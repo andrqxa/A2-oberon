@@ -69,7 +69,7 @@ To update: AosConfig.Init ~
 			
 			<Setting name="DefaultSkin" value="SkinEngine.Load stijn.skin"/>
 			
-		<!--Setting name="Hotkey support" value="AosHotKeys.Open"/-->
+		<Setting name="Hotkey support" value="AosHotKeys.Open"/>
 			
 			
 		<!--Setting name="Hardware Detection" value="AosPCITools.DetectHardware"/-->
@@ -283,7 +283,7 @@ To update: AosConfig.Init ~
 				<Section name="General">
 					<Setting name="BackupOnStore" value="TRUE"/>
 					<Setting name="ShowPathInTabs" value="FALSE"/>
-					<Setting name="ScratchPanelHeight" value="250"/>
+					<Setting name="ScratchPanelHeight" value="5"/>
 				</Section>
 				<Section name="Compilers">
 					<Setting name="PACO" options="\Ws" fileExtension="MOD" loadmodule="PC0" tree="TRUE"/>
