@@ -4,7 +4,7 @@ Paths.Search="Work;ObjE;Src;Src/vyants;Aos;../source;Doc.vy.ants"
 Paths.Work="Work"
 Defaults.Extension=".Obw"
 oberon="OberonExternal.Text"
-cmd="SEQ Win32AosDisplay.Install Fullscreen;WindowManager.Install;AosClipboard.Install;Autostart.Run;AosFSTools.Mount WORK WinRelFS ./"
+cmd="SEQ Win32AosDisplay.Install;WindowManager.Install;AosClipboard.Install;Autostart.Run;AosFSTools.Mount WORK WinRelFS ./"
 ~
 ; external, starting with Oberon
 AlternateConfig = "myAos.config"
