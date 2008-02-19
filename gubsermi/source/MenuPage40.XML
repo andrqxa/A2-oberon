@@ -61,44 +61,6 @@
 
 		<Button>
 			<Properties>
-				<Caption>Chinese</Caption>
-				<Alignment>2</Alignment>
-				<OnClickHandler>X Run</OnClickHandler>
-			</Properties>
-			
-			<SystemCommand>
-				<Properties>
-					<ID>X</ID>
-					<CommandString>WMPinyinIME.Install</CommandString>
-				</Properties>
-			</SystemCommand>
-		</Button>
-	</Panel>	
-	
-<!-- 3rd column -->	
-	<Panel>
-		<Properties>
-			<Alignment>1</Alignment>
-			<Bounds> <Width>120</Width> </Bounds>	
-		</Properties>
-
-		<Button>
-			<Properties>
-				<Caption>Cyrillic</Caption>
-				<Alignment>2</Alignment>
-				<OnClickHandler>X Run</OnClickHandler>
-			</Properties>
-			
-			<SystemCommand>
-				<Properties>
-					<ID>X</ID>
-					<CommandString>WMCyrillicIME.Install</CommandString>
-				</Properties>
-			</SystemCommand>
-		</Button>
-		
-		<Button>
-			<Properties>
 				<Caption>Unicode</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
@@ -111,10 +73,10 @@
 				</Properties>
 			</SystemCommand>
 		</Button>
+
 	</Panel>	
-
-
-<!-- 4th column -->	
+	
+<!-- 3rd column -->	
 	<Panel>
 		<Properties>
 			<Alignment>1</Alignment>
@@ -123,7 +85,7 @@
 
 		<Button>
 			<Properties>
-				<Caption>Arabic</Caption>
+				<Caption>IMEInfo</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -131,50 +93,11 @@
 			<SystemCommand>
 				<Properties>
 					<ID>X</ID>
-					<CommandString>WMArabicIME.Install</CommandString>
+					<CommandString>WMInputMethods.OpenIMEInfo</CommandString>
 				</Properties>
 			</SystemCommand>
 		</Button>
-		
-		<Button>
-			<Properties>
-				<Caption>Hebrew</Caption>
-				<Alignment>2</Alignment>
-				<OnClickHandler>X Run</OnClickHandler>
-			</Properties>
-			
-			<SystemCommand>
-				<Properties>
-					<ID>X</ID>
-					<CommandString>WMHebrewIME.Install</CommandString>
-				</Properties>
-			</SystemCommand>
-		</Button>
-	</Panel>	
 
-<!-- 5th column -->	
-	<Panel>
-		<Properties>
-			<Alignment>1</Alignment>
-			<Bounds>	
-				<Width>120</Width>
-			</Bounds>	
-		</Properties>
-
-		<Button>
-			<Properties>
-				<Caption>UnicodeMap</Caption>
-				<Alignment>2</Alignment>
-				<OnClickHandler>X Run</OnClickHandler>
-			</Properties>
-			
-			<SystemCommand>
-				<Properties>
-					<ID>X</ID>
-					<CommandString>WMCharMap.Open</CommandString>
-				</Properties>
-			</SystemCommand>
-		</Button>
 		
 		<Button>
 			<Properties>
@@ -190,14 +113,18 @@
 				</Properties>
 			</SystemCommand>
 		</Button>
-	</Panel>	
+	</Panel>
 
-
-<!--
+<!-- 4th column -->	
+	<Panel>
+		<Properties>
+			<Alignment>1</Alignment>
+			<Bounds> <Width>120</Width> </Bounds>	
+		</Properties>
 
 		<Button>
 			<Properties>
-				<Caption>3d.Clown</Caption>
+				<Caption></Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -205,14 +132,15 @@
 			<SystemCommand>
 				<Properties>
 					<ID>X</ID>
-					<CommandString>W3dExplorer.Open</CommandString>
+					<CommandString></CommandString>
 				</Properties>
 			</SystemCommand>
 		</Button>
 
+		
 		<Button>
 			<Properties>
-				<Caption>Logo</Caption>
+				<Caption></Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -220,10 +148,9 @@
 			<SystemCommand>
 				<Properties>
 					<ID>X</ID>
-					<CommandString>WMBunny.Insert aos1.gif 25 -15;WMBunny.Insert aos2.gif 25 10;WMBunny.Insert aos3.gif 25 15</CommandString>
+					<CommandString></CommandString>
 				</Properties>
 			</SystemCommand>
 		</Button>
--->	
-	
+	</Panel>		
 </Panel>
