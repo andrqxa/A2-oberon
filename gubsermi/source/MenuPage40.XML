@@ -61,7 +61,7 @@
 
 		<Button>
 			<Properties>
-				<Caption>Unicode</Caption>
+				<Caption>IMEInfo</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -69,7 +69,7 @@
 			<SystemCommand>
 				<Properties>
 					<ID>X</ID>
-					<CommandString>WMUnicodeIME.Install</CommandString>
+					<CommandString>WMInputMethods.OpenIMEInfo</CommandString>
 				</Properties>
 			</SystemCommand>
 		</Button>
@@ -85,7 +85,7 @@
 
 		<Button>
 			<Properties>
-				<Caption>IMEInfo</Caption>
+				<Caption></Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -93,7 +93,7 @@
 			<SystemCommand>
 				<Properties>
 					<ID>X</ID>
-					<CommandString>WMInputMethods.OpenIMEInfo</CommandString>
+					<CommandString></CommandString>
 				</Properties>
 			</SystemCommand>
 		</Button>
