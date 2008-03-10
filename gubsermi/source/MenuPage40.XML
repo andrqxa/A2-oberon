@@ -85,7 +85,7 @@
 
 		<Button>
 			<Properties>
-				<Caption></Caption>
+				<Caption>Bidi Marker Field</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -93,15 +93,14 @@
 			<SystemCommand>
 				<Properties>
 					<ID>X</ID>
-					<CommandString></CommandString>
+					<CommandString>UnicodeBidirectionalityMarkers.OpenBidiMarkerField</CommandString>
 				</Properties>
 			</SystemCommand>
 		</Button>
 
-		
 		<Button>
 			<Properties>
-				<Caption></Caption>
+				<Caption>UnicodeMap</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -109,7 +108,7 @@
 			<SystemCommand>
 				<Properties>
 					<ID>X</ID>
-					<CommandString></CommandString>
+					<CommandString>WMCharMap.Open</CommandString>
 				</Properties>
 			</SystemCommand>
 		</Button>
