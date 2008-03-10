@@ -1,0 +1,21 @@
+<Desktop>
+	<Window name="Logwindow" loader="LogWindow.Restore" l="3" t="20" r="643" b="440"/>
+	<Window name="WMTextStyleTool" loader="WMTextStyleTool.Restore" l="20" t="746" r="140" b="886">
+		<TextStyleToolData expanded="False"/>
+	</Window>
+	<Window name="Notepad" loader="Notepad.Restore" l="96" t="39" r="946" b="739">
+		<NotepadData file="C:/AOS/branches/gubsermi/WinAos/Work/BidiTestData.txt" codecFormat="AUTO" firstLine="0" cursorPos="602" wordWrap="false"/>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="256" t="64" r="1280" b="832">
+		<PETData>
+			<General SelectedPageNr="1" ProjectTextFile=""/>
+			<Tab file="C:/AOS/branches/gubsermi/source/WMTextView.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="250"/>
+			</Tab>
+		</PETData>
+	</Window>
+</Desktop>
