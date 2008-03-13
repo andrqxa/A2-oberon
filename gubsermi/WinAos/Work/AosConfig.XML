@@ -193,9 +193,9 @@ To update: AosConfig.Init ~
 		
 		<Section name="IME">
 			<Setting name="Arabic" value="WMArabicIME.Install"/>
-			<Setting name="Chinese" value="WMPinyinIME.Install"/>
 			<Setting name="Cyrillic" value="WMCyrillicIME.Install"/>
 			<Setting name="Hebrew" value="WMHebrewIME.Install"/>
+			<Setting name="Pinyin" value="WMPinyinIME.Install"/>
 			<Setting name="Unicode" value="WMUnicodeIME.Install"/>
 		</Section>
 		
