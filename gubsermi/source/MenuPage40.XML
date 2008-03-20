@@ -61,7 +61,7 @@
 
 		<Button>
 			<Properties>
-				<Caption>IMEInfo</Caption>
+				<Caption>Input Methods</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>

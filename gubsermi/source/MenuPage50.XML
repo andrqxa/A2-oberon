@@ -61,7 +61,7 @@
 
 		<Button>
 			<Properties>
-				<Caption></Caption>
+				<Caption>Text Positions</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -69,7 +69,7 @@
 			<SystemCommand>
 				<Properties>
 					<ID>X</ID>
-					<CommandString></CommandString>
+					<CommandString>PositionDebugging.Open</CommandString>
 				</Properties>
 			</SystemCommand>
 		</Button>
