@@ -1,0 +1,16 @@
+This is a test file for the Paragraph Level step of the algorithm.
+
+The P-steps should split the text into paragraphs correctly and assign an embedding level according to the first 'strong' character of the paragraph. This embedding level depends on the character's primary order.
+This paragraph is left-to-right.
+גשקן גשכחןשכ שגןכ this  paragraph will be right-to-left.
+the following lines are to test, if explicit embedding codes are ignored.
+‪kaödskjfaf akjd flkjadfi lakjdf lkajd f
+‫lakjdf lkja fd akdfj lakjdf lad flkj 
+‭ lkfajdlfkja dlfkja dflkjadf jlkajdflk aldfj 
+‮ a flkjad lfkjaldfjk adfkj afdlkja df
+‪ ךשחכ חש גךכלח שכגךלשח גכךלחשג 
+‫  ךלשחג כלחש גכךלחשחךגכלח שךכחג שגכ
+‭  ךלש כגךלחש גכךלחש גכךלח שךלגכ
+ ‮  שךגכח ךשלחגכ ךשלחגכך לשחךכג 
+
+jlkadfadf
