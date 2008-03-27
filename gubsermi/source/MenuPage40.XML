@@ -85,7 +85,7 @@
 
 		<Button>
 			<Properties>
-				<Caption>Bidi Marker Field</Caption>
+				<Caption>Unicode Markers</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
