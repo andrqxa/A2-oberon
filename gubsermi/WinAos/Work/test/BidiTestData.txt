@@ -1,7 +1,7 @@
  this is a test file with a test text.
 this line has the single purpose to satisfy multi-paragraph division.
 this line is going to be quite long. this is because it is for checking if the algorithm correctly checks multi-line paragraphs. a number (e.g. 12345.678) would be nice too to check some properties later on.
-seems like we need some arabic letter. so, here they are: öشسمشسيب2341بشيباث. is that enough? want some hebrew? here: שךגדכח666שדגכןקכחךל. done! 
+seems like we need some arabic letter. so, here they are: شسمشسيب2341بشيباث. is that enough? want some hebrew? here: שךגדכח666שדגכןקכחךל. done! 
 منشيبثهشب(شيسبنتaeilj)lakdf          
 this is another line with hebrew (גןקמגךןקכ3492כךקח) text in it.
 
@@ -22,4 +22,5 @@ this is another line with hebrew (גןקמגךןקכ3492כךקח) text in it.
          כ שךגכחלךשלכחג ךשלחגכךשןקחכךשלכחגךש גחכךלשגחד כךלחשגכךלחשג כךלחשגךכל שד
          כחךלש גכךלשחגכ לשחגכךשח כךלחגךכלחשגדךכלח שןכחךשגכח ךלשדכחג לשךחגכ
          שגכחךלשד גכךלחשגךכלחש ךגכלחשךגכלחשךגכחשןךםקחכךשלדחגכ ךשלדחגכךןשדחגכ שג
-         
+
+٢٣٤٠٢ ٣٤٢٣٤٨٢٣٤ ٢٣٤ ٢٣٤٢٣٤
