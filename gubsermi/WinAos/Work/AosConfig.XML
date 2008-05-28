@@ -199,6 +199,13 @@ To update: AosConfig.Init ~
 			<Setting name="Unicode" value="WMUnicodeIME.Install"/>
 		</Section>
 		
+	<!-- Contextual Dependency -->
+		
+		<Section name="Context">
+			<Setting name="Arabic" value="ArabicContext.xml"/>
+			<Setting name="Test" value="TestContext.xml"/>
+		</Section>
+		
 	<!-- Filehandlers-->
 		
 		<Section name="Filehandlers">
