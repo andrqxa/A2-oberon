@@ -1,0 +1,13 @@
+<LanguageContext language="Arabic" base="Hex">
+  <Properties>
+    <Range low="600" high="6FF"/>
+    <Size value="close"/>
+  </Properties>
+  <Character code="74">
+    <Context>
+      <last range="20"/>
+	<next range="!65"/>
+	<result code="54"/>
+    </Context>
+  </Character>
+</LanguageContext>
