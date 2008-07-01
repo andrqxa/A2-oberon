@@ -4,7 +4,7 @@
 Aos configuration 
 
 To edit: Notepad.OpenAscii AosConfig.XML
-To update: AosConfig.Init ~
+To update: Configuration.Init ~
 -->
 
 <!DOCTYPE Config [
@@ -125,7 +125,7 @@ To update: AosConfig.Init ~
 				<Setting name="HEX" value="AosTextUtilities.HEXEncoderFactory" />
 			</Section>
 			<Section name="Image">
-				<Setting name="BMP" value="AosBMPCodec.EncoderFactory" />
+				<Setting name="BMP" value="BMPCodec.EncoderFactory" />
 				<Setting name="GIF" value="AosGIFCodec.EncoderFactory" />
 			</Section>
 			<Section name="Video">
@@ -146,7 +146,7 @@ To update: AosConfig.Init ~
 			<Section name="Image">
 				<Setting name="JP2" value="JPEG2000Decoder.Factory"/>
 				<Setting name="PNG" value="AosPNGDecoder.Factory" />
-				<Setting name="BMP" value="AosBMPCodec.DecoderFactory" />
+				<Setting name="BMP" value="BMPCodec.DecoderFactory" />
 				<Setting name="GIF" value="AosGIFCodec.DecoderFactory" />
 			</Section>
 			<Section name="Video">
@@ -178,7 +178,7 @@ To update: AosConfig.Init ~
 		<Setting name="txt" value="Notepad.OpenAuto" />
 		<Setting name="xml" value="PET.Open" />
 		<Setting name="obx" value="AosDecoder.Open" />
-		<Setting name="oba" value="AosARMDecoder.Init;AosDecoder.Open" />
+		<Setting name="oba" value="ARMDecoder.Init;AosDecoder.Open" />
 		<Setting name="skin" value="SkinEditor.OpenSkin"/>
 		<Setting name="tar" value="WMArchives.Open"/>
 		<Setting name="html" value="WebBrowser.OpenFile"/>

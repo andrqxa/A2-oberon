@@ -19,7 +19,7 @@
 <PCI>
 	<deviceSpecific>
 		<vendor id="1022" name="AMD">
-			<device id="2000"	name="79C970 Ethernet Controller"	revision="all"	flags=""> AosAM79C970.Install;AosInitNet.Init </device>
+			<device id="2000"	name="79C970 Ethernet Controller"	revision="all"	flags=""> AM79C970.Install;AosInitNet.Init </device>
 		</vendor>
 		<vendor id="1073" name="Yamaha">
 			<device id="0004"	name="YMF724"		revision="all"	flags=""> AosYMF754.Install </device>
@@ -30,20 +30,20 @@
 			<device id="0012"	name="YMF754"		revision="all"	flags=""> AosYMF754.Install </device>
 		</vendor>
 		<vendor id="109E" 	name="Brooktree">
-			<device id="0350"	name="BT848"			revision="all"	flags=""> AosBT848.Install </device>
-			<device id="0351"	name="BT849"			revision="all"	flags=""> AosBT848.Install </device>
-			<device id="036E"	name="BT878"			revision="all"	flags=""> AosBT848.Install </device>
-			<device id="036F"	name="BT879"			revision="all"	flags=""> AosBT848.Install </device>
+			<device id="0350"	name="BT848"			revision="all"	flags=""> BT848.Install </device>
+			<device id="0351"	name="BT849"			revision="all"	flags=""> BT848.Install </device>
+			<device id="036E"	name="BT878"			revision="all"	flags=""> BT848.Install </device>
+			<device id="036F"	name="BT879"			revision="all"	flags=""> BT848.Install </device>
 		</vendor>	
 		<vendor id="10B7"	name="3COM">
-			<device id="6055"	name="Model90xB"	revision="all"	flags=""> Aos3Com90x.Install;AosInitNet.Init </device>
-			<device id="9000"	name="Model90x"		revision="all"	flags=""> Aos3Com90x.Install;AosInitNet.Init </device>
-			<device id="9001"	name="Model90x"		revision="all"	flags=""> Aos3Com90x.Install;AosInitNet.Init </device>
-			<device id="9004"	name="Model90xB"	revision="all"	flags=""> Aos3Com90x.Install;AosInitNet.Init </device>
-			<device id="9005"	name="Model90xB"	revision="all"	flags=""> Aos3Com90x.Install;AosInitNet.Init </device>
-			<device id="9050"	name="Model90x"		revision="all"	flags=""> Aos3Com90x.Install;AosInitNet.Init </device>
-			<device id="9056"	name="Model90xB"	revision="all"	flags=""> Aos3Com90x.Install;AosInitNet.Init </device>
-			<device id="9200"	name="Model90xC"	revision="all"	flags=""> Aos3Com90x.Install;AosInitNet.Init </device>
+			<device id="6055"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
+			<device id="9000"	name="Model90x"		revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
+			<device id="9001"	name="Model90x"		revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
+			<device id="9004"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
+			<device id="9005"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
+			<device id="9050"	name="Model90x"		revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
+			<device id="9056"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
+			<device id="9200"	name="Model90xC"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
 		</vendor>
 		<vendor id="10EC"	name="RealTek">
 			<device id="8129"	name="RTL8129"		revision="all"	flags=""> AosRTL8139Install;AosInitNet.Init </device>
@@ -90,7 +90,7 @@
 			<subclass nbr="00" name="SCSI Bus Controller">
 			</subclass>
 			<subclass nbr="01" name="IDE Controller">
-				<protocol nbr="all" name="IDE Controller" revision="all" flags="">AosATADisks.Install</protocol>
+				<protocol nbr="all" name="IDE Controller" revision="all" flags="">ATADisks.Install</protocol>
 			</subclass>
 			<subclass nbr="02" name="Floppy Disk Controller">
 				<protocol nbr="all" name="Floppy Disk Controller" revision="all" flags="">AosDiskettes.Install</protocol>
@@ -98,10 +98,10 @@
 			<subclass nbr="03" name="IPI Bus Controller">
 			</subclass>
 			<subclass nbr="04" name="RAID Controller">
-				<protocol nbr="all" name="RAID Controller" revision="all" flags="">AosATADisks.Install</protocol>
+				<protocol nbr="all" name="RAID Controller" revision="all" flags="">ATADisks.Install</protocol>
 			</subclass>
 			<subclass nbr="06" name="SATA Controller">
-				<protocol nbr="all" name="SATA Controller" revision="all" flags="">AosATADisks.Install</protocol>
+				<protocol nbr="all" name="SATA Controller" revision="all" flags="">ATADisks.Install</protocol>
 			</subclass>
 			<subclass nbr="80" name="Other Mass Storage Controller">
 			</subclass>

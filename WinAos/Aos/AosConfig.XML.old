@@ -4,7 +4,7 @@
 Aos configuration 
 
 To edit: EditTools.OpenAscii AosConfig.XML
-To update: AosConfig.Init
+To update: Configuration.Init
 -->
 
 <!DOCTYPE Config [
