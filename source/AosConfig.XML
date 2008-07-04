@@ -39,12 +39,12 @@ To update: Configuration.Init ~
 		
 	<!-- File systems -->
 		
-		<Section name="AosFS">
+		<Section name="Files">
 			<Section name="Alias">
-				<Setting name="AosFS" value="AosDiskVolumes.New;AosDiskFS.NewFS"/>
-				<Setting name="NatFS" value="AosDiskVolumes.New;AosDiskFS.NewFS"/>
-				<Setting name="RamFS" value="AosRAMVolumes.New;AosDiskFS.NewFS"/>
-				<Setting name="FatFS" value="AosFATVolumes.New;AosFATFiles.NewFS"/>
+				<Setting name="Files" value="DiskVolumes.New;DiskFS.NewFS"/>
+				<Setting name="NatFS" value="DiskVolumes.New;DiskFS.NewFS"/>
+				<Setting name="RamFS" value="AosRAMVolumes.New;DiskFS.NewFS"/>
+				<Setting name="FatFS" value="FATVolumes.New;FATFiles.NewFS"/>
 				<Setting name="IsoFS" value="AosISO9660Volumes.New;AosISO9660Files.NewFS"/>
 				<Setting name="ZipFS" value="NIL;AosZipFS.NewFS"/>
 				<Setting name="WinRelFS" value="NIL;Win32RelFS.NewFS"/>
@@ -125,11 +125,11 @@ To update: Configuration.Init ~
 			</Section>
 		</Section>
 		
-	<!-- Font formats for AosGfxFonts.Open -->
+	<!-- Font formats for GfxFonts.Open -->
 		
 		<Section name="FontFormats">
-			<Setting name="TTF" value="AosGfxOType.Install"/>
-			<Setting name="pk" value="AosGfxPKFonts.Install"/>
+			<Setting name="TTF" value="GfxOType.Install"/>
+			<Setting name="pk" value="GfxPKFonts.Install"/>
 		</Section>
 		
 	<!-- TLS Settings -->
@@ -202,9 +202,9 @@ To update: Configuration.Init ~
 					<Setting name="SVG" value="SVGDecoder.Factory"/>
 				</Section>
 				<Section name="Video">
-					<Setting name="DivX" value="AosDivXDecoder.Factory"/>
-					<Setting name="DIVX" value="AosDivXDecoder.Factory"/>
-					<Setting name="divx" value="AosDivXDecoder.Factory"/>
+					<Setting name="DivX" value="DivXDecoder.Factory"/>
+					<Setting name="DIVX" value="DivXDecoder.Factory"/>
+					<Setting name="divx" value="DivXDecoder.Factory"/>
 					<Setting name="MPG" value="MPEGVideoDecoder.DecoderFactory"/>
 				</Section>
 				<Section name="Audio">
@@ -232,10 +232,10 @@ To update: Configuration.Init ~
 			<Setting name="log" value="PET.Open"/>
 			<Setting name="mod" value="PET.Open"/>
 			<Setting name="mp3" value="WMPlayer.Open"/>
-			<Setting name="abx" value="AosDecoder.Open"/>
-			<Setting name="oba" value="AosDecoder.Open"/>
-			<Setting name="obx" value="AosDecoder.Open"/>
-			<Setting name="obw" value="AosDecoder.Open"/>
+			<Setting name="abx" value="Decoder.Open"/>
+			<Setting name="oba" value="Decoder.Open"/>
+			<Setting name="obx" value="Decoder.Open"/>
+			<Setting name="obw" value="Decoder.Open"/>
 			<Setting name="ogg" value="OGGVorbisPlayer.Play"/>
 			<Setting name="pet" value="PET.OpenState"/>
 			<Setting name="pict" value="WMPicView.Open"/>

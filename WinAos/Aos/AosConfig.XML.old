@@ -37,12 +37,12 @@ To update: Configuration.Init
 	</Section>
 
 	<!-- File systems -->	
-	<Section name="AosFS">
+	<Section name="Files">
 		<Section name="Alias">
-			<Setting name="AosFS" value="AosDiskVolumes.New;AosDiskFS.NewFS"/>
-			<Setting name="NatFS" value="AosDiskVolumes.New;AosDiskFS.NewFS"/>
-			<Setting name="RamFS" value="AosRAMVolumes.New;AosDiskFS.NewFS"/>
-			<Setting name="FatFS" value="AosFATVolumes.New;AosFATFiles.NewFS"/>
+			<Setting name="Files" value="DiskVolumes.New;DiskFS.NewFS"/>
+			<Setting name="NatFS" value="DiskVolumes.New;DiskFS.NewFS"/>
+			<Setting name="RamFS" value="AosRAMVolumes.New;DiskFS.NewFS"/>
+			<Setting name="FatFS" value="FATVolumes.New;FATFiles.NewFS"/>
 			<Setting name="IsoFS" value="AosISO9660Volumes.New;AosISO9660Files.NewFS"/>
 		</Section>
 	</Section>
@@ -52,7 +52,7 @@ To update: Configuration.Init
 		<Setting value="WebFTPServer.Start"/>
 		<Setting value="WMVNCView.Install Aos db33070ae4 5901 0 0 1280 1024"/>
 		<Setting value="WMVNCView.Install guti oberon 5999 0 0 1280 1024"/>
-		<Setting value="AosFSTools.Mount RAM RamFS 32768 4096"/>
+		<Setting value="FSTools.Mount RAM RamFS 32768 4096"/>
 		<Setting value="AosQuoteServer.Open"/>
 	</Section>
 
@@ -88,16 +88,16 @@ To update: Configuration.Init
 		</Section>
 	</Section>
 	
-	<!-- Font formats for AosGfxFonts.Open -->
+	<!-- Font formats for GfxFonts.Open -->
 	<Section name="FontFormats">
-		<Setting name="TTF" value="AosGfxOType.Install"/>
-		<Setting name="pk" value="AosGfxPKFonts.Install"/>
+		<Setting name="TTF" value="GfxOType.Install"/>
+		<Setting name="pk" value="GfxPKFonts.Install"/>
 	</Section>
 	
 	<!-- FileManager -->
 	<Section name="FileManager">
 		<Section name="Plugins">
-			<Setting name="Default" value="FMAosFSPlugin.Start"/>
+			<Setting name="Default" value="FMFilesPlugin.Start"/>
 			<Setting name="Test" value="FMTestPlugin.Start"/>
 		</Section>
 		<Section name="Filehandlers">

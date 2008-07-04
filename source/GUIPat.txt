@@ -174,7 +174,7 @@ can help to decide wich one to favour:
 
 AosUsbStorage.Install ~	Use these to transfer the file to and fro an external USB drive
 
-AosFSTools.Mount USB AosFS USB0#1 ~		AosFSTools.Unmount USB ~
+FSTools.Mount USB Files USB0#1 ~		FSTools.Unmount USB ~
 
 AosTar.Create GUIPat.tar GUIPat.txt GUIPat1.Mod GUIPat2.Mod GUIPat3.Mod GUIPat4.Mod GUIPat5.Mod
 GUIPat6.Mod GUIPat7.Mod GUIPat8.Mod GUIPat9.Mod GUIPat10.Mod
@@ -212,7 +212,7 @@ FileList					WMSystemComponents.Mod
 GenericGrid				WMGrids.Mod					GUIPat3.Mod
 TextView				WMTextView.Mod
 
-TreeView				WMTrees.Mod					AosDecoder ModuleTrees SkinEditor WMArchives
+TreeView				WMTrees.Mod					Decoder ModuleTrees SkinEditor WMArchives
 														WMSystemComponents WMUsbInfo WMXMLTree
 DirectoryTree			WMSystemComponents.Mod
 
@@ -279,12 +279,12 @@ ExampleTextWriter.Mod
 
 PDFExample.Mod
 
-AosExample6.Mod
+Example6.Mod
 
-AosExample7.Mod
+Example7.Mod
 
-AosExample8.Mod
-AosExampleOberon.Mod
+Example8.Mod
+ExampleOberon.Mod
 
 WMScribble.Mod
 WMPicView.Mod
