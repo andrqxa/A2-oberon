@@ -43,7 +43,7 @@ To update: Configuration.Init
 			<Setting name="NatFS" value="DiskVolumes.New;DiskFS.NewFS"/>
 			<Setting name="RamFS" value="AosRAMVolumes.New;DiskFS.NewFS"/>
 			<Setting name="FatFS" value="FATVolumes.New;FATFiles.NewFS"/>
-			<Setting name="IsoFS" value="AosISO9660Volumes.New;AosISO9660Files.NewFS"/>
+			<Setting name="IsoFS" value="ISO9660Volumes.New;ISO9660Files.NewFS"/>
 		</Section>
 	</Section>
 	

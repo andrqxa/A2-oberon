@@ -45,7 +45,7 @@ To update: Configuration.Init ~
 				<Setting name="NatFS" value="DiskVolumes.New;DiskFS.NewFS"/>
 				<Setting name="RamFS" value="AosRAMVolumes.New;DiskFS.NewFS"/>
 				<Setting name="FatFS" value="FATVolumes.New;FATFiles.NewFS"/>
-				<Setting name="IsoFS" value="AosISO9660Volumes.New;AosISO9660Files.NewFS"/>
+				<Setting name="IsoFS" value="ISO9660Volumes.New;ISO9660Files.NewFS"/>
 				<Setting name="ZipFS" value="NIL;AosZipFS.NewFS"/>
 				<Setting name="WinRelFS" value="NIL;Win32RelFS.NewFS"/>
 			</Section>
@@ -69,10 +69,10 @@ To update: Configuration.Init ~
 			
 			<Setting name="DefaultSkin" value="SkinEngine.Load stijn.skin"/>
 			
-		<!--Setting name="Hotkey support" value="AosHotKeys.Open"/-->
+		<!--Setting name="Hotkey support" value="HotKeys.Open"/-->
 			
 			
-		<!--Setting name="Hardware Detection" value="AosPCITools.DetectHardware"/-->
+		<!--Setting name="Hardware Detection" value="PCITools.DetectHardware"/-->
 			
 			<Setting name="TrapWriter" value="WMTrapWriter.Install"/>
 		</Section>
@@ -174,7 +174,7 @@ To update: Configuration.Init ~
 				</Section>
 				<Section name="Image">
 					<Setting name="BMP" value="BMPCodec.EncoderFactory"/>
-					<Setting name="GIF" value="AosGIFCodec.EncoderFactory"/>
+					<Setting name="GIF" value="GIFCodec.EncoderFactory"/>
 				</Section>
 				<Section name="Video"/>
 				<Section name="Audio">
@@ -196,9 +196,9 @@ To update: Configuration.Init ~
 					<Setting name="JP2" value="JPEG2000Decoder.Factory"/>
 					<Setting name="PNG" value="AosPNGDecoder.Factory"/>
 					<Setting name="BMP" value="BMPCodec.DecoderFactory"/>
-					<Setting name="GIF" value="AosGIFCodec.DecoderFactory"/>
-					<Setting name="JPEG" value="AosJPEGDecoder.Factory"/>
-					<Setting name="JPG" value="AosJPEGDecoder.Factory"/>
+					<Setting name="GIF" value="GIFCodec.DecoderFactory"/>
+					<Setting name="JPEG" value="JPEGDecoder.Factory"/>
+					<Setting name="JPG" value="JPEGDecoder.Factory"/>
 					<Setting name="SVG" value="SVGDecoder.Factory"/>
 				</Section>
 				<Section name="Video">
@@ -208,7 +208,7 @@ To update: Configuration.Init ~
 					<Setting name="MPG" value="MPEGVideoDecoder.DecoderFactory"/>
 				</Section>
 				<Section name="Audio">
-					<Setting name="MP3" value="AosMP3Decoder.Factory"/>
+					<Setting name="MP3" value="MP3Decoder.Factory"/>
 					<Setting name="WAV" value="AosWAVCodec.DecoderFactory"/>
 				</Section>
 			</Section>

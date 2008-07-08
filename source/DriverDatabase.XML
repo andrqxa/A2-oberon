@@ -19,7 +19,7 @@
 <PCI>
 	<deviceSpecific>
 		<vendor id="1022" name="AMD">
-			<device id="2000"	name="79C970 Ethernet Controller"	revision="all"	flags=""> AM79C970.Install;AosInitNet.Init </device>
+			<device id="2000"	name="79C970 Ethernet Controller"	revision="all"	flags=""> AM79C970.Install;InitNetwork.Init </device>
 		</vendor>
 		<vendor id="1073" name="Yamaha">
 			<device id="0004"	name="YMF724"		revision="all"	flags=""> AosYMF754.Install </device>
@@ -36,20 +36,20 @@
 			<device id="036F"	name="BT879"			revision="all"	flags=""> BT848.Install </device>
 		</vendor>	
 		<vendor id="10B7"	name="3COM">
-			<device id="6055"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
-			<device id="9000"	name="Model90x"		revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
-			<device id="9001"	name="Model90x"		revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
-			<device id="9004"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
-			<device id="9005"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
-			<device id="9050"	name="Model90x"		revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
-			<device id="9056"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
-			<device id="9200"	name="Model90xC"	revision="all"	flags=""> Ethernet3Com90x.Install;AosInitNet.Init </device>
+			<device id="6055"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;InitNetwork.Init </device>
+			<device id="9000"	name="Model90x"		revision="all"	flags=""> Ethernet3Com90x.Install;InitNetwork.Init </device>
+			<device id="9001"	name="Model90x"		revision="all"	flags=""> Ethernet3Com90x.Install;InitNetwork.Init </device>
+			<device id="9004"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;InitNetwork.Init </device>
+			<device id="9005"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;InitNetwork.Init </device>
+			<device id="9050"	name="Model90x"		revision="all"	flags=""> Ethernet3Com90x.Install;InitNetwork.Init </device>
+			<device id="9056"	name="Model90xB"	revision="all"	flags=""> Ethernet3Com90x.Install;InitNetwork.Init </device>
+			<device id="9200"	name="Model90xC"	revision="all"	flags=""> Ethernet3Com90x.Install;InitNetwork.Init </device>
 		</vendor>
 		<vendor id="10EC"	name="RealTek">
-			<device id="8129"	name="RTL8129"		revision="all"	flags=""> AosRTL8139Install;AosInitNet.Init </device>
-			<device id="8138"	name="RTL8139CB"	revision="all"	flags=""> AosRTL8139.Install;AosInitNet.Init </device>
-			<device id="8139"	name="RTL8139"		revision="all"	flags=""> AosRTL8139.Install;AosInitNet.Init </device>
-			<device id="8169"	name="RTL8169"		revision="all"	flags=""> AosRTL8169.Install;AosInitNet.Init </device>				
+			<device id="8129"	name="RTL8129"		revision="all"	flags=""> AosRTL8139Install;InitNetwork.Init </device>
+			<device id="8138"	name="RTL8139CB"	revision="all"	flags=""> AosRTL8139.Install;InitNetwork.Init </device>
+			<device id="8139"	name="RTL8139"		revision="all"	flags=""> AosRTL8139.Install;InitNetwork.Init </device>
+			<device id="8169"	name="RTL8169"		revision="all"	flags=""> AosRTL8169.Install;InitNetwork.Init </device>				
 		</vendor>
 		<vendor id="1274"	name="Ensoniq">
 			<device id="1371" 	name="ES1371"			revision="all"	flags=""> EnsoniqSound.Install </device>
@@ -60,28 +60,28 @@
 			<device id ="0018" name="Linksys USB200M Rev. 2" revision="all" flags=""> AosUsbNetworkUSB200M.Mod </device>
 		</vendor>
 		<vendor id="8086"	name="Intel">
-			<device id="1029"	name="82559 Ethernet Controller"	revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1031"	name="ICH3"			revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1032"	name="Unknown"		revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1033"	name="Unknown"		revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1034"	name="Unknown"		revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1035"	name="Unknown"		revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1036"	name="Unknown"		revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1037"	name="Unknown"		revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1038"	name="Unknown"		revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="103D"name="Unknown"		revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init</device>
-			<device id="1064" name="82562ET/EZ/GT/GZ - Pro/100 VE" revision="all" flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1209"	name="82559ER Ethernet Controller"		revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
-			<device id="1229"	name="Ethernet Pro 100"					revision="all"	flags=""> AosIntel8255x.Install;AosInitNet.Init </device>
+			<device id="1029"	name="82559 Ethernet Controller"	revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1031"	name="ICH3"			revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1032"	name="Unknown"		revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1033"	name="Unknown"		revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1034"	name="Unknown"		revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1035"	name="Unknown"		revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1036"	name="Unknown"		revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1037"	name="Unknown"		revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1038"	name="Unknown"		revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="103D"name="Unknown"		revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init</device>
+			<device id="1064" name="82562ET/EZ/GT/GZ - Pro/100 VE" revision="all" flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1209"	name="82559ER Ethernet Controller"		revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
+			<device id="1229"	name="Ethernet Pro 100"					revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
 
-			<device id="2415"	name="i810 Sound"	revision="all"	flags=""> Aosi810Sound.Install </device>
-			<device id="2425"	name="i810 Sound"	revision="all"	flags=""> Aosi810Sound.Install </device>
-			<device id="2445"	name="i810 Sound"	revision="all"	flags=""> Aosi810Sound.Install </device>
-			<device id="2485"	name="i810 Sound"	revision="all"	flags=""> Aosi810Sound.Install </device>
-			<device id="24C5"	name="i810 Sound"	revision="all"	flags=""> Aosi810Sound.Install </device>
-			<device id="24D5"	name="i810 Sound"	revision="all"	flags=""> Aosi810Sound.Install </device>
-			<device id="7195"	name="i810 Sound"	revision="all"	flags=""> Aosi810Sound.Install </device>
-			<device id="266E" name="i810 Sound"	revision="all"	flags=""> Aosi810Sound.Install </device>			
+			<device id="2415"	name="i810 Sound"	revision="all"	flags=""> i810Sound.Install </device>
+			<device id="2425"	name="i810 Sound"	revision="all"	flags=""> i810Sound.Install </device>
+			<device id="2445"	name="i810 Sound"	revision="all"	flags=""> i810Sound.Install </device>
+			<device id="2485"	name="i810 Sound"	revision="all"	flags=""> i810Sound.Install </device>
+			<device id="24C5"	name="i810 Sound"	revision="all"	flags=""> i810Sound.Install </device>
+			<device id="24D5"	name="i810 Sound"	revision="all"	flags=""> i810Sound.Install </device>
+			<device id="7195"	name="i810 Sound"	revision="all"	flags=""> i810Sound.Install </device>
+			<device id="266E" name="i810 Sound"	revision="all"	flags=""> i810Sound.Install </device>			
 		</vendor>
 	</deviceSpecific>
 	

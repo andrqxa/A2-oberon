@@ -43,7 +43,7 @@ To update: Configuration.Init ~
 			<Setting name="NatFS" value="DiskVolumes.New;DiskFS.NewFS"/>
 			<Setting name="RamFS" value="AosRAMVolumes.New;DiskFS.NewFS"/>
 			<Setting name="FatFS" value="FATVolumes.New;FATFiles.NewFS"/>
-			<Setting name="IsoFS" value="AosISO9660Volumes.New;AosISO9660Files.NewFS"/>
+			<Setting name="IsoFS" value="ISO9660Volumes.New;ISO9660Files.NewFS"/>
 			<Setting name="ZipFS" value="NIL;AosZipFS.NewFS"/>
 		</Section>
 	</Section>
@@ -126,7 +126,7 @@ To update: Configuration.Init ~
 			</Section>
 			<Section name="Image">
 				<Setting name="BMP" value="BMPCodec.EncoderFactory" />
-				<Setting name="GIF" value="AosGIFCodec.EncoderFactory" />
+				<Setting name="GIF" value="GIFCodec.EncoderFactory" />
 			</Section>
 			<Section name="Video">
 			</Section>
@@ -147,7 +147,7 @@ To update: Configuration.Init ~
 				<Setting name="JP2" value="JPEG2000Decoder.Factory"/>
 				<Setting name="PNG" value="AosPNGDecoder.Factory" />
 				<Setting name="BMP" value="BMPCodec.DecoderFactory" />
-				<Setting name="GIF" value="AosGIFCodec.DecoderFactory" />
+				<Setting name="GIF" value="GIFCodec.DecoderFactory" />
 			</Section>
 			<Section name="Video">
 				<Setting name="DivX" value="DivXDecoder.Factory" />
@@ -155,7 +155,7 @@ To update: Configuration.Init ~
 				<Setting name="divx" value="DivXDecoder.Factory" />
 			</Section>
 			<Section name="Audio">
-				<Setting name="MP3" value="AosMP3Decoder.Factory" />
+				<Setting name="MP3" value="MP3Decoder.Factory" />
 			</Section>
 		</Section>
 	</Section>
