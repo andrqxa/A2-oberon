@@ -46,10 +46,10 @@
 			<device id="9200"	name="Model90xC"	revision="all"	flags=""> Ethernet3Com90x.Install;InitNetwork.Init </device>
 		</vendor>
 		<vendor id="10EC"	name="RealTek">
-			<device id="8129"	name="RTL8129"		revision="all"	flags=""> AosRTL8139Install;InitNetwork.Init </device>
-			<device id="8138"	name="RTL8139CB"	revision="all"	flags=""> AosRTL8139.Install;InitNetwork.Init </device>
-			<device id="8139"	name="RTL8139"		revision="all"	flags=""> AosRTL8139.Install;InitNetwork.Init </device>
-			<device id="8169"	name="RTL8169"		revision="all"	flags=""> AosRTL8169.Install;InitNetwork.Init </device>				
+			<device id="8129"	name="RTL8129"		revision="all"	flags=""> RTL8139Install;InitNetwork.Init </device>
+			<device id="8138"	name="RTL8139CB"	revision="all"	flags=""> RTL8139.Install;InitNetwork.Init </device>
+			<device id="8139"	name="RTL8139"		revision="all"	flags=""> RTL8139.Install;InitNetwork.Init </device>
+			<device id="8169"	name="RTL8169"		revision="all"	flags=""> RTL8169.Install;InitNetwork.Init </device>				
 		</vendor>
 		<vendor id="1274"	name="Ensoniq">
 			<device id="1371" 	name="ES1371"			revision="all"	flags=""> EnsoniqSound.Install </device>

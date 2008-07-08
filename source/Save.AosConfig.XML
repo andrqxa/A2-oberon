@@ -41,7 +41,7 @@ To update: Configuration.Init ~
 		<Section name="Alias">
 			<Setting name="Files" value="DiskVolumes.New;DiskFS.NewFS"/>
 			<Setting name="NatFS" value="DiskVolumes.New;DiskFS.NewFS"/>
-			<Setting name="RamFS" value="AosRAMVolumes.New;DiskFS.NewFS"/>
+			<Setting name="RamFS" value="RAMVolumes.New;DiskFS.NewFS"/>
 			<Setting name="FatFS" value="FATVolumes.New;FATFiles.NewFS"/>
 			<Setting name="IsoFS" value="ISO9660Volumes.New;ISO9660Files.NewFS"/>
 			<Setting name="ZipFS" value="NIL;AosZipFS.NewFS"/>
@@ -56,7 +56,7 @@ To update: Configuration.Init ~
 			<Setting value="WMPinyinIME.Test"/>
 		-->	
 		<!-- Quote Server (remove comment to activate)
-			<Setting value="AosQuoteServer.Open"/>
+			<Setting value="QuoteServer.Open"/>
 		-->
 	</Section>
 
@@ -100,8 +100,8 @@ To update: Configuration.Init ~
 	</Section>	
 
 	<Section name="Archives">
-		<Setting name="tar" value="AosTar" />
-		<Setting name="skin" value="AosTar" />
+		<Setting name="tar" value="Tar" />
+		<Setting name="skin" value="Tar" />
 	</Section>
 	
 	<!-- Codecs -->
@@ -118,11 +118,11 @@ To update: Configuration.Init ~
 		<!-- Encoders -->
 		<Section name="Encoder">
 			<Section name="Text">
-				<Setting name="Oberon" value="AosTextUtilities.OberonEncoderFactory" />
-				<Setting name="BBT" value="AosTextUtilities.BluebottleEncoderFactory" />
-				<Setting name="UTF-8" value="AosTextUtilities.UTF8EncoderFactory" />
-				<Setting name="ISO8859-1" value="AosTextUtilities.ISO88591EncoderFactory" />
-				<Setting name="HEX" value="AosTextUtilities.HEXEncoderFactory" />
+				<Setting name="Oberon" value="TextUtilities.OberonEncoderFactory" />
+				<Setting name="BBT" value="TextUtilities.BluebottleEncoderFactory" />
+				<Setting name="UTF-8" value="TextUtilities.UTF8EncoderFactory" />
+				<Setting name="ISO8859-1" value="TextUtilities.ISO88591EncoderFactory" />
+				<Setting name="HEX" value="TextUtilities.HEXEncoderFactory" />
 			</Section>
 			<Section name="Image">
 				<Setting name="BMP" value="BMPCodec.EncoderFactory" />
@@ -137,15 +137,15 @@ To update: Configuration.Init ~
 		<!-- Decoders -->
 		<Section name="Decoder">
 			<Section name="Text">
-				<Setting name="Oberon" value="AosTextUtilities.OberonDecoderFactory" />
-				<Setting name="BBT" value="AosTextUtilities.BluebottleDecoderFactory" />
-				<Setting name="UTF-8" value="AosTextUtilities.UTF8DecoderFactory" />
-				<Setting name="ISO8859-1" value="AosTextUtilities.ISO88591DecoderFactory" />
-				<Setting name="HEX" value="AosTextUtilities.HEXDecoderFactory" />
+				<Setting name="Oberon" value="TextUtilities.OberonDecoderFactory" />
+				<Setting name="BBT" value="TextUtilities.BluebottleDecoderFactory" />
+				<Setting name="UTF-8" value="TextUtilities.UTF8DecoderFactory" />
+				<Setting name="ISO8859-1" value="TextUtilities.ISO88591DecoderFactory" />
+				<Setting name="HEX" value="TextUtilities.HEXDecoderFactory" />
 			</Section>		
 			<Section name="Image">
 				<Setting name="JP2" value="JPEG2000Decoder.Factory"/>
-				<Setting name="PNG" value="AosPNGDecoder.Factory" />
+				<Setting name="PNG" value="PNGDecoder.Factory" />
 				<Setting name="BMP" value="BMPCodec.DecoderFactory" />
 				<Setting name="GIF" value="GIFCodec.DecoderFactory" />
 			</Section>

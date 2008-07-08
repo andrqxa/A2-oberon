@@ -41,7 +41,7 @@ To update: Configuration.Init
 		<Section name="Alias">
 			<Setting name="Files" value="DiskVolumes.New;DiskFS.NewFS"/>
 			<Setting name="NatFS" value="DiskVolumes.New;DiskFS.NewFS"/>
-			<Setting name="RamFS" value="AosRAMVolumes.New;DiskFS.NewFS"/>
+			<Setting name="RamFS" value="RAMVolumes.New;DiskFS.NewFS"/>
 			<Setting name="FatFS" value="FATVolumes.New;FATFiles.NewFS"/>
 			<Setting name="IsoFS" value="ISO9660Volumes.New;ISO9660Files.NewFS"/>
 		</Section>
@@ -53,7 +53,7 @@ To update: Configuration.Init
 		<Setting value="WMVNCView.Install Aos db33070ae4 5901 0 0 1280 1024"/>
 		<Setting value="WMVNCView.Install guti oberon 5999 0 0 1280 1024"/>
 		<Setting value="FSTools.Mount RAM RamFS 32768 4096"/>
-		<Setting value="AosQuoteServer.Open"/>
+		<Setting value="QuoteServer.Open"/>
 	</Section>
 
 	<!-- Window Manager -->
@@ -77,13 +77,13 @@ To update: Configuration.Init
 	<!-- Image formats for Raster.Load and Raster.Store -->
 	<Section name="ImageFormats">
 		<Section name="Load">
-			<Setting name="Pict" value="AosPictImages.AosLoad"/>
+			<Setting name="Pict" value="PictImages.AosLoad"/>
 			<Setting name="bmp" value="AosBMPImages.AosLoad"/>
 			<Setting name="gif" value="AosGIFImages.AosLoad"/>
 			<Setting name="png" value="AosPNGImages.AosLoad"/>
 		</Section>
 		<Section name="Store">
-			<Setting name="Pict" value="AosPictImages.AosStore"/>
+			<Setting name="Pict" value="PictImages.AosStore"/>
 			<Setting name="bmp" value="AosBMPImages.AosStore"/>
 		</Section>
 	</Section>
