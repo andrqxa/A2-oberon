@@ -172,7 +172,7 @@ can help to decide wich one to favour:
 
 ]]></Span><Span style="AdHoc Oberon 14 1 0 000000FF 00000000"><![CDATA[Installation procedure using an archive file GUIPat.tar]]></Span><Span style="Normal"><![CDATA[
 
-AosUsbStorage.Install ~	Use these to transfer the file to and fro an external USB drive
+UsbStorage.Install ~	Use these to transfer the file to and fro an external USB drive
 
 FSTools.Mount USB Files USB0#1 ~		FSTools.Unmount USB ~
 

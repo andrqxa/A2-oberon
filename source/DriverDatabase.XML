@@ -22,12 +22,12 @@
 			<device id="2000"	name="79C970 Ethernet Controller"	revision="all"	flags=""> AM79C970.Install;InitNetwork.Init </device>
 		</vendor>
 		<vendor id="1073" name="Yamaha">
-			<device id="0004"	name="YMF724"		revision="all"	flags=""> AosYMF754.Install </device>
-			<device id="000A"	name="YMF740"		revision="all"	flags=""> AosYMF754.Install </device>
-			<device id="000C"	name="YMF740C"		revision="all"	flags=""> AosYMF754.Install </device>
-			<device id="000D"	name="YMF724F"		revision="all"	flags=""> AosYMF754.Install </device>
-			<device id="0010"	name="YMF744"		revision="all"	flags=""> AosYMF754.Install </device>
-			<device id="0012"	name="YMF754"		revision="all"	flags=""> AosYMF754.Install </device>
+			<device id="0004"	name="YMF724"		revision="all"	flags=""> YMF754.Install </device>
+			<device id="000A"	name="YMF740"		revision="all"	flags=""> YMF754.Install </device>
+			<device id="000C"	name="YMF740C"		revision="all"	flags=""> YMF754.Install </device>
+			<device id="000D"	name="YMF724F"		revision="all"	flags=""> YMF754.Install </device>
+			<device id="0010"	name="YMF744"		revision="all"	flags=""> YMF754.Install </device>
+			<device id="0012"	name="YMF754"		revision="all"	flags=""> YMF754.Install </device>
 		</vendor>
 		<vendor id="109E" 	name="Brooktree">
 			<device id="0350"	name="BT848"			revision="all"	flags=""> BT848.Install </device>
@@ -57,7 +57,7 @@
 			<device id="5880" 	name="5880 AudioPCI"	revision="all"	flags=""> EnsoniqSound.Install </device>				
 		</vendor> 
 		<vendor id="13B1" name ="Cisco-Linksys">
-			<device id ="0018" name="Linksys USB200M Rev. 2" revision="all" flags=""> AosUsbNetworkUSB200M.Mod </device>
+			<device id ="0018" name="Linksys USB200M Rev. 2" revision="all" flags=""> UsbNetworkUSB200M.Mod </device>
 		</vendor>
 		<vendor id="8086"	name="Intel">
 			<device id="1029"	name="82559 Ethernet Controller"	revision="all"	flags=""> Intel8255x.Install;InitNetwork.Init </device>
@@ -108,9 +108,9 @@
 		</class>
 		<class nbr="0C" name="Serial Bus Controller">
 			<subclass nbr="03" name="Universal Serial Bus">
-				<protocol nbr="00" name="UHCI Programming Interface" revision="all" flags="">AosUsbHubDriver.Install;AosUsbUhci.Install</protocol>
-				<protocol nbr="10" name="OHCI Programming Interface" revision="all" flags="">AosUsbHubDriver.Install;AosUsbOhci.Install</protocol>
-				<protocol nbr="20" name="EHCI Programming Interface" revision="all" flags="">AosUsbHubDriver.Install;AosUsbEhci.Install</protocol>
+				<protocol nbr="00" name="UHCI Programming Interface" revision="all" flags="">UsbHubDriver.Install;UsbUhci.Install</protocol>
+				<protocol nbr="10" name="OHCI Programming Interface" revision="all" flags="">UsbHubDriver.Install;UsbOhci.Install</protocol>
+				<protocol nbr="20" name="EHCI Programming Interface" revision="all" flags="">UsbHubDriver.Install;UsbEhci.Install</protocol>
 			</subclass>
 		</class>
 	</classSpecific>
@@ -124,15 +124,15 @@
 <USB>
 	<deviceSpecific>
 		<vendor id="091E" name="Garmin">
-			<device id="03" name="GPS18" revision="all" flags="N">AosUsbGarminGPS18.Install</device>
+			<device id="03" name="GPS18" revision="all" flags="N">UsbGarminGPS18.Install</device>
 		</vendor>
 		<vendor id="0711" name="Magic Control Technology">
-			<device id="200" name="D-Link DU-H3SP USB Bay" revision="all" flags="N"> AosUsbRS232.Install </device>
-			<device id="210" name="MCT U232-P25" revision="all" flags="N"> AosUsbRS232.Install </device>
-			<device id="230" name="MCT U232-P9" revision="all" flags="N"> AosUsbRS232.Install </device>
+			<device id="200" name="D-Link DU-H3SP USB Bay" revision="all" flags="N"> UsbRS232.Install </device>
+			<device id="210" name="MCT U232-P25" revision="all" flags="N"> UsbRS232.Install </device>
+			<device id="230" name="MCT U232-P9" revision="all" flags="N"> UsbRS232.Install </device>
 		</vendor>
 		<vendor id="050D" name="Belkin">
-			<device id="109" name="Belkin F5U109" revision="all" flags="N"> AosUsbRS232.Install </device>
+			<device id="109" name="Belkin F5U109" revision="all" flags="N"> UsbRS232.Install </device>
 		</vendor>
 	</deviceSpecific>
 	
@@ -145,9 +145,9 @@
 			<subclass nbr="0" name="No Subclass">
 			</subclass>
 			<subclass nbr="1" name="Boot Interface Subclass">
-				<protocol nbr="0" name="None" revision="all">AosUsbHidDriver.Install</protocol>
-				<protocol nbr="1" name="Keyboard" revision="all" flags="N">AosUsbHidDriver.Install</protocol>
-				<protocol nbr="2" name="Mouse" revision="all" flags="N">AosUsbHidDriver.Install</protocol>
+				<protocol nbr="0" name="None" revision="all">UsbHidDriver.Install</protocol>
+				<protocol nbr="1" name="Keyboard" revision="all" flags="N">UsbHidDriver.Install</protocol>
+				<protocol nbr="2" name="Mouse" revision="all" flags="N">UsbHidDriver.Install</protocol>
 			</subclass>
 		</class>	
 		<class nbr="5"	name="Physical">
@@ -156,45 +156,45 @@
 		</class>	
 		<class nbr="7"	name="Printer">
 			<subclass nbr="1" name="Printers">
-				<protocol nbr="1" name="Unidirectional Interface" revision="all" flags="N">AosUsbPrinter.Install</protocol>
-				<protocol nbr="2" name="Bidirectional Interface" revision="all" flags="N">AosUsbPrinter.Install</protocol>
-				<protocol nbr="3" name="1284.4 Compatible Bidirectional Interface" revision="all" flags="N">AosUsbPrinter.Install</protocol>
-				<protocol nbr="FF" name="Vendor-Specific Interface" revision="all" flags="N">AosUsbPrinter.Install</protocol>
+				<protocol nbr="1" name="Unidirectional Interface" revision="all" flags="N">UsbPrinter.Install</protocol>
+				<protocol nbr="2" name="Bidirectional Interface" revision="all" flags="N">UsbPrinter.Install</protocol>
+				<protocol nbr="3" name="1284.4 Compatible Bidirectional Interface" revision="all" flags="N">UsbPrinter.Install</protocol>
+				<protocol nbr="FF" name="Vendor-Specific Interface" revision="all" flags="N">UsbPrinter.Install</protocol>
 			</subclass>
 		</class>	
 		<class nbr="8"	name="Mass-Storage">
 			<subclass nbr="1" name="Reduced Block Commands">
-				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
+				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> UsbStorage.Install </protocol>
 			</subclass>
 			<subclass nbr="2" name="SFF-8020i/MMC-2">
-				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
+				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> UsbStorage.Install </protocol>
 			</subclass>
 			<subclass nbr="3" name="QIC-157">
-				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
+				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> UsbStorage.Install </protocol>
 			</subclass>
-				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
+				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> UsbStorage.Install </protocol>
 			<subclass nbr="4" name="UFI">
-				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
+				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> UsbStorage.Install </protocol>
 			</subclass>
 			<subclass nbr="5" name="SFF-8070i">
-				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
+				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> UsbStorage.Install </protocol>
 			</subclass>
 			<subclass nbr="6" name="SCSI Transparent Command Set">
-				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> AosUsbStorage.Install </protocol>
-				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> AosUsbStorage.Install </protocol>
+				<protocol nbr="0" name="CBI Transport"			 	revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="1" name="CBI Transport"				revision="all" flags="N"> UsbStorage.Install </protocol>
+				<protocol nbr="50" name="Bulk-Only Transport" 	revision="all" flags="N"> UsbStorage.Install </protocol>
 			</subclass>
 		</class>	
 		<class nbr="9"	name="Hub"> 
@@ -213,7 +213,7 @@
 		</class>	
 		<class nbr="E0" name="Wireless Controller">
 			<subclass nbr="1" name="RF Controller">
-				<protocol nbr="1" name="Bluebooth" revision="all" flags="N"> AosUsbBluetooth.Install </protocol>
+				<protocol nbr="1" name="Bluebooth" revision="all" flags="N"> UsbBluetooth.Install </protocol>
 			</subclass>
 		</class>	
 		<class nbr="EF" name="Miscellaneous Device Class">

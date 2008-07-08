@@ -106,7 +106,7 @@
 			<SystemCommand>
 				<Properties>
 					<ID>X</ID>
-					<CommandString>AosVNC.Open</CommandString>
+					<CommandString>VNC.Open</CommandString>
 				</Properties>
 			</SystemCommand>
 		</Button>
