@@ -21,10 +21,15 @@
 		<property name="activeTopMargin" type="int32" mandatory="false" />
 		<property name="activeColor" type="color" mandatory="false" />
 		<property name="activeCloseBitmap" type="resource" mandatory="false" />
+		<property name="activeMinimizeBitmap" type="resource" mandatory="false" />
 		<property name="inactiveLeftMargin" type="int32" mandatory="false" />
 		<property name="inactiveTopMargin" type="int32" mandatory="false" />
 		<property name="inactiveColor" type="color" mandatory="false" />
 		<property name="inactiveCloseBitmap" type="resource" mandatory="false" />
+		<property name="inactiveMinimizeBitmap" type="resource" mandatory="false" />
+		<property name="hoverCloseBitmap" type="resource" mandatory ="false"/>
+		<property name="hoverMinimizeBitmap" type="resource" mandatory="false"/>
+		<property name="minimizeOffset" type="int32" mandatory="false"/>
 	</component>
 	<component name="top">
 		<property name="activeLeft" type="resource" mandatory="false"/>
@@ -216,12 +221,14 @@
 		<property name="clTextHover" type="color" mandatory="false" />
 		<property name="clTextSelected" type="color" mandatory="false" />
 		<property name="clTextAttention" type="color" mandatory="false" />
+		<property name="clTextSelectedAttention" type="color" mandatory="false"/>
 		<property name="borderWidth" type="int32" mandatory="false" />
 		<property name="useBgBitmaps" type="boolean" mandatory="true" />
 		<property name="clDefault" type="color" mandatory="false" />
 		<property name="clHover" type="color" mandatory="false" />
 		<property name="clSelected" type="color" mandatory="false" />
 		<property name="clAttention" type="color" mandatory="false" />
+		<property name="clSelectedAttention" type="color" mandatory="false"/>
 		<property name="bgLeftDefault" type="resource" mandatory="false" />
 		<property name="bgMiddleDefault" type="resource" mandatory="false" />
 		<property name="bgRightDefault" type="resource" mandatory="false" />
