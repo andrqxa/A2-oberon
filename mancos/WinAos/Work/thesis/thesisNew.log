@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592-1.40.4 (MiKTeX 2.7) (preloaded format=pdflatex 2009.2.19)  22 MAR 2009 17:25
+This is pdfTeX, Version 3.141592-1.40.4 (MiKTeX 2.7) (preloaded format=pdflatex 2009.2.19)  22 MAR 2009 21:17
 entering extended mode
 **thesisNew.tex
 (thesisNew.tex
@@ -288,177 +288,177 @@ Overfull \hbox (9.88576pt too wide) in paragraph at lines 242--247
 [] 
  []
 
-
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 253--257
- [] 
- []
-
-
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 258--263
-[] 
- []
-
 [8]
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 266--270
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 255--259
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 271--276
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 260--265
 [] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 271--276
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 268--272
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 273--278
+[] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 273--278
 
  []
 
 [9]
-Underfull \vbox (badness 10000) has occurred while \output is active []
+Underfull \vbox (badness 6173) has occurred while \output is active []
 
  [10]
 [11] <server.png, id=68, 435.12563pt x 84.315pt>
 File: server.png Graphic file (type png)
  <use server.png>
-Overfull \hbox (9.88582pt too wide) in paragraph at lines 335--335
+Overfull \hbox (9.88582pt too wide) in paragraph at lines 337--337
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 344--348
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 346--350
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 355--359
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 357--361
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 366--370
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 368--372
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 377--381
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 379--383
  [] 
  []
 
 [12 <server.png (PNG copy)>]
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 388--392
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 390--394
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 399--403
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 401--405
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 410--414
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 412--416
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 421--425
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 423--427
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 430--434
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 432--436
  [] 
  []
 
 [13]
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 439--443
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 441--445
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 448--452
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 450--454
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 457--461
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 459--463
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 466--470
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 468--472
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 476--480
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 478--482
  [] 
  []
 
 [14]
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 486--490
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 488--492
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 495--499
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 497--501
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 504--508
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 506--510
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 513--517
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 515--519
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 523--527
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 525--529
  [] 
  []
 
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 530.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 532.
 
 ("C:\Program Files\MiKTeX 2.7\tex\latex\base\omscmr.fd"
 File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 530.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 532.
  [15]
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 540--544
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 542--546
  [] 
  []
 
 
-Overfull \hbox (14.55487pt too wide) in paragraph at lines 545--546
+Overfull \hbox (14.55487pt too wide) in paragraph at lines 547--548
 \OT1/cmr/m/n/10.95 The find close mes-sage is sent to close a search started by
  a \OT1/cmtt/m/n/10.95 TRANS2[]FIND[]FIRST2
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 549--553
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 551--555
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 558--562
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 560--564
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 567--571
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 569--573
  [] 
  []
 
 
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 576--580
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 578--582
  [] 
  []
 
 [16]
-Overfull \hbox (9.88576pt too wide) in paragraph at lines 587--591
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 589--593
  [] 
  []
 
@@ -486,9 +486,9 @@ Appendix A.
 
 ] [24]
 LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 732.
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 734.
  [25]
-Overfull \hbox (30.91077pt too wide) in paragraph at lines 773--773
+Overfull \hbox (30.91077pt too wide) in paragraph at lines 775--775
 []    \OT1/cmtt/m/n/10.95 FLAGS     = 0x18   (Canonicalized and case-sensitive 
 path names)[] 
  []
@@ -497,31 +497,31 @@ path names)[]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [26]
-Overfull \hbox (2.16733pt too wide) in paragraph at lines 812--812
+Overfull \hbox (2.16733pt too wide) in paragraph at lines 814--814
 []\OT1/cmtt/m/n/10.95 (** Open an existing file. The same file descriptor is re
 turned[] 
  []
 
 
-Overfull \hbox (2.16733pt too wide) in paragraph at lines 812--812
+Overfull \hbox (2.16733pt too wide) in paragraph at lines 814--814
 []\OT1/cmtt/m/n/10.95 PROCEDURE Delete0*(name: ARRAY OF CHAR; VAR key, res: LON
 GINT);[] 
  []
 
 
-Overfull \hbox (13.6647pt too wide) in paragraph at lines 812--812
+Overfull \hbox (13.6647pt too wide) in paragraph at lines 814--814
 []\OT1/cmtt/m/n/10.95 (** Enumerate canonical file names. mask may contain * wi
 ldcards.[] 
  []
 
 
-Overfull \hbox (25.16208pt too wide) in paragraph at lines 812--812
+Overfull \hbox (25.16208pt too wide) in paragraph at lines 814--814
 []\OT1/cmtt/m/n/10.95 PROCEDURE CreateDirectory0*(name: ARRAY OF CHAR; VAR res:
  LONGINT);[] 
  []
 
 
-Overfull \hbox (13.6647pt too wide) in paragraph at lines 812--812
+Overfull \hbox (13.6647pt too wide) in paragraph at lines 814--814
 []    \OT1/cmtt/m/n/10.95 (name: ARRAY OF CHAR; force: BOOLEAN; VAR key, res: L
 ONGINT);[] 
  []
@@ -533,42 +533,42 @@ Underfull \vbox (badness 7486) has occurred while \output is active []
 [28] [29] [30
 
 ]
-Underfull \hbox (badness 1859) in paragraph at lines 873--874
+Underfull \hbox (badness 1859) in paragraph at lines 875--876
 []\OT1/cmr/m/n/10.95 LEACH, Paul J., NAIK, Dilip C.: \OT1/cmr/m/it/10.95 A Com-
 mon In-ter-
  []
 
 
-Overfull \hbox (0.82976pt too wide) in paragraph at lines 873--874
+Overfull \hbox (0.82976pt too wide) in paragraph at lines 875--876
 \OT1/cmtt/m/n/10.95 http://www.microsoft.com/about/legal/protocols/BSTD/ 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 874--875
+Underfull \hbox (badness 10000) in paragraph at lines 876--877
 []\OT1/cmr/m/n/10.95 Microsoft Cor-po-ra-tion: \OT1/cmr/m/it/10.95 [MS-SMB] - S
 erver
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 874--875
+Underfull \hbox (badness 10000) in paragraph at lines 876--877
 \OT1/cmr/m/it/10.95 Mes-sage Block (SMB) Pro-to-col Spec-i-fi-ca-tion\OT1/cmr/m
 /n/10.95 ,
  []
 
 
-Overfull \hbox (9.62012pt too wide) in paragraph at lines 874--875
+Overfull \hbox (9.62012pt too wide) in paragraph at lines 876--877
 \OT1/cmtt/m/n/10.95 http://msdn.microsoft.com/en-us/library/cc246231.aspx\OT1/c
 mr/m/n/10.95 ,
  []
 
 
-Underfull \hbox (badness 3240) in paragraph at lines 875--876
+Underfull \hbox (badness 3240) in paragraph at lines 877--878
 []\OT1/cmr/m/n/10.95 Storage Net-work-ing In-dus-try As-so-ci-a-tion (SNIA): \O
 T1/cmr/m/it/10.95 Com-
  []
 
 
-Underfull \hbox (badness 4556) in paragraph at lines 875--876
+Underfull \hbox (badness 4556) in paragraph at lines 877--878
 \OT1/cmr/m/it/10.95 mon In-ter-net File Sys-tem (CIFS) Tech-ni-cal Ref-er-ence\
 OT1/cmr/m/n/10.95 ,
  []
@@ -592,7 +592,7 @@ iles/MiKTeX 2.7/fonts/type1/bluesky/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.7/
 fonts/type1/bluesky/cm/cmti10.pfb><C:/Program Files/MiKTeX 2.7/fonts/type1/blue
 sky/cm/cmtt10.pfb><C:/Program Files/MiKTeX 2.7/fonts/type1/bluesky/cm/cmtt12.pf
 b>
-Output written on thesisNew.pdf (37 pages, 228516 bytes).
+Output written on thesisNew.pdf (37 pages, 228456 bytes).
 PDF statistics:
  175 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 131072)
