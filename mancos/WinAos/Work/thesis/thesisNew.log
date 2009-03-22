@@ -1,0 +1,600 @@
+This is pdfTeX, Version 3.141592-1.40.4 (MiKTeX 2.7) (preloaded format=pdflatex 2009.2.19)  22 MAR 2009 17:25
+entering extended mode
+**thesisNew.tex
+(thesisNew.tex
+LaTeX2e <2005/12/01>
+Babel <v3.8h> and hyphenation patterns for english, dumylang, nohyphenation, ge
+rman, ngerman, french, loaded.
+("C:\Program Files\MiKTeX 2.7\tex\latex\base\book.cls"
+Document Class: book 2005/09/16 v1.4f Standard LaTeX document class
+("C:\Program Files\MiKTeX 2.7\tex\latex\base\bk11.clo"
+File: bk11.clo 2005/09/16 v1.4f Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@chapter=\count80
+\c@section=\count81
+\c@subsection=\count82
+\c@subsubsection=\count83
+\c@paragraph=\count84
+\c@subparagraph=\count85
+\c@figure=\count86
+\c@table=\count87
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+("C:\Program Files\MiKTeX 2.7\tex\latex\base\inputenc.sty"
+Package: inputenc 2006/05/05 v1.1b Input encoding file
+\inpenc@prehook=\toks14
+\inpenc@posthook=\toks15
+
+("C:\Program Files\MiKTeX 2.7\tex\latex\base\latin1.def"
+File: latin1.def 2006/05/05 v1.1b Input encoding file
+))
+("C:\Program Files\MiKTeX 2.7\tex\latex\graphics\graphicx.sty"
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+("C:\Program Files\MiKTeX 2.7\tex\latex\graphics\keyval.sty"
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+("C:\Program Files\MiKTeX 2.7\tex\latex\graphics\graphics.sty"
+Package: graphics 2006/02/20 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+("C:\Program Files\MiKTeX 2.7\tex\latex\graphics\trig.sty"
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+("C:\Program Files\MiKTeX 2.7\tex\latex\00miktex\graphics.cfg"
+File: graphics.cfg 2007/01/18 v1.5 graphics configuration of teTeX/TeXLive
+)
+Package graphics Info: Driver file: pdftex.def on input line 90.
+
+("C:\Program Files\MiKTeX 2.7\tex\latex\graphics\pdftex.def"
+File: pdftex.def 2007/06/12 v0.04h Graphics/color for pdfTeX
+\Gread@gobject=\count88
+))
+\Gin@req@height=\dimen103
+\Gin@req@width=\dimen104
+)
+("C:\Program Files\MiKTeX 2.7\tex\latex\amsmath\amsmath.sty"
+Package: amsmath 2000/07/18 v2.13 AMS math features
+\@mathmargin=\skip43
+
+For additional information on amsmath, use the `?' option.
+("C:\Program Files\MiKTeX 2.7\tex\latex\amsmath\amstext.sty"
+Package: amstext 2000/06/29 v2.01
+
+("C:\Program Files\MiKTeX 2.7\tex\latex\amsmath\amsgen.sty"
+File: amsgen.sty 1999/11/30 v2.0
+\@emptytoks=\toks17
+\ex@=\dimen105
+))
+("C:\Program Files\MiKTeX 2.7\tex\latex\amsmath\amsbsy.sty"
+Package: amsbsy 1999/11/29 v1.2d
+\pmbraise@=\dimen106
+)
+("C:\Program Files\MiKTeX 2.7\tex\latex\amsmath\amsopn.sty"
+Package: amsopn 1999/12/14 v2.01 operator names
+)
+\inf@bad=\count89
+LaTeX Info: Redefining \frac on input line 211.
+\uproot@=\count90
+\leftroot@=\count91
+LaTeX Info: Redefining \overline on input line 307.
+\classnum@=\count92
+\DOTSCASE@=\count93
+LaTeX Info: Redefining \ldots on input line 379.
+LaTeX Info: Redefining \dots on input line 382.
+LaTeX Info: Redefining \cdots on input line 467.
+\Mathstrutbox@=\box26
+\strutbox@=\box27
+\big@size=\dimen107
+LaTeX Font Info:    Redeclaring font encoding OML on input line 567.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
+\macc@depth=\count94
+\c@MaxMatrixCols=\count95
+\dotsspace@=\muskip10
+\c@parentequation=\count96
+\dspbrk@lvl=\count97
+\tag@help=\toks18
+\row@=\count98
+\column@=\count99
+\maxfields@=\count100
+\andhelp@=\toks19
+\eqnshift@=\dimen108
+\alignsep@=\dimen109
+\tagshift@=\dimen110
+\tagwidth@=\dimen111
+\totwidth@=\dimen112
+\lineht@=\dimen113
+\@envbody=\toks20
+\multlinegap=\skip44
+\multlinetaggap=\skip45
+\mathdisplay@stack=\toks21
+LaTeX Info: Redefining \[ on input line 2666.
+LaTeX Info: Redefining \] on input line 2667.
+)
+("C:\Program Files\MiKTeX 2.7\tex\latex\amsfonts\amsfonts.sty"
+Package: amsfonts 2001/10/25 v2.2f
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 132.
+)
+("C:\Program Files\MiKTeX 2.7\tex\latex\amsfonts\amssymb.sty"
+Package: amssymb 2002/01/22 v2.2d
+) (thesisNew.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 12.
+LaTeX Font Info:    ... okay on input line 12.
+
+("C:\Program Files\MiKTeX 2.7\tex\context\base\supp-pdf.tex"
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count101
+\scratchdimen=\dimen114
+\scratchbox=\box28
+\nofMPsegments=\count102
+\nofMParguments=\count103
+\MPscratchCnt=\count104
+\MPscratchDim=\dimen115
+\MPnumerator=\count105
+\everyMPtoPDFconversion=\toks22
+) [1
+
+
+
+{C:/Documents and Settings/All Users/Application Data/MiKTeX/2.7/pdftex/config/
+pdftex.map}] [2
+
+] [3] [4
+
+] (thesisNew.toc
+LaTeX Font Info:    Try loading font information for U+msa on input line 5.
+
+("C:\Program Files\MiKTeX 2.7\tex\latex\amsfonts\umsa.fd"
+File: umsa.fd 2002/01/19 v2.2g AMS font definitions
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 5.
+
+("C:\Program Files\MiKTeX 2.7\tex\latex\amsfonts\umsb.fd"
+File: umsb.fd 2002/01/19 v2.2g AMS font definitions
+))
+\tf@toc=\write3
+ [5] [6]
+Chapter 1.
+
+Underfull \vbox (badness 2351) has occurred while \output is active []
+
+ [1
+
+
+]
+[2] <login.png, id=35, 273.27094pt x 365.86688pt>
+File: login.png Graphic file (type png)
+ <use login.png> [3 <login.png>] <fileaccess.png, id=40, 249.18094pt x 261.9787
+4pt>
+File: fileaccess.png Graphic file (type png)
+ <use fileaccess.png>
+[4 <fileaccess.png>]
+Chapter 2.
+[5
+
+]
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 125--129
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 130--135
+[] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 138--142
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 143--148
+[] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 151--155
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 158--163
+[] 
+ []
+
+[6]
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 166--170
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 173--178
+[] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 181--185
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 186--191
+[] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 194--198
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 199--204
+[] 
+ []
+
+
+Overfull \hbox (6.62074pt too wide) in paragraph at lines 208--208
+[]\OT1/cmtt/m/n/10.95 CreateDirectory0| 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 207--211
+ [] 
+ []
+
+[7]
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 214--219
+[] 
+ []
+
+
+Overfull \hbox (6.62074pt too wide) in paragraph at lines 223--223
+[]\OT1/cmtt/m/n/10.95 RemoveDirectory0| 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 222--226
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 229--234
+[] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 237--241
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 242--247
+[] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 253--257
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 258--263
+[] 
+ []
+
+[8]
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 266--270
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 271--276
+[] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 271--276
+
+ []
+
+[9]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [10]
+[11] <server.png, id=68, 435.12563pt x 84.315pt>
+File: server.png Graphic file (type png)
+ <use server.png>
+Overfull \hbox (9.88582pt too wide) in paragraph at lines 335--335
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 344--348
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 355--359
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 366--370
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 377--381
+ [] 
+ []
+
+[12 <server.png (PNG copy)>]
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 388--392
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 399--403
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 410--414
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 421--425
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 430--434
+ [] 
+ []
+
+[13]
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 439--443
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 448--452
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 457--461
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 466--470
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 476--480
+ [] 
+ []
+
+[14]
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 486--490
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 495--499
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 504--508
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 513--517
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 523--527
+ [] 
+ []
+
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 530.
+
+("C:\Program Files\MiKTeX 2.7\tex\latex\base\omscmr.fd"
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 530.
+ [15]
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 540--544
+ [] 
+ []
+
+
+Overfull \hbox (14.55487pt too wide) in paragraph at lines 545--546
+\OT1/cmr/m/n/10.95 The find close mes-sage is sent to close a search started by
+ a \OT1/cmtt/m/n/10.95 TRANS2[]FIND[]FIRST2
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 549--553
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 558--562
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 567--571
+ [] 
+ []
+
+
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 576--580
+ [] 
+ []
+
+[16]
+Overfull \hbox (9.88576pt too wide) in paragraph at lines 587--591
+ [] 
+ []
+
+<dostime.png, id=85, 486.81876pt x 80.3pt>
+File: dostime.png Graphic file (type png)
+ <use dostime.png> [17 <dostime.png (PNG copy)>] [18]
+Chapter 3.
+<1x100mb.png, id=92, 578.91281pt x 315.42844pt>
+File: 1x100mb.png Graphic file (type png)
+ <use 1x100mb.png>
+<1000x100kb.png, id=93, 771.88374pt x 420.57124pt>
+File: 1000x100kb.png Graphic file (type png)
+ <use 1000x100kb.png>
+Underfull \vbox (badness 4699) has occurred while \output is active []
+
+ [19
+
+ <1x100mb.png (PNG copy)>] [20 <1000x100kb.png (PNG copy)>]
+Chapter 4.
+[21
+
+] [22]
+Appendix A.
+[23
+
+] [24]
+LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 732.
+ [25]
+Overfull \hbox (30.91077pt too wide) in paragraph at lines 773--773
+[]    \OT1/cmtt/m/n/10.95 FLAGS     = 0x18   (Canonicalized and case-sensitive 
+path names)[] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [26]
+Overfull \hbox (2.16733pt too wide) in paragraph at lines 812--812
+[]\OT1/cmtt/m/n/10.95 (** Open an existing file. The same file descriptor is re
+turned[] 
+ []
+
+
+Overfull \hbox (2.16733pt too wide) in paragraph at lines 812--812
+[]\OT1/cmtt/m/n/10.95 PROCEDURE Delete0*(name: ARRAY OF CHAR; VAR key, res: LON
+GINT);[] 
+ []
+
+
+Overfull \hbox (13.6647pt too wide) in paragraph at lines 812--812
+[]\OT1/cmtt/m/n/10.95 (** Enumerate canonical file names. mask may contain * wi
+ldcards.[] 
+ []
+
+
+Overfull \hbox (25.16208pt too wide) in paragraph at lines 812--812
+[]\OT1/cmtt/m/n/10.95 PROCEDURE CreateDirectory0*(name: ARRAY OF CHAR; VAR res:
+ LONGINT);[] 
+ []
+
+
+Overfull \hbox (13.6647pt too wide) in paragraph at lines 812--812
+[]    \OT1/cmtt/m/n/10.95 (name: ARRAY OF CHAR; force: BOOLEAN; VAR key, res: L
+ONGINT);[] 
+ []
+
+
+Underfull \vbox (badness 7486) has occurred while \output is active []
+
+ [27]
+[28] [29] [30
+
+]
+Underfull \hbox (badness 1859) in paragraph at lines 873--874
+[]\OT1/cmr/m/n/10.95 LEACH, Paul J., NAIK, Dilip C.: \OT1/cmr/m/it/10.95 A Com-
+mon In-ter-
+ []
+
+
+Overfull \hbox (0.82976pt too wide) in paragraph at lines 873--874
+\OT1/cmtt/m/n/10.95 http://www.microsoft.com/about/legal/protocols/BSTD/ 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 874--875
+[]\OT1/cmr/m/n/10.95 Microsoft Cor-po-ra-tion: \OT1/cmr/m/it/10.95 [MS-SMB] - S
+erver
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 874--875
+\OT1/cmr/m/it/10.95 Mes-sage Block (SMB) Pro-to-col Spec-i-fi-ca-tion\OT1/cmr/m
+/n/10.95 ,
+ []
+
+
+Overfull \hbox (9.62012pt too wide) in paragraph at lines 874--875
+\OT1/cmtt/m/n/10.95 http://msdn.microsoft.com/en-us/library/cc246231.aspx\OT1/c
+mr/m/n/10.95 ,
+ []
+
+
+Underfull \hbox (badness 3240) in paragraph at lines 875--876
+[]\OT1/cmr/m/n/10.95 Storage Net-work-ing In-dus-try As-so-ci-a-tion (SNIA): \O
+T1/cmr/m/it/10.95 Com-
+ []
+
+
+Underfull \hbox (badness 4556) in paragraph at lines 875--876
+\OT1/cmr/m/it/10.95 mon In-ter-net File Sys-tem (CIFS) Tech-ni-cal Ref-er-ence\
+OT1/cmr/m/n/10.95 ,
+ []
+
+[31] (thesisNew.aux) ) 
+Here is how much of TeX's memory you used:
+ 1894 strings out of 95327
+ 21538 string characters out of 1183974
+ 72511 words of memory out of 1500000
+ 5086 multiletter control sequences out of 110000
+ 12531 words of font info for 47 fonts, out of 1200000 for 2000
+ 14 hyphenation exceptions out of 8191
+ 27i,9n,22p,1173b,324s stack positions out of 5000i,500n,10000p,200000b,5000s
+<C:/Program Files/MiKTeX 2.7/fonts/type1/bluesky/cm/cmbx1
+0.pfb><C:/Program Files/MiKTeX 2.7/fonts/type1/bluesky/cm/cmbx12.pfb><C:/Progra
+m Files/MiKTeX 2.7/fonts/type1/bluesky/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.
+7/fonts/type1/bluesky/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.7/fonts/type1/blu
+esky/cm/cmr9.pfb><C:/Program Files/MiKTeX 2.7/fonts/type1/bluesky/cm/cmsl10.pfb
+><C:/Program Files/MiKTeX 2.7/fonts/type1/bluesky/cm/cmsltt10.pfb><C:/Program F
+iles/MiKTeX 2.7/fonts/type1/bluesky/cm/cmsy10.pfb><C:/Program Files/MiKTeX 2.7/
+fonts/type1/bluesky/cm/cmti10.pfb><C:/Program Files/MiKTeX 2.7/fonts/type1/blue
+sky/cm/cmtt10.pfb><C:/Program Files/MiKTeX 2.7/fonts/type1/bluesky/cm/cmtt12.pf
+b>
+Output written on thesisNew.pdf (37 pages, 228516 bytes).
+PDF statistics:
+ 175 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 131072)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
+
