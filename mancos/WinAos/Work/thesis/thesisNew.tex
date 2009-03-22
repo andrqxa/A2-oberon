@@ -7,7 +7,7 @@
 \linespread{1.3}
 \author{Stefano Manco}
 \title{Samba Client/Server for A2}
-\date{22.03.2009}
+\date{21.03.2009}
 
 \begin{document}
 
@@ -21,20 +21,20 @@
 \vspace{\stretch{1.5}}
 {\Large\bf Stefano Manco} \\
 \vspace{\stretch{1.5}}
-22.03.2009 \\
+21.03.2009 \\
 \vspace{\stretch{3}}
 Sven Philipp Stauber \\
-{\footnotesize Responsible assistant} \\
+{\footnotesize Responsible Assistant} \\
 \vspace{\stretch{1}}
 Prof. J\"{u}rg Gutknecht \\
 Native Systems Group \\
-Departement of Computer Science \\
+Department of Computer Science \\
 ETH Zurich \\
 \end{center}
 \end{titlepage}
 
 \chapter*{Abstract}
-The goal of this master thesis is to simplify data access between A2 and other operating systems, in particular Windows. Windows and many Linux versions use Samba for this purpose. The implementation of a Samba client and a Samba server for A2 helps to increase the interoperability between A2 and other operating systems. 
+The goal of this master thesis is to simplify data access between A2, an operating system developed at ETH Zurich, and other operating systems, in particular Windows. Windows and many Linux versions use Samba for this purpose. Samba is a client-server based protocol used to provide access to files, printers, serial ports and interprocess communication over the network. The implementation of a Samba client and a Samba server for A2 helps to increase the interoperability between A2 and other operating systems. 
 
 \tableofcontents
 
@@ -43,7 +43,7 @@ The goal of this master thesis is to simplify data access between A2 and other o
 \chapter{Introduction}
 The Native Systems Group of the ETH Zurich has developed an operating system called A2. The kernel of A2 offers multi-processor support, preemptive multi-tasking, automatic memory management and dynamically loadable modules. The language used in A2 is the Active Oberon Language, which is strongly typed, object-oriented and has integrated concurrency support.
 
-At the moment, A2 has not the functionality to access files on other machines. The goal of this master thesis is to increase the interoperability between A2 and other operating systems by implementing a client and a server for the Server Message Block (SMB) protocol. SMB is a client-server based protocol used to provide access to files, printers, serial ports and interprocess communication over the network. Originally SMB was developed by Microsoft, IBM, Intel and 3Com for DOS, but Microsoft integrated SMB also in Windows versions. Through the dominance of Microsoft in the desktop world, SMB became the de facto standard for file and printer access in Local Area Networks. Roughly on every major release or update of Windows, Microsoft has introduced new dialects with added extensions to the core SMB protocol. The currently most diffused dialect, also in the Unix world, is NT LM 0.12, which was introduced with Windows NT 4.0. The A2 implementations of client and server support only NT LM 0.12, since Microsoft guarantees backward compatibility.
+At the moment, A2 has not the functionality to access files on remote shares. The goal of this master thesis is to increase the interoperability between A2 and other operating systems by implementing a client and a server for the Server Message Block (SMB) protocol. SMB is a client-server based protocol used to provide access to files, printers, serial ports and interprocess communication over the network. Originally SMB was developed by Microsoft, IBM, Intel and 3Com for DOS, but Microsoft integrated SMB also in Windows versions. Through the dominance of Microsoft in the desktop world, SMB became the de facto standard for file and printer access in Local Area Networks. Roughly on every major release or update of Windows, Microsoft has introduced new dialects which added extensions to the core SMB protocol. The currently most diffused dialect, also in the Unix world, is NT LM 0.12, which was introduced with Windows NT 4.0. The A2 implementations of client and server support only NT LM 0.12, since Microsoft guarantees backward compatibility.
 
 SMB allows a client to manipulate files (read, write, create, delete and rename), as if they were available on the local computer, but in fact the files are stored on a remote server. Therefore, the client has to send commands to the server. Client and server communicate over the network using packets. In the OSI model, the SMB protocol is classified in the Application/Presentation level. The transport, which has to be absolutely reliable in SMB, is realized through the well-known Transmission Control Protocol (TCP).
 
@@ -69,7 +69,7 @@ SMB allows a client to manipulate files (read, write, create, delete and rename)
 \textit{The OSI model.}
 \end{center}
 
-The client has to map all functions relative to the file system to SMB packets. A SMB packet contains all necessary information to perform a manipulation to a file. Not all operations are executable with one SMB request. Certain operations need multiple different requests. The first of the two following figures shows, which packets are sent to log in and the second figure shows the packets sent to read a file:
+The client has to map all functions related to the file system to SMB packets. A SMB packet contains all necessary information to perform a manipulation to a file. Not all operations are executable with one SMB request. Certain operations need multiple different requests. The first of the two following figures shows, which packets are sent to log in on a SMB server and the second figure shows the packets sent to read a file from a share:
 
 \newpage
 
@@ -127,7 +127,7 @@ The traditional Windows SMB client has one very important characteristic: it off
 \hline
 \end{tabular}
 \end{center}
-To create a file on the server, the client first has to create a file object locally. The newly created file is associated to the SMB file system. Now, the client can proceed with the remote operations. Therefore the client sends a request to the server containing the command to create a new file. As response, the client recieves a file ID (FID), which is used as local ID too. This unique ID ensures, that the client as well as the server are operating on the correct file. \\
+To create a file on the server, the client first has to create a file object locally. The newly created file is associated to the SMB file system. Now, the client can proceed with the remote operations. Therefore the client sends a request to the server containing the command to create a new file. As response, the client receives a file ID (FID), which is used as local ID, too. This unique ID ensures that the client as well as the server are operating on the correct file. \\
 \renewcommand{\tabcolsep}{5mm}
 \begin{tabular}{p{3cm}p{8cm}}
 Packets needed: & \texttt{SMB\_COM\_OPEN\_ANDX} \\
@@ -140,7 +140,7 @@ Packets needed: & \texttt{SMB\_COM\_OPEN\_ANDX} \\
 \hline
 \end{tabular}
 \end{center}
-To open a remote file, the client has to follow a similar procedure to \texttt{New0} and create a file object locally, even if the file exists on the server. The reason is that the client needs a file object to work. Then the client sends an open request and recieves a FID, which is needed for further operations on the file. \\
+To open a remote file, the client has to follow a similar procedure to \texttt{New0} and create a file object locally. Then the client sends an open request and receives a FID, which is needed for further operations on the file. \\
 \renewcommand{\tabcolsep}{5mm}
 \begin{tabular}{p{3cm}p{8cm}}
 Packets needed: & \texttt{SMB\_COM\_OPEN\_ANDX} \\
@@ -155,7 +155,7 @@ Packets needed: & \texttt{SMB\_COM\_OPEN\_ANDX} \\
 \end{center}
 If the client wants to delete a remote file, the file has to be closed. To delete the file, the client sends a delete request for the given filename. If no other clients have this file opened, i.e. have a lock on this file, the server can successfully delete the file.
 
-This command cannot be executed always successfully, because A2 cannot explicitly close files. In general, the client opens a file at least once without closing it. A simple solution would maintain a list of open files and close the relative file before it is deleted. All applications having a reference to an open file would not be considered when closing the file. These references would become invalid. Client and server were in an inconsistent state. \\
+This command cannot be executed always successfully, because A2 cannot explicitly close files. In general, the client opens a file at least once without closing it. A solution would maintain a list of open files and close the relative file before it is deleted. All applications having a reference to an open file would not be considered when closing the file. These references would become invalid. Client and server were in an inconsistent state. \\
 \renewcommand{\tabcolsep}{5mm}
 \begin{tabular}{p{3cm}p{8cm}}
 Packets needed: & \texttt{SMB\_COM\_DELETE}, (\texttt{SMB\_COM\_CLOSE}) \\
@@ -183,7 +183,7 @@ Packets needed: & \texttt{SMB\_COM\_RENAME}, (\texttt{SMB\_COM\_CLOSE}) \\
 \hline
 \end{tabular}
 \end{center}
-The client typically calls this procedure, if it needs to list all files present on the server in the File Manager. This procedure works with masks, which differ from the masks used in SMB. The client sends a listing request containing the appropriate mask, previously transformed by a simple helper procedure. If the list contained in the response is not complete, i.e. not all files of the share are listed, the client continues sending other requests containing the last entry and the ID of the search, until the list is complete. \\
+The client typically calls this procedure, if it needs to list the files on the share or a subdirectory of it in the File Manager. This procedure works with filename masks, which differ from the masks used in SMB. The client sends a listing request containing the appropriate mask, previously transformed by a simple helper procedure. If the list is too big for a packet, the list is divided in multiple packets. The client continues sending other requests containing the last entry and the ID of the search, until the list is complete. \\
 \renewcommand{\tabcolsep}{5mm}
 \begin{tabular}{p{3cm}p{8cm}}
 Packets needed: & \texttt{TRANS2\_FIND\_FIRST2}, \texttt{TRANS2\_FIND\_NEXT2} \\
@@ -239,7 +239,7 @@ Packets needed: & \texttt{SMB\_COM\_DELETE\_DIRECTORY} \\
 \hline
 \end{tabular}
 \end{center}
-This procedure closes the connection before unmounting the file system. \\
+This procedure closes the network connection before unmounting the file system. \\
 \renewcommand{\tabcolsep}{5mm}
 \begin{tabular}{p{3cm}p{8cm}}
 Packets needed: & \texttt{-} \\
@@ -257,7 +257,7 @@ The File Interface handles operations on the content of files. It is different f
 \hline
 \end{tabular}
 \end{center}
-The client can read bytes of a file, if it was already opened. The request sent by the client must contain the file ID, the offset from where to start reading and the desired length of bytes. The response contains the requested bytes, which are buffered locally. The client also has to adjust the offset of the Rider. Too large requests (more than 65'535 bytes) are splitted up in multiple requests. \\
+The client can read bytes of a file, if it was already opened. The request sent by the client must contain the file ID, the offset from where to start reading and the desired number of bytes. The response contains the requested bytes, which are buffered locally. The client also has to adjust the offset of the Rider. The Rider holds the position in a certain file. Reading or writing the file always starts from this position. On every modification of the content of a file the Rider has to be adjusted. Too large requests (more than 65'535 bytes) are splitted up in multiple requests. \\
 \renewcommand{\tabcolsep}{5mm}
 \begin{tabular}{p{3cm}p{8cm}}
 Packets needed: & \texttt{SMB\_COM\_READ\_ANDX} \\
@@ -296,15 +296,15 @@ Update & Flushes the changes made to a file from its buffers. \\
 \end{center}
 
 \subsection{Connection}
-The implemented File System and File interface are not enough to integrate a Samba File System in A2, because SMB is a network protocol and the files are not locally available. The client has to establish a reliable connection to the server. As seen in the introduction, the connection is based on TCP. This is realized by an object called TCPSender, which establishes a connection to a specified IP address and port and opens streams to read and write. Packets are created and sent directly in the implemented interfaces. Helper procedures preprocess incoming packets and in case of error take the appropriate steps.
+The client has to establish a reliable connection to the server. As seen in the introduction, the connection is based on TCP. This is realized by an object called TCPSender, which establishes a connection to a specified IP address and port and opens streams to read and write. Packets are created and sent directly in the SMB implementation of the File System and File interface. Helper procedures preprocess incoming packets and in case of error take the appropriate steps.
 
 \subsection{Mounting}
-The mounting process starts directly when the client is opened. The new Samba file system recieves the prefix \texttt{SMB:} similar to the Windows drive letters. Then the client establishes a connection to the server and tries to log in. The log in step is the same as described in the introduction. At this point, the client is running and files can be accessed, if no error has occured so far.
+To access the files on a server, the client has to mount the share. The client establishes a connection to the server and tries to log in. The log in step is the same as described in the introduction. At this point, the client is running and files can be accessed, if no error has occured so far.
 
-To unmount the file system, the client has first to log off on the remote machine and close the connection. The prefix \texttt{SMB:} becomes invalid.
+To unmount the file system, the client has first to log off on the remote machine and close the connection.
 
 \subsection{Implemented SMB Packets}
-The SMB protocol offers approximately 75 different commands, not including subcommands. Not all are necessary to implement the client. The list of needed commands can be determined by the functions required by the client, i.e. the equivalent commands to the procedures of the interfaces. A command of special interest is \texttt{SMB\_COM\_TRANSACTION2}, which carries one of potentially 17 different subcommands. The client can send only 2 of them needed for the directory listing.
+The SMB protocol offers approximately 75 different commands, not including subcommands. Not all are necessary to implement the client. The list of needed commands can be determined by the functions required by the client, i.e. the equivalent commands to the procedures of the File System and File interfaces. A command of special interest is \texttt{SMB\_COM\_TRANSACTION2}, which carries one of potentially 17 different subcommands. The client can send only 2 of them needed for the directory listing.
 
 \begin{center}
 \begin{tabular}{c|l}
@@ -329,7 +329,7 @@ Command & Description \\
 \end{center}
 
 \section{The Server Implementation}
-The server works in a different way as the client. While the client can send requests if required, the server can only send responses when it recieves a request. An efficient server therefore has to understand all requests a client might send. The list of commands to implement was determined through a network protocol analyzer using a Windows XP client and the client provided by Ubuntu 8.10.
+The server works in a different way as the client. While the client can send requests if required, the server can only send responses when it receives a request. An efficient server therefore has to understand all requests a client might send. The list of commands to implement was determined through a network protocol analyzer using a Windows XP client and the client provided by Ubuntu 8.10.
 
 \subsection{Request Handling}
 The running server listens on port 445 (defined port for raw SMB) for incoming connections. The port listener is implemented using an Agent of module TCPServices. If a client tries to connect to the server, the listener accepts the connection, reads the recieved packet and passes it to the dispatcher. The dispatcher interprets the command and passes the packet to the appropriate handler, which starts to evaluate the information contained in the packet and performs the requested operation. Then the handler generates a response for the client. Since the server is in an endless loop, it can accept the next packet and the cycle restarts.
@@ -443,7 +443,7 @@ The set information message is sent to change the properties of a file, e.g. las
 \hline
 \end{tabular}
 \end{center}
-The write message is sent to write bytes to a file. The additional file ID, the offset specifying form where to start, the length of bytes and the data itself are passed. If the length is zero and no data is passed, the server must truncate the file to the length specified in the offset field.
+The write message is sent to write bytes to a file. The additional file ID, the offset specifying form where to start, the number of bytes and the data itself are passed. If the length is zero and no data is passed, the server must truncate the file to the length specified in the offset field.
 
 \begin{center}
 \renewcommand{\tabcolsep}{5mm}
@@ -490,7 +490,7 @@ The transaction message is sent to pass pipe or LANMAN information. The server a
 \hline
 \end{tabular}
 \end{center}
-The echo message is sent to test the connection to the server and to check that the server works. The server echoes the data recieved in the request.
+The echo message is sent to test the connection to the server and to check that the server works. The server echoes the data received in the request.
 
 \begin{center}
 \renewcommand{\tabcolsep}{5mm}
@@ -508,7 +508,7 @@ The open andx message is sent to open an existing file or to create a new non-ex
 \hline
 \end{tabular}
 \end{center}
-The read andx message is sent to read bytes of a file. The additional file ID, the offset specifying form where to start and the length of bytes are passed. 
+The read andx message is sent to read bytes of a file. The additional file ID, the offset specifying form where to start and the number of bytes are passed. 
 
 \begin{center}
 \renewcommand{\tabcolsep}{5mm}
@@ -562,7 +562,7 @@ The tree disconnect message is sent to invalidate a share handle for the request
 \hline
 \end{tabular}
 \end{center}
-The negotiate message is sent to agree on a dialect. This is the first packet sent by the client to establish a connection. This message contains a list of dialect, that the client understands. The response contains information about the server, e.g. server time, server name.
+The negotiate message is sent to agree on a dialect. This is the first packet sent by the client to establish a connection. This message contains a list of dialects, that the client understands. The response contains information about the server, e.g. server time, server name.
 
 \begin{center}
 \renewcommand{\tabcolsep}{5mm}
@@ -631,7 +631,7 @@ Also for this benchmark the Windows XP to Windows XP value is taken as a referen
 \chapter{Conclusion \& Future Work}
 
 \section{Conclusion}
-This master thesis provides a client and server implementation of Samba, the de facto standard for file access in Local Area Networks, for A2. The goal, to simplify data access and to increase the interoperability between A2 and other operating systems, especially Windows, is reached. The old server implementation for Bluebottle probably did not work, because two fields of \texttt{SMB\_COM\_TREE\_CONNECT\_ANDX} response, revealed by Microsoft in 2007, were not considered.
+This master thesis provides a client and server implementation of Samba, the de facto standard for file access in Local Area Networks, for A2. The goal, to simplify data access and to increase the interoperability between A2 and other operating systems, especially Windows, is reached. With the A2 client implementation it is possible to mount a share on a Windows or Unix server as a file system. The A2 server implementation allows Windows and Unix clients to access an A2 share.
 
 The procedures-to-packets mapping of the client is complete. All procedures are implemented equivalently in Samba packets. The server definitely does not implement all existing commands, but understands all encountered by sniffing the network using Windows and Linux clients.
 
