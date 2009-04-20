@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone='yes'?>
+	
+<!-- 
+Highlight 
+-->
+	<hightlight>
+		<language name= "Oberon">
+			<keywords>
+				<item> if </item>
+				<item> then </item>
+				<item> else </item>
+				<item> end </item>
+			</keywords>
+			<style name= "default">
+				<fontname>Oberon</fontname>
+				<fontsize>10</fontsize>
+				<style>fu</style>
+				<color>000000000H</color>
+				<bgcolor>0000000FFH</bgcolor>
+			</style>
+			<style name= "default">
+				<fontname>Oberon</fontname>
+				<fontsize>12</fontsize>
+				<style>fu2</style>
+				<color>000000000H</color>
+				<bgcolor>0000000FFH</bgcolor>
+			</style>
+		</language>
+	</highlight>
+
+	<!--
+        PROCEDURE EnsureAttribute(VAR attr : Texts.Attributes);
+        BEGIN
+        	IF (attr = NIL) THEN NEW(attr); NEW(attr.fontInfo);
+        		attr.fontInfo.name := "Oberon";
+        		attr.fontInfo.size := 12;
+        		attr.fontInfo.style := {};
+        		attr.color := 000000000H;
+        		attr.bgcolor := 0000000FFH;
+        	END
+        END EnsureAttribute;
+        *)
+        PROCEDURE ChangeAttribute(VAR attr : Texts.Attributes; userData : ANY);
+        BEGIN
+        	IF (attr = NIL) THEN NEW(attr); NEW(attr.fontInfo); END;
+        
+        	attr.fontInfo.name := "Oberon";
+        	attr.fontInfo.size := 12;
+        	attr.fontInfo.style := {};
+        	attr.color := SHORT(0FF0000FFH);
+        	attr.bgcolor := 000000000H;
+        	attr.fontInfo.fontcache := NIL;
+        END ChangeAttribute;
+        
+        PROCEDURE ResetAttribute(VAR attr : Texts.Attributes; userData : ANY);
+        BEGIN
+        	IF (attr = NIL) THEN NEW(attr); NEW(attr.fontInfo); END;
+        
+        	attr.fontInfo.name := "Oberon";
+        	attr.fontInfo.size := 10;
+        	attr.fontInfo.style := {};
+        	attr.color := 0000000FFH;
+        	attr.bgcolor := 000000000H;
+        	attr.fontInfo.fontcache := NIL;
+        END ResetAttribute;
+	-->
+	<!--
+		<Section name="Local">
+			<Section name="Attr">
+				<Section name="fontInfo">
+					<Setting name="name" value="Oberon"/>
+					<Setting name="size" value="12"/>
+					<Setting name="style" value="{}"/>
+				</Section>
+				<Setting name="color" value="000000000H"/>
+				<Setting name="bgcolor" value="0000000FFH"/>
+			</Section>
+		</Section>
+
+	-->
+		
+		
+	
