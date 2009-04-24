@@ -2,28 +2,38 @@
 
 <!-- 
 Used in Highlighter.Mod
+
+rs: v1: with attributes. It works, but doesn't look very good. :)
+
 -->
 
 <hightlight>
-
-	<language name="Oberon" value="1" />
-	<language name="Ober000021" value="2" />
-	<language name="Ober0000321" value="1" />
-	<language name="Eiffel" value="1" />
-	<style name="Short" value="dd.mm.yy"/>
+	
+	<keywords name="Oberon" value="if" />
+	<keywords name="Oberon" value="then" />
+	<keywords name="Oberon" value="else" />
+	<keywords name="Oberon" value="END" />
+	<keywords name="foobar" value="hello" />
+	<keywords name="foobar" value="this" />
+	<keywords name="foobar" value="what" />
+	<keywords name="foobar" value="eth0" />
+	<keywords name="Eiffel" value="ELSEIFOR" />
+	<styles name="default" fontname="Oberon" fontsize="10" color="000000000H" bgcolor="0000000FFH" />
+	<styles name="highlight" fontname="Oberon" fontsize="12" color="000FF00FFH" bgcolor="0000000FFH" />
 
 </hightlight>
 
 <!--
 
-	<languae> Ober0053442 </languae>
-	<lguage> Ober019999393 </lguage>
-	<language> Unter0004 </language>
-	<laguge> Ober019999395 </laguge>
-<language> Ober0002 </language>
-<language name= "Oberon"> value = "00002" </language>
 
+	<keywords name="Oberon">
+	 	value="1" 
+	 </keywords>
 
+				<keywords name="Time">
+					<Setting name="Short" value="hh:nn"/>
+					<Setting name="Long" value="hh:nn:ss"/>
+				</Section>
 
 <hightlight>
 	<keywords>
