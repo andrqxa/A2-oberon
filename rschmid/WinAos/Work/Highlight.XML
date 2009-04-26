@@ -2,73 +2,32 @@
 
 <!-- 
 Used in Highlighter.Mod
-
 rs: v1: with attributes. It works, but doesn't look very good. :)
 
 -->
 
 <hightlight>
 	
-	<keywords name="Oberon" value="if" />
-	<keywords name="Oberon" value="then" />
-	<keywords name="Oberon" value="else" />
+	<keywords name="Oberon" value="IF" />
+	<keywords name="Oberon" value="THEN" />
+	<keywords name="Oberon" value="ELSE" />
 	<keywords name="Oberon" value="END" />
+	<keywords name="Oberon" value="var" />
+	<keywords name="Oberon" value="BEGIN" />
 	<keywords name="foobar" value="hello" />
 	<keywords name="foobar" value="this" />
 	<keywords name="foobar" value="what" />
 	<keywords name="foobar" value="eth0" />
 	<keywords name="Eiffel" value="ELSEIFOR" />
-	<styles name="default" fontname="Oberon" fontsize="10" color="000000000H" bgcolor="0000000FFH" />
-	<styles name="highlight" fontname="Oberon" fontsize="12" color="000FF00FFH" bgcolor="0000000FFH" />
+	<keywords name="Eiffel" value="ELSEIFOR" />
+	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="{}"; color="000000000H" bgcolor="0000000FFH" />
+	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="{}"; color="000FF00FFH" bgcolor="0000000FFH" />
+	<styles name="assert" fontname="Oberon" fontsize="12" fontstyle ="{}"; color="0FF00FFFFH" bgcolor="0000000FFH" />
+	<styles name="procedure" fontname="Oberon" fontsize="10" fontstyle ="0"; color="000000000H" bgcolor="0000000FFH" />
 
 </hightlight>
 
 <!--
-
-
-	<keywords name="Oberon">
-	 	value="1" 
-	 </keywords>
-
-				<keywords name="Time">
-					<Setting name="Short" value="hh:nn"/>
-					<Setting name="Long" value="hh:nn:ss"/>
-				</Section>
-
-<hightlight>
-	<keywords>
-		<oberon>
-			<item> if </item>
-			<item> then </item>
-			<item> else </item>
-			<item> END </item>
-			<item> NIL </item>
-		</oberon>
-		<foobar>
-			<item> hello </item>
-			<item> this </item>
-			<item> what </item>
-			<item> eth0 </item>
-		</foobar>
-	</keywords>
-			
-	<styles>
-		<default>
-			<fontname>Oberon</fontname>
-			<fontsize>10</fontsize>
-			<style>fu</style>
-			<color>000000000H</color>
-			<bgcolor>0000000FFH</bgcolor>
-		</default>
-
-		<highlight>
-			<fontname>Oberon</fontname>
-			<fontsize>12</fontsize>
-			<style>fu2</style>
-			<color>0008800FFH</color>
-			<bgcolor>0000000FFH</bgcolor>
-		<highlight>
-	</styles>
 
 	-->
 		
