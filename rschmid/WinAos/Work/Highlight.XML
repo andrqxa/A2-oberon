@@ -3,7 +3,7 @@
 <!-- 
 Used in Highlighter.Mod
 rs: v1: with attributes. It works, but doesn't look very good. :)
-
+Maximal 128 Keywords pro Sprache.
 -->
 
 <hightlight>
@@ -11,9 +11,9 @@ rs: v1: with attributes. It works, but doesn't look very good. :)
 	<keywords name="Oberon" value="IF" />
 	<keywords name="Oberon" value="THEN" />
 	<keywords name="Oberon" value="ELSE" />
-	<keywords name="Oberon" value="END" />
-	<keywords name="Oberon" value="var" />
+	<keywords name="Oberon" value="VAR" />
 	<keywords name="Oberon" value="BEGIN" />
+	<keywords name="Oberon" value="END" />
 	<keywords name="foobar" value="hello" />
 	<keywords name="foobar" value="this" />
 	<keywords name="foobar" value="what" />
@@ -31,5 +31,3 @@ rs: v1: with attributes. It works, but doesn't look very good. :)
 
 	-->
 		
-		
-	
