@@ -19,13 +19,17 @@ Maximal 128 Keywords pro Sprache.
 	<keywords name="foobar" value="what" />
 	<keywords name="foobar" value="eth0" />
 	<keywords name="Eiffel" value="ELSEIFOR" />
-	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="{}" color="000000000H" bgcolor="0000000FFH" />
-	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="{}" color="000FF00FFH" bgcolor="0000000FFH" />
-	<styles name="assert" fontname="Oberon" fontsize="12" fontstyle ="{}" color="0FF00FFFFH" bgcolor="0000000FFH" />
-	<styles name="procedure" fontname="Oberon" fontsize="10" fontstyle ="0" color="000000000H" bgcolor="0000000FFH" />
+	<keywords name="assert" value="assert" />
+	<no name="It" value="Blah" />
+	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="" voff = "0" color="FF0000000H" bgcolor="0000000FFH" />
+	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="" voff = "0" color="000FF00FFH" bgcolor="0000000FFH" />
+	<styles name="assert" fontname="Oberon" fontsize="12" fontstyle ="" voff = "0" color="0FF00FFFFH" bgcolor="0000000FFH" />
+	<styles name="procedure" fontname="Oberon" fontsize="10" fontstyle ="0" voff = "0" color="000000000H" bgcolor="0000000FFH" />
+	<mappings language="Oberon" style="highlight" />
+	<mappings language="assert" style="assert" />
 
 </hightlight>
 
 <!--
-
+	
 	-->
