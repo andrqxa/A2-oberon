@@ -3,7 +3,7 @@
 <!-- 
 Used in Highlighter.Mod
 rs: v1: with attributes. It works, but doesn't look very good. :)
-Maximal 128 Keywords pro Sprache.
+
 -->
 
 <hightlight>
@@ -13,21 +13,37 @@ Maximal 128 Keywords pro Sprache.
 	<keywords name="Oberon" value="ELSE" />
 	<keywords name="Oberon" value="VAR" />
 	<keywords name="Oberon" value="BEGIN" />
+	<keywords name="Oberon" value="VAR" />
+	<keywords name="Oberon" value="CHAR" />
+	<keywords name="Oberon" value="LONGINT" />
+	<keywords name="Oberon" value="PROCEDURE" />
+	<keywords name="Oberon" value="MODULE" />
+	<keywords name="Oberon" value="IS" />
+	<keywords name="Oberon" value="NIL" />
+	<keywords name="Oberon" value="ELSIF" />
+	<keywords name="Oberon" value="RETURN" />
+	<keywords name="Oberon" value="FOR" />
+	<keywords name="Oberon" value="WHILE" />
+	<keywords name="Oberon" value="DO" />
 	<keywords name="Oberon" value="END" />
+
 	<keywords name="foobar" value="hello" />
 	<keywords name="foobar" value="this" />
+	<keywords name="foobar" value="OMGWTF" />
 	<keywords name="foobar" value="what" />
 	<keywords name="foobar" value="eth0" />
 	<keywords name="Eiffel" value="ELSEIFOR" />
 	<keywords name="assert" value="assert" />
 	<no name="It" value="Blah" />
-	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="" voff = "0" color="0FF0000000" bgcolor="0000000FF" />
-	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="" voff = "1" color="000FF00FF" bgcolor="0000000FF" />
-	<styles name="assert" fontname="Oberon" fontsize="12" fontstyle ="" voff = "2" color="0FF00FFFF" bgcolor="0000000FF" />
-	<styles name="procedure" fontname="Oberon" fontsize="10" fontstyle ="0" voff = "3" color="000000000" bgcolor="0000000FF" />
+	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="" voff = "0" color="000000FF" bgcolor="00000000" />
+	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="" voff = "0" color="00FF00FF" bgcolor="00000000" />
+	<styles name="foobar" fontname="Oberon" fontsize="10" fontstyle ="0" voff = "0" color="FF0000FF" bgcolor="00000000" />
+	<styles name="assert" fontname="Oberon" fontsize="10" fontstyle ="0" voff = "0" color="FF00FFFF" bgcolor="00000000" />
+	<styles name="procedure" fontname="Oberon" fontsize="10" fontstyle ="0" voff = "0" color="000000000" bgcolor="000000FF" />
 	<mappings language="Oberon" style="highlight" />
+	<mappings language="foobar" style="foobar" />
 	<mappings language="assert" style="assert" />
-
+	
 </hightlight>
 
 <!--
