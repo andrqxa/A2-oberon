@@ -32,14 +32,17 @@ rs: v1: with attributes. It works, but doesn't look very good. :)
 	<keywords name="foobar" value="OMGWTF" />
 	<keywords name="foobar" value="what" />
 	<keywords name="foobar" value="eth0" />
+
 	<keywords name="Eiffel" value="ELSEIFOR" />
+
 	<keywords name="assert" value="assert" />
-	<no name="It" value="Blah" />
-	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="" voff = "0" color="000000FF" bgcolor="00000000" />
-	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="" voff = "0" color="00FF00FF" bgcolor="00000000" />
-	<styles name="foobar" fontname="Oberon" fontsize="10" fontstyle ="0" voff = "0" color="FF0000FF" bgcolor="00000000" />
-	<styles name="assert" fontname="Oberon" fontsize="10" fontstyle ="0" voff = "0" color="FF00FFFF" bgcolor="00000000" />
-	<styles name="procedure" fontname="Oberon" fontsize="10" fontstyle ="0" voff = "0" color="000000000" bgcolor="000000FF" />
+
+	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="{}" voff = "0" color="000000FF" bgcolor="00000000" />
+	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="{}" voff = "0" color="00FF00FF" bgcolor="00000000" />
+	<styles name="foobar" fontname="Oberon" fontsize="10" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
+	<styles name="assert" fontname="Oberon" fontsize="10" fontstyle ="{0}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
+	<styles name="procedure" fontname="Oberon" fontsize="10" fontstyle ="{0}" voff = "0" color="000000000" bgcolor="000000FF" />
+
 	<mappings language="Oberon" style="highlight" />
 	<mappings language="foobar" style="foobar" />
 	<mappings language="assert" style="assert" />
