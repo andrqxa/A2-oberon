@@ -3,11 +3,9 @@
 <!-- 
 Used in Highlighter.Mod
 rs: v1: with attributes. It works, but doesn't look very good. :)
-
 -->
 
 <hightlight>
-	
 	<keywords name="Oberon" value="IF" />
 	<keywords name="Oberon" value="THEN" />
 	<keywords name="Oberon" value="ELSE" />
@@ -26,16 +24,25 @@ rs: v1: with attributes. It works, but doesn't look very good. :)
 	<keywords name="Oberon" value="WHILE" />
 	<keywords name="Oberon" value="DO" />
 	<keywords name="Oberon" value="END" />
+	<keywords name="Oberon-ext" value="EXCLUSIVE" style="fdsjfd" />
 
 	<keywords name="foobar" value="hello" />
 	<keywords name="foobar" value="this" />
 	<keywords name="foobar" value="OMGWTF" />
 	<keywords name="foobar" value="what" />
 	<keywords name="foobar" value="eth0" />
+	<keywords name="foobar" value="foo" />
+	<keywords name="foobar" value="bar" />
+	<keywords name="foobar" value="foobar" />
 
 	<keywords name="Eiffel" value="ELSEIFOR" />
-
 	<keywords name="assert" value="assert" />
+
+	<keywords name="java" value="if" />
+	<keywords name="java" value="then" />
+	<keywords name="java" value="else" />
+	<keywords name="java" value="while" />
+	<keywords name="java" value="for" />
 
 	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="{}" voff = "0" color="000000FF" bgcolor="00000000" />
 	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="{}" voff = "0" color="00FF00FF" bgcolor="00000000" />
@@ -46,9 +53,17 @@ rs: v1: with attributes. It works, but doesn't look very good. :)
 	<mappings language="Oberon" style="highlight" />
 	<mappings language="foobar" style="foobar" />
 	<mappings language="assert" style="assert" />
-	
+
 </hightlight>
 
-<!--
+<!-- 
+
+<Language>
 	
-	-->
+		<Group>
+			<Style>COmment<STule.>
+			<
+		</Group>
+	
+	</Language>
+-->
