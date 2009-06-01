@@ -46,7 +46,7 @@ rs: v1: with attributes. It works, but doesn't look very good. :)
 
 	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="{}" voff = "0" color="000000FF" bgcolor="00000000" />
 	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="{}" voff = "0" color="00FF00FF" bgcolor="00000000" />
-	<styles name="foobar" fontname="Oberon" fontsize="10" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
+	<styles name="foobar" fontname="Oberon" fontsize="12" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
 	<styles name="assert" fontname="Oberon" fontsize="10" fontstyle ="{0}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
 	<styles name="procedure" fontname="Oberon" fontsize="10" fontstyle ="{0}" voff = "0" color="000000000" bgcolor="000000FF" />
 
@@ -57,13 +57,51 @@ rs: v1: with attributes. It works, but doesn't look very good. :)
 </hightlight>
 
 <!-- 
+<Oberon>
+	<keyword name= "" style= "" />
+	oder
+	<keywords>
+		<style> Fett </style>
+		<keyword> IF </keyword>
+		<keyword> THEN </keyword>
+		<keyword> ELSE </keyword>
+		<keyword> END </keyword>
+		
+	</keywords>
+	<keywords>
+		<style> FettGelb </style>
+		<keyword> PROCEDURE </keyword>
+		<keyword> VAR </keyword>
+		<keyword> BEGIN </keyword>
+		<keyword> EXCLUSIVE </keyword>
+	</keywords>
+</Oberon>
 
-<Language>
-	
-		<Group>
-			<Style>COmment<STule.>
-			<
-		</Group>
-	
-	</Language>
+<foobar>
+	<keyword name= "" style= "" />
+	oder
+	<keywords>
+		<style> Fett </style>
+		<keyword> hello </keyword>
+		<keyword> OMGWTF </keyword>
+		<keyword> bar </keyword>
+		<keyword> foo </keyword>
+		<keyword> foobar </keyword>
+		<keyword> this </keyword>
+		<keyword> that </keyword>
+		<keyword> eth0 </keyword>
+	</keywords>
+	<keywords>
+		<style> assert </style>
+		<keyword> PROCEDURE </keyword>
+		<keyword> VAR </keyword>
+		<keyword> BEGIN </keyword>
+		<keyword> EXCLUSIVE </keyword>
+	</keywords>
+</foobar>
+
+<Styles>
+	<style name="Fett" fontname="Oberon" fontsize="12" fontstyle ="{}" voff = "0" color="00FF00FF" bgcolor="00000000" />
+	<styles name="FettGelb" fontname="Oberon" fontsize="10" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
+</Styles>
 -->
