@@ -1,107 +1,47 @@
 <?xml version="1.0" encoding="UTF-8" standalone='yes'?>
-
 <!-- 
 Used in Highlighter.Mod
-rs: v1: with attributes. It works, but doesn't look very good. :)
 -->
-
 <hightlight>
-	<keywords name="Oberon" value="IF" />
-	<keywords name="Oberon" value="THEN" />
-	<keywords name="Oberon" value="ELSE" />
-	<keywords name="Oberon" value="VAR" />
-	<keywords name="Oberon" value="BEGIN" />
-	<keywords name="Oberon" value="VAR" />
-	<keywords name="Oberon" value="CHAR" />
-	<keywords name="Oberon" value="LONGINT" />
-	<keywords name="Oberon" value="PROCEDURE" />
-	<keywords name="Oberon" value="MODULE" />
-	<keywords name="Oberon" value="IS" />
-	<keywords name="Oberon" value="NIL" />
-	<keywords name="Oberon" value="ELSIF" />
-	<keywords name="Oberon" value="RETURN" />
-	<keywords name="Oberon" value="FOR" />
-	<keywords name="Oberon" value="WHILE" />
-	<keywords name="Oberon" value="DO" />
-	<keywords name="Oberon" value="END" />
-	<keywords name="Oberon-ext" value="EXCLUSIVE" style="fdsjfd" />
+	<languages>
+		<oberon>
+			<style name = "highlight">
+				<keyword name = "IF" />
+				<keyword name = "THEN" />
+				<keyword name = "ELSE" />
+				<keyword name = "END" />
+				<keyword name = "PROCEDURE" />
+				<keyword name = "VAR" />
+				<keyword name = "BEGIN" />
+				<keyword name = "EXCLUSIVE" />
+			</style>
+			<style name = "assert">
+				<keyword name = "assert" />
+			</style>
+			<style name = "foobar">  
+				<keyword name = "hello" />
+				<keyword name = "OMGWTF" />
+				<keyword name = "bar" />
+				<keyword name = "foo" />
+				<keyword name = "foobar" />
+				<keyword name = "eth0" />
+				<keyword name = "this" />
+				<keyword name = "that" />
+			</style>
+		</oberon>
+		<foobar>
+			<style name = "assert">
+				<keyword name = "assert2" />
+			</style>
+		</foobar>
+	</languages>
 
-	<keywords name="foobar" value="hello" />
-	<keywords name="foobar" value="this" />
-	<keywords name="foobar" value="OMGWTF" />
-	<keywords name="foobar" value="what" />
-	<keywords name="foobar" value="eth0" />
-	<keywords name="foobar" value="foo" />
-	<keywords name="foobar" value="bar" />
-	<keywords name="foobar" value="foobar" />
+	<styles>
+		<highlight fontname="Oberon" fontsize="12" fontstyle ="{0}" voff = "0" color="000000FF" bgcolor="00000000" />
+		<foobar fontname="Oberon" fontsize="20" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
+		<assert fontname="Vera" fontsize="40" fontstyle ="{1,0}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
 
-	<keywords name="Eiffel" value="ELSEIFOR" />
-	<keywords name="assert" value="assert" />
-
-	<keywords name="java" value="if" />
-	<keywords name="java" value="then" />
-	<keywords name="java" value="else" />
-	<keywords name="java" value="while" />
-	<keywords name="java" value="for" />
-
-	<styles name="default" fontname="Oberon" fontsize="10" fontstyle ="{}" voff = "0" color="000000FF" bgcolor="00000000" />
-	<styles name="highlight" fontname="Oberon" fontsize="12" fontstyle ="{}" voff = "0" color="00FF00FF" bgcolor="00000000" />
-	<styles name="foobar" fontname="Oberon" fontsize="12" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
-	<styles name="assert" fontname="Oberon" fontsize="10" fontstyle ="{0}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
-	<styles name="procedure" fontname="Oberon" fontsize="10" fontstyle ="{0}" voff = "0" color="000000000" bgcolor="000000FF" />
-
-	<mappings language="Oberon" style="highlight" />
-	<mappings language="foobar" style="foobar" />
-	<mappings language="assert" style="assert" />
-
+		<default fontname="Oberon" fontsize="10" fontstyle ="{}" voff = "0" color="00FF00FF" bgcolor="00000000" />
+		<procedure fontname="Oberon" fontsize="10" fontstyle ="{0}" voff = "0" color="000000000" bgcolor="000000FF" />
+	</styles>
 </hightlight>
-
-<!-- 
-<Oberon>
-	<keyword name= "" style= "" />
-	oder
-	<keywords>
-		<style> Fett </style>
-		<keyword> IF </keyword>
-		<keyword> THEN </keyword>
-		<keyword> ELSE </keyword>
-		<keyword> END </keyword>
-		
-	</keywords>
-	<keywords>
-		<style> FettGelb </style>
-		<keyword> PROCEDURE </keyword>
-		<keyword> VAR </keyword>
-		<keyword> BEGIN </keyword>
-		<keyword> EXCLUSIVE </keyword>
-	</keywords>
-</Oberon>
-
-<foobar>
-	<keyword name= "" style= "" />
-	oder
-	<keywords>
-		<style> Fett </style>
-		<keyword> hello </keyword>
-		<keyword> OMGWTF </keyword>
-		<keyword> bar </keyword>
-		<keyword> foo </keyword>
-		<keyword> foobar </keyword>
-		<keyword> this </keyword>
-		<keyword> that </keyword>
-		<keyword> eth0 </keyword>
-	</keywords>
-	<keywords>
-		<style> assert </style>
-		<keyword> PROCEDURE </keyword>
-		<keyword> VAR </keyword>
-		<keyword> BEGIN </keyword>
-		<keyword> EXCLUSIVE </keyword>
-	</keywords>
-</foobar>
-
-<Styles>
-	<style name="Fett" fontname="Oberon" fontsize="12" fontstyle ="{}" voff = "0" color="00FF00FF" bgcolor="00000000" />
-	<styles name="FettGelb" fontname="Oberon" fontsize="10" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
-</Styles>
--->
