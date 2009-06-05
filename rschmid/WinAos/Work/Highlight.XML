@@ -26,11 +26,12 @@ Used in Highlighter.Mod
 				<keyword name = "ANY" />
 				<keyword name = "RETURN" />
 				<keyword name = "NEW" />
-				<keyword name = "NIL" />				
+				<keyword name = "NIL" />
+				<keyword name = "OF" />
 			</style>
 			
 			<style name = "assert">
-				<keyword name = "assert" />
+				<keyword name = "ASSERT" />
 				<keyword name = "EXCLUSIVE" />
 			</style>
 			<style name = "hime">
@@ -40,9 +41,7 @@ Used in Highlighter.Mod
 				<keyword name = "FALSE" />
 			</style>
 			<style name = "kernellog">
-				<keyword name = "KernelLog.Ln" />
-				<keyword name = "KernelLog.String" />
-				<keyword name = "KernelLog.Int" />
+				<keyword name = "KernelLog" />
 			</style>
 			<style name = "foobar">  
 				<keyword name = "hello" />
@@ -59,6 +58,10 @@ Used in Highlighter.Mod
 			<style name = "assert">
 				<keyword name = "assert2" />
 			</style>
+			<style name = "hime">
+				<keyword name = "this" />
+				<keyword name = "kill" />
+			</style>
 		</foobar>
 	</languages>
 
@@ -68,7 +71,5 @@ Used in Highlighter.Mod
 		<kernellog fontname="Oberon" fontsize="12" fontstyle ="{1}" voff = "0" color="5500FFFF" bgcolor="00000000" />
 		<foobar fontname="Oberon" fontsize="20" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
 		<assert fontname="Vera" fontsize="40" fontstyle ="{1,0}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
-		<default fontname="Oberon" fontsize="10" fontstyle ="{}" voff = "0" color="00FF00FF" bgcolor="00000000" />
-		<procedure fontname="Oberon" fontsize="10" fontstyle ="{0}" voff = "0" color="000000000" bgcolor="000000FF" />
 	</styles>
 </hightlight>
