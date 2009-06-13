@@ -53,6 +53,14 @@ Used in Highlighter.Mod
 				<keyword name = "this" />
 				<keyword name = "that" />
 			</style>
+			<style name = "acquire">  
+				<keyword name = "Acquire" />
+				<keyword name = "Release" />
+				<keyword name = "AcquireRead" />
+				<keyword name = "ReleaseRead" />
+				<keyword name = "AcquireWrite" />
+				<keyword name = "ReleaseWrite" />
+			</style>
 		</oberon>
 		<foobar>
 			<style name = "assert">
@@ -71,5 +79,6 @@ Used in Highlighter.Mod
 		<kernellog fontname="Oberon" fontsize="12" fontstyle ="{1}" voff = "0" color="5500FFFF" bgcolor="00000000" />
 		<foobar fontname="Oberon" fontsize="20" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
 		<assert fontname="Vera" fontsize="40" fontstyle ="{1,0}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
+		<acquire fontname="Oberon" fontsize="12" fontstyle ="{}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
 	</styles>
 </hightlight>
