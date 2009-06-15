@@ -4,7 +4,7 @@ Used in Highlighter.Mod
 -->
 <hightlight>
 	<languages>
-		<oberon>
+		<language name = "oberon">
 			<style name = "highlight">
 				<keyword name = "MODULE" />
 				<keyword name = "IMPORT" />
@@ -28,8 +28,9 @@ Used in Highlighter.Mod
 				<keyword name = "NEW" />
 				<keyword name = "NIL" />
 				<keyword name = "OF" />
+				<keyword name = "REPEAT" />
+				<keyword name = "UNTIL" />
 			</style>
-			
 			<style name = "assert">
 				<keyword name = "ASSERT" />
 				<keyword name = "EXCLUSIVE" />
@@ -61,8 +62,8 @@ Used in Highlighter.Mod
 				<keyword name = "AcquireWrite" />
 				<keyword name = "ReleaseWrite" />
 			</style>
-		</oberon>
-		<foobar>
+		</language>
+		<language name = "foobar">
 			<style name = "assert">
 				<keyword name = "assert2" />
 			</style>
@@ -70,15 +71,17 @@ Used in Highlighter.Mod
 				<keyword name = "this" />
 				<keyword name = "kill" />
 			</style>
-		</foobar>
+		</language>
 	</languages>
 
 	<styles>
-		<highlight fontname="Oberon" fontsize="12" fontstyle ="{0}" voff = "0" color="000000FF" bgcolor="00000000" />
-		<hime fontname="Oberon" fontsize="12" fontstyle ="{0}" voff = "0" color="00FF00FF" bgcolor="00000000" />
-		<kernellog fontname="Oberon" fontsize="12" fontstyle ="{1}" voff = "0" color="5500FFFF" bgcolor="00000000" />
-		<foobar fontname="Oberon" fontsize="20" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
-		<assert fontname="Vera" fontsize="40" fontstyle ="{1,0}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
-		<acquire fontname="Oberon" fontsize="12" fontstyle ="{}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
+		<style name= "highlight" fontname="Oberon" fontsize="12" fontstyle ="{0}" voff = "0" color="000000FF" bgcolor="00000000" />
+		<style name= "hime" fontname="Oberon" fontsize="12" fontstyle ="{0}" voff = "0" color="00FF00FF" bgcolor="00000000" />
+		<style name= "kernellog" fontname="Oberon" fontsize="12" fontstyle ="{1}" voff = "0" color="5500FFFF" bgcolor="00000000" />
+		<style name= "foobar" fontname="Oberon" fontsize="20" fontstyle ="{1}" voff = "0" color="FF0000FF" bgcolor="00000000" />
+		<style name= "assert" fontname="Vera" fontsize="40" fontstyle ="{1,0}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
+		<style name= "acquire" fontname="Oberon" fontsize="12" fontstyle ="{}" voff = "0" color="FF00FFFF" bgcolor="00000000" />
+		<style name= "comment" fontname="Oberon" fontsize="10" fontstyle ="{}" voff = "0" color="808080FF" bgcolor="00000000" />
+		<style name= "inquotes" fontname="Oberon" fontsize="14" fontstyle ="{}" voff = "0" color="40C0FFFF" bgcolor="00000000" />
 	</styles>
 </hightlight>
