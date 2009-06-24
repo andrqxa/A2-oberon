@@ -1,0 +1,144 @@
+<Panel caption=" Develop ">
+	<Properties>
+		<FillColor>0</FillColor>
+	</Properties>
+	<Panel>
+		<Properties>
+			<Alignment>1</Alignment>
+			<Bounds>
+				<Width>120</Width>
+			</Bounds>
+		</Properties>
+		<Button>
+			<Properties>
+				<Caption>IDE</Caption>
+				<Alignment>2</Alignment>
+				<OnClickHandler>X Run</OnClickHandler>
+			</Properties>
+			<SystemCommand>
+				<Properties>
+					<ID>X</ID>
+					<CommandString>PET.Open</CommandString>
+				</Properties>
+			</SystemCommand>
+		</Button>
+		<Button>
+			<Properties>
+				<Caption>Oberon FullScreen</Caption>
+				<Alignment>2</Alignment>
+				<OnClickHandler>X Run</OnClickHandler>
+			</Properties>
+			<SystemCommand>
+				<Properties>
+					<ID>X</ID>
+					<CommandString>OberonDisplay.Install Oberon 0x0;Oberon.Call System.Init Oberon</CommandString>
+				</Properties>
+			</SystemCommand>
+		</Button>
+	</Panel>
+	<!-- Second column -->
+	<Panel>
+		<Properties>
+			<Alignment>1</Alignment>
+			<Bounds>
+				<Width>120</Width>
+			</Bounds>
+		</Properties>
+		<Button>
+			<Properties>
+				<Caption>GUIPatterns</Caption>
+				<Alignment>2</Alignment>
+				<OnClickHandler>X Run</OnClickHandler>
+			</Properties>
+			<SystemCommand>
+				<Properties>
+					<ID>X</ID>
+					<CommandString>Notepad.Open GUIPat.txt</CommandString>
+				</Properties>
+			</SystemCommand>
+		</Button>
+		<Button>
+			<Properties>
+				<Caption></Caption>
+				<Alignment>2</Alignment>
+				<OnClickHandler>X Run</OnClickHandler>
+			</Properties>
+			<SystemCommand>
+				<Properties>
+					<ID>X</ID>
+					<CommandString></CommandString>
+				</Properties>
+			</SystemCommand>
+		</Button>
+	</Panel>
+	<!-- 3rd column -->
+	<Panel>
+		<Properties>
+			<Alignment>1</Alignment>
+			<Bounds>
+				<Width>120</Width>
+			</Bounds>
+		</Properties>
+		<Button>
+			<Properties>
+				<Caption/>
+				<Alignment>2</Alignment>
+				<OnClickHandler>X Run</OnClickHandler>
+			</Properties>
+			<SystemCommand>
+				<Properties>
+					<ID>X</ID>
+					<CommandString/>
+				</Properties>
+			</SystemCommand>
+		</Button>
+		<Button>
+			<Properties>
+				<Caption/>
+				<Alignment>2</Alignment>
+				<OnClickHandler>X Run</OnClickHandler>
+			</Properties>
+			<SystemCommand>
+				<Properties>
+					<ID>X</ID>
+					<CommandString/>
+				</Properties>
+			</SystemCommand>
+		</Button>
+	</Panel>
+	<!-- 4th column -->
+	<Panel>
+		<Properties>
+			<Alignment>1</Alignment>
+			<Bounds>
+				<Width>120</Width>
+			</Bounds>
+		</Properties>
+		<Button>
+			<Properties>
+				<Caption/>
+				<Alignment>2</Alignment>
+				<OnClickHandler>X Run</OnClickHandler>
+			</Properties>
+			<SystemCommand>
+				<Properties>
+					<ID>X</ID>
+					<CommandString/>
+				</Properties>
+			</SystemCommand>
+		</Button>
+		<Button>
+			<Properties>
+				<Caption/>
+				<Alignment>2</Alignment>
+				<OnClickHandler>X Run</OnClickHandler>
+			</Properties>
+			<SystemCommand>
+				<Properties>
+					<ID>X</ID>
+					<CommandString/>
+				</Properties>
+			</SystemCommand>
+		</Button>
+	</Panel>
+</Panel>
