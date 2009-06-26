@@ -5,7 +5,7 @@ IMPORT
 
 CONST
 	MaxSize= 256;
-	cArraySize = 1024;
+	cArraySize = 10000;
 	HighlightFile = "Highlight.XML";
 	VeryLargeNumber = 100000000;
 
@@ -282,6 +282,37 @@ TYPE
 					END;
 				END;
 
+				IF (current # NIL) & (Strings.Match(current.name,Star)) THEN
+					current := current.next;
+
+					IF (current # NIL) THEN
+						pos := pos + current.distance;
+					END;
+
+					IF (current # NIL) & (Strings.Match(current.name,CloseBracket)) & (current.distance = 1) THEN
+						IF (~quotes) THEN
+							(* Last comment closed *)
+							IF (depth > 1) THEN
+								DEC(depth);
+							ELSE
+								IF (depth = 1) THEN
+									depth := 0;
+									pArray[counter].name := DefaultTag;
+									pArray[counter].pos := pos;
+									INC(counter);
+								ELSE
+									DEC(depth);
+								END;
+							END;
+							current := current.next;
+
+							IF (current # NIL) THEN
+								pos := pos + current.distance;
+							END;
+						END;
+					END;
+				END;
+
 				IF (current # NIL) & (Strings.Match(current.name,OpenBracket)) THEN
 					current := current.next;
 					IF (current # NIL) THEN
@@ -307,37 +338,6 @@ TYPE
 					END;
 				END;
 
-				IF (current # NIL) & (Strings.Match(current.name,Star)) THEN
-					current := current.next;
-
-					IF (current # NIL) THEN
-						pos := pos + current.distance;
-					END;
-
-					IF (current # NIL) & (Strings.Match(current.name,CloseBracket)) & (current.distance = 1) THEN
-						IF (~quotes) THEN
-							(* Last comment closed *)
-							IF (depth > 1) THEN
-								DEC(depth);
-							ELSE
-								IF (depth = 1) THEN
-									depth := 0;
-									pArray[counter].name := DefaultTag;
-									pArray[counter].pos := pos-2;
-									INC(counter);
-								ELSE
-									DEC(depth);
-								END;
-							END;
-							current := current.next;
-
-							IF (current # NIL) THEN
-								pos := pos + current.distance;
-							END;
-						END;
-					END;
-				END;
-
 				IF (current # NIL) & (Strings.Match(current.name,CloseBracket)) THEN
 					current := current.next;
 
@@ -356,12 +356,10 @@ END;
 		PROCEDURE UpdateComments*(text : Texts.Text; info: Texts.TextChangeInfo; VAR fullLayout: BOOLEAN);
 		VAR
 			(* info: timestamp*, op*, pos*, len* *)
-			counter : LONGINT;
+			counter,compos, check, sp, eot: LONGINT;
 			name: Array32;
 			com : pComment;
-			compos : LONGINT;
 			overflow: BOOLEAN;
-			check: LONGINT;
 
 		BEGIN
 
@@ -428,15 +426,15 @@ KernelLog.String("Sub: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(
 
 			IF (info.op = 3) THEN
 KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
-		(* maybe teh sheit works *)
 				NEW(com);
+
+				first := NIL;
 				
-				IF (first # NIL) THEN
-					first := NIL;
-				END;
+				sp := textReader.GetPosition();
 				counter := 0;
 				textReader.SetPosition(0);
-				WHILE (~textReader.eot) DO
+				eot := textReader.text.GetLength();
+				WHILE (counter < eot) DO
 					NEW(com);
 
 					IF (isComment(textReader,counter,name)) THEN
@@ -445,9 +443,12 @@ KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" lette
 					END;
 					INC (counter);
 				END;
-			END;
 
-		UpdateArray;
+			textReader.SetPosition(sp);			
+			
+			END;
+	
+			UpdateArray;
 
 		END UpdateComments;
 
@@ -491,49 +492,6 @@ KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" lette
 			END;
 
 		END CheckComments;
-
-		PROCEDURE PrintComments*;
-		VAR
-			current: pComment;
-			counter: LONGINT;
-		BEGIN
-			
-			IF (first = NIL) THEN
-KernelLog.String("no Comments yet"); KernelLog.Ln;
-			ELSE
-				NEW(current);
-				current := first;
-(*
-KernelLog.Ln; KernelLog.Ln;
-KernelLog.String(" ||||||||||||||||||||||||||||||||||||||||||||||||||||||X|||||||||||||||||||||||||||||||||||||||||||||||||||||| ");
-KernelLog.Ln; KernelLog.Ln;
-KernelLog.String(" Verkettete Liste: ");
-
-				WHILE (current # NIL) DO
-KernelLog.Ln;
-KernelLog.String("   "); KernelLog.Int(current.distance,0);
-KernelLog.String(" / "); KernelLog.Int(Strings.Length(current.name),0);
-KernelLog.String(" / "); KernelLog.String(current.name);
-					current := current.next;
-				END;
-*)
-KernelLog.Ln;KernelLog.Ln;
-KernelLog.String("/////////////////////////////////X\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
-KernelLog.Ln; KernelLog.Ln;
-KernelLog.String(" Array: ");
-				counter := 0;
-KernelLog.Ln;				
-
-				WHILE (pArray[counter].name # 0X) DO
-KernelLog.String(" ("); KernelLog.Int(pArray[counter].pos,0);
-KernelLog.String(") "); KernelLog.String(pArray[counter].name);
-KernelLog.String(" / ");
-					INC(counter);
-				END;				
-KernelLog.Ln;	
-			END;
-
-		END PrintComments;
 
 		PROCEDURE CheckKeyword(CONST word : ARRAY OF CHAR): BOOLEAN;
 		VAR
@@ -586,7 +544,10 @@ KernelLog.Ln;
 					ELSE
 						hiSwitch := FALSE;
 					END;
+				ELSE
+					hiSwitch := FALSE;
 				END;
+				
 			END;
 			
 			reader.SetPosition(sp);
@@ -634,7 +595,7 @@ BEGIN
 		(* Find the end of the word *)
 		end := TextUtilities.FindEndWordRight(reader, pos);
 
-	END;
+	END; 
 END GetWordBorders;
 
 PROCEDURE GetWord(reader: Texts.TextReader; start, end : LONGINT; VAR word : ARRAY OF CHAR);
