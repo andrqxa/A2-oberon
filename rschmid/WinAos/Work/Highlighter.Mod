@@ -26,6 +26,8 @@ CONST
 	
 	QuoteTag = "quote"; DefaultTag = "default"; CommentTag = "comment";
 
+	Trace = TRUE;
+
 TYPE
 	Attributes = Texts.Attributes;
 	
@@ -338,21 +340,20 @@ TYPE
 			com : pComment;
 			overflow: BOOLEAN;
 		BEGIN
-			IF (textReader = NIL) THEN NEW(textReader,text); END;
+			IF Trace THEN
+				KernelLog.Ln;
+				KernelLog.String("Op: "); KernelLog.Int(info.op, 0); 
+				KernelLog.String(" Pos: "); KernelLog.Int(info.pos, 0); 
+				KernelLog.String(" Len: "); KernelLog.Int(info.len, 0); 
+				KernelLog.String(" Timestamp: "); KernelLog.Int(info.timestamp, 0); 
+				KernelLog.Ln;
+			END;		
+			IF (textReader = NIL) THEN NEW(textReader, text); END;
 			textReader.SetPosition(info.pos);
 			textReader.SetDirection(1);
 
-(* Informationblock *)
-KernelLog.Ln;
-KernelLog.String("Op: "); KernelLog.Int(info.op,0); 
-KernelLog.String(" Pos: "); KernelLog.Int(info.pos,0); 
-KernelLog.String(" Len: "); KernelLog.Int(info.len,0); 
-KernelLog.String(" Timestamp: "); KernelLog.Int(info.timestamp,0); 
-KernelLog.Ln;
-
-
 			IF (info.op = 0) THEN
-				KernelLog.String("Add: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
+				IF Trace THEN KernelLog.String("Add: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)"); END;
 				counter := info.pos;
 				WHILE (counter < info.pos + info.len) DO
 					NEW(com);
@@ -369,17 +370,13 @@ KernelLog.Ln;
 					END;
 					INC(counter);
 				END;
-			END;
-
-			IF (info.op = 1) THEN
-				KernelLog.String("Sub: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
+			ELSIF (info.op = 1) THEN
+				IF Trace THEN KernelLog.String("Sub: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)"); END;
 				counter := info.pos;
 				check := info.len;
-				
 				WHILE (check > 0) DO				
 					NEW(com);
 					findElement(com, counter, compos, overflow);
-					
 					IF (info.pos = compos) THEN
 						removeComment(com);
 						fullLayout := TRUE;
@@ -391,7 +388,7 @@ KernelLog.Ln;
 					DEC(check);
 				END;
 			ELSIF (info.op = 3) THEN
-				KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
+				IF Trace THEN KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)"); END;
 				NEW(com);
 				first := NIL;
 				sp := textReader.GetPosition();
@@ -400,7 +397,6 @@ KernelLog.Ln;
 				eot := textReader.text.GetLength();
 				WHILE (counter < eot) DO
 					NEW(com);
-
 					IF (isComment(textReader,counter,name)) THEN
 						com.name := name;
 						addComment(com, counter);
