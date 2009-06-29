@@ -78,6 +78,7 @@ VAR
 	error : BOOLEAN;
 
 TYPE
+
 	Highlighter* = OBJECT
 	VAR
 		keywords: KeywordArray;
@@ -112,7 +113,6 @@ TYPE
 			reader.ReadCh(char);
 
 (*  34 = """  // 40 = "("  //  41 = ")"  //  42 = "*"  *)
-			
 
 			IF (char = 34) THEN
 				name := Quote;
@@ -141,7 +141,6 @@ TYPE
 		PROCEDURE findElement(VAR current: pComment; CONST pos: LONGINT; VAR counter:LONGINT; VAR overflow: BOOLEAN);
 		BEGIN
 			overflow := FALSE;
-
 			IF (first # NIL) THEN
 				current := first;
 				counter := current.distance;
@@ -161,7 +160,6 @@ TYPE
 			current : pComment;
 			curpos : LONGINT;
 			overflow, add: BOOLEAN;
-			
 		BEGIN
 			IF (first = NIL) THEN
 				first := com;
@@ -199,7 +197,6 @@ TYPE
 						com.next.prev := com;
 						com.distance := current.distance - (curpos - pos);
 						current.distance := curpos - pos + 1;
-
 					END;
 				END;
 			END;
@@ -207,7 +204,6 @@ TYPE
 
 		PROCEDURE removeComment(CONST com: pComment);
 		BEGIN
-
 			IF (com # NIL) THEN
 				(* Remove only element from the list *)
 				IF (com.prev = NIL) & (com.next = NIL) THEN
@@ -236,13 +232,7 @@ TYPE
 		END removeComment;
 
 		PROCEDURE UpdateArray;
-		VAR
-			current: pComment;
-			counter : LONGINT;
-			pos : LONGINT;
-			depth : LONGINT;
-			quotes : BOOLEAN;
-
+		VAR current: pComment; counter, pos, depth : LONGINT; quotes : BOOLEAN;
 		BEGIN
 			NEW(pArray);
 			quotes := FALSE;
@@ -340,17 +330,14 @@ TYPE
 
 				IF (current # NIL) & (Strings.Match(current.name,CloseBracket)) THEN
 					current := current.next;
-
-IF (current # NIL) THEN
-					pos := pos + current.distance;
-END;
-				END;
-				
+					IF (current # NIL) THEN
+						pos := pos + current.distance;
+					END;
+				END;				
 			END;
-			
+
 			pArray[counter+1].name := 0X;
 			pArray[counter+1].pos := VeryLargeNumber;
-
 		END UpdateArray;
 
 		PROCEDURE UpdateComments*(text : Texts.Text; info: Texts.TextChangeInfo; VAR fullLayout: BOOLEAN);
@@ -360,16 +347,10 @@ END;
 			name: Array32;
 			com : pComment;
 			overflow: BOOLEAN;
-
 		BEGIN
-
-		IF (textReader = NIL) THEN
-			NEW(textReader,text);
-		END;
-
-		textReader.SetPosition(info.pos);
-		textReader.SetDirection(1);
-
+			IF (textReader = NIL) THEN NEW(textReader,text); END;
+			textReader.SetPosition(info.pos);
+			textReader.SetDirection(1);
 
 (* Informationblock *)
 KernelLog.Ln;
@@ -381,7 +362,7 @@ KernelLog.Ln;
 
 
 			IF (info.op = 0) THEN
-KernelLog.String("Add: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
+				KernelLog.String("Add: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
 				counter := info.pos;
 				WHILE (counter < info.pos + info.len) DO
 					NEW(com);
@@ -403,8 +384,7 @@ KernelLog.String("Add: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(
 			END;
 
 			IF (info.op = 1) THEN
-KernelLog.String("Sub: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
-
+				KernelLog.String("Sub: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
 				counter := info.pos;
 				check := info.len;
 				
@@ -425,11 +405,9 @@ KernelLog.String("Sub: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(
 			END;
 
 			IF (info.op = 3) THEN
-KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
+				KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
 				NEW(com);
-
 				first := NIL;
-				
 				sp := textReader.GetPosition();
 				counter := 0;
 				textReader.SetPosition(0);
@@ -443,21 +421,14 @@ KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" lette
 					END;
 					INC (counter);
 				END;
-
-			textReader.SetPosition(sp);			
-			
+				textReader.SetPosition(sp);						
 			END;
-	
 			UpdateArray;
-
 		END UpdateComments;
 
 		PROCEDURE CheckComments*(reader: Texts.TextReader; CONST pos: LONGINT; VAR attr: Attributes; VAR notDefault: BOOLEAN);
-		VAR
-			counter: LONGINT;
-			overflow: BOOLEAN;
+		VAR counter: LONGINT; overflow: BOOLEAN;
 		BEGIN
-			
 			notDefault := FALSE;
 			counter := 0;
 			
@@ -488,16 +459,11 @@ KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" lette
 					notDefault := TRUE;
 					attr:= InQuotes.attributes.Clone();
 				END;
-				
 			END;
-
 		END CheckComments;
 
 		PROCEDURE CheckKeyword(CONST word : ARRAY OF CHAR): BOOLEAN;
-		VAR
-			i,j : LONGINT;
-			isKeyword : BOOLEAN;
-
+		VAR i,j : LONGINT; isKeyword : BOOLEAN;
 		BEGIN
 			i := 0; j := 0;
 			isKeyword := FALSE;
@@ -512,11 +478,7 @@ KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" lette
 		END CheckKeyword;
 
 		PROCEDURE CheckHighlight*(reader : Texts.TextReader; CONST sp : LONGINT; VAR attr:  Attributes; VAR hiSwitch : BOOLEAN; VAR resetHCounter:BOOLEAN);
-		VAR
-			start, end : LONGINT;
-			word : Array32;
-			char : Char32;
-
+		VAR start, end : LONGINT; word : Array32; char : Char32;
 		BEGIN
 			IF (resetHCounter) THEN
 				hCounter := 0;
@@ -546,65 +508,43 @@ KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" lette
 					END;
 				ELSE
 					hiSwitch := FALSE;
-				END;
-				
-			END;
-			
+				END;				
+			END;			
 			reader.SetPosition(sp);
-
 		END CheckHighlight;		
 
 		PROCEDURE &Init(CONST language : Array32);
-
 		BEGIN
-
-		IF (LoadXML()) THEN
-			KernelLog.Ln; 
-			KernelLog.String(HighlightFile); 
-			KernelLog.String(" loaded ");
-			KernelLog.Ln;
-		ELSE
-			KernelLog.Ln; KernelLog.String("Loading "); 
-			KernelLog.String(HighlightFile); 
-			KernelLog.String(" failed!!!");
-			KernelLog.Ln;
-		END;
-
-		keywords := GetHighlighting(language);
-		
+			IF LoadXML() THEN
+				KernelLog.Ln; 
+				KernelLog.String(HighlightFile); KernelLog.String(" loaded "); KernelLog.Ln;
+			ELSE
+				KernelLog.Ln; KernelLog.String("Loading ");  KernelLog.String(HighlightFile); 
+				KernelLog.String(" failed!!!"); KernelLog.Ln;
+			END;
+			keywords := GetHighlighting(language);		
 		END Init;
 
 	END Highlighter;
 
-
 PROCEDURE GetWordBorders(reader: Texts.TextReader; pos: LONGINT; VAR start, end : LONGINT);
-VAR
-	a : Texts.Char32;
-
+VAR a : Texts.Char32;
 BEGIN
+	start := pos; end := pos;
 	reader.SetPosition(pos);
 	reader.SetDirection(1);
 	reader.ReadCh(a);
-
-	start := pos; end := pos;
-
 	IF (TextUtilities.IsAlphaNum(a)) THEN
 		(* Find the start of the word *)
 		start := TextUtilities.FindPosWordLeft(reader,pos);
-
 		(* Find the end of the word *)
 		end := TextUtilities.FindEndWordRight(reader, pos);
-
 	END; 
 END GetWordBorders;
 
 PROCEDURE GetWord(reader: Texts.TextReader; start, end : LONGINT; VAR word : ARRAY OF CHAR);
-VAR
-	length, i : LONGINT;
-	a : Texts.Char32;
-
+VAR length, i : LONGINT; a : Texts.Char32;
 BEGIN
-
 	(* Write the wort into the wordarray if it is long enough *)
 	length := end - start;
 	IF (length < 32) THEN
@@ -619,7 +559,6 @@ BEGIN
 		END;
 		word[i] := 0X;
 	END;
-
 END GetWord;
 
 PROCEDURE GetHighlighting(CONST language: Array32): KeywordArray;
@@ -629,14 +568,10 @@ VAR
 	i: LONGINT;
 	keywordCounter: LONGINT;
 	attributes : Attributes;
-	
 BEGIN
-
 	NEW (attributes);
-	
 	keywordCounter := 0;
 	keywordListListCounter := 0;
-
 	WHILE (KeywordListList[keywordListListCounter].name # 0X) DO
 		IF (Strings.Match(language,KeywordListList[keywordListListCounter].name)) THEN
 			styleListCounter := 0;
@@ -656,9 +591,7 @@ BEGIN
 		END;
 		INC(keywordListListCounter);
 	END;
-
 	RETURN keywords;
-
 END GetHighlighting;
 
 PROCEDURE LoadXML(): BOOLEAN;
@@ -679,7 +612,6 @@ VAR
 	p2,p3,p4: ANY; 
 	s2,s3,s4: XML.String; 
 	enum2,enum3,enum4: XMLObjects.Enumerator; 
-	
 BEGIN
 	NEW(s,32);
 	NEW(last,32);
@@ -764,7 +696,6 @@ BEGIN
 						(* STYLES *)
 						(* Assumption: No two styles have the same name *)
 						IF (s^ = styleblock) THEN
-							
 
 							enum2 := p(XML.Element).GetContents();
 							WHILE enum2.HasMoreElements() DO
@@ -773,7 +704,6 @@ BEGIN
 
 									(* STYLE NAME *)
 									s := p2(XML.Element).GetName();
-
 
 									IF (s # NIL) THEN
 										s := p2(XML.Element).GetAttributeValue(NameAttr);
@@ -833,16 +763,11 @@ BEGIN
 			END;
 		END;
 	END;
-
 	RETURN loaded;
-
 END LoadXML;
 
 PROCEDURE InitXML(): BOOLEAN;
-
-VAR 
-	f: Files.File; scanner: XMLScanner.Scanner; parser: XMLParser.Parser; r: Files.Reader;
-
+VAR f: Files.File; scanner: XMLScanner.Scanner; parser: XMLParser.Parser; r: Files.Reader;
 BEGIN {EXCLUSIVE}
 	error := FALSE;
 	highlight := NIL;
@@ -858,22 +783,17 @@ BEGIN {EXCLUSIVE}
 			KernelLog.Ln;
 		END;
 	END;
-	
 	RETURN ~error;
-
 END InitXML;
 
 PROCEDURE TrapHandler(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
 BEGIN
 	IF ~error THEN
-		KernelLog.String("Error in ");
-		KernelLog.String(HighlightFile);
-		KernelLog.String(" at position "); 
+		KernelLog.String("Error in "); KernelLog.String(HighlightFile); KernelLog.String(" at position "); 
 		KernelLog.String("pos= "); KernelLog.Int(pos, 0); KernelLog.String(" line= "); KernelLog.Int(line, 0); KernelLog.String(" row= "); KernelLog.Int(row, 0); 
 		KernelLog.String(" !"); KernelLog.Ln
 	ELSE
-		KernelLog.String("Error in ");
-		KernelLog.String(HighlightFile); KernelLog.String(" giving up!"); KernelLog.Ln;
+		KernelLog.String("Error in "); KernelLog.String(HighlightFile); KernelLog.String(" giving up!"); KernelLog.Ln;
 	END;	
 	error := TRUE; highlight := NIL;
 END TrapHandler;
