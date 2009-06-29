@@ -102,36 +102,26 @@ TYPE
 		END GetAttributes;
 
 		PROCEDURE isComment(reader: Texts.TextReader; CONST pos: LONGINT; VAR name: Array32):BOOLEAN;
-		VAR
-			char : Char32;
-			isCom : BOOLEAN;
+		VAR char : Char32; isCom : BOOLEAN;
 		BEGIN
-			name := "";
-			isCom := FALSE;
-
 			reader.SetPosition(pos);
 			reader.ReadCh(char);
 
-(*  34 = """  // 40 = "("  //  41 = ")"  //  42 = "*"  *)
-
-			IF (char = 34) THEN
+			IF (char = ORD('"')) THEN
 				name := Quote;
 				isCom := TRUE;
-			END;
-
-			IF (char = 40) THEN
+			ELSIF (char = ORD("(")) THEN
 				name := OpenBracket;
 				isCom := TRUE;
-			END;
-
-			IF (char = 41) THEN
+			ELSIF (char = ORD(")")) THEN
 				name := CloseBracket;
 				isCom := TRUE;
-			END;
-
-			IF (char = 42) THEN
+			ELSIF (char = ORD("*")) THEN
 				name := Star;
 				isCom := TRUE;
+			ELSE
+				name := "";
+				isCom := FALSE;
 			END;
 
 			reader.SetPosition(pos);
@@ -376,9 +366,7 @@ KernelLog.Ln;
 						IF (~overflow) THEN
 							INC(com.distance);
 						END;
-						
 					END;
-
 					INC(counter);
 				END;
 			END;
@@ -402,9 +390,7 @@ KernelLog.Ln;
 					END;
 					DEC(check);
 				END;
-			END;
-
-			IF (info.op = 3) THEN
+			ELSIF (info.op = 3) THEN
 				KernelLog.String("Multi: "); KernelLog.Int(info.len,0); KernelLog.String(" letter(s)");
 				NEW(com);
 				first := NIL;
