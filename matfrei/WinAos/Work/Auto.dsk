@@ -1,26 +1,40 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="25" t="45" r="442" b="891" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="442" t="51" r="1269" b="892" flags="{0..2}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="0" t="50" r="369" b="896" flags="{0..2}"/>
+	<Window name="PET" loader="PET.Restore" l="383" t="49" r="1291" b="890" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/Efi.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="152"/>
+			<General SelectedPageNr="4" ProjectTextFile=""/>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFITest.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="372"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFITrace.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="163"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFI.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="150" cursorPos="5676"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFIBlockIO.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/Tests.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="12" cursorPos="551"/>
+				<Editor firstLine="98" cursorPos="2609"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/source/Win32.Machine.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="741" cursorPos="23746"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="WINAP" replaceString=""/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
