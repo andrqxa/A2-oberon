@@ -2,27 +2,27 @@
 	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="0" t="50" r="369" b="896" flags="{0..2}"/>
 	<Window name="PET" loader="PET.Restore" l="383" t="49" r="1291" b="890" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="4" ProjectTextFile=""/>
+			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFITest.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="372"/>
+				<Editor firstLine="0" cursorPos="344"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFITrace.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="163"/>
+				<Editor firstLine="0" cursorPos="120"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
 			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFI.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="150" cursorPos="5676"/>
+				<Editor firstLine="0" cursorPos="1157"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="POINTER TO" replaceString=""/>
 				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
+				<SidePanel visible="true" width="255" scratchHeight="5"/>
 			</Tab>
 			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFIBlockIO.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
@@ -31,8 +31,22 @@
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFISimpleFS.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="3" cursorPos="699"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString=":= Data" replaceString=":= SimpleFSGUIDData"/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFIFileProtocol.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="315"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
 			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/Tests.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="98" cursorPos="2609"/>
+				<Editor firstLine="49" cursorPos="978"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
