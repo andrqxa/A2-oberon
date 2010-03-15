@@ -4,49 +4,14 @@
 		<PETData>
 			<General SelectedPageNr="0" ProjectTextFile=""/>
 			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFITest.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="344"/>
+				<Editor firstLine="27" cursorPos="1733"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFITrace.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="120"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFI.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="1157"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="POINTER TO" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="255" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFIBlockIO.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="0"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFISimpleFS.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="3" cursorPos="699"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString=":= Data" replaceString=":= SimpleFSGUIDData"/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFIFileProtocol.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="315"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/Tests.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="49" cursorPos="978"/>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFILib.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="56"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
