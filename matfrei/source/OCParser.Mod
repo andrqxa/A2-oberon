@@ -283,7 +283,7 @@ TYPE
 			IF MandatoryIdentifier(name) THEN
 				identifier := SyntaxTree.NewIdentifier(position,name);
 			ELSE
-				identifier := Global.invalidIdentifier;
+				identifier := SyntaxTree.invalidIdentifier;
 			END;
 			RETURN identifier
 		END Identifier;
@@ -356,7 +356,7 @@ TYPE
 			IF Trace THEN S( "QualifiedIdentifier" ) END;
 			position:= symbol.start;
 			prefix := Identifier();
-			IF prefix # Global.invalidIdentifier THEN
+			IF prefix # SyntaxTree.invalidIdentifier THEN
 				IF ~Optional( Scanner.Period )THEN
 					suffix := prefix;  prefix := NIL;   (* empty *)
 				ELSE
@@ -364,7 +364,7 @@ TYPE
 				END;
 				qualifiedIdentifier := SyntaxTree.NewQualifiedIdentifier( position, prefix,suffix);
 			ELSE
-				qualifiedIdentifier := Global.invalidQualifiedIdentifier;
+				qualifiedIdentifier := SyntaxTree.invalidQualifiedIdentifier;
 			END;
 			IF Trace THEN E( "QualifiedIdentifier" ) END;
 			RETURN qualifiedIdentifier
@@ -598,7 +598,7 @@ TYPE
 					factor.End(symbol.end);
 			ELSE
 				Error( position, Basic.ValueStartIncorrectSymbol, "" );
-				NextSymbol;  factor := Global.invalidExpression;
+				NextSymbol;  factor := SyntaxTree.invalidExpression;
 			END;
 			(* suffix *)
 			IF Optional(Scanner.Transpose) THEN
@@ -1193,6 +1193,7 @@ TYPE
 		PROCEDURE EnumerationType(position: LONGINT; parentScope: SyntaxTree.Scope): SyntaxTree.Type;
 		VAR type: SyntaxTree.EnumerationType; scope: SyntaxTree.EnumerationScope; identifier: SyntaxTree.Identifier;
 			qualifiedIdentifier: SyntaxTree.QualifiedIdentifier; qualifiedType: SyntaxTree.QualifiedType; access: SET;
+			constant: SyntaxTree.Constant; expression: SyntaxTree.Expression;
 		BEGIN
 			scope := SyntaxTree.NewEnumerationScope(parentScope);
 			type := SyntaxTree.NewEnumerationType(position,parentScope, scope);
@@ -1202,13 +1203,18 @@ TYPE
 				type.SetEnumerationBase( qualifiedType );
 				Check( Scanner.RightParenthesis )
 			END;
-			IdentifierDefinition(identifier,access,FALSE);
-			scope.AddEnumerator(identifier); scope.lastEnumerator.SetAccess(access);
-			WHILE Optional(Scanner.Comma) DO
+			REPEAT
 				IdentifierDefinition(identifier,access,FALSE);
-				scope.AddEnumerator(identifier);
-				scope.lastEnumerator.SetAccess(access);
-			END;
+				position := symbol.start;
+				constant := SyntaxTree.NewConstant( position, identifier );
+				CommentSymbol(constant);
+				constant.SetAccess(access * SyntaxTree.ReadOnly);
+				IF Optional(Scanner.Equal) THEN
+					expression := Expression();
+					constant.SetValue( expression );
+				END;
+				scope.AddConstant( constant );
+			UNTIL ~Optional(Scanner.Comma);
 			IF Mandatory(Scanner.End) THEN END;
 			RETURN type
 		END EnumerationType;
@@ -1562,14 +1568,14 @@ TYPE
 			REPEAT
 				position := symbol.start;
 				alias := Identifier();
-				IF alias # Global.invalidIdentifier THEN
+				IF alias # SyntaxTree.invalidIdentifier THEN
 					IF Optional( Scanner.Becomes ) THEN name := Identifier() ELSE name := alias;  END;
 					import := SyntaxTree.NewImport( position, alias, name, TRUE );
 					CommentSymbol(import);
 					IF Optional(Scanner.In) THEN
 						position := symbol.start;
 						context := Identifier();
-						IF context # Global.invalidIdentifier THEN  import.SetContext(context) END;
+						IF context # SyntaxTree.invalidIdentifier THEN  import.SetContext(context) END;
 					END;
 					moduleScope.AddImport( import );
 				END;

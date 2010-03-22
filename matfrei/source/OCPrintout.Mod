@@ -116,7 +116,7 @@ TYPE
 
 		PROCEDURE VisitQualifiedType(x: SyntaxTree.QualifiedType);
 		BEGIN
-			IF x.resolved = Global.invalidType THEN
+			IF x.resolved = SyntaxTree.invalidType THEN
 				AlertString("(*unresolved*)");
 			END;
 			IF x.qualifiedIdentifier # NIL THEN
@@ -132,7 +132,7 @@ TYPE
 		END VisitStringType;
 
 		PROCEDURE VisitEnumerationType(x: SyntaxTree.EnumerationType);
-		VAR e: SyntaxTree.Enumerator; first: BOOLEAN;
+		VAR e: SyntaxTree.Constant; first: BOOLEAN;
 		BEGIN
 			Keyword("ENUM ");
 
@@ -142,11 +142,11 @@ TYPE
 				w.String(") ");
 			END;
 
-			e := x.enumerationScope.firstEnumerator; first := TRUE;
+			e := x.enumerationScope.firstConstant; first := TRUE;
 			WHILE (e # NIL) DO
 				IF ~first THEN w.String(",") ELSE first := FALSE END;
-				PrintSymbol(e);
-				e := e.nextEnumerator
+				VisitConstant(e);
+				e := e.nextConstant;
 			END;
 
 
@@ -388,7 +388,7 @@ TYPE
 		PROCEDURE VisitConversion(x: SyntaxTree.Conversion);
 		BEGIN
 			IF x.typeExpression # NIL THEN Expression(x.typeExpression); w.String("(");
-			ELSIF info THEN BeginComment; Type(x.type); w.String("<-"); EndComment;
+			ELSIF info THEN BeginComment; ShortType(x.type); w.String("<-"); EndComment;
 			END;
 			Expression(x.expression);
 			IF x.typeExpression # NIL THEN w.String(")") END;
@@ -684,9 +684,9 @@ TYPE
 		BEGIN w.String( "NIL" ); IF info THEN BeginComment; Type(x.type); EndComment; END;
 		END VisitNilValue;
 
-		PROCEDURE VisitEnumeratorValue(x: SyntaxTree.EnumeratorValue);
+		PROCEDURE VisitEnumerationValue(x: SyntaxTree.EnumerationValue);
 		BEGIN w.Int(x.value,1);
-		END VisitEnumeratorValue;
+		END VisitEnumerationValue;
 
 		(**** symbols ****)
 
@@ -739,15 +739,6 @@ TYPE
 			END;
 		END PrintSymbol;
 
-		PROCEDURE VisitEnumerator(x: SyntaxTree.Enumerator);
-		BEGIN
-			IF Visible(x) THEN
-				IF (x.access # SyntaxTree.Hidden) OR (mode > SourceCode) THEN
-					PrintSymbol(x);
-				END;
-			END;
-		END VisitEnumerator;
-
 		PROCEDURE VisitTypeDeclaration(x: SyntaxTree.TypeDeclaration);
 		BEGIN
 			IF Visible(x) THEN
@@ -781,8 +772,11 @@ TYPE
 		BEGIN
 			IF Visible(x) THEN
 				IF (mode > SourceCode) OR (x.access # SyntaxTree.Hidden) THEN
-					PrintSymbol(x); w.String( " = " );  Expression(x.value);
-					IF info THEN BeginComment; Type(x.type); EndComment; END;
+					PrintSymbol(x); 
+					IF x.value # NIL THEN
+						w.String( " = " );  Expression(x.value);
+					END;
+					IF info THEN BeginComment; ShortType(x.type); EndComment; END;
 					IF info & (x.value.resolved = NIL) THEN AlertString("(*NOT A CONSTANT*)") END;
 				END;
 			END;
@@ -814,14 +808,6 @@ TYPE
 				END
 			END;
 		END VisitVariable;
-
-		PROCEDURE VisitGuardedVariable(x: SyntaxTree.GuardedVariable);
-		BEGIN
-			w.BeginAlert;
-			w.String("(* Guard(->"); Type(x.type); w.String("*)");
-			Symbol(x.variable);
-			w.EndAlert;
-		END VisitGuardedVariable;
 
 		PROCEDURE VariableList(x: SyntaxTree.Variable);
 		VAR next: SyntaxTree.Variable;
@@ -1305,8 +1291,10 @@ TYPE
 		VAR  i: LONGINT; ch: CHAR; cr: BOOLEAN; size,value: LONGINT; procedure: SyntaxTree.Procedure;
 		CONST CR=0DX;
 		BEGIN
-			procedure := currentScope(SyntaxTree.ProcedureScope).ownerProcedure;
-			IF (mode >= SourceCode) OR (procedure.access * SyntaxTree.Public # {}) & procedure.HasFlag(SyntaxTree.InlineFlag) THEN
+			IF currentScope # NIL THEN
+				procedure := currentScope(SyntaxTree.ProcedureScope).ownerProcedure;
+			END;
+			IF (mode >= SourceCode) OR (procedure = NIL) OR (procedure.access * SyntaxTree.Public # {}) & procedure.HasFlag(SyntaxTree.InlineFlag) THEN
 				IF (x.sourceCode # NIL) THEN
 					i := 0;
 					ch := x.sourceCode[0];
@@ -1456,7 +1444,6 @@ VAR
 				IF scope IS SyntaxTree.ModuleScope THEN D.Str("ModuleScope: ")
 				ELSIF scope IS SyntaxTree.ProcedureScope THEN D.Str("ProcedureScope: ");
 				ELSIF scope IS SyntaxTree.RecordScope THEN D.Str("RecordScope: ");
-				ELSIF scope IS SyntaxTree.WithScope THEN D.Str("WithScope: ");
 				ELSE D.Str("Scope: ");
 				END;
 				symbol := scope.firstSymbol;

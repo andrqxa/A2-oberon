@@ -32,10 +32,10 @@ CONST
 	UntracedFlag*=9;
 	ConstructorFlag*=10;
 	BodyProcedureFlag*=11;
-	
+
 	InterruptFlag*=12;
 	NoPAFFlag*=13;
-	
+
 	(* statement flags *)
 	UnreachableFlag*=14;
 	(* modification flags *)
@@ -70,7 +70,6 @@ CONST
 	Undefined*={}; BeingResolved*=1; Resolved*=2; FingerPrinted*=3;
 
 VAR
-
 	(** debugging / counters *)
 
 	nodeCount, listCount, identifierCount, qualifiedIdentifierCount, typeCount, basicTypeCount, typeDeclarationCount, arrayTypeCount, pointerTypeCount, recordTypeCount,
@@ -234,8 +233,8 @@ TYPE
 		PROCEDURE VisitNilValue*(x: NilValue);
 		BEGIN HALT(100) (* abstract *) END VisitNilValue;
 
-		PROCEDURE VisitEnumeratorValue*(x: EnumeratorValue);
-		BEGIN HALT(100) (* abstract *) END VisitEnumeratorValue;
+		PROCEDURE VisitEnumerationValue*(x: EnumerationValue);
+		BEGIN HALT(100) (* abstract *) END VisitEnumerationValue;
 
 		(** symbols *)
 		PROCEDURE VisitSymbol*(x: Symbol);
@@ -249,12 +248,6 @@ TYPE
 
 		PROCEDURE VisitVariable*(x: Variable);
 		BEGIN HALT(100) (* abstract *) END VisitVariable;
-
-		PROCEDURE VisitGuardedVariable*(x: GuardedVariable);
-		BEGIN HALT(100) (* abstract *) END VisitGuardedVariable;
-
-		PROCEDURE VisitEnumerator*(x:Enumerator);
-		BEGIN HALT(100) (* abstract *) END VisitEnumerator;
 
 		PROCEDURE VisitParameter*(x: Parameter);
 		BEGIN HALT(100) (* abstract *) END VisitParameter;
@@ -533,14 +526,14 @@ TYPE
 	VAR
 		enumerationScope-: EnumerationScope;
 		enumerationBase-: Type;
-		baseValue-: LONGINT;
+		rangeLowest-,rangeHighest-: LONGINT;
 
 		PROCEDURE &InitEnumerationType(position: LONGINT; scope: Scope; enumerationScope: EnumerationScope);
 		BEGIN
 			InitType(position);
 			SELF.scope := scope;
 			enumerationBase := NIL;
-			baseValue := 0;
+			rangeLowest := 0; rangeHighest := 0;
 			SELF.enumerationScope := enumerationScope;
 			enumerationScope.ownerEnumeration := SELF;
 		END InitEnumerationType;
@@ -549,9 +542,9 @@ TYPE
 		BEGIN enumerationBase := base
 		END SetEnumerationBase;
 
-		PROCEDURE SetBaseValue*(number: LONGINT);
-		BEGIN baseValue := number;
-		END SetBaseValue;
+		PROCEDURE SetRange*(lowest,highest: LONGINT);
+		BEGIN rangeLowest := lowest; rangeHighest := highest;
+		END SetRange;
 
 		PROCEDURE Accept*(v: Visitor);
 		VAR position: LONGINT;
@@ -1568,15 +1561,14 @@ TYPE
 	END NilValue;
 
 	(** <<value = enum.x >> **)
-	EnumeratorValue* = OBJECT (Value)
+	EnumerationValue* = OBJECT (Value)
 	VAR
 		value-: LONGINT;
-		enumerator-: Enumerator;
 
-		PROCEDURE & InitEnumeratorValue(position: LONGINT; value: LONGINT);
+		PROCEDURE & InitEnumerationValue(position: LONGINT; value: LONGINT);
 		BEGIN
 			InitValue(position);  SELF.value := value;
-		END InitEnumeratorValue;
+		END InitEnumerationValue;
 
 		PROCEDURE SetValue*(value: LONGINT);
 		BEGIN SELF.value := value
@@ -1584,13 +1576,13 @@ TYPE
 
 		PROCEDURE Accept*(v: Visitor);
 		VAR position: LONGINT;
-		BEGIN position := SELF.position; v.VisitEnumeratorValue(SELF)
+		BEGIN position := SELF.position; v.VisitEnumerationValue(SELF)
 		END Accept;
 
 		PROCEDURE Equals*(v: Value):BOOLEAN;
-		BEGIN RETURN (v IS EnumeratorValue) & (v(EnumeratorValue).value = value); END Equals;
+		BEGIN RETURN (v IS EnumerationValue) & (v(EnumerationValue).value = value); END Equals;
 
-	END EnumeratorValue;
+	END EnumerationValue;
 
 	(**** symbols ****)
 
@@ -1733,26 +1725,6 @@ TYPE
 
 	END Constant;
 
-	Enumerator*= OBJECT(Symbol)
-	VAR
-		nextEnumerator-: Enumerator;
-		value-: EnumeratorValue;
-
-		PROCEDURE & InitEnumerator( position: LONGINT;  name: Identifier ; value: LONGINT);
-		BEGIN
-			InitSymbol(position,name);
-			SELF.value := NewEnumeratorValue(position,value);
-			SELF.value.enumerator := SELF;
-			nextEnumerator := NIL;
-		END InitEnumerator;
-
-		PROCEDURE Accept*(v: Visitor);
-		VAR position: LONGINT;
-		BEGIN position := SELF.position; v.VisitEnumerator(SELF)
-		END Accept;
-
-	END Enumerator;
-
 	(** <<VAR name: type >>
 		Variable declaration symbol. Represents a variable defined in the form VAR name: Type.
 		The type of the variable is stored in the symbol's type field and is resolved by the semantic checker.
@@ -1779,34 +1751,6 @@ TYPE
 		END Accept;
 
 	END Variable;
-
-	(** <<variable : type>>
-		guarded variable symbol. Represents a variable in a with-guarded block in the form
-		WITH variable: type DO
-			...
-		END
-	**)
-	GuardedVariable*=OBJECT (Symbol)
-	VAR
-		variable-: Symbol;
-		typeExpression-: Expression; (* for printing only *)
-
-		PROCEDURE & InitGuardedVariable*(position: LONGINT; name: Identifier; variable: Symbol);
-		BEGIN
-			InitSymbol(position,name);
-			SELF.variable := variable; typeExpression := NIL;
-		END InitGuardedVariable;
-
-		PROCEDURE SetTypeExpression*(typeExpression: Expression);
-		BEGIN SELF.typeExpression := typeExpression
-		END SetTypeExpression;
-
-		PROCEDURE Accept*(v: Visitor);
-		VAR position: LONGINT;
-		BEGIN position := SELF.position; v.VisitGuardedVariable(SELF)
-		END Accept;
-
-	END GuardedVariable;
 
 	(** << [VAR | CONST] name: type >>
 		Parameter declaration symbol. Represents a parameter in the form [VAR | CONST] name: Type.
@@ -2768,31 +2712,9 @@ TYPE
 
 	END ProcedureScope;
 
-	WithScope*=OBJECT (Scope)
-	VAR
-		guardedVariable-: GuardedVariable;
-
-		PROCEDURE & InitWithScope(outer: Scope; guardedVariable: GuardedVariable);
-		BEGIN
-			InitScope(outer);
-			SELF.guardedVariable := guardedVariable;
-		END InitWithScope;
-
-	END WithScope;
-
 	EnumerationScope*= OBJECT(Scope)
 	VAR
-		firstEnumerator-,lastEnumerator-: Enumerator; numberEnumerators-: LONGINT;
 		ownerEnumeration-: EnumerationType;
-
-		PROCEDURE AddEnumerator*(name: Identifier);
-		VAR e: Enumerator;
-		BEGIN
-			NEW(e,name.position,name,numberEnumerators);
-			IF lastEnumerator = NIL THEN firstEnumerator := e ELSE lastEnumerator.nextEnumerator:= e END;
-			lastEnumerator := e;
-			INC(numberEnumerators);
-		END AddEnumerator;
 
 		(** Find symbol by name *)
 		PROCEDURE FindSymbol*(identifier: Identifier): Symbol;
@@ -2811,7 +2733,6 @@ TYPE
 		PROCEDURE &InitEnumerationScope(outer: Scope);
 		BEGIN
 			InitScope(outer);
-			firstEnumerator := NIL; lastEnumerator := NIL; numberEnumerators := 0;
 			ownerEnumeration := NIL; (* must be set by EnumerationType *)
 		END InitEnumerationScope;
 
@@ -3099,6 +3020,15 @@ TYPE
 	END Module;
 
 VAR
+	(* invalid items used, for example, by parser and checker *)
+	invalidString-: Basic.String;
+	invalidIdentifier-: Identifier;
+	invalidQualifiedIdentifier-: QualifiedIdentifier;
+	invalidType-: Type;
+	invalidExpression-: Expression; (* mapped to invalidDesignator for better error handling in checker *)
+	invalidDesignator-: Designator;
+	invalidValue-: Value;
+	invalidSymbol-: Symbol;
 
 	anonymous-: Basic.String;
 	anonymousIdentifier-: Identifier;
@@ -3249,12 +3179,6 @@ VAR
 	BEGIN
 		INC( variableCount );  NEW( variable, position, name );  RETURN variable
 	END NewVariable;
-
-	PROCEDURE NewGuardedVariable*( position: LONGINT;  name: Identifier; variable: Symbol): GuardedVariable;
-	VAR guardedVariable: GuardedVariable;
-	BEGIN
-		INC( variableCount );  NEW(guardedVariable, position, name, variable );  RETURN guardedVariable
-	END NewGuardedVariable;
 
 	PROCEDURE NewQualifiedIdentifier*( position: LONGINT;  prefix, suffix: Identifier ): QualifiedIdentifier;
 	VAR qualifiedIdentifier: QualifiedIdentifier;
@@ -3417,6 +3341,7 @@ VAR
 	PROCEDURE NewConversion*( position: LONGINT;  expression: Expression; type: Type; typeExpression: Expression): Conversion;
 	VAR conversion: Conversion;
 	BEGIN
+		ASSERT(type # NIL);
 		NEW( conversion, position, expression,type, typeExpression );  RETURN conversion;
 	END NewConversion;
 
@@ -3473,11 +3398,11 @@ VAR
 		INC( nilValueCount );  NEW( nilValue, position );  RETURN nilValue
 	END NewNilValue;
 
-	PROCEDURE NewEnumeratorValue*( position: LONGINT; value: LONGINT ): EnumeratorValue;
-	VAR enumeratorValue: EnumeratorValue;
+	PROCEDURE NewEnumerationValue*( position: LONGINT; value: LONGINT ): EnumerationValue;
+	VAR enumeratorValue: EnumerationValue;
 	BEGIN
 		INC( enumeratorValueCount );  NEW( enumeratorValue, position, value );  RETURN enumeratorValue
-	END NewEnumeratorValue;
+	END NewEnumerationValue;
 
 	PROCEDURE NewStatement*(outer: Statement): Statement; (* for error handling: invalid Statement *)
 	VAR statement: Statement;
@@ -3613,11 +3538,6 @@ VAR
 	BEGIN	NEW(scope,outer); RETURN scope
 	END NewRecordScope;
 
-	PROCEDURE NewWithScope*(outer: Scope; guardedVariable: GuardedVariable): WithScope;
-	VAR scope: WithScope;
-	BEGIN NEW(scope,outer,guardedVariable); RETURN scope
-	END NewWithScope;
-
 	PROCEDURE NewEnumerationScope*(outer: Scope): EnumerationScope;
 	VAR scope: EnumerationScope;
 	BEGIN NEW(scope,outer); RETURN scope
@@ -3720,12 +3640,24 @@ VAR
 	PROCEDURE Init;
 	BEGIN
 
+		invalidString := Basic.MakeString("@invalidString");
+		invalidIdentifier := NewIdentifier(-1,"@invalidString");
+		invalidQualifiedIdentifier := NewQualifiedIdentifier(-1,NIL,invalidIdentifier);
+		invalidType := NewType();
+		invalidDesignator := NewDesignator();
+		invalidDesignator.SetType(invalidType);
+		invalidExpression := invalidDesignator;
+		invalidValue := NewValue();
+		invalidSymbol := NewSymbol(NewIdentifier(-1,""));
+		invalidSymbol.SetType(invalidType);
+
 		importType := NewType();
 		importType.SetState(Resolved);
 		typeDeclarationType := NewType();
 		typeDeclarationType.SetState(Resolved);
 		anonymous := Basic.MakeString("");
 		anonymousIdentifier := NewIdentifier(-1,"");
+
 
 
 		(* debugging *)
