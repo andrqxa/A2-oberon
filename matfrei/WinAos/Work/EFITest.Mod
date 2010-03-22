@@ -13,10 +13,11 @@ VAR
 	root : EFIFileProtocol.Protocol;
 	file : EFIFileProtocol.Protocol;
 	filename : ARRAY 32 OF EFI.Char16;
+	buf : ARRAY 30 OF CHAR;
 BEGIN
 	EFILib.StringToLongString("\test.txt",filename);
 	(*status := EFI.table.ConOut.OutputString(EFI.table.ConOut, filename);*)
-	size := LEN(buffer);
+	size := LEN(buffer)*4;
 	status := EFI.table.BS.LocateHandle(EFI.ByProtocol, EFISimpleFS.GUID , 0, size, buffer);
 	IF (status # EFI.Success) THEN
 		Trace.String("Status: "); Trace.Int(status, 0); Trace.Ln;
@@ -33,13 +34,20 @@ BEGIN
 			status := fs.OpenVolume(fs, root);
 			Trace.Int(status,0); Trace.Ln;
 			IF status = EFI.Success THEN
-				Trace.String("Trying to open the file now ...");
-				Trace.Address(SYSTEM.VAL(SYSTEM.ADDRESS, root)); Trace.Ln;
+				Trace.String("Trying to open the file ");
+				status := EFI.table.ConOut.OutputString(EFI.table.ConOut, filename);
+				Trace.Ln;
 				status := root.Open(root, file, filename, EFIFileProtocol.ModeRead+EFIFileProtocol.ModeWrite, 0);
-				Trace.Int(status-EFI.Error,0); Trace.Ln;
 				IF status = EFI.Success THEN
-					status := file.Delete(file);
-					Trace.Int(status, 0); Trace.Ln;
+					size := 20;
+					status := file.Read(file, size, buf);
+					Trace.String(buf);
+					buf := "pipapo";
+					size := LEN(buf);
+					status := file.SetPosition(file, -1); (* EOF *)
+					status := file.Write(file, size,buf);
+					status := file.Close(file);
+					Trace.Int(status,0);
 				END;
 			END;
 		END;
@@ -55,8 +63,11 @@ BEGIN
 	TestFS;
 END EFITest.
 
-
 Compiler.Compile  --objectFile=Generic --symbolFile=Textual --extensions 
-	Runtime.Mod Trace.Mod EFI.Mod EFITrace.Mod EFILib.Mod EFIFileProtocol.Mod EFISimpleFS.Mod EFITest.Mod ~
+	Runtime.Mod Trace.Mod EFI.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod EFILib.Mod EFITest.Mod ~
 StaticLinker.Link --fileName=test.efi --fileFormat=EFI32 --displacement=401000H
-	Runtime Trace EFI EFILib EFITrace EFISimpleFS EFIFileProtocol  EFITest ~
+	Runtime Trace EFI EFITrace EFISimpleFS EFIFileProtocol EFILib EFITest 
+
+
+
+
