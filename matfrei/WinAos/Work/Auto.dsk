@@ -1,17 +1,34 @@
 <Desktop>
-	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="0" t="50" r="369" b="896" flags="{0..2}"/>
-	<Window name="PET" loader="PET.Restore" l="383" t="49" r="1291" b="890" flags="{0..2}">
+	<Window name="WMKernelLog" loader="WMKernelLog.Restore" l="5" t="45" r="374" b="891" flags="{0..2}"/>
+	<Window name="Notepad" loader="Notepad.Restore" l="413" t="92" r="1263" b="792" flags="{0..2}">
+		<NotepadData file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/CompileCommand.Tool" codecFormat="AUTO" firstLine="0" cursorPos="178" wordWrap="true"/>
+	</Window>
+	<Window name="PET" loader="PET.Restore" l="388" t="47" r="1296" b="888" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="0" ProjectTextFile=""/>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFITest.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="27" cursorPos="1733"/>
+			<General SelectedPageNr="1" ProjectTextFile=""/>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFILib.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="65" cursorPos="3468"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFILib.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="56"/>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFI.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="157" cursorPos="4070"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFIAOSLoader.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="242"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/Tests.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="1204"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
