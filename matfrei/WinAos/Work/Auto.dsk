@@ -5,51 +5,51 @@
 	</Window>
 	<Window name="PET" loader="PET.Restore" l="358" t="50" r="1266" b="891" flags="{0..2}">
 		<PETData>
-			<General SelectedPageNr="2" ProjectTextFile=""/>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFILib.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="148" cursorPos="4512"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFI.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="145" cursorPos="4070"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/EFIAOSLoader.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="162" cursorPos="6019"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="bootTa" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/Tests.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="1204"/>
-				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
-				<LogPanel height="130"/>
-				<SidePanel visible="true" width="250" scratchHeight="5"/>
-			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/source/Config.txt" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+			<General SelectedPageNr="9" ProjectTextFile=""/>
+			<Tab file="C:/Documents and Settings/student/Desktop/matfrei/a2/WinAos/Work/Config.txt" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
 				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="false" width="250" scratchHeight="781"/>
 			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/source/I386.Machine.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
-				<Editor firstLine="1056" cursorPos="33981"/>
+			<Tab file="C:/Documents and Settings/student/Desktop/matfrei/a2/WinAos/Work/Tests.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
-				<SearchPanel visible="true" wrap="true" casesensitive="true" backwards="false" highlight="false" searchString="ReadBo" replaceString=""/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
 				<SidePanel visible="true" width="250" scratchHeight="5"/>
 			</Tab>
-			<Tab file="C:/Documents and Settings/student/Desktop/Matthias/WinAos/Work/Compile.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
-				<Editor firstLine="0" cursorPos="572"/>
+			<Tab file="C:/Documents and Settings/student/Desktop/matfrei/a2/source/I386.Machine.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/matfrei/a2/WinAos/Work/Compile.Tool" codecFormat="AUTO" compilerOptions="\check" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/matfrei/a2/WinAos/Work/EFI.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/matfrei/a2/WinAos/Work/EFIAOSLoader.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
+				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
+				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
+				<LogPanel height="130"/>
+				<SidePanel visible="true" width="250" scratchHeight="5"/>
+			</Tab>
+			<Tab file="C:/Documents and Settings/student/Desktop/matfrei/a2/WinAos/Work/EFILib.Mod" codecFormat="AUTO" compilerOptions="\Ws" showLabels="false" wordWrap="false">
+				<Editor firstLine="0" cursorPos="0"/>
 				<SplitEditor visible="false" firstLine="0" cursorPos="0" height="400"/>
 				<SearchPanel visible="false" wrap="false" casesensitive="true" backwards="false" highlight="false" searchString="" replaceString=""/>
 				<LogPanel height="130"/>
