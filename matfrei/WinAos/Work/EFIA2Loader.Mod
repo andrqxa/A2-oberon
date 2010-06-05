@@ -158,10 +158,13 @@ VAR
 	
 	cfgname, cfgval : SYSTEM.ADDRESS;
 	cfgnamelen, cfgvallen : LONGINT;
+	
+	parseError : BOOLEAN;
 
 	PROCEDURE ReportError(at : LONGINT);
 	VAR status : EFI.Status;
 	BEGIN
+		parseError := TRUE;
 		Trace.String("Sytnax error in file ");
 		status := EFI.table.ConOut.OutputString(EFI.table.ConOut, configFileName); (* configFileName is a Unicode string *)
 		Trace.String(" at position ");
@@ -270,11 +273,16 @@ BEGIN
 	SYSTEM.PUT8(btPos, 0); INC(btPos);
 	SYSTEM.PUT32(btPos, -1); INC(btPos, 4);
 	
-	WHILE (ReadConfig(cfgname, cfgnamelen, cfgval, cfgvallen)) DO
+	parseError := FALSE;
+	WHILE (ReadConfig(cfgname, cfgnamelen, cfgval, cfgvallen))  DO
 		AddConfigA(cfgname, cfgnamelen, cfgval, cfgvallen);
 	END;
 
-	RETURN EFI.Success;
+	IF (parseError) THEN
+		RETURN EFI.Error;
+	ELSE
+		RETURN EFI.Success;
+	END;
 END LoadBootTable;
 
 PROCEDURE AddConfig(CONST name, val : ARRAY OF CHAR);
@@ -441,7 +449,7 @@ BEGIN
 		(* parse the configuration file and generate the boot table *)
 		btStat := LoadBootTable(configFileName, btAddr);
 		
-		IF (btAddr # 0) THEN
+		IF (btStat = EFI.Success) THEN
 			(* get the configurations for the framebuffer and get the address of the corresponding framebuffer *)
 			GetConfig("DWidth",val); i:=0; dWidth := EFILib.StringToInt(i, val);
 			GetConfig("DHeight",val); i:=0; dHeight := EFILib.StringToInt(i, val);
