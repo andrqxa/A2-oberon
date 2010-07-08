@@ -14,7 +14,7 @@ VAR
 	(* memory allocation *)
 	allocations : ARRAY maxAllocations OF Allocation;
 	numAllocations : LONGINT;
-	
+
 	(* argument parsing *)
 	args : PtrToLongString;
 	argLen : LONGINT;
@@ -50,7 +50,7 @@ END AllocateMemory;
 
 (* free all pages allocated by AllocateMemory *)
 PROCEDURE FreeMemory*;
-VAR 
+VAR
 	status : EFI.Status;
 	i : LONGINT;
 BEGIN
@@ -59,11 +59,41 @@ BEGIN
 	END;
 END FreeMemory;
 
+(* find the size of the RAM by investigating the entries of the EFI Memory Map.  *)
+PROCEDURE GetMemorySize*(VAR memsize : EFI.Int64 ) : EFI.Status;
+CONST
+	approxMemMapSize = 2048; (* we actually can not resize the buffer. just hope its enough *)
+VAR
+	MemMapSize, MapKey, DescriptorSize, DescriptorVersion : EFI.Int;
+	status : EFI.Status;
+	MemMap : ARRAY approxMemMapSize OF EFI.MemoryDescriptor;
+	i, numEntries : LONGINT;
+BEGIN
+	MemMapSize := LEN(MemMap)*SYSTEM.SIZEOF(EFI.MemoryDescriptor);
+	status := EFI.table.BS.GetMemoryMap(MemMapSize, MemMap, MapKey, DescriptorSize, DescriptorVersion);
+	IF status = EFI.ErrBufferTooSmall THEN
+		(* we cant resize. We are doomed!*)
+		RETURN status;
+	END;
+	
+	numEntries := MemMapSize DIV SYSTEM.SIZEOF(EFI.MemoryDescriptor);
+	memsize := 0;
+	FOR i := 0 TO numEntries DO
+		IF (memsize < MemMap[i].PhysicalStart + MemMap[i].NumberOfPages*LONG(EFI.PageSize)) THEN
+			memsize := MemMap[i].PhysicalStart + MemMap[i].NumberOfPages*LONG(EFI.PageSize);
+		END;
+	END;
+	
+	memsize := SYSTEM.GET32(SYSTEM.ADR(memsize)+4); (* BUG! where ? *)
+
+	RETURN EFI.Success;
+END GetMemorySize;
+
 (* stop bootservices. The idea is that we get the current memory map, s.t. the OS is aware of EFI allocated memory. We dont
 care so we just throw it away *)
 PROCEDURE ExitBootServices*(): EFI.Status;
 CONST
-	approxMemMapSize = 1024; (* we actually can not resize the buffer. just hope its enough *)
+	approxMemMapSize = 2048; (* we actually can not resize the buffer. just hope its enough *)
 VAR
 	MemMapSize, MapKey, DescriptorSize, DescriptorVersion : EFI.Int;
 	status : EFI.Status;
@@ -96,7 +126,7 @@ BEGIN
 	RETURN status;
 END GetArgs;
 
-(* (re-) initialize variables for GetNextArg. Automatically called by at the first call to GetNextArg. Can be used to reset GetNextArg. 
+(* (re-) initialize variables for GetNextArg. Automatically called by at the first call to GetNextArg. Can be used to reset GetNextArg.
 Assumes that EFI-Shell passes commandline as a string in the form "imagename (arguments)*" like e.g. unix shells do. *)
 PROCEDURE InitArgs*() : EFI.Status;
 VAR
@@ -110,24 +140,24 @@ BEGIN
 		loadedImage := SYSTEM.VAL(EFILoadedImage.Protocol, prot);
 		loadOptionsSize := loadedImage.LoadOptionsSize;
 		loadOptions := loadedImage.LoadOptions;
-		
+
 		(* setup GetNextArg variables *)
 		args:= SYSTEM.VAL(PtrToLongString, loadOptions);
 		argLen := loadOptionsSize DIV 2; (* 16-bit characters *)
-		argPos := 0;		
-		
+		argPos := 0;
+
 		(* skip the 'imagename' by skipping the first word of the load options *)
 		(* Do not skip if the image was not loaded directly by the firmware bootmanager.
 		This should be useful to not have to type the name of the image as an argument when starting directly
 		from the bootmanager while still being compatible to the EFI-Shell.
-		ParentHandle should be NULL if the image was loaded by the firmware bootmanager. *) 
-		(* Apparently this does not work (at least it does not in qemu-EFI) although it should - therefore commented out 
+		ParentHandle should be NULL if the image was loaded by the firmware bootmanager. *)
+		(* Apparently this does not work (at least it does not in qemu-EFI) although it should - therefore commented out
 		IF (loadedImage.ParentHandle # 0) THEN *)
-				
+
 		WHILE (argPos < argLen) & (args[argPos] # 0) & (args[argPos] # ORD(' ')) DO
 			INC(argPos);
 		END;
-		
+
 		(*END; *)
 	ELSE
 		ReportError(status);
@@ -136,7 +166,7 @@ BEGIN
 END InitArgs;
 
 
-(* read one argument after another. Returns true iff successfully parsed. 
+(* read one argument after another. Returns true iff successfully parsed.
 Treats ' ' (blank) as seperator between arguments. (text between '"' is NOT merged into one argument.
  *)
 PROCEDURE GetNextArg*(VAR arg : ARRAY OF EFI.Char16) : BOOLEAN;
@@ -150,7 +180,7 @@ BEGIN
 			RETURN FALSE;
 		END;
 	END;
-	
+
 	(* skip whitspace *)
 	WHILE (argPos < argLen) & (args[argPos] = ORD(' ')) DO INC(argPos); END;
 
@@ -158,8 +188,8 @@ BEGIN
 	WHILE (i < LEN(arg)) & (argPos < argLen) & (args[argPos] # 0) & (args[argPos] # ORD(' ')) DO
 		arg[i] := args[argPos];
 		INC(i); INC(argPos);
-	END;		
-	
+	END;
+
 	RETURN (i > 0);
 END GetNextArg;
 
@@ -168,8 +198,8 @@ PROCEDURE ReadString*(VAR buf : ARRAY OF EFI.Char16);
 CONST ScanCodeNull = 0; (* if ScanCode = 0 then UnicodeChar is valid. Else a special key was hit (e.g ESC, Fx,..) *)
 	CharLF = 0AH;
 	CharCR = 0DH;
-VAR key : EFI.InputKey; i : LONGINT; 
-	status : EFI.Status; 
+VAR key : EFI.InputKey; i : LONGINT;
+	status : EFI.Status;
 	ConIn : POINTER TO EFI.SimpleInputInterface;
 	ConOut : POINTER TO EFI.SimpleTextOutputInterface;
 	newline, cursorEnabled : BOOLEAN;
@@ -219,7 +249,7 @@ BEGIN
 		slen := 11;
 	END;
 	s[slen] := 0X;
-	
+
 	start := 0;
 	IF (x < 0) & ( slen > 0 ) THEN
 		x0 := -x;
@@ -228,8 +258,8 @@ BEGIN
 	i := slen;
 	WHILE ( i > start ) DO
 		DEC(i);
-		s[i] := CHR (x0 MOD 10 + 30H); 
-		x0 := x0 DIV 10; 
+		s[i] := CHR (x0 MOD 10 + 30H);
+		x0 := x0 DIV 10;
 	END;
 END IntToString;
 
@@ -377,7 +407,7 @@ VAR
 BEGIN
 	fileSize :=  GetFileSize(file);
 	numPages := SHORT(fileSize DIV EFI.PageSize) + 1;
-	
+
 	addr := loadAddr;
 	status := AllocateMemory(addr, numPages);
 	(* now addr contains the base address of the allocated pages *)
@@ -391,7 +421,7 @@ END LoadFile;
 
 (* Reports a description of the error code *)
 PROCEDURE ReportError*(status : EFI.Status);
-BEGIN		
+BEGIN
 
 (*
 	CASE status OF
@@ -400,7 +430,7 @@ BEGIN
 		| EFI.WarnUnknownGlyph : Trace.String("Warning : Unknown Glyph");
 		| EFI.WarnDeleteFailure : Trace.String("Warning : Delete Failure");
 		| EFI.WarnWriteFailure : Trace.String("Warning : Write Failure");
-		| EFI.WarnBufferTooSmall : Trace.String("Warning : Buffer Too Small"); 
+		| EFI.WarnBufferTooSmall : Trace.String("Warning : Buffer Too Small");
 		(* Errors*)
 		| EFI.ErrLoadError : Trace.String("Error : Load Error");
 		| EFI.ErrInvalidParameter : Trace.String("Error : Invalid Parameter");

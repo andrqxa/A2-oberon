@@ -161,6 +161,8 @@ VAR
 	
 	parseError : BOOLEAN;
 
+	ramSize : EFI.Int64;
+
 	PROCEDURE ReportError(at : LONGINT);
 	VAR status : EFI.Status;
 	BEGIN
@@ -255,11 +257,24 @@ BEGIN
 	btAddr := bootTableBegin; (* out *)
 	btPos := bootTableBegin;
 
-	(* boot memory/top of low memory *)
+	(* boot memory/top of low memory. Trying to stay compatible with OBL.Asm *)
 	type := 3;
-
+	SYSTEM.PUT32(btPos, type); INC(btPos, 4);
+	SYSTEM.PUT32(btPos, 16); INC(btPos, 4); (* entry size *)
+	SYSTEM.PUT32(btPos, 0); INC(btPos, 4); (* boot memory address (?) *)
+	SYSTEM.PUT32(btPos, 640*1024); INC(btPos, 4); (* boot memory size (in bytes) *)
+	
 	(* free memory/extended memory size *)
+	status := EFILib.GetMemorySize(ramSize);
 	type := 4;
+	SYSTEM.PUT32(btPos, type); INC(btPos, 4);
+	SYSTEM.PUT32(btPos, 16); INC(btPos, 4); (* entry size *)
+	SYSTEM.PUT32(btPos, 100000H); INC(btPos, 4); (* extended memory address *)
+	SYSTEM.PUT32(btPos, SHORT(ramSize) - 100000H); INC(btPos, 4); (* extended memory size *)
+	IF traceDebug THEN
+		Trace.String("DEBUG: ramsize: "); Trace.Hex(SHORT(ramSize), 0); Trace.String("H MB"); Trace.Ln;
+	END;
+
 
 	(* config strings; Parse the configuration file and copy the content to the boot table *)
 	type := 8;
@@ -437,7 +452,7 @@ VAR
 	kernelAddr, btAddr, fbAddr : SYSTEM.ADDRESS;
 	kernelSize, fbSize : LONGINT;
 	kernelStat, btStat, fbStat, status : EFI.Status;
-	kernelFileName, configFileName : ARRAY 128 OF EFI.Char16;
+	kernelFileName, configFileName, arg : ARRAY 128 OF EFI.Char16;
 	val : ARRAY 100 OF CHAR; 
 	i, dWidth, dHeight, dDepth, dFormat : LONGINT;
 BEGIN
@@ -491,6 +506,13 @@ BEGIN
 			Trace.String("DEBUG: BootTable at ");Trace.Address(btAddr);Trace.Ln;
 			Trace.String("DEBUG: FrameBuffer at "); Trace.Address(fbAddr); Trace.Ln;
 			Trace.String("DEBUG: boot table:"); Trace.Ln; Trace.Memory(bootTableBegin, bootTableEnd-bootTableBegin + 5);
+		END;
+		
+		;
+		IF (EFILib.GetNextArg(arg) & (CHR(arg[0]) = '-') & (CHR(arg[1]) = 'd')) THEN
+			Trace.Ln;
+			Trace.String("Dry Run Complete"); Trace.Ln;
+			RETURN;
 		END;
 		
 		IF ((kernelStat = EFI.Success) OR (kernelStat = EFI.WarnWriteFailure)) & (btStat = EFI.Success) THEN
