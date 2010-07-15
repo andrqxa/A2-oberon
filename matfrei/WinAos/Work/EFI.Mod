@@ -1,5 +1,4 @@
-MODULE EFI; (** AUTHOR "Matthias Frei"; PURPOSE "Provides (low-level) API
-to the (Unified) Extensible Firmware Interface"; *)
+MODULE EFI; (** AUTHOR "Matthias Frei"; PURPOSE "Provides (low-level) API to the (Unified) Extensible Firmware Interface"; *)
 
 IMPORT SYSTEM;
 
@@ -30,7 +29,7 @@ CONST
 	AllocateMaxAddress* = 1;
 	AllocateAddress* = 2;
 	MaxAllocateType* = 3;
-	
+
 	(* Memory Types (for BSAllocatePages and MemoryDescriptor.Type)*)
 	MTReserved* = 0;
 	MTLoderCode* = 1;
@@ -47,10 +46,10 @@ CONST
 	MTMemoryMappedIOPortSpace* = 12;
 	MTPalCode* = 13;
 	MTMaxMemoryType* = 14;
-	
+
 	(* Page Size in bytes *)
 	PageSize* = 1000H; (* = 4KB *)
-	
+
 	(* BSLocateHandle search types *)
 	AllHandles* = 0; (* the 'Protocol' and 'SearchLey' argument are ignored and all handles in the system are returned *)
 	ByRegistryNotify* = 1; (* 'SearchKey' supplies the Registration value returned by RegisterProtocolNotify(). 'Protocol' is ignored *)
@@ -61,8 +60,6 @@ CONST
 	CallbackTPL* = 8;
 	NotifiyTPL* = 16;
 	HighLevelTPL* = 31;
-
-	
 
 (* various type definitions *)
 TYPE Char8* = SHORTINT;
@@ -77,7 +74,7 @@ TYPE Int64* = HUGEINT;
 
 TYPE Status* = Int;
 TYPE TPL* = Int;
-TYPE LBA* = Int64; 
+TYPE LBA* = Int64;
 TYPE Pointer* = Int32;
 TYPE VirtualAddress* = Int64; (* sic! *)
 TYPE PhysicalAddress* = Int64; (* sic! *)
@@ -114,8 +111,7 @@ TYPE Time* = RECORD
 	TimeZone- : Int8; (* -1440 - 1440 or 2047 (= unspecified) *)
 	Daylight-: Int8; (* 1 : EFITimeAdjustDaylight, 2 : EFITimeInDaylight *)
 	Pad2 : Int8;
-END; 
-	
+END;
 
 (* main EFI tables *)
 TYPE SystemTable* = RECORD
@@ -133,7 +129,6 @@ TYPE SystemTable* = RECORD
 	NumberOfTableEntries-: Int;
 	ConfigurationTable-{UNTRACED}: POINTER TO ARRAY 2048 OF ConfigurationTableEntry; (* access to ACPI, SMBIOS, ... *)
 END;
-
 
 (* BootServices function type declarations *)
 TYPE DevicePath* = RECORD
@@ -244,7 +239,6 @@ END;
 
 (* basic EFI protocols ( = function tables to communicate with EFI services ) *)
 
-
 (* Simple Input Interface Protocol *)
 TYPE InputKey* = RECORD
 	ScanCode-: Int16;
@@ -294,7 +288,6 @@ TYPE SimpleTextOutputInterface* = RECORD(ProtocolDescription)
 	Mode-{UNTRACED}: POINTER TO SimpleTextOutputInterfaceMode;
 END;
 
-
 VAR
 	imageHandle-: Handle;
 	table- {UNTRACED}: POINTER TO SystemTable;
@@ -309,4 +302,3 @@ BEGIN
 	SYSTEM.PUT32 (SYSTEM.ADR (imageHandle), GetParameter (12));
 	SYSTEM.PUT32 (SYSTEM.ADR (table), GetParameter (16));
 END EFI.
-

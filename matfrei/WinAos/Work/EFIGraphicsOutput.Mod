@@ -1,4 +1,4 @@
-MODULE EFIGraphicsOutput; (** AUTHOR ""; PURPOSE ""; *)
+MODULE EFIGraphicsOutput; (** AUTHOR "Matthias Frei"; PURPOSE "EFI Graphics Output Protocol"; *)
 
 IMPORT
 	EFI, SYSTEM;
@@ -33,7 +33,7 @@ TYPE GraphicsModeInfoDescription* = RECORD
 	PixelBitmask-: RECORD RedMask-,GreenMask-,BlueMask-,ReservedMask-:EFI.Int32; END;
 	PixelsPerScanline-: EFI.Int32;
 END;
-	
+
 TYPE Protocol* = POINTER TO ProtocolDescription;
 TYPE GOQueryMode* = PROCEDURE{C}(This : Protocol; ModeNumber : EFI.Int32; VAR SizeOfInfo : EFI.Int; VAR Info : GraphicsModeInfo) : EFI.Status;
 TYPE GOSetMode* = PROCEDURE{C}(This : Protocol; ModeNumber : EFI.Int32) : EFI.Status;

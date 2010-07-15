@@ -1,4 +1,4 @@
-MODULE EFITrace;
+MODULE EFITrace; (** AUTHOR "Matthias Frei"; PURPOSE "EFI Console Output"; *)
 
 IMPORT EFI, Trace;
 
@@ -18,4 +18,3 @@ BEGIN
 	Trace.Char := Char;
 	Trace.Color := Color;
 END EFITrace.
-

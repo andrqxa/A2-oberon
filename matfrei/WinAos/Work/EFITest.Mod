@@ -1,7 +1,6 @@
-MODULE EFITest;
+MODULE EFITest; (** AUTHOR "Matthias Frei"; PURPOSE "EFI Test"; *)
 
 IMPORT EFI, EFISimpleFS, EFIFileProtocol, EFILib, Trace, SYSTEM;
-
 
 PROCEDURE TestFS;
 VAR
@@ -63,11 +62,7 @@ BEGIN
 	TestFS;
 END EFITest.
 
-Compiler.Compile  --objectFile=Generic --symbolFile=Textual --extensions 
+Compiler.Compile  --objectFile=Generic --symbolFile=Textual --extensions
 	Runtime.Mod Trace.Mod EFI.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod EFILib.Mod EFITest.Mod ~
 StaticLinker.Link --fileName=test.efi --fileFormat=EFI32 --displacement=401000H
-	Runtime Trace EFI EFITrace EFISimpleFS EFIFileProtocol EFILib EFITest 
-
-
-
-
+	Runtime Trace EFI EFITrace EFISimpleFS EFIFileProtocol EFILib EFITest ~

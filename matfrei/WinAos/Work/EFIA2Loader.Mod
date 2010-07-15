@@ -1,4 +1,4 @@
-MODULE EFIA2Loader; (** AUTHOR ""; PURPOSE ""; *)
+MODULE EFIA2Loader; (** AUTHOR "Matthias Frei"; PURPOSE "EFI A2 Boot Loader"; *)
 
 IMPORT
 	SYSTEM, EFI, EFILib, EFIFileProtocol, EFIGraphicsOutput, Trace;
@@ -41,7 +41,7 @@ BEGIN
 			RETURN -1;
 		END;
 		(* now check whether this is the mode we are looking for *)
-		IF (prefWidth = info.HorizontalResolution) & (prefHeight = info.VerticalResolution) 
+		IF (prefWidth = info.HorizontalResolution) & (prefHeight = info.VerticalResolution)
 				& (prefFormat = info.PixelFormat) & (prefDepth = 32) THEN (* all pixel formats are 32 bit *)
 			RETURN i;
 		END;
@@ -152,13 +152,13 @@ VAR
 	btAddrPhys : EFI.PhysicalAddress;
 	btPos : SYSTEM.ADDRESS;
 	status : EFI.Status;
-	
+
 	type : LONGINT;
 	fileSize : LONGINT;
-	
+
 	cfgname, cfgval : SYSTEM.ADDRESS;
 	cfgnamelen, cfgvallen : LONGINT;
-	
+
 	parseError : BOOLEAN;
 
 	ramSize : EFI.Int64;
@@ -173,12 +173,12 @@ VAR
 		Trace.Int(at,0);
 		Trace.Ln;
 	END ReportError;
-	
+
 	PROCEDURE IsWhitespace(ch : CHAR) : BOOLEAN;
 	BEGIN
 		RETURN (ch = ' ') OR (ch = 09X) OR (ch = 0AX); (* space, tab or newline *)
 	END IsWhitespace;
-	
+
 	(* searches the next configuration entry in the config file and returns the positions and lengths of its name and value *)
 	PROCEDURE ReadConfig (VAR name : SYSTEM.ADDRESS; VAR namelen : LONGINT; VAR val : SYSTEM.ADDRESS; VAR vallen : LONGINT) : BOOLEAN;
 	VAR ch : CHAR;
@@ -188,9 +188,9 @@ VAR
 		WHILE (cfPos # cfEnd) & IsWhitespace(ch) DO
 			SYSTEM.GET(cfPos, ch); INC(cfPos);
 		END;
-		
+
 		IF (ch = '~') THEN RETURN FALSE; END;
-		
+
 		name := cfPos-1;
 		namelen := 0;
 		(* skip name *)
@@ -198,21 +198,21 @@ VAR
 			INC(namelen);
 			SYSTEM.GET(cfPos, ch); INC(cfPos);
 		END;
-		
+
 		(* skip whitespace before = *)
 		WHILE (cfPos # cfEnd) & IsWhitespace(ch) DO
 			SYSTEM.GET(cfPos, ch); INC(cfPos);
 		END;
 		IF (ch # '=') THEN ReportError(cfPos - cfAddr); RETURN FALSE; END;
 		IF (cfPos # cfEnd) THEN SYSTEM.GET(cfPos, ch); INC(cfPos); END;
-		
+
 		(* skip whitespace after = *)
 		WHILE (cfPos # cfEnd) & IsWhitespace(ch) DO
 			SYSTEM.GET(cfPos, ch); INC(cfPos);
 		END;
 		IF (ch # '"') THEN ReportError(cfPos - cfAddr); RETURN FALSE; END;
 		IF (cfPos # cfEnd) THEN SYSTEM.GET(cfPos, ch); INC(cfPos); END;
-		
+
 		val := cfPos-1;
 		vallen := 0;
 		(* skip val *)
@@ -227,7 +227,7 @@ VAR
 		END;
 		RETURN TRUE;
 	END ReadConfig;
-	
+
 BEGIN
 	(* open and load the configuration file *)
 	configFile := EFILib.OpenFile(configFileName);
@@ -263,7 +263,7 @@ BEGIN
 	SYSTEM.PUT32(btPos, 16); INC(btPos, 4); (* entry size *)
 	SYSTEM.PUT32(btPos, 0); INC(btPos, 4); (* boot memory address (?) *)
 	SYSTEM.PUT32(btPos, 640*1024); INC(btPos, 4); (* boot memory size (in bytes) *)
-	
+
 	(* free memory/extended memory size *)
 	status := EFILib.GetMemorySize(ramSize);
 	type := 4;
@@ -275,19 +275,18 @@ BEGIN
 		Trace.String("DEBUG: ramsize: "); Trace.Hex(SHORT(ramSize), 0); Trace.String("H MB"); Trace.Ln;
 	END;
 
-
 	(* config strings; Parse the configuration file and copy the content to the boot table *)
 	type := 8;
 	(* write a config string entry 'header'. *)
 	bootTableCfgStrEntry := btPos;
 	SYSTEM.PUT32(btPos, type); INC(btPos, 4);
 	SYSTEM.PUT32(btPos, 0); INC(btPos, 4); (* reserve space for the size field *)
-	
+
 	bootTableEnd := btPos;
 	(* write trailer - will be overwritten by addconfig *)
 	SYSTEM.PUT8(btPos, 0); INC(btPos);
 	SYSTEM.PUT32(btPos, -1); INC(btPos, 4);
-	
+
 	parseError := FALSE;
 	WHILE (ReadConfig(cfgname, cfgnamelen, cfgval, cfgvallen))  DO
 		AddConfigA(cfgname, cfgnamelen, cfgval, cfgvallen);
@@ -304,7 +303,7 @@ PROCEDURE AddConfig(CONST name, val : ARRAY OF CHAR);
 VAR strlenName, strlenVal : LONGINT;
 BEGIN
 	strlenName:=0; WHILE (name[strlenName] # 0X) & (strlenName < LEN(name)) DO INC(strlenName); END;
-	strlenVal:=0; WHILE (val[strlenVal] # 0X) & (strlenVal < LEN(val)) DO INC(strlenVal); END; 
+	strlenVal:=0; WHILE (val[strlenVal] # 0X) & (strlenVal < LEN(val)) DO INC(strlenVal); END;
 
 	AddConfigA(SYSTEM.ADR(name[0]), strlenName, SYSTEM.ADR(val[0]), strlenVal);
 END AddConfig;
@@ -324,11 +323,11 @@ BEGIN
 	SYSTEM.PUT(btEnd, 0); INC(btEnd); (*separator *)
 
 	INC(bootTableEnd, namelen + 1 + vallen + 1);
-	
+
 	SYSTEM.PUT(btEnd, 0); INC(btEnd); (* marks the end of the config string entry *)
 	SYSTEM.PUT32(btEnd, -1); (* marks the end of the table *)
 	(* do not increment bootTableEnd here again. the 0 and the -1 will be overwritten if another entry is added *)
-	
+
 	cfgStrSize := bootTableEnd + 1 - bootTableCfgStrEntry; (* size including the 0 byte of the trailer *)
 	SYSTEM.PUT32(bootTableCfgStrEntry + 4, cfgStrSize);
 END AddConfigA;
@@ -368,7 +367,6 @@ BEGIN
 	val[0] := 0X
 END GetConfig;
 
-
 (* 	loads the kernel image to kernelAddress if possible. Otherwise loads it to somewhere else and return WarnWriteFailure.
 	Allocates makes sure the memory at kernelRelocAddress is allocated (by us or by someone else) s.t.
 	the boot table will certainly not be allocated there.
@@ -399,7 +397,7 @@ BEGIN
 				END;
 			END;
 		END;
-		
+
 		loadAddr := kernelAddress;
 		status := EFILib.LoadFile(kernelImageFile, loadAddr);
 		IF (status = EFI.Success ) THEN
@@ -412,7 +410,7 @@ BEGIN
 				status := EFILib.AllocateMemory(allocAddr, 1);
 				allocAddr := allocAddr + EFI.PageSize;
 			END;
-			
+
 			loadAddr := -1;
 			status := EFILib.LoadFile(kernelImageFile, loadAddr);
 			IF (status = EFI.Success) THEN
@@ -429,7 +427,6 @@ BEGIN
 		RETURN EFI.ErrNotFound;
 	END;
 END LoadKernel;
-
 
 (*  I386.Machine.Mod uses following registers as arguments:
 	eax	: bootFlag (= address of boot table)
@@ -453,7 +450,7 @@ VAR
 	kernelSize, fbSize : LONGINT;
 	kernelStat, btStat, fbStat, status : EFI.Status;
 	kernelFileName, configFileName, arg : ARRAY 128 OF EFI.Char16;
-	val : ARRAY 100 OF CHAR; 
+	val : ARRAY 100 OF CHAR;
 	i, dWidth, dHeight, dDepth, dFormat : LONGINT;
 BEGIN
 	Trace.String("Starting"); Trace.Ln;
@@ -463,14 +460,14 @@ BEGIN
 		kernelStat := LoadKernel(kernelFileName, kernelAddr, kernelSize);
 		(* parse the configuration file and generate the boot table *)
 		btStat := LoadBootTable(configFileName, btAddr);
-		
+
 		IF (btStat = EFI.Success) THEN
 			(* get the configurations for the framebuffer and get the address of the corresponding framebuffer *)
 			GetConfig("DWidth",val); i:=0; dWidth := EFILib.StringToInt(i, val);
 			GetConfig("DHeight",val); i:=0; dHeight := EFILib.StringToInt(i, val);
 			GetConfig("DDepth",val); i:=0; dDepth := EFILib.StringToInt(i, val);
 			dFormat := EFIGraphicsOutput.PFBGRX8Bit;  (* Displays.Mod uses BGR *)
-			
+
 			fbStat := GetFrameBuffer(dWidth,dHeight,dDepth, dFormat, fbAddr, fbSize);
 			IF (fbStat = EFI.Success) THEN
 				(* Does not work because IntToString does not function properly for large numbers.
@@ -489,7 +486,7 @@ BEGIN
 						Trace.String("."); Trace.Ln;
 					END;
 				END;
-				
+
 				*)
 			ELSE
 				Trace.String("Warning: Requested display mode ");
@@ -499,22 +496,20 @@ BEGIN
 				Trace.String("Continuing happily."); Trace.Ln;
 			END;
 		END;
-		
-			
+
 		IF traceDebug THEN
 			Trace.String("DEBUG: Kernel at ");Trace.Address(kernelAddr);Trace.Ln;
 			Trace.String("DEBUG: BootTable at ");Trace.Address(btAddr);Trace.Ln;
 			Trace.String("DEBUG: FrameBuffer at "); Trace.Address(fbAddr); Trace.Ln;
 			Trace.String("DEBUG: boot table:"); Trace.Ln; Trace.Memory(bootTableBegin, bootTableEnd-bootTableBegin + 5);
 		END;
-		
-		;
+
 		IF (EFILib.GetNextArg(arg) & (CHR(arg[0]) = '-') & (CHR(arg[1]) = 'd')) THEN
 			Trace.Ln;
 			Trace.String("Dry Run Complete"); Trace.Ln;
 			RETURN;
 		END;
-		
+
 		IF ((kernelStat = EFI.Success) OR (kernelStat = EFI.WarnWriteFailure)) & (btStat = EFI.Success) THEN
 			Trace.String("Shutting down Boot Services..."); Trace.Ln;
 			status := EFILib.ExitBootServices();
@@ -547,16 +542,18 @@ BEGIN
 	EFILib.FreeMemory;
 END LoadA2;
 
-
 BEGIN
 	LoadA2;
 END EFIA2Loader.
 
 SystemTools.DoCommands
-Compiler.Compile  --objectFile=Generic --symbolFile=Textual --extensions
-	Runtime.Mod Trace.Mod EFI.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod
-	EFILoadedImage.Mod EFIGraphicsOutput.Mod EFILib.Mod EFIA2Loader.Mod ~
-StaticLinker.Link --fileName=..\a2loader.efi --fileFormat=EFI32 --displacement=401000H
-	Runtime Trace EFI EFITrace EFISimpleFS  EFIFileProtocol EFILoadedImage EFIGraphicsOutput EFILib EFIA2Loader ~
-SystemTools.Show done ~
+
+	Compiler.Compile  --objectFile=Generic --symbolFile=Textual --extensions
+		Runtime.Mod Trace.Mod EFI.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod
+		EFILoadedImage.Mod EFIGraphicsOutput.Mod EFILib.Mod EFIA2Loader.Mod ~
+
+	StaticLinker.Link --fileName=..\a2loader.efi --fileFormat=EFI32 --displacement=401000H
+		Runtime Trace EFI EFITrace EFISimpleFS  EFIFileProtocol EFILoadedImage EFIGraphicsOutput EFILib EFIA2Loader ~
+
+	SystemTools.Show done ~
 ~

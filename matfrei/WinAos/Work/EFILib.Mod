@@ -1,4 +1,4 @@
-MODULE EFILib; (** AUTHOR ""; PURPOSE ""; *)
+MODULE EFILib; (** AUTHOR "Matthias Frei"; PURPOSE "EFI API"; *)
 
 IMPORT SYSTEM, EFI, EFIFileProtocol, EFISimpleFS, EFILoadedImage, Trace;
 
@@ -19,7 +19,6 @@ VAR
 	args : PtrToLongString;
 	argLen : LONGINT;
 	argPos : LONGINT;
-
 
 (* allocate memory pages. If addr = -1 (=FFFFFFFFFH) then a page at an arbitrary position will be allocated. *)
 PROCEDURE AllocateMemory*(VAR addr : EFI.PhysicalAddress; numPages : EFI.Int) : EFI.Status;
@@ -46,7 +45,6 @@ BEGIN
 		RETURN EFI.Error;
 	END;
 END AllocateMemory;
-
 
 (* free all pages allocated by AllocateMemory *)
 PROCEDURE FreeMemory*;
@@ -75,7 +73,7 @@ BEGIN
 		(* we cant resize. We are doomed!*)
 		RETURN status;
 	END;
-	
+
 	numEntries := MemMapSize DIV SYSTEM.SIZEOF(EFI.MemoryDescriptor);
 	memsize := 0;
 	FOR i := 0 TO numEntries DO
@@ -83,7 +81,7 @@ BEGIN
 			memsize := MemMap[i].PhysicalStart + MemMap[i].NumberOfPages*LONG(EFI.PageSize);
 		END;
 	END;
-	
+
 	memsize := SYSTEM.GET32(SYSTEM.ADR(memsize)+4); (* BUG! where ? *)
 
 	RETURN EFI.Success;
@@ -164,7 +162,6 @@ BEGIN
 	END;
 	RETURN status;
 END InitArgs;
-
 
 (* read one argument after another. Returns true iff successfully parsed.
 Treats ' ' (blank) as seperator between arguments. (text between '"' is NOT merged into one argument.
@@ -262,7 +259,6 @@ BEGIN
 		x0 := x0 DIV 10;
 	END;
 END IntToString;
-
 
 (* Copied from I386.Machine.Mod - StrToInt *)
 (** Convert a string to an integer. Parameter i specifies where in the string scanning should begin (usually 0 in the first call). Scanning stops at the first non-valid character, and i returns the updated position. Parameter s is the string to be scanned. The value is returned as result, or 0 if not valid. Syntax: number = ["-"] digit {digit} ["H" | "h"] . digit = "0" | ... "9" | "A" .. "F" | "a" .. "f" . If the number contains any hexdecimal letter, or if it ends in "H" or "h", it is interpreted as hexadecimal. *)
@@ -394,8 +390,6 @@ BEGIN
 	RETURN file;
 END OpenFileOnDevice;
 
-
-
 (* allocate memory and copy the content of the file to memory. If loadAddr = -1 an arbitrary memory page will be allocated *)
 PROCEDURE LoadFile*(file : EFIFileProtocol.Protocol; VAR loadAddr : SYSTEM.ADDRESS) : EFI.Status;
 VAR
@@ -422,7 +416,6 @@ END LoadFile;
 (* Reports a description of the error code *)
 PROCEDURE ReportError*(status : EFI.Status);
 BEGIN
-
 (*
 	CASE status OF
 		|EFI.Success : Trace.String("Success");
@@ -452,4 +445,3 @@ BEGIN
 	numAllocations := 0;
 	args := NIL;
 END EFILib.
-
