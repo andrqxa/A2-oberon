@@ -320,6 +320,7 @@ TYPE
 		ident*: InfoItem;
 		vis*: SHORTINT;
 		initializer*: InfoItem;
+		external*: Strings.String;
 	END IdentDef;
 
 	IdentList* = OBJECT (NodeList)
@@ -643,6 +644,7 @@ TYPE
 			NEW(proc.head, proc);
 			ProcHeadP(proc.head);
 			IF proc.head.identDef = NIL THEN proc.head := NIL; RETURN END;
+			IF proc.head.identDef.external # NIL THEN RETURN END;
 			Check(FoxScanner.Semicolon);
 			IF 	(symbol.token = FoxScanner.Const) OR (symbol.token = FoxScanner.Var) OR
 				(symbol.token = FoxScanner.Type) OR (symbol.token = FoxScanner.Procedure) OR (symbol.token = FoxScanner.Operator) THEN
@@ -1269,10 +1271,16 @@ TYPE
 			ELSE
 				identDef.vis := Private;
 			END;
+			identDef.external := NIL;
 			IF symbol.token = FoxScanner.Becomes THEN
 				NextSymbol;
 				NEW(identDef.initializer);
 				ConstExprP(FoxScanner.Colon, FoxScanner.Comma, identDef.initializer);
+			ELSIF symbol.token = FoxScanner.Extern THEN
+				NextSymbol;
+				identDef.external := Strings.NewString(symbol.string^);
+				Check(FoxScanner.String);
+				TRACE (identDef.external^);
 			END;
 		END IdentDefP;
 

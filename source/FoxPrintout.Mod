@@ -920,6 +920,11 @@ TYPE
 				IF info THEN BeginComment; w.String("<- hidden"); EndComment  END;
 			END;
 
+			IF x.externalName # NIL THEN
+				Keyword(" EXTERN " ); w.Char('"');
+				w.String(x.externalName^); w.Char('"');
+			END;
+
 			IF info THEN
 				BeginComment;
 				w.String("access= {");
@@ -1184,12 +1189,14 @@ TYPE
 					Symbol(type.returnParameter);
 					EndComment;
 				END;
-				w.String( ";" );
-				Comments(x.comment,x,TRUE);
-				IF mode >= SymbolFile THEN
-					ProcedureScope(x.procedureScope);
+				IF x.externalName = NIL THEN
+					w.String( ";" );
+					Comments(x.comment,x,TRUE);
+					IF mode >= SymbolFile THEN
+						ProcedureScope(x.procedureScope);
+					END;
+					Indent;  Keyword("END " );  Identifier(x.name);
 				END;
-				Indent;  Keyword("END " );  Identifier(x.name);
 			END;
 		END VisitProcedure;
 

@@ -316,6 +316,7 @@ TYPE
 		PROCEDURE VisitVariable(x: SyntaxTree.Variable);
 		VAR name: Basic.SegmentedName; irv: IntermediateCode.Section;
 		BEGIN
+			IF x.externalName # NIL THEN RETURN END;
 			IF (currentScope IS SyntaxTree.ModuleScope) OR (currentScope IS SyntaxTree.CellScope) THEN
 				(* code section for variable *)
 				Global.GetSymbolSegmentedName(x,name);
@@ -481,6 +482,8 @@ TYPE
 			END HasValue;
 
 		BEGIN
+			IF x.externalName # NIL THEN RETURN END;
+
 			(*
 			IF Trace & (dump # NIL) THEN dump.String("DeclarationVisitor:Procedure"); dump.Ln END;
 			*)
@@ -7083,9 +7086,14 @@ TYPE
 				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,x.offsetInBits));
 			ELSIF (x.scope = moduleScope) OR (x.scope IS SyntaxTree.CellScope) THEN (* global variable *)
 				InitOperand(result,ModeReference);
-				Global.GetSymbolSegmentedName(x,name);
-				symbol := NewSection(module.allSections, Sections.VarSection, name,x,commentPrintout # NIL);
-				IntermediateCode.InitAddress(result.op, addressType, symbol.name, GetFingerprint(symbol.symbol), 0);
+				IF x.externalName # NIL THEN
+					Basic.ToSegmentedName(x.externalName^, name);
+					IntermediateCode.InitAddress(result.op, addressType, name, 0, 0);
+				ELSE
+					Global.GetSymbolSegmentedName(x,name);
+					symbol := NewSection(module.allSections, Sections.VarSection, name,x,commentPrintout # NIL);
+					IntermediateCode.InitAddress(result.op, addressType, symbol.name, GetFingerprint(symbol.symbol), 0);
+				END;
 			ELSIF x.scope IS SyntaxTree.ModuleScope THEN (* global variable in imported module *)
 				InitOperand(result,ModeReference);
 				Global.GetSymbolSegmentedName(x,name);
@@ -7296,29 +7304,34 @@ TYPE
 				ReleaseIntermediateOperand(result.tag);
 			ELSE tag := nil
 			END;
-			GetCodeSectionNameForSymbol(x, name);
 			IF x.isInline  THEN
 				sectionType := Sections.InlineCodeSection;
 			ELSE
 				sectionType := Sections.CodeSection;
 			END;
-			IF (x.scope.ownerModule = module.module) THEN
-				source := NewSection(module.allSections, sectionType, name,x,commentPrintout # NIL);
-			ELSIF (sectionType = Sections.InlineCodeSection) & (x.procedureScope.body.code.sourceCode # NIL) THEN
-				source := NewSection(module.allSections, sectionType, name,x,commentPrintout # NIL);
-				IF source.pc = 0 THEN (* no code yet *)
-					source.Emit(Asm(position,x.procedureScope.body.code.sourceCode,NIL,NIL));
-				END;
-			ELSIF (sectionType = Sections.InlineCodeSection) & (x.procedureScope.body.code.inlineCode # NIL) THEN
-				bits := x.procedureScope.body.code.inlineCode;
-				source := NewSection(module.allSections, sectionType, name, x, commentPrintout # NIL);
-				binary := BinaryCode.NewBinarySection(source.type, source.priority, system.codeUnit, name, FALSE, FALSE);
-				binary.CopyBits(bits, 0, bits.GetSize());
-				source.SetResolved(binary);
+			IF x.externalName # NIL THEN
+				Basic.ToSegmentedName(x.externalName^, name);
+				IntermediateCode.InitAddress(reg, addressType, name, 0, 0);
 			ELSE
-				source := NewSection(module.importedSections, sectionType, name,x,commentPrintout # NIL);
+				GetCodeSectionNameForSymbol(x, name);
+				IF (x.scope.ownerModule = module.module) THEN
+					source := NewSection(module.allSections, sectionType, name,x,commentPrintout # NIL);
+				ELSIF (sectionType = Sections.InlineCodeSection) & (x.procedureScope.body.code.sourceCode # NIL) THEN
+					source := NewSection(module.allSections, sectionType, name,x,commentPrintout # NIL);
+					IF source.pc = 0 THEN (* no code yet *)
+						source.Emit(Asm(position,x.procedureScope.body.code.sourceCode,NIL,NIL));
+					END;
+				ELSIF (sectionType = Sections.InlineCodeSection) & (x.procedureScope.body.code.inlineCode # NIL) THEN
+					bits := x.procedureScope.body.code.inlineCode;
+					source := NewSection(module.allSections, sectionType, name, x, commentPrintout # NIL);
+					binary := BinaryCode.NewBinarySection(source.type, source.priority, system.codeUnit, name, FALSE, FALSE);
+					binary.CopyBits(bits, 0, bits.GetSize());
+					source.SetResolved(binary);
+				ELSE
+					source := NewSection(module.importedSections, sectionType, name,x,commentPrintout # NIL);
+				END;
+				IntermediateCode.InitAddress(reg, addressType, source.name , GetFingerprint(source.symbol), 0);
 			END;
-			IntermediateCode.InitAddress(reg, addressType, source.name , GetFingerprint(source.symbol), 0);
 			InitOperand(operand,ModeValue);
 			operand.op := reg;
 			operand.tag := tag;

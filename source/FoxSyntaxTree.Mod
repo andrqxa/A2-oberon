@@ -2814,6 +2814,7 @@ TYPE
 		nextSymbol-: Symbol;
 
 		name-: Identifier; (* constant / variable / parameter / type name / module name *)
+		externalName-: Scanner.StringType;  (* variable / procedure *)
 		access-: SET; (* access flags (exported, readonly etc.) *)
 		type-: Type; (* type of constant / variable / parameter / procedure return type *)
 		scope-:Scope; (* container of symbol *)
@@ -2833,6 +2834,7 @@ TYPE
 			SELF.position := position; state := Undefined;
 			nextSymbol := NIL;
 			SELF.name := name;
+			externalName := NIL;
 			scope:= NIL;
 			type := NIL;
 			access := Internal;
@@ -2904,6 +2906,10 @@ TYPE
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitSymbol(SELF)
 		END Accept;
+		
+		PROCEDURE SetExternalName*(name: Scanner.StringType);
+		BEGIN externalName := name;
+		END SetExternalName;
 
 	END Symbol;
 

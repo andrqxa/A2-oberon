@@ -1737,6 +1737,7 @@ TYPE
 			isInline: BOOLEAN;
 			modifiers: SyntaxTree.Modifier;
 			forwardDeclaration: BOOLEAN;
+			string: Scanner.StringType;
 		BEGIN
 			IF Trace THEN S( "Procedure" ) END;
 			(* symbol procedure has already been consumed *)
@@ -1780,8 +1781,11 @@ TYPE
 
 			procedureType.SetModifiers(modifiers);
 			procedure.SetType(procedureType);
+			IF Optional(Scanner.Extern) & MandatoryString(string) THEN procedure.SetExternalName(string); END;
 			IF Optional(Scanner.LeftParenthesis) THEN FormalParameters( procedureType, procedureScope) END;
-			IF ~forwardDeclaration THEN
+			IF procedure.externalName # NIL THEN
+				parentScope.AddProcedure( procedure )
+			ELSIF ~forwardDeclaration THEN
 				IF Lax THEN Ignore(Scanner.Semicolon) ELSE Check( Scanner.Semicolon ) END;
 				DeclarationSequence( procedureScope);
 				IF Peek(Scanner.Begin) OR Peek(Scanner.Code) THEN
@@ -1863,7 +1867,7 @@ TYPE
 
 		(** VariableNameList = IdentifierDefinition [Flags] {',' IdentifierDefinition [Flags]}.**)
 		PROCEDURE VariableNameList( scope: SyntaxTree.Scope );
-		VAR varname: SyntaxTree.Identifier;  position: LONGINT; variable: SyntaxTree.Variable;  flags,access: SET;
+		VAR varname: SyntaxTree.Identifier;  position: LONGINT; variable: SyntaxTree.Variable;  flags,access: SET; string: Scanner.StringType;
 		BEGIN
 			IF Trace THEN S( "VariableNameList" ) END;
 			REPEAT
@@ -1873,7 +1877,8 @@ TYPE
 				variable := SyntaxTree.NewVariable( position, varname );
 				CommentSymbol(variable);
 				IF Optional(Scanner.LeftBrace) THEN variable.SetModifiers(Flags()) END;
-				IF Optional(Scanner.Becomes) THEN variable.SetInitializer (Expression()) END;
+				IF Optional(Scanner.Becomes) THEN variable.SetInitializer (Expression());
+				ELSIF Optional(Scanner.Extern) & MandatoryString(string) THEN variable.SetExternalName(string); END;
 				variable.SetAccess(access);
 				scope.AddVariable(variable);
 			UNTIL ~Optional( Scanner.Comma );
