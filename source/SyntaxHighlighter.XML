@@ -171,6 +171,8 @@
 					SYSTEM.PACK SYSTEM.UNPK
 					HALT
 					UNTRACED
+					UNCHECKED
+					UNCOOPERATIVE
 				</Group>
 				<Group style="Debug">
 					KernelLog
