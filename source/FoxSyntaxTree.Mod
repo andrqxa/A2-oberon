@@ -4052,6 +4052,7 @@ TYPE
 			isExclusive-: BOOLEAN;
 			isRealtime-: BOOLEAN;
 			isUnchecked-: BOOLEAN;
+			isUncooperative-: BOOLEAN;
 
 		PROCEDURE & InitStatementBlock( position: LONGINT ; outer: Statement);
 		BEGIN
@@ -4059,6 +4060,7 @@ TYPE
 			isExclusive := FALSE;
 			isRealtime := FALSE;
 			isUnchecked := FALSE;
+			isUncooperative := FALSE;
 		END InitStatementBlock;
 
 		PROCEDURE SetRealtime*(b: BOOLEAN);
@@ -4070,6 +4072,11 @@ TYPE
 		BEGIN
 			isUnchecked := unchecked
 		END SetUnchecked;
+
+		PROCEDURE SetUncooperative*(uncooperative: BOOLEAN);
+		BEGIN
+			isUncooperative := uncooperative
+		END SetUncooperative;
 
 		PROCEDURE SetModifier*(modifier: Modifier);
 		BEGIN

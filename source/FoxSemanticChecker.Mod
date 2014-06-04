@@ -7574,6 +7574,12 @@ TYPE
 					ELSE
 						block.SetUnchecked(TRUE);
 					END;
+				ELSIF name=Global.NameUncooperative THEN
+					IF block.isUncooperative THEN
+						Error(position,Diagnostics.Invalid,"duplicate uncooperative flag")
+					ELSE
+						block.SetUncooperative(TRUE);
+					END;
 				ELSE
 					Error(position,Diagnostics.Invalid,"unknown block modifier");
 				END;
