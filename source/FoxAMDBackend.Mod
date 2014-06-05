@@ -1514,7 +1514,7 @@ TYPE
 
 		PROCEDURE EmitConvertFloat(CONST instruction: IntermediateCode.Instruction);
 		VAR destType, srcType, dtype: IntermediateCode.Type; dest,src,espm,imm: Assembler.Operand; sizeInBytes, index: LONGINT;
-		temp, temp2, temp3, temp4: Assembler.Operand; ticket: Ticket; vdest, vsrc: IntermediateCode.Operand
+		temp, temp2, temp3, temp4: Assembler.Operand; ticket: Ticket; vdest, vsrc: IntermediateCode.Operand;
 		BEGIN
 			vdest := instruction.op1; vsrc := instruction.op2;
 			srcType := vsrc.type;
@@ -2035,7 +2035,7 @@ TYPE
 		END EmitArithmetic3;
 
 		PROCEDURE EmitArithmetic3XMM(CONST instruction: IntermediateCode.Instruction; op32, op64: LONGINT);
-		VAR op: LONGINT
+		VAR op: LONGINT;
 		BEGIN
 			IF instruction.op1.type.sizeInBits = 32 THEN op := op32 ELSE op := op64 END;
 			EmitArithmetic3(instruction, Low, op);
@@ -2050,7 +2050,7 @@ TYPE
 		END EmitArithmetic2;
 
 		PROCEDURE EmitArithmetic2XMM(CONST instruction: IntermediateCode.Instruction; op32, op64: LONGINT);
-		VAR op: LONGINT
+		VAR op: LONGINT;
 		BEGIN
 			IF instruction.op1.type.sizeInBits = 32 THEN op := op32 ELSE op := op64 END;
 			EmitArithmetic2(instruction, Low, op);
