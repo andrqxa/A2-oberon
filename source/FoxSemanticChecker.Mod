@@ -76,6 +76,7 @@ TYPE
 		module: SyntaxTree.Module;
 		diagnostics: Diagnostics.Diagnostics;
 		useDarwinCCalls: BOOLEAN;
+		cooperative: BOOLEAN;
 		error-: BOOLEAN;
 		VerboseErrorMessage: BOOLEAN;
 		typeFixes, pointerFixes: LateFixList;
@@ -105,10 +106,11 @@ TYPE
 		activeCellsSpecification: ActiveCells.Specification;
 		replacements*: Replacement;
 
-		PROCEDURE &InitChecker*(diagnostics: Diagnostics.Diagnostics; verboseErrorMessage,useDarwinCCalls: BOOLEAN; system: Global.System; symbolFileFormat: Formats.SymbolFileFormat; activeCellsSpecification: ActiveCells.Specification; VAR importCache: SyntaxTree.ModuleScope);
+		PROCEDURE &InitChecker*(diagnostics: Diagnostics.Diagnostics; verboseErrorMessage,useDarwinCCalls,cooperative: BOOLEAN; system: Global.System; symbolFileFormat: Formats.SymbolFileFormat; activeCellsSpecification: ActiveCells.Specification; VAR importCache: SyntaxTree.ModuleScope);
 		BEGIN
 			SELF.diagnostics := diagnostics;
 			SELF.useDarwinCCalls := useDarwinCCalls;
+			SELF.cooperative := cooperative;
 			SELF.system := system;
 			SELF.symbolFileFormat := symbolFileFormat;
 			SELF.activeCellsSpecification := activeCellsSpecification;
@@ -7574,7 +7576,7 @@ TYPE
 					ELSE
 						block.SetUnchecked(TRUE);
 					END;
-				ELSIF name=Global.NameUncooperative THEN
+				ELSIF (name=Global.NameUncooperative) & cooperative THEN
 					IF block.isUncooperative THEN
 						Error(position,Diagnostics.Invalid,"duplicate uncooperative flag")
 					ELSE
@@ -9160,10 +9162,10 @@ TYPE
 	END EnterCase;
 
 	(** generate and return a new checker object, errors are entered into diagnostics **)
-	PROCEDURE NewChecker*(diagnostics: Diagnostics.Diagnostics; verboseErrorMessage,useDarwinCCalls: BOOLEAN; system: Global.System; symbolFileFormat: Formats.SymbolFileFormat; activeCellsSpecification: ActiveCells.Specification; VAR importCache: SyntaxTree.ModuleScope): Checker;
+	PROCEDURE NewChecker*(diagnostics: Diagnostics.Diagnostics; verboseErrorMessage,useDarwinCCalls,cooperative: BOOLEAN; system: Global.System; symbolFileFormat: Formats.SymbolFileFormat; activeCellsSpecification: ActiveCells.Specification; VAR importCache: SyntaxTree.ModuleScope): Checker;
 	VAR checker: Checker;
 	BEGIN
-		NEW(checker, diagnostics,verboseErrorMessage,useDarwinCCalls,system,symbolFileFormat,activeCellsSpecification, importCache);
+		NEW(checker, diagnostics,verboseErrorMessage,useDarwinCCalls,cooperative,system,symbolFileFormat,activeCellsSpecification, importCache);
 		RETURN checker
 	END NewChecker;
 
