@@ -629,6 +629,8 @@ TYPE
 						ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
 					ELSIF ~scope.body.isUnchecked & ~backend.noRuntimeChecks THEN
 						ir.Emit(Trap(x.position,ReturnTrap));
+					ELSE
+						ir.Emit(Nop(x.position));
 					END
 				END;
 			ELSE (* force body for procedures *)
@@ -9476,7 +9478,7 @@ TYPE
 			ELSIF scope IS SyntaxTree.ModuleScope THEN
 				variable := scope(SyntaxTree.ModuleScope).firstVariable;
 				WHILE variable # NIL DO
-					IF ~(variable.untraced) THEN
+					IF ~(variable.untraced) & (variable.externalName = NIL) THEN
 						symbol := module.allSections.FindBySymbol(variable);
 						ASSERT(symbol # NIL);
 						Pointers(0,symbol, source,variable.type,numberPointers);
