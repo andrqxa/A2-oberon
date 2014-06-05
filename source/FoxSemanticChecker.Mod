@@ -5491,6 +5491,24 @@ TYPE
 						actualParameters.SetExpression(0,parameter0);
 					END;
 					type := system.shortintType;
+				(* ---- SYSTEM.GetStackPointer ----- *)
+				ELSIF (id = Global.systemGetStackPointer) & CheckArity(0,0) THEN
+					type := system.addressType;
+				(* ---- SYSTEM.GetFramePointer ----- *)
+				ELSIF (id = Global.systemGetFramePointer) & CheckArity(0,0) THEN
+					type := system.addressType;
+				(* ---- SYSTEM.SetStackPointer ----- *)
+				ELSIF (id = Global.systemSetStackPointer) & CheckArity(1,1) THEN
+					IF CheckAddressType(parameter0) THEN
+						parameter0 := NewConversion(0,parameter0,system.addressType,NIL);
+						actualParameters.SetExpression(0,parameter0);
+					END;
+				(* ---- SYSTEM.SetFramePointer ----- *)
+				ELSIF (id = Global.systemSetFramePointer) & CheckArity(1,1) THEN
+					IF CheckAddressType(parameter0) THEN
+						parameter0 := NewConversion(0,parameter0,system.addressType,NIL);
+						actualParameters.SetExpression(0,parameter0);
+					END;
 				(* ---- LSH, LSL, ROT, ROR ----- *)
 				ELSIF ((id = Global.Lsh) OR (id = Global.Rot) OR (id= Global.Ror)) & CheckArity(2,2) THEN
 				 	type := type0;

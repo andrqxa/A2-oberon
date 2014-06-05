@@ -6484,7 +6484,24 @@ TYPE
 				ReleaseOperand(s0);
 				InitOperand(result,ModeValue);
 				result.op := res;
-
+			(* ---- SYSTEM.GetStackPointer ----- *)
+			|Global.systemGetStackPointer:
+				InitOperand(result,ModeValue);
+				result.op := sp;
+			(* ---- SYSTEM.GetFramePointer ----- *)
+			|Global.systemGetFramePointer:
+				InitOperand(result,ModeValue);
+				result.op := fp;
+			(* ---- SYSTEM.SetStackPointer ----- *)
+			|Global.systemSetStackPointer:
+				Evaluate(p0,s0); (*  *)
+				Emit(Mov(position,sp,s0.op));
+				ReleaseOperand(s0);
+			(* ---- SYSTEM.SetFramePointer ----- *)
+			|Global.systemSetFramePointer:
+				Evaluate(p0,s0); (*  *)
+				Emit(Mov(position,fp,s0.op));
+				ReleaseOperand(s0);
 			(* ---- SYSTEM.VAL ----- *)
 			|Global.systemVal:
 				Expression(p1);

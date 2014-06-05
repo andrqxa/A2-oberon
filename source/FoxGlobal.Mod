@@ -111,8 +111,10 @@ systemPut32*= systemPut16+1; systemPut64*= systemPut32+1; systemTrace*= systemPu
 systemAdr*= systemTrace+1; systemSize*= systemAdr+1; systemBit*= systemSize+1; 
 systemGet64*= systemBit+1; systemGet32*= systemGet64+1; systemGet16*= systemGet32+1; 
 systemGet8*= systemGet16+1; systemVal*= systemGet8+1; systemMsk*= systemVal+1;
+systemGetStackPointer*= systemMsk+1; systemSetStackPointer*= systemGetStackPointer+1;
+systemGetFramePointer*= systemSetStackPointer+1; systemSetFramePointer*= systemGetFramePointer+1;
 (* for active cells *)
-Send*= systemMsk+1; Receive*= Send+1;
+Send*= systemSetFramePointer+1; Receive*= Send+1;
 (* for backend specific extensions *)
 systemSpecial*= Receive+1;
 (* compatibility with Oberon07 -- other mappings: LSL -> LSH, FLOOR -> Entier, Pack und Unpk currently unsupported *)
@@ -685,6 +687,10 @@ TYPE
 		NewBuiltin(systemMsk,"MSK",system.systemScope,TRUE);
 		NewBuiltin(systemBit,"BIT",system.systemScope,TRUE);
 
+		NewBuiltinCamelCase(systemGetStackPointer,"GetStackPointer",system.systemScope,TRUE);
+		NewBuiltinCamelCase(systemSetStackPointer,"SetStackPointer",system.systemScope,TRUE);
+		NewBuiltinCamelCase(systemGetFramePointer,"GetFramePointer",system.systemScope,TRUE);
+		NewBuiltinCamelCase(systemSetFramePointer,"SetFramePointer",system.systemScope,TRUE);
 
 		(* Set up system types *)
 		DeclareType(system.characterType,"CHAR",system.globalScope);
@@ -964,6 +970,12 @@ TYPE
 		NewBuiltin0(id,nameU,scope[Scanner.Uppercase],realtime);
 		NewBuiltin0(id,nameL,scope[Scanner.Lowercase],realtime);
 	END NewBuiltin;
+
+	PROCEDURE NewBuiltinCamelCase*(id: LONGINT; CONST name: ARRAY OF CHAR; CONST scope: ARRAY OF SyntaxTree.ModuleScope; realtime: BOOLEAN);
+	BEGIN
+		NewBuiltin0(id,name,scope[Scanner.Uppercase],realtime);
+		NewBuiltin0(id,name,scope[Scanner.Lowercase],realtime);
+	END NewBuiltinCamelCase;
 
 	PROCEDURE NewCustomBuiltin0(CONST name: ARRAY OF CHAR; scope: SyntaxTree.ModuleScope; subType: SHORTINT; procedureType: SyntaxTree.ProcedureType);
 	VAR
