@@ -5497,6 +5497,9 @@ TYPE
 				(* ---- SYSTEM.GetFramePointer ----- *)
 				ELSIF (id = Global.systemGetFramePointer) & CheckArity(0,0) THEN
 					type := system.addressType;
+				(* ---- SYSTEM.GetActivity ----- *)
+				ELSIF cooperative & (id = Global.systemGetActivity) & CheckArity(0,0) THEN
+					type := system.addressType;
 				(* ---- SYSTEM.SetStackPointer ----- *)
 				ELSIF (id = Global.systemSetStackPointer) & CheckArity(1,1) THEN
 					IF CheckAddressType(parameter0) THEN
@@ -5505,6 +5508,12 @@ TYPE
 					END;
 				(* ---- SYSTEM.SetFramePointer ----- *)
 				ELSIF (id = Global.systemSetFramePointer) & CheckArity(1,1) THEN
+					IF CheckAddressType(parameter0) THEN
+						parameter0 := NewConversion(0,parameter0,system.addressType,NIL);
+						actualParameters.SetExpression(0,parameter0);
+					END;
+				(* ---- SYSTEM.SetActivity ----- *)
+				ELSIF cooperative & (id = Global.systemSetActivity) & CheckArity(1,1) THEN
 					IF CheckAddressType(parameter0) THEN
 						parameter0 := NewConversion(0,parameter0,system.addressType,NIL);
 						actualParameters.SetExpression(0,parameter0);

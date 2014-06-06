@@ -1030,7 +1030,7 @@ TYPE
 		usedRegisters: RegisterEntry;
 
 		(* useful operands and types *)
-		nil,fp,sp,true,false: IntermediateCode.Operand;
+		nil,fp,sp,ap,true,false: IntermediateCode.Operand;
 		bool,addressType,setType, sizeType: IntermediateCode.Type;
 
 		commentPrintout: Printout.Printer;
@@ -1087,6 +1087,7 @@ TYPE
 			sizeType := IntermediateCode.GetType(system, system.sizeType);
 			fp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.FP);
 			sp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.SP);
+			ap := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.AP);
 			nil := IntermediateCode.Immediate(addressType,0);
 
 			IntermediateCode.InitOperand(destination);
@@ -6492,6 +6493,11 @@ TYPE
 			|Global.systemGetFramePointer:
 				InitOperand(result,ModeValue);
 				result.op := fp;
+			(* ---- SYSTEM.GetActivity ----- *)
+			|Global.systemGetActivity:
+				ASSERT(backend.cooperative);
+				InitOperand(result,ModeValue);
+				result.op := ap;
 			(* ---- SYSTEM.SetStackPointer ----- *)
 			|Global.systemSetStackPointer:
 				Evaluate(p0,s0); (*  *)
@@ -6501,6 +6507,12 @@ TYPE
 			|Global.systemSetFramePointer:
 				Evaluate(p0,s0); (*  *)
 				Emit(Mov(position,fp,s0.op));
+				ReleaseOperand(s0);
+			(* ---- SYSTEM.Activity ----- *)
+			|Global.systemSetActivity:
+				ASSERT(backend.cooperative);
+				Evaluate(p0,s0); (*  *)
+				Emit(Mov(position,ap,s0.op));
 				ReleaseOperand(s0);
 			(* ---- SYSTEM.VAL ----- *)
 			|Global.systemVal:
@@ -9803,6 +9815,7 @@ TYPE
 		simpleMetaData-: BOOLEAN;
 		noAsserts: BOOLEAN;
 		optimize-: BOOLEAN;
+		cooperative-: BOOLEAN;
 		preregisterStatic-: BOOLEAN;
 		dump-: Basic.Writer;
 
@@ -9920,6 +9933,7 @@ TYPE
 			profile := options.GetFlag("profile");
 			noRuntimeChecks := options.GetFlag("noRuntimeChecks");
 			noAsserts := options.GetFlag("noAsserts");
+			cooperative := options.GetFlag("cooperative");
 			IF options.GetFlag("newObjectFile") THEN newObjectFile := TRUE END;
 			IF options.GetString("objectFile",string) & (string = "Minos") THEN 
 				simpleMetaData := TRUE

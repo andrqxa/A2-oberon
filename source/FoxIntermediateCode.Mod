@@ -52,6 +52,7 @@ CONST
 	None*=-1; (* no register assigned *)
 	SP*=-2; (* stack pointer *)
 	FP*=-3; (* frame pointer *)
+	AP*=-4; (* activity pointer *)
 	HwRegister*=-32; (* any value below or equal hwreg is a user defined hardware register *)
 
 	(* FoxProgTools.Enum -e -l=8
@@ -549,6 +550,8 @@ TYPE
 			w.String("sp")
 		ELSIF registerNumber = FP THEN
 			w.String("fp")
+		ELSIF registerNumber = AP THEN
+			w.String("ap")
 		ELSIF registerNumber > None THEN
 			w.String("r"); w.Int(registerNumber, 0);
 			IF registerClass.class = Parameter THEN w.String(":p"); w.Int(registerClass.number,0) END;
@@ -855,7 +858,7 @@ TYPE
 
 	PROCEDURE InitRegister*(VAR op: Operand; type: Type; registerClass: RegisterClass;  register: LONGINT);
 	BEGIN
-		Assert((register >0) OR (register = SP) OR (register = FP) OR (register <= HwRegister) ,"unmapped register number");
+		Assert((register >0) OR (register = SP) OR (register = FP) OR (register = AP) OR (register <= HwRegister) ,"unmapped register number");
 		InitOperand(op);
 		op.mode := ModeRegister;
 		op.type := type;
@@ -1069,6 +1072,7 @@ TYPE
 			END;
 		ELSIF name = "sp" THEN register := SP; RETURN TRUE
 		ELSIF name = "fp" THEN register := FP ; RETURN TRUE
+		ELSIF name = "ap" THEN register := AP ; RETURN TRUE
 		ELSE RETURN FALSE
 		END;
 	END DenotesRegister;

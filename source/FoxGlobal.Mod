@@ -113,8 +113,9 @@ systemGet64*= systemBit+1; systemGet32*= systemGet64+1; systemGet16*= systemGet3
 systemGet8*= systemGet16+1; systemVal*= systemGet8+1; systemMsk*= systemVal+1;
 systemGetStackPointer*= systemMsk+1; systemSetStackPointer*= systemGetStackPointer+1;
 systemGetFramePointer*= systemSetStackPointer+1; systemSetFramePointer*= systemGetFramePointer+1;
+systemGetActivity*= systemSetFramePointer+1; systemSetActivity*= systemGetActivity+1;
 (* for active cells *)
-Send*= systemSetFramePointer+1; Receive*= Send+1;
+Send*= systemSetActivity+1; Receive*= Send+1;
 (* for backend specific extensions *)
 systemSpecial*= Receive+1;
 (* compatibility with Oberon07 -- other mappings: LSL -> LSH, FLOOR -> Entier, Pack und Unpk currently unsupported *)
@@ -691,6 +692,8 @@ TYPE
 		NewBuiltinCamelCase(systemSetStackPointer,"SetStackPointer",system.systemScope,TRUE);
 		NewBuiltinCamelCase(systemGetFramePointer,"GetFramePointer",system.systemScope,TRUE);
 		NewBuiltinCamelCase(systemSetFramePointer,"SetFramePointer",system.systemScope,TRUE);
+		NewBuiltinCamelCase(systemGetActivity,"GetActivity",system.systemScope,TRUE);
+		NewBuiltinCamelCase(systemSetActivity,"SetActivity",system.systemScope,TRUE);
 
 		(* Set up system types *)
 		DeclareType(system.characterType,"CHAR",system.globalScope);
