@@ -57,7 +57,7 @@ TYPE
 		hint: LONGINT;
 		useFPU: BOOLEAN;
 
-		PROCEDURE &InitPhysicalRegisters(fpu: BOOLEAN);
+		PROCEDURE &InitPhysicalRegisters(fpu,cooperative: BOOLEAN);
 		VAR i: LONGINT;
 		BEGIN
 			FOR i := 0 TO LEN(toVirtual)-1 DO
@@ -90,10 +90,10 @@ TYPE
 
 	PhysicalRegisters32=OBJECT (PhysicalRegisters) (* 32 bit implementation *)
 
-		PROCEDURE & InitPhysicalRegisters32(fpu: BOOLEAN);
+		PROCEDURE & InitPhysicalRegisters32(fpu,cooperative: BOOLEAN);
 		VAR i: LONGINT;
 		BEGIN
-			InitPhysicalRegisters(fpu);
+			InitPhysicalRegisters(fpu,cooperative);
 			(* disable registers that are only usable in 64 bit mode *)
 			FOR i := 0 TO 31 DO
 				toVirtual[i+RAX] := unusable;
@@ -314,9 +314,9 @@ TYPE
 
 	PhysicalRegisters64=OBJECT (PhysicalRegisters) (* 64 bit implementation *)
 
-		PROCEDURE & InitPhysicalRegisters64(fpu: BOOLEAN);
+		PROCEDURE & InitPhysicalRegisters64(fpu,cooperative: BOOLEAN);
 		BEGIN
-			InitPhysicalRegisters(fpu);
+			InitPhysicalRegisters(fpu,cooperative);
 		END InitPhysicalRegisters64;
 
 		PROCEDURE SetReserved(index: LONGINT; res: BOOLEAN);
@@ -512,6 +512,7 @@ TYPE
 
 		*)
 
+		ap: Ticket;
 
 		(* -------------------------- constructor -------------------------------*)
 		PROCEDURE &InitGeneratorAMD64(CONST runtime: SyntaxTree.IdentifierString; diagnostics: Diagnostics.Diagnostics; backend: BackendAMD64);
@@ -523,13 +524,13 @@ TYPE
 
 			NEW(emitter,diagnostics);
 			IF cpuBits=32 THEN
-				NEW(physicalRegisters32, backend.forceFPU); physicalRegisters := physicalRegisters32; error := ~emitter.SetBits(32);
+				NEW(physicalRegisters32, backend.forceFPU, backend.cooperative); physicalRegisters := physicalRegisters32; error := ~emitter.SetBits(32);
 				opBP := opEBP; opSP := opESP; opRA := opEAX; opRB := opEBX; opRD := opEDI; opRS := opESI; opRC := opECX;
 				SP := ESP; BP := EBP; RA := EAX;
 				RD := EDI; RS := ESI; RC := ECX;
 				ASSERT(~error);
 			ELSIF cpuBits=64 THEN
-				NEW(physicalRegisters64, backend.forceFPU); physicalRegisters := physicalRegisters64; error := ~emitter.SetBits(64);
+				NEW(physicalRegisters64, backend.forceFPU, backend.cooperative); physicalRegisters := physicalRegisters64; error := ~emitter.SetBits(64);
 				opBP := opRBP; opSP := opRSP; opRA := registerOperands[RAX]; opRB := registerOperands[RBX]; opRD := registerOperands[RDI];
 				opRS := registerOperands[RSI]; opRC := registerOperands[RCX];
 				opR8 := registerOperands[R8]; opR9 := registerOperands[R9];
@@ -554,6 +555,10 @@ TYPE
 
 		BEGIN
 			spillStack.Init;
+			IF backend.cooperative THEN
+				ap := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,IntermediateCode.UnsignedIntegerType(cpuBits),RC,in.pc);
+				ap.spillable := FALSE;
+			END;
 			emitter.SetCode(out);
 			Section^(in,out);
 			IF FrameSpillStack & (spillStack.MaxSize() >0) THEN
@@ -565,6 +570,9 @@ TYPE
 			END;
 			ASSERT(fpStackPointer = 0);
 			CheckEmptySpillStack;
+			IF backend.cooperative THEN 
+				UnmapTicket(ap);
+			END;
 			error := error OR emitter.error;
 		END Section;
 
@@ -699,6 +707,9 @@ TYPE
 				RETURN physicalRegister= BP
 			ELSIF (virtualRegister = IntermediateCode.SP) THEN
 				RETURN physicalRegister = SP
+			ELSIF (virtualRegister = IntermediateCode.AP) THEN
+				ASSERT(backend.cooperative);
+				RETURN ~(ap.spilled) & (ap.register = physicalRegister)
 			ELSE
 				RETURN FALSE
 			END;
@@ -950,6 +961,10 @@ TYPE
 				index := IntermediateCode.ParameterRegister - virtualRegister;
 				physical := registerOperands[ParameterRegister(index, type)];
 			*)
+			ELSIF virtual.register = IntermediateCode.AP THEN
+				ASSERT(backend.cooperative);
+				Assert(part=Low,"forbidden partitioned register on AP");
+				TicketToOperand(ap, physical);
 			ELSE HALT(100);
 			END;
 
@@ -1262,15 +1277,9 @@ TYPE
 					END;
 					IF numberMachineWords >4 THEN
 						Assembler.InitImm(imm, 0, numberMachineWords DIV 4);
-						IF instruction.op3.intValue > 0 THEN (* register C is blocked *)
-							emitter.Emit2(InstructionSet.opMOV, opRB, imm);
-							destPC := out.pc;
-							emitter.Emit1(InstructionSet.opDEC, opRB);
-						ELSE
-							emitter.Emit2(InstructionSet.opMOV, opRC, imm);
-							destPC := out.pc;
-							emitter.Emit1(InstructionSet.opDEC, opRC);
-						END;
+						emitter.Emit2(InstructionSet.opMOV, opRB, imm);
+						destPC := out.pc;
+						emitter.Emit1(InstructionSet.opDEC, opRB);
 						emitter.Emit1(InstructionSet.opPUSH, opRA);
 						emitter.Emit1(InstructionSet.opPUSH, opRA);
 						emitter.Emit1(InstructionSet.opPUSH, opRA);
@@ -2343,8 +2352,11 @@ TYPE
 				END;
 			END;
 
-
-			Spill(physicalRegisters.Mapped(ECX)); ecx := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,IntermediateCode.int32,ECX,inPC);
+			IF instruction.op3.mode # IntermediateCode.ModeImmediate THEN
+				IF backend.cooperative THEN ap.spillable := TRUE END;
+				Spill(physicalRegisters.Mapped(ECX)); 
+				ecx := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,IntermediateCode.int32,ECX,inPC);
+			END;
 
 			(*GetTemporaryRegister(instruction.op2.type,dest);*)
 			MakeOperand(instruction.op1,Low,op1,NIL);
@@ -2424,6 +2436,11 @@ TYPE
 					emitter.Emit2( op, op1High, shift);
 				END;
 			END;
+			IF backend.cooperative & (instruction.op3.mode # IntermediateCode.ModeImmediate) THEN
+				UnmapTicket(ecx);
+				UnSpill(ap);
+				ap.spillable := FALSE;
+			END;
 		END EmitShift;
 
 		PROCEDURE EmitCas(CONST instruction: IntermediateCode.Instruction);
@@ -2461,7 +2478,8 @@ TYPE
 			ELSE
 				Spill(physicalRegisters.Mapped(ESI));
 				Spill(physicalRegisters.Mapped(EDI));
-				Spill(physicalRegisters.Mapped(ECX));;
+				IF backend.cooperative THEN ap.spillable := TRUE END;
+				Spill(physicalRegisters.Mapped(ECX)); 
 
 				esi := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,IntermediateCode.int32,RS,inPC);
 				edi := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,IntermediateCode.int32,RD,inPC);
@@ -2551,6 +2569,10 @@ TYPE
 				UnmapTicket(esi);
 				UnmapTicket(edi);
 				UnmapTicket(ecx);
+				IF backend.cooperative THEN
+					UnSpill(ap);
+					ap.spillable := FALSE;
+				END;
 			END;
 		END EmitCopy;
 
@@ -2587,6 +2609,7 @@ TYPE
 				END;
 			ELSE
 				Spill(physicalRegisters.Mapped(EDI));
+				IF backend.cooperative THEN ap.spillable := TRUE END;
 				Spill(physicalRegisters.Mapped(ECX));
 				edi := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,IntermediateCode.int32,EDI,inPC);
 				ecx := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,IntermediateCode.int32,ECX,inPC);
@@ -2620,6 +2643,11 @@ TYPE
 				emitter.Emit0(op);
 				IF down THEN (* needed as calls to windows crash otherwise *)
 					emitter.Emit0(InstructionSet.opCLD);
+				END;
+				UnmapTicket(ecx);
+				IF backend.cooperative THEN
+					UnSpill(ap);
+					ap.spillable := FALSE;
 				END;
 			END;
 		END EmitFill;

@@ -5,7 +5,7 @@ IMPORT Diagnostics, Sections := FoxSections, Streams, BinaryCode := FoxBinaryCod
 		StringPool, Strings, D := Debugging;
 
 CONST
-		None=-1;
+		None=IntermediateCode.None;
 		OptimizeRegisterTransfer*=0;
 TYPE
 	(* ----------------------------------- register allocation ------------------------------------- *)
@@ -585,7 +585,7 @@ TYPE
 		type-: IntermediateCode.Type;
 		class-: IntermediateCode.RegisterClass;
 		lastuse-: LONGINT;
-		spilled*: BOOLEAN;
+		spilled*, spillable*: BOOLEAN;
 		register*, offset*: LONGINT;
 		parts-: LONGINT;
 	END;
@@ -601,14 +601,15 @@ TYPE
 		END Init;
 
 		(* enter a new ticket into the list of live tickets, sorted by lastuse *)
-		PROCEDURE Enter*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; spilled: BOOLEAN; offset: LONGINT; lastuse: LONGINT): Ticket;
+		PROCEDURE Enter*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; spillable, spilled: BOOLEAN; offset: LONGINT; lastuse: LONGINT): Ticket;
 		VAR ticket,link: Ticket;
 		BEGIN
 			ASSERT(~spilled & (register # None) OR spilled & (offset # None));
+			ASSERT(spillable OR ~spilled);
 			IF free # NIL THEN ticket := free; free := free.next; ticket.next := NIL;
 			ELSE NEW(ticket)
 			END;
-			ticket.type := type;	ticket.class := class; ticket.register := register; ticket.spilled := spilled;	ticket.offset := offset; ticket.lastuse := lastuse; ticket.parts := 0;
+			ticket.type := type;	ticket.class := class; ticket.register := register; ticket.spillable := spillable; ticket.spilled := spilled;	ticket.offset := offset; ticket.lastuse := lastuse; ticket.parts := 0;
 			IF (live = NIL) OR (live.lastuse > ticket.lastuse) THEN
 				ticket.next := live; live := ticket
 			ELSE
@@ -879,8 +880,6 @@ TYPE
 		VAR ticket: Ticket;
 		BEGIN
 			Section^(in,out);
-			ticket := tickets.live;
-			IF ticket # NIL THEN HALT(100) END;
 		END Section;
 
 		(*-------------------  procedures that must be overwritten by implementers  ----------------------*)
@@ -918,7 +917,7 @@ TYPE
 		PROCEDURE Spill*(ticket: Ticket);
 		VAR register,offset,size: LONGINT;
 		BEGIN
-			IF (ticket = NIL) OR (ticket.spilled) THEN RETURN END;
+			IF (ticket = NIL) OR ~ticket.spillable OR ticket.spilled THEN RETURN END;
 			register := ticket.register;
 			offset := spillStack.NextFree();
 			ticket.offset := offset;
@@ -1018,7 +1017,7 @@ TYPE
 			PROCEDURE Spillable(ticket: Ticket; best:BOOLEAN): BOOLEAN;
 			BEGIN
 				RETURN
-					~ticket.spilled & (ticket.register # None)
+					~ticket.spilled & ticket.spillable & (ticket.register # None) 
 					& ((ticket.type.form = IntermediateCode.Float) = (type.form = IntermediateCode.Float)) (* don't spill float when int is needed *)
 					& (~best OR (ticket.type.sizeInBits = type.sizeInBits))
 					& (~physicalRegisters.Reserved(ticket.register))
@@ -1056,7 +1055,7 @@ TYPE
 		PROCEDURE ReservePhysicalRegister*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; lastUse: LONGINT): Ticket;
 		VAR ticket: Ticket;
 		BEGIN
-			ticket := tickets.Enter(class, type,register,FALSE,None,lastUse);
+			ticket := tickets.Enter(class, type,register,TRUE, FALSE,None,lastUse);
 			IF dump # NIL THEN
 				dump.String(" allocate register : index="); dump.Int(register,1); dump.Ln;
 			END;
@@ -1087,7 +1086,7 @@ TYPE
 			BEGIN
 				index := physicalRegisters.NextFree(type);
 				IF index # None THEN
-					ticket := tickets.Enter(class,type,index,FALSE,0,lastuse);
+					ticket := tickets.Enter(class,type,index,TRUE, FALSE,0,lastuse);
 					IF dump # NIL THEN
 						dump.String(" allocate register : index="); dump.Int(index,1); dump.Ln;
 					END;
@@ -1095,7 +1094,7 @@ TYPE
 					physicalRegisters.SetReserved(index,TRUE);
 				ELSE (* spill new ticket rightaway, no phyiscal register assigned yet *)
 					offset := spillStack.NextFree();
-					ticket := tickets.Enter(class,type,index,TRUE,offset,lastuse);
+					ticket := tickets.Enter(class,type,index,TRUE, TRUE,offset,lastuse);
 					size := spillStack.Size();
 					ticket.offset := offset;
 					IF dump# NIL THEN dump.String("spillstack allocate (3) "); dump.Int(offset,1);dump.Ln; END;
@@ -1112,7 +1111,7 @@ TYPE
 			BEGIN
 				ticket :=  physicalRegisters.Mapped(index);
 				IF ticket # NIL THEN Spill(ticket) END;
-				ticket := tickets.Enter(class, type, index, FALSE,0,lastuse);
+				ticket := tickets.Enter(class, type, index, TRUE, FALSE,0,lastuse);
 				IF dump # NIL THEN
 					dump.String(" allocate register : index="); dump.Int(index,1); dump.Ln;
 				END;
