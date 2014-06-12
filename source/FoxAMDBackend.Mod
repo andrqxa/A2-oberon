@@ -867,7 +867,11 @@ TYPE
 				IF virtualRegister = IntermediateCode.FP THEN physicalRegister := BP;
 				ELSIF virtualRegister = IntermediateCode.SP THEN  physicalRegister := SP;
 				ELSE
-					ticket := virtualRegisters.Mapped(virtualRegister,Low);
+					IF virtualRegister = IntermediateCode.AP THEN
+						ticket := ap;
+					ELSE
+						ticket := virtualRegisters.Mapped(virtualRegister,Low);
+					END;
 					IF ticket.spilled THEN
 						IF physicalRegisters.Reserved(ticket.register) THEN
 							orig := ticket;
