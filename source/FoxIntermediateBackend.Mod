@@ -1062,6 +1062,9 @@ TYPE
 		moduleBodySection: IntermediateCode.Section;
 		NeedDescriptor : BOOLEAN;
 
+		cooperativeSwitches: BOOLEAN;
+		lastSwitchPC: LONGINT;
+
 		isUnchecked: BOOLEAN;
 
 		PROCEDURE & Init(system: Global.System; checker: SemanticChecker.Checker; supportedInstructionProcedure: SupportedInstructionProcedure; supportedImmediateProcedure: SupportedImmediateProcedure; emitLabels: BOOLEAN; CONST runtime: SyntaxTree.IdentifierString; backend: IntermediateBackend;
@@ -7618,6 +7621,18 @@ TYPE
 			Assign(x.left,x.right);
 			IF Trace THEN TraceExit("VisitAssignment") END;
 		END VisitAssignment;
+		
+		PROCEDURE EmitCooperativeSwitch;
+		CONST QuantumOffset = 6;
+		VAR quantum, offset, zero: IntermediateCode.Operand; skip: Label;
+		BEGIN
+			ASSERT (cooperativeSwitches);
+			IF lastSwitchPC = section.pc THEN RETURN END;
+			IntermediateCode.InitMemory (quantum,  IntermediateCode.SignedIntegerType(addressType.sizeInBits), ap, ToMemoryUnits(system, QuantumOffset * addressType.sizeInBits));
+			IntermediateCode.InitImmediate(offset, quantum.type, section.pc - lastSwitchPC); IntermediateCode.InitImmediate(zero, quantum.type, 0); 
+			Emit(Sub(position,quantum,quantum, offset)); skip := NewLabel(); BrgeL(skip, quantum, zero);
+			CallThis("Activities","Switch",0); SetLabel(skip); lastSwitchPC := section.pc;
+		END EmitCooperativeSwitch;
 
 		PROCEDURE VisitCommunicationStatement(communication: SyntaxTree.CommunicationStatement);
 		VAR p0,p1: SyntaxTree.Expression; len,val: LONGINT; l,r: Operand; res,adr,reg: IntermediateCode.Operand; type, componentType: SyntaxTree.Type;
@@ -7815,6 +7830,7 @@ TYPE
 		VAR start: Label; true,false: Label;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitWhileStatement") END;
+			IF cooperativeSwitches THEN EmitCooperativeSwitch END;
 			start := NewLabel();
 			true := NewLabel();
 			false := NewLabel();
@@ -7822,6 +7838,7 @@ TYPE
 			Condition(x.condition,true,false);
 			SetLabel(true);
 			StatementSequence(x.statements);
+			IF cooperativeSwitches THEN EmitCooperativeSwitch END;
 			BrL(start);
 			SetLabel(false);
 			IF Trace THEN TraceExit("VisitWhileStatement") END;
@@ -7831,10 +7848,12 @@ TYPE
 		VAR false,true: Label;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitRepeatStatement") END;
+			IF cooperativeSwitches THEN EmitCooperativeSwitch END;
 			true := NewLabel();
 			false := NewLabel();
 			SetLabel(false);
 			StatementSequence(x.statements);
+			IF cooperativeSwitches THEN EmitCooperativeSwitch END;
 			Condition(x.condition,true,false);
 			SetLabel(true);
 			IF Trace THEN TraceExit("VisitRepeatStatement") END;
@@ -7867,6 +7886,7 @@ TYPE
 			binary := SyntaxTree.NewBinaryExpression(0,x.variable,temporaryVariableDesignator,cmp);
 			binary.SetType(system.booleanType);
 
+			IF cooperativeSwitches THEN EmitCooperativeSwitch END;
 			SetLabel(start);
 
 
@@ -7877,6 +7897,8 @@ TYPE
 			binary := SyntaxTree.NewBinaryExpression(0,x.variable,x.by,Scanner.Plus);
 			binary.SetType(x.variable.type);
 			Assign(x.variable,binary);
+
+			IF cooperativeSwitches THEN EmitCooperativeSwitch END;
 
 			BrL(start);
 			SetLabel(false);
@@ -7900,11 +7922,13 @@ TYPE
 		VAR prevLoop,start: Label;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitLoopStatement") END;
+			IF cooperativeSwitches THEN EmitCooperativeSwitch END;
 			start := NewLabel();
 			prevLoop := currentLoop;
 			SetLabel(start);
 			currentLoop := NewLabel();
 			StatementSequence(x.statements);
+			IF cooperativeSwitches THEN EmitCooperativeSwitch END;
 			BrL(start);
 			SetLabel(currentLoop);
 			currentLoop := prevLoop;
@@ -8148,6 +8172,7 @@ TYPE
 			FOR i := 0 TO x.Length() - 1 DO
 				statement := x.GetStatement( i );
 				Statement(statement);
+				IF cooperativeSwitches & (section.pc - lastSwitchPC > 1000) THEN EmitCooperativeSwitch END;
 			END;
 		END StatementSequence;
 
@@ -8196,19 +8221,23 @@ TYPE
 		END Lock;
 
 		PROCEDURE VisitStatementBlock(x: SyntaxTree.StatementBlock);
-		VAR previouslyUnchecked: BOOLEAN;
+		VAR previouslyUnchecked, previouslyCooperativeSwitches: BOOLEAN;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitStatementBlock") END;
 			IF emitLabels THEN Emit(LabelInstruction(x.position)) END;
 
 			previouslyUnchecked := isUnchecked;
 			isUnchecked := isUnchecked OR x.isUnchecked;
+			previouslyCooperativeSwitches := cooperativeSwitches;
+			cooperativeSwitches := cooperativeSwitches & ~x.isUncooperative;
+
 			IF x.isExclusive THEN Lock(TRUE); ASSERT(~locked);  locked := TRUE; END;
 			IF x.statements # NIL THEN
 				StatementSequence(x.statements);
 			END;
 			IF x.isExclusive THEN Lock(FALSE); ASSERT(locked); locked := FALSE; END;
 			isUnchecked := previouslyUnchecked;
+			cooperativeSwitches := previouslyCooperativeSwitches;
 
 			IF Trace THEN TraceExit("VisitStatementBlock") END;
 		END VisitStatementBlock;
@@ -8393,6 +8422,9 @@ TYPE
 
 			prevScope := currentScope;
 			currentScope := scope;
+			
+			lastSwitchPC := section.pc;
+			cooperativeSwitches := backend.cooperative;
 
 			procedure := scope(SyntaxTree.ProcedureScope).ownerProcedure;
 			procedureType := procedure.type(SyntaxTree.ProcedureType);
