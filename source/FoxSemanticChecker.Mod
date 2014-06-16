@@ -4490,7 +4490,7 @@ TYPE
 		BEGIN
 			result := FALSE; type := x.type.resolved;
 			IF x = SyntaxTree.invalidExpression THEN
-			ELSIF  ~(type IS SyntaxTree.AddressType) & ~(type IS SyntaxTree.SizeType) & ~( (type IS SyntaxTree.IntegerType) & (type.sizeInBits <= system.addressType.sizeInBits)) & ~IsAddressValue(x) THEN
+			ELSIF  ~(type IS SyntaxTree.AddressType) & ~(type IS SyntaxTree.SizeType) & ~( (type IS SyntaxTree.IntegerType) & (type.sizeInBits <= system.addressType.sizeInBits)) & ~IsAddressValue(x) & (~(type IS SyntaxTree.PointerType) OR ~type(SyntaxTree.PointerType).isUnsafe) THEN
 				TRACE(type.sizeInBits);
 				TRACE(system.addressType.sizeInBits);
 				Error(x.position,Diagnostics.Invalid,"is no address type");
@@ -4510,6 +4510,18 @@ TYPE
 			END;
 			RETURN result
 		END CheckSizeType;
+
+		PROCEDURE CheckObjectType(x: SyntaxTree.Expression): BOOLEAN;
+		VAR result: BOOLEAN; type: SyntaxTree.Type;
+		BEGIN
+			result := FALSE; type := x.type.resolved;
+			IF x = SyntaxTree.invalidExpression THEN
+			ELSIF ~(type IS SyntaxTree.NilType) & ~(type IS SyntaxTree.ObjectType) & (~(type IS SyntaxTree.PointerType) OR ~(type(SyntaxTree.PointerType).pointerBase IS SyntaxTree.RecordType) OR ~type(SyntaxTree.PointerType).pointerBase(SyntaxTree.RecordType).isObject) THEN
+				Error(x.position,Diagnostics.Invalid,"is no object type");
+			ELSE result := TRUE
+			END;
+			RETURN result
+		END CheckObjectType;
 
 		(**
 			if expression x is of integer type then return true else report error and return false
@@ -5499,7 +5511,7 @@ TYPE
 					type := system.addressType;
 				(* ---- SYSTEM.GetActivity ----- *)
 				ELSIF cooperative & (id = Global.systemGetActivity) & CheckArity(0,0) THEN
-					type := system.addressType;
+					type := system.objectType;
 				(* ---- SYSTEM.SetStackPointer ----- *)
 				ELSIF (id = Global.systemSetStackPointer) & CheckArity(1,1) THEN
 					IF CheckAddressType(parameter0) THEN
@@ -5514,7 +5526,7 @@ TYPE
 					END;
 				(* ---- SYSTEM.SetActivity ----- *)
 				ELSIF cooperative & (id = Global.systemSetActivity) & CheckArity(1,1) THEN
-					IF CheckAddressType(parameter0) THEN
+					IF CheckObjectType(parameter0) THEN
 						parameter0 := NewConversion(0,parameter0,system.addressType,NIL);
 						actualParameters.SetExpression(0,parameter0);
 					END;
