@@ -5743,6 +5743,12 @@ TYPE
 				ToMemory(s0.op,setType,0);
 				Emit(Mov(position,s0.op,res));
 				ReleaseOperand(s0); ReleaseIntermediateOperand(res);
+			(* ---- DISPOSE ----- *)
+			|Global.Dispose:
+				Designate(p0,s0);
+				Emit(Push(position,s0.op));
+				ReleaseOperand(s0);
+				CallThis("Runtime","Dispose", 1);
 			(* ---- GETPROCEDURE ----- *)
 			|Global.GetProcedure:
 				Designate(p0,s0);
