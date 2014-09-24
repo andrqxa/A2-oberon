@@ -338,18 +338,20 @@ TYPE
 
 				variable := scope.firstVariable;
 				WHILE (variable # NIL) DO
-					size := SizeOf(variable.type.resolved);
-					IF size < 0 THEN RETURN FALSE END;
-					DEC(offset,size);
+					IF variable.externalName = NIL THEN
+						size := SizeOf(variable.type.resolved);
+						IF size < 0 THEN RETURN FALSE END;
+						DEC(offset,size);
 
-					IF variable.alignment > 0 THEN
-						Basic.Align(offset, -variable.alignment*dataUnit);
-					ELSE
-						alignment := AlignmentOf(SELF.variableAlignment,variable.type.resolved);
-						Basic.Align(offset,-alignment);
+						IF variable.alignment > 0 THEN
+							Basic.Align(offset, -variable.alignment*dataUnit);
+						ELSE
+							alignment := AlignmentOf(SELF.variableAlignment,variable.type.resolved);
+							Basic.Align(offset,-alignment);
+						END;
+
+						variable.SetOffset(offset);
 					END;
-
-					variable.SetOffset(offset);
 					variable := variable.nextVariable;
 				END;
 			END;

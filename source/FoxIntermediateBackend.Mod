@@ -7120,20 +7120,18 @@ TYPE
 					UseRegister(reg);
 				END;
 				IntermediateCode.InitRegister(result.op,IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,reg);
+			ELSIF x.externalName # NIL THEN
+				Basic.ToSegmentedName(x.externalName^, name);
+				IntermediateCode.InitAddress(result.op, addressType, name, 0, 0);
 			ELSIF (x.scope IS SyntaxTree.ProcedureScope) THEN (* local variable (potentially via nested procedure) *)
 				InitOperand(result,ModeReference);
 				GetBaseRegister(result.op,currentScope,x.scope);
 				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,x.offsetInBits));
 			ELSIF (x.scope = moduleScope) OR (x.scope IS SyntaxTree.CellScope) THEN (* global variable *)
 				InitOperand(result,ModeReference);
-				IF x.externalName # NIL THEN
-					Basic.ToSegmentedName(x.externalName^, name);
-					IntermediateCode.InitAddress(result.op, addressType, name, 0, 0);
-				ELSE
-					Global.GetSymbolSegmentedName(x,name);
-					symbol := NewSection(module.allSections, Sections.VarSection, name,x,commentPrintout # NIL);
-					IntermediateCode.InitAddress(result.op, addressType, symbol.name, GetFingerprint(symbol.symbol), 0);
-				END;
+				Global.GetSymbolSegmentedName(x,name);
+				symbol := NewSection(module.allSections, Sections.VarSection, name,x,commentPrintout # NIL);
+				IntermediateCode.InitAddress(result.op, addressType, symbol.name, GetFingerprint(symbol.symbol), 0);
 			ELSIF x.scope IS SyntaxTree.ModuleScope THEN (* global variable in imported module *)
 				InitOperand(result,ModeReference);
 				Global.GetSymbolSegmentedName(x,name);
