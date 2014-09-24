@@ -1200,6 +1200,16 @@ TYPE
 				EnsureSymbol(moduleName,procedureName); (* remainder for binary object file *)
 			END;
 		END Emit;
+		
+		PROCEDURE EmitTrap (position, trapNo: LONGINT);
+		BEGIN
+			IF backend.cooperative THEN
+				Emit(Push(position,IntermediateCode.Immediate(sizeType,trapNo)));
+				CallThis("RuntimeSupport","Trap",1); 
+			ELSE
+				Emit(Trap(position,trapNo));
+			END;
+		END EmitTrap;
 
 		PROCEDURE Symbol(x: SyntaxTree.Symbol; VAR op: Operand);
 		VAR m: SymbolMap; e: SyntaxTree.Expression; o, t: IntermediateCode.Operand;
@@ -1708,7 +1718,7 @@ TYPE
 			Assert((left.mode # IntermediateCode.ModeImmediate) OR (right.mode # IntermediateCode.ModeImmediate),"trap emission with two immediates");
 			exit := NewLabel();
 			br(exit,left,right);
-			Emit(Trap(position,trapNo));
+			EmitTrap(position,trapNo);
 			SetLabel(exit);
 		END TrapC;
 
@@ -2436,7 +2446,7 @@ TYPE
 						IF ~isUnchecked THEN
 							exit := NewLabel();
 							BrltL(exit,zero,right.op);
-							Emit(Trap(position,NegativeDivisorTrap));
+							EmitTrap(position,NegativeDivisorTrap);
 							SetLabel(exit);
 						END;
 					END;
@@ -2459,7 +2469,7 @@ TYPE
 						IF ~isUnchecked THEN
 							exit := NewLabel();
 							BrltL(exit,zero,right.op);
-							Emit(Trap(position,NegativeDivisorTrap));
+							EmitTrap(position,NegativeDivisorTrap);
 							SetLabel(exit);
 						END;
 					END;
@@ -4589,7 +4599,7 @@ TYPE
 			ReleaseOperand(operand);
 
 			IF procedureType.noReturn THEN
-				Emit(Trap(position,NoReturnTrap));
+				EmitTrap(position,NoReturnTrap);
 			END;
 
 			IF (procedureType.returnType # NIL) & ~structuredReturnType THEN
@@ -5903,9 +5913,8 @@ TYPE
 				END
 			(* ---- HALT, SYSTEM.HALT----- *)
 			|Global.Halt, Global.systemHalt:
-				Evaluate(p0,result);
-				ASSERT(result.op.mode = IntermediateCode.ModeImmediate);
-				Emit(Trap(position,SHORT(result.op.intValue)));
+				val := p0.resolved(SyntaxTree.IntegerValue).value;
+				EmitTrap (position, val);
 			(* ---- ASSERT ----- *)
 			|Global.Assert:
 				IF ~backend.noAsserts THEN
@@ -5918,7 +5927,7 @@ TYPE
 					END;
 
 					SetLabel(falseL);
-					Emit(Trap(position,val));
+					EmitTrap(position,val);
 					SetLabel(trueL);
 				END;
 
@@ -6786,7 +6795,7 @@ TYPE
 				TypeTest(tag,x.type,trueL,falseL);
 				ReleaseIntermediateOperand(tag);
 				SetLabel(falseL);
-				Emit(Trap(position,TypeCheckTrap));
+				EmitTrap(position,TypeCheckTrap);
 				SetLabel(trueL);
 			END;
 			destination := dest;
@@ -7747,7 +7756,7 @@ TYPE
 			END;
 			IF x.elsePart = NIL THEN
 				IF ~isUnchecked THEN
-					Emit(Trap(position,WithTrap));
+					EmitTrap(position,WithTrap);
 				END;
 			ELSE
 				StatementSequence(x.elsePart)
@@ -7819,7 +7828,7 @@ TYPE
 			IF x.elsePart # NIL THEN
 				StatementSequence(x.elsePart);
 			ELSIF ~isUnchecked THEN
-				Emit(Trap(position,CaseTrap));
+				EmitTrap(position,CaseTrap);
 			END;
 			SetLabel(out);
 			FOR i := 0 TO size-1 DO
