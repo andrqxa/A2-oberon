@@ -112,6 +112,7 @@ CONST
 
 
 	(** WaitForSingleObject return values *)
+	WaitFailed* = -1;
 	WaitTimeout* = 0102H;
 
 	(** SetErrorMode *)
@@ -377,6 +378,8 @@ VAR
 																	   VAR lpCurrentDirectory: ARRAY   OF CHAR;
 																	   VAR lpStartupInfo: StartupInfo;
 																	   VAR lpProcessInformation: ProcessInformation ): BOOL;
+	(** The CreateSemaphore function creates or opens a named or unnamed semaphore object. *)
+	CreateSemaphore-: PROCEDURE {WINAPI} ( lpThreadAttributes: ADDRESS; lInitialCount: LONGINT; lMaximumCount: LONGINT; lpName: LPSTR): HANDLE;
 	(** The CreateThread function creates a thread to execute within the address space of the calling process. *)
 	CreateThread-: PROCEDURE {WINAPI} ( lpThreadAttributes: ADDRESS;
 																	  dwStackSize: LONGINT;
@@ -504,6 +507,8 @@ VAR
 																			CONST lpReturnedString: ARRAY OF CHAR;
 																			nSize: LONGINT;
 																			CONST lpFileName: ARRAY OF CHAR): LONGINT;
+	(** The GetProcessAffinityMask function retrieves the process affinity mask for the specified process and the system affinity mask for the system. *)
+	GetProcessAffinityMask- : PROCEDURE {WINAPI} ( hProcess: HANDLE; lpProcessAffinityMask: ADDRESS;  lpSystemAffinityMask: ADDRESS ): BOOL;
 	(** The GetProcessHeap function retrieves a handle to the default heap of the calling process. This handle can then be used in subsequent calls to the heap functions. *)
 	GetProcessHeap- : PROCEDURE {WINAPI} (): HANDLE;
 	(** The GetProcessTimes function returns the times spent in kernel mode, user mode ... for the specified process *)
@@ -636,6 +641,8 @@ VAR
 																				   VAR lpBuffer: ARRAY   OF SYSTEM.BYTE;
 																				   nSize: LONGINT;
 																				   VAR lpNumberOfBytesRead: LONGINT ): BOOL;
+	(** The ReleaseSemaphore function increases the count of the specified semaphore object by a specified amount. *)
+	ReleaseSemaphore-: PROCEDURE ( hSemaphore: HANDLE; lReleaseCount: LONGINT; lpPreviousCount: ADDRESS): BOOL;
 	(** The RemoveDirectory function deletes an existing empty directory. *)
 	RemoveDirectory-: PROCEDURE {WINAPI} ( VAR lpPathName: ARRAY   OF CHAR ): BOOL;
 	(** The ResetEvent function sets the state of the specified event object to nonsignaled. *)
@@ -689,6 +696,8 @@ VAR
 																    VAR lpCreationTime, lpLastAccessTime, lpLastWriteTime: FileTime ): BOOL;
 	(** The SetLocalTime function sets the current local time and date. *)
 	SetLocalTime-: PROCEDURE {WINAPI} ( VAR lpSystemTime: SystemTime ): BOOL;
+	(** The SetThreadAffinityMask function sets a processor affinity mask for the specified thread. *)
+	SetThreadAffinityMask-: PROCEDURE {WINAPI} ( hThread: HANDLE; dwThreadAffinityMask: SET): SET;
 	(** The SetThreadContext function sets the context in the specified thread. *)
 	SetThreadContext-: PROCEDURE {WINAPI} ( hThread: HANDLE;
 																			  VAR lpContext: Context ): BOOL;
@@ -806,6 +815,7 @@ VAR
 		GetProcAddress(mod, "CreateEventA",SYSTEM.VAL(ADDRESS,CreateEvent));
 		GetProcAddress(mod, "CreateFileA",SYSTEM.VAL(ADDRESS,CreateFile));
 		GetProcAddress(mod, "CreateProcessA",SYSTEM.VAL(ADDRESS,CreateProcess));
+		GetProcAddress(mod, "CreateSemaphore",SYSTEM.VAL(ADDRESS,CreateSemaphore));
 		GetProcAddress(mod, "CreateThread",SYSTEM.VAL(ADDRESS,CreateThread));
 		GetProcAddress(mod, "DeleteCriticalSection",SYSTEM.VAL(ADDRESS,DeleteCriticalSection));
 		GetProcAddress(mod, "DeleteFileA",SYSTEM.VAL(ADDRESS,DeleteFile));
@@ -847,6 +857,7 @@ VAR
 		GetProcAddress(mod, "GetModuleHandleA",SYSTEM.VAL(ADDRESS,GetModuleHandle));
 		GetProcAddress(mod, "GetPrivateProfileStringA",SYSTEM.VAL(ADDRESS,GetPrivateProfileString));
 		(* must be done by linker: GetProcAddress(mod, "GetProcAddress",SYSTEM.VAL(ADDRESS,getProcAddress)); *)
+		GetProcAddress(mod, "GetProcessAffinityMask",SYSTEM.VAL(ADDRESS,GetProcessAffinityMask));
 		GetProcAddress(mod, "GetProcessHeap",SYSTEM.VAL(ADDRESS,GetProcessHeap));
 		GetProcAddress(mod, "GetProcessTimes", SYSTEM.VAL(ADDRESS, GetProcessTimes));
 		GetProcAddress(mod, "GetStartupInfoA",SYSTEM.VAL(ADDRESS,GetStartupInfo));
@@ -889,6 +900,7 @@ VAR
 		GetProcAddress(mod, "QueryThreadCycleTime", SYSTEM.VAL(ADDRESS, QueryThreadCycleTime));
 		GetProcAddress(mod, "ReadFile",SYSTEM.VAL(ADDRESS,ReadFile));
 		GetProcAddress(mod, "ReadProcessMemory",SYSTEM.VAL(ADDRESS,ReadProcessMemory));
+		GetProcAddress(mod, "ReleaseSemaphore",SYSTEM.VAL(ADDRESS,ReleaseSemaphore));
 		GetProcAddress(mod, "RemoveDirectoryA",SYSTEM.VAL(ADDRESS,RemoveDirectory));
 		GetProcAddress(mod, "ResetEvent",SYSTEM.VAL(ADDRESS,ResetEvent));
 		GetProcAddress(mod, "ResumeThread",SYSTEM.VAL(ADDRESS,ResumeThread));
@@ -909,6 +921,7 @@ VAR
 		GetProcAddress(mod, "SetFilePointer",SYSTEM.VAL(ADDRESS,SetFilePointer));
 		GetProcAddress(mod, "SetFileTime",SYSTEM.VAL(ADDRESS,SetFileTime));
 		GetProcAddress(mod, "SetLocalTime",SYSTEM.VAL(ADDRESS,SetLocalTime));
+		GetProcAddress(mod, "SetThreadAffinityMask",SYSTEM.VAL(ADDRESS,SetThreadAffinityMask));
 		GetProcAddress(mod, "SetThreadContext",SYSTEM.VAL(ADDRESS,SetThreadContext));
 		GetProcAddress(mod, "SetThreadPriority",SYSTEM.VAL(ADDRESS,SetThreadPriority));
 		GetProcAddress(mod, "SetupComm",SYSTEM.VAL(ADDRESS,SetupComm));
