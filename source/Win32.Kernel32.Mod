@@ -51,6 +51,11 @@ CONST
 	MEMCommit* = 12;  MEMReserve* = 13;  MEMDecommit* = 14;
 	MEMRelease* = 15;  CreateSuspended* = 2;  TLSOutOfIndexes* = -1;
 
+	(** heap allocation options *)
+	HeapNoSerialize* = 2H;
+	HeapGenerateExceptions* = 4H;
+	HeapZeroMemory* = 8H;
+	
 	(** protect (VirtualAlloc) flags *)
 	PageReadWrite* = 2;  PageExecuteReadWrite* = 6;
 
@@ -499,9 +504,10 @@ VAR
 																			CONST lpReturnedString: ARRAY OF CHAR;
 																			nSize: LONGINT;
 																			CONST lpFileName: ARRAY OF CHAR): LONGINT;
-	(* The GetProcessTimes function returns the times spent in kernel mode, user mode ... for the specified process *)
+	(** The GetProcessHeap function retrieves a handle to the default heap of the calling process. This handle can then be used in subsequent calls to the heap functions. *)
+	GetProcessHeap- : PROCEDURE {WINAPI} (): HANDLE;
+	(** The GetProcessTimes function returns the times spent in kernel mode, user mode ... for the specified process *)
 	GetProcessTimes- : PROCEDURE {WINAPI} (CONST hProcess: HANDLE; VAR lpCreationTime, lpExitTime, lpKernelTime, lpUserTime: FileTime ): LONGINT;
-
 	(** The GetStartupInfo function retrieves the contents of the StartupInfo structure that was specified when
 			the calling process was created. *)
 	GetStartupInfo-: PROCEDURE {WINAPI} ( VAR lpStartupInfo: StartupInfo );
@@ -574,6 +580,10 @@ VAR
 	(** The GlobalUnlock function decrements the lock count associated with a memory object that was allocated with
 			the GMEM_MOVEABLE flag. *)
 	GlobalUnlock-: PROCEDURE {WINAPI} ( hMem: HGLOBAL ): BOOL;
+	(** The HeapAlloc function allocates a block of memory from a heap. The allocated memory is not movable. *)
+	HeapAlloc-: PROCEDURE {WINAPI} ( hHeap: HANDLE; dwFlags: LONGINT; size: SIZE): ADDRESS;
+	(** The HeapFree function frees a memory block allocated from a heap by the HeapAlloc or HeapReAlloc function. *)
+	HeapFree-: PROCEDURE {WINAPI} ( hHeap: HANDLE; dwFlags: LONGINT; lpMem: ADDRESS): ADDRESS;
 	(** The InitializeCriticalSection function initializes a critical section object. *)
 	InitializeCriticalSection-: PROCEDURE {WINAPI} ( VAR lpCriticalSection: CriticalSection );
 	(** The InterlockedDecrement function both decrements (decreases by one) the value of the specified 32-bit
@@ -614,8 +624,6 @@ VAR
 
 	(** Retrieves the cycle time for the specified thread (both user and kernel mode, Windows Vista and newer) *)
 	QueryThreadCycleTime- : PROCEDURE {WINAPI} (hThread : HANDLE; VAR cycleTime : HUGEINT) : BOOL;
-
-
 	(** The ReadFile function reads data from a file, starting at the position indicated by the file pointer. *)
 	ReadFile-: PROCEDURE {WINAPI} ( hFile: HANDLE;
 															  VAR lpBuffer: ARRAY   OF SYSTEM.BYTE;
@@ -839,6 +847,7 @@ VAR
 		GetProcAddress(mod, "GetModuleHandleA",SYSTEM.VAL(ADDRESS,GetModuleHandle));
 		GetProcAddress(mod, "GetPrivateProfileStringA",SYSTEM.VAL(ADDRESS,GetPrivateProfileString));
 		(* must be done by linker: GetProcAddress(mod, "GetProcAddress",SYSTEM.VAL(ADDRESS,getProcAddress)); *)
+		GetProcAddress(mod, "GetProcessHeap",SYSTEM.VAL(ADDRESS,GetProcessHeap));
 		GetProcAddress(mod, "GetProcessTimes", SYSTEM.VAL(ADDRESS, GetProcessTimes));
 		GetProcAddress(mod, "GetStartupInfoA",SYSTEM.VAL(ADDRESS,GetStartupInfo));
 		GetProcAddress(mod, "GetStdHandle",SYSTEM.VAL(ADDRESS,GetStdHandle));
@@ -862,6 +871,8 @@ VAR
 		GetProcAddress(mod, "GlobalReAlloc",SYSTEM.VAL(ADDRESS,GlobalReAlloc));
 		GetProcAddress(mod, "GlobalSize",SYSTEM.VAL(ADDRESS,GlobalSize));
 		GetProcAddress(mod, "GlobalUnlock",SYSTEM.VAL(ADDRESS,GlobalUnlock));
+		GetProcAddress(mod, "HeapAlloc",SYSTEM.VAL(ADDRESS,HeapAlloc));
+		GetProcAddress(mod, "HeapFree",SYSTEM.VAL(ADDRESS,HeapFree));
 		GetProcAddress(mod, "InitializeCriticalSection",SYSTEM.VAL(ADDRESS,InitializeCriticalSection));
 		GetProcAddress(mod, "InterlockedDecrement",SYSTEM.VAL(ADDRESS,InterlockedDecrement));
 		GetProcAddress(mod, "InterlockedIncrement",SYSTEM.VAL(ADDRESS,InterlockedIncrement));
