@@ -8446,8 +8446,9 @@ TYPE
 				res := NewRegisterOperand(bool);
 				IF backend.cooperative THEN
 					CallThis("Runtime","InsertModule",1);
+					Emit(Result(position,res));
 				ELSE
-					CallThis2("Modules","PublishThis","Runtime","InsertModule",2,res);
+					CallThis2("Modules","PublishThis","Runtime","InsertModule",1,res);
 				END;
 				end := NewLabel();
 				(*AcquireThisRegister(bool, IntermediateCode.Result);*)
