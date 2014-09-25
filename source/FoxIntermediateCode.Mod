@@ -438,7 +438,8 @@ TYPE
 			END;
 			*)
 
-			ASSERT(result.name= name); ASSERT(result.symbol = syntaxTreeSymbol);
+			ASSERT(result.name= name);
+			(*ASSERT(result.symbol = syntaxTreeSymbol);*)
 			RETURN section
 		END;
 

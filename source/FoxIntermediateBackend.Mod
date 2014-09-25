@@ -1197,7 +1197,9 @@ TYPE
 
 			IF supportedInstruction(instruction,moduleName,procedureName) THEN section.Emit(instruction)
 			ELSE section.Emit(instruction);
-				EnsureSymbol(moduleName,procedureName); (* remainder for binary object file *)
+				IF ~backend.cooperative THEN
+					EnsureSymbol(moduleName,procedureName); (* remainder for binary object file *)
+				END;
 			END;
 		END Emit;
 		
@@ -2190,7 +2192,7 @@ TYPE
 		VAR procedure: SyntaxTree.Procedure; result: Operand; reg: IntermediateCode.Operand; source: IntermediateCode.Section;
 			pooledName: Basic.SegmentedName;
 		BEGIN
-			IF GetRuntimeProcedure(moduleName,procedureName,procedure,numberParameters < 0) THEN (* ready for dynamic linking *)
+			IF ~backend.newObjectFile & GetRuntimeProcedure(moduleName,procedureName,procedure,numberParameters < 0) THEN (* ready for dynamic linking *)
 				StaticCallOperand(result,procedure);
 				Emit(Call(position,result.op,ProcedureParametersSize(system,procedure)));
 				ReleaseOperand(result);
@@ -2240,38 +2242,34 @@ TYPE
 		BEGIN
 			procedureName := "CompareString";
 
-			IF GetRuntimeProcedure(runtimeModuleName,procedureName,procedure,TRUE) THEN
-				SaveRegisters();ReleaseUsedRegisters(saved);
-				Designate(leftExpression,left);
-				leftSize := GetDynamicSize(leftExpression.type,left.tag);
-				Emit(Push(position,leftSize));
-				ReleaseIntermediateOperand(leftSize);
-				Emit(Push(position,left.op));
-				ReleaseOperand(left);
+			SaveRegisters();ReleaseUsedRegisters(saved);
+			Designate(leftExpression,left);
+			leftSize := GetDynamicSize(leftExpression.type,left.tag);
+			Emit(Push(position,leftSize));
+			ReleaseIntermediateOperand(leftSize);
+			Emit(Push(position,left.op));
+			ReleaseOperand(left);
 
-				Designate(rightExpression,right);
-				rightSize := GetDynamicSize(rightExpression.type,right.tag);
-				Emit(Push(position,rightSize));
-				ReleaseIntermediateOperand(rightSize);
-				Emit(Push(position,right.op));
-				ReleaseOperand(right);
+			Designate(rightExpression,right);
+			rightSize := GetDynamicSize(rightExpression.type,right.tag);
+			Emit(Push(position,rightSize));
+			ReleaseIntermediateOperand(rightSize);
+			Emit(Push(position,right.op));
+			ReleaseOperand(right);
 
-				StaticCallOperand(result,procedure);
-				IntermediateCode.InitRegister(reg,int8,IntermediateCode.GeneralPurposeRegister,AcquireRegister(int8,IntermediateCode.GeneralPurposeRegister));
-				Emit(Call(position,result.op,ProcedureParametersSize(system,procedure)));
-				Emit(Result(position,reg));
-				ReleaseOperand(result);
-				(*
-				AcquireThisRegister(int8,IntermediateCode.Result);
-				*)
-				RestoreRegisters(saved); (* must be done before use of result, might be jumped over otherwise *)
-				(*
-				IntermediateCode.InitRegister(reg,int8,IntermediateCode.Result);
-				*)
-				br(trueLabel,reg,IntermediateCode.Immediate(int8,0));
-				ReleaseIntermediateOperand(reg);
-				BrL(falseLabel);
-			END;
+			CallThis(runtimeModuleName,procedureName, 4);
+			IntermediateCode.InitRegister(reg,int8,IntermediateCode.GeneralPurposeRegister,AcquireRegister(int8,IntermediateCode.GeneralPurposeRegister));
+			Emit(Result(position,reg));
+			(*
+			AcquireThisRegister(int8,IntermediateCode.Result);
+			*)
+			RestoreRegisters(saved); (* must be done before use of result, might be jumped over otherwise *)
+			(*
+			IntermediateCode.InitRegister(reg,int8,IntermediateCode.Result);
+			*)
+			br(trueLabel,reg,IntermediateCode.Immediate(int8,0));
+			ReleaseIntermediateOperand(reg);
+			BrL(falseLabel);
 		END CompareString;
 
 		PROCEDURE CopyString(leftExpression,rightExpression: SyntaxTree.Expression);
@@ -2284,27 +2282,23 @@ TYPE
 		BEGIN
 			procedureName := "CopyString";
 
-			IF GetRuntimeProcedure(runtimeModuleName,procedureName,procedure,TRUE) THEN
-				SaveRegisters();ReleaseUsedRegisters(saved);
-				Designate(leftExpression,left);
-				leftSize := GetDynamicSize(leftExpression.type,left.tag);
-				Emit(Push(position,leftSize));
-				ReleaseIntermediateOperand(leftSize);
-				Emit(Push(position,left.op));
-				ReleaseOperand(left);
+			SaveRegisters();ReleaseUsedRegisters(saved);
+			Designate(leftExpression,left);
+			leftSize := GetDynamicSize(leftExpression.type,left.tag);
+			Emit(Push(position,leftSize));
+			ReleaseIntermediateOperand(leftSize);
+			Emit(Push(position,left.op));
+			ReleaseOperand(left);
 
-				Designate(rightExpression,right);
-				rightSize := GetDynamicSize(rightExpression.type,right.tag);
-				Emit(Push(position,rightSize));
-				ReleaseIntermediateOperand(rightSize);
-				Emit(Push(position,right.op));
-				ReleaseOperand(right);
+			Designate(rightExpression,right);
+			rightSize := GetDynamicSize(rightExpression.type,right.tag);
+			Emit(Push(position,rightSize));
+			ReleaseIntermediateOperand(rightSize);
+			Emit(Push(position,right.op));
+			ReleaseOperand(right);
 
-				StaticCallOperand(result,procedure);
-				Emit(Call(position,result.op,ProcedureParametersSize(system,procedure)));
-				ReleaseOperand(result);
-				RestoreRegisters(saved);
-			END;
+			CallThis(runtimeModuleName,procedureName,4);
+			RestoreRegisters(saved);
 		END CopyString;
 
 		PROCEDURE VisitBinaryExpression(x: SyntaxTree.BinaryExpression);
@@ -8450,7 +8444,11 @@ TYPE
 				Emit(Push(position,op));
 				*)
 				res := NewRegisterOperand(bool);
-				CallThis2("Modules","PublishThis","Runtime","InsertModule",2,res);
+				IF backend.cooperative THEN
+					CallThis("Runtime","InsertModule",1);
+				ELSE
+					CallThis2("Modules","PublishThis","Runtime","InsertModule",2,res);
+				END;
 				end := NewLabel();
 				(*AcquireThisRegister(bool, IntermediateCode.Result);*)
 				BrneL(end, res,true);
