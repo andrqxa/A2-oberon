@@ -15,6 +15,7 @@ END InsertModule;
 
 PROCEDURE DivHA(l,r: HUGEINT): HUGEINT;
 CODE{SYSTEM.i386}
+	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	; divides two signed 64-bit numbers and delivers the quotient
 	;
@@ -93,6 +94,7 @@ CODE{SYSTEM.i386}
 	SUB EAX, ESI 			; If (quotient < 0),
 	SBB EDX, ESI 			; compute 2's complement of result.
 	DONE:
+	POP	ECX
 END DivHA;
 
 PROCEDURE DivH*(l,r: HUGEINT): HUGEINT;
@@ -109,6 +111,7 @@ END DivH;
 
 PROCEDURE MulH*(l,r: HUGEINT): HUGEINT;
 CODE{SYSTEM.i386}
+	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	; computes the low-order half of the product of its
 	; arguments, two 64-bit integers.
@@ -132,10 +135,12 @@ CODE{SYSTEM.i386}
 	MUL DWORD [EBP+16] 	; p1 = multiplicand_lo * multiplier_lo
 	ADD EDX,ECX 			; p1 + p2_lo + p3_lo = result in EDX:EAX
 	done:
+	POP	ECX
 END MulH;
 
 PROCEDURE ModHA(l,r: HUGEINT): HUGEINT;
 CODE{SYSTEM.i386}
+	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	; DIVIDES TWO SIGNED 64-BIT NUMBERS AND RETURNS THE REMAINDER.
 	;
@@ -222,6 +227,7 @@ CODE{SYSTEM.i386}
 	SUB EAX, ESI 				; IF (REMAINDER < 0),
 	SBB EDX, ESI 				; COMPUTE 2'S COMPLEMENT OF RESULT.
 	done:
+	POP	ECX
 END ModHA;
 
 PROCEDURE ModH*(l,r: HUGEINT): HUGEINT;
@@ -244,6 +250,7 @@ END AslH;
 
 PROCEDURE LslH*(l: HUGEINT; r: LONGINT): HUGEINT;
 CODE{SYSTEM.i386}
+	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	MOV ECX,[EBP+8]
 	MOV EAX,[EBP+12]
@@ -257,10 +264,12 @@ CODE{SYSTEM.i386}
 	MOV EDX,EAX			; Left shift EDX:EAX
 	XOR EAX,EAX 			; by 32 bits
 	lshiftdone:
+	POP	ECX
 END LslH;
 
 PROCEDURE AsrH*(l: HUGEINT; r: LONGINT): HUGEINT;
 CODE{SYSTEM.i386}
+	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	MOV ECX,[EBP+8]
 	MOV EAX,[EBP+12]
@@ -274,10 +283,12 @@ CODE{SYSTEM.i386}
 	MOV EAX,EDX			; Left shift EDX:EAX
 	SAR EDX,31 			; by 32 bits (fill EDX with sign bits)
 	rshiftdone:
+	POP	ECX
 END AsrH;
 
 PROCEDURE LsrH*(l: HUGEINT; r: LONGINT): HUGEINT;
 CODE{SYSTEM.i386}
+	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	MOV ECX,[EBP+8]
 	MOV EAX,[EBP+12]
@@ -291,10 +302,12 @@ CODE{SYSTEM.i386}
 	MOV EAX,EDX			; Left shift EDX:EAX
 	XOR EDX,EDX 			; by 32 bits (clear EDX)
 	rshiftdone:
+	POP	ECX
 END LsrH;
 
 PROCEDURE RorH*(l: HUGEINT; r: LONGINT): HUGEINT;
 CODE{SYSTEM.i386}
+	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	MOV ECX,[EBP+8]
 	MOV EAX,[EBP+12]
@@ -311,10 +324,12 @@ CODE{SYSTEM.i386}
 	SHRD EAX,EDX,CL
 	SHRD EDX,EBX,CL
 	rshiftdone:
+	POP	ECX
 END RorH;
 
 PROCEDURE RolH*(l: HUGEINT; r: LONGINT): HUGEINT;
 CODE{SYSTEM.i386}
+	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
 	MOV ECX,[EBP+8]
 	MOV EAX,[EBP+12]
@@ -331,16 +346,19 @@ CODE{SYSTEM.i386}
 	SHLD EDX,EAX,CL
 	SHLD EAX, EBX, CL
 	lshiftdone:
+	POP	ECX
 END RolH;
 
 PROCEDURE CasH*(VAR value: HUGEINT; old, new: HUGEINT): HUGEINT;
 CODE{SYSTEM.Pentium}
+	PUSH	ECX
 	MOV	EAX, [EBP + old + 0]
 	MOV	EDX, [EBP + old + 4]
 	MOV	EBX, [EBP + new + 0]
 	MOV	ECX, [EBP + new + 4]
 	MOV	EDI, [EBP + value]
 	LOCK CMPXCHG8B [EDI]
+	POP	ECX
 END CasH;
 
 PROCEDURE EntierXH*(x: LONGREAL): HUGEINT;
