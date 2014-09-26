@@ -247,7 +247,7 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	# cooperative runtime system
 	COOP { I386.CPU.Mod Counters.Mod }
 	WINCOOP { Coop.Win32.Kernel32.Mod Win32.Processors.Mod }
-	COOP { Queues.Mod Activities.Mod }
+	COOP { Queues.Mod Activities.Mod ExclusiveBlocks.Mod }
 	WINCOOP { Win32.Environment.Mod }
 
 	UNIX { Unix.Glue.Mod }

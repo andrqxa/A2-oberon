@@ -8232,9 +8232,16 @@ TYPE
 				dump.Ln;dump.Update;
 			END;
 			PushSelfPointer;
-			Emit(Push(position,true));
-			IF lock THEN CallThis("Objects","Lock",2)
-			ELSE CallThis("Objects","Unlock",2);
+			IF backend.cooperative THEN
+				Emit(Push(position,IntermediateCode.Immediate(sizeType, 1)));
+				IF lock THEN CallThis("ExclusiveBlocks","Enter",2)
+				ELSE CallThis("ExclusiveBlocks","Exit",2);
+				END;
+			ELSE
+				Emit(Push(position,true));
+				IF lock THEN CallThis("Objects","Lock",2)
+				ELSE CallThis("Objects","Unlock",2);
+				END;
 			END;
 			IF profile THEN ProfilerEnterExit(numberProcedures, TRUE) END;
 			IF Trace THEN TraceExit("Lock") END;
