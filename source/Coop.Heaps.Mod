@@ -1037,7 +1037,7 @@ BEGIN
 
 	systemBlockAdr:= NewBlock(blockSize);
 	IF systemBlockAdr # 0 THEN
-		INC (systemBlockAdr, AddressSize * 2);
+		INC (systemBlockAdr, BlockHeaderSize);
 		SYSTEM.PUT(systemBlockAdr + TypeDescOffset, systemBlockTag);
 		SYSTEM.GET(Machine.CurrentBP()+SIZEOF(ADDRESS),pc);
 		SYSTEM.PUT(systemBlockAdr + HeapBlockOffset,pc);
@@ -1091,7 +1091,7 @@ BEGIN
 
 		recordBlockAdr := NewBlock(blockSize);
 		IF recordBlockAdr # 0 THEN
-			INC (recordBlockAdr, AddressSize * 2);
+			INC (recordBlockAdr, BlockHeaderSize);
 			SYSTEM.PUT(recordBlockAdr + TypeDescOffset, recordBlockTag);
 			SYSTEM.GET(Machine.CurrentBP()+SIZEOF(ADDRESS),pc);
 			SYSTEM.PUT(recordBlockAdr + HeapBlockOffset,pc);
@@ -1131,7 +1131,7 @@ BEGIN
 
 	protRecBlockAdr := NewBlock(blockSize);
 	IF protRecBlockAdr # 0 THEN
-		INC (protRecBlockAdr, AddressSize * 2);
+		INC (protRecBlockAdr, BlockHeaderSize);
 		SYSTEM.PUT(protRecBlockAdr + TypeDescOffset, protRecBlockTag);
 		SYSTEM.GET(Machine.CurrentBP()+SIZEOF(ADDRESS),pc);
 		SYSTEM.PUT(protRecBlockAdr + HeapBlockOffset,pc);
@@ -1198,7 +1198,7 @@ BEGIN
 			INC(blockSize, (-blockSize) MOD BlockSize); (* round up to multiple of BlockSize *)
 			arrayBlockAdr := NewBlock(blockSize);
 			IF arrayBlockAdr # 0 THEN
-				INC (arrayBlockAdr, AddressSize * 2);
+				INC (arrayBlockAdr, BlockHeaderSize);
 				SYSTEM.PUT(arrayBlockAdr + TypeDescOffset, arrayBlockTag);
 				SYSTEM.GET(Machine.CurrentBP()+SIZEOF(ADDRESS),pc);
 				SYSTEM.PUT(arrayBlockAdr + HeapBlockOffset,pc);
