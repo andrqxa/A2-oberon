@@ -91,7 +91,7 @@ END
 
 BUILDS
 	A2 {
-		INCLUDE "NATIVE NATIVEORIG I386 I386ORIG"
+		INCLUDE "NATIVE NATIVEORIG I386 I386ORIG UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS ""
 		TARGET "AMD"
@@ -103,7 +103,7 @@ BUILDS
 	}
 	A2NewObjectFile
 	{
-		INCLUDE "NATIVE NATIVEGEN I386 I386GEN"
+		INCLUDE "NATIVE NATIVEGEN I386 I386GEN UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "--objectFile=Generic --newObjectFile"
 		TARGET "AMD"
@@ -115,7 +115,7 @@ BUILDS
 	}
 	WinAosNewObjectFile
 	{
-		INCLUDE "WIN iWIN WINGEN"
+		INCLUDE "WIN iWIN WINGEN UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "--objectFile=Generic --newObjectFile"
 		TARGET "AMD"
@@ -126,7 +126,7 @@ BUILDS
 		DISABLED "FALSE"
 	}
 	A2_64 {
-		INCLUDE "NATIVE NATIVEORIG AMD64"
+		INCLUDE "NATIVE NATIVEORIG AMD64 UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "--bits=64"
 		TARGET "AMD"
@@ -137,7 +137,7 @@ BUILDS
 		DISABLED "FALSE"
 	}
 	A2mini {
-		INCLUDE "NATIVE NATIVEORIG I386 I386ORIG"
+		INCLUDE "NATIVE NATIVEORIG I386 I386ORIG UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS ""
 		TARGET "AMD"
@@ -148,7 +148,7 @@ BUILDS
 		DISABLED "FALSE"
 	}
 	WinAos {
-		INCLUDE "WIN WINORIG iWIN"
+		INCLUDE "WIN WINORIG iWIN UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS ""
 		TARGET "AMD"
@@ -158,9 +158,20 @@ BUILDS
 		EXCLUDEPACKAGES ""
 		DISABLED "FALSE"
 	}
+	WinAosCooperative {
+		INCLUDE "WIN COOP WINCOOP"
+		COMPILER "Compiler.Compile"
+		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile"
+		TARGET "AMD"
+		EXTENSION "Gof"
+		SYMBOLEXTENSION "Sym"
+		PATH "../obj/"
+		EXCLUDEPACKAGES "System Drivers Compiler ApplicationsMini Applications GuiApplicationsMini GuiApplications Fun Testing Education Build EFI Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
+		DISABLED "FALSE"
+	}
 	WinAosMini
 	{
-		INCLUDE "WIN WINORIG iWIN"
+		INCLUDE "WIN WINORIG iWIN UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS ""
 		TARGET "AMD"
@@ -171,7 +182,7 @@ BUILDS
 		DISABLED "FALSE"
 	}
 	eWinAos {
-		INCLUDE "WIN WINORIG eWIN"
+		INCLUDE "WIN WINORIG eWIN UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS ""
 		TARGET "AMD"
@@ -183,7 +194,7 @@ BUILDS
 	}
 
 	LinuxAos {
-		INCLUDE "UNIX LINUX"
+		INCLUDE "UNIX LINUX UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS ""
 		TARGET "AMD"
@@ -194,7 +205,7 @@ BUILDS
 		DISABLED "FALSE"
 	}
 	DarwinAos {
-		INCLUDE "UNIX DARWIN"
+		INCLUDE "UNIX DARWIN UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "--darwinHost"
 		TARGET "AMD"
@@ -205,7 +216,7 @@ BUILDS
 		DISABLED "FALSE"
 	}
 	SolarisAos {
-		INCLUDE "UNIX SOLARIS"
+		INCLUDE "UNIX SOLARIS UNCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS ""
 		TARGET "AMD"
@@ -233,6 +244,12 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	# Low-level trace output
 	Trace.Mod
 
+	# cooperative runtime system
+	COOP { I386.CPU.Mod Counters.Mod }
+	WINCOOP { Coop.Win32.Kernel32.Mod Win32.Processors.Mod }
+	COOP { Queues.Mod Activities.Mod }
+	WINCOOP { Win32.Environment.Mod }
+
 	UNIX { Unix.Glue.Mod }
 	DARWIN { Darwin.Unix.Mod } LINUX { Linux.Unix.Mod } SOLARIS { Solaris.Unix.Mod }
 
@@ -242,19 +259,24 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	I386ORIG { I386.Machine.Mod }
 	I386GEN { oc/Generic.I386.Machine.Mod }
 	AMD64 { AMD64.Machine.Mod }
-	WIN {Win32.Machine.Mod }
+	WINORIG, WINGEN {Win32.Machine.Mod }
+	COOP { Coop.Machine.Mod }
 
 	UNIX { Unix.I386.Machine.Mod }
 
-	NATIVE, WIN { Heaps.Mod }
+	NATIVE, WINORIG, WINGEN { Heaps.Mod }
 	UNIX { Unix.Heaps.Mod }
+	COOP { Coop.Heaps.Mod }
 
-	NATIVEORIG, WINORIG, UNIX {Modules.Mod}
+	NATIVEORIG, WINORIG, UNIX { Modules.Mod }
 	NATIVEGEN, WINGEN { oc/Generic.Modules.Mod}
+	COOP { Coop.Modules.Mod }
 
 	NATIVE { Objects.Mod Kernel.Mod }
 	WIN { Win32.Objects.Mod Win32.Kernel.Mod }
 	UNIX { Unix.Objects.Mod Unix.Kernel.Mod }
+
+	COOP { RuntimeSupport.Mod }
 
 	# Support for DEFINITIONs
 	NATIVE,WIN { Interfaces.Mod }
