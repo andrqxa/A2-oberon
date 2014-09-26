@@ -4578,7 +4578,7 @@ TYPE
 			END;
 
 			IF symbol IS SyntaxTree.Procedure THEN
-				IF (symbol.scope IS SyntaxTree.ProcedureScope) THEN (* nested procedure *)
+				IF IsNested(symbol(SyntaxTree.Procedure)) THEN
 					GetBaseRegister(reg,currentScope,symbol.scope); (* static link, may be fp or [fp+8] (if nested proc calls itself) *)
 					Emit(Push(position,reg));
 					ReleaseIntermediateOperand(reg);
@@ -10343,7 +10343,7 @@ TYPE
 
 	PROCEDURE IsNested(procedure: SyntaxTree.Procedure): BOOLEAN;
 	BEGIN
-		RETURN procedure.scope IS SyntaxTree.ProcedureScope
+		RETURN (procedure.scope IS SyntaxTree.ProcedureScope) & (procedure.externalName = NIL);
 	END IsNested;
 
 	PROCEDURE ProcedureParametersSize(system: Global.System; procedure: SyntaxTree.Procedure): LONGINT;
