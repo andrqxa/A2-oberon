@@ -35,6 +35,11 @@
 #	Release.Build --path="/temp/obg/" WinAosNewObjectFile ~
 #	StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=Gof --displacement=401000H --path="/temp/obg/" Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~
 # 
+# WINAOS cooperative
+#	Release.Build --build --path="./" WinAosCooperative ~
+#	StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=Gof --displacement=401000H --path="./" Runtime Trace CPU Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Machine Heaps Modules Objects Kernel RuntimeSupport KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~
+#	FSTools.CloseFiles A2.exe ~
+# 
 # Notes:
 #	-	The command PELinker.Link creates the Aos.exe executable file. Per default, it will be created in the Work folder.
 #	-	The configuration file aos.ini specifies from which directory the object files are loaded. If you want to switch between the
@@ -159,14 +164,14 @@ BUILDS
 		DISABLED "FALSE"
 	}
 	WinAosCooperative {
-		INCLUDE "WIN COOP WINCOOP"
+		INCLUDE "WIN iWIN COOP WINCOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile"
 		TARGET "AMD"
 		EXTENSION "Gof"
 		SYMBOLEXTENSION "Sym"
 		PATH "../obj/"
-		EXCLUDEPACKAGES "System Drivers Compiler ApplicationsMini Applications GuiApplicationsMini GuiApplications Fun Testing Education Build EFI Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
+		EXCLUDEPACKAGES ""
 		DISABLED "FALSE"
 	}
 	WinAosMini
@@ -343,7 +348,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	NATIVE,WIN,UNIX { RelativeFileSystem.Mod } # file system relative to path
 
 	NATIVE,WIN,UNIX { Loader.Mod }
-	NATIVEGEN, WINGEN {BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod  oc/GenericLoader.Mod}
+	NATIVEGEN, WINGEN, COOP {BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod }
 
 	# binding modules
 	NATIVE,WIN { BootConsole.Mod }
