@@ -10,7 +10,7 @@ VAR stdout: Kernel32.HANDLE;
 
 PROCEDURE {NORETURN} Abort-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	Kernel32.ExitProcess (1);
+	Activities.TerminateCurrentActivity;
 END Abort;
 
 PROCEDURE {NORETURN} Exit- (status: WORD);
