@@ -5663,18 +5663,23 @@ TYPE
 						StaticCallOperand(callop,procedure);
 						Emit(Push(position,callop.op));
 						IF body.priority # NIL THEN Evaluate(body.priority,op); priority := op.op;
-							Convert(priority,int32);
-						ELSE priority := IntermediateCode.Immediate(int32,0)
+							Convert(priority,sizeType);
+						ELSE priority := IntermediateCode.Immediate(sizeType,0)
 						END;
 						Emit(Push(position,priority));
 						ReleaseIntermediateOperand(priority);
-						flags := 0;
-						IF body.isSafe THEN
-							flags := 1;
+						IF backend.cooperative THEN
+							Emit(Push(position,self));
+							CallThis("Activities","Create",3)
+						ELSE
+							flags := 0;
+							IF body.isSafe THEN
+								flags := 1;
+							END;
+							Emit(Push(position,IntermediateCode.Immediate(IntermediateCode.GetType(system,system.setType),flags)));
+							Emit(Push(position,self));
+							CallThis("Objects","CreateProcess",4)
 						END;
-						Emit(Push(position,IntermediateCode.Immediate(IntermediateCode.GetType(system,system.setType),flags)));
-						Emit(Push(position,self));
-						CallThis("Objects","CreateProcess",4)
 					ELSE
 						Emit(Push(position,self));
 						StaticCallOperand(callop,procedure);
