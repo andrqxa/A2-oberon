@@ -951,24 +951,9 @@ BEGIN
 	*)
 END Init;
 
-PROCEDURE TestA;
-VAR i: WORD;
-BEGIN
-	LOOP END;
-	FOR i := 0 TO 10000 DO Trace.Char ('a') END;
-END TestA;
-
-PROCEDURE TestB;
-VAR i: WORD;
-BEGIN
-	LOOP END;
-	FOR i := 0 TO 10000 DO Trace.Char ('b') END;
-END TestB;
-
 PROCEDURE InitializeModules;
 BEGIN
 	Activities.Call (Activities.Idle);
-	Activities.Call (TestA);
 END InitializeModules;
 
 BEGIN {UNCOOPERATIVE, UNCHECKED}
