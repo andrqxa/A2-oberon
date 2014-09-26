@@ -4377,6 +4377,10 @@ TYPE
 				isCallOfDynamicOperator := FALSE
 			END;
 
+			IF backend.cooperative & (procedureType.callingConvention = SyntaxTree.WinAPICallingConvention) THEN
+				Emit(Push(position, ap));
+			END;
+
 			alignment := procedureType.stackAlignment;
 			IF alignment > 1 THEN
 				IntermediateCode.InitRegister(reg,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
@@ -4628,6 +4632,10 @@ TYPE
 
 			IF alignment > 1 THEN
 				Emit(Pop(position,sp));
+			END;
+
+			IF backend.cooperative & (procedureType.callingConvention = SyntaxTree.WinAPICallingConvention) THEN
+				Emit(Pop(position, ap));
 			END;
 
 			IF conditional & (procedureType.returnType # NIL) & (procedureType.returnType.resolved IS SyntaxTree.BooleanType) THEN
@@ -5752,7 +5760,7 @@ TYPE
 				Designate(p0,s0);
 				Emit(Push(position,s0.op));
 				ReleaseOperand(s0);
-				CallThis("Runtime","Dispose", 1);
+				CallThis("RuntimeSupport","Dispose", 1);
 			(* ---- GETPROCEDURE ----- *)
 			|Global.GetProcedure:
 				Designate(p0,s0);
@@ -6049,26 +6057,26 @@ TYPE
 					Emit(Push(position,l.op));
 					ReleaseOperand(l);
 
-					(* push type descriptor *)
-					reg := TypeDescriptorAdr(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved);
-					IF ~newObjectFile THEN
-						IntermediateCode.MakeMemory(reg,addressType);
-					END;
-					Emit(Push(position,reg));
-					ReleaseIntermediateOperand(reg);
+						(* push type descriptor *)
+						reg := TypeDescriptorAdr(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved);
+						IF ~newObjectFile THEN
+							IntermediateCode.MakeMemory(reg,addressType);
+						END;
+						Emit(Push(position,reg));
+						ReleaseIntermediateOperand(reg);
 
-					(* push realtime flag *)
-					IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
-					ELSE Emit(Push(position,false));
-					END;
+						(* push realtime flag *)
+						IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
+						ELSE Emit(Push(position,false));
+						END;
 
-					CallThis("Heaps","NewRec", 3);
-					(* check allocation success, if not successful then do not call initializers and bodies *)
-					IntermediateCode.InitRegister(pointer,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
-					Emit(Pop(position,pointer));
-					MakeMemory(reg,pointer,addressType,0);
-					ReleaseIntermediateOperand(pointer);
-					pointer := reg;
+						CallThis("Heaps","NewRec", 3);
+						(* check allocation success, if not successful then do not call initializers and bodies *)
+						IntermediateCode.InitRegister(pointer,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
+						Emit(Pop(position,pointer));
+						MakeMemory(reg,pointer,addressType,0);
+						ReleaseIntermediateOperand(pointer);
+						pointer := reg;
 					exit := NewLabel();
 					BreqL(exit,pointer,nil);
 					Emit(Push(position,pointer));
@@ -7630,7 +7638,7 @@ TYPE
 		END VisitAssignment;
 		
 		PROCEDURE EmitCooperativeSwitch;
-		CONST QuantumOffset = 6;
+		CONST QuantumOffset = 4;
 		VAR quantum, offset, zero: IntermediateCode.Operand; skip: Label;
 		BEGIN
 			ASSERT (cooperativeSwitches);
@@ -10194,7 +10202,7 @@ TYPE
 
 	PROCEDURE IsUnsafePointer(type: SyntaxTree.Type): BOOLEAN;
 	BEGIN RETURN (type # NIL) & (type.resolved IS SyntaxTree.PointerType) & type.resolved(SyntaxTree.PointerType).isUnsafe
-	END IsUnsafePointer
+	END IsUnsafePointer;
 
 	PROCEDURE IsPointerToRecord(type: SyntaxTree.Type; VAR recordType: SyntaxTree.RecordType): BOOLEAN;
 	BEGIN type := type.resolved;
