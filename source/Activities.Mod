@@ -210,6 +210,7 @@ END FinalizeSwitch;
 PROCEDURE Create- (body: PROCEDURE; priority: Priority; object {UNTRACED}: OBJECT);
 VAR activity: Process;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	IF priority = IdlePriority THEN priority := SYSTEM.GetActivity ()(Activity).priority END;
 	NEW (activity, body, priority, object);
 	ASSERT (activity # NIL);
 	Resume (activity);
