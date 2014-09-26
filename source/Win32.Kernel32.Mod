@@ -493,7 +493,7 @@ VAR
 	(* The GetLogicalDrives function retrieves a bitmask representing the currently available disk drives.
 *)
 
-	GetLogicalDrives-: PROCEDURE ( ): SET;
+	GetLogicalDrives-: PROCEDURE {WINAPI} ( ): SET;
 	GetModuleFileName-: PROCEDURE {WINAPI} ( hModule: HMODULE;
 																				    VAR lpFileName: ARRAY   OF CHAR;
 																				    nSize: LONGINT ): LONGINT;
@@ -642,7 +642,7 @@ VAR
 																				   nSize: LONGINT;
 																				   VAR lpNumberOfBytesRead: LONGINT ): BOOL;
 	(** The ReleaseSemaphore function increases the count of the specified semaphore object by a specified amount. *)
-	ReleaseSemaphore-: PROCEDURE ( hSemaphore: HANDLE; lReleaseCount: LONGINT; lpPreviousCount: ADDRESS): BOOL;
+	ReleaseSemaphore-: PROCEDURE {WINAPI} ( hSemaphore: HANDLE; lReleaseCount: LONGINT; lpPreviousCount: ADDRESS): BOOL;
 	(** The RemoveDirectory function deletes an existing empty directory. *)
 	RemoveDirectory-: PROCEDURE {WINAPI} ( VAR lpPathName: ARRAY   OF CHAR ): BOOL;
 	(** The ResetEvent function sets the state of the specified event object to nonsignaled. *)
@@ -815,7 +815,7 @@ VAR
 		GetProcAddress(mod, "CreateEventA",SYSTEM.VAL(ADDRESS,CreateEvent));
 		GetProcAddress(mod, "CreateFileA",SYSTEM.VAL(ADDRESS,CreateFile));
 		GetProcAddress(mod, "CreateProcessA",SYSTEM.VAL(ADDRESS,CreateProcess));
-		GetProcAddress(mod, "CreateSemaphore",SYSTEM.VAL(ADDRESS,CreateSemaphore));
+		GetProcAddress(mod, "CreateSemaphoreA",SYSTEM.VAL(ADDRESS,CreateSemaphore));
 		GetProcAddress(mod, "CreateThread",SYSTEM.VAL(ADDRESS,CreateThread));
 		GetProcAddress(mod, "DeleteCriticalSection",SYSTEM.VAL(ADDRESS,DeleteCriticalSection));
 		GetProcAddress(mod, "DeleteFileA",SYSTEM.VAL(ADDRESS,DeleteFile));
