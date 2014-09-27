@@ -230,16 +230,22 @@ BEGIN {EXCLUSIVE}
 		m.published := TRUE;
 		m.next := root; root := m;
 		m.refcnt := 0;
-
 		IF m.module # NIL THEN
 			FOR i := 0 TO LEN(m.module)-1 DO INC(m.module[i].refcnt) END;
 		END;
-
-		IF m.body # NIL THEN m.body END;
-		m.init := TRUE;
 		new := TRUE;
 	END;
 END Publish;
+
+PROCEDURE Initialize*(VAR module: Module);
+VAR new: BOOLEAN;
+BEGIN
+	Publish (module, new);
+	IF new THEN
+		IF module.body # NIL THEN module.body END;
+		module.init := TRUE;
+	END;
+END Initialize;
 
 (** Return the named module or NIL if it is not loaded yet. *)
 PROCEDURE ModuleByName*(CONST name: ARRAY OF CHAR): Module;
@@ -261,7 +267,7 @@ END GetFileName;
 (** Load the module if it is not already loaded. *)	(* Algorithm J. Templ, ETHZ, 1994 *)
 PROCEDURE ThisModule*(CONST name: ARRAY OF CHAR; VAR res: LONGINT; VAR msg: ARRAY OF CHAR): Module;
 TYPE Body = PROCEDURE;
-VAR m, p: Module; fileName: ARRAY 64 OF CHAR; new: BOOLEAN; i: LONGINT;
+VAR m, p: Module; fileName: ARRAY 64 OF CHAR; i: LONGINT;
 BEGIN {EXCLUSIVE}
 	res := Ok; msg[0] := 0X; m := ModuleByName(name);
 	IF m = NIL THEN
@@ -283,7 +289,7 @@ BEGIN {EXCLUSIVE}
 		END;
 		p := m;
 		IF (m # NIL) & ~m.published THEN	(* no race on m.published, as update is done below in Publish *)
-			Publish(m, new);
+			Initialize(m);
 		END;
 		IF trace THEN
 			Trace.String("<"); Trace.StringLn (name);
@@ -587,17 +593,17 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Register;
 
 PROCEDURE PublishRegisteredModules;
-VAR m {UNTRACED}: Module; module, import: SIZE; new: BOOLEAN;
+VAR m {UNTRACED}: Module; module, import: SIZE;
 BEGIN {UNCHECKED}
 	Activities.Call (Activities.Idle);
 	FOR module := 0 TO registered - 1 DO
 		m := register[module];
 		IF m.module # NIL THEN
 			FOR import := 0 TO LEN (m.module) - 1 DO
-				Publish (m.module[import], new);
+				Initialize (m.module[import]);
 			END;
 		END;
-		Publish (m, new);
+		Initialize (m);
 	END;
 END PublishRegisteredModules;
 
