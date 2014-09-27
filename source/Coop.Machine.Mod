@@ -1245,10 +1245,8 @@ END Portout32;
 
 
 
-(*
 BEGIN
 	trace[1] := 0X; Trace.Char := LogChar; Trace.Color := TraceColor;
 	InitLocks();
 	Init;
-*)
 END Machine.
