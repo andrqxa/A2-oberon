@@ -8151,36 +8151,52 @@ TYPE
 
 		PROCEDURE VisitAwaitStatement(x: SyntaxTree.AwaitStatement);
 		VAR proc: SyntaxTree.Procedure; res: IntermediateCode.Operand; symbol: Sections.Section;
-			call: IntermediateCode.Operand; label: Label; name: Basic.SegmentedName;
+			call: IntermediateCode.Operand; label, start, true, false: Label; name: Basic.SegmentedName;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitAwaitStatement") END;
 			IF profile THEN ProfilerEnterExit(numberProcedures, FALSE) END;
+			
+			IF backend.cooperative THEN
+				start := NewLabel();
+				true := NewLabel();
+				false := NewLabel();
+				SetLabel(start);
+				Condition(x.condition,true,false);
+				SetLabel(false);
+				PushSelfPointer();
+				CallThis("ExclusiveBlocks","Await",1);
+				BrL(start);
+				SetLabel(true);
+				PushSelfPointer();
+				CallThis("ExclusiveBlocks","FinalizeAwait",1);
+			ELSE
+				proc := MakeAwaitProcedure(x);
+				Emit(Push(position,fp));
+				Global.GetSymbolSegmentedName(proc,name);
+				symbol := NewSection(module.allSections, Sections.CodeSection, name,proc,commentPrintout # NIL);
+				IntermediateCode.InitAddress(call,addressType,name, GetFingerprint(proc), 0);
+				res := NewRegisterOperand(IntermediateCode.GetType(system,system.booleanType));
+				Emit(Call(position,call,ProcedureParametersSize(system,proc)));
+				Emit(Result(position,res));
+				(*
+				AcquireThisRegister(IntermediateCode.GetType(system,system.booleanType),IntermediateCode.Result);
+				IntermediateCode.InitRegister(res,IntermediateCode.GetType(system,system.booleanType),IntermediateCode.Result);
+				*)
+				InitOperand(result,ModeValue);
+				result.op := res;
+				label := NewLabel();
+				BreqL(label, result.op, SELF.true);
+				ReleaseOperand(result);
+				symbol := NewSection(module.allSections, Sections.CodeSection, name,proc,commentPrintout # NIL);
+				IntermediateCode.InitAddress(res, addressType, name,GetFingerprint(proc), 0);
+				Emit(Push(position,res));
+				Emit(Push(position,fp));
+				PushSelfPointer();
+				Emit(Push(position,nil));
+				CallThis("Objects","Await",4);
+				SetLabel(label);
+			END;
 
-			proc := MakeAwaitProcedure(x);
-			Emit(Push(position,fp));
-			Global.GetSymbolSegmentedName(proc,name);
-			symbol := NewSection(module.allSections, Sections.CodeSection, name,proc,commentPrintout # NIL);
-			IntermediateCode.InitAddress(call,addressType,name, GetFingerprint(proc), 0);
-			res := NewRegisterOperand(IntermediateCode.GetType(system,system.booleanType));
-			Emit(Call(position,call,ProcedureParametersSize(system,proc)));
-			Emit(Result(position,res));
-			(*
-			AcquireThisRegister(IntermediateCode.GetType(system,system.booleanType),IntermediateCode.Result);
-			IntermediateCode.InitRegister(res,IntermediateCode.GetType(system,system.booleanType),IntermediateCode.Result);
-			*)
-			InitOperand(result,ModeValue);
-			result.op := res;
-			label := NewLabel();
-			BreqL(label, result.op, true);
-			ReleaseOperand(result);
-			symbol := NewSection(module.allSections, Sections.CodeSection, name,proc,commentPrintout # NIL);
-			IntermediateCode.InitAddress(res, addressType, name,GetFingerprint(proc), 0);
-			Emit(Push(position,res));
-			Emit(Push(position,fp));
-			PushSelfPointer();
-			Emit(Push(position,nil));
-			CallThis("Objects","Await",4);
-			SetLabel(label);
 			IF profile THEN ProfilerEnterExit(numberProcedures, TRUE) END;
 
 			IF Trace THEN TraceExit("VisitAwaitStatement") END;
