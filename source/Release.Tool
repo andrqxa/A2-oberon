@@ -278,8 +278,9 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	COOP { Coop.Modules.Mod }
 
 	NATIVE { Objects.Mod Kernel.Mod }
-	WIN { Win32.Objects.Mod Win32.Kernel.Mod }
+	WINORIG, WINGEN { Win32.Objects.Mod Win32.Kernel.Mod }
 	UNIX { Unix.Objects.Mod Unix.Kernel.Mod }
+	COOP { Coop.Objects.Mod Coop.Kernel.Mod }
 
 	COOP { RuntimeSupport.Mod }
 
