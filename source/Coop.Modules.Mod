@@ -167,21 +167,6 @@ TYPE
 			crc*: LONGINT;
 			body*: PROCEDURE;
 
-		PROCEDURE FindRoots;	(* override *)
-		VAR i: LONGINT; ptr: ANY; (* moduleName: Name; *) false: BOOLEAN;
-		BEGIN
-			false := FALSE; IF false THEN BEGIN{EXCLUSIVE} END END; (* trick to make a module a protected record ... *)
-			IF published THEN	(* mark global pointers *)
-				(* moduleName := name; *)
-				FOR i := 0 TO LEN(ptrAdr) - 1 DO
-					SYSTEM.GET (ptrAdr[i], ptr);
-					IF ptr # NIL THEN Heaps.Mark(ptr) END
-				END;
-				Heaps.AddRootObject(next);
-				(* all other fields are being traversed by Mark of the Garbage Collector *)
-			END;
-		END FindRoots;
-
 	END Module;
 
 	LoaderProc* = PROCEDURE (name, fileName: ARRAY OF CHAR; VAR res: LONGINT;

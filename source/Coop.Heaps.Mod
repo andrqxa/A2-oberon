@@ -13,23 +13,15 @@ MODULE Heaps;	(** AUTHOR "pjm/Luc Bläser/U. Glavitsch (ug)"; PURPOSE "Heap mana
 IMPORT SYSTEM, Trace, Machine;
 
 CONST
-	DebugValue = LONGINT(0DEADDEADH);	(* set non-0 to clear free storage to this value *)
-
 	Stats* = TRUE;					(* maintain statistical counters *)
 
 	AddressSize = SIZEOF(ADDRESS);
 
-	MaxTries = 16;				(* max number of times to try and allocate memory, before trapping *)
-	Unmarked = -1;				(* mark value of free blocks *)
 	BlockSize* = 32;			(* power of two, <= 32 for RegisterCandidates *)
 	ArrayAlignment = 8;			(* first array element of ArrayBlock and first data element of SystemBlock must be aligned to 0 MOD ArrayAlignment *)
 	BlockHeaderSize* = 2 * AddressSize;
 	HeapBlockOffset* = - 2 * AddressSize;
 	TypeDescOffset* = - AddressSize;
-
-	MaxCandidates = 1024;
-
-	MarkStackSize = 1024;		(* maximum stack size for temporary marking *)
 
 	ProtTypeBit* = 31;			(** flags in TypeDesc, RoundUp(log2(MaxTags)) low bits reserved for extLevel *)
 
@@ -116,27 +108,6 @@ TYPE
 
 	PointerOffsets = POINTER TO ARRAY OF SIZE;
 
-TYPE
-	GCStatus* = OBJECT
-		(* the following procedures are overridden in Objects.GCStatusExt. The reason is that shared objects can only be implemented in modules Objects or higher *)
-
-		PROCEDURE SetgcOngoing*(value: BOOLEAN);
-		BEGIN
-			HALT(2000);
-		END SetgcOngoing;
-
-		PROCEDURE  GetgcOngoing*(): BOOLEAN;
-		BEGIN
-			HALT(2001); RETURN FALSE
-		END GetgcOngoing;
-
-		PROCEDURE WaitForGCEnd*;
-		BEGIN
-			HALT(2002)
-		END WaitForGCEnd;
-
-	END GCStatus;
-
 CONST
 	MaxFreeLists = 14;
 	FreeListBarrier = 7;
@@ -147,15 +118,6 @@ VAR
 	freeLists: FreeLists;
 	GC*: PROCEDURE;	(** activate the garbage collector *)
 	initBlock: ANY;	(* anchor for init calls *)
-	markStack: ARRAY MarkStackSize OF ADDRESS; (* temporary marking stack *)
-	lowestForgotten: ADDRESS; (* lowest forgotten block due to mark stack overflow *)
-	markStackHeight: LONGINT; (* current free position in mark stack *)
-	currentMarkValue: LONGINT; (* all objects that have this value in their mark field are still used - initial value filled in by linker *)
-	sweepMarkValue: LONGINT; (* most recent mark value *)
-	sweepBlockAdr: ADDRESS;	(* where to resume sweeping *)
-	sweepMemBlock {UNTRACED}: Machine.MemoryBlock; (* where to resume sweeping *)
-	candidates: ARRAY MaxCandidates OF ADDRESS; (* procedure stack pointer candidates *)
-	numCandidates: LONGINT;
 	rootList {UNTRACED}: RootObject;	(* list of root objects during GC - tracing does not harm but is unnecessary *)
 	realtimeList {UNTRACED}: HeapBlock; (* list of realtime objects - tracing does not harm but is unnecessary *)
 	newSum: SIZE;
@@ -177,8 +139,6 @@ VAR
 	Nmark-, Nmarked-, NfinalizeAlive-, NfinalizeDead-: LONGINT;
 	NgcCyclesMark-, NgcCyclesLastRun-, NgcCyclesMax-, NgcCyclesAllRuns- : HUGEINT;
 
-	gcStatus*: GCStatus;
-
 	GCType*: LONGINT;
 	freeBlockFound-, freeBlockNotFound-: LONGINT;
 	EnableFreeLists, EnableReturnBlocks, trace-: BOOLEAN;
@@ -191,204 +151,8 @@ BEGIN
 	allocationLogger := a
 END SetAllocationLogger;
 
-(* check validity of p *)
-PROCEDURE CheckPointer(p: ADDRESS): BOOLEAN;
-VAR ret: BOOLEAN; heapBlockAdr, tdAdr: ADDRESS;
-BEGIN
-	ret := FALSE;
-	IF Machine.ValidHeapAddress(p)THEN
-		SYSTEM.GET(p + HeapBlockOffset, heapBlockAdr);
-		IF Machine.ValidHeapAddress(heapBlockAdr + TypeDescOffset) THEN
-			SYSTEM.GET(heapBlockAdr + TypeDescOffset, tdAdr);
-			IF (tdAdr = systemBlockTag) OR (tdAdr = recordBlockTag) OR (tdAdr = protRecBlockTag) OR (tdAdr = arrayBlockTag) THEN
-				ret := TRUE
-			END
-		END
-	END;
-	RETURN ret
-END CheckPointer;
-
-PROCEDURE Inspect(blockAdr: ADDRESS);
-VAR adr: ADDRESS; heapBlock {UNTRACED}: HeapBlock; rootObj: RootObject; staticTypeBlock {UNTRACED}: StaticTypeBlock;
-	block {UNTRACED}: ANY;
-BEGIN
-	(* ug: check for validity of block is necessary since users may assign values to pointer variables that are not real heap blocks, e.g. by using SYSTEM.VAL or ADDRESSOF *)
-	IF (blockAdr = NilVal) OR ~CheckPointer(blockAdr) THEN RETURN END;
-	SYSTEM.GET(blockAdr + HeapBlockOffset, heapBlock);
-	IF (heapBlock = NIL) OR (heapBlock.mark >= currentMarkValue) THEN RETURN END;
-
-	block := SYSTEM.VAL(ANY, blockAdr);
-	heapBlock.mark := currentMarkValue;
-	IF Stats THEN INC(Nmarked) END;
-	IF (heapBlock IS RecordBlock) OR (heapBlock IS ProtRecBlock) OR (heapBlock IS ArrayBlock) THEN
-		IF block IS RootObject THEN
-			rootObj := SYSTEM.VAL(RootObject, block);
-			rootObj.nextRoot := rootList; rootList := rootObj;	(* link root list *)
-		END;
-		SYSTEM.GET(blockAdr + TypeDescOffset, staticTypeBlock);
-		IF (LEN(staticTypeBlock.pointerOffsets) > 0) OR (heapBlock IS ProtRecBlock) THEN (* not atomic or heapBlock is ProtRecBlock containing awaiting queues *)
-			IF markStackHeight # MarkStackSize THEN
-				markStack[markStackHeight] := blockAdr; INC(markStackHeight);
-			ELSE (* overflow *)
-				adr := SYSTEM.VAL(ADDRESS, heapBlock) - BlockHeaderSize; (* lowestForgotten points to block start *)
-				IF Machine.LessThan(adr, lowestForgotten) THEN lowestForgotten := adr END
-			END
-		END
-	END
-END Inspect;
-
 (** Mark - Mark an object and its decendents. Used by findRoots. *)
-PROCEDURE Mark*(p: ANY);
-VAR orgBlock, block: ADDRESS; staticTypeBlock {UNTRACED}: StaticTypeBlock;
-	orgHeapBlock {UNTRACED}: HeapBlock;
-	currentArrayElemAdr, lastArrayElemAdr: ADDRESS; i: LONGINT;
-BEGIN
-	IF Stats THEN INC(Nmark) END;
-	markStackHeight := 0; 	(* clear mark stack *)
-	lowestForgotten := Machine.memBlockTail.endBlockAdr; 	(* sentinel: no overflow has happened *)
-	block := p;
-	Inspect(block);
-	LOOP
-		WHILE markStackHeight # 0 DO
-			DEC(markStackHeight);
-			orgBlock := markStack[markStackHeight];
-			SYSTEM.GET(orgBlock + HeapBlockOffset, orgHeapBlock);
-			IF orgHeapBlock # NIL THEN
-				SYSTEM.GET(orgBlock + TypeDescOffset, staticTypeBlock);
-				IF ~(orgHeapBlock IS ArrayBlock) THEN
-					FOR i := 0 TO LEN(staticTypeBlock.pointerOffsets) - 1 DO
-						SYSTEM.GET(orgBlock + staticTypeBlock.pointerOffsets[i], block);
-						Inspect(block)
-					END
-				ELSE
-					SYSTEM.GET(orgBlock + 2 * AddressSize, currentArrayElemAdr);
-					SYSTEM.GET(orgBlock, lastArrayElemAdr);
-					IF Machine.GreaterThan(currentArrayElemAdr, lastArrayElemAdr) THEN HALT(100) END;
-					WHILE Machine.LessOrEqual(currentArrayElemAdr, lastArrayElemAdr) DO
-						FOR i := 0 TO LEN(staticTypeBlock.pointerOffsets) - 1 DO
-							SYSTEM.GET(currentArrayElemAdr + staticTypeBlock.pointerOffsets[i], block);
-							Inspect(block)
-						END;
-						INC(currentArrayElemAdr, staticTypeBlock.recSize);
-					END
-				END;
-				IF orgHeapBlock IS ProtRecBlock THEN
-					Inspect(orgHeapBlock(ProtRecBlock).awaitingLock.head);
-					(* inspection of orgHeapBlock.awaitingLock.tail implicitly done *)
-					Inspect(orgHeapBlock(ProtRecBlock).awaitingCond.head);
-					(* inspection of orgHeapBlock.awaitingCond.tail implicity done *)
-					Inspect(orgHeapBlock(ProtRecBlock).lockedBy);
-					Inspect(orgHeapBlock(ProtRecBlock).lock)
-				END
-			ELSE
-				(* mark stack entry is of type HeapBlock or extended type - this may happen, do nothing in this case *)
-			END
-		END;
-		IF lowestForgotten = Machine.memBlockTail.endBlockAdr THEN EXIT END;
-		FindForgottenBlock;
-		(* must continue *)
-	END;
-END Mark;
-
-(* mark heap blocks that could not be marked during regular mark phase because of mark stack overflow *)
-PROCEDURE FindForgottenBlock;
-VAR memBlock {UNTRACED}, startMemBlock {UNTRACED}: Machine.MemoryBlock; p {UNTRACED}, heapBlock {UNTRACED}: HeapBlock;
-	staticTypeBlock {UNTRACED}: StaticTypeBlock;
-	blockAdr, currentArrayElemAdr, lastArrayElemAdr, refBlock: ADDRESS;
-	isMarkStackEntry, isOverflow: BOOLEAN; i: LONGINT;
-
-BEGIN
-	isOverflow := FALSE;
-	memBlock := Machine.memBlockHead;
-	WHILE (memBlock # NIL) & ~(Machine.LessOrEqual(memBlock.beginBlockAdr, lowestForgotten) & Machine.LessThan(lowestForgotten, memBlock.endBlockAdr)) DO
-		memBlock := memBlock.next
-	END;
-	startMemBlock := memBlock;
-	WHILE (memBlock # NIL) & ~isOverflow DO
-		IF memBlock = startMemBlock THEN
-			blockAdr := lowestForgotten;
-		ELSE
-			blockAdr := memBlock.beginBlockAdr
-		END;
-		WHILE Machine.LessThan(blockAdr, memBlock.endBlockAdr) & ~isOverflow DO
-			p := SYSTEM.VAL(HeapBlock, blockAdr + BlockHeaderSize);
-			IF (p.mark = currentMarkValue) & ((p IS RecordBlock) OR (p IS ProtRecBlock) OR (p IS ArrayBlock)) THEN (* these blocks have outgoing references *)
-				isMarkStackEntry := FALSE;
-				SYSTEM.GET(p.dataAdr + TypeDescOffset, staticTypeBlock);
-				IF ~(p IS ArrayBlock) THEN
-					i := 0;
-					WHILE ~isMarkStackEntry & (i < LEN(staticTypeBlock.pointerOffsets)) DO
-						SYSTEM.GET(p.dataAdr + staticTypeBlock.pointerOffsets[i], refBlock);
-						IF refBlock # NilVal THEN
-							SYSTEM.GET(refBlock + HeapBlockOffset, heapBlock);
-							IF heapBlock.mark < currentMarkValue THEN
-								isMarkStackEntry := TRUE
-							END
-						END;
-						INC(i)
-					END
-				ELSE
-					SYSTEM.GET(p.dataAdr + 2 * AddressSize, currentArrayElemAdr);  (* first element *)
-					SYSTEM.GET(p.dataAdr, lastArrayElemAdr);
-					WHILE ~isMarkStackEntry & Machine.LessOrEqual(currentArrayElemAdr, lastArrayElemAdr) DO
-						i := 0;
-						WHILE ~isMarkStackEntry & (i < LEN(staticTypeBlock.pointerOffsets)) DO
-							SYSTEM.GET(currentArrayElemAdr + staticTypeBlock.pointerOffsets[i], refBlock);
-							IF refBlock # NilVal THEN
-								SYSTEM.GET(refBlock + HeapBlockOffset, heapBlock);
-								IF heapBlock.mark < currentMarkValue THEN
-									isMarkStackEntry := TRUE
-								END
-							END;
-							INC(i)
-						END;
-						INC(currentArrayElemAdr, staticTypeBlock.recSize)
-					END
-				END;
-				IF ~isMarkStackEntry & (p IS ProtRecBlock) THEN
-					(* check whether awaiting queues are not marked, only queue heads need to be checked, tails will be found as a consequence *)
-					IF p(ProtRecBlock).awaitingLock.head # NIL THEN
-						SYSTEM.GET(SYSTEM.VAL(ADDRESS, p(ProtRecBlock).awaitingLock.head) + HeapBlockOffset, heapBlock);
-						IF heapBlock.mark < currentMarkValue THEN isMarkStackEntry := TRUE END
-					END;
-					IF p(ProtRecBlock).awaitingCond.head # NIL THEN
-						SYSTEM.GET(SYSTEM.VAL(ADDRESS, p(ProtRecBlock).awaitingCond.head) + HeapBlockOffset, heapBlock);
-						IF heapBlock.mark < currentMarkValue THEN isMarkStackEntry := TRUE END
-					END;
-					IF p(ProtRecBlock).lockedBy # NIL THEN
-						SYSTEM.GET(SYSTEM.VAL(ADDRESS, p(ProtRecBlock).lockedBy) + HeapBlockOffset, heapBlock);
-						IF heapBlock.mark < currentMarkValue THEN isMarkStackEntry := TRUE END
-					END;
-				END;
-
-				IF isMarkStackEntry THEN (* forgotten block *)
-					IF markStackHeight # MarkStackSize THEN
-						markStack[markStackHeight] := p.dataAdr;
-						INC(markStackHeight)
-					ELSE
-						isOverflow := TRUE;
-						lowestForgotten := blockAdr;
-					END
-				END
-			END;
-			blockAdr := blockAdr + p.size;
-		END;
-		memBlock := memBlock.next;
-	END;
-	IF ~isOverflow THEN
-		lowestForgotten := Machine.memBlockTail.endBlockAdr
-	END
-END FindForgottenBlock;
-
-PROCEDURE MarkRealtimeObjects;
-VAR heapBlock {UNTRACED}: HeapBlock;
-BEGIN
-	heapBlock := realtimeList;
-	WHILE heapBlock # NIL DO
-		Mark(SYSTEM.VAL(ANY, heapBlock.dataAdr));
-		heapBlock := heapBlock.nextRealtime;
-	END;
-END MarkRealtimeObjects;
+PROCEDURE Mark* EXTERN "GarbageCollector.Mark" (p: ANY);
 
 (** WriteType - Write a type name (for tracing only). *)
 PROCEDURE WriteType*(t: ADDRESS);	(* t is static type descriptor *)
@@ -412,417 +176,9 @@ BEGIN
 	END
 END WriteType;
 
-(** free list handling **)
-PROCEDURE ClearFreeLists;
-VAR i: LONGINT;
-BEGIN
-	FOR i := 0 TO MaxFreeLists DO
-		freeLists[i].first := NIL;
-		freeLists[i].last := NIL
-	END;
-END ClearFreeLists;
-
-(* insert element in fifo, first = freeList.first; last = freeList.last *)
-PROCEDURE AppendFree(VAR freeList: FreeList; block: FreeBlock);
-BEGIN
-	ASSERT(block.size >= freeList.minSize);
-	IF freeList.first = NIL THEN
-		freeList.first := block; freeList.last := block
-	ELSE
-		freeList.last.next := block;
-		freeList.last := block;
-	END;
-	block.next := NIL
-END AppendFree;
-
-(* get last element from fifo *)
-PROCEDURE GetFree(VAR freeList: FreeList): FreeBlock;
-VAR block: FreeBlock;
-BEGIN
-	IF freeList.first = NIL THEN block := NIL;
-	ELSIF freeList.first = freeList.last THEN block := freeList.first; freeList.first := NIL; freeList.last := NIL
-	ELSE block := freeList.first; freeList.first := block.next; block.next := NIL
-	END;
-	RETURN block
-END GetFree;
-
-(** insert sorted into queue, no handling of last queue element *)
-PROCEDURE InsertSorted(VAR freeList: FreeList; block: FreeBlock);
-VAR x: FreeBlock;
-BEGIN
-	(* keep them ordered to avoid unnecessary splits *)
-	(* this optimization has positive impact on heap utilization
-	    130 MB vs. 240 MB heap for compiling and linking a new system
-	    but it slows down heap allocation speed. 	*)
-	x := freeList.first;
-	WHILE x # NIL DO
-		ASSERT(x # block);
-		x := x.next;
-	END;
-
-	x := freeList.first;
-
-	IF (x = NIL) OR (block.size <= x.size) THEN
-		block.next := x;
-		freeList.first := block;
-	ELSE
-		WHILE (x.next # NIL) & (block.size > x.next.size) DO  x := x.next  END;
-		block.next := x.next;
-		x.next := block;
-	END;
-END InsertSorted;
-
-PROCEDURE AppendFreeBlock(block: FreeBlock);
-VAR i: LONGINT;
-BEGIN
-	i := MaxFreeLists;
-	WHILE (i > 0) & (freeLists[i].minSize > block.size)  DO  DEC( i )  END;
-
-	IF i < FreeListBarrier THEN
-		AppendFree(freeLists[i], block);
-	ELSE
-		InsertSorted(freeLists[i], block);
-	END;
-END AppendFreeBlock;
-
-PROCEDURE FindFreeBlock( size: SIZE ): FreeBlock;
-VAR prev, block: FreeBlock;  i: LONGINT;
-BEGIN
-	i := MaxFreeLists;
-	WHILE (i > 0) & (freeLists[i].minSize > size)  DO  DEC( i )  END;
-
-	REPEAT
-		IF i < FreeListBarrier THEN
-			block := GetFree(freeLists[i]);
-		ELSE
-			block := freeLists[i].first;
-			WHILE (block # NIL) & (block.size < size) DO
-				prev := block;
-				block := block.next;
-			END;
-
-			IF block # NIL THEN (* block.size >= size *)
-				IF prev = NIL THEN freeLists[i].first := block.next
-				ELSE prev.next := block.next
-				END;
-				block.next := NIL;
-			END;
-
-			prev := freeLists[i].first;
-			WHILE prev # NIL DO
-				ASSERT(prev # block);
-				prev := prev.next;
-			END;
-
-		END;
-		INC( i )
-	UNTIL (block # NIL) OR (i > MaxFreeLists);
-	RETURN block
-END FindFreeBlock;
-
-PROCEDURE GetFreeBlockAndSplit(size: SIZE): FreeBlock;
-VAR p,remainder: FreeBlock;
-BEGIN
-	p := FindFreeBlock(size);
-	IF (p # NIL) & Machine.GreaterThan(p.size, size) THEN (* block too big - divide block into two parts: block with required size and remaining free block *)
-		ASSERT(Machine.GreaterOrEqual(p.size - size, BlockHeaderSize + SIZEOF(FreeBlockDesc)));
-		remainder := SYSTEM.VAL(FreeBlock, SYSTEM.VAL(ADDRESS, p) + size);
-		InitFreeBlock(remainder, Unmarked, NilVal, p.size - size);
-		AppendFreeBlock(remainder);
-		p.size := size;
-	END;
-	IF p # NIL THEN INC(freeBlockFound) ELSE INC(freeBlockNotFound) END;
-	RETURN p
-END GetFreeBlockAndSplit;
-
-PROCEDURE GetFreeBlock(size: SIZE; VAR p: FreeBlock);
-BEGIN
-	IF EnableFreeLists THEN
-		IF sweepMarkValue < currentMarkValue THEN
-			(*Trace.String("clear free lists and lazy sweep"); Trace.Ln;*)
-			ClearFreeLists;
-			LazySweep(MAX(LONGINT), p)
-		END;
-		p := GetFreeBlockAndSplit(size)
-	ELSE
-		LazySweep(size, p)
-	END;
-END GetFreeBlock;
-
-(* Sweep phase *)
-PROCEDURE LazySweep(size: SIZE; VAR p: FreeBlock);
-VAR lastFreeBlockAdr: ADDRESS; found : BOOLEAN;
-	block: HeapBlock; freeBlock, lastFreeBlock: FreeBlock; blockMark: LONGINT; blockSize: SIZE;
-BEGIN
-	found := FALSE;
-	lastFreeBlockAdr := NilVal;
-	lastFreeBlock := NIL;
-	IF (sweepMemBlock = NIL) OR (sweepMarkValue < currentMarkValue) THEN (* restart lazy sweep including clearance of lists *)
-		(* note that the order of the blocks does not necessarily represent the historical order of insertion
-			as they are potentially provided by the underlying host system in with non-increasing address ranges
-			blocks are sorted by Machine.Mod in an increased address range order
-		*)
-		sweepMemBlock := Machine.memBlockHead;
-		sweepBlockAdr := Machine.memBlockHead.beginBlockAdr;
-		sweepMarkValue := currentMarkValue;
-	END;
-	WHILE ~found & (sweepMemBlock # NIL) DO
-		WHILE ~found & Machine.LessThan(sweepBlockAdr, sweepMemBlock.endBlockAdr) DO
-			block := SYSTEM.VAL(HeapBlock, sweepBlockAdr + BlockHeaderSize); (* get heap block *)
-			blockMark := block.mark; (* cache these values since they may be overwritten during concatenation *)
-			blockSize := block.size;
-			IF (block.mark < sweepMarkValue) THEN
-				IF (block IS SystemBlock) OR (block IS RecordBlock) OR (block IS ProtRecBlock) OR (block IS ArrayBlock) THEN
-					freeBlock := SYSTEM.VAL(FreeBlock, block);
-					InitFreeBlock(freeBlock, Unmarked, NilVal, block.size); (* convert this block into a free heap block and clear its data *)
-					Machine.Fill32(sweepBlockAdr + BlockHeaderSize + SIZEOF(FreeBlockDesc), freeBlock.size - BlockHeaderSize - SIZEOF(FreeBlockDesc), DebugValue);
-				ELSE
-					ASSERT(block IS FreeBlock);
-					freeBlock := block(FreeBlock); (* free block has data cleared by definition *)
-				END;
-				IF lastFreeBlockAdr = NilVal THEN
-					lastFreeBlockAdr := sweepBlockAdr;
-					lastFreeBlock := freeBlock;
-				ELSIF lastFreeBlockAdr + lastFreeBlock.size = sweepBlockAdr THEN
-					(* there are two contiguous free blocks - merge them *)
-					lastFreeBlock.size := lastFreeBlock.size + block.size;
-					(* clear header fields of concatenated block *)
-					Machine.Fill32(sweepBlockAdr, BlockHeaderSize + SIZEOF(FreeBlockDesc), DebugValue);
-				END
-			END;
-			IF (blockMark >= sweepMarkValue) OR (sweepBlockAdr + blockSize = sweepMemBlock.endBlockAdr) THEN (* no further merging is possible *)
-				IF lastFreeBlockAdr # NilVal THEN
-					IF Machine.GreaterOrEqual(lastFreeBlock.size, size) THEN (* block found - may be too big *)
-						p := lastFreeBlock;
-						IF Machine.GreaterThan(p.size, size) THEN (* block too big - divide block into two parts: block with required size and remaining free block *)
-							ASSERT(Machine.GreaterOrEqual(p.size - size, BlockHeaderSize + SIZEOF(FreeBlockDesc)));
-							freeBlock := SYSTEM.VAL(FreeBlock, SYSTEM.VAL(ADDRESS, p) + size);
-							InitFreeBlock(freeBlock, Unmarked, NilVal, p.size - size);
-							p.size := size
-						END;
-						found := TRUE;
-						sweepBlockAdr := lastFreeBlockAdr + size (* make sure next lazy sweep continues after block p *)
-					ELSIF EnableFreeLists THEN AppendFreeBlock(lastFreeBlock);
-					END;
-					lastFreeBlockAdr := NilVal;
-					lastFreeBlock := NIL;
-				END
-			END;
-			IF ~found THEN sweepBlockAdr := sweepBlockAdr + blockSize END
-		END;
-		IF ~found THEN
-			sweepMemBlock := sweepMemBlock.next;
-			IF sweepMemBlock # NIL THEN
-				sweepBlockAdr := sweepMemBlock.beginBlockAdr
-			ELSE
-				sweepBlockAdr := NilVal
-			END
-		END
-	END;
-END LazySweep;
-
-PROCEDURE CheckHeap;
-VAR memBlock {UNTRACED}: Machine.MemoryBlock; p, refBlock, currentArrayElemAdr, lastArrayElemAdr: ADDRESS;
-	heapBlock {UNTRACED}: HeapBlock; staticTypeBlock {UNTRACED}: StaticTypeBlock; i: LONGINT;
-
-	PROCEDURE CheckBlock(block: ADDRESS): BOOLEAN;
-	VAR heapBlockAdr: ADDRESS;
-	BEGIN
-		IF block = NilVal THEN
-			RETURN TRUE
-		ELSE
-			IF Machine.GreaterOrEqual(block, Machine.memBlockHead.beginBlockAdr) & Machine.LessThan(block, Machine.memBlockTail.endBlockAdr) THEN
-				SYSTEM.GET(block + HeapBlockOffset, heapBlockAdr);
-				IF Machine.GreaterOrEqual(heapBlockAdr, Machine.memBlockHead.beginBlockAdr) & Machine.LessThan(heapBlockAdr, Machine.memBlockTail.endBlockAdr) THEN
-					RETURN TRUE
-				ELSE
-					RETURN FALSE
-				END
-			ELSE
-				RETURN FALSE
-			END
-		END
-	END CheckBlock;
-
-BEGIN
-	memBlock := Machine.memBlockHead;
-	WHILE memBlock # NIL DO
-		p := memBlock.beginBlockAdr;
-		WHILE Machine.LessThan(p, memBlock.endBlockAdr) DO
-			heapBlock := SYSTEM.VAL(HeapBlock, p + BlockHeaderSize);
-			IF heapBlock IS SystemBlock THEN
-			ELSIF heapBlock IS RecordBlock THEN
-				IF heapBlock.dataAdr # NilVal THEN
-					SYSTEM.GET(heapBlock.dataAdr + TypeDescOffset, staticTypeBlock); ASSERT(staticTypeBlock # NIL);
-					FOR i := 0 TO LEN(staticTypeBlock.pointerOffsets) - 1 DO
-						SYSTEM.GET(heapBlock.dataAdr + staticTypeBlock.pointerOffsets[i], refBlock);
-						IF ~CheckBlock(refBlock) THEN
-							Trace.String("SEVERE ERROR: RecordBlock = "); Trace.Hex(heapBlock.dataAdr, 8);
-							Trace.String(" invalid reference at pointer offset = "); Trace.Hex(staticTypeBlock.pointerOffsets[i], 0); Trace.Ln
-						END
-					END;
-					IF heapBlock IS ProtRecBlock THEN
-						IF CheckBlock(heapBlock(ProtRecBlock).awaitingLock.head) &
-							CheckBlock(heapBlock(ProtRecBlock).awaitingLock.tail) &
-							CheckBlock(heapBlock(ProtRecBlock).awaitingCond.head) &
-							CheckBlock(heapBlock(ProtRecBlock).awaitingCond.tail) &
-							CheckBlock(heapBlock(ProtRecBlock).lockedBy) THEN
-						ELSE
-							Trace.String("SEVERE ERROR in awaiting queues of block = "); Trace.Hex(heapBlock.dataAdr, 8); Trace.Ln
-						END
-					END
-				ELSE
-					Trace.StringLn("SEVERE ERROR: heapBlock.dataAdr = NilVal for RecordBlock or ProtRecBlock")
-				END;
-			ELSIF heapBlock IS ArrayBlock THEN
-				IF heapBlock.dataAdr # NilVal THEN
-					SYSTEM.GET(heapBlock.dataAdr + TypeDescOffset, staticTypeBlock); ASSERT(staticTypeBlock # NIL);
-					SYSTEM.GET(heapBlock.dataAdr + 2 * AddressSize, currentArrayElemAdr);
-					SYSTEM.GET(heapBlock.dataAdr, lastArrayElemAdr);
-					WHILE Machine.LessOrEqual(currentArrayElemAdr, lastArrayElemAdr) DO
-						FOR i := 0 TO LEN(staticTypeBlock.pointerOffsets) - 1 DO
-							SYSTEM.GET(currentArrayElemAdr + staticTypeBlock.pointerOffsets[i], refBlock);
-							IF ~CheckBlock(refBlock) THEN
-								Trace.String("SEVERE ERROR in ArrayBlock = "); Trace.Hex(currentArrayElemAdr, 8);
-								Trace.String(" invalid reference at pointer offset = "); Trace.Hex(staticTypeBlock.pointerOffsets[i], 0); Trace.Ln
-							END
-						END;
-					 	INC(currentArrayElemAdr, staticTypeBlock.recSize)
-					 END
-				ELSE
-					Trace.StringLn("SEVERE ERROR: heapBlock.dataAdr = NilVal for ArrayBlock")
-				END
-			ELSIF heapBlock IS FreeBlock THEN
-			ELSE
-				Trace.StringLn("Invalid heap block type")
-			END;
-			p := p + heapBlock.size;
-		END;
-		memBlock := memBlock.next
-	END
-END CheckHeap;
-
 (* CheckCandidates - Check which candidates could be pointers, and mark them. (exported for debugging only) *)
 PROCEDURE CheckCandidates*;
-CONST MinDataOffset = BlockHeaderSize + SIZEOF(HeapBlockDesc) + BlockHeaderSize; (* minimal offset of data address with respect to block start address *)
-VAR i, j, h: LONGINT; p, blockStart, tdAdr: ADDRESS; memBlock {UNTRACED}: Machine.MemoryBlock;
-	heapBlock {UNTRACED}: HeapBlock;
-BEGIN
-	(* {numCandidates > 0} *)
-	(* first sort them in increasing order using shellsort *)
-	h := 1;  REPEAT h := h*3 + 1 UNTIL h > numCandidates;
-	REPEAT
-		h := h DIV 3;  i := h;
-		WHILE i < numCandidates DO
-			p := candidates[i];  j := i;
-			WHILE (j >= h) & Machine.GreaterThan(candidates[j-h], p) DO
-				candidates[j] := candidates[j-h];  j := j-h;
-			END;
-			candidates[j] := p;  INC(i)
-		END
-	UNTIL h = 1;
-
-	(* sweep phase *)
-	i := 0;
-	p := candidates[i];
-	memBlock := Machine.memBlockHead;
-	WHILE memBlock # NIL DO
-		blockStart := memBlock.beginBlockAdr;
-		WHILE (i < numCandidates) & Machine.LessThan(blockStart, memBlock.endBlockAdr) DO
-			IF Machine.LessThan(p, blockStart + MinDataOffset) THEN (* candidate missed *)
-				INC(i);
-				IF i < numCandidates THEN
-					p := candidates[i]
-				END
-			ELSE
-				heapBlock := SYSTEM.VAL(HeapBlock, blockStart + BlockHeaderSize);
-				SYSTEM.GET(blockStart + BlockHeaderSize + TypeDescOffset, tdAdr);	(* type descriptor address of heapBlock *)
-				IF ~(tdAdr = freeBlockTag) & (p = heapBlock.dataAdr) THEN (* heap block must not be a free block but any other heap block type *)
-					Mark(SYSTEM.VAL(ANY, p))
-				END;
-				blockStart := blockStart + heapBlock.size;
-			END
-		END;
-		memBlock := memBlock.next
-	END;
-	numCandidates := 0
 END CheckCandidates;
-
-(* Check validity of single pointer candidate *)
-PROCEDURE Candidate*(p: ADDRESS);
-VAR memBlock {UNTRACED}: Machine.MemoryBlock; heapBlockAdr, tdAdr: ADDRESS;
-BEGIN
-	IF Machine.GreaterOrEqual(p, Machine.memBlockHead.beginBlockAdr) & Machine.LessThan(p, Machine.memBlockTail.endBlockAdr) THEN
-		memBlock := Machine.memBlockHead;
-		WHILE memBlock # NIL DO
-			IF Machine.GreaterOrEqual(p + HeapBlockOffset, memBlock.beginBlockAdr) & Machine.LessThan(p + HeapBlockOffset, memBlock.endBlockAdr) THEN
-				SYSTEM.GET(p + HeapBlockOffset, heapBlockAdr);
-				IF Machine.GreaterOrEqual(heapBlockAdr + TypeDescOffset, memBlock.beginBlockAdr) & Machine.LessThan(heapBlockAdr + TypeDescOffset, memBlock.endBlockAdr) THEN
-					SYSTEM.GET(heapBlockAdr + TypeDescOffset, tdAdr);
-					(* check whether tdAdr is a valid type descriptor address *)
-					IF (tdAdr = systemBlockTag) OR (tdAdr = recordBlockTag) OR (tdAdr = protRecBlockTag) OR (tdAdr = arrayBlockTag) THEN
-						candidates[numCandidates] := p;
-						INC(numCandidates);
-						IF numCandidates = LEN(candidates) THEN CheckCandidates END
-					END
-				END
-			END;
-			memBlock := memBlock.next
-		END
-	END
-END Candidate;
-
-(** RegisterCandidates - Register a block of pointer candidates *)
-PROCEDURE RegisterCandidates*(adr: ADDRESS; size: SIZE);
-VAR end, p: ADDRESS;
-BEGIN
-	(* current processor must hold Heaps lock *)
-	end := adr + size;
-	WHILE adr # end DO
-		SYSTEM.GET(adr, p);
-		Candidate(p);
-		INC(adr, AddressSize)
-	END
-END RegisterCandidates;
-
-(* Check reachability of finalized objects. *)
-PROCEDURE CheckFinalizedObjects;
-VAR n, p, t: FinalizerNode; heapBlock {UNTRACED}: HeapBlock;
-
-	PROCEDURE MarkDelegate(p: Finalizer);
-	VAR pointer: ANY;
-	BEGIN
-		SYSTEM.GET(ADDRESSOF(p)+SIZEOF(ADDRESS),pointer);
-		IF pointer # NIL THEN Mark(pointer) END;
-	END MarkDelegate;
-
-BEGIN
-	n := checkRoot;
-	WHILE n # NIL DO	(* move unmarked checked objects to finalize list *)
-		SYSTEM.GET(SYSTEM.VAL(ADDRESS, n.objWeak) + HeapBlockOffset, heapBlock);
-		IF heapBlock.mark < currentMarkValue THEN
-			IF n = checkRoot THEN checkRoot := n.nextFin ELSE p.nextFin := n.nextFin END;
-			n.objStrong := n.objWeak;	(* anchor the object for finalization *)
-			n.finalizerStrong := n.finalizer; (* anchor the finalizer for finalization *)
-			t := n.nextFin; n.nextFin := finalizeRoot; finalizeRoot := n; n := t;
-			IF Stats THEN DEC(NfinalizeAlive); INC(NfinalizeDead) END
-		ELSE
-			p := n; n := n.nextFin
-		END
-	END;
-	(* now trace the weak references to keep finalized objects alive during this collection *)
-	n := finalizeRoot;
-	WHILE n # NIL DO
-		MarkDelegate(n.finalizerStrong);
-		Mark(n.objStrong); n := n.nextFin
-	END;
-
-	n := checkRoot;
-	WHILE n # NIL DO (* list of objects that had been marked before entering CheckFinalizedObjects *)
-		(* we still have to mark the weak finalizers, as they might have not been marked before  *)
-		MarkDelegate(n.finalizer); n := n.nextFin
-	END;
-END CheckFinalizedObjects;
 
 (** Return the next scheduled finalizer or NIL if none available. Called by finalizer object in Kernel. *)
 PROCEDURE GetFinalizer* (): FinalizerNode;
@@ -880,133 +236,12 @@ BEGIN
 	END
 END CleanupModuleFinalizers;
 
-(* Add a root object to the set of traversable objects. If in allocated heap then mark and traverse, if in Module Heap (Bootfile) then only traverse. *)
-PROCEDURE AddRootObject*(rootObject: RootObject);
-BEGIN
-	IF rootObject = NIL THEN (* nothing *)
-	ELSIF CheckPointer(rootObject) THEN
-		(* object in heap, must be fully marked and traversed *)
-		Mark(rootObject)
-	ELSE
-		(* object in bootfile, traverse as root object only *)
-		rootObject.nextRoot := rootList; rootList := rootObject;	(* link root list *)
-	END;
-END AddRootObject;
-
-(* interruptible garbage collector for native A2 *)
-PROCEDURE CollectGarbage*(root : RootObject);
-VAR
-	obj: RootObject;
-	time1, time2: HUGEINT;
-	f: FreeBlock;
-BEGIN
-	 (* do never use any low level locks as the garbage collector process has a very high priority and may thus be blocked by lower level processes -> potential deadlock *)
-	(*!
-	Do not use windows functionality such as  trace here in general -- can lead to deadlock when stopped processes are in writing to a file
-	*)
-	(* GC may run only if and only if sweep phase has been completed *)
-	IF (sweepMemBlock = NIL) & (sweepMarkValue = currentMarkValue) THEN
-		IF Stats THEN
-			Nmark := 0; Nmarked := 0;
-			INC(Ngc);
-			time1 := Machine.GetTimer ();
-		END;
-		numCandidates := 0;
-		rootList := NIL;
-		INC(currentMarkValue);
-		AddRootObject(root);
-
-		IF GCType = HeuristicStackInspectionGC THEN
-
-			REPEAT
-				REPEAT
-					IF rootList # NIL THEN	(* check root objects *)
-						REPEAT
-							obj := rootList;					(* get head object *)
-							rootList := rootList.nextRoot;		(* link to next *)
-							obj.FindRoots; (* Mark called via AddRootObject, but not for objects in static heap *)
-						UNTIL rootList = NIL
-					END;
-					IF numCandidates # 0 THEN CheckCandidates END
-				UNTIL (numCandidates = 0) & (rootList = NIL);
-				MarkRealtimeObjects;
-				CheckFinalizedObjects;
-			UNTIL rootList = NIL;
-
-		ELSIF GCType = MetaDataForStackGC THEN
-
-			REPEAT
-				IF rootList # NIL THEN	(* check root objects *)
-					REPEAT
-						obj := rootList;					(* get head object *)
-						rootList := rootList.nextRoot;		(* link to next *)
-						obj.FindRoots; (* Mark called via AddRootObject, but not for objects in static heap *)
-					UNTIL rootList = NIL
-				END;
-				MarkRealtimeObjects;
-				CheckFinalizedObjects
-			UNTIL rootList = NIL;
-
-		ELSE
-			HALT(901)	(* wrong GCType constant *)
-		END;
-
-		IF Stats THEN
-			time2 := Machine.GetTimer ();
-			NgcCyclesLastRun := time2 - time1;
-			IF NgcCyclesLastRun > NgcCyclesMax THEN NgcCyclesMax := NgcCyclesLastRun; END;
-			INC(NgcCyclesAllRuns, NgcCyclesLastRun);
-			NgcCyclesMark := NgcCyclesLastRun
-		END;
-
-	END;
-
-	IF EnableFreeLists THEN GetFreeBlock(MAX(LONGINT), f) END;
-
-END CollectGarbage;
-
-PROCEDURE InvokeGC*;
-BEGIN
-	ASSERT(gcStatus # NIL);
-	gcStatus.SetgcOngoing(TRUE);
-END InvokeGC;
-
-PROCEDURE ReturnBlocks;
-VAR memBlock {UNTRACED}, free{UNTRACED}: Machine.MemoryBlock; p: ADDRESS; heapBlock {UNTRACED}: HeapBlock; f: FreeBlock;
-BEGIN
-	GetFreeBlock(MAX(LONGINT), f); (* merge all empty blocks, if necessary *)
-	memBlock := Machine.memBlockHead;
-	WHILE memBlock # NIL DO
-		free := NIL;
-		p := memBlock.beginBlockAdr;
-		heapBlock := SYSTEM.VAL(HeapBlock, p + BlockHeaderSize);
-		IF (heapBlock IS FreeBlock)  & (p + heapBlock.size = memBlock.endBlockAdr)  THEN
-			free := memBlock;
-		END;
-		memBlock := memBlock.next;
-		IF free # NIL THEN
-			Machine.FreeMemBlock(free)
-		END;
-	END;
-	sweepMemBlock := NIL; (* restart LazySweep  *)
-	ClearFreeLists;
-END ReturnBlocks;
+PROCEDURE InvokeGC* EXTERN "GarbageCollector.Collect";
 
 PROCEDURE LazySweepGC*;
 VAR p {UNTRACED}: FreeBlock;
 BEGIN
-	(* make sure that lazy sweep phase is finished before invoking a new mark phase *)
-	Machine.Acquire(Machine.Heaps);
-	(* trying to satisfy a request of MAX(LONGINT) bytes will never succeed - lazy sweep runs until end of heap *)
-	GetFreeBlock(MAX(LONGINT), p);
-	Machine.Release(Machine.Heaps);
-	(* invoke mark phase, mark phase starts at next scheduler interrupt *)
 	GC;
-	(* return blocks now *)
-	Machine.Acquire(Machine.Heaps);
-	(* trying to satisfy a request of MAX(LONGINT) bytes will never succeed - lazy sweep runs until end of heap *)
-	ReturnBlocks;
-	Machine.Release(Machine.Heaps);
 END LazySweepGC;
 
 (* initialize a free heap block *)
@@ -1045,7 +280,6 @@ BEGIN
 		SYSTEM.PUT(dataBlockAdr + TypeDescOffset, NilVal);		(* no type descriptor *)
 		SYSTEM.PUT(dataBlockAdr + HeapBlockOffset, systemBlockAdr);
 		systemBlock := SYSTEM.VAL(SystemBlock, systemBlockAdr);
-		systemBlock.mark := currentMarkValue;
 		systemBlock.dataAdr := dataBlockAdr;
 		systemBlock.size := blockSize;
 		IF isRealtime THEN
@@ -1100,7 +334,6 @@ BEGIN
 			SYSTEM.PUT(dataBlockAdr + HeapBlockOffset, recordBlockAdr);
 			recordBlock := SYSTEM.VAL(RecordBlock, recordBlockAdr);
 			(* recordBlock.next and recordBlock.prev already set to NIL by NewBlock *)
-			recordBlock.mark := currentMarkValue;
 			recordBlock.dataAdr := dataBlockAdr;
 			recordBlock.size := blockSize;
 			IF isRealtime THEN
@@ -1139,7 +372,6 @@ BEGIN
 		SYSTEM.PUT(dataBlockAdr + TypeDescOffset, tag);
 		SYSTEM.PUT(dataBlockAdr + HeapBlockOffset, protRecBlockAdr);
 		protRecBlock := SYSTEM.VAL(ProtRecBlock, protRecBlockAdr);
-		protRecBlock.mark := currentMarkValue;
 		protRecBlock.dataAdr := dataBlockAdr;
 		protRecBlock.size := blockSize;
 		IF isRealtime THEN
@@ -1206,7 +438,6 @@ BEGIN
 				SYSTEM.PUT(dataBlockAdr + TypeDescOffset, elemTag);
 				SYSTEM.PUT(dataBlockAdr + HeapBlockOffset, arrayBlockAdr);
 				arrayBlock := SYSTEM.VAL(ArrayBlock, arrayBlockAdr);
-				arrayBlock.mark := currentMarkValue;
 				arrayBlock.dataAdr := dataBlockAdr;
 				arrayBlock.size := blockSize;
 				IF isRealtime THEN
@@ -1274,38 +505,16 @@ END AddFinalizer;
 
 (** Compute total heap size, free space and largest free block size in bytes. This is a slow operation. *)
 PROCEDURE GetHeapInfo*(VAR total, free, largest: SIZE);
-VAR memBlock {UNTRACED}: Machine.MemoryBlock; blockAdr: ADDRESS;
-	block {UNTRACED}: HeapBlock;
 BEGIN
 	Machine.Acquire(Machine.Heaps);
-	memBlock := Machine.memBlockHead;
 	total := 0; free := 0; largest := 0;
-	WHILE memBlock # NIL DO
-		total := total + memBlock.endBlockAdr - memBlock.beginBlockAdr;
-		blockAdr := memBlock.beginBlockAdr;
-		WHILE Machine.LessThan(blockAdr, memBlock.endBlockAdr) DO
-			block := SYSTEM.VAL(HeapBlock, blockAdr + BlockHeaderSize); (* get heap block *)
-			IF (block.mark < currentMarkValue) THEN (* free/unused block encountered *)
-				free := free + block.size;
-				IF Machine.GreaterThan(block.size, largest) THEN largest := block.size END
-			END;
-			blockAdr := blockAdr + block.size;
-		END;
-		memBlock := memBlock.next
-	END;
 	Machine.Release(Machine.Heaps)
 END GetHeapInfo;
-
-(* NilGC - Default garbage collector. *)
-PROCEDURE NilGC;
-BEGIN
-	HALT(301)	(* garbage collector not available yet *)
-END NilGC;
 
 (* Init - Initialize the heap. *)
 PROCEDURE Init;
 VAR beginBlockAdr, endBlockAdr, freeBlockAdr, p: ADDRESS;
-	heapBlock {UNTRACED}: HeapBlock; freeBlock {UNTRACED}: FreeBlock; memBlock {UNTRACED}: Machine.MemoryBlock;
+	heapBlock {UNTRACED}: HeapBlock; freeBlock {UNTRACED}: FreeBlock;
 	s: ARRAY 32 OF CHAR; minSize,i: LONGINT;
 BEGIN
 	Machine.GetConfig("EnableFreeLists", s);
@@ -1323,10 +532,8 @@ BEGIN
 		IF i < FreeListBarrier THEN  INC( minSize, BlockSize )  ELSE  minSize := 2 * minSize  END
 	END;
 
-	GC := NilGC;
 	newSum := 0;
 	checkRoot := NIL; finalizeRoot := NIL; rootList := NIL; realtimeList := NIL;
-	gcStatus := NIL;
 
 	Machine.SetGCParams;
 	Machine.GetStaticHeap(beginBlockAdr, endBlockAdr, freeBlockAdr);
@@ -1345,28 +552,6 @@ BEGIN
 		initBlock := SYSTEM.VAL(ANY, heapBlock.dataAdr);
 		p := p + heapBlock.size;
 		heapBlock := SYSTEM.VAL(HeapBlock, p + BlockHeaderSize)
-	END;
-
-	ASSERT(p = freeBlockAdr);
-	IF Machine.GreaterThan(endBlockAdr - freeBlockAdr, 0) THEN
-		(* initialization of free heap block done here since boot file is only written up to freeBlockAdr *)
-		freeBlock := SYSTEM.VAL(FreeBlock, freeBlockAdr + BlockHeaderSize);
-		InitFreeBlock(freeBlock, Unmarked, NilVal, endBlockAdr - freeBlockAdr);
-		IF EnableFreeLists THEN AppendFreeBlock(freeBlock) END;
-		ASSERT(freeBlock.size MOD BlockSize  =  0)
-	END;
-
-	currentMarkValue := 1;
-	(* extend the heap for one block such that module initialization can continue as long as Heaps.GC is not set validly *)
-	Machine.ExpandHeap(1, 1, memBlock, beginBlockAdr, endBlockAdr);	(* try = 1, size = 1 -> the minimal heap block expansion is performed *)
-	IF Machine.GreaterThan(endBlockAdr, beginBlockAdr) THEN
-		freeBlock := SYSTEM.VAL(FreeBlock, beginBlockAdr + BlockHeaderSize);
-		InitFreeBlock(freeBlock, Unmarked, NilVal, endBlockAdr - beginBlockAdr);
-		Machine.SetMemoryBlockEndAddress(memBlock, endBlockAdr);
-		IF EnableFreeLists THEN AppendFreeBlock(freeBlock) END;
-		sweepMarkValue := currentMarkValue;
-		sweepMemBlock := memBlock;
-		sweepBlockAdr := beginBlockAdr
 	END;
 
 END Init;

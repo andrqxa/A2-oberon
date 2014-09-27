@@ -36,11 +36,6 @@ CONST
 	halt* = 2222;
 	haltUnbreakable* = 2223;
 
-	(* constant used in GC Process.FindPointers *)
-	InitDiff = MAX(LONGINT);
-
-	AddressSize = SIZEOF (ADDRESS);
-
 TYPE
 	CpuCyclesArray* = ARRAY Machine.MaxCPU OF HUGEINT;
 
@@ -160,263 +155,11 @@ TYPE
 		*)
 		lastThreadTimes: HUGEINT;   (*ALEX 2005.12.12*)
 
-		PROCEDURE FindRoots;   (* override, called while GC, replaces Threads.CheckStacks *)
-		VAR sp: LONGINT; res: Kernel32.BOOL; pc, bp, curbp: ADDRESS;
-			d0, d1: SIZE; first : BOOLEAN;
-		BEGIN
-		(*ALEX 2005.12.13 senseless ASSERT that blocks for AWAITING THREADS that were closed*)
-
-			IF (handle = 0) OR (mode = Terminated) OR (mode < Ready) (* procedure Wrapper not yet started *)
-			OR (priority > High) (* stack of GC and realtime processes not traced *) THEN
-				RETURN
-			END;
-			(*
-			ASSERT( SYSTEM.VAL( Process, Kernel32.TlsGetValue( tlsIndex ) ) # SELF); (* should not trace gc process *)
-			*)
-
-			state.ContextFlags := Kernel32.ContextControl + Kernel32.ContextInteger;
-			res := Kernel32.GetThreadContext( handle, state );
-
-			ASSERT ( res # 0, 1004 );
-			sp := state.SP;  bp := state.BP; pc := state.PC;
-
-			(* stack garbage collection *)
-
-			IF Heaps.GCType= Heaps.HeuristicStackInspectionGC THEN
-				Heaps.Candidate( state.EDI );  Heaps.Candidate( state.ESI );
-				Heaps.Candidate( state.EBX ); Heaps.Candidate( state.EDX );
-				Heaps.Candidate( state.ECX ); Heaps.Candidate( state.EAX );
-				IF (stackBottom # 0) & (sp # 0) THEN
-					Heaps.RegisterCandidates( sp, stackBottom - sp );
-				END;
-			ELSIF Heaps.GCType = Heaps.MetaDataForStackGC THEN
-				first := TRUE; curbp := bp;
-				WHILE (bp # Heaps.NilVal) & (sp <= bp) & (bp < stackBottom)  DO
-					FindPointers(bp, pc, d0, d1);
- 					IF first THEN
- 						ASSERT(d0#2);
- 						ASSERT(d1 # 1);
- 						IF (d0 = 0) OR (d0 = 1) OR (d1 = 3)  THEN
- 							(* 	situation where pc and bp are not synchronized: *)
- 							(* 	entry protocol of a procedure:
- 								PUSH 	EBP			-- 1 byte instruction length, if pc points to this instruction at offset 0 from the codeoffset then bp still refers to caller frame -> critical
- 								MOV	EBP, ESP	-- 2 bytes instruction length, do. for offset 1 from the codeoffset
- 								(followed by initialization of local variables)
- 								exit protocol of a procedure:
- 								MOV	ESP, EBP	-- 2 bytes instruction length
- 								POP	EBP			-- 1 byte instruction length
- 								RET		n			-- 3 bytes instruction length, if pc points to this instruction at offset 3 from the last statement then bp already refers to caller's frame -> critical
- 							*)
- 							IF (d0 = 0) OR (d1 = 3) THEN
- 								SYSTEM.GET(state.SP, pc);		(* matching pc is at position of stack pointer *)
- 							ELSE
- 								SYSTEM.GET(state.SP + AddressSize, pc);		(* matching pc is at 4 bytes after stack pointer, pushed base pointer is at stack pointer position *)
-							END;
- 						ELSE
- 							(* regular case: bp and pc were synchronized *)
- 							curbp := bp;
-							SYSTEM.GET(curbp + AddressSize, pc);
-							SYSTEM.GET(curbp, bp);
- 						END;
- 						first := FALSE;
- 					ELSE
-	 					(* regular case: bp and pc were synchronized *)
- 						curbp := bp;
-						SYSTEM.GET(curbp, bp);
-						SYSTEM.GET(curbp + AddressSize, pc);
-					END
-				END
-			ELSE HALT(101);
-			END
-		END FindRoots;
-
-		PROCEDURE FindPointers(bp, pc : ADDRESS; VAR diff0, diff1: SIZE);
-		VAR data: Modules.ProcTableEntry; startIndex, i: LONGINT; ptr : ADDRESS; success: BOOLEAN;
-		BEGIN
-			diff0 := InitDiff; diff1 := InitDiff;
-			Modules.FindProc(pc, data, startIndex, success);
-			IF success THEN
-				diff0 := pc - data.pcFrom;
-				diff1 := pc - data.pcStatementEnd;
-				IF (data.noPtr > 0) & (pc >= data.pcStatementBegin) & (pc <= data.pcStatementEnd) THEN
-					FOR i := 0 TO data.noPtr - 1 DO
-						SYSTEM.GET(bp + Modules.ptrOffsets[startIndex + i], ptr);
-						IF ptr # Heaps.NilVal THEN
-							Heaps.Mark(SYSTEM.VAL(ANY, ptr))
-						END
-					END
-				END
-			END
-		END FindPointers;
-
 	END Process;
 
 	ExceptionHandler* = PROCEDURE(	VAR context: Kernel32.Context;
 										VAR excpRec: Kernel32.ExceptionRecord;
 										VAR handled: BOOLEAN);
-
-
-	GCStatusExt = OBJECT(Heaps.GCStatus)
-		VAR
-			(*
-			gcOngoing: BOOLEAN;
-			event: Kernel32.HANDLE;
-			caller: Process;
-
-		PROCEDURE &Init;
-		BEGIN
-			gcOngoing := FALSE;
-			event := Kernel32.CreateEvent( NIL, Kernel32.False (* auto-reset *), Kernel32.False, NIL );   (* manual set event with initial state = reset *)
-			ASSERT(event # 0);
-		END Init;
-			*)
-
-		(*
-		(* called from Heaps.InvokeGC, i.e. this is a hidden upcall. However, it is necessary to take the Machine.Objects lock here since writing
-		    the set of variables here must not be interrupted, i.e. atomic writing of the set of variables is absolutely necessary.  They system may hang
-		    if the lock is not taken. *)
-		PROCEDURE SetgcOngoing(value: BOOLEAN);
-		VAR p: Heaps.ProcessLink; cur, r: Process; res: Kernel32.BOOL; num: LONGINT;
-		BEGIN (* serialize writers *)
-			IF value THEN
-				(* Low, Medium or High priority process calls this *)
-				Machine.Acquire(Machine.Objects);
-				Machine.Acquire(Machine.Heaps); (* to protect agains concurrent LazySweep *)
-				r := CurrentProcess();
-				caller := r;
-				r.mode := AwaitingEvent;
-				num := 0;
-				IF ~gcOngoing THEN
-					gcOngoing := TRUE;
-					p := ready.head;
-					WHILE p # NIL DO
-						cur := p(Process);
-						IF ((cur.mode = Ready) OR (cur.mode = Running)) & (cur.priority <= High) & (cur # r) THEN
-							res := Kernel32.SuspendThread(cur.handle);
-							cur.mode := Suspended
-						ELSE INC(num);
-						END;
-						p := p.next
-					END;
-					(* start GC *)
-					gcActivity.Activate;
-				END;
-				Machine.Release(Machine.Heaps);
-				Machine.Release(Machine.Objects);
-				(* no process is running except the caller process and the GC process, no race here *)
-				res := Kernel32.WaitForSingleObject(event, Kernel32.Infinite); (* block execution *)
-				ASSERT(res = Kernel32.WaitObject0)
-			ELSE
-				(* gcProcess calls this *)
-				Machine.Acquire(Machine.Objects);
-				gcOngoing := FALSE;
-				p := ready.head;
-				WHILE (p # NIL) DO
-					cur := p(Process);
-					(* only suspended and awaiting processes of ready queue are resumed *)
-					IF cur.mode = Suspended THEN
-						res := Kernel32.ResumeThread(cur.handle);
-						cur.mode := Running
-					END;
-					p := p.next
-				END;
-				caller.mode := Running;
-				Kernel32.SetEvent(event);
-				r := CurrentProcess();
-				ASSERT(r = gcActivity.process);
-				r.mode := AwaitingEvent;
-				Machine.Release(Machine.Objects);
-			END;
-		END SetgcOngoing;
-		*)
-
-	(* called from Heaps.InvokeGC, i.e. this is a hidden upcall. However, it is necessary to take the Machine.Objects lock here since writing
-		    the set of variables here must not be interrupted, i.e. atomic writing of the set of variables is absolutely necessary.  They system may hang
-		    if the lock is not taken. *)
-		PROCEDURE SetgcOngoing(value: BOOLEAN);
-		VAR p: Heaps.ProcessLink; cur, r: Process; res: Kernel32.BOOL; num: LONGINT; time: LONGINT;
-		BEGIN (* serialize writers *)
-			IF value THEN
-				(* Low, Medium or High priority process calls this *)
-				time := Kernel32.GetTickCount();
-				Machine.Acquire(Machine.Objects);
-				Machine.Acquire(Machine.Heaps); (* to protect agains concurrent LazySweep *)
-				r := CurrentProcess();
-				num := 0;
-				p := ready.head;
-				WHILE p # NIL DO
-					cur := p(Process);
-					IF ((cur.mode = Ready) OR (cur.mode = Running)) & (cur.priority <= High) & (cur # r) THEN
-						res := Kernel32.SuspendThread(cur.handle);
-						cur.mode := Suspended
-					ELSE INC(num);
-					END;
-					p := p.next
-				END;
-
-				Heaps.CollectGarbage(Modules.root);
-				p := ready.head;
-				WHILE (p # NIL) DO
-					cur := p(Process);
-					(* only suspended and awaiting processes of ready queue are resumed *)
-					IF cur.mode = Suspended THEN
-						res := Kernel32.ResumeThread(cur.handle);
-						cur.mode := Running
-					END;
-					p := p.next
-				END;
-
-
-				Machine.Release(Machine.Heaps);
-				Machine.Release(Machine.Objects);
-				time := Kernel32.GetTickCount()-time;
-				IF Heaps.trace THEN Trace.String("GC Called -- duration "); Trace.Int(time,0); Trace.String(" ms."); Trace.Ln END;
-				IF finalizerCaller # NIL THEN finalizerCaller.Activate() END;
-			END;
-		END SetgcOngoing;
-
-	END GCStatusExt;
-
-	GCActivity = OBJECT
-	(*
-	VAR
-		res: Kernel32.BOOL;
-		event: Kernel32.HANDLE;
-		process: Process;
-
-		PROCEDURE &Init;
-		BEGIN
-			ASSERT(gcActivity = NIL); (* should only exist once *)
-			event := Kernel32.CreateEvent( NIL, Kernel32.False (* auto-reset *), Kernel32.False, NIL );   (* manual set event with initial state = reset *)
-		END Init;
-
-		PROCEDURE Activate;
-		BEGIN
-			process.mode := Running;
-			res := Kernel32.SetEvent(event);
-		END Activate;
-
-		PROCEDURE Wait;
-		BEGIN
-			process.mode := AwaitingEvent;
-			res := Kernel32.WaitForSingleObject(event, Kernel32.Infinite); (* block execution *)
-			ASSERT(res = Kernel32.WaitObject0);
-		END Wait;
-
-	BEGIN {ACTIVE, SAFE, PRIORITY(GCPriority)}
-		Machine.Acquire(Machine.Objects);
-		process := CurrentProcess();
-		process.mode := AwaitingEvent;
-		Machine.Release(Machine.Objects);
-		LOOP
-			Wait;
-			(* process is scheduled -> perform garbage collection now *)
-			Heaps.CollectGarbage(Modules.root);
-			Heaps.gcStatus.SetgcOngoing(FALSE); (* resumes waiting processes and suspends itself *)
-			IF finalizerCaller # NIL THEN finalizerCaller.Activate() END;
-		END
-	*)
-	END GCActivity;
 
 	FinalizedCollection* = OBJECT
 		PROCEDURE RemoveAll*(obj: ANY); (** abstract *)
@@ -427,50 +170,6 @@ TYPE
 		c*: FinalizedCollection (* base type for collection containing object *)
 	END;
 
-	FinalizerCaller = OBJECT  (* separate active object that calls finalizers *)
-	VAR n: Heaps.FinalizerNode;
-		event: Kernel32.HANDLE;
-		process: Process;
-
-		PROCEDURE &Init;
-		BEGIN
-			event := Kernel32.CreateEvent( NIL, Kernel32.False (* automatic *), Kernel32.False, NIL );
-			ASSERT(event # 0);
-		END Init;
-
-		PROCEDURE Wait;
-		VAR res: Kernel32.BOOL; mode: LONGINT;
-		BEGIN
-			mode := process.mode;
-			process.mode := AwaitingEvent;
-			res := Kernel32.WaitForSingleObject(event, Kernel32.Infinite);
-			ASSERT(res = Kernel32.WaitObject0);
-			process.mode := mode;
-		END Wait;
-
-		PROCEDURE Activate;
-		VAR res: Kernel32.BOOL;
-		BEGIN
-			res := Kernel32.SetEvent(event);
-		END Activate;
-
-	BEGIN {ACTIVE, SAFE, PRIORITY(High)}
-		process := CurrentProcess();
-		LOOP
-			Wait;
-			LOOP
-				n := Heaps.GetFinalizer();
-				IF n = NIL THEN EXIT END;
-				IF n IS FinalizerNode THEN
-					n( FinalizerNode ).c.RemoveAll( n.objStrong ) (* remove it if it is not removed yet *)
-				END;
-				IF n.finalizer # NIL THEN
-					n.finalizer( n.objStrong ) (* may acquire locks *)
-				END
-			END
-		END;
-	END FinalizerCaller;
-
 VAR
 	awc-, awl-: LONGINT;
 	oberonLoop*: ANY;   (* Oberon Loop Process temporary workaround for Threads.oberonLoop *)
@@ -479,8 +178,6 @@ VAR
 	ready: ProcessQueue;	(* contains running processes in this implementation *)
 
 	numberOfProcessors: LONGINT; (* cached value of Machine.NumberOfProcessors() *)
-	finalizerCaller: FinalizerCaller; (* active object for finalizer process, regarded as aprt of GC *)
-	gcActivity: GCActivity;
 
 	event: Timer; (* list of events *)
 	clock: Clock;
@@ -1236,8 +933,6 @@ BEGIN
 	ASSERT(t.handle # 0);
 	Machine.Release(Machine.Objects);
 	InitEventHandling; (* implicit call of NewProcess! *)
-	InitGCHandling; (* do. *)
-	Heaps.gcStatus := GCStatusFactory()
 END Init;
 
 (** Set (or reset) an event handler object's timeout value. *)
@@ -1296,20 +991,6 @@ BEGIN
 	NEW(event); event.next := event; event.prev := event;  (* event: head of timer event queue, only a sentinel *)
 	NEW(clock)
 END InitEventHandling;
-
-PROCEDURE InitGCHandling;
-BEGIN
-	NEW(gcActivity);
-	NEW(finalizerCaller);
-END InitGCHandling;
-
-PROCEDURE GCStatusFactory(): Heaps.GCStatus;
-VAR gcStatusExt : GCStatusExt;
-BEGIN
-	ASSERT(Heaps.gcStatus = NIL);
-	NEW(gcStatusExt);
-	RETURN gcStatusExt
-END GCStatusFactory;
 
 PROCEDURE InstallExceptionHandler*( e: ExceptionHandler );
 BEGIN
