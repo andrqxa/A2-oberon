@@ -1,6 +1,7 @@
 (* Automatic memory management *)
+(* Copyright (C) Florian Negele *)
 
-(** The {{{GarbageCollector}}} module provides an automatic memory management for pointers allocated using the {{{NEW}}} statement. *)
+(** The GarbageCollector module provides an automatic memory management for pointers allocated using the NEW statement. *)
 (** It implements a concurrent and interruptible mark and sweep garbage collection. *)
 MODULE GarbageCollector;
 
@@ -14,7 +15,7 @@ PROCEDURE Initialize-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Initialize;
 
-(** Terminates the module and disposes its resources and all remaining pointers that have been registered using the {{{[[GarbageCollector.Watch]]}}} procedure. *)
+(** Terminates the module and disposes its resources and all remaining pointers that have been registered using the Watch procedure. *)
 PROCEDURE Terminate-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Terminate;

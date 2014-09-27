@@ -1,4 +1,5 @@
 (* Runtime support for CPU internals *)
+(* Copyright (C) Florian Negele *)
 
 MODULE CPU;
 

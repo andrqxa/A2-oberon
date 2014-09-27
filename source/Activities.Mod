@@ -1,5 +1,9 @@
 (* Runtime support for activities *)
+(* Copyright (C) Florian Negele *)
 
+(** The module provides the runtime support for activities associated with active objects. *)
+(** It implements a basic task scheduler that distributes the work of concurrent activities to logical processors. *)
+(** In addition, it also provides a framework for implementing synchronisation primitives. *)
 MODULE Activities;
 
 IMPORT SYSTEM, CPU, Counters, Processors, Queues;

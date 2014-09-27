@@ -1,6 +1,7 @@
 (* Runtime support for exclusive blocks *)
+(* Copyright (C) Florian Negele *)
 
-(** The {{{ExclusiveBlocks}}} module implements object monitors and provides runtime support for block statements marked as exclusive. *)
+(** The ExclusiveBlocks module implements object monitors and provides runtime support for block statements marked as exclusive. *)
 MODULE ExclusiveBlocks;
 
 IMPORT SYSTEM, Activities, Queues;
@@ -67,7 +68,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Enqueue;
 
 (** Exits an exclusive region by releasing the monitor of the corresponding object if its nesting level reaches zero. *)
-(** The compiler calls this procedure at the end of each block statement marked as exclusive or during the execution of a {{{RETURN}}} statement inside such blocks. *)
+(** The compiler calls this procedure at the end of each block statement marked as exclusive or during the execution of a RETURN statement inside such blocks. *)
 (** A monitor may not be released if it was not acquired by the same activity beforehand. *)
 PROCEDURE Exit- (object {UNTRACED}: OBJECT; nestingLevel: SIZE);
 VAR monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor; currentActivity {UNTRACED}: Activities.Activity; item: Queues.Item;
@@ -99,7 +100,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Exit;
 
 (** Temporarily releases an acquired monitor and waits for other activities to modify the object by entering and exiting an exclusive region. *)
-(** The compiler calls this procedure whenever the repeated evaluation of an {{{AWAIT}}} statement yields an unsatisfied condition. *)
+(** The compiler calls this procedure whenever the repeated evaluation of an AWAIT statement yields an unsatisfied condition. *)
 PROCEDURE Await- (object {UNTRACED}: OBJECT);
 VAR monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor; currentActivity {UNTRACED}, nextActivity: Activities.Activity; nestingLevel: SIZE; item: Queues.Item;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -167,7 +168,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Release;
 
 (** Guarantees that all other activities awaiting a condition will evaluate it again when the current activity leaves the exclusive region. *)
-(** The compiler calls this procedure after the evaluation of an {{{AWAIT}}} statement has yielded a satisfied condition. *)
+(** The compiler calls this procedure after the evaluation of an AWAIT statement has yielded a satisfied condition. *)
 PROCEDURE FinalizeAwait- (object {UNTRACED}: OBJECT);
 VAR monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor; currentActivity {UNTRACED}: Activities.Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}

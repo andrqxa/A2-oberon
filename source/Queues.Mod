@@ -1,4 +1,5 @@
 (* Lock-free queues *)
+(* Copyright (C) Florian Negele *)
 
 MODULE Queues;
 
@@ -107,7 +108,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Enqueue;
 
 (** Removes the first element at the front of a queue and returns it in a variable parameter. *)
-(** If there are no elements in the queue, the procedure returns {{{FALSE}}} and sets the variable parameter to {{{NIL}}}. *)
+(** If there are no elements in the queue, the procedure returns FALSE and sets the variable parameter to NIL. *)
 PROCEDURE Dequeue- (VAR item: Item; VAR queue: Queue): BOOLEAN;
 VAR first, next, last: Node;
 BEGIN {UNCOOPERATIVE, UNCHECKED}

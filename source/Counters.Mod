@@ -1,4 +1,5 @@
 (* Atomic counters *)
+(* Copyright (C) Florian Negele *)
 
 (** Provides a counter type with the following atomic operations. *)
 MODULE Counters;

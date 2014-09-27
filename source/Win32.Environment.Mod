@@ -1,4 +1,5 @@
-(* Generic runtime environment *)
+(* Runtime environment for Windows *)
+(* Copyright (C) Florian Negele *)
 
 MODULE Environment;
 

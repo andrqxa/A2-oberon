@@ -1,4 +1,5 @@
 (* Windows runtime support for processors *)
+(* Copyright (C) Florian Negele *)
 
 MODULE Processors;
 
@@ -18,7 +19,7 @@ VAR thread: ARRAY Maximum OF Kernel32.HANDLE;
 PROCEDURE GetCurrentIndex- EXTERN "Activities.GetCurrentProcessorIndex" (): SIZE;
 
 (** Suspends the execution of the current processor. *)
-(** A suspended processor must be resumed by a call to the {{{[[Processors.ResumeAnyProcessor]]}}} procedure. *)
+(** A suspended processor must be resumed by a call to the ResumeAnyProcessor procedure. *)
 (** This procedure may not be called if there is only one processor in the system. *)
 PROCEDURE SuspendCurrentProcessor-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
