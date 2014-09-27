@@ -29,8 +29,9 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Deallocate;
 
 PROCEDURE Write- (character: CHAR);
+VAR written: LONGINT;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (Kernel32.WriteFile (stdout, ADDRESS OF character, 1, NIL, NIL) # 0);
+	ASSERT (Kernel32.WriteFile (stdout, ADDRESS OF character, 1, written, NIL) # 0);
 END Write;
 
 PROCEDURE Initialize-;
