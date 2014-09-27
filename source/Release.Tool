@@ -283,9 +283,6 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	COOP { Coop.Objects.Mod Coop.Kernel.Mod }
 
 	COOP { RuntimeSupport.Mod }
-
-	# Support for DEFINITIONs
-	NATIVE,WIN { Interfaces.Mod }
 END
 
 PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
