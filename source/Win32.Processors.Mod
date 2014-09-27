@@ -9,7 +9,7 @@ IMPORT Kernel32;
 CONST Maximum* = MAX (SET) - MIN (SET) + 1;
 
 (** Holds the actual number of processors in the system. *)
-VAR count- := 0: SIZE;
+VAR count-: SIZE;
 
 VAR affinityMask: SET;
 VAR semaphore: Kernel32.HANDLE;
@@ -67,6 +67,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 
 	ASSERT (Kernel32.GetProcessAffinityMask (Kernel32.GetCurrentProcess (), ADDRESS OF affinityMask, ADDRESS OF systemAffinityMask) # 0);
 
+	count := 0;
 	FOR i := 0 TO Maximum - 1 DO
 		IF i IN affinityMask THEN
 			INC (count);
