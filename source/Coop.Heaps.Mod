@@ -27,8 +27,6 @@ CONST
 
 	FlagsOfs = AddressSize * 3;			(* flags offset in TypeDesc *)
 	ModOfs* = AddressSize * 4;			(* moduleAdr offset in TypeDesc *)
-	TypeNameOfs = AddressSize * 5;		(* type name offset in TypeDesc *)
-	ModNameOfs = AddressSize * 2;		(* module name offset in ModuleDesc *)
 
 	MinPtrOfs = -40000000H;	(* sentinel offset for ptrOfs *)
 	MethodEndMarker* = MinPtrOfs;   (* marks the end of the method addresses, used in Info.ModuleDetails *)
@@ -153,28 +151,6 @@ END SetAllocationLogger;
 
 (** Mark - Mark an object and its decendents. Used by findRoots. *)
 PROCEDURE Mark* EXTERN "GarbageCollector.Mark" (p: ANY);
-
-(** WriteType - Write a type name (for tracing only). *)
-PROCEDURE WriteType*(t: ADDRESS);	(* t is static type descriptor *)
-VAR m: ADDRESS; i: LONGINT; ch: CHAR; name: ARRAY 32 OF CHAR;
-BEGIN
-	SYSTEM.GET (t + TypeDescOffset, t);
-	SYSTEM.GET (t + ModOfs, m);	(* m is only a hint *)
-	IF m # NilVal THEN	(* could be a type without module, e.g. a Java class *)
-		i := 0; SYSTEM.GET (m + ModNameOfs + i, ch);
-		WHILE (ch >= "0") & (ch <= "z") & (i # 32) DO
-			Trace.Char(ch);
-			INC(i); SYSTEM.GET (m + ModNameOfs + i, ch)
-		END
-	ELSE
-		Trace.String("NIL")
-	END;
-	Trace.Char(".");
-	SYSTEM.MOVE(t + TypeNameOfs, ADDRESSOF(name[0]), 32);
-	IF name[0] = 0X THEN Trace.String("-")
-	ELSE Trace.String(name)
-	END
-END WriteType;
 
 (* CheckCandidates - Check which candidates could be pointers, and mark them. (exported for debugging only) *)
 PROCEDURE CheckCandidates*;
