@@ -3,7 +3,7 @@
 
 MODULE CPU;
 
-CONST StackSize* = 2048;
+CONST StackSize* = 8192;
 CONST Quantum* = 1000000;
 CONST CacheLineSize* = 64;
 CONST StackDisplacement* = 0;
