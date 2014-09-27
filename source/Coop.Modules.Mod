@@ -180,6 +180,8 @@ VAR
 	root-: Module;	(** list of modules (read-only) *)
 	shutdown*: LONGINT;	(** None, Reboot, PowerDown *)
 	trace: BOOLEAN;
+	register: ARRAY 48 OF Module;
+	registered: LONGINT;
 
 (** Register a module loader. *)
 
@@ -580,23 +582,22 @@ END Init;
 
 PROCEDURE Register- (module {UNTRACED}: Module);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	module.next := root; root := module;
+	register[registered] := module;
+	INC (registered);
 END Register;
 
 PROCEDURE PublishRegisteredModules;
-VAR module {UNTRACED}, next {UNTRACED}: Module; i: SIZE; new: BOOLEAN;
+VAR m {UNTRACED}: Module; module, import: SIZE; new: BOOLEAN;
 BEGIN {UNCHECKED}
 	Activities.Call (Activities.Idle);
-	module := root; root := NIL;
-	WHILE module # NIL DO
-		next := module.next;
-		IF module.module # NIL THEN
-			FOR i := 0 TO LEN (module.module) - 1 DO
-				Publish (module.module[i], new);
+	FOR module := 0 TO registered - 1 DO
+		m := register[module];
+		IF m.module # NIL THEN
+			FOR import := 0 TO LEN (m.module) - 1 DO
+				Publish (m.module[import], new);
 			END;
 		END;
-		Publish (module, new);
-		module := next;
+		Publish (m, new);
 	END;
 END PublishRegisteredModules;
 
