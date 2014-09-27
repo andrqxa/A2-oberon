@@ -937,9 +937,12 @@ VAR
 		GetProcAddress(mod, "WaitForSingleObject",SYSTEM.VAL(ADDRESS,WaitForSingleObject));
 		GetProcAddress(mod, "WriteFile",SYSTEM.VAL(ADDRESS,WriteFile));
 		GetProcAddress(mod, "GlobalMemoryStatusEx",SYSTEM.VAL(ADDRESS,GlobalMemoryStatusEx));
+		IF IsDebuggerPresent()=True THEN
+			OutputString := OutputDebugString
+		ELSE
+			OutputString := NoOutputString
+		END;
 		END Init;
-
-
 
 		(* The following procedure is linked as the first block in the code section of a PE32 executable file 
 			It contains the import table for the two procedures Kernel32.GetProcAddress and Kernel32.LoadLibrary that
@@ -984,17 +987,8 @@ VAR
 			MOV LoadLibrary, EAX
 			MOV EAX,[401000H+adrGetProcAddress]
 			MOV getProcAddress, EAX
-			
+			CALL Init
 		END EntryPoint;
-		
 
-		
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	Init;
-	IF IsDebuggerPresent()=True THEN
-		OutputString := OutputDebugString
-	ELSE
-		OutputString := NoOutputString
-	END;
 END Kernel32.
 	
