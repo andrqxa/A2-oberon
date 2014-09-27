@@ -667,7 +667,12 @@ TYPE
 			ir.SetExported(TRUE);
 			ir.SetPriority(InitPriority);
 			Global.GetSymbolSegmentedName (bodyProcedure,name);
-			IF backend.preregisterStatic THEN
+			IF backend.cooperative THEN
+				implementationVisitor.currentScope := module.module.moduleScope;
+				implementationVisitor.section := ir;
+				implementationVisitor.PushSelfPointer();
+				implementationVisitor.CallThis("Modules","Register",1);
+			ELSIF backend.preregisterStatic THEN
 				implementationVisitor.currentScope := module.module.moduleScope;
 				implementationVisitor.section := ir;
 				implementationVisitor.PushSelfPointer();
@@ -8471,7 +8476,7 @@ TYPE
 
 			procedure := scope(SyntaxTree.ProcedureScope).ownerProcedure;
 			procedureType := procedure.type(SyntaxTree.ProcedureType);
-			IF newObjectFile & moduleBody & ~suppressModuleRegistration & ~meta.simple THEN
+			IF newObjectFile & moduleBody & ~suppressModuleRegistration & ~meta.simple & ~backend.cooperative THEN
 				PushSelfPointer();
 				(*
 				moduleSection := ModuleSection(module);
@@ -8480,12 +8485,7 @@ TYPE
 				Emit(Push(position,op));
 				*)
 				res := NewRegisterOperand(bool);
-				IF backend.cooperative THEN
-					CallThis("Runtime","InsertModule",1);
-					Emit(Result(position,res));
-				ELSE
-					CallThis2("Modules","PublishThis","Runtime","InsertModule",1,res);
-				END;
+				CallThis2("Modules","PublishThis","Runtime","InsertModule",1,res);
 				end := NewLabel();
 				(*AcquireThisRegister(bool, IntermediateCode.Result);*)
 				BrneL(end, res,true);
@@ -8538,7 +8538,7 @@ TYPE
 				END;
 
 			END;
-			IF newObjectFile & moduleBody  & ~suppressModuleRegistration & ~meta.simple THEN
+			IF newObjectFile & moduleBody  & ~suppressModuleRegistration & ~meta.simple & ~backend.cooperative THEN
 				PushSelfPointer();
 				CallThis("Modules","SetInitialized",1);
 				SetLabel(end);

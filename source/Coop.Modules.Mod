@@ -23,9 +23,6 @@ CONST
 
 	ClearCode = TRUE;
 
-	InitTableLen = 1024;
-	InitPtrTableLen = 2048;
-
 	DefaultContext* = "A2";
 	NoLoader=3400;
 
@@ -180,35 +177,25 @@ VAR
 
 	freeRoot*: Module;	(** list of freed modules (temporary) *)
 
-	(* the following two variables are initialized by Linker *)
 	root-: Module;	(** list of modules (read-only) *)
-	initBlock: ANY;	(* placeholder - anchor for module init code (initialized by linker) *)
-	procOffsets-: ProcOffsetTable;	(* global table containing procedure code offsets and pointer offsets, sorted in ascending order of procedure code offsets *)
-	numProcs: LONGINT;			(* number of entries in procOffsets *)
-	ptrOffsets-: PtrTable;
-	numPtrs: LONGINT;
 	shutdown*: LONGINT;	(** None, Reboot, PowerDown *)
 	trace: BOOLEAN;
-	preregisterRoot: Module;
 
 (** Register a module loader. *)
 
 PROCEDURE AddLoader*(CONST ext: ARRAY OF CHAR; proc: LoaderProc);
-BEGIN
-	Machine.Acquire(Machine.Modules);
+BEGIN {EXCLUSIVE}
 	ASSERT(numLoaders < MaxObjFormats);
 	loader[numLoaders] := proc;
 	COPY(ext, extension[numLoaders]);
 	ASSERT(ext = extension[numLoaders]);	(* no overflow *)
 	INC(numLoaders);
-	Machine.Release(Machine.Modules)
 END AddLoader;
 
 (** Remove a module loader. *)
 PROCEDURE RemoveLoader*(CONST ext: ARRAY OF CHAR; proc: LoaderProc);
 VAR i, j: LONGINT;
-BEGIN
-	Machine.Acquire(Machine.Modules);
+BEGIN {EXCLUSIVE}
 	i := 0;
 	WHILE (i # numLoaders) & ((loader[i] # proc) OR (extension[i] # ext)) DO INC(i) END;
 	IF i # numLoaders THEN
@@ -218,7 +205,6 @@ BEGIN
 		loader[numLoaders - 1] := NIL; extension[numLoaders - 1] := "";
 		DEC(numLoaders)
 	END;
-	Machine.Release(Machine.Modules)
 END RemoveLoader;
 
 (** Append string from to to, truncating on overflow. *)
@@ -231,93 +217,35 @@ BEGIN
 	to[j] := 0X
 END Append;
 
-PROCEDURE Preregister*(m: Module);
-BEGIN
-	m.next := preregisterRoot; preregisterRoot := m;
-	Trace.String("preregister: "); Trace.String(m.name); Trace.Ln
-END Preregister;
-
-
 (** Add a module to the pool of accessible modules, or return named module. *)
 PROCEDURE Publish*(VAR m: Module; VAR new: BOOLEAN);
-VAR n: Module; i: LONGINT; a: ANY;
-BEGIN
-	(*
-	ASSERT((m.code # NIL) & (LEN(m.code^) > 0));
-	*)
-	Machine.Acquire(Machine.Modules);
+VAR n: Module; i: LONGINT;
+BEGIN {EXCLUSIVE}
 	n := root; WHILE (n # NIL) & (n.name # m.name) DO 	n := n.next END;
 	IF n # NIL THEN	(* module with same name exists, return it and ignore new m *)
 		m := n; new := FALSE
 	ELSE
-		IF TraceBoot THEN
-			Trace.String("publish "); Trace.String(m.name);
-			(*
-			a := m;
-			IF a IS Heaps.RootObject THEN Trace.String(" IS RootObj") END;
-			IF a IS Module THEN Trace.String(" IS Module"); END;
-			*)
-			Trace.Ln;
-		END;
 		m.published := TRUE;
 		m.next := root; root := m;
 		m.refcnt := 0;
-		(*! reactivate: does not work with statically linked image
-		SortProcTable(m);
-		InsertProcOffsets(m.procTable, m.ptrTable, m.maxPtrs);
-		*)
-
-		(*! yes: used, cf. ThisModuleByAdr
-		m.procTable := NIL; m.ptrTable := NIL; (* not used any more as entered in global variable *)
-		*)
 
 		IF m.module # NIL THEN
-		FOR i := 0 TO LEN(m.module)-1 DO INC(m.module[i].refcnt) END;
+			FOR i := 0 TO LEN(m.module)-1 DO INC(m.module[i].refcnt) END;
 		END;
 
+		IF m.body # NIL THEN m.body END;
+		m.init := TRUE;
 		new := TRUE;
 	END;
-	Machine.Release(Machine.Modules)
 END Publish;
-
-(* runtime call for new compiler -- called by body of loaded module *)
-PROCEDURE PublishThis*(m: Module): BOOLEAN;
-VAR new: BOOLEAN; i:LONGINT; module: Module;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-(*
-	IF m = SELF THEN
-		RETURN Runtime.InsertModule(SYSTEM.VAL(ADDRESS,m))
-	END;
-	Publish(m,new);
-*)
-	RETURN new
-END PublishThis;
-
-(* runtime call for new compiler -- called by body of loaded module *)
-PROCEDURE SetInitialized*(m: Module);
-BEGIN
-	m.init := TRUE;
-END SetInitialized;
 
 (** Return the named module or NIL if it is not loaded yet. *)
 PROCEDURE ModuleByName*(CONST name: ARRAY OF CHAR): Module;
 VAR m: Module;
-BEGIN
-	Machine.Acquire(Machine.Modules);
+BEGIN {EXCLUSIVE}
 	m := root; WHILE (m # NIL) & (m.name # name) DO m := m.next END;
-	Machine.Release(Machine.Modules);
 	RETURN m
 END ModuleByName;
-
-(** Return the named module or NIL if it is not loaded yet. *)
-PROCEDURE PreregisteredModuleByName*(CONST name: ARRAY OF CHAR): Module;
-VAR m: Module;
-BEGIN
-	Machine.Acquire(Machine.Modules);
-	m := preregisterRoot; WHILE (m # NIL) & (m.name # name) DO m := m.next END;
-	Machine.Release(Machine.Modules);
-	RETURN m
-END PreregisteredModuleByName;
 
 (* Generate a module file name. *)
 PROCEDURE GetFileName(CONST name, extension: ARRAY OF CHAR; VAR fileName: ARRAY OF CHAR);
@@ -328,91 +256,15 @@ BEGIN
 	fileName[i] := 0X
 END GetFileName;
 
-	PROCEDURE SortProcTable(m: Module);
-		VAR i, j, min : LONGINT;
-
-		PROCEDURE Max(a,b: LONGINT): LONGINT;
-		BEGIN
-			IF a > b THEN RETURN a ELSE RETURN b END;
-		END Max;
-
-
-		PROCEDURE SwapProcTableEntries(p, q : LONGINT);
-		VAR procentry : ProcTableEntry;
-			k, i, basep, baseq: LONGINT; ptr: SIZE;
-		BEGIN
-			k := Max(m.procTable[p].noPtr, m.procTable[q].noPtr);
-			IF k > 0 THEN (* swap entries in ptrTable first *)
-				basep := p * m.maxPtrs; baseq := q * m.maxPtrs;
-				FOR i := 0 TO k - 1 DO
-					ptr := m.ptrTable[basep + i];
-					m.ptrTable[basep + i] := m.ptrTable[baseq + i];
-					m.ptrTable[baseq + i] := ptr
-				END
-			END;
-			procentry := m.procTable[p];
-			m.procTable[p] := m.procTable[q];
-			m.procTable[q] := procentry
-		END SwapProcTableEntries;
-
-		PROCEDURE NormalizePointerArray;
-		VAR ptrTable: PtrTable; i,j,k: LONGINT;
-		BEGIN
-			NEW(ptrTable, m.maxPtrs*m.noProcs);
-			k := 0;
-			FOR i := 0 TO LEN(m.procTable)-1 DO
-				FOR j := 0 TO m.procTable[i].noPtr-1 DO
-					ptrTable[i*m.maxPtrs+j] := m.ptrTable[k];
-					INC(k);
-				END;
-			END;
-			m.ptrTable := ptrTable;
-		END NormalizePointerArray;
-
-
-	BEGIN
-		NormalizePointerArray;
-		FOR i := 0 TO m.noProcs - 2 DO
-			min := i;
-			FOR j := i + 1 TO m.noProcs - 1 DO
-				IF m.procTable[j].pcFrom < m.procTable[min].pcFrom THEN min:= j END
-			END;
-			IF min # i THEN SwapProcTableEntries(i, min) END
-		END
-	END SortProcTable;
-
-	PROCEDURE SelectionSort(exTable: ExceptionTable);
-	VAR
-		p, q, min: LONGINT;
-		entry: ExceptionTableEntry;
-	BEGIN
-		FOR p := 0 TO LEN(exTable) - 2 DO
-			min := p;
-			FOR q := p + 1 TO LEN(exTable) - 1 DO
-				IF exTable[min].pcFrom > exTable[q].pcFrom THEN min := q END;
-				entry := exTable[min]; exTable[min] := exTable[p]; exTable[p] := entry;
-			END
-		END
-	END SelectionSort;
-
 (** Load the module if it is not already loaded. *)	(* Algorithm J. Templ, ETHZ, 1994 *)
 PROCEDURE ThisModule*(CONST name: ARRAY OF CHAR; VAR res: LONGINT; VAR msg: ARRAY OF CHAR): Module;
 TYPE Body = PROCEDURE;
-VAR m, p: Module; fileName: ARRAY 64 OF CHAR; body: Body; new: BOOLEAN; i: LONGINT;
-BEGIN
+VAR m, p: Module; fileName: ARRAY 64 OF CHAR; new: BOOLEAN; i: LONGINT;
+BEGIN {EXCLUSIVE}
 	res := Ok; msg[0] := 0X; m := ModuleByName(name);
 	IF m = NIL THEN
-		m := PreregisteredModuleByName(name);
-		IF m # NIL THEN
-			SortProcTable(m);
-			SelectionSort(m.exTable);
-			m.body;
-			RETURN m
-		END;
 		IF trace THEN
-			Machine.Acquire (Machine.TraceOutput);
 			Trace.String(">"); Trace.StringLn (name);
-			Machine.Release (Machine.TraceOutput);
 		END;
 		IF numLoaders = 0 THEN
 			res := NoLoader; m := NIL;
@@ -425,34 +277,23 @@ BEGIN
 			UNTIL (m # NIL) OR (i=numLoaders);
 		END;
 		IF trace THEN
-			Machine.Acquire (Machine.TraceOutput);
 			Trace.String("?"); Trace.StringLn (name);
-			Machine.Release (Machine.TraceOutput);
 		END;
 		p := m;
 		IF (m # NIL) & ~m.published THEN	(* no race on m.published, as update is done below in Publish *)
 			Publish(m, new);
-			IF new THEN	(* m was successfully published *)
-				body := SYSTEM.VAL (Body, ADDRESSOF(m.code[0]));
-				body; res := Ok; msg[0] := 0X;
-				m.init := TRUE	(* allow ThisCommand *)
-			ELSE
-				(* m was part of cycle, replaced by existing module *)
-			END
 		END;
 		IF trace THEN
-			Machine.Acquire (Machine.TraceOutput);
 			Trace.String("<"); Trace.StringLn (name);
-			Machine.Release (Machine.TraceOutput);
 		END;
 	END;
 	RETURN m
 END ThisModule;
 
-(** Return the module that contains code address pc or NIL if not found. Can also return freed modules. Non-blocking version for reflection *)
-PROCEDURE ThisModuleByAdr0*(pc: ADDRESS): Module;
-VAR m: Module; cbase, dbase: ADDRESS; i: LONGINT; found: BOOLEAN; list: LONGINT;
-BEGIN
+(** Return the module that contains code address pc or NIL if not found. Can also return freed modules. *)
+PROCEDURE ThisModuleByAdr*(pc: ADDRESS): Module;
+VAR m: Module; i: LONGINT; found: BOOLEAN; list: LONGINT;
+BEGIN {EXCLUSIVE}
 	list := 0; found := FALSE;
 	REPEAT
 		CASE list OF
@@ -476,26 +317,19 @@ BEGIN
 		INC(list)
 	UNTIL found OR (list=2);
 	RETURN m
-END ThisModuleByAdr0;
-
-(** Return the module that contains code address pc or NIL if not found. Can also return freed modules. *)
-PROCEDURE ThisModuleByAdr*(pc: ADDRESS): Module;
-VAR m: Module; cbase, dbase: ADDRESS; i: LONGINT; found: BOOLEAN; list: LONGINT;
-BEGIN
-	Machine.Acquire(Machine.Modules);
-	m := ThisModuleByAdr0(pc);
-	Machine.Release(Machine.Modules);
-	RETURN m
 END ThisModuleByAdr;
+
+PROCEDURE ThisModuleByAdr0*(pc: ADDRESS): Module;
+BEGIN RETURN ThisModuleByAdr(pc);
+END ThisModuleByAdr0;
 
 (*	Retrieve a procedure given a module name, the procedure name and some type information (kernel call) *)
 PROCEDURE GetProcedure*(CONST moduleName, procedureName : ARRAY OF CHAR; argTdAdr, retTdAdr : ADDRESS; VAR entryAdr : ADDRESS);
 VAR module : Module; ignoreMsg : ARRAY 32 OF CHAR; i, res : LONGINT;
-BEGIN
+BEGIN {EXCLUSIVE}
 	module := ThisModule(moduleName, res, ignoreMsg);
 	IF (res = Ok) THEN
 		ASSERT(module.init);	(* module body must have been called (see note at end of module) *)
-		Machine.Acquire(Machine.Modules);
 		i := 0; entryAdr := Heaps.NilVal;
 		WHILE (entryAdr = Heaps.NilVal) & (i # LEN(module.command^)) DO
 			IF (module.command[i].name = procedureName) & (module.command[i].argTdAdr = argTdAdr) & (module.command[i].retTdAdr = retTdAdr) THEN
@@ -503,15 +337,13 @@ BEGIN
 			END;
 			INC(i)
 		END;
-		Machine.Release(Machine.Modules);
 	END;
 END GetProcedure;
 
 (** Return the named type *)
 PROCEDURE ThisType*(m: Module; CONST name: ARRAY OF CHAR): TypeDesc;
 VAR i: LONGINT; type: TypeDesc;
-BEGIN
-	Machine.Acquire(Machine.Modules);
+BEGIN {EXCLUSIVE}
 	i := 0;
 	WHILE (i < LEN(m.typeInfo)) & (m.typeInfo[i].name # name) DO INC(i) END;
 	IF i = LEN(m.typeInfo) THEN
@@ -519,18 +351,15 @@ BEGIN
 	ELSE
 		type := m.typeInfo[i]
 	END;
-	Machine.Release(Machine.Modules);
 	RETURN type
 END ThisType;
 
 PROCEDURE ThisTypeByAdr*(adr: ADDRESS; VAR m: Module; VAR t: TypeDesc);
-BEGIN
+BEGIN {EXCLUSIVE}
 	IF adr # 0 THEN
-		Machine.Acquire(Machine.Modules);
 		SYSTEM.GET (adr + Heaps.TypeDescOffset, adr);
 		t := SYSTEM.VAL(TypeDesc, adr);
 		m := t.mod;
-		Machine.Release(Machine.Modules)
 	ELSE
 		m := NIL; t := NIL
 	END
@@ -556,163 +385,6 @@ BEGIN
 	RETURN t;
 END TypeOf;
 
-PROCEDURE FindPos(key: ADDRESS; VAR pos: LONGINT): BOOLEAN;
-VAR l, r, x: LONGINT; isHit: BOOLEAN;
-BEGIN
-	IF numProcs > 0 THEN
-		l := 0; r := numProcs - 1;
-		REPEAT
-			x := (l + r) DIV 2;
-			IF key < procOffsets[x].data.pcFrom THEN r := x - 1 ELSE l := x + 1 END;
-			isHit := ((procOffsets[x].data.pcFrom <= key) & (key < procOffsets[x].data.pcLimit));
-		UNTIL isHit OR (l > r);
-		IF isHit THEN
-			pos := x;
-			RETURN TRUE
-		END;
-	END;
-	RETURN FALSE
-END FindPos;
-
-(** searches for the given pc in the global ProcKeyTable, if found it returns the corresponding data element *)
-PROCEDURE FindProc*(pc: ADDRESS; VAR data: ProcTableEntry; VAR index: LONGINT; VAR success: BOOLEAN);
-VAR x: LONGINT;
-BEGIN
-	success := FindPos(pc, x);
-	IF success THEN
-		data := procOffsets[x].data;
-		index := procOffsets[x].startIndex
-	END
-END FindProc;
-
-PROCEDURE FindInsertionPos(VAR entry: ProcTableEntry; VAR pos: LONGINT): BOOLEAN;
-VAR l, r, x: LONGINT; success, isHit: BOOLEAN;
-BEGIN
-	pos := -1;
-	success := FALSE;
-	IF numProcs = 0 THEN (* empty table *)
-		pos := 0; success := TRUE
-	ELSE
-		l := 0; r := numProcs - 1;
-		REPEAT
-			x := (l + r) DIV 2;
-			IF entry.pcLimit < procOffsets[x].data.pcFrom THEN r := x - 1 ELSE l := x + 1 END;
-			isHit := ((x = 0) OR (procOffsets[x - 1].data.pcLimit <= entry.pcFrom)) & (entry.pcLimit <= procOffsets[x].data.pcFrom);
-		UNTIL isHit OR (l > r);
-		IF isHit THEN
-			pos := x; success := TRUE
-		ELSE
-			IF (x = numProcs - 1) & (procOffsets[x].data.pcLimit <= entry.pcFrom) THEN
-				pos := x + 1; success := TRUE
-			END
-		END
-	END;
-	RETURN success
-END FindInsertionPos;
-
-PROCEDURE NumTotalPtrs(procTable: ProcTable): LONGINT;
-VAR i, num: LONGINT;
-BEGIN
-	num := 0;
-	IF procTable # NIL THEN
-		FOR i := 0 TO LEN(procTable) - 1 DO
-			num := num + procTable[i].noPtr
-		END;
-	END;
-	RETURN num
-END NumTotalPtrs;
-
-
-(* insert the procedure code offsets and pointer offsets of a single module into the global table *)
-PROCEDURE InsertProcOffsets(procTable: ProcTable; ptrTable: PtrTable; maxPtr: LONGINT);
-VAR success: BOOLEAN; i, j, pos, poslast, newLen, num,numberPointer: LONGINT;
-	temp: ADDRESS;
-	newProcOffsets: ProcOffsetTable; newPtrOffsets: PtrTable;
-	ptrOfsLen,procOfsLen: LONGINT;
-BEGIN
-	(* this procedure is called by procedure Publish only and is protected by the Machine.Modules lock *)
-	IF procTable=NIL THEN RETURN END;
-	IF ptrTable=NIL THEN RETURN END;
-	IF LEN(procTable) > 0 THEN
-		IF procOffsets = NIL THEN procOfsLen := 0 ELSE procOfsLen := LEN(procOffsets) END;
-		IF numProcs + LEN(procTable) > procOfsLen THEN
-			newLen := procOfsLen + InitTableLen;
-			WHILE numProcs + LEN(procTable) > newLen DO newLen := newLen + InitTableLen END;
-			NEW(newProcOffsets, newLen);
-			FOR i := 0 TO numProcs - 1 DO
-				newProcOffsets[i] := procOffsets[i]
-			END;
-			procOffsets := newProcOffsets
-		END;
-		num := NumTotalPtrs(procTable);
-		IF ptrOffsets = NIL THEN ptrOfsLen := 0 ELSE ptrOfsLen := LEN(ptrOffsets) END;
-		IF numPtrs + num > ptrOfsLen THEN
-			newLen := ptrOfsLen + InitPtrTableLen;
-			WHILE numPtrs + num > newLen DO newLen := newLen + InitPtrTableLen END;
-			NEW(newPtrOffsets, newLen);
-			FOR i := 0 TO numPtrs - 1 DO
-				newPtrOffsets[i] := ptrOffsets[i]
-			END;
-			ptrOffsets := newPtrOffsets
-		END;
-		success := FindInsertionPos(procTable[0], pos); success := success & FindInsertionPos(procTable[LEN(procTable) - 1], poslast);
-		IF (~success) OR (pos # poslast) THEN Machine.Release(Machine.Modules); HALT(2001) END;
-
-		FOR i := numProcs - 1 TO pos BY -1 DO procOffsets[i + LEN(procTable)] := procOffsets[i] END;
-		numberPointer := 0;
-		FOR i := 0 TO LEN(procTable) - 1 DO
-			procOffsets[pos + i].data := procTable[i];
-			procOffsets[pos + i].startIndex := numPtrs; (* this field is never accessed in case of procTable[i].noPtr = 0, so we may as well put numPtrs in there *)
-			FOR j := 0 TO procTable[i].noPtr - 1 DO
-				(*
-				temp := ptrTable[numberPointer]; INC(numberPointer);
-				*)
-				temp := ptrTable[i * maxPtr + j];
-				ptrOffsets[numPtrs + j] := temp;
-			END;
-			numPtrs := numPtrs + procTable[i].noPtr;
-		END;
-		numProcs := numProcs + LEN(procTable);
-	END
-END InsertProcOffsets;
-
-(** deletes a sequence of entries given in procTable from the global procOffsets table - the table remains sorted,
-	this procedure is called within AosLocks.AosModules, so no lock is taken here. *)
-PROCEDURE DeleteProcOffsets(firstProcPC: ADDRESS; noProcsInMod: LONGINT);
-VAR pos, i, noPtrsInMod, oldIndex: LONGINT; success: BOOLEAN;
-BEGIN
-	IF noProcsInMod > 0 THEN
-		success := FindPos(firstProcPC, pos);
-		IF success THEN
-			(* delete entries in ptrOffsets first *)
-			noPtrsInMod := 0;
-			FOR i := pos TO pos + noProcsInMod - 1 DO
-				noPtrsInMod := noPtrsInMod + procOffsets[i].data.noPtr
-			END;
-			oldIndex := procOffsets[pos].startIndex;
-			FOR i := procOffsets[pos].startIndex + noPtrsInMod TO numPtrs - 1 DO
-				ptrOffsets[i - noPtrsInMod] := ptrOffsets[i]
-			END;
-			numPtrs := numPtrs - noPtrsInMod;
-			(* delete entries in procOffsets *)
-			FOR i := pos + noProcsInMod TO numProcs - 1 DO
-				procOffsets[i - noProcsInMod] := procOffsets[i]
-			END;
-			numProcs := numProcs - noProcsInMod;
-			(* adjust startIndex of procOffsets entries greater than those that have been deleted *)
-			FOR i := 0 TO numProcs - 1 DO
-				IF procOffsets[i].startIndex > oldIndex THEN
-					procOffsets[i].startIndex := procOffsets[i].startIndex - noPtrsInMod
-				END
-			END;
-		ELSE
-			Trace.String("corrupt global procOffsets table"); Trace.Ln;
-			Machine.Release(Machine.Modules);
-			(*HALT(2000)*)
-		END
-	END
-END DeleteProcOffsets;
-
 (** Install procedure to execute when module is freed or shut down. The handler can distinguish the two cases by checking Modules.shutdown. If it is None, the module is being freed, otherwise the system is being shut down or rebooted. Only one handler may be installed per module. The last handler installed is active. *)
 PROCEDURE InstallTermHandler*(h: TerminationHandler);
 VAR m: Module;
@@ -726,7 +398,7 @@ END InstallTermHandler;
 (** Free a module. The module's termination handler, if any, is called first. Then all objects that have finalizers in this module are finalized (even if they are still reachable). Then the module's data and code are invalidated. *)
 PROCEDURE FreeModule*(CONST name: ARRAY OF CHAR; VAR res: LONGINT; VAR msg: ARRAY OF CHAR);
 VAR p, m: Module; term: TerminationHandler; i: LONGINT;
-BEGIN
+BEGIN {EXCLUSIVE}
 	m := ModuleByName(name);
 	IF (m # NIL) & (m.refcnt = 0) THEN	(* will be freed below *)
 		IF m.term # NIL THEN	(* call termination handler *)
@@ -735,7 +407,6 @@ BEGIN
 		Heaps.CleanupModuleFinalizers(ADDRESSOF(m.code[0]), LEN(m.code), m.name)
 	END;
 	res := Ok; msg[0] := 0X;
-	Machine.Acquire(Machine.Modules);
 	Trace.String("Acquired Machine.Modules x"); Trace.Ln;
 	p := NIL; m := root;
 	WHILE (m # NIL) & (m.name # name) DO p := m; m := m.next END;
@@ -767,10 +438,6 @@ BEGIN
 			(* do not clear m.data or m.code, as they are used in ThisModuleByAdr (for debugging). *)
 			(* do not clear m.refs, as they are used in Traps (for debugging). *)
 			m.export.dsc := NIL; m.exTable := NIL;
-			Trace.String("delete proc offsets"); Trace.Ln;
-
-					DeleteProcOffsets(m.firstProc, m.noProcs);
-			Trace.String("delete proc offsets f"); Trace.Ln;
 		ELSE
 			res := 1901;	(* can not free module in use *)
 			COPY(name, msg); Append(" reference count not zero", msg)
@@ -779,24 +446,19 @@ BEGIN
 		res := 1902;	(* module not found *)
 		COPY(name, msg); Append(" not found", msg)
 	END;
-	Machine.Release(Machine.Modules)
 END FreeModule;
 
 (** Shut down all modules by calling their termination handlers and then call Machine.Shutdown. *)
 PROCEDURE Shutdown*(code: LONGINT);
 VAR m: Module; term: TerminationHandler;
-BEGIN
+BEGIN {EXCLUSIVE}
 	IF code # None THEN
 		LOOP
-			Machine.Acquire(Machine.Modules);
 			m := root; WHILE (m # NIL) & (m.term = NIL) DO m := m.next END;
 			IF m # NIL THEN term := m.term; m.term := NIL END;
-			Machine.Release(Machine.Modules);
 			IF m = NIL THEN EXIT END;
 			IF trace THEN
-				Machine.Acquire (Machine.TraceOutput);
 				Trace.String("TermHandler "); Trace.StringLn (m.name);
-				Machine.Release (Machine.TraceOutput);
 			END;
 			term	(* if this causes exception or hangs, another shutdown call will retry *)
 		END;
@@ -809,9 +471,7 @@ BEGIN
 			m := m.next
 		END;
 		IF trace THEN
-			Machine.Acquire (Machine.TraceOutput);
 			Trace.StringLn ("Modules.Shutdown finished");
-			Machine.Release (Machine.TraceOutput);
 		END;
 		Machine.Shutdown(code = Reboot)	(* does not return *)
 	END
@@ -894,7 +554,6 @@ VAR
 	newRec: PROCEDURE (VAR p: ANY; tag: ADDRESS; isRealtime: BOOLEAN);
 	getProcedure: PROCEDURE(CONST m, p : ARRAY OF CHAR; argTdAdr, retTdAdr : ADDRESS; VAR entryAdr : ADDRESS);
 	s: ARRAY 4 OF CHAR;
-	module: Module; new: BOOLEAN; i: LONGINT;
 BEGIN
 	(* root and initBlock are initialized by the linker *)
 	shutdown := None;
@@ -917,45 +576,43 @@ BEGIN
 	freeRoot := NIL;
 	Machine.GetConfig("TraceModules", s);
 	trace := (s[0] = "1");
-
-(*
-	FOR i := 0 TO Runtime.modules-1 DO
-		module := SYSTEM.VAL(Module,Runtime.kernelModule[i]);
-		IF TraceBoot THEN
-			Trace.String("publishing module ");
-			Trace.String(module.name); Trace.Ln;
-		END;
-		Publish(module,new);
-		ASSERT(new,112233);
-	END;
-*)
-
-	(*
-	module := SYSTEM.VAL(Module,SELF);
-	Publish(module,new);
-	*)
 END Init;
 
-PROCEDURE InitializeModules;
-BEGIN
-	Activities.Call (Activities.Idle);
-END InitializeModules;
+PROCEDURE Register- (module {UNTRACED}: Module);
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	module.next := root; root := module;
+END Register;
 
+PROCEDURE PublishRegisteredModules;
+VAR module {UNTRACED}, next {UNTRACED}: Module; i: SIZE; new: BOOLEAN;
+BEGIN {UNCHECKED}
+	Activities.Call (Activities.Idle);
+	module := root; root := NIL;
+	WHILE module # NIL DO
+		next := module.next;
+		IF module.module # NIL THEN
+			FOR i := 0 TO LEN (module.module) - 1 DO
+				Publish (module.module[i], new);
+			END;
+		END;
+		Publish (module, new);
+		module := next;
+	END;
+END PublishRegisteredModules;
+
+PROCEDURE {FINAL} Main;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Environment.Initialize;
 	Processors.Initialize;
-	Activities.Execute (InitializeModules);
+	Activities.Execute (PublishRegisteredModules);
 	Processors.Terminate;
 	Activities.Terminate;
 	Queues.Terminate;
 	Environment.Terminate;
 	Environment.Exit (Environment.status);
+END Main;
+
+BEGIN
+	Init
 END Modules.
 
-(*
-19.03.1998	pjm	Started
-06.10.1998	pjm	FreeModule
-
-Note:
-o ThisCommand race: process A calls ThisModule, the module is published, but before its body has finished executing, process B calls ThisCommand, causing the assert (m.init) to fail. Process B should perhaps wait in this case until the body has executed, or ThisCommand should return NIL (but that will just move the race to the user).
-*)
