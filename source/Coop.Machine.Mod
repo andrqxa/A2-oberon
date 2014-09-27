@@ -161,7 +161,6 @@ VAR
 
 	PROCEDURE -SpinHint*;
 	CODE {SYSTEM.i386}
-		XOR	ECX, ECX	;  just in case some processor interprets REP this way
 		REP	NOP	;  PAUSE instruction (* NOP on pre-P4 processors, Spin Loop Hint on P4 and after *)
 	END SpinHint;
 
@@ -255,6 +254,7 @@ END GreaterOrEqual;
 	(** Return h*g. based on code from "AMD Athlon Processor x86 code optimization guide" *)
 	PROCEDURE MulH* (h, g: HUGEINT): HUGEINT;
 	CODE {SYSTEM.i386}
+		PUSH	ECX
 		MOV EDX, [EBP+12]	; y_hi
 		MOV ECX, [EBP+20]	; x_hi
 		OR EDX, ECX		; are x_hi and y_hi both zeros?
@@ -277,11 +277,13 @@ END GreaterOrEqual;
 		MUL DWORD [EBP+16]	; EDX := HI(y_lo*x_lo), EAX := LO(y_lo*x_lo)
 		ADD EDX, EBX		; EDX := y_lo*x_hi + y_hi*x_lo + HI(y_lo*x_lo)
 	exit:
+		POP	ECX
 	END MulH;
 
 	(** Return h DIV g. Rounding and division by zero behaviour is currently undefined. *)
 	PROCEDURE DivH* (x, y: HUGEINT): HUGEINT;
 	CODE {SYSTEM.i386}
+		PUSH	ECX
 		MOV ECX, [EBP+12]	; y-hi
 		MOV EBX, [EBP+8]	; y-lo
 		MOV EDX, [EBP+20]	; x-hi
@@ -360,32 +362,33 @@ END GreaterOrEqual;
 		SUB EAX, ESI		; if (quotient < 0)
 		SBB EDX, ESI		; compute 2s complement of result
 	exit:
+		POP	ECX
 	END DivH;
 
 (** Return ASH(h, n). *)
 	PROCEDURE -ASHH*( h: HUGEINT;  n: LONGINT ): HUGEINT;
 	CODE {SYSTEM.i386}
-		POP	ECX
+		POP	EBX
 		POP	EAX
 		POP	EDX
-		CMP	ECX, 0
+		CMP	EBX, 0
 		JL	right
-		AND	ECX, 63	;  limit count, like ASH
+		AND	EBX, 63	;  limit count, like ASH
 		JZ	exit
 		ll:
 		SHL	EAX, 1
 		RCL	EDX, 1
-		DEC	ECX
+		DEC	EBX
 		JNZ	ll
 		JMP	exit
 		right:
-		NEG ECX
-		AND	ECX, 63	;  limit count, like ASH
+		NEG EBX
+		AND	EBX, 63	;  limit count, like ASH
 		JZ	exit
 		lr:
 		SAR	EDX, 1
 		RCR	EAX, 1
-		DEC	ECX
+		DEC	EBX
 		JNZ	lr
 		exit:
 	END ASHH;
@@ -438,6 +441,7 @@ END GreaterOrEqual;
 
 	PROCEDURE CPUID*( VAR vendor: Vendor;  VAR version: LONGINT;  VAR features1,features2: SET );
 	CODE {SYSTEM.i386, SYSTEM.Pentium}
+		PUSH	ECX
 		MOV	EAX, 0
 		CPUID
 		CMP	EAX, 0
@@ -466,6 +470,7 @@ END GreaterOrEqual;
 		MOV	ESI, [EBP+features2]
 		MOV	[ESI], ECX
 		end:
+		POP	ECX
 	END CPUID;
 
 	PROCEDURE GetConfig*( CONST name: ARRAY OF CHAR;  VAR val: ARRAY OF CHAR );
@@ -1129,8 +1134,8 @@ END PhysicalAdr;
 	CODE {SYSTEM.i386}
 		POP EBX		; new
 		POP EAX		; old
-		POP ECX		; address of x
-		DB 0F0X, 00FX, 0B1X, 019X	; LOCK CMPXCHG [ECX], EBX; atomicly compare x with old and set it to new if equal
+		POP EDX		; address of x
+		DB 0F0X, 00FX, 0B1X, 01AX	; LOCK CMPXCHG [EDX], EBX; atomicly compare x with old and set it to new if equal
 	END AtomicCAS;
 
 (* function returning the number of processors that are available to Aos *)
@@ -1197,24 +1202,24 @@ PROCEDURE Portin8*(port: LONGINT; VAR val: CHAR);
 CODE{SYSTEM.i386}
 	MOV EDX,[EBP+port]
 	IN AL, DX
-	MOV ECX, [EBP+val]
-	MOV [ECX], AL
+	MOV EBX, [EBP+val]
+	MOV [EBX], AL
 END Portin8;
 
 PROCEDURE Portin16*(port: LONGINT; VAR val: INTEGER);
 CODE{SYSTEM.i386}
 	MOV EDX,[EBP+port]
 	IN AX, DX
-	MOV ECX, [EBP+val]
-	MOV [ECX], AX
+	MOV EBX, [EBP+val]
+	MOV [EBX], AX
 END Portin16;
 
 PROCEDURE Portin32*(port: LONGINT; VAR val: LONGINT);
 CODE{SYSTEM.i386}
 	MOV EDX,[EBP+port]
 	IN EAX, DX
-	MOV ECX, [EBP+val]
-	MOV [ECX], EAX
+	MOV EBX, [EBP+val]
+	MOV [EBX], EAX
 END Portin32;
 
 PROCEDURE Portout8*(port: LONGINT; val: CHAR);
