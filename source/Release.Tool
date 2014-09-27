@@ -302,7 +302,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod
 	I386 { Traps.Mod }
 	AMD64 { AMD64.Traps.Mod }
-	WIN {  Win32.Traps.Mod }
+	WINORIG, WINGEN {  Win32.Traps.Mod }
 	UNIX { Unix.StdIO.Mod Unix.Traps.Mod }
 
 	# Recursive and R/W locks
@@ -683,8 +683,8 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 	PartitionEditorTable.Mod
 
 	NATIVE{ Profiler.Mod HierarchicalProfiler0.Mod } # Hierarchical profiler has GUI: WMProfiler.Mod
-	WIN { Win32.HierarchicalProfiler0.Mod }
-	NATIVE, WIN { HierarchicalProfiler.Mod}
+	WINORIG, WINGEN { Win32.HierarchicalProfiler0.Mod }
+	NATIVE, WINORIG, WINGEN { HierarchicalProfiler.Mod}
 
 	FTPClient.Mod
 
@@ -988,7 +988,7 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 	WMShell.Mod	# GUI for Shell
 
 	# GUI for hierarchical profiler (HierarchicalProfiler.Mod)
-	NATIVE, WIN { WMProfiler.Mod }
+	NATIVE, WINORIG, WINGEN { WMProfiler.Mod }
 
 	# ssh
 	SSH.Tool
