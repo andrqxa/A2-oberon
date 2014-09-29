@@ -186,18 +186,21 @@ VAR
 (** Register a module loader. *)
 
 PROCEDURE AddLoader*(CONST ext: ARRAY OF CHAR; proc: LoaderProc);
-BEGIN {EXCLUSIVE}
+BEGIN
+	Machine.Acquire(Machine.Modules);
 	ASSERT(numLoaders < MaxObjFormats);
 	loader[numLoaders] := proc;
 	COPY(ext, extension[numLoaders]);
 	ASSERT(ext = extension[numLoaders]);	(* no overflow *)
 	INC(numLoaders);
+	Machine.Release(Machine.Modules)
 END AddLoader;
 
 (** Remove a module loader. *)
 PROCEDURE RemoveLoader*(CONST ext: ARRAY OF CHAR; proc: LoaderProc);
 VAR i, j: LONGINT;
-BEGIN {EXCLUSIVE}
+BEGIN
+	Machine.Acquire(Machine.Modules);
 	i := 0;
 	WHILE (i # numLoaders) & ((loader[i] # proc) OR (extension[i] # ext)) DO INC(i) END;
 	IF i # numLoaders THEN
@@ -207,6 +210,7 @@ BEGIN {EXCLUSIVE}
 		loader[numLoaders - 1] := NIL; extension[numLoaders - 1] := "";
 		DEC(numLoaders)
 	END;
+	Machine.Release(Machine.Modules)
 END RemoveLoader;
 
 (** Append string from to to, truncating on overflow. *)
@@ -222,10 +226,12 @@ END Append;
 (** Add a module to the pool of accessible modules, or return named module. *)
 PROCEDURE Publish*(VAR m: Module; VAR new: BOOLEAN);
 VAR n: Module; i: LONGINT;
-BEGIN {EXCLUSIVE}
-	n := root; WHILE (n # NIL) & (n.name # m.name) DO 	n := n.next END;
+BEGIN
+	Machine.Acquire(Machine.Modules);
+	n := root; WHILE (n # NIL) & (n.name # m.name) DO n := n.next END;
 	IF n # NIL THEN	(* module with same name exists, return it and ignore new m *)
-		m := n; new := FALSE
+		m := n; new := FALSE;
+		Machine.Release(Machine.Modules);
 	ELSE
 		m.published := TRUE;
 		m.next := root; root := m;
@@ -234,6 +240,7 @@ BEGIN {EXCLUSIVE}
 			FOR i := 0 TO LEN(m.module)-1 DO INC(m.module[i].refcnt) END;
 		END;
 		new := TRUE;
+		Machine.Release(Machine.Modules);
 	END;
 END Publish;
 
@@ -250,8 +257,10 @@ END Initialize;
 (** Return the named module or NIL if it is not loaded yet. *)
 PROCEDURE ModuleByName*(CONST name: ARRAY OF CHAR): Module;
 VAR m: Module;
-BEGIN {EXCLUSIVE}
+BEGIN
+	Machine.Acquire(Machine.Modules);
 	m := root; WHILE (m # NIL) & (m.name # name) DO m := m.next END;
+	Machine.Release(Machine.Modules);
 	RETURN m
 END ModuleByName;
 
@@ -268,11 +277,13 @@ END GetFileName;
 PROCEDURE ThisModule*(CONST name: ARRAY OF CHAR; VAR res: LONGINT; VAR msg: ARRAY OF CHAR): Module;
 TYPE Body = PROCEDURE;
 VAR m, p: Module; fileName: ARRAY 64 OF CHAR; i: LONGINT;
-BEGIN {EXCLUSIVE}
+BEGIN
 	res := Ok; msg[0] := 0X; m := ModuleByName(name);
 	IF m = NIL THEN
 		IF trace THEN
+			Machine.Acquire (Machine.TraceOutput);
 			Trace.String(">"); Trace.StringLn (name);
+			Machine.Release (Machine.TraceOutput);
 		END;
 		IF numLoaders = 0 THEN
 			res := NoLoader; m := NIL;
@@ -285,23 +296,33 @@ BEGIN {EXCLUSIVE}
 			UNTIL (m # NIL) OR (i=numLoaders);
 		END;
 		IF trace THEN
+			Machine.Acquire (Machine.TraceOutput);
 			Trace.String("?"); Trace.StringLn (name);
+			Machine.Release (Machine.TraceOutput);
 		END;
 		p := m;
 		IF (m # NIL) & ~m.published THEN	(* no race on m.published, as update is done below in Publish *)
 			Initialize(m);
 		END;
 		IF trace THEN
-			Trace.String("<"); Trace.StringLn (name);
+			Machine.Acquire (Machine.TraceOutput);
+			IF m = NIL THEN
+				Trace.String("could not load "); Trace.StringLn(name)
+			ELSIF ~m.published THEN
+				Trace.String("not published "); Trace.StringLn(name)
+			ELSE
+				Trace.String("<"); Trace.StringLn (name);
+			END;
+			Machine.Release (Machine.TraceOutput);
 		END;
 	END;
 	RETURN m
 END ThisModule;
 
-(** Return the module that contains code address pc or NIL if not found. Can also return freed modules. *)
-PROCEDURE ThisModuleByAdr*(pc: ADDRESS): Module;
+(** Return the module that contains code address pc or NIL if not found. Can also return freed modules. -- non-blocking variant for Reflection. *)
+PROCEDURE ThisModuleByAdr0*(pc: ADDRESS): Module;
 VAR m: Module; i: LONGINT; found: BOOLEAN; list: LONGINT;
-BEGIN {EXCLUSIVE}
+BEGIN
 	list := 0; found := FALSE;
 	REPEAT
 		CASE list OF
@@ -325,25 +346,35 @@ BEGIN {EXCLUSIVE}
 		INC(list)
 	UNTIL found OR (list=2);
 	RETURN m
-END ThisModuleByAdr;
-
-PROCEDURE ThisModuleByAdr0*(pc: ADDRESS): Module;
-BEGIN RETURN ThisModuleByAdr(pc);
 END ThisModuleByAdr0;
+
+(** Return the module that contains code address pc or NIL if not found. Can also return freed modules. *)
+PROCEDURE ThisModuleByAdr*(pc: ADDRESS): Module;
+VAR m: Module;
+BEGIN
+	Machine.Acquire(Machine.Modules);
+	m := ThisModuleByAdr0(pc);
+	Machine.Release(Machine.Modules);
+	RETURN m
+END ThisModuleByAdr;
 
 (*	Retrieve a procedure given a module name, the procedure name and some type information (kernel call) *)
 PROCEDURE GetProcedure*(CONST moduleName, procedureName : ARRAY OF CHAR; argTdAdr, retTdAdr : ADDRESS; VAR entryAdr : ADDRESS);
 VAR module : Module; ignoreMsg : ARRAY 32 OF CHAR; i, res : LONGINT;
-BEGIN {EXCLUSIVE}
+BEGIN
 	module := ThisModule(moduleName, res, ignoreMsg);
 	IF (res = Ok) THEN
 		ASSERT(module.init);	(* module body must have been called (see note at end of module) *)
-		i := 0; entryAdr := Heaps.NilVal;
-		WHILE (entryAdr = Heaps.NilVal) & (i # LEN(module.command^)) DO
-			IF (module.command[i].name = procedureName) & (module.command[i].argTdAdr = argTdAdr) & (module.command[i].retTdAdr = retTdAdr) THEN
-				entryAdr := module.command[i].entryAdr;
+		IF module.init THEN
+			Machine.Acquire(Machine.Modules);
+			i := 0; entryAdr := Heaps.NilVal;
+			WHILE (entryAdr = Heaps.NilVal) & (i # LEN(module.command^)) DO
+				IF (module.command[i].name = procedureName) & (module.command[i].argTdAdr = argTdAdr) & (module.command[i].retTdAdr = retTdAdr) THEN
+					entryAdr := module.command[i].entryAdr;
+				END;
+				INC(i)
 			END;
-			INC(i)
+			Machine.Release(Machine.Modules);
 		END;
 	END;
 END GetProcedure;
@@ -351,7 +382,8 @@ END GetProcedure;
 (** Return the named type *)
 PROCEDURE ThisType*(m: Module; CONST name: ARRAY OF CHAR): TypeDesc;
 VAR i: LONGINT; type: TypeDesc;
-BEGIN {EXCLUSIVE}
+BEGIN
+	Machine.Acquire(Machine.Modules);
 	i := 0;
 	WHILE (i < LEN(m.typeInfo)) & (m.typeInfo[i].name # name) DO INC(i) END;
 	IF i = LEN(m.typeInfo) THEN
@@ -359,15 +391,18 @@ BEGIN {EXCLUSIVE}
 	ELSE
 		type := m.typeInfo[i]
 	END;
+	Machine.Release(Machine.Modules);
 	RETURN type
 END ThisType;
 
 PROCEDURE ThisTypeByAdr*(adr: ADDRESS; VAR m: Module; VAR t: TypeDesc);
-BEGIN {EXCLUSIVE}
+BEGIN
 	IF adr # 0 THEN
+		Machine.Acquire(Machine.Modules);
 		SYSTEM.GET (adr + Heaps.TypeDescOffset, adr);
 		t := SYSTEM.VAL(TypeDesc, adr);
 		m := t.mod;
+		Machine.Release(Machine.Modules)
 	ELSE
 		m := NIL; t := NIL
 	END
@@ -406,7 +441,7 @@ END InstallTermHandler;
 (** Free a module. The module's termination handler, if any, is called first. Then all objects that have finalizers in this module are finalized (even if they are still reachable). Then the module's data and code are invalidated. *)
 PROCEDURE FreeModule*(CONST name: ARRAY OF CHAR; VAR res: LONGINT; VAR msg: ARRAY OF CHAR);
 VAR p, m: Module; term: TerminationHandler; i: LONGINT;
-BEGIN {EXCLUSIVE}
+BEGIN
 	m := ModuleByName(name);
 	IF (m # NIL) & (m.refcnt = 0) THEN	(* will be freed below *)
 		IF m.term # NIL THEN	(* call termination handler *)
@@ -415,13 +450,10 @@ BEGIN {EXCLUSIVE}
 		Heaps.CleanupModuleFinalizers(ADDRESSOF(m.code[0]), LEN(m.code), m.name)
 	END;
 	res := Ok; msg[0] := 0X;
-	Trace.String("Acquired Machine.Modules x"); Trace.Ln;
+	Machine.Acquire(Machine.Modules);
 	p := NIL; m := root;
 	WHILE (m # NIL) & (m.name # name) DO p := m; m := m.next END;
-	Trace.String("Acquired Machine.Modules y"); Trace.Ln;
-
 	IF m # NIL THEN
-		Trace.String("found module"); Trace.Ln;
 		IF m.refcnt = 0 THEN	(* free the module *)
 			FOR i := 0 TO LEN(m.module)-1 DO DEC(m.module[i].refcnt) END;
 			m.init := FALSE;	(* disallow ThisCommand *)
@@ -454,19 +486,24 @@ BEGIN {EXCLUSIVE}
 		res := 1902;	(* module not found *)
 		COPY(name, msg); Append(" not found", msg)
 	END;
+	Machine.Release(Machine.Modules)
 END FreeModule;
 
 (** Shut down all modules by calling their termination handlers and then call Machine.Shutdown. *)
 PROCEDURE Shutdown*(code: LONGINT);
 VAR m: Module; term: TerminationHandler;
-BEGIN {EXCLUSIVE}
+BEGIN
 	IF code # None THEN
 		LOOP
+			Machine.Acquire(Machine.Modules);
 			m := root; WHILE (m # NIL) & (m.term = NIL) DO m := m.next END;
-			IF m # NIL THEN term := m.term; m.term := NIL END;
+			IF m # NIL THEN term := m.term; m.term := NIL END; (* finalizer only called once *)
+			Machine.Release(Machine.Modules);
 			IF m = NIL THEN EXIT END;
 			IF trace THEN
+				Machine.Acquire (Machine.TraceOutput);
 				Trace.String("TermHandler "); Trace.StringLn (m.name);
+				Machine.Release (Machine.TraceOutput);
 			END;
 			term	(* if this causes exception or hangs, another shutdown call will retry *)
 		END;
@@ -479,7 +516,9 @@ BEGIN {EXCLUSIVE}
 			m := m.next
 		END;
 		IF trace THEN
+			Machine.Acquire (Machine.TraceOutput);
 			Trace.StringLn ("Modules.Shutdown finished");
+			Machine.Release (Machine.TraceOutput);
 		END;
 		Machine.Shutdown(code = Reboot)	(* does not return *)
 	END

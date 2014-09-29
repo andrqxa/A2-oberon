@@ -150,14 +150,16 @@ END CheckCandidates;
 (** Return the next scheduled finalizer or NIL if none available. Called by finalizer object in Kernel. *)
 PROCEDURE GetFinalizer* (): FinalizerNode;
 VAR n: FinalizerNode;
-BEGIN {EXCLUSIVE}
+BEGIN
 	n := NIL;
 	IF finalizeRoot # NIL THEN
+		Machine.Acquire(Machine.Heaps);
 		n := finalizeRoot;	(* take one finalizer *)
 		IF n # NIL THEN
 			finalizeRoot := n.nextFin; n.nextFin := NIL;
 			IF Stats THEN DEC(NfinalizeDead) END;
 		END;
+		Machine.Release(Machine.Heaps);
 	END;
 	RETURN n
 END GetFinalizer;
@@ -165,8 +167,9 @@ END GetFinalizer;
 (** Check finalizers registered in the specified module, which is about to be freed or shut down. Remove all finalizer procedures in this module from the finalizer lists so they won't be called any more. *)
 PROCEDURE CleanupModuleFinalizers*(codeAdr: ADDRESS; codeLen: SIZE; CONST name: ARRAY OF CHAR);
 VAR n, p, t: FinalizerNode; codeEnd: ADDRESS; N1, N2: LONGINT;
-BEGIN {EXCLUSIVE}
+BEGIN
 	codeEnd := codeAdr + codeLen; N1 := 0; N2 := 0;
+	Machine.Acquire(Machine.Heaps);
 	n := checkRoot;
 	WHILE n # NIL DO	(* iterate over checked list *)
 		t := n; n := n.nextFin;
@@ -190,10 +193,13 @@ BEGIN {EXCLUSIVE}
 			p := t
 		END
 	END;
+	Machine.Release(Machine.Heaps);
 	IF (N1 # 0) OR (N2 # 0) THEN
+		Machine.Acquire (Machine.TraceOutput);
 		Trace.String(name); Trace.Char(" ");
 		Trace.Int(N1, 1); Trace.String(" discarded finalizers, ");
 		Trace.Int(N2, 1); Trace.StringLn (" pending finalizers");
+		Machine.Release (Machine.TraceOutput);
 	END
 END CleanupModuleFinalizers;
 
@@ -428,7 +434,8 @@ END NewArr;
 PROCEDURE FillStaticType*(VAR staticTypeAddr: ADDRESS; startAddr, typeInfoAdr: ADDRESS; size, recSize: SIZE;
 							numPtrs, numSlots: LONGINT);
 VAR p, offset: ADDRESS; staticTypeBlock {UNTRACED}: StaticTypeBlock;
-BEGIN {EXCLUSIVE}
+BEGIN
+	Machine.Acquire(Machine.Heaps);
 
 	Machine.Fill32(startAddr, size, 0);	(* clear whole static type, size MOD AddressSize = 0 implicitly, see WriteType in PCOF.Mod *)
 	SYSTEM.PUT(startAddr, MethodEndMarker);	(* sentinel *)
@@ -450,18 +457,22 @@ BEGIN {EXCLUSIVE}
 	staticTypeBlock.pointerOffsets := SYSTEM.VAL(PointerOffsets, p); (* the fourth field contains the dimension of the array *)
 
 	(* pointer offsets  filled in later *)
+
+	Machine.Release(Machine.Heaps)
 END FillStaticType;
 
 PROCEDURE AddFinalizer*(obj: ANY; n: FinalizerNode);
-BEGIN {EXCLUSIVE}
+BEGIN
 	n.objWeak := obj; n.objStrong := NIL; n.finalizerStrong := NIL;
+	Machine.Acquire(Machine.Heaps);
 	n.nextFin := checkRoot; checkRoot := n;
 	IF Stats THEN INC(NfinalizeAlive) END;
+	Machine.Release(Machine.Heaps)
 END AddFinalizer;
 
 (** Compute total heap size, free space and largest free block size in bytes. This is a slow operation. *)
 PROCEDURE GetHeapInfo*(VAR total, free, largest: SIZE);
-BEGIN {EXCLUSIVE}
+BEGIN
 	total := 0; free := 0; largest := 0;
 END GetHeapInfo;
 
