@@ -1,0 +1,95 @@
+(* APIC runtime support for processors *)
+(* Copyright (C) Florian Negele *)
+
+(** The Processors module represents all logical processors of the system. *)
+MODULE Processors;
+
+IMPORT APIC, Counters, CPU;
+
+(** Indicates the maximal number of logical processors that are supported by the system. *)
+CONST Maximum* = APIC.Processors + 4;
+
+CONST InitMessage = APIC.INIT + APIC.Assert + APIC.AllExcludingSelf;
+CONST StartupMessage = APIC.STARTUP + APIC.Assert + APIC.AllExcludingSelf;
+CONST NonmaskableMessage = APIC.NMI + APIC.Assert + APIC.AllExcludingSelf;
+
+(** Holds the actual number of processors in the system. *)
+VAR count- := 1: SIZE;
+
+VAR running: Counters.AlignedCounter; (* counts the number of application processors currently running *)
+VAR semaphore: Counters.AlignedCounter; (* counter that acts as semaphore for suspended processors *)
+
+(** Returns the unique index of the processor executing this procedure call. *)
+PROCEDURE GetCurrentIndex- EXTERN "Activities.GetCurrentProcessorIndex" (): SIZE;
+
+(** Suspends the execution of the current processor. *)
+(** A suspended processor must be resumed by a call to the Processors.ResumeAnyProcessor procedure. *)
+(** This procedure may not be called if there is only one processor in the system. *)
+(** @topic Scheduling *)
+PROCEDURE SuspendCurrentProcessor-;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	REPEAT IF Counters.Read (semaphore) = 0 THEN APIC.AwaitInterrupt END;
+	UNTIL Counters.Decrement (semaphore, 1) # 0;
+END SuspendCurrentProcessor;
+
+(** Resumes the execution of a single suspended processor. *)
+(** This procedure may not be called if there is only one processor in the system. *)
+(** @topic Scheduling *)
+PROCEDURE ResumeAnyProcessor-;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	IF Counters.Increment (semaphore, 1) = 0 THEN APIC.SendInterrupt (NonmaskableMessage, {}); END;
+END ResumeAnyProcessor;
+
+(** Starts the execution of all available processors. *)
+(** This procedure may not be called if there is only one processor in the system. *)
+(** @topic Scheduling *)
+PROCEDURE StartAll-;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	ASSERT (count > 1);
+	APIC.SendInterrupt (NonmaskableMessage, {});
+END StartAll;
+
+PROCEDURE {NORETURN} Start;
+PROCEDURE Execute EXTERN "Activities.Execute" (procedure: PROCEDURE);
+PROCEDURE Idle EXTERN "Activities.Idle";
+VAR value: SIZE;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	LOOP
+		value := CAS (count, 0, 0);
+		IF value = APIC.Processors THEN CPU.Halt END;
+		IF CAS (count, value, value + 1) = value THEN EXIT END;
+		CPU.Backoff;
+	END;
+	Counters.Inc (running);
+	APIC.AwaitInterrupt; Execute (Idle);
+	Counters.Dec (running);
+	CPU.Halt;
+END Start;
+
+PROCEDURE AwaitStartups;
+VAR current := 0, previous := 0, counter := 0: SIZE;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	REPEAT
+		current := Counters.Read (running); INC (counter);
+		IF current # previous THEN previous := current; counter := 0 END;
+	UNTIL counter = 100000;
+END AwaitStartups;
+
+(** Initializes the module by enumerating all available processors. *)
+(** @topic Runtime Call *)
+PROCEDURE Initialize-;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	APIC.CopyBootCode (Start);
+	APIC.SendInterrupt (InitMessage, {});
+	APIC.SendInterrupt (StartupMessage, {});
+	AwaitStartups;
+END Initialize;
+
+(** Terminates the module and waits for all other processors to stop their execution. *)
+(** @topic Runtime Call *)
+PROCEDURE Terminate-;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	REPEAT UNTIL Counters.Read (running) = 0;
+END Terminate;
+
+END Processors.

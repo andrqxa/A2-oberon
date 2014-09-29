@@ -16,4 +16,22 @@ loop:
 	JNZ		loop
 END Backoff;
 
+(* cpu control *)
+PROCEDURE {NORETURN} Reset-;
+CODE
+	CLI
+	PUSH	0
+	PUSH	0
+	LIDT	[ESP]
+	INT3
+END Reset;
+
+PROCEDURE {NORETURN} Halt-;
+CODE
+	CLI
+end:
+	HLT
+	JMP	end
+END Halt;
+
 END CPU.

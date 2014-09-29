@@ -106,6 +106,17 @@ BUILDS
 		EXCLUDEPACKAGES ""
 		DISABLED "FALSE"
 	}
+	A2Cooperative {
+		INCLUDE "NATIVE NATIVEGEN I386 I386GEN COOP NATIVECOOP"
+		COMPILER "Compiler.Compile"
+		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile"
+		TARGET "AMD"
+		EXTENSION "Gof"
+		SYMBOLEXTENSION "Sym"
+		PATH "AOS:"
+		EXCLUDEPACKAGES ""
+		DISABLED "FALSE"
+	}
 	A2NewObjectFile
 	{
 		INCLUDE "NATIVE NATIVEGEN I386 I386GEN UNCOOP"
@@ -251,6 +262,7 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 
 	# cooperative runtime system
 	COOP { I386.CPU.Mod Counters.Mod }
+	NATIVECOOP { I386.APIC.Mod APIC.Processors.Mod }
 	WINCOOP { Coop.Win32.Kernel32.Mod Win32.Processors.Mod }
 	COOP { Queues.Mod Activities.Mod ExclusiveBlocks.Mod }
 	WINCOOP { Win32.Environment.Mod }
