@@ -399,6 +399,7 @@ TYPE
 			IF x.isDelegate THEN Flag(Global.NameDelegate,first) END;
 			IF x.isInterrupt THEN Flag(Global.NameInterrupt,first) END;
 			IF x.noPAF THEN Flag(Global.NameNoPAF,first) END;
+			IF x.noReturn THEN Flag(Global.NameNoReturn,first) END;
 			IF x.callingConvention = SyntaxTree.WinAPICallingConvention THEN
 				Flag(Global.NameWinAPI,first)
 			ELSIF x.callingConvention = SyntaxTree.CCallingConvention THEN
@@ -1164,6 +1165,7 @@ TYPE
 				first := TRUE;
 				IF type.stackAlignment > 1 THEN Value(Global.NameStackAligned,type.stackAlignment,first) END;
 				IF (type.isRealtime) THEN Flag(Global.NameRealtime,first) END;
+				IF (type.noReturn) THEN Flag(Global.NameNoReturn,first) END;
 				IF (x.fixed) THEN Value(Global.NameFixed, x.alignment,first)
 				ELSIF (x.alignment >1) THEN Value(Global.NameAligned, x.alignment, first)
 				END;
