@@ -65,6 +65,7 @@ TYPE Activity* = OBJECT {DISPOSABLE} (VirtualProcessor)
 	VAR finalizer := NIL: SwitchFinalizer;
 	VAR previous: Activity; argument: ADDRESS;
 	VAR framePointer {UNTRACED}: StackFrame;
+	VAR object-: OBJECT;
 
 	PROCEDURE &InitializeActivity (procedure: PROCEDURE; priority: Priority);
 	VAR stackFrame {UNTRACED}: StackFrame;
@@ -87,8 +88,6 @@ END Activity;
 
 (* Represents a handler for an activity that is associated with an active object. *)
 TYPE Process = OBJECT {DISPOSABLE} (Activity)
-
-	VAR object: OBJECT;
 
 	PROCEDURE &InitializeProcess (procedure: PROCEDURE; priority: Priority; object: OBJECT);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}

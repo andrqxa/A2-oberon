@@ -2,7 +2,7 @@ MODULE Machine;
 (** AUTHOR "pjm,fof"; PURPOSE "Bootstrapping, configuration and machine interface, adaption to windows fof"; *)
 (* red marked parts are WinAos specific *)
 
-IMPORT SYSTEM, Trace, Kernel32, Mutexes;
+IMPORT SYSTEM, Trace, Kernel32, Mutexes, Processors;
 
 CONST
 	Version = "WinAos Revision 4634 (12.03.2012)";
@@ -10,7 +10,7 @@ CONST
 	DefaultConfigFile = "aos.ini";
 	UserConfigFile = "myaos.ini";
 
-	MaxCPU* = 8;	(* dummy definition to make GC for both Win32 and I386 work *)
+	MaxCPU* = Processors.Maximum;	(* dummy definition to make GC for both Win32 and I386 work *)
 
 	DefaultObjectFileExtension* = ".Obw";
 
@@ -32,7 +32,6 @@ CONST
 	Interrupts* = 3;   (* Interrupt handling. *)
 	Modules* = 4;   (* Module list *)
 	Objects* = 5;   (* Ready queue *)
-	Processors* = 6;   (* Interprocessor interrupts *)
 	KernelLog* = 7;   (* Atomic output *)
 	GC* = 8;
 	MaxLocks = 9;   (* { <= 32 } *)
@@ -495,10 +494,9 @@ CODE {SYSTEM.Pentium}
 	RDTSC	; set EDX:EAX
 END GetTimer;
 
-(* Dan:  mono CPU PCs *)
 PROCEDURE ID*(): LONGINT;
 BEGIN
-	RETURN 0
+	RETURN Processors.GetCurrentIndex ();
 END ID;
 
 (* setup MMX, SSE and SSE2..SSE5 and AVX extension *)

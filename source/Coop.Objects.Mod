@@ -155,7 +155,7 @@ END Yield;
 (** Return current process. (DEPRECATED, use ActiveObject) *)
 PROCEDURE CurrentProcess*( ): Process;
 BEGIN
-	HALT(1234);
+	RETURN NIL;
 END CurrentProcess;
 
 (* Return stack bottom of process. For compatibility WinAos/UnixAos/NativeAos  *)
@@ -166,18 +166,14 @@ END GetStackBottom;
 
 (** Return the active object currently executing. *)
 PROCEDURE ActiveObject* (): ANY;
-VAR r: Process;
 BEGIN
-	HALT(1234);
-	RETURN r.obj
+	RETURN Activities.GetCurrentActivity ().object;
 END ActiveObject;
 
 (** Return the ID of the active currently executing process. *)
 PROCEDURE GetProcessID* (): LONGINT;
-VAR r: Process;
 BEGIN
-	HALT(1234);
-	RETURN r.id
+	RETURN SYSTEM.VAL (LONGINT, Activities.GetCurrentActivity ());
 END GetProcessID;
 
 (* Attempt to terminate a specific process (mostly ignoring its locks). DEPRECATED *)
