@@ -102,7 +102,6 @@ VAR
 	mhz*: HUGEINT;   (** clock rate of GetTimer() in MHz, or 0 if not known *)
 	boottime-: HUGEINT; (** in timer units *)
 
-	commandLine-: ARRAY 256 OF CHAR;
 	hin, hout: Kernel32.HANDLE;
 
 VAR
@@ -532,66 +531,6 @@ BEGIN
 	END;
 END SetupSSE2Ext;
 
-PROCEDURE ReadCommandLine(VAR commandLine: ARRAY OF CHAR);
-VAR adr: ADDRESS; i: LONGINT; ch: CHAR;
-BEGIN
-	adr := Kernel32.GetCommandLine();
-	SYSTEM.GET(adr,ch);
-	i := 0;
-	WHILE (i<LEN(commandLine)-1) & (ch # 0X) DO
-		commandLine[i] := ch;
-		INC(adr); INC(i);
-		SYSTEM.GET(adr,ch);
-	END;
-END ReadCommandLine;
-
-PROCEDURE ParseLine(VAR c: ARRAY OF CHAR; VAR iniFile: ARRAY OF CHAR);
-VAR i: LONGINT;
-
-	PROCEDURE SkipSpaces;
-	BEGIN
-		WHILE (c[i] <= " ") & (c[i] # 0X) DO INC(i) END;
-	END SkipSpaces;
-
-	PROCEDURE SkipName;
-	BEGIN
-		WHILE (c[i] > " ") DO INC(i) END;
-	END SkipName;
-
-	PROCEDURE CheckName(CONST name: ARRAY OF CHAR): BOOLEAN;
-	VAR j: LONGINT;
-	BEGIN
-		j := 0;
-		WHILE (c[i] = name[j]) & (c[i] # 0X) & (name[j] # 0X) DO
-			INC(i); INC(j);
-		END;
-		RETURN (name[j] = 0X);
-	END CheckName;
-
-	PROCEDURE ReadName(VAR name: ARRAY OF CHAR);
-	VAR j: LONGINT;
-	BEGIN
-		SkipSpaces;
-		j := 0;
-		WHILE (c[i] > " ") & (j < LEN(name)-1) DO
-			name[j] := c[i];
-			INC(i); INC(j);
-		END;
-		name[j] := 0X;
-	END ReadName;
-
-BEGIN
-	c[LEN(c)-1] := 0X;
-	i := 0;
-	SkipSpaces;
-	SkipName;
-	SkipSpaces;
-	IF c[i] = "-" THEN (* option *)
-		INC(i);
-		IF CheckName("ini") THEN SkipSpaces; ReadName(iniFile) END;
-	END;
-END ParseLine;
-
 PROCEDURE TraceChar(c: CHAR);
 VAR len: LONGINT;
 BEGIN
@@ -717,17 +656,8 @@ BEGIN
 	CPUID(vendor, ver, features,features2);	 SetupSSE2Ext;
 	fcr := (FCR() - {0,2,3,10,11}) + {0..5,8,9};	(* default FCR RC=00B *)
 
-	ReadCommandLine(commandLine);
-
 	ToExecutablePath(DefaultConfigFile, defaultConfigFile);
 	ToExecutablePath(UserConfigFile, userConfigFile);
-
-	(* ever used ? *)
-	ParseLine(commandLine, userConfigFile);
-	userConfigFile[Kernel32.GetFullPathName (userConfigFile, Kernel32.MaxPath, userConfigFile, 0)] := 0X;
-
-	Trace.String("config file = "); Trace.String(defaultConfigFile); Trace.Ln;
-	Trace.String("user config file = "); Trace.String(userConfigFile); Trace.Ln;
 
 	traceName[0] := 0X;
 	GetConfig("Trace",traceName);
