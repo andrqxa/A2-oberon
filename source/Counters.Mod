@@ -10,7 +10,7 @@ IMPORT CPU;
 TYPE Counter* = RECORD value := 0: SIZE END;
 
 (** Represents an atomic counter aligned for optimal cache behavior. *)
-TYPE AlignedCounter* = RECORD (Counter) END;
+TYPE AlignedCounter* = RECORD (Counter) dummy {ALIGNED (CPU.CacheLineSize)} : RECORD END END;
 
 VAR a: AlignedCounter;
 

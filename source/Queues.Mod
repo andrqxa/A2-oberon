@@ -26,9 +26,9 @@ END Item;
 TYPE Queue* = RECORD first := NIL, last := NIL: Node END;
 
 (** Represents a first-in first-out data structure which is aligned for optimal cache behavior. *)
-TYPE AlignedQueue* = RECORD (Queue) END;
+TYPE AlignedQueue* = RECORD (Queue) dummy {ALIGNED (CPU.CacheLineSize)} : RECORD END END;
 
-VAR processors: ARRAY Processors.Maximum OF RECORD hazard {UNTRACED}, pooled {UNTRACED}: ARRAY 2 OF Node END;
+VAR processors: ARRAY Processors.Maximum OF RECORD hazard {UNTRACED}, pooled {UNTRACED}: ARRAY 2 OF Node; dummy {ALIGNED (CPU.CacheLineSize)} : RECORD END END;
 
 PROCEDURE Swap (VAR shared {UNTRACED}, node {UNTRACED}: Node);
 VAR current {UNTRACED}: Node;

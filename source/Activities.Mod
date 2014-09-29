@@ -106,6 +106,7 @@ TYPE Processor = RECORD
 	originalFramePointer: ADDRESS;
 	runningActivity: Activity;
 	index: SIZE;
+	dummy {ALIGNED (CPU.CacheLineSize)} : RECORD END;
 END;
 
 VAR processors: ARRAY Processors.Maximum OF Processor;
