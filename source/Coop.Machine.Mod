@@ -2,7 +2,7 @@ MODULE Machine;
 (** AUTHOR "pjm,fof"; PURPOSE "Bootstrapping, configuration and machine interface, adaption to windows fof"; *)
 (* red marked parts are WinAos specific *)
 
-IMPORT SYSTEM, Trace, Kernel32;
+IMPORT SYSTEM, Trace, Kernel32, Mutexes;
 
 CONST
 	Version = "WinAos Revision 4634 (12.03.2012)";
@@ -106,7 +106,7 @@ VAR
 
 VAR
 	lock-: ARRAY MaxLocks OF CHAR;  (* not implemented as SET because of shared access *)
-	cs: ARRAY MaxLocks OF Kernel32.CriticalSection;
+	mutex: ARRAY MaxLocks OF Mutexes.Mutex;
 	trace: ARRAY 2 OF CHAR;
 	defaultConfigFile, userConfigFile, traceName: ARRAY Kernel32.MaxPath OF CHAR;
 
@@ -670,36 +670,16 @@ BEGIN
 	END;
 END Init;
 
-	(* Initialize locks. *)
-	PROCEDURE InitLocks;
-	VAR i: LONGINT;
-	BEGIN
-		i := 0;
-		WHILE i < MaxLocks DO Kernel32.InitializeCriticalSection( cs[i] ); lock[i] := "N"; INC( i ) END;
-	END InitLocks;
-
 (** Acquire a spin-lock. *)
 	PROCEDURE Acquire*( level: LONGINT );   (* non reentrant lock  (non reentrance "ensured" by ASSERT statement ), CriticalSections are reentrant *)
 	BEGIN
-		Kernel32.EnterCriticalSection( cs[level] );
-		IF StrongChecks THEN
-			ASSERT ( lock[level] = "N", 1001 );
-		ELSIF lock[level] # "N" THEN
-			Trace.String("warning: reentered non-reentrant lock"); Trace.Ln;
-		END;
-		lock[level] := "Y";
+		Mutexes.Acquire (mutex[level]);
 	END Acquire;
 
 (** Release a spin-lock. *)
 	PROCEDURE Release*( level: LONGINT );   (* release lock *)
 	BEGIN
-		IF StrongChecks THEN
-			ASSERT ( lock[level] ="Y", 1002 );
-		ELSIF lock[level] # "Y" THEN
-			Trace.String("warning: reentered non-reentrant lock"); Trace.Ln;
-		END;
-		lock[level] := "N";
-		Kernel32.LeaveCriticalSection( cs[level] )
+		Mutexes.Release (mutex[level]);
 	END Release;
 
 (* returns if an address is a currently allocated heap address *)
@@ -874,6 +854,5 @@ END Portout32;
 
 BEGIN
 	trace[1] := 0X; Trace.Char := LogChar; Trace.Color := TraceColor;
-	InitLocks();
 	Init;
 END Machine.

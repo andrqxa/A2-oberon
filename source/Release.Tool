@@ -37,7 +37,7 @@
 # 
 # WINAOS cooperative
 #	Release.Build --build --path="./" WinAosCooperative ~
-#	StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=Gof --displacement=401000H --path="./" Runtime Trace CPU Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Machine Heaps Modules Objects Kernel RuntimeSupport GarbageCollector KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~
+#	StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=Gof --displacement=401000H --path="./" Runtime Trace CPU Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules Objects Kernel RuntimeSupport GarbageCollector KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~
 #	FSTools.CloseFiles A2.exe ~
 # 
 # Notes:
@@ -278,7 +278,7 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	I386GEN { oc/Generic.I386.Machine.Mod }
 	AMD64 { AMD64.Machine.Mod }
 	WINORIG, WINGEN {Win32.Machine.Mod }
-	COOP { Coop.Machine.Mod }
+	COOP { Mutexes.Mod Coop.Machine.Mod }
 
 	UNIX { Unix.I386.Machine.Mod }
 
