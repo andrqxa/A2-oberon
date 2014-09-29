@@ -140,13 +140,9 @@ TYPE
 				next := fn.nextObj;	(* current (or other) object may be removed by enum call *)
 				obj := NIL;
 
-				Machine.Acquire(Machine.GC);	(* prevent GC from running *)
-
 				IF (fn.objWeak # NIL ) & (fn.objStrong = NIL ) THEN (* object is not yet on the finalizers list *)
 					obj := fn.objWeak; (* now object is locally referenced, will therefore not be GCed *)
 				END;
-
-				Machine.Release(Machine.GC);
 
 				IF obj # NIL THEN enum( obj, cont ); END;
 				IF cont THEN fn := next ELSE fn := NIL END

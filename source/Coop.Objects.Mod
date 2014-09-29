@@ -76,20 +76,16 @@ TYPE
 		process := CurrentProcess();
 		mode := process.mode;
 		LOOP
-			Machine.Acquire(Machine.Objects);
 			process.mode := mode;
 			LOOP
 				h := event.next;  (* event: head of timer event queue *)
 				IF (h = event) OR (h.trigger - ticks > 0) THEN EXIT END;
 				event.next := h.next;  event.next.prev := event;   (* unlink *)
 				h.next := NIL;  h.prev := NIL;
-				Machine.Release(Machine.Objects);
 				h.handler();   (* assume handler will return promptly *)
-				Machine.Acquire(Machine.Objects)
 			END;
 			mode := process.mode;
 			process.mode := AwaitingEvent;
-			Machine.Release(Machine.Objects);
 		END
 	END Clock;
 
@@ -138,12 +134,10 @@ END SetPriority;
 (** Return TRUE iff the specified protected object is locked exclusive to the current process. *)
 PROCEDURE LockedByCurrent*( obj: ANY ): BOOLEAN;
 VAR hdr {UNTRACED}: Heaps.ProtRecBlock; res: BOOLEAN;
-BEGIN
+BEGIN {EXCLUSIVE}
 	SYSTEM.GET(SYSTEM.VAL(ADDRESS, obj) + Heaps.HeapBlockOffset, hdr);
 	ASSERT(hdr IS Heaps.ProtRecBlock);
-	Machine.Acquire(Machine.Objects);
 	res := (hdr.lockedBy = ActiveObject());
-	Machine.Release(Machine.Objects);
 	RETURN res
 END LockedByCurrent;
 
@@ -192,11 +186,10 @@ END Terminate;
 (** Set (or reset) an event handler object's timeout value. *)
 PROCEDURE SetTimeout*(t: Timer; h: EventHandler;  ms: LONGINT );
 VAR e: Timer;  trigger: LONGINT;
-BEGIN
+BEGIN {EXCLUSIVE}
 	ASSERT(Machine.Second= 1000); (* assume milliseconds for now *)
 	ASSERT((t # NIL) & (h # NIL));
 	ASSERT(ms >= 0);
-	Machine.Acquire(Machine.Objects);
 	IF t.next # NIL THEN  (* cancel previous timeout *)
 		t.next.prev := t.prev;  t.prev.next := t.next
 	END;
@@ -204,17 +197,15 @@ BEGIN
 	e := event.next;   (* performance: linear search! *)
 	WHILE (e # event) & (e.trigger - trigger <= 0) DO e := e.next END;
 	t.prev := e.prev;  e.prev := t;  t.next := e;  t.prev.next := t;
-	Machine.Release(Machine.Objects);
 	clock.Wakeup()
 END SetTimeout;
 
 (** Set (or reset) an event handler object's timeout value. Here ms is absolute *)
 PROCEDURE SetTimeoutAt*(t: Timer; h: EventHandler; ms: LONGINT);
 VAR e: Timer; trigger: LONGINT;
-BEGIN
+BEGIN {EXCLUSIVE}
 	ASSERT(Machine.Second= 1000);	(* assume milliseconds for now *)
 	ASSERT((t # NIL) & (h # NIL));
-	Machine.Acquire(Machine.Objects);
 	trigger := ms; (* ignore overflow *)
 	IF t.next # NIL THEN (* cancel previous timeout *)
 		t.next.prev := t.prev; t.prev.next := t.next
@@ -223,20 +214,17 @@ BEGIN
 	e := event.next;	(* performance: linear search! *)
 	WHILE (e # event) & (e.trigger - trigger <= 0) DO e := e.next END;
 	t.prev := e.prev; e.prev := t; t.next := e; t.prev.next := t;
-	Machine.Release(Machine.Objects);
 	clock.Wakeup()
 END SetTimeoutAt;
 
 (** Cancel an event handler object's timeout, if any. It is possible that the timer has expired, but not yet been scheduled to run. *)
 PROCEDURE CancelTimeout*( t: Timer );
-BEGIN
-	Machine.Acquire(Machine.Objects);
+BEGIN {EXCLUSIVE}
 	ASSERT (t # event );
 	IF t.next # NIL THEN
 		t.next.prev := t.prev;  t.prev.next := t.next;  t.next := NIL;
 		t.prev := NIL
 	END;
-	Machine.Release(Machine.Objects);
 END CancelTimeout;
 
 PROCEDURE InitEventHandling;
