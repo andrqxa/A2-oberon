@@ -3,9 +3,11 @@
 
 MODULE Environment;
 
-IMPORT SYSTEM, CPU, Activities, Trace;
+IMPORT SYSTEM, CPU, Activities, HeapManager, Trace;
 
 CONST Running = 0; ShuttingDown = 1; Rebooting = 2;
+
+CONST HeapAdr = 100000H;
 
 CONST TraceV24 = 2; TraceScreen = 0;
 CONST TraceWidth = 80; TraceHeight = 25;
@@ -15,7 +17,9 @@ CONST TraceSize = TraceLen * TraceHeight;
 VAR traceMode: SET;
 VAR bootFlag: ADDRESS;
 VAR status* := 0: WORD;
+VAR memTop: ADDRESS;
 VAR traceBase: ADDRESS;
+VAR heap: HeapManager.Heap;
 VAR config: ARRAY 2048 OF CHAR;
 VAR tracePort, tracePos, traceColor: SIZE;
 
@@ -36,12 +40,12 @@ END Clock;
 
 PROCEDURE Allocate- (size: SIZE): ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	RETURN 0;
+	RETURN HeapManager.Allocate (size, heap);
 END Allocate;
 
 PROCEDURE Deallocate- (address: ADDRESS);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	HALT (1234);
+	HeapManager.Deallocate (address, heap);
 END Deallocate;
 
 PROCEDURE StrToInt (VAR i: LONGINT; CONST s: ARRAY OF CHAR): LONGINT;
@@ -109,6 +113,7 @@ BEGIN {UNCOOPERATIVE}
 			SYSTEM.GET (p + 8, addr); SYSTEM.GET (p + 12, size);
 		ELSIF type = 4 THEN	(* free memory/extended memory size *)
 			SYSTEM.GET (p + 8, addr); SYSTEM.GET (p + 12, size);
+			IF addr = HeapAdr THEN heapSize := size END
 		ELSIF type = 5 THEN	(* HD config *)
 		ELSIF type = 8 THEN	(* config strings *)
 			i := p + 8; j := 0;	(* copy the config strings over *)
@@ -121,6 +126,7 @@ BEGIN {UNCOOPERATIVE}
 		END;
 		SYSTEM.GET (p + 4, size); INC (p, size)
 	END;
+	memTop := HeapAdr + heapSize
 END ReadBootTable;
 
 PROCEDURE TraceChar (c: CHAR);
@@ -215,16 +221,21 @@ PROCEDURE Initialize-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ReadBootTable (bootFlag);
 	InitTrace;
+	HeapManager.Initialize (heap, ADDRESS OF KernelEnd, memTop);
 END Initialize;
 
 PROCEDURE Terminate-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Terminate;
 
-PROCEDURE {NOPAF, FIXED(100000H)} EntryPoint;
+PROCEDURE {NOPAF, FIXED(100000H)} KernelBegin;
 CODE
 	MOV bootFlag, EAX
-END EntryPoint;
+END KernelBegin;
+
+PROCEDURE {NOPAF, ALIGNED(32)} KernelEnd;
+CODE {SYSTEM.i386}
+END KernelEnd;
 
 END Environment.
 
