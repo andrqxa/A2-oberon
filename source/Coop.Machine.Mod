@@ -1,11 +1,9 @@
 MODULE Machine;
-(** AUTHOR "pjm,fof"; PURPOSE "Bootstrapping, configuration and machine interface, adaption to windows fof"; *)
-(* red marked parts are WinAos specific *)
 
-IMPORT SYSTEM, Trace, Kernel32, Mutexes, Processors;
+IMPORT Environment, Trace, Mutexes, Processors;
 
 CONST
-	Version = "WinAos Revision 4634 (12.03.2012)";
+	Version = "A2 Cooperative Revision 5791";
 
 	MaxCPU* = Processors.Maximum;	(* dummy definition to make GC for both Win32 and I386 work *)
 
@@ -17,11 +15,6 @@ CONST
 	debug* = FALSE;   (** display more debug output during booting *)
 
 CONST
-	AddressSize = SIZEOF(ADDRESS);
-	StaticBlockSize = 32;		(* static heap block size *)
-	BlockHeaderSize = 2 * AddressSize;
-	RecordDescSize = 4 * AddressSize;  (* needs to be adapted in case Heaps.RecordBlockDesc is changed *)
-
 (** standard lock levels (in order) *)  (* also refer to Traps.Show *)
 	TraceOutput* = 0;   (* Trace output *)
 	Memory* = 1;   (* Virtual memory management, stack and page allocation *)
@@ -33,23 +26,9 @@ CONST
 	GC* = 8;
 	MaxLocks = 9;   (* { <= 32 } *)
 
-	StrongChecks = FALSE;
-
-	HeaderSize = 40H; (* cf. Linker0 *)
-	EndBlockOfs = 38H;	(* cf. Linker0 *)
-	MemoryBlockOfs = BlockHeaderSize + RecordDescSize + BlockHeaderSize; (* memory block (including header) starts at offset HeaderSize *)
-
-	MemBlockSize = 8*1024*1024; (* 8 MB, must be multiple of StaticBlockSize *)
-	MinMemBlockSize = 4*1024*1024;
-
-	NilVal = 0;
-
-	Second* = 1000; (* frequency of ticks increments in Hz *)
-
-CONST
-		(* error codes *)
-		Ok* = 0;
-		NilAdr* = -1;	(* nil value for addresses (not same as pointer NIL value) *)
+	(* error codes *)
+	Ok* = 0;
+	NilAdr* = -1;	(* nil value for addresses (not same as pointer NIL value) *)
 
 TYPE
 	Vendor* = ARRAY 13 OF CHAR;
@@ -98,8 +77,6 @@ VAR
 	lock-: ARRAY MaxLocks OF CHAR;  (* not implemented as SET because of shared access *)
 	mutex: ARRAY MaxLocks OF Mutexes.Mutex;
 
-	bootHeapAdr: ADDRESS; 	(* initialized by linker, variable name must not be changed, see Win32.Aos.Link *)
-	bootHeapSize: SIZE; 			(* initialized by linker, variable name must not be changed, see Win32.Aos.Link *)
 	memBlockHead-{UNTRACED}, memBlockTail-{UNTRACED}: MemoryBlock; (* head and tail of sorted list of memory blocks *)
 
 
@@ -463,7 +440,7 @@ END GreaterOrEqual;
 
 	PROCEDURE Shutdown*( restart: BOOLEAN );
 	BEGIN
-		Kernel32.Shutdown( 0 );   (* calls the finalizer of Heaps *)
+		Environment.Exit (0);
 	END Shutdown;
 
 (* Dan: from new Machine *)
@@ -687,8 +664,7 @@ CODE{SYSTEM.i386}
 	OUT DX,EAX
 END Portout32;
 
-
-
 BEGIN
+	Trace.String("Machine: "); Trace.Blue; Trace.StringLn (Version); Trace.Default;
 	Init;
 END Machine.

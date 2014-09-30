@@ -24,6 +24,10 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Kernel32.ExitProcess (status);
 END Exit;
 
+PROCEDURE Clock- (): LONGINT;
+BEGIN RETURN Kernel32.GetTickCount ();
+END Clock;
+
 PROCEDURE Allocate- (size: SIZE): ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	RETURN Kernel32.HeapAlloc(heap, Kernel32.HeapZeroMemory, size);
@@ -149,6 +153,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ToExecutablePath(DefaultConfigFile, defaultConfigFile);
 	ToExecutablePath(UserConfigFile, userConfigFile);
 
+	Trace.Init;
 	traceName[0] := 0X;
 	Trace.Char := OutputChar;
 	GetConfig("Trace",traceName);

@@ -4,13 +4,13 @@
 
 MODULE Kernel;   (** AUTHOR "pjm, ejz, fof, ug"; PURPOSE "Implementation-independent kernel interface"; *)
 
-IMPORT SYSTEM, Kernel32, Machine, Heaps, (* Modules, *) Objects;
+IMPORT Environment, Heaps, Objects;
 
 CONST
 
 	TimerFree = 0;  TimerSleeping = 1;  TimerWoken = 2;  TimerExpired = 3;   (* Timer state *)
 
-	Second* = Machine.Second;
+	Second* = 1000;
 
 TYPE
 	(** Finalizer for FinalizedCollection.Add. *)
@@ -178,7 +178,7 @@ VAR
 		Ticks increment rate is stored in "second" variable in Hz. *)
 	PROCEDURE GetTicks*() : LONGINT;
 	BEGIN
-		RETURN Kernel32.GetTickCount()
+		RETURN Environment.Clock()
 	END GetTicks;
 
 	(** -- Garbage collection -- *)
@@ -195,35 +195,30 @@ VAR
 (** Set timer to expire in approximately "ms" milliseconds. *)
 	PROCEDURE SetTimer*( VAR t: MilliTimer;  ms: LONGINT );
 	BEGIN
-		IF Machine.Second # 1000 THEN  (* convert to ticks *)
-			ASSERT ( (ms >= 0) & (ms <= MAX( LONGINT ) DIV Machine.Second) );
-			ms := ms * Machine.Second DIV 1000
-		END;
 		IF ms < 5 THEN INC( ms ) END;   (* Nyquist adjustment *)
-		t.start := Kernel32.GetTickCount();  t.target := t.start + ms
+		t.start := Environment.Clock();  t.target := t.start + ms
 	END SetTimer;
 
 (** Test whether a timer has expired. *)
 	PROCEDURE Expired*( VAR t: MilliTimer ): BOOLEAN;
 	BEGIN
-		RETURN Kernel32.GetTickCount() - t.target >= 0
+		RETURN Environment.Clock() - t.target >= 0
 	END Expired;
 
 (** Return elapsed time on a timer in milliseconds. *)
 	PROCEDURE Elapsed*( VAR t: MilliTimer ): LONGINT;
 	BEGIN
-		RETURN (Kernel32.GetTickCount() - t.start) * (1000 DIV Machine.Second)
+		RETURN Environment.Clock() - t.start
 	END Elapsed;
 
 (** Return time left on a timer in milliseconds. *)
 	PROCEDURE Left*( VAR t: MilliTimer ): LONGINT;
 	BEGIN
-		RETURN (t.target - Kernel32.GetTickCount()) * (1000 DIV Machine.Second)
+		RETURN t.target - Environment.Clock()
 	END Left;
 
 BEGIN
-	ASSERT (1000 MOD Machine.Second = 0);   (* for Elapsed *)
-	second := Machine.Second;
+	second := Second;
 	Heaps.GC := Heaps.InvokeGC; (* must be done after all processors have started *)
 END Kernel.
 

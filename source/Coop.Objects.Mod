@@ -189,7 +189,6 @@ END Terminate;
 PROCEDURE SetTimeout*(t: Timer; h: EventHandler;  ms: LONGINT );
 VAR e: Timer;  trigger: LONGINT;
 BEGIN
-	ASSERT(Machine.Second= 1000); (* assume milliseconds for now *)
 	ASSERT((t # NIL) & (h # NIL));
 	ASSERT(ms >= 0);
 	Machine.Acquire(Machine.Objects);
@@ -208,7 +207,6 @@ END SetTimeout;
 PROCEDURE SetTimeoutAt*(t: Timer; h: EventHandler; ms: LONGINT);
 VAR e: Timer; trigger: LONGINT;
 BEGIN
-	ASSERT(Machine.Second= 1000);	(* assume milliseconds for now *)
 	ASSERT((t # NIL) & (h # NIL));
 	Machine.Acquire(Machine.Objects);
 	trigger := ms; (* ignore overflow *)
