@@ -91,10 +91,6 @@ VAR
 	SSE5Support-: BOOLEAN;
 	AVXSupport-: BOOLEAN;
 
-	(* windows *)
-	hInstance-: Kernel32.HINSTANCE;   (* init by linker/loader *)
-	isEXE-: BOOLEAN;
-
 	version*: ARRAY 64 OF CHAR;   (** Aos version *)
 	features*,features2*: SET;   (** processor features *)
 	fcr*: SET;   (** default floating-point control register value (default rounding mode is towards -infinity, for ENTIER) *)
@@ -624,7 +620,7 @@ END RemoveTraceFile;
 PROCEDURE ToExecutablePath(CONST name: ARRAY OF CHAR; VAR fullName: ARRAY OF CHAR);
 VAR i,j: LONGINT;
 BEGIN
-	Kernel32.GetModuleFileName(hInstance, fullName, LEN( fullName ) );
+	Kernel32.GetModuleFileName(Kernel32.hInstance, fullName, LEN( fullName ) );
 	j := -1; i := 0;
 	WHILE fullName[i] # 0X DO
 		IF fullName[i] = '\' THEN j := i END;
@@ -641,10 +637,6 @@ PROCEDURE Init;
 VAR vendor: Vendor; ver: LONGINT;
 BEGIN
 	boottime:=GetTimer();
-	IF hInstance = Kernel32.NULL THEN  (* from exe file *)
-		hInstance := Kernel32.GetModuleHandle( NIL );  isEXE := TRUE
-	ELSE isEXE := FALSE
-	END;
 
 	COPY( Version, version );
 	CPUID(vendor, ver, features,features2);	 SetupSSE2Ext;

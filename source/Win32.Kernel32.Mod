@@ -747,6 +747,9 @@ VAR
 	(** Method used to write text to the Console. *)
 	OutputString*: PROCEDURE ( CONST a: ARRAY OF CHAR );
 
+	hInstance-: HINSTANCE;   (* init by linker/loader *)
+	isEXE-: BOOLEAN;
+
 	(** Wrapper for getProcAddress. *)
 	PROCEDURE GetProcAddress*( hModule: HMODULE;  procName: ARRAY OF CHAR; VAR adr: ADDRESS );
 	BEGIN
@@ -935,6 +938,8 @@ VAR
 		GetProcAddress(mod, "WaitForSingleObject",SYSTEM.VAL(ADDRESS,WaitForSingleObject));
 		GetProcAddress(mod, "WriteFile",SYSTEM.VAL(ADDRESS,WriteFile));
 		GetProcAddress(mod, "GlobalMemoryStatusEx",SYSTEM.VAL(ADDRESS,GlobalMemoryStatusEx));
+		isEXE := hInstance = NULL;
+		IF isEXE THEN hInstance := GetModuleHandle( NIL ) END;
 		END Init;
 
 		(* for new object file:

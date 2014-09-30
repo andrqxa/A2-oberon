@@ -747,6 +747,9 @@ VAR
 	(** Method used to write text to the Console. *)
 	OutputString*: PROCEDURE ( CONST a: ARRAY OF CHAR );
 
+	hInstance-: HINSTANCE;   (* init by linker/loader *)
+	isEXE-: BOOLEAN;
+
 	(** Wrapper for getProcAddress. *)
 	PROCEDURE GetProcAddress*( hModule: HMODULE;  procName: ARRAY OF CHAR; VAR adr: ADDRESS );
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -938,6 +941,8 @@ VAR
 		ELSE
 			OutputString := NoOutputString
 		END;
+		isEXE := hInstance = NULL;
+		IF isEXE THEN hInstance := GetModuleHandle( NIL ) END;
 		END Init;
 
 		(* The following procedure is linked as the first block in the code section of a PE32 executable file 
