@@ -7615,7 +7615,7 @@ TYPE
 					ELSE
 						block.SetUnchecked(TRUE);
 					END;
-				ELSIF (name=Global.NameUncooperative) & cooperative THEN
+				ELSIF (name=Global.NameUncooperative) THEN
 					IF block.isUncooperative THEN
 						Error(position,Diagnostics.Invalid,"duplicate uncooperative flag")
 					ELSE

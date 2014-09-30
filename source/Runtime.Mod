@@ -6,7 +6,7 @@ VAR
 	modules-: LONGINT;
 
 PROCEDURE InsertModule*(a: ADDRESS): BOOLEAN;
-BEGIN
+BEGIN {UNCOOPERATIVE}
 	kernelModule[modules] := a;
 	INC(modules);
 	RETURN TRUE
@@ -99,7 +99,7 @@ END DivHA;
 
 PROCEDURE DivH*(l,r: HUGEINT): HUGEINT;
 VAR result: HUGEINT;
-BEGIN
+BEGIN {UNCOOPERATIVE}
 	IF l > 0 THEN RETURN DivHA(l,r)
 	ELSIF l< 0 THEN
 		result :=  -DivHA(-l,r);
@@ -232,19 +232,19 @@ END ModHA;
 
 PROCEDURE ModH*(l,r: HUGEINT): HUGEINT;
 VAR res: HUGEINT;
-BEGIN
+BEGIN {UNCOOPERATIVE}
 	res := ModHA(l,r);
 	IF res < 0 THEN INC(res,r) END;
 	RETURN res
 END ModH;
 
 PROCEDURE AbsH*(l: HUGEINT): HUGEINT;
-BEGIN
+BEGIN {UNCOOPERATIVE}
 	IF l< 0 THEN RETURN -l ELSE RETURN l END;
 END AbsH;
 
 PROCEDURE AslH*(l: HUGEINT; r: LONGINT): HUGEINT; (*! coincides with Logic Shift, remove ? *)
-BEGIN
+BEGIN {UNCOOPERATIVE}
 	RETURN LslH(l,r)
 END AslH;
 
@@ -410,7 +410,7 @@ END EntierRH;
 *)
 PROCEDURE CompareString*(CONST left,right: ARRAY OF CHAR): SHORTINT;
 VAR i: LONGINT; res: SHORTINT; l,r: CHAR;
-BEGIN
+BEGIN {UNCOOPERATIVE}
 	i := 0; res := 0;
 	LOOP
 		l := left[i]; 		(* index check included *)
@@ -432,7 +432,7 @@ END CompareString;
 (* copy string from src to dest, emits trap if not 0X terminated or destination too short *)
 PROCEDURE CopyString*(VAR dest: ARRAY OF CHAR; CONST src: ARRAY OF CHAR);
 VAR i: LONGINT; ch :CHAR; l1,l2: LONGINT;
-BEGIN
+BEGIN {UNCOOPERATIVE}
 	(*
 	i := 0;
 	REPEAT
@@ -452,7 +452,7 @@ END CopyString;
 
 PROCEDURE EnsureAllocatedStack*(size: SIZE);
 VAR i: ADDRESS; temp: ADDRESS;
-BEGIN
+BEGIN {UNCOOPERATIVE}
 	FOR i := 0 TO size BY 4096 DO
 		SYSTEM.GET(ADDRESSOF(i)-i,temp);
 		(*
