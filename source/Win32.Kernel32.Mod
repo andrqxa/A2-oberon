@@ -669,6 +669,8 @@ VAR
 	(** The SetConsoleScreenBufferSize function changes the size of the specified console screen buffer. *)
 	SetConsoleScreenBufferSize-: PROCEDURE {WINAPI} ( hConsoleOuput: HANDLE;
 																							   dwSize: LONGINT ): BOOL;
+	(** The SetConsoleTextAttribute function sets the attributes of characters written to the console screen buffer by the WriteFile or WriteConsole function, or echoed by the ReadFile or ReadConsole function. *)
+	SetConsoleTextAttribute-: PROCEDURE {WINAPI} (hConsoleOutput: HANDLE; wAttributes: LONGINT): BOOL;
 	(** The SetConsoleTitle function sets the title bar string for the current console window. *)
 	SetConsoleTitle-: PROCEDURE {WINAPI} ( VAR lpConsoleTitle: ARRAY   OF CHAR ): BOOL;
 	(** The SetConsoleWindowInfo function sets the current size and position of a console screen buffer's window. *)
@@ -910,6 +912,7 @@ VAR
 		GetProcAddress(mod, "SetCommTimeouts",SYSTEM.VAL(ADDRESS,SetCommTimeouts));
 		GetProcAddress(mod, "SetConsoleCursorPosition",SYSTEM.VAL(ADDRESS,SetConsoleCursorPosition));
 		GetProcAddress(mod, "SetConsoleScreenBufferSize",SYSTEM.VAL(ADDRESS,SetConsoleScreenBufferSize));
+		GetProcAddress(mod, "SetConsoleTextAttribute",SYSTEM.VAL(ADDRESS,SetConsoleTextAttribute));
 		GetProcAddress(mod, "SetConsoleTitleA",SYSTEM.VAL(ADDRESS,SetConsoleTitle));
 		GetProcAddress(mod, "SetConsoleWindowInfo",SYSTEM.VAL(ADDRESS,SetConsoleWindowInfo));
 		GetProcAddress(mod, "SetCurrentDirectoryA",SYSTEM.VAL(ADDRESS,SetCurrentDirectory));

@@ -53,6 +53,11 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (Kernel32.WriteFile (stdout, char ,1, written, NIL) # 0);
 END WriteChar;
 
+PROCEDURE SetConsoleColor (color: SHORTINT);
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	ASSERT (Kernel32.SetConsoleTextAttribute (stdout, color) # 0);
+END SetConsoleColor;
+
 PROCEDURE OutputChar (char: CHAR);
 VAR trace: ARRAY 2 OF CHAR;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -169,7 +174,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 		Kernel32.AllocConsole ();
 		stdin:= Kernel32.GetStdHandle (Kernel32.STDInput);
 		stdout := Kernel32.GetStdHandle (Kernel32.STDOutput);
-		Trace.Char := WriteChar;
+		Trace.Char := WriteChar; Trace.Color := SetConsoleColor;
 	END;
 END Initialize;
 
