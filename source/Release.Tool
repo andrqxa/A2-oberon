@@ -13,6 +13,11 @@
 #	UsbHubDriver UsbEhci UsbUhci UsbOhci UsbStorageBoot
 #	DiskVolumes DiskFS BootConsole ~
 #
+# A2 Cooperative
+#
+#	Release.Build --build --path="./" A2Cooperative ~
+#	StaticLinker.Link --fileName=a2.bin --extension=Gof --displacement=10000H --path="./" Runtime Trace CPU Counters APIC Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules Objects Kernel RuntimeSupport GarbageCollector KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
+#
 # WINAOS
 #
 # There are two different variants of WinAOS:
@@ -35,9 +40,9 @@
 #	Release.Build --path="/temp/obg/" WinAosNewObjectFile ~
 #	StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=Gof --displacement=401000H --path="/temp/obg/" Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~
 # 
-# WINAOS cooperative
+# WINAOS Cooperative
 #	Release.Build --build --path="./" WinAosCooperative ~
-#	StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=Gof --displacement=401000H --path="./" Runtime Trace CPU Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules Objects Kernel RuntimeSupport GarbageCollector KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~
+#	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=Gof --displacement=401000H --path="./" Runtime Trace CPU Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules Objects Kernel RuntimeSupport GarbageCollector KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #	FSTools.CloseFiles A2.exe ~
 # 
 # Notes:
