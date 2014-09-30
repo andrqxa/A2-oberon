@@ -747,9 +747,6 @@ VAR
 	(** Method used to write text to the Console. *)
 	OutputString*: PROCEDURE ( CONST a: ARRAY OF CHAR );
 
-	(* OutputString*: OutputStringProc; *)
-	Shutdown*: PROCEDURE ( code: LONGINT );
-
 	(** Wrapper for getProcAddress. *)
 	PROCEDURE GetProcAddress*( hModule: HMODULE;  procName: ARRAY OF CHAR; VAR adr: ADDRESS );
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -792,16 +789,15 @@ VAR
 		outputDebugString( s );  s[0] := 0AX;  s[1] := 0X;  outputDebugString( s )
 	END SendToDebugger;
 
-	PROCEDURE ShutdownP(l: LONGINT);
+	PROCEDURE Shutdown*(l: LONGINT);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		outputDebugString("Kernel32.Shutdown");
 		ExitProcess(l);
-	END ShutdownP;
+	END Shutdown;
 
 	PROCEDURE Init;
 	VAR mod: HMODULE;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
-		Shutdown := ShutdownP;
 		mod := LoadLibrary("Kernel32.DLL");
 		GetProcAddress(mod, "AllocConsole",SYSTEM.VAL(ADDRESS,AllocConsole));
 		GetProcAddress(mod, "Beep",SYSTEM.VAL(ADDRESS,Beep));

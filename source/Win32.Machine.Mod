@@ -94,7 +94,7 @@ VAR
 
 	(* windows *)
 	hInstance-: Kernel32.HINSTANCE;   (* init by linker/loader *)
-	isEXE-: BOOLEAN;  locks*: LONGINT;
+	isEXE-: BOOLEAN;
 
 	version*: ARRAY 64 OF CHAR;   (** Aos version *)
 	features*,features2*: SET;   (** processor features *)
@@ -477,9 +477,6 @@ END GreaterOrEqual;
 
 	PROCEDURE Shutdown*( restart: BOOLEAN );
 	BEGIN
-		ASSERT ( locks <= 0 );
-		IF locks = MIN( LONGINT ) THEN RETURN END;   (* prevent double call *)
-		locks := MIN( LONGINT );  Trace.StringLn ( "Machine.Shutdown" );
 		RemoveTraceFile;
 		Kernel32.Shutdown( 0 );   (* calls the finalizer of Heaps *)
 	END Shutdown;
@@ -701,7 +698,6 @@ PROCEDURE Init;
 VAR vendor: Vendor; ver: LONGINT;
 BEGIN
 	boottime:=GetTimer();
-	locks := 0;
 	IF hInstance = Kernel32.NULL THEN  (* from exe file *)
 		hInstance := Kernel32.GetModuleHandle( NIL );  isEXE := TRUE
 	ELSE isEXE := FALSE
