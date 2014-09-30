@@ -733,10 +733,8 @@ END PhysicalAdr;
 
 (* function returning the number of processors that are available to Aos *)
 PROCEDURE NumberOfProcessors*( ): LONGINT;
-VAR info: Kernel32.SystemInfo;
 BEGIN
-	Kernel32.GetSystemInfo( info );
-	RETURN info.dwNumberOfProcessors
+	RETURN Processors.count;
 END NumberOfProcessors;
 
 (* function for changing byte order *)
