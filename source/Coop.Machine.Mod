@@ -190,7 +190,10 @@ CODE {SYSTEM.i386}
 	SETAE AL
 END GreaterOrEqual;
 
-
+PROCEDURE MapPhysical*(physAdr: ADDRESS; size: SIZE; VAR virtAdr: ADDRESS);
+BEGIN
+	virtAdr := physAdr;
+END MapPhysical;
 
 (** Fill "size" bytes at "destAdr" with "filler".  "size" must be multiple of 4. *)
 
@@ -449,6 +452,20 @@ CODE {SYSTEM.Pentium}
 	RDTSC	; set EDX:EAX
 END GetTimer;
 
+(** Disable interrupts and return old interrupt state. *)
+PROCEDURE -DisableInterrupts* (): SET;
+CODE {SYSTEM.i386}
+	PUSHFD
+	CLI
+	POP EAX
+END DisableInterrupts;
+
+(** Restore interrupt state. Parameter s must be return value of earlier DisableInterrupts call on same processor. *)
+PROCEDURE -RestoreInterrupts* (s: SET);
+CODE {SYSTEM.i386}
+	POPFD
+END RestoreInterrupts;
+
 PROCEDURE ID*(): LONGINT;
 BEGIN
 	RETURN Processors.GetCurrentIndex ();
@@ -663,6 +680,28 @@ CODE{SYSTEM.i386}
 	MOV EDX,[EBP+port]
 	OUT DX,EAX
 END Portout32;
+
+(* Delay for IO *)
+PROCEDURE -Wait*;
+CODE {SYSTEM.i386}
+	JMP 0
+	JMP 0
+	JMP 0
+END Wait;
+
+(** Read a byte from the non-volatile setup memory. *)
+PROCEDURE GetNVByte* (ofs: LONGINT): CHAR;
+VAR c: CHAR;
+BEGIN
+	Portout8 (70H, CHR(ofs)); Wait; Portin8(71H, c);
+	RETURN c
+END GetNVByte;
+
+(** Write a byte to the non-volatile setup memory. *)
+PROCEDURE PutNVByte* (ofs: LONGINT; val: CHAR);
+BEGIN
+	Portout8 (70H, CHR(ofs)); Wait; Portout8 (71H, val)
+END PutNVByte;
 
 BEGIN
 	Trace.String("Machine: "); Trace.Blue; Trace.StringLn (Version); Trace.Default;

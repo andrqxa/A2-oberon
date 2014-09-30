@@ -107,7 +107,7 @@ BUILDS
 		DISABLED "FALSE"
 	}
 	A2Cooperative {
-		INCLUDE "NATIVE NATIVEGEN I386 I386GEN COOP NATIVECOOP"
+		INCLUDE "NATIVE I386 COOP NATIVECOOP"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile"
 		TARGET "AMD"
@@ -282,7 +282,7 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 
 	UNIX { Unix.I386.Machine.Mod }
 
-	NATIVE, WINORIG, WINGEN { Heaps.Mod }
+	NATIVEORIG, NATIVEGEN, WINORIG, WINGEN { Heaps.Mod }
 	UNIX { Unix.Heaps.Mod }
 	COOP { Coop.Heaps.Mod }
 
@@ -290,7 +290,7 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	NATIVEGEN, WINGEN { oc/Generic.Modules.Mod}
 	COOP { Coop.Modules.Mod }
 
-	NATIVE { Objects.Mod Kernel.Mod }
+	NATIVEORIG, NATIVEGEN { Objects.Mod Kernel.Mod }
 	WINORIG, WINGEN { Win32.Objects.Mod Win32.Kernel.Mod }
 	UNIX { Unix.Objects.Mod Unix.Kernel.Mod }
 	COOP { Coop.Objects.Mod Coop.Kernel.Mod }
@@ -313,7 +313,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	# default trap handling
 	Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod
-	I386 { Traps.Mod }
+	NATIVEORIG, NATIVEGEN { Traps.Mod }
 	AMD64 { AMD64.Traps.Mod }
 	WINORIG, WINGEN {  Win32.Traps.Mod }
 	UNIX { Unix.StdIO.Mod Unix.Traps.Mod }
