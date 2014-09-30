@@ -34,4 +34,46 @@ end:
 	JMP	end
 END Halt;
 
+(* input / output ports *)
+PROCEDURE OutChar- (port: SIZE; value: CHAR);
+CODE
+	MOV	AL, [EBP + value]
+	MOV	DX, [EBP + port]
+	OUT	DX, AL
+END OutChar;
+
+PROCEDURE OutByte- (port: SIZE; value: SIZE);
+CODE
+	MOV	AL, [EBP + value]
+	MOV	DX, [EBP + port]
+	OUT	DX, AL
+END OutByte;
+
+PROCEDURE OutSet- (port: SIZE; value: SET);
+CODE
+	MOV	AL, [EBP + value]
+	MOV	DX, [EBP + port]
+	OUT	DX, AL
+END OutSet;
+
+PROCEDURE InChar- (port: SIZE): CHAR;
+CODE
+	MOV	DX, [EBP + port]
+	IN		AL, DX
+END InChar;
+
+PROCEDURE InByte- (port: SIZE): SIZE;
+CODE
+	MOV	DX, [EBP + port]
+	IN		AL, DX
+	MOVZX	EAX, AL
+END InByte;
+
+PROCEDURE InSet- (port: SIZE): SET;
+CODE
+	MOV	DX, [EBP + port]
+	IN		AL, DX
+	MOVZX	EAX, AL
+END InSet;
+
 END CPU.
