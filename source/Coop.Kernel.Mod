@@ -4,7 +4,7 @@
 
 MODULE Kernel;   (** AUTHOR "pjm, ejz, fof, ug"; PURPOSE "Implementation-independent kernel interface"; *)
 
-IMPORT Environment, Heaps, Objects;
+IMPORT Environment, Heaps, Objects, Trace;
 
 CONST
 
@@ -220,6 +220,7 @@ VAR
 BEGIN
 	second := Second;
 	Heaps.GC := Heaps.InvokeGC; (* must be done after all processors have started *)
+	Trace.String("Kernel: Initialized and started."); Trace.Ln;
 END Kernel.
 
 (**
