@@ -7,9 +7,6 @@ IMPORT SYSTEM, Trace, Kernel32, Mutexes, Processors;
 CONST
 	Version = "WinAos Revision 4634 (12.03.2012)";
 
-	DefaultConfigFile = "aos.ini";
-	UserConfigFile = "myaos.ini";
-
 	MaxCPU* = Processors.Maximum;	(* dummy definition to make GC for both Win32 and I386 work *)
 
 	DefaultObjectFileExtension* = ".Obw";
@@ -97,13 +94,9 @@ VAR
 	mhz*: HUGEINT;   (** clock rate of GetTimer() in MHz, or 0 if not known *)
 	boottime-: HUGEINT; (** in timer units *)
 
-	hin, hout: Kernel32.HANDLE;
-
 VAR
 	lock-: ARRAY MaxLocks OF CHAR;  (* not implemented as SET because of shared access *)
 	mutex: ARRAY MaxLocks OF Mutexes.Mutex;
-	trace: ARRAY 2 OF CHAR;
-	defaultConfigFile, userConfigFile, traceName: ARRAY Kernel32.MaxPath OF CHAR;
 
 	bootHeapAdr: ADDRESS; 	(* initialized by linker, variable name must not be changed, see Win32.Aos.Link *)
 	bootHeapSize: SIZE; 			(* initialized by linker, variable name must not be changed, see Win32.Aos.Link *)
@@ -466,18 +459,10 @@ END GreaterOrEqual;
 		POP	ECX
 	END CPUID;
 
-	PROCEDURE GetConfig*( CONST name: ARRAY OF CHAR;  VAR val: ARRAY OF CHAR );
-	CONST ConfigKey = "Configuration";
-	BEGIN
-		COPY ("", val);
-		IF Kernel32.GetPrivateProfileString (ConfigKey, name, "", val, LEN (val), userConfigFile) # 0 THEN
-		ELSIF Kernel32.GetPrivateProfileString (ConfigKey, name, "", val, LEN (val), defaultConfigFile) # 0 THEN
-		END;
-	END GetConfig;
+	PROCEDURE GetConfig* EXTERN "Environment.GetConfig" ( CONST name: ARRAY OF CHAR;  VAR val: ARRAY OF CHAR );
 
 	PROCEDURE Shutdown*( restart: BOOLEAN );
 	BEGIN
-		RemoveTraceFile;
 		Kernel32.Shutdown( 0 );   (* calls the finalizer of Heaps *)
 	END Shutdown;
 
@@ -522,138 +507,13 @@ BEGIN
 	END;
 END SetupSSE2Ext;
 
-PROCEDURE TraceChar(c: CHAR);
-VAR len: LONGINT;
-BEGIN
-	len := 1;
-	Kernel32.WriteFile(hout,c,len,len,NIL);
-END TraceChar;
-
-PROCEDURE SetTraceFile(VAR filename: ARRAY OF CHAR);
-BEGIN
-	Trace.String("trace -> file "); Trace.String(filename); Trace.Ln;
-	hout := Kernel32.CreateFile(filename, {Kernel32.GenericWrite}, {Kernel32.FileShareRead}, NIL, Kernel32.CreateAlways, {Kernel32.FileAttributeNormal}, Kernel32.NULL);
-	Kernel32.GetFullPathName(filename, LEN(filename), filename, NIL);
-	Trace.Char := TraceChar;
-END SetTraceFile;
-
-PROCEDURE SetTraceConsole;
-VAR res: LONGINT;
-BEGIN
-	Trace.String("trace -> console"); Trace.Ln;
-	res := Kernel32.AllocConsole ();
-	hin := Kernel32.GetStdHandle (Kernel32.STDInput);
-	hout := Kernel32.GetStdHandle (Kernel32.STDOutput);
-	Trace.Char := TraceChar;
-END SetTraceConsole;
-
-PROCEDURE SetupTraceName(VAR traceName: ARRAY OF CHAR);
-VAR
-	ext: ARRAY 256 OF CHAR;
-	extPos,i,j: LONGINT;
-	systemTime: Kernel32.SystemTime;
-	ch: CHAR;
-
-	PROCEDURE AppendDecimals(int: LONGINT; from, to: LONGINT);
-	VAR ten: LONGINT;
-	BEGIN
-		WHILE to >= from DO
-			traceName[i] := CHR(ORD("0")+ int DIV to MOD 10); INC(i);
-			to := to DIV 10;
-		END;
-	END AppendDecimals;
-
-BEGIN
-	Kernel32.GetLocalTime(systemTime);
-
-	extPos := 0;
-	REPEAT
-		ch := traceName[i];
-
-		IF ch = "." THEN j := 0; extPos := i END;
-
-		ext[j] := ch;
-		INC(j); INC(i);
-	UNTIL ch = 0X;
-
-	IF extPos > 0 THEN i := extPos END;
-	ext[j] := 0X;
-
-	AppendDecimals(systemTime.wYear,1,1000);
-	AppendDecimals(systemTime.wMonth,1,10);
-	AppendDecimals(systemTime.wDay,1,10);
-	traceName[i] := "_"; INC(i);
-	AppendDecimals(systemTime.wHour,1,10);
-	AppendDecimals(systemTime.wMinute,1,10);
-	AppendDecimals(systemTime.wSecond,1,10);
-	traceName[i] := "_"; INC(i);
-	AppendDecimals(systemTime.wMilliseconds,10,100);
-	j := 0;
-	REPEAT
-		ch := ext[j];
-		traceName[i] := ch;
-		INC(i); INC(j);
-	UNTIL ch = 0X;
-
-END SetupTraceName;
-
-PROCEDURE RemoveTraceFile;
-VAR res: LONGINT;
-BEGIN
-	IF traceName[0] # 0X THEN
-		Trace.String("removing "); Trace.String(traceName); Trace.Ln;
-		Trace.Char := LogChar;
-		res := Kernel32.CloseHandle(hout);
-		IF res = 0 THEN
-			res := Kernel32.GetLastError();
-			Trace.String("could not close "); Trace.String("; res = "); Trace.Int(res,1); Trace.Ln;
-		END;
-		res := Kernel32.DeleteFile(traceName);
-		IF res = 0 THEN
-			res := Kernel32.GetLastError();
-			Trace.String("could not delete "); Trace.String(traceName); Trace.String("; res = "); Trace.Int(res,1); Trace.Ln;
-		END;
-
-	END;
-END RemoveTraceFile;
-
-PROCEDURE ToExecutablePath(CONST name: ARRAY OF CHAR; VAR fullName: ARRAY OF CHAR);
-VAR i,j: LONGINT;
-BEGIN
-	Kernel32.GetModuleFileName(Kernel32.hInstance, fullName, LEN( fullName ) );
-	j := -1; i := 0;
-	WHILE fullName[i] # 0X DO
-		IF fullName[i] = '\' THEN j := i END;
-		INC( i )
-	END;
-	i := 0; INC(j);
-	WHILE name[i] # 0X DO
-		fullName[j] := name[i]; INC(i); INC(j);
-	END;
-	fullName[j] := 0X;
-END ToExecutablePath;
-
 PROCEDURE Init;
 VAR vendor: Vendor; ver: LONGINT;
 BEGIN
 	boottime:=GetTimer();
-
 	COPY( Version, version );
 	CPUID(vendor, ver, features,features2);	 SetupSSE2Ext;
 	fcr := (FCR() - {0,2,3,10,11}) + {0..5,8,9};	(* default FCR RC=00B *)
-
-	ToExecutablePath(DefaultConfigFile, defaultConfigFile);
-	ToExecutablePath(UserConfigFile, userConfigFile);
-
-	traceName[0] := 0X;
-	GetConfig("Trace",traceName);
-	IF traceName = "File" THEN
-		traceName := "SystemTrace.txt";
-		SetupTraceName(traceName);
-		SetTraceFile(traceName);
-	ELSIF traceName = "Console" THEN SetTraceConsole
-	(* else trace is on kernel log *)
-	END;
 END Init;
 
 (** Acquire a spin-lock. *)
@@ -744,13 +604,6 @@ CODE { SYSTEM.Pentium }
 	BSWAP EAX						; swap byte order
 END ChangeByteOrder;
 
-PROCEDURE TraceColor (c: SHORTINT);
-END TraceColor;
-
-PROCEDURE LogChar (c: CHAR);
-BEGIN trace[0] := c; Kernel32.OutputString (trace);
-END LogChar;
-
 PROCEDURE -GetEAX*(): LONGINT;
 CODE{SYSTEM.i386}
 END GetEAX;
@@ -837,6 +690,5 @@ END Portout32;
 
 
 BEGIN
-	trace[1] := 0X; Trace.Char := LogChar; Trace.Color := TraceColor;
 	Init;
 END Machine.
