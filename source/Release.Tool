@@ -16,7 +16,7 @@
 # A2 Cooperative
 #
 #	Release.Build --build --path="./" A2Cooperative ~
-#	StaticLinker.Link --fileName=a2.bin --extension=Gof --displacement=10000H --path="./" Runtime Trace CPU Counters APIC Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules Objects Kernel RuntimeSupport GarbageCollector KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
+#	StaticLinker.Link --fileName=a2.bin --extension=Gof --displacement=100000H --path="./" Runtime Trace CPU Counters APIC Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules Objects Kernel RuntimeSupport GarbageCollector KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #
 # WINAOS
 #
