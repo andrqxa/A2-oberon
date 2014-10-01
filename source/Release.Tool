@@ -321,6 +321,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	AMD64 { AMD64.Traps.Mod }
 	WINORIG, WINGEN {  Win32.Traps.Mod }
 	UNIX { Unix.StdIO.Mod Unix.Traps.Mod }
+	COOP { Coop.Traps.Mod }
 
 	# Recursive and R/W locks
 	Locks.Mod
