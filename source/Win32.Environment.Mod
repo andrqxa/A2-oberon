@@ -151,6 +151,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END ToExecutablePath;
 
 PROCEDURE Initialize-;
+VAR trace: ARRAY 32 OF CHAR;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	heap := Kernel32.GetProcessHeap();
 	stdout := Kernel32.GetStdHandle(Kernel32.STDOutput);
@@ -161,15 +162,15 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Trace.Init;
 	traceName[0] := 0X;
 	Trace.Char := OutputChar;
-	GetString("Trace",traceName);
-	IF traceName = "File" THEN
+	GetString("Trace",trace);
+	IF trace = "File" THEN
 		traceName := "SystemTrace.txt";
 		SetupTraceName(traceName);
 		Trace.String("trace -> file "); Trace.String(traceName); Trace.Ln;
 		stdout := Kernel32.CreateFile(traceName, {Kernel32.GenericWrite}, {Kernel32.FileShareRead}, NIL, Kernel32.CreateAlways, {Kernel32.FileAttributeNormal}, Kernel32.NULL);
 		Kernel32.GetFullPathName(traceName, LEN(traceName), traceName, NIL);
 		Trace.Char := WriteChar;
-	ELSIF traceName = "Console" THEN
+	ELSIF trace = "Console" THEN
 		Trace.String("trace -> console"); Trace.Ln;
 		Kernel32.AllocConsole ();
 		stdin:= Kernel32.GetStdHandle (Kernel32.STDInput);
