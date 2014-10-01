@@ -225,7 +225,7 @@ BEGIN
 	SYSTEM.PUT(freeBlockAdr + HeapBlockOffset, NilVal)
 END InitFreeBlock;
 
-PROCEDURE NewBlock EXTERN "RuntimeSupport.New" (size: SIZE): ADDRESS;
+PROCEDURE NewBlock EXTERN "Runtime.New" (size: SIZE): ADDRESS;
 
 (** NewSys - Implementation of SYSTEM.NEW. *)
 PROCEDURE NewSys*(VAR p: ANY; size: SIZE; isRealtime: BOOLEAN);

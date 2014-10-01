@@ -16,7 +16,7 @@
 # A2 Cooperative
 #
 #	Release.Build --build --path="./" A2Cooperative ~
-#	StaticLinker.Link --fileName=a2.bin --extension=Gof --displacement=100000H --path="./" Runtime Trace CPU Counters APIC Processors Queues Activities ExclusiveBlocks HeapManager Environment Mutexes Machine Heaps Modules Objects Kernel RuntimeSupport GarbageCollector KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
+#	StaticLinker.Link --fileName=a2.bin --extension=Gof --displacement=100000H --path="./" CPU Runtime Trace Counters APIC Processors Queues Activities ExclusiveBlocks HeapManager Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #
 # WINAOS
 #
@@ -42,7 +42,7 @@
 # 
 # WINAOS Cooperative
 #	Release.Build --build --path="./" WinAosCooperative ~
-#	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=Gof --displacement=401000H --path="./" Runtime Trace CPU Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules Objects Kernel RuntimeSupport GarbageCollector KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
+#	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=Gof --displacement=401000H --path="./" CPU Runtime Trace Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #	FSTools.CloseFiles A2.exe ~
 # 
 # Notes:
@@ -260,13 +260,15 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 
 # Active Oberon run-time
 
-	Runtime.Mod # Runtime support for HUGEINT and strings
+	 # Runtime support for HUGEINT and strings
+	UNCOOP { Runtime.Mod }
+	COOP { I386.CPU.Mod Coop.Runtime.Mod }
 
 	# Low-level trace output
 	Trace.Mod
 
 	# cooperative runtime system
-	COOP { I386.CPU.Mod Counters.Mod }
+	COOP { Counters.Mod }
 	NATIVECOOP { I386.APIC.Mod APIC.Processors.Mod }
 	WINCOOP { Coop.Win32.Kernel32.Mod Win32.Processors.Mod }
 	COOP { Queues.Mod Activities.Mod ExclusiveBlocks.Mod }
@@ -293,14 +295,12 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 
 	NATIVEORIG, WINORIG, UNIX { Modules.Mod }
 	NATIVEGEN, WINGEN { oc/Generic.Modules.Mod}
-	COOP { Coop.Modules.Mod }
+	COOP { Coop.Modules.Mod GarbageCollector.Mod }
 
 	NATIVEORIG, NATIVEGEN { Objects.Mod Kernel.Mod }
 	WINORIG, WINGEN { Win32.Objects.Mod Win32.Kernel.Mod }
 	UNIX { Unix.Objects.Mod Unix.Kernel.Mod }
 	COOP { Coop.Objects.Mod Coop.Kernel.Mod }
-
-	COOP { RuntimeSupport.Mod GarbageCollector.Mod }
 END
 
 PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"

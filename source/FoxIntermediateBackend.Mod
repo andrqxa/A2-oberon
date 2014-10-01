@@ -1212,7 +1212,7 @@ TYPE
 		BEGIN
 			IF backend.cooperative THEN
 				Emit(Push(position,IntermediateCode.Immediate(sizeType,trapNo)));
-				CallThis("RuntimeSupport","Trap",1); 
+				CallThis(DefaultRuntimeModuleName,"Trap",1); 
 			ELSE
 				Emit(Trap(position,trapNo));
 			END;
@@ -2197,7 +2197,7 @@ TYPE
 		VAR procedure: SyntaxTree.Procedure; result: Operand; reg: IntermediateCode.Operand; source: IntermediateCode.Section;
 			pooledName: Basic.SegmentedName;
 		BEGIN
-			IF ~backend.newObjectFile & GetRuntimeProcedure(moduleName,procedureName,procedure,numberParameters < 0) THEN (* ready for dynamic linking *)
+			IF GetRuntimeProcedure(moduleName,procedureName,procedure,numberParameters < 0) THEN (* ready for dynamic linking *)
 				StaticCallOperand(result,procedure);
 				Emit(Call(position,result.op,ProcedureParametersSize(system,procedure)));
 				ReleaseOperand(result);
@@ -2262,7 +2262,11 @@ TYPE
 			Emit(Push(position,right.op));
 			ReleaseOperand(right);
 
-			CallThis(runtimeModuleName,procedureName, 4);
+			IF backend.cooperative THEN
+				CallThis(DefaultRuntimeModuleName,procedureName, 4);
+			ELSE
+				CallThis(runtimeModuleName,procedureName, 4);
+			END;
 			IntermediateCode.InitRegister(reg,int8,IntermediateCode.GeneralPurposeRegister,AcquireRegister(int8,IntermediateCode.GeneralPurposeRegister));
 			Emit(Result(position,reg));
 			(*
@@ -2302,7 +2306,11 @@ TYPE
 			Emit(Push(position,right.op));
 			ReleaseOperand(right);
 
-			CallThis(runtimeModuleName,procedureName,4);
+			IF backend.cooperative THEN
+				CallThis(DefaultRuntimeModuleName,procedureName, 4);
+			ELSE
+				CallThis(runtimeModuleName,procedureName,4);
+			END;
 			RestoreRegisters(saved);
 		END CopyString;
 
@@ -5770,7 +5778,7 @@ TYPE
 				Designate(p0,s0);
 				Emit(Push(position,s0.op));
 				ReleaseOperand(s0);
-				CallThis("RuntimeSupport","Dispose", 1);
+				CallThis(DefaultRuntimeModuleName,"Dispose", 1);
 			(* ---- GETPROCEDURE ----- *)
 			|Global.GetProcedure:
 				Designate(p0,s0);
@@ -10014,7 +10022,7 @@ TYPE
 			noRuntimeChecks := options.GetFlag("noRuntimeChecks");
 			noAsserts := options.GetFlag("noAsserts");
 			cooperative := options.GetFlag("cooperative");
-			IF options.GetFlag("newObjectFile") THEN newObjectFile := TRUE END;
+			IF options.GetFlag("newObjectFile") THEN newObjectFile := TRUE; SetRuntimeModuleName("CPU") END;
 			IF options.GetString("objectFile",string) & (string = "Minos") THEN 
 				simpleMetaData := TRUE
 			END;

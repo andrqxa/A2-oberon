@@ -439,7 +439,10 @@ END MapPhysical;
 		POP	ECX
 	END CPUID;
 
-	PROCEDURE GetConfig* EXTERN "Environment.GetConfig" ( CONST name: ARRAY OF CHAR;  VAR val: ARRAY OF CHAR );
+	PROCEDURE GetConfig* ( CONST name: ARRAY OF CHAR;  VAR val: ARRAY OF CHAR );
+	PROCEDURE GetString EXTERN "Environment.GetString" ( CONST name: ARRAY OF CHAR;  VAR val: ARRAY OF CHAR );
+	BEGIN GetString (name, val);
+	END GetConfig;
 
 	PROCEDURE Shutdown*( restart: BOOLEAN );
 	BEGIN

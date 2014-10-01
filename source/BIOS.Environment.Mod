@@ -66,7 +66,7 @@ BEGIN {UNCOOPERATIVE}
 	RETURN sgn * vd
 END StrToInt;
 
-PROCEDURE GetConfig- (CONST name: ARRAY OF CHAR; VAR result: ARRAY OF CHAR);
+PROCEDURE GetString- (CONST name: ARRAY OF CHAR; VAR result: ARRAY OF CHAR);
 VAR i, src: LONGINT; ch: CHAR;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (name[0] # "=");	(* no longer supported, use GetInit instead *)
@@ -98,7 +98,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 		END
 	END;
 	result[0] := 0X
-END GetConfig;
+END GetString;
 
 PROCEDURE ReadBootTable (bt: ADDRESS);
 VAR i, p: ADDRESS; j, d, type, addr, size, heapSize: LONGINT; ch: CHAR;
@@ -179,11 +179,10 @@ CONST MaxPorts = 8;
 VAR i, p, bps: LONGINT; off: SIZE; s, name: ARRAY 32 OF CHAR;
 	baselist: ARRAY MaxPorts OF LONGINT;
 BEGIN {UNCOOPERATIVE}
-	GetConfig ("TraceMode", s);
+	GetString ("TraceMode", s);
 	p := 0; traceMode := SYSTEM.VAL (SET, StrToInt (p, s));
-traceMode := {TraceScreen};
 	IF TraceScreen IN traceMode THEN
-		GetConfig ("TraceMem", s);
+		GetString ("TraceMem", s);
 		p := 0; traceBase := SYSTEM.VAL (ADDRESS, StrToInt (p, s));
 		IF traceBase = 0 THEN traceBase := 0B8000H END;	(* default screen buffer *)
 		FOR off := 0 TO TraceSize - SIZEOF(INTEGER) BY SIZEOF(INTEGER) DO SYSTEM.PUT16 (traceBase + off, 100H * 7H + 32) END;
@@ -196,14 +195,14 @@ traceMode := {TraceScreen};
 	IF TraceV24 IN traceMode THEN
 		FOR i := 0 TO MaxPorts - 1 DO
 			COPY ("COMx", name); name[3] := CHR (ORD ("1") + i);
-			GetConfig (name, s); p := 0; baselist[i] := StrToInt (p, s);
+			GetString (name, s); p := 0; baselist[i] := StrToInt (p, s);
 		END;
 		IF baselist[0] = 0 THEN baselist[0] := 3F8H END;	(* COM1 port default values *)
 		IF baselist[1] = 0 THEN baselist[1] := 2F8H END;	(* COM2 port default values *)
-		GetConfig("TracePort", s); p := 0; p := StrToInt(p, s); DEC(p);
+		GetString("TracePort", s); p := 0; p := StrToInt(p, s); DEC(p);
 		IF (p >= 0) & (p < MaxPorts) THEN tracePort := baselist[p] ELSE tracePort := baselist[0] END;
 		ASSERT(tracePort > 0);
-		GetConfig("TraceBPS", s); p := 0; bps := StrToInt(p, s);
+		GetString("TraceBPS", s); p := 0; bps := StrToInt(p, s);
 		IF bps <= 0 THEN bps := 38400 END;
 		CPU.OutByte (tracePort + 3, 80H);	(* Set the Divisor Latch Bit - DLAB = 1 *)
 		bps := 115200 DIV bps;	(* compiler DIV/PORTOUT bug workaround *)

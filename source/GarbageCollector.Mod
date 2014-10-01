@@ -5,7 +5,7 @@
 (** It implements a concurrent and interruptible mark and sweep garbage collection. *)
 MODULE GarbageCollector;
 
-IMPORT Activities, Counters, CPU;
+IMPORT Activities, Counters, CPU, Modules;
 
 (** Represents a pointer type. *)
 TYPE Pointer* = OBJECT {DISPOSABLE}
