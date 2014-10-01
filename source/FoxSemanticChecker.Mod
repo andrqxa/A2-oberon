@@ -4490,7 +4490,7 @@ TYPE
 		BEGIN
 			result := FALSE; type := x.type.resolved;
 			IF x = SyntaxTree.invalidExpression THEN
-			ELSIF  ~(type IS SyntaxTree.AddressType) & ~(type IS SyntaxTree.SizeType) & ~( (type IS SyntaxTree.IntegerType) & (type.sizeInBits <= system.addressType.sizeInBits)) & ~IsAddressValue(x) & (~(type IS SyntaxTree.PointerType) OR ~type(SyntaxTree.PointerType).isUnsafe) THEN
+			ELSIF  ~(type IS SyntaxTree.AddressType) & ~(type IS SyntaxTree.NilType) & ~(type IS SyntaxTree.SizeType) & ~( (type IS SyntaxTree.IntegerType) & (type.sizeInBits <= system.addressType.sizeInBits)) & ~IsAddressValue(x) & (~(type IS SyntaxTree.PointerType) OR ~type(SyntaxTree.PointerType).isUnsafe) THEN
 				TRACE(type.sizeInBits);
 				TRACE(system.addressType.sizeInBits);
 				Error(x.position,Diagnostics.Invalid,"is no address type");

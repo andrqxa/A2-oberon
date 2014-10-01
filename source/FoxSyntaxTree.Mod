@@ -576,7 +576,7 @@ TYPE
 		END SameType;
 
 		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
-		BEGIN RETURN (to IS NilType) OR (to IS ObjectType) OR (to IS AnyType) OR (to IS PointerType) OR (to IS ProcedureType)
+		BEGIN RETURN (to IS NilType) OR (to IS ObjectType) OR (to IS AnyType) OR (to IS PointerType) OR (to IS ProcedureType) OR (to IS AddressType)
 		END CompatibleTo;
 
 		PROCEDURE IsPointer(): BOOLEAN;
