@@ -220,7 +220,7 @@ VAR
 BEGIN
 	second := Second;
 	Heaps.GC := Heaps.InvokeGC; (* must be done after all processors have started *)
-	Trace.String("Kernel: Initialized and started."); Trace.Ln;
+	Trace.String ("Kernel: "); Trace.Green; Trace.StringLn("Initialized and started."); Trace.Default;
 END Kernel.
 
 (**
