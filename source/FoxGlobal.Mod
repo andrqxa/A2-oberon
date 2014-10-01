@@ -2,7 +2,7 @@ MODULE FoxGlobal; (** AUTHOR "fof & fn"; PURPOSE "Oberon Compiler Globally Defin
 (* (c) fof ETH Zürich, 2008 *)
 
 IMPORT
-	SyntaxTree := FoxSyntaxTree, Basic := FoxBasic, Scanner := FoxScanner, Strings, Runtime, D:= Debugging;
+	SyntaxTree := FoxSyntaxTree, Basic := FoxBasic, Scanner := FoxScanner, Strings, D:= Debugging;
 
 CONST
 	(* system flag names *)
@@ -1229,35 +1229,25 @@ TYPE
 	END Level;
 
 	PROCEDURE ConvertSigned*(this: HUGEINT; bits: LONGINT): HUGEINT;
-	VAR h: HUGEINT;
 	BEGIN
 		bits := 64-bits;
-		h :=Runtime.AslH(this,bits);
-		h := Runtime.AsrH(h,bits);
-		RETURN h
+		RETURN ASH (ASH (this, bits), -bits);
 	END ConvertSigned;
 
 	PROCEDURE ConvertUnsigned*(this: HUGEINT; bits: LONGINT): HUGEINT;
-	VAR h: HUGEINT;
 	BEGIN
 		bits := 64-bits;
-		h := Runtime.LslH(this,bits);
-		h := Runtime.LsrH(h,bits);
-		RETURN h;
+		RETURN LSH (LSH (this, bits), -bits);
 	END ConvertUnsigned;
 
 	PROCEDURE MaxInteger*(system: System; type: SyntaxTree.BasicType): HUGEINT;
-	VAR h: HUGEINT;
 	BEGIN
-		h := Runtime.AslH(1,system.SizeOf(type)-1);
-		RETURN h-1
+		RETURN ASH (HUGEINT(1), system.SizeOf (type) - 1) - 1;
 	END MaxInteger;
 
 	PROCEDURE MinInteger*(system: System; type: SyntaxTree.BasicType): HUGEINT;
-	VAR h: HUGEINT;
 	BEGIN
-		h := Runtime.AslH(1,system.SizeOf(type)-1);
-		RETURN -h
+		RETURN -ASH (HUGEINT(1), system.SizeOf (type) - 1);
 	END MinInteger;
 
 	(*! make architecture  independent ! *)
@@ -1274,14 +1264,14 @@ TYPE
 	PROCEDURE IsUnsignedInteger*(this: HUGEINT; sizeInBits: LONGINT): BOOLEAN;
 	VAR m: HUGEINT;
 	BEGIN
-		m := Runtime.AslH(1,sizeInBits);
+		m := ASH(HUGEINT(1),sizeInBits);
 		RETURN (this >= 0) & (this < m)
 	END IsUnsignedInteger;
 
 	PROCEDURE IsSignedInteger*(this: HUGEINT; sizeInBits: LONGINT): BOOLEAN;
 	VAR m: HUGEINT;
 	BEGIN
-			m := Runtime.AslH(1,sizeInBits-1);
+			m := ASH(HUGEINT(1),sizeInBits-1);
 			RETURN (this < m) & (-this <= m)
 	END IsSignedInteger;
 
