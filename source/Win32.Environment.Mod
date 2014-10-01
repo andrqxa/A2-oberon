@@ -15,7 +15,8 @@ VAR defaultConfigFile, userConfigFile, traceName: ARRAY Kernel32.MaxPath OF CHAR
 
 PROCEDURE {NORETURN} Abort-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	Activities.TerminateCurrentActivity;
+	IF Activities.GetCurrentActivity () # NIL THEN Activities.TerminateCurrentActivity END;
+	Exit (1);
 END Abort;
 
 PROCEDURE {NORETURN} Exit- (status: WORD);

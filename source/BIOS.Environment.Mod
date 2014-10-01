@@ -25,7 +25,8 @@ VAR tracePort, tracePos, traceColor: SIZE;
 
 PROCEDURE {NORETURN} Abort-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	Activities.TerminateCurrentActivity;
+	IF Activities.GetCurrentActivity () # NIL THEN Activities.TerminateCurrentActivity END;
+	Exit (ShuttingDown);
 END Abort;
 
 PROCEDURE {NORETURN} Exit- (status: WORD);

@@ -648,6 +648,8 @@ END PublishRegisteredModules;
 
 PROCEDURE {FINAL} Main;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	SYSTEM.SetActivity (NIL);
+	SYSTEM.SetFramePointer (NIL);
 	Environment.Initialize;
 	Processors.Initialize;
 	Activities.Execute (PublishRegisteredModules);
