@@ -38,14 +38,14 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (Kernel32.HeapFree(heap, 0, address) # 0);
 END Deallocate;
 
-PROCEDURE GetConfig- (CONST name: ARRAY OF CHAR; VAR result: ARRAY OF CHAR);
+PROCEDURE GetString- (CONST name: ARRAY OF CHAR; VAR result: ARRAY OF CHAR);
 CONST ConfigKey = "Configuration";
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF Kernel32.GetPrivateProfileString (ConfigKey, name, "", result, LEN (result), userConfigFile) # 0 THEN
 	ELSIF Kernel32.GetPrivateProfileString (ConfigKey, name, "", result, LEN (result), defaultConfigFile) # 0 THEN
 	ELSE result[0] := 0X;
 	END;
-END GetConfig;
+END GetString;
 
 PROCEDURE WriteChar (char: CHAR);
 VAR written: LONGINT;
@@ -161,7 +161,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Trace.Init;
 	traceName[0] := 0X;
 	Trace.Char := OutputChar;
-	GetConfig("Trace",traceName);
+	GetString("Trace",traceName);
 	IF traceName = "File" THEN
 		traceName := "SystemTrace.txt";
 		SetupTraceName(traceName);
