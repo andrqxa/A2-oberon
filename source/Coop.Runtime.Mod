@@ -5,6 +5,10 @@ MODULE Runtime;
 
 IMPORT SYSTEM, Trace;
 
+TYPE TrapHandler* = PROCEDURE (number: SIZE);
+
+VAR trapHandler*: TrapHandler;
+
 (* compare strings,
 	returns 0 if strings are equal,
 	returns +1 if left is lexicographic greater than right,
@@ -81,7 +85,12 @@ END EnsureAllocatedStack;
 PROCEDURE {NORETURN} Trap- (number: SIZE);
 PROCEDURE Abort EXTERN "Environment.Abort";
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	Trace.String ("trap "); Trace.Int (number, 0); Trace.Ln;
+	IF trapHandler # NIL THEN
+		trapHandler (number);
+	ELSE
+		Trace.String ("trap: "); Trace.Int (number, 0); Trace.Ln;
+		Trace.StackFrames (1, 20, 100 * SIZE OF ADDRESS);
+	 END;
 	Abort;
 END Trap;
 

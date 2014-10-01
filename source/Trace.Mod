@@ -141,9 +141,11 @@ BEGIN {UNCOOPERATIVE}
 				Hex (ORD (ch), -2)
 			ELSE
 				Char (' ');
+				Char (' ');
+				Char (' ');
 			END
 		END;
-		Char (' ');
+		Char (' '); Char (' ');
 		FOR j := i TO i+15 DO
 			IF j <= size THEN
 				SYSTEM.GET (j, ch);
@@ -154,6 +156,30 @@ BEGIN {UNCOOPERATIVE}
 		Ln
 	END;
 END Memory;
+
+(* Write basic stack frame information *)
+PROCEDURE StackFrames- (skip, count, size: SIZE);
+VAR frame {UNTRACED}: POINTER {UNSAFE} TO RECORD previous, caller, parameters: ADDRESS END;
+BEGIN {UNCOOPERATIVE}
+	frame := ADDRESS OF frame + SIZE OF ADDRESS;
+	WHILE skip # 0 DO
+		frame := frame.previous;
+		IF frame = NIL THEN RETURN END;
+		DEC (skip);
+	END;
+	WHILE count # 0 DO
+		Address (frame.caller); Char (':'); Ln;
+		IF frame.previous = NIL THEN RETURN END;
+		IF frame.previous - ADDRESS OF frame.previous <= size THEN
+			Memory (ADDRESS OF frame.parameters, frame.previous - ADDRESS OF frame.previous);
+		ELSIF size # 0 THEN
+			Memory (ADDRESS OF frame.parameters, size); String ("..."); Ln;
+		END;
+		DEC (count); frame := frame.previous;
+	END;
+	WHILE frame.previous # NIL DO INC (count); frame := frame.previous END;
+	IF count # 0 THEN Char ('+'); Int (count, 0); Ln; END;
+END StackFrames;
 
 (** Write a buffer in hex. *)
 PROCEDURE Buffer* (CONST buf: ARRAY OF CHAR; ofs, len: LONGINT);
