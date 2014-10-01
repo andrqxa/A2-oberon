@@ -16,7 +16,7 @@
 # A2 Cooperative
 #
 #	Release.Build --build --path="./" A2Cooperative ~
-#	StaticLinker.Link --fileName=a2.bin --extension=Gof --displacement=100000H --path="./" CPU Runtime Trace Counters APIC Processors Queues Activities ExclusiveBlocks HeapManager Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
+#	StaticLinker.Link --fileName=a2.bin --extension=Gof --displacement=100000H --path="./" Trace CPU Runtime Counters APIC Processors Queues Activities ExclusiveBlocks HeapManager Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #
 # WINAOS
 #
@@ -42,7 +42,7 @@
 # 
 # WINAOS Cooperative
 #	Release.Build --build --path="./" WinAosCooperative ~
-#	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=Gof --displacement=401000H --path="./" CPU Runtime Trace Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
+#	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=Gof --displacement=401000H --path="./" Trace CPU Runtime Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #	FSTools.CloseFiles A2.exe ~
 # 
 # Notes:
@@ -262,13 +262,12 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 
 	 # Runtime support for HUGEINT and strings
 	UNCOOP { Runtime.Mod }
-	COOP { I386.CPU.Mod Coop.Runtime.Mod }
 
 	# Low-level trace output
 	Trace.Mod
 
 	# cooperative runtime system
-	COOP { Counters.Mod }
+	COOP { I386.CPU.Mod Coop.Runtime.Mod Counters.Mod }
 	NATIVECOOP { I386.APIC.Mod APIC.Processors.Mod }
 	WINCOOP { Coop.Win32.Kernel32.Mod Win32.Processors.Mod }
 	COOP { Queues.Mod Activities.Mod ExclusiveBlocks.Mod }
