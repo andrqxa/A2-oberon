@@ -581,7 +581,6 @@ VAR
 	PROCEDURE LoadObj*(name, fileName: ARRAY OF CHAR;  VAR res: LONGINT;  VAR msg: ARRAY OF CHAR): Modules.Module;
 	TYPE Body=PROCEDURE;
 	VAR
-		body: Body;
 		file: Files.File; reader: Files.Reader; linker: Linker;
 		arrangement: Arrangement; diagnostics: Diagnostics.StreamDiagnostics; stringWriter: Streams.StringWriter;
 		module: Modules.Module; heapBlockAdr,moduleAdr: LONGINT;
@@ -628,12 +627,6 @@ VAR
 			res := FileNotFound;  COPY(fileName, msg);  Modules.Append(" not found", msg)
 		END;
 		IF res # Ok THEN module := NIL END;
-		IF (module # NIL) & (arrangement.hasBody) THEN
-			IF TraceLoading THEN Trace.String("calling body of module"); Trace.Ln END;
-			body := SYSTEM.VAL (Body, arrangement.bodyAddress);
-			body;
-		END;
-
 		IF (res # Ok) & (res # FileNotFound) THEN D.String(msg);D.Ln END;
 		RETURN module
 	FINALLY
