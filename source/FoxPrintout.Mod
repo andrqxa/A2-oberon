@@ -2,7 +2,7 @@ MODULE FoxPrintout; (** AUTHOR "fof & fn"; PURPOSE "Oberon Compiler Module Outpu
 (* (c) fof ETHZ 2009 *)
 
 IMPORT
-	Scanner := FoxScanner, SyntaxTree := FoxSyntaxTree, Global := FoxGlobal, Basic := FoxBasic, Streams, D:=Debugging, Runtime, SYSTEM;
+	Scanner := FoxScanner, SyntaxTree := FoxSyntaxTree, Global := FoxGlobal, Basic := FoxBasic, Streams, D:=Debugging, SYSTEM;
 
 CONST
 	(* print modes *)
@@ -767,7 +767,7 @@ TYPE
 			PROCEDURE InBounds(val: HUGEINT; bits: LONGINT): BOOLEAN;
 			VAR m: HUGEINT;
 			BEGIN
-				m := Runtime.AslH(1,bits-1);
+				m := ASH(HUGEINT(1),bits-1);
 				RETURN (val < m) & (-val <= m)
 			END InBounds;
 		BEGIN
