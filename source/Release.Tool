@@ -394,9 +394,11 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	ActiveTimers.Mod
 
+	WIN { Win32.GDI32.Mod }
+	WINORIG, WINGEN { Win32.Display.Mod }
+	WINCOOP { Coop.Win32.Display.Mod }
+	
 	WIN {
-		Win32.GDI32.Mod
-		Win32.Display.Mod
 		Win32.WSock32.Mod
 		Win32.Network.Mod
 		Win32.IP.Mod Win32.DNS.Mod
