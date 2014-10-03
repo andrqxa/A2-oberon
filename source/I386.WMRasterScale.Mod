@@ -183,6 +183,7 @@ END Q0BGR565BGR565;
 PROCEDURE XQ0BGR565BGR565(srcadr, dstadr: ADDRESS; srcbpr, dstbpr, dl, dt, dr, db, sx, sy, sdx, sdy, sw, sh : LONGINT);
 VAR yadr : LONGINT;
 CODE {SYSTEM.i386}
+	PUSH	ECX
 	MOV	EDX, [EBP+dstadr]
 	MOV	EBX, [EBP+dl]
 	SHL	EBX, 1
@@ -238,6 +239,7 @@ innerloop:
 
 	DEC	DWORD [EBP+db]
 	JNLE	outerloop
+	POP	ECX
 END XQ0BGR565BGR565;
 
 

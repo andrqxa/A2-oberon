@@ -2879,20 +2879,24 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		VAR bit, bb, x, c, t: LONGINT; m: Mode; adr, aa: ADDRESS;
 		PROCEDURE Fill16(destAdr: ADDRESS; size: SIZE; filler: LONGINT);
 		CODE {SYSTEM.i386}
+			PUSH ECX
 			MOV EDI, [EBP+destAdr]
 			MOV ECX, [EBP+size]
 			MOV EAX, [EBP+filler]
 			CLD
 			REP STOSW
+			POP ECX
 		END Fill16;
 
 		PROCEDURE Fill32(destAdr: ADDRESS; size: SIZE; filler: LONGINT);
 		CODE {SYSTEM.i386}
+			PUSH ECX
 			MOV EDI, [EBP+destAdr]
 			MOV ECX, [EBP+size]
 			MOV EAX, [EBP+filler]
 			CLD
 			REP STOSD
+			POP ECX
 		END Fill32;
 
 	BEGIN
