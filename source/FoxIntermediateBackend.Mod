@@ -1202,9 +1202,7 @@ TYPE
 
 			IF supportedInstruction(instruction,moduleName,procedureName) THEN section.Emit(instruction)
 			ELSE section.Emit(instruction);
-				IF ~backend.cooperative THEN
-					EnsureSymbol(moduleName,procedureName); (* remainder for binary object file *)
-				END;
+				EnsureSymbol(moduleName,procedureName); (* remainder for binary object file *)
 			END;
 		END Emit;
 		
