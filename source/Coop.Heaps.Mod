@@ -203,7 +203,10 @@ BEGIN
 	END
 END CleanupModuleFinalizers;
 
-PROCEDURE InvokeGC* EXTERN "GarbageCollector.Collect";
+PROCEDURE InvokeGC*;
+PROCEDURE Collect EXTERN "GarbageCollector.Collect";
+BEGIN Collect;
+END InvokeGC;
 
 PROCEDURE LazySweepGC*;
 VAR p {UNTRACED}: FreeBlock;
