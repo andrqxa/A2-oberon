@@ -36,29 +36,11 @@ TYPE StackFrame = POINTER {UNSAFE} TO RECORD
 	procedureArgument {UNTRACED}: OBJECT;
 END;
 
-(** Represents the handler of an activity that resembles a virtual processor. *)
-TYPE VirtualProcessor* = OBJECT {DISPOSABLE} (Queues.Item)
+(** Represents the handler identifying activities that are currently either running or suspended. *)
+TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 
 	VAR processor {UNTRACED}: POINTER {UNSAFE} TO Processor;
 	VAR stack {UNTRACED}: POINTER {DISPOSABLE} TO ARRAY OF CHAR;
-
-	PROCEDURE &InitializeProcessor;
-	BEGIN {UNCOOPERATIVE, UNCHECKED}
-		NEW (stack, InitialStackSize);
-		ASSERT (stack # NIL);
-	END InitializeProcessor;
-
-	PROCEDURE Finalize;
-	BEGIN {UNCOOPERATIVE, UNCHECKED}
-		DISPOSE (stack);
-		Finalize^;
-	END Finalize;
-
-END VirtualProcessor;
-
-(** Represents the handler identifying activities that are currently either running or suspended. *)
-TYPE Activity* = OBJECT {DISPOSABLE} (VirtualProcessor)
-
 	VAR stackLimit: ADDRESS;
 	VAR quantum := CPU.Quantum: LONGWORD;
 	VAR priority: Priority;
@@ -70,10 +52,10 @@ TYPE Activity* = OBJECT {DISPOSABLE} (VirtualProcessor)
 	PROCEDURE &InitializeActivity (procedure: PROCEDURE; priority: Priority);
 	VAR stackFrame {UNTRACED}: StackFrame;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
-		InitializeProcessor;
-		ASSERT (procedure # NIL);
 		ASSERT (priority < Priorities);
 		ASSERT (InitialStackSize > SafeStackSize);
+		NEW (stack, InitialStackSize);
+		ASSERT (stack # NIL);
 		stackLimit := ADDRESS OF stack[SafeStackSize]; SELF.priority := priority;
 		stackFrame := ADDRESS OF stack[InitialStackSize - 6 * SIZE OF ADDRESS - CPU.StackDisplacement];
 		stackFrame.procedureArgument := NIL;
@@ -83,6 +65,12 @@ TYPE Activity* = OBJECT {DISPOSABLE} (VirtualProcessor)
 		stackFrame.previous := NIL;
 		framePointer := stackFrame;
 	END InitializeActivity;
+
+	PROCEDURE Finalize;
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		DISPOSE (stack);
+		Finalize^;
+	END Finalize;
 
 END Activity;
 
@@ -123,7 +111,7 @@ END GetCurrentActivity;
 
 (** Returns the unique index of the processor executing this procedure call. *)
 PROCEDURE GetCurrentProcessorIndex- (): SIZE;
-BEGIN {UNCOOPERATIVE, UNCHECKED} IF SYSTEM.GetActivity () # NIL THEN RETURN SYSTEM.GetActivity ()(VirtualProcessor).processor.index ELSE RETURN 0 END;
+BEGIN {UNCOOPERATIVE, UNCHECKED} IF SYSTEM.GetActivity () # NIL THEN RETURN SYSTEM.GetActivity ()(Activity).processor.index ELSE RETURN 0 END;
 END GetCurrentProcessorIndex;
 
 (** Sets the priority of the current activity calling this procedure and returns the previous value. *)
@@ -221,10 +209,10 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Create;
 
 (** Creates an activity that pretends to be executed on a distinct processor. *)
-PROCEDURE CreateVirtualProcessor- (): VirtualProcessor;
-VAR activity: VirtualProcessor; index: SIZE;
+PROCEDURE CreateVirtualProcessor- (): Activity;
+VAR activity: Activity; index: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	NEW (activity);
+	NEW (activity, NIL, DefaultPriority);
 	ASSERT (activity # NIL);
 	index := Counters.Increment (virtualProcessors, 1) + Processors.count;
 	ASSERT (index < Processors.Maximum);
@@ -234,7 +222,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END CreateVirtualProcessor;
 
 (** Temporarily exchanges the currently running activity with a virtual processor in order to call the specified procedure in a different context. *)
-PROCEDURE CallVirtual- (procedure: PROCEDURE (value: ADDRESS); value: ADDRESS; processor: VirtualProcessor);
+PROCEDURE CallVirtual- (procedure: PROCEDURE (value: ADDRESS); value: ADDRESS; processor: Activity);
 VAR currentActivity {UNTRACED}: Activity; stackPointer: ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (processor # NIL);
@@ -331,9 +319,9 @@ END Dispose;
 
 (** Returns whether the specified address corresponds to a local variable that resides on the stack of the current activity calling this procedure. *)
 PROCEDURE IsLocalVariable- (address: ADDRESS): BOOLEAN;
-VAR currentActivity {UNTRACED}: VirtualProcessor; begin, end: ADDRESS;
+VAR currentActivity {UNTRACED}: Activity; begin, end: ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	currentActivity := SYSTEM.GetActivity ()(VirtualProcessor);
+	currentActivity := SYSTEM.GetActivity ()(Activity);
 	IF currentActivity = NIL THEN RETURN FALSE END;
 	begin := ADDRESS OF currentActivity.stack[0];
 	end := begin + LEN (currentActivity.stack);
