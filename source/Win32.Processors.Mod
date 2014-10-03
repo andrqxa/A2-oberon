@@ -23,7 +23,6 @@ PROCEDURE GetCurrentIndex- EXTERN "Activities.GetCurrentProcessorIndex" (): SIZE
 (** This procedure may not be called if there is only one processor in the system. *)
 PROCEDURE SuspendCurrentProcessor-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (count > 1);
 	ASSERT (Kernel32.WaitForSingleObject (semaphore, Kernel32.Infinite) # Kernel32.WaitFailed);
 END SuspendCurrentProcessor;
 
@@ -31,7 +30,6 @@ END SuspendCurrentProcessor;
 (** This procedure may not be called if there is only one processor in the system. *)
 PROCEDURE ResumeAnyProcessor-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (count > 1);
 	ASSERT (Kernel32.ReleaseSemaphore (semaphore, 1, NIL) # 0);
 END ResumeAnyProcessor;
 
@@ -40,7 +38,6 @@ END ResumeAnyProcessor;
 PROCEDURE StartAll-;
 VAR i: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (count > 1);
 	FOR i := 0 TO Maximum - 1 DO
 		IF thread[i] # NIL THEN
 			ASSERT (Kernel32.ResumeThread (thread[i]) # -1);
