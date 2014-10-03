@@ -143,7 +143,7 @@ BUILDS
 		EXTENSION "Gof"
 		SYMBOLEXTENSION "Sym"
 		PATH "AOS:"
-		EXCLUDEPACKAGES ""
+		EXCLUDEPACKAGES "Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts TrueTypeFonts CjkFonts Pr3Fonts ScreenFonts Pr6Fonts"
 		DISABLED "FALSE"
 	}
 	A2_64 {
@@ -187,7 +187,7 @@ BUILDS
 		EXTENSION "Gof"
 		SYMBOLEXTENSION "Sym"
 		PATH "../obj/"
-		EXCLUDEPACKAGES ""
+		EXCLUDEPACKAGES "Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts TrueTypeFonts CjkFonts Pr3Fonts ScreenFonts Pr6Fonts"
 		DISABLED "FALSE"
 	}
 	WinAosMini
