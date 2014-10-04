@@ -15,26 +15,22 @@ CONST Assert* = {14}; AllExcludingSelf* = {18, 19};
 VAR baseAddress := NIL: ADDRESS;
 
 PROCEDURE AwaitInterrupt-;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	CODE HLT END;
+CODE
+	HLT;
 END AwaitInterrupt;
 
 PROCEDURE SendInterrupt- (low, high: SET);
-CONST ICRL = 300H; ICRH = 310H; DS = 12;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (baseAddress # NIL);
-(*
-	SYSTEM.ASM ("
-		mov	edx, [baseAddress]
-		mov	eax, [ebp + high]
-		mov	[edx + ICRH], eax
-		mov	eax, [ebp + low]
-		mov	[edx + ICRL], eax
-	wait:	pause
-		bt	dword [edx + ICRL], DS
-		jc	wait
-	");
-*)
+CONST ICRL = 300H; ICRH = 310H; Status = 12;
+CODE
+	MOV	EDX, baseAddress
+	MOV	EAX, [EBP + high]
+	MOV	[EDX + ICRH], EAX
+	MOV	EAX, [EBP + low]
+	MOV	[EDX + ICRL], EAX
+wait:
+	PAUSE
+	BT		DWORD [EDX + ICRL], Status
+	JC		wait
 END SendInterrupt;
 
 PROCEDURE CopyBootCode- (start: PROCEDURE {NORETURN});
@@ -119,31 +115,26 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END CopyBootCode;
 
 PROCEDURE Initialize-;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (baseAddress = NIL);
-(*
-	SYSTEM.ASM ("
-		; check APIC availability
-		push	ecx
-		mov	eax, 0
-		cpuid
-		cmp	eax, 1
-		jl	skip
-		mov	eax, 1
-		cpuid
-		bt	edx, 9
-		jnc	skip
+CODE
+	; check APIC availability
+	PUSH	ECX
+	MOV	EAX, 0
+	CPUID
+	CMP	EAX, 1
+	JL		skip
+	MOV	EAX, 1
+	CPUID
+	BT		EDX, 9
+	JNC	skip
 
-		; get APIC base address
-		mov	ecx, 0000001Bh
-		rdmsr
-		and	eax, 0xfffff000
-		mov	edx, eax
-		mov	[baseAddress], edx
-	skip:	pop	ecx
-	");
-*)
-	ASSERT (baseAddress # NIL);
+	; get APIC base address
+	MOV	ECX, 0000001BH
+	RDMSR
+	AND	EAX, 0FFFFF000H
+	MOV	EDX, EAX
+	MOV	baseAddress, EDX
+skip:
+	POP	ECX
 END Initialize;
 
 END APIC.
