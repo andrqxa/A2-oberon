@@ -262,12 +262,13 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 
 	 # Runtime support for HUGEINT and strings
 	UNCOOP { Runtime.Mod }
+	COOP { I386.CPU.Mod }
 
 	# Low-level trace output
 	Trace.Mod
 
 	# cooperative runtime system
-	COOP { I386.CPU.Mod Coop.Runtime.Mod Counters.Mod }
+	COOP { Coop.Runtime.Mod Counters.Mod }
 	NATIVECOOP { I386.APIC.Mod APIC.Processors.Mod }
 	WINCOOP { Coop.Win32.Kernel32.Mod Win32.Processors.Mod }
 	COOP { Queues.Mod Activities.Mod ExclusiveBlocks.Mod }
