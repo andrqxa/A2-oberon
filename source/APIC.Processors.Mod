@@ -79,6 +79,7 @@ END AwaitStartups;
 (** @topic Runtime Call *)
 PROCEDURE Initialize-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	APIC.Initialize;
 	APIC.CopyBootCode (Start);
 	APIC.SendInterrupt (InitMessage, {});
 	APIC.SendInterrupt (StartupMessage, {});
