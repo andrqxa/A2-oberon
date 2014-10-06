@@ -3,7 +3,7 @@
 
 MODULE Environment;
 
-IMPORT SYSTEM, CPU, Activities, HeapManager, Trace;
+IMPORT SYSTEM, CPU, Activities, HeapManager, Interrupts, Trace;
 
 CONST Running = 0; ShuttingDown = 1; Rebooting = 2;
 
@@ -16,12 +16,14 @@ CONST TraceSize = TraceLen * TraceHeight;
 
 VAR traceMode: SET;
 VAR bootFlag: ADDRESS;
+VAR clock := 0: LONGINT;
 VAR status* := 0: WORD;
 VAR memTop: ADDRESS;
 VAR traceBase: ADDRESS;
 VAR heap: HeapManager.Heap;
 VAR config: ARRAY 2048 OF CHAR;
 VAR tracePort, tracePos, traceColor: SIZE;
+VAR previousTimerHandler: CPU.InterruptHandler;
 
 PROCEDURE {NORETURN} Abort-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -37,7 +39,20 @@ END Exit;
 
 PROCEDURE Clock- (): LONGINT;
 BEGIN {UNCOOPERATIVE}
+	RETURN clock;
 END Clock;
+
+PROCEDURE Sleep- (milliseconds: LONGINT);
+VAR interrupt: Interrupts.Interrupt;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Interrupts.Install (interrupt, CPU.IRQ0); INC (milliseconds, clock);
+	WHILE clock - milliseconds < 0 DO Interrupts.Await (interrupt) END;
+END Sleep;
+
+PROCEDURE HandleTimerInterrupt (index: SIZE);
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	INC (clock);
+END HandleTimerInterrupt;
 
 PROCEDURE Allocate- (size: SIZE): ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -217,11 +232,28 @@ BEGIN {UNCOOPERATIVE}
 	traceColor := 7; Trace.Char := TraceChar; Trace.Color := TraceColor;
 END InitTrace;
 
-PROCEDURE Initialize-;
+PROCEDURE SetupTimer (channel, mode: SHORTINT; frequency: LONGINT);
+CONST CommandPort = 043H; AccessLoHiByte = 030H; Binary = 000H; Channel0Port = 040H;
+CONST OscillatorFrequency = 1193180;
+VAR divisor: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	ASSERT (frequency > 1);
+	ASSERT (frequency < OscillatorFrequency);
+	divisor := OscillatorFrequency DIV frequency;
+	CPU.OutByte (CommandPort, AccessLoHiByte + Binary + mode + channel * 64);
+	CPU.OutChar (Channel0Port + channel, CHR (divisor MOD 100H));
+	CPU.OutChar (Channel0Port + channel, CHR (divisor DIV 100H));
+END SetupTimer;
+
+PROCEDURE Initialize-;
+CONST Channel0 = 0; RateGenerator = 4;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	CPU.Initialize;
 	ReadBootTable (bootFlag);
 	InitTrace;
 	HeapManager.Initialize (heap, ADDRESS OF KernelEnd, memTop);
+	previousTimerHandler := CPU.InstallInterrupt (HandleTimerInterrupt, CPU.IRQ0);
+	SetupTimer (Channel0, RateGenerator, 1000);
 END Initialize;
 
 PROCEDURE Terminate-;
