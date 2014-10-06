@@ -16,7 +16,7 @@
 # A2 Cooperative
 #
 #	Release.Build --build --path="./" A2Cooperative ~
-#	StaticLinker.Link --fileName=a2.bin --extension=Gof --displacement=100000H --path="./" Trace CPU Runtime Counters APIC Processors Queues Activities ExclusiveBlocks HeapManager Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
+#	StaticLinker.Link --fileName=a2.bin --extension=Gof --displacement=100000H --path="./" Trace CPU Runtime Counters APIC Processors Queues Activities ExclusiveBlocks HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #
 # WINAOS
 #
@@ -272,7 +272,7 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	NATIVECOOP { I386.APIC.Mod APIC.Processors.Mod }
 	WINCOOP { Coop.Win32.Kernel32.Mod Win32.Processors.Mod }
 	COOP { Queues.Mod Activities.Mod ExclusiveBlocks.Mod }
-	NATIVECOOP { HeapManager.Mod BIOS.Environment.Mod }
+	NATIVECOOP { HeapManager.Mod Interrupts.Mod BIOS.Environment.Mod }
 	WINCOOP { Win32.Environment.Mod }
 
 	UNIX { Unix.Glue.Mod }
