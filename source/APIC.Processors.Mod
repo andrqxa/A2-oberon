@@ -14,7 +14,7 @@ CONST StartupMessage = APIC.STARTUP + APIC.Assert + APIC.AllExcludingSelf;
 CONST NonmaskableMessage = APIC.NMI + APIC.Assert + APIC.AllExcludingSelf;
 
 (** Holds the actual number of processors in the system. *)
-VAR count- := 1: SIZE;
+VAR count-: SIZE;
 
 VAR running: Counters.AlignedCounter; (* counts the number of application processors currently running *)
 VAR semaphore: Counters.AlignedCounter; (* counter that acts as semaphore for suspended processors *)
@@ -79,6 +79,7 @@ END AwaitStartups;
 (** @topic Runtime Call *)
 PROCEDURE Initialize-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	count := 1;
 	APIC.Initialize;
 	APIC.CopyBootCode (Start);
 	APIC.SendInterrupt (InitMessage, {});
