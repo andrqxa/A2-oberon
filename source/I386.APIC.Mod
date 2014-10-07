@@ -34,85 +34,79 @@ wait:
 END SendInterrupt;
 
 PROCEDURE CopyBootCode- (start: PROCEDURE {NORETURN});
-CONST ID = 20H;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (baseAddress # NIL);
-(*
-	SYSTEM.ASM ("
-		; copy bootstrap code
-		push	ecx
-		mov	edi, 0
-		mov	esi, dword @APIC.BootCode
-		mov	ecx, bootcode_size / 4
-		cld
-		rep movsd
-		pop	ecx
+CODE
+	; copy bootstrap code
+	PUSH	ECX
+	MOV	EDI, 0
+	MOV	ESI, BootCode
+	MOV	ECX, 119
+	CLD
+	REP MOVSB
+	POP	ECX
 
-		; patch start procedure
-		mov	eax, [ebp + start]
-		sub	eax, dword patch - bootcode_begin
-		mov	[patch - bootcode_begin - 4], eax
-
-		; skip application processor code
-		jmp	dword bootcode_end
-
-		.pad	4
-	bootcode_begin:
-		.bitmode	16
-		.alias	APIC.BootCode
-
-		; enter protected mode
-		cli
-		lgdt	[gdt32 - bootcode_begin]
-		mov	eax, cr0
-		or	eax, 1
-		mov	cr0, eax
-
-		; prepare segment registers
-		mov	bx, (data32 - gdt32_begin) / 8 << 3
-		mov	ds, bx
-		mov	es, bx
-		mov	fs, bx
-		mov	gs, bx
-		mov	ss, bx
-
-		; activate protected mode
-		jmpfar	(code32 - gdt32_begin) / 8 << 3, dword protected - bootcode_begin
-
-	protected:
-		.bitmode	32
-
-		; create unique stack pointer
-		mov	eax, [baseAddress]
-		mov	eax, [eax + ID]
-		shr	eax, 24
-		inc	eax
-		mov	ebx, (ReservedArea - bootcode_size) / Processors / 4 * 4
-		mul	ebx
-		mov	esp, eax
-		add	esp, dword bootcode_size
-		lidt	[@CPU.idt]
-
-		; jump to start procedure
-		jmp	dword 0
-	patch:
-
-	gdt32:
-		.dbyte	gdt32_end - gdt32_begin
-		.qbyte	gdt32_begin - bootcode_begin
-
-	gdt32_begin:
-		.qbyte	0, 0
-		code32:	.byte	11111111b, 11111111b, 00h, 00h, 00h, 10011110b, 11001111b, 0h
-		data32:	.byte	11111111b, 11111111b, 00h, 00h, 00h, 10010010b, 11001111b, 0h
-	gdt32_end:
-		.pad	4
-	bootcode_end:
-	bootcode_size:	.equals	bootcode_end - bootcode_begin
-		.assert	bootcode_size % 4 == 0
-	");
-*)
+	; patch start procedure
+	MOV	EAX, [EBP + start]
+	SUB	EAX, ESI
+	MOV	[ESI - 4], EAX
 END CopyBootCode;
+
+PROCEDURE {NOPAF} BootCode;
+CONST ID = 20H; Interrupts = CPU.Interrupts;
+CODE
+bootcodebegin:
+	BITS	16
+	
+	; enter protected mode
+	CLI
+	DB		00fh, 001h, 016h, gdt32 - bootcodebegin, 000H
+	MOV	EAX, CR0
+	OR		EAX, 1
+	MOV	CR0, EAX
+	
+	; prepare segment registers
+	MOV	BX, 16
+	MOV	DS, BX
+	MOV	ES, BX
+	MOV	FS, BX
+	MOV	GS, BX
+	MOV	SS, BX
+
+	; activate protected mode
+	DB		066h, 0eah, protected - bootcodebegin, 000h, 000h, 000h, 008h, 000h
+
+gdt32:
+	DW		gdt32end - gdt32begin
+	DD		gdt32begin
+
+gdt32begin:
+	DD		0, 0
+code32:	DB	11111111b, 11111111b, 00h, 00h, 00h, 10011110b, 11001111b, 0h
+data32:	DB	11111111b, 11111111b, 00h, 00h, 00h, 10010010b, 11001111b, 0h
+gdt32end:
+	
+protected:
+	BITS	32
+
+	; create unique stack pointer
+	MOV	EAX, baseAddress
+	MOV	EAX, [EAX + ID]
+	SHR	EAX, 24
+	INC	EAX
+	MOV	EAX, (ReservedArea - (bootcodeend - bootcodebegin)) / Processors / 4 * 4
+	MUL	EBX
+	MOV	ESP, EAX
+	ADD	ESP, bootcodeend - bootcodebegin
+	LEA	EAX, CPU.idt
+	PUSH	EAX
+	MOV	AX, Interrupts * 8
+	PUSH	AX
+	LIDT	[ESP]
+
+	; jump to start procedure
+	JMP	DWORD 0
+
+bootcodeend:
+END BootCode;
 
 PROCEDURE Initialize-;
 CODE
