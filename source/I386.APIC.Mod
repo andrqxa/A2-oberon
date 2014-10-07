@@ -46,8 +46,8 @@ CODE
 
 	; patch start procedure
 	MOV	EAX, [EBP + start]
-	SUB	EAX, ESI
-	MOV	[ESI - 4], EAX
+	SUB	EAX, EDI
+	MOV	[EDI - 4], EAX
 END CopyBootCode;
 
 PROCEDURE {NOPAF} BootCode;
@@ -75,13 +75,13 @@ bootcodebegin:
 	DB		066h, 0eah, protected - bootcodebegin, 000h, 000h, 000h, 008h, 000h
 
 gdt32:
-	DW		gdt32end - gdt32begin
-	DD		gdt32begin
+	DW	gdt32end - gdt32begin
+	DD		gdt32begin - bootcodebegin
 
 gdt32begin:
 	DD		0, 0
-code32:	DB	11111111b, 11111111b, 00h, 00h, 00h, 10011110b, 11001111b, 0h
-data32:	DB	11111111b, 11111111b, 00h, 00h, 00h, 10010010b, 11001111b, 0h
+code32:	DB	0ffh, 0ffh, 000h, 000h, 000h, 09eh, 0cfh, 000h
+data32:		DB	0ffh, 0ffh, 000h, 000h, 000h, 092h, 0cfh, 000h
 gdt32end:
 	
 protected:
