@@ -2,7 +2,7 @@ MODULE FoxGlobal; (** AUTHOR "fof & fn"; PURPOSE "Oberon Compiler Globally Defin
 (* (c) fof ETH Zürich, 2008 *)
 
 IMPORT
-	SyntaxTree := FoxSyntaxTree, Basic := FoxBasic, Scanner := FoxScanner, Strings, D:= Debugging;
+	SyntaxTree := FoxSyntaxTree, Basic := FoxBasic, Scanner := FoxScanner, Strings, Dates, D:= Debugging;
 
 CONST
 	(* system flag names *)
@@ -600,6 +600,7 @@ TYPE
 	END BuildScopes;
 
 	PROCEDURE SetDefaultDeclarations*(system: System; minBits: LONGINT);
+	VAR now: Dates.DateTime; date, time: ARRAY 20 OF CHAR;
 	BEGIN
 		(* types *)
 		system.longintType := SyntaxTree.NewIntegerType(32, TRUE);
@@ -690,6 +691,11 @@ TYPE
 		NewBuiltin(systemMsk,"MSK",system.systemScope,TRUE);
 		NewBuiltin(systemBit,"BIT",system.systemScope,TRUE);
 
+		now := Dates.Now ();
+		Strings.FormatDateTime ("hh:nn:ss", now, time);
+		Strings.FormatDateTime ("mmm dd yyyy", now, date);
+		NewStringConstantCamelCase("Time", Strings.NewString (time), system.characterType, system.systemScope);
+		NewStringConstantCamelCase("Date", Strings.NewString (date), system.characterType, system.systemScope);
 		NewBuiltinCamelCase(systemGetStackPointer,"GetStackPointer",system.systemScope,TRUE);
 		NewBuiltinCamelCase(systemSetStackPointer,"SetStackPointer",system.systemScope,TRUE);
 		NewBuiltinCamelCase(systemGetFramePointer,"GetFramePointer",system.systemScope,TRUE);
@@ -951,6 +957,36 @@ TYPE
 		NewConstant0(nameU,int,type,scope[Scanner.Uppercase]);
 		NewConstant0(nameL,int,type,scope[Scanner.Lowercase]);
 	END NewConstant;
+
+	PROCEDURE NewStringConstant0(CONST name: ARRAY OF CHAR; string: SyntaxTree.String; baseType: SyntaxTree.Type; in: SyntaxTree.Scope);
+	VAR constant: SyntaxTree.Constant; value: SyntaxTree.StringValue;duplicate: BOOLEAN;
+	BEGIN
+		value := SyntaxTree.NewStringValue(-1,string);
+		value.SetType(SyntaxTree.NewStringType(-1,baseType,value.length));
+		constant := SyntaxTree.NewConstant(-1,SyntaxTree.NewIdentifier(name));
+		constant.SetValue(value);
+		constant.SetType(value.type);
+		constant.SetAccess(SyntaxTree.ReadOnly);
+		constant.SetState(SyntaxTree.Resolved);
+		in.AddConstant(constant);
+		in.EnterSymbol(constant,duplicate);
+		ASSERT(~duplicate);
+	END NewStringConstant0;
+
+	PROCEDURE NewStringConstant*(CONST name: ARRAY OF CHAR; string: SyntaxTree.String; type: SyntaxTree.Type; CONST scope: ARRAY OF SyntaxTree.ModuleScope);
+	VAR nameL,nameU: Scanner.IdentifierString;
+	BEGIN
+		Basic.Lowercase(name,nameL);
+		Basic.Uppercase(name,nameU);
+		NewStringConstant0(nameU,string,type,scope[Scanner.Uppercase]);
+		NewStringConstant0(nameL,string,type,scope[Scanner.Lowercase]);
+	END NewStringConstant;
+
+	PROCEDURE NewStringConstantCamelCase*(CONST name: ARRAY OF CHAR; string: SyntaxTree.String; type: SyntaxTree.Type; CONST scope: ARRAY OF SyntaxTree.ModuleScope);
+	BEGIN
+		NewStringConstant0(name,string,type,scope[Scanner.Uppercase]);
+		NewStringConstant0(name,string,type,scope[Scanner.Lowercase]);
+	END NewStringConstantCamelCase;
 
 	PROCEDURE NewBuiltin0( id: LONGINT; CONST name: ARRAY OF CHAR; in:  SyntaxTree.ModuleScope; realtime: BOOLEAN);
 	VAR basic: SyntaxTree.Builtin; duplicate: BOOLEAN; type: SyntaxTree.ProcedureType;
