@@ -2005,7 +2005,7 @@ TYPE
 					ELSIF symbol = symIdent THEN
 						IF ident = "END" THEN
 							symbol := symNone;
-						ELSIF ~(scope # NIL) & (ident = "BITS") THEN
+						ELSIF ident = "BITS" THEN
 							NextSymbol;
 							IF ~Ensure (symNumber, 553) OR ~emitter.SetBits (val) THEN
 								SkipLine;
