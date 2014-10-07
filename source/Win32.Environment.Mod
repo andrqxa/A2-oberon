@@ -3,13 +3,14 @@
 
 MODULE Environment;
 
-IMPORT SYSTEM, Activities, Kernel32, Processors, Trace;
+IMPORT SYSTEM, Activities, Counters, Kernel32, Processors, Queues, Trace;
 
 CONST DefaultConfigFile = "aos.ini";
 CONST UserConfigFile = "myaos.ini";
 
 VAR status* := 0: WORD;
 VAR heap: Kernel32.HANDLE;
+VAR sleepingQueue: Queues.Queue;
 VAR stdin, stdout: Kernel32.HANDLE;
 VAR defaultConfigFile, userConfigFile, traceName: ARRAY Kernel32.MaxPath OF CHAR;
 
@@ -26,8 +27,42 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Exit;
 
 PROCEDURE Clock- (): LONGINT;
-BEGIN RETURN Kernel32.GetTickCount ();
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	RETURN Kernel32.GetTickCount ();
 END Clock;
+
+PROCEDURE Sleep- (milliseconds: LONGINT);
+VAR nextActivity: Activities.Activity;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	INC (milliseconds, Kernel32.GetTickCount ());
+	Counters.Inc (Activities.awaiting);
+	WHILE Kernel32.GetTickCount () - milliseconds < 0 DO
+		IF Activities.Select (nextActivity, Activities.IdlePriority) THEN
+			Activities.SwitchTo (nextActivity, Enqueue, NIL);
+			Activities.FinalizeSwitch;
+		END;
+	END;
+	Counters.Dec (Activities.awaiting);
+END Sleep;
+
+PROCEDURE Enqueue (previous {UNTRACED}: Activities.Activity; argument: ADDRESS);
+VAR item: Queues.Item;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Queues.Enqueue (previous, sleepingQueue);
+END Enqueue;
+
+PROCEDURE {WINAPI} Timer (lpParameter: ANY): LONGINT;
+VAR item: Queues.Item;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	SYSTEM.SetActivity (Activities.CreateVirtualProcessor ());
+	LOOP
+		Kernel32.Sleep (10);
+		WHILE Queues.Dequeue (item, sleepingQueue) DO
+			Activities.Resume (item(Activities.Activity));
+		END;
+	END;
+	Kernel32.ExitThread(0);
+END Timer;
 
 PROCEDURE Allocate- (size: SIZE): ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -190,4 +225,5 @@ BEGIN
 	Trace.Int (Processors.count, 0); Trace.String (" CPU");
 	IF Processors.count > 1 THEN Trace.Char ('s') END; Trace.String (", ");
 	Trace.Int (SIZE OF ADDRESS * 8, 0); Trace.String ("-bit)"); Trace.Ln;
+	ASSERT (Kernel32.CreateThread (NIL, 0, Timer, NIL, {}, NIL) # Kernel32.InvalidHandleValue);
 END Environment.
