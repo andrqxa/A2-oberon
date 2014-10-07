@@ -3,7 +3,7 @@
 
 MODULE Environment;
 
-IMPORT SYSTEM, CPU, Activities, HeapManager, Interrupts, Trace;
+IMPORT SYSTEM, CPU, Activities, HeapManager, Interrupts, Processors, Trace;
 
 CONST Running = 0; ShuttingDown = 1; Rebooting = 2;
 
@@ -14,6 +14,7 @@ CONST TraceWidth = 80; TraceHeight = 25;
 CONST TraceLen = TraceWidth * SIZEOF (INTEGER);
 CONST TraceSize = TraceLen * TraceHeight;
 
+VAR memory: SIZE;
 VAR traceMode: SET;
 VAR bootFlag: ADDRESS;
 VAR clock := 0: LONGINT;
@@ -251,6 +252,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	CPU.Initialize;
 	ReadBootTable (bootFlag);
 	InitTrace;
+	memory := memTop - ADDRESS OF KernelEnd;
 	HeapManager.Initialize (heap, ADDRESS OF KernelEnd, memTop);
 	previousTimerHandler := CPU.InstallInterrupt (HandleTimerInterrupt, CPU.IRQ0);
 	SetupTimer (Channel0, RateGenerator, 1000);
@@ -269,5 +271,12 @@ PROCEDURE {NOPAF, ALIGNED(32)} KernelEnd;
 CODE {SYSTEM.i386}
 END KernelEnd;
 
+BEGIN
+	Trace.String ("Build "); Trace.String (SYSTEM.Date); Trace.String (" (");
+	Trace.Int (memory DIV (1024 * 1024), 0); Trace.String (" MB RAM, ");
+	Trace.String ("GC, ");
+	Trace.Int (Processors.count, 0); Trace.String (" CPU");
+	IF Processors.count > 1 THEN Trace.Char ('s') END; Trace.String (", ");
+	Trace.Int (SIZE OF ADDRESS * 8, 0); Trace.String ("-bit)"); Trace.Ln;
 END Environment.
 

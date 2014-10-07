@@ -3,7 +3,7 @@
 
 MODULE Environment;
 
-IMPORT Activities, Kernel32, Trace;
+IMPORT SYSTEM, Activities, Kernel32, Processors, Trace;
 
 CONST DefaultConfigFile = "aos.ini";
 CONST UserConfigFile = "myaos.ini";
@@ -184,4 +184,10 @@ PROCEDURE Terminate-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Terminate;
 
+BEGIN
+	Trace.String ("Build "); Trace.String (SYSTEM.Date); Trace.String (" (Windows, ");
+	Trace.String ("GC, ");
+	Trace.Int (Processors.count, 0); Trace.String (" CPU");
+	IF Processors.count > 1 THEN Trace.Char ('s') END; Trace.String (", ");
+	Trace.Int (SIZE OF ADDRESS * 8, 0); Trace.String ("-bit)"); Trace.Ln;
 END Environment.
