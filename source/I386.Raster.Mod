@@ -1491,6 +1491,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	PROCEDURE SSE2BGRA8888CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
 	CODE {SYSTEM.i386, SYSTEM.MMX, SYSTEM.SSE, SYSTEM.SSE2, SYSTEM.Pentium}
 		PUSHFD
+		PUSH		ECX
 		PUSH 		EBX
 		; CLI
 
@@ -1553,6 +1554,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	end:
 		EMMS ; declare FPU registers free
 		POP 		EBX
+		POP		ECX
 		POPFD
 	END SSE2BGRA8888CopyBGR888;
 
@@ -1579,6 +1581,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	PROCEDURE SSE2BGR888CopyBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
 	CODE {SYSTEM.i386, SYSTEM.MMX, SYSTEM.SSE, SYSTEM.SSE2,SYSTEM.Pentium}
 		PUSHFD
+		PUSH		ECX
 		PUSH 		EBX
 		; CLI
 
@@ -1647,6 +1650,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	end:
 		EMMS ; declare FPU registers free
 		POP 		EBX
+		POP		ECX
 		POPFD
 	END SSE2BGR888CopyBGRA8888;
 
@@ -2025,6 +2029,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	PROCEDURE MMXBGRA8888Over565(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
 	CODE {SYSTEM.i386, SYSTEM.MMX}
 		PUSHFD
+		PUSH		ECX
 		; CLI
 		MOV 		ESI, [EBP+sadr]
 		MOV 		EDI, [EBP+dadr]
@@ -2144,6 +2149,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		JMP 		loop
 	end:
 		EMMS ; declare FPU registers free
+		POP		ECX
 		POPFD
 	END MMXBGRA8888Over565;
 
@@ -2151,6 +2157,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	PROCEDURE SSE2BGRA8888Over565(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
 	CODE {SYSTEM.i386, SYSTEM.MMX, SYSTEM.SSE, SYSTEM.SSE2}
 		PUSHFD
+		PUSH		ECX
 		PUSH 		EBX
 		; CLI
 
@@ -2558,6 +2565,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	end:
 		EMMS ; declare FPU registers free
 		POP 		EBX
+		POP		ECX
 		POPFD
 
 	END SSE2BGRA8888Over565;
