@@ -207,7 +207,7 @@ TYPE
 		DR0*, DR1*, DR2*, DR3*, DR6*, DR7*: LONGINT;
 		FloatSave*: FloatingSaveArea;
 		GS*, FS*, ES*, DS*: LONGINT;
-		EDI*, ESI*, EBX*, EDX*, ECX*, EAX*: LONGINT;
+		EDI*, ESI*, EBX*, EDX*, ECX*, EAX*: OBJECT;
 		BP*, PC*, CS*, FLAGS*, SP*, SS*: LONGINT; (* whereas BP is EBP and SP is ESP *)
 	END;
 
@@ -755,6 +755,7 @@ VAR
 	PROCEDURE {WINAPI} ExceptionHandler( VAR excpRec: ExceptionRecord; excpFrame: ExcpFrmPtr;
 	 										VAR context: Context;  dispatch: LONGINT ): LONGINT;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		SYSTEM.SetActivity (context.ECX);
 		Runtime.Trap (excpRec.ExceptionCode);
 	END ExceptionHandler;
 
