@@ -54,6 +54,7 @@ END Enqueue;
 PROCEDURE {WINAPI} Timer (lpParameter: ANY): LONGINT;
 VAR item: Queues.Item;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Kernel32.InstallExceptionHandler;
 	SYSTEM.SetActivity (Activities.CreateVirtualProcessor ());
 	LOOP
 		Kernel32.Sleep (10);

@@ -50,6 +50,7 @@ PROCEDURE {WINAPI} Start (lpParameter: ANY): LONGINT;
 PROCEDURE Execute EXTERN "Activities.Execute" (procedure: PROCEDURE);
 PROCEDURE Idle EXTERN "Activities.Idle";
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Kernel32.InstallExceptionHandler;
 	Execute (Idle);
 	Kernel32.ExitThread(0);
 END Start;

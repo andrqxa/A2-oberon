@@ -2,7 +2,7 @@
 
 MODULE Kernel32;   (** AUTHOR "ejz"; PURPOSE "Definition of the Win32 Kernel32 API used by (Win)Aos"; *)
 
-IMPORT SYSTEM;
+IMPORT SYSTEM, Runtime;
 
 CONST
 	(** NIL pointer/address value *)
@@ -752,6 +752,18 @@ VAR
 	hInstance-: HINSTANCE;   (* init by linker/loader *)
 	isEXE-: BOOLEAN;
 
+	PROCEDURE {WINAPI} ExceptionHandler( VAR excpRec: ExceptionRecord; excpFrame: ExcpFrmPtr;
+	 										VAR context: Context;  dispatch: LONGINT ): LONGINT;
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		Runtime.Trap (excpRec.ExceptionCode);
+	END ExceptionHandler;
+
+	PROCEDURE InstallExceptionHandler-;
+	CODE
+		DB	064H, 08BH, 01DH, 000H, 000H, 000H, 000H
+		MOV	[EBX + 4], ExceptionHandler
+	END InstallExceptionHandler;
+
 	(** Wrapper for getProcAddress. *)
 	PROCEDURE GetProcAddress*( hModule: HMODULE;  procName: ARRAY OF CHAR; VAR adr: ADDRESS );
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -803,6 +815,7 @@ VAR
 	PROCEDURE Init;
 	VAR mod: HMODULE;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		InstallExceptionHandler;
 		mod := LoadLibrary("Kernel32.DLL");
 		GetProcAddress(mod, "AllocConsole",SYSTEM.VAL(ADDRESS,AllocConsole));
 		GetProcAddress(mod, "Beep",SYSTEM.VAL(ADDRESS,Beep));

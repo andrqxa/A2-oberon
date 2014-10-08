@@ -924,6 +924,7 @@ VAR
 	VAR activity: Activities.Activity;
 	VAR msg: User32.Msg;  i: LONGINT; mode: LONGINT;
 	BEGIN
+		Kernel32.InstallExceptionHandler;
 		SYSTEM.SetActivity (create(CreateStruct).win.processor);
 		KernelLog.String( "Display: Initialize message dispatcher..." );  KernelLog.Ln;
 		RegisterClasses();  CreateHWND( create(CreateStruct) );  create := NIL;
