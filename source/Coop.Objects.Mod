@@ -2,7 +2,7 @@
 
 MODULE Objects;   (** AUTHOR "pjm, ejz, fof"; PURPOSE "Active object runtime support"; *)
 
-IMPORT SYSTEM, Machine, Modules, Heaps, Activities;
+IMPORT SYSTEM, Environment, Machine, Modules, Heaps, Activities;
 
 CONST
 	(* Process flags *)
@@ -54,42 +54,20 @@ TYPE
 	END;
 
 	Clock = OBJECT
-		VAR h: Timer;
-			ticks: LONGINT;
-			mode: LONGINT;
-			process: Process;
-
-		PROCEDURE Wakeup;
-		BEGIN {EXCLUSIVE}
-		END Wakeup;
-
-		PROCEDURE Finalize(ptr: ANY);
-		END Finalize;
-
-		PROCEDURE &Init*;
-		VAR fn: Heaps.FinalizerNode;
-		BEGIN
-			NEW(fn); fn.finalizer := SELF.Finalize; Heaps.AddFinalizer(SELF, fn)
-		END Init;
-
+	VAR h: Timer;
 	BEGIN {ACTIVE, SAFE, PRIORITY(High)}
-		process := CurrentProcess();
-		mode := process.mode;
 		LOOP
 			Machine.Acquire(Machine.Objects);
-			process.mode := mode;
 			LOOP
-				h := event.next;  (* event: head of timer event queue *)
-				IF (h = event) OR (h.trigger - ticks > 0) THEN EXIT END;
-				event.next := h.next;  event.next.prev := event;   (* unlink *)
-				h.next := NIL;  h.prev := NIL;
+				h := event.next;
+				IF (h = event) OR (h.trigger - Environment.Clock () > 0) THEN EXIT END;
+				event.next := h.next; event.next.prev := event; (* unlink *)
+				h.next := NIL; h.prev := NIL;
 				Machine.Release(Machine.Objects);
-				h.handler();   (* assume handler will return promptly *)
+				h.handler;	(* assume handler will return promptly *)
 				Machine.Acquire(Machine.Objects)
 			END;
-			mode := process.mode;
-			process.mode := AwaitingEvent;
-			Machine.Release(Machine.Objects);
+			Environment.Sleep (1);
 		END
 	END Clock;
 
@@ -155,6 +133,7 @@ END Yield;
 (** Return current process. (DEPRECATED, use ActiveObject) *)
 PROCEDURE CurrentProcess*( ): Process;
 BEGIN
+	HALT (1234);
 	RETURN NIL;
 END CurrentProcess;
 
@@ -187,20 +166,20 @@ END Terminate;
 
 (** Set (or reset) an event handler object's timeout value. *)
 PROCEDURE SetTimeout*(t: Timer; h: EventHandler;  ms: LONGINT );
-VAR e: Timer;  trigger: LONGINT;
+VAR e: Timer; trigger: LONGINT;
 BEGIN
 	ASSERT((t # NIL) & (h # NIL));
-	ASSERT(ms >= 0);
+	IF ms < 1 THEN ms := 1 END;
 	Machine.Acquire(Machine.Objects);
-	IF t.next # NIL THEN  (* cancel previous timeout *)
-		t.next.prev := t.prev;  t.prev.next := t.next
+	trigger := Environment.Clock () + ms;
+	IF t.next # NIL THEN (* cancel previous timeout *)
+		t.next.prev := t.prev; t.prev.next := t.next
 	END;
-	t.trigger := trigger;  t.handler := h;
-	e := event.next;   (* performance: linear search! *)
+	t.trigger := trigger; t.handler := h;
+	e := event.next;	(* performance: linear search! *)
 	WHILE (e # event) & (e.trigger - trigger <= 0) DO e := e.next END;
-	t.prev := e.prev;  e.prev := t;  t.next := e;  t.prev.next := t;
-	Machine.Release(Machine.Objects);
-	clock.Wakeup()
+	t.prev := e.prev; e.prev := t; t.next := e; t.prev.next := t;
+	Machine.Release(Machine.Objects)
 END SetTimeout;
 
 (** Set (or reset) an event handler object's timeout value. Here ms is absolute *)
@@ -218,7 +197,6 @@ BEGIN
 	WHILE (e # event) & (e.trigger - trigger <= 0) DO e := e.next END;
 	t.prev := e.prev; e.prev := t; t.next := e; t.prev.next := t;
 	Machine.Release(Machine.Objects);
-	clock.Wakeup()
 END SetTimeoutAt;
 
 (** Cancel an event handler object's timeout, if any. It is possible that the timer has expired, but not yet been scheduled to run. *)

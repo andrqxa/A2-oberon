@@ -32,34 +32,43 @@ TYPE
 	(** Delay timer *)
 	Timer* = OBJECT
 	VAR
+		timer: Objects.Timer;
 		state-: SHORTINT;
 		nofHandleTimeout-, nofHandleTimeout2- : LONGINT;
 		nofSleeps-, nofSleepsLeft- : LONGINT;
 		nofAwaits-, nofAwaitsLeft- : LONGINT;
 
+		PROCEDURE HandleTimeout;
+		BEGIN {EXCLUSIVE}
+			INC(nofHandleTimeout);
+			IF state # TimerFree THEN INC(nofHandleTimeout2); state := TimerExpired END
+		END HandleTimeout;
+
 		(** Delay the calling process the specified number of milliseconds or until Wakeup is called. Only one process may sleep on a specific timer at a time. *)
 		PROCEDURE Sleep*(ms: LONGINT);
-		BEGIN
+		BEGIN {EXCLUSIVE}
+			INC(nofSleeps);
 			ASSERT(state = TimerFree);	(* only one process may sleep on a timer *)
 			state := TimerSleeping;
-			INC (ms, Environment.Clock ());
-			WHILE (state = TimerSleeping) & (Environment.Clock () - ms < 0) DO
-				Activities.Switch;
-			END;
+			Objects.SetTimeout(timer, HandleTimeout, ms);
+			INC(nofAwaits);
+			AWAIT(state # TimerSleeping);
+			INC(nofAwaitsLeft);
+			IF state # TimerExpired THEN Objects.CancelTimeout(timer) END;
 			state := TimerFree;
 			INC(nofSleepsLeft);
 		END Sleep;
 
 		(** Wake up the process sleeping on the timer, if any. *)
 		PROCEDURE Wakeup*;
-		BEGIN
+		BEGIN {EXCLUSIVE}
 			IF state = TimerSleeping THEN state := TimerWoken END
 		END Wakeup;
 
 		(** Initializer. *)
 		PROCEDURE &Init*;
 		BEGIN
-			state := TimerFree;
+			state := TimerFree; NEW(timer);
 			nofHandleTimeout := 0; nofHandleTimeout2 := 0;
 			nofSleeps := 0; nofSleepsLeft := 0;
 			nofAwaits := 0; nofAwaitsLeft := 0;
