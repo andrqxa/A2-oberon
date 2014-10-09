@@ -58,7 +58,7 @@ CONST
 
 	Sizemaximized = 2;  Sizeminimized = 1;  Sizerestored = 0;
 
-	WindowTitle = "WinAOS";
+	WindowTitle = "WinAOS (Cooperative)";
 
 	WM_DEVICECHANGE = 0219H;
 
