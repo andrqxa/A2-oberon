@@ -1,6 +1,6 @@
 MODULE Display;   (** fof , source Win32.Windows.Mod+Win32.Displays.Mod+Win32.Display.Mod+Win32.Viewers.Mod **)
 
-IMPORT SYSTEM, Activities, Counters, Kernel32, User32, Modules, KernelLog, GDI32, Displays, Strings,
+IMPORT SYSTEM, Environment, Activities, Counters, Kernel32, User32, Modules, KernelLog, GDI32, Displays, Strings,
 	AosInputs := Inputs, Commands, Objects,WinFS, Options;
 
 CONST
@@ -335,10 +335,7 @@ VAR
 
 	PROCEDURE HandleFocus( win: Window;  uMsg: LONGINT;  wParam: User32.WParam );
 	BEGIN
-		IF (uMsg = User32.WMSetFocus) & (hook # win) THEN
-			Kernel32.Sleep( 0 );   (* ????????????????????? *)
-		ELSIF uMsg = User32.WMKillFocus THEN
-
+		IF uMsg = User32.WMKillFocus THEN
 			IF wParam # Kernel32.NULL THEN
 				IF wParam = win.hWnd THEN RETURN END;
 			END;
@@ -678,7 +675,7 @@ VAR
 	BEGIN
 		IF traceDisplay THEN
 			ret := GDI32.BitBlt( win.hDC (* = destination *) , x + dx, y + dy, w, h, win.bmphdc (* source *) , x, y, GDI32.NotSrcCopy );
-			Kernel32.Sleep(50);
+			Environment.Sleep(50);
 		END;
 		ret := GDI32.BitBlt( win.hDC (* = destination *) , x + dx, y + dy, w, h, win.bmphdc (* source *) , x, y, GDI32.SrcCopy );
 	END ToWindow;
