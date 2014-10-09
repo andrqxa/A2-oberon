@@ -65,8 +65,9 @@ TYPE
 				h.next := NIL; h.prev := NIL;
 				Machine.Release(Machine.Objects);
 				h.handler;	(* assume handler will return promptly *)
-				Machine.Acquire(Machine.Objects)
+				Machine.Acquire(Machine.Objects);
 			END;
+			Machine.Release(Machine.Objects);
 			Environment.Sleep (1);
 		END
 	END Clock;
@@ -214,9 +215,7 @@ END CancelTimeout;
 PROCEDURE InitEventHandling;
 BEGIN
 	NEW(event); event.next := event; event.prev := event;  (* event: head of timer event queue, only a sentinel *)
-(*
 	NEW(clock)
-*)
 END InitEventHandling;
 
 PROCEDURE NumReady*( ): LONGINT;
