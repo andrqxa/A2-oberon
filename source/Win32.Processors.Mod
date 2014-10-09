@@ -12,7 +12,7 @@ CONST Maximum* = MAX (SET) - MIN (SET) + 1;
 VAR count-: SIZE;
 
 VAR affinityMask: SET;
-VAR semaphore: Kernel32.HANDLE;
+VAR event: Kernel32.HANDLE;
 VAR thread: ARRAY Maximum OF Kernel32.HANDLE;
 
 (** Returns the unique index of the processor executing this procedure call. *)
@@ -20,21 +20,19 @@ PROCEDURE GetCurrentIndex- EXTERN "Activities.GetCurrentProcessorIndex" (): SIZE
 
 (** Suspends the execution of the current processor. *)
 (** A suspended processor must be resumed by a call to the ResumeAnyProcessor procedure. *)
-(** This procedure may not be called if there is only one processor in the system. *)
 PROCEDURE SuspendCurrentProcessor-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (Kernel32.WaitForSingleObject (semaphore, Kernel32.Infinite) # Kernel32.WaitFailed);
+	ASSERT (Kernel32.WaitForSingleObject (event, Kernel32.Infinite) # Kernel32.WaitFailed);
 END SuspendCurrentProcessor;
 
-(** Resumes the execution of a single suspended processor. *)
-(** This procedure may not be called if there is only one processor in the system. *)
-PROCEDURE ResumeAnyProcessor-;
+(** Resumes the execution of all suspended processors. *)
+PROCEDURE ResumeAllProcessors-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (Kernel32.ReleaseSemaphore (semaphore, 1, NIL) # 0);
-END ResumeAnyProcessor;
+	ASSERT (Kernel32.SetEvent (event) # 0);
+	ASSERT (Kernel32.ResetEvent (event) # 0);
+END ResumeAllProcessors;
 
 (** Starts the execution of all available processors. *)
-(** This procedure may not be called if there is only one processor in the system. *)
 PROCEDURE StartAll-;
 VAR i: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -60,8 +58,8 @@ END Start;
 PROCEDURE Initialize-;
 VAR systemAffinityMask: SET; i: SIZE; handle: Kernel32.HANDLE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	semaphore := Kernel32.CreateSemaphore (NIL, 0, MAX (LONGINT), NIL);
-	ASSERT (semaphore # Kernel32.InvalidHandleValue);
+	event := Kernel32.CreateEvent (NIL, Kernel32.True, Kernel32.False, NIL);
+	ASSERT (event # Kernel32.InvalidHandleValue);
 
 	ASSERT (Kernel32.GetProcessAffinityMask (Kernel32.GetCurrentProcess (), ADDRESS OF affinityMask, ADDRESS OF systemAffinityMask) # 0);
 
@@ -96,7 +94,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 			ASSERT (Kernel32.CloseHandle (thread[i]) # 0);
 		END;
 	END;
-	ASSERT (Kernel32.CloseHandle (semaphore) # 0);
+	ASSERT (Kernel32.CloseHandle (event) # 0);
 END Terminate;
 
 END Processors.

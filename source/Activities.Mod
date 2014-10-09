@@ -48,6 +48,7 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR previous: Activity; argument: ADDRESS;
 	VAR framePointer {UNTRACED}: StackFrame;
 	VAR object-: OBJECT;
+	VAR bound := FALSE: BOOLEAN;
 
 	PROCEDURE &InitializeActivity (procedure: PROCEDURE; priority: Priority);
 	VAR stackFrame {UNTRACED}: StackFrame;
@@ -91,6 +92,7 @@ END Process;
 TYPE Processor = RECORD
 	assigning := FALSE: BOOLEAN;
 	originalFramePointer: ADDRESS;
+	readyQueue: ARRAY Priorities OF Queues.AlignedQueue;
 	runningActivity: Activity;
 	index: SIZE;
 	dummy {ALIGNED (CPU.CacheLineSize)} : RECORD END;
@@ -125,14 +127,29 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	RETURN previousPriority;
 END SetCurrentPriority;
 
+(** Binds the calling activity to the currently executing processor. *)
+PROCEDURE BindToCurrentProcessor-;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	SYSTEM.GetActivity ()(Activity).bound := TRUE;
+END BindToCurrentProcessor;
+
 (** Returns whether there is an activity that is ready to run and has at least the specified priority. *)
 PROCEDURE Select- (VAR activity: Activity; minimum: Priority): BOOLEAN;
+VAR processor {UNTRACED}: POINTER {UNSAFE} TO Processor;
 VAR priority := HighestPriority + 1: Priority; item: Queues.Item;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	processor := SYSTEM.GetActivity ()(Activity).processor;
 	REPEAT
 		DEC (priority);
-		IF Queues.Dequeue (item, readyQueue[priority]) THEN
+		IF Queues.Dequeue (item, processor.readyQueue[priority]) THEN
 			activity := item(Activity); RETURN TRUE;
+		ELSIF Queues.Dequeue (item, readyQueue[priority]) THEN
+			activity := item(Activity);
+			IF activity.bound & (activity.processor # processor) THEN
+				Enqueue (activity, ADDRESS OF activity.processor.readyQueue[activity.priority]);
+			ELSE
+				RETURN TRUE;
+			END;
 		END;
 	UNTIL priority = minimum;
 	RETURN FALSE;
@@ -157,7 +174,7 @@ PROCEDURE Enqueue (previous {UNTRACED}: Activity; queue {UNTRACED}: POINTER {UNS
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Queues.Enqueue (previous, queue^);
 	IF ADDRESS OF queue^ = ADDRESS OF readyQueue[IdlePriority] THEN RETURN END;
-	IF Counters.Read (working) < Processors.count THEN Processors.ResumeAnyProcessor END;
+	IF Counters.Read (working) < Processors.count THEN Processors.ResumeAllProcessors END;
 END Enqueue;
 
 (** Resumes the execution of an activity that was suspended by a call to the {{{[[Activities.SwitchTo]]}}} procedure beforehand. *)
@@ -292,7 +309,7 @@ VAR currentActivity {UNTRACED}: Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	currentActivity := SYSTEM.GetActivity ()(Activity);
 	currentActivity.framePointer := SYSTEM.GetFramePointer ();
-	IF Counters.Decrement (working, 1) < Processors.count THEN Processors.ResumeAnyProcessor END;
+	IF Counters.Decrement (working, 1) < Processors.count THEN Processors.ResumeAllProcessors END;
 	SYSTEM.SetFramePointer (currentActivity.processor.originalFramePointer);
 END EndExecution;
 

@@ -17,35 +17,29 @@ CONST NonmaskableMessage = APIC.NMI + APIC.Assert + APIC.AllExcludingSelf;
 VAR count-: SIZE;
 
 VAR running: Counters.AlignedCounter; (* counts the number of application processors currently running *)
-VAR semaphore: Counters.AlignedCounter; (* counter that acts as semaphore for suspended processors *)
 
 (** Returns the unique index of the processor executing this procedure call. *)
 PROCEDURE GetCurrentIndex- EXTERN "Activities.GetCurrentProcessorIndex" (): SIZE;
 
 (** Suspends the execution of the current processor. *)
 (** A suspended processor must be resumed by a call to the Processors.ResumeAnyProcessor procedure. *)
-(** This procedure may not be called if there is only one processor in the system. *)
 (** @topic Scheduling *)
 PROCEDURE SuspendCurrentProcessor-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	REPEAT IF Counters.Read (semaphore) = 0 THEN APIC.AwaitInterrupt END;
-	UNTIL Counters.Decrement (semaphore, 1) # 0;
+	APIC.AwaitInterrupt;
 END SuspendCurrentProcessor;
 
 (** Resumes the execution of a single suspended processor. *)
-(** This procedure may not be called if there is only one processor in the system. *)
 (** @topic Scheduling *)
-PROCEDURE ResumeAnyProcessor-;
+PROCEDURE ResumeAllProcessors-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	IF Counters.Increment (semaphore, 1) = 0 THEN APIC.SendInterrupt (NonmaskableMessage, {}); END;
-END ResumeAnyProcessor;
+	APIC.SendInterrupt (NonmaskableMessage, {});
+END ResumeAllProcessors;
 
 (** Starts the execution of all available processors. *)
-(** This procedure may not be called if there is only one processor in the system. *)
 (** @topic Scheduling *)
 PROCEDURE StartAll-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	ASSERT (count > 1);
 	APIC.SendInterrupt (NonmaskableMessage, {});
 END StartAll;
 
