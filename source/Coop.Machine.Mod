@@ -1,6 +1,6 @@
 MODULE Machine;
 
-IMPORT Environment, Trace, Mutexes, Processors;
+IMPORT CPU, Environment, Trace, Mutexes, Processors;
 
 CONST
 	Version = "A2 Cooperative Revision 5791";
@@ -29,6 +29,9 @@ CONST
 	(* error codes *)
 	Ok* = 0;
 	NilAdr* = -1;	(* nil value for addresses (not same as pointer NIL value) *)
+
+	IRQ0* = CPU.IRQ0;
+	MaxIRQ* = CPU.IRQ15;
 
 TYPE
 	Vendor* = ARRAY 13 OF CHAR;
