@@ -92,10 +92,10 @@ protected:
 	MOV	EAX, [EAX + ID]
 	SHR	EAX, 24
 	INC	EAX
-	MOV	EAX, (ReservedArea - (bootcodeend - bootcodebegin)) / Processors / 4 * 4
+	MOV	EBX, (ReservedArea - (bootcodeend - bootcodebegin)) / Processors / 4 * 4
 	MUL	EBX
 	MOV	ESP, EAX
-	ADD	ESP, bootcodeend - bootcodebegin
+	ADD	ESP, (bootcodeend - bootcodebegin) / 4 * 4
 	LEA	EAX, CPU.idt
 	PUSH	EAX
 	MOV	AX, Interrupts * 8
