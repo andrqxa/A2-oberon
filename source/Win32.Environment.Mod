@@ -51,19 +51,23 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Queues.Enqueue (previous, sleepingQueue);
 END Enqueue;
 
-PROCEDURE {WINAPI} Timer (lpParameter: ANY): LONGINT;
-VAR item: Queues.Item;
+PROCEDURE {WINAPI} TimerThread (lpParameter: ANY): LONGINT;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Kernel32.InstallExceptionHandler;
-	SYSTEM.SetActivity (Activities.CreateVirtualProcessor ());
+	Activities.CallVirtual (TickLoop, NIL, Activities.CreateVirtualProcessor ());
+	RETURN 0;
+END TimerThread;
+
+PROCEDURE TickLoop (argument: ADDRESS);
+VAR item: Queues.Item;
+BEGIN
 	LOOP
-		Kernel32.Sleep (10);
+		Kernel32.Sleep (1);
 		WHILE Queues.Dequeue (item, sleepingQueue) DO
 			Activities.Resume (item(Activities.Activity));
 		END;
 	END;
-	Kernel32.ExitThread(0);
-END Timer;
+END TickLoop;
 
 PROCEDURE Allocate- (size: SIZE): ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -226,5 +230,5 @@ BEGIN
 	Trace.Int (Processors.count, 0); Trace.String (" CPU");
 	IF Processors.count > 1 THEN Trace.Char ('s') END; Trace.String (", ");
 	Trace.Int (SIZE OF ADDRESS * 8, 0); Trace.String ("-bit)"); Trace.Ln;
-	ASSERT (Kernel32.CreateThread (NIL, 0, Timer, NIL, {}, NIL) # Kernel32.InvalidHandleValue);
+	ASSERT (Kernel32.CreateThread (NIL, 0, TimerThread, NIL, {}, NIL) # Kernel32.InvalidHandleValue);
 END Environment.

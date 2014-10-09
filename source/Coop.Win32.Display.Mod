@@ -135,7 +135,9 @@ TYPE
 	DisplayProc* = PROCEDURE ( disp: Window );
 	PaintProc* = PROCEDURE ( disp: Window;  x, y, w, h: LONGINT );
 
-	CreateStruct = POINTER TO RECORD
+	CreateStruct = POINTER TO CreateStructDesc;
+
+	CreateStructDesc = RECORD
 		win: Window;
 		finished: BOOLEAN;
 		className: ARRAY 32 OF CHAR;
@@ -918,14 +920,19 @@ VAR
 		RETURN w
 	END FirstWindow;
 
-	PROCEDURE {WINAPI} MessageLoop (create: ANY): LONGINT;
+	PROCEDURE {WINAPI} WindowThread (create: ANY): LONGINT;
+	BEGIN {UNCOOPERATIVE}
+		Kernel32.InstallExceptionHandler;
+		Activities.CallVirtual (MessageLoop, ADDRESS OF create(CreateStruct)^, create(CreateStruct).win.processor);
+		RETURN 0;
+	END WindowThread;
+
+	PROCEDURE MessageLoop (create {UNTRACED}: POINTER {UNSAFE} TO CreateStructDesc);
 	VAR activity: Activities.Activity;
 	VAR msg: User32.Msg;  i: LONGINT; mode: LONGINT;
 	BEGIN
-		Kernel32.InstallExceptionHandler;
-		SYSTEM.SetActivity (create(CreateStruct).win.processor);
 		KernelLog.String( "Display: Initialize message dispatcher..." );  KernelLog.Ln;
-		RegisterClasses();  CreateHWND( create(CreateStruct) );  create := NIL;
+		RegisterClasses();  CreateHWND( create );  create := NIL;
 		KernelLog.String( "Display: Start message dispatching" ); KernelLog.Ln;
 		LOOP
 			i := User32.GetMessage( msg, 0, 0, 0 );
@@ -942,7 +949,6 @@ VAR
 		END;
 		UnregisterClasses();
 		Counters.Dec (Activities.awaiting);
-		RETURN 0;
 	END MessageLoop;
 
 	PROCEDURE CreateWin( create: CreateStruct );
@@ -951,7 +957,7 @@ VAR
 		IF nWindows <= 0 THEN
 			Counters.Inc (Activities.awaiting);
 			create.win.processor := Activities.CreateVirtualProcessor ();
-			Kernel32.CreateThread (NIL, 0, MessageLoop, create, {}, NIL);
+			Kernel32.CreateThread (NIL, 0, WindowThread, create, {}, NIL);
 			root := create.win;
 		ELSE
 			theWin := FirstWindow();
