@@ -235,6 +235,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (index < Processors.Maximum);
 	activity.processor := ADDRESS OF processors[index];
 	activity.processor.index := index;
+	activity.bound := TRUE;
 	RETURN activity;
 END CreateVirtualProcessor;
 
