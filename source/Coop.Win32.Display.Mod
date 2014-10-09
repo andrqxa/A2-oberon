@@ -361,7 +361,8 @@ VAR
 	VAR win: Window;  create: CreateStruct;  ret: Kernel32.BOOL;
 	BEGIN
 		win := SYSTEM.VAL( Window, User32.GetWindowLong( hwnd, GWLWindow ) );
-
+		IF win # NIL THEN SYSTEM.SetActivity (win.processor) END;
+		
 		IF win # NIL THEN RETURN DummyHandler( win, uMsg, wParam, lParam )
 		ELSIF uMsg = User32.WMCreate THEN
 			SYSTEM.GET( lParam, create );  wParam := SYSTEM.VAL( User32.WParam, create );
@@ -726,7 +727,6 @@ VAR
 			User32.PostQuitMessage(0);
 		END;
 	BEGIN
-		SYSTEM.SetActivity (win.processor);
 		IF update IN win.state THEN
 			handled := TRUE;
 			IF uMsg < User32.WMKeyFirst THEN
@@ -785,6 +785,8 @@ VAR
 															    lParam: User32.LParam ): User32.LResult;
 	VAR win: Window;  dbh: DEV_BROADCAST_HDRP; dbv : DEV_BROADCAST_VOLUMEP; i: LONGINT;
 	BEGIN
+		win := SYSTEM.VAL( Window, User32.GetWindowLong( hwnd, GWLWindow ) );
+		IF win # NIL THEN SYSTEM.SetActivity (win.processor) END;
 
 		IF uMsg = WM_DEVICECHANGE THEN
 			IF wParam = DBT_DEVICEARRIVAL THEN
@@ -802,7 +804,6 @@ VAR
 			END;
 		END;
 
-		win := SYSTEM.VAL( Window, User32.GetWindowLong( hwnd, GWLWindow ) );
 		IF win # NIL THEN RETURN WindowHandler( win, uMsg, wParam, lParam )
 		ELSE RETURN DummyProc( hwnd, uMsg, wParam, lParam )
 		END
