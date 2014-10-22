@@ -247,6 +247,7 @@ PROCEDURE SSE2Q0BGR565BGR565(srcadr, dstadr: ADDRESS; srcbpr, dstbpr, dl, dt, dr
 VAR yadr : LONGINT;
 CODE {SYSTEM.i386, SYSTEM.MMX, SYSTEM.SSE, SYSTEM.SSE2}
 	PUSHFD
+	PUSH		ECX
 	PUSH 		EBX
 	; CLI
 
@@ -380,6 +381,7 @@ outside2:
 endyloop:
 	EMMS 							; declare FPU registers free
 	POP 		EBX
+	POP		ECX
 	POPFD
 END SSE2Q0BGR565BGR565;
 
@@ -438,6 +440,7 @@ VAR x, y, xfleft, xfright, yftop, yfbottom : LONGINT; yadr, adr, col, col0, col1
 
 CODE {SYSTEM.i386, SYSTEM.MMX, SYSTEM.SSE, SYSTEM.SSE2}
 	PUSHFD
+	PUSH		ECX
 	PUSH 		EBX
 	; CLI
 
@@ -704,6 +707,7 @@ endxloop:
 endyloop:
 	EMMS 							; declare FPU registers free
 	POP 		EBX
+	POP		ECX
 	POPFD
 END SSE2Q1BGR565BGR565;
 
@@ -772,6 +776,7 @@ PROCEDURE SSE2Q1BGRA8888BGR565(srcadr, dstadr: ADDRESS; srcbpr, dstbpr, dl, dt, 
 
 CODE {SYSTEM.i386, SYSTEM.MMX, SYSTEM.SSE, SYSTEM.SSE2}
 	PUSHFD
+	PUSH		ECX
 	PUSH 		EBX
 	; CLI
 	PXOR		MMX3,MMX3
@@ -1801,6 +1806,7 @@ endxloop:
 endyloop:
 	EMMS									; declare FPU registers free
 	POP 		EBX
+	POP		ECX
 	POPFD
 END SSE2Q1BGRA8888BGR565;
 
@@ -2032,6 +2038,7 @@ VAR x, y, xfleft, xfright, yftop, yfbottom : LONGINT; yadr, adr, col, col0, col1
 
 CODE {SYSTEM.i386, SYSTEM.MMX, SYSTEM.SSE, SYSTEM.SSE2}
 	PUSHFD
+	PUSH		ECX
 	PUSH 		EBX
 	; CLI
 
@@ -2608,6 +2615,7 @@ endxloop:
 endyloop:
 	EMMS 								; declare FPU registers free
 	POP 		EBX
+	POP		ECX
 	POPFD
 
 END SSE2Q0BGRA8888BGR565;
