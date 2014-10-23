@@ -6173,7 +6173,7 @@ TYPE
 				scope := scope.outerScope;
 			END;
 			IF (scope # NIL) THEN (* symbol (directly or indirectly) in procedure scope *)
-				IF (symbol.access * SyntaxTree.Public # {}) & (~(symbol IS SyntaxTree.Procedure) OR  ~symbol(SyntaxTree.Procedure).isBodyProcedure & ~symbol(SyntaxTree.Procedure).isConstructor)  THEN
+				IF (symbol.access * SyntaxTree.Public # {}) & (~(symbol IS SyntaxTree.Procedure) OR  ~symbol(SyntaxTree.Procedure).isBodyProcedure & ~symbol(SyntaxTree.Procedure).isConstructor & ~symbol(SyntaxTree.Procedure).isFinalizer)  THEN
 					Error(symbol.position,Diagnostics.Invalid,"cannot be exported");
 					IF VerboseErrorMessage THEN
 						Printout.Info("symbol",symbol);
@@ -6386,8 +6386,10 @@ TYPE
 			- check the procedure type
 			- check if method (i.e. in record scope), if so then
 				- check if (unique) constructor
+				- check if (unique) finalizer
 				- check if super method available, if so then check signature
 			- of not in record scope then negative check on constructor flag
+			- of not in record scope then negative check on finalizer flag
 			- check declarations (including a delayed implementation check, cf procedure Declarations)
 			- check procedure symbol
 		**)
@@ -6503,10 +6505,31 @@ TYPE
 							procedure.scope(SyntaxTree.RecordScope).SetConstructor(procedure);
 						END;
 					END;
+					IF procedure.isFinalizer THEN
+						procedure.MarkUsed;
+						IF procedureType.returnType # NIL THEN
+							Error(procedure.position,Diagnostics.Invalid,"finalizer with forbidden return type");
+						END;
+						IF procedureType.numberParameters # 0 THEN
+							Error(procedure.position,Diagnostics.Invalid,"finalizer with formal parameters");
+						END;
+						proc := procedure.scope.firstProcedure;
+						WHILE (proc # NIL) & ((proc = procedure) OR ~(proc.isFinalizer)) DO
+							proc := proc.nextProcedure;
+						END;
+						IF proc # NIL THEN
+							Error(procedure.position,Diagnostics.Invalid,"duplicate finalizer")
+						ELSE
+							procedure.scope(SyntaxTree.RecordScope).SetFinalizer(procedure);
+						END;
+					END;
 					super := FindSuperProcedure(record.recordScope, procedure);
 					IF (super # NIL) & SignatureCompatible(procedure.position,procedureType,super.type.resolved(SyntaxTree.ProcedureType)) THEN
 						IF (super.isConstructor) & ~(procedure.isConstructor) THEN
 							Error(procedure.position,Diagnostics.Invalid,"incompatible signature: non-constructor extends constructor");
+						END;
+						IF (super.isFinalizer) & ~(procedure.isFinalizer) THEN
+							Error(procedure.position,Diagnostics.Invalid,"incompatible signature: non-finalizer extends finalizer");
 						END;
 						IF super.isFinal THEN
 							Error(procedure.position,Diagnostics.Invalid,"forbidden method extending final method");

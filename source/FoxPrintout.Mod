@@ -1161,6 +1161,7 @@ TYPE
 				*)
 				IF x.isInline THEN w.String(" - ") END;
 				IF x.isConstructor THEN w.String(" & ") END;
+				IF x.isFinalizer THEN w.String(" ~ ") END;
 
 				first := TRUE;
 				IF type.stackAlignment > 1 THEN Value(Global.NameStackAligned,type.stackAlignment,first) END;

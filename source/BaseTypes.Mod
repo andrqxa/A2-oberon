@@ -55,7 +55,7 @@ TYPE Object* = OBJECT {DISPOSABLE} (Pointer)
 
 	(** This finalizer disposes the meta data of an object. *)
 	(** It is guaranteed to be called during the disposal of any object instance. *)
-	PROCEDURE Finalize-;
+	PROCEDURE ~Finalize-;
 	VAR PointerDescriptor EXTERN "BaseTypes.Pointer": ADDRESS;
 	PROCEDURE Unlink EXTERN "Activities.Process.Unlink" (activity {UNTRACED}: OBJECT);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}

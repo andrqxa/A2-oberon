@@ -15,7 +15,7 @@ TYPE Item* = OBJECT {DISPOSABLE}
 	VAR node {UNTRACED} := NIL: Node;
 
 	(** Finalizes the element by disposing any resources associated with it. *)
-	PROCEDURE Finalize-;
+	PROCEDURE ~Finalize-;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF Acquire (node) THEN node.next := NIL; node.item := NIL; DISPOSE (node) END;
 	END Finalize;

@@ -3103,7 +3103,7 @@ TYPE
 			procedureScope- : ProcedureScope;
 			super-: Procedure;
 			level-, methodNumber-: LONGINT;
-			isBodyProcedure-, isConstructor-, isInline-,isOberonInline-, isEntry-, isExit-,isFinal-,isAbstract-,isOverwritten-: BOOLEAN;
+			isBodyProcedure-, isConstructor-,isFinalizer-,isInline-,isOberonInline-, isEntry-, isExit-,isFinal-,isAbstract-,isOverwritten-: BOOLEAN;
 
 		PROCEDURE & InitProcedure( position: LONGINT;  name: Identifier; scope: ProcedureScope);
 		BEGIN
@@ -3117,6 +3117,7 @@ TYPE
 			methodNumber := -1;
 			isBodyProcedure := FALSE;
 			isConstructor := FALSE;
+			isFinalizer := FALSE;
 			isInline := FALSE;
 			isOberonInline := FALSE;
 			isEntry := FALSE;
@@ -3138,6 +3139,10 @@ TYPE
 		PROCEDURE SetConstructor*(isConstructor: BOOLEAN);
 		BEGIN SELF.isConstructor := isConstructor
 		END SetConstructor;
+
+		PROCEDURE SetFinalizer*(isFinalizer: BOOLEAN);
+		BEGIN SELF.isFinalizer := isFinalizer
+		END SetFinalizer;
 
 		PROCEDURE SetInline*(isInline: BOOLEAN);
 		BEGIN SELF.isInline := isInline
@@ -4413,6 +4418,7 @@ TYPE
 			ownerRecord-: RecordType;
 			bodyProcedure-: Procedure;
 			constructor-: Procedure;
+			finalizer-: Procedure;
 			numberMethods-: LONGINT;
 			firstParameter-,lastParameter-: Parameter; numberParameters-: LONGINT;  (* parameters for Active Cells programming*)
 			firstOperator-, lastOperator-: Operator; numberOperators: LONGINT; (* defined operators *)
@@ -4424,6 +4430,7 @@ TYPE
 			numberMethods := 0;
 			bodyProcedure := NIL;
 			constructor := NIL;
+			finalizer := NIL;
 			firstOperator := NIL; lastOperator := NIL; numberOperators := 0;
 		END InitRecordScope;
 
@@ -4434,6 +4441,10 @@ TYPE
 		PROCEDURE SetConstructor*(body: Procedure);
 		BEGIN SELF.constructor := body
 		END SetConstructor;
+
+		PROCEDURE SetFinalizer*(body: Procedure);
+		BEGIN SELF.finalizer := body
+		END SetFinalizer;
 
 		PROCEDURE SetNumberMethods*(numberMethods: LONGINT);
 		BEGIN SELF.numberMethods := numberMethods;

@@ -27,14 +27,11 @@ CONST Priorities = HighestPriority - LowestPriority + 1;
 TYPE SwitchFinalizer* = PROCEDURE (previous {UNTRACED}: Activity; value: ADDRESS);
 
 (* Represents a stack frame of an activity. *)
-TYPE StackFrame = POINTER {UNSAFE} TO RECORD
-	previous*: ADDRESS;
-	caller*: PROCEDURE;
-	(* initial stack *)
-	finalizeSwitchCaller: PROCEDURE;
-	procedureCaller: PROCEDURE {NORETURN};
-	procedureArgument {UNTRACED}: OBJECT;
-END;
+TYPE StackFrame = OBJECT {UNSAFE} (BaseTypes.StackFrame)
+	VAR finalizeSwitchCaller: PROCEDURE;
+	VAR procedureCaller: PROCEDURE {NORETURN};
+	VAR procedureArgument {UNTRACED}: OBJECT;
+END StackFrame;
 
 (** Represents the handler identifying activities that are currently either running or suspended. *)
 TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
@@ -67,8 +64,14 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 		framePointer := stackFrame;
 	END InitializeActivity;
 
-	PROCEDURE Finalize;
+	PROCEDURE ~Finalize;
+	VAR stackFrame {UNTRACED}: BaseTypes.StackFrame;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		stackFrame := framePointer;
+		WHILE stackFrame # NIL DO
+			stackFrame.Reset;
+			stackFrame := stackFrame.previous;
+		END;
 		DISPOSE (stack);
 		Finalize^;
 	END Finalize;

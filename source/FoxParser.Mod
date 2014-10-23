@@ -31,7 +31,7 @@ CONST
 
 		VariableDeclaration  = VariableNameList ':' Type.
 
-		ProcedureDeclaration = 'procedure' ['&'|'-'|Flags ['-']] IdentifierDefinition [FormalParameters]';'
+		ProcedureDeclaration = 'procedure' ['&'|'~'|'-'|Flags ['-']] IdentifierDefinition [FormalParameters]';'
 		                       DeclarationSequence  [Body] 'end' Identifier.
 
 		(nopov)
@@ -1722,7 +1722,7 @@ TYPE
 			recentCommentItem := symbol
 		END CommentWithPart;
 
-		(** ProcedureDeclaration = 'procedure' ['^'|'&'|'-'|Flags ['-']] IdentifierDefinition [FormalParameters]';'
+		(** ProcedureDeclaration = 'procedure' ['^'|'&'|'~'|'-'|Flags ['-']] IdentifierDefinition [FormalParameters]';'
 			                       DeclarationSequence  [Body] 'end' Identifier.
 			Forward declarations ignored.
 		**)
@@ -1734,6 +1734,7 @@ TYPE
 			access: SET;
 			position: LONGINT;
 			isConstructor: BOOLEAN;
+			isFinalizer: BOOLEAN;
 			isInline: BOOLEAN;
 			modifiers: SyntaxTree.Modifier;
 			forwardDeclaration: BOOLEAN;
@@ -1743,10 +1744,9 @@ TYPE
 			(* symbol procedure has already been consumed *)
 
 			modifiers := NIL;
-			isConstructor := FALSE; isInline := FALSE;
+			isConstructor := FALSE; isFinalizer := FALSE; isInline := FALSE;
 
 			procedureType := SyntaxTree.NewProcedureType(symbol.start, parentScope);
-			isConstructor := FALSE; isInline := FALSE;
 
 			IF Optional( Scanner.Arrow) THEN (* ignore forward declarations *)
 				forwardDeclaration := TRUE;
@@ -1756,6 +1756,8 @@ TYPE
 
 			IF Optional( Scanner.And ) THEN  (* constructor *)
 				isConstructor := TRUE
+			ELSIF Optional( Scanner.Not ) THEN  (* finalizer *)
+				isFinalizer := TRUE
 			ELSIF Optional( Scanner.Minus ) THEN  (* inline *)
 				isInline := TRUE;
 			ELSIF Optional( Scanner.LeftBrace) THEN
@@ -1775,6 +1777,7 @@ TYPE
 			procedureScope := SyntaxTree.NewProcedureScope(parentScope);
 			procedure := SyntaxTree.NewProcedure( position, name, procedureScope);
 			procedure.SetConstructor(isConstructor);
+			procedure.SetFinalizer(isFinalizer);
 			procedure.SetInline(isInline);
 			CommentSymbol(procedure);
 			procedure.SetAccess(access);
