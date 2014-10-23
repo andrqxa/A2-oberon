@@ -22,6 +22,58 @@ TYPE Pointer* = OBJECT {DISPOSABLE}
 
 END Pointer;
 
+(** Represents an array type. *)
+TYPE Array* = OBJECT {DISPOSABLE} (Pointer)
+
+END Array;
+
+(** Represents a record type. *)
+TYPE Record* = OBJECT {DISPOSABLE} (Pointer)
+
+END Record;
+
+(** Represents the meta data for an active object. *)
+TYPE Action* = RECORD
+	activity* {UNTRACED}: OBJECT; (* stores the activity associated with the active object *)
+	waitingQueue*: Queues.Queue; (* stores all activities that are waiting inside a wait statement *)
+END;
+
+(** Represents the monitor associated with an object that has procedures with exclusive regions. *)
+TYPE Monitor* = RECORD
+	owner* {UNTRACED} := NIL: OBJECT; (* stores the current activity that has exclusive access *)
+	nestingLevel* := 0: SIZE; (* counts how many times the same activity has acquired the monitor *)
+	blockedQueue*: Queues.Queue; (* stores all activities that failed to acquire the monitor *)
+	waitingQueue*: Queues.Queue; (* stores all activities that are waiting inside an await statement *)
+	waitingSentinel* {UNTRACED} := NIL: OBJECT; (* stores the oldest activity waiting in the await statement *)
+END;
+
+(** Represents the basic object type. *)
+TYPE Object* = OBJECT {DISPOSABLE} (Pointer)
+
+	VAR action-: POINTER {UNSAFE} TO Action;
+	VAR monitor-: POINTER {UNSAFE} TO Monitor;
+
+	(** This finalizer disposes the meta data of an object. *)
+	(** It is guaranteed to be called during the disposal of any object instance. *)
+	PROCEDURE Finalize-;
+	VAR PointerDescriptor EXTERN "BaseTypes.Pointer": ADDRESS;
+	PROCEDURE Unlink EXTERN "Activities.Process.Unlink" (activity {UNTRACED}: OBJECT);
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		IF action # NIL THEN
+			IF action.activity # NIL THEN Unlink (action.activity); action.activity := NIL END;
+			Queues.Dispose (action.waitingQueue);
+		END;
+		IF monitor # NIL THEN
+			monitor.owner := NIL;
+			monitor.waitingSentinel := NIL;
+			Queues.Dispose (monitor.blockedQueue);
+			Queues.Dispose (monitor.waitingQueue);
+		END;
+		descriptor := ADDRESS OF PointerDescriptor;
+	END Finalize;
+
+END Object;
+
 (** Represents a stack frame of an activity. *)
 TYPE StackFrame* = OBJECT {UNSAFE}
 
