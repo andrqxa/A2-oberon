@@ -5,6 +5,23 @@
 (** Objects are segmented into separate data structures in order to save memory because not all objects are active or need a monitor at runtime. *)
 MODULE BaseTypes;
 
+IMPORT Counters, Queues;
+
+(** Represents a pointer type. *)
+TYPE Pointer* = OBJECT {DISPOSABLE}
+
+	VAR descriptor-: ADDRESS; (* stores the address of the type descriptor *)
+	VAR cycle* := 0: LONGWORD; (* stores the last garbage collection cycle which reached the pointer *)
+	VAR references*: Counters.Counter; (* counts how many times the pointer is referenced by local variables *)
+	VAR nextMarked* {UNTRACED} := NIL: Pointer; (* stores the next item in the linked list of marked pointers *)
+	VAR nextWatched* {UNTRACED} := NIL: Pointer; (* stores the next item in the linked list of watched pointers *)
+
+	PROCEDURE Trace-;
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
+	END Trace;
+
+END Pointer;
+
 (** Represents a stack frame of an activity. *)
 TYPE StackFrame* = OBJECT {UNSAFE}
 

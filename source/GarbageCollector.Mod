@@ -5,33 +5,17 @@
 (** It implements a concurrent and interruptible mark and sweep garbage collection. *)
 MODULE GarbageCollector;
 
-IMPORT Activities, Counters, CPU, Modules;
-
-(** Represents a pointer type. *)
-TYPE Pointer* = OBJECT {DISPOSABLE}
-
-	VAR descriptor-: ADDRESS; (* stores the address of the type descriptor *)
-	VAR cycle* := 0: LONGWORD; (* stores the last garbage collection cycle which reached the pointer *)
-	VAR references*: Counters.Counter; (* counts how many times the pointer is referenced by local variables *)
-	VAR nextMarked* {UNTRACED} := NIL: Pointer; (* stores the next item in the linked list of marked pointers *)
-	VAR nextWatched* {UNTRACED} := NIL: Pointer; (* stores the next item in the linked list of watched pointers *)
-
-	PROCEDURE Trace-;
-	BEGIN {UNCOOPERATIVE, UNCHECKED}
-	END Trace;
-
-END Pointer;
-
+IMPORT Activities, BaseTypes, Counters, CPU, Modules;
 
 VAR tracings: Counters.AlignedCounter;
 VAR currentCycle := 0, oldestCycle := 0: LONGWORD;
-VAR firstMarked {UNTRACED}, firstWatched {UNTRACED}: Pointer;
-VAR markedSentinel {UNTRACED}, watchedSentinel {UNTRACED}: Pointer;
+VAR firstMarked {UNTRACED}, firstWatched {UNTRACED}: BaseTypes.Pointer;
+VAR markedSentinel {UNTRACED}, watchedSentinel {UNTRACED}: BaseTypes.Pointer;
 
 (** Registers the specified pointer for automatic memory management. *)
 (** This procedure is called by the compiler when a pointer or object type is allocated using the NEW statement. *)
-PROCEDURE Watch- (pointer {UNTRACED}: Pointer);
-VAR value {UNTRACED}: Pointer;
+PROCEDURE Watch- (pointer {UNTRACED}: BaseTypes.Pointer);
+VAR value {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid arguments *)
 	ASSERT (pointer # NIL);
@@ -51,8 +35,8 @@ END Watch;
 
 (** Performs the assignment of a pointer variable. *)
 (** This procedure is called by the compiler when assigning variables of pointer type. *)
-PROCEDURE Assign- (VAR pointer {UNTRACED}: Pointer; value {UNTRACED}: Pointer);
-VAR previousValue {UNTRACED}: Pointer;
+PROCEDURE Assign- (VAR pointer {UNTRACED}: BaseTypes.Pointer; value {UNTRACED}: BaseTypes.Pointer);
+VAR previousValue {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	previousValue := pointer; pointer := value; IF value # NIL THEN Mark (value) END;
 	IF Activities.IsLocalVariable (ADDRESS OF pointer) THEN
@@ -63,7 +47,7 @@ END Assign;
 
 (** Performs the assignment of an array containing pointers. *)
 (** This procedure is called by the compiler when assigning arrays of pointer type. *)
-PROCEDURE AssignArray- (VAR target {UNTRACED}: ARRAY OF Pointer; CONST source {UNTRACED}: ARRAY OF Pointer);
+PROCEDURE AssignArray- (VAR target {UNTRACED}: ARRAY OF BaseTypes.Pointer; CONST source {UNTRACED}: ARRAY OF BaseTypes.Pointer);
 VAR i: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (LEN (target) = LEN (source));
@@ -74,8 +58,8 @@ END AssignArray;
 
 (** Executes an atomic compare-and-swap operation on a pointer variable. *)
 (** This procedure is called by the compiler when executing CAS expressions. *)
-PROCEDURE CompareAndSwap- (VAR pointer {UNTRACED}: Pointer; previousValue {UNTRACED}, value {UNTRACED}: Pointer): Pointer;
-VAR result {UNTRACED}: Pointer;
+PROCEDURE CompareAndSwap- (VAR pointer {UNTRACED}: BaseTypes.Pointer; previousValue {UNTRACED}, value {UNTRACED}: BaseTypes.Pointer): BaseTypes.Pointer;
+VAR result {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	result := CAS (pointer, previousValue, value); IF value # NIL THEN Mark (value) END;
 	IF (result = previousValue) & Activities.IsLocalVariable (ADDRESS OF pointer) THEN
@@ -87,7 +71,7 @@ END CompareAndSwap;
 
 (** Resets a pointer variable. *)
 (** This procedure is called by the compiler when assigning NIL to variables of pointer type. *)
-PROCEDURE Reset- (VAR pointer {UNTRACED}: Pointer);
+PROCEDURE Reset- (VAR pointer {UNTRACED}: BaseTypes.Pointer);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF pointer = NIL THEN RETURN END;
 	IF Activities.IsLocalVariable (ADDRESS OF pointer) THEN Counters.Dec (pointer.references) END;
@@ -96,7 +80,7 @@ END Reset;
 
 (** Resets an array of pointers. *)
 (** This procedure is called by the compiler for resetting all elements of array variables containing pointers. *)
-PROCEDURE ResetArray- (VAR pointers {UNTRACED}: ARRAY OF Pointer);
+PROCEDURE ResetArray- (VAR pointers {UNTRACED}: ARRAY OF BaseTypes.Pointer);
 VAR i: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	FOR i := 0 TO LEN (pointers) - 1 DO
@@ -120,7 +104,7 @@ END Increment;
 (** Performs a complete garbage collection cycle by marking the object graph and disposing all unreachable objects. *)
 (** Garbage can be collected concurrently if necessary. *)
 PROCEDURE Collect*;
-VAR cycle: LONGWORD; first {UNTRACED}: Pointer;
+VAR cycle: LONGWORD; first {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCHECKED}
 	(* ensure list of marked pointers is empty *)
 	TraceMarkedPointers;
@@ -153,8 +137,8 @@ END Collect;
 
 (** Marks the specified pointer as reachable. *)
 (** This procedure is called by the compiler while tracing outgoing pointers of marked objects. *)
-PROCEDURE Mark- (pointer {UNTRACED}: Pointer);
-VAR cycle, current: LONGWORD; first {UNTRACED}: Pointer;
+PROCEDURE Mark- (pointer {UNTRACED}: BaseTypes.Pointer);
+VAR cycle, current: LONGWORD; first {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* ignore nil pointers *)
 	IF pointer = NIL THEN RETURN END;
@@ -183,7 +167,7 @@ END Mark;
 
 (** Marks an array of pointers. *)
 (** This procedure is called by the compiler while tracing arrays of pointer type. *)
-PROCEDURE MarkArray- (CONST pointers: ARRAY OF Pointer);
+PROCEDURE MarkArray- (CONST pointers: ARRAY OF BaseTypes.Pointer);
 VAR i: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	FOR i := 0 TO LEN (pointers) - 1 DO
@@ -192,8 +176,8 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END MarkArray;
 
 (* Acquires ownership of the specified linked list by exchanging its first item with its sentinel. *)
-PROCEDURE AcquireList (VAR first {UNTRACED}: Pointer; sentinel {UNTRACED}: Pointer): Pointer;
-VAR value {UNTRACED}: Pointer;
+PROCEDURE AcquireList (VAR first {UNTRACED}: BaseTypes.Pointer; sentinel {UNTRACED}: BaseTypes.Pointer): BaseTypes.Pointer;
+VAR value {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	LOOP
 		value := CAS (first, NIL, NIL);
@@ -206,7 +190,7 @@ END AcquireList;
 
 (* Traverses the linked list of marked pointers and traces outgoing pointers. *)
 PROCEDURE TraceMarkedPointers;
-VAR current {UNTRACED}: Pointer;
+VAR current {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCHECKED}
 	(* notify older collections cycles that the list is traversed *)
 	IF CAS (firstMarked, NIL, NIL) = markedSentinel THEN RETURN END;
@@ -229,8 +213,8 @@ BEGIN {UNCHECKED}
 END TraceMarkedPointers;
 
 (* Traverses a list of watched pointers and marks local references. *)
-PROCEDURE MarkReferenced (VAR first {UNTRACED}: Pointer);
-VAR current {UNTRACED}, previous {UNTRACED}, next {UNTRACED}, front {UNTRACED}, back {UNTRACED}: Pointer;
+PROCEDURE MarkReferenced (VAR first {UNTRACED}: BaseTypes.Pointer);
+VAR current {UNTRACED}, previous {UNTRACED}, next {UNTRACED}, front {UNTRACED}, back {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCHECKED}
 	(* traverse linked list and remove unreferenced items  *)
 	current := first; previous := NIL; front := NIL; back := NIL;
@@ -251,8 +235,8 @@ BEGIN {UNCHECKED}
 END MarkReferenced;
 
 (* Insert specified items to linked list of watched pointers. *)
-PROCEDURE InsertWatched (first {UNTRACED}, last {UNTRACED}: Pointer);
-VAR value {UNTRACED}: Pointer;
+PROCEDURE InsertWatched (first {UNTRACED}, last {UNTRACED}: BaseTypes.Pointer);
+VAR value {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF last = NIL THEN RETURN END;
 	LOOP
@@ -264,8 +248,8 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END InsertWatched;
 
 (** Disposes all unmarked pointers up to the specified garbage collection cycle. *)
-PROCEDURE Sweep (first {UNTRACED}: Pointer; cycle: LONGWORD);
-VAR current {UNTRACED}, previous {UNTRACED}, next {UNTRACED}: Pointer;
+PROCEDURE Sweep (first {UNTRACED}: BaseTypes.Pointer; cycle: LONGWORD);
+VAR current {UNTRACED}, previous {UNTRACED}, next {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCHECKED}
 	(* traverse linked list and remove unmarked items *)
 	current := first; previous := NIL;
@@ -295,7 +279,7 @@ END Initialize;
 (** Terminates the module and disposes its resources and all remaining pointers that have been registered using the GarbageCollector.Watch procedure. *)
 (** @topic Runtime Call *)
 PROCEDURE Terminate-;
-VAR current {UNTRACED}, next {UNTRACED}: Pointer;
+VAR current {UNTRACED}, next {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	WHILE firstWatched # watchedSentinel DO
 		current := firstWatched;
