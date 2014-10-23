@@ -6,7 +6,7 @@
 (** In addition, it also provides a framework for implementing synchronisation primitives. *)
 MODULE Activities;
 
-IMPORT SYSTEM, CPU, Counters, Processors, Queues;
+IMPORT SYSTEM, BaseTypes, Counters, CPU, Processors, Queues;
 
 (** Represents one of four different priorities of an activity. *)
 TYPE Priority* = SIZE;
@@ -271,8 +271,6 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Dispose (previousActivity, NIL);
 END Execute;
 
-PROCEDURE Allocate EXTERN "RuntimeSupport.New" (size: SIZE);
-
 (* Turns the calling procedure temporarily into an activity that begins its execution with the specified procedure. *)
 PROCEDURE BeginExecution (procedure: PROCEDURE);
 VAR activity {UNTRACED}: Activity; index: SIZE;
@@ -334,6 +332,38 @@ PROCEDURE Dispose (previous {UNTRACED}: Activity; value: ADDRESS);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	DISPOSE (previous);
 END Dispose;
+
+(** Expands the stack memory of the current activity to include the specified stack address and returns the corresponding address on the expanded stack. *)
+PROCEDURE ExpandStack- (address: ADDRESS): ADDRESS;
+VAR currentActivity {UNTRACED}: Activity; size, minSize, newSize, offset: SIZE; stackTop: ADDRESS;
+VAR newStack {UNTRACED}: POINTER {DISPOSABLE} TO ARRAY OF CHAR; stackFrame {UNTRACED}, previousFrame {UNTRACED}: BaseTypes.StackFrame;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	(* check for valid argument *)
+	currentActivity := SYSTEM.GetActivity ()(Activity);
+	size := LEN (currentActivity.stack); stackTop := ADDRESS OF currentActivity.stack[0] + size;
+	ASSERT (address <= stackTop);
+	IF address >= currentActivity.stackLimit THEN RETURN address END;
+
+	(* compute new stack size *)
+	minSize := stackTop - address + SafeStackSize; newSize := size;
+	REPEAT INC (newSize, newSize) UNTIL newSize >= minSize;
+	ASSERT (newSize <= MaximumStackSize);
+
+	(* allocate new stack and copy contents *)
+	NEW (newStack, newSize); ASSERT (newStack # NIL);
+	offset := ADDRESS OF newStack[newSize - size] - ADDRESS OF currentActivity.stack[0]; stackFrame := SYSTEM.GetFramePointer ();
+	REPEAT previousFrame := stackFrame.previous; stackFrame.Move (offset, stackTop); stackFrame := previousFrame UNTIL stackFrame = NIL;
+	SYSTEM.MOVE (ADDRESS OF currentActivity.stack[0], ADDRESS OF currentActivity.stack[0] + offset, size);
+
+	(* move stack pointers and swap stacks *)
+	SYSTEM.SetStackPointer (SYSTEM.GetStackPointer () + offset);
+	SYSTEM.SetFramePointer (SYSTEM.GetFramePointer () + offset);
+	DISPOSE (currentActivity.stack); currentActivity.stack := newStack;
+	currentActivity.stackLimit := ADDRESS OF currentActivity.stack[SafeStackSize];
+
+	(* return new address on increased stack *)
+	RETURN address + offset;
+END ExpandStack;
 
 (** Returns whether the specified address corresponds to a local variable that resides on the stack of the current activity calling this procedure. *)
 PROCEDURE IsLocalVariable- (address: ADDRESS): BOOLEAN;
