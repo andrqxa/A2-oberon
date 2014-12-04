@@ -133,8 +133,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 
 	(* associate the previous sentinel node with the dequeued element *)
-	first.item := NIL; first.next := first; item.node := first;
-	Discard (First); Discard (Next); RETURN TRUE;
+	item.node := first; Discard (First); Discard (Next); RETURN TRUE;
 END Dequeue;
 
 (** Disposes the elements of a queue. *)
