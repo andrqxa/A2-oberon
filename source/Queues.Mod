@@ -40,7 +40,7 @@ END Swap;
 PROCEDURE Acquire (VAR node {UNTRACED}: Node): BOOLEAN;
 VAR index := 0: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	WHILE (node # NIL) & (index # Processors.count) DO
+	WHILE (node # NIL) & (index # Processors.Maximum) DO
 		IF node = processors[index].hazard[First] THEN Swap (processors[index].pooled[First], node); index := 0;
 		ELSIF node = processors[index].hazard[Next] THEN Swap (processors[index].pooled[Next], node); index := 0;
 		ELSE INC (index) END;
@@ -153,7 +153,7 @@ END Dispose;
 PROCEDURE Terminate-;
 VAR index, pointer: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	FOR index := 0 TO Processors.count - 1 DO
+	FOR index := 0 TO Processors.Maximum - 1 DO
 		FOR pointer := First TO Next DO
 			ASSERT (processors[index].hazard[pointer] = NIL);
 			IF processors[index].pooled[pointer] # NIL THEN DISPOSE (processors[index].pooled[pointer]) END;

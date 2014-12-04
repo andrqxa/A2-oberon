@@ -49,7 +49,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 
 	(* partition the heap into at least as many free blocks as there are processors *)
 	heap.sentinel := GetIndex (end - begin + BlockSize); index := heap.sentinel;
-	REPEAT DEC (index); heap.free[index].first := NIL UNTIL ASH (1, heap.sentinel - index) >= Processors.Maximum;
+	REPEAT DEC (index); heap.free[index].first := NIL UNTIL (index = 0) OR (ASH (1, heap.sentinel - index) >= Processors.Maximum);
 
 	(* setup all blocks and map the memory range as unallocated *)
 	REPEAT
@@ -85,7 +85,7 @@ END Discard;
 PROCEDURE IsHazardous (block {UNTRACED}: Block): BOOLEAN;
 VAR index: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	FOR index := 0 TO Processors.count - 1 DO
+	FOR index := 0 TO Processors.Maximum - 1 DO
 		IF block = processors[index].hazard THEN RETURN TRUE END;
 	END;
 	RETURN FALSE;
