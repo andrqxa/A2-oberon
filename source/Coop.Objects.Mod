@@ -2,7 +2,7 @@
 
 MODULE Objects;   (** AUTHOR "pjm, ejz, fof"; PURPOSE "Active object runtime support"; *)
 
-IMPORT SYSTEM, Environment, Machine, Modules, Heaps, Activities;
+IMPORT SYSTEM, Environment, Machine, Modules, Heaps, Activities, Interrupts, CPU;
 
 CONST
 	(* Process flags *)
@@ -29,6 +29,9 @@ CONST
 	(* Process termination halt codes *)
 	halt* = 2222;
 	haltUnbreakable* = 2223;
+
+	MinIRQ = Machine.IRQ0;
+	NumIRQ = Machine.MaxIRQ-MinIRQ+1;
 
 TYPE
 	CpuCyclesArray* = ARRAY Machine.MaxCPU OF HUGEINT;
@@ -101,6 +104,73 @@ TYPE
 	FinalizerNode* = POINTER TO RECORD (Heaps.FinalizerNode)
 		c*: FinalizedCollection (* base type for collection containing object *)
 	END;
+	
+	InterruptList = POINTER TO RECORD
+		next: InterruptList;
+		handler: EventHandler
+	END;
+
+	Interrupter* = OBJECT
+
+		VAR root: InterruptList;
+		VAR cancelled: BOOLEAN;
+		VAR interrupt: Interrupts.Interrupt;
+		
+		PROCEDURE &Init (irq: SIZE);
+		BEGIN
+			Interrupts.Install (interrupt, irq);
+		END Init;
+
+		PROCEDURE Add (handler: EventHandler);
+		VAR item: InterruptList;
+		BEGIN {EXCLUSIVE}
+			NEW (item);
+			item.next := root;
+			item.handler := handler;
+			root := item;
+		END Add;
+		
+		PROCEDURE Remove (handler: EventHandler);
+		VAR previous, current: InterruptList;
+		BEGIN {EXCLUSIVE}
+			previous := NIL; current := root;
+			WHILE (current # NIL) & (current.handler # handler) DO
+				previous := current; current := current.next;
+			END;
+			IF current # NIL THEN
+				IF previous = NIL THEN
+					root := NIL;
+				ELSE
+					previous.next := current.next;
+				END;
+			END;
+		END Remove;
+		
+		PROCEDURE Cancel;
+		BEGIN {EXCLUSIVE}
+			IF ~cancelled THEN
+				cancelled := TRUE;
+				Interrupts.Cancel (interrupt);
+			END;
+		END Cancel;
+
+		PROCEDURE Handle;
+		VAR item: InterruptList;
+		BEGIN {EXCLUSIVE}
+			item := root;
+			WHILE item # NIL DO
+				item.handler;
+				item := item.next;
+			END;
+		END Handle;
+
+	BEGIN {ACTIVE, PRIORITY(High)}
+		LOOP
+			Interrupts.Await (interrupt);
+			IF cancelled THEN EXIT END;
+			Handle;
+		END;
+	END Interrupter;
 
 VAR
 	awc-, awl-: LONGINT;
@@ -108,6 +178,7 @@ VAR
 
 	event: Timer; (* list of events *)
 	clock: Clock;
+	interrupt: ARRAY NumIRQ OF Interrupter;
 
 (* Set the current process' priority. *)
 PROCEDURE SetPriority*( priority: LONGINT );
@@ -238,6 +309,29 @@ BEGIN
 		END;
 	END;
 END GetCpuCycles;
+
+(** Install interrupt handler. *)
+PROCEDURE InstallHandler*(h: EventHandler; int: LONGINT);
+VAR ih: Interrupter;
+BEGIN {EXCLUSIVE}
+	ASSERT((int >= MinIRQ) & (int-MinIRQ < NumIRQ));
+	IF interrupt[int-MinIRQ] = NIL THEN
+		NEW (interrupt[int-MinIRQ], int);
+	END;
+END InstallHandler;
+
+(** Remove interrupt handler. *)
+PROCEDURE RemoveHandler*(h: EventHandler; int: LONGINT);
+BEGIN {EXCLUSIVE}
+	ASSERT((int >= MinIRQ) & (int-MinIRQ < NumIRQ));
+	IF interrupt[int-MinIRQ] # NIL THEN
+		interrupt[int-MinIRQ].Remove (h);
+		IF interrupt[int-MinIRQ].root = NIL THEN
+			interrupt[int-MinIRQ].Cancel
+		END;
+		interrupt[int-MinIRQ] := NIL;
+	END;
+END RemoveHandler;
 
 BEGIN
 	InitEventHandling;
