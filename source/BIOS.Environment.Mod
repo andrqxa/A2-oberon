@@ -23,6 +23,7 @@ VAR memTop: ADDRESS;
 VAR traceBase: ADDRESS;
 VAR heap: HeapManager.Heap;
 VAR config: ARRAY 2048 OF CHAR;
+VAR initRegs: ARRAY 2OF ADDRESS;
 VAR tracePort, tracePos, traceColor: SIZE;
 VAR previousTimerHandler: CPU.InterruptHandler;
 
@@ -246,6 +247,10 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	CPU.OutChar (Channel0Port + channel, CHR (divisor DIV 100H));
 END SetupTimer;
 
+PROCEDURE GetInit- (n: SIZE; VAR val: LONGINT);
+BEGIN val := initRegs[n]
+END GetInit;
+
 PROCEDURE Initialize-;
 CONST Channel0 = 0; RateGenerator = 4;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -265,6 +270,9 @@ END Terminate;
 PROCEDURE {NOPAF, FIXED(100000H)} KernelBegin;
 CODE
 	MOV bootFlag, EAX
+	LEA EAX, initRegs
+	MOV [EAX + 0], ESI
+	MOV [EAX + 4], EDI
 END KernelBegin;
 
 PROCEDURE {NOPAF, ALIGNED(32)} KernelEnd;

@@ -191,6 +191,10 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	fullName[j] := 0X;
 END ToExecutablePath;
 
+PROCEDURE GetInit- (n: SIZE; VAR val: LONGINT);
+BEGIN val := 0;
+END GetInit;
+
 PROCEDURE Initialize-;
 VAR trace: ARRAY 32 OF CHAR;
 BEGIN {UNCOOPERATIVE, UNCHECKED}

@@ -55,6 +55,8 @@ TYPE
 		adr*: ADDRESS;		(* lowest address on allocated stack *)	(* exported for Objects only *)
 		high*: ADDRESS;	(* next virtual address after stack *)	(* exported for Objects only *)
 	END;
+	
+	Address32* = LONGINT;
 
 VAR
 
@@ -197,6 +199,30 @@ PROCEDURE MapPhysical*(physAdr: ADDRESS; size: SIZE; VAR virtAdr: ADDRESS);
 BEGIN
 	virtAdr := physAdr;
 END MapPhysical;
+
+(** Unmap an area previously mapped with MapPhysical. *)
+PROCEDURE UnmapPhysical*(virtAdr: ADDRESS; size: SIZE);
+END UnmapPhysical;
+
+(** Translate a virtual address range to num ranges of physical address. num returns 0 on error. *)
+PROCEDURE TranslateVirtual*(virtAdr: ADDRESS; size: SIZE;  VAR num: LONGINT; VAR physAdr: ARRAY OF Range);
+BEGIN num := 1; physAdr[0].adr := virtAdr; physAdr[0].size := size;
+END TranslateVirtual;
+
+PROCEDURE Ensure32BitAddress*(adr: ADDRESS): Address32;
+BEGIN
+	ASSERT (Address32 (adr) = adr);
+	RETURN Address32 (adr);
+END Ensure32BitAddress;
+
+PROCEDURE Is32BitAddress*(adr: ADDRESS): BOOLEAN;
+BEGIN RETURN Address32 (adr) = adr;
+END Is32BitAddress;
+
+(** Get parameter values from Init string. If n = 0, return val = ASH(bx, 16) + ax, and if n = 1, return val = ASH(dx, 16) + cx, where ax, bx, cx, dx are the register values after the OBL boot loader or noboot.exe have executed the 16-bit x86 code in the Init string. *)
+PROCEDURE GetInit* (n: LONGINT; VAR val: LONGINT);
+BEGIN Environment.GetInit (n, val);
+END GetInit;
 
 (** Fill "size" bytes at "destAdr" with "filler".  "size" must be multiple of 4. *)
 
@@ -451,6 +477,14 @@ END MapPhysical;
 	BEGIN
 		Environment.Exit (0);
 	END Shutdown;
+
+PROCEDURE Cli*;
+BEGIN HALT (1234);
+END Cli;
+
+PROCEDURE Sti*;
+BEGIN HALT (1234);
+END Sti;
 
 (* Dan: from new Machine *)
 PROCEDURE -GetTimer*(): HUGEINT;
