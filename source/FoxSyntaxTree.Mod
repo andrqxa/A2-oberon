@@ -1251,6 +1251,7 @@ TYPE
 		VAR
 			modifiers-: Modifier; (* set by the parser *)
 			pointerBase-: Type;
+			isPlain-: BOOLEAN;
 			isUnsafe-: BOOLEAN;
 			isDisposable-: BOOLEAN;
 
@@ -1258,6 +1259,7 @@ TYPE
 		BEGIN
 			modifiers := NIL;
 			pointerBase := NIL;
+			isPlain := FALSE;
 			isUnsafe := FALSE;
 			isDisposable := FALSE;
 			InitType(position);
@@ -1273,6 +1275,11 @@ TYPE
 		BEGIN
 			pointerBase := type;
 		END SetPointerBase;
+
+		PROCEDURE SetPlain*(plain: BOOLEAN);
+		BEGIN
+			isPlain := plain;
+		END SetPlain;
 
 		PROCEDURE SetUnsafe*(unsafe: BOOLEAN);
 		BEGIN

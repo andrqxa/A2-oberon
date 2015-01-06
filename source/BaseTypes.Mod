@@ -8,7 +8,7 @@ MODULE BaseTypes;
 IMPORT Counters, Queues;
 
 (** Represents a pointer type. *)
-TYPE Pointer* = OBJECT {DISPOSABLE}
+TYPE Pointer* = OBJECT {DISPOSABLE,PLAIN}
 
 	VAR descriptor-: ADDRESS; (* stores the address of the type descriptor *)
 	VAR cycle* := 0: LONGWORD; (* stores the last garbage collection cycle which reached the pointer *)
@@ -57,10 +57,14 @@ TYPE Object* = OBJECT {DISPOSABLE} (Pointer)
 	(** It is guaranteed to be called during the disposal of any object instance. *)
 	PROCEDURE ~Finalize-;
 	VAR PointerDescriptor EXTERN "BaseTypes.Pointer": ADDRESS;
+(*
 	PROCEDURE Unlink EXTERN "Activities.Process.Unlink" (activity {UNTRACED}: OBJECT);
+*)
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF action # NIL THEN
+(*
 			IF action.activity # NIL THEN Unlink (action.activity); action.activity := NIL END;
+*)
 			Queues.Dispose (action.waitingQueue);
 		END;
 		IF monitor # NIL THEN
@@ -75,7 +79,7 @@ TYPE Object* = OBJECT {DISPOSABLE} (Pointer)
 END Object;
 
 (** Represents a stack frame of an activity. *)
-TYPE StackFrame* = OBJECT {UNSAFE}
+TYPE StackFrame* = OBJECT {UNSAFE,PLAIN}
 
 	VAR descriptor*: ADDRESS;
 	VAR previous*: ADDRESS;

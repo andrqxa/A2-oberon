@@ -678,6 +678,7 @@ TYPE
 			IF TypeNeedsResolution(x) THEN
 				modifiers := x.modifiers;
 				x.SetRealtime(HasFlag(modifiers,Global.NameRealtime, position));
+				x.SetPlain(HasFlag(modifiers,Global.NamePlain,position));
 				x.SetDisposable(HasFlag(modifiers,Global.NameDisposable, position));
 				x.SetUnsafe(HasFlag(modifiers,Global.NameUnsafe,position));
 				(* inheritance cycle check
