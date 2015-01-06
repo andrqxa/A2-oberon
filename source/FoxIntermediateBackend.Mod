@@ -74,6 +74,8 @@ CONST
 		ExitPriority=-1;
 
 		StrictChecks = FALSE;
+		
+		BasePointerTypeSize = 5;
 TYPE
 	SupportedInstructionProcedure* = PROCEDURE {DELEGATE} (CONST instr: IntermediateCode.Instruction; VAR moduleName,procedureName: ARRAY OF CHAR): BOOLEAN;
 	SupportedImmediateProcedure* = PROCEDURE {DELEGATE} (CONST op: IntermediateCode.Operand): BOOLEAN;
@@ -6062,96 +6064,114 @@ TYPE
 				type := p0.type.resolved;
 				IF (type IS SyntaxTree.PointerType) & (type(SyntaxTree.PointerType).pointerBase.resolved IS SyntaxTree.RecordType)
 				THEN
-					temporaryVariable := GetTemporaryVariable(type, FALSE);
-					IF temporaryVariable # NIL THEN
-						Symbol(temporaryVariable,l); (*Designate(temporaryVariable,l)*)
-					ELSE
-						Designate(p0,l);
-					END;
-					(* l.op contains address of pointer to record *)
-					Emit(Push(position,l.op)); (* address for use after syscall *)
-					Emit(Push(position,l.op));
-					ReleaseOperand(l);
-
-						(* push type descriptor *)
+					IF backend.cooperative THEN
+						size := ToMemoryUnits(system,system.SizeOf(type(SyntaxTree.PointerType).pointerBase.resolved));
+						IF ~type(SyntaxTree.PointerType).isPlain THEN INC (size, BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits)) END;
+						Emit(Push(position,IntermediateCode.Immediate(sizeType,size)));
+						CallThis("Runtime","New", 1);
+						res := NewRegisterOperand(IntermediateCode.GetType(system, p0.type));
+						Emit(Result(position, res));
+						exit := NewLabel();
+						BreqL(exit,res,nil);
 						reg := TypeDescriptorAdr(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved);
-						IF ~newObjectFile THEN
-							IntermediateCode.MakeMemory(reg,addressType);
-						END;
-						Emit(Push(position,reg));
+						Emit(Mov(position,IntermediateCode.Memory(addressType,res,0),reg));
 						ReleaseIntermediateOperand(reg);
+						SetLabel(exit);
+						Designate(p0,l);
+						Emit(Mov(position,IntermediateCode.Memory(addressType,l.op,0),res));
+						ReleaseIntermediateOperand(res);
+						ReleaseOperand(l);
+					ELSE
+						temporaryVariable := GetTemporaryVariable(type, FALSE);
+						IF temporaryVariable # NIL THEN
+							Symbol(temporaryVariable,l); (*Designate(temporaryVariable,l)*)
+						ELSE
+							Designate(p0,l);
+						END;
+						(* l.op contains address of pointer to record *)
+						Emit(Push(position,l.op)); (* address for use after syscall *)
+						Emit(Push(position,l.op));
+						ReleaseOperand(l);
 
-						(* push realtime flag *)
-						IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
-						ELSE Emit(Push(position,false));
+							(* push type descriptor *)
+							reg := TypeDescriptorAdr(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved);
+							IF ~newObjectFile THEN
+								IntermediateCode.MakeMemory(reg,addressType);
+							END;
+							Emit(Push(position,reg));
+							ReleaseIntermediateOperand(reg);
+
+							(* push realtime flag *)
+							IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
+							ELSE Emit(Push(position,false));
+							END;
+
+							CallThis("Heaps","NewRec", 3);
+							(* check allocation success, if not successful then do not call initializers and bodies *)
+							IntermediateCode.InitRegister(pointer,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
+							Emit(Pop(position,pointer));
+							MakeMemory(reg,pointer,addressType,0);
+							ReleaseIntermediateOperand(pointer);
+							pointer := reg;
+						exit := NewLabel();
+						BreqL(exit,pointer,nil);
+						Emit(Push(position,pointer));
+
+						(* initialize fields *)
+						InitFields(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved, pointer,0);
+
+						(* call initializer *)
+						constructor := GetConstructor(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved(SyntaxTree.RecordType));
+						IF constructor # NIL THEN
+							(*! should be unified with ProcedureCallDesignator *)
+							Emit(Push(position,pointer));
+							ReleaseIntermediateOperand(pointer);
+							formalParameter := constructor.type(SyntaxTree.ProcedureType).firstParameter;
+							FOR i := 1 TO x.parameters.Length()-1 DO
+								PushParameter(x.parameters.GetExpression(i), formalParameter,SyntaxTree.OberonCallingConvention, FALSE, dummy,-1);
+								formalParameter := formalParameter.nextParameter;
+							END;
+							(* static call of the constructor *)
+							Global.GetSymbolSegmentedName(constructor,name);
+							ASSERT(~constructor.isInline);
+							IF constructor.scope.ownerModule # module.module THEN
+								symbol := NewSection(module.importedSections, Sections.CodeSection, name,constructor,commentPrintout # NIL);
+							ELSE
+								symbol := NewSection(module.allSections, Sections.CodeSection, name,constructor,commentPrintout # NIL);
+							END;
+							Emit(Call(position,IntermediateCode.Address(addressType, symbol.name, GetFingerprint(constructor), 0),ProcedureParametersSize(system,constructor)));
+						ELSE
+							ReleaseIntermediateOperand(pointer);
 						END;
 
-						CallThis("Heaps","NewRec", 3);
-						(* check allocation success, if not successful then do not call initializers and bodies *)
 						IntermediateCode.InitRegister(pointer,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
 						Emit(Pop(position,pointer));
-						MakeMemory(reg,pointer,addressType,0);
-						ReleaseIntermediateOperand(pointer);
-						pointer := reg;
-					exit := NewLabel();
-					BreqL(exit,pointer,nil);
-					Emit(Push(position,pointer));
 
-					(* initialize fields *)
-					InitFields(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved, pointer,0);
-
-					(* call initializer *)
-					constructor := GetConstructor(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved(SyntaxTree.RecordType));
-					IF constructor # NIL THEN
-						(*! should be unified with ProcedureCallDesignator *)
-						Emit(Push(position,pointer));
-						ReleaseIntermediateOperand(pointer);
-						formalParameter := constructor.type(SyntaxTree.ProcedureType).firstParameter;
-						FOR i := 1 TO x.parameters.Length()-1 DO
-							PushParameter(x.parameters.GetExpression(i), formalParameter,SyntaxTree.OberonCallingConvention, FALSE, dummy,-1);
-							formalParameter := formalParameter.nextParameter;
+						IF temporaryVariable # NIL THEN
+							Designate(p0,l);
+							ToMemory(l.op,addressType,0);
+							Emit(Mov(position,l.op,pointer));
+							ReleaseOperand(l);
+							result.tag := emptyOperand;
 						END;
-						(* static call of the constructor *)
-						Global.GetSymbolSegmentedName(constructor,name);
-						ASSERT(~constructor.isInline);
-						IF constructor.scope.ownerModule # module.module THEN
-							symbol := NewSection(module.importedSections, Sections.CodeSection, name,constructor,commentPrintout # NIL);
+
+						(* call bodies *)
+						CallBodies(pointer,p0.type);
+						ReleaseIntermediateOperand(pointer);
+
+						IF temporaryVariable # NIL THEN
+							end := NewLabel();
+							BrL(end);
+							SetLabel(exit);
+							Designate(p0,l);
+							ToMemory(l.op,addressType,0);
+							Emit(Mov(position,l.op,nil)); (* write NIL to adr *)
+							ReleaseOperand(l);
+							SetLabel(end);
 						ELSE
-							symbol := NewSection(module.allSections, Sections.CodeSection, name,constructor,commentPrintout # NIL);
+							SetLabel(exit);
 						END;
-						Emit(Call(position,IntermediateCode.Address(addressType, symbol.name, GetFingerprint(constructor), 0),ProcedureParametersSize(system,constructor)));
-					ELSE
-						ReleaseIntermediateOperand(pointer);
 					END;
-
-					IntermediateCode.InitRegister(pointer,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
-					Emit(Pop(position,pointer));
-
-					IF temporaryVariable # NIL THEN
-						Designate(p0,l);
-						ToMemory(l.op,addressType,0);
-						Emit(Mov(position,l.op,pointer));
-						ReleaseOperand(l);
-						result.tag := emptyOperand;
-					END;
-
-					(* call bodies *)
-					CallBodies(pointer,p0.type);
-					ReleaseIntermediateOperand(pointer);
-
-					IF temporaryVariable # NIL THEN
-						end := NewLabel();
-						BrL(end);
-						SetLabel(exit);
-						Designate(p0,l);
-						ToMemory(l.op,addressType,0);
-						Emit(Mov(position,l.op,nil)); (* write NIL to adr *)
-						ReleaseOperand(l);
-						SetLabel(end);
-					ELSE
-						SetLabel(exit);
-					END;
-
 				ELSIF (type IS SyntaxTree.PointerType) & (type(SyntaxTree.PointerType).pointerBase.resolved IS SyntaxTree.ArrayType)  THEN
 					type := type(SyntaxTree.PointerType).pointerBase.resolved;
 
@@ -6871,6 +6891,9 @@ TYPE
 			type := x.type.resolved;
 			Dereference(d,type,IsUnsafePointer(x.left.type));
 			result := d;
+			IF ~x.left.type(SyntaxTree.PointerType).isPlain THEN
+				IntermediateCode.AddOffset(result.op, BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+			END;
 			destination := dest;
 			IF Trace THEN TraceExit("VisitDereferenceDesignator") END;
 		END VisitDereferenceDesignator;
