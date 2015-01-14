@@ -23,12 +23,12 @@ TYPE Pointer* = OBJECT {DISPOSABLE,PLAIN}
 END Pointer;
 
 (** Represents an array type. *)
-TYPE Array* = OBJECT {DISPOSABLE} (Pointer)
+TYPE Array* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
 
 END Array;
 
 (** Represents a record type. *)
-TYPE Record* = OBJECT {DISPOSABLE} (Pointer)
+TYPE Record* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
 
 END Record;
 
@@ -48,7 +48,7 @@ TYPE Monitor* = RECORD
 END;
 
 (** Represents the basic object type. *)
-TYPE Object* = OBJECT {DISPOSABLE} (Pointer)
+TYPE Object* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
 
 	VAR action-: POINTER {UNSAFE} TO Action;
 	VAR monitor-: POINTER {UNSAFE} TO Monitor;
