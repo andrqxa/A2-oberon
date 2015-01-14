@@ -1029,7 +1029,7 @@ TYPE
 
 		currentLoop: Label; (* variable to hand over loop exit jump list *)
 		conditional: BOOLEAN;
-		trueLabel, falseLabel: Label;
+		trueLabel, falseLabel, exitLabel: Label;
 		locked: BOOLEAN;
 		(*
 		usedRegisters: Registers;
@@ -2073,6 +2073,86 @@ TYPE
 			section := previousSection;
 		END CreateTraceMethod;
 
+		PROCEDURE CreateResetProcedure (recordType: SyntaxTree.RecordType);
+		VAR name: Basic.SegmentedName; previousSection: IntermediateCode.Section;
+		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
+		BEGIN
+			previousSection := section;
+			GetRecordTypeName (recordType,name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+
+			variable := recordType.recordScope.firstVariable;
+			WHILE variable # NIL DO
+				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
+					register := NewRegisterOperand (addressType);
+					Emit (Mov(position,register,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits))));
+					IntermediateCode.AddOffset(register,ToMemoryUnits(system,variable.offsetInBits));
+					IF recordType.isObject & ((recordType.pointerType = NIL) OR ~recordType.pointerType.isPlain) THEN
+						IntermediateCode.AddOffset(register,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+					END;
+					IF SemanticChecker.IsPointerType (variable.type) THEN
+						Emit (Push(position,register));
+						CallThis("GarbageCollector","Reset", 1);
+					ELSIF variable.type.resolved IS SyntaxTree.RecordType THEN
+						Emit (Push(position,register));
+						GetRecordTypeName (variable.type.resolved(SyntaxTree.RecordType),name);
+						Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+						IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+						Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
+					END;
+					ReleaseIntermediateOperand(register);
+				END;
+				variable := variable.nextVariable;
+			END;
+
+			recordBase := recordType.GetBaseRecord();
+			IF recordBase # NIL THEN
+				GetRecordTypeName (recordBase,name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+				Emit(Br(position,op));
+			ELSE
+				Emit(Exit(position,0,0));
+			END;
+			section := previousSection;
+		END CreateResetProcedure;
+
+		PROCEDURE ResetVariables ();
+		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter;
+
+			PROCEDURE Reset (symbol: SyntaxTree.Symbol);
+			VAR operand: Operand; name: Basic.SegmentedName; op: IntermediateCode.Operand;
+			BEGIN
+				Symbol (symbol, operand);
+				Emit (Push(position, operand.op));
+				IF SemanticChecker.IsPointerType (symbol.type) THEN
+					CallThis("GarbageCollector","Reset", 1);
+				ELSIF symbol.type.resolved IS SyntaxTree.RecordType THEN
+					GetRecordTypeName (symbol.type.resolved(SyntaxTree.RecordType),name);
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+					Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
+				END;
+				ReleaseOperand(operand);
+			END Reset;
+
+		BEGIN
+			variable := currentScope.firstVariable;
+			WHILE variable # NIL DO
+				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
+					Reset (variable);
+				END;
+				variable := variable.nextVariable;
+			END;
+			parameter := currentScope(SyntaxTree.ProcedureScope).ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
+			WHILE parameter # NIL DO
+				IF ~parameter.untraced & parameter.type.resolved.hasPointers & ((parameter.kind = SyntaxTree.ValueParameter) OR (parameter.kind= SyntaxTree.ConstParameter) & ~(parameter.type.resolved IS SyntaxTree.RecordType)) THEN
+					Reset (parameter);
+				END;
+				parameter := parameter.nextParameter;
+			END;
+		END ResetVariables;
 
 		PROCEDURE AddImport(CONST moduleName: ARRAY OF CHAR; VAR module: SyntaxTree.Module; force: BOOLEAN): BOOLEAN;
 		VAR import: SyntaxTree.Import;
@@ -8250,8 +8330,12 @@ TYPE
 				IF profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
 			END;
 
-			Emit(Leave(position,procedure.type(SyntaxTree.ProcedureType).callingConvention));
-			Emit(Exit(position,procedure.type(SyntaxTree.ProcedureType).pcOffset,procedure.type(SyntaxTree.ProcedureType).callingConvention));
+			IF backend.cooperative THEN
+				BrL(exitLabel);
+			ELSE
+				Emit(Leave(position,procedure.type(SyntaxTree.ProcedureType).callingConvention));
+				Emit(Exit(position,procedure.type(SyntaxTree.ProcedureType).pcOffset,procedure.type(SyntaxTree.ProcedureType).callingConvention));
+			END;
 			IF Trace THEN TraceExit("VisitReturnStatement") END;
 		END VisitReturnStatement;
 
@@ -8655,7 +8739,10 @@ TYPE
 				ParameterCopies(procedureType);
 				InitVariables(scope);
 				IF x.code = NIL THEN
+					exitLabel := NewLabel ();
 					VisitStatementBlock(x);
+					SetLabel(exitLabel);
+					IF backend.cooperative THEN ResetVariables END;
 				ELSE
 					VisitCode(x.code)
 				END;
@@ -10020,6 +10107,9 @@ TYPE
 						
 						IF recordType.hasPointers THEN
 							implementationVisitor.CreateTraceMethod(recordType);
+							IF ~recordType.isObject THEN
+								implementationVisitor.CreateResetProcedure(recordType);
+							END;
 						END;
 
 					ELSIF ~simple THEN
