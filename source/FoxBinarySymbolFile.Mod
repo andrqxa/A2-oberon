@@ -445,7 +445,7 @@ TYPE
 			Scope(recordType.recordScope);
 			var := recordType.recordScope.firstVariable;
 			WHILE var # NIL DO
-				hasPointer := hasPointer OR var.type.resolved.hasPointers;
+				hasPointer := hasPointer OR var.type.resolved.hasPointers & ~var.untraced;
 				var := var.nextVariable;
 			END;
 			recordType.SetHasPointers(hasPointer);

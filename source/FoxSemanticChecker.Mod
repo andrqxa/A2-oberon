@@ -930,12 +930,11 @@ TYPE
 				END;
 
 				isRealtime := TRUE;
-				hasPointers := FALSE;
 				symbol := x.recordScope.firstSymbol; (* sorted symbols, important to go through procedures in a sorted way here !*)
 				WHILE symbol # NIL DO
 					IF symbol IS SyntaxTree.Variable THEN
 						isRealtime := isRealtime & symbol.type.resolved.isRealtime;
-						hasPointers := hasPointers OR symbol.type.resolved.hasPointers;
+						hasPointers := hasPointers OR symbol.type.resolved.hasPointers & ~symbol(SyntaxTree.Variable).untraced;
 					END;
 					IF symbol IS SyntaxTree.Procedure THEN
 						procedure := symbol(SyntaxTree.Procedure);
