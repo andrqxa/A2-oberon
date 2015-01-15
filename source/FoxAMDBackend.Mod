@@ -1253,7 +1253,6 @@ TYPE
 		VAR op1,imm,target: Assembler.Operand; cc,size,numberMachineWords,destPC: LONGINT;
 		CONST initialize=TRUE;
 		BEGIN
-			cc := SHORT(instruction.op1.intValue);
 			stackSize := SHORT(instruction.op2.intValue);
 			size := stackSize;
 
@@ -1263,6 +1262,13 @@ TYPE
 			INC(traceStackSize, stackSize);
 
 			emitter.Emit1(InstructionSet.opPUSH,opBP);
+			IF instruction.op1.mode # IntermediateCode.ModeNumber THEN
+				EmitPush(instruction.op1,Low);
+				cc := SyntaxTree.OberonCallingConvention;
+			ELSE
+				cc := SHORT(instruction.op1.intValue);
+				
+			END;
 			emitter.Emit2(InstructionSet.opMOV,opBP,opSP);
 			IF initialize THEN
 				(* always including this instruction make trace insertion possible *)
@@ -1327,7 +1333,7 @@ TYPE
 		END EmitEnter;
 
 		PROCEDURE EmitLeave(CONST instruction: IntermediateCode.Instruction);
-		VAR cc: LONGINT;
+		VAR cc: LONGINT; offset: Assembler.Operand;
 		BEGIN
 			cc := SHORT(instruction.op1.intValue);
 			IF (cc = SyntaxTree.WinAPICallingConvention)  OR (cc = SyntaxTree.CCallingConvention) THEN
@@ -1335,7 +1341,12 @@ TYPE
 				emitter.Emit1(InstructionSet.opPOP,opEDI);
 				emitter.Emit1(InstructionSet.opPOP,opEBX);
 			END;
-			emitter.Emit2(InstructionSet.opMOV,opSP,opBP);
+			IF instruction.op2.intValue # 0 THEN
+				Assembler.InitMem(offset,SHORT(SHORT(cpuBits DIV 8)),BP,SHORT(instruction.op2.intValue));
+				emitter.Emit2(InstructionSet.opLEA,opSP,offset);
+			ELSE
+				emitter.Emit2(InstructionSet.opMOV,opSP,opBP);
+			END;
 			emitter.Emit1(InstructionSet.opPOP,opBP);
 		END EmitLeave;
 

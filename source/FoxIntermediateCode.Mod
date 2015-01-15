@@ -726,9 +726,9 @@ TYPE
 		(* call adr parSize - procedure call, second operand contains parameter size *)
 		AddFormat(call, "call", RegMemImm, Num, Undef,{});
 		(* enter cc pafSize regs - set up procedure activation frame;  op1 = calling convention, op2 = paf size, op3 = numberOfParameters in registers *)
-		AddFormat(enter, "enter", Num, Num, Num ,{});
+		AddFormat(enter, "enter", Num+Any, Num, Num ,{});
 		(* leave cc - remove paf, does not imply return, op1= calling convention, does not imply exit from procedure *)
-		AddFormat(leave, "leave", Num, Undef, Undef ,{});
+		AddFormat(leave, "leave", Num, Num, Undef ,{});
 		(* return value : return value, op1= returned value, if any, does not imply exit from procedure *)
 		AddFormat(return,"return",RegMemImm, Undef, Undef,{});
 		(* exit parSize pcOffset cc - exit from procedure, op1 = offset that has to be subtracted from return address (e.g., used for ARM interrupt procedures), op2 = calling convention *)

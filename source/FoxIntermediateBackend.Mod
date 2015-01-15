@@ -605,7 +605,7 @@ TYPE
 					END;
 
 
-					ir.EmitAt(pc(*+2*),Enter(x.position,cc,ToMemoryUnits(system,stackSize),registerNumber)); (*!!*)
+					ir.EmitAt(pc(*+2*),implementationVisitor.Enter(x.position,x,cc,ToMemoryUnits(system,stackSize),registerNumber)); (*!!*)
 
 					IF stackSize > 0 THEN
 						IF (stackSize MOD system.addressSize = 0) THEN
@@ -628,7 +628,7 @@ TYPE
 
 
 					IF (procedureType.returnType = NIL) OR (scope.body.code # NIL)  THEN
-						ir.Emit(Leave(x.position,cc));
+						ir.Emit(implementationVisitor.Leave(x.position,x,cc));
 						ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
 					ELSIF ~scope.body.isUnchecked & ~backend.noRuntimeChecks THEN
 						ir.Emit(Trap(x.position,ReturnTrap));
@@ -637,13 +637,13 @@ TYPE
 					END
 				END;
 			ELSE (* force body for procedures *)
-				ir.Emit(Enter(x.position,cc,0,0));
+				ir.Emit(implementationVisitor.Enter(x.position,x,cc,0,0));
 				ir.EnterValidPAF;
 				implementationVisitor.usedRegisters := NIL;
 				implementationVisitor.Body(scope.body,currentScope,ir,x = module.module.moduleScope.bodyProcedure);
 				IF implementationVisitor.usedRegisters # NIL THEN D.TraceBack END;
 				ir.ExitValidPAF;
-				ir.Emit(Leave(x.position,cc));
+				ir.Emit(implementationVisitor.Leave(x.position,x,cc));
 				ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
 			END;
 			Scope(scope);
@@ -785,7 +785,7 @@ TYPE
 				implementationVisitor.profileId.Emit(Reserve(-1,ToMemoryUnits(system,system.SizeOf(system.longintType))));
 				Global.GetModuleSegmentedName(module.module,name); Basic.SuffixSegmentedName(name, Basic.MakeString("@InitProfiler"));
 				implementationVisitor.profileInit := implementationVisitor.NewSection(module.allSections, Sections.CodeSection, name,NIL,dump);
-				implementationVisitor.profileInit.Emit(Enter(-1,0,0,0));
+				implementationVisitor.profileInit.Emit(implementationVisitor.Enter(-1,NIL,0,0,0));
 
 				Global.GetModuleName(module.module,idstr);
 				implementationVisitor.ProfilerAddModule(idstr);
@@ -806,13 +806,13 @@ TYPE
 				EnsureBodyProcedure(x.moduleScope);
 				Global.GetModuleSegmentedName(module.module,name); Basic.SuffixSegmentedName(name, Basic.MakeString("@OperatorInitialization"));
 				implementationVisitor.operatorInitializationCodeSection := implementationVisitor.NewSection(module.allSections, Sections.CodeSection,name, NIL, dump);
-				implementationVisitor.operatorInitializationCodeSection.Emit(Enter(-1,0,0,0));
+				implementationVisitor.operatorInitializationCodeSection.Emit(implementationVisitor.Enter(-1,NIL,0,0,0));
 			END;
 
 			Scope(x.moduleScope);
 
 			IF hasDynamicOperatorDeclarations THEN
-				implementationVisitor.operatorInitializationCodeSection.Emit(Leave(-1,0));
+				implementationVisitor.operatorInitializationCodeSection.Emit(implementationVisitor.Leave(-1,NIL,0));
 				implementationVisitor.operatorInitializationCodeSection.Emit(Exit(-1,0,0));
 			END;
 
@@ -1218,6 +1218,42 @@ TYPE
 				Emit(Trap(position,trapNo));
 			END;
 		END EmitTrap;
+
+		PROCEDURE Enter (position: LONGINT; procedure: SyntaxTree.Procedure; callconv: LONGINT; varSize: LONGINT; numRegs: LONGINT): IntermediateCode.Instruction;
+		VAR name: Basic.SegmentedName;
+		VAR op1,op2,op3: IntermediateCode.Operand;
+		VAR instruction: IntermediateCode.Instruction;
+		BEGIN
+			IF backend.cooperative & (callconv = SyntaxTree.OberonCallingConvention) THEN
+				IF (procedure # NIL) & (HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope)) THEN
+					Global.GetSymbolSegmentedName(procedure, name);
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Descriptor"));
+				ELSE
+					Basic.ToSegmentedName ("BaseTypes.StackFrame",name);
+				END;
+				IntermediateCode.InitAddress(op1, addressType, name , 0, 0);
+			ELSE
+				IntermediateCode.InitNumber(op1,callconv);
+			END;
+			IntermediateCode.InitNumber(op2,varSize);
+			IntermediateCode.InitNumber(op3, numRegs);
+			IntermediateCode.InitInstruction(instruction, position, IntermediateCode.enter,op1,op2,op3);
+			RETURN instruction;
+		END Enter;
+
+		PROCEDURE Leave(position: LONGINT; procedure: SyntaxTree.Procedure; callconv: LONGINT): IntermediateCode.Instruction;
+		VAR op1,op2: IntermediateCode.Operand;
+		VAR instruction: IntermediateCode.Instruction;
+		BEGIN
+			IntermediateCode.InitNumber(op1,callconv);
+			IF backend.cooperative & (callconv = SyntaxTree.OberonCallingConvention) THEN
+				IntermediateCode.InitNumber(op2,ToMemoryUnits(system, system.addressSize));
+			ELSE
+				IntermediateCode.InitNumber(op2,0);
+			END;
+			IntermediateCode.InitInstruction(instruction, position, IntermediateCode.leave,op1,op2,emptyOperand);
+			RETURN instruction
+		END Leave;
 
 		PROCEDURE Symbol(x: SyntaxTree.Symbol; VAR op: Operand);
 		VAR m: SymbolMap; e: SyntaxTree.Expression; o, t: IntermediateCode.Operand;
@@ -2117,6 +2153,59 @@ TYPE
 			END;
 			section := previousSection;
 		END CreateResetProcedure;
+		
+		PROCEDURE CreateResetMethod (scope: SyntaxTree.ProcedureScope);
+		VAR previousSection: IntermediateCode.Section; previousScope: SyntaxTree.Scope;
+		VAR name: Basic.SegmentedName;
+		BEGIN
+			previousSection := section;
+			previousScope := currentScope;
+			Global.GetSymbolSegmentedName(scope.ownerProcedure, name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			Emit(Enter(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention,0,0));
+			currentScope := scope; ResetVariables;
+			Emit(Leave(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention));
+			Emit(Exit(position,0,0));
+			currentScope := previousScope;
+			section := previousSection;
+		END CreateResetMethod;
+
+		PROCEDURE CreateMoveMethod (scope: SyntaxTree.ProcedureScope);
+		VAR previousSection: IntermediateCode.Section; name: Basic.SegmentedName;
+		VAR parameter: SyntaxTree.Parameter; op: IntermediateCode.Operand;
+		VAR stackFrame, value: IntermediateCode.Operand; skip: Label;
+		BEGIN
+			previousSection := section;
+			Global.GetSymbolSegmentedName(scope.ownerProcedure, name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
+			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			stackFrame := NewRegisterOperand (addressType); Emit (Mov(position,stackFrame,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 1))));
+			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
+			WHILE parameter # NIL DO
+				IF IsVariableParameter (parameter) THEN
+					IF (parameter.kind = SyntaxTree.ValueParameter) & IsOpenArray (parameter.type) THEN
+						value := IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits));
+						Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
+					ELSE
+						value := NewRegisterOperand (addressType);
+						Emit (Mov(position,value,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits))));
+						skip := NewLabel ();
+						BrltL (skip,value,stackFrame);
+						BrgeL (skip,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3)));
+						Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
+						Emit (Mov(position,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits)),value));
+						SetLabel (skip);
+					END;
+				END;
+				parameter := parameter.nextParameter;
+			END;
+			ReleaseIntermediateOperand(stackFrame);
+			Basic.ToSegmentedName ("BaseTypes.StackFrame.Move",name);
+			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+			Emit(Br(position,op));
+			section := previousSection;
+		END CreateMoveMethod
 
 		PROCEDURE ResetVariables ();
 		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter;
@@ -2153,6 +2242,40 @@ TYPE
 				parameter := parameter.nextParameter;
 			END;
 		END ResetVariables;
+		
+		PROCEDURE CreateProcedureDescriptor (procedure: SyntaxTree.Procedure);
+		VAR previousSection: IntermediateCode.Section; name: Basic.SegmentedName;
+		VAR op: IntermediateCode.Operand;
+		BEGIN
+			previousSection := section;
+			Global.GetSymbolSegmentedName(procedure, name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Descriptor"));
+			section := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, name,NIL,TRUE);
+			Basic.ToSegmentedName ("BaseTypes.StackFrame",name);
+
+			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+			Emit(Data(position,op));
+			Emit(Data(position,nil));
+
+			IF HasVariableParameters (procedure.procedureScope) THEN
+				Global.GetSymbolSegmentedName(procedure, name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
+			ELSE
+				Basic.ToSegmentedName ("BaseTypes.StackFrame.Move",name);
+			END;
+			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+			Emit(Data(position,op));
+
+			IF HasPointers (procedure.procedureScope) THEN
+				Global.GetSymbolSegmentedName(procedure, name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+			ELSE
+				Basic.ToSegmentedName ("BaseTypes.StackFrame.Reset",name);
+			END;
+			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+			Emit(Data(position,op));
+			section := previousSection;
+		END CreateProcedureDescriptor;
 
 		PROCEDURE AddImport(CONST moduleName: ARRAY OF CHAR; VAR module: SyntaxTree.Module; force: BOOLEAN): BOOLEAN;
 		VAR import: SyntaxTree.Import;
@@ -5054,7 +5177,7 @@ TYPE
 		BEGIN
 			IntermediateCode.InitImmediate(reg, IntermediateCode.GetType(system,system.longintType), numberProcedures);
 			profileInit.EmitAt(profileInitPatchPosition,Push(position,reg));
-			profileInit.Emit(Leave(position,0));
+			profileInit.Emit(Leave(position,NIL,0));
 			profileInit.Emit(Exit(position,0,0));
 		END ProfilerPatchInit;
 
@@ -8333,7 +8456,7 @@ TYPE
 			IF backend.cooperative THEN
 				BrL(exitLabel);
 			ELSE
-				Emit(Leave(position,procedure.type(SyntaxTree.ProcedureType).callingConvention));
+				Emit(Leave(position,procedure,procedure.type(SyntaxTree.ProcedureType).callingConvention));
 				Emit(Exit(position,procedure.type(SyntaxTree.ProcedureType).pcOffset,procedure.type(SyntaxTree.ProcedureType).callingConvention));
 			END;
 			IF Trace THEN TraceExit("VisitReturnStatement") END;
@@ -8596,7 +8719,7 @@ TYPE
 				END;
 				IF currentIsInline THEN RETURN END;
 
-				Emit(Leave(position,procedureType(SyntaxTree.ProcedureType).callingConvention));
+				Emit(Leave(position,procedure,procedureType(SyntaxTree.ProcedureType).callingConvention));
 				Emit(Exit(position,procedureType(SyntaxTree.ProcedureType).pcOffset,procedureType(SyntaxTree.ProcedureType).callingConvention));
 				ReleaseIntermediateOperand(return);
 			END;
@@ -8742,7 +8865,11 @@ TYPE
 					exitLabel := NewLabel ();
 					VisitStatementBlock(x);
 					SetLabel(exitLabel);
-					IF backend.cooperative THEN ResetVariables END;
+					IF backend.cooperative THEN
+						IF HasPointers (procedure.procedureScope) THEN ResetVariables; CreateResetMethod (procedure.procedureScope) END;
+						IF HasVariableParameters (procedure.procedureScope) THEN CreateMoveMethod (procedure.procedureScope) END;
+						IF HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope) THEN CreateProcedureDescriptor (procedure) END;
+					END;
 				ELSE
 					VisitCode(x.code)
 				END;
@@ -10494,6 +10621,41 @@ TYPE
 		constant.SetScope(module.moduleScope);
 		RETURN constant
 	END BuildConstant;
+	
+	PROCEDURE HasPointers (scope: SyntaxTree.ProcedureScope): BOOLEAN;
+	VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter;
+	BEGIN
+		variable := scope.firstVariable;
+		WHILE variable # NIL DO
+			IF ~variable.untraced & variable.type.resolved.hasPointers THEN
+				RETURN TRUE;
+			END;
+			variable := variable.nextVariable;
+		END;
+		parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
+		WHILE parameter # NIL DO
+			IF ~parameter.untraced & parameter.type.resolved.hasPointers & ~IsVariableParameter(parameter) THEN
+				RETURN TRUE;
+			END;
+			parameter := parameter.nextParameter;
+		END;
+		RETURN FALSE;
+	END HasPointers;
+	
+	PROCEDURE IsVariableParameter (parameter: SyntaxTree.Parameter): BOOLEAN;
+	BEGIN RETURN (parameter.kind = SyntaxTree.VarParameter) OR (parameter.kind = SyntaxTree.ConstParameter) & ((parameter.type.resolved IS SyntaxTree.RecordType) OR (parameter.type.resolved IS SyntaxTree.ArrayType)) OR IsOpenArray (parameter.type);
+	END IsVariableParameter;
+	
+	PROCEDURE HasVariableParameters(scope: SyntaxTree.ProcedureScope): BOOLEAN;
+	VAR parameter: SyntaxTree.Parameter;
+	BEGIN
+		parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
+		WHILE parameter # NIL DO
+			IF IsVariableParameter (parameter) THEN RETURN TRUE END;
+			parameter := parameter.nextParameter;
+		END;
+		RETURN FALSE;
+	END HasVariableParameters;
 
 	PROCEDURE IsIntegerConstant(expression: SyntaxTree.Expression; VAR val: HUGEINT): BOOLEAN;
 	BEGIN
@@ -10758,26 +10920,6 @@ TYPE
 		IntermediateCode.InitInstruction(instruction, position, IntermediateCode.call,op,IntermediateCode.Number(parSize),emptyOperand);
 		RETURN instruction
 	END Call;
-
-	PROCEDURE Enter(position: LONGINT;callconv: LONGINT; varSize: LONGINT; numRegs: LONGINT): IntermediateCode.Instruction;
-	VAR op1,op2,op3: IntermediateCode.Operand;
-	VAR instruction: IntermediateCode.Instruction;
-	BEGIN
-		IntermediateCode.InitNumber(op1,callconv);
-		IntermediateCode.InitNumber(op2,varSize);
-		IntermediateCode.InitNumber(op3, numRegs);
-		IntermediateCode.InitInstruction(instruction, position, IntermediateCode.enter,op1,op2,op3);
-		RETURN instruction
-	END Enter;
-
-	PROCEDURE Leave(position: LONGINT;callconv: LONGINT): IntermediateCode.Instruction;
-	VAR op1: IntermediateCode.Operand;
-	VAR instruction: IntermediateCode.Instruction;
-	BEGIN
-		IntermediateCode.InitNumber(op1,callconv);
-		IntermediateCode.InitInstruction(instruction, position, IntermediateCode.leave,op1,emptyOperand,emptyOperand);
-		RETURN instruction
-	END Leave;
 
 	PROCEDURE Exit(position: LONGINT;pcOffset: LONGINT; callingConvention: LONGINT): IntermediateCode.Instruction;
 	VAR op1, op2: IntermediateCode.Operand;
