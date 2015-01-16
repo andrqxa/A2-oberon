@@ -27,7 +27,7 @@ CONST Priorities = HighestPriority - LowestPriority + 1;
 TYPE SwitchFinalizer* = PROCEDURE (previous {UNTRACED}: Activity; value: ADDRESS);
 
 (* Represents a stack frame of an activity. *)
-TYPE StackFrame = OBJECT {UNSAFE} (BaseTypes.StackFrame)
+TYPE StackFrame = OBJECT {UNSAFE,PLAIN} (BaseTypes.StackFrame)
 	VAR finalizeSwitchCaller: PROCEDURE;
 	VAR procedureCaller: PROCEDURE {NORETURN};
 	VAR procedureArgument {UNTRACED}: OBJECT;
