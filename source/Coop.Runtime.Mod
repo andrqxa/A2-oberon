@@ -3,7 +3,7 @@
 
 MODULE Runtime;
 
-IMPORT SYSTEM, Trace;
+IMPORT SYSTEM, BaseTypes, Trace;
 
 TYPE TrapHandler* = PROCEDURE (number: SIZE);
 
@@ -97,21 +97,28 @@ END Trap;
 (** This procedure acquires memory and returns the address to the first byte or NIL if the allocation fails. *)
 (** The compiler implements all NEW statements with a call to this procedure. *)
 PROCEDURE New- (size: SIZE): ADDRESS;
+VAR result: ADDRESS; tries: SIZE;
+PROCEDURE CollectGarbage EXTERN "GarbageCollector.Collect";
 PROCEDURE Allocate EXTERN "Environment.Allocate" (size: SIZE): ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	RETURN Allocate (size);
+	FOR tries := 1 TO 10 DO
+		result := Allocate (size);
+		IF result # NIL THEN RETURN result END;
+		CollectGarbage;
+	END;
+	RETURN NIL;
 END New;
 
 (** This procedure releases memory that was previously acquired by a call to the [[Runtime.New]] procedure. *)
 (** The compiler implements DISPOSE statements on types marked as disposable with a call to this procedure. *)
-PROCEDURE Dispose- (VAR pointer {UNTRACED}: OBJECT);
+PROCEDURE Dispose- (VAR pointer {UNTRACED}: BaseTypes.Pointer);
 PROCEDURE Deallocate EXTERN "Environment.Deallocate" (address: ADDRESS);
+PROCEDURE Watch EXTERN "GarbageCollector.Watch" (pointer {UNTRACED}: BaseTypes.Pointer);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (pointer # NIL);
-(*
-	Deallocate (pointer);
-*)
-	pointer := NIL;
+	IF pointer IS BaseTypes.Object THEN pointer(BaseTypes.Object).Finalize END;
+	IF (pointer IS BaseTypes.Pointer) & (pointer(BaseTypes.Pointer).nextWatched = NIL) THEN Watch (pointer(BaseTypes.Pointer));
+	ELSE Deallocate (pointer) END; pointer := NIL;
 END Dispose;
 
 BEGIN
