@@ -2000,6 +2000,9 @@ TYPE
 				
 				IF backend.cooperative THEN
 		 			repeatL := NewLabel();
+		 			IF ~type(SyntaxTree.RecordType).isObject THEN
+						Emit(Mov(position,left,IntermediateCode.Memory(addressType,left,ToMemoryUnits(system,addressType.sizeInBits))));
+					END;
 		 			SetLabel(repeatL);
 					BreqL(trueL,left,right);
 					Emit(Mov(position,left,IntermediateCode.Memory(addressType,left,0)));
@@ -2205,7 +2208,7 @@ TYPE
 			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 			Emit(Br(position,op));
 			section := previousSection;
-		END CreateMoveMethod
+		END CreateMoveMethod;
 
 		PROCEDURE ResetVariables ();
 		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter;
@@ -7154,10 +7157,7 @@ TYPE
 						IntermediateCode.MakeMemory(operand.tag,addressType);
 					END;
 				ELSE
-					IF backend.cooperative THEN
-						Emit(Mov(position,operand.tag, IntermediateCode.Memory(addressType,operand.tag, 0)));
-						IntermediateCode.AddOffset(operand.tag,ToMemoryUnits(system,addressType.sizeInBits));
-					ELSE
+					IF ~backend.cooperative THEN
 						IntermediateCode.AddOffset(operand.tag,ToMemoryUnits(system,-addressType.sizeInBits));
 					END;
 					IntermediateCode.MakeMemory(operand.tag,addressType);
@@ -7192,13 +7192,13 @@ TYPE
 			type := x.type.resolved;
 			Dereference(d,type,IsUnsafePointer(x.left.type));
 			result := d;
+(*
 			IF backend.cooperative & (x.left.type.resolved IS SyntaxTree.PointerType) & ~x.left.type.resolved(SyntaxTree.PointerType).isPlain THEN
-				IF (type IS SyntaxTree.RecordType) & type(SyntaxTree.RecordType).isObject THEN
-					IntermediateCode.AddOffset(result.op,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
-				ELSE
+				IF ~(type IS SyntaxTree.RecordType) OR ~type(SyntaxTree.RecordType).isObject THEN
 					IntermediateCode.AddOffset(result.op,BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 				END;
 			END;
+*)
 			destination := dest;
 			IF Trace THEN TraceExit("VisitDereferenceDesignator") END;
 		END VisitDereferenceDesignator;
@@ -7461,7 +7461,7 @@ TYPE
 		END GetBaseRegister;
 
 		PROCEDURE VisitVariable(x: SyntaxTree.Variable);
-		VAR symbol: Sections.Section;  type: SyntaxTree.Type; name: Basic.SegmentedName; temp: IntermediateCode.Operand; reg: LONGINT;
+		VAR symbol: Sections.Section;  type: SyntaxTree.Type; recordType: SyntaxTree.RecordType; name: Basic.SegmentedName; temp: IntermediateCode.Operand; reg: LONGINT;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitVariable");  END;
 			type := x.type.resolved;
@@ -7500,6 +7500,13 @@ TYPE
 					result.op := temp;
 				END;
 				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,x.offsetInBits));
+
+				IF backend.cooperative & (x.scope IS SyntaxTree.RecordScope) THEN
+					recordType := x.scope(SyntaxTree.RecordScope).ownerRecord;
+					IF recordType.isObject & ~recordType.pointerType.isPlain THEN
+						IntermediateCode.AddOffset(result.op,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+					END;
+				END;
 			END;
 
 			IF conditional & (x.type.resolved IS SyntaxTree.BooleanType) THEN
@@ -7667,7 +7674,7 @@ TYPE
 		END VisitParameter;
 
 		PROCEDURE DynamicCallOperand(VAR operand: Operand; x: SyntaxTree.Procedure);
-		VAR tag,reg,tmp: IntermediateCode.Operand;
+		VAR tag,reg,tmp: IntermediateCode.Operand; offset: LONGINT;
 		BEGIN
 			IF Trace THEN TraceEnter("DynamicCallOperand") END;
 			(* left.p: left already emitted *)
@@ -7678,8 +7685,18 @@ TYPE
 			(* get method adr *)
 			Reuse1(reg,tmp);
 			ReleaseIntermediateOperand(tmp);
-			Emit(Add(position,reg,tmp,IntermediateCode.Immediate(addressType, ToMemoryUnits(system,system.addressSize  *(meta.MethodTableOffset - x.methodNumber)))));
-
+			
+			IF backend.cooperative THEN
+				IF x.scope(SyntaxTree.RecordScope).ownerRecord.pointerType.isPlain THEN
+					offset := 0;
+				ELSE
+					offset := 1;
+				END;
+				Emit(Add(position,reg,tmp,IntermediateCode.Immediate(addressType, ToMemoryUnits(system,system.addressSize  *(meta.MethodTableOffset + x.methodNumber + offset)))));
+			ELSE
+				Emit(Add(position,reg,tmp,IntermediateCode.Immediate(addressType, ToMemoryUnits(system,system.addressSize  *(meta.MethodTableOffset - x.methodNumber)))));
+			END;
+			
 			InitOperand(operand,ModeReference);
 			(* then operand.op contains the method adr and operand.tag contains the potential self pointer value *)
 			operand.op := reg;
@@ -8912,7 +8929,12 @@ TYPE
 
 		PROCEDURE &InitMetaDataGenerator(implementationVisitor: ImplementationVisitor; declarationVisitor: DeclarationVisitor; simple: BOOLEAN);
 		BEGIN
-			IF simple THEN
+			IF implementationVisitor.backend.cooperative THEN
+				TypeTags := MAX(LONGINT); (* only 3 extensions allowed *)
+				BaseTypesTableOffset := 0;
+				MethodTableOffset := 2;
+				TypeRecordBaseOffset := 0;			
+			ELSIF simple THEN
 				TypeTags := 3; (* only 3 extensions allowed *)
 				BaseTypesTableOffset := -1;
 				MethodTableOffset := -TypeTags+BaseTypesTableOffset;
@@ -9943,9 +9965,6 @@ TYPE
 			PatchLongint(source,pc,numberPointers);
 		END PointerArray;
 
-
-
-
 		PROCEDURE CheckTypeDeclaration(x: SyntaxTree.Type);
 		VAR recordType: SyntaxTree.RecordType;
 			tir: IntermediateCode.Section; op: IntermediateCode.Operand; name: Basic.SegmentedName; td: SyntaxTree.TypeDeclaration;
@@ -10082,7 +10101,7 @@ TYPE
 			END GetSection;
 
 			PROCEDURE NewTypeDescriptor;
-			VAR name: Basic.SegmentedName; op: IntermediateCode.Operand; source, base: IntermediateCode.Section;
+			VAR name, stackFrame: Basic.SegmentedName; op: IntermediateCode.Operand; source, base: IntermediateCode.Section;
 				procedure: SyntaxTree.Procedure; variable: SyntaxTree.Variable;
 				baseRecord: SyntaxTree.RecordType; baseTD: SyntaxTree.TypeDeclaration;
 				numberPointers: LONGINT;  padding,offset, i: LONGINT;
@@ -10211,24 +10230,32 @@ TYPE
 
 						Info(source, "base record descriptor");
 						Symbol(source, base, 0, 0);
-						
+
 						baseRecord := recordType;
-						WHILE (baseRecord # NIL) & ~baseRecord.hasPointers DO
+						WHILE baseRecord.baseType # NIL DO
 							baseRecord := baseRecord.GetBaseRecord ();
 						END;
-						IF baseRecord # NIL THEN
-							GetRecordTypeName (baseRecord, name);
-						ELSIF recordType.isObject THEN
-							Basic.ToSegmentedName ("BaseTypes.Object",name);
-						ELSE
-							Basic.ToSegmentedName ("BaseTypes.Record",name);
+						GetRecordTypeName (baseRecord, name);
+						Basic.ToSegmentedName ("BaseTypes.StackFrame", stackFrame);
+						IF name # stackFrame THEN
+							baseRecord := recordType;
+							WHILE (baseRecord # NIL) & ~baseRecord.hasPointers DO
+								baseRecord := baseRecord.GetBaseRecord ();
+							END;
+							IF baseRecord # NIL THEN
+								GetRecordTypeName (baseRecord, name);
+							ELSIF recordType.isObject THEN
+								Basic.ToSegmentedName ("BaseTypes.Object",name);
+							ELSE
+								Basic.ToSegmentedName ("BaseTypes.Record",name);
+							END;
+							IF ~recordType.isObject THEN
+								Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
+							END;
+							Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+							tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
+							Symbol(source, tir,  0, 0);
 						END;
-						IF ~recordType.isObject THEN
-							Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
-						END;
-						Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
-						tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
-						Symbol(source, tir,  0, 0);
 						CooperativeMethodTable;
 						source.SetReferenced(FALSE);
 						
