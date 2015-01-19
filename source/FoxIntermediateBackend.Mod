@@ -7125,7 +7125,9 @@ TYPE
 						IntermediateCode.MakeMemory(ptr,addressType);
 						Emit(Mov(position,tag, ptr));
 					END;
-					IntermediateCode.AddOffset(tag,ToMemoryUnits(system,-addressType.sizeInBits));
+					IF ~backend.cooperative THEN
+						IntermediateCode.AddOffset(tag,ToMemoryUnits(system,-addressType.sizeInBits));
+					END;
 					IntermediateCode.MakeMemory(tag,addressType);
 				ELSE
 					tag := result.tag;
@@ -8881,11 +8883,6 @@ TYPE
 					exitLabel := NewLabel ();
 					VisitStatementBlock(x);
 					SetLabel(exitLabel);
-					IF backend.cooperative THEN
-						IF HasPointers (procedure.procedureScope) THEN ResetVariables; CreateResetMethod (procedure.procedureScope) END;
-						IF HasVariableParameters (procedure.procedureScope) THEN CreateMoveMethod (procedure.procedureScope) END;
-						IF HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope) THEN CreateProcedureDescriptor (procedure) END;
-					END;
 				ELSE
 					VisitCode(x.code)
 				END;
@@ -8897,9 +8894,12 @@ TYPE
 					ProfilerEnterExit(numberProcedures,FALSE);
 					INC(numberProcedures);
 				END;
-
 			END;
-			IF newObjectFile & moduleBody  & ~suppressModuleRegistration & ~meta.simple & ~backend.cooperative THEN
+			IF backend.cooperative THEN
+				IF HasPointers (procedure.procedureScope) THEN ResetVariables; CreateResetMethod (procedure.procedureScope) END;
+				IF HasVariableParameters (procedure.procedureScope) THEN CreateMoveMethod (procedure.procedureScope) END;
+				IF HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope) THEN CreateProcedureDescriptor (procedure) END;
+			ELSIF newObjectFile & moduleBody  & ~suppressModuleRegistration & ~meta.simple THEN
 				PushSelfPointer();
 				CallThis("Modules","SetInitialized",1);
 				SetLabel(end);
