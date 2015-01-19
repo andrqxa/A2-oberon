@@ -6359,10 +6359,11 @@ TYPE
 			- check parameter kind and set read-only flags if appropriate
 		**)
 		PROCEDURE VisitParameter(parameter: SyntaxTree.Parameter);
-		VAR expression: SyntaxTree.Expression;
+		VAR modifiers: SyntaxTree.Modifier; expression: SyntaxTree.Expression; position: LONGINT;
 		BEGIN
 			IF Trace THEN D.Str("VisitParameter "); D.Str0(parameter.name);  D.Ln;  END;
 			IF SymbolNeedsResolution(parameter) THEN
+				modifiers := parameter.modifiers;
 				parameter.SetType(ResolveType(parameter.type));
 				ASSERT(parameter.type.resolved # NIL);
 				CheckSymbolVisibility(parameter);
@@ -6377,7 +6378,15 @@ TYPE
 						END;
 					END;
 				END;
-				parameter.SetState(SyntaxTree.Resolved);
+				IF HasFlag(modifiers, Global.NameUntraced,position) THEN
+					parameter.SetUntraced(TRUE);
+					IF ~ContainsPointer(parameter.type) THEN
+						IF VerboseErrorMessage THEN Printout.Info("parameter",parameter); Printout.Info("parameter.type",parameter.type.resolved); END;
+						Error(position,Diagnostics.Invalid,"untraced flag on non-pointer variable");
+					END;
+				END;
+				CheckModifiers(modifiers, ~InCellNetScope(parameter.scope) OR ~(parameter.type.resolved IS SyntaxTree.CellType));
+			parameter.SetState(SyntaxTree.Resolved);
 			END;
 		END VisitParameter;
 
