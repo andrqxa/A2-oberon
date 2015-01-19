@@ -1986,9 +1986,6 @@ TYPE
 
 				ASSERT(type IS SyntaxTree.RecordType);
 
-				level := type(SyntaxTree.RecordType).Level();
-				(* get type desc tag of level relative to base tag *)
-				offset := (meta.BaseTypesTableOffset - level) * addressType.sizeInBits;
 				(*
 				IntermediateCode.MakeMemory(tag,addressType); (*! already done during generation *)
 				*)
@@ -2008,6 +2005,9 @@ TYPE
 					Emit(Mov(position,left,IntermediateCode.Memory(addressType,left,0)));
 					BrneL(repeatL,left,nil);
 				ELSE
+					level := type(SyntaxTree.RecordType).Level();
+					(* get type desc tag of level relative to base tag *)
+					offset := (meta.BaseTypesTableOffset - level) * addressType.sizeInBits;
 					IntermediateCode.AddOffset(left,ToMemoryUnits(system,offset));
 					IntermediateCode.MakeMemory(left,addressType);
 					BreqL(trueL,left,right);
@@ -2198,6 +2198,7 @@ TYPE
 						BrgeL (skip,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3)));
 						Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
 						Emit (Mov(position,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits)),value));
+						ReleaseIntermediateOperand (value);
 						SetLabel (skip);
 					END;
 				END;
@@ -7192,13 +7193,11 @@ TYPE
 			type := x.type.resolved;
 			Dereference(d,type,IsUnsafePointer(x.left.type));
 			result := d;
-(*
 			IF backend.cooperative & (x.left.type.resolved IS SyntaxTree.PointerType) & ~x.left.type.resolved(SyntaxTree.PointerType).isPlain THEN
 				IF ~(type IS SyntaxTree.RecordType) OR ~type(SyntaxTree.RecordType).isObject THEN
 					IntermediateCode.AddOffset(result.op,BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 				END;
 			END;
-*)
 			destination := dest;
 			IF Trace THEN TraceExit("VisitDereferenceDesignator") END;
 		END VisitDereferenceDesignator;
