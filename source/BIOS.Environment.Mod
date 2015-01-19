@@ -29,7 +29,7 @@ VAR previousTimerHandler: CPU.InterruptHandler;
 
 PROCEDURE {NORETURN} Abort-;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	IF Activities.GetCurrentActivity () # NIL THEN Activities.TerminateCurrentActivity END;
+	IF SYSTEM.GetActivity () # NIL THEN Activities.TerminateCurrentActivity END;
 	Exit (ShuttingDown);
 END Abort;
 
@@ -258,6 +258,7 @@ END GetInit;
 PROCEDURE Initialize-;
 CONST Channel0 = 0; RateGenerator = 4;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	SYSTEM.SetActivity (NIL);
 	CPU.Initialize;
 	ReadBootTable (bootFlag);
 	InitTrace;
