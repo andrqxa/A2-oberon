@@ -9814,6 +9814,27 @@ TYPE
 				crc*: LONGINT;
 		*)
 
+		PROCEDURE BasePointer (section: IntermediateCode.Section);
+		BEGIN
+			Info(section, "cycle");
+			Size(section,0);
+			Info(section, "references");
+			Size(section,0);
+			Info(section, "nextMarked");
+			Address(section,0);
+			Info(section, "nextWatched");
+			Address(section,0);
+		END BasePointer;
+		
+		PROCEDURE BaseObject (section: IntermediateCode.Section);
+		BEGIN
+			BasePointer(section);
+			Info(section, "action");
+			Address(section,0);
+			Info(section, "monitor");
+			Address(section,0);
+		END BaseObject;
+
 		PROCEDURE ModuleSection(): IntermediateCode.Section;
 		VAR name: ARRAY 128 OF CHAR;
 			moduleSection,moduleTD: IntermediateCode.Section; offset: LONGINT; pooledName: Basic.SegmentedName;
@@ -9825,13 +9846,20 @@ TYPE
 			moduleSection := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, pooledName,NIL,TRUE);
 			moduleSection.SetExported(TRUE);
 			IF moduleSection.pc = 0 THEN
-				ProtectedHeapBlock("Heaps","ProtRecBlockDesc",moduleSection,2);
-				Info(moduleSection, "HeapBlock");
-				Symbol(moduleSection,moduleSection,2,0);
-				Info(moduleSection, "TypeDescriptor");
-				symbol := implementationVisitor.GetTypeDescriptor("Modules","Module", pooledName);
-				offset := ToMemoryUnits(module.system,(1 + 1 (*= numberMethods*) +16+1)*module.system.addressSize);
-				NamedSymbol(moduleSection, pooledName,symbol, 0, offset);
+				IF implementationVisitor.backend.cooperative THEN
+					Info(moduleSection, "descriptor");
+					symbol := implementationVisitor.GetTypeDescriptor("Modules","Module", pooledName);
+					NamedSymbol(moduleSection, pooledName,symbol, 0, 0);
+					BaseObject(moduleSection);
+				ELSE
+					ProtectedHeapBlock("Heaps","ProtRecBlockDesc",moduleSection,2);
+					Info(moduleSection, "HeapBlock");
+					Symbol(moduleSection,moduleSection,2,0);
+					Info(moduleSection, "TypeDescriptor");
+					symbol := implementationVisitor.GetTypeDescriptor("Modules","Module", pooledName);
+					offset := ToMemoryUnits(module.system,(TypeRecordBaseOffset + 1 (*= numberMethods*))*module.system.addressSize);
+					NamedSymbol(moduleSection, pooledName,symbol, 0, offset);
+				END;
 			END;
 			RETURN moduleSection;
 		END ModuleSection;
