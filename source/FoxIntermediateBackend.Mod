@@ -628,11 +628,18 @@ TYPE
 
 
 					IF (procedureType.returnType = NIL) OR (scope.body.code # NIL)  THEN
+						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
 						ir.Emit(implementationVisitor.Leave(x.position,x,cc));
 						ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
 					ELSIF ~scope.body.isUnchecked & ~backend.noRuntimeChecks THEN
-						ir.Emit(Trap(x.position,ReturnTrap));
+						implementationVisitor.EmitTrap(x.position,ReturnTrap);
+						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
+						IF backend.cooperative THEN
+							ir.Emit(implementationVisitor.Leave(x.position,x,cc));
+							ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
+						END;
 					ELSE
+						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
 						ir.Emit(Nop(x.position));
 					END
 				END;
@@ -8813,6 +8820,7 @@ TYPE
 			IF Trace THEN TraceEnter("Body") END;
 			ReleaseUsedRegisters(saved); (* just in case ... *)
 			section := ir;
+			exitLabel := NewLabel ();
 			IF moduleBody THEN moduleBodySection := section END;
 			IF ir.comments # NIL THEN
 				commentPrintout := Printout.NewPrinter(ir.comments,Printout.SourceCode,FALSE);
@@ -8880,9 +8888,7 @@ TYPE
 				ParameterCopies(procedureType);
 				InitVariables(scope);
 				IF x.code = NIL THEN
-					exitLabel := NewLabel ();
 					VisitStatementBlock(x);
-					SetLabel(exitLabel);
 				ELSE
 					VisitCode(x.code)
 				END;
