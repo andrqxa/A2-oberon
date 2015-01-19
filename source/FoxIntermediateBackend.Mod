@@ -640,7 +640,12 @@ TYPE
 						END;
 					ELSE
 						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
-						ir.Emit(Nop(x.position));
+						IF backend.cooperative THEN
+							ir.Emit(implementationVisitor.Leave(x.position,x,cc));
+							ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
+						ELSE
+							ir.Emit(Nop(x.position));
+						END;
 					END
 				END;
 			ELSE (* force body for procedures *)
