@@ -1412,6 +1412,15 @@ TYPE
 		BEGIN SELF.isObject := isObject
 		END IsObject;
 
+		PROCEDURE IsActive*(): BOOLEAN;
+		VAR base: RecordType;
+		BEGIN
+			IF (recordScope.bodyProcedure # NIL) & (recordScope.bodyProcedure.procedureScope.body # NIL) & (recordScope.bodyProcedure.procedureScope.body.isActive) THEN RETURN TRUE END;
+			base := GetBaseRecord();
+			IF base # NIL THEN RETURN IsActive() END;
+			RETURN FALSE
+		END IsActive;
+
 		PROCEDURE IsProtected*(): BOOLEAN;
 		VAR base: RecordType;
 		BEGIN

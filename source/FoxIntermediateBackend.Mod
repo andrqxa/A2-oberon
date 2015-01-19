@@ -77,6 +77,9 @@ CONST
 		
 		BasePointerTypeSize = 5;
 		BaseObjectTypeSize = 7;
+		ActionTypeSize = 3;
+		MonitorTypeSize = 7;
+		
 TYPE
 	SupportedInstructionProcedure* = PROCEDURE {DELEGATE} (CONST instr: IntermediateCode.Instruction; VAR moduleName,procedureName: ARRAY OF CHAR): BOOLEAN;
 	SupportedImmediateProcedure* = PROCEDURE {DELEGATE} (CONST op: IntermediateCode.Operand): BOOLEAN;
@@ -5956,6 +5959,7 @@ TYPE
 			dest: IntermediateCode.Operand;
 			staticLength: LONGINT; itype: IntermediateCode.Type;
 			convert,isTensor: BOOLEAN;
+			recordType: SyntaxTree.RecordType;
 			flags: SET;
 			left: SyntaxTree.Expression;
 			call: SyntaxTree.Designator;
@@ -6376,18 +6380,43 @@ TYPE
 				type := p0.type.resolved;
 				IF (type IS SyntaxTree.PointerType) & (type(SyntaxTree.PointerType).pointerBase.resolved IS SyntaxTree.RecordType)
 				THEN
+					recordType := type(SyntaxTree.PointerType).pointerBase.resolved(SyntaxTree.RecordType);
 					IF backend.cooperative THEN
-						size := ToMemoryUnits(system,system.SizeOf(type(SyntaxTree.PointerType).pointerBase.resolved));
-						IF ~type(SyntaxTree.PointerType).isPlain THEN INC (size, BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits)) END;
+						size := ToMemoryUnits(system,system.SizeOf(recordType));
+						IF ~type(SyntaxTree.PointerType).isPlain THEN
+							IF recordType.isObject THEN
+								INC (size, BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+								IF recordType.IsActive() THEN
+									INC (size, ActionTypeSize * ToMemoryUnits(system,addressType.sizeInBits))
+								END;
+								IF recordType.IsProtected() THEN
+									INC (size, MonitorTypeSize * ToMemoryUnits(system,addressType.sizeInBits))
+								END;
+							ELSE
+								INC (size, BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+							END;
+						END;
 						Emit(Push(position,IntermediateCode.Immediate(sizeType,size)));
 						CallThis("Runtime","New", 1);
 						res := NewRegisterOperand(IntermediateCode.GetType(system, p0.type));
 						Emit(Result(position, res));
 						exit := NewLabel();
 						BreqL(exit,res,nil);
-						reg := TypeDescriptorAdr(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved);
-						Emit(Mov(position,IntermediateCode.Memory(addressType,res,0),reg));
-						ReleaseIntermediateOperand(reg);
+						IF ~type(SyntaxTree.PointerType).isPlain THEN
+							reg := TypeDescriptorAdr(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved);
+							Emit(Mov(position,IntermediateCode.Memory(addressType,res,0),reg));
+							ReleaseIntermediateOperand(reg);
+							IF recordType.isObject THEN
+								IF recordType.IsProtected() THEN
+									DEC (size, MonitorTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+									Emit(Mov(position,IntermediateCode.Memory(addressType,res,(BasePointerTypeSize + 1) * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,res.register,size)));
+								END;
+								IF recordType.IsActive() THEN
+									DEC (size, ActionTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+									Emit(Mov(position,IntermediateCode.Memory(addressType,res,(BasePointerTypeSize + 0) * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,res.register,size)));
+								END;
+							END;
+						END;
 						SetLabel(exit);
 						Designate(p0,l);
 						Emit(Mov(position,IntermediateCode.Memory(addressType,l.op,0),res));

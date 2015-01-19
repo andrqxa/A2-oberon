@@ -872,6 +872,11 @@ TYPE
 	BEGIN InitRegister(op,type,registerClass, register); RETURN op
 	END Register;
 
+	PROCEDURE RegisterOffset*(type: Type; registerClass: RegisterClass; register, offset: LONGINT): Operand;
+	VAR op: Operand;
+	BEGIN InitRegister(op,type,registerClass, register); SetOffset (op, offset); RETURN op
+	END RegisterOffset;
+
 	PROCEDURE AddOffset*(VAR op: Operand; offset: LONGINT);
 	BEGIN
 		Assert((op.mode = ModeRegister) OR (op.mode = ModeImmediate) & (op.type.form IN {SignedInteger, UnsignedInteger}),"offset not on register or integer immediate");
