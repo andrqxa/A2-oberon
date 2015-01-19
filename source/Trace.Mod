@@ -159,7 +159,7 @@ END Memory;
 
 (* Write basic stack frame information *)
 PROCEDURE StackFrames- (skip, count, size: SIZE);
-VAR frame {UNTRACED}: POINTER {UNSAFE} TO RECORD previous, caller, parameters: ADDRESS END;
+VAR frame {UNTRACED}: POINTER {UNSAFE} TO RECORD descriptor, previous, caller, parameters: ADDRESS END;
 BEGIN {UNCOOPERATIVE}
 	frame := ADDRESS OF frame + SIZE OF ADDRESS;
 	WHILE skip # 0 DO
