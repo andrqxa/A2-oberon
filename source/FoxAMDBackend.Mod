@@ -3167,11 +3167,11 @@ TYPE
 		BEGIN
 			IF system = NIL THEN
 				IF bits=32 THEN
-					NEW(system,8,8,32, 8,32,32,32,64,0);
+					NEW(system,8,8,32, 8,32,32,32,64,0,cooperative);
 					Global.SetDefaultDeclarations(system,8);
 					Global.SetDefaultOperators(system);
 				ELSE
-					NEW(system,8,8,64,8,64,64,64,128,4 (* parameter registers *));
+					NEW(system,8,8,64,8,64,64,64,128,4 (* parameter registers *),cooperative);
 					Global.SetDefaultDeclarations(system,8);
 					Global.SetDefaultOperators(system);
 				END;

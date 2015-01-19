@@ -247,7 +247,7 @@ TYPE
 
 		CanPassInRegister-: PassInRegisterProc;
 
-		PROCEDURE &InitSystem*(codeUnit, dataUnit: LONGINT; addressSize, minVarAlign, maxVarAlign, minParAlign, maxParAlign, offsetFirstPar, registerParameters: LONGINT);
+		PROCEDURE &InitSystem*(codeUnit, dataUnit: LONGINT; addressSize, minVarAlign, maxVarAlign, minParAlign, maxParAlign, offsetFirstPar, registerParameters: LONGINT; cooperative: BOOLEAN);
 		VAR i: LONGINT;
 		BEGIN
 			ASSERT(dataUnit > 0);
@@ -264,6 +264,7 @@ TYPE
 			SELF.parameterAlignment.max := maxParAlign;
 			SELF.offsetFirstParameter := offsetFirstPar;
 			SELF.registerParameters := registerParameters;
+			IF cooperative THEN INC(SELF.offsetFirstParameter,addressSize) END;
 			activeCellsCapabilities := NIL;
 			BuildScopes(SELF);
 			FOR i := 0 TO LEN(operatorDefined)-1 DO
@@ -878,7 +879,7 @@ TYPE
 	PROCEDURE DefaultSystem*(): System;
 	VAR system: System;
 	BEGIN
-		NEW(system,8,8,32, 8,32,32,32,64,0);
+		NEW(system,8,8,32, 8,32,32,32,64,0,FALSE);
 		SetDefaultDeclarations(system,8);
 		SetDefaultOperators(system);
 		RETURN system
