@@ -6398,29 +6398,67 @@ TYPE
 						END;
 						Emit(Push(position,IntermediateCode.Immediate(sizeType,size)));
 						CallThis("Runtime","New", 1);
-						res := NewRegisterOperand(IntermediateCode.GetType(system, p0.type));
-						Emit(Result(position, res));
+						pointer := NewRegisterOperand(IntermediateCode.GetType(system, p0.type));
+						Emit(Result(position, pointer));
 						exit := NewLabel();
-						BreqL(exit,res,nil);
+						BreqL(exit,pointer,nil);
 						IF ~type(SyntaxTree.PointerType).isPlain THEN
 							reg := TypeDescriptorAdr(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved);
-							Emit(Mov(position,IntermediateCode.Memory(addressType,res,0),reg));
+							Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,0),reg));
 							ReleaseIntermediateOperand(reg);
 							IF recordType.isObject THEN
 								IF recordType.IsProtected() THEN
 									DEC (size, MonitorTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
-									Emit(Mov(position,IntermediateCode.Memory(addressType,res,(BasePointerTypeSize + 1) * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,res.register,size)));
+									Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,(BasePointerTypeSize + 1) * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,pointer.register,size)));
 								END;
 								IF recordType.IsActive() THEN
 									DEC (size, ActionTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
-									Emit(Mov(position,IntermediateCode.Memory(addressType,res,(BasePointerTypeSize + 0) * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,res.register,size)));
+									Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,(BasePointerTypeSize + 0) * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,pointer.register,size)));
 								END;
 							END;
 						END;
+						
+						(* initialize fields *)
+						IF type(SyntaxTree.PointerType).isPlain THEN
+							size := 0;
+						ELSIF recordType.isObject THEN
+							size := BaseObjectTypeSize;
+						ELSE
+							size := BasePointerTypeSize;
+						END;
+						InitFields(recordType, pointer,size*ToMemoryUnits(system,addressType.sizeInBits));
+
+						(* call initializer *)
+						constructor := GetConstructor(recordType);
+						IF constructor # NIL THEN
+							(*! should be unified with ProcedureCallDesignator *)
+							Emit(Push(position,pointer));
+							ReleaseIntermediateOperand(pointer);
+							formalParameter := constructor.type(SyntaxTree.ProcedureType).firstParameter;
+							FOR i := 1 TO x.parameters.Length()-1 DO
+								PushParameter(x.parameters.GetExpression(i), formalParameter,SyntaxTree.OberonCallingConvention, FALSE, dummy,-1);
+								formalParameter := formalParameter.nextParameter;
+							END;
+							(* static call of the constructor *)
+							Global.GetSymbolSegmentedName(constructor,name);
+							ASSERT(~constructor.isInline);
+							IF constructor.scope.ownerModule # module.module THEN
+								symbol := NewSection(module.importedSections, Sections.CodeSection, name,constructor,commentPrintout # NIL);
+							ELSE
+								symbol := NewSection(module.allSections, Sections.CodeSection, name,constructor,commentPrintout # NIL);
+							END;
+							Emit(Call(position,IntermediateCode.Address(addressType, symbol.name, GetFingerprint(constructor), 0),ProcedureParametersSize(system,constructor) - ToMemoryUnits(system,addressType.sizeInBits)));
+							IntermediateCode.InitRegister(pointer,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
+							Emit(Pop(position,pointer));
+						END;
+
+						(* call bodies *)
+						CallBodies(pointer,p0.type);
+						
 						SetLabel(exit);
 						Designate(p0,l);
-						Emit(Mov(position,IntermediateCode.Memory(addressType,l.op,0),res));
-						ReleaseIntermediateOperand(res);
+						Emit(Mov(position,IntermediateCode.Memory(addressType,l.op,0),pointer));
+						ReleaseIntermediateOperand(pointer);
 						ReleaseOperand(l);
 					ELSE
 						temporaryVariable := GetTemporaryVariable(type, FALSE);
@@ -6435,7 +6473,7 @@ TYPE
 						ReleaseOperand(l);
 
 							(* push type descriptor *)
-							reg := TypeDescriptorAdr(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved);
+							reg := TypeDescriptorAdr(recordType);
 							IF ~newObjectFile THEN
 								IntermediateCode.MakeMemory(reg,addressType);
 							END;
@@ -6459,10 +6497,10 @@ TYPE
 						Emit(Push(position,pointer));
 
 						(* initialize fields *)
-						InitFields(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved, pointer,0);
+						InitFields(recordType, pointer,0);
 
 						(* call initializer *)
-						constructor := GetConstructor(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved(SyntaxTree.RecordType));
+						constructor := GetConstructor(recordType);
 						IF constructor # NIL THEN
 							(*! should be unified with ProcedureCallDesignator *)
 							Emit(Push(position,pointer));
