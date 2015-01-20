@@ -1417,7 +1417,7 @@ TYPE
 		BEGIN
 			IF (recordScope.bodyProcedure # NIL) & (recordScope.bodyProcedure.procedureScope.body # NIL) & (recordScope.bodyProcedure.procedureScope.body.isActive) THEN RETURN TRUE END;
 			base := GetBaseRecord();
-			IF base # NIL THEN RETURN IsActive() END;
+			IF base # NIL THEN RETURN base.IsActive() END;
 			RETURN FALSE
 		END IsActive;
 
