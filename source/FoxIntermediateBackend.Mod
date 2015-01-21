@@ -6253,7 +6253,7 @@ TYPE
 				EmitTrap (position, val);
 			(* ---- ASSERT ----- *)
 			|Global.Assert:
-				IF ~backend.noAsserts THEN
+				IF ~backend.noAsserts & (p0.resolved = NIL) THEN
 					trueL := NewLabel();
 					falseL := NewLabel();
 					Condition(p0,trueL,falseL);
