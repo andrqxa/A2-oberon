@@ -170,8 +170,8 @@ BEGIN {UNCOOPERATIVE}
 	WHILE count # 0 DO
 		Address (frame.caller); Char (':'); Ln;
 		IF frame.previous = NIL THEN RETURN END;
-		IF frame.previous - ADDRESS OF frame.previous <= size THEN
-			Memory (ADDRESS OF frame.parameters, frame.previous - ADDRESS OF frame.previous);
+		IF frame.previous - ADDRESS OF frame.descriptor <= size THEN
+			Memory (ADDRESS OF frame.parameters, frame.previous - ADDRESS OF frame.descriptor);
 		ELSIF size # 0 THEN
 			Memory (ADDRESS OF frame.parameters, size); String ("..."); Ln;
 		END;
