@@ -7389,7 +7389,11 @@ TYPE
 			IF scope.outerScope IS SyntaxTree.ModuleScope THEN
 				IF newObjectFile THEN
 					moduleSection := meta.ModuleSection();
-					moduleOffset := moduleSection.pc;
+					IF backend.cooperative THEN
+						moduleOffset := 0;
+					ELSE
+						moduleOffset := moduleSection.pc;
+					END;
 					result.mode := ModeValue;
 					result.op := IntermediateCode.Address(addressType, moduleSection.name, GetFingerprint(moduleSection.symbol), moduleOffset);
 				ELSE
@@ -8742,7 +8746,11 @@ TYPE
 					IntermediateCode.MakeMemory(op.op,addressType);
 				ELSE
 					moduleSection := meta.ModuleSection();
-					moduleOffset := moduleSection.pc;
+					IF backend.cooperative THEN
+						moduleOffset := 0;
+					ELSE
+						moduleOffset := moduleSection.pc;
+					END;
 					op.op := IntermediateCode.Address(addressType, moduleSection.name, GetFingerprint(moduleSection.symbol), moduleOffset);
 				END;
 			ELSE
