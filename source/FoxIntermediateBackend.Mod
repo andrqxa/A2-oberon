@@ -76,7 +76,8 @@ CONST
 		StrictChecks = FALSE;
 		
 		BasePointerTypeSize = 5;
-		BaseObjectTypeSize = 7;
+		BaseArrayTypeSize = BasePointerTypeSize + 3;
+		BaseObjectTypeSize = BasePointerTypeSize + 2;
 		ActionTypeSize = 3;
 		MonitorTypeSize = 7;
 		
@@ -6586,10 +6587,19 @@ TYPE
 					IF backend.cooperative THEN
 
 						size := ToMemoryUnits(system,system.SizeOf(type));
+						WHILE type IS SyntaxTree.ArrayType DO
+							type := type(SyntaxTree.ArrayType).arrayBase.resolved;
+						END;
+						size := size DIV ToMemoryUnits(system,system.SizeOf(type));
 						IF (size # 1) THEN
 							Emit(Mul(position,reg,reg,IntermediateCode.Immediate(addressType,size))); (*! optimize the multiplication of immediate operands *)
 						END;
-						Emit(Add(position,reg,reg,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(BasePointerTypeSize + openDim)* system.addressSize))));
+						Emit(Push(position,reg));
+						size := ToMemoryUnits(system,system.SizeOf(type));
+						IF (size # 1) THEN
+							Emit(Mul(position,reg,reg,IntermediateCode.Immediate(addressType,size))); (*! optimize the multiplication of immediate operands *)
+						END;
+						Emit(Add(position,reg,reg,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(BaseArrayTypeSize + openDim)* system.addressSize))));
 						Emit(Push(position,reg));
 						ReleaseIntermediateOperand(reg);
 						CallThis("Runtime","New", 1);
@@ -6599,21 +6609,34 @@ TYPE
 						exit := NewLabel();
 						else := NewLabel();
 						BreqL(else,pointer,nil);
-
-						Basic.ToSegmentedName ("BaseTypes.Array",name);
+						
+						IF ~type.hasPointers THEN 
+							Basic.ToSegmentedName ("BaseTypes.Array",name);
+						ELSIF type IS SyntaxTree.RecordType THEN
+							Basic.ToSegmentedName ("BaseTypes.RecordArray",name);
+						ELSE
+							Basic.ToSegmentedName ("BaseTypes.PointerArray",name);
+						END;
 						Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,0),IntermediateCode.Address(addressType,name,0,0)));
+
+						Emit(Pop(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + 0)* system.addressSize))));
+						Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + 1)* system.addressSize)),IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,pointer.register,ToMemoryUnits(system,(BaseArrayTypeSize + openDim)* system.addressSize))));
+						IF type IS SyntaxTree.RecordType THEN
+							GetRecordTypeName(type(SyntaxTree.RecordType),name);
+							Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + 2)* system.addressSize)),IntermediateCode.Address(addressType,name,0,0)));
+						ELSE
+							Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + 2)* system.addressSize)),nil));
+						END;
 						
 						i := openDim;
 						WHILE i > 0 DO
 							DEC (i);
-							Emit(Pop(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + i)* system.addressSize))));
+							Emit(Pop(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BaseArrayTypeSize + i)* system.addressSize))));
 						END;
 
 						SetLabel(else);
-						IF openDim > 0 THEN
-							BrL(exit);
-							Emit(Add(position,sp,sp,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,openDim*system.addressSize))));
-						END;
+						BrL(exit);
+						Emit(Add(position,sp,sp,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(openDim+1)*system.addressSize))));
 						SetLabel(exit);
 						Designate(p0,l);
 						Emit(Mov(position,IntermediateCode.Memory(addressType,l.op,0),pointer));
@@ -7293,9 +7316,9 @@ TYPE
 					END;
 				ELSE
 					IF backend.cooperative THEN
-						arrayDataOffset := (BasePointerTypeSize + DynamicDim(type)) * addressType.sizeInBits;
+						arrayDataOffset := (BaseArrayTypeSize + DynamicDim(type)) * addressType.sizeInBits;
 						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,arrayDataOffset));
-						IntermediateCode.AddOffset(operand.tag,ToMemoryUnits(system,BasePointerTypeSize*system.addressSize));
+						IntermediateCode.AddOffset(operand.tag,ToMemoryUnits(system,BaseArrayTypeSize*system.addressSize));
 					ELSE
 						arrayDataOffset := DynamicDim(type) * addressType.sizeInBits + 3 * addressType.sizeInBits;
 						INC(arrayDataOffset, (-arrayDataOffset) MOD ArrayAlignment);  (* round up to multiple of ArrayAlignment to ensure that first array element is aligned at 0 MOD ArrayAlignment *)

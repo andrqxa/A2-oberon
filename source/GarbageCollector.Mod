@@ -167,13 +167,24 @@ END Mark;
 
 (** Marks an array of pointers. *)
 (** This procedure is called by the compiler while tracing arrays of pointer type. *)
-PROCEDURE MarkArray- (CONST pointers: ARRAY OF BaseTypes.Pointer);
+PROCEDURE MarkPointerArray- (CONST pointers: ARRAY OF BaseTypes.Pointer);
 VAR i: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	FOR i := 0 TO LEN (pointers) - 1 DO
 		Mark (pointers[i]);
 	END;
-END MarkArray;
+END MarkPointerArray;
+
+(** Marks an array of records. *)
+(** This procedure is called by the compiler while tracing arrays of record type. *)
+PROCEDURE MarkRecordArray- (address: ADDRESS; length: SIZE; descriptor {UNTRACED}: BaseTypes.Descriptor);
+VAR i: SIZE;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	FOR i := 0 TO length - 1 DO
+		descriptor.trace (address);
+		INC (address, descriptor.size);
+	END;
+END MarkRecordArray;
 
 (* Acquires ownership of the specified linked list by exchanging its first item with its sentinel. *)
 PROCEDURE AcquireList (VAR first {UNTRACED}: BaseTypes.Pointer; sentinel {UNTRACED}: BaseTypes.Pointer): BaseTypes.Pointer;

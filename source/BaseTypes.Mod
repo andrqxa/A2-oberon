@@ -7,10 +7,17 @@ MODULE BaseTypes;
 
 IMPORT Counters, Queues;
 
+(** Represents a type descriptor. *)
+TYPE Descriptor* = POINTER {UNSAFE} TO RECORD
+	parent- {UNTRACED}: Descriptor;
+	size-: SIZE;
+	trace-: PROCEDURE (self: ADDRESS);
+END;
+
 (** Represents a pointer type. *)
 TYPE Pointer* = OBJECT {DISPOSABLE,PLAIN}
 
-	VAR descriptor-: ADDRESS; (* stores the address of the type descriptor *)
+	VAR descriptor- {UNTRACED}: Descriptor; (* stores the address of the type descriptor *)
 	VAR cycle* := 0: LONGWORD; (* stores the last garbage collection cycle which reached the pointer *)
 	VAR references*: Counters.Counter; (* counts how many times the pointer is referenced by local variables *)
 	VAR nextMarked* {UNTRACED} := NIL: Pointer; (* stores the next item in the linked list of marked pointers *)
@@ -25,7 +32,33 @@ END Pointer;
 (** Represents an array type. *)
 TYPE Array* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
 
+	VAR length: SIZE;
+	VAR data: ADDRESS;
+	VAR descriptor {UNTRACED}: Descriptor;
+
 END Array;
+
+(** Represents an array of pointer type. *)
+TYPE PointerArray* = OBJECT {DISPOSABLE,PLAIN} (Array)
+
+	PROCEDURE Trace-;
+	PROCEDURE MarkPointerArray EXTERN "GarbageCollector.MarkPointerArray" (address: ADDRESS; length: SIZE);
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		MarkPointerArray (data, length);
+	END Trace;
+
+END PointerArray;
+
+(** Represents an array of record type. *)
+TYPE RecordArray* = OBJECT {DISPOSABLE,PLAIN} (Array)
+
+	PROCEDURE Trace-;
+	PROCEDURE MarkRecordArray EXTERN "GarbageCollector.MarkRecordArray" (address: ADDRESS; length: SIZE; descriptor {UNTRACED}: Descriptor);
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		MarkRecordArray (data, length, descriptor);
+	END Trace;
+
+END RecordArray;
 
 (** Represents a record type. *)
 TYPE Record* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
