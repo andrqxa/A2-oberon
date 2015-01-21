@@ -6462,7 +6462,8 @@ TYPE
 						
 						SetLabel(exit);
 						Designate(p0,l);
-						Emit(Mov(position,IntermediateCode.Memory(addressType,l.op,0),pointer));
+						ToMemory(l.op,addressType,0);
+						Emit(Mov(position,l.op,pointer));
 						ReleaseIntermediateOperand(pointer);
 						ReleaseOperand(l);
 					ELSE
@@ -6643,7 +6644,8 @@ TYPE
 						Emit(Add(position,sp,sp,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(openDim+1)*system.addressSize))));
 						SetLabel(exit);
 						Designate(p0,l);
-						Emit(Mov(position,IntermediateCode.Memory(addressType,l.op,0),pointer));
+						ToMemory(l.op,addressType,0);
+						Emit(Mov(position,l.op,pointer));
 						ReleaseIntermediateOperand(pointer);
 						ReleaseOperand(l);
 					ELSE
@@ -7346,7 +7348,7 @@ TYPE
 			type := x.type.resolved;
 			Dereference(d,type,IsUnsafePointer(x.left.type));
 			result := d;
-			IF backend.cooperative & (x.left.type.resolved IS SyntaxTree.PointerType) & ~x.left.type.resolved(SyntaxTree.PointerType).isPlain THEN
+			IF backend.cooperative & (x.left.type.resolved IS SyntaxTree.PointerType) & ~x.left.type.resolved(SyntaxTree.PointerType).isPlain & ~x.left.type.resolved(SyntaxTree.PointerType).isUnsafe THEN
 				IF (type IS SyntaxTree.RecordType) & ~type(SyntaxTree.RecordType).isObject THEN
 					IntermediateCode.AddOffset(result.op,BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 				END;
