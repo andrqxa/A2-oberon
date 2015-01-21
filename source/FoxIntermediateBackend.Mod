@@ -9360,16 +9360,40 @@ TYPE
 			RETURN FALSE
 		END ExportDesc;
 
-		PROCEDURE Array(source: IntermediateCode.Section; VAR sizePC: LONGINT);
+		PROCEDURE Array(source: IntermediateCode.Section; VAR sizePC: LONGINT; CONST baseType: ARRAY OF  CHAR);
+		VAR name: Basic.SegmentedName;
 		BEGIN
 			Info(source,"ArrayHeader");
-			Address(source,0);
-			Address(source,0);
-			Address(source,0);
-			sizePC := source.pc;
-			Address(source,0);
-			Info(source,"array data");
+			IF implementationVisitor.backend.cooperative THEN
+				sizePC := source.pc;
+				Address(source,0);
+				NamedSymbol(source,source.name,NIL,0,ToMemoryUnits(implementationVisitor.system,(BaseArrayTypeSize + 1)*implementationVisitor.addressType.sizeInBits));
+				IF baseType # "" THEN
+					Basic.ToSegmentedName(baseType, name);
+					NamedSymbol(source, name,NIL, 0, 0);
+				ELSE
+					Address(source,0);
+				END;
+				Address(source,0);
+			ELSE
+				Address(source,0);
+				Address(source,0);
+				Address(source,0);
+				sizePC := source.pc;
+				Address(source,0);
+				Info(source,"array data");
+			END;
 		END Array;
+
+		PROCEDURE PatchArray(section: IntermediateCode.Section; pc: LONGINT; size: LONGINT);
+		BEGIN
+			IF implementationVisitor.backend.cooperative THEN
+				PatchLongint(section, pc, size);
+				PatchLongint(section, pc + 3, size);
+			ELSE
+				PatchLongint(section, pc, size);
+			END;
+		END PatchArray;
 
 		PROCEDURE ExportDescArray(source: IntermediateCode.Section; VAR size: LONGINT);
 		VAR
@@ -9377,12 +9401,12 @@ TYPE
 		BEGIN
 			NEW(fingerPrinter, module.system);
 			size := 0;
-			Array(source,sizePC);
+			Array(source,sizePC,"Modules.ExportDesc");
 			FOR i := 0 TO module.allSections.Length() - 1 DO
 				section := module.allSections.GetSection(i);
 				IF ExportDesc( source, fingerPrinter, section) THEN INC(size) END
 			END;
-			PatchLongint(source,sizePC,size);
+			PatchArray(source,sizePC,size);
 		END ExportDescArray;
 
 		PROCEDURE ExceptionArray(source: IntermediateCode.Section);
@@ -9391,7 +9415,7 @@ TYPE
 		BEGIN
 			Info(source, "exception table offsets array descriptor");
 			size := 0;
-			Array(source,sizePC);
+			Array(source,sizePC,"Modules.ExceptionTableEntry");
 			Info(source, "exception table content");
 			FOR i := 0 TO module.allSections.Length() - 1 DO
 				p := module.allSections.GetSection(i);
@@ -9405,7 +9429,7 @@ TYPE
 					END;
 				END
 			END;
-			PatchLongint(source,sizePC,size);
+			PatchArray(source,sizePC,size);
 			END ExceptionArray;
 
 			PROCEDURE Name(section: IntermediateCode.Section; CONST name: ARRAY OF CHAR);
@@ -9704,7 +9728,7 @@ TYPE
 
 
 			BEGIN
-				Array(section,sizePC);
+				Array(section,sizePC,"");
 
 				size := 0;
 				Char(section,0FFX); (* sign for trap writer *)
@@ -9725,7 +9749,7 @@ TYPE
 					END
 				END;
 
-				PatchLongint(section,sizePC,size);
+				PatchArray(section,sizePC,size);
 
 			END References;
 
@@ -9791,7 +9815,7 @@ TYPE
 
 		BEGIN
 			Info(source, "command array descriptor");
-			Array(source,sizePC);
+			Array(source,sizePC,"Modules.Command");
 			numberCommands := 0;
 			Info(source, "command array content");
 
@@ -9820,7 +9844,7 @@ TYPE
 					END;
 				END
 			END;
-			PatchLongint(source,sizePC,numberCommands);
+			PatchArray(source,sizePC,numberCommands);
 		END CommandArray;
 
 		(* to prevent from double import of different module aliases *)
@@ -9837,9 +9861,13 @@ TYPE
 		PROCEDURE ImportsArray(source: IntermediateCode.Section);
 		VAR import: SyntaxTree.Import ; pc: LONGINT;name: Basic.SegmentedName; numberImports: LONGINT; offset: LONGINT;
 		BEGIN
-			Array(source,pc);
+			Array(source,pc,"");
 			Info(source, "import module array data");
-			offset := ToMemoryUnits(module.system, 22* module.system.addressSize) (* Module pointer offset -- cf. ModuleSection(), how to encode generically correct? *);
+			IF implementationVisitor.backend.cooperative THEN
+				offset := 0;
+			ELSE
+				offset := ToMemoryUnits(module.system, 22* module.system.addressSize) (* Module pointer offset -- cf. ModuleSection(), how to encode generically correct? *);
+			END;
 			import :=  module.module.moduleScope.firstImport;
 			numberImports := 0;
 			WHILE import # NIL DO
@@ -9851,7 +9879,7 @@ TYPE
 				END;
 				import := import.nextImport
 			END;
-			PatchLongint(source,pc,numberImports);
+			PatchArray(source,pc,numberImports);
 		END ImportsArray;
 
 		PROCEDURE TypeInfoSection(source: IntermediateCode.Section);
@@ -9860,7 +9888,7 @@ TYPE
 		BEGIN
 			Info(source, "Type info section");
 			size := 0;
-			Array(source,sizePC);
+			Array(source,sizePC,"Modules.TypeDesc");
 			FOR i := 0 TO module.allSections.Length() - 1 DO
 				p := module.allSections.GetSection(i);
 				WITH p: IntermediateCode.Section DO
@@ -9870,7 +9898,7 @@ TYPE
 					END;
 				END
 			END;
-			PatchLongint(source,sizePC,size);
+			PatchArray(source,sizePC,size);
 		END TypeInfoSection;
 
 		(*
@@ -9991,7 +10019,7 @@ TYPE
 			Info(section, "nextWatched");
 			Address(section,0);
 		END BasePointer;
-		
+
 		PROCEDURE BaseObject (section: IntermediateCode.Section);
 		BEGIN
 			BasePointer(section);
@@ -10045,15 +10073,24 @@ TYPE
 				Strings.Append(name,suffix);
 				Basic.ToSegmentedName(name, pooledName);
 				section := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, pooledName, NIL,TRUE);
-				HeapBlock(mName,typeName,section,2);
-				Info(section, "HeapBlock");
-				(*
-				Symbol(section,section,2,0);
-				*)
-				Address(section,0); (* empty such that GC does not go on traversing *)
-				Info(section, "TypeDescriptor");
-				Address(section,0);
-				offset := section.pc;
+				
+				IF implementationVisitor.backend.cooperative THEN
+					Info(section, "TypeDescriptor");
+					Basic.ToSegmentedName("BaseTypes.Array", pooledName);
+					NamedSymbol(section, pooledName,NIL, 0, 0);
+					BasePointer(section);
+					offset := 0;
+				ELSE
+					HeapBlock(mName,typeName,section,2);
+					Info(section, "HeapBlock");
+					(*
+					Symbol(section,section,2,0);
+					*)
+					Address(section,0); (* empty such that GC does not go on traversing *)
+					Info(section, "TypeDescriptor");
+					Address(section,0);
+					offset := section.pc;
+				END;
 				RETURN section
 			END Block;
 
@@ -10077,7 +10114,7 @@ TYPE
 			ptrTableSection := Block("Heaps","SystemBlockDesc",".@PtrTable",ptrTableSectionOffset);
 			PointersInProcTables(procTableSection,ptrTableSection,numberProcs,maxPointers);
 			emptyArraySection := Block("Heaps","SystemBlockDesc",".@EmptyArray",emptyArraySectionOffset);
-			Array(emptyArraySection,temp);
+			Array(emptyArraySection,temp,"");
 			moduleSection := ModuleSection();
 			Info(moduleSection, "nextRoot*: RootObject");
 			Address(moduleSection,0);
@@ -10140,7 +10177,7 @@ TYPE
 		PROCEDURE PointerArray(source: IntermediateCode.Section; scope: SyntaxTree.Scope; VAR numberPointers: LONGINT);
 		VAR variable: SyntaxTree.Variable; pc: LONGINT; symbol: Sections.Section;
 		BEGIN
-			Array(source,pc);
+			Array(source,pc,"");
 			Info(source, "pointer offsets array data");
 			IF scope IS SyntaxTree.RecordScope THEN
 				Pointers(0,symbol, source,scope(SyntaxTree.RecordScope).ownerRecord,numberPointers);
@@ -10155,7 +10192,7 @@ TYPE
 					variable := variable.nextVariable;
 				END;
 			END;
-			PatchLongint(source,pc,numberPointers);
+			PatchArray(source,pc,numberPointers);
 		END PointerArray;
 
 		PROCEDURE CheckTypeDeclaration(x: SyntaxTree.Type);
@@ -10168,7 +10205,7 @@ TYPE
 				segmentedName: Basic.SegmentedName;
 				td: SyntaxTree.TypeDeclaration;
 			BEGIN
-				Array(source,pc);
+				Array(source,pc,"Modules.FieldEntry");
 
 				Info(source, "FieldArray");
 				IF x IS SyntaxTree.RecordType THEN
@@ -10213,7 +10250,7 @@ TYPE
 					variable := variable.nextVariable;
 					INC(size);
 				END;
-				PatchLongint(source,pc,size);
+				PatchArray(source,pc,size);
 			END FieldArray;
 
 			PROCEDURE NewTypeDescriptorInfo(tag: Sections.Section; offset: LONGINT; isProtected: BOOLEAN): Sections.Section;
