@@ -6472,26 +6472,26 @@ TYPE
 						Emit(Push(position,l.op));
 						ReleaseOperand(l);
 
-							(* push type descriptor *)
-							reg := TypeDescriptorAdr(recordType);
-							IF ~newObjectFile THEN
-								IntermediateCode.MakeMemory(reg,addressType);
-							END;
-							Emit(Push(position,reg));
-							ReleaseIntermediateOperand(reg);
+						(* push type descriptor *)
+						reg := TypeDescriptorAdr(recordType);
+						IF ~newObjectFile THEN
+							IntermediateCode.MakeMemory(reg,addressType);
+						END;
+						Emit(Push(position,reg));
+						ReleaseIntermediateOperand(reg);
 
-							(* push realtime flag *)
-							IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
-							ELSE Emit(Push(position,false));
-							END;
+						(* push realtime flag *)
+						IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
+						ELSE Emit(Push(position,false));
+						END;
 
-							CallThis("Heaps","NewRec", 3);
-							(* check allocation success, if not successful then do not call initializers and bodies *)
-							IntermediateCode.InitRegister(pointer,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
-							Emit(Pop(position,pointer));
-							MakeMemory(reg,pointer,addressType,0);
-							ReleaseIntermediateOperand(pointer);
-							pointer := reg;
+						CallThis("Heaps","NewRec", 3);
+						(* check allocation success, if not successful then do not call initializers and bodies *)
+						IntermediateCode.InitRegister(pointer,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
+						Emit(Pop(position,pointer));
+						MakeMemory(reg,pointer,addressType,0);
+						ReleaseIntermediateOperand(pointer);
+						pointer := reg;
 						exit := NewLabel();
 						BreqL(exit,pointer,nil);
 						Emit(Push(position,pointer));
@@ -6582,94 +6582,133 @@ TYPE
 
 					openDim := dim;
 					ASSERT(~(type IS SyntaxTree.ArrayType) OR (type(SyntaxTree.ArrayType).form = SyntaxTree.Static));
+					
+					IF backend.cooperative THEN
 
-					(*! the following code is only correct for "standard" Oberon calling convention *)
-					IF SemanticChecker.ContainsPointer(type) THEN
-						IF type IS SyntaxTree.ArrayType THEN
-							staticLength := 1;
-							WHILE (type IS SyntaxTree.ArrayType) DO (* static array *)
-								staticLength := staticLength * type(SyntaxTree.ArrayType).staticLength;
-								type := type(SyntaxTree.ArrayType).arrayBase.resolved;
-							END;
-							tmp := IntermediateCode.Immediate(reg.type,staticLength);
-							Emit(Mul(position,reg,reg,tmp));
-						END;
-						Designate(p0,l);
-						IF openDim > 0 THEN
-							Emit(Push(position,l.op)); (* address for use after syscall *)
-						END;
-						Emit(Push(position,l.op)); (* address *)
-						ReleaseOperand(l);
-
-						tmp := TypeDescriptorAdr(type);
-						IF ~newObjectFile THEN
-							IntermediateCode.MakeMemory(tmp,addressType);
-						END;
-						Emit(Push(position,tmp)); (* type descriptor *)
-						ReleaseIntermediateOperand(tmp);
-
-						Emit(Push(position,reg)); (* number Elements *)
-						ReleaseIntermediateOperand(reg);
-						tmp := IntermediateCode.Immediate(addressType,dim);
-						Emit(Push(position,tmp)); (* dimensions *)
-						(* push realtime flag *)
-						IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
-						ELSE Emit(Push(position,false));
-						END;
-						CallThis("Heaps","NewArr",5)
-					ELSE
 						size := ToMemoryUnits(system,system.SizeOf(type));
 						IF (size # 1) THEN
 							Emit(Mul(position,reg,reg,IntermediateCode.Immediate(addressType,size))); (*! optimize the multiplication of immediate operands *)
 						END;
-						tmp := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,ArrayDimTable * system.addressSize+ system.addressSize+  system.addressSize * 2 * (openDim DIV 2)));
-						(* DIV 2 term for some strange alignment, don't understand it at the moment - copied from PCC *)
-						Emit(Add(position,reg,reg,tmp));
-						Designate(p0,l);
-						IF openDim >0 THEN
-							Emit(Push(position,l.op)); (* address for use after syscall *)
-						END;
-						Emit(Push(position,l.op)); (* address for syscall *)
-						ReleaseOperand(l); (* pointer address *)
-
-						Emit(Push(position,reg)); (* size *)
+						Emit(Add(position,reg,reg,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(BasePointerTypeSize + openDim)* system.addressSize))));
+						Emit(Push(position,reg));
 						ReleaseIntermediateOperand(reg);
-						(* push realtime flag *)
-						IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
-						ELSE Emit(Push(position,false));
-						END;
-						CallThis("Heaps","NewSys", 3)
-					END;
+						CallThis("Runtime","New", 1);
 
-					IF openDim > 0 THEN
-						IntermediateCode.InitRegister(adr,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
-						Emit(Pop(position,adr));
-						ToMemory(adr,addressType,0);
-						ReuseCopy(tmp,adr);
-						ReleaseIntermediateOperand(adr);
-						adr := tmp;
-
-						else := NewLabel();
-						BreqL(else,adr,IntermediateCode.Immediate(addressType,0));
-
-						i := openDim-1;
-						IntermediateCode.InitRegister(reg,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
-						WHILE (i >= 0) DO
-							Emit(Pop(position,reg));
-							IntermediateCode.InitMemory(res,addressType,adr,ToMemoryUnits(system,ArrayDimTable* system.addressSize + system.addressSize*((openDim-1)-i)));
-							Emit(Mov(position,res,reg));
-							DEC(i);
-						END;
-						ReleaseIntermediateOperand(adr);
-						ReleaseIntermediateOperand(reg);
-
+						pointer := NewRegisterOperand(IntermediateCode.GetType(system, p0.type));
+						Emit(Result(position, pointer));
 						exit := NewLabel();
-						BrL(exit);
+						else := NewLabel();
+						BreqL(else,pointer,nil);
+
+						Basic.ToSegmentedName ("BaseTypes.Array",name);
+						Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,0),IntermediateCode.Address(addressType,name,0,0)));
+						
+						i := openDim;
+						WHILE i > 0 DO
+							DEC (i);
+							Emit(Pop(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + i)* system.addressSize))));
+						END;
+
 						SetLabel(else);
-						(* else part: array could not be allocated *)
-						tmp := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,openDim*system.addressSize));
-						Emit(Add(position,sp,sp,tmp));
+						IF openDim > 0 THEN
+							BrL(exit);
+							Emit(Add(position,sp,sp,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,openDim*system.addressSize))));
+						END;
 						SetLabel(exit);
+						Designate(p0,l);
+						Emit(Mov(position,IntermediateCode.Memory(addressType,l.op,0),pointer));
+						ReleaseIntermediateOperand(pointer);
+						ReleaseOperand(l);
+					ELSE
+
+						(*! the following code is only correct for "standard" Oberon calling convention *)
+						IF SemanticChecker.ContainsPointer(type) THEN
+							IF type IS SyntaxTree.ArrayType THEN
+								staticLength := 1;
+								WHILE (type IS SyntaxTree.ArrayType) DO (* static array *)
+									staticLength := staticLength * type(SyntaxTree.ArrayType).staticLength;
+									type := type(SyntaxTree.ArrayType).arrayBase.resolved;
+								END;
+								tmp := IntermediateCode.Immediate(reg.type,staticLength);
+								Emit(Mul(position,reg,reg,tmp));
+							END;
+							Designate(p0,l);
+							IF openDim > 0 THEN
+								Emit(Push(position,l.op)); (* address for use after syscall *)
+							END;
+							Emit(Push(position,l.op)); (* address *)
+							ReleaseOperand(l);
+
+							tmp := TypeDescriptorAdr(type);
+							IF ~newObjectFile THEN
+								IntermediateCode.MakeMemory(tmp,addressType);
+							END;
+							Emit(Push(position,tmp)); (* type descriptor *)
+							ReleaseIntermediateOperand(tmp);
+
+							Emit(Push(position,reg)); (* number Elements *)
+							ReleaseIntermediateOperand(reg);
+							tmp := IntermediateCode.Immediate(addressType,dim);
+							Emit(Push(position,tmp)); (* dimensions *)
+							(* push realtime flag *)
+							IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
+							ELSE Emit(Push(position,false));
+							END;
+							CallThis("Heaps","NewArr",5)
+						ELSE
+							size := ToMemoryUnits(system,system.SizeOf(type));
+							IF (size # 1) THEN
+								Emit(Mul(position,reg,reg,IntermediateCode.Immediate(addressType,size))); (*! optimize the multiplication of immediate operands *)
+							END;
+							tmp := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,ArrayDimTable * system.addressSize+ system.addressSize+  system.addressSize * 2 * (openDim DIV 2)));
+							(* DIV 2 term for some strange alignment, don't understand it at the moment - copied from PCC *)
+							Emit(Add(position,reg,reg,tmp));
+							Designate(p0,l);
+							IF openDim >0 THEN
+								Emit(Push(position,l.op)); (* address for use after syscall *)
+							END;
+							Emit(Push(position,l.op)); (* address for syscall *)
+							ReleaseOperand(l); (* pointer address *)
+
+							Emit(Push(position,reg)); (* size *)
+							ReleaseIntermediateOperand(reg);
+							(* push realtime flag *)
+							IF (p0.type.resolved.isRealtime) THEN Emit(Push(position,true));
+							ELSE Emit(Push(position,false));
+							END;
+							CallThis("Heaps","NewSys", 3)
+						END;
+
+						IF openDim > 0 THEN
+							IntermediateCode.InitRegister(adr,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
+							Emit(Pop(position,adr));
+							ToMemory(adr,addressType,0);
+							ReuseCopy(tmp,adr);
+							ReleaseIntermediateOperand(adr);
+							adr := tmp;
+
+							else := NewLabel();
+							BreqL(else,adr,IntermediateCode.Immediate(addressType,0));
+
+							i := openDim-1;
+							IntermediateCode.InitRegister(reg,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
+							WHILE (i >= 0) DO
+								Emit(Pop(position,reg));
+								IntermediateCode.InitMemory(res,addressType,adr,ToMemoryUnits(system,ArrayDimTable* system.addressSize + system.addressSize*((openDim-1)-i)));
+								Emit(Mov(position,res,reg));
+								DEC(i);
+							END;
+							ReleaseIntermediateOperand(adr);
+							ReleaseIntermediateOperand(reg);
+
+							exit := NewLabel();
+							BrL(exit);
+							SetLabel(else);
+							(* else part: array could not be allocated *)
+							tmp := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,openDim*system.addressSize));
+							Emit(Add(position,sp,sp,tmp));
+							SetLabel(exit);
+						END;
 					END;
 				ELSIF (type IS SyntaxTree.MathArrayType) THEN
 					IF t1 IS SyntaxTree.MathArrayType THEN (* NEW(a, array) *)
@@ -7253,10 +7292,16 @@ TYPE
 						operand.tag := emptyOperand;
 					END;
 				ELSE
-					arrayDataOffset := DynamicDim(type) * addressType.sizeInBits + 3 * addressType.sizeInBits;
-					INC(arrayDataOffset, (-arrayDataOffset) MOD ArrayAlignment);  (* round up to multiple of ArrayAlignment to ensure that first array element is aligned at 0 MOD ArrayAlignment *)
-					IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,arrayDataOffset));
-					IntermediateCode.AddOffset(operand.tag,ToMemoryUnits(system,ArrayDimTable*system.addressSize))
+					IF backend.cooperative THEN
+						arrayDataOffset := (BasePointerTypeSize + DynamicDim(type)) * addressType.sizeInBits;
+						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,arrayDataOffset));
+						IntermediateCode.AddOffset(operand.tag,ToMemoryUnits(system,BasePointerTypeSize*system.addressSize));
+					ELSE
+						arrayDataOffset := DynamicDim(type) * addressType.sizeInBits + 3 * addressType.sizeInBits;
+						INC(arrayDataOffset, (-arrayDataOffset) MOD ArrayAlignment);  (* round up to multiple of ArrayAlignment to ensure that first array element is aligned at 0 MOD ArrayAlignment *)
+						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,arrayDataOffset));
+						IntermediateCode.AddOffset(operand.tag,ToMemoryUnits(system,ArrayDimTable*system.addressSize))
+					END;
 				END;
 			ELSIF type IS SyntaxTree.MathArrayType THEN
 				IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,MathAdrOffset*addressType.sizeInBits));
@@ -7275,7 +7320,7 @@ TYPE
 			Dereference(d,type,IsUnsafePointer(x.left.type));
 			result := d;
 			IF backend.cooperative & (x.left.type.resolved IS SyntaxTree.PointerType) & ~x.left.type.resolved(SyntaxTree.PointerType).isPlain THEN
-				IF ~(type IS SyntaxTree.RecordType) OR ~type(SyntaxTree.RecordType).isObject THEN
+				IF (type IS SyntaxTree.RecordType) & ~type(SyntaxTree.RecordType).isObject THEN
 					IntermediateCode.AddOffset(result.op,BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 				END;
 			END;
@@ -10326,7 +10371,7 @@ TYPE
 						ELSE
 							IF recordType.isObject THEN
 								Basic.ToSegmentedName ("BaseTypes.Object",name);
-							ELSE								
+							ELSE
 								Basic.ToSegmentedName ("BaseTypes.Record",name);
 							END;
 							tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
