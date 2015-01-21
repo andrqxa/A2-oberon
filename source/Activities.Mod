@@ -48,7 +48,7 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR bound := FALSE: BOOLEAN;
 
 	PROCEDURE &InitializeActivity (procedure: PROCEDURE; priority: Priority);
-	VAR stackFrame {UNTRACED}: StackFrame;
+	VAR stackFrame {UNTRACED}: StackFrame; StackFrameDescriptor {UNTRACED} EXTERN "BaseTypes.StackFrame": BaseTypes.Descriptor;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		ASSERT (priority < Priorities);
 		ASSERT (InitialStackSize > SafeStackSize);
@@ -61,6 +61,7 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 		stackFrame.finalizeSwitchCaller := procedure;
 		stackFrame.caller := FinalizeSwitch;
 		stackFrame.previous := NIL;
+		stackFrame.descriptor := ADDRESS OF StackFrameDescriptor;
 		framePointer := stackFrame;
 	END InitializeActivity;
 
