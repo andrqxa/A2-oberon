@@ -235,6 +235,7 @@ TYPE
 			IF x.isUnsafe THEN Flag(Global.NameUnsafe,first) END;
 			IF x.isRealtime THEN Flag(Global.NameRealtime,first) END;
 			IF x.isDisposable THEN Flag(Global.NameDisposable,first) END;
+			IF x.isPlain THEN Flag(Global.NamePlain,first) END;
 			FlagEnd(first);
 		END PointerFlags;
 
