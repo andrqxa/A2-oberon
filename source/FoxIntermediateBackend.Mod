@@ -2085,7 +2085,11 @@ TYPE
 			recordBase := recordType.GetBaseRecord();
 			IF recordBase # NIL THEN
 				GetRecordTypeName (recordBase,name);
-				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+				IF HasExplicitTraceMethod (recordBase) THEN
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("Trace"));
+				ELSE
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+				END;
 				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 				Emit(Br(position,op));
 			ELSIF (recordType.pointerType # NIL) & recordType.pointerType.isPlain THEN
@@ -10323,17 +10327,15 @@ TYPE
 				END MethodTable;
 
 				PROCEDURE CooperativeMethodTable;
-				VAR i,methods: LONGINT; name,trace: Basic.SegmentedName;
+				VAR i,start,methods: LONGINT; name,trace: Basic.SegmentedName;
 				BEGIN
 					Info(source, "method table");
-					Basic.ToSegmentedName ("BaseTypes.Pointer.Trace", trace);
+					IF ~HasExplicitTraceMethod(recordType) THEN start := 1 ELSE start := 0 END;
 					methods := recordType.recordScope.numberMethods;
-					FOR i := 0 TO methods-1 DO
+					FOR i := start TO methods-1 DO
 						procedure := recordType.recordScope.FindMethod(i);
 						Global.GetSymbolSegmentedName(procedure, name);
-						IF (i # 0) OR (name # trace) THEN
-							NamedSymbol(source, name,procedure, 0,0);
-						END;
+						NamedSymbol(source, name,procedure, 0,0);
 					END;
 				END CooperativeMethodTable;
 
@@ -10410,7 +10412,7 @@ TYPE
 						END;
 						GetRecordTypeName (baseRecord, name);
 						Basic.ToSegmentedName ("BaseTypes.StackFrame", stackFrame);
-						IF name # stackFrame THEN
+						IF (name # stackFrame) & ~HasExplicitTraceMethod(recordType) THEN
 							baseRecord := recordType;
 							WHILE (baseRecord # NIL) & ~baseRecord.hasPointers DO
 								baseRecord := baseRecord.GetBaseRecord ();
@@ -10433,7 +10435,9 @@ TYPE
 						source.SetReferenced(FALSE);
 						
 						IF recordType.hasPointers THEN
-							implementationVisitor.CreateTraceMethod(recordType);
+							IF ~HasExplicitTraceMethod (recordType) THEN
+								implementationVisitor.CreateTraceMethod(recordType);
+							END;
 							IF ~recordType.isObject THEN
 								implementationVisitor.CreateResetProcedure(recordType);
 							END;
@@ -10856,6 +10860,12 @@ TYPE
 		END;
 		RETURN FALSE;
 	END HasVariableParameters;
+	
+	PROCEDURE HasExplicitTraceMethod(recordType: SyntaxTree.RecordType): BOOLEAN;
+	BEGIN
+		IF (recordType.pointerType # NIL) & ~recordType.pointerType.isPlain THEN RETURN FALSE END;
+		RETURN (recordType.recordScope.firstProcedure # NIL) & Basic.StringEqual (Basic.MakeString ("Trace"), recordType.recordScope.firstProcedure.name);
+	END HasExplicitTraceMethod;
 
 	PROCEDURE IsIntegerConstant(expression: SyntaxTree.Expression; VAR val: HUGEINT): BOOLEAN;
 	BEGIN
