@@ -7402,6 +7402,9 @@ TYPE
 				result.op := basereg;
 				parametersSize := ProcedureParametersSize(system,scope(SyntaxTree.ProcedureScope).ownerProcedure);
 				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,addressType.sizeInBits)+parametersSize);
+				IF backend.cooperative THEN
+					IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,addressType.sizeInBits));
+				END;
 				(* tag must be loaded when dereferencing SELF pointer *)
 			END;
 			destination := dest;
@@ -8744,6 +8747,9 @@ TYPE
 				GetBaseRegister(op.op,currentScope,scope);
 				parametersSize := ProcedureParametersSize(system,scope(SyntaxTree.ProcedureScope).ownerProcedure);
 				IntermediateCode.AddOffset(op.op,ToMemoryUnits(system,addressType.sizeInBits)+parametersSize);
+				IF backend.cooperative THEN
+					IntermediateCode.AddOffset(op.op,ToMemoryUnits(system,addressType.sizeInBits)+parametersSize);
+				END;
 				IntermediateCode.MakeMemory(op.op,addressType);
 			END;
 			Emit(Push(position,op.op));
