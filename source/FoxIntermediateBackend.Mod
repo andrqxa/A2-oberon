@@ -8156,7 +8156,7 @@ TYPE
 		END VisitAssignment;
 		
 		PROCEDURE EmitCooperativeSwitch;
-		CONST QuantumOffset = 4;
+		CONST QuantumOffset = BaseObjectTypeSize + 4;
 		VAR quantum, offset, zero: IntermediateCode.Operand; skip: Label;
 		BEGIN
 			ASSERT (cooperativeSwitches);
