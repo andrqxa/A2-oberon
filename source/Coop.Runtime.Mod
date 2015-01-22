@@ -89,7 +89,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 		trapHandler (number);
 	ELSE
 		Trace.Red; Trace.String ("trap: "); Trace.Int (number, 0); Trace.Ln;
-		Trace.Default; Trace.StackFrames (1, 20, 100 * SIZE OF ADDRESS);
+		Trace.Default; Trace.StackFrames (1, 8, 20 * SIZE OF ADDRESS);
 	 END;
 	Abort;
 END Trap;
