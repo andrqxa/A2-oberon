@@ -2675,20 +2675,25 @@ TYPE
 			PROCEDURE JmpDest(brop: LONGINT);
 			BEGIN
 				IF instruction.op1.mode = IntermediateCode.ModeImmediate THEN
-					Assert(instruction.op1.symbol.name # "","branch without symbol destination");
-					dest := (instruction.op1.symbolOffset); (* this is the offset in the in-data section (intermediate code), it is not byte- *)
-					destPC := (in.instructions[dest].pc );
-					offset := destPC - (out.pc );
-					IF dest > inPC THEN (* forward jump *)
-						Assembler.InitOffset32(target,0);
-						Assembler.SetSymbol(target,instruction.op1.symbol.name,instruction.op1.symbol.fingerprint,instruction.op1.symbolOffset,instruction.op1.offset);
-						emitter.Emit1(brop,target);
-					ELSIF ABS(offset)  <= 126 THEN
-						Assembler.InitOffset8(target,destPC);
+					IF instruction.op1.symbol.name # "" THEN
+						Assembler.InitOffset32(target,instruction.op1.intValue);
+						Assembler.SetSymbol(target,instruction.op1.symbol.name,instruction.op1.symbol.fingerprint,instruction.op1.offset,0);
 						emitter.Emit1(brop,target);
 					ELSE
-						Assembler.InitOffset32(target,destPC);
-						emitter.Emit1(brop,target);
+						dest := (instruction.op1.symbolOffset); (* this is the offset in the in-data section (intermediate code), it is not byte- *)
+						destPC := (in.instructions[dest].pc );
+						offset := destPC - (out.pc );
+						IF dest > inPC THEN (* forward jump *)
+							Assembler.InitOffset32(target,0);
+							Assembler.SetSymbol(target,instruction.op1.symbol.name,instruction.op1.symbol.fingerprint,instruction.op1.symbolOffset,instruction.op1.offset);
+							emitter.Emit1(brop,target);
+						ELSIF ABS(offset)  <= 126 THEN
+							Assembler.InitOffset8(target,destPC);
+							emitter.Emit1(brop,target);
+						ELSE
+							Assembler.InitOffset32(target,destPC);
+							emitter.Emit1(brop,target);
+						END;
 					END;
 				ELSE
 					MakeOperand(instruction.op1,Low,target,NIL);
