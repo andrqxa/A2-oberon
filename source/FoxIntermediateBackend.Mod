@@ -8768,7 +8768,7 @@ TYPE
 				parametersSize := ProcedureParametersSize(system,scope(SyntaxTree.ProcedureScope).ownerProcedure);
 				IntermediateCode.AddOffset(op.op,ToMemoryUnits(system,addressType.sizeInBits)+parametersSize);
 				IF backend.cooperative THEN
-					IntermediateCode.AddOffset(op.op,ToMemoryUnits(system,addressType.sizeInBits)+parametersSize);
+					IntermediateCode.AddOffset(op.op,ToMemoryUnits(system,addressType.sizeInBits));
 				END;
 				IntermediateCode.MakeMemory(op.op,addressType);
 			END;
