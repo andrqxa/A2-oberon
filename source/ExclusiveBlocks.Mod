@@ -4,31 +4,18 @@
 (** The ExclusiveBlocks module implements object monitors and provides runtime support for block statements marked as exclusive. *)
 MODULE ExclusiveBlocks;
 
-IMPORT SYSTEM, Activities, Queues;
-
-(** Represents the monitor associated with an object that has procedures with exclusive regions. *)
-TYPE Monitor* = RECORD
-		mark: LONGINT;
-		dataAdr-: ADDRESS;
-		size-: SIZE;
-		nextRealtime: OBJECT;
-	owner* {UNTRACED} := NIL: OBJECT; (* stores the current activity that has exclusive access *)
-	nestingLevel* := 0: SIZE; (* counts how many times the same activity has acquired the monitor *)
-	blockedQueue*: Queues.Queue; (* stores all activities that failed to acquire the monitor *)
-	waitingQueue*: Queues.Queue; (* stores all activities that are waiting inside an await statement *)
-	waitingSentinel* {UNTRACED} := NIL: OBJECT; (* stores the oldest activity waiting in the await statement *)
-END;
+IMPORT SYSTEM, Activities, BaseTypes, Queues;
 
 (** Enters an exclusive region by acquiring the monitor of the corresponding object. *)
 (** If the monitor is currently acquired by another activity, this procedure waits until it gets exclusive access to it. *)
 (** The compiler calls this procedure at the beginning of each block statement marked as exclusive. *)
 (** The specified nesting level keeps track of how many times the same activity has acquired the monitor. *)
-PROCEDURE Enter- (object {UNTRACED}: OBJECT; nestingLevel: SIZE);
-VAR monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor; currentActivity {UNTRACED}, nextActivity: Activities.Activity; previousOwner {UNTRACED}: OBJECT;
+PROCEDURE Enter- (object {UNTRACED}: BaseTypes.Object; nestingLevel: SIZE);
+VAR monitor {UNTRACED}: POINTER {UNSAFE} TO BaseTypes.Monitor; currentActivity {UNTRACED}, nextActivity: Activities.Activity; previousOwner {UNTRACED}: OBJECT;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid arguments *)
 	ASSERT (object # NIL);
-	SYSTEM.GET(SYSTEM.VAL(ADDRESS, object) - SIZE OF ADDRESS * 2, monitor);
+	monitor := object.monitor;
 	ASSERT (monitor # NIL);
 
 	(* repeated tries of atomically changing the owner from NIL to the current activity guarantees mutual exclusion *)
@@ -49,7 +36,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Enter;
 
 (* This procedure is a switch finalizer and is executed by a different activity *)
-PROCEDURE Enqueue (previousActivity {UNTRACED}: Activities.Activity; monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor);
+PROCEDURE Enqueue (previousActivity {UNTRACED}: Activities.Activity; monitor {UNTRACED}: POINTER {UNSAFE} TO BaseTypes.Monitor);
 VAR item: Queues.Item;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* the monitor could have already been released at this point, *)
@@ -70,12 +57,12 @@ END Enqueue;
 (** Exits an exclusive region by releasing the monitor of the corresponding object if its nesting level reaches zero. *)
 (** The compiler calls this procedure at the end of each block statement marked as exclusive or during the execution of a RETURN statement inside such blocks. *)
 (** A monitor may not be released if it was not acquired by the same activity beforehand. *)
-PROCEDURE Exit- (object {UNTRACED}: OBJECT; nestingLevel: SIZE);
-VAR monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor; currentActivity {UNTRACED}: Activities.Activity; item: Queues.Item;
+PROCEDURE Exit- (object {UNTRACED}: BaseTypes.Object; nestingLevel: SIZE);
+VAR monitor {UNTRACED}: POINTER {UNSAFE} TO BaseTypes.Monitor; currentActivity {UNTRACED}: Activities.Activity; item: Queues.Item;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid arguments *)
 	ASSERT (object # NIL);
-	SYSTEM.GET(SYSTEM.VAL(ADDRESS, object) - SIZE OF ADDRESS * 2, monitor);
+	monitor := object.monitor;
 	ASSERT (monitor # NIL);
 	currentActivity := Activities.GetCurrentActivity ();
 	ASSERT (monitor.owner = currentActivity);
@@ -101,12 +88,12 @@ END Exit;
 
 (** Temporarily releases an acquired monitor and waits for other activities to modify the object by entering and exiting an exclusive region. *)
 (** The compiler calls this procedure whenever the repeated evaluation of an AWAIT statement yields an unsatisfied condition. *)
-PROCEDURE Await- (object {UNTRACED}: OBJECT);
-VAR monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor; currentActivity {UNTRACED}, nextActivity: Activities.Activity; nestingLevel: SIZE; item: Queues.Item;
+PROCEDURE Await- (object {UNTRACED}: BaseTypes.Object);
+VAR monitor {UNTRACED}: POINTER {UNSAFE} TO BaseTypes.Monitor; currentActivity {UNTRACED}, nextActivity: Activities.Activity; nestingLevel: SIZE; item: Queues.Item;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid arguments *)
 	ASSERT (object # NIL);
-	SYSTEM.GET(SYSTEM.VAL(ADDRESS, object) - SIZE OF ADDRESS * 2, monitor);
+	monitor := object.monitor;
 	ASSERT (monitor # NIL);
 	currentActivity := Activities.GetCurrentActivity ();
 	ASSERT (monitor.owner = currentActivity);
@@ -147,7 +134,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Await;
 
 (* Enqueues the previous activity in the waiting queue of a monitor and transfers its ownership to the currently executing activity. *)
-PROCEDURE Transfer (previousActivity {UNTRACED}: Activities.Activity; monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor);
+PROCEDURE Transfer (previousActivity {UNTRACED}: Activities.Activity; monitor {UNTRACED}: POINTER {UNSAFE} TO BaseTypes.Monitor);
 VAR currentActivity {UNTRACED}: Activities.Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	currentActivity := Activities.GetCurrentActivity ();
@@ -156,7 +143,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Transfer;
 
 (* Enqueues the previous activity in the waiting queue of a monitor and releases its owner. *)
-PROCEDURE Release (previousActivity {UNTRACED}: Activities.Activity; monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor);
+PROCEDURE Release (previousActivity {UNTRACED}: Activities.Activity; monitor {UNTRACED}: POINTER {UNSAFE} TO BaseTypes.Monitor);
 VAR item: Queues.Item;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Queues.Enqueue (previousActivity, monitor.waitingQueue);
@@ -169,12 +156,12 @@ END Release;
 
 (** Guarantees that all other activities awaiting a condition will evaluate it again when the current activity leaves the exclusive region. *)
 (** The compiler calls this procedure after the evaluation of an AWAIT statement has yielded a satisfied condition. *)
-PROCEDURE FinalizeAwait- (object {UNTRACED}: OBJECT);
-VAR monitor {UNTRACED}: POINTER {UNSAFE} TO Monitor; currentActivity {UNTRACED}: Activities.Activity;
+PROCEDURE FinalizeAwait- (object {UNTRACED}: BaseTypes.Object);
+VAR monitor {UNTRACED}: POINTER {UNSAFE} TO BaseTypes.Monitor; currentActivity {UNTRACED}: Activities.Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid arguments *)
 	ASSERT (object # NIL);
-	SYSTEM.GET(SYSTEM.VAL(ADDRESS, object) - SIZE OF ADDRESS * 2, monitor);
+	monitor := object.monitor;
 	ASSERT (monitor # NIL);
 	currentActivity := Activities.GetCurrentActivity ();
 	ASSERT (monitor.owner = currentActivity);
