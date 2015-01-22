@@ -536,10 +536,18 @@ BEGIN
 	SSE5Support := SSE3Support & (SSE5Flag IN features2);
 	AVXSupport := SSE3Support & (AVXFlag IN features2);
 
-	IF SSESupport & (FXSRFlag IN features) THEN
-		(* InitSSE(); *) (*! not privileged mode in Windows not allowed *)
+	IF Environment.IsNative & SSESupport & (FXSRFlag IN features) THEN
+		InitSSE();
 	END;
 END SetupSSE2Ext;
+
+PROCEDURE -InitSSE;
+CODE {SYSTEM.Pentium, SYSTEM.Privileged}
+	MOV	EAX, CR4
+	OR	EAX, 00000200H		; set bit 9 (OSFXSR)
+	AND	EAX, 0FFFFFBFFH	; delete bit 10 (OSXMMEXCPT)
+	MOV	CR4, EAX
+END InitSSE;
 
 PROCEDURE Init;
 VAR vendor: Vendor; ver: LONGINT;

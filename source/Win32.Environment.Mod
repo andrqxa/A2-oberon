@@ -5,6 +5,8 @@ MODULE Environment;
 
 IMPORT SYSTEM, Activities, Counters, Kernel32, Processors, Queues, Trace;
 
+CONST IsNative* = FALSE;
+
 CONST DefaultConfigFile = "aos.ini";
 CONST UserConfigFile = "myaos.ini";
 

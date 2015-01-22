@@ -5,6 +5,8 @@ MODULE Environment;
 
 IMPORT SYSTEM, CPU, Activities, HeapManager, Interrupts, Processors, Trace;
 
+CONST IsNative* = TRUE;
+
 CONST Running = 0; ShuttingDown = 1; Rebooting = 2;
 
 CONST HeapAdr = 100000H;

@@ -21,7 +21,7 @@ Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
 Partitions.SetConfig VDISK0#1
 	TraceMode="5" TracePort="1" TraceBPS="115200"
 	BootSystem="Test.Initialize"
-	ExtMemSize="20"
+	ExtMemSize="120"
 	Init=""
 	~
 VirtualDisks.Uninstall VDISK0 ~
