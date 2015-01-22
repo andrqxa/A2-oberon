@@ -9225,6 +9225,14 @@ TYPE
 			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, module.system.longintType),value);
 			section.PatchOperands(pc,op,noOperand,noOperand);
 		END PatchLongint;
+		
+		PROCEDURE PatchSymbol(section: IntermediateCode.Section; pc: LONGINT; name: Basic.SegmentedName; symbol: SyntaxTree.Symbol; virtualOffset, realOffset: LONGINT);
+		VAR op, noOperand: IntermediateCode.Operand;
+		BEGIN
+			IntermediateCode.InitOperand(noOperand);
+			IntermediateCode.InitAddress(op, IntermediateCode.GetType(module.system, module.system.addressType), name,implementationVisitor.GetFingerprint(symbol), virtualOffset);
+			section.PatchOperands(pc,op,noOperand,noOperand);
+		END PatchSymbol;
 
 		PROCEDURE Boolean(section: IntermediateCode.Section; value: BOOLEAN);
 		VAR op: IntermediateCode.Operand; intValue: LONGINT;
@@ -10182,6 +10190,20 @@ TYPE
 
 			Info(moduleSection, "body*: ADDRESS");
 			Symbol(moduleSection, bodyProc, 0,0);
+
+			IF implementationVisitor.backend.cooperative THEN
+				PatchSymbol(moduleSection,BasePointerTypeSize+1,moduleSection.name,NIL,moduleSection.pc,0);
+				Info(moduleSection, "monitor.owner");
+				Address(moduleSection,0);
+				Info(moduleSection, "monitor.nestingLevel");
+				Address(moduleSection,0);
+				Info(moduleSection, "monitor.blockedQueue");
+				Address(moduleSection,0); Address(moduleSection,0);
+				Info(moduleSection, "monitor.waitingQueue");
+				Address(moduleSection,0); Address(moduleSection,0);
+				Info(moduleSection, "monitor.waitingSentinel");
+				Address(moduleSection,0);
+			END;
 		END Module;
 
 		PROCEDURE PointerArray(source: IntermediateCode.Section; scope: SyntaxTree.Scope; VAR numberPointers: LONGINT);
