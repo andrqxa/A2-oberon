@@ -2083,6 +2083,9 @@ TYPE
 			END;
 			
 			recordBase := recordType.GetBaseRecord();
+			WHILE (recordBase # NIL) & ~recordBase.hasPointers DO
+				recordBase := recordBase.GetBaseRecord();
+			END;			
 			IF recordBase # NIL THEN
 				GetRecordTypeName (recordBase,name);
 				IF HasExplicitTraceMethod (recordBase) THEN
