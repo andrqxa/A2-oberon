@@ -6384,6 +6384,12 @@ TYPE
 				Reuse1a(result.op,operand.op,dest);
 				Emit(Abs(position,result.op,operand.op));
 				ReleaseOperand(operand);
+			(* ---- WAIT ----- *)
+			|Global.Wait:
+				Evaluate(p0,operand);
+				Emit(Push(position,operand));
+				ReleaseOperand(operand);
+				CallThis("Activities","Wait", 1);
 			(* ---- NEW ----- *)
 			|Global.New:
 				(*! the following code is only correct for "standard" Oberon calling convention *)

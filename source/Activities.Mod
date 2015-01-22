@@ -44,7 +44,7 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR finalizer := NIL: SwitchFinalizer;
 	VAR previous: Activity; argument: ADDRESS;
 	VAR framePointer {UNTRACED}: StackFrame;
-	VAR object-: OBJECT;
+	VAR object-: BaseTypes.Object;
 	VAR bound := FALSE: BOOLEAN;
 
 	PROCEDURE &InitializeActivity (procedure: PROCEDURE; priority: Priority);
@@ -82,13 +82,28 @@ END Activity;
 (* Represents a handler for an activity that is associated with an active object. *)
 TYPE Process = OBJECT {DISPOSABLE} (Activity)
 
-	PROCEDURE &InitializeProcess (procedure: PROCEDURE; priority: Priority; object: OBJECT);
+	PROCEDURE &InitializeProcess (procedure: PROCEDURE; priority: Priority; object: BaseTypes.Object);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		InitializeActivity (procedure, priority);
 		ASSERT (object # NIL);
 		SELF.object := object;
 		framePointer.procedureArgument := object;
 	END InitializeProcess;
+
+	PROCEDURE Unlink;
+	BEGIN {UNCOOPERATIVE, UNCHECKED} object := NIL;
+	END Unlink;
+
+	PROCEDURE ~Finalize;
+	VAR item: Queues.Item;
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		IF object # NIL THEN
+			object.action.activity := NIL;
+			IF Queues.Dequeue (item, object.action.waitingQueue) THEN Resume (item(Activity)) END;
+			Unlink;
+		END;
+		Finalize^;
+	END Finalize;
 
 END Process;
 
@@ -220,7 +235,7 @@ END FinalizeSwitch;
 
 (** This procedure is called by the compiler for each {{{NEW}}} statement that creates an active object. *)
 (** It associates an active object with a new activity that begins its execution with the specified body procedure. *)
-PROCEDURE Create- (body: PROCEDURE; priority: Priority; object {UNTRACED}: OBJECT);
+PROCEDURE Create- (body: PROCEDURE; priority: Priority; object {UNTRACED}: BaseTypes.Object);
 VAR activity: Process;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF priority = IdlePriority THEN priority := SYSTEM.GetActivity ()(Activity).priority END;
@@ -336,6 +351,28 @@ PROCEDURE Dispose (previous {UNTRACED}: Activity; value: ADDRESS);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	DISPOSE (previous);
 END Dispose;
+
+(** This procedure is called by the compiler while executing a {{{WAIT}}} statement. *)
+(** It awaits the termination of all activities associated with an active object. *)
+PROCEDURE Wait- (object {UNTRACED}: BaseTypes.Object);
+VAR nextActivity: Activity; item: Queues.Item;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	ASSERT (object # NIL);
+	IF object.action = NIL THEN RETURN END;
+	IF object.action.activity = NIL THEN RETURN END;
+	REPEAT UNTIL Select (nextActivity, IdlePriority);
+	SwitchTo (nextActivity, EnqueueWaiting, object.action); FinalizeSwitch;
+	WHILE Queues.Dequeue (item, object.action.waitingQueue) DO Resume (item (Activity)) END;
+END Wait;
+
+(* Switch finalizer that enqueues acitivities waiting on an active object. *)
+PROCEDURE EnqueueWaiting (previous {UNTRACED}: Activity; action {UNTRACED}: POINTER {UNSAFE} TO BaseTypes.Action);
+VAR item: Queues.Item;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Queues.Enqueue (previous, action.waitingQueue);
+	IF action.activity # NIL THEN RETURN END;
+	IF Queues.Dequeue (item, action.waitingQueue) THEN Resume (item (Activity)) END;
+END EnqueueWaiting;
 
 (** Expands the stack memory of the current activity to include the specified stack address and returns the corresponding address on the expanded stack. *)
 PROCEDURE ExpandStack- (address: ADDRESS): ADDRESS;

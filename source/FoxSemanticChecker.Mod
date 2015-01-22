@@ -4899,6 +4899,10 @@ TYPE
 							rules imposed by the architecture / current runtime
 						 *)
 					END;
+				(* ---- WAIT ----- *)
+				ELSIF cooperative & (id = Global.Wait) & CheckArity(1,1) THEN
+					IF CheckObjectType(parameter0) THEN
+					END;
 				(* ---- NEW ----- *)
 				ELSIF (id = Global.New) & CheckArity(1,Infinity) THEN
 					IF currentIsRealtime THEN
