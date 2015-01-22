@@ -2494,12 +2494,18 @@ TYPE
 			END;
 			Spill(physicalRegisters.Mapped(register));
 			ra := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,instruction.op2.type,register,inPC);
-			MakeOperand(instruction.op2,Low,op2,ra);
-			MakeRegister(instruction.op1,Low,op1);
-			Assembler.InitMem(mem,SHORT(instruction.op2.type.sizeInBits DIV 8),op1.register,0);
-			MakeRegister(instruction.op3,Low,op3);
-			emitter.EmitPrefix (InstructionSet.prfLOCK);
-			emitter.Emit2(InstructionSet.opCMPXCHG,mem,op3);
+			IF IntermediateCode.OperandEquals (instruction.op2,instruction.op3) THEN
+				MakeOperand(instruction.op1,Low,op1,ra);
+				Assembler.InitMem(mem,SHORT(instruction.op1.type.sizeInBits DIV 8),op1.register,0);
+				emitter.Emit2(InstructionSet.opMOV,op1,mem);
+			ELSE
+				MakeOperand(instruction.op2,Low,op2,ra);
+				MakeRegister(instruction.op1,Low,op1);
+				Assembler.InitMem(mem,SHORT(instruction.op2.type.sizeInBits DIV 8),op1.register,0);
+				MakeRegister(instruction.op3,Low,op3);
+				emitter.EmitPrefix (InstructionSet.prfLOCK);
+				emitter.Emit2(InstructionSet.opCMPXCHG,mem,op3);
+			END;
 		END EmitCas;
 
 		PROCEDURE EmitCopy(CONST instruction: IntermediateCode.Instruction);
