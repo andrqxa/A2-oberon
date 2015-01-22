@@ -17,7 +17,7 @@ VAR trapHandler*: TrapHandler;
 *)
 PROCEDURE CompareString*(CONST left,right: ARRAY OF CHAR): SHORTINT;
 VAR i: LONGINT; res: SHORTINT; l,r: CHAR;
-BEGIN {UNCOOPERATIVE}
+BEGIN {UNCOOPERATIVE, UNCHECKED}
 	i := 0; res := 0;
 	LOOP
 		l := left[i]; 		(* index check included *)
@@ -39,7 +39,7 @@ END CompareString;
 (* copy string from src to dest, emits trap if not 0X terminated or destination too short *)
 PROCEDURE CopyString*(VAR dest: ARRAY OF CHAR; CONST src: ARRAY OF CHAR);
 VAR i: LONGINT; ch :CHAR; l1,l2: LONGINT;
-BEGIN {UNCOOPERATIVE}
+BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(*
 	i := 0;
 	REPEAT
@@ -59,7 +59,7 @@ END CopyString;
 
 PROCEDURE EnsureAllocatedStack*(size: SIZE);
 VAR i: ADDRESS; temp: ADDRESS;
-BEGIN {UNCOOPERATIVE}
+BEGIN {UNCOOPERATIVE, UNCHECKED}
 	FOR i := 0 TO size BY 4096 DO
 		SYSTEM.GET(ADDRESSOF(i)-i,temp);
 		(*
@@ -88,8 +88,8 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF trapHandler # NIL THEN
 		trapHandler (number);
 	ELSE
-		Trace.String ("trap: "); Trace.Int (number, 0); Trace.Ln;
-		Trace.StackFrames (1, 20, 100 * SIZE OF ADDRESS);
+		Trace.Red; Trace.String ("trap: "); Trace.Int (number, 0); Trace.Ln;
+		Trace.Default; Trace.StackFrames (1, 20, 100 * SIZE OF ADDRESS);
 	 END;
 	Abort;
 END Trap;
@@ -123,8 +123,6 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ELSE Deallocate (pointer) END; pointer := NIL;
 END Dispose;
 
-BEGIN
-	(*! assumed that modules = 0, implicit call of InsertModule *)
 END Runtime.
 
 Runtime.Obw

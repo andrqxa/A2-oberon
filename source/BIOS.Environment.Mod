@@ -40,7 +40,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Exit;
 
 PROCEDURE Clock- (): LONGINT;
-BEGIN {UNCOOPERATIVE}
+BEGIN {UNCOOPERATIVE, UNCHECKED}
 	RETURN clock;
 END Clock;
 
@@ -72,7 +72,7 @@ END Deallocate;
 
 PROCEDURE StrToInt (VAR i: LONGINT; CONST s: ARRAY OF CHAR): LONGINT;
 VAR vd, vh, sgn, d: LONGINT; hex: BOOLEAN;
-BEGIN {UNCOOPERATIVE}
+BEGIN {UNCOOPERATIVE, UNCHECKED}
 	vd := 0; vh := 0; hex := FALSE;
 	IF s[i] = "-" THEN sgn := -1; INC (i) ELSE sgn := 1 END;
 	LOOP
@@ -124,7 +124,7 @@ END GetString;
 
 PROCEDURE ReadBootTable (bt: ADDRESS);
 VAR i, p: ADDRESS; j, d, type, addr, size, heapSize: LONGINT; ch: CHAR;
-BEGIN {UNCOOPERATIVE}
+BEGIN {UNCOOPERATIVE, UNCHECKED}
 	heapSize := 0;
 	p := bt; d := 0;
 	LOOP
@@ -157,14 +157,14 @@ VAR status: SIZE;
 	(* Scroll the screen by one line. *)
 	PROCEDURE Scroll;
 	VAR adr: ADDRESS; off: SIZE;
-	BEGIN {UNCOOPERATIVE}
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		adr := traceBase + TraceLen;
 		SYSTEM.MOVE (adr, adr - TraceLen, TraceSize - TraceLen);
 		adr := traceBase + TraceSize - TraceLen;
 		FOR off := 0 TO TraceLen - SIZEOF(INTEGER) BY SIZEOF(INTEGER) DO SYSTEM.PUT16 (adr + off, 100H * 7H + 32) END
 	END Scroll;
 
-BEGIN {UNCOOPERATIVE}
+BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF TraceV24 IN traceMode THEN
 		REPEAT	(* wait until port is ready to accept a character *)
 			status := CPU.InByte (tracePort + 5)
@@ -193,14 +193,14 @@ BEGIN {UNCOOPERATIVE}
 END TraceChar;
 
 PROCEDURE TraceColor (c: SHORTINT);
-BEGIN {UNCOOPERATIVE} traceColor := c;
+BEGIN {UNCOOPERATIVE, UNCHECKED} traceColor := c;
 END TraceColor;
 
 PROCEDURE InitTrace;
 CONST MaxPorts = 8;
 VAR i, p, bps: LONGINT; off: SIZE; s, name: ARRAY 32 OF CHAR;
 	baselist: ARRAY MaxPorts OF LONGINT;
-BEGIN {UNCOOPERATIVE}
+BEGIN {UNCOOPERATIVE, UNCHECKED}
 	GetString ("TraceMode", s);
 	p := 0; traceMode := SYSTEM.VAL (SET, StrToInt (p, s));
 	IF TraceScreen IN traceMode THEN

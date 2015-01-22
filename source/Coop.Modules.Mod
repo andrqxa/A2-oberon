@@ -633,7 +633,7 @@ END Register;
 
 PROCEDURE PublishRegisteredModules;
 VAR m {UNTRACED}: Module; module, import: SIZE;
-BEGIN {UNCHECKED}
+BEGIN
 	Activities.Call (Activities.Idle);
 	FOR module := 0 TO registered - 1 DO
 		m := register[module];
