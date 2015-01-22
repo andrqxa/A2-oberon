@@ -80,6 +80,8 @@ CONST
 		BaseObjectTypeSize = BasePointerTypeSize + 2;
 		ActionTypeSize = 3;
 		MonitorTypeSize = 7;
+		StackLimitOffset* = BaseObjectTypeSize + 3;
+		QuantumOffset = BaseObjectTypeSize + 4;
 		
 TYPE
 	SupportedInstructionProcedure* = PROCEDURE {DELEGATE} (CONST instr: IntermediateCode.Instruction; VAR moduleName,procedureName: ARRAY OF CHAR): BOOLEAN;
@@ -8169,7 +8171,6 @@ TYPE
 		END VisitAssignment;
 		
 		PROCEDURE EmitCooperativeSwitch;
-		CONST QuantumOffset = BaseObjectTypeSize + 4;
 		VAR quantum, offset, zero: IntermediateCode.Operand; skip: Label;
 		BEGIN
 			ASSERT (cooperativeSwitches);
