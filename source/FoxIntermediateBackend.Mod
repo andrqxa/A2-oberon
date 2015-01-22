@@ -2203,7 +2203,7 @@ TYPE
 			Global.GetSymbolSegmentedName(scope.ownerProcedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
-			stackFrame := NewRegisterOperand (addressType); Emit (Mov(position,stackFrame,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 1))));
+			stackFrame := NewRegisterOperand (addressType); Emit (Mov(position,stackFrame,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3))));
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 			WHILE parameter # NIL DO
 				IF IsVariableParameter (parameter) THEN
@@ -2215,7 +2215,7 @@ TYPE
 						Emit (Mov(position,value,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits))));
 						skip := NewLabel ();
 						BrltL (skip,value,stackFrame);
-						BrgeL (skip,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3)));
+						BrgeL (skip,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 1)));
 						Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
 						Emit (Mov(position,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits)),value));
 						ReleaseIntermediateOperand (value);
@@ -2226,7 +2226,7 @@ TYPE
 			END;
 			ReleaseIntermediateOperand(stackFrame);
 			Basic.ToSegmentedName ("BaseTypes.StackFrame.Move",name);
-			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+			IntermediateCode.InitAddress(op, addressType, name, 0, 0);
 			Emit(Br(position,op));
 			section := previousSection;
 		END CreateMoveMethod;
@@ -7300,7 +7300,7 @@ TYPE
 			operand.tag := dereferenced;
 			UseIntermediateOperand(operand.tag);
 			IF (type=NIL) OR (type IS SyntaxTree.RecordType) THEN
-				IF isUnsafe THEN
+				IF isUnsafe & ((type = NIL) OR ~type(SyntaxTree.RecordType).isObject) THEN
 					ReleaseIntermediateOperand(operand.tag);
 					operand.tag := TypeDescriptorAdr(type);
 					IF ~newObjectFile THEN
@@ -7835,7 +7835,7 @@ TYPE
 		END VisitParameter;
 
 		PROCEDURE DynamicCallOperand(VAR operand: Operand; x: SyntaxTree.Procedure);
-		VAR tag,reg,tmp: IntermediateCode.Operand; offset: LONGINT;
+		VAR tag,reg,tmp: IntermediateCode.Operand; offset: LONGINT; recordType: SyntaxTree.RecordType; name, stackFrame: Basic.SegmentedName;
 		BEGIN
 			IF Trace THEN TraceEnter("DynamicCallOperand") END;
 			(* left.p: left already emitted *)
@@ -7848,7 +7848,13 @@ TYPE
 			ReleaseIntermediateOperand(tmp);
 			
 			IF backend.cooperative THEN
-				IF x.scope(SyntaxTree.RecordScope).ownerRecord.pointerType.isPlain THEN
+				recordType := x.scope(SyntaxTree.RecordScope).ownerRecord;
+				WHILE recordType.baseType # NIL DO
+					recordType := recordType.GetBaseRecord ();
+				END;
+				GetRecordTypeName (recordType,name);
+				Basic.ToSegmentedName ("BaseTypes.StackFrame",stackFrame);
+				IF (name = stackFrame) OR HasExplicitTraceMethod (recordType) THEN
 					offset := 0;
 				ELSE
 					offset := 1;
@@ -10380,10 +10386,39 @@ TYPE
 				END MethodTable;
 
 				PROCEDURE CooperativeMethodTable;
-				VAR i,start,methods: LONGINT; name,trace: Basic.SegmentedName;
+				VAR baseRecord: SyntaxTree.RecordType; name, stackFrame: Basic.SegmentedName; i,start,methods: LONGINT;
 				BEGIN
 					Info(source, "method table");
-					IF ~HasExplicitTraceMethod(recordType) THEN start := 1 ELSE start := 0 END;
+					baseRecord := recordType;
+					WHILE baseRecord.baseType # NIL DO
+						baseRecord := baseRecord.GetBaseRecord ();
+					END;
+					GetRecordTypeName (baseRecord, name);
+					Basic.ToSegmentedName ("BaseTypes.StackFrame", stackFrame);
+					IF name = stackFrame THEN
+						start := 0;
+					ELSIF ~HasExplicitTraceMethod(recordType) THEN
+						baseRecord := recordType;
+						WHILE (baseRecord # NIL) & ~baseRecord.hasPointers DO
+							baseRecord := baseRecord.GetBaseRecord ();
+						END;
+						IF baseRecord # NIL THEN
+							GetRecordTypeName (baseRecord, name);
+						ELSIF recordType.isObject THEN
+							Basic.ToSegmentedName ("BaseTypes.Object",name);
+						ELSE
+							Basic.ToSegmentedName ("BaseTypes.Record",name);
+						END;
+						IF ~recordType.isObject THEN
+							Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
+						END;
+						Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+						tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
+						Symbol(source, tir,  0, 0);
+						start := 0;
+					ELSE
+						start := 1;
+					END;
 					methods := recordType.recordScope.numberMethods;
 					FOR i := start TO methods-1 DO
 						procedure := recordType.recordScope.FindMethod(i);
@@ -10458,32 +10493,6 @@ TYPE
 
 						Info(source, "base record descriptor");
 						Symbol(source, base, 0, 0);
-
-						baseRecord := recordType;
-						WHILE baseRecord.baseType # NIL DO
-							baseRecord := baseRecord.GetBaseRecord ();
-						END;
-						GetRecordTypeName (baseRecord, name);
-						Basic.ToSegmentedName ("BaseTypes.StackFrame", stackFrame);
-						IF (name # stackFrame) & ~HasExplicitTraceMethod(recordType) THEN
-							baseRecord := recordType;
-							WHILE (baseRecord # NIL) & ~baseRecord.hasPointers DO
-								baseRecord := baseRecord.GetBaseRecord ();
-							END;
-							IF baseRecord # NIL THEN
-								GetRecordTypeName (baseRecord, name);
-							ELSIF recordType.isObject THEN
-								Basic.ToSegmentedName ("BaseTypes.Object",name);
-							ELSE
-								Basic.ToSegmentedName ("BaseTypes.Record",name);
-							END;
-							IF ~recordType.isObject THEN
-								Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
-							END;
-							Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
-							tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
-							Symbol(source, tir,  0, 0);
-						END;
 						CooperativeMethodTable;
 						source.SetReferenced(FALSE);
 						
