@@ -2675,9 +2675,9 @@ TYPE
 			PROCEDURE JmpDest(brop: LONGINT);
 			BEGIN
 				IF instruction.op1.mode = IntermediateCode.ModeImmediate THEN
-					IF instruction.op1.symbol.name # "" THEN
+					IF instruction.op1.symbol.name # in.name THEN
 						Assembler.InitOffset32(target,instruction.op1.intValue);
-						Assembler.SetSymbol(target,instruction.op1.symbol.name,instruction.op1.symbol.fingerprint,instruction.op1.offset,0);
+						Assembler.SetSymbol(target,instruction.op1.symbol.name,instruction.op1.symbol.fingerprint,instruction.op1.symbolOffset,instruction.op1.offset);
 						emitter.Emit1(brop,target);
 					ELSE
 						dest := (instruction.op1.symbolOffset); (* this is the offset in the in-data section (intermediate code), it is not byte- *)
