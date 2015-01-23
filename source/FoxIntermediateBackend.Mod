@@ -2059,6 +2059,7 @@ TYPE
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			IF dump # NIL THEN dump := section.comments END;
 
 			variable := recordType.recordScope.firstVariable;
 			WHILE variable # NIL DO
@@ -2115,6 +2116,7 @@ TYPE
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 				section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+				IF dump # NIL THEN dump := section.comments END;
 				
 				register := NewRegisterOperand (addressType);
 				Emit (Mov(position,register,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits))));
@@ -2135,6 +2137,7 @@ TYPE
 				Emit(Exit(position,0,0));
 			END;
 			section := previousSection;
+			IF dump # NIL THEN dump := section.comments END;
 		END CreateTraceMethod;
 
 		PROCEDURE CreateResetProcedure (recordType: SyntaxTree.RecordType);
@@ -2145,6 +2148,7 @@ TYPE
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			IF dump # NIL THEN dump := section.comments END;
 
 			variable := recordType.recordScope.firstVariable;
 			WHILE variable # NIL DO
@@ -2180,6 +2184,7 @@ TYPE
 				Emit(Exit(position,0,0));
 			END;
 			section := previousSection;
+			IF dump # NIL THEN dump := section.comments END;
 		END CreateResetProcedure;
 		
 		PROCEDURE CreateResetMethod (scope: SyntaxTree.ProcedureScope);
@@ -2191,12 +2196,14 @@ TYPE
 			Global.GetSymbolSegmentedName(scope.ownerProcedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			IF dump # NIL THEN dump := section.comments END;
 			Emit(Enter(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention,0,0));
 			currentScope := scope; ResetVariables;
 			Emit(Leave(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention));
 			Emit(Exit(position,0,0));
 			currentScope := previousScope;
 			section := previousSection;
+			IF dump # NIL THEN dump := section.comments END;
 		END CreateResetMethod;
 
 		PROCEDURE CreateMoveMethod (scope: SyntaxTree.ProcedureScope);
@@ -2208,6 +2215,7 @@ TYPE
 			Global.GetSymbolSegmentedName(scope.ownerProcedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			IF dump # NIL THEN dump := section.comments END;
 			stackFrame := NewRegisterOperand (addressType); Emit (Mov(position,stackFrame,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3))));
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 			WHILE parameter # NIL DO
@@ -2234,6 +2242,7 @@ TYPE
 			IntermediateCode.InitAddress(op, addressType, name, 0, 0);
 			Emit(Br(position,op));
 			section := previousSection;
+			IF dump # NIL THEN dump := section.comments END;
 		END CreateMoveMethod;
 
 		PROCEDURE ResetVariables ();
@@ -2280,6 +2289,7 @@ TYPE
 			Global.GetSymbolSegmentedName(procedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Descriptor"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, name,NIL,TRUE);
+			IF dump # NIL THEN dump := section.comments END;
 			Basic.ToSegmentedName ("BaseTypes.StackFrame",name);
 
 			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
@@ -2304,6 +2314,7 @@ TYPE
 			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 			Emit(Data(position,op));
 			section := previousSection;
+			IF dump # NIL THEN dump := section.comments END;
 		END CreateProcedureDescriptor;
 
 		PROCEDURE AddImport(CONST moduleName: ARRAY OF CHAR; VAR module: SyntaxTree.Module; force: BOOLEAN): BOOLEAN;
