@@ -10,6 +10,7 @@ CONST IsNative* = TRUE;
 CONST Running = 0; ShuttingDown = 1; Rebooting = 2;
 
 CONST HeapAdr = 100000H;
+CONST MaxMemTop = 80000000H;
 
 CONST TraceV24 = 2; TraceScreen = 0;
 CONST TraceWidth = 80; TraceHeight = 25;
@@ -240,6 +241,46 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	traceColor := 7; Trace.Char := TraceChar; Trace.Color := TraceColor;
 END InitTrace;
 
+(* Check if the specified address is RAM. *)
+PROCEDURE IsRAM(adr: ADDRESS): BOOLEAN;
+CONST Pattern1 = 0BEEFC0DEH; Pattern2 = 0AA55FF00H;
+VAR save, x: ADDRESS; ok: BOOLEAN;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	ok := FALSE;
+	SYSTEM.GET (adr, save);
+	SYSTEM.PUT (adr, Pattern1);	(* attempt 1st write *)
+	x := Pattern2;				(* write something else *)
+	SYSTEM.GET (adr, x);		(* attempt 1st read *)
+	IF x = Pattern1 THEN		(* first test passed *)
+		SYSTEM.PUT (adr, Pattern2);	(* attempt 2nd write *)
+		x := Pattern1;			(* write something else *)
+		SYSTEM.GET (adr, x);	(* attempt 2nd read *)
+		ok := (x = Pattern2)
+	END;
+	SYSTEM.PUT (adr, save);
+	RETURN ok
+END IsRAM;
+
+(* Check amount of memory available and update memTop. *)
+PROCEDURE CheckMemory;
+CONST M = 100000H; ExtMemAdr = M; Step = M;
+VAR s: ARRAY 16 OF CHAR; adr: ADDRESS; i: LONGINT;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	GetString("ExtMemSize", s);	(* in MB *)
+	IF s[0] # 0X THEN	(* override detection *)
+		i := 0; memTop := ExtMemAdr + StrToInt(i, s) * M;
+	ELSE
+		IF memTop >= 15*M THEN	(* search for more memory (ignore aliasing) *)
+			adr := memTop-4;
+			WHILE (LSH(memTop, -12) < LSH(MaxMemTop, -12)) & IsRAM(adr) DO
+				memTop := adr + 4;
+				INC (adr, Step)
+			END;
+			IF (memTop <= 0) THEN memTop := 2047 * M ; END;
+		END
+	END;
+END CheckMemory;
+
 PROCEDURE SetupTimer (channel, mode: SHORTINT; frequency: LONGINT);
 CONST CommandPort = 043H; AccessLoHiByte = 030H; Binary = 000H; Channel0Port = 040H;
 CONST OscillatorFrequency = 1193180;
@@ -264,6 +305,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	CPU.Initialize;
 	ReadBootTable (bootFlag);
 	InitTrace;
+	CheckMemory;
 	memory := memTop - ADDRESS OF KernelEnd;
 	HeapManager.Initialize (heap, ADDRESS OF KernelEnd, memTop);
 	previousTimerHandler := CPU.InstallInterrupt (HandleTimerInterrupt, CPU.IRQ0);
