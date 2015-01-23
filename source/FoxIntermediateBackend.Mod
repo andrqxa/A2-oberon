@@ -7659,6 +7659,7 @@ TYPE
 				END;
 				IntermediateCode.InitRegister(result.op,IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,reg);
 			ELSIF x.externalName # NIL THEN
+				InitOperand(result,ModeReference);
 				Basic.ToSegmentedName(x.externalName^, name);
 				IntermediateCode.InitAddress(result.op, addressType, name, 0, 0);
 			ELSIF (x.scope IS SyntaxTree.ProcedureScope) THEN (* local variable (potentially via nested procedure) *)
