@@ -66,13 +66,12 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	END InitializeActivity;
 
 	PROCEDURE ~Finalize;
-	VAR stackFrame {UNTRACED}: BaseTypes.StackFrame;
+	VAR stackFrame {UNTRACED}: BaseTypes.StackFrame; currentActivity {UNTRACED}: Activity;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		stackFrame := framePointer;
-		WHILE stackFrame # NIL DO
-			stackFrame.Reset;
-			stackFrame := stackFrame.previous;
-		END;
+		currentActivity := SYSTEM.GetActivity ()(Activity); SYSTEM.SetActivity (SELF);
+		WHILE stackFrame # NIL DO stackFrame.Reset; stackFrame := stackFrame.previous END;
+		SYSTEM.SetActivity (currentActivity);
 		DISPOSE (stack);
 		Finalize^;
 	END Finalize;
@@ -86,7 +85,9 @@ TYPE Process = OBJECT {DISPOSABLE} (Activity)
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		InitializeActivity (procedure, priority);
 		ASSERT (object # NIL);
+		ASSERT (object.action # NIL);
 		SELF.object := object;
+		object.action.activity := SELF;
 		framePointer.procedureArgument := object;
 	END InitializeProcess;
 

@@ -6387,7 +6387,7 @@ TYPE
 			(* ---- WAIT ----- *)
 			|Global.Wait:
 				Evaluate(p0,operand);
-				Emit(Push(position,operand));
+				Emit(Push(position,operand.op));
 				ReleaseOperand(operand);
 				CallThis("Activities","Wait", 1);
 			(* ---- NEW ----- *)

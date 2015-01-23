@@ -90,14 +90,10 @@ TYPE Object* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
 	(** It is guaranteed to be called during the disposal of any object instance. *)
 	PROCEDURE ~Finalize-;
 	VAR PointerDescriptor {UNTRACED} EXTERN "BaseTypes.Pointer": Descriptor;
-(*
 	PROCEDURE Unlink EXTERN "Activities.Process.Unlink" (activity {UNTRACED}: OBJECT);
-*)
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF action # NIL THEN
-(*
 			IF action.activity # NIL THEN Unlink (action.activity); action.activity := NIL END;
-*)
 			Queues.Dispose (action.waitingQueue);
 		END;
 		IF monitor # NIL THEN
