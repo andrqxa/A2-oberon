@@ -7894,7 +7894,7 @@ TYPE
 				IF (name = stackFrame) OR HasExplicitTraceMethod (recordType) THEN
 					offset := 0;
 				ELSE
-					offset := 1;
+					offset := 2;
 				END;
 				Emit(Add(position,reg,tmp,IntermediateCode.Immediate(addressType, ToMemoryUnits(system,system.addressSize  *(meta.MethodTableOffset + x.methodNumber + offset)))));
 			ELSE
