@@ -8,7 +8,7 @@ MODULE GarbageCollector;
 IMPORT Activities, BaseTypes, Counters, CPU, Modules;
 
 VAR tracings: Counters.AlignedCounter;
-VAR currentCycle := 0, oldestCycle := 0: LONGWORD;
+VAR currentCycle, oldestCycle: LONGWORD;
 VAR firstMarked {UNTRACED}, firstWatched {UNTRACED}: BaseTypes.Pointer;
 VAR markedSentinel {UNTRACED}, watchedSentinel {UNTRACED}: BaseTypes.Pointer;
 
