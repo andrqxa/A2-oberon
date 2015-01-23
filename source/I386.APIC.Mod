@@ -12,7 +12,9 @@ CONST ReservedArea* = Processors * CPU.StackSize;
 CONST NMI* = {10}; INIT* = {8, 10}; STARTUP* = {9, 10};
 CONST Assert* = {14}; AllExcludingSelf* = {18, 19};
 
-VAR baseAddress := NIL: ADDRESS;
+CONST BootCodeSize = 119;
+
+VAR baseAddress: ADDRESS;
 
 PROCEDURE AwaitInterrupt-;
 CODE
@@ -39,7 +41,7 @@ CODE
 	PUSH	ECX
 	MOV	EDI, 0
 	MOV	ESI, BootCode
-	MOV	ECX, 119
+	MOV	ECX, BootCodeSize
 	CLD
 	REP MOVSB
 	POP	ECX
@@ -106,6 +108,8 @@ protected:
 	JMP	DWORD 0
 
 bootcodeend:
+	; "static assert"
+	MOV AL, (bootcodeend - bootcodebegin - BootCodeSize) * 256
 END BootCode;
 
 PROCEDURE Initialize-;
