@@ -2065,6 +2065,50 @@ TYPE
 			END;
 		END Warning;
 		
+		PROCEDURE CreateTraceModuleMethod(mod: SyntaxTree.Module);
+		VAR name: Basic.SectionName; pointer, pooledName: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
+		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
+		BEGIN
+			previousSection := section;
+			Global.GetModuleName(mod,name);
+			Strings.Append(name,".@Module.@Trace");
+			Basic.ToSegmentedName(name, pooledName);
+			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, pooledName,NIL,TRUE);
+			IF dump # NIL THEN dump := section.comments END;
+
+			variable := mod.moduleScope.firstVariable;
+			WHILE variable # NIL DO
+				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
+					register := NewRegisterOperand (addressType);
+					Emit (Mov(position,register,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits))));
+					IntermediateCode.AddOffset(register,ToMemoryUnits(system,variable.offsetInBits));
+					(* object offset *)
+					IntermediateCode.AddOffset(register,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+					IF SemanticChecker.IsPointerType (variable.type) THEN
+						Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+						CallThis("GarbageCollector","Mark", 1);
+					ELSIF variable.type.resolved IS SyntaxTree.RecordType THEN
+						Emit (Push(position,register));
+						GetRecordTypeName (variable.type.resolved(SyntaxTree.RecordType),pooledName);
+						Basic.SuffixSegmentedName (pooledName, Basic.MakeString ("@Trace"));
+						IntermediateCode.InitAddress(op, addressType, pooledName , 0, 0);
+						Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
+					END;
+					ReleaseIntermediateOperand(register);
+				END;
+				variable := variable.nextVariable;
+			END;
+
+			Basic.ToSegmentedName ("BaseTypes.Object.@Trace",pooledName);
+			IntermediateCode.InitAddress(op, addressType, pooledName , 0, 0);
+			Emit(Br(position,op));
+		
+			section := previousSection;
+			IF dump # NIL THEN dump := section.comments END;
+			
+		END CreateTraceModuleMethod;
+		
+		
 		PROCEDURE CreateTraceMethod (recordType: SyntaxTree.RecordType);
 		VAR name, pointer: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
@@ -10078,6 +10122,31 @@ TYPE
 			Info(section, "monitor");
 			Address(section,0);
 		END BaseObject;
+		
+		PROCEDURE ModuleDescriptor(section: IntermediateCode.Section);
+		VAR descriptorSection: IntermediateCode.Section; name: ARRAY 128 OF CHAR;
+			pooledName: Basic.SegmentedName;
+			symbol: SyntaxTree.Symbol;
+		BEGIN
+			Global.GetModuleName(module.module,name);
+			Strings.Append(name,".@Module.@Descriptor");
+			Basic.ToSegmentedName(name, pooledName);
+			descriptorSection := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, pooledName,NIL,TRUE);
+			Symbol(section,descriptorSection,0,0);
+			
+			Info(descriptorSection, "descriptor");
+			symbol := implementationVisitor.GetTypeDescriptor("Modules","Module", pooledName);
+			NamedSymbol(descriptorSection, pooledName,symbol, 0, 0);
+			Address(descriptorSection,0);
+
+			Global.GetModuleName(module.module,name);
+			Strings.Append(name,".@Trace");
+			Basic.ToSegmentedName(name, pooledName);
+			NamedSymbol(descriptorSection, pooledName,NIL, 0, 0);
+			
+			Basic.ToSegmentedName ("BaseTypes.Object.Finalize",pooledName);
+			NamedSymbol(descriptorSection, pooledName,NIL, 0, 0);
+		END ModuleDescriptor;
 
 		PROCEDURE ModuleSection(): IntermediateCode.Section;
 		VAR name: ARRAY 128 OF CHAR;
@@ -10092,9 +10161,9 @@ TYPE
 			IF moduleSection.pc = 0 THEN
 				IF implementationVisitor.backend.cooperative THEN
 					Info(moduleSection, "descriptor");
-					symbol := implementationVisitor.GetTypeDescriptor("Modules","Module", pooledName);
-					NamedSymbol(moduleSection, pooledName,symbol, 0, 0);
+					ModuleDescriptor(moduleSection);
 					BaseObject(moduleSection);
+					implementationVisitor.CreateTraceModuleMethod(module.module);
 				ELSE
 					ProtectedHeapBlock("Heaps","ProtRecBlockDesc",moduleSection,2);
 					Info(moduleSection, "HeapBlock");
