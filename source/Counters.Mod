@@ -12,8 +12,6 @@ TYPE Counter* = RECORD value := 0: SIZE END;
 (** Represents an atomic counter aligned for optimal cache behavior. *)
 TYPE AlignedCounter* = RECORD (Counter) dummy {ALIGNED (CPU.CacheLineSize)} : RECORD END END;
 
-VAR a: AlignedCounter;
-
 (** Returns the current value of an atomic counter. *)
 PROCEDURE Read- (VAR counter: Counter): SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN CAS (counter.value, 0, 0);
