@@ -7914,8 +7914,8 @@ TYPE
 		BEGIN
 			IF Trace THEN TraceEnter("StaticCallOperand") END;
 			IF x.type(SyntaxTree.ProcedureType).isDelegate THEN
-				tag := result.op;
-				ReleaseIntermediateOperand(result.tag);
+				tag := operand.op;
+				ReleaseIntermediateOperand(operand.tag);
 			ELSE tag := nil
 			END;
 			IF x.isInline  THEN
