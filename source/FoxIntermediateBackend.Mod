@@ -430,11 +430,11 @@ TYPE
 		PROCEDURE Procedure(x: SyntaxTree.Procedure);
 		VAR scope: SyntaxTree.ProcedureScope;
 			prevScope: SyntaxTree.Scope;
-			inline: BOOLEAN;
+			inline, finalizer: BOOLEAN;
 			procedureType: SyntaxTree.ProcedureType;
 			pc: LONGINT;
 			stackSize: LONGINT;
-			name: Basic.SegmentedName; ir: IntermediateCode.Section;
+			name,baseObject: Basic.SegmentedName; ir: IntermediateCode.Section;
 			null,size,src,dest,fp: IntermediateCode.Operand;
 			cc: LONGINT;
 			actorType: SyntaxTree.CellType;
@@ -442,6 +442,7 @@ TYPE
 			registerClass: IntermediateCode.RegisterClass;
 			type: IntermediateCode.Type;
 			formalParameter: SyntaxTree.Parameter;
+			recordType: SyntaxTree.RecordType;
 			priority: INTEGER;
 
 			PROCEDURE Signature;
@@ -634,9 +635,22 @@ TYPE
 
 
 					IF (procedureType.returnType = NIL) OR (scope.body.code # NIL)  THEN
+						finalizer := FALSE;
+						IF backend.cooperative & x.isFinalizer THEN
+							recordType := x.scope(SyntaxTree.RecordScope).ownerRecord;
+							Basic.ToSegmentedName("BaseTypes.Object", baseObject);
+							GetRecordTypeName(recordType,name);
+							finalizer := (name # baseObject) & (recordType.baseType = NIL);
+						END;
 						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
 						ir.Emit(implementationVisitor.Leave(x.position,x,cc));
-						ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
+						IF finalizer THEN
+							Basic.ToSegmentedName("BaseTypes.Object.Finalize", name);
+							IntermediateCode.InitAddress(dest, addressType, name , 0, 0);
+							ir.Emit(Br(x.position,dest));
+						ELSE
+							ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
+						END;
 					ELSIF ~scope.body.isUnchecked & ~backend.noRuntimeChecks THEN
 						implementationVisitor.EmitTrap(x.position,ReturnTrap);
 						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
@@ -10463,11 +10477,26 @@ TYPE
 					ELSE
 						start := 1;
 					END;
+					IF (name # stackFrame) & recordType.isObject THEN
+						baseRecord := recordType;
+						WHILE (baseRecord # NIL) & (baseRecord.recordScope.finalizer = NIL) DO
+							baseRecord := baseRecord.GetBaseRecord ();
+						END;
+						IF (baseRecord = NIL) OR (baseRecord.recordScope.finalizer = NIL) THEN
+							Basic.ToSegmentedName ("BaseTypes.Object.Finalize",name);
+						ELSE
+							Global.GetSymbolSegmentedName(baseRecord.recordScope.finalizer, name);
+						END;
+						tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
+						Symbol(source, tir,  0, 0);
+					END;
 					methods := recordType.recordScope.numberMethods;
 					FOR i := start TO methods-1 DO
 						procedure := recordType.recordScope.FindMethod(i);
-						Global.GetSymbolSegmentedName(procedure, name);
-						NamedSymbol(source, name,procedure, 0,0);
+						IF ~procedure.isFinalizer THEN
+							Global.GetSymbolSegmentedName(procedure, name);
+							NamedSymbol(source, name,procedure, 0,0);
+						END;
 					END;
 				END CooperativeMethodTable;
 

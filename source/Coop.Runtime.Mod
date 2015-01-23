@@ -116,9 +116,7 @@ PROCEDURE Deallocate EXTERN "Environment.Deallocate" (address: ADDRESS);
 PROCEDURE Watch EXTERN "GarbageCollector.Watch" (pointer {UNTRACED}: BaseTypes.Pointer);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (pointer # NIL);
-(*
 	IF pointer IS BaseTypes.Object THEN pointer(BaseTypes.Object).Finalize END;
-*)
 	IF (pointer IS BaseTypes.Pointer) & (pointer(BaseTypes.Pointer).nextWatched = NIL) THEN Watch (pointer(BaseTypes.Pointer));
 	ELSE Deallocate (pointer) END; pointer := NIL;
 END Dispose;
