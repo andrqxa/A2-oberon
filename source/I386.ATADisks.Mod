@@ -1912,24 +1912,28 @@ VAR
 
 (* Block port input instruction. *)
 
-PROCEDURE -RepInWord(port, bufAdr: ADDRESS; len: SIZE);
+PROCEDURE RepInWord(port, bufAdr: ADDRESS; len: SIZE);
 CODE {SYSTEM.i386}
-	POP ECX
-	POP EDI
-	POP EDX
+	PUSH	ECX
+	MOV	EDX, [EBP + port]
+	MOV	EDI, [EBP + bufAdr]
+	MOV	ECX, [EBP + len]
 	CLD
-	REP INSW
+	REP	INSW
+	POP	ECX
 END RepInWord;
 
 (* Block port out instruction. *)
 
-PROCEDURE -RepOutWord(port, bufAdr: ADDRESS; len: SIZE);
+PROCEDURE RepOutWord(port, bufAdr: ADDRESS; len: SIZE);
 CODE {SYSTEM.i386}
-	POP ECX
-	POP ESI
-	POP EDX
+	PUSH	ECX
+	MOV	EDX, [EBP + port]
+	MOV	ESI, [EBP + bufAdr]
+	MOV	ECX, [EBP + len]
 	CLD
-	REP OUTSW
+	REP	OUTSW
+	POP	ECX
 END RepOutWord;
 
 PROCEDURE ResetCommand(cmd: Command; size: SIZE);
