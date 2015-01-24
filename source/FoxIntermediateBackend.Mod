@@ -2072,7 +2072,7 @@ TYPE
 		BEGIN
 			previousSection := section;
 			Global.GetModuleName(mod,name);
-			Strings.Append(name,".@Module.@Trace");
+			Strings.Append(name,".@Trace");
 			Basic.ToSegmentedName(name, pooledName);
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, pooledName,NIL,TRUE);
 			IF dump # NIL THEN dump := section.comments END;
