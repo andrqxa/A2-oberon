@@ -10,9 +10,9 @@ FSTools.DeleteFiles hd.img ~
 VirtualDisks.Create hd.img 8000 512 ~
 VirtualDisks.Install -b=512 VDISK0 hd.img ~
 
-StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Reflection TrapWriters Traps Plugins Disks PCI ATADisks Caches Commands Files DiskVolumes Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
+StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Reflection TrapWriters Traps Plugins Disks PCI ATADisks Caches Commands Files DiskVolumes Clock DiskFS Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
 
-Partitions.WriteMBR VDISK0#0 OBEMBR.Bin ~
+Partitions.WriteMBR VDISK0#0 OBEMBR.BIN ~
 Partitions.Create VDISK0#1 76 4 ~
 Partitions.Activate VDISK0#1 ~
 
@@ -20,7 +20,9 @@ Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
 
 Partitions.SetConfig VDISK0#1
 	TraceMode="5" TracePort="1" TraceBPS="115200"
-	BootSystem="Test.Initialize"
+	BootVol1="AOS AosFS IDE0#1"
+	Boot="DisplayLinear.Install"
+	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ExtMemSize="120"
 	Init=""
 	~
