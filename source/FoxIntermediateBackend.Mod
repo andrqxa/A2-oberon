@@ -2068,6 +2068,7 @@ TYPE
 		PROCEDURE CreateTraceModuleMethod(mod: SyntaxTree.Module);
 		VAR name: Basic.SectionName; pointer, pooledName: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
+			operand:Operand;
 		BEGIN
 			previousSection := section;
 			Global.GetModuleName(mod,name);
@@ -2079,11 +2080,8 @@ TYPE
 			variable := mod.moduleScope.firstVariable;
 			WHILE variable # NIL DO
 				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
-					register := NewRegisterOperand (addressType);
-					Emit (Mov(position,register,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits))));
-					IntermediateCode.AddOffset(register,ToMemoryUnits(system,variable.offsetInBits));
-					(* object offset *)
-					IntermediateCode.AddOffset(register,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+					Symbol(variable, operand);
+					register := operand.op;
 					IF SemanticChecker.IsPointerType (variable.type) THEN
 						Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 						CallThis("GarbageCollector","Mark", 1);
