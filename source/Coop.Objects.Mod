@@ -318,6 +318,7 @@ BEGIN {EXCLUSIVE}
 	IF interrupt[int-MinIRQ] = NIL THEN
 		NEW (interrupt[int-MinIRQ], int);
 	END;
+	interrupt[int-MinIRQ].Add(h);
 END InstallHandler;
 
 (** Remove interrupt handler. *)
@@ -326,10 +327,6 @@ BEGIN {EXCLUSIVE}
 	ASSERT((int >= MinIRQ) & (int-MinIRQ < NumIRQ));
 	IF interrupt[int-MinIRQ] # NIL THEN
 		interrupt[int-MinIRQ].Remove (h);
-		IF interrupt[int-MinIRQ].root = NIL THEN
-			interrupt[int-MinIRQ].Cancel
-		END;
-		interrupt[int-MinIRQ] := NIL;
 	END;
 END RemoveHandler;
 
