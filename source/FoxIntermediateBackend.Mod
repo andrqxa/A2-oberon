@@ -5145,7 +5145,11 @@ TYPE
 					ELSE
 						source := NewSection(module.importedSections, Sections.ConstSection,name,td,commentPrintout # NIL);
 					END;
-					offset := ToMemoryUnits(system,meta.GetTypeRecordBaseOffset(x(SyntaxTree.RecordType).recordScope.numberMethods)*system.addressSize);
+					IF backend.cooperative THEN
+						offset := 0;
+					ELSE
+						offset := ToMemoryUnits(system,meta.GetTypeRecordBaseOffset(x(SyntaxTree.RecordType).recordScope.numberMethods)*system.addressSize);
+					END;
 				ELSE
 					offset := 0;
 					source := module.allSections.FindBySymbol(td); (*TODO*)
@@ -9880,7 +9884,7 @@ TYPE
 
 				PROCEDURE WriteType(type : SyntaxTree.Type);
 				VAR typeDeclaration: SyntaxTree.TypeDeclaration; section: Sections.Section;
-					name: Basic.SegmentedName;
+					name: Basic.SegmentedName; offset: LONGINT;
 				BEGIN
 					IF type = NIL THEN
 						Address(source,0);
@@ -9901,7 +9905,12 @@ TYPE
 							(* TODO *)
 							section := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,typeDeclaration, source.comments # NIL);
 						END;
-						Symbol(source,section, 0, ToMemoryUnits(module.system,(1 + type(SyntaxTree.RecordType).recordScope.numberMethods+16+1)*module.system.addressSize));
+						IF implementationVisitor.backend.cooperative THEN
+							offset := 0;
+						ELSE
+							offset := 1 + type(SyntaxTree.RecordType).recordScope.numberMethods+16+1;
+						END;
+						Symbol(source,section, 0, ToMemoryUnits(module.system,offset*module.system.addressSize));
 					END;
 				END WriteType;
 
