@@ -2006,9 +2006,10 @@ TYPE
 
 		(* test if e is of type type, side effect: result of evaluation of e stays in the operand *)
 		PROCEDURE TypeTest(tag: IntermediateCode.Operand; type: SyntaxTree.Type; trueL,falseL: Label);
-		VAR left,right: IntermediateCode.Operand; level,offset: LONGINT; repeatL: Label;
+		VAR left,right: IntermediateCode.Operand; level,offset: LONGINT; repeatL: Label; originalType: SyntaxTree.Type;
 		BEGIN
 			type := type.resolved;
+			originalType := type;
 			IF type IS SyntaxTree.PointerType THEN
 				type := type(SyntaxTree.PointerType).pointerBase.resolved;
 			END;
@@ -2029,7 +2030,7 @@ TYPE
 				
 				IF backend.cooperative THEN
 		 			repeatL := NewLabel();
-		 			IF ~type(SyntaxTree.RecordType).isObject THEN
+		 			IF (originalType IS SyntaxTree.PointerType) & ~type(SyntaxTree.RecordType).isObject THEN
 						Emit(Mov(position,left,IntermediateCode.Memory(addressType,left,ToMemoryUnits(system,addressType.sizeInBits))));
 					END;
 		 			SetLabel(repeatL);
