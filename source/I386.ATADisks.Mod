@@ -1940,7 +1940,7 @@ PROCEDURE ResetCommand(cmd: Command; size: SIZE);
 BEGIN
 	ASSERT(cmd # NIL);
 	ASSERT(size MOD 4 = 0);
-	Machine.Fill32(SYSTEM.VAL(ADDRESS, cmd), size, 0);
+	Machine.Fill32(ADDRESS OF cmd.dev, size, 0);
 END ResetCommand;
 
 PROCEDURE GetPhysAdr(bufAdr: ADDRESS; size: LONGINT; VAR physAdr: ADDRESS): BOOLEAN;
