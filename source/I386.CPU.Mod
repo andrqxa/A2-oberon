@@ -110,26 +110,16 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	RETURN previous;
 END InstallInterrupt;
 
-PROCEDURE IsInService (index: SIZE): BOOLEAN;
-VAR port: SIZE;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	IF index MOD 8 # 7 THEN RETURN TRUE END;
-	ASSERT (index >= IRQ0); ASSERT (index <= IRQ15);
-	IF index >= IRQ8 THEN port := PIC2CommandPort; DEC (index, 8) ELSE port := PIC1CommandPort END;
-	OutByte (port, PIC_READ_ISR); RETURN index IN InSet (port);
-END IsInService;
-
 PROCEDURE HandleInterrupt (index: SIZE);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	CODE PUSHAD END;
 	SYSTEM.SetActivity (NIL);
 
-	IF index < IRQ0 THEN
-		IF handlers[index] # NIL THEN handlers[index] (index) ELSE HALT (1234) END;
-	ELSIF IsInService (index) THEN
-		IF handlers[index] # NIL THEN handlers[index] (index) ELSE HALT (1234) END;
-		IF index >= IRQ8 THEN OutByte (PIC2CommandPort, PIC_EOI) END; OutByte (PIC1CommandPort, PIC_EOI);
-	ELSIF index >= IRQ8 THEN
+	IF handlers[index] # NIL THEN handlers[index] (index) ELSE HALT (1234) END;
+
+	IF index >= IRQ8 THEN
+		OutByte (PIC2CommandPort, PIC_EOI); OutByte (PIC1CommandPort, PIC_EOI);
+	ELSIF index >= IRQ0 THEN
 		OutByte (PIC1CommandPort, PIC_EOI);
 	END;
 
