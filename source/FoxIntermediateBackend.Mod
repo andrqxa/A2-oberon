@@ -6491,9 +6491,12 @@ TYPE
 						exit := NewLabel();
 						BreqL(exit,pointer,nil);
 						IF ~type(SyntaxTree.PointerType).isPlain THEN
-							reg := TypeDescriptorAdr(p0.type.resolved(SyntaxTree.PointerType).pointerBase.resolved);
-							Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,0),reg));
-							ReleaseIntermediateOperand(reg);
+							GetRecordTypeName (recordType,name);
+							IF ~recordType.isObject THEN
+								Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
+							END;
+							IntermediateCode.InitAddress(adr, addressType, name , 0, 0);
+							Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,0),adr));
 							IF recordType.isObject THEN
 								IF recordType.IsProtected() THEN
 									DEC (size, MonitorTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
@@ -10539,15 +10542,15 @@ TYPE
 						END;
 						IF baseRecord # NIL THEN
 							GetRecordTypeName (baseRecord, name);
+							IF ~baseRecord.isObject THEN
+								Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
+							END;
+							Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 						ELSIF recordType.isObject THEN
-							Basic.ToSegmentedName ("BaseTypes.Object",name);
+							Basic.ToSegmentedName ("BaseTypes.Object.@Trace",name);
 						ELSE
-							Basic.ToSegmentedName ("BaseTypes.Record",name);
+							Basic.ToSegmentedName ("BaseTypes.Pointer.Trace",name);
 						END;
-						IF ~recordType.isObject THEN
-							Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
-						END;
-						Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 						tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
 						Symbol(source, tir,  0, 0);
 						start := 0;
