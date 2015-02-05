@@ -12,7 +12,7 @@ IMPORT SYSTEM, BaseTypes, Counters, CPU, Processors, Queues;
 TYPE Priority* = SIZE;
 
 CONST SafeStackSize = 120 * SIZE OF ADDRESS;
-CONST MaximumStackSize = 128 * InitialStackSize;
+CONST MaximumStackSize* = 128 * InitialStackSize;
 CONST InitialStackSize = CPU.StackSize;
 
 CONST (** Indicates the lowest priority used for idle processors. *) IdlePriority* = 0;

@@ -317,7 +317,9 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	AMD64 { AMD64.Reals.Mod }
 
 	# default trap handling
-	Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod
+	UNCOOP { Reflection.Mod }
+	COOP { Coop.Reflection.Mod }
+	TrapWriters.Mod CRC.Mod SystemVersion.Mod
 	NATIVEORIG, NATIVEGEN { Traps.Mod }
 	AMD64 { AMD64.Traps.Mod }
 	WINORIG, WINGEN {  Win32.Traps.Mod }

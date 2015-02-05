@@ -3,7 +3,7 @@
 
 MODULE Traps;
 
-IMPORT CPU, Runtime, Machine, Streams, Reflection, TrapWriters;
+IMPORT Runtime, Activities, Machine, Streams, Reflection, TrapWriters;
 
 CONST
 	RecursiveLimit = 2;		(* normally 1 or 2 - how many recursive traps to display before stopping *)
@@ -13,7 +13,7 @@ VAR
 	trapState: ARRAY Machine.MaxCPU OF LONGINT;	(* indexed by Machine.ID() *)
 
 PROCEDURE HandleTrap (number: SIZE);
-VAR frame {UNTRACED}: POINTER {UNSAFE} TO RECORD previous, caller, parameters: ADDRESS END; w: Streams.Writer; id: SIZE;
+VAR frame {UNTRACED}: POINTER {UNSAFE} TO RECORD descriptor, previous, caller, parameters: ADDRESS END; w: Streams.Writer; id: SIZE;
 BEGIN
 	w := TrapWriters.GetWriter();
 	w.Update;	(* flush previous output stuck in global writer w *)
@@ -49,7 +49,7 @@ BEGIN
 		w.Ln;
 		w.String( "StackTraceBack:" );  w.Ln;
 		frame := ADDRESS OF frame + SIZE OF ADDRESS; frame := frame.previous;
-		Reflection.StackTraceBack(w, frame.caller, frame.previous, ADDRESS OF frame + CPU.StackSize, TRUE, FALSE);
+		Reflection.StackTraceBack(w, frame.caller, frame.previous, ADDRESS OF frame + Activities.MaximumStackSize, TRUE, FALSE);
 	END;
 	w.String("---------------------------------"); w.Ln;
 	w.Char(02X);	(* "end of trap" *)
