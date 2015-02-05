@@ -879,7 +879,7 @@ TYPE
 
 	PROCEDURE AddOffset*(VAR op: Operand; offset: LONGINT);
 	BEGIN
-		Assert((op.mode = ModeRegister) OR (op.mode = ModeImmediate) & (op.type.form IN {SignedInteger, UnsignedInteger}),"offset not on register or integer immediate");
+		Assert((op.mode = ModeRegister) OR (op.mode = ModeMemory) OR (op.mode = ModeImmediate) & (op.type.form IN {SignedInteger, UnsignedInteger}),"offset not on register or integer immediate");
 		IF (op.mode = ModeImmediate) & (op.symbol.name = "") THEN
 			INC(op.intValue,offset)
 		ELSE
