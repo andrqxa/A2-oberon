@@ -582,6 +582,7 @@ BEGIN
 END GetFreeK;
 
 PROCEDURE PhysicalAdr*(adr: ADDRESS; size: SIZE): ADDRESS;
+BEGIN RETURN adr;
 END PhysicalAdr;
 
 	(** -- Atomic operations -- *)
