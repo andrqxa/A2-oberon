@@ -90,8 +90,6 @@ TYPE
 		map: ARRAY MapSize OF SET
 	END;
 
-	FileHd = POINTER TO FileHeader;
-
 	Buffer = POINTER TO RECORD (Files.Hint)
 		apos, lim: LONGINT;
 		mod: BOOLEAN;
@@ -554,12 +552,12 @@ TYPE
 		END Init;
 
 		PROCEDURE New0(name: ARRAY OF CHAR): Files.File;
-		VAR i, res: LONGINT; f: File; buf: Buffer; head: FileHd; namebuf: FileName;
+		VAR i, res: LONGINT; f: File; buf: Buffer; head {UNTRACED}: POINTER {UNSAFE} TO FileHeader; namebuf: FileName;
 		BEGIN {EXCLUSIVE}
 			f := NIL; Check(name, namebuf, res);
 			IF res <= 0 THEN
 				NEW(buf); buf.apos := 0; buf.mod := TRUE; buf.lim := HeaderSize; buf.next := buf;
-				head := SYSTEM.VAL(FileHd, ADDRESSOF(buf.data));
+				head := ADDRESSOF(buf.data);
 				head.mark := HeaderMark;
 				head.aleng := 0; head.bleng := HeaderSize; head.name := namebuf;
 				Clock.Get(head.time, head.date);
@@ -578,7 +576,7 @@ TYPE
 
 		PROCEDURE Old0(name: ARRAY OF CHAR): Files.File;
 		VAR
-			i, k, res: LONGINT; f: File; header: DiskAdr; buf: Buffer; head {UNTRACED}: FileHd;
+			i, k, res: LONGINT; f: File; header: DiskAdr; buf: Buffer; head {UNTRACED}: POINTER {UNSAFE} TO FileHeader;
 			namebuf: FileName; super: SuperIndex; sub: SubIndex; sec: IndexSector;
 		BEGIN {EXCLUSIVE}
 			f := NIL; Check(name, namebuf, res);
@@ -588,7 +586,7 @@ TYPE
 					NEW(buf); buf.apos := 0; buf.next := buf; buf.mod := FALSE;
 
 					GetSector(vol, header, buf.data);
-					head := SYSTEM.VAL(FileHd, ADDRESSOF(buf.data));
+					head := ADDRESSOF(buf.data);
 
 					NEW(f); f.fs := SELF; f.key := header;
 					f.aleng := head.aleng; f.bleng := head.bleng;
