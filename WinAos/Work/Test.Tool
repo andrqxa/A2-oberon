@@ -18,6 +18,12 @@ Partitions.Activate VDISK0#1 ~
 
 Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
 
+FSTools.Mount TEMP AosFS VDISK0#1 ~
+FSTools.Unsafe ~
+FSTools.CopyFiles DisplayLinear.Gof => TEMP:DisplayLinear.Gof ~
+FSTools.Watch TEMP ~
+FSTools.Unmount TEMP ~
+
 Partitions.SetConfig VDISK0#1
 	TraceMode="5" TracePort="1" TraceBPS="115200"
 	BootVol1="AOS AosFS IDE0#1"
@@ -41,7 +47,7 @@ I386.CPU.Mod Trace.Mod Counters.Mod I386.APIC.Mod APIC.Processors.Mod Queues.Mod
 BaseTypes.Mod Activities.Mod ExclusiveBlocks.Mod Interrupts.Mod Coop.Runtime.Mod HeapManager.Mod 
 BIOS.Environment.Mod Mutexes.Mod Coop.Machine.Mod Coop.Heaps.Mod Coop.Modules.Mod GarbageCollector.Mod 
 Coop.Objects.Mod Coop.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod 
-I386.Reals.Mod Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod Coop.Traps.Mod Locks.Mod
+I386.Reals.Mod Coop.Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod Coop.Traps.Mod Locks.Mod
 I386.PCI.Mod Clock.Mod Coop.MemCache.Mod Disks.Mod Files.Mod Dates.Mod Strings.Mod UTF8Strings.Mod 
 FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod OldDiskVolumes.Mod RAMVolumes.Mod DiskFS.Mod OldDiskFS.Mod 
 OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod ISO9660Files.Mod 
