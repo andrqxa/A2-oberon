@@ -2265,8 +2265,28 @@ TYPE
 
 		PROCEDURE CreateMoveMethod (scope: SyntaxTree.ProcedureScope);
 		VAR previousSection: IntermediateCode.Section; name: Basic.SegmentedName;
-		VAR parameter: SyntaxTree.Parameter; op: IntermediateCode.Operand;
-		VAR stackFrame, value: IntermediateCode.Operand; skip: Label;
+		VAR parameter: SyntaxTree.Parameter; op, stackFrame: IntermediateCode.Operand;
+		
+			PROCEDURE Move (parameter: SyntaxTree.Parameter);
+			VAR value: IntermediateCode.Operand; skip: Label;
+			BEGIN
+				ASSERT (IsVariableParameter (parameter));
+				IF (parameter.kind = SyntaxTree.ValueParameter) & IsOpenArray (parameter.type) THEN
+					value := IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits));
+					Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
+				ELSE
+					value := NewRegisterOperand (addressType);
+					Emit (Mov(position,value,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits))));
+					skip := NewLabel ();
+					BrltL (skip,value,stackFrame);
+					BrgeL (skip,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 1)));
+					Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
+					Emit (Mov(position,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits)),value));
+					ReleaseIntermediateOperand (value);
+					SetLabel (skip);
+				END;
+			END Move;
+
 		BEGIN
 			previousSection := section;
 			Global.GetSymbolSegmentedName(scope.ownerProcedure, name);
@@ -2276,24 +2296,11 @@ TYPE
 			stackFrame := NewRegisterOperand (addressType); Emit (Mov(position,stackFrame,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3))));
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 			WHILE parameter # NIL DO
-				IF IsVariableParameter (parameter) THEN
-					IF (parameter.kind = SyntaxTree.ValueParameter) & IsOpenArray (parameter.type) THEN
-						value := IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits));
-						Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
-					ELSE
-						value := NewRegisterOperand (addressType);
-						Emit (Mov(position,value,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits))));
-						skip := NewLabel ();
-						BrltL (skip,value,stackFrame);
-						BrgeL (skip,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 1)));
-						Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
-						Emit (Mov(position,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits)),value));
-						ReleaseIntermediateOperand (value);
-						SetLabel (skip);
-					END;
-				END;
+				IF IsVariableParameter (parameter) THEN Move (parameter) END;
 				parameter := parameter.nextParameter;
 			END;
+			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).returnParameter;
+			IF parameter # NIL THEN Move (parameter) END;
 			ReleaseIntermediateOperand(stackFrame);
 			Basic.ToSegmentedName ("BaseTypes.StackFrame.Move",name);
 			IntermediateCode.InitAddress(op, addressType, name, 0, 0);
@@ -11075,7 +11082,7 @@ TYPE
 			IF IsVariableParameter (parameter) THEN RETURN TRUE END;
 			parameter := parameter.nextParameter;
 		END;
-		RETURN FALSE;
+		RETURN scope.ownerProcedure.type(SyntaxTree.ProcedureType).returnParameter # NIL;
 	END HasVariableParameters;
 	
 	PROCEDURE HasExplicitTraceMethod(recordType: SyntaxTree.RecordType): BOOLEAN;
