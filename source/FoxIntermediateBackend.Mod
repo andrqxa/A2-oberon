@@ -7691,11 +7691,13 @@ TYPE
 			IF scope # baseScope THEN
 				(* left := [fp+8] *)
 				IntermediateCode.InitMemory(right,addressType,fp,ToMemoryUnits(system,2*addressType.sizeInBits));
+				IF backend.cooperative THEN IntermediateCode.AddOffset (right, ToMemoryUnits(system,addressType.sizeInBits)) END;
 				ReuseCopy(left,right);
 				ReleaseIntermediateOperand(right);
 				scope := scope.outerScope; DEC(level);
 				(* { left := [left+8] } *)
 				IntermediateCode.InitMemory(right,addressType,left,ToMemoryUnits(system,2*addressType.sizeInBits));
+				IF backend.cooperative THEN IntermediateCode.AddOffset (right, ToMemoryUnits(system,addressType.sizeInBits)) END;
 				WHILE (scope # baseScope) & (scope IS SyntaxTree.ProcedureScope) DO
 					Emit(Mov(position,left,right));
 					scope := scope.outerScope; DEC(level);
