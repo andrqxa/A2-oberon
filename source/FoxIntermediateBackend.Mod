@@ -9470,11 +9470,15 @@ TYPE
 		PROCEDURE ExportDesc(source: IntermediateCode.Section; namePool: IntermediateCode.Section;fingerPrinter: FingerPrinter.FingerPrinter; symbol: Sections.Section): BOOLEAN;
 		VAR fingerPrint: SyntaxTree.FingerPrint;
 		BEGIN
-			IF (symbol # NIL) & (symbol.symbol # NIL) & (symbol.type # Sections.InitCodeSection)
-				& (symbol.type # Sections.InlineCodeSection)
+			IF (symbol # NIL) & ( (implementationVisitor.backend.cooperative) & (symbol.symbol = NIL) OR (symbol.symbol # NIL) & (symbol.type # Sections.InitCodeSection)
+				& (symbol.type # Sections.InlineCodeSection))
 			THEN
-				fingerPrint := fingerPrinter.SymbolFP(symbol.symbol);
-				Longint(source,fingerPrint.shallow);
+				IF symbol.symbol # NIL THEN 
+					fingerPrint := fingerPrinter.SymbolFP(symbol.symbol);
+					Longint(source,fingerPrint.shallow);
+				ELSE
+					Longint(source, 0);
+				END;
 				Symbol(source, namePool, DynamicName(namePool, symbol.name), 0); (* reference to dynamic name *)
 				Symbol(source,symbol,0,0);
 				Address(source,0);
