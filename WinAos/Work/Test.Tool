@@ -20,14 +20,15 @@ Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
 
 FSTools.Mount TEMP AosFS VDISK0#1 ~
 FSTools.Unsafe ~
-FSTools.CopyFiles DisplayLinear.Gof => TEMP:DisplayLinear.Gof ~
+Compiler.Compile --cooperative --objectFile=Generic --newObjectFile -b=AMD --objectFileExtension=.Gof --symbolFileExtension=.Sym --destPath=./ --traceModule=Trace TestLoad.Mod ~
+FSTools.CopyFiles TestLoad.Gof => TEMP:TestLoad.Gof ~
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
 
 Partitions.SetConfig VDISK0#1
 	TraceMode="5" TracePort="1" TraceBPS="115200"
 	BootVol1="AOS AosFS IDE0#1"
-	Boot="DisplayLinear.Install"
+	Boot="TestLoad."
 	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ExtMemSize="120"
 	Init=""

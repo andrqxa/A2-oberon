@@ -9452,8 +9452,22 @@ TYPE
 			(* ELSE no pointers in type *)
 			END;
 		END Pointers;
-
-		PROCEDURE ExportDesc(source: IntermediateCode.Section; fingerPrinter: FingerPrinter.FingerPrinter; symbol: Sections.Section): BOOLEAN;
+		
+		PROCEDURE DynamicName(source: IntermediateCode.Section; name: Basic.SegmentedName): LONGINT;
+		VAR s: Basic.SectionName; i: LONGINT; ch: CHAR; position: LONGINT;
+		BEGIN
+			position := source.pc;
+			Basic.SegmentedNameToString(name, s);
+			Info(source, s);
+			i := 0;
+			REPEAT
+				ch := s[i]; INC(i);
+				Char( source, ch);
+			UNTIL ch = 0X;
+			RETURN position;
+		END DynamicName;
+		
+		PROCEDURE ExportDesc(source: IntermediateCode.Section; namePool: IntermediateCode.Section;fingerPrinter: FingerPrinter.FingerPrinter; symbol: Sections.Section): BOOLEAN;
 		VAR fingerPrint: SyntaxTree.FingerPrint;
 		BEGIN
 			IF (symbol # NIL) & (symbol.symbol # NIL) & (symbol.type # Sections.InitCodeSection)
@@ -9461,6 +9475,7 @@ TYPE
 			THEN
 				fingerPrint := fingerPrinter.SymbolFP(symbol.symbol);
 				Longint(source,fingerPrint.shallow);
+				Symbol(source, namePool, DynamicName(namePool, symbol.name), 0); (* reference to dynamic name *)
 				Symbol(source,symbol,0,0);
 				Address(source,0);
 				Address(source,0);
@@ -9504,7 +9519,7 @@ TYPE
 			END;
 		END PatchArray;
 
-		PROCEDURE ExportDescArray(source: IntermediateCode.Section; VAR size: LONGINT);
+		PROCEDURE ExportDescArray(source: IntermediateCode.Section; namePool: IntermediateCode.Section; VAR size: LONGINT);
 		VAR
 			sizePC, i: LONGINT; section: Sections.Section; fingerPrinter : FingerPrinter.FingerPrinter;
 		BEGIN
@@ -9513,7 +9528,7 @@ TYPE
 			Array(source,sizePC,"Modules.ExportDesc");
 			FOR i := 0 TO module.allSections.Length() - 1 DO
 				section := module.allSections.GetSection(i);
-				IF ExportDesc( source, fingerPrinter, section) THEN INC(size) END
+				IF ExportDesc( source, namePool, fingerPrinter, section) THEN INC(size) END
 			END;
 			PatchArray(source,sizePC,size);
 		END ExportDescArray;
@@ -10199,9 +10214,9 @@ TYPE
 
 		PROCEDURE Module(bodyProc: IntermediateCode.Section);
 		VAR moduleName: ARRAY 128 OF CHAR;
-		moduleSection, pointerSection, importSection, emptyArraySection, exportDescArray, exceptionSection, commandsSection,
+		moduleSection, pointerSection, importSection, emptyArraySection, namePool, exportDescArray, exceptionSection, commandsSection,
 			typeInfoSection, procTableSection, ptrTableSection, referenceSection : IntermediateCode.Section;
-			emptyArraySectionOffset, pointerSectionOffset, importSectionOffset, numberPointers, exportDescArrayOffset, exportDescSize,
+			emptyArraySectionOffset, namePoolOffset, pointerSectionOffset, importSectionOffset, numberPointers, exportDescArrayOffset, exportDescSize,
 			exceptionSectionOffset, commandsSectionOffset, typeInfoSectionOffset, procTableSectionOffset, ptrTableSectionOffset, maxPointers, numberProcs,temp,
 			referenceSectionOffset	: LONGINT;
 
@@ -10236,7 +10251,8 @@ TYPE
 		BEGIN
 			Global.GetModuleName(module.module,moduleName);
 			exportDescArray := Block("Heaps","SystemBlockDesc",".@ExportDescArray",exportDescArrayOffset);
-			ExportDescArray(exportDescArray, exportDescSize);
+			namePool := Block("Heaps","SystemBlockDesc",".@NamePool",namePoolOffset); 
+			ExportDescArray(exportDescArray, namePool, exportDescSize);
 			pointerSection := Block("Heaps","SystemBlockDesc",".@PointerArray",pointerSectionOffset);
 			PointerArray(pointerSection,module.module.moduleScope, numberPointers);
 			importSection := Block("Heaps","SystemBlockDesc",".@ImportsArray",importSectionOffset);
@@ -10291,6 +10307,7 @@ TYPE
 			Symbol(moduleSection,emptyArraySection,emptyArraySectionOffset,0);
 			Symbol(moduleSection,referenceSection,referenceSectionOffset,0);
 			Info(moduleSection, "export*: ExportDesc");
+			Address(moduleSection,0);
 			Address(moduleSection,0);
 			Address(moduleSection,0);
 			Longint(moduleSection,exportDescSize);

@@ -31,6 +31,7 @@ CONST
 TYPE
 	(* definitions for object-model loader support *)
 	Name* = ARRAY 32 OF CHAR;
+	DynamicName* = POINTER {UNSAFE} TO ARRAY OF CHAR;
 
 	Command* = RECORD
 		(* Fields exported for initialization by loader/linker only! Consider read-only! *)
@@ -41,6 +42,7 @@ TYPE
 
 	ExportDesc* = RECORD
 		fp*: ADDRESS;
+		name*: DynamicName;
 		adr*: ADDRESS;
 		exports*: LONGINT;
 		dsc*: ExportArray

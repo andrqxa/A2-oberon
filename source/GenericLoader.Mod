@@ -358,17 +358,29 @@ TYPE
 		msg: ARRAY 128 OF CHAR; module: Modules.Module; adr: LONGINT; m: HashTableInt;
 		s: ObjectFile.SectionName; isModule: BOOLEAN; identifier: ObjectFile.Identifier;
 
+			PROCEDURE CheckName(CONST n: ObjectFile.SegmentedName; CONST name: POINTER {UNSAFE} TO ARRAY OF CHAR): BOOLEAN;
+			VAR s,t: ObjectFile.SectionName; i: LONGINT;
+			BEGIN
+				IF name = NIL THEN RETURN FALSE END;
+				ObjectFile.SegmentedNameToString(n, s);
+				i := 0;
+				WHILE (s[i] # 0X) & (name[i] # 0X) & (s[i] = name[i]) DO
+					INC(i);
+				END;
+				RETURN s[i] = name[i];
+			END CheckName;
+		
 			(* stupid implementation: just search for fp in all exports *)
 			PROCEDURE CheckScope(CONST scope: Modules.ExportDesc; level: LONGINT): LONGINT;
 			VAR adr,i: LONGINT;
 			BEGIN
 				IF (level > 2) THEN RETURN 0 END;
 				adr := 0;
-
 				(*D.String("checking "); D.Int(scope.fp,1); D.Ln;*)
 
-				IF identifier.fingerprint = scope.fp THEN
+				IF (identifier.fingerprint # 0) & (identifier.fingerprint = scope.fp) OR CheckName(identifier.name, scope.name) THEN
 					adr := scope.adr;
+					(*
 					IF module.staticTypeDescs # testTypeDescs THEN (* old object file format *)
 						IF (adr = 0) & (scope.dsc # NIL) THEN (* type in old object file format *)
 							adr := scope.dsc[0].adr;
@@ -379,6 +391,7 @@ TYPE
 					ELSE
 						(*D.String("new object file format"); D.Ln;*)
 					END;
+					*)
 					RETURN adr
 				END;
 				i := 0;
@@ -412,12 +425,14 @@ TYPE
 				isModule := identifier.name[2] = InternalModuleName;
 			END;
 
-			IF ~isModule & (identifier.fingerprint = 0) THEN
+			(*
+				IF ~isModule & (identifier.fingerprint = 0) THEN
 				D.String("Invalid attempt to import symbol without fingerprint ");
 				s := identifier.name; D.String(s);
 				D.Ln;
 				RETURN NIL
 			END;
+			*)
 
 			module := Modules.ThisModule(name,res,msg);
 			IF module = NIL THEN
@@ -430,7 +445,9 @@ TYPE
 				m := moduleList.ThisModule(module);
 				ASSERT(module # NIL);
 				(* first try via hash-table *)
-				adr := m.Get(identifier.fingerprint);
+				IF identifier.fingerprint # 0 THEN
+					adr := m.Get(identifier.fingerprint);
+				END;
 				(* if it does not work, then try export table directly *)
 				IF adr = 0 THEN
 					adr := CheckScope(module.export,0(*level*) );
