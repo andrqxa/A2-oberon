@@ -2232,7 +2232,7 @@ TYPE
 			END;
 
 			recordBase := recordType.GetBaseRecord();
-			IF recordBase # NIL THEN
+			IF (recordBase # NIL) & (recordBase.hasPointers) THEN
 				GetRecordTypeName (recordBase,name);
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
