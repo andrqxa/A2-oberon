@@ -622,9 +622,6 @@ VAR
 				IF TraceLoading THEN Trace.String("linking done"); Trace.Ln END;
 
 				moduleAdr := linker.moduleBlock.address;
-				SYSTEM.GET(moduleAdr+3*SIZEOF(ADDRESS), moduleAdr);
-				SYSTEM.GET(moduleAdr-8,heapBlockAdr);
-				ASSERT(heapBlockAdr = linker.moduleBlock.address+2*SIZEOF(ADDRESS));
 				module := SYSTEM.VAL(Modules.Module,moduleAdr);
 
 				module.staticTypeDescs := testTypeDescs; (* trick to identify new object file loaded modules *)
@@ -633,9 +630,10 @@ VAR
 				module.firstProc := arrangement.code.firstAddress;
 				module.sb := arrangement.data.firstAddress;
 
+				(*
 				SortProcTable(module);
 				SelectionSort(module.exTable);
-
+				*)
 
 			ELSE module := NIL; res := LinkerError; stringWriter.Update; stringWriter.Get(msg);
 
@@ -645,6 +643,7 @@ VAR
 		END;
 		IF res # Ok THEN module := NIL END;
 		IF (res # Ok) & (res # FileNotFound) THEN D.String(msg);D.Ln END;
+		TRACE(module);
 		RETURN module
 	FINALLY
 		RETURN NIL
