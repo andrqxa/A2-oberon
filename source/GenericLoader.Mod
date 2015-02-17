@@ -629,7 +629,8 @@ VAR
 				module.code := arrangement.code.bytes;
 				module.firstProc := arrangement.code.firstAddress;
 				module.sb := arrangement.data.firstAddress;
-
+				module.body := SYSTEM.VAL(Body, arrangement.bodyAddress);
+				TRACE(module.body);
 				(*
 				SortProcTable(module);
 				SelectionSort(module.exTable);
