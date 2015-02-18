@@ -347,7 +347,7 @@ TYPE
 				hash.Put(block.identifier.fingerprint, block)
 			END;
 			IF (block.identifier.name[0] >= 0) & (block.identifier.name[1] >= 0)  THEN
-				IF (block.identifier.name[1] = InternalModuleName) OR (block.identifier.name[2] = InternalModuleName) THEN
+				IF (block.identifier.name[1] = InternalModuleName) & (block.identifier.name[2]<0) OR (block.identifier.name[2] = InternalModuleName) & (block.identifier.name[3] < 0) THEN
 					moduleBlock := block;
 				END;
 			END;
