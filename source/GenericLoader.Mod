@@ -630,7 +630,6 @@ VAR
 				module.firstProc := arrangement.code.firstAddress;
 				module.sb := arrangement.data.firstAddress;
 				module.body := SYSTEM.VAL(Body, arrangement.bodyAddress);
-				TRACE(module.body);
 				(*
 				SortProcTable(module);
 				SelectionSort(module.exTable);
@@ -644,7 +643,6 @@ VAR
 		END;
 		IF res # Ok THEN module := NIL END;
 		IF (res # Ok) & (res # FileNotFound) THEN D.String(msg);D.Ln END;
-		TRACE(module);
 		RETURN module
 	FINALLY
 		RETURN NIL
