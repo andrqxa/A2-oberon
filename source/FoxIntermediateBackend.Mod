@@ -10507,7 +10507,7 @@ TYPE
 			PROCEDURE NewTypeDescriptor;
 			VAR name, stackFrame: Basic.SegmentedName; op: IntermediateCode.Operand; source, base: IntermediateCode.Section;
 				procedure: SyntaxTree.Procedure; variable: SyntaxTree.Variable;
-				baseRecord: SyntaxTree.RecordType; baseTD: SyntaxTree.TypeDeclaration;
+				baseRecord: SyntaxTree.RecordType; baseTD: SyntaxTree.TypeDeclaration; sym: SyntaxTree.Symbol;
 				numberPointers: LONGINT;  padding,offset, i: LONGINT;
 			CONST MPO=-40000000H;
 
@@ -10653,13 +10653,15 @@ TYPE
 						Info(source, "parent");
 						IF baseRecord # NIL THEN
 							Global.GetSymbolSegmentedName(baseTD,name);
+							sym := baseTD;
 							IF ~recordType.isObject THEN
 								Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
+								sym := NIL;
 							END;
 							IF (baseTD.scope = NIL) OR (baseTD.scope.ownerModule = module.module) THEN
-								tir := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
+								tir := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, name,sym,implementationVisitor.dump # NIL);
 							ELSE
-								tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
+								tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,sym,implementationVisitor.dump # NIL);
 							END;
 							Symbol(source, tir,  0, 0);
 						ELSIF (recordType.pointerType # NIL) & recordType.pointerType.isPlain THEN
