@@ -7,13 +7,13 @@ PartitionsLib.SetBootLoaderFile OBLUnreal.Bin ~
 
 FSTools.DeleteFiles hd.img ~
 
-VirtualDisks.Create hd.img 16000 512 ~
+VirtualDisks.Create hd.img 160000 512 ~
 VirtualDisks.Install -b=512 VDISK0 hd.img ~
 
 StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Reflection TrapWriters Traps Plugins Disks PCI ATADisks Caches Commands Files DiskVolumes Clock DiskFS Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
 
 Partitions.WriteMBR VDISK0#0 OBEMBR.BIN ~
-Partitions.Create VDISK0#1 76 8 ~
+Partitions.Create VDISK0#1 76 80 ~
 Partitions.Activate VDISK0#1 ~
 
 Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
@@ -31,6 +31,7 @@ Partitions.SetConfig VDISK0#1
 	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ExtMemSize="120"
 	Init="118"
+	TraceModules="1"
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable"
 	Boot3="WindowManager.Install"
