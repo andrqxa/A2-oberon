@@ -1,3 +1,5 @@
+# if you changed the sources, do not forget to compile below
+
 SystemTools.DoCommands
 
 SystemTools.Timer start ~
