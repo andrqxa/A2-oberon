@@ -59,7 +59,6 @@ I386.ATADisks.Mod Caches.Mod DiskVolumes.Mod DiskFS.Mod Diagnostics.Mod BitSets.
 ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod BootConsole.Mod Displays.Mod Options.Mod DisplayLinear.Mod
 Inputs.Mod I386.Keyboard.Mod MousePS2.Mod UsbDriverLoader.Mod UTF8Strings.Mod DynamicStrings.Mod XMLObjects.Mod XML.Mod
 XMLScanner.Mod XMLParser.Mod DriverDatabase.Mod
-~ 
 
 UTF8Strings.Mod FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod OldDiskVolumes.Mod RAMVolumes.Mod 
 DiskFS.Mod OldDiskFS.Mod OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod 
@@ -88,7 +87,7 @@ FoxFrontend.Mod FoxOberonFrontend.Mod FoxCompiler.Mod FoxFingerPrinter.Mod
 FoxInterfaceComparison.Mod FoxTextualSymbolFile.Mod FoxBinarySymbolFile.Mod FoxIntermediateCode.Mod 
 FoxIntermediateBackend.Mod FoxCodeGenerators.Mod FoxBinaryObjectFile.Mod FoxGenericObjectFile.Mod 
 FoxAMD64InstructionSet.Mod FoxAMD64Assembler.Mod FoxAMDBackend.Mod FoxProfiler.Mod XMM.I386.Math.Mod 
-XMM.I386.MathL.Mod FoxArrayBase.Mod I386.FoxArrayBaseOptimized.Mod Errors.Mod ProcessInfo0.Mod 
+XMM.I386.MathL.Mod Errors.Mod ProcessInfo0.Mod 
 ProcessInfo.Mod SystemTools.Mod Reboot.Mod DriverDatabase.Mod PCITools.Mod XMM.I386.Math.Mod 
 XMM.I386.MathL.Mod Random.Mod Drand48.Mod SerialsVirtual.Mod Autostart.Mod FSTools.Mod UpTime.Mod 
 CLUTs.Mod I386.Raster.Mod Localization.Mod Archives.Mod WMRectangles.Mod WMEvents.Mod 
