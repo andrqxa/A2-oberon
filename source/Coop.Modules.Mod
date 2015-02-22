@@ -649,16 +649,20 @@ BEGIN
 END PublishRegisteredModules;
 
 PROCEDURE {FINAL} Main;
+PROCEDURE InitializeGC EXTERN "GarbageCollector.Initialize";
+PROCEDURE TerminateGC EXTERN "GarbageCollector.Terminate";
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	SYSTEM.SetActivity (NIL);
 	SYSTEM.SetFramePointer (NIL);
 	Environment.Initialize;
+	InitializeGC;
 	Processors.Initialize;
 	Activities.Execute (PublishRegisteredModules);
 	Processors.Terminate;
 	Activities.Terminate;
 	Queues.Terminate;
 	Environment.Terminate;
+	TerminateGC;
 	Environment.Exit (Environment.status);
 END Main;
 
