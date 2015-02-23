@@ -425,13 +425,6 @@ END GetInit;
 		FNINIT
 	END InitFPU;
 
-(** Setup FPU control word of current processor. *)
-
-	PROCEDURE SetupFPU*;
-	BEGIN
-		InitFPU;  SetFCR( fcr )
-	END SetupFPU;
-
 (** CPU identification. *)
 
 	PROCEDURE CPUID*( VAR vendor: Vendor;  VAR version: LONGINT;  VAR features1,features2: SET );
@@ -513,7 +506,15 @@ END ID;
 
 (* setup MMX, SSE and SSE2..SSE5 and AVX extension *)
 
-PROCEDURE SetupSSE2Ext;
+PROCEDURE -InitSSE;
+CODE {SYSTEM.Pentium, SYSTEM.Privileged}
+	MOV	EAX, CR4
+	OR	EAX, 00000200H		; set bit 9 (OSFXSR)
+	AND	EAX, 0FFFFFBFFH	; delete bit 10 (OSXMMEXCPT)
+	MOV	CR4, EAX
+END InitSSE;
+
+PROCEDURE InitBootProcessor-;
 CONST
 	MMXFlag=23;(*IN features from EBX*)
 	FXSRFlag = 24;
@@ -525,7 +526,9 @@ CONST
 	SSE42Flag =20;
 	SSE5Flag = 11;
 	AVXFlag = 28;
-BEGIN
+VAR vendor: Vendor; ver: LONGINT;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	CPUID(vendor, ver, features,features2);
 	MMXSupport := MMXFlag IN features;
 	SSESupport := SSEFlag IN features;
 	SSE2Support := SSESupport & (SSE2Flag IN features);
@@ -535,28 +538,17 @@ BEGIN
 	SSE42Support := SSE3Support & (SSE42Flag IN features2);
 	SSE5Support := SSE3Support & (SSE5Flag IN features2);
 	AVXSupport := SSE3Support & (AVXFlag IN features2);
+	fcr := (FCR() - {0,2,3,10,11}) + {0..5,8,9};	(* default FCR RC=00B *)
+	InitApplicationProcessor;
+END InitBootProcessor;
 
-	IF Environment.IsNative & SSESupport & (FXSRFlag IN features) THEN
+PROCEDURE InitApplicationProcessor-;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	InitFPU;  SetFCR( fcr );
+	IF Environment.IsNative & SSESupport THEN
 		InitSSE();
 	END;
-END SetupSSE2Ext;
-
-PROCEDURE -InitSSE;
-CODE {SYSTEM.Pentium, SYSTEM.Privileged}
-	MOV	EAX, CR4
-	OR	EAX, 00000200H		; set bit 9 (OSFXSR)
-	AND	EAX, 0FFFFFBFFH	; delete bit 10 (OSXMMEXCPT)
-	MOV	CR4, EAX
-END InitSSE;
-
-PROCEDURE Init;
-VAR vendor: Vendor; ver: LONGINT;
-BEGIN
-	boottime:=GetTimer();
-	COPY( Version, version );
-	CPUID(vendor, ver, features,features2);	 SetupSSE2Ext;
-	fcr := (FCR() - {0,2,3,10,11}) + {0..5,8,9};	(* default FCR RC=00B *)
-END Init;
+END InitApplicationProcessor;
 
 (** Acquire a spin-lock. *)
 	PROCEDURE Acquire*( level: LONGINT );   (* non reentrant lock  (non reentrance "ensured" by ASSERT statement ), CriticalSections are reentrant *)
@@ -754,5 +746,6 @@ END PutNVByte;
 
 BEGIN
 	Trace.String("Machine: "); Trace.Blue; Trace.StringLn (Version); Trace.Default;
-	Init;
+	boottime:=GetTimer();
+	COPY( Version, version );
 END Machine.

@@ -44,6 +44,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END StartAll;
 
 PROCEDURE {NORETURN} Start;
+PROCEDURE InitProcessor EXTERN "Machine.InitApplicationProcessor";
 PROCEDURE Execute EXTERN "Activities.Execute" (procedure: PROCEDURE);
 PROCEDURE Idle EXTERN "Activities.Idle";
 VAR value: SIZE;
@@ -54,6 +55,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF CAS (count, value, value + 1) = value THEN EXIT END;
 		CPU.Backoff;
 	END;
+	InitProcessor;
 	Counters.Inc (running);
 	APIC.AwaitInterrupt; Execute (Idle);
 	Counters.Dec (running);
@@ -72,7 +74,9 @@ END AwaitStartups;
 (** Initializes the module by enumerating all available processors. *)
 (** @topic Runtime Call *)
 PROCEDURE Initialize-;
+PROCEDURE InitProcessor EXTERN "Machine.InitBootProcessor";
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	InitProcessor;
 	count := 1;
 	APIC.Initialize;
 	APIC.CopyBootCode (Start);
