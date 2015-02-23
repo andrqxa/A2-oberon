@@ -47,11 +47,8 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	begin := begin + (BlockSize - (begin + SIZE OF ADDRESS) MOD BlockSize) MOD BlockSize;
 	end := begin + (end - begin) DIV BlockSize * BlockSize; heap.begin := begin; heap.end := end;
 
-	(* partition the heap into at least as many free blocks as there are processors *)
-	heap.sentinel := GetIndex (end - begin + BlockSize); index := heap.sentinel;
-	REPEAT DEC (index); heap.free[index].first := NIL UNTIL (index = 0) OR (ASH (1, heap.sentinel - index) >= Processors.Maximum);
-
 	(* setup all blocks and map the memory range as unallocated *)
+	heap.sentinel := GetIndex (end - begin + BlockSize); index := heap.sentinel - 1;
 	REPEAT
 		LOOP
 			next := begin + ASH (BlockSize, index);
