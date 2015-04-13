@@ -1777,6 +1777,10 @@ TYPE
 		BEGIN position := SELF.position; v.VisitExpression(SELF)
 		END Accept;
 
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN FALSE;
+		END NeedsTrace;
+
 	END Expression;
 
 	(** <<expression, expression, ...>> **)
@@ -2216,6 +2220,10 @@ TYPE
 		BEGIN position := SELF.position; v.VisitBracketDesignator(SELF)
 		END Accept;
 
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN NeedsTrace(left.resolved) & NeedsTrace(type.resolved);
+		END NeedsTrace;
+
 	END BracketDesignator;
 
 	(*** second phase (after checker) designators ***)
@@ -2415,6 +2423,10 @@ TYPE
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitDereferenceDesignator(SELF)
 		END Accept;
+
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN NeedsTrace(left.resolved) & NeedsTrace(type.resolved);
+		END NeedsTrace;
 
 	END DereferenceDesignator;
 
