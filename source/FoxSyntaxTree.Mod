@@ -493,6 +493,11 @@ TYPE
 		BEGIN RETURN FALSE
 		END IsComposite;
 
+		(** Returns if the type needs to be traced for garbage collection *)
+		PROCEDURE NeedsTrace*(): BOOLEAN;
+		BEGIN RETURN IsPointer ();
+		END NeedsTrace;
+
 		PROCEDURE Accept*(v: Visitor);
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitType(SELF)
@@ -1103,6 +1108,10 @@ TYPE
 		BEGIN RETURN TRUE
 		END IsComposite;
 
+		PROCEDURE NeedsTrace*(): BOOLEAN;
+		BEGIN RETURN arrayBase.resolved.NeedsTrace ();
+		END NeedsTrace;
+
 		PROCEDURE Accept*(v: Visitor);
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitArrayType(SELF)
@@ -1500,6 +1509,10 @@ TYPE
 		PROCEDURE IsComposite(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsComposite;
+
+		PROCEDURE NeedsTrace*(): BOOLEAN;
+		BEGIN RETURN recordScope.NeedsTrace();
+		END NeedsTrace;
 
 		PROCEDURE Accept*(v: Visitor);
 		VAR position: LONGINT;
@@ -2927,6 +2940,10 @@ TYPE
 		BEGIN externalName := name;
 		END SetExternalName;
 
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN FALSE;
+		END NeedsTrace;
+
 	END Symbol;
 
 	(**
@@ -3058,6 +3075,10 @@ TYPE
 		BEGIN position := SELF.position; v.VisitVariable(SELF)
 		END Accept;
 
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN ~untraced & (externalName = NIL) & type.resolved.NeedsTrace ();
+		END NeedsTrace;
+
 	END Variable;
 
 	(** << [VAR | CONST] name: type >>
@@ -3105,6 +3126,10 @@ TYPE
 
 		PROCEDURE SetKind*(kind: LONGINT);
 		BEGIN SELF.kind := kind; END SetKind;
+
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN ~untraced & (kind = ValueParameter) & type.resolved.NeedsTrace ();
+		END NeedsTrace;
 
 	END Parameter;
 
@@ -4381,6 +4406,17 @@ TYPE
 			RETURN level;
 		END Level;
 
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		VAR variable: Variable;
+		BEGIN
+			variable := firstVariable;
+			WHILE variable # NIL DO
+				IF variable.NeedsTrace () THEN RETURN TRUE END;
+				variable := variable.nextVariable;
+			END;
+			RETURN FALSE;
+		END NeedsTrace;
+
 	END Scope;
 
 	ProcedureScope*=OBJECT (Scope)
@@ -4399,6 +4435,17 @@ TYPE
 		BEGIN
 			SELF.body := body;
 		END SetBody;
+
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		VAR parameter: Parameter;
+		BEGIN
+			parameter := ownerProcedure.type.resolved(ProcedureType).firstParameter;
+			WHILE parameter # NIL DO
+				IF parameter.NeedsTrace () THEN RETURN TRUE END;
+				parameter := parameter.nextParameter;
+			END;
+			RETURN NeedsTrace^();
+		END NeedsTrace;
 
 	END ProcedureScope;
 
@@ -4552,6 +4599,14 @@ TYPE
 			END;
 			RETURN p;
 		END FindMethod;
+
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		VAR base: RecordType;
+		BEGIN
+			base := ownerRecord.GetBaseRecord();
+			IF (base # NIL) & (base.NeedsTrace ()) THEN RETURN TRUE END;
+			RETURN NeedsTrace^();
+		END NeedsTrace;
 
 	END RecordScope;
 
