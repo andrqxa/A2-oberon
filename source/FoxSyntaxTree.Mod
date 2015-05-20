@@ -2221,7 +2221,7 @@ TYPE
 		END Accept;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN NeedsTrace(left.resolved) & NeedsTrace(type.resolved);
+		BEGIN RETURN left.resolved.NeedsTrace() & type.resolved.NeedsTrace();
 		END NeedsTrace;
 
 	END BracketDesignator;
@@ -2425,7 +2425,7 @@ TYPE
 		END Accept;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN NeedsTrace(left.resolved) & NeedsTrace(type.resolved);
+		BEGIN RETURN left.resolved.NeedsTrace() & type.resolved.NeedsTrace();
 		END NeedsTrace;
 
 	END DereferenceDesignator;
