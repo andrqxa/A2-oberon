@@ -10,7 +10,7 @@ VAR
 
 (** Send the specified characters to the trace output (cf. Streams.Sender). *)
 PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: LONGINT);
-BEGIN {UNCOOPERATIVE, UNCHECKED} INC (len, ofs); ASSERT (len < LEN (buf)); WHILE ofs # len DO Char (buf[ofs]); INC (ofs); END; res := 0;
+BEGIN {UNCOOPERATIVE, UNCHECKED} INC (len, ofs); ASSERT (len <= LEN (buf)); WHILE ofs # len DO Char (buf[ofs]); INC (ofs); END; res := 0;
 END Send;
 
 (** Skip to the next line on trace output. *)
