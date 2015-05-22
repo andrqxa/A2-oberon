@@ -866,7 +866,7 @@ TYPE
 		BEGIN
 			count := 0;
 			IF used = NIL THEN NEW(used,64); END;
-			FOR i := 0 TO LEN(used)-1 DO used[i].count := 0 END;
+			FOR i := 0 TO LEN(used)-1 DO used[i].count := 0; used[i].map := i END;
 		END Init;
 
 		PROCEDURE Grow;
@@ -1258,7 +1258,7 @@ TYPE
 		BEGIN
 			IF backend.cooperative & (callconv = SyntaxTree.OberonCallingConvention) THEN
 				IF (procedure # NIL) & (HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope)) THEN
-					Global.GetSymbolSegmentedName(procedure, name);
+					GetCodeSectionNameForSymbol(procedure, name);
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Descriptor"));
 				ELSE
 					Basic.ToSegmentedName ("BaseTypes.StackFrame",name);
@@ -1505,6 +1505,7 @@ TYPE
 		BEGIN
 			IF (register > 0) THEN
 				register := registerUsageCount.Map(register);
+
 				registerUsageCount.IncUse(register);
 				IF TraceRegisterUsageCount & (dump# NIL) THEN
 					dump.String("use register "); dump.Int(register,1); dump.String(": ");dump.Int(registerUsageCount.Use(register),1); dump.Ln; dump.Update;
@@ -2250,7 +2251,7 @@ TYPE
 		BEGIN
 			previousSection := section;
 			previousScope := currentScope;
-			Global.GetSymbolSegmentedName(scope.ownerProcedure, name);
+			GetCodeSectionNameForSymbol(scope.ownerProcedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
 			IF dump # NIL THEN dump := section.comments END;
@@ -2289,11 +2290,13 @@ TYPE
 
 		BEGIN
 			previousSection := section;
-			Global.GetSymbolSegmentedName(scope.ownerProcedure, name);
+			GetCodeSectionNameForSymbol(scope.ownerProcedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
 			IF dump # NIL THEN dump := section.comments END;
-			stackFrame := NewRegisterOperand (addressType); Emit (Mov(position,stackFrame,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3))));
+			stackFrame := NewRegisterOperand (addressType); 
+			Emit (Mov(position,stackFrame,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3))));
+			
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 			WHILE parameter # NIL DO
 				IF IsVariableParameter (parameter) THEN Move (parameter) END;
@@ -2350,7 +2353,7 @@ TYPE
 		VAR op: IntermediateCode.Operand;
 		BEGIN
 			previousSection := section;
-			Global.GetSymbolSegmentedName(procedure, name);
+			GetCodeSectionNameForSymbol(procedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Descriptor"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, name,NIL,TRUE);
 			IF dump # NIL THEN dump := section.comments END;
@@ -2361,7 +2364,7 @@ TYPE
 			Emit(Data(position,nil));
 
 			IF HasVariableParameters (procedure.procedureScope) THEN
-				Global.GetSymbolSegmentedName(procedure, name);
+				GetCodeSectionNameForSymbol(procedure, name);
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
 			ELSE
 				Basic.ToSegmentedName ("BaseTypes.StackFrame.Move",name);
@@ -2370,7 +2373,7 @@ TYPE
 			Emit(Data(position,op));
 
 			IF HasPointers (procedure.procedureScope) THEN
-				Global.GetSymbolSegmentedName(procedure, name);
+				GetCodeSectionNameForSymbol(procedure, name);
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 			ELSE
 				Basic.ToSegmentedName ("BaseTypes.StackFrame.Reset",name);
@@ -5146,7 +5149,7 @@ TYPE
 				END;
 
 				IF newObjectFile THEN
-					Global.GetSymbolSegmentedName(td,name);
+					GetCodeSectionNameForSymbol(td,name);
 					IF (td.scope = NIL) OR (td.scope.ownerModule = module.module) THEN
 						meta.CheckTypeDeclaration(x);
 						source := NewSection(module.allSections, Sections.ConstSection, name,td,commentPrintout # NIL);
@@ -5163,7 +5166,7 @@ TYPE
 					source := module.allSections.FindBySymbol(td); (*TODO*)
 					IF source = NIL THEN
 						null := 0;
-						Global.GetSymbolSegmentedName(td,name);
+						GetCodeSectionNameForSymbol(td,name);
 						source := NewSection(module.allSections, Sections.ConstSection, name,td,commentPrintout # NIL);
 						IntermediateCode.InitImmediate(op,addressType,0);
 						source(IntermediateCode.Section).Emit(Data(position,op));
@@ -6538,7 +6541,7 @@ TYPE
 								formalParameter := formalParameter.nextParameter;
 							END;
 							(* static call of the constructor *)
-							Global.GetSymbolSegmentedName(constructor,name);
+							GetCodeSectionNameForSymbol(constructor,name);
 							ASSERT(~constructor.isInline);
 							IF constructor.scope.ownerModule # module.module THEN
 								symbol := NewSection(module.importedSections, Sections.CodeSection, name,constructor,commentPrintout # NIL);
@@ -6610,7 +6613,7 @@ TYPE
 								formalParameter := formalParameter.nextParameter;
 							END;
 							(* static call of the constructor *)
-							Global.GetSymbolSegmentedName(constructor,name);
+							GetCodeSectionNameForSymbol(constructor,name);
 							ASSERT(~constructor.isInline);
 							IF constructor.scope.ownerModule # module.module THEN
 								symbol := NewSection(module.importedSections, Sections.CodeSection, name,constructor,commentPrintout # NIL);
@@ -7603,7 +7606,7 @@ TYPE
 			IF Trace THEN TraceEnter("VisitMathArrayValue") END;
 			IF ~TryConstantDeclaration() THEN
 				IF constantDeclaration = NIL THEN constantDeclaration:=BuildConstant(module.module,x,constId) END;
-				Global.GetSymbolSegmentedName(constantDeclaration,name);
+				GetCodeSectionNameForSymbol(constantDeclaration,name);
 				irv := NewSection(module.allSections,Sections.ConstSection,name,constantDeclaration,commentPrintout # NIL);
 				RecursiveData(x.array);
 				InitOperand(result,ModeReference);
@@ -7659,7 +7662,7 @@ TYPE
 			IF Trace THEN TraceEnter("VisitStringValue") END;
 			IF ~TryConstantDeclaration() THEN
 				IF constantDeclaration = NIL THEN constantDeclaration:=BuildConstant(module.module,x,constId) END;
-				Global.GetSymbolSegmentedName(constantDeclaration,name);
+				GetCodeSectionNameForSymbol(constantDeclaration,name);
 				irv := NewSection(module.allSections, Sections.ConstSection, name,constantDeclaration,commentPrintout # NIL);
 				FOR i := 0 TO x.length-1 DO
 					IntermediateCode.InitImmediate(op,IntermediateCode.GetType(system,system.characterType),ORD(x.value[i]));
@@ -7741,12 +7744,12 @@ TYPE
 				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,x.offsetInBits));
 			ELSIF (x.scope = moduleScope) OR (x.scope IS SyntaxTree.CellScope) THEN (* global variable *)
 				InitOperand(result,ModeReference);
-				Global.GetSymbolSegmentedName(x,name);
+				GetCodeSectionNameForSymbol(x,name);
 				symbol := NewSection(module.allSections, Sections.VarSection, name,x,commentPrintout # NIL);
 				IntermediateCode.InitAddress(result.op, addressType, symbol.name, GetFingerprint(symbol.symbol), 0);
 			ELSIF x.scope IS SyntaxTree.ModuleScope THEN (* global variable in imported module *)
 				InitOperand(result,ModeReference);
-				Global.GetSymbolSegmentedName(x,name);
+				GetCodeSectionNameForSymbol(x,name);
 				symbol := NewSection(module.importedSections, Sections.VarSection, name,x,commentPrintout # NIL);
 				IntermediateCode.InitAddress(result.op, addressType, symbol.name, GetFingerprint(symbol.symbol), 0)
 			ELSE (* field, left designator must have been emitted *)
@@ -7809,7 +7812,7 @@ TYPE
 			IF x.ownerType IS SyntaxTree.CellType THEN
 				IF ~(x.type.resolved IS SyntaxTree.PortType) THEN
 					InitOperand(result,ModeReference);
-					Global.GetSymbolSegmentedName(x,name);
+					GetCodeSectionNameForSymbol(x,name);
 					symbol := NewSection(module.allSections, Sections.ConstSection, name,x,commentPrintout # NIL);
 					IntermediateCode.InitAddress(result.op, addressType, symbol.name, GetFingerprint(symbol.symbol),0);
 					RETURN
@@ -7830,7 +7833,7 @@ TYPE
 				END;
 			ELSIF (currentScope IS SyntaxTree.ProcedureScope) & (currentScope(SyntaxTree.ProcedureScope).ownerProcedure.isConstructor) & (currentScope.outerScope IS SyntaxTree.CellScope) THEN
 				InitOperand(result,ModeReference);
-				Global.GetSymbolSegmentedName(x,name);
+				GetCodeSectionNameForSymbol(x,name);
 				symbol := NewSection(module.allSections, Sections.VarSection, name,x,commentPrintout # NIL);
 				IntermediateCode.InitAddress(result.op, addressType, symbol.name, GetFingerprint(symbol.symbol), 0);
 				RETURN
@@ -8794,7 +8797,7 @@ TYPE
 			ELSE
 				proc := MakeAwaitProcedure(x);
 				Emit(Push(position,fp));
-				Global.GetSymbolSegmentedName(proc,name);
+				GetCodeSectionNameForSymbol(proc,name);
 				symbol := NewSection(module.allSections, Sections.CodeSection, name,proc,commentPrintout # NIL);
 				IntermediateCode.InitAddress(call,addressType,name, GetFingerprint(proc), 0);
 				res := NewRegisterOperand(IntermediateCode.GetType(system,system.booleanType));
