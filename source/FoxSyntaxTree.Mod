@@ -502,6 +502,11 @@ TYPE
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitType(SELF)
 		END Accept;
+				
+		PROCEDURE IsRecordType*(): BOOLEAN;
+		BEGIN
+			RETURN FALSE;
+		END IsRecordType;
 
 	END Type;
 
@@ -950,6 +955,16 @@ TYPE
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitQualifiedType(SELF)
 		END Accept;
+
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN (resolved # NIL) & (resolved.NeedsTrace());
+		END NeedsTrace;
+		
+		PROCEDURE IsRecordType(): BOOLEAN;
+		BEGIN
+			RETURN (resolved # NIL) & (resolved.IsRecordType());
+		END IsRecordType;
+		
 
 	END QualifiedType;
 
@@ -1518,6 +1533,11 @@ TYPE
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitRecordType(SELF)
 		END Accept;
+		
+		PROCEDURE IsRecordType(): BOOLEAN;
+		BEGIN
+			RETURN TRUE;
+		END IsRecordType;
 
 	END RecordType;
 
@@ -2200,7 +2220,7 @@ TYPE
 	END ArrowDesignator;
 
 	(** <<left[parameters]>>
-		designates an index designator
+		designates an index designator, before checker
 	**)
 	BracketDesignator* = OBJECT(Designator)
 		VAR parameters-: ExpressionList;
@@ -2220,9 +2240,6 @@ TYPE
 		BEGIN position := SELF.position; v.VisitBracketDesignator(SELF)
 		END Accept;
 
-		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN left.resolved.NeedsTrace() & type.resolved.NeedsTrace();
-		END NeedsTrace;
 
 	END BracketDesignator;
 
@@ -2255,6 +2272,10 @@ TYPE
 		PROCEDURE SetSymbol*(s: Symbol);
 		BEGIN SELF.symbol := s;
 		END SetSymbol;
+
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN symbol.NeedsTrace();
+		END NeedsTrace;
 
 	END SymbolDesignator;
 
@@ -2296,6 +2317,10 @@ TYPE
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitIndexDesignator(SELF)
 		END Accept;
+		
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN left.resolved.NeedsTrace() & type.resolved.NeedsTrace();
+		END NeedsTrace;
 
 	END IndexDesignator;
 
@@ -2467,6 +2492,11 @@ TYPE
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitSelfDesignator(SELF)
 		END Accept;
+		
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN type.NeedsTrace();
+		END NeedsTrace;
+
 
 	END SelfDesignator;
 

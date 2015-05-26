@@ -2067,10 +2067,13 @@ TYPE
 			END;
 		END Warning;
 		
+
+		
+		
 		PROCEDURE CreateTraceModuleMethod(mod: SyntaxTree.Module);
 		VAR name: Basic.SectionName; pointer, pooledName: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
-			operand:Operand;
+			operand:Operand; size: LONGINT;
 		BEGIN
 			previousSection := section;
 			Global.GetModuleName(mod,name);
@@ -2087,12 +2090,22 @@ TYPE
 					IF SemanticChecker.IsPointerType (variable.type) THEN
 						Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 						CallThis("GarbageCollector","Mark", 1);
-					ELSIF variable.type.resolved IS SyntaxTree.RecordType THEN
+					ELSIF variable.type.IsRecordType() THEN
 						Emit (Push(position,register));
 						GetRecordTypeName (variable.type.resolved(SyntaxTree.RecordType),pooledName);
 						Basic.SuffixSegmentedName (pooledName, Basic.MakeString ("@Trace"));
 						IntermediateCode.InitAddress(op, addressType, pooledName , 0, 0);
 						Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
+					ELSIF IsStaticArray(variable.type) THEN
+						size := StaticArrayNumElements(variable.type);
+						Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+						Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+						IF StaticArrayBaseType(variable.type).IsRecordType() THEN
+							CallThis("GarbageCollector","MarkRecordArray", 1);
+						ELSE 
+							CallThis("GarbageCollector","MarkPointerArray", 1);
+							ASSERT(StaticArrayBaseType(variable.type).IsPointer());
+						END;
 					END;
 					ReleaseIntermediateOperand(register);
 				END;
@@ -2108,10 +2121,21 @@ TYPE
 			
 		END CreateTraceModuleMethod;
 		
+		PROCEDURE CreateCopyMethod();
+		VAR name, pointer: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
+		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
+		BEGIN
+			previousSection := section;
+			(*GetRecordTypeName (recordType,name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			IF dump # NIL THEN dump := section.comments END;
+		*)
+		END CreateCopyMethod;
 		
 		PROCEDURE CreateTraceMethod (recordType: SyntaxTree.RecordType);
 		VAR name, pointer: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
-		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
+		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT;
 		BEGIN
 			previousSection := section;
 			GetRecordTypeName (recordType,name);
@@ -2137,6 +2161,17 @@ TYPE
 						Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 						IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 						Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
+					ELSIF IsStaticArray(variable.type) THEN
+						size := StaticArrayNumElements(variable.type);
+						Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+						Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+						IF StaticArrayBaseType(variable.type).IsRecordType() THEN
+							CallThis("GarbageCollector","MarkRecordArray", 1);
+						ELSE 
+							CallThis("GarbageCollector","MarkPointerArray", 1);
+							ASSERT(StaticArrayBaseType(variable.type).IsPointer());
+						END;
+
 					END;
 					ReleaseIntermediateOperand(register);
 				END;
@@ -8142,6 +8177,10 @@ TYPE
 			ASSERT(left.type # NIL); ASSERT(right.type # NIL);
 			leftType := left.type.resolved; rightType:= right.type.resolved;
 
+			IF backend.cooperative & left.NeedsTrace() THEN
+				TRACE(left.position, left);
+			END;
+
 			IF CanPassAsResultParameter(right) THEN
 				procedureResultDesignator := left(SyntaxTree.Designator);
 				Expression(right);
@@ -11220,6 +11259,26 @@ TYPE
 		RETURN (type IS SyntaxTree.ArrayType) & (type(SyntaxTree.ArrayType).form = SyntaxTree.Static);
 	END IsStaticArray;
 
+	PROCEDURE StaticArrayNumElements(type: SyntaxTree.Type): LONGINT;
+	VAR size: LONGINT;
+	BEGIN
+		size := 1;
+		WHILE (IsStaticArray(type)) DO
+			size := size * type.resolved(SyntaxTree.ArrayType).staticLength;
+			type := type.resolved(SyntaxTree.ArrayType).arrayBase;
+		END;
+		RETURN size;
+	END StaticArrayNumElements;
+	
+	PROCEDURE StaticArrayBaseType(type: SyntaxTree.Type): SyntaxTree.Type;
+	BEGIN
+		WHILE (IsStaticArray(type)) DO
+			type := type.resolved(SyntaxTree.ArrayType).arrayBase;
+		END;
+		RETURN type;
+	END StaticArrayBaseType;
+	
+
 	PROCEDURE IsDelegate(type: SyntaxTree.Type): BOOLEAN;
 	BEGIN
 		IF type = NIL THEN RETURN FALSE END;
@@ -11242,7 +11301,7 @@ TYPE
 		END;
 		RETURN i
 	END DynamicDim;
-
+	
 
 
 	PROCEDURE StaticSize(system: Global.System; type: SyntaxTree.Type): LONGINT;
