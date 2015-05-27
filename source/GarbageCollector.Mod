@@ -12,6 +12,8 @@ VAR currentCycle, oldestCycle: LONGWORD;
 VAR firstMarked {UNTRACED}, firstWatched {UNTRACED}: BaseTypes.Pointer;
 VAR markedSentinel {UNTRACED}, watchedSentinel {UNTRACED}: BaseTypes.Pointer;
 
+TYPE Delegate = RECORD proc: ADDRESS; pointer{UNTRACED}: BaseTypes.Pointer END;
+
 (** Registers the specified pointer for automatic memory management. *)
 (** This procedure is called by the compiler when a pointer or object type is allocated using the NEW statement. *)
 PROCEDURE Watch- (pointer {UNTRACED}: BaseTypes.Pointer);
@@ -45,6 +47,12 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END Assign;
 
+PROCEDURE AssignDelegate-(VAR target : Delegate; CONST source: Delegate);
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Assign(target.pointer, source.pointer);
+	target.proc := source.proc;
+END AssignDelegate;
+
 (** Performs the assignment of an array containing pointers. *)
 (** This procedure is called by the compiler when assigning arrays of pointer type. *)
 PROCEDURE AssignPointerArray- (VAR target {UNTRACED}: ARRAY OF BaseTypes.Pointer; CONST source {UNTRACED}: ARRAY OF BaseTypes.Pointer);
@@ -55,6 +63,15 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 		Assign (target[i], source[i]);
 	END;
 END AssignPointerArray;
+
+PROCEDURE AssignDelegateArray-(VAR target: ARRAY OF Delegate; CONST source : ARRAY OF Delegate);
+VAR i: LONGINT;
+BEGIN{UNCOOPERATIVE, UNCHECKED}
+	FOR i := 0 TO LEN(target) DO
+		AssignDelegate(target[i], source[i]);
+	END;
+END AssignDelegateArray;
+
 
 (** Executes an atomic compare-and-swap operation on a pointer variable. *)
 (** This procedure is called by the compiler when executing CAS expressions. *)
@@ -167,13 +184,22 @@ END Mark;
 
 (** Marks an array of pointers. *)
 (** This procedure is called by the compiler while tracing arrays of pointer type. *)
-PROCEDURE MarkPointerArray- (CONST pointers: ARRAY OF BaseTypes.Pointer);
+PROCEDURE MarkPointerArray- (CONST pointers {UNTRACED} : ARRAY OF BaseTypes.Pointer);
 VAR i: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	FOR i := 0 TO LEN (pointers) - 1 DO
 		Mark (pointers[i]);
 	END;
 END MarkPointerArray;
+
+PROCEDURE MarkDelegateArray-(CONST delegates : ARRAY OF Delegate);
+VAR i: LONGINT;
+BEGIN{UNCOOPERATIVE, UNCHECKED}
+	FOR i := 0 TO LEN(delegates) DO
+		Mark (delegates[i].pointer);
+	END;
+END MarkDelegateArray;
+
 
 (* Acquires ownership of the specified linked list by exchanging its first item with its sentinel. *)
 PROCEDURE AcquireList (VAR first {UNTRACED}: BaseTypes.Pointer; sentinel {UNTRACED}: BaseTypes.Pointer): BaseTypes.Pointer;

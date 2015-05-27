@@ -2128,6 +2128,12 @@ TYPE
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
 					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 					Emit(Call(position,op,3));
+				ELSIF base.resolved IS SyntaxTree.ProcedureType THEN (* array of delegates *)
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,dst,0)));
+					CallThis("GarbageCollector","AssignDelegateArray", 2);
 				ELSE 
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
 					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
@@ -2136,6 +2142,11 @@ TYPE
 					CallThis("GarbageCollector","AssignPointerArray", 1);
 					ASSERT(StaticArrayBaseType(type).IsPointer());
 				END;
+			ELSIF type.resolved IS SyntaxTree.ProcedureType THEN
+				Emit (Push(position, dst));
+				Emit (Push(position, src));
+				CallThis("GarbageCollector","AssignDelegate", 1);
+			ELSE HALT(100); (* missing ? *)
 			END;
 		END CallAssignMethod;
 		
@@ -2147,7 +2158,7 @@ TYPE
 			previousSection := section;
 			parameter1 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
 			parameter2 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
-			parameter3 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
+			parameter3 := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
 			
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
@@ -2245,16 +2256,22 @@ TYPE
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 					Emit(Call(position, op, 2));
+				ELSIF base.resolved IS SyntaxTree.ProcedureType THEN (* array of delegates *)
+					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					CallThis("GarbageCollector","MarkDelegateArray", 2);
 				ELSE 
 					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					CallThis("GarbageCollector","MarkPointerArray", 1);
-					ASSERT(StaticArrayBaseType(type).IsPointer());
-				END;					
+					CallThis("GarbageCollector","MarkPointerArray", 2);
+					ASSERT(base.IsPointer());
+				END;
+			ELSIF type.resolved IS SyntaxTree.ProcedureType THEN
+				Emit (Push(position, IntermediateCode.Memory (addressType,register,ToMemoryUnits(system,addressType.sizeInBits))));
+				CallThis("GarbageCollector","Mark", 1);
+			ELSE HALT(100); (* missing ? *)
 			END;
-
 		END CallTraceMethod;
-		
 		
 		PROCEDURE CreateTraceMethod (recordType: SyntaxTree.RecordType);
 		VAR name, pointer: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
@@ -2263,7 +2280,7 @@ TYPE
 		BEGIN
 			previousSection := section;
 			parameter1 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
-			parameter2 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
+			parameter2 := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
@@ -8306,6 +8323,14 @@ TYPE
 
 			IF backend.cooperative & left.NeedsTrace() THEN
 				TRACE(left.position, left);
+				Designate(right, rightO);
+				Designate(left, leftO); 
+				TransferToRegister(leftO.op, leftO.op);
+				TransferToRegister(rightO.op, rightO.op); 
+				CallAssignMethod(leftO.op, rightO.op, left.type);
+				ReleaseOperand(leftO); 
+				ReleaseOperand(rightO);
+				RETURN; 
 			END;
 
 			IF CanPassAsResultParameter(right) THEN
