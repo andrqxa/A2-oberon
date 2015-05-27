@@ -2073,7 +2073,7 @@ TYPE
 		PROCEDURE CreateTraceModuleMethod(mod: SyntaxTree.Module);
 		VAR name: Basic.SectionName; pointer, pooledName: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
-			operand:Operand; size: LONGINT;
+			operand:Operand; size: LONGINT; base: SyntaxTree.Type;
 		BEGIN
 			previousSection := section;
 			Global.GetModuleName(mod,name);
@@ -2087,26 +2087,7 @@ TYPE
 				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
 					Symbol(variable, operand);
 					register := operand.op;
-					IF SemanticChecker.IsPointerType (variable.type) THEN
-						Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
-						CallThis("GarbageCollector","Mark", 1);
-					ELSIF variable.type.IsRecordType() THEN
-						Emit (Push(position,register));
-						GetRecordTypeName (variable.type.resolved(SyntaxTree.RecordType),pooledName);
-						Basic.SuffixSegmentedName (pooledName, Basic.MakeString ("@Trace"));
-						IntermediateCode.InitAddress(op, addressType, pooledName , 0, 0);
-						Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
-					ELSIF IsStaticArray(variable.type) THEN
-						size := StaticArrayNumElements(variable.type);
-						Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-						Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
-						IF StaticArrayBaseType(variable.type).IsRecordType() THEN
-							CallThis("GarbageCollector","MarkRecordArray", 1);
-						ELSE 
-							CallThis("GarbageCollector","MarkPointerArray", 1);
-							ASSERT(StaticArrayBaseType(variable.type).IsPointer());
-						END;
-					END;
+					CallTraceMethod(register, variable.type);
 					ReleaseIntermediateOperand(register);
 				END;
 				variable := variable.nextVariable;
@@ -2120,24 +2101,169 @@ TYPE
 			IF dump # NIL THEN dump := section.comments END;
 			
 		END CreateTraceModuleMethod;
+
+		PROCEDURE CallAssignMethod(CONST src, dst: IntermediateCode.Operand; type: SyntaxTree.Type);
+		VAR name: Basic.SegmentedName; size: LONGINT; base: SyntaxTree.Type; op: IntermediateCode.Operand;
+		BEGIN
+			IF SemanticChecker.IsPointerType (type) THEN
+				Emit (Push(position, dst));
+				Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
+				CallThis("GarbageCollector","Assign", 1);
+			ELSIF type.IsRecordType() THEN
+				Emit (Push(position,src));
+				Emit (Push(position,dst));
+				GetRecordTypeName (type.resolved(SyntaxTree.RecordType),name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
+				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+				Emit(Call(position,op, 2*ToMemoryUnits(system, system.addressSize)));
+			ELSIF IsStaticArray(type) THEN
+				size := StaticArrayNumElements(type);
+				base := StaticArrayBaseType(type);
+				IF base.IsRecordType() THEN
+					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,dst,0)));
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));					
+					GetRecordTypeName (base.resolved(SyntaxTree.RecordType),name);
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
+					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+					Emit(Call(position,op,3));
+				ELSE 
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,dst,0)));
+					CallThis("GarbageCollector","AssignPointerArray", 1);
+					ASSERT(StaticArrayBaseType(type).IsPointer());
+				END;
+			END;
+		END CallAssignMethod;
 		
-		PROCEDURE CreateCopyMethod();
-		VAR name, pointer: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
-		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
+		PROCEDURE CreateAssignMethod (recordType: SyntaxTree.RecordType);
+		VAR name: Basic.SegmentedName; previousSection: IntermediateCode.Section;
+		VAR variable: SyntaxTree.Variable; src, dst, op, ofs: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT;
+			parameter1, parameter2, parameter3: IntermediateCode.Operand; label: Label;
 		BEGIN
 			previousSection := section;
-			(*GetRecordTypeName (recordType,name);
-			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+			parameter1 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
+			parameter2 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
+			parameter3 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
+			
+			GetRecordTypeName (recordType,name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
 			IF dump # NIL THEN dump := section.comments END;
-		*)
-		END CreateCopyMethod;
+
+			src := parameter1;
+			dst := parameter2;
+			size := ToMemoryUnits(system,system.SizeOf(recordType));
+			Emit(Copy(position,dst,src,IntermediateCode.Immediate(addressType,size)));
+			ReleaseIntermediateOperand(dst);
+			ReleaseIntermediateOperand(src);
+			
+			variable := recordType.recordScope.firstVariable;
+			WHILE variable # NIL DO
+				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
+
+					src := NewRegisterOperand (addressType);
+					dst := NewRegisterOperand (addressType);
+					Emit (Mov(position, src, parameter1));
+					Emit (Mov(position, dst, parameter2));
+;
+					IntermediateCode.AddOffset(src,BaseObjectTypeSize * ToMemoryUnits(system,variable.offsetInBits));
+					IntermediateCode.AddOffset(dst,BaseObjectTypeSize * ToMemoryUnits(system,variable.offsetInBits));
+					IF recordType.isObject & ((recordType.pointerType = NIL) OR ~recordType.pointerType.isPlain) THEN
+						IntermediateCode.AddOffset(src,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+						IntermediateCode.AddOffset(dst,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+					END;
+					CallAssignMethod(src, dst, variable.type);
+					ReleaseIntermediateOperand(dst);
+					ReleaseIntermediateOperand(src);
+				END;
+				variable := variable.nextVariable;
+			END;
+			
+			recordBase := recordType.GetBaseRecord();
+			IF recordBase # NIL THEN
+				GetRecordTypeName (recordBase,name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
+				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+				Emit(Br(position,op));
+			ELSE
+				Emit(Exit(position,0,0));
+			END;
+			
+			GetRecordTypeName (recordType,name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
+			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+
+			src := NewRegisterOperand (addressType);
+			dst := NewRegisterOperand (addressType);
+			ofs := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(recordType)));
+			Emit(Mov(position, src, parameter1));
+			Emit(Mov(position, dst, parameter2));
+			label := NewLabel(); 
+			SetLabel(label);
+			Emit(Push(position, src)); 
+			Emit(Push(position, dst));
+			GetRecordTypeName (recordType,name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
+			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+			Emit(Call(position, op, 0));
+			Emit(Pop(position, dst));
+			Emit(Pop(position, src));
+			Emit(Add(position, src, src, ofs));
+			Emit(Add(position, dst, dst, ofs));
+			Emit(Sub(position, parameter3, parameter3, IntermediateCode.Immediate(sizeType, 1)));
+			BrneL(label, parameter3, IntermediateCode.Immediate(sizeType, 0));
+			Emit(Exit(position,0,0));
+			section := previousSection;
+			IF dump # NIL THEN dump := section.comments END;
+		END CreateAssignMethod;
+		
+		PROCEDURE CallTraceMethod(CONST register: IntermediateCode.Operand; type: SyntaxTree.Type);
+		VAR name: Basic.SegmentedName; op: IntermediateCode.Operand; size: LONGINT; base: SyntaxTree.Type;
+		BEGIN
+			IF SemanticChecker.IsPointerType (type) THEN
+				Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+				CallThis("GarbageCollector","Mark", 1);
+			ELSIF type.IsRecordType() THEN
+				Emit (Push(position,register));
+				GetRecordTypeName (type.resolved(SyntaxTree.RecordType),name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+				Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
+			ELSIF IsStaticArray(type) THEN
+				size := StaticArrayNumElements(type);
+				base := StaticArrayBaseType(type);
+				IF base.IsRecordType() THEN
+					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					GetRecordTypeName (base.resolved(SyntaxTree.RecordType), name);
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+					Emit(Call(position, op, 2));
+				ELSE 
+					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					CallThis("GarbageCollector","MarkPointerArray", 1);
+					ASSERT(StaticArrayBaseType(type).IsPointer());
+				END;					
+			END;
+
+		END CallTraceMethod;
+		
 		
 		PROCEDURE CreateTraceMethod (recordType: SyntaxTree.RecordType);
 		VAR name, pointer: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
-		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT;
+		VAR variable: SyntaxTree.Variable; register,op,ofs: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT; base: SyntaxTree.Type;
+			parameter1, parameter2: IntermediateCode.Operand; label: Label;
 		BEGIN
 			previousSection := section;
+			parameter1 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
+			parameter2 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
@@ -2147,32 +2273,12 @@ TYPE
 			WHILE variable # NIL DO
 				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
 					register := NewRegisterOperand (addressType);
-					Emit (Mov(position,register,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits))));
+					Emit (Mov(position,register,parameter1));
 					IntermediateCode.AddOffset(register,ToMemoryUnits(system,variable.offsetInBits));
 					IF recordType.isObject & ((recordType.pointerType = NIL) OR ~recordType.pointerType.isPlain) THEN
 						IntermediateCode.AddOffset(register,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 					END;
-					IF SemanticChecker.IsPointerType (variable.type) THEN
-						Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
-						CallThis("GarbageCollector","Mark", 1);
-					ELSIF variable.type.resolved IS SyntaxTree.RecordType THEN
-						Emit (Push(position,register));
-						GetRecordTypeName (variable.type.resolved(SyntaxTree.RecordType),name);
-						Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
-						IntermediateCode.InitAddress(op, addressType, name , 0, 0);
-						Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
-					ELSIF IsStaticArray(variable.type) THEN
-						size := StaticArrayNumElements(variable.type);
-						Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-						Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
-						IF StaticArrayBaseType(variable.type).IsRecordType() THEN
-							CallThis("GarbageCollector","MarkRecordArray", 1);
-						ELSE 
-							CallThis("GarbageCollector","MarkPointerArray", 1);
-							ASSERT(StaticArrayBaseType(variable.type).IsPointer());
-						END;
-
-					END;
+					CallTraceMethod(register, variable.type);
 					ReleaseIntermediateOperand(register);
 				END;
 				variable := variable.nextVariable;
@@ -2229,6 +2335,27 @@ TYPE
 				ReleaseIntermediateOperand(register);
 				Emit(Exit(position,0,0));
 			END;
+			
+			GetRecordTypeName (recordType,name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+
+			register := NewRegisterOperand (addressType);
+			ofs := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(recordType)));
+			Emit(Mov(position, register, parameter1));
+			label := NewLabel(); 
+			SetLabel(label);
+			Emit(Push(position, register)); 
+			GetRecordTypeName (recordType,name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+			Emit(Call(position, op, 0));
+			Emit(Pop(position, register));
+			Emit(Add(position, register, register, ofs));
+			Emit(Sub(position, parameter2, parameter2, IntermediateCode.Immediate(sizeType, 1)));
+			BrneL(label, parameter2, IntermediateCode.Immediate(sizeType, 0));
+			Emit(Exit(position,0,0));
 			section := previousSection;
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateTraceMethod;
@@ -10730,6 +10857,7 @@ TYPE
 							IF ~recordType.isObject THEN
 								implementationVisitor.CreateResetProcedure(recordType);
 							END;
+							implementationVisitor.CreateAssignMethod(recordType);
 						END;
 
 					ELSIF ~simple THEN

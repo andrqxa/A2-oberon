@@ -10,8 +10,7 @@ IMPORT Counters, Queues;
 (** Represents a type descriptor. *)
 TYPE Descriptor* = POINTER {UNSAFE} TO RECORD
 	parent- {UNTRACED}: Descriptor;
-	size-: SIZE;
-	trace-: PROCEDURE (self: ADDRESS);
+	size-: SIZE; (* or base record descriptor for arrays *)
 END;
 
 (** Represents a pointer type. *)

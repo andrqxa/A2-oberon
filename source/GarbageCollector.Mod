@@ -47,14 +47,14 @@ END Assign;
 
 (** Performs the assignment of an array containing pointers. *)
 (** This procedure is called by the compiler when assigning arrays of pointer type. *)
-PROCEDURE AssignArray- (VAR target {UNTRACED}: ARRAY OF BaseTypes.Pointer; CONST source {UNTRACED}: ARRAY OF BaseTypes.Pointer);
+PROCEDURE AssignPointerArray- (VAR target {UNTRACED}: ARRAY OF BaseTypes.Pointer; CONST source {UNTRACED}: ARRAY OF BaseTypes.Pointer);
 VAR i: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (LEN (target) = LEN (source));
 	FOR i := 0 TO LEN (target) - 1 DO
 		Assign (target[i], source[i]);
 	END;
-END AssignArray;
+END AssignPointerArray;
 
 (** Executes an atomic compare-and-swap operation on a pointer variable. *)
 (** This procedure is called by the compiler when executing CAS expressions. *)
@@ -174,17 +174,6 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 		Mark (pointers[i]);
 	END;
 END MarkPointerArray;
-
-(** Marks an array of records. *)
-(** This procedure is called by the compiler while tracing arrays of record type. *)
-PROCEDURE MarkRecordArray- (address: ADDRESS; length: SIZE; descriptor {UNTRACED}: BaseTypes.Descriptor);
-VAR i: SIZE;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	FOR i := 0 TO length - 1 DO
-		descriptor.trace (address);
-		INC (address, descriptor.size);
-	END;
-END MarkRecordArray;
 
 (* Acquires ownership of the specified linked list by exchanging its first item with its sentinel. *)
 PROCEDURE AcquireList (VAR first {UNTRACED}: BaseTypes.Pointer; sentinel {UNTRACED}: BaseTypes.Pointer): BaseTypes.Pointer;
