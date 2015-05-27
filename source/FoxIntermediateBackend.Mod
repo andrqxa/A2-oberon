@@ -2195,7 +2195,7 @@ TYPE
 			END;
 			
 			recordBase := recordType.GetBaseRecord();
-			IF recordBase # NIL THEN
+			IF (recordBase # NIL) & recordBase.NeedsTrace() THEN
 				GetRecordTypeName (recordBase,name);
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
 				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
