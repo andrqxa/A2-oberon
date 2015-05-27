@@ -336,7 +336,7 @@ TYPE
 	ArrayAccessOperators* = RECORD
 		len*: Operator; (* length operator *)
 		generalRead*, generalWrite*: Operator; (* operators on ARRAY [*] RANGE, for tensors *)
-		read*, write*: ARRAY [*] OF Operator; (* fixed-dim. operators *)
+		read*, write*: POINTER TO ARRAY OF Operator; (* fixed-dim. operators *)
 	END;
 
 	FingerPrint*= RECORD
@@ -2319,7 +2319,7 @@ TYPE
 		END Accept;
 		
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN left.resolved.NeedsTrace() & type.resolved.NeedsTrace();
+		BEGIN RETURN type.NeedsTrace();
 		END NeedsTrace;
 
 	END IndexDesignator;
@@ -2450,7 +2450,7 @@ TYPE
 		END Accept;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN left.resolved.NeedsTrace() & type.resolved.NeedsTrace();
+		BEGIN RETURN type.NeedsTrace();
 		END NeedsTrace;
 
 	END DereferenceDesignator;
