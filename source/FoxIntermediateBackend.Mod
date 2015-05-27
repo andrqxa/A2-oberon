@@ -1068,6 +1068,8 @@ TYPE
 		*)
 		registerUsageCount: RegisterUsageCount;
 		usedRegisters: RegisterEntry;
+		
+		
 
 		(* useful operands and types *)
 		nil,fp,sp,ap,true,false: IntermediateCode.Operand;
@@ -1157,6 +1159,32 @@ TYPE
 			NeedDescriptor := FALSE;
 			isUnchecked := backend.noRuntimeChecks;
 		END Init;
+		
+		TYPE Context = RECORD 
+			section: IntermediateCode.Section;
+			registerUsageCount: RegisterUsageCount;
+			usedRegisters: RegisterEntry;
+			END;
+		
+		PROCEDURE SwitchContext(new: IntermediateCode.Section): Context;
+		VAR context: Context;
+		BEGIN
+			context.section := section;
+			context.registerUsageCount := registerUsageCount;
+			context.usedRegisters := usedRegisters;
+			section := new;
+			NEW(registerUsageCount);
+			usedRegisters := NIL; 
+			RETURN context;
+		END SwitchContext;
+		
+		PROCEDURE ReturnToContext(context: Context);
+		BEGIN
+			section := context.section;
+			registerUsageCount := context.registerUsageCount;
+			usedRegisters := context.usedRegisters;
+		END ReturnToContext;
+		
 
 		PROCEDURE NewSection(list: Sections.SectionList; type: SHORTINT; CONST name: Basic.SegmentedName; syntaxTreeSymbol: SyntaxTree.Symbol; dump: BOOLEAN): IntermediateCode.Section;
 		VAR fp: SyntaxTree.FingerPrint; section: IntermediateCode.Section;
@@ -2153,16 +2181,17 @@ TYPE
 		PROCEDURE CreateAssignMethod (recordType: SyntaxTree.RecordType);
 		VAR name: Basic.SegmentedName; previousSection: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; src, dst, op, ofs: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT;
-			parameter1, parameter2, parameter3: IntermediateCode.Operand; label: Label;
+			parameter1, parameter2, parameter3: IntermediateCode.Operand; label: Label; previousUsedRegisters: RegisterEntry; 
+			previousRegisterUsageCount: RegisterUsageCount; context: Context;
 		BEGIN
-			previousSection := section;
 			parameter1 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
 			parameter2 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
 			parameter3 := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
 			
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
-			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
+
 			IF dump # NIL THEN dump := section.comments END;
 
 			src := parameter1;
@@ -2208,6 +2237,8 @@ TYPE
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			NEW(registerUsageCount);
+			usedRegisters := NIL;
 
 			src := NewRegisterOperand (addressType);
 			dst := NewRegisterOperand (addressType);
@@ -2229,7 +2260,7 @@ TYPE
 			Emit(Sub(position, parameter3, parameter3, IntermediateCode.Immediate(sizeType, 1)));
 			BrneL(label, parameter3, IntermediateCode.Immediate(sizeType, 0));
 			Emit(Exit(position,0,0));
-			section := previousSection;
+			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateAssignMethod;
 		
@@ -2276,14 +2307,14 @@ TYPE
 		PROCEDURE CreateTraceMethod (recordType: SyntaxTree.RecordType);
 		VAR name, pointer: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; register,op,ofs: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT; base: SyntaxTree.Type;
-			parameter1, parameter2: IntermediateCode.Operand; label: Label;
+			parameter1, parameter2: IntermediateCode.Operand; label: Label; context: Context;
 		BEGIN
 			previousSection := section;
 			parameter1 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
 			parameter2 := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
-			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
 			IF dump # NIL THEN dump := section.comments END;
 
 			variable := recordType.recordScope.firstVariable;
@@ -2332,6 +2363,8 @@ TYPE
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 				section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+				NEW(registerUsageCount);
+				usedRegisters := NIL;
 				IF dump # NIL THEN dump := section.comments END;
 				
 				register := NewRegisterOperand (addressType);
@@ -2357,6 +2390,8 @@ TYPE
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			NEW(registerUsageCount);
+			usedRegisters := NIL;
 
 			register := NewRegisterOperand (addressType);
 			ofs := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(recordType)));
@@ -2373,18 +2408,17 @@ TYPE
 			Emit(Sub(position, parameter2, parameter2, IntermediateCode.Immediate(sizeType, 1)));
 			BrneL(label, parameter2, IntermediateCode.Immediate(sizeType, 0));
 			Emit(Exit(position,0,0));
-			section := previousSection;
+			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateTraceMethod;
 
 		PROCEDURE CreateResetProcedure (recordType: SyntaxTree.RecordType);
 		VAR name: Basic.SegmentedName; previousSection: IntermediateCode.Section;
-		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
+		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; context: Context;
 		BEGIN
-			previousSection := section;
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
-			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
 			IF dump # NIL THEN dump := section.comments END;
 
 			variable := recordType.recordScope.firstVariable;
@@ -2420,32 +2454,32 @@ TYPE
 			ELSE
 				Emit(Exit(position,0,0));
 			END;
-			section := previousSection;
+			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateResetProcedure;
 		
 		PROCEDURE CreateResetMethod (scope: SyntaxTree.ProcedureScope);
 		VAR previousSection: IntermediateCode.Section; previousScope: SyntaxTree.Scope;
-		VAR name: Basic.SegmentedName;
+		VAR name: Basic.SegmentedName; context: Context;
 		BEGIN
 			previousSection := section;
 			previousScope := currentScope;
 			GetCodeSectionNameForSymbol(scope.ownerProcedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
-			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
 			IF dump # NIL THEN dump := section.comments END;
 			Emit(Enter(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention,0,0));
 			currentScope := scope; ResetVariables;
 			Emit(Leave(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention));
 			Emit(Exit(position,0,0));
 			currentScope := previousScope;
-			section := previousSection;
+			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateResetMethod;
 
 		PROCEDURE CreateMoveMethod (scope: SyntaxTree.ProcedureScope);
 		VAR previousSection: IntermediateCode.Section; name: Basic.SegmentedName;
-		VAR parameter: SyntaxTree.Parameter; op, stackFrame: IntermediateCode.Operand;
+		VAR parameter: SyntaxTree.Parameter; op, stackFrame: IntermediateCode.Operand; context: Context;
 		
 			PROCEDURE Move (parameter: SyntaxTree.Parameter);
 			VAR value: IntermediateCode.Operand; skip: Label;
@@ -2471,7 +2505,7 @@ TYPE
 			previousSection := section;
 			GetCodeSectionNameForSymbol(scope.ownerProcedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
-			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
 			IF dump # NIL THEN dump := section.comments END;
 			stackFrame := NewRegisterOperand (addressType); 
 			Emit (Mov(position,stackFrame,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3))));
@@ -2488,6 +2522,7 @@ TYPE
 			IntermediateCode.InitAddress(op, addressType, name, 0, 0);
 			Emit(Br(position,op));
 			section := previousSection;
+			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateMoveMethod;
 
@@ -2529,12 +2564,12 @@ TYPE
 		
 		PROCEDURE CreateProcedureDescriptor (procedure: SyntaxTree.Procedure);
 		VAR previousSection: IntermediateCode.Section; name: Basic.SegmentedName;
-		VAR op: IntermediateCode.Operand;
+		VAR op: IntermediateCode.Operand; context: Context;
 		BEGIN
 			previousSection := section;
 			GetCodeSectionNameForSymbol(procedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Descriptor"));
-			section := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, name,NIL,TRUE);
+			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.ConstSection, name,NIL,TRUE));
 			IF dump # NIL THEN dump := section.comments END;
 			Basic.ToSegmentedName ("BaseTypes.StackFrame",name);
 
@@ -2559,7 +2594,7 @@ TYPE
 			END;
 			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 			Emit(Data(position,op));
-			section := previousSection;
+			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateProcedureDescriptor;
 
