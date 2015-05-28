@@ -2274,7 +2274,7 @@ TYPE
 		END SetSymbol;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN symbol.NeedsTrace();
+		BEGIN RETURN symbol.NeedsTrace() & ((left = NIL) OR (left.NeedsTrace()));
 		END NeedsTrace;
 
 	END SymbolDesignator;
@@ -2319,7 +2319,7 @@ TYPE
 		END Accept;
 		
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN type.NeedsTrace();
+		BEGIN RETURN type.NeedsTrace() & left.NeedsTrace(); (* for x[y]: if x is untraced, then also x[y] should be treated untraced *)
 		END NeedsTrace;
 
 	END IndexDesignator;
@@ -2428,6 +2428,10 @@ TYPE
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitTypeGuardDesignator(SELF)
 		END Accept;
+		
+		PROCEDURE NeedsTrace* (): BOOLEAN;
+		BEGIN RETURN left.NeedsTrace() & type.NeedsTrace(); (* for x(Y): if x is untraced, then x as Y should also be treated untraced  *)
+		END NeedsTrace;
 
 	END TypeGuardDesignator;
 
@@ -2450,7 +2454,7 @@ TYPE
 		END Accept;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN type.NeedsTrace();
+		BEGIN RETURN left.NeedsTrace() & type.NeedsTrace(); (* for x^: if x is an untraced pointer, the content of x^ is also treated untraced *)
 		END NeedsTrace;
 
 	END DereferenceDesignator;
@@ -3118,7 +3122,7 @@ TYPE
 		END Accept;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN ~untraced & (externalName = NIL) & type.resolved.NeedsTrace ();
+		BEGIN RETURN ~untraced & (externalName = NIL) & type.NeedsTrace ();
 		END NeedsTrace;
 
 	END Variable;
@@ -3170,7 +3174,7 @@ TYPE
 		BEGIN SELF.kind := kind; END SetKind;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN ~untraced & (kind = ValueParameter) & type.resolved.NeedsTrace ();
+		BEGIN RETURN ~untraced & (kind = ValueParameter) & type.NeedsTrace ();
 		END NeedsTrace;
 
 	END Parameter;
