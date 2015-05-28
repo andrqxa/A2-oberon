@@ -61,6 +61,15 @@ TYPE RecordArray* = OBJECT {DISPOSABLE,PLAIN} (Array)
 
 END RecordArray;
 
+TYPE DelegateArray* = OBJECT {DISPOSABLE,PLAIN} (Array)
+
+	PROCEDURE Trace-;
+	PROCEDURE MarkDelegateArray EXTERN "GarbageCollector.MarkDelegateArray" (length: SIZE; address: ADDRESS);
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		MarkDelegateArray (length, data);
+	END Trace;
+
+END DelegateArray;
 (** Represents a record type. *)
 TYPE Record* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
 

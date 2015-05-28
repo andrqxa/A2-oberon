@@ -6929,6 +6929,8 @@ TYPE
 							Basic.ToSegmentedName ("BaseTypes.Array",name);
 						ELSIF type IS SyntaxTree.RecordType THEN
 							Basic.ToSegmentedName ("BaseTypes.RecordArray",name);
+						ELSIF type IS SyntaxTree.ProcedureType THEN
+							Basic.ToSegmentedName ("BaseTypes.DelegateArray",name);
 						ELSE
 							Basic.ToSegmentedName ("BaseTypes.PointerArray",name);
 						END;
