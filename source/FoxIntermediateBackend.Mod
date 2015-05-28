@@ -8359,7 +8359,6 @@ TYPE
 			leftType := left.type.resolved; rightType:= right.type.resolved;
 
 			IF backend.cooperative & left.NeedsTrace() THEN
-				TRACE(left.position, left);
 				Designate(right, rightO);
 				Designate(left, leftO); 
 				TransferToRegister(leftO.op, leftO.op);
