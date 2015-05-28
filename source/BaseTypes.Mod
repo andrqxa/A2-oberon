@@ -11,7 +11,7 @@ IMPORT Counters, Queues;
 TYPE Descriptor* = POINTER {UNSAFE} TO RECORD
 	parent- {UNTRACED}: Descriptor;
 	size-: SIZE; (* or base record descriptor for arrays *)
-	trace-: PROCEDURE(this {UNTRACED}: Pointer);
+	trace-: PROCEDURE(this: ADDRESS);
 	(* method table -- filled in by the compiler *)
 END;
 
