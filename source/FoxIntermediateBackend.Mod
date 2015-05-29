@@ -2145,37 +2145,37 @@ TYPE
 				GetRecordTypeName (type.resolved(SyntaxTree.RecordType),name);
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
 				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
-				Emit(Call(position,op, 2*ToMemoryUnits(system, system.addressSize)));
+				Emit(Call(position,op, ToMemoryUnits(system, 2*system.addressSize)));
 			ELSIF IsStaticArray(type) THEN
 				size := StaticArrayNumElements(type);
 				base := StaticArrayBaseType(type);
 				IF base.IsRecordType() THEN
-					Emit (Push(position, IntermediateCode.Memory (addressType,dst,0)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
+					Emit (Push(position, dst));
+					Emit (Push(position, src));
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));					
 					GetRecordTypeName (base.resolved(SyntaxTree.RecordType),name);
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
 					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
-					Emit(Call(position,op,3));
+					Emit(Call(position,op,ToMemoryUnits(system, 3*system.addressSize)));
 				ELSIF base.resolved IS SyntaxTree.ProcedureType THEN (* array of delegates *)
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,dst,0)));
+					Emit (Push(position, dst));
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
-					CallThis("GarbageCollector","AssignDelegateArray", 2);
+					Emit (Push(position, src));
+					CallThis("GarbageCollector","AssignDelegateArray", 4);
 				ELSE 
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,dst,0)));
+					Emit (Push(position, dst));
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
-					CallThis("GarbageCollector","AssignPointerArray", 1);
+					Emit (Push(position, src));
+					CallThis("GarbageCollector","AssignPointerArray", 4);
 					ASSERT(StaticArrayBaseType(type).IsPointer());
 				END;
 			ELSIF type.resolved IS SyntaxTree.ProcedureType THEN
 				Emit (Push(position, dst));
 				Emit (Push(position, src));
-				CallThis("GarbageCollector","AssignDelegate", 1);
+				CallThis("GarbageCollector","AssignDelegate", 2);
 			ELSE HALT(100); (* missing ? *)
 			END;
 		END CallAssignMethod;
