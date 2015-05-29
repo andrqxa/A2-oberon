@@ -2127,16 +2127,21 @@ TYPE
 
 		END CreateTraceModuleMethod;
 
-		PROCEDURE CallAssignMethod(CONST src, dst: IntermediateCode.Operand; type: SyntaxTree.Type);
+		PROCEDURE CallAssignPointer(CONST dst (* address *) , src (* value *): IntermediateCode.Operand);
+		BEGIN
+			Emit (Push(position, dst));
+			Emit (Push(position, src));
+			CallThis("GarbageCollector","Assign", 2);
+		END CallAssignPointer;
+
+		PROCEDURE CallAssignMethod(CONST dst (* address *) , src (* address *) : IntermediateCode.Operand; type: SyntaxTree.Type);
 		VAR name: Basic.SegmentedName; size: LONGINT; base: SyntaxTree.Type; op: IntermediateCode.Operand;
 		BEGIN
 			IF SemanticChecker.IsPointerType (type) THEN
-				Emit (Push(position, dst));
-				Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
-				CallThis("GarbageCollector","Assign", 1);
+				CallAssignPointer(dst, IntermediateCode.Memory (addressType,src,0));
 			ELSIF type.IsRecordType() THEN
-				Emit (Push(position,src));
 				Emit (Push(position,dst));
+				Emit (Push(position,src));
 				GetRecordTypeName (type.resolved(SyntaxTree.RecordType),name);
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
 				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
@@ -2145,8 +2150,8 @@ TYPE
 				size := StaticArrayNumElements(type);
 				base := StaticArrayBaseType(type);
 				IF base.IsRecordType() THEN
-					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
 					Emit (Push(position, IntermediateCode.Memory (addressType,dst,0)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));					
 					GetRecordTypeName (base.resolved(SyntaxTree.RecordType),name);
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
@@ -2155,15 +2160,15 @@ TYPE
 					Emit(Call(position,op,3));
 				ELSIF base.resolved IS SyntaxTree.ProcedureType THEN (* array of delegates *)
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
-					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
 					Emit (Push(position, IntermediateCode.Memory (addressType,dst,0)));
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
 					CallThis("GarbageCollector","AssignDelegateArray", 2);
 				ELSE 
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
-					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
 					Emit (Push(position, IntermediateCode.Memory (addressType,dst,0)));
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,src,0)));
 					CallThis("GarbageCollector","AssignPointerArray", 1);
 					ASSERT(StaticArrayBaseType(type).IsPointer());
 				END;
@@ -2181,9 +2186,9 @@ TYPE
 			parameter1, parameter2, parameter3: IntermediateCode.Operand; label: Label; previousUsedRegisters: RegisterEntry; 
 			previousRegisterUsageCount: RegisterUsageCount; context: Context;
 		BEGIN
-			parameter1 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
-			parameter2 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
-			parameter3 := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
+			parameter1 (* dest *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
+			parameter2 (* src *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
+			parameter3 (* len *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
 			
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
@@ -2196,20 +2201,20 @@ TYPE
 			WHILE variable # NIL DO
 				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
 
-					src := NewRegisterOperand (addressType);
 					dst := NewRegisterOperand (addressType);
-					Emit (Mov(position, src, parameter1));
-					Emit (Mov(position, dst, parameter2));
+					src := NewRegisterOperand (addressType);
+					Emit (Mov(position, dst, parameter1));
+					Emit (Mov(position, src, parameter2));
 ;
-					IntermediateCode.AddOffset(src,BaseObjectTypeSize * ToMemoryUnits(system,variable.offsetInBits));
 					IntermediateCode.AddOffset(dst,BaseObjectTypeSize * ToMemoryUnits(system,variable.offsetInBits));
+					IntermediateCode.AddOffset(src,BaseObjectTypeSize * ToMemoryUnits(system,variable.offsetInBits));
 					IF recordType.isObject & ((recordType.pointerType = NIL) OR ~recordType.pointerType.isPlain) THEN
-						IntermediateCode.AddOffset(src,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 						IntermediateCode.AddOffset(dst,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+						IntermediateCode.AddOffset(src,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 					END;
-					CallAssignMethod(src, dst, variable.type);
-					ReleaseIntermediateOperand(dst);
+					CallAssignMethod(dst, src, variable.type);
 					ReleaseIntermediateOperand(src);
+					ReleaseIntermediateOperand(dst);
 				END;
 				variable := variable.nextVariable;
 			END;
@@ -2231,23 +2236,23 @@ TYPE
 			NEW(registerUsageCount);
 			usedRegisters := NIL;
 
-			src := NewRegisterOperand (addressType);
 			dst := NewRegisterOperand (addressType);
+			src := NewRegisterOperand (addressType);
 			ofs := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(recordType)));
-			Emit(Mov(position, src, parameter1));
-			Emit(Mov(position, dst, parameter2));
+			Emit(Mov(position, dst, parameter1));
+			Emit(Mov(position, src, parameter2));
 			label := NewLabel(); 
 			SetLabel(label);
-			Emit(Push(position, src)); 
 			Emit(Push(position, dst));
+			Emit(Push(position, src)); 
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
 			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 			Emit(Call(position, op, 0));
-			Emit(Pop(position, dst));
 			Emit(Pop(position, src));
-			Emit(Add(position, src, src, ofs));
+			Emit(Pop(position, dst));
 			Emit(Add(position, dst, dst, ofs));
+			Emit(Add(position, src, src, ofs));
 			Emit(Sub(position, parameter3, parameter3, IntermediateCode.Immediate(sizeType, 1)));
 			BrneL(label, parameter3, IntermediateCode.Immediate(sizeType, 0));
 			Emit(Exit(position,0,0));
@@ -8351,26 +8356,38 @@ TYPE
 			leftType := left.type.resolved; rightType:= right.type.resolved;
 
 			IF backend.cooperative & left.NeedsTrace() THEN
-				Designate(right, rightO);
-				Designate(left, leftO); 
-				TransferToRegister(leftO.op, leftO.op);
-				TransferToRegister(rightO.op, rightO.op); 
-				isComposite :=  (leftType IS SyntaxTree.RecordType) OR IsStaticArray(leftType);
-
-				IF isComposite THEN
+				IF  (leftType IS SyntaxTree.RecordType) OR IsStaticArray(leftType) THEN
+					Designate(right, rightO);
+					Designate(left, leftO); 
+					TransferToRegister(leftO.op, leftO.op);
+					TransferToRegister(rightO.op, rightO.op); 
 					Emit(Push(position, leftO.op));
 					Emit(Push(position, rightO.op));
-				END;
-				CallAssignMethod(leftO.op, rightO.op, left.type);
-				IF isComposite THEN
+					CallAssignMethod(leftO.op, rightO.op, left.type);
 					Emit(Pop(position, rightO.op));
 					Emit(Pop(position, leftO.op));
 					size := ToMemoryUnits(system,system.SizeOf(leftType));
 					Emit(Copy(position,leftO.op,rightO.op,IntermediateCode.Immediate(addressType,size)));
+					ReleaseOperand(leftO); 
+					ReleaseOperand(rightO);
+				ELSE
+					Evaluate(right,rightO);
+					Designate(left,leftO);
+					IF (leftType IS SyntaxTree.ProcedureType) THEN
+						(* copy procedure address first *)
+						MakeMemory(mem,leftO.op,addressType,0);
+						Emit(Mov(position,mem,rightO.op));
+						ReleaseIntermediateOperand(mem);
+						(* copy pointer address *)
+						IntermediateCode.AddOffset(leftO.op, ToMemoryUnits(system,system.addressSize));
+						CallAssignPointer(leftO.op, rightO.tag);
+					ELSE
+						CallAssignPointer(leftO.op, rightO.op);
+					END;
 				END;
 				ReleaseOperand(leftO); 
 				ReleaseOperand(rightO);
-				RETURN; 
+				RETURN;
 			END;
 
 			IF CanPassAsResultParameter(right) THEN

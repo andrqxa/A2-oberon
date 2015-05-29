@@ -1745,6 +1745,11 @@ TYPE
 		VAR position: LONGINT;
 		BEGIN position := SELF.position; v.VisitProcedureType(SELF)
 		END Accept;
+		
+		(** Returns if the type needs to be traced for garbage collection *)
+		PROCEDURE NeedsTrace*(): BOOLEAN;
+		BEGIN RETURN isDelegate;
+		END NeedsTrace;
 
 	END ProcedureType;
 

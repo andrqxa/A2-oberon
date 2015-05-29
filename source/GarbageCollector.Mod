@@ -47,7 +47,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END Assign;
 
-PROCEDURE AssignDelegate-(VAR target : Delegate; CONST source: Delegate);
+PROCEDURE AssignDelegate-(target, source :  POINTER {UNSAFE} TO Delegate);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Assign(target.pointer, source.pointer);
 	target.proc := source.proc;
@@ -68,7 +68,7 @@ PROCEDURE AssignDelegateArray-(VAR target: ARRAY OF Delegate; CONST source : ARR
 VAR i: LONGINT;
 BEGIN{UNCOOPERATIVE, UNCHECKED}
 	FOR i := 0 TO LEN(target) DO
-		AssignDelegate(target[i], source[i]);
+		AssignDelegate(ADDRESS OF target[i], ADDRESS OF source[i]);
 	END;
 END AssignDelegateArray;
 
