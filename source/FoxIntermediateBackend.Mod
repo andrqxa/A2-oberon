@@ -2150,9 +2150,9 @@ TYPE
 				size := StaticArrayNumElements(type);
 				base := StaticArrayBaseType(type);
 				IF base.IsRecordType() THEN
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));					
 					Emit (Push(position, dst));
 					Emit (Push(position, src));
-					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));					
 					GetRecordTypeName (base.resolved(SyntaxTree.RecordType),name);
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
@@ -2183,12 +2183,12 @@ TYPE
 		PROCEDURE CreateAssignMethod (recordType: SyntaxTree.RecordType);
 		VAR name: Basic.SegmentedName; previousSection: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; src, dst, op, ofs: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT;
-			parameter1, parameter2, parameter3: IntermediateCode.Operand; label: Label; previousUsedRegisters: RegisterEntry; 
+			parameter1, parameter2, parameter0: IntermediateCode.Operand; label: Label; previousUsedRegisters: RegisterEntry; 
 			previousRegisterUsageCount: RegisterUsageCount; context: Context;
 		BEGIN
-			parameter1 (* dest *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
-			parameter2 (* src *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
-			parameter3 (* len *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,1*addressType.sizeInBits));
+			parameter0 (* len *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
+			parameter1 (* dest *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
+			parameter2 (* src *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,1*addressType.sizeInBits));
 			
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
@@ -2253,8 +2253,8 @@ TYPE
 			Emit(Pop(position, dst));
 			Emit(Add(position, dst, dst, ofs));
 			Emit(Add(position, src, src, ofs));
-			Emit(Sub(position, parameter3, parameter3, IntermediateCode.Immediate(sizeType, 1)));
-			BrneL(label, parameter3, IntermediateCode.Immediate(sizeType, 0));
+			Emit(Sub(position, parameter0, parameter0, IntermediateCode.Immediate(sizeType, 1)));
+			BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
 			Emit(Exit(position,0,0));
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
