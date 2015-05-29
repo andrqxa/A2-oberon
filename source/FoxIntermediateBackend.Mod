@@ -2186,9 +2186,9 @@ TYPE
 			parameter1, parameter2, parameter3: IntermediateCode.Operand; label: Label; previousUsedRegisters: RegisterEntry; 
 			previousRegisterUsageCount: RegisterUsageCount; context: Context;
 		BEGIN
-			parameter1 (* dest *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
+			parameter1 (* dest *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
 			parameter2 (* src *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
-			parameter3 (* len *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,3*addressType.sizeInBits));
+			parameter3 (* len *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,1*addressType.sizeInBits));
 			
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
@@ -2282,14 +2282,14 @@ TYPE
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
-					Emit(Call(position, op, 2));
+					Emit(Call(position, op, ToMemoryUnits(system, system.addressSize*2)));
 				ELSIF base.resolved IS SyntaxTree.ProcedureType THEN (* array of delegates *)
-					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 					CallThis("GarbageCollector","MarkDelegateArray", 2);
 				ELSE 
-					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 					CallThis("GarbageCollector","MarkPointerArray", 2);
 					ASSERT(base.IsPointer());
 				END;
@@ -2306,8 +2306,8 @@ TYPE
 			parameter1, parameter2: IntermediateCode.Operand; label: Label; context: Context;
 		BEGIN
 			previousSection := section;
-			parameter1 := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits));
-			parameter2 := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
+			parameter1 (* address *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
+			parameter2 (* size *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,1*addressType.sizeInBits));
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
