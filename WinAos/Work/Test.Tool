@@ -1,4 +1,6 @@
 # if you changed the sources, do not forget to compile below
+FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
+FSTools.Unmount SRC ~
 
 SystemTools.DoCommands
 
@@ -22,9 +24,16 @@ Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
 
 FSTools.Mount TEMP AosFS VDISK0#1 ~
 FSTools.Unsafe ~
-FSTools.CopyFiles *.Gof => TEMP:*.Gof ~
-FSTools.CopyFiles source/*.XML => TEMP:*.XML source/*.xml => TEMP:*.xml source/Auto.dsk => TEMP:Auto.dsk source/*.rep => TEMP:*.rep ~
-FSTools.CopyFiles source/*.zip => TEMP:*.zip source/*.Fnt => TEMP:*.Fnt ~
+FSTools.CopyFiles 
+	*.Gof => TEMP:*.Gof ~
+FSTools.CopyFiles -o 
+	SRC:*.XML => TEMP:*.XML 
+	SRC:*.xml => TEMP:*.xml 
+	SRC:Auto.dsk => TEMP:Auto.dsk 
+	SRC:*.rep => TEMP:*.rep ~
+FSTools.CopyFiles  -o
+	SRC:*.zip => TEMP:*.zip 
+	SRC:*.Fnt => TEMP:*.Fnt ~
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
 
@@ -38,7 +47,7 @@ Partitions.SetConfig VDISK0#1
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable"
 	Boot3="WindowManager.Install"
-	Boot5="Autostart.Run"
+	Boot5="WMKernelLog.Open;SystemTools.Show Release C"
 	Boot="DisplayLinear.Install"
 	~
 VirtualDisks.Uninstall VDISK0 ~
@@ -48,6 +57,7 @@ FSTools.CloseFiles hd.img ~
 SystemTools.Show HDD image build time:  ~ SystemTools.Timer elapsed ~
 
 ~
+Release.Build  --path="./" A2Cooperative ~
 
 SystemTools.FreeDownTo FoxIntermediateBackend  FoxAMDBackend ~
 
@@ -85,7 +95,7 @@ FoxFrontend.Mod FoxOberonFrontend.Mod FoxCompiler.Mod FoxFingerPrinter.Mod
 FoxInterfaceComparison.Mod FoxTextualSymbolFile.Mod FoxBinarySymbolFile.Mod FoxIntermediateCode.Mod 
 FoxIntermediateBackend.Mod FoxCodeGenerators.Mod FoxBinaryObjectFile.Mod FoxGenericObjectFile.Mod 
 FoxAMD64InstructionSet.Mod FoxAMD64Assembler.Mod FoxAMDBackend.Mod FoxProfiler.Mod XMM.I386.Math.Mod 
-XMM.I386.MathL.Mod Errors.Mod ProcessInfo0.Mod 
+XMM.I386.MathL.Mod FoxArrayBase.Mod I386.FoxArrayBaseOptimized.Mod Errors.Mod ProcessInfo0.Mod 
 ProcessInfo.Mod SystemTools.Mod Reboot.Mod DriverDatabase.Mod PCITools.Mod XMM.I386.Math.Mod 
 XMM.I386.MathL.Mod Random.Mod Drand48.Mod SerialsVirtual.Mod Autostart.Mod FSTools.Mod UpTime.Mod 
 CLUTs.Mod I386.Raster.Mod Localization.Mod Archives.Mod WMRectangles.Mod WMEvents.Mod 
@@ -196,20 +206,23 @@ TFSMTPServer.Mod WMFontCCGConverter.Mod WebCGI.Mod RegisterRFW.Mod WebBimbodot.M
 PDF.Mod AFM.Mod PDFExample.Mod Visualizer.Mod ReleaseVisualizerScanner.Mod 
 ReleaseVisualizer.Mod OdUtil.Mod OdXml.Mod OdCond.Mod OdAuthBase.Mod OdAuth.Mod OdClient.Mod OdVCSBase.Mod 
 SVNArgument.Mod SVNOutput.Mod SVNUtil.Mod SVNAdmin.Mod OdSvn.Mod SVNWebDAV.Mod SVN.Mod UsbRS232.Mod 
-FirewireLowUtil.Mod FirewireLow.Mod FirewireSBP2.Mod ~
+FirewireLowUtil.Mod FirewireLow.Mod FirewireSBP2.Mod 
+~
+
 
 SystemTools.DoCommands
 Compiler.Compile --cooperative --objectFile=Generic --newObjectFile -b=AMD --objectFileExtension=.Gof --symbolFileExtension=.Sym --destPath=./ --traceModule=Trace
-I386.CPU.Mod Trace.Mod Coop.Runtime.Mod Counters.Mod Coop.Win32.Kernel32.Mod 
-Win32.Processors.Mod Queues.Mod Activities.Mod ExclusiveBlocks.Mod Win32.Environment.Mod Mutexes.Mod 
-Coop.Machine.Mod Coop.Heaps.Mod Coop.Modules.Mod GarbageCollector.Mod Coop.Objects.Mod 
-Coop.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod I386.Reals.Mod 
-Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod Coop.Traps.Mod Locks.Mod Win32.Clock.Mod Disks.Mod 
-Files.Mod Dates.Mod Strings.Mod UTF8Strings.Mod FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod 
-OldDiskVolumes.Mod RAMVolumes.Mod DiskFS.Mod OldDiskFS.Mod OberonFS.Mod FATVolumes.Mod FATFiles.Mod 
-ISO9660Volumes.Mod ISO9660Files.Mod Win32.User32.Mod Win32.WinTrace.Mod Win32.ODBC.Mod 
-Win32.Shell32.Mod Win32.SQL.Mod Win32.WinFS.Mod RelativeFileSystem.Mod Loader.Mod BitSets.Mod 
-Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod BootConsole.Mod ~
+I386.CPU.Mod Trace.Mod Counters.Mod I386.APIC.Mod APIC.Processors.Mod Queues.Mod 
+BaseTypes.Mod Activities.Mod ExclusiveBlocks.Mod Interrupts.Mod Coop.Runtime.Mod HeapManager.Mod 
+BIOS.Environment.Mod Mutexes.Mod Coop.Machine.Mod Coop.Heaps.Mod Coop.Modules.Mod GarbageCollector.Mod 
+Coop.Objects.Mod Coop.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod 
+I386.Reals.Mod Coop.Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod Coop.Traps.Mod 
+Locks.Mod I386.PCI.Mod Clock.Mod Coop.MemCache.Mod Disks.Mod Files.Mod Dates.Mod Strings.Mod 
+UTF8Strings.Mod FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod OldDiskVolumes.Mod RAMVolumes.Mod 
+DiskFS.Mod OldDiskFS.Mod OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod 
+ISO9660Files.Mod RelativeFileSystem.Mod Loader.Mod BitSets.Mod Diagnostics.Mod StringPool.Mod 
+ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod BootConsole.Mod
+~
 
 SystemTools.DoCommands
 StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=Gof --displacement=401000H --path="./" Trace CPU Runtime Counters Kernel32 Processors Queues Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~

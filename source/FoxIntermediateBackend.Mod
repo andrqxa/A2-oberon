@@ -8370,9 +8370,11 @@ TYPE
 					Emit(Copy(position,leftO.op,rightO.op,IntermediateCode.Immediate(addressType,size)));
 					ReleaseOperand(leftO); 
 					ReleaseOperand(rightO);
+					RETURN;
 				ELSE
 					Evaluate(right,rightO);
 					Designate(left,leftO);
+					ASSERT(leftO.mode = ModeReference);
 					IF (leftType IS SyntaxTree.ProcedureType) THEN
 						(* copy procedure address first *)
 						MakeMemory(mem,leftO.op,addressType,0);
@@ -8382,12 +8384,13 @@ TYPE
 						IntermediateCode.AddOffset(leftO.op, ToMemoryUnits(system,system.addressSize));
 						CallAssignPointer(leftO.op, rightO.tag);
 					ELSE
+						ASSERT(system.SizeOf(left.type) = system.addressSize);
 						CallAssignPointer(leftO.op, rightO.op);
 					END;
+					ReleaseOperand(leftO); 
+					ReleaseOperand(rightO);
+					RETURN;
 				END;
-				ReleaseOperand(leftO); 
-				ReleaseOperand(rightO);
-				RETURN;
 			END;
 
 			IF CanPassAsResultParameter(right) THEN
