@@ -2094,10 +2094,7 @@ TYPE
 				dump.String(s); dump.Ln; dump.Update;
 			END;
 		END Warning;
-		
 
-		
-		
 		PROCEDURE CreateTraceModuleMethod(mod: SyntaxTree.Module);
 		VAR name: Basic.SectionName; pointer, pooledName: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType;
@@ -2124,10 +2121,10 @@ TYPE
 			Basic.ToSegmentedName ("BaseTypes.Object.@Trace",pooledName);
 			IntermediateCode.InitAddress(op, addressType, pooledName , 0, 0);
 			Emit(Br(position,op));
-		
+
 			section := previousSection;
 			IF dump # NIL THEN dump := section.comments END;
-			
+
 		END CreateTraceModuleMethod;
 
 		PROCEDURE CallAssignMethod(CONST src, dst: IntermediateCode.Operand; type: SyntaxTree.Type);
@@ -2194,12 +2191,6 @@ TYPE
 
 			IF dump # NIL THEN dump := section.comments END;
 
-			src := parameter1;
-			dst := parameter2;
-			size := ToMemoryUnits(system,system.SizeOf(recordType));
-			Emit(Copy(position,dst,src,IntermediateCode.Immediate(addressType,size)));
-			ReleaseIntermediateOperand(dst);
-			ReleaseIntermediateOperand(src);
 			
 			variable := recordType.recordScope.firstVariable;
 			WHILE variable # NIL DO
@@ -8336,6 +8327,7 @@ TYPE
 			procedure: SyntaxTree.Procedure;
 			call: SyntaxTree.ProcedureCallDesignator;
 			designator: SyntaxTree.Designator;
+			isComposite: BOOLEAN;
 
 			PROCEDURE CanPassAsResultParameter(right: SyntaxTree.Expression): BOOLEAN;
 			VAR procedureType: SyntaxTree.ProcedureType;
@@ -8363,7 +8355,19 @@ TYPE
 				Designate(left, leftO); 
 				TransferToRegister(leftO.op, leftO.op);
 				TransferToRegister(rightO.op, rightO.op); 
+				isComposite :=  (leftType IS SyntaxTree.RecordType) OR IsStaticArray(leftType);
+
+				IF isComposite THEN
+					Emit(Push(position, leftO.op));
+					Emit(Push(position, rightO.op));
+				END;
 				CallAssignMethod(leftO.op, rightO.op, left.type);
+				IF isComposite THEN
+					Emit(Pop(position, rightO.op));
+					Emit(Pop(position, leftO.op));
+					size := ToMemoryUnits(system,system.SizeOf(leftType));
+					Emit(Copy(position,leftO.op,rightO.op,IntermediateCode.Immediate(addressType,size)));
+				END;
 				ReleaseOperand(leftO); 
 				ReleaseOperand(rightO);
 				RETURN; 
@@ -10814,7 +10818,21 @@ TYPE
 						tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
 						Symbol(source, tir,  0, 0);
 						start := 0;
+						
+						baseRecord := recordType;
+						WHILE (baseRecord # NIL) DO
+							IF HasExplicitTraceMethod(baseRecord) THEN start := 1 END;
+							baseRecord := baseRecord.GetBaseRecord ();
+						END;
 					ELSE
+						(* explicit trace method: *)
+
+						procedure := recordType.recordScope.FindMethod(0);
+						IF ~procedure.isFinalizer THEN
+							Global.GetSymbolSegmentedName(procedure, name);
+							NamedSymbol(source, name,procedure, 0,0);
+						END;
+
 						start := 1;
 					END;
 					IF (name # stackFrame) & recordType.isObject THEN
@@ -11338,7 +11356,7 @@ TYPE
 		END;
 		RETURN scope.ownerProcedure.type(SyntaxTree.ProcedureType).returnParameter # NIL;
 	END HasVariableParameters;
-	
+
 	PROCEDURE HasExplicitTraceMethod(recordType: SyntaxTree.RecordType): BOOLEAN;
 	BEGIN
 		IF (recordType.pointerType # NIL) & ~recordType.pointerType.isPlain THEN RETURN FALSE END;
