@@ -47,7 +47,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END Assign;
 
-PROCEDURE AssignDelegate-(target, source :  POINTER {UNSAFE} TO Delegate);
+PROCEDURE AssignDelegate-(target, source {UNTRACED}:  POINTER {UNSAFE} TO Delegate);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Assign(target.pointer, source.pointer);
 	target.proc := source.proc;

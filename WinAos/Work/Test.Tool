@@ -47,7 +47,7 @@ Partitions.SetConfig VDISK0#1
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable"
 	Boot3="WindowManager.Install"
-	Boot5="WMKernelLog.Open;SystemTools.Show Release C"
+	Boot5="WMKernelLog.Open;SystemTools.Show Release J"
 	Boot="DisplayLinear.Install"
 	~
 VirtualDisks.Uninstall VDISK0 ~
@@ -145,7 +145,9 @@ WMInputMethodTool.Mod WMUtilities.Mod WMTrapWriter.Mod FoxA2Interface.Mod WMMenu
 WMDiagramComponents.Mod MainMenu.Mod StartMenu.Mod HotKeys.Mod WMNavigate.Mod WMNavigator.Mod WMDesktops.Mod 
 WMSystemComponents.Mod WMFileManager.Mod WMSearchTool.Mod WMFTPClient.Mod WMUsbInfo.Mod SkinLanguage.Mod 
 FNHistories.Mod SkinEngine.Mod Notepad.Mod WMProcessInfo.Mod WMObjectTracker.Mod WMTCPTracker.Mod 
-WMKernelLog.Mod WMEventLog.Mod WMPartitionsComponents.Mod WMPartitions.Mod 
+WMKernelLog.Mod ~
+
+WMEventLog.Mod WMPartitionsComponents.Mod WMPartitions.Mod 
 PartitionEditorComponents.Mod PartitionEditor.Mod MultiLogger.Mod MemoryReader.Mod Decoder.Mod I386Decoder.Mod 
 ARMDecoder.Mod AMD64Decoder.Mod WMTextTool.Mod WMPerfMonPlugins.Mod WMPerfMonAlerts.Mod 
 WMPerfMonAlertsUtils.Mod WMPerfMonPluginModVars.Mod WMPerfMonPluginHeap.Mod WMPerfMonPluginProcesses.Mod 

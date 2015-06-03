@@ -2173,6 +2173,7 @@ TYPE
 					ASSERT(StaticArrayBaseType(type).IsPointer());
 				END;
 			ELSIF type.resolved IS SyntaxTree.ProcedureType THEN
+				ASSERT(type.resolved(SyntaxTree.ProcedureType).isDelegate);
 				Emit (Push(position, dst));
 				Emit (Push(position, src));
 				CallThis("GarbageCollector","AssignDelegate", 2);
@@ -2206,8 +2207,8 @@ TYPE
 					Emit (Mov(position, dst, parameter1));
 					Emit (Mov(position, src, parameter2));
 ;
-					IntermediateCode.AddOffset(dst,BaseObjectTypeSize * ToMemoryUnits(system,variable.offsetInBits));
-					IntermediateCode.AddOffset(src,BaseObjectTypeSize * ToMemoryUnits(system,variable.offsetInBits));
+					IntermediateCode.AddOffset(dst,ToMemoryUnits(system,variable.offsetInBits));
+					IntermediateCode.AddOffset(src,ToMemoryUnits(system,variable.offsetInBits));
 					IF recordType.isObject & ((recordType.pointerType = NIL) OR ~recordType.pointerType.isPlain) THEN
 						IntermediateCode.AddOffset(dst,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 						IntermediateCode.AddOffset(src,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
