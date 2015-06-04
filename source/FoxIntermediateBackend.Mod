@@ -80,6 +80,7 @@ CONST
 		BaseObjectTypeSize = BasePointerTypeSize + 2;
 		ActionTypeSize = 3;
 		MonitorTypeSize = 7;
+		ProcessorOffset = BaseObjectTypeSize + 1;
 		StackLimitOffset* = BaseObjectTypeSize + 3;
 		QuantumOffset = BaseObjectTypeSize + 4;
 		
@@ -6769,8 +6770,8 @@ TYPE
 						
 						SetLabel(exit);
 						Designate(p0,l);
-						ToMemory(l.op,addressType,0);
-						Emit(Mov(position,l.op,pointer));
+							ToMemory(l.op,addressType,0);
+							Emit(Mov(position,l.op,pointer));
 						ReleaseIntermediateOperand(pointer);
 						ReleaseOperand(l);
 					ELSE
@@ -8322,6 +8323,21 @@ TYPE
 				RestoreRegisters(saved);
 			END;
 		END AssignMathArray;
+		
+		PROCEDURE ModifyAssignments(value: BOOLEAN);
+		VAR processor,mem,dst,val: IntermediateCode.Operand;
+		BEGIN
+			IntermediateCode.InitMemory (processor,  IntermediateCode.SignedIntegerType(addressType.sizeInBits), ap, ToMemoryUnits(system, ProcessorOffset * addressType.sizeInBits));
+			dst := NewRegisterOperand (addressType);
+			Emit(Mov(position,dst, processor));
+			IntermediateCode.InitMemory(mem,bool, dst, 0);
+			IF value THEN 
+				Emit(Mov(position,mem, true))
+			ELSE
+				Emit(Mov(position,mem, false))
+			END;
+			ReleaseIntermediateOperand(dst);
+		END ModifyAssignments;
 
 		PROCEDURE Assign(left,right: SyntaxTree.Expression);
 		VAR
@@ -8357,6 +8373,7 @@ TYPE
 			leftType := left.type.resolved; rightType:= right.type.resolved;
 
 			IF backend.cooperative & left.NeedsTrace() THEN
+				ModifyAssignments(TRUE);
 				IF  (leftType IS SyntaxTree.RecordType) OR IsStaticArray(leftType) THEN
 					Designate(right, rightO);
 					Designate(left, leftO); 
@@ -8371,7 +8388,6 @@ TYPE
 					Emit(Copy(position,leftO.op,rightO.op,IntermediateCode.Immediate(addressType,size)));
 					ReleaseOperand(leftO); 
 					ReleaseOperand(rightO);
-					RETURN;
 				ELSE
 					Evaluate(right,rightO);
 					Designate(left,leftO);
@@ -8390,8 +8406,9 @@ TYPE
 					END;
 					ReleaseOperand(leftO); 
 					ReleaseOperand(rightO);
-					RETURN;
 				END;
+				ModifyAssignments(FALSE);
+				RETURN;
 			END;
 
 			IF CanPassAsResultParameter(right) THEN
