@@ -2810,11 +2810,16 @@ TYPE
 		(* Call a runtime procedure.  If numberParameters >= 0 then the procedure may be called without module import. Otherwise the signature has to be inferred from the import. *)
 		PROCEDURE CallThis(CONST moduleName, procedureName: ARRAY OF CHAR; numberParameters: LONGINT);
 		VAR procedure: SyntaxTree.Procedure; result: Operand; reg: IntermediateCode.Operand; source: IntermediateCode.Section;
-			pooledName: Basic.SegmentedName;
+			pooledName: Basic.SegmentedName; size: LONGINT;
 		BEGIN
 			IF GetRuntimeProcedure(moduleName,procedureName,procedure,numberParameters < 0) THEN (* ready for dynamic linking *)
 				StaticCallOperand(result,procedure);
-				Emit(Call(position,result.op,ProcedureParametersSize(system,procedure)));
+				IF numberParameters < 0 THEN
+					size := ProcedureParametersSize(system,procedure);
+				ELSE
+					size := ToMemoryUnits(system,numberParameters * system.addressSize)
+				END;
+				Emit(Call(position, result.op, size));
 				ReleaseOperand(result);
 			ELSE (* only static linking possible *)
 				Basic.InitSegmentedName(pooledName);
@@ -6768,12 +6773,26 @@ TYPE
 						(* call bodies *)
 						CallBodies(pointer,p0.type);
 						
+						
 						SetLabel(exit);
+						IF p0.NeedsTrace() THEN ModifyAssignments(TRUE) END;
+						(*!
+						IF ~type(SyntaxTree.PointerType).isDisposable THEN
+							Emit(Push(position, pointer));
+							CallThis("GarbageCollector","Watch",0);
+							Emit(Pop(position, pointer));
+						END;
+						*)
 						Designate(p0,l);
+						IF p0.NeedsTrace() THEN
+							CallAssignPointer(l.op, pointer);
+						ELSE
 							ToMemory(l.op,addressType,0);
 							Emit(Mov(position,l.op,pointer));
+						END;
 						ReleaseIntermediateOperand(pointer);
 						ReleaseOperand(l);
+						IF p0.NeedsTrace()THEN ModifyAssignments(FALSE) END;
 					ELSE
 						temporaryVariable := GetTemporaryVariable(type, FALSE);
 						IF temporaryVariable # NIL THEN
