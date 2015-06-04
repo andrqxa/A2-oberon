@@ -6776,13 +6776,11 @@ TYPE
 						
 						SetLabel(exit);
 						IF p0.NeedsTrace() THEN ModifyAssignments(TRUE) END;
-						(*!
 						IF ~type(SyntaxTree.PointerType).isDisposable THEN
 							Emit(Push(position, pointer));
 							CallThis("GarbageCollector","Watch",0);
 							Emit(Pop(position, pointer));
 						END;
-						*)
 						Designate(p0,l);
 						IF p0.NeedsTrace() THEN
 							CallAssignPointer(l.op, pointer);
