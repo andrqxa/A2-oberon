@@ -6777,7 +6777,7 @@ TYPE
 						
 						SetLabel(exit);
 						needsTrace := p0.NeedsTrace();
-						IF needsTrace THEN ModifyAssignments(TRUE) END;
+						IF needsTrace THEN ModifyAssignments(true) END;
 						IF ~type(SyntaxTree.PointerType).isDisposable THEN
 							Emit(Push(position, pointer));
 							CallThis("GarbageCollector","Watch",0);
@@ -6792,7 +6792,7 @@ TYPE
 						END;
 						ReleaseIntermediateOperand(pointer);
 						ReleaseOperand(l);
-						IF needsTrace THEN ModifyAssignments(FALSE) END;
+						IF needsTrace THEN ModifyAssignments(false) END;
 					ELSE
 						temporaryVariable := GetTemporaryVariable(type, FALSE);
 						IF temporaryVariable # NIL THEN
@@ -6974,7 +6974,7 @@ TYPE
 						SetLabel(exit);
 						
 						needsTrace := p0.NeedsTrace();
-						IF needsTrace THEN ModifyAssignments(TRUE) END;
+						IF needsTrace THEN ModifyAssignments(true) END;
 						IF ~p0.type.resolved(SyntaxTree.PointerType).isDisposable THEN
 							Emit(Push(position, pointer));
 							CallThis("GarbageCollector","Watch",0);
@@ -7465,7 +7465,7 @@ TYPE
 			(* ---- CAS ----- *)
 			|Global.Cas:
 				needsTrace := p0.NeedsTrace();
-				IF needsTrace THEN ModifyAssignments(TRUE) END;
+				IF needsTrace THEN ModifyAssignments(true) END;
 				Designate(p0,s0);
 				Evaluate(p1,s1);
 				Evaluate(p2,s2);
@@ -7478,7 +7478,7 @@ TYPE
 					Emit(Cas(position,s0.op,s1.op,s2.op));
 				END;
 				ReleaseOperand(s0); ReleaseOperand(s1); ReleaseOperand(s2);
-				IF needsTrace THEN ModifyAssignments(FALSE) END;
+				IF needsTrace THEN ModifyAssignments(false) END;
 				res := NewRegisterOperand(IntermediateCode.GetType(system, p0.type));
 				Emit(Result(position, res)); result.op := res; result.mode := ModeValue;
 				IF conditional THEN
@@ -8365,18 +8365,14 @@ TYPE
 			END;
 		END AssignMathArray;
 		
-		PROCEDURE ModifyAssignments(value: BOOLEAN);
+		PROCEDURE ModifyAssignments(CONST value: IntermediateCode.Operand);
 		VAR processor,mem,dst,val: IntermediateCode.Operand;
 		BEGIN
 			IntermediateCode.InitMemory (processor,  IntermediateCode.SignedIntegerType(addressType.sizeInBits), ap, ToMemoryUnits(system, ProcessorOffset * addressType.sizeInBits));
 			dst := NewRegisterOperand (addressType);
 			Emit(Mov(position,dst, processor));
 			IntermediateCode.InitMemory(mem,bool, dst, 0);
-			IF value THEN 
-				Emit(Mov(position,mem, true))
-			ELSE
-				Emit(Mov(position,mem, false))
-			END;
+			Emit(Mov(position,mem, value));
 			ReleaseIntermediateOperand(dst);
 		END ModifyAssignments;
 
@@ -8414,7 +8410,7 @@ TYPE
 			leftType := left.type.resolved; rightType:= right.type.resolved;
 
 			IF backend.cooperative & left.NeedsTrace() THEN
-				ModifyAssignments(TRUE);
+				ModifyAssignments(true);
 				IF  (leftType IS SyntaxTree.RecordType) OR IsStaticArray(leftType) THEN
 					Designate(right, rightO);
 					Designate(left, leftO); 
@@ -8448,7 +8444,7 @@ TYPE
 					ReleaseOperand(leftO); 
 					ReleaseOperand(rightO);
 				END;
-				ModifyAssignments(FALSE);
+				ModifyAssignments(false);
 				RETURN;
 			END;
 
