@@ -6279,6 +6279,7 @@ TYPE
 			isVarPar: ARRAY 3 OF BOOLEAN;
 			callsection: Sections.Section;
 			segmentedName: Basic.SegmentedName;
+			needsTrace: BOOLEAN;
 
 			PROCEDURE CallBodies(self: IntermediateCode.Operand; type: SyntaxTree.Type);
 			VAR recordScope: SyntaxTree.RecordScope; procedure: SyntaxTree.Procedure; body: SyntaxTree.Body; flags: LONGINT;
@@ -6775,14 +6776,15 @@ TYPE
 						
 						
 						SetLabel(exit);
-						IF p0.NeedsTrace() THEN ModifyAssignments(TRUE) END;
+						needsTrace := p0.NeedsTrace();
+						IF needsTrace THEN ModifyAssignments(TRUE) END;
 						IF ~type(SyntaxTree.PointerType).isDisposable THEN
 							Emit(Push(position, pointer));
 							CallThis("GarbageCollector","Watch",0);
 							Emit(Pop(position, pointer));
 						END;
 						Designate(p0,l);
-						IF p0.NeedsTrace() THEN
+						IF needsTrace THEN
 							CallAssignPointer(l.op, pointer);
 						ELSE
 							ToMemory(l.op,addressType,0);
@@ -6790,7 +6792,7 @@ TYPE
 						END;
 						ReleaseIntermediateOperand(pointer);
 						ReleaseOperand(l);
-						IF p0.NeedsTrace()THEN ModifyAssignments(FALSE) END;
+						IF needsTrace THEN ModifyAssignments(FALSE) END;
 					ELSE
 						temporaryVariable := GetTemporaryVariable(type, FALSE);
 						IF temporaryVariable # NIL THEN
@@ -6970,9 +6972,21 @@ TYPE
 						BrL(exit);
 						Emit(Add(position,sp,sp,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(openDim+1)*system.addressSize))));
 						SetLabel(exit);
+						
+						needsTrace := p0.NeedsTrace();
+						IF needsTrace THEN ModifyAssignments(TRUE) END;
+						IF ~p0.type.resolved(SyntaxTree.PointerType).isDisposable THEN
+							Emit(Push(position, pointer));
+							CallThis("GarbageCollector","Watch",0);
+							Emit(Pop(position, pointer));
+						END;
 						Designate(p0,l);
-						ToMemory(l.op,addressType,0);
-						Emit(Mov(position,l.op,pointer));
+						IF needsTrace THEN
+							CallAssignPointer(l.op, pointer);
+						ELSE
+							ToMemory(l.op,addressType,0);
+							Emit(Mov(position,l.op,pointer));
+						END;
 						ReleaseIntermediateOperand(pointer);
 						ReleaseOperand(l);
 					ELSE
@@ -7450,11 +7464,21 @@ TYPE
 			|Global.Sum: HALT(200);
 			(* ---- CAS ----- *)
 			|Global.Cas:
+				needsTrace := p0.NeedsTrace();
+				IF needsTrace THEN ModifyAssignments(TRUE) END;
 				Designate(p0,s0);
 				Evaluate(p1,s1);
 				Evaluate(p2,s2);
-				Emit(Cas(position,s0.op,s1.op,s2.op));
+				IF needsTrace THEN 
+					Emit(Push(position, s0.op));
+					Emit(Push(position, s1.op));
+					Emit(Push(position, s2.op));
+					CallThis("GarbageCollector","CompareAndSwap",3);
+				ELSE
+					Emit(Cas(position,s0.op,s1.op,s2.op));
+				END;
 				ReleaseOperand(s0); ReleaseOperand(s1); ReleaseOperand(s2);
+				IF needsTrace THEN ModifyAssignments(FALSE) END;
 				res := NewRegisterOperand(IntermediateCode.GetType(system, p0.type));
 				Emit(Result(position, res)); result.op := res; result.mode := ModeValue;
 				IF conditional THEN
