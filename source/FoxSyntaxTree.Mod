@@ -1608,6 +1608,8 @@ TYPE
 		VAR
 			modifiers-: Modifier; (* set by the parser *)
 			returnType-: Type;
+			returnTypeModifiers-: Modifier;
+			hasUntracedReturn-: BOOLEAN;
 			firstParameter-,lastParameter-: Parameter; numberParameters-: LONGINT;  (* parameters *)
 			returnParameter-: Parameter; (* not really necessary in syntax tree but very handy for backends *)
 
@@ -1629,6 +1631,8 @@ TYPE
 			callingConvention := OberonCallingConvention;
 			parameterOffset := 0;
 			pcOffset := 0;
+			hasUntracedReturn := FALSE;
+			returnTypeModifiers := NIL;
 		END InitProcedureType;
 
 		PROCEDURE SetNoPAF*(noPAF: BOOLEAN);
@@ -1651,9 +1655,18 @@ TYPE
 		BEGIN modifiers := flags
 		END SetModifiers;
 
+		PROCEDURE SetReturnTypeModifiers*(flags: Modifier);
+		BEGIN returnTypeModifiers := flags
+		END SetReturnTypeModifiers;
+
 		PROCEDURE SetDelegate*(delegate: BOOLEAN);
 		BEGIN SELF.isDelegate := delegate; SELF.hasPointers := delegate;
 		END SetDelegate;
+		
+		PROCEDURE SetUntracedReturn*(untraced: BOOLEAN);
+		BEGIN
+			hasUntracedReturn := untraced;
+		END SetUntracedReturn;
 
 		PROCEDURE SetStackAlignment*(alignment: LONGINT);
 		BEGIN
@@ -3179,7 +3192,7 @@ TYPE
 		BEGIN SELF.kind := kind; END SetKind;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN ~untraced & ((kind = ValueParameter) OR (kind = ConstParameter) & ~type.IsComposite()) & type.NeedsTrace ();
+		BEGIN RETURN ~untraced  & type.NeedsTrace ();
 		END NeedsTrace;
 
 	END Parameter;

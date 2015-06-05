@@ -1622,6 +1622,9 @@ TYPE
 			END;
 			IF Optional( Scanner.Colon ) THEN
 				position:= symbol.start;
+				IF Optional( Scanner.LeftBrace) THEN
+					procedureType.SetReturnTypeModifiers(Flags());
+				END;
 				type := Type(SyntaxTree.invalidIdentifier,parentScope);
 				(* formally, any type is permitted as return type. Actually some of them might simply not be usable *)
 				procedureType.SetReturnType(type);

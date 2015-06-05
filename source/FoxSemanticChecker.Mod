@@ -737,6 +737,7 @@ TYPE
 					parameter := SyntaxTree.NewParameter(procedureType.position,procedureType,Global.ResultName, SyntaxTree.VarParameter);
 					parameter.SetType(procedureType.returnType);
 					parameter.SetAccess(SyntaxTree.Hidden);
+					parameter.SetUntraced(procedureType.hasUntracedReturn);
 					VisitParameter(parameter);
 					procedureType.SetReturnParameter(parameter); (* return parameter serves as a cache only *)
 				END;
@@ -834,6 +835,11 @@ TYPE
 				IF HasFlag(modifiers, Global.NameDelegate,position) THEN procedureType.SetDelegate(TRUE) END;
 				IF HasFlag(modifiers, Global.NameRealtime,position) THEN procedureType.SetRealtime(TRUE) END;
 				CheckModifiers(modifiers, TRUE);
+				
+				modifiers := procedureType.returnTypeModifiers;
+				procedureType.SetUntracedReturn(HasFlag(modifiers, Global.NameUntraced, position));
+				CheckModifiers(modifiers, TRUE);
+				
 				typeFixes.Add(procedureType,currentScope);
 				procedureType.SetHasPointers(procedureType.isDelegate);
 				procedureType.SetState(SyntaxTree.Resolved);
@@ -6468,6 +6474,13 @@ TYPE
 				END;
 
 				CheckModifiers(modifiers, TRUE);
+				
+				modifiers := procedureType.returnTypeModifiers;
+				procedureType.SetUntracedReturn(HasFlag(modifiers, Global.NameUntraced, position));
+				CheckModifiers(modifiers, TRUE);
+				
+
+				
 				FixProcedureType(procedureType);
 				currentIsRealtime := procedureType.isRealtime;
 				currentIsBodyProcedure := procedure.isBodyProcedure;

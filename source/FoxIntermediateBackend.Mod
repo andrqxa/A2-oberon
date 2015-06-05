@@ -5149,6 +5149,7 @@ TYPE
 					d := resultDesignator;
 				ELSE
 					variable := GetTemporaryVariable(procedureType.returnType, FALSE);
+					variable.SetUntraced(procedureType.hasUntracedReturn);
 					d := SyntaxTree.NewSymbolDesignator(-1,NIL,variable);
 					d.SetType(variable.type);
 				END;
@@ -9006,22 +9007,12 @@ TYPE
 						ReleaseIntermediateOperand(mem);
 
 						ReleaseOperand(right);
-
-					ELSIF SemanticChecker.IsPointerType(type) THEN
-						Evaluate(expression, right);
-						MakeMemory(mem, left, IntermediateCode.GetType(system, system.addressType), 0);
-						Emit(Mov(position,mem, right.op)); (* step *)
-						ReleaseOperand(right); ReleaseIntermediateOperand(mem);
-					ELSE
-						(* not array range type *)
-						Designate(expression, right);
-						IF type IS SyntaxTree.RecordType THEN
-							size := IntermediateCode.Memory(addressType, fp, ToMemoryUnits(system, returnTypeOffset + system.addressSize));
-						ELSE ASSERT( (type IS SyntaxTree.ArrayType) OR (type IS SyntaxTree.MathArrayType));
-							size := IntermediateCode.Immediate(addressType, ToMemoryUnits(system, system.SizeOf(type)));
-						END;
-						Emit(Copy(position,left, right.op, size));
-						ReleaseOperand(right)
+					ELSE (* covers cases: pointer / record / array *)
+						parameter := procedureType.returnParameter;
+						checker.SetCurrentScope(currentScope);
+						ASSERT(parameter # NIL); 
+						parameterDesignator := checker.NewSymbolDesignator(expression.position,NIL,parameter);
+						Assign(parameterDesignator,expression);
 					END;
 					ReleaseIntermediateOperand(left);
 					IF locked THEN Lock(FALSE) END;
@@ -11414,7 +11405,7 @@ TYPE
 		END;
 		parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 		WHILE parameter # NIL DO
-			IF parameter.NeedsTrace() THEN
+			IF parameter.NeedsTrace() & ~IsVariableParameter(parameter) THEN
 				RETURN TRUE;
 			END;
 			parameter := parameter.nextParameter;
