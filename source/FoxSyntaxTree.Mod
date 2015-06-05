@@ -3179,7 +3179,7 @@ TYPE
 		BEGIN SELF.kind := kind; END SetKind;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
-		BEGIN RETURN ~untraced & (kind = ValueParameter) & type.NeedsTrace ();
+		BEGIN RETURN ~untraced & ((kind = ValueParameter) OR (kind = ConstParameter) & ~type.IsComposite()) & type.NeedsTrace ();
 		END NeedsTrace;
 
 	END Parameter;

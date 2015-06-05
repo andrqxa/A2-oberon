@@ -644,6 +644,9 @@ TYPE
 							finalizer := (name # baseObject) & (recordType.baseType = NIL);
 						END;
 						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
+						IF backend.cooperative THEN
+							IF HasPointers (scope) THEN  implementationVisitor.ResetVariables(scope); END;
+						END;
 						ir.Emit(implementationVisitor.Leave(x.position,x,cc));
 						IF finalizer THEN
 							Basic.ToSegmentedName("BaseTypes.Object.Finalize", name);
@@ -656,12 +659,15 @@ TYPE
 						implementationVisitor.EmitTrap(x.position,ReturnTrap);
 						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
 						IF backend.cooperative THEN
+							IF HasPointers (scope) THEN  implementationVisitor.ResetVariables(scope); END;
 							ir.Emit(implementationVisitor.Leave(x.position,x,cc));
 							ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
 						END;
 					ELSE
 						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
 						IF backend.cooperative THEN
+							ASSERT(scope = currentScope);
+							IF HasPointers (scope) THEN  implementationVisitor.ResetVariables(scope); END;
 							ir.Emit(implementationVisitor.Leave(x.position,x,cc));
 							ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
 						ELSE
@@ -2278,8 +2284,8 @@ TYPE
 				size := StaticArrayNumElements(type);
 				base := StaticArrayBaseType(type);
 				IF base.IsRecordType() THEN
-					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 					GetRecordTypeName (base.resolved(SyntaxTree.RecordType), name);
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
@@ -2305,11 +2311,11 @@ TYPE
 		PROCEDURE CreateTraceMethod (recordType: SyntaxTree.RecordType);
 		VAR name, pointer: Basic.SegmentedName; previousSection,source: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; register,op,ofs: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT; base: SyntaxTree.Type;
-			parameter1, parameter2: IntermediateCode.Operand; label: Label; context: Context;
+			parameter0, parameter1: IntermediateCode.Operand; label: Label; context: Context;
 		BEGIN
 			previousSection := section;
-			parameter1 (* address *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
-			parameter2 (* size *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,1*addressType.sizeInBits));
+			parameter0 (* size *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
+			parameter1 (* address *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,1*addressType.sizeInBits));
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
@@ -2403,8 +2409,8 @@ TYPE
 			Emit(Call(position, op, 0));
 			Emit(Pop(position, register));
 			Emit(Add(position, register, register, ofs));
-			Emit(Sub(position, parameter2, parameter2, IntermediateCode.Immediate(sizeType, 1)));
-			BrneL(label, parameter2, IntermediateCode.Immediate(sizeType, 0));
+			Emit(Sub(position, parameter0, parameter0, IntermediateCode.Immediate(sizeType, 1)));
+			BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
 			Emit(Exit(position,0,0));
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
@@ -2457,20 +2463,16 @@ TYPE
 		END CreateResetProcedure;
 		
 		PROCEDURE CreateResetMethod (scope: SyntaxTree.ProcedureScope);
-		VAR previousSection: IntermediateCode.Section; previousScope: SyntaxTree.Scope;
 		VAR name: Basic.SegmentedName; context: Context;
 		BEGIN
-			previousSection := section;
-			previousScope := currentScope;
 			GetCodeSectionNameForSymbol(scope.ownerProcedure, name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
 			IF dump # NIL THEN dump := section.comments END;
 			Emit(Enter(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention,0,0));
-			currentScope := scope; ResetVariables;
+			ResetVariables(scope);
 			Emit(Leave(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention));
 			Emit(Exit(position,0,0));
-			currentScope := previousScope;
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateResetMethod;
@@ -2524,8 +2526,8 @@ TYPE
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateMoveMethod;
 
-		PROCEDURE ResetVariables ();
-		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter;
+		PROCEDURE ResetVariables (scope: SyntaxTree.ProcedureScope);
+		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter; previousScope: SyntaxTree.Scope;
 
 			PROCEDURE Reset (symbol: SyntaxTree.Symbol);
 			VAR operand: Operand; name: Basic.SegmentedName; op: IntermediateCode.Operand;
@@ -2544,20 +2546,23 @@ TYPE
 			END Reset;
 
 		BEGIN
-			variable := currentScope.firstVariable;
+			previousScope := currentScope;
+			currentScope := scope;
+			variable := scope.firstVariable;
 			WHILE variable # NIL DO
 				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
 					Reset (variable);
 				END;
 				variable := variable.nextVariable;
 			END;
-			parameter := currentScope(SyntaxTree.ProcedureScope).ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
+			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 			WHILE parameter # NIL DO
 				IF ~parameter.untraced & parameter.type.resolved.hasPointers & ((parameter.kind = SyntaxTree.ValueParameter) OR (parameter.kind= SyntaxTree.ConstParameter) & ~(parameter.type.resolved IS SyntaxTree.RecordType)) THEN
 					Reset (parameter);
 				END;
 				parameter := parameter.nextParameter;
 			END;
+			currentScope := previousScope;
 		END ResetVariables;
 		
 		PROCEDURE CreateProcedureDescriptor (procedure: SyntaxTree.Procedure);
@@ -9472,7 +9477,7 @@ TYPE
 				END;
 			END;
 			IF backend.cooperative THEN
-				IF HasPointers (procedure.procedureScope) THEN ResetVariables; CreateResetMethod (procedure.procedureScope) END;
+				IF HasPointers (procedure.procedureScope) THEN CreateResetMethod (procedure.procedureScope) END;
 				IF HasVariableParameters (procedure.procedureScope) THEN CreateMoveMethod (procedure.procedureScope) END;
 				IF HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope) THEN CreateProcedureDescriptor (procedure) END;
 			ELSIF newObjectFile & moduleBody  & ~suppressModuleRegistration & ~meta.simple THEN
@@ -11402,14 +11407,14 @@ TYPE
 	BEGIN
 		variable := scope.firstVariable;
 		WHILE variable # NIL DO
-			IF ~variable.untraced & variable.type.resolved.hasPointers THEN
+			IF variable.NeedsTrace() THEN
 				RETURN TRUE;
 			END;
 			variable := variable.nextVariable;
 		END;
 		parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 		WHILE parameter # NIL DO
-			IF ~parameter.untraced & parameter.type.resolved.hasPointers & ~IsVariableParameter(parameter) THEN
+			IF parameter.NeedsTrace() THEN
 				RETURN TRUE;
 			END;
 			parameter := parameter.nextParameter;
