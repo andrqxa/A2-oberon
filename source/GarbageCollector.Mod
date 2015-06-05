@@ -76,7 +76,7 @@ END AssignDelegateArray;
 (** Executes an atomic compare-and-swap operation on a pointer variable. *)
 (** This procedure is called by the compiler when executing CAS expressions. *)
 PROCEDURE CompareAndSwap- (VAR pointer {UNTRACED}: BaseTypes.Pointer; previousValue {UNTRACED}, value {UNTRACED}: BaseTypes.Pointer): BaseTypes.Pointer;
-VAR result {UNTRACED}: BaseTypes.Pointer;
+VAR result: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	result := CAS (pointer, previousValue, value); IF value # NIL THEN Mark (value) END;
 	IF (result = previousValue) & Activities.IsLocalVariable (ADDRESS OF pointer) THEN
@@ -212,7 +212,7 @@ BEGIN{UNCOOPERATIVE, UNCHECKED}
 END MarkDelegateArray;
 
 (* Acquires ownership of the specified linked list by exchanging its first item with its sentinel. *)
-PROCEDURE AcquireList (VAR first {UNTRACED}: BaseTypes.Pointer; sentinel {UNTRACED}: BaseTypes.Pointer): BaseTypes.Pointer;
+PROCEDURE AcquireList (VAR first {UNTRACED}: BaseTypes.Pointer; sentinel {UNTRACED}: BaseTypes.Pointer): {UNTRACED} BaseTypes.Pointer;
 VAR value {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	LOOP

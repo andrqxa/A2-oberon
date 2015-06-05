@@ -62,7 +62,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	REPEAT heap.free[index].pooled := NIL; INC (index) UNTIL index = heap.sentinel;
 END Initialize;
 
-PROCEDURE Access (VAR first {UNTRACED}: Block): Block;
+PROCEDURE Access (VAR first {UNTRACED}: Block): {UNTRACED} Block;
 VAR index: SIZE; value {UNTRACED}: Block;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	value := CAS (first, NIL, NIL);
@@ -98,7 +98,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END Pool;
 
-PROCEDURE Acquire (index: SIZE; VAR heap: Heap): Block;
+PROCEDURE Acquire (index: SIZE; VAR heap: Heap): {UNTRACED} Block;
 VAR first {UNTRACED}, value {UNTRACED}: Block;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	first := CAS (heap.free[index].pooled, NIL, NIL);

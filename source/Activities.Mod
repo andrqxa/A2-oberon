@@ -127,7 +127,7 @@ VAR working, physicalProcessors, virtualProcessors: Counters.AlignedCounter;
 VAR awaiting*: Counters.AlignedCounter;
 
 (** Returns the handler of the current activity executing this procedure call. *)
-PROCEDURE GetCurrentActivity- (): Activity;
+PROCEDURE GetCurrentActivity- (): {UNTRACED} Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN SYSTEM.GetActivity ()(Activity);
 END GetCurrentActivity;
 
