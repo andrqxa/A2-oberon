@@ -2624,34 +2624,33 @@ TYPE
 
 
 		PROCEDURE EmitFill(CONST instruction: IntermediateCode.Instruction; down: BOOLEAN);
-		VAR op1,op2,op3: Assembler.Operand; reg,sizeInBits,i: LONGINT;val,src,dest: Assembler.Operand;
+		VAR reg,sizeInBits,i: LONGINT;val, value, size, dest: Assembler.Operand;
 			op: LONGINT;
 			edi, ecx: Ticket;
 		BEGIN
-			IF FALSE & (instruction.op3.mode = IntermediateCode.ModeImmediate) & (instruction.op3.symbol.name = "") & (instruction.op3.intValue < 5) THEN
-				sizeInBits := instruction.op2.type.sizeInBits;
-				IF sizeInBits = IntermediateCode.Bits8 THEN src := opAL;
-				ELSIF sizeInBits = IntermediateCode.Bits16 THEN src := opAX;
-				ELSIF sizeInBits = IntermediateCode.Bits32 THEN src := opEAX;
+			IF FALSE & (instruction.op2.mode = IntermediateCode.ModeImmediate) & (instruction.op2.symbol.name = "") & (instruction.op2.intValue < 5) THEN
+				sizeInBits := instruction.op3.type.sizeInBits;
+				IF sizeInBits = IntermediateCode.Bits8 THEN value := opAL;
+				ELSIF sizeInBits = IntermediateCode.Bits16 THEN value := opAX;
+				ELSIF sizeInBits = IntermediateCode.Bits32 THEN value := opEAX;
 				ELSE HALT(200)
 				END;
-				MakeOperand(instruction.op1,Low,op1,NIL);
-				IF instruction.op1.mode = IntermediateCode.ModeRegister THEN reg := op1.register
-				ELSE emitter.Emit2(InstructionSet.opMOV,opEDX,op1); reg := EDX;
+				MakeOperand(instruction.op1,Low,dest,NIL);
+				IF instruction.op1.mode = IntermediateCode.ModeRegister THEN reg := dest.register
+				ELSE emitter.Emit2(InstructionSet.opMOV,opEDX,dest); reg := EDX;
 				END;
-				IF (instruction.op2.mode = IntermediateCode.ModeImmediate) & (instruction.op2.type.form IN IntermediateCode.Integer) & (instruction.op2.intValue = 0) THEN
+				IF (instruction.op3.mode = IntermediateCode.ModeImmediate) & (instruction.op3.type.form IN IntermediateCode.Integer) & (instruction.op3.intValue = 0) THEN
 					emitter.Emit2(InstructionSet.opXOR,opEAX,opEAX);
 				ELSE
-					MakeOperand(instruction.op2,Low,op2,NIL);
-					emitter.Emit2(InstructionSet.opMOV,src,op2);
+					MakeOperand(instruction.op3,Low,value,NIL);
 				END;
-				FOR i := 0 TO SHORT(instruction.op3.intValue)-1 DO
+				FOR i := 0 TO SHORT(instruction.op2.intValue)-1 DO
 					IF down THEN
 						Assembler.InitMem(dest,SHORT(SHORT(sizeInBits DIV 8)),reg,-i*sizeInBits DIV 8);
 					ELSE
 						Assembler.InitMem(dest,SHORT(SHORT(sizeInBits DIV 8 )),reg,i*sizeInBits DIV 8);
 					END;
-					emitter.Emit2(InstructionSet.opMOV,dest,src);
+					emitter.Emit2(InstructionSet.opMOV,dest,value);
 				END;
 			ELSE
 				Spill(physicalRegisters.Mapped(EDI));
@@ -2660,24 +2659,24 @@ TYPE
 				edi := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,IntermediateCode.int32,EDI,inPC);
 				ecx := ReservePhysicalRegister(IntermediateCode.GeneralPurposeRegister,IntermediateCode.int32,ECX,inPC);
 
-				MakeOperand(instruction.op1,Low,op1,edi);
-				MakeOperand(instruction.op3,Low,op3,ecx);
-				MakeOperand(instruction.op2,Low,op2,NIL);
+				MakeOperand(instruction.op1,Low,dest,edi);
+				MakeOperand(instruction.op2,Low,size,ecx);
+				MakeOperand(instruction.op3,Low,value,NIL);
 				(*
 				emitter.Emit2(InstructionSet.opMOV,opEDI, op1[Low]);
 				emitter.Emit2(InstructionSet.opMOV,opECX, op3[Low]);
 				*)
-				CASE instruction.op2.type.sizeInBits OF
+				CASE instruction.op3.type.sizeInBits OF
 					IntermediateCode.Bits8: val := opAL; op := InstructionSet.opSTOSB;
 					|IntermediateCode.Bits16: val := opAX; op := InstructionSet.opSTOSW;
 					|IntermediateCode.Bits32: val := opEAX; op := InstructionSet.opSTOSD;
 				ELSE Halt("only supported for upto 32 bit integers ");
 				END;
 
-				IF (instruction.op2.mode = IntermediateCode.ModeImmediate) & (instruction.op2.type.form IN IntermediateCode.Integer) & (instruction.op2.intValue = 0) THEN
+				IF (instruction.op3.mode = IntermediateCode.ModeImmediate) & (instruction.op3.type.form IN IntermediateCode.Integer) & (instruction.op3.intValue = 0) THEN
 					emitter.Emit2(InstructionSet.opXOR,opEAX,opEAX);
 				ELSE
-					emitter.Emit2(InstructionSet.opMOV,val,op2);
+					emitter.Emit2(InstructionSet.opMOV,val,value);
 				END;
 
 				IF down THEN
