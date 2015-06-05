@@ -108,9 +108,16 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END ResetArray;
 
+(** Reset a delegate. *)
+(** This procedure is called by the compiler when resetting variables of procedure delegate type. *)
+PROCEDURE ResetDelegate-(target {UNTRACED}:  POINTER {UNSAFE} TO Delegate);
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Reset(target.pointer);
+END ResetDelegate;
+
 (** Resets an array of delegates. *)
 (** This procedure is called by the compiler for resetting all elements of array variables containing procedure delegates. *)
-PROCEDURE ResetDelegateArray- (VAR delegates {UNTRACED}: ARRAY OF Delegate);
+PROCEDURE ResetDelegateArray-(VAR delegates {UNTRACED}: ARRAY OF Delegate);
 VAR i: SIZE;
 BEGIN{UNCOOPERATIVE, UNCHECKED}
 	FOR i := 0 TO LEN(delegates) DO
@@ -243,6 +250,7 @@ VAR current {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCHECKED}
 	(* notify older collections cycles that the list is traversed *)
 	IF CAS (firstMarked, NIL, NIL) = markedSentinel THEN RETURN END;
+
 	Counters.Inc (tracings);
 
 	LOOP

@@ -1080,7 +1080,7 @@ TYPE
 
 		(* useful operands and types *)
 		nil,fp,sp,ap,true,false: IntermediateCode.Operand;
-		bool,addressType,setType, sizeType: IntermediateCode.Type;
+		bool,addressType,setType, sizeType, byteType: IntermediateCode.Type;
 
 		commentPrintout: Printout.Printer;
 		dump: Streams.Writer;
@@ -1137,6 +1137,8 @@ TYPE
 			addressType := IntermediateCode.GetType(system,system.addressType);
 			setType := IntermediateCode.GetType(system,system.setType);
 			sizeType := IntermediateCode.GetType(system, system.sizeType);
+			byteType := IntermediateCode.GetType(system, system.byteType);
+			
 			fp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.FP);
 			sp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.SP);
 			ap := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.AP);
@@ -2207,7 +2209,7 @@ TYPE
 			
 			variable := recordType.recordScope.firstVariable;
 			WHILE variable # NIL DO
-				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
+				IF variable.NeedsTrace() THEN
 
 					dst := NewRegisterOperand (addressType);
 					src := NewRegisterOperand (addressType);
@@ -2323,7 +2325,7 @@ TYPE
 
 			variable := recordType.recordScope.firstVariable;
 			WHILE variable # NIL DO
-				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
+				IF variable.NeedsTrace() THEN
 					register := NewRegisterOperand (addressType);
 					Emit (Mov(position,register,parameter1));
 					IntermediateCode.AddOffset(register,ToMemoryUnits(system,variable.offsetInBits));
@@ -2418,39 +2420,37 @@ TYPE
 
 		PROCEDURE CreateResetProcedure (recordType: SyntaxTree.RecordType);
 		VAR name: Basic.SegmentedName; previousSection: IntermediateCode.Section;
-		VAR variable: SyntaxTree.Variable; register,op: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; context: Context;
+		VAR variable: SyntaxTree.Variable; dst, op, ofs: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT;
+			parameter1, parameter0: IntermediateCode.Operand; label: Label; previousUsedRegisters: RegisterEntry; 
+			previousRegisterUsageCount: RegisterUsageCount; context: Context;
 		BEGIN
+			parameter0 (* len *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
+			parameter1 (* dest *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,1*addressType.sizeInBits));
+			
 			GetRecordTypeName (recordType,name);
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
+
 			IF dump # NIL THEN dump := section.comments END;
 
 			variable := recordType.recordScope.firstVariable;
 			WHILE variable # NIL DO
-				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
-					register := NewRegisterOperand (addressType);
-					Emit (Mov(position,register,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits))));
-					IntermediateCode.AddOffset(register,ToMemoryUnits(system,variable.offsetInBits));
+				IF variable.NeedsTrace() THEN
+
+					dst := NewRegisterOperand (addressType);
+					Emit (Mov(position, dst, parameter1));
+					IntermediateCode.AddOffset(dst,ToMemoryUnits(system,variable.offsetInBits));
 					IF recordType.isObject & ((recordType.pointerType = NIL) OR ~recordType.pointerType.isPlain) THEN
-						IntermediateCode.AddOffset(register,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+						IntermediateCode.AddOffset(dst,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 					END;
-					IF SemanticChecker.IsPointerType (variable.type) THEN
-						Emit (Push(position,register));
-						CallThis("GarbageCollector","Reset", 1);
-					ELSIF variable.type.resolved IS SyntaxTree.RecordType THEN
-						Emit (Push(position,register));
-						GetRecordTypeName (variable.type.resolved(SyntaxTree.RecordType),name);
-						Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
-						IntermediateCode.InitAddress(op, addressType, name , 0, 0);
-						Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
-					END;
-					ReleaseIntermediateOperand(register);
+					CallResetProcedure(dst, variable.type);
+					ReleaseIntermediateOperand(dst);
 				END;
 				variable := variable.nextVariable;
 			END;
-
+			
 			recordBase := recordType.GetBaseRecord();
-			IF (recordBase # NIL) & (recordBase.hasPointers) THEN
+			IF (recordBase # NIL) & recordBase.NeedsTrace() THEN
 				GetRecordTypeName (recordBase,name);
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
@@ -2458,6 +2458,29 @@ TYPE
 			ELSE
 				Emit(Exit(position,0,0));
 			END;
+			
+			GetRecordTypeName (recordType,name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+			NEW(registerUsageCount);
+			usedRegisters := NIL;
+
+			dst := NewRegisterOperand (addressType);
+			ofs := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(recordType)));
+			Emit(Mov(position, dst, parameter1));
+			label := NewLabel(); 
+			SetLabel(label);
+			Emit(Push(position, dst));
+			GetRecordTypeName (recordType,name);
+			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+			Emit(Call(position, op, 0));
+			Emit(Pop(position, dst));
+			Emit(Add(position, dst, dst, ofs));
+			Emit(Sub(position, parameter0, parameter0, IntermediateCode.Immediate(sizeType, 1)));
+			BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
+			Emit(Exit(position,0,0));
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateResetProcedure;
@@ -2526,22 +2549,56 @@ TYPE
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateMoveMethod;
 
+		PROCEDURE CallResetProcedure(dest: IntermediateCode.Operand; type: SyntaxTree.Type);
+		VAR base: SyntaxTree.Type; size: SIZE; op: IntermediateCode.Operand; name: Basic.SegmentedName;
+		BEGIN
+			IF SemanticChecker.IsPointerType (type) THEN
+				Emit (Push(position, dest));
+				CallThis("GarbageCollector","Reset", 1);
+			ELSIF type.IsRecordType() THEN
+				Emit (Push(position, dest));
+				GetRecordTypeName (type.resolved(SyntaxTree.RecordType),name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+				Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
+			ELSIF IsStaticArray(type) THEN
+				size := StaticArrayNumElements(type);
+				base := StaticArrayBaseType(type);
+				IF base.IsRecordType() THEN
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));					
+					Emit (Push(position, dest));
+					GetRecordTypeName (base.resolved(SyntaxTree.RecordType),name);
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
+					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
+					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+					Emit(Call(position,op,ToMemoryUnits(system, 2*system.addressSize)));
+				ELSIF base.resolved IS SyntaxTree.ProcedureType THEN (* array of delegates *)
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, dest));
+					CallThis("GarbageCollector","ResetDelegateArray", 2);
+				ELSE 
+					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, dest));
+					CallThis("GarbageCollector","ResetArray", 2);
+					ASSERT(StaticArrayBaseType(type).IsPointer());
+				END;
+			ELSIF type.resolved IS SyntaxTree.ProcedureType THEN
+				ASSERT(type.resolved(SyntaxTree.ProcedureType).isDelegate);
+				Emit (Push(position, dest));
+				CallThis("GarbageCollector","ResetDelegate", 1);
+			ELSE HALT(100); (* missing ? *)
+			END;
+		END CallResetProcedure;
+		
+
 		PROCEDURE ResetVariables (scope: SyntaxTree.ProcedureScope);
 		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter; previousScope: SyntaxTree.Scope;
 
 			PROCEDURE Reset (symbol: SyntaxTree.Symbol);
-			VAR operand: Operand; name: Basic.SegmentedName; op: IntermediateCode.Operand;
+			VAR operand: Operand; 
 			BEGIN
 				Symbol (symbol, operand);
-				Emit (Push(position, operand.op));
-				IF SemanticChecker.IsPointerType (symbol.type) THEN
-					CallThis("GarbageCollector","Reset", 1);
-				ELSIF symbol.type.resolved IS SyntaxTree.RecordType THEN
-					GetRecordTypeName (symbol.type.resolved(SyntaxTree.RecordType),name);
-					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
-					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
-					Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
-				END;
+				CallResetProcedure(operand.op, symbol.type.resolved);
 				ReleaseOperand(operand);
 			END Reset;
 
@@ -2550,14 +2607,14 @@ TYPE
 			currentScope := scope;
 			variable := scope.firstVariable;
 			WHILE variable # NIL DO
-				IF ~variable.untraced & variable.type.resolved.hasPointers THEN
+				IF variable.NeedsTrace() THEN
 					Reset (variable);
 				END;
 				variable := variable.nextVariable;
 			END;
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 			WHILE parameter # NIL DO
-				IF ~parameter.untraced & parameter.type.resolved.hasPointers & ((parameter.kind = SyntaxTree.ValueParameter) OR (parameter.kind= SyntaxTree.ConstParameter) & ~(parameter.type.resolved IS SyntaxTree.RecordType)) THEN
+				IF parameter.NeedsTrace() & ~IsVariableParameter(parameter) THEN
 					Reset (parameter);
 				END;
 				parameter := parameter.nextParameter;
@@ -4108,7 +4165,7 @@ TYPE
 		VAR
 			type, descriptorType, baseType: SyntaxTree.Type;
 			operand, tmpOperand, variableOp, variable2Op: Operand;
-			baseReg, tmp, dimOp: IntermediateCode.Operand;
+			baseReg, tmp, dimOp, null, dst: IntermediateCode.Operand;
 			variable, variable2: SyntaxTree.Variable;
 			dim, i, size: LONGINT;
 
@@ -4608,6 +4665,14 @@ TYPE
 
 						IF type IS SyntaxTree.StringType THEN (* source potentially shorter than destination *)
 							size := type(SyntaxTree.StringType).length;
+						END;
+						IF backend.cooperative & parameter.NeedsTrace() THEN
+							dst := NewRegisterOperand (addressType);
+							Emit(Mov(position,dst, sp));
+							IntermediateCode.InitImmediate(null, byteType, 0);
+							Emit(Fill(position, dst, IntermediateCode.Immediate(addressType,size), null));
+							CallAssignMethod(dst, operand.op, parameter.type);
+							ReleaseIntermediateOperand(dst);
 						END;
 						Emit(Copy(position,sp,operand.op,IntermediateCode.Immediate(addressType,size)));
 					ELSIF IsOpenArray(parameter.type) THEN
@@ -11933,6 +11998,13 @@ TYPE
 		IntermediateCode.InitInstruction(instruction,position,IntermediateCode.copy,dest,src,size);
 		RETURN instruction
 	END Copy;
+
+	PROCEDURE Fill(position: LONGINT;dest,size, value: IntermediateCode.Operand): IntermediateCode.Instruction;
+	VAR instruction: IntermediateCode.Instruction;
+	BEGIN
+		IntermediateCode.InitInstruction(instruction,position,IntermediateCode.fill,dest,size,value);
+		RETURN instruction
+	END Fill;
 
 	PROCEDURE Asm(position: LONGINT;s: SyntaxTree.SourceCode; inRules, outRules: IntermediateCode.Rules): IntermediateCode.Instruction;
 	VAR instruction: IntermediateCode.Instruction; string, o1, o2: IntermediateCode.Operand;
