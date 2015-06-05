@@ -12,7 +12,7 @@ VAR currentCycle, oldestCycle: LONGWORD;
 VAR firstMarked {UNTRACED}, firstWatched {UNTRACED}: BaseTypes.Pointer;
 VAR markedSentinel {UNTRACED}, watchedSentinel {UNTRACED}: BaseTypes.Pointer;
 
-TYPE Delegate = RECORD proc: PROCEDURE; pointer{UNTRACED}: BaseTypes.Pointer END;
+TYPE Delegate = RECORD proc: PROCEDURE; pointer: BaseTypes.Pointer END;
 
 (** Registers the specified pointer for automatic memory management. *)
 (** This procedure is called by the compiler when a pointer or object type is allocated using the NEW statement. *)
@@ -47,6 +47,8 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END Assign;
 
+(** Performs the assignment of a procedure delegate. *)
+(** This procedure is called by the compiler when assigning variables of procedure delegate type. *)
 PROCEDURE AssignDelegate-(target, source {UNTRACED}:  POINTER {UNSAFE} TO Delegate);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Assign(target.pointer, source.pointer);
@@ -64,14 +66,15 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END AssignPointerArray;
 
-PROCEDURE AssignDelegateArray-(VAR target: ARRAY OF Delegate; CONST source : ARRAY OF Delegate);
-VAR i: LONGINT;
+(** Performs the assignment of an array containing delegates. *)
+(** This procedure is called by the compiler when assigning arrays of procedure delegate type. *)
+PROCEDURE AssignDelegateArray-(VAR target {UNTRACED}: ARRAY OF Delegate; CONST source {UNTRACED}: ARRAY OF Delegate);
+VAR i: SIZE;
 BEGIN{UNCOOPERATIVE, UNCHECKED}
 	FOR i := 0 TO LEN(target) DO
 		AssignDelegate(ADDRESS OF target[i], ADDRESS OF source[i]);
 	END;
 END AssignDelegateArray;
-
 
 (** Executes an atomic compare-and-swap operation on a pointer variable. *)
 (** This procedure is called by the compiler when executing CAS expressions. *)
@@ -105,6 +108,16 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END ResetArray;
 
+(** Resets an array of delegates. *)
+(** This procedure is called by the compiler for resetting all elements of array variables containing procedure delegates. *)
+PROCEDURE ResetDelegateArray- (VAR delegates {UNTRACED}: ARRAY OF Delegate);
+VAR i: SIZE;
+BEGIN{UNCOOPERATIVE, UNCHECKED}
+	FOR i := 0 TO LEN(delegates) DO
+		Reset (delegates[i].pointer);
+	END;
+END ResetDelegateArray;
+
 (* Increments a garbage collection cycle and returns its previous value. *)
 (* Collection cycles should be able to overflow and are therefore represented using a signed type. *)
 PROCEDURE Increment (VAR cycle: LONGWORD): LONGWORD;
@@ -136,7 +149,7 @@ BEGIN {UNCHECKED}
 	first := AcquireList (firstWatched, watchedSentinel);
 
 	(* mark global referenced pointers *)
-(*	Mark (Modules.first); TraceMarkedPointers; *)
+	(*Mark (Modules.first); TraceMarkedPointers;*)
 
 	(* mark pointers changed by assignments *)
 	WHILE Activities.AssignmentsInProgress () DO TraceMarkedPointers END;
@@ -203,8 +216,8 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END MarkRecordArray;
 
-PROCEDURE MarkDelegateArray-(CONST delegates : ARRAY OF Delegate);
-VAR i: LONGINT;
+PROCEDURE MarkDelegateArray-(CONST delegates {UNTRACED}: ARRAY OF Delegate);
+VAR i: SIZE;
 BEGIN{UNCOOPERATIVE, UNCHECKED}
 	FOR i := 0 TO LEN(delegates) DO
 		Mark (delegates[i].pointer);
