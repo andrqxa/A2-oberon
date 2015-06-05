@@ -4619,11 +4619,25 @@ TYPE
 						Pass((operand.op)); (* address of the array *)
 					ELSIF IsDelegate(parameter.type) THEN
 						Evaluate(expression,operand);
-						Pass((operand.tag));
+						IF backend.cooperative & parameter.NeedsTrace() THEN
+							Emit(Push(position, nil));
+							Emit(Push(position, sp));
+							Emit(Push(position, operand.tag));
+							CallThis("GarbageCollector","Assign",2);
+						ELSE
+							Pass((operand.tag));
+						END;
 						Pass((operand.op));
 					ELSE
 						Evaluate(expression,operand);
-						Pass((operand.op));
+						IF backend.cooperative & parameter.NeedsTrace() THEN
+							Emit(Push(position, nil));
+							Emit(Push(position, sp));
+							Emit(Push(position, operand.op));
+							CallThis("GarbageCollector","Assign",2);
+						ELSE
+							Pass((operand.op));
+						END;
 					END;
 				ELSIF expression IS SyntaxTree.NilValue THEN (* for special WinAPI rule *)
 					Evaluate(expression,operand);
