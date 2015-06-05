@@ -12,7 +12,7 @@ VAR currentCycle, oldestCycle: LONGWORD;
 VAR firstMarked {UNTRACED}, firstWatched {UNTRACED}: BaseTypes.Pointer;
 VAR markedSentinel {UNTRACED}, watchedSentinel {UNTRACED}: BaseTypes.Pointer;
 
-TYPE Delegate = RECORD proc: ADDRESS; pointer{UNTRACED}: BaseTypes.Pointer END;
+TYPE Delegate = RECORD proc: PROCEDURE; pointer{UNTRACED}: BaseTypes.Pointer END;
 
 (** Registers the specified pointer for automatic memory management. *)
 (** This procedure is called by the compiler when a pointer or object type is allocated using the NEW statement. *)
