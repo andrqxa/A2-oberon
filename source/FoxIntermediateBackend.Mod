@@ -8523,6 +8523,7 @@ TYPE
 				IF  (leftType IS SyntaxTree.RecordType) OR IsStaticArray(leftType) THEN
 					Designate(right, rightO);
 					Designate(left, leftO); 
+					ASSERT(leftO.mode = ModeReference);
 					TransferToRegister(leftO.op, leftO.op);
 					TransferToRegister(rightO.op, rightO.op); 
 					Emit(Push(position, leftO.op));
@@ -8544,8 +8545,8 @@ TYPE
 						Emit(Mov(position,mem,rightO.op));
 						ReleaseIntermediateOperand(mem);
 						(* copy pointer address *)
-						IntermediateCode.AddOffset(leftO.op, ToMemoryUnits(system,system.addressSize));
-						CallAssignPointer(leftO.op, rightO.tag);
+						IntermediateCode.MakeAddress(leftO.tag, addressType);
+						CallAssignPointer(leftO.tag, rightO.tag);
 					ELSE
 						ASSERT(system.SizeOf(left.type) = system.addressSize);
 						CallAssignPointer(leftO.op, rightO.op);

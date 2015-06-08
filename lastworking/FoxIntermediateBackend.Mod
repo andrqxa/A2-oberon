@@ -2625,7 +2625,7 @@ TYPE
 			END;
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 			WHILE parameter # NIL DO
-				IF parameter.NeedsTrace() & ~IsVariableParameter(parameter) THEN
+				IF parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter) & ~IsVariableParameter(parameter) THEN
 					Reset (parameter);
 				END;
 				parameter := parameter.nextParameter;
@@ -4678,7 +4678,7 @@ TYPE
 						IF type IS SyntaxTree.StringType THEN (* source potentially shorter than destination *)
 							size := type(SyntaxTree.StringType).length;
 						END;
-						IF backend.cooperative & parameter.NeedsTrace() THEN
+						IF backend.cooperative & parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter) THEN
 							dst := NewRegisterOperand (addressType);
 							Emit(Mov(position,dst, sp));
 							IntermediateCode.InitImmediate(null, byteType, 0);
@@ -4699,7 +4699,7 @@ TYPE
 						Pass((operand.op)); (* address of the array *)
 					ELSIF IsDelegate(parameter.type) THEN
 						Evaluate(expression,operand);
-						IF backend.cooperative & parameter.NeedsTrace() THEN
+						IF backend.cooperative & parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter) THEN
 							Emit(Push(position, nil));
 							dst := NewRegisterOperand (addressType);
 							Emit(Mov(position,dst, sp));
@@ -4716,7 +4716,7 @@ TYPE
 						Pass((operand.op));
 					ELSE
 						Evaluate(expression,operand);
-						IF backend.cooperative & parameter.NeedsTrace() THEN
+						IF backend.cooperative & parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter)  THEN
 							Emit(Push(position, nil));
 							dst := NewRegisterOperand (addressType);
 							Emit(Mov(position,dst, sp));
@@ -6888,7 +6888,7 @@ TYPE
 						
 						
 						SetLabel(exit);
-						needsTrace := p0.NeedsTrace();
+						needsTrace := FALSE & p0.NeedsTrace();
 						IF needsTrace THEN ModifyAssignments(true) END;
 						IF ~type(SyntaxTree.PointerType).isDisposable THEN
 							Emit(Push(position, pointer));
@@ -7085,7 +7085,7 @@ TYPE
 						Emit(Add(position,sp,sp,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(openDim+1)*system.addressSize))));
 						SetLabel(exit);
 						
-						needsTrace := p0.NeedsTrace();
+						needsTrace := FALSE & p0.NeedsTrace();
 						IF needsTrace THEN ModifyAssignments(true) END;
 						IF ~p0.type.resolved(SyntaxTree.PointerType).isDisposable THEN
 							Emit(Push(position, pointer));
@@ -7576,7 +7576,7 @@ TYPE
 			|Global.Sum: HALT(200);
 			(* ---- CAS ----- *)
 			|Global.Cas:
-				needsTrace := p0.NeedsTrace();
+				needsTrace := FALSE & p0.NeedsTrace();
 				IF needsTrace THEN ModifyAssignments(true) END;
 				Designate(p0,s0);
 				Evaluate(p1,s1);
@@ -8521,11 +8521,12 @@ TYPE
 			ASSERT(left.type # NIL); ASSERT(right.type # NIL);
 			leftType := left.type.resolved; rightType:= right.type.resolved;
 
-			IF backend.cooperative & left.NeedsTrace() THEN
+			IF backend.cooperative & left.NeedsTrace() & ~( (leftType IS SyntaxTree.RecordType) OR (leftType IS SyntaxTree.ArrayType)) THEN
 				ModifyAssignments(true);
 				IF  (leftType IS SyntaxTree.RecordType) OR IsStaticArray(leftType) THEN
 					Designate(right, rightO);
 					Designate(left, leftO); 
+					ASSERT(leftO.mode = ModeReference);
 					TransferToRegister(leftO.op, leftO.op);
 					TransferToRegister(rightO.op, rightO.op); 
 					Emit(Push(position, leftO.op));
@@ -8547,8 +8548,8 @@ TYPE
 						Emit(Mov(position,mem,rightO.op));
 						ReleaseIntermediateOperand(mem);
 						(* copy pointer address *)
-						IntermediateCode.AddOffset(leftO.op, ToMemoryUnits(system,system.addressSize));
-						CallAssignPointer(leftO.op, rightO.tag);
+						IntermediateCode.MakeAddress(leftO.tag, addressType);
+						CallAssignPointer(leftO.tag, rightO.tag);
 					ELSE
 						ASSERT(system.SizeOf(left.type) = system.addressSize);
 						CallAssignPointer(leftO.op, rightO.op);
@@ -11529,7 +11530,7 @@ TYPE
 		END;
 		parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 		WHILE parameter # NIL DO
-			IF parameter.NeedsTrace() & ~IsVariableParameter(parameter) THEN
+			IF parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter) & ~IsVariableParameter(parameter) THEN
 				RETURN TRUE;
 			END;
 			parameter := parameter.nextParameter;

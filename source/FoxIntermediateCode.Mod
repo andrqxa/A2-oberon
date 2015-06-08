@@ -910,6 +910,18 @@ TYPE
 		op.mode := ModeMemory;
 		ASSERT(op.register # 0);
 	END MakeMemory;
+	
+	PROCEDURE MakeAddress*(VAR op: Operand; CONST type: Type);
+	BEGIN
+		ASSERT(op.mode = ModeMemory);
+		IF op.register = None THEN
+			op.mode := ModeImmediate;
+		ELSE
+			op.mode := ModeRegister;
+			ASSERT(op.symbol.name = "");
+		END;
+		op.type := type;
+	END MakeAddress;
 
 	PROCEDURE InitAddress*(VAR op: Operand; type: Type; symbol: Sections.SectionName; fp: LONGINT; symbolOffset: LONGINT);
 	BEGIN
