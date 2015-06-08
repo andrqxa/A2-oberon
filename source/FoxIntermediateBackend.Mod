@@ -8485,10 +8485,24 @@ TYPE
 			ReleaseIntermediateOperand(dst);
 		END ModifyAssignments;
 
+		PROCEDURE CopySize(left: SyntaxTree.Expression): IntermediateCode.Operand;
+		VAR type: SyntaxTree.Type; procedureType: SyntaxTree.ProcedureType; parameter: SyntaxTree.Parameter;
+		BEGIN
+			type := left.type.resolved;
+			IF (type IS SyntaxTree.RecordType) & (left IS SyntaxTree.SymbolDesignator) & (left(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Parameter) THEN
+				parameter := left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Parameter);
+				procedureType := parameter.ownerType.resolved(SyntaxTree.ProcedureType);
+				IF procedureType.returnParameter = parameter THEN
+					RETURN IntermediateCode.Memory(addressType, fp, ToMemoryUnits(system, parameter.offsetInBits + system.addressSize));
+				END;
+			END;
+			RETURN IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.SizeOf(type)));
+		END CopySize;
+
 		PROCEDURE Assign(left,right: SyntaxTree.Expression);
 		VAR
 			leftO, rightO: Operand;
-			mem: IntermediateCode.Operand;
+			mem, sizeOp: IntermediateCode.Operand;
 			leftType, rightType, componentType: SyntaxTree.Type;
 			size: LONGINT;
 			parameters: SyntaxTree.ExpressionList;
@@ -8531,8 +8545,8 @@ TYPE
 					CallAssignMethod(leftO.op, rightO.op, left.type);
 					Emit(Pop(position, rightO.op));
 					Emit(Pop(position, leftO.op));
-					size := ToMemoryUnits(system,system.SizeOf(leftType));
-					Emit(Copy(position,leftO.op,rightO.op,IntermediateCode.Immediate(addressType,size)));
+					sizeOp := CopySize(left);
+					Emit(Copy(position,leftO.op,rightO.op,sizeOp));
 					ReleaseOperand(leftO); 
 					ReleaseOperand(rightO);
 				ELSE
@@ -8651,8 +8665,8 @@ TYPE
 			ELSIF (leftType IS SyntaxTree.RecordType) THEN
 				Designate(right,rightO);
 				Designate(left,leftO);
-				size := ToMemoryUnits(system,system.SizeOf(leftType));
-				Emit(Copy(position,leftO.op,rightO.op,IntermediateCode.Immediate(addressType,size)));
+				sizeOp := CopySize(left);
+				Emit(Copy(position,leftO.op,rightO.op,sizeOp));
 				ReleaseOperand(leftO); ReleaseOperand(rightO);
 			ELSIF (leftType IS SyntaxTree.ArrayType) THEN
 				IF (rightType IS SyntaxTree.StringType) THEN
