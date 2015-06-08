@@ -7576,7 +7576,7 @@ TYPE
 			|Global.Sum: HALT(200);
 			(* ---- CAS ----- *)
 			|Global.Cas:
-				needsTrace := FALSE & p0.NeedsTrace();
+				needsTrace := p0.NeedsTrace();
 				IF needsTrace THEN ModifyAssignments(true) END;
 				Designate(p0,s0);
 				Evaluate(p1,s1);
@@ -8521,7 +8521,7 @@ TYPE
 			ASSERT(left.type # NIL); ASSERT(right.type # NIL);
 			leftType := left.type.resolved; rightType:= right.type.resolved;
 
-			IF backend.cooperative & left.NeedsTrace() & ~( (leftType IS SyntaxTree.RecordType) OR (leftType IS SyntaxTree.ArrayType)) THEN
+			IF backend.cooperative & left.NeedsTrace() THEN
 				ModifyAssignments(true);
 				IF  (leftType IS SyntaxTree.RecordType) OR IsStaticArray(leftType) THEN
 					Designate(right, rightO);

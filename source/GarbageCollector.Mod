@@ -78,8 +78,8 @@ END AssignDelegateArray;
 
 (** Executes an atomic compare-and-swap operation on a pointer variable. *)
 (** This procedure is called by the compiler when executing CAS expressions. *)
-PROCEDURE CompareAndSwap- (VAR pointer {UNTRACED}: BaseTypes.Pointer; previousValue {UNTRACED}, value {UNTRACED}: BaseTypes.Pointer): BaseTypes.Pointer;
-VAR result: BaseTypes.Pointer;
+PROCEDURE CompareAndSwap- (VAR pointer {UNTRACED}: BaseTypes.Pointer; previousValue {UNTRACED}, value {UNTRACED}: BaseTypes.Pointer): ADDRESS;
+VAR result {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	result := CAS (pointer, previousValue, value); IF value # NIL THEN Mark (value) END;
 	IF (result = previousValue) & Activities.IsLocalVariable (ADDRESS OF pointer) THEN
