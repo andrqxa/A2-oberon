@@ -421,7 +421,15 @@ TYPE
 			IF (x.firstParameter # NIL) OR (x.returnType # NIL) THEN
 				ParameterList(x.firstParameter)
 			END;
-			IF x.returnType # NIL THEN w.String( ":" );  Type(x.returnType) END;
+			IF x.returnType # NIL THEN 
+				w.String( ":" );  					
+				IF x.hasUntracedReturn THEN
+						first := TRUE;
+						Flag(Global.NameUntraced, first);
+						FlagEnd(first);
+				END;
+				Type(x.returnType) 
+			END;
 			IF info & (x.returnParameter # NIL) THEN
 				BeginComment;
 				VisitParameter(x.returnParameter);
@@ -1097,6 +1105,17 @@ TYPE
 
 		PROCEDURE ParameterList*(x: SyntaxTree.Parameter);
 		VAR next: SyntaxTree.Parameter; first: BOOLEAN;
+
+			PROCEDURE Flags(x: SyntaxTree.Parameter);
+			VAR first: BOOLEAN;
+			BEGIN
+				first := TRUE;
+				IF x.untraced THEN
+					Flag(Global.NameUntraced,first)
+				END;
+				FlagEnd(first);
+			END Flags;
+			
 		BEGIN
 			first := TRUE;
 			w.String( "(" );
@@ -1108,14 +1127,14 @@ TYPE
 					IF x.kind = SyntaxTree.VarParameter THEN Keyword("VAR " );
 					ELSIF x.kind = SyntaxTree.ConstParameter THEN Keyword("CONST " );
 					END;
-					PrintSymbol(x);
+					PrintSymbol(x); Flags(x);
 					IF x.defaultValue # NIL THEN
 						w.String("= "); Expression(x.defaultValue);
 					END;
 
 					WHILE (next # NIL) & (next.type = x.type) & (next.kind = x.kind) & ((next.access # SyntaxTree.Hidden) OR (mode > SourceCode)) DO
 						w.String(", ");
-						PrintSymbol(next);
+						PrintSymbol(next); Flags(next);
 						IF next.defaultValue # NIL THEN
 							w.String("= "); Expression(next.defaultValue);
 						END;
@@ -1185,6 +1204,11 @@ TYPE
 				END;
 				IF type.returnType # NIL THEN
 					w.String( ": " );
+					IF type.hasUntracedReturn THEN
+						first := TRUE;
+						Flag(Global.NameUntraced, first);
+						FlagEnd(first);
+					END;
 					Type(type.returnType);
 				END;
 				IF info & (type.returnParameter # NIL) THEN
@@ -1249,6 +1273,11 @@ TYPE
 				ParameterList(type.firstParameter);
 				IF type.returnType # NIL THEN
 					w.String( ": " );
+					IF type.hasUntracedReturn THEN
+						first := TRUE;
+						Flag(Global.NameUntraced, first);
+						FlagEnd(first);
+					END;
 					Type(type.returnType);
 				END;
 				IF info & (type.returnParameter # NIL) THEN
