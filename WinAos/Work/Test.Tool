@@ -24,14 +24,14 @@ Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
 
 FSTools.Mount TEMP AosFS VDISK0#1 ~
 FSTools.Unsafe ~
-FSTools.CopyFiles 
+FSTools.CopyFiles -q
 	*.Gof => TEMP:*.Gof ~
-FSTools.CopyFiles -o 
+FSTools.CopyFiles -o -q 
 	SRC:*.XML => TEMP:*.XML 
 	SRC:*.xml => TEMP:*.xml 
 	SRC:Auto.dsk => TEMP:Auto.dsk 
 	SRC:*.rep => TEMP:*.rep ~
-FSTools.CopyFiles  -o
+FSTools.CopyFiles  -o -q
 	SRC:*.zip => TEMP:*.zip 
 	SRC:*.Fnt => TEMP:*.Fnt ~
 FSTools.Watch TEMP ~
