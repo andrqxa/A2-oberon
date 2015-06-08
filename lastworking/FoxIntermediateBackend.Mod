@@ -2561,8 +2561,6 @@ TYPE
 			IF SemanticChecker.IsPointerType (type) THEN
 				Emit (Push(position, dest));
 				CallThis("GarbageCollector","Reset", 1);
-			
-
 			ELSIF type.IsRecordType() THEN
 				Emit (Push(position, dest));
 				GetRecordTypeName (type.resolved(SyntaxTree.RecordType),name);
@@ -2618,14 +2616,13 @@ TYPE
 			variable := scope.firstVariable;
 			WHILE variable # NIL DO
 				IF variable.NeedsTrace() THEN
-					ASSERT(~variable.untraced & variable.type.resolved.hasPointers);
 					Reset (variable);
 				END;
 				variable := variable.nextVariable;
 			END;
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 			WHILE parameter # NIL DO
-				IF parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter) & ~IsVariableParameter(parameter) THEN
+				IF parameter.NeedsTrace() & ~IsVariableParameter(parameter) THEN
 					Reset (parameter);
 				END;
 				parameter := parameter.nextParameter;
@@ -4678,7 +4675,7 @@ TYPE
 						IF type IS SyntaxTree.StringType THEN (* source potentially shorter than destination *)
 							size := type(SyntaxTree.StringType).length;
 						END;
-						IF backend.cooperative & parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter) THEN
+						IF backend.cooperative & parameter.NeedsTrace() THEN
 							dst := NewRegisterOperand (addressType);
 							Emit(Mov(position,dst, sp));
 							IntermediateCode.InitImmediate(null, byteType, 0);
@@ -4699,7 +4696,7 @@ TYPE
 						Pass((operand.op)); (* address of the array *)
 					ELSIF IsDelegate(parameter.type) THEN
 						Evaluate(expression,operand);
-						IF backend.cooperative & parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter) THEN
+						IF backend.cooperative & parameter.NeedsTrace() THEN
 							Emit(Push(position, nil));
 							dst := NewRegisterOperand (addressType);
 							Emit(Mov(position,dst, sp));
@@ -4716,7 +4713,7 @@ TYPE
 						Pass((operand.op));
 					ELSE
 						Evaluate(expression,operand);
-						IF backend.cooperative & parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter)  THEN
+						IF backend.cooperative & parameter.NeedsTrace() THEN
 							Emit(Push(position, nil));
 							dst := NewRegisterOperand (addressType);
 							Emit(Mov(position,dst, sp));
@@ -6888,7 +6885,7 @@ TYPE
 						
 						
 						SetLabel(exit);
-						needsTrace := FALSE & p0.NeedsTrace();
+						needsTrace := p0.NeedsTrace();
 						IF needsTrace THEN ModifyAssignments(true) END;
 						IF ~type(SyntaxTree.PointerType).isDisposable THEN
 							Emit(Push(position, pointer));
@@ -7085,7 +7082,7 @@ TYPE
 						Emit(Add(position,sp,sp,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(openDim+1)*system.addressSize))));
 						SetLabel(exit);
 						
-						needsTrace := FALSE & p0.NeedsTrace();
+						needsTrace := p0.NeedsTrace();
 						IF needsTrace THEN ModifyAssignments(true) END;
 						IF ~p0.type.resolved(SyntaxTree.PointerType).isDisposable THEN
 							Emit(Push(position, pointer));
@@ -11530,7 +11527,7 @@ TYPE
 		END;
 		parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 		WHILE parameter # NIL DO
-			IF parameter.NeedsTrace() & (parameter.kind = SyntaxTree.ValueParameter) & ~IsVariableParameter(parameter) THEN
+			IF parameter.NeedsTrace() & ~IsVariableParameter(parameter) THEN
 				RETURN TRUE;
 			END;
 			parameter := parameter.nextParameter;
