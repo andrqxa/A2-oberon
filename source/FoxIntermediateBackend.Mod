@@ -2561,6 +2561,8 @@ TYPE
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 				Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
+
+
 			ELSIF IsStaticArray(type) THEN
 				size := StaticArrayNumElements(type);
 				base := StaticArrayBaseType(type);
@@ -4173,6 +4175,7 @@ TYPE
 			oldArrayDestinationTag: IntermediateCode.Operand;
 			oldArrayDestinationDimension: LONGINT;
 			position: LONGINT;
+			saved: RegisterEntry;
 
 			PROCEDURE Pass(op: IntermediateCode.Operand);
 			VAR registerClass: IntermediateCode.RegisterClass; parameterRegister: IntermediateCode.Operand;
@@ -4686,9 +4689,15 @@ TYPE
 						Evaluate(expression,operand);
 						IF backend.cooperative & parameter.NeedsTrace() THEN
 							Emit(Push(position, nil));
-							Emit(Push(position, sp));
+							dst := NewRegisterOperand (addressType);
+							Emit(Mov(position,dst, sp));
+							ReleaseIntermediateOperand(dst);
+							SaveRegisters();ReleaseUsedRegisters(saved);
+							Emit(Push(position, dst));
+							(* register dst has been freed before SaveRegisters already *)
 							Emit(Push(position, operand.tag));
 							CallThis("GarbageCollector","Assign",2);
+							RestoreRegisters(saved);
 						ELSE
 							Pass((operand.tag));
 						END;
@@ -4697,9 +4706,15 @@ TYPE
 						Evaluate(expression,operand);
 						IF backend.cooperative & parameter.NeedsTrace() THEN
 							Emit(Push(position, nil));
-							Emit(Push(position, sp));
+							dst := NewRegisterOperand (addressType);
+							Emit(Mov(position,dst, sp));
+							ReleaseIntermediateOperand(dst);
+							SaveRegisters();ReleaseUsedRegisters(saved);
+							Emit(Push(position, dst));
+							(* register dst has been freed before SaveRegisters already *)
 							Emit(Push(position, operand.op));
 							CallThis("GarbageCollector","Assign",2);
+							RestoreRegisters(saved);
 						ELSE
 							Pass((operand.op));
 						END;

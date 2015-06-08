@@ -4178,6 +4178,7 @@ TYPE
 			oldArrayDestinationTag: IntermediateCode.Operand;
 			oldArrayDestinationDimension: LONGINT;
 			position: LONGINT;
+			saved: RegisterEntry;
 
 			PROCEDURE Pass(op: IntermediateCode.Operand);
 			VAR registerClass: IntermediateCode.RegisterClass; parameterRegister: IntermediateCode.Operand;
@@ -4689,22 +4690,34 @@ TYPE
 						Pass((operand.op)); (* address of the array *)
 					ELSIF IsDelegate(parameter.type) THEN
 						Evaluate(expression,operand);
-						IF FALSE & backend.cooperative & parameter.NeedsTrace() THEN
+						IF backend.cooperative & parameter.NeedsTrace() THEN
 							Emit(Push(position, nil));
-							Emit(Push(position, sp));
+							dst := NewRegisterOperand (addressType);
+							Emit(Mov(position,dst, sp));
+							ReleaseIntermediateOperand(dst);
+							SaveRegisters();ReleaseUsedRegisters(saved);
+							Emit(Push(position, dst));
+							(* register dst has been freed before SaveRegisters already *)
 							Emit(Push(position, operand.tag));
 							CallThis("GarbageCollector","Assign",2);
+							RestoreRegisters(saved);
 						ELSE
 							Pass((operand.tag));
 						END;
 						Pass((operand.op));
 					ELSE
 						Evaluate(expression,operand);
-						IF FALSE & backend.cooperative & parameter.NeedsTrace() THEN
+						IF backend.cooperative & parameter.NeedsTrace() THEN
 							Emit(Push(position, nil));
-							Emit(Push(position, sp));
+							dst := NewRegisterOperand (addressType);
+							Emit(Mov(position,dst, sp));
+							ReleaseIntermediateOperand(dst);
+							SaveRegisters();ReleaseUsedRegisters(saved);
+							Emit(Push(position, dst));
+							(* register dst has been freed before SaveRegisters already *)
 							Emit(Push(position, operand.op));
 							CallThis("GarbageCollector","Assign",2);
+							RestoreRegisters(saved);
 						ELSE
 							Pass((operand.op));
 						END;
