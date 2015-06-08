@@ -4672,13 +4672,16 @@ TYPE
 						IF type IS SyntaxTree.StringType THEN (* source potentially shorter than destination *)
 							size := type(SyntaxTree.StringType).length;
 						END;
-						IF FALSE & backend.cooperative & parameter.NeedsTrace() THEN
+						IF backend.cooperative & parameter.NeedsTrace() THEN
 							dst := NewRegisterOperand (addressType);
 							Emit(Mov(position,dst, sp));
 							IntermediateCode.InitImmediate(null, byteType, 0);
 							Emit(Fill(position, dst, IntermediateCode.Immediate(addressType,size), null));
-							CallAssignMethod(dst, operand.op, parameter.type);
 							ReleaseIntermediateOperand(dst);
+							SaveRegisters();ReleaseUsedRegisters(saved);
+							(* register dst has been freed before SaveRegisters already *)
+							CallAssignMethod(dst, operand.op, parameter.type);
+							RestoreRegisters(saved);
 						END;
 						Emit(Copy(position,sp,operand.op,IntermediateCode.Immediate(addressType,size)));
 					ELSIF IsOpenArray(parameter.type) THEN
