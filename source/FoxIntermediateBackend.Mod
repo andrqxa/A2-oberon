@@ -436,7 +436,7 @@ TYPE
 			pc: LONGINT;
 			stackSize: LONGINT;
 			name,baseObject: Basic.SegmentedName; ir: IntermediateCode.Section;
-			null,size,src,dest,fp: IntermediateCode.Operand;
+			null,size,src,dest,fp,res: IntermediateCode.Operand;
 			cc: LONGINT;
 			actorType: SyntaxTree.CellType;
 			registerNumber: LONGINT;
@@ -655,19 +655,25 @@ TYPE
 						ELSE
 							ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
 						END;
-					ELSIF ~scope.body.isUnchecked & ~backend.noRuntimeChecks THEN
-						implementationVisitor.EmitTrap(x.position,ReturnTrap);
-						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
-						IF backend.cooperative THEN
-							IF HasPointers (scope) THEN  implementationVisitor.ResetVariables(scope); END;
-							ir.Emit(implementationVisitor.Leave(x.position,x,cc));
-							ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
-						END;
 					ELSE
+						IF ~scope.body.isUnchecked & ~backend.noRuntimeChecks THEN
+							implementationVisitor.EmitTrap(x.position,ReturnTrap);
+						END;
 						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
 						IF backend.cooperative THEN
-							ASSERT(scope = currentScope);
-							IF HasPointers (scope) THEN  implementationVisitor.ResetVariables(scope); END;
+							IF HasPointers (scope) THEN 
+								IF ~ReturnedAsParameter(procedureType.returnType) THEN
+									res := implementationVisitor.NewRegisterOperand(IntermediateCode.GetType(system, procedureType.returnType));
+									ir.Emit(Result(x.position, res));
+									ir.Emit(Push(x.position, res)); 
+									implementationVisitor.ResetVariables(scope); 
+									ir.Emit(Pop(x.position, res));
+									ir.Emit(Return(x.position, res));
+								ELSE
+									implementationVisitor.ResetVariables(scope); 
+								END;
+							END;
+							
 							ir.Emit(implementationVisitor.Leave(x.position,x,cc));
 							ir.Emit(Exit(x.position,procedureType.pcOffset,cc));
 						ELSE
