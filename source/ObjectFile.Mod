@@ -271,7 +271,7 @@ VAR
 		dest.name := source.name; dest.fingerprint := source.fingerprint
 	END CopyIdentifier;
 
-	PROCEDURE CopyPattern(CONST source: Pattern; VAR dest: Pattern);
+	PROCEDURE CopyPattern( source: Pattern; VAR dest: Pattern);
 	VAR i: LONGINT;
 	BEGIN
 		NEW(dest);
@@ -294,7 +294,7 @@ VAR
 		END;
 	END CopyPatches;
 
-	PROCEDURE CopyFixup*(CONST source: Fixup; VAR dest: Fixup);
+	PROCEDURE CopyFixup*(source: Fixup; VAR dest: Fixup);
 	VAR i: LONGINT;
 	BEGIN
 		CopyIdentifier(source.identifier, dest.identifier);
@@ -376,7 +376,7 @@ VAR
 			writer.Int (identifier.fingerprint, 0);
 		END WriteIdentifier;
 
-		PROCEDURE WritePattern(CONST pattern: Pattern);
+		PROCEDURE WritePattern(pattern: Pattern);
 		VAR i: LONGINT;
 		BEGIN
 			WriteValueIdentifier (pattern.mode, modes);
@@ -656,7 +656,7 @@ VAR
 			writer.RawNum (identifier.fingerprint);
 		END WriteIdentifier;
 
-		PROCEDURE WritePattern(CONST pattern: Pattern);
+		PROCEDURE WritePattern(pattern: Pattern);
 		VAR i: LONGINT;
 		BEGIN
 			WriteValueIdentifier (pattern.mode, modes);

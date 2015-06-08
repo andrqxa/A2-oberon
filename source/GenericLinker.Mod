@@ -25,7 +25,7 @@ TYPE Arrangement* = OBJECT
 	PROCEDURE Patch* (pos, value: Address; offset, bits, unit: ObjectFile.Bits);
 	END Patch;
 
-	PROCEDURE CheckReloc*(target: Address; CONST pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
+	PROCEDURE CheckReloc*(target: Address; pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
 	BEGIN
 		(* to be able to provide relocation information in an image*)
 	END CheckReloc;
@@ -167,7 +167,7 @@ VAR
 	END Aliases;
 	*)
 
-	PROCEDURE PatchAlias*(CONST block: Block);
+	PROCEDURE PatchAlias*(block: Block);
 	VAR newBlock: Block; alias: ObjectFile.Alias; i: LONGINT; name: ARRAY 256 OF CHAR;
 	BEGIN
 		IF block.aliasOf # NIL THEN INC(block.address, block.aliasOf.address) END;
@@ -249,7 +249,7 @@ VAR
 			BEGIN arrangement.Patch (target, address, pattern.offset, pattern.bits, block.unit); address := ASH (address, -pattern.bits);
 			END PatchPattern;
 
-			PROCEDURE CheckBits(value: LONGINT; CONST pattern: ObjectFile.Pattern; offset: LONGINT);
+			PROCEDURE CheckBits(value: LONGINT; pattern: ObjectFile.Pattern; offset: LONGINT);
 			VAR i, nobits,remainder: LONGINT; minval, maxval: ObjectFile.Unit; name: ObjectFile.SectionName; number: ARRAY 32 OF CHAR;
 			BEGIN
 				nobits := 0;
@@ -273,7 +273,7 @@ VAR
 				END;
 			END CheckBits;
 
-			PROCEDURE ApplyPatch(CONST pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
+			PROCEDURE ApplyPatch(pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
 			VAR i,j: LONGINT;
 			BEGIN
 					target := block.address + patch.offset;

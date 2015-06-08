@@ -150,7 +150,7 @@ TYPE
 	BEGIN SELF.bits.SetBits ((pos - displacement) * unit + offset, bits, value);
 	END Patch;
 
-	PROCEDURE CheckReloc(target: LONGINT; CONST pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
+	PROCEDURE CheckReloc(target: LONGINT; pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
 	VAR i: LONGINT;
 	BEGIN
 		IF (pattern.mode = ObjectFile.Absolute) & (relocInfo # NIL) THEN
