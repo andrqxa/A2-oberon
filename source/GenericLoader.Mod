@@ -358,7 +358,7 @@ TYPE
 		msg: ARRAY 128 OF CHAR; module: Modules.Module; adr: LONGINT; m: HashTableInt;
 		s: ObjectFile.SectionName; isModule: BOOLEAN; identifier: ObjectFile.Identifier;
 
-			PROCEDURE CheckName(CONST n: ObjectFile.SegmentedName; name: POINTER {UNSAFE} TO ARRAY OF CHAR): BOOLEAN;
+			PROCEDURE CheckName(CONST n: ObjectFile.SegmentedName;  name {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR): BOOLEAN;
 			VAR s,t: ObjectFile.SectionName; i: LONGINT;
 			BEGIN
 				IF name = NIL THEN RETURN FALSE END;

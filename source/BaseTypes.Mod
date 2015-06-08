@@ -93,8 +93,8 @@ END;
 (** Represents the basic object type. *)
 TYPE Object* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
 
-	VAR action-: POINTER {UNSAFE} TO Action;
-	VAR monitor-: POINTER {UNSAFE} TO Monitor;
+	VAR action- {UNTRACED}: POINTER {UNSAFE} TO Action;
+	VAR monitor- {UNTRACED}: POINTER {UNSAFE} TO Monitor;
 
 	(** This finalizer disposes the meta data of an object. *)
 	(** It is guaranteed to be called during the disposal of any object instance. *)

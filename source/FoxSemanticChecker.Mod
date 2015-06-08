@@ -2212,7 +2212,7 @@ TYPE
 					int := Global.ConvertSigned(int,system.SizeOf(type));
 					result := SyntaxTree.NewIntegerValue(position,int);
 					result.SetType(type);
-				ELSIF (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.PointerType) & type(SyntaxTree.PointerType).isUnsafe THEN
+				ELSIF (type IS SyntaxTree.AddressType) OR IsUnsafePointer(type) THEN
 					int := Global.ConvertUnsigned(int,system.SizeOf(type));
 					result := SyntaxTree.NewIntegerValue(position,int);
 					result.SetType(type);
@@ -4496,7 +4496,7 @@ TYPE
 		BEGIN
 			result := FALSE; type := x.type.resolved;
 			IF x = SyntaxTree.invalidExpression THEN
-			ELSIF  ~(type IS SyntaxTree.AddressType) & ~(type IS SyntaxTree.NilType) & ~(type IS SyntaxTree.SizeType) & ~( (type IS SyntaxTree.IntegerType) & (type.sizeInBits <= system.addressType.sizeInBits)) & ~IsAddressValue(x) & (~(type IS SyntaxTree.PointerType) OR ~type(SyntaxTree.PointerType).isUnsafe) THEN
+			ELSIF  ~(type IS SyntaxTree.AddressType) & ~(type IS SyntaxTree.NilType) & ~(type IS SyntaxTree.SizeType) & ~( (type IS SyntaxTree.IntegerType) & (type.sizeInBits <= system.addressType.sizeInBits)) & ~IsAddressValue(x) & ~IsUnsafePointer(type) THEN
 				TRACE(type.sizeInBits);
 				TRACE(system.addressType.sizeInBits);
 				Error(x.position,Diagnostics.Invalid,"is no address type");
@@ -6335,6 +6335,9 @@ TYPE
 						Error(position,Diagnostics.Invalid,"untraced flag on non-pointer variable");
 					END;
 				END;
+				IF ~variable.untraced & IsUnsafePointer(variable.type) THEN
+					Error(variable.position,Diagnostics.Invalid,"unsafe pointer variable must be untraced");
+				END;
 				IF HasValue(modifiers, Global.NameAligned,position, value) THEN
 					IF (variable.scope IS SyntaxTree.ProcedureScope) THEN
 						IF ~PowerOf2(value) THEN
@@ -6395,8 +6398,11 @@ TYPE
 						Error(position,Diagnostics.Invalid,"untraced flag on non-pointer variable");
 					END;
 				END;
+				IF ~parameter.untraced & IsUnsafePointer(parameter.type) THEN
+					Error(parameter.position,Diagnostics.Invalid,"unsafe pointer parameter must be untraced");
+				END;
 				CheckModifiers(modifiers, ~InCellNetScope(parameter.scope) OR ~(parameter.type.resolved IS SyntaxTree.CellType));
-			parameter.SetState(SyntaxTree.Resolved);
+				parameter.SetState(SyntaxTree.Resolved);
 			END;
 		END VisitParameter;
 
@@ -8948,6 +8954,18 @@ TYPE
 		END;
 		RETURN result
 	END IsPointerType;
+
+	PROCEDURE IsUnsafePointer*(type: SyntaxTree.Type): BOOLEAN;
+	VAR result: BOOLEAN;
+	BEGIN
+		IF type = NIL THEN result := FALSE
+		ELSE
+		type := type.resolved;
+		result :=  (type IS SyntaxTree.PointerType) & type(SyntaxTree.PointerType).isUnsafe;
+		END;
+		RETURN result
+	END IsUnsafePointer;
+	
 
 	PROCEDURE IsDisposable*(type: SyntaxTree.Type): BOOLEAN;
 	BEGIN

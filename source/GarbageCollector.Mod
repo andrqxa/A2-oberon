@@ -49,7 +49,7 @@ END Assign;
 
 (** Performs the assignment of a procedure delegate. *)
 (** This procedure is called by the compiler when assigning variables of procedure delegate type. *)
-PROCEDURE AssignDelegate-(target, source {UNTRACED}:  POINTER {UNSAFE} TO Delegate);
+PROCEDURE AssignDelegate-(target {UNTRACED}, source {UNTRACED}:  POINTER {UNSAFE} TO Delegate);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Assign(target.pointer, source.pointer);
 	target.proc := source.proc;
