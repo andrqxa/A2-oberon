@@ -43,9 +43,9 @@ END Array;
 TYPE PointerArray* = OBJECT {DISPOSABLE,PLAIN} (Array)
 
 	PROCEDURE Trace-;
-	PROCEDURE MarkPointerArray EXTERN "GarbageCollector.MarkPointerArray" (address: ADDRESS; length: SIZE);
+	PROCEDURE MarkPointerArray EXTERN "GarbageCollector.MarkPointerArray" (length: SIZE; address: ADDRESS);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
-		MarkPointerArray (data, length);
+		MarkPointerArray (length, data);
 	END Trace;
 
 END PointerArray;
