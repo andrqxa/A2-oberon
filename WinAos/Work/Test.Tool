@@ -1,8 +1,8 @@
 # if you changed the sources, do not forget to compile below
-FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
 FSTools.Unmount SRC ~
 
 SystemTools.DoCommands
+FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
 
 SystemTools.Timer start ~
 
@@ -54,9 +54,100 @@ VirtualDisks.Uninstall VDISK0 ~
 
 FSTools.CloseFiles hd.img ~
 
+
+
+~~~~ ----------------------------------- U S B --------------------------------
+
+SystemTools.DoCommands
+FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
+
+SystemTools.Timer start ~
+
+PCAAMD64.Assemble OBLUnreal.Asm ~
+PartitionsLib.SetBootLoaderFile OBLUnreal.Bin ~
+
+FSTools.DeleteFiles hd.img ~
+
+VirtualDisks.Create hd.img 160000 512 ~
+VirtualDisks.Install -b=512 VDISK0 hd.img ~
+
+StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" 
+Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks 
+HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel 
+KernelLog Streams Reflection TrapWriters Traps Plugins Disks PCI Caches Commands Files 
+UsbDebug  Usbdi UsbHcdi UsbUhci UsbEhci UsbUtilities UsbDriverLoader Usb UsbHubDriver UsbStorageBase UsbStorageBot UsbStorageBoot
+DiskVolumes Clock DiskFS Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
+
+Partitions.WriteMBR VDISK0#0 OBEMBR.BIN ~
+Partitions.Create VDISK0#1 76 80 ~
+Partitions.Activate VDISK0#1 ~
+
+Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
+
+FSTools.Mount TEMP AosFS VDISK0#1 ~
+FSTools.Unsafe ~
+FSTools.CopyFiles -q
+	*.Gof => TEMP:*.Gof ~
+FSTools.CopyFiles -o -q 
+	SRC:*.XML => TEMP:*.XML 
+	SRC:*.xml => TEMP:*.xml 
+	SRC:Auto.dsk => TEMP:Auto.dsk 
+	SRC:*.rep => TEMP:*.rep ~
+FSTools.CopyFiles  -o -q
+	SRC:*.zip => TEMP:*.zip 
+	SRC:*.Fnt => TEMP:*.Fnt ~
+FSTools.Watch TEMP ~
+FSTools.Unmount TEMP ~
+
+Partitions.SetConfig VDISK0#1
+	TraceMode="5" TracePort="1" TraceBPS="115200"
+	BootVol1="AOS AosFS USB0#1"
+	Boot="DisplayLinear.Install"
+	AosFS="DiskVolumes.New DiskFS.NewFS"
+	ExtMemSize="200"
+	Init=""
+	Boot1="Keyboard.Install;MousePS2.Install"
+	Boot2="DriverDatabase.Enable"
+	Boot3="WindowManager.Install"
+	Boot5="WMKernelLog.Open;SystemTools.Show Release W"
+	Boot="DisplayLinear.Install"
+	TraceModules = "1"
+	~
+VirtualDisks.Uninstall VDISK0 ~
+
+FSTools.CloseFiles hd.img ~
+
+
 SystemTools.Show HDD image build time:  ~ SystemTools.Timer elapsed ~
 
+
+~~
+
+
+WinDisks.Install "PhysicalDrive2" RW ~
+
 ~
+*** CAUTION: check that drive is not a local drive !!!! ***
+SystemTools.DoCommands
+Partitions.FileToPartition PhysicalDrive2#0 hd.img 0 160000  ~
+WinDisks.Uninstall "PhysicalDrive2" ~
+~
+
+
+(* compile the kernel *)
+Compiler.Compile --cooperative --objectFile=Generic --newObjectFile -b=AMD --objectFileExtension=.Gof --symbolFileExtension=.Sym --destPath=./ --traceModule=Trace
+I386.CPU.Mod Trace.Mod Counters.Mod I386.APIC.Mod APIC.Processors.Mod Queues.Mod 
+BaseTypes.Mod Activities.Mod ExclusiveBlocks.Mod Interrupts.Mod Coop.Runtime.Mod HeapManager.Mod 
+BIOS.Environment.Mod Mutexes.Mod Coop.Machine.Mod Coop.Heaps.Mod Coop.Modules.Mod GarbageCollector.Mod 
+Coop.Objects.Mod Coop.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod 
+I386.Reals.Mod Coop.Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod Coop.Traps.Mod 
+Locks.Mod I386.PCI.Mod Clock.Mod Coop.MemCache.Mod Disks.Mod Files.Mod Dates.Mod Strings.Mod 
+UTF8Strings.Mod FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod OldDiskVolumes.Mod RAMVolumes.Mod 
+DiskFS.Mod OldDiskFS.Mod OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod 
+ISO9660Files.Mod RelativeFileSystem.Mod Loader.Mod BitSets.Mod Diagnostics.Mod StringPool.Mod 
+ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod BootConsole.Mod I386.ATADisks.Mod 
+~
+
 Release.Build  --path="./" A2Cooperative ~
 
 SystemTools.FreeDownTo FoxIntermediateBackend  FoxAMDBackend ~
@@ -71,7 +162,9 @@ Locks.Mod I386.PCI.Mod Clock.Mod Coop.MemCache.Mod Disks.Mod Files.Mod Dates.Mod
 UTF8Strings.Mod FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod OldDiskVolumes.Mod RAMVolumes.Mod 
 DiskFS.Mod OldDiskFS.Mod OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod 
 ISO9660Files.Mod RelativeFileSystem.Mod Loader.Mod BitSets.Mod Diagnostics.Mod StringPool.Mod 
-ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod BootConsole.Mod Displays.Mod Inputs.Mod 
+ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod BootConsole.Mod 
+
+Displays.Mod Inputs.Mod 
 Options.Mod Events.Mod EventsUtils.Mod EventsKernelLog.Mod EventsFileLog.Mod EventsMemoryLog.Mod 
 DynamicStrings.Mod XMLObjects.Mod XML.Mod XMLScanner.Mod XMLParser.Mod Configuration.Mod 
 FileHandlers.Mod BootShell.Mod I386.Network.Mod NetworkMii.Mod ActiveTimers.Mod I386.IP.Mod 
@@ -145,7 +238,7 @@ WMInputMethodTool.Mod WMUtilities.Mod WMTrapWriter.Mod FoxA2Interface.Mod WMMenu
 WMDiagramComponents.Mod MainMenu.Mod StartMenu.Mod HotKeys.Mod WMNavigate.Mod WMNavigator.Mod WMDesktops.Mod 
 WMSystemComponents.Mod WMFileManager.Mod WMSearchTool.Mod WMFTPClient.Mod WMUsbInfo.Mod SkinLanguage.Mod 
 FNHistories.Mod SkinEngine.Mod Notepad.Mod WMProcessInfo.Mod WMObjectTracker.Mod WMTCPTracker.Mod 
-WMKernelLog.Mod ~
+WMKernelLog.Mod 
 
 WMEventLog.Mod WMPartitionsComponents.Mod WMPartitions.Mod 
 PartitionEditorComponents.Mod PartitionEditor.Mod MultiLogger.Mod MemoryReader.Mod Decoder.Mod I386Decoder.Mod 
