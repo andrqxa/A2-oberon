@@ -2277,9 +2277,16 @@ TYPE
 		END CreateAssignMethod;
 		
 		PROCEDURE CallTraceMethod(CONST register: IntermediateCode.Operand; type: SyntaxTree.Type);
-		VAR name: Basic.SegmentedName; op: IntermediateCode.Operand; size: LONGINT; base: SyntaxTree.Type;
+		VAR name: Basic.SegmentedName; op: IntermediateCode.Operand; size: LONGINT; base: SyntaxTree.Type; skip: Label;
 		BEGIN
-			IF SemanticChecker.IsPointerType (type) THEN
+			IF IsUnsafePointer (type) THEN
+				skip := NewLabel();
+				IntermediateCode.InitRegister(op, addressType, IntermediateCode.GeneralPurposeRegister, register.register);
+				Emit (Mov (position, op, IntermediateCode.Memory (addressType,register,0)));
+				BreqL (skip, op, nil);
+				CallTraceMethod (op,type.resolved(SyntaxTree.PointerType).pointerBase);
+				SetLabel (skip);
+			ELSIF SemanticChecker.IsPointerType (type) THEN
 				Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
 				CallThis("GarbageCollector","Mark", 1);
 			ELSIF type.IsRecordType() THEN

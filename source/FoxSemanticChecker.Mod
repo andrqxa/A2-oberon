@@ -6335,9 +6335,6 @@ TYPE
 						Error(position,Diagnostics.Invalid,"untraced flag on non-pointer variable");
 					END;
 				END;
-				IF ~variable.untraced & IsUnsafePointer(variable.type) THEN
-					Error(variable.position,Diagnostics.Invalid,"unsafe pointer variable must be untraced");
-				END;
 				IF HasValue(modifiers, Global.NameAligned,position, value) THEN
 					IF (variable.scope IS SyntaxTree.ProcedureScope) THEN
 						IF ~PowerOf2(value) THEN
@@ -6397,9 +6394,6 @@ TYPE
 						IF VerboseErrorMessage THEN Printout.Info("parameter",parameter); Printout.Info("parameter.type",parameter.type.resolved); END;
 						Error(position,Diagnostics.Invalid,"untraced flag on non-pointer variable");
 					END;
-				END;
-				IF ~parameter.untraced & IsUnsafePointer(parameter.type) THEN
-					Error(parameter.position,Diagnostics.Invalid,"unsafe pointer parameter must be untraced");
 				END;
 				CheckModifiers(modifiers, ~InCellNetScope(parameter.scope) OR ~(parameter.type.resolved IS SyntaxTree.CellType));
 				parameter.SetState(SyntaxTree.Resolved);
