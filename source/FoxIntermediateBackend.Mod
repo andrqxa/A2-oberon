@@ -2789,6 +2789,39 @@ TYPE
 			END;
 		END GetDynamicSize;
 		
+		PROCEDURE GetArrayLength(type: SyntaxTree.Type; tag: IntermediateCode.Operand):IntermediateCode.Operand;
+		VAR size: LONGINT;
+
+			PROCEDURE GetLength(type: SyntaxTree.ArrayType; offset: LONGINT):IntermediateCode.Operand;
+			VAR baseType: SyntaxTree.Type; size: LONGINT; sizeOperand,len,res: IntermediateCode.Operand;
+			BEGIN
+				ASSERT(type.form = SyntaxTree.Open);
+				baseType := type.arrayBase.resolved;
+				IF IsOpenArray(baseType) THEN
+					sizeOperand := GetLength(baseType(SyntaxTree.ArrayType),offset+system.addressSize);
+				ELSE
+					sizeOperand :=  IntermediateCode.Immediate(addressType,StaticArrayNumElements(baseType));
+				END;
+				len := tag;
+				IntermediateCode.AddOffset(len,ToMemoryUnits(system,offset));
+				IntermediateCode.MakeMemory(len,addressType);
+				UseIntermediateOperand(len);
+				Reuse2(res,sizeOperand,len);
+				Emit(Mul(position,res,sizeOperand,len));
+				ReleaseIntermediateOperand(sizeOperand); ReleaseIntermediateOperand(len);
+				RETURN res
+			END GetLength;
+
+		BEGIN
+			type := type.resolved;
+			IF IsOpenArray(type)  THEN
+				ASSERT(tag.mode # IntermediateCode.ModeImmediate);
+				RETURN  GetLength(type.resolved(SyntaxTree.ArrayType),0)
+			ELSE
+				RETURN IntermediateCode.Immediate(addressType,1)
+			END;
+		END GetArrayLength;
+		
 		PROCEDURE GetSizeFromTag(tag: IntermediateCode.Operand): IntermediateCode.Operand;
 		VAR result: IntermediateCode.Operand;
 		BEGIN
@@ -9448,9 +9481,12 @@ TYPE
 		END VisitCode;
 
 		PROCEDURE ParameterCopies(x: SyntaxTree.ProcedureType);
-		VAR parameter: SyntaxTree.Parameter; type: SyntaxTree.Type; op: Operand; temp,size,par: IntermediateCode.Operand;
-			const: IntermediateCode.Operand;
+		VAR parameter: SyntaxTree.Parameter; type, base: SyntaxTree.Type; 
+			op: Operand; temp,size,par,dst, length,null: IntermediateCode.Operand;
+			const, call: IntermediateCode.Operand;
 			parameterDesignator: SyntaxTree.Expression;
+			saved: RegisterEntry;
+			name: Basic.SegmentedName;
 		BEGIN
 			IF Trace THEN TraceEnter("ParameterCopies") END;
 			parameter := x.firstParameter;
@@ -9460,17 +9496,67 @@ TYPE
 					IF IsOpenArray(type) THEN
 						VisitParameter(parameter);
 						op := result;
-						temp := GetDynamicSize(type,op.tag);
-						ReuseCopy(size,temp);
-						ReleaseIntermediateOperand(temp);
-						const := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,-system.addressSize)); (* alignment *)
-						Emit(Sub(position,size,sp,size));
-						Emit(And(position,size,size,const));
-						Emit(Mov(position,sp,size));
-						par := fp;
-						IntermediateCode.AddOffset(par,ToMemoryUnits(system,parameter.offsetInBits));
-						ReleaseIntermediateOperand(size);
-						size := GetDynamicSize(type,op.tag);
+						IF backend.cooperative & parameter.NeedsTrace() THEN
+							length := GetArrayLength(type, op.tag);
+							size := NewRegisterOperand(addressType);
+							base := ArrayBaseType(type);
+							const := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.SizeOf(base)));							
+							Emit(Mul(position, size, length, const)); 
+							
+							dst := NewRegisterOperand (addressType);
+							Emit(Mov(position, dst, size));
+							const := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,-system.addressSize)); (* alignment *)
+							Emit(Sub(position,dst,sp,dst));
+							Emit(And(position,dst,dst,const));
+							Emit(Mov(position,sp,dst));
+							par := fp;
+							IntermediateCode.AddOffset(par,ToMemoryUnits(system,parameter.offsetInBits));
+							IntermediateCode.InitImmediate(null, byteType, 0);
+							Emit(Fill(position, dst, size, null));
+							ReleaseIntermediateOperand(dst);
+							ReleaseIntermediateOperand(length);
+							SaveRegisters();ReleaseUsedRegisters(saved);
+							(* register dst has been freed before SaveRegisters already *)
+							base := ArrayBaseType(type);
+							(* assign method of open array *)
+							IF base.IsRecordType() THEN
+								Emit (Push(position, length));					
+								Emit (Push(position, dst));
+								Emit (Push(position, op.op));
+								GetRecordTypeName (base.resolved(SyntaxTree.RecordType),name);
+								Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
+								Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
+								IntermediateCode.InitAddress(call, addressType, name , 0, 0);
+								Emit(Call(position,call,ToMemoryUnits(system, 3*system.addressSize)));
+							ELSIF base.resolved IS SyntaxTree.ProcedureType THEN (* array of delegates *)
+								Emit (Push(position,length));
+								Emit (Push(position, dst));
+								Emit (Push(position, length));
+								Emit (Push(position, op.op));
+								CallThis("GarbageCollector","AssignDelegateArray", 4);
+							ELSE 
+								Emit (Push(position, length));
+								Emit (Push(position, dst));
+								Emit (Push(position, length));
+								Emit (Push(position, op.op));
+								CallThis("GarbageCollector","AssignPointerArray", 4);
+								ASSERT(ArrayBaseType(type).IsPointer());
+							END;
+							RestoreRegisters(saved);
+						ELSE
+							temp := GetDynamicSize(type,op.tag);
+							ReuseCopy(size,temp);
+							ReleaseIntermediateOperand(temp);
+							const := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,-system.addressSize)); (* alignment *)
+							Emit(Sub(position,size,sp,size));
+							Emit(And(position,size,size,const));
+							Emit(Mov(position,sp,size));
+							par := fp;
+							IntermediateCode.AddOffset(par,ToMemoryUnits(system,parameter.offsetInBits));
+							ReleaseIntermediateOperand(size);
+							size := GetDynamicSize(type,op.tag);
+						END;
+												
 						Emit(Copy(position,sp,op.op,size));
 						ReleaseIntermediateOperand(size);
 						ReleaseOperand(op);
@@ -11688,8 +11774,15 @@ TYPE
 		END;
 		RETURN type;
 	END StaticArrayBaseType;
-	
 
+	PROCEDURE ArrayBaseType(type: SyntaxTree.Type): SyntaxTree.Type;
+	BEGIN
+		WHILE (type.resolved IS SyntaxTree.ArrayType) DO
+			type := type.resolved(SyntaxTree.ArrayType).arrayBase;
+		END;
+		RETURN type;
+	END ArrayBaseType;
+	
 	PROCEDURE IsDelegate(type: SyntaxTree.Type): BOOLEAN;
 	BEGIN
 		IF type = NIL THEN RETURN FALSE END;
@@ -11712,8 +11805,6 @@ TYPE
 		END;
 		RETURN i
 	END DynamicDim;
-	
-
 
 	PROCEDURE StaticSize(system: Global.System; type: SyntaxTree.Type): LONGINT;
 	BEGIN
