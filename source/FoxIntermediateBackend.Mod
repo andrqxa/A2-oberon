@@ -2456,7 +2456,7 @@ TYPE
 					IF recordType.isObject & ((recordType.pointerType = NIL) OR ~recordType.pointerType.isPlain) THEN
 						IntermediateCode.AddOffset(dst,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 					END;
-					CallResetProcedure(dst, variable.type);
+					CallResetProcedure(dst, nil, variable.type);
 					ReleaseIntermediateOperand(dst);
 				END;
 				variable := variable.nextVariable;
@@ -2562,8 +2562,8 @@ TYPE
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateMoveMethod;
 
-		PROCEDURE CallResetProcedure(dest: IntermediateCode.Operand; type: SyntaxTree.Type);
-		VAR base: SyntaxTree.Type; size: SIZE; op: IntermediateCode.Operand; name: Basic.SegmentedName;
+		PROCEDURE CallResetProcedure(dest, tag: IntermediateCode.Operand; type: SyntaxTree.Type);
+		VAR base: SyntaxTree.Type; op, size: IntermediateCode.Operand; name: Basic.SegmentedName;
 		BEGIN
 			IF SemanticChecker.IsPointerType (type) THEN
 				Emit (Push(position, dest));
@@ -2574,13 +2574,11 @@ TYPE
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 				Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
-
-
-			ELSIF IsStaticArray(type) THEN
-				size := StaticArrayNumElements(type);
-				base := StaticArrayBaseType(type);
+			ELSIF type.resolved IS SyntaxTree.ArrayType THEN
+				size := GetArrayLength(type, tag);
+				base := ArrayBaseType(type);
 				IF base.IsRecordType() THEN
-					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));					
+					Emit (Push(position, size));					
 					Emit (Push(position, dest));
 					GetRecordTypeName (base.resolved(SyntaxTree.RecordType),name);
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
@@ -2588,15 +2586,16 @@ TYPE
 					IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 					Emit(Call(position,op,ToMemoryUnits(system, 2*system.addressSize)));
 				ELSIF base.resolved IS SyntaxTree.ProcedureType THEN (* array of delegates *)
-					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, size));
 					Emit (Push(position, dest));
 					CallThis("GarbageCollector","ResetDelegateArray", 2);
 				ELSE 
-					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
+					Emit (Push(position, size));
 					Emit (Push(position, dest));
 					CallThis("GarbageCollector","ResetArray", 2);
-					ASSERT(StaticArrayBaseType(type).IsPointer());
+					ASSERT(ArrayBaseType(type).IsPointer());
 				END;
+				ReleaseIntermediateOperand(size);
 			ELSIF type.resolved IS SyntaxTree.ProcedureType THEN
 				ASSERT(type.resolved(SyntaxTree.ProcedureType).isDelegate);
 				Emit (Push(position, dest));
@@ -2613,7 +2612,7 @@ TYPE
 			VAR operand: Operand; 
 			BEGIN
 				Symbol (symbol, operand);
-				CallResetProcedure(operand.op, symbol.type.resolved);
+				CallResetProcedure(operand.op, operand.tag, symbol.type.resolved);
 				ReleaseOperand(operand);
 			END Reset;
 
@@ -11640,7 +11639,7 @@ TYPE
 	END HasPointers;
 	
 	PROCEDURE IsVariableParameter (parameter: SyntaxTree.Parameter): BOOLEAN;
-	BEGIN RETURN (parameter.kind = SyntaxTree.VarParameter) OR (parameter.kind = SyntaxTree.ConstParameter) & ((parameter.type.resolved IS SyntaxTree.RecordType) OR (parameter.type.resolved IS SyntaxTree.ArrayType)) OR IsOpenArray (parameter.type);
+	BEGIN RETURN (parameter.kind = SyntaxTree.VarParameter) OR (parameter.kind = SyntaxTree.ConstParameter) & ((parameter.type.resolved IS SyntaxTree.RecordType) OR (parameter.type.resolved IS SyntaxTree.ArrayType));
 	END IsVariableParameter;
 	
 	PROCEDURE HasVariableParameters(scope: SyntaxTree.ProcedureScope): BOOLEAN;
