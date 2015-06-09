@@ -7092,6 +7092,7 @@ TYPE
 						Designate(p0,l);
 						IF needsTrace THEN
 							CallAssignPointer(l.op, pointer);
+							ModifyAssignments(false);
 						ELSE
 							ToMemory(l.op,addressType,0);
 							Emit(Mov(position,l.op,pointer));
@@ -8474,9 +8475,18 @@ TYPE
 			END;
 		END AssignMathArray;
 		
+		VAR modifyAssignmentCounter := 0: LONGINT; 
+		
 		PROCEDURE ModifyAssignments(CONST value: IntermediateCode.Operand);
 		VAR processor,mem,dst,val: IntermediateCode.Operand;
 		BEGIN
+			IF value.intValue = true.intValue THEN
+				INC(modifyAssignmentCounter);
+				IF (modifyAssignmentCounter > 1) THEN RETURN END;
+			ELSE
+				DEC(modifyAssignmentCounter);
+				IF (modifyAssignmentCounter > 0) THEN RETURN END;
+			END;
 			IntermediateCode.InitMemory (processor,  IntermediateCode.SignedIntegerType(addressType.sizeInBits), ap, ToMemoryUnits(system, ProcessorOffset * addressType.sizeInBits));
 			dst := NewRegisterOperand (addressType);
 			Emit(Mov(position,dst, processor));
@@ -9295,6 +9305,7 @@ TYPE
 			IF Trace THEN TraceEnter("Lock") END;
 			IF profile THEN ProfilerEnterExit(numberProcedures, FALSE) END;
 			CheckRegistersFree(); (* no register may be in use as operands should not be preserved over the lock / unlock boundary *)
+			ASSERT(modifyAssignmentCounter = 0);
 			IF dump # NIL THEN
 				IF lock THEN dump.String("lock") ELSE dump.String("unlock") END;
 				dump.Ln;dump.Update;
@@ -9598,6 +9609,7 @@ TYPE
 				SELF.position := x.position;
 			END;
 			CheckRegistersFree();
+			ASSERT(modifyAssignmentCounter = 0);
 			currentScope := prevScope;
 			IF Trace THEN TraceExit("Body") END;
 		END Body;
