@@ -2133,7 +2133,7 @@ TYPE
 				variable := variable.nextVariable;
 			END;
 
-			Basic.ToSegmentedName ("BaseTypes.Object.@Trace",pooledName);
+			Basic.ToSegmentedName ("Modules.Module.@Trace",pooledName);
 			IntermediateCode.InitAddress(op, addressType, pooledName , 0, 0);
 			Emit(Br(position,op));
 
