@@ -5,7 +5,7 @@
 (** It implements a concurrent and interruptible mark and sweep garbage collection. *)
 MODULE GarbageCollector;
 
-IMPORT Activities, BaseTypes, Counters, CPU, Modules;
+IMPORT Activities, BaseTypes, Counters, CPU;
 
 VAR tracings: Counters.AlignedCounter;
 VAR currentCycle, oldestCycle: LONGWORD;
@@ -141,6 +141,7 @@ END Increment;
 (** Performs a complete garbage collection cycle by marking the object graph and disposing all unreachable objects. *)
 (** Garbage can be collected concurrently if necessary. *)
 PROCEDURE Collect*;
+VAR root EXTERN "Modules.root": BaseTypes.Pointer;
 VAR cycle: LONGWORD; first {UNTRACED}: BaseTypes.Pointer;
 BEGIN {UNCHECKED}
 	(* ensure list of marked pointers is empty *)
@@ -156,7 +157,7 @@ BEGIN {UNCHECKED}
 	first := AcquireList (firstWatched, watchedSentinel);
 
 	(* mark global referenced pointers *)
-	(*Mark (Modules.first); TraceMarkedPointers;*)
+	Mark (root); TraceMarkedPointers;
 
 	(* mark pointers changed by assignments *)
 	WHILE Activities.AssignmentsInProgress () DO TraceMarkedPointers END;
