@@ -10976,7 +10976,7 @@ TYPE
 					END;
 				END MethodTable;
 
-				PROCEDURE CooperativeMethodTable;
+				PROCEDURE CooperativeMethodTable(pointer: BOOLEAN);
 				VAR baseRecord: SyntaxTree.RecordType; name, stackFrame: Basic.SegmentedName; i,start,methods: LONGINT;
 				BEGIN
 					Info(source, "method table");
@@ -10995,14 +10995,16 @@ TYPE
 						END;
 						IF baseRecord # NIL THEN
 							GetRecordTypeName (baseRecord, name);
-							IF ~baseRecord.isObject THEN
+							IF pointer & ~baseRecord.isObject THEN
 								Basic.SuffixSegmentedName (name, Basic.MakeString ("@Pointer"));
 							END;
 							Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
 						ELSIF recordType.isObject THEN
 							Basic.ToSegmentedName ("BaseTypes.Object.@Trace",name);
-						ELSE
+						ELSIF pointer THEN
 							Basic.ToSegmentedName ("BaseTypes.Pointer.Trace",name);
+						ELSE
+							Basic.ToSegmentedName ("BaseTypes.Record.@Trace",name);
 						END;
 						tir := IntermediateCode.NewSection(module.importedSections, Sections.ConstSection, name,NIL,implementationVisitor.dump # NIL);
 						Symbol(source, tir,  0, 0);
@@ -11077,6 +11079,7 @@ TYPE
 							Info(source, "record size");
 							Address(source, ToMemoryUnits(module.system,module.system.SizeOf(recordType)));
 							source.SetReferenced(FALSE);
+							CooperativeMethodTable(FALSE);
 	
 							base := source;
 							Global.GetSymbolSegmentedName(td,name);
@@ -11115,7 +11118,7 @@ TYPE
 
 						Info(source, "base record descriptor");
 						Symbol(source, base, 0, 0);
-						CooperativeMethodTable;
+						CooperativeMethodTable(TRUE);
 						source.SetReferenced(FALSE);
 						
 						IF recordType.hasPointers THEN
