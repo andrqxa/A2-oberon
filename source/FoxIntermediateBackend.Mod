@@ -2293,7 +2293,7 @@ TYPE
 				base := StaticArrayBaseType(type);
 				IF base.IsRecordType() THEN
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+					Emit (Push(position, register));
 					GetRecordTypeName (base.resolved(SyntaxTree.RecordType), name);
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
@@ -2301,11 +2301,11 @@ TYPE
 					Emit(Call(position, op, ToMemoryUnits(system, system.addressSize*2)));
 				ELSIF base.resolved IS SyntaxTree.ProcedureType THEN (* array of delegates *)
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+					Emit (Push(position, register));
 					CallThis("GarbageCollector","MarkDelegateArray", 2);
 				ELSE 
 					Emit (Push(position, IntermediateCode.Immediate (sizeType,size)));
-					Emit (Push(position, IntermediateCode.Memory (addressType,register,0)));
+					Emit (Push(position, register));
 					CallThis("GarbageCollector","MarkPointerArray", 2);
 					ASSERT(base.IsPointer());
 				END;
