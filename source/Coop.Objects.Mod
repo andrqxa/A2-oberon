@@ -139,18 +139,27 @@ TYPE
 			END;
 			IF current # NIL THEN
 				IF previous = NIL THEN
-					root := NIL;
+					root := current.next;
 				ELSE
 					previous.next := current.next;
 				END;
 			END;
 		END Remove;
 		
+		PROCEDURE Count(): SIZE;
+		VAR count := 0: SIZE; item: InterruptList;
+		BEGIN {EXCLUSIVE}
+			item := root;
+			WHILE item # NIL DO INC (count); item := item.next END;
+			RETURN count;
+		END Count;
+		
 		PROCEDURE Cancel;
 		BEGIN {EXCLUSIVE}
 			IF ~cancelled THEN
 				cancelled := TRUE;
 				Interrupts.Cancel (interrupt);
+				WAIT (SELF);
 			END;
 		END Cancel;
 
@@ -315,18 +324,26 @@ PROCEDURE InstallHandler*(h: EventHandler; int: LONGINT);
 VAR ih: Interrupter;
 BEGIN {EXCLUSIVE}
 	ASSERT((int >= MinIRQ) & (int-MinIRQ < NumIRQ));
-	IF interrupt[int-MinIRQ] = NIL THEN
-		NEW (interrupt[int-MinIRQ], int);
+	ih := interrupt[int-MinIRQ];
+	IF ih = NIL THEN
+		NEW (ih, int);
+		interrupt[int-MinIRQ] := ih;
 	END;
-	interrupt[int-MinIRQ].Add(h);
+	ih.Add(h);
 END InstallHandler;
 
 (** Remove interrupt handler. *)
 PROCEDURE RemoveHandler*(h: EventHandler; int: LONGINT);
+VAR ih: Interrupter;
 BEGIN {EXCLUSIVE}
 	ASSERT((int >= MinIRQ) & (int-MinIRQ < NumIRQ));
-	IF interrupt[int-MinIRQ] # NIL THEN
-		interrupt[int-MinIRQ].Remove (h);
+	ih := interrupt[int-MinIRQ];
+	IF ih # NIL THEN
+		ih.Remove(h);
+		IF ih.Count () = 0 THEN
+			ih.Cancel;
+			interrupt[int-MinIRQ] := NIL;
+		END;
 	END;
 END RemoveHandler;
 
