@@ -74,8 +74,9 @@ END DelegateArray;
 (** Represents a record type. *)
 TYPE Record* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
 
-	VAR action-: POINTER {UNSAFE} TO Action;
-	VAR monitor-: POINTER {UNSAFE} TO Monitor;
+	(* required fields for layout-compatibility with objects extending pointer to records *)
+	VAR action: ADDRESS;
+	VAR monitor: ADDRESS;
 
 END Record;
 
@@ -95,12 +96,15 @@ TYPE Monitor* = RECORD
 END;
 
 (** Represents the basic object type. *)
-TYPE Object* = OBJECT {DISPOSABLE,PLAIN} (Record)
+TYPE Object* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
+
+	VAR action-: POINTER {UNSAFE} TO Action;
+	VAR monitor-: POINTER {UNSAFE} TO Monitor;
 
 	(** This finalizer disposes the meta data of an object. *)
 	(** It is guaranteed to be called during the disposal of any object instance. *)
 	PROCEDURE ~Finalize-;
-	VAR BaseDescriptor {UNTRACED} EXTERN "BaseTypes.Record": Descriptor;
+	VAR BaseDescriptor {UNTRACED} EXTERN "BaseTypes.Pointer": Descriptor;
 	PROCEDURE Unlink EXTERN "Activities.Process.Unlink" (activity {UNTRACED}: OBJECT);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF action # NIL THEN
