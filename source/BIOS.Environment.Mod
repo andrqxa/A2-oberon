@@ -7,7 +7,7 @@ IMPORT SYSTEM, CPU, Activities, HeapManager, Interrupts, Processors, Trace;
 
 CONST IsNative* = TRUE;
 
-CONST Running = 0; ShuttingDown = 1; Rebooting = 2;
+CONST Running* = 0; ShuttingDown* = 1; Rebooting* = 2;
 
 CONST HeapAdr = 100000H;
 CONST MaxMemTop = 80000000H;
@@ -21,7 +21,7 @@ VAR memory: SIZE;
 VAR traceMode: SET;
 VAR bootFlag: ADDRESS;
 VAR clock: LONGINT;
-VAR status*: WORD;
+VAR status-: WORD;
 VAR memTop: ADDRESS;
 VAR traceBase: ADDRESS;
 VAR heap: HeapManager.Heap;
@@ -36,10 +36,24 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Exit (ShuttingDown);
 END Abort;
 
+PROCEDURE Shutdown*;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	IF CAS (status, Running, ShuttingDown) # Running THEN RETURN END;
+	Trace.StringLn ("system: shutting down...");
+END Shutdown;
+
+PROCEDURE Reboot*;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Shutdown;
+	ASSERT (CAS (status, ShuttingDown, Rebooting) = ShuttingDown);
+END Reboot;
+
 PROCEDURE {NORETURN} Exit- (status: WORD);
 VAR index: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	IF status = Rebooting THEN CPU.Reset ELSE CPU.Halt END;
+	Trace.String ("system: ");
+	IF status = Rebooting THEN Trace.StringLn ("rebooting..."); CPU.Reset END;
+	Trace.StringLn ("ready for power off or restart"); CPU.Halt;
 END Exit;
 
 PROCEDURE Clock- (): LONGINT;
@@ -51,7 +65,7 @@ PROCEDURE Sleep- (milliseconds: LONGINT);
 VAR interrupt: Interrupts.Interrupt;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Interrupts.Install (interrupt, CPU.IRQ0); INC (milliseconds, clock);
-	WHILE clock - milliseconds < 0 DO Interrupts.Await (interrupt) END;
+	WHILE (status = Running) & (clock - milliseconds < 0) DO Interrupts.Await (interrupt) END;
 END Sleep;
 
 PROCEDURE HandleTimerInterrupt (index: SIZE);

@@ -468,7 +468,7 @@ END GetInit;
 
 	PROCEDURE Shutdown*( restart: BOOLEAN );
 	BEGIN
-		Environment.Exit (0);
+		IF restart THEN Environment.Reboot ELSE Environment.Shutdown END;
 	END Shutdown;
 
 PROCEDURE Cli*;
