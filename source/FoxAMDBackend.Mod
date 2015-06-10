@@ -1912,7 +1912,7 @@ TYPE
 					(* resolved must be available at this point ! *)
 					resolved := fixup(IntermediateCode.Section).resolved;
 					IF resolved # NIL THEN
-						emitter.code.CopyBits(resolved.bits,0,resolved.bits.GetSize());
+						emitter.code.CopyBits(resolved.os.bits,0,resolved.os.bits.GetSize());
 						emitterFixup := resolved.fixupList.firstFixup;
 						WHILE (emitterFixup # NIL) DO
 							newFixup := BinaryCode.NewFixup(emitterFixup.mode,emitterFixup.offset+pc,emitterFixup.symbol,emitterFixup.symbolOffset,emitterFixup.displacement,emitterFixup.scale,emitterFixup.pattern);
@@ -3266,7 +3266,7 @@ TYPE
 			 		cg.Section(in(IntermediateCode.Section),out);
 			 		procedure := in.symbol(SyntaxTree.Procedure);
 			 		IF procedure.procedureScope.body.code # NIL THEN
-				 		procedure.procedureScope.body.code.SetBinaryCode(out.bits);
+				 		procedure.procedureScope.body.code.SetBinaryCode(out.os.bits);
 				 	END;
 			 	END
 		 	END;
@@ -3282,12 +3282,12 @@ TYPE
 			 			name := in.name;
 				 		out := ResolvedSection(in(IntermediateCode.Section));
 				 		cg.Section(in(IntermediateCode.Section),out);
-				 		IF out.type = Sections.VarSection THEN
+				 		IF out.os.type = Sections.VarSection THEN
 				 			IF out.pc = 1 THEN out.SetAlignment(FALSE,1)
 				 			ELSIF out.pc = 2 THEN out.SetAlignment(FALSE,2)
 				 			ELSIF out.pc > 2 THEN out.SetAlignment(FALSE,4)
 				 			END;
-				 		ELSIF out.type = Sections.ConstSection THEN
+				 		ELSIF out.os.type = Sections.ConstSection THEN
 				 			out.SetAlignment(FALSE,4);
 				 		END;
 			 		END

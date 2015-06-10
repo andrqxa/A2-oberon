@@ -550,7 +550,7 @@ TYPE
 			sizeInUnits := SHORT(instruction.op1.intValue);
 			ASSERT(sizeInUnits >= 0); (* size is initialized to MIN(LONGINT), this checks if size field has been visited *)
 			FOR i := 0 TO sizeInUnits-1 DO
-				out.PutBits(0,out.unit);
+				out.PutBits(0,out.os.unit);
 			END;
 		END EmitReserve;
 
