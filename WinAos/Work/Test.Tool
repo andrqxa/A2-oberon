@@ -1,8 +1,8 @@
 # if you changed the sources, do not forget to compile below
 FSTools.Unmount SRC ~
+FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
 
 SystemTools.DoCommands
-FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
 
 SystemTools.Timer start ~
 
@@ -54,6 +54,7 @@ VirtualDisks.Uninstall VDISK0 ~
 
 FSTools.CloseFiles hd.img ~
 
+SystemTools.Show HDD image build time:  ~ SystemTools.Timer elapsed ~
 
 
 ~~~~ ----------------------------------- U S B --------------------------------
@@ -117,8 +118,7 @@ VirtualDisks.Uninstall VDISK0 ~
 
 FSTools.CloseFiles hd.img ~
 
-
-SystemTools.Show HDD image build time:  ~ SystemTools.Timer elapsed ~
+SystemTools.Show USB image build time:  ~ SystemTools.Timer elapsed ~
 
 
 ~~
