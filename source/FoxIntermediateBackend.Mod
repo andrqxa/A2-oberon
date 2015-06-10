@@ -10257,6 +10257,7 @@ TYPE
 				PROCEDURE WriteVariable(variable: SyntaxTree.Variable; indirect: BOOLEAN);
 					VAR name: ARRAY 256 OF CHAR;
 				BEGIN
+					IF variable.externalName # NIL THEN RETURN END;
 					IF indirect THEN Char(section,rfIndirect) ELSE Char(section,rfDirect) END;
 					INC(size);
 					variable.GetName(name);
