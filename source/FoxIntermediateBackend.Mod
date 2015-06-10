@@ -77,12 +77,18 @@ CONST
 		
 		BasePointerTypeSize = 5;
 		BaseArrayTypeSize = BasePointerTypeSize + 3;
-		BaseObjectTypeSize = BasePointerTypeSize + 2;
-		ActionTypeSize = 3;
-		MonitorTypeSize = 7;
-		ProcessorOffset = BaseObjectTypeSize + 1;
-		StackLimitOffset* = BaseObjectTypeSize + 3;
-		QuantumOffset = BaseObjectTypeSize + 4;
+			LengthOffset = BasePointerTypeSize + 0;
+			DataOffset = BasePointerTypeSize + 1;
+			DescriptorOffset = BasePointerTypeSize + 2;
+		BaseRecordTypeSize = BasePointerTypeSize + 2;
+			ActionOffset = BasePointerTypeSize + 0;
+			MonitorOffset = BasePointerTypeSize + 1;
+		BaseObjectTypeSize = BaseRecordTypeSize;
+			ActionTypeSize = 3;
+			MonitorTypeSize = 7;
+			ProcessorOffset = BaseObjectTypeSize + 1;
+			StackLimitOffset* = BaseObjectTypeSize + 3;
+			QuantumOffset = BaseObjectTypeSize + 4;
 		
 TYPE
 	SupportedInstructionProcedure* = PROCEDURE {DELEGATE} (CONST instr: IntermediateCode.Instruction; VAR moduleName,procedureName: ARRAY OF CHAR): BOOLEAN;
@@ -2196,7 +2202,7 @@ TYPE
 			END;
 		END CallAssignMethod;
 		
-		PROCEDURE CreateAssignMethod (recordType: SyntaxTree.RecordType);
+		PROCEDURE CreateAssignProcedure (recordType: SyntaxTree.RecordType);
 		VAR name: Basic.SegmentedName; previousSection: IntermediateCode.Section;
 		VAR variable: SyntaxTree.Variable; src, dst, op, ofs: IntermediateCode.Operand; recordBase: SyntaxTree.RecordType; size: LONGINT;
 			parameter1, parameter2, parameter0: IntermediateCode.Operand; label: Label; previousUsedRegisters: RegisterEntry; 
@@ -2224,10 +2230,6 @@ TYPE
 ;
 					IntermediateCode.AddOffset(dst,ToMemoryUnits(system,variable.offsetInBits));
 					IntermediateCode.AddOffset(src,ToMemoryUnits(system,variable.offsetInBits));
-					IF recordType.isObject & ((recordType.pointerType = NIL) OR ~recordType.pointerType.isPlain) THEN
-						IntermediateCode.AddOffset(dst,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
-						IntermediateCode.AddOffset(src,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
-					END;
 					CallAssignMethod(dst, src, variable.type);
 					ReleaseIntermediateOperand(src);
 					ReleaseIntermediateOperand(dst);
@@ -2274,7 +2276,7 @@ TYPE
 			Emit(Exit(position,0,0));
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
-		END CreateAssignMethod;
+		END CreateAssignProcedure;
 		
 		PROCEDURE CallTraceMethod(CONST register: IntermediateCode.Operand; type: SyntaxTree.Type);
 		VAR name: Basic.SegmentedName; op: IntermediateCode.Operand; size: LONGINT; base: SyntaxTree.Type; skip: Label;
@@ -2389,11 +2391,7 @@ TYPE
 				register := NewRegisterOperand (addressType);
 				Emit (Mov(position,register,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits))));
 				IF (recordType.pointerType = NIL) OR ~recordType.pointerType.isPlain THEN
-					IF recordType.isObject THEN
-						IntermediateCode.AddOffset(register,BaseObjectTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
-					ELSE
-						IntermediateCode.AddOffset(register,BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
-					END;
+					IntermediateCode.AddOffset(register,BaseRecordTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 				END;
 
 				Emit (Push(position,register));
@@ -3530,10 +3528,19 @@ TYPE
 		(** designators (expressions) *)
 
 		PROCEDURE VisitSymbolDesignator(x: SyntaxTree.SymbolDesignator);
+		VAR ownerType, designatorType: SyntaxTree.RecordType;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitSymbolDesignator") END;
 			IF x.left # NIL THEN Expression(x.left) END;
 			Symbol(x.symbol,result);
+			IF backend.cooperative & (x.symbol IS SyntaxTree.Variable) & (x.symbol.scope IS SyntaxTree.RecordScope) THEN
+				ASSERT ((x.left # NIL) & (x.left.type.resolved IS SyntaxTree.RecordType));
+				ownerType := x.symbol.scope(SyntaxTree.RecordScope).ownerRecord;
+				designatorType := x.left.type.resolved(SyntaxTree.RecordType);
+				IF ~ownerType.isObject & designatorType.isObject & ~designatorType.pointerType.isPlain THEN
+					IntermediateCode.AddOffset(result.op,BaseRecordTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+				END;
+			END;
 			IF Trace THEN TraceExit("VisitSymbolDesignator") END;
 		END VisitSymbolDesignator;
 
@@ -6857,7 +6864,7 @@ TYPE
 									INC (size, MonitorTypeSize * ToMemoryUnits(system,addressType.sizeInBits))
 								END;
 							ELSE
-								INC (size, BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+								INC (size, BaseRecordTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 							END;
 						END;
 						Emit(Push(position,IntermediateCode.Immediate(sizeType,size)));
@@ -6876,11 +6883,11 @@ TYPE
 							IF recordType.isObject THEN
 								IF recordType.IsProtected() THEN
 									DEC (size, MonitorTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
-									Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,(BasePointerTypeSize + 1) * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,pointer.register,size)));
+									Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,MonitorOffset * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,pointer.register,size)));
 								END;
 								IF recordType.IsActive() THEN
 									DEC (size, ActionTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
-									Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,(BasePointerTypeSize + 0) * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,pointer.register,size)));
+									Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ActionOffset * ToMemoryUnits(system,addressType.sizeInBits)), IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,pointer.register,size)));
 								END;
 							END;
 						END;
@@ -6891,7 +6898,7 @@ TYPE
 						ELSIF recordType.isObject THEN
 							size := BaseObjectTypeSize;
 						ELSE
-							size := BasePointerTypeSize;
+							size := BaseRecordTypeSize;
 						END;
 						InitFields(recordType, pointer,size*ToMemoryUnits(system,addressType.sizeInBits));
 
@@ -7101,13 +7108,13 @@ TYPE
 						END;
 						Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,0),IntermediateCode.Address(addressType,name,0,0)));
 
-						Emit(Pop(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + 0)* system.addressSize))));
-						Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + 1)* system.addressSize)),IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,pointer.register,ToMemoryUnits(system,(BaseArrayTypeSize + openDim)* system.addressSize))));
+						Emit(Pop(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,LengthOffset * system.addressSize))));
+						Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,DataOffset * system.addressSize)),IntermediateCode.RegisterOffset(addressType,IntermediateCode.GeneralPurposeRegister,pointer.register,ToMemoryUnits(system,(BaseArrayTypeSize + openDim)* system.addressSize))));
 						IF type IS SyntaxTree.RecordType THEN
 							GetRecordTypeName(type(SyntaxTree.RecordType),name);
-							Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + 2)* system.addressSize)),IntermediateCode.Address(addressType,name,0,0)));
+							Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,DescriptorOffset * system.addressSize)),IntermediateCode.Address(addressType,name,0,0)));
 						ELSE
-							Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BasePointerTypeSize + 2)* system.addressSize)),nil));
+							Emit(Mov(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,DescriptorOffset * system.addressSize)),nil));
 						END;
 						
 						i := openDim;
@@ -7850,7 +7857,7 @@ TYPE
 			result := d;
 			IF backend.cooperative & (x.left.type.resolved IS SyntaxTree.PointerType) & ~x.left.type.resolved(SyntaxTree.PointerType).isPlain & ~x.left.type.resolved(SyntaxTree.PointerType).isUnsafe THEN
 				IF (type IS SyntaxTree.RecordType) & ~type(SyntaxTree.RecordType).isObject THEN
-					IntermediateCode.AddOffset(result.op,BasePointerTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
+					IntermediateCode.AddOffset(result.op,BaseRecordTypeSize * ToMemoryUnits(system,addressType.sizeInBits));
 				END;
 			END;
 			destination := dest;
@@ -10861,7 +10868,7 @@ TYPE
 			Symbol(moduleSection, bodyProc, 0,0);
 
 			IF implementationVisitor.backend.cooperative THEN
-				PatchSymbol(moduleSection,BasePointerTypeSize+1,moduleSection.name,NIL,moduleSection.pc,0);
+				PatchSymbol(moduleSection,MonitorOffset,moduleSection.name,NIL,moduleSection.pc,0);
 				Info(moduleSection, "monitor.owner");
 				Address(moduleSection,0);
 				Info(moduleSection, "monitor.nestingLevel");
@@ -11232,7 +11239,7 @@ TYPE
 							IF ~recordType.isObject THEN
 								implementationVisitor.CreateResetProcedure(recordType);
 							END;
-							implementationVisitor.CreateAssignMethod(recordType);
+							implementationVisitor.CreateAssignProcedure(recordType);
 						END;
 
 					ELSIF ~simple THEN

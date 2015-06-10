@@ -70,8 +70,12 @@ TYPE DelegateArray* = OBJECT {DISPOSABLE,PLAIN} (Array)
 	END Trace;
 
 END DelegateArray;
+
 (** Represents a record type. *)
 TYPE Record* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
+
+	VAR action-: POINTER {UNSAFE} TO Action;
+	VAR monitor-: POINTER {UNSAFE} TO Monitor;
 
 END Record;
 
@@ -91,15 +95,12 @@ TYPE Monitor* = RECORD
 END;
 
 (** Represents the basic object type. *)
-TYPE Object* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
-
-	VAR action-: POINTER {UNSAFE} TO Action;
-	VAR monitor-: POINTER {UNSAFE} TO Monitor;
+TYPE Object* = OBJECT {DISPOSABLE,PLAIN} (Record)
 
 	(** This finalizer disposes the meta data of an object. *)
 	(** It is guaranteed to be called during the disposal of any object instance. *)
 	PROCEDURE ~Finalize-;
-	VAR PointerDescriptor {UNTRACED} EXTERN "BaseTypes.Pointer": Descriptor;
+	VAR BaseDescriptor {UNTRACED} EXTERN "BaseTypes.Record": Descriptor;
 	PROCEDURE Unlink EXTERN "Activities.Process.Unlink" (activity {UNTRACED}: OBJECT);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF action # NIL THEN
@@ -112,7 +113,7 @@ TYPE Object* = OBJECT {DISPOSABLE,PLAIN} (Pointer)
 			Queues.Dispose (monitor.blockedQueue);
 			Queues.Dispose (monitor.waitingQueue);
 		END;
-		descriptor := ADDRESS OF PointerDescriptor;
+		descriptor := ADDRESS OF BaseDescriptor;
 	END Finalize;
 
 END Object;
