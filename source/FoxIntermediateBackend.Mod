@@ -2503,9 +2503,10 @@ TYPE
 			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Reset"));
 			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
 			IF dump # NIL THEN dump := section.comments END;
-			Emit(Enter(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention,0,0));
+			Emit(Push(position,fp));
+			Emit(Mov(position,fp, IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
 			ResetVariables(scope);
-			Emit(Leave(position,NIL,scope.ownerProcedure.type(SyntaxTree.ProcedureType).callingConvention));
+			Emit(Pop(position,fp));
 			Emit(Exit(position,0,0));
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
