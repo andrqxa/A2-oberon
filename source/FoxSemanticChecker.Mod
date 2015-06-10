@@ -6047,6 +6047,9 @@ TYPE
 				ELSIF (left.type.resolved # NIL) & (left.type.resolved IS SyntaxTree.ProcedureType) THEN
 					resolvedExpression := NewSupercallDesignator(arrowDesignator.position,left);
 				ELSE
+					IF IsPointerToObject(left.type) THEN
+						Warning(arrowDesignator.position,  "forbidden dereference on object"); 
+					END;
 					resolvedExpression := NewDereferenceDesignator(arrowDesignator.position,left)
 				END
 			END
@@ -8978,6 +8981,21 @@ TYPE
 		END;
 		RETURN result
 	END IsPointerToRecord;
+
+	PROCEDURE IsPointerToObject(type: SyntaxTree.Type): BOOLEAN;
+	VAR result: BOOLEAN;
+	BEGIN
+		IF type = NIL THEN result := FALSE
+		ELSE
+			type := type.resolved;
+			result := (type IS SyntaxTree.PointerType) & (type(SyntaxTree.PointerType).pointerBase.resolved IS SyntaxTree.RecordType)
+				&  (type(SyntaxTree.PointerType).pointerBase.resolved(SyntaxTree.RecordType).isObject)
+				;
+			result := result OR	(type IS SyntaxTree.RecordType) & (type(SyntaxTree.RecordType).pointerType # NIL);
+			result := result OR (type IS SyntaxTree.ObjectType);
+		END;
+		RETURN result
+	END IsPointerToObject;
 
 	PROCEDURE ContainsPointer*(type: SyntaxTree.Type): BOOLEAN;
 	BEGIN
