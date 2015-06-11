@@ -648,6 +648,17 @@ BEGIN
 	END;
 END PublishRegisteredModules;
 
+PROCEDURE FinalizeModules;
+VAR module {UNTRACED}: Module;
+PROCEDURE Finalize EXTERN "BaseTypes.Object.Finalize" (module {UNTRACED}: Module);
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	module := root;
+	WHILE module # NIL DO
+		Finalize (module);
+		module := module.next;
+	END;
+END FinalizeModules;
+
 PROCEDURE {FINAL} Main;
 PROCEDURE InitializeGC EXTERN "GarbageCollector.Initialize";
 PROCEDURE TerminateGC EXTERN "GarbageCollector.Terminate";
@@ -659,6 +670,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Processors.Initialize;
 	Activities.Execute (PublishRegisteredModules);
 	Processors.Terminate;
+	FinalizeModules;
 	Activities.Terminate;
 	Queues.Terminate;
 	Environment.Terminate;
