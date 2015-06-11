@@ -82,7 +82,7 @@ VAR node {UNTRACED}, last, next: Node;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid argument *)
 	ASSERT (item # NIL);
-	node := item.node;
+	node := item.node; item.node := NIL;
 
 	(* associate a node with the element *)
 	IF ~Acquire (node) THEN NEW (node); ASSERT (node # NIL) END;
