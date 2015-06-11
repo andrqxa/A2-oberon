@@ -21,10 +21,10 @@ CONST
 	Running* = 2; AwaitingLock* = 3; AwaitingCond* = 4; AwaitingEvent* = 5; Suspended* = 6; Terminated* = 7;
 
 	(** Process priorities *)
-	MinPriority = 0;							(* only system idle processes run at this priority level *)
-	Low* = 1; Normal* = 2; High* = 3;		(* "user" priorities *)
-	GCPriority* = 4;							(* priority of garbage collector *)
-	Realtime* = 5;							(* reserved for interrupt handling and realtime apps, these processes are not allowed to allocate memory *)
+	Low* = Activities.DefaultPriority;								(* "user" priorities *)
+	Normal* = Activities.DefaultPriority;	
+	High* = Activities.HighPriority;
+	Realtime* = Activities.RealtimePriority;						(* reserved for interrupt handling and realtime apps *)
 
 	(* Process termination halt codes *)
 	halt* = 2222;
@@ -173,7 +173,7 @@ TYPE
 			END;
 		END Handle;
 
-	BEGIN {ACTIVE, PRIORITY(High)}
+	BEGIN {ACTIVE, PRIORITY(Realtime)}
 		LOOP
 			Interrupts.Await (interrupt);
 			IF cancelled THEN EXIT END;
