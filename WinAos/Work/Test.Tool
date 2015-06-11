@@ -47,8 +47,7 @@ Partitions.SetConfig VDISK0#1
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable"
 	Boot3="WindowManager.Install"
-	Boot5="WMKernelLog.Open;SystemTools.Show Release J"
-	Boot="DisplayLinear.Install"
+	Boot5="Autostart.Run"
 	~
 VirtualDisks.Uninstall VDISK0 ~
 
