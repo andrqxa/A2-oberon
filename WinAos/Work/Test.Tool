@@ -11,13 +11,13 @@ PartitionsLib.SetBootLoaderFile OBLUnreal.Bin ~
 
 FSTools.DeleteFiles hd.img ~
 
-VirtualDisks.Create hd.img 160000 512 ~
+VirtualDisks.Create hd.img 300000 512 ~
 VirtualDisks.Install -b=512 VDISK0 hd.img ~
 
 StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Reflection TrapWriters Traps Plugins Disks PCI ATADisks Caches Commands Files DiskVolumes Clock DiskFS Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
 
 Partitions.WriteMBR VDISK0#0 OBEMBR.BIN ~
-Partitions.Create VDISK0#1 76 80 ~
+Partitions.Create VDISK0#1 76 150 ~
 Partitions.Activate VDISK0#1 ~
 
 Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
@@ -25,20 +25,15 @@ Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
 FSTools.Mount TEMP AosFS VDISK0#1 ~
 FSTools.Unsafe ~
 FSTools.CopyFiles -q
-	*.Gof => TEMP:*.Gof ~
+	*.Gof => TEMP:*.Gof
+	*.Sym => TEMP:*.Sym ~
 FSTools.CopyFiles -o -q 
-	SRC:*.XML => TEMP:*.XML 
-	SRC:*.xml => TEMP:*.xml 
-	SRC:Auto.dsk => TEMP:Auto.dsk 
-	SRC:*.rep => TEMP:*.rep ~
-FSTools.CopyFiles  -o -q
-	SRC:*.zip => TEMP:*.zip 
-	SRC:*.Fnt => TEMP:*.Fnt ~
+	SRC:*.* => TEMP:*.* ~
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
 
 Partitions.SetConfig VDISK0#1
-	TraceMode="5" TracePort="1" TraceBPS="115200"
+	TraceMode="4" TracePort="1" TraceBPS="115200"
 	BootVol1="AOS AosFS IDE0#1"
 	Boot="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
@@ -59,7 +54,6 @@ SystemTools.Show HDD image build time:  ~ SystemTools.Timer elapsed ~
 ~~~~ ----------------------------------- U S B --------------------------------
 
 SystemTools.DoCommands
-FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
 
 SystemTools.Timer start ~
 
@@ -68,7 +62,7 @@ PartitionsLib.SetBootLoaderFile OBLUnreal.Bin ~
 
 FSTools.DeleteFiles hd.img ~
 
-VirtualDisks.Create hd.img 160000 512 ~
+VirtualDisks.Create hd.img 300000 512 ~
 VirtualDisks.Install -b=512 VDISK0 hd.img ~
 
 StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" 
@@ -79,7 +73,7 @@ UsbDebug  Usbdi UsbHcdi UsbUhci UsbEhci UsbUtilities UsbDriverLoader Usb UsbHubD
 DiskVolumes Clock DiskFS Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
 
 Partitions.WriteMBR VDISK0#0 OBEMBR.BIN ~
-Partitions.Create VDISK0#1 76 80 ~
+Partitions.Create VDISK0#1 76 150 ~
 Partitions.Activate VDISK0#1 ~
 
 Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
@@ -87,30 +81,24 @@ Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
 FSTools.Mount TEMP AosFS VDISK0#1 ~
 FSTools.Unsafe ~
 FSTools.CopyFiles -q
-	*.Gof => TEMP:*.Gof ~
+	*.Gof => TEMP:*.Gof
+	*.Sym => TEMP:*.Sym ~
 FSTools.CopyFiles -o -q 
-	SRC:*.XML => TEMP:*.XML 
-	SRC:*.xml => TEMP:*.xml 
-	SRC:Auto.dsk => TEMP:Auto.dsk 
-	SRC:*.rep => TEMP:*.rep ~
-FSTools.CopyFiles  -o -q
-	SRC:*.zip => TEMP:*.zip 
-	SRC:*.Fnt => TEMP:*.Fnt ~
+	SRC:*.* => TEMP:*.* ~
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
 
 Partitions.SetConfig VDISK0#1
-	TraceMode="5" TracePort="1" TraceBPS="115200"
+	TraceMode="4" TracePort="1" TraceBPS="115200"
 	BootVol1="AOS AosFS USB0#1"
 	Boot="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ExtMemSize="200"
-	Init=""
+	Init="118"
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable"
 	Boot3="WindowManager.Install"
-	Boot5="WMKernelLog.Open;SystemTools.Show Release W"
-	Boot="DisplayLinear.Install"
+	Boot5="Autostart.Run"
 	TraceModules = "1"
 	~
 VirtualDisks.Uninstall VDISK0 ~
