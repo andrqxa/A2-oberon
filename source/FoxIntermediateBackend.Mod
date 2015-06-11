@@ -2227,7 +2227,7 @@ TYPE
 					src := NewRegisterOperand (addressType);
 					Emit (Mov(position, dst, parameter1));
 					Emit (Mov(position, src, parameter2));
-;
+
 					IntermediateCode.AddOffset(dst,ToMemoryUnits(system,variable.offsetInBits));
 					IntermediateCode.AddOffset(src,ToMemoryUnits(system,variable.offsetInBits));
 					CallAssignMethod(dst, src, variable.type);
@@ -2247,33 +2247,36 @@ TYPE
 				Emit(Exit(position,0,0));
 			END;
 			
-			GetRecordTypeName (recordType,name);
-			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
-			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
-			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
-			NEW(registerUsageCount);
-			usedRegisters := NIL;
+			IF ~recordType.isObject THEN
+				GetRecordTypeName (recordType,name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
+				section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+				NEW(registerUsageCount);
+				usedRegisters := NIL;
 
-			dst := NewRegisterOperand (addressType);
-			src := NewRegisterOperand (addressType);
-			ofs := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(recordType)));
-			Emit(Mov(position, dst, parameter1));
-			Emit(Mov(position, src, parameter2));
-			label := NewLabel(); 
-			SetLabel(label);
-			Emit(Push(position, dst));
-			Emit(Push(position, src)); 
-			GetRecordTypeName (recordType,name);
-			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
-			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
-			Emit(Call(position, op, 0));
-			Emit(Pop(position, src));
-			Emit(Pop(position, dst));
-			Emit(Add(position, dst, dst, ofs));
-			Emit(Add(position, src, src, ofs));
-			Emit(Sub(position, parameter0, parameter0, IntermediateCode.Immediate(sizeType, 1)));
-			BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
-			Emit(Exit(position,0,0));
+				dst := NewRegisterOperand (addressType);
+				src := NewRegisterOperand (addressType);
+				ofs := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(recordType)));
+				Emit(Mov(position, dst, parameter1));
+				Emit(Mov(position, src, parameter2));
+				label := NewLabel(); 
+				SetLabel(label);
+				Emit(Push(position, dst));
+				Emit(Push(position, src)); 
+				GetRecordTypeName (recordType,name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Assign"));
+				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+				Emit(Call(position, op, 0));
+				Emit(Pop(position, src));
+				Emit(Pop(position, dst));
+				Emit(Add(position, dst, dst, ofs));
+				Emit(Add(position, src, src, ofs));
+				Emit(Sub(position, parameter0, parameter0, IntermediateCode.Immediate(sizeType, 1)));
+				BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
+				Emit(Exit(position,0,0));
+			END;
+
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateAssignProcedure;
@@ -2401,30 +2404,31 @@ TYPE
 				Emit(Call(position,op, ToMemoryUnits(system, system.addressSize)));
 				ReleaseIntermediateOperand(register);
 				Emit(Exit(position,0,0));
-			END;
-			
-			GetRecordTypeName (recordType,name);
-			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
-			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
-			section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
-			NEW(registerUsageCount);
-			usedRegisters := NIL;
+				
+				GetRecordTypeName (recordType,name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Array"));
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+				section := IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE);
+				NEW(registerUsageCount);
+				usedRegisters := NIL;
 
-			register := NewRegisterOperand (addressType);
-			ofs := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(recordType)));
-			Emit(Mov(position, register, parameter1));
-			label := NewLabel(); 
-			SetLabel(label);
-			Emit(Push(position, register)); 
-			GetRecordTypeName (recordType,name);
-			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
-			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
-			Emit(Call(position, op, 0));
-			Emit(Pop(position, register));
-			Emit(Add(position, register, register, ofs));
-			Emit(Sub(position, parameter0, parameter0, IntermediateCode.Immediate(sizeType, 1)));
-			BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
-			Emit(Exit(position,0,0));
+				register := NewRegisterOperand (addressType);
+				ofs := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(recordType)));
+				Emit(Mov(position, register, parameter1));
+				label := NewLabel(); 
+				SetLabel(label);
+				Emit(Push(position, register)); 
+				GetRecordTypeName (recordType,name);
+				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Trace"));
+				IntermediateCode.InitAddress(op, addressType, name , 0, 0);
+				Emit(Call(position, op, 0));
+				Emit(Pop(position, register));
+				Emit(Add(position, register, register, ofs));
+				Emit(Sub(position, parameter0, parameter0, IntermediateCode.Immediate(sizeType, 1)));
+				BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
+				Emit(Exit(position,0,0));
+			END;
+
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateTraceMethod;
@@ -2435,6 +2439,7 @@ TYPE
 			parameter1, parameter0: IntermediateCode.Operand; label: Label; previousUsedRegisters: RegisterEntry; 
 			previousRegisterUsageCount: RegisterUsageCount; context: Context;
 		BEGIN
+			IF recordType.isObject THEN RETURN END;
 			parameter0 (* len *) := IntermediateCode.Memory(sizeType,sp,ToMemoryUnits(system,2*addressType.sizeInBits));
 			parameter1 (* dest *) := IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,1*addressType.sizeInBits));
 			
@@ -11238,9 +11243,7 @@ TYPE
 							IF ~HasExplicitTraceMethod (recordType) THEN
 								implementationVisitor.CreateTraceMethod(recordType);
 							END;
-							IF ~recordType.isObject THEN
-								implementationVisitor.CreateResetProcedure(recordType);
-							END;
+							implementationVisitor.CreateResetProcedure(recordType);
 							implementationVisitor.CreateAssignProcedure(recordType);
 						END;
 
