@@ -1292,6 +1292,8 @@ TYPE
 					emitter.Emit1(InstructionSet.opCALL,target);
 					ASSERT (out.pc - firstPC = FirstOffset);
 					ASSERT (out.pc - secondPC = SecondOffset);
+					Assembler.InitMem(op1,SHORT(SHORT(cpuBits DIV 8)),RA,stackSize);
+					emitter.Emit2(InstructionSet.opLEA,opSP,op1);
 				END;
 			END;
 			
