@@ -6,7 +6,7 @@ isNativeSnapshot="no"
 createType="monolithicFlat"
 
 # Extent description
-RW 160000 FLAT "hd.img" 0
+RW 300000 FLAT "hd.img" 0
 
 # The Disk Data Base 
 #DDB
@@ -14,14 +14,14 @@ RW 160000 FLAT "hd.img" 0
 ddb.adapterType = "ide"
 ddb.encoding = "windows-1252"
 ddb.geometry.biosCylinders = "100"
-ddb.geometry.biosHeads = "16"
+ddb.geometry.biosHeads = "30"
 ddb.geometry.biosSectors = "100"
-ddb.geometry.cylinders = "100"
+ddb.geometry.cylinders = "297"
 ddb.geometry.heads = "16"
-ddb.geometry.sectors = "1''"
+ddb.geometry.sectors = "63"
 ddb.longContentID = "ccba9e5014934814138b8a661c89f3e3"
 ddb.uuid.image = "a028a4fa-0efc-4865-8864-0a36bd9877bf"
-ddb.uuid.modification = "49b28af6-5e0b-4674-b8c1-3efd6831ccf9"
+ddb.uuid.modification = "0e2e144c-089e-4287-8f9c-8e15f508c97f"
 ddb.uuid.parent = "00000000-0000-0000-0000-000000000000"
 ddb.uuid.parentmodification = "8c8a9447-34f1-4f6b-8940-777b6c46118d"
 ddb.virtualHWVersion = "6"
