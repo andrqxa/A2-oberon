@@ -28,7 +28,10 @@ FSTools.CopyFiles -q
 	*.Gof => TEMP:*.Gof
 	*.Sym => TEMP:*.Sym ~
 FSTools.CopyFiles -o -q 
-	SRC:*.* => TEMP:*.* ~
+	SRC:*.* => TEMP:*.* 
+	Test.Tool => TEMP:Test.Tool
+	T.Mod => TEMP:T.Mod
+	~
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
 
@@ -43,6 +46,7 @@ Partitions.SetConfig VDISK0#1
 	Boot2="DriverDatabase.Enable"
 	Boot3="WindowManager.Install"
 	Boot5="Autostart.Run"
+	TraceModules = "1"
 	~
 VirtualDisks.Uninstall VDISK0 ~
 
