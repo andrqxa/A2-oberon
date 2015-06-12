@@ -182,7 +182,7 @@ VAR
 	root-: Module;	(** list of modules (read-only) *)
 	shutdown*: LONGINT;	(** None, Reboot, PowerDown *)
 	trace: BOOLEAN;
-	register: ARRAY 64 OF Module;
+	register {UNTRACED}: ARRAY 64 OF Module;
 	registered: LONGINT;
 
 (** Register a module loader. *)
