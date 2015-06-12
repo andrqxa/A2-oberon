@@ -2,7 +2,7 @@
 
 MODULE Kernel32;   (** AUTHOR "ejz"; PURPOSE "Definition of the Win32 Kernel32 API used by (Win)Aos"; *)
 
-IMPORT SYSTEM, Runtime;
+IMPORT SYSTEM;
 
 CONST
 	(** NIL pointer/address value *)
@@ -754,9 +754,10 @@ VAR
 
 	PROCEDURE {WINAPI} ExceptionHandler( VAR excpRec: ExceptionRecord; excpFrame: ExcpFrmPtr;
 	 										VAR context: Context;  dispatch: LONGINT ): LONGINT;
+	PROCEDURE Trap EXTERN "Runtime.Trap" (number: SIZE);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		SYSTEM.SetActivity (context.ECX);
-		Runtime.Trap (excpRec.ExceptionCode);
+		Trap (excpRec.ExceptionCode);
 	END ExceptionHandler;
 
 	PROCEDURE InstallExceptionHandler-;
