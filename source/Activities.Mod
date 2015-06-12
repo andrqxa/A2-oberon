@@ -246,8 +246,8 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END Create;
 
 (** Creates an activity that pretends to be executed on a distinct processor. *)
-PROCEDURE CreateVirtualProcessor- (): Activity;
-VAR activity: Activity; index: SIZE;
+PROCEDURE CreateVirtualProcessor- (): {UNTRACED} Activity;
+VAR activity {UNTRACED}: Activity; index: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	NEW (activity, NIL, DefaultPriority);
 	ASSERT (activity # NIL);
@@ -260,7 +260,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END CreateVirtualProcessor;
 
 (** Temporarily exchanges the currently running activity with a virtual processor in order to call the specified procedure in a different context. *)
-PROCEDURE CallVirtual- (procedure: PROCEDURE (value: ADDRESS); value: ADDRESS; processor: Activity);
+PROCEDURE CallVirtual- (procedure: PROCEDURE (value: ADDRESS); value: ADDRESS; processor {UNTRACED}: Activity);
 VAR currentActivity {UNTRACED}: Activity; stackPointer: ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (processor # NIL);

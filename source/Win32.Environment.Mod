@@ -53,7 +53,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Queues.Enqueue (previous, sleepingQueue);
 END Enqueue;
 
-PROCEDURE {WINAPI} TimerThread (lpParameter: ANY): LONGINT;
+PROCEDURE {WINAPI} TimerThread (lpParameter {UNTRACED}: ANY): LONGINT;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Kernel32.InstallExceptionHandler;
 	Activities.CallVirtual (TickLoop, NIL, Activities.CreateVirtualProcessor ());
