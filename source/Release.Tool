@@ -42,7 +42,7 @@
 # 
 # WINAOS Cooperative
 #	Release.Build --build --path="./" WinAosCooperative ~
-#	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=Gof --displacement=401000H --path="./" Trace CPU Runtime Counters Kernel32 Processors Queues BaseTypes Activities ExclusiveBlocks Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
+#	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=Gof --displacement=401000H --path="./" Trace CPU Runtime Counters Kernel32 Processors Queues BaseTypes Activities ExclusiveBlocks Environment Mutexes Interrupts Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #	FSTools.CloseFiles A2.exe ~
 # 
 # Notes:
