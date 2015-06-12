@@ -2073,6 +2073,7 @@ TYPE
 				|Scanner.Address:
 					IF HasAddress(left) THEN
 						type := system.addressType;
+						IF IsLocalDesignator(left) THEN Warning(left.position,"taking address of local variable") END;
 					ELSE
 						type := SyntaxTree.invalidType;
 						Error(left.position,Diagnostics.Invalid,"has no address");
@@ -5463,6 +5464,7 @@ TYPE
 				ELSIF (id = Global.systemAdr) & CheckArity(1,1) THEN
 					IF HasAddress(parameter0) THEN
 						type := system.addressType;
+						IF IsLocalDesignator(parameter0) THEN Warning(parameter0.position,"taking address of local variable") END;
 					ELSE
 						type := SyntaxTree.invalidType;
 						Error(parameter0.position,Diagnostics.Invalid,"has no address");
@@ -9408,6 +9410,20 @@ TYPE
 			OR (expression IS SyntaxTree.StatementDesignator) & HasAddress(expression(SyntaxTree.StatementDesignator).result);
 	END HasAddress;
 
+	PROCEDURE IsLocalSymbol(symbol: SyntaxTree.Symbol): BOOLEAN;
+	BEGIN
+		RETURN ((symbol IS SyntaxTree.Variable) OR (symbol IS SyntaxTree.Parameter)) & (symbol.scope IS SyntaxTree.ProcedureScope);
+	END IsLocalSymbol;
+
+	PROCEDURE IsLocalDesignator(expression: SyntaxTree.Expression): BOOLEAN;
+	BEGIN
+		ASSERT (expression # NIL);
+		RETURN (expression IS SyntaxTree.SymbolDesignator) & IsLocalSymbol(expression(SyntaxTree.SymbolDesignator).symbol) OR (expression IS SyntaxTree.ResultDesignator)
+			OR (expression IS SyntaxTree.IndexDesignator) & IsLocalDesignator(expression(SyntaxTree.IndexDesignator).left)
+			OR (expression IS SyntaxTree.TypeGuardDesignator) & IsLocalDesignator(expression(SyntaxTree.TypeGuardDesignator).left)
+			OR (expression IS SyntaxTree.StatementDesignator) & IsLocalDesignator(expression(SyntaxTree.StatementDesignator).left)
+	END IsLocalDesignator;
+	
 	PROCEDURE IsStaticProcedure*(procedure: SyntaxTree.Procedure): BOOLEAN;
 	BEGIN
 		IF procedure.scope IS SyntaxTree.RecordScope THEN
