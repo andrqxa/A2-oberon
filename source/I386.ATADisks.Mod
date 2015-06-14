@@ -976,6 +976,7 @@ TYPE
 			num1, try, ignore: LONGINT; bufAdr: ADDRESS;
 			dma: BOOLEAN;
 		BEGIN
+			Objects.PinStack(1024);
 			bufAdr := ADDRESSOF(data[ofs]);
 			IF (block >= 0) & (num >= 0) & (block < size) & (block+num <= size) THEN
 				ASSERT(num*blockSize <= LEN(data)-ofs);	(* range check *)
@@ -1023,6 +1024,7 @@ TYPE
 				KernelLog.Int(size, 1); KernelLog.Char(" "); KernelLog.String(name);
 				res := 2826	(* transfer out of range *)
 			END;
+			Objects.UnpinStack;
 		END Transfer;
 
 		PROCEDURE GetSize*(VAR size, res: LONGINT);
@@ -1480,6 +1482,7 @@ TYPE
 				command.protocol := Protocol_PacketPIO;
 			END;
 			command.read := read;
+			Objects.PinStack(1024);
 			command.bufAdr := ADDRESSOF(data[ofs]);
 			command.size := size;
 
@@ -1487,6 +1490,7 @@ TYPE
 				command.packet[i] := packet[i];
 			END;
 			res := controller.ExecuteCommand(command, ATAPITimeout, status);
+			Objects.UnpinStack;
 			sense := -1;
 			ProcessSense(res);
 			RETURN res;
