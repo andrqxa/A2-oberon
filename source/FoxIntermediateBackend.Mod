@@ -2524,11 +2524,11 @@ TYPE
 			PROCEDURE Move (parameter: SyntaxTree.Parameter);
 			VAR value: IntermediateCode.Operand; skip: Label;
 			BEGIN
-				ASSERT (IsVariableParameter (parameter));
 				IF (parameter.kind = SyntaxTree.ValueParameter) & IsOpenArray (parameter.type) THEN
 					value := IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits));
 					Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
 				ELSE
+					ASSERT (IsVariableParameter (parameter) OR parameter.movable);
 					value := NewRegisterOperand (addressType);
 					Emit (Mov(position,value,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits))));
 					skip := NewLabel ();
@@ -2552,7 +2552,10 @@ TYPE
 			
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 			WHILE parameter # NIL DO
-				IF IsVariableParameter (parameter) THEN Move (parameter) END;
+				IF IsVariableParameter (parameter) THEN Move (parameter) 
+				ELSIF (parameter.kind = SyntaxTree.ValueParameter) & IsOpenArray (parameter.type) THEN Move(parameter)
+				ELSIF parameter.movable THEN Move(parameter)
+				END;
 				parameter := parameter.nextParameter;
 			END;
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).returnParameter;
@@ -11660,6 +11663,7 @@ TYPE
 		parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
 		WHILE parameter # NIL DO
 			IF IsVariableParameter (parameter) THEN RETURN TRUE END;
+			IF parameter.movable THEN RETURN TRUE END;
 			parameter := parameter.nextParameter;
 		END;
 		RETURN scope.ownerProcedure.type(SyntaxTree.ProcedureType).returnParameter # NIL;

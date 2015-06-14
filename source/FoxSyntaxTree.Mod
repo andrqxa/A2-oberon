@@ -3158,6 +3158,7 @@ TYPE
 		kind-: LONGINT;   (* ValueParameter, ConstParameter, VarParameter *)
 		ownerType-: Type;
 		untraced-: BOOLEAN;
+		movable-: BOOLEAN;
 
 		PROCEDURE & InitParameter( position: LONGINT;  ownerType: Type ; name: Identifier; kind: LONGINT);
 		BEGIN
@@ -3169,6 +3170,7 @@ TYPE
 			modifiers := NIL;
 			untraced := FALSE;
 			defaultValue := NIL;
+			movable := FALSE;
 		END InitParameter;
 
 		PROCEDURE SetModifiers*(flag: Modifier);
@@ -3178,6 +3180,10 @@ TYPE
 		PROCEDURE SetUntraced*(untraced: BOOLEAN);
 		BEGIN SELF.untraced := untraced
 		END SetUntraced;
+
+		PROCEDURE SetMoveable*(movable: BOOLEAN);
+		BEGIN SELF.movable := movable
+		END SetMoveable;
 
 		PROCEDURE SetDefaultValue*(e: Expression);
 		BEGIN defaultValue := e

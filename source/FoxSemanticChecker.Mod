@@ -2073,7 +2073,7 @@ TYPE
 				|Scanner.Address:
 					IF HasAddress(left) THEN
 						type := system.addressType;
-						IF IsLocalDesignator(left) THEN Warning(left.position,"taking address of local variable") END;
+						WarnIfAddressOnStack(left);
 					ELSE
 						type := SyntaxTree.invalidType;
 						Error(left.position,Diagnostics.Invalid,"has no address");
@@ -4760,6 +4760,25 @@ TYPE
 			END;
 			RETURN result
 		END CheckPortType;
+		
+		PROCEDURE WarnIfAddressOnStack(e: SyntaxTree.Expression);
+		VAR d: SyntaxTree.Designator;
+		BEGIN
+			IF cooperative & (e IS SyntaxTree.Designator) THEN
+				d := e(SyntaxTree.Designator);
+				WHILE (d # NIL) & ~(d IS SyntaxTree.SymbolDesignator) DO
+					IF d IS SyntaxTree.DereferenceDesignator THEN (* on heap *) RETURN END;
+					e := d.left;
+					IF (e # NIL) & (e IS SyntaxTree.Designator) THEN d := e(SyntaxTree.Designator) ELSE d := NIL END;
+				END;
+				IF d # NIL THEN
+					IF d(SyntaxTree.SymbolDesignator).symbol.scope IS SyntaxTree.ProcedureScope THEN
+						Warning(e.position,"potentially dangerous use of address of variables on stack");
+					END;
+				END;
+			END;
+		END WarnIfAddressOnStack;
+		
 
 
 		(* move to builtin procedure call statement ?
@@ -5464,7 +5483,7 @@ TYPE
 				ELSIF (id = Global.systemAdr) & CheckArity(1,1) THEN
 					IF HasAddress(parameter0) THEN
 						type := system.addressType;
-						IF IsLocalDesignator(parameter0) THEN Warning(parameter0.position,"taking address of local variable") END;
+						WarnIfAddressOnStack(parameter0);
 					ELSE
 						type := SyntaxTree.invalidType;
 						Error(parameter0.position,Diagnostics.Invalid,"has no address");
@@ -6398,6 +6417,16 @@ TYPE
 					IF ~ContainsPointer(parameter.type) THEN
 						IF VerboseErrorMessage THEN Printout.Info("parameter",parameter); Printout.Info("parameter.type",parameter.type.resolved); END;
 						Error(position,Diagnostics.Invalid,"untraced flag on non-pointer variable");
+					END;
+				END;
+				IF HasFlag(modifiers, Global.NameMovable,position) THEN
+					parameter.SetMoveable(TRUE);
+					IF ~(parameter.type.resolved IS SyntaxTree.AddressType) THEN
+						IF VerboseErrorMessage THEN Printout.Info("parameter",parameter); Printout.Info("parameter.type",parameter.type.resolved); END;
+						Error(position,Diagnostics.Invalid,"illegal movable flag on non-address variable");
+					ELSIF parameter.kind = SyntaxTree.VarParameter THEN
+						IF VerboseErrorMessage THEN Printout.Info("parameter",parameter); Printout.Info("parameter.type",parameter.type.resolved); END;
+						Error(position,Diagnostics.Invalid,"unnecessary movable flag on variable variable");
 					END;
 				END;
 				CheckModifiers(modifiers, ~InCellNetScope(parameter.scope) OR ~(parameter.type.resolved IS SyntaxTree.CellType));
@@ -8943,6 +8972,17 @@ TYPE
 		RETURN expression.assignable;
 	END IsVariable;
 
+	PROCEDURE IsVariableParameter (symbol: SyntaxTree.Symbol): BOOLEAN;
+	BEGIN 
+		IF (symbol IS SyntaxTree.Parameter) THEN
+			WITH symbol: SyntaxTree.Parameter DO
+				RETURN (symbol.kind = SyntaxTree.VarParameter) OR (symbol.kind = SyntaxTree.ConstParameter) & ((symbol.type.resolved IS SyntaxTree.RecordType) OR (symbol.type.resolved IS SyntaxTree.ArrayType));
+			END;
+		ELSE
+			RETURN FALSE
+		END;
+	END IsVariableParameter;
+
 	PROCEDURE IsPointerType*(type: SyntaxTree.Type): BOOLEAN;
 	VAR result: BOOLEAN;
 	BEGIN
@@ -9410,20 +9450,6 @@ TYPE
 			OR (expression IS SyntaxTree.StatementDesignator) & HasAddress(expression(SyntaxTree.StatementDesignator).result);
 	END HasAddress;
 
-	PROCEDURE IsLocalSymbol(symbol: SyntaxTree.Symbol): BOOLEAN;
-	BEGIN
-		RETURN ((symbol IS SyntaxTree.Variable) OR (symbol IS SyntaxTree.Parameter)) & (symbol.scope IS SyntaxTree.ProcedureScope);
-	END IsLocalSymbol;
-
-	PROCEDURE IsLocalDesignator(expression: SyntaxTree.Expression): BOOLEAN;
-	BEGIN
-		ASSERT (expression # NIL);
-		RETURN (expression IS SyntaxTree.SymbolDesignator) & IsLocalSymbol(expression(SyntaxTree.SymbolDesignator).symbol) OR (expression IS SyntaxTree.ResultDesignator)
-			OR (expression IS SyntaxTree.IndexDesignator) & IsLocalDesignator(expression(SyntaxTree.IndexDesignator).left)
-			OR (expression IS SyntaxTree.TypeGuardDesignator) & IsLocalDesignator(expression(SyntaxTree.TypeGuardDesignator).left)
-			OR (expression IS SyntaxTree.StatementDesignator) & IsLocalDesignator(expression(SyntaxTree.StatementDesignator).left)
-	END IsLocalDesignator;
-	
 	PROCEDURE IsStaticProcedure*(procedure: SyntaxTree.Procedure): BOOLEAN;
 	BEGIN
 		IF procedure.scope IS SyntaxTree.RecordScope THEN
