@@ -814,7 +814,6 @@ TYPE
 			IF res # Res_OK THEN
 				(* Most likely, there is no device .... Show("Could not select device"); KernelLog.Ln; *)
 			END;
-
 			(* Check if registers are valid. FAST DETECTION  *)
 			Machine.Portout8(cmdbase+Ofs_CountLow, 055X);
 			NanoDelay(400);
@@ -834,10 +833,12 @@ TYPE
 				KernelLog.String("Identify Device "); KernelLog.Int(devNum,1); KernelLog.Ln;
 			END;
 			NEW(command);
+			Objects.PinStack(1024);
 			command.dev := devNum; command.cmd := 0ECH; (* identify device *)
 			command.protocol := Protocol_PIO; command.read := TRUE;
 			command.bufAdr := ADDRESSOF(buf[0]); command.count := 1;
 			res := ExecuteCommand(command, IdentifyTimeout, status);
+			Objects.UnpinStack();
 
 			IF TraceVerbose & (trace * TraceInit # {}) THEN
 				KernelLog.Ln;
@@ -856,10 +857,12 @@ TYPE
 				IF ch # ATAPISig THEN RETURN Res_Err; END;
 				(* ATAPI device *)
 				NEW(command);
+				Objects.PinStack(1024);
 				command.dev := devNum; command.cmd := 0A1H; (* identify packet device *)
 				command.protocol := Protocol_PIO; command.read := TRUE;
 				command.bufAdr := ADDRESSOF(buf[0]); command.count := 1;
 				res := ExecuteCommand(command, IdentifyTimeout, status);
+				Objects.UnpinStack();
 				IF TraceVerbose & (trace * TraceInit # {}) THEN
 					Show("Identify packet device command, res: "); KernelLog.Int(res, 0); KernelLog.String(", status: "); KernelLog.Bits(status, 0, 32);
 				END;
@@ -1589,6 +1592,7 @@ TYPE
 				 Show(name); KernelLog.String(" request sense"); KernelLog.Ln;
 			END;
 			sense := -1;
+			Objects.PinStack(1024);
 			command := NewCommandPacket(03H);
 			command.protocol := Protocol_PacketPIO;
 			command.read := TRUE;
@@ -1596,7 +1600,7 @@ TYPE
 			command.size := LEN(buf);
 			command.packet[4] := CHR(LEN(buf));
 			res := controller.ExecuteCommand(command, ATAPITimeout, status);
-
+			Objects.UnpinStack;
 			IF TraceVerbose & (trace * (TraceErrors + TraceSense) # {}) & (res # Res_OK) THEN
 				Show(name); KernelLog.String(" request sense failed"); KernelLog.Ln;
 			END;
@@ -1710,12 +1714,14 @@ TYPE
 			IF TraceVerbose & (trace * (TraceCommands + TraceAtapi + TraceInit) # {}) THEN
 				 Show(name); KernelLog.String(" read capacity");KernelLog.Ln;
 			END;
+			Objects.PinStack(1024);
 			command := NewCommandPacket(25H);
 			command.protocol := Protocol_PacketPIO;
 			command.read := TRUE;
 			command.bufAdr := ADDRESSOF(buf[0]);
 			command.size := 8;
 			res := controller.ExecuteCommand(command, ATAPITimeout, status);
+			Objects.UnpinStack;
 			sense := -1;
 			IF TraceVerbose & (trace * (TraceErrors + TraceInit) # {}) & (res # Res_OK) THEN
 				Show(name); KernelLog.String(" read capacity failed "); KernelLog.Int(res, 0); KernelLog.Ln;
