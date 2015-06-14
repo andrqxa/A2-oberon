@@ -46,6 +46,7 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR framePointer {UNTRACED}: StackFrame;
 	VAR object-: BaseTypes.Object;
 	VAR bound := FALSE: BOOLEAN;
+	VAR stackPinned := FALSE: BOOLEAN;
 
 	PROCEDURE &InitializeActivity (procedure: PROCEDURE; priority: Priority);
 	VAR stackFrame {UNTRACED}: StackFrame; StackFrameDescriptor {UNTRACED} EXTERN "BaseTypes.StackFrame": BaseTypes.Descriptor;
@@ -382,6 +383,7 @@ VAR newStack {UNTRACED}: POINTER {DISPOSABLE} TO ARRAY OF CHAR; stackFrame {UNTR
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid argument *)
 	currentActivity := SYSTEM.GetActivity ()(Activity);
+	ASSERT(~currentActivity.stackPinned);
 	size := LEN (currentActivity.stack); stackTop := ADDRESS OF currentActivity.stack[0] + size;
 	ASSERT (address <= stackTop);
 	IF address >= currentActivity.stackLimit THEN RETURN address END;
@@ -406,6 +408,28 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* return new address on increased stack *)
 	RETURN address + offset;
 END ExpandStack;
+
+PROCEDURE PinStack*(maxAdditionalSize: SIZE);
+VAR address, sp: ADDRESS; currentActivity: Activity;
+BEGIN
+	currentActivity := SYSTEM.GetActivity ()(Activity);
+	ASSERT(~currentActivity.stackPinned);
+	IF maxAdditionalSize > 0 THEN
+		address := SYSTEM.GetStackPointer();
+		DEC(address, maxAdditionalSize);
+		sp := ExpandStack(address);
+		SYSTEM.SetStackPointer(sp);
+	END;
+	currentActivity.stackPinned := TRUE;
+END PinStack;
+
+PROCEDURE UnpinStack*;
+VAR currentActivity: Activity;
+BEGIN
+	currentActivity := SYSTEM.GetActivity ()(Activity);
+	ASSERT(currentActivity.stackPinned);
+	currentActivity.stackPinned := FALSE;
+END UnpinStack;
 
 (** Returns whether the specified address corresponds to a local variable that resides on the stack of the current activity calling this procedure. *)
 PROCEDURE IsLocalVariable- (address: ADDRESS): BOOLEAN;

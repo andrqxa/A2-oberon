@@ -194,6 +194,17 @@ PROCEDURE SetPriority*( priority: LONGINT );
 BEGIN
 END SetPriority;
 
+PROCEDURE PinStack*(maxAdditionalSize: SIZE);
+BEGIN
+	Activities.PinStack(maxAdditionalSize);
+END PinStack;
+
+PROCEDURE UnpinStack*;
+BEGIN
+	Activities.UnpinStack;
+END UnpinStack;
+
+
 (** Return TRUE iff the specified protected object is locked exclusive to the current process. *)
 PROCEDURE LockedByCurrent*( obj: ANY ): BOOLEAN;
 VAR hdr {UNTRACED}: Heaps.ProtRecBlock; res: BOOLEAN;
