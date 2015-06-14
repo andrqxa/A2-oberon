@@ -5,8 +5,13 @@ MODULE UsbEhci; (** AUTHOR "staubesv"; PURPOSE "USB Enhanced Host Controller Dri
  *
  * Usage:
  *
- *	UsbEhci.Install ~ to load this device driver
- *	SystemTools.Free UsbEhci ~ unloads it
+ * This module provides the core implementation of the EHCI driver. Finding EHCI controllers was moved to a separate
+ * module to increase flexibility. If your EHCI controller is accessible with PCI, the command:
+ * 		UsbEhciPCI.Install ~
+ * will install EHCI drivers as needed. To remove them, simply uninstall Ehci modules:
+ * 		SystemTools.Free UsbEhciPCI UsbEhci ~
+ *
+ * In other cases, specific modules can be written, that will instanciate drivers as needed.
  *
  * References:
  *	Enhanced Host Controller Interface Specification for Universal Serial Bus, Rev. 1.0
@@ -43,11 +48,11 @@ MODULE UsbEhci; (** AUTHOR "staubesv"; PURPOSE "USB Enhanced Host Controller Dri
  *	13.11.2006	UpdatePipeStatus: Set pipe.status to Usbdi.Stalled when a stall is detected (staubesv)
  *)
 
-IMPORT SYSTEM, KernelLog, Machine, PCI, Kernel, Objects, Modules, UsbHcdi, Usbdi, Debug := UsbDebug;
+IMPORT SYSTEM, KernelLog, Machine, Kernel, Objects, Modules, UsbHcdi, Usbdi, Debug := UsbDebug;
 
 CONST
 
-	Description = "USB Enhanced Host Controller";
+	Description * = "USB Enhanced Host Controller";
 
 	(* Some configuration stuff *)
 	HcInterruptThreshold = 01H; (* Maximum rate at which the host controller will issue interrupts (in microframes, 125 microseconds) *)
@@ -60,52 +65,49 @@ CONST
 	should result in higher performance. *)
 	HcAsyncParkModeCount = 3;
 
-	(* If TRUE, the HC driver just continues if it could not get the ownership of the HC *)
-	OverrideHcOwnership = TRUE;
-
 	(* Host Controller Capability Registers *)
 	HcCapLength = 00H;
 	HcCapHciVersion = 02H;
 	HcCapSparams = 04H;
-	HcCapCparams = 08H;
+	HcCapCparams * = 08H;
 	HcCapPortroute = 0CH;
 
 	(* Host Controller Operational Registers *)
-	HcUsbCmd = 00H;
-	HcUsbSts = 04H;
-	HcUsbIntr = 08H;
-	HcFrIndex = 0CH;
-	HcCtrlDsSegment = 10H;
-	HcPeriodicListBase = 14H;
-	HcAsyncListAddr = 18H;
-	HcConfigFlag = 40H;
-	HcPortSc = 44H;
+	HcUsbCmd * = 00H;
+	HcUsbSts * = 04H;
+	HcUsbIntr * = 08H;
+	HcFrIndex * = 0CH;
+	HcCtrlDsSegment * = 10H;
+	HcPeriodicListBase * = 14H;
+	HcAsyncListAddr * = 18H;
+	HcConfigFlag * = 40H;
+	HcPortSc * = 44H;
 
 	(* HcUsbCmd register fields *)
-	CmdInterruptThreshold = {16..23};
-	CmdAsyncSchedParkMode = {11};
-	CmdAsyncSchedParkCount = {8..9};
-	CmdLightHcReset = {7}; (* Note: optional *)
-	CmdAsyncAdvDoorbell = {6};
-	CmdAsyncSchedEnable = {5};
-	CmdPeriodicSchedEnable = {4};
-	CmdFrameListSize = {2..3};
-	CmdHcReset = {1};
-	CmdRunStop = {0};
-	CmdReserved = {10} + {12..15} + {24..31};
+	CmdInterruptThreshold * = {16..23};
+	CmdAsyncSchedParkMode * = {11};
+	CmdAsyncSchedParkCount * = {8..9};
+	CmdLightHcReset * = {7}; (* Note: optional *)
+	CmdAsyncAdvDoorbell * = {6};
+	CmdAsyncSchedEnable * = {5};
+	CmdPeriodicSchedEnable * = {4};
+	CmdFrameListSize * = {2 .. 3};
+	CmdHcReset * = {1};
+	CmdRunStop * = {0};
+	CmdReserved * = {10} + {12..15} + {24..31};
 
 	(* HcUsbSts register fields *)
-	StsAsyncSchedule = {15};
-	StsPeriodicSchedule = {14};
-	StsReclamation = {13};
-	StsHcHalted = {12};
+	StsAsyncSchedule * = {15};
+	StsPeriodicSchedule * = {14};
+	StsReclamation * = {13};
+	StsHcHalted * = {12};
 	(* HcUsbSts & HcUsbIntr common fields *)
- 	StsAsyncAdvance= {5};
-	StsHostSystemError = {4};
-	StsFrameListRollover = {3};
-	StsPortChange = {2};
-	StsUsbError = {1};
-	StsUsbInterrupt = {0};
+ 	StsAsyncAdvance * = {5};
+	StsHostSystemError * = {4};
+	StsFrameListRollover * = {3};
+	StsPortChange * = {2};
+	StsUsbError * = {1};
+	StsUsbInterrupt * = {0};
 
 	(* Port Status & Control register, EHCIspec p. 26-30 *)
 	PscWakeOnOvercurrent = {22};
@@ -114,7 +116,7 @@ CONST
 	PscTestControl = {16..19};
 	PscIndicatorControl = {14..15};
 	PscPortOwner = {13};
-	PscPortPower = {12};
+	PscPortPower * = {12};
 	PscLineStatus = {10..11};
 	PscPortReset = {8};
 	PscSuspend = {7};
@@ -263,18 +265,15 @@ CONST
 
 	PageSize = 4096;
 
-	(* Legacy support related constants *)
-	bOwnedByBios = {16};
-	bRequestOwnership = {24};
-	USBCapabilityID = 01H; (* Capability ID of USB Legacy Support Extended Capability *)
+	Polling = FALSE;
 
 TYPE
 
-	EnhancedHostController = OBJECT (UsbHcdi.Hcd)
+	EnhancedHostController * = OBJECT (UsbHcdi.Hcd)
 	VAR
-		framelist : UsbHcdi.AlignedMemSpace;
+		framelist *: UsbHcdi.AlignedMemSpace;
 
-		pwcr : LONGINT; (* Port Wake Capability Register; Not implemented by device if pwcr = 0 *)
+		pwcr * : LONGINT; (* Port Wake Capability Register; Not implemented by device if pwcr = 0 *)
 
 		(* Information from Host Controller Capability Registers *)
 		(* HCSPARAMS - Structural Parameters *)
@@ -296,8 +295,8 @@ TYPE
 
 		(* The size of control data structures is dependent on whether the HC uses 32bit or 64bit address pointers as indicated
 		by the cap64bit field *)
-		sizeQtd : LONGINT;
-		sizeQh : LONGINT;
+		sizeQtd, alignQtd : LONGINT;
+		sizeQh, alignQh : LONGINT;
 
 		(* HC Companion Port Route Descriptor, NIL of not available.
 		If the capPortRoutingRules is TRUE, the HC provides a description of which port is routed to
@@ -313,10 +312,10 @@ TYPE
 
 		(* The Asynchronous Advance Doorbell interrupt is always enabled by this driver. Since the interrupt handler will
 		clear the bit that were set when it was invoked, it sets hcHandshake to TRUE, so its sticky *)
-		hcHandshake : BOOLEAN;
+		hcHandshake * : BOOLEAN;
 
 		(* Set of all currently enabled interrupts *)
-		interruptsEnabled : SET;
+		interruptsEnabled * : SET;
 
 		(** Enable power for the specified port *)
 		PROCEDURE EnablePortPower*(port : LONGINT);
@@ -511,6 +510,18 @@ TYPE
 		VAR dword : SET; nakRL, multi, mmask : LONGINT;
 		BEGIN
 			ASSERT(pipe.maxPacketSize <= 1024); (* Maximum allowed packet size *)
+
+			(*
+			pipe.qh := Align(pipe.qh, alignQh);
+			pipe.tdBase := pipe.qh + alignQh;;
+			*)
+			(*
+			IF ~CheckBoundary(pipe.qh, sizeQh) THEN
+				INC(pipe.qh, sizeQh);
+				INC(pipe.tdBase, sizeQh)
+			END;
+			*)
+			
 			(* Queue Head Horizontal Link Pointer is not set here *)
 			(* Queue Head Endpoint Capabilities 1 *)
 			nakRL := 3;
@@ -623,6 +634,7 @@ TYPE
 					(* If the asynchronous schedule is enabled, exactly one queue head MUST have the H-bit set. *)
 					dword := SYSTEM.VAL(SET, SYSTEM.GET32(pipe.qh + QhEpCapabilities1)) + QhHeadOfReclamation;
 					SYSTEM.PUT32(pipe.qh + QhEpCapabilities1, dword);
+					Machine.FlushDCacheRange(pipe.qh, sizeQh);
 
 					(* Insert the queue head into the schedule list and activate the asynchronous schedule *)
 					SYSTEM.PUT32(iobase + HcAsyncListAddr, pipe.qh); FlushPCI;
@@ -632,6 +644,7 @@ TYPE
 					adr := asyncListAddr;
 					dword := SYSTEM.VAL(SET, SYSTEM.GET32(adr + QhHorizontalLinkPointer));
 					SYSTEM.PUT32(pipe.qh + QhHorizontalLinkPointer, dword);
+					Machine.FlushDCacheRange(pipe.qh, sizeQh);
 
 					(* Insert the newly created queue head into the asynchronous schedule list. *)
 					dword := SYSTEM.VAL(SET, pipe.qh) * {5..31} + {1}  - {2}  - QhTerminate;
@@ -641,6 +654,8 @@ TYPE
 				adr := SYSTEM.GET32(pipe.queue + QhHorizontalLinkPointer);
 				SYSTEM.PUT32(pipe.qh + QhHorizontalLinkPointer, adr);
 				SYSTEM.PUT32(pipe.queue + QhHorizontalLinkPointer, pipe.qh + SYSTEM.VAL(LONGINT, {1} - {2}));
+				Machine.FlushDCacheRange(pipe.qh, sizeQh);
+				Machine.FlushDCacheRange(pipe.queue, sizeQh);
 				(* Enable the periodic list if necessary *)
 				dword := SYSTEM.VAL(SET, SYSTEM.GET32(iobase + HcUsbSts));
 				IF dword * StsPeriodicSchedule = {} THEN
@@ -649,7 +664,8 @@ TYPE
 					END;
 				END;
 			END;
-			IF Debug.Trace & Debug.traceQueuing THEN Show("Inserted QH at "); KernelLog.Hex(pipe.qh, 8); KernelLog.Ln; END;
+			IF Debug.Trace & Debug.traceQueuing THEN Show("Inserted QH at "); KernelLog.Address(pipe.qh); KernelLog.Ln; END;
+			Machine.FlushDCacheRange(pipe.qh, sizeQh);
 			RETURN TRUE;
 		END InsertQH;
 
@@ -694,12 +710,15 @@ TYPE
 		 BEGIN (* Caller must hold obj lock *)
 			prev := SYSTEM.GET32(iobase + HcAsyncListAddr);
 			ASSERT((prev # 0) & (SYSTEM.VAL(SET, prev) * {0..4} = {}));
+			Machine.InvalidateDCacheRange(prev, sizeQh);
 			prev := SYSTEM.GET32(prev + QhHorizontalLinkPointer);
 			ASSERT((SYSTEM.VAL(SET, prev) * {1} # {}) & (SYSTEM.VAL(SET, prev) * QhTerminate = {})); (* Pointer references queue head *)
 			prev := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, prev) * {5..31});
+			Machine.InvalidateDCacheRange(prev, sizeQh);
 			cur := SYSTEM.GET32(prev + QhHorizontalLinkPointer);
 			ASSERT((SYSTEM.VAL(SET, cur) * {1} # {}) & (SYSTEM.VAL(SET, cur) * QhTerminate  =  {})); (* Pointer references queue head *)
 			cur := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, cur) * {5..31});
+			Machine.InvalidateDCacheRange(cur, sizeQh);
 
 			(* prev is the address of the queue head that points to the queue head with the address cur *)
 			IF cur = prev THEN (* Only one queue head in the list *)
@@ -724,6 +743,7 @@ TYPE
 					cur := SYSTEM.VAL(LONGINT, dword * {5..31});
 					IF cur = pipe.qh THEN (* QH found *) EXIT; END;
 					IF cur = start THEN (* list completely searched but QH not found *) EXIT; END;
+					Machine.InvalidateDCacheRange(cur, sizeQh);
 				END;
 
 				IF cur = pipe.qh THEN (* Found the queue head. prev is pointing to it *)
@@ -736,6 +756,7 @@ TYPE
 					(* Remove QH from asynchronous list and inforam host controller *)
 					dword := SYSTEM.VAL(SET, SYSTEM.GET32(cur + QhHorizontalLinkPointer));
 					SYSTEM.PUT32(prev + QhHorizontalLinkPointer, dword);
+					Machine.FlushDCacheRange(prev, sizeQh);
 				ELSIF Debug.Level >= Debug.Warnings THEN Show("Failed to remove QH from asynchronous list: QH not found."); KernelLog.Ln;
 				END;
 				(* Before we may free the pipe ressources, we have to make sure that the HC has no cached references to the structure 	*)
@@ -776,10 +797,12 @@ TYPE
 			IF pipe.queue = 0 THEN RETURN; END;
 			cur := pipe.queue;
 			LOOP
+				Machine.InvalidateDCacheRange(cur, sizeQh);
 				next := SYSTEM.VAL(SET, SYSTEM.GET32(cur + QhHorizontalLinkPointer));
 				IF next * {5..31} = SYSTEM.VAL(SET, pipe.qh) * {5..31} THEN (* found *)
 					temp := SYSTEM.GET32(pipe.qh + QhHorizontalLinkPointer);
 					SYSTEM.PUT32(cur + QhHorizontalLinkPointer, temp);
+					Machine.FlushDCacheRange(cur, sizeQh);
 					IF Debug.Trace & Debug.traceQueuing THEN KernelLog.String("UsbEhci: Deleted Interrupt Pipe QH."); KernelLog.Ln; END;
 					NEW(timer); timer.Sleep(10); (* HC has still access to QH, wait > 1ms *)
 					EXIT;
@@ -829,7 +852,7 @@ TYPE
 		END LinkTDsAllowed;
 
 		(* Insert the TD list <td> into the queue (ED) <queue> *)
-		PROCEDURE LinkTDs*(pipe : UsbHcdi.Pipe;  qtd : LONGINT);
+		PROCEDURE LinkTDs*(pipe : UsbHcdi.Pipe;  qtd : Machine.Address32);
 		VAR dword : SET;
 		BEGIN {EXCLUSIVE}
 			ASSERT(SYSTEM.VAL(SET, qtd) * {0..4} = {}); (* 32byte alignment *)
@@ -841,6 +864,8 @@ TYPE
 			END;
 
 			SYSTEM.PUT32(pipe.qh + QhNextQtdPointer, qtd);
+			Machine.FlushDCacheRange(pipe.qh, sizeQh);
+			Machine.FlushDCacheRange(qtd, sizeQtd);
 			IF SYSTEM.VAL(SET, SYSTEM.GET32(iobase + HcUsbSts)) * StsAsyncSchedule = {} THEN
 				dword := SYSTEM.VAL(SET, SYSTEM.GET32(iobase + HcUsbCmd));
 				IF dword * CmdAsyncSchedEnable = {} THEN
@@ -856,14 +881,17 @@ TYPE
 		END UnlinkTDs;
 
 		(** Remove all transfer descriptors from the pipe's queue head *)
-		PROCEDURE UnlinkTDsInternal*(pipe : UsbHcdi.Pipe);
+		PROCEDURE UnlinkTDsInternal(pipe : UsbHcdi.Pipe);
 		VAR dword : SET; timer : Kernel.Timer; qtd : LONGINT; mtimer : Kernel.MilliTimer;
 		BEGIN (* caller must hold obj lock *)
 			IF pipe.firstTD = 0 THEN RETURN END; (* pipe has not yet been used *)
 			(* We must inactivate all qTD of the queue head... *)
 
 			qtd := pipe.firstTD; ASSERT(pipe.lastTD >= pipe.firstTD); (* Consistency check *)
+			AssertAlignment(qtd, alignQtd);
 			WHILE qtd <= pipe.lastTD DO
+				Machine.InvalidateDCacheRange(qtd, sizeQtd);
+				AssertAlignment(qtd, alignQtd);
 				dword := SYSTEM.VAL(SET, SYSTEM.GET32(qtd + QtdToken));
 				SYSTEM.PUT32(qtd + QtdToken, dword - TdActive);
 				qtd := qtd + sizeQtd;
@@ -871,8 +899,10 @@ TYPE
 
 			(* we should wait until the transaction overlay is also inactive *)
 			Kernel.SetTimer(mtimer, 2000);
+			Machine.InvalidateDCacheRange(pipe.qh, sizeQh);
 			dword := SYSTEM.VAL(SET, SYSTEM.GET32(pipe.qh + QhQtdToken));
 			WHILE ~Kernel.Expired(mtimer) & (dword  * TdActive # {}) DO
+				Machine.InvalidateDCacheRange(pipe.qh, sizeQh);
 				dword := SYSTEM.VAL(SET, SYSTEM.GET32(pipe.qh + QhQtdToken));
 				Objects.Yield;
 			END;
@@ -882,6 +912,7 @@ TYPE
 
 			NEW(timer); timer.Sleep(10); (* > 1ms - the HC could update the QhQtdToken field *)
 			SYSTEM.PUT32(pipe.qh + QhQtdToken, 0);
+			Machine.FlushDCacheRange(pipe.qh, sizeQh);
 			timer.Sleep(2); (* > 1ms *)
 			IF SYSTEM.VAL(SET, SYSTEM.GET32(pipe.qh + QhQtdToken)) * TdActive # {} THEN
 				IF Debug.Level >= Debug.Errors THEN Show("Failed to unlink TDs from pipe:"); KernelLog.Ln;  pipe.Show(TRUE); KernelLog.Ln; END;
@@ -892,6 +923,7 @@ TYPE
 			SYSTEM.PUT32(pipe.qh + QhAltNextQtdPointer, QhTerminate);
 			SYSTEM.PUT32(pipe.qh + QhCurrentQtdPointer, 0); (* Bits 0-4 are reserved *)
 			SYSTEM.PUT32(pipe.qh + QhQtdToken, 0);
+			Machine.FlushDCacheRange(pipe.qh, sizeQh);
 			pipe.firstTD := 0; pipe.lastTD := 0;
 		END UnlinkTDsInternal;
 
@@ -903,6 +935,7 @@ TYPE
 		PROCEDURE ClearHalt(pipe : UsbHcdi.Pipe);
 		VAR dword : SET;
 		BEGIN
+			Machine.InvalidateDCacheRange(pipe.qh, sizeQh);
 			dword := SYSTEM.VAL(SET, SYSTEM.GET32(pipe.qh + QhQtdToken));
 			IF dword * TdHalted # {} THEN
 				SYSTEM.PUT32(pipe.qh + QhCurrentQtdPointer, 0);
@@ -922,6 +955,7 @@ TYPE
 					SYSTEM.PUT32(pipe.qh + QhExtBufferPointer3, 0);
 					SYSTEM.PUT32(pipe.qh + QhExtBufferPointer4, 0);
 				END;
+				Machine.FlushDCacheRange(pipe.qh, sizeQh)
 			ELSIF Debug.Level >= Debug.Warnings THEN Show("Tried to clear a non-halted pipe."); KernelLog.Ln;
 			END;
 		END ClearHalt;
@@ -943,14 +977,20 @@ TYPE
 		 *)
 		PROCEDURE ScheduleControl*(pipe : UsbHcdi.Pipe; direction : LONGINT; msg : UsbHcdi.ControlMessage;  bufferLen : LONGINT; VAR buffer : Usbdi.Buffer);
 		VAR
-			qtd : LONGINT;
+			qtd : Machine.Address32;
 			dword : SET;
 			ranges : ARRAY ScatterGatherListSize OF Machine.Range;
 			numRanges : LONGINT;
 		BEGIN
+			(*Machine.FlushDCacheRange(ADDRESSOF(buffer[0]), bufferLen);*)
 			(* pipe.tdBase = pipe.qh + 32 in UsbHcdi *)
-			pipe.firstTD := pipe.tdBase - 32 + sizeQh;
+(*			pipe.firstTD := pipe.tdBase;
+			ASSERT(pipe.firstTD = pipe.qh + alignQh); 
+*)			
+			pipe.firstTD := pipe.tdBase - 32 + alignQh;
+			AssertAlignment(pipe.firstTD, alignQtd);
 			ASSERT(SYSTEM.VAL(SET, pipe.firstTD) * {0..4} = {}); (* qTDs must be 32byte aligned *)
+			ASSERT(pipe.firstTD MOD alignQtd = 0);
 
 			IF (pipe.speed = UsbHcdi.LowSpeed) OR (pipe.speed = UsbHcdi.FullSpeed) THEN
 				IF pipe.maxRetries = 0 THEN
@@ -963,6 +1003,7 @@ TYPE
 			qtd := pipe.firstTD;
 			ASSERT((qtd + sizeQtd - 1 <= ADDRESSOF(pipe.tdBuffer[pipe.tdBufferLen-1])));
 
+			AssertAlignment(qtd+sizeQtd, alignQtd);
 			SYSTEM.PUT32(qtd + QtdNextQtdPointer, qtd + sizeQtd);
 			SYSTEM.PUT32(qtd + QtdAltNextQtdPointer, QtdTerminate); (* Mark Alternate Next qTD Pointer as invalid *)
 
@@ -994,6 +1035,7 @@ TYPE
 				SYSTEM.PUT32(qtd + QtdExtBufferPtr3, 0);
 				SYSTEM.PUT32(qtd + QtdExtBufferPtr4, 0);
 			END;
+			Machine.FlushDCacheRange(qtd, sizeQtd);
 
 			(* Setup phase always starts with dataToggle = FALSE, so now it must be TRUE *)
 			pipe.dataToggle := TRUE;
@@ -1005,7 +1047,9 @@ TYPE
 				END;
 			END;
 
+			Machine.FlushDCacheRange(qtd, sizeQtd);
 			qtd := qtd + sizeQtd;
+			AssertAlignment(qtd, alignQtd);
 			IF qtd + sizeQtd - 1 > ADDRESSOF(pipe.tdBuffer[pipe.tdBufferLen-1]) THEN
 				IF Debug.Level >= Debug.Errors THEN KernelLog.String("UsbEhci: TD buffer too small."); KernelLog.Ln; END;
 				pipe.status := Usbdi.Error; pipe.errors := pipe.errors + UsbHcdi.OutOfTDs; RETURN;
@@ -1043,15 +1087,24 @@ TYPE
 				SYSTEM.PUT32(qtd + QtdExtBufferPtr4, 0);
 			END;
 
+			Machine.FlushDCacheRange(ADDRESSOF(msg[0]), LEN(msg));
+			Machine.FlushDCacheRange(ADDRESSOF(buffer[0]), bufferLen);
+			Machine.FlushDCacheRange(qtd, sizeQtd);
 			pipe.lastTD := qtd;
 		END ScheduleControl;
 
 		PROCEDURE Schedule*(pipe : UsbHcdi.Pipe; bufferLen, offset: LONGINT; VAR buffer: Usbdi.Buffer);
 		VAR dword : SET;
 		BEGIN
-			 SYSTEM.PUT32(pipe.qh + QhCurrentQtdPointer, 0);
-
-			pipe.firstTD :=  pipe.tdBase - 32 + sizeQh;
+			Machine.FlushDCacheRange(ADDRESSOF(buffer[offset]), bufferLen);
+			SYSTEM.PUT32(pipe.qh + QhCurrentQtdPointer, 0);
+(*			pipe.firstTD := pipe.tdBase;
+			ASSERT(pipe.firstTD = pipe.qh + alignQh); 
+*)
+			pipe.firstTD :=  pipe.tdBase - 32 + alignQh;
+			
+			AssertAlignment(pipe.firstTD, alignQtd);
+			ASSERT(pipe.firstTD MOD alignQtd = 0);
 			ASSERT(SYSTEM.VAL(SET, pipe.firstTD) * {0..4} = {}); (* qTDs must be 32byte aligned *)
 
 			IF ~CreateTDList(pipe, pipe.direction, bufferLen, offset, buffer, pipe.firstTD, pipe.lastTD, FALSE) THEN
@@ -1066,10 +1119,10 @@ TYPE
 			END;
 		END Schedule;
 
-		PROCEDURE CreateTDList(pipe : UsbHcdi.Pipe; direction, len, ofs : LONGINT; VAR buffer : Usbdi.Buffer; firstTD : LONGINT; VAR lastTD : LONGINT; tdToggle : BOOLEAN) : BOOLEAN;
+		PROCEDURE CreateTDList(pipe : UsbHcdi.Pipe; direction, len, ofs : LONGINT; VAR buffer : Usbdi.Buffer; firstTD : LONGINT; VAR lastTD : Machine.Address32; tdToggle : BOOLEAN) : BOOLEAN;
 		VAR
 			restlen, curlen, temp : LONGINT;
-			i, qtd : LONGINT;
+			j, qtd, nextTd : LONGINT;
 			dword : SET;
 			numRanges, idx, offset : LONGINT;
 		BEGIN
@@ -1088,7 +1141,7 @@ TYPE
 			restlen := len;	(* total amount of data to be transferred *)
 
 			WHILE restlen > 0 DO (* build qTD chain *)
-
+				
 				qtd := qtd + sizeQtd;
 				IF qtd + sizeQtd - 1 > ADDRESSOF(pipe.tdBuffer[pipe.tdBufferLen-1]) THEN
 					IF Debug.Level >= Debug.Errors THEN KernelLog.String("UsbEhci: TD buffer too small"); KernelLog.Ln; END;
@@ -1108,12 +1161,11 @@ TYPE
 				INC(idx);
 
 				(* Fill in the other 4 buffer pointers *)
-				i := 1;
-				WHILE (i < 5) DO
+				FOR j := 1 TO 4 DO
 					IF restlen <= 0 THEN
-						SYSTEM.PUT32(qtd + QtdBufferPtr0 + i*4, 0);
+						SYSTEM.PUT32(qtd + QtdBufferPtr0 + j*4, 0);
 					ELSE
-						IF i = 4 THEN (* last buffer available in this qTD *)
+						IF j = 4 THEN (* last buffer available in this qTD *)
 							temp := PageSize - ((curlen + PageSize) MOD pipe.maxPacketSize); (* data that fits into the last buffer (max) *)
 							IF restlen > temp THEN
 								(* The HC will issues USB transaction at pipe.maxPacketSize granularity. If this is not the 			*)
@@ -1121,13 +1173,13 @@ TYPE
 								(* chain was not a multiple of pipe.maxPacketSize, the device will send more data (since we 		*)
 								(* requested more data) and the HC thinks it's a babble.											*)
 								curlen := curlen + temp; restlen := restlen - temp; offset := temp;
-								SYSTEM.PUT32(qtd + QtdBufferPtr0 + i*4, pipe.sgList[idx].adr);
+								SYSTEM.PUT32(qtd + QtdBufferPtr0 + j*4, pipe.sgList[idx].adr);
 								IF offset = PageSize THEN INC(idx); offset := 0;
 								ELSE (* In the next iteration of the outer while loop, the same page will be completed -> don't increment idx *)
 								END;
 							ELSE (* this is the last qTD in chains *)
 								curlen := curlen + restlen; restlen := 0;
-								SYSTEM.PUT32(qtd + QtdBufferPtr0 + i*4, pipe.sgList[idx].adr);
+								SYSTEM.PUT32(qtd + QtdBufferPtr0 + j*4, pipe.sgList[idx].adr);
 							END;
 						ELSE
 							IF restlen > PageSize THEN
@@ -1135,11 +1187,10 @@ TYPE
 							ELSE
 								curlen := curlen + restlen; restlen := 0;
 							END;
-							SYSTEM.PUT32(qtd + QtdBufferPtr0 + i*4, pipe.sgList[idx].adr);
+							SYSTEM.PUT32(qtd + QtdBufferPtr0 + j*4, pipe.sgList[idx].adr);
 							INC(idx);
 						END;
 					END;
-					INC(i);
 				END;
 
 				IF cap64bit THEN
@@ -1178,11 +1229,14 @@ TYPE
 				END;
 
 				SYSTEM.PUT32(qtd + QtdToken, dword);
+				Machine.FlushDCacheRange(qtd, sizeQtd);
 			END;
 
 			lastTD := qtd;
 			RETURN TRUE;
 		END CreateTDList;
+
+
 
 		PROCEDURE InterruptHandler;
 		VAR s  : SET;
@@ -1232,11 +1286,15 @@ TYPE
 		BEGIN
 			FlushPCI;
 			(* First look up active bit in the QH tranfer overlay *)
+			Machine.InvalidateDCacheRange(pipe.qh, sizeQh);
 			s := SYSTEM.VAL(SET, SYSTEM.GET32(pipe.qh + QhQtdToken));
 			IF s * TdActive # {}  THEN  (* The HC hasn't yet executed the transaction *) RETURN; END;
 
 			errors := UsbHcdi.NoErrors; loop := 0; restLen := 0; qtd := pipe.firstTD;
 			LOOP
+				AssertAlignment(qtd, alignQtd);
+				Machine.InvalidateDCacheRange(qtd, sizeQtd);
+
 				(* evaluate condition codes (CC)*)
 				s := SYSTEM.VAL(SET, SYSTEM.GET32(qtd + QtdToken)) * QtdStatus - TdPingState - TdSplitTransactionState;
 
@@ -1297,6 +1355,7 @@ TYPE
 				END;
 			END;
 
+			Machine.InvalidateDCacheRange(pipe.qh, sizeQh);
 			s := SYSTEM.VAL(SET, SYSTEM.GET32(pipe.qh + QhQtdToken));
 			IF s * TdHalted # {} THEN
 				ClearHalt(pipe);
@@ -1305,6 +1364,7 @@ TYPE
 			IF (pipe.type = UsbHcdi.PipeBulk) OR (pipe.type = UsbHcdi.PipeInterrupt) THEN
 				(* If we received an ACK, do the toggle *)
 				IF (pipe.status = Usbdi.Ok) OR (pipe.status = Usbdi.ShortPacket) THEN
+					Machine.InvalidateDCacheRange(pipe.lastTD, sizeQtd);
 					s := SYSTEM.VAL(SET, SYSTEM.GET32(pipe.lastTD + QtdToken));
 					IF s * QtdDataToggle # {} THEN  pipe.dataToggle := TRUE; ELSE pipe.dataToggle := FALSE;  END;
 				END;
@@ -1312,7 +1372,7 @@ TYPE
 		END UpdatePipeStatus;
 
 		(* Reset the host controller. Note: This will NOT assert reset on the USB downstream ports. *)
-		PROCEDURE HardwareReset() : BOOLEAN;
+		PROCEDURE HardwareReset * () : BOOLEAN;
 		CONST MaxWaits = 1000; (* Timeout in milliseconds the HC must have completed the reset command *)
 		VAR dword : SET; i : LONGINT;
 		BEGIN
@@ -1418,6 +1478,7 @@ TYPE
 					INC(k); j := j DIV 2;
 				END;
 				framelist.data[framelist.base + i] := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, interruptQh[k]) + {1});
+				Machine.FlushDCacheRange(ADDRESSOF(framelist.data[framelist.base]), 4096);
 			END;
 			RETURN TRUE;
 		END InitFrameList;
@@ -1427,7 +1488,7 @@ TYPE
 		 * @param int Interrupt Line
 		 * @return TRUE if initialization succeeded, FALSE otherwise
 		 *)
-		PROCEDURE Init(iobase , irq  :  LONGINT) : BOOLEAN;
+		PROCEDURE Init * (iobase , irq  :  LONGINT) : BOOLEAN;
 		VAR
 			reg  : LONGINT;
 			dword : SET; qword : HUGEINT;
@@ -1440,7 +1501,7 @@ TYPE
 
 			(* Read in the Host Controller Capability Registers *)
 			(* Get and check EHCI revision *)
-			reg :=SYSTEM.GET16(iobase + HcCapHciVersion);
+			reg := SYSTEM.GET16(iobase + HcCapHciVersion);
 			IF reg # 0100H THEN
 				KernelLog.String("UsbEhci: Revision of EHCI Programming Interface not supported."); KernelLog.Ln;
 				RETURN FALSE;
@@ -1512,9 +1573,13 @@ TYPE
 			IF cap64bit THEN
 				sizeQh := 96; (* Actually: 68 Bytes *)
 				sizeQtd := 64; (* Actually: 52 Bytes *)
+				alignQh := 128;
+				alignQtd := 64;
 			ELSE
 				sizeQh := 64; (* Actually: 48 Byte *)
 				sizeQtd := 32;
+				alignQh := 64;
+				alignQtd := 32;
 			END;
 
 			IF ~InitFrameList() THEN
@@ -1549,6 +1614,7 @@ TYPE
 
 			(* Set interrupt threshold *)
 			dword := SYSTEM.VAL(SET, SYSTEM.GET32(iobase + HcUsbCmd));
+			dword := dword - {16 .. 23};
 			IF ((HcInterruptThreshold#01H) & (HcInterruptThreshold#02H) & (HcInterruptThreshold#04H) & (HcInterruptThreshold#08H)
 			    & (HcInterruptThreshold#10H) & (HcInterruptThreshold#20H) & (HcInterruptThreshold#40H)) THEN
 				(* Wrong parameter value... use default *)
@@ -1570,11 +1636,23 @@ TYPE
 		END Init;
 
 		(* PCI writes may be posted. A read forces posted writes to be flushed before the read transaction is proceeded. *)
-		PROCEDURE FlushPCI;
+		PROCEDURE FlushPCI *;
 		VAR ignore : LONGINT;
 		BEGIN
 			ignore := SYSTEM.GET32(iobase + HcUsbSts);
 		END FlushPCI;
+
+		(* Release the HC ownership semaphore; eecp is the EHCI Extended Capability Pointer *)
+		PROCEDURE ReleaseHcOwnerShip(bus, device, function, eecp : LONGINT);
+		END ReleaseHcOwnerShip;
+
+		(**
+		 * Inits the ULPI PHY of the controller.
+		 *)
+		PROCEDURE InitUlpi(): BOOLEAN;
+		BEGIN
+			RETURN TRUE
+		END InitUlpi;
 
 		(*
 		 * Start the host controller.
@@ -1585,14 +1663,39 @@ TYPE
 		 * - route all ports to the EHCI controller
 		 * - power on all ports of the root hub
 	  	 *)
-		PROCEDURE Start():BOOLEAN;
+		PROCEDURE Start * ():BOOLEAN;
 		VAR dword : SET;
+		TYPE 
+			IRQPoller = OBJECT (* support polling i/o IRQ -- for testing *)
+				VAR handler: PROCEDURE {DELEGATE}; timer: Kernel.Timer;
+				
+				PROCEDURE & Init* (h: PROCEDURE {DELEGATE});
+				BEGIN
+					handler := h;
+					NEW(timer); 
+				END Init;
+				
+			BEGIN{ACTIVE}
+				LOOP
+					handler();
+					timer.Sleep(1);
+				END;
+			END IRQPoller;
+		VAR is: IRQPoller;
 		BEGIN
 			IF Debug.Trace & Debug.traceInit THEN KernelLog.String("UsbEhci: Starting host controller... "); KernelLog.Ln; END;
 			(* Enable Interrupts *)
 			SetState(UsbHcdi.Initialized);
-			Objects.InstallHandler(InterruptHandler, Machine.IRQ0+irq);
+			
+			IF Polling THEN
+				NEW(is, InterruptHandler)
+			ELSE
+				Objects.InstallHandler(InterruptHandler, Machine.IRQ0+irq);
+			END;
 
+			(* Clear interrupts *)
+			SYSTEM.PUT32(iobase + HcUsbSts, 0);
+			
 			(* Enable all interrupts except the frame list rollover interrupt *)
 			dword := SYSTEM.VAL(SET, SYSTEM.GET32(iobase + HcUsbIntr));
 			interruptsEnabled := dword + {0..5}  - StsFrameListRollover;
@@ -1613,7 +1716,7 @@ TYPE
 			dword := dword + {0};
 			SYSTEM.PUT32(iobase + HcConfigFlag, dword); FlushPCI;
 
-			RETURN TRUE;
+			RETURN InitUlpi();
 		END Start;
 
 		PROCEDURE &Default*(bus, device, function : LONGINT);
@@ -1795,13 +1898,18 @@ TYPE
 			END;
 		END Diag;
 
-		PROCEDURE Show(txt : ARRAY OF CHAR);
+		PROCEDURE Show * (txt : ARRAY OF CHAR);
 		BEGIN
 			KernelLog.String("UsbEhci: "); KernelLog.String(name); KernelLog.String(" ("); KernelLog.String(desc); KernelLog.String("): ");
 			KernelLog.String(txt);
 		END Show;
 
 	END EnhancedHostController;
+
+PROCEDURE AssertAlignment(desc: ADDRESS; alignment: SIZE);
+BEGIN
+	ASSERT(desc MOD alignment = 0);
+END AssertAlignment;
 
 PROCEDURE Indent(spaces : LONGINT);
 VAR i : LONGINT;
@@ -2080,7 +2188,7 @@ BEGIN
 END ShowItd;
 *)
 
-PROCEDURE ShowInterrupts(s : SET);
+PROCEDURE ShowInterrupts * (s : SET);
 BEGIN
 	IF Debug.Trace THEN
  	IF s * StsAsyncAdvance # {} THEN KernelLog.String("[AsyncAdvance]"); END;
@@ -2092,205 +2200,14 @@ BEGIN
 	END;
 END ShowInterrupts;
 
-(*
- * Get the ownership of the host controller.
- * If the EHCI Extended Capability Pointer (EECP) in the Host Controller Capabilities Parameters register (HCCPARAM) has
- * a non-zero value, its value indicates the presence of EHCI Extended Capabilities Registers. At offset EECP + 0H in
- * the PCI configuration space, we find the USB Legacy Support Extended Capability (USBLEGSUP), which is used to coordinate
- * ownership of the EHCI host controller by the pre-OS software and the operating system software.
- * IF the USBLEGSUP register is not available, this procedure simply returns TRUE since there is no legacy support. Otherwise,
- * we request HC ownership and wait for the pre-OS software to acknowledge.
- * Note: At the time this driver was implemented, the current EHCI specification did not specify any other Extended Capabilities
- *           than USB Legacy Support. The capability registers from, however, a linked list, so more capabilities could be added in
- *           the future.
- * @param bus PCI bus number of HC
- * @param device PCI device number of HC
- * @param function PCI function number of HC
- * @param iobase Virtual I/O base address of the HC
- * @return TRUE, if system software taken over the HC, false otherwise
- *)
-PROCEDURE GetHcOwnerShip(bus, device, function: LONGINT; iobase : ADDRESS) : BOOLEAN;
-CONST
-	MaxWaits = 1000; (* Timeout for pre-OS to system software HC handoff [ms], not specified by EHCIspec *)
-VAR
-	timer : Kernel.Timer;
-	usblegsup : SET;
-	eecp, reg, res, waits : LONGINT;
-	hcOwnedByOS : BOOLEAN;
-BEGIN
-	(* Get the HC Capabilities Parameters register *)
-	reg := SYSTEM.GET32(iobase + HcCapCparams);
-
-	(* Get the EHCI Extended Capabilities Pointer (EECP) *)
-	eecp := SYSTEM.VAL(LONGINT, LSH(SYSTEM.VAL(SET, reg) * {8..15}, - 8));
-
-	(* 00H: No capability list; > 40H to maintain consistency with PCI header *)
-	IF eecp > 40H THEN
- 		(* USB Legacy Support registers are available. eecp is an offset into the PCI configuration space	*)
-		(* pointing to the USB Legacy Support Extended Capability, which we load now.  				*)
-		IF Debug.Trace & Debug.traceInit THEN
-			KernelLog.String("UsbEhci: EHCI Extended Capabilities at offset "); KernelLog.Hex(eecp, -2); KernelLog.Char("H"); KernelLog.Ln;
-		END;
-      		res :=  PCI.ReadConfigDword(bus, device, function, eecp, reg);
-		IF (res = PCI.Done) & (reg MOD 256 = USBCapabilityID) THEN (* USB legacy support available *)
-			IF Debug.Trace & Debug.traceInit THEN KernelLog.String("UsbEhci: Legacy support capability found."); KernelLog.Ln; END;
-			usblegsup := SYSTEM.VAL(SET, reg);
-			IF usblegsup * bOwnedByBios # {} THEN
-				IF Debug.Trace & Debug.traceInit THEN KernelLog.String("UsbEhci: Request ownership of host controller... "); END;
-				(* The value of the USB Legacy Support Extented Capability keeps its value when soft booting. If we set it before, 	*)
-				(* clear the bRequestOwnership bit now 																		*)
-				IF usblegsup * bRequestOwnership # {} THEN
-					KernelLog.Enter; KernelLog.String("UsbEhci: Warning: controller already owns HC."); KernelLog.Exit;
-					res := PCI.WriteConfigByte(bus, device, function, eecp + 3, SYSTEM.VAL(LONGINT, LSH(usblegsup - bRequestOwnership, -24)));
-					ASSERT(res = PCI.Done);
-				END;
-
-				(* Set HC OS Owned Semaphore to indicate that we (want to) control the host controller... *)
-				res := PCI.WriteConfigByte(bus, device, function, eecp + 3, SYSTEM.VAL(LONGINT, LSH(usblegsup + bRequestOwnership, -24)));
-
-				hcOwnedByOS := FALSE; waits := 0; NEW(timer);
-				WHILE ~hcOwnedByOS & (res = PCI.Done) & (waits < MaxWaits) DO
-					(* The pre-OS software should clear the HC BIOS Owned Semaphore bit... *)
-					res := PCI.ReadConfigDword(bus, device, function, eecp, reg);
-					usblegsup := SYSTEM.VAL(SET, reg);
-					IF (usblegsup * bRequestOwnership # {}) & (usblegsup * bOwnedByBios = {}) THEN
-						hcOwnedByOS := TRUE;
-					ELSE
-						INC(waits, 1); timer.Sleep(1);
-					END;
-				END;
-				IF ~hcOwnedByOS THEN
-					KernelLog.Enter; KernelLog.String("UsbEhci: Pre-OS to system software handoff failed."); KernelLog.Exit;
-					IF OverrideHcOwnership THEN
-						KernelLog.Enter; KernelLog.String("UsbEhci: Override Pre-OS... take over HC!"); KernelLog.Exit;
-						RETURN TRUE;
-					ELSE
-						RETURN FALSE;
-					END;
-				END;
-				IF Debug.Trace & Debug.traceInit THEN KernelLog.String("done."); KernelLog.Ln; END;
-			END;
-		ELSE
-			IF Debug.Level >= Debug.Errors THEN KernelLog.String("UsbEhci: PCI error: Couldn't get USB Legacy Support register."); KernelLog.Ln; END;
-			RETURN FALSE;
-		END;
-	END;
-	RETURN TRUE;
-END GetHcOwnerShip;
-
-(* Release the HC ownership semaphore; eecp is the EHCI Extended Capability Pointer *)
-PROCEDURE ReleaseHcOwnerShip(bus, device, function, eecp : LONGINT);
-VAR register, res : LONGINT; usblegsup : SET;
-BEGIN
-	(* 00H: No capability list; > 40H to maintain consistency with PCI header *)
-	IF (eecp > 40H) THEN
-		res :=  PCI.ReadConfigDword(bus, device, function, eecp, register);
-		ASSERT(res = PCI.Done);
-		IF (register MOD 256 = USBCapabilityID) THEN (* USB legacy support available *)
-			usblegsup := SYSTEM.VAL(SET, register);
-			IF usblegsup * bRequestOwnership # {} THEN
-				IF Debug.Trace & Debug.traceInit THEN KernelLog.String("UsbEhci: Release HC ownership semaphore... "); END;
-				res := PCI.WriteConfigByte(bus, device, function, eecp + 3, SYSTEM.VAL(LONGINT, LSH(usblegsup - bRequestOwnership, -24)));
-				ASSERT(res = PCI.Done);
-			END;
-		END;
-	END;
-END ReleaseHcOwnerShip;
-
-(*
- * Find EHCI host controllers on the PCI bus, create correspondig EHCI controller objects and register them in the
- * EHCI USB host controllers registry. For EHCI host controllers, this procedure also takes care of the handoff from
- * Pre-OS software to the host system software.
- *)
-PROCEDURE PCIFindEhci;
-CONST
-	EhciClassCode = 0C0320H;
-	PCIStatusErrorMask = {24,27,28,29,30,31};
-VAR
-	hostController : EnhancedHostController;
-	bus, device, function : LONGINT;
-	iobasePhys, irq : LONGINT;
-	iobaseVirt: ADDRESS;
-	pciCmdStsReg, sbrn  : LONGINT;
-	index : LONGINT;
-	res: LONGINT;
-BEGIN
-	IF Debug.Trace & Debug.traceInit THEN KernelLog.String("UsbEhci: Looking for PCI Enhanced USB Host Controllers..."); KernelLog.Ln; END;
-	(* Traverse all USB EHCI Host Controllers of all PCI busses in the system *)
-	index := 0;
-	WHILE PCI.FindPCIClassCode(EhciClassCode, index, bus, device, function) = PCI.Done DO
-		res := PCI.ReadConfigDword(bus, device, function, PCI.CmdReg, pciCmdStsReg); ASSERT(res = PCI.Done);
-
-		IF SYSTEM.VAL(SET, pciCmdStsReg) * PCIStatusErrorMask # {} THEN
-			IF Debug.Level >= Debug.Warnings THEN KernelLog.String("UsbEhci: Warning: PCI device is in error ."); KernelLog.Ln; END;
-		END;
-
-		IF PCI.Enable(PCI.MemorySpace + PCI.BusMaster, bus, device, function) = PCI.Done THEN
-
-			res := PCI.ReadConfigByte(bus, device, function, PCI.IntlReg, irq); ASSERT(res = PCI.Done);
-			res := PCI.ReadConfigDword(bus, device, function, PCI.Adr0Reg, iobasePhys); ASSERT(res = PCI.Done);
-
-			IF SYSTEM.VAL(SET, iobasePhys) * {0} # {} THEN
-				KernelLog.String("UsbEhci: Error: Operational Register are not memory mapped"); KernelLog.Ln;
-			ELSIF SYSTEM.VAL(SET, iobasePhys) * {1,2,3} # {} THEN
-				KernelLog.String("UsbEhci: Error: Operational Register are not correctly mapped "); KernelLog.Ln;
-			ELSIF irq = 0 THEN
-				KernelLog.String("UsbEhci: Error: Please enable interrupts for all USB Host Controllers."); KernelLog.Ln;
-			ELSE
-				iobasePhys := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, iobasePhys) * {4..31});
-				(* Check the Serial Bus Release Number; 20H expected *)
-				res := PCI.ReadConfigDword(bus, device, function, 60H, sbrn); ASSERT(res = PCI.Done);
-
-     				IF (sbrn MOD 256) # 20H THEN
-     					KernelLog.Enter; KernelLog.String("UsbEhci: Error: Serial bus release number not supported."); KernelLog.Exit;
-     				ELSE
-     					(* Map the capabiliy registers and the operational registers to memory *)
-     					Machine.MapPhysical(iobasePhys, 4096, iobaseVirt);
-					IF GetHcOwnerShip(bus, device, function, iobaseVirt) THEN
-						NEW(hostController, bus, device, function);
-						IF hostController.Init(Machine.Ensure32BitAddress (iobaseVirt), irq) THEN
-							(* Host controller has been initialized and started successfully *)
-							IF Debug.Verbose THEN
-								KernelLog.Enter;
-								KernelLog.String("UsbEhci: Initialised USB Enhanced Host Controller at base 0");
-								KernelLog.Hex(iobasePhys, 8); KernelLog.String(", Irq: "); KernelLog.Int(irq, 0);
-								KernelLog.Exit;
-							END;
-							(* Set the value for the Port Wake Capability Register *)
-							hostController.pwcr := LSH(sbrn, -16);
-							UsbHcdi.RegisterHostController(hostController, Description);
-						ELSE (* ERROR: host controller initialization failed *)
-							KernelLog.Enter;
-							KernelLog.String("UsbEhci: Cannot init USB Enhanced Host Controller at base 0");
-							KernelLog.Hex(iobasePhys, 8); KernelLog.String(", Irq: "); KernelLog.Int(irq, 0);
-							KernelLog.Exit;
-						END;
-					ELSE
-						KernelLog.Enter; KernelLog.String("UsbEhci: Couldn't get ownership of host controller."); KernelLog.Exit;
-					END;
-				END;
-			END;
-		ELSE
-			KernelLog.Enter; KernelLog.String("UsbEhci: Could not enable bus mastering or memory space access."); KernelLog.Exit;
-		END;
-		INC(index);
-	END; (* End while loop *)
-END PCIFindEhci;
-
 (* Called when this module is unloaded. Unregister all EnhancedHostController objects *)
 PROCEDURE Cleanup;
 BEGIN
 	UsbHcdi.UnRegisterHostControllers(Description);
 END Cleanup;
 
-PROCEDURE Install*;
-(* Load module *)
-END Install;
-
 BEGIN
 	Modules.InstallTermHandler(Cleanup);
-	(* Find, init and start all compatible PCI EHCI USB host controllers and register them in the UsbHcdi.controllers registry *)
-	PCIFindEhci;
 END UsbEhci.
 
 UsbEhci.Install ~  SystemTools.Free UsbEhci ~

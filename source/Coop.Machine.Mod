@@ -750,6 +750,17 @@ BEGIN
 	Portout8 (70H, CHR(ofs)); Wait; Portout8 (71H, val)
 END PutNVByte;
 
+PROCEDURE InvalidateDCacheRange*(a: ADDRESS; s: SIZE);
+BEGIN
+	
+END InvalidateDCacheRange;
+
+PROCEDURE FlushDCacheRange*(a: ADDRESS; s: SIZE);
+BEGIN
+	
+END FlushDCacheRange;
+
+
 BEGIN
 	Trace.String("Machine: "); Trace.Blue; Trace.StringLn (Version); Trace.Default;
 	boottime:=GetTimer();
