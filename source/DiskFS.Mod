@@ -930,9 +930,9 @@ TYPE
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
 			IF len > 0 THEN
-				dst := ADDRESSOF(x[ofs]);
 				buf := r.hint(Buffer);
 				IF r.apos # buf.apos THEN buf := GetBuf(SELF, r.apos); r.hint := buf END;
+				dst := ADDRESSOF(x[ofs]);
 				LOOP
 					IF len <= 0 THEN EXIT END ;
 					src := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + len;
@@ -996,9 +996,9 @@ TYPE
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
 			IF len > 0 THEN
-				src := ADDRESSOF(x[ofs]);
 				buf := r.hint(Buffer);
 				IF r.apos # buf.apos THEN buf := GetBuf(SELF, r.apos); r.hint := buf END;
+				src := ADDRESSOF(x[ofs]);
 				LOOP
 					IF len <= 0 THEN EXIT END;
 					buf.mod := TRUE; dst := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + len;
