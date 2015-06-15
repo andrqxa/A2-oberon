@@ -758,6 +758,7 @@ TYPE
 			Check(FoxScanner.RightParenthesis);
 			IF symbol.token = FoxScanner.Colon THEN
 				NextSymbol;
+				SysFlag;
 				NEW(pars.returnType, pars);
 				TypeP(pars.returnType)
 			END;
