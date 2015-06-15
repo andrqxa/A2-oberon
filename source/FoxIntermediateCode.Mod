@@ -257,6 +257,7 @@ TYPE
 		PROCEDURE Emit*(instruction: Instruction);
 		VAR new: Instructions;
 			op1size,op2size,op3size,op1form,op2form,op3form: LONGINT;
+			i: SIZE;
 		BEGIN
 			op1size := instruction.op1.type.sizeInBits;
 			op2size := instruction.op2.type.sizeInBits;
@@ -290,7 +291,9 @@ TYPE
 				NEW(instructions, 16);
 			ELSIF pc = LEN(instructions) THEN
 				NEW(new,4*LEN(instructions));
-				SYSTEM.MOVE(ADDRESSOF(instructions[0]), ADDRESSOF(new[0]), LEN(instructions)*SIZEOF(Instruction));
+				FOR i := 0 TO LEN(instructions)-1 DO
+					new[i] := instructions[i];
+				END;
 				instructions := new;
 			END;
 			instruction.pc := pc;
