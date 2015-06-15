@@ -2325,7 +2325,12 @@ TYPE
 					result := SyntaxTree.invalidExpression;
 				END;
 			ELSIF expression IS SyntaxTree.NilValue THEN
-				result := expression;
+				IF type IS SyntaxTree.AddressType THEN
+					result := SyntaxTree.NewIntegerValue(position,0);
+					result.SetType(type);
+				ELSE
+					result := expression;
+				END;
 				(* nothing to be done *)
 			ELSIF expression IS SyntaxTree.MathArrayValue THEN
 				result := MathArrayConversion(position, expression,type);
