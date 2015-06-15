@@ -4762,7 +4762,7 @@ TYPE
 		END CheckPortType;
 		
 		PROCEDURE WarnIfAddressOnStack(e: SyntaxTree.Expression);
-		VAR d: SyntaxTree.Designator;
+		VAR d: SyntaxTree.Designator; symbol: SyntaxTree.Symbol;
 		BEGIN
 			IF cooperative & (e IS SyntaxTree.Designator) THEN
 				d := e(SyntaxTree.Designator);
@@ -4772,7 +4772,8 @@ TYPE
 					IF (e # NIL) & (e IS SyntaxTree.Designator) THEN d := e(SyntaxTree.Designator) ELSE d := NIL END;
 				END;
 				IF d # NIL THEN
-					IF d(SyntaxTree.SymbolDesignator).symbol.scope IS SyntaxTree.ProcedureScope THEN
+					symbol := d(SyntaxTree.SymbolDesignator).symbol;
+					IF (symbol.scope IS SyntaxTree.ProcedureScope) & (symbol.externalName = NIL) THEN
 						Warning(e.position,"potentially dangerous use of address of variables on stack");
 					END;
 				END;
