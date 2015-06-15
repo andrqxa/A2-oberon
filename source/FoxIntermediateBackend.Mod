@@ -7132,11 +7132,6 @@ TYPE
 							Emit(Pop(position,IntermediateCode.Memory(addressType,pointer,ToMemoryUnits(system,(BaseArrayTypeSize + i)* system.addressSize))));
 						END;
 
-						SetLabel(else);
-						BrL(exit);
-						Emit(Add(position,sp,sp,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(openDim+1)*system.addressSize))));
-						SetLabel(exit);
-						
 						needsTrace := p0.NeedsTrace();
 						IF needsTrace THEN ModifyAssignments(true) END;
 						IF ~p0.type.resolved(SyntaxTree.PointerType).isDisposable THEN
@@ -7154,6 +7149,20 @@ TYPE
 						END;
 						ReleaseIntermediateOperand(pointer);
 						ReleaseOperand(l);
+						BrL(exit);
+
+						SetLabel(else);
+						Emit(Add(position,sp,sp,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,(openDim+1)*system.addressSize))));
+						Designate(p0,l);
+						IF needsTrace THEN
+							CallResetProcedure(l.op,l.tag,p0.type.resolved);
+						ELSE
+							ToMemory(l.op,addressType,0);
+							Emit(Mov(position,l.op,pointer));
+						END;
+						ReleaseOperand(l);
+						SetLabel(exit);
+
 					ELSE
 
 						(*! the following code is only correct for "standard" Oberon calling convention *)
