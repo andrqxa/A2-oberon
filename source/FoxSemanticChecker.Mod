@@ -887,6 +887,7 @@ TYPE
 						ELSIF resolved IS SyntaxTree.ObjectType THEN (* the type denoted by the <<OBJECT>> alone *)
 							baseType := NIL
 						ELSIF IsPointerToRecord(resolved,recordType) THEN
+							IF ~recordType.isObject THEN Warning(position, "deprecated extension of record to object"); END; 
 						ELSIF resolved IS SyntaxTree.MathArrayType THEN
 						ELSE
 							Error(position, Diagnostics.Invalid,"object does not extend pointer to record, object or math array ")
