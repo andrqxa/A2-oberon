@@ -44,6 +44,7 @@ CONST
 		SetElementTrap*=11; (* indicates that a set element is out of MIN(SET)...MAX(SET) *)
 		NegativeDivisorTrap*=12;
 		NoReturnTrap*=16; (* indicates that a procedure marked no return did return *)
+		NilPointerTrap*=17; (* indicates that a nil pointer was being dereferenced *)
 
 		Trace = FALSE;
 		TraceRegisterUsageCount=TRUE;
@@ -7815,7 +7816,7 @@ TYPE
 		END VisitTypeGuardDesignator;
 
 		PROCEDURE Dereference(VAR operand: Operand; type: SyntaxTree.Type; isUnsafe: BOOLEAN);
-		VAR dereferenced: IntermediateCode.Operand; arrayDataOffset: LONGINT;
+		VAR dereferenced: IntermediateCode.Operand; arrayDataOffset: LONGINT;label: Label;
 		BEGIN
 			LoadValue(operand,system.addressType); (* in case operand is not a value yet *)
 			ReuseCopy(dereferenced,operand.op);
@@ -7861,6 +7862,12 @@ TYPE
 				IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,MathAdrOffset*addressType.sizeInBits));
 				IntermediateCode.MakeMemory(operand.op,addressType);
 			ELSE HALT(100);
+			END;
+			IF backend.cooperative THEN
+				label := NewLabel();
+				BrneL(label, operand.op, nil);
+				Emit(Trap(position, NilPointerTrap));
+				SetLabel(label);
 			END;
 		END Dereference;
 
