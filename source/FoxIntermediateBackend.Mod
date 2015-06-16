@@ -7824,7 +7824,7 @@ TYPE
 				IF backend.cooperative THEN
 					label := NewLabel();
 					BrneL(label, operand.op, nil);
-					Emit(Trap(position, NilPointerTrap));
+					EmitTrap(position, NilPointerTrap);
 					SetLabel(label);
 				END;
 			END NilCheck;
