@@ -1307,7 +1307,7 @@ TYPE
 		VAR instruction: IntermediateCode.Instruction;
 		BEGIN
 			IF backend.cooperative & (callconv = SyntaxTree.OberonCallingConvention) THEN
-				IF (procedure # NIL) & (HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope)) THEN
+				IF (procedure # NIL) & (HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope) OR IsNested (procedure)) THEN
 					GetCodeSectionNameForSymbol(procedure, name);
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Descriptor"));
 				ELSE
@@ -2520,7 +2520,7 @@ TYPE
 
 		PROCEDURE CreateMoveMethod (scope: SyntaxTree.ProcedureScope);
 		VAR previousSection: IntermediateCode.Section; name: Basic.SegmentedName;
-		VAR parameter: SyntaxTree.Parameter; op, stackFrame: IntermediateCode.Operand; context: Context;
+		VAR parameter: SyntaxTree.Parameter; op, stackFrame, staticLink: IntermediateCode.Operand; context: Context;
 		
 			PROCEDURE Move (parameter: SyntaxTree.Parameter);
 			VAR value: IntermediateCode.Operand; skip: Label;
@@ -2561,6 +2561,12 @@ TYPE
 			END;
 			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).returnParameter;
 			IF parameter # NIL THEN Move (parameter) END;
+
+			IF IsNested (scope.ownerProcedure) THEN
+				IntermediateCode.InitMemory (staticLink, addressType, stackFrame, ToMemoryUnits(system,addressType.sizeInBits * 3));
+				Emit(Add (position,staticLink,staticLink,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
+			END;
+
 			ReleaseIntermediateOperand(stackFrame);
 			Basic.ToSegmentedName ("BaseTypes.StackFrame.Move",name);
 			IntermediateCode.InitAddress(op, addressType, name, 0, 0);
@@ -2659,7 +2665,7 @@ TYPE
 			Emit(Data(position,op));
 			Emit(Data(position,nil));
 
-			IF HasVariableParameters (procedure.procedureScope) THEN
+			IF HasVariableParameters (procedure.procedureScope) OR IsNested (procedure) THEN
 				GetCodeSectionNameForSymbol(procedure, name);
 				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
 			ELSE
@@ -9731,8 +9737,8 @@ TYPE
 			END;
 			IF backend.cooperative THEN
 				IF HasPointers (procedure.procedureScope) THEN CreateResetMethod (procedure.procedureScope) END;
-				IF HasVariableParameters (procedure.procedureScope) THEN CreateMoveMethod (procedure.procedureScope) END;
-				IF HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope) THEN CreateProcedureDescriptor (procedure) END;
+				IF HasVariableParameters (procedure.procedureScope) OR IsNested (procedure) THEN CreateMoveMethod (procedure.procedureScope) END;
+				IF HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope) OR IsNested (procedure) THEN CreateProcedureDescriptor (procedure) END;
 			ELSIF newObjectFile & moduleBody  & ~suppressModuleRegistration & ~meta.simple THEN
 				PushSelfPointer();
 				CallThis("Modules","SetInitialized",1);
