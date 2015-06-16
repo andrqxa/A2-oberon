@@ -3,7 +3,7 @@ MODULE PCI;	(** non-portable *)
 
 (* Contributed by P. Ryser to the System 3 project *)
 
-	IMPORT SYSTEM, Machine, KernelLog;
+	IMPORT SYSTEM, Machine, Objects, KernelLog;
 
 	CONST
 		Trace = TRUE;
@@ -290,7 +290,9 @@ MODULE PCI;	(** non-portable *)
 	BEGIN {EXCLUSIVE}
 		IF pci THEN
 			eax := PCIFunctionId + getIrqRoutingOptions;
-			rb.BufferSize := dbN; rb.SegSelector := 0; rb.DataBufferAdr := ADDRESSOF(db[0]);
+			rb.BufferSize := dbN; rb.SegSelector := 0; 
+			Objects.PinStack(1024);
+			rb.DataBufferAdr := ADDRESSOF(db[0]);
 			ebx := 0H; edi := ADDRESSOF(rb);
 			state := Machine.DisableInterrupts();
 			pcicall(pciEntry, eax, ebx, ecx, edx, esi, edi, eflags);
@@ -317,6 +319,7 @@ MODULE PCI;	(** non-portable *)
 				END;
 				rt := rt.next
 			END;
+			Objects.UnpinStack;
 			IF debug THEN
 				KernelLog.String("GetIrqRoutingOptions:"); KernelLog.Ln;
 				OutRegs(eax, ebx, ecx, edx, esi, edi, eflags)
