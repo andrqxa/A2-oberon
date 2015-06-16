@@ -7816,7 +7816,19 @@ TYPE
 		END VisitTypeGuardDesignator;
 
 		PROCEDURE Dereference(VAR operand: Operand; type: SyntaxTree.Type; isUnsafe: BOOLEAN);
-		VAR dereferenced: IntermediateCode.Operand; arrayDataOffset: LONGINT;label: Label;
+		VAR dereferenced: IntermediateCode.Operand; arrayDataOffset: LONGINT;
+		
+			PROCEDURE NilCheck(CONST op: IntermediateCode.Operand);
+			VAR label: Label;
+			BEGIN
+				IF backend.cooperative THEN
+					label := NewLabel();
+					BrneL(label, operand.op, nil);
+					Emit(Trap(position, NilPointerTrap));
+					SetLabel(label);
+				END;
+			END NilCheck;
+			
 		BEGIN
 			LoadValue(operand,system.addressType); (* in case operand is not a value yet *)
 			ReuseCopy(dereferenced,operand.op);
@@ -7838,8 +7850,10 @@ TYPE
 					END;
 					IntermediateCode.MakeMemory(operand.tag,addressType);
 				END;
+				NilCheck(operand.op);
 			ELSIF type IS SyntaxTree.ArrayType THEN
 				IF isUnsafe THEN
+					NilCheck(operand.op);
 					ReleaseIntermediateOperand(operand.tag);
 					IF type(SyntaxTree.ArrayType).form = SyntaxTree.Static THEN
 						IntermediateCode.InitImmediate(operand.tag,addressType,type(SyntaxTree.ArrayType).staticLength);
@@ -7847,6 +7861,7 @@ TYPE
 						operand.tag := emptyOperand;
 					END;
 				ELSE
+					NilCheck(operand.op);
 					IF backend.cooperative THEN
 						arrayDataOffset := (BaseArrayTypeSize + DynamicDim(type)) * addressType.sizeInBits;
 						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,arrayDataOffset));
@@ -7862,12 +7877,6 @@ TYPE
 				IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,MathAdrOffset*addressType.sizeInBits));
 				IntermediateCode.MakeMemory(operand.op,addressType);
 			ELSE HALT(100);
-			END;
-			IF backend.cooperative THEN
-				label := NewLabel();
-				BrneL(label, operand.op, nil);
-				Emit(Trap(position, NilPointerTrap));
-				SetLabel(label);
 			END;
 		END Dereference;
 
