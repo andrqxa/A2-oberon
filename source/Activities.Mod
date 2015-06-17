@@ -45,6 +45,8 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR previous: Activity; argument: ADDRESS;
 	VAR framePointer {UNTRACED}: StackFrame;
 	VAR object-: BaseTypes.Object;
+	VAR moveable {UNTRACED}: ARRAY 16 OF POINTER {UNSAFE} TO RECORD address: ADDRESS END;
+	VAR moveables := 0: SIZE;
 	VAR bound := FALSE: BOOLEAN;
 	VAR stackPinned := FALSE: BOOLEAN;
 
@@ -378,7 +380,7 @@ END EnqueueWaiting;
 
 (** Expands the stack memory of the current activity to include the specified stack address and returns the corresponding address on the expanded stack. *)
 PROCEDURE ExpandStack- (address: ADDRESS): ADDRESS;
-VAR currentActivity {UNTRACED}: Activity; size, minSize, newSize, offset: SIZE; stackTop: ADDRESS;
+VAR currentActivity {UNTRACED}: Activity; size, minSize, newSize, offset, index: SIZE; stackTop: ADDRESS;
 VAR newStack {UNTRACED}: POINTER {DISPOSABLE} TO ARRAY OF CHAR; stackFrame {UNTRACED}, previousFrame {UNTRACED}: BaseTypes.StackFrame;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid argument *)
@@ -393,10 +395,18 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	REPEAT INC (newSize, newSize) UNTIL newSize >= minSize;
 	ASSERT (newSize <= MaximumStackSize);
 
-	(* allocate new stack and copy contents *)
+	(* allocate new stack and move frames *)
 	NEW (newStack, newSize); ASSERT (newStack # NIL);
 	offset := ADDRESS OF newStack[newSize - size] - ADDRESS OF currentActivity.stack[0]; stackFrame := SYSTEM.GetFramePointer ();
 	REPEAT previousFrame := stackFrame.previous; stackFrame.Move (offset, stackTop); stackFrame := previousFrame UNTIL stackFrame = NIL;
+
+	(* move moveable addresses *)
+	FOR index := 0 TO currentActivity.moveables - 1 DO
+		INC (currentActivity.moveable[index].address, offset);
+		currentActivity.moveable[index] := ADDRESS OF currentActivity.moveable[index]^ + offset;
+	END;
+
+	(* move contents *)	
 	SYSTEM.MOVE (ADDRESS OF currentActivity.stack[0], ADDRESS OF currentActivity.stack[0] + offset, size);
 
 	(* move stack pointers and swap stacks *)
@@ -435,6 +445,26 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	end := begin + LEN (currentActivity.stack);
 	RETURN (address >= begin) & (address < end);
 END IsLocalVariable;
+
+(** Registers an address of a local variable that must be moved during expanding the stack. *)
+PROCEDURE RegisterMoveable- (address: ADDRESS);
+VAR currentActivity {UNTRACED}: Activity;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	IF ~IsLocalVariable (address) THEN RETURN END;
+	currentActivity := SYSTEM.GetActivity ()(Activity);
+	ASSERT (currentActivity.moveables < LEN (currentActivity.moveable));
+	currentActivity.moveable[currentActivity.moveables] := address;
+	INC (currentActivity.moveables);
+END RegisterMoveable;
+
+(** Cancels the specified number of the most current moveable address registrations. *)
+PROCEDURE UnregisterMoveables- (count: SIZE);
+VAR currentActivity {UNTRACED}: Activity;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	currentActivity := SYSTEM.GetActivity ()(Activity);
+	ASSERT (count <= currentActivity.moveables);
+	DEC (currentActivity.moveables, count);
+END UnregisterMoveables;
 
 (** Returns whether any activity is currently executing an assignment statement. *)
 PROCEDURE AssignmentsInProgress- (): BOOLEAN;
