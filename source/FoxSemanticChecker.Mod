@@ -4768,21 +4768,9 @@ TYPE
 		END CheckPortType;
 		
 		PROCEDURE WarnIfAddressOnStack(e: SyntaxTree.Expression);
-		VAR d: SyntaxTree.Designator; symbol: SyntaxTree.Symbol;
 		BEGIN
-			IF cooperative & (e IS SyntaxTree.Designator) THEN
-				d := e(SyntaxTree.Designator);
-				WHILE (d # NIL) & ~(d IS SyntaxTree.SymbolDesignator) DO
-					IF d IS SyntaxTree.DereferenceDesignator THEN (* on heap *) RETURN END;
-					e := d.left;
-					IF (e # NIL) & (e IS SyntaxTree.Designator) THEN d := e(SyntaxTree.Designator) ELSE d := NIL END;
-				END;
-				IF d # NIL THEN
-					symbol := d(SyntaxTree.SymbolDesignator).symbol;
-					IF (symbol.scope IS SyntaxTree.ProcedureScope) & (symbol.externalName = NIL) THEN
-						Warning(e.position,"potentially dangerous use of address of variables on stack");
-					END;
-				END;
+			IF cooperative & IsLocalVariable(e) THEN
+				Warning(e.position,"potentially dangerous use of address of variables on stack");
 			END;
 		END WarnIfAddressOnStack;
 		
@@ -9456,6 +9444,24 @@ TYPE
 			OR (expression IS SyntaxTree.TypeGuardDesignator) OR (expression IS SyntaxTree.StringValue)
 			OR (expression IS SyntaxTree.StatementDesignator) & HasAddress(expression(SyntaxTree.StatementDesignator).result);
 	END HasAddress;
+	
+	PROCEDURE IsLocalVariable*(e: SyntaxTree.Expression): BOOLEAN;
+	VAR d: SyntaxTree.Designator; symbol: SyntaxTree.Symbol;
+	BEGIN
+		IF (e IS SyntaxTree.Designator) THEN
+			d := e(SyntaxTree.Designator);
+			WHILE (d # NIL) & ~(d IS SyntaxTree.SymbolDesignator) DO
+				IF d IS SyntaxTree.DereferenceDesignator THEN (* on heap *) RETURN FALSE END;
+				e := d.left;
+				IF (e # NIL) & (e IS SyntaxTree.Designator) THEN d := e(SyntaxTree.Designator) ELSE d := NIL END;
+			END;
+			IF d # NIL THEN
+				symbol := d(SyntaxTree.SymbolDesignator).symbol;
+				RETURN (symbol.scope IS SyntaxTree.ProcedureScope) & (symbol.externalName = NIL);
+			END;
+		END;
+		RETURN FALSE;
+	END IsLocalVariable;
 
 	PROCEDURE IsStaticProcedure*(procedure: SyntaxTree.Procedure): BOOLEAN;
 	BEGIN
