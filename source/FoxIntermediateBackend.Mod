@@ -4736,7 +4736,7 @@ TYPE
 					Designate(expression, operand);
 					Pass((operand.op));
 					RegisterMovable();					
-			ELSE
+				ELSE
 					ASSERT((parameter.kind = SyntaxTree.ValueParameter) OR (parameter.kind = SyntaxTree.ConstParameter));
 					Evaluate(expression, operand);
 					Pass((operand.tag)); (* real part *)
@@ -4793,7 +4793,7 @@ TYPE
 						Pass((operand.op));
 					ELSE
 						Evaluate(expression,operand);
-						IF backend.cooperative & parameter.NeedsTrace() THEN
+						IF backend.cooperative & parameter.NeedsTrace() & (operand.op.mode # IntermediateCode.ModeImmediate) THEN
 							Emit(Push(position, nil));
 							dst := NewRegisterOperand (addressType);
 							Emit(Mov(position,dst, sp));
