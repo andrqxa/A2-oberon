@@ -402,7 +402,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 
 	(* move movable addresses *)
 	FOR index := 0 TO currentActivity.movables - 1 DO
-		IF currentActivity.movable[index].address # NIL THEN
+		IF IsLocalVariable (currentActivity.movable[index].address) THEN
 			INC (currentActivity.movable[index].address, offset);
 			currentActivity.movable[index] := ADDRESS OF currentActivity.movable[index]^ + offset;
 		END;
@@ -452,7 +452,6 @@ END IsLocalVariable;
 PROCEDURE RegisterMovable- (address: ADDRESS);
 VAR currentActivity {UNTRACED}: Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	IF ~IsLocalVariable (address) THEN address := NIL END;
 	currentActivity := SYSTEM.GetActivity ()(Activity);
 	ASSERT (currentActivity.movables < LEN (currentActivity.movable));
 	currentActivity.movable[currentActivity.movables] := address;
