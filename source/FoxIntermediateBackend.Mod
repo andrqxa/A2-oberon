@@ -4996,11 +4996,15 @@ TYPE
 		END InlineProcedureCall;
 
 		PROCEDURE RegisterMovable;
-		VAR saved: RegisterEntry;
+		VAR saved: RegisterEntry; dst: IntermediateCode.Operand;
 		BEGIN
 			IF backend.cooperative & ~isUnchecked THEN
+				dst := NewRegisterOperand (addressType);
+				Emit(Mov(position,dst, sp));
+				ReleaseIntermediateOperand(dst);
 				SaveRegisters();ReleaseUsedRegisters(saved);
-				Emit(Push(position,sp));
+				Emit(Push(position, dst));
+				(* register dst has been freed before SaveRegisters already *)
 				CallThis("Activities","RegisterMovable",1);
 				RestoreRegisters(saved);
 				INC(registeredMovables);
