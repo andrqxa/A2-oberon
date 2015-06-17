@@ -4283,18 +4283,6 @@ TYPE
 					PushArrayLens(formalType(SyntaxTree.ArrayType).arrayBase.resolved, actualArrayBase,dim-1);
 				END;
 			END PushArrayLens;
-			
-			PROCEDURE RegisterMovable;
-			VAR saved: RegisterEntry;
-			BEGIN
-				IF backend.cooperative & ~isUnchecked THEN
-					SaveRegisters();ReleaseUsedRegisters(saved);
-					Emit(Push(position,sp));
-					CallThis("Activities","RegisterMovable",1);
-					RestoreRegisters(saved);
-					INC(registeredMovables);
-				END;
-			END RegisterMovable;
 
 		BEGIN
 			IF Trace THEN TraceEnter("PushParameter") END;
@@ -5006,6 +4994,18 @@ TYPE
 			currentIsInline := wasInline;
 			RETURN ~tooComplex
 		END InlineProcedureCall;
+
+		PROCEDURE RegisterMovable;
+		VAR saved: RegisterEntry;
+		BEGIN
+			IF backend.cooperative & ~isUnchecked THEN
+				SaveRegisters();ReleaseUsedRegisters(saved);
+				Emit(Push(position,sp));
+				CallThis("Activities","RegisterMovable",1);
+				RestoreRegisters(saved);
+				INC(registeredMovables);
+			END;
+		END RegisterMovable;
 		
 		PROCEDURE UnregisterMovables(num: SIZE);
 		VAR saved: RegisterEntry;
@@ -5351,6 +5351,7 @@ TYPE
 			 		Emit(Push(position,size));
 			 		Emit(Push(position,returnValue.op));
 			 		ReleaseOperand(returnValue);
+			 		RegisterMovable;
 				ELSE
 					PushParameter(d,procedureType.returnParameter,procedureType.callingConvention, FALSE, dummy,-1)
 		 		END;
