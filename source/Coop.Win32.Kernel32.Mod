@@ -258,7 +258,7 @@ TYPE
 	END;
 
 	(** CreateThread *)
-	ThreadProc* = PROCEDURE {WINAPI} ( lpParameter: ANY ): LONGINT;
+	ThreadProc* = PROCEDURE {WINAPI} ( lpParameter {UNTRACED}: ANY ): LONGINT;
 
 	(** CreateProcess *)
 	ProcessInformation* = RECORD
@@ -355,26 +355,26 @@ VAR
 	CopyFile-: PROCEDURE {WINAPI} ( VAR lpExistingFileName, lpNewFileName: ARRAY  OF CHAR; bFailIfExists: BOOL ): BOOL;
 	(** The CreateDirectory function creates a new directory. *)
 	CreateDirectory-: PROCEDURE {WINAPI} ( VAR lpPathName: ARRAY   OF CHAR;
-																		 lpSecurityAttributes: ANY ): BOOL;
+																		 lpSecurityAttributes {UNTRACED}: ANY ): BOOL;
 	(** The CreateEvent function creates a named or unnamed event object. *)
-	CreateEvent-: PROCEDURE {WINAPI} ( lpEventAttributes: ANY;
+	CreateEvent-: PROCEDURE {WINAPI} ( lpEventAttributes {UNTRACED}: ANY;
 																   bManualReset, bInitialState: BOOL;
 																   CONST lpName: ARRAY   OF CHAR ): HANDLE;
 	(** The CreateFile function creates or opens the following objects and returns a handle that can be used to access the object:
 		 files, pipes, mailslots, communications resources, disk devices (Windows NT only), consoles, directories (open only) *)
 	CreateFile-: PROCEDURE {WINAPI} ( CONST lpFileName: ARRAY   OF CHAR;
 																dwDesiredAccess, dwShareMode: SET;
-																lpSecurityAttributes: ANY;
+																lpSecurityAttributes {UNTRACED}: ANY;
 																dwCreationDistribution: LONGINT;
 																dwFlagsAndAttributes: SET;
 																hTemplateFile: HANDLE ): HANDLE;
 	(** The CreateProcess function creates a new process and its primary thread. The new process executes the specified
 			executable file. *)
 	CreateProcess-: PROCEDURE {WINAPI} ( CONST lpApplicationName, lpCommandLine: ARRAY   OF CHAR;
-																	   lpProcessAttributes, lpThreadAttributes: ANY;
+																	   lpProcessAttributes, lpThreadAttributes {UNTRACED}: ANY;
 																	   bInheritHandles: BOOL;
 																	   dwCreationFlags: LONGINT;
-																	   lpEnvironment: ANY;
+																	   lpEnvironment {UNTRACED}: ANY;
 																	   VAR lpCurrentDirectory: ARRAY   OF CHAR;
 																	   VAR lpStartupInfo: StartupInfo;
 																	   VAR lpProcessInformation: ProcessInformation ): BOOL;
@@ -384,7 +384,7 @@ VAR
 	CreateThread-: PROCEDURE {WINAPI} ( lpThreadAttributes: ADDRESS;
 																	  dwStackSize: LONGINT;
 																	  lpStartAddress: ThreadProc;
-																	  lpParameter: ANY;  dwCreationFlags: SET;
+																	  lpParameter {UNTRACED}: ANY;  dwCreationFlags: SET;
 																	  VAR lpThreadId: LONGINT ): HANDLE;
 	(** The DeleteCriticalSection function releases all resources used by an unowned critical section object. *)
 	DeleteCriticalSection-: PROCEDURE {WINAPI} ( VAR lpCriticalSection: CriticalSection );
@@ -634,7 +634,7 @@ VAR
 															  VAR lpBuffer: ARRAY   OF SYSTEM.BYTE;
 															  nNumberOfBytesToRead: LONGINT;
 															  VAR lpNumberOfBytesRead: LONGINT;
-															  lpOverlapped: ANY ): BOOL;
+															  lpOverlapped {UNTRACED}: ANY ): BOOL;
 	(** The ReadProcessMemory function reads data from an area of memory in a specified process. *)
 	ReadProcessMemory-: PROCEDURE {WINAPI} ( hProcess: HANDLE;
 																				   lpBaseAddress: ADDRESS;
@@ -742,7 +742,7 @@ VAR
 															   CONST lpBuffer: ARRAY   OF SYSTEM.BYTE;
 															   nNumberOfBytesToWrite: LONGINT;
 															   VAR lpNumberOfBytesWritten: LONGINT;
-															   lpOverlapped: ANY ): BOOL;
+															   lpOverlapped {UNTRACED}: ANY ): BOOL;
 	(** Thread abort notifier, parameter is the threads id. Note this should only be used in modules which
 			can't use the exception handling mechanism provided by module Exceptions. *)
 
