@@ -402,8 +402,10 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 
 	(* move movable addresses *)
 	FOR index := 0 TO currentActivity.movables - 1 DO
-		INC (currentActivity.movable[index].address, offset);
-		currentActivity.movable[index] := ADDRESS OF currentActivity.movable[index]^ + offset;
+		IF currentActivity.movable[index].address # NIL THEN
+			INC (currentActivity.movable[index].address, offset);
+			currentActivity.movable[index] := ADDRESS OF currentActivity.movable[index]^ + offset;
+		END;
 	END;
 
 	(* move contents *)	
@@ -447,24 +449,24 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END IsLocalVariable;
 
 (** Registers an address of a local variable that must be moved during expanding the stack. *)
-PROCEDURE RegisterMoveable- (address: ADDRESS);
+PROCEDURE RegisterMovable- (address: ADDRESS);
 VAR currentActivity {UNTRACED}: Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	IF ~IsLocalVariable (address) THEN RETURN END;
+	IF ~IsLocalVariable (address) THEN address := NIL END;
 	currentActivity := SYSTEM.GetActivity ()(Activity);
 	ASSERT (currentActivity.movables < LEN (currentActivity.movable));
 	currentActivity.movable[currentActivity.movables] := address;
 	INC (currentActivity.movables);
-END RegisterMoveable;
+END RegisterMovable;
 
 (** Cancels the specified number of the most current movable address registrations. *)
-PROCEDURE UnregisterMoveables- (count: SIZE);
+PROCEDURE UnregisterMovables- (count: SIZE);
 VAR currentActivity {UNTRACED}: Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	currentActivity := SYSTEM.GetActivity ()(Activity);
 	ASSERT (count <= currentActivity.movables);
 	DEC (currentActivity.movables, count);
-END UnregisterMoveables;
+END UnregisterMovables;
 
 (** Returns whether any activity is currently executing an assignment statement. *)
 PROCEDURE AssignmentsInProgress- (): BOOLEAN;
