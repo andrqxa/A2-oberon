@@ -7829,7 +7829,7 @@ TYPE
 			PROCEDURE NilCheck(CONST op: IntermediateCode.Operand);
 			VAR label: Label;
 			BEGIN
-				IF backend.cooperative THEN
+				IF backend.cooperative & ~isUnchecked THEN
 					label := NewLabel();
 					BrneL(label, operand.op, nil);
 					EmitTrap(position, NilPointerTrap);
