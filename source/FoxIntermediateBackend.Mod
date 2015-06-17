@@ -1128,7 +1128,8 @@ TYPE
 		lastSwitchPC: LONGINT;
 
 		isUnchecked: BOOLEAN;
-
+		registeredMovables := 0: SIZE;
+		
 		PROCEDURE & Init(system: Global.System; checker: SemanticChecker.Checker; supportedInstructionProcedure: SupportedInstructionProcedure; supportedImmediateProcedure: SupportedImmediateProcedure; emitLabels: BOOLEAN; CONST runtime: SyntaxTree.IdentifierString; backend: IntermediateBackend;
 			newObjectFile: BOOLEAN);
 		BEGIN
@@ -4283,6 +4284,17 @@ TYPE
 				END;
 			END PushArrayLens;
 			
+			PROCEDURE RegisterMovable;
+			VAR saved: RegisterEntry;
+			BEGIN
+				IF backend.cooperative & ~isUnchecked THEN
+					SaveRegisters();ReleaseUsedRegisters(saved);
+					Emit(Push(position,sp));
+					CallThis("Activities","RegisterMovable",1);
+					RestoreRegisters(saved);
+					INC(registeredMovables);
+				END;
+			END RegisterMovable;
 
 		BEGIN
 			IF Trace THEN TraceEnter("PushParameter") END;
@@ -4309,6 +4321,7 @@ TYPE
 					Pass((operand.tag));
 				END;
 				Pass((operand.op));
+				RegisterMovable();
 			ELSIF IsOpenArray(parameter.type) THEN
 				Designate(expression,operand);
 				baseReg := operand.tag;
@@ -4316,6 +4329,7 @@ TYPE
 					PushArrayLens(parameter.type,type,operand.dimOffset+DynamicDim(parameter.type)-1);
 				END;
 				Pass((operand.op)); (* address of the array *)
+				RegisterMovable();
 			ELSIF parameter.type.resolved IS SyntaxTree.MathArrayType THEN
 			(* case 1 *)
 				IF (parameter.type.resolved(SyntaxTree.MathArrayType).form = SyntaxTree.Open) &
@@ -4708,7 +4722,8 @@ TYPE
 				IF parameter.kind = SyntaxTree.VarParameter THEN
 					ASSERT(~(expression IS SyntaxTree.RangeExpression));
 					Designate(expression, operand);
-					Pass((operand.op))
+					Pass((operand.op));
+					RegisterMovable();
 				ELSE
 					ASSERT((parameter.kind = SyntaxTree.ValueParameter) OR (parameter.kind = SyntaxTree.ConstParameter));
 					Evaluate(expression, operand);
@@ -4719,8 +4734,9 @@ TYPE
 			ELSIF parameter.type.resolved IS SyntaxTree.ComplexType THEN
 				IF parameter.kind = SyntaxTree.VarParameter THEN
 					Designate(expression, operand);
-					Pass((operand.op))
-				ELSE
+					Pass((operand.op));
+					RegisterMovable();					
+			ELSE
 					ASSERT((parameter.kind = SyntaxTree.ValueParameter) OR (parameter.kind = SyntaxTree.ConstParameter));
 					Evaluate(expression, operand);
 					Pass((operand.tag)); (* real part *)
@@ -4757,6 +4773,7 @@ TYPE
 							PushArrayLens(parameter.type,type,operand.dimOffset+DynamicDim(parameter.type)-1);
 						END;
 						Pass((operand.op)); (* address of the array *)
+						RegisterMovable();
 					ELSIF IsDelegate(parameter.type) THEN
 						Evaluate(expression,operand);
 						IF backend.cooperative & parameter.NeedsTrace() THEN
@@ -4802,6 +4819,7 @@ TYPE
 						END;	
 					END;
 					Pass((operand.op));
+					RegisterMovable();
 				END;
 			END;
 
@@ -4988,7 +5006,18 @@ TYPE
 			currentIsInline := wasInline;
 			RETURN ~tooComplex
 		END InlineProcedureCall;
-
+		
+		PROCEDURE UnregisterMovables(num: SIZE);
+		VAR saved: RegisterEntry;
+		BEGIN
+			IF backend.cooperative & (num # 0) 	& ~isUnchecked THEN
+				SaveRegisters();ReleaseUsedRegisters(saved);
+				Emit(Push(position,IntermediateCode.Immediate(sizeType, num )));
+				CallThis("Activities","UnregisterMovables",1);
+				RestoreRegisters(saved);
+				INC(registeredMovables);
+			END;
+		END UnregisterMovables;
 
 		PROCEDURE VisitProcedureCallDesignator(x: SyntaxTree.ProcedureCallDesignator);
 		VAR
@@ -5036,6 +5065,7 @@ TYPE
 
 			passByRegister: BOOLEAN; registerNumber,stackSize: LONGINT;
 			procedure: SyntaxTree.Procedure;
+			previousRegisteredMovables: SIZE;
 
 			PROCEDURE BackupGlobalState;
 			BEGIN
@@ -5068,7 +5098,7 @@ TYPE
 				locked := oldLocked;
 				usedRegisters := oldUsedRegisters
 			END RestoreGlobalState;
-
+			
 			(** do preparations before parameter push for array-structured object types (ASOTs):
 				if ASOT is passed as VAR parameter:
 				- allocate temporary variable of math array type
@@ -5162,6 +5192,7 @@ TYPE
 			dest := destination; destination := emptyOperand;
 			SaveRegisters();ReleaseUsedRegisters(saved);
 
+			previousRegisteredMovables := registeredMovables;
 			parameters := x.parameters;
 
 			IF (x.left IS SyntaxTree.SymbolDesignator) & (x.left(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Operator) THEN
@@ -5386,6 +5417,9 @@ TYPE
 			ELSIF (symbol IS SyntaxTree.Variable) OR (symbol IS SyntaxTree.Parameter) THEN
 				parametersSize := ParametersSize(system,procedureType,FALSE);
 			END;
+			
+			UnregisterMovables(registeredMovables-previousRegisteredMovables);
+			registeredMovables := previousRegisteredMovables;
 			
 			ReleaseParameterRegisters();
 			IF (procedureType.callingConvention = SyntaxTree.WinAPICallingConvention) OR (procedureType.callingConvention = SyntaxTree.CCallingConvention) THEN
@@ -6448,6 +6482,7 @@ TYPE
 			callsection: Sections.Section;
 			segmentedName: Basic.SegmentedName;
 			needsTrace: BOOLEAN;
+			previousRegisteredMovables: SIZE;
 
 			PROCEDURE CallBodies(self: IntermediateCode.Operand; type: SyntaxTree.Type);
 			VAR recordScope: SyntaxTree.RecordScope; procedure: SyntaxTree.Procedure; body: SyntaxTree.Body; flags: LONGINT;
@@ -6919,6 +6954,7 @@ TYPE
 						constructor := GetConstructor(recordType);
 						IF constructor # NIL THEN
 							(*! should be unified with ProcedureCallDesignator *)
+							previousRegisteredMovables := registeredMovables;
 							Emit(Push(position,pointer));
 							ReleaseIntermediateOperand(pointer);
 							formalParameter := constructor.type(SyntaxTree.ProcedureType).firstParameter;
@@ -6926,6 +6962,9 @@ TYPE
 								PushParameter(x.parameters.GetExpression(i), formalParameter,SyntaxTree.OberonCallingConvention, FALSE, dummy,-1);
 								formalParameter := formalParameter.nextParameter;
 							END;
+							UnregisterMovables(registeredMovables - previousRegisteredMovables);
+							registeredMovables := previousRegisteredMovables;
+
 							(* static call of the constructor *)
 							GetCodeSectionNameForSymbol(constructor,name);
 							ASSERT(~constructor.isInline);
