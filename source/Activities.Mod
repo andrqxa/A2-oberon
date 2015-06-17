@@ -45,8 +45,8 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR previous: Activity; argument: ADDRESS;
 	VAR framePointer {UNTRACED}: StackFrame;
 	VAR object-: BaseTypes.Object;
-	VAR moveable {UNTRACED}: ARRAY 16 OF POINTER {UNSAFE} TO RECORD address: ADDRESS END;
-	VAR moveables := 0: SIZE;
+	VAR movable {UNTRACED}: ARRAY 16 OF POINTER {UNSAFE} TO RECORD address: ADDRESS END;
+	VAR movables := 0: SIZE;
 	VAR bound := FALSE: BOOLEAN;
 	VAR stackPinned := FALSE: BOOLEAN;
 
@@ -400,10 +400,10 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	offset := ADDRESS OF newStack[newSize - size] - ADDRESS OF currentActivity.stack[0]; stackFrame := SYSTEM.GetFramePointer ();
 	REPEAT previousFrame := stackFrame.previous; stackFrame.Move (offset, stackTop); stackFrame := previousFrame UNTIL stackFrame = NIL;
 
-	(* move moveable addresses *)
-	FOR index := 0 TO currentActivity.moveables - 1 DO
-		INC (currentActivity.moveable[index].address, offset);
-		currentActivity.moveable[index] := ADDRESS OF currentActivity.moveable[index]^ + offset;
+	(* move movable addresses *)
+	FOR index := 0 TO currentActivity.movables - 1 DO
+		INC (currentActivity.movable[index].address, offset);
+		currentActivity.movable[index] := ADDRESS OF currentActivity.movable[index]^ + offset;
 	END;
 
 	(* move contents *)	
@@ -452,18 +452,18 @@ VAR currentActivity {UNTRACED}: Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF ~IsLocalVariable (address) THEN RETURN END;
 	currentActivity := SYSTEM.GetActivity ()(Activity);
-	ASSERT (currentActivity.moveables < LEN (currentActivity.moveable));
-	currentActivity.moveable[currentActivity.moveables] := address;
-	INC (currentActivity.moveables);
+	ASSERT (currentActivity.movables < LEN (currentActivity.movable));
+	currentActivity.movable[currentActivity.movables] := address;
+	INC (currentActivity.movables);
 END RegisterMoveable;
 
-(** Cancels the specified number of the most current moveable address registrations. *)
+(** Cancels the specified number of the most current movable address registrations. *)
 PROCEDURE UnregisterMoveables- (count: SIZE);
 VAR currentActivity {UNTRACED}: Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	currentActivity := SYSTEM.GetActivity ()(Activity);
-	ASSERT (count <= currentActivity.moveables);
-	DEC (currentActivity.moveables, count);
+	ASSERT (count <= currentActivity.movables);
+	DEC (currentActivity.movables, count);
 END UnregisterMoveables;
 
 (** Returns whether any activity is currently executing an assignment statement. *)
