@@ -4282,6 +4282,7 @@ TYPE
 					PushArrayLens(formalType(SyntaxTree.ArrayType).arrayBase.resolved, actualArrayBase,dim-1);
 				END;
 			END PushArrayLens;
+			
 
 		BEGIN
 			IF Trace THEN TraceEnter("PushParameter") END;
@@ -4793,19 +4794,13 @@ TYPE
 				ELSIF expression IS SyntaxTree.NilValue THEN (* for special WinAPI rule *)
 					Evaluate(expression,operand);
 					Pass((operand.op));
-				ELSIF (type IS SyntaxTree.RecordType) & (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) THEN
-					Designate(expression,operand);
-					IF callingConvention = SyntaxTree.OberonCallingConvention  THEN
-						(* MakeTypeTag(operand); (* late emission, otherwise type tags are generated when not used *) *)
-						Pass((operand.tag));
-					END;
-					Pass((operand.op));
-				ELSIF IsDelegate(parameter.type) THEN (* var parameter delegate: push base address only *)
-					Designate(expression,operand); (* push address *)
-					(* Pass((operand.tag));*)
-					Pass((operand.op));
 				ELSE (* var parameter *)
 					Designate(expression,operand);
+					IF (type IS SyntaxTree.RecordType) & (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) THEN
+						IF callingConvention = SyntaxTree.OberonCallingConvention  THEN
+							Pass((operand.tag));
+						END;	
+					END;
 					Pass((operand.op));
 				END;
 			END;
@@ -11454,6 +11449,7 @@ TYPE
 		BEGIN
 			ASSERT(intermediateCodeModule IS Sections.Module);
 			result := intermediateCodeModule(Sections.Module);
+
 			IF trace THEN
 				traceName := "intermediate code trace: ";
 				Strings.Append(traceName,traceString);
