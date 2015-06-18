@@ -935,19 +935,19 @@ VAR
 		KernelLog.String( "Display: Initialize message dispatcher..." );  KernelLog.Ln;
 		RegisterClasses();  CreateHWND( create );  create := NIL;
 		KernelLog.String( "Display: Start message dispatching" ); KernelLog.Ln;
-		LOOP
+		REPEAT
 			i := User32.GetMessage( msg, 0, 0, 0 );
-			IF i = 0 THEN EXIT
+			IF i = 0 THEN
 			ELSIF i # -1 THEN
 				IF ( msg.message = User32.WMKeyDown ) THEN
 					(* Translate virtual key code  to character. This generates a WMChar message if translation succeeds. Since
 					AOS doesn't allow ALT-Printable-Keys combinations, we don't translate User32.WMSysKeyDown messages
 					that would generate WMSysChar messages *)
-					i := User32.TranslateMessage( msg );
+					User32.TranslateMessage( msg );
 				END;
-				i := User32.DispatchMessage( msg )
+				User32.DispatchMessage( msg )
 			END;
-		END;
+		UNTIL (i = 0) OR (Environment.status # 0);
 		UnregisterClasses();
 		Counters.Dec (Activities.awaiting);
 	END MessageLoop;
