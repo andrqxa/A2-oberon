@@ -1329,7 +1329,7 @@ TYPE
 		VAR instruction: IntermediateCode.Instruction;
 		BEGIN
 			IntermediateCode.InitNumber(op1,callconv);
-			IF backend.cooperative & (callconv = SyntaxTree.OberonCallingConvention) THEN
+			IF backend.cooperative THEN
 				IntermediateCode.InitNumber(op2,ToMemoryUnits(system, system.addressSize));
 			ELSE
 				IntermediateCode.InitNumber(op2,0);
