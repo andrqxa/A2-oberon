@@ -306,7 +306,7 @@ VAR
 
 (* Common base handler for all variants of windows provided by this module. *)
 	PROCEDURE DummyHandler( win: Window;  uMsg: LONGINT;  wParam: User32.WParam;  lParam: User32.LParam ): User32.LResult;
-	VAR res: User32.LResult; proc: User32.WndProc; hhWnd: ANY;  ret: Kernel32.BOOL;
+	VAR res: User32.LResult; proc: User32.WndProc; hhWnd {UNTRACED}: ANY;  ret: Kernel32.BOOL;
 	BEGIN
 		IF (uMsg = User32.WMDestroy) & ~(external IN win.state) THEN
 			EXCL( win.state, update );  DEC( nWindows );
@@ -360,11 +360,11 @@ VAR
 
 	PROCEDURE {WINAPI} DummyProc( hwnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
 															  lParam: User32.LParam ): User32.LResult;
-	VAR win: Window;  create: CreateStruct;  ret: Kernel32.BOOL;
-	BEGIN
+	VAR win {UNTRACED}: Window;  create {UNTRACED}: CreateStruct;  ret: Kernel32.BOOL;
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		win := SYSTEM.VAL( Window, User32.GetWindowLong( hwnd, GWLWindow ) );
 		IF win # NIL THEN SYSTEM.SetActivity (win.processor) END;
-		
+
 		IF win # NIL THEN RETURN DummyHandler( win, uMsg, wParam, lParam )
 		ELSIF uMsg = User32.WMCreate THEN
 			SYSTEM.GET( lParam, create );  wParam := SYSTEM.VAL( User32.WParam, create );
@@ -785,8 +785,8 @@ VAR
 
 	PROCEDURE {WINAPI} WindowProc( hwnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
 															    lParam: User32.LParam ): User32.LResult;
-	VAR win: Window;  dbh: DEV_BROADCAST_HDRP; dbv : DEV_BROADCAST_VOLUMEP; i: LONGINT;
-	BEGIN
+	VAR win {UNTRACED}: Window;  dbh: DEV_BROADCAST_HDRP; dbv : DEV_BROADCAST_VOLUMEP; i: LONGINT;
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		win := SYSTEM.VAL( Window, User32.GetWindowLong( hwnd, GWLWindow ) );
 		IF win # NIL THEN SYSTEM.SetActivity (win.processor) END;
 
@@ -971,8 +971,8 @@ VAR
 
 	PROCEDURE {WINAPI} ControlWindowProc( hwnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
 																		    lParam: User32.LParam ): User32.LResult;
-	VAR win: Window;  ret: Kernel32.BOOL;
-	BEGIN
+	VAR win {UNTRACED}: Window;  ret: Kernel32.BOOL;
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		win := SYSTEM.VAL( Window, User32.GetWindowLong( hwnd, GWLWindow ) );
 		IF win # NIL THEN RETURN WindowHandler( win, uMsg, wParam, lParam )
 		ELSIF uMsg = User32.WMCreate THEN
@@ -984,7 +984,7 @@ VAR
 
 	PROCEDURE {WINAPI} UnregisterControlWinClass;
 	VAR ret: Kernel32.BOOL;
-	BEGIN
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF aControlWinClass # Kernel32.NULL THEN
 			ret := User32.UnregisterClass( controlClassName, Kernel32.hInstance );  aControlWinClass := Kernel32.NULL
 		END
