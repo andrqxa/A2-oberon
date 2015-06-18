@@ -7928,13 +7928,18 @@ TYPE
 		END Dereference;
 
 		PROCEDURE VisitDereferenceDesignator(x: SyntaxTree.DereferenceDesignator);
-		VAR  type: SyntaxTree.Type; d: Operand; dest: IntermediateCode.Operand;
+		VAR  type: SyntaxTree.Type; d: Operand; dest: IntermediateCode.Operand;prevIsUnchecked: BOOLEAN;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitDereferenceDesignator") END;
 			dest := destination; destination := emptyOperand;
 			Evaluate(x.left,d);
 			type := x.type.resolved;
+			prevIsUnchecked := isUnchecked;
+			IF (x.left # NIL) & (x.left IS SyntaxTree.SelfDesignator) THEN 
+				isUnchecked := TRUE; (* avoid NIL-pointer-check for SELF pointer *)
+			END;
 			Dereference(d,type,IsUnsafePointer(x.left.type));
+			isUnchecked := prevIsUnchecked;
 			result := d;
 			IF backend.cooperative & (x.left.type.resolved IS SyntaxTree.PointerType) & ~x.left.type.resolved(SyntaxTree.PointerType).isPlain & ~x.left.type.resolved(SyntaxTree.PointerType).isUnsafe THEN
 				IF (type IS SyntaxTree.RecordType) & ~type(SyntaxTree.RecordType).isObject THEN
