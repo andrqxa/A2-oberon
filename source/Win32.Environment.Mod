@@ -7,6 +7,8 @@ IMPORT SYSTEM, Activities, Counters, Kernel32, Processors, Queues, Trace;
 
 CONST IsNative* = FALSE;
 
+CONST Running* = 0; ShuttingDown* = 1; Rebooting* = 2;
+
 CONST DefaultConfigFile = "aos.ini";
 CONST UserConfigFile = "myaos.ini";
 
@@ -22,8 +24,26 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Exit (1);
 END Abort;
 
+PROCEDURE Shutdown*;
+VAR mod: Kernel32.HANDLE;
+VAR SendMessage: PROCEDURE {WINAPI} (hWnd: ADDRESS; Msg: LONGINT; wParam: ADDRESS; lParam: ADDRESS): LONGINT;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	IF CAS (status, Running, ShuttingDown) # Running THEN RETURN END;
+	Trace.StringLn ("system: shutting down...");
+	mod := Kernel32.LoadLibrary("User32.DLL");
+	Kernel32.GetProcAddress(mod, "PostMessageA", SYSTEM.VAL (ADDRESS,SendMessage));
+	SendMessage (0FFFFH, 0, 0, 0);
+END Shutdown;
+
+PROCEDURE Reboot*;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Shutdown;
+	ASSERT (CAS (status, ShuttingDown, Rebooting) = ShuttingDown);
+END Reboot;
+
 PROCEDURE {NORETURN} Exit- (status: WORD);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	Trace.String ("system: exiting to windows");
 	RemoveTraceFile;
 	Kernel32.ExitProcess (status);
 END Exit;
@@ -63,7 +83,7 @@ END TimerThread;
 PROCEDURE TickLoop (argument: ADDRESS);
 VAR item: Queues.Item;
 BEGIN
-	LOOP
+	WHILE status = Running DO
 		Kernel32.Sleep (1);
 		WHILE Queues.Dequeue (item, sleepingQueue) DO
 			Activities.Resume (item(Activities.Activity));

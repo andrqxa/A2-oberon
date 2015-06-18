@@ -467,14 +467,8 @@ END GetInit;
 	END GetConfig;
 
 	PROCEDURE Shutdown*( restart: BOOLEAN );
-	PROCEDURE Reboot EXTERN "Environment.Reboot";
-	PROCEDURE Shutdown EXTERN "Environment.Shutdown";
 	BEGIN
-		IF Environment.IsNative THEN
-			IF restart THEN Reboot ELSE Shutdown END;
-		ELSE
-			Environment.Exit (0);
-		END;
+		IF restart THEN Environment.Reboot ELSE Environment.Shutdown END;
 	END Shutdown;
 
 PROCEDURE Cli*;
