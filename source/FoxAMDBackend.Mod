@@ -1263,11 +1263,15 @@ TYPE
 
 			emitter.Emit1(InstructionSet.opPUSH,opBP);
 			IF instruction.op1.mode # IntermediateCode.ModeNumber THEN
+				ASSERT (backend.cooperative);
 				EmitPush(instruction.op1,Low);
 				cc := SyntaxTree.OberonCallingConvention;
 			ELSE
+				IF backend.cooperative THEN
+					Assembler.InitImm(imm, SHORTINT (cpuBits DIV 8), 0);
+					emitter.Emit1(InstructionSet.opPUSH,imm);
+				END;				
 				cc := SHORT(instruction.op1.intValue);
-				
 			END;
 			emitter.Emit2(InstructionSet.opMOV,opBP,opSP);
 			
