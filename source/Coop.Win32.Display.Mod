@@ -920,17 +920,18 @@ VAR
 		RETURN w
 	END FirstWindow;
 
-	PROCEDURE {WINAPI} WindowThread (create: ANY): LONGINT;
-	BEGIN {UNCOOPERATIVE}
+	PROCEDURE {WINAPI} WindowThread (create {UNTRACED}: ANY): LONGINT;
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		Kernel32.InstallExceptionHandler;
-		Activities.CallVirtual (MessageLoop, ADDRESS OF create(CreateStruct)^, create(CreateStruct).win.processor);
+		Activities.CallVirtual (MessageLoop, create, create(CreateStruct).win.processor);
 		RETURN 0;
 	END WindowThread;
 
-	PROCEDURE MessageLoop (create {UNTRACED}: POINTER {UNSAFE} TO CreateStructDesc);
-	VAR activity: Activities.Activity;
+	PROCEDURE MessageLoop (c: ADDRESS);
+	VAR activity: Activities.Activity; create: CreateStruct;
 	VAR msg: User32.Msg;  i: LONGINT; mode: LONGINT;
 	BEGIN
+		create := SYSTEM.VAL (CreateStruct, c);
 		KernelLog.String( "Display: Initialize message dispatcher..." );  KernelLog.Ln;
 		RegisterClasses();  CreateHWND( create );  create := NIL;
 		KernelLog.String( "Display: Start message dispatching" ); KernelLog.Ln;
