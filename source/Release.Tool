@@ -41,8 +41,8 @@
 #	StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=Gof --displacement=401000H --path="/temp/obg/" Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~
 # 
 # WINAOS Cooperative
-#	Release.Build --build --path="./" WinAosCooperative ~
-#	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=Gof --displacement=401000H --path="./" Trace CPU Runtime Counters Kernel32 Processors Queues BaseTypes Activities ExclusiveBlocks Environment Mutexes Interrupts Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
+#	Release.Build  --path="./" WinAosCooperative ~
+#	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=GofW --displacement=401000H --path="./" Trace CPU Runtime Counters Kernel32 Processors Queues BaseTypes Activities ExclusiveBlocks Environment Mutexes Interrupts Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #	FSTools.CloseFiles A2.exe ~
 # 
 # Notes:
@@ -184,8 +184,8 @@ BUILDS
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile"
 		TARGET "AMD"
-		EXTENSION "Gof"
-		SYMBOLEXTENSION "Sym"
+		EXTENSION "GofW"
+		SYMBOLEXTENSION "SymW"
 		PATH "../obj/"
 		EXCLUDEPACKAGES "Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts TrueTypeFonts CjkFonts Pr3Fonts ScreenFonts Pr6Fonts"
 		DISABLED "FALSE"
@@ -503,7 +503,7 @@ PACKAGE Drivers ARCHIVE "Drivers.zip" SOURCE "DriversSrc.zip" DESCRIPTION "Devic
 		# USB core
 		UsbDebug.Mod
 		Usbdi.Mod UsbHcdi.Mod
-		UsbUhci.Mod UsbOhci.Mod UsbEhci.Mod
+		UsbUhci.Mod UsbOhci.Mod UsbEhci.Mod UsbEhciPCI.Mod
 		UsbDriverLoader.Mod UsbUtilities.Mod Usb.Mod UsbHubDriver.Mod
 
 		# USB mass storage class driver

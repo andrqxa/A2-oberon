@@ -45,7 +45,7 @@ Partitions.SetConfig VDISK0#1
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable"
 	Boot3="WindowManager.Install"
-	Boot5="Autostart.Run"
+	Boot5="Notepad.Open Test.Tool"
 	TraceModules = "1"
 	~
 VirtualDisks.Uninstall VDISK0 ~
@@ -73,7 +73,7 @@ StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H -
 Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks 
 HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel 
 KernelLog Streams Reflection TrapWriters Traps Plugins Disks PCI Caches Commands Files 
-UsbDebug  Usbdi UsbHcdi UsbUhci UsbEhci UsbUtilities UsbDriverLoader Usb UsbHubDriver UsbStorageBase UsbStorageBot UsbStorageBoot
+UsbDebug  Usbdi UsbHcdi UsbUhci UsbEhci UsbEhciPCI UsbUtilities UsbDriverLoader Usb UsbHubDriver UsbStorageBase UsbStorageBot UsbStorageBoot
 DiskVolumes Clock DiskFS Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
 
 Partitions.WriteMBR VDISK0#0 OBEMBR.BIN ~
@@ -87,18 +87,16 @@ FSTools.Unsafe ~
 FSTools.CopyFiles -q
 	*.Gof => TEMP:*.Gof
 	*.Sym => TEMP:*.Sym ~
-FSTools.CopyFiles -o -q 
-	SRC:*.* => TEMP:*.* ~
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
 
 Partitions.SetConfig VDISK0#1
-	TraceMode="4" TracePort="1" TraceBPS="115200"
+	TraceMode="5" TracePort="1" TraceBPS="115200"
 	BootVol1="AOS AosFS USB0#1"
 	Boot="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ExtMemSize="200"
-	Init="118"
+	Init=""
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable"
 	Boot3="WindowManager.Install"
@@ -123,6 +121,21 @@ SystemTools.DoCommands
 Partitions.FileToPartition PhysicalDrive2#0 hd.img 0 160000  ~
 WinDisks.Uninstall "PhysicalDrive2" ~
 ~
+
+(* compile the kernel *)
+Compiler.Compile --cooperative --objectFile=Generic --newObjectFile -b=AMD --objectFileExtension=.Gof --symbolFileExtension=.Sym --traceModule=Trace
+I386.CPU.Mod Trace.Mod Counters.Mod I386.APIC.Mod APIC.Processors.Mod Queues.Mod 
+BaseTypes.Mod Activities.Mod ExclusiveBlocks.Mod Interrupts.Mod Coop.Runtime.Mod HeapManager.Mod 
+BIOS.Environment.Mod Mutexes.Mod Coop.Machine.Mod Coop.Heaps.Mod Coop.Modules.Mod GarbageCollector.Mod 
+Coop.Objects.Mod Coop.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod 
+I386.Reals.Mod Coop.Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod Coop.Traps.Mod 
+Locks.Mod I386.PCI.Mod Clock.Mod Coop.MemCache.Mod Disks.Mod Files.Mod Dates.Mod Strings.Mod 
+UTF8Strings.Mod FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod OldDiskVolumes.Mod RAMVolumes.Mod 
+DiskFS.Mod OldDiskFS.Mod OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod 
+ISO9660Files.Mod RelativeFileSystem.Mod Loader.Mod BitSets.Mod Diagnostics.Mod StringPool.Mod 
+ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod BootConsole.Mod I386.ATADisks.Mod 
+~
+
 
 
 (* compile the kernel *)
@@ -165,7 +178,7 @@ VirtualDisks.Mod DisplayNull.Mod V24.Mod Beep.Mod SCSI.Mod I386.ATADisks.Mod I38
 Adaptec7.Mod NCRScript.Mod SymbiosASPI.Mod SymbiosDisks.Mod NCR810Disks.Mod I386.Keyboard.Mod 
 MousePS2.Mod MouseSerial.Mod DisplayLinear.Mod Loopback.Mod Ethernet3Com90x.Mod RTL8139.Mod 
 RTL8169.Mod Intel8255x.Mod AM79C970.Mod EnsoniqSound.Mod YMF754.Mod i810Sound.Mod BT848.Mod 
-UsbDebug.Mod Usbdi.Mod UsbHcdi.Mod UsbUhci.Mod UsbOhci.Mod UsbEhci.Mod UsbDriverLoader.Mod 
+UsbDebug.Mod Usbdi.Mod UsbHcdi.Mod UsbUhci.Mod UsbOhci.Mod UsbEhci.Mod UsbEhciPCI.Mod UsbDriverLoader.Mod 
 UsbUtilities.Mod Usb.Mod UsbHubDriver.Mod UsbStorageBase.Mod UsbStorageBot.Mod UsbStorageCbi.Mod 
 UsbStorageScm.Mod UsbStorageBoot.Mod UsbStorage.Mod UsbHid.Mod UsbMouse.Mod UsbFTDI.Mod 
 I386.UsbKeyboard.Mod UsbHidUP.Mod UsbHidErrors.Mod UsbHidReport.Mod UsbHidParserExt.Mod UsbHidParser.Mod 
