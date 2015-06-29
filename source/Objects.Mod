@@ -1749,6 +1749,14 @@ BEGIN
 	finalizerProcess := NIL; NEW(finalizerCaller);
 END InitGCHandling;
 
+PROCEDURE PinStack*(size: SIZE);
+BEGIN (* stub for compatibility with A2 Coop *)
+END PinStack;
+
+PROCEDURE UnpinStack*();
+BEGIN (* stub for compatibility with A2 Coop *)
+END UnpinStack;
+
 PROCEDURE InitStats;
 BEGIN
 	Nlock := 0; Nunlock := 0; Nawait := 0; NawaitNoIF := 0; NawaitTrue := 0;

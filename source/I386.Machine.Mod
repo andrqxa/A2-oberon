@@ -2284,6 +2284,30 @@ PROCEDURE Is32BitAddress*(adr: ADDRESS): BOOLEAN;
 BEGIN RETURN SYSTEM.VAL (Address32, adr) = adr;
 END Is32BitAddress;
 
+(**
+ * Flush Data Cache for the specified virtual address range. If len is negative, flushes the whole cache.
+ * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
+ * left empty on Intel architecture.
+ *)
+PROCEDURE FlushDCacheRange * (adr: ADDRESS; len: LONGINT);
+END FlushDCacheRange;
+
+(**
+ * Invalidate Data Cache for the specified virtual address range. If len is negative, flushes the whole cache.
+ * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
+ * left empty on Intel architecture.
+ *)
+PROCEDURE InvalidateDCacheRange * (adr: ADDRESS; len: LONGINT);
+END InvalidateDCacheRange;
+
+(**
+ * Invalidate Instruction Cache for the specified virtual address range. If len is negative, flushes the whole cache.
+ * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
+ * left empty on Intel architecture.
+ *)
+PROCEDURE InvalidateICacheRange * (adr: ADDRESS; len: LONGINT);
+END InvalidateICacheRange;
+
 (* Unexpected - Default interrupt handler *)
 PROCEDURE Unexpected(VAR state: State);
 VAR int: LONGINT; isr, irr: CHAR;
@@ -3486,9 +3510,9 @@ END InitMPTimer;
 PROCEDURE HandleMPTimer(VAR state: State);
 BEGIN	(* {interrupts off} *)
 	timer(ID(), state);
-	ApicPut(0B0H, {});	(* EOI *)
 	Sti;	(* enable interrupts before acquiring locks below - to avoid deadlock with StopAll. *)
-	Timeslice(state)	(* fixme: check recursive interrupt *)
+	Timeslice(state);
+	ApicPut(0B0H, {});	(* EOI *)
 END HandleMPTimer;
 
 (* Handle uniprocessor timer interrupt. *)
@@ -3698,14 +3722,22 @@ BEGIN
 	InstallHandler(HandleKernelCall, MPKC);
 END InitProcessors;
 
+VAR scrollLines: LONGINT;
+
 (* Send and print character *)
 PROCEDURE TraceChar (c: CHAR);
 VAR status: SHORTINT;
 
 	(* Scroll the screen by one line. *)
 	PROCEDURE Scroll;
-	VAR adr: ADDRESS; off: SIZE;
+	VAR adr: ADDRESS; off: SIZE; i,j: LONGINT;
 	BEGIN
+		IF (traceDelay > 0) & (scrollLines MOD TraceHeight = 0) THEN 
+			FOR i := 0 TO traceDelay-1 DO 
+				FOR j := 0 TO 1000000 DO END;
+			END;
+		END;
+		INC(scrollLines);
 		adr := traceBase + TraceLen;
 		SYSTEM.MOVE (adr, adr - TraceLen, TraceSize - TraceLen);
 		adr := traceBase + TraceSize - TraceLen;
@@ -3745,6 +3777,7 @@ PROCEDURE TraceColor (c: SHORTINT);
 BEGIN traceColor := c;
 END TraceColor;
 
+VAR traceDelay: LONGINT; 
 (* Initialise tracing. *)
 PROCEDURE InitTrace;
 CONST MaxPorts = 8;
@@ -3762,7 +3795,10 @@ BEGIN
 		Portout8(3D4H, 0EX);
 		Portout8(3D5H, CHR((TraceWidth*TraceHeight) DIV 100H));
 		Portout8(3D4H, 0FX);
-		Portout8(3D5H, CHR((TraceWidth*TraceHeight) MOD 100H))
+		Portout8(3D5H, CHR((TraceWidth*TraceHeight) MOD 100H));
+		GetConfig("TraceDelay", s); 
+		p := 0; traceDelay := StrToInt(p, s); 
+
 	END;
 	IF TraceV24 IN traceMode THEN
 		FOR i := 0 TO MaxPorts - 1 DO
