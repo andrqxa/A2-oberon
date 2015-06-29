@@ -722,7 +722,7 @@ TYPE
 			ir.SetExported(TRUE);
 			ir.SetPriority(InitPriority);
 			Global.GetSymbolSegmentedName (bodyProcedure,name);
-			IF backend.cooperative THEN
+			IF TRUE OR backend.cooperative THEN
 				implementationVisitor.currentScope := module.module.moduleScope;
 				implementationVisitor.section := ir;
 				implementationVisitor.PushSelfPointer();
@@ -9721,6 +9721,7 @@ TYPE
 			procedure := scope(SyntaxTree.ProcedureScope).ownerProcedure;
 			procedureType := procedure.type(SyntaxTree.ProcedureType);
 			IF newObjectFile & moduleBody & ~suppressModuleRegistration & ~meta.simple & ~backend.cooperative THEN
+				(*
 				PushSelfPointer();
 				(*
 				moduleSection := ModuleSection(module);
@@ -9734,6 +9735,7 @@ TYPE
 				(*AcquireThisRegister(bool, IntermediateCode.Result);*)
 				BrneL(end, res,true);
 				ReleaseIntermediateOperand(res);
+				*)
 			END;
 			IF x # NIL THEN
 				IF emitLabels THEN Emit(LabelInstruction(x.position)) END;
@@ -9786,9 +9788,13 @@ TYPE
 				IF HasVariableParameters (procedure.procedureScope) OR IsNested (procedure) THEN CreateMoveMethod (procedure.procedureScope) END;
 				IF HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope) OR IsNested (procedure) THEN CreateProcedureDescriptor (procedure) END;
 			ELSIF newObjectFile & moduleBody  & ~suppressModuleRegistration & ~meta.simple THEN
+				(*! not required any more? check and delete!
 				PushSelfPointer();
 				CallThis("Modules","SetInitialized",1);
+				*)
+				(*
 				SetLabel(end);
+				*)
 			END;
 			IF x # NIL THEN
 				SELF.position := x.position;
@@ -11551,7 +11557,10 @@ TYPE
 			noRuntimeChecks := options.GetFlag("noRuntimeChecks");
 			noAsserts := options.GetFlag("noAsserts");
 			cooperative := options.GetFlag("cooperative");
-			IF options.GetFlag("newObjectFile") THEN newObjectFile := TRUE; SetRuntimeModuleName("CPU") END;
+			IF options.GetFlag("newObjectFile") THEN newObjectFile := TRUE; 
+				IF cooperative THEN 
+					SetRuntimeModuleName("CPU") END
+				END;
 			IF options.GetString("objectFile",string) & (string = "Minos") THEN 
 				simpleMetaData := TRUE
 			END;

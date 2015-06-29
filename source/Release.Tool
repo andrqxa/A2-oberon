@@ -128,8 +128,8 @@ BUILDS
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "--objectFile=Generic --newObjectFile"
 		TARGET "AMD"
-		EXTENSION "Gof"
-		SYMBOLEXTENSION "Sym"
+		EXTENSION "GofX"
+		SYMBOLEXTENSION "SymX"
 		PATH "AOS:"
 		EXCLUDEPACKAGES "Applications GuiApplications Fun Testing Education Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
 		DISABLED "FALSE"
@@ -279,10 +279,10 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	DARWIN { Darwin.Unix.Mod } LINUX { Linux.Unix.Mod } SOLARIS { Solaris.Unix.Mod }
 
 	WINORIG { Win32.Kernel32.Mod}
-	WINGEN {oc/Generic.Win32.Kernel32.Mod}
+	WINGEN {Generic.Win32.Kernel32.Mod}
 
 	I386ORIG { I386.Machine.Mod }
-	I386GEN { oc/Generic.I386.Machine.Mod }
+	I386GEN { Generic.I386.Machine.Mod }
 	AMD64 { AMD64.Machine.Mod }
 	WINORIG, WINGEN {Win32.Machine.Mod }
 	COOP { Mutexes.Mod Coop.Machine.Mod }
@@ -294,7 +294,7 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	COOP { Coop.Heaps.Mod }
 
 	NATIVEORIG, WINORIG, UNIX { Modules.Mod }
-	NATIVEGEN, WINGEN { oc/Generic.Modules.Mod}
+	NATIVEGEN, WINGEN { Generic.Modules.Mod}
 	COOP { Coop.Modules.Mod GarbageCollector.Mod }
 
 	NATIVEORIG, NATIVEGEN { Objects.Mod Kernel.Mod }
