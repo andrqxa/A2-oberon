@@ -330,7 +330,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	Locks.Mod
 
 	# PCI bus interface
-	I386 { I386.PCI.Mod }
+	I386 {BiosFreePCI.Mod }
 	AMD64 { AMD64.PCI.Mod }
 
 	# Realtime clock driver
