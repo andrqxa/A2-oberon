@@ -18,7 +18,7 @@ VirtualDisks.Create hd.img 300000 512 ~
 VirtualDisks.Install -b=512 VDISK0 hd.img ~
 
 Linker.Link \.Obx kernel.Bin  0100000H 100000H Kernel Traps
-			UsbHubDriver UsbEhci UsbUhci UsbStorageBoot UsbInfo
+			UsbHubDriver UsbEhci UsbEhciPCI UsbUhci UsbStorageBoot UsbInfo
 			DiskVolumes DiskFS 
 			Loader BootConsole ~
 			
@@ -83,12 +83,12 @@ VirtualDisks.Install -b=512 VDISK0 hd.img ~
 
 StaticLinker.Link
 	--fileName=kernel.Bin
-	--extension=GofX
+	--extension=Gox
 	--displacement=0100000H
 	--path="./"
 	Runtime Trace Machine Heaps Modules Objects Kernel 
 	KernelLog Plugins Streams Commands Reals 
-	Reflection TrapWriters Traps Locks PCI Clock MemCache Disks Files Caches 
+	Reflection TrapWriters Traps Locks PCI Clock Disks Files Caches 
 	UsbDebug  Usbdi UsbHcdi UsbUhci UsbEhci UsbEhciPCI UsbUtilities UsbDriverLoader Usb UsbHubDriver UsbStorageBase UsbStorageBot UsbStorageBoot
 	DiskVolumes DiskFS Dates Strings Diagnostics BitSets StringPool ObjectFile GenericLinker 
 	GenericLoader BootConsole 
@@ -103,10 +103,7 @@ Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
 FSTools.Mount TEMP AosFS VDISK0#1 ~
 FSTools.Unsafe ~
 FSTools.CopyFiles -q
-	*.GofX => TEMP:*.GofX
-	~
-FSTools.CopyFiles -o -q 
-	SRC:*.* => TEMP:*.* 
+	*.Gox => TEMP:*.Gox
 	~
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
@@ -116,9 +113,9 @@ Partitions.SetConfig VDISK0#1
 	BootVol1="AOS AosFS USB0#1"
 	Boot="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
-	ObjectFileExtension=".GofX"
+	ObjectFileExtension=".Gox"
 	ExtMemSize="500"
-	Init="114"
+	Init=""
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable"
 	Boot3="WindowManager.Install"
