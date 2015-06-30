@@ -2693,6 +2693,25 @@ entry:
 ;	CALL traceInterruptIn
 
 	MOV EBX, [ESP+32]	; EBX = int number
+
+	CMP BL, IRQ0 + 7 ; if irq=7 then check for spurious interrupt on master
+	JNE skip1
+	MOV    AL, 0BH
+	OUT    IntA0, AL
+	IN    AL, IntA0
+	BT    AX, 7
+	JNC    end
+skip1:
+	CMP BL, IRQ8 + 7  ; if irq=15 then check for spurious interrupt on slave
+	JNE skip2
+	MOV    AL, 0BH
+	OUT    IntB0, AL
+	IN    AL, IntB0
+	BT    AX, 7
+	MOV AL, 20H
+	JNC    irq0 ; acknowledge IRQ on master
+
+skip2:
 	IMUL EBX, EBX, MaxNumHandlers
 	IMUL EBX, EBX, 12
 	LEA EAX, intHandler
@@ -3488,9 +3507,9 @@ END InitMPTimer;
 PROCEDURE HandleMPTimer(VAR state: State);
 BEGIN	(* {interrupts off} *)
 	timer(ID(), state);
-	ApicPut(0B0H, {});	(* EOI *)
 	Sti;	(* enable interrupts before acquiring locks below - to avoid deadlock with StopAll. *)
-	Timeslice(state)	(* fixme: check recursive interrupt *)
+	Timeslice(state);
+	ApicPut(0B0H, {});	(* EOI *)
 END HandleMPTimer;
 
 (* Handle uniprocessor timer interrupt. *)
@@ -3691,14 +3710,22 @@ BEGIN
 	InstallHandler(HandleKernelCall, MPKC);
 END InitProcessors;
 
+VAR scrollLines: LONGINT;
+
 (* Send and print character *)
 PROCEDURE TraceChar (c: CHAR);
 VAR status: SHORTINT;
 
 	(* Scroll the screen by one line. *)
 	PROCEDURE Scroll;
-	VAR adr: ADDRESS; off: SIZE;
+	VAR adr: ADDRESS; off: SIZE; i,j: LONGINT;
 	BEGIN
+		IF (traceDelay > 0) & (scrollLines MOD TraceHeight = 0) THEN 
+			FOR i := 0 TO traceDelay-1 DO 
+				FOR j := 0 TO 1000000 DO END;
+			END;
+		END;
+		INC(scrollLines);
 		adr := traceBase + TraceLen;
 		SYSTEM.MOVE (adr, adr - TraceLen, TraceSize - TraceLen);
 		adr := traceBase + TraceSize - TraceLen;
@@ -3738,6 +3765,7 @@ PROCEDURE TraceColor (c: SHORTINT);
 BEGIN traceColor := c;
 END TraceColor;
 
+VAR traceDelay: LONGINT; 
 (* Initialise tracing. *)
 PROCEDURE InitTrace;
 CONST MaxPorts = 8;
@@ -3755,7 +3783,10 @@ BEGIN
 		Portout8(3D4H, 0EX);
 		Portout8(3D5H, CHR((TraceWidth*TraceHeight) DIV 100H));
 		Portout8(3D4H, 0FX);
-		Portout8(3D5H, CHR((TraceWidth*TraceHeight) MOD 100H))
+		Portout8(3D5H, CHR((TraceWidth*TraceHeight) MOD 100H));
+		GetConfig("TraceDelay", s); 
+		p := 0; traceDelay := StrToInt(p, s); 
+
 	END;
 	IF TraceV24 IN traceMode THEN
 		FOR i := 0 TO MaxPorts - 1 DO
@@ -3823,7 +3854,6 @@ BEGIN
 	ReadBootTable(bootFlag);
 	InitTrace;
 	Trace.String("Machine: "); Trace.Blue;Trace.StringLn (Version); Trace.Default;
-	Trace.Address(CurrentSP());
 	CheckMemory;
 	SearchMP;
 	AllocateDMA;	(* must be called after SearchMP, as lowTop is modified *)
@@ -3840,7 +3870,6 @@ BEGIN
 	InitPages;	(* create page tables *)
 	InitMemory;	(* switch on segmentation, paging and switch stack *)
 	Trace.Green; Trace.StringLn("Ok"); Trace.Default;
-	Trace.Address(CurrentSP());
 
 	(* allocate empty memory block with enough space for at least one free block *)
 	memBlockHead := SYSTEM.VAL (MemoryBlock, ADDRESSOF (initialMemBlock));
