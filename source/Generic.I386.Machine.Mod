@@ -3808,6 +3808,9 @@ CODE {SYSTEM.i386}
 END LastAddress;
 
 (* Init code called from OBL. EAX = boot table offset. ESI, EDI=initRegs. 2k stack is available. No trap handling. *)
+(* must be called from module caller chain *)
+
+PROCEDURE Init*;
 BEGIN
 	initRegs[0] := initRegs0;
 	initRegs[1] := initRegs1;
@@ -3818,6 +3821,7 @@ BEGIN
 	ReadBootTable(bootFlag);
 	InitTrace;
 	Trace.String("Machine: "); Trace.Blue;Trace.StringLn (Version); Trace.Default;
+	Trace.Address(CurrentSP());
 	CheckMemory;
 	SearchMP;
 	AllocateDMA;	(* must be called after SearchMP, as lowTop is modified *)
@@ -3834,6 +3838,7 @@ BEGIN
 	InitPages;	(* create page tables *)
 	InitMemory;	(* switch on segmentation, paging and switch stack *)
 	Trace.Green; Trace.StringLn("Ok"); Trace.Default;
+	Trace.Address(CurrentSP());
 
 	(* allocate empty memory block with enough space for at least one free block *)
 	memBlockHead := SYSTEM.VAL (MemoryBlock, ADDRESSOF (initialMemBlock));
@@ -3849,6 +3854,9 @@ BEGIN
 		END
 	END;
 	default.valid := FALSE;	(* initialized later *)
+END Init;
+
+BEGIN
 END Machine.
 
 (*

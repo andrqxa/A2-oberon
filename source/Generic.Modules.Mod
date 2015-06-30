@@ -317,14 +317,26 @@ BEGIN
 	END;
 END Initialize;
 
-PROCEDURE Initialize0*(VAR module: Module);
+PROCEDURE Initialize0*(module: Module);
 VAR new: BOOLEAN;
 BEGIN
+	(*
 	(* don't use trace here, Trace might be uninitialized ! *)
-	Publish (module, new);
-	IF new THEN
+
+	Trace.String("init module "); Trace.String(module.name); Trace.Ln;
+	module.published := TRUE;
+	module.next := root; root := module;
+	module.refcnt := 0;
+	(*
 		SortProcTable(module);
 		SelectionSort(module.exTable);
+	*)
+	body := SYSTEM.VAL(ADDRESS, module.body);
+	IF module.body # NIL THEN module.body END;
+	module.init := TRUE;
+	*)
+	Publish (module, new);
+	IF new THEN
 		IF module.body # NIL THEN module.body END;
 		module.init := TRUE;
 	END;
@@ -922,7 +934,8 @@ END PublishRegisteredModules;
 (* procedure that will be called last in a linked kernel *)
 PROCEDURE {FINAL} Main;
 BEGIN
-	Trace.String("publishing registered modules"); Trace.Ln;
+	Machine.Init;
+	Trace.String("published registered modules"); Trace.Ln;
 	PublishRegisteredModules;
 END Main;
 
