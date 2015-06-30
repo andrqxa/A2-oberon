@@ -208,7 +208,22 @@ END UnmapPhysical;
 
 (** Translate a virtual address range to num ranges of physical address. num returns 0 on error. *)
 PROCEDURE TranslateVirtual*(virtAdr: ADDRESS; size: SIZE;  VAR num: LONGINT; VAR physAdr: ARRAY OF Range);
-BEGIN num := 1; physAdr[0].adr := virtAdr; physAdr[0].size := size;
+CONST PS = 4096;
+VAR ofs, phys1: ADDRESS; size1: SIZE;
+BEGIN
+	num := 0;
+	LOOP
+		IF size = 0 THEN EXIT END;
+		IF num = LEN(physAdr) THEN num := 0; EXIT END;	(* index check *)
+		ofs := virtAdr MOD PS;	(* offset in page *)
+		size1 := PS - ofs;	(* distance to next page boundary *)
+		IF size1 > size THEN size1 := size END;
+		phys1 := virtAdr - ofs;
+		physAdr[num].adr := phys1 - phys1 MOD PS + ofs;
+		physAdr[num].size := size1; INC(num);
+		INC(virtAdr, size1); DEC(size, size1)
+	END;
+	IF num = 0 THEN physAdr[0].adr := NilAdr; physAdr[0].size := 0 END;
 END TranslateVirtual;
 
 PROCEDURE Ensure32BitAddress*(adr: ADDRESS): Address32;
