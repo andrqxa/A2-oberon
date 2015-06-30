@@ -622,8 +622,12 @@ VAR
 				IF TraceLoading THEN Trace.String("linking done"); Trace.Ln END;
 
 				moduleAdr := linker.moduleBlock.address;
+				IF ~Machine.IsCooperative THEN
+					SYSTEM.GET(moduleAdr+3*SIZEOF(ADDRESS), moduleAdr);
+					SYSTEM.GET(moduleAdr-2*SIZEOF(ADDRESS), heapBlockAdr);
+					ASSERT(heapBlockAdr = linker.moduleBlock.address+2*SIZEOF(ADDRESS));
+				END;
 				module := SYSTEM.VAL(Modules.Module,moduleAdr);
-
 				module.staticTypeDescs := testTypeDescs; (* trick to identify new object file loaded modules *)
 				module.data := arrangement.data.bytes;
 				module.code := arrangement.code.bytes;

@@ -22,6 +22,8 @@ CONST
 
 	DefaultDMASize = 20;	(* default size of ISA DMA area in KB *)
 
+	IsCooperative*= FALSE;
+
 CONST
 	StrongChecks = FALSE;	(* perform strong checks *)
 	Stats* = FALSE;	(* acquire statistics *)
