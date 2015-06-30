@@ -70,14 +70,19 @@ VirtualDisks.Create hd.img 300000 512 ~
 VirtualDisks.Install -b=512 VDISK0 hd.img ~
 
 StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" 
-Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks 
-HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel 
-KernelLog Streams Reflection TrapWriters Traps Plugins Disks PCI Caches Commands Files 
-UsbDebug  Usbdi UsbHcdi UsbUhci UsbEhci UsbEhciPCI UsbUtilities UsbDriverLoader Usb UsbHubDriver UsbStorageBase UsbStorageBot UsbStorageBoot
-DiskVolumes Clock DiskFS Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
+	Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks 
+	HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel 
+	KernelLog Streams Reflection  TrapWriters Traps  Plugins
+	UsbDriverLoader Usbdi UsbDebug UsbHcdi UsbUtilities Usb UsbHubDriver UsbEhci PCI UsbEhciPCI UsbUhci 
+	Disks Commands
+	UsbStorageBase UsbStorageBot UsbStorageBoot
+	Reals Clock Dates Strings UsbInfo Caches Files DiskVolumes DiskFS 
+	Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole 
+	~
+
 
 Partitions.WriteMBR VDISK0#0 OBEMBR.BIN ~
-Partitions.Create VDISK0#1 76 150 ~
+Partitions.Create VDISK0#1 76 150 ~	
 Partitions.Activate VDISK0#1 ~
 
 Partitions.Format VDISK0#1 AosFS -1 kernel.bin ~
@@ -86,20 +91,25 @@ FSTools.Mount TEMP AosFS VDISK0#1 ~
 FSTools.Unsafe ~
 FSTools.CopyFiles -q
 	*.Gof => TEMP:*.Gof
-	*.Sym => TEMP:*.Sym ~
+~
+FSTools.CopyFiles -o -q 
+	SRC:*.* => TEMP:*.* 
+~
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
 
 Partitions.SetConfig VDISK0#1
 	TraceMode="5" TracePort="1" TraceBPS="115200"
 	BootVol1="AOS AosFS USB0#1"
-	Boot="DisplayLinear.Install"
+	Boot="!UsbInfo.TraceAll"
+	Boot1="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
-	ExtMemSize="200"
-	Init=""
-	Boot1="Keyboard.Install;MousePS2.Install"
-	Boot2="DriverDatabase.Enable"
-	Boot3="WindowManager.Install"
+	ExtMemSize="500"
+	ObjectFileExtension=".Gof"
+	Init="118"
+	Boot2="Keyboard.Install;MousePS2.Install"
+	Boot3="DriverDatabase.Enable"
+	Boot4="WindowManager.Install"
 	Boot5="Autostart.Run"
 	TraceModules = "1"
 	~
@@ -118,7 +128,7 @@ WinDisks.Install "PhysicalDrive2" RW ~
 ~
 *** CAUTION: check that drive is not a local drive !!!! ***
 SystemTools.DoCommands
-Partitions.FileToPartition PhysicalDrive2#0 hd.img 0 160000  ~
+Partitions.FileToPartition PhysicalDrive2#0 hd.img 0 300000  ~
 WinDisks.Uninstall "PhysicalDrive2" ~
 ~
 

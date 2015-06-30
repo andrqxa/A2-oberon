@@ -39,15 +39,16 @@ FSTools.CopyFiles -o -q
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
 
+
 Partitions.SetConfig VDISK0#1
 	TraceMode="5" TracePort="1" TraceBPS="115200"
 	BootVol1="AOS AosFS USB0#1"
 	Boot="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ExtMemSize="500"
-	Init="114"
+	Init=""
 	Boot1="Keyboard.Install;MousePS2.Install"
-	Boot2="DriverDatabase.Enable"
+	Boot2="DriverDatabase.Enable;UsbHubDriver.Install;UsbEhci.Install;UsbUhci.Install;UsbOhci.Install"
 	Boot3="WindowManager.Install"
 	Boot5="Autostart.Run"
 	TraceModules = "1"
@@ -71,6 +72,7 @@ FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
 
 SystemTools.DoCommands
 
+
 SystemTools.Timer start ~
 
 PCAAMD64.Assemble OBLUnreal.Asm ~
@@ -87,11 +89,12 @@ StaticLinker.Link
 	--displacement=0100000H
 	--path="./"
 	Runtime Trace Machine Heaps Modules Objects Kernel 
-	KernelLog Plugins Streams Commands Reals 
-	Reflection TrapWriters Traps Locks PCI Clock Disks Files Caches 
-	UsbDebug  Usbdi UsbHcdi UsbUhci UsbEhci UsbEhciPCI UsbUtilities UsbDriverLoader Usb UsbHubDriver UsbStorageBase UsbStorageBot UsbStorageBoot
-	DiskVolumes DiskFS Dates Strings Diagnostics BitSets StringPool ObjectFile GenericLinker 
-	GenericLoader BootConsole 
+	KernelLog Streams Reflection  TrapWriters Traps  Plugins
+	UsbDriverLoader Usbdi UsbDebug UsbHcdi UsbUtilities Usb UsbHubDriver UsbEhci PCI UsbEhciPCI UsbUhci 
+	Disks Commands
+	UsbStorageBase UsbStorageBot UsbStorageBoot
+	Reals Clock Dates Strings UsbInfo Caches Files DiskVolumes DiskFS 
+	Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole 
 	~
 				
 Partitions.WriteMBR VDISK0#0 OBEMBR.BIN ~
@@ -105,6 +108,9 @@ FSTools.Unsafe ~
 FSTools.CopyFiles -q
 	*.Gox => TEMP:*.Gox
 	~
+FSTools.CopyFiles -o -q 
+	SRC:*.* => TEMP:*.* 
+	~
 FSTools.Watch TEMP ~
 FSTools.Unmount TEMP ~
 
@@ -117,7 +123,7 @@ Partitions.SetConfig VDISK0#1
 	ExtMemSize="500"
 	Init=""
 	Boot1="Keyboard.Install;MousePS2.Install"
-	Boot2="DriverDatabase.Enable"
+	Boot2="DriverDatabase.Enable;UsbHubDriver.Install;UsbEhci.Install;UsbUhci.Install;UsbOhci.Install"
 	Boot3="WindowManager.Install"
 	Boot5="Autostart.Run"
 	TraceModules = "1"
@@ -131,14 +137,3 @@ SystemTools.Show USB image build time:  ~ SystemTools.Timer elapsed ~
 
 ~~
 
-
-
-
-WinDisks.Install "PhysicalDrive2" RW ~
-
-~
-*** CAUTION: check that drive is not a local drive !!!! ***
-SystemTools.DoCommands
-Partitions.FileToPartition PhysicalDrive2#0 hd.img 0 160000  ~
-WinDisks.Uninstall "PhysicalDrive2" ~
-~
