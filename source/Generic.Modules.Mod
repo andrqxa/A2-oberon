@@ -317,6 +317,8 @@ BEGIN
 	END;
 END Initialize;
 
+VAR callagain: BOOLEAN;
+
 PROCEDURE Initialize0*(module: Module);
 VAR new: BOOLEAN;
 BEGIN
@@ -336,8 +338,14 @@ BEGIN
 	module.init := TRUE;
 	*)
 	Publish (module, new);
+	callagain := FALSE;
 	IF new THEN
+		IF module.name = "Objects" THEN
+			callagain := TRUE;
+			module.init := TRUE;
+		END;
 		IF module.body # NIL THEN module.body END;
+		IF callagain THEN PublishRegisteredModules (* does not return *) END;
 		module.init := TRUE;
 	END;
 END Initialize0;
