@@ -2742,7 +2742,7 @@ loop:					; call all handlers for the interrupt
 	OUT IntB0, AL		; 2nd controller
 irq0:
 	OUT IntA0, AL		; 1st controller
-
+end:
 	POPAD				; now EBP = error code
 	POP EBP			; now EBP = INT
 	POP EBP			; now EBP = caller EBP
