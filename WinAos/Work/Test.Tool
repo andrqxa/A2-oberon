@@ -73,10 +73,10 @@ StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H -
 	Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks 
 	HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel 
 	KernelLog Streams Reflection  TrapWriters Traps  Plugins
-	UsbDriverLoader Usbdi UsbDebug UsbHcdi UsbUtilities Usb UsbHubDriver UsbEhci PCI UsbEhciPCI UsbUhci 
+	UsbDriverLoader Usbdi UsbDebug UsbHcdi UsbUtilities Usb UsbHubDriver UsbEhci PCI UsbEhciPCI UsbUhci UsbInfo 
 	Disks Commands
 	UsbStorageBase UsbStorageBot UsbStorageBoot
-	Reals Clock Dates Strings UsbInfo Caches Files DiskVolumes DiskFS 
+	Reals Clock Dates Strings Caches Files DiskVolumes DiskFS 
 	Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole 
 	~
 
@@ -101,15 +101,14 @@ FSTools.Unmount TEMP ~
 Partitions.SetConfig VDISK0#1
 	TraceMode="5" TracePort="1" TraceBPS="115200"
 	BootVol1="AOS AosFS USB0#1"
-	Boot="!UsbInfo.TraceAll"
-	Boot1="DisplayLinear.Install"
+	Boot="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
-	ExtMemSize="500"
 	ObjectFileExtension=".Gof"
-	Init="118"
-	Boot2="Keyboard.Install;MousePS2.Install"
-	Boot3="DriverDatabase.Enable"
-	Boot4="WindowManager.Install"
+	ExtMemSize="500"
+	Init=""
+	Boot1="Keyboard.Install;MousePS2.Install"
+	Boot2="DriverDatabase.Enable;UsbHubDriver.Install;UsbEhci.Install;UsbUhci.Install;UsbOhci.Install"
+	Boot3="WindowManager.Install"
 	Boot5="Autostart.Run"
 	TraceModules = "1"
 	~
@@ -172,7 +171,7 @@ BaseTypes.Mod Activities.Mod ExclusiveBlocks.Mod Interrupts.Mod Coop.Runtime.Mod
 BIOS.Environment.Mod Mutexes.Mod Coop.Machine.Mod Coop.Heaps.Mod Coop.Modules.Mod GarbageCollector.Mod 
 Coop.Objects.Mod Coop.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod 
 I386.Reals.Mod Coop.Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod Coop.Traps.Mod 
-Locks.Mod I386.PCI.Mod Clock.Mod Coop.MemCache.Mod Disks.Mod Files.Mod Dates.Mod Strings.Mod 
+Locks.Mod BiosFreePCI.Mod Clock.Mod Coop.MemCache.Mod Disks.Mod Files.Mod Dates.Mod Strings.Mod 
 UTF8Strings.Mod FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod OldDiskVolumes.Mod RAMVolumes.Mod 
 DiskFS.Mod OldDiskFS.Mod OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod 
 ISO9660Files.Mod RelativeFileSystem.Mod Loader.Mod BitSets.Mod Diagnostics.Mod StringPool.Mod 

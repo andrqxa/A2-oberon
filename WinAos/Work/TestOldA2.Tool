@@ -18,7 +18,7 @@ VirtualDisks.Create hd.img 300000 512 ~
 VirtualDisks.Install -b=512 VDISK0 hd.img ~
 
 Linker.Link \.Obx kernel.Bin  0100000H 100000H Kernel Traps
-			UsbHubDriver UsbEhci UsbEhciPCI UsbUhci UsbStorageBoot UsbInfo
+			UsbHubDriver UsbEhci UsbEhciPCI UsbUhci UsbInfo UsbStorageBoot 
 			DiskVolumes DiskFS 
 			Loader BootConsole ~
 			
@@ -90,10 +90,10 @@ StaticLinker.Link
 	--path="./"
 	Runtime Trace Machine Heaps Modules Objects Kernel 
 	KernelLog Streams Reflection  TrapWriters Traps  Plugins
-	UsbDriverLoader Usbdi UsbDebug UsbHcdi UsbUtilities Usb UsbHubDriver UsbEhci PCI UsbEhciPCI UsbUhci 
+	UsbDriverLoader Usbdi UsbDebug UsbHcdi UsbUtilities Usb UsbHubDriver UsbEhci PCI UsbEhciPCI UsbUhci UsbInfo
 	Disks Commands
 	UsbStorageBase UsbStorageBot UsbStorageBoot
-	Reals Clock Dates Strings UsbInfo Caches Files DiskVolumes DiskFS 
+	Reals Clock Dates Strings  Caches Files DiskVolumes DiskFS 
 	Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole 
 	~
 				
