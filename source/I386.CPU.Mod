@@ -5,7 +5,7 @@ MODULE CPU;
 
 IMPORT SYSTEM;
 
-CONST StackSize* = 2048;
+CONST StackSize* = 1024 *  SIZEOF(ADDRESS);
 CONST Quantum* = 1000000;
 CONST CacheLineSize* = 64;
 CONST StackDisplacement* = 0;
@@ -105,8 +105,7 @@ VAR previous: InterruptHandler;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (handler # NIL); ASSERT (index < Interrupts);
 	REPEAT previous := CAS (handlers[index], NIL, NIL) UNTIL CAS (handlers[index], previous, handler) = previous;
-	IF (previous = NIL) & (index >= IRQ0) & (index <= IRQ7) THEN Unmask (PIC1DataPort, {index - IRQ0}) END;
-	IF (previous = NIL) & (index >= IRQ8) & (index <= IRQ15) THEN Unmask (PIC2DataPort, {index - IRQ8}) END;
+	IF previous = NIL THEN EnableIRQ (index) END;
 	RETURN previous;
 END InstallInterrupt;
 
@@ -116,7 +115,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	SYSTEM.SetActivity (NIL);
 
 	IF handlers[index] # NIL THEN handlers[index] (index) ELSE HALT (1234) END;
-
+	
 	IF index >= IRQ8 THEN
 		OutByte (PIC2CommandPort, PIC_EOI); OutByte (PIC1CommandPort, PIC_EOI);
 	ELSIF index >= IRQ0 THEN
@@ -130,10 +129,23 @@ PROCEDURE DisableInterrupt- (index: SIZE);
 VAR previous: InterruptHandler;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (index < Interrupts);
-	IF (previous = NIL) & (index >= IRQ0) & (index <= IRQ7) THEN Mask (PIC1DataPort, {index - IRQ0}) END;
-	IF (previous = NIL) & (index >= IRQ8) & (index <= IRQ15) THEN Mask (PIC2DataPort, {index - IRQ8}) END;
+	IF previous = NIL THEN DisableIRQ (index) END;
 	REPEAT previous := CAS (handlers[index], NIL, NIL) UNTIL CAS (handlers[index], previous, NIL) = previous;
 END DisableInterrupt;
+
+PROCEDURE EnableIRQ- (index: SIZE);
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	ASSERT (index < Interrupts);
+	IF (index >= IRQ0) & (index <= IRQ7) THEN Unmask (PIC1DataPort, {index - IRQ0}) END;
+	IF (index >= IRQ8) & (index <= IRQ15) THEN Unmask (PIC2DataPort, {index - IRQ8}) END;
+END EnableIRQ;
+
+PROCEDURE DisableIRQ- (index: SIZE);
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	ASSERT (index < Interrupts);
+	IF (index >= IRQ0) & (index <= IRQ7) THEN Mask (PIC1DataPort, {index - IRQ0}) END;
+	IF (index >= IRQ8) & (index <= IRQ15) THEN Mask (PIC2DataPort, {index - IRQ8}) END;
+END DisableIRQ;
 
 VAR idt-: ARRAY Interrupts OF ARRAY 4 OF INTEGER;
 VAR wrapper: ARRAY Interrupts OF ARRAY 16 OF CHAR;

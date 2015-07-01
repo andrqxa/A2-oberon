@@ -52,6 +52,9 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 
 	(* check whether an interrupt was missed *)
 	IF CAS (timestamps[interrupt.index], 0, 0) = interrupt.timestamp THEN
+		
+		(* this is a workaround for a buggy USB driver that sends too many interrupts *)
+		IF interrupt.index # CPU.IRQ0 (* timer interrupt *) THEN CPU.EnableIRQ(interrupt.index) END;
 
 		(* inform the scheduler that there is at least one activity awaiting interrupts *)
 		Counters.Inc (Activities.awaiting);
@@ -94,6 +97,9 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 
 	(* update the global timestamp *)
 	INC (timestamps[index]);
+
+	(* this is a workaround for a buggy USB driver that sends too many interrupts *)
+	IF index # CPU.IRQ0 (* timer interrupt *) THEN CPU.DisableIRQ(index) END;
 
 	(* this handler might have interrupted the execution of code in an uncooperative block *)
 	(* executing the very same code more than once is semantically only valid when done by a different processor *)
