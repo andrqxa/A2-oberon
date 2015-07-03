@@ -235,6 +235,12 @@ BEGIN
 		m := n; new := FALSE;
 		Machine.Release(Machine.Modules);
 	ELSE
+		IF TraceBoot THEN
+			Machine.Acquire(Machine.TraceOutput);
+			Trace.String("publish "); Trace.String(m.name);
+			Trace.Ln;
+			Machine.Release(Machine.TraceOutput);
+		END;
 		m.published := TRUE;
 		m.next := root; root := m;
 		m.refcnt := 0;
