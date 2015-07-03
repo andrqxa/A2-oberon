@@ -85,6 +85,9 @@ TYPE
 				WHILE exportNames[m] < exportNames[j] DO DEC(j) END;
 
 				IF i <= j THEN
+					IF m = i THEN  m := j (* pivot will be moved by Swap *)
+					ELSIF m = j THEN  m := i (* pivot will be moved by Swap *)
+					END; 
 					Swap(i,j);
 					INC(i); DEC(j)
 				END
