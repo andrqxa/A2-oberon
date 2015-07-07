@@ -8844,7 +8844,7 @@ TYPE
 			IntermediateCode.InitMemory (quantum,  IntermediateCode.SignedIntegerType(addressType.sizeInBits), ap, ToMemoryUnits(system, QuantumOffset * addressType.sizeInBits));
 			IntermediateCode.InitImmediate(offset, quantum.type, section.pc - lastSwitchPC); IntermediateCode.InitImmediate(zero, quantum.type, 0); 
 			Emit(Sub(position,quantum,quantum, offset)); skip := NewLabel(); BrgeL(skip, quantum, zero);
-			CallThis("Activities","Switch",0); SetLabel(skip); lastSwitchPC := section.pc;
+			lastSwitchPC := section.pc; CallThis("Activities","Switch",0); SetLabel(skip);
 		END EmitCooperativeSwitch;
 
 		PROCEDURE VisitCommunicationStatement(communication: SyntaxTree.CommunicationStatement);
@@ -9715,7 +9715,7 @@ TYPE
 			prevScope := currentScope;
 			currentScope := scope;
 			
-			lastSwitchPC := section.pc;
+			lastSwitchPC := 0;
 			cooperativeSwitches := backend.cooperative;
 
 			procedure := scope(SyntaxTree.ProcedureScope).ownerProcedure;
