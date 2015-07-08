@@ -46,11 +46,12 @@ Partitions.SetConfig VDISK0#1
 	Boot="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ExtMemSize="500"
-	Init=""
+	Init="114"
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable;UsbHubDriver.Install;UsbEhci.Install;UsbUhci.Install;UsbOhci.Install"
 	Boot3="WindowManager.Install"
 	Boot5="Autostart.Run"
+	Boot6="FoxProfiler.Report time"
 	TraceModules = "1"
 	~
 VirtualDisks.Uninstall VDISK0 ~
@@ -64,6 +65,10 @@ SystemTools.Show USB image build time:  ~ SystemTools.Timer elapsed ~
 
 
 ~~~~ old A2 with generic object file ~~~
+
+Compiler.Compile --profile --objectFile=Generic --newObjectFile -b=AMD --objectFileExtension=.Gox --symbolFileExtension=.Syx --destPath=AOS: 
+BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod 
+GenericLinker.Mod GenericLoader.Mod ~
 
 FSTools.Mount AOS RelativeFileSystem ./ ~
 Release.Build A2NewObjectFile ~
@@ -94,7 +99,7 @@ StaticLinker.Link
 	Disks Commands
 	UsbStorageBase UsbStorageBot UsbStorageBoot
 	Reals Clock Dates Strings  Caches Files DiskVolumes DiskFS 
-	Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole 
+	Diagnostics FoxProfiler BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole 
 	~
 				
 Partitions.WriteMBR VDISK0#0 OBEMBR.BIN ~
@@ -121,7 +126,7 @@ Partitions.SetConfig VDISK0#1
 	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ObjectFileExtension=".Gox"
 	ExtMemSize="500"
-	Init=""
+	Init="114"
 	Boot1="Keyboard.Install;MousePS2.Install"
 	Boot2="DriverDatabase.Enable;UsbHubDriver.Install;UsbEhci.Install;UsbUhci.Install;UsbOhci.Install"
 	Boot3="WindowManager.Install"

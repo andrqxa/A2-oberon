@@ -41,11 +41,11 @@ Partitions.SetConfig VDISK0#1
 	Boot="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ExtMemSize="200"
-	Init="118"
+	Init="114"
 	Boot1="Keyboard.Install;MousePS2.Install"
-	Boot2="DriverDatabase.Enable"
+	Boot2="DriverDatabase.Enable;UsbHubDriver.Install;UsbEhci.Install;UsbUhci.Install;UsbOhci.Install"
 	Boot3="WindowManager.Install"
-	Boot5="Notepad.Open Test.Tool"
+	Boot5="Autostart.Run"
 	TraceModules = "1"
 	~
 VirtualDisks.Uninstall VDISK0 ~
@@ -56,6 +56,13 @@ SystemTools.Show HDD image build time:  ~ SystemTools.Timer elapsed ~
 
 
 ~~~~ ----------------------------------- U S B --------------------------------
+
+Compiler.Compile --cooperative --objectFile=Generic --newObjectFile -b=AMD --objectFileExtension=.Gof --symbolFileExtension=.Sym --traceModule=Trace
+	FoxProfiler.Mod ~
+Compiler.Compile --cooperative --objectFile=Generic --newObjectFile -b=AMD --objectFileExtension=.Gof --symbolFileExtension=.Sym --traceModule=Trace
+	--profile 
+	BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod 
+	~
 
 SystemTools.DoCommands
 
@@ -70,14 +77,14 @@ VirtualDisks.Create hd.img 300000 512 ~
 VirtualDisks.Install -b=512 VDISK0 hd.img ~
 
 StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" 
-	Trace CPU Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks 
+	Trace CPU ACPI Timer Runtime Counters APIC Processors Queues BaseTypes Activities ExclusiveBlocks 
 	HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel 
 	KernelLog Streams Reflection  TrapWriters Traps  Plugins
 	UsbDriverLoader Usbdi UsbDebug UsbHcdi UsbUtilities Usb UsbHubDriver UsbEhci PCI UsbEhciPCI UsbUhci UsbInfo 
 	Disks Commands
 	UsbStorageBase UsbStorageBot UsbStorageBoot
 	Reals Clock Dates Strings Caches Files DiskVolumes DiskFS 
-	Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole 
+	Diagnostics FoxProfiler BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole 
 	~
 
 
@@ -104,12 +111,15 @@ Partitions.SetConfig VDISK0#1
 	Boot="DisplayLinear.Install"
 	AosFS="DiskVolumes.New DiskFS.NewFS"
 	ObjectFileExtension=".Gof"
-	ExtMemSize="500"
-	Init=""
-	Boot1="Keyboard.Install;MousePS2.Install"
-	Boot2="DriverDatabase.Enable;UsbHubDriver.Install;UsbEhci.Install;UsbUhci.Install;UsbOhci.Install"
-	Boot3="WindowManager.Install"
-	Boot5="Autostart.Run"
+	ExtMemSize="1000"
+	Init="114"
+	Boot1="FoxProfiler.Report time"
+	Boot2="Keyboard.Install;MousePS2.Install"
+	Boot3="DriverDatabase.Enable;UsbHubDriver.Install;UsbEhci.Install;UsbUhci.Install;UsbOhci.Install"
+	Boot4="WindowManager.Install"
+	Boot5="FoxProfiler.Report time"	
+	Boot6="Autostart.Run"
+	Boot7="FoxProfiler.Report time"
 	TraceModules = "1"
 	~
 VirtualDisks.Uninstall VDISK0 ~
@@ -133,7 +143,7 @@ WinDisks.Uninstall "PhysicalDrive2" ~
 
 (* compile the kernel *)
 Compiler.Compile --cooperative --objectFile=Generic --newObjectFile -b=AMD --objectFileExtension=.Gof --symbolFileExtension=.Sym --traceModule=Trace
-I386.CPU.Mod Trace.Mod Counters.Mod I386.APIC.Mod APIC.Processors.Mod Queues.Mod 
+I386.CPU.Mod BIOS.ACPI.Mod ACPI.Timer.Mod Trace.Mod Counters.Mod I386.APIC.Mod APIC.Processors.Mod Queues.Mod 
 BaseTypes.Mod Activities.Mod ExclusiveBlocks.Mod Interrupts.Mod Coop.Runtime.Mod HeapManager.Mod 
 BIOS.Environment.Mod Mutexes.Mod Coop.Machine.Mod Coop.Heaps.Mod Coop.Modules.Mod GarbageCollector.Mod 
 Coop.Objects.Mod Coop.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod 
@@ -166,7 +176,7 @@ Release.Build  --path="./" A2Cooperative ~
 SystemTools.FreeDownTo FoxIntermediateBackend  FoxAMDBackend ~
 
 Compiler.Compile --cooperative --objectFile=Generic --newObjectFile -b=AMD --objectFileExtension=.Gof --symbolFileExtension=.Sym --destPath=./ --traceModule=Trace
-I386.CPU.Mod Trace.Mod Counters.Mod I386.APIC.Mod APIC.Processors.Mod Queues.Mod 
+I386.CPU.Mod BIOS.ACPI.Mod ACPI.Timer.Mod Trace.Mod Counters.Mod I386.APIC.Mod APIC.Processors.Mod Queues.Mod 
 BaseTypes.Mod Activities.Mod ExclusiveBlocks.Mod Interrupts.Mod Coop.Runtime.Mod HeapManager.Mod 
 BIOS.Environment.Mod Mutexes.Mod Coop.Machine.Mod Coop.Heaps.Mod Coop.Modules.Mod GarbageCollector.Mod 
 Coop.Objects.Mod Coop.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod 
