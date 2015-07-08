@@ -2,7 +2,7 @@
 
 MODULE Objects;   (** AUTHOR "pjm, ejz, fof"; PURPOSE "Active object runtime support"; *)
 
-IMPORT SYSTEM, Environment, Machine, Modules, Heaps, Activities, Interrupts, CPU;
+IMPORT SYSTEM, Environment, Machine, Modules, Heaps, Activities, Interrupts, CPU, TimerModule := Timer;
 
 CONST
 	(* Process flags *)
@@ -329,6 +329,16 @@ BEGIN
 		END;
 	END;
 END GetCpuCycles;
+
+PROCEDURE CurrentProcessTime*(): HUGEINT;
+BEGIN
+	RETURN Activities.GetProcessTime();
+END CurrentProcessTime;
+
+PROCEDURE TimerFrequency*(): HUGEINT;
+BEGIN
+	RETURN TimerModule.GetFrequency();
+END TimerFrequency;
 
 (** Install interrupt handler. *)
 PROCEDURE InstallHandler*(h: EventHandler; int: LONGINT);

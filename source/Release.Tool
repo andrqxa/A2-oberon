@@ -269,8 +269,8 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 
 	# cooperative runtime system
 	COOP { Counters.Mod }
-	NATIVECOOP { I386.APIC.Mod APIC.Processors.Mod }
-	WINCOOP { Coop.Win32.Kernel32.Mod Win32.Processors.Mod }
+	NATIVECOOP { I386.APIC.Mod APIC.Processors.Mod BIOS.ACPI.Mod ACPI.Timer.Mod}
+	WINCOOP { Coop.Win32.Kernel32.Mod Win32.Processors.Mod  Win32.Timer.Mod}
 	COOP { Queues.Mod BaseTypes.Mod Activities.Mod ExclusiveBlocks.Mod Interrupts.Mod Coop.Runtime.Mod }
 	NATIVECOOP { HeapManager.Mod BIOS.Environment.Mod }
 	WINCOOP { Win32.Environment.Mod }

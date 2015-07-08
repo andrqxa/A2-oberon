@@ -3,7 +3,7 @@
 
 MODULE Environment;
 
-IMPORT SYSTEM, CPU, Activities, HeapManager, Interrupts, Processors, Trace;
+IMPORT SYSTEM, CPU, ACPI, Activities, HeapManager, Interrupts, Processors, Timer, Trace;
 
 CONST IsNative* = TRUE;
 
@@ -317,6 +317,8 @@ CONST Channel0 = 0; RateGenerator = 4;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	SYSTEM.SetActivity (NIL);
 	CPU.Initialize;
+	ACPI.Initialize;
+	Timer.Initialize;
 	ReadBootTable (bootFlag);
 	InitTrace;
 	CheckMemory;

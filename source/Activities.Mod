@@ -6,7 +6,7 @@
 (** In addition, it also provides a framework for implementing synchronisation primitives. *)
 MODULE Activities;
 
-IMPORT SYSTEM, BaseTypes, Counters, CPU, Processors, Queues;
+IMPORT SYSTEM, BaseTypes, Counters, CPU, Processors, Queues, Timer;
 
 (** Represents one of four different priorities of an activity. *)
 TYPE Priority* = SIZE;
@@ -49,6 +49,8 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR movables := 0: SIZE;
 	VAR bound := FALSE: BOOLEAN;
 	VAR stackPinned := FALSE: BOOLEAN;
+	VAR startTime-: Timer.Counter;
+	VAR time- := 0: HUGEINT;
 
 	PROCEDURE &InitializeActivity (procedure: PROCEDURE; priority: Priority);
 	VAR stackFrame {UNTRACED}: StackFrame; StackFrameDescriptor {UNTRACED} EXTERN "BaseTypes.StackFrame": BaseTypes.Descriptor;
@@ -128,6 +130,14 @@ VAR working, physicalProcessors, virtualProcessors: Counters.AlignedCounter;
 (** Stores an atomic counter indicating the number of activities that are awaiting interrupts to occur. *)
 (** The scheduler stops its execution if all processors are idle, unless there are activities waiting for interrupts. *)
 VAR awaiting*: Counters.AlignedCounter;
+
+PROCEDURE GetProcessTime-(): HUGEINT;
+VAR activity: Activity; diff: Timer.Counter;
+BEGIN{UNCOOPERATIVE, UNCHECKED}
+	activity := SYSTEM.GetActivity ()(Activity);
+	diff := Timer.GetCounter()-activity.startTime;
+	RETURN activity.time + diff;
+END GetProcessTime;
 
 (** Returns the handler of the current activity executing this procedure call. *)
 PROCEDURE GetCurrentActivity- (): {UNTRACED} Activity;
@@ -211,17 +221,20 @@ END Resume;
 (** The resumed activity continues its execution by first calling the specified finalizer procedure with the given argument. *)
 (** Each invocation of this procedure must be directly followed by a call to the {{{[[Activities.FinalizeSwitch]]}}} procedure. *)
 PROCEDURE SwitchTo- (VAR activity: Activity; finalizer: SwitchFinalizer; argument: ADDRESS);
-VAR currentActivity {UNTRACED}, nextActivity {UNTRACED}: Activity;
+VAR currentActivity {UNTRACED}, nextActivity {UNTRACED}: Activity; diff: Timer.Counter;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	currentActivity := SYSTEM.GetActivity ()(Activity);
 	currentActivity.framePointer := SYSTEM.GetFramePointer ();
 	currentActivity.quantum := CPU.Quantum;
+	diff := Timer.GetCounter() - currentActivity.startTime;
+	currentActivity.time := currentActivity.time + diff;
 	nextActivity := activity;
 	nextActivity.processor := currentActivity.processor;
 	nextActivity.finalizer := finalizer;
 	nextActivity.argument := argument;
 	nextActivity.previous := currentActivity;
 	nextActivity.processor.runningActivity := nextActivity;
+	nextActivity.startTime := Timer.GetCounter();
 	activity := NIL;
 	SYSTEM.SetActivity (nextActivity);
 	SYSTEM.SetFramePointer (nextActivity.framePointer);
