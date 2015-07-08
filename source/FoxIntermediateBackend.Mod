@@ -452,6 +452,7 @@ TYPE
 			formalParameter: SyntaxTree.Parameter;
 			recordType: SyntaxTree.RecordType;
 			priority: INTEGER;
+			isModuleBody: BOOLEAN;
 
 			PROCEDURE Signature;
 			VAR parameter: SyntaxTree.Parameter; procedureType: SyntaxTree.ProcedureType; returnType : SyntaxTree.Type;
@@ -510,7 +511,7 @@ TYPE
 			prevScope := currentScope;
 			currentScope := scope;
 			procedureType := x.type(SyntaxTree.ProcedureType);
-
+			isModuleBody := x = module.module.moduleScope.bodyProcedure;
 			implementationVisitor.temporaries.Init;
 
 			implementationVisitor.GetCodeSectionNameForSymbol(x, name);
@@ -597,7 +598,7 @@ TYPE
 
 				implementationVisitor.tagsAvailable := procedureType.callingConvention = SyntaxTree.OberonCallingConvention;
 
-				implementationVisitor.Body(scope.body,currentScope,ir,x = module.module.moduleScope.bodyProcedure);
+				implementationVisitor.Body(scope.body,currentScope,ir,isModuleBody);
 
 				IF ~inline & ~(procedureType.noPAF) & ~x.isEntry & ~x.isExit THEN
 					IF scope.lastVariable # NIL THEN
@@ -653,6 +654,9 @@ TYPE
 						implementationVisitor.SetLabel(implementationVisitor.exitLabel);
 						IF backend.cooperative THEN
 							IF HasPointers (scope) THEN  implementationVisitor.ResetVariables(scope); END;
+							IF implementationVisitor.profile  & ~isModuleBody THEN 
+								implementationVisitor.ProfilerEnterExit(implementationVisitor.numberProcedures-1, FALSE) 
+							END;
 						END;
 						ir.Emit(implementationVisitor.Leave(x.position,x,cc));
 						IF finalizer THEN
@@ -674,10 +678,23 @@ TYPE
 									ir.Emit(Result(x.position, res));
 									ir.Emit(Push(x.position, res)); 
 									implementationVisitor.ResetVariables(scope); 
+									IF implementationVisitor.profile  & ~isModuleBody THEN implementationVisitor.ProfilerEnterExit(implementationVisitor.numberProcedures-1, FALSE) END;
 									ir.Emit(Pop(x.position, res));
 									ir.Emit(Return(x.position, res));
 								ELSE
 									implementationVisitor.ResetVariables(scope); 
+									IF implementationVisitor.profile & ~isModuleBody THEN implementationVisitor.ProfilerEnterExit(implementationVisitor.numberProcedures-1, FALSE) END;
+								END;
+							ELSIF  implementationVisitor.profile & ~isModuleBody THEN
+								IF ~ReturnedAsParameter(procedureType.returnType) THEN
+									res := implementationVisitor.NewRegisterOperand(IntermediateCode.GetType(system, procedureType.returnType));
+									ir.Emit(Result(x.position, res));
+									ir.Emit(Push(x.position, res)); 
+									implementationVisitor.ProfilerEnterExit(implementationVisitor.numberProcedures-1, FALSE);
+									ir.Emit(Pop(x.position, res));
+									ir.Emit(Return(x.position, res));
+								ELSE
+									implementationVisitor.ProfilerEnterExit(implementationVisitor.numberProcedures-1, FALSE);
 								END;
 							END;
 							
@@ -9198,7 +9215,7 @@ TYPE
 				type := expression.type.resolved;
 				IF (expression IS SyntaxTree.ResultDesignator) THEN
 					IF locked THEN Lock(FALSE) END;
-					IF profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
+					IF ~backend.cooperative & profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
 					(* "RETURN RESULT" -> no assignment, it is assumed that result has been written to return parameter via structured return type *)
 				ELSIF (type IS SyntaxTree.BasicType) & ~(type IS SyntaxTree.RangeType) & ~(type IS SyntaxTree.ComplexType) & ~type.IsPointer() OR (procedureType.callingConvention # SyntaxTree.OberonCallingConvention) THEN
 					(* return without structured return parameter *)
@@ -9209,7 +9226,7 @@ TYPE
 						IF delegate THEN HALT(200) END;
 						ReleaseOperand(res);
 						IF locked THEN Lock(FALSE) END;
-						IF profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
+						IF ~backend.cooperative & profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
 						reg := NewRegisterOperand(res.op.type);
 						Emit(Pop(position,reg));
 						Emit(Return(position,reg));
@@ -9276,7 +9293,7 @@ TYPE
 					END;
 					ReleaseIntermediateOperand(left);
 					IF locked THEN Lock(FALSE) END;
-					IF profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
+					IF ~backend.cooperative & profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
 				ELSIF (type IS SyntaxTree.MathArrayType) OR (type IS SyntaxTree.ProcedureType) THEN
 					parameter := procedureType.returnParameter;
 					checker.SetCurrentScope(currentScope);
@@ -9288,13 +9305,13 @@ TYPE
 						Assign(parameterDesignator,expression);
 					END;
 					IF locked THEN Lock(FALSE) END;
-					IF profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
+					IF ~backend.cooperative & profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
 				ELSE
 					HALT(200);
 				END;
 			ELSE
 				IF locked THEN Lock(FALSE) END;
-				IF profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
+				IF ~backend.cooperative & profile THEN ProfilerEnterExit(numberProcedures,FALSE) END;
 			END;
 
 			IF backend.cooperative THEN
@@ -9779,7 +9796,9 @@ TYPE
 					StatementSequence(x.finally)
 				END;
 				IF profile & (x.code = NIL) & ~moduleBody THEN (* do not profile assembler code sections *)
+					IF ~backend.cooperative THEN 
 						ProfilerEnterExit(numberProcedures,FALSE);
+					END;
 					INC(numberProcedures);
 				END;
 			END;
