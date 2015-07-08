@@ -12,7 +12,7 @@ CONST
 
 	(* optimizations *)
 	PatchFixups = TRUE; (* patch all fixups that can be processed during object file generation *)
-	AliasOnlyExported = TRUE;  (* create an alias only for exported sections *)
+	AliasOnlyExported = FALSE;  (* create an alias only for exported sections *)
 
 VAR
 	statModules, statModulesSize: LONGINT;
