@@ -358,53 +358,38 @@ TYPE
 		msg: ARRAY 128 OF CHAR; module: Modules.Module; adr: LONGINT; m: HashTableInt;
 		s: ObjectFile.SectionName; isModule: BOOLEAN; identifier: ObjectFile.Identifier;
 
-			PROCEDURE CheckName(CONST n: ObjectFile.SegmentedName;  name {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR): BOOLEAN;
+			PROCEDURE CheckName(CONST n: ObjectFile.SegmentedName;  name {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR): LONGINT;
 			VAR s,t: ObjectFile.SectionName; i: LONGINT;
 			BEGIN
-				IF name = NIL THEN RETURN FALSE END;
+				IF name = NIL THEN RETURN -1 END;
 				ObjectFile.SegmentedNameToString(n, s);
 				i := 0;
 				WHILE (s[i] # 0X) & (name[i] # 0X) & (s[i] = name[i]) DO
 					INC(i);
 				END;
-				RETURN s[i] = name[i];
+				RETURN ORD(s[i]) - ORD(name[i]);
 			END CheckName;
 		
 			(* stupid implementation: just search for fp in all exports *)
 			PROCEDURE CheckScope(CONST scope: Modules.ExportDesc; level: LONGINT): LONGINT;
-			VAR adr,i: LONGINT;
+			VAR adr,i,lo,hi,m,res: LONGINT;
 			BEGIN
 				IF (level > 2) THEN RETURN 0 END;
 				adr := 0;
-				(*D.String("checking "); D.Int(scope.fp,1); D.Ln;*)
-
-				IF (identifier.fingerprint # 0) & (identifier.fingerprint = scope.fp) OR CheckName(identifier.name, scope.name) THEN
-					adr := scope.adr;
-					(*
-					IF module.staticTypeDescs # testTypeDescs THEN (* old object file format *)
-						IF (adr = 0) & (scope.dsc # NIL) THEN (* type in old object file format *)
-							adr := scope.dsc[0].adr;
-							SYSTEM.GET(module.sb + adr, adr);
-						ELSIF adr # 0 THEN
-							INC(adr,ADDRESSOF(module.code[0]));
-						END;
-					ELSE
-						(*D.String("new object file format"); D.Ln;*)
+				
+				(* export names are sorted, binary search: *)
+				lo := 0; hi := scope.exports-1;
+				WHILE (lo <= hi) DO
+				 	m := (lo + hi) DIV 2;
+					res := CheckName(identifier.name, scope.dsc[m].name);
+					IF res = 0 THEN RETURN scope.dsc[m].adr
+					ELSIF res > 0 THEN lo := m+1;
+					ELSE hi := m-1;
 					END;
-					*)
-					RETURN adr
 				END;
-				i := 0;
-				WHILE (adr = 0) & (i < scope.exports) DO
-					IF (scope.dsc # NIL) & (i < LEN(scope.dsc)) THEN
-						adr := CheckScope(scope.dsc[i],level+1);
-					ELSE
-						(*D.String("checkscope overflow"); D.Ln;*)
-					END;
-					INC(i);
-				END;
-				RETURN adr
+				RETURN 0;
 			END CheckScope;
+						
 
 		BEGIN
 			identifier := fixup.identifier;

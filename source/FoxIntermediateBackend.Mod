@@ -9779,7 +9779,7 @@ TYPE
 					StatementSequence(x.finally)
 				END;
 				IF profile & (x.code = NIL) & ~moduleBody THEN (* do not profile assembler code sections *)
-					ProfilerEnterExit(numberProcedures,FALSE);
+						ProfilerEnterExit(numberProcedures,FALSE);
 					INC(numberProcedures);
 				END;
 			END;
@@ -10149,15 +10149,64 @@ TYPE
 			END;
 		END PatchArray;
 
+
 		PROCEDURE ExportDescArray(source: IntermediateCode.Section; namePool: IntermediateCode.Section; VAR size: LONGINT);
 		VAR
 			sizePC, i: LONGINT; section: Sections.Section; fingerPrinter : FingerPrinter.FingerPrinter;
+			sectionArray: POINTER TO ARRAY OF Sections.Section;
+			
+			PROCEDURE Compare(VAR s1, s2: Sections.Section): BOOLEAN;
+			VAR n1, n2: Basic.SectionName; index: LONGINT; ch1, ch2: CHAR;
+			BEGIN
+				Basic.SegmentedNameToString(s1.name,n1);
+				Basic.SegmentedNameToString(s2.name,n2);
+				index := 0; 
+				ch1 := n1[index];
+				ch2 := n2[index];
+				WHILE (ch1 # 0X) & (ch1 = ch2)  DO
+					INC(index);
+					ch1 := n1[index];
+					ch2 := n2[index];
+				END;
+				RETURN ch1 < ch2;
+			END Compare;
+			
+			PROCEDURE QuickSort(VAR list: ARRAY OF Sections.Section;  lo, hi: LONGINT);
+			VAR
+				i, j: LONGINT;
+				x, t: Sections.Section;
+			BEGIN
+				IF lo < hi THEN
+					i := lo; j := hi; x:= list[(lo+hi) DIV 2];
+
+					WHILE i <= j DO
+						WHILE Compare(list[i], x) DO INC(i) END;
+						WHILE Compare(x, list[j]) DO DEC(j) END;
+
+						IF i <= j THEN
+							t := list[i]; list[i] := list[j]; list[j] := t; (* swap i and j *)
+							INC(i); DEC(j)
+						END
+					END;
+
+					IF lo < j THEN QuickSort(list, lo, j) END;
+					IF i < hi THEN QuickSort(list, i, hi) END
+				END;
+			END QuickSort;
+			
+			
 		BEGIN
 			NEW(fingerPrinter, module.system);
 			size := 0;
 			Array(source,sizePC,"Modules.ExportDesc");
+			NEW(sectionArray, module.allSections.Length());
 			FOR i := 0 TO module.allSections.Length() - 1 DO
 				section := module.allSections.GetSection(i);
+				sectionArray[i] := section;
+			END;
+			QuickSort(sectionArray^,0,module.allSections.Length()-1);
+			FOR i := 0 TO module.allSections.Length() - 1 DO
+				section := sectionArray[i];
 				IF ExportDesc( source, namePool, fingerPrinter, section) THEN INC(size) END
 			END;
 			PatchArray(source,sizePC,size);
