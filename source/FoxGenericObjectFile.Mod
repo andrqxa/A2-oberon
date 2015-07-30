@@ -13,10 +13,21 @@ CONST
 	(* optimizations *)
 	PatchFixups = TRUE; (* patch all fixups that can be processed during object file generation *)
 	AliasOnlyExported = FALSE;  (* create an alias only for exported sections *)
+	DetailedStatistics = TRUE;
 
 VAR
 	statModules, statModulesSize: LONGINT;
 	statHeaders, statHeadersSize: LONGINT;
+TYPE
+
+	SectionStat = POINTER TO RECORD
+		name: ARRAY 64 OF CHAR;
+		entries: LONGINT;
+		size: LONGINT;
+	END;
+	
+VAR
+	statPool : Basic.HashTableInt;
 
 TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 	VAR extension: Files.FileName; binary: BOOLEAN; mergeSections: BOOLEAN;
@@ -214,10 +225,44 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				RETURN TRUE
 			END ExportSections;
 
+			PROCEDURE MakeStatistics(sections: Sections.SectionList);
+			VAR i: LONGINT;
+				section: Sections.Section;
+				resolved: BinaryCode.Section;
+				suffix: ARRAY 128 OF CHAR;
+				index: StringPool.Index;
+				any: ANY;
+				sectionStat : SectionStat;
+			BEGIN
+				FOR i := 0 TO sections.Length()-1 DO
+					section := sections.GetSection(i);
+					resolved := section(IntermediateCode.Section).resolved;
+					Basic.GetSuffix(section.name, suffix);
+					IF (suffix[0] = "@")  & ((suffix[1] # "c") OR (suffix[2] # "o")) THEN
+						StringPool.GetIndex(suffix, index);
+						any := statPool.Get(index);
+						IF any = NIL THEN
+							NEW(sectionStat);
+							COPY(suffix, sectionStat.name);
+							sectionStat.entries := 0;
+							sectionStat.size := 0;
+							statPool.Put(index, sectionStat);
+						ELSE
+							sectionStat := any(SectionStat);
+						END;
+						INC(sectionStat.entries);
+						INC(sectionStat.size, resolved.pc);
+					END;
+				END;
+			END MakeStatistics;
+
 			PROCEDURE ExportModule (module: Sections.Module): BOOLEAN;
 			VAR result: BOOLEAN; pos: LONGINT;
 			BEGIN
 				pos := writer.Pos();
+				IF DetailedStatistics THEN
+					MakeStatistics(module.allSections);
+				END;
 				IF mergeSections & ~MergeSections(module.allSections) THEN RETURN FALSE END;
 				WriteHeader(writer,binary,module.allSections,poolMap, fingerPrinter);
 				INC(statHeaders); INC(statHeadersSize, writer.Pos()-pos);
@@ -526,7 +571,15 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 	END Show;
 
 	PROCEDURE Statistics*;
+	VAR iterator: Basic.IntIterator; stat: SectionStat; index: StringPool.Index; any: ANY;
 	BEGIN
+		IF DetailedStatistics THEN
+			iterator := statPool.GetIterator();
+			WHILE iterator.GetNext(index, any) DO
+				stat := any(SectionStat);
+				TRACE(stat.name, stat.entries, stat.size);
+			END;
+		END;
 		TRACE(statModules, statModulesSize);
 		TRACE(statHeaders, statHeadersSize);
 		ObjectFile.Statistics;
@@ -537,6 +590,9 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 		ObjectFile.ResetStatistics;
 		statModules := 0; statModulesSize := 0;
 		statHeaders := 0; statHeadersSize := 0;
+		IF DetailedStatistics THEN
+			NEW(statPool,64);
+		END;
 	END ResetStatistics;
 
 BEGIN
