@@ -10912,23 +10912,25 @@ TYPE
 				Symbol(procArray,destination,destination.validPAFEnter,0);
 				Info(procArray,"pcStatementEnd");
 				Symbol(procArray,destination,destination.validPAFExit,0);
-				Basic.SegmentedNameToString(destination.name, string);
-				Info(pointerArray,string);
-				procedure := destination.symbol(SyntaxTree.Procedure);
-				procedureType := procedure.type(SyntaxTree.ProcedureType);
-				variable := procedure.procedureScope.firstVariable;
-				WHILE(variable # NIL) DO
-					IF ~(variable.untraced) THEN
-						Pointers(ToMemoryUnits(module.system,variable.offsetInBits), NIL,  pointerArray, variable.type, numberPointers);
+				IF ~implementationVisitor.backend.cooperative THEN 
+					Basic.SegmentedNameToString(destination.name, string);
+					Info(pointerArray,string);
+					procedure := destination.symbol(SyntaxTree.Procedure);
+					procedureType := procedure.type(SyntaxTree.ProcedureType);
+					variable := procedure.procedureScope.firstVariable;
+					WHILE(variable # NIL) DO
+						IF ~(variable.untraced) THEN
+							Pointers(ToMemoryUnits(module.system,variable.offsetInBits), NIL,  pointerArray, variable.type, numberPointers);
+						END;
+						variable := variable.nextVariable
 					END;
-					variable := variable.nextVariable
-				END;
-				parameter := procedureType.firstParameter;
-				WHILE(parameter # NIL) DO
-					IF ~(parameter.untraced) THEN
-						Pointers(ToMemoryUnits(module.system,parameter.offsetInBits), NIL,  pointerArray, parameter.type, numberPointers);
+					parameter := procedureType.firstParameter;
+					WHILE(parameter # NIL) DO
+						IF ~(parameter.untraced) THEN
+							Pointers(ToMemoryUnits(module.system,parameter.offsetInBits), NIL,  pointerArray, parameter.type, numberPointers);
+						END;
+						parameter := parameter.nextParameter;
 					END;
-					parameter := parameter.nextParameter;
 				END;
 				Info(procArray,"numberPointers");
 				Longint(procArray,numberPointers);
@@ -10945,13 +10947,15 @@ TYPE
 			procArraySizePC := procArray.pc;
 			Address(procArray,0);
 			procArraySize := 0;
-			Info(pointerArray, "pointer array descriptor");
-			Address(pointerArray,0);
-			Address(pointerArray,0);
-			Address(pointerArray,0);
-			pointerArraySizePC := pointerArray.pc;
-			Address(pointerArray,0);
-			pointerArraySize := 0;
+			IF ~implementationVisitor.backend.cooperative THEN
+				Info(pointerArray, "pointer array descriptor");
+				Address(pointerArray,0);
+				Address(pointerArray,0);
+				Address(pointerArray,0);
+				pointerArraySizePC := pointerArray.pc;
+				Address(pointerArray,0);
+				pointerArraySize := 0;
+			END;
 			procArraySize := 0;
 			FOR i := 0 TO module.allSections.Length() - 1 DO
 				destination := module.allSections.GetSection(i);
@@ -10962,7 +10966,9 @@ TYPE
 			END;
 
 			PatchLongint(procArray,procArraySizePC,procArraySize);
-			PatchLongint(pointerArray,pointerArraySizePC,pointerArraySize);
+			IF ~implementationVisitor.backend.cooperative THEN
+				PatchLongint(pointerArray,pointerArraySizePC,pointerArraySize);
+			END;
 		END PointersInProcTables;
 
 		(*
@@ -11077,7 +11083,7 @@ TYPE
 			referenceSectionOffset	: LONGINT;
 		BEGIN
 			Global.GetModuleName(module.module,moduleName);
-
+			
 			pointerSection := Block("Heaps","SystemBlockDesc",".@PointerArray",pointerSectionOffset);
 			PointerArray(pointerSection,module.module.moduleScope, numberPointers);
 			importSection := Block("Heaps","SystemBlockDesc",".@ImportsArray",importSectionOffset);
@@ -11091,7 +11097,11 @@ TYPE
 			referenceSection := Block("Heaps","SystemBlockDesc",".@References",referenceSectionOffset);
 			References(referenceSection);
 			procTableSection := Block("Heaps","SystemBlockDesc",".@ProcTable",procTableSectionOffset);
-			ptrTableSection := Block("Heaps","SystemBlockDesc",".@PtrTable",ptrTableSectionOffset);
+			IF ~implementationVisitor.backend.cooperative THEN
+				ptrTableSection := Block("Heaps","SystemBlockDesc",".@PtrTable",ptrTableSectionOffset);
+			ELSE
+				ptrTableSection := NIL;
+			END;
 			PointersInProcTables(procTableSection,ptrTableSection,numberProcs,maxPointers);
 			emptyArraySection := Block("Heaps","SystemBlockDesc",".@EmptyArray",emptyArraySectionOffset);
 			Array(emptyArraySection,temp,"");
@@ -11125,7 +11135,11 @@ TYPE
 			Info(moduleSection, "procTable*: ProcTable");
 			Symbol(moduleSection,procTableSection,procTableSectionOffset,0);
 			Info(moduleSection, "ptrTable*: PtrTable");
-			Symbol(moduleSection,ptrTableSection,ptrTableSectionOffset,0);
+			IF ~implementationVisitor.backend.cooperative THEN
+				Symbol(moduleSection,ptrTableSection,ptrTableSectionOffset,0);
+			ELSE
+				Symbol(moduleSection,emptyArraySection,emptyArraySectionOffset,0);
+			END;
 			Info(moduleSection, "data*, code*, staticTypeDescs*, refs*: Bytes");
 			Symbol(moduleSection,emptyArraySection,emptyArraySectionOffset,0);
 			Symbol(moduleSection,emptyArraySection,emptyArraySectionOffset,0);
