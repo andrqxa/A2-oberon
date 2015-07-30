@@ -1,7 +1,7 @@
 ~~~~ old A2 with binary object file ~~~
 
 FSTools.Mount AOS RelativeFileSystem ./ ~
-Release.Build A2 ~
+Release.Build A2mini ~
 
 FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
 
@@ -73,7 +73,8 @@ GenericLinker.Mod GenericLoader.Mod ~
 FSTools.Mount AOS RelativeFileSystem ./ ~
 Release.Build A2NewObjectFile ~
 
-FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/ ~
+FSTools.Unmount SRC ~
+FSTools.Mount SRC RelativeFileSystem /a2/branches/cooperative/source/   ~
 
 SystemTools.DoCommands
 

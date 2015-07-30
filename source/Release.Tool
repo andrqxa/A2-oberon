@@ -114,19 +114,19 @@ BUILDS
 	A2Cooperative {
 		INCLUDE "NATIVE I386 COOP NATIVECOOP"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile"
+		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile --traceModule=Trace --mergeSections"
 		TARGET "AMD"
 		EXTENSION "Gof"
 		SYMBOLEXTENSION "Sym"
 		PATH "AOS:"
-		EXCLUDEPACKAGES ""
+		EXCLUDEPACKAGES "Applications GuiApplications Fun Testing Education Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
 	A2NewObjectFile
 	{
 		INCLUDE "NATIVE NATIVEGEN I386 I386GEN UNCOOP"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--objectFile=Generic --newObjectFile"
+		COMPILEOPTIONS "--objectFile=Generic --newObjectFile --mergeSections"
 		TARGET "AMD"
 		EXTENSION "Gox"
 		SYMBOLEXTENSION "Syx"
