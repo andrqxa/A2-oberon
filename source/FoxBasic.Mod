@@ -1819,6 +1819,7 @@ VAR
 		IF i < LEN(name) THEN (* name[i] = empty *) name[i-1] := -1
 		ELSE (* i = LEN(name), name[i] = nonempty *)
 			DEC(i);
+			StringPool.GetString(name[i],string);
 		pos0 := 0; pos := 0;
 		WHILE (pos0 < LEN(string)) & (string[pos0] # 0X) DO
 			IF string[pos0] = "." THEN pos := pos0 END;
