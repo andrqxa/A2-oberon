@@ -44,10 +44,10 @@ TYPE
 		fp*: ADDRESS;
 		name* {UNTRACED}: DynamicName;
 		adr*: ADDRESS;
-		exports*: LONGINT;
-		dsc*: ExportArray
+		exports*: LONGINT; (* number of exports referenced by ExportArray *)
+		dsc* {UNTRACED}: ExportArray; (* pointer to memory containing a raw array with "exports" entries *)
 	END;
-	ExportArray* = POINTER TO ARRAY OF ExportDesc;
+	ExportArray* = POINTER {UNSAFE} TO ARRAY OF ExportDesc;
 
 	Bytes* = POINTER TO ARRAY OF CHAR;
 

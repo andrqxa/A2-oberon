@@ -72,7 +72,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 					resolved := section(IntermediateCode.Section).resolved;
 					IF resolved = NIL THEN RETURN FALSE END;
 
-					IF (resolved # NIL) & (resolved.os.alignment # 0) & (~resolved.os.fixed) & (resolved.os.priority = 0) THEN
+					IF (resolved # NIL)  & (resolved.pc # 0) & (~resolved.os.fixed) & (resolved.os.priority = 0) THEN
 						IF section.type = ObjectFile.Code THEN
 							codeAlign := CommonAlignment(codeAlign, resolved.os.alignment);
 							ASSERT((codeUnit=0) OR (codeUnit = resolved.os.unit));
@@ -112,9 +112,11 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 					section := sections.GetSection(i);
 					resolved := section(IntermediateCode.Section).resolved;
 					exported := section(IntermediateCode.Section).exported;
-					IF (resolved # NIL) & (resolved.os.alignment # 0) & (~resolved.os.fixed) & (resolved.os.priority = 0)  THEN
+					IF (resolved # NIL) & (resolved.pc # 0) & (~resolved.os.fixed) & (resolved.os.priority = 0)  THEN
 						IF section.type = ObjectFile.Code THEN
+							IF resolved.os.alignment # 0 THEN
 							codeSection.Align(resolved.os.alignment);
+							END;
 							resolved.os.identifier.fingerprint := GetFingerPrint (section, fingerPrinter);
 
 							NEW(alias, resolved.os.identifier, codeSection.pc);
@@ -123,14 +125,18 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 							codeSection.CopyBits(resolved.os.bits,0, resolved.pc*codeUnit);
 
 						ELSIF section.type = ObjectFile.Data THEN
+							IF resolved.os.alignment # 0 THEN
 							dataSection.Align(resolved.os.alignment);
+							END;
 							resolved.os.identifier.fingerprint := GetFingerPrint (section, fingerPrinter);
 							NEW(alias, resolved.os.identifier, dataSection.pc);
 							IF ~AliasOnlyExported OR exported THEN dataSection.aliasList.AddAlias(alias) END;
 							section(IntermediateCode.Section).SetAlias(dataSection, dataSection.pc);
 							dataSection.CopyBits(resolved.os.bits,0, resolved.pc*dataUnit );
 						ELSIF section.type = ObjectFile.Const THEN
+							IF resolved.os.alignment # 0 THEN
 							constSection.Align(resolved.os.alignment);
+							END;
 							resolved.os.identifier.fingerprint := GetFingerPrint (section, fingerPrinter);
 							NEW(alias, resolved.os.identifier, constSection.pc);
 							IF ~AliasOnlyExported OR exported THEN constSection.aliasList.AddAlias(alias) END;

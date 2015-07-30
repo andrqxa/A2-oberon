@@ -1146,6 +1146,7 @@ TYPE
 
 		isUnchecked: BOOLEAN;
 		registeredMovables := 0: SIZE;
+	
 		
 		PROCEDURE & Init(system: Global.System; checker: SemanticChecker.Checker; supportedInstructionProcedure: SupportedInstructionProcedure; supportedImmediateProcedure: SupportedImmediateProcedure; emitLabels: BOOLEAN; CONST runtime: SyntaxTree.IdentifierString; backend: IntermediateBackend;
 			newObjectFile: BOOLEAN);
@@ -9830,7 +9831,8 @@ TYPE
 	VAR
 		implementationVisitor: ImplementationVisitor;
 		module: Sections.Module;
-
+		moduleName: ARRAY 128 OF CHAR;
+ 
 		simple: BOOLEAN; (* simple = no methods, no module loading, no reflection *)
 
 		MethodTableOffset: LONGINT; (* method table offset from zero *)
@@ -10098,40 +10100,52 @@ TYPE
 			END;
 		END Pointers;
 		
-		PROCEDURE DynamicName(source: IntermediateCode.Section; name: Basic.SegmentedName): LONGINT;
+		PROCEDURE DynamicName(source: IntermediateCode.Section; name: StringPool.Index; pool: Basic.HashTableInt): LONGINT;
 		VAR s: Basic.SectionName; i: LONGINT; ch: CHAR; position: LONGINT;
 		BEGIN
-			position := source.pc;
-			Basic.SegmentedNameToString(name, s);
-			Info(source, s);
-			i := 0;
-			REPEAT
-				ch := s[i]; INC(i);
-				Char( source, ch);
-			UNTIL ch = 0X;
+			IF pool.Has(name) THEN
+				RETURN pool.GetInt(name)
+			ELSE
+				position := source.pc;
+				pool.PutInt(name, position);
+				StringPool.GetString(name, s);
+				Info(source, s);
+				i := 0;
+				REPEAT
+					ch := s[i]; INC(i);
+					Char( source, ch);
+				UNTIL ch = 0X;
+			END;
 			RETURN position;
 		END DynamicName;
-		
-		PROCEDURE ExportDesc(source: IntermediateCode.Section; namePool: IntermediateCode.Section;fingerPrinter: FingerPrinter.FingerPrinter; symbol: Sections.Section): BOOLEAN;
-		VAR fingerPrint: SyntaxTree.FingerPrint;
+
+		PROCEDURE Block(CONST mName, typeName, suffix: ARRAY OF CHAR; VAR offset: LONGINT): IntermediateCode.Section;
+		VAR name: ARRAY 128 OF CHAR; section: IntermediateCode.Section; pooledName: Basic.SegmentedName;
 		BEGIN
-			IF (symbol # NIL) & ( (implementationVisitor.backend.cooperative) & (symbol.symbol = NIL) OR (symbol.symbol # NIL) & (symbol.type # Sections.InitCodeSection)
-				& (symbol.type # Sections.InlineCodeSection))
-			THEN
-				IF symbol.symbol # NIL THEN 
-					fingerPrint := fingerPrinter.SymbolFP(symbol.symbol);
-					Longint(source,fingerPrint.shallow);
-				ELSE
-					Longint(source, 0);
-				END;
-				Symbol(source, namePool, DynamicName(namePool, symbol.name), 0); (* reference to dynamic name *)
-				Symbol(source,symbol,0,0);
-				Address(source,0);
-				Address(source,0);
-				RETURN TRUE
+			COPY(moduleName,name);
+			Strings.Append(name,suffix);
+			Basic.ToSegmentedName(name, pooledName);
+			section := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, pooledName, NIL,TRUE);
+			
+			IF implementationVisitor.backend.cooperative THEN
+				Info(section, "TypeDescriptor");
+				Basic.ToSegmentedName("BaseTypes.Array", pooledName);
+				NamedSymbol(section, pooledName,NIL, 0, 0);
+				BasePointer(section);
+				offset := 0;
+			ELSE
+				HeapBlock(mName,typeName,section,2);
+				Info(section, "HeapBlock");
+				(*
+				Symbol(section,section,2,0);
+				*)
+				Address(section,0); (* empty such that GC does not go on traversing *)
+				Info(section, "TypeDescriptor");
+				Address(section,0);
+				offset := section.pc;
 			END;
-			RETURN FALSE
-		END ExportDesc;
+			RETURN section
+		END Block;		
 
 		PROCEDURE Array(source: IntermediateCode.Section; VAR sizePC: LONGINT; CONST baseType: ARRAY OF  CHAR);
 		VAR name: Basic.SegmentedName;
@@ -10168,11 +10182,13 @@ TYPE
 			END;
 		END PatchArray;
 
-
-		PROCEDURE ExportDescArray(source: IntermediateCode.Section; namePool: IntermediateCode.Section; VAR size: LONGINT);
+		PROCEDURE ExportDesc(source: IntermediateCode.Section);
 		VAR
-			sizePC, i: LONGINT; section: Sections.Section; fingerPrinter : FingerPrinter.FingerPrinter;
+			i: LONGINT; section: Sections.Section; fingerPrinter : FingerPrinter.FingerPrinter;
 			sectionArray: POINTER TO ARRAY OF Sections.Section;
+			poolMap: Basic.HashTableInt;
+			namePool: IntermediateCode.Section;
+			namePoolOffset: LONGINT;
 			
 			PROCEDURE Compare(VAR s1, s2: Sections.Section): BOOLEAN;
 			VAR n1, n2: Basic.SectionName; index: LONGINT; ch1, ch2: CHAR;
@@ -10212,24 +10228,163 @@ TYPE
 					IF i < hi THEN QuickSort(list, i, hi) END
 				END;
 			END QuickSort;
+		
+	(*
+	ExportDesc* = RECORD
+		fp*: ADDRESS;
+		name* {UNTRACED}: DynamicName;
+		adr*: ADDRESS;
+		exports*: LONGINT;
+		dsc* {UNTRACED}: ExportArray
+	END;
+	ExportArray* = POINTER {UNSAFE} TO ARRAY OF ExportDesc;
+	*)
+	
+		PROCEDURE ExportDesc2(
+			source: IntermediateCode.Section; 
+			namePool: IntermediateCode.Section;
+			fingerPrinter: FingerPrinter.FingerPrinter;
+			symbol: Sections.Section;
+			name: StringPool.Index;
+			VAR patchAdr: LONGINT
+			): BOOLEAN;
+		VAR fingerPrint: SyntaxTree.FingerPrint; 
+		BEGIN
+			(*IF  (implementationVisitor.backend.cooperative) & (symbol.symbol = NIL) OR (symbol.symbol # NIL) & (symbol.type # Sections.InitCodeSection)
+				& (symbol.type # Sections.InlineCodeSection)
+			THEN
+			*)
+			IF (symbol = NIL) OR ( (implementationVisitor.backend.cooperative) & (symbol.symbol = NIL) OR (symbol.symbol # NIL) & (symbol.type # Sections.InitCodeSection)
+				& (symbol.type # Sections.InlineCodeSection))
+			THEN
+
+				IF (symbol = NIL) OR (symbol # NIL) & (symbol.type # Sections.InlineCodeSection) THEN
+					IF (symbol # NIL) & (symbol.symbol # NIL) THEN 
+						fingerPrint := fingerPrinter.SymbolFP(symbol.symbol);
+						Longint(source,fingerPrint.shallow);
+					ELSE
+						Longint(source, 0);
+					END;
+					
+					Symbol(source, namePool, DynamicName(namePool, name, poolMap), 0); (* reference to dynamic name *)
+					Symbol(source, symbol,0,0);
+					patchAdr := source.pc;
+					Address(source,0);
+					Address(source,0);
+				END;
+				RETURN TRUE
+			ELSE
+				RETURN FALSE
+			END;
+		END ExportDesc2;
+		
+		
 			
+			PROCEDURE Export(CONST sections: ARRAY OF Sections.Section);
+			VAR level, olevel, s: LONGINT; prev, this: Basic.SegmentedName; name: ARRAY 256 OF CHAR;
+				scopes: ARRAY LEN(prev)+1 OF Scope; arrayName: ARRAY 32 OF CHAR;
+				sym: Sections.Section; ignore: LONGINT; symbol: Sections.Section;
+			TYPE
+				Scope = RECORD
+					elements: LONGINT;
+					gelements: LONGINT;
+					section: IntermediateCode.Section;
+					patchAdr: LONGINT;
+					arraySizePC: LONGINT;
+					beginPC: LONGINT; (* current scope start pc *)
+				END;
+			BEGIN
+				Basic.InitSegmentedName(prev);
+				olevel := -1;
+				scopes[0].section := source;
+
+				FOR s := 0 TO LEN(sections)-1 DO
+					symbol := sections[s];
+					IF (symbol # NIL) & (implementationVisitor.backend.cooperative) & (symbol.symbol = NIL) OR (symbol.symbol # NIL) & (symbol.type # Sections.InitCodeSection) & (symbol.type # Sections.InlineCodeSection) THEN
+						this := sections[s].name;
+						level := 0;
+						WHILE  (this[level] > 0) DO
+							WHILE  (this[level] > 0) & (prev[level] = this[level]) DO
+								INC(level);
+							END;
+							WHILE level < olevel DO 
+								(*TRACE("closing",olevel,scopes[olevel].elements); *)
+								IF olevel > 0 THEN
+									PatchLongint(scopes[olevel-1].section,scopes[olevel-1].patchAdr, scopes[olevel].elements);
+									PatchSymbol(scopes[olevel-1].section,scopes[olevel-1].patchAdr+1, scopes[olevel].section.name,  scopes[olevel].section.symbol, scopes[olevel].beginPC, 0);
+								END;
+								scopes[olevel].gelements := scopes[olevel].gelements + scopes[olevel].elements;
+								DEC(olevel); 
+							END;
+							IF (this[level] > 0) THEN
+								IF level > olevel THEN 
+									(*TRACE("opening",level); *)
+									IF scopes[level].section = NIL THEN
+										arrayName := ".@ExportArray";
+										Strings.AppendInt(arrayName, level);
+										scopes[level].section := Block("Heaps","SystemBlockDesc",arrayName,ignore);
+										Array(scopes[level].section,scopes[level].arraySizePC,"Modules.ExportDesc");
+									END;
+									scopes[level].beginPC := scopes[level].section.pc;
+									
+									olevel := level;
+									scopes[olevel].elements := 0;
+								END;
+								IF (level = LEN(this)-1) OR (this[level+1] <= 0) THEN
+									sym := sections[s];
+								ELSE
+									sym := NIL;
+								END;
+								IF ExportDesc2(scopes[level].section, namePool, fingerPrinter, sym, this[level], scopes[level].patchAdr)
+								THEN
+									INC(scopes[olevel].elements);
+								END;
+								(*StringPool.GetString(this[level], name);*)
+								(*TRACE(level, name);*)
+								(* enter string in scope *)
+								INC(level);
+							END;
+						END;
+						Basic.SegmentedNameToString(this, name);
+						(*TRACE(level, "enter", name);*)
+						prev := this;
+					END;
+				END;
+				WHILE 0 <= olevel DO 
+					(*TRACE("closing",olevel,scopes[olevel].elements); *)
+					IF olevel > 0 THEN
+						PatchLongint(scopes[olevel-1].section,scopes[olevel-1].patchAdr, scopes[olevel].elements);
+						PatchSymbol(scopes[olevel-1].section,scopes[olevel-1].patchAdr+1, scopes[olevel].section.name,  scopes[olevel].section.symbol, scopes[olevel].beginPC, 0);
+					END;
+					scopes[olevel].gelements := scopes[olevel].gelements + scopes[olevel].elements;
+					DEC(olevel); 
+				END;
+				
+				level := 0;
+				WHILE (level < LEN(scopes)) DO
+					IF scopes[level].section # NIL THEN
+						PatchArray(scopes[level].section, scopes[level].arraySizePC, scopes[level].gelements);
+					END;
+					INC(level);
+				END;
+				
+			END Export;
 			
 		BEGIN
 			NEW(fingerPrinter, module.system);
-			size := 0;
-			Array(source,sizePC,"Modules.ExportDesc");
+			NEW(poolMap, 64);
+			namePool := Block("Heaps","SystemBlockDesc",".@NamePool",namePoolOffset); 
+			
 			NEW(sectionArray, module.allSections.Length());
 			FOR i := 0 TO module.allSections.Length() - 1 DO
 				section := module.allSections.GetSection(i);
 				sectionArray[i] := section;
 			END;
 			QuickSort(sectionArray^,0,module.allSections.Length()-1);
-			FOR i := 0 TO module.allSections.Length() - 1 DO
-				section := sectionArray[i];
-				IF ExportDesc( source, namePool, fingerPrinter, section) THEN INC(size) END
-			END;
-			PatchArray(source,sizePC,size);
-		END ExportDescArray;
+			
+			Export(sectionArray^);
+		END ExportDesc;
+
 
 		PROCEDURE ExceptionArray(source: IntermediateCode.Section);
 		VAR
@@ -10910,48 +11065,19 @@ TYPE
 			END;
 			RETURN moduleSection;
 		END ModuleSection;
+		
 
+			
 		PROCEDURE Module(bodyProc: IntermediateCode.Section);
-		VAR moduleName: ARRAY 128 OF CHAR;
-		moduleSection, pointerSection, importSection, emptyArraySection, namePool, exportDescArray, exceptionSection, commandsSection,
+		VAR
+		moduleSection, pointerSection, importSection, emptyArraySection, exceptionSection, commandsSection,
 			typeInfoSection, procTableSection, ptrTableSection, referenceSection : IntermediateCode.Section;
-			emptyArraySectionOffset, namePoolOffset, pointerSectionOffset, importSectionOffset, numberPointers, exportDescArrayOffset, exportDescSize,
+			emptyArraySectionOffset, pointerSectionOffset, importSectionOffset, numberPointers,
 			exceptionSectionOffset, commandsSectionOffset, typeInfoSectionOffset, procTableSectionOffset, ptrTableSectionOffset, maxPointers, numberProcs,temp,
 			referenceSectionOffset	: LONGINT;
-
-			PROCEDURE Block(CONST mName, typeName, suffix: ARRAY OF CHAR; VAR offset: LONGINT): IntermediateCode.Section;
-			VAR name: ARRAY 128 OF CHAR; section: IntermediateCode.Section; pooledName: Basic.SegmentedName;
-			BEGIN
-				COPY(moduleName,name);
-				Strings.Append(name,suffix);
-				Basic.ToSegmentedName(name, pooledName);
-				section := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, pooledName, NIL,TRUE);
-				
-				IF implementationVisitor.backend.cooperative THEN
-					Info(section, "TypeDescriptor");
-					Basic.ToSegmentedName("BaseTypes.Array", pooledName);
-					NamedSymbol(section, pooledName,NIL, 0, 0);
-					BasePointer(section);
-					offset := 0;
-				ELSE
-					HeapBlock(mName,typeName,section,2);
-					Info(section, "HeapBlock");
-					(*
-					Symbol(section,section,2,0);
-					*)
-					Address(section,0); (* empty such that GC does not go on traversing *)
-					Info(section, "TypeDescriptor");
-					Address(section,0);
-					offset := section.pc;
-				END;
-				RETURN section
-			END Block;
-
 		BEGIN
 			Global.GetModuleName(module.module,moduleName);
-			exportDescArray := Block("Heaps","SystemBlockDesc",".@ExportDescArray",exportDescArrayOffset);
-			namePool := Block("Heaps","SystemBlockDesc",".@NamePool",namePoolOffset); 
-			ExportDescArray(exportDescArray, namePool, exportDescSize);
+
 			pointerSection := Block("Heaps","SystemBlockDesc",".@PointerArray",pointerSectionOffset);
 			PointerArray(pointerSection,module.module.moduleScope, numberPointers);
 			importSection := Block("Heaps","SystemBlockDesc",".@ImportsArray",importSectionOffset);
@@ -11006,11 +11132,7 @@ TYPE
 			Symbol(moduleSection,emptyArraySection,emptyArraySectionOffset,0);
 			Symbol(moduleSection,referenceSection,referenceSectionOffset,0);
 			Info(moduleSection, "export*: ExportDesc");
-			Address(moduleSection,0);
-			Address(moduleSection,0);
-			Address(moduleSection,0);
-			Longint(moduleSection,exportDescSize);
-			Symbol(moduleSection,exportDescArray, exportDescArrayOffset,0);
+			ExportDesc(moduleSection);
 			Info(moduleSection, "term*: TerminationHandler");
 			Address(moduleSection,0);
 			Info(moduleSection, "exTable*: ExceptionTable");

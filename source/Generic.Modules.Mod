@@ -48,9 +48,9 @@ TYPE
 		name* {UNTRACED}: DynamicName;
 		adr*: ADDRESS;
 		exports*: LONGINT;
-		dsc*: ExportArray
+		dsc* {UNTRACED}: ExportArray
 	END;
-	ExportArray* = POINTER TO ARRAY OF ExportDesc;
+	ExportArray* = POINTER {UNSAFE} TO ARRAY OF ExportDesc;
 
 	Bytes* = POINTER TO ARRAY OF CHAR;
 

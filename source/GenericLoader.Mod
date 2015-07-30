@@ -358,11 +358,11 @@ TYPE
 		msg: ARRAY 128 OF CHAR; module: Modules.Module; adr: LONGINT; m: HashTableInt;
 		s: ObjectFile.SectionName; isModule: BOOLEAN; identifier: ObjectFile.Identifier;
 
-			PROCEDURE CheckName(CONST n: ObjectFile.SegmentedName;  name {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR): LONGINT;
-			VAR s,t: ObjectFile.SectionName; i: LONGINT;
+			PROCEDURE CheckName(n: StringPool.Index;  name {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF CHAR): LONGINT;
+			VAR s: ObjectFile.SectionName; i: LONGINT;
 			BEGIN
 				IF name = NIL THEN RETURN -1 END;
-				ObjectFile.SegmentedNameToString(n, s);
+				StringPool.GetString(n, s); 
 				i := 0;
 				WHILE (s[i] # 0X) & (name[i] # 0X) & (s[i] = name[i]) DO
 					INC(i);
@@ -374,15 +374,21 @@ TYPE
 			PROCEDURE CheckScope(CONST scope: Modules.ExportDesc; level: LONGINT): LONGINT;
 			VAR adr,i,lo,hi,m,res: LONGINT;
 			BEGIN
-				IF (level > 2) THEN RETURN 0 END;
 				adr := 0;
-				
 				(* export names are sorted, binary search: *)
 				lo := 0; hi := scope.exports-1;
 				WHILE (lo <= hi) DO
 				 	m := (lo + hi) DIV 2;
-					res := CheckName(identifier.name, scope.dsc[m].name);
-					IF res = 0 THEN RETURN scope.dsc[m].adr
+					res := CheckName(identifier.name[level], scope.dsc[m].name);
+					IF res = 0 THEN 
+						IF (level = LEN(identifier.name)-1) OR (identifier.name[level+1] <= 0) THEN
+							IF (scope.dsc[m].fp # identifier.fingerprint) & (scope.dsc[m].fp # 0) & (identifier.fingerprint # 0) THEN
+								TRACE("fingerprints don't match");
+							END;
+							RETURN scope.dsc[m].adr
+						ELSE
+							RETURN CheckScope(scope.dsc[m], level+1);
+						END;
 					ELSIF res > 0 THEN lo := m+1;
 					ELSE hi := m-1;
 					END;
@@ -430,12 +436,14 @@ TYPE
 				m := moduleList.ThisModule(module);
 				ASSERT(module # NIL);
 				(* first try via hash-table *)
+				(* disabled -- might be able to remove hash table completely, needs some testing
 				IF identifier.fingerprint # 0 THEN
 					adr := m.Get(identifier.fingerprint);
 				END;
+				*)
 				(* if it does not work, then try export table directly *)
 				IF adr = 0 THEN
-					adr := CheckScope(module.export,0(*level*) );
+					adr := CheckScope(module.export,1(*level*) );
 				END;
 			END;
 
@@ -579,7 +587,7 @@ VAR
 			END
 		END
 	END SelectionSort;
-
+	
 	PROCEDURE LoadObj*(CONST name, fileName: ARRAY OF CHAR;  VAR res: LONGINT;  VAR msg: ARRAY OF CHAR): Modules.Module;
 	TYPE Body=PROCEDURE;
 	VAR
