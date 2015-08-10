@@ -33,11 +33,18 @@ TYPE StackFrame = OBJECT {UNSAFE,PLAIN} (BaseTypes.StackFrame)
 	VAR procedureArgument {UNTRACED}: OBJECT;
 END StackFrame;
 
+
+Stack = POINTER {DISPOSABLE} TO ARRAY OF CHAR;
+StackRecord = POINTER {UNSAFE} TO RECORD
+	prev {UNTRACED}, next {UNTRACED}: Stack;
+	size: SIZE;
+END;
+
 (** Represents the handler identifying activities that are currently either running or suspended. *)
 TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 
 	VAR processor {UNTRACED}: POINTER {UNSAFE} TO Processor;
-	VAR stack {UNTRACED}: POINTER {DISPOSABLE} TO ARRAY OF CHAR;
+	VAR firstStack {UNTRACED}: Stack;
 	VAR stackLimit: ADDRESS;
 	VAR quantum := CPU.Quantum: LONGWORD;
 	VAR priority: Priority;
@@ -51,13 +58,20 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR stackPinned := FALSE: BOOLEAN;
 	VAR startTime-: Timer.Counter;
 	VAR time- := 0: HUGEINT;
+	VAR stack {UNTRACED}: Stack;
 
 	PROCEDURE &InitializeActivity (procedure: PROCEDURE; priority: Priority);
-	VAR stackFrame {UNTRACED}: StackFrame; StackFrameDescriptor {UNTRACED} EXTERN "BaseTypes.StackFrame": BaseTypes.Descriptor;
+	VAR 
+		stackFrame {UNTRACED}: StackFrame; StackFrameDescriptor {UNTRACED} EXTERN "BaseTypes.StackFrame": BaseTypes.Descriptor;
+		stackRecord: StackRecord; adr: ADDRESS;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		ASSERT (priority < Priorities);
 		ASSERT (InitialStackSize > SafeStackSize);
 		NEW (stack, InitialStackSize);
+		firstStack := stack;
+		stackRecord := ADDRESS OF stack[0];
+		stackRecord.next := NIL;
+		stackRecord.prev := NIL;
 		ASSERT (stack # NIL);
 		stackLimit := ADDRESS OF stack[SafeStackSize]; SELF.priority := priority;
 		stackFrame := ADDRESS OF stack[InitialStackSize - 6 * SIZE OF ADDRESS - CPU.StackDisplacement];
@@ -71,13 +85,21 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	END InitializeActivity;
 
 	PROCEDURE ~Finalize;
-	VAR stackFrame {UNTRACED}: BaseTypes.StackFrame; currentActivity {UNTRACED}: Activity;
+	VAR stackFrame {UNTRACED}: BaseTypes.StackFrame; currentActivity {UNTRACED}: Activity; stack{UNTRACED}, next{UNTRACED}: Stack; stackRecord{UNTRACED}: StackRecord;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		stackFrame := framePointer;
 		currentActivity := SYSTEM.GetActivity ()(Activity); SYSTEM.SetActivity (SELF);
 		WHILE stackFrame # NIL DO stackFrame.Reset; stackFrame := stackFrame.previous END;
 		SYSTEM.SetActivity (currentActivity);
-		DISPOSE (stack);
+		
+		stack := firstStack;
+		REPEAT
+			stackRecord := ADDRESS OF stack[0];
+			next := stackRecord.next;
+			DISPOSE (stack);
+			stack := next;
+		UNTIL stack = NIL;
+		
 		Finalize^;
 	END Finalize;
 
@@ -391,60 +413,111 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF Queues.Dequeue (item, action.waitingQueue) THEN Resume (item (Activity)) END;
 END EnqueueWaiting;
 
-(** Expands the stack memory of the current activity to include the specified stack address and returns the corresponding address on the expanded stack. *)
-PROCEDURE ExpandStack- (address: ADDRESS): ADDRESS;
-VAR currentActivity {UNTRACED}: Activity; size, minSize, newSize, offset, index: SIZE; stackTop: ADDRESS;
-VAR newStack {UNTRACED}: POINTER {DISPOSABLE} TO ARRAY OF CHAR; stackFrame {UNTRACED}, previousFrame {UNTRACED}: BaseTypes.StackFrame;
+
+PROCEDURE  ReturnToStackSegment*;
+VAR stackFrame {UNTRACED}, previousFrame{UNTRACED}: BaseTypes.StackFrame;
+	currentActivity {UNTRACED}: Activity; 
+	newStack {UNTRACED}: Stack;
+	stackRecord {UNTRACED}: StackRecord; 
+BEGIN{UNCOOPERATIVE, UNCHECKED}
+	(* old stack pointer and base pointer have been pushed again, we have to revert this *)
+	stackFrame := SYSTEM.GetFramePointer();
+	(*TRACE(stackFrame.caller);
+	TRACE(stackFrame.previous);
+	previousFrame := stackFrame.previous;
+	TRACE(ADDRESS OF previousFrame.caller);
+	TRACE(previousFrame.caller);
+	TRACE(previousFrame.previous);
+	*)
+	currentActivity := SYSTEM.GetActivity ()(Activity);
+	stackRecord := ADDRESS OF currentActivity.stack[0];
+	newStack := stackRecord.prev;
+	currentActivity.stack := newStack;
+	currentActivity.stackLimit := ADDRESS OF newStack[SafeStackSize + 3 * SIZE OF ADDRESS];
+	(*SYSTEM.SetFramePointer(stackFrame.previous);*)
+END ReturnToStackSegment;
+
+PROCEDURE {NOPAF} ReturnToStackSegment0;
+BEGIN
+	CPU.SaveResult;
+	ReturnToStackSegment;
+	CPU.RestoreResultAndReturn;
+END ReturnToStackSegment0;
+
+
+
+(** Expands the stack memory of the current activity to include the specified stack address and returns the new stack pointer to be set after the call. *)
+PROCEDURE ExpandStack- (address, parSize: ADDRESS): ADDRESS;
+VAR currentActivity {UNTRACED}: Activity; size, varSize, minSize, newSize, offset, index: SIZE; stackTop, fp, sp: ADDRESS;
+VAR newStack {UNTRACED}: POINTER {DISPOSABLE} TO ARRAY OF CHAR; stackFrame {UNTRACED}, previousFrame {UNTRACED}, newFrame {UNTRACED}: BaseTypes.StackFrame;
+	stackRecord{UNTRACED}, newStackRecord{UNTRACED}: StackRecord;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid argument *)
 	currentActivity := SYSTEM.GetActivity ()(Activity);
 	ASSERT (~currentActivity.stackPinned);
-	size := LEN (currentActivity.stack); stackTop := ADDRESS OF currentActivity.stack[0] + size;
-	ASSERT (address <= stackTop);
-	IF address >= currentActivity.stackLimit THEN RETURN address END;
+	size := LEN (currentActivity.stack); 
+	stackTop := ADDRESS OF currentActivity.stack[0] + size;
+	
+	stackFrame := SYSTEM.GetFramePointer ();
+	previousFrame := stackFrame.previous;
+	varSize := stackFrame.previous - address;
+	(*
+	TRACE(SYSTEM.GetFramePointer(), address, varSize, parSize);
+	*)
 
-	(* compute new stack size *)
-	minSize := stackTop - address + SafeStackSize; newSize := size;
+	newSize := size;
+	minSize := SafeStackSize + parSize + varSize + 3 * SIZEOF(ADDRESS) (* stack frame *) + 3 * SIZEOF(ADDRESS) (* prev, next, size *);
 	REPEAT INC (newSize, newSize) UNTIL newSize >= minSize;
 	ASSERT (newSize <= MaximumStackSize);
-
-	(* allocate new stack and move frames *)
-	NEW (newStack, newSize); ASSERT (newStack # NIL);
-	offset := ADDRESS OF newStack[newSize - size] - ADDRESS OF currentActivity.stack[0]; stackFrame := SYSTEM.GetFramePointer ();
-	REPEAT previousFrame := stackFrame.previous; stackFrame.Move (offset, stackTop); stackFrame := previousFrame UNTIL stackFrame = NIL;
-
-	(* move movable addresses *)
-	FOR index := 0 TO currentActivity.movables - 1 DO
-		IF IsLocalVariable (currentActivity.movable[index].address) THEN
-			INC (currentActivity.movable[index].address, offset);
-			currentActivity.movable[index] := ADDRESS OF currentActivity.movable[index]^ + offset;
-		END;
+	stackRecord := ADDRESS OF currentActivity.stack[0];
+	newStack := stackRecord.next;
+	IF (newStack = NIL) OR (LEN(newStack) < newSize) THEN 
+		NEW (newStack, newSize); 
+		ASSERT (newStack # NIL);
+		newStackRecord := ADDRESS OF newStack[0];
+		newStackRecord.prev := currentActivity.stack;
+		newStackRecord.next := NIL;
+		stackRecord.next := newStack;
+	ELSE 
+		newStackRecord := ADDRESS OF newStack[0];
+		ASSERT(newStackRecord.prev = currentActivity.stack);
+		ASSERT(stackRecord.next = newStack);
 	END;
+	newSize := LEN(newStack); 
+	
+	newFrame := ADDRESS OF newStack[newSize-1] - parSize + 1 -  3*SIZE OF ADDRESS; 
+	newFrame.previous := stackFrame.previous;
+	newFrame.descriptor := previousFrame.descriptor;
+	newFrame.caller := ReturnToStackSegment;
+	previousFrame.descriptor := stackFrame.descriptor; (* trick to get a base stack frame descriptor *)
 
-	(* move contents *)	
-	SYSTEM.MOVE (ADDRESS OF currentActivity.stack[0], ADDRESS OF currentActivity.stack[0] + offset, size);
+	stackFrame.previous := newFrame;
+	SYSTEM.MOVE(ADDRESS OF previousFrame.caller + SIZE OF ADDRESS, ADDRESS OF newFrame.caller + SIZE OF ADDRESS, parSize); (* copy parameters *)
+	
+	(*
+	TRACE(ADDRESS OF previousFrame.caller + SIZE OF ADDRESS, ADDRESS OF newFrame.caller + SIZE OF ADDRESS, parSize); (* copy parameters *)
+	TRACE(ADDRESS OF previousFrame.caller);
+	TRACE(ADDRESS OF newFrame.caller); 
+	TRACE(ADDRESS OF newStack[newSize-1]);
+	*)
+	sp := ADDRESSOF(newFrame.descriptor) - SIZE OF ADDRESS - varSize; 
+	currentActivity.stack := newStack;
+	currentActivity.stackLimit := ADDRESS OF newStack[SafeStackSize + 3 * SIZE OF ADDRESS];
 
-	(* move stack pointers and swap stacks *)
-	SYSTEM.SetStackPointer (SYSTEM.GetStackPointer () + offset);
-	SYSTEM.SetFramePointer (SYSTEM.GetFramePointer () + offset);
-	DISPOSE (currentActivity.stack); currentActivity.stack := newStack;
-	currentActivity.stackLimit := ADDRESS OF currentActivity.stack[SafeStackSize];
-
-	(* return new address on increased stack *)
-	RETURN address + offset;
+	RETURN sp; 
+	
 END ExpandStack;
 
 PROCEDURE PinStack*(maxAdditionalSize: SIZE);
 VAR currentActivity {UNTRACED}: Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	currentActivity := SYSTEM.GetActivity ()(Activity);
-	SYSTEM.SetStackPointer (ExpandStack (SYSTEM.GetStackPointer () - maxAdditionalSize));
-	currentActivity.stackPinned := TRUE;
+	RETURN; (* stacks are pinned anyway *)
 END PinStack;
 
 PROCEDURE UnpinStack*;
 VAR currentActivity {UNTRACED}: Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	RETURN; (* stacks are pinned anyway *)
 	currentActivity := SYSTEM.GetActivity ()(Activity);
 	ASSERT (currentActivity.stackPinned);
 	currentActivity.stackPinned := FALSE;
@@ -452,13 +525,19 @@ END UnpinStack;
 
 (** Returns whether the specified address corresponds to a local variable that resides on the stack of the current activity calling this procedure. *)
 PROCEDURE IsLocalVariable- (address: ADDRESS): BOOLEAN;
-VAR currentActivity {UNTRACED}: Activity; begin, end: ADDRESS;
+VAR currentActivity {UNTRACED}: Activity; begin, end: ADDRESS; stack {UNTRACED}: Stack; stackRecord {UNTRACED}: StackRecord;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	currentActivity := SYSTEM.GetActivity ()(Activity);
 	IF currentActivity = NIL THEN RETURN FALSE END;
-	begin := ADDRESS OF currentActivity.stack[0];
-	end := begin + LEN (currentActivity.stack);
-	RETURN (address >= begin) & (address < end);
+	stack := currentActivity.firstStack;
+	REPEAT
+		begin := ADDRESS OF stack[0];
+		end := begin + LEN (stack);
+		IF (address >= begin) & (address < end) THEN RETURN TRUE END;
+		stackRecord := begin;
+		stack := stackRecord.next;
+	UNTIL stack = NIL;
+	RETURN FALSE;
 END IsLocalVariable;
 
 (** Registers an address of a local variable that must be moved during expanding the stack. *)

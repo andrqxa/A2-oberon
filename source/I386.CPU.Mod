@@ -5,7 +5,7 @@ MODULE CPU;
 
 IMPORT SYSTEM;
 
-CONST StackSize* = 1024 *  SIZEOF(ADDRESS);
+CONST StackSize* = 128*1024 *  SIZEOF(ADDRESS);
 CONST Quantum* = 1000000;
 CONST CacheLineSize* = 64;
 CONST StackDisplacement* = 0;
@@ -77,6 +77,23 @@ CODE
 	IN		AL, DX
 	MOVZX	EAX, AL
 END InSet;
+
+PROCEDURE -SaveResult-;
+CODE
+	PUSH EAX
+	PUSH EDX
+END SaveResult;
+
+PROCEDURE -RestoreResultAndReturn-;
+CODE
+	POP EDX
+	POP EAX
+	LEA ESP, [EBP+4]
+	POP EBP
+	RET
+END RestoreResultAndReturn;
+
+
 
 PROCEDURE Mask- (port: SIZE; value: SET);
 BEGIN {UNCOOPERATIVE, UNCHECKED}

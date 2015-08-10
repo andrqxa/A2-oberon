@@ -1250,8 +1250,9 @@ TYPE
 
 		(* enter procedure: generate PAF and clear stack *)
 		PROCEDURE EmitEnter(CONST instruction: IntermediateCode.Instruction);
-		VAR op1,imm,target: Assembler.Operand; cc,size,numberMachineWords,destPC,firstPC,secondPC: LONGINT; body: SyntaxTree.Body; name: Basic.SegmentedName;
-		CONST initialize=TRUE; FirstOffset = 5; SecondOffset = 6;
+		VAR op1,imm,target: Assembler.Operand; cc,size,numberMachineWords,destPC,firstPC,secondPC,x: LONGINT; body: SyntaxTree.Body; name: Basic.SegmentedName;
+		parametersSize: SIZE;
+		CONST initialize=TRUE; FirstOffset = 5; SecondOffset = 11; 
 		BEGIN
 			stackSize := SHORT(instruction.op2.intValue);
 			size := stackSize;
@@ -1291,10 +1292,14 @@ TYPE
 					secondPC := out.pc;
 					ASSERT (out.pc - firstPC = FirstOffset);
 					emitter.Emit1(InstructionSet.opPUSH,opRA);
+					parametersSize := IntermediateBackend.ProcedureParametersSize(backend.system, in.symbol(SyntaxTree.Procedure));
+					Assembler.InitImm(imm, SHORTINT (cpuBits DIV 8), parametersSize);
+					emitter.Emit1(InstructionSet.opPUSH,imm);
 					Basic.ToSegmentedName ("Activities.ExpandStack", name);
 					Assembler.InitOffset32(target,0);
 					Assembler.SetSymbol (target,name,0,0,0);
 					emitter.Emit1(InstructionSet.opCALL,target);
+					x := out.pc - secondPC;
 					ASSERT (out.pc - secondPC = SecondOffset);
 					Assembler.InitMem(op1,SHORT(SHORT(cpuBits DIV 8)),RA,stackSize);
 					emitter.Emit2(InstructionSet.opLEA,opSP,op1);

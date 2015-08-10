@@ -2162,7 +2162,7 @@ TYPE
 			Basic.ToSegmentedName ("Modules.Module.@Trace",pooledName);
 			IntermediateCode.InitAddress(op, addressType, pooledName , 0, 0);
 			Emit(Br(position,op));
-
+			INC(statCoopTraceModule, section.pc);
 			section := previousSection;
 			IF dump # NIL THEN dump := section.comments END;
 
@@ -2296,7 +2296,7 @@ TYPE
 				BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
 				Emit(Exit(position,0,0));
 			END;
-
+			INC(statCoopAssignProcedure, section.pc);
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateAssignProcedure;
@@ -2448,6 +2448,7 @@ TYPE
 				BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
 				Emit(Exit(position,0,0));
 			END;
+			INC(statCoopTraceMethod, section.pc);
 
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
@@ -2517,6 +2518,8 @@ TYPE
 			Emit(Sub(position, parameter0, parameter0, IntermediateCode.Immediate(sizeType, 1)));
 			BrneL(label, parameter0, IntermediateCode.Immediate(sizeType, 0));
 			Emit(Exit(position,0,0));
+			INC(statCoopResetProcedure, section.pc);
+
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateResetProcedure;
@@ -2590,6 +2593,8 @@ TYPE
 			Basic.ToSegmentedName ("BaseTypes.StackFrame.Move",name);
 			IntermediateCode.InitAddress(op, addressType, name, 0, 0);
 			Emit(Br(position,op));
+			INC(statCoopMoveMethod, section.pc);
+
 			section := previousSection;
 			ReturnToContext(context);
 			IF dump # NIL THEN dump := section.comments END;
@@ -2639,10 +2644,10 @@ TYPE
 		
 
 		PROCEDURE ResetVariables (scope: SyntaxTree.ProcedureScope);
-		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter; previousScope: SyntaxTree.Scope;
+		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter; previousScope: SyntaxTree.Scope;   pc: LONGINT;
 
 			PROCEDURE Reset (symbol: SyntaxTree.Symbol);
-			VAR operand: Operand; 
+			VAR operand: Operand;
 			BEGIN
 				Symbol (symbol, operand);
 				CallResetProcedure(operand.op, operand.tag, symbol.type.resolved);
@@ -2652,6 +2657,7 @@ TYPE
 		BEGIN
 			previousScope := currentScope;
 			currentScope := scope;
+			pc := section.pc;
 			variable := scope.firstVariable;
 			WHILE variable # NIL DO
 				IF variable.NeedsTrace() THEN
@@ -2666,7 +2672,8 @@ TYPE
 				END;
 				parameter := parameter.nextParameter;
 			END;
-			currentScope := previousScope;
+				INC(statCoopResetVariables, section.pc - pc); 
+				currentScope := previousScope;
 		END ResetVariables;
 		
 		PROCEDURE CreateProcedureDescriptor (procedure: SyntaxTree.Procedure);
@@ -5014,9 +5021,10 @@ TYPE
 		END InlineProcedureCall;
 
 		PROCEDURE RegisterMovable;
-		VAR saved: RegisterEntry; dst: IntermediateCode.Operand;
+		VAR saved: RegisterEntry; dst: IntermediateCode.Operand; pc: LONGINT;
 		BEGIN
 			IF backend.cooperative & ~isUnchecked THEN
+				pc := section.pc;
 				dst := NewRegisterOperand (addressType);
 				Emit(Mov(position,dst, sp));
 				ReleaseIntermediateOperand(dst);
@@ -5026,18 +5034,21 @@ TYPE
 				CallThis("Activities","RegisterMovable",1);
 				RestoreRegisters(saved);
 				INC(registeredMovables);
+				INC(statCoopRegisterMovables, section.pc - pc);
 			END;
 		END RegisterMovable;
 		
 		PROCEDURE UnregisterMovables(num: SIZE);
-		VAR saved: RegisterEntry;
+		VAR saved: RegisterEntry; pc: LONGINT;
 		BEGIN
 			IF backend.cooperative & (num # 0) 	& ~isUnchecked THEN
+				pc := section.pc;
 				SaveRegisters();ReleaseUsedRegisters(saved);
 				Emit(Push(position,IntermediateCode.Immediate(sizeType, num )));
 				CallThis("Activities","UnregisterMovables",1);
 				RestoreRegisters(saved);
 				INC(registeredMovables);
+				INC(statCoopRegisterMovables, section.pc - pc);
 			END;
 		END UnregisterMovables;
 
@@ -7884,13 +7895,15 @@ TYPE
 		VAR dereferenced: IntermediateCode.Operand; arrayDataOffset: LONGINT;
 		
 			PROCEDURE NilCheck(CONST op: IntermediateCode.Operand);
-			VAR label: Label;
+			VAR label: Label; pc: LONGINT;
 			BEGIN
 				IF backend.cooperative & ~isUnchecked THEN
+					pc := section.pc;
 					label := NewLabel();
 					BrneL(label, operand.op, nil);
 					EmitTrap(position, NilPointerTrap);
 					SetLabel(label);
+					INC(statCoopNilCheck, section.pc - pc);
 				END;
 			END NilCheck;
 			
@@ -8633,9 +8646,12 @@ TYPE
 			IF value.intValue = true.intValue THEN
 				INC(modifyAssignmentCounter);
 				IF (modifyAssignmentCounter > 1) THEN RETURN END;
+				modifyAssignmentsPC := section.pc;
+
 			ELSE
 				DEC(modifyAssignmentCounter);
 				IF (modifyAssignmentCounter > 0) THEN RETURN END;
+				INC(statCoopModifyAssignments , section.pc - modifyAssignmentsPC);
 			END;
 			IntermediateCode.InitMemory (processor,  IntermediateCode.SignedIntegerType(addressType.sizeInBits), ap, ToMemoryUnits(system, ProcessorOffset * addressType.sizeInBits));
 			dst := NewRegisterOperand (addressType);
@@ -8855,14 +8871,16 @@ TYPE
 		END VisitAssignment;
 		
 		PROCEDURE EmitCooperativeSwitch;
-		VAR quantum, offset, zero: IntermediateCode.Operand; skip: Label;
+		VAR quantum, offset, zero: IntermediateCode.Operand; skip: Label; pc: LONGINT;
 		BEGIN
 			ASSERT (cooperativeSwitches);
+			pc := section.pc; 
 			IF lastSwitchPC = section.pc THEN RETURN END;
 			IntermediateCode.InitMemory (quantum,  IntermediateCode.SignedIntegerType(addressType.sizeInBits), ap, ToMemoryUnits(system, QuantumOffset * addressType.sizeInBits));
 			IntermediateCode.InitImmediate(offset, quantum.type, section.pc - lastSwitchPC); IntermediateCode.InitImmediate(zero, quantum.type, 0); 
 			Emit(Sub(position,quantum,quantum, offset)); skip := NewLabel(); BrgeL(skip, quantum, zero);
 			lastSwitchPC := section.pc; CallThis("Activities","Switch",0); SetLabel(skip);
+			INC(statCoopSwitch, section.pc - pc);
 		END EmitCooperativeSwitch;
 
 		PROCEDURE VisitCommunicationStatement(communication: SyntaxTree.CommunicationStatement);
@@ -11803,6 +11821,43 @@ TYPE
 	VAR int8-, int16-, int32-, int64-, uint8-, uint16-, uint32-, uint64-, float32-, float64-: IntermediateCode.Type;
 		emptyOperand: IntermediateCode.Operand;
 		systemCalls: ARRAY NumberSystemCalls OF SyntaxTree.Symbol;
+		statCoopResetVariables: LONGINT;
+		statCoopRegisterMovables: LONGINT;
+		statCoopModifyAssignments: LONGINT;
+		modifyAssignmentsPC : LONGINT;
+		statCoopNilCheck: LONGINT;
+		statCoopSwitch: LONGINT;
+		statCoopAssignProcedure: LONGINT;
+		statCoopTraceMethod: LONGINT;
+		statCoopMoveMethod: LONGINT;
+		statCoopResetProcedure: LONGINT;
+		statCoopTraceModule: LONGINT;
+		
+	PROCEDURE ResetStatistics*;
+	BEGIN
+		statCoopResetVariables := 0;
+		statCoopRegisterMovables := 0;
+		statCoopModifyAssignments := 0; 
+		statCoopNilCheck:= 0;
+		statCoopSwitch:= 0;
+		statCoopAssignProcedure:= 0;
+		statCoopTraceMethod:= 0;
+		statCoopMoveMethod:= 0;
+		statCoopResetProcedure:= 0;
+		statCoopTraceModule:= 0;
+	END ResetStatistics;
+
+	PROCEDURE Statistics*;
+	BEGIN
+		TRACE(statCoopResetVariables, statCoopRegisterMovables, statCoopModifyAssignments);
+		TRACE(statCoopNilCheck, statCoopSwitch);
+		TRACE(statCoopAssignProcedure,
+		statCoopTraceMethod,
+		statCoopMoveMethod,
+		statCoopResetProcedure,
+		statCoopTraceModule)
+	END Statistics;
+	
 
 	PROCEDURE PassBySingleReference(parameter: SyntaxTree.Parameter): BOOLEAN;
 	BEGIN
@@ -12196,7 +12251,7 @@ TYPE
 		RETURN (procedure.scope IS SyntaxTree.ProcedureScope) & (procedure.externalName = NIL);
 	END IsNested;
 
-	PROCEDURE ProcedureParametersSize(system: Global.System; procedure: SyntaxTree.Procedure): LONGINT;
+	PROCEDURE ProcedureParametersSize*(system: Global.System; procedure: SyntaxTree.Procedure): LONGINT;
 	BEGIN
 		IF (procedure.scope IS SyntaxTree.CellScope) & (procedure = procedure.scope(SyntaxTree.CellScope).constructor) THEN
 			RETURN 0
