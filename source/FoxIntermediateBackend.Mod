@@ -1145,7 +1145,6 @@ TYPE
 		lastSwitchPC: LONGINT;
 
 		isUnchecked: BOOLEAN;
-		registeredMovables := 0: SIZE;
 	
 		
 		PROCEDURE & Init(system: Global.System; checker: SemanticChecker.Checker; supportedInstructionProcedure: SupportedInstructionProcedure; supportedImmediateProcedure: SupportedImmediateProcedure; emitLabels: BOOLEAN; CONST runtime: SyntaxTree.IdentifierString; backend: IntermediateBackend;
@@ -2540,66 +2539,6 @@ TYPE
 			IF dump # NIL THEN dump := section.comments END;
 		END CreateResetMethod;
 
-		PROCEDURE CreateMoveMethod (scope: SyntaxTree.ProcedureScope);
-		VAR previousSection: IntermediateCode.Section; name: Basic.SegmentedName;
-		VAR parameter: SyntaxTree.Parameter; op, stackFrame, staticLink: IntermediateCode.Operand; context: Context;
-		
-			PROCEDURE Move (parameter: SyntaxTree.Parameter);
-			VAR value: IntermediateCode.Operand; skip: Label;
-			BEGIN
-				IF (parameter.kind = SyntaxTree.ValueParameter) & IsOpenArray (parameter.type) THEN
-					value := IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits));
-					Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
-				ELSE
-					ASSERT (IsVariableParameter (parameter) OR parameter.movable);
-					value := NewRegisterOperand (addressType);
-					Emit (Mov(position,value,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits))));
-					skip := NewLabel ();
-					BrltL (skip,value,stackFrame);
-					BrgeL (skip,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 1)));
-					Emit(Add (position,value,value,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
-					Emit (Mov(position,IntermediateCode.Memory(addressType,stackFrame,ToMemoryUnits(system,parameter.offsetInBits)),value));
-					ReleaseIntermediateOperand (value);
-					SetLabel (skip);
-				END;
-			END Move;
-
-		BEGIN
-			previousSection := section;
-			GetCodeSectionNameForSymbol(scope.ownerProcedure, name);
-			Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
-			context := SwitchContext(IntermediateCode.NewSection(module.allSections, Sections.CodeSection, name,NIL,TRUE));
-			IF dump # NIL THEN dump := section.comments END;
-			stackFrame := NewRegisterOperand (addressType); 
-			Emit (Mov(position,stackFrame,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 3))));
-			
-			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).firstParameter;
-			WHILE parameter # NIL DO
-				IF IsVariableParameter (parameter) THEN Move (parameter) 
-				ELSIF (parameter.kind = SyntaxTree.ValueParameter) & IsOpenArray (parameter.type) THEN Move(parameter)
-				ELSIF parameter.movable THEN Move(parameter)
-				END;
-				parameter := parameter.nextParameter;
-			END;
-			parameter := scope.ownerProcedure.type(SyntaxTree.ProcedureType).returnParameter;
-			IF parameter # NIL THEN Move (parameter) END;
-
-			IF IsNested (scope.ownerProcedure) THEN
-				IntermediateCode.InitMemory (staticLink, addressType, stackFrame, ToMemoryUnits(system,addressType.sizeInBits * 3));
-				Emit(Add (position,staticLink,staticLink,IntermediateCode.Memory(addressType,sp,ToMemoryUnits(system,addressType.sizeInBits * 2))));
-			END;
-
-			ReleaseIntermediateOperand(stackFrame);
-			Basic.ToSegmentedName ("BaseTypes.StackFrame.Move",name);
-			IntermediateCode.InitAddress(op, addressType, name, 0, 0);
-			Emit(Br(position,op));
-			INC(statCoopMoveMethod, section.pc);
-
-			section := previousSection;
-			ReturnToContext(context);
-			IF dump # NIL THEN dump := section.comments END;
-		END CreateMoveMethod;
-
 		PROCEDURE CallResetProcedure(dest, tag: IntermediateCode.Operand; type: SyntaxTree.Type);
 		VAR base: SyntaxTree.Type; op, size: IntermediateCode.Operand; name: Basic.SegmentedName;
 		BEGIN
@@ -2690,15 +2629,6 @@ TYPE
 			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
 			Emit(Data(position,op));
 			Emit(Data(position,nil));
-
-			IF HasVariableParameters (procedure.procedureScope) OR IsNested (procedure) THEN
-				GetCodeSectionNameForSymbol(procedure, name);
-				Basic.SuffixSegmentedName (name, Basic.MakeString ("@Move"));
-			ELSE
-				Basic.ToSegmentedName ("BaseTypes.StackFrame.Move",name);
-			END;
-			IntermediateCode.InitAddress(op, addressType, name , 0, 0);
-			Emit(Data(position,op));
 
 			IF HasPointers (procedure.procedureScope) THEN
 				GetCodeSectionNameForSymbol(procedure, name);
@@ -4334,7 +4264,6 @@ TYPE
 					Pass((operand.tag));
 				END;
 				Pass((operand.op));
-				RegisterMovable();
 			ELSIF IsOpenArray(parameter.type) THEN
 				Designate(expression,operand);
 				baseReg := operand.tag;
@@ -4342,7 +4271,6 @@ TYPE
 					PushArrayLens(parameter.type,type,operand.dimOffset+DynamicDim(parameter.type)-1);
 				END;
 				Pass((operand.op)); (* address of the array *)
-				RegisterMovable();
 			ELSIF parameter.type.resolved IS SyntaxTree.MathArrayType THEN
 			(* case 1 *)
 				IF (parameter.type.resolved(SyntaxTree.MathArrayType).form = SyntaxTree.Open) &
@@ -4736,7 +4664,6 @@ TYPE
 					ASSERT(~(expression IS SyntaxTree.RangeExpression));
 					Designate(expression, operand);
 					Pass((operand.op));
-					RegisterMovable();
 				ELSE
 					ASSERT((parameter.kind = SyntaxTree.ValueParameter) OR (parameter.kind = SyntaxTree.ConstParameter));
 					Evaluate(expression, operand);
@@ -4748,7 +4675,6 @@ TYPE
 				IF parameter.kind = SyntaxTree.VarParameter THEN
 					Designate(expression, operand);
 					Pass((operand.op));
-					RegisterMovable();					
 				ELSE
 					ASSERT((parameter.kind = SyntaxTree.ValueParameter) OR (parameter.kind = SyntaxTree.ConstParameter));
 					Evaluate(expression, operand);
@@ -4786,7 +4712,6 @@ TYPE
 							PushArrayLens(parameter.type,type,operand.dimOffset+DynamicDim(parameter.type)-1);
 						END;
 						Pass((operand.op)); (* address of the array *)
-						RegisterMovable();
 					ELSIF IsDelegate(parameter.type) THEN
 						Evaluate(expression,operand);
 						IF backend.cooperative & parameter.NeedsTrace() THEN
@@ -4832,7 +4757,6 @@ TYPE
 						END;	
 					END;
 					Pass((operand.op));
-					RegisterMovable();
 				END;
 			END;
 
@@ -5020,38 +4944,6 @@ TYPE
 			RETURN ~tooComplex
 		END InlineProcedureCall;
 
-		PROCEDURE RegisterMovable;
-		VAR saved: RegisterEntry; dst: IntermediateCode.Operand; pc: LONGINT;
-		BEGIN
-			IF backend.cooperative & ~isUnchecked THEN
-				pc := section.pc;
-				dst := NewRegisterOperand (addressType);
-				Emit(Mov(position,dst, sp));
-				ReleaseIntermediateOperand(dst);
-				SaveRegisters();ReleaseUsedRegisters(saved);
-				Emit(Push(position, dst));
-				(* register dst has been freed before SaveRegisters already *)
-				CallThis("Activities","RegisterMovable",1);
-				RestoreRegisters(saved);
-				INC(registeredMovables);
-				INC(statCoopRegisterMovables, section.pc - pc);
-			END;
-		END RegisterMovable;
-		
-		PROCEDURE UnregisterMovables(num: SIZE);
-		VAR saved: RegisterEntry; pc: LONGINT;
-		BEGIN
-			IF backend.cooperative & (num # 0) 	& ~isUnchecked THEN
-				pc := section.pc;
-				SaveRegisters();ReleaseUsedRegisters(saved);
-				Emit(Push(position,IntermediateCode.Immediate(sizeType, num )));
-				CallThis("Activities","UnregisterMovables",1);
-				RestoreRegisters(saved);
-				INC(registeredMovables);
-				INC(statCoopRegisterMovables, section.pc - pc);
-			END;
-		END UnregisterMovables;
-
 		PROCEDURE VisitProcedureCallDesignator(x: SyntaxTree.ProcedureCallDesignator);
 		VAR
 			parameters: SyntaxTree.ExpressionList;
@@ -5098,7 +4990,6 @@ TYPE
 
 			passByRegister: BOOLEAN; registerNumber,stackSize: LONGINT;
 			procedure: SyntaxTree.Procedure;
-			previousRegisteredMovables: SIZE;
 
 			PROCEDURE BackupGlobalState;
 			BEGIN
@@ -5225,7 +5116,6 @@ TYPE
 			dest := destination; destination := emptyOperand;
 			SaveRegisters();ReleaseUsedRegisters(saved);
 
-			previousRegisteredMovables := registeredMovables;
 			parameters := x.parameters;
 
 			IF (x.left IS SyntaxTree.SymbolDesignator) & (x.left(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Operator) THEN
@@ -5384,7 +5274,6 @@ TYPE
 			 		Emit(Push(position,size));
 			 		Emit(Push(position,returnValue.op));
 			 		ReleaseOperand(returnValue);
-			 		RegisterMovable;
 				ELSE
 					PushParameter(d,procedureType.returnParameter,procedureType.callingConvention, FALSE, dummy,-1)
 		 		END;
@@ -5451,10 +5340,7 @@ TYPE
 			ELSIF (symbol IS SyntaxTree.Variable) OR (symbol IS SyntaxTree.Parameter) THEN
 				parametersSize := ParametersSize(system,procedureType,FALSE);
 			END;
-			
-			UnregisterMovables(registeredMovables-previousRegisteredMovables);
-			registeredMovables := previousRegisteredMovables;
-			
+						
 			ReleaseParameterRegisters();
 			IF (procedureType.callingConvention = SyntaxTree.WinAPICallingConvention) OR (procedureType.callingConvention = SyntaxTree.CCallingConvention) THEN
 				Emit(Call(position,operand.op,0));
@@ -6516,7 +6402,6 @@ TYPE
 			callsection: Sections.Section;
 			segmentedName: Basic.SegmentedName;
 			needsTrace: BOOLEAN;
-			previousRegisteredMovables: SIZE;
 
 			PROCEDURE CallBodies(self: IntermediateCode.Operand; type: SyntaxTree.Type);
 			VAR recordScope: SyntaxTree.RecordScope; procedure: SyntaxTree.Procedure; body: SyntaxTree.Body; flags: LONGINT;
@@ -6988,7 +6873,6 @@ TYPE
 						constructor := GetConstructor(recordType);
 						IF constructor # NIL THEN
 							(*! should be unified with ProcedureCallDesignator *)
-							previousRegisteredMovables := registeredMovables;
 							Emit(Push(position,pointer));
 							ReleaseIntermediateOperand(pointer);
 							formalParameter := constructor.type(SyntaxTree.ProcedureType).firstParameter;
@@ -6996,8 +6880,6 @@ TYPE
 								PushParameter(x.parameters.GetExpression(i), formalParameter,SyntaxTree.OberonCallingConvention, FALSE, dummy,-1);
 								formalParameter := formalParameter.nextParameter;
 							END;
-							UnregisterMovables(registeredMovables - previousRegisteredMovables);
-							registeredMovables := previousRegisteredMovables;
 
 							(* static call of the constructor *)
 							GetCodeSectionNameForSymbol(constructor,name);
@@ -9823,7 +9705,6 @@ TYPE
 			END;
 			IF backend.cooperative THEN
 				IF HasPointers (procedure.procedureScope) THEN CreateResetMethod (procedure.procedureScope) END;
-				IF HasVariableParameters (procedure.procedureScope) OR IsNested (procedure) THEN CreateMoveMethod (procedure.procedureScope) END;
 				IF HasPointers (procedure.procedureScope) OR HasVariableParameters (procedure.procedureScope) OR IsNested (procedure) THEN CreateProcedureDescriptor (procedure) END;
 			ELSIF newObjectFile & moduleBody  & ~suppressModuleRegistration & ~meta.simple THEN
 				(*! not required any more? check and delete!
@@ -11822,38 +11703,33 @@ TYPE
 		emptyOperand: IntermediateCode.Operand;
 		systemCalls: ARRAY NumberSystemCalls OF SyntaxTree.Symbol;
 		statCoopResetVariables: LONGINT;
-		statCoopRegisterMovables: LONGINT;
 		statCoopModifyAssignments: LONGINT;
 		modifyAssignmentsPC : LONGINT;
 		statCoopNilCheck: LONGINT;
 		statCoopSwitch: LONGINT;
 		statCoopAssignProcedure: LONGINT;
 		statCoopTraceMethod: LONGINT;
-		statCoopMoveMethod: LONGINT;
 		statCoopResetProcedure: LONGINT;
 		statCoopTraceModule: LONGINT;
 		
 	PROCEDURE ResetStatistics*;
 	BEGIN
 		statCoopResetVariables := 0;
-		statCoopRegisterMovables := 0;
 		statCoopModifyAssignments := 0; 
 		statCoopNilCheck:= 0;
 		statCoopSwitch:= 0;
 		statCoopAssignProcedure:= 0;
 		statCoopTraceMethod:= 0;
-		statCoopMoveMethod:= 0;
 		statCoopResetProcedure:= 0;
 		statCoopTraceModule:= 0;
 	END ResetStatistics;
 
 	PROCEDURE Statistics*;
 	BEGIN
-		TRACE(statCoopResetVariables, statCoopRegisterMovables, statCoopModifyAssignments);
+		TRACE(statCoopResetVariables, statCoopModifyAssignments);
 		TRACE(statCoopNilCheck, statCoopSwitch);
 		TRACE(statCoopAssignProcedure,
 		statCoopTraceMethod,
-		statCoopMoveMethod,
 		statCoopResetProcedure,
 		statCoopTraceModule)
 	END Statistics;

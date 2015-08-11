@@ -5,7 +5,7 @@ MODULE CPU;
 
 IMPORT SYSTEM;
 
-CONST StackSize* = 128*1024 *  SIZEOF(ADDRESS);
+CONST StackSize* = 1024 *  SIZEOF(ADDRESS);
 CONST Quantum* = 1000000;
 CONST CacheLineSize* = 64;
 CONST StackDisplacement* = 0;

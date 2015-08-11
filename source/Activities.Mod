@@ -11,9 +11,9 @@ IMPORT SYSTEM, BaseTypes, Counters, CPU, Processors, Queues, Timer;
 (** Represents one of four different priorities of an activity. *)
 TYPE Priority* = SIZE;
 
-CONST SafeStackSize = 120 * SIZE OF ADDRESS;
-CONST MaximumStackSize* = 128 * InitialStackSize;
+CONST SafeStackSize = 512 * SIZE OF ADDRESS;
 CONST InitialStackSize = CPU.StackSize;
+CONST MaximumStackSize* = 1024 * InitialStackSize;
 
 CONST (** Indicates the lowest priority used for idle processors. *) IdlePriority* = 0;
 CONST (** Indicates the default priority of new activities. *) DefaultPriority* = 1;
@@ -37,7 +37,6 @@ END StackFrame;
 Stack = POINTER {DISPOSABLE} TO ARRAY OF CHAR;
 StackRecord = POINTER {UNSAFE} TO RECORD
 	prev {UNTRACED}, next {UNTRACED}: Stack;
-	size: SIZE;
 END;
 
 (** Represents the handler identifying activities that are currently either running or suspended. *)
@@ -52,10 +51,7 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR previous: Activity; argument: ADDRESS;
 	VAR framePointer {UNTRACED}: StackFrame;
 	VAR object-: BaseTypes.Object;
-	VAR movable {UNTRACED}: ARRAY 16 OF POINTER {UNSAFE} TO RECORD address: ADDRESS END;
-	VAR movables := 0: SIZE;
 	VAR bound := FALSE: BOOLEAN;
-	VAR stackPinned := FALSE: BOOLEAN;
 	VAR startTime-: Timer.Counter;
 	VAR time- := 0: HUGEINT;
 	VAR stack {UNTRACED}: Stack;
@@ -63,17 +59,17 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	PROCEDURE &InitializeActivity (procedure: PROCEDURE; priority: Priority);
 	VAR 
 		stackFrame {UNTRACED}: StackFrame; StackFrameDescriptor {UNTRACED} EXTERN "BaseTypes.StackFrame": BaseTypes.Descriptor;
-		stackRecord: StackRecord; adr: ADDRESS;
+		stackRecord: StackRecord;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		ASSERT (priority < Priorities);
 		ASSERT (InitialStackSize > SafeStackSize);
 		NEW (stack, InitialStackSize);
+		ASSERT (stack # NIL);
 		firstStack := stack;
 		stackRecord := ADDRESS OF stack[0];
 		stackRecord.next := NIL;
 		stackRecord.prev := NIL;
-		ASSERT (stack # NIL);
-		stackLimit := ADDRESS OF stack[SafeStackSize]; SELF.priority := priority;
+		stackLimit := ADDRESS OF stack[SafeStackSize+3* SIZE OF ADDRESS]; SELF.priority := priority;
 		stackFrame := ADDRESS OF stack[InitialStackSize - 6 * SIZE OF ADDRESS - CPU.StackDisplacement];
 		stackFrame.procedureArgument := NIL;
 		stackFrame.procedureCaller := TerminateCurrentActivity;
@@ -91,7 +87,6 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 		currentActivity := SYSTEM.GetActivity ()(Activity); SYSTEM.SetActivity (SELF);
 		WHILE stackFrame # NIL DO stackFrame.Reset; stackFrame := stackFrame.previous END;
 		SYSTEM.SetActivity (currentActivity);
-		
 		stack := firstStack;
 		REPEAT
 			stackRecord := ADDRESS OF stack[0];
@@ -415,17 +410,19 @@ END EnqueueWaiting;
 
 
 PROCEDURE  ReturnToStackSegment*;
-VAR stackFrame {UNTRACED}, previousFrame{UNTRACED}: BaseTypes.StackFrame;
+VAR 
+	stackFrame {UNTRACED}: BaseTypes.StackFrame;
 	currentActivity {UNTRACED}: Activity; 
 	newStack {UNTRACED}: Stack;
 	stackRecord {UNTRACED}: StackRecord; 
 BEGIN{UNCOOPERATIVE, UNCHECKED}
 	(* old stack pointer and base pointer have been pushed again, we have to revert this *)
 	stackFrame := SYSTEM.GetFramePointer();
-	(*TRACE(stackFrame.caller);
+	(*
+	TRACE(stackFrame.caller);
 	TRACE(stackFrame.previous);
 	previousFrame := stackFrame.previous;
-	TRACE(ADDRESS OF previousFrame.caller);
+	TRACE(ADDRESS OF previousFrame.caller + SIZE OF ADDRESS);
 	TRACE(previousFrame.caller);
 	TRACE(previousFrame.previous);
 	*)
@@ -434,39 +431,40 @@ BEGIN{UNCOOPERATIVE, UNCHECKED}
 	newStack := stackRecord.prev;
 	currentActivity.stack := newStack;
 	currentActivity.stackLimit := ADDRESS OF newStack[SafeStackSize + 3 * SIZE OF ADDRESS];
-	(*SYSTEM.SetFramePointer(stackFrame.previous);*)
 END ReturnToStackSegment;
 
 PROCEDURE {NOPAF} ReturnToStackSegment0;
-BEGIN
+BEGIN{UNCOOPERATIVE, UNCHECKED}
 	CPU.SaveResult;
 	ReturnToStackSegment;
 	CPU.RestoreResultAndReturn;
 END ReturnToStackSegment0;
 
 
-
 (** Expands the stack memory of the current activity to include the specified stack address and returns the new stack pointer to be set after the call. *)
 PROCEDURE ExpandStack- (address, parSize: ADDRESS): ADDRESS;
-VAR currentActivity {UNTRACED}: Activity; size, varSize, minSize, newSize, offset, index: SIZE; stackTop, fp, sp: ADDRESS;
-VAR newStack {UNTRACED}: POINTER {DISPOSABLE} TO ARRAY OF CHAR; stackFrame {UNTRACED}, previousFrame {UNTRACED}, newFrame {UNTRACED}: BaseTypes.StackFrame;
+VAR 
+	currentActivity {UNTRACED}: Activity; 
+	varSize, minSize, newSize: SIZE;  sp: ADDRESS;
+	newStack {UNTRACED}: POINTER {DISPOSABLE} TO ARRAY OF CHAR; 
+	stackFrame {UNTRACED}, previousFrame {UNTRACED}, newFrame {UNTRACED}: BaseTypes.StackFrame;
 	stackRecord{UNTRACED}, newStackRecord{UNTRACED}: StackRecord;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	(* check for valid argument *)
 	currentActivity := SYSTEM.GetActivity ()(Activity);
-	ASSERT (~currentActivity.stackPinned);
-	size := LEN (currentActivity.stack); 
-	stackTop := ADDRESS OF currentActivity.stack[0] + size;
 	
 	stackFrame := SYSTEM.GetFramePointer ();
 	previousFrame := stackFrame.previous;
 	varSize := stackFrame.previous - address;
+	
 	(*
-	TRACE(SYSTEM.GetFramePointer(), address, varSize, parSize);
+	TRACE(SYSTEM.GetFramePointer(), address, varSize, parSize, size, stackFrame.caller);
 	*)
+	ASSERT(varSize >= 0); 
+	ASSERT(parSize >= 0);
 
-	newSize := size;
-	minSize := SafeStackSize + parSize + varSize + 3 * SIZEOF(ADDRESS) (* stack frame *) + 3 * SIZEOF(ADDRESS) (* prev, next, size *);
+	newSize := LEN (currentActivity.stack); (* current stack size *)
+	minSize := SafeStackSize + parSize + varSize + 3 * SIZEOF(ADDRESS) (* stack frame *) + 3 * SIZEOF(ADDRESS) (* prev, next *);
 	REPEAT INC (newSize, newSize) UNTIL newSize >= minSize;
 	ASSERT (newSize <= MaximumStackSize);
 	stackRecord := ADDRESS OF currentActivity.stack[0];
@@ -484,44 +482,21 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 		ASSERT(stackRecord.next = newStack);
 	END;
 	newSize := LEN(newStack); 
-	
-	newFrame := ADDRESS OF newStack[newSize-1] - parSize + 1 -  3*SIZE OF ADDRESS; 
+	newFrame := ADDRESS OF newStack[0] + newSize- parSize -  3*SIZE OF ADDRESS; 
 	newFrame.previous := stackFrame.previous;
 	newFrame.descriptor := previousFrame.descriptor;
-	newFrame.caller := ReturnToStackSegment;
+	newFrame.caller := ReturnToStackSegment0;
 	previousFrame.descriptor := stackFrame.descriptor; (* trick to get a base stack frame descriptor *)
 
 	stackFrame.previous := newFrame;
 	SYSTEM.MOVE(ADDRESS OF previousFrame.caller + SIZE OF ADDRESS, ADDRESS OF newFrame.caller + SIZE OF ADDRESS, parSize); (* copy parameters *)
-	
-	(*
-	TRACE(ADDRESS OF previousFrame.caller + SIZE OF ADDRESS, ADDRESS OF newFrame.caller + SIZE OF ADDRESS, parSize); (* copy parameters *)
-	TRACE(ADDRESS OF previousFrame.caller);
-	TRACE(ADDRESS OF newFrame.caller); 
-	TRACE(ADDRESS OF newStack[newSize-1]);
-	*)
-	sp := ADDRESSOF(newFrame.descriptor) - SIZE OF ADDRESS - varSize; 
+		
+	sp := ADDRESSOF(newFrame.descriptor) - varSize; 
 	currentActivity.stack := newStack;
 	currentActivity.stackLimit := ADDRESS OF newStack[SafeStackSize + 3 * SIZE OF ADDRESS];
 
 	RETURN sp; 
-	
 END ExpandStack;
-
-PROCEDURE PinStack*(maxAdditionalSize: SIZE);
-VAR currentActivity {UNTRACED}: Activity;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	RETURN; (* stacks are pinned anyway *)
-END PinStack;
-
-PROCEDURE UnpinStack*;
-VAR currentActivity {UNTRACED}: Activity;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	RETURN; (* stacks are pinned anyway *)
-	currentActivity := SYSTEM.GetActivity ()(Activity);
-	ASSERT (currentActivity.stackPinned);
-	currentActivity.stackPinned := FALSE;
-END UnpinStack;
 
 (** Returns whether the specified address corresponds to a local variable that resides on the stack of the current activity calling this procedure. *)
 PROCEDURE IsLocalVariable- (address: ADDRESS): BOOLEAN;
@@ -539,25 +514,6 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	UNTIL stack = NIL;
 	RETURN FALSE;
 END IsLocalVariable;
-
-(** Registers an address of a local variable that must be moved during expanding the stack. *)
-PROCEDURE RegisterMovable- (address: ADDRESS);
-VAR currentActivity {UNTRACED}: Activity;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	currentActivity := SYSTEM.GetActivity ()(Activity);
-	ASSERT (currentActivity.movables < LEN (currentActivity.movable));
-	currentActivity.movable[currentActivity.movables] := address;
-	INC (currentActivity.movables);
-END RegisterMovable;
-
-(** Cancels the specified number of the most current movable address registrations. *)
-PROCEDURE UnregisterMovables- (count: SIZE);
-VAR currentActivity {UNTRACED}: Activity;
-BEGIN {UNCOOPERATIVE, UNCHECKED}
-	currentActivity := SYSTEM.GetActivity ()(Activity);
-	ASSERT (count <= currentActivity.movables);
-	DEC (currentActivity.movables, count);
-END UnregisterMovables;
 
 (** Returns whether any activity is currently executing an assignment statement. *)
 PROCEDURE AssignmentsInProgress- (): BOOLEAN;

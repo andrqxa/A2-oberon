@@ -2074,7 +2074,6 @@ TYPE
 				|Scanner.Address:
 					IF HasAddress(left) THEN
 						type := system.addressType;
-						WarnIfAddressOnStack(left);
 					ELSE
 						type := SyntaxTree.invalidType;
 						Error(left.position,Diagnostics.Invalid,"has no address");
@@ -4766,15 +4765,6 @@ TYPE
 			END;
 			RETURN result
 		END CheckPortType;
-		
-		PROCEDURE WarnIfAddressOnStack(e: SyntaxTree.Expression);
-		BEGIN
-			IF cooperative & IsLocalVariable(e) THEN
-				Warning(e.position,"potentially dangerous use of address of variables on stack");
-			END;
-		END WarnIfAddressOnStack;
-		
-
 
 		(* move to builtin procedure call statement ?
 			remove builtin procedure call designator ?
@@ -5478,7 +5468,6 @@ TYPE
 				ELSIF (id = Global.systemAdr) & CheckArity(1,1) THEN
 					IF HasAddress(parameter0) THEN
 						type := system.addressType;
-						WarnIfAddressOnStack(parameter0);
 					ELSE
 						type := SyntaxTree.invalidType;
 						Error(parameter0.position,Diagnostics.Invalid,"has no address");
