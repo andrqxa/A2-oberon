@@ -442,7 +442,7 @@ END ReturnToStackSegment0;
 
 
 (** Expands the stack memory of the current activity to include the specified stack address and returns the new stack pointer to be set after the call. *)
-PROCEDURE ExpandStack- (address, parSize: ADDRESS): ADDRESS;
+PROCEDURE ExpandStack- (address: ADDRESS; parSize: SIZE): ADDRESS;
 VAR 
 	currentActivity {UNTRACED}: Activity; 
 	varSize, minSize, newSize: SIZE;  sp: ADDRESS;
