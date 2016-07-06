@@ -2000,11 +2000,23 @@ TYPE
 		*)
 		PROCEDURE Reuse2a(VAR result: IntermediateCode.Operand; src1,src2: IntermediateCode.Operand; VAR alternative: IntermediateCode.Operand);
 		BEGIN
-			IF destReg > 0 THEN
-				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, destReg);
-				destReg := -1;
+			IF optimize THEN
+				IF destReg > 0 THEN
+					IntermediateCode.InitRegister(result,src1.type,src1.registerClass, destReg);
+					destReg := -1;
+				ELSE
+					IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
+				END;
 			ELSE
-				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
+				IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
+					UseIntermediateOperand(result);
+				ELSIF ReusableRegister(src2) THEN IntermediateCode.InitRegister(result,src2.type,src2.registerClass, src2.register);
+					UseIntermediateOperand(result);
+				ELSIF alternative.mode # IntermediateCode.Undefined THEN
+					result := alternative; alternative := emptyOperand;
+					UseIntermediateOperand(result);
+				ELSE IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
+				END;
 			END;
 		END Reuse2a;
 
@@ -2017,11 +2029,20 @@ TYPE
 		(* like reuse2a but only one source *)
 		PROCEDURE Reuse1a(VAR result: IntermediateCode.Operand; src1: IntermediateCode.Operand; VAR alternative: IntermediateCode.Operand);
 		BEGIN
-			IF destReg > 0 THEN
-				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, destReg);
-				destReg := -1;
+			IF optimize THEN
+				IF destReg > 0 THEN
+					IntermediateCode.InitRegister(result,src1.type,src1.registerClass, destReg);
+					destReg := -1;
+				ELSE
+					IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
+				END;
 			ELSE
-				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
+				IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
+					UseIntermediateOperand(result);
+				ELSIF alternative.mode # IntermediateCode.Undefined THEN result := alternative; alternative := emptyOperand;
+					UseIntermediateOperand(result);
+				ELSE IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
+				END;
 			END;
 		END Reuse1a;
 
@@ -6476,13 +6497,15 @@ TYPE
 					Assign(reference,variable.initializer);
 				END;
 				IF optimize & (type IS SyntaxTree.BasicType) & ~type.IsPointer() THEN
-					VisitVariable(variable);
+					(*VisitVariable(variable);*)
 					variable.SetUseRegister(TRUE);
 
 					variable.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
 					tmp := IntermediateCode.Register(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,variable.registerNumber);
-					LoadValue(result, type);
+					(*LoadValue(result, type);*)
+					result.op := IntermediateCode.Immediate(IntermediateCode.GetType(system, type),0);
 					Emit(Mov(section.pc, tmp, result.op))
+					
 				END;
 				InitFields(type, operand.op,0);
 				ReleaseOperand(operand);
@@ -9782,6 +9805,7 @@ TYPE
 			procedure: SyntaxTree.Procedure;
 			call: SyntaxTree.ProcedureCallDesignator;
 			designator: SyntaxTree.Designator;
+			doOptimize: BOOLEAN;
 
 			PROCEDURE CanPassAsResultParameter(right: SyntaxTree.Expression): BOOLEAN;
 			VAR procedureType: SyntaxTree.ProcedureType;
@@ -9903,22 +9927,29 @@ TYPE
 			ELSIF (leftType IS SyntaxTree.BasicType) OR (leftType IS SyntaxTree.PointerType) OR (leftType IS SyntaxTree.EnumerationType)
 				OR (leftType IS SyntaxTree.PortType) THEN
 
-				IF optimize & (left IS SyntaxTree.SymbolDesignator) & (left(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable)
-						& (left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).useRegister) THEN
-					(* rightO := leftO;*)
-					(*Designate(left,leftO);*)
-					destReg := left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).registerNumber;
-					Evaluate(right,rightO);
-					destReg := -1;
+				doOptimize := optimize & (left IS SyntaxTree.SymbolDesignator) & (left(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable)
+						& (left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).useRegister);
 
-					(*left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).SetRegisterNumber(rightO.op.register);*)
-					ReleaseOperand(leftO);
-					RETURN
-				END;
-
-				(* rightO := leftO;*)
 				Evaluate(right,rightO);
 				(* DO NOT REORDER EMISSION OF LEFT AND RIGHT OPERAND *)
+
+				IF doOptimize &(section.comments # NIL) THEN
+					section.comments.String("Optimized assignment to register");
+					section.comments.Ln;
+				END;
+				IF doOptimize THEN
+					destReg := left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).registerNumber;
+				END;
+					Evaluate(right,rightO);
+				IF doOptimize THEN
+					destReg := -1;
+					IF rightO.op.mode = IntermediateCode.ModeRegister THEN
+						leftO := rightO;
+					ELSE
+						doOptimize := FALSE;
+					END;
+				END;
+
 				Designate(left,leftO);
 				IF leftO.mode = ModeReference THEN
 					MakeMemory(mem,leftO.op,IntermediateCode.GetType(system,left.type),0);
@@ -9926,7 +9957,7 @@ TYPE
 				ELSE
 					destination := leftO.op;
 				END;
-				ReleaseOperand(leftO);
+				IF ~doOptimize THEN ReleaseOperand(leftO); END;
 				IF destination.mode # IntermediateCode.Undefined THEN
 					Emit(Mov(position,destination,rightO.op));
 				END;
@@ -10244,10 +10275,9 @@ TYPE
 			start := NewLabel();
 
 			Assign(x.variable,x.from);
-			temporaryVariable := GetTemporaryVariable(x.variable.type, FALSE);
+			temporaryVariable := GetTemporaryVariable(x.variable.type, optimize);
 			temporaryVariableDesignator := SyntaxTree.NewSymbolDesignator(SemanticChecker.InvalidPosition, NIL, temporaryVariable);
 			temporaryVariableDesignator.SetType(x.variable.type.resolved);
-
 
 			Assign(temporaryVariableDesignator,x.to);
 			IF x.by = NIL THEN by := 1 ELSE by := x.by.resolved(SyntaxTree.IntegerValue).hvalue END;
