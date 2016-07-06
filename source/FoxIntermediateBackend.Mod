@@ -2,7 +2,7 @@ MODULE FoxIntermediateBackend; (** AUTHOR ""; PURPOSE ""; *)
 
 IMPORT Basic := FoxBasic, SyntaxTree := FoxSyntaxTree, SemanticChecker := FoxSemanticChecker, Backend := FoxBackend, Global := FoxGlobal,
 	Scanner := FoxScanner, IntermediateCode := FoxIntermediateCode, Sections := FoxSections, BinaryCode := FoxBinaryCode,  Printout := FoxPrintout,
-	SYSTEM, Diagnostics, Strings, Options, Streams, Compiler, Formats := FoxFormats, SymbolFileFormat := FoxTextualSymbolFile, D := Debugging,
+	SYSTEM, Diagnostics, Strings, Options, Streams, Compiler, Formats := FoxFormats, SymbolFileFormat := FoxTextualSymbolFile, D := Debugging, (*FoxSSA, FoxSSABackend,*)
 	FingerPrinter := FoxFingerPrinter, StringPool;
 
 CONST
@@ -1318,10 +1318,12 @@ TYPE
 		lastSwitchPC: LONGINT;
 
 		isUnchecked: BOOLEAN;
+		optimize: BOOLEAN; (* do we need to prepare code for SSA? *)
+		destReg: LONGINT;
 	
 		
 		PROCEDURE & Init(system: Global.System; checker: SemanticChecker.Checker; supportedInstructionProcedure: SupportedInstructionProcedure; supportedImmediateProcedure: SupportedImmediateProcedure; emitLabels: BOOLEAN; CONST runtime: SyntaxTree.IdentifierString; backend: IntermediateBackend;
-			newObjectFile: BOOLEAN);
+			newObjectFile, optimize: BOOLEAN);
 		BEGIN
 			SELF.system := system;
 			SELF.runtimeModuleName := runtime;
@@ -1373,6 +1375,7 @@ TYPE
 			currentIsInline := FALSE;
 			NeedDescriptor := FALSE;
 			isUnchecked := backend.noRuntimeChecks;
+			SELF.optimize := optimize
 		END Init;
 		
 		TYPE Context = RECORD 
@@ -1982,18 +1985,12 @@ TYPE
 			END;
 		END CheckRegistersFree;
 
-
 		(* Reuse2: reuse src1 or src2 for ongoing computation if src1 or src2, respectively, is a register.
 			Otherwise allocate a new register.
 			Does NOT necessarily keep the content of src1 or src2 in result! *)
 		PROCEDURE Reuse2(VAR result: IntermediateCode.Operand; src1,src2: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
-				UseIntermediateOperand(result);
-			ELSIF ReusableRegister(src2) THEN IntermediateCode.InitRegister(result,src2.type,src2.registerClass, src2.register);
-				UseIntermediateOperand(result);
-			ELSE IntermediateCode.InitRegister(result,src1.type,src1.registerClass,AcquireRegister(src1.type, src1.registerClass));
-			END;
+			IntermediateCode.InitRegister(result,src1.type,src1.registerClass,AcquireRegister(src1.type, src1.registerClass));
 		END Reuse2;
 
 		(* Reuse2a: reuse src1 or src2 for ongoing computation if src1 or src2, respectively, is a register.
@@ -2003,59 +2000,43 @@ TYPE
 		*)
 		PROCEDURE Reuse2a(VAR result: IntermediateCode.Operand; src1,src2: IntermediateCode.Operand; VAR alternative: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
-				UseIntermediateOperand(result);
-			ELSIF ReusableRegister(src2) THEN IntermediateCode.InitRegister(result,src2.type,src2.registerClass, src2.register);
-				UseIntermediateOperand(result);
-			ELSIF alternative.mode # IntermediateCode.Undefined THEN
-				result := alternative; alternative := emptyOperand;
-				UseIntermediateOperand(result);
-			ELSE IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
+			IF destReg > 0 THEN
+				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, destReg);
+				destReg := -1;
+			ELSE
+				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
 			END;
 		END Reuse2a;
 
 		(* like reuse2 but only one source *)
 		PROCEDURE Reuse1(VAR result: IntermediateCode.Operand; src1: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
-				UseIntermediateOperand(result);
-			ELSE IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
-			END;
+			IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
 		END Reuse1;
 
 		(* like reuse2a but only one source *)
 		PROCEDURE Reuse1a(VAR result: IntermediateCode.Operand; src1: IntermediateCode.Operand; VAR alternative: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
-				UseIntermediateOperand(result);
-			ELSIF alternative.mode # IntermediateCode.Undefined THEN result := alternative; alternative := emptyOperand;
-				UseIntermediateOperand(result);
-			ELSE IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
+			IF destReg > 0 THEN
+				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, destReg);
+				destReg := -1;
+			ELSE
+				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
 			END;
 		END Reuse1a;
 
 		(* like reuse1 but guarantees that content of src1 is in result *)
 		PROCEDURE ReuseCopy(VAR result: IntermediateCode.Operand; src1: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src1) THEN
-				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
-				ASSERT((src1.mode = IntermediateCode.ModeRegister) & (src1.offset = 0));
-				UseIntermediateOperand(result);
-			ELSE
-				IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
-				Emit(Mov(position,result,src1));
-			END
+			IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
+			Emit(Mov(position,result,src1));
 		END ReuseCopy;
 
 		PROCEDURE TransferToRegister(VAR result: IntermediateCode.Operand; src: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src) THEN
-				IntermediateCode.InitRegister(result,src.type,src.registerClass, src.register);
-			ELSE
-				IntermediateCode.InitRegister(result,src.type,src.registerClass, AcquireRegister(src.type, src.registerClass));
-				Emit(Mov(position,result,src));
-				ReleaseIntermediateOperand(src);
-			END
+			IntermediateCode.InitRegister(result,src.type,src.registerClass, AcquireRegister(src.type, src.registerClass));
+			Emit(Mov(position,result,src));
+			ReleaseIntermediateOperand(src);
 		END TransferToRegister;
 
 
@@ -2301,15 +2282,17 @@ TYPE
 
 
 		PROCEDURE VisitUnaryExpression(x: SyntaxTree.UnaryExpression);
-		VAR type,t0: SyntaxTree.Type; operand: Operand; dest: IntermediateCode.Operand;
+		VAR type,t0: SyntaxTree.Type; operand: Operand; dest: IntermediateCode.Operand; dReg: LONGINT;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitUnaryExpression") END;
+			dReg := destReg;
 			dest := destination; destination := emptyOperand;
 			IF x.operator = Scanner.Not THEN
 				IF conditional THEN
 					Condition(x.left,falseLabel,trueLabel)
 				ELSE
 					Evaluate(x.left,operand);
+					destReg := dReg;
 					InitOperand(result,ModeValue);
 					Reuse1a(result.op,operand.op,dest);
 					Emit(Xor(position,result.op,operand.op,true));
@@ -2317,6 +2300,7 @@ TYPE
 				END;
 			ELSIF x.operator = Scanner.Minus THEN
 				Evaluate(x.left,operand);
+					destReg := dReg;
 				InitOperand(result,ModeValue);
 				Reuse1a(result.op,operand.op,dest);
 				type := x.left.type.resolved;
@@ -2333,6 +2317,7 @@ TYPE
 				ReleaseOperand(operand);
 			ELSIF x.operator = Scanner.Address THEN
 				Designate(x.left,operand);
+				destReg := dReg;
 				operand.mode := ModeValue;
 				t0 := x.left.type.resolved;
 				IF (t0 IS SyntaxTree.MathArrayType) & (t0(SyntaxTree.MathArrayType).form = SyntaxTree.Open) THEN
@@ -3316,11 +3301,14 @@ TYPE
 			componentType: IntermediateCode.Type;
 			value: HUGEINT; exp: LONGINT;next,exit: Label; recordType: SyntaxTree.RecordType; dest: IntermediateCode.Operand;
 			size: LONGINT;
+			dReg: LONGINT;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitBinaryExpression") END;
 			dest := destination; destination := emptyOperand;
 			leftType := x.left.type.resolved;
 			rightType := x.right.type.resolved;
+			dReg := destReg;
+			destReg := -1;
 			(* for "OR" and "&" the left and right expressions may not be emitted first <= shortcut evaluation *)
 			CASE x.operator OF
 			Scanner.Or:
@@ -3357,6 +3345,7 @@ TYPE
 			|Scanner.Plus:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF leftType IS SyntaxTree.SetType THEN
 					InitOperand(result,ModeValue);
 					Reuse2a(result.op,left.op,right.op,dest);
@@ -3376,6 +3365,7 @@ TYPE
 			|Scanner.Minus:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF leftType IS SyntaxTree.SetType THEN
 					InitOperand(result,ModeValue);
 					Reuse1(result.op,right.op);
@@ -3399,6 +3389,7 @@ TYPE
 			|Scanner.Times:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF leftType IS SyntaxTree.SetType THEN
 					InitOperand(result,ModeValue);
 					Reuse2a(result.op,left.op,right.op,dest);
@@ -3437,6 +3428,7 @@ TYPE
 			|Scanner.Div:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF ((x.type.resolved IS SyntaxTree.IntegerType) OR (x.type.resolved IS SyntaxTree.AddressType)) & IsIntegerConstant(x.right,value) & PowerOf2(value,exp) THEN
 					InitOperand(result,ModeValue);
 					Reuse1a(result.op,left.op,dest);
@@ -3460,6 +3452,7 @@ TYPE
 			|Scanner.Mod:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF ((x.type.resolved IS SyntaxTree.IntegerType) OR (x.type.resolved IS SyntaxTree.AddressType)) & IsIntegerConstant(x.right,value) & PowerOf2(value,exp) THEN
 					IntermediateCode.InitImmediate(right.op,IntermediateCode.GetType(system,x.type),value-1);
 					InitOperand(result,ModeValue);
@@ -3483,6 +3476,7 @@ TYPE
 			|Scanner.Slash:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF leftType IS SyntaxTree.SetType THEN
 					InitOperand(result,ModeValue);
 					Reuse2a(result.op,left.op,right.op,dest);
@@ -3668,6 +3662,7 @@ TYPE
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
 				Convert(left.op,setType);
+				destReg := dReg;
 				ReuseCopy(temp.op,right.op);
 				Emit(Shr(position,temp.op,temp.op,left.op));
 				ReleaseOperand(right); ReleaseOperand(left);
@@ -6456,7 +6451,7 @@ TYPE
 		END InitFields;
 
 		PROCEDURE InitVariable(VAR variable: SyntaxTree.Variable);
-		VAR type: SyntaxTree.Type; operand: Operand; tmp: IntermediateCode.Operand; reference: SyntaxTree.Expression;
+		VAR type: SyntaxTree.Type; operand: Operand; tmp: IntermediateCode.Operand; reference: SyntaxTree.Expression; reg: LONGINT;
 		BEGIN
 			type := variable.type.resolved;
 			IF (type IS SyntaxTree.MathArrayType) THEN
@@ -6479,6 +6474,15 @@ TYPE
 					reference.SetType(variable.type.resolved);
 					reference.SetAssignable(TRUE);
 					Assign(reference,variable.initializer);
+				END;
+				IF optimize & (type IS SyntaxTree.BasicType) & ~type.IsPointer() THEN
+					VisitVariable(variable);
+					variable.SetUseRegister(TRUE);
+
+					variable.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
+					tmp := IntermediateCode.Register(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,variable.registerNumber);
+					LoadValue(result, type);
+					Emit(Mov(section.pc, tmp, result.op))
 				END;
 				InitFields(type, operand.op,0);
 				ReleaseOperand(operand);
@@ -9068,8 +9072,6 @@ TYPE
 		VAR basereg: IntermediateCode.Operand; scope: SyntaxTree.Scope; dest: IntermediateCode.Operand;
 			moduleSection: IntermediateCode.Section; moduleOffset, parametersSize: LONGINT;
 			name: Basic.SegmentedName;
-			procedure: SyntaxTree.Procedure;
-			procedureType: SyntaxTree.ProcedureType;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitSelfDesignator") END;
 			dest := destination; destination := emptyOperand;
@@ -9099,11 +9101,9 @@ TYPE
 				GetBaseRegister(basereg,currentScope,scope);
 				InitOperand(result,ModeReference);
 				result.op := basereg;
-				procedure := scope(SyntaxTree.ProcedureScope).ownerProcedure;
-				procedureType := procedure.type(SyntaxTree.ProcedureType);
-				parametersSize := ProcedureParametersSize(system,procedure);
-				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,addressType.sizeInBits)*(procedureType.parametersOffset+1)+parametersSize);
-				IF backend.cooperative THEN
+				parametersSize := ProcedureParametersSize(system,scope(SyntaxTree.ProcedureScope).ownerProcedure);
+				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,addressType.sizeInBits)+parametersSize);
+				IF backend.cooperative OR backend.preciseGC THEN
 					IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,addressType.sizeInBits));
 				END;
 				(* tag must be loaded when dereferencing SELF pointer *)
@@ -9902,6 +9902,20 @@ TYPE
 				ReleaseOperand(leftO)
 			ELSIF (leftType IS SyntaxTree.BasicType) OR (leftType IS SyntaxTree.PointerType) OR (leftType IS SyntaxTree.EnumerationType)
 				OR (leftType IS SyntaxTree.PortType) THEN
+
+				IF optimize & (left IS SyntaxTree.SymbolDesignator) & (left(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable)
+						& (left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).useRegister) THEN
+					(* rightO := leftO;*)
+					(*Designate(left,leftO);*)
+					destReg := left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).registerNumber;
+					Evaluate(right,rightO);
+					destReg := -1;
+
+					(*left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).SetRegisterNumber(rightO.op.register);*)
+					ReleaseOperand(leftO);
+					RETURN
+				END;
+
 				(* rightO := leftO;*)
 				Evaluate(right,rightO);
 				(* DO NOT REORDER EMISSION OF LEFT AND RIGHT OPERAND *)
@@ -10862,6 +10876,8 @@ TYPE
 			saved: RegisterEntry; left, right: IntermediateCode.Operand;
 			name: Basic.SegmentedName;
 			offset: LONGINT;
+			(*builder: FoxSSABackend.CreationVisitor;*)
+
 		BEGIN
 			IF Trace THEN TraceEnter("Body") END;
 			ReleaseUsedRegisters(saved); (* just in case ... *)
@@ -10956,6 +10972,9 @@ TYPE
 			ASSERT(modifyAssignmentCounter = 0);
 			currentScope := prevScope;
 			IF Trace THEN TraceExit("Body") END;
+
+			(*NEW(builder);
+			builder.Section(section).Dump(dump)*)
 		END Body;
 
 	END ImplementationVisitor;
@@ -11734,9 +11753,6 @@ TYPE
 				sfIN = 0X;
 				sfOUT = 1X;
 				
-				flagDelegate = 0;
-				flagConstructor = 1;
-				
 				(* variable / parameter addressing modes *)
 				sfAbsolute = 0X; (* global vars *)
 				sfRelative = 1X; (* variables, value parameters *)
@@ -12053,7 +12069,7 @@ TYPE
 				*)
 				PROCEDURE NProcedure(procedure: SyntaxTree.Procedure; scopeOffset: LONGINT);
 				VAR s: Sections.Section; procedureType: SyntaxTree.ProcedureType; parameter: SyntaxTree.Parameter; pos: LONGINT;
-					name: Basic.SegmentedName; flags: SET;
+					name: Basic.SegmentedName;
 				BEGIN
 					IF RefInfo THEN Info(section, "Procedure") END;
 					pos := CurrentIndex(); 
@@ -12064,15 +12080,6 @@ TYPE
 					s := module.allSections.FindBySymbol(procedure); 
 					Symbol(section,s,0,0); (* start *)
 					Symbol(section,s,s(IntermediateCode.Section).pc,0); (* end *)
-					
-					flags := {};
-					IF procedureType.isDelegate THEN
-						INCL(flags, flagDelegate);
-					END;
-					IF procedure.isConstructor THEN
-						INCL(flags, flagConstructor);
-					END;
-					Set(section, flags);
 					
 					Global.GetSymbolSegmentedName(procedure,name);
 					Basic.SuffixSegmentedName (name, Basic.MakeString ("@Descriptor"));
@@ -13160,7 +13167,7 @@ TYPE
 			Global.GetModuleName(x, name);
 			module.SetModuleName(name);
 
-			NEW(implementationVisitor,system,checker,supportedInstruction, supportedImmediate, Compiler.FindPC IN flags, runtimeModuleName, SELF, newObjectFile);
+			NEW(implementationVisitor,system,checker,supportedInstruction, supportedImmediate, Compiler.FindPC IN flags, runtimeModuleName, SELF, newObjectFile, optimize);
 			NEW(declarationVisitor,system,implementationVisitor,SELF,Compiler.ForceModuleBodies IN flags,trace & (Compiler.Info IN flags));
 
 			NEW(meta, implementationVisitor, declarationVisitor,simpleMetaData);
@@ -13400,7 +13407,7 @@ TYPE
 
 	PROCEDURE ReusableRegister(op: IntermediateCode.Operand): BOOLEAN;
 	BEGIN
-		RETURN (op.mode = IntermediateCode.ModeRegister) & (op.register > 0) & (op.offset = 0);
+		RETURN FALSE
 	END ReusableRegister;
 
 	PROCEDURE EnsureBodyProcedure(moduleScope: SyntaxTree.ModuleScope);
