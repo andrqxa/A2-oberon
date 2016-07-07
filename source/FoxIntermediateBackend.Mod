@@ -9930,34 +9930,31 @@ TYPE
 				doOptimize := optimize & (left IS SyntaxTree.SymbolDesignator) & (left(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable)
 						& (left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).useRegister);
 
-				Evaluate(right,rightO);
-				(* DO NOT REORDER EMISSION OF LEFT AND RIGHT OPERAND *)
-
-				IF doOptimize &(section.comments # NIL) THEN
-					section.comments.String("Optimized assignment to register");
-					section.comments.Ln;
-				END;
 				IF doOptimize THEN
 					destReg := left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).registerNumber;
 				END;
-					Evaluate(right,rightO);
+				Evaluate(right,rightO);
+				(* DO NOT REORDER EMISSION OF LEFT AND RIGHT OPERAND *)
+				destReg := -1;
 				IF doOptimize THEN
-					destReg := -1;
-					IF rightO.op.mode = IntermediateCode.ModeRegister THEN
+					IF (rightO.op.mode = IntermediateCode.ModeRegister) & (rightO.op.register = left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).registerNumber) THEN
 						leftO := rightO;
 					ELSE
 						doOptimize := FALSE;
+						Designate(left, leftO);
 					END;
+				ELSE
+					Designate(left,leftO);
 				END;
 
-				Designate(left,leftO);
 				IF leftO.mode = ModeReference THEN
 					MakeMemory(mem,leftO.op,IntermediateCode.GetType(system,left.type),0);
 					destination := mem;
 				ELSE
 					destination := leftO.op;
 				END;
-				IF ~doOptimize THEN ReleaseOperand(leftO); END;
+
+				ReleaseOperand(leftO);
 				IF destination.mode # IntermediateCode.Undefined THEN
 					Emit(Mov(position,destination,rightO.op));
 				END;
