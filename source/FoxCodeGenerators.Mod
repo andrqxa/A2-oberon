@@ -195,7 +195,7 @@ TYPE
 
 			PROCEDURE GetRegisterAllocation;
 			CONST MaxParameterRegisters=16;
-			VAR pc,i: LONGINT; parameterRegisters: ARRAY MaxParameterRegisters OF IntermediateCode.Operand;
+			VAR pc,i,op,ofs: LONGINT; parameterRegisters: ARRAY MaxParameterRegisters OF IntermediateCode.Operand;
 
 				PROCEDURE RegisterUsage(CONST instruction: IntermediateCode.Instruction);
 				VAR i: LONGINT;
@@ -234,6 +234,15 @@ TYPE
 				FOR pc := 0 TO in.pc-1 DO
 					inPC := pc;
 					RegisterUsage(in.instructions[pc]);
+					op := in.instructions[pc].opcode;
+					IF (op = IntermediateCode.br) OR (op = IntermediateCode.breq) OR (op = IntermediateCode.brne) OR (op = IntermediateCode.brge) OR (op = IntermediateCode.brlt) THEN
+						IF (in.instructions[pc].op1.mode = IntermediateCode.ModeImmediate) & (in.instructions[pc].op1.offset < pc) THEN
+							ofs := in.instructions[pc].op1.offset;
+							FOR i := 0 TO LEN(allocation.table) - 1 DO
+								IF (ofs <= allocation.table[i].last) & (allocation.table[i].last <= pc) THEN allocation.table[i].last := pc; END;
+							END;
+						END;
+					END;
 				END;
 			END GetRegisterAllocation;
 
