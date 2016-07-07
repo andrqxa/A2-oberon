@@ -685,7 +685,9 @@ TYPE
 		VAR op: Assembler.Operand;
 		BEGIN
 			GetSpillOperand(ticket,op);
-			emitter.Emit2(InstructionSet.opMOV,registerOperands[ticket.register],op);
+			(*emitter.Emit2(InstructionSet.opMOV,registerOperands[ticket.register],op);*)
+			Move(registerOperands[ticket.register], op, ticket.type)
+
 		END ToRegister;
 
 		PROCEDURE ExchangeTickets(ticket1,ticket2: Ticket);
