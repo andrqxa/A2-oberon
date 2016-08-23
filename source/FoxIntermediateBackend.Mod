@@ -6503,9 +6503,10 @@ TYPE
 					variable.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
 					tmp := IntermediateCode.Register(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,variable.registerNumber);
 					(*LoadValue(result, type);*)
-					result.op := IntermediateCode.Immediate(IntermediateCode.GetType(system, type),0);
-					Emit(Mov(section.pc, tmp, result.op))
-					
+					result.op := IntermediateCode.Memory(IntermediateCode.GetType(system, type), fp, variable.offsetInBits);
+					Emit(Allocate(section.pc, tmp, result.op));
+					ReleaseIntermediateOperand(tmp);
+					ReleaseOperand(result)
 				END;
 				InitFields(type, operand.op,0);
 				ReleaseOperand(operand);
@@ -9929,9 +9930,21 @@ TYPE
 
 				doOptimize := optimize & (left IS SyntaxTree.SymbolDesignator) & (left(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable)
 						& (left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).useRegister);
+				IF section.comments # NIL THEN
+					section.comments.String("optimize expression destination = ");
+					IF doOptimize THEN section.comments.String("TRUE")
+					ELSE section.comments.String("FALSE") END;
+					section.comments.Ln;
+				END;
 
 				IF doOptimize THEN
 					destReg := left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).registerNumber;
+					UseRegister(destReg);
+					IF section.comments # NIL THEN
+						section.comments.String("target register = ");
+						section.comments.Int(destReg, 0);
+						section.comments.Ln;
+					END;
 				END;
 				Evaluate(right,rightO);
 				(* DO NOT REORDER EMISSION OF LEFT AND RIGHT OPERAND *)
@@ -9954,8 +9967,8 @@ TYPE
 					destination := leftO.op;
 				END;
 
-				ReleaseOperand(leftO);
-				IF destination.mode # IntermediateCode.Undefined THEN
+				IF (*destination.mode # IntermediateCode.Undefined*) ~doOptimize THEN
+					ReleaseOperand(leftO);
 					Emit(Mov(position,destination,rightO.op));
 				END;
 				ReleaseOperand(rightO);
@@ -14088,6 +14101,13 @@ TYPE
 		IntermediateCode.InitInstruction(instruction,position,IntermediateCode.data,op,emptyOperand,emptyOperand);
 		RETURN instruction
 	END Data;
+
+	PROCEDURE Allocate*(position: LONGINT; register, memory: IntermediateCode.Operand): IntermediateCode.Instruction;
+	VAR instruction: IntermediateCode.Instruction;
+	BEGIN
+		IntermediateCode.InitInstruction(instruction, position, IntermediateCode.allocate, register, memory, emptyOperand);
+		RETURN instruction
+	END Allocate;
 
 	PROCEDURE SpecialInstruction(position: LONGINT;subtype: SHORTINT; op1,op2,op3: IntermediateCode.Operand): IntermediateCode.Instruction;
 	VAR instruction: IntermediateCode.Instruction;

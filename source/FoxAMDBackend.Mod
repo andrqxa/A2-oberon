@@ -1240,6 +1240,7 @@ TYPE
 			|IntermediateCode.copy: EmitCopy(instruction);
 			|IntermediateCode.fill: EmitFill(instruction,FALSE);
 			|IntermediateCode.asm: EmitAsm(instruction);
+			|IntermediateCode.allocate: EmitAllocate(instruction);
 			END;
 
 			ReserveOperandRegisters(instruction.op3,FALSE); ReserveOperandRegisters(instruction.op2,FALSE); ReserveOperandRegisters(instruction.op1,FALSE);
@@ -3112,6 +3113,12 @@ TYPE
 			*)
 		END EmitAsm;
 
+		PROCEDURE EmitAllocate(CONST instruction: IntermediateCode.Instruction);
+		VAR left: Assembler.Operand; ticket: Ticket;
+		BEGIN
+			PrepareOp2(instruction,Low,left,ticket);
+			FinishOp(instruction.op1, Low, left, ticket);
+		END EmitAllocate;
 	END CodeGeneratorAMD64;
 
 	BackendAMD64= OBJECT (IntermediateBackend.IntermediateBackend)
