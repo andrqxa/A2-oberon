@@ -6496,18 +6496,6 @@ TYPE
 					reference.SetAssignable(TRUE);
 					Assign(reference,variable.initializer);
 				END;
-				IF optimize & (type IS SyntaxTree.BasicType) & ~type.IsPointer() THEN
-					(*VisitVariable(variable);*)
-					variable.SetUseRegister(TRUE);
-
-					variable.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
-					tmp := IntermediateCode.Register(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,variable.registerNumber);
-					(*LoadValue(result, type);*)
-					result.op := IntermediateCode.Memory(IntermediateCode.GetType(system, type), fp, variable.offsetInBits);
-					Emit(Allocate(section.pc, tmp, result.op));
-					ReleaseIntermediateOperand(tmp);
-					ReleaseOperand(result)
-				END;
 				InitFields(type, operand.op,0);
 				ReleaseOperand(operand);
 			END;
@@ -9374,6 +9362,19 @@ TYPE
 				InitOperand(result,ModeReference);
 				GetBaseRegister(result.op,currentScope,x.scope);
 				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,x.offsetInBits));
+
+				(* Optimize local variables *)
+				IF (currentScope = x.scope) & optimize & (type IS SyntaxTree.BasicType) & ~type.IsPointer() THEN
+					(*VisitVariable(variable);*)
+					x.SetUseRegister(TRUE);
+					x.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
+					temp := IntermediateCode.Register(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,x.registerNumber);
+					Emit(Allocate(section.pc, temp, result.op));
+					(*LoadValue(result, type);*)
+					ReleaseIntermediateOperand(result.op);
+					result.op := temp
+				END;
+
 			ELSIF (x.scope = moduleScope) OR (x.scope IS SyntaxTree.CellScope) & ~backend.cellsAreObjects THEN (* global variable *)
 				InitOperand(result,ModeReference);
 				GetCodeSectionNameForSymbol(x,name);
@@ -14102,7 +14103,7 @@ TYPE
 		RETURN instruction
 	END Data;
 
-	PROCEDURE Allocate*(position: LONGINT; register, memory: IntermediateCode.Operand): IntermediateCode.Instruction;
+	PROCEDURE Allocate(position: LONGINT; register, memory: IntermediateCode.Operand): IntermediateCode.Instruction;
 	VAR instruction: IntermediateCode.Instruction;
 	BEGIN
 		IntermediateCode.InitInstruction(instruction, position, IntermediateCode.allocate, register, memory, emptyOperand);

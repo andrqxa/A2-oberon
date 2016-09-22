@@ -775,7 +775,9 @@ TYPE
 		(*-------------------  operand generation ----------------------*)
 		PROCEDURE GetSpillOperand(ticket: Ticket; VAR op: Assembler.Operand);
 		BEGIN
-			IF FrameSpillStack THEN
+			IF ticket.fixed THEN
+				op := Assembler.NewMem(SHORTINT(ticket.type.sizeInBits*ticket.type.length DIV 8), BP , (ticket.offset));
+			ELSIF FrameSpillStack THEN
 				op := Assembler.NewMem(SHORTINT(ticket.type.sizeInBits*ticket.type.length DIV 8), BP , -(spillStackStart + cpuBits DIV 8 + ticket.offset*cpuBits DIV 8));
 			ELSE
 				op := Assembler.NewMem(SHORTINT(ticket.type.sizeInBits*ticket.type.length DIV 8),SP , (spillStack.Size()-ticket.offset)*cpuBits DIV 8);
@@ -789,7 +791,6 @@ TYPE
 			ELSIF ticket.spilled THEN
 				GetSpillOperand(ticket,op)
 			ELSE
-				IF ticket.register = none THEN physicalRegisters.Dump(D.Log); tickets.Dump(D.Log); virtualRegisters.Dump(D.Log); D.Update; END;
 				ASSERT(ticket.register # none);
 				IF (ticket.type.form = IntermediateCode.Float) & backend.forceFPU THEN
 					op := registerOperands[ticket.register+fpStackPointer]
@@ -3114,10 +3115,38 @@ TYPE
 		END EmitAsm;
 
 		PROCEDURE EmitAllocate(CONST instruction: IntermediateCode.Instruction);
-		VAR left: Assembler.Operand; ticket: Ticket;
+		VAR ticket: Ticket; reg: LONGINT; left: Assembler.Operand;
 		BEGIN
-			PrepareOp2(instruction,Low,left,ticket);
-			FinishOp(instruction.op1, Low, left, ticket);
+			(*UnSpill(ticket);
+			IF ticket.spilled THEN
+			END;*)
+			reg := physicalRegisters.NextFree(instruction.op1.type);
+			IF reg = none THEN
+				ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, instruction.op1.type, reg, TRUE, TRUE, TRUE, instruction.op2.offset, LastUse(instruction.op1.register));
+				virtualRegisters.SetMapped(instruction.op1.register, 0, ticket);
+				out.comments.String("r");
+				out.comments.Int(instruction.op1.register, 0);
+				out.comments.String(" is assigned to stack offset ");
+				out.comments.Int(instruction.op1.offset, 0);
+				out.comments.String(", spilled = ");
+				IF ticket.spilled THEN out.comments.String("TRUE"); ELSE out.comments.String("FALSE"); END;
+				out.comments.Ln;
+				(*tickets.Remove(ticket);*)
+				(*virtualRegisters.Dump(out.comments);
+				tickets.Dump(out.comments);
+				physicalRegisters.Dump(out.comments);*)
+			ELSE
+				ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, instruction.op1.type, reg, TRUE, TRUE, FALSE, instruction.op2.offset, LastUse(instruction.op1.register));
+				physicalRegisters.Allocate(reg, ticket);
+				virtualRegisters.SetMapped(instruction.op1.register, 0, ticket);
+				(*physicalRegisters.SetReserved(reg, TRUE);*)
+				(*PrepareOp2(instruction,Low,left,ticket);
+				FinishOp(instruction.op1, Low, left, NIL);*)
+				(*FinishOp(instruction.op2, Low, left, NIL);*)
+			END;
+			(*PrepareOp2(instruction,Low,left,ticket);
+			FinishOp(instruction.op1, Low, left, NIL);*)
+			(*FinishOp(instruction.op2, Low, left, NIL);*)
 		END EmitAllocate;
 	END CodeGeneratorAMD64;
 

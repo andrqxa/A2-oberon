@@ -216,7 +216,7 @@ TYPE
 						END;
 					END Use;
 				BEGIN
-					IF instruction.opcode = IntermediateCode.allocate THEN RETURN END;
+					(*IF instruction.opcode = IntermediateCode.allocate THEN RETURN END;*)
 					Use(instruction.op1);
 					Use(instruction.op2);
 					Use(instruction.op3);
@@ -607,7 +607,7 @@ TYPE
 		type-: IntermediateCode.Type;
 		class-: IntermediateCode.RegisterClass;
 		lastuse-: LONGINT;
-		spilled*, spillable*: BOOLEAN;
+		fixed*, spilled*, spillable*: BOOLEAN;
 		register*, offset*: LONGINT;
 		parts-: LONGINT;
 	END;
@@ -623,20 +623,21 @@ TYPE
 		END Init;
 
 		(* enter a new ticket into the list of live tickets, sorted by lastuse *)
-		PROCEDURE Enter*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; spillable, spilled: BOOLEAN; offset: LONGINT; lastuse: LONGINT): Ticket;
+		PROCEDURE Enter*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; fixed, spillable, spilled: BOOLEAN; offset: LONGINT; lastuse: LONGINT): Ticket;
 		VAR ticket,link: Ticket;
 		BEGIN
-			ASSERT(~spilled & (register # None) OR spilled & (offset # None));
-			ASSERT(spillable OR ~spilled);
+			ASSERT(~spilled & (register # None) OR spilled & (offset # None) OR fixed & (offset # None));
+			ASSERT(fixed OR spillable OR ~spilled);
 			IF free # NIL THEN ticket := free; free := free.next; ticket.next := NIL;
 			ELSE NEW(ticket)
 			END;
-			ticket.type := type;	ticket.class := class; ticket.register := register; ticket.spillable := spillable; ticket.spilled := spilled;	ticket.offset := offset; ticket.lastuse := lastuse; ticket.parts := 0;
+			ticket.type := type;	ticket.class := class; ticket.register := register; ticket.fixed := fixed; ticket.spillable := spillable; ticket.spilled := spilled;	ticket.offset := offset; ticket.lastuse := lastuse; ticket.parts := 0;
 			IF (live = NIL) OR (live.lastuse > ticket.lastuse) THEN
 				ticket.next := live; live := ticket
 			ELSE
 				link := live;
 				WHILE (link.next # NIL) & (link.next.lastuse < ticket.lastuse) DO
+					TRACE(link, link.next.lastuse, ticket.lastuse);
 					ASSERT((link.register # ticket.register) OR ticket.spilled);
 					link := link.next;
 				END;
@@ -723,6 +724,7 @@ TYPE
 			IF firstMapped > register THEN firstMapped := register END;
 
 			ASSERT((part >=0) & (part < parts));
+			TRACE(register, part, register * parts + part, tickets[register * parts + part]);
 			WHILE (register*parts >= LEN(tickets)) DO Grow END;
 			tickets[register*parts+part] := ticket;
 			INC(ticket.parts);
@@ -940,19 +942,22 @@ TYPE
 		PROCEDURE Spill*(ticket: Ticket);
 		VAR register,offset,size: LONGINT;
 		BEGIN
-			IF (ticket = NIL) OR ~ticket.spillable OR ticket.spilled THEN RETURN END;
+			IF (ticket = NIL) THEN RETURN END;
+			IF ~ticket.fixed & (~ticket.spillable OR ticket.spilled) THEN RETURN END;
 			register := ticket.register;
-			offset := spillStack.NextFree();
-			ticket.offset := offset;
-			size := spillStack.Size();
-			IF dump# NIL THEN dump.String("spillstack allocate (1) "); dump.Int(offset,1); dump.Ln; END;
-			spillStack.Allocate(offset,ticket);
-			size := spillStack.Size()-size;
-			ASSERT(size>=0);
-			IF size>0 THEN AllocateSpillStack(size) END;
+			IF ~ticket.fixed THEN
+				offset := spillStack.NextFree();
+				ticket.offset := offset;
+				size := spillStack.Size();
+				IF dump# NIL THEN dump.String("spillstack allocate (1) "); dump.Int(offset,1); dump.Ln; END;
+				spillStack.Allocate(offset,ticket);
+				size := spillStack.Size()-size;
+				ASSERT(size>=0);
+				IF size>0 THEN AllocateSpillStack(size) END;
+			END;
 
 			ToSpillStack(ticket);
-			ticket.offset := offset;
+			IF ~ticket.fixed THEN ticket.offset := offset; END;
 			physicalRegisters.Free(register);
 			ticket.spilled := TRUE;
 		END Spill;
@@ -966,7 +971,7 @@ TYPE
 				IF ticket1.spilled THEN ASSERT(~ticket2.spilled); RETURN ExchangeSpill(ticket2,ticket1) END;
 				IF (ticket1.type.sizeInBits # ticket2.type.sizeInBits)
 					OR ~(ticket1.type.form IN IntermediateCode.Integer) OR ~(ticket2.type.form IN IntermediateCode.Integer)
-					OR ticket1.spilled THEN
+					OR ticket1.spilled OR ticket1.fixed OR ticket2.fixed THEN
 					RETURN FALSE
 				END;
 
@@ -996,18 +1001,21 @@ TYPE
 					dump.String(" allocate register : index="); dump.Int(ticket.register,1); dump.Ln;
 				END;
 				ToRegister(ticket);
-				size := spillStack.Size();
-				spillStack.Free(ticket.offset);
+				IF ~ticket.fixed THEN
+					size := spillStack.Size();
+					spillStack.Free(ticket.offset);
+					ticket.offset := 0;
+					size := spillStack.Size()-size;
+					ASSERT(size<=0);
+					IF size<0 THEN AllocateSpillStack(size) END;
+				END;
 				ticket.spilled := FALSE;
-				ticket.offset := 0;
 				physicalRegisters.Allocate(register,ticket);
-				size := spillStack.Size()-size;
-				ASSERT(size<=0);
-				IF size<0 THEN AllocateSpillStack(size) END;
 			END SpillToRegister;
 
 		BEGIN
 			IF (ticket = NIL) OR ~ticket.spilled THEN RETURN END;
+			(*IF ticket.fixed THEN ticket.spilled := FALSE; ToRegister(ticket); RETURN END;*)
 
 			register := ticket.register;
 			IF register = None THEN
@@ -1039,6 +1047,11 @@ TYPE
 		VAR ticket,spill: Ticket;
 			PROCEDURE Spillable(ticket: Ticket; best:BOOLEAN): BOOLEAN;
 			BEGIN
+				TRACE(~ticket.spilled, ticket.spillable, (ticket.register # None),
+					((ticket.type.form = IntermediateCode.Float) = (type.form = IntermediateCode.Float)) (* don't spill float when int is needed *),
+					(~best OR (ticket.type.sizeInBits = type.sizeInBits)),
+					(~physicalRegisters.Reserved(ticket.register)));
+
 				RETURN
 					~ticket.spilled & ticket.spillable & (ticket.register # None) 
 					& ((ticket.type.form = IntermediateCode.Float) = (type.form = IntermediateCode.Float)) (* don't spill float when int is needed *)
@@ -1059,6 +1072,7 @@ TYPE
 					ticket := ticket.next
 				END;
 			END;
+			IF spill = NIL THEN tickets.Dump(out.comments); physicalRegisters.Dump(out.comments); out.comments.Update END;
 			ASSERT(spill # NIL);
 			RETURN spill
 		END GetPreferredSpill;
@@ -1078,7 +1092,7 @@ TYPE
 		PROCEDURE ReservePhysicalRegister*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; lastUse: LONGINT): Ticket;
 		VAR ticket: Ticket;
 		BEGIN
-			ticket := tickets.Enter(class, type,register,TRUE, FALSE,None,lastUse);
+			ticket := tickets.Enter(class, type,register,FALSE, TRUE, FALSE,None,lastUse);
 			IF dump # NIL THEN
 				dump.String(" allocate register : index="); dump.Int(register,1); dump.Ln;
 			END;
@@ -1109,7 +1123,7 @@ TYPE
 			BEGIN
 				index := physicalRegisters.NextFree(type);
 				IF index # None THEN
-					ticket := tickets.Enter(class,type,index,TRUE, FALSE,0,lastuse);
+					ticket := tickets.Enter(class,type,index, FALSE, TRUE, FALSE,0,lastuse);
 					IF dump # NIL THEN
 						dump.String(" allocate register : index="); dump.Int(index,1); dump.Ln;
 					END;
@@ -1117,7 +1131,7 @@ TYPE
 					physicalRegisters.SetReserved(index,TRUE);
 				ELSE (* spill new ticket rightaway, no phyiscal register assigned yet *)
 					offset := spillStack.NextFree();
-					ticket := tickets.Enter(class,type,index,TRUE, TRUE,offset,lastuse);
+					ticket := tickets.Enter(class,type,index,FALSE, TRUE, TRUE,offset,lastuse);
 					size := spillStack.Size();
 					ticket.offset := offset;
 					IF dump# NIL THEN dump.String("spillstack allocate (3) "); dump.Int(offset,1);dump.Ln; END;
@@ -1134,7 +1148,7 @@ TYPE
 			BEGIN
 				ticket :=  physicalRegisters.Mapped(index);
 				IF ticket # NIL THEN Spill(ticket) END;
-				ticket := tickets.Enter(class, type, index, TRUE, FALSE,0,lastuse);
+				ticket := tickets.Enter(class, type, index, FALSE, TRUE, FALSE,0,lastuse);
 				IF dump # NIL THEN
 					dump.String(" allocate register : index="); dump.Int(index,1); dump.Ln;
 				END;
@@ -1169,6 +1183,7 @@ TYPE
 		VAR size: LONGINT;
 		BEGIN
 			IF ticket.spilled THEN
+				IF ticket.fixed THEN RETURN END;
 				IF dump # NIL THEN
 					dump.String(" free spilled register : ofs="); dump.Int(ticket.offset,1); dump.Ln;
 				END;
@@ -1286,162 +1301,6 @@ TYPE
 				END;
 			END;
 		END ReserveOperandRegisters;
-
-		PROCEDURE AllocateRegisters*;
-		VAR
-			byFirstUse: POINTER TO ARRAY OF LONGINT; (** register numbers, sorted by increasing first use *)
-			liveByLastUse: POINTER TO ARRAY OF LONGINT; (** live registers, sorted by increasing last use *)
-			len: LONGINT; (** number of entries in byFirstUse *)
-			live: LONGINT; (** number of entries in liveByLastUse *)
-			i, j: LONGINT;
-
-			PROCEDURE SortLiveRanges;
-			VAR
-				i, j, k: LONGINT;
-			BEGIN
-				NEW(byFirstUse, LEN(allocation.table));
-				(* Improve sort algo *)
-				FOR i := 0 TO LEN(allocation.table) - 1 DO
-					IF allocation.table[i].first # MAX(LONGINT) THEN
-						j := 0;
-						WHILE (j < LEN(allocation.table) - 1) & (allocation.table[byFirstUse[j]].first < allocation.table[i].first) DO INC(j) END;
-						FOR k := len - 1 TO j DO byFirstUse[j + 1] := byFirstUse[j] END;
-						byFirstUse[j] := i;
-						INC(len)
-					END;
-				END;
-			END SortLiveRanges;
-
-			PROCEDURE ExpireOldIntervals(i: LONGINT);
-			VAR
-				j, k: LONGINT;
-			BEGIN
-				WHILE (j < live) DO
-					IF allocation.table[liveByLastUse[j]].last < allocation.table[i].first THEN
-						FOR k := j TO live - 2 DO liveByLastUse[k] := liveByLastUse[k + 1] END;
-						liveByLastUse[live - 1] := -1;
-						DEC(live);
-						TRACE(live);
-					ELSE
-						INC(j);
-					END;
-				END;
-			END ExpireOldIntervals;
-
-			PROCEDURE AddLiveInterval(i: LONGINT);
-			VAR
-				j, k: LONGINT;
-			BEGIN
-				WHILE (j < live) & (allocation.table[liveByLastUse[j]].last < allocation.table[i].last) DO INC(j) END;
-				FOR k := live - 1 TO j BY -1 DO liveByLastUse[k + 1] := liveByLastUse[k] END;
-				liveByLastUse[j] := i;
-				INC(live);
-			END AddLiveInterval;
-
-			PROCEDURE AllocateInterval(i: LONGINT);
-			VAR
-				ticket: Ticket;
-				spill: LONGINT;
-				reg: LONGINT;
-			BEGIN
-				IF live > 0 THEN spill := liveByLastUse[live - 1]; END;
-				reg := physicalRegisters.NextFree(GetTypeOf(i));
-				IF reg # None THEN
-					(* i <- reg *)
-					MapVirtualRegister(i, IntermediateCode.GeneralPurposeRegister, GetTypeOf(i), 0);
-					out.comments.String("allocating r");
-					out.comments.Int(i, 0);
-					out.comments.String(" to physical register ");
-					out.comments.Int(reg, 0);
-					out.comments.Ln;
-				ELSIF allocation.table[spill].last > allocation.table[i].last THEN
-					
-					out.comments.String("spilling r");
-					out.comments.Int(spill, 0);
-					virtualRegisters.SetMapped(i, 0, virtualRegisters.Mapped(spill, 0));
-					ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, GetTypeOf(spill), None, TRUE, TRUE, GetOffsetOf(spill), allocation.table[spill].last);
-					virtualRegisters.SetMapped(spill, 0, ticket);
-					(*
-						ticket[spill] -> ticket[i]
-						spill <- stack ticket
-					*)
-				ELSE
-					ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, GetTypeOf(i), None, TRUE, TRUE, GetOffsetOf(i), allocation.table[i].last);
-					virtualRegisters.SetMapped(i, 0, ticket);
-					out.comments.String("spilling r");
-					out.comments.Int(i, 0);
-					(*
-						i <- stack ticket
-					*)
-				END;
-				out.comments.Ln;
-			END AllocateInterval;
-
-			PROCEDURE GetTypeOf(i: LONGINT): IntermediateCode.Type;
-			VAR
-				pc: LONGINT;
-				instr: IntermediateCode.Instruction;
-			BEGIN
-				REPEAT
-					instr := in.instructions[pc];
-					INC(pc);
-				UNTIL (pc = in.pc) OR (instr.opcode = IntermediateCode.allocate) & (instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i);
-				ASSERT(pc < in.pc);
-				RETURN instr.op1.type;
-			END GetTypeOf;
-
-			PROCEDURE GetOffsetOf(i: LONGINT): LONGINT;
-			VAR
-				pc: LONGINT;
-				instr: IntermediateCode.Instruction;
-			BEGIN
-				REPEAT
-					instr := in.instructions[pc];
-					INC(pc);
-				UNTIL (pc = in.pc) OR (instr.opcode = IntermediateCode.allocate) & (instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i);
-				ASSERT(pc < in.pc);
-				RETURN instr.op2.offset;;
-			END GetOffsetOf;
-
-		BEGIN
-			SortLiveRanges;
-			IF out.comments # NIL THEN
-				out.comments.String("Registers sorted by first use: ");
-				FOR i := 0 TO len - 1 DO
-					IF i # 0 THEN out.comments.String(", ") END;
-					out.comments.Int(byFirstUse[i], 0);
-				END;
-				out.comments.Ln;
-			END;
-
-			NEW(liveByLastUse, len);
-			FOR i := 0 TO len - 1 DO liveByLastUse[i] := -1 END;
-			FOR i := 0 TO len - 1 DO
-				ExpireOldIntervals(byFirstUse[i]);
-				IF out.comments # NIL THEN
-					out.comments.String("Live registers at pc=");
-					out.comments.Int(allocation.table[byFirstUse[i]].first, 0);
-					out.comments.String(":");
-					FOR j := 0 TO len - 1 DO
-						IF liveByLastUse[j] >= 0 THEN
-							out.comments.String(" r");
-							out.comments.Int(liveByLastUse[j], 0);
-						END;
-					END;
-					out.comments.String(" (");
-					out.comments.Int(live, 0);
-					out.comments.String(")");
-					out.comments.Ln;
-				END;
-				AllocateInterval(byFirstUse[i]);
-				AddLiveInterval(byFirstUse[i]);
-			END;
-		END AllocateRegisters;
-
-		PROCEDURE Prepare *;
-		BEGIN
-			IF in.type = Sections.CodeSection THEN AllocateRegisters; END;
-		END Prepare;
 	END GeneratorWithTickets;
 
 	PROCEDURE Assert(cond: BOOLEAN; CONST reason: ARRAY OF CHAR);
