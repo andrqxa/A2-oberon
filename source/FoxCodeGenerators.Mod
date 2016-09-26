@@ -216,7 +216,7 @@ TYPE
 						END;
 					END Use;
 				BEGIN
-					(*IF instruction.opcode = IntermediateCode.allocate THEN RETURN END;*)
+					IF instruction.opcode = IntermediateCode.allocate THEN RETURN END;
 					Use(instruction.op1);
 					Use(instruction.op2);
 					Use(instruction.op3);
@@ -637,7 +637,7 @@ TYPE
 			ELSE
 				link := live;
 				WHILE (link.next # NIL) & (link.next.lastuse < ticket.lastuse) DO
-					TRACE(link, link.next.lastuse, ticket.lastuse);
+					TRACE(link, link.next.lastuse, ticket.lastuse, link.register, ticket.register, ticket.spilled, link.spilled);
 					ASSERT((link.register # ticket.register) OR ticket.spilled);
 					link := link.next;
 				END;
@@ -1015,7 +1015,7 @@ TYPE
 
 		BEGIN
 			IF (ticket = NIL) OR ~ticket.spilled THEN RETURN END;
-			(*IF ticket.fixed THEN ticket.spilled := FALSE; ToRegister(ticket); RETURN END;*)
+			IF ticket.fixed & (ticket.register # None) THEN ticket.spilled := FALSE; ToRegister(ticket); RETURN END;
 
 			register := ticket.register;
 			IF register = None THEN
@@ -1301,6 +1301,200 @@ TYPE
 				END;
 			END;
 		END ReserveOperandRegisters;
+
+		PROCEDURE AllocateRegisters*;
+		VAR
+			byFirstUse: POINTER TO ARRAY OF LONGINT; (** register numbers, sorted by increasing first use *)
+			liveByLastUse: POINTER TO ARRAY OF LONGINT; (** live registers, sorted by increasing last use *)
+			len: LONGINT; (** number of entries in byFirstUse *)
+			live: LONGINT; (** number of entries in liveByLastUse *)
+			i, j: LONGINT;
+
+			PROCEDURE SortLiveRanges;
+			VAR
+				i, j, k: LONGINT;
+			BEGIN
+				NEW(byFirstUse, LEN(allocation.table));
+				len := 0;
+				(* Improve sort algo *)
+				FOR i := 0 TO LEN(allocation.table) - 1 DO
+					IF allocation.table[i].first # MAX(LONGINT) THEN
+						j := 0;
+						WHILE (j < len) & (allocation.table[byFirstUse[j]].first <= allocation.table[i].first) DO INC(j) END;
+						FOR k := len - 1 TO j BY -1 DO byFirstUse[k + 1] := byFirstUse[k] END;
+						byFirstUse[j] := i;
+						INC(len);
+					END;
+				END;
+			END SortLiveRanges;
+
+			PROCEDURE ExpireOldIntervals(i: LONGINT);
+			VAR
+				j, k: LONGINT;
+			BEGIN
+				WHILE (j < live) DO
+					IF allocation.table[liveByLastUse[j]].last < allocation.table[i].first THEN
+						FOR k := j TO live - 2 DO liveByLastUse[k] := liveByLastUse[k + 1] END;
+						liveByLastUse[live - 1] := -1;
+						DEC(live);
+					ELSE
+						INC(j);
+					END;
+				END;
+			END ExpireOldIntervals;
+
+			PROCEDURE AddLiveInterval(i: LONGINT);
+			VAR
+				j, k: LONGINT;
+			BEGIN
+				WHILE (j < live) & (allocation.table[liveByLastUse[j]].last < allocation.table[i].last) DO INC(j) END;
+				FOR k := live - 1 TO j BY -1 DO liveByLastUse[k + 1] := liveByLastUse[k] END;
+				liveByLastUse[j] := i;
+				INC(live);
+			END AddLiveInterval;
+
+			PROCEDURE AllocateInterval(i: LONGINT): BOOLEAN;
+			VAR
+				ticket: Ticket;
+				spill: LONGINT;
+				reg: LONGINT;
+				k: LONGINT;
+
+				PROCEDURE GetTypeOf(i: LONGINT): IntermediateCode.Type;
+				VAR
+					pc: LONGINT;
+					instr: IntermediateCode.Instruction;
+				BEGIN
+					REPEAT
+						instr := in.instructions[pc];
+						INC(pc);
+					UNTIL (pc = in.pc) (*OR (instr.opcode = IntermediateCode.allocate)*) OR ((instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i)) OR ((instr.op2.mode = IntermediateCode.ModeRegister) & (instr.op2.register = i)) OR ((instr.op3.mode = IntermediateCode.ModeRegister) & (instr.op3.register = i));
+					ASSERT(pc < in.pc);
+					IF (instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i) THEN
+						RETURN instr.op1.type;
+					ELSIF (instr.op2.mode = IntermediateCode.ModeRegister) & (instr.op2.register = i) THEN
+						RETURN instr.op2.type;
+					ELSE
+						RETURN instr.op2.type;
+					END;
+				END GetTypeOf;
+
+				PROCEDURE GetOffsetOf(i: LONGINT): LONGINT;
+				VAR
+					pc: LONGINT;
+					instr: IntermediateCode.Instruction;
+					
+					offset, size: LONGINT;
+				BEGIN
+					REPEAT
+						instr := in.instructions[pc];
+						INC(pc);
+					UNTIL (pc = in.pc) OR (instr.opcode = IntermediateCode.allocate) & (instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i);
+					IF (pc < in.pc) THEN
+						RETURN instr.op2.offset;
+					END;
+					(*RETURN 0;*)
+
+					offset := spillStack.NextFree();
+					size := spillStack.Size();
+					ticket.offset := offset;
+					spillStack.Allocate(offset,ticket);
+					size := spillStack.Size()-size;
+					ASSERT(size>=0);
+					IF size>0 THEN AllocateSpillStack(size) END;
+					RETURN offset;
+				END GetOffsetOf;
+
+			BEGIN
+				IF live > 0 THEN spill := liveByLastUse[live - 1]; END;
+				reg := physicalRegisters.NextFree(GetTypeOf(i));
+				IF reg # None THEN
+					(* i <- reg *)
+					MapVirtualRegister(i, IntermediateCode.GeneralPurposeRegister, GetTypeOf(i), 0);
+					out.comments.String("allocating r");
+					out.comments.Int(i, 0);
+					out.comments.String(" to physical register ");
+					out.comments.Int(reg, 0);
+					out.comments.Ln;
+					RETURN TRUE;
+				ELSIF allocation.table[spill].last > allocation.table[i].last THEN
+					
+					virtualRegisters.SetMapped(i, 0, virtualRegisters.Mapped(spill, 0));
+					ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, GetTypeOf(spill), None, TRUE, TRUE, TRUE, 0(*GetOffsetOf(spill)*), allocation.table[spill].last);
+					ticket.offset := GetOffsetOf(spill);
+					(*IF ticket.offset # 0 THEN*)
+						virtualRegisters.SetMapped(spill, 0, ticket);
+
+						out.comments.String("spilling r");
+						out.comments.Int(spill, 0);
+						out.comments.String(" at offset ");
+						out.comments.Int(ticket.offset, 0);
+						out.comments.Ln;
+					(*END;*)
+					DEC(live);
+					RETURN TRUE;
+					(*
+						ticket[spill] -> ticket[i]
+						spill <- stack ticket
+					*)
+				ELSE
+					ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, GetTypeOf(i), None, TRUE, TRUE, TRUE, 0, allocation.table[i].last);
+					ticket.offset := GetOffsetOf(i);
+					(*IF ticket.offset # 0 THEN*)
+						virtualRegisters.SetMapped(i, 0, ticket);
+						out.comments.String("spilling r");
+						out.comments.Int(i, 0);
+						out.comments.String(" at offset ");
+						out.comments.Int(ticket.offset, 0);
+						out.comments.Ln;
+					(*END;*)
+					RETURN FALSE;
+					(*
+						i <- stack ticket
+					*)
+				END;
+			END AllocateInterval;
+
+		BEGIN
+			SortLiveRanges;
+			IF out.comments # NIL THEN
+				out.comments.String("Registers sorted by first use: r");
+				FOR i := 0 TO len - 1 DO
+					IF i # 0 THEN out.comments.String(", r") END;
+					out.comments.Int(byFirstUse[i], 0);
+				END;
+				out.comments.Ln;
+			END;
+
+			NEW(liveByLastUse, len);
+			FOR i := 0 TO len - 1 DO liveByLastUse[i] := -1 END;
+			FOR i := 0 TO len - 1 DO
+				ExpireOldIntervals(byFirstUse[i]);
+				IF out.comments # NIL THEN
+					out.comments.String("Live registers at pc=");
+					out.comments.Int(allocation.table[byFirstUse[i]].first, 0);
+					out.comments.String(":");
+					FOR j := 0 TO len - 1 DO
+						IF liveByLastUse[j] >= 0 THEN
+							out.comments.String(" r");
+							out.comments.Int(liveByLastUse[j], 0);
+						END;
+					END;
+					out.comments.String(" (");
+					out.comments.Int(live, 0);
+					out.comments.String(")");
+					out.comments.Ln;
+				END;
+				IF AllocateInterval(byFirstUse[i]) THEN
+					AddLiveInterval(byFirstUse[i]);
+				END;
+			END;
+		END AllocateRegisters;
+
+		PROCEDURE Prepare *;
+		BEGIN
+			IF in.type = Sections.CodeSection THEN AllocateRegisters; END;
+		END Prepare;
 	END GeneratorWithTickets;
 
 	PROCEDURE Assert(cond: BOOLEAN; CONST reason: ARRAY OF CHAR);

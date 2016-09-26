@@ -1320,7 +1320,7 @@ TYPE
 		isUnchecked: BOOLEAN;
 		optimize: BOOLEAN; (* do we need to prepare code for SSA? *)
 		destReg: LONGINT;
-	
+
 		
 		PROCEDURE & Init(system: Global.System; checker: SemanticChecker.Checker; supportedInstructionProcedure: SupportedInstructionProcedure; supportedImmediateProcedure: SupportedImmediateProcedure; emitLabels: BOOLEAN; CONST runtime: SyntaxTree.IdentifierString; backend: IntermediateBackend;
 			newObjectFile, optimize: BOOLEAN);

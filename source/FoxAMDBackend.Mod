@@ -5,7 +5,7 @@ IMPORT
 	IntermediateCode := FoxIntermediateCode, IntermediateBackend := FoxIntermediateBackend, BinaryCode := FoxBinaryCode,
 	InstructionSet := FoxAMD64InstructionSet, Assembler := FoxAMD64Assembler, SemanticChecker := FoxSemanticChecker, Formats := FoxFormats,
 	Diagnostics, Streams, Options, Strings, ObjectFileFormat := FoxBinaryObjectFile, 
-	Machine, D := Debugging, CodeGenerators := FoxCodeGenerators, ObjectFile;
+	Machine, D := Debugging, CodeGenerators := FoxCodeGenerators, ObjectFile, SYSTEM;
 
 CONST
 
@@ -3115,7 +3115,7 @@ TYPE
 		END EmitAsm;
 
 		PROCEDURE EmitAllocate(CONST instruction: IntermediateCode.Instruction);
-		VAR ticket: Ticket; reg: LONGINT; left: Assembler.Operand;
+		VAR ticket: Ticket; reg: LONGINT; left, right: Assembler.Operand;
 		BEGIN
 			(*UnSpill(ticket);
 			IF ticket.spilled THEN
@@ -3136,9 +3136,15 @@ TYPE
 				tickets.Dump(out.comments);
 				physicalRegisters.Dump(out.comments);*)
 			ELSE
-				ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, instruction.op1.type, reg, TRUE, TRUE, FALSE, instruction.op2.offset, LastUse(instruction.op1.register));
+				ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, instruction.op1.type, reg, TRUE, TRUE, TRUE, instruction.op2.offset, LastUse(instruction.op1.register));
 				physicalRegisters.Allocate(reg, ticket);
 				virtualRegisters.SetMapped(instruction.op1.register, 0, ticket);
+
+				UnSpill(ticket);
+				(*right := TicketToOperand(ticket);
+				ticket.spilled := FALSE;
+				left := TicketToOperand(ticket);
+				Move(left, right, instruction.op1.type);*)
 				(*physicalRegisters.SetReserved(reg, TRUE);*)
 				(*PrepareOp2(instruction,Low,left,ticket);
 				FinishOp(instruction.op1, Low, left, NIL);*)
