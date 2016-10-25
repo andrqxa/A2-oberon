@@ -785,12 +785,28 @@ TYPE
 		END GetSpillOperand;
 
 		PROCEDURE TicketToOperand(ticket: Ticket; VAR op: Assembler.Operand);
+		(*!DBG*)VAR i: LONGINT;
 		BEGIN
 			IF (ticket = NIL) THEN
 				Assembler.InitOperand(op)
 			ELSIF ticket.spilled THEN
 				GetSpillOperand(ticket,op)
 			ELSE
+				IF (ticket.register = none) & (out.comments # NIL) THEN
+					out.comments.String("Found not assigned ticket for r");
+					WHILE (virtualRegisters.Mapped(i, 0) # ticket) DO INC(i) END;
+					out.comments.Int(i, 0);
+					out.comments.Ln;
+					out.comments.String("Ticket is ");
+					IF ~ticket.spilled THEN
+						out.comments.String("not ");
+					END;
+					out.comments.String("spilled");
+					out.comments.Ln;
+					tickets.Dump(out.comments);
+					virtualRegisters.Dump(out.comments);
+					out.comments.Update
+				END;
 				ASSERT(ticket.register # none);
 				IF (ticket.type.form = IntermediateCode.Float) & backend.forceFPU THEN
 					op := registerOperands[ticket.register+fpStackPointer]
@@ -1009,6 +1025,11 @@ TYPE
 		PROCEDURE MakeOperand(CONST vop: IntermediateCode.Operand; part: LONGINT; VAR op: Assembler.Operand; ticket: Ticket);
 		VAR tmp: Assembler.Operand;
 		BEGIN
+			(*!DBG*)IF vop.register = 4 THEN
+				virtualRegisters.Dump(out.comments);
+				out.comments.Update;
+			END;
+
 			TryAllocate(vop,part);
 			CASE vop.mode OF
 				IntermediateCode.ModeMemory: GetMemory(vop,part,op);
@@ -1099,10 +1120,12 @@ TYPE
 				ticket := ReservePhysicalRegister(instruction.op1.type,hwreg,lastUse);
 			END;
 			*)
+			EnterLiveTickets;
 			ReserveOperandRegisters(instruction.op1,TRUE); ReserveOperandRegisters(instruction.op2,TRUE);ReserveOperandRegisters(instruction.op3,TRUE);
 			(*TryAllocate(instruction.op1,Low);
 			IF IsComplex(instruction.op1) THEN TryAllocate(instruction.op1,High) END;
 			*)
+			(*!DBG*)IF out.comments # NIL THEN physicalRegisters.Dump(out.comments) END;
 			opcode := instruction.opcode;
 			CASE opcode OF
 			IntermediateCode.nop: (* do nothing *)
@@ -1245,7 +1268,7 @@ TYPE
 			END;
 
 			ReserveOperandRegisters(instruction.op3,FALSE); ReserveOperandRegisters(instruction.op2,FALSE); ReserveOperandRegisters(instruction.op1,FALSE);
-
+			RemoveDeadTickets;
 		END Generate;
 
 		PROCEDURE PostGenerate(CONST instruction: IntermediateCode.Instruction);
@@ -3120,7 +3143,7 @@ TYPE
 			(*UnSpill(ticket);
 			IF ticket.spilled THEN
 			END;*)
-			reg := physicalRegisters.NextFree(instruction.op1.type);
+			(*reg := physicalRegisters.NextFree(instruction.op1.type);
 			IF reg = none THEN
 				ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, instruction.op1.type, reg, TRUE, TRUE, TRUE, instruction.op2.offset, LastUse(instruction.op1.register));
 				virtualRegisters.SetMapped(instruction.op1.register, 0, ticket);
@@ -3149,7 +3172,7 @@ TYPE
 				(*PrepareOp2(instruction,Low,left,ticket);
 				FinishOp(instruction.op1, Low, left, NIL);*)
 				(*FinishOp(instruction.op2, Low, left, NIL);*)
-			END;
+			END;*)
 			(*PrepareOp2(instruction,Low,left,ticket);
 			FinishOp(instruction.op1, Low, left, NIL);*)
 			(*FinishOp(instruction.op2, Low, left, NIL);*)

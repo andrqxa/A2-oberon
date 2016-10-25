@@ -489,9 +489,11 @@ TYPE
 					|IntermediateCode.label: EmitLabel(instruction);
 				ELSE
 					IF Supported(instruction, moduleName, procedureName) THEN
+						PreGenerate(pc, instruction);
 						Generate(instruction);
 						PostGenerate(instruction);
 					ELSE
+						PreGenerate(pc, instruction);
 						Emulate(instruction, moduleName, procedureName);
 						PostGenerate(instruction);
 					END
@@ -525,6 +527,10 @@ TYPE
 		PROCEDURE Generate*(VAR instr: IntermediateCode.Instruction);
 		BEGIN (*HALT(100); *) (* abstract *)
 		END Generate;
+
+		PROCEDURE PreGenerate*(pc: LONGINT; CONST instr: IntermediateCode.Instruction);
+		BEGIN
+		END PreGenerate;
 
 		PROCEDURE PostGenerate*(CONST instr: IntermediateCode.Instruction);
 		BEGIN
@@ -647,6 +653,40 @@ TYPE
 			END;
 			RETURN ticket
 		END Enter;
+
+		PROCEDURE EnterTicket*(ticket: Ticket);
+		VAR
+			link: Ticket;
+		BEGIN
+			IF (live = NIL) OR (live.lastuse > ticket.lastuse) THEN
+				ticket.next := live; live := ticket
+			ELSE
+				link := live;
+				WHILE (link.next # NIL) & (link.next.lastuse < ticket.lastuse) DO
+					ASSERT((link.register # ticket.register) OR ticket.spilled);
+					link := link.next;
+				END;
+				IF (link.register=ticket.register) & (~ticket.spilled & ~link.spilled) THEN Dump(D.Log); D.Update; END;
+				ASSERT((link.register # ticket.register) OR ticket.spilled OR link.spilled);
+				ticket.next := link.next; link.next := ticket;
+			END;
+		END EnterTicket;
+
+		PROCEDURE RemoveTicket*(ticket: Ticket);
+		VAR
+			link: Ticket;
+		BEGIN
+			IF live=ticket THEN
+				live := live.next;
+			ELSE
+				link := live;
+				WHILE (link.next # NIL) & (link.next # ticket) DO
+					link := link.next
+				END;
+				ASSERT(link.next=ticket);
+				link.next := ticket.next;
+			END;
+		END RemoveTicket;
 
 		(* remove ticket from live list *)
 		PROCEDURE Remove*(ticket: Ticket);
@@ -1015,7 +1055,12 @@ TYPE
 
 		BEGIN
 			IF (ticket = NIL) OR ~ticket.spilled THEN RETURN END;
-			IF ticket.fixed & (ticket.register # None) THEN ticket.spilled := FALSE; ToRegister(ticket); RETURN END;
+			IF ticket.fixed & (ticket.register # None) THEN
+				ticket.spilled := FALSE;
+				physicalRegisters.Allocate(ticket.register, ticket);
+				ToRegister(ticket);
+				RETURN
+			END;
 
 			register := ticket.register;
 			IF register = None THEN
@@ -1045,13 +1090,9 @@ TYPE
 
 		PROCEDURE GetPreferredSpill*(CONST type: IntermediateCode.Type): Ticket;
 		VAR ticket,spill: Ticket;
+
 			PROCEDURE Spillable(ticket: Ticket; best:BOOLEAN): BOOLEAN;
 			BEGIN
-				TRACE(~ticket.spilled, ticket.spillable, (ticket.register # None),
-					((ticket.type.form = IntermediateCode.Float) = (type.form = IntermediateCode.Float)) (* don't spill float when int is needed *),
-					(~best OR (ticket.type.sizeInBits = type.sizeInBits)),
-					(~physicalRegisters.Reserved(ticket.register)));
-
 				RETURN
 					~ticket.spilled & ticket.spillable & (ticket.register # None) 
 					& ((ticket.type.form = IntermediateCode.Float) = (type.form = IntermediateCode.Float)) (* don't spill float when int is needed *)
@@ -1072,8 +1113,8 @@ TYPE
 					ticket := ticket.next
 				END;
 			END;
-			IF spill = NIL THEN tickets.Dump(out.comments); physicalRegisters.Dump(out.comments); out.comments.Update END;
 			ASSERT(spill # NIL);
+			ASSERT(~physicalRegisters.Reserved(spill.register));
 			RETURN spill
 		END GetPreferredSpill;
 
@@ -1239,6 +1280,11 @@ TYPE
 					MapVirtualRegister(operand.register,operand.registerClass, operand.type,part);
 				END;
 				ASSERT(virtualRegisters.Mapped(operand.register,part)#NIL);
+			(*ELSIF FirstUse(operand.register) = inPC THEN
+				tickets.EnterTicket(virtualRegisters.Mapped(operand.register, part));
+				IF ~virtualRegisters.Mapped(operand.register, part).spilled & (physicalRegisters.Mapped(virtualRegisters.Mapped(operand.register, part).register) # virtualRegisters.Mapped(operand.register, part)) THEN
+					physicalRegisters.Allocate(virtualRegisters.Mapped(operand.register, part).register, virtualRegisters.Mapped(operand.register, part));
+				END;*)
 			END;
 		END TryAllocate;
 
@@ -1302,6 +1348,38 @@ TYPE
 			END;
 		END ReserveOperandRegisters;
 
+		PROCEDURE EnterLiveTickets*;
+		VAR
+			virtual: LONGINT;
+			ticket: Ticket;
+		BEGIN
+			FOR virtual := virtualRegisters.firstMapped TO virtualRegisters.lastMapped DO
+				IF FirstUse(virtual) = in.pc THEN
+					ticket := virtualRegisters.Mapped(virtual, 0);
+					tickets.EnterTicket(ticket);
+					IF ~ticket.spilled THEN
+						physicalRegisters.Allocate(ticket.register, ticket);
+					END;
+				END;
+			END;
+		END EnterLiveTickets;
+
+		PROCEDURE RemoveDeadTickets*;
+		VAR
+			virtual: LONGINT;
+			ticket: Ticket;
+		BEGIN
+			FOR virtual := virtualRegisters.firstMapped TO virtualRegisters.lastMapped DO
+				IF LastUse(virtual) = in.pc THEN
+					ticket := virtualRegisters.Mapped(virtual, 0);
+					tickets.Remove(ticket);
+					IF ~ticket.spilled THEN
+						physicalRegisters.Free(ticket.register);
+					END;
+				END;
+			END;
+		END RemoveDeadTickets;
+
 		PROCEDURE AllocateRegisters*;
 		VAR
 			byFirstUse: POINTER TO ARRAY OF LONGINT; (** register numbers, sorted by increasing first use *)
@@ -1330,10 +1408,32 @@ TYPE
 
 			PROCEDURE ExpireOldIntervals(i: LONGINT);
 			VAR
+				ticket: Ticket;
 				j, k: LONGINT;
 			BEGIN
 				WHILE (j < live) DO
 					IF allocation.table[liveByLastUse[j]].last < allocation.table[i].first THEN
+						(*IF out.comments # NIL THEN
+							out.comments.String("Removing r"); out.comments.Int(liveByLastUse[j], 0);
+						END;*)
+						ticket := virtualRegisters.Mapped(liveByLastUse[j], 0);
+						IF ticket # NIL THEN
+							(*tickets.RemoveTicket(ticket);*)
+							IF ticket.spilled & ~ticket.fixed THEN
+								spillStack.Free(ticket.offset);
+								(*IF out.comments  # NIL THEN
+									out.comments.String("freeing stack offset ");
+									out.comments.Int(ticket.offset, 0);
+								END;*)
+							ELSIF ~ticket.spilled THEN
+								physicalRegisters.Free(ticket.register);
+								(*IF out.comments # NIL THEN
+									out.comments.String(" freeing physical register ");
+									out.comments.Int(ticket.register, 0);
+								END;*)
+							END;
+						END;
+						(*IF out.comments # NIL THEN out.comments.Ln END;*)
 						FOR k := j TO live - 2 DO liveByLastUse[k] := liveByLastUse[k + 1] END;
 						liveByLastUse[live - 1] := -1;
 						DEC(live);
@@ -1395,6 +1495,7 @@ TYPE
 					END;
 					(*RETURN 0;*)
 
+					ticket.fixed := FALSE;
 					offset := spillStack.NextFree();
 					size := spillStack.Size();
 					ticket.offset := offset;
@@ -1410,28 +1511,36 @@ TYPE
 				reg := physicalRegisters.NextFree(GetTypeOf(i));
 				IF reg # None THEN
 					(* i <- reg *)
-					MapVirtualRegister(i, IntermediateCode.GeneralPurposeRegister, GetTypeOf(i), 0);
-					out.comments.String("allocating r");
+					(*ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, GetTypeOf(i), reg, TRUE, TRUE, FALSE, 0, allocation.table[i].last);*)
+					NEW(ticket);
+					ticket.type := GetTypeOf(i); ticket.class := IntermediateCode.GeneralPurposeRegister; ticket.register := reg; ticket.fixed := TRUE; ticket.spillable := TRUE; ticket.spilled := FALSE; ticket.lastuse := allocation.table[i].last; ticket.parts := 1;
+					physicalRegisters.Allocate(reg, ticket);
+					virtualRegisters.SetMapped(i, 0, ticket);
+
+					(*out.comments.String("allocating r");
 					out.comments.Int(i, 0);
 					out.comments.String(" to physical register ");
 					out.comments.Int(reg, 0);
-					out.comments.Ln;
+					out.comments.Ln;*)
 					RETURN TRUE;
 				ELSIF allocation.table[spill].last > allocation.table[i].last THEN
-					
-					virtualRegisters.SetMapped(i, 0, virtualRegisters.Mapped(spill, 0));
+					ticket := virtualRegisters.Mapped(spill, 0);
+					virtualRegisters.Unmap(spill);
+					virtualRegisters.SetMapped(i, 0, ticket);
 					ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, GetTypeOf(spill), None, TRUE, TRUE, TRUE, 0(*GetOffsetOf(spill)*), allocation.table[spill].last);
 					ticket.offset := GetOffsetOf(spill);
 					(*IF ticket.offset # 0 THEN*)
-						virtualRegisters.SetMapped(spill, 0, ticket);
+					virtualRegisters.SetMapped(spill, 0, ticket);
+					tickets.RemoveTicket(ticket);
 
-						out.comments.String("spilling r");
-						out.comments.Int(spill, 0);
-						out.comments.String(" at offset ");
-						out.comments.Int(ticket.offset, 0);
-						out.comments.Ln;
+					(*out.comments.String("spilling r");
+					out.comments.Int(spill, 0);
+					out.comments.String(" at offset ");
+					out.comments.Int(ticket.offset, 0);
+					IF ticket.fixed THEN out.comments.String(" (fixed)"); END;
+					out.comments.Ln;*)
+					(*DEC(live);*)
 					(*END;*)
-					DEC(live);
 					RETURN TRUE;
 					(*
 						ticket[spill] -> ticket[i]
@@ -1441,12 +1550,15 @@ TYPE
 					ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, GetTypeOf(i), None, TRUE, TRUE, TRUE, 0, allocation.table[i].last);
 					ticket.offset := GetOffsetOf(i);
 					(*IF ticket.offset # 0 THEN*)
-						virtualRegisters.SetMapped(i, 0, ticket);
-						out.comments.String("spilling r");
-						out.comments.Int(i, 0);
-						out.comments.String(" at offset ");
-						out.comments.Int(ticket.offset, 0);
-						out.comments.Ln;
+					virtualRegisters.SetMapped(i, 0, ticket);
+					tickets.RemoveTicket(ticket);
+
+					(*out.comments.String("spilling r");
+					out.comments.Int(i, 0);
+					out.comments.String(" at offset ");
+					out.comments.Int(ticket.offset, 0);
+					IF ticket.fixed THEN out.comments.String(" (fixed)"); END;
+					out.comments.Ln;*)
 					(*END;*)
 					RETURN FALSE;
 					(*
@@ -1457,20 +1569,20 @@ TYPE
 
 		BEGIN
 			SortLiveRanges;
-			IF out.comments # NIL THEN
+			(*IF out.comments # NIL THEN
 				out.comments.String("Registers sorted by first use: r");
 				FOR i := 0 TO len - 1 DO
 					IF i # 0 THEN out.comments.String(", r") END;
 					out.comments.Int(byFirstUse[i], 0);
 				END;
 				out.comments.Ln;
-			END;
+			END;*)
 
 			NEW(liveByLastUse, len);
 			FOR i := 0 TO len - 1 DO liveByLastUse[i] := -1 END;
 			FOR i := 0 TO len - 1 DO
 				ExpireOldIntervals(byFirstUse[i]);
-				IF out.comments # NIL THEN
+				(*IF out.comments # NIL THEN
 					out.comments.String("Live registers at pc=");
 					out.comments.Int(allocation.table[byFirstUse[i]].first, 0);
 					out.comments.String(":");
@@ -1484,17 +1596,61 @@ TYPE
 					out.comments.Int(live, 0);
 					out.comments.String(")");
 					out.comments.Ln;
-				END;
+				END;*)
 				IF AllocateInterval(byFirstUse[i]) THEN
 					AddLiveInterval(byFirstUse[i]);
 				END;
 			END;
+			ExpireOldIntervals(0);
+			IF out.comments # NIL THEN virtualRegisters.Dump(out.comments); END;
 		END AllocateRegisters;
 
 		PROCEDURE Prepare *;
 		BEGIN
 			IF in.type = Sections.CodeSection THEN AllocateRegisters; END;
 		END Prepare;
+
+		PROCEDURE PreGenerate*(pc: LONGINT; CONST instr: IntermediateCode.Instruction);
+		VAR
+			ticket: Ticket;
+		BEGIN
+			IF (instr.op1.mode = IntermediateCode.ModeRegister) THEN
+				ticket := virtualRegisters.Mapped(instr.op1.register, 0);
+				IF ticket # NIL THEN
+					IF (FirstUse(instr.op1.register) = pc) THEN
+						tickets.EnterTicket(ticket);
+						IF (*ticket.register # None*) ~ticket.spilled THEN physicalRegisters.Allocate(ticket.register, ticket); END;
+					ELSIF (LastUse(instr.op1.register) = pc - 1) THEN
+						tickets.Remove(ticket);
+						IF (*ticket.register # None*) ~ticket.spilled THEN physicalRegisters.Free(ticket.register); END;
+					END;
+				END;
+			END;
+			IF (instr.op2.mode = IntermediateCode.ModeRegister) THEN
+				ticket := virtualRegisters.Mapped(instr.op2.register, 0);
+				IF ticket # NIL THEN
+					IF (FirstUse(instr.op2.register) = pc) THEN
+						tickets.EnterTicket(ticket);
+						IF (*ticket.register # None*) ~ticket.spilled THEN physicalRegisters.Allocate(ticket.register, ticket); END;
+					ELSIF (LastUse(instr.op2.register) = pc - 1) THEN
+						tickets.Remove(ticket);
+						IF (*ticket.register # None*) ~ticket.spilled THEN physicalRegisters.Free(ticket.register); END;
+					END;
+				END;
+			END;
+			IF (instr.op3.mode = IntermediateCode.ModeRegister) THEN
+				ticket := virtualRegisters.Mapped(instr.op3.register, 0);
+				IF ticket # NIL THEN
+					IF (FirstUse(instr.op3.register) = pc) THEN
+						tickets.EnterTicket(ticket);
+						IF (*ticket.register # None*) ~ticket.spilled THEN physicalRegisters.Allocate(ticket.register, ticket); END;
+					ELSIF (LastUse(instr.op3.register) = pc - 1) THEN
+						tickets.Remove(ticket);
+						IF (*ticket.register # None*) ~ticket.spilled THEN physicalRegisters.Free(ticket.register); END;
+					END;
+				END;
+			END;
+		END PreGenerate;
 	END GeneratorWithTickets;
 
 	PROCEDURE Assert(cond: BOOLEAN; CONST reason: ARRAY OF CHAR);

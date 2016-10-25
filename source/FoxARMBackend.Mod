@@ -715,6 +715,38 @@ TYPE
 			IF Trace THEN D.Ln; D.String(" runtime procedure name: "); D.String(resultingName); D.Ln; D.Update END
 		END GetRuntimeProcedureName;
 
+		PROCEDURE ToSpillStack*(ticket: Ticket);
+		VAR
+			op: InstructionSet.Operand;
+		BEGIN
+			IF out.comments # NIL THEN
+				out.comments.String("ToSpillStack: R");
+				out.comments.Int(ticket.register, 0);
+				out.comments.String(" -> ofs. ");
+				out.comments.Int(ticket.offset, 0);
+				out.comments.Ln;
+				out.comments.Update;
+			END;
+			op := GetSpillOperand(ticket);
+			Store(InstructionSet.NewRegister(ticket.register, InstructionSet.None, InstructionSet.None, InstructionSet.None), op, ticket.type);
+		END ToSpillStack;
+
+		PROCEDURE ToRegister*(ticket: Ticket);
+		VAR
+			op: Operand;
+		BEGIN
+			IF out.comments # NIL THEN
+				out.comments.String("ToRegister: ofs. ");
+				out.comments.Int(ticket.offset, 0);
+				out.comments.String(" -> R");
+				out.comments.Int(ticket.register, 0);
+				out.comments.Ln;
+				out.comments.Update;
+			END;
+			op := GetSpillOperand(ticket);
+			Load(InstructionSet.NewRegister(ticket.register, None, None, 0), op, ticket.type);
+		END ToRegister;
+
 		(* check whether the instruction modifies the stack pointer (outside of a stack allocation )*)
 		PROCEDURE CheckStackPointer(CONST destination: Operand);
 		BEGIN
@@ -1041,14 +1073,24 @@ TYPE
 		PROCEDURE GetSpillOperand(ticket: Ticket): Operand;
 		VAR
 			offset: LONGINT;
+			flags: SET;
 			result: Operand;
 		BEGIN
-			ASSERT(ticket.spilled);
+			(*ASSERT(ticket.spilled);*)
+			TRACE(ticket, ticket.fixed, ticket.offset);
+			IF ~ticket.fixed THEN
+				offset := spillStackStart + ticket.offset + 1; (* TODO: check this *)
+				INCL(flags, InstructionSet.Decrement);
+				ASSERT((0 <= offset) & (offset < InstructionSet.Bits12));
+			ELSIF ticket.offset < 0 THEN
+				offset := -ticket.offset;
+				INCL(flags, InstructionSet.Decrement);
+			ELSE
+				offset := ticket.offset;
+				INCL(flags, InstructionSet.Increment);
+			END;
 
-			offset := spillStackStart + ticket.offset + 1; (* TODO: check this *)
-			ASSERT((0 <= offset) & (offset < InstructionSet.Bits12));
-
-			result := InstructionSet.NewImmediateOffsetMemory(PhysicalRegisterNumber(IntermediateCode.FP, Low), offset, {InstructionSet.Decrement});
+			result := InstructionSet.NewImmediateOffsetMemory(PhysicalRegisterNumber(IntermediateCode.FP, Low), offset, flags);
 
 			ASSERT(result.mode = InstructionSet.modeMemory);
 			RETURN result
@@ -1144,11 +1186,30 @@ TYPE
 		PROCEDURE RegisterFromIrRegister(CONST irRegisterOperand: IntermediateCode.Operand; part: LONGINT; registerHint: Operand): Operand;
 		VAR
 			result: Operand;
+			ticket: CodeGenerators.Ticket;
+			type: IntermediateCode.Type;
 		BEGIN
 			ASSERT(irRegisterOperand.mode = IntermediateCode.ModeRegister);
 
-			result := InstructionSet.NewRegister(PhysicalRegisterNumber(irRegisterOperand.register, part), None, None, 0);
-			result := RegisterAfterAppliedOffset(result, irRegisterOperand.offset, registerHint);
+			ticket := virtualRegisters.Mapped(irRegisterOperand.register, part);
+			IF (ticket = NIL) OR ~ticket.spilled THEN
+				result := InstructionSet.NewRegister(PhysicalRegisterNumber(irRegisterOperand.register, part), None, None, 0);
+				result := RegisterAfterAppliedOffset(result, irRegisterOperand.offset, registerHint);
+			ELSIF ticket.fixed  THEN
+				physicalRegisters.Dump(out.comments);
+				tickets.Dump(out.comments);
+				UnSpill(ticket);
+				result := InstructionSet.NewRegister(PhysicalRegisterNumber(irRegisterOperand.register, part), None, None, 0);
+			ELSE
+				result := GetFreeRegister(type);
+				IF result.register = None THEN
+					GetPartType(ticket.type, part, type);
+					ticket := GetPreferredSpill(type);
+					ASSERT(~physicalRegisters.Reserved(ticket.register));
+					Spill(ticket);
+					result := GetFreeRegister(type);
+				END;
+			END;
 
 			ASSERT(result.mode = InstructionSet.modeRegister);
 			RETURN result
@@ -1543,6 +1604,7 @@ TYPE
 			| IntermediateCode.fill: EmitFill(irInstruction, FALSE)
 			| IntermediateCode.asm: EmitAsm(irInstruction)
 			| IntermediateCode.special: EmitSpecial(irInstruction)
+			| IntermediateCode.allocate: EmitAllocate(irInstruction)
 			END;
 
 			ReserveOperandRegisters(irInstruction.op3, FALSE);
@@ -1767,6 +1829,7 @@ TYPE
 						HALT(200)
 					ELSE
 						(* mov int, int: *)
+						TRACE(a.mode, a.register, b.mode, b.register);
 						Emit2(opMOV, a, b)
 					END
 				END
@@ -1780,12 +1843,24 @@ TYPE
 		PROCEDURE AcquireDestinationRegister(CONST irDestinationOperand: IntermediateCode.Operand; part: LONGINT; registerHint: Operand): Operand;
 		VAR
 			result: Operand;
+			ticket: CodeGenerators.Ticket;
 		BEGIN
 			IF irDestinationOperand.mode = IntermediateCode.ModeMemory THEN
 				result := GetFreeRegisterOrHint(PartType(irDestinationOperand.type, part), registerHint)
 			ELSIF irDestinationOperand.mode = IntermediateCode.ModeRegister THEN
-				ASSERT(irDestinationOperand.offset = 0);
-				IF virtualRegisters.Mapped(irDestinationOperand.register, part) = NIL THEN TryAllocate(irDestinationOperand, part) END; (* create the mapping if not yet done *)
+				(*ASSERT(irDestinationOperand.offset = 0);*)
+				IF virtualRegisters.Mapped(irDestinationOperand.register, part) = NIL THEN TryAllocate(irDestinationOperand, part)
+				(*ELSIF virtualRegisters.Mapped(irDestinationOperand.register, part).fixed & (virtualRegisters.Mapped(irDestinationOperand.register, part).spilled) THEN*)
+				ELSIF virtualRegisters.Mapped(irDestinationOperand.register, part).spilled THEN
+					result := GetFreeRegister(PartType(irDestinationOperand.type, part));
+					IF result.register = None THEN
+						ticket := GetPreferredSpill(PartType(irDestinationOperand.type, part));
+						ASSERT(~physicalRegisters.Reserved(ticket.register));
+						Spill(ticket);
+						result := GetFreeRegister(PartType(irDestinationOperand.type, part));
+					END;
+					RETURN result;
+				END; (* create the mapping if not yet done *)
 				result := InstructionSet.NewRegister(PhysicalRegisterNumber(irDestinationOperand.register, part), None, None, 0)
 			ELSE
 				HALT(100)
@@ -1801,10 +1876,26 @@ TYPE
 		PROCEDURE WriteBack(VAR irDestinationOperand: IntermediateCode.Operand; part: LONGINT; register: Operand);
 		VAR
 			mappedArmRegister: Operand;
+			reg: LONGINT;
+
+			PROCEDURE UnSpillRegister (register: LONGINT);
+			VAR
+				vreg: LONGINT;
+				ticket: Ticket;
+			BEGIN
+				FOR vreg := virtualRegisters.firstMapped TO virtualRegisters.lastMapped DO
+					ticket := virtualRegisters.Mapped(vreg, 0);
+					IF (ticket # NIL) & (ticket.spilled) & (ticket.register = register) THEN
+						UnSpill(ticket);
+						RETURN
+					END;
+				END;
+			END UnSpillRegister;
+
 		BEGIN
 			ASSERT(register.mode = InstructionSet.modeRegister);
 
-			IF irDestinationOperand.mode = IntermediateCode.ModeMemory THEN
+			IF (irDestinationOperand.mode = IntermediateCode.ModeMemory) THEN
 				Store(register, MemoryOperandFromIrMemoryOperand(irDestinationOperand, part, emptyOperand), PartType(irDestinationOperand.type, part))
 			ELSIF irDestinationOperand.mode = IntermediateCode.ModeRegister THEN
 				ASSERT((virtualRegisters.Mapped(irDestinationOperand.register, part) # NIL)
@@ -1812,8 +1903,20 @@ TYPE
 						OR (irDestinationOperand.register = IntermediateCode.FP)
 						OR (irDestinationOperand.register = IntermediateCode.LR)
 						OR (irDestinationOperand.register = IntermediateCode.AP));
-				mappedArmRegister := InstructionSet.NewRegister(PhysicalRegisterNumber(irDestinationOperand.register, part), None, None, 0);
-				MovIfDifferent(mappedArmRegister, register)
+				IF (virtualRegisters.Mapped(irDestinationOperand.register, part) # NIL) & virtualRegisters.Mapped(irDestinationOperand.register, part).spilled THEN
+					reg := register.register;
+					Store(register, GetSpillOperand(virtualRegisters.Mapped(irDestinationOperand.register, part)), PartType(irDestinationOperand.type, part));
+					physicalRegisters.Free(reg);
+					virtualRegisters.Mapped(irDestinationOperand.register, part).register := None;
+					(*UnSpillRegister(reg);
+
+					out.comments.String("After WriteBack"); out.comments.Ln;
+					physicalRegisters.Dump(out.comments);
+					virtualRegisters.Dump(out.comments);*)
+				ELSE
+					mappedArmRegister := InstructionSet.NewRegister(PhysicalRegisterNumber(irDestinationOperand.register, part), None, None, 0);
+					MovIfDifferent(mappedArmRegister, register)
+				END;
 			ELSE
 				HALT(100)
 			END;
@@ -2158,7 +2261,19 @@ TYPE
 			END;
 
 			(* get destination operand *)
+			(*IntermediateCode.DumpOperand(out.comments, irDestination);
+			out.comments.Ln;
+			out.comments.String("ticket: ");
+			IF virtualRegisters.Mapped(irDestination.register, part) = NIL THEN out.comments.String("NIL")
+			ELSE
+				CodeGenerators.DumpTicket(out.comments, virtualRegisters.Mapped(irDestination.register, part));
+			END;
+			out.comments.Ln;*)
 			destination := AcquireDestinationRegister(irDestination, part, emptyOperand);
+			(*out.comments.String("dest reg = R");
+			out.comments.Int(destination.register, 0);
+			out.comments.Ln;
+			out.comments.Update;*)
 
 			(* get source operands *)
 			IF doSwap THEN SwapIrOperands(irLeft, irRight) END; (* if needed, swap operands *)
@@ -3241,6 +3356,9 @@ TYPE
 		BEGIN
 			HALT(200) (* note that this instruction is not used at the moment *)
 		END EmitFill;
+
+		PROCEDURE EmitAllocate(CONST irInstruction: IntermediateCode.Instruction);
+		END EmitAllocate;
 
 		(* PREPARATION OF OPERATIONS *)
 
