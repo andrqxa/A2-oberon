@@ -61,17 +61,17 @@ CONST
 		br breq brne brge brlt
 		pop push neg not abs
 		mul div  mod sub add and or xor shl shr rol ror
-		cas copy fill asm data reserve label allocate special NofOpcodes~
+		cas copy fill asm data reserve label allocate save restore special NofOpcodes~
 	*)
 	nop*= 0; mov*= 1; conv*= 2; call*= 3; enter*= 4; exit*= 5; leave*= 6; return*= 7; 
 	result*= 8; trap*= 9; br*= 10; breq*= 11; brne*= 12; brge*= 13; brlt*= 14; pop*= 15; 
 	push*= 16; neg*= 17; not*= 18; abs*= 19; mul*= 20; div*= 21; mod*= 22; sub*= 23; 
 	add*= 24; and*= 25; or*= 26; xor*= 27; shl*= 28; shr*= 29; rol*= 30; ror*= 31; 
 	cas*= 32; copy*= 33; fill*= 34; asm*= 35; data*= 36; reserve*= 37; label*= 38; allocate*= 39; 
-	special*= 40;
-	NofOpcodes*= 41; 
+	save*= 40; restore*= 41; special*= 42;
+	NofOpcodes*= 43;
 
-	NotYetCalculatedSize = -2;
+ 	NotYetCalculatedSize = -2;
 
 TYPE
 	Type*=RECORD
@@ -800,7 +800,11 @@ TYPE
 		(* label - pseudo-instruction to reference back to source code positions *)
 		AddFormat(label, "label",Num,Undef,Undef,{});
 		(* allocate - instruction hint to register - memory map for register allocator *)
-		AddFormat(allocate, "allocate", Reg, RegMem, {}, {});
+		AddFormat(allocate, "allocate", Reg, RegMem, Undef, {});
+		(* save - save all used physical registers to memory *)
+		AddFormat(save, "save", Undef, Undef, Undef, {});
+		(* restore - restore all registers saved by matching save instruction *)
+		AddFormat(restore, "restore", Undef, Undef, Undef, {});
 		(* special instruction support for backend addtions *)
 		AddFormat(special,"special",Any, Any, Any, {} );
 	END InitInstructions;

@@ -5532,7 +5532,8 @@ TYPE
 
 
 			dest := destination; destination := emptyOperand;
-			SaveRegisters();ReleaseUsedRegisters(saved);
+			(*SaveRegisters();ReleaseUsedRegisters(saved);*)
+			Emit(Save(0));
 
 			parameters := x.parameters;
 
@@ -5830,6 +5831,7 @@ TYPE
 				END;
 			END;
 
+			Emit(Restore(0));
 			IF (resultDesignator = NIL) & (procedureType.returnType # NIL) THEN
 
 				IF structuredReturnType THEN
@@ -5837,11 +5839,11 @@ TYPE
 					size := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.SizeOfParameter(procedureType.returnParameter)));
 					Emit(Add(position,sp,sp,size));
 					*)
-					RestoreRegisters(saved);
+					(*RestoreRegisters(saved);*)
 					InitOperand(result,ModeReference);
 					Symbol(variable,result);
 				ELSE
-					RestoreRegisters(saved);
+					(*RestoreRegisters(saved);*)
 					InitOperand(result,ModeValue);
 					result.op := return;
 				END;
@@ -14109,6 +14111,20 @@ TYPE
 		IntermediateCode.InitInstruction(instruction, position, IntermediateCode.allocate, register, memory, emptyOperand);
 		RETURN instruction
 	END Allocate;
+
+	PROCEDURE Save(position: LONGINT): IntermediateCode.Instruction;
+	VAR instruction: IntermediateCode.Instruction;
+	BEGIN
+		IntermediateCode.InitInstruction(instruction, position, IntermediateCode.save, emptyOperand, emptyOperand, emptyOperand);
+		RETURN instruction
+	END Save;
+
+	PROCEDURE Restore(position: LONGINT): IntermediateCode.Instruction;
+	VAR instruction: IntermediateCode.Instruction;
+	BEGIN
+		IntermediateCode.InitInstruction(instruction, position, IntermediateCode.restore, emptyOperand, emptyOperand, emptyOperand);
+		RETURN instruction
+	END Restore;
 
 	PROCEDURE SpecialInstruction(position: LONGINT;subtype: SHORTINT; op1,op2,op3: IntermediateCode.Operand): IntermediateCode.Instruction;
 	VAR instruction: IntermediateCode.Instruction;
