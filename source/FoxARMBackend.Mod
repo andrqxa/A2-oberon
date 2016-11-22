@@ -356,7 +356,7 @@ TYPE
 		PROCEDURE & InitPhysicalRegisters(supportFramePointer, useFPU32, useFPU64, cooperative: BOOLEAN);
 		VAR
 			i: LONGINT;
-			unusable: Ticket;
+			(*unusable: Ticket;*)
 		BEGIN
 			SELF.useFPU32 := useFPU32;
 			SELF.useFPU64 := useFPU64;
@@ -583,6 +583,8 @@ TYPE
 		END InitGeneratorARM;
 
 		(*------------------- overwritten methods ----------------------*)
+		PROCEDURE AllocateSpillStack*(size: LONGINT);
+		END AllocateSpillStack;
 
 		(* TODO: revise this *)
 		PROCEDURE Section(in: IntermediateCode.Section; out: BinaryCode.Section);
@@ -719,14 +721,14 @@ TYPE
 		VAR
 			op: InstructionSet.Operand;
 		BEGIN
-			IF out.comments # NIL THEN
+			(*IF out.comments # NIL THEN
 				out.comments.String("ToSpillStack: R");
 				out.comments.Int(ticket.register, 0);
 				out.comments.String(" -> ofs. ");
 				out.comments.Int(ticket.offset, 0);
 				out.comments.Ln;
 				out.comments.Update;
-			END;
+			END;*)
 			op := GetSpillOperand(ticket);
 			Store(InstructionSet.NewRegister(ticket.register, InstructionSet.None, InstructionSet.None, InstructionSet.None), op, ticket.type);
 		END ToSpillStack;
@@ -735,14 +737,14 @@ TYPE
 		VAR
 			op: Operand;
 		BEGIN
-			IF out.comments # NIL THEN
+			(*IF out.comments # NIL THEN
 				out.comments.String("ToRegister: ofs. ");
 				out.comments.Int(ticket.offset, 0);
 				out.comments.String(" -> R");
 				out.comments.Int(ticket.register, 0);
 				out.comments.Ln;
 				out.comments.Update;
-			END;
+			END;*)
 			op := GetSpillOperand(ticket);
 			Load(InstructionSet.NewRegister(ticket.register, None, None, 0), op, ticket.type);
 		END ToRegister;
@@ -1077,10 +1079,12 @@ TYPE
 			result: Operand;
 		BEGIN
 			(*ASSERT(ticket.spilled);*)
-			TRACE(ticket, ticket.fixed, ticket.offset);
 			IF ~ticket.fixed THEN
-				offset := spillStackStart + ticket.offset + 1; (* TODO: check this *)
-				INCL(flags, InstructionSet.Decrement);
+				offset := spillStackStart - ticket.offset - 1; (* TODO: check this *)
+				IF offset < 0 THEN
+					INCL(flags, InstructionSet.Decrement);
+					offset := -offset;
+				END;
 				ASSERT((0 <= offset) & (offset < InstructionSet.Bits12));
 			ELSIF ticket.offset < 0 THEN
 				offset := -ticket.offset;
@@ -1196,8 +1200,6 @@ TYPE
 				result := InstructionSet.NewRegister(PhysicalRegisterNumber(irRegisterOperand.register, part), None, None, 0);
 				result := RegisterAfterAppliedOffset(result, irRegisterOperand.offset, registerHint);
 			ELSIF ticket.fixed  THEN
-				physicalRegisters.Dump(out.comments);
-				tickets.Dump(out.comments);
 				UnSpill(ticket);
 				result := InstructionSet.NewRegister(PhysicalRegisterNumber(irRegisterOperand.register, part), None, None, 0);
 			ELSE
@@ -1605,12 +1607,13 @@ TYPE
 			| IntermediateCode.asm: EmitAsm(irInstruction)
 			| IntermediateCode.special: EmitSpecial(irInstruction)
 			| IntermediateCode.allocate: EmitAllocate(irInstruction)
+			| IntermediateCode.save: EmitSave(irInstruction)
+			| IntermediateCode.restore: EmitRestore(irInstruction)
 			END;
 
 			ReserveOperandRegisters(irInstruction.op3, FALSE);
 			ReserveOperandRegisters(irInstruction.op2 ,FALSE);
 			ReserveOperandRegisters(irInstruction.op1, FALSE);
-
 		END Generate;
 
 		PROCEDURE PostGenerate(CONST instruction: IntermediateCode.Instruction);
@@ -1905,9 +1908,12 @@ TYPE
 						OR (irDestinationOperand.register = IntermediateCode.AP));
 				IF (virtualRegisters.Mapped(irDestinationOperand.register, part) # NIL) & virtualRegisters.Mapped(irDestinationOperand.register, part).spilled THEN
 					reg := register.register;
+					(*Spill(virtualRegisters.Mapped(irDestinationOperand.register, part));*)
 					Store(register, GetSpillOperand(virtualRegisters.Mapped(irDestinationOperand.register, part)), PartType(irDestinationOperand.type, part));
-					physicalRegisters.Free(reg);
+					virtualRegisters.Mapped(irDestinationOperand.register, part).spilled := TRUE;
 					virtualRegisters.Mapped(irDestinationOperand.register, part).register := None;
+					(*physicalRegisters.Free(reg);
+					virtualRegisters.Mapped(irDestinationOperand.register, part).register := None;*)
 					(*UnSpillRegister(reg);
 
 					out.comments.String("After WriteBack"); out.comments.Ln;
@@ -3359,6 +3365,41 @@ TYPE
 
 		PROCEDURE EmitAllocate(CONST irInstruction: IntermediateCode.Instruction);
 		END EmitAllocate;
+
+		PROCEDURE EmitSave(CONST irInstruction: IntermediateCode.Instruction);
+		VAR
+			ticket: Ticket;
+		BEGIN
+			(*IF out.comments # NIL THEN
+				tickets.Dump(out.comments)
+			END;*)
+			ticket := tickets.live;
+			WHILE ticket # NIL DO
+				IF out.comments # NIL THEN
+					out.comments.String("saving register");
+					out.comments.Int(ticket.register, 0);
+					out.comments.String(" to offset ");
+					out.comments.Int(ticket.offset, 0);
+					out.comments.Ln;
+				END;
+				Spill(ticket);
+				ticket := ticket.next;
+			END;
+		END EmitSave;
+
+		PROCEDURE EmitRestore(CONST irInstruction: IntermediateCode.Instruction);
+		VAR
+			ticket: Ticket;
+		BEGIN
+			IF out.comments # NIL THEN
+				tickets.Dump(out.comments)
+			END;
+			ticket := tickets.live;
+			WHILE ticket # NIL DO
+				UnSpill(ticket);
+				ticket := ticket.next
+			END
+		END EmitRestore;
 
 		(* PREPARATION OF OPERATIONS *)
 
