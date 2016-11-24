@@ -546,6 +546,7 @@ TYPE
 		stackSizeKnown: BOOLEAN; (* whether the size of the current stack frame is known at compile time *)
 
 		inStackAllocation: BOOLEAN;
+		savedTickets: Basic.List; (* Tickets spilled by save instruction *)
 
 
 
@@ -578,7 +579,7 @@ TYPE
 			dump := NIL;
 
 			NEW(listOfReferences);
-
+			NEW(savedTickets, 16);
 
 		END InitGeneratorARM;
 
@@ -1080,11 +1081,8 @@ TYPE
 		BEGIN
 			(*ASSERT(ticket.spilled);*)
 			IF ~ticket.fixed THEN
-				offset := spillStackStart - ticket.offset - 1; (* TODO: check this *)
-				IF offset < 0 THEN
-					INCL(flags, InstructionSet.Decrement);
-					offset := -offset;
-				END;
+				offset := spillStackStart + (ticket.offset) * 4; (* TODO: check this *)
+				INCL(flags, InstructionSet.Decrement);
 				ASSERT((0 <= offset) & (offset < InstructionSet.Bits12));
 			ELSIF ticket.offset < 0 THEN
 				offset := -ticket.offset;
@@ -2088,7 +2086,7 @@ TYPE
 			Basic.Align(allocationSize, 4); (* 4 byte alignment *)
 			AllocateStack(allocationSize, TRUE, backend.initLocals);
 			(* allocate space on stack for register spills *)
-			spillStackStart := -stackSize; 
+			spillStackStart := stackSize + 4;
 			IF spillStack.MaxSize() > 0 THEN AllocateStack(spillStack.MaxSize(), TRUE, FALSE) END
 		END EmitEnter;
 
@@ -3370,34 +3368,42 @@ TYPE
 		VAR
 			ticket: Ticket;
 		BEGIN
-			(*IF out.comments # NIL THEN
-				tickets.Dump(out.comments)
-			END;*)
+			ASSERT(savedTickets.Length() = 0);
 			ticket := tickets.live;
 			WHILE ticket # NIL DO
-				IF out.comments # NIL THEN
-					out.comments.String("saving register");
-					out.comments.Int(ticket.register, 0);
-					out.comments.String(" to offset ");
-					out.comments.Int(ticket.offset, 0);
-					out.comments.Ln;
+				IF ~ticket.spilled THEN
+					IF out.comments # NIL THEN
+						out.comments.String("saving register");
+						out.comments.Int(ticket.register, 0);
+						out.comments.String(" to offset ");
+						out.comments.Int(ticket.offset, 0);
+						out.comments.Ln;
+					END;
+					Spill(ticket);
+					savedTickets.Add(ticket);
+					ticket := ticket.next;
 				END;
-				Spill(ticket);
-				ticket := ticket.next;
 			END;
 		END EmitSave;
 
 		PROCEDURE EmitRestore(CONST irInstruction: IntermediateCode.Instruction);
 		VAR
 			ticket: Ticket;
+			i: LONGINT;
 		BEGIN
-			IF out.comments # NIL THEN
-				tickets.Dump(out.comments)
-			END;
-			ticket := tickets.live;
-			WHILE ticket # NIL DO
+			i := savedTickets.Length() - 1;
+			WHILE i >= 0 DO
+				ticket := savedTickets.Get(i)(Ticket);
+				savedTickets.RemoveByIndex(i);
+				IF out.comments # NIL THEN
+					out.comments.String("restoring register");
+					out.comments.Int(ticket.register, 0);
+					out.comments.String(" from offset ");
+					out.comments.Int(ticket.offset, 0);
+					out.comments.Ln;
+				END;
 				UnSpill(ticket);
-				ticket := ticket.next
+				DEC(i)
 			END
 		END EmitRestore;
 

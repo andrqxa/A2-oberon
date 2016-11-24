@@ -5533,7 +5533,6 @@ TYPE
 
 			dest := destination; destination := emptyOperand;
 			(*SaveRegisters();ReleaseUsedRegisters(saved);*)
-			Emit(Save(0));
 
 			parameters := x.parameters;
 
@@ -5787,6 +5786,7 @@ TYPE
 
 						
 			ReleaseParameterRegisters();
+			Emit(Save(0));
 			IF (procedureType.callingConvention = SyntaxTree.WinAPICallingConvention) OR SysvABI(procedureType.callingConvention) THEN
 				Emit(Call(position,operand.op,0));
 			ELSE
