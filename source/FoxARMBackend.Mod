@@ -1620,6 +1620,11 @@ TYPE
 			TryUnmap(instruction.op3); TryUnmap(instruction.op2); TryUnmap(instruction.op1);
 			ticket := tickets.live;
 			WHILE (ticket # NIL) & (ticket.lastuse = inPC) DO
+				IF dump # NIL THEN
+					dump.String("unmapping ticket: ");
+					CodeGenerators.DumpTicket(dump, ticket);
+					dump.Ln; dump.Update
+				END;
 				UnmapTicket(ticket);
 				ticket := tickets.live
 			END;

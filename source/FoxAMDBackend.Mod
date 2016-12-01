@@ -792,7 +792,7 @@ TYPE
 			ELSIF ticket.spilled THEN
 				GetSpillOperand(ticket,op)
 			ELSE
-				IF (ticket.register = none) & (out.comments # NIL) THEN
+				(*IF (ticket.register = none) & (out.comments # NIL) THEN
 					out.comments.String("Found not assigned ticket for r");
 					WHILE (virtualRegisters.Mapped(i, 0) # ticket) DO INC(i) END;
 					out.comments.Int(i, 0);
@@ -806,7 +806,7 @@ TYPE
 					tickets.Dump(out.comments);
 					virtualRegisters.Dump(out.comments);
 					out.comments.Update
-				END;
+				END;*)
 				ASSERT(ticket.register # none);
 				IF (ticket.type.form = IntermediateCode.Float) & backend.forceFPU THEN
 					op := registerOperands[ticket.register+fpStackPointer]
@@ -1025,10 +1025,10 @@ TYPE
 		PROCEDURE MakeOperand(CONST vop: IntermediateCode.Operand; part: LONGINT; VAR op: Assembler.Operand; ticket: Ticket);
 		VAR tmp: Assembler.Operand;
 		BEGIN
-			(*!DBG*)IF vop.register = 4 THEN
+			(*(*!DBG*)IF vop.register = 4 THEN
 				virtualRegisters.Dump(out.comments);
 				out.comments.Update;
-			END;
+			END;*)
 
 			TryAllocate(vop,part);
 			CASE vop.mode OF
@@ -1125,7 +1125,7 @@ TYPE
 			(*TryAllocate(instruction.op1,Low);
 			IF IsComplex(instruction.op1) THEN TryAllocate(instruction.op1,High) END;
 			*)
-			(*!DBG*)IF out.comments # NIL THEN physicalRegisters.Dump(out.comments) END;
+			(*(*!DBG*)IF out.comments # NIL THEN physicalRegisters.Dump(out.comments) END;*)
 			opcode := instruction.opcode;
 			CASE opcode OF
 			IntermediateCode.nop: (* do nothing *)
@@ -1265,6 +1265,7 @@ TYPE
 			|IntermediateCode.fill: EmitFill(instruction,FALSE);
 			|IntermediateCode.asm: EmitAsm(instruction);
 			|IntermediateCode.allocate: EmitAllocate(instruction);
+			|IntermediateCode.save, IntermediateCode.restore:
 			END;
 
 			ReserveOperandRegisters(instruction.op3,FALSE); ReserveOperandRegisters(instruction.op2,FALSE); ReserveOperandRegisters(instruction.op1,FALSE);

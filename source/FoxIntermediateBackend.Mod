@@ -9371,7 +9371,8 @@ TYPE
 					x.SetUseRegister(TRUE);
 					x.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
 					temp := IntermediateCode.Register(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,x.registerNumber);
-					Emit(Allocate(section.pc, temp, result.op));
+					Emit(Allocate(section.pc, temp, IntermediateCode.Memory(IntermediateCode.GetType(system, type), result.op, result.op.offset)));
+					Emit(Mov(section.pc, temp, IntermediateCode.Immediate(IntermediateCode.GetType(system, type), 0)));
 					(*LoadValue(result, type);*)
 					ReleaseIntermediateOperand(result.op);
 					result.op := temp
