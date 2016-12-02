@@ -4,12 +4,13 @@ IMPORT
 	Basic := FoxBasic, SyntaxTree := FoxSyntaxTree, Global := FoxGlobal, Backend := FoxBackend, Sections := FoxSections,
 	IntermediateCode := FoxIntermediateCode, IntermediateBackend := FoxIntermediateBackend, CodeGenerators := FoxCodeGenerators, BinaryCode := FoxBinaryCode,
 	SemanticChecker := FoxSemanticChecker, Formats := FoxFormats, Assembler := FoxARMAssembler, InstructionSet := FoxARMInstructionSet,
-	SYSTEM, Diagnostics, Streams, Options, Strings, ObjectFile, Scanner := FoxScanner, ObjectFileFormat := FoxGenericObjectFile,
+	SYSTEM, Diagnostics, Streams, Options, Strings, ObjectFile, Scanner := FoxScanner, ObjectFileFormat := FoxGenericObjectFile, Compiler,
 	D := Debugging;
 
 CONST
 	Trace = FALSE; (* general trace *)
 	DefaultRuntimeModuleName = "ARMRuntime";
+	SupportMovW = TRUE; (* movw is only available on ARM from V6/V7, not on older platforms *)
 
 	None = -1;
 
@@ -67,6 +68,7 @@ CONST
 	opMCR = InstructionSet.opMCR; opMCR2 = InstructionSet.opMCR2;
 	opMCRR = InstructionSet.opMCRR; opMLA = InstructionSet.opMLA;
 	opMOV = InstructionSet.opMOV; opMRC = InstructionSet.opMRC;
+	opMOVW = InstructionSet.opMOVW;
 	opMRC2 = InstructionSet.opMRC2; opMRRC = InstructionSet.opMRRC;
 	opMRS = InstructionSet.opMRS; opMSR = InstructionSet.opMSR;
 	opMUL = InstructionSet.opMUL; opMVN = InstructionSet.opMVN;
@@ -356,7 +358,7 @@ TYPE
 		PROCEDURE & InitPhysicalRegisters(supportFramePointer, useFPU32, useFPU64, cooperative: BOOLEAN);
 		VAR
 			i: LONGINT;
-			(*unusable: Ticket;*)
+			unusable: Ticket;
 		BEGIN
 			SELF.useFPU32 := useFPU32;
 			SELF.useFPU64 := useFPU64;
@@ -595,7 +597,7 @@ TYPE
 			PROCEDURE CheckEmptySpillStack(): BOOLEAN;
 			BEGIN
 				IF spillStack.Size() # 0 THEN
-					Error(inPC,"implementation error, spill stack not cleared");
+					Error(Basic.invalidPosition,"implementation error, spill stack not cleared");
 					IF dump # NIL THEN
 						spillStack.Dump(dump);
 						tickets.Dump(dump)
@@ -638,7 +640,7 @@ TYPE
 		if not, the location of a runtime is returned **)
 		PROCEDURE Supported(CONST irInstruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
 		VAR
-			result: BOOLEAN;
+			result: BOOLEAN; value: HUGEINT; exp: LONGINT;
 		BEGIN
 			CASE irInstruction.opcode OF
 			| IntermediateCode.add, IntermediateCode.sub, IntermediateCode.mul, IntermediateCode.abs, IntermediateCode.neg:
@@ -648,12 +650,13 @@ TYPE
 				ELSE
 					result :=  ~IsFloat(irInstruction.op1) OR backend.useFPU32 & IsSinglePrecisionFloat(irInstruction.op1) OR backend.useFPU64 & IsDoublePrecisionFloat(irInstruction.op1);
 				END;
+				result := result OR (irInstruction.opcode = IntermediateCode.mul) & IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp)
 
 			| IntermediateCode.div:
-				result :=  backend.useFPU32 & IsSinglePrecisionFloat(irInstruction.op1) OR backend.useFPU64 & IsDoublePrecisionFloat(irInstruction.op1);
-				(*
-				result := result OR IntermediateCode.IsConstantInteger(irInstruction.op3,value) & PowerOf2(value,exp)
-				*)
+				result :=  backend.useFPU32 & IsSinglePrecisionFloat(irInstruction.op1) 
+							OR backend.useFPU64 & IsDoublePrecisionFloat(irInstruction.op1)
+							OR backend.useFPU64 & IsNonComplexInteger(irInstruction.op1);
+				result := result OR IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp)
 
 			| IntermediateCode.conv:
 				IF IsInteger64(irInstruction.op1) & IsFloat(irInstruction.op2) THEN  (* ENTIERH: REAL/LONGREAL --> HUGEINT*)
@@ -666,10 +669,8 @@ TYPE
 									OR backend.useFPU64;
 				END;
 			| IntermediateCode.mod:
-				result := FALSE;
-				(*
-				result := IntermediateCode.IsConstantInteger(irInstruction.op3,value) & PowerOf2(value,exp)
-				*)
+				result :=  IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp)
+				
 			| IntermediateCode.rol, IntermediateCode.ror:
 				result := ~IsComplex(irInstruction.op1)
 			ELSE
@@ -1466,6 +1467,11 @@ TYPE
 		END IsInteger;
 
 		(** whether an IR operand hold am integer value **)
+		PROCEDURE IsNonComplexInteger(CONST irOperand: IntermediateCode.Operand): BOOLEAN;
+		BEGIN RETURN (irOperand.type.form IN IntermediateCode.Integer) & (irOperand.type.sizeInBits <= 32)
+		END IsNonComplexInteger;
+
+		(** whether an IR operand hold am integer value **)
 		PROCEDURE IsInteger64(CONST irOperand: IntermediateCode.Operand): BOOLEAN;
 		BEGIN RETURN (irOperand.type.form IN IntermediateCode.Integer) & (irOperand.type.sizeInBits = 64)
 		END IsInteger64;
@@ -1592,7 +1598,7 @@ TYPE
 			| IntermediateCode.div: EmitDiv(irInstruction)
 			| IntermediateCode.mod: EmitMod(irInstruction)
 			| IntermediateCode.sub, IntermediateCode.add: EmitAddOrSub(irInstruction)
-			| IntermediateCode.and: EmitAnd(irInstruction, Low); IF IsComplex(irInstruction.op1) THEN EmitAnd(irInstruction, High) END
+			| IntermediateCode.and: EmitAnd(irInstruction);
 			| IntermediateCode.or: EmitOr(irInstruction, Low); IF IsComplex(irInstruction.op1) THEN EmitOr(irInstruction, High) END
 			| IntermediateCode.xor: EmitXor(irInstruction, Low); IF IsComplex(irInstruction.op1) THEN EmitXor(irInstruction, High) END
 			| IntermediateCode.shl: EmitShiftOrRotation(irInstruction)
@@ -1612,6 +1618,7 @@ TYPE
 			ReserveOperandRegisters(irInstruction.op3, FALSE);
 			ReserveOperandRegisters(irInstruction.op2 ,FALSE);
 			ReserveOperandRegisters(irInstruction.op1, FALSE);
+
 		END Generate;
 
 		PROCEDURE PostGenerate(CONST instruction: IntermediateCode.Instruction);
@@ -1835,7 +1842,6 @@ TYPE
 						HALT(200)
 					ELSE
 						(* mov int, int: *)
-						TRACE(a.mode, a.register, b.mode, b.register);
 						Emit2(opMOV, a, b)
 					END
 				END
@@ -1901,7 +1907,7 @@ TYPE
 		BEGIN
 			ASSERT(register.mode = InstructionSet.modeRegister);
 
-			IF (irDestinationOperand.mode = IntermediateCode.ModeMemory) THEN
+			IF irDestinationOperand.mode = IntermediateCode.ModeMemory THEN
 				Store(register, MemoryOperandFromIrMemoryOperand(irDestinationOperand, part, emptyOperand), PartType(irDestinationOperand.type, part))
 			ELSIF irDestinationOperand.mode = IntermediateCode.ModeRegister THEN
 				ASSERT((virtualRegisters.Mapped(irDestinationOperand.register, part) # NIL)
@@ -1909,23 +1915,8 @@ TYPE
 						OR (irDestinationOperand.register = IntermediateCode.FP)
 						OR (irDestinationOperand.register = IntermediateCode.LR)
 						OR (irDestinationOperand.register = IntermediateCode.AP));
-				IF (virtualRegisters.Mapped(irDestinationOperand.register, part) # NIL) & virtualRegisters.Mapped(irDestinationOperand.register, part).spilled THEN
-					reg := register.register;
-					(*Spill(virtualRegisters.Mapped(irDestinationOperand.register, part));*)
-					Store(register, GetSpillOperand(virtualRegisters.Mapped(irDestinationOperand.register, part)), PartType(irDestinationOperand.type, part));
-					virtualRegisters.Mapped(irDestinationOperand.register, part).spilled := TRUE;
-					virtualRegisters.Mapped(irDestinationOperand.register, part).register := None;
-					(*physicalRegisters.Free(reg);
-					virtualRegisters.Mapped(irDestinationOperand.register, part).register := None;*)
-					(*UnSpillRegister(reg);
-
-					out.comments.String("After WriteBack"); out.comments.Ln;
-					physicalRegisters.Dump(out.comments);
-					virtualRegisters.Dump(out.comments);*)
-				ELSE
-					mappedArmRegister := InstructionSet.NewRegister(PhysicalRegisterNumber(irDestinationOperand.register, part), None, None, 0);
-					MovIfDifferent(mappedArmRegister, register)
-				END;
+				mappedArmRegister := InstructionSet.NewRegister(PhysicalRegisterNumber(irDestinationOperand.register, part), None, None, 0);
+				MovIfDifferent(mappedArmRegister, register)
 			ELSE
 				HALT(100)
 			END;
@@ -2091,7 +2082,7 @@ TYPE
 			Basic.Align(allocationSize, 4); (* 4 byte alignment *)
 			AllocateStack(allocationSize, TRUE, backend.initLocals);
 			(* allocate space on stack for register spills *)
-			spillStackStart := stackSize + 4;
+			spillStackStart := -stackSize; 
 			IF spillStack.MaxSize() > 0 THEN AllocateStack(spillStack.MaxSize(), TRUE, FALSE) END
 		END EmitEnter;
 
@@ -2109,7 +2100,9 @@ TYPE
 		(* exit <parSize>, <pcOffset> *)
 		PROCEDURE EmitExit(CONST irInstruction: IntermediateCode.Instruction);
 		BEGIN
-			Emit2(opLDR, opLR, InstructionSet.NewImmediateOffsetMemory(InstructionSet.SP, 4, {InstructionSet.Increment, InstructionSet.PostIndexed}));
+			IF (irInstruction.op2.intValue # SyntaxTree.InterruptCallingConvention) THEN
+				Emit2(opLDR, opLR, InstructionSet.NewImmediateOffsetMemory(InstructionSet.SP, 4, {InstructionSet.Increment, InstructionSet.PostIndexed}));
+			END;
 			IF (irInstruction.op1.intValue = 0) & (irInstruction.op2.intValue # SyntaxTree.InterruptCallingConvention) THEN
 				(* Emit2(opMOV, opPC, opLR) *)
 				Emit1(opBX, opLR) (* recommended for better interoperability between ARM and Thumb *)
@@ -2151,7 +2144,7 @@ TYPE
 			WriteBack(irInstruction.op1, part, destination)
 		END EmitNot;
 
-		PROCEDURE EmitAnd(VAR irInstruction: IntermediateCode.Instruction; part: LONGINT);
+		PROCEDURE EmitAndP(VAR irInstruction: IntermediateCode.Instruction; part: LONGINT);
 		VAR
 			dummy: BOOLEAN;
 			destination, left, right: Operand;
@@ -2159,6 +2152,12 @@ TYPE
 			PrepareDoubleSourceOpWithImmediate(irInstruction, part, destination, left, right, dummy);
 			Emit3(opAND, destination, left, right);
 			WriteBack(irInstruction.op1, part, destination)
+		END EmitAndP;
+
+		PROCEDURE EmitAnd(VAR irInstruction: IntermediateCode.Instruction);
+		BEGIN
+			EmitAndP(irInstruction, Low);
+			IF IsComplex(irInstruction.op1) THEN EmitAndP(irInstruction, High) END
 		END EmitAnd;
 
 		PROCEDURE EmitOr(VAR irInstruction: IntermediateCode.Instruction; part: LONGINT);
@@ -2319,8 +2318,17 @@ TYPE
 
 		PROCEDURE EmitMul(VAR irInstruction: IntermediateCode.Instruction);
 		VAR
-			destination, left, right: ARRAY 2 OF Operand;
+			destination, left, right: ARRAY 2 OF Operand; inst: IntermediateCode.Instruction; 
+			value: HUGEINT;exp: LONGINT; op3:IntermediateCode.Operand;
 		BEGIN
+			IF IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
+				IntermediateCode.InitImmediate(op3, IntermediateCode.uint32, exp);
+				IntermediateCode.InitInstruction(inst, Basic.invalidPosition, IntermediateCode.shl, irInstruction.op1, irInstruction.op2, op3);
+				EmitShiftOrRotation(inst);
+				RETURN;
+			END;
+
+		
 			IF IsSinglePrecisionFloat(irInstruction.op1) THEN
 				ASSERT(backend.useFPU32);
 				PrepareDoubleSourceOp(irInstruction, Low, destination[Low], left[Low], right[Low]);
@@ -2361,8 +2369,18 @@ TYPE
 
 		PROCEDURE EmitDiv(VAR irInstruction: IntermediateCode.Instruction);
 		VAR
-			destination, left, right: Operand;
+			destination, left, right, float, leftd, rightd, fpstatus: Operand; 
+			value: HUGEINT; exp: LONGINT; op3: IntermediateCode.Operand;
+			inst: IntermediateCode.Instruction;
 		BEGIN
+			IF IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
+				IntermediateCode.InitImmediate(op3, IntermediateCode.uint32, exp);
+				IntermediateCode.InitInstruction(inst, Basic.invalidPosition, IntermediateCode.shr, irInstruction.op1, irInstruction.op2, op3);
+				EmitShiftOrRotation(inst);
+				RETURN;
+			END;
+
+		
 			IF IsSinglePrecisionFloat(irInstruction.op1) THEN
 				ASSERT(backend.useFPU32);
 				PrepareDoubleSourceOp(irInstruction, Low, destination, left, right);
@@ -2373,13 +2391,53 @@ TYPE
 				PrepareDoubleSourceOp(irInstruction, Low, destination, left, right);
 				Emit3(opFDIVD, destination, left, right);
 				WriteBack(irInstruction.op1, Low, destination)
+			ELSIF IsNonComplexInteger(irInstruction.op1) THEN
+				ASSERT(backend.useFPU64);
+				PrepareDoubleSourceOp(irInstruction, Low, destination, left, right);
+				(* left and right operands to double *)
+				float := GetFreeRegister(IntermediateCode.FloatType(32));
+		 		Emit2(opFMSR, float, left);
+				leftd := GetFreeRegister(IntermediateCode.FloatType(64));
+	 			IF irInstruction.op1.type.form = IntermediateCode.UnsignedInteger THEN
+					Emit2(opFUITOD, leftd, float)
+				ELSE
+					Emit2(opFSITOD,leftd, float)
+				END;
+		 		Emit2(opFMSR, float,right);
+				rightd := GetFreeRegister(IntermediateCode.FloatType(64));
+	 			IF irInstruction.op1.type.form = IntermediateCode.UnsignedInteger THEN
+					Emit2(opFUITOD, rightd, float)
+				ELSE
+					Emit2(opFSITOD,rightd, float)
+				END;
+				(* div *)
+				Emit3(opFDIVD, leftd, leftd, rightd);
+				(* result to destination *)
+				RoundDown(fpstatus);
+	 			IF irInstruction.op1.type.form = IntermediateCode.UnsignedInteger THEN
+					Emit2(opFTOUID, float, leftd)
+				ELSE
+					Emit2(opFTOSID, float, leftd)
+				END;
+				ResetRounding(fpstatus);
+		 		Emit2(opFMRS, destination, float);
+				WriteBack(irInstruction.op1, Low, destination)
 			ELSE
 				HALT(200)
 			END
 		END EmitDiv;
 
 		PROCEDURE EmitMod(CONST irInstruction: IntermediateCode.Instruction);
-		BEGIN HALT(100) (* handled by a runtime call *)
+		VAR
+			value: HUGEINT;exp: LONGINT; op3:IntermediateCode.Operand; inst: IntermediateCode.Instruction;
+		BEGIN
+			IF IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
+				IntermediateCode.InitImmediate(op3, irInstruction.op3.type, value-1);
+				IntermediateCode.InitInstruction(inst, Basic.invalidPosition, IntermediateCode.and, irInstruction.op1, irInstruction.op2, op3);
+				EmitAnd(inst);
+				RETURN;
+			END;
+			HALT(100) (* handled by a runtime call *)
 		END EmitMod;
 
 		PROCEDURE EmitAbs(VAR irInstruction: IntermediateCode.Instruction);
@@ -2693,6 +2751,7 @@ TYPE
 
 			NEW(assembler, diagnostics);
 			scanner := Scanner.NewAssemblerScanner(module.moduleName(*module.module.sourceName*), reader, LONGINT(irInstruction.op1.intValue) (* ? *), diagnostics);
+			scanner.useLineNumbers := Compiler.UseLineNumbers IN backend.flags;
 			assembler.InlineAssemble(scanner, in, scope, module);
 			error := error OR assembler.error
 		END EmitAsm;
@@ -3084,29 +3143,29 @@ TYPE
 
 		END EmitBr;
 
-		(* TODO: floats *)
+		PROCEDURE RoundDown(VAR fpstatus: Operand);
+		BEGIN
+			fpstatus := GetFreeRegister(IntermediateCode.UnsignedIntegerType(32));
+			(* round to minus infitinity *)
+			Emit2(InstructionSet.opVMRS, fpstatus, fpscr);
+			Emit3(opORR, fpstatus, fpstatus, InstructionSet.NewImmediate(0x800000));
+			Emit2(InstructionSet.opVMSR, fpscr, fpstatus);
+		END RoundDown;
+		
+		PROCEDURE ResetRounding(VAR fpstatus: Operand);
+		BEGIN
+			(* reset rounding mode *)
+			Emit3(opBIC, fpstatus, fpstatus, InstructionSet.NewImmediate(0x800000));
+			Emit2(InstructionSet.opVMSR, fpscr, fpstatus);
+		END ResetRounding;
+		
+
 		PROCEDURE EmitConv(VAR irInstruction: IntermediateCode.Instruction);
 		VAR
 			irDestination, irSource: IntermediateCode.Operand;
 			destination, source: ARRAY 2 OF Operand;
 			temp, fpstatus: Operand;
 			partType: IntermediateCode.Type;
-			
-			PROCEDURE RoundDown;
-			BEGIN
-				fpstatus := GetFreeRegister(IntermediateCode.UnsignedIntegerType(32));
-				(* round to minus infitinity *)
-				Emit2(InstructionSet.opVMRS, fpstatus, fpscr);
-				Emit3(opORR, fpstatus, fpstatus, InstructionSet.NewImmediate(0x800000));
-				Emit2(InstructionSet.opVMSR, fpscr, fpstatus);
-			END RoundDown;
-			
-			PROCEDURE ResetRounding;
-			BEGIN
-				(* reset rounding mode *)
-				Emit3(opBIC, fpstatus, fpstatus, InstructionSet.NewImmediate(0x800000));
-				Emit2(InstructionSet.opVMSR, fpscr, fpstatus);
-			END ResetRounding;
 			
 			
 		BEGIN
@@ -3159,34 +3218,30 @@ TYPE
 						(* single precision float to non-complex integer: *)
 						temp := GetFreeRegister(IntermediateCode.FloatType(32));
 						
+						RoundDown(fpstatus);
 						IF irDestination.type.form = IntermediateCode.UnsignedInteger THEN
 							(* single precision float to non-complex unsigned integer: *)
-							RoundDown;
 							Emit2(opFTOUIS, temp, source[Low]);
-							ResetRounding;
 						ELSE
 							(* single precision float to non-complex signed integer: *)
-							RoundDown;
 							Emit2(opFTOSIS, temp, source[Low]);
-							ResetRounding;
 						END;
+						ResetRounding(fpstatus);
 						Emit2(opFMRS, destination[Low], temp)
 					ELSIF IsDoublePrecisionFloat(irSource) THEN
 						(* LONGREAL --> INTEGER *)
 						ASSERT(backend.useFPU64);
 						(* single precision float to non-complex integer: *)
 						temp := GetFreeRegister(IntermediateCode.FloatType(32));
+						RoundDown(fpstatus);
 						IF irDestination.type.form = IntermediateCode.UnsignedInteger THEN
 							(* single precision float to non-complex unsigned integer: *)
-							RoundDown;
 							Emit2(opFTOUID, temp, source[Low]);
-							ResetRounding;
 						ELSE
 							(* single precision float to non-complex signed integer: *)
-							RoundDown;
 							Emit2(opFTOSID, temp, source[Low]);
-							ResetRounding;
 						END;
+						ResetRounding(fpstatus);
 						Emit2(opFMRS, destination[Low], temp)
 					ELSE
 						(* anything to non-complex integer: *)
@@ -3507,6 +3562,7 @@ TYPE
 			system := NIL;
 			initLocals := TRUE;
 			SetHasLinkRegister;
+			SetName("ARM");
 		END InitBackendARM;
 
 		PROCEDURE Initialize(diagnostics: Diagnostics.Diagnostics; log: Streams.Writer; flags: SET; checker: SemanticChecker.Checker; system: Global.System);
@@ -3521,7 +3577,7 @@ TYPE
 			parameter: SyntaxTree.Parameter;
 
 			PROCEDURE New;
-			BEGIN procedureType := SyntaxTree.NewProcedureType(-1, NIL)
+			BEGIN procedureType := SyntaxTree.NewProcedureType(Basic.invalidPosition, NIL)
 			END New;
 
 			PROCEDURE BoolRet;
@@ -3534,25 +3590,25 @@ TYPE
 
 			PROCEDURE IntPar;
 			BEGIN
-				parameter := SyntaxTree.NewParameter(-1, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.ValueParameter);
+				parameter := SyntaxTree.NewParameter(Basic.invalidPosition, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.ValueParameter);
 				parameter.SetType(Global.Integer32); procedureType.AddParameter(parameter)
 			END IntPar;
 
 			PROCEDURE AddressPar;
 			BEGIN
-				parameter := SyntaxTree.NewParameter(-1, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.ValueParameter);
+				parameter := SyntaxTree.NewParameter(Basic.invalidPosition, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.ValueParameter);
 				parameter.SetType(Global.Unsigned32); procedureType.AddParameter(parameter)
 			END AddressPar;
 
 			PROCEDURE IntVarPar;
 			BEGIN
-				parameter := SyntaxTree.NewParameter(-1, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.VarParameter);
+				parameter := SyntaxTree.NewParameter(Basic.invalidPosition, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.VarParameter);
 				parameter.SetType(Global.Integer32); procedureType.AddParameter(parameter)
 			END IntVarPar;
 
 			PROCEDURE RealVarPar;
 			BEGIN
-				parameter := SyntaxTree.NewParameter(-1, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.VarParameter);
+				parameter := SyntaxTree.NewParameter(Basic.invalidPosition, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.VarParameter);
 				parameter.SetType(Global.Float32); procedureType.AddParameter(parameter)
 			END RealVarPar;
 
@@ -3781,7 +3837,7 @@ TYPE
 		 		PatchFixups(in(IntermediateCode.Section).resolved)
 		 	END;
 
-			IF cg.error THEN Error("", Diagnostics.Invalid, Diagnostics.Invalid,  "") END
+			IF cg.error THEN Error("", Basic.invalidPosition, Diagnostics.Invalid,  "") END
 		END GenerateBinary;
 
 		(** create an ARM code module from an intermediate code module **)
@@ -3865,7 +3921,7 @@ TYPE
 			UNTIL (i = module(Sections.Module).allSections.Length()) OR (section.name = pooledName);
 
 			IF section.name # pooledName THEN
-				diagnostics.Error(module.module.sourceName,Diagnostics.Invalid,Diagnostics.Invalid," could not locate pc");
+					Basic.Error(diagnostics, module.module.sourceName,Basic.invalidPosition, " could not locate pc");
 			ELSE
 				binarySection := section(IntermediateCode.Section).resolved;
 				label := binarySection.labels;
@@ -3873,9 +3929,9 @@ TYPE
 					label := label.prev;
 				END;
 				IF label # NIL THEN
-					diagnostics.Information(module.module.sourceName,label.position,Diagnostics.Invalid," pc position");
+					Basic.Information(diagnostics, module.module.sourceName,label.position, " pc position");
 				ELSE
-					diagnostics.Error(module.module.sourceName,Diagnostics.Invalid,Diagnostics.Invalid," could not locate pc");
+					Basic.Error(diagnostics, module.module.sourceName, Basic.invalidPosition, " could not locate pc");
 				END;
 			END;
 		END FindPC;
@@ -3893,17 +3949,6 @@ VAR
 	PROCEDURE Halt(CONST message: ARRAY OF CHAR);
 	BEGIN HALT(100)
 	END Halt;
-
-	PROCEDURE PowerOf2(val: HUGEINT;  VAR exp: LONGINT): BOOLEAN;
-	BEGIN
-		IF val <= 0 THEN RETURN FALSE END;
-		exp := 0;
-		WHILE ~ODD(val) DO
-			val := val DIV 2;
-			INC(exp)
-		END;
-		RETURN val = 1
-	END PowerOf2;
 
 	(** get the ARM code section that corresponds to an intermediate code section **)
 	PROCEDURE ResolvedSection(irSection: IntermediateCode.Section): BinaryCode.Section;

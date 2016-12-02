@@ -88,25 +88,30 @@ END UnlockOberon;
 
 (** List all currently loaded modules *)
 PROCEDURE ListModules*(context : Commands.Context);
-VAR m: Modules.Module; options: Options.Options; details: BOOLEAN;
+VAR m: Modules.Module; options: Options.Options; details: BOOLEAN; first, reverse: BOOLEAN;
+
+	PROCEDURE List(m: Modules.Module);
+	BEGIN
+		IF m = NIL THEN RETURN END;
+		IF reverse THEN List(m.next) END;
+		IF ~first & options.GetFlag("l") THEN context.out.Ln ELSE context.out.String(" ") END;
+		first := FALSE;
+		context.out.String(m.name);
+		IF options.GetFlag("crc") THEN context.out.String(" crc="); context.out.Hex(m.crc,-8); context.out.String("") END;
+		IF~reverse THEN List(m.next) END;
+	END List;
+	
+
 BEGIN
 	NEW(options);
 	options.Add("c", "crc", Options.Flag);
 	options.Add("l", "ln", Options.Flag);
 	options.Add("b", "base", Options.Flag);
+	options.Add("r", "reverse", Options.Flag);
 	IF options.Parse(context.arg, context.error) THEN
-		m := Modules.root;
-		WHILE m # NIL DO
-			context.out.String(m.name);
-			(*IF options.GetFlag("base") THEN context.out.String(" base="); context.out.Hex(m.firstProc,-8) END;*)
-			IF options.GetFlag("crc") THEN context.out.String(" crc="); context.out.Hex(m.crc,-8); context.out.String("") END;
-			m := m.next;
-			IF m # NIL THEN
-				IF options.GetFlag("l") THEN context.out.Ln ELSE context.out.String(" ") END;
-			ELSE
-				context.out.Ln
-			END;
-		END;
+		reverse := ~options.GetFlag("r");
+		first := FALSE;
+		List(Modules.root);
 	END;
 END ListModules;
 
@@ -397,6 +402,30 @@ BEGIN
 	RETURN (ch = " ") OR (ch = CR) OR (ch = LF) OR (ch = TAB) OR (ch = ";") OR (ch = 0X);
 END IsDelimiter;
 
+PROCEDURE DoFile*(context: Commands.Context);
+VAR 
+	newContext: Commands.Context;
+	file: Files.File; 
+	r: Streams.Reader;
+	filename: Files.FileName;
+	res: LONGINT;
+	msg: ARRAY 256 OF CHAR;
+BEGIN
+	IF context.arg.GetString(filename) THEN
+		file := Files.Old(filename); 
+		IF file # NIL THEN
+			r := NEW Files.Reader(file, 0);
+			NEW(newContext, context.in, r, context.out, context.error, context.caller);
+			Commands.Activate("SystemTools.DoCommands", newContext, {Commands.Wait}, res, msg);
+		ELSE
+			context.error.String("Error: no such file: "); context.error.String(filename); context.error.Ln;
+		END;
+	ELSE
+		context.error.String("Error: mo filename provided."); context.error.String(filename); context.error.Ln;
+	END;
+END DoFile;
+
+
 (** Sequentially execute a list of commands .
 IMPORTANT: This command is specially handled by command interpreters that support it. It is the only command
 in the system for which two tilde characters (only separated by whitespace) are used to delimit the parameter string.
@@ -684,7 +713,7 @@ END Version;
 
 END SystemTools.
 
-SystemTools.Free S  ~
+SystemTools.Free SystemTools  ~
 SystemTools.Kill 57 ~
 
 SystemTools.Time ~
@@ -699,4 +728,6 @@ SystemTools.DoCommands
 ~
 
 SystemTools.CollectGarbage ~
+
+SystemTools.ListModules -r ~
 

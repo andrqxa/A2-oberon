@@ -1,5 +1,5 @@
 # Oberon language test and validation suite
-# options 	--mayTrap --prolog="Compiler.Compile -p=Win23G TesterInput.txt" --command="SystemTools.Free Test Dummy B A;SystemTools.Load Test" --logFile="FoxExecutionTest.Log" --result="Oberon.Execution.Test.Diff"
+# options 	--mayTrap --prolog="Compiler.Compile -p=Win32G TesterInput.txt" --command="SystemTools.Free Test Dummy B A;SystemTools.Load Test" --logFile="FoxExecutionTest.Log" --result="Oberon.Execution.Test.Diff"
 
 # test halt and assert statements and simple procedure call (basics for the test suite)
 
@@ -2231,7 +2231,7 @@ negative: unsatisfied type guard on pointer to record
 	BEGIN NEW (p0); p1 := p0(P1);
 	END Test.
 
-negative: type guard on nil pointer to same record
+positive: type guard on nil pointer to same record
 
 	MODULE Test;
 	TYPE R = RECORD END; P = POINTER TO R;
@@ -2298,7 +2298,7 @@ negative: unsatisfied type guard on object
 	BEGIN NEW (o0); o1 := o0(O1);
 	END Test.
 
-negative: type guard on same nil object
+positive: type guard on same nil object
 
 	MODULE Test;
 	TYPE O = OBJECT END O;
@@ -2504,7 +2504,7 @@ positive: unsatisfied type test on returned pointer to record
 	BEGIN ASSERT (~(Function () IS P1)); ASSERT (~(Function ()^ IS R1));
 	END Test.
 
-negative: type test on nil pointer to same record
+positive: type test on nil pointer to same record
 
 	MODULE Test;
 	TYPE R = RECORD END; P = POINTER TO R;
@@ -2583,7 +2583,7 @@ positive: unsatisfied type test on returned object
 	BEGIN ASSERT (~(Function () IS O1));
 	END Test.
 
-negative: type test on same nil object
+positive: type test on same nil object
 
 	MODULE Test;
 	TYPE O = OBJECT END O;
@@ -5073,14 +5073,14 @@ positive: copy statement with open array of character parameter as source
 	BEGIN Procedure ("source");
 	END Test.
 
-negative: copy statement with too long open array of character parameter as source
+positive: copy statement with too long open array of character parameter as source (truncate)
 
 	MODULE Test;
 	PROCEDURE Procedure (source: ARRAY OF CHAR);
 	VAR dest: ARRAY 2 OF CHAR;
-	BEGIN COPY (source, dest);
+	BEGIN COPY (source, dest); ASSERT(dest="s");
 	END Procedure;
-	BEGIN Procedure ("source");
+	BEGIN Procedure ("source"); 
 	END Test.
 
 positive: copy statement with open variable array of character parameter as source
@@ -5094,15 +5094,15 @@ positive: copy statement with open variable array of character parameter as sour
 	BEGIN source := "source"; Procedure (source);
 	END Test.
 
-negative: copy statement with too long open variable array of character parameter as source
+positive: copy statement with too long open variable array of character parameter as source (truncate)
 
 	MODULE Test;
 	VAR source: ARRAY 20 OF CHAR;
 	PROCEDURE Procedure (VAR source: ARRAY OF CHAR);
 	VAR dest: ARRAY 2 OF CHAR;
-	BEGIN COPY (source, dest);
+	BEGIN COPY (source, dest);ASSERT(dest="s");
 	END Procedure;
-	BEGIN source := "source"; Procedure (source);
+	BEGIN source := "source"; Procedure (source); 
 	END Test.
 
 positive: copy statement with open constant array of character parameter as source
@@ -5115,14 +5115,14 @@ positive: copy statement with open constant array of character parameter as sour
 	BEGIN Procedure ("source");
 	END Test.
 
-negative: copy statement with too long open constant array of character parameter as source
+positive: copy statement with too long open constant array of character parameter as source (truncate)
 
 	MODULE Test;
 	PROCEDURE Procedure (CONST source: ARRAY OF CHAR);
 	VAR dest: ARRAY 2 OF CHAR;
-	BEGIN COPY (source, dest);
+	BEGIN COPY (source, dest); ASSERT(dest="s");
 	END Procedure;
-	BEGIN Procedure ("source");
+	BEGIN Procedure ("source"); 
 	END Test.
 
 positive: copy statement with array of character parameter as destination
@@ -5156,12 +5156,12 @@ positive: copy statement with open array of character parameter as destination
 	BEGIN Procedure ("destination");
 	END Test.
 
-negative: copy statement with too short open array of character parameter as destination
+positive: copy statement with too short open array of character parameter as destination (truncate)
 
 	MODULE Test;
 	PROCEDURE Procedure (dest: ARRAY OF CHAR);
 	VAR source: ARRAY 20 OF CHAR;
-	BEGIN source := "source"; COPY (source, dest);
+	BEGIN source := "source"; COPY (source, dest); ASSERT(dest="");
 	END Procedure;
 	BEGIN Procedure ("");
 	END Test.
@@ -5177,13 +5177,13 @@ positive: copy statement with open variable array of character parameter as dest
 	BEGIN Procedure (dest); ASSERT (dest = "source");
 	END Test.
 
-negative: copy statement with too short open variable array of character parameter as destination
+positive: copy statement with too short open variable array of character parameter as destination (truncate)
 
 	MODULE Test;
 	VAR dest: ARRAY 2 OF CHAR;
 	PROCEDURE Procedure (VAR dest: ARRAY OF CHAR);
 	VAR source: ARRAY 20 OF CHAR;
-	BEGIN source := "source"; COPY (source, dest);
+	BEGIN source := "source"; COPY (source, dest); ASSERT(dest="s");
 	END Procedure;
 	BEGIN Procedure (dest);
 	END Test.
@@ -5250,12 +5250,12 @@ positive: copy statement with empty string as source and open array of character
 	BEGIN Procedure ("destination");
 	END Test.
 
-negative: copy statement with string as source and too short open array of character parameter as destination
+positive: copy statement with string as source and too short open array of character parameter as destination (truncate)
 
 	MODULE Test;
 	CONST Source = "source";
 	PROCEDURE Procedure (dest: ARRAY OF CHAR);
-	BEGIN COPY (Source, dest); ASSERT (dest = Source);
+	BEGIN COPY (Source, dest); ASSERT (dest = "");
 	END Procedure;
 	BEGIN Procedure ("");
 	END Test.
@@ -5282,7 +5282,7 @@ positive: copy statement with empty string as source and open variable array of 
 	BEGIN Procedure (dest); ASSERT (dest = Source); ASSERT (dest[0] = 0X);
 	END Test.
 
-negative: copy statement with string as source and too short open variable array of character parameter as destination
+positive: copy statement with string as source and too short open variable array of character parameter as destination (truncate)
 
 	MODULE Test;
 	CONST Source = "source";
@@ -5290,7 +5290,7 @@ negative: copy statement with string as source and too short open variable array
 	PROCEDURE Procedure (VAR dest: ARRAY OF CHAR);
 	BEGIN COPY (Source, dest);
 	END Procedure;
-	BEGIN Procedure (dest);
+	BEGIN Procedure (dest); ASSERT(dest="s");
 	END Test.
 
 
@@ -5356,7 +5356,7 @@ positive: string assignment on open variable array of character parameter
 	BEGIN Procedure (dest); ASSERT (dest = Source);
 	END Test.
 
-negative: string assignment on too short open variable array of character parameter
+positive: string assignment on too short open variable array of character parameter (truncate)
 
 	MODULE Test;
 	CONST Source = "source";
@@ -5364,7 +5364,7 @@ negative: string assignment on too short open variable array of character parame
 	PROCEDURE Procedure (VAR dest: ARRAY OF CHAR);
 	BEGIN dest := Source;
 	END Procedure;
-	BEGIN Procedure (dest);
+	BEGIN Procedure (dest); ASSERT(dest="s");
 	END Test.
 
 
@@ -7131,16 +7131,16 @@ positive: bitwise rotate
 	VAR val,rot: SET; by: LONGINT;
 	BEGIN
 		val := {1,2,3,30,31};
-		rot := SYSTEM.VAL(SET,SYSTEM.ROT(SYSTEM.VAL(LONGINT,val),7));
+		rot := SYSTEM.VAL(SET,ROT(SYSTEM.VAL(LONGINT,val),7));
 		ASSERT(rot ={5..6,8..10});
-		rot :=  SYSTEM.VAL(SET,SYSTEM.ROT(SYSTEM.VAL(LONGINT,val),-7));
+		rot :=  SYSTEM.VAL(SET,ROT(SYSTEM.VAL(LONGINT,val),-7));
 		ASSERT(rot={23..24,26..28});
 		val := {1,2,3,30,31};
 		by := 7;
-		rot := SYSTEM.VAL(SET,SYSTEM.ROT(SYSTEM.VAL(LONGINT,val),by));
+		rot := SYSTEM.VAL(SET,ROT(SYSTEM.VAL(LONGINT,val),by));
 		ASSERT(rot ={5..6,8..10});
 		by := -7;
-		rot := SYSTEM.VAL(SET,SYSTEM.ROT(SYSTEM.VAL(LONGINT,val),by));
+		rot := SYSTEM.VAL(SET,ROT(SYSTEM.VAL(LONGINT,val),by));
 		ASSERT(rot={23..24,26..28});
 
 	END P;
@@ -7437,7 +7437,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 	BEGIN
 		r := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
-		SYSTEM.MOVE(SYSTEM.ADR(r),SYSTEM.ADR(l),SYSTEM.SIZEOF(REAL));
+		SYSTEM.MOVE(SYSTEM.ADR(r),SYSTEM.ADR(l),SIZEOF(REAL));
 		RETURN l;
 	END Real;
 
@@ -7446,7 +7446,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 	BEGIN
 		r := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
-		SYSTEM.MOVE(SYSTEM.ADR(r),SYSTEM.ADR(l),SYSTEM.SIZEOF(HUGEINT));
+		SYSTEM.MOVE(SYSTEM.ADR(r),SYSTEM.ADR(l),SIZEOF(HUGEINT));
 		RETURN l;
 	END Longreal;
 
@@ -7455,7 +7455,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 	BEGIN
 		l := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
-		SYSTEM.MOVE(SYSTEM.ADR(l),SYSTEM.ADR(r),SYSTEM.SIZEOF(REAL));
+		SYSTEM.MOVE(SYSTEM.ADR(l),SYSTEM.ADR(r),SIZEOF(REAL));
 		RETURN r;
 	END Longint;
 
@@ -7464,7 +7464,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 	BEGIN
 		l := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
-		SYSTEM.MOVE(SYSTEM.ADR(l),SYSTEM.ADR(r),SYSTEM.SIZEOF(LONGREAL));
+		SYSTEM.MOVE(SYSTEM.ADR(l),SYSTEM.ADR(r),SIZEOF(LONGREAL));
 		RETURN r;
 	END Hugeint;
 
@@ -7802,3 +7802,72 @@ positive: pass record size to array of system.byte with dynamic dize for varpars
 		TestI(a^);
 		TestI(c);
 	END Test.
+
+positive: pass variables and values to array of byte
+
+	MODULE Test;
+
+	IMPORT SYSTEM; 
+
+	PROCEDURE Pass(CONST a: ARRAY OF SYSTEM.BYTE; len: LONGINT);
+	VAR i: LONGINT;
+	BEGIN
+		ASSERT(LEN(a) = len);
+	END Pass;
+
+	PROCEDURE Test;
+	VAR i: LONGINT;
+	BEGIN
+		Pass(3,1);
+		Pass(i,4);
+		Pass(3+i,4);
+		Pass(65000, 2); 
+	END Test;
+	
+	BEGIN
+		Test;
+	END Test.
+	
+positive: pass three-dimensional arrays A[x,y,z] with missing dimensions, e.g. A[x]
+	
+	MODULE Test;
+
+	IMPORT SYSTEM; 
+
+	PROCEDURE Pass(CONST a: ARRAY OF SYSTEM.BYTE; adr, len: ADDRESS);
+	VAR i: LONGINT;
+	BEGIN
+		ASSERT(ADDRESS OF a[0] = adr);
+		ASSERT(LEN(a) = len);
+	END Pass;
+
+	PROCEDURE Test;
+	TYPE
+		R= RECORD a,b,c: LONGINT END;
+		S= ARRAY 3 OF LONGINT;
+	VAR 
+		b: POINTER TO ARRAY OF ARRAY OF ARRAY OF LONGINT;
+		c: POINTER TO ARRAY OF ARRAY OF ARRAY OF R;
+		d: POINTER TO ARRAY OF ARRAY OF ARRAY OF S;
+	BEGIN
+		NEW(b,7,8,9);
+		Pass(b^, ADDRESS OF b[0,0,0], LEN(b,0)*LEN(b,1)*LEN(b,2)*SIZEOF(LONGINT));
+		Pass(b[1], ADDRESS OF b[1,0,0], LEN(b,1)*LEN(b,2)*SIZEOF(LONGINT));
+		Pass(b[1,2], ADDRESS OF b[1,2,0], LEN(b,2)*SIZEOF(LONGINT));
+		Pass(b[1,2,3], ADDRESS OF b[1,2,3], SIZEOF(LONGINT));
+		NEW(c,7,8,9);
+		Pass(c^, ADDRESS OF c[0,0,0], LEN(c,0)*LEN(c,1)*LEN(c,2)*SIZEOF(R));
+		Pass(c[1], ADDRESS OF c[1,0,0], LEN(c,1)*LEN(c,2)*SIZEOF(R));
+		Pass(c[1,2], ADDRESS OF c[1,2,0], LEN(c,2)*SIZEOF(R));
+		Pass(c[1,2,3], ADDRESS OF c[1,2,3], SIZEOF(R));
+		NEW(d,7,8,9);
+		Pass(d^, ADDRESS OF d[0,0,0], LEN(d,0)*LEN(d,1)*LEN(d,2)*SIZEOF(S));
+		Pass(d[1], ADDRESS OF d[1,0,0], LEN(d,1)*LEN(d,2)*SIZEOF(S));
+		Pass(d[1,2], ADDRESS OF d[1,2,0], LEN(d,2)*SIZEOF(S));
+		Pass(d[1,2,3], ADDRESS OF d[1,2,3], SIZEOF(S));
+	END Test;
+
+	BEGIN
+		Test;
+	END Test.
+

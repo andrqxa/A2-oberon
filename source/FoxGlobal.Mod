@@ -38,6 +38,8 @@ CONST
 	StringRealtime* = "REALTIME";
 	StringDynamic* = "DYNAMIC";
 	
+	StringFingerprint*="FingerPrint";
+	
 	StringInstructionWidth*="InstructionWidth";
 	StringDataMemorySize*= "DataMemorySize";
 	StringCodeMemorySize*= "CodeMemorySize";
@@ -59,6 +61,8 @@ CONST
 	StringEngine*="Engine";
 	StringTRM*="TRM";
 	StringTRMS*="TRMS";
+	StringBackend*="Backend";
+	StringRuntime*="Runtime";
 
 	(* traps *)
 	WithTrap* = 1;
@@ -186,9 +190,9 @@ VAR
 	SelfParameterName-,ReturnParameterName-,SystemName-,systemName-,PointerReturnName-, ResultName-,
 	A2Name-,OberonName-,ArrayBaseName-,RecordBodyName-,ModuleBodyName-,
 	NameWinAPI-,NameC-,NameMovable-,NameUntraced-,NameDelegate-,NameInterrupt-, NamePcOffset-, NameNoPAF-,NameEntry-, NameExit-, NameFixed-,NameFictive-, NameAligned-,NameStackAligned-,
-	NameExclusive-,NameActive-,NamePriority-,NameSafe-,NameRealtime-, NameDynamic-, NameDataMemorySize-, NameCodeMemorySize-
+	NameExclusive-,NameActive-,NamePriority-,NameSafe-,NameRealtime-, NameDynamic-, NameFingerprint-, NameDataMemorySize-, NameCodeMemorySize-
 	, NameChannelWidth-, NameChannelDepth-, NameChannelModule-, NameVector-, NameFloatingPoint-, NameNoMul-,NameNonBlockingIO-, NameTRM-, NameTRMS-, NameEngine-, NameFinal-, NameAbstract-,
-	NameFrequencyDivider-, NameRegister-,NameNoReturn-,NamePlain-,NameUnsafe-,NameDisposable-,NameUnchecked-,NameUncooperative-: SyntaxTree.Identifier;
+	NameBackend-, NameRuntime-, NameFrequencyDivider-, NameRegister-,NameNoReturn-,NamePlain-,NameUnsafe-,NameDisposable-,NameUnchecked-,NameUncooperative-: SyntaxTree.Identifier;
 
 	identifiers: ARRAY 2 OF ARRAY end OF SyntaxTree.Identifier;
 
@@ -203,9 +207,12 @@ VAR
 	Byte32: SyntaxTree.ByteType;
 
 TYPE
+	Position = SyntaxTree.Position;
+	
 	Alignment* = RECORD
 		min, max: LONGINT; (* alignments in bits *)
 	END;
+
 
 	PassInRegisterProc = PROCEDURE {DELEGATE} (type: SyntaxTree.Type): BOOLEAN;
 
@@ -333,6 +340,7 @@ TYPE
 
 		PROCEDURE GenerateCellOffsets(x: SyntaxTree.CellType): BOOLEAN;
 		VAR baseType: SyntaxTree.Type; offset,size: LONGINT; alignment, thisAlignment: LONGINT; variable: SyntaxTree.Variable;
+			parameter: SyntaxTree.Parameter; property: SyntaxTree.Property;
 		BEGIN
 			baseType := x.baseType;
 			IF (baseType # NIL) THEN
@@ -355,6 +363,44 @@ TYPE
 				IF alignment <= 0 THEN alignment := dataUnit END;
 			END;
 
+			IF cellsAreObjects THEN
+				(* ports *)
+				parameter := x.cellScope.ownerCell.firstParameter;
+				WHILE (parameter # NIL) DO
+					size := SizeOf(parameter.type.resolved);
+					IF size < 0 THEN RETURN FALSE END;
+
+					IF parameter.alignment > 0 THEN
+						thisAlignment := parameter.alignment*dataUnit;
+					ELSE
+						thisAlignment := AlignmentOf(SELF.variableAlignment, parameter.type.resolved);
+					END;
+					Basic.Align(offset, thisAlignment);
+					IF thisAlignment  > alignment THEN alignment := thisAlignment END;
+					parameter.SetOffset(offset);
+					INC(offset,size);
+					parameter := parameter.nextParameter;
+				END;
+				(* properties *)
+				property := x.cellScope.ownerCell.firstProperty;
+				WHILE (property # NIL) DO
+					size := SizeOf(property.type.resolved);
+					IF size < 0 THEN RETURN FALSE END;
+
+					IF property.alignment > 0 THEN
+						thisAlignment := property.alignment*dataUnit;
+					ELSE
+						thisAlignment := AlignmentOf(SELF.variableAlignment, property.type.resolved);
+					END;
+					Basic.Align(offset, thisAlignment);
+					IF thisAlignment  > alignment THEN alignment := thisAlignment END;
+
+					property.SetOffset(offset);
+					INC(offset,size);
+					property := property.nextProperty;
+				END;
+			END;
+			(* variables *)
 			variable := x.cellScope.firstVariable;
 			WHILE (variable # NIL) DO
 				IF ~variable.fictive THEN
@@ -435,7 +481,7 @@ TYPE
 					parameter.SetOffset(offset);
 					size := SizeOfParameter(parameter);
 					IF size < 0 THEN RETURN FALSE END;
-					INC(offset,SizeOfParameter(parameter));
+					INC(offset,size);
 					parameter := parameter.prevParameter;
 				END;
 				parameter := procedureType.returnParameter;
@@ -444,7 +490,15 @@ TYPE
 					parameter.SetOffset(offset);
 					size := SizeOfParameter(parameter);
 					IF size < 0 THEN RETURN FALSE END;
-					INC(offset,SizeOfParameter(parameter));
+					INC(offset,size);
+				END;
+				parameter := procedureType.selfParameter;
+				IF parameter # NIL THEN
+					Basic.Align(offset,addressSize);
+					parameter.SetOffset(offset);
+					size := SizeOfParameter(parameter);
+					IF size < 0 THEN RETURN FALSE END;
+					INC(offset,size);
 				END;
 			ELSE
 				parameter := procedureType.firstParameter;
@@ -457,7 +511,7 @@ TYPE
 					parameter := parameter.nextParameter;
 				END;
 			END;
-			IF (procedureType.isDelegate) THEN
+			IF procedureType.isDelegate & (procedureType.selfParameter = NIL) THEN
 				INC(offset,addressSize); (* parameter offset of delegate *)
 			END;
 			RETURN TRUE
@@ -570,7 +624,9 @@ TYPE
 					RETURN SizeOf(rangeType) (* array range components are materialized on stack for both value and const parameters *)
 				END
 			ELSIF par.type.resolved IS SyntaxTree.RecordType THEN
-				IF (par.kind IN {SyntaxTree.ConstParameter,SyntaxTree.VarParameter}) THEN
+				IF par.selfParameter THEN
+					RETURN addressSize
+				ELSIF (par.kind IN {SyntaxTree.ConstParameter,SyntaxTree.VarParameter}) THEN
 					IF IsOberonProcedure(par.ownerType) THEN
 						RETURN 2*addressSize
 					ELSE
@@ -647,12 +703,12 @@ TYPE
 		END;
 		system.globalScope[Scanner.Uppercase] := SyntaxTree.NewModuleScope();
 		system.globalScope[Scanner.Lowercase] := SyntaxTree.NewModuleScope();
-		system.globalModule[Scanner.Uppercase] := SyntaxTree.NewModule("",-1,SyntaxTree.NewIdentifier("@GLOBAL"),system.globalScope[Scanner.Uppercase],Scanner.Uppercase);
-		system.globalModule[Scanner.Lowercase] := SyntaxTree.NewModule("",-1,SyntaxTree.NewIdentifier("@global"),system.globalScope[Scanner.Lowercase],Scanner.Lowercase);
+		system.globalModule[Scanner.Uppercase] := SyntaxTree.NewModule("",SyntaxTree.invalidPosition,SyntaxTree.NewIdentifier("@GLOBAL"),system.globalScope[Scanner.Uppercase],Scanner.Uppercase);
+		system.globalModule[Scanner.Lowercase] := SyntaxTree.NewModule("",SyntaxTree.invalidPosition,SyntaxTree.NewIdentifier("@global"),system.globalScope[Scanner.Lowercase],Scanner.Lowercase);
 		system.systemScope[Scanner.Uppercase] := SyntaxTree.NewModuleScope();
 		system.systemScope[Scanner.Lowercase] := SyntaxTree.NewModuleScope();
-		system.systemModule[Scanner.Uppercase] := SyntaxTree.NewModule("",-1,SystemName,system.systemScope[Scanner.Uppercase],Scanner.Uppercase);
-		system.systemModule[Scanner.Lowercase] := SyntaxTree.NewModule("",-1,systemName,system.systemScope[Scanner.Lowercase],Scanner.Lowercase);
+		system.systemModule[Scanner.Uppercase] := SyntaxTree.NewModule("",SyntaxTree.invalidPosition,SystemName,system.systemScope[Scanner.Uppercase],Scanner.Uppercase);
+		system.systemModule[Scanner.Lowercase] := SyntaxTree.NewModule("",SyntaxTree.invalidPosition,systemName,system.systemScope[Scanner.Lowercase],Scanner.Lowercase);
 	END BuildScopes;
 
 	PROCEDURE SetDefaultDeclarations*(system: System; minBits: LONGINT);
@@ -976,7 +1032,7 @@ TYPE
 	PROCEDURE DeclareType0(type: SyntaxTree.Type; CONST name: ARRAY OF CHAR; in: SyntaxTree.Scope);
 	VAR basic: SyntaxTree.TypeDeclaration; duplicate: BOOLEAN;
 	BEGIN
-		basic := SyntaxTree.NewTypeDeclaration(-1,SyntaxTree.NewIdentifier(name));
+		basic := SyntaxTree.NewTypeDeclaration(SyntaxTree.invalidPosition,SyntaxTree.NewIdentifier(name));
 		basic.SetDeclaredType(type);
 		basic.SetState(SyntaxTree.Resolved);
 		basic.SetAccess(SyntaxTree.ReadOnly);
@@ -1007,9 +1063,9 @@ TYPE
 	PROCEDURE NewConstant0(CONST name: ARRAY OF CHAR; int: LONGINT; type: SyntaxTree.Type; in: SyntaxTree.Scope);
 	VAR constant: SyntaxTree.Constant; value: SyntaxTree.IntegerValue;duplicate: BOOLEAN;
 	BEGIN
-		value := SyntaxTree.NewIntegerValue(-1,int);
+		value := SyntaxTree.NewIntegerValue(SyntaxTree.invalidPosition,int);
 		value.SetType(type);
-		constant := SyntaxTree.NewConstant(-1,SyntaxTree.NewIdentifier(name));
+		constant := SyntaxTree.NewConstant(SyntaxTree.invalidPosition,SyntaxTree.NewIdentifier(name));
 		constant.SetValue(value);
 		constant.SetType(value.type);
 		constant.SetAccess(SyntaxTree.ReadOnly);
@@ -1031,9 +1087,9 @@ TYPE
 	PROCEDURE NewStringConstant0(CONST name: ARRAY OF CHAR; string: SyntaxTree.String; baseType: SyntaxTree.Type; in: SyntaxTree.Scope);
 	VAR constant: SyntaxTree.Constant; value: SyntaxTree.StringValue;duplicate: BOOLEAN;
 	BEGIN
-		value := SyntaxTree.NewStringValue(-1,string);
-		value.SetType(SyntaxTree.NewStringType(-1,baseType,value.length));
-		constant := SyntaxTree.NewConstant(-1,SyntaxTree.NewIdentifier(name));
+		value := SyntaxTree.NewStringValue(SyntaxTree.invalidPosition,string);
+		value.SetType(SyntaxTree.NewStringType(SyntaxTree.invalidPosition,baseType,value.length));
+		constant := SyntaxTree.NewConstant(SyntaxTree.invalidPosition,SyntaxTree.NewIdentifier(name));
 		constant.SetValue(value);
 		constant.SetType(value.type);
 		constant.SetAccess(SyntaxTree.ReadOnly);
@@ -1061,9 +1117,9 @@ TYPE
 	PROCEDURE NewBuiltin0( id: LONGINT; CONST name: ARRAY OF CHAR; in:  SyntaxTree.ModuleScope; realtime: BOOLEAN);
 	VAR basic: SyntaxTree.Builtin; duplicate: BOOLEAN; type: SyntaxTree.ProcedureType;
 	BEGIN
-		basic := SyntaxTree.NewBuiltin(-1,SyntaxTree.NewIdentifier(name),id);
+		basic := SyntaxTree.NewBuiltin(SyntaxTree.invalidPosition,SyntaxTree.NewIdentifier(name),id);
 		basic.SetAccess(SyntaxTree.ReadOnly);
-		type := SyntaxTree.NewProcedureType(-1,in);
+		type := SyntaxTree.NewProcedureType(SyntaxTree.invalidPosition,in);
 		type.SetRealtime(realtime);
 		type.SetReturnType(SyntaxTree.invalidType); (* make incompatible to any procedure *)
 		basic.SetType(type);
@@ -1093,7 +1149,7 @@ TYPE
 		isDuplicate: BOOLEAN;
 		customBuiltin: SyntaxTree.CustomBuiltin;
 	BEGIN
-		customBuiltin := SyntaxTree.NewCustomBuiltin(-1, SyntaxTree.NewIdentifier(name), systemSpecial, subType);
+		customBuiltin := SyntaxTree.NewCustomBuiltin(SyntaxTree.invalidPosition, SyntaxTree.NewIdentifier(name), systemSpecial, subType);
 		customBuiltin.SetAccess(SyntaxTree.ReadOnly); (* TODO: this might be changed *)
 		procedureType.SetRealtime(TRUE);
 		customBuiltin.SetType(procedureType); (* TODO: make incompatible to any procedure *)
@@ -1424,7 +1480,7 @@ TYPE
 		END;
 	END GetIntegerType;
 	
-	PROCEDURE NewIntegerValue*(system: System; position: LONGINT; hugeint: HUGEINT): SyntaxTree.Value;
+	PROCEDURE NewIntegerValue*(system: System; position: Position; hugeint: HUGEINT): SyntaxTree.Value;
 	VAR value: SyntaxTree.IntegerValue;
 	BEGIN
 		value := SyntaxTree.NewIntegerValue(position,hugeint);
@@ -1432,7 +1488,7 @@ TYPE
 		RETURN value
 	END NewIntegerValue;
 
-	PROCEDURE NewBooleanValue*(system: System; position: LONGINT; b: BOOLEAN): SyntaxTree.Value;
+	PROCEDURE NewBooleanValue*(system: System; position: Position; b: BOOLEAN): SyntaxTree.Value;
 	VAR value: SyntaxTree.BooleanValue;
 	BEGIN
 		value := SyntaxTree.NewBooleanValue(position,b);
@@ -1440,7 +1496,7 @@ TYPE
 		RETURN value
 	END NewBooleanValue;
 
-	PROCEDURE NewSetValue*(system: System; position: LONGINT; s: SET): SyntaxTree.Value;
+	PROCEDURE NewSetValue*(system: System; position: Position; s: SET): SyntaxTree.Value;
 	VAR value: SyntaxTree.SetValue;
 	BEGIN
 		value := SyntaxTree.NewSetValue(position,s);
@@ -1448,7 +1504,7 @@ TYPE
 		RETURN value
 	END NewSetValue;
 
-	PROCEDURE NewCharacterValue*(system: System; position: LONGINT; c: CHAR): SyntaxTree.Value;
+	PROCEDURE NewCharacterValue*(system: System; position: Position; c: CHAR): SyntaxTree.Value;
 	VAR value: SyntaxTree.CharacterValue;
 	BEGIN
 		value := SyntaxTree.NewCharacterValue(position,c);
@@ -1456,7 +1512,7 @@ TYPE
 		RETURN value
 	END NewCharacterValue;
 
-	PROCEDURE NewNilValue*(system: System; position: LONGINT): SyntaxTree.Value;
+	PROCEDURE NewNilValue*(system: System; position: Position): SyntaxTree.Value;
 	VAR value: SyntaxTree.NilValue;
 	BEGIN
 		value := SyntaxTree.NewNilValue(position);
@@ -1651,6 +1707,8 @@ TYPE
 		NameNonBlockingIO:=SyntaxTree.NewIdentifier(StringNonBlockingIO);
 		NameTRM := SyntaxTree.NewIdentifier(StringTRM);
 		NameTRMS := SyntaxTree.NewIdentifier(StringTRMS);
+		NameBackend := SyntaxTree.NewIdentifier(StringBackend);
+		NameRuntime := SyntaxTree.NewIdentifier(StringRuntime);
 		NameEngine := SyntaxTree.NewIdentifier(StringEngine);
 		NameFinal := SyntaxTree.NewIdentifier(StringFinal);
 		NameAbstract := SyntaxTree.NewIdentifier(StringAbstract);
@@ -1662,6 +1720,7 @@ TYPE
 		NameDisposable := SyntaxTree.NewIdentifier(StringDisposable);
 		NameUnchecked := SyntaxTree.NewIdentifier(StringUnchecked);
 		NameUncooperative := SyntaxTree.NewIdentifier(StringUncooperative);
+		NameFingerprint := SyntaxTree.NewIdentifier(StringFingerprint);
 
 		(* types *)
 		Boolean8 := SyntaxTree.NewBooleanType(8);

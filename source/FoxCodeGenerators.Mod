@@ -132,12 +132,12 @@ TYPE
 			SELF.module := module;
 		END SetModule;
 
-		PROCEDURE Error*(position: LONGINT; CONST message: ARRAY OF CHAR);
+		PROCEDURE Error*(position: Basic.Position; CONST message: ARRAY OF CHAR);
 		VAR string:Basic.MessageString;
 		BEGIN
 			IF diagnostics # NIL THEN
 				Basic.SegmentedNameToString(in.name, string);
-				diagnostics.Error(string, position, Diagnostics.Invalid, message)
+				Basic.Error(diagnostics,string, position, message)
 			END;
 			IF dump # NIL THEN (* to see error in trace output also *)
 				dump.String("Error: "); dump.String(message); dump.Ln; dump.Update;
@@ -184,7 +184,7 @@ TYPE
 							Strings.Append(msg, ":");
 							Strings.IntToStr(fixup.offset, number);
 							Strings.Append(msg, number);
-							Error(inPC,msg)
+							Error(Basic.invalidPosition,msg)
 						END
 					ELSE
 						out.fixupList.AddFixup(fixup);
@@ -195,7 +195,7 @@ TYPE
 
 			PROCEDURE GetRegisterAllocation;
 			CONST MaxParameterRegisters=16;
-			VAR pc,i,op: LONGINT; ofs: HUGEINT; parameterRegisters: ARRAY MaxParameterRegisters OF IntermediateCode.Operand;
+			VAR pc,i,op,ofs: LONGINT; parameterRegisters: ARRAY MaxParameterRegisters OF IntermediateCode.Operand;
 
 				PROCEDURE RegisterUsage(CONST instruction: IntermediateCode.Instruction);
 				VAR i: LONGINT;
@@ -216,7 +216,6 @@ TYPE
 						END;
 					END Use;
 				BEGIN
-					(*IF instruction.opcode = IntermediateCode.allocate THEN RETURN END;*)
 					Use(instruction.op1);
 					Use(instruction.op2);
 					Use(instruction.op3);
@@ -584,10 +583,8 @@ TYPE
 		END EmitReserve;
 
 		PROCEDURE EmitLabel(CONST instruction: IntermediateCode.Instruction);
-		VAR position: LONGINT;
 		BEGIN
-			position := SHORT(instruction.op1.intValue);
-			out.AddLabel(position);
+			out.AddLabel(instruction.textPosition);
 		END EmitLabel;
 
 		PROCEDURE Prepare*;
@@ -644,7 +641,6 @@ TYPE
 			ELSE
 				link := live;
 				WHILE (link.next # NIL) & (link.next.lastuse < ticket.lastuse) DO
-					TRACE(link, link.next.lastuse, ticket.lastuse, link.register, ticket.register, ticket.spilled, link.spilled);
 					ASSERT((link.register # ticket.register) OR ticket.spilled);
 					link := link.next;
 				END;
@@ -1093,7 +1089,6 @@ TYPE
 
 		PROCEDURE GetPreferredSpill*(CONST type: IntermediateCode.Type): Ticket;
 		VAR ticket,spill: Ticket;
-
 			PROCEDURE Spillable(ticket: Ticket; best:BOOLEAN): BOOLEAN;
 			BEGIN
 				RETURN

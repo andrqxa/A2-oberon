@@ -4,7 +4,7 @@ IMPORT
 	Basic := FoxBasic, Scanner := FoxScanner, SyntaxTree := FoxSyntaxTree, Global := FoxGlobal, Backend := FoxBackend, Sections := FoxSections,
 	IntermediateCode := FoxIntermediateCode, IntermediateBackend := FoxIntermediateBackend, BinaryCode := FoxBinaryCode,
 	InstructionSet := FoxAMD64InstructionSet, Assembler := FoxAMD64Assembler, SemanticChecker := FoxSemanticChecker, Formats := FoxFormats,
-	Diagnostics, Streams, Options, Strings, ObjectFileFormat := FoxBinaryObjectFile, 
+	Diagnostics, Streams, Options, Strings, ObjectFileFormat := FoxBinaryObjectFile, Compiler,
 	Machine, D := Debugging, CodeGenerators := FoxCodeGenerators, ObjectFile, SYSTEM;
 
 CONST
@@ -241,7 +241,7 @@ TYPE
 			sizeInBits := type.sizeInBits;
 			form := type.form;
 			IF (type.length > 1) THEN
-				IF (* (type.form = IntermediateCode.Float) &*)  (type.sizeInBits=32) & (type.length =4) THEN
+				IF (* (type.form = IntermediateCode.Float) &*)  (type.sizeInBits<=32) & (type.length =4) THEN
 					i := Get(XMM7, XMM0);
 				ELSE
 					HALT(100)
@@ -552,7 +552,7 @@ TYPE
 
 			PROCEDURE CheckEmptySpillStack;
 			BEGIN
-				IF spillStack.Size()#0 THEN Error(inPC,"implementation error, spill stack not cleared") END;
+				IF spillStack.Size()#0 THEN Error(Basic.invalidPosition,"implementation error, spill stack not cleared") END;
 			END CheckEmptySpillStack;
 
 		BEGIN
@@ -639,8 +639,13 @@ TYPE
 			IF type.length > 1 THEN
 				IF type.length = 4 THEN
 					(*ASSERT(type.form = IntermediateCode.Float);*)
-					ASSERT(type.sizeInBits = 32);
+					IF (*(type.form = IntermediateCode.Float) & *) (type.sizeInBits = 32) THEN
 					SpecialMove(InstructionSet.opMOVUPS, InstructionSet.opMOVUPS, TRUE, dest, src, type);
+					ELSIF (type.sizeInBits = 16) THEN
+						SpecialMove(InstructionSet.opMOVQ, InstructionSet.opMOVQ, TRUE, dest, src, type);
+					ELSIF  (type.sizeInBits = 8) THEN
+						SpecialMove(InstructionSet.opMOVD, InstructionSet.opMOVD, TRUE, dest, src, type);
+					END;
 				ELSE
 					(*
 					ASSERT(type.form = IntermediateCode.Float);
@@ -685,9 +690,7 @@ TYPE
 		VAR op: Assembler.Operand;
 		BEGIN
 			GetSpillOperand(ticket,op);
-			(*emitter.Emit2(InstructionSet.opMOV,registerOperands[ticket.register],op);*)
-			Move(registerOperands[ticket.register], op, ticket.type)
-
+			emitter.Emit2(InstructionSet.opMOV,registerOperands[ticket.register],op);
 		END ToRegister;
 
 		PROCEDURE ExchangeTickets(ticket1,ticket2: Ticket);
@@ -1008,7 +1011,7 @@ TYPE
 					TicketToOperand(ticket, tmp);
 					ticket := NIL;
 				END;
-				IF Assembler.IsRegisterOperand(physical) THEN
+				IF Assembler.IsRegisterOperand(physical) & (type.sizeInBits > 8) THEN
 					Assembler.InitMem(physical,SHORTINT(type.length * type.sizeInBits DIV 8) , physical.register, virtual.offset);
 					emitter.Emit2(InstructionSet.opLEA, tmp,physical);
 				ELSE
@@ -1231,8 +1234,8 @@ TYPE
 					ELSE
 						EmitArithmetic3XMM(instruction, InstructionSet.opSUBSS, InstructionSet.opSUBSD)
 					END;
-				ELSE EmitArithmetic3(instruction,Low,InstructionSet.opSUB);
-					IF IsComplex(instruction.op1) THEN EmitArithmetic3(instruction, High, InstructionSet.opSBB) END;
+				ELSE EmitArithmetic3Part(instruction,Low,InstructionSet.opSUB);
+					IF IsComplex(instruction.op1) THEN EmitArithmetic3Part(instruction, High, InstructionSet.opSBB) END;
 				END;
 			|IntermediateCode.add:
 				IF IsFloat(instruction.op1) THEN
@@ -1241,21 +1244,18 @@ TYPE
 					ELSE
 						EmitArithmetic3XMM(instruction, InstructionSet.opADDSS, InstructionSet.opADDSD)
 					END;
-				ELSE EmitArithmetic3(instruction,Low,InstructionSet.opADD);
-					IF IsComplex(instruction.op1) THEN EmitArithmetic3(instruction, High, InstructionSet.opADC) END;
+				ELSE EmitArithmetic3Part(instruction,Low,InstructionSet.opADD);
+					IF IsComplex(instruction.op1) THEN EmitArithmetic3Part(instruction, High, InstructionSet.opADC) END;
 				END;
 			|IntermediateCode.and:
 				Assert(~IsFloat(instruction.op1),"operation not defined on float");
-				EmitArithmetic3(instruction,Low,InstructionSet.opAND);
-				IF IsComplex(instruction.op1) THEN EmitArithmetic3(instruction, High, InstructionSet.opAND) END;
+				EmitArithmetic3(instruction,InstructionSet.opAND);
 			|IntermediateCode.or:
 				Assert(~IsFloat(instruction.op1),"operation not defined on float");
-				EmitArithmetic3(instruction,Low,InstructionSet.opOR);
-				IF IsComplex(instruction.op1) THEN EmitArithmetic3(instruction, High, InstructionSet.opOR) END;
+				EmitArithmetic3(instruction,InstructionSet.opOR);
 			|IntermediateCode.xor:
 				Assert(~IsFloat(instruction.op1),"operation not defined on float");
-				EmitArithmetic3(instruction,Low,InstructionSet.opXOR);
-				IF IsComplex(instruction.op1) THEN EmitArithmetic3(instruction, High, InstructionSet.opXOR) END;
+				EmitArithmetic3(instruction,InstructionSet.opXOR);
 			|IntermediateCode.shl: EmitShift(instruction);
 			|IntermediateCode.shr: EmitShift(instruction);
 			|IntermediateCode.rol: EmitShift(instruction);
@@ -1525,8 +1525,9 @@ TYPE
 		VAR op1,op2: Assembler.Operand; tmp: IntermediateCode.Operand;
 			t: CodeGenerators.Ticket;
 			type: IntermediateCode.Type;
+			offset: LONGINT;
 		BEGIN
-			IF (vdest.mode = IntermediateCode.ModeRegister) & (vsrc.mode = IntermediateCode.ModeRegister) & (vsrc.offset # 0) THEN
+			IF (vdest.mode = IntermediateCode.ModeRegister) & (vsrc.mode = IntermediateCode.ModeRegister) & (vsrc.type.sizeInBits > 8) & (vsrc.offset # 0)THEN
 				(* MOV R1, R2+offset => LEA EAX, [EBX+offset] *)
 				tmp := vsrc;
 				IntermediateCode.MakeMemory(tmp,vsrc.type);
@@ -1541,7 +1542,6 @@ TYPE
 					UnSpill(t); (* make sure this has not spilled *)
 					MakeOperand(vdest,part, op1,NIL);
 				END;
-
 				emitter.Emit2(InstructionSet.opLEA,op1,op2);
 			ELSE
 				MakeOperand(vsrc,part,op2,NIL);
@@ -2084,19 +2084,25 @@ TYPE
 			END;
 		END FinishOp;
 
-		PROCEDURE EmitArithmetic3(CONST instruction: IntermediateCode.Instruction; part: LONGINT; opcode: LONGINT);
+		PROCEDURE EmitArithmetic3Part(CONST instruction: IntermediateCode.Instruction; part: LONGINT; opcode: LONGINT);
 		VAR left,right: Assembler.Operand; ticket: Ticket;
 		BEGIN
 			PrepareOp3(instruction, part, left,right,ticket);
 			emitter.Emit2(opcode,left,right);
 			FinishOp(instruction.op1,part,left,ticket);
+		END EmitArithmetic3Part;
+
+		PROCEDURE EmitArithmetic3(CONST instruction: IntermediateCode.Instruction; opcode: LONGINT);
+		BEGIN
+				EmitArithmetic3Part(instruction,Low,opcode);
+				IF IsComplex(instruction.op1) THEN EmitArithmetic3Part(instruction, High, opcode) END;
 		END EmitArithmetic3;
 
 		PROCEDURE EmitArithmetic3XMM(CONST instruction: IntermediateCode.Instruction; op32, op64: LONGINT);
 		VAR op: LONGINT;
 		BEGIN
 			IF instruction.op1.type.sizeInBits = 32 THEN op := op32 ELSE op := op64 END;
-			EmitArithmetic3(instruction, Low, op);
+			EmitArithmetic3Part(instruction, Low, op);
 		END EmitArithmetic3XMM;
 
 		PROCEDURE EmitArithmetic2(CONST instruction: IntermediateCode.Instruction; part: LONGINT; opcode: LONGINT);
@@ -2146,7 +2152,16 @@ TYPE
 
 		PROCEDURE EmitMul(CONST instruction: IntermediateCode.Instruction);
 		VAR op1,op2,op3,temp: Assembler.Operand; ra,rd: Ticket;
+			value: HUGEINT; exp: LONGINT; iop3: IntermediateCode.Operand;
+			inst: IntermediateCode.Instruction;
 		BEGIN
+			IF IntermediateCode.IsConstantInteger(instruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
+				IntermediateCode.InitImmediate(iop3, IntermediateCode.uint32, exp);
+				IntermediateCode.InitInstruction(inst, Basic.invalidPosition, IntermediateCode.shl, instruction.op1, instruction.op2, iop3);
+				EmitShift(inst);
+				RETURN;
+			END;
+
 			ASSERT(~IsComplex(instruction.op1));
 			ASSERT(instruction.op1.type.form IN IntermediateCode.Integer);
 			IF (instruction.op1.type.sizeInBits = IntermediateCode.Bits8) THEN
@@ -2226,7 +2241,24 @@ TYPE
 			dividend,quotient,remainder,imm,target,memop: Assembler.Operand;
 			op1,op2,op3: Assembler.Operand; ra,rd: Ticket;
 			size: LONGINT;
+			value: HUGEINT; exp: LONGINT; iop3: IntermediateCode.Operand;
+			inst: IntermediateCode.Instruction;
+
 		BEGIN
+			IF IntermediateCode.IsConstantInteger(instruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
+				IF instruction.opcode = IntermediateCode.div THEN					
+					IntermediateCode.InitImmediate(iop3, IntermediateCode.uint32, exp);
+					IntermediateCode.InitInstruction(inst, Basic.invalidPosition, IntermediateCode.shr, instruction.op1, instruction.op2, iop3);
+					EmitShift(inst);
+					RETURN;
+				ELSE
+					IntermediateCode.InitImmediate(iop3, instruction.op3.type, value-1);
+					IntermediateCode.InitInstruction(inst, Basic.invalidPosition, IntermediateCode.and, instruction.op1, instruction.op2, iop3);
+					EmitArithmetic3(inst,InstructionSet.opAND);
+					RETURN;					
+				END;
+			END;
+
 			(*
 			In general it must obviously hold that
 				a = (a div b) * b + a mod b and
@@ -3113,7 +3145,8 @@ TYPE
 			procedure := symbol(SyntaxTree.Procedure);
 			scope := procedure.procedureScope;
 			NEW(assembler,diagnostics,emitter);
-			assembler.Assemble(reader,SHORT(instruction.op1.intValue),scope,in,in,module,procedure.access * SyntaxTree.Public # {}, procedure.isInline, map)	;
+			assembler.useLineNumbers := Compiler.UseLineNumbers IN backend.flags;
+			assembler.Assemble(reader,instruction.textPosition,scope,in,in,module,procedure.access * SyntaxTree.Public # {}, procedure.isInline, map)	;
 			error := error OR assembler.error;
 
 			IF outr # NIL THEN
@@ -3124,11 +3157,7 @@ TYPE
 						IF ticket.lastuse = inPC THEN UnmapTicket(ticket); physicalRegisters.AllocationHint(register) END; (* try to reuse register here *)
 						Assembler.InitRegister(reg, register);
 						MakeOperand(outr[i], Low, dest, NIL);
-						IF outr[i].type.length > 1 THEN
-							SpecialMove(InstructionSet.opMOVUPS,InstructionSet.opMOVUPS, TRUE, dest, reg, outr[i].type)
-						ELSE
-							Move( dest, reg,outr[i].type)
-						END;
+						Move( dest, reg,outr[i].type)
 					END;
 				END;
 			END;
@@ -3208,6 +3237,7 @@ TYPE
 			cRegisters[4] := R8 - RAX;
 			cRegisters[5] := R9 - RAX; 
 			
+			SetName("AMD");
 		END InitBackendAMD64;
 
 		PROCEDURE Initialize(diagnostics: Diagnostics.Diagnostics; log: Streams.Writer; flags: SET; checker: SemanticChecker.Checker; system: Global.System);
@@ -3401,7 +3431,7 @@ TYPE
 		 	END;
 			*)
 
-			IF cg.error THEN Error("",Diagnostics.Invalid, Diagnostics.Invalid,"") END;
+			IF cg.error THEN Error("",Basic.invalidPosition, Diagnostics.Invalid,"") END;
 		END GenerateBinary;
 
 		(* genasm *)
@@ -3457,7 +3487,7 @@ TYPE
 			UNTIL (i = module(Sections.Module).allSections.Length()) OR (section.name = pooledName);
 
 			IF section.name # pooledName THEN
-				diagnostics.Error(module.module.sourceName,Diagnostics.Invalid,Diagnostics.Invalid," could not locate pc");
+				Basic.Error(diagnostics, module.module.sourceName,Basic.invalidPosition, " could not locate pc");
 			ELSE
 				binarySection := section(IntermediateCode.Section).resolved;
 				label := binarySection.labels;
@@ -3465,9 +3495,9 @@ TYPE
 					label := label.prev;
 				END;
 				IF label # NIL THEN
-					diagnostics.Information(module.module.sourceName,label.position,Diagnostics.Invalid," pc position");
+					Basic.Information(diagnostics, module.module.sourceName,label.position, " pc position");
 				ELSE
-					diagnostics.Error(module.module.sourceName,Diagnostics.Invalid,Diagnostics.Invalid," could not locate pc");
+					Basic.Error(diagnostics, module.module.sourceName,Basic.invalidPosition, " could not locate pc");
 				END;
 			END;
 		END FindPC;
@@ -3475,7 +3505,12 @@ TYPE
 		PROCEDURE CanPassInRegister*(type: SyntaxTree.Type): BOOLEAN;
 		VAR length: LONGINT; baseType: SyntaxTree.Type; b: BOOLEAN;
 		BEGIN
-			b := SemanticChecker.IsStaticMathArray(type, length, baseType) & (baseType IS SyntaxTree.FloatType) & (baseType.sizeInBits = 32) & (length = 4);
+			b := SemanticChecker.IsStaticMathArray(type, length, baseType) & (baseType IS SyntaxTree.FloatType) & 
+			(baseType.sizeInBits <= 32) & (length = 4);
+			b := b OR SemanticChecker.IsStaticMathArray(type, length, baseType) & (baseType IS SyntaxTree.CharacterType) & 
+			(baseType.sizeInBits = 8) & (length = 4);
+			b := b OR SemanticChecker.IsStaticArray(type, baseType, length) & (baseType.resolved IS SyntaxTree.CharacterType) & 
+			(baseType.resolved.sizeInBits = 8) & (length = 4);
 			RETURN b
 		END CanPassInRegister;
 

@@ -124,7 +124,7 @@ TYPE
 	Instruction* = POINTER TO RECORD
 		opcode-: SHORTINT; (* instruction opcode *)
 		subtype-: SHORTINT; (* for special backend instruction *)
-		textPosition-: LONGINT; (* for error handling and tracking (findPC) *)
+		textPosition-: Basic.Position; (* for error handling and tracking (findPC) *)
 		pc-: LONGINT; (* backend program counter (in bits) for debugging and for label fixups in backend *)
 		op1*,op2*,op3*: Operand; (* first operand typically provides the result, if any *)
 	END;
@@ -809,7 +809,7 @@ TYPE
 		AddFormat(special,"special",Any, Any, Any, {} );
 	END InitInstructions;
 
-	PROCEDURE InitInstruction*(VAR instr: Instruction; textPosition: LONGINT; opcode: SHORTINT; op1,op2,op3: Operand);
+	PROCEDURE InitInstruction*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SHORTINT; op1,op2,op3: Operand);
 	VAR format: InstructionFormat; mode1, mode2, mode3: LONGINT; (* debugging *)
 	BEGIN
 		IF instr = NIL THEN NEW(instr) END;
@@ -835,17 +835,17 @@ TYPE
 		instr.textPosition := textPosition;
 	END InitInstruction;
 
-	PROCEDURE InitInstruction2*(VAR instr: Instruction; textPosition: LONGINT; opcode: SHORTINT; op1,op2: Operand);
+	PROCEDURE InitInstruction2*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SHORTINT; op1,op2: Operand);
 	BEGIN
 		InitInstruction(instr, textPosition, opcode, op1, op2, empty);
 	END InitInstruction2;
 
-	PROCEDURE InitInstruction1*(VAR instr: Instruction; textPosition: LONGINT; opcode: SHORTINT; op1: Operand);
+	PROCEDURE InitInstruction1*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SHORTINT; op1: Operand);
 	BEGIN
 		InitInstruction(instr, textPosition, opcode, op1, empty, empty);
 	END InitInstruction1;
 
-	PROCEDURE InitInstruction0*(VAR instr: Instruction; textPosition: LONGINT; opcode: SHORTINT);
+	PROCEDURE InitInstruction0*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SHORTINT);
 	BEGIN
 		InitInstruction(instr, textPosition, opcode, empty, empty, empty);
 	END InitInstruction0;
@@ -1211,6 +1211,16 @@ TYPE
 
 			RETURN GetType(system,system.addressType);
 		ELSIF (type IS SyntaxTree.ArrayType) & (type(SyntaxTree.ArrayType).form = SyntaxTree.SemiDynamic) THEN
+			RETURN GetType(system,system.addressType);
+		ELSIF type IS SyntaxTree.ArrayType THEN
+			WITH type: SyntaxTree.ArrayType DO
+				IF type.form = SyntaxTree.Static THEN
+					t := GetType(system, type.arrayBase);
+					ASSERT(t.length = 1);
+					ToVectorType(t, type.staticLength);
+					RETURN t
+				END;
+			END;		
 			RETURN GetType(system,system.addressType);
 		ELSIF type IS SyntaxTree.PortType THEN
 			RETURN GetType(system, system.addressType);

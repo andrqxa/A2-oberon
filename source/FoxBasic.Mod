@@ -2,7 +2,7 @@ MODULE FoxBasic;   (**  AUTHOR "fof"; PURPOSE "Oberon Compiler: basic helpers: s
 (* (c) fof ETH Zürich, 2009 *)
 
 
-IMPORT KernelLog, StringPool, Strings, Streams, Diagnostics, Files, SYSTEM, ObjectFile, D:= Debugging;
+IMPORT KernelLog, StringPool, Strings, Streams, Diagnostics, Files, SYSTEM, ObjectFile, Modules, D:= Debugging;
 
 CONST
 	(* error numbers *)
@@ -45,7 +45,7 @@ CONST
 	MaxSet* = 31;   (* must be >= 15, else the bootstraped compiler cannot run (IN-tests) *)
 
 	invalidString*=-1;
-
+	InvalidCode*=Diagnostics.Invalid;
 TYPE
 	(*
 	String* = POINTER TO ARRAY OF CHAR;
@@ -62,6 +62,14 @@ TYPE
 	ErrorMsgs = POINTER TO ARRAY OF StringPool.Index;
 
 	ComparisonFunction = PROCEDURE {DELEGATE} (object1, object2: ANY): BOOLEAN;
+	
+	Position*= RECORD
+		start*, end*, line*, linepos*: LONGINT;
+		reader*: Streams.Reader;
+	END;
+	
+	ErrorCode*=LONGINT;
+
 
 	List* = OBJECT  (* by Luc Bläser *)
 	VAR
@@ -1697,6 +1705,7 @@ VAR
 	getWriter: WriterFactory;
 	getDiagnostics: DiagnosticsFactory;
 	CRC32Table: ARRAY 256 OF SET;
+	invalidPosition-: Position;
 
 	(* Make a string out of a series of characters. *)
 	PROCEDURE MakeString*( CONST s: ARRAY OF CHAR ): String;
@@ -1735,6 +1744,86 @@ VAR
 		END;
 		Strings.Append(res, msg);
 	END GetErrorMessage;
+	
+	PROCEDURE AppendPosition*(VAR msg: ARRAY OF CHAR; pos: Position);
+	BEGIN
+		IF pos.line >= 0 THEN
+			Strings.Append(msg, " in line "); 
+			Strings.AppendInt(msg, pos.line); 
+			Strings.Append(msg, ", col "); 
+			Strings.AppendInt(msg, pos.start- pos.linepos);
+		END;
+	END AppendPosition;
+	
+	PROCEDURE MakeMessage(pos: Position; code: ErrorCode; CONST msg: ARRAY OF CHAR; VAR message: ARRAY OF CHAR);
+	BEGIN
+		GetErrorMessage(code, msg, message);
+		AppendPosition(message, pos);
+	END MakeMessage;
+	
+	(* error message with code *)
+	PROCEDURE ErrorC*(diagnostics: Diagnostics.Diagnostics; CONST source: ARRAY OF CHAR; pos: Position; code: ErrorCode; CONST msg: ARRAY OF CHAR);
+	VAR message,err: ARRAY 512 OF CHAR; ch: CHAR; b: BOOLEAN; oldpos: LONGINT;
+		file: Files.File; reader: Streams.Reader;
+	BEGIN
+		IF diagnostics # NIL THEN
+			MakeMessage(pos, code, msg,message);
+			IF (pos.linepos >= 0) & ((source # "") OR (pos.reader # NIL)) THEN
+				reader := pos.reader;
+				IF reader = NIL THEN 
+					file := Files.Old(source);
+					IF file # NIL THEN 
+						reader := NEW Files.Reader(file, pos.linepos); 
+					END;
+				END;
+				IF (reader # NIL) & (reader.CanSetPos()) THEN 
+					err[0] := 0AX;
+					err[1] := 0X;
+					oldpos := reader.Pos();
+					reader.SetPos(pos.linepos);
+					reader.Char(ch);
+					WHILE (ch # 0X) & (ch # 0AX) DO
+						Strings.AppendChar(err, ch);
+						IF reader.Pos() = pos.start THEN
+							Strings.Append(err,"(*!*)");
+						END;
+						reader.Char(ch);
+					END;
+					reader.SetPos(oldpos); 
+					Strings.Append(message, err);
+					(*diagnostics.Error(source, Diagnostics.Invalid, Diagnostics.Invalid, err);*)
+				END;
+			END;
+			diagnostics.Error(source, pos.start, code, message);
+			
+		END;
+	END ErrorC;
+
+	(* error message without code *)
+	PROCEDURE Error*(diagnostics: Diagnostics.Diagnostics; CONST source: ARRAY OF CHAR; pos: Position; CONST msg: ARRAY OF CHAR);
+	BEGIN
+		ErrorC(diagnostics, source, pos, InvalidCode, msg);
+	END Error;
+	
+	
+
+	PROCEDURE Warning*(diagnostics: Diagnostics.Diagnostics; CONST source: ARRAY OF CHAR; pos: Position; CONST msg: ARRAY OF CHAR);
+	VAR message: ARRAY 256 OF CHAR;
+	BEGIN
+		IF diagnostics # NIL THEN
+			MakeMessage(pos, InvalidCode, msg,message);
+			diagnostics.Warning(source, pos.start, InvalidCode, message);
+		END;
+	END Warning;
+
+	PROCEDURE Information*(diagnostics: Diagnostics.Diagnostics; CONST source: ARRAY OF CHAR; pos: Position;CONST msg: ARRAY OF CHAR);
+	VAR message: ARRAY 256 OF CHAR;
+	BEGIN
+		IF diagnostics # NIL THEN
+			MakeMessage(pos, InvalidCode, msg,message);
+			diagnostics.Information(source, pos.start, InvalidCode, message);
+		END;
+	END Information;
 
 	(** SetErrorMsg - Set message for error n *)
 
@@ -2076,7 +2165,9 @@ VAR
 	VAR install: PROCEDURE;
 	BEGIN
 		getDebugWriter := NIL; getWriter := NIL;
-		GETPROCEDURE("FoxA2Interface","Install",install);
+		IF Modules.ModuleByName("WindowManager") # NIL THEN
+			GETPROCEDURE("FoxA2Interface","Install",install);
+		END;
 		IF install # NIL THEN install END;
 	END InitWindowWriter;
 
@@ -2225,6 +2316,10 @@ BEGIN
 	lists := 0;  enlarged := 0;  strings := 0;
 	emptyString := MakeString("");
 	debug := FALSE;
+	invalidPosition.start := -1;
+	invalidPosition.end := -1;
+	invalidPosition.line := -1;
+	invalidPosition.linepos := -1;
 	NEW(integerObjects, 128);
 END FoxBasic.
 

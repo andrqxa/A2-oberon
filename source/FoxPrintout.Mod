@@ -2,7 +2,7 @@ MODULE FoxPrintout; (** AUTHOR "fof & fn"; PURPOSE "Oberon Compiler Module Outpu
 (* (c) fof ETHZ 2009 *)
 
 IMPORT
-	Scanner := FoxScanner, SyntaxTree := FoxSyntaxTree, Global := FoxGlobal, Basic := FoxBasic, Streams, D:=Debugging, SYSTEM;
+	Scanner := FoxScanner, SyntaxTree := FoxSyntaxTree, Global := FoxGlobal, Basic := FoxBasic, FingerPrinter := FoxFingerPrinter, Streams, D:=Debugging, SYSTEM;
 
 CONST
 	(* print modes *)
@@ -18,6 +18,7 @@ TYPE
 		useCase: BOOLEAN; (* TRUE to enable case conversion in "Identifier" *)
 
 		alertCount, commentCount: LONGINT;
+		fingerPrinter:FingerPrinter.FingerPrinter;
 
 		PROCEDURE Small(CONST name: ARRAY OF CHAR; VAR result: ARRAY OF CHAR);
 		VAR ch: CHAR; i: LONGINT;
@@ -154,7 +155,9 @@ TYPE
 			IF x.qualifiedIdentifier # NIL THEN
 				(* Problem: how to distinguish betwteen type aliases, e.g. Status = LONGINT and actual use of LONGINT?
 					This tries to use scope level: if the type is declared in the global scope, it should be a basic type use. *)
-				useCase := (x.resolved IS SyntaxTree.BasicType) & (x.scope.Level() = 0);
+				IF x.resolved # NIL THEN
+					useCase := (x.resolved IS SyntaxTree.BasicType) & (x.scope.Level() = 0);
+				END;
 				QualifiedIdentifier(x.qualifiedIdentifier);
 				useCase := FALSE;
 			ELSE
@@ -317,7 +320,7 @@ TYPE
 			Scope(x.cellScope);
 
 			IF (x.cellScope IS SyntaxTree.CellScope) & (x.cellScope(SyntaxTree.CellScope).bodyProcedure # NIL) THEN
-				Body(x.cellScope(SyntaxTree.CellScope).bodyProcedure.procedureScope.body)
+				Body(x.cellScope(SyntaxTree.CellScope).bodyProcedure.procedureScope.body, mode >= SourceCode)
 			END;
 
 			Indent; Keyword("END ");
@@ -354,7 +357,7 @@ TYPE
 				Scope(x.recordScope);
 
 				IF (x.recordScope.bodyProcedure # NIL) THEN
-					Body(x.recordScope.bodyProcedure.procedureScope.body)
+					Body(x.recordScope.bodyProcedure.procedureScope.body, mode >= SourceCode)
 				END;
 
 				Indent; Keyword("END ");
@@ -379,37 +382,6 @@ TYPE
 				Indent; Keyword("END" );
 			END;
 		END VisitRecordType;
-
-		PROCEDURE Flags((*flags: SET*));
-		(*
-		VAR first: BOOLEAN;
-			PROCEDURE Flag(CONST name: ARRAY OF CHAR);
-			BEGIN
-				IF first THEN w.String("{"); first := FALSE; ELSE w.String(", ") END;
-				w.String(name);
-			END Flag;
-		BEGIN
-			first := TRUE;
-			IF SyntaxTree.ActiveFlag IN flags THEN Flag("ACTIVE") END;
-			IF SyntaxTree.ExclusiveFlag IN flags THEN Flag("EXCLUSIVE") END;
-			IF SyntaxTree.SafeFlag IN flags THEN Flag("SAFE") END;
-			IF SyntaxTree.RealtimeFlag IN flags THEN Flag("REALTIME") END;
-			IF SyntaxTree.WinAPIFlag IN flags THEN Flag("WINAPI") END;
-			IF SyntaxTree.CFlag IN flags THEN Flag("C") END;
-			IF SyntaxTree.DelegateFlag IN flags THEN Flag("DELEGATE") END;
-			IF SyntaxTree.UntracedFlag IN flags THEN Flag("UNTRACED") END;
-			IF ~first THEN w.String("} ") END;
-
-			IF info THEN
-				BeginComment;
-				IF SyntaxTree.AccessedFlag IN flags THEN Flag("ACCESSED") END;
-				IF SyntaxTree.WrittenFlag IN flags THEN Flag("WRITTEN") END;
-				IF SyntaxTree.UnreachableFlag IN flags THEN Flag("UNREACHABLE") END;
-				IF ~first THEN w.String("}") END;
-				EndComment;
-			END;
-			*)
-		END Flags;
 
 		PROCEDURE Flag(identifier: SyntaxTree.Identifier; VAR first: BOOLEAN);
 		VAR name: SyntaxTree.IdentifierString;
@@ -962,7 +934,6 @@ TYPE
 		END Visible;
 
 		PROCEDURE PrintSymbol(x: SyntaxTree.Symbol);
-		VAR first: BOOLEAN;
 		BEGIN
 			IF x IS SyntaxTree.Operator THEN
 				w.String('"');Identifier(x.name);  w.String('"')
@@ -1061,7 +1032,6 @@ TYPE
 		END ConstantList;
 
 		PROCEDURE VisitVariable(x: SyntaxTree.Variable);
-		VAR first: BOOLEAN;
 		BEGIN
 			IF Visible(x) THEN
 				IF (x.access # SyntaxTree.Hidden) THEN
@@ -1224,13 +1194,13 @@ TYPE
 		END Access;
 
 		PROCEDURE VisitProcedure(x: SyntaxTree.Procedure);
-		VAR type: SyntaxTree.ProcedureType;  flags: SET; first: BOOLEAN;
+		VAR type: SyntaxTree.ProcedureType;  first: BOOLEAN; fp: SyntaxTree.FingerPrint;
 		BEGIN
 			IF Visible(x) THEN
 				Indent;
 				Comments(x.comment,x,FALSE);
 				Keyword("PROCEDURE " );
-				IF (mode = SymbolFile) & ~x.isInline THEN
+				IF (mode = SymbolFile) & ~x.isInline & ~x.isOberonInline THEN
 					w.String("^ ");
 				END;
 
@@ -1241,9 +1211,6 @@ TYPE
 				(*
 				flags := type.flags;
 				*)
-				IF x.isInline THEN w.String(" - ") END;
-				IF x.isConstructor THEN w.String(" & ") END;
-				IF x.isFinalizer THEN w.String(" ~ ") END;
 
 				first := TRUE;
 				IF type.stackAlignment > 1 THEN Value(Global.NameStackAligned,type.stackAlignment,first) END;
@@ -1252,7 +1219,26 @@ TYPE
 				IF (x.fixed) THEN Value(Global.NameFixed, x.alignment,first)
 				ELSIF (x.alignment >1) THEN Value(Global.NameAligned, x.alignment, first)
 				END;
+				IF type.callingConvention = SyntaxTree.WinAPICallingConvention THEN
+					Flag(Global.NameWinAPI,first)
+				ELSIF type.callingConvention = SyntaxTree.CCallingConvention THEN
+					Flag(Global.NameC,first)
+				END;
+
+				IF x.isInline & (mode = SymbolFile) THEN
+					IF fingerPrinter = NIL THEN NEW(fingerPrinter) END;
+					fp := fingerPrinter.SymbolFP(x);
+					Value(Global.NameFingerprint, fp.shallow, first) 
+				END;
 				FlagEnd(first);
+
+				IF x.isInline OR x.isOberonInline THEN w.String(" - ") END;
+				IF x.isConstructor THEN w.String(" & ") END;
+				IF x.isFinalizer THEN w.String(" ~ ") END;
+
+				IF type.selfParameter # NIL THEN
+					ParameterList(type.selfParameter);
+				END;
 
 				IF info THEN
 					BeginComment;
@@ -1280,10 +1266,10 @@ TYPE
 					EndComment;
 				END;
 				IF x.externalName = NIL THEN
-					IF (mode > SymbolFile) OR (mode = SymbolFile) & (x.isInline) THEN
+					IF (mode > SymbolFile) OR (mode = SymbolFile) & (x.isInline OR x.isOberonInline) THEN
 						w.String( ";" );
 						Comments(x.comment,x,TRUE);
-						IF mode >= SymbolFile THEN
+						IF (mode >= SymbolFile) OR x.isOberonInline THEN
 							ProcedureScope(x.procedureScope);
 						END;
 						Indent;  Keyword("END " );  Identifier(x.name);
@@ -1327,7 +1313,7 @@ TYPE
 				Keyword("OPERATOR ");
 
 				first := TRUE;
-				IF x.isInline THEN
+				IF x.isInline  OR x.isOberonInline THEN
 					ASSERT(~x.isDynamic);
 					w.String("-");
 				ELSE
@@ -1358,7 +1344,7 @@ TYPE
 				END;
 
 				IF x.externalName = NIL THEN
-					IF (mode > SymbolFile) OR (mode = SymbolFile) & (x.isInline) THEN
+					IF (mode > SymbolFile) OR (mode = SymbolFile) & (x.isInline OR x.isOberonInline) THEN
 						w.String( ";" );
 						Comments(x.comment,x,TRUE);
 						IF mode >= SymbolFile THEN
@@ -1370,18 +1356,17 @@ TYPE
 			END
 		END VisitOperator;
 
-		PROCEDURE ProcedureList(x: SyntaxTree.Procedure);
+		PROCEDURE ProcedureList(list: SyntaxTree.ProcedureList);
+		VAR x: SyntaxTree.Procedure; i: LONGINT;
 		BEGIN
 			w.IncIndent;
-			WHILE(x # NIL) DO
+			FOR i := 0 TO list.Length()-1 DO
+				x := list.GetProcedure(i);
 				IF (x.access # SyntaxTree.Hidden) & ~(x.isBodyProcedure) OR (mode > SourceCode)  THEN
 					Symbol(x);
 					w.String( "; " );
 				END;
-				x := x.nextProcedure;
-
-				IF (x# NIL) & (mode > SymbolFile) & ((x.access # SyntaxTree.Hidden) OR (mode > SourceCode)) THEN w.Ln END;
-
+				IF (i# list.Length()-1) & (mode > SymbolFile) & ((x.access # SyntaxTree.Hidden) OR (mode > SourceCode)) THEN w.Ln END;
 			END;
 			w.DecIndent;
 		END ProcedureList;
@@ -1470,7 +1455,7 @@ TYPE
 			IF info THEN
 				WHILE (x#NIL) DO
 					Indent;
-					w.String("comment at position "); w.Int(x.position,1);
+					w.String("comment at position "); w.Int(x.position.start,1);
 					IF x.sameLine THEN w.String("(in line with item)") END;
 					IF x.item = NIL THEN w.String("(no item)"); END;
 					w.String(":");
@@ -1488,10 +1473,14 @@ TYPE
 			prevScope := currentScope;
 			currentScope := x;
 			(* ASSERT(currentScope.outerScope = prevScope); (* sanity check *) *)
+			WITH x: SyntaxTree.CellScope DO
+				IF x.firstImport # NIL THEN ImportList(x.firstImport) END;
+			ELSE
+			END;
 			IF x.firstConstant # NIL THEN ConstantList(x.firstConstant); END;
 			IF x.firstTypeDeclaration # NIL THEN TypeDeclarationList(x.firstTypeDeclaration); END;
 			IF x.firstVariable # NIL THEN Indent;  Keyword("VAR " );  VariableList(x.firstVariable);  END;
-			IF x.firstProcedure # NIL THEN w.Ln; ProcedureList(x.firstProcedure) END;
+			IF x.procedures # NIL THEN w.Ln; ProcedureList(x.procedures) END;
 			currentScope := prevScope;
 		END Scope;
 
@@ -1500,9 +1489,10 @@ TYPE
 		BEGIN
 			prevScope := currentScope;
 			currentScope := x;
-			IF (mode  >= SourceCode) OR (x.ownerProcedure.isInline) THEN Scope(x) END;
-			IF (mode >= SymbolFile) & (x.body # NIL) THEN Body(x.body)
+			IF (mode  >= SourceCode) OR (x.ownerProcedure.isInline) OR (x.ownerProcedure.isOberonInline) THEN 
+				Scope(x); 
 			END;
+			IF (mode >= SymbolFile) & (x.body # NIL) THEN Body(x.body,  (mode  >= SourceCode) OR (x.ownerProcedure.isInline) OR (x.ownerProcedure.isOberonInline) ) END;
 			currentScope := prevScope;
 		END ProcedureScope;
 
@@ -1778,7 +1768,7 @@ TYPE
 				procedure := currentScope(SyntaxTree.ProcedureScope).ownerProcedure;
 				procedureType := procedure.type(SyntaxTree.ProcedureType);
 			END;
-			IF (mode >= SourceCode) OR (procedure = NIL) OR (procedure.access * SyntaxTree.Public # {}) & procedure.isInline THEN
+			IF (mode >= SourceCode) OR (procedure = NIL) OR (procedure.access * SyntaxTree.Public # {}) & (procedure.isInline OR procedure.isOberonInline) THEN
 				(*
 				IF x.inlineCode # NIL THEN
 					unit := 8;
@@ -1835,15 +1825,17 @@ TYPE
 			Indent; Keyword("END");
 		END VisitCode;
 
-		PROCEDURE Body(x: SyntaxTree.Body);
+		PROCEDURE Body(x: SyntaxTree.Body; implementation: BOOLEAN);
 		VAR
 		BEGIN
 			IF x.code # NIL THEN
 				Indent; Keyword("CODE");
-				Code(x.code);
+				IF implementation THEN
+					Code(x.code);
+				END;
 			ELSE
 				Indent;  Keyword("BEGIN" ); Modifiers(x.blockModifiers);
-				IF mode >= SourceCode THEN
+				IF implementation THEN
 					IF x.statements # NIL THEN
 						w.IncIndent;
 						StatementSequence(x.statements);
@@ -1892,7 +1884,7 @@ TYPE
 				END;
 
 				IF (x.moduleScope.bodyProcedure # NIL) & (x.moduleScope.bodyProcedure.procedureScope.body # NIL) THEN
-					Body(x.moduleScope.bodyProcedure.procedureScope.body)
+					Body(x.moduleScope.bodyProcedure.procedureScope.body, mode >= SourceCode)
 				END;
 				Indent; Keyword("END "); Identifier(x.name); w.String( "." ); w.Ln;  w.Update;
 
@@ -1984,18 +1976,6 @@ VAR
 		END;
 		D.Update();
 	END Info;
-
-	PROCEDURE IsIntegerValue(x: SyntaxTree.Expression; VAR value: LONGINT): BOOLEAN;
-	VAR result: BOOLEAN;
-	BEGIN
-		IF (x.resolved # NIL) & (x.resolved IS SyntaxTree.IntegerValue) THEN
-			value :=  x.resolved(SyntaxTree.IntegerValue).value;
-			result := TRUE
-		ELSE
-			result := FALSE
-		END;
-		RETURN result
-	END IsIntegerValue;
 
 	PROCEDURE Init;
 	BEGIN

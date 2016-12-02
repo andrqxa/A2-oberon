@@ -170,16 +170,28 @@ END Arrangement;
 
 TYPE FileFormat = PROCEDURE (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer);
 
+VAR defaults: Options.Defaults; 
+	processing, finished: GenericLinker.Block;
+
 PROCEDURE Align(this, to: LONGINT): LONGINT;
 BEGIN
 	this := this + (-this) MOD to;
 	RETURN this;
 END Align;
 
-PROCEDURE ReadObjectFile*(CONST moduleName, path, extension: ARRAY OF CHAR; linker: GenericLinker.Linker);
-VAR fileName: Files.FileName; file: Files.File; reader: Files.Reader;
+PROCEDURE ReadObjectFile*(CONST moduleName, path, extension: ARRAY OF CHAR; linker: GenericLinker.Linker; moduleList: GenericLinker.HashTableSegmentedName);
+VAR fileName: Files.FileName; file: Files.File; reader: Files.Reader; i: LONGINT;
+offers, requires: ObjectFile.NameList;name: ARRAY 256 OF CHAR; sn: ObjectFile.SegmentedName;
 BEGIN
-	linker.Information (moduleName, "processing");
+	sn := moduleName;
+	IF (moduleList # NIL) & (moduleList.Get(sn) = finished) THEN
+		linker.Warning(moduleName, "duplicate");
+		RETURN;
+	ELSIF (moduleList # NIL) & (moduleList.Get(sn) = processing) THEN
+		linker.Error(moduleName, "cyclic import");
+		RETURN;
+	END;
+	
 	IF path # "" THEN Files.JoinPath (path, moduleName, fileName); ELSE COPY(moduleName,fileName); END;
 	file := Files.Old (fileName);
 	IF file = NIL THEN (* try with extension *)
@@ -191,7 +203,38 @@ BEGIN
 	END;
 	IF file = NIL THEN linker.Error (fileName, "failed to open file"); RETURN; END;
 	Files.OpenReader (reader, file, 0);
-	GenericLinker.Process (reader, linker) ;
+	
+	GenericLinker.OffersRequires(reader, offers, requires);
+	IF (moduleList # NIL) & (offers # NIL) THEN
+		FOR i := 0 TO LEN(offers)-1 DO
+			moduleList.Put(offers[i],processing);
+		END;
+	END;
+	
+	IF (moduleList # NIL) & (requires # NIL) THEN
+		FOR i := 0 TO LEN(requires)-1 DO
+			IF moduleList.Get(requires[i]) = NIL THEN 
+				name := requires[i];
+				(*linker.Information(name, "auto");*)
+				ReadObjectFile(name,path,extension, linker, moduleList);
+				IF linker.error THEN RETURN END;
+			ELSIF moduleList.Get(requires[i]) = processing THEN
+				name := requires[i];
+				Strings.Append(name, moduleName);
+				linker.Error(name, "cyclic import!");
+				RETURN;
+			END;
+		END;
+	END;
+	linker.Information (moduleName, "processing");
+	
+	reader.SetPos(0);
+	GenericLinker.Process (reader, linker);
+	IF (moduleList # NIL) & (offers # NIL) THEN
+		FOR i := 0 TO LEN(offers)-1 DO
+			moduleList.Put(offers[i],finished);
+		END;
+	END;
 	IF reader.res # Files.Ok THEN linker.Error (fileName, "failed to parse"); END;
 END ReadObjectFile;
 
@@ -902,8 +945,15 @@ VAR options: Options.Options;
 	use: SET;
 	exportString: ARRAY 1024 OF CHAR;
 	error: BOOLEAN;
+	parsed: BOOLEAN;
+	position: LONGINT;
+	name: ARRAY 32 OF CHAR;
+	reader: Streams.Reader;
+	moduleList: GenericLinker.HashTableSegmentedName;
+	segmentedName: ObjectFile.SegmentedName;
 BEGIN
 	NEW (options);
+	options.Add('p',"platform", Options.String);
 	options.Add (0X, "silent", Options.Flag);
 	options.Add ('a', "useAll", Options.Flag);
 	options.Add ('s', "strict", Options.Flag);
@@ -914,7 +964,22 @@ BEGIN
 	options.Add (0X, "logFileName", Options.String);
 	options.Add(0X,"linkRoot", Options.String);
 	options.Add(0X,"exports", Options.String);
-	IF ~options.Parse (context.arg, context.error) THEN context.result := Commands.CommandParseError; RETURN; END;
+
+	position := context.arg.Pos();
+	parsed := options.Parse(context.arg,NIL);
+	IF options.GetString("platform", name) THEN
+		reader := defaults.Get(name);
+		IF reader = NIL THEN 
+			context.error.String("Unknown platform"); context.error.Ln 
+		ELSE
+			parsed := options.Parse(reader, NIL) & parsed;
+			context.arg.SetPos(position);
+			context.arg.SetPos(position);
+			parsed := options.Parse(context.arg, context.error) & parsed; (* reparse overwrites *)
+		END;
+	END;
+		
+	IF ~parsed THEN context.result := Commands.CommandParseError; RETURN; END;
 	silent := options.GetFlag ("silent");
 	useAll := options.GetFlag ("useAll");
 	strict := options.GetFlag ("strict");
@@ -948,8 +1013,14 @@ BEGIN
 
 	IF options.GetString("linkRoot",linkRoot) THEN linker.SetLinkRoot(linkRoot) END;
 
+	NEW(moduleList,32);
+	segmentedName := "SYSTEM";
+	moduleList.Put(segmentedName, finished);
+	segmentedName := "system";
+	moduleList.Put(segmentedName, finished);
+	
 	WHILE ~linker.error & context.arg.GetString (moduleName) DO
-		ReadObjectFile (moduleName, path, extension, linker);
+		ReadObjectFile (moduleName, path, extension, linker, moduleList);
 		IF strict & ~linker.error THEN linker.Resolve END;
 	END;
 	(* do linking after having read in all blocks to account for potential constraints *)
@@ -981,6 +1052,19 @@ BEGIN
 	IF error THEN context.result := Commands.CommandError; END;
 END Link;
 
+PROCEDURE ShowDefaults*(context: Commands.Context);
+BEGIN
+	defaults.Show(context.out);
+END ShowDefaults;
+
+BEGIN
+	NEW(processing);
+	NEW(finished);
+	NEW(defaults);
+	defaults.Add("Win32C","--fileFormat=PE32CUI --fileName=oberon.exe --extension=GofW --displacement=401000H");
+	defaults.Add("Linux32G","--fileFormat=Raw --fileName=oberon --extension=.GofU --displacement=08048000H");
+	defaults.Add("RPI","--fileName=kernel.img --extension=.Goa --displacement=8000H -sa ");
+	defaults.Add("A2G","--fileName=kernel.img --extension=.GofG --displacement=0100000H");
 END StaticLinker.
 
 StaticLinker.Link --fileName=test.exe --fileFormat=PE32 --displacement=401000H Test ~

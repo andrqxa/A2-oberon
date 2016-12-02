@@ -1,7 +1,7 @@
 MODULE FoxTest;	(** AUTHOR "fof"; PURPOSE "Fox tester"; *)
 (* (c) fof ETH Zürich, 2008 *)
 
-IMPORT Basic := FoxBasic, TestSuite, Diagnostics, Streams, Commands, Shell, Options, Files, Strings, Versioning, CompilerInterface, Texts, TextUtilities, Modules;
+IMPORT Basic := FoxBasic, TestSuite, Diagnostics, Streams, Commands, Shell, Options, Files, Strings, Versioning, CompilerInterface, Texts, TextUtilities, Modules, KernelLog;
 
 TYPE
 	Command = ARRAY 256 OF CHAR;
@@ -12,8 +12,10 @@ TYPE
 		fileLog: Streams.Writer;
 
 		mayTrap: BOOLEAN;
+		commandFlags: SET;
 		command, prolog, epilog: Command;
 		fileName: Files.FileName;
+		dots: LONGINT;
 
 		PROCEDURE &InitTester (log, logFileWriter: Streams.Writer;  diagnostics: Diagnostics.Diagnostics; mayTrap: BOOLEAN; CONST prolog, command, epilog: Command; CONST fileName: ARRAY OF CHAR);
 		BEGIN
@@ -22,13 +24,15 @@ TYPE
 			COPY(epilog, SELF.epilog);
 			COPY(command, SELF.command);
 			COPY(fileName, SELF.fileName);
+			commandFlags := {Commands.Wait};
+			IF log = NIL THEN INCL(commandFlags, Commands.Silent) END;
 		END InitTester;
 
 		PROCEDURE Handle (r: Streams.Reader; position: LONGINT; CONST name: ARRAY OF CHAR; type: TestSuite.TestType): INTEGER;
 		VAR result: INTEGER; msg: ARRAY 128 OF CHAR; res: LONGINT; f: Files.File; w: Files.Writer; ch: CHAR;
 		BEGIN
 			result := TestSuite.Failure;
-			IF log # NIL THEN log.String ("testing: "); log.String (name); log.String("@"); log.Int(position,0); log.Ln END;
+			IF log # NIL THEN log.String ("testing: "); log.String (name); log.String("@"); log.Int(position,0); log.Ln; log.Update; END;
 
 			(* prepare tester input as a file for all test cases *)
 			f := Files.New(fileName);
@@ -39,16 +43,18 @@ TYPE
 			w.Update;
 			Files.Register(f);
 
+			IF log = NIL THEN KernelLog.Char("."); INC(dots); IF dots MOD 256 = 0 THEN KernelLog.Ln END; END; 
+
 			res := Commands.Ok;
 			IF prolog # "" THEN
-				Commands.Call(prolog, {Commands.Wait}, res, msg);
+				Commands.Call(prolog, commandFlags, res, msg);
 				IF (res # Commands.Ok) & (log # NIL)  THEN
 					log.String("prolog failed: "); log.String(msg); log.Ln;
 				END;
 			END;
 
 			IF (command # "") & (res = Commands.Ok) THEN
-				Commands.Call(command, {Commands.Wait}, res, msg);
+				Commands.Call(command,  commandFlags, res, msg);
 				IF res = Commands.Ok THEN
 					result := TestSuite.Positive
 				ELSIF (res < 3500) & (res >= 3440) THEN (* loader error *)
@@ -65,7 +71,7 @@ TYPE
 			END;
 
 			IF epilog # "" THEN
-				Commands.Call(epilog, {Commands.Wait}, res, msg);
+				Commands.Call(epilog,  commandFlags, res, msg);
 			END;
 
 			IF fileLog # NIL THEN

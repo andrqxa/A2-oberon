@@ -27,7 +27,7 @@ TYPE
 
 			IF (module # NIL) & ~(SyntaxTree.Resolved IN module.state) THEN
 				(*! should rather be done by importer *)
-				checker := SemanticChecker.NewChecker(NIL,FALSE,FALSE,TRUE,system,SELF,importCache);
+				checker := SemanticChecker.NewChecker(NIL,FALSE,FALSE,TRUE,system,SELF,importCache,"");
 				checker.Module(module); (* semantic check *)
 				IF checker.error THEN module := NIL END;
 			END;
@@ -44,9 +44,7 @@ TYPE
 
 			file := Files.New(fileName);
 			IF file = NIL THEN
-				IF diagnostics # NIL THEN
-					diagnostics.Error(module.sourceName, -1, -1, "could not open export file for writing");
-				END;
+				Basic.Error(diagnostics, module.sourceName, Basic.invalidPosition,  "could not open export file for writing");
 				result := FALSE;
 			ELSE
 
@@ -56,13 +54,13 @@ TYPE
 
 				IF noRedefinition OR noModification THEN
 					IF (InterfaceComparison.Redefined IN flags) THEN
-						diagnostics.Error(module.sourceName,Diagnostics.Invalid,Diagnostics.Invalid," no redefinition of symbol file allowed");
+						Basic.Error(diagnostics, module.sourceName, Basic.invalidPosition, " no redefinition of symbol file allowed");
 						RETURN FALSE;
 					END;
 				END;
 				IF noModification THEN
 					IF (InterfaceComparison.Extended IN flags) THEN
-						diagnostics.Error(module.sourceName,Diagnostics.Invalid,Diagnostics.Invalid," no extension of symbol file allowed");
+						Basic.Error(diagnostics, module.sourceName,Basic.invalidPosition,  " no extension of symbol file allowed");
 						RETURN FALSE;
 					END;
 				END;

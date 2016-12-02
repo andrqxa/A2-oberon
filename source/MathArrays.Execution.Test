@@ -1,4 +1,5 @@
 # Math Array Exeuction Test Suite
+# options 	--mayTrap --prolog="Compiler.Compile -p=Win32G TesterInput.txt" --command="SystemTools.Free Test Dummy B A;SystemTools.Load Test" --logFile="FoxExecutionTest.Log" --result="MathArrays.Execution.Test.Diff"
 
 positive: DIM and LEN
 
@@ -730,16 +731,16 @@ positive: array structured object type (was: problem with register restoration w
 	  ASSERT(asot[*, *][*, 0] = [LONGINT(0),0,0,0]);
 	 END Test.
 
-positive: correct use of SYSTEM.ADR and SYSTEM.VAL for tensors and open math arrays
+positive: correct use of ADDRESS OF and SYSTEM.VAL for tensors and open math arrays
 
 	MODULE Test;
 	IMPORT SYSTEM;
 
 	VAR a: ARRAY [*,*,*] OF REAL;
 
-	PROCEDURE GetDim(adr: SYSTEM.ADDRESS): LONGINT;
+	PROCEDURE GetDim(adr: ADDRESS): LONGINT;
 	CONST
-		AddressSize=SYSTEM.SIZEOF(SYSTEM.ADDRESS);
+		AddressSize=SIZEOF(ADDRESS);
 		MathDimOffset=3*AddressSize;
 	BEGIN
 		SYSTEM.GET(adr+MathDimOffset,adr); RETURN adr;
@@ -818,3 +819,20 @@ positive: Test of Min and Max
 
 	BEGIN Min; Max;
 	END Test.
+
+positive: Temporary allocation of small arrays (failed before 2016.10.07)
+
+	MODULE Test;
+
+	PROCEDURE Do;
+	VAR LT1,LT2: ARRAY [4,4] OF REAL;
+	    L: ARRAY [4] OF REAL;
+	BEGIN
+	    L := LT1 * LT2 * [0.3, 0, 0, 1];
+	END Do;
+
+	BEGIN
+		Do;
+	END Test. 
+	
+

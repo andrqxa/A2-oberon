@@ -19,13 +19,15 @@ type
 	Context*= object
 	var
 		topNet-: any; (** top-level CELLNET object specific to this runtime context *)
+		finishedAssembly-: boolean; (** assigned to TRUE after the whole architecture has been assembled *)
+		res*: longint; (** error code, 0 in case of success *)
 		
 		procedure Allocate*(scope: any; var c: any; t: Modules.TypeDesc; const name: array of char; isCellNet, isEngine: boolean);
 		end Allocate;
 		
 		procedure AddPort*(c: any; var p: any; const name: array of char; inout: set; width: longint);
 		end AddPort;
-
+		
 		procedure AddPortArray*(c: any; var ports: any; const name: array of char; inout: set; width: longint; const lens: array of longint);
 		end AddPortArray;
 
@@ -68,14 +70,31 @@ type
 		procedure Send*(p: any; value: longint);
 		end Send;
 		
+		procedure BulkSend*(p: any; const value: array of system.byte);
+		end BulkSend;
+		
 		procedure SendNonBlocking*(p: any; value: longint): boolean;
 		end SendNonBlocking;
 
 		procedure Receive*(p: any; var value: longint);
 		end Receive;
 		
+		procedure BulkReceive*(p: any; var value: array of system.byte);
+		end BulkReceive;
+		
 		procedure ReceiveNonBlocking*(p: any; var value: longint): boolean;
 		end ReceiveNonBlocking;
+		
+		(* called in Execute after the architecture is fully assembled *)
+		procedure FinishedAssembly();
+		begin{EXCLUSIVE}
+			finishedAssembly := true;
+		end FinishedAssembly;
+
+		procedure WaitUntilFinishedAssembly();
+		begin{EXCLUSIVE}
+			await(finishedAssembly or (res # 0));
+		end WaitUntilFinishedAssembly;
 			
 	end Context;
 	
@@ -83,7 +102,8 @@ type
 	var 
 		proc: procedure {DELEGATE};
 		context: Context;
-		finished: boolean;
+		finished, delayedStart: boolean;
+		error-: boolean;
 		
 		procedure & Init*(context: Context);
 		begin
@@ -95,13 +115,30 @@ type
 		procedure Start*(p: procedure{DELEGATE}; doWait: boolean);
 		begin{EXCLUSIVE}
 			proc := p;
+			if ~doWait then delayedStart := true; end; (* delay actual start until the whole architecture is fully assembled *)
 			await(~doWait or finished);
 		end Start;
 		
-	begin{ACTIVE,EXCLUSIVE}
-		await(proc # nil);
-		proc;
-		finished := true;
+	begin{ACTIVE}
+		begin{EXCLUSIVE}
+			await(proc # nil);
+		end;
+		if delayedStart then
+			context.WaitUntilFinishedAssembly;
+		end;
+		if context.res = 0 then
+			proc;
+		end;
+		begin{EXCLUSIVE}
+			finished := true
+		end;
+		finally
+		begin{EXCLUSIVE}
+			if ~finished then
+				error := true;
+				finished := true;
+			end;
+		end;
 	end Launcher;
 	
 	procedure GetContext(): Context;
@@ -232,6 +269,11 @@ type
 		GetContext().Send(p, value);
 	end Send;
 	
+	procedure BulkSend*(p: any; const value: array of system.byte);
+	begin
+		GetContext().BulkSend(p,value);
+	end BulkSend;
+	
 	procedure SendNonBlocking*(p: any; value: longint): boolean;
 	begin
 		return GetContext().SendNonBlocking(p, value);
@@ -241,6 +283,11 @@ type
 	begin
 		GetContext().Receive(p, value);
 	end Receive;
+	
+	procedure BulkReceive*(p: any; var value: array of system.byte);
+	begin
+		GetContext().BulkReceive(p,value);
+	end BulkReceive;
 	
 	procedure ReceiveNonBlocking*(p: any; var value: longint): boolean;
 	begin
@@ -347,13 +394,13 @@ type
 			begin
 				Start(c, p)
 			end P;
-		end Starter
+		end Starter;
 				
 	var
 		moduleName, typeName, name: array 256 of char;
 		m: Modules.Module;
 		typeInfo: Modules.TypeDesc;
-		i, res: longint;
+		i, res: longint; 
 		str: array 256 of char;
 		scope: Cell;
 		unloaded: longint;
@@ -398,6 +445,8 @@ type
 
 		copy(typeName, name);
 		Strings.Append(name, ".@Body");
+		trace(name);
+		trace(m.refs);
 		offset := Reflection.FindByName(m.refs, 0, name, true);
 		if offset # 0 then
 			if Reflection.GetChar(m.refs,offset) = Reflection.sfProcedure then
@@ -417,21 +466,73 @@ type
 
 				new(starter, pc, scope);
 			end;
-			new(launcher, context); 
+			new(launcher, context);
 			launcher.Start(starter.P, true);
+			context.FinishedAssembly;
+			assert(~launcher.error);
 		else 
 			Reflection.Report(Commands.GetContext().out, m.refs, offset);
 		end;
 	end Execute;
 	
-(*	type LA = array of longint;
-	operator "<<"* (p: port out; const a: LA);
-	var i: longint;
+	type bytearray= array of system.byte; 
+	operator "<<"* (p: port out; const a: bytearray);
 	begin
-		for i := 0 to len(a)-1 do
-			p << a[i];
-		end;
+		if EnableTrace then trace('bulk send',len(a)); end;
+		BulkSend(system.val(any,p),a);
 	end "<<";
-*)
+	
+	
+	operator "<<"* (var  a: bytearray; p: port in);
+	begin
+		if EnableTrace then trace('bulk rec',len(a));end;
+		BulkReceive(system.val(any,p),a);
+	end "<<";
+	
+	(*The extra functions for longint and real were introduced because right now primitive types cannot be passed as byte arrays*)
+	type longintSpecial= longint; 
+	operator "<<"* (p: port out; a: longintSpecial);
+	begin
+		if EnableTrace then trace('longint send');end;
+		BulkSend(system.val(any,p),a);
+	end "<<";
+	
+	operator "<<"* (var  a: longintSpecial; p: port in); 
+	begin
+		if EnableTrace then trace('longint rec');end;
+		BulkReceive(system.val(any,p),a);
+	end "<<";
+
+	type realSpecial= real;
+	operator "<<"* (p: port out; a: realSpecial);
+	begin
+		if EnableTrace then trace('real send');end;
+		BulkSend(system.val(any,p),a);
+	end "<<";
+	
+	operator "<<"* (var  a:realSpecial; p: port in); 
+	begin
+		if EnableTrace then trace('real rec');end;
+		BulkReceive(system.val(any,p),a);
+	end "<<";
+
+	type Pin = port in; Pout = port out;
+	
+	operator ">>"* (pout: Pout; pin: Pin); 
+	begin
+		Connect(system.val(any, pout), system.val(any, pin), 0);
+	end ">>";
+	
+	operator ">>"* (cellPort: Pout; netPort: Pout); 
+	begin
+		Delegate(system.val(any, cellPort), system.val(any, netPort));
+	end ">>";
+	
+	operator ">>"* (netPort: Pin; cellPort: Pin); 
+	begin
+		Delegate(system.val(any, netPort), system.val(any, cellPort));
+	end ">>";
 end ActiveCellsRuntime.
 
+
+SystemTools.FreeDownTo FoxSemanticChecker ~

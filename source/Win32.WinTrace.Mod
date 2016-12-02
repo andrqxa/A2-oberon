@@ -5,22 +5,43 @@ IMPORT Kernel32, Modules,Trace,Commands;
 CONST
 	none = 0; console = 1; file = 2;
 VAR
-	hin-, hout-: Kernel32.HANDLE;
+	hin-, hout-, herr-: Kernel32.HANDLE;
 	mode: LONGINT; (* none, console or file *)
 
 (* Sender to be used with Stream.Writer *)
 PROCEDURE Send* (CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: LONGINT);
+VAR b: Kernel32.BOOL;
 BEGIN
 	IF mode # none THEN
-		Kernel32.WriteFile (hout, buf[ofs], len, len, NIL);
+		b := Kernel32.WriteFile (hout, buf[ofs], len, len, NIL);
 		Kernel32.FlushFileBuffers(hout);
 	END;
 END Send;
 
+(* Sender to be used with Stream.Writer *)
+PROCEDURE SendError* (CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: LONGINT);
+VAR b: Kernel32.BOOL;
+BEGIN
+	IF mode # none THEN
+		b := Kernel32.WriteFile (herr, buf[ofs], len, len, NIL);
+		Kernel32.FlushFileBuffers(herr);
+	END;
+END SendError;
+
+
 (* Receiver to be used with Stream.Reader *)
 PROCEDURE Receive* (VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
+VAR b: Kernel32.BOOL; tlen: LONGINT;
 BEGIN
-	Kernel32.ReadFile (hin, buf[ofs], min, len, NIL);
+	len := 0;
+	b := Kernel32.ReadFile (hin, buf[ofs], size, len, NIL);
+	DEC(size, len);
+	WHILE (len < min) DO
+		b := Kernel32.ReadFile (hin, buf[ofs], size, tlen, NIL);
+		INC(len, tlen);
+		DEC(size, tlen);
+	END;
+	res := 0;
 END Receive;
 
 PROCEDURE Init;
@@ -57,6 +78,9 @@ BEGIN
 	hout := Kernel32.GetStdHandle (Kernel32.STDOutput);
 	ASSERT ((hout) # (Kernel32.InvalidHandleValue));
 
+	herr := Kernel32.GetStdHandle (Kernel32.STDError);
+	ASSERT ((herr) # (Kernel32.InvalidHandleValue));
+
 	Trace.Char := Char;
 	mode := console;
 END OpenConsole;
@@ -68,6 +92,7 @@ BEGIN
 	IF ~context.arg.GetString(filename) THEN filename := "WinTrace.Text" END;
 	hout := Kernel32.CreateFile(filename, {Kernel32.GenericWrite}, {Kernel32.FileShareRead}, NIL, Kernel32.CreateAlways, {Kernel32.FileAttributeNormal}, Kernel32.NULL);
 	ASSERT ((hout) # (Kernel32.InvalidHandleValue));
+	herr := hout;
 	Trace.Char := Char;
 	mode := file;
 END OpenFile;
@@ -78,10 +103,10 @@ BEGIN
 END Terminate;
 
 PROCEDURE Char(c: CHAR);
-VAR len: LONGINT;
+VAR len: LONGINT; b: Kernel32.BOOL;
 BEGIN
 	len := 1;
-	Kernel32.WriteFile(hout,c,len,len,NIL);
+	b := Kernel32.WriteFile(hout,c,len,len,NIL);
 END Char;
 
 BEGIN

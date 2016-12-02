@@ -5,7 +5,7 @@ IMPORT
 	IntermediateCode := FoxIntermediateCode, IntermediateBackend := FoxIntermediateBackend, BinaryCode := FoxBinaryCode,
 	SemanticChecker := FoxSemanticChecker, Formats := FoxFormats, Assembler := FoxTRMAssembler, InstructionSet := FoxTRMInstructionSet,
 	SYSTEM, Diagnostics, Streams, Options, Strings, ObjectFile, Scanner := FoxScanner, ObjectFileFormat := FoxIntermediateObjectFile,
-	CodeGenerators := FoxCodeGenerators, D := Debugging;
+	CodeGenerators := FoxCodeGenerators, D := Debugging, Compiler;
 
 CONST
 	TraceFixups = FALSE;
@@ -304,7 +304,7 @@ TYPE
 
 			PROCEDURE CheckEmptySpillStack(): BOOLEAN;
 			BEGIN
-				IF spillStack.Size()#0 THEN Error(inPC,"implementation error, spill stack not cleared");
+				IF spillStack.Size()#0 THEN Error(Basic.invalidPosition,"implementation error, spill stack not cleared");
 					IF dump # NIL THEN
 						spillStack.Dump(dump);
 						tickets.Dump(dump);
@@ -346,7 +346,7 @@ TYPE
 		END Section;
 
 		PROCEDURE Supported(CONST instr: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
-		VAR sizeInBits: LONGINT; form: LONGINT; opcode: LONGINT;
+		VAR sizeInBits: LONGINT; form: LONGINT; opcode: LONGINT; value: HUGEINT; exp: LONGINT;
 		BEGIN
 			opcode := instr.opcode;
 			form := instr.op1.type.form;
@@ -401,8 +401,10 @@ TYPE
 			ELSIF form IN IntermediateCode.Integer THEN
 				IF instr.op1.type.sizeInBits = IntermediateCode.Bits64 THEN
 					CASE instr.opcode OF
-					IntermediateCode.div:	procedureName := "DivH"; RETURN FALSE
-					| IntermediateCode.mod: procedureName := "ModH"; RETURN FALSE
+					IntermediateCode.div: procedureName := "DivH";  RETURN FALSE
+					| IntermediateCode.mod: 
+						IF IntermediateCode.IsConstantInteger(instr.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN RETURN TRUE END;
+						procedureName := "ModH"; RETURN FALSE
 					| IntermediateCode.abs: procedureName := "AbsH"; RETURN FALSE;
 					| IntermediateCode.shl :
 						IF instr.op1.type.form = IntermediateCode.SignedInteger THEN
@@ -422,11 +424,16 @@ TYPE
 					END
 				ELSIF instr.op1.type.sizeInBits = IntermediateCode.Bits32 THEN
 					CASE instr.opcode OF
-					IntermediateCode.div:	procedureName := "DivL"; RETURN FALSE
-					| IntermediateCode.mod: procedureName := "ModL"; RETURN FALSE
+					IntermediateCode.div:	
+						IF IntermediateCode.IsConstantInteger(instr.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN RETURN TRUE 
+						ELSE procedureName := "DivL"; RETURN FALSE END;
+					| IntermediateCode.mod: 
+						IF IntermediateCode.IsConstantInteger(instr.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN RETURN TRUE END;
+						procedureName := "ModL"; RETURN FALSE
 					| IntermediateCode.mul:
 						IF (Global.NoMulCapability IN backend.capabilities) THEN  (*mul forbidden*)
-							procedureName:="MulL"; RETURN FALSE	
+							IF IntermediateCode.IsConstantInteger(instr.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN RETURN TRUE 
+							ELSE procedureName:="MulL"; RETURN FALSE	 END;
 						ELSE
 							RETURN TRUE;	
 						END
@@ -681,10 +688,7 @@ TYPE
 					EmitAdd(instruction)
 				END
 			|IntermediateCode.and:
-				EmitAnd(instruction,Low);
-				IF IsComplex(instruction.op1) THEN
-					EmitAnd(instruction,High);
-				END;
+				EmitAnd(instruction);
 			|IntermediateCode.or:
 				EmitOr(instruction,Low);
 				IF IsComplex(instruction.op1) THEN
@@ -1451,7 +1455,15 @@ TYPE
 		PROCEDURE EmitMul(VAR instruction: IntermediateCode.Instruction);
 		VAR negate: BOOLEAN;
 			op1Low, op2Low, op3Low, op1High, op2High, op3High, destLow, destHigh: Operand;
+			value: HUGEINT; exp: LONGINT; iop3: IntermediateCode.Operand;
+			inst: IntermediateCode.Instruction;
 		BEGIN
+			IF IntermediateCode.IsConstantInteger(instruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
+				IntermediateCode.InitImmediate(iop3, instruction.op3.type, exp);
+				IntermediateCode.InitInstruction(inst, Basic.invalidPosition, IntermediateCode.shl, instruction.op1, instruction.op2, iop3);
+				EmitShift(inst);
+				RETURN;
+			END;
 			IF ~IsComplex(instruction.op1) THEN
 				PrepareOp3(instruction,Low,FALSE,negate,destLow, op1Low,op2Low);
 				Emit2(opMUL,op1Low,op2Low);
@@ -1485,24 +1497,52 @@ TYPE
 			FinishOp(instruction.op1,Low,destLow, leftLow);
 		END EmitFMul;
 
-		PROCEDURE EmitDiv(CONST instr: IntermediateCode.Instruction);
+		PROCEDURE EmitDiv(CONST instruction: IntermediateCode.Instruction);
+		VAR
+			value: HUGEINT; exp: LONGINT; iop3: IntermediateCode.Operand;
+			inst: IntermediateCode.Instruction;
 		BEGIN
+			IF instruction.opcode = IntermediateCode.div THEN
+				IF IntermediateCode.IsConstantInteger(instruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
+					IntermediateCode.InitImmediate(iop3, instruction.op3.type, exp);
+					IntermediateCode.InitInstruction(inst, Basic.invalidPosition, IntermediateCode.shr, instruction.op1, instruction.op2, iop3);
+					EmitShift(inst);
+					RETURN;
+				END;
+			END;
 			HALT(100); (*! div is not supported by hardware, must be runtime call -- cf. method Supported *)
 		END EmitDiv;
 
 		(* undefined for float and huegint, huegint version as library *)
-		PROCEDURE EmitMod(CONST instr: IntermediateCode.Instruction);
+		PROCEDURE EmitMod(CONST instruction: IntermediateCode.Instruction);
+		VAR
+			value: HUGEINT;exp: LONGINT; op3:IntermediateCode.Operand; inst: IntermediateCode.Instruction;
 		BEGIN
+			IF IntermediateCode.IsConstantInteger(instruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
+				IntermediateCode.InitImmediate(op3, instruction.op3.type, value-1);
+				IntermediateCode.InitInstruction(inst, Basic.invalidPosition, IntermediateCode.and, instruction.op1, instruction.op2, op3);
+				EmitAnd(inst);
+				RETURN;
+			END;
 			HALT(100); (*! mod is not supported by hardware, must be runtime call -- cf. method Supported *)
 		END EmitMod;
 
-		PROCEDURE EmitAnd(VAR instruction: IntermediateCode.Instruction; part: LONGINT);
+		PROCEDURE EmitAndPart(VAR instruction: IntermediateCode.Instruction; part: LONGINT);
 		VAR left, right, dest: Operand; negate: BOOLEAN;
 		BEGIN
 			PrepareOp3(instruction,part,FALSE,negate,dest,left,right);
 			Emit2(opAND,left,right);
 			FinishOp(instruction.op1, part,dest, left)
+		END EmitAndPart;
+
+		PROCEDURE EmitAnd(VAR instruction: IntermediateCode.Instruction);
+		BEGIN
+				EmitAndPart(instruction,Low);
+				IF IsComplex(instruction.op1) THEN
+					EmitAndPart(instruction,High);
+				END;
 		END EmitAnd;
+
 
 		PROCEDURE EmitOr(VAR instruction: IntermediateCode.Instruction; part: LONGINT);
 		VAR left, right, dest: Operand; negate: BOOLEAN;
@@ -2143,6 +2183,7 @@ TYPE
 
 			NEW(assembler, diagnostics, backend.capabilities,instructionSet );
 			scanner := Scanner.NewAssemblerScanner(module.moduleName(*module.module.sourceName*), reader, SHORT(instr.op1.intValue), diagnostics);
+			scanner.useLineNumbers := Compiler.UseLineNumbers IN backend.flags;
 			assembler.InlineAssemble(scanner, in, scope, module);
 			error := error OR assembler.error
 		END EmitAsm;
@@ -2183,6 +2224,7 @@ TYPE
 			myInstructionSet:=defaultInstructionSet;
 			SetHasLinkRegister;
 			recentInstructionWidth := Sections.UnknownSize;
+			SetName("TRM");
 		END InitBackendTRM;
 
 		PROCEDURE Initialize(diagnostics: Diagnostics.Diagnostics; log: Streams.Writer; flags: SET; checker: SemanticChecker.Checker; system: Global.System);
@@ -2325,7 +2367,7 @@ TYPE
 		 		PatchFixups(in(IntermediateCode.Section).resolved)
 		 	END;
 
-			IF cg.error THEN Error("", Diagnostics.Invalid, Diagnostics.Invalid,  "") END;
+			IF cg.error THEN Error("", Basic.invalidPosition, Diagnostics.Invalid,  "") END;
 		END GenerateBinary;
 
 		(* genasm *)
@@ -2413,7 +2455,7 @@ TYPE
 			UNTIL (i = module(Sections.Module).allSections.Length()) OR (section.name = pooledName);
 
 			IF section.name # pooledName THEN
-				diagnostics.Error(module.module.sourceName,Diagnostics.Invalid,Diagnostics.Invalid," could not locate pc");
+				Basic.Error(diagnostics, module.module.sourceName,Basic.invalidPosition," could not locate pc");
 			ELSE
 				binarySection := section(IntermediateCode.Section).resolved;
 				label := binarySection.labels;
@@ -2421,9 +2463,9 @@ TYPE
 					label := label.prev;
 				END;
 				IF label # NIL THEN
-					diagnostics.Information(module.module.sourceName,label.position,Diagnostics.Invalid," pc position");
+					Basic.Information(diagnostics, module.module.sourceName,label.position," pc position");
 				ELSE
-					diagnostics.Error(module.module.sourceName,Diagnostics.Invalid,Diagnostics.Invalid," could not locate pc");
+					Basic.Error(diagnostics, module.module.sourceName, Basic.invalidPosition," could not locate pc");
 				END;
 			END;
 		END FindPC;

@@ -5,7 +5,7 @@ MODULE Machine;
 IMPORT SYSTEM, Trace, Kernel32;
 
 CONST
-	Version = "WinAos Revision 5614 (04.07.2014)";
+	Version = "WinAos (32bit) ";
 
 	DefaultConfigFile = "aos.ini";
 	DefaultGenericConfigFile = "aosg.ini";
@@ -82,7 +82,7 @@ TYPE
 
 VAR
 
-
+	LastAddress: RECORD END;
 
 	MMXSupport*: BOOLEAN;
 	SSESupport*: BOOLEAN;
@@ -279,6 +279,13 @@ END SetSP;
 		IF Kernel32.GetPrivateProfileString (ConfigKey, name, "", val, LEN (val), userConfigFile) # 0 THEN
 		ELSIF Kernel32.GetPrivateProfileString (ConfigKey, name, "", val, LEN (val), defaultConfigFile) # 0 THEN
 		END;
+		IF (name = "ObjectFileExtension") & (val = "") THEN
+			IF Kernel32.Generic THEN
+				val := ".GofW";
+			ELSE
+				val := ".Obw"
+			END;
+		END;
 	END GetConfig;
 
 	PROCEDURE Shutdown*( restart: BOOLEAN );
@@ -416,10 +423,10 @@ BEGIN
 END ParseLine;
 
 PROCEDURE TraceChar(c: CHAR);
-VAR len: LONGINT;
+VAR len: LONGINT; b: Kernel32.BOOL;
 BEGIN
 	len := 1;
-	Kernel32.WriteFile(hout,c,len,len,NIL);
+	b := Kernel32.WriteFile(hout,c,len,len,NIL);
 END TraceChar;
 
 PROCEDURE SetTraceFile(VAR filename: ARRAY OF CHAR);
@@ -526,6 +533,19 @@ BEGIN
 	fullName[j] := 0X;
 END ToExecutablePath;
 
+PROCEDURE Append(VAR s: ARRAY OF CHAR; CONST t: ARRAY OF CHAR);
+VAR i,j: LONGINT;
+BEGIN
+	i := 0; 
+	WHILE(s[i] # 0X) DO INC(i) END;
+	j := 0;
+	WHILE (t[j] # 0X) DO
+		s[i] := t[j];
+		INC(i); INC(j);
+	END;
+	s[i] := 0X;
+END Append;
+
 PROCEDURE Init*;
 VAR vendor: Vendor; ver: LONGINT; hfile: Kernel32.HANDLE;
 BEGIN
@@ -536,6 +556,7 @@ BEGIN
 	boottime:=GetTimer();
 
 	COPY( Version, version );
+	Append(version, SYSTEM.Date);
 	CPUID(vendor, ver, features,features2);	 SetupSSE2Ext;
 	fcr := (FCR() - {0,2,3,10,11}) + {0..5,8,9};	(* default FCR RC=00B *)
 
@@ -753,9 +774,7 @@ END GetStaticHeap;
 PROCEDURE ValidHeapAddress*(p: ADDRESS): BOOLEAN;
 BEGIN
 	RETURN (p >= memBlockHead.beginBlockAdr) & (p <= memBlockTail.endBlockAdr)
-
-		OR (p>=401000H) & (p<=500000H) (*! guess until kernel size known *)
-
+		OR (p>=401000H) & (p<=ADDRESSOF(LastAddress))
 END ValidHeapAddress;
 
 
@@ -1082,3 +1101,4 @@ BEGIN
 		Init
 	END;
 END Machine.
+

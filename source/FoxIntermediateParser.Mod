@@ -9,6 +9,7 @@ CONST
 
 TYPE
 	MessageString= ARRAY 256 OF CHAR;
+	Position = Basic.Position;
 
 	(** the intermediate code parser **)
 	IntermediateCodeParser* = OBJECT
@@ -31,12 +32,10 @@ TYPE
 			error := FALSE
 		END Init;
 
-		PROCEDURE Error(pos: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE Error(pos: Position; CONST msg: ARRAY OF CHAR);
 		BEGIN
 			error := TRUE;
-			IF diagnostics # NIL THEN
-				diagnostics.Error(scanner.source^,pos,Diagnostics.Invalid,msg);
-			END;
+			Basic.Error(diagnostics, scanner.source^,pos,msg);
 
 			D.Update;
 			IF Trace THEN D.TraceBack END
@@ -51,9 +50,9 @@ TYPE
 			IF ~error & (symbol.token = x) THEN NextSymbol; RETURN TRUE ELSE RETURN FALSE END;
 		END ThisToken;
 
-		PROCEDURE GetIdentifier(VAR pos: LONGINT; VAR identifier: ARRAY OF CHAR): BOOLEAN;
+		PROCEDURE GetIdentifier(VAR pos: Position; VAR identifier: ARRAY OF CHAR): BOOLEAN;
 		BEGIN
-			pos := symbol.start;
+			pos := symbol.position;
 			IF symbol.token # Scanner.Identifier THEN RETURN FALSE
 			ELSE COPY(symbol.identifierString,identifier); NextSymbol; RETURN TRUE
 			END;
@@ -66,7 +65,7 @@ TYPE
 			IF ThisToken(x) THEN RETURN TRUE
 			ELSE
 				s := "expected token "; Strings.Append(s,Scanner.tokens[x]); Strings.Append(s," but got "); Strings.Append(s,Scanner.tokens[symbol.token]);
-				Error(symbol.start, s);RETURN FALSE
+				Error(symbol.position, s);RETURN FALSE
 			END;
 		END ExpectToken;
 
@@ -75,7 +74,7 @@ TYPE
 			IF ~error & (symbol.token = Scanner.Identifier) & (this = symbol.identifierString) THEN NextSymbol; RETURN TRUE ELSE RETURN FALSE END;
 		END ThisIdentifier;
 
-		PROCEDURE ExpectAnyIdentifier(VAR pos: LONGINT; VAR identifier: ARRAY OF CHAR): BOOLEAN;
+		PROCEDURE ExpectAnyIdentifier(VAR pos: Position; VAR identifier: ARRAY OF CHAR): BOOLEAN;
 		BEGIN
 			IF ~GetIdentifier(pos,identifier)THEN Error(pos,"identifier expected"); RETURN FALSE
 			ELSE RETURN TRUE
@@ -125,7 +124,7 @@ TYPE
 				NextSymbol;
 				RETURN TRUE
 			ELSE
-				Error(symbol.start, "end of line/text expected");
+				Error(symbol.position, "end of line/text expected");
 				RETURN FALSE
 			END;
 		END ExpectLineDelimiter;
@@ -133,12 +132,13 @@ TYPE
 		(** parse an optional line number **)
 		PROCEDURE ParseLineNumber(expectedLineNumber: LONGINT);
 		VAR
-			positionOfLine, specifiedLineNumber: LONGINT;
+			positionOfLine: Position;
+			specifiedLineNumber: LONGINT;
 			message, tempString: MessageString;
 		BEGIN
 			IF Trace THEN D.String(">>> ParseLineNumber"); D.Ln END;
 
-			positionOfLine := symbol.start;
+			positionOfLine := symbol.position;
 			IF ThisToken(Scanner.Number) THEN (* note: line numbers are optional *)
 				specifiedLineNumber := symbol.integer;
 				IF ExpectToken(Scanner.Colon) THEN
@@ -157,7 +157,7 @@ TYPE
 		(** parse an intermediate code operand **)
 		PROCEDURE ParseOperand(VAR operand: IntermediateCode.Operand; sectionList: Sections.SectionList);
 		VAR
-			positionOfOperand, pos, registerNumber, symbolOffset, someLongint, integer: LONGINT;
+			positionOfOperand, pos: Position;  registerNumber, symbolOffset, someLongint, integer: LONGINT;
 			someHugeint: HUGEINT;
 			hasTypeDescriptor, isMemoryOperand, lastWasIdentifier, isNegated: BOOLEAN;
 			someLongreal: LONGREAL;
@@ -169,7 +169,7 @@ TYPE
 		BEGIN
 			IF Trace THEN D.String(">>> ParseOperand"); D.Ln END;
 
-			positionOfOperand := symbol.start;
+			positionOfOperand := symbol.position;
 
 			(* defaults *)
 			hasTypeDescriptor := FALSE;
@@ -203,7 +203,7 @@ TYPE
 						IF ExpectIntegerWithSign(integer) THEN
 							symbolOffset := integer
 						ELSE
-							Error(symbol.start, "invalid symbol offset")
+							Error(symbol.position, "invalid symbol offset")
 						END
 					END;
 
@@ -270,13 +270,13 @@ TYPE
 				IF ExpectIntegerWithoutSign(integer) THEN
 					IntermediateCode.SetOffset(operand, integer)
 				ELSE
-					Error(symbol.start, "invalid offset")
+					Error(symbol.position, "invalid offset")
 				END
 			ELSIF ThisToken(Scanner.Minus) THEN
 				IF ExpectIntegerWithoutSign(integer) THEN
 					IntermediateCode.SetOffset(operand, -integer)
 				ELSE
-					Error(symbol.start, "invalid offset")
+					Error(symbol.position, "invalid offset")
 				END
 			END;
 
@@ -294,7 +294,8 @@ TYPE
 		PROCEDURE ParseInstruction(VAR instruction: IntermediateCode.Instruction; sectionList: Sections.SectionList);
 		VAR
 			opCode: SHORTINT;
-			positionOfInstruction, positionOfOperand, operandNumber: LONGINT;
+			positionOfInstruction, positionOfOperand: Position; 
+			operandNumber: LONGINT;
 			operand: IntermediateCode.Operand;
 			operands: ARRAY 3 OF IntermediateCode.Operand;
 			operandType: IntermediateCode.Type;
@@ -302,7 +303,7 @@ TYPE
 		BEGIN
 			IF Trace THEN D.String(">>> ParseInstruction"); D.Ln END;
 
-			positionOfInstruction := symbol.start;
+			positionOfInstruction := symbol.position;
 			IF ExpectAnyIdentifier(positionOfInstruction, identifier) THEN
 				(* TODO: detect labels of the form << labelName: >> *)
 				opCode := IntermediateCode.FindMnemonic(identifier);
@@ -319,7 +320,7 @@ TYPE
 					operandNumber := 0;
 					IF ~ThisToken(Scanner.Ln) & ~ThisToken(Scanner.EndOfText) THEN
 						REPEAT
-							positionOfOperand := symbol.start;
+							positionOfOperand := symbol.position;
 							IF operandNumber > 2 THEN
 								Error(positionOfInstruction, "instruction has too many operands")
 							ELSE
@@ -379,12 +380,12 @@ TYPE
 		(** parse a list of section properties **)
 		PROCEDURE ParseSectionProperties(VAR section: IntermediateCode.Section);
 		VAR
-			positionOfProperty, integer: LONGINT;
+			positionOfProperty: Position;  integer: LONGINT;
 		BEGIN
 			IF Trace THEN D.Ln; D.String(">>> ParseSectionProperties"); D.Ln END;
 
 			WHILE ~error & (symbol.token # Scanner.EndOfText) & (symbol.token # Scanner.Ln) DO
-				positionOfProperty := symbol.start;
+				positionOfProperty := symbol.position;
 
 				(* fingerprint *)
 				IF ThisIdentifier("fingerprint") & ExpectToken(Scanner.Equal) THEN
@@ -446,7 +447,7 @@ TYPE
 		(** parse the content of an intermediate code module **)
 		PROCEDURE ParseModuleContent*(scanner: Scanner.AssemblerScanner ; module: Sections.Module (* sectionList: Sections.SectionList; VAR moduleName: SyntaxTree.IdentifierString; VAR backend: Backend.Backend; loader: ModuleLoader*) ): BOOLEAN;
 		VAR
-			pos, positionOfDirective: LONGINT;
+			pos, positionOfDirective:Position;
 			identifier: Scanner.IdentifierString;
 			afterModuleDirective, afterImportsDirective, afterFirstSection, isExternalSection: BOOLEAN;
 			sectionType: SHORTINT;
@@ -469,7 +470,7 @@ TYPE
 			afterFirstSection := FALSE;
 			IgnoreNewLines;
 			WHILE ~error & (symbol.token # Scanner.EndOfText) DO
-				positionOfDirective := symbol.start;
+				positionOfDirective := symbol.position;
 				IF ExpectToken(Scanner.Period) & ExpectAnyIdentifier(pos, identifier) THEN
 					(* 'module' directive *)
 					IF identifier = "module" THEN
@@ -518,7 +519,7 @@ TYPE
 					ELSE
 						(* determine if section is external *)
 						IF identifier = "external" THEN
-							positionOfDirective := symbol.start;
+							positionOfDirective := symbol.position;
 							IF ExpectToken(Scanner.Period) & ExpectAnyIdentifier(pos, identifier) THEN END;
 							isExternalSection := TRUE
 						ELSE
@@ -614,7 +615,7 @@ TYPE
 		IF reader = NIL THEN
 			msg := "failed to open ";
 			Strings.Append(msg, filename);
-			diagnostics.Error(filename, Diagnostics.Invalid, Diagnostics.Invalid, msg);
+			Basic.Error(diagnostics, filename, Basic.invalidPosition, msg);
 			RETURN NIL
 		ELSE
 			NEW(module, NIL, system);

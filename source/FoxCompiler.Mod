@@ -23,6 +23,7 @@ CONST
 	ChangeCase*=12;
 	Cooperative*=13;
 	CellsAreObjects*=14;
+	UseLineNumbers*=15;
 
 	DefaultBackend = "AMD";
 	DefaultFrontend = "Oberon";
@@ -97,6 +98,7 @@ TYPE
 		split: Strings.StringArray;
 		sectionOffset: LONGINT;
 		flags: SET;
+		backendName: ARRAY 32 OF CHAR;
 
 		PROCEDURE FinalMessage(error: BOOLEAN; CONST msg: ARRAY OF CHAR);
 		VAR message,name: ARRAY 256 OF CHAR;
@@ -159,7 +161,7 @@ TYPE
 
 		IF (options.objectFile # NIL) & (options.objectFile.ForceModuleBodies()) THEN INCL(flags, ForceModuleBodies) END;
 
-		options.frontend.Initialize(diagnostics, reader, source, position);
+		options.frontend.Initialize(diagnostics, flags, reader, source, position);
 		REPEAT
 			(** first phase: scan and parse **)
 			module := options.frontend.Parse();
@@ -174,7 +176,12 @@ TYPE
 				IF (options.symbolFile # NIL) THEN
 					options.symbolFile.Initialize(diagnostics,system,options.destPath);
 				END;
-				checker := SemanticChecker.NewChecker(diagnostics,Info IN flags,UseDarwinCCalls IN flags,Cooperative IN flags,system,options.symbolFile,importCache);
+				IF options.backend # NIL THEN
+					COPY(options.backend.name, backendName);
+				ELSE
+					backendName := "";
+				END;
+				checker := SemanticChecker.NewChecker(diagnostics,Info IN flags,UseDarwinCCalls IN flags,Cooperative IN flags,system,options.symbolFile,importCache,backendName);
 				checker.replacements := options.replacements;
 				checker.Module(module);
 				IF checker.error THEN
@@ -260,21 +267,6 @@ TYPE
 
 		RETURN TRUE;
 	END Modules;
-	
-
-	
-	PROCEDURE GetDefaults(CONST name: ARRAY OF CHAR): Streams.Reader;
-	VAR s: Streams.StringReader; platform: Platform;
-	BEGIN
-		s := NIL;
-		platform := GetPlatform(name);
-		IF platform # NIL THEN
-			NEW(s, LEN(platform.defaults));
-			s.Set(platform.defaults);
-		END;
-		RETURN s;
-	END GetDefaults;
-	
 
 	PROCEDURE GetOptions*(input: Streams.Reader; error:Streams.Writer; diagnostics: Diagnostics.Diagnostics;
 		VAR compilerOptions: CompilerOptions): BOOLEAN;
@@ -295,6 +287,7 @@ TYPE
 		
 		options.Add("p","platform",Options.String);
 		options.Add(0X,"showOptions",Options.Flag);
+		options.Add("l","lineNumbers", Options.Flag);
 		
 		options.Add(0X,"print",Options.Flag);
 		options.Add(0X,"Print",Options.Flag);
@@ -322,7 +315,7 @@ TYPE
 		position := input.Pos();
 		parsed := options.Parse(input,NIL);
 		IF options.GetString("platform", name) THEN
-			defaults := GetDefaults(name);
+			defaults := platforms.Get(name);
 			IF defaults = NIL THEN 	
 				error.String("Unknown platform"); error.Ln 
 			ELSE
@@ -436,8 +429,9 @@ TYPE
 			IF compilerOptions.symbolFile # NIL THEN compilerOptions.symbolFile.GetOptions(options) END;
 			IF compilerOptions.objectFile # NIL THEN compilerOptions.objectFile.GetOptions(options) END;
 			IF compilerOptions.documentation # NIL THEN compilerOptions.documentation.GetOptions(options) END;
+			IF options.GetFlag("lineNumbers") THEN INCL(compilerOptions.flags, UseLineNumbers) END;
 		END;
-		
+
 		IF options.GetFlag("showOptions") THEN options.Show(error) END;
 		RETURN result
 	END GetOptions;
@@ -514,56 +508,32 @@ TYPE
 			context.out.Update;
 		END;
 	END CompileReader;
-	
-	TYPE 
-	Platform = POINTER TO RECORD
-		name: ARRAY 32 OF CHAR;
-		defaults: ARRAY 256 OF CHAR;
-	END;
-	
-	Platforms = OBJECT(Basic.List)
-		PROCEDURE GetPlatform(i: LONGINT): Platform;
-		BEGIN
-			RETURN Get(i)(Platform);
-		END GetPlatform;
-	END Platforms;
-	
-	VAR platforms: Platforms;
+
+	VAR platforms: Options.Defaults;
 	
 	PROCEDURE AddPlatform(CONST name: ARRAY OF CHAR; CONST defaults: ARRAY OF CHAR);
-	VAR i: LONGINT; platform: Platform;
 	BEGIN
-		platform := GetPlatform(name);
-		IF platform = NIL THEN 
-			NEW(platform);
-			COPY(name, platform.name);
-			platforms.Add(platform);
-		END;
-		COPY(defaults, platform.defaults);
+		platforms.Add(name, defaults);
 	END AddPlatform;
 	
-	PROCEDURE GetPlatform(CONST name: ARRAY OF CHAR): Platform;
-	VAR i: LONGINT; platform: Platform;
+	PROCEDURE ShowDefaults*(context: Commands.Context);
 	BEGIN
-		FOR i := 0 TO platforms.Length()-1 DO
-			platform := platforms.GetPlatform(i);
-			IF platform.name = name THEN
-				RETURN platform
-			END;
-		END;
-		RETURN  NIL;
-	END GetPlatform;
+		platforms.Show(context.out)
+	END ShowDefaults;
+	
 
 BEGIN
-	NEW(platforms,8);
+	NEW(platforms);
 	(* platform definitions hard coded for the common cases -- maybe (parts of it) should be outsourced to a file ?*)
 	AddPlatform("Win32","-b=AMD --objectFile=Binary --symbolFile=Binary --objectFileExtensions=.Obw --symbolFileExtension=.Obw");
 	AddPlatform("Win32G","-b=AMD --objectFile=Generic --symbolFile=Textual --newObjectFile --mergeSections --objectFileExtension=.GofW --symbolFileExtension=.SymW --preciseGC");
-	AddPlatform("Minos","-b=ARM --objectFile=Generic --newObjectFile --metaData=simple --objectFileExtension=.Goa --symbolFileExtension=.Sya");
+	AddPlatform("ARM","-b=ARM --objectFile=Generic --newObjectFile --metaData=simple --objectFileExtension=.Goa --symbolFileExtension=.Sya");
+	AddPlatform("Minos","-b=ARM --objectFile=Minos"); 
 	AddPlatform("TRM","-b=TRM --objectFile=Generic --newObjectFile --metaData=simple --objectFileExtension=.GofT --symbolFileExtension=.SymT");
 	AddPlatform("TRMI","-b=TRM --objectFile=Intermediate --newObjectFile --metaData=simple --objectFileExtension=.IroT --symbolFileExtension=.IrsT");
 	AddPlatform("A2","-b=AMD --objectFile=Binary --objectFileExtension=.Obx --symbolFileExtension=.Obx");
 	AddPlatform("A2G","-b=AMD --objectFile=Generic --newObjectFile --mergeSections --objectFileExtension=.GofG --symbolFileExtension=.SymG");
 	AddPlatform("A2Coop","-b=AMD --cooperative --objectFile=Generic --newObjectFile --traceModule=Trace --mergeSections");
 	AddPlatform("ARMA2","-b=ARM --objectFile=Generic --newObjectFile --symbolFile=Textual --mergeSections");
+	AddPlatform("Linux32G","-b=AMD --objectFile=Generic --newObjectFile --traceModule=Trace --symbolFile=Textual --objectFileExtension=.GofU --symbolFileExtension=.SymU --preciseGC");
 END Compiler.

@@ -189,7 +189,7 @@ END MaskIn;
 	
 (* interrupt handling *)
 CONST Interrupts* = 7;
-CONST UndefinedInstruction* = 1; SoftwareInterrupt* = 2; PrefetchAbort* = 3; DataAbort* = 4; IRQ* = 5; FIQ* = 6;
+CONST UndefinedInstruction* = 1; SoftwareInterrupt* = 2; PrefetchAbort* = 3; DataAbort* = 4; IRQ* = 5; FIQ* = 6; IRQ0* = IRQ;
 
 TYPE InterruptHandler* = PROCEDURE (index: SIZE);
 
@@ -217,6 +217,17 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF index = IRQ THEN WriteMask (IRQDisable1, ReadMask (IRQEnable1)); WriteMask (IRQDisable2, ReadMask (IRQEnable2)) END;
 	REPEAT previous := CAS (handlers[index], NIL, NIL) UNTIL CAS (handlers[index], previous, NIL) = previous;
 END DisableInterrupt;
+
+PROCEDURE EnableIRQ- (index: SIZE);
+BEGIN
+	(* no effect -- only for compatibility *)
+END EnableIRQ;
+
+PROCEDURE DisableIRQ-(index: SIZE);
+BEGIN
+	(* no effect -- only for compatibility *)
+END DisableIRQ;
+
 
 PROCEDURE Initialize-;
 CODE
@@ -525,5 +536,42 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 
 	remainder := dividend;
 END DivModU64;
+
+	PROCEDURE MulS64*(x, y: HUGEINT): HUGEINT;
+	CODE
+		ldr r0, [FP,#x]
+		ldr r1, [FP,#x+4]
+
+		ldr r2, [FP,#y]
+		ldr r3, [FP,#y+4]
+
+		muls	r1, r1, r2
+		muls	r3, r3, r0
+		adds	r1, r1, r3
+
+		lsrs	r3, r0, #16
+		lsrs	r4, r2, #16
+		muls	r3, r3, r4
+		adds	r1, r1, r3
+
+		lsrs	r3, r0, #16
+		uxth	r0, r0
+		uxth	r2, r2
+		muls	r3, r3, r2
+		muls	r4, r4, r0
+		muls	r0, r0, r2
+
+		movs	r2, #0
+		adds	r3, r3, r4
+		adcs	r2, r2, r2
+		lsls	r2, r2, #16
+		adds	r1, r1, r2
+
+		lsls	r2, r3, #16
+		lsrs	r3, r3, #16
+		adds	r0, r0, r2
+		adcs	r1, r1, r3
+
+	END MulS64;
 
 END CPU.

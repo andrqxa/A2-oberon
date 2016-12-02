@@ -105,8 +105,8 @@ TYPE
 		locked*: BOOLEAN;
 		awaitingLock*, awaitingCond*: ProcessQueue;
 		lockedBy*: ANY;
-		lock*: ANY;	(* used by Win32, unused for I386 *)
 		waitingPriorities*: ARRAY NumPriorities OF LONGINT;
+		lock*: ANY; (* generic implementation slot -- used by LinuxAos *)
 	END;
 
 	ArrayBlock* = POINTER TO ArrayBlockDesc;
@@ -342,7 +342,7 @@ BEGIN
 			Inspect(protected.awaitingLock.head);
 			Inspect(protected.awaitingCond.head);
 			Inspect(protected.lockedBy);
-			Inspect(protected.lock)
+			Inspect(protected.lock);
 		END;
 		orgHeapBlock := ExtractFromMarkList();
 	END;
@@ -1250,8 +1250,8 @@ BEGIN
 		protRecBlock.awaitingCond.head := NIL;
 		protRecBlock.awaitingCond.tail := NIL;
 		protRecBlock.lockedBy := NIL;
-		protRecBlock.lock := NIL;
 		protRecBlock.locked := FALSE;
+		protRecBlock.lock := NIL;
 		FOR i := 0 TO NumPriorities - 1 DO
 			protRecBlock.waitingPriorities[i] := 0
 		END;
@@ -1407,6 +1407,23 @@ BEGIN
 	Machine.Release(Machine.Heaps)
 END GetHeapInfo;
 
+(* redundant, for compatibility *)
+PROCEDURE HeapSize*(): SIZE;
+VAR total, free, largest: SIZE;
+BEGIN
+	GetHeapInfo(total, free, largest);
+	RETURN total;
+END HeapSize;
+
+(* redundant, for compatibility *)
+PROCEDURE Used*(): SIZE;
+VAR total, free, largest: SIZE;
+BEGIN
+	GetHeapInfo(total, free, largest);
+	RETURN total-free;
+END Used;
+
+
 (* NilGC - Default garbage collector. *)
 PROCEDURE NilGC;
 BEGIN
@@ -1496,11 +1513,9 @@ BEGIN
 END SetMetaData;
 
 BEGIN
-	Trace.String("Heaps: Initializing heap...");
 	(* The meta data stack inspection is more efficient than the heuristics *)
-	SetHeuristic;
+	GCType := HeuristicStackInspectionGC;
 	Init;
-	Trace.Green; Trace.StringLn("... Ok"); Trace.Default;
 END Heaps.
 
 

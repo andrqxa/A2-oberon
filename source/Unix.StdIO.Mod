@@ -6,46 +6,63 @@ IMPORT S := SYSTEM, Modules, Commands, Streams, Unix;
 
 CONST 
 	AddrSize = SIZEOF( ADDRESS );
+TYPE
+	String=POINTER TO ARRAY OF CHAR;
 VAR 
 	env-: Commands.Context;
-	argc-: LONGINT;
-	
-	
-	argv: ADDRESS;
-	iarg: LONGINT;
-	addr: ADDRESS; 
-	ch: CHAR;
-	
 
-PROCEDURE ReceiveArg( VAR data: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len, res: LONGINT );
+PROCEDURE Args(): String;
+VAR size, pos: SIZE; i,j: LONGINT; str: String;
+	argc: LONGINT;
+	argv {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF POINTER {UNSAFE} TO ARRAY OF CHAR;
 BEGIN
-	len := 0;
-	REPEAT
-		IF ch = 0X THEN
-			IF iarg >= argc THEN  
-				IF len >= min THEN  res := Streams.Ok  ELSE  res := Streams.EOF  END;
-				RETURN
-			END;
-			S.GET( argv + iarg*AddrSize, addr );
-			INC( iarg );
+	argc := Unix.argc;
+	argv := Unix.argv;
+	pos := 0;
+	FOR i := 0 TO argc-1 DO
+		j := 0; 
+		WHILE argv[i,j] # 0X DO
+			INC(pos); INC(j);
 		END;
-		REPEAT
-			S.GET( addr, ch );  data[ofs] := ch;  INC( addr );  INC( ofs );  INC( len );  DEC( size )
-		UNTIL (ch = 0X) OR (size <= 0);
-		IF ch = 0X THEN  data[ofs-1] := ' '  END
-	UNTIL (size <= 0) OR (ofs >= LEN(data));
-	res := Streams.Ok
-END ReceiveArg;
+		INC(pos);
+	END;
+	size := pos + 1;
+	NEW(str, size);
+	pos := 0;
+	FOR i := 0 TO argc-1 DO
+		j := 0; 
+		WHILE argv[i,j] # 0X DO
+			str[pos] := argv[i,j];
+			INC(pos); INC(j);
+		END;
+		str[pos] := " ";
+		INC(pos);
+	END;
+	str[pos] := 0X;
+	RETURN str;
+END Args;
 
 PROCEDURE ReceiveStdin( VAR data: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len, res: LONGINT );
-VAR ures: LONGINT;
+VAR ures,i,err: LONGINT;
 BEGIN
 	len := 0;
 	REPEAT
 		ures := Unix.read( 0, ADDRESSOF( data[ofs] ), size );
 		IF ures > 0 THEN  INC( ofs, ures );  DEC( size, ures );  INC( len, ures )  END;
-	UNTIL (len >= min) OR ((ures <= 0) & (Unix.errno() # Unix.EINTR));
-	IF len > 0 THEN  res := Streams.Ok  ELSE  res := Streams.EOF  END
+		IF ures < 0 THEN err := Unix.errno() END;
+	UNTIL (len >= min) OR ((ures <= 0) & (err # Unix.EINTR) & (err # 0));
+	IF len >= min THEN  res := Streams.Ok  ELSE  res := Streams.EOF  END;
+	(*
+	TRACE(len, size, min, ures, Unix.errno(),err);
+	IF len < min THEN
+		Unix.Perror("receive: ")
+	END;
+	Trace.String("received: "); 
+	FOR i := ofs-len TO ofs-1 DO
+		Trace.Char(data[i]); 
+	END;
+	Trace.Ln;
+	*)
 END ReceiveStdin;
 
 PROCEDURE SendStdout( CONST data: ARRAY OF CHAR;  ofs, len: LONGINT;  prop: BOOLEAN;  VAR res: LONGINT );
@@ -69,19 +86,18 @@ END Cleanup;
 
 PROCEDURE Setup;
 VAR
-	arg: Streams.Reader;
+	arg: Streams.StringReader;
 	stdin: Streams.Reader;
 	stdout: Streams.Writer;
-	errout: Streams.Writer
+	errout: Streams.Writer;
+	str: String;
 BEGIN
-	NEW( arg, ReceiveArg, 512 );
+	str := Args();
+	NEW( arg, LEN(str) ); arg.Set(str^);
 	NEW( stdin, ReceiveStdin, 1024 );
 	NEW( stdout, SendStdout, 1024 );
 	NEW( errout, SendErrout, 512 );
 	NEW( env, stdin, arg, stdout, errout, NIL );
-	argc := Unix.argc;
-	argv := Unix.argv;
-	iarg := 0; ch := 0X;
 	Modules.InstallTermHandler( Cleanup )
 END Setup
 

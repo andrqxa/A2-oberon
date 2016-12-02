@@ -24,7 +24,6 @@ TYPE
 VAR
 	appl: CommandThread;
 
-
 	PROCEDURE LoadModule( CONST name: Modules.Name );
 	VAR
 		m: Module;  res: LONGINT;  msg: ARRAY 256 OF CHAR;
@@ -34,8 +33,6 @@ VAR
 			Trace.String( "could not load module " );  Trace.String( name );  Trace.Ln
 		END
 	END LoadModule;
-
-
 
 	PROCEDURE Command( CONST cmd: Modules.Name );
 	VAR
@@ -172,7 +169,6 @@ VAR
 			LoadModule( "Clock" );
 			Execute( "XDisplay",  "Install" );
 			Execute( "KbdMouse",  "Init" );
-
 
 			Command( "WindowManager.Install" );
 			Command( "DisplayRefresher.Install" );

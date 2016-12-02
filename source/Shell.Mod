@@ -171,7 +171,7 @@ TYPE
 			FOR i :=	 0 TO len-1 DO context.out.Char(Backspace); END;
 		END DeleteStringFromDisplay;
 
-		PROCEDURE ReadCommand(VAR command : ARRAY OF CHAR);
+		PROCEDURE ReadCommand(VAR command : ARRAY OF CHAR): CHAR;
 		VAR
 			ch: CHAR;
 			currentIndex : LONGINT;
@@ -218,7 +218,7 @@ TYPE
 
 					IF IsControlCharacter(ch) OR (ch = Delete) THEN
 
-						IF (ch = CR) OR (ch = LF) OR (ch = Streams.EOT) OR (context.in.res # Streams.Ok) THEN
+						IF (* (ch = CR) OR*)  (ch = LF) OR (ch = Streams.EOT) OR (context.in.res # Streams.Ok) THEN
 							EXIT
 
 						ELSIF (ch = Backspace) OR (ch = Delete)THEN
@@ -257,11 +257,12 @@ TYPE
 
 			command[currentIndex+1] := 0X;
 
-			IF ch = CR THEN
+			IF (ch = LF) (*OR (ch =CR)*)  THEN
 				commandHistory.AddCommand(command);
-				IF (context.in.Available() > 0) & (context.in.Peek() = LF) THEN ch := context.in.Get() END;
+				
 				IF echo THEN context.out.Ln; context.out.Update END
 			END;
+			RETURN ch;
 		END ReadCommand;
 
 		PROCEDURE Parse(VAR cmd: Command; VAR wait: BOOLEAN): LONGINT;
@@ -519,7 +520,7 @@ TYPE
 			IF (cmd.command = "alias") THEN
 				ReadAlias(cmd, TRUE)
 			ELSIF (cmd.command = "loadalias") THEN
-				LoadAliasesFromFile(cmd.parameters);
+				LoadAliasesFromFile(cmd.parameters, TRUE);
 			ELSIF (cmd.command = "batch") THEN
 				context.out.String(Version); context.out.Ln; context.out.Update;
 				oldContext := context; context := cmd.context;
@@ -570,7 +571,7 @@ TYPE
 		END Execute;
 
 		PROCEDURE Run;
-		VAR cmdList: Command; wait, exit: BOOLEAN; i : LONGINT;
+		VAR cmdList: Command; wait, exit: BOOLEAN; i : LONGINT; ch: CHAR; 
 		BEGIN
 			exit := FALSE;
 			WHILE ~close & ~exit & (context.in.res = Streams.Ok) DO
@@ -581,12 +582,17 @@ TYPE
 					END;
 					context.out.Update
 				END;
-				ReadCommand(command);
+				ch := ReadCommand(command);
 				IF (context.in.res = Streams.Ok) & (command # "") THEN
 					IF (Parse(cmdList, wait) = 0) THEN
 						Execute(cmdList, wait, exit)
 					END
-				END
+				END;
+				(* do this here because Available can block for in-streams in WIndows/Linux *)
+				(*
+				IF (context.in.Available() > 0) & ((ch = CR) & (context.in.Peek() = LF) OR (ch = LF) & (context.in.Peek() = CR)) THEN ch := context.in.Get() END;
+				*)
+
 			END;
 			context.out.Update; context.error.Update
 		END Run;
@@ -615,7 +621,7 @@ TYPE
 		END ParseAliases;
 
 		(* Read aliases from specified file. Returns NIL if file not found or parsing failed. *)
-		PROCEDURE LoadAliasesFromFile(filename : ARRAY OF CHAR);
+		PROCEDURE LoadAliasesFromFile(filename : ARRAY OF CHAR; critical: BOOLEAN);
 		VAR in : Files.Reader; f : Files.File;
 		BEGIN
 			IF filename = "" THEN COPY(DefaultAliasFile, filename); END;
@@ -627,7 +633,7 @@ TYPE
 					ParseAliases(in);
 					context.out.String("done."); context.out.Ln;
 				END;
-			ELSE
+			ELSIF critical THEN
 				context.out.String("Loading aliases failed: File "); context.out.String(filename);
 				context.out.String(" not found."); context.out.Ln;
 			END;
@@ -637,13 +643,20 @@ TYPE
 	BEGIN {ACTIVE, SAFE}
 		context.out.String(Version); context.out.Ln;
 		context.out.String("Enter 'help' if needed"); context.out.Ln;
-		LoadAliasesFromFile(DefaultAliasFile);
+		LoadAliasesFromFile(DefaultAliasFile, FALSE);
 		context.out.Update;
 		Run;
 		IF (upcall # NIL) THEN upcall(ExitShell); END;
 		BEGIN {EXCLUSIVE} dead := TRUE; END;
 	END Shell;
 
+	PROCEDURE Start*(context: Commands.Context);
+	VAR shell: Shell;
+	BEGIN
+		NEW(shell, context.in, context.out, context.error, FALSE, ">");
+		shell.AwaitDeath()
+	END Start;
+	
 END Shell.
 
 SystemTools.Free Shell ~

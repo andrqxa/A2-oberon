@@ -62,11 +62,15 @@ TYPE
 		BEGIN
 			IF (Token() = Scanner.ExclamationMark) THEN
 				statement := Cmd();
-				statements.AddStatement(statement);
+				IF statement # NIL THEN 
+					statements.AddStatement(statement);
+				END;
 				RETURN TRUE
 			ELSIF (Token() = Scanner.Questionmark) THEN
 				statement := Print();
-				statements.AddStatement(statement);
+				IF statement # NIL THEN 
+					statements.AddStatement(statement);
+				END;
 				RETURN TRUE
 			ELSE
 				RETURN Statement^(statements, outer);
@@ -132,9 +136,7 @@ TYPE
 			IF error THEN RETURN END;
 			(*! use diagnostics *)
 			error := TRUE;
-			IF diagnostics # NIL THEN
-				diagnostics.Error("",Diagnostics.Invalid, Diagnostics.Invalid, msg);
-			END;
+			Basic.Error(diagnostics, "", Basic.invalidPosition, msg);
 			D.TraceBack;
 		END Error;
 
@@ -146,9 +148,7 @@ TYPE
 			error := TRUE;
 			COPY(msg, message);
 			IF id # 0 THEN Strings.Append(message," "); StringPool.GetString(id, name); Strings.Append(message, name); END;
-			IF diagnostics # NIL THEN
-				diagnostics.Error("",Diagnostics.Invalid, Diagnostics.Invalid, message);
-			END;
+			Basic.Error(diagnostics, "", Basic.invalidPosition, message);
 		END ErrorSS;
 
 		(** syntax tree types omitted -- unused *)
@@ -659,7 +659,7 @@ TYPE
 			parameter: SyntaxTree.Parameter;
 			name: Basic.SectionName;
 			modifier: SyntaxTree.Modifier;
-			position: LONGINT;
+			position: SyntaxTree.Position;
 			value: Value;
 			result: Result;
 			address: ADDRESS;
@@ -1099,7 +1099,7 @@ TYPE
 		PROCEDURE VisitCaseStatement*(x: SyntaxTree.CaseStatement);
 		VAR binary: SyntaxTree.BinaryExpression; i: LONGINT;
 		BEGIN
-			binary := SyntaxTree.NewBinaryExpression(0, x.variable, x.variable, Scanner.Equal);
+			binary := SyntaxTree.NewBinaryExpression(Basic.invalidPosition, x.variable, x.variable, Scanner.Equal);
 			FOR i := 0 TO x.CaseParts()-1 DO
 				IF CasePart(x.GetCasePart(i), binary) THEN RETURN END;
 			END;

@@ -170,12 +170,13 @@ TYPE
 TYPE
 
 	Token*=LONGINT;
+	Position*= Basic.Position;
 
 	(**
 		symbol: data structure for the data transfer of the last read input from the scanner to the parser
 	**)
 	Symbol*= RECORD
-		start*,end*,line-: LONGINT; (* start and end position of symbol *)
+		position*: Position;
 		token*: Token; (* token of symbol *)
 		identifier*: IdentifierType; (* identifier *)
 		identifierString*: IdentifierString; (* cache of identifier's string *)
@@ -285,8 +286,11 @@ TYPE
 		diagnostics: Diagnostics.Diagnostics;   (* error logging *)
 
 		ch-: CHAR;   (* look-ahead character *)
+		position-: Position;
+		(*
 		position-: LONGINT;   (* current position *)
 		line-: LONGINT;
+		*)
 
 		error-: BOOLEAN;   (* if error occured during scanning *)
 
@@ -294,6 +298,8 @@ TYPE
 		case-: LONGINT;
 		stringWriter: Streams.Writer;
 		stringMaker: StringMaker;
+	
+		useLineNumbers*: BOOLEAN;
 
 		(*
 			source: name of the source code for reference in error outputs
@@ -315,8 +321,11 @@ TYPE
 			firstIdentifier := TRUE;
 			IF reader = NIL THEN ch := EOT ELSE 	GetNextCharacter END;
 			IF Trace THEN D.Str( "New scanner  " );   D.Ln;  END;
-			SELF.position := position;
-			line := 0;
+			SELF.position.start := position;
+			SELF.position.line := 1;
+			SELF.position.linepos := 0;
+			IF source = "" THEN SELF.position.reader := reader END; 
+			useLineNumbers := FALSE;
 		END InitializeScanner;
 
 		PROCEDURE ResetCase*; (*! needs a better naming ! *)
@@ -332,28 +341,22 @@ TYPE
 		(** report an error occured during scanning **)
 		PROCEDURE ErrorS(CONST msg: ARRAY OF CHAR);
 		BEGIN
-			IF diagnostics # NIL THEN
-				diagnostics.Error(source^, position, Diagnostics.Invalid, msg)
-			END;
+			Basic.Error(diagnostics, source^, position,  msg);
 			error := TRUE;
 		END ErrorS;
 
 		(** report an error occured during scanning **)
 		PROCEDURE Error( code: INTEGER );
-		VAR errorMessage: ARRAY 256 OF CHAR;
 		BEGIN
-			IF diagnostics # NIL THEN
-				Basic.GetErrorMessage(code,"",errorMessage);
-				diagnostics.Error(source^, position, code, errorMessage)
-			END;
+			Basic.ErrorC(diagnostics, source^, position, code, "");
 			error := TRUE;
 		END Error;
 
 		(** get next character, end of text results in ch = EOT **)
 		PROCEDURE GetNextCharacter*;
 		BEGIN
-			reader.Char(ch); INC(position);
-			IF ch = LF THEN INC(line) END;
+			reader.Char(ch); INC(position.start);
+			IF ch = LF THEN INC(position.line); position.linepos := position.start+1 END;
 			(*
 			(* not necessary, as Streams returns 0X if reading failed, but in case Streams.Reader.Char is modified ...  *)
 			IF reader.res # Streams.Ok THEN ch := EOT END;
@@ -458,7 +461,7 @@ TYPE
 
 		BEGIN
 			(* traverse *)
-			escapePos := 0; ech := endString[0]; startPosition := position;
+			escapePos := 0; ech := endString[0]; startPosition := position.start;
 			GetNextCharacter;
 			REPEAT
 				IF ch = ech THEN
@@ -487,7 +490,7 @@ TYPE
 					ech := endString[0]; escapePos := 0;
 				END;
 			UNTIL (ch = EOT) OR (ech = 0X) OR error;
-			IF ch = EOT THEN position := startPosition; ErrorS("Unexpected end of text in string") END;
+			IF ch = EOT THEN position.start := startPosition; ErrorS("Unexpected end of text in string") END;
 		END ConsumeStringUntil;
 
 		PROCEDURE GetEscapedString(VAR symbol: Symbol);
@@ -802,11 +805,11 @@ TYPE
 		BEGIN
 			ASSERT(case # Unknown);
 			stringMaker.Clear;
-			startPos := symbol.end;
+			startPos := symbol.position.end;
 			s := symbol.token;
 			WHILE (s # EndOfText) & (s # End) & (s # With) DO
-				symbol.start := position;
-				endPos := position;
+				symbol.position := position;
+				endPos := position.start;
 				CASE ch OF
 				'A' .. 'Z','a'..'z': s := Identifier;
 					GetIdentifier(symbol);
@@ -821,7 +824,7 @@ TYPE
 					stringWriter.Char(ch);
 					GetNextCharacter;
 				END;
-				symbol.end := position;
+				symbol.position.end := position.start;
 			END;
 			stringWriter.Update;
 			symbol.string := stringMaker.GetStringCopy(symbol.stringLength);
@@ -850,7 +853,7 @@ TYPE
 		VAR s,token: LONGINT;
 		BEGIN
 			SkipBlanks;
-			symbol.start := position; symbol.line := line;
+			symbol.position := position;
 			stringMaker.Clear;
 			CASE ch OF  (* ch > " " *)
 			EOT: s := EndOfText
@@ -951,7 +954,7 @@ TYPE
 			firstIdentifier := FALSE;
 
 			symbol.token := s;
-			symbol.end := position;
+			symbol.position.end := position.start;
 
 			IF Trace THEN OutSymbol(D.Log,symbol); D.Ln; END;
 
@@ -974,7 +977,8 @@ TYPE
 	END Scanner;
 
 	Context*=RECORD
-		position, readerPosition : LONGINT;
+		position: Position;
+		readerPosition : LONGINT;
 		ch: CHAR;
 	END;
 
@@ -1122,7 +1126,7 @@ TYPE
 		BEGIN
 			REPEAT
 				SkipBlanks;
-				symbol.start := position; symbol.line := line;
+				symbol.position := position;
 				CASE ch OF  (* ch > ' ' *)
 				| EOT: 	s := EndOfText;
 				| DoubleQuote:
@@ -1139,7 +1143,7 @@ TYPE
 						IF ch = '*' THEN GetNextCharacter; ReadComment(symbol);  s := Comment; ELSE s := LeftParenthesis END
 				| ')':     s := RightParenthesis;  GetNextCharacter
 				| CR: GetNextCharacter; s := Ln;IF ch = LF THEN GetNextCharacter END;
-				| LF: GetNextCharacter; s := Ln;
+				| LF: GetNextCharacter; s := Ln; IF ch = CR THEN GetNextCharacter END;
 				| '*':    s := Times; GetNextCharacter;
 				| '+':    s := Plus ; GetNextCharacter;
 				| ',':     s := Comma;  GetNextCharacter
@@ -1166,12 +1170,12 @@ TYPE
 					IF ch = '$' THEN s := PCOffset; GetNextCharacter ELSE s := PC; END
 				ELSE s := None; GetNextCharacter;
 				END;
-				symbol.end := position;
+				symbol.position.end := position.start;
 			UNTIL s # Comment;
 
 			symbol.token := s;
 
-			IF Trace THEN D.Ln;  D.Str( "Scan at " );  D.Int( symbol.start,1 );  D.Str( ": " );  OutSymbol(D.Log,symbol); D.Update;  END;
+			IF Trace THEN D.Ln;  D.Str( "Scan at " );  D.Int( symbol.position.start,1 );  D.Str( ": " );  OutSymbol(D.Log,symbol); D.Update;  END;
 			RETURN ~error
 		END GetNextSymbol;
 
@@ -1213,7 +1217,7 @@ TYPE
 	PROCEDURE OutSymbol*(w: Streams.Writer; CONST symbol: Symbol);
 	VAR str: ARRAY 256 OF CHAR;
 	BEGIN
-		w.Int(symbol.start,1); w.String("-");w.Int(symbol.end,1); w.String(":");
+		w.Int(symbol.position.start,1); w.String("-");w.Int(symbol.position.end,1); w.String(":");
 		w.String(tokens[symbol.token]);
 		IF symbol.token= Number THEN
 			CASE symbol.numberType OF

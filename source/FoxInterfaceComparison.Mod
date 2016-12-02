@@ -60,13 +60,13 @@ CONST
 		RETURN TRUE
 	END CompareSymbols;
 
-	PROCEDURE ErrorSS(pos: LONGINT; CONST s1,s2: ARRAY OF CHAR);
+	PROCEDURE ErrorSS(pos: SyntaxTree.Position; CONST s1,s2: ARRAY OF CHAR);
 	VAR msg: ARRAY 256 OF CHAR;
 	BEGIN
 		COPY(s1,msg);
 		Strings.Append(msg,s2);
-		IF (diagnostics # NIL) & (module # NIL) THEN
-			diagnostics.Information(module.sourceName,pos,Diagnostics.Invalid,msg);
+		IF (module # NIL) THEN
+			Basic.Information(diagnostics, module.sourceName,pos,msg);
 		END;
 	END ErrorSS;
 
@@ -110,7 +110,7 @@ CONST
 				newSymbol := NextSymbol(newSymbol.nextSymbol);
 			ELSIF oldName < newName THEN
 				IF oldPublic THEN
-					ErrorSS(Diagnostics.Invalid,oldName," is no longer visible");
+					ErrorSS(Basic.invalidPosition,oldName," is no longer visible");
 					INCL(flags,Redefined);
 				END;
 				oldSymbol := NextSymbol(oldSymbol.nextSymbol);
@@ -127,7 +127,7 @@ CONST
 			oldSymbol.GetName(oldName);
 			oldPublic := oldSymbol.access * SyntaxTree.Public # {};
 			IF oldSymbol.access * SyntaxTree.Public # {} THEN
-				ErrorSS(Diagnostics.Invalid,oldName," is no longer visible");
+				ErrorSS(Basic.invalidPosition,oldName," is no longer visible");
 				INCL(flags,Redefined);
 			END;
 			oldSymbol := NextSymbol(oldSymbol.nextSymbol);
@@ -148,7 +148,7 @@ CONST
 		Global.ModuleFileName(module.name,module.context,fname);
 		importedModule := symbolFileFormat.Import(fname,importCache);
 
-		NEW(fingerprinter,symbolFileFormat.system);
+		NEW(fingerprinter);
 		IF importedModule # NIL THEN
 			CompareScopes(module.moduleScope,importedModule.moduleScope);
 			IF importCache # NIL THEN SemanticChecker.RemoveModuleFromCache(importCache, importedModule) END;
