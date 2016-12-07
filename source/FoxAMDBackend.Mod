@@ -627,7 +627,9 @@ TYPE
 		BEGIN
 			ASSERT(type.sizeInBits >0);
 			IF (type.sizeInBits > cpuBits) & (type.form IN IntermediateCode.Integer) THEN
-				IntermediateCode.InitType(typePart,type.form,32);
+				IF part * 32 >= type.sizeInBits THEN typePart := IntermediateCode.undef;
+				ELSE IntermediateCode.InitType(typePart,type.form,32);
+				END;
 			ELSE ASSERT((type.form IN IntermediateCode.Integer) OR (type.form = IntermediateCode.Float));
 				IF part=Low THEN typePart := type ELSE typePart := IntermediateCode.undef END;
 			END;
@@ -636,6 +638,8 @@ TYPE
 		(* simple move without conversion *)
 		PROCEDURE Move(VAR dest, src: Assembler.Operand; CONST type: IntermediateCode.Type);
 		BEGIN
+			ASSERT(dest.type # none);
+			ASSERT(src.type # none);
 			IF type.length > 1 THEN
 				IF type.length = 4 THEN
 					(*ASSERT(type.form = IntermediateCode.Float);*)
