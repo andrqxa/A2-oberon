@@ -497,6 +497,9 @@ TYPE
 		stackSize: LONGINT;
 		spillStackStart: LONGINT;
 
+		(* list of tickets spilled by save instruction *)
+		savedTickets: Basic.List;
+
 		(* floating point stack state *)
 		fpStackPointer: LONGINT; (* floating point stack pointer, increases with allocation, decreases with releasing, used to determine current relative position on stack (as is necessary for intel FP instructions) *)
 		(*
@@ -544,6 +547,7 @@ TYPE
 
 			fpStackPointer := 0;
 			InitTicketGenerator(diagnostics,backend.optimize,2,physicalRegisters);
+			NEW(savedTickets, 16);
 		END InitGeneratorAMD64;
 
 		(*------------------- overwritten methods ----------------------*)
@@ -1269,7 +1273,8 @@ TYPE
 			|IntermediateCode.fill: EmitFill(instruction,FALSE);
 			|IntermediateCode.asm: EmitAsm(instruction);
 			|IntermediateCode.allocate: EmitAllocate(instruction);
-			|IntermediateCode.save, IntermediateCode.restore:
+			|IntermediateCode.save: EmitSave(instruction);
+			|IntermediateCode.restore: EmitRestore(instruction);
 			END;
 
 			ReserveOperandRegisters(instruction.op3,FALSE); ReserveOperandRegisters(instruction.op2,FALSE); ReserveOperandRegisters(instruction.op1,FALSE);
@@ -3172,45 +3177,51 @@ TYPE
 		END EmitAsm;
 
 		PROCEDURE EmitAllocate(CONST instruction: IntermediateCode.Instruction);
-		VAR ticket: Ticket; reg: LONGINT; left, right: Assembler.Operand;
-		BEGIN
-			(*UnSpill(ticket);
-			IF ticket.spilled THEN
-			END;*)
-			(*reg := physicalRegisters.NextFree(instruction.op1.type);
-			IF reg = none THEN
-				ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, instruction.op1.type, reg, TRUE, TRUE, TRUE, instruction.op2.offset, LastUse(instruction.op1.register));
-				virtualRegisters.SetMapped(instruction.op1.register, 0, ticket);
-				out.comments.String("r");
-				out.comments.Int(instruction.op1.register, 0);
-				out.comments.String(" is assigned to stack offset ");
-				out.comments.Int(instruction.op1.offset, 0);
-				out.comments.String(", spilled = ");
-				IF ticket.spilled THEN out.comments.String("TRUE"); ELSE out.comments.String("FALSE"); END;
-				out.comments.Ln;
-				(*tickets.Remove(ticket);*)
-				(*virtualRegisters.Dump(out.comments);
-				tickets.Dump(out.comments);
-				physicalRegisters.Dump(out.comments);*)
-			ELSE
-				ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, instruction.op1.type, reg, TRUE, TRUE, TRUE, instruction.op2.offset, LastUse(instruction.op1.register));
-				physicalRegisters.Allocate(reg, ticket);
-				virtualRegisters.SetMapped(instruction.op1.register, 0, ticket);
-
-				UnSpill(ticket);
-				(*right := TicketToOperand(ticket);
-				ticket.spilled := FALSE;
-				left := TicketToOperand(ticket);
-				Move(left, right, instruction.op1.type);*)
-				(*physicalRegisters.SetReserved(reg, TRUE);*)
-				(*PrepareOp2(instruction,Low,left,ticket);
-				FinishOp(instruction.op1, Low, left, NIL);*)
-				(*FinishOp(instruction.op2, Low, left, NIL);*)
-			END;*)
-			(*PrepareOp2(instruction,Low,left,ticket);
-			FinishOp(instruction.op1, Low, left, NIL);*)
-			(*FinishOp(instruction.op2, Low, left, NIL);*)
 		END EmitAllocate;
+
+		PROCEDURE EmitSave(CONST instruction: IntermediateCode.Instruction);
+		VAR
+			ticket: Ticket;
+		BEGIN
+			(*IF dump # NIL THEN tickets.Dump(dump); dump.Update; END;*)
+			ASSERT(savedTickets.Length() = 0);
+			ticket := tickets.live;
+			WHILE ticket # NIL DO
+				IF ~ticket.spilled THEN
+					IF out.comments # NIL THEN
+						out.comments.String("saving register");
+						out.comments.Int(ticket.register, 0);
+						out.comments.String(" to offset ");
+						out.comments.Int(ticket.offset, 0);
+						out.comments.Ln;
+					END;
+					Spill(ticket);
+					savedTickets.Add(ticket);
+				END;
+				ticket := ticket.next;
+			END;
+		END EmitSave;
+
+		PROCEDURE EmitRestore(CONST instruction: IntermediateCode.Instruction);
+		VAR
+			ticket: Ticket;
+			i: LONGINT;
+		BEGIN
+			i := savedTickets.Length() - 1;
+			WHILE i >= 0 DO
+				ticket := savedTickets.Get(i)(Ticket);
+				savedTickets.RemoveByIndex(i);
+				IF out.comments # NIL THEN
+					out.comments.String("restoring register");
+					out.comments.Int(ticket.register, 0);
+					out.comments.String(" from offset ");
+					out.comments.Int(ticket.offset, 0);
+					out.comments.Ln;
+				END;
+				UnSpill(ticket);
+				DEC(i)
+			END
+		END EmitRestore;
 	END CodeGeneratorAMD64;
 
 	BackendAMD64= OBJECT (IntermediateBackend.IntermediateBackend)

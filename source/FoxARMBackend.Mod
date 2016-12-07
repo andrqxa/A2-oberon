@@ -1488,7 +1488,7 @@ TYPE
 		- a part type is by definition directly representable in a register *)
 		PROCEDURE GetPartType(CONST type: IntermediateCode.Type; part: LONGINT; VAR partType: IntermediateCode.Type);
 		BEGIN
-			ASSERT((part = Low) OR (part = High));
+			(*ASSERT((part = Low) OR (part = High));*)
 			IF (type.sizeInBits <= 32) OR (type.form = IntermediateCode.Float) & backend.useFPU64 THEN
 				IF part = Low THEN
 					partType := type
@@ -1498,7 +1498,7 @@ TYPE
 			ELSIF type.sizeInBits = 64 THEN
 				IF part = Low THEN
 					partType := IntermediateCode.NewType(IntermediateCode.UnsignedInteger, 32) (* conceptually the low part is always unsigned *)
-				ELSE
+				ELSIF part = High THEN
 					IF type.form = IntermediateCode.Float THEN
 						partType := IntermediateCode.NewType(IntermediateCode.SignedInteger, 32)
 					ELSE
@@ -1506,9 +1506,10 @@ TYPE
 					END;
 				END
 			ELSE
-				HALT(100)
+				(*HALT(100)*)
+				partType := IntermediateCode.undef
 			END;
-			ASSERT(partType.form > IntermediateCode.Undefined);
+			(*ASSERT(partType.form > IntermediateCode.Undefined);*)
 		END GetPartType;
 
 		(** the value of a 32 bit part **)
@@ -3441,8 +3442,8 @@ TYPE
 					END;
 					Spill(ticket);
 					savedTickets.Add(ticket);
-					ticket := ticket.next;
 				END;
+				ticket := ticket.next;
 			END;
 		END EmitSave;
 

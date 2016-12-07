@@ -655,6 +655,7 @@ TYPE
 		VAR
 			link: Ticket;
 		BEGIN
+			ticket.next := NIL;
 			IF (live = NIL) OR (live.lastuse > ticket.lastuse) THEN
 				ticket.next := live; live := ticket
 			ELSE
@@ -683,6 +684,7 @@ TYPE
 				ASSERT(link.next=ticket);
 				link.next := ticket.next;
 			END;
+			ticket.next := NIL;
 		END RemoveTicket;
 
 		(* remove ticket from live list *)
@@ -701,6 +703,14 @@ TYPE
 			END;
 			ticket.next := free; free := ticket
 		END Remove;
+
+		PROCEDURE IsLive*(ticket: Ticket): BOOLEAN;
+		VAR t: Ticket;
+		BEGIN
+			t := live;
+			WHILE (t # NIL) & (t # ticket) DO t := t.next; END;
+			RETURN t # NIL;
+		END IsLive;
 
 		PROCEDURE Dump*(w: Streams.Writer);
 		VAR ticket: Ticket;
@@ -1521,19 +1531,6 @@ TYPE
 				LOOP
 					GetPartType(type, part, partType);
 					IF partType.form = IntermediateCode.Undefined THEN EXIT END;
-					IF dump # NIL THEN
-						dump.String("Allocating r");
-						dump.Int(i, 0);
-						dump.String(".");
-						dump.Int(part, 0);
-						dump.String("(");
-						IntermediateCode.DumpType(dump, type);
-						dump.String(", ");
-						IntermediateCode.DumpType(dump, partType);
-						dump.String(")");
-						dump.Ln;
-						dump.Update;
-					END;
 					IF live > 0 THEN
 						k := live - 1;
 						REPEAT
@@ -1615,95 +1612,17 @@ TYPE
 
 		PROCEDURE PreGenerate*(pc: LONGINT; CONST instr: IntermediateCode.Instruction);
 		VAR
-			ticket1, ticket2, ticket3: Ticket;
+			ticket: Ticket;
+			part, reg: LONGINT;
 		BEGIN
-			IF (instr.op1.mode = IntermediateCode.ModeRegister) THEN
-				ticket1 := virtualRegisters.Mapped(instr.op1.register, 0);
-				IF ticket1 # NIL THEN
-					IF (FirstUse(instr.op1.register) = pc) THEN
-						tickets.EnterTicket(ticket1);
-						IF (*ticket.register # None*) ~ticket1.spilled THEN
-							physicalRegisters.Allocate(ticket1.register, ticket1);
-							(*ticket1.spilled := TRUE;
-							UnSpill(ticket1);*)
+			FOR reg := 0 TO LEN(allocation.table) - 1 DO
+				IF pc = allocation.table[reg].first THEN
+					FOR part := 0 TO 1 DO
+						ticket := virtualRegisters.Mapped(reg, part);
+						IF ticket # NIL THEN
+							tickets.EnterTicket(ticket);
+							IF ~ticket.spilled THEN physicalRegisters.Allocate(ticket.register, ticket); END;
 						END;
-					ELSIF (LastUse(instr.op1.register) = pc - 1) THEN
-						tickets.Remove(ticket1);
-						IF (*ticket.register # None*) ~ticket1.spilled THEN physicalRegisters.Free(ticket1.register); END;
-					END;
-				END;
-				ticket1 := virtualRegisters.Mapped(instr.op1.register, 1);
-				IF ticket1 # NIL THEN
-					IF (FirstUse(instr.op1.register) = pc) THEN
-						tickets.EnterTicket(ticket1);
-						IF (*ticket.register # None*) ~ticket1.spilled THEN
-							physicalRegisters.Allocate(ticket1.register, ticket1);
-							(*ticket1.spilled := TRUE;
-							UnSpill(ticket1);*)
-						END;
-					ELSIF (LastUse(instr.op1.register) = pc - 1) THEN
-						tickets.Remove(ticket1);
-						IF (*ticket.register # None*) ~ticket1.spilled THEN physicalRegisters.Free(ticket1.register); END;
-					END;
-				END;
-			END;
-			IF (instr.op2.mode = IntermediateCode.ModeRegister) THEN
-				ticket2 := virtualRegisters.Mapped(instr.op2.register, 0);
-				IF (ticket2 # NIL) & (ticket2 # ticket1) THEN
-					IF (FirstUse(instr.op2.register) = pc) THEN
-						tickets.EnterTicket(ticket2);
-						IF ~ticket2.spilled THEN
-							physicalRegisters.Allocate(ticket2.register, ticket2);
-							(*ticket2.spilled := TRUE;
-							UnSpill(ticket2);*)
-						END;
-					ELSIF (LastUse(instr.op2.register) = pc - 1) THEN
-						tickets.Remove(ticket2);
-						IF ~ticket2.spilled THEN physicalRegisters.Free(ticket2.register); END;
-					END;
-				END;
-				ticket2 := virtualRegisters.Mapped(instr.op2.register, 1);
-				IF (ticket2 # NIL) & (ticket2 # ticket1) THEN
-					IF (FirstUse(instr.op2.register) = pc) THEN
-						tickets.EnterTicket(ticket2);
-						IF ~ticket2.spilled THEN
-							physicalRegisters.Allocate(ticket2.register, ticket2);
-							(*ticket2.spilled := TRUE;
-							UnSpill(ticket2);*)
-						END;
-					ELSIF (LastUse(instr.op2.register) = pc - 1) THEN
-						tickets.Remove(ticket2);
-						IF ~ticket2.spilled THEN physicalRegisters.Free(ticket2.register); END;
-					END;
-				END;
-			END;
-			IF (instr.op3.mode = IntermediateCode.ModeRegister) THEN
-				ticket3 := virtualRegisters.Mapped(instr.op3.register, 0);
-				IF (ticket3 # NIL) & (ticket3 # ticket2) & (ticket3 # ticket1) THEN
-					IF (FirstUse(instr.op3.register) = pc) THEN
-						tickets.EnterTicket(ticket3);
-						IF ~ticket3.spilled THEN
-							physicalRegisters.Allocate(ticket3.register, ticket3);
-							(*ticket3.spilled := TRUE;
-							UnSpill(ticket3);*)
-						END;
-					ELSIF (LastUse(instr.op3.register) = pc - 1) THEN
-						tickets.Remove(ticket3);
-						IF ~ticket3.spilled THEN physicalRegisters.Free(ticket3.register); END;
-					END;
-				END;
-				ticket3 := virtualRegisters.Mapped(instr.op3.register, 1);
-				IF (ticket3 # NIL) & (ticket3 # ticket2) & (ticket3 # ticket1) THEN
-					IF (FirstUse(instr.op3.register) = pc) THEN
-						tickets.EnterTicket(ticket3);
-						IF ~ticket3.spilled THEN
-							physicalRegisters.Allocate(ticket3.register, ticket3);
-							(*ticket3.spilled := TRUE;
-							UnSpill(ticket3);*)
-						END;
-					ELSIF (LastUse(instr.op3.register) = pc - 1) THEN
-						tickets.Remove(ticket3);
-						IF ~ticket3.spilled THEN physicalRegisters.Free(ticket3.register); END;
 					END;
 				END;
 			END;
@@ -1768,7 +1687,7 @@ TYPE
 		ELSE
 			FOR pc := 0 TO Width(max) - 1 DO w.Char(' ') END;
 		END;
-		w.String('|  Physical Location');
+		w.String('|  Type  Physical Location');
 		w.Ln;
 
 		(* Print one line per register: 'r...' then 'x-----x' *)
@@ -1787,14 +1706,18 @@ TYPE
 				FOR pc := 0 TO Width(max) - 1 DO w.Char(' '); END;
 				w.String('|  ');
 				part := 0;
-				LOOP
-					IF part >= registers.Parts() THEN EXIT END;
+				FOR part := 0 TO 1 DO
 					ticket := registers.Mapped(r, part);
-					IF ticket = NIL THEN EXIT
-					ELSIF ticket.spilled THEN w.String("[fp + "); w.Int(ticket.offset, 0); w.Char(']');
-					ELSE w.String("R"); w.Int(ticket.register, 0);
+					IF ticket # NIL THEN
+						IF ticket.spilled THEN
+							w.String("[fp + "); w.Int(ticket.offset, 0); w.Char(']');
+						ELSE
+							w.String("R"); w.Int(ticket.register, 0);
+						END;
 					END;
-					w.String('  ');
+					w.String(' (');
+					IntermediateCode.DumpType(w, ticket.type);
+					w.String(')  ');
 					INC(part);
 				END;
 				w.Ln;
