@@ -697,8 +697,12 @@ TYPE
 		PROCEDURE ToRegister(ticket: Ticket);
 		VAR op: Assembler.Operand;
 		BEGIN
-			GetSpillOperand(ticket,op);
-			emitter.Emit2(InstructionSet.opMOV,registerOperands[ticket.register],op);
+			IF (ticket.type.form = IntermediateCode.Float) & backend.forceFPU THEN
+				HALT(100); (*! TODO: implement *)
+			ELSE
+				GetSpillOperand(ticket,op);
+				Move(registerOperands[ticket.register], op, ticket.type);
+			END;
 		END ToRegister;
 
 		PROCEDURE ExchangeTickets(ticket1,ticket2: Ticket);
