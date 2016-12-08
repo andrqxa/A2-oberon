@@ -6531,6 +6531,21 @@ TYPE
 					END;
 				END;
 			ELSE
+
+				(* Optimize local variables of current procedure only *)
+				IF (currentScope = variable.scope) & optimize & (type IS SyntaxTree.BasicType) & ~type.IsPointer() THEN
+					VisitVariable(variable);
+					variable.SetUseRegister(TRUE);
+					variable.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
+					tmp := IntermediateCode.Register(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,variable.registerNumber);
+					Emit(Allocate(variable.position, tmp, IntermediateCode.Memory(IntermediateCode.GetType(system, type), result.op, result.op.offset)));
+					Emit(Mov(variable.position, tmp, IntermediateCode.Immediate(IntermediateCode.GetType(system, type), 0)));
+					(*LoadValue(result, type);*)
+					ReleaseIntermediateOperand(result.op);
+					(*ReleaseIntermediateOperand(temp);*)
+					result.op := tmp
+				END;
+
 				Symbol(variable,operand);
 				IF variable.initializer # NIL THEN
 					reference := SyntaxTree.NewSymbolDesignator(variable.initializer.position,NIL,variable);
@@ -9366,19 +9381,6 @@ TYPE
 				GetBaseRegister(result.op,currentScope,x.scope);
 				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,x.offsetInBits));
 
-				(* Optimize local variables *)
-				IF (currentScope = x.scope) & optimize & (type IS SyntaxTree.BasicType) & ~type.IsPointer() THEN
-					(*VisitVariable(variable);*)
-					x.SetUseRegister(TRUE);
-					x.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
-					temp := IntermediateCode.Register(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,x.registerNumber);
-					Emit(Allocate(x.position, temp, IntermediateCode.Memory(IntermediateCode.GetType(system, type), result.op, result.op.offset)));
-					Emit(Mov(x.position, temp, IntermediateCode.Immediate(IntermediateCode.GetType(system, type), 0)));
-					(*LoadValue(result, type);*)
-					ReleaseIntermediateOperand(result.op);
-					(*ReleaseIntermediateOperand(temp);*)
-					result.op := temp
-				END;
 
 			ELSIF (x.scope = moduleScope) OR (x.scope IS SyntaxTree.CellScope) & ~backend.cellsAreObjects THEN (* global variable *)
 				InitOperand(result,ModeReference);
