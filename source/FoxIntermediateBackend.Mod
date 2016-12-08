@@ -2189,8 +2189,10 @@ TYPE
 				Reuse1(temp, operand.tag);
 				IntermediateCode.InitImmediate(size, operand.tag.type, operand.op.type.sizeInBits - 1);
 				Emit(Sub(position,temp, size, operand.tag));
+				operand.tag := temp;
+				Reuse1(temp, operand.tag);
 			END;
-			Emit(Shr(position,temp, allBits, operand.tag));
+			Emit(Shr(position,temp, allBits,  operand.tag));
 			ReleaseIntermediateOperand(operand.tag);
 			operand.tag := temp;
 
