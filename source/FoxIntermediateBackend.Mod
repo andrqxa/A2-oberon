@@ -1309,7 +1309,8 @@ TYPE
 
 		isUnchecked: BOOLEAN;
 		optimize: BOOLEAN; (* do we need to prepare code for SSA? *)
-		destReg: LONGINT;
+		destReg: LONGINT; (* preferred destination register for expression evaluation *)
+		saveLevel: LONGINT; (* register saving nesting level *)
 
 		
 		PROCEDURE & Init(system: Global.System; checker: SemanticChecker.Checker; supportedInstructionProcedure: SupportedInstructionProcedure; supportedImmediateProcedure: SupportedImmediateProcedure; emitLabels: BOOLEAN; CONST runtime: SyntaxTree.IdentifierString; backend: IntermediateBackend;
@@ -1620,6 +1621,22 @@ TYPE
 			END;
 			SELF.section := prevSection;
 		END EmitLeave;
+
+		PROCEDURE EmitSave(position: Basic.Position);
+		BEGIN
+			IF saveLevel = 0 THEN
+				Emit(Save(position));
+			END;
+			INC(saveLevel);
+		END EmitSave;
+
+		PROCEDURE EmitRestore(position: Basic.Position);
+		BEGIN
+			IF saveLevel = 1 THEN
+				Emit(Restore(position));
+			END;
+			DEC(saveLevel);
+		END EmitRestore;
 
 		PROCEDURE Symbol(x: SyntaxTree.Symbol; VAR op: Operand);
 		VAR m: SymbolMap; 
@@ -5829,7 +5846,7 @@ TYPE
 
 						
 			ReleaseParameterRegisters();
-			Emit(Save(position));
+			EmitSave(position);
 			IF (procedureType.callingConvention = SyntaxTree.WinAPICallingConvention) OR SysvABI(procedureType.callingConvention) THEN
 				Emit(Call(position,operand.op,0));
 			ELSE
@@ -5874,7 +5891,7 @@ TYPE
 				END;
 			END;
 
-			Emit(Restore(position));
+			EmitRestore(position);
 			IF (resultDesignator = NIL) & (procedureType.returnType # NIL) THEN
 
 				IF structuredReturnType THEN
@@ -8654,7 +8671,7 @@ TYPE
 				ReleaseOperand(s0);
 			(* ---- SYSTEM.VAL ----- *)
 			|Global.systemVal:
-				Emit(Save(position));
+				EmitSave(position);
 				IF optimize & (p1 IS SyntaxTree.SymbolDesignator) & (p1(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) THEN
 					(* Local variable, possibly optimized to register *)
 					InitOperand(result,ModeReference);
@@ -8690,7 +8707,7 @@ TYPE
 						result := s1;
 					END;
 				END;
-				Emit(Restore(position));
+				EmitRestore(position);
 			(* ---- SYSTEM.GET ----- *)
 			|Global.systemGet:
 				Evaluate(p0,s0); (* adr *)
