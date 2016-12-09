@@ -5199,7 +5199,7 @@ TYPE
 						IF callingConvention = SyntaxTree.OberonCallingConvention  THEN
 							Pass((operand.tag));
 						END;
-					ELSIF (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) & (operand.op.mode = IntermediateCode.ModeRegister) THEN
+					ELSIF (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) & (expression IS SyntaxTree.SymbolDesignator) & (expression(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) THEN
 						InitOperand(operand,ModeValue);
 						GetBaseRegister(operand.op,currentScope,expression(SyntaxTree.SymbolDesignator).symbol.scope);
 						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,expression(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).offsetInBits));
@@ -8654,7 +8654,15 @@ TYPE
 				ReleaseOperand(s0);
 			(* ---- SYSTEM.VAL ----- *)
 			|Global.systemVal:
-				Expression(p1);
+				Emit(Save(position));
+				IF optimize & (p1 IS SyntaxTree.SymbolDesignator) & (p1(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) THEN
+					(* Local variable, possibly optimized to register *)
+					InitOperand(result,ModeReference);
+					GetBaseRegister(result.op,currentScope,p1(SyntaxTree.SymbolDesignator).symbol.scope);
+					IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,p1(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).offsetInBits));
+				ELSE
+					Expression(p1);
+				END;
 				s1 := result;
 				type :=p0(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.TypeDeclaration).declaredType;
 				IF s1.mode = ModeReference THEN
@@ -8682,6 +8690,7 @@ TYPE
 						result := s1;
 					END;
 				END;
+				Emit(Restore(position));
 			(* ---- SYSTEM.GET ----- *)
 			|Global.systemGet:
 				Evaluate(p0,s0); (* adr *)
