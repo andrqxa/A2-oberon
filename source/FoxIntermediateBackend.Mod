@@ -5198,7 +5198,11 @@ TYPE
 					IF (type IS SyntaxTree.RecordType) & (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) THEN
 						IF callingConvention = SyntaxTree.OberonCallingConvention  THEN
 							Pass((operand.tag));
-						END;	
+						END;
+					ELSIF (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) & (operand.op.mode = IntermediateCode.ModeRegister) THEN
+						InitOperand(operand,ModeValue);
+						GetBaseRegister(operand.op,currentScope,expression(SyntaxTree.SymbolDesignator).symbol.scope);
+						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,expression(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).offsetInBits));
 					END;
 					Pass((operand.op));
 				END;
@@ -6535,17 +6539,17 @@ TYPE
 			ELSE
 
 				(* Optimize local variables of current procedure only *)
-				IF (currentScope = variable.scope) & optimize & (type IS SyntaxTree.BasicType) & ~type.IsPointer() THEN
+				IF optimize & (currentScope = variable.scope) & (type IS SyntaxTree.BasicType) & ~type.IsPointer() THEN
 					VisitVariable(variable);
 					variable.SetUseRegister(TRUE);
 					variable.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
 					tmp := IntermediateCode.Register(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister,variable.registerNumber);
-					Emit(Allocate(variable.position, tmp, IntermediateCode.Memory(IntermediateCode.GetType(system, type), result.op, result.op.offset)));
+					result.mode := IntermediateCode.ModeMemory;
+					Emit(Allocate(variable.position, tmp, (*IntermediateCode.Memory(IntermediateCode.GetType(system, type), result.op, result.op.offset)*)result.op));
 					Emit(Mov(variable.position, tmp, IntermediateCode.Immediate(IntermediateCode.GetType(system, type), 0)));
 					(*LoadValue(result, type);*)
 					ReleaseIntermediateOperand(result.op);
-					(*ReleaseIntermediateOperand(temp);*)
-					result.op := tmp
+					(*ReleaseIntermediateOperand(tmp);*)
 				END;
 
 				Symbol(variable,operand);
@@ -9364,7 +9368,7 @@ TYPE
 		BEGIN
 			IF Trace THEN TraceEnter("VisitVariable");  END;
 			type := x.type.resolved;
-			IF (x.useRegister) THEN
+			IF (x.useRegister) & (x.scope = currentScope) THEN (* Only local variables are allowed to be in registers *)
 				InitOperand(result, ModeValue);
 				IF x.registerNumber < 0 THEN
 					x.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
@@ -9382,8 +9386,6 @@ TYPE
 				InitOperand(result,ModeReference);
 				GetBaseRegister(result.op,currentScope,x.scope);
 				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,x.offsetInBits));
-
-
 			ELSIF (x.scope = moduleScope) OR (x.scope IS SyntaxTree.CellScope) & ~backend.cellsAreObjects THEN (* global variable *)
 				InitOperand(result,ModeReference);
 				GetCodeSectionNameForSymbol(x,name);
