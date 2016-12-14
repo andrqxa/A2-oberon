@@ -1995,6 +1995,11 @@ TYPE
 		END CheckRegistersFree;
 
 
+		PROCEDURE ReusableRegister(op: IntermediateCode.Operand): BOOLEAN;
+		BEGIN
+			RETURN (~optimize) & (op.mode = IntermediateCode.ModeRegister) & (op.register > 0) & (op.offset = 0);
+		END ReusableRegister;
+
 		(* Reuse2: reuse src1 or src2 for ongoing computation if src1 or src2, respectively, is a register.
 			Otherwise allocate a new register.
 			Does NOT necessarily keep the content of src1 or src2 in result! *)
@@ -8596,7 +8601,15 @@ TYPE
 
 			(* ---- ADDRESSOF----- *)
 			|Global.systemAdr:
-				Designate(p0,s0);
+				EmitSave(position);
+				IF optimize & (p0 IS SyntaxTree.SymbolDesignator) & (p0(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) &(p0(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable) THEN
+					(* Local variable, possibly optimized to register *)
+					InitOperand(s0,ModeReference);
+					GetBaseRegister(s0.op,currentScope,p0(SyntaxTree.SymbolDesignator).symbol.scope);
+					IntermediateCode.AddOffset(s0.op,ToMemoryUnits(system,p0(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).offsetInBits));
+				ELSE
+					Designate(p0, s0);
+				END;
 				s0.mode := ModeValue;
 				IF (t0 IS SyntaxTree.MathArrayType) & (t0(SyntaxTree.MathArrayType).form = SyntaxTree.Open) THEN
 					ReleaseIntermediateOperand(s0.op);
@@ -8605,6 +8618,7 @@ TYPE
 				END;
 				Convert(s0.op,IntermediateCode.GetType(system,x.type));
 				result := s0;
+				EmitRestore(position);
 			(* ---- BIT ----- *)
 			|Global.systemBit:
 				Evaluate(p0,s0);
@@ -8672,7 +8686,7 @@ TYPE
 			(* ---- SYSTEM.VAL ----- *)
 			|Global.systemVal:
 				EmitSave(position);
-				IF optimize & (p1 IS SyntaxTree.SymbolDesignator) & (p1(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) THEN
+				IF optimize & (p1 IS SyntaxTree.SymbolDesignator) & (p1(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) & (p1(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable) THEN
 					(* Local variable, possibly optimized to register *)
 					InitOperand(result,ModeReference);
 					GetBaseRegister(result.op,currentScope,p1(SyntaxTree.SymbolDesignator).symbol.scope);
@@ -8745,11 +8759,27 @@ TYPE
 				END;
 			(* ---- SYSTEM.MOVE ----- *)
 			|Global.systemMove:
-				Evaluate(p0,s0);
-				Evaluate(p1,s1);
+				EmitSave(position);
+				IF optimize & (p0 IS SyntaxTree.SymbolDesignator) & (p0(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) &(p0(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable) THEN
+					(* Local variable, possibly optimized to register *)
+					InitOperand(s0,ModeReference);
+					GetBaseRegister(s0.op,currentScope,p0(SyntaxTree.SymbolDesignator).symbol.scope);
+					IntermediateCode.AddOffset(s0.op,ToMemoryUnits(system,p0(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).offsetInBits));
+				ELSE
+					Evaluate(p0, s0);
+				END;
+				IF optimize & (p1 IS SyntaxTree.SymbolDesignator) & (p1(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) &(p1(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable) THEN
+					(* Local variable, possibly optimized to register *)
+					InitOperand(s1,ModeReference);
+					GetBaseRegister(s1.op,currentScope,p1(SyntaxTree.SymbolDesignator).symbol.scope);
+					IntermediateCode.AddOffset(s1.op,ToMemoryUnits(system,p1(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).offsetInBits));
+				ELSE
+					Evaluate(p1, s1);
+				END;
 				Evaluate(p2,s2);
 				Emit(Copy(position,s1.op,s0.op,s2.op));
 				ReleaseOperand(s0); ReleaseOperand(s1); ReleaseOperand(s2);
+				EmitRestore(position);
 			(* ---- SYSTEM.NEW ----- *)
 			|Global.systemNew:
 				Designate(p0,s0);
@@ -13558,11 +13588,6 @@ TYPE
 	PROCEDURE Assert(cond: BOOLEAN; CONST reason: ARRAY OF CHAR);
 	BEGIN ASSERT(cond);
 	END Assert;
-
-	PROCEDURE ReusableRegister(op: IntermediateCode.Operand): BOOLEAN;
-	BEGIN
-		RETURN FALSE
-	END ReusableRegister;
 
 	PROCEDURE EnsureBodyProcedure(moduleScope: SyntaxTree.ModuleScope);
 	VAR procedure: SyntaxTree.Procedure; procedureScope: SyntaxTree.ProcedureScope;
