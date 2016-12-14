@@ -1286,14 +1286,14 @@ TYPE
 		END Generate;
 
 		PROCEDURE PostGenerate(CONST instruction: IntermediateCode.Instruction);
-		VAR ticket: Ticket;
+		VAR ticket, next: Ticket;
 		BEGIN
 			TryUnmap(instruction.op3); TryUnmap(instruction.op2); TryUnmap(instruction.op1);
 			ticket := tickets.live;
-			WHILE (ticket # NIL) & (ticket.lastuse = inPC) DO
-				IF ~ticket.spilled THEN Spill(ticket); END;
-				UnmapTicket(ticket);
-				ticket := tickets.live
+			WHILE (ticket # NIL) DO
+				next := ticket.next;
+				IF ticket.lastuse = inPC THEN UnmapTicket(ticket); END;
+				ticket := next;
 			END;
 		END PostGenerate;
 

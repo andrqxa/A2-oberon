@@ -5216,7 +5216,7 @@ TYPE
 						IF callingConvention = SyntaxTree.OberonCallingConvention  THEN
 							Pass((operand.tag));
 						END;
-					ELSIF (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) & (expression IS SyntaxTree.SymbolDesignator) & (expression(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) THEN
+					ELSIF (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) & (expression IS SyntaxTree.SymbolDesignator) & (expression(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) & (expression(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable) THEN
 						InitOperand(operand,ModeValue);
 						GetBaseRegister(operand.op,currentScope,expression(SyntaxTree.SymbolDesignator).symbol.scope);
 						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,expression(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).offsetInBits));
@@ -6566,7 +6566,7 @@ TYPE
 					Emit(Mov(variable.position, tmp, IntermediateCode.Immediate(IntermediateCode.GetType(system, type), 0)));
 					(*LoadValue(result, type);*)
 					ReleaseIntermediateOperand(result.op);
-					(*ReleaseIntermediateOperand(tmp);*)
+					ReleaseIntermediateOperand(tmp);
 				END;
 
 				Symbol(variable,operand);
