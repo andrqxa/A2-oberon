@@ -1245,14 +1245,20 @@ TYPE
 				IF dump # NIL THEN
 					dump.String("free register: index="); dump.Int(ticket.register,1);  dump.Ln;
 				END;
-				(*virtualRegisters.Dump(out.comments);
-				tickets.Dump(out.comments);
-				physicalRegisters.Dump(out.comments);
-				out.comments.Ln;
-				out.comments.Update;*)
-				physicalRegisters.SetReserved(ticket.register,FALSE);
-				physicalRegisters.Free(ticket.register);
-				ASSERT(~physicalRegisters.Reserved(ticket.register));
+				IF ticket.fixed THEN
+					Spill(ticket);
+				ELSE
+					IF (ticket.offset # None) & ~ticket.fixed THEN
+						size := spillStack.Size();
+						spillStack.Free(ticket.offset);
+						size := spillStack.Size()-size;
+						ASSERT(size<=0);
+						IF size<0 THEN AllocateSpillStack(size) END;
+					END;
+					physicalRegisters.SetReserved(ticket.register,FALSE);
+					physicalRegisters.Free(ticket.register);
+					ASSERT(~physicalRegisters.Reserved(ticket.register));
+				END;
 			END;
 		END FreeTicket;
 
@@ -1464,7 +1470,7 @@ TYPE
 			PROCEDURE AllocateInterval(i: LONGINT): BOOLEAN;
 			VAR
 				type, spillType, partType: IntermediateCode.Type;
-				ticket: Ticket;
+				ticket, spillTicket: Ticket;
 				spill, part, reg, k: LONGINT;
 				inRegister: BOOLEAN;
 
@@ -1553,15 +1559,15 @@ TYPE
 						virtualRegisters.SetMapped(i, part, ticket);
 						inRegister := TRUE;
 					ELSIF allocation.table[spill].last > allocation.table[i].last THEN
-						ticket := virtualRegisters.Mapped(spill, 0);
-						ticket.fixed := IsFixed(i);
+						spillTicket := virtualRegisters.Mapped(spill, 0);
+
+						ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, partType, spillTicket.register, IsFixed(i), TRUE, FALSE, 0, allocation.table[i].last);
 						ticket.offset := GetOffsetOf(i);
-						virtualRegisters.Unmap(spill);
 						virtualRegisters.SetMapped(i, part, ticket);
-						ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, partType, None, IsFixed(spill), TRUE, TRUE, 0(*GetOffsetOf(spill)*), allocation.table[spill].last);
-						ticket.offset := GetOffsetOf(spill);
-						virtualRegisters.SetMapped(spill, 0, ticket);
 						tickets.RemoveTicket(ticket);
+
+						spillTicket.spilled := TRUE;
+						spillTicket.register := None;
 						DEC(live);
 						inRegister := TRUE;
 						(*
