@@ -1040,11 +1040,6 @@ TYPE
 		PROCEDURE MakeOperand(CONST vop: IntermediateCode.Operand; part: LONGINT; VAR op: Assembler.Operand; ticket: Ticket);
 		VAR tmp: Assembler.Operand;
 		BEGIN
-			(*(*!DBG*)IF vop.register = 4 THEN
-				virtualRegisters.Dump(out.comments);
-				out.comments.Update;
-			END;*)
-
 			TryAllocate(vop,part);
 			CASE vop.mode OF
 				IntermediateCode.ModeMemory: GetMemory(vop,part,op);

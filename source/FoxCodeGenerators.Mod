@@ -124,7 +124,7 @@ TYPE
 			SELF.diagnostics := diagnostics;
 			error := FALSE;
 			NEW(allocation); NEW(liveRegisters);
-			(*IF optimize THEN SELF.optimize := {0..31} ELSE SELF.optimize := {} END;*)
+			IF optimize THEN SELF.optimize := {31} ELSE SELF.optimize := {} END;
 		END InitGenerator;
 
 		PROCEDURE SetModule*(module: Sections.Module); (* needed for inline code for symbol reference *)
@@ -1248,7 +1248,7 @@ TYPE
 				IF ticket.fixed THEN
 					Spill(ticket);
 				ELSE
-					IF (ticket.offset # None) & ~ticket.fixed THEN
+					IF (optimize # {}) & (ticket.offset # None) & ~ticket.fixed THEN
 						size := spillStack.Size();
 						spillStack.Free(ticket.offset);
 						size := spillStack.Size()-size;
@@ -1517,7 +1517,7 @@ TYPE
 						INC(pc);
 					UNTIL (pc = in.pc) OR ((instr.opcode = IntermediateCode.allocate) & (instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i));
 					IF (pc < in.pc) THEN
-						RETURN instr.op2.offset;
+						RETURN instr.op2.offset + part * partType.sizeInBits DIV 8;
 					END;
 					(*RETURN 0;*)
 
@@ -1613,7 +1613,7 @@ TYPE
 
 		PROCEDURE Prepare *;
 		BEGIN
-			(*IF in.type = Sections.CodeSection THEN*) AllocateRegisters; (*END;*)
+			IF optimize # {} THEN AllocateRegisters; END;
 		END Prepare;
 
 		PROCEDURE PreGenerate*(pc: LONGINT; CONST instr: IntermediateCode.Instruction);
