@@ -115,7 +115,7 @@ TYPE
 		allocation: RegisterAllocation;
 		liveRegisters: LiveRegisters;
 		inEmulation-: BOOLEAN;
-		optimize: SET;
+		optimize-: SET;
 
 		(* generic *)
 		PROCEDURE & InitGenerator*(diagnostics: Diagnostics.Diagnostics; optimize: BOOLEAN);
@@ -935,6 +935,7 @@ TYPE
 		virtualRegisters-: VirtualRegisters; (* virtual registers --> tickets *)
 		tickets-: Tickets;  (* tickets <-> physical registers *)
 		spillStack-: SpillStack; (* spill stack offset <-> ticket *)
+		forcedFree-: Basic.List; (* list of tickets forced free *)
 
 		(* generic *)
 		PROCEDURE & InitTicketGenerator*(diagnostics: Diagnostics.Diagnostics; optimize: BOOLEAN; numberRegisterParts: LONGINT; physicalRegisters: PhysicalRegisters);
@@ -944,6 +945,7 @@ TYPE
 			NEW(virtualRegisters,numberRegisterParts);
 			NEW(spillStack);
 			SELF.physicalRegisters := physicalRegisters;
+			NEW(forcedFree, 16);
 		END InitTicketGenerator;
 
 		PROCEDURE Section*(in: IntermediateCode.Section; out: BinaryCode.Section);
@@ -1134,6 +1136,7 @@ TYPE
 				ticket := GetPreferredSpill(type);
 				Spill(ticket);
 				tempReg := physicalRegisters.NextFree(type);
+				IF tempReg # None THEN forcedFree.Add(ticket); END;
 			END;
 			RETURN tempReg
 		END ForceFreeRegister;
@@ -1428,24 +1431,17 @@ TYPE
 			PROCEDURE ExpireOldIntervals(i: LONGINT);
 			VAR
 				ticket: Ticket;
-				j, k: LONGINT;
+				part, j, k: LONGINT;
 			BEGIN
 				WHILE (j < live) DO
 					IF allocation.table[liveByLastUse[j]].last < allocation.table[i].first THEN
-						(* Free low part *)
-						ticket := virtualRegisters.Mapped(liveByLastUse[j], 0);
-						IF ticket # NIL THEN
-							IF ticket.spilled & ~ticket.fixed THEN
-							ELSIF ~ticket.spilled THEN
-								physicalRegisters.Free(ticket.register);
-							END;
-						END;
-						(* Free high part *)
-						ticket := virtualRegisters.Mapped(liveByLastUse[j], 1);
-						IF ticket # NIL THEN
-							IF ticket.spilled & ~ticket.fixed THEN
-							ELSIF ~ticket.spilled THEN
-								physicalRegisters.Free(ticket.register);
+						FOR part := 0 TO 1 DO
+							ticket := virtualRegisters.Mapped(liveByLastUse[j], part);
+							IF ticket # NIL THEN
+								IF ticket.spilled & ~ticket.fixed THEN
+								ELSIF ~ticket.spilled THEN
+									physicalRegisters.Free(ticket.register);
+								END;
 							END;
 						END;
 						FOR k := j TO live - 2 DO liveByLastUse[k] := liveByLastUse[k + 1] END;
@@ -1469,7 +1465,7 @@ TYPE
 
 			PROCEDURE AllocateInterval(i: LONGINT): BOOLEAN;
 			VAR
-				type, spillType, partType: IntermediateCode.Type;
+				type, partType: IntermediateCode.Type;
 				ticket, spillTicket: Ticket;
 				spill, part, reg, k: LONGINT;
 				inRegister: BOOLEAN;
@@ -1532,20 +1528,37 @@ TYPE
 					RETURN offset;
 				END GetOffsetOf;
 
-			BEGIN
-				type := GetTypeOf(i);
-				LOOP
-					GetPartType(type, part, partType);
-					IF partType.form = IntermediateCode.Undefined THEN EXIT END;
+				PROCEDURE GetSpillCandidate(CONST type: IntermediateCode.Type; VAR spill: LONGINT): Ticket;
+				VAR
+					k, part: LONGINT;
+					spillType, partType: IntermediateCode.Type;
+				BEGIN
 					IF live > 0 THEN
 						k := live - 1;
 						REPEAT
 							spill := liveByLastUse[k];
+							spillType := GetTypeOf(spill);
+							part := 0;
+							LOOP
+								GetPartType(spillType, part, partType);
+								IF (part = 1) OR IntermediateCode.TypeEquals(partType, type) THEN EXIT END;
+								INC(part);
+							END;
 							DEC(k);
-						UNTIL (k < 0) OR IntermediateCode.TypeEquals(GetTypeOf(spill), partType);
+						UNTIL (k < 0) OR IntermediateCode.TypeEquals(partType, type);
 						IF k < 0 THEN spill := 0 END;
-						spill := liveByLastUse[live - 1];
+						RETURN virtualRegisters.Mapped(spill, part)
 					END;
+					RETURN NIL
+				END GetSpillCandidate;
+
+			BEGIN
+				type := GetTypeOf(i);
+				LOOP
+					GetPartType(type, part, partType);
+					IF (partType.form = IntermediateCode.Undefined) OR (part = 2) THEN EXIT END;
+					IF dump # NIL THEN dump.String("Allocating r"); dump.Int(i, 0); dump.Char('.'); dump.Int(part, 0); dump.String(" ("); IntermediateCode.DumpType(dump, partType); dump.Char(')'); dump.Ln; END;
+					spillTicket := GetSpillCandidate(partType, spill);
 					reg := physicalRegisters.NextFree(partType);
 					IF reg # None THEN
 						(* i <- reg *)
@@ -1559,8 +1572,6 @@ TYPE
 						virtualRegisters.SetMapped(i, part, ticket);
 						inRegister := TRUE;
 					ELSIF allocation.table[spill].last > allocation.table[i].last THEN
-						spillTicket := virtualRegisters.Mapped(spill, 0);
-
 						ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, partType, spillTicket.register, IsFixed(i), TRUE, FALSE, 0, allocation.table[i].last);
 						ticket.offset := GetOffsetOf(i);
 						virtualRegisters.SetMapped(i, part, ticket);
@@ -1568,6 +1579,13 @@ TYPE
 
 						spillTicket.spilled := TRUE;
 						spillTicket.register := None;
+						(* Remove spill from live list *)
+						k := 0;
+						WHILE (k < live) & (liveByLastUse[k] # spill) DO INC(k); END;
+						ASSERT(k < live);
+						spill := k;
+						FOR k := spill TO live - 2 DO liveByLastUse[k] := liveByLastUse[k + 1]; END;
+						liveByLastUse[live - 1] := -1;
 						DEC(live);
 						inRegister := TRUE;
 						(*
