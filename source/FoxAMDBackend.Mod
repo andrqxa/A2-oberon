@@ -1280,8 +1280,24 @@ TYPE
 			RemoveDeadTickets;
 		END Generate;
 
+		PROCEDURE UnSpillRegsForcedFree;
+		VAR
+			len: LONGINT;
+			ticket: Ticket;
+		BEGIN
+			LOOP
+				len := forcedFree.Length();
+				IF len = 0 THEN EXIT END;
+				ticket := forcedFree.Get(len - 1)(Ticket);
+				ASSERT(ticket # NIL);
+				IF dump # NIL THEN dump.String("Unspilling forced spill: "); CodeGenerators.DumpTicket(dump, ticket); dump.Ln; END;
+				UnSpill(ticket);
+				forcedFree.RemoveByIndex(len - 1);
+			END;
+		END UnSpillRegsForcedFree;
+
 		PROCEDURE PostGenerate(CONST instruction: IntermediateCode.Instruction);
-		VAR ticket, next: Ticket;
+		VAR ticket, next: Ticket; len: LONGINT;
 		BEGIN
 			TryUnmap(instruction.op3); TryUnmap(instruction.op2); TryUnmap(instruction.op1);
 			ticket := tickets.live;
@@ -1290,6 +1306,7 @@ TYPE
 				IF ticket.lastuse = inPC THEN UnmapTicket(ticket); END;
 				ticket := next;
 			END;
+			UnSpillRegsForcedFree;
 		END PostGenerate;
 
 		(* enter procedure: generate PAF and clear stack *)
@@ -2902,6 +2919,7 @@ TYPE
 					END;
 				END;
 			END;
+			IF instruction.opcode # IntermediateCode.br THEN UnSpillRegsForcedFree; END;
 			JmpDest(hit);
 			IF failPC > 0 THEN out.PutByteAt(failPC,(out.pc-failPC)-1); END;
 		END EmitBr;
@@ -3183,22 +3201,23 @@ TYPE
 		VAR
 			ticket: Ticket;
 		BEGIN
-			(*IF dump # NIL THEN tickets.Dump(dump); dump.Update; END;*)
-			ASSERT(savedTickets.Length() = 0);
-			ticket := tickets.live;
-			WHILE ticket # NIL DO
-				IF ~ticket.spilled THEN
-					IF out.comments # NIL THEN
-						out.comments.String("saving register");
-						out.comments.Int(ticket.register, 0);
-						out.comments.String(" to offset ");
-						out.comments.Int(ticket.offset, 0);
-						out.comments.Ln;
+			IF optimize # {} THEN
+				ASSERT(savedTickets.Length() = 0);
+				ticket := tickets.live;
+				WHILE ticket # NIL DO
+					IF ~ticket.spilled THEN
+						IF out.comments # NIL THEN
+							out.comments.String("saving register");
+							out.comments.Int(ticket.register, 0);
+							out.comments.String(" to offset ");
+							out.comments.Int(ticket.offset, 0);
+							out.comments.Ln;
+						END;
+						Spill(ticket);
+						savedTickets.Add(ticket);
 					END;
-					Spill(ticket);
-					savedTickets.Add(ticket);
+					ticket := ticket.next;
 				END;
-				ticket := ticket.next;
 			END;
 		END EmitSave;
 
@@ -3207,20 +3226,22 @@ TYPE
 			ticket: Ticket;
 			i: LONGINT;
 		BEGIN
-			i := savedTickets.Length() - 1;
-			WHILE i >= 0 DO
-				ticket := savedTickets.Get(i)(Ticket);
-				savedTickets.RemoveByIndex(i);
-				IF out.comments # NIL THEN
-					out.comments.String("restoring register");
-					out.comments.Int(ticket.register, 0);
-					out.comments.String(" from offset ");
-					out.comments.Int(ticket.offset, 0);
-					out.comments.Ln;
+			IF optimize # {} THEN
+				i := savedTickets.Length() - 1;
+				WHILE i >= 0 DO
+					ticket := savedTickets.Get(i)(Ticket);
+					savedTickets.RemoveByIndex(i);
+					IF out.comments # NIL THEN
+						out.comments.String("restoring register");
+						out.comments.Int(ticket.register, 0);
+						out.comments.String(" from offset ");
+						out.comments.Int(ticket.offset, 0);
+						out.comments.Ln;
+					END;
+					UnSpill(ticket);
+					DEC(i)
 				END;
-				UnSpill(ticket);
-				DEC(i)
-			END
+			END;
 		END EmitRestore;
 	END CodeGeneratorAMD64;
 
