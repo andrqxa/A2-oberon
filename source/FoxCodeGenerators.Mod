@@ -1080,16 +1080,16 @@ TYPE
 					SpillToRegister(ticket, register)
 				ELSE
 					mapped := GetPreferredSpill(ticket.type);
-					IF ~ExchangeSpill(mapped, ticket) THEN
+					(*IF ~ExchangeSpill(mapped, ticket) THEN*)
 						register := ForceFreeRegister(ticket.type);
 						SpillToRegister(ticket, register);
-					END;
+					(*END;*)
 				END;
 			ELSE
 				mapped := physicalRegisters.Mapped(register);
 				IF mapped = NIL THEN
 					SpillToRegister(ticket, register)
-				ELSIF ~ExchangeSpill(mapped, ticket) THEN
+				ELSE(*IF ~ExchangeSpill(mapped, ticket) THEN*)
 					WHILE mapped # NIL DO
 						Spill(mapped);
 						mapped := physicalRegisters.Mapped(ticket.register);
@@ -1557,7 +1557,6 @@ TYPE
 				LOOP
 					GetPartType(type, part, partType);
 					IF (partType.form = IntermediateCode.Undefined) OR (part = 2) THEN EXIT END;
-					IF dump # NIL THEN dump.String("Allocating r"); dump.Int(i, 0); dump.Char('.'); dump.Int(part, 0); dump.String(" ("); IntermediateCode.DumpType(dump, partType); dump.Char(')'); dump.Ln; END;
 					spillTicket := GetSpillCandidate(partType, spill);
 					reg := physicalRegisters.NextFree(partType);
 					IF reg # None THEN
@@ -1733,15 +1732,14 @@ TYPE
 				FOR part := 0 TO 1 DO
 					ticket := registers.Mapped(r, part);
 					IF ticket # NIL THEN
+						IntermediateCode.DumpType(w, ticket.type);
+						w.String("	");
 						IF ticket.spilled THEN
 							w.String("[fp + "); w.Int(ticket.offset, 0); w.Char(']');
 						ELSE
 							w.String("R"); w.Int(ticket.register, 0);
 						END;
 					END;
-					w.String(' (');
-					IntermediateCode.DumpType(w, ticket.type);
-					w.String(')  ');
 					INC(part);
 				END;
 				w.Ln;

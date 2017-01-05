@@ -2919,7 +2919,8 @@ TYPE
 					END;
 				END;
 			END;
-			IF instruction.opcode # IntermediateCode.br THEN UnSpillRegsForcedFree; END;
+			(*IF instruction.opcode # IntermediateCode.br THEN UnSpillRegsForcedFree(*; FreeDeadRegisters(inPC)*) END;*)
+			IF instruction.opcode # IntermediateCode.br THEN PostGenerate(instruction); END;
 			JmpDest(hit);
 			IF failPC > 0 THEN out.PutByteAt(failPC,(out.pc-failPC)-1); END;
 		END EmitBr;
