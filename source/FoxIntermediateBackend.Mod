@@ -3438,6 +3438,7 @@ TYPE
 			|Scanner.Times:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF leftType IS SyntaxTree.SetType THEN
 					InitOperand(result,ModeValue);
 					Reuse2a(result.op,left.op,right.op,dest);
@@ -3471,6 +3472,7 @@ TYPE
 			|Scanner.Div:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF (x.type.resolved IS SyntaxTree.IntegerType) & (x.right.resolved = NIL) THEN (* divisor negative check *)
 					IntermediateCode.InitImmediate(zero,IntermediateCode.GetType(system,rightType),0);
 					IF ~isUnchecked THEN
@@ -3487,6 +3489,7 @@ TYPE
 			|Scanner.Mod:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF (x.type.resolved IS SyntaxTree.IntegerType) & (x.right.resolved = NIL) THEN (* divisor negative check *)
 					IntermediateCode.InitImmediate(zero,IntermediateCode.GetType(system,rightType),0);
 					IF ~isUnchecked THEN
@@ -3503,6 +3506,7 @@ TYPE
 			|Scanner.Slash:
 				Evaluate(x.left,left);
 				Evaluate(x.right,right);
+				destReg := dReg;
 				IF leftType IS SyntaxTree.SetType THEN
 					InitOperand(result,ModeValue);
 					Reuse2a(result.op,left.op,right.op,dest);

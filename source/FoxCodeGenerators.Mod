@@ -1135,8 +1135,8 @@ TYPE
 			WHILE tempReg = None DO
 				ticket := GetPreferredSpill(type);
 				Spill(ticket);
+				forcedFree.Add(ticket);
 				tempReg := physicalRegisters.NextFree(type);
-				IF tempReg # None THEN forcedFree.Add(ticket); END;
 			END;
 			RETURN tempReg
 		END ForceFreeRegister;

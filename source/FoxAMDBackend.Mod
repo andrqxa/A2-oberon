@@ -1277,7 +1277,7 @@ TYPE
 			END;
 
 			ReserveOperandRegisters(instruction.op3,FALSE); ReserveOperandRegisters(instruction.op2,FALSE); ReserveOperandRegisters(instruction.op1,FALSE);
-			RemoveDeadTickets;
+			(*RemoveDeadTickets;*)
 		END Generate;
 
 		PROCEDURE UnSpillRegsForcedFree;
@@ -1300,11 +1300,16 @@ TYPE
 		VAR ticket, next: Ticket; len: LONGINT;
 		BEGIN
 			TryUnmap(instruction.op3); TryUnmap(instruction.op2); TryUnmap(instruction.op1);
-			ticket := tickets.live;
+			(*ticket := tickets.live;
 			WHILE (ticket # NIL) DO
 				next := ticket.next;
 				IF ticket.lastuse = inPC THEN UnmapTicket(ticket); END;
 				ticket := next;
+			END;*)
+			ticket := tickets.live;
+			WHILE (ticket # NIL) & (ticket.lastuse = inPC) DO
+				UnmapTicket(ticket);
+				ticket := tickets.live;
 			END;
 			UnSpillRegsForcedFree;
 		END PostGenerate;
@@ -2919,7 +2924,7 @@ TYPE
 					END;
 				END;
 			END;
-			(*IF instruction.opcode # IntermediateCode.br THEN UnSpillRegsForcedFree(*; FreeDeadRegisters(inPC)*) END;*)
+			(*(*IF instruction.opcode # IntermediateCode.br THEN*) UnSpillRegsForcedFree; (*FreeDeadRegisters(inPC) END;*)*)
 			IF instruction.opcode # IntermediateCode.br THEN PostGenerate(instruction); END;
 			JmpDest(hit);
 			IF failPC > 0 THEN out.PutByteAt(failPC,(out.pc-failPC)-1); END;
