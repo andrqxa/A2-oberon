@@ -1310,6 +1310,7 @@ TYPE
 		isUnchecked: BOOLEAN;
 		optimize: BOOLEAN; (* do we need to prepare code for SSA? *)
 		destReg: LONGINT; (* preferred destination register for expression evaluation *)
+		destType: IntermediateCode.Type;
 		saveLevel: LONGINT; (* register saving nesting level *)
 
 		
@@ -1366,7 +1367,8 @@ TYPE
 			currentIsInline := FALSE;
 			NeedDescriptor := FALSE;
 			isUnchecked := backend.noRuntimeChecks;
-			SELF.optimize := optimize
+			SELF.optimize := optimize;
+			destReg := -1;
 		END Init;
 		
 		TYPE Context = RECORD 
@@ -2005,11 +2007,15 @@ TYPE
 			Does NOT necessarily keep the content of src1 or src2 in result! *)
 		PROCEDURE Reuse2(VAR result: IntermediateCode.Operand; src1,src2: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
+			IF optimize & (destReg # -1) & IntermediateCode.TypeEquals(src1.type, destType) THEN
+				IntermediateCode.InitRegister(result, src1.type, src1.registerClass, destReg);
+				(*UseIntermediateOperand(result);*)
+			ELSIF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
 				UseIntermediateOperand(result);
 			ELSIF ReusableRegister(src2) THEN IntermediateCode.InitRegister(result,src2.type,src2.registerClass, src2.register);
 				UseIntermediateOperand(result);
-			ELSE IntermediateCode.InitRegister(result,src1.type,src1.registerClass,AcquireRegister(src1.type, src1.registerClass));
+			ELSE
+				IntermediateCode.InitRegister(result,src1.type,src1.registerClass,AcquireRegister(src1.type, src1.registerClass));
 			END;
 		END Reuse2;
 
@@ -2020,7 +2026,10 @@ TYPE
 		*)
 		PROCEDURE Reuse2a(VAR result: IntermediateCode.Operand; src1,src2: IntermediateCode.Operand; VAR alternative: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
+			IF optimize & (destReg # -1) & IntermediateCode.TypeEquals(src1.type, destType) THEN
+				IntermediateCode.InitRegister(result, src1.type, src1.registerClass, destReg);
+				(*UseIntermediateOperand(result);*)
+			ELSIF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
 				UseIntermediateOperand(result);
 			ELSIF ReusableRegister(src2) THEN IntermediateCode.InitRegister(result,src2.type,src2.registerClass, src2.register);
 				UseIntermediateOperand(result);
@@ -2034,7 +2043,10 @@ TYPE
 		(* like reuse2 but only one source *)
 		PROCEDURE Reuse1(VAR result: IntermediateCode.Operand; src1: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
+			IF optimize & (destReg # -1) & IntermediateCode.TypeEquals(src1.type, destType) THEN
+				IntermediateCode.InitRegister(result, src1.type, src1.registerClass, destReg);
+				(*UseIntermediateOperand(result);*)
+			ELSIF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
 				UseIntermediateOperand(result);
 			ELSE IntermediateCode.InitRegister(result,src1.type,src1.registerClass, AcquireRegister(src1.type, src1.registerClass));
 			END;
@@ -2043,7 +2055,10 @@ TYPE
 		(* like reuse2a but only one source *)
 		PROCEDURE Reuse1a(VAR result: IntermediateCode.Operand; src1: IntermediateCode.Operand; VAR alternative: IntermediateCode.Operand);
 		BEGIN
-			IF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
+			IF optimize & (destReg # -1) & IntermediateCode.TypeEquals(src1.type, destType) THEN
+				IntermediateCode.InitRegister(result, src1.type, src1.registerClass, destReg);
+				(*UseIntermediateOperand(result);*)
+			ELSIF ReusableRegister(src1) THEN IntermediateCode.InitRegister(result,src1.type,src1.registerClass, src1.register);
 				UseIntermediateOperand(result);
 			ELSIF alternative.mode # IntermediateCode.Undefined THEN result := alternative; alternative := emptyOperand;
 				UseIntermediateOperand(result);
@@ -2338,7 +2353,7 @@ TYPE
 				END;
 			ELSIF x.operator = Scanner.Minus THEN
 				Evaluate(x.left,operand);
-					destReg := dReg;
+				destReg := dReg;
 				InitOperand(result,ModeValue);
 				Reuse1a(result.op,operand.op,dest);
 				type := x.left.type.resolved;
@@ -4670,7 +4685,11 @@ TYPE
 					Evaluate(expression, tmpOperand);
 					variable := GetTemporaryVariable(expression.type, FALSE);
 					Symbol(variable, operand);
-					(*MakeMemory(tmp,operand.op,tmpOperand.op.type,0);*)tmp := operand.op;
+					IF optimize THEN
+						tmp := operand.op;
+					ELSE
+						MakeMemory(tmp,operand.op,tmpOperand.op.type,0);
+					END;
 					Emit(Mov(position,tmp, tmpOperand.op));
 					ReleaseOperand(tmpOperand);
 				END;
@@ -5225,7 +5244,7 @@ TYPE
 						IF callingConvention = SyntaxTree.OberonCallingConvention  THEN
 							Pass((operand.tag));
 						END;
-					ELSIF (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) & (expression IS SyntaxTree.SymbolDesignator) & (expression(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) & (expression(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable) THEN
+					ELSIF optimize & (parameter.kind IN {SyntaxTree.ConstParameter, SyntaxTree.VarParameter}) & (expression IS SyntaxTree.SymbolDesignator) & (expression(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) & (expression(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable) THEN
 						InitOperand(operand,ModeValue);
 						GetBaseRegister(operand.op,currentScope,expression(SyntaxTree.SymbolDesignator).symbol.scope);
 						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,expression(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).offsetInBits));
@@ -5597,7 +5616,7 @@ TYPE
 
 
 			dest := destination; destination := emptyOperand;
-			(*SaveRegisters();ReleaseUsedRegisters(saved);*)
+			IF ~optimize THEN SaveRegisters();ReleaseUsedRegisters(saved); END;
 
 			parameters := x.parameters;
 
@@ -5855,7 +5874,7 @@ TYPE
 
 						
 			ReleaseParameterRegisters();
-			EmitSave(position);
+			IF optimize THEN EmitSave(position); END;
 			IF (procedureType.callingConvention = SyntaxTree.WinAPICallingConvention) OR SysvABI(procedureType.callingConvention) THEN
 				Emit(Call(position,operand.op,0));
 			ELSE
@@ -5900,7 +5919,7 @@ TYPE
 				END;
 			END;
 
-			EmitRestore(position);
+			IF optimize THEN EmitRestore(position); END;
 			IF (resultDesignator = NIL) & (procedureType.returnType # NIL) THEN
 
 				IF structuredReturnType THEN
@@ -5908,11 +5927,11 @@ TYPE
 					size := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.SizeOfParameter(procedureType.returnParameter)));
 					Emit(Add(position,sp,sp,size));
 					*)
-					(*RestoreRegisters(saved);*)
+					IF ~optimize THEN RestoreRegisters(saved); END;
 					InitOperand(result,ModeReference);
 					Symbol(variable,result);
 				ELSE
-					(*RestoreRegisters(saved);*)
+					IF ~optimize THEN RestoreRegisters(saved); END;
 					InitOperand(result,ModeValue);
 					result.op := return;
 				END;
@@ -8622,7 +8641,7 @@ TYPE
 				END;
 				Convert(s0.op,IntermediateCode.GetType(system,x.type));
 				result := s0;
-				EmitRestore(position);
+				IF optimize THEN EmitRestore(position); END;
 			(* ---- BIT ----- *)
 			|Global.systemBit:
 				Evaluate(p0,s0);
@@ -8689,7 +8708,7 @@ TYPE
 				ReleaseOperand(s0);
 			(* ---- SYSTEM.VAL ----- *)
 			|Global.systemVal:
-				EmitSave(position);
+				IF optimize THEN EmitSave(position); END;
 				IF optimize & (p1 IS SyntaxTree.SymbolDesignator) & (p1(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) & (p1(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable) THEN
 					(* Local variable, possibly optimized to register *)
 					InitOperand(result,ModeReference);
@@ -8725,7 +8744,7 @@ TYPE
 						result := s1;
 					END;
 				END;
-				EmitRestore(position);
+				IF optimize THEN EmitRestore(position); END;
 			(* ---- SYSTEM.GET ----- *)
 			|Global.systemGet:
 				Evaluate(p0,s0); (* adr *)
@@ -8763,7 +8782,7 @@ TYPE
 				END;
 			(* ---- SYSTEM.MOVE ----- *)
 			|Global.systemMove:
-				EmitSave(position);
+				IF optimize THEN EmitSave(position); END;
 				IF optimize & (p0 IS SyntaxTree.SymbolDesignator) & (p0(SyntaxTree.SymbolDesignator).symbol.scope = currentScope) &(p0(SyntaxTree.SymbolDesignator).symbol IS SyntaxTree.Variable) THEN
 					(* Local variable, possibly optimized to register *)
 					InitOperand(s0,ModeReference);
@@ -8783,7 +8802,7 @@ TYPE
 				Evaluate(p2,s2);
 				Emit(Copy(position,s1.op,s0.op,s2.op));
 				ReleaseOperand(s0); ReleaseOperand(s1); ReleaseOperand(s2);
-				EmitRestore(position);
+				IF optimize THEN EmitRestore(position); END;
 			(* ---- SYSTEM.NEW ----- *)
 			|Global.systemNew:
 				Designate(p0,s0);
@@ -9428,7 +9447,7 @@ TYPE
 		BEGIN
 			IF Trace THEN TraceEnter("VisitVariable");  END;
 			type := x.type.resolved;
-			IF (x.useRegister) & (x.scope = currentScope) THEN (* Only local variables are allowed to be in registers *)
+			IF (x.useRegister) & (~optimize OR (x.scope = currentScope)) THEN (* Only local variables are allowed to be in registers *)
 				InitOperand(result, ModeValue);
 				IF x.registerNumber < 0 THEN
 					x.SetRegisterNumber(AcquireRegister(IntermediateCode.GetType(system, type),IntermediateCode.GeneralPurposeRegister));
@@ -10006,7 +10025,7 @@ TYPE
 
 				IF doOptimize THEN
 					destReg := left(SyntaxTree.SymbolDesignator).symbol(SyntaxTree.Variable).registerNumber;
-					(*UseRegister(destReg);*)
+					destType := GetType(system, leftType);
 					IF section.comments # NIL THEN
 						section.comments.String("target register = ");
 						section.comments.Int(destReg, 0);
@@ -10272,6 +10291,7 @@ TYPE
 			section := NewSection(module.allSections, Sections.ConstSection,name,SyntaxTree.NewSymbol(name[1]),commentPrintout # NIL);
 			section.isCaseTable := TRUE;
 			IntermediateCode.InitAddress(jmp, addressType, section.name, GetFingerprint(section.symbol), 0);
+			jmp.resolved := section;
 			ReuseCopy(res,var.op);
 			ReleaseOperand(var);
 			Emit(Mul(position,res,res,IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.addressSize))));

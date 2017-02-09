@@ -7,6 +7,19 @@ IMPORT Diagnostics, Sections := FoxSections, Streams, BinaryCode := FoxBinaryCod
 CONST
 		None=IntermediateCode.None;
 		OptimizeRegisterTransfer*=0;
+		OptimizeRegisterAllocation*=1;
+
+		(* Parts of virtual registers *)
+		Low = 0; High = 1;
+
+		(** Physical register use flags *)
+		UseRead = 0;		(** Virtual register use is a read *)
+		UseWrite = 1;		(** Virtual register use is a write *)
+		UseRegister* = 2;	(** Virtual register use requires a physical register *)
+		UseMemory* = 3;	(** Virtual register use requires writeback in home memory location *)
+
+
+		Trace=TRUE;
 TYPE
 	(* ----------------------------------- register allocation ------------------------------------- *)
 
@@ -115,7 +128,7 @@ TYPE
 		allocation: RegisterAllocation;
 		liveRegisters: LiveRegisters;
 		inEmulation-: BOOLEAN;
-		optimize-: SET;
+		optimize: SET;
 
 		(* generic *)
 		PROCEDURE & InitGenerator*(diagnostics: Diagnostics.Diagnostics; optimize: BOOLEAN);
@@ -124,7 +137,7 @@ TYPE
 			SELF.diagnostics := diagnostics;
 			error := FALSE;
 			NEW(allocation); NEW(liveRegisters);
-			IF optimize THEN SELF.optimize := {31} ELSE SELF.optimize := {} END;
+			IF optimize THEN SELF.optimize := {0..31} ELSE SELF.optimize := {} END;
 		END InitGenerator;
 
 		PROCEDURE SetModule*(module: Sections.Module); (* needed for inline code for symbol reference *)
@@ -195,7 +208,7 @@ TYPE
 
 			PROCEDURE GetRegisterAllocation;
 			CONST MaxParameterRegisters=16;
-			VAR pc,i,op,ofs: LONGINT; parameterRegisters: ARRAY MaxParameterRegisters OF IntermediateCode.Operand;
+			VAR pc,i: LONGINT; parameterRegisters: ARRAY MaxParameterRegisters OF IntermediateCode.Operand;
 
 				PROCEDURE RegisterUsage(CONST instruction: IntermediateCode.Instruction);
 				VAR i: LONGINT;
@@ -234,31 +247,7 @@ TYPE
 				FOR pc := 0 TO in.pc-1 DO
 					inPC := pc;
 					RegisterUsage(in.instructions[pc]);
-					op := in.instructions[pc].opcode;
-					IF (op = IntermediateCode.br) OR (op = IntermediateCode.breq) OR (op = IntermediateCode.brne) OR (op = IntermediateCode.brge) OR (op = IntermediateCode.brlt) THEN
-						IF (in.instructions[pc].op1.mode = IntermediateCode.ModeImmediate) & (in.instructions[pc].op1.symbolOffset < pc) THEN
-							ofs := in.instructions[pc].op1.symbolOffset;
-							FOR i := 0 TO LEN(allocation.table) - 1 DO
-								IF (ofs <= allocation.table[i].last) & (allocation.table[i].last <= pc) THEN allocation.table[i].last := pc; END;
-								IF (ofs <= allocation.table[i].first) & (allocation.table[i].first <= pc) THEN allocation.table[i].first := ofs; END;
-							END;
-						END;
-					END;
 				END;
-				(*IF out.comments # NIL THEN
-					FOR i := 0 TO LEN(allocation.table) - 1 DO
-						IF (allocation.table[i].first # MAX(LONGINT)) & (allocation.table[i].last # MIN(LONGINT)) THEN
-							out.comments.String("Live interval for r");
-							out.comments.Int(i, 0);
-							out.comments.String(": [");
-							out.comments.Int(allocation.table[i].first, 0);
-							out.comments.String(", ");
-							out.comments.Int(allocation.table[i].last, 0);
-							out.comments.String("]");
-							out.comments.Ln;
-						END;
-					END;
-				END;*)
 			END GetRegisterAllocation;
 
 			PROCEDURE Optimize;
@@ -489,11 +478,9 @@ TYPE
 					|IntermediateCode.label: EmitLabel(instruction);
 				ELSE
 					IF Supported(instruction, moduleName, procedureName) THEN
-						PreGenerate(pc, instruction);
 						Generate(instruction);
 						PostGenerate(instruction);
 					ELSE
-						PreGenerate(pc, instruction);
 						Emulate(instruction, moduleName, procedureName);
 						PostGenerate(instruction);
 					END
@@ -527,10 +514,6 @@ TYPE
 		PROCEDURE Generate*(VAR instr: IntermediateCode.Instruction);
 		BEGIN (*HALT(100); *) (* abstract *)
 		END Generate;
-
-		PROCEDURE PreGenerate*(pc: LONGINT; CONST instr: IntermediateCode.Instruction);
-		BEGIN
-		END PreGenerate;
 
 		PROCEDURE PostGenerate*(CONST instr: IntermediateCode.Instruction);
 		BEGIN
@@ -611,7 +594,7 @@ TYPE
 		type-: IntermediateCode.Type;
 		class-: IntermediateCode.RegisterClass;
 		lastuse-: LONGINT;
-		fixed*, spilled*, spillable*: BOOLEAN;
+		fixed*,spilled*, spillable*: BOOLEAN;
 		register*, offset*: LONGINT;
 		parts-: LONGINT;
 	END;
@@ -627,15 +610,15 @@ TYPE
 		END Init;
 
 		(* enter a new ticket into the list of live tickets, sorted by lastuse *)
-		PROCEDURE Enter*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; fixed, spillable, spilled: BOOLEAN; offset: LONGINT; lastuse: LONGINT): Ticket;
+		PROCEDURE Enter*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; spillable, spilled: BOOLEAN; offset: LONGINT; lastuse: LONGINT): Ticket;
 		VAR ticket,link: Ticket;
 		BEGIN
-			ASSERT(~spilled & (register # None) OR spilled & (offset # None) OR fixed & (offset # None));
-			ASSERT(fixed OR spillable OR ~spilled);
+			ASSERT(~spilled & (register # None) OR spilled & (offset # None));
+			ASSERT(spillable OR ~spilled);
 			IF free # NIL THEN ticket := free; free := free.next; ticket.next := NIL;
 			ELSE NEW(ticket)
 			END;
-			ticket.type := type;	ticket.class := class; ticket.register := register; ticket.fixed := fixed; ticket.spillable := spillable; ticket.spilled := spilled;	ticket.offset := offset; ticket.lastuse := lastuse; ticket.parts := 0;
+			ticket.type := type;	ticket.class := class; ticket.register := register; ticket.spillable := spillable; ticket.spilled := spilled;	ticket.offset := offset; ticket.lastuse := lastuse; ticket.parts := 0;
 			IF (live = NIL) OR (live.lastuse > ticket.lastuse) THEN
 				ticket.next := live; live := ticket
 			ELSE
@@ -650,42 +633,6 @@ TYPE
 			END;
 			RETURN ticket
 		END Enter;
-
-		PROCEDURE EnterTicket*(ticket: Ticket);
-		VAR
-			link: Ticket;
-		BEGIN
-			ticket.next := NIL;
-			IF (live = NIL) OR (live.lastuse > ticket.lastuse) THEN
-				ticket.next := live; live := ticket
-			ELSE
-				link := live;
-				WHILE (link.next # NIL) & (link.next.lastuse < ticket.lastuse) DO
-					ASSERT((link.register # ticket.register) OR ticket.spilled);
-					link := link.next;
-				END;
-				IF (link.register=ticket.register) & (~ticket.spilled & ~link.spilled) THEN Dump(D.Log); D.Update; END;
-				ASSERT((link.register # ticket.register) OR ticket.spilled OR link.spilled);
-				ticket.next := link.next; link.next := ticket;
-			END;
-		END EnterTicket;
-
-		PROCEDURE RemoveTicket*(ticket: Ticket);
-		VAR
-			link: Ticket;
-		BEGIN
-			IF live=ticket THEN
-				live := live.next;
-			ELSE
-				link := live;
-				WHILE (link.next # NIL) & (link.next # ticket) DO
-					link := link.next
-				END;
-				ASSERT(link.next=ticket);
-				link.next := ticket.next;
-			END;
-			ticket.next := NIL;
-		END RemoveTicket;
 
 		(* remove ticket from live list *)
 		PROCEDURE Remove*(ticket: Ticket);
@@ -703,14 +650,6 @@ TYPE
 			END;
 			ticket.next := free; free := ticket
 		END Remove;
-
-		PROCEDURE IsLive*(ticket: Ticket): BOOLEAN;
-		VAR t: Ticket;
-		BEGIN
-			t := live;
-			WHILE (t # NIL) & (t # ticket) DO t := t.next; END;
-			RETURN t # NIL;
-		END IsLive;
 
 		PROCEDURE Dump*(w: Streams.Writer);
 		VAR ticket: Ticket;
@@ -935,7 +874,7 @@ TYPE
 		virtualRegisters-: VirtualRegisters; (* virtual registers --> tickets *)
 		tickets-: Tickets;  (* tickets <-> physical registers *)
 		spillStack-: SpillStack; (* spill stack offset <-> ticket *)
-		forcedFree-: Basic.List; (* list of tickets forced free *)
+		allocator: RegisterAllocator;
 
 		(* generic *)
 		PROCEDURE & InitTicketGenerator*(diagnostics: Diagnostics.Diagnostics; optimize: BOOLEAN; numberRegisterParts: LONGINT; physicalRegisters: PhysicalRegisters);
@@ -945,15 +884,19 @@ TYPE
 			NEW(virtualRegisters,numberRegisterParts);
 			NEW(spillStack);
 			SELF.physicalRegisters := physicalRegisters;
-			NEW(forcedFree, 16);
+			IF OptimizeRegisterAllocation IN SELF.optimize THEN NEW(allocator, SELF); END;
 		END InitTicketGenerator;
 
 		PROCEDURE Section*(in: IntermediateCode.Section; out: BinaryCode.Section);
-		VAR ticket: Ticket;
 		BEGIN
 			virtualRegisters.Init(virtualRegisters.parts);
 			Section^(in,out);
 		END Section;
+
+		PROCEDURE Prepare*;
+		BEGIN
+			IF OptimizeRegisterAllocation IN optimize THEN allocator.Allocate(in); END;
+		END Prepare;
 
 		(*-------------------  procedures that must be overwritten by implementers  ----------------------*)
 
@@ -982,7 +925,42 @@ TYPE
 		BEGIN HALT(100) (* abstract *)
 		END ParameterRegister;
 
-
+		(* Reserve physical registers used by instruction. Set needRegisters according to what the architecture requires for physical operands. *)
+		PROCEDURE PhysicalRegisterUse*(CONST instruction: IntermediateCode.Instruction; VAR uses: ARRAY OF SET);
+		VAR
+			i: LONGINT;
+		BEGIN (*HALT(100) (* abstract *)*)
+			(*! the UseRegister in here is intel specific: it should be moved to each backend *)
+			CASE instruction.opcode OF
+				 IntermediateCode.trap, IntermediateCode.return, IntermediateCode.call, IntermediateCode.push:
+				 	(* Only 1 argument, which is not written *)
+				 	uses[0] := {UseRead};
+				 	uses[1] := {};
+				 	uses[2] := {};
+				|IntermediateCode.allocate:
+					(* 2 arguments, read *)
+					uses[0] := {UseRead};
+					uses[1] := {UseRead};
+					uses[2] := {};
+				|IntermediateCode.br .. IntermediateCode.brlt:
+					(* argument 1 requires register *)
+					uses[0] := {};
+					uses[1] := {UseRead, UseRegister};
+					uses[2] := {UseRead};
+			ELSE
+				uses[0] := {UseWrite, UseRegister};
+				uses[1] := {UseRead};
+				uses[2] := {UseRead};
+			END;
+			(* Physical register uses *)
+			CASE instruction.opcode OF
+				 IntermediateCode.call, IntermediateCode.asm, IntermediateCode.save, IntermediateCode.restore:
+					FOR i := 0 TO physicalRegisters.NumberRegisters() - 1 DO
+						physicalRegisters.SetReserved(i, TRUE);
+					END;
+			ELSE
+			END;
+		END PhysicalRegisterUse;
 
 		(*---------------------------- ticket handling and register allocation ----------------------------*)
 
@@ -990,22 +968,19 @@ TYPE
 		PROCEDURE Spill*(ticket: Ticket);
 		VAR register,offset,size: LONGINT;
 		BEGIN
-			IF (ticket = NIL) THEN RETURN END;
-			IF ~ticket.fixed & (~ticket.spillable OR ticket.spilled) THEN RETURN END;
+			IF (ticket = NIL) OR ~ticket.spillable OR ticket.spilled THEN RETURN END;
 			register := ticket.register;
-			IF ~ticket.fixed THEN
-				offset := spillStack.NextFree();
-				ticket.offset := offset;
-				size := spillStack.Size();
-				IF dump# NIL THEN dump.String("spillstack allocate (1) "); dump.Int(offset,1); dump.Ln; END;
-				spillStack.Allocate(offset,ticket);
-				size := spillStack.Size()-size;
-				ASSERT(size>=0);
-				IF size>0 THEN AllocateSpillStack(size) END;
-			END;
+			offset := spillStack.NextFree();
+			ticket.offset := offset;
+			size := spillStack.Size();
+			IF dump# NIL THEN dump.String("spillstack allocate (1) "); dump.Int(offset,1); dump.Ln; END;
+			spillStack.Allocate(offset,ticket);
+			size := spillStack.Size()-size;
+			ASSERT(size>=0);
+			IF size>0 THEN AllocateSpillStack(size) END;
 
 			ToSpillStack(ticket);
-			IF ~ticket.fixed THEN ticket.offset := offset; END;
+			ticket.offset := offset;
 			physicalRegisters.Free(register);
 			ticket.spilled := TRUE;
 		END Spill;
@@ -1019,7 +994,7 @@ TYPE
 				IF ticket1.spilled THEN ASSERT(~ticket2.spilled); RETURN ExchangeSpill(ticket2,ticket1) END;
 				IF (ticket1.type.sizeInBits # ticket2.type.sizeInBits)
 					OR ~(ticket1.type.form IN IntermediateCode.Integer) OR ~(ticket2.type.form IN IntermediateCode.Integer)
-					OR ticket1.spilled OR ticket1.fixed OR ticket2.fixed THEN
+					OR ticket1.spilled THEN
 					RETURN FALSE
 				END;
 
@@ -1049,29 +1024,18 @@ TYPE
 					dump.String(" allocate register : index="); dump.Int(ticket.register,1); dump.Ln;
 				END;
 				ToRegister(ticket);
-				IF ~ticket.fixed THEN
-					size := spillStack.Size();
-					spillStack.Free(ticket.offset);
-					ticket.offset := 0;
-					size := spillStack.Size()-size;
-					ASSERT(size<=0);
-					IF size<0 THEN AllocateSpillStack(size) END;
-				END;
+				size := spillStack.Size();
+				spillStack.Free(ticket.offset);
 				ticket.spilled := FALSE;
+				ticket.offset := 0;
 				physicalRegisters.Allocate(register,ticket);
+				size := spillStack.Size()-size;
+				ASSERT(size<=0);
+				IF size<0 THEN AllocateSpillStack(size) END;
 			END SpillToRegister;
 
 		BEGIN
 			IF (ticket = NIL) OR ~ticket.spilled THEN RETURN END;
-			IF ticket.fixed & (ticket.register # None) THEN
-				IF physicalRegisters.Mapped(ticket.register) # NIL THEN
-					Spill(physicalRegisters.Mapped(ticket.register))
-				END;
-				ticket.spilled := FALSE;
-				physicalRegisters.Allocate(ticket.register, ticket);
-				ToRegister(ticket);
-				RETURN
-			END;
 
 			register := ticket.register;
 			IF register = None THEN
@@ -1080,16 +1044,16 @@ TYPE
 					SpillToRegister(ticket, register)
 				ELSE
 					mapped := GetPreferredSpill(ticket.type);
-					(*IF ~ExchangeSpill(mapped, ticket) THEN*)
+					IF ~ExchangeSpill(mapped, ticket) THEN
 						register := ForceFreeRegister(ticket.type);
 						SpillToRegister(ticket, register);
-					(*END;*)
+					END;
 				END;
 			ELSE
 				mapped := physicalRegisters.Mapped(register);
 				IF mapped = NIL THEN
 					SpillToRegister(ticket, register)
-				ELSE(*IF ~ExchangeSpill(mapped, ticket) THEN*)
+				ELSIF ~ExchangeSpill(mapped, ticket) THEN
 					WHILE mapped # NIL DO
 						Spill(mapped);
 						mapped := physicalRegisters.Mapped(ticket.register);
@@ -1124,7 +1088,6 @@ TYPE
 				END;
 			END;
 			ASSERT(spill # NIL);
-			ASSERT(~physicalRegisters.Reserved(spill.register));
 			RETURN spill
 		END GetPreferredSpill;
 
@@ -1135,7 +1098,6 @@ TYPE
 			WHILE tempReg = None DO
 				ticket := GetPreferredSpill(type);
 				Spill(ticket);
-				forcedFree.Add(ticket);
 				tempReg := physicalRegisters.NextFree(type);
 			END;
 			RETURN tempReg
@@ -1144,7 +1106,7 @@ TYPE
 		PROCEDURE ReservePhysicalRegister*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; lastUse: LONGINT): Ticket;
 		VAR ticket: Ticket;
 		BEGIN
-			ticket := tickets.Enter(class, type,register,FALSE, TRUE, FALSE,None,lastUse);
+			ticket := tickets.Enter(class, type,register,TRUE, FALSE,None,lastUse);
 			IF dump # NIL THEN
 				dump.String(" allocate register : index="); dump.Int(register,1); dump.Ln;
 			END;
@@ -1175,7 +1137,7 @@ TYPE
 			BEGIN
 				index := physicalRegisters.NextFree(type);
 				IF index # None THEN
-					ticket := tickets.Enter(class,type,index, FALSE, TRUE, FALSE,0,lastuse);
+					ticket := tickets.Enter(class,type,index,TRUE, FALSE,0,lastuse);
 					IF dump # NIL THEN
 						dump.String(" allocate register : index="); dump.Int(index,1); dump.Ln;
 					END;
@@ -1183,7 +1145,7 @@ TYPE
 					physicalRegisters.SetReserved(index,TRUE);
 				ELSE (* spill new ticket rightaway, no phyiscal register assigned yet *)
 					offset := spillStack.NextFree();
-					ticket := tickets.Enter(class,type,index,FALSE, TRUE, TRUE,offset,lastuse);
+					ticket := tickets.Enter(class,type,index,TRUE, TRUE,offset,lastuse);
 					size := spillStack.Size();
 					ticket.offset := offset;
 					IF dump# NIL THEN dump.String("spillstack allocate (3) "); dump.Int(offset,1);dump.Ln; END;
@@ -1200,7 +1162,7 @@ TYPE
 			BEGIN
 				ticket :=  physicalRegisters.Mapped(index);
 				IF ticket # NIL THEN Spill(ticket) END;
-				ticket := tickets.Enter(class, type, index, FALSE, TRUE, FALSE,0,lastuse);
+				ticket := tickets.Enter(class, type, index, TRUE, FALSE,0,lastuse);
 				IF dump # NIL THEN
 					dump.String(" allocate register : index="); dump.Int(index,1); dump.Ln;
 				END;
@@ -1235,7 +1197,6 @@ TYPE
 		VAR size: LONGINT;
 		BEGIN
 			IF ticket.spilled THEN
-				IF ticket.fixed THEN RETURN END;
 				IF dump # NIL THEN
 					dump.String(" free spilled register : ofs="); dump.Int(ticket.offset,1); dump.Ln;
 				END;
@@ -1248,20 +1209,9 @@ TYPE
 				IF dump # NIL THEN
 					dump.String("free register: index="); dump.Int(ticket.register,1);  dump.Ln;
 				END;
-				IF ticket.fixed THEN
-					Spill(ticket);
-				ELSE
-					IF (optimize # {}) & (ticket.offset # None) & ~ticket.fixed THEN
-						size := spillStack.Size();
-						spillStack.Free(ticket.offset);
-						size := spillStack.Size()-size;
-						ASSERT(size<=0);
-						IF size<0 THEN AllocateSpillStack(size) END;
-					END;
-					physicalRegisters.SetReserved(ticket.register,FALSE);
-					physicalRegisters.Free(ticket.register);
-					ASSERT(~physicalRegisters.Reserved(ticket.register));
-				END;
+				physicalRegisters.SetReserved(ticket.register,FALSE);
+				physicalRegisters.Free(ticket.register);
+				ASSERT(~physicalRegisters.Reserved(ticket.register));
 			END;
 		END FreeTicket;
 
@@ -1302,11 +1252,6 @@ TYPE
 					MapVirtualRegister(operand.register,operand.registerClass, operand.type,part);
 				END;
 				ASSERT(virtualRegisters.Mapped(operand.register,part)#NIL);
-			(*ELSIF FirstUse(operand.register) = inPC THEN
-				tickets.EnterTicket(virtualRegisters.Mapped(operand.register, part));
-				IF ~virtualRegisters.Mapped(operand.register, part).spilled & (physicalRegisters.Mapped(virtualRegisters.Mapped(operand.register, part).register) # virtualRegisters.Mapped(operand.register, part)) THEN
-					physicalRegisters.Allocate(virtualRegisters.Mapped(operand.register, part).register, virtualRegisters.Mapped(operand.register, part));
-				END;*)
 			END;
 		END TryAllocate;
 
@@ -1370,287 +1315,1042 @@ TYPE
 			END;
 		END ReserveOperandRegisters;
 
-		PROCEDURE EnterLiveTickets*;
-		VAR
-			virtual: LONGINT;
-			ticket: Ticket;
-		BEGIN
-			FOR virtual := virtualRegisters.firstMapped TO virtualRegisters.lastMapped DO
-				IF FirstUse(virtual) = in.pc THEN
-					ticket := virtualRegisters.Mapped(virtual, 0);
-					tickets.EnterTicket(ticket);
-					IF ~ticket.spilled THEN
-						physicalRegisters.Allocate(ticket.register, ticket);
-					END;
-				END;
+	END GeneratorWithTickets;
+
+	(*-------------------  Linear scan register allocation ----------------------*)
+	(**
+		Optimized linear scan register allocator.
+
+		The register allocator inspects every intermediate code section (of type code) before the code generator emits any code for it.
+		This register allocator works on intermediate code only and does not rely on prior treatment of the intermediate code. E.g. it
+		does not require SSA form. The only constraint imposed on intermediate code is the absence of branches to register, except in
+		the pattern generated by the oberon frontend for CASE statements.
+
+		The algorithm for allocation proper and resolution is taken from:
+			Wimmer & Mössenböck, Optimized Interval Splitting in a Linear Scan Register Allocator, VEE'05
+		The liveness analysis preceding the linear scan algorithm is a straight-forward backwards dataflow analysis.
+
+		The register allocation proper is done in Allocate. Prepare is used during code emission in order to transfer allocation, spilling and
+		move information to the code generator.
+	*)
+	RegisterAllocator * = OBJECT
+	CONST
+		InitSize = 16;
+	TYPE
+		(** An elementary, contiguous live range for a variable *)
+		Range = POINTER TO RECORD
+			start,				(** First PC in the live range *)
+			stop: LONGINT;	(** Last PC in the live range *)
+		END;
+		(** Use (or definition) of a virtual register *)
+		Use = POINTER TO RECORD
+			pc: LONGINT;		(** PC of the use *)
+			flags: SET;			(** Additional info *)
+		END;
+		(** Physical location move *)
+		Move = POINTER TO RECORD
+			src,							(** source of the move *)
+			dst: RECORD				(** destination of the move *)
+				spilled: BOOLEAN;	(** is location a stack offset? *)
+				location: LONGINT;	(** stack offset or physical register *)
 			END;
-		END EnterLiveTickets;
-
-		PROCEDURE RemoveDeadTickets*;
+		END;
+		(** A hole-containing liveness interval for a virtual register *)
+		Interval=OBJECT
+		CONST
+			InitSize	= 16;
 		VAR
-			virtual: LONGINT;
-			ticket: Ticket;
-		BEGIN
-			FOR virtual := virtualRegisters.firstMapped TO virtualRegisters.lastMapped DO
-				IF LastUse(virtual) = in.pc THEN
-					ticket := virtualRegisters.Mapped(virtual, 0);
-					tickets.Remove(ticket);
-					IF ~ticket.spilled THEN
-						physicalRegisters.Free(ticket.register);
+			ranges: Basic.List;				(** List of ranges making up the interval, non-overlapping, sorted by increasing start PC. *)
+			uses: Basic.List;				(** List of uses of the virtual register, sorted by increasing PC *)
+			location: Ticket;				(** Allocated location, may use 1 or 2 parts *)
+			first,							(** First PC in the interval (may not be in a range) *)
+			last,							(** Last PC in the interval (may not be in a range) *)
+			part,							(** Virtual register part for the interval *)
+			virtual: LONGINT;				(** Virtual register associated with the interval *)
+
+			PROCEDURE & Init(virtual, part: LONGINT; CONST type: IntermediateCode.Type);
+			BEGIN
+				NEW(ranges, InitSize);
+				NEW(uses, InitSize);
+				NEW(location);
+				SELF.virtual := virtual;
+				SELF.part := part;
+				location.type := type;
+				first := MAX(LONGINT);
+				last := 0;
+			END Init;
+
+			(** Adds a range [start, stop] to the interval. Merge all overlapping ranges *)
+			PROCEDURE AddRange*(start, stop: LONGINT);
+			VAR
+				range: Range;
+				i: LONGINT;
+			BEGIN
+				IF start < first THEN first := start; END;
+				IF stop > last THEN last := stop; END;
+				i := SearchRange(start);
+				IF i < ranges.Length() THEN
+					range := ranges.Get(i)(Range);
+					(* We know that r starts after or contains start. This is the only potentially overlapping range. *)
+					IF (range.start <= stop + 1) OR (range.stop >= start - 1) THEN
+						(* overlapping *)
+						range.start := MIN(range.start, start);
+						range.stop := MAX(range.stop, stop);
+						RETURN;
 					END;
 				END;
-			END;
-		END RemoveDeadTickets;
+				(* not overlapping *)
+				NEW(range);
+				range.start := start;
+				range.stop := stop;
+				ranges.Insert(i, range);
+			END AddRange;
 
-		PROCEDURE AllocateRegisters*;
-		VAR
-			byFirstUse: POINTER TO ARRAY OF LONGINT; (** register numbers, sorted by increasing first use *)
-			liveByLastUse: POINTER TO ARRAY OF LONGINT; (** live registers, sorted by increasing last use *)
-			len: LONGINT; (** number of entries in byFirstUse *)
-			live: LONGINT; (** number of entries in liveByLastUse *)
-			i, j: LONGINT;
-
-			PROCEDURE SortLiveRanges;
+			(** Add a use in the interval, at pc with the given flags. Flags are OR'd to maintain a unique use per PC. *)
+			PROCEDURE AddUse*(pc: LONGINT; flags: SET);
 			VAR
-				i, j, k: LONGINT;
+				i: LONGINT;
+				use: Use;
 			BEGIN
-				NEW(byFirstUse, LEN(allocation.table));
-				len := 0;
-				(* Improve sort algo *)
-				FOR i := 0 TO LEN(allocation.table) - 1 DO
-					IF allocation.table[i].first # MAX(LONGINT) THEN
-						j := 0;
-						WHILE (j < len) & (allocation.table[byFirstUse[j]].first <= allocation.table[i].first) DO INC(j) END;
-						FOR k := len - 1 TO j BY -1 DO byFirstUse[k + 1] := byFirstUse[k] END;
-						byFirstUse[j] := i;
-						INC(len);
+				i := SearchUse(pc);
+				IF i < uses.Length() THEN
+					use := uses.Get(i)(Use);
+					IF use.pc = pc THEN
+						use.flags := use.flags + flags;
+						RETURN;
 					END;
 				END;
-			END SortLiveRanges;
+				NEW(use);
+				use.pc := pc;
+				use.flags := flags;
+				uses.Insert(i, use);
+			END AddUse;
 
-			PROCEDURE ExpireOldIntervals(i: LONGINT);
+			(** Next range starting at or after pc. Returns -1 if none is found. *)
+			PROCEDURE NextRange*(pc: LONGINT): LONGINT;
 			VAR
-				ticket: Ticket;
-				part, j, k: LONGINT;
+				i: LONGINT;
 			BEGIN
-				WHILE (j < live) DO
-					IF allocation.table[liveByLastUse[j]].last < allocation.table[i].first THEN
-						FOR part := 0 TO 1 DO
-							ticket := virtualRegisters.Mapped(liveByLastUse[j], part);
-							IF ticket # NIL THEN
-								IF ticket.spilled & ~ticket.fixed THEN
-								ELSIF ~ticket.spilled THEN
-									physicalRegisters.Free(ticket.register);
-								END;
-							END;
-						END;
-						FOR k := j TO live - 2 DO liveByLastUse[k] := liveByLastUse[k + 1] END;
-						liveByLastUse[live - 1] := -1;
-						DEC(live);
-					ELSE
-						INC(j);
-					END;
-				END;
-			END ExpireOldIntervals;
+				i := SearchRange(pc);
+				IF i = ranges.Length() THEN RETURN -1; END;
+				RETURN ranges.Get(i)(Range).start;
+			END NextRange;
 
-			PROCEDURE AddLiveInterval(i: LONGINT);
+			(** Next use having the flags set in mask at or after pc. Returns -1 if nont found. *)
+			PROCEDURE NextUse*(pc: LONGINT; mask: SET): LONGINT;
 			VAR
-				j, k: LONGINT;
+				i: LONGINT;
+				u: Use;
 			BEGIN
-				WHILE (j < live) & (allocation.table[liveByLastUse[j]].last < allocation.table[i].last) DO INC(j) END;
-				FOR k := live - 1 TO j BY -1 DO liveByLastUse[k + 1] := liveByLastUse[k] END;
-				liveByLastUse[j] := i;
-				INC(live);
-			END AddLiveInterval;
-
-			PROCEDURE AllocateInterval(i: LONGINT): BOOLEAN;
-			VAR
-				type, partType: IntermediateCode.Type;
-				ticket, spillTicket: Ticket;
-				spill, part, reg, k: LONGINT;
-				inRegister: BOOLEAN;
-
-				PROCEDURE IsFixed(i: LONGINT): BOOLEAN;
-				VAR
-					pc: LONGINT;
-					instr: IntermediateCode.Instruction;
-				BEGIN
-					REPEAT
-						instr := in.instructions[pc];
-						INC(pc);
-					UNTIL (pc = in.pc) OR ((instr.opcode = IntermediateCode.allocate) & (instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i));
-					RETURN pc # in.pc;
-				END IsFixed;
-
-				PROCEDURE GetTypeOf(i: LONGINT): IntermediateCode.Type;
-				VAR
-					pc: LONGINT;
-					instr: IntermediateCode.Instruction;
-				BEGIN
-					REPEAT
-						instr := in.instructions[pc];
-						INC(pc);
-					UNTIL (pc = in.pc) (*OR (instr.opcode = IntermediateCode.allocate)*) OR ((instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i)) OR ((instr.op2.mode = IntermediateCode.ModeRegister) & (instr.op2.register = i)) OR ((instr.op3.mode = IntermediateCode.ModeRegister) & (instr.op3.register = i));
-					ASSERT(pc < in.pc);
-					IF (instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i) THEN
-						RETURN instr.op1.type;
-					ELSIF (instr.op2.mode = IntermediateCode.ModeRegister) & (instr.op2.register = i) THEN
-						RETURN instr.op2.type;
-					ELSE
-						RETURN instr.op2.type;
-					END;
-				END GetTypeOf;
-
-				PROCEDURE GetOffsetOf(i: LONGINT): LONGINT;
-				VAR
-					pc: LONGINT;
-					instr: IntermediateCode.Instruction;
-					
-					offset, size: LONGINT;
-				BEGIN
-					REPEAT
-						instr := in.instructions[pc];
-						INC(pc);
-					UNTIL (pc = in.pc) OR ((instr.opcode = IntermediateCode.allocate) & (instr.op1.mode = IntermediateCode.ModeRegister) & (instr.op1.register = i));
-					IF (pc < in.pc) THEN
-						RETURN instr.op2.offset + part * partType.sizeInBits DIV 8;
-					END;
-					(*RETURN 0;*)
-
-					ticket.fixed := FALSE;
-					offset := spillStack.NextFree();
-					size := spillStack.Size();
-					ticket.offset := offset;
-					spillStack.Allocate(offset,ticket);
-					size := spillStack.Size()-size;
-					ASSERT(size>=0);
-					IF size>0 THEN AllocateSpillStack(size) END;
-					RETURN offset;
-				END GetOffsetOf;
-
-				PROCEDURE GetSpillCandidate(CONST type: IntermediateCode.Type; VAR spill: LONGINT): Ticket;
-				VAR
-					k, part: LONGINT;
-					spillType, partType: IntermediateCode.Type;
-				BEGIN
-					IF live > 0 THEN
-						k := live - 1;
-						REPEAT
-							spill := liveByLastUse[k];
-							spillType := GetTypeOf(spill);
-							part := 0;
-							LOOP
-								GetPartType(spillType, part, partType);
-								IF (part = 1) OR IntermediateCode.TypeEquals(partType, type) THEN EXIT END;
-								INC(part);
-							END;
-							DEC(k);
-						UNTIL (k < 0) OR IntermediateCode.TypeEquals(partType, type);
-						IF k < 0 THEN spill := 0 END;
-						RETURN virtualRegisters.Mapped(spill, part)
-					END;
-					RETURN NIL
-				END GetSpillCandidate;
-
-			BEGIN
-				type := GetTypeOf(i);
 				LOOP
-					GetPartType(type, part, partType);
-					IF (partType.form = IntermediateCode.Undefined) OR (part = 2) THEN EXIT END;
-					spillTicket := GetSpillCandidate(partType, spill);
-					reg := physicalRegisters.NextFree(partType);
-					IF reg # None THEN
-						(* i <- reg *)
-						ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, partType, reg, IsFixed(i), TRUE, FALSE, 0, allocation.table[i].last);
-						IF IsFixed(i) THEN
-							ticket.fixed := TRUE;
-							ticket.offset := GetOffsetOf(i);
-						END;
-						tickets.RemoveTicket(ticket);
-						physicalRegisters.Allocate(reg, ticket);
-						virtualRegisters.SetMapped(i, part, ticket);
-						inRegister := TRUE;
-					ELSIF allocation.table[spill].last > allocation.table[i].last THEN
-						ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, partType, spillTicket.register, IsFixed(i), TRUE, FALSE, 0, allocation.table[i].last);
-						ticket.offset := GetOffsetOf(i);
-						virtualRegisters.SetMapped(i, part, ticket);
-						tickets.RemoveTicket(ticket);
+					i := SearchUse(pc);
+					IF i = uses.Length() THEN RETURN -1; END;
+					u := uses.Get(i)(Use);
+					IF u.flags < mask THEN RETURN u.pc; END;
+					pc := u.pc + 1;
+				END;
+			END NextUse;
 
-						spillTicket.spilled := TRUE;
-						spillTicket.register := None;
-						(* Remove spill from live list *)
-						k := 0;
-						WHILE (k < live) & (liveByLastUse[k] # spill) DO INC(k); END;
-						ASSERT(k < live);
-						spill := k;
-						FOR k := spill TO live - 2 DO liveByLastUse[k] := liveByLastUse[k + 1]; END;
-						liveByLastUse[live - 1] := -1;
-						DEC(live);
-						inRegister := TRUE;
-						(*
-							ticket[spill] -> ticket[i]
-							spill <- stack ticket
-						*)
+			(** Is interval live at pc? I.e. is pc in a range? *)
+			PROCEDURE Covers*(pc: LONGINT): BOOLEAN;
+			VAR
+				i: LONGINT;
+				r: Range;
+			BEGIN
+				i := SearchRange(pc);
+				IF i = ranges.Length() THEN RETURN FALSE; END;
+				r := ranges.Get(i)(Range);
+				RETURN (r.start <= pc) & (pc <= r.stop);
+			END Covers;
+
+			(** Returns next intersection of SELF with other (i.e. next pc for which both are live). Returns -1 if not found *)
+			PROCEDURE Intersects*(other: Interval): BOOLEAN;
+			VAR
+				pc: LONGINT;
+			BEGIN
+				FOR pc := MIN(first, other.first) TO MAX(last, other.last) DO
+					IF Covers(pc) & other.Covers(pc) THEN RETURN TRUE; END;
+				END;
+				RETURN FALSE;
+			END Intersects;
+
+			(** Split interval in 2 independants intervals. SELF stops at pc - 1 and the returned interval starts at pc. *)
+			PROCEDURE Split*(pc: LONGINT): Interval;
+			VAR
+				new: Interval;
+				range, newRange: Range;
+				i, j: LONGINT;
+			BEGIN
+				i := SearchRange(pc);
+				j := SearchUse(pc);
+				(* Check if we really need to split *)
+				IF (i = ranges.Length()) & (j = uses.Length()) THEN RETURN NIL; END;
+				(* Split *)
+				NEW(new, virtual, part, location.type);
+				new.location.offset := location.offset;
+				new.location.fixed := location.fixed;
+				new.first := pc;
+				last := pc - 1;
+				(* Separate ranges and uses. One range might need splitting *)
+				range := ranges.Get(i)(Range);
+				IF (range.start <= pc) & (pc <= range.stop) THEN
+					NEW(newRange);
+					newRange.start := pc;
+					newRange.stop := range.stop;
+					range.stop := pc - 1;
+					new.ranges.Add(newRange);
+					INC(i);
+				END;
+				WHILE (i < ranges.Length()) DO new.ranges.Add(ranges.Get(i)); ranges.RemoveByIndex(i); END;
+				WHILE (j < uses.Length()) DO new.uses.Add(uses.Get(j)); uses.RemoveByIndex(j); END;
+				RETURN new;
+			END Split;
+
+			(** Search for range containing pc. Returns its index in ranges. Returns the first range after pc if no range covers pc. *)
+			PROCEDURE SearchRange(pc: LONGINT): LONGINT;
+			VAR
+				m, M, i: LONGINT;
+				r: Range;
+			BEGIN
+				IF ranges.Length() = 0 THEN RETURN 0 END;
+				(*m := 0;
+				M := ranges.Length();
+				WHILE m # M DO
+					i := (m + M) DIV 2;
+					r := ranges.Get(i)(Range);
+					IF r.stop < pc THEN
+						M := i;
+					ELSIF r.start > pc THEN
+						m := i + 1;
 					ELSE
-						ticket := tickets.Enter(IntermediateCode.GeneralPurposeRegister, partType, None, IsFixed(i), TRUE, TRUE, 0, allocation.table[i].last);
-						ticket.offset := GetOffsetOf(i);
-						virtualRegisters.SetMapped(i, part, ticket);
-						tickets.RemoveTicket(ticket);
-						(*
-							i <- stack ticket
-						*)
+						(* Found range *)
+						RETURN i;
 					END;
-					INC(part);
 				END;
-				RETURN inRegister;
-			END AllocateInterval;
+				(* did not find range, this is the first one after *)
+				IF r.stop < pc THEN INC(m); END;
+				RETURN m;*)
+				LOOP
+					IF i = ranges.Length() THEN EXIT; END;
+					r := ranges.Get(i)(Range);
+					IF ((r.start <= pc) & (pc <= r.stop)) OR (r.start >= pc) THEN EXIT; END;
+					INC(i);
+				END;
+				RETURN i
+			END SearchRange;
 
+			(** Search for use at pc. Returns its index in uses. Returns the first use after pc if no use is at pc. *)
+			PROCEDURE SearchUse(pc: LONGINT): LONGINT;
+			VAR
+				m, M, i: LONGINT;
+				u: Use;
+			BEGIN
+				IF uses.Length() = 0 THEN RETURN 0 END;
+				(*m := 0;
+				M := uses.Length();
+				WHILE m # M DO
+					i := (m + M) DIV 2;
+					u := uses.Get(i)(Use);
+					IF u.pc < pc THEN
+						M := i;
+					ELSIF u.pc > pc THEN
+						m := i + 1;
+					ELSE
+						(* Found use *)
+						RETURN i;
+					END;
+				END;
+				(* did not find use, return the first one after pc *)
+				IF uses.Get(m - 1)(Use).pc > pc THEN DEC(m);
+				ELSIF u.pc < pc THEN INC(m);
+				END;
+				RETURN m;*)
+				LOOP
+					IF i = uses.Length() THEN EXIT; END;
+					u := uses.Get(i)(Use);
+					IF u.pc >= pc THEN EXIT; END;
+					INC(i);
+				END;
+				RETURN i;
+			END SearchUse;
+		END Interval;
+
+		(** Basic block for CFG building *)
+		BasicBlock=OBJECT(Basic.Block)
+		VAR
+			start,					(** First instruction in the block *)
+			stop: LONGINT;		(** Last instruction in the block. Is necessarily a branch, except for special EXIT block *)
+			live: Basic.IntegerSet;	(** Set of live registers at the beginning of the block *)
+			moves: Basic.List;		(** List of moves for each successor *)
+
+			PROCEDURE & Init *;
+			BEGIN
+				Init^;
+				NEW(live, InitSize);
+				NEW(moves, 2); (* typical number of successors *)
+			END Init;
+		END BasicBlock;
+
+		VAR
+			generator: GeneratorWithTickets;	(** associated generator *)
+			cfg: Basic.Graph;					(** CFG produced by dataflow analysis *)
+			intervals: Basic.List;				(** Intervals built during dataflow analysis. Indexed by virtual register * 2 + part *)
+			fixedIntervals,						(** Fixed intervals build for physical registers. Indexed by physical register *)
+			handled: Basic.List;				(** List of allocated intervals, it is the only complete list after allocation *)
+			physicalNb: LONGINT;			(** Number of physical registers *)
+
+		PROCEDURE & Init (generator: GeneratorWithTickets);
+		VAR
+			i: LONGINT;
+			int: Interval;
 		BEGIN
-			SortLiveRanges;
-
-			NEW(liveByLastUse, len);
-			FOR i := 0 TO len - 1 DO liveByLastUse[i] := -1 END;
-			FOR i := 0 TO len - 1 DO
-				ExpireOldIntervals(byFirstUse[i]);
-				IF AllocateInterval(byFirstUse[i]) THEN
-					AddLiveInterval(byFirstUse[i]);
-				END;
+			SELF.generator := generator;
+			NEW(intervals, InitSize);
+			physicalNb := generator.physicalRegisters.NumberRegisters();
+			NEW(fixedIntervals, physicalNb);
+			FOR i := 0 TO physicalNb - 1 DO
+				NEW(int, i, 0, IntermediateCode.undef);
+				fixedIntervals.Add(int);
 			END;
-			ExpireOldIntervals(0);
-			(*FOR i := 0 TO len - 1 DO
-				IF ~virtualRegisters.Mapped(byFirstUse[i], 0).fixed & virtualRegisters.Mapped(byFirstUse[i], 0).spilled THEN
-					spillStack.Free(virtualRegisters.Mapped(byFirstUse[i], 0).offset);
-				END;
-			END;*)
-			IF out.comments # NIL THEN
-				(*virtualRegisters.Dump(out.comments);*)
-				DumpAllocationGraph(out.comments, allocation, virtualRegisters);
-			END;
-		END AllocateRegisters;
+		END Init;
 
-		PROCEDURE Prepare *;
+		(**
+			Register allocation: analyses the parameter section and allocates a location for each virtual register used
+			in section. Called once globally before code emission.
+		*)
+		PROCEDURE Allocate*(section: IntermediateCode.Section);
 		BEGIN
-			IF optimize # {} THEN AllocateRegisters; END;
+			BuildCfg(section);
+			LivenessAnalysis(section);
+			AllocateStack(section);
+			LinearScan;
+			DumpAlloc(generator.dump, section.pc);
+			(*Resolution;*)
+		END Allocate;
+
+		(**
+			Prepare the code generator for generating 'instruction', at intermediate code PC 'pc': sets up all tickets as
+			needed so that the code generator has no virtual register allocation to do.
+			Returns TRUE if the code generator should emit code for this instruction and FALSE if it should not
+			emit any code.
+		*)
+		PROCEDURE Prepare*(pc: LONGINT; CONST instruction: IntermediateCode.Instruction): BOOLEAN;
 		END Prepare;
 
-		PROCEDURE PreGenerate*(pc: LONGINT; CONST instr: IntermediateCode.Instruction);
-		VAR
-			ticket: Ticket;
-			part, reg: LONGINT;
+		PROCEDURE CompareByStart(block1, block2: ANY): BOOLEAN;
 		BEGIN
-			FOR reg := 0 TO LEN(allocation.table) - 1 DO
-				IF pc = allocation.table[reg].first THEN
-					FOR part := 0 TO 1 DO
-						ticket := virtualRegisters.Mapped(reg, part);
-						IF ticket # NIL THEN
-							tickets.EnterTicket(ticket);
-							IF ~ticket.spilled THEN physicalRegisters.Allocate(ticket.register, ticket); END;
+			RETURN block1(BasicBlock).start < block2(BasicBlock).start
+		END CompareByStart;
+		(*
+			Build CFG of the section.
+		*)
+		PROCEDURE BuildCfg(section: IntermediateCode.Section);
+		VAR
+			dest: IntermediateCode.Operand;
+			block: BasicBlock;
+			blocks: Basic.List;
+			pc, opcode, i, offset: LONGINT;
+			created: BOOLEAN;
+
+			(* Connect start to a basic block starting at pc. Split as needed *)
+			PROCEDURE BranchTo(src, pc: LONGINT);
+			VAR
+				start, stop: BasicBlock;
+			BEGIN
+				IF Trace THEN
+					generator.dump.String("Branch: ");
+					generator.dump.Int(src, 0);
+					generator.dump.String(" -> ");
+					generator.dump.Int(pc, 0);
+					generator.dump.Ln;
+				END;
+				start := FindBlock(src);
+				IF start.stop # src THEN stop := SplitBlock(start, src + 1, FALSE); END;
+				stop := FindBlock(pc);
+				IF stop.start # pc THEN stop := SplitBlock(stop, pc, pc < src); END;
+				cfg.Connect(start, stop);
+			END BranchTo;
+
+			(* Split a block at pc. If connect = TRUE, connect the 2 resulting blocks *)
+			PROCEDURE SplitBlock(block: BasicBlock; pc: LONGINT; connect: BOOLEAN): BasicBlock;
+			VAR
+				succ, new: BasicBlock;
+				k: LONGINT;
+			BEGIN
+				ASSERT(block.start < pc);
+				ASSERT(block.stop >= pc);
+				NEW(new);
+				new.start := pc;
+				new.stop := block.stop;
+				block.stop := pc - 1;
+				cfg.AddBlock(new);
+
+				(* Connect new *)
+				FOR k := 0 TO block.successors.Length() - 1 DO
+					succ := block.successors.Get(0)(BasicBlock);
+					cfg.Split(block, succ);
+					cfg.Connect(new, succ);
+				END;
+				IF connect THEN cfg.Connect(block, new); END;
+				RETURN new;
+			END SplitBlock;
+
+			(* Find the block containing pc *)
+			PROCEDURE FindBlock(pc: LONGINT): BasicBlock;
+			VAR
+				i: LONGINT;
+				block: BasicBlock;
+			BEGIN
+				i := 0;
+				LOOP
+					block := cfg.blocks.Get(i)(BasicBlock);
+					IF (block.start <= pc) & (pc <= block.stop) THEN RETURN block; END;
+					INC(i);
+				END;
+			END FindBlock;
+
+		BEGIN
+			NEW(cfg);
+			NEW(block);
+			cfg.AddBlock(block);
+
+			block.start := 0;
+			block.stop := section.pc - 1;
+			FOR pc := 0 TO section.pc - 1 DO
+				block := FindBlock(pc);
+				opcode := section.instructions[pc].opcode;
+				IF (IntermediateCode.br <= opcode) & (opcode <= IntermediateCode.brlt) THEN
+					(* instruction is a branch *)
+					dest := section.instructions[pc].op1;
+					created := FALSE;
+					IF dest.register # None THEN
+						(* Branch to register: assume it is a case jump table *)
+						dest := section.instructions[pc - 1].op3;
+						FOR i := 0 TO dest.resolved(IntermediateCode.Section).pc - 1 DO
+							offset := dest.resolved(IntermediateCode.Section).instructions[i].op1.symbolOffset;
+							BranchTo(pc, offset);
+						END;
+					ELSIF dest.symbolOffset # pc THEN
+						(* Branch to a past constant *)
+						BranchTo(pc, dest.symbolOffset);
+						IF opcode # IntermediateCode.br THEN
+							BranchTo(pc, pc + 1);
+						END;
+					END;
+				ELSIF (pc = block.stop) & (pc < section.pc - 1) THEN
+					BranchTo(pc, pc + 1);
+				END;
+			END;
+
+			(* Reorder blocks by start PC *)
+			NEW(blocks, cfg.blocks.Length());
+			blocks.Append(cfg.blocks);
+			cfg.blocks.Clear();
+			blocks.Sort(CompareByStart);
+			FOR i := 0 TO blocks.Length() -1 DO cfg.AddBlock(blocks.Get(i)(BasicBlock)); END;
+
+			IF generator.dump # NIL THEN DumpCfg(generator.dump); END;
+		END BuildCfg;
+
+		(** Dataflow analysis to build interval for each virtual and physical register *)
+		PROCEDURE LivenessAnalysis(section: IntermediateCode.Section);
+		VAR
+			instruction: IntermediateCode.Instruction;
+			live: Basic.IntegerSet;
+			blocks: Basic.List;
+			block: BasicBlock;
+			interval: Interval;
+			p: ANY;
+			pc, b, i: LONGINT;
+			flags: ARRAY 3 OF SET;
+
+			PROCEDURE Use(CONST register: IntermediateCode.Operand; flags: SET);
+			VAR
+				type: IntermediateCode.Type;
+				interval: Interval;
+			BEGIN
+				ASSERT({UseRead, UseWrite} * flags # {});
+				generator.GetPartType(register.type, Low, type);
+				IF (register.register * 2 + Low >= intervals.Length()) OR (intervals.Get(register.register * 2 + Low) = NIL) THEN
+					NEW(interval, register.register, Low, type);
+					intervals.GrowAndSet(register.register * 2 + Low, interval);
+				ELSE
+					interval := intervals.Get(register.register * 2 + Low)(Interval);
+					IF type.sizeInBits > interval.location.type.sizeInBits THEN
+						interval.location.type := type;
+					END;
+				END;
+				interval.AddUse(pc, flags);
+				IF UseRead IN flags THEN
+					interval.AddRange(pc, pc(*block.stop*));
+					live.Include(register.register);
+				ELSE
+					interval.AddRange((*block.start*)pc, pc);
+					live.Exclude(register.register);
+				END;
+				
+				IF IntermediateCode.TypeEquals(type, register.type) THEN RETURN; END;
+				IF (register.register * 2 + High >= intervals.Length()) OR (intervals.Get(register.register * 2 + High) = NIL) THEN
+					generator.GetPartType(register.type, High, type);
+					NEW(interval, register.register, High, type);
+					intervals.GrowAndSet(register.register * 2 + High, interval);
+				ELSE
+					interval := intervals.Get(register.register * 2 + High)(Interval);
+				END;
+				interval.AddUse(pc, flags);
+				IF UseRead IN flags THEN
+					interval.AddRange(pc, pc(*block.stop*));
+					live.Include(register.register);
+				ELSE
+					interval.AddRange((*block.start*)pc, pc);
+					live.Exclude(register.register);
+				END;
+			END Use;
+
+		BEGIN
+			NEW(live, InitSize);
+			NEW(blocks, cfg.blocks.Length());
+			blocks.Append(cfg.blocks);
+			WHILE blocks.Length() > 0 DO
+				block := blocks.Get(blocks.Length() - 1)(BasicBlock);
+				blocks.Remove(block);
+				live.Clear();
+				(* LiveOut = union of LiveIn for all successors *)
+				FOR b := 0 TO block.successors.Length() - 1 DO
+					live.Union(block.successors.Get(b)(BasicBlock).live);
+				END;
+				FOR pc := block.stop TO block.start BY -1 DO
+					instruction := section.instructions[pc];
+					generator.PhysicalRegisterUse(instruction, flags);
+					(* Analyse physical register uses. Done in 2 loops to avoid interference between aliased registers (e.g. AL, AH, AX and EAX in intel 32 bits *)
+					FOR i := 0 TO physicalNb - 1 DO
+						IF generator.physicalRegisters.Reserved(i) THEN
+							interval := fixedIntervals.Get(i)(Interval);
+							interval.AddUse(pc, {UseWrite, UseRegister});
+							interval.AddRange(pc, pc);
+						END;
+					END;
+					FOR i := 0 TO physicalNb - 1 DO
+						generator.physicalRegisters.SetReserved(i, FALSE);
+					END;
+					(* Uses *)
+					 IF ((instruction.op3.mode = IntermediateCode.ModeRegister) OR (instruction.op3.mode = IntermediateCode.ModeMemory)) & (instruction.op3.register > None) THEN Use(instruction.op3, flags[2]); END;
+					 IF ((instruction.op2.mode = IntermediateCode.ModeRegister) OR (instruction.op2.mode = IntermediateCode.ModeMemory)) & (instruction.op2.register > None) THEN Use(instruction.op2, flags[1]); END;
+					 IF ((instruction.op1.mode = IntermediateCode.ModeRegister) OR (instruction.op1.mode = IntermediateCode.ModeMemory)) & (instruction.op1.register > None) THEN Use(instruction.op1, flags[0]); END;
+				END;
+				IF live # block.live THEN
+					(* LiveIn set changed, we need to process all predecessors again *)
+					FOR i := 0 TO block.predecessors.Length() - 1 DO
+						p := block.predecessors.Get(i);
+						IF ~blocks.Contains(p) THEN blocks.Insert(0, p); END;
+					END;
+					block.live.Clear();
+					block.live.Union(live);
+				END;
+			END;
+		END LivenessAnalysis;
+
+		(** Find a stack location for each virtual registers *)
+		PROCEDURE AllocateStack(section: IntermediateCode.Section);
+		VAR
+			type: IntermediateCode.Type;
+			any: ANY;
+			interval: Interval;
+			i, offset, register: LONGINT;
+
+		BEGIN
+			(* FInd all explicitely allocated intervals *)
+			FOR i := 0 TO section.pc - 1 DO
+				IF section.instructions[i].opcode = IntermediateCode.allocate THEN
+					register := section.instructions[i].op1.register;
+					offset := section.instructions[i].op2.offset;
+					interval := intervals.Get(register * 2 + Low)(Interval);
+					ASSERT(interval.virtual = register);
+					interval.location.offset := offset;
+					interval.location.fixed := TRUE;
+					type := interval.location.type;
+					IF register * 2 + High < intervals.Length() THEN
+						any := intervals.Get(register * 2 + High);
+						IF any # NIL THEN
+							any(Interval).location.offset := offset + type.sizeInBits DIV 8;
+							any(Interval).location.fixed := TRUE;
 						END;
 					END;
 				END;
 			END;
-		END PreGenerate;
-	END GeneratorWithTickets;
+			(* Allocate spill stack for all interval without offset *)
+			FOR i := 0 TO intervals.Length() - 1 DO
+				any := intervals.Get(i);
+				IF any # NIL THEN
+					interval := any(Interval);
+					IF ~interval.location.fixed THEN
+						offset := generator.spillStack.NextFree();
+						interval.location.offset := offset;
+						generator.spillStack.Allocate(offset, interval.location);
+					END;
+				END;
+			END;
+		END AllocateStack;
+
+		PROCEDURE CompareByFirstPC(interval1, interval2: ANY): BOOLEAN;
+		BEGIN
+			RETURN interval1(Interval).first < interval2(Interval).first
+		END CompareByFirstPC;
+
+		(** Allocate all intervals to a physical location *)
+		PROCEDURE LinearScan;
+		VAR
+			unhandled, active, inactive: Basic.List;
+			current, interval: Interval;
+			next: POINTER TO ARRAY OF LONGINT;
+			pc, i: LONGINT;
+
+			PROCEDURE InsertInUnhandled(interval: Interval);
+			VAR
+				curr: Interval;
+				i: LONGINT;
+			BEGIN
+				LOOP
+					IF i = unhandled.Length() THEN
+						unhandled.Add(interval);
+						EXIT;
+					END;
+					curr := unhandled.Get(i)(Interval);
+					IF curr.first > interval.first THEN
+						unhandled.Insert(i, interval);
+						EXIT;
+					END;
+				END;
+			END InsertInUnhandled;
+
+			PROCEDURE FindIntervalByReg(physical, pc: LONGINT): Interval;
+			VAR
+				i: LONGINT;
+				interval: Interval;
+			BEGIN
+				LOOP
+					IF i = active.Length() THEN
+						interval := NIL;
+						EXIT;
+					END;
+					interval := active.Get(i)(Interval);
+					ASSERT(~interval.location.spilled);
+					IF interval.Covers(pc) & (interval.location.register = physical) THEN EXIT; END;
+					INC(i);
+				END;
+				IF interval # NIL THEN RETURN interval; END;
+				i := 0;
+				LOOP
+					IF i = inactive.Length() THEN
+						interval := NIL;
+						EXIT;
+					END;
+					interval := inactive.Get(i)(Interval);
+					ASSERT(~interval.location.spilled);
+					IF (interval.first <= pc) & (interval.last <= pc) & (interval.location.register = physical) THEN EXIT; END;
+					INC(i);
+				END;
+				RETURN interval;
+			END FindIntervalByReg;
+
+			PROCEDURE AllocateFreeReg(current: Interval; pc: LONGINT);
+			VAR
+				interval: Interval;
+				tmp: Ticket;
+				i, n, r: LONGINT;
+			BEGIN
+				(* next represents the next allocated use of a physical register *)
+				(* get free until values from fixed intervals *)
+				FOR i := 0 TO physicalNb - 1 DO
+					n := fixedIntervals.Get(i)(Interval).NextRange(pc);
+					IF n = -1 THEN n := MAX(LONGINT);
+					ELSIF n = pc THEN n := 0;
+					END;
+					next[i] := n;
+				END;
+				(* Update free until with active intervals: those registers are not free *)
+				FOR i := 0 TO active.Length() - 1 DO
+					interval := active.Get(i)(Interval);
+					r := interval.location.register;
+					next[r] := 0;
+				END;
+				(* Update free until with inactive intervals: free until start of next range in interval *)
+				FOR i := 0 TO inactive.Length() - 1 DO
+					interval := inactive.Get(i)(Interval);
+					n := interval.NextRange(pc);
+					r := interval.location.register;
+					IF n > -1 THEN next[r] := MIN(next[r], n); END;
+				END;
+
+				(* Find a type-matching register with maximal free until *)
+				FOR i := 0 TO physicalNb - 1 DO
+					interval := fixedIntervals.Get(i)(Interval);
+					interval.location.lastuse := next[i];
+				END;
+				current.location.register := None;
+
+				REPEAT
+					n := 0;
+					r := None;
+					FOR i := 0 TO physicalNb - 1 DO
+						IF next[i] > n THEN
+							r := i;
+							n := next[i];
+						END;
+					END;
+					IF (r # None) & (n > pc) THEN
+						generator.physicalRegisters.SetReserved(r, FALSE);
+						IF generator.physicalRegisters.NextFree(current.location.type) = r THEN
+							IF current.last >= n THEN
+								(* Split at n *)
+								IF Trace THEN
+									generator.dump.String("Splitting for allocate (current): r");
+									generator.dump.Int(current.virtual, 0);
+									generator.dump.String(".");
+									generator.dump.Int(current.part, 0);
+									generator.dump.String(" at ");
+									generator.dump.Int(n, 0);
+									generator.dump.Ln;
+								END;
+								InsertInUnhandled(current.Split(n));
+							END;
+							current.location.spilled := FALSE;
+							current.location.register := r;
+							n := 0;
+						END;
+						generator.physicalRegisters.SetReserved(r, TRUE);
+						next[r] := 0;
+					END;
+				UNTIL n = 0;
+			END AllocateFreeReg;
+
+			PROCEDURE AllocateBlockedReg(current: Interval; pc: LONGINT);
+			VAR
+				interval: Interval;
+				i, n, r, c: LONGINT;
+				found: BOOLEAN;
+			BEGIN
+				(* next represents the next use of a physical register *)
+				(* get free until values from fixed intervals *)
+				FOR i := 0 TO physicalNb - 1 DO
+					n := fixedIntervals.Get(i)(Interval).NextUse(pc, {});
+					IF n = -1 THEN n := MAX(LONGINT); END;
+					next[i] := n;
+				END;
+				(* Update free until with active intervals: those registers are not free *)
+				FOR i := 0 TO active.Length() - 1 DO
+					interval := active.Get(i)(Interval);
+					r := interval.location.register;
+					n := interval.NextUse(pc, {});
+					IF n > -1 THEN next[r] := MIN(next[r], n); END;
+				END;
+				(* Update free until with inactive intervals: free until start of next range in interval *)
+				FOR i := 0 TO inactive.Length() - 1 DO
+					interval := inactive.Get(i)(Interval);
+					n := interval.NextUse(pc, {});
+					r := interval.location.register;
+					IF n > -1 THEN next[r] := MIN(next[r], n); END;
+				END;
+
+				(* Find a type-matching register with maximal free until *)
+				FOR i := 0 TO physicalNb - 1 DO
+					interval := fixedIntervals.Get(i)(Interval);
+					interval.location.lastuse := next[i];
+					generator.physicalRegisters.SetReserved(i, TRUE);
+				END;
+				current.location.register := None;
+
+				found := FALSE;
+				REPEAT
+					n := 0;
+					r := None;
+					FOR i := 0 TO physicalNb - 1 DO
+						IF next[i] > n THEN
+							r := i;
+							n := next[i];
+						END;
+					END;
+					IF r # None THEN
+						generator.physicalRegisters.SetReserved(r, FALSE);
+						IF generator.physicalRegisters.NextFree(current.location.type) = r THEN
+							found := TRUE;
+						END;
+						generator.physicalRegisters.SetReserved(r, TRUE);
+						next[r] := 0;
+					END;
+				UNTIL found OR (n = 0);
+				ASSERT(r # None);
+				(* Select which interval to spill between current and the one allocated to r *)
+				c := current.NextUse(pc, {});
+				IF c = -1 THEN c := MAX(LONGINT); END;
+				IF n < c THEN
+					(* spill r *)
+					interval := FindIntervalByReg(r, pc);
+					ASSERT(interval # NIL);
+					c := current.NextUse(pc, {UseRegister});
+					IF c = -1 THEN c := n; END;
+					IF Trace THEN
+						generator.dump.String("Splitting for spill (other): r");
+						generator.dump.Int(interval.virtual, 0);
+						generator.dump.String(".");
+						generator.dump.Int(interval.part, 0);
+						generator.dump.String(" at ");
+						generator.dump.Int(c, 0);
+						generator.dump.Ln;
+					END;
+					InsertInUnhandled(interval.Split(c));
+
+					IF active.Contains(interval) THEN active.Remove(interval);
+					ELSE inactive.Remove(interval);
+					END;
+
+					interval.location.spilled := TRUE;
+					current.location.register := r;
+					current.location.spilled := FALSE;
+					handled.Add(interval);
+				ELSE
+					(* spill current *)
+					c := current.NextUse(pc, {UseRegister});
+					IF c > -1 THEN
+						IF Trace THEN
+							generator.dump.String("Splitting for spill (current): r");
+							generator.dump.Int(current.virtual, 0);
+							generator.dump.String(".");
+							generator.dump.Int(current.part, 0);
+							generator.dump.String(" at ");
+							generator.dump.Int(c, 0);
+							generator.dump.Ln;
+						END;
+						InsertInUnhandled(current.Split(c));
+					END;
+					current.location.spilled := TRUE;
+					handled.Add(current);
+				END;
+			END AllocateBlockedReg;
+
+		BEGIN
+			NEW(unhandled, InitSize);
+			NEW(active, InitSize);
+			NEW(inactive, InitSize);
+			NEW(handled, InitSize);
+			NEW(next, physicalNb);
+			FOR i := 0 TO intervals.Length() - 1 DO
+				IF intervals.Get(i) # NIL THEN
+					unhandled.Add(intervals.Get(i));
+				END;
+			END;
+			unhandled.Sort(CompareByFirstPC);
+
+			WHILE unhandled.Length() > 0 DO
+				current := unhandled.Get(0)(Interval);
+				unhandled.RemoveByIndex(0);
+				pc := current.first;
+				current.location.register := None;
+
+				i := 0;
+				WHILE i < active.Length() DO
+					interval := active.Get(i)(Interval);
+					IF interval.last < pc THEN
+						(* Active -> Handled *)
+						active.RemoveByIndex(i);
+						(*generator.physicalRegisters.Free(interval.location.register);*)
+						generator.physicalRegisters.SetReserved(interval.location.register, FALSE);
+						handled.Add(interval);
+					ELSIF ~interval.Covers(pc) THEN
+						(* Active -> Inactive *)
+						active.RemoveByIndex(i);
+						(*generator.physicalRegisters.Free(interval.location.register);*)
+						inactive.Add(interval);
+					ELSE
+						INC(i);
+					END;
+				END;
+				i := 0;
+				WHILE i < inactive.Length() DO
+					interval := inactive.Get(i)(Interval);
+					IF interval.last < pc THEN
+						(* Inactive -> Handled *)
+						inactive.RemoveByIndex(i);
+						(*generator.physicalRegisters.Free(interval.location.register);*)
+						generator.physicalRegisters.SetReserved(interval.location.register, FALSE);
+						handled.Add(interval);
+					ELSIF interval.Covers(pc) THEN
+						(* Inactive -> Active *)
+						inactive.RemoveByIndex(i);
+						(*generator.physicalRegisters.Allocate(interval.location.register, interval.location);*)
+						active.Add(interval);
+					ELSE
+						INC(i);
+					END;
+				END;
+
+				AllocateFreeReg(current, pc);
+				IF current.location.register = None THEN AllocateBlockedReg(current, pc); END;
+				IF ~current.location.spilled THEN
+					active.Add(current);
+				END;
+				IF Trace THEN
+					generator.dump.String("Allocated r");
+					generator.dump.Int(current.virtual, 0);
+					generator.dump.String('.');
+					generator.dump.Int(current.part, 0);
+					generator.dump.String(" to ");
+					IF current.location.spilled THEN
+						generator.dump.String("stack offset ");
+						generator.dump.Int(current.location.offset, 0);
+					ELSE
+						generator.dump.String("R");
+						generator.dump.Int(current.location.register, 0);
+					END;
+					generator.dump.Ln;
+				END;
+			END;
+			(* Add all active and inactive intervals to handled *)
+			handled.Append(active);
+			handled.Append(inactive);
+		END LinearScan;
+
+		(** Post-processing needed after register allocation *)
+		PROCEDURE Resolution;
+		TYPE
+			ResolutionVisitor=OBJECT(Basic.GraphVisitor)
+				PROCEDURE VisitEdge(edge: Basic.Edge);
+				VAR
+					src, dest: BasicBlock;
+				BEGIN
+					src := edge.from(BasicBlock);
+					dest := edge.to(BasicBlock);
+					
+				END VisitEdge;
+			END ResolutionVisitor;
+
+		VAR
+			visitor: ResolutionVisitor;
+		BEGIN
+			NEW(visitor);
+			visitor.VisitGraph(cfg);
+		END Resolution;
+
+		PROCEDURE OrderMoves(moves: Basic.List);
+		END OrderMoves;
+
+		PROCEDURE DumpCfg*(w: Streams.Writer);
+		VAR
+			i, j: LONGINT;
+			block: BasicBlock;
+		BEGIN
+			w.String("CFG:"); w.Ln;
+			FOR i := 0 TO cfg.blocks.Length() - 1 DO
+				block := cfg.blocks.Get(i)(BasicBlock);
+				w.String("Block"); w.Int(i, 0);
+				w.String(" ["); w.Int(block.start, 0); w.String(", "); w.Int(block.stop, 0); w.String("]");
+				w.Ln;
+				IF block.predecessors.Length() > 0 THEN
+					w.String("	<- ");
+					FOR j := 0 TO block.predecessors.Length() - 1 DO
+						w.Int(block.predecessors.GetBlock(j).index, 0);
+						w.String(" ");
+					END;
+					w.Ln;
+				END;
+				IF block.successors.Length() > 0 THEN
+					w.String("	-> ");
+					FOR j := 0 TO block.successors.Length() - 1 DO
+						w.Int(block.successors.GetBlock(j).index, 0);
+						w.String(" ");
+					END;
+					w.Ln;
+				END;
+			END;
+		END DumpCfg;
+
+		PROCEDURE DumpAlloc*(w: Streams.Writer; max: LONGINT);
+		VAR
+			interval: Interval;
+			pc, i: LONGINT;
+
+			PROCEDURE FindUse (int: Interval; pc: LONGINT): SET;
+			VAR
+				use: Use;
+				i: LONGINT;
+			BEGIN
+				LOOP
+					IF i = int.uses.Length() THEN EXIT END;
+					use := int.uses.Get(i)(Use);
+					IF use.pc = pc THEN RETURN use.flags;
+					ELSIF use.pc > pc THEN EXIT;
+					END;
+					INC(i);
+				END;
+				RETURN {};
+			END FindUse;
+
+			PROCEDURE PrintInterval(interval: Interval; virtual: BOOLEAN);
+			VAR
+				use: SET;
+			BEGIN
+				IF virtual THEN
+					w.String("r");
+				ELSE
+					w.String("R");
+				END;
+				w.Int(interval.virtual, 1);
+				IF virtual THEN
+					w.Char('.');
+					w.Int(interval.part, 0);
+				END;
+				IF interval.virtual < 10 THEN w.Char(' '); END;
+				w.String(" |");
+				FOR pc := 0 TO max DO
+					use := FindUse(interval, pc);
+					IF {UseRead, UseWrite} * use = {UseRead, UseWrite} THEN w.Char('X');	(* Read and write *)
+					ELSIF UseRead IN use THEN w.Char('R');										(* Read only *)
+					ELSIF UseWrite IN use THEN w.Char('W');									(* Write only *)
+					ELSIF interval.Covers(pc) THEN w.Char("-");									(* Live but not used *)
+					ELSIF pc MOD 5 = 0 THEN w.Char(":");										(* Not live, PC marker *)
+					ELSE w.Char(" ");																(* Not live *)
+					END;
+				END;
+				w.String("|  ");
+				IF virtual THEN
+					IntermediateCode.DumpType(w, interval.location.type);
+					w.String(" ");
+					IF interval.location.spilled THEN w.String("[fp + "); w.Int(interval.location.offset, 0); w.String(']');
+					ELSE w.String('R'); w.Int(interval.location.register, 0);
+					END;
+				END;
+				w.Ln;
+			END PrintInterval;
+
+		BEGIN
+			w.String("Register Allocation; W = Write, R = Read, X = Read and Write, - = live");
+			w.Ln;
+			w.String("PC   ");
+			FOR pc := 0 TO max DO
+				IF pc MOD 5 = 0 THEN
+					w.Int(pc, 3);
+					(*INC(pc, 2);*)
+				ELSIF (pc MOD 5 <= 2) THEN
+					w.String(" ");
+				END;
+			END;
+			IF max MOD 5 > 2 THEN w.String("  "); END;
+			w.String("|  Type Location");
+			w.Ln;
+
+			FOR i := 0 TO handled.Length() - 1 DO
+				IF handled.Get(i) # NIL THEN
+					interval := handled.Get(i)(Interval);
+					PrintInterval(interval, TRUE);
+				END;
+			END;
+			IF Trace THEN
+				FOR i := 0 TO fixedIntervals.Length() - 1 DO
+					PrintInterval(fixedIntervals.Get(i)(Interval), FALSE);
+				END;
+			END;
+		END DumpAlloc;
+	END RegisterAllocator;
 
 	PROCEDURE Assert(cond: BOOLEAN; CONST reason: ARRAY OF CHAR);
 	BEGIN ASSERT(cond);
@@ -1665,87 +2365,4 @@ TYPE
 		w.String(" parts "); w.Int(ticket.parts,1);
 		w.String(" last use "); w.Int(ticket.lastuse,1);
 	END DumpTicket;
-
-	PROCEDURE DumpAllocationGraph*(w: Streams.Writer; allocation: RegisterAllocation; registers: VirtualRegisters);
-	VAR
-		ticket: Ticket;
-		min, max, pc, part, r: LONGINT;
-
-		PROCEDURE Width(i: LONGINT): LONGINT;
-		VAR
-			w: LONGINT;
-		BEGIN
-			(*IF i < 0 THEN TRACE(i); i := -i; INC(w); END;*)
-			ASSERT(i >= 0);
-			REPEAT
-				INC(w); i := i DIV 10
-			UNTIL i = 0;
-			RETURN w
-		END Width;
-	BEGIN
-		(* Print header: 'PC' and pc scale *)
-		min := MAX(LONGINT);
-		max := MIN(LONGINT);
-		FOR r := 0 TO LEN(allocation.table) - 1 DO
-			IF allocation.table[r].first < min THEN min := allocation.table[r].first END;
-			IF allocation.table[r].last > max THEN max := allocation.table[r].last END;
-		END;
-		IF (min = MAX(LONGINT)) OR (max = MIN(LONGINT)) THEN RETURN END;
-		w.String("PC    |");
-		w.Int(min, 0);
-
-		pc := min + Width(min);
-		REPEAT
-			IF pc MOD 10 = 0 THEN
-				w.Int(pc, 0);
-				INC(pc, Width(pc));
-			ELSE
-				w.Char(' ');
-				INC(pc);
-			END;
-		UNTIL pc >= max;
-		IF pc = max THEN
-			w.Int(max, 0);
-			w.Char(' ');
-		ELSE
-			FOR pc := 0 TO Width(max) - 1 DO w.Char(' ') END;
-		END;
-		w.String('|  Type  Physical Location');
-		w.Ln;
-
-		(* Print one line per register: 'r...' then 'x-----x' *)
-		FOR r := 0 TO LEN(allocation.table) - 1 DO
-			IF allocation.table[r].first # MAX(LONGINT) THEN
-				w.Char('r');
-				w.Int(r, 0);
-				pc := Width(r);
-				WHILE pc < 5 DO w.Char(' '); INC(pc); END;
-				w.Char('|');
-				FOR pc := min TO allocation.table[r].first - 1 DO IF pc MOD 10 = 0 THEN w.Char(':'); ELSE w.Char(' '); END; END;
-				w.Char('x');
-				FOR pc := allocation.table[r].first + 1 TO allocation.table[r].last - 1 DO w.Char('-'); END;
-				w.Char('x');
-				FOR pc := allocation.table[r].last + 1 TO max DO IF pc MOD 10 = 0 THEN w.Char(':'); ELSE w.Char(' '); END; END;
-				FOR pc := 0 TO Width(max) - 1 DO w.Char(' '); END;
-				w.String('|  ');
-				part := 0;
-				FOR part := 0 TO 1 DO
-					ticket := registers.Mapped(r, part);
-					IF ticket # NIL THEN
-						IntermediateCode.DumpType(w, ticket.type);
-						w.String("	");
-						IF ticket.spilled THEN
-							w.String("[fp + "); w.Int(ticket.offset, 0); w.Char(']');
-						ELSE
-							w.String("R"); w.Int(ticket.register, 0);
-						END;
-					END;
-					INC(part);
-				END;
-				w.Ln;
-			END;
-		END;
-		w.Update;
-	END DumpAllocationGraph;
-
 END FoxCodeGenerators.

@@ -5,7 +5,7 @@ IMPORT
 	IntermediateCode := FoxIntermediateCode, IntermediateBackend := FoxIntermediateBackend, BinaryCode := FoxBinaryCode,
 	InstructionSet := FoxAMD64InstructionSet, Assembler := FoxAMD64Assembler, SemanticChecker := FoxSemanticChecker, Formats := FoxFormats,
 	Diagnostics, Streams, Options, Strings, ObjectFileFormat := FoxBinaryObjectFile, Compiler,
-	Machine, D := Debugging, CodeGenerators := FoxCodeGenerators, ObjectFile, SYSTEM;
+	Machine, D := Debugging, CodeGenerators := FoxCodeGenerators, ObjectFile;
 
 CONST
 
@@ -497,9 +497,6 @@ TYPE
 		stackSize: LONGINT;
 		spillStackStart: LONGINT;
 
-		(* list of tickets spilled by save instruction *)
-		savedTickets: Basic.List;
-
 		(* floating point stack state *)
 		fpStackPointer: LONGINT; (* floating point stack pointer, increases with allocation, decreases with releasing, used to determine current relative position on stack (as is necessary for intel FP instructions) *)
 		(*
@@ -547,7 +544,6 @@ TYPE
 
 			fpStackPointer := 0;
 			InitTicketGenerator(diagnostics,backend.optimize,2,physicalRegisters);
-			NEW(savedTickets, 16);
 		END InitGeneratorAMD64;
 
 		(*------------------- overwritten methods ----------------------*)
@@ -631,9 +627,7 @@ TYPE
 		BEGIN
 			ASSERT(type.sizeInBits >0);
 			IF (type.sizeInBits > cpuBits) & (type.form IN IntermediateCode.Integer) THEN
-				IF part * 32 >= type.sizeInBits THEN typePart := IntermediateCode.undef;
-				ELSE IntermediateCode.InitType(typePart,type.form,32);
-				END;
+				IntermediateCode.InitType(typePart,type.form,32);
 			ELSE ASSERT((type.form IN IntermediateCode.Integer) OR (type.form = IntermediateCode.Float));
 				IF part=Low THEN typePart := type ELSE typePart := IntermediateCode.undef END;
 			END;
@@ -642,8 +636,6 @@ TYPE
 		(* simple move without conversion *)
 		PROCEDURE Move(VAR dest, src: Assembler.Operand; CONST type: IntermediateCode.Type);
 		BEGIN
-			ASSERT(dest.type # none);
-			ASSERT(src.type # none);
 			IF type.length > 1 THEN
 				IF type.length = 4 THEN
 					(*ASSERT(type.form = IntermediateCode.Float);*)
@@ -697,12 +689,8 @@ TYPE
 		PROCEDURE ToRegister(ticket: Ticket);
 		VAR op: Assembler.Operand;
 		BEGIN
-			IF (ticket.type.form = IntermediateCode.Float) & backend.forceFPU THEN
-				HALT(100); (*! TODO: implement *)
-			ELSE
-				GetSpillOperand(ticket,op);
-				Move(registerOperands[ticket.register], op, ticket.type);
-			END;
+			GetSpillOperand(ticket,op);
+			emitter.Emit2(InstructionSet.opMOV,registerOperands[ticket.register],op);
 		END ToRegister;
 
 		PROCEDURE ExchangeTickets(ticket1,ticket2: Ticket);
@@ -790,9 +778,7 @@ TYPE
 		(*-------------------  operand generation ----------------------*)
 		PROCEDURE GetSpillOperand(ticket: Ticket; VAR op: Assembler.Operand);
 		BEGIN
-			IF ticket.fixed THEN
-				op := Assembler.NewMem(SHORTINT(ticket.type.sizeInBits*ticket.type.length DIV 8), BP , (ticket.offset));
-			ELSIF FrameSpillStack THEN
+			IF FrameSpillStack THEN
 				op := Assembler.NewMem(SHORTINT(ticket.type.sizeInBits*ticket.type.length DIV 8), BP , -(spillStackStart + cpuBits DIV 8 + ticket.offset*cpuBits DIV 8));
 			ELSE
 				op := Assembler.NewMem(SHORTINT(ticket.type.sizeInBits*ticket.type.length DIV 8),SP , (spillStack.Size()-ticket.offset)*cpuBits DIV 8);
@@ -800,28 +786,13 @@ TYPE
 		END GetSpillOperand;
 
 		PROCEDURE TicketToOperand(ticket: Ticket; VAR op: Assembler.Operand);
-		(*!DBG*)VAR i: LONGINT;
 		BEGIN
 			IF (ticket = NIL) THEN
 				Assembler.InitOperand(op)
 			ELSIF ticket.spilled THEN
 				GetSpillOperand(ticket,op)
 			ELSE
-				(*IF (ticket.register = none) & (out.comments # NIL) THEN
-					out.comments.String("Found not assigned ticket for r");
-					WHILE (virtualRegisters.Mapped(i, 0) # ticket) DO INC(i) END;
-					out.comments.Int(i, 0);
-					out.comments.Ln;
-					out.comments.String("Ticket is ");
-					IF ~ticket.spilled THEN
-						out.comments.String("not ");
-					END;
-					out.comments.String("spilled");
-					out.comments.Ln;
-					tickets.Dump(out.comments);
-					virtualRegisters.Dump(out.comments);
-					out.comments.Update
-				END;*)
+				IF ticket.register = none THEN physicalRegisters.Dump(D.Log); tickets.Dump(D.Log); virtualRegisters.Dump(D.Log); D.Update; END;
 				ASSERT(ticket.register # none);
 				IF (ticket.type.form = IntermediateCode.Float) & backend.forceFPU THEN
 					op := registerOperands[ticket.register+fpStackPointer]
@@ -1065,11 +1036,7 @@ TYPE
 				previous := op;
 				temp := TemporaryTicket(vop.registerClass,vop.type);
 				TicketToOperand(temp,op);
-				IF vop.type.length > 1 THEN
-					emitter.Emit2(InstructionSet.opMOVUPS, op, previous);
-				ELSE
-					Move(op, previous, vop.type);
-				END;
+				Move(op, previous, vop.type);
 			END;
 		END MakeRegister;
 
@@ -1130,12 +1097,10 @@ TYPE
 				ticket := ReservePhysicalRegister(instruction.op1.type,hwreg,lastUse);
 			END;
 			*)
-			EnterLiveTickets;
 			ReserveOperandRegisters(instruction.op1,TRUE); ReserveOperandRegisters(instruction.op2,TRUE);ReserveOperandRegisters(instruction.op3,TRUE);
 			(*TryAllocate(instruction.op1,Low);
 			IF IsComplex(instruction.op1) THEN TryAllocate(instruction.op1,High) END;
 			*)
-			(*(*!DBG*)IF out.comments # NIL THEN physicalRegisters.Dump(out.comments) END;*)
 			opcode := instruction.opcode;
 			CASE opcode OF
 			IntermediateCode.nop: (* do nothing *)
@@ -1271,47 +1236,21 @@ TYPE
 			|IntermediateCode.copy: EmitCopy(instruction);
 			|IntermediateCode.fill: EmitFill(instruction,FALSE);
 			|IntermediateCode.asm: EmitAsm(instruction);
-			|IntermediateCode.allocate: EmitAllocate(instruction);
-			|IntermediateCode.save: EmitSave(instruction);
-			|IntermediateCode.restore: EmitRestore(instruction);
 			END;
 
 			ReserveOperandRegisters(instruction.op3,FALSE); ReserveOperandRegisters(instruction.op2,FALSE); ReserveOperandRegisters(instruction.op1,FALSE);
-			(*RemoveDeadTickets;*)
+
 		END Generate;
 
-		PROCEDURE UnSpillRegsForcedFree;
-		VAR
-			len: LONGINT;
-			ticket: Ticket;
-		BEGIN
-			LOOP
-				len := forcedFree.Length();
-				IF len = 0 THEN EXIT END;
-				ticket := forcedFree.Get(len - 1)(Ticket);
-				ASSERT(ticket # NIL);
-				IF dump # NIL THEN dump.String("Unspilling forced spill: "); CodeGenerators.DumpTicket(dump, ticket); dump.Ln; END;
-				UnSpill(ticket);
-				forcedFree.RemoveByIndex(len - 1);
-			END;
-		END UnSpillRegsForcedFree;
-
 		PROCEDURE PostGenerate(CONST instruction: IntermediateCode.Instruction);
-		VAR ticket, next: Ticket; len: LONGINT;
+		VAR ticket: Ticket;
 		BEGIN
 			TryUnmap(instruction.op3); TryUnmap(instruction.op2); TryUnmap(instruction.op1);
-			(*ticket := tickets.live;
-			WHILE (ticket # NIL) DO
-				next := ticket.next;
-				IF ticket.lastuse = inPC THEN UnmapTicket(ticket); END;
-				ticket := next;
-			END;*)
 			ticket := tickets.live;
 			WHILE (ticket # NIL) & (ticket.lastuse = inPC) DO
 				UnmapTicket(ticket);
-				ticket := tickets.live;
+				ticket := tickets.live
 			END;
-			UnSpillRegsForcedFree;
 		END PostGenerate;
 
 		(* enter procedure: generate PAF and clear stack *)
@@ -2924,8 +2863,6 @@ TYPE
 					END;
 				END;
 			END;
-			(*(*IF instruction.opcode # IntermediateCode.br THEN*) UnSpillRegsForcedFree; (*FreeDeadRegisters(inPC) END;*)*)
-			IF instruction.opcode # IntermediateCode.br THEN PostGenerate(instruction); END;
 			JmpDest(hit);
 			IF failPC > 0 THEN out.PutByteAt(failPC,(out.pc-failPC)-1); END;
 		END EmitBr;
@@ -3200,55 +3137,6 @@ TYPE
 			*)
 		END EmitAsm;
 
-		PROCEDURE EmitAllocate(CONST instruction: IntermediateCode.Instruction);
-		END EmitAllocate;
-
-		PROCEDURE EmitSave(CONST instruction: IntermediateCode.Instruction);
-		VAR
-			ticket: Ticket;
-		BEGIN
-			IF optimize # {} THEN
-				ASSERT(savedTickets.Length() = 0);
-				ticket := tickets.live;
-				WHILE ticket # NIL DO
-					IF ~ticket.spilled THEN
-						IF out.comments # NIL THEN
-							out.comments.String("saving register");
-							out.comments.Int(ticket.register, 0);
-							out.comments.String(" to offset ");
-							out.comments.Int(ticket.offset, 0);
-							out.comments.Ln;
-						END;
-						Spill(ticket);
-						savedTickets.Add(ticket);
-					END;
-					ticket := ticket.next;
-				END;
-			END;
-		END EmitSave;
-
-		PROCEDURE EmitRestore(CONST instruction: IntermediateCode.Instruction);
-		VAR
-			ticket: Ticket;
-			i: LONGINT;
-		BEGIN
-			IF optimize # {} THEN
-				i := savedTickets.Length() - 1;
-				WHILE i >= 0 DO
-					ticket := savedTickets.Get(i)(Ticket);
-					savedTickets.RemoveByIndex(i);
-					IF out.comments # NIL THEN
-						out.comments.String("restoring register");
-						out.comments.Int(ticket.register, 0);
-						out.comments.String(" from offset ");
-						out.comments.Int(ticket.offset, 0);
-						out.comments.Ln;
-					END;
-					UnSpill(ticket);
-					DEC(i)
-				END;
-			END;
-		END EmitRestore;
 	END CodeGeneratorAMD64;
 
 	BackendAMD64= OBJECT (IntermediateBackend.IntermediateBackend)

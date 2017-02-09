@@ -67,7 +67,7 @@ TYPE
 		start*, end*, line*, linepos*: LONGINT;
 		reader*: Streams.Reader;
 	END;
-	
+
 	ErrorCode*=LONGINT;
 
 
@@ -1434,6 +1434,121 @@ TYPE
 		END Init;
 
 	END GraphPrinter;
+
+	IntegerSet* = OBJECT
+	VAR
+		sets: POINTER TO ARRAY OF SET;
+
+		PROCEDURE & Init*(size: LONGINT);
+		BEGIN
+			NEW(sets, size DIV 32);
+		END Init;
+
+		PROCEDURE Include*(i: LONGINT);
+		VAR
+			outer, inner: LONGINT;
+		BEGIN
+			outer := i DIV 32;
+			inner := i MOD 32;
+			IF outer >= LEN(sets) THEN Grow(MAX(outer + 1, 2 * LEN(sets))); END;
+			INCL(sets[outer], inner);
+		END Include;
+
+		PROCEDURE Exclude*(i: LONGINT);
+		VAR
+			outer, inner: LONGINT;
+		BEGIN
+			outer := i DIV 32;
+			inner := i MOD 32;
+			WHILE outer >= LEN(sets) DO Grow(MAX(outer + 1, 2 * LEN(sets))); END;
+			EXCL(sets[outer], inner);
+		END Exclude;
+
+		PROCEDURE Contains*(i: LONGINT): BOOLEAN;
+		VAR
+			outer, inner: LONGINT;
+		BEGIN
+			outer := i DIV 32;
+			inner := i MOD 32;
+			IF outer >= LEN(sets) THEN RETURN FALSE; END;
+			RETURN inner IN sets[outer];
+		END Contains;
+
+		PROCEDURE Union*(other: IntegerSet);
+		VAR
+			i: LONGINT;
+		BEGIN
+			IF LEN(other.sets) > LEN(sets) THEN Grow(LEN(other.sets)); END;
+			FOR i := 0 TO LEN(other.sets) - 1 DO sets[i] := sets[i] + other.sets[i]; END;
+		END Union;
+
+		PROCEDURE Intersection*(other: IntegerSet);
+		VAR
+			i: LONGINT;
+		BEGIN
+			IF LEN(other.sets) > LEN(sets) THEN Grow(LEN(other.sets)); END;
+			FOR i := 0 TO LEN(other.sets) - 1 DO sets[i] := sets[i] * other.sets[i]; END;
+			WHILE i < LEN(sets) DO
+				sets[i] := {};
+				INC(i);
+			END;
+		END Intersection;
+
+		PROCEDURE Difference*(other: IntegerSet);
+		VAR
+			i: LONGINT;
+		BEGIN
+			IF LEN(other.sets) > LEN(sets) THEN Grow(LEN(other.sets)); END;
+			FOR i := 0 TO LEN(other.sets) - 1 DO sets[i] := sets[i] - other.sets[i]; END;
+		END Difference;
+
+		PROCEDURE SymDifference*(other: IntegerSet);
+		VAR
+			i: LONGINT;
+		BEGIN
+			IF LEN(other.sets) > LEN(sets) THEN Grow(LEN(other.sets)); END;
+			FOR i := 0 TO LEN(other.sets) - 1 DO sets[i] := sets[i] / other.sets[i]; END;
+		END SymDifference;
+
+		OPERATOR "=" * (other: IntegerSet): BOOLEAN;
+		VAR
+			i, len: LONGINT;
+		BEGIN
+			len := MIN(LEN(sets), LEN(other.sets));
+			FOR i := 0 TO len - 1 DO
+				IF sets[i] # other.sets[i] THEN RETURN FALSE; END;
+			END;
+			FOR i := len TO LEN(sets) - 1 DO
+				IF sets[i] # {} THEN RETURN FALSE; END;
+			END;
+			FOR i := len TO LEN(other.sets) - 1 DO
+				IF other.sets[i] # {} THEN RETURN FALSE; END;
+			END;
+			RETURN TRUE;
+		END "=";
+
+		OPERATOR "#" * (other: IntegerSet): BOOLEAN;
+		BEGIN
+			RETURN ~(SELF = other);
+		END "#";
+
+		PROCEDURE Clear*;
+		VAR
+			i: LONGINT;
+		BEGIN
+			FOR i := 0 TO LEN(sets) - 1 DO sets[i] := {}; END;
+		END Clear;
+
+		PROCEDURE Grow(size: LONGINT);
+		VAR
+			new: POINTER TO ARRAY OF SET;
+			i: LONGINT;
+		BEGIN
+			NEW(new, size);
+			FOR i := 0 TO LEN(sets) - 1 DO new[i] := sets[i]; END;
+			sets := new;
+		END Grow;
+	END IntegerSet;
 
 	IntegerObject = OBJECT
 	END IntegerObject;
