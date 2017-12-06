@@ -4,7 +4,7 @@ MODULE UnixFiles;   (** AUTHOR "gf"; PURPOSE "Unix file systems" *)
 
 (*  derived fron (SPARCOberon) Files.Mod by J. Templ 1.12. 89/14.05.93 *)
 
-IMPORT S := SYSTEM, Unix, Kernel, Modules, Log := KernelLog, Files;
+IMPORT S := SYSTEM, Unix, Kernel, Modules, Log := KernelLog, Files, Commands, Tr := Trace;
 
 
 CONST
@@ -361,17 +361,17 @@ TYPE
 									res := Unix.errno( );  
 									RETURN NoDesc;
 								END;
-								n := Unix.read( fdold, ADDRESSOF( buf ), Bufsize );
-								WHILE n > 0 DO
-									r := Unix.write( fdnew, ADDRESSOF( buf ), n );
-									IF r < 0 THEN
-										res := Unix.errno();  
-										r := Unix.close( fdold );  
-										r := Unix.close( fdnew );
-										RETURN NoDesc;
-									END;
-									n := Unix.read( fdold, ADDRESSOF( buf ), Bufsize )
-								END;
+								REPEAT
+									n := UnixRead( fdold, ADDRESSOF( buf ), Bufsize ); 
+									IF n > 0 THEN
+										r := UnixWrite( fdnew, ADDRESSOF( buf ), n );
+										IF r < 0 THEN
+											r := Unix.close( fdold );  
+											r := Unix.close( fdnew );   
+											RETURN NoDesc;
+										END;
+									END
+								UNTIL n = 0;
 								r := Unix.unlink( ADDRESSOF( old ) );
 								r := Unix.close( fdold );
 								r := Unix.close( fdnew );  
@@ -479,7 +479,7 @@ TYPE
 								ELSE  INC( i );  j := 0  
 								END
 							ELSE
-								dirName[j] := searchPath[i];  INC( j );  INC( i )
+								dirName[j] := searchPath[i];  INC( j );  INC( i )    
 							END
 						END
 					END;
@@ -556,7 +556,11 @@ TYPE
 				BEGIN
 					IF buf.chg THEN
 						IF fd = NoDesc THEN  CreateUnixFile  END;
-						IF buf.org # fpos THEN  res := Unix.lseek( fd, buf.org, 0 )  END;
+						IF buf.org # fpos THEN  
+							IF Unix.lseek( fd, buf.org, 0 ) = -1 THEN
+								Halt( SELF, TRUE, "UnixFiles.File.Flush: lseek failed" ) 
+							END 
+						END;
 						res := Unix.write( fd, ADDRESSOF( buf.data ), buf.size );
 						IF res < 0 THEN  Halt( SELF, TRUE, "UnixFiles.File.Flush: write failed" )  END;
 						fpos := buf.org + buf.size;  buf.chg := FALSE;
@@ -596,8 +600,11 @@ TYPE
 							buf.size := 0
 						ELSE
 							IF fd = NoDesc THEN  CreateUnixFile  END;
-							IF fpos # org THEN  res := Unix.lseek( fd, org, 0 )  END;
-							IF res < 0 THEN  Halt( SELF, TRUE, "UnixFiles.File.Set: lseek failed" )  END;
+							IF fpos # org THEN  
+								IF Unix.lseek( fd, org, 0 ) = -1 THEN
+									Halt( SELF, TRUE, "UnixFiles.File.Set: lseek failed" ) 
+								END  
+							END;
 							n := Unix.read( fd, ADDRESSOF( buf.data ), Bufsize );
 							IF n < 0 THEN  
 								IF p < fsize THEN  Halt( SELF, TRUE, "UnixFiles.File.Set: read failed" )  

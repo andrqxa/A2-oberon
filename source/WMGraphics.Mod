@@ -24,10 +24,9 @@ CONST
 	Yellow* = LONGINT(0FFFF00FFH); 
 	Magenta* = LONGINT(0FF00FFFFH); 
 	Cyan* = 00FFFFFFH;
-	
-
 
 TYPE
+	Real* = REAL;
 	Char32 = LONGINT;
 	Point2d* = RECORD x*, y* : LONGINT END;
 	Image* = OBJECT(Raster.Image)
@@ -91,7 +90,7 @@ TYPE
 		END HasChar;
 
 		(** Render an UTF8 string to a canvas *)
-		PROCEDURE RenderString*(canvas : Canvas ; x, y : REAL; CONST text : ARRAY OF CHAR);
+		PROCEDURE RenderString*(canvas : Canvas ; x, y : Real; CONST text : ARRAY OF CHAR);
 		VAR i, len, code : LONGINT; g : GlyphSpacings;
 		BEGIN
 			len := LEN(text); i := 0;
@@ -128,7 +127,7 @@ TYPE
 		END GetStringSize;
 
 		(** Render character char to canvas at x, y (baseline) *)
-		PROCEDURE RenderChar*(canvas : Canvas ; x, y : REAL; char : Char32);
+		PROCEDURE RenderChar*(canvas : Canvas ; x, y : Real; char : Char32);
 		VAR g : GlyphSpacings; img : Image;
 		BEGIN
 			GetGlyphSpacings(char, g);
@@ -258,7 +257,7 @@ TYPE
 			END
 		END DrawString;
 
-		PROCEDURE SetLineWidth*(w:REAL);
+		PROCEDURE SetLineWidth*(w : Real);
 		BEGIN
 			(* Dummy. But is implemented in WMGraphicsGfx *)
 		END SetLineWidth;
@@ -266,7 +265,111 @@ TYPE
 		(** draw a line within the current clipping rectangle *)
 		(** Override for improved speed *)
 		PROCEDURE Line*(x0, y0, x1, y1 : LONGINT; color : Color; mode : LONGINT);
-		VAR t, xi, mi, xf, mf, dt2 : LONGINT;
+		VAR t, xi, mi, xf, mf, dt2, ds2 : LONGINT; r: Rectangles.Rectangle;
+		
+		
+		(* clipped bresenham algorithm according to 
+			Bresenham's Line Generation Algorithm with Built-in Clipping, Yevgeny P. Kuzmin, 1995
+		*)
+		PROCEDURE ClippedLine(x0,y0,x1,y1: LONGINT; r: Rectangle; color : Color; mode : LONGINT);
+		VAR
+			dsx,dsy,stx,sty,xd,yd,dx2,dy2,rem,term,e: LONGINT;
+			tmp: HUGEINT;
+			rev,setx: BOOLEAN;
+		BEGIN
+			(* standardization && trivial reject *)
+			IF( x1 - x0 > 0 ) THEN 
+				IF ( x0 > r.r) OR (x1 < r.l ) THEN RETURN END; 
+				stx := 1; 
+			ELSE 
+				IF ( x1 > r.r) OR ( x0 < r.l ) THEN RETURN END;
+				stx := -1; 
+				x0 :=-x0; x1 :=-x1; 
+				r.l :=-r.l; r.r :=-r.r; 
+				Swap(r.l,r.r); 
+			END;
+
+			IF ( y1 - y0 > 0 ) THEN 
+				IF ( y0 > r.b) OR (y1 < r.t ) THEN RETURN END; 
+				sty:=1; 
+			ELSE 
+				IF ( y1 > r.b) OR (y0 < r.t ) THEN RETURN END; 
+				sty :=-1; 
+				y0 :=-y0; y1 :=-y1; 
+				r.t :=-r.t; r.b :=-r.b; 
+				Swap(r.t,r.b);
+			END; 
+			
+			dsx := x1-x0; dsy := y1-y0; 
+			IF ( dsx < dsy ) THEN
+				rev := TRUE;
+				Swap(x0,y0); Swap(x1,y1); Swap(dsx,dsy); 
+				Swap(r.l,r.t); Swap(r.r,r.b); Swap(stx,sty); 
+			ELSE
+				rev := FALSE;
+			END;
+		
+			(* Bresenham's set up *) 
+			dx2 := 2*dsx; dy2 := 2*dsy; 
+			xd := x0; yd :=y0; 
+			e := 2*dsy-dsx; term := x1; 
+			setx := TRUE;
+			IF (y0 < r.t) THEN
+				(* window horizontal entry *) 
+				tmp := HUGEINT(dx2) *(r.t-y0)-dsx; 
+				INC(xd,LONGINT(tmp DIV dy2));
+				rem := LONGINT(tmp MOD dy2); 
+				IF ( xd>r.r ) THEN RETURN END; 
+				IF ( xd+1>=r.l ) THEN
+					yd := r.t; DEC(e,rem+dsx); 
+					IF (rem>0 ) THEN INC(xd); INC(e,dy2) END; 
+					setx := FALSE;
+				END;
+			END;
+			
+			IF setx & ( x0 < r.l )  THEN
+				(* window vertical entry *) 
+				tmp := HUGEINT(dy2) * (r.l-x0); 
+				INC(yd, LONGINT(tmp DIV dx2)); 
+				rem := LONGINT(tmp MOD dx2); 
+				IF ( yd>r.b) OR (yd=r.b) & (rem>=dsx) THEN RETURN END; 
+				xd :=r.l; INC(e,rem); 
+				IF( rem>=dsx ) THEN INC(yd); DEC(e,dx2) END; 
+			END;
+			
+			IF ( y1 > r.b )  THEN
+				(* window exit *) 
+				tmp := HUGEINT(dx2)*(r.b-y0)+dsx; 
+				term := x0+LONGINT(tmp DIV dy2); 
+				rem := LONGINT(tmp MOD dy2); 
+				IF ( rem=0 ) THEN DEC(term) END;
+			END;
+			IF ( term>r.r) THEN term := r.r; END;
+			INC(term); 
+			IF ( sty =-1 ) THEN yd := -yd END;
+			
+			(* reverse transformation *)
+			IF ( stx =-1 ) THEN xd := -xd; term := -term; END;
+			DEC(dx2,dy2);
+			
+			(* Bresenham's line drawing *) 
+			IF rev THEN
+				WHILE ( xd # term ) DO 
+					SetPixel(yd, xd, color, mode);
+					IF ( e >= 0 ) THEN INC(xd, stx); INC(yd, sty); DEC(e,dx2) 
+					ELSE INC(xd, stx); INC(e, dy2); 
+					END;
+				END;
+			ELSE
+				WHILE ( xd # term ) DO (* Bresenham's line drawing *) 
+						SetPixel(xd,yd, color, mode);
+					IF ( e >= 0 ) THEN INC(xd, stx); INC(yd, sty); DEC(e,dx2) 
+					ELSE INC(xd, stx); INC(e, dy2); 
+					END;
+				END;
+			END;
+		END ClippedLine;
+		
 		BEGIN
 			IF y0 = y1 THEN (* horizontal case *)
 				IF x0 > x1 THEN t := x0; x0 := x1; x1 := t END;
@@ -275,9 +378,25 @@ TYPE
 				IF y0 > y1 THEN t := y0; y0 := y1; y1 := t END;
 				Fill(Rectangles.MakeRect(x0, y0, x0 + 1, y1 + 1), color, mode)
 			ELSE (* general case *)
+				GetClipRect(r);
+				ClippedLine(x0,y0,x1,y1,r,color,mode);
+				(*
 				IF ABS(y1 - y0) > ABS(x1 - x0) THEN
 					IF y0 > y1 THEN t := y0; y0 := y1; y1 := t; t := x0; x0 := x1; x1 := t END;
 					xi := x0; xf :=	y0 - y1; mi := (x1 - x0) DIV (y1 - y0); mf := 2 * ( (x1 - x0) MOD (y1 - y0)); dt2 := 2 * (y1 - y0);
+					GetClipRect(r);
+					IF y0 < r.t THEN 
+						(* this loop should be replaced by a closed expression *)
+						FOR t := y0 TO r.t-1 DO
+							INC(xi, mi); INC(xf, mf);
+							IF xf > 0 THEN INC(xi); DEC(xf, dt2) END
+						END;
+						y0 := r.t;
+					END;
+					IF y1 > r.b THEN
+						y1 := r.b;
+					END;
+					
 					FOR t := y0 TO y1 DO
 						SetPixel(xi, t, color, mode);
 						INC(xi, mi); INC(xf, mf);
@@ -286,14 +405,32 @@ TYPE
 				ELSE
 					IF x0 > x1 THEN t := y0; y0 := y1; y1 := t; t := x0; x0 := x1; x1 := t END;
 					xi := y0; xf :=	x0 - x1; mi := (y1 - y0) DIV (x1 - x0); mf := 2 * ( (y1 - y0) MOD (x1 - x0)); dt2 := 2 * (x1 - x0);
+					GetClipRect(r);
+					IF x0 < r.l THEN 
+						(* this loop should be replaced by a closed expression *)
+						FOR t := x0 TO r.l-1 DO
+							INC(xi, mi); INC(xf, mf);
+							IF xf > 0 THEN INC(xi); DEC(xf, dt2) END
+						END;
+						x0 := r.l;
+					END;
+					IF x1 > r.r THEN
+						x1 := r.r;
+					END;
 					FOR t := x0 TO x1 DO
 						SetPixel(t, xi, color, mode);
 						INC(xi, mi); INC(xf, mf);
 						IF xf > 0 THEN INC(xi); DEC(xf, dt2) END
 					END
 				END
+				*)
 			END
 		END Line;
+		
+		PROCEDURE LineReal*(x0, y0, x1, y1 : Real; color : Color; mode : LONGINT);
+		BEGIN
+			Line(ENTIER(x0),ENTIER(y0),ENTIER(x1),ENTIER(y1),color,mode);
+		END LineReal;
 
 		(** set a pixel within the current clipping rectangle *)
 		PROCEDURE SetPixel*(x, y : LONGINT; color : Color; mode : LONGINT);
@@ -530,8 +667,10 @@ TYPE
 		PROCEDURE DrawImage*(x, y: LONGINT; img: Raster.Image; mode : LONGINT);
 		VAR imgBounds : Rectangle;
 			rm : Raster.Mode;
+			dx, dy: LONGINT;
 		BEGIN
-			IF img = NIL THEN RETURN END;
+			IF (img = NIL) OR (img.adr = NIL) THEN RETURN END;
+			dx := SELF.dx; dy := SELF.dy; (* avoid race below *)
 			imgBounds := MakeRectangle(0, 0, img.width, img.height);
 
 			(* to super coordinates *)
@@ -589,6 +728,12 @@ BEGIN
 	IF a>b THEN RETURN a ELSE RETURN b END
 END Max;
 
+PROCEDURE Swap(VAR a,b: LONGINT);
+VAR t: LONGINT;
+BEGIN
+	t := a; a := b; b := t;
+END Swap;
+
 (* Tool Functions *)
 PROCEDURE MakeRectangle*(l, t, r, b: LONGINT):Rectangle;
 VAR result : Rectangle;
@@ -610,13 +755,23 @@ BEGIN
 END RGBAToColor;
 
 PROCEDURE Dark*(color:Color):Color;
+VAR c:Color;
 BEGIN
-	RETURN LONGINT((color MOD 100000000H+0FFH) DIV 2);
+	c := MAX(0, (color DIV 1000000H) MOD 100H-40H);
+	c := 100H * c + MAX(0, (color DIV 10000H) MOD 100H - 40H);
+	c := 100H * c +MAX(0, (color DIV 100H) MOD 100H-40H);
+	c := 100H * c + color MOD 100H;
+	RETURN LONGINT(c);
 END Dark;
 
 PROCEDURE Light*(color:Color):Color;
+VAR c:Color;
 BEGIN
-	RETURN LONGINT((color MOD 100000000H + 0FFFFFFFFH MOD 100000000H) DIV 2);
+	c := MIN(0FFH, (color DIV 1000000H) MOD 100H + 40H);
+	c := 100H * c + MIN(0FFH, (color DIV 10000H) MOD 100H + 40H);
+	c := 100H * c +MIN(0FFH, (color DIV 100H) MOD 100H + 40H);
+	c := 100H * c + color MOD 100H;
+	RETURN LONGINT(c);
 END Light;
 
 PROCEDURE CheckImage(obj: ANY; VAR cont: BOOLEAN);
@@ -780,7 +935,7 @@ BEGIN { EXCLUSIVE }
 END GetFont;
 
 (** Render the fallback case of the character char to canvas at x, y (baseline) *)
-PROCEDURE FBRenderChar*(canvas : Canvas ; x, y : REAL; char : Char32);
+PROCEDURE FBRenderChar*(canvas : Canvas ; x, y : Real; char : Char32);
 VAR i, w, h : LONGINT; f : Font; found : BOOLEAN; str : ARRAY 16 OF CHAR; r: Rectangles.Rectangle;
 BEGIN
 	i := 0; found := FALSE;

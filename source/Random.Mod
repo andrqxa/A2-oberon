@@ -95,6 +95,21 @@ TYPE
 		BEGIN
 			RETURN -Math.ln(Uniform())/mu
 		END Exp;
+		
+		PROCEDURE Gaussian*(): REAL; (*generates a normal distribution with mean 0, variance 1 using the Box-Muller Transform*)
+		VAR
+			x1,x2,w,y1: REAL;
+		BEGIN
+			REPEAT
+				x1:=2.0*Uniform()-1;
+				x2:=2.0*Uniform()-1;
+				w:=x1*x1+x2*x2;
+			UNTIL w<1;
+			w:=Math.sqrt( (-2.0* Math.ln(w) ) /w);
+			y1:=x1*w;
+			(*y2:=x2*w*)
+			RETURN y1;
+		END Gaussian;
 
 	END Generator;
 
@@ -132,6 +147,12 @@ TYPE
 		BEGIN {EXCLUSIVE}
 			RETURN r.Exp(mu)
 		END Exp;
+		
+		PROCEDURE Gaussian*(): REAL; (*generates a normal distribution with mean 0, variance 1 using the Box-Muller Transform*)
+		BEGIN{EXCLUSIVE}
+			RETURN r.Gaussian();
+		END Gaussian;
+
 
 	END Sequence;
 

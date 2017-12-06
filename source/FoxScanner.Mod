@@ -307,7 +307,7 @@ TYPE
 			position: reference position (offset) of the input stream , for error output
 			diagnostics: error output object
 		*)
-		PROCEDURE & InitializeScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; position: LONGINT; diagnostics: Diagnostics.Diagnostics );
+		PROCEDURE & InitializeScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; pos: Position; diagnostics: Diagnostics.Diagnostics );
 		BEGIN
 			NEW(stringMaker,1024);
 			stringWriter := stringMaker.GetWriter();
@@ -319,15 +319,14 @@ TYPE
 			ch := " ";
 			case := Unknown;
 			firstIdentifier := TRUE;
+			SELF.position := pos; 
+			DEC(position.start, 1); (* one symbol lookahead *)
 			IF reader = NIL THEN ch := EOT ELSE 	GetNextCharacter END;
 			IF Trace THEN D.Str( "New scanner  " );   D.Ln;  END;
-			SELF.position.start := position;
-			SELF.position.line := 1;
-			SELF.position.linepos := 0;
 			IF source = "" THEN SELF.position.reader := reader END; 
 			useLineNumbers := FALSE;
 		END InitializeScanner;
-
+		
 		PROCEDURE ResetCase*; (*! needs a better naming ! *)
 		BEGIN
 			firstIdentifier := TRUE; case := Unknown;
@@ -638,27 +637,61 @@ TYPE
 				ELSE Error( Basic.NumberIllegalCharacter );  RETURN 0
 				END
 			END Hexadecimal;
+			
+			PROCEDURE IsHexDigit(ch: CHAR): BOOLEAN;
+			BEGIN
+				RETURN (ch >= "0") & (ch <= "9") OR (ch >= "a") & (ch <="f") OR (ch >= "A") & (ch <= "F") 
+			END IsHexDigit;
+
+			PROCEDURE IsBinaryDigit(ch: CHAR): BOOLEAN;
+			BEGIN
+				RETURN (ch >= "0") & (ch <= "1") 
+			END IsBinaryDigit;
+			
 
 		BEGIN  (* ("0" <= ch) & (ch <= "9") *)
 			result := Number;
 			i := 0;  m := 0;  n := 0;  d := 0;  si := 0;  long := FALSE;
 			
-			IF (ch = "0") & (reader.Peek() = "x") THEN (* hex number *)
-				digits := 0;
-				GetNextCharacter; GetNextCharacter;
-				WHILE (ch >= "0") & (ch <= "9") OR (ch >= "a") & (ch <="f") OR (ch >= "A") & (ch <= "F") DO
-					number := number * 10H + Hexadecimal(ch);
-					INC(digits);
-					GetNextCharacter;
+			IF (ch = "0") THEN
+				IF (reader.Peek() = "x") THEN (* hex number *)
+					digits := 0;
+					GetNextCharacter; GetNextCharacter;
+					IF (ch = "'")& IsHexDigit(reader.Peek())  THEN GetNextCharacter END;
+					WHILE IsHexDigit(ch) DO
+						number := number * 10H + Hexadecimal(ch);
+						INC(digits);
+						GetNextCharacter;
+						IF (ch = "'") & IsHexDigit(reader.Peek()) THEN GetNextCharacter END;
+					END;
+					symbol.hugeint := number;
+					symbol.integer := SHORT(number);
+					IF (digits > MaxHexDigits) OR (digits = MaxHexDigits) & (number > MAX(LONGINT)) THEN
+						symbol.numberType := Hugeint
+					ELSE
+						symbol.numberType := Integer
+					END;
+					RETURN result;
+				ELSIF reader.Peek() = "b" THEN (* binary number *)
+					digits := 0;
+					GetNextCharacter; GetNextCharacter;
+					IF (ch = "'") & IsBinaryDigit(reader.Peek()) THEN GetNextCharacter END;
+					WHILE IsBinaryDigit(ch) DO
+						number := number * 2;
+						INC(digits);
+						IF ch = "1" THEN INC(number) END;
+						GetNextCharacter;
+						IF (ch = "'") & IsBinaryDigit(reader.Peek()) THEN GetNextCharacter END;
+					END;
+					symbol.hugeint := number;
+					symbol.integer := SHORT(number);
+					IF digits > 32 THEN
+						symbol.numberType := Hugeint
+					ELSE
+						symbol.numberType := Integer
+					END;
+					RETURN result;
 				END;
-				symbol.hugeint := number;
-				symbol.integer := SHORT(number);
-				IF digits > MaxHexDigits THEN
-					symbol.numberType := Hugeint
-				ELSE
-					symbol.numberType := Integer
-				END;
-				RETURN result;
 			END;
 			
 			LOOP  (* read mantissa *)
@@ -674,6 +707,7 @@ TYPE
 					ELSIF d = 0 THEN  (* i > 0 *) d := i
 					ELSE Error( Basic.NumberIllegalCharacter )
 					END
+				ELSIF ch = "'" THEN GetNextCharacter; (* ignore *)
 				ELSE EXIT
 				END
 			END;   (* 0 <= n <= m <= i, 0 <= d <= i *)
@@ -989,9 +1023,10 @@ TYPE
 		Identifier		= '@' | Letter {'@' | '.' | Letter | Digit | '_'} .
 		Letter 				= 'A' | 'B' | .. |  'Z' | 'a' | 'b' |  .. | 'z' .
 		Digit 				= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'.
+		BinaryDigit 	= '0' | '1' .
 		Number			= Integer | Real.
 		Character		= Digit [HexDigit] 'X'.
-		Integer			=  Digit {Digit} | Digit {HexDigit} 'H' | '0x' {HexDigit}.
+		Integer			=  Digit {Digit} | Digit {HexDigit} 'H' | '0x' {HexDigit} | '0b' {BinaryDigit}.
 		Real					= Digit {Digit} '.' {Digit} [ScaleFactor].
 		ScaleFactor	= ('E' | 'D') ['+' | '-'] digit {digit}.
 		HexDigit		= Digit | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'.
@@ -1001,7 +1036,7 @@ TYPE
 	VAR
 		startContext-: Context;
 
-		PROCEDURE &InitAssemblerScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; position: LONGINT; diagnostics: Diagnostics.Diagnostics );
+		PROCEDURE &InitAssemblerScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; position: Position; diagnostics: Diagnostics.Diagnostics );
 		BEGIN
 			InitializeScanner(source,reader,position,diagnostics);
 			GetContext(startContext);
@@ -1058,59 +1093,6 @@ TYPE
 			IF i = MaxIdentifierLength THEN Error( Basic.IdentifierTooLong );  DEC( i ) END;
 			symbol.identifierString[i] := 0X;
 		END GetIdentifier;
-
-		PROCEDURE GetNumber(VAR symbol: Symbol): Token;
-		VAR number: HUGEINT; result: Token; digits: LONGINT;
-
-			(** return hexadecimal number associated to character ch, error if none **)
-			PROCEDURE Hexadecimal( ch: CHAR ): LONGINT;
-			BEGIN
-				IF (ch >= "0") & (ch <= "9") THEN RETURN ORD( ch ) - ORD( "0" )
-				ELSIF (ch >= "a") & (ch <= "f") THEN RETURN ORD( ch ) - ORD( "a" ) + 10
-				ELSE Error( Basic.NumberIllegalCharacter );  RETURN 0
-				END
-			END Hexadecimal;
-
-		BEGIN
-			result := Number;
-			IF (ch = "0") THEN
-				IF reader.Peek() = "x" THEN (* hex number *)
-					digits := 0;
-					GetNextCharacter; GetNextCharacter;
-					WHILE (ch >= "0") & (ch <= "9") OR (ch >= "a") & (ch <="f") DO
-						number := number * 10H + Hexadecimal(ch);
-						INC(digits);
-						GetNextCharacter;
-					END;
-					symbol.hugeint := number;
-					symbol.integer := SHORT(number);
-					IF digits > MaxHexDigits THEN
-						symbol.numberType := Hugeint
-					ELSE
-						symbol.numberType := Integer
-					END;
-				ELSIF reader.Peek() = "b" THEN (* binary number *)
-					digits := 0;
-					GetNextCharacter; GetNextCharacter;
-					WHILE (ch >= "0") & (ch <= "1") DO
-						number := number * 2;
-						INC(digits);
-						IF ch = "1" THEN INC(number) END;
-						GetNextCharacter;
-					END;
-					symbol.hugeint := number;
-					symbol.integer := SHORT(number);
-					IF digits > 32 THEN
-						symbol.numberType := Hugeint
-					ELSE
-						symbol.numberType := Integer
-					END;
-				ELSE RETURN GetNumber^(symbol)
-				END;
-			ELSE RETURN GetNumber^(symbol)
-			END;
-			RETURN result
-		END GetNumber;
 
 		(** get next symbol **)
 		PROCEDURE GetNextSymbol*(VAR symbol: Symbol ): BOOLEAN;
@@ -1190,15 +1172,23 @@ TYPE
 
 	(** return a new scanner on a stream, error output via diagnostics  **)
 	PROCEDURE NewScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; position: LONGINT; diagnostics: Diagnostics.Diagnostics ): Scanner;
-	VAR s: Scanner;
+	VAR s: Scanner; pos: Position; 
 	BEGIN
-		NEW( s, source, reader, position, diagnostics );  RETURN s;
+		pos.start := position;
+		pos.end := position;
+		pos.line := 1;
+		pos.linepos := 0;
+		NEW( s, source, reader, pos, diagnostics );  RETURN s;
 	END NewScanner;
 
 	PROCEDURE NewAssemblerScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; position: LONGINT; diagnostics: Diagnostics.Diagnostics ): AssemblerScanner;
-	VAR s: AssemblerScanner;
+	VAR s: AssemblerScanner;pos: Position; 
 	BEGIN
-		NEW( s, source, reader, position, diagnostics );  RETURN s;
+		pos.start := position;
+		pos.end := position;
+		pos.line := 1;
+		pos.linepos := 0;
+		NEW( s, source, reader, pos, diagnostics );  RETURN s;
 	END NewAssemblerScanner;
 
 	PROCEDURE SymbolToString*(CONST symbol: Symbol; case: LONGINT; VAR str: ARRAY OF CHAR);

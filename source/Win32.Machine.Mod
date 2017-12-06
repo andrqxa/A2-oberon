@@ -24,6 +24,7 @@ CONST
 	AddressSize = SIZEOF(ADDRESS);
 	StaticBlockSize = 32;		(* static heap block size *)
 	BlockHeaderSize = 2 * AddressSize;
+	(* change this when Heaps.HeapBlock is modified *)
 	RecordDescSize = 4 * AddressSize;  (* needs to be adapted in case Heaps.RecordBlockDesc is changed *)
 
 (** standard lock levels (in order) *)  (* also refer to Traps.Show *)
@@ -44,7 +45,7 @@ CONST
 	EndBlockOfs = 38H;	(* cf. Linker0 *)
 	MemoryBlockOfs = BlockHeaderSize + RecordDescSize + BlockHeaderSize; (* memory block (including header) starts at offset HeaderSize *)
 
-	MemBlockSize = 4*1024*1024; (* must be multiple of StaticBlockSize *)
+	MemBlockSize = 32*1024*1024; (* must be multiple of StaticBlockSize *)
 	MinMemBlockSize = 4*1024*1024;
 
 	NilVal = 0;
@@ -432,7 +433,7 @@ END TraceChar;
 PROCEDURE SetTraceFile(VAR filename: ARRAY OF CHAR);
 BEGIN
 	Trace.String("trace -> file "); Trace.String(filename); Trace.Ln;
-	hout := Kernel32.CreateFile(filename, {Kernel32.GenericWrite}, {Kernel32.FileShareRead}, NIL, Kernel32.CreateAlways, {Kernel32.FileAttributeNormal}, Kernel32.NULL);
+	hout := Kernel32.CreateFile(filename, Kernel32.SetToDW({Kernel32.GenericWrite}), Kernel32.SetToDW({Kernel32.FileShareRead}), NIL, Kernel32.CreateAlways, Kernel32.SetToDW({Kernel32.FileAttributeNormal}), Kernel32.NULL);
 	Kernel32.GetFullPathName(filename, LEN(filename), filename, NIL);
 	Trace.Char := TraceChar;
 END SetTraceFile;
@@ -568,7 +569,7 @@ BEGIN
 		ToExecutablePath(DefaultConfigFile, defaultConfigFile);
 	END;
 	COPY(UserConfigFile, userConfigFile);
-	hfile := Kernel32.CreateFile( userConfigFile, {Kernel32.GenericRead}, {Kernel32.FileShareRead}, NIL , Kernel32.OpenExisting, {Kernel32.FileAttributeNormal}, 0 );
+	hfile := Kernel32.CreateFile( userConfigFile, Kernel32.SetToDW({Kernel32.GenericRead}), Kernel32.SetToDW({Kernel32.FileShareRead}), NIL , Kernel32.OpenExisting, Kernel32.SetToDW({Kernel32.FileAttributeNormal}), 0 );
 	IF hfile = Kernel32.InvalidHandleValue THEN
 		ToExecutablePath(UserConfigFile, userConfigFile);
 	ELSE
@@ -702,9 +703,9 @@ BEGIN
 	IF memBlkSize < MemBlockSize THEN memBlkSize := MemBlockSize END; 	(* MemBlockSize implicitly multiple of StaticBlockSize *)
 
 	initVal := 8*1024*1024;
-	adr := Kernel32.VirtualAlloc(initVal, memBlkSize, {Kernel32.MEMCommit, Kernel32.MEMReserve}, {Kernel32.PageExecuteReadWrite});
+	adr := Kernel32.VirtualAlloc(initVal, memBlkSize, Kernel32.SetToDW({Kernel32.MEMCommit, Kernel32.MEMReserve}), Kernel32.SetToDW({Kernel32.PageExecuteReadWrite}));
 	IF adr = NilVal THEN (* allocation failed *)
-		adr := Kernel32.VirtualAlloc(NilVal, memBlkSize, {Kernel32.MEMCommit}, {Kernel32.PageExecuteReadWrite});
+		adr := Kernel32.VirtualAlloc(NilVal, memBlkSize, Kernel32.SetToDW({Kernel32.MEMCommit}), Kernel32.SetToDW({Kernel32.PageExecuteReadWrite}));
 	END;
 	Trace.String("first heap block intVal "); Trace.Int(initVal,1); Trace.Ln;
 	Trace.String("first heap block memBlkSize "); Trace.Int(memBlkSize,1); Trace.Ln;
@@ -737,10 +738,12 @@ BEGIN
 	SYSTEM.PUT(beginBlockAdr,0);
 	SYSTEM.PUT(beginBlockAdr+AddressSize,0);
 	SYSTEM.PUT(beginBlockAdr+2*AddressSize,0);
+	(* change this when Heaps.HeapBlock is modified *)
 	SYSTEM.PUT(beginBlockAdr+3*AddressSize,beginBlockAdr+7*AddressSize);
 	SYSTEM.PUT(beginBlockAdr+4*AddressSize,endBlockAdr-beginBlockAdr);
 	SYSTEM.PUT(beginBlockAdr+5*AddressSize,beginBlockAdr+2*AddressSize);
 	SYSTEM.PUT(beginBlockAdr+6*AddressSize,0);
+
 
 	memoryBlock := memBlock;
 END InitHeap;
@@ -846,9 +849,9 @@ BEGIN
 	memBlkSize := memDescSize + size + StaticBlockSize; 		(* add StaticBlockSize to account for alignments different from multiples of StaticBlockSize *)
 	INC(memBlkSize, (-memBlkSize) MOD MemBlockSize);
 	initVal := memBlockTail.startAdr + memBlockTail.size;
-	adr := Kernel32.VirtualAlloc(initVal, memBlkSize, {Kernel32.MEMCommit, Kernel32.MEMReserve}, {Kernel32.PageExecuteReadWrite});
+	adr := Kernel32.VirtualAlloc(initVal, memBlkSize, Kernel32.SetToDW({Kernel32.MEMCommit, Kernel32.MEMReserve}), Kernel32.SetToDW({Kernel32.PageExecuteReadWrite}));
 	IF adr = NilVal THEN (* allocation failed *)
-		adr := Kernel32.VirtualAlloc(NilVal, memBlkSize, {Kernel32.MEMCommit}, {Kernel32.PageExecuteReadWrite});
+		adr := Kernel32.VirtualAlloc(NilVal, memBlkSize, Kernel32.SetToDW({Kernel32.MEMCommit}), Kernel32.SetToDW({Kernel32.PageExecuteReadWrite}));
 	END;
 	continue := adr = initVal;
 	Trace.String("expand heap block intVal "); Trace.Int(initVal,1); Trace.Ln;
@@ -932,8 +935,8 @@ BEGIN
 		END;
 		memBlock.next := NIL;
 		startAdr := memBlock.startAdr; (* this value must be cached for the second call of Kernel32.VirtualFree *)
-		Kernel32.VirtualFree(SYSTEM.VAL(LONGINT, memBlock.startAdr), memBlock.size, {Kernel32.MEMDecommit});
-		Kernel32.VirtualFree(SYSTEM.VAL(LONGINT, startAdr ), 0, {Kernel32.MEMRelease});
+		Kernel32.VirtualFree(SYSTEM.VAL(LONGINT, memBlock.startAdr), memBlock.size, Kernel32.SetToDW({Kernel32.MEMDecommit}));
+		Kernel32.VirtualFree(SYSTEM.VAL(LONGINT, startAdr ), 0, Kernel32.SetToDW({Kernel32.MEMRelease}));
 	ELSE
 		HALT(535)	(* error in memory block management *)
 	END;
@@ -1101,4 +1104,3 @@ BEGIN
 		Init
 	END;
 END Machine.
-

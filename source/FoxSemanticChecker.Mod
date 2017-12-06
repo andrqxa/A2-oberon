@@ -83,6 +83,7 @@ TYPE
 		typeFixes, pointerFixes: LateFixList;
 		importCache-: SyntaxTree.ModuleScope; (* contains global imports, did not take ImportList as it was much slower, for whatever reasons *)
 		arrayBaseImported: BOOLEAN;
+		complexNumbersImported: BOOLEAN;
 		phase: LONGINT;
 		system-: Global.System;
 		symbolFileFormat-: Formats.SymbolFileFormat;
@@ -127,6 +128,7 @@ TYPE
 			IF importCache = NIL THEN importCache := SyntaxTree.NewModuleScope() END;
 			SELF.importCache := importCache;
 			arrayBaseImported := FALSE;
+			complexNumbersImported := FALSE;
 			SELF.VerboseErrorMessage := verboseErrorMessage;
 			global := NIL;
 			phase := UndefinedPhase;
@@ -723,6 +725,7 @@ TYPE
 				x.SetPlain(HasFlag(modifiers,Global.NamePlain,position));
 				x.SetDisposable(HasFlag(modifiers,Global.NameDisposable, position));
 				x.SetUnsafe(HasFlag(modifiers,Global.NameUnsafe,position));
+				x.SetUntraced(HasFlag(modifiers,Global.NameUntraced,position));
 				(* inheritance cycle check
 					example:
 					A=POINTER TO RECORD(B) END;
@@ -1413,8 +1416,8 @@ TYPE
 		END TwoToThePowerOf;
 
 		(** check if a LEN operator has a correct signature. i.e.
-		for non-tensors: 'OPERATOR "LEN"(): ARRAY [<Dimensionality>] OF LONGINT;'
-		for tensors (or non-tensors): 'OPERATOR "LEN"(): ARRAY [*] OF LONGINT;'
+		for non-tensors: 'OPERATOR "LEN"(): ARRAY [<Dimensionality>] OF <LENTYPE>;'
+		for tensors (or non-tensors): 'OPERATOR "LEN"(): ARRAY [*] OF <LENTYPE>;'
 		**)
 		PROCEDURE CheckLenOperator(operator: SyntaxTree.Operator; arrayStructure: SyntaxTree.MathArrayType): BOOLEAN;
 		VAR
@@ -1427,7 +1430,7 @@ TYPE
 			IF (procedureType.numberParameters = 0) THEN
 				IF (procedureType.returnType # NIL) & (procedureType.returnType.resolved IS SyntaxTree.MathArrayType) THEN
 					returnedArrayType := procedureType.returnType.resolved(SyntaxTree.MathArrayType);
-					IF system.longintType.SameType(returnedArrayType.arrayBase.resolved) THEN
+					IF system.lenType.SameType(returnedArrayType.arrayBase.resolved) THEN
 						IF returnedArrayType.form = SyntaxTree.Open THEN
 							(* ARRAY [*] OF LONGINT: acceptable for both tensors and non-tensors *)
 							result := TRUE
@@ -1971,7 +1974,7 @@ TYPE
 
 					(* guaranteed by VisitRangeExpression: *)
 					ASSERT((left # NIL) & (right # NIL));
-					ASSERT(system.longintType.SameType(left.type.resolved) & system.longintType.SameType(right.type.resolved));
+					ASSERT(system.lenType.SameType(left.type.resolved) & system.lenType.SameType(right.type.resolved));
 
 				ELSE
 					(* the element is not a range expression *)
@@ -2807,13 +2810,19 @@ TYPE
 					END
 				END;
 			ELSE
+				IF ~complexNumbersImported THEN
+					IF (leftExpression # NIL) & IsComplexType(leftExpression.type) 
+						OR (rightExpression # NIL) & IsComplexType(rightExpression.type)
+					THEN
+						(* operators on complex numbers *)
+						ImportModule(Global.ComplexNumbersName,position);
+						complexNumbersImported := TRUE;
+					END;
+				END;
+				
 				(* import OCArrayBase if needed *)
 				IF ~arrayBaseImported THEN
-					IF (leftExpression # NIL) & IsComplexType(leftExpression.type) THEN
-						(* operators on complex numbers *)
-						ImportModule(Global.ArrayBaseName,position);
-						arrayBaseImported := TRUE;
-					ELSIF (leftExpression # NIL) & IsMathArrayType(leftExpression.type) OR (rightExpression # NIL) & IsMathArrayType(rightExpression.type) THEN
+					IF (leftExpression # NIL) & IsMathArrayType(leftExpression.type) OR (rightExpression # NIL) & IsMathArrayType(rightExpression.type) THEN
 						IF op = Global.Dim THEN
 							(* not existing in OCArrayBase *)
 						ELSIF (op = Global.Len) & (rightExpression # NIL) THEN
@@ -3051,6 +3060,12 @@ TYPE
 				(* IsPointerType(leftType) OR ~IsPointerType(rightType) THEN *)
 					Error(binaryExpression.position,"incompatible operands");
 					IF VerboseErrorMessage THEN Printout.Info("leftType",leftType); Printout.Info("right",rightType) END
+				ELSIF (operator = Scanner.Plus) OR (operator = Scanner.Minus) THEN
+					left := NewConversion(left.position, left, system.addressType, NIL);
+					right := NewConversion(right.position, right, system.addressType, NIL);
+					binaryExpression.SetLeft(left);
+					binaryExpression.SetRight(right);
+					type := system.addressType;
 				ELSIF (operator = Scanner.Equal) OR (operator = Scanner.Unequal) THEN
 					ConvertOperands(left, right);
 					binaryExpression.SetLeft(left);
@@ -3409,7 +3424,7 @@ TYPE
 					hasError := TRUE
 				ELSE
 					first := ResolveExpression(first);
-					IF ~(first.type.resolved IS SyntaxTree.IntegerType) & ~IsCharacterType(first.type.resolved) THEN
+					IF ~IsIntegerType(first.type.resolved) & ~IsCharacterType(first.type.resolved) THEN
 						Error(first.position, "lower bound not integer or character");
 						hasError := TRUE
 					ELSE
@@ -3431,8 +3446,8 @@ TYPE
 					first := SyntaxTree.NewIntegerValue(x.position, 0);
 				END;
 				first := ResolveExpression(first);
-				IF first.type.resolved IS SyntaxTree.IntegerType THEN
-					first := NewConversion(first.position, first, system.longintType, NIL)
+				IF IsIntegerType(first.type.resolved)  THEN
+					first := NewConversion(first.position, first, system.lenType, NIL)
 				ELSE
 					Error(first.position, "lower bound not integer");
 					hasError := TRUE
@@ -3446,7 +3461,7 @@ TYPE
 					hasError := TRUE
 				ELSE
 					last := ResolveExpression(last);
-					IF ~(last.type.resolved IS SyntaxTree.IntegerType) & ~IsCharacterType(last.type.resolved) THEN
+					IF ~IsIntegerType(last.type.resolved) & ~IsCharacterType(last.type.resolved) THEN
 						Error(last.position, "lower bound not integer or character");
 						hasError := TRUE
 					ELSE
@@ -3479,8 +3494,8 @@ TYPE
 					END
 				END;
 				last := ResolveExpression(last);
-				IF last.type.resolved IS SyntaxTree.IntegerType THEN
-					last := NewConversion(last.position, last, system.longintType, NIL)
+				IF IsIntegerType(last.type.resolved) THEN
+					last := NewConversion(last.position, last, system.lenType, NIL)
 				ELSE
 					Error(last.position, "upper bound not integer");
 					hasError := TRUE
@@ -3493,8 +3508,8 @@ TYPE
 					step := SyntaxTree.NewIntegerValue(x.position, 1)
 				END;
 				step := ResolveExpression(step);
-				IF step.type.resolved IS SyntaxTree.IntegerType THEN
-					step := NewConversion(step.position, step, system.longintType, NIL)
+				IF IsIntegerType(step.type.resolved) THEN
+					step := NewConversion(step.position, step, system.lenType, NIL)
 				ELSE
 					Error(step.position, "step size not integer");
 					hasError := TRUE
@@ -3871,7 +3886,7 @@ TYPE
 				indexDesignator.parameters.AddExpression(indexListItem);
 				indexDesignator.SetType(SyntaxTree.NewMathArrayType(position, NIL, SyntaxTree.Tensor))
 
-			ELSIF indexListItem.type.resolved IS SyntaxTree.IntegerType THEN
+			ELSIF IsIntegerType(indexListItem.type.resolved) THEN
 				IndexCheck(indexListItem, sourceArray.length);
 				indexListItem := NewConversion(Basic.invalidPosition, indexListItem, system.sizeType, NIL);
 				indexDesignator.parameters.AddExpression(indexListItem)
@@ -3902,9 +3917,9 @@ TYPE
 
 					(* add conversions to size type *)
 					(* TODO: needed? *)
-					rangeExpression.SetFirst(NewConversion(Basic.invalidPosition, first, system.sizeType, NIL));
-					rangeExpression.SetLast(NewConversion(Basic.invalidPosition, last, system.sizeType, NIL));
-					rangeExpression.SetStep(NewConversion(Basic.invalidPosition, step, system.sizeType, NIL));
+					rangeExpression.SetFirst(NewConversion(Basic.invalidPosition, first, system.lenType, NIL));
+					rangeExpression.SetLast(NewConversion(Basic.invalidPosition, last, system.lenType, NIL));
+					rangeExpression.SetStep(NewConversion(Basic.invalidPosition, step, system.lenType, NIL));
 				END;
 
 				IF indexDesignator.hasTensorRange THEN
@@ -4225,6 +4240,7 @@ TYPE
 		PROCEDURE NewObjectOperatorCall*(position: Position; left: SyntaxTree.Expression; oper: LONGINT; parameters: SyntaxTree.ExpressionList; rhs: SyntaxTree.Expression): SyntaxTree.Designator;
 		VAR type: SyntaxTree.Type; expression: SyntaxTree.Expression; op: SyntaxTree.Operator; recordType: SyntaxTree.RecordType;
 			actualParameters: SyntaxTree.ExpressionList; i: LONGINT; result: SyntaxTree.Designator;
+			pointer: BOOLEAN; designator: SyntaxTree.Designator;
 
 			PROCEDURE FindOperator(recordType: SyntaxTree.RecordType; identifier: SyntaxTree.Identifier; actualParameters: SyntaxTree.ExpressionList): SyntaxTree.Operator;
 			VAR bestOperator: SyntaxTree.Operator; bestDistance: LONGINT; numberParameters: LONGINT; procedureType: SyntaxTree.ProcedureType;
@@ -4270,8 +4286,14 @@ TYPE
 			END FindOperator;
 		BEGIN
 			type := left.type.resolved;
-			IF ~(type IS SyntaxTree.PointerType) THEN RETURN NIL END;
-			recordType := type(SyntaxTree.PointerType).pointerBase.resolved(SyntaxTree.RecordType);
+			IF type IS SyntaxTree.RecordType THEN
+				pointer := FALSE;
+				recordType := type(SyntaxTree.RecordType);
+			ELSE
+				pointer := TRUE;
+				IF ~(type IS SyntaxTree.PointerType) THEN RETURN NIL END;
+				recordType := type(SyntaxTree.PointerType).pointerBase.resolved(SyntaxTree.RecordType);
+			END;
 
 			actualParameters := SyntaxTree.NewExpressionList();
 			IF parameters # NIL THEN
@@ -4284,7 +4306,9 @@ TYPE
 
 			op := FindOperator(recordType, SyntaxTree.NewIdentifier("[]"), actualParameters);
 			IF op # NIL THEN
-				expression := NewSymbolDesignator(position, NewDereferenceDesignator(Basic.invalidPosition, left(SyntaxTree.Designator)) , op);
+				designator := left(SyntaxTree.Designator);
+				IF pointer THEN designator := NewDereferenceDesignator(Basic.invalidPosition, designator) END;
+				expression := NewSymbolDesignator(position, designator , op);
 				ASSERT(expression IS SyntaxTree.Designator);
 				result := NewProcedureCallDesignator(position, expression(SyntaxTree.Designator), actualParameters);
 				result.SetRelatedAsot(left);
@@ -4394,7 +4418,9 @@ TYPE
 				indexDesignator := NIL;
 
 				(*!!! clean up *)
-				IF (type IS SyntaxTree.PointerType) & (type(SyntaxTree.PointerType).pointerBase.resolved IS SyntaxTree.RecordType) & ~IsArrayStructuredObjectType(type) THEN
+				IF (type IS SyntaxTree.PointerType) & (type(SyntaxTree.PointerType).pointerBase.resolved IS SyntaxTree.RecordType) & ~IsArrayStructuredObjectType(type) 
+					OR (type IS SyntaxTree.RecordType)
+				THEN
 					resolvedExpression := NewObjectOperatorCall(bracketDesignator.position, designator, 0, bracketDesignator.parameters,bracketDesignator.relatedRhs);
 					IF resolvedExpression = NIL THEN 
 						Error(bracketDesignator.position,"undefined operator");
@@ -5261,7 +5287,7 @@ TYPE
 								REPEAT
 									actualParameter := actualParameters.GetExpression(i);
 									IF CheckSizeType(actualParameter) THEN
-										actualParameter := NewConversion(Basic.invalidPosition,actualParameter,system.longintType,NIL);
+										actualParameter := NewConversion(Basic.invalidPosition,actualParameter,system.lenType,NIL);
 										actualParameters.SetExpression(i,actualParameter);
 									END;
 									INC(i);
@@ -5330,9 +5356,9 @@ TYPE
 									END;
 
 									parameterType := SyntaxTree.NewMathArrayType(Basic.invalidPosition,currentScope,SyntaxTree.Open);
-									parameterType(SyntaxTree.MathArrayType).SetArrayBase(system.longintType);
+									parameterType(SyntaxTree.MathArrayType).SetArrayBase(system.lenType);
 									IF ~CompatibleTo(system,type1,parameterType) THEN
-										Error(parameter1.position,"parameter incompatible to math array of longint");
+										Error(parameter1.position,"parameter incompatible to math array len type");
 										result := SyntaxTree.invalidExpression;
 									ELSE
 										parameter1 := NewConversion(Basic.invalidPosition,parameter1,parameterType,NIL); actualParameters.SetExpression(1,parameter1);
@@ -5511,7 +5537,7 @@ TYPE
 					END;
 				(* ---- LEN ----- *)
 				ELSIF (id = Global.Len) & CheckArity(1,2) THEN
-					type := system.longintType;
+					type := system.lenType;
 					base := type0;
 
 					IF (base IS SyntaxTree.PointerType) & (parameter0 IS SyntaxTree.Designator) THEN
@@ -5546,7 +5572,7 @@ TYPE
 							END;
 						END;
 						IF numberActualParameters=2 THEN
-							parameter1 := NewConversion(parameter1.position,parameter1,system.longintType,NIL);
+							parameter1 := NewConversion(parameter1.position,parameter1,system.lenType,NIL);
 							actualParameters.SetExpression(1,parameter1);
 						ELSIF base IS SyntaxTree.MathArrayType THEN
 							Error(position, "missing dimension specification");
@@ -5573,23 +5599,23 @@ TYPE
 							END;
 						END;
 					ELSE
-						type := system.longintType;
+						type := system.lenType;
 					END;
 				(* ---- FIRST ---- *)
 				ELSIF (id = Global.First) & CheckArity(1,1) THEN
-					type := system.longintType;
+					type := system.lenType;
 					IF CheckRangeType(parameter0) THEN END;
 					result.SetAssignable(parameter0.assignable)
 
 				(* ---- LAST ---- *)
 				ELSIF (id = Global.Last) & CheckArity(1,1) THEN
-					type := system.longintType;
+					type := system.lenType;
 					IF CheckRangeType(parameter0) THEN END;
 					result.SetAssignable(parameter0.assignable)
 
 				(* ---- STEP ---- *)
 				ELSIF (id = Global.Step) & CheckArity(1,1) THEN
-					type := system.longintType;
+					type := system.lenType;
 					IF CheckRangeType(parameter0) THEN END;
 					result.SetAssignable(parameter0.assignable)
 
@@ -5981,7 +6007,7 @@ TYPE
 					type := system.addressType
 				(* ---- INCR ----- *)
 				ELSIF (id = Global.Incr) & CheckArity(1,2) THEN
-					type := system.sizeType;
+					type := system.lenType;
 					base := type0;
 					IF (numberActualParameters =2) & CheckSizeType(parameter1) THEN
 						IF ~IsIntegerValue(parameter1,i1) THEN i1 := 0 END;
@@ -5999,17 +6025,17 @@ TYPE
 								base := SyntaxTree.invalidType;
 							END;
 						END;
-						parameter1 := NewConversion(parameter1.position,parameter1,system.longintType,NIL);
+						parameter1 := NewConversion(parameter1.position,parameter1,system.lenType,NIL);
 						actualParameters.SetExpression(1,parameter1);
 						IF (numberActualParameters =2) & (parameter1 IS SyntaxTree.IntegerValue) THEN
 							mathArrayType := base(SyntaxTree.MathArrayType);
 							IF (mathArrayType.form = SyntaxTree.Static) THEN
 								result := SyntaxTree.NewIntegerValue(position,ToMemoryUnits(system,mathArrayType.staticIncrementInBits));
-								type := system.longintType;
+								type := system.lenType;
 							END;
 						END;
 					ELSE
-						type := system.longintType;
+						type := system.lenType;
 					END;
 
 
@@ -6021,7 +6047,7 @@ TYPE
 					Error(position, "all operator not applicable");
 				(* ---- DIM ----- *)
 				ELSIF (id = Global.Dim) & CheckArity(1,1) THEN
-					type := system.sizeType;
+					type := system.lenType;
 					IF type0 IS SyntaxTree.MathArrayType THEN
 						IF type0(SyntaxTree.MathArrayType).form # SyntaxTree.Tensor THEN
 							i := Dimension(type0,{SyntaxTree.Open,SyntaxTree.Static});
@@ -6784,6 +6810,10 @@ TYPE
 						END;
 					END;
 				END;
+				IF (parameter.kind = SyntaxTree.ValueParameter) & IsMathArrayType(parameter.type)THEN 
+					Error(parameter.position, "forbidden value parameter of math array type ");
+				END; 
+				
 				IF HasFlag(modifiers, Global.NameUntraced,position) THEN
 					parameter.SetUntraced(TRUE);
 					IF ~ContainsPointer(parameter.type) THEN
@@ -6882,6 +6912,8 @@ TYPE
 				IF HasValue(modifiers, Global.NameFingerprint, position, value) THEN 
 					SyntaxTree.InitFingerPrint(fp);
 					fp.shallow := value;
+					fp.public := value;
+					fp.private := value;
 					fp.shallowAvailable := TRUE;
 					procedure.SetFingerPrint(fp);
 				END;
@@ -7080,7 +7112,7 @@ TYPE
 						END;
 
 						(* check whether at least one of the operand types is declared in the current module (this check is skipped for the module FoxArrayBase) *)
-						IF currentScope.ownerModule.name # Global.ArrayBaseName THEN
+						IF (currentScope.ownerModule.name # Global.ArrayBaseName) & (currentScope.ownerModule.name # Global.ComplexNumbersName) THEN
 							IF ~(IsLocallyDefined(leftType) OR IsLocallyDefined(rightType)) THEN
 								Error(operator.position, "none of the operands is declared in the same module")
 							END
@@ -7137,8 +7169,10 @@ TYPE
 						| Global.Odd: (* TODO: arity? *)
 						| Global.Sum: (* TODO: arity? *)
 						| Global.All: (* TODO: arity? *)
+						| Global.Re, Global.Im:
 						| Global.Dim: mustBeUnary := TRUE; mustReturnInteger := TRUE;
 						| Scanner.Alias:
+						
 						| Scanner.GreaterGreater, Scanner.LessLess:
 							mustBeBinary := TRUE; hasReturnType := FALSE;
 						| Scanner.GreaterGreaterQ, Scanner.LessLessQ:
@@ -8318,6 +8352,7 @@ TYPE
 		VAR
 			constant: SyntaxTree.Constant;
 			typeDeclaration: SyntaxTree.TypeDeclaration;
+			declaredType: SyntaxTree.Type;
 			variable: SyntaxTree.Variable;
 			procedure: SyntaxTree.Procedure;
 			procedureType : SyntaxTree.ProcedureType;
@@ -8466,8 +8501,16 @@ TYPE
 							ELSE
 								procedureType.selfParameter.type(SyntaxTree.QualifiedType).SetResolved(typeDeclaration.declaredType.resolved);
 								procedureType.selfParameter.SetState(SyntaxTree.Resolved);
-								typeDeclaration.declaredType(SyntaxTree.RecordType).recordScope.AddProcedure(procedure);
-								Register(procedure, typeDeclaration.declaredType(SyntaxTree.RecordType).recordScope, procedure IS SyntaxTree.Operator);
+								declaredType := typeDeclaration.declaredType; 
+								IF declaredType IS SyntaxTree.PointerType THEN
+									declaredType := declaredType(SyntaxTree.PointerType).pointerBase.resolved
+								END;
+								IF declaredType IS SyntaxTree.RecordType THEN 
+									declaredType(SyntaxTree.RecordType).recordScope.AddProcedure(procedure);
+									Register(procedure, declaredType(SyntaxTree.RecordType).recordScope, procedure IS SyntaxTree.Operator);
+								ELSE
+									Error(procedureType.selfParameter.position,"type is no record or pointer to record");
+								END; 
 							END;
 						END;
 					END;
@@ -8932,7 +8975,7 @@ TYPE
 					result := (this IS SyntaxTree.IntegerType) & (to.sizeInBits = 8) OR IsCharacterType(this)
 				ELSIF to IS SyntaxTree.CharacterType THEN
 					result := IsCharacterType(this)
-				ELSIF (to IS SyntaxTree.SizeType) & ((this IS SyntaxTree.SizeType) OR (this IS SyntaxTree.IntegerType) OR (this IS SyntaxTree.AddressType)) THEN
+				ELSIF (to IS SyntaxTree.SizeType) & ((this IS SyntaxTree.SizeType) OR (this IS SyntaxTree.IntegerType) OR IsAddressType(this, system.addressSize)) THEN
 					result := to.sizeInBits >= this.sizeInBits (*! weak compatibility: signed size type may be assigned with unsigned address type of same size *)
 				ELSIF (to IS SyntaxTree.AddressType) & ((this IS SyntaxTree.AddressType) OR (this IS SyntaxTree.IntegerType) OR (this IS SyntaxTree.SizeType) OR IsPointerType(this) OR (this IS SyntaxTree.ProcedureType)) THEN
 					result := to.sizeInBits >= this.sizeInBits; (*! weak compatibility: addresses may be assigned with signed integer *)
@@ -9395,7 +9438,10 @@ TYPE
 
 	PROCEDURE IsAddressType*(type: SyntaxTree.Type; addressWidth: LONGINT): BOOLEAN;
 	BEGIN
-		RETURN (type # NIL) & ((type IS SyntaxTree.IntegerType) & (type(SyntaxTree.IntegerType).sizeInBits <= addressWidth) OR (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.SizeType))
+		RETURN (type # NIL) & ((type IS SyntaxTree.IntegerType) & (type(SyntaxTree.IntegerType).sizeInBits <= addressWidth) 
+					OR (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.SizeType)
+					OR IsPointerType(type)
+					)
 	END IsAddressType;
 
 	PROCEDURE IsSizeType(type: SyntaxTree.Type; addressWidth: LONGINT): BOOLEAN;

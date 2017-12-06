@@ -1,7 +1,7 @@
 MODULE SystemTools; (** AUTHOR "TF"; PURPOSE "Access to System Functions"; *)
 
 IMPORT
-	Machine, Modules, Objects, Commands, Options, ProcessInfo, Kernel, Streams, Dates, Strings, Plugins, Files, SystemVersion, Heaps;
+	Machine, Modules, Objects, Commands, Options, ProcessInfo, Kernel, Streams, Dates, Strings, Plugins, Files, SystemVersion, Heaps, Reflection;
 
 CONST
 	MaxTimers = 16;
@@ -15,7 +15,7 @@ CONST
 
 	Trace = {};
 
-	OberonKernel = "Oberon.Kernel";
+	OberonKernel = "Oberon-Kernel";
 
 TYPE
 
@@ -211,6 +211,30 @@ BEGIN
 	END;
 	context.out.Ln;
 END IsLoaded;
+
+PROCEDURE ModuleState*(context: Commands.Context);
+VAR name: Modules.Name; module: Modules.Module; msg: ARRAY 256 OF CHAR; res: LONGINT;
+BEGIN	
+	context.arg.SkipWhitespace;
+	context.arg.String(name);
+	module := Modules.ThisModule(name, res, msg);
+	context.result := res;
+	IF (res = Modules.Ok) THEN
+		context.out.String(name); 
+		context.out.String(" crc "); context.out.Hex(module.crc,-8); 
+		context.out.String(" state: "); context.out.Ln;
+		Reflection.ModuleState(context.out, module);
+	ELSE
+		context.error.String("Could not load module "); context.error.String(name);
+		context.error.String(", res: "); context.error.Int(res, 0);
+		IF (msg # "") THEN
+			context.error.String(" ("); context.error.String(msg); context.error.String(")");
+		END;
+		context.error.Ln;
+	END;
+	
+END ModuleState;
+
 
 (** Load the specified module *)
 PROCEDURE Load*(context : Commands.Context); (** modulename ~ *)
@@ -730,4 +754,6 @@ SystemTools.DoCommands
 SystemTools.CollectGarbage ~
 
 SystemTools.ListModules -r ~
+
+SystemTools.ModuleState Heaps ~
 

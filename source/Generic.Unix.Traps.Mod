@@ -6,24 +6,35 @@ MODULE Traps;  (** AUTHOR "G.F."; PURPOSE "Exception Trap and symbolic debugging
 (* 2000.02.06	g.f.	UnixOberon release 2.3.6d	*)
 (* 2006.07.09	g.f.	UnixAos version	*)
 
-IMPORT S := SYSTEM, Trace, Glue, Unix, Objects, Machine, Heaps, Streams, Modules, Reflection,
+IMPORT S := SYSTEM, Trace, Unix, Objects, Machine, Streams, Modules, Reflection,
 		TrapWriters, Commands, StdIO;
 
 CONST
 	AddrSize = SIZEOF( ADDRESS );
-	MaxRecursion = 4;
+	MaxRecursion = 2;
 TYPE
 
 	ExceptionHandler = RECORD  pc, fp, sp: ADDRESS  END;
 
 VAR
 
-	TrapHandlingLevel: LONGINT;
+	trapHandlingLevel: LONGINT;
 
 	trace: BOOLEAN;
 
 	unix: Commands.Context;
 	trapMutex: Unix.Mutex_t;
+	
+	PROCEDURE LockTrap;
+	BEGIN 
+		Unix.MtxLock( trapMutex );
+	END LockTrap;
+	
+	PROCEDURE UnlockTrap;
+	BEGIN
+		trapHandlingLevel := 0;
+		Unix.MtxUnlock( trapMutex )
+	END UnlockTrap;
 
 	PROCEDURE Append( VAR ar: ARRAY OF CHAR;  CONST this: ARRAY OF CHAR );
 	VAR i, j: LONGINT;
@@ -69,26 +80,28 @@ VAR
 			S.GET( tag - AddrSize, td );
 			IF td.mod # NIL THEN
 				COPY( td.mod.name, name );  Append( name,  "." );  Append( name, td.name );
-				IF name = "Oberon.System.OberonRunner" THEN  UnlockOberon  END
+				IF name = "Oberon-System.OberonRunner" THEN  UnlockOberon  END
 			END
 		END;
 		
 
 	END FinishTrap;
 
-	PROCEDURE Registers(CONST c:Unix.McontextDesc; w: Streams.Writer);
+	PROCEDURE Registers( CONST mc: Unix.Mcontext; w: Streams.Writer );
 	BEGIN
-		w.String("EAX= "); w.Address(c.r_ax);
-		w.String(" EBX= "); w.Address(c.r_bx);
-		w.String(" ECX= "); w.Address(c.r_cx);
-		w.String(" EDX= "); w.Address(c.r_dx);
-		w.String(" ESI= "); w.Address(c.r_si);
-		w.String(" EDI= "); w.Address(c.r_di);
-		w.Ln;
+		w.String( "SP  = " );  w.Address( mc.r_sp );  
+		w.String( " FP  = " );  w.Address( mc.r_bp );
+		w.String( " PC  = " );  w.Address( mc.r_pc );  w.Ln;
+		w.String( "EAX = "); w.Address( mc.r_ax );
+		w.String(" EBX = "); w.Address( mc.r_bx );
+		w.String(" ECX = "); w.Address( mc.r_cx );
+		w.String(" EDX = "); w.Address( mc.r_dx );
+		w.String(" ESI = "); w.Address( mc.r_si );
+		w.String(" EDI = "); w.Address( mc.r_di );  w.Ln;
 	END Registers;
 
 
-	PROCEDURE Trap( sig: LONGINT;  ucp: Unix.Ucontext);
+	PROCEDURE Trap( sig: LONGINT;  mc: Unix.Mcontext);
 	VAR
 		pc, sp, bp: ADDRESS;
 		trapno: LONGINT;
@@ -96,37 +109,35 @@ VAR
 		handler: ExceptionHandler;
 		w: Streams.Writer;
 	BEGIN
-		Trace.Char("Z");
-		IF trace THEN
-			Trace.String( "Aos Trap:  signal = " );  Trace.Int( sig, 0 );
-			Trace.String( ",  ucp = " );  Trace.Address( S.VAL( ADDRESS, ucp ) );
-			Trace.String( ", traphandling  level = " ); Trace.Int( TrapHandlingLevel, 1 );
-			Trace.Ln;
+		IF sig IN {1, 2, 14, 15} (* SIGHUP, SIGINT, SIGALRM, SIGTERM *) THEN
+			(* ignore *) RETURN
 		END;
-
-		Unix.MtxLock(trapMutex);
-
-		INC( TrapHandlingLevel );
-
+		
+		LockTrap;
+		
+		INC( trapHandlingLevel );
+		IF trapHandlingLevel > MaxRecursion THEN  
+			UnlockTrap;
+			Objects.Terminate
+		END;
+		
 		w := TrapWriters.GetWriter();
 		w.Char( 1X );   (* begin of trap text *)
- 		Trace.Char("Y");
 
 		w.Ln;
 		w.String( Machine.version ); w.String( "   " );  TimeTag( w );  w.Ln;
-		IF TrapHandlingLevel <= MaxRecursion THEN
+		IF trapHandlingLevel = 1 THEN
 			w.String( "Trap " );
 		ELSE
-			w.String( "[recursive Trap] " );
+			w.String( "[Recursive Trap] " );
 		END;
-		sp := ucp.mc.r_sp;
 		CASE sig OF
 		| 1:		w.String( "1 (Hangup signal)" );
 		| 2:  	w.String( "2 (User interrupt)" );
 		| 3:		w.String( "3 (Quit signal)" );
 		| 4:  	w.String( "4 (Illegal instruction)" );
 		| 5:   	w.String( "5." );
-				S.GET( sp, trapno );  w.Int( trapno, 0 );
+				S.GET( mc.r_sp, trapno );  w.Int( trapno, 0 );
 				CASE trapno OF
 				| 1:		w.String( "  (WITH guard failed)" )
 				| 2:		w.String( "  (CASE invalid)" )
@@ -150,34 +161,30 @@ VAR
 		ELSE
 			w.String( "(Signal " );  w.Int( sig, 0 );  w.Char( ')' );
 		END;
+		w.Ln; w.Ln;
+		Registers( mc, w );	
 		w.Ln;
-		IF TrapHandlingLevel <= MaxRecursion THEN
-			process := Objects.CurrentProcess( );
-			pc := ucp.mc.r_pc;  bp := ucp.mc.r_bp;
-			IF pc = 0 THEN
-				(* assume call of procedure variable with value NIL *)
-				S.GET( sp, pc );   (* get return address on top of stack *)
-			END;
-			w.Ln;
-			w.String(" pid = "); w.Hex(process.id , -8 );
-			w.String( "    sp = " );  w.Address( sp );  w.String( ", fp = " );  w.Address( bp );
-			w.String( ", pc = " );  w.Address( pc );  w.Ln;
-			w.Ln;
-			Registers(ucp.mc,w);
-			Reflection.StackTraceBack( w, pc, bp, sp, Objects.GetStackBottom( process ), TRUE, FALSE );
-			SearchExceptionHandler( process, ucp, handler ); 
+		
+		process := Objects.CurrentProcess( );
+		sp := mc.r_sp;  pc := mc.r_pc;  bp := mc.r_bp;
+		IF pc = 0 THEN
+			(* assume call of procedure variable with value NIL *)
+			S.GET( sp, pc );   (* get return address on top of stack *)
 		END;
+		
+		IF process # NIL THEN
+			Reflection.StackTraceBack( w, pc, bp, sp, Objects.GetStackBottom( process ), TRUE, FALSE );
+			SearchExceptionHandler( process, mc, handler ); 
+		ELSE
+			(* avoid recusive trap in case of faulty module Objects *)
+			Reflection.StackTraceBack( w, pc, bp, sp, sp+512, TRUE, FALSE );
+			END;
 		w.Ln; w.Ln;
 		w.String("----------------------------------------------------"); w.Ln;
 
-		IF (TrapHandlingLevel > MaxRecursion) THEN  Machine.Shutdown( FALSE )  END;
-
 		FinishTrap( w, process);
 		
-		TrapHandlingLevel := 0;
-
-		Unix.MtxUnlock(trapMutex);
-
+		UnlockTrap;
 
 		IF handler.pc # 0 THEN
 			IF Unix.Version # "Darwin" THEN
@@ -185,7 +192,7 @@ VAR
 				w.Ln;
 				w.String( "### program continues with exception handler ###" );   w.Ln;
 
-				Unix.ModifyContext( ucp, handler.pc, handler.fp, handler.sp );
+				Unix.ModifyContext( mc, handler.pc, handler.fp, handler.sp );
 				RETURN  (*! to exception handler !! *)
 			END
 		END;
@@ -195,8 +202,6 @@ VAR
 			unix.error.String( "### Program aborted. Stack traceback in logfile" );  unix.error.Ln;
 			unix.error.Update;
 			Machine.Shutdown( FALSE )
-		ELSIF TrapHandlingLevel > MaxRecursion THEN
-			Objects.Terminate
 		ELSE
 			Objects.ExitTrap()
 		END
@@ -204,7 +209,7 @@ VAR
 
 
 	PROCEDURE UnlockOberon;
-	CONST OberonKernel = "Oberon.Kernel";
+	CONST OberonKernel = "Oberon-Kernel";
 	VAR c: PROCEDURE;
 	BEGIN
 		IF Modules.ModuleByName( OberonKernel ) # NIL THEN
@@ -213,7 +218,7 @@ VAR
 		END;
 	END UnlockOberon;
 
-	PROCEDURE CheckBP(fp: ADDRESS): ADDRESS;
+	PROCEDURE CheckBP( fp: ADDRESS ): ADDRESS;
 	VAR n: ADDRESS;
 	BEGIN
 		IF (fp # NIL) THEN
@@ -222,12 +227,14 @@ VAR
 		END;
 		RETURN fp;
 	END CheckBP;
+	
+	
 
-	PROCEDURE SearchExceptionHandler( process: Objects.Process;  cont: Unix.Ucontext;  VAR handler: ExceptionHandler );
+	PROCEDURE SearchExceptionHandler( process: Objects.Process;  mc: Unix.Mcontext;  VAR handler: ExceptionHandler );
 	VAR entry, fp, sp, pc: ADDRESS;
 	BEGIN
 		handler.pc := 0;  (* no handler *)
-		pc := cont.mc.r_pc;  fp := cont.mc.r_bp;  sp := cont.mc.r_sp;
+		pc := mc.r_pc;  fp := mc.r_bp;  sp := mc.r_sp;
 		IF pc = 0 THEN
 			(* assume call of procedure variable with value NIL *)
 			S.GET( sp, pc );   (* get return address on top of stack *)
@@ -247,32 +254,9 @@ VAR
 	END SearchExceptionHandler;
 
 
-	PROCEDURE SignalHandler( signal: LONGINT;  scp, ucp, dummy: ADDRESS );
-		(* 'dummy' for 16 byte stack alignment, MacOS! *)
-	BEGIN
-		IF ~(signal IN  {1, 2, 14, 15}) (* SIGHUP, SIGINT, SIGALRM, SIGTERM *) THEN
-			IF trace THEN
-				Trace.String( "Traps.SignalHander: received signal " );
-				Trace.Int( signal, 1 );  Trace.Ln
-			END;
-			(*IF Heaps.collecting THEN
-				Trace.Ln;  Trace.String( "PANIC: Trap " );  Trace.Int( signal, 0 );
-				Trace.String( " in garbage collector" );  Trace.Ln;  Trace.Ln;
-				Machine.Release( Machine.Heaps );
-
-				Trap( signal, S.VAL( Unix.Ucontext, ucp ), TRUE )
-			ELSE
-			*)
-				Trap( signal, S.VAL( Unix.Ucontext, ucp ))
-	(*		END  *)
-		END
-	END SignalHandler;
-
-
-
 BEGIN
-	trapMutex := Unix.RecursiveMtxInit(0);
-	trace := 3 IN Glue.debug;
-	Unix.InstallSignalHandler( SignalHandler );
+	trapMutex := Unix.NewRecursiveMtx( );
+	trace := FALSE;  
+	Unix.InstallTrap( Trap );
 	unix := StdIO.env
 END Traps.

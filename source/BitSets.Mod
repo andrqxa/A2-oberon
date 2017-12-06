@@ -7,7 +7,7 @@ CONST Elements = MAX (SET) - MIN (SET) + 1;
 TYPE Data = POINTER TO ARRAY OF SET;
 
 TYPE BitSet* = OBJECT
-	VAR size: SIZE;
+	VAR size: LONGINT;
 	VAR data: Data;
 
 	PROCEDURE & InitBitSet* (size: LONGINT);
@@ -19,7 +19,7 @@ TYPE BitSet* = OBJECT
 	BEGIN FOR i := 0 TO LEN(data)-1 DO data[i] := {} END;
 	END Zero;
 
-	PROCEDURE Resize* (size: SIZE);
+	PROCEDURE Resize* (size: LONGINT);
 	VAR newData: Data; i: SIZE;
 	BEGIN
 		ASSERT (size >= 0);
@@ -36,7 +36,7 @@ TYPE BitSet* = OBJECT
 		data := newData;
 	END Resize;
 
-	PROCEDURE GetSize* (): SIZE;
+	PROCEDURE GetSize* (): LONGINT;
 	BEGIN RETURN size;
 	END GetSize;
 
@@ -56,7 +56,7 @@ TYPE BitSet* = OBJECT
 		RETURN pos MOD Elements IN data[pos DIV Elements];
 	END GetBit;
 
-	PROCEDURE SetBits* (startPos: SIZE; bits, value: LONGINT);
+	PROCEDURE SetBits* (startPos: SIZE; bits: LONGINT; value: HUGEINT);
 	VAR adr: ADDRESS;
 	BEGIN
 		ASSERT (startPos >= 0); ASSERT (startPos+bits <= size);
@@ -112,7 +112,7 @@ TYPE BitSet* = OBJECT
 
 END BitSet;
 
-PROCEDURE CopyBits* (source: BitSet; sourcePos: LONGINT; dest: BitSet; destPos, count: LONGINT);
+PROCEDURE CopyBits* (source: BitSet; sourcePos: SIZE; dest: BitSet; destPos, count: SIZE);
 CONST setSize= MAX(SET)+1;
 BEGIN
 	ASSERT (count >= 0);
@@ -121,7 +121,7 @@ BEGIN
 			dest.SetBit (destPos, source.GetBit (sourcePos));
 			INC (sourcePos); INC (destPos); DEC (count);
 		END;
-		WHILE (count > 31) DO
+		WHILE (count >= setSize) DO
 			dest.data[destPos DIV setSize] := source.data[sourcePos DIV setSize];
 			INC(sourcePos,setSize); INC(destPos,setSize); DEC(count,setSize);
 		END;

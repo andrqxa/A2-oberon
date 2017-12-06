@@ -619,6 +619,29 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END Create;
 
 
+	PROCEDURE CreateWithBuffer*(img: Image; width, height: LONGINT; fmt: Format; mem: POINTER TO ARRAY OF CHAR; VAR adr: ADDRESS);
+	VAR size: LONGINT; a0, a1: ADDRESS;
+	BEGIN
+		ASSERT((width > 0) & (height > 0), 100);
+		img.width := width; img.height := height;
+		img.fmt := fmt;
+		img.bpr := (width * fmt.bpp + 7) DIV 8;
+		IF fmt.align > 1 THEN
+			img.bpr := (img.bpr + fmt.align - 1) DIV fmt.align * fmt.align
+		END;
+		size := height * img.bpr; INC(size, (-size) MOD 4);
+		a0 := adr; a1 := adr + size;
+		ASSERT(ADDRESSOF(mem[0]) <= a0);
+		ASSERT(a1 <= ADDRESSOF(mem[LEN(mem)-1]));
+		WHILE a0 # a1 DO
+			SYSTEM.PUT32(a0,0); INC(a0, SIZEOF(LONGINT))
+		END;
+		img.adr := adr;
+		img.mem := mem;
+		adr := LONGINT(a1);
+	END CreateWithBuffer;
+
+
 	(**--- Transfer Modes ---**)
 
 	(** initialize transfer mode **)
@@ -628,8 +651,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		IF (mode.src.pal # NIL) & ((mode.map = NIL) OR (LEN(mode.map^) # mode.src.pal.used)) THEN
 			NEW(mode.map, mode.src.pal.used)
 		END;
-		(*SetRGB(mode.col, 255, 255, 255);*)
-		mode.col := SYSTEM.VAL(Pixel, -1);
+		SetRGB(mode.col, 255, 255, 255);
+		(*mode.col := SYSTEM.VAL(Pixel, -1);*)
 		mode.src.pack := NIL; mode.dst.pack := NIL	(* force re-evaluation of transfer procedure *)
 	END InitMode;
 
@@ -656,7 +679,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(** blend source pixel into destination pixel according to compositing operation **)
 	PROCEDURE Blend* (op: LONGINT; VAR src, dst: Pixel);
-		VAR fs, fd, i: LONGINT;
+		VAR fs, fd: LONGINT;
 	BEGIN
 		CASE op OF
 		| clear: fs := 0; fd := 0
@@ -674,20 +697,22 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END;
 
 		IF fs + fd = 0 THEN
-			FOR i := 0 TO 3 DO dst[i] := 0X END
+			dst := Zero;
 		ELSIF fs = 0 THEN
 			IF fd # 255 THEN
-				FOR i := 0 TO 3 DO
-					dst[i] := Clamp[200H + fd * ORD(dst[i]) DIV 255]
-				END
+				dst[0] := Clamp[200H + fd * ORD(dst[0]) DIV 255];
+				dst[1] := Clamp[200H + fd * ORD(dst[1]) DIV 255];
+				dst[2] := Clamp[200H + fd * ORD(dst[2]) DIV 255];
+				dst[3] := Clamp[200H + fd * ORD(dst[3]) DIV 255];
 			END
 		ELSIF fd = 0 THEN
 			IF fs = 255 THEN
 				dst := src
 			ELSE
-				FOR i := 0 TO 3 DO
-					dst[i] := Clamp[200H + fs * ORD(src[i]) DIV 255]
-				END
+				dst[0] := Clamp[200H + fs * ORD(src[0]) DIV 255];
+				dst[1] := Clamp[200H + fs * ORD(src[1]) DIV 255];
+				dst[2] := Clamp[200H + fs * ORD(src[2]) DIV 255];
+				dst[3] := Clamp[200H + fs * ORD(src[3]) DIV 255];
 			END
 		ELSE
 			dst[0] := Clamp[200H + (fs * ORD(src[0]) + fd * ORD(dst[0])) DIV 255];
@@ -1877,13 +1902,15 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END A8OverA8;
 
-
 	(* BGRA8888 *)
 	PROCEDURE BGRA8888OverAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
 		VAR spix, dpix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
+			SYSTEM.MOVE(sadr, ADDRESSOF(spix),4);
+			(*
 			SYSTEM.GET (sadr, spix);
+			*)
 			IF spix[a] = 0FFX THEN
 				mode.dst.pack(mode.dst, dadr, dbit, spix)
 			ELSIF spix[a] # 0X THEN
@@ -1895,6 +1922,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 			dbit := dbit + mode.dst.bpp; INC(dadr, dbit DIV 8); dbit := dbit MOD 8
 		END
 	END BGRA8888OverAny;
+
 
 	PROCEDURE BGRA8888OverA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
 		VAR in, out: CHAR;
@@ -1915,7 +1943,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		VAR src, dst: Pixel; fd, t: LONGINT;
 	BEGIN
 		WHILE len > 0 DO
-			SYSTEM.GET (sadr, src);
+			SYSTEM.MOVE(sadr, ADDRESSOF(src),4);
 			IF src[a] = 0FFX THEN
 				mode.dst.pack(mode.dst, dadr, dbit, src)
 			ELSIF src[a] # 0X THEN
@@ -1935,12 +1963,14 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 			INC(dadr, 2); INC(sadr, SIZEOF (Pixel)); DEC(len)
 		END
 	END BGRA8888OverAny16;
-
 	PROCEDURE BGRA8888Over565* (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
 		VAR src, dst: Pixel; fd, t: LONGINT;
 	BEGIN
 		WHILE len > 0 DO
+			SYSTEM.MOVE(sadr,ADDRESSOF(src),4);
+			(*
 			SYSTEM.GET (sadr, src);
+			*)
 			IF src[a] = 0FFX THEN
 				SYSTEM.PUT16(dadr, ASH(ORD(src[b]), -3) + ASH(ASH(ORD(src[g]), -2), 5) + ASH(ASH(ORD(src[r]), -3), 11));
 			ELSIF src[a] # 0X THEN
@@ -1964,6 +1994,9 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END BGRA8888Over565;
 
 
+
+
+
 	PROCEDURE MMXBGRA8888Over565(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
 	CODE {SYSTEM.AMD64, SYSTEM.MMX}
 		PUSHFQ
@@ -1980,7 +2013,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		MOV		ECX, [RBP + len]
 	loop:
 		CMP		ECX, 0
-		JE 			WORD end
+		JE 			 end
 
 		MOV		EAX, [RSI]
 		XOR		EBX, EBX
@@ -1990,7 +2023,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		MOV		EDX, EAX
 		SHR		EDX, 24
 		CMP		EDX, 0
-		JE			WORD empty
+		JE			 empty
 		CMP		EDX, 255
 		JE			full
 
@@ -2083,7 +2116,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		ADD 		RSI, 4;
 		ADD 		RDI, 2;
 		DEC		ECX
-		JMP 		WORD loop
+		JMP 		loop
 	end:
 		EMMS ; declare FPU registers free
 		POPFQ
@@ -2135,18 +2168,18 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	loop:
 		CMP 		ECX,0
-		JE 			WORD end ; jump to end if ECX = 0
+		JE 			end ; jump to end if ECX = 0
 
 		; if len < 8 then do one pixel at the time
 		CMP		ECX, 8
-		JL 			WORD singlepixel
+		JL 			 singlepixel
 		; else
 		; take 8 at the time
 
 		MOV		EBX, ESI
 		AND 		EBX, 0FH
 		CMP		EBX, 0
-		JNE 		WORD singlepixel
+		JNE 		singlepixel
 
 	alleightpixels:
 		; dest blue -> MM6
@@ -2185,7 +2218,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		PCMPEQD 	XMM0, XMM5
 		PMOVMSKB EAX, XMM0
 		CMP 		EAX, 0FFFFH ; all alphas = zero; TEST not possible, because only 8 bits compared
-		JE      		WORD endloop
+		JE      		 endloop
 
 		; mask out alpha = zero
 
@@ -2410,7 +2443,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		ADD 		RSI, 32 ; num of bytes
 		ADD 		RDI, 16
 		SUB 		ECX, 8
-		JMP 		WORD loop
+		JMP 		loop
 
 	singlepixel: ; original code from MMXBGRA8888Over565, adjusted to fit this procedure
 		MOV	 	EAX, 0FFFFFFFFH
@@ -2426,7 +2459,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		SHR		EDX, 24
 
 		CMP		EDX, 0
-		JE			WORD empty
+		JE			 empty
 		CMP		EDX, 255
 		JE			full
 
@@ -2495,7 +2528,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		ADD 		RSI, 4;
 		ADD 		RDI, 2;
 		DEC		ECX
-		JMP 		WORD loop
+		JMP 		loop
 
 	end:
 		EMMS ; declare FPU registers free
@@ -3093,7 +3126,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(** add components of two (faded) images **)
 	PROCEDURE Add* (i, j, res: Image);
-		VAR y, x, ibit, jbit, rbit, k: LONGINT; iadr, jadr, radr: ADDRESS; ipix, jpix, rpix: Pixel;
+		VAR y, x, ibit, jbit, rbit: LONGINT; iadr, jadr, radr: ADDRESS; ipix, jpix, rpix: Pixel;
 	BEGIN
 		ASSERT((i.width = j.width) & (i.height = j.height) & (i.width <= res.width) & (i.height <= res.height), 100);
 		y := 0;
@@ -3101,9 +3134,12 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 			x := 0; iadr := i.adr + y * i.bpr; ibit := 0; jadr := j.adr + y * j.bpr; jbit := 0; radr := res.adr + y * res.bpr; rbit := 0;
 			WHILE x < i.width DO
 				i.fmt.unpack(i.fmt, iadr, ibit, ipix); j.fmt.unpack(j.fmt, jadr, jbit, jpix);
-				FOR k := 0 TO 3 DO
-					rpix[k] := Clamp[ORD(ipix[k]) + ORD(jpix[k])]
-				END;
+
+				rpix[0] := Clamp[ORD(ipix[0]) + ORD(jpix[0])];
+				rpix[1] := Clamp[ORD(ipix[1]) + ORD(jpix[1])];
+				rpix[2] := Clamp[ORD(ipix[2]) + ORD(jpix[2])];
+				rpix[3] := Clamp[ORD(ipix[3]) + ORD(jpix[3])];
+
 				res.fmt.pack(res.fmt, radr, rbit, rpix);
 				ibit := ibit + i.fmt.bpp; INC(iadr, ibit); ibit := ibit MOD 8;
 				jbit := jbit + j.fmt.bpp; INC(jadr, jbit); jbit := jbit MOD 8;

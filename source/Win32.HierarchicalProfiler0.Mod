@@ -108,7 +108,7 @@ BEGIN
 	IF (handle # Kernel32.NULL) & (handle # Kernel32.InvalidHandleValue) THEN
 		res := Kernel32.SuspendThread(handle);
 		IF (res >= 0) THEN
-			context.ContextFlags := Kernel32.ContextControl+Kernel32.ContextInteger;
+			context.ContextFlags := Kernel32.SetToDW(Kernel32.ContextControl+Kernel32.ContextInteger);
 			res := Kernel32.GetThreadContext(handle, context);
 			IF (res = Kernel32.True) THEN
 				IF (context.PC # 0) THEN
@@ -154,3 +154,5 @@ END HierarchicalProfiler0.
 WMProfiler.Open
 
 SystemTools.Free WMProfiler HierarchicalProfiler HierarchicalProfiler0 ~
+
+Debugging.DisableGC~

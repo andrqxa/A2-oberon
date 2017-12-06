@@ -1,6 +1,6 @@
 MODULE Reflection; (** AUTHOR "fof"; PURPOSE "tools for module, stack and process reflection"; *)
 
-IMPORT Modules,Streams,Machine,Heaps,Objects,SYSTEM;
+IMPORT Modules,Streams,Machine,Heaps,Objects,Kernel,Trace,SYSTEM;
 
 CONST
 	ShowAllProcs = TRUE;
@@ -310,7 +310,12 @@ VAR
 				ELSE
 					IF v.n > MaxArray THEN etc := TRUE; v.n := MaxArray END
 				END;
-				WriteVar(w, v, col);	(* write value *)
+				IF (v.type <= 8) & ((v.adr > base + 64) OR (v.adr < base - 4096)) & (~CheckHeapAddress( v.adr )) THEN
+					(* CONST parameter ? *)
+					w.String( "???" )
+				ELSE
+					WriteVar(w, v, col);	(* write value *)
+				END;
 				IF etc THEN w.String("..."); INC(col, 3) END;
 				IF ~dense THEN
 					w.Ln; col := 0; Wait(w);
@@ -639,7 +644,30 @@ VAR
 			w.Char(" "); w.Set(p.flags)
 		END
 	END WriteProcess;
+	
+	
+
+VAR trace: Streams.Writer;
+
+	PROCEDURE TraceH(process: Objects.Process; pc, bp: ADDRESS; stacklow, stackhigh: ADDRESS);
+	BEGIN
+		trace.String("----------- Process = "); 
+		trace.Address(process); 
+		trace.String(", Object = "); trace.Address(process.obj); 
+		trace.Ln;
+		StackTraceBack(trace, pc, bp, stacklow ,stackhigh, TRUE, FALSE);
+		trace.Update;
+	END TraceH;
+
+	(* tracing the stacks of all processes during GC phase (needs to identify and stop all processes) *)
+	PROCEDURE TraceProcesses*;
+	BEGIN
+		Objects.TraceProcessHook := TraceH;
+		Kernel.GC;
+		Objects.TraceProcessHook := NIL;
+	END TraceProcesses;
 
 BEGIN
+	NEW(trace, Trace.Send, 4096); 
 	modes := " rdy run awl awc awe rip";   (* 4 characters per mode from Objects.Ready to Objects.Terminated *)
 END Reflection.

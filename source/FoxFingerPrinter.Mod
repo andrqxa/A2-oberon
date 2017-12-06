@@ -100,6 +100,8 @@ CONST
 	fpTypeComplex = 24;
 	fpTypeLongcomplex = 25;
 	fpTypeModule=26;
+	fpTypeSize=27;
+	fpTypeAddress=28;
 
 	fpTypeBasic=1;
 	fpTypeStaticArray=2;
@@ -201,17 +203,12 @@ TYPE
 
 		PROCEDURE VisitAddressType(x: SyntaxTree.AddressType);
 		BEGIN
-			SetTypeFingerprint(x,fpTypePointer)
+			SetTypeFingerprint(x,fpTypeAddress)
 		END VisitAddressType;
 
 		PROCEDURE VisitSizeType(x: SyntaxTree.SizeType);
 		BEGIN
-			IF x.sizeInBits=8 THEN SetTypeFingerprint(x,fpTypeShortint)
-			ELSIF x.sizeInBits = 16 THEN SetTypeFingerprint(x,fpTypeInteger)
-			ELSIF x.sizeInBits = 32 THEN SetTypeFingerprint(x,fpTypeLongint)
-			ELSIF x.sizeInBits = 64 THEN SetTypeFingerprint(x,fpTypeHugeint)
-			ELSE HALT(100)
-			END;
+			SetTypeFingerprint(x, fpTypeSize); 
 		END VisitSizeType;
 
 		PROCEDURE VisitObjectType(x: SyntaxTree.ObjectType);
@@ -361,6 +358,8 @@ TYPE
 
 				IF x.form = SyntaxTree.Static THEN FPNumber(fp,x.staticLength) END;
 				fingerprint.shallow := fp;
+				fingerprint.public := fingerprint.shallow;
+				fingerprint.private := fingerprint.shallow;
 				x.SetFingerPrint(fingerprint);
 				SELF.deep := deep;
 			END;
@@ -408,6 +407,8 @@ TYPE
 				END;
 				IF x.form = SyntaxTree.Static THEN FPNumber(fp,x.staticLength) END;
 				fingerprint.shallow := fp;
+				fingerprint.public := fingerprint.shallow;
+				fingerprint.private := fingerprint.shallow;
 				fingerprint.shallowAvailable := TRUE;
 				x.SetFingerPrint(fingerprint);
 				SELF.deep := deep;
@@ -482,7 +483,7 @@ TYPE
 		PrivateFP(PointerType)     = 0.
 		*)
 		PROCEDURE VisitPointerType(x: SyntaxTree.PointerType);
-		VAR fingerprint: FingerPrint; fp: LONGINT; deep: BOOLEAN;
+		VAR fingerprint,typeFP: FingerPrint; fp: LONGINT; deep: BOOLEAN;
 		BEGIN
 			IF Trace THEN TraceEnter("PointerType");  END;
 			fingerprint := x.fingerprint;
@@ -508,8 +509,11 @@ TYPE
 					fingerprint.deepAvailable := TRUE;
 				END;
 				*)
+				x.SetFingerPrint(fingerprint);
 				SELF.deep := deep;
 			END;
+			
+			
 			IF Trace THEN TraceExit("PointerType",fingerprint) END;
 
 			SELF.fingerprint := fingerprint;
@@ -566,6 +570,8 @@ TYPE
 				FPString(fp,name);
 				FPSignature(fp,procedure.type(SyntaxTree.ProcedureType),procedure IS SyntaxTree.Operator );
 				fingerprint.shallow := fp;
+				fingerprint.public := fingerprint.shallow;
+				fingerprint.private := fingerprint.shallow;
 				fingerprint.shallowAvailable := TRUE;
 				procedure.SetFingerPrint(fingerprint)
 			ELSE
@@ -615,7 +621,7 @@ TYPE
 		VAR scope: SyntaxTree.RecordScope; fp: LONGINT; variable: SyntaxTree.Variable;
 			fingerprint,variableFingerPrint,variableTypeFingerPrint,baseFingerPrint: FingerPrint;flags: SET;
 			symbol: SyntaxTree.Symbol; procedure: SyntaxTree.Procedure;  baseType: SyntaxTree.Type;
-			body: SyntaxTree.Body;
+			body: SyntaxTree.Body; name: ARRAY 256 OF CHAR;
 			deep: BOOLEAN;
 		(* for dealing with cycles the private and public fingerprint are computed here
 			while FP is computed completely during call of Type0 *)
@@ -637,8 +643,27 @@ TYPE
 					baseType := x.GetBaseRecord();
 					FPType(fp,baseType);
 				END;
+				
+				SELF.deep := TRUE;
+				(* methods, sorted *)
+				scope := x.recordScope;
+				symbol := scope.firstSymbol;
+				WHILE symbol # NIL DO (* number and names of procedures -- method table ! *)
+					IF symbol IS SyntaxTree.Procedure THEN
+						procedure := symbol(SyntaxTree.Procedure);
+						FPNumber(fp,fpModeMethod);
+						Global.GetSymbolName(procedure,name);
+						FPString(fp,name);
+						IF Trace THEN TraceIndent; D.Str("RecordType Method "); TraceFP(fingerprint); D.Ln; END;
+					END;
+					symbol := symbol.nextSymbol
+				END;
+
 				fingerprint.shallow := fp;
+				fingerprint.public := fingerprint.shallow;
+				fingerprint.private := fingerprint.shallow;
 				fingerprint.shallowAvailable := TRUE;
+
 				x.SetFingerPrint(fingerprint);
 				SELF.deep := deep;
 				IF Trace THEN TraceIndent; D.Str("RecordType Shallow Done "); TraceFP(fingerprint); D.Ln;  END;
@@ -704,6 +729,8 @@ TYPE
 					END;
 					variable := variable.nextVariable;
 				END;
+				FPNumber(fingerprint.private, SHORT(x.sizeInBits DIV 8));
+				FPNumber(fingerprint.public, SHORT(x.sizeInBits DIV 8));
 
 				flags := {};
 				IF x.recordScope.bodyProcedure # NIL THEN
@@ -949,6 +976,7 @@ TYPE
 		PROCEDURE VisitTypeDeclaration(x: SyntaxTree.TypeDeclaration);
 		VAR fp: LONGINT;
 			fingerprint: FingerPrint; deep: BOOLEAN;
+			typeFP: FingerPrint;
 		BEGIN
 			fingerprint := x.fingerprint;
 
@@ -961,15 +989,29 @@ TYPE
 				FPName(fp,x.name);
 				IF Trace THEN TraceIndent; D.String("access="); D.Set(x.access); D.Ln;  END;
 				FPVisibility(fp, x.access);
-
 				x.declaredType.Accept(SELF);
 				FPNumber(fp, SELF.fingerprint.shallow);
 				fingerprint.shallow := fp;
+				fingerprint.public := fp;
+				fingerprint.private := fp;
 				fingerprint.shallowAvailable := TRUE;
 				x.SetFingerPrint(fingerprint);
 				SELF.deep := deep;
 				IF Trace THEN TraceExit("TypeDeclaration",fingerprint) END;
 			END;
+			
+			IF deep & ~fingerprint.deepAvailable THEN
+				fingerprint := x.fingerprint;
+				typeFP := TypeFP(x.declaredType);
+				IF x.declaredType.resolved IS SyntaxTree.PointerType THEN
+					typeFP := TypeFP(x.declaredType.resolved(SyntaxTree.PointerType).pointerBase);
+				END;
+				FPNumber(fingerprint.public, typeFP.public);
+				FPNumber(fingerprint.private, typeFP.private);
+				fingerprint.deepAvailable := TRUE;
+				x.SetFingerPrint(fingerprint);
+			END;
+
 			SELF.fingerprint := fingerprint
 		END VisitTypeDeclaration;
 
@@ -997,6 +1039,8 @@ TYPE
 				FPNumber(fp, fpTypeBasic);
 				FPValue(fp, x.value);
 				fingerprint.shallow := fp;
+				fingerprint.public := fingerprint.shallow;
+				fingerprint.private := fingerprint.shallow;
 				fingerprint.shallowAvailable := TRUE;
 				x.SetFingerPrint(fingerprint);
 				SELF.deep := deep;
@@ -1023,6 +1067,8 @@ TYPE
 				x.type.Accept(SELF);
 				FPNumber(fp,SELF.fingerprint.shallow);
 				fingerprint.shallow := fp;
+				fingerprint.public := fingerprint.shallow;
+				fingerprint.private := fingerprint.shallow;
 				fingerprint.shallowAvailable := TRUE;
 				x.SetFingerPrint(fingerprint);
 				SELF.deep := deep;
@@ -1055,6 +1101,8 @@ TYPE
 				x.type.Accept(SELF);
 				FPNumber(fp,SELF.fingerprint.shallow);
 				fingerprint.shallow := fp;
+				fingerprint.public := fingerprint.shallow;
+				fingerprint.private := fingerprint.shallow;
 				fingerprint.shallowAvailable := TRUE;
 				x.SetFingerPrint(fingerprint);
 				SELF.deep := deep;
@@ -1107,6 +1155,8 @@ TYPE
 						FPSignature(fp,x.type(SyntaxTree.ProcedureType),x IS SyntaxTree.Operator);
 					END;
 					fingerprint.shallow := fp;
+					fingerprint.public := fingerprint.shallow;
+					fingerprint.private := fingerprint.shallow;
 					fingerprint.shallowAvailable := TRUE;
 					x.SetFingerPrint(fingerprint);
 					SELF.deep := deep;
@@ -1139,6 +1189,8 @@ TYPE
 				IF Trace THEN TraceIndent; D.Str("Module Name ");D.Hex(fp,-8);  D.Ln; END;
 
 				fingerprint.shallow := fp;
+				fingerprint.public := fingerprint.shallow;
+				fingerprint.private := fingerprint.shallow;
 				fingerprint.shallowAvailable := TRUE;
 				x.SetFingerPrint(fingerprint);
 				SELF.deep := deep;
@@ -1182,6 +1234,8 @@ TYPE
 		PROCEDURE VisitSymbol(x: SyntaxTree.Symbol);
 		BEGIN
 			fingerprint.shallow := 0;
+			fingerprint.public := fingerprint.shallow;
+			fingerprint.private := fingerprint.shallow;
 			fingerprint.shallowAvailable := TRUE;
 			x.SetFingerPrint(fingerprint);
 		END VisitSymbol;

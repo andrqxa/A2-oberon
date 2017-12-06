@@ -6,7 +6,7 @@ IMPORT S := SYSTEM, Trace, Unix, Glue;
 CONST
 	DefaultConfig = "Color 0  StackSize 128";
 	
-	Version = "Aos (rev.6640)";
+	Version = "Aos (rev.7355)";
 
 	DefaultObjectFileExtension* = ".Obj";
 	
@@ -445,7 +445,8 @@ END GetTimer;
 	VAR i, src: LONGINT; ch: CHAR;
 	BEGIN
 		ASSERT (name[0] # "=");	(* no longer supported, use GetInit instead *)
-		src := -1;
+		
+		src := -1;  val := "";
 		LOOP
 			REPEAT
 				INC( src );  ch := config[src]; 
@@ -475,7 +476,9 @@ END GetTimer;
 				UNTIL ch <= ' '
 			END
 		END;
-		val[0] := 0X
+		IF (name = "ObjectFileExtension") & (val = "") THEN  
+			val := DefaultObjectFileExtension
+		END;
 	END GetConfig;
 
 

@@ -66,7 +66,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Swap(i,j: LONGINT);
-		VAR name: ExportName; adr: LONGINT;
+		VAR name: ExportName; adr: GenericLinker.Address;
 		BEGIN
 			name := exportNames[i]; exportNames[i] := exportNames[j]; exportNames[j] := name;
 			name := symbolNames[i]; symbolNames[i] := symbolNames[j]; symbolNames[j] := name;
@@ -124,7 +124,7 @@ TYPE
 	BEGIN
 		IF section.unit > maxUnitSize THEN maxUnitSize := section.unit END;
 		IF section.fixed THEN
-			address := (section.alignment - displacement) * section.unit;
+			address := ObjectFile.Bits((section.alignment - displacement) * section.unit);
 		ELSE
 			address := bits.GetSize (); alignment := section.alignment * section.unit;
 			IF alignment = 0 THEN alignment := section.unit; END;
@@ -157,11 +157,11 @@ TYPE
 	BEGIN SELF.bits.SetBits ((pos - displacement) * unit + offset, bits, value);
 	END Patch;
 
-	PROCEDURE CheckReloc(target: LONGINT; pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
+	PROCEDURE CheckReloc(target: GenericLinker.Address; pattern: ObjectFile.Pattern; CONST patch: ObjectFile.Patch);
 	VAR i: LONGINT;
 	BEGIN
 		IF (pattern.mode = ObjectFile.Absolute) & (relocInfo # NIL) THEN
-			relocInfo.AddReloc(target+patch.offset);
+			relocInfo.AddReloc(LONGINT(target+patch.offset));
 		END;
 	END CheckReloc;
 
@@ -238,6 +238,24 @@ BEGIN
 	IF reader.res # Files.Ok THEN linker.Error (fileName, "failed to parse"); END;
 END ReadObjectFile;
 
+PROCEDURE WriteRelocations( arr: Arrangement; w: Files.Writer );
+VAR pb: PatchBlock; i, relocations, binsize: LONGINT;
+BEGIN
+	binsize := w.Pos();
+	pb := arr.relocInfo.patchBlock; relocations := 0;
+	WHILE pb # NIL DO
+		FOR i := 0 TO pb.addresses -1 DO
+			w.RawLInt( pb.address[i] );  INC( relocations );
+		END;
+		pb := pb.next;
+	END;
+	(* now patch header (cf  Generic.Unix.I386.Glue.Mod)  *)
+	w.SetPos( 24 );
+	w.RawLInt( binsize );
+	w.RawLInt( relocations );
+	w.RawLInt( 0 );	(* base *)
+END WriteRelocations;
+
 PROCEDURE WriteOutputFile* (arrangement: Arrangement; CONST fileName: Files.FileName; linker: GenericLinker.Linker; fileFormat: FileFormat);
 VAR file: Files.File; writer: Files.Writer; msg: ARRAY 64 OF CHAR; number: ARRAY 32 OF CHAR;
 BEGIN
@@ -263,7 +281,14 @@ BEGIN
 	END;
 END WriteBinaryFile;
 
-
+PROCEDURE WriteUnixBinaryFile (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer);
+VAR i: LONGINT;
+BEGIN
+	FOR i := 0 TO arrangement.bits.GetSize () - 1 BY 8 DO
+		writer.Char (CHR (arrangement.bits.GetBits (i, 8)));
+	END;
+	WriteRelocations( arrangement, writer )
+END WriteUnixBinaryFile;
 
 PROCEDURE WriteTRMFile (arrangement: Arrangement; writer: Files.Writer; bitsPerLine, lines:LONGINT);
 VAR i,j,size,end,nonZeroInLeadingNibble,leadingzeros: LONGINT;
@@ -328,7 +353,7 @@ PROCEDURE WritePEFile (linker: GenericLinker.Linker; arrangement: Arrangement; w
 CONST DOSText = "This program cannot be run in DOS mode.$";
 CONST DOSHeaderSize = 64; DOSCodeSize = 14; DOSTextSize = 40; DOSStubSize = ((DOSHeaderSize + DOSCodeSize + DOSTextSize + 15) DIV 16) * 16;
 CONST FileAlignment = 200H; SectionAlignment = 1000H; HeaderSize = 24; SectionHeaderSize = 40; DirectoryEntries = 16;
-VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize, BaseCodeAddress, BaseAddress: LONGINT; exportInfo: ExportInfo; relocInfo: RelocationInfo;
+VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize: LONGINT;  BaseCodeAddress, BaseAddress: LONGINT; exportInfo: ExportInfo; relocInfo: RelocationInfo;
 	pos: LONGINT;
 
 	PROCEDURE Reserve (size: LONGINT);
@@ -347,8 +372,8 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize, BaseCodeAddress,
 	BEGIN WriteWORD (value MOD 10000H); WriteWORD (value DIV 10000H);
 	END WriteDWORD;
 
-	PROCEDURE WritePTR (value: LONGINT);
-	BEGIN WriteDWORD (value); IF bitmode = 64 THEN WriteDWORD (0) END;
+	PROCEDURE WritePTR (value: GenericLinker.Address);
+	BEGIN WriteDWORD (LONGINT(value)); IF bitmode = 64 THEN WriteDWORD (0) END;
 	END WritePTR;
 
 	PROCEDURE WriteString(s: ARRAY OF CHAR);
@@ -600,7 +625,7 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize, BaseCodeAddress,
 			(* export address table *)
 			FOR i := 0 TO exportInfo.exports-1 DO
 				ASSERT(exportInfo.exportAddresses[i] # 0);
-				WriteDWORD(exportInfo.exportAddresses[i]-BaseAddress+BaseCodeAddress); (* RVA ! *)
+				WriteDWORD(LONGINT(exportInfo.exportAddresses[i]-BaseAddress+BaseCodeAddress)); (* RVA ! *)
 			END;
 
 			(* export name pointer table *)
@@ -647,7 +672,7 @@ BEGIN
 	exportInfo := arrangement.exportInfo;
 	relocInfo := arrangement.relocInfo;
 	IF HasExports() THEN exportInfo.Sort END;
-	BaseAddress := arrangement.displacement; (* ASSERT (arrangement.displacement = BaseAddress); *)
+	BaseAddress := LONGINT(arrangement.displacement); (* ASSERT (arrangement.displacement = BaseAddress); *)
 	OptionalHeaderSize := 96 + DirectoryEntries * 8;
 	IF bitmode = 64 THEN INC (OptionalHeaderSize, 16); END;
 	CodeSize := arrangement.bits.GetSize () DIV 8;
@@ -864,6 +889,7 @@ BEGIN
 	ELSIF format = "MACHO" THEN RETURN WriteMachOFile;
 	ELSIF format = "DLL32" THEN RETURN WriteDLL32File;
 	ELSIF format = "DLL64" THEN RETURN WriteDLL64File;
+	ELSIF format = "UnixRaw" THEN RETURN WriteUnixBinaryFile;
 	ELSE RETURN default; END;
 END GetFileFormat;
 
@@ -938,7 +964,7 @@ PROCEDURE Link* (context: Commands.Context);
 VAR options: Options.Options;
 	silent, useAll, strict: BOOLEAN;
 	codeFileFormat, dataFileFormat: FileFormat;
-	codeDisplacement, dataDisplacement: GenericLinker.Address;
+	codeDisplacement, dataDisplacement: LONGINT;
 	path, extension, codeFileName, dataFileName, moduleName, logFileName, tempName: Files.FileName;
 	diagnostics: Diagnostics.StreamDiagnostics; code, data: Arrangement; linker: GenericLinker.Linker;
 	linkRoot: ARRAY 256 OF CHAR; logFile: Files.File; log: Files.Writer;
@@ -1061,15 +1087,19 @@ BEGIN
 	NEW(processing);
 	NEW(finished);
 	NEW(defaults);
-	defaults.Add("Win32C","--fileFormat=PE32CUI --fileName=oberon.exe --extension=GofW --displacement=401000H");
+	defaults.Add("Win32CUI","--fileFormat=PE32CUI --fileName=oberon.exe --extension=GofW --displacement=401000H");
 	defaults.Add("Linux32G","--fileFormat=Raw --fileName=oberon --extension=.GofU --displacement=08048000H");
 	defaults.Add("RPI","--fileName=kernel.img --extension=.Goa --displacement=8000H -sa ");
 	defaults.Add("A2G","--fileName=kernel.img --extension=.GofG --displacement=0100000H");
+	defaults.Add("Solaris32G", "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofU --displacement=0" );
+	defaults.Add("Darwin32G",   "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofU --displacement=0" );
 END StaticLinker.
 
 StaticLinker.Link --fileName=test.exe --fileFormat=PE32 --displacement=401000H Test ~
 StaticLinker.Link --fileName=a.out --fileFormat=ELF --displacement=08048000H Test ~
 StaticLinker.Link --fileName=a.out --fileFormat=MACHO --displacement=000010E8H Test ~
+
+SystemTools.Free StaticLinker ~
 
 
 

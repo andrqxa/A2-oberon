@@ -413,13 +413,14 @@ TYPE
 		PROCEDURE NextFree(CONST type: IntermediateCode.Type): LONGINT;
 		VAR i: LONGINT;
 
-			PROCEDURE GetHint(offset: LONGINT): LONGINT;
+			PROCEDURE GetGPHint(offset: LONGINT): LONGINT;
 			VAR res: LONGINT;
 			BEGIN
-				IF (hint # none) & (toVirtual[hint MOD 32 + offset]=free) & ~Reserved(hint) THEN res := hint ELSE res := none END;
+				IF (hint # none) & (hint >= AL) & (hint <= R15) & (toVirtual[hint MOD 32 + offset]=free) & ~Reserved(hint) THEN res := hint MOD 32 + offset ELSE res := none END;
 				hint := none;
 				RETURN res
-			END GetHint;
+			END GetGPHint;
+
 
 			PROCEDURE Get(from,to: LONGINT): LONGINT;
 			VAR i: LONGINT;
@@ -438,22 +439,30 @@ TYPE
 			BEGIN
 			IF type.form IN IntermediateCode.Integer THEN
 				IF type.sizeInBits = IntermediateCode.Bits8 THEN
-					i := GetHint(AL);
+					i := GetGPHint(AL);
+					IF i = none THEN i := Get(BL, AL) END;
+					IF i = none THEN i := Get(BH, AH) END;
 					IF i = none THEN
 						i := Get(AL,R15B)
 					END;
 				ELSIF type.sizeInBits = IntermediateCode.Bits16 THEN
-					i := GetHint(AX);
+					i := GetGPHint(AX);
+					IF i = none THEN i := Get(DI, SI) END;
+					IF i = none THEN i := Get(BX, AX) END;
 					IF i = none THEN
 						i := Get(AX,R15W);
 					END;
 				ELSIF type.sizeInBits = IntermediateCode.Bits32 THEN
-					i := GetHint(EAX);
+					i := GetGPHint(EAX);
+					IF i = none THEN i := Get(EDI,ESI) END;
+					IF i = none THEN i := Get(EBX,EAX) END;
 					IF i = none THEN
 						i := Get(EAX,R15D);
 					END;
 				ELSIF type.sizeInBits = IntermediateCode.Bits64 THEN
-					i := GetHint(RAX);
+					i := GetGPHint(RAX);
+					IF i = none THEN i := Get(RDI,RSI) END;
+					IF i = none THEN i := Get(RBX,RAX) END;
 					IF i = none THEN
 						i := Get(RAX, R15)
 					END;
@@ -487,7 +496,7 @@ TYPE
 		(* static generator state variables, considered constant during generation *)
 		runtimeModuleName: SyntaxTree.IdentifierString;
 		cpuBits: LONGINT;
-		opBP, opSP, opRA, opRB, opRC, opRD, opRS, opR8, opR9: Assembler.Operand; (* base pointer, stack pointer, register A, depends on cpuBits*)
+		opBP, opSP, opRA, opRB, opRC,  opRD, opRSI, opRDI, opR8, opR9, opR10, opR11, opR12, opR13, opR14, opR15: Assembler.Operand; (* base pointer, stack pointer, register A, depends on cpuBits*)
 		BP, SP, RA, RD, RS, RC: LONGINT; (* base pointer and stack pointer register index, depends on cpuBits *)
 
 		emitter: Assembler.Emitter; (* assembler generating and containing the machine code *)
@@ -527,15 +536,20 @@ TYPE
 			NEW(emitter,diagnostics);
 			IF cpuBits=32 THEN
 				NEW(physicalRegisters32, backend.forceFPU, backend.cooperative); physicalRegisters := physicalRegisters32; error := ~emitter.SetBits(32);
-				opBP := opEBP; opSP := opESP; opRA := opEAX; opRB := opEBX; opRD := opEDI; opRS := opESI; opRC := opECX;
+				opBP := opEBP; opSP := opESP; opRA := opEAX; opRB := opEBX; opRD := opEDX; opRDI := opEDI; opRSI := opESI; opRC := opECX;
 				SP := ESP; BP := EBP; RA := EAX;
 				RD := EDI; RS := ESI; RC := ECX;
 				ASSERT(~error);
 			ELSIF cpuBits=64 THEN
 				NEW(physicalRegisters64, backend.forceFPU, backend.cooperative); physicalRegisters := physicalRegisters64; error := ~emitter.SetBits(64);
-				opBP := opRBP; opSP := opRSP; opRA := registerOperands[RAX]; opRB := registerOperands[RBX]; opRD := registerOperands[RDI];
-				opRS := registerOperands[RSI]; opRC := registerOperands[RCX];
+				opBP := opRBP; opSP := opRSP; 
+				opRA := registerOperands[RAX]; opRC := registerOperands[RCX];
+				opRB := registerOperands[RBX]; opRD := registerOperands[RDX];
+				opRDI := registerOperands[RDI]; opRSI := registerOperands[RSI];
 				opR8 := registerOperands[R8]; opR9 := registerOperands[R9];
+				opR10 := registerOperands[R10]; opR11 := registerOperands[R11];
+				opR12 := registerOperands[R12]; opR13 := registerOperands[R13];
+				opR14 := registerOperands[R14]; opR15 := registerOperands[R15];
 				SP := RSP; BP := RBP; RA := RAX;
 				RD := RDI; RS := RSI; RC := RCX;
 				ASSERT(~error);
@@ -1281,9 +1295,10 @@ TYPE
 					END;
 					IF numberMachineWords >4 THEN
 						Assembler.InitImm(imm, 0, numberMachineWords DIV 4);
-						emitter.Emit2(InstructionSet.opMOV, opRB, imm);
+						(* do not use EBX because it is not volative in WINAPI, do not use ECX: special register in COOP *)
+						emitter.Emit2(InstructionSet.opMOV, opRD, imm);
 						destPC := out.pc;
-						emitter.Emit1(InstructionSet.opDEC, opRB);
+						emitter.Emit1(InstructionSet.opDEC, opRD);
 						emitter.Emit1(InstructionSet.opPUSH, opRA);
 						emitter.Emit1(InstructionSet.opPUSH, opRA);
 						emitter.Emit1(InstructionSet.opPUSH, opRA);
@@ -1309,10 +1324,20 @@ TYPE
 
 			cc := SHORT(instruction.op1.intValue);
 			IF (cc = SyntaxTree.WinAPICallingConvention) OR (cc = SyntaxTree.CCallingConvention) THEN
-				(* the winapi calling convention presumes that all registers except EAX, EDX and ECX are retained by the callee *)
-				emitter.Emit1(InstructionSet.opPUSH,opEBX);
-				emitter.Emit1(InstructionSet.opPUSH,opEDI);
-				emitter.Emit1(InstructionSet.opPUSH,opESI);
+				IF  cpuBits = 32 THEN
+					(* the winapi calling convention presumes that all registers except EAX, EDX and ECX are retained by the callee *)
+					emitter.Emit1(InstructionSet.opPUSH,opEBX);
+					emitter.Emit1(InstructionSet.opPUSH,opEDI);
+					emitter.Emit1(InstructionSet.opPUSH,opESI);
+				ELSE ASSERT(cpuBits =64);
+					emitter.Emit1(InstructionSet.opPUSH,opRB);
+					emitter.Emit1(InstructionSet.opPUSH,opRDI);
+					emitter.Emit1(InstructionSet.opPUSH,opRSI);
+					emitter.Emit1(InstructionSet.opPUSH,opR12);
+					emitter.Emit1(InstructionSet.opPUSH,opR13);
+					emitter.Emit1(InstructionSet.opPUSH,opR14);
+					emitter.Emit1(InstructionSet.opPUSH,opR15);
+				END;
 			END;
 			spillStackStart := stackSize;
 		END EmitEnter;
@@ -1322,17 +1347,29 @@ TYPE
 		BEGIN
 			cc := SHORT(instruction.op1.intValue);
 			IF (cc = SyntaxTree.WinAPICallingConvention)  OR (cc = SyntaxTree.CCallingConvention) THEN
-				emitter.Emit1(InstructionSet.opPOP,opESI);
-				emitter.Emit1(InstructionSet.opPOP,opEDI);
-				emitter.Emit1(InstructionSet.opPOP,opEBX);
+				IF cpuBits = 32 THEN
+					emitter.Emit1(InstructionSet.opPOP,opESI);
+					emitter.Emit1(InstructionSet.opPOP,opEDI);
+					emitter.Emit1(InstructionSet.opPOP,opEBX);
+				ELSE ASSERT(cpuBits =64);
+					emitter.Emit1(InstructionSet.opPOP,opR15);
+					emitter.Emit1(InstructionSet.opPOP,opR14);
+					emitter.Emit1(InstructionSet.opPOP,opR13);
+					emitter.Emit1(InstructionSet.opPOP,opR12);
+					emitter.Emit1(InstructionSet.opPOP,opRSI);
+					emitter.Emit1(InstructionSet.opPOP,opRDI);
+					emitter.Emit1(InstructionSet.opPOP,opRB);
+				END;
+				
 			END;
 		END EmitLeave;
 
 		PROCEDURE EmitExit(CONST instruction: IntermediateCode.Instruction);
-		VAR parSize: LONGINT; operand: Assembler.Operand;
+		VAR parSize,cc: LONGINT; operand: Assembler.Operand;
 		BEGIN
+			cc := SHORT(instruction.op2.intValue);
 			parSize := SHORT(instruction.op3.intValue);
-			IF parSize = 0 THEN
+			IF (parSize = 0) OR (cc = SyntaxTree.WinAPICallingConvention) & (cpuBits = 64) THEN
 				emitter.Emit0(InstructionSet.opRET)
 			ELSE (* e.g. for WINAPI calling convention *)
 				operand := Assembler.NewImm16(parSize);
@@ -2944,7 +2981,11 @@ TYPE
 			ELSE
 				sizeInBytes := vop.type.sizeInBits DIV 8;
 				length := vop.type.length;
-				AllocateStack(sizeInBytes*length);
+				IF sizeInBytes * length * 8 < cpuBits THEN 
+					AllocateStack(cpuBits DIV 8);
+				ELSE
+					AllocateStack(sizeInBytes*length);
+				END;
 				Assembler.InitMem(memop, SHORTINT(sizeInBytes*length),SP,0);
 				IF backend.forceFPU THEN
 					emitter.Emit1(InstructionSet.opFLD,op); INC(fpStackPointer);
@@ -3030,6 +3071,7 @@ TYPE
 				| IntermediateCode.Bits8: imm := Assembler.NewImm8 (7); source := opAL;
 				| IntermediateCode.Bits16: imm := Assembler.NewImm8 (15); source := opAX;
 				| IntermediateCode.Bits32: imm := Assembler.NewImm8 (31); source := opEAX;
+				| IntermediateCode.Bits64: imm := Assembler.NewImm8 (63); source := registerOperands[RAX];
 				END;
 				emitter.Emit2 (InstructionSet.opMOV, source,op2);
 				emitter.Emit2 (InstructionSet.opMOV, op1,source);
@@ -3326,10 +3368,11 @@ TYPE
 				 		IF out.os.type = Sections.VarSection THEN
 				 			IF out.pc = 1 THEN out.SetAlignment(FALSE,1)
 				 			ELSIF out.pc = 2 THEN out.SetAlignment(FALSE,2)
-				 			ELSIF out.pc > 2 THEN out.SetAlignment(FALSE,4)
+				 			ELSIF (out.pc > 4) & (bits > 32) THEN out.SetAlignment(FALSE,8)
+				 			ELSIF (out.pc > 2) THEN out.SetAlignment(FALSE,4)
 				 			END;
 				 		ELSIF out.os.type = Sections.ConstSection THEN
-				 			out.SetAlignment(FALSE,4);
+				 			out.SetAlignment(FALSE,bits DIV 8);
 				 		END;
 			 		END
 			 	END
@@ -3420,9 +3463,11 @@ TYPE
 				Basic.Error(diagnostics, module.module.sourceName,Basic.invalidPosition, " could not locate pc");
 			ELSE
 				binarySection := section(IntermediateCode.Section).resolved;
-				label := binarySection.labels;
-				WHILE (label # NIL) & (label.offset >= sectionOffset) DO
-					label := label.prev;
+				IF binarySection # NIL THEN
+					label := binarySection.labels;
+					WHILE (label # NIL) & (label.offset >= sectionOffset) DO
+						label := label.prev;
+					END;
 				END;
 				IF label # NIL THEN
 					Basic.Information(diagnostics, module.module.sourceName,label.position, " pc position");
@@ -3569,3 +3614,6 @@ BEGIN
 	Init;
 	usePool := Machine.NumberOfProcessors()>1;
 END FoxAMDBackend.
+
+
+SystemTools.FreeDownTo FoxAMDBackend ~

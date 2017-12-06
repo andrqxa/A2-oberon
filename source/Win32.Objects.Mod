@@ -160,13 +160,19 @@ TYPE
 		*)
 		lastThreadTimes: HUGEINT;   (*ALEX 2005.12.12*)
 		gcContext: GCContext;
+		context: ANY; (* commands contect *)
 
 		PROCEDURE FindRoots;   (* override, called while GC, replaces Threads.CheckStacks *)
 		VAR sp: ADDRESS; res: Kernel32.BOOL; pc, bp: ADDRESS;
-			n,adr: ADDRESS; desc: Modules.ProcedureDescPointer; i: LONGINT; p {UNTRACED}: ANY;
+			n,adr: ADDRESS; desc {UNTRACED}: Modules.ProcedureDescPointer; i: LONGINT; p {UNTRACED}: ANY;
 			context: Kernel32.Wow64Context;
 			a0,a1, obp, osb, osbp, opc, gbp: ADDRESS;
+			O: ANY; ID: LONGINT;
+			mod {UNTRACED}: Modules.Module;
+			proc {UNTRACED}: Modules.ProcedureDescPointer;
+			modName: ARRAY 128 OF CHAR;
 		BEGIN
+			O := obj; ID := id;
 			IF (handle = 0) OR (mode = Terminated) OR (mode < Ready) (* procedure Wrapper not yet started *)
 			OR (priority > High) (* stack of GC and realtime processes not traced *) THEN
 				RETURN
@@ -184,10 +190,10 @@ TYPE
 					ASSERT(res # -1);
 				END;
 
-				state.ContextFlags := Kernel32.ContextControl + Kernel32.ContextInteger;
+				state.ContextFlags := Kernel32.SetToDW(Kernel32.ContextControl + Kernel32.ContextInteger);
 				res := Kernel32.GetThreadContext( handle, state );
 				
-				context.ContextFlags := Kernel32.ContextControl + Kernel32.ContextInteger;
+				context.ContextFlags := Kernel32.SetToDW(Kernel32.ContextControl + Kernel32.ContextInteger);;
 				IF isWow64 THEN 
 					res := Kernel32.Wow64GetThreadContext( handle, context );
 				ELSE
@@ -196,12 +202,21 @@ TYPE
 				ASSERT(res # 0);
 				sp := context.SP; bp := context.BP; pc := context.PC;
 				
+				mod := Modules.ThisModuleByAdr0(pc);
+				IF mod # NIL THEN
+					COPY(mod.name, modName);
+					proc := Modules.FindProc(pc,mod.procTable);
+				END;
 				
 				obp := bp; osb := stackBottom; opc := pc;
 				osbp := state.BP;
 			END;
 			gbp := gcContext.ebp;
 			IF gbp # NIL THEN bp := gbp END;
+			
+			IF TraceProcessHook # NIL THEN
+				TraceProcessHook(SELF,pc,bp,sp,stackBottom);
+			END;
 			
 			(* stack garbage collection *)
 
@@ -225,7 +240,7 @@ TYPE
 								FOR i := 0 TO LEN(desc.offsets)-1 DO
 									adr := bp + desc.offsets[i]; (* pointer at offset *)
 									SYSTEM.GET(adr, p); (* load pointer *)
-									IF p # NIL THEN 
+									IF p # NIL THEN
 										Heaps.Mark(p);
 									END;
 								END;
@@ -424,9 +439,25 @@ END Yield;
 
 (** Return current process. (DEPRECATED, use ActiveObject) *)
 PROCEDURE CurrentProcess*( ): Process;
-BEGIN
+BEGIN{UNCHECKED} (* makes sure that Enter and Leave are not emitted *)
 	RETURN SYSTEM.VAL(Process, Kernel32.TlsGetValue(tlsIndex));
 END CurrentProcess;
+
+PROCEDURE CurrentContext*(): ANY;
+VAR p: Process;
+BEGIN
+	p := CurrentProcess();
+	IF p # NIL THEN RETURN p.context
+	ELSE RETURN NIL
+	END;
+END CurrentContext;
+
+PROCEDURE SetContext*(context: ANY);
+VAR p: Process;
+BEGIN
+	p := CurrentProcess();
+	IF p # NIL THEN p.context := context END;
+END SetContext;
 
 (* Return stack bottom of process. For compatibility WinAos/UnixAos/NativeAos  *)
 PROCEDURE GetStackBottom*(p: Process): ADDRESS;
@@ -799,11 +830,13 @@ BEGIN
 	Kernel32.Sleep(999999);   (* wait until dependent threads terminated *)
 END TerminateProc;
 
+
 (* Allocate a new process associated with "obj". Must be outside lock region, because of potential GC. *)
 PROCEDURE NewProcess(body: Body; priority: LONGINT;  flags: SET; obj: ProtectedObject; VAR new: Process);
 VAR t,r: Process;  fn: Heaps.FinalizerNode;
 BEGIN
 	NEW(t);
+	t.context := CurrentContext(); (* inherit contet from parent process *)
 	t.handle := 0;
 	IF priority = 0 THEN  (* no priority specified *)
 		r := CurrentProcess();
@@ -827,7 +860,7 @@ BEGIN
 		t.restartPC := SYSTEM.VAL(ADDRESS, terminateProc);
 	END;
 
-	t.handle := Kernel32.CreateThread(0, defaultStackSize, Wrapper, t, {}, t.id);
+	t.handle := Kernel32.CreateThread(0, defaultStackSize, Wrapper, t, Kernel32.SetToDW({}), t.id);
 
 	IF TraceVerbose OR TraceOpenClose THEN
 		Machine.Acquire(Machine.TraceOutput);
@@ -1047,7 +1080,7 @@ END Await;
 				ELSE
 					retBOOL := Kernel32.SuspendThread( t.handle );
 				END;
-				t.state.ContextFlags := Kernel32.ContextControl;
+				t.state.ContextFlags := Kernel32.SetToDW(Kernel32.ContextControl);
 				retBOOL := Kernel32.GetThreadContext( t.handle, t.state );
 				mod := Modules.ThisModuleByAdr( t.state.PC );  Trace.String( "Objects Break at adr: " );
 				Trace.Int( t.state.PC, 5 );  Trace.Ln;
@@ -1119,7 +1152,7 @@ BEGIN
 	t.handle := Kernel32.GetCurrentThread();
 	t.id := Kernel32.GetCurrentThreadId();
 	proc := Kernel32.GetCurrentProcess();
-	res := Kernel32.DuplicateHandle(proc, t.handle, proc, t.handle, {}, 0, {Kernel32.DuplicateSameAccess});
+	res := Kernel32.DuplicateHandle(proc, t.handle, proc, t.handle, Kernel32.SetToDW({}), 0, Kernel32.SetToDW({Kernel32.DuplicateSameAccess}));
 	ASSERT(res # 0);
 	res := Kernel32.TlsSetValue(tlsIndex, SYSTEM.VAL(LONGINT, t));
 	ASSERT(res # 0);
@@ -1128,8 +1161,6 @@ BEGIN
 	ASSERT(t.handle # 0);
 	Machine.Release(Machine.Objects);
 	InitEventHandling; (* implicit call of NewProcess! *)
-	Kernel32.LeaveA2 := LeaveA2;
-	Kernel32.ReenterA2 := ReenterA2;
 	InitGCHandling; (* do. *)
 	Heaps.gcStatus := GCStatusFactory()
 END Init;
@@ -1274,6 +1305,7 @@ VAR GetProcedureName*: PROCEDURE (pc: ADDRESS; VAR n: ARRAY OF CHAR; VAR spc: AD
 PROCEDURE LeaveA2;
 VAR cur: Process; ebp,n: ADDRESS;
 BEGIN
+	IF clock = NIL THEN RETURN END;
 	cur := CurrentProcess();
 	IF cur # NIL THEN 
 		ebp := Machine.CurrentBP();
@@ -1286,6 +1318,7 @@ END LeaveA2;
 PROCEDURE ReenterA2;
 VAR cur: Process;
 BEGIN
+	IF clock = NIL THEN RETURN END;
 	cur := CurrentProcess();
 	IF cur # NIL THEN 
 		cur.gcContext.ebp := NIL;
@@ -1294,8 +1327,10 @@ END ReenterA2;
 
 VAR
 	lpContext: Kernel32.Wow64Context;
+	TraceProcessHook*: PROCEDURE (prcoess: Process; pc, bp: ADDRESS; stacklow, stackhigh: ADDRESS);
 	
 BEGIN
+	TraceProcessHook := NIL;
 	exceptionhandler := NIL;
 	terminateProc := TerminateProc;
 	ready.head := NIL; ready.tail := NIL;

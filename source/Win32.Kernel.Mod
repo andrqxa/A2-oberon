@@ -224,11 +224,20 @@ VAR
 	BEGIN
 		RETURN (t.target - Kernel32.GetTickCount()) * (1000 DIV Machine.Second)
 	END Left;
+	
+	PROCEDURE Nothing;
+	BEGIN
+		
+	END Nothing;
+	
 
 BEGIN
 	ASSERT (1000 MOD Machine.Second = 0);   (* for Elapsed *)
 	second := Machine.Second;
 	Heaps.GC := Heaps.InvokeGC; (* must be done after all processors have started *)
+	(*
+	Heaps.GC := Nothing;
+	*)
 END Kernel.
 
 (**

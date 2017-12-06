@@ -77,7 +77,7 @@ TYPE
 	Process* = OBJECT(Heaps.ProcessLink)
 	VAR
 		obj-: ProtectedObject;   (* associated active object *)
-		state-: RECORD PC-,BP-: ADDRESS END;
+		state-: RECORD PC-,BP-,SP-: ADDRESS END;
 		condition-: Condition;   (* awaited process' condition *)
 		condFP-: LONGINT;   (* awaited process' condition's context *)
 		mode-: LONGINT;   (* process state *)  (* only changed inside Objects lock ??? *)
@@ -90,7 +90,6 @@ TYPE
 		restartPC-: LONGINT;   (** entry point of body, for SAFE exception recovery *)
 		restartSP-: LONGINT;   (** stack level at start of body, for SAFE exception recovery *)
 		cpuCycles, lastCpuCycles : CpuCyclesArray;
-
 	END Process;
 
 	FinalizedCollection* = OBJECT
@@ -186,6 +185,9 @@ VAR
 	clock: Clock;
 	interrupt: ARRAY CPU.Interrupts OF Interrupter;
 
+	(* for compatibility and later extension *)
+	TraceProcessHook* := NIL: PROCEDURE (prcoess: Process; pc, bp: ADDRESS; stacklow, stackhigh: ADDRESS);
+	
 (* Set the current process' priority. *)
 PROCEDURE SetPriority*( priority: LONGINT );
 BEGIN
@@ -215,6 +217,16 @@ BEGIN
 	RETURN NIL;
 END CurrentProcess;
 
+PROCEDURE CurrentContext*(): ANY;
+BEGIN
+	RETURN NIL; (* stub *)
+END CurrentContext;
+
+PROCEDURE SetContext*(context: ANY);
+BEGIN
+	(* stub *)
+END SetContext;
+
 (* Return stack bottom of process. For compatibility WinAos/UnixAos/NativeAos  *)
 PROCEDURE GetStackBottom*(p: Process): ADDRESS;
 BEGIN
@@ -223,9 +235,12 @@ END GetStackBottom;
 
 (** Return the active object currently executing. *)
 PROCEDURE ActiveObject* (): ANY;
-BEGIN
-	RETURN Activities.GetCurrentActivity ().object;
+VAR activity {UNTRACED}: Activities.Activity;
+BEGIN {UNCOOPERATIVE, UNCHECKED}
+	activity := Activities.GetCurrentActivity ();
+	IF activity.object # NIL THEN RETURN activity.object ELSE RETURN activity END;
 END ActiveObject;
+
 
 (** Return the ID of the active currently executing process. *)
 PROCEDURE GetProcessID* (): LONGINT;
@@ -236,6 +251,12 @@ END GetProcessID;
 (* Attempt to terminate a specific process (mostly ignoring its locks). DEPRECATED *)
 PROCEDURE TerminateThis*( t: Process;  halt: BOOLEAN );
 END TerminateThis;
+
+(* called by WMProcessInfo to obtain the current state of a running process *)
+PROCEDURE UpdateProcessState*( p: Process );	
+BEGIN
+	(*  update p.stat.{PC,BP,SP}  *)
+END UpdateProcessState;
 
 PROCEDURE Terminate*;
 BEGIN

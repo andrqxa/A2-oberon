@@ -209,7 +209,7 @@ TYPE
 		procID-		: LONGINT;				(* processor ID where running, not used in UnixAos *)
 		state-			: Machine.State;		(*! not used in UnixAos! *)
 		state0	: ARRAY 2048 OF CHAR;		(* thread state at body start, used for restart after trap *)
-					
+		context: ANY; (* commands cotext *)
 				
 		PROCEDURE FindRoots*;
 		VAR sp, ptr: ADDRESS;
@@ -265,6 +265,7 @@ TYPE
 			flags := fl;
 			priority := prio;
 			nextProcess := NIL;
+			context := CurrentContext();
 			IF root # NIL THEN
 				newProcess := SELF;
 				ASSERT( bodyProc # NIL );
@@ -463,7 +464,22 @@ TYPE
 		RETURN p
 	END CurrentProcess;
 
-	
+	PROCEDURE CurrentContext*(): ANY;
+	VAR p: Process;
+	BEGIN
+		p := CurrentProcess();
+		IF p # NIL THEN RETURN p.context
+		ELSE RETURN NIL
+		END;
+	END CurrentContext;
+
+	PROCEDURE SetContext*(context: ANY);
+	VAR p: Process;
+	BEGIN
+		p := CurrentProcess();
+		IF p # NIL THEN p.context := context END;
+	END SetContext;
+
 	(* Return the active object currently executing. *)
 	PROCEDURE ActiveObject*( ): ANY;		
 	VAR p: Process;
@@ -642,6 +658,13 @@ TYPE
 
 	(*--------------------  Garbage Collection  ------------------------------------*)
 	
+	
+	(* called by WMProcessInfo to obtain the current state of a running process *)
+	PROCEDURE UpdateProcessState*( p: Process );	
+	BEGIN
+		(*  update p.stat.{PC,BP,SP}  *)
+	END UpdateProcessState;
+
 	PROCEDURE SuspendActivities;
 	VAR t: Process;  
 	BEGIN
@@ -787,8 +810,13 @@ TYPE
 		Heaps.GC := InvokeGC;
 		Heaps.InvokeGC := InvokeGC;
 	END Init;
-
+	
+VAR
+	(* for compatibility and later extension *)
+	TraceProcessHook*: PROCEDURE (prcoess: Process; pc, bp: ADDRESS; stacklow, stackhigh: ADDRESS);
+	
 BEGIN
+	TraceProcessHook := NIL;
 	Init;
 END Objects.
 

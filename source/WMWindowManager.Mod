@@ -511,7 +511,7 @@ TYPE
 
 		PROCEDURE SetCanvasGenerator*(canvasGen:Graphics.CanvasGenerator);
 		BEGIN{EXCLUSIVE}
-			SELF.canvasGen:=canvasGen; canvas:=canvasGen(img); 
+			SELF.canvasGen:=canvasGen; IF img # NIL THEN canvas:=canvasGen(img); END;
 			IF manager # NIL THEN manager.AddVisibleDirty(SELF, bounds) END
 		END SetCanvasGenerator;
 		
@@ -527,7 +527,9 @@ TYPE
 		END IsHit;
 
 		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h, q : LONGINT);
+		VAR img: Graphics.Image;
 		BEGIN
+			img := SELF.img;
 			IF reduceQuality THEN q := 0 END;
 			IF img # NIL THEN
 				IF (w = img.width) & (h = img.height) THEN
@@ -603,8 +605,8 @@ TYPE
 		PROCEDURE SetCanvasGenerator*(canvasGen:Graphics.CanvasGenerator);
 		BEGIN
 			SELF.canvasGen:=canvasGen; 
-			visibleCanvas:=canvasGen(img);
-			canvas:=canvasGen(backImg); 
+			IF img # NIL THEN visibleCanvas:=canvasGen(img); END;
+			IF backImg # NIL THEN canvas:=canvasGen(backImg); END;
 			IF manager # NIL THEN manager.AddVisibleDirty(SELF, bounds) END
 		END SetCanvasGenerator;
 

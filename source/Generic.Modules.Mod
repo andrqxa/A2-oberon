@@ -28,6 +28,9 @@ CONST
 
 	TraceBoot=FALSE;
 
+	(* flags *)
+	PreciseGC* = 0;
+
 TYPE
 	(* definitions for object-model loader support *)
 	Name* = ARRAY 32 OF CHAR;
@@ -35,7 +38,7 @@ TYPE
 	(* the correponding name array is protected from being GCed via module's internal pointer arrray 
 		compiler generated!
 	*)
-	DynamicName* = POINTER {UNSAFE} TO ARRAY 256 OF CHAR;
+	DynamicName* = POINTER {UNSAFE,UNTRACED} TO ARRAY 256 OF CHAR;
 	
 	Command* = RECORD
 		(* Fields exported for initialization by loader/linker only! Consider read-only! *)
@@ -51,7 +54,7 @@ TYPE
 		exports*: LONGINT; (* number of exports referenced by ExportArray *)
 		dsc* {UNTRACED}: ExportArray; (* pointer to memory containing a raw array with "exports" entries *)
 	END;
-	ExportArray* = POINTER {UNSAFE} TO ARRAY OF ExportDesc;
+	ExportArray* = POINTER {UNSAFE,UNTRACED} TO ARRAY OF ExportDesc;
 
 	Bytes* = POINTER TO ARRAY OF CHAR;
 
@@ -61,8 +64,8 @@ TYPE
 	(* all implicit or explicit pointers in the subsequent data structures are protected with one pointer array
 	*)
 
-	TypeDesc* = POINTER TO RECORD 
-		descSize-: LONGINT;
+	TypeDesc* = POINTER  TO RECORD 
+		descSize-: SIZE;
 		sentinel-: LONGINT;	(* = MPO-4 *)
 		tag-: ADDRESS; (* pointer to static type descriptor, only used by linker and loader *)
 		flags-: SET;
@@ -108,12 +111,15 @@ TYPE
 			internal-: POINTER TO ARRAY OF ANY;
 			crc*: LONGINT;
 			body*: PROCEDURE;
-
+			flags*: SET;	 (* e.g. compilation flags *)
+			
 		PROCEDURE FindRoots;	(* override *)
 		VAR i: LONGINT; ptr: ANY; false: BOOLEAN;
+		VAR name: Name;
 		BEGIN
+			name := SELF.name;
 			false := FALSE; IF false THEN BEGIN{EXCLUSIVE} END END; (* trick to make a module a protected record ... *)
-			IF published THEN	(* mark global pointers *)
+			IF published THEN	(* mark global pointers *)				
 				FOR i := 0 TO LEN(ptrAdr) - 1 DO
 					SYSTEM.GET (ptrAdr[i], ptr);
 					IF ptr # NIL THEN Heaps.Mark(ptr) END
@@ -146,6 +152,12 @@ VAR
 	procedureDescriptors-: ProcedureDescs;
 
 (** Register a module loader. *)
+
+PROCEDURE Halt(CONST reason: ARRAY OF CHAR);
+BEGIN
+	HALT(999);
+END Halt;
+
 
 PROCEDURE AddLoader*(CONST ext: ARRAY OF CHAR; proc: LoaderProc);
 BEGIN
@@ -188,7 +200,7 @@ END Append;
 
 (** Add a module to the pool of accessible modules, or return named module. *)
 PROCEDURE Publish*(VAR m: Module; VAR new: BOOLEAN);
-VAR n: Module; i: LONGINT;
+VAR n: Module; i: LONGINT; name: Name;
 BEGIN
 	Machine.Acquire(Machine.Modules);
 	n := root; WHILE (n # NIL) & (n.name # m.name) DO n := n.next END;
@@ -214,7 +226,11 @@ BEGIN
 
 		new := TRUE;
 	END;
-	Machine.Release(Machine.Modules)
+	Machine.Release(Machine.Modules);
+	IF (Heaps.GCType = Heaps.MetaDataForStackGC) & ~(PreciseGC IN m.flags) THEN
+		name := m.name;
+		Halt("Module does not provide metadata required by the GC.");
+	END;
 END Publish;
 
 PROCEDURE Initialize*(VAR module: Module);
@@ -668,7 +684,7 @@ BEGIN
 			IF m # NIL THEN term := m.term; m.term := NIL END; (* finalizer only called once *)
 			Machine.Release(Machine.Modules);
 			IF m = NIL THEN EXIT END;
-			IF trace THEN
+			IF TraceBoot OR trace THEN
 				Machine.Acquire (Machine.TraceOutput);
 				Trace.String("TermHandler "); Trace.StringLn (m.name);
 				Machine.Release (Machine.TraceOutput);
@@ -678,12 +694,12 @@ BEGIN
 		(* clean up finalizers *)
 		m := root;
 		WHILE m # NIL DO
-			IF LEN(m.code)>0 THEN
+			IF (m.code # NIL) & (LEN(m.code)>0) THEN
 				Heaps.CleanupModuleFinalizers(ADDRESSOF(m.code[0]), LEN(m.code), m.name)
 			END;
 			m := m.next
 		END;
-		IF trace THEN
+		IF TraceBoot OR trace THEN
 			Machine.Acquire (Machine.TraceOutput);
 			Trace.StringLn ("Modules.Shutdown finished");
 			Machine.Release (Machine.TraceOutput);
@@ -829,6 +845,8 @@ BEGIN
 		Trace.String("publish registered modules"); Trace.Ln;
 	END;
 	PublishRegisteredModules;
+	(* a standard A2 kernel does not reach this point, but for standalone executables this is required *)
+	Machine.Shutdown(FALSE);
 END Main;
 
 PROCEDURE Init;

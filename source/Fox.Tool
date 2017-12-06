@@ -3,13 +3,15 @@ Build and Test Tool
 (c) Felix Friedrich (fof), ETH Zürich, 2008-2016
 Conceptual design of the compiler has been worked out together with Florian Negele.
 
+Heaps.SetYoung 
+Heaps.SetOld 
 
 Compiler.Compile --noInterfaceCheck
 (* 
 	SystemTools.DoCommands
 	SystemTools.Timer start ~
 
-	Compiler.Compile -p=Win32G *)
+	Compiler.Compile -p=Win32G --writeBarriers *)
 
 	BitSets.Mod ObjectFile.Mod GenericLinker.Mod StaticLinker.Mod
 	FoxBasic.Mod  FoxProgTools.Mod  FoxScanner.Mod FoxCSharpScanner.Mod FoxSyntaxTree.Mod FoxGlobal.Mod
@@ -130,4 +132,18 @@ some documentation rules
 
 
 -----------------------------------------------------------------------------------
+
+
+Building a library: 
+
+	FoxGenericObjectFile.MakeLibrary 
+		Kernel.Lib Runtime.GofW Trace.GofW
+		Kernel32.GofW Machine.GofW Heaps.GofW Modules.GofW Objects.GofW
+		Kernel.GofW KernelLog.GofW Streams.GofW Commands.GofW Files.GofW 
+		WinFS.GofW Clock.GofW Dates.GofW Reals.GofW Strings.GofW Diagnostics.GofW BitSets.GofW StringPool.GofW ObjectFile.GofW GenericLinker.GofW Reflection.GofW 
+		GenericLoader.GofW
+		WinTrace.GofW StdIO.GofW
+		~ 
+		
+
 

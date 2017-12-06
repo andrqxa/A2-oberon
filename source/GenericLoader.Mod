@@ -15,12 +15,12 @@ CONST
 TYPE
 
 	HashEntryIntInt = RECORD
-		key,value: LONGINT;
+		key,value: SIZE;
 	END;
 	HashIntArray = POINTER TO ARRAY OF HashEntryIntInt;
 
 	HashEntryIntAny = RECORD
-		key: LONGINT; value: ANY;
+		key: SIZE; value: ANY;
 	END;
 
 	HashIntAnyArray = POINTER TO ARRAY OF HashEntryIntAny;
@@ -43,8 +43,8 @@ TYPE
 			maxLoadFactor := 0.75;
 		END Init;
 
-		PROCEDURE Put*(key: LONGINT; value: LONGINT);
-		VAR hash: LONGINT;
+		PROCEDURE Put*(key: SIZE; value: SIZE);
+		VAR hash: SIZE;
 		BEGIN
 			ASSERT(key # 0);
 			ASSERT(used < size);
@@ -57,12 +57,12 @@ TYPE
 			IF (used / size) > maxLoadFactor THEN Grow END;
 		END Put;
 
-		PROCEDURE Get*(key: LONGINT):LONGINT;
+		PROCEDURE Get*(key: SIZE):SIZE;
 		BEGIN
 			RETURN table[HashValue(key)].value;
 		END Get;
 
-		PROCEDURE Has*(key: LONGINT):BOOLEAN;
+		PROCEDURE Has*(key: SIZE):BOOLEAN;
 		BEGIN
 			RETURN table[HashValue(key)].key = key;
 		END Has;
@@ -76,8 +76,8 @@ TYPE
 
 		(* Internals *)
 
-		PROCEDURE HashValue(key: LONGINT):LONGINT;
-		VAR value, h1, h2, i: LONGINT;
+		PROCEDURE HashValue(key: SIZE):SIZE;
+		VAR value, h1, h2, i: SIZE;
 		BEGIN
 			i := 0;
 			value := key;
@@ -92,7 +92,7 @@ TYPE
 		END HashValue;
 
 		PROCEDURE Grow;
-		VAR oldTable: HashIntArray; oldSize, i, key: LONGINT;
+		VAR oldTable: HashIntArray; oldSize, i, key: SIZE;
 		BEGIN
 			oldSize := size;
 			oldTable := table;
@@ -125,8 +125,8 @@ TYPE
 			maxLoadFactor := 0.75;
 		END Init;
 
-		PROCEDURE Put*(key: LONGINT; value: ANY);
-		VAR hash: LONGINT;
+		PROCEDURE Put*(key: SIZE; value: ANY);
+		VAR hash: SIZE;
 		BEGIN
 			ASSERT(key # 0);
 			ASSERT(used < size);
@@ -160,8 +160,8 @@ TYPE
 
 		(* Internals *)
 
-		PROCEDURE HashValue(key: LONGINT):LONGINT;
-		VAR value, h1, h2, i: LONGINT;
+		PROCEDURE HashValue(key: SIZE):SIZE;
+		VAR value, h1, h2, i:SIZE;
 		BEGIN
 			i := 0;
 			value := key;
@@ -176,7 +176,7 @@ TYPE
 		END HashValue;
 
 		PROCEDURE Grow;
-		VAR oldTable: HashIntAnyArray; oldSize, i, key: LONGINT;
+		VAR oldTable: HashIntAnyArray; oldSize, i, key: SIZE;
 		BEGIN
 			oldSize := size;
 			oldTable := table;
@@ -191,14 +191,14 @@ TYPE
 
 	END HashTableIntAny;
 
-	Data=RECORD size, pos: LONGINT; bytes: Modules.Bytes; firstAddress: LONGINT; END;
+	Data=RECORD size, pos: LONGINT; bytes: Modules.Bytes; firstAddress: ADDRESS; END;
 
 	Arrangement* = OBJECT (GenericLinker.Arrangement);
 	VAR
 		code, data: Data;
 		(*moduleAdr: LONGINT;*)
 		hasBody: BOOLEAN;
-		bodyAddress : LONGINT;
+		bodyAddress : ADDRESS;
 
 		PROCEDURE & InitArrangement;
 		BEGIN InitData(code); InitData(data); hasBody := FALSE;
@@ -271,7 +271,7 @@ TYPE
 			any: ANY;
 
 			PROCEDURE TraverseScopes(CONST scope: Modules.ExportDesc; level: LONGINT);
-			VAR adr,i: LONGINT;
+			VAR adr: ADDRESS; i: LONGINT;
 			BEGIN
 				IF (level > 2) THEN RETURN END;
 				IF (scope.fp # 0) THEN
@@ -356,8 +356,9 @@ TYPE
 
 		PROCEDURE ImportBlock(CONST fixup: ObjectFile.Fixup): GenericLinker.Block;
 		VAR name: Modules.Name; res: LONGINT;
-		msg: ARRAY 128 OF CHAR; module: Modules.Module; adr: LONGINT; m: HashTableInt;
-		s: ObjectFile.SectionName; isModule: BOOLEAN; identifier: ObjectFile.Identifier;
+			msg: ARRAY 128 OF CHAR; module: Modules.Module; adr: ADDRESS; m: HashTableInt;
+			s: ObjectFile.SectionName; isModule: BOOLEAN; identifier: ObjectFile.Identifier;
+			fp: SIZE;
 
 			PROCEDURE CheckName(n: StringPool.Index;  name {UNTRACED}: Modules.DynamicName): LONGINT;
 			VAR s: ObjectFile.SectionName; i: LONGINT;
@@ -370,10 +371,18 @@ TYPE
 				END;
 				RETURN ORD(s[i]) - ORD(name[i]);
 			END CheckName;
+			
+			PROCEDURE Error(n: StringPool.Index);
+			VAR name: ARRAY 256 OF CHAR;
+			BEGIN
+				StringPool.GetString(n, name); 
+				TRACE("Fingerprint does not match",name);
+			END Error;
+			
 		
 			(* stupid implementation: just search for fp in all exports *)
-			PROCEDURE CheckScope(CONST scope: Modules.ExportDesc; level: LONGINT): LONGINT;
-			VAR adr,lo,hi,m,res: LONGINT;
+			PROCEDURE CheckScope(CONST scope: Modules.ExportDesc; level: LONGINT): ADDRESS;
+			VAR adr,lo,hi,m,res: SIZE;
 			BEGIN
 				adr := 0;
 				(* export names are sorted, binary search: *)
@@ -383,9 +392,11 @@ TYPE
 					res := CheckName(identifier.name[level], scope.dsc[m].name);
 					IF res = 0 THEN 
 						IF (level = LEN(identifier.name)-1) OR (identifier.name[level+1] <= 0) THEN
-							IF (scope.dsc[m].fp # identifier.fingerprint) & (scope.dsc[m].fp # 0) & (identifier.fingerprint # 0) THEN
-								TRACE("fingerprints don't match");
+							(*IF (scope.dsc[m].fp # identifier.fingerprint) & (scope.dsc[m].fp # 0) & (identifier.fingerprint # 0) THEN
+								Error(identifier.name[level]);
 							END;
+							*)
+							fp := scope.dsc[m].fp;
 							RETURN scope.dsc[m].adr
 						ELSE
 							RETURN CheckScope(scope.dsc[m], level+1);
@@ -410,12 +421,6 @@ TYPE
 
 			StringPool.GetString(identifier.name[0], name);
 			isModule := identifier.name[1] = InternalModuleName;
-			IF (identifier.name[0] = OberonName) & (identifier.name[2] >= 0)  THEN (* in Oberon name space *)
-				StringPool.GetString(identifier.name[1], s);
-				Strings.Append(name, ".");
-				Strings.Append(name, s);
-				isModule := identifier.name[2] = InternalModuleName;
-			END;
 
 			(*
 				IF ~isModule & (identifier.fingerprint = 0) THEN
@@ -449,10 +454,10 @@ TYPE
 			END;
 
 			IF adr = 0 THEN
-				D.String("GenericLoader Fatal error: did not find block "); s := identifier.name; D.String(s); D.Ln;
+				(*D.String("GenericLoader Fatal error: did not find block "); s := identifier.name; D.String(s); D.Ln;*)
 				RETURN NIL;
 			ELSE (* found *)
-				importBlock.identifier.fingerprint := identifier.fingerprint; importBlock.address := adr
+				importBlock.identifier.fingerprint := LONGINT(fp); importBlock.address := adr
 			END;
 			RETURN importBlock
 		END ImportBlock;
@@ -462,7 +467,7 @@ TYPE
 VAR
 	moduleList: ModuleList;
 	testTypeDescs: Modules.Bytes;
-	InternalModuleName, OberonName: StringPool.Index;
+	InternalModuleName: StringPool.Index;
 
 	PROCEDURE InitData(VAR data: Data);
 	BEGIN
@@ -498,8 +503,8 @@ VAR
 		INC(data.size, section.bits.GetSize() DIV 8);
 	END DoPreallocate;
 
-	PROCEDURE DoAllocate(CONST section: ObjectFile.Section; VAR data: Data): GenericLinker.Address;
-	VAR address: ObjectFile.Bits; size: SIZE;
+	PROCEDURE DoAllocate(CONST section: ObjectFile.Section; VAR data: Data): ADDRESS;
+	VAR address: ADDRESS; size: SIZE;
 	BEGIN
 		IF (data.bytes = NIL) OR (LEN(data.bytes) # data.size) THEN NEW(data.bytes, data.size) END;
 
@@ -509,7 +514,7 @@ VAR
 		address := ADDRESSOF(data.bytes[0])+data.pos; (*  to account for potentially empty variable at end of data ... *)
 		size := section.bits.GetSize();
 		section.bits.CopyTo(address, size);
-		INC(data.pos, size DIV 8);
+		INC(data.pos, LONGINT(size DIV 8));
 		(*
 		bitPos:= 0;
 		WHILE size > 0 DO
@@ -527,7 +532,7 @@ VAR
 	VAR
 		file: Files.File; reader: Files.Reader; linker: Linker;
 		arrangement: Arrangement; diagnostics: Diagnostics.StreamDiagnostics; stringWriter: Streams.StringWriter;
-		module: Modules.Module; heapBlockAdr,moduleAdr: LONGINT;
+		module: Modules.Module; heapBlockAdr,moduleAdr: ADDRESS;
 		Log: Streams.Writer;
 	BEGIN
 		file := Files.Old(fileName);
@@ -606,7 +611,6 @@ VAR
 	BEGIN
 		NEW(testTypeDescs,1);
 		Modules.InstallTermHandler(Remove);
-		StringPool.GetIndex("Oberon",OberonName);
 		StringPool.GetIndex("@Module",InternalModuleName);
 		NEW(moduleList);
 		Install;

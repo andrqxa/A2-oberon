@@ -54,7 +54,7 @@ TYPE
 			diagnostics.Error (filename, Diagnostics.Invalid, Diagnostics.Invalid, "failed to open");
 		ELSE
 
-			NEW(scanner, filename, reader,0, diagnostics);
+			scanner := Scanner.NewScanner(filename, reader, 0, diagnostics);
 			NEW(parser, scanner, diagnostics);
 
 			REPEAT (* WHILE parser.Peek(Scanner.Identifier) DO*)
@@ -104,15 +104,8 @@ TYPE
 		VAR message,name: ARRAY 256 OF CHAR;
 		BEGIN
 			message := "";
-			IF (module # NIL) & (module.context # SyntaxTree.invalidIdentifier) THEN
-				Basic.GetString(module.context,message);
-				Strings.Append (message, ".");
-			ELSE
-				message := "";
-			END;
-			IF (module # NIL) & (module.name # SyntaxTree.invalidIdentifier) THEN
-				Basic.GetString(module.name,name);
-				Strings.Append (message, name);
+			IF module # NIL THEN
+				Global.GetModuleName(module, message); 
 			END;
 			Strings.Append (message, msg);
 			IF error THEN
@@ -525,8 +518,10 @@ TYPE
 BEGIN
 	NEW(platforms);
 	(* platform definitions hard coded for the common cases -- maybe (parts of it) should be outsourced to a file ?*)
-	AddPlatform("Win32","-b=AMD --objectFile=Binary --symbolFile=Binary --objectFileExtensions=.Obw --symbolFileExtension=.Obw");
-	AddPlatform("Win32G","-b=AMD --objectFile=Generic --symbolFile=Textual --newObjectFile --mergeSections --objectFileExtension=.GofW --symbolFileExtension=.SymW --preciseGC");
+	AddPlatform("Win32","-b=AMD --objectFile=Binary --symbolFile=Binary --objectFileExtension=.Obw --symbolFileExtension=.Obw");
+	AddPlatform("Win32G","-b=AMD --objectFile=Generic --symbolFile=Textual --newObjectFile --mergeSections --objectFileExtension=.GofW --symbolFileExtension=.SymW --preciseGC --trackLeave --writeBarriers");
+	AddPlatform("Win64G","-b=AMD --bits=64 --objectFile=Generic --newObjectFile  --mergeSections --symbolFile=Textual  --objectFileExtension=.GofWw --symbolFileExtension=.SymWw --preciseGC --trackLeave");
+	AddPlatform("Win32C","-b=AMD --cooperative --objectFile=Generic --newObjectFile --traceModule=Trace --objectFileExtension=.GofCW --symbolFileExtension=.SymCW");
 	AddPlatform("ARM","-b=ARM --objectFile=Generic --newObjectFile --metaData=simple --objectFileExtension=.Goa --symbolFileExtension=.Sya");
 	AddPlatform("Minos","-b=ARM --objectFile=Minos"); 
 	AddPlatform("TRM","-b=TRM --objectFile=Generic --newObjectFile --metaData=simple --objectFileExtension=.GofT --symbolFileExtension=.SymT");

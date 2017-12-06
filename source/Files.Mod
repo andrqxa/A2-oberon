@@ -245,7 +245,7 @@ TYPE
 		BEGIN
 			SELF.flags := flags; SELF.size := size; SELF.reserved := reserved;
 			IF ~(ReadOnly IN flags) THEN
-				maplen := (size+1+SetSize - 1) DIV SetSize;
+				maplen := (size + SetSize) DIV SetSize;
 				NEW(map, maplen);
 				WHILE maplen > 0 DO DEC(maplen); map[maplen] := {} END;
 				INCL(map[0], 0);	(* reserve sector 0 (illegal to use) *)
@@ -1074,6 +1074,23 @@ VAR
 		IF fs # NIL THEN fs.Enumerate0(fmask, flags, enum) END
 	END
 END Enumerate;
+
+
+(* add a search path to the system *)
+PROCEDURE SetWorkPath*(context: Commands.Context);
+VAR cmd: ARRAY 32 OF CHAR; msg: ARRAY 256 OF CHAR;  res: LONGINT;
+BEGIN
+	(* preliminary implementation until we know how to solve this generically *)
+	IF Modules.ModuleByName("WinFS") # NIL THEN 
+		cmd := "WinFS.SetWorkPath";
+	ELSIF Modules.ModuleByName("UnixFiles") # NIL THEN 
+		cmd := "UnixFiles.SetWorkPath";
+	END;
+	IF cmd # "" THEN 
+		Commands.Activate(cmd, context, {Commands.Wait}, res, msg);
+		IF res # 0 THEN context.error.String(msg); context.error.Ln; END;
+	END
+END SetWorkPath;
 
 (* Find an open file. *)
 

@@ -515,7 +515,7 @@ TYPE
 			IF Trace THEN E( "ExpressionList" ) END;
 		END ExpressionList;
 
-		(** IndexList = '?' [',' ExpressionList ] | ExpressionList [',' '?']. **)
+		(** IndexList =   '?' [',' ExpressionList]  |  Expression { ',' Expression } [',' '?' [',' ExpressionList] ] **)
 		PROCEDURE IndexList(expressionList: SyntaxTree.ExpressionList);
 		VAR
 			position: Position;
@@ -537,6 +537,9 @@ TYPE
 					IF Optional(Scanner.Comma) THEN
 						IF Optional(Scanner.Questionmark) THEN
 							expressionList.AddExpression(SyntaxTree.NewTensorRangeExpression(position));
+							IF Optional(Scanner.Comma) THEN
+								ExpressionList(expressionList);
+							END;
 							done := TRUE;
 						ELSE
 							expressionList.AddExpression(Expression())
@@ -645,7 +648,8 @@ TYPE
 				designator := SyntaxTree.NewSelfDesignator(position);
 			ELSIF Optional(Scanner.Result) THEN
 				designator := SyntaxTree.NewResultDesignator(position);
-			ELSIF (Token() = Scanner.Address) OR (Token()=Scanner.Size) OR (Token() = Scanner.Alias) THEN
+			(* ADDRESS AND SIZE can be type identifiers used for type conversion *)
+			ELSIF (Token() = Scanner.Address) OR (Token()=Scanner.Size) THEN
 				identifier := symbol.identifier;
 				designator := SyntaxTree.NewIdentifierDesignator(position,identifier);
 				NextSymbol;
@@ -752,7 +756,7 @@ TYPE
 
 		(** Factor = Number | Character | String | 'nil' | 'imag' | 'true' | 'false' | Set
 			 			  | '(' Expression ')' | '~' Factor | Factor '`' | Designator | MathArray.
-			 			  | 'SIZE' 'OF' Designator | 'ADDRESS' 'OF' Designator
+			 			  | 'SIZE' 'OF' Designator | 'ADDRESS' 'OF' Designator | 'ALIAS' OF Expression
 			 			  **)
 		PROCEDURE Factor( ): SyntaxTree.Expression;
 		VAR factor: SyntaxTree.Expression; position: Position; operator: LONGINT;
@@ -811,11 +815,19 @@ TYPE
 					factor := Factor();
 					factor := SyntaxTree.NewUnaryExpression( position, factor, Scanner.Not );
 					factor.End( symbol.position.end );
-			| Scanner.Address, Scanner.Size, Scanner.Alias:
+			| Scanner.Address, Scanner.Size:
 					operator := Token();
-					factor := Designator();
+					factor := Designator(); (* ADDRESS AND SIZE can be type identifiers used for type conversion *)
 					IF Optional(Scanner.Of) THEN
 						factor := Designator();
+						factor := SyntaxTree.NewUnaryExpression( position, factor, operator );
+					END;
+					factor.End (symbol.position.end)
+			| Scanner.Alias:
+					operator := Token();
+					NextSymbol();
+					IF Mandatory(Scanner.Of) THEN
+						factor := Factor();
 						factor := SyntaxTree.NewUnaryExpression( position, factor, operator );
 					END;
 					factor.End (symbol.position.end)
@@ -1486,7 +1498,13 @@ TYPE
 					IF Peek(Scanner.Identifier) THEN VariableDeclaration( recordScope ) END;
 				UNTIL ~Optional( Scanner.Semicolon );
 			END;
-			WHILE Optional(Scanner.Procedure) DO ProcedureDeclaration(recordScope); Ignore(Scanner.Semicolon) END; 
+			LOOP 
+				IF Optional(Scanner.Procedure) THEN ProcedureDeclaration(recordScope); Ignore(Scanner.Semicolon);
+				ELSIF Optional(Scanner.Operator) THEN OperatorDeclaration(recordScope); Ignore(Scanner.Semicolon);
+				ELSE EXIT 
+				END;
+			END;
+			(*WHILE Optional(Scanner.Procedure) DO ProcedureDeclaration(recordScope); Ignore(Scanner.Semicolon) END; *)
 			Check( Scanner.End );
 			IF Trace THEN E( "RecordType" ) END;
 			RETURN recordType
@@ -2289,3 +2307,5 @@ TYPE
 	END NewParser;
 
 END FoxParser.
+
+SystemTools.FreeDownTo FoxParser ~

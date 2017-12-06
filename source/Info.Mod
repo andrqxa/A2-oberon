@@ -72,7 +72,7 @@ TYPE
 		VAR i, j : LONGINT; temp : Type;
 
 			PROCEDURE IsGreaterThan(CONST entry1, entry2 : Type; mode : LONGINT) : BOOLEAN;
-			VAR name1, name2: ARRAY 256 OF CHAR; count1,count2, size1, size2: LONGINT;
+			VAR name1, name2: ARRAY 256 OF CHAR; count1,count2, size1, size2: SIZE;
 			BEGIN
 				IF mode = SortByName THEN
 					GetName(entry1.ptag,name1);
@@ -219,7 +219,7 @@ TYPE
 						Reflection.GetProcedureName(types[i].pc, copy,startpc);
 						Strings.AppendX(string, copy);
 						Strings.Append(string,":");
-						Strings.IntToStr(types[i].pc - startpc, copy);
+						Strings.IntToStr(LONGINT(types[i].pc - startpc), copy);
 						Strings.Append(string,copy);
 					END;
 
@@ -259,9 +259,9 @@ TYPE
 		END ShowBlocks;
 
 		PROCEDURE Show(out : Streams.Writer; CONST mask : ARRAY OF CHAR; sortMode : LONGINT; byPC: BOOLEAN);
-		VAR nofUsedBlocks, sizeUsedBlocks : LONGINT;
+		VAR nofUsedBlocks, sizeUsedBlocks :SIZE;
 
-			PROCEDURE ShowBlock(CONST name : ARRAY OF CHAR; nofBlocks: LONGINT; size: SIZE; totalNofBlocks: LONGINT; totalSize : SIZE; out : Streams.Writer);
+			PROCEDURE ShowBlock(CONST name : ARRAY OF CHAR; nofBlocks: SIZE; size: SIZE; totalNofBlocks: SIZE; totalSize : SIZE; out : Streams.Writer);
 			BEGIN
 				out.Int(nofBlocks, 8); out.Char(" "); ShowPercent(nofBlocks, totalNofBlocks, out); out.Char(" ");
 				out.String(name);
@@ -463,11 +463,14 @@ BEGIN
 	NEW(options);
 	options.Add("s", "sort", Options.Integer);
 	options.Add(0X, "pc", Options.Flag);
+	options.Add(0X, "gc", Options.Flag);
 	IF options.Parse(context.arg, context.error) THEN
 		IF ~options.GetInteger("sort", sortMode) THEN sortMode := SortNone; END;
 		context.arg.SkipWhitespace; context.arg.String(mask);
 		NEW(analyzer, MaxNofTypes);
+		IF options.GetFlag("gc") THEN Heaps.LazySweepGC END; (* slight inaccuracy here: other processes can kick in now *)
 		Machine.Acquire(Machine.Heaps);
+		Heaps.FullSweep(); (* the heap might contain wrong pointers in the freed part *)
 		memBlock := Machine.memBlockHead;
 		WHILE memBlock # NIL DO
 			p := memBlock.beginBlockAdr;
@@ -774,7 +777,7 @@ BEGIN
 	END
 END WriteType;
 
-PROCEDURE GetName(adr: LONGINT; VAR name: ARRAY OF CHAR);
+PROCEDURE GetName(adr: ADDRESS; VAR name: ARRAY OF CHAR);
 VAR  m : Modules.Module;  t : Modules.TypeDesc;
 BEGIN
 	Modules.ThisTypeByAdr(adr, m, t);
@@ -810,11 +813,15 @@ VAR address : ADDRESS; module : Modules.Module; variable : Reflection.Variable;
 BEGIN
 	address := Heaps.NilVal;
 	module := Modules.ModuleByName("Heaps");
+	ASSERT(module # NIL); 
 	IF (module # NIL) THEN
 		IF Reflection.FindVar(module, "currentMarkValue", variable) THEN
+			(*
 			ASSERT(variable.n = 1); (* currentMarkValue is not an array *)
 			ASSERT(variable.type = 6); (*? type is LONGINT, currently no support for 64-bit addresses *)
+			*)
 			address := variable.adr;
+		ELSE HALT(100);
 		END;
 	END;
 	RETURN address;
@@ -833,17 +840,33 @@ END Info.
 
 SystemTools.Free Info ~
 
+Debugging.DisableGC
+Debugging.EnableGC 
+Compiler.Compile -p=Win32G FoxIntermediateBackend.Mod ~
 Info.AllObjects ~
 Info.AllObjects * ~
 
-Info.AllObjects --sort=0 * ~
-Info.AllObjects --sort=1 * ~
-Info.AllObjects --sort=2 * ~
+(* view by type *)
+Info.AllObjects --sort=0 * ~ sort by none
+Info.AllObjects --sort=1 * ~ sort by count
+Info.AllObjects --sort=2 * ~ sort by size
+Info.AllObjects --sort=3 * ~ sort by total size
+Info.AllObjects --sort=4 * ~ sort by name
+
+(* view by allocation pc *)
+Info.AllObjects --pc --sort=0 * ~ sort by none
+Info.AllObjects --pc --sort=1 * ~ sort by count
+Info.AllObjects --pc --sort=2 * ~ sort by size
+Info.AllObjects --pc --sort=3 * ~ sort by total size
+Info.AllObjects --pc --sort=4 * ~ sort by name
+
+
+
 
 Info.TraceModule PET ~
 
 Info.TraceModule Info ~
-Info.TraceModule Info * ~
+Info.TraceModule FoxIntermediateBackend * ~
 
 Info.TraceReference HotKeys.hotkeys ~
 Info.TraceReference HotKeys.hotkeys * ~

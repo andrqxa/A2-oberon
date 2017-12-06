@@ -2854,11 +2854,11 @@ TYPE
 	ImagePanel* = OBJECT(Panel)
 	VAR
 		imgName- : WMProperties.StringProperty;
-		img : WMGraphics.Image;
+		img- : WMGraphics.Image;
 		vScrollbar, hScrollbar : Scrollbar;
 		dx, dy : LONGINT;
 
-		PROCEDURE & Init*;
+		PROCEDURE &  Init*;
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenImagePanel");
@@ -2875,11 +2875,39 @@ TYPE
 			SetNameAsString(StrImagePanel);
 			dx := 0;  dy := 0
 		END Init;
-
+		
+		PROCEDURE Resized*;
+		BEGIN			
+			Resized^;
+			IF img=NIL THEN
+				RETURN;
+			END;
+			IF img.width > bounds.GetWidth() THEN
+				dx := img.width - bounds.GetWidth();
+				hScrollbar.visible.Set(TRUE)
+			ELSE
+				dx := 0;
+				hScrollbar.visible.Set(FALSE)
+			END;
+			IF img.height > bounds.GetHeight() THEN
+				dy := img.height - bounds.GetHeight();
+				vScrollbar.visible.Set(TRUE)
+			ELSE
+				dy := 0;
+				vScrollbar.visible.Set(FALSE)
+			END;
+		END Resized;
+		
+		PROCEDURE GetOffsets*(VAR x,y: LONGINT); (*returns offset caused by scrollbars*)
+		BEGIN
+			x :=-( dx * hScrollbar.pos.Get() DIV 100);
+			y :=-(dy * vScrollbar.pos.Get() DIV 100);
+		END GetOffsets;	
+		
 		PROCEDURE PropertyChanged*(sender, property : ANY);
 		BEGIN
 			IF property = imgName THEN
-				RecacheProperties; Invalidate;
+				RecacheProperties; Invalidate;(*? invalidate also called in RecacheProperties->SetImage()*)
 			ELSE
 				PropertyChanged^(sender, property)
 			END
@@ -2888,7 +2916,8 @@ TYPE
 		PROCEDURE RecacheProperties*;
 		VAR s : String;
 		BEGIN
-			s := imgName.Get(); IF s # NIL THEN SetImage(SELF, WMGraphics.LoadImage(s^, TRUE)) END
+			s := imgName.Get();
+			IF s # NIL THEN SetImage(SELF, WMGraphics.LoadImage(s^, TRUE)) END (*?implicit invalidate IFF changed*)
 		END RecacheProperties;
 
 		PROCEDURE ScrollbarsChanged(sender, data : ANY);
@@ -2896,12 +2925,13 @@ TYPE
 			Invalidate
 		END ScrollbarsChanged;
 
-		(** Iff data IS WMGraphics.Image, it is set as background. Else the background is set to white *)
+		(** Iff data IS WMGraphics.Image, it is set as background. Else the background is set to white. bounds may need to be adapted by caller.  *)
 		(* Note: Only use for anonymous Images without a specific Name *)
 		PROCEDURE SetImage*(sender, data : ANY); (*? PH is Invalidate always handled in PropertyChanged here, or does this exporte procedure occur in other contexts ?*)
 		BEGIN
 			IF (data # NIL) & (data IS WMGraphics.Image) THEN
 				img := data(WMGraphics.Image);
+				IF bounds.GetWidth() * bounds.GetHeight() = 0 THEN bounds.SetExtents(img.width, img.height) END;
 				IF img.width > bounds.GetWidth() THEN
 					dx := img.width - bounds.GetWidth();
 					hScrollbar.visible.Set(TRUE)
@@ -2913,7 +2943,7 @@ TYPE
 					dy := img.height - bounds.GetHeight();
 					vScrollbar.visible.Set(TRUE)
 				ELSE
-					dx := 0;
+					dy := 0;
 					vScrollbar.visible.Set(FALSE)
 				END;
 				Invalidate
@@ -2928,9 +2958,8 @@ TYPE
 			IF show THEN
 				DrawBackground^(canvas);
 				IF img # NIL THEN
-					x := dx * hScrollbar.pos.Get() DIV 100;
-					y := dy * vScrollbar.pos.Get() DIV 100;
-					canvas.DrawImage(-x, -y, img, WMGraphics.ModeSrcOverDst)
+					GetOffsets(x,y);
+					canvas.DrawImage(x, y, img, WMGraphics.ModeSrcOverDst)
 				END
 			END;
 		END DrawBackground;

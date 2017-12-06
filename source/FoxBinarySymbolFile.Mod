@@ -115,6 +115,8 @@ CONST
 		sfTypeProcedure=33H;
 		sfSysFlag=34H;
 		sfInvisible=35H;
+		sfHidden = 0ACH;
+
 		sfReadOnly=36H;
 		sfObjFlag = 37H; (* fof: very (!) bad idea to have same number for two type flags *)
 		sfConst=37H;
@@ -1153,6 +1155,7 @@ TYPE
 					thisIndex := numberTypes; INC(numberTypes);
 
 					IF tag = sfInvisible THEN visibility := SyntaxTree.Internal;  R.RawNum(tag)  END;
+					IF tag = sfHidden THEN visibility := SyntaxTree.Hidden; R.RawNum(tag) END;
 					IF tag = sfSysFlag THEN R.RawNum(sysflag); R.RawNum(tag)  END;
 
 
@@ -1930,7 +1933,9 @@ TYPE
 
 						name:="";
 						IF  typeDeclaration#NIL THEN typeDeclaration.GetName(name);
-							IF typeDeclaration.access* SyntaxTree.Public={} THEN
+							IF typeDeclaration.access  = SyntaxTree.Hidden THEN
+								w.RawNum(sfHidden);
+							ELSIF typeDeclaration.access* SyntaxTree.Public={} THEN
 								w.RawNum(sfInvisible);
 							END;
 						END;

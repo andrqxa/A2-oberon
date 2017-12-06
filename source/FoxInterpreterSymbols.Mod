@@ -17,7 +17,7 @@ TYPE
 	Meta* = RECORD
 		module*: Modules.Module;
 		refs*: Modules.Bytes;
-		offset*: LONGINT;
+		offset*: SIZE;
 	END;
 
 	PROCEDURE FindSymbol*(CONST name: ARRAY OF CHAR; meta: Meta): Meta;
@@ -192,8 +192,8 @@ TYPE
 	Callstack = OBJECT
 	VAR 
 		data: ARRAY 1024 OF CHAR;
-		pos: LONGINT;
-		size: LONGINT;
+		pos: SIZE;
+		size: SIZE;
 		H: HUGEINT; (* result in register *)
 		
 		pPos: LONGINT;
@@ -210,14 +210,14 @@ TYPE
 		END Next;
 		
 		PROCEDURE PushH(h: HUGEINT);
-		VAR p: POINTER {UNSAFE} TO RECORD h: HUGEINT END;
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD h: HUGEINT END;
 		BEGIN
 			p := Next(SIZEOF(HUGEINT));
 			p.h := h;
 		END PushH;
 
 		PROCEDURE PushL(i: LONGINT);
-		VAR p: POINTER {UNSAFE} TO RECORD i: LONGINT END;
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD i: LONGINT END;
 		BEGIN
 			p := Next(SIZEOF(LONGINT));
 			p.i := i;
@@ -234,7 +234,7 @@ TYPE
 		END PushS;		
 		
 		PROCEDURE PushB(b: BOOLEAN);
-		VAR p: POINTER {UNSAFE} TO RECORD b: BOOLEAN END;
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD b: BOOLEAN END;
 		BEGIN
 			p := Next(SIZEOF(LONGINT));
 			p.b := b;
@@ -246,28 +246,28 @@ TYPE
 		END PushC;
 		
 		PROCEDURE PushSet(set: SET);
-		VAR p: POINTER {UNSAFE} TO RECORD s:SET END;
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD s:SET END;
 		BEGIN
 			p := Next(SIZEOF(SET));
 			p.s := set;
 		END PushSet;
 
 		PROCEDURE PushR(r: REAL);
-		VAR p: POINTER {UNSAFE} TO RECORD r: REAL END;
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD r: REAL END;
 		BEGIN
 			p := Next(SIZEOF(REAL));
 			p.r := r;
 		END PushR;
 		
 		PROCEDURE PushX(x: LONGREAL);
-		VAR p: POINTER {UNSAFE} TO RECORD x: LONGREAL END;
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD x: LONGREAL END;
 		BEGIN
 			p := Next(SIZEOF(LONGREAL));
 			p.x := x;
 		END PushX;
 		
 		PROCEDURE PushA(a: ADDRESS);
-		VAR p: POINTER {UNSAFE} TO RECORD a: ADDRESS END;
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD a: ADDRESS END;
 		BEGIN
 			p := Next(SIZEOF(ADDRESS));
 			p.a := a;
@@ -275,7 +275,7 @@ TYPE
 
 
 		PROCEDURE PushSz(s: SIZE);
-		VAR p: POINTER {UNSAFE} TO RECORD s: SIZE END;
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD s: SIZE END;
 		BEGIN
 			p := Next(SIZEOF(SIZE));
 			p.s := s;
@@ -941,9 +941,9 @@ TYPE
 		END Enumerate;
 
 		PROCEDURE Set(CONST name: ARRAY OF CHAR; index: LONGINT; c: Content);
-		VAR int: LONGINT;
+		VAR int: HUGEINT;
 		BEGIN
-			IF name = StrValue THEN c.GetInteger(int); value := int;
+			IF name = StrValue THEN c.GetInteger(int); value := ADDRESS(int);
 			ELSE Set^(name, index, c);
 			END;
 		END Set;
@@ -984,7 +984,7 @@ TYPE
 		END Enumerate;
 
 		PROCEDURE Set(CONST name: ARRAY OF CHAR; index: LONGINT; c: Content);
-		VAR val: LONGINT;
+		VAR val: HUGEINT;
 		BEGIN
 			IF name = StrValue THEN c.GetInteger(val); value := val;
 			ELSE Set^(name, index, c);
@@ -1267,9 +1267,9 @@ TYPE
 	END CharValue;
 
 	EnumValue*=OBJECT(Value)
-	VAR value: LONGINT; translation: PersistentObjects.Translation;
+	VAR value: HUGEINT; translation: PersistentObjects.Translation;
 
-		PROCEDURE & InitEnumValue*(trans: PersistentObjects.Translation; v: LONGINT);
+		PROCEDURE & InitEnumValue*(trans: PersistentObjects.Translation; v: HUGEINT);
 		BEGIN InitValue; value := v;  translation := trans; type := "EnumValue";
 		END InitEnumValue;
 
@@ -1294,7 +1294,7 @@ TYPE
 		PROCEDURE WriteValue(w: Streams.Writer);
 		VAR str: ARRAY 32 OF CHAR;
 		BEGIN
-			IF translation.Name(value, str) THEN w.String(str) ELSE w.String("unknown") END;
+			IF translation.Name(SIZE(value), str) THEN w.String(str) ELSE w.String("unknown") END;
 		END WriteValue;
 
 		PROCEDURE Address(): ADDRESS;
@@ -1540,7 +1540,7 @@ TYPE
 	END ContentGetValue;
 
 
-	PROCEDURE NewIntegerValue(value: LONGINT): IntegerValue;
+	PROCEDURE NewIntegerValue(value: HUGEINT): IntegerValue;
 	VAR obj: IntegerValue;
 	BEGIN
 		NEW(obj, value); RETURN obj
@@ -1588,7 +1588,7 @@ TYPE
 		NEW(obj, value); RETURN obj
 	END NewSetValue;
 
-	PROCEDURE NewEnumValue(translation: PersistentObjects.Translation; value: LONGINT): EnumValue;
+	PROCEDURE NewEnumValue(translation: PersistentObjects.Translation; value: HUGEINT): EnumValue;
 	VAR obj: EnumValue;
 	BEGIN
 		NEW(obj, translation, value);

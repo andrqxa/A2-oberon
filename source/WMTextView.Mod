@@ -2721,8 +2721,15 @@ TYPE
 
 	(* navigation *)
 		PROCEDURE WheelMove*(dz: LONGINT); (** PROTECTED *)
+		VAR ddz: DZ; 
 		BEGIN
-			IF mouseWheelScrollSpeedI # 0 THEN
+			IF modifierFlags * Inputs.Ctrl # {} THEN (* CTRL pressed -> Resize Font*)
+				text.AcquireWrite;
+				IF dz > 0 THEN dz := 1 ELSIF dz<0 THEN dz := -1 END;
+				NEW(ddz, dz); 
+				text.UpdateAttributes(0, text.GetLength(), ChangeAttribute, ddz);
+				text.ReleaseWrite;
+			ELSIF mouseWheelScrollSpeedI # 0 THEN
 				firstLine.Set(firstLine.Get() + mouseWheelScrollSpeedI * dz)
 			END;
 		END WheelMove;
@@ -3216,7 +3223,14 @@ TYPE
 				text.ReleaseRead
 			END;
 		END DragOver;
-
+		
+		PROCEDURE ConfirmDrag(accept: BOOLEAN; dragInfo: WMWindowManager.DragInfo);
+		BEGIN
+			IF dragInfo.onAccept # NIL THEN 
+				dragInfo.onAccept(SELF, dragInfo) 
+			END;
+		END ConfirmDrag;
+		
 		PROCEDURE DragDropped*(x, y : LONGINT; dragInfo : WMWindowManager.DragInfo);
 		VAR dropTarget : TextDropTarget;
 			pos, internalPos : LONGINT;
@@ -3240,10 +3254,8 @@ TYPE
 				IF ~hasFocus & ~alwaysShowCursorI THEN cursor.SetVisible(FALSE) END;
 				dragInfo.data := dropTarget;
 				ConfirmDrag(TRUE, dragInfo);
-				IF dragInfo.onAccept # NIL THEN dragInfo.onAccept(SELF, dragInfo) END;
 			ELSE
 				ConfirmDrag(FALSE, dragInfo);
-				IF dragInfo.onReject # NIL THEN dragInfo.onReject(SELF, dragInfo) END;
 			END;
 		END DragDropped;
 
@@ -4165,6 +4177,81 @@ BEGIN
 	IF x > max THEN x := max END;
 	RETURN x
 END Limit;
+
+(* Actually, this is a hack... but for now, do it.  *)
+PROCEDURE GetNewSize(CONST fontname : ARRAY OF CHAR; value, currentSize : LONGINT; VAR newSize : LONGINT);
+BEGIN
+	IF (fontname = "Oberon") THEN
+		IF (value >0) THEN
+			IF (currentSize <= 8) THEN newSize := 10;
+			ELSIF (currentSize <= 10) THEN newSize := 12;
+			ELSIF (currentSize <= 12) THEN newSize := 14;
+			ELSIF (currentSize <= 14) THEN newSize := 16;
+			ELSIF (currentSize <= 16) THEN newSize := 20;
+			ELSIF (currentSize <= 20) THEN newSize := 24;
+			ELSE (* go to default *)
+				newSize := 24; (* max. size of Oberon font *)
+			END;
+		ELSE
+			IF (currentSize >= 24) THEN newSize := 20;
+			ELSIF (currentSize >= 20) THEN newSize := 16;
+			ELSIF (currentSize >= 16) THEN newSize := 14;
+			ELSIF (currentSize >= 14) THEN newSize := 12;
+			ELSIF (currentSize >= 12) THEN newSize := 10;
+			ELSE
+				newSize := 8;
+			END;
+		END;
+	ELSIF (fontname = "Courier") THEN
+		IF (value > 0) THEN
+			IF (currentSize <= 8) THEN newSize := 10;
+			ELSE
+				newSize := 12;
+			END;
+		ELSE
+			IF (currentSize >= 12) THEN newSize := 10;
+			ELSE
+				newSize := 8;
+			END;
+		END;
+	ELSE
+		newSize := currentSize + value * currentSize DIV 4;
+	END;
+	IF (newSize < 8) THEN newSize := 8; END;
+END GetNewSize;
+
+TYPE 
+
+DZ = OBJECT (Texts.Attributes);
+VAR value: LONGINT;
+	PROCEDURE &Init(v: LONGINT);
+	BEGIN
+		value := v;
+	END Init;
+END DZ; 
+
+PROCEDURE EnsureAttribute(VAR attr : Texts.Attributes);
+BEGIN
+	IF (attr = NIL) THEN
+		NEW(attr); NEW(attr.fontInfo);
+		attr.fontInfo.name := "Vera";
+		attr.fontInfo.size := 16;
+		attr.fontInfo.style := {};
+		attr.color := 0000000FFH;
+		attr.bgcolor := 000000000H;
+	END
+END EnsureAttribute;
+
+PROCEDURE ChangeAttribute(VAR attr : Texts.Attributes; userData : ANY);
+VAR dz: DZ;
+BEGIN
+	IF (userData # NIL) & (userData IS DZ) THEN
+		EnsureAttribute(attr);
+		dz := userData(DZ);
+		GetNewSize(attr.fontInfo.name,-dz.value, attr.fontInfo.size, attr.fontInfo.size);
+		attr.fontInfo.fontcache := NIL;
+	END;
+END ChangeAttribute;
 
 PROCEDURE GetFontFromAttr(info : Texts.FontInfo) : WMGraphics.Font;
 BEGIN

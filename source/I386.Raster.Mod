@@ -616,7 +616,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		img.adr := ADDRESSOF(img.mem[0])
 	END Create;
 
-	PROCEDURE CreateWithBuffer*(img: Image; width, height: LONGINT; fmt: Format; mem: POINTER TO ARRAY OF CHAR; VAR adr: LONGINT);
+	PROCEDURE CreateWithBuffer*(img: Image; width, height: LONGINT; fmt: Format; mem: POINTER TO ARRAY OF CHAR; VAR adr: ADDRESS);
 	VAR size: LONGINT; a0, a1: ADDRESS;
 	BEGIN
 		ASSERT((width > 0) & (height > 0), 100);
@@ -635,7 +635,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END;
 		img.adr := adr;
 		img.mem := mem;
-		adr := a1;
+		adr := LONGINT(a1);
 	END CreateWithBuffer;
 
 	(**--- Transfer Modes ---**)
@@ -677,7 +677,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(** blend source pixel into destination pixel according to compositing operation **)
 	PROCEDURE Blend* (op: LONGINT; VAR src, dst: Pixel);
-		VAR fs, fd, i: LONGINT;
+		VAR fs, fd: LONGINT;
 	BEGIN
 		CASE op OF
 		| clear: fs := 0; fd := 0
@@ -695,20 +695,22 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END;
 
 		IF fs + fd = 0 THEN
-			FOR i := 0 TO 3 DO dst[i] := 0X END
+			dst := Zero;
 		ELSIF fs = 0 THEN
 			IF fd # 255 THEN
-				FOR i := 0 TO 3 DO
-					dst[i] := Clamp[200H + fd * ORD(dst[i]) DIV 255]
-				END
+				dst[0] := Clamp[200H + fd * ORD(dst[0]) DIV 255];
+				dst[1] := Clamp[200H + fd * ORD(dst[1]) DIV 255];
+				dst[2] := Clamp[200H + fd * ORD(dst[2]) DIV 255];
+				dst[3] := Clamp[200H + fd * ORD(dst[3]) DIV 255];
 			END
 		ELSIF fd = 0 THEN
 			IF fs = 255 THEN
 				dst := src
 			ELSE
-				FOR i := 0 TO 3 DO
-					dst[i] := Clamp[200H + fs * ORD(src[i]) DIV 255]
-				END
+				dst[0] := Clamp[200H + fs * ORD(src[0]) DIV 255];
+				dst[1] := Clamp[200H + fs * ORD(src[1]) DIV 255];
+				dst[2] := Clamp[200H + fs * ORD(src[2]) DIV 255];
+				dst[3] := Clamp[200H + fs * ORD(src[3]) DIV 255];
 			END
 		ELSE
 			dst[0] := Clamp[200H + (fs * ORD(src[0]) + fd * ORD(dst[0])) DIV 255];
@@ -3234,7 +3236,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 					img.fmt.unpack(img.fmt, adr, bit, pix);
 					pix[r] := clamp[ORD(pix[r])]; pix[g] := clamp[ORD(pix[g])]; pix[b] := clamp[ORD(pix[b])];
 					img.fmt.pack(img.fmt, adr, bit, pix);
-					bit := bit + img.fmt.bpp; INC(adr, bit); bit := bit MOD 8;
+					bit := bit + img.fmt.bpp; INC(adr, bit DIV 8); bit := bit MOD 8;
 					INC(x)
 				END;
 				INC(y)
@@ -3263,7 +3265,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 					pix[r] := clamp[ORD(pix[r])]; pix[g] := clamp[ORD(pix[g])];
 					pix[b] := clamp[ORD(pix[b])]; pix[a] := clamp[ORD(pix[a])];
 					img.fmt.pack(img.fmt, adr, bit, pix);
-					bit := bit + img.fmt.bpp; INC(adr, bit); bit := bit MOD 8;
+					bit := bit + img.fmt.bpp; INC(adr, bit DIV 8); bit := bit MOD 8;
 					INC(x)
 				END;
 				INC(y)
@@ -3291,7 +3293,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 					img.fmt.unpack(img.fmt, adr, bit, pix);
 					pix[a] := clamp[ORD(pix[a])];
 					img.fmt.pack(img.fmt, adr, bit, pix);
-					bit := bit + img.fmt.bpp; INC(adr, bit); bit := bit MOD 8;
+					bit := bit + img.fmt.bpp; INC(adr, bit DIV 8); bit := bit MOD 8;
 					INC(x)
 				END;
 				INC(y)
@@ -3301,7 +3303,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(** add components of two (faded) images **)
 	PROCEDURE Add* (i, j, res: Image);
-		VAR y, x, ibit, jbit, rbit, k: LONGINT; iadr, jadr, radr: ADDRESS; ipix, jpix, rpix: Pixel;
+		VAR y, x, ibit, jbit, rbit: LONGINT; iadr, jadr, radr: ADDRESS; ipix, jpix, rpix: Pixel;
 	BEGIN
 		ASSERT((i.width = j.width) & (i.height = j.height) & (i.width <= res.width) & (i.height <= res.height), 100);
 		y := 0;
@@ -3309,9 +3311,12 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 			x := 0; iadr := i.adr + y * i.bpr; ibit := 0; jadr := j.adr + y * j.bpr; jbit := 0; radr := res.adr + y * res.bpr; rbit := 0;
 			WHILE x < i.width DO
 				i.fmt.unpack(i.fmt, iadr, ibit, ipix); j.fmt.unpack(j.fmt, jadr, jbit, jpix);
-				FOR k := 0 TO 3 DO
-					rpix[k] := Clamp[ORD(ipix[k]) + ORD(jpix[k])]
-				END;
+
+				rpix[0] := Clamp[ORD(ipix[0]) + ORD(jpix[0])];
+				rpix[1] := Clamp[ORD(ipix[1]) + ORD(jpix[1])];
+				rpix[2] := Clamp[ORD(ipix[2]) + ORD(jpix[2])];
+				rpix[3] := Clamp[ORD(ipix[3]) + ORD(jpix[3])];
+
 				res.fmt.pack(res.fmt, radr, rbit, rpix);
 				ibit := ibit + i.fmt.bpp; INC(iadr, ibit); ibit := ibit MOD 8;
 				jbit := jbit + j.fmt.bpp; INC(jadr, jbit); jbit := jbit MOD 8;

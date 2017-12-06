@@ -258,6 +258,7 @@ TYPE
 		BEGIN
 			first := TRUE;
 			IF x.isUnsafe THEN Flag(Global.NameUnsafe,first) END;
+			IF x.isUntraced THEN Flag(Global.NameUntraced,first) END;
 			IF x.isRealtime THEN Flag(Global.NameRealtime,first) END;
 			IF x.isDisposable THEN Flag(Global.NameDisposable,first) END;
 			IF x.isPlain THEN Flag(Global.NamePlain,first) END;
@@ -378,6 +379,7 @@ TYPE
 				prevScope := currentScope;
 				currentScope := x.recordScope;
 				VariableList(x.recordScope.firstVariable);
+				IF x.recordScope.procedures # NIL THEN w.Ln; ProcedureList(x.recordScope.procedures) END;
 				currentScope := prevScope;
 				Indent; Keyword("END" );
 			END;
@@ -1228,7 +1230,7 @@ TYPE
 				IF x.isInline & (mode = SymbolFile) THEN
 					IF fingerPrinter = NIL THEN NEW(fingerPrinter) END;
 					fp := fingerPrinter.SymbolFP(x);
-					Value(Global.NameFingerprint, fp.shallow, first) 
+					Value(Global.NameFingerprint, fp.public, first) 
 				END;
 				FlagEnd(first);
 

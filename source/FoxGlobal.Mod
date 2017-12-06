@@ -188,7 +188,7 @@ CONST
 VAR
 	(* names *)
 	SelfParameterName-,ReturnParameterName-,SystemName-,systemName-,PointerReturnName-, ResultName-,
-	A2Name-,OberonName-,ArrayBaseName-,RecordBodyName-,ModuleBodyName-,
+	A2Name-,ArrayBaseName-, ComplexNumbersName-, RecordBodyName-,ModuleBodyName-,
 	NameWinAPI-,NameC-,NameMovable-,NameUntraced-,NameDelegate-,NameInterrupt-, NamePcOffset-, NameNoPAF-,NameEntry-, NameExit-, NameFixed-,NameFictive-, NameAligned-,NameStackAligned-,
 	NameExclusive-,NameActive-,NamePriority-,NameSafe-,NameRealtime-, NameDynamic-, NameFingerprint-, NameDataMemorySize-, NameCodeMemorySize-
 	, NameChannelWidth-, NameChannelDepth-, NameChannelModule-, NameVector-, NameFloatingPoint-, NameNoMul-,NameNonBlockingIO-, NameTRM-, NameTRMS-, NameEngine-, NameFinal-, NameAbstract-,
@@ -244,7 +244,8 @@ TYPE
 		*)
 
 		addressType-, sizeType-, shortintType-, integerType-, longintType-, hugeintType-, wordType-, longWordType-, characterType-, characterType8-, characterType16-, characterType32-, setType-, booleanType-, anyType-,byteType-,
-		realType-, longrealType-, complexType-, longcomplexType-, objectType-, nilType-, rangeType-: SyntaxTree.Type;
+		realType-, longrealType-, complexType-, longcomplexType-, objectType-, nilType-, rangeType-, lenType-: SyntaxTree.Type;
+
 
 		CanPassInRegister-: PassInRegisterProc;
 		cellsAreObjects-: BOOLEAN;
@@ -770,6 +771,9 @@ TYPE
 		system.sizeType := SyntaxTree.NewSizeType(system.addressSize);
 		system.rangeType := SyntaxTree.NewRangeType(3 * system.SizeOf(system.longintType));
 
+		system.lenType := system.longintType;
+		(* generally, the lenType should be sizeType but for historical (legacy) reasons, it is longint in the current implementation *)
+
 		system.complexType := Complex64;
 		system.longcomplexType := Complex128;
 		system.setType := SyntaxTree.NewSetType(system.addressSize);
@@ -905,6 +909,9 @@ TYPE
 		NewBuiltin(Send,"SEND",system.globalScope,FALSE);
 		NewBuiltin(Delegate,"DELEGATE",system.globalScope,FALSE);
 
+		NewBuiltin(IncMul,"INCMUL",system.globalScope,TRUE);
+		NewBuiltin(DecMul,"DECMUL",system.globalScope,TRUE);
+
 
 		(*!
 
@@ -992,6 +999,8 @@ TYPE
 		OperatorDefined(system,Scanner.Size, TRUE);
 		OperatorDefined(system,Scanner.Alias, TRUE);
 		OperatorDefined(system,All,TRUE);
+		OperatorDefined(system,Re,TRUE);
+		OperatorDefined(system,Im,TRUE);
 		
 		OperatorDefined(system, Scanner.Questionmarks, TRUE);
 
@@ -1169,18 +1178,37 @@ TYPE
 		NewCustomBuiltin0(nameL, scope[Scanner.Lowercase], subType, procedureType)
 	END NewCustomBuiltin;
 
-	PROCEDURE ModuleFileName*(moduleName,context: SyntaxTree.Identifier; VAR fileName: ARRAY OF CHAR);
-	VAR prefix,name: Scanner.IdentifierString;
+	PROCEDURE GetModuleSectionName*(name, context: SyntaxTree.Identifier; VAR n: ARRAY OF CHAR);
+	VAR s: SyntaxTree.IdentifierString; 
 	BEGIN
-		Basic.GetString(moduleName,name);
-		IF (context = SyntaxTree.invalidIdentifier) OR (context = A2Name) THEN
-			COPY(name,fileName);
+		IF context # SyntaxTree.invalidIdentifier THEN
+			Basic.GetString(context,n);
+			IF n = "A2" THEN 
+				Basic.GetString(name,n);
+				RETURN;
+			END;
+			Basic.GetString(name,s);
+			Strings.Append(n,"-");Strings.Append(n,s);
 		ELSE
-			ASSERT(context=OberonName);
-			Basic.GetString(context,prefix);
-			Basic.Concat(fileName,prefix,".",name);
+			Basic.GetString(name,n);
 		END;
+	END GetModuleSectionName;
+
+	PROCEDURE ModuleFileName*(name, context: SyntaxTree.Identifier; VAR n: ARRAY OF CHAR);
+	BEGIN
+		GetModuleSectionName(name, context, n);
 	END ModuleFileName;
+	
+	PROCEDURE ModuleSectionIdentifier*(name, context: SyntaxTree.Identifier): SyntaxTree.Identifier;
+	VAR s,n: SyntaxTree.IdentifierString; 
+	BEGIN
+		IF context # SyntaxTree.invalidIdentifier THEN
+			GetModuleSectionName(name, context, n);
+			RETURN SyntaxTree.NewIdentifier(n);
+		ELSE
+			RETURN name
+		END;
+	END ModuleSectionIdentifier;
 
 	PROCEDURE ContextFromName*(CONST fileName: ARRAY OF CHAR; VAR module,context: SyntaxTree.Identifier);
 	VAR moduleName, contextName: Scanner.IdentifierString; i,j: LONGINT;
@@ -1209,26 +1237,14 @@ TYPE
 	PROCEDURE GetModuleName*(module: SyntaxTree.Module; VAR name: ARRAY OF CHAR);
 	VAR n: SyntaxTree.IdentifierString;
 	BEGIN
-		name := "";
-		IF module.context # SyntaxTree.invalidIdentifier THEN
-			Basic.GetString(module.context,n);
-			IF n# "A2" THEN Strings.Append(name,n);Strings.Append(name,".") END;
-		END;
-		module.GetName(n);
-		Strings.Append(name,n);
+		GetModuleSectionName(module.name, module.context, name);
 	END GetModuleName;
 
 	PROCEDURE GetModuleSegmentedName*(module: SyntaxTree.Module; VAR name: Basic.SegmentedName);
+	VAR moduleName: SyntaxTree.IdentifierString;
 	BEGIN
-		Basic.InitSegmentedName(name);
-		IF (module.context # SyntaxTree.invalidIdentifier) & (module.context # A2Name) THEN
-			name[0] := module.context;
-			name[1] := module.name;
-			name[2] := -1;
-		ELSE
-			name[0] :=module.name;
-			name[1] := -1;
-		END;
+		name[0] := ModuleSectionIdentifier(module.name, module.context);
+		name[1] := -1;
 	END GetModuleSegmentedName;
 
 	PROCEDURE FindSymbol*(CONST name: Basic.SegmentedName; scope: SyntaxTree.Scope): SyntaxTree.Symbol;
@@ -1336,10 +1352,7 @@ TYPE
 			IF scope = NIL THEN (* do nothing, locally declared temporary symbol *)
 			ELSIF scope = inScope THEN (* do not traverse further *)
 			ELSIF scope IS SyntaxTree.ModuleScope THEN
-				IF scope(SyntaxTree.ModuleScope).ownerModule.context # A2Name THEN
-					Basic.SuffixSegmentedName(pooledName, scope(SyntaxTree.ModuleScope).ownerModule.context);
-				END;
-				Basic.SuffixSegmentedName(pooledName,scope.ownerModule.name);
+				Basic.SuffixSegmentedName(pooledName,ModuleSectionIdentifier(scope.ownerModule.name, scope.ownerModule.context));
 			ELSIF scope IS SyntaxTree.RecordScope THEN
 				Scope(scope.outerScope);
 				td := scope(SyntaxTree.RecordScope).ownerRecord.typeDeclaration;
@@ -1537,6 +1550,16 @@ TYPE
 			WHILE toSize >= fromSize DO
 				toSize := toSize DIV 2; INC(distance);
 			END;
+		ELSIF (from IS SyntaxTree.IntegerType) & (to IS SyntaxTree.SizeType) & (toSize >= fromSize)  THEN
+			distance := 1;
+			WHILE toSize >= fromSize DO
+				toSize := toSize DIV 2; INC(distance);
+			END;
+		ELSIF (from IS SyntaxTree.SizeType) & (to IS SyntaxTree.IntegerType)  & (toSize >= fromSize) THEN
+			distance := 1;
+			WHILE toSize >= fromSize DO
+				toSize := toSize DIV 2; INC(distance);
+			END;
 		ELSIF (from IS SyntaxTree.CharacterType) & (to IS SyntaxTree.CharacterType) & (toSize >= fromSize)  OR
 			(from IS SyntaxTree.FloatType) & (to IS SyntaxTree.FloatType) & (toSize >= fromSize) 
 		THEN
@@ -1635,6 +1658,10 @@ TYPE
 		NewBuiltinIdentifier(Inc,"INC");
 		NewBuiltinIdentifier(Incl,"INCL");
 		NewBuiltinIdentifier(All,"ALL");
+		NewBuiltinIdentifier(Re,"RE");
+		NewBuiltinIdentifier(Im,"IM");
+		NewBuiltinIdentifier(IncMul,"INCMUL");
+		NewBuiltinIdentifier(DecMul,"DECMUL");
 
 
 		(* TODO: check if ok. The operators defined in FoxArrayBase require the following identifiers *)
@@ -1649,10 +1676,6 @@ TYPE
 		identifiers[Scanner.Uppercase, AtMulDec] := SyntaxTree.NewIdentifier("@MulDec");
 		identifiers[Scanner.Lowercase, AtMulInc] := SyntaxTree.NewIdentifier("@MulInc");
 		identifiers[Scanner.Uppercase, AtMulInc] := SyntaxTree.NewIdentifier("@MulInc");
-		identifiers[Scanner.Lowercase, DecMul] := SyntaxTree.NewIdentifier("DecMul");
-		identifiers[Scanner.Uppercase, DecMul] := SyntaxTree.NewIdentifier("DecMul");
-		identifiers[Scanner.Lowercase, IncMul] := SyntaxTree.NewIdentifier("IncMul");
-		identifiers[Scanner.Uppercase, IncMul] := SyntaxTree.NewIdentifier("IncMul");
 
 		identifiers[Scanner.Lowercase,Conversion] := SyntaxTree.NewIdentifier("@Convert");
 		identifiers[Scanner.Uppercase,Conversion] := SyntaxTree.NewIdentifier("@Convert");
@@ -1671,8 +1694,8 @@ TYPE
 		PointerReturnName := SyntaxTree.NewIdentifier("@PtrReturnType");
 		ResultName := SyntaxTree.NewIdentifier("RESULT");
 		A2Name := SyntaxTree.NewIdentifier("A2");
-		OberonName := SyntaxTree.NewIdentifier("Oberon");
 		ArrayBaseName := SyntaxTree.NewIdentifier("FoxArrayBase");
+		ComplexNumbersName := SyntaxTree.NewIdentifier("ComplexNumbers");
 		RecordBodyName := SyntaxTree.NewIdentifier("@Body");
 		ModuleBodyName := SyntaxTree.NewIdentifier("@Body");
 

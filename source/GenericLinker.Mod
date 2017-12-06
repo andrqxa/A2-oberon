@@ -3,10 +3,10 @@
 
 IMPORT ObjectFile, Streams, Diagnostics, Strings, SYSTEM;
 
-TYPE Address* = ObjectFile.Unit;
+TYPE Address* = ADDRESS;
 
 CONST
-	InvalidAddress* = MAX (Address);
+	InvalidAddress* = -1 (* MAX (Address) *);
 
 CONST
 	Fixed* = 0; InitCode*=1; BodyCode* = 2; Code* = 3; Data* = 4; Const* = 5; Empty* = 6;
@@ -247,7 +247,7 @@ VAR
 	VAR block: Block; used: BOOLEAN; name: ARRAY 256 OF CHAR;
 	BEGIN
 		IF ~error THEN block := firstBlock;
-			WHILE block # firstLinkedBlock DO
+			WHILE (block # firstLinkedBlock) & ~error DO
 				ObjectFile.SegmentedNameToString(block.identifier.name, name);
 				used := (GetType (block) IN usedCategories) OR (linkRoot # "") & Strings.StartsWith(linkRoot,0,name) OR (block.aliases > 0);
 				Reference (block, used); block := block.next;
@@ -309,7 +309,7 @@ VAR
 				ObjectFile.SegmentedNameToString(block.identifier.name,name);
 				Strings.Append(str,  name);
 				Error(str, "unresolved");
-			ELSIF (reference.identifier.fingerprint # 0) & (block.fixup[i].identifier.fingerprint # 0) & (reference.identifier.fingerprint # block.fixup[i].identifier.fingerprint) THEN
+			ELSIF (reference.identifier.fingerprint # 0) & (fixup.identifier.fingerprint # 0) & (reference.identifier.fingerprint # fixup.identifier.fingerprint) THEN
 				ObjectFile.SegmentedNameToString(fixup.identifier.name,str); Strings.Append(str," in " );
 				ObjectFile.SegmentedNameToString(block.identifier.name,name);
 				Strings.Append(str,  name);
@@ -321,7 +321,10 @@ VAR
 		IF used & ~block.used THEN block.used := TRUE;
 		ELSIF block.referenced THEN RETURN; END; block.referenced := TRUE;
 		IF ~used THEN RETURN END;
-		FOR i := 0 TO block.fixups - 1 DO ReferenceFixup (block.fixup[i]); END;
+		FOR i := 0 TO block.fixups - 1 DO 
+			ReferenceFixup (block.fixup[i]); 
+			IF error THEN RETURN END;
+		END;
 	END Reference;
 
 	PROCEDURE Prearrange (block: Block);
@@ -360,7 +363,7 @@ VAR
 				FOR i := 0 TO pattern.patterns-1 DO
 					INC(nobits,pattern.pattern[i].bits);
 				END;
-				remainder := ASH(address,-nobits);
+				remainder := LONGINT(ASH(address,-nobits));
 
 				IF  (nobits <32) & ((remainder > 0) OR (remainder < -1)) THEN
 					IF pattern.mode = ObjectFile.Relative THEN (* negative values allowed *)

@@ -70,11 +70,20 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	END InitializeActivity;
 
 	PROCEDURE ~Finalize;
-	VAR stackFrame {UNTRACED}: BaseTypes.StackFrame; currentActivity {UNTRACED}: Activity; stack{UNTRACED}, next{UNTRACED}: Stack; stackRecord{UNTRACED}: StackRecord;
+	VAR address: ADDRESS; stackFrame {UNTRACED}: BaseTypes.StackFrame; currentActivity {UNTRACED}: Activity; stack{UNTRACED}, next{UNTRACED}: Stack; stackRecord{UNTRACED}: StackRecord;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
-		stackFrame := framePointer;
+		address := framePointer;
 		currentActivity := SYSTEM.GetActivity ()(Activity); SYSTEM.SetActivity (SELF);
-		WHILE stackFrame # NIL DO stackFrame.Reset; stackFrame := stackFrame.previous END;
+		WHILE address # NIL DO
+			stackFrame := address;
+			IF ODD (stackFrame.descriptor) THEN
+				DEC (stackFrame.descriptor);
+				stackFrame.Reset;
+				address := stackFrame.previous;
+			ELSE
+				address := stackFrame.descriptor;
+			END;
+		END;
 		SYSTEM.SetActivity (currentActivity);
 		stack := firstStack;
 		REPEAT
@@ -133,6 +142,8 @@ VAR working, physicalProcessors, virtualProcessors: Counters.AlignedCounter;
 (** Stores an atomic counter indicating the number of activities that are awaiting interrupts to occur. *)
 (** The scheduler stops its execution if all processors are idle, unless there are activities waiting for interrupts. *)
 VAR awaiting*: Counters.AlignedCounter;
+
+PROCEDURE StoreActivity EXTERN "Environment.StoreActivity";
 
 PROCEDURE GetProcessTime-(): HUGEINT;
 VAR activity: Activity; diff: Timer.Counter;
@@ -226,6 +237,10 @@ END Resume;
 PROCEDURE SwitchTo- (VAR activity: Activity; finalizer: SwitchFinalizer; argument: ADDRESS);
 VAR currentActivity {UNTRACED}, nextActivity {UNTRACED}: Activity; diff: Timer.Counter;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
+	IF activity.bound & (activity.processor # SYSTEM.GetActivity ()(Activity).processor) THEN
+		REPEAT UNTIL Select (nextActivity, IdlePriority);
+		Resume (activity); activity := nextActivity;
+	END;
 	currentActivity := SYSTEM.GetActivity ()(Activity);
 	currentActivity.framePointer := SYSTEM.GetFramePointer ();
 	currentActivity.quantum := CPU.Quantum;
@@ -239,7 +254,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	nextActivity.processor.runningActivity := nextActivity;
 	nextActivity.startTime := Timer.GetCounter();
 	activity := NIL;
-	SYSTEM.SetActivity (nextActivity);
+	SYSTEM.SetActivity (nextActivity); StoreActivity;
 	SYSTEM.SetFramePointer (nextActivity.framePointer);
 END SwitchTo;
 
@@ -295,9 +310,9 @@ PROCEDURE CallVirtual- (procedure: PROCEDURE (value: ADDRESS); value: ADDRESS; p
 VAR currentActivity {UNTRACED}: Activity; stackPointer: ADDRESS;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (processor # NIL);
-	currentActivity := SYSTEM.GetActivity ()(Activity); stackPointer := SYSTEM.GetStackPointer (); SYSTEM.SetActivity (processor);
+	currentActivity := SYSTEM.GetActivity ()(Activity); stackPointer := SYSTEM.GetStackPointer (); SYSTEM.SetActivity (processor); StoreActivity;
 	SYSTEM.SetStackPointer (ADDRESS OF processor.stack[LEN (processor.stack) - CPU.StackDisplacement]);
-	procedure (value); SYSTEM.SetActivity (currentActivity); SYSTEM.SetStackPointer (stackPointer);
+	procedure (value); SYSTEM.SetActivity (currentActivity); StoreActivity; SYSTEM.SetStackPointer (stackPointer);
 END CallVirtual;
 
 (** Creates a new activity that calls the specified procedure. *)

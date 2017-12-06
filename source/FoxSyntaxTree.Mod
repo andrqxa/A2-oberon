@@ -703,7 +703,7 @@ TYPE
 		END InitSizeType;
 
 		PROCEDURE SameType*(this: Type): BOOLEAN;
-		BEGIN	RETURN (this IS SizeType) OR (this IS IntegerType) & (this(IntegerType).signed = TRUE) & (this.sizeInBits = sizeInBits)
+		BEGIN	RETURN (this IS SizeType)
 		END SameType;
 
 		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
@@ -852,7 +852,6 @@ TYPE
 
 		PROCEDURE SameType*(this: Type): BOOLEAN;
 		BEGIN RETURN (this = SELF) OR (this IS IntegerType) & (this.sizeInBits = sizeInBits) & (this(IntegerType).signed = signed)
-			OR signed & (this IS SizeType) & (this.sizeInBits=sizeInBits)
 		END SameType;
 
 		PROCEDURE CompatibleTo*(to: Type): BOOLEAN;
@@ -1163,7 +1162,7 @@ TYPE
 
 		PROCEDURE & InitMathArrayType(position: Position;scope: Scope; form: LONGINT);
 		BEGIN
-			length := NIL; arrayBase := NIL; InitType(position); staticLength := 0; staticIncrementInBits := 0; SELF.form := form; SELF.scope := scope;
+			length := NIL; arrayBase := NIL; InitType(position); staticLength := 0; staticIncrementInBits := 0; SetForm(form); SELF.scope := scope;
 		END InitMathArrayType;
 
 		PROCEDURE SetForm*(form: LONGINT);
@@ -1277,6 +1276,10 @@ TYPE
 			RETURN result
 		END IsFullyDynamic;
 
+		PROCEDURE NeedsTrace*(): BOOLEAN;
+		BEGIN RETURN hasPointers OR (arrayBase # NIL) & (arrayBase.resolved.NeedsTrace());
+		END NeedsTrace;
+		
 		PROCEDURE IsComposite(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsComposite;
@@ -1295,6 +1298,7 @@ TYPE
 			pointerBase-: Type;
 			isPlain-: BOOLEAN;
 			isUnsafe-: BOOLEAN;
+			isUntraced-: BOOLEAN;
 			isDisposable-: BOOLEAN;
 			isHidden-: BOOLEAN;
 
@@ -1309,6 +1313,7 @@ TYPE
 			SELF.scope := scope;
 			hasPointers := TRUE;
 			isHidden := FALSE;
+			isUntraced := FALSE;
 		END InitPointerType;
 
 		PROCEDURE SetHidden*(hidden: BOOLEAN);
@@ -1334,6 +1339,11 @@ TYPE
 		BEGIN
 			isUnsafe := unsafe;
 		END SetUnsafe;
+		
+		PROCEDURE SetUntraced*(untraced: BOOLEAN);
+		BEGIN
+			isUntraced := untraced;
+		END SetUntraced;
 
 		PROCEDURE SetDisposable*(disposable: BOOLEAN);
 		BEGIN
@@ -1371,6 +1381,10 @@ TYPE
 		PROCEDURE IsPointer(): BOOLEAN;
 		BEGIN RETURN TRUE
 		END IsPointer;
+		
+		PROCEDURE NeedsTrace*(): BOOLEAN;
+		BEGIN RETURN  ~isUntraced;
+		END NeedsTrace;
 
 		PROCEDURE Accept*(v: Visitor);
 		VAR position: LONGINT;
