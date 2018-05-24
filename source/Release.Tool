@@ -52,11 +52,6 @@
 #	StaticLinker.Link --fileFormat=PE32 --fileName=a2.exe --extension=GofCW --displacement=401000H --path="./" Trace CPU Runtime Counters Kernel32 Processors Queues BaseTypes Timer Activities ExclusiveBlocks Environment Mutexes Interrupts Machine Heaps Modules GarbageCollector Objects Kernel KernelLog Streams Commands Files WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #	FSTools.CloseFiles A2.exe ~
 #
-# Notes:
-#	-	The command PELinker.Link creates the Aos.exe executable file. Per default, it will be created in the Work folder.
-#	-	The configuration file aos.ini specifies from which directory the object files are loaded. If you want to switch between the
-#		internal and external version, you need to adapted aos.ini.
-#
 # For the detailed command syntax: See Release.Mod
 #
 
@@ -1280,7 +1275,6 @@ PACKAGE Build ARCHIVE "Build.zip" SOURCE "BuildSrc.zip" DESCRIPTION "Build Tools
 	ReleaseThreadPool.Mod Release.Mod Release.Tool	# Build release tool
 	PETReleaseTree.Mod
 	Linker0.Mod Linker1.Mod Linker.Mod
-	WIN { Win32.Aos.Link }
 	OBEMBR4.ASM BootManager.Asm OBL.Asm # Asm
 	BootManager.Mod BootManager.Tool # Splits up BootManager.Bin into BootManagerMBR.Bin and BootManagerTail.Bin
 END
@@ -1611,8 +1605,6 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	Gadgets.Pict Default.Pict	# Default.Pict used in Scramble
 
 	PC.Tool Oberon.ErrorGadgets.Mod Oberon.PC.Mod	# Oberon Interface for PACO
-
-	WIN32 { Win32.PELinker.Mod PELinker.Tool }
 
 	WIN { Win32.Oberon.Clipboard.Mod Win32.Oberon.FontRes.Mod FontRes.Tool }
 	UNIX { Unix.Oberon.Clipboard.Mod }

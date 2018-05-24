@@ -1556,4 +1556,4 @@ Linker0.Find 10A3C4H
 
 Linker0.WriteLog
 
-SystemTools.Free PELinker Linker1 Linker0 ~
+SystemTools.Free Linker1 Linker0 ~
