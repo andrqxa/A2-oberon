@@ -3,11 +3,11 @@
 	WMGraphics can block when WMDefaultFont is not loaded. Make sure to link WMDefaultFont into images requiring WMGraphics that should work without module loading
 	Modules that must be loaded during startup must be linked before IOShell / Bootconsole, respectively
 
-WIN32G -- 32-bit windows a2 using generic object files
+WIN32 -- 32-bit windows a2
 =================================
 
 	## Compile all files ##
-		Release.Build  --path=NewAos/ Win32G~
+		Release.Build  --path=NewAos/ Win32~
 	
 	## Link A2.exe (bootconsole for graphical OS) ##
 		StaticLinker.Link --path=NewAos/ --fileFormat=PE32 --fileName=A2.exe --extension=GofW --displacement=401000H  
@@ -26,7 +26,7 @@ WIN32G -- 32-bit windows a2 using generic object files
 
 FSTools.CloseFiles oberon.exe ~
 
-Compiler.Compile -p=Win32G
+Compiler.Compile -p=Win32
 Runtime.Mod Trace.Mod Generic.Win32.Kernel32.Mod Win32.Machine.Mod Heaps.Mod 
 Generic.Modules.Mod Win32.Objects.Mod Win32.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod 
 Commands.Mod In.Mod Out.Mod I386.Reals.Mod Generic.Reflection.Mod TrapWriters.Mod CRC.Mod 
@@ -137,7 +137,7 @@ Win64G -- work in progress
 		FSTools.CopyFiles -o oberon => ../../Linux32/oberon ~ 
 
 		FSTools.DeleteFiles -s NewAos/* ~
-		Release.Build --build --path=NewAos/ Win32G ~
+		Release.Build --build --path=NewAos/ Win32 ~
 		StaticLinker.Link --path=NewAos/ --fileFormat=PE32 --fileName=A2.exe --extension=GofW --displacement=401000H  
 			Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands Files WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool 
 			ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~		

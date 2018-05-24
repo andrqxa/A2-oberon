@@ -14780,15 +14780,15 @@ BEGIN
 END FoxIntermediateBackend.
 
 
-Compiler.Compile -p=Win32G FoxIntermediateBackend.Mod ~
+Compiler.Compile -p=Win32 FoxIntermediateBackend.Mod ~
 
-#	Release.Build --path="/temp/obg/" Win32G ~
+#	Release.Build --path="/temp/obg/" Win32 ~
 #	StaticLinker.Link --fileFormat=PE32 --fileName=A2H.exe --extension=GofW --displacement=401000H  Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands Files WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~
 FStols.CloseFiles A2Z.exe ~
 
 SystemTools.FreeDownTo FoxIntermediateBackend ~
 
-Compiler.Compile -p=Win32G --destPath=/temp/obg/ --traceModule=Trace
+Compiler.Compile -p=Win32 --destPath=/temp/obg/ --traceModule=Trace
 Runtime.Mod Trace.Mod Generic.Win32.Kernel32.Mod Win32.Machine.Mod Heaps.Mod 
 Generic.Modules.Mod Win32.Objects.Mod Win32.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod 
 Commands.Mod I386.Reals.Mod Generic.Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod 

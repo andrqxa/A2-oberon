@@ -65,7 +65,7 @@ compiler options:
 	-d	--documentation	string	install documentation engine
 	-S	--sourcePath	string	specification of a source path
 	-D --destPath		string	specification of a destination path
-	-p 	--platform		string	compiler options for platforms such as ARMA2, Win32G, defined in FoxCompiler.Mod
+	-p 	--platform		string	compiler options for platforms such as ARMA2, Win32, defined in FoxCompiler.Mod
 
 backend options (intermediate and AMD)
 		--trace			string	display trace information for sections (--trace=* : all sections)
@@ -101,8 +101,8 @@ SystemTools.DoCommands
 	FoxTest.Compile	-l=Test.Log ActiveCells.Execution.Test ActiveCells.Execution.TestDiff ~
 	FoxTest.Compile	-l=Test.Log MathArrays.Execution.Test  ~ 
 ~
-	TextCompiler.CompileClipboard -p=Win32G  ~
-	TextCompiler.CompileSelection -p=Win32G ~
+	TextCompiler.CompileClipboard -p=Win32  ~
+	TextCompiler.CompileSelection -p=Win32 ~
 
 open regression test files
 PET.Open Oberon.Compilation.Test ~

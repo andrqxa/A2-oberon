@@ -1868,7 +1868,7 @@ TraceHeap:
 Co
 
 
-Compiler.Compile -p=Win32G --writeBarriers --traceModule=Trace
+Compiler.Compile -p=Win32 --writeBarriers --traceModule=Trace
 Runtime.Mod Trace.Mod Generic.Win32.Kernel32.Mod Win32.Machine.Mod Heaps.Mod 
 Generic.Modules.Mod Win32.Objects.Mod Win32.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod 
 Commands.Mod I386.Reals.Mod Generic.Reflection.Mod
@@ -1881,7 +1881,7 @@ StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod BootConsole.Mo
 
 ~
 
-Compiler.Compile -p=Win32G --traceModule=Trace --writeBarriers Heaps.Mod ~
+Compiler.Compile -p=Win32 --traceModule=Trace --writeBarriers Heaps.Mod ~
 StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=GofW --displacement=401000H Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands FIles WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  BootConsole ~
 FSTools.CloseFiles A2.exe ~
 

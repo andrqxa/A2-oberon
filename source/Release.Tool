@@ -15,8 +15,8 @@
 #	Release.Build --build --path="./" A2ZynqCooperative ~
 #	StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" Trace CPU Runtime Counters Processors Queues BaseTypes Timer Activities ExclusiveBlocks HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel ~
 #
-# WINAOS generic
-#	Release.Build Win32G ~
+# WINAOS
+#	Release.Build Win32 ~
 #	StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=GofW --displacement=401000H Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands Files WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
 #	Do not forget to add the object file path to the path and to add ObjectFileExtension= ".ObfW" to your .ini file in order to configure the loader.
 # Command line shell:
@@ -152,11 +152,11 @@ BUILDS
 		EXCLUDEPACKAGES "Applications GuiApplications Fun Testing Education Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
-	Win32G
+	Win32
 	{
 		INCLUDE "WIN WINGEN WINGEN32 UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "-p=Win32G"
+		COMPILEOPTIONS "-p=Win32"
 		EXCLUDEPACKAGES ""
 		DISABLED "FALSE"
 	}
