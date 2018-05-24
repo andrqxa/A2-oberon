@@ -572,7 +572,7 @@ BEGIN
 
 	(* platform definitions hard coded for the common cases -- maybe (parts of it) should be outsourced to a file ?*)
 	DoAddPlatform("Win32","-b=AMD --newObjectFile --mergeSections --objectFileExtension=.GofW --symbolFileExtension=.SymW --preciseGC --trackLeave --writeBarriers --cellsAreObjects --platformCC=WINAPI");
-	DoAddPlatform("Win64G","-b=AMD --bits=64 --newObjectFile --mergeSections --objectFileExtension=.GofWw --symbolFileExtension=.SymWw --preciseGC --trackLeave --cellsAreObjects --platformCC=WINAPI");
+	DoAddPlatform("Win64","-b=AMD --bits=64 --newObjectFile --mergeSections --objectFileExtension=.GofWw --symbolFileExtension=.SymWw --preciseGC --trackLeave --cellsAreObjects --platformCC=WINAPI");
 	DoAddPlatform("Win32C","-b=AMD --cooperative --newObjectFile --traceModule=Trace --objectFileExtension=.GofCW --symbolFileExtension=.SymCW --platformCC=WINAPI");
 	DoAddPlatform("ARM","-b=ARM --newObjectFile --metaData=simple --objectFileExtension=.Goa --symbolFileExtension=.Sya");
 	DoAddPlatform("Minos","-b=ARM --objectFile=Minos"); 

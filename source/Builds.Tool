@@ -100,10 +100,10 @@ SOLARIS32 -- 32 bit solaris a2
 		UnixBinary.Build  oberon.bin  ->  A2Core ~
 
 
-Win64G -- work in progress
+WIN64 -- 64-bit windows a2
 ================
 	
-	Release.Build --path=NewAos/ Win64G ~
+	Release.Build --path=NewAos/ Win64 ~
 
 	StaticLinker.Link  --fileFormat=PE64CUI --fileName=oberon.exe --extension=GofWw --displacement=401000H  
 		Runtime Trace Kernel32 
@@ -145,14 +145,14 @@ Win64G -- work in progress
 		FSTools.CopyFiles -o A2.exe => ../../WinAos/A2.exe ~ 
 
 		FSTools.DeleteFiles -s NewAos/* ~
-		Release.Build --build --path=NewAos/ Win64G ~
+		Release.Build --build --path=NewAos/ Win64 ~
 		StaticLinker.Link --path=NewAos/  --fileFormat=PE64CUI --fileName=oberon.exe --extension=GofWw --displacement=401000H  
 			Runtime Trace Kernel32 
 			Heaps Modules Objects Kernel
 			KernelLog Streams Commands Files WinFS Clock Dates Reals Strings Diagnostics BitSets 
 			StringPool ObjectFile GenericLinker Reflection  GenericLoader Shell  StdIOShell Traps SystemTools ~
-		FSTools.CopyFiles -oq NewAos/*.* => ../../Win64G/bin/*.* ~ 
-		FSTools.CopyFiles -o oberon.exe => ../../Win64G/oberon.exe ~ 
+		FSTools.CopyFiles -oq NewAos/*.* => ../../Win64/bin/*.* ~ 
+		FSTools.CopyFiles -o oberon.exe => ../../Win64/oberon.exe ~ 
 
 		FSTools.DeleteFiles -s NewAos/* ~
 		~ 
