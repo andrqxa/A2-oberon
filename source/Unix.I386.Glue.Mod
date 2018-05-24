@@ -84,10 +84,10 @@ END Glue.
 
 Compiler.Compile -p=Linux32
 		Runtime.Mod Trace.Mod 
-		Generic.Unix.I386.Glue.Mod  Generic.Solaris.I386.Unix.Mod  Generic.Unix.I386.Machine.Mod	
-		Heaps.Mod  Generic.Modules.Mod  Generic.Solaris.Objects.Mod  Unix.Kernel.Mod
-		KernelLog.Mod  Streams.Mod  Pipes.Mod  Commands.Mod  TrapWriters.Mod  Generic.Reflection.Mod	
-		Unix.StdIO.Mod  Generic.Unix.Traps.Mod  UTF8Strings.Mod  Files.Mod  Unix.UnixFiles.Mod
+		Unix.I386.Glue.Mod  Solaris.I386.Unix.Mod  Unix.I386.Machine.Mod	
+		Heaps.Mod  Modules.Mod  Solaris.Objects.Mod  Unix.Kernel.Mod
+		KernelLog.Mod  Streams.Mod  Pipes.Mod  Commands.Mod  TrapWriters.Mod  Reflection.Mod	
+		Unix.StdIO.Mod  Unix.Traps.Mod  UTF8Strings.Mod  Files.Mod  Unix.UnixFiles.Mod
 		RelativeFileSystem.Mod  StringPool.Mod  BitSets.Mod  ObjectFile.Mod  
 		I386.Reals.Mod  Unix.Clock.Mod  Dates.Mod  Strings.Mod  Diagnostics.Mod 
 		GenericLinker.Mod  GenericLoader.Mod  Unix.BootConsole.Mod 

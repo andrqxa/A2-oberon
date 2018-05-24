@@ -262,37 +262,37 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	ZYNQCOOP { HeapManager.Mod Zynq.Environment.Mod }
 	WINCOOP { Win32.Environment.Mod }
 
-	LINUX32 { Generic.Linux.I386.Glue.Mod Generic.Linux.I386.Unix.Mod }
-	LINUX64 { Generic.Linux.AMD64.Glue.Mod Generic.Linux.AMD64.Unix.Mod }
-	DARWIN32 { Generic.Unix.I386.Glue.Mod Generic.Darwin.I386.Unix.Mod }
-	DARWIN64 { Generic.Unix.AMD64.Glue.Mod Generic.Darwin.AMD64.Unix.Mod }
-	SOLARIS32 { Generic.Unix.I386.Glue.Mod Generic.Solaris.I386.Unix.Mod }
-	SOLARIS64 { Generic.Unix.AMD64.Glue.Mod Generic.Solaris.AMD64.Unix.Mod }
+	LINUX32 { Linux.I386.Glue.Mod Linux.I386.Unix.Mod }
+	LINUX64 { Linux.AMD64.Glue.Mod Linux.AMD64.Unix.Mod }
+	DARWIN32 { Unix.I386.Glue.Mod Darwin.I386.Unix.Mod }
+	DARWIN64 { Unix.AMD64.Glue.Mod Darwin.AMD64.Unix.Mod }
+	SOLARIS32 { Unix.I386.Glue.Mod Solaris.I386.Unix.Mod }
+	SOLARIS64 { Unix.AMD64.Glue.Mod Solaris.AMD64.Unix.Mod }
 
-	WIN32 {Generic.Win32.Kernel32.Mod}
-	WIN64 {Generic.Win64.Kernel32.Mod}
+	WIN32 { Win32.Kernel32.Mod }
+	WIN64 { Win64.Kernel32.Mod }
 
-	I386GEN { Generic.I386.Machine.Mod }
+	I386GEN { I386.Machine.Mod }
 	WIN32 {Win32.Machine.Mod }
 	WIN64 {Win64.Machine.Mod}
 	COOP { Mutexes.Mod }
 	I386COOP { Coop.I386.Machine.Mod }
 	RPICOOP, ZYNQCOOP { Coop.ARM.Machine.Mod }
 
-	UNIX32 { Generic.Unix.I386.Machine.Mod }
-	UNIX64 { Generic.Unix.AMD64.Machine.Mod }
+	UNIX32 { Unix.I386.Machine.Mod }
+	UNIX64 { Unix.AMD64.Machine.Mod }
 
 	NATIVE, WIN, UNIX { Heaps.Mod }
 	COOP { Coop.Heaps.Mod }
 
-	NATIVE, WIN, UNIX { Generic.Modules.Mod}
+	NATIVE, WIN, UNIX { Modules.Mod }
 	COOP { Coop.Modules.Mod GarbageCollector.Mod }
 
 	NATIVE { Objects.Mod Kernel.Mod }
 	WIN32 { Win32.Objects.Mod }
 	WIN64 { Win64.Objects.Mod }
 	WIN { Win32.Kernel.Mod }
-	UNIX { Generic.Unix.Objects.Mod Unix.Kernel.Mod }
+	UNIX { Unix.Objects.Mod Unix.Kernel.Mod }
 	COOP { Coop.Objects.Mod Coop.Kernel.Mod }
 END
 
@@ -312,13 +312,13 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	ARM { ARM.Reals.Mod }
 
 	# default trap handling
-	Generic.Reflection.Mod
+	Reflection.Mod
 	TrapWriters.Mod CRC.Mod SystemVersion.Mod
 	NATIVE { Traps.Mod }
 	ARM { ARM.Traps.Mod }
 	WIN32 { Win32.Traps.Mod }
 	WIN64 {Win64.Traps.Mod}
-	UNIX { Unix.StdIO.Mod Generic.Unix.Traps.Mod }
+	UNIX { Unix.StdIO.Mod Unix.Traps.Mod }
 	COOP { Coop.Traps.Mod }
 	WIN {Win32.WinTrace.Mod Win32.StdIO.Mod }
 
@@ -861,8 +861,7 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 	cjkfont.bfnt # since used as fallback
 
 	WindowManager.Mod
-	UNIX { Generic.Unix.X11.Mod }
-	UNIX { Unix.X11Api.Mod Unix.XDisplay.Mod Unix.Beep.Mod Unix.KbdMouse.Mod Unix.Clipboard.Mod Unix.Display.Mod }
+	UNIX { Unix.X11.Mod Unix.X11Api.Mod Unix.XDisplay.Mod Unix.Beep.Mod Unix.KbdMouse.Mod Unix.Clipboard.Mod Unix.Display.Mod }
 
 
 	# Icons representing applications (don't put icons used by applications inside!)
