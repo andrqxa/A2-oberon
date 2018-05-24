@@ -243,18 +243,6 @@ BUILDS
 		EXCLUDEPACKAGES "Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts TrueTypeFonts CjkFonts Pr3Fonts ScreenFonts Pr6Fonts"
 		DISABLED "FALSE"
 	}
-	WinAosMini
-	{
-		INCLUDE "WIN WINORIG UNCOOP UNCOOP32"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS ""
-		TARGET "AMD"
-		EXTENSION "Obw"
-		SYMBOLEXTENSION "Obw"
-		PATH ""
-		EXCLUDEPACKAGES "Build Education Fun Testing Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts CjkFonts Pr3Fonts Pr6Fonts"
-		DISABLED "FALSE"
-	}
 	Linux32G {
 		INCLUDE "UNIXG UNIXG32 LINUXG32 UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
