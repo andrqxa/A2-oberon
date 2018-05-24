@@ -168,17 +168,6 @@ BUILDS
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
-	A2_64 {
-		INCLUDE "NATIVE NATIVEORIG AMD64 AMD64ORIG UNCOOP UNCOOP64"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--bits=64"
-		TARGET "AMD"
-		EXTENSION "Abx"
-		SYMBOLEXTENSION "Abx"
-		PATH "AOS:"
-		EXCLUDEPACKAGES "Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
-		DISABLED "FALSE"
-	}
 	WinAosCooperative {
 		INCLUDE "WIN COOP WINCOOP I386COOP"
 		COMPILER "Compiler.Compile"
@@ -284,7 +273,6 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	WIN64 {Generic.Win64.Kernel32.Mod}
 
 	I386GEN { Generic.I386.Machine.Mod }
-	AMD64 { AMD64.Machine.Mod }
 	WIN32 {Win32.Machine.Mod }
 	WIN64 {Win64.Machine.Mod}
 	COOP { Mutexes.Mod }
@@ -294,14 +282,13 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	UNIX32 { Generic.Unix.I386.Machine.Mod }
 	UNIX64 { Generic.Unix.AMD64.Machine.Mod }
 
-	NATIVEORIG, NATIVEGEN, WIN, UNIX { Heaps.Mod }
+	NATIVEGEN, WIN, UNIX { Heaps.Mod }
 	COOP { Coop.Heaps.Mod }
 
-	NATIVEORIG { Modules.Mod }
 	NATIVEGEN, WIN, UNIX { Generic.Modules.Mod}
 	COOP { Coop.Modules.Mod GarbageCollector.Mod }
 
-	NATIVEORIG, NATIVEGEN { Objects.Mod Kernel.Mod }
+	NATIVEGEN { Objects.Mod Kernel.Mod }
 	WIN32 { Win32.Objects.Mod }
 	WIN64 { Win64.Objects.Mod }
 	WIN { Win32.Kernel.Mod }
@@ -321,16 +308,14 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	In.Mod Out.Mod
 
 	I386, WIN32, UNIX32 { I386.Reals.Mod }
-	AMD64, WIN64, UNIX64 { AMD64.Reals.Mod }
+	WIN64, UNIX64 { AMD64.Reals.Mod }
 	ARM { ARM.Reals.Mod }
 
 	# default trap handling
-	NATIVEORIG { Reflection.Mod }
 	NATIVEGEN, WIN, UNIX {Generic.Reflection.Mod}
 	COOP { Generic.Reflection.Mod }
 	TrapWriters.Mod CRC.Mod SystemVersion.Mod
-	NATIVEORIG, NATIVEGEN { Traps.Mod }
-	AMD64 { AMD64.Traps.Mod }
+	NATIVEGEN { Traps.Mod }
 	ARM { ARM.Traps.Mod }
 	WIN32 { Win32.Traps.Mod }
 	WIN64 {Win64.Traps.Mod}
@@ -343,7 +328,6 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	# PCI bus interface
 	I386 {BiosFreePCI.Mod }
-	AMD64 { AMD64.PCI.Mod }
 
 	# Realtime clock driver
 	NATIVE { Clock.Mod }
@@ -352,7 +336,6 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	# Memory cache control
 	I386GEN { I386.MemCache.Mod }
-	AMD64ORIG { AMD64.MemCache.Mod }
 	COOP { Coop.MemCache.Mod }
 
 	# Block device interface
@@ -379,7 +362,6 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	RelativeFileSystem.Mod	# file system relative to path
 
-	NATIVEORIG { Loader.Mod }
 	NATIVEGEN, WIN, COOP, UNIX {BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod }
 
 	# binding modules
@@ -407,7 +389,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	BootShell.Mod
 
 	I386, UNIX32 { I386.Network.Mod }
-	AMD64, UNIX64 { AMD64.Network.Mod }
+	UNIX64 { AMD64.Network.Mod }
 	ARM { ARM.Network.Mod }
 	NATIVE { NetworkMii.Mod }
 
@@ -427,7 +409,6 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	}
 
 	I386 { I386.IP.Mod I386.IPv4.Mod }
-	AMD64 { AMD64.IP.Mod AMD64.IPv4.Mod }
 	ARM { ARM.IP.Mod ARM.IPv4.Mod }
 
 	NATIVE {
@@ -482,7 +463,6 @@ PACKAGE Drivers ARCHIVE "Drivers.zip" SOURCE "DriversSrc.zip" DESCRIPTION "Devic
 	NATIVE { SCSI.Mod }
 
 	I386 { I386.ATADisks.Mod }
-	AMD64 { AMD64.ATADisks.Mod }
 
 	I386 { I386.Adaptec7Script.Mod Adaptec7.Mod } # Adaptec SCSI driver
 
@@ -494,7 +474,6 @@ PACKAGE Drivers ARCHIVE "Drivers.zip" SOURCE "DriversSrc.zip" DESCRIPTION "Devic
 	# PS/2 keyboard incl. layouts
 
 	I386 { I386.Keyboard.Mod }
-	AMD64 { AMD64.Keyboard.Mod }
 
 	NATIVE {
 		KeyUK.Bin KeyCA.Bin KeyCH.Bin KeyD.Bin KeyN.Bin KeyTR.Bin KeyPL.Bin KeyDV.Bin
@@ -537,7 +516,6 @@ PACKAGE Drivers ARCHIVE "Drivers.zip" SOURCE "DriversSrc.zip" DESCRIPTION "Devic
 	}
 
 	I386 { I386.UsbKeyboard.Mod }
-	AMD64 { AMD64.UsbKeyboard.Mod }
 
 	NATIVE {
 		UsbHidUP.Mod UsbHidErrors.Mod UsbHidReport.Mod
@@ -558,7 +536,7 @@ PACKAGE Drivers ARCHIVE "Drivers.zip" SOURCE "DriversSrc.zip" DESCRIPTION "Devic
 		BluetoothHCI.Mod BluetoothL2CAP.Mod BluetoothRFCOMM.Mod
 	}
 
-	NATIVEORIG {
+	NATIVEGEN {
 		# Floppy disk driver
 		Diskettes.Mod
 	}
@@ -594,12 +572,12 @@ PACKAGE Compiler ARCHIVE "Compiler.zip" SOURCE "CompilerSrc.zip" DESCRIPTION "Ac
 	# Runtime support for math oberon (Move to runtime package? *)
 	I386, WIN32, UNIX32 { XMM.I386.Math.Mod XMM.I386.MathL.Mod }
 	#FPU32 { I386.Math.Mod I386.MathL.Mod }
-	AMD64, WIN64, UNIX64 { XMM.AMD64.Math.Mod XMM.AMD64.MathL.Mod }
+	WIN64, UNIX64 { XMM.AMD64.Math.Mod XMM.AMD64.MathL.Mod }
 	#FPU64 { AMD64.Math.Mod AMD64.MathL.Mod }
 	ComplexNumbers.Mod
 	FoxArrayBase.Mod
 	I386, WIN32, UNIX32 { I386.FoxArrayBaseOptimized.Mod }
-	AMD64, WIN64, UNIX64, UNIX64 { AMD64.FoxArrayBaseOptimized.Mod }
+	WIN64, UNIX64, UNIX64 { AMD64.FoxArrayBaseOptimized.Mod }
 END
 
 PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMiniSrc.zip" DESCRIPTION "Minimal applications set"
@@ -623,7 +601,7 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 	}
 
 	I386, WIN32, UNIX32 { XMM.I386.Math.Mod XMM.I386.MathL.Mod }
-	AMD64, WIN64 { XMM.AMD64.Math.Mod XMM.AMD64.MathL.Mod }
+	WIN64 { XMM.AMD64.Math.Mod XMM.AMD64.MathL.Mod }
 	#FPU32 { I386.Math.Mod I386.MathL.Mod }
 	#FPU64 { AMD64.Math.Mod AMD64.MathL.Mod }
 
@@ -639,7 +617,7 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 
 	# raster images (eos)
 	I386, WIN32, UNIX32 { I386.Raster.Mod }
-	AMD64, WIN64, UNIX64 { AMD64.Raster.Mod }
+	WIN64, UNIX64 { AMD64.Raster.Mod }
 
 	Localization.Mod
 	Archives.Mod
@@ -672,7 +650,7 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 
 	# Move to graphical package!!
 	I386, WIN32, UNIX32 { I386.WMRasterScale.Mod }
-	AMD64, WIN64, UNIX64 { AMD64.WMRasterScale.Mod }
+	WIN64, UNIX64 { AMD64.WMRasterScale.Mod }
 
 	WMGraphics.Mod
 	WMGraphicsSmooth.Mod
@@ -738,9 +716,9 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 	config.txt # default config string settings
 	PartitionEditorTable.Mod
 
-	NATIVEORIG{ Profiler.Mod HierarchicalProfiler0.Mod } # Hierarchical profiler has GUI: WMProfiler.Mod
+	# { Profiler.Mod HierarchicalProfiler0.Mod } # Hierarchical profiler has GUI: WMProfiler.Mod
 	WIN { Win32.HierarchicalProfiler0.Mod }
-	NATIVEORIG, WIN { HierarchicalProfiler.Mod}
+	WIN { HierarchicalProfiler.Mod}
 
 	FTPClient.Mod
 
@@ -770,7 +748,7 @@ PACKAGE Applications ARCHIVE "Applications.zip" SOURCE "ApplicationsSrc.zip" DES
 	Fido.Mod
 
 	I386, WIN32, UNIX32 { I386.CPUID.Mod }
-	AMD64, WIN64 { AMD64.CPUID.Mod }
+	WIN64 { AMD64.CPUID.Mod }
 
 	A2Sequencers.Mod
 
@@ -788,7 +766,7 @@ PACKAGE Applications ARCHIVE "Applications.zip" SOURCE "ApplicationsSrc.zip" DES
 	TCPServices.Mod TestServer.Mod	# TCP services
 	TCPTools.Mod						# Some useful TCP-related commands
 
-	NATIVEORIG { Performance.Mod }
+	# { Performance.Mod }
 	WIN, UNIX, NATIVECOOP { Win32.Performance.Mod } # This is just a dummy
 
 	Bin2Hex.Mod BinToCode.Mod
@@ -801,7 +779,6 @@ PACKAGE Applications ARCHIVE "Applications.zip" SOURCE "ApplicationsSrc.zip" DES
 
 	ShellCommands.Mod Telnet.Mod	# Telnet Shell (currently broken)
 
-	AMD64ORIG { AMD64.MemInfo.Mod }
 	I386,WIN { Info.Mod }
 
 	TFClasses.Mod Mail.Mod SMTPClient.Mod
@@ -1017,7 +994,7 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 	WMPerfMonAlerts.Mod WMPerfMonAlertsUtils.Mod WMPerfMonAlerts.XML
 
 	# perfmon kernel plugins
-	NATIVEORIG, NATIVEGEN {
+	NATIVEGEN {
 		WMPerfMonPluginCpu.Mod WMPerfMonPluginMemory.Mod
 		WMPerfMonPluginInterrupts.Mod
 		WMPerfMonPluginUsb.Mod WMPerfMonPluginNetStats.Mod
@@ -1048,7 +1025,7 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 	WMShell.Mod	# GUI for Shell
 
 	# GUI for hierarchical profiler (HierarchicalProfiler.Mod)
-	NATIVEORIG, WIN { WMProfiler.Mod }
+	WIN { WMProfiler.Mod }
 
 	# ssh
 	SSH.Tool
@@ -1149,7 +1126,7 @@ PACKAGE GuiApplications ARCHIVE "GuiApplications.zip" SOURCE "GuiApplicationsSrc
 	}
 
 	I386, WIN32, UNIX32 { I386.WMTransitions.Mod }
-	AMD64, WIN64, UNIX64 { AMD64.WMTransitions.Mod }
+	WIN64, UNIX64 { AMD64.WMTransitions.Mod }
 	MediaPlayer.Mod Presentation.Mod
 	MP3Player.Mod WMPlayer.Mod
 	WAVRecorder.Mod
@@ -1234,7 +1211,7 @@ PACKAGE Testing ARCHIVE "Testing.zip" SOURCE "TestingSrc.zip" DESCRIPTION "Tests
 
 	CSV.Test
 
-	NATIVEORIG, NATIVEGEN {
+	NATIVEGEN {
 		TestLocks.Mod
 		BenchSpeedup.Mod BenchObjCount.Mod
 		BenchClockDrift.Mod BenchNew.Mod BenchLocks.Mod
@@ -1243,7 +1220,6 @@ PACKAGE Testing ARCHIVE "Testing.zip" SOURCE "TestingSrc.zip" DESCRIPTION "Tests
 	}
 
 	I386GEN { I386.BenchInterrupts.Mod }
-	AMD64 { AMD64.BenchInterrupts.Mod }
 
 	BenchTCP.Mod
 
@@ -1314,7 +1290,7 @@ END
 PACKAGE EFI ARCHIVE "EFI.zip" SOURCE "EFISrc.zip" DESCRIPTION "EFI Boot Loader and API"
 	EFI.Tool EFI.Mod
 	I386, WIN32, UNIX32 {I386.EFIMachine.Mod}
-	AMD64, WIN64, UNIX64 { AMD64.EFIMachine.Mod }
+	WIN64, UNIX64 { AMD64.EFIMachine.Mod }
 
 
 	EFIBlockIO.Mod EFIDiskIO.Mod
@@ -1345,7 +1321,7 @@ PACKAGE Contributions ARCHIVE "Contributions.zip" SOURCE "ContributionsSrc.zip" 
 	srRenderTools.Text srReadMe.Text	# Realtime Fractal-Voxel Raytracer (Soren Renner)
 	srBase.Mod srRayEngine.Mod srMath.Mod
 	I386, WIN32, UNIX32 { I386.srE.Mod }
-	AMD64, WIN64, UNIX64 { AMD64.srE.Mod }
+	WIN64, UNIX64 { AMD64.srE.Mod }
 	srGL.Mod srHex.Mod srImage.Mod
 	srVoxel.Mod srVoxel2.Mod srVoxel3.Mod srVolShader.Mod srVoxel4.Mod srVoxel5.Mod
 	srM2Space.Mod srM3Space.Mod srM5Space.Mod srM6Space.Mod srRastermovie.Mod
@@ -1497,7 +1473,7 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 	Edit.Tool Oberon.Edit.Mod	# Edit
 	Script.Tool Oberon.Styles.Mod Oberon.ScriptFrames.Mod Oberon.Script.Mod	# Script
 
-	NATIVEORIG, NATIVEGEN {
+	NATIVEGEN {
 	Oberon.Diskettes.Mod	# Diskette driver
 	Backup.Tool Oberon.Diskette.Mod Oberon.Backup.Mod	# Backup
 	}
@@ -1696,7 +1672,7 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 
 	WIN { Win32.Oberon.PlugInDocs.Mod }
 
-	NATIVEORIG, NATIVEGEN {
+	NATIVEGEN {
 	Oberon.Profiler.Mod	# alternative profiler (prk)
 	Oberon.FATDocs.Mod	# FAT browser (be)
 	}
