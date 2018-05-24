@@ -96,7 +96,7 @@ Compiler.Compile -p=Linux64
 		~
 		
 	
-StaticLinker.Link  -p=Solaris64G
+StaticLinker.Link  -p=Solaris64
 		Runtime Trace Glue 
 		Unix  Machine  Heaps Modules  Objects  Kernel  KernelLog 
 		Streams  Pipes  Commands  StdIO  TrapWriters  Traps 
