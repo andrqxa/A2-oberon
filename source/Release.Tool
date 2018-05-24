@@ -203,17 +203,6 @@ BUILDS
 		EXCLUDEPACKAGES "Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
-	A2mini {
-		INCLUDE "NATIVE NATIVEORIG I386 I386ORIG UNCOOP UNCOOP32"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS ""
-		TARGET "AMD"
-		EXTENSION "Obx"
-		SYMBOLEXTENSION "Obx"
-		PATH "AOS:"
-		EXCLUDEPACKAGES "Applications GuiApplications Fun Testing Education Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
-		DISABLED "FALSE"
-	}
 	WinAosCooperative {
 		INCLUDE "WIN COOP WINCOOP I386COOP"
 		COMPILER "Compiler.Compile"
