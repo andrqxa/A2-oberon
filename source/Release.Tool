@@ -444,7 +444,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 		Win32.WinFS.Mod
 	}
 
-	NATIVE,WIN,UNIXG { RelativeFileSystem.Mod } # file system relative to path
+	RelativeFileSystem.Mod	# file system relative to path
 
 	NATIVEORIG,WINORIG { Loader.Mod }
 	NATIVEGEN, WINGEN, COOP, UNIXG {BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod }
@@ -1530,29 +1530,27 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 	Oberon.Objects.Mod
 	OberonInput.Mod	# WM-less Oberon I/O
 
-	NATIVE, WIN, UNIXG {
-		OberonDisplay.Mod Oberon.Display.Mod Oberon.Display.Mod
-		Oberon.Input.Mod	# WM-based Display & Input
-		Oberon.Viewers.Mod Oberon.Fonts.Mod
-	}
+	OberonDisplay.Mod Oberon.Display.Mod Oberon.Display.Mod
+	Oberon.Input.Mod	# WM-based Display & Input
+	Oberon.Viewers.Mod Oberon.Fonts.Mod
 
-	NATIVE, WIN, UNIXG {Oberon.Mod}
+	Oberon.Mod
 
 	Oberon.Texts.Mod
 
 	WIN { Win32.OberonConfiguration.Mod }
 
-	NATIVE, WIN, UNIXG { Oberon.Oberon.Mod }
+	Oberon.Oberon.Mod
 
 	Oberon.MenuViewers.Mod Oberon.TextFrames.Mod
 
-	NATIVE, WIN, UNIXG { Oberon.System.Mod }
+	Oberon.System.Mod
 
 	Oberon.In.Mod Oberon.Out.Mod Oberon.Dates.Mod Oberon.Strings.Mod	# Utility modules
 
 	NATIVE, WIN { Oberon.Centronics.Mod }
 
-	NATIVE, WIN, UNIXG { I386.Oberon.Bitmaps.Mod Oberon.Pictures.Mod }
+	I386.Oberon.Bitmaps.Mod Oberon.Pictures.Mod
 
 	Oberon.RandomNumbers.Mod
 
@@ -1645,14 +1643,12 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 
 	Colors.Tool
 
-	NATIVE, WIN, UNIXG {
-		Oberon.Colors.Mod	# Color models
-		Oberon.Display3.Mod Oberon.Effects.Mod
-	}
+	Oberon.Colors.Mod	# Color models
+	Oberon.Display3.Mod Oberon.Effects.Mod
 
 	Oberon.Printer3.Mod Oberon.Attributes.Mod Oberon.Links.Mod
 
-	NATIVE, WIN, UNIXG { Oberon.Gadgets.Mod }
+	Oberon.Gadgets.Mod
 
 	WIN { Win32.Oberon.PrinterInfo.Mod }
 
@@ -1663,11 +1659,11 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	Oberon.Panels.Mod
 
 
-	NATIVE,WIN, UNIXG { Oberon.TextGadgets0.Mod Oberon.TextGadgets.Mod }
+	Oberon.TextGadgets0.Mod Oberon.TextGadgets.Mod
 
 	Oberon.BasicFigures.Mod
 
-	NATIVE,WIN,UNIXG { Oberon.Scrollbars.Mod }
+	Oberon.Scrollbars.Mod
 
 	NATIVE, UNIXG { Oberon.Directories.Mod }
 	WIN { Win32.Oberon.Directories.Mod }
@@ -1677,14 +1673,14 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	Oberon.ProgressMeters.Mod Oberon.Sisiphus.Mod Sisyphus.Data
 	Oberon.Documents.Mod Oberon.Views.Mod
 
-	NATIVE, WIN, UNIXG { Oberon.Desktops.Mod }
+	Oberon.Desktops.Mod
 
-	NATIVE,WIN, UNIXG{ Oberon.TextDocs.Mod }
+	Oberon.TextDocs.Mod
 
 	TextDocs.Lib Oberon.PanelDocs.Mod	# Document catalog
 	Oberon.Icons.Mod Oberon.ColorTools.Mod Oberon.NamePlates.Mod Oberon.Navigators.Mod Oberon.NoteBooks.Mod
 
-	NATIVE, WIN, UNIXG { Oberon.Finder.Mod }
+	Oberon.Finder.Mod
 
 	Oberon.GadgetsIn.Mod Oberon.GadgetsOut.Mod
 
@@ -1702,7 +1698,7 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	Oberon.StyleGadgets.Mod Oberon.ScriptGadgets.Mod
 	Rembrandt.Panel Oberon.Rembrandt0.Mod
 
-	NATIVE, WIN, UNIXG { Oberon.Rembrandt.Mod }
+	Oberon.Rembrandt.Mod
 
 	Oberon.RembrandtDocs.Mod	# Rembrandt in Popups.Tool
 	Oberon.RembrandtTools.Mod Rembrandt.Lib Clown.Pict Grapes.Pict
@@ -1721,14 +1717,14 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 
 	Images.Tool Oberon.Images.Mod
 
-	NATIVE, WIN, UNIXG { Oberon.ImageGadgets.Mod }
+	Oberon.ImageGadgets.Mod
 
 	Oberon.ImageDocs.Mod	# Images
 
 	Oberon.PictImages.Mod Oberon.BMPImages.Mod Oberon.JPEGImages.Mod Oberon.GIFImages.Mod Oberon.PSDImages.Mod
 	Colors.Panel
 
-	NATIVE, WIN, UNIXG { Oberon.ColorGadgets.Mod }
+	Oberon.ColorGadgets.Mod
 
 	Oberon.PCXImages.Mod	# Color views
 	Oberon.ColorWells.Mod	# Leonardo legacy
@@ -1920,7 +1916,7 @@ END
 PACKAGE OberonVoyager ARCHIVE "OberonVoyager.zip" SOURCE "OberonVoyagerSrc.zip" DESCRIPTION "Oberon Voyager"
 
 	# Portability Module
-	NATIVE, WIN, UNIXG { Oberon.vyPortability.Mod }
+	Oberon.vyPortability.Mod
 	Oberon.vyHost.Mod Oberon.vyHostFonts.Mod	# Host modules
 	Oberon.vyLinks.Mod Oberon.vyHostStrings.Mod Oberon.vyHostTexts.Mod Oberon.vyBase.Mod Oberon.vyName.Mod	# Base and Name
 	Oberon.vyScanners.Mod Oberon.vyParser.Mod Oberon.vyPars.Mod Oberon.vyIn.Mod Oberon.vyOut.Mod Oberon.vyFiles.Mod Oberon.vyTextsCtl.Mod	# In and Output
