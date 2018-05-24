@@ -107,6 +107,18 @@ HEADER
 END
 
 BUILDS
+	A2
+	{
+		INCLUDE "NATIVE NATIVEGEN I386 I386GEN UNCOOP UNCOOP32"
+		COMPILER "Compiler.Compile"
+		COMPILEOPTIONS "--newObjectFile --mergeSections"
+		TARGET "AMD"
+		EXTENSION "GofG"
+		SYMBOLEXTENSION "SymG"
+		PATH "AOS"
+		EXCLUDEPACKAGES "Applications GuiApplications Fun Testing Education Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
+		DISABLED "FALSE"
+	}
 	A2Cooperative {
 		INCLUDE "NATIVE I386 COOP NATIVECOOP NATIVEI386COOP I386COOP"
 		COMPILER "Compiler.Compile"
@@ -138,18 +150,6 @@ BUILDS
 		SYMBOLEXTENSION "Sym"
 		PATH "AOS"
 		EXCLUDEPACKAGES "System Drivers Compiler ApplicationsMini Applications GuiApplicationsMini GuiApplications Fun Testing Education Build EFI Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
-		DISABLED "FALSE"
-	}
-	A2NewObjectFile
-	{
-		INCLUDE "NATIVE NATIVEGEN I386 I386GEN UNCOOP UNCOOP32"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--newObjectFile --mergeSections"
-		TARGET "AMD"
-		EXTENSION "GofG"
-		SYMBOLEXTENSION "SymG"
-		PATH "AOS"
-		EXCLUDEPACKAGES "Applications GuiApplications Fun Testing Education Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
 	Win32
