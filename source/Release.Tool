@@ -110,7 +110,7 @@ BUILDS
 	A2Cooperative {
 		INCLUDE "NATIVE I386 COOP NATIVECOOP NATIVEI386COOP I386COOP"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile --traceModule=Trace --mergeSections"
+		COMPILEOPTIONS "--cooperative --newObjectFile --traceModule=Trace --mergeSections"
 		TARGET "AMD"
 		EXTENSION "Gof"
 		SYMBOLEXTENSION "Sym"
@@ -121,7 +121,7 @@ BUILDS
 	A2RPiCooperative {
 		INCLUDE "NATIVE ARM RPI COOP RPICOOP"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile --traceModule=Trace --mergeSections"
+		COMPILEOPTIONS "--cooperative --newObjectFile --traceModule=Trace --mergeSections"
 		TARGET "ARM"
 		EXTENSION "Gof"
 		SYMBOLEXTENSION "Sym"
@@ -132,7 +132,7 @@ BUILDS
 	A2ZynqCooperative {
 		INCLUDE "NATIVE ARM ZYNQ COOP ZYNQCOOP"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile --traceModule=Trace --mergeSections"
+		COMPILEOPTIONS "--cooperative --newObjectFile --traceModule=Trace --mergeSections"
 		TARGET "ARM"
 		EXTENSION "Gof"
 		SYMBOLEXTENSION "Sym"
@@ -144,7 +144,7 @@ BUILDS
 	{
 		INCLUDE "NATIVE NATIVEGEN I386 I386GEN UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--objectFile=Generic --newObjectFile --mergeSections"
+		COMPILEOPTIONS "--newObjectFile --mergeSections"
 		TARGET "AMD"
 		EXTENSION "GofG"
 		SYMBOLEXTENSION "SymG"
@@ -182,7 +182,7 @@ BUILDS
 	WinAosCooperative {
 		INCLUDE "WIN COOP WINCOOP I386COOP"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--cooperative --objectFile=Generic --newObjectFile --traceModule=Trace"
+		COMPILEOPTIONS "--cooperative --newObjectFile --traceModule=Trace"
 		TARGET "AMD"
 		EXTENSION "GofCW"
 		SYMBOLEXTENSION "SymCW"

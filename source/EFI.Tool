@@ -3,7 +3,7 @@
 ** Loader * *
 
 SystemTools.DoCommands
-Compiler.Compile  --objectFile=Generic --bits=32 --traceModule=Trace
+Compiler.Compile --bits=32 --traceModule=Trace
 	Runtime.Mod Trace.Mod EFI.Mod I386.EFIMachine.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod
 	EFILoadedImage.Mod EFIGraphicsOutput.Mod EFILib.Mod EFIGraphicalConsole.Mod EFIA2Loader.Mod
 ~
@@ -15,7 +15,7 @@ StaticLinker.Link --fileName=E:/felix.svn/qemu/disk/A2Loader.efi --fileFormat=EF
 ** Kernel Image **
 
 SystemTools.DoCommands
-Compiler.Compile --objectFile=Generic --newObjectFile --mergeSections -b=AMD --objectFileExtension=.Gox --symbolFileExtension=.Syx --traceModule=Trace
+Compiler.Compile --newObjectFile --mergeSections -b=AMD --objectFileExtension=.Gox --symbolFileExtension=.Syx --traceModule=Trace
 	Runtime.Mod Trace.Mod EFI.I386.Machine.Mod EFIGraphicalConsole.Mod StartConsole.Mod Heaps.Mod Generic.Modules.Mod 
 	Objects.Mod Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod I386.Reals.Mod 
 	Reflection.Mod TrapWriters.Mod CRC.Mod SystemVersion.Mod Traps.Mod Locks.Mod BiosFreePCI.Mod 
@@ -44,7 +44,7 @@ StaticLinker.Link
 SystemTools.FreeDownTo FoxIntermediateBackend ~
 
 
-	Compiler.Compile --newObjectFile --objectFile=Generic  -b=AMD --bits=64  --objectFileExtension=.Gos --symbolFileExtension=.Sys --traceModule=Trace
+	Compiler.Compile --newObjectFile -b=AMD --bits=64 --objectFileExtension=.Gos --symbolFileExtension=.Sys --traceModule=Trace
 	--trace=* -i StartConsole.Mod ~
 ~
 
@@ -52,7 +52,7 @@ SystemTools.FreeDownTo FoxIntermediateBackend ~
 ** Loader **
 ~
 SystemTools.DoCommands
-Compiler.Compile  --objectFile=Generic --bits=64 --traceModule=Trace
+Compiler.Compile --bits=64 --traceModule=Trace
 	AMD64.Runtime.Mod Trace.Mod EFI.Mod AMD64.EFIMachine.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod
 	EFILoadedImage.Mod EFIGraphicsOutput.Mod EFILib.Mod EFIGraphicalConsole.Mod EFIA2Loader.Mod
 ~
@@ -65,7 +65,7 @@ StaticLinker.Link --fileName=E:/felix.svn/qemu/disk/A2Loader.efi --fileFormat=EF
 ** Kernel Image **
 	
 SystemTools.DoCommands
-	Compiler.Compile --newObjectFile --objectFile=Generic  -b=AMD --bits=64  --objectFileExtension=.Gos --symbolFileExtension=.Sys --traceModule=Trace
+	Compiler.Compile --newObjectFile -b=AMD --bits=64 --objectFileExtension=.Gos --symbolFileExtension=.Sys --traceModule=Trace
 	AMD64.Runtime.Mod Trace.Mod EFI.AMD64.Machine.Mod EFIGraphicalConsole.Mod StartConsole.Mod Heaps.Mod Generic.Modules.Mod Objects.Mod Kernel.Mod 
 	Interfaces.Mod KernelLog.Mod Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod AMD64.Reals.Mod 
 	Reflection.Mod TrapWriters.Mod AMD64.Traps.Mod Locks.Mod BiosFreePCI.Mod Clock.Mod AMD64.MemCache.Mod Disks.Mod Files.Mod 

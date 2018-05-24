@@ -66,7 +66,7 @@ END  StdIO.
 
 SystemTools.DoCommands 
 
-	Compiler.Compile  -b=AMD --objectFile=Generic --newObjectFile  --objectFileExtension=.Gox --symbolFileExtension=.Syx --mergeSections
+	Compiler.Compile  -b=AMD --newObjectFile  --objectFileExtension=.Gox --symbolFileExtension=.Syx --mergeSections
 		Runtime.Mod Trace.Mod Generic.Win32.Kernel32.Mod Win32.Machine.Mod Heaps.Mod 
 		Generic.Modules.Mod Win32.Objects.Mod Win32.Kernel.Mod KernelLog.Mod Streams.Mod Commands.Mod 
 		I386.Reals.Mod Reflection.Mod Locks.Mod Win32.Clock.Mod Files.Mod Dates.Mod Strings.Mod 
