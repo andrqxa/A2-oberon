@@ -38,10 +38,10 @@
 #		BitSets StringPool GenericLinker Reflection GenericLoader BootConsole ~
 #    UnixBinary.Build oberon.bin -> A2Core ~
 #
-# DarwinAOS Generic
-#    Release.Build Darwin32G ~
+# DarwinAOS
+#    Release.Build Darwin32 ~
 # X11 Bootconsole:
-#    StaticLinker.Link -p=Darwin32G --path=NewAos/
+#    StaticLinker.Link -p=Darwin32 --path=NewAos/
 #		Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog Streams Pipes
 #		Commands StdIO TrapWriters Traps Files UnixFiles Clock Dates Reals Strings Diagnostics
 #		BitSets StringPool GenericLinker Reflection GenericLoader BootConsole ~
@@ -206,7 +206,7 @@ BUILDS
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
-	Darwin32G {
+	Darwin32 {
 		INCLUDE "UNIXG UNIXG32 DARWING32 UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "-p=Linux32"

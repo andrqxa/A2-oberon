@@ -1093,7 +1093,7 @@ BEGIN
 	defaults.Add("A2G","--fileName=kernel.img --extension=.GofG --displacement=0100000H");
 	defaults.Add("Solaris32G", "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofU --displacement=0" );
 	defaults.Add("Solaris64G", "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofUu --displacement=0" );
-	defaults.Add("Darwin32G",   "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofU --displacement=0" );
+	defaults.Add("Darwin32",   "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofU --displacement=0" );
 	defaults.Add("Darwin64G",   "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofUu --displacement=0" );
 END StaticLinker.
 
