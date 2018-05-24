@@ -1947,7 +1947,7 @@ END
 PACKAGE OberonAnts ARCHIVE "OberonAnts.zip" SOURCE "OberonAntsSrc.zip" DESCRIPTION "OberonAnts"
 	Oberon.antsS3.ScrollbarsR.Mod Oberon.antsCommandInvoker.Mod	# generic tools
 
-	NATIVE, UNIXG { Oberon.antsPortability.Mod }	# Portability
+	Oberon.antsPortability.Mod	# Portability
 
 	NATIVE,WIN {
 		Oberon.antsExpressionsObjects.Mod Oberon.antsExpressions.Mod Oberon.antsExpressionsDefaults.Mod	# command prompt interpreter
