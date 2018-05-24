@@ -1,18 +1,5 @@
 # To compile all files in a specific release...
 #
-# A2
-#
-#	Release.Build A2 ~
-#
-#	Bootimage (IDE)
-#	Linker.Link \PAOS: \.Obx AOS:IDE.Bin 0100000H 1000H Kernel Traps
-#	ATADisks DiskVolumes DiskFS BootConsole ~
-#
-#	Bootimage (USB)
-#	Linker.Link \PAOS: \.Obx AOS:USB.Bin 0100000H 1000H Kernel Traps
-#	UsbHubDriver UsbEhci UsbUhci UsbOhci UsbStorageBoot
-#	DiskVolumes DiskFS BootConsole ~
-#
 # A2 Cooperative
 #
 #	Release.Build --build --path="./" A2Cooperative ~
@@ -120,17 +107,6 @@ HEADER
 END
 
 BUILDS
-	A2 {
-		INCLUDE "NATIVE NATIVEORIG I386 I386ORIG UNCOOP UNCOOP32"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS ""
-		TARGET "AMD"
-		EXTENSION "Obx"
-		SYMBOLEXTENSION "Obx"
-		PATH "AOS"
-		EXCLUDEPACKAGES ""
-		DISABLED "FALSE"
-	}
 	A2Cooperative {
 		INCLUDE "NATIVE I386 COOP NATIVECOOP NATIVEI386COOP I386COOP"
 		COMPILER "Compiler.Compile"
@@ -307,7 +283,6 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	WINGEN32 {Generic.Win32.Kernel32.Mod}
 	WINGEN64 {Generic.Win64.Kernel32.Mod}
 
-	I386ORIG { I386.Machine.Mod }
 	I386GEN { Generic.I386.Machine.Mod }
 	AMD64 { AMD64.Machine.Mod }
 	WINGEN32 {Win32.Machine.Mod }
@@ -376,7 +351,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	UNIXG { Unix.Clock.Mod }
 
 	# Memory cache control
-	I386ORIG, I386GEN { I386.MemCache.Mod }
+	I386GEN { I386.MemCache.Mod }
 	AMD64ORIG { AMD64.MemCache.Mod }
 	COOP { Coop.MemCache.Mod }
 
@@ -826,7 +801,6 @@ PACKAGE Applications ARCHIVE "Applications.zip" SOURCE "ApplicationsSrc.zip" DES
 
 	ShellCommands.Mod Telnet.Mod	# Telnet Shell (currently broken)
 
-	I386ORIG { I386.MemInfo.Mod }	# basic tools module
 	AMD64ORIG { AMD64.MemInfo.Mod }
 	I386,WIN { Info.Mod }
 
@@ -1268,7 +1242,7 @@ PACKAGE Testing ARCHIVE "Testing.zip" SOURCE "TestingSrc.zip" DESCRIPTION "Tests
 		BluetoothTest.Mod
 	}
 
-	I386ORIG, I386GEN { I386.BenchInterrupts.Mod }
+	I386GEN { I386.BenchInterrupts.Mod }
 	AMD64 { AMD64.BenchInterrupts.Mod }
 
 	BenchTCP.Mod
