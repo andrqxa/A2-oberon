@@ -3405,7 +3405,6 @@ Release.Build A2 ~
 
 Release.Build --path="../Test/" -b A2 ~
 Release.Build --path="../ObjT1/" -bn WinAos ~
-Release.Build --path="../TestE/" eWinAos ~
 
 Release.Build --path="../Test/" --xml A2 ~
 

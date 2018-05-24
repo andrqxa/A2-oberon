@@ -30,21 +30,10 @@
 #
 # WINAOS
 #
-# There are two different variants of WinAOS:
-#
-#	Internal version: Oberon Application runs in a WinAos Window
-#
 #	Release.Build --build WinAos ~
 #
 #	Bootimage
 #	PELinker.Link --path=../obj/ Win32.Aos.Link ~
-#
-#	External version: Oberon Applications runs in a separate MS Windows Window
-#
-#	Release.Build eWinAos ~
-#
-#	Bootimage
-#	PELinker.Link --path=../ObjE/ Win32.Aos.Link ~
 #
 # WINAOS generic
 #	Release.Build Win32G ~
@@ -264,17 +253,6 @@ BUILDS
 		SYMBOLEXTENSION "Obw"
 		PATH ""
 		EXCLUDEPACKAGES "Build Education Fun Testing Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts CjkFonts Pr3Fonts Pr6Fonts"
-		DISABLED "FALSE"
-	}
-	eWinAos {
-		INCLUDE "WIN WINORIG eWIN UNCOOP UNCOOP32"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS ""
-		TARGET "AMD"
-		EXTENSION "Obw"
-		SYMBOLEXTENSION "Obw"
-		PATH "../ObjE/"
-		EXCLUDEPACKAGES ""
 		DISABLED "FALSE"
 	}
 	Linux32G {
@@ -1560,19 +1538,11 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 
 	NATIVE, iWIN, UNIXG {Oberon.Mod}
 
-	eWIN {
-	Win32.Oberon.Mod
-	Win32.Threads.Mod
-	Win32.Oberon.Displays.Mod Win32.Oberon.Display.Mod Win32.Oberon.Viewers.Mod
-	Win32.Oberon.Input.Mod Win32.Oberon.Fonts.Mod Win32.Oberon.Windows.Mod
-	}
-
 	Oberon.Texts.Mod
 
 	WIN { Win32.OberonConfiguration.Mod }
 
 	NATIVE,iWIN, UNIXG { Oberon.Oberon.Mod }
-	eWIN { Win32.Oberon.WinFonts.Mod Win32.Oberon.Oberon.Mod }
 
 	Oberon.MenuViewers.Mod Oberon.TextFrames.Mod
 
@@ -1589,9 +1559,7 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 	Oberon.V24.Mod
 	NATIVE { Oberon.Printer.Mod }
 	UNIXG { Unix.Oberon.Printer.Mod }
-	eWIN { Win32.Oberon.Bitmaps.Mod Win32.Oberon.Pictures.Mod }
 	WIN { Win32.Oberon.Printer.Mod Win32.ADVAPI32.Mod }
-	eWIN { Win32.Oberon.System.Mod Win32.OberonDisplay.Mod }
 
 	Compiler.Tool Oberon.OPM.Mod Oberon.OPS.Mod Oberon.OPT.Mod Oberon.OPB.Mod Oberon.OPA.Mod Oberon.OPP.Mod	# Compiler (prk)
 	Oberon.OPO.Mod Oberon.OPL.Mod Oberon.OPC.Mod Oberon.OPV.Mod Oberon.Compiler.Mod Oberon.OPAData.Mod OPA.Data
@@ -1625,7 +1593,6 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 	# Configuration
 	Configuration.Tool
 	WINORIG, WINGEN32 { Win32.Oberon.Registry.Mod }
-	eWIN { Win32.Oberon.Configuration.Mod }
 	NATIVE,iWIN { Oberon.Configuration.Mod }
 
 # Basic Tools. NetSystem, Telnet, TextMail, ET, developer's tools, OpenType.
@@ -1683,15 +1650,9 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 		Oberon.Display3.Mod Oberon.Effects.Mod
 	}
 
-	eWIN {
-		Win32.Oberon.Colors.Mod
-		Win32.Oberon.Display3.Mod Win32.Oberon.Effects.Mod
-	}
-
 	Oberon.Printer3.Mod Oberon.Attributes.Mod Oberon.Links.Mod
 
 	NATIVE,iWIN, UNIXG { Oberon.Gadgets.Mod }
-	eWIN { Win32.Oberon.Gadgets.Mod }
 
 	WIN { Win32.Oberon.PrinterInfo.Mod }
 
@@ -1717,7 +1678,6 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	Oberon.Documents.Mod Oberon.Views.Mod
 
 	NATIVE,iWIN, UNIXG { Oberon.Desktops.Mod }
-	eWIN { Win32.Oberon.Desktops.Mod }
 
 	NATIVE,WIN, UNIXG{ Oberon.TextDocs.Mod }
 
@@ -1725,11 +1685,8 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	Oberon.Icons.Mod Oberon.ColorTools.Mod Oberon.NamePlates.Mod Oberon.Navigators.Mod Oberon.NoteBooks.Mod
 
 	NATIVE,iWIN, UNIXG { Oberon.Finder.Mod }
-	eWIN { Win32.Oberon.Finder.Mod }
 
 	Oberon.GadgetsIn.Mod Oberon.GadgetsOut.Mod
-
-	eWIN { Win32.Oberon.Miscellaneous.Mod Win32.COMDLG32.Mod Win32.Oberon.WinMenus.Mod Win32.Oberon.WinPrinter.Mod }
 
 	Libraries.Panel Oberon.ScrollViews.Mod Oberon.RefGadgets.Mod Oberon.Columbus.Mod Columbus.Lib	# Columbus in Popups.Tool
 	ObjExplorer.Panel Oberon.ObjExplorer.Mod	# ObjExplorer in Popups.Tool
@@ -1746,7 +1703,6 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	Rembrandt.Panel Oberon.Rembrandt0.Mod
 
 	NATIVE,iWIN, UNIXG { Oberon.Rembrandt.Mod }
-	eWIN { Win32.Oberon.Rembrandt.Mod }
 
 	Oberon.RembrandtDocs.Mod	# Rembrandt in Popups.Tool
 	Oberon.RembrandtTools.Mod Rembrandt.Lib Clown.Pict Grapes.Pict
@@ -1757,7 +1713,6 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	WINORIG,WINGEN32 { Win32.PELinker.Mod PELinker.Tool }
 
 	iWIN { Win32.Oberon.Clipboard.Mod }
-	eWIN { Win32.External.Oberon.Clipboard.Mod Win32.Oberon.RegistryTools.Mod }
 	WIN { Win32.Oberon.FontRes.Mod FontRes.Tool }
 	UNIXG { Unix.Oberon.Clipboard.Mod }
 	WIN, UNIXG { Clipboard.Tool }
@@ -1768,7 +1723,6 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	Images.Tool Oberon.Images.Mod
 
 	NATIVE,iWIN, UNIXG { Oberon.ImageGadgets.Mod }
-	eWIN { Win32.Oberon.WinImages.Mod Win32.Oberon.ImageGadgets.Mod }
 
 	Oberon.ImageDocs.Mod	# Images
 
@@ -1776,7 +1730,6 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 	Colors.Panel
 
 	NATIVE, iWIN, UNIXG { Oberon.ColorGadgets.Mod }
-	eWIN { Win32.Oberon.ColorGadgets.Mod }
 
 	Oberon.PCXImages.Mod	# Color views
 	Oberon.ColorWells.Mod	# Leonardo legacy
@@ -1968,7 +1921,6 @@ END
 PACKAGE OberonVoyager ARCHIVE "OberonVoyager.zip" SOURCE "OberonVoyagerSrc.zip" DESCRIPTION "Oberon Voyager"
 
 	# Portability Module
-	eWIN { Win32.Oberon.vyPortability.Mod }
 	NATIVE, iWIN, UNIXG { Oberon.vyPortability.Mod }
 	Oberon.vyHost.Mod Oberon.vyHostFonts.Mod	# Host modules
 	Oberon.vyLinks.Mod Oberon.vyHostStrings.Mod Oberon.vyHostTexts.Mod Oberon.vyBase.Mod Oberon.vyName.Mod	# Base and Name
@@ -2000,14 +1952,12 @@ END
 PACKAGE OberonAnts ARCHIVE "OberonAnts.zip" SOURCE "OberonAntsSrc.zip" DESCRIPTION "OberonAnts"
 	Oberon.antsS3.ScrollbarsR.Mod Oberon.antsCommandInvoker.Mod	# generic tools
 
-	eWIN { Win32.Oberon.antsPortability.Mod }
 	NATIVE,iWIN,UNIXG { Oberon.antsPortability.Mod }	# Portability
 
 	NATIVE,WIN {
 		Oberon.antsExpressionsObjects.Mod Oberon.antsExpressions.Mod Oberon.antsExpressionsDefaults.Mod	# command prompt interpreter
 		Oberon.antsSecurity.Mod Oberon.antsOrganizers.Mod Oberon.antsMessages.Mod Oberon.antsScriptObjects.Mod
 	}
-	eWIN { Win32.Oberon.antsTracking.Mod }
 	NATIVE,WIN {
 		Oberon.antsContainers.Mod Oberon.antsTexts.Mod Oberon.antsGlobals.Mod Oberon.antsBasicGadgets.Mod Oberon.antsOnTheFly.Mod
 		Oberon.antsConstRandom.Mod Oberon.antsFiles.Mod Oberon.antsCommands.Mod Oberon.ants.fofAutomatic.Mod Oberon.antsArrays.Mod
