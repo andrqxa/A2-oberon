@@ -13,7 +13,7 @@ Compiler.Compile --noInterfaceCheck
 
 	Compiler.Compile *)
 
-	BitSets.Mod ObjectFile.Mod GenericLinker.Mod StaticLinker.Mod
+	BitSets.Mod ObjectFile.Mod GenericLinker.Mod Linker.Mod
 	FoxBasic.Mod  FoxProgTools.Mod  FoxScanner.Mod FoxCSharpScanner.Mod FoxSyntaxTree.Mod FoxGlobal.Mod
 	FoxFormats.Mod 	FoxFingerPrinter.Mod FoxPrintout.Mod
 	FoxParser.Mod FoxCSharpParser.Mod  FoxSemanticChecker.Mod

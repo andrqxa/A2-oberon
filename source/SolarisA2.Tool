@@ -17,7 +17,7 @@ Compiler.Compile
 		
 		
 	(* the correct displacement is shown by  'A2Loader.elf  -h'  *)
-StaticLinker.Link  
+Linker.Link  
 	-p=Solaris32G --path=NewAos/
 		Runtime Trace Glue 
 		Unix  Machine  Heaps Modules  Objects  Kernel  KernelLog 

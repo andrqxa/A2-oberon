@@ -229,7 +229,7 @@ SystemTools.DoCommands
 		ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod Unix.BootConsole.Mod 
 	~
 
-	StaticLinker.Link --fileFormat=Raw --fileName=simple_elf --extension=.GofU --displacement=08048000H
+	Linker.Link --fileFormat=Raw --fileName=simple_elf --extension=.GofU --displacement=08048000H
 		Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog 
 Streams Commands StdIO TrapWriters Traps 
 Files UnixFiles Clock Dates Reals Strings Diagnostics 

@@ -83,7 +83,7 @@ SystemTools.DoCommands
 		~ 
 		
 		
-	StaticLinker.Link --fileFormat=PE32CUI --fileName=fox.exe --extension=Gox --displacement=401000H
+	Linker.Link --fileFormat=PE32CUI --fileName=fox.exe --extension=Gox --displacement=401000H
 		Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands Files 
 		WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader
 		WinTrace StdIO Pipes Shell TestStdIO ~

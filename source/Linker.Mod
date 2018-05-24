@@ -1,4 +1,4 @@
-MODULE StaticLinker;	(* AUTHOR "negelef"; PURPOSE "Static Object File Linker"; *)
+MODULE Linker;	(* AUTHOR "negelef"; PURPOSE "Object File Linker"; *)
 
 IMPORT Commands, Options, Diagnostics, Files, GenericLinker, ObjectFile, BitSets, Strings, Streams;
 
@@ -1095,13 +1095,13 @@ BEGIN
 	defaults.Add("Solaris64", "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofUu --displacement=0" );
 	defaults.Add("Darwin32",   "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofU --displacement=0" );
 	defaults.Add("Darwin64",   "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofUu --displacement=0" );
-END StaticLinker.
+END Linker.
 
-StaticLinker.Link --fileName=test.exe --fileFormat=PE32 --displacement=401000H Test ~
-StaticLinker.Link --fileName=a.out --fileFormat=ELF --displacement=08048000H Test ~
-StaticLinker.Link --fileName=a.out --fileFormat=MACHO --displacement=000010E8H Test ~
+Linker.Link --fileName=test.exe --fileFormat=PE32 --displacement=401000H Test ~
+Linker.Link --fileName=a.out --fileFormat=ELF --displacement=08048000H Test ~
+Linker.Link --fileName=a.out --fileFormat=MACHO --displacement=000010E8H Test ~
 
-SystemTools.Free StaticLinker ~
+SystemTools.Free Linker ~
 
 
 

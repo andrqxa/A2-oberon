@@ -7,7 +7,7 @@ Compiler.Compile --bits=32 --traceModule=Trace
 	Runtime.Mod Trace.Mod EFI.Mod I386.EFIMachine.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod
 	EFILoadedImage.Mod EFIGraphicsOutput.Mod EFILib.Mod EFIGraphicalConsole.Mod EFIA2Loader.Mod
 ~
-StaticLinker.Link --fileName=E:/felix.svn/qemu/disk/A2Loader.efi --fileFormat=EFI32 --displacement=401000H
+Linker.Link --fileName=E:/felix.svn/qemu/disk/A2Loader.efi --fileFormat=EFI32 --displacement=401000H
 	Runtime Trace EFI EFIMachine EFITrace EFISimpleFS  EFIFileProtocol EFILoadedImage EFIGraphicsOutput EFILib 
 	 EFIGraphicalConsole EFIA2Loader~
 ~
@@ -27,7 +27,7 @@ Compiler.Compile --newObjectFile --mergeSections -b=AMD --objectFileExtension=.G
 
 ~
 
-StaticLinker.Link
+Linker.Link
 	--fileName=E:/felix.svn/qemu/disk/IDE.Bin
 	--extension=Gox
 	--displacement=0100000H
@@ -56,7 +56,7 @@ Compiler.Compile --bits=64 --traceModule=Trace
 	AMD64.Runtime.Mod Trace.Mod EFI.Mod AMD64.EFIMachine.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod
 	EFILoadedImage.Mod EFIGraphicsOutput.Mod EFILib.Mod EFIGraphicalConsole.Mod EFIA2Loader.Mod
 ~
-StaticLinker.Link --fileName=E:/felix.svn/qemu/disk/A2Loader.efi --fileFormat=EFI64 --displacement=401000H
+Linker.Link --fileName=E:/felix.svn/qemu/disk/A2Loader.efi --fileFormat=EFI64 --displacement=401000H
 	Runtime Trace EFI EFIMachine EFITrace EFISimpleFS  EFIFileProtocol EFILoadedImage EFIGraphicsOutput EFILib 
 	 EFIGraphicalConsole EFIA2Loader
 ~
@@ -73,7 +73,7 @@ SystemTools.DoCommands
 	RAMVolumes.Mod DiskFS.Mod OldDiskFS.Mod OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod 
 	ISO9660Files.Mod RelativeFileSystem.Mod Loader.Mod BootConsole.Mod AMD64.ATADisks.Mod ~
 	
-	StaticLinker.Link
+	Linker.Link
 	--fileName=E:/felix.svn/qemu/disk/IDE.Bin
 	--extension=Gos
 	--displacement=0100000H
