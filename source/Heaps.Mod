@@ -1886,8 +1886,6 @@ StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=GofW --displac
 FSTools.CloseFiles A2.exe ~
 
 
-FoxBinarySymbolFile.Test /temp/obj/Heaps ~
-
 Heaps.ShowCards 
 
 (* enable generational garbage collection *)
