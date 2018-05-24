@@ -3,7 +3,7 @@
 ** Loader * *
 
 SystemTools.DoCommands
-Compiler.Compile  --objectFile=Generic --symbolFile=Textual --bits=32 --traceModule=Trace
+Compiler.Compile  --objectFile=Generic --bits=32 --traceModule=Trace
 	Runtime.Mod Trace.Mod EFI.Mod I386.EFIMachine.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod
 	EFILoadedImage.Mod EFIGraphicsOutput.Mod EFILib.Mod EFIGraphicalConsole.Mod EFIA2Loader.Mod
 ~
@@ -52,7 +52,7 @@ SystemTools.FreeDownTo FoxIntermediateBackend ~
 ** Loader **
 ~
 SystemTools.DoCommands
-Compiler.Compile  --objectFile=Generic --symbolFile=Textual --bits=64 --traceModule=Trace
+Compiler.Compile  --objectFile=Generic --bits=64 --traceModule=Trace
 	AMD64.Runtime.Mod Trace.Mod EFI.Mod AMD64.EFIMachine.Mod EFITrace.Mod EFIFileProtocol.Mod EFISimpleFS.Mod
 	EFILoadedImage.Mod EFIGraphicsOutput.Mod EFILib.Mod EFIGraphicalConsole.Mod EFIA2Loader.Mod
 ~
