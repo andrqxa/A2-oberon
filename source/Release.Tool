@@ -1274,7 +1274,6 @@ PACKAGE Build ARCHIVE "Build.zip" SOURCE "BuildSrc.zip" DESCRIPTION "Build Tools
 	IsoImages.Mod
 	ReleaseThreadPool.Mod Release.Mod Release.Tool	# Build release tool
 	PETReleaseTree.Mod
-	Linker0.Mod Linker1.Mod Linker.Mod
 	OBEMBR4.ASM BootManager.Asm OBL.Asm # Asm
 	BootManager.Mod BootManager.Tool # Splits up BootManager.Bin into BootManagerMBR.Bin and BootManagerTail.Bin
 END
@@ -1283,7 +1282,6 @@ PACKAGE EFI ARCHIVE "EFI.zip" SOURCE "EFISrc.zip" DESCRIPTION "EFI Boot Loader a
 	EFI.Tool EFI.Mod
 	I386, WIN32, UNIX32 {I386.EFIMachine.Mod}
 	WIN64, UNIX64 { AMD64.EFIMachine.Mod }
-
 
 	EFIBlockIO.Mod EFIDiskIO.Mod
 	EFIFileProtocol.Mod EFISimpleFS.Mod
