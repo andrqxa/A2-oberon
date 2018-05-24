@@ -304,17 +304,6 @@ BUILDS
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
-	DarwinAos {
-		INCLUDE "UNIX UNIX32 DARWIN UNCOOP UNCOOP32"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "--darwinHost"
-		TARGET "AMD"
-		EXTENSION "Obj"
-		SYMBOLEXTENSION "Obj"
-		PATH "./NewAos/"
-		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
-		DISABLED "FALSE"
-	}
 	Darwin32G {
 		INCLUDE "UNIXG UNIXG32 DARWING32 UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
@@ -391,7 +380,6 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 
 	UNIX { Unix.Glue.Mod }
 	LINUX { Linux.I386.Unix.Mod }
-	DARWIN { Darwin.I386.Unix.Mod }
 
 	WINORIG { Win32.Kernel32.Mod}
 	WINGEN32 {Generic.Win32.Kernel32.Mod}
