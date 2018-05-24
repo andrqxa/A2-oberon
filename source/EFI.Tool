@@ -23,7 +23,7 @@ Compiler.Compile --newObjectFile --mergeSections -b=AMD --objectFileExtension=.G
 	FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod OldDiskVolumes.Mod RAMVolumes.Mod DiskFS.Mod OldDiskFS.Mod 
 	OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod ISO9660Files.Mod 
 	RelativeFileSystem.Mod Loader.Mod BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod 
-	GenericLinker.Mod GenericLoader.Mod BootConsole.Mod
+	GenericLinker.Mod Loader.Mod BootConsole.Mod
 
 ~
 
@@ -36,7 +36,7 @@ Linker.Link
 	KernelLog Streams Reflection  TrapWriters Traps  Plugins
 	Diagnostics BitSets StringPool ObjectFile Reals Clock Dates Strings GenericLinker 
 	Commands
-	Files GenericLoader BootConsole 
+	Files Loader BootConsole 
 	~
 ~
 

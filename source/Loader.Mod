@@ -1,4 +1,4 @@
-MODULE GenericLoader; (** AUTHOR "fof"; PURPOSE "Active Oberon Generic Object File Loader"; *)
+MODULE Loader; (** AUTHOR "fof"; PURPOSE "Object File Loader"; *)
 
 (* cf. Linker *)
 
@@ -454,7 +454,7 @@ TYPE
 			END;
 
 			IF adr = 0 THEN
-				(*D.String("GenericLoader Fatal error: did not find block "); s := identifier.name; D.String(s); D.Ln;*)
+				(*D.String("Loader Fatal error: did not find block "); s := identifier.name; D.String(s); D.Ln;*)
 				RETURN NIL;
 			ELSE (* found *)
 				importBlock.identifier.fingerprint := LONGINT(fp); importBlock.address := adr
@@ -614,7 +614,7 @@ VAR
 		StringPool.GetIndex("@Module",InternalModuleName);
 		NEW(moduleList);
 		Install;
-	END GenericLoader.
+	END Loader.
 
 
 

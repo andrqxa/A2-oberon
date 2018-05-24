@@ -226,14 +226,14 @@ SystemTools.DoCommands
 		UTF8Strings.Mod FileTrapWriter.Mod Caches.Mod DiskVolumes.Mod OldDiskVolumes.Mod RAMVolumes.Mod 
 		DiskFS.Mod OldDiskFS.Mod OberonFS.Mod FATVolumes.Mod FATFiles.Mod ISO9660Volumes.Mod 
 		ISO9660Files.Mod Unix.UnixFiles.Mod RelativeFileSystem.Mod BitSets.Mod StringPool.Mod DIagnostics.Mod 
-		ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod Unix.BootConsole.Mod 
+		ObjectFile.Mod GenericLinker.Mod Loader.Mod Unix.BootConsole.Mod 
 	~
 
 	Linker.Link --fileFormat=Raw --fileName=simple_elf --extension=.GofU --displacement=08048000H
 		Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog 
 Streams Commands StdIO TrapWriters Traps 
 Files UnixFiles Clock Dates Reals Strings Diagnostics 
-BitSets StringPool ObjectFile GenericLinker Reflection  GenericLoader  
+BitSets StringPool ObjectFile GenericLinker Reflection  Loader  
 BootConsole 
  ~
 

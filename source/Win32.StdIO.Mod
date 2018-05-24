@@ -74,7 +74,7 @@ SystemTools.DoCommands
 		Win32.WinTrace.Mod Win32.WinFS.Mod 
 
 		Diagnostics.Mod StringPool.Mod BitSets.Mod ObjectFile.Mod 
-		GenericLinker.Mod GenericLoader.Mod Options.Mod Debugging.Mod
+		GenericLinker.Mod Loader.Mod Options.Mod Debugging.Mod
 		
 		Win32.StdIO.Mod 		Pipes.Mod Shell.Mod TestStdIO.Mod
 		
@@ -85,7 +85,7 @@ SystemTools.DoCommands
 		
 	Linker.Link --fileFormat=PE32CUI --fileName=fox.exe --extension=Gox --displacement=401000H
 		Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands Files 
-		WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader
+		WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection Loader
 		WinTrace StdIO Pipes Shell TestStdIO ~
 		
 		FSTools.CloseFiles fox.exe ~ 

@@ -10,7 +10,7 @@ Compiler.Compile
 		Unix.StdIO.Mod  Generic.Unix.Traps.Mod  UTF8Strings.Mod  Files.Mod  Unix.UnixFiles.Mod
 		RelativeFileSystem.Mod  StringPool.Mod  BitSets.Mod  ObjectFile.Mod  
 		I386.Reals.Mod  Unix.Clock.Mod  Dates.Mod  Strings.Mod  Diagnostics.Mod 
-		GenericLinker.Mod  GenericLoader.Mod  Unix.BootConsole.Mod 
+		GenericLinker.Mod  Loader.Mod  Unix.BootConsole.Mod 
 		
 		ElfBinary.Mod 
 		~
@@ -23,7 +23,7 @@ Linker.Link
 		Unix  Machine  Heaps Modules  Objects  Kernel  KernelLog 
 		Streams  Pipes  Commands  StdIO  TrapWriters  Traps 
 		Files  UnixFiles  Clock  Dates  Reals  Strings  Diagnostics 
-		BitSets  StringPool  GenericLinker  Reflection  GenericLoader
+		BitSets  StringPool  GenericLinker  Reflection  Loader
 		BootConsole
 		~
 
