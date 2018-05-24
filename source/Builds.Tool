@@ -88,13 +88,13 @@ DARWIN32 -- 32 bit darwin a2
 		UnixBinary.Build  oberon.bin  ->  A2Core ~
 
 
-SOLARIS32G -- 32 bit solaris a2 using generic object files
+SOLARIS32 -- 32 bit solaris a2
 ================================
 
-	Release.Build -b Solaris32G ~
+	Release.Build -b Solaris32 ~
 	
 	## X11 bootconsole ##
-		StaticLinker.Link -p=Solaris32G  --path=./NewAos/
+		StaticLinker.Link -p=Solaris32  --path=./NewAos/
 				Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog  Streams Commands Pipes StdIO TrapWriters Reflection 
 				Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker   GenericLoader  BootConsole ~
 		UnixBinary.Build  oberon.bin  ->  A2Core ~

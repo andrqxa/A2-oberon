@@ -29,10 +29,10 @@
 # X11 Bootconsole:
 #	StaticLinker.Link -p=Linux32 Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog Streams Commands Pipes StdIO TrapWriters Reflection Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
 #
-# SolarisAOS Generic
-#    Release.Build Solaris32G ~
+# SolarisAOS
+#    Release.Build Solaris32 ~
 # X11 Bootconsole:
-#    StaticLinker.Link -p=Solaris32G --path=NewAos/
+#    StaticLinker.Link -p=Solaris32 --path=NewAos/
 #		Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog Streams Pipes
 #		Commands StdIO TrapWriters Traps Files UnixFiles Clock Dates Reals Strings Diagnostics
 #		BitSets StringPool GenericLinker Reflection GenericLoader BootConsole ~
@@ -222,7 +222,7 @@ BUILDS
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
-	Solaris32G {
+	Solaris32 {
 		INCLUDE "UNIXG UNIXG32 SOLARISG32 UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "-p=Linux32"

@@ -1091,7 +1091,7 @@ BEGIN
 	defaults.Add("Linux64","--fileFormat=Raw --fileName=oberon --extension=.GofUu --displacement=08048000H");
 	defaults.Add("RPI","--fileName=kernel.img --extension=.Goa --displacement=8000H -sa ");
 	defaults.Add("A2G","--fileName=kernel.img --extension=.GofG --displacement=0100000H");
-	defaults.Add("Solaris32G", "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofU --displacement=0" );
+	defaults.Add("Solaris32", "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofU --displacement=0" );
 	defaults.Add("Solaris64G", "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofUu --displacement=0" );
 	defaults.Add("Darwin32",   "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofU --displacement=0" );
 	defaults.Add("Darwin64",   "--fileFormat=UnixRaw --fileName=oberon.bin --extension=.GofUu --displacement=0" );
