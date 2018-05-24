@@ -40,19 +40,19 @@ Shell.Mod StdIOShell.Mod ~
 
 SystemTools.FreeDownTo FoxIntermediateBackend ~
 
-LINUX32G -- 32 bit linux a2 using generic object files
+LINUX32 -- 32 bit linux a2
 ================================
 
-	Release.Build --path=NewAos/ Linux32G ~
+	Release.Build --path=NewAos/ Linux32 ~
 	
 	## X11 bootconsole ##
-		StaticLinker.Link -p=Linux32G --path=NewAos/ 
+		StaticLinker.Link -p=Linux32 --path=NewAos/ 
 		Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel 
 		KernelLog  Streams Commands Pipes StdIO TrapWriters Reflection Traps Files UnixFiles Clock Dates 
 		Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker   GenericLoader  BootConsole ~
 	
 	## Command line shell including compiler (and linker) ##
-		StaticLinker.Link -p=Linux32G --path=NewAos/
+		StaticLinker.Link -p=Linux32 --path=NewAos/
 			Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog  Streams Commands Pipes StdIO 
 			TrapWriters Reflection Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker   GenericLoader  SystemTools StdIOShell 
 			Shell ~  StaticLinker Compiler FoxOberonFrontend FoxARMBackend FoxAMDBackend ~
@@ -128,13 +128,13 @@ Win64G -- work in progress
 		FSTools.CopyFiles -o oberon => ../../Linux64G/oberon ~ 
 
 		FSTools.DeleteFiles -s NewAos/* ~
-		Release.Build --build --path=NewAos/ Linux32G ~
-		StaticLinker.Link -p=Linux32G --path=NewAos/
+		Release.Build --build --path=NewAos/ Linux32 ~
+		StaticLinker.Link -p=Linux32 --path=NewAos/
 			Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog  Streams Commands Pipes StdIO 
 			TrapWriters Reflection Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker   GenericLoader  SystemTools StdIOShell 
 			Shell ~
-		FSTools.CopyFiles -oq NewAos/*.* => ../../Linux32G/bin/*.* ~ 
-		FSTools.CopyFiles -o oberon => ../../Linux32G/oberon ~ 
+		FSTools.CopyFiles -oq NewAos/*.* => ../../Linux32/bin/*.* ~ 
+		FSTools.CopyFiles -o oberon => ../../Linux32/oberon ~ 
 
 		FSTools.DeleteFiles -s NewAos/* ~
 		Release.Build --build --path=NewAos/ Win32G ~

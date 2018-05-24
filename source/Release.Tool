@@ -22,12 +22,12 @@
 # Command line shell:
 # StaticLinker.Link --fileFormat=PE32CUI --fileName=oberon.exe --extension=GofW --displacement=401000H Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands Files WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader WinTrace StdIO Traps RelativeFileSystem WMDefaultFont SystemTools StdIOShell ~
 #
-# LinuxAOS Generic
-#	Release.Build Linux32G ~
+# LinuxAOS
+#	Release.Build Linux32 ~
 # Command line version:
-#	StaticLinker.Link -p=Linux32G Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog Streams Commands Pipes StdIO TrapWriters Reflection Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader Shell SystemTools StdIOShell ~
+#	StaticLinker.Link -p=Linux32 Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog Streams Commands Pipes StdIO TrapWriters Reflection Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader Shell SystemTools StdIOShell ~
 # X11 Bootconsole:
-#	StaticLinker.Link -p=Linux32G Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog Streams Commands Pipes StdIO TrapWriters Reflection Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
+#	StaticLinker.Link -p=Linux32 Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog Streams Commands Pipes StdIO TrapWriters Reflection Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker GenericLoader BootConsole ~
 #
 # SolarisAOS Generic
 #    Release.Build Solaris32G ~
@@ -190,10 +190,10 @@ BUILDS
 		EXCLUDEPACKAGES "Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts TrueTypeFonts CjkFonts Pr3Fonts ScreenFonts Pr6Fonts"
 		DISABLED "FALSE"
 	}
-	Linux32G {
+	Linux32 {
 		INCLUDE "UNIXG UNIXG32 LINUXG32 UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "-p=Linux32G"
+		COMPILEOPTIONS "-p=Linux32"
 		PATH "./NewAos/"
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"
@@ -209,7 +209,7 @@ BUILDS
 	Darwin32G {
 		INCLUDE "UNIXG UNIXG32 DARWING32 UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "-p=Linux32G"
+		COMPILEOPTIONS "-p=Linux32"
 		PATH "./NewAos/"
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"
@@ -225,7 +225,7 @@ BUILDS
 	Solaris32G {
 		INCLUDE "UNIXG UNIXG32 SOLARISG32 UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS "-p=Linux32G"
+		COMPILEOPTIONS "-p=Linux32"
 		PATH "./NewAos/"
 		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
 		DISABLED "FALSE"

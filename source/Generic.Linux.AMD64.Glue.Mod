@@ -217,7 +217,7 @@ END Glue.
 SystemTools.FreeDownTo FoxIntermediateBackend ~
 
 SystemTools.DoCommands
-	Compiler.Compile -p=Linux32G
+	Compiler.Compile -p=Linux32
 		Runtime.Mod Trace.Mod Generic.Linux.I386.Glue.Mod Generic.Linux.I386.Unix.Mod Generic.Unix.I386.Machine.Mod Heaps.Mod  Generic.Modules.Mod 
 		Generic.Unix.Objects.Mod 
 		Unix.Kernel.Mod KernelLog.Mod Plugins.Mod Streams.Mod 
