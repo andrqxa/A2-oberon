@@ -582,7 +582,7 @@ BEGIN
 	DoAddPlatform("A2Coop","-b=AMD --cooperative --newObjectFile --traceModule=Trace --mergeSections");
 	DoAddPlatform("ARMA2","-b=ARM --newObjectFile --mergeSections");
 	DoAddPlatform("Linux32","-b=AMD --newObjectFile --mergeSections --traceModule=Trace --objectFileExtension=.GofU --symbolFileExtension=.SymU --preciseGC --cellsAreObjects --platformCC=C");
-	DoAddPlatform("Linux64G","-b=AMD --bits=64 --newObjectFile --mergeSections --traceModule=Trace --objectFileExtension=.GofUu --symbolFileExtension=.SymUu --preciseGC --cellsAreObjects --platformCC=C");
+	DoAddPlatform("Linux64","-b=AMD --bits=64 --newObjectFile --mergeSections --traceModule=Trace --objectFileExtension=.GofUu --symbolFileExtension=.SymUu --preciseGC --cellsAreObjects --platformCC=C");
 	
 	SetupDefaults;
 END Compiler.

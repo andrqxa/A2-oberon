@@ -58,19 +58,19 @@ LINUX32 -- 32 bit linux a2
 			Shell ~  StaticLinker Compiler FoxOberonFrontend FoxARMBackend FoxAMDBackend ~
 
 
-LINUX64G -- 64 bit linux a2 using generic object files
+LINUX64 -- 64 bit linux a2
 ================================
 
-	Release.Build --path=NewAos/ Linux64G ~
+	Release.Build --path=NewAos/ Linux64 ~
 	
 	## X11 bootconsole ##
-		StaticLinker.Link -p=Linux64G --path=NewAos/ 
+		StaticLinker.Link -p=Linux64 --path=NewAos/ 
 		Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel 
 		KernelLog  Streams Commands Pipes StdIO TrapWriters Reflection Traps Files UnixFiles Clock Dates 
 		Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker   GenericLoader  BootConsole ~
 	
 	## Command line shell including compiler (and linker) ##
-		StaticLinker.Link -p=Linux64G --path=NewAos/
+		StaticLinker.Link -p=Linux64 --path=NewAos/
 			Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog  Streams Commands Pipes StdIO 
 			TrapWriters Reflection Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker   GenericLoader  SystemTools StdIOShell 
 			Shell ~ StaticLinker Compiler FoxOberonFrontend FoxARMBackend FoxAMDBackend ~
@@ -119,13 +119,13 @@ Win64G -- work in progress
 
 	SystemTools.DoCommands	
 		FSTools.DeleteFiles -s NewAos/* ~
-		Release.Build --build --path=NewAos/ Linux64G ~
-		StaticLinker.Link -p=Linux64G --path=NewAos/
+		Release.Build --build --path=NewAos/ Linux64 ~
+		StaticLinker.Link -p=Linux64 --path=NewAos/
 			Runtime Trace Glue Unix Machine Heaps Modules Objects Kernel KernelLog  Streams Commands Pipes StdIO 
 			TrapWriters Reflection Traps Files UnixFiles Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker   GenericLoader  SystemTools StdIOShell 
 			Shell ~ 
-		FSTools.CopyFiles -oq NewAos/*.* => ../../Linux64G/bin/*.* ~ 
-		FSTools.CopyFiles -o oberon => ../../Linux64G/oberon ~ 
+		FSTools.CopyFiles -oq NewAos/*.* => ../../Linux64/bin/*.* ~ 
+		FSTools.CopyFiles -o oberon => ../../Linux64/oberon ~ 
 
 		FSTools.DeleteFiles -s NewAos/* ~
 		Release.Build --build --path=NewAos/ Linux32 ~
