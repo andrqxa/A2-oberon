@@ -277,17 +277,6 @@ BUILDS
 		EXCLUDEPACKAGES ""
 		DISABLED "FALSE"
 	}
-	LinuxAos {
-		INCLUDE "UNIX UNIX32 LINUX UNCOOP UNCOOP32"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS ""
-		TARGET "AMD"
-		EXTENSION "Obj"
-		SYMBOLEXTENSION "Obj"
-		PATH "NewAos/"
-		EXCLUDEPACKAGES "OberonVoyager OberonAnts"
-		DISABLED "FALSE"
-	}
 	Linux32G {
 		INCLUDE "UNIXG UNIXG32 LINUXG32 UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
@@ -379,7 +368,6 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	SOLARISG64 { Generic.Unix.AMD64.Glue.Mod Generic.Solaris.AMD64.Unix.Mod }
 
 	UNIX { Unix.Glue.Mod }
-	LINUX { Linux.I386.Unix.Mod }
 
 	WINORIG { Win32.Kernel32.Mod}
 	WINGEN32 {Generic.Win32.Kernel32.Mod}
