@@ -312,8 +312,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	ARM { ARM.Reals.Mod }
 
 	# default trap handling
-	NATIVE, WIN, UNIX {Generic.Reflection.Mod}
-	COOP { Generic.Reflection.Mod }
+	Generic.Reflection.Mod
 	TrapWriters.Mod CRC.Mod SystemVersion.Mod
 	NATIVE { Traps.Mod }
 	ARM { ARM.Traps.Mod }
@@ -362,7 +361,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	RelativeFileSystem.Mod	# file system relative to path
 
-	NATIVE, WIN, COOP, UNIX {BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod }
+	BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod
 
 	# binding modules
 	NATIVE,WIN { BootConsole.Mod }
@@ -1672,7 +1671,7 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 
 	WIN { Win32.Oberon.PlugInDocs.Mod }
 
-	NATIVEG {
+	NATIVE {
 	Oberon.Profiler.Mod	# alternative profiler (prk)
 	Oberon.FATDocs.Mod	# FAT browser (be)
 	}
