@@ -109,7 +109,7 @@ END
 BUILDS
 	A2
 	{
-		INCLUDE "NATIVE NATIVEGEN I386 I386GEN UNCOOP UNCOOP32"
+		INCLUDE "NATIVE I386 I386GEN UNCOOP UNCOOP32"
 		COMPILER "Compiler.Compile"
 		COMPILEOPTIONS "--newObjectFile --mergeSections"
 		TARGET "AMD"
@@ -282,13 +282,13 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	UNIX32 { Generic.Unix.I386.Machine.Mod }
 	UNIX64 { Generic.Unix.AMD64.Machine.Mod }
 
-	NATIVEGEN, WIN, UNIX { Heaps.Mod }
+	NATIVE, WIN, UNIX { Heaps.Mod }
 	COOP { Coop.Heaps.Mod }
 
-	NATIVEGEN, WIN, UNIX { Generic.Modules.Mod}
+	NATIVE, WIN, UNIX { Generic.Modules.Mod}
 	COOP { Coop.Modules.Mod GarbageCollector.Mod }
 
-	NATIVEGEN { Objects.Mod Kernel.Mod }
+	NATIVE { Objects.Mod Kernel.Mod }
 	WIN32 { Win32.Objects.Mod }
 	WIN64 { Win64.Objects.Mod }
 	WIN { Win32.Kernel.Mod }
@@ -312,10 +312,10 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	ARM { ARM.Reals.Mod }
 
 	# default trap handling
-	NATIVEGEN, WIN, UNIX {Generic.Reflection.Mod}
+	NATIVE, WIN, UNIX {Generic.Reflection.Mod}
 	COOP { Generic.Reflection.Mod }
 	TrapWriters.Mod CRC.Mod SystemVersion.Mod
-	NATIVEGEN { Traps.Mod }
+	NATIVE { Traps.Mod }
 	ARM { ARM.Traps.Mod }
 	WIN32 { Win32.Traps.Mod }
 	WIN64 {Win64.Traps.Mod}
@@ -362,7 +362,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	RelativeFileSystem.Mod	# file system relative to path
 
-	NATIVEGEN, WIN, COOP, UNIX {BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod }
+	NATIVE, WIN, COOP, UNIX {BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod }
 
 	# binding modules
 	NATIVE,WIN { BootConsole.Mod }
@@ -536,7 +536,7 @@ PACKAGE Drivers ARCHIVE "Drivers.zip" SOURCE "DriversSrc.zip" DESCRIPTION "Devic
 		BluetoothHCI.Mod BluetoothL2CAP.Mod BluetoothRFCOMM.Mod
 	}
 
-	NATIVEGEN {
+	NATIVE {
 		# Floppy disk driver
 		Diskettes.Mod
 	}
@@ -994,7 +994,7 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 	WMPerfMonAlerts.Mod WMPerfMonAlertsUtils.Mod WMPerfMonAlerts.XML
 
 	# perfmon kernel plugins
-	NATIVEGEN {
+	NATIVE {
 		WMPerfMonPluginCpu.Mod WMPerfMonPluginMemory.Mod
 		WMPerfMonPluginInterrupts.Mod
 		WMPerfMonPluginUsb.Mod WMPerfMonPluginNetStats.Mod
@@ -1211,7 +1211,7 @@ PACKAGE Testing ARCHIVE "Testing.zip" SOURCE "TestingSrc.zip" DESCRIPTION "Tests
 
 	CSV.Test
 
-	NATIVEGEN {
+	NATIVE {
 		TestLocks.Mod
 		BenchSpeedup.Mod BenchObjCount.Mod
 		BenchClockDrift.Mod BenchNew.Mod BenchLocks.Mod
@@ -1473,7 +1473,7 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 	Edit.Tool Oberon.Edit.Mod	# Edit
 	Script.Tool Oberon.Styles.Mod Oberon.ScriptFrames.Mod Oberon.Script.Mod	# Script
 
-	NATIVEGEN {
+	NATIVE {
 	Oberon.Diskettes.Mod	# Diskette driver
 	Backup.Tool Oberon.Diskette.Mod Oberon.Backup.Mod	# Backup
 	}
@@ -1672,7 +1672,7 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 
 	WIN { Win32.Oberon.PlugInDocs.Mod }
 
-	NATIVEGEN {
+	NATIVEG {
 	Oberon.Profiler.Mod	# alternative profiler (prk)
 	Oberon.FATDocs.Mod	# FAT browser (be)
 	}
