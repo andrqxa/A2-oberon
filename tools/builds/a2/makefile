@@ -21,8 +21,6 @@ dependencies: modules source/*.Mod
 	@./original DependencyWalker.Walk --fileExtension=$(object) $(addprefix source/, $(shell sort -u modules)) DependencyWalker.Mod | tr -d '\r' | grep "^.\+\$(object):" > $@
 
 -include dependencies
-Trace$(object) Streams$(object): Runtime$(object)
-FoxArrayBase$(object): ComplexNumbers$(object)
 
 %$(object):
 	@$(tool) compile -p=$(target) $(if $<, $<, $(error no target for $@))
@@ -30,7 +28,7 @@ FoxArrayBase$(object): ComplexNumbers$(object)
 # Fox Compiler
 
 oberon: $(addsuffix $(object), Runtime Trace Glue Unix Machine Heaps Modules Objects Streams Kernel Reflection KernelLog TrapWriters Commands Pipes StdIO Traps Files UnixFiles BitSets StringPool ObjectFile Diagnostics Reals Clock Dates Strings GenericLinker GenericLoader WMRectangles CLUTs Plugins Displays Raster UTF8Strings WMRasterScale SoundDevices XMLObjects DynamicStrings XML XMLScanner XMLParser Configuration Inflate CRC Unzip WMEvents Locks FP1616 Texts Archives Codecs WMGraphics WMDefaultFont StdIOShell Shell Options ProcessInfo0 ProcessInfo SystemVersion SystemTools Debugging FoxBasic FoxScanner FoxSyntaxTree FoxGlobal FoxParser FoxFingerPrinter FoxPrintout FoxFormats FoxSemanticChecker FoxBackend FoxFrontend Compiler FoxOberonFrontend FoxSections FoxBinaryCode FoxIntermediateCode FoxInterfaceComparison FoxTextualSymbolFile FoxIntermediateBackend FoxAMD64InstructionSet FoxAMD64Assembler FoxCodeGenerators FoxAMDBackend FoxGenericObjectFile Math MathL ComplexNumbers FoxArrayBase FoxArrayBaseOptimized StaticLinker DependencyWalker Localization Repositories UnicodeProperties TextUtilities ReleaseThreadPool Zlib ZlibBuffers ZlibInflate ZlibReaders ZlibDeflate ZlibWriters Zip CompilerInterface Release)
-	@$(tool) StaticLinker.Link -p=$(target) --fileName=$@ Runtime Traps UnixFiles GenericLoader WMDefaultFont StdIOShell Shell SystemTools Compiler FoxOberonFrontend FoxAMDBackend FoxGenericObjectFile FoxArrayBase FoxArrayBaseOptimized StaticLinker DependencyWalker Release && chmod +x $@
+	@$(tool) StaticLinker.Link -p=$(target) --fileName=$@ Runtime Traps UnixFiles GenericLoader WMDefaultFont StdIOShell Shell SystemTools Compiler FoxOberonFrontend FoxAMDBackend FoxArrayBase FoxArrayBaseOptimized StaticLinker DependencyWalker Release && chmod +x $@
 # grep ":processing\s$" oberon.log | grep "^[^:]\+" -o | tr '\n' ' '
 
 compiler: $(addsuffix $(object), FoxA2Interface FoxActiveCells FoxAMD64Assembler FoxAMD64InstructionSet FoxAMDBackend FoxARMAssembler FoxARMBackend FoxARMInstructionSet FoxArrayBase FoxArrayBaseOptimized FoxAssembler FoxBackend FoxBasic FoxBinaryCode FoxCodeGenerators Compiler FoxCSharpFrontend FoxCSharpParser FoxCSharpScanner FoxDisassembler FoxDocumentationBackend FoxDocumentationHtml FoxDocumentationParser FoxDocumentationPrinter FoxDocumentationScanner FoxDocumentationTree FoxFingerPrinter FoxFormats FoxFrontend FoxGenericObjectFile FoxGlobal FoxHardware FoxInterfaceComparison FoxIntermediateAssembler FoxIntermediateBackend FoxIntermediateCode FoxIntermediateLinker FoxIntermediateObjectFile FoxIntermediateParser FoxInterpreterBackend FoxMinosObjectFile FoxOberonFrontend FoxParser FoxPrintout FoxProfiler FoxProgTools FoxScanner FoxSections FoxSemanticChecker FoxSyntaxTree FoxTest TextCompiler FoxTextualSymbolFile FoxTranspilerBackend FoxTRMAssembler FoxTRMBackend FoxTRMInstructionSet)
