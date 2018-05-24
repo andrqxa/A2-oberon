@@ -28,13 +28,6 @@
 #	Release.Build --build --path="./" A2ZynqCooperative ~
 #	StaticLinker.Link --fileName=kernel.bin --extension=Gof --displacement=100000H --path="./" Trace CPU Runtime Counters Processors Queues BaseTypes Timer Activities ExclusiveBlocks HeapManager Interrupts Environment Mutexes Machine Heaps Modules GarbageCollector Objects Kernel ~
 #
-# WINAOS
-#
-#	Release.Build --build WinAos ~
-#
-#	Bootimage
-#	PELinker.Link --path=../obj/ Win32.Aos.Link ~
-#
 # WINAOS generic
 #	Release.Build Win32G ~
 #	StaticLinker.Link --fileFormat=PE32 --fileName=A2.exe --extension=GofW --displacement=401000H Runtime Trace Kernel32 Machine Heaps Modules Objects Kernel KernelLog Streams Commands Files WinFS Clock Dates Reals Strings Diagnostics BitSets StringPool ObjectFile GenericLinker Reflection GenericLoader BootConsole ~
@@ -221,17 +214,6 @@ BUILDS
 		EXCLUDEPACKAGES "Applications GuiApplications Fun Testing Education Contributions Oberon OberonGadgets OberonApplications OberonDocumentation OberonVoyager OberonAnts"
 		DISABLED "FALSE"
 	}
-	WinAos {
-		INCLUDE "WIN WINORIG UNCOOP UNCOOP32"
-		COMPILER "Compiler.Compile"
-		COMPILEOPTIONS ""
-		TARGET "AMD"
-		EXTENSION "Obw"
-		SYMBOLEXTENSION "Obw"
-		PATH "../obj/"
-		EXCLUDEPACKAGES ""
-		DISABLED "FALSE"
-	}
 	WinAosCooperative {
 		INCLUDE "WIN COOP WINCOOP I386COOP"
 		COMPILER "Compiler.Compile"
@@ -333,14 +315,13 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	SOLARISG32 { Generic.Unix.I386.Glue.Mod Generic.Solaris.I386.Unix.Mod }
 	SOLARISG64 { Generic.Unix.AMD64.Glue.Mod Generic.Solaris.AMD64.Unix.Mod }
 
-	WINORIG { Win32.Kernel32.Mod}
 	WINGEN32 {Generic.Win32.Kernel32.Mod}
 	WINGEN64 {Generic.Win64.Kernel32.Mod}
 
 	I386ORIG { I386.Machine.Mod }
 	I386GEN { Generic.I386.Machine.Mod }
 	AMD64 { AMD64.Machine.Mod }
-	WINORIG, WINGEN32 {Win32.Machine.Mod }
+	WINGEN32 {Win32.Machine.Mod }
 	WINGEN64 {Win64.Machine.Mod}
 	COOP { Mutexes.Mod }
 	I386COOP { Coop.I386.Machine.Mod }
@@ -349,15 +330,15 @@ PACKAGE Kernel ARCHIVE "Kernel.zip" SOURCE "KernelSrc.zip" DESCRIPTION "A2 Kerne
 	UNIXG32 { Generic.Unix.I386.Machine.Mod }
 	UNIXG64 { Generic.Unix.AMD64.Machine.Mod }
 
-	NATIVEORIG, NATIVEGEN, WINORIG, WINGEN, UNIXG { Heaps.Mod }
+	NATIVEORIG, NATIVEGEN, WINGEN, UNIXG { Heaps.Mod }
 	COOP { Coop.Heaps.Mod }
 
-	NATIVEORIG, WINORIG { Modules.Mod }
+	NATIVEORIG { Modules.Mod }
 	NATIVEGEN, WINGEN, UNIXG { Generic.Modules.Mod}
 	COOP { Coop.Modules.Mod GarbageCollector.Mod }
 
 	NATIVEORIG, NATIVEGEN { Objects.Mod Kernel.Mod }
-	WINORIG, WINGEN32 { Win32.Objects.Mod }
+	WINGEN32 { Win32.Objects.Mod }
 	WINGEN64 { Win64.Objects.Mod }
 	WINGEN { Win32.Kernel.Mod }
 	UNIXG { Generic.Unix.Objects.Mod Unix.Kernel.Mod }
@@ -375,19 +356,19 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	Plugins.Mod Streams.Mod Pipes.Mod Commands.Mod
 	In.Mod Out.Mod
 
-	I386, WINORIG, WINGEN32, UNIXG32 { I386.Reals.Mod }
+	I386, WINGEN32, UNIXG32 { I386.Reals.Mod }
 	AMD64, WINGEN64, UNIXG64 { AMD64.Reals.Mod }
 	ARM { ARM.Reals.Mod }
 
 	# default trap handling
-	NATIVEORIG,WINORIG { Reflection.Mod }
+	NATIVEORIG { Reflection.Mod }
 	NATIVEGEN, WINGEN, UNIXG {Generic.Reflection.Mod}
 	COOP { Generic.Reflection.Mod }
 	TrapWriters.Mod CRC.Mod SystemVersion.Mod
 	NATIVEORIG, NATIVEGEN { Traps.Mod }
 	AMD64 { AMD64.Traps.Mod }
 	ARM { ARM.Traps.Mod }
-	WINORIG, WINGEN32 { Win32.Traps.Mod }
+	WINGEN32 { Win32.Traps.Mod }
 	WINGEN64 {Win64.Traps.Mod}
 	UNIXG { Unix.StdIO.Mod Generic.Unix.Traps.Mod }
 	COOP { Coop.Traps.Mod }
@@ -434,7 +415,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 
 	RelativeFileSystem.Mod	# file system relative to path
 
-	NATIVEORIG,WINORIG { Loader.Mod }
+	NATIVEORIG { Loader.Mod }
 	NATIVEGEN, WINGEN, COOP, UNIXG {BitSets.Mod Diagnostics.Mod StringPool.Mod ObjectFile.Mod GenericLinker.Mod GenericLoader.Mod }
 
 	# binding modules
@@ -469,7 +450,7 @@ PACKAGE System ARCHIVE "System.zip" SOURCE "SystemSrc.zip" DESCRIPTION "System"
 	ActiveTimers.Mod
 
 	WIN { Win32.GDI32.Mod }
-	WINORIG, WINGEN { Win32.Display.Mod }
+	WINGEN { Win32.Display.Mod }
 	WINCOOP { Coop.Win32.Display.Mod }
 
 	WIN {
@@ -647,13 +628,13 @@ PACKAGE Compiler ARCHIVE "Compiler.zip" SOURCE "CompilerSrc.zip" DESCRIPTION "Ac
 	FoxProfiler.Mod
 
 	# Runtime support for math oberon (Move to runtime package? *)
-	I386, WINORIG, WINGEN32, UNIXG32 { XMM.I386.Math.Mod XMM.I386.MathL.Mod }
+	I386, WINGEN32, UNIXG32 { XMM.I386.Math.Mod XMM.I386.MathL.Mod }
 	#FPU32 { I386.Math.Mod I386.MathL.Mod }
 	AMD64, WINGEN64, UNIXG64 { XMM.AMD64.Math.Mod XMM.AMD64.MathL.Mod }
 	#FPU64 { AMD64.Math.Mod AMD64.MathL.Mod }
 	ComplexNumbers.Mod
 	FoxArrayBase.Mod
-	I386, WINORIG, WINGEN32, UNIXG32 { I386.FoxArrayBaseOptimized.Mod }
+	I386, WINGEN32, UNIXG32 { I386.FoxArrayBaseOptimized.Mod }
 	AMD64, WINGEN64, UNIX64, UNIXG64 { AMD64.FoxArrayBaseOptimized.Mod }
 END
 
@@ -677,7 +658,7 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 		PCITools.Mod pci.ids # Automatic HW detection
 	}
 
-	I386, WINORIG, WINGEN32, UNIXG32 { XMM.I386.Math.Mod XMM.I386.MathL.Mod }
+	I386, WINGEN32, UNIXG32 { XMM.I386.Math.Mod XMM.I386.MathL.Mod }
 	AMD64, WINGEN64 { XMM.AMD64.Math.Mod XMM.AMD64.MathL.Mod }
 	#FPU32 { I386.Math.Mod I386.MathL.Mod }
 	#FPU64 { AMD64.Math.Mod AMD64.MathL.Mod }
@@ -693,7 +674,7 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 	CLUTs.Mod AosDefault.Pal
 
 	# raster images (eos)
-	I386, WINORIG, WINGEN32, UNIXG32 { I386.Raster.Mod }
+	I386, WINGEN32, UNIXG32 { I386.Raster.Mod }
 	AMD64, WINGEN64, UNIXG64 { AMD64.Raster.Mod }
 
 	Localization.Mod
@@ -726,7 +707,7 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 	UnicodeBidirectionality.Mod
 
 	# Move to graphical package!!
-	I386, WINORIG, WINGEN32, UNIXG32 { I386.WMRasterScale.Mod }
+	I386, WINGEN32, UNIXG32 { I386.WMRasterScale.Mod }
 	AMD64, WINGEN64, UNIXG64 { AMD64.WMRasterScale.Mod }
 
 	WMGraphics.Mod
@@ -756,7 +737,7 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 	PCDebug.Mod PCM.Mod PCS.Mod PCT.Mod PCBT.Mod	# prk
 	PCLIR.Mod PCO.Mod PCG386.Mod PCC.Mod PCV.Mod PCArrays.Mod
 	PCB.Mod PCP.Mod PCA386.Mod PCOM.Mod PCOF.Mod PCOFPE.Mod PC.Mod
-	I386,WINORIG,WINGEN32 { ArrayBase.Mod I386.ArrayBaseOptimized.Mod }
+	I386,WINGEN32 { ArrayBase.Mod I386.ArrayBaseOptimized.Mod }
 	PCOARM.Mod PCARMCP.Mod PCARMRegisters.Mod	# ARM Backend (be)
 	PCAARM.Mod PCGARM.Mod
 	ASMAMD64.Mod PCAAMD64.Mod PCGAMD64.Mod	# AMD64 Backend
@@ -794,8 +775,8 @@ PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMini
 	PartitionEditorTable.Mod
 
 	NATIVEORIG{ Profiler.Mod HierarchicalProfiler0.Mod } # Hierarchical profiler has GUI: WMProfiler.Mod
-	WINORIG, WINGEN { Win32.HierarchicalProfiler0.Mod }
-	NATIVEORIG, WINORIG, WINGEN { HierarchicalProfiler.Mod}
+	WINGEN { Win32.HierarchicalProfiler0.Mod }
+	NATIVEORIG, WINGEN { HierarchicalProfiler.Mod}
 
 	FTPClient.Mod
 
@@ -824,7 +805,7 @@ PACKAGE Applications ARCHIVE "Applications.zip" SOURCE "ApplicationsSrc.zip" DES
 
 	Fido.Mod
 
-	I386, WINORIG, WINGEN32, UNIXG32 { I386.CPUID.Mod }
+	I386, WINGEN32, UNIXG32 { I386.CPUID.Mod }
 	AMD64, WINGEN64 { AMD64.CPUID.Mod }
 
 	A2Sequencers.Mod
@@ -903,7 +884,7 @@ PACKAGE Applications ARCHIVE "Applications.zip" SOURCE "ApplicationsSrc.zip" DES
 	MP3Decoder.Mod MP3Huffman.Bin # MP3 Decoder
 
 	# Video codecs
-	I386, WINORIG, WINGEN32, UNIXG32 {
+	I386, WINGEN32, UNIXG32 {
 		I386.IDCT.Mod
 		AVI.Mod DivXTypes.Mod I386.DivXHelper.Mod I386.DivXDecoder.Mod # DivX Support
 		MPEGTables.Mod I386.MPEGUtilities.Mod MPEGVideoDecoder.Mod	# MPEG1/2 Support
@@ -1104,7 +1085,7 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 	WMShell.Mod	# GUI for Shell
 
 	# GUI for hierarchical profiler (HierarchicalProfiler.Mod)
-	NATIVEORIG, WINORIG, WINGEN { WMProfiler.Mod }
+	NATIVEORIG, WINGEN { WMProfiler.Mod }
 
 	# ssh
 	SSH.Tool
@@ -1204,7 +1185,7 @@ PACKAGE GuiApplications ARCHIVE "GuiApplications.zip" SOURCE "GuiApplicationsSrc
 		TVRemoteControl.Mod TV.Tool
 	}
 
-	I386, WINORIG, WINGEN32, UNIXG32 { I386.WMTransitions.Mod }
+	I386, WINGEN32, UNIXG32 { I386.WMTransitions.Mod }
 	AMD64, WINGEN64, UNIXG64 { AMD64.WMTransitions.Mod }
 	MediaPlayer.Mod Presentation.Mod
 	MP3Player.Mod WMPlayer.Mod
@@ -1369,7 +1350,7 @@ END
 
 PACKAGE EFI ARCHIVE "EFI.zip" SOURCE "EFISrc.zip" DESCRIPTION "EFI Boot Loader and API"
 	EFI.Tool EFI.Mod
-	I386, WINORIG, WINGEN32, UNIXG32 {I386.EFIMachine.Mod}
+	I386, WINGEN32, UNIXG32 {I386.EFIMachine.Mod}
 	AMD64, WINGEN64, UNIXG64 { AMD64.EFIMachine.Mod }
 
 
@@ -1400,7 +1381,7 @@ PACKAGE Contributions ARCHIVE "Contributions.zip" SOURCE "ContributionsSrc.zip" 
 
 	srRenderTools.Text srReadMe.Text	# Realtime Fractal-Voxel Raytracer (Soren Renner)
 	srBase.Mod srRayEngine.Mod srMath.Mod
-	I386, WINORIG, WINGEN32, UNIXG32 { I386.srE.Mod }
+	I386, WINGEN32, UNIXG32 { I386.srE.Mod }
 	AMD64, WINGEN64, UNIXG64 { AMD64.srE.Mod }
 	srGL.Mod srHex.Mod srImage.Mod
 	srVoxel.Mod srVoxel2.Mod srVoxel3.Mod srVolShader.Mod srVoxel4.Mod srVoxel5.Mod
@@ -1435,7 +1416,7 @@ PACKAGE Contributions ARCHIVE "Contributions.zip" SOURCE "ContributionsSrc.zip" 
 	CalcFn.Mod CalcD1.Mod CalcD2.Mod CalcD3.Mod CalcD4.Mod CalcGauss.Mod
 	MathMitLef.Mod CalcConvolution.Mod CalcGrunwald.Mod CalcDiethelm.Mod
 
-	NATIVE,WINORIG,WINGEN32,UNIXG32 {
+	NATIVE,WINGEN32,UNIXG32 {
 
 		# Disable index checking for these modules with \sx for efficiency
 		I386.Array1dBytes.Mod Array1dInt.Mod Array1dRat.Mod Array1dRe.Mod Array1dCplx.Mod I386.ArrayXdBytes.Mod
@@ -1578,7 +1559,7 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 
 	# Configuration
 	Configuration.Tool
-	WINORIG, WINGEN32 { Win32.Oberon.Registry.Mod }
+	WINGEN32 { Win32.Oberon.Registry.Mod }
 	NATIVE, WIN { Oberon.Configuration.Mod }
 
 # Basic Tools. NetSystem, Telnet, TextMail, ET, developer's tools, OpenType.
@@ -1694,7 +1675,7 @@ PACKAGE OberonGadgets ARCHIVE "OberonGadgets.zip" SOURCE "OberonGadgetsSrc.zip" 
 
 	PC.Tool Oberon.ErrorGadgets.Mod Oberon.PC.Mod	# Oberon Interface for PACO
 
-	WINORIG,WINGEN32 { Win32.PELinker.Mod PELinker.Tool }
+	WINGEN32 { Win32.PELinker.Mod PELinker.Tool }
 
 	WIN { Win32.Oberon.Clipboard.Mod Win32.Oberon.FontRes.Mod FontRes.Tool }
 	UNIXG { Unix.Oberon.Clipboard.Mod }
