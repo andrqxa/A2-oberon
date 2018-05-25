@@ -4,7 +4,7 @@ IMPORT
 	IntermediateCode := FoxIntermediateCode, Basic := FoxBasic, Streams, Files, Backend := FoxBackend,
 	Global := FoxGlobal, Formats := FoxFormats, 
 	ObjectFile, BinaryCode := FoxBinaryCode, Commands, Options, IRObjectFile := FoxIntermediateObjectFile,
-	GenericLinker, Linker;
+	GenericLinker, StaticLinker := Linker;
 
 CONST
 	DefaultBackend = "AMD";
@@ -1270,7 +1270,7 @@ TYPE
 	END Link;
 	
 	PROCEDURE WriteCodeAndDataFiles*(CONST instanceName: ARRAY OF CHAR; CONST codeFileExtension, dataFileExtension: ARRAY OF CHAR; objectFile: Formats.ObjectFileFormat; VAR instructionMemorySize, dataMemorySize: LONGINT; backend: Backend.Backend;  diagnostics: Diagnostics.Diagnostics; log:Streams.Writer): BOOLEAN;
-	VAR code, data: Linker.Arrangement; linker: GenericLinker.Linker; linkerLog: Files.Writer;
+	VAR code, data: StaticLinker.Arrangement; linker: GenericLinker.Linker; linkerLog: Files.Writer;
 			logFile: Files.File; 
 			objectFileExtension: ARRAY 32 OF CHAR;
 			error : BOOLEAN;
@@ -1285,7 +1285,7 @@ TYPE
 		COPY(instanceName, fileName); Strings.Append(fileName,".log");	logFile := Files.New(fileName);
 		IF logFile # NIL THEN NEW(linkerLog,logFile,0) ELSE logFile := NIL END;
 		NEW (linker, diagnostics, linkerLog, GenericLinker.UseInitCode, code, data);
-		Linker.ReadObjectFile(instanceName, "",objectFile.extension, linker, NIL);
+		StaticLinker.ReadObjectFile(instanceName, "",objectFile.extension, linker, NIL);
 
 				(* do linking after having read in all blocks to account for potential constraints *)
 				IF ~linker.error THEN linker.Link; END;
@@ -1311,8 +1311,8 @@ TYPE
 				Files.JoinExtension(instanceName,dataFileExtension,dataFileName);
 
 				IF ~linker.error THEN
-					Linker.WriteOutputFile (code, codeFileName, linker, Linker.WriteTRMCodeFile);
-					Linker.WriteOutputFile (data, dataFileName, linker, Linker.WriteTRMDataFile);
+					StaticLinker.WriteOutputFile (code, codeFileName, linker, StaticLinker.WriteTRMCodeFile);
+					StaticLinker.WriteOutputFile (data, dataFileName, linker, StaticLinker.WriteTRMDataFile);
 					
 					
 					
