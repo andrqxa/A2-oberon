@@ -16,7 +16,7 @@ VAR
 
 (** Send the specified characters to the trace output (cf. Streams.Sender). *)
 
-PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
+PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 VAR next: ADDRESS; c: CHAR;
 BEGIN
 	INC(len, ofs);	(* len is now end position *)

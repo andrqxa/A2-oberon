@@ -153,11 +153,11 @@ TYPE
 
 
 				(** Send data on a TCP connection. *)
-				PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: LONGINT;  propagate: BOOLEAN;  VAR res: WORD );
+				PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
 				BEGIN
 					IF trace THEN  Out.String( "Send: socket=" );  Out.Int( socket, 0 )  END;
 					IF state = Established THEN
-						IF sender.SendPacket( data, ofs, len ) THEN
+						IF sender.SendPacket( data, TODO(ofs), TODO(len) ) THEN
 							res := Ok
 						ELSE
 							res := ConnectionReset

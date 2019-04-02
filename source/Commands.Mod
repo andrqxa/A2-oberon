@@ -145,7 +145,7 @@ BEGIN
 	RETURN reader;
 END GetEmptyReader;
 
-PROCEDURE SendNothing(CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
+PROCEDURE SendNothing(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 END SendNothing;
 
 (** Splits a command string of the form moduleName.commandProcName into its components. Can be used to check whether a

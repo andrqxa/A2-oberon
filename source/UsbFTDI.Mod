@@ -957,17 +957,17 @@ TYPE
 		END Open;
 
 		(** Send len characters from buf to output, starting at ofs. res is non-zero on error. *)
-		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 		VAR status : Usbdi.Status;
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN res := Serials.Closed; RETURN; END;
 			IF Trace * TraceSend # {} THEN ShowModule("Sending "); KernelLog.Int(len, 0); KernelLog.String(" bytes"); KernelLog.Ln; END;
 			IF ((sendBuffer = NIL) OR (LEN(sendBuffer) < len)) THEN NEW(sendBuffer, len) END;
 			SYSTEM.MOVE(ADDRESSOF(buf[ofs]), ADDRESSOF(sendBuffer[0]), len);
-			status := driver.bulkOut.Transfer(len, ofs, sendBuffer^);
+			status := driver.bulkOut.Transfer(TODO(len), TODO(ofs), sendBuffer^);
 			IF status = Usbdi.Ok THEN
 				res := Serials.Ok;
-				charactersSent := charactersSent + len;
+				charactersSent := charactersSent + TODO(len);
 			ELSE
 				res := Serials.TransportError;
 				IF Debug THEN ShowModule("Transmission failed, res: "); KernelLog.Int(status, 0); KernelLog.Ln; END;

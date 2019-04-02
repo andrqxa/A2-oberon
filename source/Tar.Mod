@@ -136,7 +136,7 @@ TYPE
 	(* for internal use only. abstract buffer class *)
 	Buffer = OBJECT
 
-		PROCEDURE Send(CONST data : ARRAY OF CHAR; ofs, len : LONGINT; propagate : BOOLEAN; VAR res : WORD);
+		PROCEDURE Send(CONST data : ARRAY OF CHAR; ofs, len : SIZE; propagate : BOOLEAN; VAR res : WORD);
 		BEGIN HALT(301)
 		END Send;
 
@@ -170,8 +170,8 @@ TYPE
 		END Init;
 
 		(* buffer any data until propagate is TRUE *)
-		PROCEDURE Send(CONST data : ARRAY OF CHAR; ofs, len : LONGINT; propagate : BOOLEAN; VAR res : WORD);
-		VAR i : LONGINT;
+		PROCEDURE Send(CONST data : ARRAY OF CHAR; ofs, len : SIZE; propagate : BOOLEAN; VAR res : WORD);
+		VAR i : SIZE;
 		BEGIN
 			IF closed THEN res := StreamClosed; RETURN END;
 			res := Streams.Ok;

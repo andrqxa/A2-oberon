@@ -143,8 +143,8 @@ TYPE
 			END
 		END Init;
 
-		PROCEDURE Sender(CONST inBuf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
-		VAR i: LONGINT;
+		PROCEDURE Sender(CONST inBuf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		VAR i: SIZE;
 		BEGIN
 			ASSERT(chunked);
 			i := ofs;
@@ -248,8 +248,8 @@ TYPE
 			Streams.OpenWriter(inW, Sender);
 		END Init;
 
-		PROCEDURE Sender(CONST outBuf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
-		VAR i: LONGINT;
+		PROCEDURE Sender(CONST outBuf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		VAR i: SIZE;
 		BEGIN
 			i := ofs;
 			res:=outW.res ;

@@ -67,14 +67,14 @@ TYPE
 			InitWriter (Add, 128 * 1024);
 		END Init;
 
-		PROCEDURE Add(CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Add(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 		VAR
 			p, i, idx, pos : LONGINT;
 			nextAttribute: LONGINT;
 			pieceOffset, pieceLength: LONGINT;
 			nextAttributes: Texts.Attributes;
 		BEGIN
-			pieceOffset := ofs; pieceLength := len;
+			pieceOffset := TODO(ofs); pieceLength := TODO(len);
 
 			IF (ucs32buf = NIL) OR (pieceLength >= LEN(ucs32buf)) THEN NEW(ucs32buf, pieceLength + 1) END;
 			p := pieceOffset; idx := 0;

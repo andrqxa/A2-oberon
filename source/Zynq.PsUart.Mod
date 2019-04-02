@@ -271,7 +271,7 @@ VAR
 	(**
 		Send data to the UART
 	*)
-	PROCEDURE Send*(uart: UartController; CONST buf: ARRAY OF CHAR; offs, len: LONGINT; propagate: BOOLEAN; onBusy: PsUartMin.BusyLoopCallback; VAR res: WORD);
+	PROCEDURE Send*(uart: UartController; CONST buf: ARRAY OF CHAR; offs, len: SIZE; propagate: BOOLEAN; onBusy: PsUartMin.BusyLoopCallback; VAR res: WORD);
 	BEGIN
 		WHILE uart.open & (len > 0) DO
 			IF ~(PsUartMin.XUARTPS_SR_TNFUL IN uart.regs.sr) THEN

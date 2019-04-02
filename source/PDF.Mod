@@ -94,8 +94,8 @@ TYPE
 			SELF.context := context; NEW(data, 4 *  4096); length := 0;
 		END Init;
 
-		PROCEDURE Add (CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
-		VAR i : LONGINT; n : Strings.String;
+		PROCEDURE Add (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		VAR i : SIZE; n : Strings.String;
 		BEGIN
 			IF length + len >= LEN(data) THEN
 				NEW(n, LEN(data) + len); FOR i := 0 TO length - 1 DO n[i] := data[i] END;

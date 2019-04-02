@@ -145,7 +145,7 @@ TYPE
 		END Open;
 
 	(** Send data on a TCP connection. *)
-		PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: LONGINT;  propagate: BOOLEAN;  VAR res: WORD );
+		PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
 		VAR err : LONGINT;
 		BEGIN
 			ASSERT((ofs >= 0) & (ofs + len <= LEN(data)));
@@ -157,7 +157,7 @@ TYPE
 			END;
 
 			res := Streams.Ok;
-			err := WSock32.send( socket, data[ofs], len, {} );
+			err := WSock32.send( socket, data[ofs], TODO(len), {} );
 
 			IF (err < 0) OR ((err = 0) & (len > 0)) THEN
 				KernelLog.String( "TCP.Send :" );  WSock32.DispError;  res := NotConnected;

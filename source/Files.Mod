@@ -123,9 +123,9 @@ TYPE
 		file : File;
 		r: Rider;
 
-		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 		BEGIN
-			r.file.WriteBytes(r, buf, ofs, len);
+			r.file.WriteBytes(r, buf, TODO(ofs), TODO(len));
 			IF propagate THEN r.file.Update END;
 			IF r.res = 0 THEN res := Streams.Ok ELSE res := WriteError (* not all bytes written *) END
 		END Send;

@@ -29,14 +29,14 @@ TYPE
 	StreamSize* = LONGINT; (* size of the stream *)
 
 	(** Any stream output procedure or method. *)
-	Sender* = PROCEDURE {DELEGATE} ( CONST buf: ARRAY OF CHAR;  ofs, len: LONGINT;  propagate: BOOLEAN;  VAR res: WORD );
+	Sender* = PROCEDURE {DELEGATE} ( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
 
 	(** Any stream input procedure or method. *)
 	Receiver* = PROCEDURE {DELEGATE} ( VAR buf: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
 
 	Connection* = OBJECT
 
-		PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: LONGINT;  propagate: BOOLEAN;  VAR res: WORD );
+		PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
 		END Send;
 
 		PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
@@ -406,7 +406,7 @@ TYPE
 			InitWriter( Send, size )
 		END InitStringWriter;
 
-		PROCEDURE Send( CONST buf: ARRAY OF CHAR;  ofs, len: LONGINT;  propagate: BOOLEAN;  VAR res: WORD );
+		PROCEDURE Send( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
 		BEGIN
 			res := StringFull
 		END Send;
@@ -952,12 +952,12 @@ TYPE
 
 	(** Set the contents of the string buffer.  The s parameter is a 0X-terminated string. *)
 		PROCEDURE Set*(CONST  s: ARRAY OF CHAR );
-		VAR len: LONGINT;
+		VAR len: SIZE;
 		BEGIN
 			len := 0;
 			WHILE s[len] # 0X DO INC( len ) END;
 			IF len > LEN( buf ) THEN len := LEN( buf ) END;
-			head := 0;  tail := len;  received := len;  res := Ok;
+			head := 0;  tail := TODO (len);  received := TODO (len);  res := Ok;
 			IF len > 0 THEN
 				SYSTEM.MOVE( ADDRESSOF( s[0] ), ADDRESSOF( buf[0] ), len )
 			END;

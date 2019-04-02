@@ -77,7 +77,7 @@ TYPE
 			END;
 		END Init;
 
-		PROCEDURE Send* (CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send* (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 		VAR
 			done : BOOLEAN;
 		BEGIN
@@ -87,8 +87,8 @@ TYPE
 			ELSIF (SELF.res < ZlibDeflate.Ok) OR (len <= 0) THEN
 				res := SELF.res;
 			ELSE
-				ZlibBuffers.Init(SELF.s.in, buf, ofs, len, len);
-				INC(inputsize, len);
+				ZlibBuffers.Init(SELF.s.in, buf, TODO(ofs), TODO(len), TODO(len));
+				INC(inputsize, TODO(len));
 				WHILE (SELF.res = ZlibDeflate.Ok) & (SELF.s.in.avail # 0) DO
 					IF (SELF.s.out.avail = 0) THEN
 						writer.Bytes(SELF.out^, 0, BufSize);
@@ -99,7 +99,7 @@ TYPE
 						SELF.res := SELF.s.res
 					END
 				END;
-				SELF.crc32 := Zlib.CRC32(SELF.crc32, buf, ofs, len - SELF.s.in.avail);
+				SELF.crc32 := Zlib.CRC32(SELF.crc32, buf, TODO(ofs), TODO(len - SELF.s.in.avail));
 			END;
 			res := SELF.res;
 			IF propagate THEN

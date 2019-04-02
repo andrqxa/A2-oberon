@@ -413,14 +413,14 @@ TYPE
 
 
 		(** Send data on a TCP connection. *)
-		PROCEDURE Send*(CONST data: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send*(CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 		VAR buf: SendBuffer; len0: LONGINT;
 		BEGIN {EXCLUSIVE}
 			IF StrongChecks THEN Invariant(SELF) END;
 			ASSERT(ofs+len <= LEN(data));	(* index check *)
 			LOOP
 				IF len <= 0 THEN EXIT END;
-				IF len <= maxseg THEN len0 := len ELSE len0 := maxseg END;
+				IF len <= maxseg THEN len0 := TODO(len) ELSE len0 := maxseg END;
 				IF ~((state IN {Established, CloseWait}) & (sndspace >= len0)) THEN	(* can not send immediately *)
 					AWAIT(((state IN {Established, CloseWait}) & (sndspace >= len0)) OR ~(state IN {SynSent..CloseWait}));
 					IF StrongChecks THEN Invariant(SELF) END;
@@ -453,7 +453,7 @@ TYPE
 				INC(ofs, len0); DEC(len, len0)
 			END;
 			IF TraceProtocol THEN
-				TraceTCP("Send", SELF, empty^, data, 0, ofs, len)
+				TraceTCP("Send", SELF, empty^, data, 0, TODO(ofs), TODO (len))
 			END;
 			res := Ok
 		END Send;

@@ -116,13 +116,13 @@ TYPE
 		END Open;
 
 	(** Send len characters from buf to output, starting at ofs. res is non-zero on error. *)
-		PROCEDURE Send*( CONST buf: ARRAY OF CHAR;  ofs, len: LONGINT;  propagate: BOOLEAN;  VAR res: WORD );
+		PROCEDURE Send*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
 		VAR written: LONGINT;  ret: Kernel32.BOOL;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + len );   (* array bound check not implemented in Kernel32.WriteFile *)
 			IF (handle # Kernel32.InvalidHandleValue) THEN
 				written := 0;
-				ret := Kernel32.WriteFile( handle, buf[ofs], len, written, wOverlapped );
+				ret := Kernel32.WriteFile( handle, buf[ofs], TODO(len), written, wOverlapped );
 				IF ret = Kernel32.False THEN
 					ret := Kernel32.GetOverlappedResult(handle,wOverlapped,written,Kernel32.True);
 				END;

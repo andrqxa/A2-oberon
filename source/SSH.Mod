@@ -209,13 +209,13 @@ TYPE
 				rbstart, rbend: LONGINT;
 				interactive: BOOLEAN;
 
-				PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: LONGINT;  propagate: BOOLEAN;  VAR res: WORD );
+				PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
 				VAR p: T.Packet; l: LONGINT; t: CHAR;
 					buf: ARRAY 512 OF CHAR;
 				BEGIN
-					NEW( p, Data, len + 32 );
+					NEW( p, Data, TODO(len) + 32 );
 					p.AppInteger( rchan );
-					p.AppArray( data, ofs, len );
+					p.AppArray( data, TODO(ofs), TODO(len) );
 					WHILE wsize < len DO
 						(* wait for server window space *)
 						t := ReceivePacket( buf, l );
@@ -224,9 +224,8 @@ TYPE
 						ELSIF t = 0X THEN  Error( "unexpected end of data" ); RETURN
 						END
 					END;
-					conn.SendPacket( p );  DEC( wsize, len );  res := Streams.Ok
+					conn.SendPacket( p );  DEC( wsize, TODO(len) );  res := Streams.Ok
 				END Send;
-
 
 				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
 				VAR
@@ -876,5 +875,4 @@ SSH.Receive fld@erwin.math.uni-bremen.de
 	~
 
 System.Free SSHClient SSH SSHAuthorize SSHTransport SSHKeys  ~
-
 

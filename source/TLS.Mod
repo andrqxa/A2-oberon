@@ -732,8 +732,8 @@ TYPE
 		END Close;
 
 		(** Send secured data *)
-		PROCEDURE Send*( CONST data: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD );
-			VAR i, size: LONGINT;
+		PROCEDURE Send*( CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD );
+			VAR i, size: SIZE;
 		BEGIN {EXCLUSIVE}
 			AWAIT((state = TCP.Established) OR (state = TCP.Closed));
 			IF state = TCP.Established THEN
@@ -744,7 +744,7 @@ TYPE
 					FOR i := 0 TO size-1 DO
 						outbuf[ i ] := data[ ofs + i ]
 					END;
-					SendRecord( outbuf, ApplicationData, 0, size );
+					SendRecord( outbuf, ApplicationData, 0, TODO(size) );
 					INC( ofs, size );
 					DEC( len, size )
 				END

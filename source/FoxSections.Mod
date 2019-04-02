@@ -155,10 +155,10 @@ TYPE
 			str[0] := 0X;
 		END Init;
 
-		PROCEDURE Append(CONST buf: ARRAY OF CHAR;  ofs, len: LONGINT);
+		PROCEDURE Append(CONST buf: ARRAY OF CHAR;  ofs, len: SIZE);
 
-			PROCEDURE Resize(newLen: LONGINT);
-			VAR new: CommentStr; i: LONGINT;
+			PROCEDURE Resize(newLen: SIZE);
+			VAR new: CommentStr; i: SIZE;
 			BEGIN
 				NEW(new,newLen);
 				FOR i := 0 TO strLen-1 DO
@@ -206,7 +206,7 @@ TYPE
 		firstComment-,lastComment-: Comment; comments-: LONGINT;
 		getPC: GetPCProcedure;
 
-		PROCEDURE AppendToLine*( CONST buf: ARRAY OF CHAR;  ofs, len: LONGINT; propagate: BOOLEAN;  VAR res: WORD );
+		PROCEDURE AppendToLine*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN;  VAR res: WORD );
 		VAR pos: LONGINT;
 		BEGIN
 			IF len = 0 THEN RETURN END;

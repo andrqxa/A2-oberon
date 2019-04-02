@@ -157,11 +157,11 @@ TYPE
 			END;
 		END SendChar;
 
-		PROCEDURE Send*( CONST buf: ARRAY OF CHAR;  ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD );
+		PROCEDURE Send*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD );
 		VAR r: SIZE; writeRes: LONGINT;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + len );   (* array bound check not implemented in Kernel32.WriteFile *)
-			r := Unix.write( fd, ADDRESSOF(buf[ofs]), len );  writeRes := LONGINT( r );
+			r := Unix.write( fd, ADDRESSOF(buf[ofs]), len );  writeRes := TODO( r );
 			IF writeRes < 0 THEN
 				res := Serials.TransportError;
 			ELSE
@@ -384,7 +384,4 @@ System.Free V24~
 
 	---------------------
 	------------------------------------------
-
-
-
 

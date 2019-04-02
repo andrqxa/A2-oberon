@@ -156,12 +156,12 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 		SectionWriter = OBJECT (Streams.Writer)
 			VAR sect: Section; org, ofs: LONGINT;
 
-			PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: WORD);
+			PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 			BEGIN
 				res := Streams.Ok; IF len <= 0 THEN RETURN END;
-				IF (SELF.ofs + len) > sect.len THEN sect.Resize(SELF.ofs + len) END;
+				IF (SELF.ofs + len) > sect.len THEN sect.Resize(SELF.ofs + TODO(len)) END;
 				SYSTEM.MOVE(ADDRESSOF(buf[ofs]), ADDRESSOF(sect.data[SELF.ofs]), len);
-				INC(SELF.ofs, len);
+				INC(SELF.ofs, TODO(len));
 				IF SELF.ofs > sect.used THEN sect.used := SELF.ofs END
 			END Send;
 

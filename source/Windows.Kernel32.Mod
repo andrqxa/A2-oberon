@@ -853,8 +853,8 @@ VAR
 	(** The WriteFile function writes data to a file and is designed for both synchronous and asynchronous operation. *)
 	WriteFile-: PROCEDURE {WINAPI} ( hFile: HANDLE;
 															   CONST lpBuffer: ARRAY   OF SYSTEM.BYTE;
-															   nNumberOfBytesToWrite: LONGINT;
-															   VAR lpNumberOfBytesWritten: LONGINT;
+															   nNumberOfBytesToWrite: DWORD;
+															   VAR lpNumberOfBytesWritten: DWORD;
 															   VAR lpOverlapped: Overlapped ): BOOL;
 	(** Thread abort notifier, parameter is the threads id. Note this should only be used in modules which
 			can't use the exception handling mechanism provided by module Exceptions. *)
