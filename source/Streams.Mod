@@ -964,10 +964,10 @@ TYPE
 		END Set;
 
 	(** Set the contents of the string buffer.  The len parameter specifies the size of the buffer s. *)
-		PROCEDURE SetRaw*(CONST s: ARRAY OF CHAR;  ofs, len: LONGINT );
+		PROCEDURE SetRaw*(CONST s: ARRAY OF CHAR;  ofs, len: SIZE );
 		BEGIN
 			IF len > LEN( buf ) THEN len := LEN( buf ) END;
-			head := 0;  tail := len;  received := len;  res := Ok;
+			head := 0;  tail := TODO(len);  received := TODO(len);  res := Ok;
 			ASSERT ( (len >= 0) & (ofs + len <= LEN( s )) );   (* index check *)
 			IF len > 0 THEN
 				SYSTEM.MOVE( ADDRESSOF( s[ofs] ), ADDRESSOF( buf[0] ), len )
