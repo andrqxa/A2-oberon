@@ -748,6 +748,8 @@ END
 
 PACKAGE ApplicationsMini ARCHIVE "ApplicationsMini.zip" SOURCE "ApplicationsMiniSrc.zip" DESCRIPTION "Minimal applications set"
 
+	StreamUtilities.Mod
+
 	# Error API and error codes definition
 	Errors.Mod errors.txt
 
