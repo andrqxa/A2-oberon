@@ -648,7 +648,7 @@ TYPE
 		BEGIN Indent; w.Char(x);
 		END Char;
 
-		PROCEDURE Bytes*(CONST x: ARRAY OF CHAR;  ofs, len: LONGINT );
+		PROCEDURE Bytes*(CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
 		BEGIN  w.Bytes(x,ofs,len);
 		END Bytes;
 

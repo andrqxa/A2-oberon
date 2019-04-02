@@ -109,8 +109,8 @@ TYPE
 		END Char;
 
 	(** Write len bytes from x, starting at ofs. *)
-		PROCEDURE Bytes*(CONST x: ARRAY OF CHAR;  ofs, len: LONGINT );
-		VAR n: LONGINT;
+		PROCEDURE Bytes*(CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
+		VAR n: SIZE;
 		BEGIN
 			ASSERT ( len >= 0 );
 			LOOP
@@ -126,7 +126,7 @@ TYPE
 				END;
 				IF n > len THEN n := len END;
 				ASSERT ( tail + n <= LEN( buf ) );   (* index check *)
-				SYSTEM.MOVE( ADDRESSOF( x[ofs] ), ADDRESSOF( buf[tail] ), n );  INC( tail, n );
+				SYSTEM.MOVE( ADDRESSOF( x[ofs] ), ADDRESSOF( buf[tail] ), n );  INC( tail, TODO(n) );
 				IF len = n THEN EXIT END;   (* done *)
 				INC( ofs, n );  DEC( len, n )
 			END
@@ -562,7 +562,7 @@ TYPE
 		END Bytes;
 
 	(** Skip n bytes on the reader. *)
-		PROCEDURE SkipBytes*( n: LONGINT );
+		PROCEDURE SkipBytes*( n: SIZE );
 		VAR ch: CHAR;
 		BEGIN
 			WHILE n > 0 DO ch := Get();  DEC( n ) END
