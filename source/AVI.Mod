@@ -218,12 +218,12 @@ IMPORT
 			Reset;
 		END SetAVIPos;
 
-		PROCEDURE Bytes*(VAR x: ARRAY OF CHAR; ofs, size: LONGINT; VAR len: LONGINT);
+		PROCEDURE Bytes*(VAR x: ARRAY OF CHAR; ofs, size: SIZE; VAR len: LONGINT);
 		VAR
 			min: LONGINT; res: WORD;
 		BEGIN
 			IF Debug THEN KernelLog.String("Bytes"); KernelLog.Ln; END;
-			demultiplexer.GetData(streamNr, x, ofs, size, min, len, res);
+			demultiplexer.GetData(streamNr, x, TODO(ofs), TODO(size), min, len, res);
 		END Bytes;
 
 		(* Set Byte Position *)

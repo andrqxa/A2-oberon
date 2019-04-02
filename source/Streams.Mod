@@ -534,7 +534,7 @@ TYPE
 		END Peek;
 
 	(** Read size bytes into x, starting at ofs.  The len parameter returns the number of bytes that were actually read. *)
-		PROCEDURE Bytes*( VAR x: ARRAY OF CHAR;  ofs, size: LONGINT;  VAR len: LONGINT );
+		PROCEDURE Bytes*( VAR x: ARRAY OF CHAR;  ofs, size: SIZE;  VAR len: LONGINT );
 		VAR n: LONGINT;
 		BEGIN
 			ASSERT ( size >= 0 );
@@ -553,7 +553,7 @@ TYPE
 					END;
 					n := tail
 				END;
-				IF n > size THEN n := size END;
+				IF n > size THEN n := TODO(size) END;
 				ASSERT ( ofs + n <= LEN( x ) );   (* index check *)
 				SYSTEM.MOVE( ADDRESSOF( buf[head] ), ADDRESSOF( x[ofs] ), n );  INC( head, n );  INC( len, n );
 				IF size = n THEN EXIT END;   (* done *)
