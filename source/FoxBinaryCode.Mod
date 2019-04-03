@@ -73,7 +73,7 @@ TYPE
 	Fixup*=OBJECT
 	VAR
 		nextFixup-: Fixup;
-		mode-: INTEGER; (* fixup mode: relative or absolute *)
+		mode-: WORD; (* fixup mode: relative or absolute *)
 		displacement-: Unit; (* displacement of the fixup ('source') *)
 		scale-: ObjectFile.Bits; (* exponent of scale factor (factor=2^scale) *)
 		patterns-: SIZE;
@@ -84,7 +84,7 @@ TYPE
 		symbolOffset-: LONGINT; (* offset in intermediate section, must be patched (resolved and added to displacement) to destination section displacement *)
 		resolved*: Sections.Section; (* cache ! *)
 
-		PROCEDURE & InitFixup*(mode: INTEGER; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset: LONGINT; displacement: Unit; scale: LONGINT; fixupPattern: ObjectFile.FixupPatterns);
+		PROCEDURE & InitFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset: LONGINT; displacement: Unit; scale: LONGINT; fixupPattern: ObjectFile.FixupPatterns);
 		BEGIN
 			ASSERT((mode = Relative) OR (mode = Absolute));
 			ASSERT(symbol.name # "");
@@ -202,7 +202,7 @@ TYPE
 			RETURN pc
 		END GetPC;
 
-		PROCEDURE & InitBinarySection*(type: SHORTINT; unit: Bits; CONST name:Basic.SegmentedName; dump: BOOLEAN; bigEndian: BOOLEAN);
+		PROCEDURE & InitBinarySection*(type: WORD; unit: Bits; CONST name:Basic.SegmentedName; dump: BOOLEAN; bigEndian: BOOLEAN);
 		BEGIN
 			ASSERT(unit > 0);
 			ASSERT(unit <= 32); (* implementation restriction *)
@@ -412,7 +412,7 @@ TYPE
 			pc := oldpc;
 		END PutQWordAt;
 
-		PROCEDURE PutBytes* (data: HUGEINT; bytes: SHORTINT);
+		PROCEDURE PutBytes* (data: HUGEINT; bytes: WORD);
 		BEGIN
 			CASE bytes OF
 			1: PutByte (SHORT(data));
@@ -623,7 +623,7 @@ TYPE
 
 	PROCEDURE ConvertReal* (value: REAL): LONGINT;
 	CONST Exponent = 8; Significant = 23;
-	VAR result: LONGINT; VAR exponent, i: INTEGER;
+	VAR result: LONGINT; VAR exponent, i: WORD;
 	BEGIN
 		(*! NaN code missing, we need an extra - machine specific - functionality for that  / cf. Streams.NaNCode *)
 		IF value = 0 THEN RETURN 0 END;
@@ -641,7 +641,7 @@ TYPE
 
 	PROCEDURE ConvertLongreal*(value: LONGREAL): HUGEINT;
 	CONST Exponent = 11; Significant = 52;
-	VAR result: HUGEINT; VAR exponent, i: INTEGER;
+	VAR result: HUGEINT; VAR exponent, i: WORD;
 	BEGIN
 		(*! NaN code missing, we need an extra - machine specific - functionality for that  / cf. Streams.NaNCode *)
 		IF value = 0 THEN RETURN 0 END;
@@ -713,13 +713,13 @@ TYPE
 		RETURN result
 	END ConvertToLongreal;
 
-	PROCEDURE NewFixup*(mode: INTEGER; fixupOffset: LONGINT; symbol: ObjectFile.Identifier; symbolOffset,displacement: LONGINT; scale: LONGINT; fixupPattern: ObjectFile.FixupPatterns): Fixup;
+	PROCEDURE NewFixup*(mode: WORD; fixupOffset: LONGINT; symbol: ObjectFile.Identifier; symbolOffset,displacement: LONGINT; scale: LONGINT; fixupPattern: ObjectFile.FixupPatterns): Fixup;
 	VAR fixup: Fixup;
 	BEGIN
 		NEW(fixup,mode,fixupOffset,symbol,symbolOffset,displacement,scale,fixupPattern); RETURN fixup
 	END NewFixup;
 
-	PROCEDURE NewBinarySection*(type: SHORTINT; unit: LONGINT; CONST name: Basic.SegmentedName; dump: BOOLEAN; bigEndian: BOOLEAN): Section;
+	PROCEDURE NewBinarySection*(type: WORD; unit: LONGINT; CONST name: Basic.SegmentedName; dump: BOOLEAN; bigEndian: BOOLEAN): Section;
 	VAR binarySection: Section;
 	BEGIN
 		NEW(binarySection,type,unit,name,dump,bigEndian); RETURN binarySection
