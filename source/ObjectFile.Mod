@@ -24,17 +24,13 @@ CONST
 
 	DefaultExtension* = ".Gof";
 
-	SegmentedNameLength=8;
 TYPE
-
 	Unit* = LONGINT;
 	Bits* = LONGINT;
 
 	Fingerprint* = HUGEINT;
 
-	SectionType = WORD;
-
-	SegmentedName*= ARRAY SegmentedNameLength OF StringPool.Index;
+	SegmentedName*= ARRAY 8 OF StringPool.Index;
 	SectionName* = ARRAY 128 OF CHAR;
 
 	(* FixupPattern = size (+|-) bits {size (+|-) bits}
@@ -90,7 +86,7 @@ TYPE
 	Aliases*= POINTER TO ARRAY OF Alias;
 
 	Section* = RECORD
-		type*: SectionType;
+		type*: WORD;
 		identifier*: Identifier;
 		unit*: Bits;
 		fixed*: BOOLEAN;
@@ -102,19 +98,19 @@ TYPE
 		bits*: BitSets.BitSet;
 	END;
 
-	PoolMapItem= RECORD key, value: LONGINT END;
-	PoolMapArray*=POINTER TO ARRAY OF PoolMapItem;
+	PoolMap* = OBJECT
+	TYPE
+		Table = POINTER TO ARRAY OF RECORD key, value: LONGINT END;
 
-	PoolMap*=OBJECT
 	VAR
-		table: PoolMapArray;
-		size: LONGINT;
+		table: Table;
+		size: SIZE;
 		used: LONGINT;
 		maxLoadFactor: REAL;
 		writer: Streams.Writer;
 		(* Interface *)
 
-		PROCEDURE & Init* (initialSize: LONGINT);
+		PROCEDURE & Init* (initialSize: SIZE);
 		BEGIN
 			ASSERT(initialSize > 2);
 			NEW(table, initialSize);
@@ -126,7 +122,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Put(key, value: LONGINT);
-		VAR hash: LONGINT;
+		VAR hash: SIZE;
 		BEGIN
 			ASSERT(used < size);
 			ASSERT(key >= 0);
@@ -158,11 +154,13 @@ TYPE
 
 		PROCEDURE Clear*;
 		VAR i: SIZE;
-		BEGIN FOR i := 0 TO size - 1 DO table[i].key := -1; END; END Clear;
+		BEGIN
+			FOR i := 0 TO size - 1 DO table[i].key := -1; END;
+		END Clear;
 
 		(* only correctly working, if NIL key cannot be entered *)
-		PROCEDURE HashValue(key: LONGINT):LONGINT;
-		VAR value, h, i: LONGINT;
+		PROCEDURE HashValue(key: LONGINT): SIZE;
+		VAR value, h, i: SIZE;
 		BEGIN
 			value := key;
 			i := 0;
@@ -176,7 +174,7 @@ TYPE
 		END HashValue;
 
 		PROCEDURE Grow;
-		VAR oldTable: PoolMapArray; oldSize, key: LONGINT; i: SIZE;
+		VAR oldTable: Table; key: LONGINT; oldSize, i: SIZE;
 		BEGIN
 			oldSize := size;
 			oldTable := table;
@@ -191,7 +189,7 @@ TYPE
 
 		(** read map and produce Local --> Global **)
 		PROCEDURE Read*(reader: Streams.Reader);
-		VAR value,pos: LONGINT; name: SectionName;
+		VAR value, pos: LONGINT; name: SectionName;
 		BEGIN
 			pos := 1;
 			reader.RawString(name);
@@ -256,7 +254,7 @@ VAR
 
 	statSections, statSectionsTotalSize: SIZE;
 
-	PROCEDURE IsCode* (type: SectionType): BOOLEAN;
+	PROCEDURE IsCode* (type: WORD): BOOLEAN;
 	BEGIN RETURN (type IN {EntryCode .. Code})
 	END IsCode;
 
