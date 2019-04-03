@@ -104,7 +104,7 @@ TYPE
 			received := pos; (* this effects that Streams.Reader.Pos() returns the correct location in the file *)
 		END SetPos;
 
-		PROCEDURE &InitFileReader*(file : File; pos: LONGINT);
+		PROCEDURE &InitFileReader*(file : File; pos: Position);
 		BEGIN
 			ASSERT(file # NIL);
 			SELF.file := file;
@@ -148,7 +148,7 @@ TYPE
 			RETURN file.Pos(r)
 		END Pos;
 
-		PROCEDURE &InitFileWriter*(file: File; pos: LONGINT);
+		PROCEDURE &InitFileWriter*(file: File; pos: Position);
 		BEGIN
 			ASSERT(file # NIL);
 			SELF.file := file;
@@ -386,12 +386,12 @@ TYPE
 
 		(** Position a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file. A Rider cannot be positioned beyond the end of a file. *)
 
-		PROCEDURE Set*(VAR r: Rider; pos: LONGINT);
+		PROCEDURE Set*(VAR r: Rider; pos: Position);
 		BEGIN HALT(301) END Set;	(* abstract *)
 
 		(** Return the offset of a Rider positioned on a file. *)
 
-		PROCEDURE Pos*(VAR r: Rider): LONGINT;
+		PROCEDURE Pos*(VAR r: Rider): Position;
 		BEGIN HALT(301) END Pos;	(* abstract *)
 
 		(** Read a byte from a file, advancing the Rider one byte further.  R.eof indicates if the end of the file has been passed. *)
@@ -570,7 +570,7 @@ VAR
 
 (** Open a reader on a file at the specified position. *)
 
-PROCEDURE OpenReader*(VAR b: Reader; f: File; pos: LONGINT);
+PROCEDURE OpenReader*(VAR b: Reader; f: File; pos: Position);
 BEGIN
 	IF b = NIL THEN
 		NEW(b, f, pos)
@@ -581,7 +581,7 @@ END OpenReader;
 
 (** Open a writer on a file at the specified position.  Remember to call Streams.Update before registering or closing the file! *)
 
-PROCEDURE OpenWriter*(VAR b: Writer; f: File; pos: LONGINT);
+PROCEDURE OpenWriter*(VAR b: Writer; f: File; pos: Position);
 BEGIN
 	NEW(b, f, pos)
 END OpenWriter;
