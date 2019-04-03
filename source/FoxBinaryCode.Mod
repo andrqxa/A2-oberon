@@ -37,7 +37,7 @@ TYPE
 
 	AliasList*=OBJECT
 	VAR
-		firstAlias-, lastAlias-: Alias; aliases-: LONGINT;
+		firstAlias-, lastAlias-: Alias; aliases-: SIZE;
 
 		PROCEDURE &InitAliasList*;
 		BEGIN
@@ -84,7 +84,7 @@ TYPE
 		symbolOffset-: LONGINT; (* offset in intermediate section, must be patched (resolved and added to displacement) to destination section displacement *)
 		resolved*: Sections.Section; (* cache ! *)
 
-		PROCEDURE & InitFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset: LONGINT; displacement: Unit; scale: LONGINT; fixupPattern: ObjectFile.FixupPatterns);
+		PROCEDURE & InitFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset: LONGINT; displacement: Unit; scale: Bits; fixupPattern: ObjectFile.FixupPatterns);
 		BEGIN
 			ASSERT((mode = Relative) OR (mode = Absolute));
 			ASSERT(symbol.name # "");
@@ -119,7 +119,7 @@ TYPE
 		END SetSymbol;
 
 		PROCEDURE Dump*(w: Streams.Writer);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			Basic.WriteSegmentedName(w, symbol.name);
 			IF symbol.fingerprint # 0 THEN w.String("["); w.Hex(symbol.fingerprint,0); w.String("]") END;
@@ -148,7 +148,7 @@ TYPE
 
 	FixupList*=OBJECT
 	VAR
-		firstFixup-, lastFixup-: Fixup; fixups-: LONGINT;
+		firstFixup-, lastFixup-: Fixup; fixups-: SIZE;
 
 		PROCEDURE &InitFixupList*;
 		BEGIN
@@ -265,11 +265,11 @@ TYPE
 		BEGIN finally := atPC
 		END SetFinally;
 
-		PROCEDURE SetAlignment*(fixed: BOOLEAN; alignat: LONGINT);
+		PROCEDURE SetAlignment*(fixed: BOOLEAN; alignat: Unit);
 		BEGIN os.alignment := alignat; SELF.os.fixed := fixed;
 		END SetAlignment;
 
-		PROCEDURE CheckSize(size: LONGINT);
+		PROCEDURE CheckSize(size: SIZE);
 		BEGIN
 			IF os.bits.GetSize()  < size + pc*os.unit THEN os.bits.Resize(size + pc*os.unit) END;
 			ASSERT(os.bits.GetSize() MOD os.unit = 0);
@@ -531,7 +531,7 @@ TYPE
 		PROCEDURE DumpCode*(w: Streams.Writer; from,to: Unit);
 		VAR i: Unit; c: Sections.Comment; nextpos: Unit;
 
-			PROCEDURE Hex(i: LONGINT): CHAR;
+			PROCEDURE Hex(i: WORD): CHAR;
 			BEGIN
 				ASSERT(i>=0);
 				ASSERT(i<16);
@@ -713,13 +713,13 @@ TYPE
 		RETURN result
 	END ConvertToLongreal;
 
-	PROCEDURE NewFixup*(mode: WORD; fixupOffset: LONGINT; symbol: ObjectFile.Identifier; symbolOffset,displacement: LONGINT; scale: LONGINT; fixupPattern: ObjectFile.FixupPatterns): Fixup;
+	PROCEDURE NewFixup*(mode: WORD; fixupOffset: LONGINT; symbol: ObjectFile.Identifier; symbolOffset,displacement: LONGINT; scale: Bits; fixupPattern: ObjectFile.FixupPatterns): Fixup;
 	VAR fixup: Fixup;
 	BEGIN
 		NEW(fixup,mode,fixupOffset,symbol,symbolOffset,displacement,scale,fixupPattern); RETURN fixup
 	END NewFixup;
 
-	PROCEDURE NewBinarySection*(type: WORD; unit: LONGINT; CONST name: Basic.SegmentedName; dump: BOOLEAN; bigEndian: BOOLEAN): Section;
+	PROCEDURE NewBinarySection*(type: WORD; unit: Bits; CONST name: Basic.SegmentedName; dump: BOOLEAN; bigEndian: BOOLEAN): Section;
 	VAR binarySection: Section;
 	BEGIN
 		NEW(binarySection,type,unit,name,dump,bigEndian); RETURN binarySection
