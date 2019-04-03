@@ -2236,7 +2236,7 @@ TYPE
 				ntilePartsAvailable : J2KU.LongIntArrayPtr;	(* The number of tile-parts for each tile as signalled in by a TNSot parameter of a SOT segment of at least one tile-part *)
 				curTile : LONGINT;			(* The index of the current tile for which data is being read *)
 				curPart : LONGINT;			(* The index of the current tile-part of curTile for which data is being read *)
-				partRem : LONGINT;			(* Number of bytes remaining in the current tile-part *)
+				partRem : SIZE;			(* Number of bytes remaining in the current tile-part *)
 				initError : BOOLEAN;		(* TRUE if an error occured during initialization *)
 				pktDec : PacketDecoder;		(* The packet decoder used to extract encoded code-block data *)
 				cblkBuf : POINTER TO ARRAY OF J2KU.CodedCblk;		(* Buffer for coded code-blocks obtained from the packed decoder *)

@@ -182,7 +182,7 @@ MODULE SSHClient; 	(** AUTHOR "G.F.";  PURPOSE "Secure Shell"; *)
 			END UpdateAll;
 
 
-			PROCEDURE WriteChars( CONST buf: ARRAY OF CHAR; n: LONGINT);
+			PROCEDURE WriteChars( CONST buf: ARRAY OF CHAR; n: SIZE);
 			VAR prev, l: Line; i, ofs: LONGINT; wrap: BOOLEAN;
 			BEGIN {EXCLUSIVE}
 				wrap := FALSE;
@@ -630,7 +630,7 @@ Out.Ln;
 
 
 			PROCEDURE Consume( ch: CHAR );
-			VAR buf: ARRAY 256 OF CHAR; i, n: LONGINT;
+			VAR buf: ARRAY 256 OF CHAR; i, n: SIZE;
 			BEGIN
 				CASE ch OF
 				|  0X: (* NUL *)

@@ -51,14 +51,14 @@ TYPE
 		END Stop;
 
 		PROCEDURE Read(VAR ch: CHAR): BOOLEAN;
-		VAR n: LONGINT; milliTimer : Kernel.MilliTimer;
+		VAR available: SIZE; milliTimer : Kernel.MilliTimer;
 		BEGIN
 			Kernel.SetTimer(milliTimer, timeout);
 			REPEAT
-				n := R.Available();
-				IF DoYield & (n = 0) THEN Objects.Yield; END;
-			UNTIL (n > 0) OR Kernel.Expired(milliTimer);
-			IF n = 0 THEN
+				available := R.Available();
+				IF DoYield & (available = 0) THEN Objects.Yield; END;
+			UNTIL (available > 0) OR Kernel.Expired(milliTimer);
+			IF available = 0 THEN
 				error := "timeout"; ch := 0X; RETURN FALSE
 			END;
 			R.Char(ch); RETURN R.res = Streams.Ok

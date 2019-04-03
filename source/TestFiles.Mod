@@ -318,7 +318,7 @@ TYPE
 				ELSIF (variable = "File.Pos()") & CheckOpen(error) THEN
 					CheckInteger(variable, file.Pos(rider), r, error, parseError);
 				ELSIF (variable = "Reader.Available()") & CheckOpen(error) THEN
-					CheckInteger(variable, reader.Available(), r, error, parseError);
+					CheckInteger(variable, TODO(reader.Available()), r, error, parseError);
 				ELSIF (variable = "Reader.Pos()") & CheckOpen(error) THEN
 					CheckInteger(variable, reader.Pos(), r, error, parseError);
 				ELSE

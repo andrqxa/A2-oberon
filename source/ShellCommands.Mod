@@ -107,7 +107,7 @@ TYPE
 	END Command;
 
 PROCEDURE GetPar(par: ANY; VAR p: CmdParameters; VAR w: Streams.Writer);
-VAR arg : Streams.StringReader; len : LONGINT;
+VAR arg : Streams.StringReader; len : SIZE; length: TODO;
 BEGIN
 	p := NIL; w := NIL;
 	IF (par # NIL) & (par IS Commands.Context) & (par(Commands.Context).arg IS Streams.StringReader) THEN
@@ -115,7 +115,7 @@ BEGIN
 		len := arg.Available();
 		IF (len > 0) THEN
 			NEW(p, len);
-			arg.Bytes(p^, 0, len, len);
+			arg.Bytes(p^, 0, len, length);
 			w := par(Commands.Context).out;
 		END;
 	END

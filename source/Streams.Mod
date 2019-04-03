@@ -485,7 +485,7 @@ TYPE
 		END SetPos;
 
 	(** Return bytes currently available in input buffer. *)
-		PROCEDURE Available*( ): LONGINT;
+		PROCEDURE Available*( ): SIZE;
 		VAR n: LONGINT;
 		BEGIN
 			IF (res = Ok) THEN

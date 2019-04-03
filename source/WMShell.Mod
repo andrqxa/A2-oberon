@@ -160,7 +160,7 @@ TYPE
 		END DeleteNCharacters;
 
 		PROCEDURE ReceiveCharacters;
-		VAR ch : CHAR; buffer : ARRAY ReceiveBufferSize OF CHAR; backspaces, i, size, len : LONGINT;
+		VAR ch : CHAR; buffer : ARRAY ReceiveBufferSize OF CHAR; i, size: SIZE; backspaces, len : TODO;
 		BEGIN
 			(* Receive at least one character *)
 			size := in.Available();
