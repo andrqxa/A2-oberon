@@ -491,9 +491,7 @@ TYPE
 
 			PROCEDURE PatchPattern (CONST pattern: ObjectFile.FixupPattern);
 			BEGIN
-				IF pattern.offset # MIN(SHORTINT) THEN
-					os.bits.SetBits(fixup.offset*os.unit+pattern.offset,pattern.bits,address);
-				END;
+				os.bits.SetBits(fixup.offset*os.unit+pattern.offset,pattern.bits,address);
 				address := ASH (address, -pattern.bits);
 			END PatchPattern;
 
@@ -728,47 +726,3 @@ TYPE
 END FoxBinaryCode.
 
 FoxBinaryCode.TestFixup
-	(*
-	PROCEDURE TestFixup*;
-	VAR data1,data2: Section; i: LONGINT; fixup: Fixup; fixupFormat: FixupFormat;
-		PROCEDURE DumpBits(ch: CHAR);
-		VAR v: LONGINT; s: ARRAY 9 OF CHAR; i: LONGINT;
-		BEGIN
-			v := ORD(ch);
-			FOR i := 7 TO 0 BY -1 DO
-				IF ODD(v) THEN s[i]:='1' ELSE s[i] := '0' END;
-				v := ASH(v,-1);
-			END;
-			s[8] := 0X;
-			D.String(s);
-		END DumpBits;
-
-	BEGIN
-		NEW(data1,Sections.CodeSection,8,"test",NIL,FALSE,TRUE);
-		NEW(data2,Sections.CodeSection,8,"test",NIL,FALSE,TRUE);
-		FOR i := 0 TO 100 DO
-			data1.PutByte(170);
-			data2.PutByte(85);
-		END;
-		FOR i := 15 TO 20 DO DumpBits(data1.data[i]); END; D.Ln;
-		FOR i := 15 TO 20 DO DumpBits(data2.data[i]); END;D.Ln;
-
-		NEW(fixupFormat,3);
-		fixupFormat[0].offset := 0;
-		fixupFormat[0].bits := 12;
-		fixupFormat[1].offset := MIN(SHORTINT);
-		fixupFormat[1].bits := 8;
-		fixupFormat[2].offset := 20;
-		fixupFormat[2].bits := 12;
-
-		NEW(fixup,Absolute,16,NIL,0,0,0,fixupFormat);
-		data1.ApplyFixup(fixup,3F7DEEDH);
-		data2.ApplyFixup(fixup,3F7DEEDH);
-		FOR i := 15 TO 20 DO DumpBits(data1.data[i]); END; D.Ln;
-		FOR i := 15 TO 20 DO DumpBits(data2.data[i]); END;D.Ln;		D.Ln;
-		D.Update;
-
-		data1.Dump(D.Log); D.Ln;
-		data2.Dump(D.Log); D.Ln;
-	END TestFixup;
-	*)
