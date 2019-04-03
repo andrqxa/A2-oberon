@@ -318,7 +318,7 @@ BEGIN
 	END;
 END ShowEvent;
 
-PROCEDURE ShowErrorCode(errorcode : LONGINT);
+PROCEDURE ShowErrorCode(errorcode : WORD);
 BEGIN
 	CASE errorcode OF
 		00H: KernelLog.String("OK");

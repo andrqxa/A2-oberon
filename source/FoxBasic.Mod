@@ -52,7 +52,7 @@ TYPE
 		reader*: Streams.Reader;
 	END;
 
-	ErrorCode*=LONGINT;
+	ErrorCode* = WORD;
 
 	Fingerprint* = ObjectFile.Fingerprint;
 
