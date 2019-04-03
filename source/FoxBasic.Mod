@@ -827,7 +827,7 @@ TYPE
 	DiagnosticsFactory*=PROCEDURE{DELEGATE} (w: Streams.Writer): Diagnostics.Diagnostics;
 
 VAR
-	lists-: LONGINT;  enlarged-: LONGINT;  strings-: LONGINT; integerObjects: HashTableInt;
+	lists-: SIZE;  enlarged-: SIZE;  strings-: SIZE; integerObjects: HashTableInt;
 	errMsg: ErrorMsgs;	(*error messages*)
 	emptyString-: String;
 	debug: BOOLEAN;
@@ -862,7 +862,7 @@ VAR
 		*)
 	END StringEqual;
 
-	PROCEDURE GetErrorMessage*(err: LONGINT; CONST msg: ARRAY OF CHAR; VAR res: ARRAY OF CHAR);
+	PROCEDURE GetErrorMessage*(err: ErrorCode; CONST msg: ARRAY OF CHAR; VAR res: ARRAY OF CHAR);
 	VAR str: ARRAY 128 OF CHAR;
 	BEGIN
 		res := "";
@@ -972,14 +972,14 @@ VAR
 
 	(** SetErrorMsg - Set message for error n *)
 
-	PROCEDURE SetErrorMessage*(n: LONGINT; CONST  msg: ARRAY OF CHAR);
+	PROCEDURE SetErrorMessage*(n: ErrorCode; CONST  msg: ARRAY OF CHAR);
 	BEGIN
 		IF errMsg = NIL THEN NEW(errMsg, InitErrMsgSize) END;
 		WHILE LEN(errMsg^) < n DO Expand(errMsg) END;
 		StringPool.GetIndex(msg, errMsg[n])
 	END SetErrorMessage;
 
-	PROCEDURE SetErrorExpected*(n: LONGINT; CONST msg: ARRAY OF CHAR);
+	PROCEDURE SetErrorExpected*(n: ErrorCode; CONST msg: ARRAY OF CHAR);
 	VAR err: ARRAY 256 OF CHAR;
 	BEGIN
 		err := "missing '";
@@ -996,7 +996,7 @@ VAR
 	END AppendNumber;
 
 	PROCEDURE InitSegmentedName*(VAR name: SegmentedName);
-	VAR i: LONGINT;
+	VAR i: SIZE;
 	BEGIN FOR i := 0 TO LEN(name)-1 DO name[i] := -1 END;
 	END InitSegmentedName;
 
@@ -1018,7 +1018,7 @@ VAR
 	END WriteSegmentedName;
 
 	PROCEDURE AppendToSegmentedName*(VAR name: SegmentedName; CONST this: ARRAY OF CHAR);
-	VAR i,j: LONGINT; string: ObjectFile.SectionName;
+	VAR i,j: SIZE; string: ObjectFile.SectionName;
 	BEGIN
 		i := 0;
 		WHILE (i<LEN(name)) & (name[i] >= 0)  DO
@@ -1042,7 +1042,7 @@ VAR
 
 	(* suffix using separation character "." *)
 	PROCEDURE SuffixSegmentedName*(VAR name: SegmentedName; this: StringPool.Index);
-	VAR string, suffix: ObjectFile.SectionName; i: LONGINT;
+	VAR string, suffix: ObjectFile.SectionName; i: SIZE;
 	BEGIN
 		i := 0;
 		WHILE (i < LEN(name)) & (name[i] >= 0) DO
@@ -1061,7 +1061,7 @@ VAR
 	END SuffixSegmentedName;
 
 	PROCEDURE SegmentedNameEndsWith*(CONST name: SegmentedName; CONST this: ARRAY OF CHAR): BOOLEAN;
-	VAR string: ObjectFile.SectionName; i: LONGINT;
+	VAR string: ObjectFile.SectionName; i: SIZE;
 	BEGIN
 		i := 0;
 		WHILE (i< LEN(name)) & (name[i] >= 0) DO
@@ -1077,7 +1077,7 @@ VAR
 	END SegmentedNameEndsWith;
 
 	PROCEDURE RemoveSuffix*(VAR name: SegmentedName);
-	VAR i,pos,pos0: LONGINT;string: ObjectFile.SectionName;
+	VAR i,pos,pos0: SIZE; string: ObjectFile.SectionName;
 	BEGIN
 		i := 0;
 		WHILE  (i< LEN(name)) & (name[i] >= 0) DO
@@ -1103,7 +1103,7 @@ VAR
 	END RemoveSuffix;
 
 	PROCEDURE GetSuffix*(CONST name: SegmentedName; VAR string: ARRAY OF CHAR);
-	VAR i,pos,pos0: LONGINT;
+	VAR i,pos,pos0: SIZE;
 	BEGIN
 		i := 0;
 		WHILE  (i< LEN(name)) & (name[i] >= 0) DO
@@ -1129,7 +1129,7 @@ VAR
 	END GetSuffix;
 
 	PROCEDURE IsPrefix*(CONST prefix, of: SegmentedName): BOOLEAN;
-	VAR prefixS, ofS: SectionName; i: LONGINT;
+	VAR prefixS, ofS: SectionName; i: SIZE;
 	BEGIN
 		i := 0;
 		WHILE (i< LEN(prefix)) & (prefix[i] = of[i]) DO INC(i) END;
@@ -1149,7 +1149,7 @@ VAR
 
 	PROCEDURE Expand(VAR oldAry: ErrorMsgs);
 	VAR
-		len, i: LONGINT;
+		len, i: SIZE;
 		newAry: ErrorMsgs;
 	BEGIN
 		IF oldAry = NIL THEN RETURN END;
@@ -1162,7 +1162,7 @@ VAR
 	END Expand;
 
 	PROCEDURE Concat*(VAR result: ARRAY OF CHAR; CONST prefix, name, suffix: ARRAY OF CHAR);
-	VAR i, j: LONGINT;
+	VAR i, j: SIZE;
 	BEGIN
 		i := 0; WHILE prefix[i] # 0X DO  result[i] := prefix[i];  INC(i)  END;
 		j := 0; WHILE name[j] # 0X DO  result[i+j] := name[j];  INC(j)  END;
@@ -1172,7 +1172,7 @@ VAR
 	END Concat;
 
 	PROCEDURE Lowercase*(CONST name: ARRAY OF CHAR; VAR result: ARRAY OF CHAR);
-	VAR ch: CHAR; i: LONGINT;
+	VAR ch: CHAR; i: SIZE;
 	BEGIN
 		i := 0;
 		REPEAT
@@ -1185,7 +1185,7 @@ VAR
 	END Lowercase;
 
 	PROCEDURE Uppercase*(CONST name: ARRAY OF CHAR; VAR result: ARRAY OF CHAR);
-	VAR ch: CHAR; i: LONGINT;
+	VAR ch: CHAR; i: SIZE;
 	BEGIN
 		i := 0;
 		REPEAT
@@ -1242,15 +1242,6 @@ VAR
 	BEGIN
 		debug := TRUE;
 	END ActivateDebug;
-
-	PROCEDURE Test*;
-	VAR table: HashTableInt; dump: LONGINT;
-	BEGIN
-		NEW(table, 32);
-		table.PutInt(32, -4);
-		dump := table.GetInt(32);
-		HALT(100);
-	END Test;
 
 	PROCEDURE GetFileReader*(CONST filename: ARRAY OF CHAR): Streams.Reader;
 	VAR
@@ -1381,7 +1372,7 @@ VAR
 		Scanner based on Peek() feature of stream. Necessary to make it restartable.
 	*)
 	PROCEDURE GetStringParameter*(r: Streams.Reader; VAR string: ARRAY OF CHAR): BOOLEAN;
-	VAR ch: CHAR; i: LONGINT; done,error: BOOLEAN;
+	VAR ch: CHAR; i: SIZE; done,error: BOOLEAN;
 
 		PROCEDURE Next;
 		BEGIN r.Char(ch); ch := r.Peek();
