@@ -876,7 +876,7 @@ VAR
 	END GetErrorMessage;
 
 	PROCEDURE AppendDetailedErrorMessage*(VAR message: ARRAY OF CHAR; pos: Position; reader: Streams.Reader);
-    VAR err: ARRAY 512 OF CHAR; ch: CHAR; oldpos: LONGINT;
+    VAR err: ARRAY 512 OF CHAR; ch: CHAR; oldpos: Streams.Position;
     BEGIN
         IF (reader # NIL) & (reader.CanSetPos()) THEN
             oldpos := reader.Pos();

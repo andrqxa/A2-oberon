@@ -973,7 +973,7 @@ VAR options: Options.Options;
 	use: SET;
 	exportString: ARRAY 1024*2 OF CHAR;
 	parsed: BOOLEAN;
-	position: LONGINT;
+	position: Streams.Position;
 	name: ARRAY 32 OF CHAR;
 	reader: Streams.Reader;
 	moduleList: GenericLinker.HashTableSegmentedName;

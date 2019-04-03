@@ -300,7 +300,7 @@ TYPE
 		PROCEDURE Parse(reader : Streams.Reader;  VAR res : WORD);
 		VAR buffer : Strings.Buffer; entry : Entry; ch : CHAR;
 
-			PROCEDURE ReportError(CONST msg : ARRAY OF CHAR; position : LONGINT);
+			PROCEDURE ReportError(CONST msg : ARRAY OF CHAR; position : Streams.Position);
 			BEGIN
 				KernelLog.String("Repositories.Dictionary.Parse: Error: "); KernelLog.String(msg);
 				KernelLog.String(" at position "); KernelLog.Int(position, 0); KernelLog.Ln;

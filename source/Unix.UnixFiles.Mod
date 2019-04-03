@@ -578,7 +578,7 @@ TYPE
 				END Flush;
 
 
-				PROCEDURE Set*( VAR r: Files.Rider;  pos: LONGINT );
+				PROCEDURE Set*( VAR r: Files.Rider;  pos: Files.Position );
 				BEGIN {EXCLUSIVE}
 					SetX( r, pos )
 				END Set;
@@ -633,7 +633,7 @@ TYPE
 				END SetX;
 
 
-				PROCEDURE Pos*( VAR r: Files.Rider ): LONGINT;
+				PROCEDURE Pos*( VAR r: Files.Rider ): Files.Position;
 				BEGIN
 					RETURN r.apos + r.bpos
 				END Pos;

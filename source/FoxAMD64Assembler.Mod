@@ -1187,7 +1187,7 @@ TYPE
 			absoluteOffset: HUGEINT;
 			orgOffset: HUGEINT;
 			char: CHAR;
-			orgReaderPos: LONGINT;
+			orgReaderPos: Streams.Position;
 			orgCodePos: LONGINT;
 			prevSourceName: Basic.FileName;
 			position: Basic.Position;

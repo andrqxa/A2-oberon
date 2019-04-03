@@ -1010,7 +1010,7 @@ TYPE
 
 	Context*=RECORD
 		position: Position;
-		readerPosition : LONGINT;
+		readerPosition : Streams.Position;
 		ch: CHAR;
 	END;
 

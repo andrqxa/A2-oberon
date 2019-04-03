@@ -295,11 +295,11 @@ TYPE
 		nofFiles- : LONGINT;
 		nofSources- : LONGINT;
 
-		position- : LONGINT;
+		position- : Files.Position;
 
 		next : Package;
 
-		PROCEDURE &Init(CONST name, archive, source, description  : ARRAY OF CHAR; position : LONGINT);
+		PROCEDURE &Init(CONST name, archive, source, description  : ARRAY OF CHAR; position : Files.Position);
 		BEGIN
 			COPY(name, SELF.name);
 			COPY(archive, SELF.archive);
@@ -429,7 +429,7 @@ TYPE
 		release- : Expression;
 		flags-: SET;
 		file : Files.File;
-		pos : LONGINT; (* Position in package description file *)
+		pos : Files.Position; (* Position in package description file *)
 
 		builds : Builds;
 
@@ -569,7 +569,7 @@ TYPE
 
 		include : Set;
 
-		position- : LONGINT;
+		position- : Files.Position;
 
 		PROCEDURE &Init;
 		VAR i : LONGINT;
@@ -970,9 +970,9 @@ TYPE
 			END;
 		END GenerateZipFiles;
 
-		PROCEDURE FindPosition*(CONST filename : ARRAY OF CHAR; diagnostics : Diagnostics.DiagnosticsList) : LONGINT;
+		PROCEDURE FindPosition*(CONST filename : ARRAY OF CHAR; diagnostics : Diagnostics.DiagnosticsList) : Streams.Position;
 		VAR
-			file, ref : File; position : LONGINT; pre, suf : ARRAY 32 OF CHAR;
+			file, ref : File; position : Files.Position; pre, suf : ARRAY 32 OF CHAR;
 			importOk : ARRAY MaxNofImports OF BOOLEAN; i : LONGINT;
 
 			PROCEDURE Done() : BOOLEAN;
@@ -1725,7 +1725,7 @@ TYPE
 			RETURN ~error;
 		END AddBuild;
 
-		PROCEDURE AddFile(CONST filename : ARRAY OF CHAR; release : Expression; package : Package;  pos : LONGINT);
+		PROCEDURE AddFile(CONST filename : ARRAY OF CHAR; release : Expression; package : Package;  pos : Files.Position);
 		VAR file, f : File; pre, suf : Files.FileName;
 		BEGIN
 			ASSERT(package # NIL);
@@ -1858,10 +1858,10 @@ TYPE
 		peekToken : ARRAY 256 OF CHAR;
 		peekError : BOOLEAN;
 
-		pos : LONGINT;
+		pos : Streams.Position;
 		name : ARRAY 256 OF CHAR;
 
-		PROCEDURE Error(pos : LONGINT; CONST msg, par1, par2 : ARRAY OF CHAR);
+		PROCEDURE Error(pos : Streams.Position; CONST msg, par1, par2 : ARRAY OF CHAR);
 		VAR message : ARRAY 128 OF CHAR;
 		BEGIN
 			error := TRUE;
@@ -2003,7 +2003,7 @@ TYPE
 
 		currentPackage : Package;
 
-		PROCEDURE Error(pos : LONGINT; CONST msg, par1, par2 : ARRAY OF CHAR);
+		PROCEDURE Error(pos : Streams.Position; CONST msg, par1, par2 : ARRAY OF CHAR);
 		VAR message : ARRAY 128 OF CHAR;
 		BEGIN
 			error := TRUE;
@@ -2011,7 +2011,7 @@ TYPE
 			diagnostics.Error(scanner.source, pos, message);
 		END Error;
 
-		PROCEDURE Warning(pos : LONGINT; CONST msg, par1, par2 : ARRAY OF CHAR);
+		PROCEDURE Warning(pos : Streams.Position; CONST msg, par1, par2 : ARRAY OF CHAR);
 		VAR message : ARRAY 128 OF CHAR;
 		BEGIN
 			MakeMessage(message, msg, par1, par2);
@@ -2305,7 +2305,7 @@ TYPE
 
 		(* PackageHeader = PACKAGE PackageName ARCHIVE ArchiveName SOURCE SourceArchiveName DESCRIPTION description *)
 		PROCEDURE ParsePackageHeader() : Package;
-		VAR package : Package; name, archive, source  : ARRAY 32 OF CHAR; description : ARRAY 256 OF CHAR; position : LONGINT;
+		VAR package : Package; name, archive, source  : ARRAY 32 OF CHAR; description : ARRAY 256 OF CHAR; position : Streams.Position;
 		BEGIN
 			package := NIL;
 			IF scanner.Check(PACKAGE) THEN
@@ -2536,12 +2536,12 @@ PROCEDURE GetModuleInfo(
 					in : Streams.Reader;
 					VAR mi : ModuleInfo;
 					CONST source, filename : ARRAY OF CHAR;
-					errorPosition : LONGINT;
+					errorPosition : Streams.Position;
 					diagnostics : Diagnostics.Diagnostics;
 					VAR error : BOOLEAN);
 
 	PROCEDURE SkipComments(in : Streams.Reader);
-	VAR level, oldLevel, oldPosition : LONGINT; ch, nextCh : CHAR;
+	VAR level, oldLevel: LONGINT; oldPosition: Streams.Position; ch, nextCh : CHAR;
 	BEGIN
 		ASSERT((in # NIL) & (in.CanSetPos()));
 		level := 0;
@@ -3061,7 +3061,7 @@ VAR
 	builds : Builds; build : BuildObj;
 	buildFile, filename : Files.FileName; buildName : Name;
 	diagnostics : Diagnostics.DiagnosticsList;
-	position : LONGINT;
+	position : Streams.Position;
 	options : Options.Options;
 BEGIN
 	NEW(options);

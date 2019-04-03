@@ -248,7 +248,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END MakeStatistics;
 
 			PROCEDURE ExportModule (module: Sections.Module): BOOLEAN;
-			VAR result: BOOLEAN; pos: LONGINT;
+			VAR result: BOOLEAN; pos: Streams.Position;
 				offers, requires: ObjectFile.NameList;
 				numImports: LONGINT;
 				name: ObjectFile.SectionName;

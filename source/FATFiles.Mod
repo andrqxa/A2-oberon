@@ -639,7 +639,7 @@ TYPE
 
 		(* Position a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file.
 			A Rider cannot be positioned beyond the end of a file. *)
-		PROCEDURE Set*(VAR r: Files.Rider; pos: LONGINT);
+		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
 		BEGIN {EXCLUSIVE} SetX(r, pos)
 		END Set;
 
@@ -659,7 +659,7 @@ TYPE
 		END SetX;
 
 		(* Return the offset of a Rider positioned on a file. *)
-		PROCEDURE Pos*(VAR r: Files.Rider): LONGINT;
+		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
 		BEGIN RETURN r.apos*clusterSize + r.bpos
 		END Pos;
 

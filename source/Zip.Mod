@@ -172,7 +172,7 @@ PROCEDURE ReadEntry(VAR r: Files.Rider): Entry;
 VAR
 	ent: Entry;
 	intDummy, nameLen, extraLen, commentLen: INTEGER;
-	longDummy: LONGINT;
+	longDummy: LONGINT; position: Streams.Position;
 BEGIN
 	Files.ReadLInt(r, longDummy);
 	IF longDummy = CentralFileHeaderSignature THEN
@@ -215,11 +215,11 @@ BEGIN
 			r.file.ReadBytes(r, ent.comment^, 0, commentLen)	(* file comment *)
 		END;
 		(* read extra field length in the local file header (can be different from extra field length stored in the file header...) *)
-		longDummy := r.file.Pos(r);	(* store actual position of file reader *)
+		position := r.file.Pos(r);	(* store actual position of file reader *)
 		r.file.Set(r, ent.offsetLocal + 28);	(* set r to position of extra field length in local file header *)
 		Files.ReadInt(r, extraLen);	(* extra field length *)
 		ent.offsetFileData := ent.offsetLocal + 30 + nameLen + extraLen;	(* compute offset of file data *)
-		r.file.Set(r, longDummy);	(* set position of file reader to previous position *)
+		r.file.Set(r, position);	(* set position of file reader to previous position *)
 		IF r.eof THEN	(* if file is a zip-archive, r is not at end of file *)
 			ent := NIL
 		END
@@ -518,7 +518,7 @@ END ExtractEntry;
 	- BadName: src is not based on a valid file **)
 PROCEDURE AddEntry*(arc: Archive; CONST name: ARRAY OF CHAR; VAR src: Files.Rider; len: LONGINT; level, strategy: SHORTINT; VAR res: WORD);
 VAR
-	dst: Files.Rider; ent: Entry; start: LONGINT;
+	dst: Files.Rider; ent: Entry; start: Streams.Position;
 BEGIN
 	IF arc = NIL THEN
 		res := NotZipArchiveError

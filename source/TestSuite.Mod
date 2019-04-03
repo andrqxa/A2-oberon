@@ -74,7 +74,7 @@ TYPE
 		RETURN TRUE;
 	END Process;
 
-	PROCEDURE Handle* (r: Streams.Reader; pos: LONGINT; CONST name: ARRAY OF CHAR; type: TestType): INTEGER;
+	PROCEDURE Handle* (r: Streams.Reader; pos: Streams.Position; CONST name: ARRAY OF CHAR; type: TestType): INTEGER;
 	END Handle;
 
 	PROCEDURE Print* (report: Report);
