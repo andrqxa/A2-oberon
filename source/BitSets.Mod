@@ -7,10 +7,10 @@ CONST Elements = MAX (SET) - MIN (SET) + 1;
 TYPE Data = POINTER TO ARRAY OF SET;
 
 TYPE BitSet* = OBJECT
-	VAR size: LONGINT;
+	VAR size: SIZE;
 	VAR data: Data;
 
-	PROCEDURE & InitBitSet* (size: LONGINT);
+	PROCEDURE & InitBitSet* (size: SIZE);
 	BEGIN SELF.size := size; Resize (size);
 	END InitBitSet;
 
@@ -19,7 +19,7 @@ TYPE BitSet* = OBJECT
 	BEGIN FOR i := 0 TO LEN(data)-1 DO data[i] := {} END;
 	END Zero;
 
-	PROCEDURE Resize* (size: LONGINT);
+	PROCEDURE Resize* (size: SIZE);
 	VAR newData: Data; i: SIZE;
 	BEGIN
 		ASSERT (size >= 0);
@@ -37,7 +37,7 @@ TYPE BitSet* = OBJECT
 	END Resize;
 
 	PROCEDURE GetSize* (): LONGINT;
-	BEGIN RETURN size;
+	BEGIN RETURN TODO (size);
 	END GetSize;
 
 	PROCEDURE SetBit* (pos: SIZE; value: BOOLEAN);
