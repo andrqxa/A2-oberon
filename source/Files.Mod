@@ -29,8 +29,8 @@ CONST
 	InvalidAdr= 2903;			(* Block address outside of volume. Causes HALT *)
 
 	(* File level errors *)
-	VolumeReadOnly* = 2905; 	(** Cannot modify read-only volume *)
-	FsNotFound* = 2906; 		(** File system not found *)
+	VolumeReadOnly* = 2905;	(** Cannot modify read-only volume *)
+	FsNotFound* = 2906;		(** File system not found *)
 	FileAlreadyExists* = 2908;	(** File already exists *)
 	BadFileName* = 2909;		(** Bad file name *)
 	FileNotFound* = 2910;		(** File not found *)
@@ -49,7 +49,7 @@ CONST
 
 	PathDelimiter* = "/";	(** Path delimiter *)
 
-	BufferSize = 32*1024; 	(* Buffersize for file copy operation *)
+	BufferSize = 32*1024;	(* Buffersize for file copy operation *)
 
 	SetSize = MAX (SET) + 1;
 
@@ -590,8 +590,8 @@ END OpenWriter;
 
 (** Split fullname = ( prefix ":" name ) into prefix and name *)
 
-PROCEDURE SplitName*(fullname: ARRAY OF CHAR; VAR prefix, name: ARRAY OF CHAR);
-VAR i, j, len: LONGINT;
+PROCEDURE SplitName*(CONST fullname: ARRAY OF CHAR; VAR prefix, name: ARRAY OF CHAR);
+VAR i, j, len: SIZE;
 BEGIN
 	i := 0; WHILE (fullname[i] # ":") & (fullname[i] # 0X) DO INC(i) END;
 	IF (fullname[i] # ":") OR (i >= LEN(prefix)) THEN
@@ -607,8 +607,8 @@ END SplitName;
 
 (** Join prefix and name to fullname = ( prefix ":" name ) *)
 
-PROCEDURE JoinName*(prefix, name: ARRAY OF CHAR; VAR fullname: ARRAY OF CHAR);
-VAR i, j, len: LONGINT;
+PROCEDURE JoinName*(CONST prefix, name: ARRAY OF CHAR; VAR fullname: ARRAY OF CHAR);
+VAR i, j, len: SIZE;
 BEGIN
 	len := LEN(fullname)-1;
 	i := 0; WHILE (i < len) & (prefix[i] # 0X) DO fullname[i] := prefix[i]; INC(i) END;
@@ -619,8 +619,8 @@ END JoinName;
 
 (** Split a pathname at the last PathDelimiter or ":" into path and filename = ( {path (PathDelimiter|":")} filename ) *)
 
-PROCEDURE SplitPath*(pathname: ARRAY OF CHAR; VAR path, name: ARRAY OF CHAR);
-VAR i,j,len: LONGINT;
+PROCEDURE SplitPath*(CONST pathname: ARRAY OF CHAR; VAR path, name: ARRAY OF CHAR);
+VAR i,j,len: SIZE;
 BEGIN
 	i := 0; j := -1;
 	WHILE pathname[i] # 0X DO
@@ -639,8 +639,8 @@ END SplitPath;
 
 (** Join path and file name = ( path PathDelimiter name ) *)
 
-PROCEDURE JoinPath*(path, name: ARRAY OF CHAR; VAR pathname: ARRAY OF CHAR);
-VAR i,j,len: LONGINT;
+PROCEDURE JoinPath*(CONST path, name: ARRAY OF CHAR; VAR pathname: ARRAY OF CHAR);
+VAR i,j,len: SIZE;
 BEGIN
 	len := LEN(pathname)-1;
 	i := 0; WHILE (i < len) & (path[i] # 0X) DO pathname[i] := path[i]; INC(i) END;
@@ -651,8 +651,8 @@ END JoinPath;
 
 (** Split a filename at the last '.' into name and extension = ( name "." extension ) *)
 
-PROCEDURE SplitExtension*(filename: ARRAY OF CHAR; VAR name, extension: ARRAY OF CHAR);
-VAR i,j,len: LONGINT;
+PROCEDURE SplitExtension*(CONST filename: ARRAY OF CHAR; VAR name, extension: ARRAY OF CHAR);
+VAR i,j,len: SIZE;
 BEGIN
 	i := 0; j := -1;
 	WHILE filename[i] # 0X DO
@@ -672,8 +672,8 @@ END SplitExtension;
 
 (** Join name and extension = ( name "." extension ) *)
 
-PROCEDURE JoinExtension*(name, extension: ARRAY OF CHAR; VAR filename: ARRAY OF CHAR);
-VAR i,j,len: LONGINT;
+PROCEDURE JoinExtension*(CONST name, extension: ARRAY OF CHAR; VAR filename: ARRAY OF CHAR);
+VAR i,j,len: SIZE;
 BEGIN
 	len := LEN(filename)-1;
 	i := 0; WHILE (i < len) & (name[i] # 0X) DO filename[i] := name[i]; INC(i) END;
@@ -686,7 +686,7 @@ END JoinExtension;
 (** Append the path delimiter to path if path does not contain one *)
 
 PROCEDURE ForceTrailingDelimiter*(VAR path: ARRAY OF CHAR);
-VAR i: LONGINT;
+VAR i: SIZE;
 BEGIN
 	i := 0; WHILE path[i] # 0X DO INC(i) END;
 	IF (i = 0) OR (path[i-1] # PathDelimiter) THEN
@@ -707,7 +707,7 @@ END WriteFS;
 
 (** Add file system at end of list, with specified prefix, which must be unique. *)
 
-PROCEDURE Add*(fs: FileSystem; prefix: ARRAY OF CHAR);
+PROCEDURE Add*(fs: FileSystem; CONST prefix: ARRAY OF CHAR);
 VAR p, c: FileSystem;
 BEGIN {EXCLUSIVE}
 	IF Trace THEN
@@ -777,7 +777,7 @@ END Remove;
 
 (* Find the file system with specified prefix. *)
 
-PROCEDURE FindFS(prefix: ARRAY OF CHAR): FileSystem;
+PROCEDURE FindFS(CONST prefix: ARRAY OF CHAR): FileSystem;
 VAR fs: FileSystem;
 BEGIN
 	fs := fsroot; WHILE (fs # NIL) & (fs.prefix # prefix) DO fs := fs.next END;
@@ -786,7 +786,7 @@ END FindFS;
 
 (** Find file system with specified prefix. *)
 
-PROCEDURE This*(prefix: ARRAY OF CHAR): FileSystem;
+PROCEDURE This*(CONST prefix: ARRAY OF CHAR): FileSystem;
 BEGIN {EXCLUSIVE}
 	RETURN FindFS(prefix)
 END This;
@@ -794,7 +794,7 @@ END This;
 (** Get a list of file systems. *)
 
 PROCEDURE GetList*(VAR list: FileSystemTable);
-VAR fs: FileSystem; n, i: LONGINT;
+VAR fs: FileSystem; n, i: SIZE;
 BEGIN {EXCLUSIVE}
 	fs := fsroot; n := 0;
 	WHILE (fs # NIL) DO fs := fs.next; INC(n) END;
@@ -845,7 +845,7 @@ END OpenOld;
 
 (** Open an existing file, searching through the mounted file system list if no prefix is specified. *)
 
-PROCEDURE Old*(name: ARRAY OF CHAR): File;
+PROCEDURE Old*(CONST name: ARRAY OF CHAR): File;
 VAR fs: FileSystem; f: File; prefix: Prefix; fname: FileName;
 BEGIN {EXCLUSIVE}
 	f := NIL;
@@ -866,7 +866,7 @@ END Old;
 
 (** Create a new file.  If no prefix is specified, create the file on the first file system in the mounted list. *)
 
-PROCEDURE New*(name: ARRAY OF CHAR): File;
+PROCEDURE New*(CONST name: ARRAY OF CHAR): File;
 VAR fs: FileSystem; f: File; prefix: Prefix; fname: FileName;
 BEGIN {EXCLUSIVE}
 	f := NIL; SplitName(name, prefix, fname);
@@ -921,7 +921,7 @@ BEGIN {EXCLUSIVE}
 END Delete;
 
 (* copies the file with the given name to the fileClipboard *)
-PROCEDURE Copy*(name: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE Copy*(CONST name: ARRAY OF CHAR; VAR res: WORD);
 VAR file: File;
 BEGIN
 	res := -1;
@@ -932,7 +932,7 @@ BEGIN
 END Copy;
 
 (* pastes the fileClipboard into the file with the given name if it doesn't exist already *)
-PROCEDURE Paste*(name: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE Paste*(CONST name: ARRAY OF CHAR; VAR res: WORD);
 VAR writer : Writer;
 	reader : Reader;
 	file : File;
@@ -963,7 +963,7 @@ END Paste;
  * @param overwrite: @in: Overwrite existing files? @out: Has an existing file been overwritten?
  * @param res: @out: Result code
  *)
-PROCEDURE CopyFile*(source, destination : ARRAY OF CHAR; VAR overwrite : BOOLEAN; VAR res : WORD);
+PROCEDURE CopyFile*(CONST source, destination : ARRAY OF CHAR; VAR overwrite : BOOLEAN; VAR res : WORD);
 VAR
 	sprefix, dprefix : Prefix;
 	sname, dname, dpath, dfilename: FileName;
@@ -1065,7 +1065,7 @@ END Register;
 
 (** Create a directory structure. Directories are automatically registered. res=0 indicates success.
 	Use Files.RemoveDirectory to delete a directory *)
-PROCEDURE CreateDirectory*(path: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE CreateDirectory*(CONST path: ARRAY OF CHAR; VAR res: WORD);
 VAR prefix: Prefix; fs: FileSystem; fpath: FileName;
 BEGIN {EXCLUSIVE}
 	SplitName(path, prefix, fpath);
@@ -1078,7 +1078,7 @@ BEGIN {EXCLUSIVE}
 END CreateDirectory;
 
 (** Remove a directory. res=0 indicates success. If force=TRUE, any files and subdirectories are automatically deleted. *)
-PROCEDURE RemoveDirectory*(path: ARRAY OF CHAR; force: BOOLEAN; VAR res: WORD);
+PROCEDURE RemoveDirectory*(CONST path: ARRAY OF CHAR; force: BOOLEAN; VAR res: WORD);
 VAR prefix: Prefix; fs: FileSystem; f: File; key: LONGINT; fpath: FileName;
 BEGIN {EXCLUSIVE}
 	SplitName(path, prefix, fpath);
@@ -1306,7 +1306,7 @@ BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes8, x), 0, 8)
 END WriteLReal;
 
-PROCEDURE WriteString*(VAR r: Rider; x: ARRAY OF CHAR);
+PROCEDURE WriteString*(VAR r: Rider; CONST x: ARRAY OF CHAR);
 VAR i: LONGINT;
 BEGIN
 	i := 0; WHILE x[i] # 0X DO INC(i) END;
@@ -1329,7 +1329,7 @@ END WriteNum;
 
 (** Append first string to second string, truncating on overflow. *)
 
-PROCEDURE AppendStr*(from: ARRAY OF CHAR; VAR to: ARRAY OF CHAR);
+PROCEDURE AppendStr*(CONST from: ARRAY OF CHAR; VAR to: ARRAY OF CHAR);
 VAR i, j, m: LONGINT;
 BEGIN
 	j := 0; WHILE to[j] # 0X DO INC(j) END;
