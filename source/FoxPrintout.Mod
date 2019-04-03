@@ -453,7 +453,7 @@ TYPE
 		(*** expressions ****)
 
 		PROCEDURE ExpressionList(x: SyntaxTree.ExpressionList);
-		VAR i: LONGINT;  expression: SyntaxTree.Expression;
+		VAR i: SIZE;  expression: SyntaxTree.Expression;
 		BEGIN
 			FOR i := 0 TO x.Length() - 1 DO
 				expression := x.GetExpression( i );  Expression(expression);
@@ -1318,7 +1318,7 @@ TYPE
 		END VisitOperator;
 
 		PROCEDURE ProcedureList(list: SyntaxTree.ProcedureList);
-		VAR x: SyntaxTree.Procedure; i: LONGINT; type: SyntaxTree.ProcedureType;
+		VAR x: SyntaxTree.Procedure; i: SIZE; type: SyntaxTree.ProcedureType;
 		BEGIN
 			w.IncIndent;
 			FOR i := 0 TO list.Length()-1 DO
@@ -1476,7 +1476,7 @@ TYPE
 		END Statement;
 
 		PROCEDURE StatementSequence*(x: SyntaxTree.StatementSequence);
-		VAR statement: SyntaxTree.Statement;  i: LONGINT;
+		VAR statement: SyntaxTree.Statement;  i: SIZE;
 		BEGIN
 			IF singleStatement THEN
 				w.String("...")
@@ -1528,7 +1528,7 @@ TYPE
 		END IfPart;
 
 		PROCEDURE VisitIfStatement*(x: SyntaxTree.IfStatement);
-		VAR i: LONGINT;  elsif: SyntaxTree.IfPart;
+		VAR i: SIZE;  elsif: SyntaxTree.IfPart;
 		BEGIN
 			IfPart(x.ifPart);
 			FOR i := 0 TO x.ElsifParts() - 1 DO
@@ -1555,7 +1555,7 @@ TYPE
 		END WithPart;
 
 		PROCEDURE VisitWithStatement*(x: SyntaxTree.WithStatement);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			Indent; Keyword("WITH " );
 			Expression(x.variable);
@@ -1593,7 +1593,7 @@ TYPE
 		END CasePart;
 
 		PROCEDURE VisitCaseStatement*(x: SyntaxTree.CaseStatement);
-		VAR i: LONGINT;  case: SyntaxTree.CasePart;
+		VAR i: SIZE;  case: SyntaxTree.CasePart;
 		BEGIN
 			Keyword("CASE " );
 			Expression(x.variable);

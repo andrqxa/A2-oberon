@@ -144,7 +144,7 @@ TYPE
 		VAR
 			filename, moduleName: SyntaxTree.IdentifierString;
 			msg: ARRAY 128 OF CHAR;
-			i: LONGINT;
+			i: SIZE;
 			module: Sections.Module;
 			name: SyntaxTree.IdentifierString;
 		BEGIN
@@ -223,7 +223,7 @@ TYPE
 		PROCEDURE MarkAsReachableStartingWith*(CONST prefix: Basic.SegmentedName; allowedSections: SET);
 		VAR
 			section: Sections.Section; name: Basic.SegmentedName;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			(* TODO: could or should one make this faster using a hash table? *)
 			(* go through all sections *)
@@ -296,7 +296,7 @@ TYPE
 		PROCEDURE MarkReachabilityOfAll*(isReachable: BOOLEAN);
 		VAR
 			section: Sections.Section;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			IF Trace THEN D.String(">>> MarkReachabilityOfAll "); IF isReachable THEN D.String("TRUE") ELSE D.String("FALSE") END; D.Ln END;
 			FOR i := 0 TO allSections.Length() - 1 DO
@@ -309,7 +309,7 @@ TYPE
 		PROCEDURE DumpSections*(writer: Streams.Writer; sections: Sections.SectionList);
 		VAR
 			section: Sections.Section;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			FOR i := 0 TO sections.Length() - 1 DO
 				section := sections.GetSection(i);
@@ -327,7 +327,7 @@ TYPE
 		PROCEDURE StoreOriginalRestrictions;
 		VAR
 			section: Sections.Section;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			NEW(originalRestrictions, allSections.Length());
 			FOR i := 0 TO allSections.Length() - 1 DO
@@ -341,7 +341,7 @@ TYPE
 		PROCEDURE RestoreOriginalRestrictions;
 		VAR
 			section: Sections.Section;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			ASSERT(LEN(originalRestrictions) = allSections.Length());
 			FOR i := 0 TO allSections.Length() - 1 DO
@@ -354,14 +354,14 @@ TYPE
 		VAR
 			fixedDataSections, flexibleDataSections: Sections.SectionList;
 			section, fixedDataSection, flexibleDataSection: Sections.Section;
-			i, currentAddress, nextOccupiedAddress, flexibleDataSectionIndex, fixedDataSectionIndex, startAddress, endAddress: LONGINT;
+			i, fixedDataSectionIndex: SIZE; currentAddress, nextOccupiedAddress, flexibleDataSectionIndex, startAddress, endAddress: LONGINT;
 			done: BOOLEAN;
 		BEGIN
 			(* sort sections if necessary *)
 			IF ~isSorted THEN
 				IF Trace THEN D.String("++++++++++ before sorting ++++++++++"); DumpSections(D.Log, allSections) END;
 				FOR i:= 0 TO allSections.Length() - 1 DO
-					allSections.GetSection(i).SetOffset(i)
+					allSections.GetSection(i).SetOffset(TODO(i))
 				END;
 				allSections.Sort(SectionPositionAndSizeComparison);
 				IF Trace THEN D.String("++++++++++ after sorting ++++++++++"); DumpSections(D.Log, allSections) END;
@@ -482,7 +482,7 @@ TYPE
 		VAR
 			result: Sections.Module;
 			section: Sections.Section;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			NEW(result, NIL, backend.GetSystem()); (* note: there is no syntax tree *)
 			result.SetModuleName(desiredName);
@@ -586,7 +586,7 @@ TYPE
 
 		(* set address of sections to a fixed position after compilation *)
 		PROCEDURE FixSections(binaryModule: Sections.Module; VAR sizes: ARRAY OF LONGINT);
-		VAR adr,i: LONGINT; section: Sections.Section; is: BinaryCode.Section;
+		VAR adr: LONGINT; i: SIZE; section: Sections.Section; is: BinaryCode.Section;
 		BEGIN
 			adr := 0;
 			FOR i := 0 TO binaryModule.allSections.Length()-1 DO
@@ -608,9 +608,8 @@ TYPE
 
 		(* check if any of the addresses of sections have changed during last compilation *)
 		PROCEDURE Conflict(binaryModule: Sections.Module; VAR sizes: ARRAY OF LONGINT): BOOLEAN;
-		VAR adr,i: LONGINT; section: Sections.Section;is: BinaryCode.Section;
+		VAR i: SIZE; section: Sections.Section;is: BinaryCode.Section;
 		BEGIN
-			adr := 0;
 			FOR i := 0 TO binaryModule.allSections.Length()-1 DO
 				section := binaryModule.allSections.GetSection(i);
 				is := section(IntermediateCode.Section).resolved;
@@ -970,7 +969,7 @@ TYPE
 	END GetPriority;
 
 	PROCEDURE CopySections*(from, to: Sections.SectionList);
-	VAR section, copy: IntermediateCode.Section; i,j: LONGINT; s: Sections.Section; instruction: IntermediateCode.Instruction;
+	VAR section, copy: IntermediateCode.Section; i, j: SIZE; s: Sections.Section; instruction: IntermediateCode.Instruction;
 	BEGIN
 		FOR i := 0 TO from.Length()-1 DO
 			s := from.GetSection(i);

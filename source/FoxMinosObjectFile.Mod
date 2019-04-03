@@ -83,7 +83,7 @@ TYPE
 		this procedure converts the section-based representation of fixups into a symbol based representation
 	*)
 	PROCEDURE GetFixups(diagnostics: Diagnostics.Diagnostics; module: Sections.Module; symbol: Sections.Section; VAR first: Fixup): LONGINT;
-	VAR temp: Fixup; fixup: BinaryCode.Fixup; nr :LONGINT; i: LONGINT; section: Sections.Section; sectionList: Sections.SectionList;
+	VAR temp: Fixup; fixup: BinaryCode.Fixup; nr :LONGINT; i: SIZE; section: Sections.Section; sectionList: Sections.SectionList;
 
 		PROCEDURE Do;
 		BEGIN
@@ -121,7 +121,7 @@ TYPE
 	PROCEDURE FindPC(pc: LONGINT; module: Sections.Module; diagnostics: Diagnostics.Diagnostics): BOOLEAN;
 	VAR
 		section:Sections.Section; binarySection: BinaryCode.Section; label: BinaryCode.LabelList;
-		i: LONGINT;
+		i: SIZE;
 	BEGIN
 		FOR i := 0 TO module.allSections.Length() - 1 DO
 			section := module.allSections.GetSection(i);
@@ -168,7 +168,7 @@ TYPE
 		PROCEDURE FirstOffsets(sectionList: Sections.SectionList);
 		VAR
 			section: Sections.Section;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			FOR i := 0 TO sectionList.Length() - 1 DO
 				section := sectionList.GetSection(i);
@@ -188,7 +188,7 @@ TYPE
 		PROCEDURE SetOffsets(sectionList: Sections.SectionList);
 		VAR
 			section: Sections.Section;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			FOR i := 0 TO sectionList.Length() - 1 DO
 				section := sectionList.GetSection(i);
@@ -232,7 +232,7 @@ TYPE
 		PROCEDURE CopySections(sectionList: Sections.SectionList);
 		VAR
 			section: Sections.Section;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			FOR i := 0 TO sectionList.Length() - 1 DO
 				section := sectionList.GetSection(i);
@@ -339,7 +339,7 @@ TYPE
 			PROCEDURE InModule(s: Basic.SegmentedName):BOOLEAN;
 			VAR
 				section: Sections.Section;
-				i: LONGINT;
+				i: SIZE;
 			BEGIN
 				FOR i := 0 TO module.allSections.Length() - 1 DO
 					section := module.allSections.GetSection(i);
@@ -351,7 +351,7 @@ TYPE
 			(* go through list of all sections and all fixups in sections and if it is a self fixup, chain it *)
 			PROCEDURE FixSelf(): LONGINT;
 			VAR prev,this,patch: LONGINT; section: Sections.Section;
-				binarySection: BinaryCode.Section; fixup: BinaryCode.Fixup; i,patchOffset: LONGINT;
+				binarySection: BinaryCode.Section; fixup: BinaryCode.Fixup; i: SIZE; patchOffset: LONGINT;
 				msg, name: ARRAY  256 OF CHAR;
 			BEGIN
 				prev := 0;
@@ -485,7 +485,7 @@ TYPE
 		PROCEDURE Commands;
 		VAR
 			procedure : SyntaxTree.Procedure; procedureType: SyntaxTree.ProcedureType;
-			p: Sections.Section; name: Name; numberParameters, i: LONGINT;
+			p: Sections.Section; name: Name; i: SIZE;
 		BEGIN
 			FOR i := 0 TO module.allSections.Length() - 1 DO
 				p := module.allSections.GetSection(i);

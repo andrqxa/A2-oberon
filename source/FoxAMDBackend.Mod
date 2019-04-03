@@ -3408,7 +3408,7 @@ TYPE
 			out: BinaryCode.Section;
 			name: Basic.SegmentedName;
 			procedure: SyntaxTree.Procedure;
-			i, j, initialSectionCount: LONGINT;
+			i, j, initialSectionCount: SIZE;
 
 			(* recompute fixup positions and assign binary sections *)
 			PROCEDURE PatchFixups(section: BinaryCode.Section);
@@ -3619,10 +3619,10 @@ TYPE
 	END BackendAMD64;
 
 	(** the number of regular sections in a section list **)
-	PROCEDURE RegularSectionCount(sectionList: Sections.SectionList): LONGINT;
+	PROCEDURE RegularSectionCount(sectionList: Sections.SectionList): SIZE;
 	VAR
 		section: Sections.Section;
-		i, result: LONGINT;
+		i, result: SIZE;
 	BEGIN
 		result := 0;
 		FOR i := 0 TO sectionList.Length() - 1 DO

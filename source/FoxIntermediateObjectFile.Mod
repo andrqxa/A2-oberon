@@ -23,7 +23,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 		VAR
 			section: Sections.Section;
 			intermediateCodeSection: IntermediateCode.Section;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			(* prepare sections for output *)
 			FOR i := 0 TO module.allSections.Length() - 1 DO
@@ -138,7 +138,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END WriteSection;
 
 			PROCEDURE SectionList(list: Sections.SectionList);
-			VAR section: Sections.Section;i: LONGINT;
+			VAR section: Sections.Section; i: SIZE;
 			BEGIN
 				w.RawNum(list.Length());
 				FOR i := 0 TO list.Length() - 1 DO
@@ -148,7 +148,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END SectionList;
 
 			PROCEDURE Imports(imports: Sections.NameList);
-			VAR name: SyntaxTree.IdentifierString;i: LONGINT;
+			VAR name: SyntaxTree.IdentifierString; i: SIZE;
 			BEGIN
 				w.RawNum(imports.Length());
 				FOR i := 0 TO imports.Length()-1 DO
@@ -460,7 +460,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 	END ReadHeader;
 
 	PROCEDURE WriteHeader(writer: Streams.Writer; binary: BOOLEAN; sections: Sections.SectionList; VAR poolMap: ObjectFile.PoolMap);
-	VAR p1,p2, size,i: LONGINT; section: Sections.Section; fixups: LONGINT; fixupList: ObjectFile.Fixups;
+	VAR i: SIZE; section: Sections.Section; fixups: LONGINT; fixupList: ObjectFile.Fixups;
 
 		PROCEDURE ProcessOperand(CONST operand: IntermediateCode.Operand);
 		BEGIN

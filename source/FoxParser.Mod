@@ -1396,7 +1396,7 @@ TYPE
 
 		(** Code = {  any \ 'end' \ 'with' } ['with' {('in'|'out') StatementSequence}] . **)
 		PROCEDURE Code(outer: SyntaxTree.Statement): SyntaxTree.Code;
-		VAR startPos: Position; endPos, i ,len: LONGINT; codeString: Scanner.StringType; code: SyntaxTree.Code;
+		VAR startPos: Position; endPos: LONGINT; i, len: SIZE; codeString: Scanner.StringType; code: SyntaxTree.Code;
 			end: Scanner.Symbol; in, out: BOOLEAN; statements, rules: SyntaxTree.StatementSequence;
 		BEGIN
 			startPos := token.position;

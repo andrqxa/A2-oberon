@@ -689,7 +689,7 @@ TYPE
 	PROCEDURE Traverse (list: Sections.SectionList; handle: PROCEDURE {DELEGATE} (section: Sections.Section));
 	VAR
 		section: Sections.Section;
-		i: LONGINT;
+		i: SIZE;
 	BEGIN
 		FOR i := 0 TO list.Length() - 1 DO
 			section := list.GetSection(i);

@@ -59,35 +59,35 @@ TYPE
 	List* = OBJECT  (* by Luc Bläser *)
 	VAR
 		list: ObjectArray;
-		count-: LONGINT;
+		count-: SIZE;
 		multipleAllowed*: BOOLEAN;
 		nilAllowed*: BOOLEAN;
 
-		PROCEDURE & InitList*(initialSize: LONGINT) ;
+		PROCEDURE & InitList*(initialSize: SIZE) ;
 		BEGIN
 			IF initialSize <= 0 THEN initialSize := 8 END;
 			INC( lists );  NEW( list, initialSize );  count := 0;  multipleAllowed := FALSE;  nilAllowed := FALSE
 		END InitList;
 
-		PROCEDURE Length*( ): LONGINT;
+		PROCEDURE Length*( ): SIZE;
 		BEGIN
 			RETURN count
 		END Length;
 
 		PROCEDURE Grow;
-		VAR old: ObjectArray;  i: LONGINT;
+		VAR old: ObjectArray;  i: SIZE;
 		BEGIN
 			INC( enlarged );  old := list;  NEW( list, (LEN( list ) * 3+1) DIV 2 (* more optimal for first-fit memory allocators *) ) ;
 			FOR i := 0 TO count - 1 DO list[i] := old[i] END
 		END Grow;
 
-		PROCEDURE Get*( i: LONGINT ): ANY;
+		PROCEDURE Get*( i: SIZE ): ANY;
 		BEGIN
 			IF (i < 0) OR (i >= count) THEN HALT( 101 ) END;
 			RETURN list[i]
 		END Get;
 
-		PROCEDURE Set*(i: LONGINT; x: ANY);
+		PROCEDURE Set*(i: SIZE; x: ANY);
 		BEGIN
 			IF (i < 0) OR (i >= count) THEN HALT( 101 ) END;
 			list[i] := x;
@@ -102,7 +102,7 @@ TYPE
 		END Add;
 
 		PROCEDURE Prepend*(x: ANY);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			IF ~nilAllowed THEN ASSERT( x # NIL ) END;
 			IF ~multipleAllowed THEN ASSERT( debug OR ~Contains( x ) ) END;   (* already contained *)
@@ -115,7 +115,7 @@ TYPE
 		END Prepend;
 
 		PROCEDURE Append*(x: List);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			FOR i := 0 TO x.Length() - 1 DO
 				IF multipleAllowed OR (~debug OR ~Contains(x.Get(i))) THEN
@@ -125,7 +125,7 @@ TYPE
 		END Append;
 
 		PROCEDURE Remove*( x: ANY );
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < count) & (list[i] # x) DO INC( i ) END;
@@ -135,7 +135,7 @@ TYPE
 			END
 		END Remove;
 
-		PROCEDURE RemoveByIndex*( i: LONGINT );
+		PROCEDURE RemoveByIndex*( i: SIZE );
 		BEGIN
 			IF i < count THEN
 				WHILE (i < count - 1) DO list[i] := list[i + 1];  INC( i ) END;
@@ -143,8 +143,8 @@ TYPE
 			END
 		END RemoveByIndex;
 
-		PROCEDURE Insert*( i: LONGINT; x: ANY );
-		VAR j: LONGINT;
+		PROCEDURE Insert*( i: SIZE; x: ANY );
+		VAR j: SIZE;
 		BEGIN
 			IF ~nilAllowed THEN ASSERT( x # NIL ) END;
 			IF ~multipleAllowed THEN ASSERT( ~debug OR ~Contains( x ) ) END;   (* already contained *)
@@ -157,14 +157,14 @@ TYPE
 		END Insert;
 
 		PROCEDURE Replace*( x, y: ANY );
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			IF ~nilAllowed THEN ASSERT( x # NIL );  ASSERT( y # NIL ) END;
 			i := IndexOf( x );
 			IF i >= 0 THEN list[i] := y END
 		END Replace;
 
-		PROCEDURE ReplaceByIndex*( i: LONGINT;  x: ANY );
+		PROCEDURE ReplaceByIndex*( i: SIZE;  x: ANY );
 		BEGIN
 			IF ~nilAllowed THEN ASSERT( x # NIL ) END;
 			IF (i >= 0) & (i < count) THEN list[i] := x
@@ -173,8 +173,8 @@ TYPE
 		END ReplaceByIndex;
 
 		(** If the object is not present, -1 is returned *)
-		PROCEDURE IndexOf*( x: ANY ): LONGINT;
-		VAR i: LONGINT;
+		PROCEDURE IndexOf*( x: ANY ): SIZE;
+		VAR i: SIZE;
 		BEGIN
 			i := 0;
 			WHILE i < count DO
@@ -190,13 +190,13 @@ TYPE
 		END Contains;
 
 		PROCEDURE Clear*;
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			FOR i := 0 TO count - 1 DO list[i] := NIL END;
 			count := 0
 		END Clear;
 
-		PROCEDURE GrowAndSet*(i: LONGINT; x: ANY);
+		PROCEDURE GrowAndSet*(i: SIZE; x: ANY);
 		BEGIN
 			IF (i<0) THEN HALT(101) END;
 			WHILE i>=LEN(list) DO Grow END;
@@ -211,9 +211,9 @@ TYPE
 			END
 		END Sort;
 
-		PROCEDURE QuickSort(comparisonFunction: ComparisonFunction; lo, hi: LONGINT);
+		PROCEDURE QuickSort(comparisonFunction: ComparisonFunction; lo, hi: SIZE);
 		VAR
-			i, j: LONGINT;
+			i, j: SIZE;
 			x, t: ANY;
 		BEGIN
 			i := lo; j := hi;

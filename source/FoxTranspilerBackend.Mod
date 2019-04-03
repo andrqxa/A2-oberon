@@ -621,7 +621,7 @@ TYPE
 			END;
 		END PrintArgument;
 
-		PROCEDURE PrintArguments (arguments: SyntaxTree.ExpressionList; index, count: LONGINT; parameter: SyntaxTree.Parameter; outerScope: SyntaxTree.Scope): BOOLEAN;
+		PROCEDURE PrintArguments (arguments: SyntaxTree.ExpressionList; index, count: SIZE; parameter: SyntaxTree.Parameter; outerScope: SyntaxTree.Scope): BOOLEAN;
 		VAR first: BOOLEAN; variable: SyntaxTree.Variable;
 		BEGIN
 			first := TRUE;
@@ -886,7 +886,7 @@ TYPE
 		END PrintNew;
 
 		PROCEDURE PrintStatements (statements: SyntaxTree.StatementSequence);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			ASSERT (statements # NIL);
 			FOR i := 0 TO statements.Length () - 1 DO PrintStatement (statements.GetStatement (i)); END;
@@ -961,7 +961,7 @@ TYPE
 		END VisitAssignment;
 
 		PROCEDURE VisitIfStatement* (statement: SyntaxTree.IfStatement);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			PrintIndent; PrintIfPart (statement.ifPart);
 			FOR i := 0 TO statement.ElsifParts () - 1 DO
@@ -974,7 +974,7 @@ TYPE
 		END VisitIfStatement;
 
 		PROCEDURE VisitWithStatement* (statement: SyntaxTree.WithStatement);
-		VAR withPart: SyntaxTree.WithPart; i: LONGINT;
+		VAR withPart: SyntaxTree.WithPart; i: SIZE;
 		BEGIN
 			FOR i := 0 TO statement.WithParts () - 1 DO
 				withPart := statement.GetWithPart (i); PrintIndent;
@@ -1063,7 +1063,7 @@ TYPE
 		END VisitAwaitStatement;
 
 		PROCEDURE VisitCaseStatement* (statement: SyntaxTree.CaseStatement);
-		VAR i: LONGINT; value: Basic.Integer; casePart: SyntaxTree.CasePart; caseConstant: SyntaxTree.CaseConstant;
+		VAR i: SIZE; value: Basic.Integer; casePart: SyntaxTree.CasePart; caseConstant: SyntaxTree.CaseConstant;
 		BEGIN
 			PrintIndent; writer.String ("switch ("); PrintExpression (statement.variable); writer.Char (')'); writer.Ln;
 			BeginBlock;
@@ -1138,7 +1138,7 @@ TYPE
 		END VisitSymbolDesignator;
 
 		PROCEDURE VisitBuiltinCallDesignator* (expression: SyntaxTree.BuiltinCallDesignator);
-		VAR argument: ARRAY 3 OF SyntaxTree.Expression; i: LONGINT; name: Identifier;
+		VAR argument: ARRAY 3 OF SyntaxTree.Expression; i: SIZE; name: Identifier;
 			position: LONGINT; typeDeclaration: SyntaxTree.TypeDeclaration;
 		BEGIN
 			FOR i := 0 TO LEN (argument) - 1 DO
@@ -1340,7 +1340,7 @@ TYPE
 		END VisitSelfDesignator;
 
 		PROCEDURE VisitIndexDesignator* (expression: SyntaxTree.IndexDesignator);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			PrintExpression (expression.left);
 			FOR i := 0 TO expression.parameters.Length () - 1 DO
@@ -1371,7 +1371,7 @@ TYPE
 		END VisitDereferenceDesignator;
 
 		PROCEDURE VisitSet* (expression: SyntaxTree.Set);
-		VAR i: LONGINT; element: SyntaxTree.Expression;
+		VAR i: SIZE; element: SyntaxTree.Expression;
 		BEGIN
 			IF expression.elements.Length () = 0 THEN
 				writer.Char ('0');

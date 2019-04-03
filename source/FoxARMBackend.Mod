@@ -3619,7 +3619,7 @@ TYPE
 			out: BinaryCode.Section;
 			name: Basic.SectionName;
 			procedure: SyntaxTree.Procedure;
-			i, j, initialSectionCount: LONGINT;
+			i, j, initialSectionCount: SIZE;
 
 			(* recompute fixup positions and assign binary sections *)
 			PROCEDURE PatchFixups(section: BinaryCode.Section);

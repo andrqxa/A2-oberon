@@ -842,7 +842,7 @@ KernelLog.Ln();
                 arrayType: SyntaxTree.ArrayType;
                 pointerType: SyntaxTree.PointerType;
                 rightExpression: SyntaxTree.Expression;
-                i, n: LONGINT;
+                i, n: SIZE;
         BEGIN
             IF Trace THEN
                 S("PrimaryExpression")
@@ -1505,7 +1505,7 @@ KernelLog.Ln();
                 statement: SyntaxTree.Statement;
                 operator: LONGINT;
                 position: Position;
-                length, i: LONGINT;
+                length, i: SIZE;
                 temp: SyntaxTree.Expression;
         BEGIN
             IF Trace THEN
@@ -1700,7 +1700,7 @@ KernelLog.Ln();
                 last: SyntaxTree.Statement;
                 element: SyntaxTree.Expression;
                 defaultSection: BOOLEAN;
-                length: LONGINT; position: Position;
+                length: SIZE; position: Position;
         BEGIN
             IF Trace THEN
                 S("SwitchSection")
@@ -1903,7 +1903,7 @@ KernelLog.Ln();
                 designator: SyntaxTree.Designator;
                 casePart: SyntaxTree.CasePart;
                 caseBody: SyntaxTree.StatementSequence;
-                length: LONGINT;
+                length: SIZE;
                 last: SyntaxTree.Statement;
         BEGIN
             IF Trace THEN
@@ -2180,7 +2180,7 @@ KernelLog.Ln();
                 statementSequence: SyntaxTree.StatementSequence;
                 iterator: SyntaxTree.StatementSequence;
                 position: Position;
-                i: LONGINT;
+                i: SIZE;
                 b: BOOLEAN;
         BEGIN
             IF Trace THEN

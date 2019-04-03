@@ -828,7 +828,7 @@ TYPE
 		END VisitSetValue;
 
 		PROCEDURE VisitMathArrayExpression*(x: SyntaxTree.MathArrayExpression);
-		VAR element: SyntaxTree.Expression; i: LONGINT;
+		VAR element: SyntaxTree.Expression; i: SIZE;
 		BEGIN
 			FOR i := 0 TO x.elements.Length()-1 DO
 				element := x.elements.GetExpression(i);

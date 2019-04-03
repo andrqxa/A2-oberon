@@ -1163,12 +1163,12 @@ TYPE
 			Set(pos, v);
 		END SetVariable;
 
-		PROCEDURE Occupy(pos: LONGINT);
+		PROCEDURE Occupy(pos: SIZE);
 		BEGIN
 			INCL(inUse[pos DIV 32], pos MOD 32);
 		END Occupy;
 
-		PROCEDURE Occupied(pos: LONGINT): BOOLEAN;
+		PROCEDURE Occupied(pos: SIZE): BOOLEAN;
 		BEGIN
 			RETURN (pos MOD 32) IN inUse[pos DIV 32];
 		END Occupied;
@@ -1203,7 +1203,7 @@ TYPE
 		PROCEDURE GetFreeVariable(type: SyntaxTree.Type; untraced: BOOLEAN; VAR pos: LONGINT): SyntaxTree.Variable;
 		VAR var : SyntaxTree.Variable; i: LONGINT;
 		BEGIN
-			pos := Length();
+			pos := TODO (Length());
 			FOR i := 0 TO pos-1 DO
 				IF ~(Occupied(i)) THEN
 					var := GetVariable(i);
@@ -2461,7 +2461,7 @@ TYPE
 			operand: Operand;
 			temp, one, noBits, dest: IntermediateCode.Operand;
 			expression: SyntaxTree.Expression;
-			i: LONGINT;
+			i: SIZE;
 
 		BEGIN
 			IF Trace THEN TraceEnter("VisitSet") END;
@@ -2938,7 +2938,7 @@ TYPE
 			res, operand: Operand;
 			temp, one, noBits, dest: IntermediateCode.Operand;
 			expression: SyntaxTree.Expression;
-			i: LONGINT;
+			i: SIZE;
 
 		BEGIN
 			IF Trace THEN TraceEnter("VisitSet") END;
@@ -2993,7 +2993,7 @@ TYPE
 			designator: SyntaxTree.Designator; i: LONGINT; element: SyntaxTree.IntegerValue;
 
 			PROCEDURE RecursiveAssignment(x: SyntaxTree.MathArrayExpression; dim: LONGINT);
-			VAR numberElements,i: LONGINT; expression: SyntaxTree.Expression;
+			VAR numberElements,i: SIZE; expression: SyntaxTree.Expression;
 				element: SyntaxTree.IntegerValue;
 			BEGIN
 				numberElements := x.elements.Length();
@@ -4534,14 +4534,14 @@ TYPE
 			expression: SyntaxTree.Expression;
 			resultingType, leftType, baseType: SyntaxTree.Type;
 			skipLabel1: Label;
-			i, indexListSize, indexDim, srcDimOffset, destDimOffset, targetArrayDimensionality: LONGINT;
+			i: SIZE; indexListSize, indexDim, srcDimOffset, destDimOffset, targetArrayDimensionality: LONGINT;
 			staticSourceLength, staticSourceIncrement, staticIndex, staticFirstIndex, staticLastIndex, staticStepSize, staticTargetLength: LONGINT;
 			variableOp: Operand;
 			variable: SyntaxTree.Variable;
 			prefixIndices, prefixRanges, suffixIndices, suffixRanges : LONGINT; tensorFound: BOOLEAN;
 
 			PROCEDURE CountIndices(parameters: SyntaxTree.ExpressionList);
-			VAR e: SyntaxTree.Expression; i: LONGINT;
+			VAR e: SyntaxTree.Expression; i: SIZE;
 			BEGIN
 				tensorFound := FALSE;
 				FOR i := 0 TO parameters.Length()-1 DO
@@ -4583,7 +4583,7 @@ TYPE
 				END
 			END;
 
-			indexListSize := x.parameters.Length();
+			indexListSize := TODO(x.parameters.Length());
 
 			CountIndices(x.parameters);
 			(*ASSERT(tensorRangeCount <= 1);*)
@@ -4852,10 +4852,10 @@ TYPE
 				(* write lengths and increments of target array for remaining dimensions *)
 				i := indexListSize;
 				WHILE indexDim < targetArrayDimensionality DO
-					GetMathArrayLengthAt(leftType(SyntaxTree.MathArrayType),array,i,FALSE, sourceLength);
+					GetMathArrayLengthAt(leftType(SyntaxTree.MathArrayType),array,TODO(i),FALSE, sourceLength);
 					PutMathArrayLength(result.tag, sourceLength.op,indexDim);
 					ReleaseOperand(sourceLength);
-					GetMathArrayIncrementAt(leftType(SyntaxTree.MathArrayType),array,i,FALSE,sourceIncrement);
+					GetMathArrayIncrementAt(leftType(SyntaxTree.MathArrayType),array,TODO(i),FALSE,sourceIncrement);
 					PutMathArrayIncrement(result.tag, sourceIncrement.op,indexDim);
 					ReleaseOperand(sourceIncrement);
 					INC(i); INC(indexDim);
@@ -4893,7 +4893,7 @@ TYPE
 		END MathIndexDesignator;
 
 		(* get the length of an array , trying to make use of static information *)
-		PROCEDURE ArrayLength(type: SyntaxTree.Type; dim: LONGINT; tag: IntermediateCode.Operand): IntermediateCode.Operand;
+		PROCEDURE ArrayLength(type: SyntaxTree.Type; dim: SIZE; tag: IntermediateCode.Operand): IntermediateCode.Operand;
 		VAR res: IntermediateCode.Operand; size: LONGINT;
 		BEGIN
 			type := type.resolved;
@@ -5009,8 +5009,8 @@ TYPE
 		END DivInt;
 
 		PROCEDURE IndexDesignator(x: SyntaxTree.IndexDesignator);
-		VAR length,res: IntermediateCode.Operand; type,ttype: SyntaxTree.Type; maxDim: LONGINT; array:Operand;
-			index: Operand; e: SyntaxTree.Expression;i: LONGINT; size: LONGINT; atype: SyntaxTree.ArrayType;
+		VAR length,res: IntermediateCode.Operand; type,ttype: SyntaxTree.Type; maxDim: SIZE; array:Operand;
+			index: Operand; e: SyntaxTree.Expression; i: SIZE; size: LONGINT; atype: SyntaxTree.ArrayType;
 		BEGIN
 			type := x.left.type.resolved;
 			IF type IS SyntaxTree.StringType THEN
@@ -5112,7 +5112,7 @@ TYPE
 				ReleaseIntermediateOperand(result.tag);
 				IntermediateCode.InitImmediate(result.tag,addressType,type(SyntaxTree.ArrayType).staticLength);
 			ELSIF (type IS SyntaxTree.ArrayType)  THEN
-				result.tag := array.tag; UseIntermediateOperand(result.tag); result.dimOffset := array.dimOffset+maxDim;
+				result.tag := array.tag; UseIntermediateOperand(result.tag); result.dimOffset := array.dimOffset+TODO(maxDim);
 			END;
 			ReleaseOperand(array);
 		END IndexDesignator;
@@ -5137,7 +5137,7 @@ TYPE
 			moduleName, procedureName: SyntaxTree.IdentifierString; arrayBase: SyntaxTree.Module; saved: RegisterEntry; s: Basic.MessageString;
 			procedure: SyntaxTree.Procedure;
 			parameters: SyntaxTree.ExpressionList; e: SyntaxTree.Expression;
-			prefixIndices, prefixRanges, suffixIndices, suffixRanges,i : LONGINT; tensorFound: BOOLEAN;
+			prefixIndices, prefixRanges, suffixIndices, suffixRanges: LONGINT; i : SIZE; tensorFound: BOOLEAN;
 		BEGIN
 			(* variable represents a newly allocaed range array in a tensor, this is allocated in CopyDescriptor and must thus not be untraced *)
 			variable := GetTemporaryVariable(expression.left.type, FALSE, FALSE (* untraced *));
@@ -6129,7 +6129,7 @@ TYPE
 			saved,saved2: RegisterEntry;
 			symbol: SyntaxTree.Symbol;
 			variable: SyntaxTree.Variable;
-			i,  parametersSize : LONGINT;
+			i,  parametersSize : SIZE;
 			structuredReturnType: BOOLEAN;
 			gap, alignment: LONGINT; (*fld*)
 			return: IntermediateCode.Operand;
@@ -6514,7 +6514,7 @@ TYPE
 			IF (callingConvention = SyntaxTree.WinAPICallingConvention) OR (callingConvention IN SysvABI) THEN
 				Emit(Call(position,operand.op,0));
 			ELSE
-				Emit(Call(position,operand.op,parametersSize));
+				Emit(Call(position,operand.op,TODO(parametersSize)));
 			END;
 			ReleaseOperand(operand);
 
@@ -6905,7 +6905,7 @@ TYPE
 			procedureVariable: SyntaxTree.Variable;
 			s,msg: Basic.MessageString;
 			res: Operand;
-			i: LONGINT;
+			i: SIZE;
 			sv: SyntaxTree.StringValue;
 			type: SyntaxTree.Type;
 			recordType: SyntaxTree.RecordType;
@@ -8072,7 +8072,7 @@ TYPE
 		VAR
 			p0,p1,p2,parameter: SyntaxTree.Expression; len,val: LONGINT; l,r: Operand; res,adr,reg: IntermediateCode.Operand; type, componentType: SyntaxTree.Type;
 			constructor: SyntaxTree.Procedure; s0,s1,s2: Operand; hint: HUGEINT;
-			i: LONGINT; formalParameter: SyntaxTree.Parameter;
+			i: SIZE; formalParameter: SyntaxTree.Parameter;
 			tmp:IntermediateCode.Operand;
 			size: LONGINT; dim,openDim: LONGINT; pointer: IntermediateCode.Operand; t0,t1,t2: SyntaxTree.Type; trueL,ignore: Label;
 			exit,else,end: Label; procedureType: SyntaxTree.ProcedureType;
@@ -8165,7 +8165,7 @@ TYPE
 			IF Trace THEN TraceEnter("VisitBuiltinCallDesignator") END;
 
 			dest := destination; destination := emptyOperand;
-			p0 := NIL; p1 := NIL; p2 := NIL; len := x.parameters.Length();
+			p0 := NIL; p1 := NIL; p2 := NIL; len := TODO (x.parameters.Length());
 			IF len > 0 THEN p0 := x.parameters.GetExpression(0); t0 := p0.type.resolved END;
 			IF len > 1 THEN p1 := x.parameters.GetExpression(1); t1 := p1.type.resolved END;
 			IF len > 2 THEN p2 := x.parameters.GetExpression(2); t2 := p2.type.resolved END;
@@ -9619,9 +9619,9 @@ TYPE
 
 		PROCEDURE EvaluateBuiltinCallDesignator(x: SyntaxTree.BuiltinCallDesignator; VAR result: Operand);
 		VAR
-			p0,p1,p2: SyntaxTree.Expression; len: LONGINT; l: Operand; res,reg: IntermediateCode.Operand; type, componentType: SyntaxTree.Type;
+			p0,p1,p2: SyntaxTree.Expression; len: SIZE; l: Operand; res,reg: IntermediateCode.Operand; type, componentType: SyntaxTree.Type;
 			s0,s1,s2: Operand; hint: HUGEINT;
-			i: LONGINT; formalParameter: SyntaxTree.Parameter;
+			i: SIZE; formalParameter: SyntaxTree.Parameter;
 			tmp:IntermediateCode.Operand;
 			t0,t1,t2: SyntaxTree.Type; ignore: Label;
 			exit,else,end: Label; procedureType: SyntaxTree.ProcedureType;
@@ -10402,7 +10402,7 @@ TYPE
 		VAR  irv: IntermediateCode.Section; name:Basic.SegmentedName;
 
 			PROCEDURE RecursiveData(x: SyntaxTree.MathArrayExpression);
-			VAR numberElements,i: LONGINT; expression: SyntaxTree.Expression; op: Operand;
+			VAR numberElements,i: SIZE; expression: SyntaxTree.Expression; op: Operand;
 			BEGIN
 				numberElements := x.elements.Length();
 				FOR i := 0 TO numberElements-1 DO
@@ -11362,7 +11362,7 @@ TYPE
 		END VisitCommunicationStatement;
 
 		PROCEDURE VisitIfStatement*(x: SyntaxTree.IfStatement);
-		VAR end: Label; i,elsifs: LONGINT; elsif: SyntaxTree.IfPart; escape: BOOLEAN;
+		VAR end: Label; i,elsifs: SIZE; elsif: SyntaxTree.IfPart; escape: BOOLEAN;
 
 			PROCEDURE IfPart(if: SyntaxTree.IfPart; last: BOOLEAN);
 			VAR false: Label; condition, value: BOOLEAN;
@@ -11421,7 +11421,7 @@ TYPE
 		END EmitWithPart;
 
 		PROCEDURE VisitWithStatement*(x: SyntaxTree.WithStatement);
-		VAR endL,elseL: Label;i: LONGINT; trueL: POINTER TO ARRAY OF Label; res: Operand; recordType: SyntaxTree.RecordType;
+		VAR endL,elseL: Label;i: SIZE; trueL: POINTER TO ARRAY OF Label; res: Operand; recordType: SyntaxTree.RecordType;
 			tag: IntermediateCode.Operand;
 		BEGIN
 			IF Trace THEN TraceEnter("VisitWithStatement") END;
@@ -11459,7 +11459,7 @@ TYPE
 		END VisitWithStatement;
 
 		PROCEDURE VisitCaseStatement*(x: SyntaxTree.CaseStatement);
-		VAR var: Operand; jmp,res,op,tmp: IntermediateCode.Operand; range, j: Basic.Integer; i,size: LONGINT; part: SyntaxTree.CasePart; constant: SyntaxTree.CaseConstant;
+		VAR var: Operand; jmp,res,op,tmp: IntermediateCode.Operand; range, j: Basic.Integer; i: SIZE; size: TODO; part: SyntaxTree.CasePart; constant: SyntaxTree.CaseConstant;
 			out,else: Label; label: Label;
 			fixups: POINTER TO ARRAY OF Label; section: IntermediateCode.Section; name: Basic.SegmentedName; string: ARRAY 32 OF CHAR;
 			symbol: SyntaxTree.Symbol;
@@ -11471,7 +11471,7 @@ TYPE
 			IF (range < 0) OR (range > 1024) & (range DIV x.caseParts.Length() >10) THEN
 				(* if case table is larger than 1024 elements and only sparsely used, then do not employ a table *)
 				table := FALSE;
-				size := x.caseParts.Length();
+				size := TODO (x.caseParts.Length());
 			ELSE
 				table := TRUE;
 				size := LONGINT(range);
@@ -11931,7 +11931,7 @@ TYPE
 		END VisitAwaitStatement;
 
 		PROCEDURE StatementSequence(x: SyntaxTree.StatementSequence);
-		VAR statement: SyntaxTree.Statement;  i: LONGINT; (* pos: LONGINT; *)
+		VAR statement: SyntaxTree.Statement; i: SIZE;
 		BEGIN
 			FOR i := 0 TO x.Length() - 1 DO
 				statement := x.GetStatement( i );
@@ -12879,7 +12879,7 @@ TYPE
 
 		PROCEDURE ExportDesc(source: IntermediateCode.Section);
 		VAR
-			i: LONGINT; section: Sections.Section; fingerprinter : Fingerprinter.Fingerprinter;
+			i: SIZE; section: Sections.Section; fingerprinter : Fingerprinter.Fingerprinter;
 			sectionArray: POINTER TO ARRAY OF Sections.Section;
 			poolMap: Basic.HashTableInt;
 			namePool: IntermediateCode.Section;
@@ -12901,9 +12901,9 @@ TYPE
 				RETURN ch1 < ch2;
 			END Compare;
 
-			PROCEDURE QuickSort(VAR list: ARRAY OF Sections.Section;  lo, hi: LONGINT);
+			PROCEDURE QuickSort(VAR list: ARRAY OF Sections.Section;  lo, hi: SIZE);
 			VAR
-				i, j: LONGINT;
+				i, j: SIZE;
 				x, t: Sections.Section;
 			BEGIN
 				IF lo < hi THEN
@@ -13089,7 +13089,7 @@ TYPE
 
 		PROCEDURE ExceptionArray(source: IntermediateCode.Section);
 		VAR
-			p: Sections.Section; finallyPC, sizePC, size, i: LONGINT;
+			p: Sections.Section; finallyPC, sizePC, size: TODO; i: SIZE;
 		BEGIN
 			Info(source, "exception table offsets array descriptor");
 			size := 0;
@@ -13713,7 +13713,7 @@ TYPE
 		VAR
 			p: Sections.Section;  sizePC, numberCommands: LONGINT;
 			procedure : SyntaxTree.Procedure; procedureType: SyntaxTree.ProcedureType;
-			name: SyntaxTree.IdentifierString; numberParameters, i: LONGINT;
+			name: SyntaxTree.IdentifierString; numberParameters, i: SIZE;
 
 				(* Returns TRUE if the built-in function GETPROCEDURE can be used with this procedure type *)
 				PROCEDURE GetProcedureAllowed() : BOOLEAN;
@@ -13845,7 +13845,7 @@ TYPE
 
 		PROCEDURE TypeInfoSection(source: IntermediateCode.Section);
 		VAR
-			p: Sections.Section; sizePC, size, i: LONGINT;
+			p: Sections.Section; sizePC, size: LONGINT; i: SIZE;
 		BEGIN
 			Info(source, "Type info section");
 			size := 0;
@@ -13859,7 +13859,7 @@ TYPE
 					END;
 				END
 			END;
-			PatchArray(source,sizePC,size);
+			PatchArray(source,sizePC,TODO(size));
 		END TypeInfoSection;
 
 		(*
@@ -13950,7 +13950,7 @@ TYPE
 		END ProcedureDescriptorPointer;
 
 		PROCEDURE ProcedureDescriptorArray(section: IntermediateCode.Section; VAR numberProcs: LONGINT);
-		VAR sizePC, i: LONGINT; destination: Sections.Section;
+		VAR sizePC: TODO; i: SIZE; destination: Sections.Section;
 		BEGIN
 			ArrayBlock(section, sizePC,"Modules.ProcedureDesc.@Pointer",FALSE);
 			numberProcs := 0;

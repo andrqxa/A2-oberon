@@ -66,7 +66,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			PROCEDURE MergeSections (sections: Sections.SectionList): BOOLEAN;
 			VAR
 				section: Sections.Section;
-				i: LONGINT;
+				i: SIZE;
 				sname: Basic.SegmentedName;
 				codeAlign, dataAlign, constAlign: LONGINT;
 				codeUnit, dataUnit, constUnit: LONGINT;
@@ -187,7 +187,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			PROCEDURE ExportSections (sections: Sections.SectionList): BOOLEAN;
 			VAR
 				section, test: Sections.Section;
-				i, j: LONGINT;
+				i, j: SIZE;
 				name: ObjectFile.SectionName;
 				msg: ARRAY 256 OF CHAR;
 			BEGIN
@@ -217,7 +217,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END ExportSections;
 
 			PROCEDURE MakeStatistics(sections: Sections.SectionList);
-			VAR i: LONGINT;
+			VAR i: SIZE;
 				section: Sections.Section;
 				resolved: BinaryCode.Section;
 				suffix: ARRAY 128 OF CHAR;
@@ -496,7 +496,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 	END ReadHeader;
 
 	PROCEDURE WriteHeader(writer: Streams.Writer; binary: BOOLEAN; sections: Sections.SectionList; VAR poolMap: ObjectFile.PoolMap; offers, requires: ObjectFile.NameList; fingerprinter:Fingerprinter.Fingerprinter);
-	VAR i: LONGINT; section: Sections.Section;
+	VAR i: SIZE; section: Sections.Section;
 
 		PROCEDURE ProcessSection(section: IntermediateCode.Section);
 		VAR i: SIZE; fixup: BinaryCode.Fixup; alias: BinaryCode.Alias;
@@ -623,7 +623,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 		is: IntermediateCode.Section;
 		sectionList: Sections.SectionList;
 		section: ObjectFile.Section;
-		i: LONGINT;
+		i: SIZE;
 		dest: Files.FileName;
 		writer: Files.Writer;
 		name: ObjectFile.SegmentedName;

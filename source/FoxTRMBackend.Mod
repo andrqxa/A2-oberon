@@ -2265,7 +2265,7 @@ TYPE
 			out: BinaryCode.Section;
 			name: Basic.SectionName;
 			procedure: SyntaxTree.Procedure;
-			i, j, initialSectionCount: LONGINT;
+			i, j, initialSectionCount: SIZE;
 
 			PROCEDURE Resolve(VAR fixup: BinaryCode.Fixup);
 			BEGIN

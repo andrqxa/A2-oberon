@@ -1965,7 +1965,7 @@ TYPE
 		BEGIN NEW( list,8 );
 		END InitList;
 
-		PROCEDURE Length*( ): LONGINT;
+		PROCEDURE Length*( ): SIZE;
 		BEGIN RETURN list.Length();
 		END Length;
 
@@ -1973,22 +1973,22 @@ TYPE
 		BEGIN list.Add(d)
 		END AddExpression;
 
-		PROCEDURE GetExpression*( index: LONGINT ): Expression;
+		PROCEDURE GetExpression*( index: SIZE ): Expression;
 		VAR p: ANY;
 		BEGIN
 			p := list.Get(index); RETURN p(Expression);
 		END GetExpression;
 
-		PROCEDURE SetExpression*(index: LONGINT; expression: Expression);
+		PROCEDURE SetExpression*(index: SIZE; expression: Expression);
 		BEGIN list.Set(index,expression)
 		END SetExpression;
 
-		PROCEDURE RemoveExpression*(i: LONGINT);
+		PROCEDURE RemoveExpression*(i: SIZE);
 		BEGIN list.RemoveByIndex(i);
 		END RemoveExpression;
 
 		PROCEDURE Revert*;
-		VAR i,j,last: LONGINT; ei,ej: ANY;
+		VAR i,j,last: SIZE; ei,ej: ANY;
 		BEGIN
 			last := Length()-1;
 			FOR i := 0 TO last DO
@@ -2001,7 +2001,7 @@ TYPE
 		END Revert;
 
 		PROCEDURE Clone*(VAR list: ExpressionList);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			IF list = NIL THEN NEW(list) END;
 			FOR i := 0 TO Length()-1 DO
@@ -3402,7 +3402,7 @@ TYPE
 		BEGIN NEW( list,32 );
 		END InitList;
 
-		PROCEDURE Length*( ): LONGINT;
+		PROCEDURE Length*( ): SIZE;
 		BEGIN RETURN list.Length();
 		END Length;
 
@@ -3418,12 +3418,12 @@ TYPE
 		BEGIN RETURN list.Contains(statement);
 		END HasStatement;
 
-		PROCEDURE GetStatement*( index: LONGINT ): Statement;
+		PROCEDURE GetStatement*( index: SIZE ): Statement;
 		VAR p: ANY;
 		BEGIN p := list.Get( index );  RETURN p( Statement );
 		END GetStatement;
 
-		PROCEDURE SetStatement*(index: LONGINT; statement: Statement);
+		PROCEDURE SetStatement*(index: SIZE; statement: Statement);
 		BEGIN
 			list.Set(index,statement);
 		END SetStatement;
@@ -3439,7 +3439,7 @@ TYPE
 		END InsertBefore;
 
 		PROCEDURE Clone(VAR copy: StatementSequence);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			IF copy = NIL THEN NEW(copy) END;
 			FOR i := 0 TO Length()-1 DO
@@ -3645,18 +3645,18 @@ TYPE
 			elsifParts.Add( elsifPart );
 		END AddElsifPart;
 
-		PROCEDURE GetElsifPart*( i: LONGINT ): IfPart;
+		PROCEDURE GetElsifPart*( i: SIZE ): IfPart;
 		VAR a: ANY;
 		BEGIN a := elsifParts.Get( i );  RETURN a( IfPart )
 		END GetElsifPart;
 
-		PROCEDURE ElsifParts*( ): LONGINT;
+		PROCEDURE ElsifParts*( ): SIZE;
 		BEGIN
 			IF elsifParts = NIL THEN RETURN 0 ELSE RETURN elsifParts.Length();  END;
 		END ElsifParts;
 
 		PROCEDURE Clone(): Statement;
-		VAR copy: IfStatement; i: LONGINT;
+		VAR copy: IfStatement; i: SIZE;
 		BEGIN
 			NEW(copy, position, outer);
 			copy.ifPart := ifPart.Clone();
@@ -3730,12 +3730,12 @@ TYPE
 		BEGIN withParts.Add( withPart );
 		END AddWithPart;
 
-		PROCEDURE GetWithPart*( i: LONGINT ): WithPart;
+		PROCEDURE GetWithPart*( i: SIZE ): WithPart;
 		VAR a: ANY;
 		BEGIN a := withParts.Get( i );  RETURN a( WithPart )
 		END GetWithPart;
 
-		PROCEDURE WithParts*( ): LONGINT;
+		PROCEDURE WithParts*( ): SIZE;
 		BEGIN
 			IF withParts = NIL THEN RETURN 0 ELSE RETURN withParts.Length();  END;
 		END WithParts;
@@ -3746,7 +3746,7 @@ TYPE
 		END SetElsePart;
 
 		PROCEDURE Clone(): Statement;
-		VAR copy: WithStatement; i: LONGINT;
+		VAR copy: WithStatement; i: SIZE;
 		BEGIN
 			NEW(copy, position, outer);
 			FOR i := 0 TO WithParts()-1 DO
@@ -3829,18 +3829,18 @@ TYPE
 			caseParts.Add( casePart );
 		END AddCasePart;
 
-		PROCEDURE GetCasePart*( i: LONGINT ): CasePart;
+		PROCEDURE GetCasePart*( i: SIZE ): CasePart;
 		VAR a: ANY;
 		BEGIN a := caseParts.Get( i );  RETURN a( CasePart )
 		END GetCasePart;
 
-		PROCEDURE CaseParts*( ): LONGINT;
+		PROCEDURE CaseParts*( ): SIZE;
 		BEGIN
 			IF caseParts = NIL THEN RETURN 0 ELSE RETURN caseParts.Length();  END;
 		END CaseParts;
 
 		PROCEDURE Clone(): Statement;
-		VAR copy: CaseStatement; i: LONGINT;
+		VAR copy: CaseStatement; i: SIZE;
 		BEGIN
 			NEW(copy, position, outer);
 			copy.SetVariable(CloneExpression(variable));
@@ -3853,7 +3853,7 @@ TYPE
 		END Clone;
 
 		PROCEDURE MaxConstant*(): Basic.Integer;
-		VAR val: Basic.Integer; i: LONGINT; part: CasePart; const: CaseConstant;
+		VAR val: Basic.Integer; i: SIZE; part: CasePart; const: CaseConstant;
 		BEGIN
 			val := -1;
 			FOR i := 0 TO CaseParts() - 1 DO
@@ -4162,7 +4162,7 @@ TYPE
 	(** << CODE {flags} {character}  END >> **)
 	Code*= OBJECT(Statement)
 	VAR
-		sourceCode-: SourceCode; sourceCodeLength-: LONGINT;
+		sourceCode-: SourceCode; sourceCodeLength-: SIZE;
 		inlineCode-: BinaryCode;
 		inRules-, outRules-: StatementSequence;
 
@@ -4174,7 +4174,7 @@ TYPE
 			NEW(inRules); NEW(outRules);
 		END InitCode;
 
-		PROCEDURE SetSourceCode*(source: SourceCode; length: LONGINT);
+		PROCEDURE SetSourceCode*(source: SourceCode; length: SIZE);
 		BEGIN sourceCode := source; sourceCodeLength := length;
 			ASSERT(sourceCodeLength <= LEN(source));
 		END SetSourceCode;
@@ -4997,7 +4997,7 @@ TYPE
 		BEGIN NEW( list,8 );
 		END InitList;
 
-		PROCEDURE Length*( ): LONGINT;
+		PROCEDURE Length*( ): SIZE;
 		BEGIN RETURN list.Length();
 		END Length;
 
@@ -5005,23 +5005,23 @@ TYPE
 		BEGIN list.Add(d)
 		END AddSymbol;
 
-		PROCEDURE GetSymbol*( index: LONGINT ): Symbol;
+		PROCEDURE GetSymbol*( index: SIZE ): Symbol;
 		VAR p: ANY;
 		BEGIN
 			p := list.Get(index); RETURN p(Symbol);
 		END GetSymbol;
 
-		PROCEDURE SetSymbol*(index: LONGINT; expression: Symbol);
+		PROCEDURE SetSymbol*(index: SIZE; expression: Symbol);
 		BEGIN list.Set(index,expression)
 		END SetSymbol;
 
-		PROCEDURE RemoveSymbol*(i: LONGINT);
+		PROCEDURE RemoveSymbol*(i: SIZE);
 		BEGIN list.RemoveByIndex(i);
 		END RemoveSymbol;
 
 		(*
 		PROCEDURE Clone*(VAR list: SymbolList);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			IF list = NIL THEN NEW(list) END;
 			FOR i := 0 TO Length()-1 DO
@@ -5039,7 +5039,7 @@ TYPE
 		BEGIN NEW( list,8 );
 		END InitList;
 
-		PROCEDURE Length*( ): LONGINT;
+		PROCEDURE Length*( ): SIZE;
 		BEGIN RETURN list.Length();
 		END Length;
 
@@ -5047,7 +5047,7 @@ TYPE
 		BEGIN list.Add(d)
 		END AddProcedure;
 
-		PROCEDURE GetProcedure*( index: LONGINT ): Procedure;
+		PROCEDURE GetProcedure*( index: SIZE ): Procedure;
 		VAR p: ANY;
 		BEGIN
 			IF index >= list.Length() THEN RETURN NIL END;
@@ -5059,17 +5059,17 @@ TYPE
 			END;
 		END GetProcedure;
 
-		PROCEDURE SetProcedure*(index: LONGINT; expression: Procedure);
+		PROCEDURE SetProcedure*(index: SIZE; expression: Procedure);
 		BEGIN list.GrowAndSet(index,expression)
 		END SetProcedure;
 
-		PROCEDURE RemoveProcedure*(i: LONGINT);
+		PROCEDURE RemoveProcedure*(i: SIZE);
 		BEGIN list.RemoveByIndex(i);
 		END RemoveProcedure;
 
 		(*
 		PROCEDURE Clone*(VAR list: ProcedureList);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			IF list = NIL THEN NEW(list) END;
 			FOR i := 0 TO Length()-1 DO
