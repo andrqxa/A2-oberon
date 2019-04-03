@@ -73,7 +73,7 @@ TYPE
 		PROCEDURE GetSelection*() : Selection;
 		VAR
 			processes : ARRAY ProcessInfo.MaxNofProcesses OF Objects.Process;
-			nofProcesses : LONGINT;
+			nofProcesses : SIZE;
 			scol, srow, ecol, erow, id, i : LONGINT;
 			selection : Selection;
 			str : Strings.String;
@@ -314,10 +314,11 @@ TYPE
 		END Update;
 
 		PROCEDURE Refresh;
-		VAR proc : ProcessInfo.IsGreaterThanProc;
+		VAR proc : ProcessInfo.IsGreaterThanProc; nofProcesses : SIZE;
 		BEGIN
 			Acquire;
 			ProcessInfo.GetProcesses(processes, nofProcesses);
+			SELF.nofProcesses := LONGINT (nofProcesses);
 			CASE sortI OF
 			| ID: proc := ProcessInfo.SortByID;
 			| Priority : proc := ProcessInfo.SortByPriority;

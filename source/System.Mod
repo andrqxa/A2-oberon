@@ -334,9 +334,9 @@ PROCEDURE ShowProcesses*(context : Commands.Context); (** [options] ~ *)
 VAR
 	options : Options.Options;
 	processes : ARRAY ProcessInfo.MaxNofProcesses OF Objects.Process;
-	nofProcesses : LONGINT;
+	nofProcesses : SIZE;
 	string : ARRAY 16 OF CHAR;
-	i : LONGINT;
+	i : SIZE;
 BEGIN
 	NEW(options);
 	options.Add("s", "sort", Options.String);
@@ -361,7 +361,7 @@ BEGIN
 END ShowProcesses;
 
 PROCEDURE ShowStacks*(context : Commands.Context);
-VAR processes : ARRAY ProcessInfo.MaxNofProcesses OF Objects.Process; nofProcesses, i : LONGINT;
+VAR processes : ARRAY ProcessInfo.MaxNofProcesses OF Objects.Process; nofProcesses, i : SIZE;
 BEGIN
 	ProcessInfo.GetProcesses(processes, nofProcesses);
 	FOR i := 0 TO nofProcesses - 1 DO ProcessInfo.ShowStack(processes[i], context.out); END;

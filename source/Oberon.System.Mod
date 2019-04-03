@@ -1147,8 +1147,8 @@ END WriteType;
 
 PROCEDURE ShowActive*;	(** non-portable *)
 VAR
-	processes : ARRAY ProcessInfo.MaxNofProcesses OF AosActive.Process; nofProcesses : LONGINT;
-	t: AosActive.Process;  i, mode, adr: LONGINT;  T: Texts.Text;
+	processes : ARRAY ProcessInfo.MaxNofProcesses OF AosActive.Process; nofProcesses : SIZE;
+	t: AosActive.Process;  i: SIZE; mode, adr: LONGINT;  T: Texts.Text;
 	pc, tmp1, tmp2: LONGINT; refs: Bytes;
 BEGIN
 	ProcessInfo.GetProcesses(processes, nofProcesses);
@@ -1251,7 +1251,7 @@ END TerminateObject;
 (** Attempt to terminate all non-immune threads. *)
 
 PROCEDURE TerminateObjects*;	(** non-portable *)
-VAR processes : ARRAY ProcessInfo.MaxNofProcesses OF AosActive.Process; nofProcesses, i : LONGINT;
+VAR processes : ARRAY ProcessInfo.MaxNofProcesses OF AosActive.Process; nofProcesses, i : SIZE;
 BEGIN
 	ProcessInfo.GetProcesses(processes, nofProcesses);
 	FOR i := 0 TO nofProcesses - 1 DO
