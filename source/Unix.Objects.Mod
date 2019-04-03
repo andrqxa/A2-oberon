@@ -57,7 +57,7 @@ VAR
 	processPointer	: Unix.Key_t;
 
 	newProcess: Process;
-	nextPID: LONGINT;
+	nextPID: WORD;
 
 	finalizerCaller	: FinalizerCaller;
 	mainthread: Unix.Thread_t;
@@ -169,7 +169,7 @@ TYPE
 		threadId-			: Unix.Thread_t;
 		nextProcess-	: Process;	(* next in list of all processes *)
 		stackBottom	-	: ADDRESS;
-		id-				: LONGINT;
+		id-				: WORD;
 		body			: Body;
 		mode-		: LONGINT;
 		flags-			: SET;
@@ -569,7 +569,7 @@ TYPE
 	END GetStackBottom;
 
 
-	PROCEDURE GetProcessID*( ): LONGINT;
+	PROCEDURE GetProcessID*( ): WORD;
 	VAR p: Process;
 	BEGIN
 		p := CurrentProcess();

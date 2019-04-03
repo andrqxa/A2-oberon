@@ -148,7 +148,7 @@ TYPE
 		mode-: LONGINT;   (* process state *)  (* only changed inside Objects lock ??? *)
 		procID-: LONGINT;   (* processor ID where running,  exported for compatibilty , useless in WinAos *)
 		waitingOn-: ProtectedObject;   (* obj this process is waiting on (for lock or condition) *)
-		id-: LONGINT;   (* unique process ID for tracing *)
+		id-: WORD;   (* unique process ID for tracing *)
 		flags*: SET;   (* process flags *)
 		priority-: LONGINT;   (* process priority *)
 
@@ -167,7 +167,7 @@ TYPE
 		VAR sp: ADDRESS; res: Kernel32.BOOL; pc, bp: ADDRESS;
 			n,adr: ADDRESS; desc {UNTRACED}: Modules.ProcedureDescPointer; p {UNTRACED}: ANY; i: SIZE;
 			a0,a1, obp, osb, osbp, opc, gbp: ADDRESS;
-			O: ANY; ID: LONGINT;
+			O: ANY; ID: WORD;
 			mod {UNTRACED}: Modules.Module;
 			proc {UNTRACED}: Modules.ProcedureDescPointer;
 			modName: ARRAY 128 OF CHAR;
@@ -492,7 +492,7 @@ BEGIN
 END ActiveObject;
 
 (** Return the ID of the active currently executing process. *)
-PROCEDURE GetProcessID* (): LONGINT;
+PROCEDURE GetProcessID* (): WORD;
 VAR r: Process;
 BEGIN
 	r := SYSTEM.VAL (Process, Kernel32.TlsGetValue( tlsIndex ));

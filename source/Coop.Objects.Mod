@@ -83,7 +83,7 @@ TYPE
 		mode-: LONGINT;   (* process state *)  (* only changed inside Objects lock ??? *)
 		procID-: LONGINT;   (* processor ID where running,  exported for compatibilty , useless in WinAos *)
 		waitingOn-: ProtectedObject;   (* obj this process is waiting on (for lock or condition) *)
-		id-: LONGINT;   (* unique process ID for tracing *)
+		id-: WORD;   (* unique process ID for tracing *)
 		flags*: SET;   (* process flags *)
 		priority-: LONGINT;   (* process priority *)
 		stackBottom: LONGINT;
@@ -239,9 +239,9 @@ END ActiveObject;
 
 
 (** Return the ID of the active currently executing process. *)
-PROCEDURE GetProcessID* (): LONGINT;
+PROCEDURE GetProcessID* (): WORD;
 BEGIN
-	RETURN SYSTEM.VAL (LONGINT, Activities.GetCurrentActivity ());
+	RETURN SYSTEM.VAL (WORD, Activities.GetCurrentActivity ());
 END GetProcessID;
 
 (* Attempt to terminate a specific process (mostly ignoring its locks). DEPRECATED *)
