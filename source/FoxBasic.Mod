@@ -253,13 +253,13 @@ TYPE
 	HashTable* = OBJECT
 	VAR
 		table: HashAnyArray;
-		size: LONGINT;
-		used-: LONGINT;
+		size: SIZE;
+		used-: SIZE;
 		maxLoadFactor: REAL;
 
 		(* Interface *)
 
-		PROCEDURE & Init* (initialSize: LONGINT);
+		PROCEDURE & Init* (initialSize: SIZE);
 		BEGIN
 			ASSERT(initialSize > 2);
 			NEW(table, initialSize);
@@ -269,7 +269,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Put*(key, value: ANY);
-		VAR hash: LONGINT;
+		VAR hash: SIZE;
 		BEGIN
 			ASSERT(used < size);
 			ASSERT(key # NIL);
@@ -295,17 +295,21 @@ TYPE
 			RETURN table[HashValue(key)].key = key;
 		END Has;
 
-		PROCEDURE Length*():LONGINT;
-		BEGIN RETURN used; END Length;
+		PROCEDURE Length*(): SIZE;
+		BEGIN
+			RETURN used;
+		END Length;
 
 		PROCEDURE Clear*;
-		VAR i: LONGINT;
-		BEGIN FOR i := 0 TO size - 1 DO table[i].key := NIL; table[i].value := NIL; table[i].valueInt := 0 END; END Clear;
+		VAR i: SIZE;
+		BEGIN
+			FOR i := 0 TO size - 1 DO table[i].key := NIL; table[i].value := NIL; table[i].valueInt := 0 END;
+		END Clear;
 
 		(* Interface for integer values *)
 
 		PROCEDURE PutInt*(key: ANY; value: LONGINT);
-		VAR hash: LONGINT;
+		VAR hash: SIZE;
 		BEGIN
 			ASSERT(used < size);
 			hash := HashValue(key);
@@ -318,15 +322,17 @@ TYPE
 		END PutInt;
 
 		PROCEDURE GetInt*(key: ANY):LONGINT;
-		BEGIN RETURN table[HashValue(key)].valueInt; END GetInt;
+		BEGIN
+			RETURN table[HashValue(key)].valueInt;
+		END GetInt;
 
 		(* Internals *)
 
 		(* only correctly working, if NIL key cannot be entered *)
-		PROCEDURE HashValue(key: ANY):LONGINT;
-		VAR value, h1, h2, i: LONGINT;
+		PROCEDURE HashValue(key: ANY): SIZE;
+		VAR value, h1, h2, i: SIZE;
 		BEGIN
-			value := SYSTEM.VAL(LONGINT, key) DIV SIZEOF(ADDRESS);
+			value := SYSTEM.VAL(SIZE, key) DIV SIZEOF(ADDRESS);
 			i := 0;
 			h1 := value MOD size;
 			h2 := 1; (* Linear probing *)
@@ -339,7 +345,7 @@ TYPE
 		END HashValue;
 
 		PROCEDURE Grow;
-		VAR oldTable: HashAnyArray; oldSize, i: LONGINT; key: ANY;
+		VAR oldTable: HashAnyArray; oldSize, i: SIZE; key: ANY;
 		BEGIN
 			oldSize := size;
 			oldTable := table;
@@ -361,7 +367,7 @@ TYPE
 	IntIterator*= OBJECT
 	VAR
 		table: HashIntArray;
-		count : LONGINT;
+		count : SIZE;
 
 		PROCEDURE & Init(t: HashIntArray);
 		BEGIN
@@ -387,13 +393,13 @@ TYPE
 	HashTableInt* = OBJECT
 	VAR
 		table: HashIntArray;
-		size: LONGINT;
-		used-: LONGINT;
+		size: SIZE;
+		used-: SIZE;
 		maxLoadFactor: REAL;
 
 		(* Interface *)
 
-		PROCEDURE & Init* (initialSize: LONGINT);
+		PROCEDURE & Init* (initialSize: SIZE);
 		BEGIN
 			ASSERT(initialSize > 2);
 			NEW(table, initialSize);
@@ -403,7 +409,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Put*(key: LONGINT; value: ANY);
-		VAR hash: LONGINT;
+		VAR hash: SIZE;
 		BEGIN
 			ASSERT(key # 0);
 			ASSERT(used < size);
@@ -426,17 +432,21 @@ TYPE
 			RETURN table[HashValue(key)].key = key;
 		END Has;
 
-		PROCEDURE Length*():LONGINT;
-		BEGIN RETURN used; END Length;
+		PROCEDURE Length*(): SIZE;
+		BEGIN
+			RETURN used;
+		END Length;
 
 		PROCEDURE Clear*;
-		VAR i: LONGINT;
-		BEGIN FOR i := 0 TO size - 1 DO table[i].key := 0; END; END Clear;
+		VAR i: SIZE;
+		BEGIN
+			FOR i := 0 TO size - 1 DO table[i].key := 0; END;
+		END Clear;
 
 		(* Interface for integer values *)
 
 		PROCEDURE PutInt*(key, value: LONGINT);
-		VAR hash: LONGINT;
+		VAR hash: SIZE;
 		BEGIN
 			(*ASSERT(key # 0);*)
 			ASSERT(used < size);
@@ -450,12 +460,14 @@ TYPE
 		END PutInt;
 
 		PROCEDURE GetInt*(key: LONGINT):LONGINT;
-		BEGIN RETURN table[HashValue(key)].valueInt; END GetInt;
+		BEGIN
+			RETURN table[HashValue(key)].valueInt;
+		END GetInt;
 
 		(* Internals *)
 
-		PROCEDURE HashValue(key: LONGINT):LONGINT;
-		VAR value, h1, h2, i: LONGINT;
+		PROCEDURE HashValue(key: LONGINT): SIZE;
+		VAR value, h1, h2, i: SIZE;
 		BEGIN
 			i := 0;
 			value := key;
@@ -470,7 +482,7 @@ TYPE
 		END HashValue;
 
 		PROCEDURE Grow;
-		VAR oldTable: HashIntArray; oldSize, i, key: LONGINT;
+		VAR oldTable: HashIntArray; oldSize, i: SIZE; key: LONGINT;
 		BEGIN
 			oldSize := size;
 			oldTable := table;
@@ -505,13 +517,13 @@ TYPE
 	HashTableSegmentedName* = OBJECT
 	VAR
 		table: HashSegmentedNameArray;
-		size: LONGINT;
-		used-: LONGINT;
+		size: SIZE;
+		used-: SIZE;
 		maxLoadFactor: REAL;
 
 		(* Interface *)
 
-		PROCEDURE & Init* (initialSize: LONGINT);
+		PROCEDURE & Init* (initialSize: SIZE);
 		BEGIN
 			ASSERT(initialSize > 2);
 			NEW(table, initialSize);
@@ -522,7 +534,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Put*(CONST key: SegmentedName; value: ANY);
-		VAR hash: LONGINT;
+		VAR hash: SIZE;
 		BEGIN
 			ASSERT(used < size);
 			hash := HashValue(key);
@@ -544,27 +556,31 @@ TYPE
 			RETURN table[HashValue(key)].key = key;
 		END Has;
 
-		PROCEDURE Length*():LONGINT;
-		BEGIN RETURN used; END Length;
+		PROCEDURE Length*(): SIZE;
+		BEGIN
+			RETURN used;
+		END Length;
 
 		PROCEDURE Clear*;
-		VAR i: LONGINT;
-		BEGIN FOR i := 0 TO size - 1 DO table[i].key[0] := -1; END; END Clear;
+		VAR i: SIZE;
+		BEGIN
+			FOR i := 0 TO size - 1 DO table[i].key[0] := -1; END;
+		END Clear;
 
 		(* Internals *)
-		PROCEDURE Hash*(CONST name: SegmentedName): LONGINT;
-		VAR fp,i: LONGINT;
+		PROCEDURE Hash*(CONST name: SegmentedName): SIZE;
+		VAR fp, i: SIZE;
 		BEGIN
 			fp := name[0]; i := 1;
 			WHILE (i<LEN(name)) & (name[i] >= 0) DO
-				fp:=SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, ROT(fp, 7)) / SYSTEM.VAL(SET, name[i]));
+				fp:=SYSTEM.VAL(SIZE, SYSTEM.VAL(SET, ROT(fp, 7)) / SYSTEM.VAL(SET, name[i]));
 				INC(i);
 			END;
 			RETURN fp
 		END Hash;
 
-		PROCEDURE HashValue(CONST key: SegmentedName):LONGINT;
-		VAR value, h,i: LONGINT;
+		PROCEDURE HashValue(CONST key: SegmentedName): SIZE;
+		VAR value, h, i: SIZE;
 		BEGIN
 			ASSERT(key[0] >= 0);
 			h := Hash(key);
@@ -578,7 +594,7 @@ TYPE
 		END HashValue;
 
 		PROCEDURE Grow;
-		VAR oldTable: HashSegmentedNameArray; oldSize, i: LONGINT; key: SegmentedName;
+		VAR oldTable: HashSegmentedNameArray; oldSize, i: SIZE; key: SegmentedName;
 		BEGIN
 			oldSize := size;
 			oldTable := table;
