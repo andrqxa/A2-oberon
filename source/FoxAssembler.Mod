@@ -487,12 +487,7 @@ TYPE
 		BEGIN
 			IF ThisSymbol(Scanner.Number) THEN
 				(* ASSERT(symbol.numberType = Scanner.Integer); *)
-				IF token.numberType = Scanner.Integer THEN
-					x.value := token.integer
-				ELSIF token.numberType = Scanner.Hugeint THEN
-					x.value := token.hugeint;
-					(* ASSERT(x.value < 0); (* the resulting 32 bit integer must be negative when interpreted as a signed value *)*)
-				END;
+				x.value := token.integer;
 				x.type := ConstantInteger;
 				RETURN TRUE;
 			ELSIF ThisSymbol(Scanner.PC) THEN (* pc IN units ! *)
@@ -783,7 +778,7 @@ TYPE
 			IgnoreNewLines;
 			WHILE ~error & (token.symbol # Scanner.Period) & (token.symbol # Scanner.EndOfText) DO
 				IF ThisSymbol(Scanner.Number) THEN
-					line := token.integer;
+					line := TODO(token.integer);
 					IF ThisSymbol(Scanner.Colon) THEN (* line number *)
 					ELSE Error(token.position,"Identifier expected");
 					END;
@@ -807,7 +802,7 @@ TYPE
 				IgnoreNewLines;
 				WHILE ~error & (token.symbol # Scanner.EndOfText) & (token.symbol # Scanner.Period) DO
 					IF ThisSymbol(Scanner.Number) THEN
-						line := token.integer;
+						line := TODO(token.integer);
 						IF ThisSymbol(Scanner.Colon) THEN (* line number *)
 						ELSE Error(token.position,"Identifier expected");
 						END;

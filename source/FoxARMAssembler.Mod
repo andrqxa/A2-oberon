@@ -131,7 +131,7 @@ TYPE
 			result: BOOLEAN;
 		BEGIN
 			IF (token.symbol = Scanner.Number) & (token.numberType = Scanner.Integer) & (token.integer >= 0) & (token.integer <= 7) THEN
-				coprocessorOpcode := token.integer;
+				coprocessorOpcode := TODO(token.integer);
 				result := TRUE;
 				NextToken
 			ELSE

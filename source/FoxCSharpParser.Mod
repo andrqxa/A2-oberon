@@ -858,13 +858,7 @@ KernelLog.Ln();
                 expression := SyntaxTree.NewBooleanValue(position, FALSE);
                 NextToken;
             ELSIF Peek(Scanner.IntegerLiteral) THEN
-                IF token.numberType = Scanner.IntNumber THEN
-                    expression := SyntaxTree.NewIntegerValue(position, token.integer);
-                ELSIF token.numberType = Scanner.LongNumber THEN
-                    expression := SyntaxTree.NewIntegerValue(position, token.hugeint);
-                ELSE
-                    HALT(100);
-                END;
+                expression := SyntaxTree.NewIntegerValue(position, token.integer);
                 NextToken;
             ELSIF Peek(Scanner.RealLiteral) THEN
                 realValue := SyntaxTree.NewRealValue(position, token.real);

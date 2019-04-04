@@ -181,8 +181,7 @@ TYPE
 		string*: StringType;  (* string or identifier *)
 		stringLength*: LONGINT; (* length of string, if stringLength = 2 then this may be interpreted as character and integer = ORD(ch) *)
 		numberType*: LONGINT;  (* Integer, HugeInteger, Real or Longreal *)
-		integer*: LONGINT;
-		hugeint*: HUGEINT;  (*! unify longint and hugeint *)
+		integer*: HUGEINT;
 		character*: CHAR;
 		real*: LONGREAL;
 	END;
@@ -594,11 +593,11 @@ TYPE
 		Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' .
 		**)
 		PROCEDURE GetNumber(VAR token: Token): Symbol;
-		VAR i, nextInt, m, n, d, e, si: LONGINT;
+		VAR i, m, n, d, e, si: LONGINT;
 			dig: ARRAY 24 OF CHAR;
 			f: LONGREAL;  expCh: CHAR;  neg, long: BOOLEAN;
 			result: Symbol;
-			hugeint, tenh, number: HUGEINT;
+			hugeint, tenh, number, nextInt: HUGEINT;
 			digits: LONGINT;
 
 			(** 10^e **)
@@ -655,8 +654,7 @@ TYPE
 						GetNextCharacter;
 						IF (ch = "'") & IsHexDigit(reader.Peek()) THEN GetNextCharacter END;
 					END;
-					token.hugeint := number;
-					token.integer := SHORT(number);
+					token.integer := number;
 					IF (digits > MaxHexDigits) OR (digits = MaxHexDigits) & (number > MAX(LONGINT)) THEN
 						token.numberType := Hugeint
 					ELSE
@@ -674,8 +672,7 @@ TYPE
 						GetNextCharacter;
 						IF (ch = "'") & IsBinaryDigit(reader.Peek()) THEN GetNextCharacter END;
 					END;
-					token.hugeint := number;
-					token.integer := SHORT(number);
+					token.integer := number;
 					IF digits > 32 THEN
 						token.numberType := Hugeint
 					ELSE
@@ -704,7 +701,7 @@ TYPE
 			END;   (* 0 <= n <= m <= i, 0 <= d <= i *)
 			IF d = 0 THEN  (* integer *)
 				IF n = m THEN
-					token.integer := 0;  i := 0;  token.hugeint := 0;
+					token.integer := 0;  i := 0;
 					IF ch = "X" THEN  (* character *)
 						token.identifierString[si] := ch;  INC( si );  GetNextCharacter;  result := Character;
 						IF  (n <= 2) THEN
@@ -718,12 +715,10 @@ TYPE
 							token.numberType := Integer;
 							(* IF (n = MaxHexDigits) & (dig[0] > "7") THEN  (* prevent overflow *) token.integer := -1 END;  *)
 							WHILE i < n DO token.integer := token.integer * 10H + Hexadecimal( dig[i] );  INC( i ) END;
-							token.hugeint := token.integer;
 						ELSIF n <= MaxHugeHexDigits THEN
 							token.numberType := Hugeint;
-							IF (n = MaxHugeHexDigits) & (dig[0] > "7") THEN  (* prevent overflow *) token.hugeint := -1 END;
-							WHILE i < n DO token.hugeint := Hexadecimal( dig[i] ) + token.hugeint * 10H; INC( i ) END;
-							token.integer :=SHORT(token.hugeint);
+							IF (n = MaxHugeHexDigits) & (dig[0] > "7") THEN  (* prevent overflow *) token.integer := -1 END;
+							WHILE i < n DO token.integer := Hexadecimal( dig[i] ) + token.integer * 10H; INC( i ) END;
 						ELSE
 							token.numberType := Hugeint; (* to make parser able to go on *)
 							Error( Basic.NumberTooLarge )
@@ -747,10 +742,7 @@ TYPE
 								hugeint := hugeint * tenh + d;
 								IF hugeint < 0 THEN Error( Basic.NumberTooLarge ) END
 							END;
-							token.hugeint := hugeint;
-							token.integer := SHORT(token.hugeint);
-						ELSE
-							token.hugeint := token.integer;
+							token.integer := hugeint;
 						END
 					END
 				ELSE

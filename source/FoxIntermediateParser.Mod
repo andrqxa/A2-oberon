@@ -88,9 +88,9 @@ TYPE
 			isNegated := ThisSymbol(Scanner.Minus);
 			IF ExpectSymbol(Scanner.Number) & (token.numberType = Scanner.Integer) THEN
 				IF isNegated THEN
-					integer := -token.integer
+					integer := -TODO(token.integer)
 				ELSE
-					integer := token.integer
+					integer := TODO(token.integer)
 				END;
 				result := TRUE
 			ELSE
@@ -104,7 +104,7 @@ TYPE
 			result: BOOLEAN;
 		BEGIN
 			IF ExpectSymbol(Scanner.Number) & (token.numberType = Scanner.Integer) THEN
-				integer := token.integer;
+				integer := TODO(token.integer);
 				result := TRUE
 			ELSE
 				result := FALSE
@@ -140,7 +140,7 @@ TYPE
 
 			positionOfLine := token.position;
 			IF ThisSymbol(Scanner.Number) THEN (* note: line numbers are optional *)
-				specifiedLineNumber := token.integer;
+				specifiedLineNumber := TODO(token.integer);
 				IF ExpectSymbol(Scanner.Colon) THEN
 					IF Strict & (specifiedLineNumber # expectedLineNumber) THEN
 						message := "invalid code line number (";
@@ -157,7 +157,7 @@ TYPE
 		(** parse an intermediate code operand **)
 		PROCEDURE ParseOperand(VAR operand: IntermediateCode.Operand; sectionList: Sections.SectionList);
 		VAR
-			positionOfOperand, pos: Position;  registerNumber, symbolOffset, someLongint, integer: LONGINT;
+			positionOfOperand, pos: Position;  registerNumber, symbolOffset, integer: LONGINT;
 			someHugeint: HUGEINT;
 			hasTypeDescriptor, isMemoryOperand, lastWasIdentifier, isNegated: BOOLEAN;
 			someLongreal: LONGREAL;
@@ -223,23 +223,11 @@ TYPE
 				isNegated := ThisSymbol(Scanner.Minus);
 				IF ThisSymbol(Scanner.Number) THEN
 					CASE token.numberType OF
-					| Scanner.Integer:
-						IF isNegated THEN someLongint := -token.integer ELSE someLongint := token.integer END;
+					| Scanner.Integer, Scanner.Hugeint:
+						IF isNegated THEN someHugeint := -token.integer ELSE someHugeint := token.integer END;
 						IF ~hasTypeDescriptor THEN
 							(* if no type description was included: use number type *)
-							IntermediateCode.InitNumber(operand, someLongint);
-						ELSIF type.form = IntermediateCode.Float THEN
-							ASSERT(hasTypeDescriptor);
-							IntermediateCode.InitFloatImmediate(operand, type, REAL(someLongint))
-						ELSE
-							ASSERT(hasTypeDescriptor & (type.form IN IntermediateCode.Integer));
-							IntermediateCode.InitImmediate(operand, type, someLongint)
-						END
-					| Scanner.Hugeint:
-						IF isNegated THEN someHugeint := - token.hugeint ELSE someHugeint := token.hugeint END;
-						IF ~hasTypeDescriptor THEN
-							(* if no type description was included: use number type *)
-							IntermediateCode.InitNumber(operand, someHugeint)
+							IntermediateCode.InitNumber(operand, someHugeint);
 						ELSIF type.form = IntermediateCode.Float THEN
 							ASSERT(hasTypeDescriptor);
 							IntermediateCode.InitFloatImmediate(operand, type, REAL(someHugeint))

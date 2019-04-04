@@ -1220,9 +1220,9 @@ TYPE
 		PROCEDURE ModifierValueP(VAR value: LONGINT);
 		BEGIN
 			IF token.symbol = FoxScanner.Equal THEN
-				NextToken; Check(FoxScanner.Number); value := token.integer
+				NextToken; Check(FoxScanner.Number); value := TODO(token.integer)
 			ELSIF token.symbol = FoxScanner.LeftParenthesis THEN
-				NextToken; Check(FoxScanner.Number); value := token.integer; Check(FoxScanner.RightParenthesis)
+				NextToken; Check(FoxScanner.Number); value := TODO(token.integer); Check(FoxScanner.RightParenthesis)
 			ELSE
 				Error(token.position.start); NextToken
 			END

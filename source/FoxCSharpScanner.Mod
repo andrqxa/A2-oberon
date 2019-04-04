@@ -167,8 +167,7 @@ TYPE
         string*: StringType;
         stringLength*: LONGINT;
         numberType*: LONGINT;
-        integer*: LONGINT;
-        hugeint*: HUGEINT;
+        integer*: HUGEINT;
         character*: CHAR;
         real*: LONGREAL;
     END;
@@ -461,11 +460,11 @@ TYPE
                 'a' | 'b' | 'c' | 'd' | 'e' | 'f'.
         **)
         PROCEDURE GetNumber(VAR token: Token; frac: BOOLEAN): Symbol;
-            VAR i, nextInt, m, n, d, e, si: LONGINT;
+            VAR i, m, n, d, e, si: LONGINT;
                 dig: ARRAY 24 OF CHAR;
                 f: LONGREAL;
                 hex, neg, long: BOOLEAN;
-                hugeint, tenh: HUGEINT;
+                hugeint, tenh, nextInt: HUGEINT;
                 result: Symbol;
 
             PROCEDURE Append(ch: CHAR);
@@ -581,7 +580,6 @@ TYPE
                 END;
                 IF n = m THEN
                     token.integer := 0;
-                    token.hugeint := 0;
                     i := 0;
                     IF hex THEN
                         IF ~long &
@@ -592,7 +590,6 @@ TYPE
                                 INC(i)
                             END;
                             token.numberType := IntNumber;
-                            token.hugeint := token.integer;
                         ELSIF n <= MaxHugeHexDigits THEN
                             hugeint := 0;
                             IF (n = MaxHugeHexDigits) & (dig[0] > '7') THEN
@@ -604,9 +601,7 @@ TYPE
                                 INC(i)
                             END;
                             token.numberType := LongNumber;
-                            token.hugeint := hugeint;
-                            token.integer := SHORT(token.hugeint);
-
+                            token.integer := hugeint;
                         ELSE
                             token.numberType := LongNumber;
                             Error(Basic.NumberTooLarge)
@@ -644,11 +639,9 @@ TYPE
                                 END
                             END;
                             token.numberType := LongNumber;
-                            token.hugeint := hugeint;
-                            token.integer := SHORT(token.hugeint);
+                            token.integer := hugeint;
                         ELSE
                             token.numberType := IntNumber;
-                            token.hugeint := token.integer;
                         END
                     END
                 ELSE

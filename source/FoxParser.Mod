@@ -898,10 +898,8 @@ TYPE
 			position := token.position;
 			CASE Symbol() OF
 			| Scanner.Number:
-					IF (token.numberType = Scanner.Integer) THEN
+					IF (token.numberType = Scanner.Integer) OR (token.numberType = Scanner.Hugeint) THEN
 						factor := SyntaxTree.NewIntegerValue( position, token.integer);
-					ELSIF (token.numberType = Scanner.Hugeint) THEN
-						factor := SyntaxTree.NewIntegerValue(position, token.hugeint);
 					ELSIF (token.numberType = Scanner.Real) OR (token.numberType = Scanner.Longreal) THEN
 						factor := SyntaxTree.NewRealValue( position, token.real);
 						factor(SyntaxTree.RealValue).SetSubtype(token.numberType);
