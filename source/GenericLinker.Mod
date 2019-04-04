@@ -73,7 +73,6 @@ TYPE
 			END;
 		END Get;
 
-
 		PROCEDURE Clear;
 		VAR i: LONGINT;
 		BEGIN FOR i := 0 TO size - 1 DO table[i].key[0] := -1; END; END Clear;
@@ -138,7 +137,6 @@ TYPE Arrangement* = OBJECT
 		(* to be able to provide relocation information in an image*)
 	END CheckReloc;
 
-
 END Arrangement;
 
 TYPE Block* = POINTER TO RECORD (ObjectFile.Section)
@@ -146,7 +144,7 @@ TYPE Block* = POINTER TO RECORD (ObjectFile.Section)
 	address*: Address;
 	aliasOf*: Block;
 	referenced, used: BOOLEAN;
-	priority: LONGINT;
+	priority: WORD;
 END;
 
 TYPE Linker* = OBJECT
@@ -212,18 +210,13 @@ VAR
 	END ExportBlock;
 
 	PROCEDURE GetArrangement (block: Block): Arrangement;
-	BEGIN  IF ObjectFile.IsCode (block.type) THEN RETURN code; ELSE RETURN data; END;
+	BEGIN IF ObjectFile.IsCode (block.type) THEN RETURN code; ELSE RETURN data; END;
 	END GetArrangement;
 
 	(* this procedure may be overwritten by implementations of the linker that need a special ordering, as, for example, the bodycode in the front or so *)
-	PROCEDURE Precedes* (this, that: Block): BOOLEAN;
-	VAR leftType, rightType: LONGINT;
-	BEGIN
-		leftType := this.priority;
-		rightType := that.priority;
-		RETURN (leftType < rightType)
+	PROCEDURE Precedes* (left, right: Block): BOOLEAN;
+	BEGIN RETURN left.priority < right.priority
 	END Precedes;
-
 
 	PROCEDURE AddSection* (CONST section: ObjectFile.Section);
 	VAR block, current, previous,newBlock: Block; name: ARRAY 256 OF CHAR; i: SIZE; alias: ObjectFile.Alias;
@@ -299,7 +292,6 @@ VAR
 		IF ~error THEN block := firstBlock; WHILE block # firstLinkedBlock DO IF block.used & (block.aliasOf=NIL) THEN Prearrange (block); END; block := block.next; END; END;
 		IF ~error THEN block := firstBlock; WHILE block # firstLinkedBlock DO IF block.used & (block.aliasOf=NIL) THEN Arrange (block); END; block := block.next; END; END;
 		IF ~error THEN block := firstBlock; WHILE block # firstLinkedBlock DO PatchAlias (block); block := block.next; END; END;
-
 
 		IF ~error THEN block := firstBlock; WHILE block # firstLinkedBlock DO IF block.used & (block.aliasOf = NIL) THEN Patch (block); END; block := block.next; END; END;
 		IF ~error THEN firstLinkedBlock := firstBlock; END;
@@ -461,7 +453,7 @@ VAR
 
 END Linker;
 
-PROCEDURE GetPriority(block: Block): LONGINT;
+PROCEDURE GetPriority(block: Block): WORD;
 BEGIN
 	IF block.fixed THEN RETURN Fixed END;
 	IF block.type = ObjectFile.InitCode THEN RETURN InitCode END;
@@ -530,6 +522,5 @@ BEGIN
 END Process;
 
 END GenericLinker.
-
 
 Compiler.Compile GenericLinker.Mod   ~~~
