@@ -4,7 +4,6 @@ IMPORT Streams, ObjectFile, Scanner := FoxScanner, Basic := FoxBasic, BitSets, D
 
 CONST Trace = FALSE;
 TYPE
-	Bits* = ObjectFile.Bits;
 	Unit* = ObjectFile.Unit;
 
 	Block*= POINTER TO RECORD (ObjectFile.Section)
@@ -14,7 +13,7 @@ TYPE
 
 	Disassembler* = OBJECT
 	VAR
-		first, block: Block; w: Streams.Writer; stringWriter: Streams.StringWriter; code,data: BitSets.BitSet; codeUnit, dataUnit: Bits;
+		first, block: Block; w: Streams.Writer; stringWriter: Streams.StringWriter; code,data: BitSets.BitSet; codeUnit, dataUnit: ObjectFile.Bits;
 		codeDisplacement-, dataDisplacement: Unit;
 
 		PROCEDURE & Init*(w: Streams.Writer);
@@ -198,7 +197,7 @@ TYPE
 			RETURN first;
 		END ParseLogFile;
 
-		PROCEDURE Disassemble*(code, data: BitSets.BitSet; codeUnit, dataUnit: Bits; logFile: Files.File; address: ADDRESS);
+		PROCEDURE Disassemble*(code, data: BitSets.BitSet; codeUnit, dataUnit: ObjectFile.Bits; logFile: Files.File; address: ADDRESS);
 		BEGIN
 			SELF.code := code;SELF.data := data; SELF.codeUnit := codeUnit; SELF.dataUnit := dataUnit;
 			first := ParseLogFile(logFile); block := first;
