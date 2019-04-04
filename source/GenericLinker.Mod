@@ -259,23 +259,6 @@ VAR
 		END;
 	END Resolve;
 
-	(*
-	PROCEDURE Aliases*(CONST block: Block);
-	VAR newBlock: Block; alias: ObjectFile.Alias; i: LONGINT; name: ARRAY 256 OF CHAR;
-	BEGIN
-		FOR i := 0 TO block.aliases-1 DO
-			alias := block.alias[i];
-			NEW(newBlock);
-			newBlock.identifier := alias.identifier;
-			newBlock.address := alias.offset;
-			newBlock.aliasOf := block;
-			newBlock.used := block.used;
-			newBlock.next := firstBlock;
-			firstBlock := newBlock;
-		END;
-	END Aliases;
-	*)
-
 	PROCEDURE PatchAlias*(block: Block);
 	BEGIN
 		IF block.aliasOf # NIL THEN INC(block.address, block.aliasOf.address) END;
@@ -467,7 +450,7 @@ BEGIN
 	HALT(100); (* undefined type *)
 END GetPriority;
 
-PROCEDURE Header(reader: Streams.Reader; linker: Linker; VAR binary: BOOLEAN; VAR poolMap: ObjectFile.PoolMap; VAR offers, requires: ObjectFile.NameList): LONGINT;
+PROCEDURE ReadHeader(reader: Streams.Reader; linker: Linker; VAR binary: BOOLEAN; VAR poolMap: ObjectFile.PoolMap; VAR offers, requires: ObjectFile.NameList): WORD;
 VAR ch: CHAR; version: WORD; string: ARRAY 32 OF CHAR;
 BEGIN
 	reader.String(string);
@@ -502,18 +485,18 @@ BEGIN
 		END
 	END;
 	RETURN version;
-END Header;
+END ReadHeader;
 
 PROCEDURE OffersRequires*(reader: Streams.Reader; VAR offers, requires: ObjectFile.NameList);
 VAR binary: BOOLEAN; poolMap: ObjectFile.PoolMap;  version: WORD;
 BEGIN
-	version := Header(reader, NIL, binary, poolMap, offers, requires);
+	version := ReadHeader(reader, NIL, binary, poolMap, offers, requires);
 END OffersRequires;
 
 PROCEDURE Process* (reader: Streams.Reader; linker: Linker);
 VAR section: ObjectFile.Section; binary: BOOLEAN; poolMap: ObjectFile.PoolMap; offers, requires: ObjectFile.NameList; version: WORD;
 BEGIN
-	version := Header(reader, linker, binary, poolMap, offers, requires);
+	version := ReadHeader(reader, linker, binary, poolMap, offers, requires);
 	WHILE reader.Peek () # 0X DO
 		ObjectFile.ReadSection (reader, version, section,binary,poolMap);
 		reader.SkipWhitespace;
