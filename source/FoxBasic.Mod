@@ -239,11 +239,11 @@ TYPE
 
 	HashEntryAny = RECORD
 		key, value: ANY;
-		valueInt: LONGINT;
+		valueInt: SIZE;
 	END;
 
 	HashEntryInt = RECORD
-		key, valueInt: LONGINT;
+		key, valueInt: SIZE;
 		value: ANY;
 	END;
 
@@ -308,7 +308,7 @@ TYPE
 
 		(* Interface for integer values *)
 
-		PROCEDURE PutInt*(key: ANY; value: LONGINT);
+		PROCEDURE PutInt*(key: ANY; value: SIZE);
 		VAR hash: SIZE;
 		BEGIN
 			ASSERT(used < size);
@@ -321,7 +321,7 @@ TYPE
 			IF (used / size) > maxLoadFactor THEN Grow END;
 		END PutInt;
 
-		PROCEDURE GetInt*(key: ANY):LONGINT;
+		PROCEDURE GetInt*(key: ANY):SIZE;
 		BEGIN
 			RETURN table[HashValue(key)].valueInt;
 		END GetInt;
@@ -375,7 +375,7 @@ TYPE
 			count := -1;
 		END Init;
 
-		PROCEDURE GetNext*(VAR key: LONGINT; VAR value: ANY): BOOLEAN;
+		PROCEDURE GetNext*(VAR key: SIZE; VAR value: ANY): BOOLEAN;
 		BEGIN
 			REPEAT
 				INC(count);
@@ -408,7 +408,7 @@ TYPE
 			maxLoadFactor := 0.75;
 		END Init;
 
-		PROCEDURE Put*(key: LONGINT; value: ANY);
+		PROCEDURE Put*(key: SIZE; value: ANY);
 		VAR hash: SIZE;
 		BEGIN
 			ASSERT(key # 0);
@@ -422,12 +422,12 @@ TYPE
 			IF (used / size) > maxLoadFactor THEN Grow END;
 		END Put;
 
-		PROCEDURE Get*(key: LONGINT):ANY;
+		PROCEDURE Get*(key: SIZE):ANY;
 		BEGIN
 			RETURN table[HashValue(key)].value;
 		END Get;
 
-		PROCEDURE Has*(key: LONGINT):BOOLEAN;
+		PROCEDURE Has*(key: SIZE):BOOLEAN;
 		BEGIN
 			RETURN table[HashValue(key)].key = key;
 		END Has;
@@ -445,7 +445,7 @@ TYPE
 
 		(* Interface for integer values *)
 
-		PROCEDURE PutInt*(key, value: LONGINT);
+		PROCEDURE PutInt*(key, value: SIZE);
 		VAR hash: SIZE;
 		BEGIN
 			(*ASSERT(key # 0);*)
@@ -459,14 +459,14 @@ TYPE
 			IF (used / size) > maxLoadFactor THEN Grow END;
 		END PutInt;
 
-		PROCEDURE GetInt*(key: LONGINT):LONGINT;
+		PROCEDURE GetInt*(key: SIZE): SIZE;
 		BEGIN
 			RETURN table[HashValue(key)].valueInt;
 		END GetInt;
 
 		(* Internals *)
 
-		PROCEDURE HashValue(key: LONGINT): SIZE;
+		PROCEDURE HashValue(key: SIZE): SIZE;
 		VAR value, h1, h2, i: SIZE;
 		BEGIN
 			i := 0;
@@ -482,7 +482,7 @@ TYPE
 		END HashValue;
 
 		PROCEDURE Grow;
-		VAR oldTable: HashIntArray; oldSize, i: SIZE; key: LONGINT;
+		VAR oldTable: HashIntArray; oldSize, i, key: SIZE;
 		BEGIN
 			oldSize := size;
 			oldTable := table;

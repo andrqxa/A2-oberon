@@ -123,7 +123,7 @@ TYPE
 		PROCEDURE IndexByIdentifier*(identifier: IdentifierType): LONGINT;
 		BEGIN
 			IF Has(identifier) THEN
-				RETURN GetInt(identifier)
+				RETURN TODO(GetInt(identifier))
 			ELSE (* do not modify index *)
 				RETURN -1
 			END;
@@ -134,7 +134,7 @@ TYPE
 		BEGIN
 			StringPool.GetIndex(name,stringPoolIndex);
 			IF Has(stringPoolIndex) THEN
-				RETURN GetInt(stringPoolIndex)
+				RETURN TODO(GetInt(stringPoolIndex))
 			ELSE (* do not modify index *)
 				RETURN -1
 			END;

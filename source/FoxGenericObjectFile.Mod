@@ -668,7 +668,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 	END MakeLibrary;
 
 	PROCEDURE Statistics*;
-	VAR iterator: Basic.IntIterator; stat: SectionStat; index: StringPool.Index; any: ANY;
+	VAR iterator: Basic.IntIterator; stat: SectionStat; index: SIZE; todo: TODO (* StringPool.Index *); any: ANY;
 	BEGIN
 		IF DetailedStatistics THEN
 			iterator := statPool.GetIterator();

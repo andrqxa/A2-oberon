@@ -12766,8 +12766,8 @@ TYPE
 			END;
 		END Pointers;
 
-		PROCEDURE EnterDynamicName(source: IntermediateCode.Section; CONST name: ARRAY OF CHAR; index: LONGINT; pool: Basic.HashTableInt): LONGINT;
-		VAR position,i: LONGINT; ch: CHAR;
+		PROCEDURE EnterDynamicName(source: IntermediateCode.Section; CONST name: ARRAY OF CHAR; index: StringPool.Index; pool: Basic.HashTableInt): SIZE;
+		VAR position,i: SIZE; ch: CHAR;
 		BEGIN
 			IF pool.Has(index) THEN
 				RETURN pool.GetInt(index)
@@ -12784,8 +12784,8 @@ TYPE
 			RETURN position;
 		END EnterDynamicName;
 
-		PROCEDURE DynamicName(source: IntermediateCode.Section; index: StringPool.Index; pool: Basic.HashTableInt): LONGINT;
-		VAR name: Basic.SectionName; position: LONGINT;
+		PROCEDURE DynamicName(source: IntermediateCode.Section; index: StringPool.Index; pool: Basic.HashTableInt): SIZE;
+		VAR name: Basic.SectionName; position: SIZE;
 		BEGIN
 			IF pool.Has(index) THEN
 				RETURN pool.GetInt(index)
@@ -12962,7 +12962,7 @@ TYPE
 							Hugeint(source, 0);
 						END;
 
-						Symbol(source, namePool, DynamicName(namePool, name, poolMap), 0); (* reference to dynamic name *)
+						Symbol(source, namePool, TODO(DynamicName(namePool, name, poolMap)), 0); (* reference to dynamic name *)
 						Symbol(source, symbol,0,0);
 						patchAdr := source.pc;
 						Longint(source, 0);
