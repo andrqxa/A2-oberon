@@ -127,6 +127,8 @@ CONST
 TYPE
 	Name = Scanner.IdentifierString;
 
+	OperandType = InstructionSet.OperandType;
+
 	Size = SHORTINT;
 	Register* = LONGINT; (* index for InstructionSet.registers *)
 	(*
@@ -134,7 +136,7 @@ TYPE
 	*)
 
 	Operand* = RECORD
-		type-: SHORTINT; (* reg8..reg64, CRn,DRn, segReg, sti, mmx, xmm, mem, imm, moffset, pntr1616, pntr1632 *)
+		type-: OperandType; (* reg8..reg64, CRn,DRn, segReg, sti, mmx, xmm, mem, imm, moffset, pntr1616, pntr1632 *)
 		(* assembler examples:
 			reg8: AL => register = InstructionSet.regAL
 			reg16: CX => register = InstructionSet.regCX
@@ -1129,7 +1131,7 @@ TYPE
 
 		(* temporaries *)
 		fixup: BinaryCode.Fixup;
-		type: SHORTINT;
+		type: OperandType;
 		currentFixup: Sections.SectionName;
 		currentLabel: NamedLabel;
 		sourceName: Basic.FileName;
@@ -1382,7 +1384,7 @@ TYPE
 
 			END GetCPU;
 
-			PROCEDURE Factor (VAR x: HUGEINT; critical: BOOLEAN; VAR type: SHORTINT): BOOLEAN;
+			PROCEDURE Factor (VAR x: HUGEINT; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
 			VAR label: NamedLabel; l: LONGINT;
 			BEGIN
 				IF symbol = symNumber THEN
@@ -1440,7 +1442,7 @@ TYPE
 				RETURN FALSE
 			END Factor;
 
-			PROCEDURE Term (VAR x: HUGEINT; critical: BOOLEAN; VAR type: SHORTINT): BOOLEAN;
+			PROCEDURE Term (VAR x: HUGEINT; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
 			VAR y: HUGEINT; op : WORD;
 			BEGIN
 				IF Factor (x, critical,type) THEN
@@ -1461,7 +1463,7 @@ TYPE
 				END;
 			END Term;
 
-			PROCEDURE Expression (VAR x: HUGEINT; critical: BOOLEAN; VAR type: SHORTINT): BOOLEAN;
+			PROCEDURE Expression (VAR x: HUGEINT; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
 			VAR y: HUGEINT; op : WORD;
 			BEGIN
 				IF symbol = symMinus THEN
@@ -1509,7 +1511,7 @@ TYPE
 			END Align;
 
 			PROCEDURE PutData (size: Size): BOOLEAN;
-			VAR i: SIZE; x: HUGEINT; type:SHORTINT; ofs: Operand;
+			VAR i: SIZE; x: HUGEINT; type: OperandType; ofs: Operand;
 			BEGIN
 				NextSymbol;
 
@@ -1597,7 +1599,7 @@ TYPE
 			END Duplicate;
 
 			PROCEDURE Reserve (size: Size) : BOOLEAN;
-			VAR type : SHORTINT; x: HUGEINT;
+			VAR type : OperandType; x: HUGEINT;
 			BEGIN
 				IF Expression (x, TRUE, type) THEN
 					absoluteOffset := absoluteOffset + x * size;
@@ -1759,7 +1761,7 @@ TYPE
 				offset: Operand;
 				i: LONGINT;
 				x: HUGEINT;
-				type: SHORTINT;
+				type: OperandType;
 			BEGIN
 				position := errPos;
 				mnem := InstructionSet.FindMnemonic (ident);
@@ -2330,7 +2332,7 @@ TYPE
 
 	END DumpInstruction;
 
-	PROCEDURE Matches(CONST operand: Operand; type: InstructionSet.OperandType): BOOLEAN;
+	PROCEDURE Matches(CONST operand: Operand; type: OperandType): BOOLEAN;
 		PROCEDURE IsMemReg(regIndex: LONGINT): BOOLEAN;
 		BEGIN
 			RETURN InstructionSet.RegisterType(regIndex) IN {reg16, reg32, reg64}
