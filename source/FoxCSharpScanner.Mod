@@ -466,7 +466,7 @@ TYPE
                 f: LONGREAL;
                 hex, neg, long: BOOLEAN;
                 hugeint, tenh: HUGEINT;
-                result: LONGINT;
+                result: Symbol;
 
             PROCEDURE Append(ch: CHAR);
             BEGIN
@@ -1029,7 +1029,7 @@ KernelLog.Ln();
             | 'a' .. 'z':
                 s := Identifier;
                 GetIdentifier(token);
-                symbol := keywords.IndexByIdentifier(token.identifier);
+                symbol := keywords.SymbolByIdentifier(token.identifier);
                 IF  (symbol >= 0) THEN
                     s := symbol
                 END;
@@ -1183,7 +1183,7 @@ KernelLog.Ln();
     (* get keyword by symbol *)
     PROCEDURE GetKeyword*(symbol: LONGINT; VAR identifier: IdentifierType);
     BEGIN
-        keywords.IdentifierByIndex(symbol, identifier);
+        keywords.IdentifierBySymbol(symbol, identifier);
     END GetKeyword;
 
     PROCEDURE InitSymbols;
@@ -1418,14 +1418,14 @@ KernelLog.Ln();
 
     (** debugging / reporting **)
     PROCEDURE ReportKeywords*(context: Commands.Context);
-        VAR i: LONGINT;
+        VAR s: Symbol;
             name: Keyword;
     BEGIN
-        FOR i := 0 TO EndOfText DO
-            context.out.Int(i, 1);
+        FOR s := 0 TO EndOfText DO
+            context.out.Int(s, 1);
             context.out.String(": ");
             context.out.Char('"');
-            keywords.StringByIndex(i, name);
+            keywords.StringBySymbol(s, name);
             context.out.String(name);
             context.out.Char('"');
             context.out.Ln;

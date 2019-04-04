@@ -108,60 +108,60 @@ CONST
 	Unknown*=2;
 
 TYPE
-	(* keywords  book keeping *)
+	(* keywords book keeping *)
 	Keyword* = ARRAY 32 OF CHAR;
 
-	KeywordTable* = OBJECT(Basic.HashTableInt); (* string -> index *)
-	VAR table: POINTER TO ARRAY OF LONGINT;
+	KeywordTable* = OBJECT(Basic.HashTableInt); (* string -> symbol *)
+	VAR table: POINTER TO ARRAY OF IdentifierType;
 
-		PROCEDURE &InitTable*(size: LONGINT);
-		VAR i: LONGINT;
+		PROCEDURE &InitTable*(size: SIZE);
+		VAR i: SIZE;
 		BEGIN
 			Init(size); NEW(table,size); FOR i := 0 TO size-1 DO table[i] := -1; END;
 		END InitTable;
 
-		PROCEDURE IndexByIdentifier*(identifier: IdentifierType): LONGINT;
+		PROCEDURE SymbolByIdentifier*(identifier: IdentifierType): Symbol;
 		BEGIN
 			IF Has(identifier) THEN
-				RETURN TODO(GetInt(identifier))
+				RETURN Symbol(GetInt(identifier))
 			ELSE (* do not modify index *)
 				RETURN -1
 			END;
-		END IndexByIdentifier;
+		END SymbolByIdentifier;
 
-		PROCEDURE IndexByString*(CONST name: ARRAY OF CHAR): LONGINT;
-		VAR stringPoolIndex: LONGINT;
+		PROCEDURE SymbolByString*(CONST name: ARRAY OF CHAR): Symbol;
+		VAR stringPoolIndex: StringPool.Index;
 		BEGIN
 			StringPool.GetIndex(name,stringPoolIndex);
 			IF Has(stringPoolIndex) THEN
-				RETURN TODO(GetInt(stringPoolIndex))
+				RETURN Symbol(GetInt(stringPoolIndex))
 			ELSE (* do not modify index *)
 				RETURN -1
 			END;
-		END IndexByString;
+		END SymbolByString;
 
-		PROCEDURE IdentifierByIndex*(index: LONGINT; VAR identifier: IdentifierType);
+		PROCEDURE IdentifierBySymbol*(symbol: Symbol; VAR identifier: IdentifierType);
 		BEGIN
-			identifier := table[index]
-		END IdentifierByIndex;
+			identifier := table[symbol]
+		END IdentifierBySymbol;
 
-		PROCEDURE StringByIndex*(index: LONGINT; VAR name: ARRAY OF CHAR);
-		VAR stringPoolIndex: LONGINT;
+		PROCEDURE StringBySymbol*(symbol: Symbol; VAR name: ARRAY OF CHAR);
+		VAR stringPoolIndex: StringPool.Index;
 		BEGIN
-			stringPoolIndex := table[index];
+			stringPoolIndex := table[symbol];
 			IF stringPoolIndex < 0 THEN
 				name := ""
 			ELSE
 				StringPool.GetString(stringPoolIndex,name);
 			END;
-		END StringByIndex;
+		END StringBySymbol;
 
-		PROCEDURE PutString*(CONST name: ARRAY OF CHAR; index: LONGINT);
-		VAR stringPoolIndex: LONGINT;
+		PROCEDURE PutString*(CONST name: ARRAY OF CHAR; symbol: Symbol);
+		VAR stringPoolIndex: StringPool.Index;
 		BEGIN
 			StringPool.GetIndex(name,stringPoolIndex);
-			table[index] := stringPoolIndex;
-			PutInt(stringPoolIndex,index);
+			table[symbol] := stringPoolIndex;
+			PutInt(stringPoolIndex,symbol);
 		END PutString;
 
 	END KeywordTable;
@@ -882,7 +882,7 @@ TYPE
 
 		(** get next token **)
 		PROCEDURE GetNextToken*(VAR token: Token ): BOOLEAN;
-		VAR s,symbol: LONGINT;
+		VAR s,symbol: Symbol;
 		BEGIN
 			SkipBlanks;
 			token.position := position;
@@ -970,13 +970,13 @@ TYPE
 					s := Upto;  GetNextCharacter
 			| 'A'..'Z': s := Identifier; GetIdentifier( token );
 					IF (case=Uppercase) OR (case=Unknown) THEN
-						symbol := keywordsUpper.IndexByIdentifier(token.identifier);
+						symbol := keywordsUpper.SymbolByIdentifier(token.identifier);
 						IF  (symbol >= 0) THEN s := symbol END;
 						IF (s = Module) OR (s=CellNet) THEN case := Uppercase END;
 					END;
 			| 'a'..'z': s := Identifier; GetIdentifier( token);
 					IF (case = Lowercase) OR (case=Unknown) THEN
-						symbol := keywordsLower.IndexByIdentifier(token.identifier);
+						symbol := keywordsLower.SymbolByIdentifier(token.identifier);
 						IF  (symbol >= 0) THEN s := symbol END;
 						IF (s = Module) OR (s=CellNet) THEN case := Lowercase END;
 					END;
@@ -1237,12 +1237,12 @@ TYPE
 	END InitReservedCharacters;
 
 	(* get keyword by symbol *)
-	PROCEDURE GetKeyword*(case:LONGINT; symbol: LONGINT; VAR identifier: IdentifierType);
+	PROCEDURE GetKeyword*(case:WORD; symbol: Symbol; VAR identifier: IdentifierType);
 	BEGIN
 		IF case = Uppercase THEN
-			keywordsUpper.IdentifierByIndex(symbol,identifier);
+			keywordsUpper.IdentifierBySymbol(symbol,identifier);
 		ELSE ASSERT(case=Lowercase);
-			keywordsLower.IdentifierByIndex(symbol,identifier);
+			keywordsLower.IdentifierBySymbol(symbol,identifier);
 		END;
 	END GetKeyword;
 
@@ -1525,17 +1525,17 @@ TYPE
 
 	(** debugging / reporting **)
 	PROCEDURE ReportKeywords*(context: Commands.Context);
-	VAR i: LONGINT; name: Keyword;
+	VAR s: Symbol; name: Keyword;
 	BEGIN
-		FOR i := 0 TO EndOfText DO
-			context.out.Int(i,1); context.out.String(": ");
+		FOR s := 0 TO EndOfText DO
+			context.out.Int(s,1); context.out.String(": ");
 			context.out.Char('"');
-			keywordsLower.StringByIndex(i,name);
+			keywordsLower.StringBySymbol(s,name);
 			context.out.String(name);
 			context.out.Char('"');
 			context.out.String(", ");
 			context.out.Char('"');
-			keywordsUpper.StringByIndex(i,name);
+			keywordsUpper.StringBySymbol(s,name);
 			context.out.String(name);
 			context.out.Char('"');
 			context.out.Ln;
