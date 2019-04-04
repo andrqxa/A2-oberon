@@ -345,13 +345,13 @@ VAR
 			END PatchPattern;
 
 			PROCEDURE CheckBits(pattern: ObjectFile.Pattern; offset: ObjectFile.Unit);
-			VAR i: SIZE; nobits, remainder: LONGINT; minval, maxval: ObjectFile.Unit; name: ObjectFile.SectionName; number: ARRAY 32 OF CHAR;
+			VAR i: SIZE; nobits, remainder: ObjectFile.Bits; minval, maxval: ObjectFile.Unit; name: ObjectFile.SectionName; number: ARRAY 32 OF CHAR;
 			BEGIN
 				nobits := 0;
 				FOR i := 0 TO pattern.patterns-1 DO
 					INC(nobits,pattern.pattern[i].bits);
 				END;
-				remainder := LONGINT(ASH(address,-nobits));
+				remainder := ObjectFile.Bits(ASH(address,-nobits));
 
 				IF  (nobits <32) & ((remainder > 0) OR (remainder < -1)) THEN
 					IF pattern.mode = ObjectFile.Relative THEN (* negative values allowed *)

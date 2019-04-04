@@ -19,12 +19,14 @@ CONST
 VAR
 	statModules, statModulesSize: LONGINT;
 	statHeaders, statHeadersSize: LONGINT;
+
 TYPE
+	Unit = BinaryCode.Unit;
 
 	SectionStat = POINTER TO RECORD
 		name: ARRAY 64 OF CHAR;
-		entries: LONGINT;
-		size: LONGINT;
+		entries: SIZE;
+		size: SIZE;
 	END;
 
 VAR
@@ -68,8 +70,8 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				section: Sections.Section;
 				i: SIZE;
 				sname: Basic.SegmentedName;
-				codeAlign, dataAlign, constAlign: LONGINT;
-				codeUnit, dataUnit, constUnit: LONGINT;
+				codeAlign, dataAlign, constAlign: Unit;
+				codeUnit, dataUnit, constUnit: BinaryCode.Bits;
 				resolved, codeSection, dataSection, constSection: BinaryCode.Section;
 				alias: BinaryCode.Alias;
 				irSection: IntermediateCode.Section;
@@ -378,20 +380,20 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 		END;
 	END CheckAlias;
 
-	PROCEDURE CopyFixups(sections: Sections.SectionList; from, to: BinaryCode.Section; offset: LONGINT);
+	PROCEDURE CopyFixups(sections: Sections.SectionList; from, to: BinaryCode.Section; offset: Unit);
 	VAR fixup: BinaryCode.Fixup; i, index, fixups: SIZE; fixupList: ObjectFile.Fixups;
 		aliasSymbol: ObjectFile.Identifier; aliasOffset: LONGINT;
 
-		PROCEDURE PatchFixup (fixup: BinaryCode.Fixup; fixupOffset, targetOffset: LONGINT);
-		VAR target, address: ObjectFile.Unit; j: SIZE;
+		PROCEDURE PatchFixup (fixup: BinaryCode.Fixup; fixupOffset, targetOffset: Unit);
+		VAR target, address: Unit; j: SIZE;
 
 			PROCEDURE PatchPattern (CONST pattern: ObjectFile.FixupPattern);
 			BEGIN
 				to.os.bits.SetBits (target * to.os.unit + pattern.offset, pattern.bits, address); address := ASH (address, -pattern.bits);
 			END PatchPattern;
 
-			PROCEDURE CheckBits(value: LONGINT; offset: LONGINT);
-			VAR i: SIZE; nobits,remainder: LONGINT; minval, maxval: ObjectFile.Unit; name: ObjectFile.SectionName; number: ARRAY 32 OF CHAR;
+			PROCEDURE CheckBits(value, offset: Unit);
+			VAR i: SIZE; nobits,remainder: ObjectFile.Bits; minval, maxval: Unit; name: ObjectFile.SectionName; number: ARRAY 32 OF CHAR;
 			BEGIN
 				nobits := 0;
 				FOR i := 0 TO fixup.patterns-1 DO
@@ -562,8 +564,8 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 		END;
 	END WriteHeader;
 
-	PROCEDURE GCD(a,b: LONGINT): LONGINT;
-	VAR h: LONGINT;
+	PROCEDURE GCD(a,b: Unit): Unit;
+	VAR h: Unit;
 	BEGIN
 		WHILE b # 0 DO
 			h := a MOD b;
@@ -573,12 +575,12 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 		RETURN a
 	END GCD;
 
-	PROCEDURE SCM(a,b: LONGINT): LONGINT;
+	PROCEDURE SCM(a,b: Unit): Unit;
 	BEGIN
 		RETURN a*b DIV GCD(a,b)
 	END SCM;
 
-	PROCEDURE CommonAlignment(a,b: LONGINT): LONGINT;
+	PROCEDURE CommonAlignment(a,b: Unit): Unit;
 	BEGIN
 		(*TRACE(a,b);*)
 		IF a = 0 THEN RETURN b
