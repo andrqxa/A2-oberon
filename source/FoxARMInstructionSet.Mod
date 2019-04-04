@@ -2858,8 +2858,8 @@ CONST
 	TYPE
 		Disasm = OBJECT (Disassembler.Disassembler)
 
-			PROCEDURE DisassembleInstruction(bitSet: BitSets.BitSet; VAR adr: LONGINT; maxInstructionSize: LONGINT; w:Streams.Writer);
-			VAR instruction: Instruction; value: WORD; mnemonic: LONGINT;
+			PROCEDURE DisassembleInstruction(bitSet: BitSets.BitSet; VAR adr: Disassembler.Unit; maxInstructionSize: Disassembler.Unit; w:Streams.Writer);
+			VAR instruction: Instruction; value: WORD; mnemonic: WORD;
 			BEGIN
 				(* maxInstructionSize can be ignored here *)
 				value := bitSet.GetBits(adr*8,32);
@@ -2893,7 +2893,7 @@ CONST
 		END Disasm;
 
 	VAR disassembler: Disasm; codeFileName, dataFileName, logFileName: Files.FileName; codeFile, logFile: Files.File;code: BitSets.BitSet; options: Options.Options;
-		address, offset: LONGINT;
+		address, offset: WORD;
 	BEGIN
 		IF context.arg.GetString(codeFileName) THEN
 			codeFile := Files.Old(codeFileName);
