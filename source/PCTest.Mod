@@ -108,7 +108,7 @@ BEGIN
 	END;
 	NEW(reader, LEN(regrbuf));
 	WHILE (pos2 # -1) & (regrfile = "") DO
-		reader.SetRaw(buffer^, TODO(pos1), TODO(pos2-pos1));
+		reader.SetRaw(buffer^, pos1, pos2-pos1);
 		reader.SkipWhitespace; reader.String(regrbuf);
 		Strings.LowerCase(regrbuf);
 		IF Strings.StartsWith2("regression", regrbuf) THEN
