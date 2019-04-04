@@ -106,7 +106,7 @@ CONST
 	RealtimeScope* = 27;		(** direct or indirect owner of scope is a realtime procedure, i.e. within scope no memory allocation, no locking and no await are allowed *)
 
 VAR
-	BodyName-, SelfName-, Anonymous-, PtrReturnType- (* ug *) : LONGINT;	(** indexes to stringpool *)
+	BodyName-, SelfName-, Anonymous-, PtrReturnType-: StringIndex;
 
 	(*debug/trace counters*)
 	AWait, ANoWait: LONGINT;
@@ -239,7 +239,7 @@ TYPE
 		END CreateProc;
 
 		(* ug *)
-		PROCEDURE CreateHiddenVarName*(VAR name: StringPool.Index);
+		PROCEDURE CreateHiddenVarName*(VAR name: StringIndex);
 			VAR s1, s: ARRAY 256 OF CHAR;
 		BEGIN
 			Strings.IntToStr(tmpCount, s1);
@@ -249,7 +249,7 @@ TYPE
 		END CreateHiddenVarName;
 
 		(* ug *)
-		PROCEDURE CreateAwaitProcName*(VAR name: StringPool.Index; count: LONGINT);
+		PROCEDURE CreateAwaitProcName*(VAR name: StringIndex; count: LONGINT);
 			VAR s1, s: ARRAY 256 OF CHAR;
 		BEGIN
 			Strings.IntToStr(count, s1);
@@ -1402,7 +1402,7 @@ VAR
 		RETURN hitProc;
 	END FindOperator;
 
-	PROCEDURE PrintString*(s: StringPool.Index);
+	PROCEDURE PrintString*(s: StringIndex);
 	VAR str: PCS.String;
 	BEGIN
 		StringPool.GetString(s, str);
@@ -2125,7 +2125,7 @@ VAR
 		END;
 	END CheckVar;
 
-	PROCEDURE NewGlobalVar*(vis: SET;  name: LONGINT;  flags: SET;  type: Struct; VAR res: WORD): GlobalVar;	(** for PCOM object comparison - don't insert in scope *)
+	PROCEDURE NewGlobalVar*(vis: SET;  name: StringIndex;  flags: SET;  type: Struct; VAR res: WORD): GlobalVar;	(** for PCOM object comparison - don't insert in scope *)
 	VAR  v: GlobalVar;
 	BEGIN
 		res := Ok;
@@ -2170,7 +2170,7 @@ VAR
 		RETURN p
 	END NewProc;
 
-	PROCEDURE FindOverwrittenMethod(owner: Record; name: StringPool.Index; mscope: ProcScope; VAR res: WORD): Method;
+	PROCEDURE FindOverwrittenMethod(owner: Record; name: StringIndex; mscope: ProcScope; VAR res: WORD): Method;
 		VAR pars: ARRAY 32 OF Struct; i, parCount: LONGINT; obj: Symbol; super: Method; par: Parameter;
 	BEGIN
 		IF owner.brec # NIL THEN
@@ -2404,7 +2404,7 @@ VAR
 
 	(* Unregister - remove a module from the database *)
 
-	PROCEDURE Unregister*(root: ModuleDB; name: StringPool.Index);
+	PROCEDURE Unregister*(root: ModuleDB; name: StringIndex);
 		VAR p: Module;
 	BEGIN {EXCLUSIVE}
 		p := root;
@@ -2416,7 +2416,7 @@ VAR
 
 	(* Retrieve - find a module in the database *)
 
-	PROCEDURE Retrieve*(root: ModuleDB; name: StringPool.Index): Module;
+	PROCEDURE Retrieve*(root: ModuleDB; name: StringIndex): Module;
 		VAR p: Module;
 	BEGIN
 		p := root.next;

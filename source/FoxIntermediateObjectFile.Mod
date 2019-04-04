@@ -42,7 +42,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			intermediateCodeSection: IntermediateCode.Section;
 
 			PROCEDURE SectionName(sectionName: ObjectFile.SegmentedName);
-			VAR name: ObjectFile.SectionName; i,num: LONGINT;
+			VAR name: ObjectFile.SectionName; i,num: SIZE;
 			BEGIN
 				i := 0;
 				REPEAT

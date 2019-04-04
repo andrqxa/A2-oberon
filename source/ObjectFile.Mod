@@ -100,12 +100,12 @@ TYPE
 
 	PoolMap* = OBJECT
 	TYPE
-		Table = POINTER TO ARRAY OF RECORD key, value: LONGINT END;
+		Table = POINTER TO ARRAY OF RECORD key, value: SIZE END;
 
 	VAR
 		table: Table;
 		size: SIZE;
-		used: LONGINT;
+		used: SIZE;
 		maxLoadFactor: REAL;
 		writer: Streams.Writer;
 		(* Interface *)
@@ -121,7 +121,7 @@ TYPE
 			Put(0,0); (* empty string mapped one-to-one *)
 		END Init;
 
-		PROCEDURE Put(key, value: LONGINT);
+		PROCEDURE Put(key, value: SIZE);
 		VAR hash: SIZE;
 		BEGIN
 			ASSERT(used < size);
@@ -138,7 +138,7 @@ TYPE
 			IF (used / size) > maxLoadFactor THEN Grow END;
 		END Put;
 
-		PROCEDURE Get*(key: LONGINT):LONGINT;
+		PROCEDURE Get*(key: SIZE):SIZE;
 		BEGIN
 			IF key = -1 THEN
 				RETURN -1
@@ -147,7 +147,7 @@ TYPE
 			END
 		END Get;
 
-		PROCEDURE Has*(key: LONGINT):BOOLEAN;
+		PROCEDURE Has*(key: SIZE):BOOLEAN;
 		BEGIN
 			RETURN table[HashValue(key)].key = key;
 		END Has;
@@ -159,7 +159,7 @@ TYPE
 		END Clear;
 
 		(* only correctly working, if NIL key cannot be entered *)
-		PROCEDURE HashValue(key: LONGINT): SIZE;
+		PROCEDURE HashValue(key: SIZE): SIZE;
 		VAR value, h, i: SIZE;
 		BEGIN
 			value := key;
@@ -174,7 +174,7 @@ TYPE
 		END HashValue;
 
 		PROCEDURE Grow;
-		VAR oldTable: Table; key: LONGINT; oldSize, i: SIZE;
+		VAR oldTable: Table; oldSize, i, key: SIZE;
 		BEGIN
 			oldSize := size;
 			oldTable := table;
@@ -189,7 +189,7 @@ TYPE
 
 		(** read map and produce Local --> Global **)
 		PROCEDURE Read*(reader: Streams.Reader);
-		VAR value, pos: LONGINT; name: SectionName;
+		VAR value, pos: SIZE; name: SectionName;
 		BEGIN
 			pos := 1;
 			reader.RawString(name);
@@ -202,7 +202,7 @@ TYPE
 		END Read;
 
 		(** write global --> local map **)
-		PROCEDURE PutGlobal*(key: LONGINT);
+		PROCEDURE PutGlobal*(key: SIZE);
 		VAR name: SectionName;
 		BEGIN
 			IF ~Has(key) THEN
@@ -644,11 +644,11 @@ VAR
 	VAR i, len: SIZE; name: ARRAY 256 OF CHAR;
 
 		PROCEDURE ReadIdentifier(VAR name: SegmentedName);
-		VAR i: SIZE; num: LONGINT;
+		VAR i: SIZE; num: SIZE;
 		BEGIN
 			i := 0;
 			REPEAT
-				reader.RawNum(num);
+				reader.RawSize(num);
 				name[i] := poolMap.Get(num);
 				INC(i);
 			UNTIL (i = LEN(name)) OR (num < 0);
@@ -681,7 +681,7 @@ VAR
 	CONST Separator = ' ';
 
 		PROCEDURE WriteIdentifier(CONST name: SegmentedName);
-		VAR i: SIZE; num: LONGINT;
+		VAR i: SIZE; num: SIZE;
 		BEGIN
 			i := 0;
 			REPEAT
@@ -731,7 +731,7 @@ VAR
 		END WriteFixupPattern;
 
 		PROCEDURE WriteIdentifier(CONST identifier: Identifier);
-		VAR i: SIZE; num: LONGINT;
+		VAR i: SIZE; num: StringPool.Index;
 		BEGIN
 			i := 0;
 			REPEAT
@@ -895,11 +895,11 @@ VAR
 		END ReadValueIdentifier;
 
 		PROCEDURE ReadIdentifier(VAR identifier: Identifier);
-		VAR i: SIZE; num: LONGINT;
+		VAR i: SIZE; num: SIZE;
 		BEGIN
 			i := 0;
 			REPEAT
-				reader.RawNum(num);
+				reader.RawSize(num);
 				identifier.name[i] := poolMap.Get(num);
 				INC(i);
 			UNTIL (i = LEN(identifier.name)) OR (num < 0);

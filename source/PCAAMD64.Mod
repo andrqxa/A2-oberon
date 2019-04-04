@@ -753,7 +753,7 @@ TYPE
 			END GetCPU;
 
 			PROCEDURE GetScopeSymbol (ident: ARRAY OF CHAR): PCT.Symbol;
-			VAR idx: LONGINT;
+			VAR idx: StringPool.Index;
 			BEGIN
 				StringPool.GetIndex(ident, idx);
 				RETURN PCT.Find (scope, scope, idx, PCT.procdeclared, TRUE);

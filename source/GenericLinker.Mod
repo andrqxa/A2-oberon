@@ -35,13 +35,13 @@ TYPE
 	HashTableSegmentedName* = OBJECT
 	VAR
 		table: HashSegmentedNameArray;
-		size: LONGINT;
-		used-: LONGINT;
+		size: SIZE;
+		used-: SIZE;
 		maxLoadFactor: REAL;
 
 		(* Interface *)
 
-		PROCEDURE & Init* (initialSize: LONGINT);
+		PROCEDURE & Init* (initialSize: SIZE);
 		BEGIN
 			ASSERT(initialSize > 2);
 			NEW(table, initialSize);
@@ -52,7 +52,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Put*(CONST key: ObjectFile.SegmentedName; value: Block);
-		VAR hash: LONGINT;
+		VAR hash: SIZE;
 		BEGIN
 			ASSERT(used < size);
 			hash := HashValue(key);
@@ -74,23 +74,25 @@ TYPE
 		END Get;
 
 		PROCEDURE Clear;
-		VAR i: LONGINT;
-		BEGIN FOR i := 0 TO size - 1 DO table[i].key[0] := -1; END; END Clear;
+		VAR i: SIZE;
+		BEGIN
+			FOR i := 0 TO size - 1 DO table[i].key[0] := -1; END;
+		END Clear;
 
 		(* Internals *)
-		PROCEDURE Hash(CONST name: ObjectFile.SegmentedName): LONGINT;
-		VAR fp,i: LONGINT;
+		PROCEDURE Hash(CONST name: ObjectFile.SegmentedName): SIZE;
+		VAR fp,i: SIZE;
 		BEGIN
 			fp := name[0]; i := 1;
 			WHILE (i<LEN(name)) & (name[i] >= 0) DO
-				fp:=SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, ROT(fp, 7)) / SYSTEM.VAL(SET, name[i]));
+				fp:=SYSTEM.VAL(SIZE, SYSTEM.VAL(SET, ROT(fp, 7)) / SYSTEM.VAL(SET, name[i]));
 				INC(i);
 			END;
 			RETURN fp
 		END Hash;
 
-		PROCEDURE HashValue(CONST key: ObjectFile.SegmentedName):LONGINT;
-		VAR value, h,i: LONGINT;
+		PROCEDURE HashValue(CONST key: ObjectFile.SegmentedName):SIZE;
+		VAR value, h,i: SIZE;
 		BEGIN
 			ASSERT(key[0] >= 0);
 			h := Hash(key);
@@ -104,7 +106,7 @@ TYPE
 		END HashValue;
 
 		PROCEDURE Grow;
-		VAR oldTable: HashSegmentedNameArray; oldSize, i: LONGINT; key: ObjectFile.SegmentedName;
+		VAR oldTable: HashSegmentedNameArray; oldSize, i: SIZE; key: ObjectFile.SegmentedName;
 		BEGIN
 			oldSize := size;
 			oldTable := table;

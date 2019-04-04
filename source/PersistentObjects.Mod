@@ -843,7 +843,7 @@ TYPE
 	END;
 
 	Symbol = POINTER TO RECORD
-		name: LONGINT;
+		name: StringPool.Index;
 		first, last: Element;
 		numberElements: LONGINT;
 		next: Symbol;
@@ -906,7 +906,7 @@ TYPE
 		END Used;
 
 		PROCEDURE AddSymbol(CONST name: ARRAY OF CHAR): Symbol;
-		VAR id: LONGINT; any: ANY; symbol: Symbol;
+		VAR id: StringPool.Index; any: ANY; symbol: Symbol;
 		BEGIN
 			id := StringPool.GetIndex1(name);
 			any := stack.symbols.Get(id);
@@ -924,7 +924,7 @@ TYPE
 		END AddSymbol;
 
 		PROCEDURE FindElement(CONST name: ARRAY OF CHAR; index: LONGINT): XML.Element;
-		VAR id: LONGINT; any: ANY; symbol: Symbol; element: Element;
+		VAR id: StringPool.Index; any: ANY; symbol: Symbol; element: Element;
 		BEGIN
 			IF name = "" THEN
 				symbol := stack.firstSymbol;

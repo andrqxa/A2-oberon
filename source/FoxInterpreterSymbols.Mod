@@ -1429,7 +1429,7 @@ TYPE
 			Enter1(item, StringPool.GetIndex1(name))
 		END Enter;
 
-		PROCEDURE Find1*(id: LONGINT): Item;
+		PROCEDURE Find1*(id: StringPool.Index): Item;
 		VAR any: ANY;
 		BEGIN
 			any := lookup.Get(id);
