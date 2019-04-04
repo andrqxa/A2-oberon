@@ -223,7 +223,7 @@ IMPORT
 			min: LONGINT; res: WORD;
 		BEGIN
 			IF Debug THEN KernelLog.String("Bytes"); KernelLog.Ln; END;
-			demultiplexer.GetData(streamNr, x, TODO(ofs), TODO(size), min, len, res);
+			demultiplexer.GetData(streamNr, x, ofs, size, min, len, res);
 		END Bytes;
 
 		(* Set Byte Position *)
