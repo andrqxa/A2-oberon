@@ -185,7 +185,7 @@ TYPE
 				END;
 
 				(* Non-blocking read of available data *)
-				l := MIN(size,Available());
+				l := MIN(size,TODO(Available()));
 				IF l > 0 THEN
 					read := 0;
 					ret := Kernel32.ReadFile( handle, buf[ofs], l, read, rOverlapped );
@@ -223,7 +223,7 @@ TYPE
 			END
 		END ReceiveChar;
 
-		PROCEDURE Available*( ): LONGINT;
+		PROCEDURE Available*( ): SIZE;
 		VAR errors: Kernel32.DWORD;  stat: Kernel32.ComStat;  res: Kernel32.BOOL;
 		BEGIN
 			IF handle # Kernel32.InvalidHandleValue THEN

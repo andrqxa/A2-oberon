@@ -487,7 +487,7 @@ TYPE
 			END;
 		END HandleData;
 
-		PROCEDURE Available*(): LONGINT;
+		PROCEDURE Available*(): SIZE;
 		BEGIN {EXCLUSIVE}
 			RETURN (tail - head) MOD BufSize
 		END Available;

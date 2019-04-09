@@ -1150,7 +1150,7 @@ TYPE
 			res := Streams.Ok;
 			WHILE running & (res = Streams.Ok) & (len = 0) DO
 				lock.Acquire(Terminal);
-				len := port.Available();
+				len := TODO (port.Available());
 				IF len # 0 THEN
 					port.Receive(buffer, 0, ReceiveBufferSize, MIN(len,ReceiveBufferSize), len, res);
 				END;

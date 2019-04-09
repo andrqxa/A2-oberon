@@ -134,7 +134,7 @@ TYPE
 			END
 		END ReceiveChar;
 
-		PROCEDURE Available*(): LONGINT;
+		PROCEDURE Available*(): SIZE;
 		BEGIN {EXCLUSIVE}
 			RETURN (tail - head) MOD BufferSize
 		END Available;
@@ -237,7 +237,7 @@ TYPE
 			END;
 		END ReceiveChar;
 
-		PROCEDURE Available*(): LONGINT;
+		PROCEDURE Available*(): SIZE;
 		BEGIN {EXCLUSIVE}
 			RETURN port.Available();
 		END Available;

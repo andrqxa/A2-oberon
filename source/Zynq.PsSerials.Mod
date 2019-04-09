@@ -83,7 +83,7 @@ TYPE
 			Machine.ReleaseObject(recvLocked);
 		END Receive;
 
-		PROCEDURE Available(): LONGINT;
+		PROCEDURE Available(): SIZE;
 		BEGIN
 			RETURN PsUart.Available(uart);
 		END Available;

@@ -1075,7 +1075,7 @@ IMPORT
 
 		END GetInfo;
 
-		PROCEDURE GetData*(streamNr: LONGINT;  VAR buf:  ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
+		PROCEDURE GetData*(streamNr: LONGINT;  VAR buf:  ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: LONGINT; VAR res: WORD);
 		VAR
 			rres: BOOLEAN;
 		BEGIN

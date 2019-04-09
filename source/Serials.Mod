@@ -109,7 +109,7 @@ TYPE
 			END;
 		END Receive;
 
-		PROCEDURE Available*(): LONGINT;
+		PROCEDURE Available*(): SIZE;
 		END Available;
 
 		(** Get the port state: state (open, closed), speed in bps, no. of data bits, parity, stop bit length. *)

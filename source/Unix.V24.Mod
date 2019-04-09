@@ -124,9 +124,9 @@ TYPE
 			END
 		END Close;
 
-		PROCEDURE Available*(): LONGINT;
+		PROCEDURE Available*(): SIZE;
 		VAR
-			 num, err: LONGINT;
+			num, err: WORD;
 		BEGIN
 		 	err := Unix.ioctl( fd, Unix.FIONREAD, ADDRESSOF(num) );
 			RETURN num;
@@ -176,7 +176,7 @@ TYPE
 			ASSERT ( LEN( buf ) >= ofs + size );
 			ASSERT ( LEN( buf ) >= ofs + min );   (* array bound check not implemented in Kernel32.ReadFile *)
 			res := Serials.Ok; len := 0;
-			i := ofs;  l := Available();
+			i := ofs;  l := TODO (Available());
 			WHILE (res = Serials.Ok) & ( (min > 0) OR ((l > 0) & (size > 0)) ) DO  (* fof 060804 *)
 				IF l > size THEN l := size END;
 				IF  l > 0 THEN
@@ -189,7 +189,7 @@ TYPE
 						res := Serials.TransportError;
 					END;
 				END;
-				l := Available();
+				l := TODO(Available());
 				IF (res = Serials.Ok) & ( (min > 0) OR ((l > 0) & (size > 0)) ) THEN
 					Objects.Sleep(1);
 				END;
