@@ -53,7 +53,7 @@ TYPE
 			BEGIN
 				ASSERT(  ~private & (dlen >= 16) );
 				msg := B.ModExp( signature, exponent, modulus );
-				l := msg.len;
+				l := TODO(msg.len);
 				FOR i := 0 TO 3 DO  l2n( msg.d[l - 1 - i], buf, 4*i )  END;
 				FOR i := 0 TO 15 DO
 					IF buf[i] # digest[i] THEN  RETURN FALSE  END;
@@ -114,13 +114,13 @@ VAR
 		NEW( pub);
 		pub.modulus := n;
 		pub.exponent := e;
-		pub.size := n.len*32;
+		pub.size := LONGINT(n.len)*32;
 		pub.private := FALSE;
 
 		NEW( priv );
 		priv.modulus := n;
 		priv.exponent := d;
-		priv.size := n.len*32;
+		priv.size := TODO(n.len*32);
 		priv.private := TRUE;
 
 		(* Add stuff needed for the chinese remainder theorem to the private key *)
@@ -147,7 +147,7 @@ VAR
 		NEW( rsa );
 		rsa.name := "unkown";
 		rsa.private := FALSE;
-		rsa.size := m.len*32;
+		rsa.size := TODO(m.len*32);
 		B.Copy( e, rsa.exponent );
 		B.Copy( m, rsa.modulus );
 		RETURN rsa

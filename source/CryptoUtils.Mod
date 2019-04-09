@@ -15,7 +15,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Add*( CONST x: ARRAY OF CHAR );
-		VAR  i: LONGINT;  c: CHAR;
+		VAR  i: SIZE;  c: CHAR;
 		BEGIN
 			c := x[0];  i := 1;
 			WHILE c # 0X DO
@@ -162,7 +162,7 @@ VAR
 
 
 	PROCEDURE PutBigNumber*( VAR buf: ARRAY OF CHAR;  VAR pos: LONGINT;  b: B.BigNumber );
-	VAR i, j, len: LONGINT;  x: UNSIGNED32;  tmp: ARRAY 2048 OF CHAR;
+	VAR i, j: SIZE; len: LONGINT;  x: UNSIGNED32;  tmp: ARRAY 2048 OF CHAR;
 	BEGIN
 		len := 0;
 		FOR i := b.len - 1 TO 0 BY -1 DO
@@ -378,6 +378,4 @@ VAR
 BEGIN
 	hexd := "0123456789ABCDEF";
 END CryptoUtils.
-
-
 

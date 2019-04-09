@@ -25,7 +25,7 @@ MODULE PKCS1;
 		(* Argument checks *)
 		ASSERT(key # NIL);
 		IF (blockType < 0) OR (blockType > 2) THEN destLen := 0; RETURN END;
-		k := 4 * key.modulus.len;
+		k := TODO (4 * key.modulus.len);
 		IF k < 12 THEN destLen := 0; RETURN END;
 		IF srcLen > k - 11 THEN destLen := 0; RETURN END;
 		IF LEN(src) < srcOfs + srcLen THEN destLen := 0; RETURN END;
@@ -94,7 +94,7 @@ MODULE PKCS1;
 			clear, cipher: CryptoBigNumbers.BigNumber;
 	BEGIN
 		(* Argument checks. *)
-		k := 4 * key.modulus.len;
+		k := TODO (4 * key.modulus.len);
 		IF srcLen # k THEN destLen := 0; RETURN END;
 		(* Guarantees cipher < key.modulus *)
 		IF src[srcOfs] # 0X THEN destLen := 0; RETURN END;
@@ -130,5 +130,4 @@ MODULE PKCS1;
 		destLen := k - ofs - 1
 	END Decrypt;
 END PKCS1.
-
 
