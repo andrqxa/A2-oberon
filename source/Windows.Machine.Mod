@@ -457,7 +457,7 @@ END ID;
  * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
  * left empty on Intel architecture.
  *)
-PROCEDURE FlushDCacheRange * (adr: ADDRESS; len: LONGINT);
+PROCEDURE FlushDCacheRange * (adr: ADDRESS; len: SIZE);
 END FlushDCacheRange;
 
 (**
@@ -465,7 +465,7 @@ END FlushDCacheRange;
  * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
  * left empty on Intel architecture.
  *)
-PROCEDURE InvalidateDCacheRange * (adr: ADDRESS; len: LONGINT);
+PROCEDURE InvalidateDCacheRange * (adr: ADDRESS; len: SIZE);
 END InvalidateDCacheRange;
 
 (**
@@ -473,7 +473,7 @@ END InvalidateDCacheRange;
  * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
  * left empty on Intel architecture.
  *)
-PROCEDURE InvalidateICacheRange * (adr: ADDRESS; len: LONGINT);
+PROCEDURE InvalidateICacheRange * (adr: ADDRESS; len: SIZE);
 END InvalidateICacheRange;
 
 

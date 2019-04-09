@@ -443,7 +443,7 @@ END ID;
 	Disable data cache for the memory range [adr, adr + len). Repeated cache disabling is recorded. A maximum of 127 successive disabling is supported.
 	Cache disabling is allowed for heap and stack memory ranges only.
 *)
-PROCEDURE DisableDCacheRange * (adr: ADDRESS; len: LONGINT);
+PROCEDURE DisableDCacheRange * (adr: ADDRESS; len: SIZE);
 END DisableDCacheRange;
 
 (**
@@ -451,7 +451,7 @@ END DisableDCacheRange;
 	The memory range must have been previously disabled.
 	It is the responsibility of client software to re-enable cache for the regions that it disabled.
 *)
-PROCEDURE EnableDCacheRange * (adr: ADDRESS; len: LONGINT);
+PROCEDURE EnableDCacheRange * (adr: ADDRESS; len: SIZE);
 END EnableDCacheRange;
 
 (* InvalidateICache - invalidates the ICache. Works only in a priviledged mode. *)
@@ -2120,7 +2120,7 @@ END Is32BitAddress;
  * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
  * left empty on Intel architecture.
  *)
-PROCEDURE FlushDCacheRange * (adr: ADDRESS; len: LONGINT);
+PROCEDURE FlushDCacheRange * (adr: ADDRESS; len: SIZE);
 END FlushDCacheRange;
 
 (**
@@ -2128,7 +2128,7 @@ END FlushDCacheRange;
  * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
  * left empty on Intel architecture.
  *)
-PROCEDURE InvalidateDCacheRange * (adr: ADDRESS; len: LONGINT);
+PROCEDURE InvalidateDCacheRange * (adr: ADDRESS; len: SIZE);
 END InvalidateDCacheRange;
 
 (**
@@ -2136,7 +2136,7 @@ END InvalidateDCacheRange;
  * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
  * left empty on Intel architecture.
  *)
-PROCEDURE InvalidateICacheRange * (adr: ADDRESS; len: LONGINT);
+PROCEDURE InvalidateICacheRange * (adr: ADDRESS; len: SIZE);
 END InvalidateICacheRange;
 
 PROCEDURE -SetRA(n: SIZE);

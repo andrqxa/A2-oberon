@@ -101,7 +101,7 @@ VAR
 	 * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
 	 * left empty on Intel architecture.
 	 *)
-	PROCEDURE FlushDCacheRange * (adr: ADDRESS; len: LONGINT);
+	PROCEDURE FlushDCacheRange * (adr: ADDRESS; len: SIZE);
 	END FlushDCacheRange;
 
 	(**
@@ -109,7 +109,7 @@ VAR
 	 * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
 	 * left empty on Intel architecture.
 	 *)
-	PROCEDURE InvalidateDCacheRange * (adr: ADDRESS; len: LONGINT);
+	PROCEDURE InvalidateDCacheRange * (adr: ADDRESS; len: SIZE);
 	END InvalidateDCacheRange;
 
 	(**
@@ -117,7 +117,7 @@ VAR
 	 * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be
 	 * left empty on Intel architecture.
 	 *)
-	PROCEDURE InvalidateICacheRange * (adr: ADDRESS; len: LONGINT);
+	PROCEDURE InvalidateICacheRange * (adr: ADDRESS; len: SIZE);
 	END InvalidateICacheRange;
 
 	(* insert given memory block in sorted list of memory blocks, sort key is startAdr field - called during GC *)

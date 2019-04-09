@@ -831,7 +831,7 @@ VAR
 		Disable data cache for the memory range [adr, adr + len). Repeated cache disabling is recorded. A maximum of 127 successive disabling is supported.
 		Cache disabling is allowed for heap and stack memory ranges only.
 	*)
-	PROCEDURE DisableDCacheRange * (adr: ADDRESS; len: LONGINT);
+	PROCEDURE DisableDCacheRange * (adr: ADDRESS; len: SIZE);
 	VAR
 		range: ARRAY 1 OF Range;
 		end: ADDRESS;
@@ -909,7 +909,7 @@ VAR
 		The memory range must have been previously disabled.
 		It is the responsibility of client software to re-enable cache for the regions that it disabled.
 	*)
-	PROCEDURE EnableDCacheRange * (adr: ADDRESS; len: LONGINT);
+	PROCEDURE EnableDCacheRange * (adr: ADDRESS; len: SIZE);
 	VAR
 		end: ADDRESS;
 		ofs, entry: LONGINT;
