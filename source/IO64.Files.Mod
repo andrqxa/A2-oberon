@@ -1106,7 +1106,7 @@ END RemoveDirectory;
 
 PROCEDURE Enumerate( VAR mask: ARRAY OF CHAR; flags: SET; enum: Enumerator );
 VAR
-	fs: FileSystem; ft: FileSystemTable; i: LONGINT;
+	fs: FileSystem; ft: FileSystemTable; i: SIZE;
 	prefix: Prefix; fmask: FileName;
 BEGIN
 	SplitName( mask, prefix, fmask );
@@ -1128,7 +1128,7 @@ END Enumerate;
 
 PROCEDURE Exists* ( CONST fileName: ARRAY OF CHAR; VAR fullName: ARRAY OF CHAR; VAR flags: SET ): BOOLEAN;
 VAR
-	fs: FileSystem; ft: FileSystemTable; i: LONGINT;
+	fs: FileSystem; ft: FileSystemTable; i: SIZE;
 	prefix: Prefix;
 BEGIN
 	IF prefix = "" THEN
@@ -1396,7 +1396,7 @@ END GetDevPart;
 (* Clean up file systems when shutting down or unloading module. *)
 
 PROCEDURE FSCleanup;
-VAR ft: FileSystemTable; i: LONGINT;
+VAR ft: FileSystemTable; i: SIZE;
 BEGIN
 	GetList( ft );
 	IF ft # NIL THEN

@@ -920,7 +920,7 @@ VAR
 	END AutoUnmountLogicalDrives;
 
 	PROCEDURE Finalization;
-	VAR ft: Files.FileSystemTable;  i: LONGINT;
+	VAR ft: Files.FileSystemTable;  i: SIZE;
 	BEGIN
 		Files.GetList( ft );
 		IF ft # NIL THEN

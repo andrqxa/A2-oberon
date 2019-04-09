@@ -874,7 +874,7 @@ BEGIN
 END NewFS;
 
 PROCEDURE FillBuf(VAR x: ARRAY OF CHAR; ch: CHAR);
-	VAR len, i: LONGINT;
+	VAR len, i: SIZE;
 BEGIN
 	len := LEN(x);
 	FOR i := 0 TO len-1 DO
@@ -887,7 +887,7 @@ END FillBuf;
 (* Clean up when module unloaded. *)
 
 PROCEDURE Cleanup;
-VAR ft: Files.FileSystemTable; i: LONGINT;
+VAR ft: Files.FileSystemTable; i: SIZE;
 BEGIN
 	IF Modules.shutdown = Modules.None THEN
 		Files.GetList(ft);

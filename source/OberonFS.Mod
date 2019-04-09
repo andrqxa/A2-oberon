@@ -1121,7 +1121,7 @@ END NewFS;
 
 (* Clean up when module freed. *)
 PROCEDURE Cleanup;
-VAR ft: Files.FileSystemTable; i: LONGINT;
+VAR ft: Files.FileSystemTable; i: SIZE;
 BEGIN
 	IF Modules.shutdown = Modules.None THEN
 		Files.GetList(ft);

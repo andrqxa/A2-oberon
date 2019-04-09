@@ -211,7 +211,7 @@ BEGIN
 END Unmount;
 
 PROCEDURE SetDefault*(context : Commands.Context); (** prefix *)
-VAR prefix: Files.Prefix; fs: Files.FileSystem; i: LONGINT; ft: Files.FileSystemTable;
+VAR prefix: Files.Prefix; fs: Files.FileSystem; i: SIZE; ft: Files.FileSystemTable;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(prefix);
 	fs := Files.This(prefix);
@@ -242,7 +242,7 @@ BEGIN
 END WriteK;
 
 PROCEDURE Watch*(context : Commands.Context); (** ~ *)
-VAR prefix : Files.Prefix; free, total, i: LONGINT; fs: Files.FileSystem; ft: Files.FileSystemTable; found : BOOLEAN;
+VAR prefix : Files.Prefix; i: SIZE; free, total: LONGINT; fs: Files.FileSystem; ft: Files.FileSystemTable; found : BOOLEAN;
 BEGIN
 	prefix := "";
 	context.arg.SkipWhitespace; context.arg.String(prefix);
