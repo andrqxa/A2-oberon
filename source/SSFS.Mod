@@ -748,7 +748,7 @@ TYPE
 		END Write;
 
 		(** Write the buffer x containing len bytes (starting at offset ofs) into a file at the Rider position. *)
-		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR dnode : Dnode; blockNumber, spaceLeft, nofBytes, pos, res : LONGINT;
 		BEGIN {EXCLUSIVE}
 			ASSERT(r.file = SELF);
@@ -783,7 +783,7 @@ TYPE
 					(* determine how much bytes we write to this dnode *)
 					spaceLeft := BlockSize - r.apos;
 					IF (len < spaceLeft) THEN
-						nofBytes := len;
+						nofBytes := TODO(len);
 					ELSE
 						nofBytes := spaceLeft;
 					END;
@@ -815,7 +815,7 @@ TYPE
 				inode.size := pos;
 				inodeModified := TRUE;
 			END;
-			r.res := len;
+			r.res := TODO(len);
 		END WriteBytes;
 
 		(** Return the current length of a file. *)

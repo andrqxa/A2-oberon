@@ -487,7 +487,7 @@ TYPE
 		END Write;
 
 		(** write len bytes into a file **)
-		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR src, dst: ADDRESS; m, errorcode: LONGINT; buf: Buffer;
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN
@@ -506,7 +506,7 @@ TYPE
 					END;
 					buf.mod := TRUE;
 					dst := ADDRESSOF(buf.data.B[0]) + r.bpos;
-					m := r.bpos + len;
+					m := r.bpos + TODO(len);
 					IF m <= buf.lim THEN
 						SYSTEM.MOVE(src, dst, len);
 						r.bpos := m;

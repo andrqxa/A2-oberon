@@ -549,7 +549,7 @@ TYPE
 			buffer.dirty := TRUE;
 		END Write;
 
-		PROCEDURE WriteBytes*( VAR r: Files.Rider;  CONST x: ARRAY OF CHAR;  ofs, len: LONGINT );
+		PROCEDURE WriteBytes*( VAR r: Files.Rider;  CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
 		VAR pos, n: LONGINT;
 		BEGIN {EXCLUSIVE}
 			IF len = 0 THEN RETURN END;
@@ -557,7 +557,7 @@ TYPE
 			WHILE len > 0 DO
 				IF buffer.apos # r.apos THEN ReadBuffer( r.apos ) END;
 				n := BufferSize - r.bpos;
-				IF n > len THEN n := len END;
+				IF n > len THEN n := TODO(len) END;
 				SYSTEM.MOVE( ADDRESSOF( x[ofs] ), ADDRESSOF( buffer.data[r.bpos] ), n );
 				IF (r.bpos + n) > buffer.len THEN buffer.len := r.bpos + n END;
 				INC( pos, n );  INC( ofs, n );  DEC( len, n );  r.apos := pos DIV BufferSize;  r.bpos := pos MOD BufferSize;

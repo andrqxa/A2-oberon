@@ -527,7 +527,7 @@ TYPE
 
 		(** Write the buffer x containing len bytes (starting at offset ofs) into a file at the Rider position. *)
 
-		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR
 			check: BOOLEAN;
 			bytesWritten: INTEGER;
@@ -543,7 +543,7 @@ TYPE
 					key := localKey;
 					openRead := FALSE;
 				ELSE
-					r.res := len;
+					r.res := TODO(len);
 					fs(FileSystem).lock.Release();
 					RETURN;
 				END;
@@ -563,7 +563,7 @@ TYPE
 	 			IF len > RWLimit THEN
 	 				adjLen := RWLimit;
 	 			ELSE
-	 				adjLen := SHORT(len);
+	 				adjLen := SHORT(TODO(len));
 	 			END;
 
 			 	(* Send *)
@@ -1248,6 +1248,4 @@ FSTools.Mount SMB SmbFS 127.0.0.1 ~
 FSTools.Mount SMB SmbFS 127.0.0.1 ~
 
 FSTools.Unmount SMB ~
-
-
 

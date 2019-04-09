@@ -826,11 +826,11 @@ TYPE
 		END WriteX;
 
 		(* Write the buffer x containing len bytes (starting at offset ofs) into a file at the Rider position. *)
-		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		BEGIN {EXCLUSIVE} WriteBytesX(r, x, ofs, len)
 		END WriteBytes;
 
-		PROCEDURE WriteBytesX(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE WriteBytesX(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR dst: ADDRESS; m: LONGINT;
 		BEGIN
 			IF (attr * WriteProtected # {}) THEN HALT(ErrFileReadOnly) END;
@@ -839,7 +839,7 @@ TYPE
 				WHILE (len > 0) DO
 					IF (buffer.pos # r.apos) THEN ReadBuffer(buffer, r.apos) END;
 					dst := ADDRESSOF(buffer.data[r.bpos]);
-					m := MIN(clusterSize-r.bpos, len);
+					m := MIN(clusterSize-r.bpos, TODO(len));
 					SYSTEM.MOVE(ADDRESSOF(x[ofs]), dst, m);
 					WriteBuffer(buffer);
 					INC(ofs, m); DEC(len, m);

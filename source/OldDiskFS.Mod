@@ -983,7 +983,7 @@ TYPE
 			buf.data.B[r.bpos] := x; INC(r.bpos); buf.mod := TRUE
 		END Write;
 
-		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR src, dst: ADDRESS; m: LONGINT; buf: Buffer;
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
@@ -992,7 +992,7 @@ TYPE
 				IF r.apos # buf.apos THEN buf := GetBuf(SELF, r.apos); r.hint := buf END;
 				LOOP
 					IF len <= 0 THEN EXIT END;
-					buf.mod := TRUE; dst := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + len;
+					buf.mod := TRUE; dst := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + TODO(len);
 					IF m <= buf.lim THEN
 						SYSTEM.MOVE(ADDRESSOF(x[ofs]), dst, len); r.bpos := m; EXIT
 					ELSIF m <= SS THEN

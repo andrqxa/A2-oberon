@@ -693,8 +693,8 @@ TYPE
 					r.bpos := offset + 1;  r.res := Files.Ok
 				END Write;
 
-				PROCEDURE WriteBytes*( VAR r: Files.Rider;  CONST x: ARRAY OF CHAR;  ofs, len: LONGINT );
-				VAR xpos, min, restInBuf, offset: LONGINT;  buf: Buffer;
+				PROCEDURE WriteBytes*( VAR r: Files.Rider;  CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
+				VAR xpos, min, restInBuf: SIZE; offset: TODO;  buf: Buffer;
 				BEGIN  {EXCLUSIVE}
 					xpos := ofs;  buf := r.hint(Buffer);  offset := r.bpos;
 					WHILE len > 0 DO
@@ -705,7 +705,7 @@ TYPE
 						restInBuf := Bufsize - offset;
 						IF len > restInBuf THEN  min := restInBuf  ELSE  min := len  END;
 						S.MOVE( ADDRESSOF( x ) + xpos, ADDRESSOF( buf.data ) + offset, min );
-						INC( offset, min );  r.bpos := offset;
+						INC( offset, TODO(min) );  r.bpos := offset;
 						IF offset > buf.size THEN
 							INC( fsize, offset - buf.size );  buf.size := offset
 						END;
