@@ -793,7 +793,7 @@ TYPE
 			overflowH: BOOLEAN;
 
 			text: Strings.String;
-			sz, ret: LONGINT;
+			sz: SIZE; ret: SIZE;
 
 			PROCEDURE  WriteLine;
 			BEGIN
@@ -855,14 +855,14 @@ TYPE
 		(*ALEX 2005.10.25*)
 		PROCEDURE DrawStringSingleLine*(x, y, width, align: LONGINT; stext : ARRAY OF CHAR);
 		VAR f : WMGraphics.Font;
-			sz, i, j: LONGINT;
+			sz, i, j: SIZE;
 			overflow: BOOLEAN;
 			buf: ARRAY 2 OF CHAR;
 			sumW, sumWLeft, strW, strH: LONGINT;
 			g: WMGraphics.GlyphSpacings;
 			lbRet: BOOLEAN;
 			text: Strings.String;
-			ret: LONGINT;
+			ret: SIZE;
 		BEGIN
 			buf[1] := 0X;
 			font := GetPDFFont(GetFont());
@@ -1071,8 +1071,8 @@ BEGIN
 END WritePDFString;
 
 (*ALEX 2005.10.26: same asa the above function only that writes data[from..to-1]*)
-PROCEDURE WritePDFStringPos(w : Streams.Writer; CONST data : ARRAY OF CHAR; from, to: LONGINT);
-VAR i : LONGINT;
+PROCEDURE WritePDFStringPos(w : Streams.Writer; CONST data : ARRAY OF CHAR; from, to: SIZE);
+VAR i : SIZE;
 BEGIN
 	w.Char("(");
 	i := from; WHILE (i < to) & (data[i] # 0X)  DO
@@ -1092,7 +1092,7 @@ BEGIN
 END WritePDFStringPos;
 
 (*ALEX 2005.10.31*)
-PROCEDURE GetCharSpacings(f: WMGraphics.Font; VAR text: ARRAY OF CHAR; i: LONGINT; VAR g : WMGraphics.GlyphSpacings): BOOLEAN;
+PROCEDURE GetCharSpacings(f: WMGraphics.Font; VAR text: ARRAY OF CHAR; i: SIZE; VAR g : WMGraphics.GlyphSpacings): BOOLEAN;
 VAR code: LONGINT;
 BEGIN
 	IF UTF8Strings.DecodeChar(text, i, code) THEN

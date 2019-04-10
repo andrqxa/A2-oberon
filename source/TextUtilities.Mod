@@ -69,7 +69,7 @@ TYPE
 
 		PROCEDURE Add(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 		VAR
-			p, i, idx, pos : LONGINT;
+			p, i: SIZE; idx, pos : LONGINT;
 			nextAttribute: LONGINT;
 			pieceOffset, pieceLength: LONGINT;
 			nextAttributes: Texts.Attributes;
@@ -93,7 +93,7 @@ TYPE
 
 			IF (p < pieceOffset + pieceLength) & (ORD(UTF8Strings.CodeLength[ORD(buf[p])]) >= pieceOffset+pieceLength)  THEN (* could not be decoded because of missing bytes. ignore other problems *)
 				WHILE p < pieceOffset+pieceLength  DO oldBytes[i] := buf[p]; INC(p); INC(i) END;
-				nofOldBytes := i;
+				nofOldBytes := TODO(i);
 				KernelLog.String("Update within UTF sequence "); KernelLog.Ln;
 			END;
 			IF len > 0 THEN
@@ -767,8 +767,8 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE GetUTF8Char(r : Streams.Reader; VAR u : Texts.Char32; VAR pos : LONGINT) : BOOLEAN;
-		VAR ch : ARRAY 8 OF CHAR; i : LONGINT;
+		PROCEDURE GetUTF8Char(r : Streams.Reader; VAR u : Texts.Char32; VAR pos : SIZE) : BOOLEAN;
+		VAR ch : ARRAY 8 OF CHAR; i : SIZE;
 		BEGIN
 			ch[0] := r.Get(); INC(pos);
 			FOR i := 1 TO ORD(UTF8Strings.CodeLength[ORD(ch[0])]) - 1 DO ch[i] := r.Get(); INC(pos) END;
@@ -777,7 +777,7 @@ TYPE
 		END GetUTF8Char;
 
 		PROCEDURE InsertPiece(charContent : XML.CDataSect);
-		VAR i, m, tpos: LONGINT; res : WORD; ch, last : Texts.Char32; tempUCS32 : ARRAY 1024 OF Texts.Char32;
+		VAR i, m: LONGINT; tpos: SIZE; res : WORD; ch, last : Texts.Char32; tempUCS32 : ARRAY 1024 OF Texts.Char32;
 			oldpos, len : LONGINT;
 			r, sr : Streams.StringReader; token : ARRAY 256 OF CHAR;
 			tempInt: LONGINT;
@@ -792,7 +792,7 @@ TYPE
 			r.Set(buffer^);
 
 			oldpos := text.GetLength();
-			len := charContent.GetLength();
+			len := TODO(charContent.GetLength());
 			tpos := 0;
 			REPEAT
 				IF GetUTF8Char(r, ch, tpos) THEN
@@ -2055,7 +2055,7 @@ BEGIN
 END ToOberonFont;
 
 PROCEDURE GetUTF8Char*(r : Streams.Reader; VAR u : Texts.Char32) : BOOLEAN;
-VAR ch : ARRAY 8 OF CHAR; i : LONGINT;
+VAR ch : ARRAY 8 OF CHAR; i : SIZE;
 BEGIN
 	ch[0] := r.Get();
 	FOR i := 1 TO ORD(UTF8Strings.CodeLength[ORD(ch[0])]) - 1 DO ch[i] := r.Get() END;

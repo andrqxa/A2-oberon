@@ -2427,7 +2427,7 @@ TYPE
 			obj: Texts.ObjectPiece;
 
 			PROCEDURE GetUTF8Char(r : Streams.Reader; VAR u : Texts.Char32; VAR pos : LONGINT) : BOOLEAN;
-			VAR ch : ARRAY 8 OF CHAR; i : LONGINT;
+			VAR ch : ARRAY 8 OF CHAR; i : SIZE;
 			BEGIN
 				ch[0] := r.Get(); INC(pos);
 				FOR i := 1 TO ORD(UTF8Strings.CodeLength[ORD(ch[0])]) - 1 DO ch[i] := r.Get(); INC(pos) END;
@@ -2450,7 +2450,7 @@ TYPE
 				sr.SetRaw(string^, 0, charContent.GetLength());
 				(* Files.OpenReader(r, charContent.GetFile(), charContent.GetPos()); *)
 				oldpos := text.GetLength();
-				len := charContent.GetLength();
+				len := TODO(charContent.GetLength());
 				KernelLog.String("StartPos : "); KernelLog.Int(charContent.GetPos(), 5); KernelLog.String(" len : ");
 				KernelLog.Int(charContent.GetLength(), 5); KernelLog.Ln;
 				tpos := 0; lengthCounter := 0;

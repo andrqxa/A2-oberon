@@ -236,7 +236,7 @@ TYPE
 		END ToggleFilter;
 
 		PROCEDURE NewCharacter(sender, data :ANY);
-		VAR code : ARRAY 16 OF CHAR; i : LONGINT;
+		VAR code : ARRAY 16 OF CHAR; i : SIZE;
 		BEGIN
 			characterEdit.GetAsString(code);
 			i := 0;

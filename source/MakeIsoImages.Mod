@@ -452,7 +452,7 @@ TYPE
 		PROCEDURE BuildRootName;
 		VAR
 			name, shortname: ARRAY MaxLen OF CHAR;
-			len, count: LONGINT;
+			len, count: SIZE;
 		BEGIN
 			IF type = Joliet THEN
 				COPY(root.name^, name);
@@ -504,7 +504,7 @@ TYPE
 		PROCEDURE BuildIsoLevel1Name(node: Node; VAR shortname: ARRAY OF CHAR): LONGINT;
 		VAR
 			name, file, ext: ARRAY MaxLen OF CHAR;
-			len, count: LONGINT;
+			len, count: SIZE;
 		BEGIN
 			count := UTF8Strings.UTF8toASCII(node.name^, CHR(95), name);
 			Strings.UpperCase(name);
@@ -521,14 +521,14 @@ TYPE
 				Strings.Copy(name, 0, len, shortname);
 				ReplaceNonDChars(shortname);
 			END;
-			RETURN len;
+			RETURN TODO(len);
 		END BuildIsoLevel1Name;
 
 		(* builds the iso level2 name and returns the length without extension *)
 		PROCEDURE BuildIsoLevel2Name(node: Node; VAR shortname: ARRAY OF CHAR): LONGINT;
 		VAR
 			name, file, ext: ARRAY MaxLen OF CHAR;
-			len, count: LONGINT;
+			len, count: SIZE;
 		BEGIN
 			count := UTF8Strings.UTF8toASCII(node.name^, CHR(95), name);
 			Strings.UpperCase(name);
@@ -551,7 +551,7 @@ TYPE
 				Strings.Copy(name, 0, len, shortname);
 				ReplaceNonDChars(shortname);
 			END;
-			RETURN len;
+			RETURN TODO(len);
 		END BuildIsoLevel2Name;
 
 
@@ -1553,7 +1553,7 @@ END SetStringWithPadding;
 PROCEDURE ConvertUTF8ToUCS2(VAR src, dst: ARRAY OF CHAR);
 VAR
 	ucs4: ARRAY MaxLen OF LONGINT;
-	i, len: LONGINT;
+	i, len: SIZE;
 BEGIN
 	UTF8Strings.UTF8toUnicode(src, ucs4, len);
 	DEC(len);

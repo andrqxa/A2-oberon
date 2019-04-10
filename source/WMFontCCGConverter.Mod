@@ -866,7 +866,7 @@ END Export;
 
 (* read a UTF8 character form a stream *)
 PROCEDURE GetUTF8Char(r : Streams.Reader; VAR u : LONGINT) : BOOLEAN;
-VAR ch : ARRAY 8 OF CHAR; i : LONGINT;
+VAR ch : ARRAY 8 OF CHAR; i : SIZE;
 BEGIN
 	ch[0] := r.Get();
 	FOR i := 1 TO ORD(UTF8Strings.CodeLength[ORD(ch[0])]) - 1 DO ch[i] := r.Get() END;

@@ -1051,7 +1051,7 @@ TYPE
 			RETURN NIL
 		END GetStr;
 
-		PROCEDURE GetLength*(): LONGINT;
+		PROCEDURE GetLength*(): SIZE;
 		BEGIN
 			RETURN 0
 		END GetLength;
@@ -1068,7 +1068,7 @@ TYPE
 	ArrayChars* = OBJECT (Chars)
 	VAR
 		str: String;
-		len: LONGINT;
+		len: SIZE;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -1081,7 +1081,7 @@ TYPE
 			RETURN str
 		END GetStr;
 
-		PROCEDURE GetLength*(): LONGINT;
+		PROCEDURE GetLength*(): SIZE;
 		BEGIN
 			RETURN len
 		END GetLength;

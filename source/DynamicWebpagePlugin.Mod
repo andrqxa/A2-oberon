@@ -613,7 +613,7 @@ TYPE
 
 	PROCEDURE ExtractModuleObjectName(n: XML.Element; VAR moduleName: Strings.String; VAR objName: Strings.String);
 	VAR elemNameDyn : DynamicStrings.DynamicString; elemName, namespaceId, attrVal: Strings.String;
-		pos: LONGINT; attrName: ARRAY 128 OF CHAR; attr: XML.Attribute; tempElem : XML.Element;
+		pos: SIZE; attrName: ARRAY 128 OF CHAR; attr: XML.Attribute; tempElem : XML.Element;
 	BEGIN (* n # NIL *)
 		moduleName := NIL; objName := NIL;
 		elemName := n.GetName();

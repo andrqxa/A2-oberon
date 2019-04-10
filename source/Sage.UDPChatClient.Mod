@@ -687,7 +687,7 @@ TYPE
 
 		PROCEDURE Append (message: String; cs: Texts.CharacterStyle; ps: Texts.ParagraphStyle);
 		VAR
-			len, idx: LONGINT;
+			len: LONGINT; idx: SIZE;
 			ucs32: Texts.PUCS32String;
 		BEGIN
 
@@ -701,8 +701,8 @@ TYPE
 
 			editChat.text.AcquireWrite;
 			editChat.text.InsertUCS32 (len, ucs32^);
-			editChat.text.SetCharacterStyle (len, idx-1, cs);
-			editChat.text.SetParagraphStyle (len+2, idx-3, ps);
+			editChat.text.SetCharacterStyle (len, TODO(idx-1), cs);
+			editChat.text.SetParagraphStyle (len+2, TODO(idx-3), ps);
 			editChat.text.ReleaseWrite;
 
 			editChat.tv.End (TRUE, FALSE);

@@ -257,7 +257,7 @@ TYPE
 		END SetBuf;
 
 		PROCEDURE SetBufAsUTF8(CONST buffer : ARRAY OF CHAR);
-		VAR length, i, idx : LONGINT;
+		VAR length, i, idx : SIZE;
 		BEGIN
 			length := UTF8Strings.Length(buffer);
 			NEW(SELF.buffer, length);

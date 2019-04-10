@@ -50,7 +50,7 @@ END EncodeChar;
 
 (** Decode one well-formed UTF-8 character at str[i..] and return its UCS-32 value in ucs.  When successful, parameter i is incremented to the start of the next UTF-8 character.  Otherwise, parameter i points to the byte where the error was detected (this will also be the next character in the case of a minimal coding error).  Return TRUE iff decoding succeeds. *)
 
-PROCEDURE DecodeChar*(CONST str: ARRAY OF CHAR; VAR i, ucs: LONGINT): BOOLEAN;
+PROCEDURE DecodeChar*(CONST str: ARRAY OF CHAR; VAR i: SIZE; VAR ucs: LONGINT): BOOLEAN;
 VAR len, ch, min: LONGINT;
 BEGIN
 	IF i < LEN(str) THEN
@@ -83,7 +83,7 @@ END DecodeChar;
 (** Check whether str is a 0X-terminated well-formed UTF-8 string. *)
 
 PROCEDURE Valid*(CONST str: ARRAY OF CHAR): BOOLEAN;
-VAR i, ucs: LONGINT;
+VAR i: SIZE; ucs: LONGINT;
 BEGIN
 	i := 0;
 	WHILE DecodeChar(str, i, ucs) DO
@@ -166,10 +166,10 @@ END Assign;
 
 (** Copy at most num UTF-8 characters from src to dst, starting at UTF-8 index idx.  If num is negative, treat it as 0.  *)
 
-PROCEDURE Extract*(CONST src: ARRAY OF CHAR; idx, num: LONGINT; VAR dst: ARRAY OF CHAR);
+PROCEDURE Extract*(CONST src: ARRAY OF CHAR; idx, num: SIZE; VAR dst: ARRAY OF CHAR);
 VAR i, j: LONGINT; ch: CHAR;
 BEGIN
-	i := OffsetOfIndex(src, idx); j := 0;
+	i := OffsetOfIndex(src, TODO(idx)); j := 0;
 	LOOP	(* copy characters *)
 		ch := src[i];
 		IF (ch = 0X) OR (j = LEN(dst)) THEN EXIT END;
@@ -256,8 +256,8 @@ END Replace;
 (** Transform a well-formed UTF-8 string into an 8-bit ASCII representation. Characters not present in the ASCII format are replaced
 	by 'substitute' if it is # 0X. *)
 
-PROCEDURE UTF8toASCII*(CONST src: ARRAY OF CHAR; substitute: CHAR; VAR dst: ARRAY OF CHAR): LONGINT;
-VAR count, i, len, pos, ucs: LONGINT;
+PROCEDURE UTF8toASCII*(CONST src: ARRAY OF CHAR; substitute: CHAR; VAR dst: ARRAY OF CHAR): SIZE;
+VAR count, i, len, pos: SIZE; ucs: LONGINT;
 BEGIN
 	len := LEN(dst); ucs := -1;
 	WHILE (ucs # 0) & DecodeChar(src, pos, ucs) & (i < len) DO
@@ -281,8 +281,8 @@ END ASCIItoUTF8;
 (** Transform a well-formed UTF-8 string into an array of UCS-32 values, ucs[idx...]. The UCS-32 representation is terminated with a 0 value.
 	The parameter idx points to the next free entry after the conversion. *)
 
-PROCEDURE UTF8toUnicode*(CONST utf8: ARRAY OF CHAR; VAR ucs: ARRAY OF LONGINT; VAR idx: LONGINT);
-VAR p, l: LONGINT;
+PROCEDURE UTF8toUnicode*(CONST utf8: ARRAY OF CHAR; VAR ucs: ARRAY OF LONGINT; VAR idx: SIZE);
+VAR p, l: SIZE;
 BEGIN
 	p := 0; l := LEN(ucs)-1;
 	WHILE (idx < l) & DecodeChar(utf8, p, ucs[idx]) & (ucs[idx] > 0)  DO INC(idx) END;
@@ -386,7 +386,7 @@ BEGIN
 END Compare;
 
 PROCEDURE CompareToUnicode*(CONST utf8 : ARRAY OF CHAR; CONST unicode : ARRAY OF LONGINT) : LONGINT;
-VAR len, i, j, char, ucs, result : LONGINT; valid, abort : BOOLEAN;
+VAR len, i, j: SIZE; char, ucs, result : LONGINT; valid, abort : BOOLEAN;
 BEGIN
 	len := LEN(unicode);
 	i := 0; j := 0; valid := TRUE; abort := FALSE;

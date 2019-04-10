@@ -232,11 +232,11 @@ TYPE
 
 		(** Resize the internal buffer so that it can hold a string of the length <min> (incl. 0X).
 			The buffer will never be bigger then MaxStringSize *)
-		PROCEDURE CheckSize(min : LONGINT);
-		VAR size : LONGINT;
+		PROCEDURE CheckSize(min : SIZE);
+		VAR size : SIZE;
 
-			PROCEDURE RoundUpSize(min : LONGINT) : LONGINT;
-			VAR size : LONGINT;
+			PROCEDURE RoundUpSize(min : SIZE) : SIZE;
+			VAR size : SIZE;
 			BEGIN
 				size := InitialStringSize;
 				WHILE (min > size) DO size := size * 2; END;
@@ -244,8 +244,8 @@ TYPE
 				RETURN size;
 			END RoundUpSize;
 
-			PROCEDURE GrowTo(size : LONGINT);
-			VAR newString : Texts.PUCS32String; i : LONGINT;
+			PROCEDURE GrowTo(size : SIZE);
+			VAR newString : Texts.PUCS32String; i : SIZE;
 			BEGIN
 				ASSERT((size > LEN(string)) & (size <= MaxStringSize));
 				NEW(newString, size);
@@ -278,7 +278,7 @@ TYPE
 
 		(** Set UTF8 string as text. The string is truncated if necessary. *)
 		PROCEDURE SetAsString*(CONST x : ARRAY OF CHAR);
-		VAR i, length : LONGINT;
+		VAR i, length : SIZE;
 		BEGIN
 			ASSERT(UTF8Strings.Valid(x));
 			IF IsAllowedString(x) THEN
@@ -512,7 +512,7 @@ TYPE
 		END IsAllowedCharacter;
 
 		PROCEDURE IsAllowedString(CONST string : ARRAY OF CHAR) : BOOLEAN;
-		VAR i : LONGINT; valid : BOOLEAN; ucs : Texts.Char32;
+		VAR i : SIZE; valid : BOOLEAN; ucs : Texts.Char32;
 		BEGIN
 			i := 0; valid := TRUE;
 			REPEAT
@@ -553,8 +553,8 @@ TYPE
 		END InsertChar;
 
 		(** Notes: Does not call DeleteSelection, x should already be checked for validity *)
-		PROCEDURE InsertStringAt(CONST x : ARRAY OF CHAR; position : LONGINT; VAR res : WORD);
-		VAR length, i, j, idx : LONGINT; changed, valid : BOOLEAN;
+		PROCEDURE InsertStringAt(CONST x : ARRAY OF CHAR; position : SIZE; VAR res : WORD);
+		VAR length, i, j, idx : SIZE; changed, valid : BOOLEAN;
 		BEGIN
 			ASSERT(UTF8Strings.Valid(x));
 			ASSERT(position >= 0);
@@ -575,9 +575,9 @@ TYPE
 							valid := UTF8Strings.DecodeChar(x, idx, string[i]);
 							INC(j);
 						END;
-						curLen := curLen + length;
+						curLen := curLen + TODO(length);
 						string[curLen] := 0;
-						cursorPosition := position + length;
+						cursorPosition := TODO(position + length);
 						changed := TRUE;
 					ELSE
 						changed := FALSE;

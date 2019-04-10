@@ -895,7 +895,7 @@ TYPE
 		END ExpandCharacterRefs;
 
 		PROCEDURE ParseEntityValue(): String;
-		VAR s, es: String; start, end, len, val: LONGINT; msg: ARRAY 17 OF CHAR;
+		VAR s, es: String; start, end, len: SIZE; val: LONGINT; msg: ARRAY 17 OF CHAR;
 		BEGIN
 			ds1.Clear; ds1.Append(s^);
 			start := 0; len := ds1.Length();

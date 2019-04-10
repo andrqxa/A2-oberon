@@ -445,7 +445,7 @@ TYPE
 		END SearchHandler;
 
 		PROCEDURE ReplaceHandler(sender, data: ANY);
-		VAR replStr : SearchString; ucsStr: UcsSearchString; idx: LONGINT;
+		VAR replStr : SearchString; ucsStr: UcsSearchString; idx: SIZE;
 		BEGIN
 			IF text = NIL THEN RETURN END;
 			IF posValid THEN
@@ -465,7 +465,7 @@ TYPE
 			searchStr, replStr : SearchString;
 			ucsSearchStr, ucsReplStr : UcsSearchString;
 			oldBackwards : BOOLEAN;
-			idx: LONGINT;
+			idx: SIZE;
 		BEGIN
 			IF text = NIL THEN RETURN END;
 			replEdit.GetAsString(replStr);
@@ -515,7 +515,7 @@ TYPE
 		END Search;
 
 		PROCEDURE SearchAndHighlight(from: LONGINT);
-		VAR searchStr : SearchString; ucsStr: UcsSearchString; length, idx : LONGINT;
+		VAR searchStr : SearchString; ucsStr: UcsSearchString; length, idx : SIZE;
 		BEGIN
 			IF text = NIL THEN RETURN END;
 			searchEdit.GetAsString(searchStr);
@@ -555,7 +555,7 @@ TYPE
 			searchString : SearchString;
 			ucsStr : UcsSearchString;
 			caption : ARRAY 32 OF CHAR; nbr : ARRAY 12 OF CHAR;
-			length, idx, pos : LONGINT; from : LONGINT;
+			length, pos, from: LONGINT; idx: SIZE;
 		BEGIN
 			IF (text = NIL) OR (highlights = NIL) THEN RETURN; END;
 			hitCount := 0;

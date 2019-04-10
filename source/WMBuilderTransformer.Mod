@@ -589,7 +589,7 @@ TYPE
 	END Transformer;
 
 PROCEDURE GetUCS32String(string : Strings.String) : Texts.PUCS32String;
-VAR ucsString : Texts.PUCS32String; idx : LONGINT;
+VAR ucsString : Texts.PUCS32String; idx : SIZE;
 BEGIN
 	ucsString := NIL;
 	IF (string # NIL) & (Strings.Length(string^) > 0) THEN
@@ -600,7 +600,7 @@ BEGIN
 END GetUCS32String;
 
 PROCEDURE Replace(CONST pattern : ARRAY OF CHAR; by : Strings.Buffer; text : Texts.Text; VAR error : BOOLEAN);
-VAR string : Strings.String; ucsPattern, ucsString : Texts.PUCS32String; nofReplacements, idx : LONGINT;
+VAR string : Strings.String; ucsPattern, ucsString : Texts.PUCS32String; nofReplacements: LONGINT; idx : SIZE;
 BEGIN
 	ASSERT(Strings.Length(pattern) > 2); (* [...] *)
 	ASSERT(by # NIL);
@@ -616,7 +616,7 @@ BEGIN
 END Replace;
 
 PROCEDURE ReplaceString(CONST string, by : ARRAY OF CHAR; text : Texts.Text; VAR error : BOOLEAN);
-VAR nofReplacements, idx : LONGINT; ucsString, ucsBy : Texts.PUCS32String;
+VAR nofReplacements: LONGINT; idx : SIZE; ucsString, ucsBy : Texts.PUCS32String;
 BEGIN
 	ASSERT(Strings.Length(string) > 2);
 	ASSERT(Strings.Length(by) > 0);

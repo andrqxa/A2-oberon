@@ -16,7 +16,7 @@ CONST
 	changedatePlace = "%changedate%";
 
 PROCEDURE ReplaceString(text : Text; search : ARRAY OF CHAR; replace : Text; sfrom, slen : LONGINT);
-VAR pos, len : LONGINT;
+VAR pos, len : SIZE;
 	xs : ARRAY 128 OF LONGINT;
 BEGIN
 	text.AcquireWrite;
@@ -24,13 +24,13 @@ BEGIN
 	len := TextUtils.UCS32StrLength(xs);
 	REPEAT
 		pos := TextUtils.Pos(xs, 0, text);
-		IF pos >= 0 THEN text.Delete(pos, len); text.CopyFromText(replace, sfrom, slen, pos) END
+		IF pos >= 0 THEN text.Delete(TODO(pos), TODO(len)); text.CopyFromText(replace, sfrom, slen, TODO(pos)) END
 	UNTIL pos < 0;
 	text.ReleaseWrite
 END ReplaceString;
 
 PROCEDURE UTFUCS(src : ARRAY OF CHAR; VAR dst : ARRAY OF LONGINT);
-VAR pos : LONGINT;
+VAR pos : SIZE;
 BEGIN
 	pos := 0; UTF8Strings.UTF8toUnicode(src, dst, pos)
 END UTFUCS;

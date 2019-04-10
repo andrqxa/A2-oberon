@@ -1418,7 +1418,7 @@ TYPE
 
 		PROCEDURE WriteFileHeaderX(f: File);
 		VAR data: ARRAY 32 OF CHAR; b, ro, writeLast: BOOLEAN;
-			ofs, i, k, len, numFree, s, ucs: LONGINT; unicode: ARRAY 256 OF INTEGER;
+			i, numFree, s, ucs: LONGINT; ofs, k, len: SIZE; unicode: ARRAY 256 OF INTEGER;
 			r: Files.Rider; c, chksum: CHAR;
 		BEGIN
 			IF (faReadOnly IN attr) THEN EXCL(attr, faReadOnly); ro := TRUE END;
@@ -1430,8 +1430,8 @@ TYPE
 				ELSE ofs := f.entry.ofs											(* reuse old position *)
 				END;
 				RemoveFileHeaderX(f);
-				f.entry.ofs := ofs;
-				f.entry.len := len;
+				f.entry.ofs := TODO(ofs);
+				f.entry.len := TODO(len);
 				f.registered := TRUE;
 
 				IF (f.entry.ofs = NotAssigned) THEN (* find 'len' subsequent free entries *)
@@ -1441,13 +1441,13 @@ TYPE
 
 					numFree := 0;
 					WHILE ~r.eof & (numFree < len) DO
-						SetX(r, ofs); ReadX(r, c);
+						SetX(r, TODO(ofs)); ReadX(r, c);
 						IF (c = deFree) THEN
-							IF (f.entry.ofs = NotAssigned) THEN f.entry.ofs := ofs END;
+							IF (f.entry.ofs = NotAssigned) THEN f.entry.ofs := TODO(ofs) END;
 							INC(numFree)
 						ELSIF (c = deLast) THEN
-							IF (f.entry.ofs = NotAssigned) THEN f.entry.ofs := ofs END;
-							numFree := len;
+							IF (f.entry.ofs = NotAssigned) THEN f.entry.ofs := TODO(ofs) END;
+							numFree := TODO(len);
 							writeLast := TRUE
 						ELSE
 							f.entry.ofs := NotAssigned; numFree := 0
@@ -1487,9 +1487,9 @@ TYPE
 						data[13] := chksum;
 						FATVolumes.PutUnsignedInteger(data, 26, 0);
 						ofs := (len-2)*13;
-						FOR k := 0 TO 4 DO FATVolumes.PutUnsignedInteger(data, 1+k*2, unicode[ofs+k]) END;
-						FOR k := 0 TO 5 DO FATVolumes.PutUnsignedInteger(data, 14+k*2, unicode[ofs+5+k]) END;
-						FOR k := 0 TO 1 DO FATVolumes.PutUnsignedInteger(data, 28+k*2, unicode[ofs+11+k]) END;
+						FOR k := 0 TO 4 DO FATVolumes.PutUnsignedInteger(data, TODO(1+k*2), unicode[ofs+k]) END;
+						FOR k := 0 TO 5 DO FATVolumes.PutUnsignedInteger(data, TODO(14+k*2), unicode[ofs+5+k]) END;
+						FOR k := 0 TO 1 DO FATVolumes.PutUnsignedInteger(data, TODO(28+k*2), unicode[ofs+11+k]) END;
 						WriteBytesX(r, data, 0, 32);
 						IF (r.res # 0) THEN HALT(ErrIOError) END;
 						DEC(len)
@@ -1793,8 +1793,8 @@ BEGIN
 END CheckSum;
 
 (* NameLength - returns the number of directory entries needed to store a file with filename 'fn' *)
-PROCEDURE NameLength(CONST fn: Filename): LONGINT;
-VAR pos, ucs, i: LONGINT;
+PROCEDURE NameLength(CONST fn: Filename): SIZE;
+VAR pos, i: SIZE; ucs: LONGINT;
 BEGIN
 	IF IsShortName(fn) THEN RETURN 1
 	ELSE

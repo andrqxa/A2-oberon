@@ -275,7 +275,7 @@ TYPE
 		END SetFileName;
 
 		PROCEDURE GetFileName(): Strings.String;
-		VAR string, fileName: Files.FileName; count: LONGINT; sr: Streams.StringReader;
+		VAR string, fileName: Files.FileName; count: SIZE; sr: Streams.StringReader;
 		BEGIN
 			filenameEdit.GetAsString(string);
 			count := UTF8Strings.UTF8toASCII(string, " ", fileName);
