@@ -729,7 +729,7 @@ BEGIN
 		context := data(WebCGI.CGIContext);
 		b := archive.frontPage;
 		context.reply.statuscode := WebHTTP.OK;
-		context.reply.contentlength:= b.GetLength();
+		context.reply.contentlength:= TODO(b.GetLength());
 		context.reply.contenttype := "text/html; charset=UTF-8";
 		WebHTTP.SendResponseHeader(context.reply, context.w);
 		s := b.GetString();

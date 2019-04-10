@@ -18,7 +18,7 @@ TYPE
 	(** The stringmaker creates an automatically growing character array from the input with an Streams writer *)
 	Buffer* = OBJECT
 	VAR
-		length : LONGINT;
+		length : SIZE;
 		data : String;
 		w : Streams.Writer;
 
@@ -60,7 +60,7 @@ TYPE
 		END GetWriter;
 
 		(** returns the number of bytes written to the string. The Streams.Writer is updated *)
-		PROCEDURE GetLength*() : LONGINT;
+		PROCEDURE GetLength*() : SIZE;
 		BEGIN
 			IF w # NIL THEN w.Update END;
 			RETURN length

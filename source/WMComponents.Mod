@@ -3173,15 +3173,15 @@ PROCEDURE Call*(cmds : ARRAY OF CHAR; caller : Component; flags : SET; VAR res :
 VAR
 	context : Commands.Context; arg : Streams.StringReader;
 	buffer : Strings.Buffer; w : Streams.Writer; par : Strings.String;
-	length, i, k : LONGINT;
+	length, i, k : SIZE;
 
-	PROCEDURE Expand(CONST string : ARRAY OF CHAR; w : Streams.Writer; start : LONGINT; VAR end : LONGINT);
+	PROCEDURE Expand(CONST string : ARRAY OF CHAR; w : Streams.Writer; start : SIZE; VAR end : SIZE);
 	VAR
 		component : Component;
 		componentStr, attributeStr : ARRAY 256 OF CHAR;
 		property : WMProperties.Property; attribute : XML.Attribute;
 		value : Strings.String;
-		lastDotIdx, i, j : LONGINT; error : BOOLEAN;
+		lastDotIdx, i, j : SIZE; error : BOOLEAN;
 	BEGIN
 		ASSERT((string[start] = "&") & (start + 1 < LEN(string)) & (w # NIL));
 		end := start; WHILE (end < LEN(string)) & (string[end] # 0X) & (string[end] # ";") & (string[end] > " ") DO INC(end); END;

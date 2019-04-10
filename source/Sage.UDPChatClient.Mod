@@ -102,7 +102,7 @@ TYPE
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.ACK, seqNum, uin, sendBuf);
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
+		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
 	END Client_ACK;
 
 	PROCEDURE Client_NewUserReg (password, shortName, fullName, eMail: ARRAY OF CHAR;
@@ -137,7 +137,7 @@ TYPE
 		sendBuf.Add (eMail, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
+		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
 	END Client_NewUserReg;
 
 	PROCEDURE Client_Login (password: ARRAY OF CHAR;
@@ -160,7 +160,7 @@ TYPE
 		sendBuf.Add (password, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
+		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
 	END Client_Login;
 
 	PROCEDURE Client_InfoReq (userUIN: LONGINT; VAR seqNum: INTEGER;
@@ -181,7 +181,7 @@ TYPE
 		sendBuf.AddInt (userUIN, 4);
 
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
+		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
 	END Client_InfoReq;
 
 	PROCEDURE Client_SendMessage (
@@ -213,7 +213,7 @@ TYPE
 		sendBuf.Add (message^, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (serverIP, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
+		s.Send (serverIP, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
 	END Client_SendMessage;
 
 	PROCEDURE Client_SendTextCode (code: String;
@@ -236,7 +236,7 @@ TYPE
 		sendBuf.Add (code^, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (serverIP, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
+		s.Send (serverIP, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
 	END Client_SendTextCode;
 
 	PROCEDURE Client_KeepAlive (VAR seqNum: INTEGER; uin: LONGINT; sendBuf: Base.Buffer;
@@ -254,7 +254,7 @@ TYPE
 		INC (seqNum);
 
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
+		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
 	END Client_KeepAlive;
 
 	PROCEDURE FindUserInfo (list: Base.List; uin: LONGINT): Base.UserInfo;
