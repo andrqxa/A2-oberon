@@ -677,7 +677,7 @@ TYPE
 	BEGIN
 		flen := f.Length( );  Strings.IntToStr( flen, lbuf );
 		buf := "C0644 "; Strings.Append( buf, lbuf );  Strings.Append( buf, " " );  Strings.Append( buf, name );
-		chan.SendBuffer( buf, Strings.Length( buf ) );
+		chan.SendBuffer( buf, TODO(Strings.Length( buf )) );
 		chan.SendNL;
 		Files.OpenReader( r, f, 0 );  i := 0;  j := 0;  sent := 0;
 		WHILE (i < flen) & (chan.state = ChanOpen) DO

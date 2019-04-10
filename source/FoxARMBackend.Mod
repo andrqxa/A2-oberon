@@ -2620,7 +2620,7 @@ TYPE
 			symbol: SyntaxTree.Symbol;
 			assembler: Assembler.Assembler;
 			scanner: Scanner.AssemblerScanner;
-			len: LONGINT;
+			len: SIZE;
 		BEGIN
 			len := Strings.Length(irInstruction.op1.string^);
 			NEW(reader, len);

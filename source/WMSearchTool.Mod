@@ -360,7 +360,7 @@ TYPE
 			cb : Strings.String;
 			cpos, i, j, k, m, shift : LONGINT;
 		BEGIN
-			m := Strings.Length(content);
+			m := TODO(Strings.Length(content));
 			f := Files.Old(filename);
 			IF f # NIL THEN
 				Files.OpenReader(r, f, 0);
@@ -394,7 +394,7 @@ TYPE
 		PROCEDURE Match(CONST name : ARRAY OF CHAR);
 		VAR d : WMSystemComponents.DirEntry;
 			p, filename : ARRAY 1024 OF CHAR;
-			l : LONGINT;
+			l : SIZE;
 		BEGIN
 			IF (currentPar.content = "") OR ContainsStr(name, currentPar.content)  THEN
 				Files.SplitPath(name, p, filename);
@@ -408,7 +408,8 @@ TYPE
 		PROCEDURE SearchPath;
 		VAR mask, name : ARRAY 1024 OF CHAR;
 			flags : SET;
-			time, date, size, len : LONGINT;
+			len: SIZE;
+			time, date, size : LONGINT;
 			e : Files.Enumerator;
 		BEGIN
 			COPY(currentPar.path, mask);

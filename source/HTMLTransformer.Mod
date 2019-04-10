@@ -829,7 +829,7 @@ TYPE
 					| 2 : s := Strings.NewString("&#9675; "); (* circle *)
 					| 3 : IF olulStackTop#NIL THEN  (* 1, 2, 3... *)
 							Strings.IntToStr(olulStackTop.value, aoc);
-							j :=Strings.Length(aoc);
+							j := TODO(Strings.Length(aoc));
 							IF (j+2) <= (LEN(aoc)-1) THEN
 								aoc[j]:='.'; aoc[j+1]:=' '; aoc[j+2]:=0X;
 							END;
@@ -2587,7 +2587,7 @@ PROCEDURE EncodeLinkData(link, target, url : String) : String;
 VAR
 	s : String;
 	inlineLink : BOOLEAN;
-	urlLen : LONGINT;
+	urlLen : SIZE;
 BEGIN
 	ASSERT(link # NIL);
 	inlineLink := FALSE;
@@ -2609,9 +2609,9 @@ BEGIN
 	END;
 END EncodeLinkData;
 
-PROCEDURE Utf82UrlEncodedUtf8*(VAR in : ARRAY OF CHAR) : String;
+PROCEDURE Utf82UrlEncodedUtf8*(CONST in : ARRAY OF CHAR) : String;
 VAR
-	i, cnt : LONGINT;
+	i, cnt : SIZE;
 	output : String;
 	aoc : ARRAY 3 OF CHAR;
 BEGIN
@@ -2690,7 +2690,7 @@ VAR
 	dyn : DynamicStrings.DynamicString;
 	dynPos : LONGINT;
 	temp : ARRAY 5 OF CHAR;
-	i, j, len : LONGINT;
+	i, j : SIZE; len : LONGINT;
 BEGIN
 	NEW(dyn);
 	dynPos := 0;
@@ -2762,7 +2762,7 @@ END GetColor;
 
 PROCEDURE StringIsWhiteSpace(VAR txt : ARRAY OF CHAR) : BOOLEAN;
 VAR
-	i : LONGINT;
+	i : SIZE;
 BEGIN
 	FOR i := 0 TO Strings.Length(txt)-1 DO
 		IF ORD(txt[i]) > 32 THEN RETURN FALSE END;
@@ -2772,7 +2772,7 @@ END StringIsWhiteSpace;
 
 PROCEDURE StringHasNewLine(VAR txt : ARRAY OF CHAR) : BOOLEAN;
 VAR
-	i : LONGINT;
+	i : SIZE;
 BEGIN
 	FOR i := 0 TO Strings.Length(txt)-1 DO
 		IF (ORD(txt[i]) = 10) OR (ORD(txt[i]) = 13) THEN RETURN TRUE END;
@@ -2784,7 +2784,7 @@ PROCEDURE ReplaceWhiteSpaces(VAR txt : String) : String;
 VAR
 	dyn : DynamicStrings.DynamicString;
 	dynPos : LONGINT;
-	i : LONGINT;
+	i : SIZE;
 	ch : CHAR;
 	putYet : BOOLEAN;
 BEGIN
@@ -2810,7 +2810,7 @@ BEGIN
 END ReplaceWhiteSpaces;
 
 PROCEDURE TrimLineBreak(VAR string : ARRAY OF CHAR);
-VAR i,j: LONGINT;
+VAR i,j: SIZE;
 BEGIN
 	j := 0;
 	WHILE (ORD(string[j]) = 10) OR (ORD(string[j]) = 13) DO INC(j) END;
@@ -2978,7 +2978,7 @@ VAR
 
 	PROCEDURE Get(f : ARRAY OF CHAR; alternatives : BOOLEAN) : String;
 	VAR
-		i, j, last : LONGINT;
+		i, j, last : SIZE;
 	BEGIN
 		Strings.Trim(f, ' ');
 		Strings.Trim(f, '"');

@@ -98,10 +98,10 @@ TYPE
 
 			lock.Acquire();
 			(* SEND *)
-			SendSMBHeader(SHORT(39 + Strings.Length(name)), 06X, c);
+			SendSMBHeader(INTEGER(39 + Strings.Length(name)), 06X, c);
 			c.out.Net8(1);								(* Word count *)
 			c.out.RawInt(22);							(* search attributes *)
-			c.out.RawInt(SHORT(2 + Strings.Length(name)));
+			c.out.RawInt(INTEGER(2 + Strings.Length(name)));
 			c.out.Net8(4);								(* ascii *)
 			c.out.RawString(name);						(* name *)
 			c.out.Update();
@@ -140,10 +140,10 @@ TYPE
 
 			lock.Acquire();
 			(* SEND *)
-			SendSMBHeader(SHORT(41 + Strings.Length(new) + Strings.Length(old)), 07X, c);
+			SendSMBHeader(INTEGER(41 + Strings.Length(new) + Strings.Length(old)), 07X, c);
 			c.out.Net8(1);			(* Word count *)
 			c.out.RawInt(22);		(* search attributes *)
-			c.out.RawInt(SHORT(4 + Strings.Length(new) + Strings.Length(old)));
+			c.out.RawInt(INTEGER(4 + Strings.Length(new) + Strings.Length(old)));
 			c.out.Net8(4);			(* ascii *)
 			c.out.RawString(old);	(* old name *)
 			c.out.Net8(4);			(* ascii *)
@@ -169,7 +169,7 @@ TYPE
 			check, endOfSearch, findFirst: BOOLEAN;
 			byteCount, dataOff, paraOff, eos: INTEGER;
 			fileFlags : SET;
-			attr, curPos, nextEntryOff, progress, maskLen: LONGINT;
+			attr, curPos, nextEntryOff, progress: LONGINT; maskLen: SIZE;
 			t: ARRAY 2 OF LONGINT;
 			ch: ARRAY 2 OF CHAR;
 			dt: Dates.DateTime;
@@ -332,9 +332,9 @@ TYPE
 
 			lock.Acquire();
 			(* SEND *)
-			SendSMBHeader(SHORT(37+ Strings.Length(name)), 00X, c);
+			SendSMBHeader(INTEGER(37+ Strings.Length(name)), 00X, c);
 			c.out.Net8(0);											(* Word count *)
-			c.out.RawInt(SHORT(2 + Strings.Length(name)));			(* byte count *)
+			c.out.RawInt(INTEGER(2 + Strings.Length(name)));			(* byte count *)
 			c.out.Net8(4);											(* buffer format *)
 			c.out.RawString(name);
 			c.out.Update();
@@ -364,9 +364,9 @@ TYPE
 
 			lock.Acquire();
 			(* SEND *)
-			SendSMBHeader(SHORT(37+ Strings.Length(name)), 01X, c);
+			SendSMBHeader(INTEGER(37+ Strings.Length(name)), 01X, c);
 			c.out.Net8(0);											(* Word count *)
-			c.out.RawInt(SHORT(2 + Strings.Length(name)));			(* byte count *)
+			c.out.RawInt(INTEGER(2 + Strings.Length(name)));			(* byte count *)
 			c.out.Net8(4);											(* buffer format *)
 			c.out.RawString(name);
 			c.out.Update();
@@ -628,9 +628,9 @@ TYPE
 			END;
 
 		 	(* SEND *)
-		 	SendSMBHeader(37 + SHORT(Strings.Length(filename)), 08X, c);
+		 	SendSMBHeader(37 + INTEGER(Strings.Length(filename)), 08X, c);
 			c.out.Net8(0);											(* word count *)
-			c.out.RawInt(SHORT(Strings.Length(filename)) + 1);		(* byte count *)
+			c.out.RawInt(INTEGER(Strings.Length(filename)) + 1);		(* byte count *)
 			c.out.Net8(4);											(* buffer format ascii *)
 			c.out.RawString(filename);								(* filename *)
 			c.out.Update();
@@ -889,7 +889,7 @@ BEGIN
 	IF Trace THEN KernelLog.String("Session Setup"); KernelLog.Ln(); END;
 
 	(* SEND *)
-	byteCount := SHORT(
+	byteCount := INTEGER(
 		Strings.Length(c.user)
 		+ Strings.Length(c.pw)
 		+ Strings.Length(PrimaryDomain)
@@ -905,7 +905,7 @@ BEGIN
 	c.out.RawInt(2);			(* mpx *)
 	c.out.RawInt(0);			(* Vc *)
 	c.out.Net32(0);			(* session key *)
-	c.out.RawInt(SHORT(Strings.Length(c.pw)+1));	(* ANSI len *)
+	c.out.RawInt(INTEGER(Strings.Length(c.pw)+1));	(* ANSI len *)
 	c.out.RawInt(0);	(* UNICODE len *)
 	c.out.Net32(0);			(* reserved *)
 	c.out.Net32(268435456);	(* capabilities *)
@@ -936,14 +936,14 @@ BEGIN
 	IF Trace THEN KernelLog.String("Tree Connect"); KernelLog.Ln(); END;
 
 	(* SEND *)
-	SendSMBHeader(54 + SHORT(Strings.Length(c.ipaddr) + Strings.Length(c.path) + Strings.Length(c.pw)), 75X, c);
+	SendSMBHeader(54 + INTEGER(Strings.Length(c.ipaddr) + Strings.Length(c.path) + Strings.Length(c.pw)), 75X, c);
 	c.out.Net8(4);			(* Word count *)
 	c.out.Net8(255);		(* no andx *)
 	c.out.Net8(0);			(* reserved *)
 	c.out.RawInt(0);			(* andx offset *)
 	c.out.RawInt(0);			(* disconnected tid *)
-	c.out.RawInt(SHORT(Strings.Length(c.pw)+1));	(* pw length *)
-	c.out.RawInt(SHORT(11 + Strings.Length(c.ipaddr) + Strings.Length(c.path) + Strings.Length(c.pw)));		(* bcc *)
+	c.out.RawInt(INTEGER(Strings.Length(c.pw)+1));	(* pw length *)
+	c.out.RawInt(INTEGER(11 + Strings.Length(c.ipaddr) + Strings.Length(c.path) + Strings.Length(c.pw)));		(* bcc *)
 	c.out.RawString(c.pw);
 	c.out.String("\\");
 	c.out.String(c.ipaddr);
@@ -972,10 +972,10 @@ BEGIN
 	IF Trace THEN KernelLog.String("TRANS 2 - "); END;
 
 	IF cmd = 1 THEN			(* FIND FIRST *)
-		len := SHORT(Strings.Length(c.mask));
+		len := INTEGER(Strings.Length(c.mask));
 		IF Trace THEN KernelLog.String("FIND FIRST"); KernelLog.Ln; END;
 	ELSIF cmd = 2 THEN		(* FIND NEXT *)
-		len := SHORT(Strings.Length(c.fnLast));
+		len := INTEGER(Strings.Length(c.fnLast));
 		IF Trace THEN KernelLog.String("FIND NEXT"); KernelLog.Ln; END;
 	ELSE
 		RETURN FALSE;
@@ -1049,7 +1049,7 @@ BEGIN
 	ReplaceSlash(name);
 
 	(* SEND *)
-	SendSMBHeader(66 + SHORT(Strings.Length(name)), 2DX, c);
+	SendSMBHeader(66 + INTEGER(Strings.Length(name)), 2DX, c);
 	c.out.Net8(15);			(* word count *)
 	c.out.Net8(255);		(* andx*)
 	c.out.Net8(0); 			(* reserved *)
@@ -1069,7 +1069,7 @@ BEGIN
 	c.out.Net32(0);			(* allocation size *)
 	c.out.Net32(0);			(* timeout *)
 	c.out.Net32(0);			(* reserved *)
-	c.out.RawInt(1 + SHORT(Strings.Length(name)));	(* byte count *)
+	c.out.RawInt(1 + INTEGER(Strings.Length(name)));	(* byte count *)
 	c.out.RawString(name);
 	c.out.Update();
 

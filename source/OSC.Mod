@@ -190,7 +190,7 @@ OSCBundle b:
 				string-: String;
 			PROCEDURE GetSize*(): LONGINT;
 			BEGIN
-				RETURN(padsize(Strings.Length(string^)+1));
+				RETURN(padsize(TODO(Strings.Length(string^))+1));
 			END GetSize;
 			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: LONGINT);
 			BEGIN
@@ -1341,7 +1341,7 @@ OSCBundle b:
 	PROCEDURE oscStrSize(s: String): LONGINT;
 	BEGIN
 		ASSERT(s # NIL );
-		RETURN padsize(Strings.Length(s^)+1);
+		RETURN padsize(TODO(Strings.Length(s^))+1);
 	END oscStrSize;
 
 	(* exports an string s to packet[pos..pos+oscstrlen(s)-1] *)

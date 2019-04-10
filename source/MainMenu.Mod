@@ -142,7 +142,7 @@ TYPE
 		VAR mask : ARRAY 64 OF CHAR;
 			name : ARRAY 256 OF CHAR; flags : SET;
 			time, date, size : LONGINT;
-			i: LONGINT;
+			i: SIZE;
 			enumerator : Files.Enumerator;
 			number: LONGINT;
 
@@ -155,7 +155,7 @@ TYPE
 			DisableUpdate;
 			NEW(enumerator);
 			FOR i := 0 TO 99 DO
-				IF pages[i] = currentPage THEN currentPageNr := i END;
+				IF pages[i] = currentPage THEN currentPageNr := TODO(i) END;
 				pages[i] := NIL
 			END;
 			mask := MenuFilePrefix;

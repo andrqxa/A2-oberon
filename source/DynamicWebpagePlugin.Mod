@@ -667,7 +667,7 @@ TYPE
 	VAR moduleVar, objectVar, methodVar, objectIdVar, var: HTTPSupport.HTTPVariable; par: DynamicWebpage.Parameter;
 		params : DynamicWebpage.ParameterList; paramTempList : TFClasses.List; activeFact: ActiveElementFactory;
 		handler: DynamicWebpage.EventHandler; p : ANY; varPrefix : ARRAY 40 OF CHAR;
-		i, prefixLength, restLength: LONGINT; session: HTTPSession.Session; objectId: Strings.String;
+		i, prefixLength, restLength: SIZE; session: HTTPSession.Session; objectId: Strings.String;
 	BEGIN
 		prefixLength := Strings.Length(DynamicWebpage.HTTPVarCommandParamPrefix);
 		moduleVar := request.GetVariableByName(DynamicWebpage.HTTPVarCommandModule);
@@ -690,7 +690,7 @@ TYPE
 			NEW(paramTempList);
 			request.variables.Lock;
 			FOR i := 0 TO request.variables.GetCount()-1 DO
-				p := request.variables.GetItem(i); var := p(HTTPSupport.HTTPVariable);
+				p := request.variables.GetItem(TODO(i)); var := p(HTTPSupport.HTTPVariable);
 				Strings.Copy(var.name, 0, prefixLength, varPrefix);
 				restLength := Strings.Length(var.name)-prefixLength;
 				IF ((varPrefix = DynamicWebpage.HTTPVarCommandParamPrefix) & (restLength > 0)) THEN
@@ -705,7 +705,7 @@ TYPE
 			IF paramTempList.GetCount() > 0 THEN
 				NEW(params.parameters, paramTempList.GetCount());
 				FOR i := 0 TO paramTempList.GetCount()-1 DO
-					p := paramTempList.GetItem(i); params.parameters[i] := p(DynamicWebpage.Parameter)
+					p := paramTempList.GetItem(TODO(i)); params.parameters[i] := p(DynamicWebpage.Parameter)
 				END
 			ELSE
 				params.parameters := NIL

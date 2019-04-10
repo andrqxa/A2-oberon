@@ -731,7 +731,7 @@ CONST
 		END GetXMLInstanceDeletion;
 
 		PROCEDURE LogXMLElement(elem: XML.Element);
-		VAR file: Files.File; fwriter: Files.Writer; writer: Streams.Writer; endPos, endTagLength: LONGINT;
+		VAR file: Files.File; fwriter: Files.Writer; writer: Streams.Writer; endPos, endTagLength: SIZE;
 		BEGIN
 			LockLoggingFile;
 			file := Files.Old(LogFileName^);
@@ -751,7 +751,7 @@ CONST
 				ELSE
 					endPos := file.Length()-endTagLength;
 					ASSERT(endPos >= 0, 9999);
-					Files.OpenWriter(fwriter, file, endPos); writer := fwriter
+					Files.OpenWriter(fwriter, file, TODO(endPos)); writer := fwriter
 				END;
 				elem.Write(writer, NIL, 0);
 

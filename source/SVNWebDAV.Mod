@@ -221,7 +221,7 @@ IMPORT
 		e2 := xml.SplitElement ( e, "DAV:propstat.DAV:prop.DAV:creator-displayname" ); ASSERT ( e2 # NIL );
 		OdXml.GetCharData ( e2, creator );
 
-		len := Strings.Length ( baseUrl );
+		len := TODO(Strings.Length ( baseUrl ));
 		ASSERT ( ~Strings.EndsWith ( "/", basePath ) );
 
 		WHILE enum.HasMoreElements() DO

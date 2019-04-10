@@ -152,7 +152,7 @@ TYPE
 					string := frame.GetAttributeValue(XmlFrom);
 					IF (string # NIL) THEN
 						Strings.TrimWS(string^);
-						minDigits := Strings.Length(string^);
+						minDigits := TODO(Strings.Length(string^));
 					ELSE
 						minDigits := 0;
 					END;

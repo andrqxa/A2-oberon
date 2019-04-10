@@ -135,7 +135,7 @@ TYPE
 			name, string : Strings.String;
 			caption : ARRAY 512 OF CHAR;
 			enum : XMLObjects.Enumerator;
-			p : ANY; i, len : LONGINT;
+			p : ANY; i, len : SIZE;
 			id: Strings.String;
 		BEGIN
 			name := component.GetName();

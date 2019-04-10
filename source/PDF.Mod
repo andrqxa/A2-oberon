@@ -598,7 +598,7 @@ TYPE
 
 
 		PROCEDURE WriteLZInt(w : Streams.Writer; val, digits : LONGINT);
-		VAR s : ARRAY 16 OF CHAR; i : LONGINT;
+		VAR s : ARRAY 16 OF CHAR; i : SIZE;
 		BEGIN
 			Strings.IntToStr(val, s);
 			FOR i := 1 TO digits - Strings.Length(s) DO w.Char("0") END;

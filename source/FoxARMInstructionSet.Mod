@@ -1953,7 +1953,7 @@ CONST
 		*)
 		PROCEDURE ParseInstructionFormat(CONST format: ARRAY OF CHAR; VAR setBits, diffBits, U, Q, S, L, F, o: SET);
 		VAR
-			curr, len, count: LONGINT;
+			curr, len, count: SIZE;
 		BEGIN
 			len := Strings.Length(format) - 1;
 			count := 0;

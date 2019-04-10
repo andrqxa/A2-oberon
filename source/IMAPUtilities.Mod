@@ -30,7 +30,7 @@ VAR
 	buffer: Strings.Buffer;
 	s: String;
 	c: CHAR;
-	i, j: LONGINT;
+	i, j: SIZE;
 BEGIN
 	NEW(addresses);
 	NEW(buffer, 16);

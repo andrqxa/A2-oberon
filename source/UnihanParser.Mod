@@ -249,7 +249,7 @@ VAR i, words : LONGINT;
 
 
 	PROCEDURE FixBugs(pinyin : ARRAY OF CHAR; code, freq : LONGINT);
-	VAR i, l : LONGINT; t : ARRAY 100 OF CHAR;
+	VAR i, l : SIZE; t : ARRAY 100 OF CHAR;
 	BEGIN
 		Strings.Trim(pinyin, " ");
 

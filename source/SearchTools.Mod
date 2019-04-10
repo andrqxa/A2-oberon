@@ -152,7 +152,7 @@ PROCEDURE FindStringRaw(CONST filename : Files.FileName; param : Parameters; sta
 VAR
 	r : Files.Reader;
 	f : Files.File;
-	m: LONGINT;
+	m: SIZE;
 	p : PatternParameters;
 BEGIN
 	ASSERT(param IS PatternParameters);
@@ -185,7 +185,7 @@ VAR
 	cb : Strings.String;
 	pos, cpos, i, j, k, m, shift : LONGINT;
 BEGIN
-	m := Strings.Length(pattern);
+	m := TODO(Strings.Length(pattern));
 	NEW(cb, m);
 	WHILE (r.res = 0 ) & (cpos < m) DO
 		cb[cpos] := r.Get();

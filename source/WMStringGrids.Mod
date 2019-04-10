@@ -170,7 +170,7 @@ TYPE
 			ASSERT(Objects.ActiveObject() = lockedBy, 3000);
 			IF (col >= 0) & (row >= 0) & (col < nofCols) & (row < nofRows) THEN
 				IF rows[row].cells[col] = NIL THEN NEW(rows[row].cells[col]) END;
-				length := MAX(minBufferSize, Strings.Length(caption) + 1); (* 0X *)
+				length := MAX(minBufferSize, TODO(Strings.Length(caption)) + 1); (* 0X *)
 				cell := rows[row].cells[col];
 				IF (cell.caption = NIL) OR ~(UseInternalBuffer IN cell.flags) OR (LEN(cell.caption) < length) THEN
 					NEW(cell.caption, length);

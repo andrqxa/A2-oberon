@@ -172,7 +172,7 @@ TYPE
 				s := a(EntryInfo).GetName();
 				NEW(draggedString, LEN(s^)+64);
 				AppendToArchiveName(s^, draggedString^);
-				w := Strings.Length(draggedString^) * 7;
+				w := TODO(Strings.Length(draggedString^)) * 7;
 				IF w > 400 THEN w := 400 END;
 				NEW(img); Raster.Create(img, w, 25, Raster.BGRA8888);
 				NEW(c, img); c.SetColor(LONGINT(0FFFF00FFH));

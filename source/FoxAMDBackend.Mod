@@ -3156,7 +3156,7 @@ TYPE
 
 		PROCEDURE EmitAsm(CONST instruction: IntermediateCode.Instruction);
 		VAR reader: Streams.StringReader;  procedure: SyntaxTree.Procedure; scope: SyntaxTree.Scope;
-				len: LONGINT; symbol: SyntaxTree.Symbol; assembler: Assembler.Assembly;
+				len: SIZE; symbol: SyntaxTree.Symbol; assembler: Assembler.Assembly;
 
 			inr, outr: IntermediateCode.Rules;
 			string: SyntaxTree.SourceCode;

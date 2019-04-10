@@ -131,8 +131,8 @@ TYPE
 (** string handling *)
 
 (** returns the length of a string *)
-PROCEDURE Length* (CONST string: ARRAY OF CHAR): LONGINT;
-VAR len: LONGINT;
+PROCEDURE Length* (CONST string: ARRAY OF CHAR): SIZE;
+VAR len: SIZE;
 BEGIN
 	len := 0; WHILE (string[len] # 0X) DO INC(len) END;
 	RETURN len

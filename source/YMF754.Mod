@@ -1616,9 +1616,10 @@ END GetPhysicalAdr;
 (* Scan the PCI bus for the specified card *)
 PROCEDURE ScanPCI(vendor, device: LONGINT; name: Plugins.Name; CntrlInst1E: BOOLEAN);
 VAR
-	len, reg, index: LONGINT; res: WORD;
+	reg, index: LONGINT; res: WORD;
 	bus, dev, fct: LONGINT;
 	base, irq: LONGINT;
+	len: SIZE;
 	d: Driver;
 BEGIN
 	index := 0;

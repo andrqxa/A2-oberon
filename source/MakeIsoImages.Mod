@@ -489,7 +489,7 @@ TYPE
 				count := map.GetCount(shortname);
 				IF count > 1 THEN
 					Strings.IntToStr(count, val);
-					Replace(shortname, len-Strings.Length(val), val);
+					Replace(shortname, len-TODO(Strings.Length(val)), val);
 				END;
 				node.shortname := Strings.NewString(shortname);
 
@@ -914,7 +914,7 @@ TYPE
 
 		PROCEDURE RemoveVersion(VAR str: ARRAY OF CHAR);
 		VAR
-			len: LONGINT;
+			len: SIZE;
 		BEGIN
 			len := Strings.Length(str);
 			IF str[len-2] = ';' THEN

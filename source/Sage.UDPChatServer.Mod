@@ -145,7 +145,7 @@ TYPE
 
 		sendBuf.AddInt (user.uin, 4);
 
-		len := Strings.Length (user.shortName) + 1;
+		len := TODO(Strings.Length (user.shortName) + 1);
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (user.shortName, 0, len, TRUE, res);
 

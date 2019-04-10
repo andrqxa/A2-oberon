@@ -166,7 +166,7 @@ VAR
 	PROCEDURE PutToClipboard( text : Texts.Text );
 	BEGIN
 		ASSERT((text # NIL) & (text.HasReadLock()));
-		TextUtilities.TextToStr( text, sendBuffer^ );  slen := Strings.Length( sendBuffer^ );
+		TextUtilities.TextToStr( text, sendBuffer^ );  slen := TODO(Strings.Length( sendBuffer^ ));
 		A2ToUnix;
 		Machine.Acquire( Machine.X11 );
 		X11.SetSelectionOwner( xdisp, clipboard (* X11.XAPRIMARY *), primary, X11.lastEventTime );

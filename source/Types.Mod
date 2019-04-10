@@ -60,8 +60,8 @@ TYPE
 
 	DynamicString* = RECORD(Any) (** Initialize using NewString! *)
 		value- : Strings.String; (* {value  # NIL} *)
-		length : LONGINT; (* {(0 <= length) & (length < LEN(value))} *)
-		bufferLength : LONGINT; (* {(0 <= bufferLength) & (bufferLength = LEN(value))} *)
+		length : SIZE; (* {(0 <= length) & (length < LEN(value))} *)
+		bufferLength : SIZE; (* {(0 <= bufferLength) & (bufferLength = LEN(value))} *)
 	END;
 
 	Set* = RECORD(Any)
@@ -513,8 +513,8 @@ BEGIN
 	END;
 END GetAOC;
 
-PROCEDURE EnsureStringLength(VAR s: Strings.String; length: LONGINT);
-VAR l: LONGINT;
+PROCEDURE EnsureStringLength(VAR s: Strings.String; length: SIZE);
+VAR l: SIZE;
 BEGIN
 	IF (s = NIL) OR (Strings.Length(s^) < length) THEN
 		NEW(s,length)
@@ -572,7 +572,6 @@ END SetAOC;
 PROCEDURE GetString*(CONST source : Any; VAR string : Strings.String; VAR res : WORD);
 VAR
 	value : ARRAY 64 OF CHAR; (*? !!! *)
-	n: LONGINT;
 BEGIN
 	res := Ok;
 	IF (source IS String) THEN
@@ -961,8 +960,8 @@ BEGIN
 END NewString;
 
 (* Ensure the <string> can hold at least minLength characters (excl. 0X-terminator) *)
-PROCEDURE EnsureLength*(VAR string : DynamicString; minLength : LONGINT);
-VAR newBuffer : Strings.String; i : LONGINT;
+PROCEDURE EnsureLength*(VAR string : DynamicString; minLength : SIZE);
+VAR newBuffer : Strings.String; i : SIZE;
 BEGIN
 	ASSERT((string.value # NIL) & ((LEN(string.value) = string.bufferLength) OR (string.value = StrEmptyString)) & (minLength >= 0));
 	IF (minLength + 1 >= string.bufferLength) THEN
@@ -980,7 +979,7 @@ BEGIN
 END EnsureLength;
 
 PROCEDURE SetValue*(VAR string : DynamicString; CONST value : ARRAY OF CHAR);
-VAR length : LONGINT;
+VAR length : SIZE;
 BEGIN
 	length := Strings.Length(value);
 	EnsureLength(string, length);
@@ -996,7 +995,7 @@ BEGIN
 END Free;
 
 PROCEDURE Append*(VAR string : DynamicString; CONST suffix : ARRAY OF CHAR);
-VAR suffixLength : LONGINT;
+VAR suffixLength : SIZE;
 BEGIN
 	suffixLength := Strings.Length(suffix);
 	EnsureLength(string, string.length + suffixLength);
@@ -1004,13 +1003,13 @@ BEGIN
 	string.length := string.length + suffixLength;
 END Append;
 
-PROCEDURE GetLength*(CONST string : DynamicString) : LONGINT;
+PROCEDURE GetLength*(CONST string : DynamicString) : SIZE;
 BEGIN
 	RETURN string.length;
 END GetLength;
 
 PROCEDURE CleanString(VAR s: ARRAY OF CHAR);
-VAR i, lead: LONGINT;
+VAR i, lead: SIZE;
 BEGIN
 	i := 0;
 	WHILE s[i] = " " DO INC(i) END;

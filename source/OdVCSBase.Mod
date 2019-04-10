@@ -134,7 +134,7 @@ VAR
 	filename = [ filesystem ":" ] ["/"] [ dir "/" ] base. *)
 PROCEDURE splitDirBase(fileName: ARRAY OF CHAR; VAR dir, base: ARRAY OF CHAR);
 CONST CollCh = "/"; FileSystemCh = ":";
-VAR collPos, len, i: LONGINT;
+VAR collPos, len, i: SIZE;
 BEGIN
 	len := Strings.Length(fileName);
 	(* Get last collection delimiter. *)
@@ -672,10 +672,10 @@ END GetDeltaList;
 
 (* write: tag, its data length, its data *)
 PROCEDURE WriteTag(VAR rdr: Files.Rider;
-	tag: CHAR; len: LONGINT; VAR data: ARRAY OF CHAR);
+	tag: CHAR; len: SIZE; VAR data: ARRAY OF CHAR);
 BEGIN
 	rdr.file.Write(rdr, tag);
-	Files.WriteNum(rdr, len);
+	Files.WriteNum(rdr, TODO(len));
 	rdr.file.WriteBytes(rdr, data, 0, len);
 END WriteTag;
 

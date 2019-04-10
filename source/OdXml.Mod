@@ -912,7 +912,7 @@ END GetVersionControlHref;
 (* update, version, href: versionName*)
 PROCEDURE GetUpdateVersionName*(doc: XML.Document; VAR versionName: ARRAY OF CHAR);
 VAR
-	e: XML.Element; versionResource: ARRAY 256 OF CHAR; i, dotPos: LONGINT;
+	e: XML.Element; versionResource: ARRAY 256 OF CHAR; i, dotPos: SIZE;
 	host, path: ARRAY 256 OF CHAR; port: LONGINT;
 BEGIN
 	e := FindElement(doc.GetRoot(), "DAV:version");

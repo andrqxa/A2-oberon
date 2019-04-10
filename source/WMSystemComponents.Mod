@@ -1024,7 +1024,7 @@ END Open;
 
 		PROCEDURE ScanPath;
 		VAR s, pathS : Strings.String;
-			i, l : LONGINT;
+			i, l : SIZE;
 			name, path, filename, mask : Files.FileName; flags : SET; time, date, size : LONGINT;
 			sorted : BOOLEAN;
 		BEGIN
@@ -1168,7 +1168,7 @@ BEGIN
 END FileExists;
 
 PROCEDURE MakePathString*(VAR s : ARRAY OF CHAR);
-VAR l : LONGINT;
+VAR l : SIZE;
 BEGIN
 	l := Strings.Length(s);
 	IF (l > 1) & (s[l - 1] # ":") & (s[l - 1] # "/") THEN Strings.Append(s, "/") END;

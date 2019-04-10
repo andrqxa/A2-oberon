@@ -760,7 +760,7 @@ TYPE
 			END GetScopeSymbol;
 
 			PROCEDURE Factor (VAR x: LONGINT; critical: BOOLEAN): BOOLEAN;
-			VAR label: Label; scopeSymbol: PCT.Symbol; l: LONGINT;
+			VAR label: Label; scopeSymbol: PCT.Symbol; l: SIZE;
 			BEGIN
 				IF symbol = symNumber THEN
 					x := val; NextSymbol; RETURN TRUE;

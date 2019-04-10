@@ -6764,7 +6764,7 @@ TYPE
 				profileInit.Emit(Push(position,reg));
 				NEW(string, LEN(name)); COPY(name, string^);
 				sv := SyntaxTree.NewStringValue(Basic.invalidPosition,string);
-				type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,Strings.Length(name));
+				type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,TODO(Strings.Length(name)));
 				sv.SetType(type);
 				Designate(sv,result);
 				profileInit.Emit(Push(position,result.tag));
@@ -6785,7 +6785,7 @@ TYPE
 				profileInit.Emit(Nop(position)); (* placeholder, will be patched by number of procedures *)
 				NEW(string, LEN(name)); COPY(name, string^);
 				sv := SyntaxTree.NewStringValue(Basic.invalidPosition, string);
-				type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,Strings.Length(name));
+				type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,TODO(Strings.Length(name)));
 				sv.SetType(type);
 				Designate(sv,result);
 				profileInit.Emit(Push(position,result.tag));
@@ -6952,7 +6952,7 @@ TYPE
 				IF GetProcedure("String") THEN
 					NEW(string, LEN(s)); COPY(s, string^);
 					sv := SyntaxTree.NewStringValue(Basic.invalidPosition,string);
-					type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,Strings.Length(s));
+					type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,TODO(Strings.Length(s)));
 					sv.SetType(type);
 					Designate(sv,res);
 					Emit(Push(position,res.tag));
@@ -7657,7 +7657,7 @@ TYPE
 		BEGIN
 			NEW(string, LEN(s)); COPY(s, string^);
 			sv := SyntaxTree.NewStringValue(Basic.invalidPosition,string);
-			type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,Strings.Length(s));
+			type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,TODO(Strings.Length(s)));
 			sv.SetType(type);
 			Designate(sv,res);
 			Emit(Push(position,res.tag));

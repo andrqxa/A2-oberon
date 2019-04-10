@@ -637,7 +637,7 @@ BEGIN
 END StringsAreEqual;
 
 PROCEDURE IsNumber(CONST string : ARRAY OF CHAR) : BOOLEAN;
-VAR i : LONGINT;
+VAR i : SIZE;
 BEGIN
 	IF ("0" <= string[0]) & (string[0] <= "9") THEN
 		FOR i := 1 TO Strings.Length(string)-1 DO

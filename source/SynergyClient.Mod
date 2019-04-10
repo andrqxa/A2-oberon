@@ -56,7 +56,7 @@ TYPE
 		PROCEDURE SendClientHello(screenName : ARRAY OF CHAR);
 		VAR strLen : LONGINT;
 		BEGIN {EXCLUSIVE}
-			strLen := Strings.Length(screenName);
+			strLen := TODO(Strings.Length(screenName));
 			out.Net32(11 + 4 + strLen);
 			out.String("Synergy");
 			out.Net16(1);

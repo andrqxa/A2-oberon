@@ -63,7 +63,7 @@ TYPE
 		(* Split at the last '/' at the moment. *)
 		PROCEDURE SplitConfRes(CONST confRes: ARRAY OF CHAR; VAR conf, res: ARRAY OF CHAR);
 		CONST CollCh = '/';
-		VAR len, pos: LONGINT;
+		VAR len, pos: SIZE;
 		BEGIN
 			len := Strings.Length(confRes);
 			pos  := len - 1;

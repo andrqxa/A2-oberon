@@ -23,7 +23,7 @@ TYPE
 		END Init;
 
 		PROCEDURE AddLine(CONST x : ARRAY OF CHAR);
-		VAR l : LONGINT; s : String; line : Line;
+		VAR l : SIZE; s : String; line : Line;
 		BEGIN
 			l := Strings.Length(x) + 1; NEW(s, l); COPY(x, s^); NEW(line); line.s := s; data.Add(line);
 		END AddLine;

@@ -351,7 +351,7 @@ END DevId;
 PROCEDURE SetTextToClipBoard(CONST text : ARRAY OF CHAR);
 VAR l, t, i: LONGINT;
 BEGIN
-	l := Strings.Length(text);
+	l := TODO(Strings.Length(text));
 	SendLength(l);
 	t := 0;
 	FOR i := 0 TO (l - 1) DIV 4 DO

@@ -235,7 +235,7 @@ VAR
 		the date and time and a random component. by "cs" *)
 	PROCEDURE NewSessionId(header: WebHTTP.RequestHeader; VAR sessionId: SessionId);
 	VAR
-		i: LONGINT;
+		i: SIZE;
 		buffer1,buffer2: POINTER TO ARRAY OF CHAR;
 		context: MD5.Context;
 		digest: MD5.Digest;
@@ -253,7 +253,7 @@ VAR
 		Strings.IntToStr(randomSequence.Integer(),buffer2^); (* some random number *)
 		Strings.Append(buffer1^,buffer2^);
 		context := MD5.New();
-		MD5.WriteBytes(context,buffer1^,Strings.Length(buffer1^));
+		MD5.WriteBytes(context,buffer1^,TODO(Strings.Length(buffer1^)));
 		MD5.Close(context,digest);
 		MD5.ToString(digest,sessionId)
 	END NewSessionId;

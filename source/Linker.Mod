@@ -176,7 +176,7 @@ TYPE FileFormat = PROCEDURE (linker: GenericLinker.Linker; arrangement: Arrangem
 VAR defaults: Options.Defaults;
 	processing, finished: GenericLinker.Block;
 
-PROCEDURE Align(this, to: LONGINT): LONGINT;
+PROCEDURE Align(this, to: SIZE): SIZE;
 BEGIN
 	this := this + (-this) MOD to;
 	RETURN this;
@@ -355,22 +355,22 @@ PROCEDURE WritePEFile (linker: GenericLinker.Linker; arrangement: Arrangement; w
 CONST DOSText = "This program cannot be run in DOS mode.$";
 CONST DOSHeaderSize = 64; DOSCodeSize = 14; DOSTextSize = 40; DOSStubSize = ((DOSHeaderSize + DOSCodeSize + DOSTextSize + 15) DIV 16) * 16;
 CONST FileAlignment = 200H; SectionAlignment = 1000H; HeaderSize = 24; SectionHeaderSize = 40; DirectoryEntries = 16;
-VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize: LONGINT;  BaseCodeAddress, BaseAddress: LONGINT; exportInfo: ExportInfo; relocInfo: RelocationInfo;
-	pos: LONGINT;
+VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize, BaseCodeAddress: SIZE; BaseAddress: LONGINT; exportInfo: ExportInfo; relocInfo: RelocationInfo;
+	pos: SIZE;
 
-	PROCEDURE Reserve (size: LONGINT);
+	PROCEDURE Reserve (size: SIZE);
 	BEGIN INC(pos, size); WHILE size # 0 DO writer.Char (0X); DEC (size); END;
 	END Reserve;
 
-	PROCEDURE WriteBYTE (value: LONGINT);
+	PROCEDURE WriteBYTE (value: SIZE);
 	BEGIN writer.Char (CHR (value)); INC(pos);
 	END WriteBYTE;
 
-	PROCEDURE WriteWORD (value: LONGINT);
+	PROCEDURE WriteWORD (value: SIZE);
 	BEGIN WriteBYTE (value MOD 100H); WriteBYTE (value DIV 100H);
 	END WriteWORD;
 
-	PROCEDURE WriteDWORD (value: LONGINT);
+	PROCEDURE WriteDWORD (value: SIZE);
 	BEGIN WriteWORD (value MOD 10000H); WriteWORD (value DIV 10000H);
 	END WriteDWORD;
 
@@ -388,11 +388,11 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize: LONGINT;  BaseCo
 		WriteString(s); WriteBYTE(0);
 	END WriteString0;
 
-	PROCEDURE AlignTo(alignment: LONGINT);
+	PROCEDURE AlignTo(alignment: SIZE);
 	BEGIN alignment := Align(pos, alignment); Reserve(alignment - pos);
 	END AlignTo;
 
-	PROCEDURE ReserveTo(p: LONGINT);
+	PROCEDURE ReserveTo(p: SIZE);
 	BEGIN ASSERT(p >= pos); Reserve(p-pos);
 	END ReserveTo;
 
@@ -401,8 +401,8 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize: LONGINT;  BaseCo
 		RETURN (exportInfo # NIL) & (exportInfo.exports # 0)
 	END HasExports;
 
-	PROCEDURE ExportTableSize(): LONGINT;
-	VAR i,offset: LONGINT;
+	PROCEDURE ExportTableSize(): SIZE;
+	VAR i,offset: SIZE;
 	BEGIN
 		IF ~HasExports() THEN RETURN 0 END;
 
@@ -414,7 +414,7 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize: LONGINT;  BaseCo
 		RETURN offset
 	END ExportTableSize;
 
-	PROCEDURE AlignedExportTableSize(): LONGINT;
+	PROCEDURE AlignedExportTableSize(): SIZE;
 	BEGIN
 		RETURN Align(ExportTableSize(), SectionAlignment);
 	END AlignedExportTableSize;
@@ -438,11 +438,11 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize: LONGINT;  BaseCo
 		RETURN size
 	END RelocTableSize;
 
-	PROCEDURE AlignedRelocTableSize(): LONGINT;
+	PROCEDURE AlignedRelocTableSize(): SIZE;
 	BEGIN RETURN Align(RelocTableSize(), SectionAlignment);
 	END AlignedRelocTableSize;
 
-	(*PROCEDURE SectionHeaderOffset(): LONGINT;
+	(*PROCEDURE SectionHeaderOffset(): SIZE;
 	BEGIN RETURN DOSStubSize + HeaderSize + OptionalHeaderSize
 	END SectionHeaderOffset;*)
 
@@ -499,7 +499,7 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize: LONGINT;  BaseCo
 	END WriteHeader;
 
 	PROCEDURE WriteOptionalHeader;
-	VAR ImageSize: LONGINT;
+	VAR ImageSize: SIZE;
 	BEGIN
 		ImageSize := Align(BaseCodeAddress+AlignedCodeSize+AlignedExportTableSize()+AlignedRelocTableSize(), SectionAlignment);
 
@@ -556,7 +556,7 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize: LONGINT;  BaseCo
 	END WriteOptionalHeader;
 
 	PROCEDURE WriteSections;
-	VAR ExportNameTableAddress, i, offset: LONGINT; p: PatchBlock;
+	VAR ExportNameTableAddress, i, offset: SIZE; p: PatchBlock;
 	BEGIN
 
 		(* code section header *)

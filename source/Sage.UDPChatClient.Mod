@@ -120,19 +120,19 @@ TYPE
 
 		INC (seqNum);
 
-		len := Strings.Length (password) + 1;
+		len := TODO(Strings.Length (password)) + 1;
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (password, 0, len, TRUE, res);
 
-		len := Strings.Length (shortName) + 1;
+		len := TODO(Strings.Length (shortName)) + 1;
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (shortName, 0, len, TRUE, res);
 
-		len := Strings.Length (fullName) + 1;
+		len := TODO(Strings.Length (fullName)) + 1;
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (fullName, 0, len, TRUE, res);
 
-		len := Strings.Length (eMail) + 1;
+		len := TODO(Strings.Length (eMail)) + 1;
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (eMail, 0, len, TRUE, res);
 
@@ -155,8 +155,8 @@ TYPE
 
 		INC (seqNum);
 
-		len := Strings.Length (password) + 1;
-		sendBuf.AddInt (len, 2);
+		len := TODO(Strings.Length (password)) + 1;
+		sendBuf.AddInt (TODO(len), 2);
 		sendBuf.Add (password, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
@@ -231,7 +231,7 @@ TYPE
 
 		INC (seqNum);
 
-		len := Strings.Length (code^) + 1;
+		len := TODO(Strings.Length (code^)) + 1;
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (code^, 0, len, TRUE, res);
 

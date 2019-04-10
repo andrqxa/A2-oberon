@@ -652,7 +652,7 @@ TYPE
 
 		(** List all source code files included in this build to a stream *)
 		PROCEDURE ToStream*(w : Streams.Writer; charactersPerLine : LONGINT);
-		VAR file : File; color : LONGINT; characterCount : LONGINT; name: Files.FileName;
+		VAR file : File; color : LONGINT; characterCount : SIZE; name: Files.FileName;
 		BEGIN
 			characterCount := 0;
 			file := files;
@@ -1244,7 +1244,7 @@ TYPE
 
 		PROCEDURE ShowDependentModules(CONST modulename : Modules.Name; mode : LONGINT;  out : Streams.Writer);
 		CONST CharactersPerLine = 60;
-		VAR module : File; ignore, nofModules, characterCount, i : LONGINT;
+		VAR module : File; ignore, nofModules, i : LONGINT; characterCount: SIZE;
 		BEGIN
 			ASSERT(out # NIL);
 			module := FindModule(modulename);

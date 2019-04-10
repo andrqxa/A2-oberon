@@ -2049,7 +2049,7 @@ TYPE
 
 	(** create attribute value text with encoded special charcters *)
 	PROCEDURE GetEncXMLAttributeText*(text: ARRAY OF CHAR): Strings.String;
-	VAR i: LONGINT; dynStr: DynamicStrings.DynamicString; chs: ARRAY 8 OF CHAR;
+	VAR i: SIZE; dynStr: DynamicStrings.DynamicString; chs: ARRAY 8 OF CHAR;
 		str: Strings.String;
 	BEGIN
 		NEW(dynStr);

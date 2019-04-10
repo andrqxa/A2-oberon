@@ -1070,7 +1070,7 @@ TYPE
 			paren, brace, brak: LONGINT;
 
 			PROCEDURE Add(CONST str: ARRAY OF CHAR);
-			VAR len1, len2 : LONGINT;
+			VAR len1, len2 : SIZE;
 			BEGIN
 				len1 := Strings.Length(exprStr);
 				len2 := Strings.Length(str);

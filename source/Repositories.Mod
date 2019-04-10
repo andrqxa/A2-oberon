@@ -1508,7 +1508,7 @@ END ExtractCommand;
 PROCEDURE CallCommand*(CONST command : ARRAY OF CHAR; VAR context : Context; VAR res : WORD);
 VAR
 	cmd : ARRAY 64 OF CHAR; param : POINTER TO ARRAY OF CHAR; reader : Streams.StringReader;
-	proc : Command;  i, j : LONGINT; object: ANY;
+	proc : Command;  i, j : SIZE; object: ANY;
 BEGIN
 	IF Strings.StartsWith2(CommandPrefix, command) THEN
 		i := Strings.Length(CommandPrefix);

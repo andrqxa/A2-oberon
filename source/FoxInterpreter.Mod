@@ -881,7 +881,7 @@ TYPE
 			command: ARRAY 256 OF CHAR; context: Commands.Context;
 
 			PROCEDURE CreateContext(paramString : Strings.String; pos: LONGINT) : Commands.Context;
-			VAR c : Commands.Context; arg : Streams.StringReader; dummy : ARRAY 1 OF CHAR; len: LONGINT;
+			VAR c : Commands.Context; arg : Streams.StringReader; dummy : ARRAY 1 OF CHAR; len: SIZE;
 			BEGIN
 				IF (paramString = NIL) THEN
 					NEW(arg, 1); dummy := ""; arg.SetRaw(dummy, 0, 1);

@@ -283,7 +283,7 @@ END Watch;
 
 (* Simple text formatting (assuming the use of fixed fonts) *)
 PROCEDURE Align(out : Streams.Writer; CONST string : ARRAY OF CHAR);
-VAR spaces, i : LONGINT;
+VAR spaces, i : SIZE;
 BEGIN
 	spaces := Column1 - Strings.Length(string); IF spaces < 0 THEN spaces := 0; END;
 	FOR i := 0 TO spaces-1 DO out.Char(" "); END;

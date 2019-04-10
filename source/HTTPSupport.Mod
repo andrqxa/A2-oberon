@@ -166,7 +166,7 @@ TYPE
 
 	(** HTTPEncode in by escaping illegal chars , author: "cs" *)
 	PROCEDURE HTTPEncode*(in: ARRAY OF CHAR; VAR enc: ARRAY OF CHAR);
-	VAR i,o: LONGINT;
+	VAR i,o: SIZE;
 		ch: LONGINT;
 
 		PROCEDURE ToHex(in: CHAR;VAR c1: CHAR; VAR c2: CHAR);

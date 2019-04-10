@@ -2800,7 +2800,7 @@ TYPE
 		END SetValue;
 
 		PROCEDURE Append*(CONST value: String);
-		VAR new: String; len: LONGINT;
+		VAR new: String; len: SIZE;
 		BEGIN
 			len := Strings.Length(SELF.value^) + Strings.Length(value^) + 1;
 			IF LEN(SELF.value) < len THEN
@@ -2809,7 +2809,7 @@ TYPE
 				SELF.value := new
 			END;
 			Strings.Append(SELF.value^, value^);
-			length := len
+			length := TODO(len)
 		END Append;
 
 		PROCEDURE AppendChar*(CONST ch: CHAR);

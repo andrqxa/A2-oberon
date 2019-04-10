@@ -1385,7 +1385,7 @@ TYPE
 			END GetCPU;
 
 			PROCEDURE Factor (VAR x: HUGEINT; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
-			VAR label: NamedLabel; l: LONGINT;
+			VAR label: NamedLabel; l: SIZE;
 			BEGIN
 				IF symbol = symNumber THEN
 					x := val; NextSymbol; RETURN TRUE;

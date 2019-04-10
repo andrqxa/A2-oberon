@@ -47,7 +47,7 @@ TYPE
 		pathIsFile, readGlobalData, readFromTempfile : BOOLEAN;
 		r : Files.Reader;
 		w : Files.Writer;
-		pathLength : LONGINT;
+		pathLength : SIZE;
 
 		PROCEDURE &Init* ( c: Commands.Context );
 		BEGIN
@@ -753,7 +753,7 @@ TYPE
 		key = "svn:wc:ra_dav:version-url";
 	VAR
 		tmp,fstr,fstr2 : ARRAY 256 OF CHAR;
-		read, len, keyLength, i : LONGINT; res : WORD;
+		keyLength: SIZE; read, len, i : LONGINT; res : WORD;
 		fr, fw : Files.File;
 		r : Files.Reader;
 		w : Files.Writer;

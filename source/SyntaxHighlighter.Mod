@@ -377,8 +377,8 @@ TYPE
 
 		PROCEDURE &Init(CONST open, close : ARRAY OF CHAR; nesting, multiline : BOOLEAN; styleOpen, styleClose, styleContent : Style);
 		BEGIN
-			Copy(open, SELF.open); openLength := Strings.Length(open); ASSERT((openLength > 0) & (openLength < MaxOpenLength));
-			Copy(close, SELF.close); closeLength := Strings.Length(close); ASSERT((closeLength >= 0) & (closeLength < MaxCloseLength));
+			Copy(open, SELF.open); openLength := TODO(Strings.Length(open)); ASSERT((openLength > 0) & (openLength < MaxOpenLength));
+			Copy(close, SELF.close); closeLength := TODO(Strings.Length(close)); ASSERT((closeLength >= 0) & (closeLength < MaxCloseLength));
 			SELF.nesting := nesting;
 			SELF.multiline := multiline;
 			SELF.styleOpen := styleOpen;
@@ -1065,7 +1065,7 @@ TYPE
 		VAR token, t : Word; length, index1, index2 : LONGINT;
 		BEGIN
 			ASSERT((Strings.Length(tokenname) > 0) & (style # NIL) & (style.name # ""));
-			length := Strings.Length(tokenname);
+			length := TODO(Strings.Length(tokenname));
 			IF (length <= MaxWordLength) THEN
 				NEW(token);
 				COPY(tokenname, token.name);
@@ -1092,7 +1092,7 @@ TYPE
 		VAR word, w : Word; nofWildcards, index1, index2, length : LONGINT;
 		BEGIN
 			ASSERT((Strings.Length(keyword) > 0) & (style # NIL) & (style.name # ""));
-			length := Strings.Length(keyword);
+			length := TODO(Strings.Length(keyword));
 			IF (length <= MaxWordLength) THEN
 				NEW(word);
 				Copy(keyword, word.name);
@@ -1136,12 +1136,12 @@ TYPE
 				WHILE (r.next # NIL) DO r := r.next; END;
 				r.next := region;
 			END;
-			length := Strings.Length(open); IF (length > longestOpen) THEN longestOpen := length; END;
+			length := TODO(Strings.Length(open)); IF (length > longestOpen) THEN longestOpen := length; END;
 			FOR i := 0 TO length-1 DO
 				regionChars[ORD(open[i])] := TRUE;
 			END;
 
-			length := Strings.Length(close); IF (length > longestClose) THEN longestClose := length; END;
+			length := TODO(Strings.Length(close)); IF (length > longestClose) THEN longestClose := length; END;
 			FOR i := 0 TO length-1 DO
 				regionChars[ORD(close[i])] := TRUE;
 			END;

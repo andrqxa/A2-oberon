@@ -2154,7 +2154,7 @@ TYPE
 
 		PROCEDURE EmitAsm(CONST instr: IntermediateCode.Instruction);
 		VAR reader: Streams.StringReader; procedure: SyntaxTree.Procedure; scope: SyntaxTree.Scope;
-				len: LONGINT; symbol: SyntaxTree.Symbol; assembler: Assembler.Assembler;
+				len: SIZE; symbol: SyntaxTree.Symbol; assembler: Assembler.Assembler;
 				scanner: Scanner.AssemblerScanner;
 		BEGIN
 			len := Strings.Length(instr.op1.string^);

@@ -720,7 +720,7 @@ VAR
 	variable: LONGINT;
 	name: ARRAY 64 OF CHAR;
 	support: BOOLEAN;
-	size: LONGINT;
+	size: SIZE;
 	dialectIndex: INTEGER;
 	t: ARRAY 2 OF LONGINT;
 BEGIN
@@ -755,7 +755,7 @@ BEGIN
 	END;
 
 	(* SEND *)
-	c.netbios := 32 + 37 + 10 + SHORT(Strings.Length(PrimaryDomain) + Strings.Length(Server));
+	c.netbios := 32 + 37 + 10 + INTEGER(Strings.Length(PrimaryDomain) + Strings.Length(Server));
 	WriteSMBHeader(c);
 	c.out.Net8(17);			(* word count *)
 	c.out.RawInt(dialectIndex);
@@ -772,7 +772,7 @@ BEGIN
 	c.out.Char(CHR(0));		(* time zone *)
 	c.out.Char(CHR(0));		(* time zone *)
 	c.out.Net8(8);			(* key length *)
-	c.out.RawInt(SHORT(Strings.Length(PrimaryDomain) + Strings.Length(Server)));
+	c.out.RawInt(INTEGER(Strings.Length(PrimaryDomain) + Strings.Length(Server)));
 	c.out.String("serverpw");
 	c.out.RawString(PrimaryDomain);
 	c.out.RawString(Server);
@@ -822,14 +822,14 @@ BEGIN
 	END;
 
 	(* SEND *)
-	c.netbios := 32 + 12 + SHORT(Strings.Length(NativeOS) + Strings.Length(PrimaryDomain) + Strings.Length(LANManager));
+	c.netbios := 32 + 12 + INTEGER(Strings.Length(NativeOS) + Strings.Length(PrimaryDomain) + Strings.Length(LANManager));
 	WriteSMBHeader(c);
 	c.out.Net8(3);			(* word count *)
 	c.out.Char(CHR(255));	(* and x *)
 	c.out.Net8(0);			(* reserved *)
 	c.out.Net16(0);			(* andx offset *)
 	c.out.RawInt(1);			(* logged in as guest *)
-	c.out.RawInt(3 + SHORT(Strings.Length(NativeOS) + Strings.Length(PrimaryDomain) + Strings.Length(LANManager)));	(* max vc *)
+	c.out.RawInt(3 + INTEGER(Strings.Length(NativeOS) + Strings.Length(PrimaryDomain) + Strings.Length(LANManager)));	(* max vc *)
 	c.out.RawString(NativeOS);
 	c.out.RawString(LANManager);
 	c.out.RawString(PrimaryDomain);
@@ -901,7 +901,7 @@ BEGIN
 	END;
 
 	(* SEND *)
-	c.netbios := 32 + 19 + SHORT(Strings.Length(FileSystem) + Strings.Length(service));
+	c.netbios := 32 + 19 + INTEGER(Strings.Length(FileSystem) + Strings.Length(service));
 	WriteSMBHeader(c);
 	c.out.Net8(7);				(* word count *)
 	c.out.Char(CHR(255));		(* and x *)
@@ -910,7 +910,7 @@ BEGIN
 	c.out.RawInt(0);				(* optional support *)
 	c.out.RawLInt(268435456); 	(* rights *)
 	c.out.RawLInt(268435456); 	(* rights *)
-	c.out.RawInt(2 + SHORT(Strings.Length(FileSystem) + Strings.Length(service)));
+	c.out.RawInt(2 + INTEGER(Strings.Length(FileSystem) + Strings.Length(service)));
 	c.out.RawString(service);
 	c.out.RawString(FileSystem);
 	c.out.Update();
@@ -1294,24 +1294,24 @@ BEGIN
 		IF Trace THEN KernelLog.String(" -- QUERY FS INFO"); KernelLog.Ln(); END;
 
 		(* SEND *)
-		c.netbios := 32 + 25 + 10 + SHORT(Strings.Length(FileSystem) + 1);
+		c.netbios := 32 + 25 + 10 + INTEGER(Strings.Length(FileSystem) + 1);
 		WriteSMBHeader(c);
 		c.out.Net8(10);
 		c.out.RawInt(0);
-		c.out.RawInt(12 + SHORT(Strings.Length(FileSystem) + 1));
+		c.out.RawInt(12 + INTEGER(Strings.Length(FileSystem) + 1));
 		c.out.Net16(0);
 		c.out.RawInt(0);
 		c.out.RawInt(55);
 		c.out.RawInt(0);
-		c.out.RawInt(12 + SHORT(Strings.Length(FileSystem) + 1));
+		c.out.RawInt(12 + INTEGER(Strings.Length(FileSystem) + 1));
 		c.out.RawInt(55);
 		c.out.RawInt(0);
 		c.out.Net8(0);
 		c.out.Net8(0);
-		c.out.RawInt(12 + SHORT(Strings.Length(FileSystem) + 1));
+		c.out.RawInt(12 + INTEGER(Strings.Length(FileSystem) + 1));
 		c.out.RawLInt(32);
 		c.out.RawLInt(64);
-		c.out.RawLInt(Strings.Length(FileSystem) + 1);
+		c.out.RawLInt(LONGINT(Strings.Length(FileSystem) + 1));
 		c.out.RawString(FileSystem);
 		c.out.Update();
 	ELSIF (subcmd = 5)  THEN
@@ -1340,7 +1340,7 @@ BEGIN
 		END;
 
 		(* SEND *)
-		c.netbios := SHORT(32 + 89 + Strings.Length(eName));
+		c.netbios := INTEGER(32 + 89 + Strings.Length(eName));
 		WriteSMBHeader(c);
 		c.out.Net8(10);			(* Word count *)
 		c.out.RawInt(2);			(* total para count *)
@@ -1389,7 +1389,7 @@ BEGIN
 		END;
 
 		c.out.RawLInt(0);		(* ea list *)
-		c.out.RawLInt(Strings.Length(eName));		(* filename len*)
+		c.out.RawLInt(LONGINT(Strings.Length(eName)));		(* filename len*)
 		c.out.RawString(eName);		(* file name*)
 		c.out.Update();
 	ELSIF (subcmd = 1) THEN
@@ -1436,8 +1436,8 @@ BEGIN
 			IF success THEN
 				Files.SplitName(fullName, prefix, eName);
 				Files.SplitPath(eName, pathname, eName);
-				totalFileNameLen := totalFileNameLen + SHORT(Strings.Length(eName));
-				lastlen := SHORT(Strings.Length(eName));
+				totalFileNameLen := totalFileNameLen + INTEGER(Strings.Length(eName));
+				lastlen := INTEGER(Strings.Length(eName));
 				INC(i);
 			END;
 		END;
@@ -1510,7 +1510,7 @@ BEGIN
 				f := Files.Old(eName);
 
 				IF loi = 260 THEN
-					c.out.RawLInt(96 + Strings.Length(eName));		(* next entry offset *)
+					c.out.RawLInt(96 + LONGINT(Strings.Length(eName)));		(* next entry offset *)
 					c.out.RawLInt(0);		(* file index*)
 					c.out.RawLInt(0);		(* created *)
 					c.out.RawLInt(0);		(* created *)
@@ -1549,7 +1549,7 @@ BEGIN
 					IF (Files.Directory IN eFlags) THEN INCL(flags, 4); END;
 					IF (Files.ReadOnly IN eFlags) THEN INCL(flags, 0) END;
 					c.out.RawLInt(SYSTEM.VAL(LONGINT, flags));		(* file attr *)
-					c.out.RawLInt(1 + Strings.Length(eName));		(* filename len *)
+					c.out.RawLInt(1 + LONGINT(Strings.Length(eName)));		(* filename len *)
 					c.out.RawLInt(0);		(* ea list *)
 					c.out.RawSInt(0);		(* short fn len *)
 					c.out.RawSInt(0);		(* reserved *)
@@ -1582,7 +1582,7 @@ BEGIN
 					IF (Files.Directory IN eFlags) THEN INCL(flags, 4); END;
 					IF (Files.ReadOnly IN eFlags) THEN INCL(flags, 0) END;
 					c.out.RawInt(SYSTEM.VAL(INTEGER, flags));			(* file attri *)
-					c.out.RawSInt(SHORT(SHORT(Strings.Length(eName))));	(* filename len *)
+					c.out.RawSInt(SHORTINT(Strings.Length(eName)));	(* filename len *)
 					c.out.RawString(eName);		(* file name*)
 				END;
 			END;
@@ -1636,8 +1636,8 @@ BEGIN
 			IF success THEN
 				Files.SplitName(fullName, prefix, eName);
 				Files.SplitPath(eName, pathname, eName);
-				totalFileNameLen := totalFileNameLen + SHORT(Strings.Length(eName));
-				lastlen := SHORT(Strings.Length(eName));
+				totalFileNameLen := totalFileNameLen + INTEGER(Strings.Length(eName));
+				lastlen := INTEGER(Strings.Length(eName));
 				INC(i);
 			END;
 		END;
@@ -1701,7 +1701,7 @@ BEGIN
 				f := Files.Old(eName);
 
 				IF loi = 260 THEN
-					c.out.RawLInt(96 + Strings.Length(eName));		(* next entry offset *)
+					c.out.RawLInt(96 + LONGINT(Strings.Length(eName)));		(* next entry offset *)
 					c.out.RawLInt(0);		(* file index*)
 					c.out.RawLInt(0);		(* created *)
 					c.out.RawLInt(0);		(* created *)
@@ -1739,7 +1739,7 @@ BEGIN
 					IF (Files.ReadOnly IN eFlags) THEN INCL(flags, 0) END;
 					c.out.RawLInt(SYSTEM.VAL(LONGINT, flags));		(* file attr *)
 
-					c.out.RawLInt(1 + Strings.Length(eName));		(* filename len *)
+					c.out.RawLInt(1 + LONGINT(Strings.Length(eName)));		(* filename len *)
 					c.out.RawLInt(0);		(* ea list *)
 					c.out.RawSInt(0);		(* short fn len *)
 					c.out.RawSInt(0);		(* reserved *)
@@ -1776,7 +1776,7 @@ BEGIN
 					IF (Files.Directory IN eFlags) THEN INCL(flags, 4); END;
 					IF (Files.ReadOnly IN eFlags) THEN INCL(flags, 0) END;
 					c.out.RawInt(SYSTEM.VAL(INTEGER, flags));			(* file attri *)
-					c.out.RawSInt(SHORT(SHORT(Strings.Length(eName))));	(* filename len *)
+					c.out.RawSInt(SHORTINT(Strings.Length(eName)));	(* filename len *)
 					c.out.RawString(eName);		(* file name*)
 				END;
 			END;
