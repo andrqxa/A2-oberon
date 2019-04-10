@@ -234,7 +234,8 @@ END StrToText;
 (** Text to UTF8 string. Objects and attributes are lost. *)
 PROCEDURE TextToStr*(text : Texts.Text; VAR string :String);
 VAR
-	i, l, pos : LONGINT;
+	i, l : LONGINT;
+	pos: SIZE;
 	r : Texts.TextReader;
 	ch : Texts.Char32;
 	ok : BOOLEAN;
@@ -581,8 +582,8 @@ VAR
 	buffer: Strings.Buffer;
 	w: Streams.Writer;
 	utf8: ARRAY 7 OF CHAR;
-	state: LONGINT;
-	value, pos: LONGINT;
+	state, value: LONGINT;
+	pos: SIZE;
 	r: BOOLEAN;
 BEGIN
 	NEW(buffer, 16);

@@ -795,7 +795,7 @@ TYPE
 		END CopySelection;
 
 		PROCEDURE GetSelectionAsString(VAR string : Strings.String) : BOOLEAN;
-		VAR i, idx : LONGINT; valid : BOOLEAN;
+		VAR i, idx : SIZE; valid : BOOLEAN;
 		BEGIN
 			IF SelectionIsValid() THEN
 				Acquire;

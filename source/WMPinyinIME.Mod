@@ -130,7 +130,7 @@ TYPE
 		END LoadPhrases;
 
 		PROCEDURE FindMatches(CONST s : ARRAY OF CHAR; resultList : ResultList; VAR nofResults : LONGINT);
-		VAR i, pos : LONGINT;
+		VAR i, pos : SIZE;
 			r, tr, cur : ResultList;
 			cl : ListElement;
 			str : ARRAY 16 OF CHAR;
@@ -439,7 +439,7 @@ TYPE
 		END GetName;
 
 		PROCEDURE KeyEvent*(ucs : LONGINT; flags : SET; keysym : LONGINT);
-		VAR x, y, pos : LONGINT; str : ARRAY 8 OF CHAR;
+		VAR x, y: LONGINT; pos : SIZE; str : ARRAY 8 OF CHAR;
 		BEGIN
 (*			IF text.isUTF THEN
 				KernelLog.String("Chinese characters are currently not allowed in potentially bidirectionally formatted texts.");

@@ -457,7 +457,7 @@ TYPE
 	END Scanner;
 
 PROCEDURE InitWithText*(t: Texts.Text; pos: LONGINT): Scanner;
-	VAR buffer: Strings.String; len, i, j, ch: LONGINT; r: Texts.TextReader;
+	VAR buffer: Strings.String; len, i, j: SIZE; ch: WORD; r: Texts.TextReader;
 	bytesPerChar: LONGINT;
 	s : Scanner;
 BEGIN
@@ -483,8 +483,8 @@ BEGIN
 	RETURN s;
 END InitWithText;
 
-PROCEDURE ExpandBuf(VAR oldBuf: Strings.String; newSize: LONGINT);
-VAR newBuf: Strings.String; i: LONGINT;
+PROCEDURE ExpandBuf(VAR oldBuf: Strings.String; newSize: SIZE);
+VAR newBuf: Strings.String; i: SIZE;
 BEGIN
 	IF LEN(oldBuf^) >= newSize THEN RETURN END;
 	NEW(newBuf, newSize);
@@ -496,7 +496,7 @@ END ExpandBuf;
 
 PROCEDURE InitReservedChars;
 VAR
-	i: LONGINT;
+	i: SIZE;
 BEGIN
 	FOR i := 0 TO LEN(reservedChar)-1 DO
 		IF CHR(i) <= 20X THEN	(* TAB, CR, ESC ... *)

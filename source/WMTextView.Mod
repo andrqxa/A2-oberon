@@ -3760,7 +3760,7 @@ TYPE
 			s : Strings.String;
 			msg : ARRAY 128 OF CHAR;
 			ignore : Modules.Name;
-			paramSize, nofLastSelections, i, j, a, b: LONGINT; res: WORD;
+			paramSize, i, j: SIZE; nofLastSelections, a, b: LONGINT; res: WORD;
 			selectionText : Texts.Text;
 			selectionOk : BOOLEAN;
 			from, to: Texts.TextPosition;

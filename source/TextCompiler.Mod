@@ -10,7 +10,7 @@ CONST
 	FileExtension = "MOD"; (*! temporary *)
 
 	PROCEDURE GetClipboardReader(): Streams.Reader;
-	VAR size : LONGINT;
+	VAR size : SIZE;
 		selectionText: Texts.Text;
 		pcStr: POINTER TO ARRAY OF CHAR;
 		stringReader: Streams.StringReader;
@@ -27,7 +27,7 @@ CONST
 	END GetClipboardReader;
 
 	PROCEDURE GetSelectionReader(): Streams.Reader;
-	VAR a, b, size : LONGINT;
+	VAR a, b: LONGINT; size : SIZE;
 		selectionText: Texts.Text;
 		from, to: Texts.TextPosition;
 		pcStr: POINTER TO ARRAY OF CHAR;
@@ -50,7 +50,7 @@ CONST
 	END GetSelectionReader;
 
 	PROCEDURE GetTextReader(text: Texts.Text; position: LONGINT): Streams.Reader;
-	VAR size : LONGINT;
+	VAR size : SIZE;
 		pcStr: POINTER TO ARRAY OF CHAR;
 		stringReader: Streams.StringReader;
 	BEGIN
@@ -64,13 +64,13 @@ CONST
 		RETURN stringReader;
 	END GetTextReader;
 
-	PROCEDURE UTF8Size(text : Texts.Text; startPos, len : LONGINT): LONGINT;
-	VAR i, length, pos,size : LONGINT; r : Texts.TextReader; ch : Texts.Char32; ok : BOOLEAN;
+	PROCEDURE UTF8Size(text : Texts.Text; startPos, len : SIZE): SIZE;
+	VAR i, length, pos,size : SIZE; r : Texts.TextReader; ch : Texts.Char32; ok : BOOLEAN;
 		string: ARRAY 16 OF CHAR;
 	BEGIN
 		text.AcquireRead;
 		NEW(r, text);
-		r.SetPosition(startPos);
+		r.SetPosition(TODO(startPos));
 		size := 0;i := 0; length := len; ok := TRUE;
 		WHILE (i < length) & ok DO
 			r.ReadCh(ch);

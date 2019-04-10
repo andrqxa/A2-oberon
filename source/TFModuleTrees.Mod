@@ -165,7 +165,7 @@ TYPE
 		PROCEDURE WriteSelected;
 		VAR ac, ar, bc, br : LONGINT;
 			p : ANY;
-			index, i : LONGINT;
+			index : SIZE;
 			str, newStr : ARRAY 1024 OF CHAR;
 			signature : TS.ProcedureSignature;
 			singleSuggestion : TS.NamedObject;
@@ -394,7 +394,7 @@ TYPE
 		END BrowseToDefinition;
 
 		PROCEDURE Complete*(sender, data : ANY);
-		VAR pos, index, i : LONGINT;
+		VAR pos: LONGINT; index : SIZE;
 			str : ARRAY 64 OF CHAR;
 			newStr : ARRAY 1024 OF CHAR;
 			signature : TS.ProcedureSignature;

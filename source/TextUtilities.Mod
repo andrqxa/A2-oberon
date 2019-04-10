@@ -200,7 +200,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Receive (VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD);
-		VAR ucs32, prevofs: LONGINT;
+		VAR ucs32, prevofs: LONGINT; offs: SIZE;
 		BEGIN
 			reader.text.AcquireRead;
 			len := 0; res := Streams.Ok;
@@ -211,12 +211,13 @@ TYPE
 					reader.ReadCh (ucs32);
 				END;
 				prevofs := ofs;
-				IF (ucs32 = 0) OR ~UTF8Strings.EncodeChar (ucs32, buf, ofs) THEN
+				IF (ucs32 = 0) OR ~UTF8Strings.EncodeChar (ucs32, buf, offs) THEN
 					remainder := ucs32;
 					IF len < min THEN res := Streams.EOF END;
 					reader.text.ReleaseRead;
 					RETURN
 				END;
+				ofs := TODO(offs);
 				INC (len, ofs - prevofs);
 			END;
 			reader.text.ReleaseRead;
@@ -1205,7 +1206,7 @@ TYPE
 		PROCEDURE WriteText*(text : Texts.Text; VAR res : WORD);
 		VAR
 			buf : Strings.String; rbuf : ARRAY 4 OF CHAR;
-			bytesPerChar, length, counter : LONGINT;
+			bytesPerChar, length: LONGINT; counter : SIZE;
 
 			PROCEDURE ExpandBuf(VAR oldBuf: Strings.String; newSize: LONGINT);
 			VAR newBuf: Strings.String; i: LONGINT;
@@ -1374,7 +1375,7 @@ TYPE
 		END Open;
 
 		PROCEDURE WriteText*(text : Texts.Text; VAR res : WORD);
-		VAR r : Texts.TextReader; ch : Texts.Char32; i, p : LONGINT; resstr : ARRAY 7 OF CHAR;
+		VAR r : Texts.TextReader; ch : Texts.Char32; i, p : SIZE; resstr : ARRAY 7 OF CHAR;
 		BEGIN
 			res := -1;
 			text.AcquireRead;
@@ -1900,7 +1901,7 @@ END StoreText;
 
 (** Text to UTF8 string. Objects and attributes are lost. The String is truncated if buffer is too small *)
 PROCEDURE TextToStr*(text : Text; VAR string : ARRAY OF CHAR);
-VAR i, l, pos : LONGINT; r : Texts.TextReader; ch : Texts.Char32; ok : BOOLEAN;
+VAR i, l, pos : SIZE; r : Texts.TextReader; ch : Texts.Char32; ok : BOOLEAN;
 BEGIN
 	text.AcquireRead;
 	COPY("", string);
@@ -1917,7 +1918,7 @@ END TextToStr;
 (** 	Write <length> characters starting at <start> to stream <w>. Objects and attributes are lost
 	Caller MUST HOLD lock!!! *)
 PROCEDURE SubTextToStream*(text : Text; start, length : LONGINT; w : Streams.Writer);
-VAR r : Texts.TextReader; ok : BOOLEAN; ch : Texts.Char32; buffer : ARRAY 6 OF CHAR; i : LONGINT;
+VAR r : Texts.TextReader; ok : BOOLEAN; ch : Texts.Char32; buffer : ARRAY 6 OF CHAR; i : SIZE;
 BEGIN
 	ASSERT((text # NIL) & (text.HasReadLock()));
 	ASSERT((0 <= start) & (length >= 0) & (start + length <= text.GetLength()));
@@ -1954,14 +1955,14 @@ BEGIN
 END TextToStream;
 
 (** Text to UTF8 string. Objects and attributes are lost. The String is truncated if buffer is too small *)
-PROCEDURE SubTextToStrAt*(text : Text; startPos, len : LONGINT; VAR index : LONGINT; VAR string : ARRAY OF CHAR);
-VAR i, length, pos : LONGINT; r : Texts.TextReader; ch : Texts.Char32; ok : BOOLEAN;
+PROCEDURE SubTextToStrAt*(text : Text; startPos, len : SIZE; VAR index : SIZE; VAR string : ARRAY OF CHAR);
+VAR i, length, pos : SIZE; r : Texts.TextReader; ch : Texts.Char32; ok : BOOLEAN;
 BEGIN
 	ASSERT((0 <= index) & (index < LEN(string)));
 	text.AcquireRead;
 	string[index] := 0X;
 	NEW(r, text);
-	r.SetPosition(startPos);
+	r.SetPosition(TODO(startPos));
 	i := 0; length := len; pos := index; ok := TRUE;
 	WHILE (i < length) & ok DO
 		r.ReadCh(ch);
@@ -1979,8 +1980,8 @@ BEGIN
 END SubTextToStrAt;
 
 (** Text to UTF8 string. Objects and attributes are lost. The String is truncated if buffer is too small *)
-PROCEDURE SubTextToStr*(text : Text; startPos, len : LONGINT; VAR string : ARRAY OF CHAR);
-VAR index : LONGINT;
+PROCEDURE SubTextToStr*(text : Text; startPos, len : SIZE; VAR string : ARRAY OF CHAR);
+VAR index : SIZE;
 BEGIN
 	index := 0;
 	SubTextToStrAt(text, startPos, len, index, string);
@@ -2064,7 +2065,7 @@ BEGIN
 END GetUTF8Char;
 
 PROCEDURE WriteUTF8Char*(w : Streams.Writer; ch : Char32);
-VAR str : ARRAY 8 OF CHAR; i : LONGINT;
+VAR str : ARRAY 8 OF CHAR; i : SIZE;
 BEGIN
 	i := 0; IF UTF8Strings.EncodeChar(ch, str, i) THEN w.Bytes(str, 0, i) END
 END WriteUTF8Char;

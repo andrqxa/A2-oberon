@@ -176,7 +176,7 @@ TYPE
 		END LoadAllCharacters;
 
 		PROCEDURE Update;
-		VAR codeStr, charString : ARRAY 16 OF CHAR; i : LONGINT;
+		VAR codeStr, charString : ARRAY 16 OF CHAR; i : SIZE;
 		BEGIN
 			paintBox.Invalidate;
 			IF UnihanParser.HasCode(curChar) THEN

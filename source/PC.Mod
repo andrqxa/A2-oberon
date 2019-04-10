@@ -389,7 +389,7 @@ PROCEDURE InitErrMsg*; (** ~ *)
 VAR
 	f: Files.File; scanner: XMLScanner.Scanner; parser: XMLParser.Parser; errors: XML.Document;
 	e: XML.Element; enum, msgEnum: XMLObjects.Enumerator; p: ANY;
-	code, i: LONGINT; str: XML.String;
+	code: LONGINT; i: SIZE; str: XML.String;
 	dynStr: DynamicStrings.DynamicString;
 	r : Files.Reader;
 	res : WORD;

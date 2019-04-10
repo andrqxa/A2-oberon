@@ -231,7 +231,7 @@ END ComparePinyinFreq;
 
 
 PROCEDURE BuildBasicPinyinIMETable*;
-VAR i, words : LONGINT;
+VAR i, words : SIZE;
 	list : ListElement; (* first element is dummy for sort *)
 	cur : ListElement;
 	str : ARRAY 16 OF CHAR;
@@ -298,7 +298,7 @@ BEGIN
 	FOR i := 0 TO MaxCode - 1 DO
 		IF codeArray[i] # NIL THEN
 			IF codeArray[i].xfreq > 0 THEN
-				DumpChar(i, codeArray[i])
+				DumpChar(TODO(i), codeArray[i])
 			END
 		END
 	END;

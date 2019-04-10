@@ -566,12 +566,12 @@ TYPE
 			COPY(node.name^, name);
 			ReplaceNonJolietChars(name);
 			IF (node IS File) & GetExtension(name, file, ext) THEN
-				len := MIN(UTF8Strings.Length(file), 64 - UTF8Strings.Length(ext) -1);
+				len := TODO(MIN(UTF8Strings.Length(file), 64 - UTF8Strings.Length(ext) -1));
 				UTF8Strings.Extract(name, 0, len, shortname);
 				Strings.Append(shortname, ".");
 				Strings.Append(shortname, ext);
 			ELSE
-				len := MIN(UTF8Strings.Length(name), 64);
+				len := TODO(MIN(UTF8Strings.Length(name), 64));
 				UTF8Strings.Extract(name, 0, len, shortname);
 			END;
 			RETURN len;
@@ -579,7 +579,7 @@ TYPE
 
 		PROCEDURE ReplaceNonJolietChars(VAR str: ARRAY OF CHAR);
 		VAR
-			len, i: LONGINT;
+			len, i: SIZE;
 		BEGIN
 			len := UTF8Strings.Length(str);
 			FOR i := 0 TO len -1 DO
@@ -594,7 +594,7 @@ TYPE
 		(* returns FALSE in case there is no extension *)
 		PROCEDURE Replace(VAR src: ARRAY OF CHAR; pos: LONGINT; CONST new: ARRAY OF CHAR);
 		VAR
-			len: LONGINT;
+			len: SIZE;
 		BEGIN
 			len := UTF8Strings.Length(new);
 			UTF8Strings.Delete(src, pos, len);
@@ -623,7 +623,7 @@ TYPE
 		VAR
 			node: Node;
 			cur: Directory;
-			max, len: LONGINT;
+			max, len: SIZE;
 		BEGIN
 			max := 0;
 			node := dir.content;
@@ -642,7 +642,7 @@ TYPE
 				INC(max); (* relevant directory *)
 				INC(max, UTF8Strings.Length(dir.shortname^)); (* length of relevant directory identifier *)
 			END;
-			RETURN max;
+			RETURN TODO(max);
 		END GetMaxPathLengthDir;
 
 		PROCEDURE AssignDirLba(dir: Directory; startsec: LONGINT): LONGINT;
@@ -666,7 +666,7 @@ TYPE
 		PROCEDURE CalcDirLength(dir: Directory): LONGINT;
 		VAR
 			node: Node;
-			secs, ofs, len: LONGINT;
+			secs: LONGINT; ofs, len: SIZE;
 		BEGIN
 			secs := 0;
 			node := dir.content;
@@ -809,11 +809,11 @@ TYPE
 
 		PROCEDURE GetIdentLen(CONST name: ARRAY OF CHAR): LONGINT;
 		VAR
-			len: LONGINT;
+			len: SIZE;
 		BEGIN
 			len := UTF8Strings.Length(name);
 			IF type = Joliet THEN len := 2*len; END;
-			RETURN len;
+			RETURN TODO(len);
 		END GetIdentLen;
 	END DirectoryTree;
 
@@ -1037,7 +1037,7 @@ TYPE
 
 		PROCEDURE CalcRecordLength(dir: Directory): LONGINT;
 		VAR
-			len: LONGINT;
+			len: SIZE;
 		BEGIN
 			IF dir.parent = dir THEN (* root directory *)
 				len := 10;
@@ -1047,7 +1047,7 @@ TYPE
 				INC(len, 8);
 				INC(len, len MOD 2); (* pad to even size *)
 			END;
-			RETURN len;
+			RETURN TODO(len);
 		END CalcRecordLength;
 
 		PROCEDURE Write	(w: Streams.Writer; tableType: LONGINT);
@@ -1076,7 +1076,7 @@ TYPE
 			(* now write the records for all other entries in the pathtable *)
 			FOR i:=1 TO  tree.dircnt-1 DO
 				dir := table[i](Directory);
-				len := UTF8Strings.Length(dir.shortname^);
+				len := TODO(UTF8Strings.Length(dir.shortname^));
 				IF tree.type = Joliet THEN len := 2*len; END;
 				rec.IdentLen := CHR(len);
 				INC(len, 8);
@@ -1565,9 +1565,9 @@ BEGIN
 END ConvertUTF8ToUCS2;
 
 (* converts an identifier to a zero terminated utf8 string *)
-PROCEDURE ConvertIdentToUTF8*(CONST id: ARRAY OF CHAR; len: LONGINT; ucs2: BOOLEAN; VAR str: ARRAY OF CHAR);
+PROCEDURE ConvertIdentToUTF8*(CONST id: ARRAY OF CHAR; len: SIZE; ucs2: BOOLEAN; VAR str: ARRAY OF CHAR);
 VAR
-	i, p, val: LONGINT;
+	i, p: SIZE; val: LONGINT;
 	b: BOOLEAN;
 BEGIN
 	ASSERT(len <= LEN(id));

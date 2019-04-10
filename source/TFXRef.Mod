@@ -757,11 +757,11 @@ BEGIN
 END GenerateModule;
 
 PROCEDURE InitWithText(t: Texts.Text; pos: LONGINT): Strings.String;
-	VAR buffer: Strings.String; len, i, j, ch: LONGINT; r: Texts.TextReader;
+	VAR buffer: Strings.String; len, i, j: SIZE; ch: LONGINT; r: Texts.TextReader;
 	bytesPerChar: LONGINT;
 
-	PROCEDURE ExpandBuf(VAR oldBuf: Strings.String; newSize: LONGINT);
-	VAR newBuf: Strings.String; i: LONGINT;
+	PROCEDURE ExpandBuf(VAR oldBuf: Strings.String; newSize: SIZE);
+	VAR newBuf: Strings.String; i: SIZE;
 	BEGIN
 		IF LEN(oldBuf^) >= newSize THEN RETURN END;
 		NEW(newBuf, newSize);

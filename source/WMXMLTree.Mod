@@ -214,7 +214,7 @@ TYPE
 			scanner : XMLScanner.Scanner;
 			parser : XMLParser.Parser;
 			doc : XML.Document;
-			tr : Texts.TextReader; ch : Texts.Char32; i, p : LONGINT; resstr : ARRAY 7 OF CHAR;
+			tr : Texts.TextReader; ch : Texts.Char32; i, p : SIZE; resstr : ARRAY 7 OF CHAR;
 			out : Streams.Writer;
 			ob : Strings.Buffer;
 			s : Strings.String;

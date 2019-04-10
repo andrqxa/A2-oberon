@@ -99,7 +99,7 @@ TYPE
 			scanner : XMLScanner.Scanner;
 			parser : XMLParser.Parser;
 			doc : XML.Document;
-			tr : Texts.TextReader; ch : Texts.Char32; i, p : LONGINT; resstr : ARRAY 7 OF CHAR;
+			tr : Texts.TextReader; ch : Texts.Char32; i, p : SIZE; resstr : ARRAY 7 OF CHAR;
 			s : Strings.String;
 			text : Texts.Text; out : Streams.Writer; ob : Strings.Buffer; hasErrors : BOOLEAN;
 		BEGIN
@@ -175,7 +175,7 @@ VAR
 	scanner : XMLScanner.Scanner;
 	parser : XMLParser.Parser;
 	doc : XML.Document;
-	tr : Texts.TextReader; ch : Texts.Char32; i, p : LONGINT; resstr : ARRAY 7 OF CHAR;
+	tr : Texts.TextReader; ch : Texts.Char32; i, p : SIZE; resstr : ARRAY 7 OF CHAR;
 	s : Strings.String;
 	out : Streams.Writer; ob : Strings.Buffer;
 	errors : ErrorReporter;

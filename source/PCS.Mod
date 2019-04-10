@@ -634,7 +634,7 @@ TYPE
 	END NewScanner;
 
 	PROCEDURE InitWithText*(t: Texts.Text; pos: LONGINT): Scanner;
-		VAR buffer: Buffer; len, i, j, ch: LONGINT; r: Texts.TextReader;
+		VAR buffer: Buffer; len, i, j: SIZE; ch: LONGINT; r: Texts.TextReader;
 		bytesPerChar: LONGINT;
 	BEGIN
 		t.AcquireRead;
@@ -656,8 +656,8 @@ TYPE
 		RETURN NewScanner(buffer, pos, 0);
 	END InitWithText;
 
-	PROCEDURE ExpandBuf(VAR oldBuf: Buffer; newSize: LONGINT);
-	VAR newBuf: Buffer; i: LONGINT;
+	PROCEDURE ExpandBuf(VAR oldBuf: Buffer; newSize: SIZE);
+	VAR newBuf: Buffer; i: SIZE;
 	BEGIN
 		IF LEN(oldBuf^) >= newSize THEN RETURN END;
 		NEW(newBuf, newSize);

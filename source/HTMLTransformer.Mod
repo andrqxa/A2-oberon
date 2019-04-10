@@ -2690,7 +2690,7 @@ VAR
 	dyn : DynamicStrings.DynamicString;
 	dynPos : LONGINT;
 	temp : ARRAY 5 OF CHAR;
-	i, j : SIZE; len : LONGINT;
+	i, j, len : SIZE;
 BEGIN
 	NEW(dyn);
 	dynPos := 0;
@@ -3148,7 +3148,7 @@ PROCEDURE GetCharEnt(VAR ent : ARRAY OF CHAR) : String;
 VAR
 	temp : String;
 	aoc : ARRAY 5 OF CHAR;
-	res, len : LONGINT; suc: WORD;
+	len : SIZE; res, suc: WORD;
 BEGIN
 	res := 0;
 	IF ent[0] = '#' THEN
