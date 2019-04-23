@@ -20,7 +20,7 @@ CONST
 	VAR
 		huff: AH.Encoder;
 		bw: BW.Encoder;
-		buffer: ARRAY BlockSize OF CHAR;  len: LONGINT;
+		buffer: ARRAY BlockSize OF CHAR;  len: SIZE;
 	BEGIN
 		NEW( huff, w );  NEW( bw );
 		w.RawLInt( ComprTag );
@@ -28,8 +28,8 @@ CONST
 			r.Bytes( buffer, 0, BlockSize, len );
 			IF len = 0 THEN  EXIT  END;
 			w.RawNum( len );
-			w.RawNum( bw.EncodeBlock( buffer, len ) );
-			huff.CompressBlock( buffer, len );
+			w.RawNum( bw.EncodeBlock( buffer, TODO(len) ) );
+			huff.CompressBlock( buffer, TODO(len) );
 		END;
 		w.RawNum( 0 );	(* mark end of stream *)
 		w.Update

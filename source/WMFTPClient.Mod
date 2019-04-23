@@ -738,7 +738,7 @@ TYPE
 		PROCEDURE CopyFile(target : WMDropTarget.DropFiles; CONST local, remote : ARRAY OF CHAR; VAR res : WORD);
 		VAR w : Streams.Writer;
 			r : Streams.Reader;
-			buf: ARRAY BufSize OF CHAR; len : LONGINT;
+			buf: ARRAY BufSize OF CHAR; len : SIZE;
 		BEGIN
 			res := -1;
 			owner.SetBusy(TRUE);

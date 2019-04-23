@@ -118,6 +118,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
+		VAR length: SIZE;
 		BEGIN
 			IF max = 0 THEN
 				res := -1;
@@ -126,7 +127,8 @@ TYPE
 			IF size < min THEN size := min END;
 			IF size > max THEN size := max END;
 
-			input.Bytes(buf, ofs, size, len);
+			input.Bytes(buf, ofs, size, length);
+			len := TODO(length);
 			DEC(max, len);
 			res := input.res
 		END Receive;
@@ -438,7 +440,7 @@ TYPE
 	END ReadHeaderBytes;
 
 	PROCEDURE ReadHeader(R: Streams.Reader; VAR hdr: Header): BOOLEAN;
-	VAR chksum, chksum2, len: LONGINT;
+	VAR chksum, chksum2: LONGINT; len: SIZE;
 	BEGIN
 		ASSERT(hdr # NIL);
 		chksum := 0;
@@ -594,7 +596,7 @@ TYPE
 
 	PROCEDURE TransferBytes(from : Streams.Reader; to : Streams.Writer; n : LONGINT);
 	VAR buf : ARRAY 1024 OF CHAR;
-		len : LONGINT;
+		len : SIZE;
 	BEGIN
 		WHILE n > 1024 DO
 			from.Bytes(buf, 0, 1024, len);

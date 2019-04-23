@@ -2169,7 +2169,7 @@ BEGIN
 END DumpAll;
 
 PROCEDURE Call*(context : Commands.Context); (** moduleName.procedureName [params] ~ *)
-VAR c : Context; cmdString : POINTER TO ARRAY OF CHAR; res : WORD; ignore: LONGINT;
+VAR c : Context; cmdString : POINTER TO ARRAY OF CHAR; res : WORD; ignore: SIZE;
 BEGIN
 	NEW(c,	NIL, NIL, context.out, context.error, context.caller);
 	IF (context.arg.Available() > 0) THEN

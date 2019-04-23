@@ -986,7 +986,7 @@ TYPE
 			VAR
 				macInput: ARRAY 13 OF CHAR;
 				verify: ARRAY 20 OF CHAR;
-				i, padd, length, len, type, macSize, res, major, minor, ofs: LONGINT;
+				i, padd, len, type, macSize, res, major, minor, ofs: LONGINT; length: SIZE;
 				badRecordMac: BOOLEAN; (* Send a bad_record_mac error *)
 		BEGIN
 			(* increment the number of received records *)

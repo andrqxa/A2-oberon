@@ -282,7 +282,7 @@ IMPORT
 	END Open;
 
 	PROCEDURE AppendFile(f: Files.File;  to: Streams.Writer);
-		VAR buffer: ARRAY 1024 OF CHAR;  r: Files.Reader;  read: LONGINT;
+		VAR buffer: ARRAY 1024 OF CHAR;  r: Files.Reader;  read: SIZE;
 	BEGIN
 		Files.OpenReader(r, f, 0);
 		REPEAT

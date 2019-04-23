@@ -88,7 +88,7 @@ PROCEDURE GetChecksum* ( CONST file : ARRAY OF CHAR ) : Strings.String;
 CONST
 	bufSize = 512;
 VAR
-	read, len : LONGINT;
+	len: SIZE;
 	tmp, res : Strings.String;
 	md5context : MD5.Context;
 	md5digest : MD5.Digest;
@@ -105,10 +105,9 @@ BEGIN
 	Files.OpenReader ( r, f, 0 );
 
 	md5context := MD5.New();
-	read := 0;
 	LOOP
-		r.Bytes ( tmp^, read, bufSize, len );
-		MD5.WriteBytes ( md5context, tmp^, len );
+		r.Bytes ( tmp^, 0, bufSize, len );
+		MD5.WriteBytes ( md5context, tmp^, TODO(len) );
 		IF len < bufSize THEN EXIT END;
 	END;
 

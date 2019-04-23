@@ -19,8 +19,8 @@ TYPE
 		PROCEDURE &New*;
 		VAR res : WORD; temp : ARRAY 16 OF CHAR;
 			r : Streams.Reader; w : Files.Writer;
-			buf: ARRAY BufSize OF CHAR; len, size : LONGINT;
-			msg, s : ARRAY 256 OF CHAR; i, j : SIZE;
+			buf: ARRAY BufSize OF CHAR; size : LONGINT;
+			msg, s : ARRAY 256 OF CHAR; len, i, j : SIZE;
 			ftpConnection : FTPClient.FTPClient;
 			errorStr : ARRAY 512 OF CHAR;
 			f : Files.File;
@@ -81,7 +81,7 @@ TYPE
 				status.Show; transCount := 0;
 				REPEAT
 					r.Bytes(buf, 0, BufSize, len); w.Bytes(buf, 0, len);
-					INC(transCount, len);
+					INC(transCount, TODO(len));
 					status.UpdateStatus(1, transCount);
 				UNTIL r.res # 0;
 				ftpConnection.CloseGet(res);

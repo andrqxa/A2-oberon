@@ -937,7 +937,7 @@ VAR writer : Writer;
 	reader : Reader;
 	file : File;
 	chunk : ARRAY 4096 OF CHAR;
-	len : LONGINT;
+	len : SIZE;
 BEGIN
 	IF fileClipboard = NIL THEN RETURN END;
 	IF Old(name) # NIL THEN res := FileAlreadyExists;			(* File already exists *)

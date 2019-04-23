@@ -413,7 +413,7 @@ TYPE
 		VAR
 			ch: CHAR;
 			tempInt : LONGINT;
-			buflen: LONGINT;
+			buflen: SIZE;
 
 			attr : Texts.Attributes;
 			tattr : Texts.FontInfo;
@@ -458,7 +458,7 @@ TYPE
 				reader.RawString(name); reader.RawInt(x); reader.RawInt(y); reader.RawInt(w); reader.RawInt(h);
 				ch := reader.Get();
 				IF ch = 0F7X THEN	(* skip meta info *)
-					ch := reader.Get(); IF ch = 08X THEN reader.RawLInt(len); reader.Bytes(temp, 0, len, templen); ch := reader.Get(); END;
+					ch := reader.Get(); IF ch = 08X THEN reader.RawLInt(len); reader.Bytes(temp, 0, len, buflen); ch := reader.Get(); END;
 				END
 			END;
 			pos := reader.Pos();

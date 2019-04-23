@@ -668,7 +668,7 @@ TYPE
 	END ExpandBuf;
 
 	PROCEDURE InitWithReader*(r: Streams.Reader; size, pos: LONGINT): Scanner;
-		VAR buffer: Buffer; read: LONGINT;
+		VAR buffer: Buffer; read: SIZE;
 	BEGIN
 		NEW(buffer, size);
 		r.Bytes(buffer^, 0, size, read);

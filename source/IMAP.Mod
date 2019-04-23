@@ -901,7 +901,7 @@ TYPE
 		PROCEDURE ReadLiteral(VAR buffer:String): BOOLEAN;
 		VAR
 			data: ARRAY 80 OF CHAR;
-			i,size,len: LONGINT;
+			i,size: LONGINT; len: SIZE;
 		BEGIN
 			i := 0;
 			ASSERT(in.Peek() = "{",1013);

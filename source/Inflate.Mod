@@ -263,7 +263,7 @@ MODULE Inflate; (** AUTHOR "ejz"; PURPOSE "Aos inflate stream"; *)
 			END CopyData;
 
 			PROCEDURE Inflate;
-				VAR win: POINTER TO Window; litT, distT,temp: Tree; bits, i, d, l: LONGINT; final: BOOLEAN;
+				VAR win: POINTER TO Window; litT, distT,temp: Tree; bits, i, d, l: LONGINT; length: SIZE; final: BOOLEAN;
 			BEGIN
 				NEW(win);
 				win.in := 0; win.out := 0; win.size := 0;
@@ -288,9 +288,9 @@ MODULE Inflate; (** AUTHOR "ejz"; PURPOSE "Aos inflate stream"; *)
 							WHILE win.size > (WindowSize-i) DO
 								CopyData(win^)
 							END;
-							input.Bytes(win.data, win.in, i, i);
-							DEC(l, i); INC(win.size, i);
-							win.in := (win.in + i) MOD WindowSize
+							input.Bytes(win.data, win.in, i, length);
+							DEC(l, TODO(length)); INC(win.size, TODO(length));
+							win.in := (win.in + TODO(length)) MOD WindowSize
 						END
 					ELSIF bits < 3 THEN (* compressed *)
 						IF bits = 2 THEN

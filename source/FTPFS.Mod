@@ -654,7 +654,7 @@ TYPE
 			VAR res : WORD;
 				rd : Streams.Reader;
 				buf : ARRAY BufSize OF CHAR;
-				len : LONGINT;
+				len : SIZE;
 				wr : Files.Writer;
 				fl : Files.File;
 				remoteFN : String;

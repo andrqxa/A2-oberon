@@ -139,7 +139,7 @@ TYPE
 			currentByte : CHAR;
 			bitPos : LONGINT;
 			lastRowStart : ADDRESS;
-			len,time,t1,t2 : LONGINT;
+			len: SIZE; time,t1,t2 : LONGINT;
 			color: RECORD b,g,r,a: CHAR END;
 
 			PROCEDURE GetNextBit() : LONGINT;

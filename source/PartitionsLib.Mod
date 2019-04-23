@@ -1650,7 +1650,7 @@ TYPE
 	FileToPartition* = OBJECT(Image);
 
 		PROCEDURE DoOperation*; (** dev#part filename [block numblocks] ~ *)
-		VAR f: Files.File; r: Files.Reader; error : String; len, pos, num, i : LONGINT; res: WORD;
+		VAR f: Files.File; r: Files.Reader; error : String; len: SIZE; pos, num, i : LONGINT; res: WORD;
 		BEGIN
 			f := Files.Old(filename);
 			IF f # NIL THEN
@@ -2015,7 +2015,7 @@ TYPE
 		(* Write the OBL boot loader and an empty config table to disk. *)
 		PROCEDURE InitOBL(flag: LONGINT; VAR res: WORD);
 		VAR
-			buf: ARRAY 10*BS OF CHAR; i, tsize, rsize, lsize, len : LONGINT;
+			buf: ARRAY 10*BS OF CHAR; i, tsize, rsize, lsize : LONGINT; len: SIZE;
 			f: Files.File; r: Files.Reader;
 		BEGIN
 			ASSERT(dev.blockSize = BS);
@@ -2226,7 +2226,7 @@ TYPE
 		PROCEDURE UpdateOBL(f: Files.File; VAR res: WORD);
 		CONST MaxSize = MaxBootLoaderSize*BS;
 		VAR
-			b, bnew: ARRAY MaxSize OF CHAR; i, tsize, rsize, lsize, len: LONGINT;
+			b, bnew: ARRAY MaxSize OF CHAR; i, tsize, rsize, lsize: LONGINT; len: SIZE;
 			r: Files.Reader;
 		BEGIN
 			ASSERT(disk.device.blockSize = BS);
@@ -2356,7 +2356,7 @@ TYPE
 		VAR
 			f: Files.File; r: Files.Reader; buf1, buf2: ARRAY BS OF CHAR;
 			string : ARRAY 256 OF CHAR;
-			res: WORD; len, i: LONGINT;
+			res: WORD; len: SIZE; i: LONGINT;
 		BEGIN
 			f := Files.Old(filename);
 			IF f # NIL THEN

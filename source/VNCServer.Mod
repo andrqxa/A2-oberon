@@ -181,7 +181,7 @@ TYPE
 		END Init;
 
 		PROCEDURE SendVersion() : BOOLEAN;
-		VAR clientVersion : ARRAY 12 OF CHAR; len : LONGINT;
+		VAR clientVersion : ARRAY 12 OF CHAR; len : SIZE;
 		BEGIN
 			out.String(Version); out.Char(0AX); out.Update();
 			IF out.res # Streams.Ok THEN RETURN FALSE END;
@@ -193,7 +193,7 @@ TYPE
 		PROCEDURE Authenticate() : BOOLEAN;
 		VAR challenge, response, clear : ARRAY 16 OF CHAR;
 			des : DES.DES; seq : Random.Sequence;
-			i, len : LONGINT; ok : BOOLEAN;
+			i : LONGINT; len: SIZE; ok : BOOLEAN;
 		BEGIN
 			Machine.AtomicInc(NnofAuthenticate);
 			IF vncInfo.password = "" THEN

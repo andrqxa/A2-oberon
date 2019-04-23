@@ -498,7 +498,7 @@ END GetDefaultResponseHeader;
 
 (** Sends all availabe data from src to dst *)
 PROCEDURE SendData*(src: Streams.Reader; dst: Streams.Writer);
-VAR len: LONGINT; buf: ARRAY FileBufSize OF CHAR;
+VAR len: SIZE; buf: ARRAY FileBufSize OF CHAR;
 BEGIN
 	WHILE (src.res = Streams.Ok) DO
 		src.Bytes(buf, 0, FileBufSize, len);

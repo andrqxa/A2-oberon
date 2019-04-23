@@ -1764,7 +1764,7 @@ END UTF8ToStream;
 	will be truncated and an error will be reported. <string> is always a valid 0X-terminated string.
 	Also works for ASCII strings. *)
 PROCEDURE UTF8FromStream*(VAR string : ARRAY OF CHAR; r : Streams.Reader; VAR res : WORD);
-VAR ch : CHAR;  escapeBuffer : ARRAY 8 OF CHAR; escaping : BOOLEAN; escapeIdx, codeLength, stringLength, i, len, actLen : LONGINT;
+VAR ch : CHAR;  escapeBuffer : ARRAY 8 OF CHAR; escaping : BOOLEAN; escapeIdx, codeLength, stringLength, i, len, actLen : SIZE;
 
 	PROCEDURE FlushEscapeBuffer;
 	VAR j : LONGINT;

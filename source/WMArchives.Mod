@@ -1110,7 +1110,7 @@ END RemovePartitionLabel;
 
 (* transfer data from rec to target *)
 PROCEDURE CopyFile(rec : Streams.Receiver; target : WMDropTarget.DropFiles; CONST remote : ARRAY OF CHAR; VAR res : WORD);
-VAR w : Streams.Writer; r : Streams.Reader; buf: ARRAY BufSize OF CHAR; len: LONGINT;
+VAR w : Streams.Writer; r : Streams.Reader; buf: ARRAY BufSize OF CHAR; len: SIZE;
 BEGIN
 	res := -1;
 	Streams.OpenReader(r, rec);

@@ -654,7 +654,7 @@ TYPE
 
 		PROCEDURE Tar(sender, data : ANY);
 		VAR
-			d : DirEntry; i, len : LONGINT;
+			d : DirEntry; i: LONGINT; len : SIZE;
 			filename, format, temp : Files.FileName;
 			buf: ARRAY BufSize OF CHAR;
 			arc : Archives.Archive;
@@ -796,7 +796,7 @@ END Open;
 		VAR w : Streams.Writer;
 			f : Files.File;
 			r : Files.Reader;
-			buf: ARRAY BufSize OF CHAR; len: LONGINT;
+			buf: ARRAY BufSize OF CHAR; len: SIZE;
 		BEGIN
 			res := -1;
 			f := Files.Old(local);

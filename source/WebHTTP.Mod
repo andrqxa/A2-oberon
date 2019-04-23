@@ -298,13 +298,14 @@ TYPE
 		END Init;
 
 		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
-		VAR l: LONGINT;
+		VAR l: LONGINT; length: SIZE;
 		BEGIN
 			IF remain > 0 THEN
 				ASSERT((size > 0) & (min <= size) & (min >= 0));
 				res := Streams.Ok;
 				l := size; IF l > remain THEN l := remain END;
-				inR.Bytes(buf, ofs, l, len);
+				inR.Bytes(buf, ofs, l, length);
+				len := TODO(length);
 				DEC(remain, len);
 			ELSE res := Streams.EOF
 			END

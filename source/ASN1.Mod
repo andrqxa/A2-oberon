@@ -190,8 +190,8 @@ BEGIN
 	END;
 END PrintString;
 
-PROCEDURE Decode*(reader:Streams.Reader; level:LONGINT; VAR len:LONGINT): Triplet;
-VAR t,t1:Triplet; lengthbytes,len0,hdrlen:LONGINT; i:LONGINT; c:CHAR;
+PROCEDURE Decode*(reader:Streams.Reader; level:LONGINT; VAR len:SIZE): Triplet;
+VAR t,t1:Triplet; lengthbytes,len0,hdrlen,i:SIZE; c:CHAR;
 BEGIN
 	NEW(t); t.level:=level;
 	len:=0; hdrlen:=0;

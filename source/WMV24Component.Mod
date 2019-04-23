@@ -1335,7 +1335,7 @@ TYPE
 			vc : WMComponents.VisualComponent;
 			configuration : WMRestorable.XmlElement; string : ARRAY 64 OF CHAR;
 			s: POINTER TO ARRAY OF CHAR;
-			len: LONGINT;
+			len: SIZE;
 		BEGIN
 			IncCount;
 

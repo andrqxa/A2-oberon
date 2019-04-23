@@ -199,7 +199,8 @@ VAR
 		cipher: Ciphers.Cipher;
 		md5: MD5.Hash;
 		digest: ARRAY 16 OF CHAR; pl: LONGINT;
-		buf: ARRAY 4096 OF CHAR; bl, n, magic: LONGINT;
+		buf: ARRAY 4096 OF CHAR; bl, magic: LONGINT;
+		n: SIZE;
 
 	BEGIN
 		NEW( k );

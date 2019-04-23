@@ -961,7 +961,7 @@ VAR
 		PROCEDURE ReadSegment(): BOOLEAN;
 		VAR len, offset: Bits; c: CHAR;
 			segment: ARRAY 128 OF CHAR;
-			received: LONGINT;
+			received: SIZE;
 		BEGIN
 			reader.RawNum(len);
 			IF len = 0 THEN RETURN FALSE END;
@@ -970,15 +970,15 @@ VAR
 				reader.Bytes(segment, 0, LEN(segment), received);
 				ASSERT(received = LEN(segment));
 				section.bits.SetBytes(offset, LEN(segment), segment);
-				DEC(len, received);
-				INC(offset, received*ByteSize);
+				DEC(len, TODO(received));
+				INC(offset, TODO(received)*ByteSize);
 			END;
 			IF size MOD 8 # 0 THEN
 				reader.Bytes(segment, 0, len-1, received);
 				ASSERT(received = len-1);
 				section.bits.SetBytes(offset, received, segment);
-				DEC(len, received);
-				INC(offset, received*ByteSize);
+				DEC(len, TODO(received));
+				INC(offset, TODO(received)*ByteSize);
 				(* last byte: only part of a byte *)
 				reader.Char(c);
 				section.bits.SetBits (offset, MIN (ByteSize, size - offset), ORD(c));

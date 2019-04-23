@@ -51,7 +51,7 @@ TYPE
 	END;
 
 PROCEDURE WriteImage(w: Streams.Writer; r: Streams.Reader; imageSize: LONGINT);
-VAR read, padLen: LONGINT; buf: ARRAY CDSectorSize OF CHAR;
+VAR read: SIZE; padLen: LONGINT; buf: ARRAY CDSectorSize OF CHAR;
 BEGIN
 	padLen := CDSectorSize - (imageSize MOD CDSectorSize);
 

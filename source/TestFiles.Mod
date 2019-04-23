@@ -19,7 +19,7 @@ TYPE
 		path : ARRAY 512 OF CHAR;
 		lastCommandWasComment : BOOLEAN;
 
-		readerBytesLength : LONGINT; (* last results from Reader.Bytes(... VAR len) *)
+		readerBytesLength : SIZE; (* last results from Reader.Bytes(... VAR len) *)
 		byte : CHAR; (* last byte read *)
 		buffer : Strings.String; (* last bytes read *)
 
@@ -300,7 +300,7 @@ TYPE
 				ELSIF (variable = "byte") THEN
 					CheckChar(variable, byte, r, error, parseError);
 				ELSIF (variable = "readerBytesLength") THEN
-					CheckInteger(variable, readerBytesLength, r, error, parseError);
+					CheckInteger(variable, TODO(readerBytesLength), r, error, parseError);
 				ELSIF (variable = "buffer") THEN
 					CheckString(variable, buffer, r, error, parseError);
 				ELSIF Strings.Match("buffer*", variable) THEN

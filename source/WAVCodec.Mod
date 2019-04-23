@@ -99,7 +99,7 @@ TYPE
 		hasMoreBytes : BOOLEAN;
 
 		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
-		VAR len, inLen: LONGINT; c: CHAR;
+		VAR len: LONGINT; inLen: SIZE; c: CHAR;
 		BEGIN
 			res := -1; inLen := 0;
 			IF in = NIL THEN
@@ -244,8 +244,10 @@ TYPE
 		END Next;
 
 		PROCEDURE FillBuffer*(buffer : SoundDevices.Buffer);
+		VAR length: SIZE;
 		BEGIN
-			in.Bytes(buffer.data^, 0, LEN(buffer.data^), buffer.len);
+			in.Bytes(buffer.data^, 0, LEN(buffer.data^), length);
+			buffer.len := TODO(length);
 			IF (in.res = Streams.EOF) OR (buffer.len < LEN(buffer.data)) THEN
 				hasMoreBytes := FALSE;
 				RETURN;
@@ -346,8 +348,10 @@ TYPE
 		END Next;
 
 		PROCEDURE FillBuffer*(buffer : SoundDevices.Buffer);
+		VAR length: SIZE;
 		BEGIN
-			in.Bytes(buffer.data^, 0, LEN(buffer.data^), buffer.len);
+			in.Bytes(buffer.data^, 0, LEN(buffer.data^), length);
+			buffer.len := TODO(length);
 			IF (in.res = Streams.EOF) OR (buffer.len < LEN(buffer.data)) THEN
 				hasMoreBytes := FALSE; KernelLog.String("BOOOOM!!");
 				RETURN;

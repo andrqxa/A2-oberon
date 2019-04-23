@@ -534,7 +534,7 @@ TYPE
 		END Peek;
 
 	(** Read size bytes into x, starting at ofs.  The len parameter returns the number of bytes that were actually read. *)
-		PROCEDURE Bytes*( VAR x: ARRAY OF CHAR;  ofs, size: SIZE;  VAR len: LONGINT );
+		PROCEDURE Bytes*( VAR x: ARRAY OF CHAR;  ofs, size: SIZE;  VAR len: SIZE );
 		VAR n: LONGINT;
 		BEGIN
 			ASSERT ( size >= 0 );
@@ -584,14 +584,14 @@ TYPE
 
 	(** Read a LONGINT. *)
 		PROCEDURE RawLInt*( VAR x: LONGINT );
-		VAR ignore: LONGINT;
+		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4, ignore )
 		END RawLInt;
 
 	(** Read a HUGEINT. *)
 		PROCEDURE RawHInt*( VAR x: HUGEINT );
-		VAR ignore: LONGINT;
+		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes8, x ), 0, 8, ignore )
 		END RawHInt;
@@ -628,13 +628,13 @@ TYPE
 		END RawSet;
 
 		PROCEDURE RawSet32* ( VAR x: SET32 );
-		VAR ignore: LONGINT;
+		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4, ignore )
 		END RawSet32;
 
 		PROCEDURE RawSet64* ( VAR x: SET64 );
-		VAR ignore: LONGINT;
+		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes8, x ), 0, 8, ignore )
 		END RawSet64;
@@ -647,14 +647,14 @@ TYPE
 
 	(** Read a REAL. *)
 		PROCEDURE RawReal*( VAR x: REAL );
-		VAR ignore: LONGINT;
+		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4, ignore )
 		END RawReal;
 
 	(** Read a LONGREAL. *)
 		PROCEDURE RawLReal*( VAR x: LONGREAL );
-		VAR ignore: LONGINT;
+		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes8, x ), 0, 8, ignore )
 		END RawLReal;

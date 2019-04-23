@@ -11,7 +11,7 @@ CONST
 VAR ftp : FTPClient.FTPClient;
 
 PROCEDURE PutFile(ftp : FTPClient.FTPClient; local, remote : ARRAY OF CHAR; VAR res : WORD);
-VAR buf: ARRAY BufSize OF CHAR; len: LONGINT;
+VAR buf: ARRAY BufSize OF CHAR; len: SIZE;
 	f : Files.File; r : Files.Reader;
 	w : Streams.Writer;
 BEGIN
@@ -54,7 +54,7 @@ BEGIN
 END PutText;
 
 PROCEDURE GetFile(ftp : FTPClient.FTPClient; remote, local : ARRAY OF CHAR; VAR res : WORD);
-VAR buf: ARRAY BufSize OF CHAR; len: LONGINT;
+VAR buf: ARRAY BufSize OF CHAR; len: SIZE;
 	f : Files.File; w : Files.Writer;
 	r : Streams.Reader;
 BEGIN

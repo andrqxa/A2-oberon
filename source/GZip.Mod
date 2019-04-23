@@ -162,11 +162,12 @@ TYPE
 
 		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
 		VAR
-			intlen : LONGINT;
+			intlen : LONGINT; length: SIZE;
 		BEGIN
 			ASSERT((0 <= ofs) & (0 <= len) & (ofs + size <= LEN(buf)), 100);
 			IF transparent THEN
-				reader.Bytes(buf, ofs, size, len);
+				reader.Bytes(buf, ofs, size, length);
+				len := TODO (length);
 				IF len >= min THEN res := Streams.Ok ELSE res := Streams.EOF (* end of file *) END;
 			ELSE
 				IF ~s.open THEN
@@ -175,7 +176,8 @@ TYPE
 					ZlibBuffers.Init(s.out, buf, ofs, size, size);
 					WHILE (s.out.avail # 0) & (s.res.code # Zlib.StreamEnd) DO
 						IF s.in.avail = 0 THEN
-							reader.Bytes(in^, 0, BufSize, intlen);
+							reader.Bytes(in^, 0, BufSize, length);
+							intlen := TODO (length);
 							ZlibBuffers.Rewind(s.in, intlen);
 							IF s.in.avail = 0 THEN
 								IF reader.res < 0 THEN
@@ -250,7 +252,7 @@ VAR
 	W2 : Streams.Writer;
 	W1 : Files.Writer;
 	buf : ARRAY  16384 OF CHAR;
-	read : LONGINT;
+	read : SIZE;
 BEGIN
 	ASSERT((in # NIL) & (out # NIL));
 	Files.OpenReader(R, in, 0);
@@ -276,7 +278,7 @@ VAR
 	R2 : Streams.Reader;
 	W : Files.Writer;
 	buf : ARRAY  16384 OF CHAR;
-	read : LONGINT;
+	read : SIZE;
 BEGIN
 	ASSERT((in # NIL) & (out # NIL));
 	Files.OpenReader(R1, in, 0);

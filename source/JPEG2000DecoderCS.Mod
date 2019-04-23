@@ -3754,7 +3754,7 @@ TYPE
 
 			PROCEDURE ReadBytes(VAR bytes : ARRAY OF CHAR; nbytes : LONGINT);
 				VAR
-					len, off : LONGINT;
+					len, off : SIZE;
 				BEGIN
 
 					IF buf8Valid THEN
@@ -4848,8 +4848,9 @@ TYPE
 
 			PROCEDURE ReadPPMSegment(VAR first, last : DataListElement; VAR nppmLeft, nppmRead : LONGINT) : BOOLEAN;
 				VAR
-				 	lppm, len, actLen, sPos, ePos, bytesLeft : LONGINT;
+				 	lppm, len, sPos, ePos, bytesLeft : LONGINT;
 				 	dummy, curElem, newElem : DataListElement;
+					actLen: SIZE;
 				 	zppm : CHAR;
 				BEGIN
 
@@ -4898,9 +4899,9 @@ TYPE
 
 						s.Bytes(curElem.data^, nppmRead, len, actLen);
 
-						INC(nppmRead, actLen);
-						DEC(nppmLeft, actLen);
-						DEC(bytesLeft, actLen);
+						INC(nppmRead, TODO(actLen));
+						DEC(nppmLeft, TODO(actLen));
+						DEC(bytesLeft, TODO(actLen));
 					END;
 
 					IF first = NIL THEN
@@ -4924,7 +4925,8 @@ TYPE
 
 			PROCEDURE ReadPPTSegment(VAR first, last : DataListElement) : BOOLEAN;
 				VAR
-				 	lppt, actLen, sPos, ePos, bytesLeft : LONGINT;
+				 	lppt, sPos, ePos, bytesLeft : LONGINT;
+					actLen: SIZE;
 				 	zppt : CHAR;
 				 	newElem : DataListElement;
 				BEGIN
@@ -4959,7 +4961,7 @@ TYPE
 
 					WHILE bytesLeft > 0 DO
 						s.Bytes(newElem.data^, 0, bytesLeft, actLen);
-						DEC(bytesLeft, actLen);
+						DEC(bytesLeft, TODO(actLen));
 					END;
 
 					ePos := s.Pos();

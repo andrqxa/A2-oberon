@@ -137,7 +137,7 @@ TYPE
 			dechunk: WebHTTP.ChunkedInStream;
 			lin : WebHTTP.LimitedInStream;
 			len: ARRAY 16 OF CHAR;
-			l:LONGINT;
+			l:SIZE;
 		BEGIN
 			requestHeader.maj := 1;
 			IF TRUE THEN requestHeader.min := 1 ELSE requestHeader.min := 0 END;
@@ -175,7 +175,7 @@ TYPE
 				WHILE length>0 DO
 					body.Bytes(buf, 0, MIN(LEN(buf),length), l);
 					w.Bytes(buf,0,l);
-					DEC(length,l);
+					DEC(length,TODO(l));
 				END;
 				w.Update();
 

@@ -107,7 +107,7 @@ TYPE
 	END Command;
 
 PROCEDURE GetPar(par: ANY; VAR p: CmdParameters; VAR w: Streams.Writer);
-VAR arg : Streams.StringReader; len : SIZE; length: TODO;
+VAR arg : Streams.StringReader; len, length : SIZE;
 BEGIN
 	p := NIL; w := NIL;
 	IF (par # NIL) & (par IS Commands.Context) & (par(Commands.Context).arg IS Streams.StringReader) THEN
@@ -397,7 +397,7 @@ BEGIN
 END execute;
 
 PROCEDURE Start*(context : Commands.Context);
-VAR msg: String; len: LONGINT; res: WORD; string : POINTER TO ARRAY OF CHAR;
+VAR msg: String; len: SIZE; res: WORD; string : POINTER TO ARRAY OF CHAR;
 BEGIN
 	IF (context.arg IS Streams.StringReader) & (context.arg.Available() > 0) THEN
 		NEW(string, context.arg.Available() +1);

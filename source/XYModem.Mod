@@ -95,7 +95,7 @@ TYPE
 		END YHeader;
 
 		PROCEDURE SendFile;
-		VAR fR: Files.Reader; len, blkn, blk, i, retry: LONGINT; start, ch: CHAR;
+		VAR fR: Files.Reader; len, blkn, blk, i, retry: LONGINT; length: SIZE; start, ch: CHAR;
 
 			PROCEDURE SendData;
 			VAR crc: LONGINT;
@@ -140,7 +140,7 @@ TYPE
 			REPEAT
 				IF retry = 0 THEN
 					IF (mode = XModem) OR (len < (1024-128)) THEN start := SOH; blkn := 128 END;
-					fR.Bytes(data, 0, blkn, i); DEC(len, blkn); INC(bytesProcessed, i);
+					fR.Bytes(data, 0, blkn, length); DEC(len, blkn); INC(bytesProcessed, TODO(length));
 					IF (fR.res # Streams.Ok) OR (i < blkn) THEN
 						WHILE i < blkn DO data[i] := EOF; INC(i) END
 					END
@@ -196,7 +196,7 @@ TYPE
 		VAR name: Files.FileName; fW: Files.Writer; len, blkn, i: LONGINT; ch, ch2: CHAR;
 
 			PROCEDURE ReceiveData(): BOOLEAN;
-			VAR len, crc, crcr: LONGINT;
+			VAR len: SIZE; crc, crcr: LONGINT;
 			BEGIN
 				R.Bytes(data, 0, blkn, len); fail := (R.res # Streams.Ok) OR (len # blkn);
 				IF ~fail THEN
@@ -341,7 +341,8 @@ CONST
 												VAR res: LONGINT
 												);
 	VAR
-		i, blockSize, n: LONGINT;
+		i, blockSize: LONGINT;
+		n: SIZE;
 		ch: CHAR;
 		blockNum, blockNumCheck: LONGINT;
 		crc, crcr: LONGINT;
@@ -442,7 +443,8 @@ CONST
 												);
 	VAR
 		ch: CHAR;
-		blockNum, blockSize, dataLen, n: LONGINT;
+		n: SIZE;
+		blockNum, blockSize, dataLen: LONGINT;
 		blockNum1, blockNum1Check: LONGINT;
 
 		data: ARRAY 1024 OF CHAR;

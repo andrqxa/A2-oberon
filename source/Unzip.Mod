@@ -19,9 +19,11 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 			VAR input: Streams.Reader; max: LONGINT;
 
 			PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
+			VAR length: SIZE;
 			BEGIN
 				IF min > max THEN min := max END;
-				input.Bytes(buf, ofs, min, len);
+				input.Bytes(buf, ofs, min, length);
+				len := TODO(length);
 				DEC(max, len); res := input.res;
 				IF (max = 0) & (res = Streams.Ok) THEN
 					res := Streams.EOF
@@ -82,7 +84,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 			END OpenReceiver;
 
 			PROCEDURE Extract*(entry: Entry; dest: Streams.Writer; VAR res: WORD);
-				VAR receiver : Streams.Receiver; R: Streams.Reader; buf: ARRAY 1024 OF CHAR; l: LONGINT; crc: CRC.CRC32Stream;
+				VAR receiver : Streams.Receiver; R: Streams.Reader; buf: ARRAY 1024 OF CHAR; l: SIZE; crc: CRC.CRC32Stream;
 			BEGIN
 				OpenReceiver(receiver, entry, res);
 				NEW(R, receiver, 1024);

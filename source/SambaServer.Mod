@@ -345,7 +345,7 @@ END HandleDeleteDir;
 
 PROCEDURE HandleEcho(c: Connection);
 VAR
-	i, len: LONGINT;
+	i: LONGINT; len: SIZE;
 	byteCount, echoCount: INTEGER;
 	buffer: ARRAY 32 OF CHAR;
 BEGIN
@@ -358,11 +358,11 @@ BEGIN
 
 	FOR i := 1 TO echoCount DO
 		(* SEND *)
-		c.netbios := 32 + 5 + SHORT(len);
+		c.netbios := 32 + 5 + INTEGER(len);
 		WriteSMBHeader(c);
 		c.out.Net8(1);	(* word count *)
 		c.out.RawInt(SHORT(i));
-		c.out.RawInt(SHORT(len));	(* bytecount *)
+		c.out.RawInt(INTEGER(len));	(* bytecount *)
 		c.out.Bytes(buffer, 0, len);
 		c.out.Update();
 	END;
@@ -401,7 +401,7 @@ END HandleTrans;
 PROCEDURE HandleRead(c: Connection);
 VAR
 	fidToRead, maxCount: INTEGER;
-	offset, len: LONGINT;
+	offset: LONGINT; len: SIZE;
 	f: Files.File;
 	r: Files.Reader;
 	buffer: ARRAY 65536 OF CHAR;
@@ -424,7 +424,7 @@ BEGIN
 	IF (f # NIL) THEN
 		Files.OpenReader(r, f, offset);
 		r.Bytes(buffer, 0, maxCount, len);
-		c.netbios := 32 + 27 + SHORT(len);
+		c.netbios := 32 + 27 + INTEGER(len);
 		WriteSMBHeader(c);
 		c.out.Net8(12);			(* word count *)
 		c.out.Net8(255);		(* andx *)
@@ -433,12 +433,12 @@ BEGIN
 		c.out.RawInt(-1);		(* remaining: reserved, must be -1 *)
 		c.out.RawInt(0); 		(* dataCompactionMode *)
 		c.out.RawInt(0); 		(* reserved *)
-		c.out.RawInt(SHORT(len));	(* low order length bytes *)
+		c.out.RawInt(INTEGER(len));	(* low order length bytes *)
 		c.out.RawInt(59);
 		c.out.RawLInt(0);		(* no write-large-capability -> datalengthhigh is 0 *)
 		c.out.RawInt(0);
 		c.out.RawLInt(0); 		(* 6 bytes reserved *)
-		c.out.RawInt(SHORT(len)); 	(* ByteCount *)
+		c.out.RawInt(INTEGER(len)); 	(* ByteCount *)
 
 		(* write data *)
 		c.out.Bytes(buffer, 0, len);
@@ -461,7 +461,7 @@ END HandleRead;
 PROCEDURE HandleWrite(c: Connection);
 VAR
 	fidToWrite, count : INTEGER;
-	offset, len: LONGINT; res: WORD;
+	offset: LONGINT; len: SIZE; res: WORD;
 	buffer: ARRAY 65536 OF CHAR;
 	filename: ARRAY 256 OF CHAR;
 	f: Files.File;
@@ -529,7 +529,7 @@ END HandleWrite;
 PROCEDURE HandleWriteAndX(c: Connection);
 VAR
 	fidToWrite, byteCount, dataOffset: INTEGER;
-	offset, len: LONGINT;
+	offset: LONGINT; len: SIZE;
 	f: Files.File;
 	w: Files.Writer;
 	buffer: ARRAY 65536 OF CHAR;
@@ -571,7 +571,7 @@ BEGIN
 		c.out.Net8(255);		(* andx *)
 		c.out.Net8(0);			(* reserved *)
 		c.out.Net16(0);			(* andx offset *)
-		c.out.RawInt(SHORT(len));	(* len written *)
+		c.out.RawInt(INTEGER(len));	(* len written *)
 		c.out.RawInt(-1);		(* remaining *)
 		c.out.RawInt(0);			(* count high *)
 		c.out.RawInt(0);			(* reserved *)
@@ -786,7 +786,7 @@ VAR
 	ucPwLen: INTEGER;
 	uniPass: ARRAY 256 OF CHAR;
 	username: ARRAY 256 OF CHAR;
-	i: LONGINT;
+	i: SIZE;
 BEGIN
 	IF Trace THEN KernelLog.String("Handle Session setup: "); KernelLog.Int(c.cmd, 0); KernelLog.Ln(); END;
 
@@ -838,8 +838,7 @@ END HandleSessionSetup;
 
 PROCEDURE HandleTreeConnect(c: Connection);
 VAR
-	i: LONGINT;
-	offset: SIZE;
+	i, offset: SIZE;
 	pwLen: INTEGER;
 	byteCount: INTEGER;
 	password: ARRAY 256 OF CHAR;

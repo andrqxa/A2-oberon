@@ -642,7 +642,7 @@ TYPE
 			f: Files.File;
 			scanner: OdXml.Scanner; parser: OdXml.Parser;
 			doc: XML.Document;
-			fr: Files.Reader; buf: ARRAY BufSize OF CHAR; read: LONGINT;
+			fr: Files.Reader; buf: ARRAY BufSize OF CHAR; read: SIZE;
 			xmlInName: ARRAY 16 OF CHAR;
 		BEGIN
 			(* Logfilename goes from XmlIn0.Log to XmlIn9.Log. *)
@@ -1457,8 +1457,8 @@ END li;
 PROCEDURE SendData*(src: Streams.Reader; dst: Streams.Writer);
 CONST Log = TRUE;
 	BufSize = 512; (* Smaller than PPP Payload. *)
-VAR len: LONGINT; buf: ARRAY BufSize OF CHAR;
-	sent: LONGINT; timer: Kernel.Timer;
+VAR len: SIZE; buf: ARRAY BufSize OF CHAR;
+	sent: SIZE; timer: Kernel.Timer;
 BEGIN
 	NEW(timer);
 	IF Log THEN log.Enter; log.String("SendData "); log.TimeStamp(); log.Exit; END;
@@ -1469,7 +1469,7 @@ BEGIN
 		sent := sent + len;
 		(*timer.Sleep(300);*) (* wtf *)
 	END;
-	IF Log THEN li("SendData ", sent); END;
+	IF Log THEN li("SendData ", TODO(sent)); END;
 END SendData;
 
 
@@ -1508,12 +1508,12 @@ PROCEDURE StoreResult2File * (VAR resHeader: WebHTTP.ResponseHeader; res: WORD;
 	out : Streams.Reader; CONST target: ARRAY OF CHAR; VAR f: Files.File);
 CONST
 	BufSize = 512;
-VAR read : LONGINT;
+VAR read, remain : SIZE;
 	timer: Kernel.Timer; slept: LONGINT;
 	r: Files.Rider;
 	buf : ARRAY BufSize OF CHAR;
 	dechunk: WebHTTP.ChunkedInStream; sequential: Streams.Reader;
-	chunkSize, remain: LONGINT; token: ARRAY 16 OF CHAR;
+	chunkSize: LONGINT; token: ARRAY 16 OF CHAR;
 BEGIN
 	f := NIL;
 	IF res = Ok THEN

@@ -468,7 +468,7 @@ VAR
 	command, parameters, paramString : Strings.String;
 	temp : Strings.String;
 	msg : ARRAY 128 OF CHAR;
-	cur, available, i, j, k: SIZE; length, res: WORD;
+	cur, available, i, j, k, length: SIZE; res: WORD;
 
 	PROCEDURE CreateContext(paramString : Strings.String) : Commands.Context;
 	VAR c : Commands.Context; arg : Streams.StringReader; dummy : ARRAY 1 OF CHAR;

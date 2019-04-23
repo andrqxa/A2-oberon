@@ -72,7 +72,7 @@ VAR
 		c: Certificate;
 		res: BOOLEAN;
 		root, segment, data: ASN1.Triplet;
-		length: LONGINT;
+		length: SIZE;
 		r: Streams.StringReader;
 		writer: Streams.Writer;
 	BEGIN
@@ -388,7 +388,7 @@ VAR
 		algo: POINTER TO ARRAY OF CHAR;
 		sequence, mod,exp: ASN1.Triplet;
 		sr: Streams.StringReader;
-		len0:LONGINT;
+		len0:SIZE;
 		modulus, exponent: CryptoBigNumbers.BigNumber;
 	BEGIN
 		algo := publicKey.child.child.svalue;

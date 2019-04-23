@@ -41,7 +41,7 @@ MODULE LPR; (* AUTHOR "ejz"; PURPOSE "RFC 1179" *)
 			writer: Streams.Writer;
 			fadr: IP.Adr;
 			locport: INTEGER;
-			connres: WORD; len : LONGINT;
+			connres: WORD; len : SIZE;
 			conn: TCP.Connection;
 			buf : ARRAY 10000 OF CHAR;
 	BEGIN

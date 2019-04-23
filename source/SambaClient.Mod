@@ -431,7 +431,7 @@ TYPE
 		VAR
 			check: BOOLEAN;
 			dataOff, byteCount, padding: INTEGER;
-			i : LONGINT;
+			i : SIZE;
 			adjLen, adjOff: INTEGER;
 			localKey: INTEGER;
 		BEGIN
@@ -506,10 +506,10 @@ TYPE
 				i := adjOff;
 
 				c.in.Bytes(x, ofs, byteCount, i);
-				ofs := ofs + i;
-				r.apos := r.apos + i;
+				ofs := ofs + TODO(i);
+				r.apos := r.apos + TODO(i);
 
-				r.res := r.res + adjLen - i;
+				r.res := r.res + adjLen - TODO(i);
 				len := len - adjLen;
 				adjOff := adjOff + adjLen;
 			END;

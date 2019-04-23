@@ -163,9 +163,10 @@ TYPE
 
 		PROCEDURE Loop;
 		VAR
-			packetLength, i, len : LONGINT;
+			packetLength, i : LONGINT;
 			packetType : ARRAY 5 OF CHAR;
 
+			len: SIZE;
 			x, dz, w, h : LONGINT;
 			keyId, keyMask, keyButton : LONGINT;
 

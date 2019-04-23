@@ -408,7 +408,7 @@ VAR
 	enumContext : Commands.Context;
 	arg : Streams.StringReader;
 	res : WORD;
-	ignore: LONGINT;
+	ignore: SIZE;
 BEGIN
 	NEW(options);
 	options.Add("s", "subdirectories", Options.Flag);

@@ -89,9 +89,11 @@ TYPE	EncryptingWriter* = OBJECT (Streams.Writer);
 		END Init;
 
 		PROCEDURE Receiver(VAR inBuf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
+		VAR length: SIZE;
 		BEGIN
 			ASSERT((size > 0) & (min <= size) & (min >= 0));
-			in.Bytes(inBuf, ofs, size, len);
+			in.Bytes(inBuf, ofs, size, length);
+			len:=TODO(length);
 			IF decrypt#NIL THEN decrypt(inBuf, ofs, len); END;
 			INC(received,len);
 			res:=in.res;
@@ -252,10 +254,12 @@ TYPE
 		END Init;
 
 		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
+		VAR length: SIZE;
 		BEGIN
 			ASSERT((size > 0) & (min <= size) & (min >= 0));
 			size := MAX(min,MIN(TODO(in.Available()),size));
-			in.Bytes(buf, ofs, size, len);
+			in.Bytes(buf, ofs, size, length);
+			len := TODO(length);
 			INC(received,len);
 			res:=in.res;
 			monitor.Bytes(buf, ofs, len);
@@ -316,11 +320,12 @@ TYPE
 		END Init;
 
 		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
-		VAR num:LONGINT;
+		VAR num:LONGINT; length: SIZE;
 		BEGIN
 			ASSERT(size >= 0);
 			IF (remain=0) THEN len:=0; res:=Streams.EOF; RETURN END;
-			in.Bytes(buf, ofs, MIN(remain,size), len);
+			in.Bytes(buf, ofs, MIN(remain,size), length);
+			len := TODO(length);
 			DEC(remain,len); INC(received,len);
 			res:=in.res;
 		END Receiver;
