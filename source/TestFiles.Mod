@@ -191,7 +191,7 @@ TYPE
 		PROCEDURE Assert(r : Streams.Reader; VAR error, parseError : BOOLEAN);
 		VAR variable : ARRAY 32 OF CHAR; index : LONGINT;
 
-			PROCEDURE CheckInteger(CONST name : ARRAY OF CHAR;  variable : LONGINT; r : Streams.Reader; VAR error, parseError : BOOLEAN);
+			PROCEDURE CheckInteger(CONST name : ARRAY OF CHAR;  variable : SIZE; r : Streams.Reader; VAR error, parseError : BOOLEAN);
 			VAR operator : ARRAY 4 OF CHAR; value : LONGINT;
 			BEGIN
 				r.SkipWhitespace; r.String(operator);
@@ -300,7 +300,7 @@ TYPE
 				ELSIF (variable = "byte") THEN
 					CheckChar(variable, byte, r, error, parseError);
 				ELSIF (variable = "readerBytesLength") THEN
-					CheckInteger(variable, TODO(readerBytesLength), r, error, parseError);
+					CheckInteger(variable, readerBytesLength, r, error, parseError);
 				ELSIF (variable = "buffer") THEN
 					CheckString(variable, buffer, r, error, parseError);
 				ELSIF Strings.Match("buffer*", variable) THEN
@@ -318,7 +318,7 @@ TYPE
 				ELSIF (variable = "File.Pos()") & CheckOpen(error) THEN
 					CheckInteger(variable, file.Pos(rider), r, error, parseError);
 				ELSIF (variable = "Reader.Available()") & CheckOpen(error) THEN
-					CheckInteger(variable, TODO(reader.Available()), r, error, parseError);
+					CheckInteger(variable, reader.Available(), r, error, parseError);
 				ELSIF (variable = "Reader.Pos()") & CheckOpen(error) THEN
 					CheckInteger(variable, reader.Pos(), r, error, parseError);
 				ELSE
