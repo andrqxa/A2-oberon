@@ -48,12 +48,12 @@ TYPE
 			PROCEDURE Verify*( CONST digest: ARRAY OF CHAR;  dlen: LONGINT;  signature: Number ): BOOLEAN;
 			VAR
 				msg: Number;
-				i, l: LONGINT;
+				i, l: SIZE;
 				buf: Buffer;
 			BEGIN
 				ASSERT(  ~private & (dlen >= 16) );
 				msg := B.ModExp( signature, exponent, modulus );
-				l := TODO(msg.len);
+				l := msg.len;
 				FOR i := 0 TO 3 DO  l2n( msg.d[l - 1 - i], buf, 4*i )  END;
 				FOR i := 0 TO 15 DO
 					IF buf[i] # digest[i] THEN  RETURN FALSE  END;
@@ -85,8 +85,8 @@ VAR
 
 
 	(* converts LONGINT to ARRAY OF CHAR; big endian order *)
-	PROCEDURE l2n( l: UNSIGNED32;  VAR buf: Buffer;  pos: LONGINT );
-	VAR i: LONGINT;
+	PROCEDURE l2n( l: UNSIGNED32;  VAR buf: Buffer;  pos: SIZE );
+	VAR i: SIZE;
 	BEGIN
 		i := pos + 3;
 		WHILE i >= pos DO
