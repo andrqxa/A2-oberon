@@ -181,11 +181,11 @@ END FindStringRaw;
 
 PROCEDURE SearchPatternRaw*(r : Streams.Reader; w: Streams.Writer; CONST pattern: ARRAY OF CHAR);
 VAR
-	d : ARRAY 256 OF LONGINT;
+	d : ARRAY 256 OF SIZE;
 	cb : Strings.String;
-	pos, cpos, i, j, k, m, shift : LONGINT;
+	pos, cpos, i, j, k, m, shift : SIZE;
 BEGIN
-	m := TODO(Strings.Length(pattern));
+	m := Strings.Length(pattern);
 	NEW(cb, m);
 	WHILE (r.res = 0 ) & (cpos < m) DO
 		cb[cpos] := r.Get();
