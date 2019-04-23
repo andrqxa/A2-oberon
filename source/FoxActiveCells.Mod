@@ -774,7 +774,7 @@ TYPE
 		PROCEDURE NewChannel*(): Channel;
 		VAR channel: Channel; name: Name;
 		BEGIN
-			name := "@Channel"; Basic.AppendNumber(name,TODO(channels.Length()));
+			name := "@Channel"; Basic.AppendNumber(name,channels.Length());
 			NEW(channel,name,SELF);
 			channels.AddChannel(channel);
 			symbols.AddSymbol(channel);

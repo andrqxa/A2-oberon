@@ -1004,7 +1004,7 @@ VAR
 		SetErrorMessage(n,err);
 	END SetErrorExpected;
 
-	PROCEDURE AppendNumber*(VAR s: ARRAY OF CHAR; num: LONGINT);
+	PROCEDURE AppendNumber*(VAR s: ARRAY OF CHAR; num: HUGEINT);
 	VAR nums: ARRAY 32 OF CHAR;
 	BEGIN
 		Strings.IntToStr(num,nums);
