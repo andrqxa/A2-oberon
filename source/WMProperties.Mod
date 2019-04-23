@@ -2241,7 +2241,7 @@ TYPE
 		END HasProperty;
 
 		PROCEDURE GetPropertyValue*(CONST name : ARRAY OF CHAR; VAR value : ARRAY OF CHAR) : BOOLEAN;
-		VAR i : LONGINT; n : String; vs : Streams.StringWriter; len : LONGINT;
+		VAR i : LONGINT; n : String; vs : Streams.StringWriter; len : SIZE;
 		BEGIN
 			AcquireRead;
 			i := 0;

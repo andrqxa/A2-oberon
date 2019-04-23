@@ -437,8 +437,8 @@ TYPE
 		END Get;
 
 	(** Return the contents of the string writer (not 0X-terminated).  The len parameters returns the string length. *)
-		PROCEDURE GetRaw*( VAR s: ARRAY OF CHAR;  VAR len: LONGINT );
-		VAR i, m: LONGINT;
+		PROCEDURE GetRaw*( VAR s: ARRAY OF CHAR;  VAR len: SIZE );
+		VAR i, m: SIZE;
 		BEGIN
 			m := LEN( s );  i := 0;
 			WHILE (i # tail) & (i < m) DO s[i] := buf[i];  INC( i ) END;

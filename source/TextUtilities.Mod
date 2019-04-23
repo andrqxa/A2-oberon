@@ -647,6 +647,7 @@ TYPE
 		VAR r: Texts.TextReader;
 			ch :Char32;
 			startPos, i, len, tempInt : LONGINT;
+			length: SIZE;
 		BEGIN
 			(* define Oberon colors *)
 			oberonColors[0] := LONGINT(0FFFFFFFFH); oberonColors[1] := LONGINT(0FF0000FFH); oberonColors[2] := 000FF00FFH; oberonColors[3] := 00000FFFFH;
@@ -702,8 +703,8 @@ TYPE
 
 			(* write string to output stream *)
 			NEW(string, text.GetLength()+hLen);
-			w2.GetRaw(string^, len);
-			out.Bytes(string^, 0, len); out.Update;
+			w2.GetRaw(string^, length);
+			out.Bytes(string^, 0, length); out.Update;
 
 			text.ReleaseRead;
 			res := 0
