@@ -169,7 +169,7 @@ END Assign;
 PROCEDURE Extract*(CONST src: ARRAY OF CHAR; idx, num: SIZE; VAR dst: ARRAY OF CHAR);
 VAR i, j: SIZE; ch: CHAR;
 BEGIN
-	i := OffsetOfIndex(src, TODO(idx)); j := 0;
+	i := OffsetOfIndex(src, idx); j := 0;
 	LOOP	(* copy characters *)
 		ch := src[i];
 		IF (ch = 0X) OR (j = LEN(dst)) THEN EXIT END;
