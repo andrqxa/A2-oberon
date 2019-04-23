@@ -190,7 +190,7 @@ TYPE
 						END
 					END;
 					crc32 := Zlib.CRC32(crc32, buf, ofs, size - s.out.avail);
-					len := size - s.out.avail
+					len := TODO(size - s.out.avail);
 				END;
 
 			END;
