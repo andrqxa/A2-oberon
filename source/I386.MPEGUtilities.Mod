@@ -531,7 +531,7 @@ TYPE
 		(* Read four bytes from the stream and write it to the buffer *)
 		PROCEDURE ReadLongintFromStream;
 		VAR
-			read: LONGINT;
+			read: SIZE;
 
 		BEGIN
 			IF eof THEN RETURN END;

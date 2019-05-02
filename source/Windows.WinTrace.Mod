@@ -32,14 +32,14 @@ END SendError;
 
 
 (* Receiver to be used with Stream.Reader *)
-PROCEDURE Receive* (VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
+PROCEDURE Receive* (VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 VAR b: Kernel32.BOOL; tlen: LONGINT;
 BEGIN
-	len := 0;
-	b := Kernel32.ReadFile (hin, buf[ofs], size, len, NIL);
-	DEC(size, len);
+	tlen := 0;
+	b := Kernel32.ReadFile (hin, buf[ofs], TODO(size), tlen, NIL);
+	len := tlen; DEC(size, len);
 	WHILE (len < min) DO
-		b := Kernel32.ReadFile (hin, buf[ofs], size, tlen, NIL);
+		b := Kernel32.ReadFile (hin, buf[ofs], TODO(size), tlen, NIL);
 		INC(len, tlen);
 		DEC(size, tlen);
 	END;

@@ -183,10 +183,10 @@ TYPE
 							REPEAT
 								INC(retries);
 								LogEnter(3); Log(3, TFTPId); Log(3, "sending block "); LogInt(3, blockNr);
-								Log(3, " ("); LogInt(3, BlockSize-r.res); Log(3, " bytes) ");
+								Log(3, " ("); LogInt(3, BlockSize-TODO(r.res)); Log(3, " bytes) ");
 								IF (retries > 1) THEN Log(3, "(retry "); LogInt(3, retries); Log(3, ")") END;
 								LogExit(3);
-								socket.Send(fip, fport, buf, 0, 4 + BlockSize - r.res, res);
+								socket.Send(fip, fport, buf, 0, 4 + BlockSize - TODO(r.res), res);
 								acked := ReceiveAck(socket, fip, fport, blockNr, ack)
 							UNTIL acked OR (retries > MaxRetries);
 						END;

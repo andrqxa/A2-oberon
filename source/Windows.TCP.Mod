@@ -165,7 +165,7 @@ TYPE
 		END Send;
 
 	(** Receive data on a TCP connection. The data parameter specifies the buffer. The ofs parameters specify the position in the buffer where data should be received (usually 0), and the size parameters specifies how many bytes of data can be received in the buffer. The min parameter specifies the minimum number of bytes to receive before Receive returns and must by <= size. The len parameter returns the number of bytes received, and the res parameter returns 0 if ok, or a non-zero error code otherwise (e.g. if the connection is closed by the communication partner, or by a call of the Close method). *)
-		PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
+		PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
 		VAR ret: LONGINT;
 		BEGIN
 			ASSERT ( (ofs >= 0) & (ofs + size <= LEN( data )) & (min <= size) );
@@ -185,7 +185,7 @@ TYPE
 			END;
 
 			REPEAT
-				ret := WSock32.recv( socket, data[ofs], size, {} );
+				ret := WSock32.recv( socket, data[ofs], TODO(size), {} );
 				IF ret > 0 THEN INC( len, ret ); INC(ofs, ret); DEC(size, ret); END;
 			UNTIL (size <= 0) OR (len >= min) OR (ret <= 0);
 

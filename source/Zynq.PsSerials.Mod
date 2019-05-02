@@ -75,7 +75,7 @@ TYPE
 			Machine.ReleaseObject(recvLocked);
 		END ReceiveChar;
 
-		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
+		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		BEGIN
 			Machine.AcquireObject(recvLocked);
 			PsUart.Receive(uart, buf, ofs, size, min, len, BusyLoopCallback, res);

@@ -367,7 +367,7 @@ TYPE
 		END Read;
 
 		(** read len bytes from a file. **)
-		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR src, dst: ADDRESS; m, errorcode: LONGINT; buf: Buffer;
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN
@@ -384,7 +384,7 @@ TYPE
 						EXIT;
 					END ;
 					src := ADDRESSOF(buf.data.B[0]) + r.bpos;
-					m := r.bpos + len;
+					m := r.bpos + TODO(len);
 					IF m <= buf.lim THEN
 						SYSTEM.MOVE(src, dst, len);
 						r.bpos := m;
@@ -757,13 +757,13 @@ END CheckTmp;
 
 (** Read Buf - reads a buffer from a file f into buf **)
 PROCEDURE ReadBuf(f: File; buf: Buffer; pos: LONGINT; VAR errorcode: LONGINT);
-VAR fsCasted: FileSystem; received: LONGINT;
+VAR fsCasted: FileSystem; received: SIZE;
 BEGIN
 	fsCasted := f.fs(FileSystem);
 	fsCasted.stubs.Read(f.key, pos*BufSize, BufSize, buf.data.B, 0, received, errorcode);
 	IF errorcode = Ok THEN
 		IF pos < f.aleng THEN
-			buf.lim := received;
+			buf.lim := TODO(received);
 		ELSE
 			buf.lim := f.bleng;
 		END;
@@ -784,7 +784,7 @@ BEGIN
 		fsCasted.stubs.Read(f.key, pos*BufSize, BufSize, buf.data.B, 0, received, errorcode);
 		IF errorcode = Ok THEN
 			IF pos < f.aleng THEN
-				buf.lim := received;
+				buf.lim := TODO(received);
 			ELSE
 				buf.lim := f.bleng;
 			END;

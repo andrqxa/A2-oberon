@@ -517,8 +517,8 @@ TYPE
 			END
 		END Read;
 
-		PROCEDURE ReadBytes*( VAR r: Files.Rider;  VAR x: ARRAY OF CHAR;  ofs, len: LONGINT );
-		VAR pos, n: LONGINT;
+		PROCEDURE ReadBytes*( VAR r: Files.Rider;  VAR x: ARRAY OF CHAR;  ofs, len: SIZE );
+		VAR pos, n: SIZE;
 		BEGIN {EXCLUSIVE}
 			ASSERT( (ofs + len) <= LEN( x ) );
 			pos := r.apos * BufferSize + r.bpos;
@@ -529,7 +529,7 @@ TYPE
 					IF n > len THEN n := len END;
 					SYSTEM.MOVE( ADDRESSOF( buffer.data[r.bpos] ), ADDRESSOF( x[ofs] ), n );
 					INC( pos, n );  INC( ofs, n );  DEC( len, n );
-					r.apos := pos DIV BufferSize;  r.bpos := pos MOD BufferSize;
+					r.apos := TODO(pos) DIV BufferSize;  r.bpos := TODO(pos) MOD BufferSize;
 				ELSE
 					pos := fsize;
 				END;

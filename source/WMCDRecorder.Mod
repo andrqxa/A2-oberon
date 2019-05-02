@@ -828,7 +828,7 @@ TYPE
 						Files.SplitPath(writeStatus.fileName^, path, filename);
 						burnPanel.SetCaption0(Strings.NewString(filename));
 					END;
-					burnPanel.progress0.SetPos(writeStatus.bytesWritten DIV 1024);
+					burnPanel.progress0.SetPos(TODO(writeStatus.bytesWritten) DIV 1024);
 				END;
 			END;
 		END StatusChanged;

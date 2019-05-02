@@ -99,7 +99,7 @@ IMPORT
 		VAR
 			bufAdr: LONGINT;
 			r : Streams.Reader;
-			chunkSize*: LONGINT;	(* Bytes in actual AVI Chunk *)
+			chunkSize*: SIZE;	(* Bytes in actual AVI Chunk *)
 			streamHeader: AVIStreamHeader;
 			stuffByte*: LONGINT;
 			eof*: BOOLEAN;	(* End of File *)
@@ -143,6 +143,7 @@ IMPORT
 		PROCEDURE  ReadNextChunk(VAR buf:  ARRAY OF CHAR);
 		VAR
 			tempBuf: ARRAY 4 OF CHAR;
+			length: SIZE;
 			len: LONGINT;
 			done: BOOLEAN;
 		BEGIN
@@ -157,7 +158,7 @@ IMPORT
 			END;
 
 			REPEAT
-				r.Bytes(tempBuf, 0, 4, len );
+				r.Bytes(tempBuf, 0, 4, length );
 				IF r.res = Streams.Ok THEN
 					r.RawLInt(len);
 					stuffByte := len MOD 2;
@@ -218,7 +219,7 @@ IMPORT
 			Reset;
 		END SetAVIPos;
 
-		PROCEDURE Bytes*(VAR x: ARRAY OF CHAR; ofs, size: SIZE; VAR len: LONGINT);
+		PROCEDURE Bytes*(VAR x: ARRAY OF CHAR; ofs, size: SIZE; VAR len: SIZE);
 		VAR
 			min: LONGINT; res: WORD;
 		BEGIN
@@ -305,7 +306,7 @@ IMPORT
 		PROCEDURE ReadHeader*(): BOOLEAN;
 		VAR
 			buf : ARRAY 8 OF CHAR;
-			len: LONGINT;
+			len: SIZE;
 			done: BOOLEAN;
 			headerLength: LONGINT;
 			headerBeginPos: LONGINT;
@@ -466,7 +467,7 @@ IMPORT
 			i: LONGINT;
 			pos: LONGINT;
 			length: LONGINT;
-			len: LONGINT;
+			len: SIZE;
 			temp: LONGINT;
 			nai: LONGINT;
 			nvi: LONGINT;
@@ -648,7 +649,7 @@ IMPORT
 			header: AVIStreamHeader;
 			headerLength: LONGINT;
 			startPos: LONGINT;
-			len: LONGINT;
+			len: SIZE;
 			temp: INTEGER;
 		BEGIN
 			NEW(header);
@@ -1075,7 +1076,7 @@ IMPORT
 
 		END GetInfo;
 
-		PROCEDURE GetData*(streamNr: LONGINT;  VAR buf:  ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: LONGINT; VAR res: WORD);
+		PROCEDURE GetData*(streamNr: LONGINT;  VAR buf:  ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		VAR
 			rres: BOOLEAN;
 		BEGIN

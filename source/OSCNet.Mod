@@ -360,7 +360,7 @@ TYPE
 
 	PROCEDURE ReceiveTCP(client: TCP.Connection; VAR p: OSC.OSCPacket): WORD;
 	VAR
-		res: WORD; len: LONGINT;
+		res: WORD; len: SIZE;
 		buffer: POINTER TO ARRAY OF CHAR;
 		sizebuf: ARRAY 4 OF CHAR;
 		packetsize: LONGINT;

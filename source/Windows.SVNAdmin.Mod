@@ -585,7 +585,7 @@ TYPE
 		PROCEDURE ReadWriteRest*;
 		VAR
 			tmp : ARRAY 256 OF CHAR;
-			len : LONGINT;
+			len : SIZE;
 		BEGIN
 			REPEAT
 				r.Bytes ( tmp, 0, LEN(tmp), len );
@@ -760,7 +760,7 @@ TYPE
 		key = "svn:wc:ra_dav:version-url";
 	VAR
 		tmp,fstr,fstr2 : ARRAY 256 OF CHAR;
-		read, len, i : LONGINT; res: WORD;
+		read, len: SIZE; i : LONGINT; res: WORD;
 		keyLength: SIZE;
 		fr, fw : Files.File;
 		r : Files.Reader;

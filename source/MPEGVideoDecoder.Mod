@@ -1921,7 +1921,7 @@ TYPE
 	MPEGDemultiplexer* = OBJECT(Codec.AVDemultiplexer);
 	VAR
 		input: Streams.Reader;
-		bytesRead: LONGINT;
+		bytesRead: SIZE;
 		streams: ARRAY 64 OF POINTER TO StreamType;
 		nextStreamNr: LONGINT;
 		singleStream: BOOLEAN;	(* TRUE if there is just one unpacked (video) stream -> no need  to demux *)
@@ -2151,10 +2151,10 @@ TYPE
 		END GetStreamInfo;
 
 		(* read data from streamNr, store it into buffer buf starting at offset ofs, store size bytes if possible, block if not read min bytes at least. Return number of read bytes in len and return code res *)
-		PROCEDURE GetData*(streamNr : LONGINT; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: LONGINT; VAR res: WORD);
+		PROCEDURE GetData*(streamNr : LONGINT; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		VAR
 			cur: POINTER TO StreamType;
-			length: LONGINT;
+			length: SIZE;
 			offset: LONGINT;
 
 		BEGIN

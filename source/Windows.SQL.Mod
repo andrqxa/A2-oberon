@@ -619,7 +619,7 @@ BEGIN
 			ELSIF cur IS FileField THEN
 				cnt:= 0; cur(FileField).f.Set(r, 0);
 				REPEAT INC(cnt);
-					cur(FileField).f.ReadBytes(r, buffer, 0, BlockSize); ODBC.PutData(s.hstmt, buffer, BlockSize-r.res, s.res);
+					cur(FileField).f.ReadBytes(r, buffer, 0, BlockSize); ODBC.PutData(s.hstmt, buffer, BlockSize-TODO(r.res), s.res);
 					IF s.res < 0 THEN RETURN END;
 					(* Out.Int(cnt, 5); Out.Int(BlockSize-r.res, 5); Out.Ln; Out.String(buffer); *)
 				UNTIL r.eof;

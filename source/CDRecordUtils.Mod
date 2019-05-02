@@ -46,7 +46,7 @@ TYPE
 
 		PROCEDURE Open*(filename : Strings.String): LONGINT;
 		VAR
-			bytesRead: LONGINT;
+			bytesRead: SIZE;
 			file: Files.File;
 			r: Files.Reader;
 			buf: ARRAY 8 OF CHAR;
@@ -125,7 +125,8 @@ TYPE
 
 		PROCEDURE GetNextFrame(r: Files.Reader; VAR frame: Frame): LONGINT;
 		VAR
-			n, start, bytesRead, tmp: LONGINT;
+			n, start, tmp: LONGINT;
+			bytesRead: SIZE;
 			chr: CHAR;
 			buf : ARRAY 4 OF CHAR;
 
@@ -682,7 +683,7 @@ VAR
 	file: Files.File;
 	r: Files.Reader;
 	id, buf: ARRAY 128 OF CHAR;
-	len, bytesRead: LONGINT;
+	len: LONGINT; bytesRead: SIZE;
 BEGIN
 	file := Files.Old(filename^);
 	IF file = NIL THEN
@@ -871,7 +872,7 @@ BEGIN
 	RETURN FALSE;
 END IsOnSameController;
 
-PROCEDURE ClearBuffer*(VAR buf: ARRAY OF CHAR; ofs, len: LONGINT);
+PROCEDURE ClearBuffer*(VAR buf: ARRAY OF CHAR; ofs, len: SIZE);
 VAR
 	adr: ADDRESS;
 	rem: SIZE;

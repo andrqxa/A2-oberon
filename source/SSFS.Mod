@@ -688,8 +688,8 @@ TYPE
 		(** Read a sequence of len bytes into the buffer x at offset ofs, advancing the Rider.
 		Less bytes will be read when reading over the end of the file.
 		r.res indicates the number of unread bytes. x must be big enough to hold all the bytes. *)
-		PROCEDURE ReadBytes*(VAR r:  Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: LONGINT);
-		VAR dnode : Dnode; dataLeft, nofBytes, pos, res : LONGINT; eof : BOOLEAN;
+		PROCEDURE ReadBytes*(VAR r:  Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+		VAR dnode : Dnode; dataLeft, pos, res : LONGINT; nofBytes: SIZE; eof : BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			ASSERT(r.file = SELF);
 			ASSERT(LEN(x) >= ofs + len); (* buffer big enough *)
@@ -720,7 +720,7 @@ TYPE
 
 						len := len - nofBytes;
 						ofs := ofs + len;
-						r.apos := (r.apos + nofBytes) MOD BlockSize;
+						r.apos := (r.apos + TODO(nofBytes)) MOD BlockSize;
 						IF (nofBytes = dataLeft) THEN
 							r.bpos := r.bpos + 1; (* rider positioned at next dnode now *)
 						END;

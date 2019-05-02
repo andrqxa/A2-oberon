@@ -931,7 +931,8 @@ TYPE
 
 		PROCEDURE Open*(filename: Strings.String): LONGINT;
 		VAR
-			ofs, bytesRead, total: LONGINT;
+			ofs, total: LONGINT;
+			bytesRead: SIZE;
 			file: Files.File;
 			r: Files.Reader;
 			buf: ARRAY SectorSize OF CHAR;
@@ -1199,7 +1200,7 @@ TYPE
 			VAR
 				file: Files.File;
 				r: Files.Reader;
-				bytesRead, i: LONGINT;
+				bytesRead: SIZE; i: LONGINT;
 				buf: POINTER TO ARRAY OF CHAR;
 				table: PartitionTable;
 			BEGIN
@@ -1318,7 +1319,7 @@ TYPE
 	WritingStatus* = OBJECT(Utils.Status);
 	VAR
 		fileName*: String;
-		bytesWritten*: LONGINT;
+		bytesWritten*: SIZE;
 	END WritingStatus;
 
 VAR
@@ -1388,7 +1389,7 @@ VAR
 	file: Files.File;
 	r: Files.Reader;
 	buf: ARRAY 1024 OF CHAR;
-	bytesRead, res: LONGINT;
+	bytesRead: SIZE; res: WORD;
 BEGIN
 	res := ErrFileNotFound;
 	status.fileName := Strings.NewString(pathname);

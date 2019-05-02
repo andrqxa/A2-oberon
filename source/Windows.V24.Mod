@@ -162,7 +162,7 @@ TYPE
 		Wait until at least min bytes (possibly zero) are available.
 			res is non-zero on error. *)
 
-		PROCEDURE Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD);
+		PROCEDURE Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD);
 		VAR i, l, read, ret: LONGINT;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + size );
@@ -174,7 +174,7 @@ TYPE
 				(* blocking read of the minimally required amount of data *)
 				IF min > 0 THEN
 					read := 0;
-					ret := Kernel32.ReadFile( handle, buf[ofs], min, read, rOverlapped );
+					ret := Kernel32.ReadFile( handle, buf[ofs], TODO(min), read, rOverlapped );
 					IF ret = Kernel32.False THEN
 						ret := Kernel32.GetOverlappedResult(handle,rOverlapped,read,Kernel32.True);
 					END;
@@ -185,7 +185,7 @@ TYPE
 				END;
 
 				(* Non-blocking read of available data *)
-				l := MIN(size,TODO(Available()));
+				l := TODO(MIN(size,Available()));
 				IF l > 0 THEN
 					read := 0;
 					ret := Kernel32.ReadFile( handle, buf[ofs], l, read, rOverlapped );
