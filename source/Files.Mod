@@ -416,7 +416,7 @@ TYPE
 
 		(** Return the current length of a file. *)
 
-		PROCEDURE Length*(): LONGINT;
+		PROCEDURE Length*(): Position;
 		BEGIN HALT(301) END Length;	(* abstract *)
 
 		(** Return the time (t) and date (d) when a file was last modified. *)
