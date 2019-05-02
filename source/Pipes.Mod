@@ -11,12 +11,12 @@ TYPE
 		(** A pipe is a bounded buffer that can be used as an Streams Reader and Writer.  Everything sent to the sink can be read from the source. *)
 	Pipe* = OBJECT
 		VAR
-			head, num: LONGINT;
+			head, num: SIZE;
 			buffer: POINTER TO ARRAY OF CHAR;
 			closed: BOOLEAN;
 
 		(** return the number of bytes that can be read without blocking *)
-		PROCEDURE Available*() : LONGINT;
+		PROCEDURE Available*() : SIZE;
 		BEGIN
 			RETURN num
 		END Available;
@@ -39,8 +39,6 @@ TYPE
 		END Send;
 
 		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
-		VAR
-			t, ti: LONGINT;
 		BEGIN
 			ASSERT((size > 0) & (min <= size) & (min >= 0));
 			len := 0;
@@ -59,7 +57,7 @@ TYPE
 			END
 		END Receive;
 
-		PROCEDURE &Init*(size: LONGINT);
+		PROCEDURE &Init*(size: SIZE);
 		BEGIN
 			head := 0; num := 0;
 			IF (buffer = NIL) OR (LEN(buffer) # size) THEN
@@ -83,7 +81,6 @@ TYPE ReadDecoupler*= OBJECT
 	VAR
 		pipe: Pipe;
 		inputReceiver: Receiver;
-		numR: LONGINT;
 		smallbuf: ARRAY[128] OF CHAR;
 		len: LONGINT;
 		res: WORD;
