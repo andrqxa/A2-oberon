@@ -808,7 +808,7 @@ END SplitEPRT;
 
 
 PROCEDURE BinaryTransfer(r: Streams.Reader;  w: Streams.Writer);
-VAR buf: ARRAY BufSize OF CHAR; len: LONGINT;
+VAR buf: ARRAY BufSize OF CHAR; len: SIZE;
 BEGIN
 	REPEAT
 		r.Bytes(buf, 0, BufSize, len); w.Bytes(buf, 0, len);
@@ -817,7 +817,7 @@ BEGIN
 END BinaryTransfer;
 
 PROCEDURE ASCIITransfer(r: Streams.Reader; w: Streams.Writer);
-VAR buf: ARRAY BufSize OF CHAR; i, len: LONGINT; c: CHAR;
+VAR buf: ARRAY BufSize OF CHAR; i, len: SIZE; c: CHAR;
 BEGIN
 	REPEAT
 		r.Bytes(buf, 0, BufSize, len);
