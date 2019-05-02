@@ -106,7 +106,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 			END Extract;
 
 			PROCEDURE &New*(F: Files.File; VAR res: WORD);
-				VAR R: Files.Reader; r, e: Entry; pos, sig, l, j: LONGINT; i: INTEGER;
+				VAR R: Files.Reader; r, e: Entry; pos: Files.Position; sig, l, j: LONGINT; i: INTEGER;
 			BEGIN
 				res := Streams.Ok; SELF.F := NIL; root := NIL; entries := 0;
 				pos := F.Length()-20; sig := 0;
@@ -119,7 +119,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 				R.RawInt(i); R.RawInt(i);
 				R.RawInt(i); entries := i;
 				R.RawInt(i); R.RawLInt(l);
-				R.RawLInt(pos);
+				R.RawLInt(j); pos := i;
 				IF R.res # Streams.Ok THEN res := R.res END;
 				IF (pos < 0) OR (pos >= F.Length()) THEN res := Streams.FormatError; RETURN END;
 				Files.OpenReader(R, F, pos);

@@ -375,7 +375,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE LoadLibrary(buf: Strings.Buffer; pos:LONGINT; VARflen:LONGINT);
+		PROCEDURE LoadLibrary(buf: Strings.Buffer; pos: Streams.Position; VARflen:LONGINT);
 		END LoadLibrary;
 
 		PROCEDURE IndexToColor(index: LONGINT): LONGINT;
@@ -386,7 +386,7 @@ TYPE
 					ASH(SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, index) * {0..1}), 7-1)
 		END IndexToColor;
 
-		PROCEDURE InsertPiece(ofs, len : LONGINT; attr : Texts.Attributes);
+		PROCEDURE InsertPiece(ofs: Streams.Position; len : LONGINT; attr : Texts.Attributes);
 		VAR i, j, m : LONGINT; ch, last : CHAR; tempUCS32 : ARRAY 1024 OF Char32;
 			oldpos : LONGINT;
 		BEGIN
@@ -412,7 +412,6 @@ TYPE
 		CONST DocBlockId = 0F7X; OldTextBlockId = 1X; TextBlockId = 0F0X; OldTextSpex = 0F0X; TextSpex = 1X; LibBlockId = 0DBX;
 		VAR
 			ch: CHAR;
-			tempInt : LONGINT;
 			buflen: SIZE;
 
 			attr : Texts.Attributes;
@@ -422,7 +421,8 @@ TYPE
 			voff: SHORTINT;
 			lib :SHORTINT;
 			type, tag: CHAR;
-			len, flen, n, off, hlen, tlen, pos, templen: LONGINT;
+			len, flen, n, hlen, tlen, templen: LONGINT;
+			tempInt, off, pos: Streams.Position;
 			x, y, w, h: INTEGER;
 			temp: ARRAY 4096 OF CHAR;
 			name, lName: ARRAY 32 OF CHAR;
@@ -646,7 +646,8 @@ TYPE
 		CONST TextBlockId = 0F0X;
 		VAR r: Texts.TextReader;
 			ch :Char32;
-			startPos, i, len, tempInt : LONGINT;
+			startPos, i, len : LONGINT;
+			tempInt: Streams.Position;
 			length: SIZE;
 		BEGIN
 			(* define Oberon colors *)

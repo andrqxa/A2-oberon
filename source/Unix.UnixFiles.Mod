@@ -640,7 +640,7 @@ TYPE
 
 
 				PROCEDURE Read*( VAR r: Files.Rider;  VAR x: CHAR );
-				VAR offset: LONGINT;  buf: Buffer;
+				VAR offset: Files.Position;  buf: Buffer;
 				BEGIN  {EXCLUSIVE}
 					buf := r.hint(Buffer);  offset := r.bpos;
 					IF r.apos # buf.org THEN
@@ -681,7 +681,7 @@ TYPE
 
 
 				PROCEDURE Write*( VAR r: Files.Rider;  x: CHAR );
-				VAR buf: Buffer;  offset: LONGINT;
+				VAR buf: Buffer;  offset: Files.Position;
 				BEGIN  {EXCLUSIVE}
 					buf := r.hint(Buffer);  offset := r.bpos;
 					IF (r.apos # buf.org) OR (offset >= Bufsize) THEN
@@ -694,7 +694,7 @@ TYPE
 				END Write;
 
 				PROCEDURE WriteBytes*( VAR r: Files.Rider;  CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
-				VAR xpos, min, restInBuf: SIZE; offset: TODO;  buf: Buffer;
+				VAR xpos, min, restInBuf: SIZE; offset: Files.Position; buf: Buffer;
 				BEGIN  {EXCLUSIVE}
 					xpos := ofs;  buf := r.hint(Buffer);  offset := r.bpos;
 					WHILE len > 0 DO
@@ -715,9 +715,9 @@ TYPE
 				END WriteBytes;
 
 
-				PROCEDURE Length*( ): LONGINT;
+				PROCEDURE Length*( ): Files.Position;
 				BEGIN
-					RETURN LONGINT(fsize)
+					RETURN TODO(fsize)
 				END Length;
 
 
