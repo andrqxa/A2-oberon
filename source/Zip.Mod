@@ -693,9 +693,9 @@ BEGIN
 END OpenReader;
 
 (** read len bytes of uncompressed data into buf[offset] and return number of bytes actually read; Reader must be opened **)
-PROCEDURE ReadBytes*(r: Reader; VAR buf: ARRAY OF CHAR; offset, len: LONGINT; VAR read: LONGINT);
+PROCEDURE ReadBytes*(r: Reader; VAR buf: ARRAY OF CHAR; offset, len: SIZE; VAR read: SIZE);
 VAR
-	bufp: POINTER TO ARRAY OF CHAR; i: LONGINT;
+	bufp: POINTER TO ARRAY OF CHAR; i: SIZE;
 BEGIN
 	IF r.open THEN
 		IF r IS UncompReader THEN
@@ -722,7 +722,7 @@ END ReadBytes;
 (** read decompressed byte **)
 PROCEDURE Read*(r: Reader; VAR ch: CHAR);
 VAR
-	buf: ARRAY 1 OF CHAR; read: LONGINT;
+	buf: ARRAY 1 OF CHAR; read: SIZE;
 BEGIN
 	ReadBytes(r, buf, 0, 1, read);
 	ch := buf[0];

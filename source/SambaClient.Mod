@@ -428,7 +428,7 @@ TYPE
 
 		(** Read a sequence of len bytes into the buffer x at offset ofs, advancing the Rider. Less bytes will be read when reading over the end of the file. r.res indicates the number of unread bytes. x must be big enough to hold all the bytes. *)
 
-		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR
 			check: BOOLEAN;
 			dataOff, byteCount, padding: INTEGER;
@@ -459,7 +459,7 @@ TYPE
 	 			IF len > RWLimit THEN
 	 				adjLen := RWLimit;
 	 			ELSE
-	 				adjLen := SHORT(len);
+	 				adjLen := INTEGER(len);
 	 			END;
 
 			 	(* SEND *)

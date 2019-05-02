@@ -203,8 +203,8 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				END
 			END Read;
 
-			PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: LONGINT);
-			VAR m, pos: LONGINT; src: ADDRESS; buf: Buffer;
+			PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+			VAR m: SIZE; pos: LONGINT; src: ADDRESS; buf: Buffer;
 			BEGIN {EXCLUSIVE}
 				IF LEN(x) < len THEN SYSTEM.HALT(19) END;
 				IF len <= 0 THEN RETURN END;
@@ -217,7 +217,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 					src := ADDRESSOF(buf.data[pos]);  m := buf.lim-pos;
 					IF m > len THEN m := len END;
 					SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), m);
-					DEC(len, m); INC(ofs, m); INC(r.apos, m);
+					DEC(len, m); INC(ofs, m); INC(r.apos, TODO(m));
 				END;
 				r.hint := buf
 			END ReadBytes;

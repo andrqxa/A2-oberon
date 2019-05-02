@@ -889,8 +889,8 @@ TYPE
 			END
 		END Read;
 
-		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: LONGINT);
-		VAR src, dst: ADDRESS; m: LONGINT; buf: Buffer;
+		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+		VAR src, dst: ADDRESS; m: SIZE; buf: Buffer;
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
 			IF len > 0 THEN
@@ -901,7 +901,7 @@ TYPE
 					IF len <= 0 THEN EXIT END ;
 					src := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + len;
 					IF m <= buf.lim THEN
-						SYSTEM.MOVE(src, dst, len); r.bpos := m; r.res := 0; EXIT
+						SYSTEM.MOVE(src, dst, len); r.bpos := TODO(m); r.res := 0; EXIT
 					ELSIF buf.lim = SS THEN
 						m := buf.lim - r.bpos;
 						IF m > 0 THEN SYSTEM.MOVE(src, dst, m); INC(dst, m); DEC(len, m) END ;

@@ -3711,7 +3711,7 @@ END GetVars;
 (* Write the specified file to the device, starting at block pos. *)
 PROCEDURE WriteFile(f: Files.File; dev: AosDisks.Device; pos: LONGINT; VAR sum: LONGINT; VAR res: WORD);
 CONST Size = 32;
-VAR buf: ARRAY Size*BS OF CHAR; r: Files.Rider; n, num: LONGINT;
+VAR buf: ARRAY Size*BS OF CHAR; r: Files.Rider; n, num: SIZE;
 BEGIN
 	ASSERT(dev.blockSize = BS);
 	f.Set(r, 0); num := (f.Length()+BS-1) DIV BS; sum := 0;
@@ -3721,9 +3721,9 @@ BEGIN
 		n := Size*BS - r.res;
 		WHILE n MOD BS # 0 DO buf[n] := 0X; INC(n) END;
 		ASSERT((n > 0) & (n <= num*BS));
-		dev.Transfer(AosDisks.Write, pos, n DIV BS, buf, 0, res);
+		dev.Transfer(AosDisks.Write, pos, TODO(n) DIV BS, buf, 0, res);
 		IF res # AosDisks.Ok THEN EXIT END;
-		DEC(num, n DIV BS); INC(pos, n DIV BS);
+		DEC(num, n DIV BS); INC(pos, TODO(n) DIV BS);
 		REPEAT DEC(n); sum := (sum + ORD(buf[n])) MOD 100H UNTIL n = 0
 	END;
 	sum := (-sum) MOD 100H
@@ -3731,7 +3731,7 @@ END WriteFile;
 
 PROCEDURE CheckFile(f: Files.File; dev: AosDisks.Device; pos: LONGINT; sum: LONGINT; VAR res: WORD);
 CONST Size = 32;
-VAR buf1, buf2: ARRAY Size*BS OF CHAR; r: Files.Rider; n, num, i: LONGINT;
+VAR buf1, buf2: ARRAY Size*BS OF CHAR; r: Files.Rider; n, num, i: SIZE;
 BEGIN
 	ASSERT(dev.blockSize = BS);
 	f.Set(r, 0); num := (f.Length()+BS-1) DIV BS;
@@ -3741,14 +3741,14 @@ BEGIN
 		n := Size*BS - r.res;
 		WHILE n MOD BS # 0 DO buf1[n] := 0X; INC(n) END;
 		ASSERT((n > 0) & (n <= num*BS));
-		dev.Transfer(AosDisks.Read, pos, n DIV BS, buf2, 0, res);
+		dev.Transfer(AosDisks.Read, pos, TODO(n) DIV BS, buf2, 0, res);
 		IF res # AosDisks.Ok THEN EXIT END;
 		i := 0;
 		WHILE i # n DO
 			IF buf1[i] # buf2[i] THEN res := CoreMismatch; EXIT END;
 			INC(i)
 		END;
-		DEC(num, n DIV BS); INC(pos, n DIV BS);
+		DEC(num, n DIV BS); INC(pos, TODO(n) DIV BS);
 		REPEAT DEC(n); sum := (sum + ORD(buf2[n])) MOD 100H UNTIL n = 0
 	END;
 	IF (res = AosDisks.Ok) & (sum # 0) THEN res := CoreChecksumError END;

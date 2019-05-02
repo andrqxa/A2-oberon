@@ -85,7 +85,7 @@ MODULE ZipFS; (** AUTHOR "ejz"; PURPOSE "mount a zipped file as a file-system"; 
 				F.Read(r, x)
 			END Read;
 
-			PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: LONGINT);
+			PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 			BEGIN
 				F.ReadBytes(r, x, ofs, len)
 			END ReadBytes;

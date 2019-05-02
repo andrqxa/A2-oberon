@@ -657,8 +657,8 @@ TYPE
 					END
 				END Read;
 
-				PROCEDURE ReadBytes*( VAR r: Files.Rider;  VAR x: ARRAY OF CHAR;  ofs, len: LONGINT );
-				VAR xpos, offset, restInBuf: SIZE;  min: LONGINT;  buf: Buffer;
+				PROCEDURE ReadBytes*( VAR r: Files.Rider;  VAR x: ARRAY OF CHAR;  ofs, len: SIZE );
+				VAR xpos, offset, restInBuf, min: SIZE;  buf: Buffer;
 				BEGIN  {EXCLUSIVE}
 					x[ofs] := 0X;  xpos := ofs;
 					buf := r.hint(Buffer);  offset := r.bpos;

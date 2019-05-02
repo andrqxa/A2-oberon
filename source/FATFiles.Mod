@@ -782,12 +782,12 @@ TYPE
 
 		(* Read a sequence of len bytes into the buffer x at offset ofs, advancing the Rider. Less bytes will be read when
 			reading over the end of the file. r.res indicates the number of unread bytes. x must be big enough to hold all the bytes. *)
-		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 		BEGIN {EXCLUSIVE} ReadBytesX(r, x, ofs, len)
 		END ReadBytes;
 
-		PROCEDURE ReadBytesX(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: LONGINT);
-		VAR src: ADDRESS; m: LONGINT;
+		PROCEDURE ReadBytesX(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
+		VAR src: ADDRESS; m: SIZE;
 		BEGIN
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
 			IF len > 0 THEN
@@ -797,7 +797,7 @@ TYPE
 					m := MIN(MIN(size - Pos(r), clusterSize - r.bpos), len);
 					SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), m);
 					INC(ofs, m); DEC(len, m);
-					INC(r.bpos, m); ASSERT(r.bpos <= clusterSize);
+					INC(r.bpos, TODO(m)); ASSERT(r.bpos <= clusterSize);
 					IF (r.bpos = clusterSize) THEN INC(r.apos); r.bpos := 0 END;
 				END;
 				r.res := len; r.eof := Pos(r) = size
@@ -1552,7 +1552,7 @@ TYPE
 						FOR i := 2 TO (dir.clusterSize DIV 32)-1 DO dir.WriteBytes(r, entry, 0, 32) END;
 
 						dir.Update;
-						res := r.res
+						res := TODO(r.res);
 					ELSE dir := NIL	(* res is already set *)
 					END
 				ELSE

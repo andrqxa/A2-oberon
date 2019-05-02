@@ -69,7 +69,7 @@ TYPE
 	Rider* = RECORD	(** not shareable between multiple processes *)
 		(* the rider must be a record, otherwise the Oberon text system will not work *)
 		eof*: BOOLEAN;	(** has end of file been passed *)
-		res*: LONGINT;	(** leftover byte count for ReadBytes/WriteBytes *)
+		res*: SIZE;	(** leftover byte count for ReadBytes/WriteBytes *)
 			(** private fields for implementors *)
 		apos*, bpos*: LONGINT;
 		hint*: Hint;
@@ -401,7 +401,7 @@ TYPE
 
 		(** Read a sequence of len bytes into the buffer x at offset ofs, advancing the Rider. Less bytes will be read when reading over the end of the file. r.res indicates the number of unread bytes. x must be big enough to hold all the bytes. *)
 
-		PROCEDURE ReadBytes*(VAR r: Rider; VAR x: ARRAY OF CHAR; ofs, len: LONGINT);
+		PROCEDURE ReadBytes*(VAR r: Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 		BEGIN HALT(301) END ReadBytes;	(* abstract *)
 
 		(** Write a byte into the file at the Rider position, advancing the Rider by one. *)
