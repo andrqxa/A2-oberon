@@ -100,7 +100,7 @@ BEGIN
 	REPEAT
 		ures := Read( ADDRESSOF (data[ofs]), size );
 		IF ures > 0 THEN
-			INC( ofs, LONGINT(ures) );  DEC( size, LONGINT(ures) );  INC( len, LONGINT(ures) )
+			INC( ofs, TODO(ures) );  DEC( size, TODO(ures) );  INC( len, TODO(ures) )
 		END;
 		IF ures < 0 THEN err := Unix.errno() END;
 	UNTIL (len >= min) OR ((ures <= 0) & (err # Unix.EINTR) & (err # 0));
