@@ -169,7 +169,8 @@ TYPE
 			check, endOfSearch, findFirst: BOOLEAN;
 			byteCount, dataOff, paraOff, eos: INTEGER;
 			fileFlags : SET;
-			attr, curPos, nextEntryOff, progress: LONGINT; maskLen: SIZE;
+			curPos: Files.Position;
+			attr, nextEntryOff, progress: LONGINT; maskLen: SIZE;
 			t: ARRAY 2 OF LONGINT;
 			ch: ARRAY 2 OF CHAR;
 			dt: Dates.DateTime;
@@ -403,7 +404,7 @@ TYPE
 
 		(** Position a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file. A Rider cannot be positioned beyond the end of a file. *)
 
-		PROCEDURE Set*(VAR r: Files.Rider; pos: LONGINT);
+		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
 		BEGIN
 			r.apos := pos;
 			r.file := SELF;
@@ -411,7 +412,7 @@ TYPE
 
 		(** Return the offset of a Rider positioned on a file. *)
 
-		PROCEDURE Pos*(VAR r: Files.Rider): LONGINT;
+		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
 		BEGIN
 			RETURN r.apos;
 		END Pos;

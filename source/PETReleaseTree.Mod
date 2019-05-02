@@ -97,7 +97,7 @@ TYPE
 			node := NewNode(packageNode, GetCaption("ArchiveSrc: ", package.source));
 		END AddPackage;
 
-		PROCEDURE SetNodeInfo(node : PETTrees.TreeNode; position : LONGINT);
+		PROCEDURE SetNodeInfo(node : PETTrees.TreeNode; position : Streams.Position);
 		BEGIN
 			ASSERT(node # NIL);
 			IF (position >= 0) THEN

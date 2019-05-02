@@ -2860,7 +2860,8 @@ TYPE
 			*)
 			PROCEDURE GetCodeBlocks* (VAR cblocks : ARRAY OF J2KU.CodedCblk; VAR cblockInfos: ARRAY OF J2KU.CblkInfo; ncblocks : LONGINT) : LONGINT;
 				VAR
-					i, startPos, cblkDecLvl : LONGINT;
+					i, cblkDecLvl : LONGINT;
+					startPos: Streams.Position;
 					ok : BOOLEAN;
 				BEGIN
 
@@ -3300,7 +3301,8 @@ TYPE
 			*)
 			PROCEDURE JumpToTilePartEnd () : LONGINT;
 				VAR
-					bytesSkipped, startPos : LONGINT;
+					bytesSkipped : LONGINT;
+					startPos: Streams.Position;
 					ok : BOOLEAN;
 				BEGIN
 					bytesSkipped := 0;
@@ -3869,7 +3871,8 @@ TYPE
 
 			PROCEDURE ReadSOTSegment() : BOOLEAN;
 				VAR
-					lsot, psot, sPos, ePos, comp, i : LONGINT;
+					lsot, psot, comp, i : LONGINT;
+					sPos, ePos: Streams.Position;
 					ncod, nqcd, npoc, nmax : LONGINT; (* Counter variables used for constraint checking *)
 					ncoc, nqcc, nrgn : J2KU.LongIntArrayPtr;
 					tileIdx, partIdx, nparts, ncomp, nt : LONGINT;
@@ -4148,7 +4151,8 @@ TYPE
 
 			PROCEDURE ReadSIZSegment(VAR imgInfo : ImageInfo) : BOOLEAN;
 				VAR
-					rsiz, lsiz, i, ssizInt, sPos, ePos : LONGINT;
+					rsiz, lsiz, i, ssizInt : LONGINT;
+					sPos, ePos: Streams.Position;
 					ssiz, ch : CHAR;
 				BEGIN
 				(*
@@ -4242,8 +4246,9 @@ TYPE
 
 			PROCEDURE ReadCODSegment (VAR cod : CodingStyle; VAR cics : CICodingStyle) : BOOLEAN;
 				VAR
-					lcod, nl, i, scodInt, cblsInt, precsizInt, sPos, ePos : LONGINT;
+					lcod, nl, i, scodInt, cblsInt, precsizInt: LONGINT;
 					scod, prog, mct, ndec, cblw, cblh, cbls, trans, precsiz: CHAR;
+					sPos, ePos: Streams.Position;
 					tmpCod : CodingStyle;
 					tmpCics : CICodingStyle;
 				BEGIN
@@ -4364,9 +4369,9 @@ TYPE
 
 			PROCEDURE ReadCOCSegment(VAR coc : CodingStyle; VAR comp : LONGINT) : BOOLEAN;
 				VAR
-					lcoc, ccoc, i, scocInt, cblsInt, precsizInt, sPos, ePos, ncomp : LONGINT;
+					lcoc, ccoc, i, scocInt, cblsInt, precsizInt, ncomp : LONGINT;
 					ccocByte, scoc, ndec, cblw, cblh, cbls, trans, precsiz: CHAR;
-					tmpCoc : CodingStyle;
+					tmpCoc : CodingStyle; sPos, ePos: Streams.Position;
 				BEGIN
 				(*
 					IF s.Available() < 9 THEN
@@ -4474,7 +4479,8 @@ TYPE
 
 			PROCEDURE ReadRGNSegment(VAR roiShift, comp : LONGINT) : BOOLEAN;
 				VAR
-					lrgn, crgn, sPos, ePos, ncomp : LONGINT;
+					lrgn, crgn, ncomp : LONGINT;
+					sPos, ePos: Streams.Position;
 					crgnByte, srgn, sprgn : CHAR;
 				BEGIN
 				(*
@@ -4533,7 +4539,8 @@ TYPE
 
 			PROCEDURE ReadQCDSegment(VAR quant : Quantization) : BOOLEAN;
 				VAR
-					lqcd, ssize, i, sqcdInt, sPos, ePos : LONGINT;
+					lqcd, ssize, i, sqcdInt : LONGINT;
+					sPos, ePos: Streams.Position;
 					sqcd, ch : CHAR;
 					tmp : Quantization;
 				BEGIN
@@ -4608,7 +4615,8 @@ TYPE
 
 			PROCEDURE ReadQCCSegment(VAR quant : Quantization; VAR comp : LONGINT) : BOOLEAN;
 				VAR
-					lqcc, ssize, i, sqccInt, cqcc, cqccLen, sPos, ePos, ncomp : LONGINT;
+					lqcc, ssize, i, sqccInt, cqcc, cqccLen, ncomp : LONGINT;
+					sPos, ePos: Streams.Position;
 					sqcc, cqccByte, ch : CHAR;
 					tmp : Quantization;
 				BEGIN
@@ -4701,7 +4709,8 @@ TYPE
 
 			PROCEDURE ReadPOCSegment(VAR changes : 	ProgChangeArrayPtr) : BOOLEAN;
 				VAR
-					nchanges, lpoc, i, sPos, ePos : LONGINT;
+					nchanges, lpoc, i : LONGINT;
+					sPos, ePos: Streams.Position;
 					rspoc, repoc, cspocByte, cepocByte, ppoc : CHAR;
 					twoBytes : BOOLEAN;
 				BEGIN
@@ -4848,8 +4857,9 @@ TYPE
 
 			PROCEDURE ReadPPMSegment(VAR first, last : DataListElement; VAR nppmLeft, nppmRead : LONGINT) : BOOLEAN;
 				VAR
-				 	lppm, len, sPos, ePos, bytesLeft : LONGINT;
+				 	lppm, len, bytesLeft : LONGINT;
 				 	dummy, curElem, newElem : DataListElement;
+					sPos, ePos: Streams.Position;
 					actLen: SIZE;
 				 	zppm : CHAR;
 				BEGIN
@@ -4925,7 +4935,8 @@ TYPE
 
 			PROCEDURE ReadPPTSegment(VAR first, last : DataListElement) : BOOLEAN;
 				VAR
-				 	lppt, sPos, ePos, bytesLeft : LONGINT;
+				 	lppt, bytesLeft : LONGINT;
+					sPos, ePos: Streams.Position;
 					actLen: SIZE;
 				 	zppt : CHAR;
 				 	newElem : DataListElement;
@@ -5418,7 +5429,8 @@ TYPE
 			*)
 			PROCEDURE GetCodeBlocks* (VAR cblocks : ARRAY OF J2KU.CodedCblk; VAR cblockInfos : ARRAY OF J2KU.CblkInfo; ncblocks : LONGINT) : LONGINT;
 				VAR
-					i, j, startPos, tmpCblkInBuf, cblkDecLvl, subbIdx, cblkSubbIdx : LONGINT;
+					i, j, tmpCblkInBuf, cblkDecLvl, subbIdx, cblkSubbIdx : LONGINT;
+					startPos: Streams.Position;
 					ok, deliver : BOOLEAN;
 				BEGIN
 

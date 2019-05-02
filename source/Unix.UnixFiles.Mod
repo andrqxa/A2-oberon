@@ -522,7 +522,7 @@ TYPE
 				mtime: HUGEINT;
 				fsize, fpos: SIZE;
 				bufs: ARRAY NBufs OF Buffer;
-				swapper, state: LONGINT;
+				swapper: SIZE; state: LONGINT;
 
 
 				PROCEDURE & Init( fs: Files.FileSystem );
@@ -583,8 +583,8 @@ TYPE
 					SetX( r, pos )
 				END Set;
 
-				PROCEDURE SetX( VAR r: Files.Rider;  p: LONGINT );
-				VAR  org, offset, i: LONGINT;  n: SIZE;  buf: Buffer;
+				PROCEDURE SetX( VAR r: Files.Rider;  p: Files.Position );
+				VAR  org, offset: Files.Position; i, n: SIZE;  buf: Buffer;
 				BEGIN
 					r.file := SELF;  r.fs := fs;
 					IF p > fsize THEN  p := LONGINT(fsize)

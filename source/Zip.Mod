@@ -62,7 +62,7 @@ TYPE
 		support: SHORTINT;
 		dataDescriptor: BOOLEAN;	(* if set, data descriptor after (compressed) file data *)
 		offsetLocal: LONGINT;	(* offset of file header in central directory *)
-		offsetFileData: LONGINT;	(* offset of (compressed) file data *)
+		offsetFileData: Files.Position;	(* offset of (compressed) file data *)
 		offsetCentralDir: LONGINT;	(* offset of local file header *)
 		next: Entry
 	END;
@@ -72,7 +72,7 @@ TYPE
 		nofEntries-: INTEGER;	(** total number of files stored in the zipfile **)
 		comment-: POINTER TO ARRAY OF CHAR;	(** comment for zipfile **)
 		file-: Files.File;	(* pointer to the according zip-file *)
-		offset: LONGINT;	(* offset of end of central dir record *)
+		offset: Files.Position;	(* offset of end of central dir record *)
 		firstEntry, lastEntry: Entry	(* first and last Entry of Archive *)
 	END;
 

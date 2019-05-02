@@ -847,8 +847,8 @@ TYPE
 			ext: SuperIndex;
 			sec: SectorTable;
 
-		PROCEDURE Set*(VAR r: Files.Rider; pos: LONGINT);
-		VAR a, b: LONGINT;
+		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
+		VAR a, b: Files.Position;
 		BEGIN {EXCLUSIVE}
 			r.eof := FALSE; r.res := 0; r.file := SELF; r.fs := fs;
 			IF pos < 0 THEN
@@ -861,7 +861,7 @@ TYPE
 			r.apos := a; r.bpos := b; r.hint := firstbuf
 		END Set;
 
-		PROCEDURE Pos*(VAR r: Files.Rider): LONGINT;
+		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
 		BEGIN
 			RETURN r.apos*SS + r.bpos - HS
 		END Pos;

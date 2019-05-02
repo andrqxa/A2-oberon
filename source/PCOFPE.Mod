@@ -243,7 +243,8 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 		END Section;
 
 		BaseReloc = POINTER TO RECORD
-			ofs: LONGINT; base: Section;
+			ofs: Streams.Position;
+			base: Section;
 			next: BaseReloc
 		END;
 
@@ -259,7 +260,8 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 		END;
 
 		ImportReloc = POINTER TO RECORD
-			ofs: LONGINT; obj: ImportObj;
+			ofs: Streams.Position;
+			obj: ImportObj;
 			next: ImportReloc;
 			iat, abs, uofs: BOOLEAN
 		END;
@@ -622,7 +624,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 			END AddExport;
 
 			PROCEDURE ExportType(W: SectionWriter; t: PCT.Struct);
-				VAR sym: PCOM.Struct; p: PCT.Proc; v: PCT.Variable; count, pos, bak: LONGINT;
+				VAR sym: PCOM.Struct; p: PCT.Proc; v: PCT.Variable; count: LONGINT; pos, bak: Streams.Position;
 			BEGIN
 				WHILE (t IS PCT.Pointer) OR (t IS PCT.Array) DO
 					IF t IS PCT.Pointer THEN t := t(PCT.Pointer).base ELSE t := t(PCT.Array).base END
@@ -756,7 +758,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 			END CheckExport;
 
 			PROCEDURE Exports;
-				VAR W: SectionWriter; i, pos: LONGINT;
+				VAR W: SectionWriter; i: Streams.Position; pos: LONGINT;
 			BEGIN
 				TypeAlign4(); desc.exports := type.used;
 				NEW(explist, 256); exppos := 0; explen := 256;
@@ -1188,7 +1190,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 			END GenStub;
 
 			PROCEDURE GenIData(base: LONGINT);
-				VAR W: SectionWriter; p, mod: ImportMod; obj: ImportObj; sect: Section; r: ImportReloc; i, j, ofs: LONGINT;
+				VAR W: SectionWriter; p, mod: ImportMod; obj: ImportObj; sect: Section; r: ImportReloc; i, j: LONGINT; ofs: Streams.Position;
 			BEGIN
 				IF name # Loader THEN
 					p := NIL; mod := imports;
@@ -1282,7 +1284,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 			END GenIData;
 
 			PROCEDURE GenEData(base: LONGINT);
-				VAR W: SectionWriter; dir: ImageExportDirectory; e: ExportObj; fix, i, n: LONGINT;
+				VAR W: SectionWriter; dir: ImageExportDirectory; e: ExportObj; fix: Streams.Position; i, n: LONGINT;
 			BEGIN
 				edata.head.VirtualAddress := base;
 				optHdr.DataDirectory[ImageDirectoryEntryExport].VirtualAddress := base;
@@ -1336,7 +1338,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				optHdr.DataDirectory[ImageDirectoryEntryExport].Size := edata.used
 			END GenEData;
 
-			PROCEDURE BeginBlock(W: SectionWriter; adr: LONGINT; VAR blockva, blocksize, blockfix: LONGINT);
+			PROCEDURE BeginBlock(W: SectionWriter; adr: LONGINT; VAR blockva, blocksize: LONGINT; VAR blockfix: Streams.Position);
 			BEGIN
 				blockva := adr - (adr MOD PageSize); blocksize := 8;
 				W.RawLInt(blockva);
@@ -1344,8 +1346,8 @@ ASSERT(code.data[offset-1] # 0E8X);
 				W.RawLInt(blocksize)
 			END BeginBlock;
 
-			PROCEDURE EndBlock(W: SectionWriter; blockfix: LONGINT; VAR blocksize: LONGINT);
-				VAR ofs: LONGINT;
+			PROCEDURE EndBlock(W: SectionWriter; blockfix: Streams.Position; VAR blocksize: LONGINT);
+				VAR ofs: Streams.Position;
 			BEGIN
 				W.RawInt(0); INC(blocksize, 2);
 				IF (blocksize MOD 4) # 0 THEN
@@ -1378,7 +1380,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 			PROCEDURE GenReloc(base: LONGINT);
 				VAR
 					W: SectionWriter; sect: Section; r: BaseReloc;
-					blockva, blocksize, blockfix, bak, x: LONGINT;
+					blockva, blocksize, bak, x: LONGINT; blockfix: Streams.Position;
 			BEGIN
 				reloc.head.VirtualAddress := base;
 				optHdr.DataDirectory[ImageDirectoryEntryBasereloc].VirtualAddress := base;
@@ -1675,7 +1677,7 @@ KernelLog.String("PCOFPE "); KernelLog.String(file);
 		RETURN now.second + 60*(now.minute - Clock.tz + 60*(now.hour + 24*days))
 	END TimeDateStamp;
 
-	PROCEDURE AddOfsReloc(sect: Section; ofs: LONGINT; base: Section);
+	PROCEDURE AddOfsReloc(sect: Section; ofs: Streams.Position; base: Section);
 		(* value at sect:ofs must be relocated to base + value *)
 		VAR p, r, n: BaseReloc;
 	BEGIN
@@ -1705,7 +1707,7 @@ KernelLog.String("PCOFPE "); KernelLog.String(file);
 		END
 	END AddImportObj;
 
-	PROCEDURE AddImportReloc(sect: Section; offset: LONGINT; obj: ImportObj; iat, abs, ofs: BOOLEAN);
+	PROCEDURE AddImportReloc(sect: Section; offset: Streams.Position; obj: ImportObj; iat, abs, ofs: BOOLEAN);
 		(*
 			value at sect:ofs must be fixed up to iat[obj]
 			iat = TRUE	iat relative

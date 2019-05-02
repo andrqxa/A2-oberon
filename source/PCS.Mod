@@ -667,7 +667,7 @@ TYPE
 		oldBuf := newBuf;
 	END ExpandBuf;
 
-	PROCEDURE InitWithReader*(r: Streams.Reader; size, pos: LONGINT): Scanner;
+	PROCEDURE InitWithReader*(r: Streams.Reader; size: SIZE; pos: Streams.Position): Scanner;
 		VAR buffer: Buffer; read: SIZE;
 	BEGIN
 		NEW(buffer, size);

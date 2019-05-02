@@ -134,7 +134,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 			nofbufs: INTEGER;
 			firstbuf: Buffer;
 
-			PROCEDURE Set*(VAR r: Files.Rider; pos: LONGINT);
+			PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
 			BEGIN {EXCLUSIVE}
 				r.eof := FALSE; r.res := 0; r.file := SELF; r.fs := fs;
 				IF (pos < 0) THEN r.apos := 0
@@ -144,7 +144,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				r.hint := firstbuf
 			END Set;
 
-			PROCEDURE Pos*(VAR r: Files.Rider): LONGINT;
+			PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
 			BEGIN {EXCLUSIVE}
 				RETURN r.apos
 			END Pos;

@@ -1170,7 +1170,7 @@ TYPE
 		assemblinker: Linker;
 		error, result, parsed: BOOLEAN;
 		options:Options.Options;
-		position: LONGINT;
+		position: Streams.Position;
 		moduleName: SyntaxTree.IdentifierString;
 
 		PROCEDURE Error(CONST error: ARRAY OF CHAR);
@@ -1346,7 +1346,7 @@ TYPE
 		name, typeName, instanceName: Files.FileName;
 		result, parsed: BOOLEAN;
 		options:Options.Options;
-		position: LONGINT;
+		position: Streams.Position;
 		extension: SyntaxTree.IdentifierString;
 		linker: Linker;
 

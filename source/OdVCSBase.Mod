@@ -428,9 +428,10 @@ BEGIN
 END GetNewestVersion;
 
 (* get position of diff from version n to n-1 *)
-PROCEDURE GetDiffPos(fr: Files.Rider; f: Files.File; n: LONGINT): LONGINT;
+PROCEDURE GetDiffPos(fr: Files.Rider; f: Files.File; n: LONGINT): Files.Position;
 VAR
-	diffPos,  nextDiffPos, len, diffLen, version: LONGINT;
+	diffPos, nextDiffPos: Files.Position;
+	len, diffLen, version: LONGINT;
 	tag: CHAR;
 	df: Files.File;
 	dfr: Files.Rider;
@@ -481,7 +482,8 @@ END Init;
 PROCEDURE GetLog*(name: TFileName; n: LONGINT; VAR log: TLog);
 
 VAR
-	diffLen, diffStart, num: LONGINT;
+	diffLen, num: LONGINT;
+	diffStart: Files.Position;
 	textLen: LONGINT;
 	dFileName: TFileName;
 	df: Files.File;
@@ -565,7 +567,8 @@ END GetLog;
 PROCEDURE GetDelta*(name: TFileName; n: LONGINT; VAR df: Files.File;
 	VAR dr: Files.Rider);
 VAR
-	diffStart, diffLen, version: LONGINT;
+	diffStart: Files.Position;
+	diffLen, version: LONGINT;
 	dFileName: TFileName;
 	log: TLog;
 	tag: CHAR; num: LONGINT;

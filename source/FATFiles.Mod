@@ -643,7 +643,7 @@ TYPE
 		BEGIN {EXCLUSIVE} SetX(r, pos)
 		END Set;
 
-		PROCEDURE SetX(VAR r: Files.Rider; pos: LONGINT);
+		PROCEDURE SetX(VAR r: Files.Rider; pos: Files.Position);
 		BEGIN
 			r.eof := FALSE; r.res := 0; r.file := SELF; r.fs := fs;
 			IF (pos < 0) THEN pos := 0
@@ -1103,7 +1103,7 @@ TYPE
 
 		(* Position a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file.
 			A Rider cannot be positioned beyond the end of a file. *)
-		PROCEDURE SetX(VAR r: Files.Rider; pos: LONGINT);
+		PROCEDURE SetX(VAR r: Files.Rider; pos: Files.Position);
 		BEGIN
 			IF (size = 0) THEN InitSize END;
 			SetX^(r, pos)

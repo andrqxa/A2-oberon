@@ -992,7 +992,7 @@ TYPE
 			sec: SectorTable;
 
 		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
-		VAR a, b: LONGINT;
+		VAR a, b: Files.Position;
 		BEGIN {EXCLUSIVE}
 			r.eof := FALSE; r.res := 0; r.file := SELF; r.fs := fs;
 			IF pos < 0 THEN

@@ -1406,7 +1406,7 @@ TYPE
 
 		PROCEDURE Open*(in: Streams.Reader; VAR res: WORD);
 		VAR
-			tmp: LONGINT;
+			tmp: Streams.Position;
 		BEGIN
 			SELF.s := in;
 

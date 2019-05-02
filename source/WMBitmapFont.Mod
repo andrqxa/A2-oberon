@@ -295,7 +295,7 @@ TYPE
 
 		PROCEDURE Save(filename : ARRAY OF CHAR);
 		VAR w : Files.Rider; i, j, c: LONGINT; f : Files.File;
-				buf : ARRAY 1024 OF CHAR; fixup, pos : LONGINT;
+				buf : ARRAY 1024 OF CHAR; fixup: Files.Position; pos : LONGINT;
 		BEGIN
 			f := Files.New(filename);f.Set(w, 0);
 			(* write number of ranges *)

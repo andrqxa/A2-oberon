@@ -209,7 +209,7 @@ IMPORT
 	BEGIN  R.sym.RawLReal(r)  END SymWLReal;
 
 
-	PROCEDURE ObjWGetPos*(VAR R: Rider; VAR pos: LONGINT);
+	PROCEDURE ObjWGetPos*(VAR R: Rider; VAR pos: Files.Position);
 	BEGIN pos := R.obj.Pos()
 	END ObjWGetPos;
 
@@ -238,7 +238,7 @@ IMPORT
 	BEGIN R.obj.RawLInt(i)
 	END ObjWLInt;
 
-	PROCEDURE ObjWLIntAt*(VAR R: Rider; pos: LONGINT; i: LONGINT);
+	PROCEDURE ObjWLIntAt*(VAR R: Rider; pos: Files.Position; i: LONGINT);
 		VAR w: Files.Writer;
 	BEGIN
 		R.obj.Update;
@@ -315,7 +315,7 @@ IMPORT
 		Files.Register(R.objF)
 	END CloseObj;
 
-	PROCEDURE RefSize*(VAR R: Rider): LONGINT;
+	PROCEDURE RefSize*(VAR R: Rider): Files.Position;
 	BEGIN  RETURN R.ref.Pos()
 	END RefSize;
 

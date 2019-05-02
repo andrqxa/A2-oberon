@@ -607,7 +607,7 @@ TYPE
 
 		PROCEDURE Write(w : Streams.Writer);
 		VAR cur : Object;
-			lastXRefPos : LONGINT;
+			lastXRefPos : Streams.Position;
 			trailDict : Dictionary;
 		BEGIN
 			(* header *)

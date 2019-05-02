@@ -366,7 +366,7 @@ TYPE
 		END EndRuntimeCall;
 
 		PROCEDURE Trace (expression: SyntaxTree.Expression);
-		VAR name: Identifier; printer: Printout.Printer; pos: LONGINT;
+		VAR name: Identifier; printer: Printout.Printer; pos: Streams.Position;
 		BEGIN
 			BeginRuntimeCall (backend.traceModule, "String"); writer.Char ('"'); pos := writer.Pos ();
 			currentProcedureScope.ownerModule.GetName (name); writer.String (name); writer.Char ('@');
