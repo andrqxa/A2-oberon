@@ -50,7 +50,7 @@ TYPE
 	(** A writer buffers output before it is sent to a Sender.  Must not be shared between processes. *)
 	Writer* = OBJECT
 	VAR
-		tail: LONGINT;
+		tail: SIZE;
 		buf: POINTER TO ARRAY OF CHAR;
 		res*: WORD; (** result of last output operation. *)
 		send: Sender;
@@ -85,14 +85,14 @@ TYPE
 		BEGIN
 			IF (res = Ok) THEN
 				send( buf^, 0, tail, TRUE , res );
-				IF res = Ok THEN INC( sent, tail );  tail := 0 END
+				IF res = Ok THEN INC( sent, TODO(tail) );  tail := 0 END
 			END
 		END Update;
 
 	(** Current write position. *)
 		PROCEDURE Pos*( ): Position;
 		BEGIN
-			RETURN sent + tail
+			RETURN sent + TODO(tail)
 		END Pos;
 
 		(** -- Write raw binary data -- *)
@@ -102,7 +102,7 @@ TYPE
 		BEGIN
 			IF (tail = LEN( buf )) & (res = Ok) THEN
 				send( buf^, 0, tail, FALSE , res );
-				IF res = Ok THEN INC( sent, tail );  tail := 0 END
+				IF res = Ok THEN INC( sent, TODO(tail) );  tail := 0 END
 			END;
 			IF res = Ok THEN buf[tail] := x;  INC( tail ) END
 		END Char;
@@ -117,7 +117,7 @@ TYPE
 				IF n = 0 THEN
 					IF res = Ok THEN  (* send current buffer *)
 						send( buf^, 0, tail, FALSE , res );
-						IF res = Ok THEN INC( sent, tail );  tail := 0 ELSE EXIT END
+						IF res = Ok THEN INC( sent, TODO(tail) );  tail := 0 ELSE EXIT END
 					ELSE
 						EXIT  (* should not be writing on an erroneous rider *)
 					END;
@@ -125,7 +125,7 @@ TYPE
 				END;
 				IF n > len THEN n := len END;
 				ASSERT ( tail + n <= LEN( buf ) );   (* index check *)
-				SYSTEM.MOVE( ADDRESSOF( x[ofs] ), ADDRESSOF( buf[tail] ), n );  INC( tail, TODO(n) );
+				SYSTEM.MOVE( ADDRESSOF( x[ofs] ), ADDRESSOF( buf[tail] ), n );  INC( tail, n );
 				IF len = n THEN EXIT END;   (* done *)
 				INC( ofs, n );  DEC( len, n )
 			END
@@ -552,7 +552,7 @@ TYPE
 					END;
 					n := tail
 				END;
-				IF n > size THEN n := TODO(size) END;
+				IF n > size THEN n := size END;
 				ASSERT ( ofs + n <= LEN( x ) );   (* index check *)
 				SYSTEM.MOVE( ADDRESSOF( buf[head] ), ADDRESSOF( x[ofs] ), n );  INC( head, n );  INC( len, n );
 				IF size = n THEN EXIT END;   (* done *)
@@ -956,7 +956,7 @@ TYPE
 			len := 0;
 			WHILE s[len] # 0X DO INC( len ) END;
 			IF len > LEN( buf ) THEN len := LEN( buf ) END;
-			head := 0;  tail := TODO (len);  received := TODO (len);  res := Ok;
+			head := 0;  tail := len;  received := TODO (len);  res := Ok;
 			IF len > 0 THEN
 				SYSTEM.MOVE( ADDRESSOF( s[0] ), ADDRESSOF( buf[0] ), len )
 			END;
@@ -966,7 +966,7 @@ TYPE
 		PROCEDURE SetRaw*(CONST s: ARRAY OF CHAR;  ofs, len: SIZE );
 		BEGIN
 			IF len > LEN( buf ) THEN len := LEN( buf ) END;
-			head := 0;  tail := TODO(len);  received := TODO(len);  res := Ok;
+			head := 0;  tail := len;  received := TODO(len);  res := Ok;
 			ASSERT ( (len >= 0) & (ofs + len <= LEN( s )) );   (* index check *)
 			IF len > 0 THEN
 				SYSTEM.MOVE( ADDRESSOF( s[ofs] ), ADDRESSOF( buf[0] ), len )
