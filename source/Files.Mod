@@ -87,7 +87,7 @@ TYPE
 
 		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		BEGIN
-			file.ReadBytes(r, buf, TODO(ofs), TODO(size));
+			file.ReadBytes(r, buf, ofs, size);
 			len := size - r.res;
 			IF len >= min THEN res := Streams.Ok ELSE res := Streams.EOF (* end of file *) END
 		END Receive;
@@ -125,7 +125,7 @@ TYPE
 
 		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 		BEGIN
-			r.file.WriteBytes(r, buf, TODO(ofs), TODO(len));
+			r.file.WriteBytes(r, buf, ofs, len);
 			IF propagate THEN r.file.Update END;
 			IF r.res = 0 THEN res := Streams.Ok ELSE res := WriteError (* not all bytes written *) END
 		END Send;

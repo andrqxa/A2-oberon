@@ -234,7 +234,7 @@ TYPE
 			enum: XMLObjects.Enumerator;
 			p : ANY;
 			i, j, res : LONGINT;
-			pos: SIZE;
+			pos, k: SIZE;
 			exitLoop : BOOLEAN;
 			aoc : ARRAY 16 OF CHAR;
 			olulStackItem : OLULStackItem;
@@ -829,9 +829,9 @@ TYPE
 					| 2 : s := Strings.NewString("&#9675; "); (* circle *)
 					| 3 : IF olulStackTop#NIL THEN  (* 1, 2, 3... *)
 							Strings.IntToStr(olulStackTop.value, aoc);
-							j := TODO(Strings.Length(aoc));
-							IF (j+2) <= (LEN(aoc)-1) THEN
-								aoc[j]:='.'; aoc[j+1]:=' '; aoc[j+2]:=0X;
+							k := Strings.Length(aoc);
+							IF (k+2) <= (LEN(aoc)-1) THEN
+								aoc[k]:='.'; aoc[k+1]:=' '; aoc[k+2]:=0X;
 							END;
 						ELSE
 							aoc := "0. ";

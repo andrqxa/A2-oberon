@@ -356,11 +356,11 @@ TYPE
 		PROCEDURE ContainsStr(CONST filename, content : ARRAY OF CHAR) : BOOLEAN;
 		VAR r : Files.Reader;
 			f : Files.File;
-			d : ARRAY 256 OF LONGINT;
+			d : ARRAY 256 OF SIZE;
 			cb : Strings.String;
-			cpos, i, j, k, m, shift : LONGINT;
+			cpos, i, j, k, m, shift : SIZE;
 		BEGIN
-			m := TODO(Strings.Length(content));
+			m := Strings.Length(content);
 			f := Files.Old(filename);
 			IF f # NIL THEN
 				Files.OpenReader(r, f, 0);
