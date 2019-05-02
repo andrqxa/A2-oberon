@@ -440,7 +440,7 @@ TYPE
 			(* Enqueues a new buffer for DMA to fetch, and updates last valid buffer index. *)
 			PROCEDURE QueueBuffer*;
 			VAR
-				noOfSamples : LONGINT;
+				noOfSamples : SIZE;
 			BEGIN
 				MixBuffers;
 
@@ -448,7 +448,7 @@ TYPE
 					ADDRESSOF(playBufferList[playCurrentBufferIndex].data[0]), BufferSize);
 
 				noOfSamples := LSH(playBufferList[playCurrentBufferIndex].len, -1);
-				DMAOut[playLastValidIndex].CmdAndLength := noOfSamples;
+				DMAOut[playLastValidIndex].CmdAndLength := TODO(noOfSamples);
 				SetBit(DMAOut[playLastValidIndex].CmdAndLength, 31);
 
 				NABMBAR.RegWrite8(BMROutBase + BMRLastValidIndexReg, playLastValidIndex)
@@ -514,7 +514,7 @@ TYPE
 			PROCEDURE MixTwo(VAR buffer : SoundDevices.Buffer; buffer2 : SoundDevices.Buffer);
 			VAR
 				mix, sample1, sample2 : LONGINT;
-				i : LONGINT;
+				i : SIZE;
 			BEGIN
 				(* First buffer don't have to be mixed *)
 				IF buffer = NIL THEN

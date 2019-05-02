@@ -790,7 +790,7 @@ TYPE
 			ELSE
 				IF data IS Utils.ConvertingStatus THEN
 					convStatus := data(Utils.ConvertingStatus);
-					burnPanel.progress0.SetPos(convStatus.bytesEncoded DIV 1024);
+					burnPanel.progress0.SetPos(TODO(convStatus.bytesEncoded DIV 1024));
 				ELSIF data IS CDRecord.RecordingStatus THEN
 					recStatus := data(CDRecord.RecordingStatus);
 					IF recStatus.operation = CDRecord.Verifying THEN

@@ -35,7 +35,7 @@ TYPE
 
 	ConvertingStatus* = OBJECT(Status)
 	VAR
-		bytesEncoded*: LONGINT;
+		bytesEncoded*: SIZE;
 	END ConvertingStatus;
 
 	StatusProc* = PROCEDURE {DELEGATE} (status: Status);
@@ -762,7 +762,7 @@ VAR
 	out : Files.Writer;
 	buffer : SoundDevices.Buffer;
 	convertStatus: ConvertingStatus;
-	bytesEncoded: LONGINT;
+	bytesEncoded: SIZE;
 BEGIN
 	NEW(convertStatus);
 	decoder := Codecs.GetAudioDecoder("MP3");
