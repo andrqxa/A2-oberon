@@ -114,8 +114,7 @@ TYPE
 
 	PROCEDURE & InitArrangement* (displacement: GenericLinker.Address);
 	BEGIN
-
-	 SELF.displacement := displacement; maxUnitSize := 1; NEW (bits, 0); exportInfo := NIL; NEW(relocInfo);
+		SELF.displacement := displacement; maxUnitSize := 1; NEW (bits, 0); exportInfo := NIL; NEW(relocInfo);
 	END InitArrangement;
 
 	PROCEDURE Allocate* (CONST section: ObjectFile.Section): GenericLinker.Address;
@@ -167,7 +166,6 @@ TYPE
 			relocInfo.AddReloc(LONGINT(target+patch.offset));
 		END;
 	END CheckReloc;
-
 
 END Arrangement;
 
@@ -601,10 +599,10 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize, BaseCodeAddress:
 
 		(* 40 / 80 / 120 *) ReserveTo(BaseCodeAddress);
 
-	 	(**** code section *****)
-	 	(* BaseCodeAddress *)
-	 	WriteBinaryFile (linker, arrangement, writer); INC(pos, arrangement.bits.GetSize () DIV 8);
-	 	(* BaseCodeAddress +CodeSize *)
+		(**** code section *****)
+		(* BaseCodeAddress *)
+		WriteBinaryFile (linker, arrangement, writer); INC(pos, arrangement.bits.GetSize () DIV 8);
+		(* BaseCodeAddress +CodeSize *)
 		Reserve (AlignedCodeSize-CodeSize);
 		(* BaseCodeAddress + AlignedCodeSize *)
 
@@ -812,9 +810,9 @@ CONST BaseAddress = 000010E8H;
 		Write (0);	(* flags *)
 	END WriteMachHeader;
 
-	 PROCEDURE WriteLoadCommand;
-	 VAR FileSize: LONGINT;
-	 BEGIN
+	PROCEDURE WriteLoadCommand;
+	VAR FileSize: LONGINT;
+	BEGIN
 		FileSize := MachHeaderSize + CommandsSize + arrangement.bits.GetSize () DIV 8;
 
 		Write (1);	(* cmd *)
@@ -961,7 +959,6 @@ BEGIN
 	RETURN success
 END CheckExports;
 
-
 PROCEDURE Link* (context: Commands.Context);
 VAR options: Options.Options;
 	silent, useAll, strict: BOOLEAN;
@@ -1106,4 +1103,3 @@ Linker.Link --fileName=a.out --fileFormat=ELF --displacement=08048000H Test ~
 Linker.Link --fileName=a.out --fileFormat=MACHO --displacement=000010E8H Test ~
 
 System.Free Linker ~
-
