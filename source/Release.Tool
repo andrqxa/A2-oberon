@@ -970,13 +970,11 @@ PACKAGE Applications ARCHIVE "Applications.zip" SOURCE "ApplicationsSrc.zip" DES
 	RFC865Client.Mod
 	QuoteServer.Mod Quotes.txt	# quote server (be)
 
-	NATIVE {
-		RfsConnection.Mod RfsClientProxy.Mod RfsFS.Mod	# Rfs (pstuedi)
-		TFTP.Mod TFTPServer.Mod TFTPFS.Mod				# TFTP (be)
-	}
+	RfsConnection.Mod RfsClientProxy.Mod RfsFS.Mod	# Rfs (pstuedi)
+	TFTP.Mod TFTPServer.Mod TFTPFS.Mod		# TFTP (be)
 
 	FTPFS.Mod
-	NATIVE, WIN { WebFTPServer.Mod }	# FTP server (be)
+	WebFTPServer.Mod	# FTP server (be)
 
 	XModem.Mod
 
@@ -1148,8 +1146,10 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 
 	MultiLogger.Mod
 
+	MemoryReader.Mod
+
 	BIOS, WIN {
-		MemoryReader.Mod Decoder.Mod I386Decoder.Mod	# GUI decoder
+		Decoder.Mod I386Decoder.Mod	# GUI decoder
 		ARMDecoder.Mod AMD64Decoder.Mod DecoderRes.zip
 	}
 
@@ -1660,7 +1660,7 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 	WIN & I386 { Windows.Oberon.Registry.Mod }
 	NATIVE, WIN { Oberon.Configuration.Mod }
 
-# Basic Tools. NetSystem, Telnet, TextMail, ET, developer's tools, OpenType.
+	# Basic Tools. NetSystem, Telnet, TextMail, ET, developer's tools, OpenType.
 	Tools.Tool
 
 	# NetSystem TCP/IP
@@ -1693,9 +1693,10 @@ PACKAGE Oberon ARCHIVE "Oberon.zip" SOURCE "OberonSrc.zip" DESCRIPTION "Oberon f
 	Oberon.TGZ.Mod	# .tgz unpacker
 	NATIVE { Oberon.PCITools.Mod }	# PCI scanner
 
-# ARM decoder
+	# ARM decoder
 	Oberon.PCARMDecoder.Mod
-# Additional things
+
+	# Additional things
 	Oberon.Aos.Mod Oberon.OFSTools.Mod Oberon.CleanupFiles.Mod	# Aos-specific tools
 	NATIVE { Oberon.TestNet.Mod }
 	AosTools.Tool
