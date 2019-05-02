@@ -44,7 +44,7 @@ TYPE
 
 		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		BEGIN
-			f.ReadBytes(r, buf, TODO(ofs), TODO(size));
+			f.ReadBytes(r, buf, ofs, size);
 			len := size - r.res;
 			IF len >= min THEN res := Streams.Ok ELSE res := Streams.EOF (* end of file *) END
 		END Receive;

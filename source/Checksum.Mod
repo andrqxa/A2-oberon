@@ -66,7 +66,7 @@ VAR
 		h.Initialize;
 		WHILE r.Available() > 0 DO
 			r.Bytes( buf, 0, 64, got );
-			h.Update( buf, 0, TODO(got) )
+			h.Update( buf, 0, got )
 		END;
 		h.GetHash( buf, 0 );
 		FOR i := 0 TO h.size - 1 DO

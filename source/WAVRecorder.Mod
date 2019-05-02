@@ -65,7 +65,7 @@ TYPE
 		VAR res : WORD;
 		BEGIN
 			encoder.Write(buf, res);
-			INC(recLength, buf.len);
+			INC(recLength, TODO(buf.len));
 			bufferPool.Add(buf)
 		END WriteBuffer;
 

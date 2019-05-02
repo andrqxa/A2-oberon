@@ -32,7 +32,7 @@ TYPE
 	*)
 	Buffer* = OBJECT
 	VAR
-		len* : LONGINT;
+		len* : SIZE;
 		data* : POINTER TO ARRAY OF CHAR;
 	END Buffer;
 

@@ -1534,7 +1534,7 @@ TYPE
 		(* @returns: nothing																	*)
 		PROCEDURE FillBuffer*(buffer: SoundDevices.Buffer);
 		VAR
-			j: LONGINT;
+			j: SIZE;
 		BEGIN
 			IF first THEN
 				NEW(encFrame);

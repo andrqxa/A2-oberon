@@ -247,7 +247,7 @@ TYPE
 		VAR length: SIZE;
 		BEGIN
 			in.Bytes(buffer.data^, 0, LEN(buffer.data^), length);
-			buffer.len := TODO(length);
+			buffer.len := length;
 			IF (in.res = Streams.EOF) OR (buffer.len < LEN(buffer.data)) THEN
 				hasMoreBytes := FALSE;
 				RETURN;
@@ -351,7 +351,7 @@ TYPE
 		VAR length: SIZE;
 		BEGIN
 			in.Bytes(buffer.data^, 0, LEN(buffer.data^), length);
-			buffer.len := TODO(length);
+			buffer.len := length;
 			IF (in.res = Streams.EOF) OR (buffer.len < LEN(buffer.data)) THEN
 				hasMoreBytes := FALSE; KernelLog.String("BOOOOM!!");
 				RETURN;

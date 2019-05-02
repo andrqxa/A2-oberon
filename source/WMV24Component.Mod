@@ -942,10 +942,10 @@ TYPE
 						GetPanelCoordinates(x, y);
 						NEW(progressWindow, progressInfo, x + 150, y + 50);
 						WHILE ~xysender.IsDone() DO
-							progressInfo.SetProgress(xysender.bytesProcessed);
+							progressInfo.SetProgress(TODO(xysender.bytesProcessed));
 							Wait(500);
 						END;
-						progressInfo.SetProgress(xysender.bytesProcessed);
+						progressInfo.SetProgress(TODO(xysender.bytesProcessed));
 						xysender.Await(msg);
 					ELSE
 						Show("FATAL ERROR, could not re-open the port"); KernelLog.Ln;
@@ -1102,12 +1102,12 @@ TYPE
 			END;
 		END Finalize;
 
-		PROCEDURE DeleteNCharacters(nbrOfCharacters : LONGINT);
+		PROCEDURE DeleteNCharacters(nbrOfCharacters : SIZE);
 		VAR pos : LONGINT;
 		BEGIN
 			text.AcquireWrite;
 			pos := textView.cursor.GetPosition();
-			text.Delete(pos - nbrOfCharacters, nbrOfCharacters);
+			text.Delete(pos - TODO(nbrOfCharacters), TODO(nbrOfCharacters));
 			text.ReleaseWrite;
 		END DeleteNCharacters;
 
@@ -1150,7 +1150,7 @@ TYPE
 			res := Streams.Ok;
 			WHILE running & (res = Streams.Ok) & (len = 0) DO
 				lock.Acquire(Terminal);
-				len := TODO (port.Available());
+				len := port.Available();
 				IF len # 0 THEN
 					port.Receive(buffer, 0, ReceiveBufferSize, MIN(len,ReceiveBufferSize), len, res);
 				END;
@@ -1177,7 +1177,7 @@ TYPE
 					ELSE
 						IF (backspaces > 0) THEN
 							w.Update;
-							DeleteNCharacters(TODO(backspaces));
+							DeleteNCharacters(backspaces);
 							backspaces := 0;
 						END;
 						w.Char(ch);
@@ -1187,7 +1187,7 @@ TYPE
 			ELSE
 				EvaluateError(res);
 			END;
-			DeleteNCharacters(TODO(backspaces));
+			DeleteNCharacters(backspaces);
 		END ReceiveCharacters;
 
 	BEGIN {ACTIVE}

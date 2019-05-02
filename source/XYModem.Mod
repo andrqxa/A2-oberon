@@ -20,7 +20,7 @@ TYPE
 		error: ARRAY 64 OF CHAR;
 		done, fail: BOOLEAN;
 
-		bytesProcessed-, totalBytes- : LONGINT;
+		bytesProcessed-, totalBytes- : SIZE;
 
 		PROCEDURE & Init*(W: Streams.Writer; R: Streams.Reader; F: Files.File; mode: LONGINT);
 		BEGIN
@@ -140,7 +140,7 @@ TYPE
 			REPEAT
 				IF retry = 0 THEN
 					IF (mode = XModem) OR (len < (1024-128)) THEN start := SOH; blkn := 128 END;
-					fR.Bytes(data, 0, blkn, length); DEC(len, blkn); INC(bytesProcessed, TODO(length));
+					fR.Bytes(data, 0, blkn, length); DEC(len, blkn); INC(bytesProcessed, length);
 					IF (fR.res # Streams.Ok) OR (i < blkn) THEN
 						WHILE i < blkn DO data[i] := EOF; INC(i) END
 					END
