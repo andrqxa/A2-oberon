@@ -170,7 +170,7 @@ TYPE
 
 				(** Receive SSH Packet into buf,  return packet type *)
 				PROCEDURE ReceivePacket*( VAR buf: ARRAY OF CHAR;  VAR size: LONGINT ): CHAR;
-				VAR i, l, pad, trlen, cbs, pos: LONGINT; res: WORD;
+				VAR i, l: SIZE; l2: TODO; pad, trlen, cbs, pos: LONGINT; res: WORD;
 					seqno: ARRAY 4 OF CHAR; rmac, cmac: ARRAY 20 OF CHAR;
 					trbuf: ARRAY 8196 OF CHAR;
 					packType: LONGINT;
@@ -219,8 +219,8 @@ TYPE
 						IF trbuf[5] = Disconn THEN
 							Out.String( "remote host closed connection: " );
 							pos := 10;
-							U.GetLength( trbuf, pos, l );
-							FOR i := 0 TO l - 1 DO Out.Char( trbuf[14 + i] ) END;  Out.Ln;
+							U.GetLength( trbuf, pos, l2 );
+							FOR i := 0 TO l2 - 1 DO Out.Char( trbuf[14 + i] ) END;  Out.Ln;
 							state := Closed
 						END;
 						FOR i := 0 TO size - 1 DO buf[i] := trbuf[i+5] END
@@ -663,14 +663,14 @@ VAR hexd: ARRAY 17 OF CHAR;
 	END Head;
 
 	PROCEDURE ReceiveLine( tcp: TCP.Connection;  VAR buf: ARRAY OF CHAR ): LONGINT;
-	VAR i, l: LONGINT; res: WORD;
+	VAR i, l: SIZE; res: WORD;
 	BEGIN
 		i := 0;
 		REPEAT tcp.Receive( buf, i, 1, 1, l, res );  INC( i );
 		UNTIL buf[i - 1] = NL;
 		IF buf[i - 2] = CR THEN i := i - 2 ELSE i := i - 1 END;
 		buf[i] := 0X;
-		RETURN i
+		RETURN TODO(i);
 	END ReceiveLine;
 
 

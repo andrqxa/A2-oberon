@@ -201,8 +201,8 @@ TYPE
 			eof := FALSE; first := TRUE;
 		END Init;
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
-		VAR i: LONGINT; token: ARRAY 16 OF CHAR; ch: CHAR;
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		VAR i: SIZE; token: ARRAY 16 OF CHAR; ch: CHAR;
 		BEGIN
 			IF ~eof THEN
 				ASSERT((size > 0) & (min <= size) & (min >= 0));
@@ -289,16 +289,16 @@ TYPE
 
 	LimitedInStream* = OBJECT
 		VAR inR: Streams.Reader;
-			remain-: LONGINT;
+			remain-: SIZE;
 
-		PROCEDURE &Init*(VAR inR, outR: Streams.Reader; size : LONGINT);
+		PROCEDURE &Init*(VAR inR, outR: Streams.Reader; size : SIZE);
 		BEGIN
 			SELF.inR := inR;	remain := size;
 			Streams.OpenReader(outR, Receiver);
 		END Init;
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
-		VAR l: LONGINT; length: SIZE;
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		VAR l, length: SIZE;
 		BEGIN
 			IF remain > 0 THEN
 				ASSERT((size > 0) & (min <= size) & (min >= 0));

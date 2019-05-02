@@ -170,13 +170,13 @@ TYPE
 			END;
 		END Send;
 
-		PROCEDURE Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
-		VAR i, l: LONGINT;  read: SIZE;
+		PROCEDURE Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+		VAR i, l: SIZE;  read: SIZE;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + size );
 			ASSERT ( LEN( buf ) >= ofs + min );   (* array bound check not implemented in Kernel32.ReadFile *)
 			res := Serials.Ok; len := 0;
-			i := ofs;  l := TODO (Available());
+			i := ofs;  l := Available();
 			WHILE (res = Serials.Ok) & ( (min > 0) OR ((l > 0) & (size > 0)) ) DO  (* fof 060804 *)
 				IF l > size THEN l := size END;
 				IF  l > 0 THEN
@@ -189,7 +189,7 @@ TYPE
 						res := Serials.TransportError;
 					END;
 				END;
-				l := TODO(Available());
+				l := Available();
 				IF (res = Serials.Ok) & ( (min > 0) OR ((l > 0) & (size > 0)) ) THEN
 					Objects.Sleep(1);
 				END;

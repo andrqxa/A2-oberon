@@ -93,14 +93,14 @@ END Args;
 
 #END
 
-PROCEDURE ReceiveStdin( VAR data: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
-VAR ures: SIZE;  i, err: LONGINT;
+PROCEDURE ReceiveStdin( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+VAR ures: SIZE;  err: WORD;
 BEGIN
 	len := 0;
 	REPEAT
 		ures := Read( ADDRESSOF (data[ofs]), size );
 		IF ures > 0 THEN
-			INC( ofs, TODO(ures) );  DEC( size, TODO(ures) );  INC( len, TODO(ures) )
+			INC( ofs, ures );  DEC( size, ures );  INC( len, ures )
 		END;
 		IF ures < 0 THEN err := Unix.errno() END;
 	UNTIL (len >= min) OR ((ures <= 0) & (err # Unix.EINTR) & (err # 0));

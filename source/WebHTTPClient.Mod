@@ -31,7 +31,7 @@ TYPE
 			END;
 		END InitContentReader;
 
-		PROCEDURE Receive * (VAR buf: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD);
+		PROCEDURE Receive * (VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD);
 		VAR
 			token: ARRAY 16 OF CHAR;
 			i, total: LONGINT; r: WORD;

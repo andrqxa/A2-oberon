@@ -754,7 +754,7 @@ TYPE
 		END Send;
 
 		(** Receive secured data *)
-		PROCEDURE Receive*( VAR data: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
+		PROCEDURE Receive*( VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		BEGIN
 			applicationDataPipe.Receive(data, ofs, size, min, len ,res);
 		END Receive;
@@ -764,7 +764,7 @@ TYPE
 			VAR
 				prf: PRF;
 				seed: ARRAY 64 OF CHAR;
-				i: LONGINT;
+				i: SIZE;
 		BEGIN
 			FOR i := 0 TO 31 DO
 				seed[ i ] := SELF.pendingSecurityParameters.clientRandom[ i ];

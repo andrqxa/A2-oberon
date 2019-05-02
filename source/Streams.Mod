@@ -32,14 +32,14 @@ TYPE
 	Sender* = PROCEDURE {DELEGATE} ( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
 
 	(** Any stream input procedure or method. *)
-	Receiver* = PROCEDURE {DELEGATE} ( VAR buf: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
+	Receiver* = PROCEDURE {DELEGATE} ( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
 
 	Connection* = OBJECT
 
 		PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
 		END Send;
 
-		PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
+		PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
 		END Receive;
 
 		PROCEDURE Close*;
@@ -55,7 +55,7 @@ TYPE
 		buf: POINTER TO ARRAY OF CHAR;
 		res*: WORD; (** result of last output operation. *)
 		send: Sender;
-		sent*: LONGINT;  (** count of sent bytes *)
+		sent*: Position;  (** count of sent bytes *)
 		(* buf[0..tail-1] contains data to write. *)
 
 		PROCEDURE & InitWriter*( send: Sender;  size: SIZE );
@@ -451,11 +451,11 @@ TYPE
 	(** A reader buffers input received from a Receiver.  Must not be shared between processes. *)
 	Reader* = OBJECT
 	VAR
-		head, tail: LONGINT;
+		head, tail: SIZE;
 		buf: POINTER TO ARRAY OF CHAR;
 		res*: WORD;   (** result of last input operation. *)
 		receive: Receiver;
-		received*: LONGINT;   (** count of received bytes *)
+		received*: Position;   (** count of received bytes *)
 		(* buf[buf.head..buf.tail-1] contains data to read. *)
 
 		PROCEDURE & InitReader*( receive: Receiver;  size: SIZE );
@@ -486,13 +486,13 @@ TYPE
 
 	(** Return bytes currently available in input buffer. *)
 		PROCEDURE Available*( ): SIZE;
-		VAR n: LONGINT;
+		VAR n: SIZE;
 		BEGIN
 			IF (res = Ok) THEN
-				IF (head = tail) THEN head := 0;  receive( buf^, 0, LEN( buf ), 0, tail, res );  INC( received, tail );
+				IF (head = tail) THEN head := 0;  receive( buf^, 0, LEN( buf ), 0, tail, res );  INC( received, TODO(tail) );
 				ELSIF (tail # LEN( buf )) THEN
 					receive( buf^, tail, LEN( buf ) - tail, 0, n, res );   (* poll *)
-					INC( tail, n );  INC( received, n )
+					INC( tail, n );  INC( received, TODO(n) )
 				END;
 				IF res = EOF THEN res := Ok END  (* ignore EOF here *)
 			END;
@@ -502,7 +502,7 @@ TYPE
 	(** Current read position. *)
 		PROCEDURE Pos*( ): Position;
 		BEGIN
-			RETURN received - (tail - head)
+			RETURN received - TODO (tail - head)
 		END Pos;
 
 		(** -- Read raw binary data -- *)
@@ -510,14 +510,14 @@ TYPE
 	(** Read one byte. x=0X if no success (e.g. file ended) *)
 		PROCEDURE Char*( VAR x: CHAR );
 		BEGIN
-			IF (head = tail) & (res = Ok) THEN head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, tail ) END;
+			IF (head = tail) & (res = Ok) THEN head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, TODO(tail) ) END;
 			IF res = Ok THEN x := buf[head];  INC( head ) ELSE x := 0X END
 		END Char;
 
 	(** Like Read, but return result. Return 0X if no success (e.g. file ended) *)
 		PROCEDURE Get*( ): CHAR;
 		BEGIN
-			IF (head = tail) & (res = Ok) THEN head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, tail ) END;
+			IF (head = tail) & (res = Ok) THEN head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, TODO(tail) ) END;
 			IF res = Ok THEN INC( head );  RETURN buf[head - 1] ELSE RETURN 0X END
 		END Get;
 
@@ -525,7 +525,7 @@ TYPE
 		PROCEDURE Peek*( ): CHAR;
 		BEGIN
 			IF (head = tail) & (res = Ok) THEN
-				head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, tail );
+				head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, TODO(tail) );
 				IF res = EOF THEN  (* ignore EOF here *)
 					res := Ok;  tail := 0; RETURN 0X (* Peek returns 0X at eof *)
 				END
@@ -535,7 +535,7 @@ TYPE
 
 	(** Read size bytes into x, starting at ofs.  The len parameter returns the number of bytes that were actually read. *)
 		PROCEDURE Bytes*( VAR x: ARRAY OF CHAR;  ofs, size: SIZE;  VAR len: SIZE );
-		VAR n: LONGINT;
+		VAR n: SIZE;
 		BEGIN
 			ASSERT ( size >= 0 );
 			len := 0;
@@ -544,7 +544,7 @@ TYPE
 				IF n = 0 THEN  (* no data available *)
 					head := 0;
 					IF res = Ok THEN  (* fill buffer *)
-						receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, tail )
+						receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, TODO(tail) )
 					END;
 					IF res # Ok THEN  (* should not be reading from erroneous rider *)
 						WHILE size # 0 DO x[ofs] := 0X;  INC( ofs );  DEC( size ) END;   (* clear rest of buffer *)
@@ -944,7 +944,7 @@ TYPE
 			head := pos;  tail := LEN( buf );  received := LEN( buf );  res := Ok;
 		END SetPos;
 
-		PROCEDURE Receive( VAR buf: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
+		PROCEDURE Receive( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
 		BEGIN
 			IF min = 0 THEN res := Ok ELSE res := EOF END;
 			len := 0;

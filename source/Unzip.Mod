@@ -16,9 +16,9 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 		END;
 
 		SizeReader = OBJECT
-			VAR input: Streams.Reader; max: LONGINT;
+			VAR input: Streams.Reader; max: SIZE;
 
-			PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
+			PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 			VAR length: SIZE;
 			BEGIN
 				IF min > max THEN min := max END;
@@ -30,7 +30,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 				END
 			END Receive;
 
-			PROCEDURE &Init*(input: Streams.Reader; size: LONGINT);
+			PROCEDURE &Init*(input: Streams.Reader; size: SIZE);
 			BEGIN
 				SELF.input := input; SELF.max := size
 			END Init;

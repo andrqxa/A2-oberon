@@ -88,14 +88,12 @@ TYPE	EncryptingWriter* = OBJECT (Streams.Writer);
 			SELF.decrypt:=decrypt;
 		END Init;
 
-		PROCEDURE Receiver(VAR inBuf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
-		VAR length: SIZE;
+		PROCEDURE Receiver(VAR inBuf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		BEGIN
 			ASSERT((size > 0) & (min <= size) & (min >= 0));
-			in.Bytes(inBuf, ofs, size, length);
-			len:=TODO(length);
-			IF decrypt#NIL THEN decrypt(inBuf, ofs, len); END;
-			INC(received,len);
+			in.Bytes(inBuf, ofs, size, len);
+			IF decrypt#NIL THEN decrypt(inBuf, TODO(ofs), TODO(len)); END;
+			INC(received,TODO(len));
 			res:=in.res;
 		END Receiver;
 
@@ -253,14 +251,12 @@ TYPE
 			SELF.monitor:=monitor;
 		END Init;
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
-		VAR length: SIZE;
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		BEGIN
 			ASSERT((size > 0) & (min <= size) & (min >= 0));
 			size := MAX(min,MIN(TODO(in.Available()),size));
-			in.Bytes(buf, ofs, size, length);
-			len := TODO(length);
-			INC(received,len);
+			in.Bytes(buf, ofs, size, len);
+			INC(received,TODO(len));
 			res:=in.res;
 			monitor.Bytes(buf, ofs, len);
 			monitor.Update;
@@ -310,23 +306,23 @@ TYPE
 
 	LimitedReader* = OBJECT (Streams.Reader);
 		VAR in : Streams.Reader;
-			total, remain-: LONGINT;
+			total, remain-: SIZE;
 
-		PROCEDURE &Init*(in:Streams.Reader; size: LONGINT);
+		PROCEDURE &Init*(in:Streams.Reader; size: SIZE);
 		BEGIN
 			InitReader(Receiver, MIN(size, ReaderBufSize));
 			SELF.in := in;
 			total:=size; remain:=size;
 		END Init;
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		VAR num:LONGINT; length: SIZE;
 		BEGIN
 			ASSERT(size >= 0);
 			IF (remain=0) THEN len:=0; res:=Streams.EOF; RETURN END;
 			in.Bytes(buf, ofs, MIN(remain,size), length);
 			len := TODO(length);
-			DEC(remain,len); INC(received,len);
+			DEC(remain,len); INC(received,TODO(len));
 			res:=in.res;
 		END Receiver;
 
@@ -421,8 +417,8 @@ TYPE	Base64Writer* = OBJECT (Streams.Writer);
 			group := 0;  i := 0; code:=0; done:=FALSE;
 		END Reset;
 
-		PROCEDURE Receiver(VAR inBuf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
-		VAR c:CHAR; size4: LONGINT;
+		PROCEDURE Receiver(VAR inBuf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		VAR c:CHAR; size4: SIZE;
 		BEGIN
 			size4:=size DIV 4 * 4; (* a multiple of 4*)
 			ASSERT((size > 0) & (min <= size4) & (min >= 0));
@@ -462,7 +458,7 @@ TYPE	Base64Writer* = OBJECT (Streams.Writer);
 			ELSE
 				res:=in.res;
 			END;
-			INC(received,len);
+			INC(received,TODO(len));
 		END Receiver;
 
 		PROCEDURE Pos*(): Streams.Position;

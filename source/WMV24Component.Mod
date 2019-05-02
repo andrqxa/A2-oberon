@@ -1144,7 +1144,7 @@ TYPE
 		END EvaluateError;
 
 		PROCEDURE ReceiveCharacters;
-		VAR ch : CHAR; buffer : ARRAY ReceiveBufferSize OF CHAR; backspaces, i, len : LONGINT; res: WORD;
+		VAR ch : CHAR; buffer : ARRAY ReceiveBufferSize OF CHAR; backspaces, i, len : SIZE; res: WORD;
 		BEGIN
 			len := 0;
 			res := Streams.Ok;
@@ -1177,7 +1177,7 @@ TYPE
 					ELSE
 						IF (backspaces > 0) THEN
 							w.Update;
-							DeleteNCharacters(backspaces);
+							DeleteNCharacters(TODO(backspaces));
 							backspaces := 0;
 						END;
 						w.Char(ch);
@@ -1187,7 +1187,7 @@ TYPE
 			ELSE
 				EvaluateError(res);
 			END;
-			DeleteNCharacters(backspaces);
+			DeleteNCharacters(TODO(backspaces));
 		END ReceiveCharacters;
 
 	BEGIN {ACTIVE}

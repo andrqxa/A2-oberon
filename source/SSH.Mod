@@ -27,7 +27,7 @@ TYPE
 				f: Forwarder; (* this client belogs to *)
 				p: T.Packet;
 				buf: ARRAY 64 OF CHAR;
-				len: LONGINT; res: WORD;
+				len: SIZE; res: WORD;
 
 
 
@@ -42,8 +42,8 @@ TYPE
 				len := 16;
 				f.clientConn.Receive( buf, 0, len, 1, len, res );
 				IF len > 0 THEN
-					p := f.chan.NewDataPacket( len + 32 );
-					p.AppArray( buf, 0, len );
+					p := f.chan.NewDataPacket( TODO(len) + 32 );
+					p.AppArray( buf, 0, TODO(len) );
 					f.chan.SendPacket( p )
 				ELSE
 					Log.String( "client at port " ); Log.Int( f.localPort, 0 );
@@ -227,7 +227,7 @@ TYPE
 					conn.SendPacket( p );  DEC( wsize, TODO(len) );  res := Streams.Ok
 				END Send;
 
-				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
+				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
 				VAR
 					plen, dlen: LONGINT; pType, ch: CHAR;
 				BEGIN

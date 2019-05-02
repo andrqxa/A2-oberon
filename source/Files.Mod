@@ -85,9 +85,9 @@ TYPE
 		file : File;
 		r: Rider;
 
-		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
+		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		BEGIN
-			file.ReadBytes(r, buf, ofs, size);
+			file.ReadBytes(r, buf, TODO(ofs), TODO(size));
 			len := size - r.res;
 			IF len >= min THEN res := Streams.Ok ELSE res := Streams.EOF (* end of file *) END
 		END Receive;

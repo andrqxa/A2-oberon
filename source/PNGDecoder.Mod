@@ -40,8 +40,8 @@ TYPE
 			remain := firstChunk;
 		END Init;
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
-		VAR i, crc, tag: LONGINT; ch: CHAR;
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		VAR i: SIZE; crc, tag: LONGINT; ch: CHAR;
 		BEGIN
 			IF ~eof THEN
 				ASSERT((size > 0) & (min <= size) & (min >= 0));

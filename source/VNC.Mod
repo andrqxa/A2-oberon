@@ -327,8 +327,8 @@ VAR
 	pool: ConnectionPool;
 	bell: Bell;
 
-PROCEDURE ReceiveBytes(c: Connection; VAR buf: ARRAY OF CHAR; size: LONGINT; VAR len: LONGINT);
-VAR dst, n: LONGINT;
+PROCEDURE ReceiveBytes(c: Connection; VAR buf: ARRAY OF CHAR; size: SIZE; VAR len: LONGINT);
+VAR dst, n: SIZE;
 BEGIN
 	IF c.res = Ok THEN
 		dst := 0; len := 0;
@@ -339,13 +339,13 @@ BEGIN
 					(* attempt to read at least size bytes, but at most a full buffer *)
 				c.pcb.Receive(c.rcvbuf^, 0, LEN(c.rcvbuf), size, n, c.res);
 				IF c.res # Ok THEN EXIT END;
-				c.rcvbufpos := 0; c.rcvbuflen := n;
+				c.rcvbufpos := 0; c.rcvbuflen := TODO(n);
 				n := MIN(n, size)	(* n is number of bytes to copy from buffer now *)
 			END;
 			ASSERT(dst+n <= LEN(buf));	(* index check *)
 			SYSTEM.MOVE(ADDRESSOF(c.rcvbuf[c.rcvbufpos]), ADDRESSOF(buf[dst]), n);
-			INC(c.rcvbufpos, n); DEC(c.rcvbuflen, n);
-			INC(dst, n); DEC(size, n); INC(len, n)
+			INC(c.rcvbufpos, TODO(n)); DEC(c.rcvbuflen, TODO(n));
+			INC(dst, n); DEC(size, n); INC(len, TODO(n))
 		END
 	ELSE
 		buf[0] := 0X; len := 0

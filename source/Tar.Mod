@@ -109,7 +109,7 @@ TYPE
 	(* for internal use only. lets read a specified amount of data *)
 	SizeReader = OBJECT
 	VAR input : Streams.Reader;
-		max : LONGINT;
+		max : SIZE;
 		archive : Archive;
 
 		PROCEDURE &Init*(input: Streams.Reader; size: LONGINT; archive : Archive);
@@ -117,8 +117,7 @@ TYPE
 			SELF.input := input; SELF.max := size; SELF.archive := archive
 		END Init;
 
-		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
-		VAR length: SIZE;
+		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		BEGIN
 			IF max = 0 THEN
 				res := -1;
@@ -127,8 +126,7 @@ TYPE
 			IF size < min THEN size := min END;
 			IF size > max THEN size := max END;
 
-			input.Bytes(buf, ofs, size, length);
-			len := TODO(length);
+			input.Bytes(buf, ofs, size, len);
 			DEC(max, len);
 			res := input.res
 		END Receive;

@@ -176,8 +176,8 @@ TYPE
 					res parameter returns 0 if ok, or a non-zero error code otherwise (e.g. if the connection is closed
 					by the communication partner, or by a call of the Close method). *)
 
-				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD );
-				VAR p, x: LONGINT;
+				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+				VAR p, x: SIZE; y: TODO;
 				BEGIN {EXCLUSIVE}
 					ASSERT( (ofs >= 0) & (ofs + size <= LEN( data )) & (min <= size) );   (* parameter consistency check *)
 					IF trace THEN
@@ -190,7 +190,8 @@ TYPE
 					IF state IN {Listen, Established} THEN
 						LOOP
 							x := size;
-							IF Sockets.Recv( socket, data, ofs, x, 0 ) THEN
+							IF Sockets.Recv( socket, data, TODO(ofs), y, 0 ) THEN
+								x := y;
 								IF x > 0 THEN
 									DEC( size, x );  INC( len, x );  INC( ofs, x );
 									IF len >= min THEN

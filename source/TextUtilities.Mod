@@ -199,8 +199,8 @@ TYPE
 			InitReader (Receive, Streams.DefaultReaderSize);
 		END Init;
 
-		PROCEDURE Receive (VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT;  VAR len: LONGINT; VAR res: WORD);
-		VAR ucs32, prevofs: LONGINT; offs: SIZE;
+		PROCEDURE Receive (VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD);
+		VAR ucs32: LONGINT; prevofs, offs: SIZE;
 		BEGIN
 			reader.text.AcquireRead;
 			len := 0; res := Streams.Ok;
@@ -217,7 +217,7 @@ TYPE
 					reader.text.ReleaseRead;
 					RETURN
 				END;
-				ofs := TODO(offs);
+				ofs := offs;
 				INC (len, ofs - prevofs);
 			END;
 			reader.text.ReleaseRead;

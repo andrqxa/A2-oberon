@@ -20,7 +20,7 @@ TYPE
 		r: Texts.Reader;
 		pos: LONGINT;
 
-		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
+		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		VAR ch: CHAR;
 		BEGIN
 			len := 0;

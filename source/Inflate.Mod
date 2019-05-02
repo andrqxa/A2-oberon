@@ -39,8 +39,8 @@ MODULE Inflate; (** AUTHOR "ejz"; PURPOSE "Aos inflate stream"; *)
 				END;
 				eof: BOOLEAN;
 
-			PROCEDURE Receive*(VAR data: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len: LONGINT; VAR res: WORD);
-				VAR n: LONGINT;
+			PROCEDURE Receive*(VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+				VAR n: SIZE;
 			BEGIN
 				len := 0;
 				WHILE len < min DO
@@ -49,7 +49,7 @@ MODULE Inflate; (** AUTHOR "ejz"; PURPOSE "Aos inflate stream"; *)
 						IF buffer.size > 0 THEN
 							n := buffer.size; IF n > size THEN n := size END;
 							SYSTEM.MOVE(ADDRESSOF(buffer.data[0]), ADDRESSOF(data[ofs]), n);
-							INC(len, n); DEC(buffer.size, n);
+							INC(len, n); DEC(buffer.size, TODO(n));
 							IF buffer.size > 0 THEN
 								SYSTEM.MOVE(ADDRESSOF(buffer.data[n]), ADDRESSOF(buffer.data[0]), buffer.size)
 							END
