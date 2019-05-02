@@ -14,26 +14,13 @@ CONST
 	(* optimizations *)
 	PatchFixups = TRUE; (* patch all fixups that can be processed during object file generation *)
 	AliasOnlyExported = TRUE;  (* create an alias only for exported sections *)
-	DetailedStatistics = FALSE;
-
-VAR
-	statModules, statModulesSize: LONGINT;
-	statHeaders, statHeadersSize: LONGINT;
 
 TYPE
 	Unit = BinaryCode.Unit;
 
-	SectionStat = POINTER TO RECORD
-		name: ARRAY 64 OF CHAR;
-		entries: SIZE;
-		size: SIZE;
-	END;
+	ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 
-VAR
-	statPool : Basic.HashTableInt;
-
-TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
-	VAR binary: BOOLEAN; mergeSections: BOOLEAN;
+		VAR binary: BOOLEAN; mergeSections: BOOLEAN;
 
 		PROCEDURE & InitObjectFileFormat;
 		BEGIN
@@ -218,48 +205,13 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				RETURN TRUE
 			END ExportSections;
 
-			PROCEDURE MakeStatistics(sections: Sections.SectionList);
-			VAR i: SIZE;
-				section: Sections.Section;
-				resolved: BinaryCode.Section;
-				suffix: ARRAY 128 OF CHAR;
-				index: StringPool.Index;
-				any: ANY;
-				sectionStat : SectionStat;
-			BEGIN
-				FOR i := 0 TO sections.Length()-1 DO
-					section := sections.GetSection(i);
-					resolved := section(IntermediateCode.Section).resolved;
-					Basic.GetSuffix(section.name, suffix);
-					IF (suffix[0] = "@")  & ((suffix[1] # "c") OR (suffix[2] # "o")) THEN
-						StringPool.GetIndex(suffix, index);
-						any := statPool.Get(index);
-						IF any = NIL THEN
-							NEW(sectionStat);
-							COPY(suffix, sectionStat.name);
-							sectionStat.entries := 0;
-							sectionStat.size := 0;
-							statPool.Put(index, sectionStat);
-						ELSE
-							sectionStat := any(SectionStat);
-						END;
-						INC(sectionStat.entries);
-						INC(sectionStat.size, resolved.pc);
-					END;
-				END;
-			END MakeStatistics;
-
 			PROCEDURE ExportModule (module: Sections.Module): BOOLEAN;
-			VAR result: BOOLEAN; pos: Streams.Position;
+			VAR result: BOOLEAN;
 				offers, requires: ObjectFile.NameList;
 				numImports: LONGINT;
 				name: ObjectFile.SectionName;
 				import: SyntaxTree.Import;
 			BEGIN
-				pos := writer.Pos();
-				IF DetailedStatistics THEN
-					MakeStatistics(module.allSections);
-				END;
 				IF mergeSections & ~MergeSections(module.allSections) THEN RETURN FALSE END;
 				NEW (offers, 1); offers[0] := module.moduleName;
 
@@ -283,9 +235,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 					END;
 				END;
 				WriteHeader(writer,binary,module.allSections, poolMap, offers, requires, fingerprinter);
-				INC(statHeaders); INC(statHeadersSize, writer.Pos()-pos);
 				result := ExportSections (module.allSections);
-				INC(statModules); INC(statModulesSize, writer.Pos()-pos);
 				RETURN result
 			END ExportModule;
 
@@ -669,31 +619,4 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 		END;
 	END MakeLibrary;
 
-	PROCEDURE Statistics*;
-	VAR iterator: Basic.IntIterator; stat: SectionStat; index: StringPool.Index; any: ANY;
-	BEGIN
-		IF DetailedStatistics THEN
-			iterator := statPool.GetIterator();
-			WHILE iterator.GetNext(index, any) DO
-				stat := any(SectionStat);
-				TRACE(stat.name, stat.entries, stat.size);
-			END;
-		END;
-		TRACE(statModules, statModulesSize);
-		TRACE(statHeaders, statHeadersSize);
-		ObjectFile.Statistics;
-	END Statistics;
-
-	PROCEDURE ResetStatistics*;
-	BEGIN
-		ObjectFile.ResetStatistics;
-		statModules := 0; statModulesSize := 0;
-		statHeaders := 0; statHeadersSize := 0;
-		IF DetailedStatistics THEN
-			NEW(statPool,64);
-		END;
-	END ResetStatistics;
-
-BEGIN
-	ResetStatistics
 END FoxGenericObjectFile.
