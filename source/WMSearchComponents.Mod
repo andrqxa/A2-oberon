@@ -500,13 +500,13 @@ TYPE
 		BEGIN
 			IF ucsStr[0] = 0 THEN posValid := FALSE; RETURN; END;
 			IF caseSensitive & ~backwards THEN
-				pos := TextUtilities.Pos(ucsStr, TODO(from), text);
+				pos := TextUtilities.Pos(ucsStr, from, text);
 			ELSE
 				(* We want to search the text that's on the left hand side of the cursor. If we start searching at position 'from',
 				we also consider the character at the current cursor position, which is on the left hand side of the cursro *)
 				IF (backwards) & (from > 1) THEN DEC(from); END;
 
-				pos := TextUtilities.GenericPos(ucsStr, TODO(from), text, ~caseSensitive, backwards);
+				pos := TextUtilities.GenericPos(ucsStr, from, text, ~caseSensitive, backwards);
 			END;
 			len := TextUtilities.UCS32StrLength(ucsStr);
 			IF pos > -1 THEN posValid := TRUE

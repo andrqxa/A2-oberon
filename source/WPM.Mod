@@ -24,7 +24,7 @@ BEGIN
 	len := TextUtils.UCS32StrLength(xs);
 	REPEAT
 		pos := TextUtils.Pos(xs, 0, text);
-		IF pos >= 0 THEN text.Delete(TODO(pos), TODO(len)); text.CopyFromText(replace, sfrom, slen, TODO(pos)) END
+		IF pos >= 0 THEN text.Delete(pos, len); text.CopyFromText(replace, sfrom, slen, pos) END
 	UNTIL pos < 0;
 	text.ReleaseWrite
 END ReplaceString;

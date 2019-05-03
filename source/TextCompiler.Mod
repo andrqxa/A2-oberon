@@ -70,7 +70,7 @@ CONST
 	BEGIN
 		text.AcquireRead;
 		NEW(r, text);
-		r.SetPosition(TODO(startPos));
+		r.SetPosition(startPos);
 		size := 0;i := 0; length := len; ok := TRUE;
 		WHILE (i < length) & ok DO
 			r.ReadCh(ch);
