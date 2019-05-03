@@ -999,7 +999,7 @@ TYPE
 		scope: Scope;
 		read: ReadTable;
 
-		PROCEDURE ReportXMLError(pos, line,col: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE ReportXMLError(pos, line,col: Streams.Position; CONST msg: ARRAY OF CHAR);
 		BEGIN
 			IF ~err THEN
 				error.Char(CHR(9H)); error.Char(CHR(9H)); error.String("pos "); error.Int(pos, 6);

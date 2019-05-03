@@ -1240,7 +1240,7 @@ TYPE
 			nofErrors := 0;
 		END Reset;
 
-		PROCEDURE Report(pos, line, col: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE Report(pos, line, col: Streams.Position; CONST msg: ARRAY OF CHAR);
 		BEGIN
 			INC(nofErrors);
 			KernelLog.Enter; KernelLog.Char(CHR(9H)); KernelLog.Char(CHR(9H)); KernelLog.String("pos "); KernelLog.Int(pos, 6);

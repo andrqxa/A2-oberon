@@ -349,7 +349,7 @@ BEGIN
 	NEW(a, c, s); RETURN a
 END NewSMTPAgent;
 
-PROCEDURE TrapHandler(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+PROCEDURE TrapHandler(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 BEGIN
 	KernelLog.String("Mail config error at pos "); KernelLog.Int(pos, 0); KernelLog.Ln;
 	errors := TRUE

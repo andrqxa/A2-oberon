@@ -1,7 +1,7 @@
 MODULE XMLParser;	(** AUTHOR "swalthert"; PURPOSE "XML parser"; *)
 
 IMPORT
-	Strings, KernelLog, DynamicStrings, Scanner := XMLScanner, XML;
+	Strings, KernelLog, DynamicStrings, Streams, Scanner := XMLScanner, XML;
 
 CONST
 	Ok* = XML.Ok;
@@ -14,7 +14,7 @@ TYPE
 		scanner: Scanner.Scanner;
 		dtd: XML.DocTypeDecl;
 		elemReg*: XML.ElementRegistry;
-		reportError*: PROCEDURE {DELEGATE} (pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+		reportError*: PROCEDURE {DELEGATE} (pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 		res*: LONGINT; (* result success / error code *)
 		ds1, ds2 : DynamicStrings.DynamicString; (** utility string, { (ds1 # NIL) & (ds2 # NIL) } *)
 
@@ -1023,7 +1023,7 @@ BEGIN
 	END
 END StrToInt;
 
-PROCEDURE DefaultReportError(pos, line, col: LONGINT; CONST msg: ARRAY OF CHAR);
+PROCEDURE DefaultReportError(pos, line, col: Streams.Position; CONST msg: ARRAY OF CHAR);
 BEGIN
 	KernelLog.Enter; KernelLog.Char(CHR(9H)); KernelLog.Char(CHR(9H)); KernelLog.String("pos "); KernelLog.Int(pos, 6);
 	KernelLog.String(", line "); KernelLog.Int(line, 0); KernelLog.String(", column "); KernelLog.Int(col, 0);

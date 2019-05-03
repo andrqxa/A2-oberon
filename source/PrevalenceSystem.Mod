@@ -1201,7 +1201,7 @@ CONST
 		lockParsingScanning := FALSE
 	END UnlockParsingScanning;
 
-	PROCEDURE ReportXMLParserScannerError(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR); (* Error handler for the XML parser *)
+	PROCEDURE ReportXMLParserScannerError(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR); (* Error handler for the XML parser *)
 	VAR w: Streams.StringWriter;
 	BEGIN
 		xmlParserErrorOccurred := TRUE;

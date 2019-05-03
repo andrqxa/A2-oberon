@@ -2,7 +2,7 @@ MODULE WMMacros;	(** AUTHOR "TF"; PURPOSE "Text macros"; *)
 
 IMPORT
 	Texts, KernelLog, Strings, TextUtilities, WMTextView, WMEditors,
-	Commands, Files, XML, XMLScanner, XMLParser, XMLObjects;
+	Commands, Files, XML, XMLScanner, XMLParser, XMLObjects, Streams;
 
 TYPE
 	String = Strings.String;
@@ -261,7 +261,7 @@ BEGIN
 END GetMacroKeySym;
 
 (* Report errors while parsing *)
-PROCEDURE Error(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+PROCEDURE Error(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 BEGIN
 	KernelLog.String("WMMacros: Parse error at pos "); KernelLog.Int(pos, 5); KernelLog.String(" in line "); KernelLog.Int(line, 5);
 	KernelLog.String(" row "); KernelLog.Int(row, 5); KernelLog.String(" - "); KernelLog.String(msg); KernelLog.Ln;

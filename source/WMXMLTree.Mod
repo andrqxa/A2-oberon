@@ -176,7 +176,7 @@ TYPE
 			RETURN result;
 		END GetErrorList;
 
-		PROCEDURE AddErrorToList(pos, line, row : LONGINT; CONST msg : ARRAY OF CHAR);
+		PROCEDURE AddErrorToList(pos, line, row : Streams.Position; CONST msg : ARRAY OF CHAR);
 		VAR temp : ErrorList; i : LONGINT;
 		BEGIN
 			IF errorList = NIL THEN
@@ -195,7 +195,7 @@ TYPE
 			COPY(msg, errorList[i].msg);
 		END AddErrorToList;
 
-		PROCEDURE Error(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE Error(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 		VAR tw : TextUtilities.TextWriter;
 		BEGIN
 			AddErrorToList(pos, line, row, msg);

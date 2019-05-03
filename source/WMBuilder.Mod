@@ -650,7 +650,7 @@ TYPE
 			hasError := FALSE;
 		END Init;
 
-		PROCEDURE ReportError(pos, line, col: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE ReportError(pos, line, col: Streams.Position; CONST msg: ARRAY OF CHAR);
 		BEGIN
 			hasError := TRUE;
 			KernelLog.String("WMBuilder.Clipboard.Parser.Parse: line = "); KernelLog.Int(line, 0);

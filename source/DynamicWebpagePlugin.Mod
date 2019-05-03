@@ -120,7 +120,7 @@ TYPE
 	END DynamicWebpagePlugin;
 
 	ParserError = POINTER TO RECORD
-		pos, line, row: LONGINT;
+		pos, line, row: Streams.Position;
 		msg: ARRAY 1024 OF CHAR
 	END;
 
@@ -658,7 +658,7 @@ TYPE
 		w.String("</address></body></html>")
 	END ReportGeneratorError;
 
-	PROCEDURE ReportXMLParserScannerError(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR); (* Error handler for the XML parser *)
+	PROCEDURE ReportXMLParserScannerError(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR); (* Error handler for the XML parser *)
 	BEGIN
 		NEW(parserError); parserError.pos := pos; parserError.line := line; COPY(msg, parserError.msg)
 	END ReportXMLParserScannerError;

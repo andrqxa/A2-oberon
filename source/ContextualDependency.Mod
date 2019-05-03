@@ -2,7 +2,7 @@ MODULE ContextualDependency; (** AUTHOR "gubsermi"; PURPOSE "Resolve context dep
 
 IMPORT
 	Files, KernelLog, Configuration, Texts, Strings,
-	XML, XMLObjects, XMLParser, XMLScanner;
+	XML, XMLObjects, XMLParser, XMLScanner, Streams;
 
 CONST
 	RangeDebug = FALSE;
@@ -1367,7 +1367,7 @@ TYPE
 		BEGIN COPY (filename, SELF.filename); xmlError := FALSE;
 		END InitTrap;
 
-		PROCEDURE Handler(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE Handler(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 		BEGIN
 			KernelLog.String("Error in ");
 			KernelLog.String(filename);

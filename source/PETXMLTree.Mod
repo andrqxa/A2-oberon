@@ -86,7 +86,7 @@ TYPE
 			tree.Release
 		END SetDocument;
 
-		PROCEDURE Error(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE Error(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 		VAR diagnostics : Diagnostics.Diagnostics; log : Streams.Writer;
 		BEGIN
 			diagnostics := SELF.diagnostics;
@@ -152,7 +152,7 @@ TYPE
 		diagnostics : Diagnostics.Diagnostics;
 		hasErrors : BOOLEAN;
 
-		PROCEDURE ReportError(pos, line, row : LONGINT; CONST msg : ARRAY OF CHAR);
+		PROCEDURE ReportError(pos, line, row : Streams.Position; CONST msg : ARRAY OF CHAR);
 		BEGIN
 			diagnostics.Error("PET", pos, msg);
 			hasErrors := TRUE;

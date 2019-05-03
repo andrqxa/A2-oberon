@@ -977,7 +977,7 @@ END File;
 
 
 (* Like in XMLScanner and XMLParser but doesn't HALT(99) *)
-PROCEDURE XMLReportError(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+PROCEDURE XMLReportError(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 	BEGIN
 		KernelLog.Enter; KernelLog.Char(CHR(9H)); KernelLog.Char(CHR(9H)); KernelLog.String("pos "); KernelLog.Int(pos, 6);
 		KernelLog.String(", line "); KernelLog.Int(line, 0); KernelLog.String(", row "); KernelLog.Int(row, 0);

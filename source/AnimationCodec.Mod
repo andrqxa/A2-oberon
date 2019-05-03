@@ -64,7 +64,7 @@ TYPE
 			default.x := 0; default.y := 0; default.time := 20; default.mode := Codecs.Unspecified;
 		END RestoreDefaultSettings;
 
-		PROCEDURE ReportError(pos, line, col: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE ReportError(pos, line, col: Streams.Position; CONST msg: ARRAY OF CHAR);
 		BEGIN
 			error := TRUE;
 		END ReportError;

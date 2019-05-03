@@ -908,7 +908,7 @@ TYPE
 			IF (link # NIL) THEN text.SetLink(oldpos, text.GetLength()-oldpos, link); KernelLog.String("bonk"); END;
 		END InsertChar;
 
-		PROCEDURE MalformedXML(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE MalformedXML(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 		BEGIN
 			Error(msg);
 		END MalformedXML;

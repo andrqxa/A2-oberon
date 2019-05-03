@@ -1063,7 +1063,7 @@ END SlideshowWindow;
 	 *  XML slideshow file reading stuff
 	 *
 	 *****)
-	PROCEDURE ErrorReport(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+	PROCEDURE ErrorReport(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 	BEGIN
 		KernelLog.String("Parse error at pos "); KernelLog.Int(pos, 5); KernelLog.String(" in line "); KernelLog.Int(line, 5);
 		KernelLog.String(" row "); KernelLog.Int(row, 5); KernelLog.String(" - "); KernelLog.String(msg); KernelLog.Ln;

@@ -2362,7 +2362,7 @@ TYPE
 		END Close;
 
 		(* XML scanner/parser error handler *)
-		PROCEDURE Error(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+		PROCEDURE Error(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 		BEGIN
 			xmlHasErrors := TRUE;
 		END Error;

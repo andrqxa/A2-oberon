@@ -1904,7 +1904,7 @@ BEGIN
 	RETURN child;
 END FindChild;
 
-PROCEDURE TrapHandler(pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+PROCEDURE TrapHandler(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 BEGIN
 	error := TRUE;
 	diagnostics.Error(source, pos, msg);
