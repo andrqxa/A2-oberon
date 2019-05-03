@@ -92,7 +92,7 @@ TYPE
 		audio : TVDriver.Audio;
 		vbi : TeletextDecoder.VbiDecoder;
 		timer : Kernel.Timer;
-		chNr : LONGINT;
+		chNr : SIZE;
 		chSwitcher : Standard.Timer;
 		autoSwitch, alive- : BOOLEAN;
 		chnlSeeker : ChannelSeeker;
@@ -441,8 +441,8 @@ PROCEDURE BuildChannelTableImpl(filename : ARRAY OF CHAR);
 CONST
 	Delay = 500;
 VAR
-	ch, max, i, found: LONGINT;
-	length: SIZE;
+	ch, max, found: LONGINT;
+	i, length: SIZE;
 	res: WORD;
 	tvWnd : TvWindow;
 	tvCh : TVChannels.TVChannel;

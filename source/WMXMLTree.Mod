@@ -84,7 +84,7 @@ TYPE
 		END SetEditor;
 
 		PROCEDURE Click(sender, data : ANY);
-		VAR p : ANY; a, b : LONGINT;
+		VAR p : ANY; a, b : SIZE;
 		BEGIN
 			IF (data # NIL) & (data IS WMTrees.TreeNode) THEN
 				tree.Acquire;

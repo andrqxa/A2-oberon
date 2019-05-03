@@ -309,13 +309,13 @@ TYPE
 			tree.Release;
 		END SortHandler;
 
-		PROCEDURE SelectNodeByPos* (pos: LONGINT);
+		PROCEDURE SelectNodeByPos* (pos: SIZE);
 		VAR root, node: WMTrees.TreeNode;
 
-			PROCEDURE FindNearestNode (node: WMTrees.TreeNode; pos: LONGINT): WMTrees.TreeNode;
-			VAR nearestNode: WMTrees.TreeNode; distance, nearestDistance: LONGINT;
+			PROCEDURE FindNearestNode (node: WMTrees.TreeNode; pos: SIZE): WMTrees.TreeNode;
+			VAR nearestNode: WMTrees.TreeNode; distance, nearestDistance: SIZE;
 
-				PROCEDURE GetDistance (node: WMTrees.TreeNode; pos: LONGINT): LONGINT;
+				PROCEDURE GetDistance (node: WMTrees.TreeNode; pos: SIZE): SIZE;
 				BEGIN
 					WHILE (node # NIL) & (~(node IS TreeNode) OR (node(TreeNode).pos = NIL)) DO
 						node := tree.GetChildren(node);
@@ -323,12 +323,12 @@ TYPE
 					IF (node # NIL) & (node IS TreeNode) & (node(TreeNode).pos # NIL) & (pos >= node(TreeNode).pos.GetPosition()) THEN
 						RETURN pos - node(TreeNode).pos.GetPosition()
 					ELSE
-						RETURN MAX(LONGINT)
+						RETURN MAX(SIZE)
 					END
 				END GetDistance;
 
 			BEGIN
-				nearestNode := NIL; nearestDistance := MAX (LONGINT);
+				nearestNode := NIL; nearestDistance := MAX (SIZE);
 				WHILE node # NIL DO
 					IF (node IS TreeNode) & (node(TreeNode).external = FALSE) THEN
 						distance := GetDistance (node, pos);
@@ -426,8 +426,8 @@ TYPE
 			IF caption # NIL THEN canvas.DrawString(dx, h - f.descent - 1 , caption^) END;
 		END DrawNode;
 
-		PROCEDURE SetEditorPosition*(position : LONGINT; doHighlight : BOOLEAN);
-		VAR text : Texts.Text; a, b : LONGINT;
+		PROCEDURE SetEditorPosition*(position : SIZE; doHighlight : BOOLEAN);
+		VAR text : Texts.Text; a, b : SIZE;
 		BEGIN
 			text := editor.text;
 			text.AcquireRead;

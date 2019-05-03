@@ -31,18 +31,18 @@ END PutFile;
 
 PROCEDURE PutText(ftp : FTPClient.FTPClient; local, remote : ARRAY OF CHAR; VAR res : WORD);
 VAR w : Streams.Writer;
-        text: Texts.Text;
-        r: Texts.TextReader;
-        ch: Texts.Char32;
-        i: LONGINT;
+	text: Texts.Text;
+	r: Texts.TextReader;
+	ch: Texts.Char32;
+	i: SIZE;
 BEGIN
-        NEW(text);
-        TextUtilities.LoadOberonText(text, local, res);
-        IF res # 0 THEN res:= LocalFileNotFound; RETURN END;
-        text.AcquireRead;
-        NEW(r, text);
-        ftp.OpenPut(remote, w, res);
-        IF res = 0 THEN
+	NEW(text);
+	TextUtilities.LoadOberonText(text, local, res);
+	IF res # 0 THEN res:= LocalFileNotFound; RETURN END;
+	text.AcquireRead;
+	NEW(r, text);
+	ftp.OpenPut(remote, w, res);
+	IF res = 0 THEN
 		FOR i := 0 TO text.GetLength() - 1 DO
 			r.ReadCh(ch);
 			IF (ch >= 0) & (ch < 128) THEN w.Char(CHR(ch)) END;

@@ -27,7 +27,7 @@ CONST
 	END GetClipboardReader;
 
 	PROCEDURE GetSelectionReader(): Streams.Reader;
-	VAR a, b: LONGINT; size : SIZE;
+	VAR a, b, size : SIZE;
 		selectionText: Texts.Text;
 		from, to: Texts.TextPosition;
 		pcStr: POINTER TO ARRAY OF CHAR;
@@ -49,7 +49,7 @@ CONST
 		RETURN stringReader;
 	END GetSelectionReader;
 
-	PROCEDURE GetTextReader(text: Texts.Text; position: LONGINT): Streams.Reader;
+	PROCEDURE GetTextReader(text: Texts.Text; position: SIZE): Streams.Reader;
 	VAR size : SIZE;
 		pcStr: POINTER TO ARRAY OF CHAR;
 		stringReader: Streams.StringReader;

@@ -687,7 +687,7 @@ TYPE
 
 		PROCEDURE Append (message: String; cs: Texts.CharacterStyle; ps: Texts.ParagraphStyle);
 		VAR
-			len: LONGINT; idx: SIZE;
+			len, idx: SIZE;
 			ucs32: Texts.PUCS32String;
 		BEGIN
 

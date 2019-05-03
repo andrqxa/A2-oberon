@@ -422,7 +422,7 @@ TYPE
 			WMRestorable.StoreString(config, "file", filename);
 			WMRestorable.StoreString(config, "codecFormat", codecFormat);
 			WMRestorable.StoreLongint(config, "firstLine", editor.tv.firstLine.Get());
-			WMRestorable.StoreLongint(config, "cursorPos", editor.tv.cursor.GetPosition());
+			WMRestorable.StoreLongint(config, "cursorPos", TODO(editor.tv.cursor.GetPosition()));
 			WMRestorable.StoreBoolean(config, "wordWrap", wordWrap);
 		END ToXml;
 

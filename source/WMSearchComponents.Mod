@@ -13,12 +13,12 @@ TYPE
 	SearchString* = ARRAY SearchStringMaxLen OF CHAR;
 	UcsSearchString* = ARRAY SearchStringMaxLen OF Texts.Char32;
 
-	StackData = POINTER TO ARRAY OF LONGINT;
+	StackData = POINTER TO ARRAY OF SIZE;
 
 	PositionStack = OBJECT
 	VAR
 		data: StackData;
-		size, top: LONGINT;
+		size, top: SIZE;
 
 		PROCEDURE & Init*;
 		BEGIN
@@ -26,15 +26,15 @@ TYPE
 			NEW(data, 32);
 		END Init;
 
-		PROCEDURE Push(l: LONGINT);
+		PROCEDURE Push(l: SIZE);
 		BEGIN
 			IF top = size THEN Expand END;
 			data[top] := l;
 			INC(top);
 		END Push;
 
-		PROCEDURE Pop(): LONGINT;
-		VAR val: LONGINT;
+		PROCEDURE Pop(): SIZE;
+		VAR val: SIZE;
 		BEGIN
 			IF top > 0 THEN
 				DEC(top);
@@ -47,7 +47,7 @@ TYPE
 
 		PROCEDURE Expand;
 		VAR
-			newSize, i: LONGINT;
+			newSize, i: SIZE;
 			newData: StackData;
 		BEGIN
 			newSize := 2*size;
@@ -79,7 +79,7 @@ TYPE
 		textView : WMTextView.TextView;
 		highlights : Highlight;
 
-		PROCEDURE Add(from, to : LONGINT);
+		PROCEDURE Add(from, to : SIZE);
 		VAR h : Highlight;
 		BEGIN {EXCLUSIVE}
 			NEW(h); h.next := highlights; highlights := h;
@@ -122,13 +122,13 @@ TYPE
 		textView: WMTextView.TextView;
 		text: Texts.Text;
 
-		pos, len: LONGINT;
-		hitCount : LONGINT;
+		pos, len: SIZE;
+		hitCount : SIZE;
 		posValid : BOOLEAN;
 		positionStack: PositionStack;
 		highlights : Highlights;
 
-		lastPos : LONGINT;
+		lastPos : SIZE;
 		lastBackwards : BOOLEAN;
 
 		PROCEDURE & Init*;
@@ -261,7 +261,7 @@ TYPE
 		VAR
 			currentSearchString, searchString : SearchString;
 			selectionText : Texts.Text; from, to : Texts.TextPosition;
-			a, b : LONGINT;
+			a, b : SIZE;
 		BEGIN
 			searchString := "";
 			IF Texts.GetLastSelection(selectionText, from, to) THEN
@@ -411,7 +411,7 @@ TYPE
 		PROCEDURE TextChanged(sender, data: ANY);
 		VAR
 			changeInfo: Texts.TextChangeInfo;
-			from : LONGINT;
+			from : SIZE;
 		BEGIN
 			IF ~IsCallFromSequencer() THEN
 				(* 	We need to use DisableUpdate/EnableUpdate in order to get reasonable performance... This requires
@@ -514,7 +514,7 @@ TYPE
 			END;
 		END Search;
 
-		PROCEDURE SearchAndHighlight(from: LONGINT);
+		PROCEDURE SearchAndHighlight(from: SIZE);
 		VAR searchStr : SearchString; ucsStr: UcsSearchString; length, idx : SIZE;
 		BEGIN
 			IF text = NIL THEN RETURN END;
@@ -555,7 +555,7 @@ TYPE
 			searchString : SearchString;
 			ucsStr : UcsSearchString;
 			caption : ARRAY 32 OF CHAR; nbr : ARRAY 12 OF CHAR;
-			length, pos, from: LONGINT; idx: SIZE;
+			length, pos, from, idx: SIZE;
 		BEGIN
 			IF (text = NIL) OR (highlights = NIL) THEN RETURN; END;
 			hitCount := 0;

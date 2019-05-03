@@ -150,8 +150,8 @@ TYPE
 			END;
 		END Finalize;
 
-		PROCEDURE DeleteNCharacters(nbrOfCharacters : LONGINT);
-		VAR pos : LONGINT;
+		PROCEDURE DeleteNCharacters(nbrOfCharacters : SIZE);
+		VAR pos : SIZE;
 		BEGIN
 			text.AcquireWrite;
 			pos := editor.editor.tv.cursor.GetPosition();
@@ -221,7 +221,7 @@ TYPE
 	VAR
 		shell : ShellComponent;
 
-		PROCEDURE HandleUpcall(command : LONGINT);
+		PROCEDURE HandleUpcall(command : WORD);
 		BEGIN
 			IF command = Shell.Clear THEN
 				shell.Clear;
@@ -275,7 +275,7 @@ TYPE
 	END Window;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIZE;
 
 	StrShellComponent : Strings.String;
 

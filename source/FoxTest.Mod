@@ -199,7 +199,7 @@ TYPE
 	PROCEDURE GetTextReader(text: Texts.Text): Streams.Reader;
 	VAR
 		buffer : POINTER TO ARRAY OF CHAR;
-		length: LONGINT; reader: Streams.StringReader;
+		length: SIZE; reader: Streams.StringReader;
 	BEGIN
 		ASSERT((text # NIL));
 		text.AcquireRead;

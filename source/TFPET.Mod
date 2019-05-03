@@ -382,7 +382,7 @@ TYPE
 
 		(* Associate current cursor position with the spec  ified key combination.  *)
 		PROCEDURE StoreCurrentPosition(ucs, keysym : LONGINT; flags : SET);
-		VAR newPosition : Position; intPos : LONGINT;
+		VAR newPosition : Position; intPos : SIZE;
 		BEGIN
 			ASSERT(flags * { Inputs.Release} = {});
 			newPosition := FindPosition(ucs, keysym, flags);
@@ -804,7 +804,7 @@ TYPE
 		END ErrorClick;
 
 		PROCEDURE GoToNextError(forward : BOOLEAN);
-		VAR nearestPosition, row, index : LONGINT; focusEditor: WMEditors.Editor;
+		VAR nearestPosition, row, index : SIZE; focusEditor: WMEditors.Editor;
 		BEGIN
 			IF focus = EditorFocus THEN focusEditor := editor; index := 0;
 			ELSIF focus = SplitEditorFocus THEN focusEditor := splitEditor; index := 1;
@@ -871,7 +871,7 @@ TYPE
 		END TextChanged;
 
 		PROCEDURE CursorChanged;
-		VAR position : LONGINT; pos : ARRAY 16 OF CHAR;
+		VAR position : SIZE; pos : ARRAY 16 OF CHAR;
 		BEGIN
 			position := editor.tv.cursor.GetPosition();
 			Strings.IntToStr(position, pos);
@@ -880,7 +880,7 @@ TYPE
 		END CursorChanged;
 
 		PROCEDURE HandleShortcut(ucs : LONGINT; flags : SET; keysym : LONGINT) : BOOLEAN;
-		VAR pos : LONGINT;
+		VAR pos : SIZE;
 
 			PROCEDURE HandlePreviousNext(forward : BOOLEAN);
 			BEGIN
@@ -930,7 +930,7 @@ TYPE
 			END HandlePositions;
 
 			PROCEDURE RemoveWhitespace;
-			VAR tw : TextUtilities.TextWriter; nofRemoved : LONGINT;
+			VAR tw : TextUtilities.TextWriter; nofRemoved : SIZE;
 			BEGIN
 				ClearLog;
 				NEW(tw, logEdit.text);
@@ -1020,7 +1020,7 @@ TYPE
 	BrowseEntry = POINTER TO RECORD
 		prev, next : BrowseEntry;
 		filename : Filename;
-		pos : LONGINT;
+		pos : SIZE;
 	END;
 
 	Window = OBJECT (WMComponents.FormWindow)
@@ -1307,7 +1307,7 @@ TYPE
 			END;
 		END ButtonHandler;
 
-		PROCEDURE NrUpdatesChanged(nrUndos, nrRedos: LONGINT);
+		PROCEDURE NrUpdatesChanged(nrUndos, nrRedos: SIZE);
 		VAR lbl, str: ARRAY 32 OF CHAR;
 		BEGIN
 			IF nrUndos = 0 THEN
@@ -1392,7 +1392,7 @@ TYPE
 		END InitCodecs;
 
 		PROCEDURE SelectNextTab;
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			IF currentPageNr < 0 THEN RETURN; END;
 			i := currentPageNr + 1;
@@ -1406,7 +1406,7 @@ TYPE
 		END SelectNextTab;
 
 		PROCEDURE SelectPreviousTab;
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			IF currentPageNr < 0 THEN RETURN; END;
 			i := currentPageNr - 1;
@@ -1419,7 +1419,7 @@ TYPE
 			END;
 		END SelectPreviousTab;
 
-		PROCEDURE SelectTab(tabNr : LONGINT);
+		PROCEDURE SelectTab(tabNr : SIZE);
 		BEGIN
 			IF (tabNr >= 0) & (tabNr < LEN(SELF.pages)) & (SELF.pages[tabNr] # NIL) THEN
 				TabSelected(NIL, tabList[tabNr]);
@@ -1442,8 +1442,8 @@ TYPE
 			END;
 		END RecordCurrentPos;
 
-		PROCEDURE GotoFileInternal(CONST filename : ARRAY OF CHAR; pos : LONGINT);
-		VAR page : PETPanel; i : LONGINT;
+		PROCEDURE GotoFileInternal(CONST filename : ARRAY OF CHAR; pos : SIZE);
+		VAR page : PETPanel; i : SIZE;
 		BEGIN
 			KernelLog.String("filename= "); KernelLog.String(filename); KernelLog.Ln;
 			KernelLog.String("pos= "); KernelLog.Int(pos, 0); KernelLog.Ln;
@@ -1700,7 +1700,7 @@ TYPE
 				findPCBtn.visible.Set(currentPage.compilerSettings.findPC);
 				currentPage.editor.tv.cursor.SetVisible(TRUE);
 				currentPage.editor.SetFocus;
-				tInt := currentPage.editor.tv.cursor.GetPosition(); Strings.IntToStr(tInt, tStr);
+				tInt := TODO(currentPage.editor.tv.cursor.GetPosition()); Strings.IntToStr(tInt, tStr);
 				positionEdit.SetAsString(tStr);
 				IF currentPage.editor.undoMgr # NIL THEN
 					NrUpdatesChanged(currentPage.editor.undoMgr.nrUndoUpdates, currentPage.editor.undoMgr.nrRedoUpdates);
@@ -2256,7 +2256,7 @@ TYPE
 		END LinkClickedHandler;
 
 		PROCEDURE FindPC(sender, data : ANY);
-		VAR a, b : LONGINT;
+		VAR a, b : SIZE;
 			pcStr : ARRAY 128 OF CHAR;
 			selectionText: Texts.Text;
 			from, to: Texts.TextPosition;
@@ -2519,13 +2519,13 @@ TYPE
 
 			NEW(entry); entry.SetName("Editor");
 				WMRestorable.StoreLongint(entry, "firstLine", page.editor.tv.firstLine.Get());
-				WMRestorable.StoreLongint(entry, "cursorPos", page.editor.tv.cursor.GetPosition());
+				WMRestorable.StoreLongint(entry, "cursorPos", TODO(page.editor.tv.cursor.GetPosition()));
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("SplitEditor");
 				WMRestorable.StoreBoolean(entry, "visible", page.splitPanel.visible.Get());
 				WMRestorable.StoreLongint(entry, "firstLine", page.splitEditor.tv.firstLine.Get());
-				WMRestorable.StoreLongint(entry, "cursorPos", page.splitEditor.tv.cursor.GetPosition());
+				WMRestorable.StoreLongint(entry, "cursorPos", TODO(page.splitEditor.tv.cursor.GetPosition()));
 				WMRestorable.StoreLongint(entry, "height", page.splitPanel.bounds.GetHeight());
 			elem.AddContent(entry);
 
@@ -2678,7 +2678,7 @@ END Restore;
 
 (** Comment the currently selected text *)
 PROCEDURE CommentSelection*(text : Texts.Text; from, to : Texts.TextPosition);
-VAR a, b : LONGINT; string : ARRAY 4 OF Texts.Char32;
+VAR a, b : SIZE; string : ARRAY 4 OF Texts.Char32;
 BEGIN
 	ASSERT((text # NIL) & (from # NIL) & (to # NIL));
 	text.AcquireWrite;
@@ -2697,8 +2697,8 @@ END CommentSelection;
 PROCEDURE UncommentSelection*(text : Texts.Text; from, to : Texts.TextPosition);
 VAR
 	reader : Texts.TextReader; ch : Texts.Char32;
-	a, b : LONGINT;
-	openPos, closePos, openLen, closeLen : LONGINT;
+	a, b : SIZE;
+	openPos, closePos, openLen, closeLen : SIZE;
 BEGIN
 	text.AcquireWrite;
 	a := MIN(from.GetPosition(), to.GetPosition());

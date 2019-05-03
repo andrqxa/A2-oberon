@@ -590,7 +590,7 @@ MODULE WMVT100; (* ejz,  ph *)
 
 			PROCEDURE Copy;
 				VAR
-					l: Line; apos, pos, ofs, end: LONGINT; buf: ARRAY 2 OF LONGINT;
+					l: Line; apos, pos, ofs, end: SIZE; buf: ARRAY 2 OF LONGINT;
 					attr: Attribute; tattr: Texts.Attributes;
 			BEGIN {EXCLUSIVE}
 				IF sel.beg.line = NIL THEN RETURN END;

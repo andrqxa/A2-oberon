@@ -1171,7 +1171,7 @@ TYPE
 
 
 		(* Parses a given line and analyzes it character-wise for defined context rules *)
-		PROCEDURE AnalyzeLine(line : Texts.TextReader; start, end : LONGINT) : Texts.TextReader;
+		PROCEDURE AnalyzeLine(line : Texts.TextReader; start, end : SIZE) : Texts.TextReader;
 		VAR
 			lineCache, newLine : String;
 			ch,ch1,ch2,ch3,ch4 : Texts.Char32;

@@ -40,8 +40,8 @@ VAR
 	hMem: Kernel32.HGLOBAL; adr: ADDRESS;
 	hBool: Kernel32.BOOL;
 	chBuff: POINTER TO ARRAY OF CHAR;
-	size,requiredSize: LONGINT;
-	ind: LONGINT;
+	size,requiredSize: SIZE;
+	ind: SIZE;
 BEGIN
 	ASSERT((text # NIL) & (text.HasReadLock()));
 	IF User32.OpenClipboard(Kernel32.NULL) # Kernel32.False THEN
@@ -55,7 +55,7 @@ BEGIN
 			IF chBuff^[ind] = LF THEN INC(requiredSize); END; (* transform LF into CRLF *)
 			INC(ind);
 		END;
-		hMem := Kernel32.GlobalAlloc({Kernel32.GMemMoveable, Kernel32.GMemDDEShare}, requiredSize);
+		hMem := Kernel32.GlobalAlloc({Kernel32.GMemMoveable, Kernel32.GMemDDEShare}, TODO(requiredSize));
 		adr := Kernel32.GlobalLock(hMem);
 		ind := 0;
 		WHILE ind < size  DO

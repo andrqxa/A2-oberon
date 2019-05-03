@@ -467,7 +467,7 @@ TYPE
 			IF (nofEntries > 0) THEN
 				FOR i := 0 TO LEN(textViews)-1 DO
 					IF (entries[0].pos # NIL) & (entries[0].pos[i] # NIL) THEN
-						positions[i] := entries[0].pos[i].GetPosition();
+						positions[i] := TODO(entries[0].pos[i].GetPosition());
 					ELSE
 						positions[i] := Streams.Invalid;
 					END;
@@ -479,8 +479,8 @@ TYPE
 			Release;
 		END GetFirstPosition;
 
-		PROCEDURE GetNearestPosition*(cursorPosition, editorIndex : LONGINT; forward : BOOLEAN; VAR nearestPosition : LONGINT; VAR number : LONGINT);
-		VAR pos, i : LONGINT;
+		PROCEDURE GetNearestPosition*(cursorPosition, editorIndex : SIZE; forward : BOOLEAN; VAR nearestPosition : SIZE; VAR number : SIZE);
+		VAR pos, i : SIZE;
 		BEGIN
 			Acquire;
 			ASSERT((textViews # NIL) & (0 <= editorIndex) & (editorIndex < LEN(textViews)));
@@ -488,7 +488,7 @@ TYPE
 			i := 0;
 			LOOP
 				IF (i >= nofEntries) OR (entries[i].pos = NIL) OR (entries[i].pos[editorIndex] = NIL) THEN EXIT; END;
-				pos := entries[i].pos[editorIndex].GetPosition();
+				pos := TODO(entries[i].pos[editorIndex].GetPosition());
 				IF forward & (pos > cursorPosition) THEN
 					IF (nearestPosition = -1) OR (pos < nearestPosition) THEN nearestPosition := pos; number := i+1; END;
 				ELSIF ~forward & (pos < cursorPosition) THEN
@@ -503,13 +503,13 @@ TYPE
 			Release;
 		END GetNearestPosition;
 
-		PROCEDURE SelectEntry*(number : LONGINT; moveTo : BOOLEAN);
+		PROCEDURE SelectEntry*(number : SIZE; moveTo : BOOLEAN);
 		BEGIN
 			Acquire;
 			IF (0 <= number) & (number <= nofEntries) THEN
-				SetSelection(0, number, 2, number);
+				SetSelection(0, TODO(number), 2, TODO(number));
 				IF moveTo THEN
-					SetTopPosition(0, number, TRUE);
+					SetTopPosition(0, TODO(number), TRUE);
 				END;
 			END;
 			Release;

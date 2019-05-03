@@ -354,13 +354,13 @@ TYPE
 			tree.Release;
 		END SortHandler;
 
-		PROCEDURE SelectNodeByPos* (pos: LONGINT);
+		PROCEDURE SelectNodeByPos* (pos: SIZE);
 		VAR root, node: WMTrees.TreeNode; data : ANY;
 
-			PROCEDURE FindNearestNode (node: WMTrees.TreeNode; pos: LONGINT): WMTrees.TreeNode;
-			VAR nearestNode: WMTrees.TreeNode; distance, nearestDistance: LONGINT;
+			PROCEDURE FindNearestNode (node: WMTrees.TreeNode; pos: SIZE): WMTrees.TreeNode;
+			VAR nearestNode: WMTrees.TreeNode; distance, nearestDistance: SIZE;
 
-				PROCEDURE GetDistance (node: WMTrees.TreeNode; pos: LONGINT): LONGINT;
+				PROCEDURE GetDistance (node: WMTrees.TreeNode; pos: SIZE): SIZE;
 				VAR data: ANY;
 				BEGIN
 					data := tree.GetNodeData (node);
@@ -370,12 +370,12 @@ TYPE
 					IF (data # NIL) & (data IS TextInfo) & (data(TextInfo).pos # NIL) & (pos >= data(TextInfo).pos.GetPosition ()) THEN
 						RETURN pos - data(TextInfo).pos.GetPosition ()
 					ELSE
-						RETURN MAX(LONGINT)
+						RETURN MAX(SIZE)
 					END
 				END GetDistance;
 
 			BEGIN
-				nearestNode := NIL; nearestDistance := MAX (LONGINT);
+				nearestNode := NIL; nearestDistance := MAX (SIZE);
 				WHILE node # NIL DO
 					data := tree.GetNodeData(node);
 					IF (data # NIL) & (data IS TextInfo) & (data(TextInfo).external = FALSE) THEN
@@ -498,7 +498,7 @@ TYPE
 			d: ANY;
 			node : WMTrees.TreeNode;
 			textInfo: TextInfo;
-			a, b  : LONGINT;
+			a, b  : SIZE;
 			text : Texts.Text;
 			moduleNode : ModuleParser.Module;
 			extInfo : ExternalInfo;

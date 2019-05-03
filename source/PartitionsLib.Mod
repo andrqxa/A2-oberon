@@ -1004,7 +1004,7 @@ TYPE
 		END ReportError;
 
 		PROCEDURE GetResult*() : Strings.String;
-		VAR string : Strings.String; length : LONGINT;
+		VAR string : Strings.String; length : SIZE;
 		BEGIN
 			string := Strings.NewString(""); result.Update;
 			resultText.AcquireRead;

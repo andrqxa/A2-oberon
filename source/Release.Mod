@@ -2846,7 +2846,7 @@ VAR
 	parser : Parser; scanner : Scanner;
 	reader : Streams.StringReader;
 	buffer : POINTER TO ARRAY OF CHAR;
-	length : LONGINT;
+	length : SIZE;
 BEGIN
 	ASSERT((text # NIL) & (diagnostics # NIL));
 	text.AcquireRead;

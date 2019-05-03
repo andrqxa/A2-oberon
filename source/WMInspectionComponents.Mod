@@ -3649,7 +3649,7 @@ TYPE
 		END EditorKeyEvent;
 
 		PROCEDURE HandleShiftReturn;
-		VAR model : Models.Model; string : Types.DynamicString; length : LONGINT; res: WORD;
+		VAR model : Models.Model; string : Types.DynamicString; length : SIZE; res: WORD;
 		BEGIN
 			model := SELF.model;
 			IF (model # NIL) THEN

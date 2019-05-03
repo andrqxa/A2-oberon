@@ -298,7 +298,7 @@ TYPE
 	CustomTextView = OBJECT(WMTextView.TextView)
 	VAR
 		selecting, selectWords, dragPossible  : BOOLEAN;
-		lastPos : LONGINT;
+		lastPos : SIZE;
 		downX, downY : LONGINT;
 
 		utilreader : Texts.TextReader;
@@ -313,7 +313,7 @@ TYPE
 		END SetText;
 
 		PROCEDURE PointerDown*(x, y : LONGINT; keys : SET);
-		VAR pos : LONGINT;
+		VAR pos : SIZE;
 		BEGIN
 			IF keys * {0, 1, 2} = {2} THEN
 				ShowContextMenu(x, y) END;
@@ -344,7 +344,7 @@ TYPE
 
 		PROCEDURE PointerMove*(x, y : LONGINT; keys : SET);
 		CONST DragDist = 5;
-		VAR pos : LONGINT;
+		VAR pos : SIZE;
 		BEGIN
 			IF dragPossible THEN
 				IF (ABS(x - downX) > DragDist) OR (ABS(y - downY) > DragDist) THEN dragPossible := FALSE; AutoStartDrag END
@@ -1103,7 +1103,7 @@ TYPE
 		END Finalize;
 
 		PROCEDURE DeleteNCharacters(nbrOfCharacters : SIZE);
-		VAR pos : LONGINT;
+		VAR pos : SIZE;
 		BEGIN
 			text.AcquireWrite;
 			pos := textView.cursor.GetPosition();

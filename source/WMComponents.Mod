@@ -2930,7 +2930,7 @@ BEGIN
 END ContainsMacros;
 
 PROCEDURE WriteSelectionToStream(w : Streams.Writer);
-VAR text : Texts.Text; from, to : Texts.TextPosition; a, b : LONGINT;
+VAR text : Texts.Text; from, to : Texts.TextPosition; a, b : SIZE;
 BEGIN
 	ASSERT(w # NIL);
 	IF Texts.GetLastSelection(text, from, to) THEN

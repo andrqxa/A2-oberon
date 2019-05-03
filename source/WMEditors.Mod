@@ -119,13 +119,13 @@ TYPE
 		currentFlags : SET;
 
 		string : Texts.PUCS32String; (* 0X-terminated unicode string *)
-		cursorPosition : LONGINT;
-		curLen : LONGINT; (* excl. 0X, {(string[curLen] = 0) OR (string = NIL)} *)
-		selection : RECORD start, end : LONGINT; END; (* -1, -1 means invalid *)
+		cursorPosition : SIZE;
+		curLen : SIZE; (* excl. 0X, {(string[curLen] = 0) OR (string = NIL)} *)
+		selection : RECORD start, end : SIZE; END; (* -1, -1 means invalid *)
 
 		cursorIsVisible : BOOLEAN;
 		selecting, doubleClicking : BOOLEAN;
-		selectingCursorPos : LONGINT;
+		selectingCursorPos : SIZE;
 		interclick : LONGINT;
 
 		(* drag'n'drop *)
@@ -387,13 +387,14 @@ TYPE
 		CONST CursorWidth = 2; BorderWidth = 1;
 		VAR
 			font : WMGraphics.Font; g : WMGraphics.GlyphSpacings;
-			x, y : LONGINT; cursorX, selectionX0, selectionX1, tw, th: LONGINT; code, i, width, height : LONGINT;
+			x, y : LONGINT; cursorX, selectionX0, selectionX1, tw, th: LONGINT; code, width, height : LONGINT;
+			i: SIZE;
 			selectionIsValid : BOOLEAN;
 			halign: LONGINT;
 			TextBorder: LONGINT;
 
 			PROCEDURE StringSize(VAR w,h: LONGINT);
-			VAR code,i: LONGINT;
+			VAR code: LONGINT; i: SIZE;
 			BEGIN
 				w := 0; h := 0;
 				FOR i := 0 TO curLen-1 DO
@@ -531,7 +532,7 @@ TYPE
 		END IsValidUCS32String;
 
 		PROCEDURE InsertChar(ch : LONGINT);
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			IF IsAllowedCharacter(ch) THEN
 				DeleteSelection;
@@ -591,8 +592,8 @@ TYPE
 			END;
 		END InsertStringAt;
 
-		PROCEDURE InsertUCS32(atPosition : LONGINT; CONST string : Texts.UCS32String);
-		VAR length, i, j : LONGINT; changed : BOOLEAN;
+		PROCEDURE InsertUCS32(atPosition : SIZE; CONST string : Texts.UCS32String);
+		VAR length, i, j : SIZE; changed : BOOLEAN;
 		BEGIN
 			ASSERT(atPosition >= 0);
 			IF IsValidUCS32String(string) THEN
@@ -632,7 +633,7 @@ TYPE
 		END InsertUCS32;
 
 		PROCEDURE Backspace;
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			IF SelectionIsValid() THEN
 				DeleteSelection; changeDue := TRUE; (*Changed;*)
@@ -651,7 +652,7 @@ TYPE
 
 		(* Delete the character on the left hand side of the cursor and invalidate the editor if necessary *)
 		PROCEDURE Delete;
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			IF SelectionIsValid() THEN
 				DeleteSelection; (*Changed;*) changeDue := TRUE;
@@ -761,7 +762,7 @@ TYPE
 		END CursorRight;
 
 		PROCEDURE DeleteSelection;
-		VAR nofSelectedCharacters, i : LONGINT;
+		VAR nofSelectedCharacters, i : SIZE;
 		BEGIN
 			IF SelectionIsValid() THEN
 				nofSelectedCharacters := selection.end - selection.start + 1;
@@ -779,7 +780,7 @@ TYPE
 		END DeleteSelection;
 
 		PROCEDURE CopySelection;
-		VAR i : LONGINT; ucs32 : Texts.PUCS32String;
+		VAR i : SIZE; ucs32 : Texts.PUCS32String;
 		BEGIN
 			IF SelectionIsValid() THEN
 				Texts.clipboard.AcquireWrite;
@@ -907,7 +908,7 @@ TYPE
 		END KeyEvent;
 
 		PROCEDURE PointerDown*(x, y : LONGINT; keys : SET);
-		VAR newCursorPosition, oldInterclick : LONGINT;
+		VAR newCursorPosition: SIZE; oldInterclick : LONGINT;
 		BEGIN
 			PointerDown^(x, y, keys);
 
@@ -968,7 +969,7 @@ TYPE
 		END PointerUp;
 
 		PROCEDURE PointerMove*(x, y : LONGINT; keys : SET);
-		VAR posX : LONGINT; valid : BOOLEAN; start, end : LONGINT;
+		VAR posX : LONGINT; valid : BOOLEAN; start, end : SIZE;
 		BEGIN
 			IF dragPossible THEN
 				IF (ABS(x - lastX) > DragMinDistance) OR (ABS(y - lastY) > DragMinDistance) THEN dragPossible := FALSE; AutoStartDrag; END;
@@ -1029,7 +1030,7 @@ TYPE
 			ds : DropString;
 			itf : WMDropTarget.DropInterface;
 			targetText, temp : Texts.Text;
-			pos, value : LONGINT; res : WORD;
+			pos: SIZE; value : LONGINT; res : WORD;
 		BEGIN
 			IF (dragString = NIL) THEN RETURN; END;
 
@@ -1121,12 +1122,12 @@ TYPE
 		END SetDroppedString;
 
 		(* this function is use by IMEs to set the next cursor position for live-editing bidirectional text *)
-		PROCEDURE SetCursorInfo(charsAdded : LONGINT);
+		PROCEDURE SetCursorInfo(charsAdded : SIZE);
 		BEGIN
 			(* ignore *)
 		END SetCursorInfo;
 
-		PROCEDURE GetCurrentCursorPosition() : LONGINT;
+		PROCEDURE GetCurrentCursorPosition() : SIZE;
 		BEGIN
 			RETURN cursorPosition;
 		END GetCurrentCursorPosition;
@@ -1424,7 +1425,7 @@ TYPE
 		END SetText;
 
 		(* this function is use by IMEs to set the next cursor position for live-editing bidirectional text *)
-		PROCEDURE SetCursorInfo(charsAdded : LONGINT);
+		PROCEDURE SetCursorInfo(charsAdded : SIZE);
 		BEGIN
 			IF text.isUTF THEN
 				(* compute the next internal position *)
@@ -1432,7 +1433,7 @@ TYPE
 			END;
 		END SetCursorInfo;
 
-		PROCEDURE GetCursorPosition() : LONGINT;
+		PROCEDURE GetCursorPosition() : SIZE;
 		BEGIN
 			RETURN tv.GetInternalPos(tv.cursor.GetPosition());
 		END GetCursorPosition;
@@ -1478,7 +1479,7 @@ TYPE
 		PROCEDURE InsertChar*(ch : Texts.Char32);
 		VAR
 			buf : ARRAY 2 OF Texts.Char32;
-			internalPos : LONGINT;
+			internalPos : SIZE;
 		BEGIN
 			IF tv.selection.b - tv.selection.a # 0 THEN DeleteSelection END;
 			buf[0] := ch; buf[1] := 0;
@@ -1491,7 +1492,7 @@ TYPE
 		END InsertChar;
 
 		PROCEDURE InsertString*(CONST string : Texts.UCS32String);
-		VAR internalPos : LONGINT;
+		VAR internalPos : SIZE;
 		BEGIN
 			IF tv.selection.b - tv.selection.a # 0 THEN DeleteSelection END;
 
@@ -1533,7 +1534,7 @@ TYPE
 
 		PROCEDURE Paste*;
 		VAR
-			pos : LONGINT;
+			pos : SIZE;
 		BEGIN
 			text.AcquireWrite;
 			Texts.clipboard.AcquireRead;
@@ -1548,7 +1549,7 @@ TYPE
 		END Paste;
 
 		PROCEDURE Delete(flags : SET);
-		VAR pos : LONGINT;
+		VAR pos : SIZE;
 		BEGIN
 			(* get the internal position of the cursor *)
 			pos := tv.GetInternalPos(tv.cursor.GetPosition());
@@ -1574,7 +1575,7 @@ TYPE
 		END Delete;
 
 		PROCEDURE Backspace(word : BOOLEAN);
-		VAR pos, np : LONGINT;
+		VAR pos, np : SIZE;
 		BEGIN
 			(* get the internal position of the cursor *)
 			pos := tv.GetInternalPos(tv.cursor.GetPosition());
@@ -1596,8 +1597,8 @@ TYPE
 		PROCEDURE Enter(flags : SET);
 		VAR
 			ctrl : BOOLEAN;
-			pos, lineStart, nofWhitespace, i : LONGINT;
-			ch : Texts.Char32; buffer : ARRAY 32 OF Texts.Char32; idx : LONGINT;
+			pos, lineStart, nofWhitespace, i : SIZE;
+			ch : Texts.Char32; buffer : ARRAY 32 OF Texts.Char32; idx : SIZE;
 		BEGIN
 			ctrl := flags * Inputs.Ctrl # {};
 			IF ctrl THEN (* put into different module ??? *)
@@ -1662,7 +1663,7 @@ TYPE
 
 		PROCEDURE MousePressed(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
 		VAR
-			pos, internalPos, a, b : LONGINT; ch : Texts.Char32;
+			pos, internalPos, a, b : SIZE; ch : Texts.Char32;
 			selectionText : Texts.Text;
 			from, to : Texts.TextPosition;
 		BEGIN
