@@ -199,7 +199,7 @@ TYPE
 			grid.model.Release;
 		END FillLines;
 
-		PROCEDURE InsertLine (pos, line: LONGINT; string: Strings.String; out : Streams.Writer);
+		PROCEDURE InsertLine (pos, line: SIZE; string: Strings.String; out : Streams.Writer);
 		VAR intStr: ARRAY 32 OF CHAR; nofRows: LONGINT; diffState : DiffState; lineWidth, dy: LONGINT;
 		BEGIN
 			font.GetStringSize(string^, lineWidth, dy); INC(lineWidth,4);
@@ -245,7 +245,7 @@ TYPE
 			INC(curLine);
 		END InsertEmptyLine;
 
-		PROCEDURE InsertCommonLine (pos, line: LONGINT; string: Strings.String; out : Streams.Writer);
+		PROCEDURE InsertCommonLine (pos, line: SIZE; string: Strings.String; out : Streams.Writer);
 		VAR intStr: ARRAY 32 OF CHAR; nofRows, lineWidth, dy: LONGINT;
 		BEGIN
 			font.GetStringSize(string^, lineWidth, dy); INC(lineWidth, 4);
@@ -572,10 +572,10 @@ TYPE
 			Scrolled(NIL, NIL)
 		END OnViewResized;
 
-		PROCEDURE Setup(nofLines: LONGINT);
+		PROCEDURE Setup(nofLines: SIZE);
 		BEGIN
-			leftView.SetNofLines(nofLines + 1);
-			rightView.SetNofLines(nofLines + 1);
+			leftView.SetNofLines(TODO(nofLines) + 1);
+			rightView.SetNofLines(TODO(nofLines) + 1);
 		END Setup;
 
 		PROCEDURE SetScrollbarProperties;
