@@ -30,7 +30,6 @@ CONST
 
 	MouseWheelMultiplier = 3;
 
-
 	NonDefaultFont = FALSE;
 
 	(* Font to be used when NonDefaultFont = TRUE *)
@@ -51,7 +50,6 @@ TYPE
 		END Init;
 
 	END NoWheelGrid;
-
 
 	DiffState= OBJECT
 	VAR state:LONGINT;
@@ -733,8 +731,8 @@ END DecCount;
 
 PROCEDURE Cleanup;
 VAR die : KillerMsg;
-	 msg : WMMessages.Message;
-	 m : WM.WindowManager;
+	msg : WMMessages.Message;
+	m : WM.WindowManager;
 BEGIN {EXCLUSIVE}
 	NEW(die); msg.ext := die; msg.msgType := WMMessages.MsgExt;
 	m := WM.GetDefaultManager();
