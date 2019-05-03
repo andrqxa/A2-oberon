@@ -181,7 +181,7 @@ TYPE
 
 		base : KeyboardBase;
 
-		(*for keeing the pressed keys in mind*)
+		(*for keeping the pressed keys in mind*)
 		pressed* : ARRAY 6 OF Key;
 
 		PROCEDURE &Init*;

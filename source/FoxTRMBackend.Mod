@@ -1425,8 +1425,8 @@ TYPE
 			IF IsComplex(instruction.op1) THEN
 				fixup := BrForward(opBAE);
 				(*
-				Emit1N(opBAE, 1);
-				*)
+				Emit1N(opBAE, 1);
+				*)
 				Emit2N(opSUB,leftHigh, 1);
 				SetTarget(fixup);
 				FinishOp(instruction.op1,High,destHigh, leftHigh)

@@ -2134,15 +2134,15 @@ TYPE
 						currentPage.editor.text.AcquireWrite;
 						encoder.WriteText(currentPage.editor.text, res);
 						currentPage.editor.text.ReleaseWrite;
-						w.Update;
-						IF res # 0 THEN
-							msg := "Could not encode file "; Strings.Append(msg, fullname);
+						w.Update;
+						IF res # 0 THEN
+							msg := "Could not encode file "; Strings.Append(msg, fullname);
 							WMDialogs.Error(WindowTitle, msg);
-						END;
-				ELSE
-						msg := "Could not store to file "; Strings.Append(msg, fullname); Strings.Append(msg, " (Could not open output stream)");
-						WMDialogs.Error(WindowTitle, msg);
-				END;
+						END;
+				ELSE
+						msg := "Could not store to file "; Strings.Append(msg, fullname); Strings.Append(msg, " (Could not open output stream)");
+						WMDialogs.Error(WindowTitle, msg);
+				END;
 				ELSE
 					msg := "Could not store file "; Strings.Append(msg, fullname); Strings.Append(msg, " (No encoder found)");
 					WMDialogs.Error(WindowTitle, msg);
@@ -2364,7 +2364,7 @@ TYPE
 		(* XML scanner/parser error handler *)
 		PROCEDURE Error(pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 		BEGIN
-			xmlHasErrors := TRUE;
+			xmlHasErrors := TRUE;
 		END Error;
 
 		PROCEDURE LoadState(CONST filename : ARRAY OF CHAR) : BOOLEAN;

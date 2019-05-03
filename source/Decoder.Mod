@@ -1870,7 +1870,7 @@ VAR
 
 	PROCEDURE OpenEmpty*;
 	BEGIN
-		NEW(win, "", NIL);
+		NEW(win, "", NIL);
 	END OpenEmpty;
 
 	PROCEDURE MakeHeader(module: Modules.Module; VAR header: ObjHeader);

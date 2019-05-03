@@ -1290,7 +1290,7 @@ TYPE
 
 		PROCEDURE Clone*(): FrameObject;
 		VAR newframe: FrameObject;
-			newcontent: ContentObject; (* DTPFrame.ContentObject; *)
+			newcontent: ContentObject; (* DTPFrame.ContentObject; *)
 		BEGIN
 			NEW(newframe);
 			newframe.SetName(GetName());					(* maybe change name to avoid conflicts *)

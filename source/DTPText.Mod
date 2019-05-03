@@ -1586,7 +1586,7 @@ TYPE
 							utilreader.cstyle.fontcache := font
 						END;
 
-*)(*						font := WMGraphics.GetFont(cStyle.family, ENTIER(DTPUtilities.FixpToFloat(cStyle.size)), cStyle.style);
+*)(*						font := WMGraphics.GetFont(cStyle.family, ENTIER(DTPUtilities.FixpToFloat(cStyle.size)), cStyle.style);
 *)					END;
 					curStyle := cStyle;
 					bgcolor := cStyle.bgColor;

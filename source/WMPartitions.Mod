@@ -481,20 +481,20 @@ TYPE
 							fs := ft[i];
 							IF fs.vol # NIL THEN
 								IF fs.vol IS DiskVolumes.Volume THEN
-									vol := fs.vol (DiskVolumes.Volume);
-									dev := vol.dev; fsStart := vol.startfs;
-								ELSIF fs.vol IS OldDiskVolumes.Volume THEN
-									volOld := fs.vol (OldDiskVolumes.Volume);
-									dev := volOld.dev; fsStart := volOld.startfs;
-								ELSIF fs.vol IS FATVolumes.Volume THEN
-									volFAT := fs.vol (FATVolumes.Volume);
-									dev := volFAT.dev; fsStart := volFAT.start;
-								ELSIF fs.vol IS ISO9660Volumes.Volume THEN
-									volISO := fs.vol (ISO9660Volumes.Volume);
-									dev := volISO.dev; fsStart := 512; (* dummy value *)
-								ELSE
-									dev := NIL;
-								END;
+									vol := fs.vol (DiskVolumes.Volume);
+									dev := vol.dev; fsStart := vol.startfs;
+								ELSIF fs.vol IS OldDiskVolumes.Volume THEN
+									volOld := fs.vol (OldDiskVolumes.Volume);
+									dev := volOld.dev; fsStart := volOld.startfs;
+								ELSIF fs.vol IS FATVolumes.Volume THEN
+									volFAT := fs.vol (FATVolumes.Volume);
+									dev := volFAT.dev; fsStart := volFAT.start;
+								ELSIF fs.vol IS ISO9660Volumes.Volume THEN
+									volISO := fs.vol (ISO9660Volumes.Volume);
+									dev := volISO.dev; fsStart := 512; (* dummy value *)
+								ELSE
+									dev := NIL;
+								END;
 								IF (dev#NIL) & (dev = selection.disk.device) &
 							           ((selection.disk.isDiskette) OR
 								    (fsStart >= dev.table[selection.partition].start) &

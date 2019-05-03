@@ -2564,7 +2564,7 @@ TYPE
 				KernelLog.String("Sending frame of length ");
 				KernelLog.Int(txLen, 0);
 				KernelLog.Ln;
-				(*KernelLog.Memory(bufBase, txLen);*)
+				(*KernelLog.Memory(bufBase, txLen);*)
 			END;
 
 			(* find out which protocols are used;

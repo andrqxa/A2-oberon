@@ -208,12 +208,12 @@ TYPE
 
 				encoder.Open(w);
 				encoder.WriteText(text, res);
-				IF res = 0 THEN
-					Files.Register(f); f.Update;
-				ELSE
-					msg := "Could not encode file "; Strings.Append(msg, fullname);
+				IF res = 0 THEN
+					Files.Register(f); f.Update;
+				ELSE
+					msg := "Could not encode file "; Strings.Append(msg, fullname);
 					WMDialogs.Error("Error", msg);
-				END;
+				END;
 			ELSE
 				msg := "Could not store file "; Strings.Append(msg, fullname); Strings.Append(msg, " (No encoder found)");
 				WMDialogs.Error("Error", msg);
