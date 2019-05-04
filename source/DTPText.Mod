@@ -1910,16 +1910,16 @@ TYPE
 			NEW(dragSelA, text);NEW(dragSelB, text);
 			dragSelA.SetPosition(selection.a); dragSelB.SetPosition(selection.b);
 
-			la := Limit(layout.FindLineNrByPos(selection.a), 0, layout.GetNofLines() - 1);
-			lb := Limit(layout.FindLineNrByPos(selection.b), 0, layout.GetNofLines() - 1);
+			la := MIN(MAX(layout.FindLineNrByPos(selection.a), 0), layout.GetNofLines() - 1);
+			lb := MIN(MAX(layout.FindLineNrByPos(selection.b), 0), layout.GetNofLines() - 1);
 			(* estimate the size of the selection *)
 			h := 0; w := 0;
 			FOR i := la TO lb DO
 				realH := realH + (layout.lines[i].height);
 				w := MAX(w, layout.lines[i].width);
 			END;
-			h := TODO(Limit(ENTIER(realH), 20, 200));
-			w := TODO(Limit(w, 20, 400));
+			h := MIN(MAX(ENTIER(realH), 20), 200);
+			w := MIN(MAX(w, 20), 400);
 
 			(* render to bitmap *)
 			NEW(img);	Raster.Create(img, w, h, Raster.BGRA8888);
@@ -3276,13 +3276,6 @@ PROCEDURE Cleanup;
 BEGIN
 	DTPEditor.plugRegistry.UnregisterPlugin(pluginName);
 END Cleanup;
-
-PROCEDURE Limit(x, min, max : SIZE) : SIZE;
-BEGIN
-	IF x < min THEN x := min END;
-	IF x > max THEN x := max END;
-	RETURN x
-END Limit;
 
 PROCEDURE TextViewDefaults;
 BEGIN

@@ -179,9 +179,10 @@ IMPORT
 		vcc, vurl, ver, tmp, tmp2, path, name, date : ARRAY 256 OF CHAR;
 		creationdate, creator, status : ARRAY 33 OF CHAR;
 		version : ARRAY 10 OF CHAR;
-		len, ft,fd : LONGINT; res: WORD;
+		ft,fd : LONGINT; res: WORD;
 		adminDir : SVNAdmin.Entry;
 		f : Files.File;
+		len: SIZE;
 	BEGIN
 		NEW ( xml );
 		NEW ( adminDir, NIL );
@@ -221,7 +222,7 @@ IMPORT
 		e2 := xml.SplitElement ( e, "DAV:propstat.DAV:prop.DAV:creator-displayname" ); ASSERT ( e2 # NIL );
 		OdXml.GetCharData ( e2, creator );
 
-		len := TODO(Strings.Length ( baseUrl ));
+		len := Strings.Length ( baseUrl );
 		ASSERT ( ~Strings.EndsWith ( "/", basePath ) );
 
 		WHILE enum.HasMoreElements() DO
