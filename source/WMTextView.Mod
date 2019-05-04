@@ -953,7 +953,7 @@ TYPE
 		PROCEDURE UpdateScrollbars;
 		BEGIN
 			IF vScrollbar # NIL THEN
-				vScrollbar.max.Set(layout.nofLines);
+				vScrollbar.max.Set(TODO(layout.nofLines));
 				vScrollbar.pos.Set(firstLineI);
 			END;
 			IF hScrollbar # NIL THEN
@@ -1357,7 +1357,7 @@ TYPE
 		PROCEDURE CheckNumberOfLines;
 		BEGIN
 			UpdateScrollbars;
-			firstLine.SetBounds(0, layout.nofLines - 1)
+			firstLine.SetBounds(0, TODO(layout.nofLines) - 1)
 		END CheckNumberOfLines;
 
 		PROCEDURE CheckCursor;
