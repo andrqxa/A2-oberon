@@ -3,12 +3,12 @@
 	<Standard:Panel>
 		<Properties>
 			<Alignment>1</Alignment>
-			<Bounds> <Width>120</Width>	</Bounds>
+			<Bounds> <Width>180</Width>	</Bounds>
 		</Properties>
 
 		<Standard:Button>
 			<Properties>
-				<Caption>Performance</Caption>
+				<Caption>::StartMenu:ButtonTitles:SPerformance</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -23,7 +23,7 @@
 
 		<Standard:Button>
 			<Properties>
-				<Caption>Objects</Caption>
+				<Caption>::StartMenu:ButtonTitles:SObjects</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -41,12 +41,12 @@
 	<Standard:Panel>
 		<Properties>
 			<Alignment>1</Alignment>
-			<Bounds> <Width>120</Width> </Bounds>
+			<Bounds> <Width>180</Width> </Bounds>
 		</Properties>
 
 		<Standard:Button>
 			<Properties>
-				<Caption>Profiler</Caption>
+				<Caption>::StartMenu:ButtonTitles:SProfiler</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -61,7 +61,7 @@
 
 		<Standard:Button>
 			<Properties>
-				<Caption>TCPTraffic</Caption>
+				<Caption>::StartMenu:ButtonTitles:STCPTraffic</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -79,12 +79,12 @@
 	<Standard:Panel>
 		<Properties>
 			<Alignment>1</Alignment>
-			<Bounds> <Width>120</Width> </Bounds>
+			<Bounds> <Width>180</Width> </Bounds>
 		</Properties>
 
 		<Standard:Button>
 			<Properties>
-				<Caption>Events</Caption>
+				<Caption>::StartMenu:ButtonTitles:SEvents</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -99,7 +99,7 @@
 
 		<Standard:Button>
 			<Properties>
-				<Caption>USBViewer</Caption>
+				<Caption>::StartMenu:ButtonTitles:SUSBViewer</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -118,13 +118,13 @@
 		<Properties>
 			<Alignment>1</Alignment>
 			<Bounds>
-				<Width>120</Width>
+				<Width>180</Width>
 			</Bounds>
 		</Properties>
 
 		<Standard:Button>
 			<Properties>
-				<Caption>Components</Caption>
+				<Caption>::StartMenu:ButtonTitles:SComponents</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -139,7 +139,7 @@
 
 		<Standard:Button>
 			<Properties>
-				<Caption>Repositories</Caption>
+				<Caption>::StartMenu:ButtonTitles:SRepositories</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>

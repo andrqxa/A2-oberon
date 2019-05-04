@@ -1182,7 +1182,7 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 	WMPerfMon.Mod WMPerfMon.Text
 
 	WMClock.Mod
-	WMClockImages.tar
+	WMClock.rep
 	WMCalendar.Mod
 
 	WMV24Component.Mod
@@ -1355,7 +1355,7 @@ PACKAGE Fun ARCHIVE "Fun.zip" SOURCE "FunSrc.zip" DESCRIPTION "Games, Demos and 
 	ComponentStyle.XML ElevatorStyle.XML # example component styles, load with WMComponents.LoadStyle
 
 	# DTP Editor examples
-	Demo.Style.XML Demo.Layout.XML Demo.Content.XML
+	Demo.Style.XML Demo.Layout.XML Demo.Content.XML Yellow_Duck.jpg Yellow_Duck_LICENSE.txt
 
 	# Xmas
 	xmas04.tar Snow.Mod SaasFee.jpg present.tar MenuEdit.Mod
@@ -2056,6 +2056,16 @@ PACKAGE TrueTypeFonts ARCHIVE "TrueTypeFonts.zip" SOURCE "" DESCRIPTION "True-ty
 	Vera.ttf VeraBd.ttf VeraBI.ttf VeraI.ttf
 	VeraMo.ttf VeraMoBd.ttf VeraMoBI.ttf VeraMoI.ttf
 	VeraSe.ttf VeraSeBd.ttf
+END
+
+PACKAGE IBMPlexFonts ARCHIVE "IBMPlexFonts.zip" SOURCE "" DESCRIPTION "IBM Plex True-type fonts"
+	IBMPlexLicense.txt
+	IBMPlexSerif-Regular.ttf IBMPlexSerif-Italic.ttf
+	IBMPlexSerif-BoldItalic.ttf	IBMPlexSerif-Bold.ttf
+	IBMPlexSans-Regular.ttf	IBMPlexSans-Italic.ttf
+	IBMPlexSans-Bold.ttf IBMPlexSans-BoldItalic.ttf
+	IBMPlexMono-Regular.ttf IBMPlexMono-Bold.ttf
+	IBMPlexMono-BoldItalic.ttf IBMPlexMono-Italic.ttf
 END
 
 PACKAGE CjkFonts ARCHIVE "CjkFonts.zip" SOURCE "" DESCRIPTION "Chinese, Japanese and Korean Fonts"

@@ -7,13 +7,13 @@
 		<Properties>
 			<Alignment>1</Alignment>
 			<Bounds>
-				<Width>120</Width>
+				<Width>180</Width>
 			</Bounds>
 		</Properties>
 
 		<Standard:Button>
 			<Properties>
-				<Caption>Tutorial</Caption>
+				<Caption>::StartMenu:ButtonTitles:STutorial</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -28,7 +28,7 @@
 
 		<Standard:Button>
 			<Properties>
-				<Caption>ChineseTutorial</Caption>
+				<Caption>::StartMenu:ButtonTitles:SCNTutorial</Caption>
 				<Alignment>2</Alignment>
 				<OnClickHandler>X Run</OnClickHandler>
 			</Properties>
@@ -47,7 +47,7 @@
 		<Properties>
 			<Alignment>1</Alignment>
 			<Bounds>
-				<Width>120</Width>
+				<Width>180</Width>
 			</Bounds>
 		</Properties>
 
@@ -87,7 +87,7 @@
 		<Properties>
 			<Alignment>1</Alignment>
 			<Bounds>
-				<Width>120</Width>
+				<Width>180</Width>
 			</Bounds>
 		</Properties>
 
@@ -129,7 +129,7 @@
 		<Properties>
 			<Alignment>1</Alignment>
 			<Bounds>
-				<Width>120</Width>
+				<Width>180</Width>
 			</Bounds>
 		</Properties>
 

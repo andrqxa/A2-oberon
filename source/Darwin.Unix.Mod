@@ -834,11 +834,11 @@ VAR
 
 
 	PROCEDURE ThrSuspend*( thr: Thread_t; saveContext: BOOLEAN );
-	VAR r: LONGINT;  machthr: MachPort;
+	VAR machthr: MachPort;
 	BEGIN
 		IF saveContext THEN
 			handler_done := FALSE;
-			r := pthread_kill( thr, SIGUSR1 );
+			IGNORE pthread_kill( thr, SIGUSR1 );
 			(*	not working in Solaris when the thread is stalled in a mutex.
 				handler gets arrived but has bad side effects,
 				yields traps and locks the system *)
@@ -859,7 +859,7 @@ VAR
 		low := sched_get_priority_min(SCHED_OTHER);
 
 		param.sched_priority := high;
-		IF pthread_setschedparam( mainthread, SCHED_RR, ADDRESSOF( param ) ) # 0 THEN END;
+		IGNORE pthread_setschedparam( mainthread, SCHED_RR, ADDRESSOF( param ) );
 
 		RETURN TRUE;
 	END ThrInitialize;

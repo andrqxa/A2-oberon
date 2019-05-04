@@ -135,14 +135,14 @@ TYPE
 			panel.AddContent(toolbar);
 			NEW(label); label.caption.SetAOC("Font:"); AL(toolbar, label);
 			NEW(famCheck); AC(toolbar, famCheck);
-			NEW(famEdit); famEdit.SetAsString("Oberon"); AE(toolbar, famEdit);
+			NEW(famEdit); famEdit.SetAsString(Texts.defaultAttributes.fontInfo.name); AE(toolbar, famEdit);
 
 			NEW(toolbar); toolbar.bounds.SetHeight(20); toolbar.alignment.Set(WMComponents.AlignTop);
 			toolbar.fillColor.Set(windowStyle.bgColor);
 			panel.AddContent(toolbar);
 			NEW(label); label.caption.SetAOC("Size:"); AL(toolbar, label);
 			NEW(sizeCheck); AC(toolbar, sizeCheck);
-			NEW(sizeEdit); sizeEdit.SetAsString("10"); AE(toolbar, sizeEdit);
+			NEW(sizeEdit); sizeEdit.SetAsString("14"); AE(toolbar, sizeEdit);
 
 			NEW(toolbar); toolbar.bounds.SetHeight(20); toolbar.alignment.Set(WMComponents.AlignTop);
 			toolbar.fillColor.Set(windowStyle.bgColor);
@@ -229,11 +229,14 @@ TYPE
 				utilreader.SetPosition(a);
 				utilreader.ReadCh(ch);
 				IF utilreader.attributes = NIL THEN
-					famEdit.SetAsString("vera");
-					sizeEdit.SetAsString("20");
+					famEdit.SetAsString(Texts.defaultAttributes.fontInfo.name);
+					Strings.IntToStr(Texts.defaultAttributes.fontInfo.size, tempString);
+					sizeEdit.SetAsString(tempString);
 					styleEdit.SetAsString("regular");
-					colorEdit.SetAsString("000000FF");
-					bgColEdit.SetAsString("00000000");
+					Strings.IntToHexStr(Texts.defaultAttributes.color, 7, tempString);
+					colorEdit.SetAsString(tempString);
+					Strings.IntToHexStr(Texts.defaultAttributes.bgcolor, 7, tempString);
+					bgColEdit.SetAsString(tempString);
 				ELSE
 					famEdit.SetAsString(utilreader.attributes.fontInfo.name);
 					Strings.IntToStr(utilreader.attributes.fontInfo.size, tempString);
@@ -552,12 +555,7 @@ END GetNewSize;
 PROCEDURE EnsureAttribute(VAR attr : Texts.Attributes);
 BEGIN
 	IF (attr = NIL) THEN
-		NEW(attr); NEW(attr.fontInfo);
-		attr.fontInfo.name := "Oberon";
-		attr.fontInfo.size := 10;
-		attr.fontInfo.style := {};
-		attr.color := 0000000FFH;
-		attr.bgcolor := 000000000H;
+		attr := Texts.defaultAttributes.Clone();
 	END
 END EnsureAttribute;
 
@@ -665,11 +663,11 @@ BEGIN
 	ApplyChange(changeInfo);
 END SetFontColor;
 
-(** Set the font for the currently selected text. Default: Oberon *)
+(** Set the font for the currently selected text. Default: default font name *)
 PROCEDURE SetFontName*(context : Commands.Context); (** [fontname] ~ *)
 VAR name : ARRAY 128 OF CHAR; changeInfo : ChangeInfo;
 BEGIN
-	IF ~context.arg.GetString(name) THEN COPY("Oberon", name); END;
+	IF ~context.arg.GetString(name) THEN COPY(Texts.defaultAttributes.fontInfo.name, name ); END;
 	NEW(changeInfo);
 	COPY(name, changeInfo.name);
 	changeInfo.fields := ChangeFont;
