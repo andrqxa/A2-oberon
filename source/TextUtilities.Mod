@@ -35,7 +35,7 @@ TYPE
 
 	AttributesBuf*=RECORD
 	 	attributes: POINTER TO ARRAY OF Texts.Attributes;
-		positions: POINTER TO ARRAY OF LONGINT;
+		positions: POINTER TO ARRAY OF Streams.Position;
 		length: LONGINT;
 	END;
 
