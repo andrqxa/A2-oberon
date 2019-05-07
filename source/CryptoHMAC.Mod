@@ -44,16 +44,16 @@ TYPE
 
 		(** set string from which a mac will be calculated. strings can be concatenated by
 			invoking Update several times without invoking Initialize *)
-		PROCEDURE Update*( CONST data: ARRAY OF CHAR;  pos, len: LONGINT );
+		PROCEDURE Update*( CONST data: ARRAY OF CHAR;  pos, len: SIZE );
 		BEGIN
 			ih.Update( data, pos, len )
 		END Update;
 
 		(** Load the generated mac of size SELF.size into buf, starting at position pos *)
-		PROCEDURE GetMac*( VAR buf: ARRAY OF CHAR;  pos: LONGINT );
+		PROCEDURE GetMac*( VAR buf: ARRAY OF CHAR;  pos: SIZE );
 		VAR
 			tmp: ARRAY 64 OF CHAR;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			ih.GetHash( tmp, 0 );
 			oh.Update( tmp, 0, ih.size );
