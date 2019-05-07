@@ -715,7 +715,7 @@ TYPE
 				END WriteBytes;
 
 
-				PROCEDURE Length*( ): Files.Position;
+				PROCEDURE Length*( ): Files.Size;
 				BEGIN
 					RETURN TODO(fsize)
 				END Length;

@@ -58,6 +58,7 @@ CONST
 
 TYPE
 	Position* = Streams.Position;
+	Size* = Streams.Position;
 	TSize* = LONGINT;
 
 TYPE
@@ -416,7 +417,7 @@ TYPE
 
 		(** Return the current length of a file. *)
 
-		PROCEDURE Length*(): Position;
+		PROCEDURE Length*(): Size;
 		BEGIN HALT(301) END Length;	(* abstract *)
 
 		(** Return the time (t) and date (d) when a file was last modified. *)

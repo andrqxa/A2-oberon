@@ -819,7 +819,7 @@ TYPE
 		END WriteBytes;
 
 		(** Return the current length of a file. *)
-		PROCEDURE Length*(): LONGINT;
+		PROCEDURE Length*(): Files.Size;
 		BEGIN {EXCLUSIVE}
 			RETURN inode.size;
 		END Length;

@@ -90,7 +90,7 @@ MODULE ZipFS; (** AUTHOR "ejz"; PURPOSE "mount a zipped file as a file-system"; 
 				F.ReadBytes(r, x, ofs, len)
 			END ReadBytes;
 
-			PROCEDURE Length*(): LONGINT;
+			PROCEDURE Length*(): Files.Size;
 			BEGIN
 				RETURN F.Length()
 			END Length;

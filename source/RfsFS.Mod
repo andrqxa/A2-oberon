@@ -564,7 +564,7 @@ TYPE
 		END WriteBytes;
 
 		(** return the lenght of a file **)
-		PROCEDURE Length*(): LONGINT;
+		PROCEDURE Length*(): Files.Size;
 		BEGIN {EXCLUSIVE}
 			IF Trace = 1 THEN
 				KernelLog.Enter;

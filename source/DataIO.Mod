@@ -259,7 +259,7 @@ TYPE
 			NEW( lib );  initialwpos := 0
 		END Initialize;
 
-		PROCEDURE Length*( ): LONGINT;
+		PROCEDURE Length*( ): Files.Size;
 		BEGIN
 			RETURN F.Length()
 		END Length;

@@ -222,7 +222,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				r.hint := buf
 			END ReadBytes;
 
-			PROCEDURE Length*(): LONGINT;
+			PROCEDURE Length*(): Files.Size;
 			BEGIN RETURN len
 			END Length;
 

@@ -616,7 +616,7 @@ TYPE
 
 		(** Return the current length of a file. *)
 
-		PROCEDURE Length*(): LONGINT;
+		PROCEDURE Length*(): Files.Size;
 		VAR
 			filesize: LONGINT;
 			check: BOOLEAN;

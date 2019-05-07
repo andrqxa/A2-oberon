@@ -791,7 +791,7 @@ TYPE
 			END
 		END WriteBytes;
 
-		PROCEDURE Length*(): LONGINT;
+		PROCEDURE Length*(): Files.Size;
 		BEGIN {EXCLUSIVE}
 			RETURN aleng*SS + bleng - HS
 		END Length;

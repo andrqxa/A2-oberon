@@ -854,7 +854,7 @@ TYPE
 		END WriteBytesX;
 
 		(* Return the current length of a file. *)
-		PROCEDURE Length*(): LONGINT;
+		PROCEDURE Length*(): Files.Size;
 		BEGIN
 			(* Length() should in principle be exlusive, however it won't do any harm if it is not, it just reflects the
 				current size if called from outside. Internal methods that call Length() are exclusive whenever needed *)
@@ -1110,7 +1110,7 @@ TYPE
 		END SetX;
 
 		(* Return the current length of a file. *)
-		PROCEDURE Length*(): LONGINT;
+		PROCEDURE Length*(): Files.Size;
 		BEGIN {EXCLUSIVE}
 			IF (size = 0) THEN InitSize END;
 			RETURN Length^()

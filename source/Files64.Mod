@@ -60,6 +60,7 @@ CONST
 
 TYPE
 	Position* = Streams.Position;
+	Size* = Streams.Position;
 
 TYPE
 (** All record fields are read-only for users, and read-write for extenders. *)
@@ -294,7 +295,7 @@ TYPE
 
 		(** Return the current length of a file. *)
 
-		PROCEDURE Length*(): Streams.Position;
+		PROCEDURE Length*(): Size;
 		BEGIN HALT(301) END Length;	(* abstract *)
 
 		(** Return the time (t) and date (d) when a file was last modified. *)
