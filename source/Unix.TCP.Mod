@@ -189,7 +189,7 @@ TYPE
 					IF size = 0 THEN  RETURN  END;
 					IF state IN {Listen, Established} THEN
 						LOOP
-							x := size;
+							y := TODO(size);
 							IF Sockets.Recv( socket, data, TODO(ofs), y, 0 ) THEN
 								x := y;
 								IF x > 0 THEN
