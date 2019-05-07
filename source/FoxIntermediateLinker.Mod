@@ -585,8 +585,8 @@ TYPE
 		END SectionPositionAndSizeComparison;
 
 		(* set address of sections to a fixed position after compilation *)
-		PROCEDURE FixSections(binaryModule: Sections.Module; VAR sizes: ARRAY OF LONGINT);
-		VAR adr: LONGINT; i: SIZE; section: Sections.Section; is: BinaryCode.Section;
+		PROCEDURE FixSections(binaryModule: Sections.Module; VAR sizes: ARRAY OF BinaryCode.Unit);
+		VAR adr: BinaryCode.Unit; i: SIZE; section: Sections.Section; is: BinaryCode.Section;
 		BEGIN
 			adr := 0;
 			FOR i := 0 TO binaryModule.allSections.Length()-1 DO
@@ -607,7 +607,7 @@ TYPE
 		END FixSections;
 
 		(* check if any of the addresses of sections have changed during last compilation *)
-		PROCEDURE Conflict(binaryModule: Sections.Module; VAR sizes: ARRAY OF LONGINT): BOOLEAN;
+		PROCEDURE Conflict(binaryModule: Sections.Module; VAR sizes: ARRAY OF BinaryCode.Unit): BOOLEAN;
 		VAR i: SIZE; section: Sections.Section;is: BinaryCode.Section;
 		BEGIN
 			FOR i := 0 TO binaryModule.allSections.Length()-1 DO
@@ -632,7 +632,7 @@ TYPE
 			intermediateCodeModule: Sections.Module;
 			binaryModule: Formats.GeneratedModule;
 			result: BOOLEAN;
-			sizes: POINTER TO ARRAY OF LONGINT; i: LONGINT;
+			sizes: POINTER TO ARRAY OF BinaryCode.Unit; i: LONGINT;
 			objectFileExtension: ARRAY 32 OF CHAR; objectFileName: Files.FileName;
 		BEGIN
 			intermediateCodeModule := ExtractModuleWithName(desiredName);
@@ -1258,7 +1258,7 @@ TYPE
 		END;
 	END Link;
 
-	PROCEDURE WriteCodeAndDataFiles*(CONST instanceName: ARRAY OF CHAR; CONST codeFileExtension, dataFileExtension: ARRAY OF CHAR; objectFile: Formats.ObjectFileFormat; VAR instructionMemorySize, dataMemorySize: LONGINT; backend: Backend.Backend;  diagnostics: Diagnostics.Diagnostics; log:Streams.Writer): BOOLEAN;
+	PROCEDURE WriteCodeAndDataFiles*(CONST instanceName: ARRAY OF CHAR; CONST codeFileExtension, dataFileExtension: ARRAY OF CHAR; objectFile: Formats.ObjectFileFormat; VAR instructionMemorySize, dataMemorySize: BinaryCode.Unit; backend: Backend.Backend;  diagnostics: Diagnostics.Diagnostics; log:Streams.Writer): BOOLEAN;
 	VAR code, data: StaticLinker.Arrangement; linker: GenericLinker.Linker; linkerLog: Files.Writer;
 			logFile: Files.File;
 			objectFileExtension: ARRAY 32 OF CHAR;

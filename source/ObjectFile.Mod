@@ -25,8 +25,8 @@ CONST
 	DefaultExtension* = ".Gof";
 
 TYPE
-	Unit* = LONGINT;
-	Bits* = LONGINT;
+	Unit* = SIZE;
+	Bits* = SIZE;
 
 	Fingerprint* = HUGEINT;
 
@@ -526,8 +526,8 @@ VAR
 
 		PROCEDURE ReadFixupPattern (VAR pattern: FixupPattern);
 		BEGIN
-			reader.SkipWhitespace; reader.Int (pattern.offset, FALSE);
-			reader.SkipWhitespace; reader.Int (pattern.bits, FALSE);
+			reader.SkipWhitespace; reader.Size (pattern.offset, FALSE);
+			reader.SkipWhitespace; reader.Size (pattern.bits, FALSE);
 		END ReadFixupPattern;
 
 		PROCEDURE ReadIdentifier(VAR identifier: Identifier);
@@ -544,7 +544,7 @@ VAR
 		BEGIN
 			reader.SkipWhitespace;
 			ReadValueIdentifier (pattern.mode, modes);
-			reader.SkipWhitespace; reader.Int (pattern.scale, FALSE);
+			reader.SkipWhitespace; reader.Size (pattern.scale, FALSE);
 			reader.SkipWhitespace; reader.Size (pattern.patterns, FALSE);
 
 			IF (pattern.pattern = NIL) OR (LEN (pattern.pattern) < pattern.patterns) THEN
@@ -557,8 +557,8 @@ VAR
 
 		PROCEDURE ReadPatch (VAR patch: Patch);
 		BEGIN
-			reader.SkipWhitespace; reader.Int (patch.displacement, FALSE);
-			reader.SkipWhitespace; reader.Int (patch.offset, FALSE);
+			reader.SkipWhitespace; reader.Size (patch.displacement, FALSE);
+			reader.SkipWhitespace; reader.Size (patch.offset, FALSE);
 		END ReadPatch;
 
 		PROCEDURE ReadFixup (VAR fixup: Fixup);
@@ -579,16 +579,16 @@ VAR
 		PROCEDURE ReadAlias (VAR alias: Alias);
 		BEGIN
 			reader.SkipWhitespace; ReadIdentifier (alias.identifier);
-			reader.SkipWhitespace; reader.Int(alias.offset,FALSE);
+			reader.SkipWhitespace; reader.Size(alias.offset,FALSE);
 		END ReadAlias;
 
 		PROCEDURE ReadSegment(): BOOLEAN;
 		VAR len, offset: Bits;
 		BEGIN
-			reader.Int(len,FALSE);
+			reader.Size(len,FALSE);
 			reader.SkipWhitespace;
 			IF len = 0 THEN RETURN FALSE END;
-			reader.Int(offset,FALSE); offset := offset * 4;
+			reader.Size(offset,FALSE); offset := offset * 4;
 			reader.SkipWhitespace;
 			WHILE len > 0 DO
 				reader.Char (char);
@@ -601,10 +601,10 @@ VAR
 	BEGIN
 		ReadValueIdentifier (section.type, categories);
 		ReadIdentifier (section.identifier);
-		reader.SkipWhitespace; reader.Int (section.unit, FALSE);
+		reader.SkipWhitespace; reader.Size (section.unit, FALSE);
 		ReadValueIdentifier(relocatibility, relocatabilities);
 		section.fixed := relocatibility = Fixed;
-		reader.SkipWhitespace; reader.Int (section.alignment, FALSE);
+		reader.SkipWhitespace; reader.Size (section.alignment, FALSE);
 		IF version < 5 THEN
 			reader.SkipWhitespace; reader.Int (priority, FALSE);
 			IF section.type = InitCode THEN
@@ -911,15 +911,15 @@ VAR
 
 		PROCEDURE ReadFixupPattern (VAR pattern: FixupPattern);
 		BEGIN
-			reader.RawNum (pattern.offset);
-			reader.RawNum (pattern.bits);
+			reader.RawSize (pattern.offset);
+			reader.RawSize (pattern.bits);
 		END ReadFixupPattern;
 
 		PROCEDURE ReadPattern(VAR pattern: Pattern);
 		VAR i: SIZE;
 		BEGIN
 			ReadValueIdentifier (pattern.mode, modes);
-			reader.RawNum (pattern.scale);
+			reader.RawSize (pattern.scale);
 			reader.RawSize (pattern.patterns);
 			IF (pattern.pattern = NIL) OR (LEN (pattern.pattern) < pattern.patterns) THEN
 				NEW (pattern.pattern, pattern.patterns);
@@ -931,8 +931,8 @@ VAR
 
 		PROCEDURE ReadPatch(VAR patch: Patch);
 		BEGIN
-			reader.RawNum(patch.displacement);
-			reader.RawNum(patch.offset);
+			reader.RawSize(patch.displacement);
+			reader.RawSize(patch.offset);
 		END ReadPatch;
 
 		PROCEDURE ReadFixup (VAR fixup: Fixup);
@@ -955,7 +955,7 @@ VAR
 		PROCEDURE ReadAlias (VAR alias: Alias);
 		BEGIN
 			ReadIdentifier (alias.identifier);
-			reader.RawNum (alias.offset);
+			reader.RawSize (alias.offset);
 		END ReadAlias;
 
 		PROCEDURE ReadSegment(): BOOLEAN;
@@ -963,9 +963,9 @@ VAR
 			segment: ARRAY 128 OF CHAR;
 			received: SIZE;
 		BEGIN
-			reader.RawNum(len);
+			reader.RawSize(len);
 			IF len = 0 THEN RETURN FALSE END;
-			reader.RawNum(offset); offset := offset * ByteSize;
+			reader.RawSize(offset); offset := offset * ByteSize;
 			WHILE len > LEN(segment) DO
 				reader.Bytes(segment, 0, LEN(segment), received);
 				ASSERT(received = LEN(segment));
@@ -994,10 +994,10 @@ VAR
 		reader.Char(ch); ASSERT(ch = 1X);
 		ReadValueIdentifier (section.type, categories);
 		ReadIdentifier (section.identifier);
-		reader.RawNum (section.unit);
+		reader.RawSize (section.unit);
 		ReadValueIdentifier(relocatibility, relocatabilities);
 		section.fixed := relocatibility = Fixed;
-		reader.RawNum (section.alignment);
+		reader.RawSize (section.alignment);
 		IF version < 5 THEN
 			reader.RawNum (priority);
 			CASE section.type OF

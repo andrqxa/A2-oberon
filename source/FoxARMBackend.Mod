@@ -1216,11 +1216,11 @@ TYPE
 
 			IF (irSection # NIL) & (irSection.resolved # NIL) & (irSection.resolved.os.fixed) THEN
 				(* optimization: if the IR section is already resolved and positioned at a fixed location, no fixup is required *)
-				address := irSection.resolved.os.alignment + irSection.instructions[symbolOffset].pc;
+				address := TODO(irSection.resolved.os.alignment + irSection.instructions[symbolOffset].pc);
 				result := RegisterFromValue(address, registerHint)
 			ELSE
 				result := GetFreeRegisterOrHint(IntermediateCode.UnsignedIntegerType(32), registerHint);
-				listOfReferences.AddSymbol(symbol, fingerprint, symbolOffset, out.pc, 12);
+				listOfReferences.AddSymbol(symbol, fingerprint, symbolOffset, TODO(out.pc), 12);
 				Emit2(opLDR, result, InstructionSet.NewImmediateOffsetMemory(opPC.register, 0, {InstructionSet.Increment})); (* LDR ..., [PC, #+???] *)
 			END;
 
@@ -1606,7 +1606,7 @@ TYPE
 					(* 1. patch all of the citations, i.e., the LDR instructions that use the symbol reference *)
 					citation := reference.firstCitation;
 					WHILE citation # NIL DO
-						patchValue := out.pc - 8 - citation.pc;
+						patchValue := TODO(out.pc - 8 - citation.pc);
 						patchValue := ASH(patchValue, -citation.shift); (* FLDS/VLDR reference counts number of words *)
 						ASSERT((0 <= patchValue) & (patchValue < ASH(1, citation.bits)));
 						out.PutBitsAt(citation.pc, patchValue, citation.bits);
@@ -1659,7 +1659,7 @@ TYPE
 			intValue := SYSTEM.VAL(HUGEINT, value);
 			(* alternative: integerValue := BinaryCode.ConvertReal(value) *)
 			result := GetFreeRegisterOrHint(IntermediateCode.FloatType(64), registerHint);
-			listOfReferences.AddHImmediate(intValue, out.pc, 8);
+			listOfReferences.AddHImmediate(intValue, TODO(out.pc), 8);
 			Emit2(opFLDD, result, InstructionSet.NewImmediateOffsetMemory(opPC.register, 0, {InstructionSet.Increment})); (* LDR ..., [PC, #+???] *)
 			ASSERT(result.mode = InstructionSet.modeRegister);
 			ASSERT((result.register >= InstructionSet.DR0) & (result.register <= InstructionSet.DR31));
@@ -1678,7 +1678,7 @@ TYPE
 				dummy := ValueComposition(value, TRUE, result);
 			ELSE
 				result := GetFreeRegisterOrHint(IntermediateCode.UnsignedIntegerType(32), registerHint);
-				listOfReferences.AddImmediate(value, out.pc, 12);
+				listOfReferences.AddImmediate(value, TODO(out.pc), 12);
 				Emit2(opLDR, result, InstructionSet.NewImmediateOffsetMemory(opPC.register, 0, {InstructionSet.Increment})); (* LDR ..., [PC, #+???] *)
 			END;
 
@@ -1946,7 +1946,7 @@ TYPE
 				(* transfer the fixups *)
 				fixup := code.fixupList.firstFixup;
 				WHILE fixup # NIL DO
-					newFixup := BinaryCode.NewFixup(fixup.mode, fixup.offset + code.pc, fixup.symbol, fixup.symbolOffset, fixup.displacement, fixup.scale, fixup.pattern);
+					newFixup := BinaryCode.NewFixup(fixup.mode, fixup.offset + code.pc, fixup.symbol, fixup.symbolOffset, TODO(fixup.displacement), fixup.scale, fixup.pattern);
 					out.fixupList.AddFixup(newFixup);
 					fixup := fixup.nextFixup
 				END
@@ -2822,7 +2822,7 @@ TYPE
 
 				IF irInstruction.op1.symbolOffset <= inPC THEN
 					(* backward branch: calculate the branch distance *)
-					branchDistance := in.instructions[irInstruction.op1.symbolOffset].pc - out.pc - 8;
+					branchDistance := TODO(in.instructions[irInstruction.op1.symbolOffset].pc - out.pc - 8);
 					ASSERT((-33554432 <= branchDistance) & (branchDistance <= 0) & ((ABS(branchDistance) MOD 4) = 0), 200);
 				ELSE
 					(* forward branch: the distance is not yet known, use some placeholder and add a relative fixup *)
@@ -3634,7 +3634,7 @@ TYPE
 						in := symbol(IntermediateCode.Section);
 						symbolOffset := fixup.symbolOffset;
 						IF symbolOffset = in.pc THEN
-							displacement := resolved.pc
+							displacement := TODO(resolved.pc);
 						ELSIF (symbolOffset # 0) THEN
 							ASSERT(in.pc > symbolOffset);
 							displacement := in.instructions[symbolOffset].pc;

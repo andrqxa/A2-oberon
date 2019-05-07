@@ -977,10 +977,10 @@ CONST
 				*)
 				IF (format.mnemonic = opB) OR (format.mnemonic = opBL) THEN
 					mode := BinaryCode.Relative;
-					displacement := operand.fixup.displacement - 8;
+					displacement := TODO(operand.fixup.displacement) - 8;
 				ELSE
 					mode := BinaryCode.Relative;
-					displacement := operand.fixup.displacement;
+					displacement := TODO(operand.fixup.displacement);
 				END;
 
 				(*
@@ -2874,9 +2874,9 @@ CONST
 						ASSERT(instruction.operands[1].mode = modeMemory);
 						IF (instruction.operands[1].register = PC) & (instruction.operands[1].offsetRegister = None) THEN
 							IF Decrement IN instruction.operands[1].indexing THEN
-								value := -instruction.operands[1].offsetImmediate + adr + 8;
+								value := -instruction.operands[1].offsetImmediate + TODO(adr) + 8;
 							ELSE
-								value := instruction.operands[1].offsetImmediate + adr + 8;
+								value := instruction.operands[1].offsetImmediate + TODO(adr) + 8;
 							END;
 							WriteReference(value, TRUE, w);
 							IF (value>=0) & (value * 8 + 32 < bitSet.GetSize()) THEN

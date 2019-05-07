@@ -119,7 +119,7 @@ TYPE
 
 							NEW(alias, resolved.os.identifier, codeSection.pc);
 							IF ~AliasOnlyExported OR exported THEN  codeSection.aliasList.AddAlias(alias) END;
-							section(IntermediateCode.Section).SetAlias(codeSection, codeSection.pc);
+							section(IntermediateCode.Section).SetAlias(codeSection, TODO(codeSection.pc));
 							codeSection.CopyBits(resolved.os.bits,0, resolved.pc*codeUnit);
 
 						ELSIF section.type = ObjectFile.Data THEN
@@ -129,7 +129,7 @@ TYPE
 							resolved.os.identifier.fingerprint := GetFingerprint (section, fingerprinter);
 							NEW(alias, resolved.os.identifier, dataSection.pc);
 							IF ~AliasOnlyExported OR exported THEN dataSection.aliasList.AddAlias(alias) END;
-							section(IntermediateCode.Section).SetAlias(dataSection, dataSection.pc);
+							section(IntermediateCode.Section).SetAlias(dataSection, TODO(dataSection.pc));
 							dataSection.CopyBits(resolved.os.bits,0, resolved.pc*dataUnit );
 						ELSIF section.type = ObjectFile.Const THEN
 							IF resolved.os.alignment # 0 THEN
@@ -138,7 +138,7 @@ TYPE
 							resolved.os.identifier.fingerprint := GetFingerprint (section, fingerprinter);
 							NEW(alias, resolved.os.identifier, constSection.pc);
 							IF ~AliasOnlyExported OR exported THEN constSection.aliasList.AddAlias(alias) END;
-							section(IntermediateCode.Section).SetAlias(constSection, constSection.pc);
+							section(IntermediateCode.Section).SetAlias(constSection, TODO(constSection.pc));
 							constSection.CopyBits(resolved.os.bits,0, resolved.pc*constUnit);
 						END;
 					END;

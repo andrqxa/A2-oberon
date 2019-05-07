@@ -234,7 +234,7 @@ TYPE
 	PROCEDURE FindPC*(context: Commands.Context);
 	VAR file: Files.File; logFile: Files.FileName; adr,maxadr: Unit; disassembler: Disassembler; block, found: Block; name: ObjectFile.SectionName;
 	BEGIN
-		IF context.arg.GetString(logFile) & context.arg.GetInteger(adr, TRUE) THEN
+		IF context.arg.GetString(logFile) & context.arg.GetSize(adr, TRUE) THEN
 			file := Files.Old(logFile);
 			IF file = NIL THEN Files.JoinExtension(logFile,".log",logFile); file := Files.Old(logFile) END;
 			IF file = NIL THEN

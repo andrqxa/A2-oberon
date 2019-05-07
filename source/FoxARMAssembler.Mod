@@ -265,7 +265,7 @@ TYPE
 							registerNumber := InstructionSet.PC;
 							isImmediateOffset := TRUE;
 							DEC(offsetImmediateValue, 8);
-							DEC(offsetImmediateValue, code.pc);
+							DEC(offsetImmediateValue, TODO(code.pc));
 							IF ABS(offsetImmediateValue) < InstructionSet.Bits12 THEN
 								IF offsetImmediateValue >= 0 THEN
 									INCL(indexingMode, InstructionSet.Increment)

@@ -153,7 +153,7 @@ TYPE
 		symbolOffset-: LONGINT; (* offset in immediate code (source) for a fixup *)
 
 		val-: HUGEINT; (* for imm and moffset  *)
-		pc-: LONGINT;
+		pc-: SIZE;
 
 		selector-, offset-: LONGINT; (* for pntr1616 / pntr1632 *)
 	END;
@@ -162,19 +162,19 @@ TYPE
 
 	NamedLabel*= OBJECT
 	VAR
-		offset: LONGINT;
+		offset: SIZE;
 		name-: SyntaxTree.IdentifierString;
 		nextNamedLabel-: NamedLabel;
 		index-: LONGINT;
 
-		PROCEDURE &InitNamedLabel(offset: LONGINT; CONST name: ARRAY OF CHAR);
+		PROCEDURE &InitNamedLabel(offset: SIZE; CONST name: ARRAY OF CHAR);
 		BEGIN
 			SELF.offset := offset;
 			COPY(name,SELF.name);
 			nextNamedLabel := NIL;
 		END InitNamedLabel;
 
-		PROCEDURE SetOffset*(ofs: LONGINT);
+		PROCEDURE SetOffset*(ofs: SIZE);
 		BEGIN SELF.offset := ofs;
 		END SetOffset;
 
@@ -275,7 +275,7 @@ TYPE
 			ErrorSS(msg1,msg);
 		END ErrorSI;
 
-		PROCEDURE AddFixup (mode: SHORTINT; size: SHORTINT; pc: LONGINT; symbol: ObjectFile.Identifier; symbolOffset, displacement: LONGINT);
+		PROCEDURE AddFixup (mode: SHORTINT; size: SHORTINT; pc: SIZE; symbol: ObjectFile.Identifier; symbolOffset, displacement: LONGINT);
 		VAR fixup: BinaryCode.Fixup; format: BinaryCode.FixupPatterns; id: ObjectFile.Identifier;
 		BEGIN
 			NEW(format,1);
@@ -300,7 +300,7 @@ TYPE
 
 			bitwidthOptions: SET;
 			opcode: ARRAY InstructionSet.maxCodeLength OF InstructionSet.Code;
-			pc0: LONGINT;
+			pc0: SIZE;
 
 			debug,temp: LONGINT;
 
@@ -699,7 +699,7 @@ TYPE
 									END;
 								*)
 								IF lastPass & (operands[addressOperand].symbol.name # "") THEN
-									AddFixup(BinaryCode.Absolute,4,code.pc,operands[addressOperand].symbol, operands[addressOperand].symbolOffset,operands[addressOperand].displacement)
+									AddFixup(BinaryCode.Absolute,4,TODO(code.pc),operands[addressOperand].symbol, operands[addressOperand].symbolOffset,operands[addressOperand].displacement)
 								END;
 								code.PutDWord (operands[addressOperand].displacement);
 							ELSE
@@ -819,12 +819,12 @@ TYPE
 						FOR i := 0 TO maxNumberOperands - 1 DO
 							IF (free[i]) & (operands[i].type = ioffset) THEN
 								IF Trace THEN KernelLog.String(" ioffset "); END;
-								offset := SHORT(operands[i].val - code.pc  - 1);
+								offset := SHORT(TODO(operands[i].val - code.pc  - 1));
 								IF lastPass & ~ValueInByteRange (offset) THEN
 									Error( "value exceeds bounds");
 									RETURN FALSE;
 								END;
-								operands[i].pc := code.pc;
+								operands[i].pc := TODO(code.pc);
 								code.PutByte (offset);
 								free[i] := FALSE; i:= maxNumberOperands;
 							ELSIF (free[i]) & (operands[i].type = imm) THEN
@@ -834,7 +834,7 @@ TYPE
 									Error( "value exceeds bounds");
 									RETURN FALSE;
 								END;
-								operands[i].pc := code.pc;
+								operands[i].pc := TODO(code.pc);
 								code.PutByte (offset);
 								free[i] := FALSE; i:= maxNumberOperands;
 							END
@@ -844,11 +844,11 @@ TYPE
 						IF val # -1 THEN code.PutByte (val); val := -1 END;
 						FOR i := 0 TO maxNumberOperands - 1 DO
 							IF (free[i]) & (InstructionSet.instructions[instr].operands[i] = InstructionSet.rel16off) THEN
-								offset := SHORT(operands[i].val - code.pc  - 2);
+								offset := SHORT(TODO(operands[i].val - code.pc) - 2);
 								IF lastPass & ~ValueInWordRange (offset) THEN
 									Error( "value exceeds bounds");
 								END;
-								operands[i].pc := code.pc;
+								operands[i].pc := TODO(code.pc);
 								code.PutWord (offset);
 								free[i] := FALSE; i:= maxNumberOperands;
 							ELSIF (free[i]) & InstructionSet.IsImmediate16(InstructionSet.instructions[instr].operands[i]) THEN
@@ -873,7 +873,7 @@ TYPE
 									AddFixup(BinaryCode.Relative,4,code.pc,operands[i].symbol,operands[i].symbolOffset,operands[i].displacement-4);
 									code.PutDWord(SHORT(operands[i].val));
 								ELSE
-									code.PutDWord (SHORT (operands[i].val - code.pc  - 4));
+									code.PutDWord (SHORT (TODO(operands[i].val - code.pc) - 4));
 								END;
 
 								free[i] := FALSE; i:= maxNumberOperands;
@@ -928,7 +928,7 @@ TYPE
 
 								IF lastPass & (operands[i].symbol.name # "") THEN AddFixup(BinaryCode.Relative,4,code.pc,operands[i].symbol,operands[i].symbolOffset,operands[i].displacement-4)  END;
 
-								code.PutDWord (SHORT (operands[i].val - code.pc - 4));
+								code.PutDWord (SHORT (TODO(operands[i].val - code.pc) - 4));
 								free[i] := FALSE; i:= maxNumberOperands;
 							ELSIF (free[i]) & InstructionSet.IsImmediate32(InstructionSet.instructions[instr].operands[i])  THEN
 								operands[i].pc := code.pc;
@@ -1031,8 +1031,8 @@ TYPE
 			op3 := operands[2];
 		END Emit;
 
-		PROCEDURE EmitAt*(pc: LONGINT;mnem: LONGINT; VAR op1,op2,op3: Operand);
-		VAR prevPC: LONGINT; prevDump: Streams.Writer;
+		PROCEDURE EmitAt*(pc: SIZE;mnem: LONGINT; VAR op1,op2,op3: Operand);
+		VAR prevPC: SIZE; prevDump: Streams.Writer;
 		BEGIN
 			prevDump := dump;
 			dump := NIL;
@@ -1043,8 +1043,8 @@ TYPE
 			dump := prevDump;
 		END EmitAt;
 
-		PROCEDURE StartEmitAt*(VAR pc: LONGINT): LONGINT;
-		VAR prevPC: LONGINT;
+		PROCEDURE StartEmitAt*(VAR pc: SIZE): SIZE;
+		VAR prevPC: SIZE;
 		BEGIN
 			prevPC := code.pc;
 			dump := NIL;
@@ -1052,7 +1052,7 @@ TYPE
 			RETURN prevPC;
 		END StartEmitAt;
 
-		PROCEDURE EndEmitAt*(pc: LONGINT);
+		PROCEDURE EndEmitAt*(pc: SIZE);
 		BEGIN
 			code.SetPC(pc);
 			SELF.dump := code.comments;
@@ -1183,14 +1183,14 @@ TYPE
 			currentLabel: NamedLabel;
 			labels: NamedLabelList;
 
-			prevPC: LONGINT;
+			prevPC: SIZE;
 			pass: LONGINT;
 			absoluteMode: BOOLEAN;
 			absoluteOffset: HUGEINT;
 			orgOffset: HUGEINT;
 			char: CHAR;
 			orgReaderPos: Streams.Position;
-			orgCodePos: LONGINT;
+			orgCodePos: SIZE;
 			prevSourceName: Basic.FileName;
 			position: Basic.Position;
 			prevCpuBits: Size;
@@ -1500,7 +1500,7 @@ TYPE
 			END Expression;
 
 			PROCEDURE Align(size: LONGINT);
-			VAR pc: LONGINT;
+			VAR pc: SIZE;
 			BEGIN
 				IF size <= 0 THEN Error("invalid alignment size"); RETURN END;
 				pc := emitter.code.pc DIV 8; (* bytes *)
@@ -1563,8 +1563,8 @@ TYPE
 				RETURN TRUE;
 			END PutData;
 
-			PROCEDURE Duplicate (size: LONGINT; fixup: BinaryCode.Fixup);
-			VAR i: LONGINT; buffer: ARRAY 100 OF CHAR; pc: LONGINT;
+			PROCEDURE Duplicate (size: SIZE; fixup: BinaryCode.Fixup);
+			VAR i: SIZE; buffer: ARRAY 100 OF CHAR; pc: SIZE;
 			BEGIN
 				IF times = 1 THEN RETURN END;
 

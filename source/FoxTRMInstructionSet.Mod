@@ -252,10 +252,10 @@ TYPE
 				patterns[0].offset := from; patterns[0].bits := to-from+1;
 				IF (opBL <= instructionFormat.mnemonic) & (instructionFormat.mnemonic <= opBF) THEN
 					mode := BinaryCode.Relative;
-					displacement := op.fixup.displacement-1;
+					displacement := TODO(op.fixup.displacement-1);
 				ELSE
 					mode := BinaryCode.Absolute;
-					displacement := op.fixup.displacement;
+					displacement := TODO(op.fixup.displacement);
 				END;
 				op.fixup.InitFixup(mode, 0, op.fixup.symbol, op.fixup.symbolOffset, displacement, 0, patterns);
 			END Fixup;

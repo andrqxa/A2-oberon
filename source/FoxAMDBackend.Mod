@@ -1305,11 +1305,11 @@ TYPE
 						(* do not use EBX because it is not volative in WINAPI, do not use ECX: special register in COOP, do not use RD: register param in SysVABI *)
 						IF cpuBits = 64 THEN
 							emitter.Emit2(InstructionSet.opMOV, opR10, imm);
-							destPC := out.pc;
+							destPC := TODO(out.pc);
 							emitter.Emit1(InstructionSet.opDEC, opR10);
 						ELSE
 							emitter.Emit2(InstructionSet.opMOV, opRD, imm);
-							destPC := out.pc;
+							destPC := TODO(out.pc);
 							emitter.Emit1(InstructionSet.opDEC, opRD);
 						END;
 						emitter.Emit1(InstructionSet.opPUSH, opRA);
@@ -1955,14 +1955,14 @@ TYPE
 			IF instruction.op1.mode = IntermediateCode.ModeImmediate THEN
 				fixup := module.allSections.FindByName(instruction.op1.symbol.name);
 				IF (fixup # NIL) & (fixup.type = Sections.InlineCodeSection) THEN
-					pc := out.pc;
+					pc := TODO(out.pc);
 					(* resolved must be available at this point ! *)
 					resolved := fixup(IntermediateCode.Section).resolved;
 					IF resolved # NIL THEN
 						emitter.code.CopyBits(resolved.os.bits,0,resolved.os.bits.GetSize());
 						emitterFixup := resolved.fixupList.firstFixup;
 						WHILE (emitterFixup # NIL) DO
-							newFixup := BinaryCode.NewFixup(emitterFixup.mode,emitterFixup.offset+pc,emitterFixup.symbol,emitterFixup.symbolOffset,emitterFixup.displacement,emitterFixup.scale,emitterFixup.pattern);
+							newFixup := BinaryCode.NewFixup(emitterFixup.mode,emitterFixup.offset+pc,emitterFixup.symbol,emitterFixup.symbolOffset,TODO(emitterFixup.displacement),emitterFixup.scale,emitterFixup.pattern);
 							out.fixupList.AddFixup(newFixup);
 							emitterFixup := emitterFixup.nextFixup;
 						END;
@@ -2428,7 +2428,7 @@ TYPE
 				Assembler.InitImm8(target,0);
 				emitter.Emit1(InstructionSet.opJGE, target);
 				emitter.Emit2( InstructionSet.opADD, remainder, op3);
-				emitter.code.PutByteAt(target.pc,(emitter.code.pc -target.pc )-1);
+				emitter.code.PutByteAt(target.pc,TODO(emitter.code.pc -target.pc )-1);
 				emitter.Emit2(InstructionSet.opMOV, op1, remainder);
 			ELSE
 				imm := Assembler.NewImm8 (1);
@@ -2788,7 +2788,7 @@ TYPE
 					IF instruction.op1.symbol.name = in.name THEN
 						dest := (instruction.op1.symbolOffset); (* this is the offset in the in-data section (intermediate code), it is not byte- *)
 						destPC := (in.instructions[dest].pc );
-						offset := destPC - (out.pc );
+						offset := TODO(destPC - (out.pc));
 						IF dest > inPC THEN (* forward jump *)
 							Assembler.InitOffset32(target,0);
 							Assembler.SetSymbol(target,instruction.op1.symbol.name,instruction.op1.symbol.fingerprint,instruction.op1.symbolOffset,instruction.op1.offset);
@@ -2921,10 +2921,10 @@ TYPE
 					END;
 					IF hit # 0 THEN JmpDest(hit)	END;
 					IF fail # 0 THEN
-						failPC := out.pc; (* to avoid potential value overflow problem, will be patched anyway  *)
+						failPC := TODO(out.pc); (* to avoid potential value overflow problem, will be patched anyway  *)
 						Assembler.InitOffset8(failOp,failPC );
 						emitter.Emit1(fail,failOp);
-						failPC := failOp.pc;
+						failPC := TODO(failOp.pc);
 					END;
 					Cmp(Low,reverse);
 					CASE instruction.opcode OF
@@ -2938,7 +2938,7 @@ TYPE
 				END;
 			END;
 			JmpDest(hit);
-			IF failPC > 0 THEN out.PutByteAt(failPC,(out.pc-failPC)-1); END;
+			IF failPC > 0 THEN out.PutByteAt(failPC,(TODO(out.pc)-failPC)-1); END;
 		END EmitBr;
 
 		PROCEDURE EmitPush(CONST vop: IntermediateCode.Operand; part: LONGINT);
@@ -3412,7 +3412,7 @@ TYPE
 
 			(* recompute fixup positions and assign binary sections *)
 			PROCEDURE PatchFixups(section: BinaryCode.Section);
-			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; displacement,symbolOffset: LONGINT; in: IntermediateCode.Section;
+			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; displacement: BinaryCode.Unit; symbolOffset: LONGINT; in: IntermediateCode.Section;
 				symbol: Sections.Section;
 			BEGIN
 				fixup := section.fixupList.firstFixup;

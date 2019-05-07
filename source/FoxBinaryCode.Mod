@@ -197,9 +197,9 @@ TYPE
 		bigEndian-: BOOLEAN; (* endianess of bits (not bytes) *)
 		pc-: Unit; (* current position, in units *)
 
-		PROCEDURE GetPC(): Unit;
+		PROCEDURE GetPC(): TODO;
 		BEGIN
-			RETURN pc
+			RETURN TODO(pc);
 		END GetPC;
 
 		PROCEDURE & InitBinarySection*(type: WORD; unit: Bits; CONST name:Basic.SegmentedName; dump: BOOLEAN; bigEndian: BOOLEAN);
@@ -711,7 +711,7 @@ TYPE
 		RETURN result
 	END ConvertToLongreal;
 
-	PROCEDURE NewFixup*(mode: WORD; fixupOffset: LONGINT; symbol: ObjectFile.Identifier; symbolOffset,displacement: LONGINT; scale: Bits; fixupPattern: ObjectFile.FixupPatterns): Fixup;
+	PROCEDURE NewFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset,displacement: LONGINT; scale: Bits; fixupPattern: ObjectFile.FixupPatterns): Fixup;
 	VAR fixup: Fixup;
 	BEGIN
 		NEW(fixup,mode,fixupOffset,symbol,symbolOffset,displacement,scale,fixupPattern); RETURN fixup

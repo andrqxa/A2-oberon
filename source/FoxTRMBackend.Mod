@@ -42,7 +42,7 @@ TYPE
 	Operand=InstructionSet.Operand;
 
 	FixupEntry=POINTER TO RECORD
-		maxPC: LONGINT;
+		maxPC: BinaryCode.Unit;
 		fixup: BinaryCode.Fixup;
 		next: FixupEntry;
 	END;
@@ -56,8 +56,8 @@ TYPE
 			first := NIL; last := NIL;
 		END Init;
 
-		PROCEDURE Enter(fixup: BinaryCode.Fixup; currentPC: LONGINT; bits: LONGINT);
-		VAR entry: FixupEntry; maxPC: LONGINT;
+		PROCEDURE Enter(fixup: BinaryCode.Fixup; currentPC: BinaryCode.Unit; bits: LONGINT);
+		VAR entry: FixupEntry; maxPC: BinaryCode.Unit;
 		BEGIN
 			maxPC := currentPC + ASH(1,bits-1) -1; (* signed *)
 			NEW(entry); entry.fixup := fixup;
@@ -70,7 +70,7 @@ TYPE
 			END;
 		END Enter;
 
-		PROCEDURE Check(outPC: LONGINT): BinaryCode.Fixup;
+		PROCEDURE Check(outPC: BinaryCode.Unit): BinaryCode.Fixup;
 		VAR fixup: BinaryCode.Fixup;
 		BEGIN
 			IF (first # NIL) & (outPC >= first.maxPC) THEN
@@ -258,7 +258,7 @@ TYPE
 		END PatchSpartan6;
 
 		PROCEDURE Emit(op: LONGINT; CONST op1, op2: InstructionSet.Operand);
-		VAR pc: LONGINT;
+		VAR pc: BinaryCode.Unit;
 		BEGIN
 			pc := (out.os.alignment + out.pc);
 			ASSERT(~patchSpartan6 OR ~out.os.fixed OR ((out.os.alignment + out.pc) MOD 1024 < 960) OR ((out.os.alignment + out.pc) MOD 1024 > 975) );
@@ -546,7 +546,7 @@ TYPE
 		PROCEDURE CheckFixups;
 		VAR  fixup, forward, newFixup: BinaryCode.Fixup; fixupOp: InstructionSet.Operand; checkPC, iterCount: LONGINT;
 
-			PROCEDURE CheckPC(): LONGINT;
+			PROCEDURE CheckPC(): BinaryCode.Unit;
 			CONST safety=16; (* max number of TRM instructions to emit IR instruction *)
 			BEGIN
 				IF patchSpartan6 & out.os.fixed & ((out.pc+out.os.alignment) MOD 1024 < 960) & ((out.pc+out.os.alignment) MOD 1024 > 960-safety) THEN
@@ -897,7 +897,7 @@ TYPE
 
 		PROCEDURE EmitCall(VAR instruction: IntermediateCode.Instruction);
 		VAR op: InstructionSet.Operand; section: IntermediateCode.Section; code: BinaryCode.Section; symbol: ObjectFile.Identifier;
-			fixup, newFixup: BinaryCode.Fixup; pc: LONGINT; regOp: Operand; offset,reloffset: LONGINT;
+			fixup, newFixup: BinaryCode.Fixup; pc: BinaryCode.Unit; regOp: Operand; offset,reloffset: LONGINT;
 		BEGIN
 			IF (instruction.op1.symbol.name # "") & (instruction.op1.mode # IntermediateCode.ModeMemory) THEN
 				Resolve(instruction.op1);
@@ -911,7 +911,7 @@ TYPE
 					fixup := code.fixupList.firstFixup;
 					pc := code.pc;
 					WHILE (fixup # NIL) DO
-						newFixup := BinaryCode.NewFixup(fixup.mode, fixup.offset+pc, fixup.symbol, fixup.symbolOffset, fixup.displacement, fixup.scale, fixup.pattern);
+						newFixup := BinaryCode.NewFixup(fixup.mode, fixup.offset+pc, fixup.symbol, fixup.symbolOffset, TODO(fixup.displacement), fixup.scale, fixup.pattern);
 						out.fixupList.AddFixup(newFixup);
 						fixup := fixup.nextFixup;
 					END;
@@ -923,7 +923,7 @@ TYPE
 						Resolve(instruction.op1);
 						symbol := instruction.op1.symbol;
 					END;
-					reloffset := offset - out.pc-out.os.alignment-1;
+					reloffset := TODO(offset - out.pc-out.os.alignment-1);
 					IF symbol.name # "" THEN
 						fixup := BinaryCode.NewFixup(BinaryCode.Relative,out.pc,symbol, offset, 0, 0, NIL);
 						instructionSet.InitFixup(op, 32, fixup);
@@ -1092,7 +1092,7 @@ TYPE
 			Resolve(vop);
 			section := vop.resolved; offset := vop.offset;
 			IF (section # NIL) & (section(IntermediateCode.Section).resolved # NIL) & (section(IntermediateCode.Section).resolved.os.fixed) THEN
-				INC(offset, section(IntermediateCode.Section).resolved.os.alignment);
+				INC(offset, TODO(section(IntermediateCode.Section).resolved.os.alignment));
 				IF vop.symbolOffset > 0 THEN
 					INC(offset, section(IntermediateCode.Section).instructions[vop.symbolOffset].pc);
 				END;
@@ -1739,14 +1739,14 @@ TYPE
 				instructionSet.InitMemory(mem1, op1.register, 0);
 				instructionSet.InitMemory(mem2, op2.register, 0);
 
-				prevSize := out.pc;
+				prevSize := TODO(out.pc);
 				Emit2(opLD, reg, mem2);
 				Emit2(opST, reg, mem1);
 				Emit2N(opADD, op1, 1);
 				Emit2N(opADD, op2, 1);
 				Emit2N(opSUB, op3, 1);
 
-				Emit1N(opBGT, -(out.pc-prevSize+1));
+				Emit1N(opBGT, -TODO(out.pc-prevSize+1));
 				UnmapTicket(ticket);
 			END;
 		END EmitCopy;
@@ -1766,7 +1766,7 @@ TYPE
 				MakeRegister(instr.op3, Low, op3);
 				instructionSet.InitMemory(mem1, op1.register, 0);
 
-				prevSize := out.pc;
+				prevSize := TODO(out.pc);
 				Emit2(opST, op2, mem1);
 				IF down THEN
 					Emit2N(opSUB, op1, 1);
@@ -1775,7 +1775,7 @@ TYPE
 				END;
 				Emit2N(opSUB, op3, 1);
 
-				Emit1N(opBGT, -(out.pc-prevSize+1));
+				Emit1N(opBGT, -TODO(out.pc-prevSize+1));
 				UnmapTicket(ticket);
 			END;
 		END EmitFill;
@@ -1812,7 +1812,7 @@ TYPE
 					Assert(instr.op1.symbol.name # "", "branch without symbol destination");
 					dest := (instr.op1.symbolOffset); (* this is the offset in the in-data section (intermediate code), it is not byte-relative *)
 					destPC := in.instructions[dest].pc + instr.op1.offset;
-					offset := destPC - out.pc;
+					offset := TODO(destPC - out.pc);
 					fixup := BinaryCode.NewFixup(BinaryCode.Relative, out.pc, instr.op1.symbol, instr.op1.symbolOffset, instr.op1.offset,0,NIL);
 					IF (fixup.symbol.name = in.name) & (fixup.symbolOffset > inPC) THEN (* forward jump *)
 						forwardFixups.Enter(fixup, out.pc, instructionSet.RelativeBranchFixupBits);
@@ -1844,7 +1844,7 @@ TYPE
 							Emit2(opMOV,oldLR, opLR);
 							Emit1N(opBL,0);
 							(* exactly here we have the current PC in LR, so we compute the offset here *)
-							offset := out.pc-destPC;
+							offset := TODO(out.pc-destPC);
 							Emit2(opMOV, thisPC, opLR);
 							Emit2(opMOV, opLR, oldLR);
 							UnmapTicket(ticket1);
@@ -2305,7 +2305,7 @@ TYPE
 					Basic.SegmentedNameToString(in.name, name);
 					out := ResolvedSection(in(IntermediateCode.Section));
 					cg.dump := out.comments;
-					SetInstructionWidth(out.os.unit);
+					SetInstructionWidth(TODO(out.os.unit));
 					cg.Section(in(IntermediateCode.Section), out);  (*compilation*)
 					IF in.symbol # NIL THEN
 						procedure := in.symbol(SyntaxTree.Procedure);
@@ -2323,7 +2323,7 @@ TYPE
 					in := module.allSections.GetSection(i);
 					IF (in.type # Sections.InlineCodeSection) (*& (in(IntermediateCode.Section).resolved = NIL) *) THEN
 						out := ResolvedSection(in(IntermediateCode.Section));
-						SetInstructionWidth(out.os.unit);
+						SetInstructionWidth(TODO(out.os.unit));
 						cg.Section(in(IntermediateCode.Section),out);
 					END
 				END
@@ -2450,7 +2450,7 @@ TYPE
 			END;
 		END FindPC;
 
-		PROCEDURE CheckCodeAddress*(VAR adr: LONGINT);
+		PROCEDURE CheckCodeAddress*(VAR adr: BinaryCode.Unit);
 		BEGIN
 			IF (patchSpartan6) & (adr MOD 1024 >= 959) (* need one instruction to jump, therefore include 959 in check *) & (adr MOD 1024 <= 975) THEN
 				adr := (adr DIV 1024) * 1024 +976;

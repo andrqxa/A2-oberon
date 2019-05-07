@@ -35,7 +35,7 @@ TYPE
 	NamedLabel*= OBJECT
 	VAR
 		section: IntermediateCode.Section;
-		offset, displacement: LONGINT; (* in contrast to offset, displacement will be reset each round of assembling. This is to make sure that GetFixup generates the right displacement in the fixup *)
+		offset, displacement: BinaryCode.Unit; (* in contrast to offset, displacement will be reset each round of assembling. This is to make sure that GetFixup generates the right displacement in the fixup *)
 		name-: Scanner.IdentifierString;
 		nextNamedLabel-: NamedLabel;
 		fixupList: FixupElement;
@@ -53,7 +53,7 @@ TYPE
 		VAR fixup: BinaryCode.Fixup; element: FixupElement; identifier: ObjectFile.Identifier;
 		BEGIN
 			identifier.name := section.name;
-			fixup := BinaryCode.NewFixup(BinaryCode.Absolute,0,identifier,0,displacement,0,NIL);
+			fixup := BinaryCode.NewFixup(BinaryCode.Absolute,0,identifier,0,TODO(displacement),0,NIL);
 			NEW(element); element.fixup := fixup; element.next := fixupList; fixupList := element;
 			RETURN fixup;
 		END GetFixup;
@@ -69,7 +69,7 @@ TYPE
 			END;
 		END ResetDisplacements;
 
-		PROCEDURE SetOffset*(ofs: LONGINT);
+		PROCEDURE SetOffset*(ofs: BinaryCode.Unit);
 		VAR element: FixupElement;
 		BEGIN
 			SELF.offset := ofs;
@@ -702,7 +702,7 @@ TYPE
 		(** if the assembler is at the last pass: put bits into the binary code section, otherwise only increment the PC **)
 		PROCEDURE PutBitsIfLastPass(data: HUGEINT; size: BinaryCode.Bits);
 		VAR
-			oldPC: LONGINT;
+			oldPC: BinaryCode.Unit;
 		BEGIN
 			IF pass = MaxPasses THEN
 				code.PutBits(data, size)
@@ -794,7 +794,7 @@ TYPE
 				IgnoreNewLines;
 			END;
 
-			orgCodePos := code.pc;
+			orgCodePos := TODO(code.pc);
 			FOR pass := 1 TO MaxPasses DO
 				labels.ResetDisplacements; (* this is important as the displacement is corrected by code emission in a cummulative way *)
 				code.SetPC(orgCodePos);

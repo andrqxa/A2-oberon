@@ -152,7 +152,7 @@ TYPE
 		RETURN address DIV section.unit + displacement;
 	END Allocate;
 
-	PROCEDURE SizeInBits*(): LONGINT;
+	PROCEDURE SizeInBits*(): ObjectFile.Bits;
 	BEGIN RETURN bits.GetSize()
 	END SizeInBits;
 
@@ -274,7 +274,7 @@ BEGIN
 END WriteOutputFile;
 
 PROCEDURE WriteBinaryFile (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer);
-VAR i: LONGINT;
+VAR i: ObjectFile.Bits;
 BEGIN
 	FOR i := 0 TO arrangement.bits.GetSize () - 1 BY 8 DO
 		writer.Char (CHR (arrangement.bits.GetBits (i, 8)));
@@ -282,7 +282,7 @@ BEGIN
 END WriteBinaryFile;
 
 PROCEDURE WriteUnixBinaryFile (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer);
-VAR i: LONGINT;
+VAR i: ObjectFile.Bits;
 BEGIN
 	FOR i := 0 TO arrangement.bits.GetSize () - 1 BY 8 DO
 		writer.Char (CHR (arrangement.bits.GetBits (i, 8)));
@@ -305,7 +305,7 @@ VAR i,j,size,end,nonZeroInLeadingNibble: LONGINT;
 	END GetFirstNibble;
 BEGIN
 (*allow line size not divisible by 4 by padding the line to a multiple of 4 bits with leading zeros*)
-	size := arrangement.bits.GetSize();
+	size := TODO(arrangement.bits.GetSize());
 
 	end := (size-1) DIV bitsPerLine + 1;
 
@@ -342,7 +342,7 @@ END WriteTRMFile;
 
 PROCEDURE WriteTRMCodeFile* (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer);
 BEGIN
-	WriteTRMFile (arrangement, writer, arrangement.maxUnitSize,1024);
+	WriteTRMFile (arrangement, writer, TODO(arrangement.maxUnitSize), 1024);
 END WriteTRMCodeFile;
 
 PROCEDURE WriteTRMDataFile* (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer);
@@ -764,7 +764,7 @@ CONST BaseAddress = 08048000H; EntryAddress = BaseAddress + HeadersSize;
 	PROCEDURE WriteProgramHeader;
 	VAR FileSize: LONGINT;
 	BEGIN
-		FileSize := HeadersSize + arrangement.bits.GetSize () DIV 8;
+		FileSize := TODO(HeadersSize + arrangement.bits.GetSize () DIV 8);
 
 		WriteWord (1);		(* p_type *)
 		WriteWord (0);		(* p_offset *)
@@ -813,7 +813,7 @@ CONST BaseAddress = 000010E8H;
 	PROCEDURE WriteLoadCommand;
 	VAR FileSize: LONGINT;
 	BEGIN
-		FileSize := MachHeaderSize + CommandsSize + arrangement.bits.GetSize () DIV 8;
+		FileSize := TODO(MachHeaderSize + CommandsSize + arrangement.bits.GetSize () DIV 8);
 
 		Write (1);	(* cmd *)
 		Write (LoadCommandSize);	(* cmdsize *)
@@ -830,7 +830,7 @@ CONST BaseAddress = 000010E8H;
 		WriteName (SectionName);	(* sectname *)
 		WriteName (SegmentName);	(* segname *)
 		Write (BaseAddress);	(* addr *)
-		Write (arrangement.bits.GetSize () DIV 8);	(* size *)
+		Write (TODO(arrangement.bits.GetSize () DIV 8));	(* size *)
 		Write (Start);	(* offset *)
 		Write (2);	(* align *)
 		Write (0);	(* reloff *)

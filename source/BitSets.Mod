@@ -38,8 +38,8 @@ TYPE BitSet* = OBJECT
 		data := newData;
 	END Resize;
 
-	PROCEDURE GetSize* (): LONGINT;
-	BEGIN RETURN TODO (size);
+	PROCEDURE GetSize* (): SIZE;
+	BEGIN RETURN size;
 	END GetSize;
 
 	PROCEDURE SetBit* (pos: Bits; value: BOOLEAN);

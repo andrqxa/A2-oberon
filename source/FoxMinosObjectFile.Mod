@@ -145,7 +145,7 @@ TYPE
 	VAR symbolName: SyntaxTree.IdentifierString; symbol: SyntaxTree.Symbol; binarySection: BinaryCode.Section;
 
 		PROCEDURE Copy(section: BinaryCode.Section; to: ByteArray; offset: LONGINT);
-		VAR i,ofs: LONGINT;
+		VAR i: BinaryCode.Unit; ofs: LONGINT;
 		BEGIN
 			ofs := (offset );
 			FOR i := 0 TO ((section.pc-1) ) DO
@@ -177,7 +177,7 @@ TYPE
 				IF symbol # NIL THEN
 					symbol.GetName(symbolName);
 					IF section.symbol = module.module.moduleScope.bodyProcedure THEN
-						section.SetOffset(0); INC(codeSize,binarySection.pc);
+						section.SetOffset(0); INC(codeSize,TODO(binarySection.pc));
 						(*ReportSection(section)*)
 					END;
 				END
@@ -204,9 +204,9 @@ TYPE
 				ELSIF symbolName = "@moduleSelf" THEN
 				ELSIF section.type = Sections.ConstSection THEN
 					IF binarySection.os.alignment # 0 THEN
-						INC(codeSize,(-codeSize) MOD binarySection.os.alignment);
+						INC(codeSize,TODO((-codeSize) MOD binarySection.os.alignment));
 					END;
-					section.SetOffset(codeSize); INC(codeSize,binarySection.pc); (* global constants: in code *)
+					section.SetOffset(codeSize); INC(codeSize,TODO(binarySection.pc)); (* global constants: in code *)
 					Basic.Align(codeSize, 4); (* word alignment *)
 					(*ReportSection(section)*)
 				ELSIF (section.type = Sections.CodeSection) OR (section.type = Sections.BodyCodeSection) THEN
@@ -214,13 +214,13 @@ TYPE
 						bodyOffset := codeSize
 					END;
 					*)
-					section.SetOffset(codeSize); INC(codeSize, binarySection.pc);
+					section.SetOffset(codeSize); INC(codeSize, TODO(binarySection.pc));
 					Basic.Align(codeSize, 4); (* word alignment *)
 					(*ReportSection(section)*)
 				ELSIF section.type = Sections.VarSection THEN
-					INC(varSize, binarySection.pc);
+					INC(varSize, TODO(binarySection.pc));
 					IF binarySection.os.alignment # 0 THEN
-						INC(varSize,(-varSize) MOD binarySection.os.alignment);
+						INC(varSize,TODO((-varSize) MOD binarySection.os.alignment));
 					END;
 					section.SetOffset(-varSize); (* global variables: negative offset *)
 					(*ReportSection(section)*)
@@ -364,13 +364,13 @@ TYPE
 							IF (fixup.mode = BinaryCode.Relative)  & InModule(fixup.symbol.name) THEN
 								Basic.Error(diagnostics, module.moduleName, Basic.invalidPosition, "Relative self fixup not supported by Minos Object File.");
 							ELSIF (fixup.mode = BinaryCode.Absolute) & InModule(fixup.symbol.name) THEN
-								this := section.offset  + fixup.offset; (* location of the fixup *)
+								this := TODO(section.offset  + fixup.offset); (* location of the fixup *)
 								(*
 								ASSERT(this < 8000H);
 								ASSERT(this >= -8000H);
 								*)
 								Resolve(fixup);
-								patchOffset := (fixup.resolved.offset + fixup.displacement);
+								patchOffset := TODO (fixup.resolved.offset + fixup.displacement);
 								IF (patchOffset DIV 4 >= 8000H) OR (patchOffset DIV 4< -8000H)
 									OR (patchOffset MOD 4 # 0)
 								THEN
@@ -441,7 +441,7 @@ TYPE
 							D.Int(numberFixups,1); D.String(" fixups "); Basic.WriteSegmentedName(D.Log, section.name); D.Ln;
 						END;
 						WHILE first # NIL DO
-							this := first.fixupSection.offset  + first.fixup.offset;
+							this := TODO(first.fixupSection.offset  + first.fixup.offset);
 							instr := Get32(this);
 							ASSERT(prev < 10000H); ASSERT(i < 100H);
 							(*
