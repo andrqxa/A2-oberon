@@ -4243,8 +4243,8 @@ TYPE
 		item-: ANY; sameLine-: BOOLEAN;
 		nextComment-: Comment;
 
-		PROCEDURE & InitComment(pos: Position; scope: Scope; CONST s: ARRAY OF CHAR; length: LONGINT);
-		VAR i: LONGINT;
+		PROCEDURE & InitComment(pos: Position; scope: Scope; CONST s: ARRAY OF CHAR; length: SIZE);
+		VAR i: SIZE;
 		BEGIN
 			SELF.scope := scope;
 			NEW(source,length);
@@ -5104,7 +5104,7 @@ VAR
 		NEW( module, sourceName, position, name, scope, case);  RETURN module;
 	END NewModule;
 
-	PROCEDURE NewComment*(position: Position; scope: Scope; CONST source: ARRAY OF CHAR; length: LONGINT): Comment;
+	PROCEDURE NewComment*(position: Position; scope: Scope; CONST source: ARRAY OF CHAR; length: SIZE): Comment;
 	VAR comment: Comment;
 	BEGIN
 		NEW(comment,position,scope,source,length); RETURN comment;

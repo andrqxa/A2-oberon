@@ -179,7 +179,7 @@ TYPE
 		identifier*: IdentifierType; (* identifier *)
 		identifierString*: IdentifierString; (* cache of identifier's string *)
 		string*: StringType;  (* string or identifier *)
-		stringLength*: LONGINT; (* length of string, if stringLength = 2 then this may be interpreted as character and integer = ORD(ch) *)
+		stringLength*: SIZE; (* length of string, if stringLength = 2 then this may be interpreted as character and integer = ORD(ch) *)
 		numberType*: LONGINT;  (* Integer, HugeInteger, Real or Longreal *)
 		integer*: HUGEINT;
 		character*: CHAR;
@@ -187,10 +187,10 @@ TYPE
 	END;
 
 	StringMaker* = OBJECT (* taken from TF's scanner *)
-	VAR length : LONGINT;
+	VAR length : SIZE;
 		data : StringType;
 
-		PROCEDURE &Init*(initialSize : LONGINT);
+		PROCEDURE &Init*(initialSize : SIZE);
 		BEGIN
 			IF initialSize < 256 THEN initialSize := 256 END;
 			NEW(data, initialSize); length := 0;
@@ -211,7 +211,7 @@ TYPE
 		END Add;
 
 		(* remove last n characters *)
-		PROCEDURE Shorten*(n : LONGINT);
+		PROCEDURE Shorten*(n : SIZE);
 		BEGIN
 			DEC(length, n);
 			IF length < 0 THEN length := 0 END;
@@ -239,13 +239,13 @@ TYPE
 			RETURN r
 		END GetReader;
 
-		PROCEDURE GetString*(VAR len: LONGINT) : StringType;
+		PROCEDURE GetString*(VAR len: SIZE) : StringType;
 		BEGIN
 			len := length;
 			RETURN data
 		END GetString;
 
-		PROCEDURE GetStringCopy*(VAR len: LONGINT): StringType;
+		PROCEDURE GetStringCopy*(VAR len: SIZE): StringType;
 		VAR new: StringType;
 		BEGIN
 			len := length;

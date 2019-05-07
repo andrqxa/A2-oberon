@@ -165,7 +165,7 @@ TYPE
         identifier*: IdentifierType;
         identifierString*: IdentifierString;
         string*: StringType;
-        stringLength*: LONGINT;
+        stringLength*: SIZE;
         numberType*: LONGINT;
         integer*: HUGEINT;
         character*: CHAR;

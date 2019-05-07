@@ -37,10 +37,10 @@ VAR
 
 TYPE
 	StringMaker = OBJECT
-	VAR length : LONGINT;
+	VAR length : SIZE;
 		data : Strings.String;
 
-		PROCEDURE &Init(initialSize : LONGINT);
+		PROCEDURE &Init(initialSize : SIZE);
 		BEGIN
 			IF initialSize < 256 THEN initialSize := 256 END;
 			NEW(data, initialSize); length := 0;
@@ -61,7 +61,7 @@ TYPE
 		END Add;
 
 		(* remove last n characters *)
-		PROCEDURE Shorten(n : LONGINT);
+		PROCEDURE Shorten(n : SIZE);
 		BEGIN
 			DEC(length, n);
 			IF length < 0 THEN length := 0 END;
@@ -81,7 +81,7 @@ TYPE
 			RETURN w
 		END GetWriter;
 
-		PROCEDURE GetLength*() : LONGINT;
+		PROCEDURE GetLength*() : SIZE;
 		BEGIN
 			RETURN length
 		END GetLength;

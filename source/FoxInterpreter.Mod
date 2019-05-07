@@ -796,7 +796,7 @@ TYPE
 		VAR
 			position : LONGINT; ch: CHAR;
 			destination, expMaker: Scanner.StringMaker; destinationWriter, expressionWriter: Streams.Writer; scanner: Scanner.Scanner; parser: Parser;
-			expression: SyntaxTree.Expression; value: Value; len: LONGINT;
+			expression: SyntaxTree.Expression; value: Value; len: SIZE;
 			comment: LONGINT;
 
 			PROCEDURE Next(VAR ch: CHAR);
