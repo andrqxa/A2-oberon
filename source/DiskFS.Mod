@@ -1007,7 +1007,7 @@ TYPE
 
 		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
 		BEGIN
-			RETURN r.apos*SectorSize + r.bpos - HeaderSize
+			RETURN r.apos*SectorSize + TODO(r.bpos) - HeaderSize
 		END Pos;
 
 		PROCEDURE Read*(VAR r: Files.Rider; VAR x: CHAR);
@@ -1100,7 +1100,7 @@ TYPE
 		END Write;
 
 		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
-		VAR dst: ADDRESS; m: LONGINT; buf: Buffer;
+		VAR dst: ADDRESS; m: SIZE; buf: Buffer;
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
 			IF len > 0 THEN
@@ -1108,12 +1108,12 @@ TYPE
 				IF r.apos # buf.apos THEN buf := GetBuf(SELF, r.apos); r.hint := buf END;
 				LOOP
 					IF len <= 0 THEN EXIT END;
-					buf.mod := TRUE; dst := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + TODO (len);
+					buf.mod := TRUE; dst := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + len;
 					IF m <= buf.lim THEN
 						SYSTEM.MOVE(ADDRESSOF(x[ofs]), dst, len); r.bpos := m; EXIT
 					ELSIF m <= SectorSize THEN
 						SYSTEM.MOVE(ADDRESSOF(x[ofs]), dst, len); r.bpos := m;
-						bleng := m; buf.lim := m; modH := TRUE; EXIT
+						bleng := LONGINT(m); buf.lim := LONGINT(m); modH := TRUE; EXIT
 					ELSE
 						m := SectorSize - r.bpos;
 						IF m > 0 THEN SYSTEM.MOVE(ADDRESSOF(x[ofs]), dst, m); INC(ofs, m); DEC(len, m) END;

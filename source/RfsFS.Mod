@@ -320,7 +320,7 @@ TYPE
 				KernelLog.Exit;
 			END;
 
-			RETURN r.apos*BufSize + r.bpos;
+			RETURN r.apos*BufSize + TODO(r.bpos);
 		END Pos;
 
 		(** reads one byte from a file **)
@@ -368,7 +368,7 @@ TYPE
 
 		(** read len bytes from a file. **)
 		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
-		VAR src, dst: ADDRESS; m, errorcode: LONGINT; buf: Buffer;
+		VAR src, dst: ADDRESS; m: SIZE; errorcode: LONGINT; buf: Buffer;
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN
 				SYSTEM.HALT(19);
@@ -384,7 +384,7 @@ TYPE
 						EXIT;
 					END ;
 					src := ADDRESSOF(buf.data.B[0]) + r.bpos;
-					m := r.bpos + TODO(len);
+					m := r.bpos + len;
 					IF m <= buf.lim THEN
 						SYSTEM.MOVE(src, dst, len);
 						r.bpos := m;
@@ -488,7 +488,7 @@ TYPE
 
 		(** write len bytes into a file **)
 		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
-		VAR src, dst: ADDRESS; m, errorcode: LONGINT; buf: Buffer;
+		VAR src, dst: ADDRESS; m: SIZE; errorcode: LONGINT; buf: Buffer;
 		BEGIN {EXCLUSIVE}
 			IF LEN(x)-ofs < len THEN
 				SYSTEM.HALT(19);
@@ -506,7 +506,7 @@ TYPE
 					END;
 					buf.mod := TRUE;
 					dst := ADDRESSOF(buf.data.B[0]) + r.bpos;
-					m := r.bpos + TODO(len);
+					m := r.bpos + len;
 					IF m <= buf.lim THEN
 						SYSTEM.MOVE(src, dst, len);
 						r.bpos := m;
@@ -514,8 +514,8 @@ TYPE
 					ELSIF m <= BufSize THEN
 						SYSTEM.MOVE(src, dst, len);
 						r.bpos := m;
-						bleng := m;
-						buf.lim := m;
+						bleng := LONGINT(m);
+						buf.lim := LONGINT(m);
 						modH := TRUE;
 						EXIT
 					ELSE

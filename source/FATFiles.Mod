@@ -660,7 +660,7 @@ TYPE
 
 		(* Return the offset of a Rider positioned on a file. *)
 		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
-		BEGIN RETURN r.apos*clusterSize + r.bpos
+		BEGIN RETURN r.apos*clusterSize + TODO(r.bpos);
 		END Pos;
 
 		(* Read logical cluster 'pos', pos=0 is the first cluster. 'pos' must be <= # of clusters in file.
@@ -831,7 +831,7 @@ TYPE
 		END WriteBytes;
 
 		PROCEDURE WriteBytesX(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
-		VAR dst: ADDRESS; m: LONGINT;
+		VAR dst: ADDRESS; m: SIZE;
 		BEGIN
 			IF (attr * WriteProtected # {}) THEN HALT(ErrFileReadOnly) END;
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
@@ -839,7 +839,7 @@ TYPE
 				WHILE (len > 0) DO
 					IF (buffer.pos # r.apos) THEN ReadBuffer(buffer, r.apos) END;
 					dst := ADDRESSOF(buffer.data[r.bpos]);
-					m := MIN(clusterSize-r.bpos, TODO(len));
+					m := MIN(clusterSize-r.bpos, len);
 					SYSTEM.MOVE(ADDRESSOF(x[ofs]), dst, m);
 					WriteBuffer(buffer);
 					INC(ofs, m); DEC(len, m);

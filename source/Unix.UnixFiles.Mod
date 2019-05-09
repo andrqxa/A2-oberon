@@ -272,7 +272,7 @@ TYPE
 								ELSE
 									NEW( f, SELF );
 									f.fd := fd;  f.dev := stat.dev;  f.ino := stat.ino;
-									f.mtime := stat.mtime.sec;  f.fsize := stat.size;  f.fpos := 0;
+									f.mtime := stat.mtime.sec;  f.fsize := TODO(stat.size);  f.fpos := 0;
 									f.state := Open;  f.swapper := -1;   (*all f.buf[i] = NIL*)
 									COPY( path, f.workName );  f.registerName := "";
 									f.tempFile := FALSE;
@@ -508,7 +508,8 @@ TYPE
 
 	Buffer =	POINTER TO RECORD (Files.Hint)
 					chg: BOOLEAN;
-					org, size: SIZE;
+					org: Files.Position;
+					size: SIZE;
 					data: ARRAY Bufsize OF CHAR;
 				END;
 
@@ -520,7 +521,8 @@ TYPE
 				dev: Unix.dev_t;
 				ino: Unix.ino_t;
 				mtime: HUGEINT;
-				fsize, fpos: SIZE;
+				fsize: Files.Size;
+				fpos: Files.Position;
 				bufs: ARRAY NBufs OF Buffer;
 				swapper: SIZE; state: LONGINT;
 
@@ -572,7 +574,7 @@ TYPE
 						END;
 						n := UnixWrite( fd, ADDRESSOF( buf.data ), buf.size );
 						IF n < 0 THEN  Halt( SELF, TRUE, "UnixFiles.File.Flush: write failed" )  END;
-						fpos := buf.org + buf.size;  buf.chg := FALSE;
+						fpos := buf.org + TODO(buf.size);  buf.chg := FALSE;
 						res := Unix.fstat( fd, stat );  mtime := stat.mtime.sec
 					END
 				END Flush;
@@ -584,13 +586,13 @@ TYPE
 				END Set;
 
 				PROCEDURE SetX( VAR r: Files.Rider;  p: Files.Position );
-				VAR  org, offset: Files.Position; i, n: SIZE;  buf: Buffer;
+				VAR  org: Files.Position; offset, i, n: SIZE;  buf: Buffer;
 				BEGIN
 					r.file := SELF;  r.fs := fs;
-					IF p > fsize THEN  p := LONGINT(fsize)
+					IF p > fsize THEN  p := fsize
 					ELSIF p < 0 THEN  p := 0
 					END;
-					offset := p MOD Bufsize;  org := p - offset;
+					offset := SIZE (p MOD Bufsize);  org := p - TODO(offset);
 					i := 0;
 					WHILE (i < NBufs) & (bufs[i] # NIL) & (org # bufs[i].org) DO  INC( i )  END;
 					IF i < NBufs THEN
@@ -621,7 +623,7 @@ TYPE
 								ELSE n := 0
 								END
 							END;
-							fpos := org + n;  buf.size := n
+							fpos := org + TODO(n);  buf.size := n
 						END;
 						buf.org := org;  buf.chg := FALSE
 					ELSE
@@ -635,22 +637,22 @@ TYPE
 
 				PROCEDURE Pos*( VAR r: Files.Rider ): Files.Position;
 				BEGIN
-					RETURN r.apos + r.bpos
+					RETURN r.apos + TODO(r.bpos);
 				END Pos;
 
 
 				PROCEDURE Read*( VAR r: Files.Rider;  VAR x: CHAR );
-				VAR offset: Files.Position;  buf: Buffer;
+				VAR offset: SIZE;  buf: Buffer;
 				BEGIN  {EXCLUSIVE}
 					buf := r.hint(Buffer);  offset := r.bpos;
 					IF r.apos # buf.org THEN
-						SetX( r, r.apos + offset );
+						SetX( r, r.apos + TODO(offset) );
 						buf := r.hint(Buffer);  offset := r.bpos
 					END;
 					IF (offset < buf.size) THEN
 						x := buf.data[offset];  r.bpos := offset + 1
 					ELSIF r.apos + offset < fsize THEN
-						SetX( r, r.apos + offset );
+						SetX( r, r.apos + TODO(offset) );
 						x := r.hint(Buffer).data[0];  r.bpos := 1
 					ELSE
 						x := 0X;  r.eof := TRUE
@@ -681,11 +683,11 @@ TYPE
 
 
 				PROCEDURE Write*( VAR r: Files.Rider;  x: CHAR );
-				VAR buf: Buffer;  offset: Files.Position;
+				VAR buf: Buffer;  offset: SIZE;
 				BEGIN  {EXCLUSIVE}
 					buf := r.hint(Buffer);  offset := r.bpos;
 					IF (r.apos # buf.org) OR (offset >= Bufsize) THEN
-						SetX( r, r.apos + offset );
+						SetX( r, r.apos + TODO(offset) );
 						buf := r.hint(Buffer);  offset := r.bpos
 					END;
 					buf.data[offset] := x;  buf.chg := TRUE;
@@ -694,12 +696,12 @@ TYPE
 				END Write;
 
 				PROCEDURE WriteBytes*( VAR r: Files.Rider;  CONST x: ARRAY OF CHAR;  ofs, len: SIZE );
-				VAR xpos, min, restInBuf: SIZE; offset: Files.Position; buf: Buffer;
+				VAR xpos, min, restInBuf, offset: SIZE;  buf: Buffer;
 				BEGIN  {EXCLUSIVE}
 					xpos := ofs;  buf := r.hint(Buffer);  offset := r.bpos;
 					WHILE len > 0 DO
 						IF (r.apos # buf.org) OR (offset >= Bufsize) THEN
-							SetX( r, r.apos + offset );
+							SetX( r, r.apos + TODO(offset) );
 							buf := r.hint(Buffer);  offset := r.bpos
 						END;
 						restInBuf := Bufsize - offset;
@@ -707,7 +709,7 @@ TYPE
 						S.MOVE( ADDRESSOF( x ) + xpos, ADDRESSOF( buf.data ) + offset, min );
 						INC( offset, TODO(min) );  r.bpos := offset;
 						IF offset > buf.size THEN
-							INC( fsize, offset - buf.size );  buf.size := offset
+							INC( fsize, TODO(offset - buf.size) );  buf.size := offset
 						END;
 						INC( xpos, min );  DEC( len, min );  buf.chg := TRUE
 					END;
@@ -717,7 +719,7 @@ TYPE
 
 				PROCEDURE Length*( ): Files.Size;
 				BEGIN
-					RETURN TODO(fsize)
+					RETURN fsize
 				END Length;
 
 
@@ -1008,7 +1010,7 @@ TYPE
 	PROCEDURE ResetBuffers( f: File;  VAR stat: Unix.Status );
 	VAR i: INTEGER;
 	BEGIN
-		f.fsize := stat.size;
+		f.fsize := TODO(stat.size);
 		IF (f.mtime # stat.mtime.sec) THEN
 			FOR i := 0 TO NBufs - 1 DO
 				IF f.bufs[i] # NIL THEN  f.bufs[i].org := -1;  f.bufs[i] := NIL  END;

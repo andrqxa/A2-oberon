@@ -71,7 +71,8 @@ TYPE
 		eof*: BOOLEAN;	(** has end of file been passed *)
 		res*: SIZE;	(** leftover byte count for ReadBytes/WriteBytes *)
 			(** private fields for implementors *)
-		apos*, bpos*: Position;
+		apos*: Position;
+		bpos*: SIZE;
 		hint*: Hint;
 		file*: File;
 		fs*: FileSystem;
