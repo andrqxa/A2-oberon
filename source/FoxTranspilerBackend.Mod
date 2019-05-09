@@ -25,8 +25,8 @@ CONST
 	StailaStyle = 1;
 
 TYPE
-	TYPE Style = INTEGER;
-	TYPE Indent = INTEGER;
+	TYPE Style = WORD;
+	TYPE Indent = WORD;
 	Identifier = ARRAY Scanner.MaxIdentifierLength OF CHAR;
 
 	TYPE Transpiler* = OBJECT (SyntaxTree.Visitor)
@@ -184,7 +184,7 @@ TYPE
 
 		PROCEDURE DefineTypes (scope: SyntaxTree.Scope);
 		TYPE Types = POINTER TO ARRAY OF SyntaxTree.Type;
-		VAR typeDeclaration: SyntaxTree.TypeDeclaration; types: Types; count: LONGINT;
+		VAR typeDeclaration: SyntaxTree.TypeDeclaration; types: Types; count: SIZE;
 
 			PROCEDURE DeclareType (type: SyntaxTree.Type);
 			VAR name: Identifier;
@@ -207,7 +207,7 @@ TYPE
 			END DeclareType;
 
 			PROCEDURE DefineType (type: SyntaxTree.Type; reference: BOOLEAN);
-			VAR i: LONGINT; variable: SyntaxTree.Variable; new: Types; name: Identifier;
+			VAR i: SIZE; variable: SyntaxTree.Variable; new: Types; name: Identifier;
 			BEGIN
 				IF (type IS SyntaxTree.PointerType) & ~reference THEN RETURN END;
 				FOR i := 0 TO count - 1 DO IF types[i] = type THEN RETURN END END;
@@ -468,7 +468,7 @@ TYPE
 		END PrintInclude;
 
 		PROCEDURE PrintComment (CONST comment: ARRAY OF CHAR);
-		VAR i, len: LONGINT; ch: CHAR; pragma: BOOLEAN;
+		VAR i, len: SIZE; ch: CHAR; pragma: BOOLEAN;
 		BEGIN
 			IF Strings.StartsWith2("#pragma", comment) THEN
 				pragma := TRUE
@@ -506,7 +506,7 @@ TYPE
 		END PrintProcedure;
 
 		PROCEDURE PrintParameter (symbol: SyntaxTree.Symbol; nested: BOOLEAN);
-		VAR name: Identifier; type: SyntaxTree.Type; index: LONGINT;
+		VAR name: Identifier; type: SyntaxTree.Type; index: SIZE;
 		BEGIN
 			GetSymbolName (symbol, name, backend.style); type := symbol.type;
 			PrintVariable (IsVarParameter (symbol) & ~IsOpenArray (type) OR nested, name, type);
@@ -568,7 +568,7 @@ TYPE
 		END PrintParameters;
 
 		PROCEDURE PrintArgument (argument: SyntaxTree.Expression; parameter: SyntaxTree.Symbol; nested: BOOLEAN);
-		VAR argumentType, parameterType: SyntaxTree.Type; index: LONGINT; name: Identifier; isEmptyRecord: BOOLEAN;
+		VAR argumentType, parameterType: SyntaxTree.Type; index: SIZE; name: Identifier; isEmptyRecord: BOOLEAN;
 		BEGIN
 			parameterType := parameter.type; index := 0;
 			IF argument = NIL THEN argumentType := parameterType.resolved ELSE argumentType := argument.type.resolved END;
@@ -763,7 +763,6 @@ TYPE
 		END PrintType;
 
 		PROCEDURE PrintBasicType (type: SyntaxTree.BasicType);
-		VAR i: LONGINT;
 		BEGIN
 			IF type IS SyntaxTree.AddressType THEN
 				writer.String ("size_t");
@@ -893,7 +892,7 @@ TYPE
 		END PrintStatements;
 
 		PROCEDURE PrintCode (code: SyntaxTree.Code);
-		VAR text: Scanner.StringType; i: LONGINT;
+		VAR text: Scanner.StringType; i: SIZE;
 		BEGIN
 			PrintIndent; writer.String ("__asm ("); writer.Char ('"');
 			text := code.sourceCode; i := 0;
@@ -1139,7 +1138,7 @@ TYPE
 
 		PROCEDURE VisitBuiltinCallDesignator* (expression: SyntaxTree.BuiltinCallDesignator);
 		VAR argument: ARRAY 3 OF SyntaxTree.Expression; i: SIZE; name: Identifier;
-			position: LONGINT; typeDeclaration: SyntaxTree.TypeDeclaration;
+			position: Streams.Position; typeDeclaration: SyntaxTree.TypeDeclaration;
 		BEGIN
 			FOR i := 0 TO LEN (argument) - 1 DO
 				IF i < expression.parameters.Length () THEN argument[i] := expression.parameters.GetExpression (i); ELSE argument[i] := NIL; END;
@@ -1251,7 +1250,7 @@ TYPE
 		END VisitRealValue;
 
 		PROCEDURE VisitStringValue* (expression: SyntaxTree.StringValue);
-		VAR char: CHAR; i: LONGINT;
+		VAR char: CHAR; i: SIZE;
 		BEGIN
 			writer.Char ('"'); i := 0;
 			LOOP
@@ -1612,14 +1611,14 @@ TYPE
 	END GetRecord;
 
 	PROCEDURE Replace (VAR string: ARRAY OF CHAR; replace, by: CHAR);
-	VAR i: LONGINT; char: CHAR;
+	VAR i: SIZE; char: CHAR;
 	BEGIN
 		i := 0; char := string[0];
 		WHILE char # 0X DO IF char = replace THEN string[i] := by; END; INC (i); char := string[i]; END;
 	END Replace;
 
 	PROCEDURE FixStailaIdentifier (VAR identifier: ARRAY OF CHAR);
-	VAR i: LONGINT; previousLower: BOOLEAN;
+	VAR i: SIZE; previousLower: BOOLEAN;
 	BEGIN
 		i := 0; previousLower := FALSE;
 		WHILE identifier[i] # 0X DO

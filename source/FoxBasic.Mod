@@ -48,7 +48,7 @@ TYPE
 	ComparisonFunction = PROCEDURE {DELEGATE} (object1, object2: ANY): BOOLEAN;
 
 	Position*= RECORD
-		start*, end*, line*, linepos*: LONGINT;
+		start*, end*, line*, linepos*: Streams.Position;
 		reader*: Streams.Reader;
 	END;
 
