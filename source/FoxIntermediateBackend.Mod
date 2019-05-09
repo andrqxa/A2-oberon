@@ -1151,14 +1151,14 @@ TYPE
 			inUse := use;
 		END SetUsage;
 
-		PROCEDURE GetVariable(i: LONGINT): SyntaxTree.Variable;
+		PROCEDURE GetVariable(i: SIZE): SyntaxTree.Variable;
 		VAR any: ANY;
 		BEGIN
 			any := Get(i);
 			IF any = NIL THEN RETURN NIL ELSE RETURN any(SyntaxTree.Variable) END;
 		END GetVariable;
 
-		PROCEDURE SetVariable(pos: LONGINT; v: SyntaxTree.Variable);
+		PROCEDURE SetVariable(pos: SIZE; v: SyntaxTree.Variable);
 		BEGIN
 			Set(pos, v);
 		END SetVariable;
@@ -1200,10 +1200,10 @@ TYPE
 				);
 		END CompatibleType;
 
-		PROCEDURE GetFreeVariable(type: SyntaxTree.Type; untraced: BOOLEAN; VAR pos: LONGINT): SyntaxTree.Variable;
-		VAR var : SyntaxTree.Variable; i: LONGINT;
+		PROCEDURE GetFreeVariable(type: SyntaxTree.Type; untraced: BOOLEAN; VAR pos: SIZE): SyntaxTree.Variable;
+		VAR var : SyntaxTree.Variable; i: SIZE;
 		BEGIN
-			pos := TODO (Length());
+			pos := Length();
 			FOR i := 0 TO pos-1 DO
 				IF ~(Occupied(i)) THEN
 					var := GetVariable(i);
@@ -4852,10 +4852,10 @@ TYPE
 				(* write lengths and increments of target array for remaining dimensions *)
 				i := indexListSize;
 				WHILE indexDim < targetArrayDimensionality DO
-					GetMathArrayLengthAt(leftType(SyntaxTree.MathArrayType),array,TODO(i),FALSE, sourceLength);
+					GetMathArrayLengthAt(leftType(SyntaxTree.MathArrayType),array,i,FALSE, sourceLength);
 					PutMathArrayLength(result.tag, sourceLength.op,indexDim);
 					ReleaseOperand(sourceLength);
-					GetMathArrayIncrementAt(leftType(SyntaxTree.MathArrayType),array,TODO(i),FALSE,sourceIncrement);
+					GetMathArrayIncrementAt(leftType(SyntaxTree.MathArrayType),array,i,FALSE,sourceIncrement);
 					PutMathArrayIncrement(result.tag, sourceIncrement.op,indexDim);
 					ReleaseOperand(sourceIncrement);
 					INC(i); INC(indexDim);
@@ -6514,7 +6514,7 @@ TYPE
 			IF (callingConvention = SyntaxTree.WinAPICallingConvention) OR (callingConvention IN SysvABI) THEN
 				Emit(Call(position,operand.op,0));
 			ELSE
-				Emit(Call(position,operand.op,TODO(parametersSize)));
+				Emit(Call(position,operand.op,parametersSize));
 			END;
 			ReleaseOperand(operand);
 
@@ -6687,10 +6687,10 @@ TYPE
 						IF baseRecord = NIL THEN
 							offset := ToMemoryUnits(system, meta.GetTypeRecordBaseOffset(0));
 						ELSE
-							offset := ToMemoryUnits(system, meta.GetTypeRecordBaseOffset(TODO(baseRecord.recordScope.numberMethods))*system.addressSize);
+							offset := ToMemoryUnits(system, meta.GetTypeRecordBaseOffset(baseRecord.recordScope.numberMethods)*system.addressSize);
 						END;
 					ELSE
-						offset := ToMemoryUnits(system,meta.GetTypeRecordBaseOffset(TODO(x(SyntaxTree.RecordType).recordScope.numberMethods))*system.addressSize);
+						offset := ToMemoryUnits(system,meta.GetTypeRecordBaseOffset(x(SyntaxTree.RecordType).recordScope.numberMethods)*system.addressSize);
 					END;
 				END;
 				RETURN td
@@ -7360,14 +7360,14 @@ TYPE
 			MathArrayLenOrIncr(type,operand,dim,FALSE,check,result);
 		END GetMathArrayLength;
 
-		PROCEDURE GetMathArrayLengthAt(type: SyntaxTree.MathArrayType; CONST operand: Operand; dim: LONGINT; check: BOOLEAN; VAR result: Operand);
+		PROCEDURE GetMathArrayLengthAt(type: SyntaxTree.MathArrayType; CONST operand: Operand; dim: SIZE; check: BOOLEAN; VAR result: Operand);
 		VAR dimOp: IntermediateCode.Operand;
 		BEGIN
 			dimOp := IntermediateCode.Immediate(sizeType, dim);
 			GetMathArrayLength(type, operand, dimOp, check, result);
 		END GetMathArrayLengthAt;
 
-		PROCEDURE GetMathArrayIncrementAt(type: SyntaxTree.MathArrayType; CONST operand: Operand; dim: LONGINT; check: BOOLEAN; VAR result: Operand);
+		PROCEDURE GetMathArrayIncrementAt(type: SyntaxTree.MathArrayType; CONST operand: Operand; dim: SIZE; check: BOOLEAN; VAR result: Operand);
 		VAR dimOp: IntermediateCode.Operand;
 		BEGIN
 			dimOp := IntermediateCode.Immediate(sizeType, dim);
@@ -7540,7 +7540,7 @@ TYPE
 		**)
 		PROCEDURE GetTemporaryVariable(type: SyntaxTree.Type; register: BOOLEAN; untraced: BOOLEAN): SyntaxTree.Variable;
 		VAR name: SyntaxTree.Identifier;  variable, v: SyntaxTree.Variable;
-			scope: SyntaxTree.Scope; duplicate: BOOLEAN; offset, index: LONGINT;
+			scope: SyntaxTree.Scope; duplicate: BOOLEAN; offset: LONGINT; index: SIZE;
 		BEGIN
 			IF ~register THEN
 				v := temporaries.GetFreeVariable(type, untraced, index);
@@ -12470,7 +12470,7 @@ TYPE
 			END;
 		END AddPointer;
 
-		PROCEDURE GetTypeRecordBaseOffset(numberMethods: LONGINT): LONGINT;
+		PROCEDURE GetTypeRecordBaseOffset(numberMethods: SIZE): SIZE;
 		BEGIN
 			IF implementationVisitor.backend.cooperative OR simple THEN RETURN 0 ELSE RETURN TypeRecordBaseOffset + numberMethods END;
 		END GetTypeRecordBaseOffset;
@@ -13326,7 +13326,7 @@ TYPE
 										ELSE
 											tir := implementationVisitor.NewSection(module.importedSections, Sections.ConstSection, segmentedName,td,declarationVisitor.dump);
 										END;
-										offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(TODO(type(SyntaxTree.RecordType).recordScope.numberMethods))*module.system.addressSize);
+										offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(type(SyntaxTree.RecordType).recordScope.numberMethods)*module.system.addressSize);
 										Symbol(section, tir,  0, offset);
 									ELSE
 										Address(section, 0);
@@ -13621,7 +13621,7 @@ TYPE
 
 					WITH declared:
 					SyntaxTree.RecordType DO
-						offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(TODO(declared.recordScope.numberMethods))*module.system.addressSize);
+						offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(declared.recordScope.numberMethods)*module.system.addressSize);
 						Symbol(section, s,  0, offset);
 						Global.GetSymbolSegmentedName(typeDeclaration,name);
 						Basic.AppendToSegmentedName(name,".@Info");
@@ -14359,7 +14359,7 @@ TYPE
 							ELSE
 								tir := implementationVisitor.NewSection(module.importedSections, Sections.ConstSection, name,baseTD,declarationVisitor.dump);
 							END;
-							offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(TODO(record.recordScope.numberMethods))*module.system.addressSize);
+							offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(record.recordScope.numberMethods)*module.system.addressSize);
 							Symbol(source, tir,  0, offset);
 							IF reverse THEN Td(record.GetBaseRecord()) END;
 						END;
@@ -15377,7 +15377,7 @@ TYPE
 		RETURN instruction
 	END Conv;
 
-	PROCEDURE Call*(position: Basic.Position;op: IntermediateCode.Operand; parSize: LONGINT): IntermediateCode.Instruction;
+	PROCEDURE Call*(position: Basic.Position;op: IntermediateCode.Operand; parSize: SIZE): IntermediateCode.Instruction;
 	VAR instruction: IntermediateCode.Instruction;
 	BEGIN
 		IntermediateCode.InitInstruction(instruction, position, IntermediateCode.call,op,IntermediateCode.Number(parSize),emptyOperand);
