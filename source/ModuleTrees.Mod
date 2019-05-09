@@ -49,7 +49,7 @@ TYPE
 		pos : Texts.TextPosition;
 		name : Strings.String;
 		color : WMGraphics.Color;
-		sortInfo : LONGINT;
+		sortInfo : WORD;
 		font : WMGraphics.Font;
 		node : ModuleParser.Node;
 		modulename : ARRAY 32 OF CHAR;
@@ -221,18 +221,18 @@ TYPE
 			scanner: FoxScanner.Scanner;
 			reader : TextUtilities.TextReader;
 			rootNode: WMTrees.TreeNode;
-			nofOpenNodes : LONGINT;
+			nofOpenNodes : SIZE;
 			openNodes : StringList;
-			i : LONGINT;
+			i : SIZE;
 
 			PROCEDURE Store;
 			VAR node, tnode : WMTrees.TreeNode;
 				stack : ARRAY 32 OF WMTrees.TreeNode;
 				caption : Strings.String;
-				tos : LONGINT;
+				tos : SIZE;
 				path : ARRAY 1024 OF CHAR;
 				sl, tl : StringList;
-				i : LONGINT;
+				i : SIZE;
 			BEGIN
 				nofOpenNodes := 0;
 				node := tree.GetRoot();
@@ -400,7 +400,7 @@ TYPE
 		PROCEDURE SortTree(parent: WMTrees.TreeNode);
 		VAR
 			n, left, right: WMTrees.TreeNode;
-			nodeCount, i: LONGINT;
+			nodeCount, i: SIZE;
 		BEGIN
 			n := tree.GetChildren(parent);
 			WHILE n # NIL DO
@@ -563,7 +563,7 @@ TYPE
 			END;
 		END MiddleClickNode;
 
-		PROCEDURE GetTextInfo(node : ModuleParser.Node; infoItem: ModuleParser.InfoItem; isPublic : BOOLEAN; sortInfo: LONGINT; color: WMGraphics.Color; style: SET): TextInfo;
+		PROCEDURE GetTextInfo(node : ModuleParser.Node; infoItem: ModuleParser.InfoItem; isPublic : BOOLEAN; sortInfo: WORD; color: WMGraphics.Color; style: SET): TextInfo;
 		VAR newInfo: TextInfo; moduleNode : ModuleParser.Module; font: WMGraphics.Font;
 		BEGIN
 			NEW(newInfo);
@@ -651,8 +651,8 @@ TYPE
 			END;
 		END GetModuleNode;
 
-		PROCEDURE GetProcedureType(procHead : ModuleParser.ProcHead) : LONGINT;
-		VAR type : LONGINT;
+		PROCEDURE GetProcedureType(procHead : ModuleParser.ProcHead) : WORD;
+		VAR type : WORD;
 
 			PROCEDURE InModuleScope(procHead : ModuleParser.ProcHead) : BOOLEAN;
 			BEGIN
@@ -701,7 +701,7 @@ TYPE
 			newNode, importNode: WMTrees.TreeNode;
 			info : TextInfo;
 			import: ModuleParser.Import;
-			nofImports : LONGINT;
+			nofImports : SIZE;
 		BEGIN
 			n := importList;
 			IF n # NIL THEN
@@ -798,7 +798,7 @@ TYPE
 		PROCEDURE AddProcHead(treeNode: WMTrees.TreeNode; procHead: ModuleParser.ProcHead): WMTrees.TreeNode;
 		VAR
 			newNode: WMTrees.TreeNode; caption: Strings.String;
-			color : WMGraphics.Color; image : WMGraphics.Image; type : LONGINT; d : ANY;
+			color : WMGraphics.Color; image : WMGraphics.Image; type : WORD; d : ANY;
 		BEGIN
 			IF (procHead # NIL) THEN
 				color := GetColor(procHead.modifiers, ColorProcedure);
@@ -898,7 +898,7 @@ TYPE
 		END AddFPSection;
 
 		PROCEDURE AddVarDecl(parent: WMTrees.TreeNode; varDecl: ModuleParser.VarDecl);
-		VAR n: ModuleParser.NodeList; nofVariables, nofIdents : LONGINT;
+		VAR n: ModuleParser.NodeList; nofVariables, nofIdents : SIZE;
 		BEGIN
 			n := varDecl; nofVariables := 0;
 			WHILE n # NIL DO
@@ -1156,7 +1156,7 @@ TYPE
 		PROCEDURE PrefixPostfixToCaption(node: WMTrees.TreeNode; prePost: Strings.String; prefix: BOOLEAN);
 		VAR
 			oldCaption, newCaption: Strings.String;
-			len: LONGINT;
+			len: SIZE;
 		BEGIN
 			oldCaption := tree.GetNodeCaption(node);
 			len := LEN(oldCaption^) + LEN(prePost^);
@@ -1179,7 +1179,7 @@ TYPE
 			PrefixPostfixToCaption(node, postfix, FALSE);
 		END AddPostfixToCaption;
 
-		PROCEDURE AddNumberPostfixToCaption(node : WMTrees.TreeNode; number : LONGINT);
+		PROCEDURE AddNumberPostfixToCaption(node : WMTrees.TreeNode; number : SIZE);
 		VAR postfix, nbr : ARRAY 16 OF CHAR;
 		BEGIN
 			Strings.IntToStr(number, nbr);
@@ -1187,7 +1187,7 @@ TYPE
 			PrefixPostfixToCaption(node, Strings.NewString(postfix), FALSE);
 		END AddNumberPostfixToCaption;
 
-		PROCEDURE AddIdentList(parent: WMTrees.TreeNode; identList: ModuleParser.IdentList; VAR nofIdents : LONGINT);
+		PROCEDURE AddIdentList(parent: WMTrees.TreeNode; identList: ModuleParser.IdentList; VAR nofIdents : SIZE);
 		VAR n: ModuleParser.NodeList; newNode: WMTrees.TreeNode;
 		BEGIN
 			nofIdents := 0;
@@ -1204,7 +1204,7 @@ TYPE
 			n: ModuleParser.NodeList;
 			newNode: WMTrees.TreeNode;
 			c : ModuleParser.ConstDecl;
-			nofConstants : LONGINT;
+			nofConstants : SIZE;
 		BEGIN
 			n := constDecl; nofConstants := 0;
 			WHILE n # NIL DO
@@ -1217,7 +1217,7 @@ TYPE
 			AddNumberPostfixToCaption(parent, nofConstants);
 		END AddConstDecl;
 
-		PROCEDURE AddIdentDef(parent: WMTrees.TreeNode; node : ModuleParser.Node; identDef: ModuleParser.IdentDef; sortInfo: LONGINT; color: WMGraphics.Color; style: SET):
+		PROCEDURE AddIdentDef(parent: WMTrees.TreeNode; node : ModuleParser.Node; identDef: ModuleParser.IdentDef; sortInfo: WORD; color: WMGraphics.Color; style: SET):
 			WMTrees.TreeNode;
 		VAR newNode: WMTrees.TreeNode;
 		BEGIN
@@ -1234,7 +1234,7 @@ TYPE
 			END
 		END AddIdentDef;
 
-		PROCEDURE AddInfoItem(parent: WMTrees.TreeNode; node : ModuleParser.Node; infoItem: ModuleParser.InfoItem; isPublic : BOOLEAN; sortInfo : LONGINT; color : WMGraphics.Color; style: SET):
+		PROCEDURE AddInfoItem(parent: WMTrees.TreeNode; node : ModuleParser.Node; infoItem: ModuleParser.InfoItem; isPublic : BOOLEAN; sortInfo : WORD; color : WMGraphics.Color; style: SET):
 			WMTrees.TreeNode;
 		VAR newNode: WMTrees.TreeNode;
 		BEGIN

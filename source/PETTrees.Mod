@@ -176,18 +176,18 @@ TYPE
 			diagnostics : Diagnostics.Diagnostics;
 			streamDiagnostics : Diagnostics.StreamDiagnostics; log, writer : Streams.Writer;
 			dummyLog : Streams.StringWriter;
-			nofOpenNodes : LONGINT;
+			nofOpenNodes : SIZE;
 			openNodes : StringList;
-			i : LONGINT;
+			i : SIZE;
 
 			PROCEDURE Store;
 			VAR node, tnode : WMTrees.TreeNode;
 				stack : ARRAY 32 OF WMTrees.TreeNode;
 				caption : Strings.String;
-				tos : LONGINT;
+				tos : SIZE;
 				path : ARRAY 1024 OF CHAR;
 				sl, tl : StringList;
-				i : LONGINT;
+				i : SIZE;
 			BEGIN
 				nofOpenNodes := 0;
 				node := tree.GetRoot();
@@ -356,7 +356,7 @@ TYPE
 		PROCEDURE SortTree(parent: WMTrees.TreeNode);
 		VAR
 			n, left, right: WMTrees.TreeNode;
-			nodeCount, i: LONGINT;
+			nodeCount, i: SIZE;
 		BEGIN
 			n := tree.GetChildren(parent);
 			WHILE n # NIL DO
@@ -465,7 +465,7 @@ TYPE
 		PROCEDURE PrefixPostfixToCaption*(node: WMTrees.TreeNode; prePost: Strings.String; prefix: BOOLEAN); (** protected *)
 		VAR
 			oldCaption, newCaption: Strings.String;
-			len: LONGINT;
+			len: SIZE;
 		BEGIN
 			oldCaption := tree.GetNodeCaption(node);
 			len := LEN(oldCaption^) + LEN(prePost^);
@@ -488,7 +488,7 @@ TYPE
 			PrefixPostfixToCaption(node, postfix, FALSE);
 		END AddPostfixToCaption;
 
-		PROCEDURE AddNumberPostfixToCaption*(node : WMTrees.TreeNode; number : LONGINT); (** protected *)
+		PROCEDURE AddNumberPostfixToCaption*(node : WMTrees.TreeNode; number : SIZE); (** protected *)
 		VAR postfix, nbr : ARRAY 16 OF CHAR;
 		BEGIN
 			Strings.IntToStr(number, nbr);
