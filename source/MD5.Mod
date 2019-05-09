@@ -213,13 +213,13 @@ under a public-key cryptosystem such as RSA. *)
 
 (** Continues an MD5 message-digest operation, processing another
 	message block, and updating the context. *)
-	PROCEDURE WriteBytes*(context: Context; CONST buf: ARRAY OF CHAR; len: LONGINT);
+	PROCEDURE WriteBytes*(context: Context; CONST buf: ARRAY OF CHAR; len: SIZE);
 		VAR
 			in: ARRAY 16 OF LONGINT;
 			beg, t: LONGINT;
 	BEGIN
 		beg := 0; t := context.bits;
-		context.bits := t + len*8;
+		context.bits := t + TODO(len*8);
 		t := (t DIV 8) MOD 64;
 		IF t > 0 THEN
 			t := 64-t;

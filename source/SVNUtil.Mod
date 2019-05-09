@@ -107,7 +107,7 @@ BEGIN
 	md5context := MD5.New();
 	LOOP
 		r.Bytes ( tmp^, 0, bufSize, len );
-		MD5.WriteBytes ( md5context, tmp^, TODO(len) );
+		MD5.WriteBytes ( md5context, tmp^, len );
 		IF len < bufSize THEN EXIT END;
 	END;
 
@@ -139,7 +139,7 @@ BEGIN
 	md5context := MD5.New();
 	Strings.FormatDateTime ( SVNOutput.DateFormat, Dates.Now(), tmp^ );
 
-	MD5.WriteBytes ( md5context, tmp^, TODO(Strings.Length ( tmp^ )) );
+	MD5.WriteBytes ( md5context, tmp^, Strings.Length ( tmp^ ) );
 	MD5.Close ( md5context, md5digest );
 	MD5.ToString ( md5digest, tmp^ );
 
