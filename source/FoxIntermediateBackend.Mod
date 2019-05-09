@@ -532,7 +532,7 @@ TYPE
 			recordType: SyntaxTree.RecordType;
 			isModuleBody: BOOLEAN;
 			parametersSize: LONGINT;
-			position: LONGINT;
+			position: Streams.Position;
 			variable: SyntaxTree.Variable;
 			nonParameterRegisters: WORD;
 

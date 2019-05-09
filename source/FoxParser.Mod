@@ -172,7 +172,8 @@ TYPE
 		token-: Scanner.Token;
 		diagnostics: Diagnostics.Diagnostics;
 		currentScope: SyntaxTree.Scope;
-		recentCommentItem: ANY; recentLine: LONGINT;
+		recentCommentItem: ANY;
+		recentLine: Streams.Position;
 		recentComment: SyntaxTree.Comment;
 		moduleScope: SyntaxTree.ModuleScope;
 		error-: BOOLEAN;
@@ -269,7 +270,7 @@ TYPE
 		(* conditional compilation according to the following syntax *)
 		(* Block = '#' 'if' Condition 'then' Block { '#' 'elsif' Condition 'then' Block } ['#' 'else' Block] '#' 'end' | any symbol until next new line. *)
 		PROCEDURE GetNextToken(VAR token: Scanner.Token): BOOLEAN;
-		VAR line: Streams.Position; end: Scanner.Symbol; startPos, endPos: LONGINT;
+		VAR line, startPos, endPos: Streams.Position; end: Scanner.Symbol;
 		BEGIN
 			LOOP
 				line := token.position.line;
@@ -1394,7 +1395,7 @@ TYPE
 
 		(** Code = {  any \ 'end' \ 'with' } ['with' {('in'|'out') StatementSequence}] . **)
 		PROCEDURE Code(outer: SyntaxTree.Statement): SyntaxTree.Code;
-		VAR startPos: Position; endPos: LONGINT; i, len: SIZE; codeString: Scanner.StringType; code: SyntaxTree.Code;
+		VAR startPos: Position; endPos: Streams.Position; i, len: SIZE; codeString: Scanner.StringType; code: SyntaxTree.Code;
 			end: Scanner.Symbol; in, out: BOOLEAN; statements, rules: SyntaxTree.StatementSequence;
 		BEGIN
 			startPos := token.position;

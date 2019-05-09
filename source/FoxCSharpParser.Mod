@@ -3,7 +3,7 @@ MODULE FoxCSharpParser;
 
 IMPORT Strings, StringPool, Diagnostics, D := Debugging, Basic := FoxBasic, FoxScanner,
     Scanner := FoxCSharpScanner, SyntaxTree := FoxSyntaxTree, Global := FoxGlobal,
-    KernelLog (* DEBUG *);
+    Streams, KernelLog (* DEBUG *);
 
 CONST
     Trace = FALSE;
@@ -113,7 +113,7 @@ TYPE
         diagnostics: Diagnostics.Diagnostics;
         currentScope: SyntaxTree.Scope;
         recentCommentItem: ANY;
-        recentLine: LONGINT;
+        recentLine: Streams.Position;
         recentComment: SyntaxTree.Comment;
         moduleScope: SyntaxTree.ModuleScope;
         error-: BOOLEAN;

@@ -436,7 +436,7 @@ TYPE
 
 		(* simple case can be utilized when endString does not contain first character, which is the case for our string convention *)
 		PROCEDURE ConsumeStringUntil(CONST endString: ARRAY OF CHAR; useControl: BOOLEAN);
-		VAR escapePos: LONGINT; ech: CHAR; i: LONGINT; startPosition: LONGINT;
+		VAR escapePos: LONGINT; ech: CHAR; i: LONGINT; startPosition: Streams.Position;
 		CONST
 			Control = '\';
 			Delimiter = '"';
@@ -818,7 +818,7 @@ TYPE
 			token.string := stringMaker.GetString(token.stringLength);
 		END ReadComment;
 
-		PROCEDURE SkipToEndOfCode*(VAR startPos,endPos: LONGINT; VAR token: Token): Symbol;
+		PROCEDURE SkipToEndOfCode*(VAR startPos,endPos: Streams.Position; VAR token: Token): Symbol;
 		VAR s: LONGINT; newline: BOOLEAN;
 		BEGIN
 			ASSERT(case # Unknown);
