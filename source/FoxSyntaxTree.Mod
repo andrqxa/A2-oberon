@@ -1608,8 +1608,8 @@ TYPE
 
 	CellType*=OBJECT (Type)
 	VAR
-		firstParameter-,lastParameter-: Parameter; numberParameters-: LONGINT;  (* parameters *)
-		firstProperty-, lastProperty-: Property; numberProperties: LONGINT; (* capabilities *)
+		firstParameter-,lastParameter-: Parameter; numberParameters-: SIZE;  (* parameters *)
+		firstProperty-, lastProperty-: Property; numberProperties: SIZE; (* capabilities *)
 		cellScope-: CellScope;
 		isCellNet-: BOOLEAN;
 		modifiers-: Modifier;
@@ -3216,7 +3216,8 @@ TYPE
 			nextProcedure-: Procedure;
 			procedureScope- : ProcedureScope;
 			super-: Procedure;
-			level-, methodNumber-: LONGINT;
+			level-: LONGINT;
+			methodNumber-: SIZE;
 			isBodyProcedure-, isConstructor-,isFinalizer-,isInline-,isOberonInline-, isEntry-, isExit-,isFinal-,isAbstract-,isOverwritten-: BOOLEAN;
 
 		PROCEDURE & InitProcedure( position: Position;  name: Identifier; scope: ProcedureScope);
@@ -3290,7 +3291,7 @@ TYPE
 		BEGIN SELF.level := level
 		END SetLevel;
 
-		PROCEDURE SetMethodNumber*(methodNumber: LONGINT);
+		PROCEDURE SetMethodNumber*(methodNumber: SIZE);
 		BEGIN SELF.methodNumber := methodNumber
 		END SetMethodNumber;
 
@@ -4267,13 +4268,13 @@ TYPE
 
 	Scope*=OBJECT
 		VAR
-		firstSymbol-: Symbol; numberSymbols-: LONGINT; (* all symbols in scope (sorted) *)
+		firstSymbol-: Symbol; numberSymbols-: SIZE; (* all symbols in scope (sorted) *)
 		symbolTable: Basic.HashTableInt;
 
-		firstConstant-,lastConstant-: Constant;  numberConstants-: LONGINT; (* constants *)
-		firstTypeDeclaration-,lastTypeDeclaration-: TypeDeclaration; numberTypeDeclarations-: LONGINT; (* type declarations *)
-		firstVariable-,lastVariable-: Variable; numberVariables-: LONGINT;  (* variables *)
-		firstProcedure-,lastProcedure-: Procedure; numberProcedures-: LONGINT;  (* procedures *)
+		firstConstant-,lastConstant-: Constant;  numberConstants-: SIZE; (* constants *)
+		firstTypeDeclaration-,lastTypeDeclaration-: TypeDeclaration; numberTypeDeclarations-: SIZE; (* type declarations *)
+		firstVariable-,lastVariable-: Variable; numberVariables-: SIZE;  (* variables *)
+		firstProcedure-,lastProcedure-: Procedure; numberProcedures-: SIZE;  (* procedures *)
 
 		procedures-: ProcedureList;
 
@@ -4435,7 +4436,7 @@ TYPE
 			RETURN p;
 		END FindProcedure;
 
-		PROCEDURE FindMethod*(number: LONGINT): Procedure;
+		PROCEDURE FindMethod*(number: SIZE): Procedure;
 		VAR p: Procedure;
 		BEGIN
 			p := firstProcedure;
@@ -4535,9 +4536,9 @@ TYPE
 			bodyProcedure-: Procedure;
 			constructor-: Procedure;
 			finalizer-: Procedure;
-			numberMethods-: LONGINT;
-			firstParameter-,lastParameter-: Parameter; numberParameters-: LONGINT;  (* parameters for Active Cells programming*)
-			firstOperator-, lastOperator-: Operator; numberOperators: LONGINT; (* defined operators *)
+			numberMethods-: SIZE;
+			firstParameter-,lastParameter-: Parameter; numberParameters-: SIZE;  (* parameters for Active Cells programming*)
+			firstOperator-, lastOperator-: Operator; numberOperators: SIZE; (* defined operators *)
 
 		PROCEDURE & InitRecordScope(outer: Scope);
 		BEGIN
@@ -4562,7 +4563,7 @@ TYPE
 		BEGIN SELF.finalizer := body
 		END SetFinalizer;
 
-		PROCEDURE SetNumberMethods*(numberMethods: LONGINT);
+		PROCEDURE SetNumberMethods*(numberMethods: SIZE);
 		BEGIN SELF.numberMethods := numberMethods;
 		END SetNumberMethods;
 
@@ -4668,7 +4669,7 @@ TYPE
 			RETURN p;
 		END FindProcedure;
 
-		PROCEDURE FindMethod*(number: LONGINT): Procedure;
+		PROCEDURE FindMethod*(number: SIZE): Procedure;
 		VAR p: Procedure; base: RecordType;
 		BEGIN
 			p := FindMethod^(number);
@@ -4696,7 +4697,7 @@ TYPE
 		ownerCell-: CellType;
 		bodyProcedure-: Procedure;
 		constructor-: Procedure;
-		firstImport-,lastImport-: Import; numberImports: LONGINT; (* imported modules *)
+		firstImport-,lastImport-: Import; numberImports: SIZE; (* imported modules *)
 
 		PROCEDURE & InitCellScope(outer: Scope);
 		BEGIN
@@ -4799,11 +4800,11 @@ TYPE
 
 	ModuleScope*= OBJECT(Scope)
 		VAR
-		firstImport-,lastImport-: Import; numberImports: LONGINT; (* imported modules *)
-		firstOperator-,lastOperator-: Operator; numberOperators: LONGINT; (* defined operators *)
-		firstBuiltin-,lastBuiltin-: Builtin; numberBuiltins: LONGINT; (* defined builtins, only for global and system module *)
+		firstImport-,lastImport-: Import; numberImports: SIZE; (* imported modules *)
+		firstOperator-,lastOperator-: Operator; numberOperators: SIZE; (* defined operators *)
+		firstBuiltin-,lastBuiltin-: Builtin; numberBuiltins: SIZE; (* defined builtins, only for global and system module *)
 
-		firstComment-,lastComment-: Comment; numberComments-: LONGINT; (* comments *)
+		firstComment-,lastComment-: Comment; numberComments-: SIZE; (* comments *)
 		bodyProcedure-: Procedure;
 
 		PROCEDURE & InitModuleScope;
@@ -4935,7 +4936,7 @@ TYPE
 			context-:Identifier; (* modules context *)
 			case-: LONGINT; (* module notation in lower or upper case, important for printout and operators *)
 			isCellNet-: BOOLEAN;
-			firstScope-,lastScope-: Scope; numberScopes-: LONGINT; (* list of all scopes for checker / backend traversal etc. *)
+			firstScope-,lastScope-: Scope; numberScopes-: SIZE; (* list of all scopes for checker / backend traversal etc. *)
 			closingComment-: Comment;
 			modifiers-: Modifier;
 

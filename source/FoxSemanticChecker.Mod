@@ -808,7 +808,7 @@ TYPE
 		**)
 		PROCEDURE ResolveRecordType(x: SyntaxTree.RecordType);
 		VAR resolved, baseType: SyntaxTree.Type; position: Position;
-			numberMethods: LONGINT; recordBase, recordType: SyntaxTree.RecordType; procedure: SyntaxTree.Procedure;
+			numberMethods: SIZE; recordBase, recordType: SyntaxTree.RecordType; procedure: SyntaxTree.Procedure;
 			symbol: SyntaxTree.Symbol; isRealtime: BOOLEAN;
 			hasPointers: BOOLEAN;
 			modifiers: SyntaxTree.Modifier;
@@ -971,7 +971,7 @@ TYPE
 			modifier: SyntaxTree.Modifier; position: Position; value: Basic.Integer; isEngine: BOOLEAN; property: SyntaxTree.Property;
 			qualifiedIdentifier: SyntaxTree.QualifiedIdentifier;
 			recordBase: SyntaxTree.RecordType;
-			numberMethods: LONGINT;
+			numberMethods: SIZE;
 			int: Basic.Integer;
 			real: LONGREAL;
 			bool: BOOLEAN;
@@ -8557,8 +8557,8 @@ TYPE
 				result := Infinity;
 			ELSIF procedureType.isDelegate & ~right.isDelegate THEN
 				INC(result);
-			END; 
-			
+			END;
+
 			(*! taken from paco, seems to not be 100% correct, check (in particular array part -> length of arrays??) *)
 			WHILE (formalParameter # NIL) & (result # Infinity) DO
 				distance := TypeDistance(system,rightParameter.type.resolved,formalParameter.type.resolved,formalParameter.kind = SyntaxTree.VarParameter);

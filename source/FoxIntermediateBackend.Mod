@@ -6687,10 +6687,10 @@ TYPE
 						IF baseRecord = NIL THEN
 							offset := ToMemoryUnits(system, meta.GetTypeRecordBaseOffset(0));
 						ELSE
-							offset := ToMemoryUnits(system, meta.GetTypeRecordBaseOffset(baseRecord.recordScope.numberMethods)*system.addressSize);
+							offset := ToMemoryUnits(system, meta.GetTypeRecordBaseOffset(TODO(baseRecord.recordScope.numberMethods))*system.addressSize);
 						END;
 					ELSE
-						offset := ToMemoryUnits(system,meta.GetTypeRecordBaseOffset(x(SyntaxTree.RecordType).recordScope.numberMethods)*system.addressSize);
+						offset := ToMemoryUnits(system,meta.GetTypeRecordBaseOffset(TODO(x(SyntaxTree.RecordType).recordScope.numberMethods))*system.addressSize);
 					END;
 				END;
 				RETURN td
@@ -13326,7 +13326,7 @@ TYPE
 										ELSE
 											tir := implementationVisitor.NewSection(module.importedSections, Sections.ConstSection, segmentedName,td,declarationVisitor.dump);
 										END;
-										offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(type(SyntaxTree.RecordType).recordScope.numberMethods)*module.system.addressSize);
+										offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(TODO(type(SyntaxTree.RecordType).recordScope.numberMethods))*module.system.addressSize);
 										Symbol(section, tir,  0, offset);
 									ELSE
 										Address(section, 0);
@@ -13621,7 +13621,7 @@ TYPE
 
 					WITH declared:
 					SyntaxTree.RecordType DO
-						offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(declared.recordScope.numberMethods)*module.system.addressSize);
+						offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(TODO(declared.recordScope.numberMethods))*module.system.addressSize);
 						Symbol(section, s,  0, offset);
 						Global.GetSymbolSegmentedName(typeDeclaration,name);
 						Basic.AppendToSegmentedName(name,".@Info");
@@ -13761,7 +13761,7 @@ TYPE
 						IF implementationVisitor.backend.cooperative THEN
 							offset := 0;
 						ELSE
-							offset := 1 + type(SyntaxTree.RecordType).recordScope.numberMethods+16+1;
+							offset := 1 + TODO(type(SyntaxTree.RecordType).recordScope.numberMethods)+16+1;
 						END;
 						Symbol(source,section, 0, ToMemoryUnits(module.system,offset*module.system.addressSize));
 					END;
@@ -14359,7 +14359,7 @@ TYPE
 							ELSE
 								tir := implementationVisitor.NewSection(module.importedSections, Sections.ConstSection, name,baseTD,declarationVisitor.dump);
 							END;
-							offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(record.recordScope.numberMethods)*module.system.addressSize);
+							offset := ToMemoryUnits(module.system,GetTypeRecordBaseOffset(TODO(record.recordScope.numberMethods))*module.system.addressSize);
 							Symbol(source, tir,  0, offset);
 							IF reverse THEN Td(record.GetBaseRecord()) END;
 						END;
@@ -14383,7 +14383,7 @@ TYPE
 				END TdTable;
 
 				PROCEDURE MethodTable(reverse: BOOLEAN);
-				VAR i,methods: LONGINT;
+				VAR i,methods: SIZE;
 				BEGIN
 					Info(source, "method table");
 					IF recordType # NIL THEN
@@ -14405,7 +14405,7 @@ TYPE
 				END MethodTable;
 
 				PROCEDURE CooperativeMethodTable(pointer: BOOLEAN);
-				VAR baseRecord: SyntaxTree.RecordType; name, stackFrame: Basic.SegmentedName; i,start,methods: LONGINT;
+				VAR baseRecord: SyntaxTree.RecordType; name, stackFrame: Basic.SegmentedName; i,start,methods: SIZE;
 				BEGIN
 					Info(source, "method table");
 					baseRecord := recordType;

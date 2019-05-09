@@ -116,7 +116,7 @@ TYPE
 		END DeclareObjects;
 
 		PROCEDURE DeclareDescriptor (record: SyntaxTree.RecordType);
-		VAR name: Identifier; method: LONGINT; procedure: SyntaxTree.Procedure; procedureType: SyntaxTree.ProcedureType;
+		VAR name: Identifier; method: SIZE; procedure: SyntaxTree.Procedure; procedureType: SyntaxTree.ProcedureType;
 		BEGIN
 			GetSymbolName (record.typeDeclaration, name, backend.style);
 			writer.Ln; writer.String ("typedef struct "); writer.String (name); writer.String (TypeTag); writer.String (StructTag);
@@ -319,7 +319,7 @@ TYPE
 		END DefineObjects;
 
 		PROCEDURE DefineDescriptor (record: SyntaxTree.RecordType);
-		VAR name: Identifier; method: LONGINT; procedure: SyntaxTree.Procedure;
+		VAR name: Identifier; method: SIZE; procedure: SyntaxTree.Procedure;
 		BEGIN
 			GetSymbolName (record.typeDeclaration, name, backend.style);
 			writer.Ln; writer.String (name); writer.String (TypeTag); writer.Char (Space); writer.String (name);
@@ -1588,7 +1588,7 @@ TYPE
 		RETURN (procedure.isInline) & (type.firstParameter = NIL) & (type.returnType = NIL) & (body # NIL) & (body.code # NIL);
 	END IsInlineAssemblyCode;
 
-	PROCEDURE GetRecordMethod (record: SyntaxTree.RecordType; method: LONGINT): SyntaxTree.Procedure;
+	PROCEDURE GetRecordMethod (record: SyntaxTree.RecordType; method: SIZE): SyntaxTree.Procedure;
 	VAR base: SyntaxTree.RecordType; scope: SyntaxTree.RecordScope; procedure: SyntaxTree.Procedure;
 	BEGIN
 		scope := record.recordScope;
