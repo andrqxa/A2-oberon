@@ -941,16 +941,16 @@ TYPE
 
 			IF info THEN
 				BeginComment;
-				w.String("access= {");
-				Access(x.access);
-				w.String("}");
 				IF x.offsetInBits # MIN(LONGINT) THEN
-					w.String("@"); w.Hex(x.offsetInBits,1);
+					w.String(" offset="); w.Int(x.offsetInBits DIV 8,0);
 				END;
 				IF x.type # NIL THEN
-				IF x.type.resolved.alignmentInBits >=0 THEN
-					w.String("@@"); w.Hex(x.type.resolved.alignmentInBits,1);
-				END;
+					IF x.type.resolved.sizeInBits # MIN(LONGINT) THEN
+						w.String(" size="); w.Int(x.type.resolved.sizeInBits DIV 8,0);
+					END;
+					IF x.type.resolved.alignmentInBits > 0 THEN
+						w.String(" alignment="); w.Int(x.type.resolved.alignmentInBits DIV 8,0);
+					END;
 				END;
 				EndComment;
 			END;
