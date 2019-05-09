@@ -290,22 +290,25 @@ BEGIN
 	WriteRelocations( arrangement, writer )
 END WriteUnixBinaryFile;
 
-PROCEDURE WriteTRMFile (arrangement: Arrangement; writer: Files.Writer; bitsPerLine, lines:LONGINT);
-VAR i,j,size,end,nonZeroInLeadingNibble: LONGINT;
-	PROCEDURE GetBits(pos: LONGINT): WORD;
+PROCEDURE WriteTRMFile (arrangement: Arrangement; writer: Files.Writer; bitsPerLine, lines: SIZE);
+VAR i, j, size, end, nonZeroInLeadingNibble: SIZE;
+
+	PROCEDURE GetBits(pos: SIZE): WORD;
 	BEGIN
 		IF pos >= size THEN RETURN 0
 		ELSIF pos+4 > size THEN RETURN arrangement.bits.GetBits(pos,size-pos)
 		ELSE RETURN arrangement.bits.GetBits(pos,4)
 		END;
 	END GetBits;
-	PROCEDURE GetFirstNibble(pos: LONGINT): WORD;
+
+	PROCEDURE GetFirstNibble(pos: SIZE): WORD;
 	BEGIN
 		RETURN arrangement.bits.GetBits(pos,nonZeroInLeadingNibble);
 	END GetFirstNibble;
+
 BEGIN
-(*allow line size not divisible by 4 by padding the line to a multiple of 4 bits with leading zeros*)
-	size := TODO(arrangement.bits.GetSize());
+	(*allow line size not divisible by 4 by padding the line to a multiple of 4 bits with leading zeros*)
+	size := arrangement.bits.GetSize();
 
 	end := (size-1) DIV bitsPerLine + 1;
 
@@ -342,7 +345,7 @@ END WriteTRMFile;
 
 PROCEDURE WriteTRMCodeFile* (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer);
 BEGIN
-	WriteTRMFile (arrangement, writer, TODO(arrangement.maxUnitSize), 1024);
+	WriteTRMFile (arrangement, writer, arrangement.maxUnitSize, 1024);
 END WriteTRMCodeFile;
 
 PROCEDURE WriteTRMDataFile* (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer);
