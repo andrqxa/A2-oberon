@@ -127,7 +127,7 @@ TYPE
 		END Get;
 
 				(*POST HTTP/1.1 message. needs either a Content-Length of the body or a chunked transfer encoding*)
-		PROCEDURE Post*(CONST url : ARRAY OF CHAR; CONST headervars: ARRAY OF CHAR; MIME: ARRAY OF CHAR; body: Streams.Reader; length: LONGINT;  VAR out : Streams.Reader; VAR res : WORD);
+		PROCEDURE Post*(CONST url : ARRAY OF CHAR; CONST headervars: ARRAY OF CHAR; MIME: ARRAY OF CHAR; body: Streams.Reader; length: Streams.Position;  VAR out : Streams.Reader; VAR res : WORD);
 		VAR w : Streams.Writer; r : Streams.Reader;
 			x : WebHTTP.AdditionalField;
 			host : ARRAY 128 OF CHAR;

@@ -41,7 +41,7 @@ TYPE
 	InfoItem* = OBJECT
 	VAR
 		name*: Strings.String;
-		pos*: LONGINT;
+		pos*: Streams.Position;
 	END InfoItem;
 
 	Node* = OBJECT
@@ -135,7 +135,7 @@ TYPE
 	VAR
 		modifiers* : SET;
 		declSeq*: DeclSeq;
-		bodyPos- : LONGINT;
+		bodyPos- : Streams.Position;
 		formalPars*: FormalPars;
 
 		PROCEDURE FindProcDecl*(CONST name : ARRAY OF CHAR) : ProcDecl;
@@ -157,7 +157,7 @@ TYPE
 		superPtr* : Object;
 		modifiers* : SET;
 		declSeq*: DeclSeq;
-		bodyPos- : LONGINT;
+		bodyPos- : Streams.Position;
 
 		PROCEDURE FindProcDecl*(CONST name : ARRAY OF CHAR) : ProcDecl;
 		VAR procDecl : ProcDecl;
@@ -240,7 +240,7 @@ TYPE
 	VAR
 		head*: ProcHead;
 		declSeq*: DeclSeq;
-		bodyPos- : LONGINT;
+		bodyPos- : Streams.Position;
 	END ProcDecl;
 
 	ProcHead* = OBJECT (NodeList)
@@ -340,7 +340,7 @@ TYPE
 		modifiers* : SET;
 		definitions*: Definition;
 		declSeq*: DeclSeq;
-		bodyPos- : LONGINT;
+		bodyPos- : Streams.Position;
 		hasError-: BOOLEAN;
 		resolved* : BOOLEAN;
 
@@ -972,7 +972,7 @@ TYPE
 
 		PROCEDURE ObjectP(object: Object);
 		VAR declSeq: DeclSeq;
-			pos: LONGINT;
+			pos: Streams.Position;
 		(*?	qualident: Qualident; *)
 		BEGIN
 			IF (token.symbol = FoxScanner.Semicolon) OR (token.symbol = FoxScanner.RightParenthesis) THEN RETURN END;
@@ -1016,7 +1016,7 @@ TYPE
 
 		PROCEDURE CellP(cell: Cell);
 		VAR declSeq: DeclSeq;
-			pos: LONGINT;
+			pos: Streams.Position;
 		(*?	qualident: Qualident; *)
 		BEGIN
 			SysFlag;
@@ -1268,7 +1268,7 @@ TYPE
 		PROCEDURE QualidentP(qualident: Qualident);
 		VAR
 			name : ARRAY 64 OF CHAR;
-			pos: LONGINT;
+			pos: Streams.Position;
 		BEGIN
 			IF token.symbol = FoxScanner.Identifier THEN
 				COPY(token.identifierString, name);
@@ -1339,7 +1339,7 @@ TYPE
 			NextToken;
 		END Check;
 
-		PROCEDURE Error(pos : LONGINT);
+		PROCEDURE Error(pos : Streams.Position);
 		BEGIN
 			KernelLog.String("ModuleParser: Error at pos "); KernelLog.Int(pos, 0); KernelLog.Ln;
 		END Error;

@@ -14,9 +14,9 @@ TYPE
 	ExternalInfo* = OBJECT
 	VAR
 		filename- : ARRAY 32 OF CHAR;
-		position- : LONGINT;
+		position- : Streams.Position;
 
-		PROCEDURE &Init*(CONST filename : ARRAY OF CHAR; position : LONGINT);
+		PROCEDURE &Init*(CONST filename : ARRAY OF CHAR; position : Streams.Position);
 		BEGIN
 			COPY(filename, SELF.filename);
 			SELF.position := position;

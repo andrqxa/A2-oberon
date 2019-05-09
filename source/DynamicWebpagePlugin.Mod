@@ -636,7 +636,7 @@ TYPE
 		END
 	END ExtractModuleObjectName;
 
-	PROCEDURE ReportGeneratorError(f: Files.File; w: Streams.Writer; pos, line, row: LONGINT; CONST msg: ARRAY OF CHAR);
+	PROCEDURE ReportGeneratorError(f: Files.File; w: Streams.Writer; pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 		VAR fname: Files.FileName;
 	BEGIN
 		IF (f # NIL) THEN

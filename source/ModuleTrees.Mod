@@ -54,16 +54,16 @@ TYPE
 		node : ModuleParser.Node;
 		modulename : ARRAY 32 OF CHAR;
 		external : BOOLEAN;
-		position : LONGINT;
+		position : Streams.Position;
 	END TextInfo;
 
 	ExternalInfo* = OBJECT
 	VAR
 		modulename- : ARRAY 32 OF CHAR;
-		position- : LONGINT;
+		position- : Streams.Position;
 		node- : ModuleParser.Node;
 
-		PROCEDURE &Init(CONST modulename : ARRAY OF CHAR; position : LONGINT; node : ModuleParser.Node);
+		PROCEDURE &Init(CONST modulename : ARRAY OF CHAR; position : Streams.Position; node : ModuleParser.Node);
 		BEGIN
 			COPY(modulename, SELF.modulename);
 			SELF.position := position;
@@ -684,7 +684,7 @@ TYPE
 			RETURN type;
 		END GetProcedureType;
 
-		PROCEDURE AddBody (root: WMTrees.TreeNode; pnode : ModuleParser.Node; modifiers: SET; pos: LONGINT);
+		PROCEDURE AddBody (root: WMTrees.TreeNode; pnode : ModuleParser.Node; modifiers: SET; pos: Streams.Position);
 		VAR node: WMTrees.TreeNode; info: TextInfo;
 		BEGIN
 			node := NewNode(root, Strings.NewString("BODY"));

@@ -30,7 +30,7 @@ MODULE LPR; (* AUTHOR "ejz"; PURPOSE "RFC 1179" *)
 
 
 
-	PROCEDURE Print*(CONST host, queue, docName, email: ARRAY OF CHAR; banner, mail: BOOLEAN; data : Streams.Reader;  size: LONGINT;  VAR res : WORD);
+	PROCEDURE Print*(CONST host, queue, docName, email: ARRAY OF CHAR; banner, mail: BOOLEAN; data : Streams.Reader;  size: Streams.Position;  VAR res : WORD);
 		VAR
 			dataFile, controlFile: ARRAY 64 OF CHAR;
 			nrStr: ARRAY 8 OF CHAR;

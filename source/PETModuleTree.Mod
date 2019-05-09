@@ -50,7 +50,7 @@ TYPE
 		modulename : Name;
 		sortHint : LONGINT;
 		flags : SET;
-		position : LONGINT;
+		position : Streams.Position;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -395,7 +395,7 @@ TYPE
 			RETURN type;
 		END GetProcedureType;
 
-		PROCEDURE AddBody (root: WMTrees.TreeNode; pnode : ModuleParser.Node; modifiers: SET; pos: LONGINT);
+		PROCEDURE AddBody (root: WMTrees.TreeNode; pnode : ModuleParser.Node; modifiers: SET; pos: Streams.Position);
 		VAR node: TreeNode;
 		BEGIN
 			node := NewNode(root, StrBODY);

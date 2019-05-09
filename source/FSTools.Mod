@@ -455,7 +455,7 @@ END Enumerate;
 PROCEDURE CreateFile*(context : Commands.Context); (** [Options] filename [content] ~ *)
 VAR
 	options : Options.Options; cr, removeWhitespace : BOOLEAN;
-	file : Files.File; filename : Files.FileName; writer : Files.Writer; ch : CHAR; pos: LONGINT;
+	file : Files.File; filename : Files.FileName; writer : Files.Writer; ch : CHAR; pos: Files.Position;
 BEGIN
 	NEW(options);
 	options.Add("c", "cr", Options.Flag);
