@@ -59,7 +59,6 @@ CONST
 TYPE
 	Position* = Streams.Position;
 	Size* = Streams.Position;
-	TSize* = LONGINT;
 
 TYPE
 (** All record fields are read-only for users, and read-write for extenders. *)
@@ -215,7 +214,7 @@ TYPE
 			DEC( used )
 		END FreeBlock;
 
-		PROCEDURE FreeBlocks* ( CONST a: ARRAY OF Address; ofs, len: TSize );
+		PROCEDURE FreeBlocks* ( CONST a: ARRAY OF Address; ofs, len: SIZE );
 		VAR i: SIZE;  adr: Address;
 		BEGIN {EXCLUSIVE}
 			IF ReadOnly IN flags THEN HALT( ReadOnlyError ) END;
@@ -238,7 +237,7 @@ TYPE
 			INC( used )
 		END MarkBlock;
 		
-		PROCEDURE MarkBlocks* ( CONST a: ARRAY OF Address; ofs, len: TSize );
+		PROCEDURE MarkBlocks* ( CONST a: ARRAY OF Address; ofs, len: SIZE );
 		VAR i: SIZE;  adr: Address;
 		BEGIN {EXCLUSIVE}
 			IF ReadOnly IN flags THEN HALT( ReadOnlyError ) END;

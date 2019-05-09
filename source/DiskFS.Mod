@@ -771,7 +771,7 @@ TYPE
 
 		(* purge all sectors of f except the sectors in 'except', except may be NIL *)
 		PROCEDURE PurgeOpenedFile(f: File; except: DiskAdrTable);
-		VAR i, p, m, n: LONGINT; super, sub: IndexSector; free: ARRAY 512 OF DiskAdr; freePosition: Files.TSize;
+		VAR i, p, m, n: LONGINT; super, sub: IndexSector; free: ARRAY 512 OF DiskAdr; freePosition: SIZE;
 
 			PROCEDURE StartFreeing;
 			BEGIN
