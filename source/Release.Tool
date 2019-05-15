@@ -1146,12 +1146,8 @@ PACKAGE GuiApplicationsMini ARCHIVE "GuiApplicationsMini.zip" SOURCE "GuiApplica
 
 	MultiLogger.Mod
 
-	MemoryReader.Mod
-
-	BIOS, WIN {
-		Decoder.Mod I386Decoder.Mod	# GUI decoder
-		ARMDecoder.Mod AMD64Decoder.Mod DecoderRes.zip
-	}
+	MemoryReader.Mod Decoder.Mod I386Decoder.Mod	# GUI decoder
+	ARMDecoder.Mod AMD64Decoder.Mod DecoderRes.zip
 
 	Tutorial.Text Quickstart.Text cn.PrgInOberon.txt	# documentation
 	WMTextTool.Mod
@@ -2060,12 +2056,14 @@ END
 
 PACKAGE IBMPlexFonts ARCHIVE "IBMPlexFonts.zip" SOURCE "" DESCRIPTION "IBM Plex True-type fonts"
 	IBMPlexLicense.txt
-	IBMPlexSerif-Regular.ttf IBMPlexSerif-Italic.ttf
-	IBMPlexSerif-BoldItalic.ttf	IBMPlexSerif-Bold.ttf
-	IBMPlexSans-Regular.ttf	IBMPlexSans-Italic.ttf
-	IBMPlexSans-Bold.ttf IBMPlexSans-BoldItalic.ttf
-	IBMPlexMono-Regular.ttf IBMPlexMono-Bold.ttf
-	IBMPlexMono-BoldItalic.ttf IBMPlexMono-Italic.ttf
+	IBMPlexSerif.ttf IBMPlexSerif_i.ttf
+	IBMPlexSerif_bd.ttf	IBMPlexSerif_bi.ttf
+	IBMPlexSans.ttf	IBMPlexSans_i.ttf
+	IBMPlexSans_bd.ttf IBMPlexSans_bi.ttf
+	IBMPlexMono.ttf IBMPlexMono_i.ttf
+	IBMPlexMono_bd.ttf IBMPlexMono_bi.ttf
+	IBMPlexSansCondensed.ttf IBMPlexSansCondensed_i.ttf
+	IBMPlexSansCondensed_bd.ttf IBMPlexSansCondensed_bi.ttf
 END
 
 PACKAGE CjkFonts ARCHIVE "CjkFonts.zip" SOURCE "" DESCRIPTION "Chinese, Japanese and Korean Fonts"

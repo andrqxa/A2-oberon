@@ -42,7 +42,7 @@ MODULE PET; (** AUTHOR "TF, PL"; PURPOSE "Programmer's Editing Tool"; *)
  *)
 
 IMPORT
-	KernelLog, KernelLogger, Modules, Commands, Options, Streams, Inputs, Files, WMRestorable, XML, XMLScanner, XMLParser, XMLObjects,
+	KernelLog, Modules, Commands, Options, Streams, Inputs, Files, WMRestorable, XML, XMLScanner, XMLParser, XMLObjects,
 	WMStandardComponents, WMGraphics, CompilerInterface, WhitespaceRemover,
 	WMComponents, WMRectangles, WMMessages, WMDialogs, WMDiagnostics,
 	WMTextView, WMEditors, Strings, TextUtilities, Texts,
@@ -68,6 +68,7 @@ CONST
 	DefaultShowLineNumbers = FALSE;
 	DefaultIndicateTabs = FALSE;
 	DefaultCurrentLineColor = 0;
+	DefaultBackgroundColor = WMGraphics.White;
 
 	(* Compiler *)
 	DefaultCompilerName = "Fox";
@@ -139,6 +140,7 @@ TYPE
 		showLineNumbers : BOOLEAN;
 		indicateTabs : BOOLEAN;
 		currentLineColor : LONGINT;
+		backgroundColor : LONGINT;
 
 		(* Compiler *)
 		defaultCompilerOptions : CompilerOptions;
@@ -164,6 +166,7 @@ TYPE
 			showLineNumbers := DefaultShowLineNumbers;
 			indicateTabs := DefaultIndicateTabs;
 			currentLineColor := DefaultCurrentLineColor;
+			backgroundColor := DefaultBackgroundColor;
 			(* Compiler *)
 			COPY(DefaultCompilerOptions, defaultCompilerOptions);
 			nofCompilers := 0;
@@ -309,11 +312,13 @@ TYPE
 			Configuration.GetBoolean("Applications.PET.General.EnableWhitespaceWarnings", enableWhitespaceWarnings, res);
 			Configuration.GetBoolean("Applications.PET.General.ShowLineNumbers", showLineNumbers, res);
 			Configuration.GetBoolean("Applications.PET.General.IndicateTabs", indicateTabs, res);
-			Configuration.Get("Applications.PET.General.CurrentLineColor", string, res);
+			Configuration.GetColor("Applications.PET.General.CurrentLineColor", temp, res);
 			IF (res = Configuration.Ok) THEN
-				Strings.TrimWS(string);
-				Strings.HexStrToInt(string, temp, res);
-				IF (res = Strings.Ok) THEN currentLineColor := temp; END;
+				currentLineColor := temp
+			END;
+			Configuration.GetColor("Applications.PET.General.BackgroundColor", temp, res);
+			IF (res = Configuration.Ok) THEN
+				backgroundColor := temp
 			END;
 
 			(* Compiler *)
@@ -633,6 +638,7 @@ TYPE
 			editor.tv.showLineNumbers.Set(settings.showLineNumbers);
 			editor.tv.indicateTabs.Set(settings.indicateTabs);
 			editor.tv.clBgCurrentLine.Set(settings.currentLineColor);
+			editor.tv.defaultTextBgColor.Set(settings.backgroundColor);
 
 			NEW(positions, editor.tv);
 			searchPanel.SetText(editor.text);
@@ -655,6 +661,7 @@ TYPE
 			splitEditor.tv.showLineNumbers.Set(settings.showLineNumbers);
 			splitEditor.tv.indicateTabs.Set(settings.indicateTabs);
 			splitEditor.tv.clBgCurrentLine.Set(settings.currentLineColor);
+			editor.tv.defaultTextBgColor.Set(settings.backgroundColor);
 
 			textViews[0] := editor.tv;
 			textViews[1] := splitEditor.tv;
@@ -2199,7 +2206,7 @@ TYPE
 			found : BOOLEAN;
 		BEGIN
 			found := FALSE;
-			NEW(pet, SELF); pet.alignment.Set(WMComponents.AlignClient); pet.fillColor.Set(0FFFFFFFFH); pet.takesFocus.Set(TRUE);
+			NEW(pet, SELF); pet.alignment.Set(WMComponents.AlignClient); pet.fillColor.Set(settings.backgroundColor); pet.takesFocus.Set(TRUE);
 			IF pet.editor.undoMgr # NIL THEN
 				pet.editor.undoMgr.nrUpdatesListener := NrUpdatesChanged;
 				NrUpdatesChanged(0, 0);

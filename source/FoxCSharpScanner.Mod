@@ -166,7 +166,7 @@ TYPE
         identifierString*: IdentifierString;
         string*: StringType;
         stringLength*: SIZE;
-        numberType*: LONGINT;
+        numberType*: FoxScanner.SubType;
         integer*: HUGEINT;
         character*: CHAR;
         real*: LONGREAL;

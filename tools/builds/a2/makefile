@@ -11,16 +11,16 @@ platforms := Bios32 Bios64 Zynq Win32 Win64 Linux32 Linux64 Darwin32 Darwin64 So
 
 target := Linux64
 pltfrm := Unix64
-object := .Gof
-symbol := .Sym
+object := .GofUu
+symbol := .SymUu
 
 # module dependencies
 
-modules: source/Release.Tool
+modules: /home/negelef/aos/source/Release.Tool
 	@AOSPATH=source ./original Release.Build --list $(target) | tr -d '\r' | grep "^[^ ]\+\.Mod\s" | tr -d ' ' > $@
 
-dependencies: modules source/*.Mod
-	@./original DependencyWalker.Walk --define=UNIX,AMD64 --fileExtension=$(object) $(addprefix source/, $(shell sort -u modules)) DependencyWalker.Mod | tr -d '\r' | grep "^.\+\$(object):" > $@
+dependencies: modules /home/negelef/aos/source/*.Mod
+	@./original DependencyWalker.Walk --define=UNIX,AMD64 --fileExtension=$(object) $(addprefix /home/negelef/aos/source/, $(shell sort -u modules)) DependencyWalker.Mod | tr -d '\r' | grep "^.\+\$(object):" > $@
 
 -include dependencies
 FoxArrayBase$(object): ComplexNumbers$(object)

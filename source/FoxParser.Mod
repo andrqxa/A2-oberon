@@ -69,7 +69,7 @@ CONST
 
 	CellType = 'cell' [Flags] [PortList] [';'] DeclarationSequence [Body] 'end' [Identifier].
 
-	ObjectType = 'object' | 'object' [Flags] ['(' (QualifiedIdentifier | ArrayType) ')'] DeclarationSequence [Body] 'end' [Identifier] .
+	ObjectType = 'object' | 'object' [Flags] ['(' (QualifiedIdentifier) ')'] DeclarationSequence [Body] 'end' [Identifier] .
 
 	ProcedureType = 'procedure' [Flags] [FormalParameters].
 
@@ -776,7 +776,7 @@ TYPE
 			IF Trace THEN S( "Designator" ) END;
 			position := token.position;
 			IF Optional(Scanner.Self) THEN
-				designator := SyntaxTree.NewSelfDesignator(position);
+				designator := SyntaxTree.NewSelfDesignator(position, NIL);
 			ELSIF Optional(Scanner.Result) THEN
 				designator := SyntaxTree.NewResultDesignator(position);
 			(* ADDRESS AND SIZE can be type identifiers used for type conversion *)
@@ -798,7 +798,7 @@ TYPE
 							Check( Scanner.RightParenthesis )
 						END;
 					END;
-					designator := SyntaxTree.NewBuiltinCallDesignator(position,Global.New, NIL, expressionList);
+					designator := SyntaxTree.NewBuiltinCallDesignator(position, NIL, Global.New, NIL, expressionList);
 					designator(SyntaxTree.BuiltinCallDesignator).SetReturnType(qualifiedType);
 					(* special case: NEW Type() *)
 				END;
@@ -858,7 +858,7 @@ TYPE
 		BEGIN
 			IF Trace THEN S( "Set" ) END;
 
-			set := SyntaxTree.NewSet(token.position);
+			set := SyntaxTree.NewSet(token.position,SyntaxTree.NewExpressionList());
 			Check(Scanner.LeftBrace);
 			IF ~Optional(Scanner.RightBrace) THEN
 				REPEAT
@@ -876,7 +876,7 @@ TYPE
 		PROCEDURE MathArray(): SyntaxTree.Expression;
 		VAR array: SyntaxTree.MathArrayExpression; element: SyntaxTree.Expression;
 		BEGIN
-			array := SyntaxTree.NewMathArrayExpression(token.position);
+			array := SyntaxTree.NewMathArrayExpression(token.position, SyntaxTree.NewExpressionList());
 			IF ~Optional(Scanner.RightBracket) THEN
 				REPEAT
 					element := Expression();
@@ -902,8 +902,7 @@ TYPE
 					IF (token.numberType = Scanner.Integer) OR (token.numberType = Scanner.Hugeint) THEN
 						factor := SyntaxTree.NewIntegerValue( position, token.integer);
 					ELSIF (token.numberType = Scanner.Real) OR (token.numberType = Scanner.Longreal) THEN
-						factor := SyntaxTree.NewRealValue( position, token.real);
-						factor(SyntaxTree.RealValue).SetSubtype(token.numberType);
+						factor := SyntaxTree.NewRealValue( position, token.real, token.numberType);
 					ELSE HALT( 100 )
 					END;
 					NextToken;
@@ -926,8 +925,7 @@ TYPE
 					factor := SyntaxTree.NewNilValue( position );
 					NextToken;
 			| Scanner.Imag:
-					factor := SyntaxTree.NewComplexValue(position, 0, 1);
-					factor(SyntaxTree.ComplexValue).SetSubtype(Scanner.Real);
+					factor := SyntaxTree.NewComplexValue(position, 0, 1, Scanner.Real);
 					NextToken;
 			| Scanner.True:
 					factor := SyntaxTree.NewBooleanValue( position, TRUE );
@@ -1396,7 +1394,7 @@ TYPE
 		(** Code = {  any \ 'end' \ 'with' } ['with' {('in'|'out') StatementSequence}] . **)
 		PROCEDURE Code(outer: SyntaxTree.Statement): SyntaxTree.Code;
 		VAR startPos: Position; endPos: Streams.Position; i, len: SIZE; codeString: Scanner.StringType; code: SyntaxTree.Code;
-			end: Scanner.Symbol; in, out: BOOLEAN; statements, rules: SyntaxTree.StatementSequence;
+			end: Scanner.Symbol; (*in, out: BOOLEAN; statements, rules: SyntaxTree.StatementSequence;*)
 		BEGIN
 			startPos := token.position;
 			end := scanner.SkipToEndOfCode(startPos.start, endPos, token);
@@ -1407,10 +1405,11 @@ TYPE
 					codeString := Strings.ConcatToNew (codeString^, token.string^);
 				END;
 			END;
-			IF (end = Scanner.End) OR (end = Scanner.With) THEN
+			IF (end = Scanner.End) (*OR (end = Scanner.With)*) THEN
 				code := SyntaxTree.NewCode(startPos,outer);
 				i := 0; len := LEN(codeString^);
 				code.SetSourceCode(codeString,len);
+				(*
 				IF (end = Scanner.With) & Mandatory(Scanner.With) THEN
 					in := Optional(Scanner.In);
 					out := Optional(Scanner.Out);
@@ -1424,6 +1423,7 @@ TYPE
 						out := Optional(Scanner.Out);
 					END;
 				END;
+				*)
 			END;
 			RETURN code;
 		END Code;

@@ -861,8 +861,7 @@ KernelLog.Ln();
                 expression := SyntaxTree.NewIntegerValue(position, token.integer);
                 NextToken;
             ELSIF Peek(Scanner.RealLiteral) THEN
-                realValue := SyntaxTree.NewRealValue(position, token.real);
-                realValue.SetSubtype(MapNumberType(token.numberType));
+                realValue := SyntaxTree.NewRealValue(position, symbol.real, symbol.numberType);
                 expression := realValue;
                 NextToken;
             ELSIF Peek(Scanner.CharacterLiteral) THEN
@@ -886,7 +885,7 @@ KernelLog.Ln();
                 expression := Expression();
                 Check(Scanner.RightParenthesis);
             ELSIF Optional(Scanner.This) THEN
-                expression := SyntaxTree.NewSelfDesignator(position);
+                expression := SyntaxTree.NewSelfDesignator(position,NIL);
             ELSIF Optional(Scanner.Base) THEN
                 Check(Scanner.Period);
                 position := token.position;
