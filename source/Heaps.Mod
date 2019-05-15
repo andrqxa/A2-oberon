@@ -338,7 +338,7 @@ VAR
 	cardSet: ARRAY 0x100000000 DIV SetSize DIV CardSize OF SET; (* 1 k blocks *)
 
 PROCEDURE ShowCards*;
-VAR i: LONGINT;
+VAR i: SIZE;
 BEGIN
 	FOR i := 0 TO LEN(cardSet)-1 DO
 		IF cardSet[i] # {} THEN
@@ -348,7 +348,7 @@ BEGIN
 END ShowCards;
 
 PROCEDURE ClearCardSet;
-VAR i: LONGINT;
+VAR i: SIZE;
 BEGIN
 	HALT(100);
 	FOR i := 0 TO LEN(cardSet)-1 DO
@@ -456,7 +456,7 @@ END Inspect;
 PROCEDURE Mark*(p {UNTRACED}: ANY);
 VAR orgBlock: ADDRESS; staticTypeBlock {UNTRACED}: StaticTypeBlock;
 	orgHeapBlock {UNTRACED}: HeapBlock;
-	currentArrayElemAdr, lastArrayElemAdr: ADDRESS; i: LONGINT;
+	currentArrayElemAdr, lastArrayElemAdr: ADDRESS; i: SIZE;
 	protected {UNTRACED}: ProtRecBlock;
 	b {UNTRACED}: POINTER {UNSAFE} TO RECORD p: ANY END;
 	meta {UNTRACED }: POINTER {UNSAFE} TO RECORD staticTypeBlock {FICTIVE=TypeDescOffset}: StaticTypeBlock; last, current, first: ADDRESS END;
@@ -513,7 +513,7 @@ END MarkRealtimeObjects;
 
 (** WriteType - Write a type name (for tracing only). *)
 PROCEDURE WriteType*(t: ADDRESS);	(* t is static type descriptor *)
-VAR m: ADDRESS; i: LONGINT; ch: CHAR;
+VAR m: ADDRESS; i: SIZE; ch: CHAR;
 	typeDesc: StaticTypeBlockU;
 BEGIN
 	typeDesc := t;
@@ -537,7 +537,7 @@ END WriteType;
 
 (** free list handling **)
 PROCEDURE ClearFreeLists;
-VAR i: LONGINT;
+VAR i: SIZE;
 BEGIN
 	FOR i := 0 TO MaxFreeLists DO
 		freeLists[i].first := NIL;
@@ -593,7 +593,7 @@ BEGIN
 END InsertSorted;
 
 PROCEDURE AppendFreeBlock(block: FreeBlock);
-VAR i: LONGINT;
+VAR i: SIZE;
 BEGIN
 	i := MaxFreeLists;
 	WHILE (i > 0) & (freeLists[i].minSize > block.size)  DO  DEC( i )  END;
@@ -613,7 +613,7 @@ BEGIN
 END AppendFreeBlock;
 
 PROCEDURE FindFreeBlock( size: SIZE ): FreeBlock;
-VAR prev, block: FreeBlock;  i: LONGINT;
+VAR prev, block: FreeBlock;  i: SIZE;
 BEGIN
 	i := MaxFreeLists;
 	WHILE (i > 0) & (freeLists[i].minSize > size)  DO  DEC( i )  END;
@@ -783,7 +783,7 @@ END LazySweep;
 (* -- useful for debugging --
 PROCEDURE CheckHeap;
 VAR memBlock {UNTRACED}: Machine.MemoryBlock; p, refBlock, currentArrayElemAdr, lastArrayElemAdr: ADDRESS;
-	heapBlock {UNTRACED}: HeapBlock; staticTypeBlock {UNTRACED}: StaticTypeBlock; i: LONGINT;
+	heapBlock {UNTRACED}: HeapBlock; staticTypeBlock {UNTRACED}: StaticTypeBlock; i: SIZE;
 
 	PROCEDURE CheckBlock(block: ADDRESS): BOOLEAN;
 	VAR heapBlockAdr: ADDRESS;
@@ -866,7 +866,7 @@ END CheckHeap;
 (* CheckCandidates - Check which candidates could be pointers, and mark them. (exported for debugging only) *)
 PROCEDURE CheckCandidates*;
 CONST MinDataOffset = BlockHeaderSize + SIZEOF(HeapBlockDesc) + BlockHeaderSize; (* minimal offset of data address with respect to block start address *)
-VAR i, j, h: LONGINT; p, blockStart: ADDRESS; memBlock {UNTRACED}: Machine.MemoryBlock;
+VAR i, j, h: SIZE; p, blockStart: ADDRESS; memBlock {UNTRACED}: Machine.MemoryBlock;
 	heapBlock {UNTRACED}: HeapBlock;
 BEGIN
 	(* {numCandidates > 0} *)
@@ -1083,7 +1083,7 @@ VAR
 	obj: RootObject;
 	time1, time2: HUGEINT;
 	f: FreeBlock;
-	i: LONGINT;
+	i: SIZE;
 BEGIN
 	 (* do never use any low level locks as the garbage collector process has a very high priority and may thus be blocked by lower level processes -> potential deadlock *)
 	(*!
@@ -1434,7 +1434,7 @@ PROCEDURE NewProtRec*(VAR p: ANY; tag: ADDRESS; isRealtime: BOOLEAN);
 VAR size, blockSize: SIZE; protRecBlockAdr, dataBlockAdr: ADDRESS;
 	protRecBlock: ProtRecBlockU;
 	dataBlock: DataBlockU;
-	i: LONGINT;
+	i: SIZE;
 	typeDesc: StaticTypeBlockU;
 BEGIN
 	typeDesc := tag;
@@ -1705,7 +1705,7 @@ PROCEDURE RecursiveReset(h {UNTRACED}: HeapBlock);
 VAR
 	orgBlock: ADDRESS;
 	staticTypeBlock {UNTRACED}: StaticTypeBlock;
-	currentArrayElemAdr, lastArrayElemAdr: ADDRESS; i: LONGINT;
+	currentArrayElemAdr, lastArrayElemAdr: ADDRESS; i: SIZE;
 	protected {UNTRACED}: ProtRecBlock;
 	b {UNTRACED}: POINTER {UNSAFE} TO RECORD p: ANY END;
 	meta {UNTRACED }: POINTER {UNSAFE} TO RECORD staticTypeBlock {FICTIVE=TypeDescOffset}: StaticTypeBlock; last, current, first: ADDRESS END;
@@ -1981,7 +1981,7 @@ END NilGC;
 PROCEDURE Init;
 VAR beginBlockAdr, endBlockAdr, freeBlockAdr, p: ADDRESS;
 	heapBlock: HeapBlockU; freeBlock: FreeBlockU; memBlock {UNTRACED}: Machine.MemoryBlock;
-	s: ARRAY 32 OF CHAR; minSize,i: LONGINT;
+	s: ARRAY 32 OF CHAR; minSize,i: SIZE;
 BEGIN
 	Machine.GetConfig("EnableFreeLists", s);
 	EnableFreeLists := (s[0] = "1");

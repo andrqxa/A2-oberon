@@ -196,7 +196,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END StackFrames;
 
 (** Write a buffer in hex. *)
-PROCEDURE Buffer* (CONST buf: ARRAY OF CHAR; ofs, len: LONGINT);
+PROCEDURE Buffer* (CONST buf: ARRAY OF CHAR; ofs, len: SIZE);
 BEGIN {UNCOOPERATIVE, UNCHECKED} Memory (ADDRESSOF (buf[ofs]), len)
 END Buffer;
 
