@@ -84,7 +84,7 @@ CODE
 #END
 END WriteMouse;
 
-PROCEDURE -SendLength(l : LONGINT);
+PROCEDURE -SendLength(l : SIZE);
 CODE
 #IF I386 THEN
 	MOV EAX, 564D5868H
@@ -103,7 +103,7 @@ CODE
 	#IF COOP THEN
 		MOV RSI, RBX
 	#END
-	POP EBX
+	POP RBX
 	MOV ECX, 8
 	MOV DX, 5658H
 	OUT DX, EAX;
@@ -349,9 +349,9 @@ END DevId;
 *)
 
 PROCEDURE SetTextToClipBoard(CONST text : ARRAY OF CHAR);
-VAR l, t, i: LONGINT;
+VAR l, i: SIZE; t: LONGINT;
 BEGIN
-	l := TODO(Strings.Length(text));
+	l := Strings.Length(text);
 	SendLength(l);
 	t := 0;
 	FOR i := 0 TO (l - 1) DIV 4 DO
@@ -361,7 +361,7 @@ BEGIN
 END SetTextToClipBoard;
 
 PROCEDURE GetTextFromClipBoard(VAR s : Strings.String);
-VAR l, t, i: LONGINT; f : ADDRESS;
+VAR l, i: SIZE; t: LONGINT; f : ADDRESS;
 BEGIN
 	l := ReceiveLength();
 	IF (l > 0) & (l < 10000H) THEN
