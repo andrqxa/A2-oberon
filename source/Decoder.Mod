@@ -1530,7 +1530,7 @@ TYPE
 		END SkipPointerInProc;
 
 		PROCEDURE &New (CONST fileName : ARRAY OF CHAR);
-		VAR ch : CHAR; tmp : LONGINT; j, res : LONGINT; msg : ARRAY 255 OF CHAR; pos: LONGINT;
+		VAR ch : CHAR; tmp : LONGINT; j, res : LONGINT; msg : ARRAY 255 OF CHAR; pos: Streams.Position;
 		BEGIN
 			Init;
 			Strings.GetExtension (fileName, msg, ext);
