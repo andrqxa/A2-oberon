@@ -861,7 +861,7 @@ KernelLog.Ln();
                 expression := SyntaxTree.NewIntegerValue(position, token.integer);
                 NextToken;
             ELSIF Peek(Scanner.RealLiteral) THEN
-                realValue := SyntaxTree.NewRealValue(position, symbol.real, symbol.numberType);
+                realValue := SyntaxTree.NewRealValue(position, token.real, token.numberType);
                 expression := realValue;
                 NextToken;
             ELSIF Peek(Scanner.CharacterLiteral) THEN
