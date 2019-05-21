@@ -497,7 +497,7 @@ BEGIN (* {Caller holds module lock} *)
 	ASSERT(samples # NIL);
 	NEW(profile);
 	profile.nofSamples := nofSamples;
-	profile.nofProcessors := Machine.NumberOfProcessors();
+	profile.nofProcessors := TODO(Machine.NumberOfProcessors());
 	profile.nofRunsTooDeep := nofRunsTooDeep;
 	profile.nofUnwindingFaults := nofUnwindingFaults;
 	profile.nofSamplesNotStored := nofSamplesNotStored;
@@ -513,7 +513,7 @@ END CreateProfile;
 (** Returns the size of the sampling buffer in bytes for a given maximum sampling time in seconds *)
 PROCEDURE GetBufferSize*(time : LONGINT) : LONGINT;
 BEGIN
-	RETURN time * Kernel.Second * Machine.NumberOfProcessors() * MaxUnwindingDepth * SIZEOF(ADDRESS);
+	RETURN time * Kernel.Second * TODO(Machine.NumberOfProcessors()) * MaxUnwindingDepth * SIZEOF(ADDRESS);
 END GetBufferSize;
 
 (**	Generate hierarchical profile of the last profiler run's data. Returns NIL if no data available *)
@@ -572,7 +572,7 @@ BEGIN {EXCLUSIVE}
 		nofRunsTooDeep := 0;
 		nofUnwindingFaults := 0;
 		nofSamplesNotStored := 0;
-		maxNofSamples := maxTime * Kernel.Second * Machine.NumberOfProcessors();
+		maxNofSamples := maxTime * Kernel.Second * TODO(Machine.NumberOfProcessors());
 		NEW(samples, maxNofSamples);
 		NEW(sampleInfos, maxNofSamples);
 		TRACE('enabling hprop0');
