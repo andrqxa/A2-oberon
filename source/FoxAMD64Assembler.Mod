@@ -68,6 +68,10 @@ CONST
 	fpStackOperand= InstructionSet.fpStackOperand; directMemoryOffset= InstructionSet.directMemoryOffset;
 	RXB = InstructionSet.RXB;
 	Src1Prefix = InstructionSet.Src1Prefix;
+	Src2Prefix = InstructionSet.Src2Prefix;
+	CountPrefix = InstructionSet.CountPrefix;
+	is4 = InstructionSet.is4;
+	is5 = InstructionSet.is5;
 
 	(* limits *)
 	maxNumberOperands = InstructionSet.maxNumberOperands;
@@ -288,7 +292,7 @@ TYPE
 		PROCEDURE EmitInstruction (mnem: LONGINT; VAR operands: ARRAY OF Operand; lastPass: BOOLEAN): BOOLEAN;
 		VAR instr, i, oppos, op: LONGINT;
 			val: LONGINT;
-			regOperand: LONGINT;
+			regOperand, regOperand2: LONGINT;
 			addressOperand: LONGINT;
 			regField, modField, rmField: LONGINT;
 			scaleField, indexField, baseField: LONGINT;
@@ -337,12 +341,13 @@ TYPE
 				RETURN instr
 			END FindInstruction;
 
-			PROCEDURE GetRegOperand (): LONGINT;
+			PROCEDURE GetRegOperand (startIndex: LONGINT): LONGINT;
 			VAR i: LONGINT;
 			BEGIN
-				FOR i := 0 TO maxNumberOperands -1 DO
+				FOR i := startIndex TO maxNumberOperands -1 DO
 					CASE InstructionSet.instructions[instr].operands[i] OF
-					InstructionSet.reg8, InstructionSet.reg16, InstructionSet.reg32, InstructionSet.reg64, InstructionSet.xmm, InstructionSet.mmx, InstructionSet.ymm: RETURN i;
+					InstructionSet.reg8, InstructionSet.reg16, InstructionSet.reg32, InstructionSet.reg64, InstructionSet.xmm, InstructionSet.mmx, InstructionSet.ymm: 
+							RETURN i;
 					ELSE
 					END;
 				END;
@@ -452,10 +457,10 @@ TYPE
 			regOperand := GetSpecialOperand ();
 			addressOperand := GetAddressOperand ();
 			IF regOperand = none THEN
-				regOperand := GetRegOperand ();
+				regOperand := GetRegOperand (0);
 			END;
 			IF addressOperand = none THEN
-				addressOperand := GetRegOperand ();
+				addressOperand := GetRegOperand (0);
 				IF regOperand # none THEN
 					temp := InstructionSet.instructions[instr].operands[regOperand];
 					IF (temp = xmm) OR (temp = mmx) THEN (* patch case such as PEXTRW EDX, XMM3, 0 *)
@@ -565,8 +570,8 @@ TYPE
 			oppos := 0;
 			val := -1;
 
-			IF rexPrefix # {} THEN
-				IF cpuBits # bits64 THEN 
+			IF (rexPrefix # {}) & ~(InstructionSet.optNoREX IN InstructionSet.instructions[instr].bitwidthOptions) THEN
+				IF cpuBits # bits64 THEN
 					ErrorSI("compiler encoding error ", mnem,operands);
 				END;
 				byte := 40H;
@@ -955,7 +960,7 @@ TYPE
 						END;
 					| rb, rw, rd, rq:
 						IF Trace THEN KernelLog.String(" r* "); END;
-						regOperand := GetRegOperand ();
+						regOperand := GetRegOperand (0);
 						val := val + InstructionSet.RegisterIndex(operands[regOperand].register) MOD 8;
 						code.PutByte (val); val := -1;
 						free[regOperand] := FALSE;
@@ -995,12 +1000,29 @@ TYPE
 						IF ~(rexX IN rexPrefix) THEN byte := byte + 40H END;
 						IF ~(rexR IN rexPrefix) THEN byte := byte + 20H END;
 						code.PutByte(byte);
-					| Src1Prefix:
+					| Src1Prefix, Src2Prefix, CountPrefix:
 						IF val # -1 THEN code.PutByte (val); val := -1 END;
 						IF Trace THEN KernelLog.String(" Src1Prefix "); END;
 						INC(oppos);
-						ASSERT((operands[1].type = xmm) OR (operands[1].type = ymm));
-						code.PutByte(ORD(opcode[oppos])+(0FH -InstructionSet.RegisterIndex(operands[1].register))*0x08);
+						i := GetRegOperand(regOperand+1);
+						ASSERT((operands[i].type = xmm) OR (operands[i].type = ymm));
+						code.PutByte(ORD(opcode[oppos])+(0FH -InstructionSet.RegisterIndex(operands[i].register))*0x08);
+					| is4:
+						IF val # -1 THEN code.PutByte (val); val := -1 END;
+						IF Trace THEN KernelLog.String(" is4 "); END;
+						INC(oppos);
+						ASSERT((operands[3].type = xmm) OR (operands[3].type = ymm));
+						code.PutByte(InstructionSet.RegisterIndex(operands[3].register)*0x10);
+					| is5:
+						IF val # -1 THEN code.PutByte (val); val := -1 END;
+						IF Trace THEN KernelLog.String(" is5 "); END;
+						INC(oppos);
+						ASSERT((operands[3].type = xmm) OR (operands[3].type = ymm));
+						ASSERT(operands[4].type = imm);
+						IF (operands[4].val > 3) OR (operands[4].val < 0) THEN
+							Error("operand exceeds bounds");
+						END;
+						code.PutByte(InstructionSet.RegisterIndex(operands[3].register)*0x10 + SHORTINT(operands[4].val));
 					ELSE HALT(100) (* decoding error *)
 					END;
 				END;
@@ -1088,34 +1110,11 @@ TYPE
 
 	END Emitter;
 
-	RegisterMapEntry*= POINTER TO RECORD
-		name-: Strings.String;
-		register-: LONGINT;
-		next: RegisterMapEntry;
-	END;
-
 	RegisterMap*= OBJECT
-	VAR first: RegisterMapEntry;
 
-		PROCEDURE & Init *;
-		BEGIN
-			first := NIL
-		END Init;
-
-		PROCEDURE Find*(CONST name: ARRAY OF CHAR): LONGINT;
-		VAR map: RegisterMapEntry;
-		BEGIN
-			map := first;
-			WHILE (map # NIL) & (map.name^#name) DO map := map.next END;
-			IF map = NIL THEN RETURN InstructionSet.none ELSE RETURN map.register END;
+		PROCEDURE Find*(CONST name: ARRAY OF CHAR): LONGINT; (* abstract *)
+		BEGIN HALT(100);
 		END Find;
-
-		PROCEDURE Add*(name: Strings.String; register: LONGINT);
-		VAR map: RegisterMapEntry;
-		BEGIN
-			NEW(map); map.name := name; map.register := register;
-			map.next := first; first := map;
-		END Add;
 
 	END RegisterMap;
 
@@ -1791,7 +1790,13 @@ TYPE
 					IF symbol = symIdent THEN (* register ?, for example EAX *)
 						reg := InstructionSet.FindRegister (ident);
 						IF reg = InstructionSet.none THEN
-							reg := map.Find(ident)
+							IF map # NIL THEN
+								reg := map.Find(ident)
+							END;
+							IF reg = InstructionSet.unassigned THEN
+								ErrorSS("register unavailable -- too many registers?",ident);
+								reg := InstructionSet.none;
+							END;
 						END;
 						IF reg # InstructionSet.none THEN
 							IF size # bitsDefault THEN
@@ -2765,4 +2770,4 @@ TYPE
 		END;
 	END FoxAMD64Assembler.
 
-OCAMD64Assembler.Test ~
+System.FreeDownTo FoxAMD64Assembler  ~

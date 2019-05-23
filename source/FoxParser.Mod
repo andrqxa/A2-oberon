@@ -1305,10 +1305,10 @@ TYPE
 					result := TRUE;
 			| Scanner.Ignore:
 					position := token.position;
-					CommentStatement(statement);
 					NextToken;
 					designator := Designator();
 					caller := SyntaxTree.NewProcedureCallStatement(designator.position, TRUE, designator,outer);
+					CommentStatement(caller);
 					statements.AddStatement( caller );
 					result := TRUE;
 			| Scanner.Begin:

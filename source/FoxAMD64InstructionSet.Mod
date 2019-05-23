@@ -37,6 +37,7 @@ CONST
 	maxMnemonicNameLength =20;
 	maxCodeLength* =12;
 	none* = -1;
+	unassigned*= -2; 
 
 	bitsDefault*=0;
 	bits8*=1;
@@ -91,6 +92,8 @@ CONST
 	optPLOCK* = 8;		(* a lock prefix must preceed the instruction *)
 	optPREP* = 9;		(* a repeat prefix must preceed the instruction *)
 	optPREPN* = 10;	(* a repeat prefix must preceed the instruction *)
+
+	optNoREX* = 11; (* an instruction that does not require a REX prefix, such as AVX instructions *) 
 
 	(*
 		FoxProgTools.Enum -l=1 -e
@@ -1361,6 +1364,7 @@ CONST
 	iw*= 8; id*= 9; iq*= 10; rb*= 11; rw*= 12; rd*= 13; rq*= 14; mem64Operand*= 15;
 	mem128Operand*= 16; fpStackOperand*= 17; directMemoryOffset*= 18;
 	Src1Prefix* = 19; Src2Prefix* = 20; CountPrefix*= 21; DestPrefix*=22; RXB*=23;
+	is4* = 24; is5* = 25;
 
 TYPE
 	Name = ARRAY 20 OF CHAR;
@@ -1826,10 +1830,8 @@ VAR
 							'r': code[k] := CHR(modRMBoth); INC(k);
 							|'0'..'7': code[k] := CHR(modRMExtension); INC(k); code[k] := CHR(HexOrd(ch2)); INC(k);
 						ELSE
-							IF cdc = "/imm8" THEN
-								(*todo*)
-							ELSIF cdc = "/is4" THEN
-								(*todo*)
+							IF cdc = "/is4" THEN
+								code[k] := CHR(is4); INC(k);
 							ELSIF cdc = "/ib" THEN
 								code[k] := CHR(ib); INC(k);
 							ELSE
@@ -1852,8 +1854,10 @@ VAR
 							|'q': code[k] := CHR(iq); INC(k);
 						ELSE
 							IF cdc = "is4" THEN
+								code[k] := CHR(is4); INC(k);
 								(*todo*)
 							ELSIF cdc = "is5" THEN
+								code[k] := CHR(is5); INC(k);
 								(*todo*)
 							ELSE
 							HALT(100)
@@ -1900,7 +1904,7 @@ VAR
 				INC(i);
 			END;
 			ASSERT(operands[at] = 0X); (* all operands parsed *)
-
+			INCL(instructions[numberInstructions].bitwidthOptions, optNoREX);
 			EncodeV(code,instructions[numberInstructions].code);
 
 			COPY(mnemonics[mnemonic].name,name);
@@ -5410,7 +5414,7 @@ END FoxAMD64InstructionSet.
 
 FoxAMD64InstructionSet.Trace
 
-System.Free FoxAMD64InstructionSet ~
+System.FreeDownTo FoxAMD64InstructionSet ~
 
 	(** Instruction Format, cf. [AMD:3], chapter 1
 		[LegacyPrefix] ; Operand-Size Override / modify opcode of media instructions
