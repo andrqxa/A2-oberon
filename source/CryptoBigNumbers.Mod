@@ -872,7 +872,7 @@ VAR
 	PROCEDURE FileWrite*( w: Streams.Writer;  b: BigNumber );
 	VAR i, j, v: LONGINT;
 	BEGIN
-		j := LONGINT (b.len); (* TODO: fix truncation *)
+		j := b.len(LONGINT);
 		w.RawLInt( j );
 		FOR i := 0 TO j - 1 DO  w.RawLInt( v ); b.d[ i ] := v  END
 	END FileWrite;

@@ -331,7 +331,8 @@ TYPE
 
 	ProcedureInfo* = OBJECT (Info)
 		VAR
-			codeOffset: ADDRESS; codeSize: LONGINT;
+			codeOffset: ADDRESS;
+			codeSize: SIZE;
 			retType, index : LONGINT;
 			fields : FieldArray;
 			fieldCount : LONGINT;
@@ -1665,7 +1666,7 @@ TYPE
 				start := Reflection.GetAddress(refs, offset);
 				end := Reflection.GetAddress(refs, offset);
 				NEW(procInfo, name, start - ADDRESS OF module.code[0], 0);
-				procInfo.codeSize := LONGINT(end - start);
+				procInfo.codeSize := end - start;
 				AddProcedure(procInfo);
 				Reflection.SkipSet(offset);
 				WHILE refs[offset] = Reflection.sfVariable DO Reflection.SkipVariable(refs, offset) END;
