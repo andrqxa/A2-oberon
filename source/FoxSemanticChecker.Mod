@@ -3001,7 +3001,7 @@ TYPE
 				- if symbol is a guarded variable then return a TypeGuardDesignator
 				- else return a symbol designator
 		**)
-		PROCEDURE NewSymbolDesignator*(position: Position; original: SyntaxTree.Designator; left: SyntaxTree.Designator; symbol: SyntaxTree.Symbol): SyntaxTree.Expression;
+		PROCEDURE NewSymbolDesignator*(position: Position; original: SyntaxTree.Expression; left: SyntaxTree.Expression; symbol: SyntaxTree.Symbol): SyntaxTree.Expression;
 		VAR result: SyntaxTree.Expression; assignable: BOOLEAN; scope: SyntaxTree.Scope;
 		guardType: SyntaxTree.Type;
 		BEGIN
@@ -3120,7 +3120,7 @@ TYPE
 		**)
 		PROCEDURE ResolveSelectorDesignator(selectorDesignator: SyntaxTree.SelectorDesignator): SyntaxTree.Expression;
 		VAR
-			symbol: SyntaxTree.Symbol; left: SyntaxTree.Designator; scope: SyntaxTree.Scope;
+			symbol: SyntaxTree.Symbol; left: SyntaxTree.Expression; scope: SyntaxTree.Scope;
 			module: SyntaxTree.Module; result: SyntaxTree.Expression; type: SyntaxTree.Type;
 		BEGIN
 			IF Trace THEN D.Str("ResolveSelectorDesignator"); D.Ln; END;
@@ -3811,7 +3811,7 @@ TYPE
 			- check parameter compatibility
 			return invalidDesignator if error
 		**)
-		PROCEDURE NewProcedureCallDesignator(position: Position; original: SyntaxTree.Expression; left: SyntaxTree.Designator; actualParameters:SyntaxTree.ExpressionList): SyntaxTree.Designator;
+		PROCEDURE NewProcedureCallDesignator(position: Position; original: SyntaxTree.Expression; left: SyntaxTree.Expression; actualParameters:SyntaxTree.ExpressionList): SyntaxTree.Designator;
 		VAR result: SyntaxTree.Designator;
 			numberFormalParameters, numberActualParameters: SIZE;
 			formalType: SyntaxTree.ProcedureType;
@@ -3844,7 +3844,7 @@ TYPE
 			END;
 
 			IF (formalType.selfParameter # NIL) & (formalType.selfParameter.kind = SyntaxTree.VarParameter) THEN
-				self := left.left;
+				self := left(SyntaxTree.Designator).left;
 				IF (self # NIL) & ~IsVariable(self) THEN
 					Error(self.position, "Non-variable expression on variable receiver");
 				END;
@@ -4344,7 +4344,7 @@ TYPE
 				(* move to builtin procedure call statement ?
 			remove builtin procedure call designator ?
 		*)
-		PROCEDURE NewBuiltinCallDesignator(position: Position; original: SyntaxTree.Designator; builtin: SyntaxTree.Builtin; actualParameters:SyntaxTree.ExpressionList; left: SyntaxTree.Designator; returnType: SyntaxTree.Type): SyntaxTree.Expression;
+		PROCEDURE NewBuiltinCallDesignator(position: Position; original: SyntaxTree.Designator; builtin: SyntaxTree.Builtin; actualParameters:SyntaxTree.ExpressionList; left: SyntaxTree.Expression; returnType: SyntaxTree.Type): SyntaxTree.Expression;
 		VAR
 			numberActualParameters,numberFormalParameters: SIZE;
 			formalParameter: SyntaxTree.Parameter;
@@ -5537,7 +5537,7 @@ TYPE
 			- returns new type guard designator
 			returns invalidDesignator = invalidExpression if error
 		**)
-		PROCEDURE NewTypeGuardDesignator(position: Position; original: SyntaxTree.Designator; left: SyntaxTree.Designator; type: SyntaxTree.Type; typeExpression: SyntaxTree.Expression): SyntaxTree.Designator;
+		PROCEDURE NewTypeGuardDesignator(position: Position; original: SyntaxTree.Expression; left: SyntaxTree.Expression; type: SyntaxTree.Type; typeExpression: SyntaxTree.Expression): SyntaxTree.Designator;
 		VAR result: SyntaxTree.Designator;
 		BEGIN
 			result := SyntaxTree.invalidDesignator;
@@ -5580,7 +5580,7 @@ TYPE
 		PROCEDURE ResolveParameterDesignator(designator: SyntaxTree.ParameterDesignator): SyntaxTree.Expression;
 		VAR
 			parameters: SyntaxTree.ExpressionList;
-			left: SyntaxTree.Designator;
+			left: SyntaxTree.Expression;
 			result,expression: SyntaxTree.Expression;
 			typeDeclaration: SyntaxTree.TypeDeclaration;
 			type, expressionType: SyntaxTree.Type;
@@ -5597,7 +5597,7 @@ TYPE
 		BEGIN
 			IF Trace THEN D.Str("ResolveParameterDesignator"); D.Ln; END;
 			result := SyntaxTree.invalidDesignator;
-			left := ResolveDesignator(designator.left);
+			left := ResolveExpression(designator.left);
 			IF left # SyntaxTree.invalidDesignator THEN
 				parameters := designator.parameters;
 				IF ExpressionList(parameters) THEN
@@ -5647,7 +5647,7 @@ TYPE
 			with error handling
 			returns invalidDesignator = invalidExpression if error
 		**)
-		PROCEDURE NewDereferenceDesignator(position: Position; original: SyntaxTree.Designator; left: SyntaxTree.Designator): SyntaxTree.Designator;
+		PROCEDURE NewDereferenceDesignator(position: Position; original: SyntaxTree.Expression; left: SyntaxTree.Expression): SyntaxTree.Designator;
 		VAR type: SyntaxTree.Type; result: SyntaxTree.Designator;
 		BEGIN
 			result := SyntaxTree.invalidDesignator;
@@ -6977,7 +6977,7 @@ TYPE
 					Printout.Info("variable",variable)
 				END;
 			ELSIF ~IsTypeExtension(variableType, type.resolved) THEN
-				Error(variable.position,"withguarded symbol is no type extension of ");
+				Error(type.position,"type does not extend withguarded symbol");
 				IF VerboseErrorMessage THEN
 					Printout.Info("variable",variable);
 					Printout.Info("type",type);
