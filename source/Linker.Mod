@@ -7,7 +7,7 @@ TYPE
 
 	PatchBlock*= POINTER TO RECORD
 		baseAdr: LONGINT;
-		addresses: LONGINT;
+		addresses: SIZE;
 		address: ARRAY 1024 OF LONGINT;
 		next: PatchBlock;
 	END;
@@ -240,7 +240,7 @@ BEGIN
 END ReadObjectFile;
 
 PROCEDURE WriteRelocations( arr: Arrangement; w: Files.Writer );
-VAR pb: PatchBlock; i, relocations, binsize: LONGINT;
+VAR pb: PatchBlock; i, relocations: SIZE; binsize: Files.Position;
 BEGIN
 	binsize := w.Pos();
 	pb := arr.relocInfo.patchBlock; relocations := 0;
@@ -252,8 +252,8 @@ BEGIN
 	END;
 	(* now patch header (cf  Unix.Glue.Mod)  *)
 	w.SetPos( 24 );
-	w.RawLInt( binsize );
-	w.RawLInt( relocations );
+	w.RawLInt( TODO(binsize) );
+	w.RawLInt( TODO(relocations) );
 END WriteRelocations;
 
 PROCEDURE WriteOutputFile* (arrangement: Arrangement; CONST fileName: Files.FileName; linker: GenericLinker.Linker; fileFormat: FileFormat);
@@ -425,8 +425,8 @@ VAR OptionalHeaderSize, CodeSize, AlignedCodeSize, HeadersSize, BaseCodeAddress:
 		RETURN (relocInfo # NIL) & (relocInfo.patchBlock # NIL)
 	END HasRelocs;
 
-	PROCEDURE RelocTableSize(): LONGINT;
-	VAR p: PatchBlock; size: LONGINT;
+	PROCEDURE RelocTableSize(): SIZE;
+	VAR p: PatchBlock; size: SIZE;
 	BEGIN
 		IF ~HasRelocs() THEN RETURN 0 END;
 		size := 0;
