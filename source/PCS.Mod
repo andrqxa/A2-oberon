@@ -672,7 +672,7 @@ TYPE
 	BEGIN
 		NEW(buffer, size);
 		r.Bytes(buffer^, 0, size, read);
-		RETURN NewScanner(buffer, 0, pos)
+		RETURN NewScanner(buffer, 0, pos(LONGINT))
 	END InitWithReader;
 
 (*

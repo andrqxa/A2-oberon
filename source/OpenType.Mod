@@ -430,7 +430,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 						END;
 						INC(n)
 					END;
-					len := SHORT(offset + len - r.file.Pos(r)) DIV 2;
+					len := SHORT(offset + len - r.file.Pos(r)(LONGINT)) DIV 2;
 					IF len > 0 THEN
 						NEW(font.cmap.glyph, len);
 						n := 0; WHILE n < len DO ReadInt(r, font.cmap.glyph[n]); INC(n) END;
@@ -951,7 +951,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 				ELSE font.file.Set(r,  r.file.Pos(r) + instrLen)
 				END
 			END;
-			
+
 			(* load flags *)
 			FOR i := 0 TO points-1 DO  flags[i] := 0  END;
 			i := 0;
@@ -1593,7 +1593,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		CharToUnicode[171] := 0DFH;
 		FOR i := 172 TO 255 DO CharToUnicode[i] := 0 END;
 	END InitCharMaps;
-	
+
 PROCEDURE GetSharpenContours;
 VAR
 	res: WORD;

@@ -119,7 +119,7 @@ TYPE
 			ASSERT(file.Length() MOD blockSize = 0);
 			Init(name, blockSize, cyls, hds, spt);
 			SELF.file := file;
-			SELF.size := file.Length() DIV blockSize;
+			SELF.size := TODO(file.Length()) DIV blockSize;
 			desc := "Virtual Disk for file "; Strings.Append(desc, filename);
 		END New;
 

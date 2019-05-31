@@ -698,7 +698,7 @@ TYPE
 				COPY(info.filename, filename); Strings.Append(filename, ".Mod");
 				file := Files.Old(filename);
 				IF (file # NIL) THEN
-					owner.GotoFile(filename, info.position);
+					owner.GotoFile(filename, TODO(info.position));
 				END;
 			END;
 		END OnGoToFile;

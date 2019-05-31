@@ -69,7 +69,7 @@ TYPE
 				RETURN ResErr;
 			END;
 			*)
-			IF size < 1024 THEN size := file.Length() - 8; END;
+			IF size < 1024 THEN size := TODO(file.Length()) - 8; END;
 
 			r.Bytes(buf, 0, 4, bytesRead);
 			IF buf # "WAVE" THEN
@@ -495,7 +495,7 @@ TYPE
 			ELSIF pos > end.Get() THEN
 				pos := end.Get();
 			END;
-			cur.Set(pos);
+			cur.Set(TODO(pos));
 			Invalidate();
 		END SetPos;
 
@@ -690,7 +690,7 @@ BEGIN
 		RETURN ResErr;
 	END;
 	Files.OpenReader(r, file, 0);
-	len := file.Length();
+	len := TODO(file.Length());
 	r.SkipBytes(len-128);
 	r.Bytes(buf, 0, 128, bytesRead);
 	Strings.Copy(buf, 0, 3, id);

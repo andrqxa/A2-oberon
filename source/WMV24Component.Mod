@@ -938,7 +938,7 @@ TYPE
 					IF res = Serials.Ok THEN
 						in.Reset; out.Reset;
 						NEW(xysender, out, in, f, mode);
-						NEW(progressInfo, filename, f.Length()); progressInfo.bounds.SetExtents(300, 60);
+						NEW(progressInfo, filename, TODO(f.Length())); progressInfo.bounds.SetExtents(300, 60);
 						GetPanelCoordinates(x, y);
 						NEW(progressWindow, progressInfo, x + 150, y + 50);
 						WHILE ~xysender.IsDone() DO

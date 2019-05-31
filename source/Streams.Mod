@@ -25,7 +25,7 @@ TYPE
 	BufferOffset*	= LONGINT; (* offset in the stream biffer *)
 
 TYPE
-	Position* = LONGINT; (* position in the stream *)
+	Position* = HUGEINT; (* position in the stream *)
 
 	(** Any stream output procedure or method. *)
 	Sender* = PROCEDURE {DELEGATE} ( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
@@ -418,8 +418,8 @@ TYPE
 	(* Set the position for the writer *)
 		PROCEDURE SetPos*( pos: Position );
 		BEGIN
-			IF pos > LEN( buf ) THEN pos := LEN( buf ) END;
-			tail := pos;  sent := 0;  res := Ok;
+			IF pos > LEN( buf ) THEN tail := LEN( buf ) ELSE tail := SIZE(pos) END;
+			sent := 0;  res := Ok;
 		END SetPos;
 
 		PROCEDURE Update*;
@@ -939,8 +939,8 @@ TYPE
 	(** Set the reader position *)
 		PROCEDURE SetPos*( pos: Position );
 		BEGIN
-			IF pos > LEN( buf ) THEN pos := LEN( buf ) END;
-			head := pos;  tail := LEN( buf );  received := LEN( buf );  res := Ok;
+			IF pos > LEN( buf ) THEN head := LEN( buf ) ELSE head := SIZE(pos) END;
+			tail := LEN( buf );  received := LEN( buf );  res := Ok;
 		END SetPos;
 
 		PROCEDURE Receive( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );

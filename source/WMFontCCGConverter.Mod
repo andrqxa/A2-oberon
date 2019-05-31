@@ -493,7 +493,7 @@ TYPE
 				KernelLog.String("Writing range "); KernelLog.Int(i, 4); KernelLog.String(" of "); KernelLog.Int(LEN(glyphRanges), 4);
 				KernelLog.Ln;
 				w.Update();
-				glyphRanges[i].filePos := w.sent;
+				glyphRanges[i].filePos := TODO(w.sent);
 				StoreRange(w, glyphRanges[i]);
 			END;
 			w.Update();

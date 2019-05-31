@@ -95,7 +95,7 @@ TYPE
 		END YHeader;
 
 		PROCEDURE SendFile;
-		VAR fR: Files.Reader; len: Files.Size; blkn, blk, i, retry: LONGINT; length: SIZE; start, ch: CHAR;
+		VAR fR: Files.Reader; len, length: SIZE; blkn, blk, i, retry: LONGINT; start, ch: CHAR;
 
 			PROCEDURE SendData;
 			VAR crc: LONGINT;
@@ -135,7 +135,7 @@ TYPE
 				blk := 0; SendData();
 				IF ~(Read(ch) & (ch = C)) THEN error := "expected C"; RETURN END
 			END;
-			Files.OpenReader(fR, F, 0); len := F.Length(); totalBytes := len;
+			Files.OpenReader(fR, F, 0); len := F.Length()(SIZE); totalBytes := len;
 			fail := FALSE; retry := 0; blk := 1; start := STX; blkn := 1024;
 			REPEAT
 				IF retry = 0 THEN

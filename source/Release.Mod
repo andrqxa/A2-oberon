@@ -99,11 +99,11 @@ CONST
 
 	(* Load Oberon text files ignoring text format *)
 	OptimizedLoads = TRUE;
-	
+
 	(** Default compression level and strategy for Zip **)
 	DefaultCompression = Zip.BestCompression;
 	DefaultStrategy = Zip.HuffmanOnly;
-	
+
 	(* If set to TRUE, the file references are re-used for different steps of the build process *)
 	KeepFilesOpen = FALSE;
 
@@ -809,7 +809,7 @@ TYPE
 				ELSE
 					f.Set(r, 0);
 					Files.SplitPath(dstname, pathName, fileName);
-					Zip.AddEntry(archive, fileName, r, f.Length(), SHORTINT(level), SHORTINT(strategy), res);
+					Zip.AddEntry(archive, fileName, r, f.Length()(LONGINT), SHORTINT(level), SHORTINT(strategy), res);
 				END;
 			END AddFile;
 

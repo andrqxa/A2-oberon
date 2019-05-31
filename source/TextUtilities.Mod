@@ -103,7 +103,7 @@ TYPE
 				pieceOffset := 0; nextAttribute := 0;
 				WHILE nextAttribute < attributesBuf.length DO
 					nextAttributes := attributesBuf.attributes[nextAttribute];
-					pieceLength:= attributesBuf.positions[nextAttribute]-pieceOffset;
+					pieceLength:= TODO(attributesBuf.positions[nextAttribute])-pieceOffset;
 					text.SetAttributes(pos+pieceOffset,pieceLength,currentAttributes);
 					INC(pieceOffset, pieceLength);
 					currentAttributes := nextAttributes;
@@ -231,7 +231,7 @@ TYPE
 		PROCEDURE SetPos*(pos: Streams.Position);
 		BEGIN
 			reader.text.AcquireRead;
-			reader.SetPosition(pos); (* pos is clipped *)
+			reader.SetPosition(TODO(pos)); (* pos is clipped *)
 			received := TODO(reader.GetPosition()); (* this effects that Streams.Reader.Pos() returns the correct location in the text *)
 			Reset;
 			remainder := 0;
@@ -684,7 +684,7 @@ TYPE
 			w.Char(0X); (* ??? *)
 			w.RawLInt(TODO(len)); (* tLen ? *)
 			w.Update;
-			hLen := w.Pos();
+			hLen := TODO(w.Pos());
 
 			(* pure text ... *)
 			r.SetPosition(0);

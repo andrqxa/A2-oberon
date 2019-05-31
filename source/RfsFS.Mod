@@ -282,7 +282,7 @@ TYPE
 			time, date: LONGINT;
 
 		(** positions a rider on a file at a given position. Riders cannot be positioned past the end of a file **)
-		PROCEDURE Set*(VAR r: Files.Rider; pos: LONGINT);
+		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
 		VAR a, b: LONGINT;
 		BEGIN {EXCLUSIVE}
 			r.eof := FALSE;
@@ -292,8 +292,8 @@ TYPE
 			IF pos < 0 THEN
 				a := 0; b := 0;
 			ELSIF pos < aleng*BufSize + bleng THEN
-				a := pos DIV BufSize;
-				b := pos MOD BufSize;
+				a := LONGINT(pos) DIV BufSize;
+				b := LONGINT(pos) MOD BufSize;
 			ELSE
 				a := aleng;
 				b := bleng;
@@ -311,7 +311,7 @@ TYPE
 		END Set;
 
 		(** return the current position of a rider **)
-		PROCEDURE Pos*(VAR r: Files.Rider): LONGINT;
+		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
 		BEGIN
 			IF Trace = 1 THEN
 				KernelLog.Enter;
@@ -328,22 +328,22 @@ TYPE
 		VAR buf: Buffer; errorcode: LONGINT;
 		BEGIN {EXCLUSIVE}
 			buf := r.hint(Buffer);
-			IF r.apos # buf.apos THEN
-				buf := GetBuf(SELF, r.apos);
+			IF LONGINT(r.apos) # buf.apos THEN
+				buf := GetBuf(SELF, LONGINT(r.apos));
 				r.hint := buf;
 			END;
 			IF r.bpos < buf.lim THEN
 				x := buf.data.B[r.bpos];
 				INC(r.bpos);
-			ELSIF r.apos < aleng THEN
+			ELSIF LONGINT(r.apos) < aleng THEN
 				INC(r.apos);
-				buf := SearchBuf(SELF, r.apos);
+				buf := SearchBuf(SELF, LONGINT(r.apos));
 				IF buf = NIL THEN
 					buf := r.hint(Buffer);
 					IF buf.mod THEN
 						WriteBuf(SELF, buf, errorcode);
 					END ;
-						ReadBuf(SELF, buf, r.apos, errorcode);
+						ReadBuf(SELF, buf, LONGINT(r.apos), errorcode);
 				ELSE
 					r.hint := buf;
 				END;
@@ -376,8 +376,8 @@ TYPE
 			IF len > 0 THEN
 				dst := ADDRESSOF(x[ofs]);
 				buf := r.hint(Buffer);
-				IF r.apos # buf.apos THEN
-					buf := GetBuf(SELF, r.apos); r.hint := buf;
+				IF LONGINT(r.apos) # buf.apos THEN
+					buf := GetBuf(SELF, LONGINT(r.apos)); r.hint := buf;
 				END;
 				LOOP
 					IF len <= 0 THEN
@@ -397,16 +397,16 @@ TYPE
 							INC(dst, m);
 							DEC(len, m)
 						END;
-						IF r.apos < aleng THEN
+						IF LONGINT(r.apos) < aleng THEN
 							INC(r.apos);
 							r.bpos := 0;
-							buf := SearchBuf(SELF, r.apos);
+							buf := SearchBuf(SELF, LONGINT(r.apos));
 							IF buf = NIL THEN
 								buf := r.hint(Buffer);
 								IF buf.mod THEN
 									WriteBuf(SELF, buf, errorcode)
 								END;
-								ReadBuf(SELF, buf, r.apos, errorcode);
+								ReadBuf(SELF, buf, LONGINT(r.apos), errorcode);
 							ELSE
 								r.hint := buf;
 							END;
@@ -444,8 +444,8 @@ TYPE
 		VAR buf: Buffer; errorcode: LONGINT;
 		BEGIN {EXCLUSIVE}
 			buf := r.hint(Buffer);
-			IF r.apos # buf.apos THEN
-				buf := GetBuf(SELF, r.apos);
+			IF LONGINT(r.apos) # buf.apos THEN
+				buf := GetBuf(SELF, LONGINT(r.apos));
 				r.hint := buf
 			END;
 			IF r.bpos >= buf.lim THEN
@@ -456,13 +456,13 @@ TYPE
 				ELSE
 					WriteBuf(SELF, buf, errorcode);
 					INC(r.apos);
-					buf := SearchBuf(SELF, r.apos);
+					buf := SearchBuf(SELF, LONGINT(r.apos));
 					IF buf = NIL THEN
 						buf := r.hint(Buffer);
-						IF r.apos <= aleng THEN
-							ReadBuf(SELF, buf, r.apos, errorcode)
+						IF LONGINT(r.apos) <= aleng THEN
+							ReadBuf(SELF, buf, LONGINT(r.apos), errorcode)
 						ELSE
-							buf.apos := r.apos;
+							buf.apos := LONGINT(r.apos);
 							buf.lim := 1;
 							INC(aleng);
 							bleng := 1;
@@ -496,8 +496,8 @@ TYPE
 			IF len > 0 THEN
 				src := ADDRESSOF(x[ofs]);
 				buf := r.hint(Buffer);
-				IF r.apos # buf.apos THEN
-					buf := GetBuf(SELF, r.apos);
+				IF LONGINT(r.apos) # buf.apos THEN
+					buf := GetBuf(SELF, LONGINT(r.apos));
 					r.hint := buf
 				END;
 				LOOP
@@ -529,13 +529,13 @@ TYPE
 						WriteBuf(SELF, buf, errorcode);
 						INC(r.apos);
 						r.bpos := 0;
-						buf := SearchBuf(SELF, r.apos);
+						buf := SearchBuf(SELF, LONGINT(r.apos));
 						IF buf = NIL THEN
 							buf := r.hint(Buffer);
-							IF r.apos <= aleng THEN
-								ReadBuf(SELF, buf, r.apos, errorcode)
+							IF LONGINT(r.apos) <= aleng THEN
+								ReadBuf(SELF, buf, LONGINT(r.apos), errorcode)
 							ELSE
-								buf.apos := r.apos;
+								buf.apos := LONGINT(r.apos);
 								buf.lim := 0;
 								INC(aleng);
 								bleng := 0;

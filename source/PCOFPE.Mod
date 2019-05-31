@@ -143,7 +143,7 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 			PROCEDURE SetPos*(ofs: Streams.Position);
 			BEGIN
 				Reset();
-				SELF.org := ofs; SELF.ofs := ofs
+				SELF.org := TODO(ofs); SELF.ofs := TODO(ofs)
 			END SetPos;
 
 			PROCEDURE &Open*(sect: Section; ofs: LONGINT);
@@ -173,7 +173,7 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 			PROCEDURE SetPos*(ofs: Streams.Position);
 			BEGIN
 				Update(); Reset();
-				SELF.org := ofs; SELF.ofs := ofs
+				SELF.org := TODO(ofs); SELF.ofs := TODO(ofs)
 			END SetPos;
 
 			PROCEDURE &Open*(sect: Section; ofs: LONGINT);
@@ -992,7 +992,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				W.RawInt(SHORT(size.nofMethods));	(*NofMethods*)
 				W.RawInt(SHORT(oldmth));	(*InheritedMethods*)
 				W.RawInt(SHORT(size.nofLocalMethods));	(*NewMethods*)
-				pos := W.Pos();
+				pos := TODO(W.Pos());
 				W.RawInt(0);
 				W.RawString(name);
 
@@ -1008,12 +1008,12 @@ ASSERT(code.data[offset-1] # 0E8X);
 				ASSERT(i = size.nofLocalMethods, 500);	(*sanity check*)
 
 				(* Ptrs in Record *)
-				i := W.Pos();
+				i := TODO(W.Pos());
 				PtrAdr(W, 0, rec, FALSE);
-				nofptrs := (W.Pos() - i) DIV 4;
+				nofptrs := (TODO(W.Pos()) - i) DIV 4;
 				IF nofptrs > MAX(INTEGER) THEN PCM.Error(221, PCM.InvalidPosition, "") END;
 				IF nofptrs # 0 THEN
-					i := W.Pos(); W.SetPos(pos);
+					i := TODO(W.Pos()); W.SetPos(pos);
 					W.RawInt(SHORT(nofptrs));
 					W.SetPos(i)
 				END
@@ -1087,7 +1087,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				W.RawLInt(0);
 				AddOfsReloc(type, W.Pos(), edata);
 				W.RawLInt(0);
-				desc.iatfix := W.Pos();
+				desc.iatfix := TODO(W.Pos());
 				sect := sects;
 				WHILE sect # NIL DO
 					r := sect.imports;
@@ -1134,7 +1134,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 									W.RawInt(0)
 								END;
 								AddOfsReloc(type, W.Pos(), code);
-								W.RawLInt(r.ofs);
+								W.RawLInt(TODO(r.ofs));
 								AddOfsReloc(type, W.Pos(), idata);
 								W.RawLInt(r.obj.iat - idata.head.VirtualAddress)
 							ELSE
@@ -1183,7 +1183,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 					END;
 					ASSERT(p # NIL);
 					W.Char(0E9X); (* JMP Main *)
-					W.RawLInt(p.adr(PCBT.Procedure).codeoffset-(W.Pos()+4))
+					W.RawLInt(p.adr(PCBT.Procedure).codeoffset-(TODO(W.Pos())+4))
 				END;
 				W.Update();
 				ModDesc()
@@ -1216,10 +1216,10 @@ ASSERT(code.data[offset-1] # 0E8X);
 				WHILE i < SIZEOF(ImageImportDescriptor) DO
 					W.Char(0X); INC(i)
 				END;
-				optHdr.DataDirectory[ImageDirectoryEntryImport].Size := W.Pos();
+				optHdr.DataDirectory[ImageDirectoryEntryImport].Size := TODO(W.Pos());
 				mod := imports;
 				WHILE mod # NIL DO
-					mod.desc.Characteristics := W.Pos();
+					mod.desc.Characteristics := TODO(W.Pos());
 					obj := mod.objs;
 					WHILE obj # NIL DO
 						W.RawLInt(0); obj := obj.next
@@ -1228,10 +1228,10 @@ ASSERT(code.data[offset-1] # 0E8X);
 					mod := mod.next
 				END;
 				ofs := W.Pos();
-				optHdr.DataDirectory[ImageDirectoryEntryIAT].VirtualAddress := base + ofs;
+				optHdr.DataDirectory[ImageDirectoryEntryIAT].VirtualAddress := base + TODO(ofs);
 				mod := imports;
 				WHILE mod # NIL DO
-					mod.desc.FirstThunk := W.Pos();
+					mod.desc.FirstThunk := TODO(W.Pos());
 					obj := mod.objs;
 					WHILE obj # NIL DO
 						W.RawLInt(0); obj := obj.next
@@ -1240,7 +1240,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 					mod := mod.next
 				END;
 				W.Update();
-				optHdr.DataDirectory[ImageDirectoryEntryIAT].Size := W.Pos() - ofs;
+				optHdr.DataDirectory[ImageDirectoryEntryIAT].Size := TODO(W.Pos() - ofs);
 				mod := imports; i := 0;
 				WHILE mod # NIL DO
 					obj := mod.objs; j := 0;
@@ -1305,23 +1305,23 @@ ASSERT(code.data[offset-1] # 0E8X);
 				dir.AddressOfNameOrdinals := 0;
 				W := edata.W; W.SetPos(0);
 				WriteImageExportDirectory(W, dir);
-				dir.AddressOfFunctions := base + W.Pos();
+				dir.AddressOfFunctions := base + TODO(W.Pos());
 				e := exports;
 				WHILE e # NIL DO
 					W.RawLInt(e.sect.head.VirtualAddress + e.ofs);
 					e := e.next
 				END;
-				dir.AddressOfNames := base + W.Pos();
+				dir.AddressOfNames := base + TODO(W.Pos());
 				fix := W.Pos(); i := 0;
 				WHILE i < n DO
 					W.RawLInt(0); INC(i)
 				END;
-				dir.AddressOfNameOrdinals := base + W.Pos();
+				dir.AddressOfNameOrdinals := base + TODO(W.Pos());
 				i := 0;
 				WHILE i < n DO
 					W.RawInt(SHORT(i)); INC(i)
 				END;
-				dir.Name := base + W.Pos();
+				dir.Name := base + TODO(W.Pos());
 				PutName(W, name);
 				e := exports;
 				WHILE e # NIL DO
@@ -1391,7 +1391,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				WHILE sect # NIL DO
 					r := sect.relocs;
 					WHILE r # NIL DO
-						x := sect.head.VirtualAddress + r.ofs;
+						x := sect.head.VirtualAddress + TODO(r.ofs);
 						ASSERT(x > bak);
 						IF x >= (blockva+PageSize) THEN
 							IF blockfix >= 0 THEN EndBlock(W, blockfix, blocksize) END;
@@ -1430,9 +1430,9 @@ KernelLog.String("PCOFPE "); KernelLog.String(file);
 				F := Files.New(file);
 				Files.OpenWriter(W, F, 0);
 				W.RawInt(ImageDosSignature);
-				i := W.Pos(); WHILE i < 60 DO W.Char(0X); INC(i) END;
+				i := TODO(W.Pos()); WHILE i < 60 DO W.Char(0X); INC(i) END;
 				W.RawLInt(128);
-				i := W.Pos(); WHILE i < 128 DO W.Char(0X); INC(i) END;
+				i := TODO(W.Pos()); WHILE i < 128 DO W.Char(0X); INC(i) END;
 				size := 128 + 4 + SIZEOF(ImageFileHeader) + SIZEOF(ImageOptionalHeader) + SELF.fileHdr.NumberOfSections*SIZEOF(ImageSectionHeader);
 				size := Align(size, DefaultFileAlign);
 				SELF.optHdr.SizeOfHeaders := size;
@@ -1467,7 +1467,7 @@ KernelLog.String("PCOFPE "); KernelLog.String(file);
 					WriteImageSectionHeader(W, sect.head);
 					sect := sect.next
 				END;
-				i := W.Pos(); WHILE i < SELF.optHdr.SizeOfHeaders DO W.Char(0X); INC(i) END;
+				i := TODO(W.Pos()); WHILE i < SELF.optHdr.SizeOfHeaders DO W.Char(0X); INC(i) END;
 				sect := SELF.sects;
 				WHILE sect # NIL DO
 					IF sect.head.SizeOfRawData > 0 THEN

@@ -245,7 +245,7 @@ TYPE
 		PROCEDURE WriteContent(w : Streams.Writer);
 		VAR i : LONGINT;
 		BEGIN
-			filepos := w.Pos();
+			filepos := w.Pos()(LONGINT);
 			w.Int(id, 0); w.String(" "); w.Int(generation, 0); w.String(" obj"); w.Ln;
 			FOR i := 0 TO content.nof - 1 DO
 				content.data[i].Write(w); w.Ln;

@@ -309,7 +309,7 @@ TYPE
 		BEGIN
 			FOR i := 0 TO nextMarker-1 DO
 				markerPositions[i].marker := tv.CreatePositionMarker();
-				markerPositions[i].marker.SetPosition(markerPositions[i].pos);
+				markerPositions[i].marker.SetPosition(TODO(markerPositions[i].pos));
 				markerPositions[i].marker.SetVisible(FALSE);
 				markerPositions[i].marker.Load("DecoderRes.zip://VariablePositionIcon.png")
 			END;
@@ -860,7 +860,7 @@ TYPE
 					opStart := opcodes.offset;
 					opEnd := opStart + opcodes.length - 1;
 					IF (markPC >= opStart) &	(markPC <= opEnd) THEN
-						pcPos := w.Pos() + LONGINT((markPC-opStart)*3); (* text position within opcode bytes *)
+						pcPos := w.Pos()(TODO) + LONGINT((markPC-opStart)*3); (* text position within opcode bytes *)
 					END
 				END;
 				opcodes.PrintOpcodeBytes(w); w.Char(9X);

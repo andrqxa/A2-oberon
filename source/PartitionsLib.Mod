@@ -1654,7 +1654,7 @@ TYPE
 		BEGIN
 			f := Files.Old(filename);
 			IF f # NIL THEN
-				num := (f.Length() + blocksize - 1) DIV blocksize;
+				num := (f.Length()(LONGINT) + blocksize - 1) DIV blocksize;
 				IF numblocks > num THEN
 					numblocks := num;
 					info.String("Warning: Specified number of blocks is bigger than image file size. Set numblocks to "); info.Int(numblocks, 0); info.Ln;
@@ -1891,7 +1891,7 @@ TYPE
 				IF res = AosDisks.Ok THEN
 					f := Files.Old(bootName);
 					IF (f # NIL) OR (fsRes # -1) THEN
-						IF fsRes = -1 THEN fsRes := (f.Length()+BS-1) DIV BS;
+						IF fsRes = -1 THEN fsRes := (f.Length()(LONGINT)+BS-1) DIV BS;
 						ELSIF fsRes = -2 THEN fsRes := FSRes;
 						ELSE fsRes := fsRes * 1024 DIV BS;
 						END;
@@ -2022,14 +2022,14 @@ TYPE
 			IF disk.gres = AosDisks.Ok THEN
 				f := Files.Old(BootLoaderName);  NEW(r, f, 0);
 				ASSERT((f # NIL) & (f.Length() <= BootLoaderSize*BS));	(* assume boot file is present and small enough *)
-				len := f.Length();
+				len := f.Length()(SIZE);
 				r.Bytes(buf, 0, BootLoaderSize*BS, len);
 				ASSERT(r.res = 0);
 				ASSERT(Get4(buf, 1F8H) = FSIDOBL); (* new OBL.Bin *)
 				(* get parameters from boot loader *)
 				rsize := Get2(buf, 0EH); tsize := ORD(buf[10H]);
 				ASSERT((rsize-tsize)*BS = f.Length()); (* check boot loader size *)
-				lsize := f.Length() DIV BS;
+				lsize := f.Length()(LONGINT) DIV BS;
 				ASSERT(lsize = BootLoaderSize);
 				(* set parameters in boot loader *)
 				IF (disk.size > DisketteLimit) THEN (* Windows 2000 workaround *)
@@ -2233,15 +2233,15 @@ TYPE
 			IF res = AosDisks.Ok THEN
 				NEW(r, f, 0);
 				ASSERT((f # NIL) & (f.Length() <= BootLoaderSize*BS)); (* assume boot file is present and small enough *)
-				r.Bytes(bnew, 0, f.Length(), len);
+				r.Bytes(bnew, 0, f.Length()(SIZE), len);
 				ASSERT(r.res = 0);
-				lsize := f.Length() DIV BS;
+				lsize := f.Length()(LONGINT) DIV BS;
 				disk.device.Transfer(AosDisks.Read, disk.device.table[partition].start, lsize, b, 0, res);
 				ASSERT(Get4(b, 1F8H) = FSID); (* OBL.Bin signature 'AOS!' *)
 				(* get parameters from boot loader *)
 				rsize := Get2(b, 0EH); tsize := ORD(b[10H]);
 				ASSERT((rsize-tsize)*BS = f.Length()); (* check boot loader size *)
-				lsize := f.Length() DIV BS;
+				lsize := f.Length()(LONGINT) DIV BS;
 				ASSERT(lsize = BootLoaderSize);
 				(* set parameters in boot loader *)
 				FOR i := 0H TO 2H DO b[i] := bnew[i] END;
@@ -3594,7 +3594,7 @@ TYPE
 				RETURN;
 			END;
 
-			nofSectors := f.Length() DIV BS;
+			nofSectors := f.Length()(LONGINT) DIV BS;
 			IF (nofSectors > 20) THEN
 				ReportError("Boot manager file is too large. Wrong file?");
 				RETURN;
@@ -3714,7 +3714,7 @@ CONST Size = 32;
 VAR buf: ARRAY Size*BS OF CHAR; r: Files.Rider; n, num: SIZE;
 BEGIN
 	ASSERT(dev.blockSize = BS);
-	f.Set(r, 0); num := (f.Length()+BS-1) DIV BS; sum := 0;
+	f.Set(r, 0); num := (f.Length()(SIZE)+BS-1) DIV BS; sum := 0;
 	LOOP
 		IF num <= 0 THEN EXIT END;
 		f.ReadBytes(r, buf, 0, Size*BS);
@@ -3734,7 +3734,7 @@ CONST Size = 32;
 VAR buf1, buf2: ARRAY Size*BS OF CHAR; r: Files.Rider; n, num, i: SIZE;
 BEGIN
 	ASSERT(dev.blockSize = BS);
-	f.Set(r, 0); num := (f.Length()+BS-1) DIV BS;
+	f.Set(r, 0); num := (f.Length()(SIZE)+BS-1) DIV BS;
 	LOOP
 		IF num <= 0 THEN EXIT END;
 		f.ReadBytes(r, buf1, 0, Size*BS);
@@ -3776,7 +3776,7 @@ BEGIN
 				IF res = AosDisks.Ok THEN
 					Put4(data, 0, LoadAdr); Put4(data, 4, Frags + ASH(sum, 16));
 					Put4(data, 8, StartAdr); Put4(data, 12, 0); (* pos relative to start *)
-					Put4(data, 16, (f.Length()+BS-1) DIV BS);
+					Put4(data, 16, (f.Length()(LONGINT)+BS-1) DIV BS);
 					config.AddEntry(Frag, LEN(data), data);
 					config.PutTable(dev, part, res)
 				END
@@ -4126,7 +4126,7 @@ BEGIN
 	IF context.arg.GetString(fileName) THEN
 		file := Files.Old(fileName);
 		IF file # NIL THEN
-			BootLoaderSize := (file.Length()-1) DIV BS + 1;
+			BootLoaderSize := (file.Length()(LONGINT)-1) DIV BS + 1;
 			COPY(fileName, BootLoaderName);
 			context.out.String("PartitionsLib.BootLoaderName = "); context.out.String(BootLoaderName); context.out.Ln;
 			context.out.String("PartitionsLib.BootLoaderSize ="); context.out.Int(BootLoaderSize,1);context.out.Ln;

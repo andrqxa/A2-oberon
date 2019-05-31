@@ -644,7 +644,7 @@ TYPE
 			dummy: LONGINT; result: WORD;
 
 		BEGIN
-			input.SetPosX(Codecs.SeekByte, pos, dummy, result);
+			input.SetPosX(Codecs.SeekByte, TODO(pos), dummy, result);
 			first := 0;
 			last := -1;
 			bitIndex := 0;

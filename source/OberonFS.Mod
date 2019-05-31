@@ -652,13 +652,13 @@ TYPE
 			sec: SectorTable;
 
 		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
-		VAR a, b: Files.Position;
+		VAR a, b: LONGINT;
 		BEGIN {EXCLUSIVE}
 			r.eof := FALSE; r.res := 0; r.file := SELF; r.fs := fs;
 			IF pos < 0 THEN
 				a := 0; b := HS
 			ELSIF pos < aleng*SS + bleng - HS THEN
-				a := (pos + HS) DIV SS; b := (pos + HS) MOD SS
+				a := (LONGINT(pos) + HS) DIV SS; b := (LONGINT(pos) + HS) MOD SS
 			ELSE
 				a := aleng; b := bleng
 			END;
@@ -675,16 +675,16 @@ TYPE
 		BEGIN {EXCLUSIVE}
 			ASSERT(r.file = SELF);
 			buf := r.hint(Buffer);
-			IF r.apos # buf.apos THEN buf := GetBuf(SELF, r.apos); r.hint := buf END;
+			IF LONGINT(r.apos) # buf.apos THEN buf := GetBuf(SELF, LONGINT(r.apos)); r.hint := buf END;
 			IF r.bpos < buf.lim THEN
 				x := buf.data.B[r.bpos]; INC(r.bpos)
-			ELSIF r.apos < aleng THEN
+			ELSIF LONGINT(r.apos) < aleng THEN
 				INC(r.apos);
-				buf := SearchBuf(SELF, r.apos);
+				buf := SearchBuf(SELF, LONGINT(r.apos));
 				IF buf = NIL THEN
 					buf := r.hint(Buffer);
 					IF buf.mod THEN WriteBuf(SELF, buf) END ;
-					ReadBuf(SELF, buf, r.apos)
+					ReadBuf(SELF, buf, LONGINT(r.apos))
 				ELSE
 					r.hint := buf
 				END;
@@ -701,7 +701,7 @@ TYPE
 			ASSERT(r.file = SELF);
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END ;
 			buf := r.hint(Buffer);
-			IF r.apos # buf.apos THEN buf := GetBuf(SELF, r.apos); r.hint := buf END;
+			IF LONGINT(r.apos) # buf.apos THEN buf := GetBuf(SELF, LONGINT(r.apos)); r.hint := buf END;
 			LOOP
 				IF len <= 0 THEN EXIT END ;
 				src := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + len;
@@ -710,12 +710,12 @@ TYPE
 				ELSIF buf.lim = SS THEN
 					m := buf.lim - r.bpos;
 					IF m > 0 THEN SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), m); INC(ofs, m); DEC(len, m) END ;
-					IF r.apos < aleng THEN
-						INC(r.apos); r.bpos := 0; buf := SearchBuf(SELF, r.apos);
+					IF LONGINT(r.apos) < aleng THEN
+						INC(r.apos); r.bpos := 0; buf := SearchBuf(SELF, LONGINT(r.apos));
 						IF buf = NIL THEN
 							buf := r.hint(Buffer);
 							IF buf.mod THEN WriteBuf(SELF, buf) END ;
-							ReadBuf(SELF, buf, r.apos)
+							ReadBuf(SELF, buf, LONGINT(r.apos))
 						ELSE
 							r.hint := buf
 						END
@@ -735,18 +735,18 @@ TYPE
 		BEGIN {EXCLUSIVE}
 			ASSERT(r.file = SELF);
 			buf := r.hint(Buffer);
-			IF r.apos # buf.apos THEN buf := GetBuf(SELF, r.apos); r.hint := buf END;
+			IF LONGINT(r.apos) # buf.apos THEN buf := GetBuf(SELF, LONGINT(r.apos)); r.hint := buf END;
 			IF r.bpos >= buf.lim THEN
 				IF r.bpos < SS THEN
 					INC(buf.lim); INC(bleng); modH := TRUE
 				ELSE
-					WriteBuf(SELF, buf); INC(r.apos); buf := SearchBuf(SELF, r.apos);
+					WriteBuf(SELF, buf); INC(r.apos); buf := SearchBuf(SELF, LONGINT(r.apos));
 					IF buf = NIL THEN
 						buf := r.hint(Buffer);
-						IF r.apos <= aleng THEN
-							ReadBuf(SELF, buf, r.apos)
+						IF LONGINT(r.apos) <= aleng THEN
+							ReadBuf(SELF, buf, LONGINT(r.apos))
 						ELSE
-							buf.apos := r.apos; buf.lim := 1; INC(aleng); bleng := 1; modH := TRUE;
+							buf.apos := LONGINT(r.apos); buf.lim := 1; INC(aleng); bleng := 1; modH := TRUE;
 							IF (aleng - STS) MOD XS = 0 THEN NewExt(SELF) END
 						END
 					ELSE
@@ -764,7 +764,7 @@ TYPE
 			ASSERT(r.file = SELF);
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
 			buf := r.hint(Buffer);
-			IF r.apos # buf.apos THEN buf := GetBuf(SELF, r.apos); r.hint := buf END;
+			IF LONGINT(r.apos) # buf.apos THEN buf := GetBuf(SELF, LONGINT(r.apos)); r.hint := buf END;
 			LOOP
 				IF len <= 0 THEN EXIT END;
 				buf.mod := TRUE; dst := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + len;
@@ -776,12 +776,12 @@ TYPE
 				ELSE
 					m := SS - r.bpos;
 					IF m > 0 THEN SYSTEM.MOVE(ADDRESSOF(x[ofs]), dst, m); INC(ofs, m); DEC(len, m) END;
-					WriteBuf(SELF, buf); INC(r.apos); r.bpos := 0; buf := SearchBuf(SELF, r.apos);
+					WriteBuf(SELF, buf); INC(r.apos); r.bpos := 0; buf := SearchBuf(SELF, LONGINT(r.apos));
 					IF buf = NIL THEN
 						buf := r.hint(Buffer);
-						IF r.apos <= aleng THEN ReadBuf(SELF, buf, r.apos)
+						IF LONGINT(r.apos) <= aleng THEN ReadBuf(SELF, buf, LONGINT(r.apos))
 						ELSE
-							buf.apos := r.apos; buf.lim := 0; INC(aleng); bleng := 0; modH := TRUE;
+							buf.apos := LONGINT(r.apos); buf.lim := 0; INC(aleng); bleng := 0; modH := TRUE;
 							IF (aleng - STS) MOD XS = 0 THEN NewExt(SELF) END
 						END
 					ELSE

@@ -93,9 +93,9 @@ TYPE
 				IF (p # NIL) & (p IS XML.Element) THEN
 					IF editor # NIL THEN
 						text.AcquireRead;
-						editor.tv.cursor.SetPosition(p(XML.Element).GetPos());
+						editor.tv.cursor.SetPosition(TODO(p(XML.Element).GetPos()));
 						editor.tv.cursor.SetVisible(TRUE);
-						editor.tv.FindCommand(p(XML.Element).GetPos()-1, a, b);
+						editor.tv.FindCommand(TODO(p(XML.Element).GetPos())-1, a, b);
 						IF highlight # NIL THEN highlight.SetFromTo(a, b) END;
 						text.ReleaseRead;
 					END

@@ -374,7 +374,7 @@ BEGIN
 		res := Zip.BadName
 	ELSE
 		f.Set(r, 0);
-		Zip.AddEntry(arc, dstname, r, f.Length(), SHORT(SHORT(level)), SHORT(SHORT(strategy)), res);
+		Zip.AddEntry(arc, dstname, r, TODO(f.Length()), SHORT(SHORT(level)), SHORT(SHORT(strategy)), res);
 	END;
 END AddFile;
 

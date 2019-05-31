@@ -355,7 +355,7 @@ TYPE
 				IF (par.mask = "") OR Strings.Match(par.mask, name) THEN
 					Strings.Concat(par.path, file.long, name);
 					IF (faDirectory IN file.attr) THEN len := 0; flags := { Files.Directory }
-					ELSE len := file.Length(); flags := {}
+					ELSE len := TODO(file.Length()); flags := {}
 					END;
 					par.enum.PutEntry(name, flags, file.writeTime, file.writeDate, len)
 				END;
@@ -649,8 +649,8 @@ TYPE
 			IF (pos < 0) THEN pos := 0
 			ELSIF (pos > size) THEN pos := size
 			END;
-			r.apos := pos DIV clusterSize;
-			r.bpos := pos MOD clusterSize;
+			r.apos := LONGINT(pos) DIV clusterSize;
+			r.bpos := LONGINT(pos) MOD clusterSize;
 			IF (buffer = NIL) THEN
 				NEW(buffer); NEW(buffer.data, clusterSize);
 				buffer.pos := NotAssigned;
@@ -771,7 +771,7 @@ TYPE
 		PROCEDURE ReadX(VAR r: Files.Rider; VAR x: CHAR);
 		BEGIN
 			IF (r.apos*clusterSize + r.bpos < size) THEN
-				IF (buffer.pos # r.apos) THEN ReadBuffer(buffer, r.apos) END;
+				IF (buffer.pos # LONGINT(r.apos)) THEN ReadBuffer(buffer, LONGINT(r.apos)) END;
 				x := buffer.data[r.bpos];
 				INC(r.bpos);
 				IF (r.bpos = clusterSize) THEN INC(r.apos); r.bpos := 0 END
@@ -792,9 +792,9 @@ TYPE
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
 			IF len > 0 THEN
 				WHILE (len > 0) & (Pos(r) < size) DO
-					IF (buffer.pos # r.apos) THEN ReadBuffer(buffer, r.apos) END;
+					IF (buffer.pos # LONGINT(r.apos)) THEN ReadBuffer(buffer, LONGINT(r.apos)) END;
 					src := ADDRESSOF(buffer.data[r.bpos]);
-					m := MIN(MIN(size - Pos(r), clusterSize - r.bpos), len);
+					m := MIN(MIN(size - LONGINT(Pos(r)), clusterSize - r.bpos), len);
 					SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), m);
 					INC(ofs, m); DEC(len, m);
 					INC(r.bpos, TODO(m)); ASSERT(r.bpos <= clusterSize);
@@ -814,12 +814,12 @@ TYPE
 		PROCEDURE WriteX(VAR r: Files.Rider; x: CHAR);
 		BEGIN
 			IF (attr * WriteProtected # {}) THEN HALT(ErrFileReadOnly) END;
-			IF (buffer.pos # r.apos) THEN ReadBuffer(buffer, r.apos) END;
+			IF (buffer.pos # LONGINT(r.apos)) THEN ReadBuffer(buffer, LONGINT(r.apos)) END;
 			buffer.data[r.bpos] := x;
 			INC(r.bpos);
 			IF (r.bpos = clusterSize) THEN INC(r.apos); r.bpos := 0 END;
 			IF (Pos(r) > size) THEN
-				ASSERT(Pos(r) = size+1); size := Pos(r);
+				ASSERT(LONGINT(Pos(r)) = size+1); size := LONGINT(Pos(r));
 				IF ~(SELF IS Directory) THEN modH := TRUE END
 			END;
 			WriteBuffer(buffer)
@@ -837,7 +837,7 @@ TYPE
 			IF LEN(x)-ofs < len THEN SYSTEM.HALT(19) END;
 			IF len > 0 THEN
 				WHILE (len > 0) DO
-					IF (buffer.pos # r.apos) THEN ReadBuffer(buffer, r.apos) END;
+					IF (buffer.pos # LONGINT(r.apos)) THEN ReadBuffer(buffer, LONGINT(r.apos)) END;
 					dst := ADDRESSOF(buffer.data[r.bpos]);
 					m := MIN(clusterSize-r.bpos, len);
 					SYSTEM.MOVE(ADDRESSOF(x[ofs]), dst, m);
@@ -846,8 +846,8 @@ TYPE
 					INC(r.bpos, m); ASSERT(r.bpos <= clusterSize);
 					IF (r.bpos = clusterSize) THEN INC(r.apos); r.bpos := 0 END;
 				END;
-				IF (Pos(r) > size) THEN
-					size := Pos(r);
+				IF (LONGINT(Pos(r)) > size) THEN
+					size := LONGINT(Pos(r));
 					IF ~(SELF IS Directory) THEN modH := TRUE END
 				END
 			END
@@ -1133,11 +1133,11 @@ TYPE
 			REPEAT
 				ReadBytesX(r, data, 0, 32);
 				IF (data[0] = deFree) THEN (* free entry *)
-					IF (Pos(r) < firstFreePos) THEN firstFreePos := Pos(r)-32 END
+					IF (Pos(r) < firstFreePos) THEN firstFreePos := LONGINT(Pos(r))-32 END
 				ELSIF (data[0] # deLast) THEN (* long/short directory entry *)
 					type := FATVolumes.AND(3FH, ORD(data[11]));
 					longname := "";
-					entry.ofs := Pos(r) - 32; entry.len := 1;
+					entry.ofs := LONGINT(Pos(r)) - 32; entry.len := 1;
 					IF (type = faLongName) THEN
 						k := -1;
 						IF parseLong & (FATVolumes.AND(40H, ORD(data[0])) = 40H) THEN
@@ -1201,7 +1201,7 @@ TYPE
 
 								IF (longname # "") & (chksumI # chksumII) THEN (* chksum mismatch, ignore long name *)
 									IF (entry.ofs < firstFreePos) THEN firstFreePos := entry.ofs END;
-									longname := ""; f.entry.ofs := Pos(r) - 32; f.entry.len := 1
+									longname := ""; f.entry.ofs := LONGINT(Pos(r)) - 32; f.entry.len := 1
 								ELSE f.long := longname; f.entry := entry
 								END;
 								IF (f.long = "") THEN
@@ -1225,7 +1225,7 @@ TYPE
 					END
 				END
 			UNTIL (data[0] = deLast) OR r.eof OR ~cont;
-			IF (firstFreePos = MAX(LONGINT)) THEN firstFreePos := MAX(Pos(r)-32, 0) END;
+			IF (firstFreePos = MAX(LONGINT)) THEN firstFreePos := MAX(LONGINT(Pos(r))-32, 0) END;
 			ASSERT(firstFreePos MOD 32 = 0)
 		END EnumerateX;
 
@@ -1501,7 +1501,7 @@ TYPE
 			END;
 
 			(* create short entry *)
-			IF (faDirectory IN f.attr) THEN s := 0 ELSE s := f.Length() END;
+			IF (faDirectory IN f.attr) THEN s := 0 ELSE s := TODO(f.Length()) END;
 			GetShortEntry(data, f.short, f.attr, f.NTres, f.cluster, s, f.time, f.date, f.writeTime, f.writeDate, f.accessDate);
 
 			(* wp: Pos(r) = position of short entry *)

@@ -596,7 +596,7 @@ TYPE
 					newInfo.external := FALSE;
 					newInfo.modulename := "";
 					NEW(newInfo.pos, editor.text);
-					newInfo.pos.SetPosition(infoItem.pos);
+					newInfo.pos.SetPosition(TODO(infoItem.pos));
 				ELSE
 					newInfo.external := TRUE;
 					newInfo.pos := NIL;
@@ -690,7 +690,7 @@ TYPE
 			node := NewNode(root, Strings.NewString("BODY"));
 			info := GetTextInfo(pnode, NIL, FALSE, SortBody, GetColor(modifiers, treeView.clTextDefault.Get()), {});
 			NEW(info.pos, editor.text);
-			info.pos.SetPosition(pos);
+			info.pos.SetPosition(TODO(pos));
 			INCL(info.flags, PosValid);
 			tree.SetNodeData(node, info);
 		END AddBody;

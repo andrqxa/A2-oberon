@@ -152,7 +152,7 @@ BEGIN
 		UNTIL (w.res # Ok) OR (totWritten >= srclen);
 		Close(w);
 		crc32 := w.crc32;
-		dstlen := w.r.file.Pos(w.r) - dst.file.Pos(dst);
+		dstlen := (w.r.file.Pos(w.r) - dst.file.Pos(dst))(LONGINT);
 	END;
 	res := w.res
 END Compress;

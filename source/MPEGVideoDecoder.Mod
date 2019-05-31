@@ -486,8 +486,8 @@ TYPE
 			stream.SkipBits(32);
 			IF ~ParseSequenceHeader() THEN RETURN END;
 
-			lastIntraPos := stream.Pos();
-			lastFramePos := stream.Pos();
+			lastIntraPos := TODO(stream.Pos());
+			lastFramePos := TODO(stream.Pos());
 
 			(* to be sure, we need to decode the last 2 i-frames. consider (decoding!) order IBBPBBIB *)
 			FOR i := 0 TO frame DO
@@ -511,7 +511,7 @@ TYPE
 						END;
 					END;
 				END;
-				lastFramePos := stream.Pos();
+				lastFramePos := TODO(stream.Pos());
 			END;
 
 			(* jump to the second last I-frame *)
@@ -1970,7 +1970,7 @@ TYPE
 			IF ~ReadSystemHeader() THEN RETURN END;
 
 			(* search for some more streams *)
-			oldPos := input.Pos();
+			oldPos := TODO(input.Pos());
 			FOR i := 0 TO 20 DO
 				(* read chunk header *)
 				IF ~GotoNextStartCode() THEN HALT(1234) END;
@@ -2214,7 +2214,7 @@ TYPE
 			ELSE
 				(* copy required bytes *)
 				input.Bytes(buf, offset, size, length);
-				cur.pos := input.Pos();
+				cur.pos := TODO(input.Pos());
 				DEC(cur.bytesLeftInPacket, length);
 			END;
 		END GetData;
@@ -2258,7 +2258,7 @@ TYPE
 
 			(* skip required bytes *)
 			input.SkipBytes(size);
-			cur.pos := input.Pos();
+			cur.pos := TODO(input.Pos());
 			DEC(cur.bytesLeftInPacket, size);
 
 		END SkipData;
@@ -2347,14 +2347,14 @@ TYPE
 			END;
 
 			(* finally we reached the next data bytes of the requested stream *)
-			stream.pos := input.Pos() + 1;		(* next byte is first byte of the stream *)
+			stream.pos := TODO(input.Pos()) + 1;		(* next byte is first byte of the stream *)
 			stream.bytesLeftInPacket := length;
 			RETURN TRUE;
 		END GotoNextPacket;
 
 
 		(* seek the streamNr to position pos with seekType. itemSize contains the size of the element seeked to, if known and applicable; res = 0 if Ok, otherwise an error number *)
-		PROCEDURE SetStreamPos*(streamNr :  LONGINT; seekType : LONGINT; pos : LONGINT; VAR itemSize : LONGINT;  VAR res : WORD);
+		PROCEDURE SetStreamPos*(streamNr :  LONGINT; seekType : LONGINT; pos : Streams.Position; VAR itemSize : LONGINT;  VAR res : WORD);
 		VAR
 			cur: POINTER TO StreamType;
 			len: LONGINT;
@@ -2370,8 +2370,8 @@ TYPE
 
 			IF singleStream THEN
 				IF streamNr # 0 THEN RETURN END;
-				input.SetPos(pos);
-				streams[0].pos := pos;
+				input.SetPos(TODO(pos));
+				streams[0].pos := TODO(pos);
 				res := Codec.ResOk;
 				RETURN;
 			END;
@@ -2388,10 +2388,10 @@ TYPE
 				IF ~GotoNextPacket(cur^) THEN HALT(1234); res := Codec.ResFailed; RETURN END;
 
 				(* skip some data *)
-				SkipData(streamNr, pos, len, res);
+				SkipData(streamNr, TODO(pos), len, res);
 			ELSE
 				(* skip some data *)
-				SkipData(streamNr, pos - (cur.stream.Pos()+cur.stream.Available()), len, res);
+				SkipData(streamNr, TODO(pos) - TODO(cur.stream.Pos()+cur.stream.Available()), len, res);
 			END;
 		END SetStreamPos;
 

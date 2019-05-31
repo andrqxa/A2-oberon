@@ -133,11 +133,11 @@ TYPE
 			END;
 		END AddNodes;
 
-		PROCEDURE SetNodeInfo(node : PETTrees.TreeNode; position : LONGINT);
+		PROCEDURE SetNodeInfo(node : PETTrees.TreeNode; position : Streams.Position);
 		BEGIN
 			IF (position >= 0) THEN
 				NEW(node.pos, editor.text);
-				node.pos.SetPosition(position);
+				node.pos.SetPosition(TODO(position));
 			ELSE
 				node.pos := NIL;
 			END;

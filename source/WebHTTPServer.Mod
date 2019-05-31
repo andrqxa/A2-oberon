@@ -137,7 +137,7 @@ TYPE
 
 				IF (reply.statuscode = WebHTTP.OK) OR (reply.statuscode = WebHTTP.NotFound) THEN
 					IF (f # NIL) THEN
-						reply.contentlength := f.Length();
+						reply.contentlength := f.Length()(LONGINT);
 						WebHTTP.SendResponseHeader(reply, out);
 						IF (request.method = WebHTTP.GetM) THEN
 							Files.OpenReader(fr, f, 0);

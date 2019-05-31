@@ -881,7 +881,7 @@ TYPE
 					hasAudio := TRUE;
 					audioCanSeek := audioDecoder.CanSeek();
 					IF in IS Codecs.FileInputStream THEN (* Set the Stream Length in Bytes, needed for some Functions in some Decoders *)
-						audioDecoder.SetStreamLength(in(Codecs.FileInputStream).f.Length());
+						audioDecoder.SetStreamLength(TODO(in(Codecs.FileInputStream).f.Length()));
 					END;
 				ELSE
 					videoDecoder := Codecs.GetVideoDecoder(ext);

@@ -315,8 +315,8 @@ IMPORT
 		Files.Register(R.objF)
 	END CloseObj;
 
-	PROCEDURE RefSize*(VAR R: Rider): Files.Position;
-	BEGIN  RETURN R.ref.Pos()
+	PROCEDURE RefSize*(VAR R: Rider): LONGINT;
+	BEGIN  RETURN R.ref.Pos()(LONGINT);
 	END RefSize;
 
 

@@ -823,7 +823,7 @@ VAR
 				DEC(len);
 				writer.Char(CHR(value));
 			END;
-			INC(statSegments); INC(statSegmentsSize, writer.Pos()-pos);
+			INC(statSegments); INC(statSegmentsSize, SIZE(writer.Pos()-pos));
 		END WriteSegment;
 
 	BEGIN
@@ -842,7 +842,7 @@ VAR
 		size := section.bits.GetSize ();
 		writer.RawNum (size DIV section.unit);
 		INC(statHeaders);
-		INC(statHeadersSize, writer.Pos()-pos);
+		INC(statHeadersSize, SIZE(writer.Pos()-pos));
 
 		(* aliases *)
 		pos := writer.Pos();
@@ -851,7 +851,7 @@ VAR
 			WriteAlias (section.alias[i]);
 		END;
 		INC(statAliases, section.aliases);
-		INC(statAliasesSize, writer.Pos()-pos);
+		INC(statAliasesSize, SIZE(writer.Pos()-pos));
 
 		(* fixups *)
 		pos := writer.Pos();
@@ -859,7 +859,7 @@ VAR
 			WriteFixup (section.fixup[i]);
 		END;
 		INC(statFixups, section.fixups);
-		INC(statFixupsSize, writer.Pos()-pos);
+		INC(statFixupsSize, SIZE(writer.Pos()-pos));
 
 		(* code / data *)
 		pos := writer.Pos();
@@ -869,11 +869,11 @@ VAR
 		END;
 		writer.RawNum(0);
 		CASE section.type OF
-			InitCode:  INC(statInitSections); INC(statInitSectionsSize, writer.Pos()-pos);
-			|BodyCode: INC(statBodySections); INC(statBodySectionsSize, writer.Pos()-pos);
-			|Code: INC(statCodeSections); INC(statCodeSectionsSize, writer.Pos()-pos);
-			|Data: INC(statDataSections); INC(statDataSectionsSize, writer.Pos()-pos);
-			|Const: INC(statConstSections); INC(statConstSectionsSize, writer.Pos()-pos);
+			InitCode:  INC(statInitSections); INC(statInitSectionsSize, SIZE(writer.Pos()-pos));
+			|BodyCode: INC(statBodySections); INC(statBodySectionsSize, SIZE(writer.Pos()-pos));
+			|Code: INC(statCodeSections); INC(statCodeSectionsSize, SIZE(writer.Pos()-pos));
+			|Data: INC(statDataSections); INC(statDataSectionsSize, SIZE(writer.Pos()-pos));
+			|Const: INC(statConstSections); INC(statConstSectionsSize, SIZE(writer.Pos()-pos));
 		ELSE (* ignored *)
 		END;
 	END WriteSectionBinary;
@@ -1058,7 +1058,7 @@ VAR
 		ELSE
 			WriteSectionTextual(writer,section)
 		END;
-		INC(statSections); INC(statSectionsTotalSize, writer.Pos()-pos);
+		INC(statSections); INC(statSectionsTotalSize, SIZE(writer.Pos()-pos));
 	END WriteSection;
 
 	PROCEDURE SetFixups*(VAR section: Section; fixups: SIZE; fixup: Fixups);

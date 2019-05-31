@@ -2908,7 +2908,7 @@ TYPE
 							END;
 
 							cblkBufPos := 0;
-							partRem := partRem - (s.Pos() - startPos);
+							partRem := partRem - TODO(s.Pos() - startPos);
 
 							IF ~ok THEN
 								RETURN i;
@@ -3330,7 +3330,7 @@ TYPE
 								ok := FALSE;
 						END;
 
-						partRem := partRem - (s.Pos() - startPos);
+						partRem := partRem - TODO(s.Pos() - startPos);
 						INC(bytesSkipped, s.Pos() - startPos);
 					END;
 
@@ -4135,7 +4135,7 @@ TYPE
 							*)
 							partRem := s.Available() - 2; (* TODO: maybe s.Available() < stream length ? *)
 						ELSE
-							partRem := psot - (ePos - sPos);
+							partRem := psot - TODO(ePos - sPos);
 						END;
 						(* Set values *)
 						SELF.curTile := tileIdx;
@@ -5533,7 +5533,7 @@ TYPE
 							END;
 
 							cblkBufPos := 0;
-							partRem := partRem - (s.Pos() - startPos);
+							partRem := partRem - TODO(s.Pos() - startPos);
 						ELSE
 							(* Don't deliver code-blocks with no data *)
 							IF cblkBuf[cblkBufPos].dataLen > 0 THEN

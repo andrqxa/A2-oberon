@@ -585,7 +585,7 @@ PROCEDURE XmlSize*(doc: XML.Document): LONGINT;
 VAR counter: Streams.Writer;
 BEGIN
 	Streams.OpenWriter(counter, Dev0); doc.Write(counter, NIL, 0); counter.Update();
-	RETURN counter.sent;
+	RETURN TODO(counter.sent);
 END XmlSize;
 
 (** Collect XML namespaces from an element. No nested scopes. So hope that no namespace is redefined in

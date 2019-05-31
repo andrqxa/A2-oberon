@@ -282,7 +282,7 @@ BEGIN
 			cmds := cmd; pR := in
 		END;
 		prev := cmd;
-		R.SkipWhitespace(); p := ofs + R.Pos();
+		R.SkipWhitespace(); p := ofs + SIZE(R.Pos());
 		IF p < len THEN
 			i := p; ch := cmdline[i];
 			WHILE (ch # 0X) & (ch # "|") & (ch # "<") & (ch # ">") DO

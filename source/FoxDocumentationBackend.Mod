@@ -1494,7 +1494,7 @@ TYPE
 	PROCEDURE ToText(w: Streams.StringWriter; text: DocumentationTree.Text; elementType: ElementType);
 	VAR textElement: DocumentationTree.TextElement; s: DocumentationTree.String;
 	BEGIN
-		NEW(s,w.Pos()+1);
+		NEW(s,(w.Pos()+1)(SIZE));
 		w.Get(s^);
 		textElement := text.AppendNew(elementType);
 		textElement.SetString(s);

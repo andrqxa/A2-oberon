@@ -338,7 +338,7 @@ BEGIN
 		RETURN;
 	END;
 
-	numSectors := CalcIsoImageSectorCount(fIn.Length());
+	numSectors := CalcIsoImageSectorCount(fIn.Length()(LONGINT));
 
 	Files.Register(fOut);
 	Files.OpenWriter(out, fOut, 0);
@@ -350,11 +350,11 @@ BEGIN
 	WriteBootCatalog(out);
 	WriteIsoFSData(out);
 	Files.OpenReader(in, fIn, 0); (* open a reader on the raw input image *)
-	WriteImage(out, in, fIn.Length()); (* write the raw image *)
+	WriteImage(out, in, fIn.Length()(LONGINT)); (* write the raw image *)
 
 	out.Update;
 	fOut.Update;
-	imageSize := fOut.Length();
+	imageSize := fOut.Length()(LONGINT);
 END MakeImage;
 
 PROCEDURE Make*(context : Commands.Context);

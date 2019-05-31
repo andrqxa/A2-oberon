@@ -274,7 +274,7 @@ TYPE
 					node.external := FALSE;
 					node.modulename := moduleName;
 					NEW(node.pos, editor.text);
-					node.pos.SetPosition(infoItem.pos);
+					node.pos.SetPosition(TODO(infoItem.pos));
 				ELSE
 					node.external := TRUE;
 					node.pos := NIL;
@@ -401,7 +401,7 @@ TYPE
 			node := NewNode(root, StrBODY);
 			SetNodeInfo(node, pnode, NIL, FALSE, SortBody, GetColor(modifiers, treeView.clTextDefault.Get()), {});
 			NEW(node.pos, editor.text);
-			node.pos.SetPosition(pos);
+			node.pos.SetPosition(TODO(pos));
 		END AddBody;
 
 		PROCEDURE AddImportList(parent: WMTrees.TreeNode; importList: ModuleParser.Import; showImportedModules : BOOLEAN);

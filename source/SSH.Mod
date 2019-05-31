@@ -671,9 +671,9 @@ TYPE
 	PROCEDURE SendFile( f: Files.File;  chan: Channel;  CONST name: ARRAY OF CHAR );
 	VAR
 		buf: ARRAY 10000 OF CHAR;
-		flen, sent: SIZE;
+		flen: Files.Size;
 		lbuf: ARRAY 16 OF CHAR;
-		r: Files.Reader;  i, j: SIZE;
+		r: Files.Reader; i, j, sent: SIZE;
 	BEGIN
 		flen := f.Length( );  Strings.IntToStr( flen, lbuf );
 		buf := "C0644 "; Strings.Append( buf, lbuf );  Strings.Append( buf, " " );  Strings.Append( buf, name );

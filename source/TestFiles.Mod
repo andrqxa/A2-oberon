@@ -684,7 +684,7 @@ BEGIN
 	IF (file # NIL) THEN
 		NEW(random);
 		random.InitSeed(seed);
-		length0 := file.Length();
+		length0 := TODO(file.Length());
 		run := 0;
 		lastChar := 0X; lastPosition := 0; lastPercent := 0;
 		context.out.String("0% "); context.out.Update;

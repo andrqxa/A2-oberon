@@ -207,7 +207,7 @@ TYPE
 			NEW(e);
 			e.SetName(name);
 			e.SetSize(size);
-			e.pos := archive.file.Length();
+			e.pos := TODO(archive.file.Length());
 			e.CalculateCheckSum();
 			archive.AddEntryNode(e);
 			Files.OpenWriter(w, archive.file, e.pos);
@@ -588,7 +588,7 @@ TYPE
 	BEGIN
 		Files.OpenReader(in, from, 0);
 		Files.OpenWriter(out, to, 0);
-		TransferBytes(in, out, from.Length());
+		TransferBytes(in, out, TODO(from.Length()));
 		out.Update
 	END CopyFiles;
 
@@ -699,7 +699,7 @@ TYPE
 		WHILE context.arg.GetString(fn) DO
 			f := Files.Old(fn);
 			IF f # NIL THEN
-				Files.OpenReader(r, f, 0); size := f.Length();
+				Files.OpenReader(r, f, 0); size := TODO(f.Length());
 				NEW(hdr); COPY(fn, hdr.name);
 				IntToOctStr(size, hdr.size);
 				CalcCheckSum(hdr);

@@ -195,8 +195,8 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 			BEGIN {EXCLUSIVE}
 				r.res := 0;
 				IF (r.apos < len) THEN
-					buf := GetBuf(r.apos, r.hint(Buffer));
-					x := buf.data[r.apos-buf.pos];
+					buf := GetBuf(LONGINT(r.apos), r.hint(Buffer));
+					x := buf.data[LONGINT(r.apos)-buf.pos];
 					INC(r.apos)
 				ELSE
 					x := 0X; r.eof := TRUE
@@ -209,11 +209,11 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				IF LEN(x) < len THEN SYSTEM.HALT(19) END;
 				IF len <= 0 THEN RETURN END;
 				buf := r.hint(Buffer);
-				m := SELF.len - r.apos;
+				m := SELF.len - LONGINT(r.apos);
 				IF len <= m THEN r.res := 0 ELSE r.eof := TRUE; r.res := len-m; len := m END;
 				WHILE len > 0 DO
-					buf := GetBuf(r.apos, buf);
-					pos := r.apos - buf.pos;
+					buf := GetBuf(LONGINT(r.apos), buf);
+					pos := LONGINT(r.apos) - buf.pos;
 					src := ADDRESSOF(buf.data[pos]);  m := buf.lim-pos;
 					IF m > len THEN m := len END;
 					SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), m);
@@ -406,7 +406,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 		f := R.file(File); fs := R.fs(FileSystem);
 		found := FALSE;
 		LOOP
-			pos := R.file.Pos(R);
+			pos := TODO(R.file.Pos(R));
 			IF debug THEN LogString("MatchFile; pos: "); LogInt(pos); LogLn END;
 			R.file.Read(R, buf[0]); entryLen := ORD(buf[0]);
 			IF debug THEN LogString("MatchFile; entryLen: "); LogInt(entryLen); LogLn END;
@@ -419,7 +419,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				GetDir(buf, fname, time, date, cl, len, attr);
 				found := Strings.Match(name, fname);
 			ELSE (* Directory entries may not cross sectors. Skip padding bytes *)
-				padding := SS - (R.file.Pos(R) MOD SS);
+				padding := SS - (TODO(R.file.Pos(R)) MOD SS);
 				IF (padding > 0) & (padding <= 256) THEN
 					IF debug THEN LogString("MatchFile; skip padding: "); LogInt(padding); LogLn; END;
 					R.file.ReadBytes(R, buf, 0, padding); (* Skip padding *)

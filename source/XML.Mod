@@ -19,7 +19,7 @@ TYPE
 
 	Content* = OBJECT
 	VAR
-		pos: LONGINT;
+		pos: Streams.Position;
 		previous, next : Content;
 
 		PROCEDURE &Init*;
@@ -28,12 +28,12 @@ TYPE
 			previous := NIL; next := NIL;
 		END Init;
 
-		PROCEDURE GetPos*(): LONGINT;
+		PROCEDURE GetPos*(): Streams.Position;
 		BEGIN
 			RETURN pos
 		END GetPos;
 
-		PROCEDURE SetPos*(pos : LONGINT);
+		PROCEDURE SetPos*(pos : Streams.Position);
 		BEGIN
 			SELF.pos := pos
 		END SetPos;

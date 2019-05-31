@@ -316,7 +316,7 @@ TYPE
 					IF (type = ASCII) THEN ASCIITransfer(r, w)
 					ELSE BinaryTransfer(r, w)
 					END;
-					IncreaseSent(f.Length());
+					IncreaseSent(f.Length()(LONGINT));
 					SendMessage(226, "Transfer complete.")
 				END;
 
@@ -324,7 +324,7 @@ TYPE
 			END
 		END Retrieve;
 
-		PROCEDURE Store(name: ARRAY OF CHAR; marker: LONGINT);
+		PROCEDURE Store(name: ARRAY OF CHAR; marker: Files.Position);
 		VAR data: TCP.Connection; r: Streams.Reader; f: Files.File; w: Files.Writer;
 			filename, msg: ARRAY dirLen OF CHAR; res: WORD;
 		BEGIN
@@ -372,7 +372,7 @@ TYPE
 					ELSE BinaryTransfer(r, w)
 					END;
 					f.Update();
-					IncreaseReceived(f.Length());
+					IncreaseReceived(f.Length()(LONGINT));
 					SendMessage(226, Msg226)
 				END;
 

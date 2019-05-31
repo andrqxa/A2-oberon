@@ -215,7 +215,7 @@ IMPORT
 			IF Debug THEN KernelLog.String("DemuxStream.SetAVIPos"); KernelLog.Ln; END;
 			r.SetPos(pos);
 			stuffByte := 0;
-			retPos := r.Pos();
+			retPos := TODO(r.Pos());
 			Reset;
 		END SetAVIPos;
 
@@ -347,7 +347,7 @@ IMPORT
 					r.RawLInt(headerLength);
 
 					headerLength := headerLength + headerLength MOD 2;
-					headerBeginPos := r.Pos();
+					headerBeginPos := TODO(r.Pos());
 					r.Bytes( buf,0,4, len );
 
 					(* Main AVI Header *)
@@ -411,7 +411,7 @@ IMPORT
 						END;
 					ELSIF CompareCharArrays(buf, "movi",4) THEN
 						(* movie data begin, including movi Tag *)
-						movieBeginPos := r.Pos()-4;
+						movieBeginPos := TODO(r.Pos())-4;
 
 						(* this could be improved... *)
 						r.SetPos(headerLength+movieBeginPos);			(* headerLength); *)
@@ -422,7 +422,7 @@ IMPORT
 							(* There is an index *)
 
 							(* Start of Index including idx1 Tag *)
-							indexStart := r.Pos()-4;
+							indexStart := TODO(r.Pos())-4;
 							ReadIndex();
 							IF Debug THEN
 								KernelLog.String("AVIDemux: Start of movie stream found " ); KernelLog.Ln()
@@ -438,7 +438,7 @@ IMPORT
 						IF Debug THEN
 							KernelLog.String("AVIDemux: Unknown StreamHeader found: " ); KernelLog.String(buf); KernelLog.Ln()
 						END;
-						r.SkipBytes( headerLength - ( r.Pos() - headerBeginPos ) )
+						r.SkipBytes( headerLength - ( TODO(r.Pos()) - headerBeginPos ) )
 					END;
 				ELSE
 					(* Unknown Header -> Skip *)
@@ -485,7 +485,7 @@ IMPORT
 				IF CompareCharArrays(buf, videoStreamHeader.streamIdentifier, 3) THEN
 					i := i+1;
 					(* Not shure, wether this is necessary - but everything works fine with it *)
-					indexStart := r.Pos()-4;
+					indexStart := TODO(r.Pos())-4;
 					EXIT;
 				END;
 				IF i >= nidx THEN
@@ -618,7 +618,7 @@ IMPORT
 			NEW( aviHeader );
 
 			r.RawLInt(headerLength);
-			startPos := r.Pos();
+			startPos := TODO(r.Pos());
 
 			r.RawLInt( aviHeader.microSecsPerFrame );
 			r.RawLInt( aviHeader.maxBytesPerSec );
@@ -637,7 +637,7 @@ IMPORT
 
 			(* Skip Bytes if we have still available *)
 			IF r.Pos() - startPos < headerLength THEN
-				r.SkipBytes( headerLength - ( r.Pos() - startPos ) )
+				r.SkipBytes( headerLength - ( TODO(r.Pos()) - startPos ) )
 			END;
 
 			RETURN aviHeader;
@@ -655,7 +655,7 @@ IMPORT
 			NEW(header);
 
 			r.RawLInt(headerLength);
-			startPos := r.Pos();
+			startPos := TODO(r.Pos());
 
 			r.Bytes( header.fccType,0,4, len );
 			r.Bytes( header.fccHandler,0,4, len );
@@ -676,7 +676,7 @@ IMPORT
 
 			(* Skio Bytes if we have still available *)
 			IF r.Pos() - startPos < headerLength THEN
-				r.SkipBytes( headerLength - ( r.Pos() - startPos ) )
+				r.SkipBytes( headerLength - ( TODO(r.Pos()) - startPos ) )
 			END;
 
 			RETURN header
@@ -693,7 +693,7 @@ IMPORT
 			NEW(header);
 
 			r.RawLInt(headerLength);
-			startPos := r.Pos();
+			startPos := TODO(r.Pos());
 
 			r.RawLInt( header.size );
 			r.RawLInt( header.width );
@@ -708,7 +708,7 @@ IMPORT
 			r.RawLInt( header.clrImportant );
 
 			IF r.Pos() - startPos < headerLength THEN
-				r.SkipBytes( headerLength - ( r.Pos() - startPos ) )
+				r.SkipBytes( headerLength - ( TODO(r.Pos()) - startPos ) )
 			END;
 
 			RETURN header
@@ -725,7 +725,7 @@ IMPORT
 			NEW(header);
 
 			r.RawLInt(headerLength);
-			startPos := r.Pos();
+			startPos := TODO(r.Pos());
 
 			r.RawInt( temp ); header.formatTag := temp;
 			r.RawInt( temp ); header.channels := temp;
@@ -736,7 +736,7 @@ IMPORT
 			r.RawInt( temp ); header.cbSize := temp;
 
 			IF r.Pos() - startPos < headerLength THEN
-				r.SkipBytes( headerLength - ( r.Pos() - startPos ) )
+				r.SkipBytes( headerLength - ( TODO(r.Pos()) - startPos ) )
 			END;
 
 			RETURN header
@@ -1133,7 +1133,7 @@ IMPORT
 			END;
 		END GetData;
 
-		PROCEDURE SetStreamPos*(streamNr: LONGINT; seekType: LONGINT; pos: LONGINT; VAR itemSize: LONGINT; VAR res: WORD);
+		PROCEDURE SetStreamPos*(streamNr: LONGINT; seekType: LONGINT; pos: Streams.Position; VAR itemSize: LONGINT; VAR res: WORD);
 		(* PROCEDURE SetStreamPos*(streamNr, pos : LONGINT; VAR res: WORD); *)
 		VAR
 			n0, n1, n, spos: LONGINT;
@@ -1163,11 +1163,11 @@ IMPORT
 					IF ((seekType = Codecs.SeekFrame) OR (seekType = Codecs.SeekKeyFrame)) THEN
 						IF pos < LEN(videoIndex) THEN
 							videoStream.SetAVIPos(videoIndex[pos].offset, itemSize);
-							itemSize := pos;
-							videoFramePos := pos;
+							itemSize := TODO(pos);
+							videoFramePos := TODO(pos);
 						END
 					ELSE
-						videoStream.SetAVIPos(pos, itemSize);
+						videoStream.SetAVIPos(TODO(pos), itemSize);
 					END;
 				END;
 			ELSE
@@ -1223,7 +1223,7 @@ IMPORT
 							KernelLog.String("itemSize= "); KernelLog.Int(itemSize, 0);  KernelLog.Ln;
 						END
 					ELSE
-						audioStream.SetAVIPos(pos, itemSize);
+						audioStream.SetAVIPos(TODO(pos), itemSize);
 					END;
 				END;
 			END;

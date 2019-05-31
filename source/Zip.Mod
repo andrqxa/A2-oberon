@@ -177,7 +177,7 @@ BEGIN
 	Files.ReadLInt(r, longDummy);
 	IF longDummy = CentralFileHeaderSignature THEN
 		NEW(ent);
-		ent.offsetCentralDir := r.file.Pos(r) - 4;
+		ent.offsetCentralDir := r.file.Pos(r)(LONGINT) - 4;
 		ent.support := 0;
 		Files.ReadInt(r, intDummy);	(* version made by *)
 		Files.ReadInt(r, intDummy);	(* version needed to extract *)
@@ -254,7 +254,7 @@ END WriteLocalFileHeader;
 (* Writes file header in central directory, updates ent.offsetCentralDir *)
 PROCEDURE WriteFileHeader(ent: Entry; VAR r: Files.Rider);
 BEGIN
-	ent.offsetCentralDir := r.file.Pos(r);
+	ent.offsetCentralDir := r.file.Pos(r)(LONGINT);
 	Files.WriteLInt(r, CentralFileHeaderSignature);	(* central file header signature *)
 	Files.WriteInt(r, CompatibleVersions * 10);	(* version made by *)
 	Files.WriteInt(r, CompatibleVersions * 10);	(* version needed to extract *)
@@ -325,7 +325,7 @@ BEGIN
 		WriteFileHeader(ent, r);
 		ent := ent.next
 	END;
-	arc.offset := r.file.Pos(r);
+	arc.offset := r.file.Pos(r)(LONGINT);
 	WriteEndOfCentDir(arc, r)
 END WriteCentralDirectory;
 
@@ -361,7 +361,7 @@ BEGIN
 		ELSE
 			NEW(arc);
 			arc.file := f;
-			arc.offset := f.Pos(r) - 4;
+			arc.offset := f.Pos(r)(LONGINT) - 4;
 			Files.ReadInt(r, intDummy);	(* number of this disk *)
 			Files.ReadInt(r, intDummy);	(* number of the disk with the start of the central directory *)
 			Files.ReadInt(r, intDummy);	(* total number of entries in the central dir on this disk *)
@@ -549,9 +549,9 @@ BEGIN
 		END;
 		arc.file.Set(dst, ent.offsetLocal);
 		WriteLocalFileHeader(ent, dst);
-		ent.offsetFileData := dst.file.Pos(dst);
+		ent.offsetFileData := dst.file.Pos(dst)(LONGINT);
 		arc.file.Update();
-		start := src.file.Pos(src);
+		start := src.file.Pos(src)(LONGINT);
 		IF level = 0 THEN
 			Copy(src, dst, len, TRUE, ent.crc32);
 			ent.compSize := len;
@@ -565,7 +565,7 @@ BEGIN
 			END
 		END;
 		IF res = Ok THEN
-			ent.uncompSize := src.file.Pos(src) - start;
+			ent.uncompSize := src.file.Pos(src)(LONGINT) - start;
 			arc.file.Update();
 			arc.file.Set(dst, ent.offsetLocal + 14);
 			Files.WriteLInt(dst, ent.crc32);
