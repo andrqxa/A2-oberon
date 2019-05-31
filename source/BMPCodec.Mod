@@ -71,7 +71,7 @@ TYPE
 
 			(* color table *)
 			IF bpp < 16 THEN
-				in.SkipBytes(FileHeaderSize + size - TODO(in.Pos()));
+				in.SkipBytes(FileHeaderSize + size - in.Pos());
 				NEW(pal); col := 0; pix[Raster.a] := 0FFX;
 				WHILE col < colors DO
 					in.Char(pix[Raster.b]); in.Char(pix[Raster.g]); in.Char(pix[Raster.r]); in.Char(ch);
@@ -84,7 +84,7 @@ TYPE
 			END;
 			NEW(img);
 			(* bitmap data *)
-			in.SkipBytes(offset - TODO(in.Pos()));
+			in.SkipBytes(offset - in.Pos());
 			res := 0;
 		END Open;
 

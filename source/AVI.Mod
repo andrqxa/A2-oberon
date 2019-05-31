@@ -438,7 +438,7 @@ IMPORT
 						IF Debug THEN
 							KernelLog.String("AVIDemux: Unknown StreamHeader found: " ); KernelLog.String(buf); KernelLog.Ln()
 						END;
-						r.SkipBytes( headerLength - ( TODO(r.Pos()) - headerBeginPos ) )
+						r.SkipBytes( headerLength - ( r.Pos() - headerBeginPos ) )
 					END;
 				ELSE
 					(* Unknown Header -> Skip *)
@@ -637,7 +637,7 @@ IMPORT
 
 			(* Skip Bytes if we have still available *)
 			IF r.Pos() - startPos < headerLength THEN
-				r.SkipBytes( headerLength - ( TODO(r.Pos()) - startPos ) )
+				r.SkipBytes( headerLength - ( r.Pos() - startPos ) )
 			END;
 
 			RETURN aviHeader;
@@ -676,7 +676,7 @@ IMPORT
 
 			(* Skio Bytes if we have still available *)
 			IF r.Pos() - startPos < headerLength THEN
-				r.SkipBytes( headerLength - ( TODO(r.Pos()) - startPos ) )
+				r.SkipBytes( headerLength - ( r.Pos() - startPos ) )
 			END;
 
 			RETURN header
@@ -736,7 +736,7 @@ IMPORT
 			r.RawInt( temp ); header.cbSize := temp;
 
 			IF r.Pos() - startPos < headerLength THEN
-				r.SkipBytes( headerLength - ( TODO(r.Pos()) - startPos ) )
+				r.SkipBytes( headerLength - ( r.Pos() - startPos ) )
 			END;
 
 			RETURN header

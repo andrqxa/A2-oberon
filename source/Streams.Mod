@@ -561,7 +561,7 @@ TYPE
 		END Bytes;
 
 	(** Skip n bytes on the reader. *)
-		PROCEDURE SkipBytes*( n: SIZE );
+		PROCEDURE SkipBytes*( n: Position );
 		VAR ch: CHAR;
 		BEGIN
 			WHILE n > 0 DO ch := Get();  DEC( n ) END
