@@ -102,7 +102,7 @@ TYPE
 			ASSERT(node # NIL);
 			IF (position >= 0) THEN
 				NEW(node.pos, editor.text);
-				node.pos.SetPosition(position);
+				node.pos.SetPosition(TODO(position));
 			ELSE
 				node.pos := NIL;
 			END;

@@ -152,10 +152,10 @@ TYPE
 		PROCEDURE InitTrack;
 		BEGIN
 			padding := 0;
-			nofsecs := file.Length() DIV secsize;
+			nofsecs := TODO(file.Length()) DIV secsize;
 			IF file.Length() MOD secsize # 0 THEN
 				INC(nofsecs);
-				padding := secsize - (file.Length() MOD secsize);
+				padding := secsize - (TODO(file.Length()) MOD secsize);
 			END;
 			IF nofsecs < MinTrackSize THEN
 				INC(padding, (MinTrackSize - nofsecs) * secsize);

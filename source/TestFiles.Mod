@@ -191,7 +191,7 @@ TYPE
 		PROCEDURE Assert(r : Streams.Reader; VAR error, parseError : BOOLEAN);
 		VAR variable : ARRAY 32 OF CHAR; index : LONGINT;
 
-			PROCEDURE CheckInteger(CONST name : ARRAY OF CHAR;  variable : SIZE; r : Streams.Reader; VAR error, parseError : BOOLEAN);
+			PROCEDURE CheckInteger(CONST name : ARRAY OF CHAR;  variable : HUGEINT; r : Streams.Reader; VAR error, parseError : BOOLEAN);
 			VAR operator : ARRAY 4 OF CHAR; value : LONGINT;
 			BEGIN
 				r.SkipWhitespace; r.String(operator);

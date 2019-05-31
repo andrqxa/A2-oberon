@@ -1136,7 +1136,7 @@ TYPE
 				IF file # NIL THEN
 					INC(size, 32);
 					NEW(root);
-					root.size := file.Length();
+					root.size := TODO(file.Length());
 					root.image := image;
 					root.id := id;
 					root.bootable := bootable;

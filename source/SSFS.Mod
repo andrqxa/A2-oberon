@@ -658,13 +658,13 @@ TYPE
 
 		(** Position a Rider at a certain position in a file. Multiple Riders can be positioned at different locations in a file.
 		A Rider cannot be positioned beyond the end of a file. *)
-		PROCEDURE Set*(VAR r: Files.Rider; pos: LONGINT);
+		PROCEDURE Set*(VAR r: Files.Rider; pos: Files.Position);
 		BEGIN {EXCLUSIVE}
 			r.res := Ok; r.eof := FALSE; r.fs := fs; r.file := SELF;
 			IF (pos < 0) THEN
 				pos := 0;
 			ELSIF (pos < inode.size) THEN
-				r.apos := pos MOD BlockSize; r.bpos := pos DIV BlockSize;
+				r.apos := LONGINT(pos) MOD BlockSize; r.bpos := LONGINT(pos) DIV BlockSize;
 			ELSE (* position beyond end of file -> set to end of file *)
 				r.apos := inode.size MOD BlockSize; r.bpos := inode.size DIV BlockSize;
 			END;
@@ -672,7 +672,7 @@ TYPE
 
 		(** Return the offset of a Rider positioned on a file. *)
 
-		PROCEDURE Pos*(VAR r:  Files.Rider): LONGINT;
+		PROCEDURE Pos*(VAR r:  Files.Rider): Files.Position;
 		BEGIN {EXCLUSIVE}
 			ASSERT(r.file = SELF);
 			RETURN r.apos + BlockSize * r.bpos;
@@ -701,7 +701,7 @@ TYPE
 					fileSystem.volume.ReadBlock(inode.direct[r.bpos], dnode, res);
 					IF (res = Ok) THEN
 						(* determine the number of bytes to be read from this dnode *)
-						dataLeft := BlockSize - r.apos; (* data in this dnode starting at offset r.apos *)
+						dataLeft := BlockSize - LONGINT(r.apos); (* data in this dnode starting at offset r.apos *)
 						IF (len < dataLeft) THEN
 							nofBytes := len;
 						ELSE
@@ -709,7 +709,7 @@ TYPE
 						END;
 
 						(* check against file length *)
-						pos := r.bpos * BlockSize + r.apos;
+						pos := r.bpos * BlockSize + LONGINT(r.apos);
 						IF (pos + nofBytes > inode.size) THEN
 							nofBytes := inode.size - pos;
 							IF (nofBytes < 0) THEN nofBytes := 0; END;
@@ -720,7 +720,7 @@ TYPE
 
 						len := len - nofBytes;
 						ofs := ofs + len;
-						r.apos := (r.apos + TODO(nofBytes)) MOD BlockSize;
+						r.apos := (LONGINT(r.apos) + TODO(nofBytes)) MOD BlockSize;
 						IF (nofBytes = dataLeft) THEN
 							r.bpos := r.bpos + 1; (* rider positioned at next dnode now *)
 						END;
@@ -781,7 +781,7 @@ TYPE
 					ASSERT(blockNumber >= fileSystem.superBlock.firstDataBlock);
 
 					(* determine how much bytes we write to this dnode *)
-					spaceLeft := BlockSize - r.apos;
+					spaceLeft := BlockSize - LONGINT(r.apos);
 					IF (len < spaceLeft) THEN
 						nofBytes := TODO(len);
 					ELSE
@@ -794,8 +794,8 @@ TYPE
 					IF (res = Ok) THEN
 						len := len - nofBytes;
 						ofs := ofs + nofBytes;
-						r.apos := (r.apos + nofBytes) MOD BlockSize;
-						IF (r.apos = 0) THEN
+						r.apos := (LONGINT(r.apos) + nofBytes) MOD BlockSize;
+						IF (LONGINT(r.apos) = 0) THEN
 							INC(r.bpos);
 							IF (r.bpos >= LEN(inode.direct)) THEN (* maximum file size reached *)
 								DEC(r.bpos);
@@ -810,7 +810,7 @@ TYPE
 					END;
 				END;
 			END;
-			pos := r.bpos * BlockSize + r.apos;
+			pos := TODO(r.bpos) * BlockSize + LONGINT(r.apos);
 			IF (pos > inode.size) THEN
 				inode.size := pos;
 				inodeModified := TRUE;

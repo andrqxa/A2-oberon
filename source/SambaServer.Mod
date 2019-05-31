@@ -629,7 +629,7 @@ BEGIN
 			dTime := Dates.OberonToDateTime(d,t);
 			GetUnixTimeStamp(dTime, t);
 			c.out.RawLInt(t);		(* last write *)
-			c.out.RawLInt(f.Length());		(* file size *)
+			c.out.RawLInt(TODO(f.Length()));		(* file size *)
 		ELSE
 			c.out.RawLInt(0);		(* last write *)
 			c.out.RawLInt(0);		(* file size *)
@@ -696,7 +696,7 @@ BEGIN
 		dTime := Dates.OberonToDateTime(d,t);
 		GetUnixTimeStamp(dTime, t);
 		c.out.RawLInt(t);		(* last write *)
-		c.out.RawLInt(f.Length());			(* datasize *)
+		c.out.RawLInt(TODO(f.Length()));			(* datasize *)
 		c.out.RawInt(0);			(* granted access *)
 		c.out.RawInt(0);			(* bytecount *)
 		c.out.Update();
@@ -981,7 +981,7 @@ BEGIN
 			dTime := Dates.OberonToDateTime(d,t);
 			GetUnixTimeStamp(dTime, t);
 			c.out.RawLInt(t);		(* last write *)
-			c.out.RawLInt(f.Length());		(* file size *)
+			c.out.RawLInt(TODO(f.Length()));		(* file size *)
 		ELSE
 			c.out.RawLInt(0);		(* last write *)
 			c.out.RawLInt(0);		(* file size *)
@@ -1014,7 +1014,7 @@ BEGIN
 		c.out.RawInt(0H);
 		GetUnixTimeStamp(Dates.Now(), t);
 		c.out.RawLInt(t);		(* last write *)
-		c.out.RawLInt(f.Length());		 (* filesize *)
+		c.out.RawLInt(TODO(f.Length()));		 (* filesize *)
 		c.out.RawInt(0);			(* granted access *)
 		c.out.RawInt(0);			(* filetype *)
 		c.out.RawInt(0);			(* ipc state *)
@@ -1212,8 +1212,8 @@ BEGIN
 		dTime := Dates.OberonToDateTime(d,t);
 		GetDOSTimeStamp(dTime, t);
 		c.out.RawLInt(t);		(* last write *)
-		c.out.RawLInt(f.Length());		(* file data size *)
-		c.out.RawLInt(f.Length());		(* file alloc *)
+		c.out.RawLInt(TODO(f.Length()));		(* file data size *)
+		c.out.RawLInt(TODO(f.Length()));		(* file alloc *)
 		c.out.RawInt(0);		(* attr *)
 		c.out.RawInt(0);		(* byte count *)
 		c.out.Update();
@@ -1530,7 +1530,7 @@ BEGIN
 					c.out.RawLInt(0);		(* change *)
 
 					IF (f # NIL) THEN
-						c.out.RawLInt(f.Length());		(* eof *)
+						c.out.RawLInt(TODO(f.Length()));		(* eof *)
 						c.out.RawLInt(0);		(* eof *)
 					ELSE
 						c.out.RawLInt(0);		(* eof *)
@@ -1538,7 +1538,7 @@ BEGIN
 					END;
 
 					IF (f # NIL) THEN
-						c.out.RawLInt(f.Length());		(* alloc *)
+						c.out.RawLInt(TODO(f.Length()));		(* alloc *)
 					ELSE
 						c.out.RawLInt(0);		(* alloc *)
 					END;
@@ -1569,8 +1569,8 @@ BEGIN
 						dTime := Dates.OberonToDateTime(d,t);
 						GetUnixTimeStamp(dTime, t);
 						c.out.RawLInt(t);		(* last write *)
-						c.out.RawLInt(f.Length());		(* data size *)
-						c.out.RawLInt(f.Length());		(* alloc size *)
+						c.out.RawLInt(TODO(f.Length()));		(* data size *)
+						c.out.RawLInt(TODO(f.Length()));		(* alloc size *)
 					ELSE
 						c.out.RawLInt(0);		(* last write *)
 						c.out.RawLInt(0);
@@ -1722,9 +1722,9 @@ BEGIN
 					c.out.RawLInt(0);		(* change *)
 
 					IF (f # NIL) THEN
-						c.out.RawLInt(f.Length());		(* eof *)
+						c.out.RawLInt(TODO(f.Length()));		(* eof *)
 						c.out.RawLInt(0);		(* eof *)
-						c.out.RawLInt(f.Length());		(* alloc *)
+						c.out.RawLInt(TODO(f.Length()));		(* alloc *)
 						c.out.RawLInt(0);		(* alloc *)
 					ELSE
 						c.out.RawLInt(0);		(* eof *)
@@ -1759,14 +1759,14 @@ BEGIN
 						dTime := Dates.OberonToDateTime(d,t);
 						GetUnixTimeStamp(dTime, t);
 						c.out.RawLInt(t);		(* last write *)
-						c.out.RawLInt(f.Length());		(* data size *)
+						c.out.RawLInt(TODO(f.Length()));		(* data size *)
 					ELSE
 						c.out.RawLInt(0);		(* last write *)
 						c.out.RawLInt(0);
 					END;
 
 					IF (f # NIL) THEN
-						c.out.RawLInt(f.Length());		(* alloc size *)
+						c.out.RawLInt(TODO(f.Length()));		(* alloc size *)
 					ELSE
 						c.out.RawLInt(0);
 					END;

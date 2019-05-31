@@ -297,7 +297,7 @@ TYPE
 				Files.WriteLInt(w, glyphRanges[i].firstCode);
 				Files.WriteLInt(w, glyphRanges[i].lastCode);
 			END;
-			fixup := f.Pos(w);
+			fixup := TODO(f.Pos(w));
 
 			(* reserve space for per character file position table *)
 			FOR i := 0 TO nofGlyphRanges - 1 DO
@@ -313,7 +313,7 @@ TYPE
 					KernelLog.String("Calling Raster... ");
 					IF c < 319 THEN
 						RasterToBWRLBytes(glyphRanges[i].glyphs[j].img, buf, pos);
-						glyphRanges[i].glyphs[j].fpos := f.Pos(w);
+						glyphRanges[i].glyphs[j].fpos := TODO(f.Pos(w));
 						KernelLog.Int(pos, 5); KernelLog.Ln;
 						f.WriteBytes(w, buf, 0, pos)
 					END

@@ -2997,7 +2997,7 @@ TYPE
 					Insert(parent, newDir);
 					list.Refresh();
 				ELSE
-					NEW(newFile, Strings.NewString(filename), Strings.NewString(name), file.Length());
+					NEW(newFile, Strings.NewString(filename), Strings.NewString(name), TODO(file.Length()));
 					INC(project.totalSize, newFile.size);
 					owner.UpdateSize(project.totalSize, project(DataProject).overhead);
 					Insert(parent, newFile);
@@ -3205,7 +3205,7 @@ VAR
 	file: Files.File;
 BEGIN
 	file := Files.Old(filename);
-	RETURN file.Length();
+	RETURN TODO(file.Length());
 END GetFileSize;
 
 PROCEDURE RemoveSpecialChars(VAR str: ARRAY OF CHAR);
