@@ -671,9 +671,9 @@ TYPE
 	PROCEDURE SendFile( f: Files.File;  chan: Channel;  CONST name: ARRAY OF CHAR );
 	VAR
 		buf: ARRAY 10000 OF CHAR;
-		flen, sent: LONGINT;
+		flen, sent: SIZE;
 		lbuf: ARRAY 16 OF CHAR;
-		r: Files.Reader;  i, j: LONGINT;
+		r: Files.Reader;  i, j: SIZE;
 	BEGIN
 		flen := f.Length( );  Strings.IntToStr( flen, lbuf );
 		buf := "C0644 "; Strings.Append( buf, lbuf );  Strings.Append( buf, " " );  Strings.Append( buf, name );
@@ -683,12 +683,12 @@ TYPE
 		WHILE (i < flen) & (chan.state = ChanOpen) DO
 			r.Char( buf[j] );  INC( i );  INC( j );
 			IF (j = MaxPacketSize-64) OR (j = chan.pmax) THEN
-				chan.SendBuffer( buf, j );  INC( sent, j );
+				chan.SendBuffer( buf, TODO(j) );  INC( sent, j );
 				j := 0;  Log.Char( '.' )
 			END
 		END;
 		IF j > 0 THEN
-			chan.SendBuffer( buf, j );  INC( sent, j ); Log.Char( '.' )
+			chan.SendBuffer( buf, TODO(j) );  INC( sent, j ); Log.Char( '.' )
 		END;
 		Log.Char( ' ' );  Log.Int( sent, 0 ); Log.String( " bytes sent." ); Log.Ln
 	END SendFile;

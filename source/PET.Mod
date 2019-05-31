@@ -1543,7 +1543,7 @@ TYPE
 			END
 		END BrowseForward;
 
-		PROCEDURE GotoFile(CONST filename : ARRAY OF CHAR; pos : LONGINT);
+		PROCEDURE GotoFile(CONST filename : ARRAY OF CHAR; pos : SIZE);
 		VAR page : PETPanel; i : LONGINT;
 		BEGIN
 			IF browseTOS = browseBase THEN RecordCurrentPos END;

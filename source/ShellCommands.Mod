@@ -264,7 +264,7 @@ END Modules;
 *)
 PROCEDURE execute(context : Commands.Context; VAR cmdline: ARRAY OF CHAR; flags: SET; VAR res: WORD; VAR msg: ARRAY OF CHAR);
 VAR
-	ctx: Context; R: Streams.StringReader; cmd, prev, cmds: Command; i, j, p, ofs, len: LONGINT; ch, filter: CHAR;
+	ctx: Context; R: Streams.StringReader; cmd, prev, cmds: Command; i, j, p, ofs, len: SIZE; ch, filter: CHAR;
 	in, pR: Streams.Reader; out, err, pW: Streams.Writer; file: Files.FileName; F, newF: Files.File; fR: Files.Reader;
 	fW: Files.Writer; pipe: Pipes.Pipe; a: CmdAlias; cmdString : POINTER TO ARRAY OF CHAR;
 BEGIN

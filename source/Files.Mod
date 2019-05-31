@@ -1020,8 +1020,8 @@ BEGIN
 		dfile.WriteBytes(dPos, buffer, 0, BufferSize);
 		INC(i);
 	END;
-	sfile.ReadBytes(sPos, buffer, 0, sfile.Length() MOD BufferSize);
-	dfile.WriteBytes(dPos, buffer, 0, sfile.Length() MOD BufferSize);
+	sfile.ReadBytes(sPos, buffer, 0, SIZE(sfile.Length() MOD BufferSize));
+	dfile.WriteBytes(dPos, buffer, 0, SIZE(sfile.Length() MOD BufferSize));
 	dfile.Update;
 	Register(dfile); (* Will enter exclusive region *)
 END CopyFile;
