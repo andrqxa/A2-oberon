@@ -243,7 +243,7 @@ TYPE
 		VAR
 			offset, mode, kind, type, dim, tdadr : LONGINT;
 			markerPositions, temp : POINTER TO ARRAY OF RECORD
-								pos : LONGINT;
+								pos : Streams.Position;
 								marker : WMTextView.PositionMarker
 								END;
 			nextMarker, markerSize : LONGINT;
@@ -287,7 +287,7 @@ TYPE
 			w.String("]")
 		END ToString;
 
-		PROCEDURE AddMarkerPosition* (pos : LONGINT);
+		PROCEDURE AddMarkerPosition* (pos : Streams.Position);
 		VAR i : LONGINT;
 		BEGIN
 			markersCreated := FALSE;

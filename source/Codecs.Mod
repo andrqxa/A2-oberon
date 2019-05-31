@@ -169,7 +169,7 @@ TYPE
 		BEGIN HALT(301); RETURN 0
 		END GetCurrentTime;
 
-		PROCEDURE SetStreamLength*(length : LONGINT);
+		PROCEDURE SetStreamLength*(length : Streams.Position);
 		END SetStreamLength;
 
 		PROCEDURE SeekSample*(sample: LONGINT; goKeySample : BOOLEAN; VAR res : WORD);

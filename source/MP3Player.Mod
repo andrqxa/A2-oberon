@@ -24,7 +24,7 @@ TYPE
 		eof* : PROCEDURE {DELEGATE} (sender, data: ANY);
 
 		(* Initialize Player with the given File *)
-		PROCEDURE &Init*(in : Streams.Reader; length: LONGINT);
+		PROCEDURE &Init*(in : Streams.Reader; length: Streams.Position);
 		VAR i: LONGINT; res: WORD;
 		BEGIN
 			ready := FALSE; finished := FALSE; paused := FALSE; oldPos := 0;

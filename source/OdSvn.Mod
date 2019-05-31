@@ -339,8 +339,9 @@ TYPE
 		dl,   (* Data length.           *)
 		(* Support variables. *)
 		co, cl, (* Copy offset, length. *)
+		n: LONGINT;
 		tvo, (* Target view offset. *)
-		istart, n: LONGINT;
+		istart: Files.Position;
 		read: SIZE;
 		iord, op: INTEGER; ch: CHAR;
 		sourceF, targetF: Files.File;

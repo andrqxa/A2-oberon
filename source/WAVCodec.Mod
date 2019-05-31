@@ -220,10 +220,10 @@ TYPE
 			RETURN ENTIER((in.Pos() - (h.fileSize - h.dataSize)) / h.bRate * 10)
 		END GetCurrentTime;
 
-		PROCEDURE SetStreamLength*(length : LONGINT);
+		PROCEDURE SetStreamLength*(length : Streams.Position);
 		BEGIN
-			h.fileSize := length-8;
-			h.dataSize := length-SIZEOF(WaveHeader);
+			h.fileSize := TODO(length)-8;
+			h.dataSize := TODO(length)-SIZEOF(WaveHeader);
 		END SetStreamLength;
 
 		PROCEDURE SeekSample*(sample: LONGINT; goKeySample : BOOLEAN; VAR res : WORD);
@@ -322,10 +322,10 @@ TYPE
 			RETURN ENTIER(8 * in.Pos() / h.bitsPerSample / h.nofCh / h.sRate * 10)
 		END GetCurrentTime;
 
-		PROCEDURE SetStreamLength*(length : LONGINT);
+		PROCEDURE SetStreamLength*(length : Streams.Position);
 		BEGIN
-			h.fileSize := length+SIZEOF(WaveHeader)-8;
-			h.dataSize := length
+			h.fileSize := TODO(length)+SIZEOF(WaveHeader)-8;
+			h.dataSize := TODO(length)
 		END SetStreamLength;
 
 		PROCEDURE SeekSample*(sample: LONGINT; goKeySample : BOOLEAN; VAR res : WORD);

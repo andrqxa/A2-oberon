@@ -2618,7 +2618,8 @@ TYPE
 				VAR
 					markerStr : ARRAY 8 OF CHAR;
 					ok : BOOLEAN;
-					bytesSkipped, ncomp, c, ndec: LONGINT;
+					bytesSkipped: Streams.Position;
+					ncomp, c, ndec: LONGINT;
 				BEGIN
 
 					(* Check preconditions *)
@@ -3299,9 +3300,9 @@ TYPE
 			(*
 				Advances to the end of the current tile-part, reads all packets from the stream
 			*)
-			PROCEDURE JumpToTilePartEnd () : LONGINT;
+			PROCEDURE JumpToTilePartEnd () : Streams.Position;
 				VAR
-					bytesSkipped : LONGINT;
+					bytesSkipped : Streams.Position;
 					startPos: Streams.Position;
 					ok : BOOLEAN;
 				BEGIN
@@ -5698,7 +5699,7 @@ TYPE
 					END;
 			END TilePartAvailable;
 
-			PROCEDURE JumpToTilePartEnd () : LONGINT;
+			PROCEDURE JumpToTilePartEnd () : Streams.Position;
 				BEGIN
 					IF reBuildMode THEN
 						curComp := cmax + 1;

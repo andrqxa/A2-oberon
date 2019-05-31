@@ -8,8 +8,8 @@ IMPORT
 TYPE
 
 	Error* = RECORD
-		pos- : LONGINT;
-		line-, row- : LONGINT;
+		pos- : Streams.Position;
+		line-, row- : Streams.Position;
 		msg- : ARRAY 128 OF CHAR;
 	END;
 

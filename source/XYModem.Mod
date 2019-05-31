@@ -70,8 +70,8 @@ TYPE
 
 	Sender* = OBJECT (Modem)
 
-		PROCEDURE YHeader(): LONGINT;
-		VAR fullname, name, pathname, path: Files.FileName; prefix : ARRAY Files.PrefixLength OF CHAR; len, i, j: LONGINT; ch: CHAR;
+		PROCEDURE YHeader(): Files.Size;
+		VAR fullname, name, pathname, path: Files.FileName; prefix : ARRAY Files.PrefixLength OF CHAR; len: Files.Size; i, j: SIZE; ch: CHAR;
 		BEGIN
 			F.GetName(fullname); len := F.Length();
 			Files.SplitName(fullname, prefix, pathname);
@@ -95,7 +95,7 @@ TYPE
 		END YHeader;
 
 		PROCEDURE SendFile;
-		VAR fR: Files.Reader; len, blkn, blk, i, retry: LONGINT; length: SIZE; start, ch: CHAR;
+		VAR fR: Files.Reader; len: Files.Size; blkn, blk, i, retry: LONGINT; length: SIZE; start, ch: CHAR;
 
 			PROCEDURE SendData;
 			VAR crc: LONGINT;

@@ -1485,7 +1485,7 @@ TYPE
 		END GetTotalSamples;
 
 		(* Sets the size of the Stream in Bytes. Only works for CBR *)
-		PROCEDURE SetStreamLength*(length : LONGINT);
+		PROCEDURE SetStreamLength*(length : Streams.Position);
 		BEGIN
 			totSamples := ENTIER(8 * length / bitRate / 1000 * samplesPerSec)
 		END SetStreamLength;
