@@ -2967,7 +2967,7 @@ TYPE
 		END ResolveSelfDesignator;
 
 		PROCEDURE ResolveResultDesignator(x: SyntaxTree.ResultDesignator): SyntaxTree.Expression;
-		VAR scope: SyntaxTree.Scope; procedure: SyntaxTree.Procedure; procedureType: SyntaxTree.ProcedureType; returnType: SyntaxTree.Type; symbol: SyntaxTree.Symbol;
+		VAR scope: SyntaxTree.Scope; procedure: SyntaxTree.Procedure; procedureType: SyntaxTree.ProcedureType; returnType: SyntaxTree.Type;
 		BEGIN
 			scope := currentScope;
 			IF (scope # NIL) & ((scope IS SyntaxTree.ProcedureScope) OR (scope IS SyntaxTree.BlockScope)) THEN
@@ -3918,12 +3918,12 @@ TYPE
 						IF (actualParameter.resolved # NIL) & (actualParameter.resolved IS SyntaxTree.Value) THEN
 							const := SyntaxTree.NewConstant(actualParameter.position,formalParameter.name);
 							const.SetValue(actualParameter);
-							const.SetType(actualParameter.type);
+							const.SetType(formalParameter.type);
 							inlineScope.AddConstant(const);
 							symbols.Add(const);
 						ELSE
 							alias := SyntaxTree.NewAlias(actualParameter.position, formalParameter.name, actualParameter);
-							alias.SetType(actualParameter.type);
+							alias.SetType(formalParameter.type);
 							inlineScope.AddAlias(alias);
 							symbols.Add(alias);
 						END;
@@ -3932,7 +3932,7 @@ TYPE
 						var.SetKind(formalParameter.kind);
 						var.PreferRegister(formalParameter.preferRegister);
 						(* copy expression to var *)
-						var.SetType(actualParameter.type);
+						var.SetType(formalParameter.type);
 						var.SetInitializer(actualParameter);
 						inlineScope.AddVariable(var);
 						symbols.Add(var);
@@ -5624,7 +5624,8 @@ TYPE
 							IF ((type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.IntegerType) & (~type(SyntaxTree.IntegerType).signed)) & (expressionType IS SyntaxTree.FloatType) THEN
 								Error(left.position,"invalid unsigned type in explicit conversion");
 							ELSE
-								result := NewConversion(designator.position,expression,typeDeclaration.declaredType,left)
+								result := NewConversion(designator.position,expression,typeDeclaration.declaredType,left);
+								result.SetOriginal(designator);
 							END;
 						ELSE
 							Error(left.position,"invalid type in explicit conversion");

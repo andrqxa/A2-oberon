@@ -131,9 +131,9 @@ CONST
 
 	Set = '{' [ RangeExpression {',' RangeExpression} ] '}'.
 
-	Designator  = ('self' | 'result' | Identifier) [DesignatorOperations].
+	Designator  = ('self' | 'result' | Identifier) [DesignatorOperations] [Flags].
 
-	DesignatorOperations = {'.' Identifier  | '[' IndexList ']' | '(' [ExpressionList] ')' | '^'} [Flags].
+	DesignatorOperations = {'.' Identifier  | '[' IndexList ']' | '(' [ExpressionList] ')' | '^'}.
 
 	RangeExpression = SimpleExpression | [SimpleExpression] '..' [SimpleExpression] ['by' SimpleExpression] | '*'.
 
@@ -764,8 +764,8 @@ TYPE
 			RETURN expression
 		END RangeExpression;
 
-		(** Designator  = ('self' | 'result' | Identifier) [DesignatorOperations].
-			DesignatorOperations = {'.' Identifier  | '[' IndexList ']' | '(' [ExpressionList] ')' | '^'} [Flags].
+		(** Designator  = ('self' | 'result' | Identifier) [DesignatorOperations] [Flags].
+			DesignatorOperations = {'.' Identifier  | '[' IndexList ']' | '(' [ExpressionList] ')' | '^'}.
 		**)
 		PROCEDURE Designator( ): SyntaxTree.Designator;
 		VAR
@@ -809,6 +809,13 @@ TYPE
 			END;
 			designator.End(token.position);
 			designator := DesignatorOperations (designator)(SyntaxTree.Designator);
+
+			IF OptionalB(Scanner.LeftBrace) THEN
+				designator.SetModifiers(Flags());
+			END;
+
+			(*IF OptionalB(Scanner.Escape) THEN END; (* skip breaking signal *)*)
+
 			IF Trace THEN E( "Designator" ) END;
 			RETURN designator
 		END Designator;
@@ -844,22 +851,11 @@ TYPE
 					designator:= SyntaxTree.NewBracketDesignator( position,expression,expressionList );
 				ELSIF OptionalB( Scanner.Arrow ) THEN
 					designator:= SyntaxTree.NewArrowDesignator( position,expression );
-				ELSE EXIT
+				ELSE RETURN expression;
 				END;
 				designator.End(token.position);
 				expression := designator;
 			END;
-
-			IF designator # NIL THEN
-				IF OptionalB(Scanner.LeftBrace) THEN
-					designator.SetModifiers(Flags());
-				END;
-				designator.End(token.position);
-			END;
-
-			(*IF OptionalB(Scanner.Escape) THEN END; (* skip breaking signal *)*)
-
-			RETURN expression;
 		END DesignatorOperations;
 
 		(** Set = '{' [ RangeExpression {',' RangeExpression} ] '}'. **)

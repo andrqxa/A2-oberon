@@ -13272,7 +13272,11 @@ TYPE
 						SyntaxTree.PointerType DO
 							IF type.pointerBase.resolved IS SyntaxTree.RecordType THEN
 								IF RefInfo THEN Info(section,"PointerToRecord") END;
-								Char(section, sfTypePointerToRecord);
+								IF type.pointerBase.resolved(SyntaxTree.RecordType).isObject THEN
+									Char(section, sfTypeOBJECT);
+								ELSE
+									Char(section, sfTypePointerToRecord);
+								END;
 								(*! do we ever need the pointer base?  NType(type.pointerBase);*)
 							ELSE
 								IF RefInfo THEN Info(section,"PointerToArray") END;
@@ -13316,8 +13320,8 @@ TYPE
 						| SyntaxTree.RecordType DO
 							IF ~Indirect(type) THEN
 								IF type.pointerType # NIL (* OBJECT *) THEN
-									IF RefInfo THEN Info(section,"PointerToRecord") END;
-									Char(section, sfTypePointerToRecord)
+									IF RefInfo THEN Info(section,"PointerToRecord->OBJECT") END;
+									Char(section, sfTypeOBJECT)
 								ELSE
 									IF RefInfo THEN Info(section,"Record") END;
 									Char(section, sfTypeRecord);

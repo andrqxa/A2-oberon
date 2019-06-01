@@ -1910,6 +1910,7 @@ TYPE
 			position-, end-: Position;
 			state-: SET;
 			resolved-: Value;
+			original-: Expression;
 			isHidden-: BOOLEAN;
 
 		PROCEDURE End*( position: Position);
@@ -1923,6 +1924,7 @@ TYPE
 		PROCEDURE &InitExpression(position: Position);
 		BEGIN
 			SELF.position := position; end :=  invalidPosition; state := Undefined; type := NIL; assignable := FALSE; resolved := NIL; isHidden := FALSE;
+			original := NIL; 
 		END InitExpression;
 
 		PROCEDURE SetHidden*(hidden: BOOLEAN);
@@ -1940,6 +1942,11 @@ TYPE
 		PROCEDURE SetAssignable*(assignable: BOOLEAN);
 		BEGIN SELF.assignable := assignable
 		END SetAssignable;
+		
+		PROCEDURE SetOriginal*(original: Expression);
+		BEGIN
+			SELF.original := original;
+		END SetOriginal;
 
 		PROCEDURE NeedsTrace* (): BOOLEAN;
 		BEGIN RETURN FALSE;
@@ -2135,11 +2142,12 @@ TYPE
 		VAR
 			expression-: Expression;
 			typeExpression-: Expression; (* for printout *)
-
-		PROCEDURE & InitConversion( position: Position;  expression: Expression; type: Type; typeExpression: Expression);
+			
+		PROCEDURE & InitConversion( position: Position; expression: Expression; type: Type; typeExpression: Expression);
 		BEGIN
 			InitExpression( position );  SELF.expression := expression;  SELF.typeExpression := typeExpression; SELF.type := type;
 		END InitConversion;
+	
 
 		PROCEDURE SetExpression*(expression: Expression);
 		BEGIN SELF.expression := expression
@@ -2155,7 +2163,6 @@ TYPE
 			left-: Expression;
 			modifiers-: Modifier;
 			relatedRhs-: Expression;
-			original-: Expression;
 
 		PROCEDURE &InitDesignator*(position: Position);
 		BEGIN
@@ -2163,7 +2170,6 @@ TYPE
 			left := NIL;
 			modifiers := NIL;
 			relatedRhs := NIL;
-			original := NIL;
 		END InitDesignator;
 
 		PROCEDURE SetLeft*(l: Expression);
@@ -5062,9 +5068,9 @@ VAR
 	VAR result: Expression;
 	BEGIN
 		IF (x = NIL) OR (x= invalidExpression) THEN RETURN x END;
+		IF x.original # NIL THEN RETURN CloneExpression(x.original) END;
 
 		WITH x: Designator DO
-			IF x.original # NIL THEN RETURN CloneExpression(x.original) END;
 			result := CloneDesignator(x);
 		| Conversion DO
 			result := CloneExpression(x.expression);
