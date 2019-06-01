@@ -17,7 +17,7 @@ TYPE
 			size, cyls, hds, spt: LONGINT;
 			new: BOOLEAN;
 
-		PROCEDURE Transfer*(op, lba, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: LONGINT; VAR res: WORD);
+		PROCEDURE Transfer*(op, lba, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
 		VAR pos, n: LONGINT; r: Files.Rider;
 		BEGIN
 			ASSERT(ofs = 0);	(* implementation restriction *)

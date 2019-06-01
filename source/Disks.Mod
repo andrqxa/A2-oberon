@@ -60,7 +60,7 @@ TYPE
 			NnofReads*, NnofWrites*, NnofOthers*, (** operation count *)
 			NnofErrors* : HUGEINT; (** read/write errors *)
 
-		PROCEDURE Transfer*(op, block, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: LONGINT; VAR res: WORD);
+		PROCEDURE Transfer*(op, block, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
 		BEGIN
 			res := Unsupported
 		END Transfer;

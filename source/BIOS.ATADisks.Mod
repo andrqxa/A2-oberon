@@ -967,7 +967,7 @@ TYPE
 		cmdLBA: CommandLBA;
 		cmdLBA48: CommandLBA48;
 
-		PROCEDURE Transfer*(op, block, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: LONGINT; VAR res: WORD);
+		PROCEDURE Transfer*(op, block, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
 		VAR
 			num1, try: LONGINT; ignore: WORD; bufAdr: ADDRESS;
 			dma: BOOLEAN;
