@@ -85,14 +85,14 @@ TYPE
 		BEGIN
 			IF (res = Ok) THEN
 				send( buf^, 0, tail, TRUE , res );
-				IF res = Ok THEN INC( sent, TODO(tail) );  tail := 0 END
+				IF res = Ok THEN INC( sent, tail );  tail := 0 END
 			END
 		END Update;
 
 	(** Current write position. *)
 		PROCEDURE Pos*( ): Position;
 		BEGIN
-			RETURN sent + TODO(tail)
+			RETURN sent + tail
 		END Pos;
 
 		(** -- Write raw binary data -- *)
@@ -102,7 +102,7 @@ TYPE
 		BEGIN
 			IF (tail = LEN( buf )) & (res = Ok) THEN
 				send( buf^, 0, tail, FALSE , res );
-				IF res = Ok THEN INC( sent, TODO(tail) );  tail := 0 END
+				IF res = Ok THEN INC( sent, tail );  tail := 0 END
 			END;
 			IF res = Ok THEN buf[tail] := x;  INC( tail ) END
 		END Char;
@@ -117,7 +117,7 @@ TYPE
 				IF n = 0 THEN
 					IF res = Ok THEN  (* send current buffer *)
 						send( buf^, 0, tail, FALSE , res );
-						IF res = Ok THEN INC( sent, TODO(tail) );  tail := 0 ELSE EXIT END
+						IF res = Ok THEN INC( sent, tail );  tail := 0 ELSE EXIT END
 					ELSE
 						EXIT  (* should not be writing on an erroneous rider *)
 					END;
@@ -488,10 +488,10 @@ TYPE
 		VAR n: SIZE;
 		BEGIN
 			IF (res = Ok) THEN
-				IF (head = tail) THEN head := 0;  receive( buf^, 0, LEN( buf ), 0, tail, res );  INC( received, TODO(tail) );
+				IF (head = tail) THEN head := 0;  receive( buf^, 0, LEN( buf ), 0, tail, res );  INC( received, tail );
 				ELSIF (tail # LEN( buf )) THEN
 					receive( buf^, tail, LEN( buf ) - tail, 0, n, res );   (* poll *)
-					INC( tail, n );  INC( received, TODO(n) )
+					INC( tail, n );  INC( received, n )
 				END;
 				IF res = EOF THEN res := Ok END  (* ignore EOF here *)
 			END;
@@ -501,7 +501,7 @@ TYPE
 	(** Current read position. *)
 		PROCEDURE Pos*( ): Position;
 		BEGIN
-			RETURN received - TODO (tail - head)
+			RETURN received - (tail - head)
 		END Pos;
 
 		(** -- Read raw binary data -- *)
@@ -509,14 +509,14 @@ TYPE
 	(** Read one byte. x=0X if no success (e.g. file ended) *)
 		PROCEDURE Char*( VAR x: CHAR );
 		BEGIN
-			IF (head = tail) & (res = Ok) THEN head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, TODO(tail) ) END;
+			IF (head = tail) & (res = Ok) THEN head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, tail ) END;
 			IF res = Ok THEN x := buf[head];  INC( head ) ELSE x := 0X END
 		END Char;
 
 	(** Like Read, but return result. Return 0X if no success (e.g. file ended) *)
 		PROCEDURE Get*( ): CHAR;
 		BEGIN
-			IF (head = tail) & (res = Ok) THEN head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, TODO(tail) ) END;
+			IF (head = tail) & (res = Ok) THEN head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, tail ) END;
 			IF res = Ok THEN INC( head );  RETURN buf[head - 1] ELSE RETURN 0X END
 		END Get;
 
@@ -524,7 +524,7 @@ TYPE
 		PROCEDURE Peek*( ): CHAR;
 		BEGIN
 			IF (head = tail) & (res = Ok) THEN
-				head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, TODO(tail) );
+				head := 0;  receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, tail );
 				IF res = EOF THEN  (* ignore EOF here *)
 					res := Ok;  tail := 0; RETURN 0X (* Peek returns 0X at eof *)
 				END
@@ -543,7 +543,7 @@ TYPE
 				IF n = 0 THEN  (* no data available *)
 					head := 0;
 					IF res = Ok THEN  (* fill buffer *)
-						receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, TODO(tail) )
+						receive( buf^, 0, LEN( buf ), 1, tail, res );  INC( received, tail )
 					END;
 					IF res # Ok THEN  (* should not be reading from erroneous rider *)
 						WHILE size # 0 DO x[ofs] := 0X;  INC( ofs );  DEC( size ) END;   (* clear rest of buffer *)
@@ -956,7 +956,7 @@ TYPE
 			len := 0;
 			WHILE s[len] # 0X DO INC( len ) END;
 			IF len > LEN( buf ) THEN len := LEN( buf ) END;
-			head := 0;  tail := len;  received := TODO (len);  res := Ok;
+			head := 0;  tail := len;  received := len;  res := Ok;
 			IF len > 0 THEN
 				SYSTEM.MOVE( ADDRESSOF( s[0] ), ADDRESSOF( buf[0] ), len )
 			END;
@@ -966,7 +966,7 @@ TYPE
 		PROCEDURE SetRaw*(CONST s: ARRAY OF CHAR;  ofs, len: SIZE );
 		BEGIN
 			IF len > LEN( buf ) THEN len := LEN( buf ) END;
-			head := 0;  tail := len;  received := TODO(len);  res := Ok;
+			head := 0;  tail := len;  received := len;  res := Ok;
 			ASSERT ( (len >= 0) & (ofs + len <= LEN( s )) );   (* index check *)
 			IF len > 0 THEN
 				SYSTEM.MOVE( ADDRESSOF( s[ofs] ), ADDRESSOF( buf[0] ), len )
