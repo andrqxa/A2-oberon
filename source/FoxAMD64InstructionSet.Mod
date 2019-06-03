@@ -3,7 +3,7 @@ MODULE FoxAMD64InstructionSet; (**  AUTHOR "fof & fn"; PURPOSE "Oberon Compiler:
 
 (** This module has been written with inspiration from
 	-module CCIx86A.Mod : Component Compiler, Intel x86 Backend Assembler, 2005-2007, by Luc Bläser and
-	-module AsmAMD64.Mod: AMD64 instruction set repository, 2006,  by Florian Negele
+	-module ASMAMD64.Mod: AMD64 instruction set repository, 2006,  by Florian Negele
 	The instruction set reference generator  is built by parsing the file InstructionSetAMD64.txt  also written by Florian Negele
 	Parser for parsing the file is contained in FoxProgTools.Mod
 **)
