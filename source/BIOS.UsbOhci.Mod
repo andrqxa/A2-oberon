@@ -883,7 +883,7 @@ TYPE
 			(* okay... now allocate memory for the 16byte aligned queue heads ... *)
 			tdlist := UsbHcdi.GetAlignedMemSpace(16*TdListSize, 16);
 
-			NEW(interruptED); FOR i := 0 TO 5 DO interruptED[i] := Machine.Ensure32BitAddress (ADDRESSOF(tdlist.data[tdlist.base]) + i*16); END;
+			NEW(interruptED); FOR i := 0 TO 5 DO interruptED[i] := (ADDRESSOF(tdlist.data[tdlist.base]) + i*16)(Machine.Address32); END;
 
 			isochronousED := interruptED[5] + 16;
 			controlED :=  isochronousED + 16;
@@ -1549,7 +1549,7 @@ BEGIN
 				iobasePhys := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, iobasePhys) * {12..31});
 				Machine.MapPhysical(iobasePhys, 4096, iobaseVirt);
 				NEW(hostController, bus, device, function);
-				IF hostController.Init(Machine.Ensure32BitAddress(iobaseVirt), irq) THEN (* host controller has been initialized and started successfully *)
+				IF hostController.Init(iobaseVirt(Machine.Address32), irq) THEN (* host controller has been initialized and started successfully *)
 					IF Debug.Verbose THEN
 						KernelLog.Enter;
 						KernelLog.String("UsbOhci: Initialised USB Open Host Controller at base 0"); KernelLog.Hex(iobasePhys, 8);

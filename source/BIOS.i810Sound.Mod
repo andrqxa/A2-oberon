@@ -1453,7 +1453,7 @@ TYPE
 		physadr : Machine.Address32;
 	BEGIN
 		(* All data has to be continous in memory since DMA does not understand pages *)
-		physadr := Machine.Ensure32BitAddress (Machine.PhysicalAdr(adr, size));
+		physadr := Machine.PhysicalAdr(adr, size)(Machine.Address32);
 		ASSERT(physadr # Machine.NilAdr);
 		(* Address must be 8 byte align. See Intel programmes manual
 		for close details of the Buffer Description List *)

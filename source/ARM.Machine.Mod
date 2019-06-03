@@ -2597,11 +2597,6 @@ VAR
 
 	(* ===== Virtual Memory Management ===== *)
 
-	PROCEDURE Ensure32BitAddress*(adr: ADDRESS): LONGINT;
-	BEGIN
-		RETURN adr
-	END Ensure32BitAddress;
-
 	PROCEDURE GetSecondLevelEntry(virtualAddress: ADDRESS): ADDRESS;
 	VAR
 		ptIdx, basePT, entry: ADDRESS;

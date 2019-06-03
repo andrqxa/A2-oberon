@@ -285,7 +285,7 @@ TYPE
 		BEGIN
 			IF pipe.firstTD = 0 THEN RETURN END; (* pipe has not yet been used *)
 			(* deactivate all TDs in list *)
-			td := Machine.Ensure32BitAddress (pipe.firstTD);
+			td := pipe.firstTD(Machine.Address32);
 			ASSERT(SYSTEM.VAL(SET, td) * {0..3} = {}); (* 16byte alignment *)
 			WHILE td < pipe.lastTD DO
 				dword := SYSTEM.VAL(SET, SYSTEM.GET32(td + TDControlStatus));
@@ -346,7 +346,7 @@ TYPE
 			UnlinkTDsInternal(pipe);
 
 			delthis := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, pipe.qh) + {1});
-			queue := Machine.Ensure32BitAddress (pipe.queue);
+			queue := pipe.queue(Machine.Address32);
 
 			LOOP (* traverse list of queue heads *)
 				qhtmp := SYSTEM.GET32(queue);
@@ -374,7 +374,7 @@ TYPE
 		PROCEDURE LinkTDs*(pipe : UsbHcdi.Pipe; td : Machine.Address32);
 		BEGIN {EXCLUSIVE}
 			ASSERT(SYSTEM.VAL(SET, td) * {0..3} = {}); (* 16byte alignment of TDs *)
-			SYSTEM.PUT32(pipe.qh + QhElementLinkPointer, Machine.Ensure32BitAddress (td)); (* queue element link pointer ::= pointer to td *)
+			SYSTEM.PUT32(pipe.qh + QhElementLinkPointer, td(Machine.Address32)); (* queue element link pointer ::= pointer to td *)
 		END LinkTDs;
 
 		PROCEDURE ScheduleControl*(pipe : UsbHcdi.Pipe; direction : LONGINT; msg : UsbHcdi.ControlMessage;  bufferLen : LONGINT;  VAR buffer : Usbdi.Buffer);
@@ -406,7 +406,7 @@ TYPE
 
 				IF direction = UsbHcdi.In THEN pid := PidIn; ELSE pid := PidOut; END;
 
-				databufferAdr := Machine.Ensure32BitAddress (pipe.physBufferAdr); (* offset included *)
+				databufferAdr := pipe.physBufferAdr(Machine.Address32); (* offset included *)
 
 				restlen := bufferLen;
 
@@ -474,7 +474,7 @@ TYPE
 			END;
 
 			restlen := bufferLen;
-			databuffer := Machine.Ensure32BitAddress (pipe.physBufferAdr); (* offset already added *)
+			databuffer := pipe.physBufferAdr(Machine.Address32); (* offset already added *)
 
 			td := pipe.firstTD - 16;
 

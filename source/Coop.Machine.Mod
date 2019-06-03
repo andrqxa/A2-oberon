@@ -168,12 +168,6 @@ BEGIN
 	IF num = 0 THEN physAdr[0].adr := NilAdr; physAdr[0].size := 0 END;
 END TranslateVirtual;
 
-PROCEDURE Ensure32BitAddress*(adr: ADDRESS): Address32;
-BEGIN
-	ASSERT (Address32 (adr) = adr);
-	RETURN Address32 (adr);
-END Ensure32BitAddress;
-
 PROCEDURE Is32BitAddress*(adr: ADDRESS): BOOLEAN;
 BEGIN RETURN Address32 (adr) = adr;
 END Is32BitAddress;

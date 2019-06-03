@@ -2094,11 +2094,6 @@ L2:
 	RET					; jump to body of first active object
 END JumpToUserLevel;
 
-PROCEDURE Ensure32BitAddress*(adr: ADDRESS): LONGINT;
-BEGIN
-	RETURN adr
-END Ensure32BitAddress;
-
 PROCEDURE Is32BitAddress*(adr: ADDRESS): BOOLEAN;
 BEGIN RETURN SYSTEM.VAL (Address32, adr) = adr;
 END Is32BitAddress;

@@ -1607,7 +1607,7 @@ VAR physadr: Machine.Address32;
 BEGIN
 	(* All data must be continous in physical memory ! *)
 	(* This can not be forced, but Aos seems to do it anyway. *)
-	physadr := Machine.Ensure32BitAddress (Machine.PhysicalAdr(adr, size));
+	physadr := Machine.PhysicalAdr(adr, size)(Machine.Address32);
 	ASSERT(physadr # Machine.NilAdr); (* check if it is continous in physical memory ! *)
 	ASSERT(physadr MOD 4 = 0); (* must be 4 byte aligned in physical memory *)
 	RETURN physadr;

@@ -2274,13 +2274,6 @@ END JumpToUserLevel;
 	replacement for unsafe: x := SYSTEM.VAL (LONGINT, y) with y of type ADDRESS
 	-> better rewrite client code! this procedure should be redundant and removable in the end! *)
 
-PROCEDURE Ensure32BitAddress*(adr: ADDRESS): Address32;
-BEGIN
-	(* TODO *)
-	ASSERT (Is32BitAddress (adr), 9876);
-	RETURN SYSTEM.VAL (Address32, adr)
-END Ensure32BitAddress;
-
 PROCEDURE Is32BitAddress*(adr: ADDRESS): BOOLEAN;
 BEGIN RETURN SYSTEM.VAL (Address32, adr) = adr;
 END Is32BitAddress;
