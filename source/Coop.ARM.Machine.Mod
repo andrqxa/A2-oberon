@@ -143,10 +143,6 @@ BEGIN
 	IF num = 0 THEN physAdr[0].adr := NilAdr; physAdr[0].size := 0 END;
 END TranslateVirtual;
 
-PROCEDURE Is32BitAddress*(adr: ADDRESS): BOOLEAN;
-BEGIN RETURN Address32 (adr) = adr;
-END Is32BitAddress;
-
 (** Fill "size" bytes at "destAdr" with "filler".  "size" must be multiple of 4. *)
 
 	PROCEDURE Fill32*(destAdr: ADDRESS; size: SIZE; filler: LONGINT);

@@ -2094,10 +2094,6 @@ L2:
 	RET					; jump to body of first active object
 END JumpToUserLevel;
 
-PROCEDURE Is32BitAddress*(adr: ADDRESS): BOOLEAN;
-BEGIN RETURN SYSTEM.VAL (Address32, adr) = adr;
-END Is32BitAddress;
-
 (**
  * Flush Data Cache for the specified virtual address range. If len is negative, flushes the whole cache.
  * This is used on some architecture to interact with DMA hardware (e.g. Ethernet and USB. It can be

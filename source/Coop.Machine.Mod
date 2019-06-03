@@ -168,10 +168,6 @@ BEGIN
 	IF num = 0 THEN physAdr[0].adr := NilAdr; physAdr[0].size := 0 END;
 END TranslateVirtual;
 
-PROCEDURE Is32BitAddress*(adr: ADDRESS): BOOLEAN;
-BEGIN RETURN Address32 (adr) = adr;
-END Is32BitAddress;
-
 (** Get parameter values from Init string. If n = 0, return val = ASH(bx, 16) + ax, and if n = 1, return val = ASH(dx, 16) + cx, where ax, bx, cx, dx are the register values after the OBL boot loader or noboot.exe have executed the 16-bit x86 code in the Init string. *)
 PROCEDURE GetInit* (n: LONGINT; VAR val: LONGINT);
 BEGIN Environment.GetInit (n, val);

@@ -714,14 +714,14 @@ TYPE
 			NEW(framelist);
 			(* Calculate the address of the 4K boundary contained in the 8K buffe (framelist base address has to be 4KB aligned) *)
 			framelist.framelistbase := SYSTEM.VAL(Machine.Address32, SYSTEM.VAL(SET, ADDRESSOF(framelist.field[0]) + 1024*4 - 1) * {12..31});
-			ASSERT (Machine.Is32BitAddress (framelist.framelistbase));
+			ASSERT (framelist.framelistbase IS Machine.Address32);
 			(* Calculate the index which points to the element positioned at the 4K boundary *)
 			framelist.index := ( framelist.framelistbase - ADDRESSOF(framelist.field[0]) ) DIV 4;
 
 			(* Okay... now allocate the 16byte aligned Queue Heads ... *)
 			NEW(tdlist, 16*TdListSize);
 			tdlistbase := SYSTEM.VAL(Machine.Address32, SYSTEM.VAL(SET, ADDRESSOF(tdlist[0])+15) * {4..31});
-			ASSERT (Machine.Is32BitAddress (tdlistbase));
+			ASSERT (tdlistbase IS Machine.Address32);
 			ASSERT(SYSTEM.VAL(SET, tdlistbase) * {0..3} = {});
 			ASSERT((tdlistbase >= ADDRESSOF(tdlist[0])) & (tdlistbase < ADDRESSOF(tdlist[16*TdListSize-1])));
 
