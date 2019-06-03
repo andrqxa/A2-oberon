@@ -1040,7 +1040,7 @@ END Open;
 			END;
 
 			IF fullView THEN enumerator.Open(mask, {Files.EnumSize, Files.EnumTime}); ELSE enumerator.Open(mask, {}); END;
-			nfiles := enumerator.size;
+			nfiles := TODO(enumerator.size);
 			i := 0;
 			sorted := TRUE;
 			NEW(dir, enumerator.size);

@@ -65,7 +65,7 @@ TYPE
 
 		(** For internal use only. *)
 
-		PROCEDURE PutEntry*(VAR name: ARRAY OF CHAR; flags: SET; time, date, size: LONGINT);
+		PROCEDURE PutEntry*(VAR name: ARRAY OF CHAR; flags: SET; time, date: LONGINT; size: Files.Size);
 		BEGIN
 			ASSERT(adding);
 
