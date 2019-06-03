@@ -316,7 +316,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
-		VAR num:LONGINT; length: SIZE;
+		VAR num, length: SIZE;
 		BEGIN
 			ASSERT(size >= 0);
 			IF (remain=0) THEN len:=0; res:=Streams.EOF; RETURN END;
@@ -335,7 +335,7 @@ TYPE
 	(* convert stream to Base64 encoding on-the-fly *)
 TYPE	Base64Writer* = OBJECT (Streams.Writer);
 		VAR out : Streams.Writer;  buf: POINTER TO ARRAY OF CHAR;
-			group, i, ll: LONGINT; done:BOOLEAN;
+			group, i, ll: SIZE; done:BOOLEAN;
 
 		PROCEDURE &Init*(out:Streams.Writer);
 		BEGIN
@@ -399,7 +399,8 @@ TYPE	Base64Writer* = OBJECT (Streams.Writer);
 		(* decode Base64 stream to cleartext on-the-fly *)
 	Base64Reader* = OBJECT(Streams.Reader)
 		VAR in: Streams.Reader;
-			i, rest, code, group: LONGINT;
+			i, rest, group: SIZE;
+			code: INTEGER;
 			done:BOOLEAN;
 
 		PROCEDURE &Init*(in: Streams.Reader);
@@ -527,14 +528,14 @@ TYPE DumpWriter*= OBJECT(Streams.Writer);
 		END OpenReaderMonitor;
 
 	(*open a size limited writer r on the out stream*)
-	PROCEDURE OpenLimitedWriter*(VAR w: Streams.Writer; out: Streams.Writer; size:LONGINT);
+	PROCEDURE OpenLimitedWriter*(VAR w: Streams.Writer; out: Streams.Writer; size:SIZE);
 	VAR lw: LimitedWriter;
 		BEGIN
 			NEW(lw, out, size); w:=lw;
 		END OpenLimitedWriter;
 
 	(*open a size limited reader r on the in stream*)
-	PROCEDURE OpenLimitedReader*(VAR r: Streams.Reader; in: Streams.Reader; size:LONGINT);
+	PROCEDURE OpenLimitedReader*(VAR r: Streams.Reader; in: Streams.Reader; size:SIZE);
 	VAR lr: LimitedReader;
 		BEGIN
 			NEW(lr, in, size); r:=lr;
@@ -579,7 +580,7 @@ END Test2;
 *)
 (*
 PROCEDURE TestAsync*;
-VAR log: Streams.Writer; i: LONGINT;
+VAR log: Streams.Writer; i: SIZE;
 BEGIN
 	NEW(log, KernelLog.Send,128);
 	log := OpenAsynchronousForwarder(log);
@@ -591,7 +592,7 @@ END TestAsync;
 
 
 PROCEDURE TestAsync2*;
-VAR log: AsynchronousWriter; i: LONGINT;
+VAR log: AsynchronousWriter; i: SIZE;
 BEGIN
 	NEW(log, KernelLog.Send,128);
 	FOR i := 0 TO 200 DO
@@ -600,16 +601,16 @@ BEGIN
 	KernelLog.String(" D O N E "); KernelLog.Ln;
 END TestAsync2;
 
-PROCEDURE TestEncode(VAR buf: ARRAY OF CHAR; pos,len:LONGINT);
-VAR i:LONGINT;
+PROCEDURE TestEncode(VAR buf: ARRAY OF CHAR; pos,len:SIZE);
+VAR i:SIZE;
 BEGIN
 	FOR i:=pos TO pos+len-1 DO
 		IF (buf[i]>="!") & (buf[i]<"~") THEN buf[i]:=CHR(ORD(buf[i])+1) END;
 	END;
 END TestEncode;
 
-PROCEDURE TestDecode(VAR buf: ARRAY OF CHAR; pos,len:LONGINT);
-VAR i:LONGINT;
+PROCEDURE TestDecode(VAR buf: ARRAY OF CHAR; pos,len:SIZE);
+VAR i:SIZE;
 BEGIN
 	FOR i:=pos TO pos+len-1 DO
 		IF (buf[i]>"!") & (buf[i]<="~") THEN buf[i]:=CHR(ORD(buf[i])-1) END;
@@ -618,7 +619,6 @@ END TestDecode;
 
 PROCEDURE TestCrypt*(context:Commands.Context);
 VAR log: Streams.Writer; secretwriter: EncryptingWriter; secretreader:DecryptingReader;
-	i: LONGINT;
 	string:ARRAY 64 OF CHAR; res:BOOLEAN;
 BEGIN
 	NEW(log, KernelLog.Send,128);
