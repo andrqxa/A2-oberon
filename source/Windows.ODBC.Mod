@@ -230,7 +230,7 @@ VAR
 	SQLPutData: PROCEDURE {WINAPI} (
 		hstmt: Kernel32.HANDLE;
 		dataAdr: ADDRESS;
-		dataSize: LONGINT): INTEGER;
+		dataSize: SIZE): INTEGER;
 
 	SQLSetConnectOption: PROCEDURE {WINAPI} (
 		hdbc: Kernel32.HANDLE;
@@ -654,7 +654,7 @@ BEGIN
 	res:= SQLParamData(hstmt.hstmt, ADDRESSOF(data))
 END ParamData;
 
-PROCEDURE PutData*(hstmt: HSTMT; VAR data: ARRAY OF S.BYTE; len: LONGINT; VAR res: INTEGER);
+PROCEDURE PutData*(hstmt: HSTMT; VAR data: ARRAY OF S.BYTE; len: SIZE; VAR res: INTEGER);
 BEGIN
 	res:= SQLPutData(hstmt.hstmt, ADDRESSOF(data), len)
 END PutData;
