@@ -22,9 +22,6 @@ CONST
 	CR = 0DX;  LF = 0AX;  TAB = 9X;  SP = 20X;
 
 TYPE
-	BufferOffset*	= LONGINT; (* offset in the stream biffer *)
-
-TYPE
 	Position* = HUGEINT; (* position in the stream *)
 
 	(** Any stream output procedure or method. *)
