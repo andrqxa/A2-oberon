@@ -2126,7 +2126,7 @@ END Convert;
 
 PROCEDURE ConvertAll*(context : Commands.Context);
 VAR enumerator : Files.Enumerator;
-	filename : Files.FileName; flags : SET; time, date, size : LONGINT;
+	filename : Files.FileName; flags : SET; time, date : LONGINT; size: Files.Size;
 BEGIN
 	NEW(enumerator);
 	enumerator.Open("", {});

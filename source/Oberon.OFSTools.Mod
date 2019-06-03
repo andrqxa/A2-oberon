@@ -191,7 +191,7 @@ END ModifyName;
 
 PROCEDURE GenCopyFiles*;	(** remprefix addprefix ( "mask" | &file | { file [=> file] } ) ~ *)
 VAR
-	s: Texts.Scanner; t: Texts.Text; time, date, size: LONGINT; enum: AosFS.Enumerator;
+	s: Texts.Scanner; t: Texts.Text; time, date: LONGINT; size: AosFS.Size; enum: AosFS.Enumerator;
 	prefix1, prefix2: AosFS.Prefix; name: AosFS.FileName; flags: SET;
 BEGIN
 	StartScan(s);

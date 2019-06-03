@@ -1268,7 +1268,8 @@ VAR
 	enum: Files.Enumerator;
 	eName, fullName, pathname, prefix, pattern, resumeFn, modPat: ARRAY 256 OF CHAR;
 	eFlags, flags : SET;
-	eTime, eDate, eSize : LONGINT;
+	eTime, eDate : LONGINT;
+	eSize : Files.Size;
 	success, eos: BOOLEAN;
 	i,j,z, searchCount, totalFileNameLen, lastlen, loi, sidnext: INTEGER;
 	f: Files.File;

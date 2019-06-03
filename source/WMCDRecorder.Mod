@@ -3056,7 +3056,8 @@ TYPE
 		VAR
 			enumerator: Files.Enumerator;
 			name, filename, path, mask: ARRAY MaxLen OF CHAR;
-			time, date, size: LONGINT;
+			time, date: LONGINT;
+			size: Files.Size;
 			flags: SET;
 			newDir, curDir : Directory;
 			newFile : MakeIsoImages.File;
@@ -3081,8 +3082,8 @@ TYPE
 						curDir := newDir;
 						tmp := newDir;
 					ELSE
-						NEW(newFile, Strings.NewString(filename), Strings.NewString(name), size);
-						INC(project.totalSize, size);
+						NEW(newFile, Strings.NewString(filename), Strings.NewString(name), TODO(size));
+						INC(project.totalSize, TODO(size));
 						owner.UpdateSize(project.totalSize, project(DataProject).overhead);
 						tmp := newFile;
 					END;

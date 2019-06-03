@@ -141,7 +141,8 @@ TYPE
 		PROCEDURE LoadPages*;
 		VAR mask : ARRAY 64 OF CHAR;
 			name : ARRAY 256 OF CHAR; flags : SET;
-			time, date, size : LONGINT;
+			time, date : LONGINT;
+			size : Files.Size;
 			i: SIZE;
 			enumerator : Files.Enumerator;
 			number: LONGINT;

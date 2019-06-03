@@ -357,7 +357,7 @@ TYPE
 
 		(* default implementation using an enumerator *)
 		PROCEDURE Has*(CONST name: ARRAY OF CHAR; VAR fullName: ARRAY OF CHAR; VAR flags: SET): BOOLEAN;
-		VAR enum: Enumerator; time, date, size: LONGINT;
+		VAR enum: Enumerator; time, date: LONGINT; size: Size;
 		BEGIN
 			NEW(enum);
 			enum.Open(name,{});
@@ -500,14 +500,14 @@ TYPE
 
 		(** Get one entry from the enumerator. *)
 
-		PROCEDURE GetEntry*(VAR name: ARRAY OF CHAR; VAR flags: SET; VAR time, date, size: LONGINT): BOOLEAN;
+		PROCEDURE GetEntry*(VAR name: ARRAY OF CHAR; VAR flags: SET; VAR time, date: LONGINT; VAR size: Size): BOOLEAN;
 		VAR len: LONGINT;
 		BEGIN
 			ReadNum(r, len);
 			IF ~r.eof THEN
 				name[len] := 0X;	(* index check *)
 				r.file.ReadBytes(r, name, 0, len);
-				ReadSet(r, flags); ReadNum(r, time); ReadNum(r, date); ReadNum(r, size);
+				ReadSet(r, flags); ReadNum(r, time); ReadNum(r, date); ReadSize(r, size);
 				ASSERT(~r.eof)
 			END;
 			RETURN ~r.eof
@@ -1263,6 +1263,18 @@ BEGIN
 	x := ASH(LSH(LONG(ORD(ch)), 25), n-25) + y
 END ReadNum;
 
+PROCEDURE ReadSize*(VAR r: Rider; VAR x: Size);
+VAR ch: CHAR; n, y: LONGINT; f: File;
+BEGIN
+	n := 0; y := 0; f := r.file;
+	f.Read(r, ch);
+	WHILE ch >= 80X DO
+		INC(y, LSH(LONG(ORD(ch)) - 128, n)); INC(n, 7);
+		f.Read(r, ch)
+	END;
+	x := ASH(LSH(LONG(ORD(ch)), 25), n-25) + y
+END ReadSize;
+
 (** Portable routines to write the standard Oberon types. DEPRECATED, used Streams instead. *)
 
 PROCEDURE WriteSInt*(VAR r: Rider; x: SHORTINT);
@@ -1316,7 +1328,7 @@ END WriteString;
 
 (* Writes a number in a compressed format. *)
 
-PROCEDURE WriteNum*(VAR r: Rider; x: LONGINT);
+PROCEDURE WriteNum*(VAR r: Rider; x: HUGEINT);
 VAR f: File;
 BEGIN
 	f := r.file;

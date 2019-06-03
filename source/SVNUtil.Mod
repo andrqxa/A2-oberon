@@ -50,7 +50,7 @@ TYPE
 			adding := FALSE;
 		END Open;
 
-		PROCEDURE GetEntry*(VAR name: ARRAY OF CHAR; VAR flags: SET; VAR time, date, size: LONGINT): BOOLEAN;
+		PROCEDURE GetEntry*(VAR name: ARRAY OF CHAR; VAR flags: SET; VAR time, date: LONGINT; VAR size: Files.Size): BOOLEAN;
 		BEGIN
 			IF found THEN
 				COPY ( name0, name );

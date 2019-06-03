@@ -388,7 +388,8 @@ BEGIN
 END LoadApproximateFont;
 
 PROCEDURE MultiTest*;
-VAR name : ARRAY 256 OF CHAR; flags : SET; time, date, size : LONGINT;
+VAR name : ARRAY 256 OF CHAR; flags : SET; time, date : LONGINT;
+	size: Files.Size;
 	enumerator : Files.Enumerator;
 	f : WMGraphics.Font;
 BEGIN

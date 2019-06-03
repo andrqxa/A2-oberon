@@ -402,7 +402,7 @@ END FreeLibraries;
 
 PROCEDURE Directory*;
 VAR
-	beg, end, time, date, size, count, total: LONGINT; enum: AosFS.Enumerator;
+	beg, end, time, date: LONGINT; size, total: AosFS.Size; count: SIZE; enum: AosFS.Enumerator;
 	par: Oberon.ParList; R: Texts.Reader; T, t: Texts.Text; flags, fileflags: SET;
 	diroption, ch: CHAR; pat: ARRAY 32 OF CHAR;
 	name: AosFS.FileName;
@@ -448,7 +448,7 @@ BEGIN
 		    Texts.Write(W, 9X); Texts.WriteDate(W, time, date)
 		END;
 		IF AosFS.EnumSize IN flags THEN
-			Texts.Write(W, 9X); Texts.WriteInt(W, size, 1);
+			Texts.Write(W, 9X); Texts.WriteInt(W, size(LONGINT), 1);
 			INC(total, size)
 		END;
 		Texts.WriteLn(W)
@@ -456,9 +456,9 @@ BEGIN
 	enum.Close;
 	NEW(t); Texts.Open(t, "");
 	IF count > 1 THEN
-		Texts.WriteLn(W);  Texts.WriteInt(W, count, 1); Texts.WriteString(W, " files");
+		Texts.WriteLn(W);  Texts.WriteInt(W, count(LONGINT), 1); Texts.WriteString(W, " files");
 		IF AosFS.EnumSize IN flags THEN
-			Texts.WriteString(W, " use "); WriteK(W, (total+1023) DIV 1024)
+			Texts.WriteString(W, " use "); WriteK(W, (total(LONGINT)+1023) DIV 1024)
 		END
 	END;
 	Texts.Append(t, W.buf);

@@ -234,7 +234,7 @@ TYPE
 		END SortDirs;
 
 		PROCEDURE EnumerateSubDirectories(tree : WMTrees.Tree; node : WMTrees.TreeNode; dir : Strings.String);
-		VAR name, path, filename, mask : Files.FileName; flags : SET; time, date, size : LONGINT;
+		VAR name, path, filename, mask : Files.FileName; flags : SET; time, date : LONGINT; size : Files.Size;
 			dirNode : WMTrees.TreeNode;
 			td : TreeData; has : BOOLEAN;
 			dirArray: POINTER TO ARRAY OF TreeData;
@@ -316,12 +316,13 @@ TYPE
 	DirEntry* = OBJECT
 	VAR
 		name*, path- : Strings.String;
-		time, date, size*: LONGINT;
+		time, date: LONGINT;
+		size*: Files.Size;
 		flags : SET;
 		visible : BOOLEAN;
 		node* : WMTrees.TreeNode;
 
-		PROCEDURE &Init*(name, path : Strings.String; time, date, size : LONGINT; flags : SET);
+		PROCEDURE &Init*(name, path : Strings.String; time, date : LONGINT; size: Files.Size; flags : SET);
 		BEGIN
 			SELF.name := name;
 			SELF.path := path;
@@ -1025,8 +1026,8 @@ END Open;
 		PROCEDURE ScanPath;
 		VAR s, pathS : Strings.String;
 			i, l : SIZE;
-			name, path, filename, mask : Files.FileName; flags : SET; time, date, size : LONGINT;
-			sorted : BOOLEAN;
+			name, path, filename, mask : Files.FileName; flags : SET; time, date : LONGINT;
+			size : Files.Size; sorted : BOOLEAN;
 		BEGIN
 			s := SELF.path;
 			IF s = NIL THEN RETURN END;

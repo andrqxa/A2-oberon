@@ -197,7 +197,7 @@ TYPE
 
 		PROCEDURE Directory(name: ARRAY OF CHAR; full: BOOLEAN);
 		VAR data: TCP.Connection; w: Streams.Writer; e: Files.Enumerator; t: Kernel.MilliTimer;
-			prefix: Files.Prefix; str: ARRAY 20 OF CHAR; date, size, time: LONGINT; res: WORD; flags: SET; c: CHAR;
+			prefix: Files.Prefix; str: ARRAY 20 OF CHAR; date, time: LONGINT; size: Files.Size; res: WORD; flags: SET; c: CHAR;
 			split: BOOLEAN;
 		BEGIN
 			SendMessage(150, "Opening ASCII mode data connection for file list.");

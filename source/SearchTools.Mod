@@ -219,7 +219,8 @@ VAR
 	enum : Files.Enumerator;
 	filename : Files.FileName;
 	fileflags : SET;
-	time, date, size: LONGINT; nofMatches : SIZE;
+	time, date : LONGINT; nofMatches : SIZE;
+	size : Files.Size;
 BEGIN
 	ASSERT(proc # NIL);
 	IF path # "" THEN Files.JoinPath(path, pattern, filename) END;

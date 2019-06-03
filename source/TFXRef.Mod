@@ -867,7 +867,8 @@ END Generate;
 (** Make sure to have built all the TFPET Symbol files first *)
 PROCEDURE MakeXRef*(par : Commands.Context) ;
 VAR e : Files.Enumerator;
-	path, name, exclude : ARRAY 256 OF CHAR; flags : SET; time, date, size : LONGINT;
+	path, name, exclude : ARRAY 256 OF CHAR; flags : SET; time, date : LONGINT;
+	size : Files.Size;
 	sr : Streams.Reader;
 	indexFileWriter : Files.Writer;
 	f : Files.File;

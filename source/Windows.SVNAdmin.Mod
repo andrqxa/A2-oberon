@@ -277,7 +277,8 @@ TYPE
 		PROCEDURE Add* ( CONST path : ARRAY OF CHAR; CONST name : ARRAY OF CHAR; addGlobal : BOOLEAN; VAR res : WORD );
 		VAR
 			file, entryfile, tmp, tmp2 : Files.FileName;
-			res1: WORD; time, date, size : LONGINT;
+			res1: WORD; time, date : LONGINT;
+			size : Files.Size;
 			w : Files.Writer;
 			flags : SET;
 			enum : Files.Enumerator;

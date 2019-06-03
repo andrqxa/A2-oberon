@@ -399,7 +399,7 @@ PROCEDURE RenameExtension*(context : Commands.Context);
 VAR
 	enumerator : Files.Enumerator;
 	oe, ne, temp: ARRAY 16 OF CHAR;
-	name, file, ext : Files.FileName; flags : SET; time, date, size: LONGINT; res : WORD;
+	name, file, ext : Files.FileName; flags : SET; time, date: LONGINT; size: Files.Size; res : WORD;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(oe);
 	context.arg.SkipWhitespace; context.arg.String(ne);

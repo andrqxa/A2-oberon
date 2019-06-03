@@ -172,7 +172,8 @@ TYPE
 		(* Get filelist of client directory *)
 		PROCEDURE ClientMembers(CONST dir: ARRAY OF CHAR): OdUtil.Lines;
 		VAR
-			enum: Files.Enumerator; time, date, size: LONGINT; entryFlags, flags: SET;
+			enum: Files.Enumerator; time, date: LONGINT;
+			size: Files.Size; entryFlags, flags: SET;
 			pattern: ARRAY 128 OF CHAR;
 			fileNames: OdUtil.Lines; name: OdUtil.Line;
 		BEGIN

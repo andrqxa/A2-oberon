@@ -2947,7 +2947,7 @@ VAR
 
 	PROCEDURE DeleteFiles(CONST pattern : ARRAY OF CHAR);
 	VAR
-		enum : Files.Enumerator; flags : SET; time, date, size : LONGINT; name : Files.FileName;
+		enum : Files.Enumerator; flags : SET; time, date : LONGINT; size : Files.Size; name : Files.FileName;
 		res : WORD;
 	BEGIN
 		NEW(enum); enum.Open(pattern, {});
@@ -3031,6 +3031,7 @@ VAR
 	enumerator : Files.Enumerator;
 	flags : SET;
 	ignore : LONGINT;
+	size : Files.Size;
 BEGIN
 	NEW(options);
 	options.Add("f", "file", Options.String);
@@ -3043,7 +3044,7 @@ BEGIN
 			NEW(diagnostics);
 			IF ParseBuildFile(buildFile, builds, context.out, diagnostics) THEN
 				NEW(enumerator); enumerator.Open(mask, {});
-				WHILE enumerator.GetEntry(fullname, flags, ignore, ignore, ignore) DO
+				WHILE enumerator.GetEntry(fullname, flags, ignore, ignore, size) DO
 					IF ~(Files.Directory IN flags) THEN
 						Files.SplitPath(fullname, path, filename);
 						IF (builds.FindFile(filename) = NIL) THEN

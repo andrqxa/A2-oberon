@@ -409,7 +409,8 @@ TYPE
 		VAR mask, name : ARRAY 1024 OF CHAR;
 			flags : SET;
 			len: SIZE;
-			time, date, size : LONGINT;
+			time, date : LONGINT;
+			size : Files.Size;
 			e : Files.Enumerator;
 		BEGIN
 			COPY(currentPar.path, mask);

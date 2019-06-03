@@ -24,7 +24,7 @@ VAR
 	PROCEDURE CheckSubDirectory( CONST dname: ARRAY OF CHAR ): BOOLEAN;
 	VAR
 		enum: Files.Enumerator;
-		fname, cname: ARRAY 64 OF CHAR; time, date, size: LONGINT; flags: SET;
+		fname, cname: ARRAY 64 OF CHAR; time, date: LONGINT; size: Files.Size; flags: SET;
 	BEGIN
 		cname := "./";  Strings.Append( cname, dname );
 		NEW( enum );

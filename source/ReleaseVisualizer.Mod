@@ -373,7 +373,7 @@ TYPE
 		END ScanModule;
 
 		PROCEDURE ScanForModules(CONST filemask : ARRAY OF CHAR; out : Streams.Writer);
-		VAR enum : Files.Enumerator; name : ARRAY 256 OF CHAR; flags : SET; time, date, size, nofFiles : LONGINT;
+		VAR enum : Files.Enumerator; name : ARRAY 256 OF CHAR; flags : SET; time, date: LONGINT; size : Files.Size; nofFiles : SIZE;
 		BEGIN
 			IF (out # NIL) THEN out.String("Scanning modules "); out.String(filemask); out.String(" ... "); out.Update; END;
 			nofModules := 0;

@@ -333,7 +333,8 @@ TYPE
 		VAR
 			enumerator: Files.Enumerator;
 			name, filename, path, mask: ARRAY MaxLen OF CHAR;
-			time, date, size: LONGINT;
+			time, date: LONGINT;
+			size: Files.Size;
 			flags: SET;
 			newDir: Directory;
 			newFile : File;
@@ -352,7 +353,7 @@ TYPE
 						BuildTree(newDir);
 						tmp := newDir;
 					ELSE
-						NEW(newFile, Strings.NewString(filename), NIL, size);
+						NEW(newFile, Strings.NewString(filename), NIL, TODO(size));
 						tmp := newFile;
 					END;
 					IF dir.content = NIL THEN
