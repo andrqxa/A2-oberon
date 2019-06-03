@@ -469,7 +469,7 @@ TYPE
 		VAR
 			r: Rider;	(* data is stored in an anonymous file, because it is potentially very long *)
 			adding: BOOLEAN;	(* prevent user calls of PutEntry *)
-			size-: LONGINT;	(** total number of entries *)
+			size-: SIZE;	(** total number of entries *)
 
 		(** Open an enumerator and enumerate the files that match mask. *)
 
@@ -523,7 +523,7 @@ TYPE
 
 		(** For internal use only. *)
 
-		PROCEDURE PutEntry*(VAR name: ARRAY OF CHAR; flags: SET; time, date, size: LONGINT);
+		PROCEDURE PutEntry*(VAR name: ARRAY OF CHAR; flags: SET; time, date: LONGINT; size: Size);
 		VAR len: LONGINT;
 		BEGIN
 			ASSERT(adding);
