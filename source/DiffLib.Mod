@@ -58,7 +58,7 @@ TYPE
 				current := current.next;
 				current.size := 0;
 			END;
-			current.lines[current.size] := TODO(reader.GetPosition ());
+			current.lines[current.size] := reader.GetPosition ();
 			INC (current.size);
 			INC (size);
 			REPEAT
