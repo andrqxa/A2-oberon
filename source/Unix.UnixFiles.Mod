@@ -568,7 +568,7 @@ TYPE
 					IF buf.chg THEN
 						IF fd = NoDesc THEN  CreateUnixFile  END;
 						IF buf.org # fpos THEN
-							IF Unix.lseek( fd, buf.org, 0 ) = -1 THEN
+							IF Unix.lseek( fd, TODO(buf.org), 0 ) = -1 THEN
 								Halt( SELF, TRUE, "UnixFiles.File.Flush: lseek failed" )
 							END
 						END;
@@ -613,7 +613,7 @@ TYPE
 						ELSE
 							IF fd = NoDesc THEN  CreateUnixFile  END;
 							IF fpos # org THEN
-								IF Unix.lseek( fd, org, 0 ) = -1 THEN
+								IF Unix.lseek( fd, TODO(org), 0 ) = -1 THEN
 									Halt( SELF, TRUE, "UnixFiles.File.Set: lseek failed" )
 								END
 							END;

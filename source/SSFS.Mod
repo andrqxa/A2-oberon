@@ -709,7 +709,7 @@ TYPE
 						END;
 
 						(* check against file length *)
-						pos := r.bpos * BlockSize + LONGINT(r.apos);
+						pos := TODO(r.bpos) * BlockSize + LONGINT(r.apos);
 						IF (pos + nofBytes > inode.size) THEN
 							nofBytes := inode.size - pos;
 							IF (nofBytes < 0) THEN nofBytes := 0; END;

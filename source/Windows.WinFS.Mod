@@ -448,7 +448,7 @@ TYPE
 			fileSystem := fs
 		END Init;
 
-		PROCEDURE Set*( VAR r: Files.Rider;  pos: LONGINT );
+		PROCEDURE Set*( VAR r: Files.Rider;  pos: Files.Position );
 		VAR size: LONGINT;
 		BEGIN {EXCLUSIVE}
 			IF hfile # Kernel32.InvalidHandleValue THEN
@@ -459,10 +459,10 @@ TYPE
 			IF pos < 0 THEN pos := 0
 			ELSIF pos > fsize THEN pos := fsize
 			END;
-			r.apos := pos DIV BufferSize;  r.bpos := pos MOD BufferSize
+			r.apos := pos DIV BufferSize;  r.bpos := SIZE(pos MOD BufferSize);
 		END Set;
 
-		PROCEDURE Pos*( VAR r: Files.Rider ): LONGINT;
+		PROCEDURE Pos*( VAR r: Files.Rider ): Files.Position;
 		BEGIN
 			RETURN r.apos * BufferSize + r.bpos
 		END Pos;
@@ -508,9 +508,9 @@ TYPE
 		PROCEDURE Read*( VAR r: Files.Rider;  VAR x: CHAR );
 		VAR pos: LONGINT;
 		BEGIN {EXCLUSIVE}
-			pos := r.apos * BufferSize + r.bpos;
+			pos := LONGINT(r.apos) * BufferSize + TODO(r.bpos);
 			IF pos < fsize THEN
-				IF buffer.apos # r.apos THEN ReadBuffer( r.apos ) END;
+				IF buffer.apos # LONGINT(r.apos) THEN ReadBuffer( LONGINT(r.apos) ) END;
 				x := buffer.data[r.bpos];  INC( pos );  r.apos := pos DIV BufferSize;  r.bpos := pos MOD BufferSize
 			ELSE
 				x := 0X; r.eof := TRUE
@@ -521,9 +521,9 @@ TYPE
 		VAR pos, n: SIZE;
 		BEGIN {EXCLUSIVE}
 			ASSERT( (ofs + len) <= LEN( x ) );
-			pos := r.apos * BufferSize + r.bpos;
+			pos := LONGINT(r.apos) * BufferSize + r.bpos;
 			WHILE (len > 0) & (pos < fsize) DO
-				IF buffer.apos # r.apos THEN ReadBuffer( r.apos ) END;
+				IF buffer.apos # LONGINT(r.apos) THEN ReadBuffer( LONGINT(r.apos) ) END;
 				n := buffer.len - r.bpos;
 				IF (n > 0) THEN
 					IF n > len THEN n := len END;
@@ -540,10 +540,10 @@ TYPE
 		PROCEDURE Write*( VAR r: Files.Rider;  x: CHAR );
 		VAR pos: LONGINT;
 		BEGIN {EXCLUSIVE}
-			pos := r.apos * BufferSize + r.bpos;
-			IF buffer.apos # r.apos THEN ReadBuffer( r.apos ) END;
+			pos := LONGINT(r.apos) * BufferSize + TODO(r.bpos);
+			IF LONGINT(r.apos) # r.apos THEN ReadBuffer( LONGINT(r.apos) ) END;
 			buffer.data[r.bpos] := x;  INC( pos );
-			IF (r.bpos + 1) > buffer.len THEN buffer.len := r.bpos + 1 END;
+			IF (r.bpos + 1) > buffer.len THEN buffer.len := TODO(r.bpos) + 1 END;
 			r.apos := pos DIV BufferSize;  r.bpos := pos MOD BufferSize;
 			IF pos > fsize THEN fsize := pos END;
 			buffer.dirty := TRUE;
@@ -553,13 +553,13 @@ TYPE
 		VAR pos, n: LONGINT;
 		BEGIN {EXCLUSIVE}
 			IF len = 0 THEN RETURN END;
-			ASSERT( (len > 0) & ((ofs + len) <= LEN( x )) );  pos := r.apos * BufferSize + r.bpos;
+			ASSERT( (len > 0) & ((ofs + len) <= LEN( x )) );  pos := LONGINT(r.apos) * BufferSize + TODO(r.bpos);
 			WHILE len > 0 DO
-				IF buffer.apos # r.apos THEN ReadBuffer( r.apos ) END;
-				n := BufferSize - r.bpos;
+				IF buffer.apos # LONGINT(r.apos) THEN ReadBuffer( LONGINT(r.apos) ) END;
+				n := BufferSize - TODO(r.bpos);
 				IF n > len THEN n := TODO(len) END;
 				SYSTEM.MOVE( ADDRESSOF( x[ofs] ), ADDRESSOF( buffer.data[r.bpos] ), n );
-				IF (r.bpos + n) > buffer.len THEN buffer.len := r.bpos + n END;
+				IF (r.bpos + n) > buffer.len THEN buffer.len := TODO(r.bpos) + n END;
 				INC( pos, n );  INC( ofs, n );  DEC( len, n );  r.apos := pos DIV BufferSize;  r.bpos := pos MOD BufferSize;
 				IF pos > fsize THEN fsize := pos END;
 				buffer.dirty := TRUE
