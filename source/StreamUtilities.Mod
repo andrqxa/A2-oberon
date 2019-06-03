@@ -23,7 +23,7 @@ TYPE	WriterMonitor* = OBJECT (Streams.Writer);
 		BEGIN
 			out.Bytes(outBuf, ofs, len);
 			monitor.Bytes(outBuf, ofs, len);
-			INC(sent,TODO(len));
+			INC(sent,len);
 			IF propagate THEN out.Update; monitor.Update END;
 			res:=out.res;
 		END Sender;
@@ -63,7 +63,7 @@ TYPE	EncryptingWriter* = OBJECT (Streams.Writer);
 			FOR i:=0 TO len-1 DO buf[i]:=outBuf[ofs+i] END;
 			IF encrypt#NIL THEN encrypt(buf^,0,len); END;
 			out.Bytes(buf^, 0, len);
-			INC(sent,TODO(len));
+			INC(sent,len);
 			IF propagate THEN out.Update END;
 			res:=out.res;
 		END Sender;
@@ -74,7 +74,7 @@ TYPE	EncryptingWriter* = OBJECT (Streams.Writer);
 
 	END EncryptingWriter;
 
-	TYPE  Decryptor*=PROCEDURE{DELEGATE}( VAR buf: ARRAY OF CHAR;  pos, len: LONGINT );
+	TYPE  Decryptor*=PROCEDURE{DELEGATE}( VAR buf: ARRAY OF CHAR;  pos, len: SIZE );
 
 	(* reader that can daisychained with another reader that reads and decrypts a stream*)
 	DecryptingReader* = OBJECT(Streams.Reader)
@@ -92,8 +92,8 @@ TYPE	EncryptingWriter* = OBJECT (Streams.Writer);
 		BEGIN
 			ASSERT((size > 0) & (min <= size) & (min >= 0));
 			in.Bytes(inBuf, ofs, size, len);
-			IF decrypt#NIL THEN decrypt(inBuf, TODO(ofs), TODO(len)); END;
-			INC(received,TODO(len));
+			IF decrypt#NIL THEN decrypt(inBuf, ofs, len); END;
+			INC(received,len);
 			res:=in.res;
 		END Receiver;
 
@@ -233,7 +233,7 @@ TYPE
 		BEGIN
 			out.Bytes(outBuf, ofs, len);
 			IF propagate THEN out.Update END;
-			INC(sent,TODO(len));
+			INC(sent,len);
 			res:=out.res;
 		END Sender;
 
@@ -254,9 +254,9 @@ TYPE
 		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		BEGIN
 			ASSERT((size > 0) & (min <= size) & (min >= 0));
-			size := MAX(min,MIN(TODO(in.Available()),size));
+			size := MAX(min,MIN(in.Available(),size));
 			in.Bytes(buf, ofs, size, len);
-			INC(received,TODO(len));
+			INC(received,len);
 			res:=in.res;
 			monitor.Bytes(buf, ofs, len);
 			monitor.Update;
@@ -278,9 +278,9 @@ TYPE
 
 	LimitedWriter* = OBJECT (Streams.Writer);
 		VAR out : Streams.Writer;
-			size, remain-: LONGINT;
+			size, remain-: SIZE;
 
-		PROCEDURE &Init*(out:Streams.Writer; size: LONGINT);
+		PROCEDURE &Init*(out:Streams.Writer; size: SIZE);
 		BEGIN
 			InitWriter(Sender, MIN(size, WriterBufSize));
 			SELF.out := out;
@@ -288,9 +288,9 @@ TYPE
 		END Init;
 
 		PROCEDURE Sender(CONST outBuf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
-		VAR num:LONGINT;
+		VAR num:SIZE;
 		BEGIN
-			num:=MIN(remain,TODO(len));
+			num:=MIN(remain,len);
 			out.Bytes(outBuf, ofs, num);
 			DEC(remain, num);
 			IF propagate THEN out.Update END;
@@ -321,8 +321,8 @@ TYPE
 			ASSERT(size >= 0);
 			IF (remain=0) THEN len:=0; res:=Streams.EOF; RETURN END;
 			in.Bytes(buf, ofs, MIN(remain,size), length);
-			len := TODO(length);
-			DEC(remain,len); INC(received,TODO(len));
+			len := length;
+			DEC(remain,len); INC(received,len);
 			res:=in.res;
 		END Receiver;
 
@@ -458,7 +458,7 @@ TYPE	Base64Writer* = OBJECT (Streams.Writer);
 			ELSE
 				res:=in.res;
 			END;
-			INC(received,TODO(len));
+			INC(received,len);
 		END Receiver;
 
 		PROCEDURE Pos*(): Streams.Position;
