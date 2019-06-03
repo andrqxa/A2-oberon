@@ -420,7 +420,7 @@ TYPE
 			ASSERT(ofs+len <= LEN(data));	(* index check *)
 			LOOP
 				IF len <= 0 THEN EXIT END;
-				IF len <= maxseg THEN len0 := TODO(len) ELSE len0 := maxseg END;
+				IF len <= maxseg THEN len0 := LONGINT(len) ELSE len0 := maxseg END;
 				IF ~((state IN {Established, CloseWait}) & (sndspace >= len0)) THEN	(* can not send immediately *)
 					AWAIT(((state IN {Established, CloseWait}) & (sndspace >= len0)) OR ~(state IN {SynSent..CloseWait}));
 					IF StrongChecks THEN Invariant(SELF) END;

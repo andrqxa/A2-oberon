@@ -29,7 +29,7 @@ CONST
 			IF len = 0 THEN  EXIT  END;
 			w.RawNum( len );
 			w.RawNum( bw.EncodeBlock( buffer, len ) );
-			huff.CompressBlock( buffer, TODO(len) );
+			huff.CompressBlock( buffer, len );
 		END;
 		w.RawNum( 0 );	(* mark end of stream *)
 		w.Update

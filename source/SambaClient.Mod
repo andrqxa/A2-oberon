@@ -507,10 +507,10 @@ TYPE
 				i := adjOff;
 
 				c.in.Bytes(x, ofs, byteCount, i);
-				ofs := ofs + TODO(i);
-				r.apos := r.apos + TODO(i);
+				ofs := ofs + i;
+				r.apos := r.apos + i;
 
-				r.res := r.res + adjLen - TODO(i);
+				r.res := r.res + adjLen - i;
 				len := len - adjLen;
 				adjOff := adjOff + adjLen;
 			END;
@@ -544,7 +544,7 @@ TYPE
 					key := localKey;
 					openRead := FALSE;
 				ELSE
-					r.res := TODO(len);
+					r.res := len;
 					fs(FileSystem).lock.Release();
 					RETURN;
 				END;

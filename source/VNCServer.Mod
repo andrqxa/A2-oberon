@@ -475,7 +475,7 @@ TYPE
 		BEGIN {EXCLUSIVE}
 			out.Char(3X); (* message type *)
 			out.Char(0X); out.Char(0X); out.Char(0X); (* padding *)
-			len := TODO(Strings.Length(text^));
+			len := Strings.Length(text^)(LONGINT);
 			out.Net32(len);
 			out.String(text^);
 		END SendClipboard;
