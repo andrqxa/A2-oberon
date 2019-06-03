@@ -746,7 +746,7 @@ END Promote;
 PROCEDURE Remove*(fs: FileSystem);
 VAR
 	enum: OBJECT
-		VAR count: LONGINT; fs: FileSystem;
+		VAR count: SIZE; fs: FileSystem;
 
 		PROCEDURE EnumFile(f: ANY; VAR cont: BOOLEAN);
 		BEGIN
@@ -972,7 +972,7 @@ VAR
 	sfs, dfs : FileSystem;
 	sfile, dfile : File;
 	buffer : ARRAY BufferSize OF CHAR;
-	i : LONGINT;
+	i : Size;
 BEGIN
 	SplitName(source, sprefix, sname);
 	SplitName(destination, dprefix, dname);
@@ -1235,7 +1235,7 @@ BEGIN
 END ReadLReal;
 
 PROCEDURE ReadString*(VAR r: Rider; VAR x: ARRAY OF CHAR);
-VAR i: LONGINT; ch: CHAR; f: File;
+VAR i: SIZE; ch: CHAR; f: File;
 BEGIN
 	i := 0; f := r.file;
 	LOOP
@@ -1257,19 +1257,19 @@ BEGIN
 	n := 0; y := 0; f := r.file;
 	f.Read(r, ch);
 	WHILE ch >= 80X DO
-		INC(y, LSH(LONG(ORD(ch)) - 128, n)); INC(n, 7);
+		INC(y, LSH(LONGINT(ORD(ch)) - 128, n)); INC(n, 7);
 		f.Read(r, ch)
 	END;
 	x := ASH(LSH(LONG(ORD(ch)), 25), n-25) + y
 END ReadNum;
 
 PROCEDURE ReadSize*(VAR r: Rider; VAR x: Size);
-VAR ch: CHAR; n, y: LONGINT; f: File;
+VAR ch: CHAR; n, y: SIZE; f: File;
 BEGIN
 	n := 0; y := 0; f := r.file;
 	f.Read(r, ch);
 	WHILE ch >= 80X DO
-		INC(y, LSH(LONG(ORD(ch)) - 128, n)); INC(n, 7);
+		INC(y, LSH(SIZE(ORD(ch)) - 128, n)); INC(n, 7);
 		f.Read(r, ch)
 	END;
 	x := ASH(LSH(LONG(ORD(ch)), 25), n-25) + y
@@ -1320,7 +1320,7 @@ BEGIN
 END WriteLReal;
 
 PROCEDURE WriteString*(VAR r: Rider; CONST x: ARRAY OF CHAR);
-VAR i: LONGINT;
+VAR i: SIZE;
 BEGIN
 	i := 0; WHILE x[i] # 0X DO INC(i) END;
 	r.file.WriteBytes(r, x, 0, i+1)
@@ -1343,7 +1343,7 @@ END WriteNum;
 (** Append first string to second string, truncating on overflow. *)
 
 PROCEDURE AppendStr*(CONST from: ARRAY OF CHAR; VAR to: ARRAY OF CHAR);
-VAR i, j, m: LONGINT;
+VAR i, j, m: SIZE;
 BEGIN
 	j := 0; WHILE to[j] # 0X DO INC(j) END;
 	m := LEN(to)-1;
@@ -1354,7 +1354,7 @@ END AppendStr;
 (** Append unsigned integer to string in ASCII format. *)
 
 PROCEDURE AppendInt*(x: LONGINT; VAR to: ARRAY OF CHAR);
-VAR i, m: LONGINT;
+VAR i: SIZE; m: LONGINT;
 BEGIN
 	ASSERT(x >= 0);
 	i := 0; WHILE to[i] # 0X DO INC(i) END;
@@ -1373,7 +1373,7 @@ END AppendInt;
 
 (** Get the dev#part string from the stream *)
 PROCEDURE GetDevPart*(arg : Streams.Reader; VAR deviceName : ARRAY OF CHAR; VAR partition : LONGINT);
-VAR i : LONGINT; ch : CHAR;
+VAR i : SIZE; ch : CHAR;
 BEGIN
 	arg.SkipWhitespace;
 	deviceName := ""; partition := 0;
@@ -1412,7 +1412,7 @@ END FSCleanup;
 PROCEDURE ShowList*;
 VAR
 	enum: OBJECT
-		VAR i: LONGINT;
+		VAR i: SIZE;
 
 		PROCEDURE EnumFile(f: ANY; VAR cont: BOOLEAN);
 		VAR name: FileName;
