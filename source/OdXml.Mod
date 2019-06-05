@@ -581,11 +581,11 @@ PROCEDURE Dev0(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR
 BEGIN END Dev0;
 
 (* Find size of an XML object which must be written. *)
-PROCEDURE XmlSize*(doc: XML.Document): LONGINT;
+PROCEDURE XmlSize*(doc: XML.Document): Streams.Position;
 VAR counter: Streams.Writer;
 BEGIN
 	Streams.OpenWriter(counter, Dev0); doc.Write(counter, NIL, 0); counter.Update();
-	RETURN TODO(counter.sent);
+	RETURN counter.sent;
 END XmlSize;
 
 (** Collect XML namespaces from an element. No nested scopes. So hope that no namespace is redefined in

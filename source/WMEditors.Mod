@@ -576,9 +576,9 @@ TYPE
 							valid := UTF8Strings.DecodeChar(x, idx, string[i]);
 							INC(j);
 						END;
-						curLen := curLen + TODO(length);
+						curLen := curLen + length;
 						string[curLen] := 0;
-						cursorPosition := TODO(position + length);
+						cursorPosition := position + length;
 						changed := TRUE;
 					ELSE
 						changed := FALSE;

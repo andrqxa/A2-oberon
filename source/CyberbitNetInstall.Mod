@@ -24,7 +24,7 @@ TYPE
 			ftpConnection : FTPClient.FTPClient;
 			errorStr : ARRAY 512 OF CHAR;
 			f : Files.File;
-			status : StatusWindow; transCount : LONGINT;
+			status : StatusWindow; transCount : SIZE;
 		BEGIN
 			NEW(ftpConnection);
 			(* open connection to the ftp *)
@@ -81,7 +81,7 @@ TYPE
 				status.Show; transCount := 0;
 				REPEAT
 					r.Bytes(buf, 0, BufSize, len); w.Bytes(buf, 0, len);
-					INC(transCount, TODO(len));
+					INC(transCount, len);
 					status.UpdateStatus(1, transCount);
 				UNTIL r.res # 0;
 				ftpConnection.CloseGet(res);
@@ -186,7 +186,7 @@ TYPE
 			shown := FALSE
 		END Hide;
 
-		PROCEDURE UpdateStatus*(file, size : LONGINT);
+		PROCEDURE UpdateStatus*(file, size : SIZE);
 		BEGIN
 			bar.bounds.SetWidth(ENTIER((windowWidth-20)/fileSize*size));
 		END UpdateStatus;

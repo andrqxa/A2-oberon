@@ -829,9 +829,10 @@ TYPE
 		CONST
 			StringWriterSize = 10000;
 		VAR
-			host : ARRAY 128 OF CHAR; path : ARRAY 256 OF CHAR; xmlSize, port : LONGINT;
+			host : ARRAY 128 OF CHAR; path : ARRAY 256 OF CHAR; port : LONGINT;
 			w, aosioWriter : Streams.Writer; x : WebHTTP.AdditionalField;
 			buf: ARRAY StringWriterSize OF CHAR; stringWriter: Streams.StringWriter;
+			xmlSize: Streams.Position;
 		BEGIN
 			reqHeader.useragent := UserAgent;
 			(* Cleanup responseHeader in case it's reused *)
@@ -1060,7 +1061,7 @@ TYPE
 			xmlDoc: XML.Document;
 			(* For bodytracing. TODO: Update should be converted to Net(). *)
 			CONST StringWriterSize = 10000;
-			VAR xmlSize: LONGINT; buf: ARRAY StringWriterSize OF CHAR; stringWriter: Streams.StringWriter;
+			VAR xmlSize: Streams.Position; buf: ARRAY StringWriterSize OF CHAR; stringWriter: Streams.StringWriter;
 			aosioWriter : Streams.Writer;
 		BEGIN
 			xmlSize := 0;
