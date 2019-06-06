@@ -614,7 +614,7 @@ BEGIN
 	IF neg THEN val := -val END
 END StrToInt;
 
-(** converts a string to an integer. Leading whitespace is ignored *)
+(** converts a string to a huge integer. Leading whitespace is ignored *)
 PROCEDURE StrToHInt*(CONST str: ARRAY OF CHAR; VAR val: HUGEINT);
 VAR i: SIZE; d: HUGEINT; neg: BOOLEAN;
 BEGIN
@@ -639,6 +639,31 @@ BEGIN
 	IF neg THEN val := -val END
 END StrToHInt;
 
+(** converts a string to a size. Leading whitespace is ignored *)
+PROCEDURE StrToSize*(CONST str: ARRAY OF CHAR; VAR val: SIZE);
+VAR i: SIZE; d: SIZE; neg: BOOLEAN;
+BEGIN
+	i := 0; WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
+	neg := FALSE;
+	IF (str[i] = "+") THEN INC(i)
+	ELSIF (str[i] = "-") THEN neg := TRUE; INC(i)
+	END;
+
+	val := 0;
+	WHILE (str[i] >= "0") & (str[i] <= "9") DO
+		d := ORD(str[i])-ORD("0");
+		IF (val <= ((MAX(SIZE)-d) DIV 10)) THEN val := 10*val+d
+		ELSIF neg & (val = MAX(SIZE) DIV 10) & (d = MAX(SIZE) MOD 10) & ((str[i+1] < "0") OR (str[i+1] > "9")) THEN
+			(* SIZE range needs special handling *)
+			val := MIN(SIZE); neg := FALSE
+		ELSE
+			HALT(99)
+		END;
+		INC(i)
+	END;
+	IF neg THEN val := -val END
+END StrToSize;
+
 (** Convert the substring beginning at position i in str into an integer. Leading whitespace is ignored.
 	After the conversion i points to the first character after the integer. *)
 PROCEDURE StrToIntPos*(CONST str: ARRAY OF CHAR; VAR val: LONGINT; VAR i: SIZE);
@@ -654,6 +679,38 @@ BEGIN
 	noStr[val] := 0X;
 	StrToInt(noStr, val)
 END StrToIntPos;
+
+(** Convert the substring beginning at position i in str into a huge integer. Leading whitespace is ignored.
+	After the conversion i points to the first character after the integer. *)
+PROCEDURE StrToHIntPos*(CONST str: ARRAY OF CHAR; VAR val: HUGEINT; VAR i: SIZE);
+VAR noStr: ARRAY 32 OF CHAR;
+BEGIN
+	WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
+	val := 0;
+	IF str[i] = "-" THEN
+		noStr[val] := str[i]; INC(val); INC(i);
+		WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END
+	END;
+	WHILE (str[i] >= "0") & (str[i] <= "9") DO noStr[val] := str[i]; INC(val); INC(i) END;
+	noStr[val] := 0X;
+	StrToHInt(noStr, val)
+END StrToHIntPos;
+
+(** Convert the substring beginning at position i in str into a size. Leading whitespace is ignored.
+	After the conversion i points to the first character after the integer. *)
+PROCEDURE StrToSizePos*(CONST str: ARRAY OF CHAR; VAR val: SIZE; VAR i: SIZE);
+VAR noStr: ARRAY 32 OF CHAR;
+BEGIN
+	WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
+	val := 0;
+	IF str[i] = "-" THEN
+		noStr[val] := str[i]; INC(val); INC(i);
+		WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END
+	END;
+	WHILE (str[i] >= "0") & (str[i] <= "9") DO noStr[val] := str[i]; INC(val); INC(i) END;
+	noStr[val] := 0X;
+	StrToSize(noStr, val)
+END StrToSizePos;
 
 (** converts an integer value to a hex string *)
 PROCEDURE IntToHexStr*(h : HUGEINT; width: WORD; VAR s: ARRAY OF CHAR);
