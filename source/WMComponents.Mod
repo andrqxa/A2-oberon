@@ -1214,7 +1214,7 @@ TYPE
 
 		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; x,y : LONGINT; VAR res : WORD);
 		VAR gen: XML.GeneratorProcedure; moduleName, procedureName ,msg: Modules.Name; element: XML.Element;
-			context: Repositories.Context; repositoryName, componentName: ARRAY 265 OF CHAR; componentID: LONGINT; object: Repositories.Component;
+			context: Repositories.Context; repositoryName, componentName: ARRAY 265 OF CHAR; componentID: SIZE; object: Repositories.Component;
 		BEGIN
 			Commands.Split(string, moduleName, procedureName, res, msg);
 			IF (res = Commands.Ok) THEN

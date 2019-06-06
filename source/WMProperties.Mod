@@ -20,7 +20,7 @@ TYPE
 		repositoryName : Strings.String;
 		componentName : Strings.String;
 		generator : Strings.String;
-		componentID : LONGINT;
+		componentID : SIZE;
 
 		inLinkUpdate: BOOLEAN;
 
@@ -53,7 +53,7 @@ TYPE
 		END LinkChanged;
 
 		PROCEDURE SetLinkAsString*(CONST string : ARRAY OF CHAR);
-		VAR repositoryName : ARRAY 256 OF CHAR; componentName : ARRAY 128 OF CHAR; componentID : LONGINT;
+		VAR repositoryName : ARRAY 256 OF CHAR; componentName : ARRAY 128 OF CHAR; componentID : SIZE;
 		context : Repositories.Context; res : WORD; object: Repositories.Component;
 		BEGIN
 			IF Repositories.IsCommandString(string) THEN
@@ -131,7 +131,7 @@ TYPE
 		END IsLink;
 
 		PROCEDURE WriteLink*(w : Streams.Writer; context: ANY;  indent : LONGINT): BOOLEAN;
-		VAR name : String; id: LONGINT; res: WORD; repository: Repositories.Repository; objectName: String;
+		VAR name : String; id: SIZE; res: WORD; repository: Repositories.Repository; objectName: String;
 		BEGIN
 			IF object # NIL THEN
 				Indent(w, indent);
@@ -1914,7 +1914,7 @@ TYPE
 		repositoryName : Strings.String;
 		componentName : Strings.String;
 		generator : Strings.String;
-		componentID : LONGINT;
+		componentID : SIZE;
 		*)
 		(* temporary used in WriteXML *)
 		level: LONGINT;
@@ -2078,7 +2078,7 @@ TYPE
 		END ToXML;
 
 		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : LONGINT);
-		VAR name : String; id: LONGINT; res: WORD; repository: Repositories.Repository; objectName: String;
+		VAR name : String; id: SIZE; res: WORD; repository: Repositories.Repository; objectName: String;
 		BEGIN
 			name := GetName();
 			IF name = NIL THEN KernelLog.String("Nameless boolean property encountered. Ignored"); KernelLog.Ln; RETURN END;

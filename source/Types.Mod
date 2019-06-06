@@ -1021,7 +1021,7 @@ END Assign;
 
 
 PROCEDURE StringToComponent(CONST string : ARRAY OF CHAR; VAR component : Repositories.Component; VAR res : WORD);
-VAR repositoryName, componentName : ARRAY 64 OF CHAR; componentID : LONGINT;
+VAR repositoryName, componentName : ARRAY 64 OF CHAR; componentID : SIZE;
 BEGIN
 	component := NIL;
 	IF Repositories.SplitName(string, repositoryName, componentName, componentID) THEN
@@ -1032,7 +1032,7 @@ BEGIN
 END StringToComponent;
 
 PROCEDURE ComponentToString(CONST component : Repositories.Component; VAR string : ARRAY OF CHAR; VAR res : WORD);
-VAR repository : Repositories.Repository; componentName : Repositories.Name; nbr : ARRAY 16 OF CHAR; componentID : LONGINT;
+VAR repository : Repositories.Repository; componentName : Repositories.Name; nbr : ARRAY 16 OF CHAR; componentID : SIZE;
 BEGIN
 	string := "";
 	IF (component # NIL) THEN

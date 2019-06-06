@@ -3403,7 +3403,7 @@ TYPE
 		PROCEDURE HandleStoreButton(sender, data : ANY);
 		VAR
 			component : Repositories.Component; repository : Repositories.Repository;
-			name, repositoryName, componentName : ARRAY 256 OF CHAR; id: LONGINT; res: WORD;
+			name, repositoryName, componentName : ARRAY 256 OF CHAR; id: SIZE; res: WORD;
 			filename : Files.FileName;
 		BEGIN
 			component := SELF.component;
@@ -3439,7 +3439,7 @@ TYPE
 		END HandleStoreButton;
 
 		PROCEDURE HandleRemoveButton(sender, data : ANY);
-		VAR component : Repositories.Component; ignore : Repositories.Name; repository : Repositories.Repository; refNum: LONGINT;
+		VAR component : Repositories.Component; ignore : Repositories.Name; repository : Repositories.Repository; refNum: SIZE;
 			res: WORD;
 		BEGIN
 			component := SELF.component;
@@ -3457,7 +3457,7 @@ TYPE
 		END HandleRemoveButton;
 
 		PROCEDURE HandleUpdateButton(sender, data : ANY);
-		VAR component : Repositories.Component; ignore : Repositories.Name;  repository : Repositories.Repository; refNum: LONGINT;
+		VAR component : Repositories.Component; ignore : Repositories.Name;  repository : Repositories.Repository; refNum: SIZE;
 			res: WORD;
 		BEGIN
 			component := SELF.component;
@@ -3475,7 +3475,7 @@ TYPE
 		END HandleUpdateButton;
 
 		PROCEDURE HandleUnbindButton(sender, data : ANY);
-		VAR component : Repositories.Component; ignore : Repositories.Name;  repository : Repositories.Repository; refNum : LONGINT;
+		VAR component : Repositories.Component; ignore : Repositories.Name;  repository : Repositories.Repository; refNum : SIZE;
 		BEGIN
 			component := SELF.component;
 			IF (component # NIL) THEN
@@ -3506,7 +3506,7 @@ TYPE
 		PROCEDURE Update;
 		VAR
 			component : Repositories.Component; repository : Repositories.Repository; cname : Repositories.Name;
-			caption : Strings.String; refNum : LONGINT;
+			caption : Strings.String; refNum : SIZE;
 		BEGIN
 			component := SELF.component;
 			IF (component # NIL) THEN
@@ -3943,5 +3943,4 @@ BEGIN
 END WMInspectionComponents.
 
 System.FreeDownTo WMInspectionComponents ~
-
 

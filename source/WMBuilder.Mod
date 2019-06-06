@@ -2937,7 +2937,7 @@ TYPE
 		PROCEDURE HandleStoreBtn(sender, data : ANY);
 		VAR
 			w : EditWindow;
-			repositoryName, componentName : ARRAY 64 OF CHAR; refNum : LONGINT;
+			repositoryName, componentName : ARRAY 64 OF CHAR; refNum : SIZE;
 			name, filename : Files.FileName;
 			repository : Repositories.Repository;
 			res : WORD;
@@ -3459,5 +3459,4 @@ PC.Compile \s
 	WMInspectionComponents.Mod
 	WMBuilder.Mod
 ~
-
 
