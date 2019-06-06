@@ -98,7 +98,7 @@ TYPE
 			state := HierarchicalProfiler.GetState(currentNofSamples, maxNofSamples);
 			IF (state # lastState) OR forceUpdate THEN
 				IF (state = HierarchicalProfiler.Running) THEN
-					progressBar.SetRange(0, TODO(maxNofSamples));
+					progressBar.SetRange(0, maxNofSamples);
 				END;
 
 				CASE state OF
@@ -125,7 +125,7 @@ TYPE
 				lastState := state;
 			END;
 			IF (state = HierarchicalProfiler.Running) THEN
-				progressBar.SetCurrent(TODO(currentNofSamples));
+				progressBar.SetCurrent(currentNofSamples);
 			END;
 		END UpdateStatusBar;
 

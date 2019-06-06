@@ -132,7 +132,7 @@ TYPE
 		pc-: LONGINT; (* points to next instruction = len *)
 		finally-: LONGINT; (* finally section starts at, -1 if none *)
 		resolved-, alias-: BinaryCode.Section; (* reference to section containing compiled byte array *) (* TODO: ret rid of that? *)
-		aliasOffset-: LONGINT; (* for aliases *)
+		aliasOffset-: SIZE; (* for aliases *)
 
 		comments-: Sections.CommentWriter;
 		sizeInUnits: LONGINT;
@@ -171,7 +171,7 @@ TYPE
 		BEGIN resolved := section
 		END SetResolved;
 
-		PROCEDURE SetAlias*(section: BinaryCode.Section; offset: LONGINT);
+		PROCEDURE SetAlias*(section: BinaryCode.Section; offset: SIZE);
 		BEGIN
 			alias := section; aliasOffset := offset;
 		END SetAlias;

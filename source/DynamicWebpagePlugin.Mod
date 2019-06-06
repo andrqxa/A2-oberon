@@ -705,7 +705,7 @@ TYPE
 			IF paramTempList.GetCount() > 0 THEN
 				NEW(params.parameters, paramTempList.GetCount());
 				FOR i := 0 TO paramTempList.GetCount()-1 DO
-					p := paramTempList.GetItem(TODO(i)); params.parameters[i] := p(DynamicWebpage.Parameter)
+					p := paramTempList.GetItem(i); params.parameters[i] := p(DynamicWebpage.Parameter)
 				END
 			ELSE
 				params.parameters := NIL

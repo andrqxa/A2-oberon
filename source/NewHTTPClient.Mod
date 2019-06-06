@@ -173,9 +173,9 @@ TYPE
 				w.Ln();
 
 				WHILE length>0 DO
-					body.Bytes(buf, 0, MIN(LEN(buf),TODO(length)), l);
+					body.Bytes(buf, 0, MIN(LEN(buf),length), l);
 					w.Bytes(buf,0,l);
-					DEC(length,TODO(l));
+					DEC(length,l);
 				END;
 				w.Update();
 

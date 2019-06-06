@@ -97,7 +97,7 @@ IMPORT
 	(* Stream for reading a Stream of an .avi file *)
 	TYPE AVIStream* = OBJECT(Codecs.DemuxStream)
 		VAR
-			bufAdr: LONGINT;
+			bufAdr: ADDRESS;
 			r : Streams.Reader;
 			chunkSize*: SIZE;	(* Bytes in actual AVI Chunk *)
 			streamHeader: AVIStreamHeader;

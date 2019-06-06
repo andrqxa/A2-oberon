@@ -733,7 +733,7 @@ TYPE
 		PROCEDURE DoCompile(findPC : BOOLEAN; CONST pc :ARRAY OF CHAR; options : CompilerOptions);
 		VAR
 			compiler : CompilerInterface.Compiler; tw : TextUtilities.TextWriter; errors : BOOLEAN;
-			positions : ARRAY 2 OF LONGINT;
+			positions : ARRAY 2 OF SIZE;
 			type : LONGINT;
 		BEGIN
 			ClearLog;

@@ -119,7 +119,7 @@ TYPE
 
 							NEW(alias, resolved.os.identifier, codeSection.pc);
 							IF ~AliasOnlyExported OR exported THEN  codeSection.aliasList.AddAlias(alias) END;
-							section(IntermediateCode.Section).SetAlias(codeSection, TODO(codeSection.pc));
+							section(IntermediateCode.Section).SetAlias(codeSection, codeSection.pc);
 							codeSection.CopyBits(resolved.os.bits,0, resolved.pc*codeUnit);
 
 						ELSIF section.type = ObjectFile.Data THEN
@@ -129,7 +129,7 @@ TYPE
 							resolved.os.identifier.fingerprint := GetFingerprint (section, fingerprinter);
 							NEW(alias, resolved.os.identifier, dataSection.pc);
 							IF ~AliasOnlyExported OR exported THEN dataSection.aliasList.AddAlias(alias) END;
-							section(IntermediateCode.Section).SetAlias(dataSection, TODO(dataSection.pc));
+							section(IntermediateCode.Section).SetAlias(dataSection, dataSection.pc);
 							dataSection.CopyBits(resolved.os.bits,0, resolved.pc*dataUnit );
 						ELSIF section.type = ObjectFile.Const THEN
 							IF resolved.os.alignment # 0 THEN
@@ -138,7 +138,7 @@ TYPE
 							resolved.os.identifier.fingerprint := GetFingerprint (section, fingerprinter);
 							NEW(alias, resolved.os.identifier, constSection.pc);
 							IF ~AliasOnlyExported OR exported THEN constSection.aliasList.AddAlias(alias) END;
-							section(IntermediateCode.Section).SetAlias(constSection, TODO(constSection.pc));
+							section(IntermediateCode.Section).SetAlias(constSection, constSection.pc);
 							constSection.CopyBits(resolved.os.bits,0, resolved.pc*constUnit);
 						END;
 					END;
@@ -310,7 +310,7 @@ TYPE
 		RETURN fp
 	END GetFingerprint;
 
-	PROCEDURE CheckAlias(sections: Sections.SectionList; VAR identifier: ObjectFile.Identifier; VAR offset: LONGINT);
+	PROCEDURE CheckAlias(sections: Sections.SectionList; VAR identifier: ObjectFile.Identifier; VAR offset: SIZE);
 	VAR section: Sections.Section; alias: BinaryCode.Section;
 	BEGIN
 		offset := 0;
@@ -332,7 +332,7 @@ TYPE
 
 	PROCEDURE CopyFixups(sections: Sections.SectionList; from, to: BinaryCode.Section; offset: Unit);
 	VAR fixup: BinaryCode.Fixup; i, index, fixups: SIZE; fixupList: ObjectFile.Fixups;
-		aliasSymbol: ObjectFile.Identifier; aliasOffset: LONGINT;
+		aliasSymbol: ObjectFile.Identifier; aliasOffset: SIZE;
 
 		PROCEDURE PatchFixup (fixup: BinaryCode.Fixup; fixupOffset, targetOffset: Unit);
 		VAR target, address: Unit; j: SIZE;

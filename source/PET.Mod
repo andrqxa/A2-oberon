@@ -755,7 +755,7 @@ TYPE
 		PROCEDURE DoCompile(findPC : BOOLEAN; CONST pc :ARRAY OF CHAR; options : CompilerOptions);
 		VAR
 			compiler : CompilerInterface.Compiler; tw : TextUtilities.TextWriter; errors : BOOLEAN; type: LONGINT;
-			positions : ARRAY 2 OF LONGINT;
+			positions : ARRAY 2 OF SIZE;
 		BEGIN
 			ClearLog;
 			IF findPC THEN Strings.Append(options, " /f") END;

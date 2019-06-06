@@ -459,7 +459,7 @@ TYPE
 			END;
 		END RemovePositionMarkers;
 
-		PROCEDURE GetFirstPosition*(VAR positions : ARRAY OF LONGINT; VAR type: LONGINT);
+		PROCEDURE GetFirstPosition*(VAR positions : ARRAY OF SIZE; VAR type: LONGINT);
 		VAR i : LONGINT;
 		BEGIN
 			Acquire;
@@ -467,7 +467,7 @@ TYPE
 			IF (nofEntries > 0) THEN
 				FOR i := 0 TO LEN(textViews)-1 DO
 					IF (entries[0].pos # NIL) & (entries[0].pos[i] # NIL) THEN
-						positions[i] := TODO(entries[0].pos[i].GetPosition());
+						positions[i] := entries[0].pos[i].GetPosition();
 					ELSE
 						positions[i] := Streams.Invalid;
 					END;
@@ -488,7 +488,7 @@ TYPE
 			i := 0;
 			LOOP
 				IF (i >= nofEntries) OR (entries[i].pos = NIL) OR (entries[i].pos[editorIndex] = NIL) THEN EXIT; END;
-				pos := TODO(entries[i].pos[editorIndex].GetPosition());
+				pos := entries[i].pos[editorIndex].GetPosition();
 				IF forward & (pos > cursorPosition) THEN
 					IF (nearestPosition = -1) OR (pos < nearestPosition) THEN nearestPosition := pos; number := i+1; END;
 				ELSIF ~forward & (pos < cursorPosition) THEN

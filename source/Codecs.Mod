@@ -100,7 +100,7 @@ TYPE
 
 		(* seek the streamNr to position pos (defined bz seekType), res = 0 if Ok, otherwise an error number *)
 		(* this procedure should not be directly called - it is called by the DemuxStream object! *)
-		PROCEDURE SetStreamPos*(streamNr : LONGINT; seekType : LONGINT; pos : Streams.Position; VAR itemSize : LONGINT; VAR res : WORD);
+		PROCEDURE SetStreamPos*(streamNr : LONGINT; seekType : LONGINT; pos : Streams.Position; VAR itemSize : Streams.Position; VAR res : WORD);
 		END SetStreamPos;
 
 	END AVDemultiplexer;

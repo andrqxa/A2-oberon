@@ -357,7 +357,7 @@ TYPE
 		enumerator : Files.Enumerator;
 		dir : DirEntries;
 		selection : DirEntries;
-		nfiles, nofRows : LONGINT;
+		nfiles: SIZE; nofRows : LONGINT;
 		px, py : LONGINT;
 		colWidths : WMGrids.Spacings;
 
@@ -1040,7 +1040,7 @@ END Open;
 			END;
 
 			IF fullView THEN enumerator.Open(mask, {Files.EnumSize, Files.EnumTime}); ELSE enumerator.Open(mask, {}); END;
-			nfiles := TODO(enumerator.size);
+			nfiles := enumerator.size;
 			i := 0;
 			sorted := TRUE;
 			NEW(dir, enumerator.size);
@@ -1071,7 +1071,7 @@ END Open;
 			PrepareList
 		END StartNewFilter;
 
-		PROCEDURE GetNofFiles*() : LONGINT;
+		PROCEDURE GetNofFiles*() : SIZE;
 		BEGIN
 			RETURN nfiles
 		END GetNofFiles;
