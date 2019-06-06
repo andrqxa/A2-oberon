@@ -309,7 +309,7 @@ TYPE
 		BEGIN
 			FOR i := 0 TO nextMarker-1 DO
 				markerPositions[i].marker := tv.CreatePositionMarker();
-				markerPositions[i].marker.SetPosition(TODO(markerPositions[i].pos));
+				markerPositions[i].marker.SetPosition(markerPositions[i].pos(SIZE));
 				markerPositions[i].marker.SetVisible(FALSE);
 				markerPositions[i].marker.Load("DecoderRes.zip://VariablePositionIcon.png")
 			END;

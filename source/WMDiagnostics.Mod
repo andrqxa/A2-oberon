@@ -436,7 +436,7 @@ TYPE
 						FOR j := 0 TO LEN(textViews) - 1 DO
 							entries[i].pos[j] := textViews[j].CreatePositionMarker();
 							IF (picture # "") THEN entries[i].pos[j].Load(picture); END;
-							entries[i].pos[j].SetPosition(TODO(entries[i].position));
+							entries[i].pos[j].SetPosition(entries[i].position(SIZE));
 						END;
 					END;
 

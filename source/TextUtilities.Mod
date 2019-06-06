@@ -231,8 +231,8 @@ TYPE
 		PROCEDURE SetPos*(pos: Streams.Position);
 		BEGIN
 			reader.text.AcquireRead;
-			reader.SetPosition(TODO(pos)); (* pos is clipped *)
-			received := TODO(reader.GetPosition()); (* this effects that Streams.Reader.Pos() returns the correct location in the text *)
+			reader.SetPosition(pos); (* pos is clipped *)
+			received := reader.GetPosition(); (* this effects that Streams.Reader.Pos() returns the correct location in the text *)
 			Reset;
 			remainder := 0;
 			reader.text.ReleaseRead;
