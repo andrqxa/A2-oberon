@@ -758,7 +758,7 @@ TYPE
 
 		PROCEDURE Pos(VAR r: Files.Rider): Files.Position;
 		BEGIN
-			RETURN r.apos*SS + TODO(r.bpos) - HS
+			RETURN r.apos*SS + r.bpos - HS
 		END Pos;
 
 		PROCEDURE Read(VAR r: Files.Rider; VAR x: CHAR);
@@ -796,7 +796,7 @@ TYPE
 					IF len <= 0 THEN EXIT END ;
 					src := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + len;
 					IF m <= buf.lim THEN
-						SYSTEM.MOVE(src, dst, len); r.bpos := TODO(m); r.res := 0; EXIT
+						SYSTEM.MOVE(src, dst, len); r.bpos := m; r.res := 0; EXIT
 					ELSIF buf.lim = SS THEN
 						m := buf.lim - r.bpos;
 						IF m > 0 THEN SYSTEM.MOVE(src, dst, m); INC(dst, m); DEC(len, m) END ;

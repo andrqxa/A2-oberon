@@ -660,7 +660,7 @@ TYPE
 
 		(* Return the offset of a Rider positioned on a file. *)
 		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
-		BEGIN RETURN r.apos*clusterSize + TODO(r.bpos);
+		BEGIN RETURN r.apos*clusterSize + r.bpos;
 		END Pos;
 
 		(* Read logical cluster 'pos', pos=0 is the first cluster. 'pos' must be <= # of clusters in file.
@@ -797,7 +797,7 @@ TYPE
 					m := MIN(MIN(size - LONGINT(Pos(r)), clusterSize - r.bpos), len);
 					SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), m);
 					INC(ofs, m); DEC(len, m);
-					INC(r.bpos, TODO(m)); ASSERT(r.bpos <= clusterSize);
+					INC(r.bpos, m); ASSERT(r.bpos <= clusterSize);
 					IF (r.bpos = clusterSize) THEN INC(r.apos); r.bpos := 0 END;
 				END;
 				r.res := len; r.eof := Pos(r) = size

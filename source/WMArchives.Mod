@@ -162,6 +162,7 @@ TYPE
 		PROCEDURE MyStartDrag(sender, data : ANY);
 		VAR img : WMGraphics.Image;
 			c : WMGraphics.BufferCanvas;
+			length: SIZE;
 			w : LONGINT;
 			a : ANY;
 			s : Strings.String;
@@ -172,8 +173,8 @@ TYPE
 				s := a(EntryInfo).GetName();
 				NEW(draggedString, LEN(s^)+64);
 				AppendToArchiveName(s^, draggedString^);
-				w := TODO(Strings.Length(draggedString^)) * 7;
-				IF w > 400 THEN w := 400 END;
+				length := Strings.Length(draggedString^) * 7;
+				IF length > 400 THEN w := 400 ELSE w := LONGINT(length) END;
 				NEW(img); Raster.Create(img, w, 25, Raster.BGRA8888);
 				NEW(c, img); c.SetColor(LONGINT(0FFFF00FFH));
 				c.Fill(WMRectangles.MakeRect(0, 0, w, 25), 0FF80H, WMGraphics.ModeCopy);

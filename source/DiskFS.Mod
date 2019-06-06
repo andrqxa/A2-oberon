@@ -1007,7 +1007,7 @@ TYPE
 
 		PROCEDURE Pos*(VAR r: Files.Rider): Files.Position;
 		BEGIN
-			RETURN LONGINT(r.apos)*SectorSize + TODO(r.bpos) - HeaderSize
+			RETURN LONGINT(r.apos)*SectorSize + r.bpos - HeaderSize
 		END Pos;
 
 		PROCEDURE Read*(VAR r: Files.Rider; VAR x: CHAR);
@@ -1045,7 +1045,7 @@ TYPE
 					IF len <= 0 THEN EXIT END ;
 					src := ADDRESSOF(buf.data.B[0]) + r.bpos; m := r.bpos + len;
 					IF m <= buf.lim THEN
-						SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), len); r.bpos := TODO(m); r.res := 0; EXIT
+						SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), len); r.bpos := m; r.res := 0; EXIT
 					ELSIF buf.lim = SectorSize THEN
 						m := buf.lim - r.bpos;
 						IF m > 0 THEN SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), m); INC(ofs, m); DEC(len, m) END ;
