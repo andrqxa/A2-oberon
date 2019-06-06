@@ -243,12 +243,12 @@ TYPE
 		progressBar : WMProgressComponents.ProgressBar;
 		filenameLabel : WMStandardComponents.Label;
 		progressLabel : WMStandardComponents.Label;
-		currentBytes, maxBytes : LONGINT;
+		currentBytes, maxBytes : Streams.Position;
 
 		w : Streams.StringWriter;
 		string : ARRAY 128 OF CHAR;
 
-		PROCEDURE SetProgress(progress : LONGINT);
+		PROCEDURE SetProgress(progress : Streams.Position);
 		BEGIN
 			w.Reset;
 			w.String("Received "); w.Int(progress, 0);
@@ -262,7 +262,7 @@ TYPE
 			progressLabel.caption.SetAOC(string);
 		END SetProgress;
 
-		PROCEDURE &New*(CONST filename : ARRAY OF CHAR; length : LONGINT);
+		PROCEDURE &New*(CONST filename : ARRAY OF CHAR; length : Streams.Position);
 		VAR panel : WMStandardComponents.Panel;
 		BEGIN
 			Init;
@@ -938,14 +938,14 @@ TYPE
 					IF res = Serials.Ok THEN
 						in.Reset; out.Reset;
 						NEW(xysender, out, in, f, mode);
-						NEW(progressInfo, filename, TODO(f.Length())); progressInfo.bounds.SetExtents(300, 60);
+						NEW(progressInfo, filename, f.Length()); progressInfo.bounds.SetExtents(300, 60);
 						GetPanelCoordinates(x, y);
 						NEW(progressWindow, progressInfo, x + 150, y + 50);
 						WHILE ~xysender.IsDone() DO
-							progressInfo.SetProgress(TODO(xysender.bytesProcessed));
+							progressInfo.SetProgress(xysender.bytesProcessed);
 							Wait(500);
 						END;
-						progressInfo.SetProgress(TODO(xysender.bytesProcessed));
+						progressInfo.SetProgress(xysender.bytesProcessed);
 						xysender.Await(msg);
 					ELSE
 						Show("FATAL ERROR, could not re-open the port"); KernelLog.Ln;
