@@ -2236,7 +2236,7 @@ TYPE
 				ntilePartsAvailable : J2KU.LongIntArrayPtr;	(* The number of tile-parts for each tile as signalled in by a TNSot parameter of a SOT segment of at least one tile-part *)
 				curTile : LONGINT;			(* The index of the current tile for which data is being read *)
 				curPart : LONGINT;			(* The index of the current tile-part of curTile for which data is being read *)
-				partRem : SIZE;			(* Number of bytes remaining in the current tile-part *)
+				partRem : Streams.Position;		(* Number of bytes remaining in the current tile-part *)
 				initError : BOOLEAN;		(* TRUE if an error occured during initialization *)
 				pktDec : PacketDecoder;		(* The packet decoder used to extract encoded code-block data *)
 				cblkBuf : POINTER TO ARRAY OF J2KU.CodedCblk;		(* Buffer for coded code-blocks obtained from the packed decoder *)
@@ -2324,7 +2324,7 @@ TYPE
 					ok : BOOLEAN;
 					nt, ncomp, comp, i, j : LONGINT;
 					markerStr : ARRAY 8 OF CHAR;
-					nppmLeft, nppmRead : LONGINT;
+					nppmLeft, nppmRead : SIZE;
 					ppmFirst, ppmLast : DataListElement;
 					ncod, nqcd, npoc, ncrg : LONGINT; (* Counter variables used for constraint checking *)
 					ncoc, nqcc, nrgn : J2KU.LongIntArrayPtr;
@@ -2908,7 +2908,7 @@ TYPE
 							END;
 
 							cblkBufPos := 0;
-							partRem := partRem - TODO(s.Pos() - startPos);
+							partRem := partRem - (s.Pos() - startPos);
 
 							IF ~ok THEN
 								RETURN i;
@@ -3330,7 +3330,7 @@ TYPE
 								ok := FALSE;
 						END;
 
-						partRem := partRem - TODO(s.Pos() - startPos);
+						partRem := partRem - (s.Pos() - startPos);
 						INC(bytesSkipped, s.Pos() - startPos);
 					END;
 
@@ -4135,7 +4135,7 @@ TYPE
 							*)
 							partRem := s.Available() - 2; (* TODO: maybe s.Available() < stream length ? *)
 						ELSE
-							partRem := psot - TODO(ePos - sPos);
+							partRem := psot - (ePos - sPos);
 						END;
 						(* Set values *)
 						SELF.curTile := tileIdx;
@@ -4856,9 +4856,9 @@ TYPE
 					RETURN TRUE;
 			END ReadPLTSegment;
 
-			PROCEDURE ReadPPMSegment(VAR first, last : DataListElement; VAR nppmLeft, nppmRead : LONGINT) : BOOLEAN;
+			PROCEDURE ReadPPMSegment(VAR first, last : DataListElement; VAR nppmLeft, nppmRead : SIZE) : BOOLEAN;
 				VAR
-				 	lppm, len, bytesLeft : LONGINT;
+				 	lppm, len, bytesLeft : SIZE;
 				 	dummy, curElem, newElem : DataListElement;
 					sPos, ePos: Streams.Position;
 					actLen: SIZE;
@@ -4910,9 +4910,9 @@ TYPE
 
 						s.Bytes(curElem.data^, nppmRead, len, actLen);
 
-						INC(nppmRead, TODO(actLen));
-						DEC(nppmLeft, TODO(actLen));
-						DEC(bytesLeft, TODO(actLen));
+						INC(nppmRead, actLen);
+						DEC(nppmLeft, actLen);
+						DEC(bytesLeft, actLen);
 					END;
 
 					IF first = NIL THEN
@@ -4936,7 +4936,8 @@ TYPE
 
 			PROCEDURE ReadPPTSegment(VAR first, last : DataListElement) : BOOLEAN;
 				VAR
-				 	lppt, bytesLeft : LONGINT;
+				 	lppt: LONGINT;
+					bytesLeft : SIZE;
 					sPos, ePos: Streams.Position;
 					actLen: SIZE;
 				 	zppt : CHAR;
@@ -4973,7 +4974,7 @@ TYPE
 
 					WHILE bytesLeft > 0 DO
 						s.Bytes(newElem.data^, 0, bytesLeft, actLen);
-						DEC(bytesLeft, TODO(actLen));
+						DEC(bytesLeft, actLen);
 					END;
 
 					ePos := s.Pos();
@@ -5533,7 +5534,7 @@ TYPE
 							END;
 
 							cblkBufPos := 0;
-							partRem := partRem - TODO(s.Pos() - startPos);
+							partRem := partRem - (s.Pos() - startPos);
 						ELSE
 							(* Don't deliver code-blocks with no data *)
 							IF cblkBuf[cblkBufPos].dataLen > 0 THEN

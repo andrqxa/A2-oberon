@@ -351,7 +351,7 @@ TYPE
 		buffer := p.GetBytes();
 		ASSERT(buffer # NIL);
 		(* TCP: <size || packet> *)
-		Network.PutNet4(size, 0, TODO(p.GetSize()));
+		Network.PutNet4(size, 0, p.GetSize()(LONGINT));
 		client.Send(size, 0, 4, FALSE, res);
 		IF(res # TCP.Ok) THEN RETURN res; END;
 		client.Send(buffer^, 0, LEN(buffer^), FALSE, res);

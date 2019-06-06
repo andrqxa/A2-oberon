@@ -678,7 +678,7 @@ PROCEDURE WriteTag(VAR rdr: Files.Rider;
 	tag: CHAR; len: SIZE; VAR data: ARRAY OF CHAR);
 BEGIN
 	rdr.file.Write(rdr, tag);
-	Files.WriteNum(rdr, TODO(len));
+	Files.WriteNum(rdr, len);
 	rdr.file.WriteBytes(rdr, data, 0, len);
 END WriteTag;
 
@@ -697,8 +697,8 @@ END NewVersion;
 
 PROCEDURE newVersion(historyName, name: TFileName; log: TLog; flags: SET): LONGINT;
 VAR
-	i: LONGINT;
 	ch: CHAR;
+	i: Files.Position;
 	tmpDFileName, dFileName, dFileNameBak: TFileName;
 	old, new: TData;
 	lenNew, oldDiffStart: LONGINT;
@@ -713,7 +713,7 @@ BEGIN
 	f := Files.Old(name);
 	IF f # NIL THEN
 	f.Set(fRdr, 0);
-		lenNew := TODO(f.Length());
+		lenNew := f.Length()(LONGINT);
 		NEW(new, lenNew);
 		(* read new file version in buffer new *)
 		fRdr.file.ReadBytes(fRdr, new^, 0, lenNew);
@@ -741,7 +741,7 @@ BEGIN
 		log.versionID :=  GetNewestVersion(odfRdr, odf);
 		INC(log.versionID);
 		log.lenOfOld := GetTextLen(odfRdr, odf);
-		oldDiffStart := TODO(odfRdr.file.Pos(odfRdr)) + log.lenOfOld;
+		oldDiffStart := odfRdr.file.Pos(odfRdr)(LONGINT) + log.lenOfOld;
 	ELSE (* first version *)
 		log.versionID := 1;
 		log.lenOfOld := 0;
@@ -761,15 +761,15 @@ BEGIN
 	END;
 	(* write diff *)
 	ndfRdr.file.Write(ndfRdr, DiffTag);
-	Files.WriteNum(ndfRdr, TODO(diff.Length()));
+	Files.WriteNum(ndfRdr, diff.Length());
 	diff.Set(diffRdr, 0);
-	FOR i := 0 TO TODO(diff.Length()) - 1 DO
+	FOR i := 0 TO diff.Length() - 1 DO
 		diffRdr.file.Read(diffRdr, ch); ndfRdr.file.Write(ndfRdr, ch);
 	END;
 	IF odf # NIL THEN
 		(* copy old diffs *)
 		odf.Set(odfRdr, oldDiffStart);
-		FOR i := 0 TO TODO(odf.Length()) - 1 - oldDiffStart DO
+		FOR i := 0 TO odf.Length() - 1 - oldDiffStart DO
 			odfRdr.file.Read(odfRdr, ch); ndfRdr.file.Write(ndfRdr, ch);
 		END;
 	END;

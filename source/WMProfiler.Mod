@@ -92,13 +92,13 @@ TYPE
 
 		PROCEDURE UpdateStatusBar(forceUpdate : BOOLEAN);
 		VAR
-			state, currentNofSamples, maxNofSamples : LONGINT;
+			state: WORD; currentNofSamples, maxNofSamples : SIZE;
 			caption : ARRAY 256 OF CHAR; number : ARRAY 16 OF CHAR;
 		BEGIN
 			state := HierarchicalProfiler.GetState(currentNofSamples, maxNofSamples);
 			IF (state # lastState) OR forceUpdate THEN
 				IF (state = HierarchicalProfiler.Running) THEN
-					progressBar.SetRange(0, maxNofSamples);
+					progressBar.SetRange(0, TODO(maxNofSamples));
 				END;
 
 				CASE state OF
@@ -125,7 +125,7 @@ TYPE
 				lastState := state;
 			END;
 			IF (state = HierarchicalProfiler.Running) THEN
-				progressBar.SetCurrent(currentNofSamples);
+				progressBar.SetCurrent(TODO(currentNofSamples));
 			END;
 		END UpdateStatusBar;
 

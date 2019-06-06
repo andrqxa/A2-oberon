@@ -222,8 +222,8 @@ TYPE
 
 		PROCEDURE SetStreamLength*(length : Streams.Position);
 		BEGIN
-			h.fileSize := TODO(length)-8;
-			h.dataSize := TODO(length)-SIZEOF(WaveHeader);
+			h.fileSize := length(LONGINT)-8;
+			h.dataSize := length(LONGINT)-SIZEOF(WaveHeader);
 		END SetStreamLength;
 
 		PROCEDURE SeekSample*(sample: LONGINT; goKeySample : BOOLEAN; VAR res : WORD);
@@ -324,8 +324,8 @@ TYPE
 
 		PROCEDURE SetStreamLength*(length : Streams.Position);
 		BEGIN
-			h.fileSize := TODO(length)+SIZEOF(WaveHeader)-8;
-			h.dataSize := TODO(length)
+			h.fileSize := length(LONGINT)+SIZEOF(WaveHeader)-8;
+			h.dataSize := length(LONGINT)
 		END SetStreamLength;
 
 		PROCEDURE SeekSample*(sample: LONGINT; goKeySample : BOOLEAN; VAR res : WORD);

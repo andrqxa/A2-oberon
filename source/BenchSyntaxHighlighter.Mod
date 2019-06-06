@@ -82,7 +82,7 @@ BEGIN
 	out.String("Region lookup"); out.Int(nofIterations, 0); out.String(" times ... "); out.Update;
 	startTime := Dates.Now();
 	FOR i := 1 TO nofIterations DO
-		position := random.Dice(TODO(length));
+		position := random.Dice(length(LONGINT));
 		style := highlighter.GetRegionStyle(position, state, start, end);
 	END;
 	endTime := Dates.Now();
