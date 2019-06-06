@@ -1320,8 +1320,8 @@ VAR
 	nbit: LONGINT;
 	posInLONGINT: LONGINT;
 	bufa, bufb: LONGINT;
-	temp: LONGINT;
-	bufAdr: LONGINT;
+	temp: ADDRESS;
+	bufAdr: ADDRESS;
 BEGIN
 	bufAdr := ADDRESSOF( buf[0] );
 	posInLONGINT := index MOD 32;
