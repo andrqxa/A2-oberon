@@ -615,6 +615,32 @@ BEGIN
 	IF neg THEN val := -val END
 END StrToInt;
 
+(** converts a string to an integer. Leading whitespace is ignored *)
+(* adopted from Strings.Mod *)
+PROCEDURE StrToHInt*(CONST str: ARRAY OF CHAR; VAR val: HUGEINT);
+VAR i: SIZE; d: HUGEINT; neg: BOOLEAN;
+BEGIN
+	i := 0; WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
+	neg := FALSE;
+	IF (str[i] = "+") THEN INC(i)
+	ELSIF (str[i] = "-") THEN neg := TRUE; INC(i)
+	END;
+
+	val := 0;
+	WHILE (str[i] >= "0") & (str[i] <= "9") DO
+		d := ORD(str[i])-ORD("0");
+		IF (val <= ((MAX(HUGEINT)-d) DIV 10)) THEN val := 10*val+d
+		ELSIF neg & (val = 922337203685477580) & (d = 8) & ((str[i+1] < "0") OR (str[i+1] > "9")) THEN
+			(* HUGEINT range: -9223372036854775808 ... 9223372036854775807 _> need special handling for -9223372036854775808 here *)
+			val := MIN(HUGEINT); neg := FALSE
+		ELSE
+			HALT(99)
+		END;
+		INC(i)
+	END;
+	IF neg THEN val := -val END
+END StrToHInt;
+
 (** Convert the substring beginning at position i in str into an integer. Leading whitespace is ignored.
 	After the conversion i points to the first character after the integer. *)
 (* adopted from Strings.Mod *)
