@@ -67,8 +67,8 @@ TYPE
 	StreamType = RECORD
 		stream*: Codec.DemuxStream;
 		idByte*: CHAR;
-		pos: LONGINT;
-		bytesLeftInPacket: LONGINT;
+		pos: SIZE;
+		bytesLeftInPacket: SIZE;
 		eos: BOOLEAN;			(* end of stream *)
 	END;
 
@@ -471,7 +471,8 @@ TYPE
 		VAR
 			i: LONGINT;
 			code: CHAR;
-			lastIntraPosOld, lastIntraNrOld, lastIntraPos, lastIntraNr, lastFramePos: LONGINT;
+			lastIntraPosOld, lastIntraPos, lastFramePos: Streams.Position;
+			lastIntraNrOld, lastIntraNr: LONGINT;
 			nrB, nrBOld: LONGINT;
 			countB: BOOLEAN;
 			type: LONGINT;
@@ -486,8 +487,8 @@ TYPE
 			stream.SkipBits(32);
 			IF ~ParseSequenceHeader() THEN RETURN END;
 
-			lastIntraPos := TODO(stream.Pos());
-			lastFramePos := TODO(stream.Pos());
+			lastIntraPos := stream.Pos();
+			lastFramePos := stream.Pos();
 
 			(* to be sure, we need to decode the last 2 i-frames. consider (decoding!) order IBBPBBIB *)
 			FOR i := 0 TO frame DO
@@ -511,12 +512,12 @@ TYPE
 						END;
 					END;
 				END;
-				lastFramePos := TODO(stream.Pos());
+				lastFramePos := stream.Pos();
 			END;
 
 			(* jump to the second last I-frame *)
 			stream.SetPos(lastIntraPosOld);
-			realFrameNr := lastIntraNrOld;
+			realFrameNr := lastIntraNrOld(LONGINT);
 			frameNr := 10000;					(* expected frameNr > tempRef => frameNr gets adjusted *)
 
 			Next();
@@ -1934,7 +1935,8 @@ TYPE
 		(** open the demultiplexer on an input stream *)
 		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
 		VAR
-			oldPos, i: LONGINT;
+			oldPos: Streams.Position;
+			i: LONGINT;
 			startCode: CHAR;
 
 		BEGIN
@@ -1970,7 +1972,7 @@ TYPE
 			IF ~ReadSystemHeader() THEN RETURN END;
 
 			(* search for some more streams *)
-			oldPos := TODO(input.Pos());
+			oldPos := input.Pos();
 			FOR i := 0 TO 20 DO
 				(* read chunk header *)
 				IF ~GotoNextStartCode() THEN HALT(1234) END;
@@ -2155,7 +2157,7 @@ TYPE
 		VAR
 			cur: POINTER TO StreamType;
 			length: SIZE;
-			offset: LONGINT;
+			offset: SIZE;
 
 		BEGIN
 			IF singleStream THEN
@@ -2214,12 +2216,12 @@ TYPE
 			ELSE
 				(* copy required bytes *)
 				input.Bytes(buf, offset, size, length);
-				cur.pos := TODO(input.Pos());
+				cur.pos := input.Pos()(LONGINT);
 				DEC(cur.bytesLeftInPacket, length);
 			END;
 		END GetData;
 
-		PROCEDURE SkipData(streamNr : LONGINT; size: LONGINT; VAR len: LONGINT; VAR res: WORD);
+		PROCEDURE SkipData(streamNr : LONGINT; size: SIZE; VAR len: SIZE; VAR res: WORD);
 		VAR
 			cur: POINTER TO StreamType;
 
@@ -2264,7 +2266,7 @@ TYPE
 		END SkipData;
 
 
-		PROCEDURE GetPosInMuxedStream*(streamNr: LONGINT): LONGINT;
+		PROCEDURE GetPosInMuxedStream*(streamNr: LONGINT): SIZE;
 		BEGIN
 			RETURN streams[streamNr].pos;
 		END GetPosInMuxedStream;
@@ -2347,7 +2349,7 @@ TYPE
 			END;
 
 			(* finally we reached the next data bytes of the requested stream *)
-			stream.pos := TODO(input.Pos()) + 1;		(* next byte is first byte of the stream *)
+			stream.pos := (input.Pos() + 1)(SIZE);		(* next byte is first byte of the stream *)
 			stream.bytesLeftInPacket := length;
 			RETURN TRUE;
 		END GotoNextPacket;
@@ -2357,7 +2359,7 @@ TYPE
 		PROCEDURE SetStreamPos*(streamNr :  LONGINT; seekType : LONGINT; pos : Streams.Position; VAR itemSize : LONGINT;  VAR res : WORD);
 		VAR
 			cur: POINTER TO StreamType;
-			len: LONGINT;
+			len: SIZE;
 		BEGIN
 			res := Codec.ResFailed;
 
@@ -2370,8 +2372,8 @@ TYPE
 
 			IF singleStream THEN
 				IF streamNr # 0 THEN RETURN END;
-				input.SetPos(TODO(pos));
-				streams[0].pos := TODO(pos);
+				input.SetPos(pos);
+				streams[0].pos := pos(SIZE);
 				res := Codec.ResOk;
 				RETURN;
 			END;
@@ -2388,10 +2390,10 @@ TYPE
 				IF ~GotoNextPacket(cur^) THEN HALT(1234); res := Codec.ResFailed; RETURN END;
 
 				(* skip some data *)
-				SkipData(streamNr, TODO(pos), len, res);
+				SkipData(streamNr, pos(SIZE), len, res);
 			ELSE
 				(* skip some data *)
-				SkipData(streamNr, TODO(pos) - TODO(cur.stream.Pos()+cur.stream.Available()), len, res);
+				SkipData(streamNr, (pos - cur.stream.Pos())(SIZE)+cur.stream.Available(), len, res);
 			END;
 		END SetStreamPos;
 

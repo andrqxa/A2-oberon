@@ -95,7 +95,7 @@ TYPE
 						text.AcquireRead;
 						editor.tv.cursor.SetPosition(p(XML.Element).GetPos()(SIZE));
 						editor.tv.cursor.SetVisible(TRUE);
-						editor.tv.FindCommand(TODO(p(XML.Element).GetPos())-1, a, b);
+						editor.tv.FindCommand((p(XML.Element).GetPos()-1)(SIZE), a, b);
 						IF highlight # NIL THEN highlight.SetFromTo(a, b) END;
 						text.ReleaseRead;
 					END

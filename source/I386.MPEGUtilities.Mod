@@ -2427,7 +2427,7 @@ TYPE
 		END TransferIDCTAddMMX;
 
 		(* Copy a macroblock to the actual picture *)
-		PROCEDURE TransferIDCTCopyGeneric( source: PointerToArrayOfLONGINT; dest: PointerToArrayOfCHAR; destOffset, stride: LONGINT );
+		PROCEDURE TransferIDCTCopyGeneric( source: PointerToArrayOfLONGINT; dest: PointerToArrayOfCHAR; destOffset, stride: SIZE );
 		VAR
 			x, y: SIZE; s, d: ADDRESS; val: LONGINT;
 		BEGIN

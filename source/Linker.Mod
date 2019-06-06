@@ -252,8 +252,8 @@ BEGIN
 	END;
 	(* now patch header (cf  Unix.Glue.Mod)  *)
 	w.SetPos( 24 );
-	w.RawLInt( TODO(binsize) );
-	w.RawLInt( TODO(relocations) );
+	w.RawLInt( binsize(LONGINT) );
+	w.RawLInt( relocations(LONGINT) );
 END WriteRelocations;
 
 PROCEDURE WriteOutputFile* (arrangement: Arrangement; CONST fileName: Files.FileName; linker: GenericLinker.Linker; fileFormat: FileFormat);
@@ -767,7 +767,7 @@ CONST BaseAddress = 08048000H; EntryAddress = BaseAddress + HeadersSize;
 	PROCEDURE WriteProgramHeader;
 	VAR FileSize: LONGINT;
 	BEGIN
-		FileSize := TODO(HeadersSize + arrangement.bits.GetSize () DIV 8);
+		FileSize := (HeadersSize + arrangement.bits.GetSize () DIV 8)(LONGINT);
 
 		WriteWord (1);		(* p_type *)
 		WriteWord (0);		(* p_offset *)
@@ -816,7 +816,7 @@ CONST BaseAddress = 000010E8H;
 	PROCEDURE WriteLoadCommand;
 	VAR FileSize: LONGINT;
 	BEGIN
-		FileSize := TODO(MachHeaderSize + CommandsSize + arrangement.bits.GetSize () DIV 8);
+		FileSize := (MachHeaderSize + CommandsSize + arrangement.bits.GetSize () DIV 8)(LONGINT);
 
 		Write (1);	(* cmd *)
 		Write (LoadCommandSize);	(* cmdsize *)
@@ -833,7 +833,7 @@ CONST BaseAddress = 000010E8H;
 		WriteName (SectionName);	(* sectname *)
 		WriteName (SegmentName);	(* segname *)
 		Write (BaseAddress);	(* addr *)
-		Write (TODO(arrangement.bits.GetSize () DIV 8));	(* size *)
+		Write ((arrangement.bits.GetSize () DIV 8)(LONGINT));	(* size *)
 		Write (Start);	(* offset *)
 		Write (2);	(* align *)
 		Write (0);	(* reloff *)

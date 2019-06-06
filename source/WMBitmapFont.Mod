@@ -319,7 +319,7 @@ TYPE
 					INC(c);
 					pos := 0;
 					RasterToBWRLBytes(glyphRanges[i].glyphs[j].img, buf, pos);
-					glyphRanges[i].glyphs[j].fpos := TODO(f.Pos(w));
+					glyphRanges[i].glyphs[j].fpos := f.Pos(w)(LONGINT);
 					KernelLog.Int(pos, 5); KernelLog.Ln;
 					f.WriteBytes(w, buf, 0, pos)
 				END
