@@ -2048,7 +2048,8 @@ TYPE
 			list: Classes.List;
 			img : WMGraphics.Image;
 			c : WMGraphics.BufferCanvas;
-			top, i: LONGINT;
+			top: LONGINT;
+			i: SIZE;
 			p: ANY;
 			message: IMAPClient.Message;
 		BEGIN
@@ -2636,7 +2637,7 @@ TYPE
 
 		PROCEDURE UpdateMessages;
 		VAR
-			i, count: LONGINT;
+			i: SIZE; count: LONGINT;
 			message: IMAPClient.Message;
 			messageP: ANY;
 			header: IMAPClient.HeaderElement;

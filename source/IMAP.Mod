@@ -1066,7 +1066,7 @@ TYPE
 			ent: Entry;
 			entP: ANY;
 			text: String;
-			i: LONGINT;
+			i: SIZE;
 			list: Classes.List;
 		BEGIN
 			ASSERT(listP # NIL,1024);

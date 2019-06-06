@@ -43,7 +43,7 @@ TYPE
 			grid.SetColSpacings(colWidths);
 			grid.nofCols.Set(3);
 			grid.SetDrawCellProc(DrawCell);
-			grid.nofRows.Set(font.glyphList.GetCount());
+			grid.nofRows.Set(TODO(font.glyphList.GetCount()));
 			grid.defaultRowHeight.Set(50);
 			grid.defaultColWidth.Set(50);
 			grid.onSelect.Add(GlyphSelected);
@@ -508,7 +508,7 @@ TYPE
 		PROCEDURE Load(CONST fileName : ARRAY OF CHAR);
 		VAR
 			r : Files.Reader;
-			i, nofRanges : LONGINT;
+			i, nofRanges : SIZE;
 			ptr :ANY; glyph, tg : Glyph;
 		BEGIN
 			fontFile := Files.Old(fileName);
@@ -551,13 +551,13 @@ TYPE
 		END DumpRange;
 
 		PROCEDURE CreateRanges;
-		VAR i, j: LONGINT;
-			nofRanges, code, lastCode, rangeStart, range, firstIndex, rangeSize : LONGINT;
+		VAR i, j, firstIndex: SIZE;
+			nofRanges, code, lastCode, rangeStart, range, rangeSize : LONGINT;
 			glyph, tg : Glyph; ptr : ANY;
 			bimboSortArray : GlyphArray;
 
-			PROCEDURE FillRange(VAR range : GlyphRange; startIndex, endIndex : LONGINT);
-			VAR glyph, tg : Glyph; i : LONGINT;
+			PROCEDURE FillRange(VAR range : GlyphRange; startIndex, endIndex : SIZE);
+			VAR glyph, tg : Glyph; i : SIZE;
 			BEGIN
 				range.firstCode := bimboSortArray[startIndex].ucs;
 				range.lastCode := bimboSortArray[endIndex].ucs;
@@ -577,7 +577,7 @@ TYPE
 
 (*
 			PROCEDURE CheckAllSorted;
-			VAR ptr : ANY; glyph : Glyph; i : LONGINT;
+			VAR ptr : ANY; glyph : Glyph; i : SIZE;
 			BEGIN
 				KernelLog.String("Searching all glyphs in the sorted array...");
 				FOR i := 0 TO glyphList.GetCount() - 1 DO
@@ -598,7 +598,7 @@ TYPE
 *)
 
 			PROCEDURE CheckAllInRanges;
-			VAR ptr : ANY; glyph, tg : Glyph; i : LONGINT;
+			VAR ptr : ANY; glyph, tg : Glyph; i : SIZE;
 			BEGIN
 				KernelLog.String("Searching all glyphs...");
 				FOR i := 0 TO glyphList.GetCount() - 1 DO
@@ -696,7 +696,7 @@ TYPE
 (* END optimized routines for native font *)
 
 		PROCEDURE FindGlyph(ucs, variant : LONGINT) : Glyph;
-		VAR g, tg : Glyph; i : LONGINT; ptr : ANY;
+		VAR g, tg : Glyph; i : SIZE; ptr : ANY;
 		BEGIN
 			g := NIL;
 			glyphList.Lock;

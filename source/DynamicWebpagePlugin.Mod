@@ -165,7 +165,7 @@ TYPE
 
 		PROCEDURE SessionExpired(session: HTTPSession.Session);
 		VAR sessionElem: SessionStateFullElement; expElemList: TFClasses.List; (* List of SessionStateFullElement *)
-			i : LONGINT; p: ANY;
+			i : SIZE; p: ANY;
 		BEGIN {EXCLUSIVE}
 			(* there could be multiple instances of a statefull active element belonging to session *)
 			NEW(expElemList);
@@ -198,7 +198,7 @@ TYPE
 
 		(* objectId is only used if a statefull active element is requested, otherwise objectId can be NIL *)
 		PROCEDURE GetElementInstance(session : HTTPSession.Session; objectId: Strings.String) : DynamicWebpage.ActiveElement;
-		VAR i: LONGINT; p: ANY; sessionElem: SessionStateFullElement; elem: DynamicWebpage.ActiveElement;
+		VAR i: SIZE; p: ANY; sessionElem: SessionStateFullElement; elem: DynamicWebpage.ActiveElement;
 			stateFullElem: DynamicWebpage.StateFullActiveElement; eventHandlerList: DynamicWebpage.EventHandlerList;
 		BEGIN {EXCLUSIVE}
 			IF (stateLessActiveElem # NIL) THEN (* it is a stateless active element *)
@@ -275,10 +275,10 @@ TYPE
 
 		(* objectId is only used for statefull activ elements and is NIL  in case of stateless active elements *)
 		PROCEDURE FindEventHandler(session: HTTPSession.Session; objectId: Strings.String; CONST handlerName: ARRAY OF CHAR) : DynamicWebpage.EventHandler;
-		VAR elem: DynamicWebpage.ActiveElement; sessionElem: SessionStateFullElement; p: ANY; i : LONGINT;
+		VAR elem: DynamicWebpage.ActiveElement; sessionElem: SessionStateFullElement; p: ANY; i : SIZE;
 
 			PROCEDURE GetEventHandlerFromList(eventList: DynamicWebpage.EventHandlerList) : DynamicWebpage.EventHandler;
-			VAR j: LONGINT;
+			VAR j: SIZE;
 			BEGIN
 				IF (eventList # NIL) THEN
 					FOR j := 0 TO LEN(eventList^)-1 DO
@@ -580,7 +580,7 @@ TYPE
 	END TransformActiveElement;
 
 	PROCEDURE IsModuleRegistered(CONST moduleName: ARRAY OF CHAR) : BOOLEAN;
-	VAR i : LONGINT; p : ANY; obj: ActiveElementFactory;
+	VAR i : SIZE; p : ANY; obj: ActiveElementFactory;
 	BEGIN
 		registeredActiveElemFact.Lock;
 		FOR i := 0 TO registeredActiveElemFact.GetCount()-1 DO
@@ -596,7 +596,7 @@ TYPE
 	END IsModuleRegistered;
 
 	PROCEDURE FindActiveElemFactory(CONST moduleName, objName: ARRAY OF CHAR) : ActiveElementFactory;
-	VAR i : LONGINT; p : ANY; obj: ActiveElementFactory;
+	VAR i : SIZE; p : ANY; obj: ActiveElementFactory;
 	BEGIN
 		registeredActiveElemFact.Lock;
 		FOR i := 0 TO registeredActiveElemFact.GetCount()-1 DO
@@ -690,7 +690,7 @@ TYPE
 			NEW(paramTempList);
 			request.variables.Lock;
 			FOR i := 0 TO request.variables.GetCount()-1 DO
-				p := request.variables.GetItem(TODO(i)); var := p(HTTPSupport.HTTPVariable);
+				p := request.variables.GetItem(i); var := p(HTTPSupport.HTTPVariable);
 				Strings.Copy(var.name, 0, prefixLength, varPrefix);
 				restLength := Strings.Length(var.name)-prefixLength;
 				IF ((varPrefix = DynamicWebpage.HTTPVarCommandParamPrefix) & (restLength > 0)) THEN
@@ -741,7 +741,7 @@ TYPE
 	END HandleClientAction;
 
 	PROCEDURE ClearFactoryList;
-	VAR p: ANY; fact: ActiveElementFactory; i: LONGINT;
+	VAR p: ANY; fact: ActiveElementFactory; i: SIZE;
 	BEGIN
 		IF (registeredActiveElemFact # NIL) THEN
 			registeredActiveElemFact.Lock;
@@ -795,7 +795,7 @@ TYPE
 	END ReadRegisteredModules;
 
 	PROCEDURE RegisterModuleByName(moduleName: Strings.String);
-	VAR module: Modules.Module; factory : DynamicWebpage.ActiveElementDescSetFactory; i: LONGINT; res: WORD;
+	VAR module: Modules.Module; factory : DynamicWebpage.ActiveElementDescSetFactory; i: SIZE; res: WORD;
 		msg: ARRAY 1024 OF CHAR; desc: DynamicWebpage.ActiveElementDescriptor;
 		descList: DynamicWebpage.ActiveElementDescSet;
 	BEGIN
@@ -893,7 +893,7 @@ TYPE
 	END Install;
 
 	PROCEDURE ModuleTerminator;
-	VAR p: ANY; h: WebHTTPServer.Host; i : LONGINT;
+	VAR p: ANY; h: WebHTTPServer.Host; i : SIZE;
 	BEGIN
 		LockServingHosts;
 		FOR i := 0 TO servingHosts.GetCount()-1 DO

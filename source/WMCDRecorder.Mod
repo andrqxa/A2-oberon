@@ -790,7 +790,7 @@ TYPE
 			ELSE
 				IF data IS Utils.ConvertingStatus THEN
 					convStatus := data(Utils.ConvertingStatus);
-					burnPanel.progress0.SetPos(TODO(convStatus.bytesEncoded DIV 1024));
+					burnPanel.progress0.SetPos(convStatus.bytesEncoded DIV 1024);
 				ELSIF data IS CDRecord.RecordingStatus THEN
 					recStatus := data(CDRecord.RecordingStatus);
 					IF recStatus.operation = CDRecord.Verifying THEN
@@ -828,7 +828,7 @@ TYPE
 						Files.SplitPath(writeStatus.fileName^, path, filename);
 						burnPanel.SetCaption0(Strings.NewString(filename));
 					END;
-					burnPanel.progress0.SetPos(TODO(writeStatus.bytesWritten) DIV 1024);
+					burnPanel.progress0.SetPos(writeStatus.bytesWritten DIV 1024);
 				END;
 			END;
 		END StatusChanged;

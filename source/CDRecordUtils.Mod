@@ -69,7 +69,7 @@ TYPE
 				RETURN ResErr;
 			END;
 			*)
-			IF size < 1024 THEN size := TODO(file.Length()) - 8; END;
+			IF size < 1024 THEN size := (file.Length() - 8)(LONGINT); END;
 
 			r.Bytes(buf, 0, 4, bytesRead);
 			IF buf # "WAVE" THEN
@@ -473,7 +473,7 @@ TYPE
 
 	ProgressBar* = OBJECT(WMComponents.VisualComponent)
 	VAR
-		start*, end*, cur*: WMProperties.Int32Property;
+		start*, end*, cur*: WMProperties.IntegerProperty;
 		color*: WMProperties.ColorProperty;
 		borderColor*: WMProperties.ColorProperty;
 
@@ -488,23 +488,23 @@ TYPE
 			NEW(cur, NIL, NIL, NIL);
 		END Init;
 
-		PROCEDURE SetPos*(pos: Streams.Position);
+		PROCEDURE SetPos*(pos: HUGEINT);
 		BEGIN
 			IF pos < start.Get() THEN
 				pos := start.Get();
 			ELSIF pos > end.Get() THEN
 				pos := end.Get();
 			END;
-			cur.Set(TODO(pos));
+			cur.Set(pos);
 			Invalidate();
 		END SetPos;
 
-		PROCEDURE GetPos*(): Streams.Position;
+		PROCEDURE GetPos*(): HUGEINT;
 		BEGIN
 			RETURN cur.Get();
 		END GetPos;
 
-		PROCEDURE SetRange*(start, end: LONGINT);
+		PROCEDURE SetRange*(start, end: HUGEINT);
 		BEGIN
 			SELF.start.Set(start);
 			SELF.end.Set(end);
@@ -526,7 +526,7 @@ TYPE
 			pt: ARRAY 4 OF WMGraphics.Point2d;
 		BEGIN
 			IF end.Get() > start.Get() THEN
-				width := (cur.Get()-start.Get()) * bounds.GetWidth() DIV (end.Get()-start.Get());
+				width := LONGINT((cur.Get()-start.Get()) * bounds.GetWidth() DIV (end.Get()-start.Get()));
 			END;
 			rect := WMRectangles.MakeRect(0, 0, width, bounds.GetHeight());
 
@@ -683,14 +683,14 @@ VAR
 	file: Files.File;
 	r: Files.Reader;
 	id, buf: ARRAY 128 OF CHAR;
-	len: LONGINT; bytesRead: SIZE;
+	len: Files.Size; bytesRead: SIZE;
 BEGIN
 	file := Files.Old(filename^);
 	IF file = NIL THEN
 		RETURN ResErr;
 	END;
 	Files.OpenReader(r, file, 0);
-	len := TODO(file.Length());
+	len := file.Length();
 	r.SkipBytes(len-128);
 	r.Bytes(buf, 0, 128, bytesRead);
 	Strings.Copy(buf, 0, 3, id);
