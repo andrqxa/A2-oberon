@@ -590,7 +590,6 @@ BEGIN
 END IntToStr;
 
 (** converts a string to an integer. Leading whitespace is ignored *)
-(* adopted from Strings.Mod *)
 PROCEDURE StrToInt*(CONST str: ARRAY OF CHAR; VAR val: LONGINT);
 VAR i: SIZE; d: LONGINT; neg: BOOLEAN;
 BEGIN
@@ -616,7 +615,6 @@ BEGIN
 END StrToInt;
 
 (** converts a string to an integer. Leading whitespace is ignored *)
-(* adopted from Strings.Mod *)
 PROCEDURE StrToHInt*(CONST str: ARRAY OF CHAR; VAR val: HUGEINT);
 VAR i: SIZE; d: HUGEINT; neg: BOOLEAN;
 BEGIN
@@ -643,7 +641,6 @@ END StrToHInt;
 
 (** Convert the substring beginning at position i in str into an integer. Leading whitespace is ignored.
 	After the conversion i points to the first character after the integer. *)
-(* adopted from Strings.Mod *)
 PROCEDURE StrToIntPos*(CONST str: ARRAY OF CHAR; VAR val: LONGINT; VAR i: SIZE);
 VAR noStr: ARRAY 16 OF CHAR;
 BEGIN
@@ -704,7 +701,6 @@ BEGIN
 END HexStrToInt;
 
 (** converts a real value to a string *)
-(* adopted from Strings.Mod *)
 PROCEDURE FloatToStr*(x: LONGREAL; n, f, D: LONGINT; VAR str: ARRAY OF CHAR);
 BEGIN
 	RC.RealToStringFix( x, n, f, D, str )
@@ -716,14 +712,12 @@ BEGIN
 END AddressToStr;
 
 (** converts a string to a real value *)
-(* adopted from Strings.Mod *)
 PROCEDURE StrToFloat*(CONST s: ARRAY OF CHAR; VAR r: LONGREAL);
 BEGIN
 	RC.StringToReal(s,r);
 END StrToFloat;
 
 (** converts a set to a string *)
-(* adopted from Strings.Mod *)
 PROCEDURE SetToStr*(set: SET; VAR s: ARRAY OF CHAR);
 VAR i, j, k: INTEGER; noFirst: BOOLEAN;
 BEGIN
@@ -748,7 +742,6 @@ BEGIN
 END SetToStr;
 
 (** converts a string to a set *)
-(* adopted from Strings.Mod *)
 PROCEDURE StrToSet*(CONST str: ARRAY OF CHAR; VAR set: SET);
 VAR i, d, d1: INTEGER; dot: BOOLEAN;
 BEGIN
@@ -774,7 +767,6 @@ BEGIN FormatDateTime(TimeFormat, time, s)
 END TimeToStr;
 
 (** converts a string to a time *)
-(* adopted from Strings.Mod *)
 PROCEDURE StrToTime*(CONST str: ARRAY OF CHAR; VAR dt: Dates.DateTime);
 VAR i: SIZE;
 BEGIN
