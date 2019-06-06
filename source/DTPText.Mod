@@ -458,7 +458,7 @@ TYPE
 		properties: WMProperties.PropertyList;
 		props: TextPropWindow;
 
-		firstLine* : WMProperties.Int32Property;
+		firstLine* : WMProperties.IntegerProperty;
 		firstLineI* : LONGINT;
 		firstPos* : SIZE;
 		firstIsFirstInP*: BOOLEAN;
@@ -861,7 +861,7 @@ TYPE
 
 		PROCEDURE CheckNumberOfLines;
 		BEGIN
-			firstLine.SetBounds(0, TODO(layout.GetNofLines()) - 1)
+			firstLine.SetBounds(0, layout.GetNofLines() - 1)
 		END CheckNumberOfLines;
 
 		PROCEDURE CheckCursor;
@@ -877,7 +877,7 @@ TYPE
 			IF (l < firstLineI) THEN
 				(* move the cursor down by 3 lines to get more context *)
 				l := MAX(0, l - 3);
-				firstLine.Set(TODO(l));
+				firstLine.Set(l);
 			ELSIF (l < layout.GetNofLines()) THEN
 				ty := bordersI.t; i := firstLineI;
 				WHILE i < l DO
@@ -888,7 +888,7 @@ TYPE
 				ty := ty + layout.lines[i].height;
 				IF ty >= bounds.GetHeight() - bordersI.b THEN
 					l := MAX(0, l - 3);
-					firstLine.Set(TODO(l))
+					firstLine.Set(l)
 				END
 			END;
 			text.ReleaseRead;
@@ -2172,7 +2172,7 @@ TYPE
 			IF cl > 0 THEN
 				DEC(cl);
 				cursor.SetPosition(layout.GetLineStartPos(cl) + MIN(layout.GetLineLength(cl) - 1, lineEnter));
-				IF cl < firstLineI THEN firstLine.Set(TODO(cl)) END
+				IF cl < firstLineI THEN firstLine.Set(cl) END
 			END;
 			IF select THEN KeyUpdateSelection(cursor.GetPosition()) END;
 			text.ReleaseRead
@@ -2249,7 +2249,7 @@ TYPE
 			IF select THEN KeyStartSelection(cursor.GetPosition())
 			ELSE selection.SetFromTo(cursor.GetPosition(), cursor.GetPosition()); Texts.ClearLastSelection
 			END;
-			IF ctrl THEN cursor.SetPosition(text.GetLength()); firstLine.Set(TODO(layout.FindLineNrByPos(text.GetLength())))
+			IF ctrl THEN cursor.SetPosition(text.GetLength()); firstLine.Set(layout.FindLineNrByPos(text.GetLength()))
 			ELSE cl := layout.FindLineNrByPos(cursor.GetPosition());
 				cursor.SetPosition(layout.GetLineStartPos(cl) + layout.GetLineLength(cl) - 1)
 			END;
@@ -2451,7 +2451,7 @@ TYPE
 				sr.SetRaw(string^, 0, charContent.GetLength());
 				(* Files.OpenReader(r, charContent.GetFile(), charContent.GetPos()); *)
 				oldpos := text.GetLength();
-				len := TODO(charContent.GetLength());
+				len := charContent.GetLength();
 				KernelLog.String("StartPos : "); KernelLog.Int(charContent.GetPos(), 5); KernelLog.String(" len : ");
 				KernelLog.Int(charContent.GetLength(), 5); KernelLog.Ln;
 				tpos := 0; lengthCounter := 0;
