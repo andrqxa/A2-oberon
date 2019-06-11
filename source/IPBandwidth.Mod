@@ -183,7 +183,7 @@ TYPE UDPLink = OBJECT (Link)
 	END SendBytes;
 
 	PROCEDURE ReceiveBytes (): SIZE;
-	VAR address: IP.Adr; port, received: WORD;
+	VAR address: IP.Adr; port: WORD; received: SIZE;
 	BEGIN
 		socket.Receive (buffer, 0, LEN (buffer), 0, address, port, received, result);
 		IF result = UDP.Ok THEN RETURN received END;

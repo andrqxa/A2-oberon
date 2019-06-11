@@ -386,12 +386,12 @@ END SendDG;
 
 PROCEDURE ReceiveDG*(S: Socket; VAR remIP: IPAdr; VAR remPort: INTEGER; pos: LONGINT; VAR len: LONGINT;
 	VAR buf: ARRAY OF SYSTEM.BYTE);
-VAR res, fport: LONGINT;
+VAR res, fport: LONGINT; length: SIZE;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));	(* index check *)
-	S.pcb.Receive(SYSTEM.VAL(Bytes, buf), pos, len, 0, remIP, fport, len, res);
+	S.pcb.Receive(SYSTEM.VAL(Bytes, buf), pos, len, 0, remIP, fport, length, res);
 	remPort := SHORT(fport);
-	IF res = 0 THEN S.res := done ELSE S.res := error; len := -1 END
+	IF res = 0 THEN S.res := done; len := length(LONGINT) ELSE S.res := error; len := -1 END
 END ReceiveDG;
 
 (** Returns the size of the first available datagram on the socket. *)

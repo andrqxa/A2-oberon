@@ -116,9 +116,9 @@ TYPE
 		PROCEDURE Recieve*(VAR p: OSC.OSCPacket; timeout (* in ms *): LONGINT): WORD;
 		VAR
 			fip2: IP.Adr; fport2: LONGINT;
-			size: LONGINT;
+			size: SIZE;
 			buffer: Strings.String;
-			got: LONGINT;
+			got: SIZE;
 			res: WORD;
 			endticks: LONGINT;
 			istimeout: BOOLEAN;
@@ -163,7 +163,7 @@ TYPE
 			newUDPData: OSCUDPData;
 			buffer: OSC.String; (* ARRAY MaxUDPPacketLength OF CHAR; *)
 			receivefip: IP.Adr; receivefport: LONGINT;
-			got: LONGINT;
+			got: SIZE;
 			res: WORD;
 
 		(* Sets the signal to stop the service *)

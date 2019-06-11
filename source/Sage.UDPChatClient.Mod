@@ -57,7 +57,8 @@ TYPE
 		str1, str2: ARRAY 256 OF CHAR;
 
 		branch, command, seqNum, messageType, inSeqNum, outSeqNum: INTEGER;
-		senderUin, receiverUin, port, len, receiveBufOffset: LONGINT;
+		senderUin, receiverUin, port, receiveBufOffset: LONGINT;
+		len: SIZE;
 		sendBuf-: Base.Buffer;
 
 		receiveBuf, message, string: String;

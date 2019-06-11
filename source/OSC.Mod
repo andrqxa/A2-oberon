@@ -929,9 +929,9 @@ OSCBundle b:
 
 	This function parses the packet in data[0..endofs-1]. It returns the corresponding object or NIL if a
 	parse error occured. *)
-	PROCEDURE ParseOSCPacket*(VAR data: ARRAY OF CHAR; endofs: LONGINT): OSCPacket;
+	PROCEDURE ParseOSCPacket*(VAR data: ARRAY OF CHAR; endofs: SIZE): OSCPacket;
 	VAR
-		ofs: LONGINT;
+		ofs: SIZE;
 	BEGIN
 		IF Trace THEN
 			KernelLog.String('ParseOSCPacket started'); KernelLog.Ln;
@@ -943,7 +943,7 @@ OSCBundle b:
 
 	(* parses a packet in data[ofs..endofs-1] (the size of the packet is endofs-ofs).
 	Note: Since ofs is a VAR parameter, it will also be adjusted in calling functions! *)
-	PROCEDURE parseOSCPacketInt(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCPacket;
+	PROCEDURE parseOSCPacketInt(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCPacket;
 	VAR
 		p: OSCPacket;
 	BEGIN
@@ -963,13 +963,13 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCPacketInt;
 
-	PROCEDURE parseOSCBundle(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCBundle;
+	PROCEDURE parseOSCBundle(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCBundle;
 	VAR
 		b: OSCBundle;
 		p: OSCPacket;
 		tt: OSCTimeTag;
-		packetsize: LONGINT;
-		packetendofs: LONGINT;
+		packetsize: SIZE;
+		packetendofs: SIZE;
 		i: SIZE;
 	BEGIN
 		IF Trace THEN KernelLog.String('parseOSCBundle: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;
@@ -1004,7 +1004,7 @@ OSCBundle b:
 		RETURN b;
 	END parseOSCBundle;
 
-	PROCEDURE parseOSCTT(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT): OSCTimeTag;
+	PROCEDURE parseOSCTT(VAR data: ARRAY OF CHAR; VAR ofs: SIZE): OSCTimeTag;
 	VAR
 		tt: OSCTimeTag;
 		sec, fraction, msec: LONGINT;
@@ -1030,7 +1030,7 @@ OSCBundle b:
 		RETURN tt;
 	END parseOSCTT;
 
-	PROCEDURE parseOSCParamInteger(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamInteger;
+	PROCEDURE parseOSCParamInteger(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamInteger;
 	VAR
 		p: OSCParamInteger;
 	BEGIN
@@ -1040,7 +1040,7 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamInteger;
 
-	PROCEDURE parseOSCParamFloat(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamFloat;
+	PROCEDURE parseOSCParamFloat(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamFloat;
 	VAR
 		p: OSCParamFloat;
 		i: LONGINT;
@@ -1051,7 +1051,7 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamFloat;
 
-	PROCEDURE parseOSCParamString(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamString;
+	PROCEDURE parseOSCParamString(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamString;
 	VAR
 		p: OSCParamString;
 		s: String;
@@ -1063,7 +1063,7 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamString;
 
-	PROCEDURE parseOSCParamBlob(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamBlob;
+	PROCEDURE parseOSCParamBlob(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamBlob;
 	VAR
 		p: OSCParamBlob;
 		b: Blob;
@@ -1079,7 +1079,7 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamBlob;
 
-	PROCEDURE parseOSCParamInteger64(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamInteger64;
+	PROCEDURE parseOSCParamInteger64(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamInteger64;
 	VAR
 		p: OSCParamInteger64;
 		h, l: LONGINT;
@@ -1095,7 +1095,7 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamInteger64;
 
-	PROCEDURE parseOSCParamTT(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamTT;
+	PROCEDURE parseOSCParamTT(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamTT;
 	VAR
 		tt: OSCTimeTag;
 		p: OSCParamTT;
@@ -1108,7 +1108,7 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamTT;
 
-	PROCEDURE parseOSCParamFloat64(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamFloat64;
+	PROCEDURE parseOSCParamFloat64(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamFloat64;
 	VAR
 		p: OSCParamFloat64;
 		h,l: LONGINT;
@@ -1123,7 +1123,7 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamFloat64;
 
-	PROCEDURE parseOSCParamAltString(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamString;
+	PROCEDURE parseOSCParamAltString(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamString;
 	VAR
 		p: OSCParamAltString;
 		s: String;
@@ -1135,7 +1135,7 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamAltString;
 
-	PROCEDURE parseOSCParamChar(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamChar;
+	PROCEDURE parseOSCParamChar(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamChar;
 	VAR
 		p: OSCParamChar;
 		i: LONGINT;
@@ -1147,7 +1147,7 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamChar;
 
-	PROCEDURE parseOSCParamRGBAColor(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCParamRGBAColor;
+	PROCEDURE parseOSCParamRGBAColor(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamRGBAColor;
 	VAR
 		p: OSCParamRGBAColor;
 	BEGIN
@@ -1157,9 +1157,9 @@ OSCBundle b:
 		RETURN p;
 	END parseOSCParamRGBAColor;
 
-	PROCEDURE parseOSCParams(adr: String; VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCMessage;
+	PROCEDURE parseOSCParams(adr: String; VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCMessage;
 	VAR
-		argstrofs: LONGINT;
+		argstrofs: SIZE;
 		m: OSCMessage;
 		param: OSCParamObject;
 		T: OSCParamTrue;
@@ -1203,12 +1203,12 @@ OSCBundle b:
 		RETURN m;
 	END parseOSCParams;
 
-	PROCEDURE parseOSCMessage(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): OSCMessage;
+	PROCEDURE parseOSCMessage(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCMessage;
 	VAR
 		adr: String;
-		argumentofs: LONGINT;
+		argumentofs: SIZE;
 		m: OSCMessage;
-		i: LONGINT;
+		i: SIZE;
 	BEGIN
 		IF Trace THEN KernelLog.String('parseOSCMessage: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;
 		(* address [ || typetagstring ] || argumentdata *)
@@ -1285,7 +1285,7 @@ OSCBundle b:
 	END CheckOSCAdrPattern;
 
 
-	PROCEDURE skipAndCheckOSCString(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): BOOLEAN;
+	PROCEDURE skipAndCheckOSCString(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): BOOLEAN;
 	BEGIN
 		IF Trace THEN KernelLog.String('skipAndCheckOSCString: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;
 		WHILE (ofs < endofs) & (data[ofs] # 0X) DO INC(ofs); END;
@@ -1302,9 +1302,9 @@ OSCBundle b:
 	END skipAndCheckOSCString;
 
 	(* helper function to import an OSCString - checks also the extra padding 0X characters *)
-	PROCEDURE importString(VAR data: ARRAY OF CHAR; VAR ofs: LONGINT; endofs: LONGINT): String;
+	PROCEDURE importString(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): String;
 	VAR
-		pos: LONGINT;
+		pos: SIZE;
 		s: String;
 	BEGIN
 		IF Trace THEN KernelLog.String('importString: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;

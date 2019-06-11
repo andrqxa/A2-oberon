@@ -213,7 +213,7 @@ VAR
 		RETURN err = 0
 	END Listen;
 
-	PROCEDURE Recv*( s: WORD; VAR buf: ARRAY OF CHAR; pos: LONGINT; VAR len: LONGINT; flags: WORD ): BOOLEAN;
+	PROCEDURE Recv*( s: WORD; VAR buf: ARRAY OF CHAR; pos: SIZE; VAR len: SIZE; flags: WORD ): BOOLEAN;
 	VAR res: SIZE; err: WORD;
 	BEGIN
 		REPEAT
@@ -221,20 +221,20 @@ VAR
 			IF res < 0 THEN  err := Unix.errno()  END
 		UNTIL (res >= 0) OR (err # Unix.EINTR);
 		IF err >= 0 THEN
-			len:= TODO(res);  RETURN TRUE
+			len:= res;  RETURN TRUE
 		ELSE
 			Unix.Perror( "Sockets.Recv" );
 			len:= 0;  RETURN FALSE
 		END
 	END Recv;
 
-	PROCEDURE Send*( s: WORD; CONST buf: ARRAY OF CHAR; pos: LONGINT; VAR len: LONGINT ): BOOLEAN;
+	PROCEDURE Send*( s: WORD; CONST buf: ARRAY OF CHAR; pos: SIZE; VAR len: SIZE ): BOOLEAN;
 	VAR err: SIZE;
 	BEGIN
 		ASSERT( LEN(buf)-pos >= len );
 		err := send( s, ADDRESSOF( buf[pos] ), len, 0 );
 		IF err >= 0 THEN
-			len := TODO(err);  RETURN TRUE
+			len := err;  RETURN TRUE
 		ELSE
 			Unix.Perror( "Sockets.Send" );
 			len := 0;  RETURN FALSE
@@ -242,7 +242,7 @@ VAR
 	END Send;
 
 	PROCEDURE RecvFrom*( s: WORD; VAR from: SocketAdr;
-						VAR buf: ARRAY OF CHAR; pos: LONGINT;  VAR len: LONGINT ): BOOLEAN;
+						VAR buf: ARRAY OF CHAR; pos: SIZE;  VAR len: SIZE ): BOOLEAN;
 	VAR res: SIZE; err, size: WORD; nbuf: NameBuf;
 	BEGIN
 		NEW( nbuf ); size := 64;
@@ -252,14 +252,14 @@ VAR
 		UNTIL (res >= 0) OR (err # Unix.EINTR);
 		IF res >= 0 THEN
 			from := BufToSocketAdr( nbuf.buf, size );
-			len := TODO(res);  RETURN TRUE
+			len := res;  RETURN TRUE
 		ELSE
 			Unix.Perror( "Sockets.RecvFrom" );
 			len := 0;  RETURN FALSE
 		END
 	END RecvFrom;
 
-	PROCEDURE SendTo*( s: WORD;  dest: SocketAdr;  CONST buf: ARRAY OF CHAR;  pos, len: LONGINT ): BOOLEAN;
+	PROCEDURE SendTo*( s: WORD;  dest: SocketAdr;  CONST buf: ARRAY OF CHAR;  pos, len: SIZE ): BOOLEAN;
 	VAR err: SIZE; size: Length;
 	BEGIN
 		ASSERT( LEN(buf) - pos >= len );

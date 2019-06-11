@@ -47,7 +47,7 @@ TYPE
 		END AddAlias;
 
 		PROCEDURE IsAlias(CONST s : ARRAY OF CHAR) : BOOLEAN;
-		VAR i : LONGINT; p : ANY;
+		VAR i : SIZE; p : ANY;
 			isAlias : BOOLEAN;
 		BEGIN
 			mailAliases.Lock;
@@ -61,7 +61,7 @@ TYPE
 		END IsAlias;
 
 		PROCEDURE DumpAccount;
-		VAR i : LONGINT; p : ANY;
+		VAR i : SIZE; p : ANY;
 		BEGIN
 			KernelLog.String("Account : "); KernelLog.String(userName^); KernelLog.Ln;
 			KernelLog.String("Aliases :");
@@ -83,7 +83,7 @@ TYPE
 		PROCEDURE SaveMessage(m : Message) : BOOLEAN;
 		VAR path, filePath : ARRAY 256 OF CHAR;
 			f : Files.File; w : Files.Writer;
-			i : LONGINT; res: WORD; p : ANY;
+			i : SIZE; res: WORD; p : ANY;
 		BEGIN
 			COPY(mailPath^, path);
 			Strings.Append(path, "/"); Strings.Append(path, userName^);
@@ -112,7 +112,7 @@ TYPE
 
 		PROCEDURE Forward(m : Message; CONST sender : ARRAY OF CHAR) : BOOLEAN;
 		VAR smtpSession : SMTPClient.SMTPSession; p : ANY;
-			res: WORD; i : LONGINT;
+			res: WORD; i : SIZE;
 		BEGIN
 			NEW(smtpSession);
 			smtpSession.Open(mailRelay, mailHost, 25, res);
@@ -236,7 +236,7 @@ TYPE
 		PROCEDURE SaveLostMessage(m : Message) : BOOLEAN;
 		VAR path, filePath : ARRAY 256 OF CHAR;
 			f : Files.File; w : Files.Writer;
-			i : LONGINT; res: WORD; p : ANY;
+			i : SIZE; res: WORD; p : ANY;
 		BEGIN
 			COPY(mailPath^, path);
 			Strings.Append(path, "/"); Strings.Append(path, "lost");
@@ -264,7 +264,7 @@ TYPE
 		END SaveLostMessage;
 
 		PROCEDURE DeliverMessage() : BOOLEAN;
-		VAR i, j : LONGINT; ap, sp : ANY;
+		VAR i, j : SIZE; ap, sp : ANY;
 			isReceiver : BOOLEAN;
 			ok : BOOLEAN;
 			lost : BOOLEAN;

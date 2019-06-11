@@ -30,7 +30,8 @@ TYPE
 		running, terminated: BOOLEAN;
 		ip: IP.Adr;
 		branch, command, seqNum, messageType: INTEGER;
-		uin, receiverUin, port, len, receiveBufOffset: LONGINT; res: WORD;
+		uin, receiverUin, port, receiveBufOffset: LONGINT;
+		len: SIZE; res: WORD;
 		user: Base.User;
 		users: Base.Users;
 		clients: Base.List;

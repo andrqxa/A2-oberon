@@ -41,7 +41,7 @@ CONST
 
 (* Parse the BootP vendor extensions in buf[i..m-1]. *)
 
-PROCEDURE ParseOptions(VAR buf: ARRAY OF CHAR; i, m: LONGINT; VAR maskAdr, gatewayAdr: IP.Adr;
+PROCEDURE ParseOptions(VAR buf: ARRAY OF CHAR; i, m: SIZE; VAR maskAdr, gatewayAdr: IP.Adr;
 		VAR dns: ARRAY OF IP.Adr; VAR domain: ARRAY OF CHAR; VAR serverIP: IP.Adr; VAR xid:LONGINT;
 		VAR msgType:CHAR);
 VAR j, len: LONGINT;
@@ -171,7 +171,8 @@ PROCEDURE InitDHCP(int: IP.Interface; VAR localAdr, maskAdr, gatewayAdr: IP.Adr;
 		VAR dns: ARRAY OF IP.Adr; VAR domain: ARRAY OF CHAR; VAR res: WORD);
 VAR
 	p: UDP.Socket;
-	fport, len, time, start, offerDelay, requestDelay, i: LONGINT;
+	fport, time, start, offerDelay, requestDelay, i: LONGINT;
+	len: SIZE;
 	fip, serverIP: IP.Adr;
 	msgType: CHAR;
 	xid, rxid, offerTries, requestTries: LONGINT;
