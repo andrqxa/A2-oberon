@@ -73,7 +73,7 @@ TYPE
 	Entry = OBJECT
 	VAR
 		next : Entry;
-		pos : LONGINT; (* pointer to beginning of entry header in tar file *)
+		pos : Files.Position; (* pointer to beginning of entry header in tar file *)
 		header : Header;
 
 		PROCEDURE & Init*;
@@ -207,7 +207,7 @@ TYPE
 			NEW(e);
 			e.SetName(name);
 			e.SetSize(size);
-			e.pos := TODO(archive.file.Length());
+			e.pos := archive.file.Length();
 			e.CalculateCheckSum();
 			archive.AddEntryNode(e);
 			Files.OpenWriter(w, archive.file, e.pos);
@@ -554,7 +554,7 @@ TYPE
 		END
 	END OctStrToInt;
 
-	PROCEDURE IntToOctStr(val: LONGINT; VAR str: ARRAY OF CHAR);
+	PROCEDURE IntToOctStr(val: HUGEINT; VAR str: ARRAY OF CHAR);
 		VAR i: LONGINT;
 	BEGIN
 		i := LEN(str)-1; str[i] := 0X;
@@ -588,11 +588,11 @@ TYPE
 	BEGIN
 		Files.OpenReader(in, from, 0);
 		Files.OpenWriter(out, to, 0);
-		TransferBytes(in, out, TODO(from.Length()));
+		TransferBytes(in, out, from.Length());
 		out.Update
 	END CopyFiles;
 
-	PROCEDURE TransferBytes(from : Streams.Reader; to : Streams.Writer; n : LONGINT);
+	PROCEDURE TransferBytes(from : Files.Reader; to : Files.Writer; n : Files.Size);
 	VAR buf : ARRAY 1024 OF CHAR;
 		len : SIZE;
 	BEGIN
@@ -689,7 +689,7 @@ TYPE
 	PROCEDURE Create*(context : Commands.Context);
 	VAR
 		fn, archivename: Files.FileName; F, f: Files.File; W: Files.Writer; r: Files.Reader;
-		hdr: Header; size, i: LONGINT; ch: CHAR;
+		hdr: Header; size, i: Files.Position; ch: CHAR;
 		nofAdded, nofErrors : LONGINT;
 	BEGIN
 		context.arg.SkipWhitespace; context.arg.String(archivename);
@@ -699,7 +699,7 @@ TYPE
 		WHILE context.arg.GetString(fn) DO
 			f := Files.Old(fn);
 			IF f # NIL THEN
-				Files.OpenReader(r, f, 0); size := TODO(f.Length());
+				Files.OpenReader(r, f, 0); size := f.Length();
 				NEW(hdr); COPY(fn, hdr.name);
 				IntToOctStr(size, hdr.size);
 				CalcCheckSum(hdr);
