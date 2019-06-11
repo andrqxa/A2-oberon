@@ -34,7 +34,7 @@ TYPE
 								r.res := num*SELF.blockSize
 							END;
 							IF r.res # 0 THEN	(* fill rest of block with 0 *)
-								pos := num*SELF.blockSize - r.res + TODO(ofs); n := r.res;
+								pos := num*SELF.blockSize - r.res + LONGINT(ofs); n := r.res;
 								WHILE n # 0 DO data[pos] := 0X; INC(pos); DEC(n) END
 							END;
 							res := Disks.Ok

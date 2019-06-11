@@ -155,12 +155,12 @@ TYPE
 			Invalidate;
 		END ToggleLineNumbers;
 
-		PROCEDURE SetNofLines(nofLines: LONGINT);
+		PROCEDURE SetNofLines(nofLines: SIZE);
 		BEGIN
 			lineNbr.model.Acquire;
 			grid.model.Acquire;
-			lineNbr.model.SetNofRows(nofLines);
-			grid.model.SetNofRows(nofLines);
+			lineNbr.model.SetNofRows(nofLines(LONGINT));
+			grid.model.SetNofRows(nofLines(LONGINT));
 			grid.model.Release;
 			lineNbr.model.Release;
 		END SetNofLines;
@@ -178,7 +178,7 @@ TYPE
 			filenameEdit.SetAsString("");
 			filenameEdit.text.AcquireRead;
 			NEW(p, filenameEdit.text); p.SetPosition(0);
-			NEW(dropTarget, filenameEdit.text, p);
+			NEW(dropTarget, filenameEdit.text, p);wc
 			filenameEdit.text.ReleaseRead;
 			IF ~filenameEdit.tv.hasFocus & ~filenameEdit.tv.alwaysShowCursor.Get() THEN filenameEdit.tv.cursor.SetVisible(FALSE) END;
 			dragInfo.data := dropTarget;
@@ -572,8 +572,8 @@ TYPE
 
 		PROCEDURE Setup(nofLines: SIZE);
 		BEGIN
-			leftView.SetNofLines(TODO(nofLines) + 1);
-			rightView.SetNofLines(TODO(nofLines) + 1);
+			leftView.SetNofLines(nofLines + 1);
+			rightView.SetNofLines(nofLines + 1);
 		END Setup;
 
 		PROCEDURE SetScrollbarProperties;

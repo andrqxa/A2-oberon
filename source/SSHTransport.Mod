@@ -608,7 +608,7 @@ TYPE
 				buf-: POINTER TO ARRAY OF CHAR;
 				len-: LONGINT;
 
-				PROCEDURE & Init*( type: CHAR; size: LONGINT );
+				PROCEDURE & Init*( type: CHAR; size: SIZE );
 				BEGIN
 					NEW( buf, size );  buf[0] := type;  len := 1;
 				END Init;
@@ -634,10 +634,10 @@ TYPE
 					INC( len, l )
 				END AppString;
 
-				PROCEDURE AppArray*( CONST arr: ARRAY OF CHAR;  pos, arrlen: LONGINT );
-				VAR i: LONGINT;
+				PROCEDURE AppArray*( CONST arr: ARRAY OF CHAR;  pos, arrlen: SIZE );
+				VAR i: SIZE;
 				BEGIN
-					AppInteger( arrlen );
+					AppInteger( arrlen(LONGINT) );
 					FOR i := 0 TO arrlen -1 DO buf[len] := arr[pos + i];  INC( len )  END
 				END AppArray;
 

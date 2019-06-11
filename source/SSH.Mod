@@ -42,8 +42,8 @@ TYPE
 				len := 16;
 				f.clientConn.Receive( buf, 0, len, 1, len, res );
 				IF len > 0 THEN
-					p := f.chan.NewDataPacket( TODO(len) + 32 );
-					p.AppArray( buf, 0, TODO(len) );
+					p := f.chan.NewDataPacket( len + 32 );
+					p.AppArray( buf, 0, len );
 					f.chan.SendPacket( p )
 				ELSE
 					Log.String( "client at port " ); Log.Int( f.localPort, 0 );
@@ -200,7 +200,7 @@ TYPE
 				state-: SHORTINT;
 				conn-: T.Connection;
 				rchan: LONGINT;
-				wsize-: LONGINT;
+				wsize-: SIZE;
 				clchan: LONGINT;
 				clwsize: LONGINT;
 				pmax: LONGINT;   (* max packet size accepted by remote *)
@@ -213,9 +213,9 @@ TYPE
 				VAR p: T.Packet; l: LONGINT; t: CHAR;
 					buf: ARRAY 512 OF CHAR;
 				BEGIN
-					NEW( p, Data, TODO(len) + 32 );
+					NEW( p, Data, len + 32 );
 					p.AppInteger( rchan );
-					p.AppArray( data, TODO(ofs), TODO(len) );
+					p.AppArray( data, ofs, len );
 					WHILE wsize < len DO
 						(* wait for server window space *)
 						t := ReceivePacket( buf, l );
@@ -224,7 +224,7 @@ TYPE
 						ELSIF t = 0X THEN  Error( "unexpected end of data" ); RETURN
 						END
 					END;
-					conn.SendPacket( p );  DEC( wsize, TODO(len) );  res := Streams.Ok
+					conn.SendPacket( p );  DEC( wsize, len );  res := Streams.Ok
 				END Send;
 
 				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
@@ -256,7 +256,7 @@ TYPE
 				END Receive;
 
 
-				PROCEDURE NewDataPacket( size: LONGINT ): T.Packet;
+				PROCEDURE NewDataPacket( size: SIZE ): T.Packet;
 				VAR p: T.Packet;
 				BEGIN
 					NEW( p, Data, size );  p.AppInteger( rchan );
@@ -287,7 +287,7 @@ TYPE
 					END
 				END SendPacket;
 
-				PROCEDURE SendBuffer*( CONST buf: ARRAY OF CHAR;  len: LONGINT );
+				PROCEDURE SendBuffer*( CONST buf: ARRAY OF CHAR;  len: SIZE );
 				VAR p: T.Packet;
 				BEGIN
 					p := NewDataPacket( len + 32 );
@@ -677,18 +677,18 @@ TYPE
 	BEGIN
 		flen := f.Length( );  Strings.IntToStr( flen, lbuf );
 		buf := "C0644 "; Strings.Append( buf, lbuf );  Strings.Append( buf, " " );  Strings.Append( buf, name );
-		chan.SendBuffer( buf, TODO(Strings.Length( buf )) );
+		chan.SendBuffer( buf, Strings.Length( buf ) );
 		chan.SendNL;
 		Files.OpenReader( r, f, 0 );  i := 0;  j := 0;  sent := 0;
 		WHILE (i < flen) & (chan.state = ChanOpen) DO
 			r.Char( buf[j] );  INC( i );  INC( j );
 			IF (j = MaxPacketSize-64) OR (j = chan.pmax) THEN
-				chan.SendBuffer( buf, TODO(j) );  INC( sent, j );
+				chan.SendBuffer( buf, j );  INC( sent, j );
 				j := 0;  Log.Char( '.' )
 			END
 		END;
 		IF j > 0 THEN
-			chan.SendBuffer( buf, TODO(j) );  INC( sent, j ); Log.Char( '.' )
+			chan.SendBuffer( buf, j );  INC( sent, j ); Log.Char( '.' )
 		END;
 		Log.Char( ' ' );  Log.Int( sent, 0 ); Log.String( " bytes sent." ); Log.Ln
 	END SendFile;

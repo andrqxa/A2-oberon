@@ -953,7 +953,7 @@ TYPE
 		PROCEDURE UpdateScrollbars;
 		BEGIN
 			IF vScrollbar # NIL THEN
-				vScrollbar.max.Set(TODO(layout.nofLines));
+				vScrollbar.max.Set(layout.nofLines(LONGINT));
 				vScrollbar.pos.Set(firstLineI);
 			END;
 			IF hScrollbar # NIL THEN
@@ -1357,7 +1357,7 @@ TYPE
 		PROCEDURE CheckNumberOfLines;
 		BEGIN
 			UpdateScrollbars;
-			firstLine.SetBounds(0, TODO(layout.nofLines) - 1)
+			firstLine.SetBounds(0, layout.nofLines(LONGINT) - 1)
 		END CheckNumberOfLines;
 
 		PROCEDURE CheckCursor;
@@ -1388,7 +1388,7 @@ TYPE
 			IF (l < firstLineI) THEN
 				(* move the cursor down by 3 lines to get more context *)
 				l := MAX(0, l - 3);
-				firstLine.Set(TODO(l));
+				firstLine.Set(l(LONGINT));
 			ELSIF (l < layout.nofLines) THEN
 				ty := bordersI.t; i := firstLineI;
 				WHILE i < l DO
@@ -1400,7 +1400,7 @@ TYPE
 				ty := ty + layout.lines[i].height;
 				IF ty >= bounds.GetHeight() - bordersI.b THEN
 					l := MAX(0, l - 3);
-					firstLine.Set(TODO(l))
+					firstLine.Set(l(LONGINT))
 				END
 			END;
 
@@ -3041,7 +3041,7 @@ TYPE
 					IF FindLabel(tempLabel, pos) THEN
 						i := layout.nofLines-1;
 						WHILE (i >= 0) DO
-							IF layout.GetLineStartPos(i) < pos THEN firstLine.Set(TODO(i)); RETURN END;
+							IF layout.GetLineStartPos(i) < pos THEN firstLine.Set(i(LONGINT)); RETURN END;
 							DEC(i);
 						END;
 					END;
@@ -3347,7 +3347,7 @@ TYPE
 				lineStart := layout.GetLineStartPos(cl);
 				cPos := lineStart + MIN(layout.GetLineLength(cl) - 1, lineEnter);
 				cursor.SetPosition(cPos);
-				IF cl < firstLineI THEN firstLine.Set(TODO(cl)) END
+				IF cl < firstLineI THEN firstLine.Set(LONGINT(cl)) END
 			END;
 			IF select THEN
 				KeyUpdateSelection(GetInternalPos(cursor.GetPosition()));
@@ -3579,7 +3579,7 @@ TYPE
 				textLength := text.GetLength();
 
 				cursor.SetPosition(GetDisplayPos(textLength));
-				firstLine.Set(TODO(layout.FindLineNrByPos(text.GetLength())))
+				firstLine.Set(layout.FindLineNrByPos(text.GetLength())(LONGINT));
 			ELSE
 				cl := layout.FindLineNrByPos(cursor.GetPosition());
 				lineEnd := layout.GetLineStartPos(cl) + layout.GetLineLength(cl) - 1;
