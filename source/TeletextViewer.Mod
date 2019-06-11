@@ -163,9 +163,9 @@ TYPE
 			NEW (panel);
 			panel.fillColor.Set(0FFH);
 			IF nofChannels MOD ButtonsPerRow = 0 THEN
-				panel.bounds.SetHeight (TODO (nofChannels DIV ButtonsPerRow) * ButtonHeight)
+				panel.bounds.SetHeight ((nofChannels DIV ButtonsPerRow)(LONGINT) * ButtonHeight)
 			ELSE
-				panel.bounds.SetHeight (TODO (nofChannels DIV ButtonsPerRow+1) * ButtonHeight)
+				panel.bounds.SetHeight ((nofChannels DIV ButtonsPerRow+1)(LONGINT) * ButtonHeight)
 			END;
 
 			(* Create columns for the buttons *)

@@ -48,7 +48,7 @@ TYPE
 		mode: Raster.Mode;
 		bytesPerPixel: LONGINT;	(* network transfer format size *)
 		rcvbuf, imgbuf: POINTER TO ARRAY OF CHAR;
-		rcvbufpos, rcvbuflen: LONGINT;
+		rcvbufpos, rcvbuflen: SIZE;
 		fip: IP.Adr
 	END;
 
@@ -339,13 +339,13 @@ BEGIN
 					(* attempt to read at least size bytes, but at most a full buffer *)
 				c.pcb.Receive(c.rcvbuf^, 0, LEN(c.rcvbuf), size, n, c.res);
 				IF c.res # Ok THEN EXIT END;
-				c.rcvbufpos := 0; c.rcvbuflen := TODO(n);
+				c.rcvbufpos := 0; c.rcvbuflen := n;
 				n := MIN(n, size)	(* n is number of bytes to copy from buffer now *)
 			END;
 			ASSERT(dst+n <= LEN(buf));	(* index check *)
 			SYSTEM.MOVE(ADDRESSOF(c.rcvbuf[c.rcvbufpos]), ADDRESSOF(buf[dst]), n);
-			INC(c.rcvbufpos, TODO(n)); DEC(c.rcvbuflen, TODO(n));
-			INC(dst, n); DEC(size, n); INC(len, TODO(n))
+			INC(c.rcvbufpos, n); DEC(c.rcvbuflen, n);
+			INC(dst, n); DEC(size, n); INC(len, n(LONGINT))
 		END
 	ELSE
 		buf[0] := 0X; len := 0
