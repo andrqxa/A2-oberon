@@ -709,10 +709,10 @@ TYPE
 						FPNumber(fp,variableTypeFingerprint.shallow);
 						variableFingerprint.shallow := fp;
 						FPNumber(fingerprint.private,variableTypeFingerprint.private);
-						FPNumber(fingerprint.private,SHORT(variable.offsetInBits DIV 8));
+						FPNumber(fingerprint.private,variable.offsetInBits DIV 8);
 						FPNumber(fingerprint.private,fp);
 						FPNumber(fingerprint.public,variableTypeFingerprint.public);
-						FPNumber(fingerprint.public,SHORT(variable.offsetInBits DIV 8));
+						FPNumber(fingerprint.public,variable.offsetInBits DIV 8);
 						FPNumber(fingerprint.public,fp);
 						IF Trace THEN TraceIndent; D.Str("RecordType Field "); D.Str0(variable.name); D.Str(" "); TraceFP(fingerprint); D.Ln; END;
 					ELSE
@@ -723,8 +723,8 @@ TYPE
 					END;
 					variable := variable.nextVariable;
 				END;
-				FPNumber(fingerprint.private, SHORT(x.sizeInBits DIV 8));
-				FPNumber(fingerprint.public, SHORT(x.sizeInBits DIV 8));
+				FPNumber(fingerprint.private, x.sizeInBits DIV 8);
+				FPNumber(fingerprint.public, x.sizeInBits DIV 8);
 
 				flags := {};
 				IF x.recordScope.bodyProcedure # NIL THEN
