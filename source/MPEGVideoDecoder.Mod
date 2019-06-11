@@ -2260,7 +2260,7 @@ TYPE
 
 			(* skip required bytes *)
 			input.SkipBytes(size);
-			cur.pos := TODO(input.Pos());
+			cur.pos := input.Pos()(SIZE);
 			DEC(cur.bytesLeftInPacket, size);
 
 		END SkipData;

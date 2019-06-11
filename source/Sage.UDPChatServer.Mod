@@ -119,7 +119,7 @@ TYPE
 		sendBuf.AddInt (uin, 4);
 
 		string := sendBuf.GetString ();
-		s.Send (ip, port, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (ip, port, string^, 0, sendBuf.GetLength (), res);
 	END Server_NewUserReply;
 
 	PROCEDURE Server_LoginReply (client: Base.Client;
@@ -133,7 +133,7 @@ TYPE
 		sendBuf.AddInt (client.uin, 4);
 
 		string := sendBuf.GetString ();
-		s.Send (client.ip, client.port, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (client.ip, client.port, string^, 0, sendBuf.GetLength (), res);
 	END Server_LoginReply;
 
 	PROCEDURE Server_InfoReply (client: Base.Client;
@@ -146,12 +146,12 @@ TYPE
 
 		sendBuf.AddInt (user.uin, 4);
 
-		len := TODO(Strings.Length (user.shortName) + 1);
+		len := (Strings.Length (user.shortName) + 1)(LONGINT);
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (user.shortName, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (client.ip, client.port, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (client.ip, client.port, string^, 0, sendBuf.GetLength (), res);
 	END Server_InfoReply;
 
 	PROCEDURE Server_ACK (client: Base.Client;
@@ -163,7 +163,7 @@ TYPE
 		Base.ServerPacketInit (Base.ACK, client.inSeqNum, sendBuf);
 
 		string := sendBuf.GetString ();
-		s.Send (client.ip, client.port, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (client.ip, client.port, string^, 0, sendBuf.GetLength (), res);
 	END Server_ACK;
 
 	PROCEDURE Server_UserStatus (client, receiver: Base.Client;
@@ -183,7 +183,7 @@ TYPE
 		sendBuf.AddInt (client.uin, 4);
 
 		string := sendBuf.GetString ();
-		s.Send (receiver.ip, receiver.port, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (receiver.ip, receiver.port, string^, 0, sendBuf.GetLength (), res);
 	END Server_UserStatus;
 
 	PROCEDURE Server_ReceiveMessage (client, receiver: Base.Client; dt: Dates.DateTime;
@@ -218,7 +218,7 @@ TYPE
 		sendBuf.Add (message^, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (receiver.ip, receiver.port, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (receiver.ip, receiver.port, string^, 0, sendBuf.GetLength (), res);
 	END Server_ReceiveMessage;
 
 	PROCEDURE MulticastStatus (clients: Base.List;

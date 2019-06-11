@@ -453,7 +453,7 @@ TYPE
 				INC(ofs, len0); DEC(len, len0)
 			END;
 			IF TraceProtocol THEN
-				TraceTCP("Send", SELF, empty^, data, 0, TODO(ofs), TODO (len))
+				TraceTCP("Send", SELF, empty^, data, 0, ofs, len)
 			END;
 			res := Ok
 		END Send;

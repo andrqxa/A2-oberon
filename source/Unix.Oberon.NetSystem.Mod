@@ -517,9 +517,10 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 
 	PROCEDURE ReceiveDG* ( soc: Socket; VAR remIP: IPAdr; VAR remport: INTEGER;
 							pos: LONGINT; VAR len: LONGINT; VAR buf: ARRAY OF S.BYTE );
-	VAR res, port: LONGINT;
+	VAR res, port: LONGINT; length: SIZE;
 	BEGIN
-		soc.Receive( S.VAL( Bytes, buf ), pos, len, 0, remIP, port, len, res );
+		soc.Receive( S.VAL( Bytes, buf ), pos, len, 0, remIP, port, length, res );
+		len := length(LONGINT);
 		remport := SHORT( port)
 	END ReceiveDG;
 
