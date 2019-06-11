@@ -2356,7 +2356,7 @@ TYPE
 
 
 		(* seek the streamNr to position pos with seekType. itemSize contains the size of the element seeked to, if known and applicable; res = 0 if Ok, otherwise an error number *)
-		PROCEDURE SetStreamPos*(streamNr :  LONGINT; seekType : LONGINT; pos : Streams.Position; VAR itemSize : LONGINT;  VAR res : WORD);
+		PROCEDURE SetStreamPos*(streamNr :  LONGINT; seekType : LONGINT; pos : LONGINT; VAR itemSize : LONGINT;  VAR res : WORD);
 		VAR
 			cur: POINTER TO StreamType;
 			len: SIZE;
@@ -2373,7 +2373,7 @@ TYPE
 			IF singleStream THEN
 				IF streamNr # 0 THEN RETURN END;
 				input.SetPos(pos);
-				streams[0].pos := pos(SIZE);
+				streams[0].pos := pos;
 				res := Codec.ResOk;
 				RETURN;
 			END;
@@ -2390,7 +2390,7 @@ TYPE
 				IF ~GotoNextPacket(cur^) THEN HALT(1234); res := Codec.ResFailed; RETURN END;
 
 				(* skip some data *)
-				SkipData(streamNr, pos(SIZE), len, res);
+				SkipData(streamNr, pos, len, res);
 			ELSE
 				(* skip some data *)
 				SkipData(streamNr, (pos - cur.stream.Pos())(SIZE)+cur.stream.Available(), len, res);

@@ -24,7 +24,7 @@ TYPE
 		eof* : PROCEDURE {DELEGATE} (sender, data: ANY);
 
 		(* Initialize Player with the given File *)
-		PROCEDURE &Init*(in : Streams.Reader; length: Streams.Position);
+		PROCEDURE &Init*(in : Streams.Reader; length: LONGINT);
 		VAR i: LONGINT; res: WORD;
 		BEGIN
 			ready := FALSE; finished := FALSE; paused := FALSE; oldPos := 0;
@@ -141,7 +141,7 @@ BEGIN
 	END;
 
 	file := Files.Old(filename);
-	NEW(player, in, file.Length());
+	NEW(player, in, file.Length()(LONGINT));
 	player.Play;
 END Open;
 

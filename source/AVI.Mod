@@ -233,7 +233,7 @@ IMPORT
 		BEGIN
 			IF Debug THEN KernelLog.String("DemuxStream.SetPos"); KernelLog.Ln; END;
 			seekType := Codecs.SeekByte;
-			demultiplexer.SetStreamPos(streamNr, seekType, pos, itemSize, res);
+			demultiplexer.SetStreamPos(streamNr, seekType, pos(LONGINT), itemSize, res);
 			Reset;
 		END SetPos;
 
@@ -1133,7 +1133,7 @@ IMPORT
 			END;
 		END GetData;
 
-		PROCEDURE SetStreamPos*(streamNr: LONGINT; seekType: LONGINT; pos: Streams.Position; VAR itemSize: LONGINT; VAR res: WORD);
+		PROCEDURE SetStreamPos*(streamNr: LONGINT; seekType: LONGINT; pos: LONGINT; VAR itemSize: LONGINT; VAR res: WORD);
 		(* PROCEDURE SetStreamPos*(streamNr, pos : LONGINT; VAR res: WORD); *)
 		VAR
 			n0, n1, n, spos: LONGINT;
@@ -1163,11 +1163,11 @@ IMPORT
 					IF ((seekType = Codecs.SeekFrame) OR (seekType = Codecs.SeekKeyFrame)) THEN
 						IF pos < LEN(videoIndex) THEN
 							videoStream.SetAVIPos(videoIndex[pos].offset, itemSize);
-							itemSize := TODO(pos);
-							videoFramePos := TODO(pos);
+							itemSize := pos;
+							videoFramePos := pos;
 						END
 					ELSE
-						videoStream.SetAVIPos(TODO(pos), itemSize);
+						videoStream.SetAVIPos(pos, itemSize);
 					END;
 				END;
 			ELSE
@@ -1223,7 +1223,7 @@ IMPORT
 							KernelLog.String("itemSize= "); KernelLog.Int(itemSize, 0);  KernelLog.Ln;
 						END
 					ELSE
-						audioStream.SetAVIPos(TODO(pos), itemSize);
+						audioStream.SetAVIPos(pos, itemSize);
 					END;
 				END;
 			END;

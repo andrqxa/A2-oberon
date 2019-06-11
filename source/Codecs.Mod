@@ -100,7 +100,7 @@ TYPE
 
 		(* seek the streamNr to position pos (defined bz seekType), res = 0 if Ok, otherwise an error number *)
 		(* this procedure should not be directly called - it is called by the DemuxStream object! *)
-		PROCEDURE SetStreamPos*(streamNr : LONGINT; seekType : LONGINT; pos : Streams.Position; VAR itemSize : Streams.Position; VAR res : WORD);
+		PROCEDURE SetStreamPos*(streamNr : LONGINT; seekType : LONGINT; pos : LONGINT; VAR itemSize : LONGINT; VAR res : WORD);
 		END SetStreamPos;
 
 	END AVDemultiplexer;
@@ -127,7 +127,7 @@ TYPE
 		VAR  seekType, itemSize: LONGINT; res: WORD;
 		BEGIN
 			seekType := SeekByte;
-			demultiplexer.SetStreamPos(streamNr, seekType, pos, itemSize, res);
+			demultiplexer.SetStreamPos(streamNr, seekType, pos(LONGINT), itemSize, res);
 			Reset
 		END SetPos;
 
@@ -169,7 +169,7 @@ TYPE
 		BEGIN HALT(301); RETURN 0
 		END GetCurrentTime;
 
-		PROCEDURE SetStreamLength*(length : Streams.Position);
+		PROCEDURE SetStreamLength*(length : LONGINT);
 		END SetStreamLength;
 
 		PROCEDURE SeekSample*(sample: LONGINT; goKeySample : BOOLEAN; VAR res : WORD);

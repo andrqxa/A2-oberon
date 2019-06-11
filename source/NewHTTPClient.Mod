@@ -127,7 +127,7 @@ TYPE
 		END Get;
 
 				(*POST HTTP/1.1 message. needs either a Content-Length of the body or a chunked transfer encoding*)
-		PROCEDURE Post*(CONST url : ARRAY OF CHAR; CONST headervars: ARRAY OF CHAR; MIME: ARRAY OF CHAR; body: Streams.Reader; length: Streams.Position;  VAR out : Streams.Reader; VAR res : WORD);
+		PROCEDURE Post*(CONST url : ARRAY OF CHAR; CONST headervars: ARRAY OF CHAR; MIME: ARRAY OF CHAR; body: Streams.Reader; length: SIZE;  VAR out : Streams.Reader; VAR res : WORD);
 		VAR w : Streams.Writer; r : Streams.Reader;
 			x : WebHTTP.AdditionalField;
 			host : ARRAY 128 OF CHAR;
@@ -231,7 +231,7 @@ VAR h : HTTPConnection;
 BEGIN
 	NEW(h);
 	f:=Files.Old("test.txt"); Files.OpenReader(fr,f,0);
-	h.Post("http://127.0.0.1/Trap", "sender=myself&receiver=you", "text/plain", fr, f.Length(), r, res);
+	h.Post("http://127.0.0.1/Trap", "sender=myself&receiver=you", "text/plain", fr, f.Length()(SIZE), r, res);
 	KernelLog.String("res= "); KernelLog.Int(res, 0); KernelLog.Ln;
 	WHILE r.res = 0 DO KernelLog.Char(r.Get()) END;
 	KernelLog.String("Loop finished");

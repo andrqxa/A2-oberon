@@ -220,10 +220,10 @@ TYPE
 			RETURN ENTIER((in.Pos() - (h.fileSize - h.dataSize)) / h.bRate * 10)
 		END GetCurrentTime;
 
-		PROCEDURE SetStreamLength*(length : Streams.Position);
+		PROCEDURE SetStreamLength*(length : LONGINT);
 		BEGIN
-			h.fileSize := length(LONGINT)-8;
-			h.dataSize := length(LONGINT)-SIZEOF(WaveHeader);
+			h.fileSize := length-8;
+			h.dataSize := length-SIZEOF(WaveHeader);
 		END SetStreamLength;
 
 		PROCEDURE SeekSample*(sample: LONGINT; goKeySample : BOOLEAN; VAR res : WORD);
@@ -244,10 +244,8 @@ TYPE
 		END Next;
 
 		PROCEDURE FillBuffer*(buffer : SoundDevices.Buffer);
-		VAR length: SIZE;
 		BEGIN
-			in.Bytes(buffer.data^, 0, LEN(buffer.data^), length);
-			buffer.len := length;
+			in.Bytes(buffer.data^, 0, LEN(buffer.data^), buffer.len);
 			IF (in.res = Streams.EOF) OR (buffer.len < LEN(buffer.data)) THEN
 				hasMoreBytes := FALSE;
 				RETURN;
@@ -322,10 +320,10 @@ TYPE
 			RETURN ENTIER(8 * in.Pos() / h.bitsPerSample / h.nofCh / h.sRate * 10)
 		END GetCurrentTime;
 
-		PROCEDURE SetStreamLength*(length : Streams.Position);
+		PROCEDURE SetStreamLength*(length : LONGINT);
 		BEGIN
-			h.fileSize := length(LONGINT)+SIZEOF(WaveHeader)-8;
-			h.dataSize := length(LONGINT)
+			h.fileSize := length+SIZEOF(WaveHeader)-8;
+			h.dataSize := length
 		END SetStreamLength;
 
 		PROCEDURE SeekSample*(sample: LONGINT; goKeySample : BOOLEAN; VAR res : WORD);
@@ -348,10 +346,8 @@ TYPE
 		END Next;
 
 		PROCEDURE FillBuffer*(buffer : SoundDevices.Buffer);
-		VAR length: SIZE;
 		BEGIN
-			in.Bytes(buffer.data^, 0, LEN(buffer.data^), length);
-			buffer.len := length;
+			in.Bytes(buffer.data^, 0, LEN(buffer.data^), buffer.len);
 			IF (in.res = Streams.EOF) OR (buffer.len < LEN(buffer.data)) THEN
 				hasMoreBytes := FALSE; KernelLog.String("BOOOOM!!");
 				RETURN;

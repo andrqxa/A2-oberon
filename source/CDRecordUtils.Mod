@@ -790,7 +790,7 @@ BEGIN
 	END;
 
 	decoder.Open(in, res);
-	decoder.SetStreamLength(srcFile.Length());
+	decoder.SetStreamLength(srcFile.Length()(LONGINT));
 	NEW(buffer);
 	buffer.len := 4096;
 	NEW(buffer.data, 4096);
