@@ -178,7 +178,7 @@ TYPE
 			filenameEdit.SetAsString("");
 			filenameEdit.text.AcquireRead;
 			NEW(p, filenameEdit.text); p.SetPosition(0);
-			NEW(dropTarget, filenameEdit.text, p);wc
+			NEW(dropTarget, filenameEdit.text, p);
 			filenameEdit.text.ReleaseRead;
 			IF ~filenameEdit.tv.hasFocus & ~filenameEdit.tv.alwaysShowCursor.Get() THEN filenameEdit.tv.cursor.SetVisible(FALSE) END;
 			dragInfo.data := dropTarget;
