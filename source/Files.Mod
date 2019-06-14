@@ -306,45 +306,45 @@ TYPE
 
 		(** Create a new file with the specified name.  End users use Files.New instead. *)
 
-		PROCEDURE New0*(name: ARRAY OF CHAR): File;
+		PROCEDURE New0*(CONST name: ARRAY OF CHAR): File;
 		BEGIN HALT(301) END New0;	(* abstract *)
 
 		(** Open an existing file. The same file descriptor is returned if a file is opened multiple times.  End users use Files.Old instead. *)
 
-		PROCEDURE Old0*(name: ARRAY OF CHAR): File;
+		PROCEDURE Old0*(CONST name: ARRAY OF CHAR): File;
 		BEGIN HALT(301) END Old0;	(* abstract *)
 
 		(** Delete a file. res = 0 indicates success.  End users use Files.Delete instead. *)
 
-		PROCEDURE Delete0*(name: ARRAY OF CHAR; VAR key: LONGINT; VAR res: WORD);
+		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: LONGINT; VAR res: WORD);
 		BEGIN HALT(301) END Delete0;	(* abstract *)
 
 		(** Rename a file. res = 0 indicates success.  End users use Files.Rename instead. *)
 
-		PROCEDURE Rename0*(old, new: ARRAY OF CHAR; f: File; VAR res: WORD);
+		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: File; VAR res: WORD);
 		BEGIN HALT(301) END Rename0;	(* abstract *)
 
 		(** Enumerate canonical file names. mask may contain * wildcards.  For internal use only.  End users use Enumerator instead. *)
 
-		PROCEDURE Enumerate0*(mask: ARRAY OF CHAR; flags: SET; enum: Enumerator);
+		PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Enumerator);
 		BEGIN HALT(301) END Enumerate0;	(* abstract *)
 
 		(** Return the unique non-zero key of the named file, if it exists. *)
 
-		PROCEDURE FileKey*(name: ARRAY OF CHAR): LONGINT;
+		PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): LONGINT;
 		BEGIN HALT(301) END FileKey;	(* abstract *)
 
 		(** Create a new directory structure. May not be supported by the actual implementation.
 			End users use Files.CreateDirectory instead.*)
 
-		PROCEDURE CreateDirectory0*(name: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE CreateDirectory0*(CONST name: ARRAY OF CHAR; VAR res: WORD);
 		BEGIN res := -1	(* not supported *)
 		END CreateDirectory0;
 
 		(** Remove a directory. If force=TRUE, any subdirectories and files should be automatically deleted.
 			End users use Files.RemoveDirectory instead. *)
 
-		PROCEDURE RemoveDirectory0*(name: ARRAY OF CHAR; force: BOOLEAN; VAR key: LONGINT; VAR res: WORD);
+		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key: LONGINT; VAR res: WORD);
 		BEGIN res := -1	(* not supported *)
 		END RemoveDirectory0;
 
@@ -473,7 +473,7 @@ TYPE
 
 		(** Open an enumerator and enumerate the files that match mask. *)
 
-		PROCEDURE Open*(mask: ARRAY OF CHAR; flags: SET);
+		PROCEDURE Open*(CONST mask: ARRAY OF CHAR; flags: SET);
 		BEGIN
 			r.file := New("");
 			r.file.Set(r, 0);
@@ -523,7 +523,7 @@ TYPE
 
 		(** For internal use only. *)
 
-		PROCEDURE PutEntry*(VAR name: ARRAY OF CHAR; flags: SET; time, date: LONGINT; size: Size);
+		PROCEDURE PutEntry*(CONST name: ARRAY OF CHAR; flags: SET; time, date: LONGINT; size: Size);
 		VAR len: LONGINT;
 		BEGIN
 			ASSERT(adding);
@@ -823,7 +823,7 @@ END Collect;
 
 (* Find file in open file list, or open and add it. *)
 
-PROCEDURE OpenOld(enum: FileSearcher; fs: FileSystem; VAR fname: ARRAY OF CHAR): File;
+PROCEDURE OpenOld(enum: FileSearcher; fs: FileSystem; CONST fname: ARRAY OF CHAR): File;
 VAR f: File; key: LONGINT;
 BEGIN
 	f := NIL;
@@ -897,7 +897,7 @@ END New;
 
 (** Delete a file. res = 0 indicates success. *)
 
-PROCEDURE Delete*(VAR name: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE Delete*(CONST name: ARRAY OF CHAR; VAR res: WORD);
 VAR fs: FileSystem; f: File; key: LONGINT; prefix: Prefix; fname: FileName;
 BEGIN {EXCLUSIVE}
 	SplitName(name, prefix, fname);
@@ -1104,7 +1104,7 @@ END RemoveDirectory;
 
 (* Enumerates files matching mask *)
 
-PROCEDURE Enumerate(VAR mask: ARRAY OF CHAR; flags: SET; enum: Enumerator);
+PROCEDURE Enumerate(CONST mask: ARRAY OF CHAR; flags: SET; enum: Enumerator);
 VAR
 	fs: FileSystem; ft: FileSystemTable; i: SIZE;
 	prefix: Prefix; fmask: FileName;

@@ -4027,6 +4027,7 @@ TYPE
 			isExclusive-: BOOLEAN;
 			isRealtime-: BOOLEAN;
 			isUnchecked-: BOOLEAN;
+			isUntracked-: BOOLEAN;
 			isUncooperative-: BOOLEAN;
 			scope-: Scope;
 
@@ -4036,6 +4037,7 @@ TYPE
 			isExclusive := FALSE;
 			isRealtime := FALSE;
 			isUnchecked := FALSE;
+			isUntracked := FALSE;
 			isUncooperative := FALSE;
 			scope := s;
 		END InitStatementBlock;
@@ -4049,6 +4051,11 @@ TYPE
 		BEGIN
 			isUnchecked := unchecked
 		END SetUnchecked;
+
+		PROCEDURE SetUntracked*(untracked: BOOLEAN);
+		BEGIN
+			isUntracked := untracked
+		END SetUntracked;
 
 		PROCEDURE SetUncooperative*(uncooperative: BOOLEAN);
 		BEGIN

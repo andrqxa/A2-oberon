@@ -629,7 +629,7 @@ VAR
 	END NewKey;
 
 	PROCEDURE ReadKey* (key: Key_t): ADDRESS;
-	BEGIN {UNCOOPERATIVE, UNCHECKED}
+	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		RETURN pthread_getspecific(key);
 	END ReadKey;
 
@@ -823,6 +823,21 @@ VAR
 		END;
 	END ThrSleep;
 
+	PROCEDURE NanoSleep(ns: LONGWORD);
+	VAR
+		sltime,rem: RECORD
+			tv_sec: LONGWORD;        (* seconds *)
+			tv_nsec: LONGWORD;       (* nanoseconds *)
+     	END;
+	BEGIN {UNCOOPERATIVE, UNCHECKED}
+		sltime.tv_sec := ns DIV 1000000000;
+		sltime.tv_nsec := ns MOD 1000000000;
+		WHILE (nanosleep(ADDRESS OF sltime, ADDRESS OF rem) < 0) DO
+			(* check error ! *)
+			sltime := rem;
+		END;
+	END NanoSleep;
+
 	PROCEDURE ThrKill*(thr: Thread_t);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF (thr # mainthread) THEN
@@ -847,7 +862,7 @@ VAR
 		res := pthread_kill( thr, T_SIGRESUME );
 		ASSERT(res = 0);
 
-		WHILE (CAS(resume_done,0,0) # 1) DO ThrSleep(1) END;
+		WHILE (CAS(resume_done,0,0) # 1) DO NanoSleep(1000) END;
 		res := pthread_mutex_unlock( ADDRESS OF suspend_mutex );
 	END ThrResume;
 
@@ -855,7 +870,7 @@ VAR
 
 	PROCEDURE {C} suspend_handler(sig: LONGINT; scp: ADDRESS; ucp: ADDRESS);
 	VAR block: Sigset_t; res: WORD;
-	BEGIN {UNCOOPERATIVE, UNCHECKED}
+	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		IF suspendHandler # NIL THEN suspendHandler( S.VAL( Ucontext, ucp) ) END;
 		res := sigfillset( ADDRESS OF block );
 		sigdelset(  ADDRESS OF block, T_SIGRESUME );
@@ -866,12 +881,12 @@ VAR
 
 	PROCEDURE ThrSuspend*(thr: Thread_t; saveContext: BOOLEAN);
 	VAR res: WORD;
-	BEGIN {UNCOOPERATIVE, UNCHECKED}
+	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		res := pthread_mutex_lock(ADDRESS OF suspend_mutex );
 		suspend_done := 0;
 		res := pthread_kill( thr, T_SIGSUSPEND );
 		ASSERT(res = 0);
-		WHILE (CAS(suspend_done,0,0) # 1) DO ThrSleep( 1 ) END;
+		WHILE (CAS(suspend_done,0,0) # 1) DO NanoSleep( 1000 ) END;
 		res := pthread_mutex_unlock( ADDRESS OF suspend_mutex );
 	END ThrSuspend;
 
