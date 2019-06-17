@@ -473,7 +473,7 @@ TYPE
 				WHILE (rcvhead # NIL) & (rcvhead # rcvreasm) & (size > 0) DO
 					IF rcvhead.nextFragment = NIL THEN
 						(* read all available data until user buffer is full *)
-						rlen := MIN(rcvhead.len, TODO(size));
+						rlen := MIN(rcvhead.len, size(LONGINT));
 						Network.Copy(rcvhead.data, data, rcvhead.ofs, ofs, rlen);
 						INC(len, rlen);
 						INC(ofs, rlen);
@@ -498,7 +498,7 @@ TYPE
 						IF rcvheadFragment = NIL THEN
 							rcvheadFragment := rcvhead;
 						END;
-						rlen := MIN(rcvheadFragment.len, TODO(size));
+						rlen := MIN(rcvheadFragment.len, size(LONGINT));
 						Network.Copy(rcvheadFragment.data, data, rcvheadFragment.ofs, ofs, rlen);
 						INC(len, rlen);
 						INC(ofs, rlen);

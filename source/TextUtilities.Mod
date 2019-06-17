@@ -103,7 +103,7 @@ TYPE
 				pieceOffset := 0; nextAttribute := 0;
 				WHILE nextAttribute < attributesBuf.length DO
 					nextAttributes := attributesBuf.attributes[nextAttribute];
-					pieceLength:= TODO(attributesBuf.positions[nextAttribute])-pieceOffset;
+					pieceLength:= attributesBuf.positions[nextAttribute]-pieceOffset;
 					text.SetAttributes(pos+pieceOffset,pieceLength,currentAttributes);
 					INC(pieceOffset, pieceLength);
 					currentAttributes := nextAttributes;

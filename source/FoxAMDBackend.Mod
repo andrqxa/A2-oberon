@@ -1279,7 +1279,7 @@ TYPE
 
 		(* enter procedure: generate PAF and clear stack *)
 		PROCEDURE EmitEnter(CONST instruction: IntermediateCode.Instruction);
-		VAR op1,imm,target: Assembler.Operand; cc,size,numberMachineWords,destPC,firstPC,secondPC,x: LONGINT; body: SyntaxTree.Body; name: Basic.SegmentedName;
+		VAR op1,imm,target: Assembler.Operand; cc,size,numberMachineWords,firstPC,secondPC,x: LONGINT; destPC: SIZE; body: SyntaxTree.Body; name: Basic.SegmentedName;
 		parametersSize: SIZE;
 		CONST initialize=TRUE; FirstOffset = 5; SecondOffset = 11;
 		BEGIN
@@ -1308,11 +1308,11 @@ TYPE
 						(* do not use EBX because it is not volative in WINAPI, do not use ECX: special register in COOP, do not use RD: register param in SysVABI *)
 						IF cpuBits = 64 THEN
 							emitter.Emit2(InstructionSet.opMOV, opR10, imm);
-							destPC := TODO(out.pc);
+							destPC := out.pc;
 							emitter.Emit1(InstructionSet.opDEC, opR10);
 						ELSE
 							emitter.Emit2(InstructionSet.opMOV, opRD, imm);
-							destPC := TODO(out.pc);
+							destPC := out.pc;
 							emitter.Emit1(InstructionSet.opDEC, opRD);
 						END;
 						emitter.Emit1(InstructionSet.opPUSH, opRA);
@@ -1952,13 +1952,13 @@ TYPE
 
 		PROCEDURE EmitCall(CONST instruction: IntermediateCode.Instruction);
 		VAR fixup: Sections.Section;  target, op: Assembler.Operand;
-			code: SyntaxTree.Code; emitterFixup,newFixup: BinaryCode.Fixup; resolved: BinaryCode.Section; pc: LONGINT;
+			code: SyntaxTree.Code; emitterFixup,newFixup: BinaryCode.Fixup; resolved: BinaryCode.Section; pc: SIZE;
 		BEGIN
 			IF fpStackPointer # 0 THEN Error(instruction.textPosition,"compiler implementation error: fp stack not cleared before call") END;
 			IF instruction.op1.mode = IntermediateCode.ModeImmediate THEN
 				fixup := module.allSections.FindByName(instruction.op1.symbol.name);
 				IF (fixup # NIL) & (fixup.type = Sections.InlineCodeSection) THEN
-					pc := TODO(out.pc);
+					pc := out.pc;
 					(* resolved must be available at this point ! *)
 					resolved := fixup(IntermediateCode.Section).resolved;
 					IF resolved # NIL THEN
@@ -3162,46 +3162,46 @@ TYPE
 			len: SIZE; symbol: SyntaxTree.Symbol; assembler: Assembler.Assembly;
 
 			string: SyntaxTree.SourceCode;
-					
+
 			TYPE Mapper = OBJECT (Assembler.RegisterMap)
 				VAR cg: CodeGeneratorAMD64; scope: SyntaxTree.Scope;
-				
+
 					PROCEDURE & InitMapper (cg: CodeGeneratorAMD64; scope: SyntaxTree.Scope);
 					BEGIN
 						SELF.cg := cg; SELF.scope := scope;
 					END InitMapper;
-					
+
 					PROCEDURE Find(CONST name: ARRAY OF CHAR): LONGINT;
-					VAR register: LONGINT; symbol: SyntaxTree.Symbol; ticket: Ticket; 
+					VAR register: LONGINT; symbol: SyntaxTree.Symbol; ticket: Ticket;
 					BEGIN
 						register := InstructionSet.none;
 						IF scope # NIL THEN
 							symbol := scope.FindSymbol(Basic.MakeString(name));
-							IF symbol # NIL THEN 
+							IF symbol # NIL THEN
 								WITH symbol: SyntaxTree.Variable DO
 									IF symbol.preferRegister THEN
 										ticket := cg.virtualRegisters.Mapped(symbol.registerNumber,Low);
-										IF ticket = NIL THEN 
+										IF ticket = NIL THEN
 											cg.MapVirtualRegister(symbol.registerNumber, IntermediateCode.GeneralPurposeRegister, IntermediateBackend.GetType(cg.module.system, symbol.type),Low);
 											ticket := cg.virtualRegisters.Mapped(symbol.registerNumber,Low);
 										END;
 										register := ticket.register;
 										IF register = InstructionSet.none THEN
 											register := InstructionSet.unassigned;
-										END; 
+										END;
 									END;
 								| SyntaxTree.Parameter DO
 									IF symbol.preferRegister THEN
 										ticket := cg.virtualRegisters.Mapped(symbol.registerNumber,Low);
-										IF ticket = NIL THEN 
+										IF ticket = NIL THEN
 											cg.MapVirtualRegister(symbol.registerNumber, IntermediateCode.GeneralPurposeRegister, IntermediateBackend.GetType(cg.module.system, symbol.type),Low);
 											ticket := cg.virtualRegisters.Mapped(symbol.registerNumber,Low);
 										END;
 										register := ticket.register;
 										IF register = InstructionSet.none THEN
 											register := InstructionSet.unassigned;
-										END; 
-									END;									
+										END;
+									END;
 								ELSE
 								END;
 							END;
