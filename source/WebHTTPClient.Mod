@@ -14,7 +14,7 @@ TYPE
 	VAR
 		in: Streams.Reader;
 		encoding: ARRAY 64 OF CHAR;
-		length: LONGINT;
+		length: SIZE;
 
 		PROCEDURE & InitContentReader * (in: Streams.Reader; CONST h: WebHTTP.ResponseHeader);
 		VAR
@@ -25,7 +25,7 @@ TYPE
 			SELF.in := in;
 			COPY(h.transferencoding, encoding);
 			IF (encoding # "") & Strings.Match("chunked", encoding) THEN
-				in.SkipSpaces(); in.Token(token); Strings.HexStrToInt(token, length, res); in.SkipLn();
+				in.SkipSpaces(); in.Token(token); Strings.HexStrToSize(token, length, res); in.SkipLn();
 			ELSE
 				length := h.contentlength;
 			END;

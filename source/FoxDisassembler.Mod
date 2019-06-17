@@ -147,16 +147,16 @@ TYPE
 				END;
 			END ExpectThisIdentifier;
 
-			PROCEDURE ExpectNumber(VAR int: LONGINT):BOOLEAN;
+			PROCEDURE ExpectNumber(VAR int: Unit):BOOLEAN;
 			BEGIN
 				IF (token.symbol = Scanner.Number) THEN
-					int := TODO(token.integer); GetNextToken; RETURN TRUE
+					int := token.integer; GetNextToken; RETURN TRUE
 				ELSE RETURN FALSE
 				END;
 			END ExpectNumber;
 
 			PROCEDURE ParseLine(): Block;
-			VAR from,to: LONGINT; block: Block; displacement: LONGINT;
+			VAR from,to: Unit; block: Block; displacement: Unit;
 			BEGIN
 				block := NIL;
 				IF ExpectNumber(from) & ExpectToken(Scanner.Colon) THEN

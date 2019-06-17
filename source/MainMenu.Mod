@@ -15,7 +15,7 @@ TYPE
 		pages : ARRAY 100 OF WMComponents.VisualComponent;
 		tabList : ARRAY 100 OF WMTabComponents.Tab;
 		currentPage : WMComponents.VisualComponent;
-		currentPageNr : LONGINT;
+		currentPageNr : SIZE;
 		page : WMStandardComponents.Panel;
 		moveToFront : BOOLEAN;
 
@@ -84,7 +84,7 @@ TYPE
 		END SetOriginator;
 
 		PROCEDURE UpdatePages;
-		VAR i : LONGINT;
+		VAR i : SIZE;
 			tab : WMTabComponents.Tab;
 			s : Strings.String;
 		BEGIN
@@ -156,7 +156,7 @@ TYPE
 			DisableUpdate;
 			NEW(enumerator);
 			FOR i := 0 TO 99 DO
-				IF pages[i] = currentPage THEN currentPageNr := TODO(i) END;
+				IF pages[i] = currentPage THEN currentPageNr := i END;
 				pages[i] := NIL
 			END;
 			mask := MenuFilePrefix;

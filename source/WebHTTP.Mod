@@ -113,7 +113,7 @@ TYPE
 		date* : ARRAY 32 OF CHAR;
 		location*: ARRAY 1024 OF CHAR;
 		contenttype* : ARRAY 64 OF CHAR;
-		contentlength* : LONGINT;
+		contentlength* : SIZE;
 		contentlocation*: ARRAY 1024 OF CHAR;
 		transferencoding* : ARRAY 64 OF CHAR;
 		lastmodified*: ARRAY 32 OF CHAR;
@@ -571,7 +571,7 @@ BEGIN
 			ELSIF sLow = "date" THEN in.Char(ch);in.Ln(header.date)
 			ELSIF sLow = "location" THEN in.Char(ch);in.Ln(header.location)
 			ELSIF sLow = "content-type" THEN in.Char(ch); in.Ln(header.contenttype)
-			ELSIF sLow = "content-length" THEN in.Char(ch); in.Ln(s); Strings.StrToInt(s, header.contentlength)
+			ELSIF sLow = "content-length" THEN in.Char(ch); in.Ln(s); Strings.StrToSize(s, header.contentlength)
 			ELSIF sLow = "content-location" THEN in.Char(ch);in.Ln(header.contentlocation)
 			ELSIF sLow = "transfer-encoding" THEN in.Char(ch); in.Ln(header.transferencoding)
 			ELSIF sLow = "last-modified" THEN in.Char(ch);in.Ln(header.lastmodified)
@@ -602,7 +602,7 @@ BEGIN
 		ELSIF sLow = "date" THEN in.Char(ch);in.Ln(header.date)
 		ELSIF sLow = "location" THEN in.Char(ch);in.Ln(header.location)
 		ELSIF sLow = "content-type" THEN in.Char(ch); in.Ln(header.contenttype)
-		ELSIF sLow = "content-length" THEN in.Char(ch); in.Ln(s); Strings.StrToInt(s, header.contentlength)
+		ELSIF sLow = "content-length" THEN in.Char(ch); in.Ln(s); Strings.StrToSize(s, header.contentlength)
 		ELSIF sLow = "content-location" THEN in.Char(ch);in.Ln(header.contentlocation)
 		ELSIF sLow = "transfer-encoding" THEN in.Char(ch); in.Ln(header.transferencoding)
 		ELSIF sLow = "last-modified" THEN in.Char(ch);in.Ln(header.lastmodified)
