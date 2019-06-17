@@ -601,8 +601,8 @@ TYPE
 			to.Bytes(buf, 0, 1024);
 			DEC(n, 1024)
 		END;
-		from.Bytes(buf, 0, n, len);
-		to.Bytes(buf, 0, n);
+		from.Bytes(buf, 0, SIZE(n), len);
+		to.Bytes(buf, 0, SIZE(n));
 		to.Update()
 	END TransferBytes;
 
