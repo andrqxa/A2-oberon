@@ -154,7 +154,7 @@ TYPE
 		segment-,index-: Register; (* registers for mem *)
 		scale-, displacement-: LONGINT;  (* for mem *)
 		symbol- : ObjectFile.Identifier; (* for imm and mem *)
-		symbolOffset-: LONGINT; (* offset in immediate code (source) for a fixup *)
+		symbolOffset-: SIZE; (* offset in immediate code (source) for a fixup *)
 
 		val-: HUGEINT; (* for imm and moffset  *)
 		pc-: SIZE;
@@ -279,7 +279,7 @@ TYPE
 			ErrorSS(msg1,msg);
 		END ErrorSI;
 
-		PROCEDURE AddFixup (mode: SHORTINT; size: SHORTINT; pc: SIZE; symbol: ObjectFile.Identifier; symbolOffset, displacement: LONGINT);
+		PROCEDURE AddFixup (mode: SHORTINT; size: SHORTINT; pc: SIZE; symbol: ObjectFile.Identifier; symbolOffset: SIZE; displacement: LONGINT);
 		VAR fixup: BinaryCode.Fixup; format: BinaryCode.FixupPatterns; id: ObjectFile.Identifier;
 		BEGIN
 			NEW(format,1);
@@ -346,7 +346,7 @@ TYPE
 			BEGIN
 				FOR i := startIndex TO maxNumberOperands -1 DO
 					CASE InstructionSet.instructions[instr].operands[i] OF
-					InstructionSet.reg8, InstructionSet.reg16, InstructionSet.reg32, InstructionSet.reg64, InstructionSet.xmm, InstructionSet.mmx, InstructionSet.ymm: 
+					InstructionSet.reg8, InstructionSet.reg16, InstructionSet.reg32, InstructionSet.reg64, InstructionSet.xmm, InstructionSet.mmx, InstructionSet.ymm:
 							RETURN i;
 					ELSE
 					END;
@@ -2627,7 +2627,7 @@ TYPE
 	BEGIN  InitMem128 (operand,reg, displacement); RETURN operand
 	END NewMem128;
 
-	PROCEDURE SetSymbol*(VAR operand: Operand; symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; symbolOffset, displacement: LONGINT);
+	PROCEDURE SetSymbol*(VAR operand: Operand; symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; symbolOffset: SIZE; displacement: LONGINT);
 	BEGIN
 		operand.symbol.name := symbol;
 		operand.symbol.fingerprint := fingerprint;

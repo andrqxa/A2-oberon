@@ -192,9 +192,9 @@ TYPE
 	SymbolReference = OBJECT (Reference)
 	VAR
 		identifier: ObjectFile.Identifier;
-		symbolOffset: LONGINT; (* offset to the symbol in IR units *)
+		symbolOffset: SIZE; (* offset to the symbol in IR units *)
 
-		PROCEDURE & InitSym(s: Sections.SectionName; fp: Basic.Fingerprint; offs: LONGINT);
+		PROCEDURE & InitSym(s: Sections.SectionName; fp: Basic.Fingerprint; offs: SIZE);
 		BEGIN
 			Init(4);
 			identifier.name := s;
@@ -257,7 +257,7 @@ TYPE
 			RETURN reference;
 		END AddReference;
 
-		PROCEDURE AddSymbol(symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; symbolOffset: LONGINT; pc: LONGINT; bits: LONGINT);
+		PROCEDURE AddSymbol(symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; symbolOffset: SIZE; pc: LONGINT; bits: LONGINT);
 		VAR
 			reference, foundReference: Reference; symbolReference: SymbolReference;
 		BEGIN
@@ -1204,7 +1204,7 @@ TYPE
 
 		(** get an ARM register that contains the address of a symbol/section
 		- use register hint if provided **)
-		PROCEDURE RegisterFromSymbol(symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; resolved: Sections.Section; symbolOffset: LONGINT; CONST registerHint: Operand): Operand;
+		PROCEDURE RegisterFromSymbol(symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; resolved: Sections.Section; symbolOffset: SIZE; CONST registerHint: Operand): Operand;
 		VAR
 			address: LONGINT;
 			result: Operand;
@@ -3623,7 +3623,7 @@ TYPE
 
 			(* recompute fixup positions and assign binary sections *)
 			PROCEDURE PatchFixups(section: BinaryCode.Section);
-			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; displacement,symbolOffset: LONGINT; in: IntermediateCode.Section;
+			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; displacement: LONGINT; symbolOffset: SIZE; in: IntermediateCode.Section;
 				symbol: Sections.Section;
 			BEGIN
 				fixup := section.fixupList.firstFixup;

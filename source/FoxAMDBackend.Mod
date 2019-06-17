@@ -2781,7 +2781,7 @@ TYPE
 		END EmitFill;
 
 		PROCEDURE EmitBr (CONST instruction: IntermediateCode.Instruction);
-		VAR dest,destPC,offset: LONGINT; target: Assembler.Operand;hit,fail: LONGINT; reverse: BOOLEAN;
+		VAR dest: SIZE; destPC,offset: LONGINT; target: Assembler.Operand;hit,fail: LONGINT; reverse: BOOLEAN;
 			(* jump operands *)  left,right,temp: Assembler.Operand;
 				failOp: Assembler.Operand; failPC: LONGINT;
 
@@ -3419,7 +3419,7 @@ TYPE
 
 			(* recompute fixup positions and assign binary sections *)
 			PROCEDURE PatchFixups(section: BinaryCode.Section);
-			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; displacement: BinaryCode.Unit; symbolOffset: LONGINT; in: IntermediateCode.Section;
+			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; displacement: BinaryCode.Unit; symbolOffset: SIZE; in: IntermediateCode.Section;
 				symbol: Sections.Section;
 			BEGIN
 				fixup := section.fixupList.firstFixup;

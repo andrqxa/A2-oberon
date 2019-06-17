@@ -92,7 +92,7 @@ TYPE
 		floatValue-: LONGREAL; (* real value, if mode = ModeImmediate and type.form = Float *)
 
 		symbol-: ObjectFile.Identifier; (* referenced symbol, only valid for mode = ModeImmediate or mode = ModeMemory *)
-		symbolOffset-: LONGINT; (* offset in IntermediateCode section, the difference to offset is that symbolOffset needs a resolving to real address offset *)
+		symbolOffset-: SIZE; (* offset in IntermediateCode section, the difference to offset is that symbolOffset needs a resolving to real address offset *)
 		resolved*: Sections.Section; (** only cache ! *)
 
 		string-: SyntaxTree.SourceCode; (* string, if Mode = ModeString *)
@@ -672,7 +672,7 @@ TYPE
 			ELSIF operand.symbol.name # "" THEN
 				Basic.WriteSegmentedName(w,operand.symbol.name);
 				IF operand.symbol.fingerprint # 0 THEN w.RawHInt(operand.symbol.fingerprint);END;
-				w.RawLInt(operand.symbolOffset);
+				w.RawLInt(operand.symbolOffset(LONGINT));
 				w.RawLInt(operand.offset);
 			ELSE w.RawLInt(SHORT(operand.intValue));
 			END;
@@ -685,7 +685,7 @@ TYPE
 			IF operand.symbol.name # "" THEN
 				Basic.WriteSegmentedName(w,operand.symbol.name);
 				IF operand.symbol.fingerprint # 0 THEN w.RawHInt(operand.symbol.fingerprint);END;
-				w.RawLInt(operand.symbolOffset);
+				w.RawLInt(operand.symbolOffset(LONGINT));
 				w.RawLInt(operand.offset);
 			ELSE
 				IF operand.type.form IN Integer THEN
@@ -963,14 +963,14 @@ TYPE
 		op.type := type;
 	END MakeAddress;
 
-	PROCEDURE InitAddress*(VAR op: Operand; type: Type; symbol: Sections.SectionName; fp: Basic.Fingerprint; symbolOffset: LONGINT);
+	PROCEDURE InitAddress*(VAR op: Operand; type: Type; symbol: Sections.SectionName; fp: Basic.Fingerprint; symbolOffset: SIZE);
 	BEGIN
 		Assert(symbol # "","forbidden nil symbol");
 		ASSERT(symbol[0] # 0); (* not initialized *)
 		InitImmediate(op,type,0); op.symbol.name := symbol; op.symbol.fingerprint := fp; op.type := type; op.symbolOffset := symbolOffset
 	END InitAddress;
 
-	PROCEDURE Address*(type: Type; symbol: Sections.SectionName; fp: Basic.Fingerprint; offset: LONGINT): Operand;
+	PROCEDURE Address*(type: Type; symbol: Sections.SectionName; fp: Basic.Fingerprint; offset: SIZE): Operand;
 	VAR op: Operand;
 	BEGIN InitAddress(op,type,symbol,fp, offset); RETURN op
 	END Address;

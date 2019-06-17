@@ -81,10 +81,10 @@ TYPE
 		offset-: Unit;
 
 		symbol-: ObjectFile.Identifier; (* reference to the fixup's destination section *)
-		symbolOffset-: LONGINT; (* offset in intermediate section, must be patched (resolved and added to displacement) to destination section displacement *)
+		symbolOffset-: SIZE; (* offset in intermediate section, must be patched (resolved and added to displacement) to destination section displacement *)
 		resolved*: Sections.Section; (* cache ! *)
 
-		PROCEDURE & InitFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset: LONGINT; displacement: Unit; scale: Bits; fixupPattern: ObjectFile.FixupPatterns);
+		PROCEDURE & InitFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset: SIZE; displacement: Unit; scale: Bits; fixupPattern: ObjectFile.FixupPatterns);
 		BEGIN
 			ASSERT((mode = Relative) OR (mode = Absolute));
 			ASSERT(symbol.name # "");
@@ -711,7 +711,7 @@ TYPE
 		RETURN result
 	END ConvertToLongreal;
 
-	PROCEDURE NewFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset,displacement: LONGINT; scale: Bits; fixupPattern: ObjectFile.FixupPatterns): Fixup;
+	PROCEDURE NewFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset: SIZE; displacement: LONGINT; scale: Bits; fixupPattern: ObjectFile.FixupPatterns): Fixup;
 	VAR fixup: Fixup;
 	BEGIN
 		NEW(fixup,mode,fixupOffset,symbol,symbolOffset,displacement,scale,fixupPattern); RETURN fixup

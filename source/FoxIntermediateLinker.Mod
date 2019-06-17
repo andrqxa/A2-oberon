@@ -361,7 +361,7 @@ TYPE
 			IF ~isSorted THEN
 				IF Trace THEN D.String("++++++++++ before sorting ++++++++++"); DumpSections(D.Log, allSections) END;
 				FOR i:= 0 TO allSections.Length() - 1 DO
-					allSections.GetSection(i).SetOffset(TODO(i))
+					allSections.GetSection(i).SetOffset(i)
 				END;
 				allSections.Sort(SectionPositionAndSizeComparison);
 				IF Trace THEN D.String("++++++++++ after sorting ++++++++++"); DumpSections(D.Log, allSections) END;

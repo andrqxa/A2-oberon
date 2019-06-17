@@ -35,7 +35,7 @@ TYPE
 		bitsPerUnit-: LONGINT; (* the unit size given in bits *)
 
 		symbol-: SyntaxTree.Symbol; (* corresponding symbol in AST *)
-		offset-: LONGINT;
+		offset-: SIZE;
 
 		(* for linking *)
 		isReachable-: BOOLEAN;
@@ -57,7 +57,7 @@ TYPE
 			RETURN type IN {EntryCodeSection .. CodeSection};
 		END IsCode;
 
-		PROCEDURE SetOffset*(offset: LONGINT);
+		PROCEDURE SetOffset*(offset: SIZE);
 		BEGIN SELF.offset := offset;
 		END SetOffset;
 

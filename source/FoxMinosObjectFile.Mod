@@ -144,8 +144,8 @@ TYPE
 	PROCEDURE MakeSectionOffsets(module: Sections.Module; VAR varSize, codeSize, bodyOffset: LONGINT; VAR code: ByteArray);
 	VAR symbolName: SyntaxTree.IdentifierString; symbol: SyntaxTree.Symbol; binarySection: BinaryCode.Section;
 
-		PROCEDURE Copy(section: BinaryCode.Section; to: ByteArray; offset: LONGINT);
-		VAR i: BinaryCode.Unit; ofs: LONGINT;
+		PROCEDURE Copy(section: BinaryCode.Section; to: ByteArray; offset: SIZE);
+		VAR i: BinaryCode.Unit; ofs: SIZE;
 		BEGIN
 			ofs := (offset );
 			FOR i := 0 TO ((section.pc-1) ) DO
@@ -264,7 +264,7 @@ TYPE
 
 			PROCEDURE ConstantNeedsSection(constant: SyntaxTree.Constant): BOOLEAN;
 			BEGIN
-				RETURN FALSE; 
+				RETURN FALSE;
 				(* constant sections are not used any more in importing modules, they are copied instead *)
 			END ConstantNeedsSection;
 
@@ -293,7 +293,7 @@ TYPE
 								IF moduleScope = module.module.moduleScope (* self *) THEN
 									D.String("Entry "); D.Int(numberEntries,1); D.String(": "); D.Str0(symbol.name); D.String(" @"); D.Int(p.offset,1); D.Ln;
 								ELSE
-									D.String("Imported Entry "); D.Int(numberEntries,1); D.String(": "); D.Str0(symbol.name); D.String(" @"); D.Int(p.offset,1); D.Ln;								
+									D.String("Imported Entry "); D.Int(numberEntries,1); D.String(": "); D.Str0(symbol.name); D.String(" @"); D.Int(p.offset,1); D.Ln;
 								END;
 							END;
 						ELSE
@@ -499,7 +499,7 @@ TYPE
 							D.Str("Command : "); D.Str(name); D.Str(" @ "); D.Int(p.offset ,1);
 						END;
 						w.RawString(name);
-						w.RawLInt(p.offset DIV 4);
+						w.RawLInt((p.offset DIV 4)(LONGINT));
 						IF Trace THEN D.Ln END
 					END
 				END
@@ -517,7 +517,7 @@ TYPE
 			w.RawLInt(0); (* body entry: body is fixed at position 0, cf. MakeSectionOffsets *)
 			FOR i := 1 TO numberEntries DO
 				ASSERT(entry[i].offset MOD 4 = 0);
-				w.RawLInt(entry[i].offset DIV 4); (* entries here must be byte wise because jumps take place with absolute fixup - I cannot distinguish here *)
+				w.RawLInt((entry[i].offset)(LONGINT) DIV 4); (* entries here must be byte wise because jumps take place with absolute fixup - I cannot distinguish here *)
 			END;
 		END Entries;
 

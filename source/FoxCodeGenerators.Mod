@@ -151,7 +151,7 @@ TYPE
 			moduleName, procedureName: SyntaxTree.IdentifierString;
 
 			PROCEDURE ResolveLocalFixups;
-			VAR fixup, next: BinaryCode.Fixup; dest: LONGINT; msg,string: Basic.MessageString; number: ARRAY 32 OF CHAR;
+			VAR fixup, next: BinaryCode.Fixup; dest: SIZE; msg,string: Basic.MessageString; number: ARRAY 32 OF CHAR;
 			BEGIN
 				fixup := out.fixupList.firstFixup;
 				out.fixupList.InitFixupList;

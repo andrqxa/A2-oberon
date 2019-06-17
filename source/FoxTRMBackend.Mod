@@ -1799,7 +1799,7 @@ TYPE
 		END SetTarget;
 
 		PROCEDURE EmitBr (VAR instr: IntermediateCode.Instruction);
-		VAR dest, destPC, offset: LONGINT; target: Operand; reverse: BOOLEAN;
+		VAR dest: SIZE; destPC, offset: LONGINT; target: Operand; reverse: BOOLEAN;
 			(* jump operands *)  op2, op3: Operand; hiHit, hiFail, lowHit: LONGINT;
 				failPC: LONGINT;
 					pattern: ObjectFile.FixupPatterns; fixup, failFixup: BinaryCode.Fixup;
@@ -2276,7 +2276,7 @@ TYPE
 
 			(* recompute fixup positions and assign binary sections *)
 			PROCEDURE PatchFixups(section: BinaryCode.Section);
-			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; symbolOffset: LONGINT; in: IntermediateCode.Section;
+			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; symbolOffset: SIZE; in: IntermediateCode.Section;
 			BEGIN
 				fixup := section.fixupList.firstFixup;
 				WHILE fixup # NIL DO
