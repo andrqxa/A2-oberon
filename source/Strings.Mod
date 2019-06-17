@@ -757,6 +757,30 @@ BEGIN
 	END;
 END HexStrToInt;
 
+(** converts a hex string to a size. Leading whitespace is ignored. res=Ok indicates success, val=0 on failure. *)
+PROCEDURE HexStrToSize*(CONST string: ARRAY OF CHAR; VAR val: SIZE; VAR res: WORD);
+VAR length, i : SIZE; ch: CHAR;
+BEGIN
+	length := LEN(string); val := 0; res := -1;
+	(* skip whitespace *)
+	i := 0; WHILE (i < length) & (string[i] # 0X) & (string[i] <= " ") DO INC(i); END;
+	IF (i < length) THEN
+		LOOP
+			IF (i >= length) OR (string[i] = 0X) THEN EXIT; END;
+			ch := string[i];
+			IF (ch >= "0") & (ch <= "9") THEN val := 16 * val + ORD(ch) - ORD("0");
+			ELSIF (CAP(ch) >= "A") & (CAP(ch) <= "F") THEN val := 16 * val + ORD(CAP(ch)) - ORD("A") + 10;
+			ELSE EXIT;
+			END;
+			INC(i);
+		END;
+		IF (i < length) & (string[i] = "H") THEN INC(i); END; (* skip optional "H" *)
+		IF (i < length) & (string[i] = 0X) THEN
+			res := Ok;
+		END;
+	END;
+END HexStrToSize;
+
 (** converts a real value to a string *)
 PROCEDURE FloatToStr*(x: LONGREAL; n, f, D: LONGINT; VAR str: ARRAY OF CHAR);
 BEGIN
