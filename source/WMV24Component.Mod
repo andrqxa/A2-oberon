@@ -1107,7 +1107,7 @@ TYPE
 		BEGIN
 			text.AcquireWrite;
 			pos := textView.cursor.GetPosition();
-			text.Delete(pos - TODO(nbrOfCharacters), TODO(nbrOfCharacters));
+			text.Delete(pos - nbrOfCharacters, nbrOfCharacters);
 			text.ReleaseWrite;
 		END DeleteNCharacters;
 

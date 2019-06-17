@@ -43,7 +43,7 @@ TYPE
 			grid.SetColSpacings(colWidths);
 			grid.nofCols.Set(3);
 			grid.SetDrawCellProc(DrawCell);
-			grid.nofRows.Set(TODO(font.glyphList.GetCount()));
+			grid.nofRows.Set(font.glyphList.GetCount()(LONGINT));
 			grid.defaultRowHeight.Set(50);
 			grid.defaultColWidth.Set(50);
 			grid.onSelect.Add(GlyphSelected);
@@ -493,7 +493,7 @@ TYPE
 				KernelLog.String("Writing range "); KernelLog.Int(i, 4); KernelLog.String(" of "); KernelLog.Int(LEN(glyphRanges), 4);
 				KernelLog.Ln;
 				w.Update();
-				glyphRanges[i].filePos := TODO(w.sent);
+				glyphRanges[i].filePos := w.sent(LONGINT);
 				StoreRange(w, glyphRanges[i]);
 			END;
 			w.Update();

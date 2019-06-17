@@ -122,7 +122,7 @@ TYPE
 			ASSERT ( LEN( buf ) >= ofs + len );   (* array bound check not implemented in Kernel32.WriteFile *)
 			IF (handle # Kernel32.InvalidHandleValue) THEN
 				written := 0;
-				ret := Kernel32.WriteFile( handle, buf[ofs], TODO(len), written, wOverlapped );
+				ret := Kernel32.WriteFile( handle, buf[ofs], len(DWORD), written, wOverlapped );
 				IF ret = Kernel32.False THEN
 					ret := Kernel32.GetOverlappedResult(handle,wOverlapped,written,Kernel32.True);
 				END;
@@ -174,7 +174,7 @@ TYPE
 				(* blocking read of the minimally required amount of data *)
 				IF min > 0 THEN
 					read := 0;
-					ret := Kernel32.ReadFile( handle, buf[ofs], TODO(min), read, rOverlapped );
+					ret := Kernel32.ReadFile( handle, buf[ofs], min(DWORD), read, rOverlapped );
 					IF ret = Kernel32.False THEN
 						ret := Kernel32.GetOverlappedResult(handle,rOverlapped,read,Kernel32.True);
 					END;
@@ -185,7 +185,7 @@ TYPE
 				END;
 
 				(* Non-blocking read of available data *)
-				l := TODO(MIN(size,Available()));
+				l := MIN(size,Available()(LONGINT));
 				IF l > 0 THEN
 					read := 0;
 					ret := Kernel32.ReadFile( handle, buf[ofs], l, read, rOverlapped );

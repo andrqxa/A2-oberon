@@ -25,7 +25,7 @@ TYPE
 		VAR
 			name-: ARRAY 128 OF CHAR;   (** Owner of this key. *)
 			private-: BOOLEAN;   (** Is this a private key? then the exponent is encrypted *)
-			size-: LONGINT;
+			size-: SIZE;
 			exponent-, modulus-: Number;
 			p, q, u: Number;   (* for chinese remainder theorem *)
 			time-, date-: LONGINT;
@@ -114,13 +114,13 @@ VAR
 		NEW( pub);
 		pub.modulus := n;
 		pub.exponent := e;
-		pub.size := LONGINT(n.len)*32;
+		pub.size := n.len*32;
 		pub.private := FALSE;
 
 		NEW( priv );
 		priv.modulus := n;
 		priv.exponent := d;
-		priv.size := TODO(n.len*32);
+		priv.size := n.len*32;
 		priv.private := TRUE;
 
 		(* Add stuff needed for the chinese remainder theorem to the private key *)
@@ -147,7 +147,7 @@ VAR
 		NEW( rsa );
 		rsa.name := "unkown";
 		rsa.private := FALSE;
-		rsa.size := TODO(m.len*32);
+		rsa.size := m.len*32;
 		B.Copy( e, rsa.exponent );
 		B.Copy( m, rsa.modulus );
 		RETURN rsa
@@ -200,14 +200,14 @@ VAR
 		md5: MD5.Hash;
 		digest: ARRAY 16 OF CHAR; pl: LONGINT;
 		buf: ARRAY 4096 OF CHAR; bl, magic: LONGINT;
-		n: SIZE;
+		n: SIZE; size: LONGINT;
 
 	BEGIN
 		NEW( k );
 		r.String( k.name );
 		r.RawBool( k.private );
 		ASSERT( k.private );
-		r.RawLInt( k.size );
+		r.RawLInt( size ); k.size := size;
 		r.RawLInt( k.time );
 		r.RawLInt( k.date );
 
@@ -261,7 +261,7 @@ VAR
 		ASSERT( k.private );
 		w.Char( '"' ); w.String( k.name ); w.Char( '"' );
 		w.RawBool( k.private );
-		w.RawLInt( k.size );
+		w.RawLInt( k.size(LONGINT) );
 		w.RawLInt( k.time );
 		w.RawLInt( k.date );
 

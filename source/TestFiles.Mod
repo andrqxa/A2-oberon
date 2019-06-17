@@ -667,7 +667,8 @@ END Test;
 PROCEDURE RandomReadWrite*(context : Commands.Context); (** path filename seed nofRuns ~ *)
 VAR
 	path, filename, fullname : Files.FileName;
-	seed, run, nofRuns, position, lastPosition, length0, temp, lastPercent : LONGINT;
+	seed, run, nofRuns, position, lastPosition, temp, lastPercent : LONGINT;
+	length0: Files.Size;
 	char, lastChar, ch : CHAR;
 	file : Files.File; rider : Files.Rider;
 	random : Random.Generator;
@@ -684,7 +685,7 @@ BEGIN
 	IF (file # NIL) THEN
 		NEW(random);
 		random.InitSeed(seed);
-		length0 := TODO(file.Length());
+		length0 := file.Length();
 		run := 0;
 		lastChar := 0X; lastPosition := 0; lastPercent := 0;
 		context.out.String("0% "); context.out.Update;
@@ -693,7 +694,7 @@ BEGIN
 				lastPercent := lastPercent + 10;
 				context.out.Int(lastPercent, 0); context.out.String("% "); context.out.Update;
 			END;
-			position := random.Dice(length0);
+			position := random.Dice(LONGINT(length0));
 			temp := random.Dice(255) + 1;
 			char := CHR(temp);
 			file.Set(rider, position);

@@ -123,15 +123,15 @@ TYPE
 			END WriteFrequencies;
 
 
-			PROCEDURE CountPatterns( CONST source: ARRAY OF CHAR; len: LONGINT ): PatternWeights;
+			PROCEDURE CountPatterns( CONST source: ARRAY OF CHAR; len: SIZE ): PatternWeights;
 			VAR
-				i: LONGINT;  pc: PatternCounts;
+				i: SIZE;  pc: PatternCounts;
 			BEGIN
 				FOR i := 0 TO 255 DO  pc[i] := 0  END;
 				FOR i := 0 TO len - 1 DO  INC( pc[ORD( source[i] )] )  END;
 				FOR i := 0 TO 255 DO
 					IF pc[i] > 0 THEN (* scale => [1..101H] *)
-						pc[i] := 100H * pc[i] DIV len + 1;
+						pc[i] := 100H * pc[i] DIV len(LONGINT) + 1;
 					END;
 				END;
 				RETURN ContainedPatterns( pc )
