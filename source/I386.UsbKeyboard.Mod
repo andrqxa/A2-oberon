@@ -188,7 +188,7 @@ TYPE
 			NEW(base);
 		END Init;
 
-		PROCEDURE EventHandler(status : Usbdi.Status; actLen : LONGINT);
+		PROCEDURE EventHandler(status : Usbdi.Status; actLen : SIZE);
 		VAR
 			i, j : LONGINT;
 			c : CHAR;

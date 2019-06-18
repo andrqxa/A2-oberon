@@ -86,10 +86,10 @@ TYPE
 		PROCEDURE SetLinkAddress*(linkAddress : Network.LinkAdr; VAR res : WORD); (* abstract *)
 		BEGIN HALT(301); END SetLinkAddress;
 
-		PROCEDURE HandleInterrupt*(status : Usbdi.Status; actLen : LONGINT); (* abstract *)
+		PROCEDURE HandleInterrupt*(status : Usbdi.Status; actLen : SIZE); (* abstract *)
 		BEGIN HALT(301); END HandleInterrupt;
 
-		PROCEDURE HandleBulkIn*(status : Usbdi.Status; actLen : LONGINT); (* abstract *)
+		PROCEDURE HandleBulkIn*(status : Usbdi.Status; actLen : SIZE); (* abstract *)
 		BEGIN HALT(301); END HandleBulkIn;
 
 		PROCEDURE InitController*(VAR rxBuffer : Usbdi.BufferPtr) : BOOLEAN; (* abstract *)

@@ -62,7 +62,7 @@ TYPE
 		description- : ARRAY 128 OF CHAR;
 
 		(** Characters sent/read since port has been opened. Consider these fields read-only! *)
-		charactersSent*, charactersReceived* : LONGINT;
+		charactersSent*, charactersReceived* : Streams.Position;
 
 		PROCEDURE Open* (bps, data, parity, stop : LONGINT; VAR res: WORD);
 		END Open;

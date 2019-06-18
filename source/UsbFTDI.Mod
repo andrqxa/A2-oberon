@@ -630,8 +630,8 @@ TYPE
 
 
 		(* Interrupt on Completion - Handler for EpBulkIn; status(first 2 bytes) & data contained in variable data64 *)
-		PROCEDURE UpdateDataStatus(status : Usbdi.Status; actLen : LONGINT);
-		VAR ignore : Usbdi.Status;i:LONGINT;
+		PROCEDURE UpdateDataStatus(status : Usbdi.Status; actLen : SIZE);
+		VAR ignore : Usbdi.Status; i: SIZE;
 		BEGIN
 			IF Trace * TraceReceive # {} THEN
 				ShowModule("UpdateDataStatus: Received ");
@@ -929,7 +929,7 @@ TYPE
 		data1 : Usbdi.BufferPtr; (* datax -> ARRAY x OF CHAR *)
 		buf: ARRAY BufSize OF CHAR;
 		sendBuffer: Usbdi.BufferPtr;
-		head, tail: LONGINT;
+		head, tail: SIZE;
 		open: BOOLEAN;
 		diagnostic: LONGINT;
 
@@ -1031,8 +1031,8 @@ TYPE
 		END Receive;
 
 		(** On detecting an interupt request, transfer the characters from the UART buffer to the input buffer *)
-		PROCEDURE HandleData(CONST data :  Usbdi.Buffer; actLen : LONGINT);
-		VAR n, i : LONGINT; 	ch : CHAR;
+		PROCEDURE HandleData(CONST data :  Usbdi.Buffer; actLen : SIZE);
+		VAR n, i : SIZE; 	ch : CHAR;
 		BEGIN {EXCLUSIVE}
 			charactersReceived := charactersReceived + actLen;
 			i := 0;

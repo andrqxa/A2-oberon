@@ -559,7 +559,7 @@ TYPE
 			END;
 		END ClearHalt;
 
-		PROCEDURE ScheduleControl*(pipe : UsbHcdi.Pipe; direction : LONGINT; msg : UsbHcdi.ControlMessage;  bufferLen : LONGINT; VAR buffer : Usbdi.Buffer);
+		PROCEDURE ScheduleControl*(pipe : UsbHcdi.Pipe; direction : LONGINT; msg : UsbHcdi.ControlMessage;  bufferLen : SIZE; VAR buffer : Usbdi.Buffer);
 		VAR ranges : ARRAY ScatterGatherListSize OF Machine.Range; 	td, numRanges : LONGINT; dword : SET;
 		BEGIN
 			(* control transfers use a three stage protocol:
@@ -627,7 +627,7 @@ TYPE
 			pipe.lastTD := td;
 		END ScheduleControl;
 
-		PROCEDURE Schedule*(pipe : UsbHcdi.Pipe; bufferLen, offset: LONGINT; VAR buffer: Usbdi.Buffer);
+		PROCEDURE Schedule*(pipe : UsbHcdi.Pipe; bufferLen, offset: SIZE; VAR buffer: Usbdi.Buffer);
 		VAR dword : SET;
 		BEGIN
 			pipe.firstTD :=  pipe.tdBase;
@@ -645,7 +645,7 @@ TYPE
 			END;
 		END Schedule;
 
-		PROCEDURE CreateTDList(pipe : UsbHcdi.Pipe; direction, len, ofs : LONGINT; VAR buffer : Usbdi.Buffer; firstTD : LONGINT; VAR lastTD : LONGINT; tdToggle : BOOLEAN) : BOOLEAN;
+		PROCEDURE CreateTDList(pipe : UsbHcdi.Pipe; direction, len, ofs : SIZE; VAR buffer : Usbdi.Buffer; firstTD : LONGINT; VAR lastTD : LONGINT; tdToggle : BOOLEAN) : BOOLEAN;
 		VAR
 			restlen, curlen : LONGINT;
 			numRanges, idx, offset : LONGINT;
@@ -659,7 +659,7 @@ TYPE
 			END;
 
 			td := firstTD - 16;
-			restlen := len; idx := 0; offset := 0;
+			restlen := len(LONGINT); idx := 0; offset := 0;
 
 			WHILE restlen > 0 DO (* build TD chain *)
 

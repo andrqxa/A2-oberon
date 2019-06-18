@@ -306,7 +306,7 @@ TYPE
 		interruptInBuffer : Usbdi.BufferPtr;
 		started, received : BOOLEAN;
 		epMaxSize : LONGINT;
-		byteCounter : LONGINT;	(* how many bytes have been received *)
+		byteCounter : SIZE;	(* how many bytes have been received *)
 
 		(* information about the GPS device and its capabilities *)
 		unitID : LONGINT;
@@ -319,7 +319,8 @@ TYPE
 
 		(* used by Handleevent *)
 		data : POINTER TO ARRAY OF CHAR;
-		fragLen, fragOfs, fragType, fragId : LONGINT;
+		fragLen, fragOfs: SIZE;
+		fragType, fragId : LONGINT;
 
 		(** Start gathering PVT data *)
 		PROCEDURE StartPvtData*() : BOOLEAN;
@@ -402,10 +403,10 @@ TYPE
 		END HandlePacket;
 
 		(* re-assembles fragmented packets and sends them to HandlePacket *)
-		PROCEDURE HandleEvent(status : Usbdi.Status; actLen : LONGINT);
+		PROCEDURE HandleEvent(status : Usbdi.Status; actLen : SIZE);
 		VAR
 			packetType, packetId : LONGINT;
-			dataLen, len, i : LONGINT;
+			dataLen, len, i : SIZE;
 			error : BOOLEAN;
 		BEGIN
 			error := FALSE;

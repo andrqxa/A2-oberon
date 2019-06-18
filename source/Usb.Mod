@@ -437,7 +437,7 @@ TYPE
 		END SynchFrame;
 
 		(** USB device request *)
-		PROCEDURE Request*(bmRequestType : SET;  bRequest, wValue, wIndex, wLength : LONGINT; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
+		PROCEDURE Request*(bmRequestType : SET;  bRequest, wValue, wIndex : LONGINT; wLength : SIZE; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
 		BEGIN
 			RETURN defaultpipe.Request(bmRequestType, bRequest, wValue, wIndex, wLength, buffer);
 		END Request;
@@ -592,7 +592,7 @@ TYPE
 		END Register;
 
 		(** Emulated USB device request *)
-		PROCEDURE Request*(bmRequestType : SET;  bRequest, wValue, wIndex, wLength : LONGINT; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
+		PROCEDURE Request*(bmRequestType : SET;  bRequest, wValue, wIndex : LONGINT; wLength : SIZE; VAR buffer : Usbdi.Buffer) : Usbdi.Status;
 		VAR res : Usbdi.Status;
 		BEGIN
 			res := Usbdi.Stalled;

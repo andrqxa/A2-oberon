@@ -550,7 +550,7 @@ TYPE
 		END Disconnect;
 
 		(*is always called, when new report arrived*)
-		PROCEDURE HandleHidEvent(status : Usbdi.Status; actLen : LONGINT);
+		PROCEDURE HandleHidEvent(status : Usbdi.Status; actLen : SIZE);
 		VAR
 			ri			: UsbHidReport.ReportItem;
 			i, bitIndex	: LONGINT;
@@ -682,7 +682,7 @@ TYPE
 		END IsTouchscreen;
 
 		PROCEDURE GetPipeStatus*(): Usbdi.Status;
-		VAR len: LONGINT;
+		VAR len: SIZE;
 		BEGIN
 			IF pipe # NIL THEN RETURN pipe.GetStatus(len)
 			ELSE RETURN Usbdi.Error
@@ -1580,8 +1580,8 @@ TYPE
 
 (*used for debug output. lists the report descriptor as described in Device Class Definition for Human Interface Devices,
 	f.e. page 61 Appendix A, B.2 Protocol 2 (Mouse)*)
-PROCEDURE LayoutBuffer*(CONST buf : Usbdi.Buffer;  len : LONGINT);
-VAR temp : LONGINT;
+PROCEDURE LayoutBuffer*(CONST buf : Usbdi.Buffer;  len : SIZE);
+VAR temp : SIZE;
 BEGIN
 	KernelLog.String("Buffer Outline:"); KernelLog.Ln;
 	FOR temp := 0 TO len-1 DO

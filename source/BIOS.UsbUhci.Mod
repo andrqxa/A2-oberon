@@ -377,7 +377,7 @@ TYPE
 			SYSTEM.PUT32(pipe.qh + QhElementLinkPointer, td(Machine.Address32)); (* queue element link pointer ::= pointer to td *)
 		END LinkTDs;
 
-		PROCEDURE ScheduleControl*(pipe : UsbHcdi.Pipe; direction : LONGINT; msg : UsbHcdi.ControlMessage;  bufferLen : LONGINT;  VAR buffer : Usbdi.Buffer);
+		PROCEDURE ScheduleControl*(pipe : UsbHcdi.Pipe; direction : LONGINT; msg : UsbHcdi.ControlMessage;  bufferLen : SIZE;  VAR buffer : Usbdi.Buffer);
 		VAR td : Machine.Address32; pid, restlen, databufferAdr, curlen : LONGINT; tdStatus : SET;
 		BEGIN
 		 	(* Control transfers use a three stage protocol:	*)
@@ -408,7 +408,7 @@ TYPE
 
 				databufferAdr := pipe.physBufferAdr(Machine.Address32); (* offset included *)
 
-				restlen := bufferLen;
+				restlen := bufferLen(LONGINT);
 
 				WHILE restlen > 0 DO (* build TD chain *)
 
@@ -451,7 +451,7 @@ TYPE
 			pipe.lastTD := td;
 		END ScheduleControl;
 
-		PROCEDURE Schedule*(pipe : UsbHcdi.Pipe; bufferLen, offset: LONGINT; VAR buffer: Usbdi.Buffer);
+		PROCEDURE Schedule*(pipe : UsbHcdi.Pipe; bufferLen, offset: SIZE; VAR buffer: Usbdi.Buffer);
 		VAR td : Machine.Address32; pid, restlen, curlen, databuffer : LONGINT; tdStatus : SET;
 		BEGIN
 			pipe.firstTD :=  pipe.tdBase;
@@ -473,7 +473,7 @@ TYPE
 				pid := PidOut;
 			END;
 
-			restlen := bufferLen;
+			restlen := bufferLen(LONGINT);
 			databuffer := pipe.physBufferAdr(Machine.Address32); (* offset already added *)
 
 			td := pipe.firstTD - 16;
@@ -827,7 +827,7 @@ TYPE
 			END;
 		END ShowSchedule;
 
-		PROCEDURE DoStrongChecks(pipe : UsbHcdi.Pipe; len, ofs : LONGINT; VAR buffer : Usbdi.Buffer);
+		PROCEDURE DoStrongChecks(pipe : UsbHcdi.Pipe; len, ofs : SIZE; VAR buffer : Usbdi.Buffer);
 		VAR i : ADDRESS;
 		BEGIN
 			IF len > 0 THEN
@@ -1103,5 +1103,4 @@ BEGIN
 END UsbUhci.
 
 UsbUhci.Install ~  System.Free UsbUhci ~
-
 

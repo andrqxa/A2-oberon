@@ -35,12 +35,12 @@ TYPE
 		END Init;
 
 		PROCEDURE UpdateDataset*;
-		VAR sent, received : LONGINT;
+		VAR sent, received : SIZE;
 		BEGIN
 			sent := port.charactersSent; received := port.charactersReceived;
-			dataset[0] := sent + received / 1024;
-			dataset[1] := received / 1024;
-			dataset[2] := sent / 1024;
+			dataset[0] := TODO(sent + received / 1024);
+			dataset[1] := TODO(received / 1024);
+			dataset[2] := TODO(sent / 1024);
 		END UpdateDataset;
 
 	END SerialPortTransferRate;

@@ -1197,8 +1197,8 @@ TYPE
 		 * This handler is called when the hub's interrupt IN status pipe reports a change of either
 		 * the hub status or the status of a hub port.
 		 *)
-		PROCEDURE HandleStatusChange(status : Usbdi.Status; actLen : LONGINT);
-		VAR ignore : Usbdi.Status; i, port : LONGINT;
+		PROCEDURE HandleStatusChange(status : Usbdi.Status; actLen : SIZE);
+		VAR ignore : Usbdi.Status; i : SIZE; port : LONGINT;
 		BEGIN
 			IF Debug.Trace & Debug.traceConnects THEN
 				Show("Hub reports status change: "); FOR i := 0 TO LEN(statusBuffer)-1 DO KernelLog.Hex(ORD(statusBuffer[i]), -2); END; KernelLog.Ln;
@@ -1213,7 +1213,7 @@ TYPE
 				FOR i := 0 TO actLen-1 DO
 					FOR port := 0 TO 7 DO
 						IF SYSTEM.VAL(SET, statusBuffer[i]) * {port} # {} THEN
-							HandlePortStatusChange(port + i * 8 - 1);
+							HandlePortStatusChange(port + i(LONGINT) * 8 - 1);
 						END;
 					END;
 				END;
@@ -1445,7 +1445,7 @@ TYPE
 
 		(* Root hubs that support interrupt notification for port status changes will call this
 		handler when a corresponding interrupt occurs. The parameters are ignored. *)
-		PROCEDURE HandleStatusChange(status : Usbdi.Status; actLen : LONGINT);
+		PROCEDURE HandleStatusChange(status : Usbdi.Status; actLen : SIZE);
 		BEGIN {EXCLUSIVE}
 			statusChange := TRUE;
 		END HandleStatusChange;
