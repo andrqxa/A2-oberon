@@ -6,7 +6,7 @@ MODULE Objects;   (** AUTHOR "pjm, G.F."; PURPOSE "Active object runtime support
 IMPORT S := SYSTEM, Trace, Glue, Unix, Machine, Heaps, Modules;
 
 CONST
-	ConcurrentGC=FALSE; (* if TRUE then release needs to be compiled with --writeBarriers *)	
+	ConcurrentGC=TRUE; (* if TRUE then release needs to be compiled with --writeBarriers *)
 
 	(*! Process flags, meaningless in Unix ports !!! *)
 	PleaseHalt* = 10;		(* Process requested to Halt itself soon *)
@@ -28,7 +28,7 @@ CONST
 
 	(* Process modes (in UnixAos Running means Running or Ready!) *)
 	Unknown* = 0;  Ready* = 1;  Running* = 2;  AwaitingLock* = 3;
-	AwaitingCond* = 4;  AwaitingEvent* = 5;  Suspended*= 6; Terminated* = 7;
+	AwaitingCond* = 4;  AwaitingEvent* = 5;  Terminated* = 6;
 
 	Second* = 1000;	(* frequency of ticks increments in Hz *)
 
@@ -169,7 +169,7 @@ TYPE
 		nextPos: SIZE; (* 0 to start with *)
 		last: ARRAY 256 OF ADDRESS;
 	END;
-	
+
 	Process* = OBJECT (Heaps.ProcessLink)
 	VAR
 		threadId-			: Unix.Thread_t;
@@ -193,11 +193,18 @@ TYPE
 		lastThreadTimes: HUGEINT;
 		gcContext: GCContext;
 
+		PROCEDURE SetMode (mode: WORD);
+		BEGIN
+				Machine.Acquire(Machine.Objects);
+				SELF.mode := mode;
+				Machine.Release(Machine.Objects); 	
+		END SetMode;
+
 		PROCEDURE FindRoots;
 		VAR sp, bp, sb, n, a0, a1, adr, pc: ADDRESS; desc: Modules.ProcedureDescPointer; i: LONGINT; p {UNTRACED}: ANY;
-			contextPos: SIZE; prevMode: LONGINT;
+			contextPos: SIZE;
 		BEGIN{UNTRACKED}
-			IF mode = Terminated THEN RETURN END;
+			IF (mode < Running) OR (mode = Terminated) THEN RETURN END;
 
 			IF SELF = CurrentProcess() THEN
 				state.SP := S.GetStackPointer( );
@@ -205,14 +212,12 @@ TYPE
 				state.PC := Machine.CurrentPC();
 			ELSIF ConcurrentGC THEN
 				Unix.ThrSuspend( threadId, mode = Running );
-				prevMode := mode;
-				mode := Suspended;
 			END;
-				
+
 			sp := state.SP; bp := state.BP; sb := stackBottom; pc := state.PC;
 
 			contextPos := gcContext.nextPos;
-			IF contextPos >= 0 THEN (* this thread is currently active in A2 *)			
+			IF contextPos >= 0 THEN (* this thread is currently active in A2 *)
 				IF Heaps.GCType = Heaps.HeuristicStackInspectionGC THEN
 					(* debugging info*)
 					IF (stackBottom # 0) & (bp < stackBottom) & (bp >= sp - SIZE OF ADDRESS) THEN
@@ -236,7 +241,8 @@ TYPE
 								bp := NIL;
 								WHILE (contextPos > 0) & (bp = NIL) DO
 									DEC(contextPos);
-									bp := gcContext.last[contextPos];
+									bp := gcContext.last[2*contextPos];
+									pc := gcContext.last[2*contextPos+1];
 								END;
 								IF bp = NIL THEN
 									EXIT;
@@ -244,7 +250,7 @@ TYPE
 							END;
 							S.GET( bp, n );
 							IF ODD( n ) THEN (* procedure descriptor at bp *)
-								IF n > 1024 THEN
+								IF (n > 1024) & (bp >= sp) THEN
 									desc := S.VAL( Modules.ProcedureDescPointer, n-1 );
 									IF desc # NIL THEN
 										a0 := ADDRESSOF( desc.offsets );
@@ -254,7 +260,7 @@ TYPE
 											adr := bp + desc.offsets[i]; (* pointer at offset *)
 											S.GET( adr, p ); (* load pointer *)
 											IF p # NIL THEN
-												Heaps.Inspect( p );
+												Heaps.Mark( p );
 											END
 										END
 									END
@@ -272,7 +278,6 @@ TYPE
 			IF ConcurrentGC THEN
 				IF SELF # CurrentProcess() THEN
 					Unix.ThrResume( threadId);
-					mode := prevMode;		
 				END;
 			END;
 		END FindRoots;
@@ -367,7 +372,7 @@ TYPE
 					SuspendActivities;
 					Heaps.CollectGarbage( Modules.root );
 					ResumeActivities;
-				END; 
+				END;
 				Machine.Release( Machine.Heaps );
 				Machine.Release( Machine.Objects );
 				finalizerCaller.Activate;
@@ -402,10 +407,8 @@ TYPE
 			res := Unix.sigsetjmp( ADDRESSOF( p.state0[0] ), 1 );
 			S.SetStackPointer (sp);
 		END;
-
-		p.mode := Running;
+		p.SetMode(Running);
 		p.body( p.obj );
-		p.mode := Terminated;
 		Exit
 	END BodyStarter;
 
@@ -448,9 +451,6 @@ TYPE
 		ASSERT( exclusive );   (* shared not implemented yet *)
 		S.GET( S.VAL( ADDRESS, obj ) + Heaps.HeapBlockOffset, hdr );
 		p := CurrentProcess();
-		p.state.SP := S.GetStackPointer( );
-		p.state.BP := S.GetFramePointer( );
-		p.state.PC := Machine.CurrentPC( );
 		p.mode := AwaitingLock;
 
 		(*! we might want to replace the lock mutex by a lock free construct *)
@@ -484,9 +484,6 @@ TYPE
 		hdr.lockedBy := c;
 		IF c # NIL THEN  Unix.CondSignal( c.continue )  ELSE  Unix.CondSignal( lock.enter )  END;
 
-		p.state.SP := S.GetStackPointer( );
-		p.state.BP := S.GetFramePointer( );
-		p.state.PC := Machine.CurrentPC( );
 		Unix.CondWait( p.continue, lock.mtx );
 
 		p.mode := Running;  hdr.lockedBy := p;  p.waitingOn := NIL
@@ -543,7 +540,7 @@ TYPE
 
 	PROCEDURE TerminateThis*( p: Process; unbreakable: BOOLEAN );
 	BEGIN
-		p.mode := Terminated;
+		p.SetMode(Terminated);
 		p.Cancel
 	END TerminateThis;
 
@@ -602,6 +599,47 @@ TYPE
 		RETURN p.stackBottom
 	END GetStackBottom;
 
+	PROCEDURE CheckBP(bp: ADDRESS): ADDRESS;
+	VAR n: ADDRESS;
+	BEGIN
+		S.GET(bp,n);
+		IF ODD(n) THEN  bp := bp + SIZEOF(ADDRESS) END;
+		RETURN bp;
+	END CheckBP;
+
+	PROCEDURE GetStack*(p: Process; VAR pc, bp, sp, sb: ADDRESS; VAR contextPos: SIZE);
+	BEGIN
+		UpdateProcessState(p);
+		bp := p.state.BP;
+		pc := p.state.PC;
+		sp := p.state.SP;
+		sb := p.stackBottom;
+		contextPos := p.gcContext.nextPos;
+
+		IF p.threadId = Unix.ThrThis( ) THEN
+			sp := S.GetStackPointer();
+			bp := CheckBP(S.GetFramePointer());
+			S.GET(bp, bp);
+			bp := CheckBP(bp);
+			S.GET(bp+SIZEOF(ADDRESS), pc);
+		ELSE
+			IF Machine.ValidHeapAddress(pc) THEN
+			ELSE 
+				IGNORE NextValidStackSegment(p, bp, pc, contextPos);
+			END;		
+		END;
+	END GetStack;
+
+	PROCEDURE NextValidStackSegment*(p: Process; VAR bp, pc: ADDRESS; VAR contextPos: SIZE): BOOLEAN;
+	BEGIN
+		bp := NIL;
+		WHILE (contextPos > 0) & (bp = NIL) DO
+			DEC(contextPos);
+			bp := p.gcContext.last[contextPos*2];
+			pc := p.gcContext.last[contextPos*2+1];
+		END;
+		RETURN bp  # NIL;
+	END NextValidStackSegment;
 
 	PROCEDURE GetProcessID*( ): WORD;
 	VAR p: Process;
@@ -644,7 +682,7 @@ TYPE
 			WHILE (p # NIL) & (p.obj # obj) DO p := p.nextProcess  END;
 		Unix.MtxUnlock( processList );
 		IF (p # NIL) & (p.obj = obj) THEN
-			p.mode := Terminated;
+			p.SetMode(Terminated);
 			Unix.CondDestroy( p.continue );  p.continue := 0;
 			FinalizeProtObject( obj );
 			p.Cancel
@@ -676,7 +714,7 @@ TYPE
 	VAR prev, p, me: Process;
 	BEGIN
 		me := CurrentProcess();
-		me.mode := Terminated;
+		me.SetMode(Terminated);
 		Unix.MtxLock( processList );
 		prev := NIL;  p := root;
 		WHILE (p # NIL ) & (p # me) DO  prev := p;  p := p.nextProcess  END;
@@ -775,6 +813,7 @@ TYPE
 	(* called by WMProcessInfo to obtain the current state of a running process *)
 	PROCEDURE UpdateProcessState*( p: Process );
 	BEGIN
+		Machine.Acquire(Machine.Objects);  (* must not run concurrently with GC *)
 		IF p.threadId = Unix.ThrThis( ) THEN
 			p.state.PC := Machine.CurrentPC( );
 			p.state.BP := S.GetFramePointer( );
@@ -789,7 +828,8 @@ TYPE
 				END;
 				timerStopped := FALSE
 			END
-		END
+		END;
+		Machine.Release(Machine.Objects); 
 	END UpdateProcessState;
 
 	PROCEDURE SuspendActivities;
@@ -846,16 +886,17 @@ TYPE
 
 	(* Leave A2 is called when a process leaves A2 by a call to the Unix API *)
 	PROCEDURE LeaveA2*;
-	VAR cur: Process; ebp,n: ADDRESS;
+	VAR cur: Process; ebp,pc: ADDRESS;
 	BEGIN{UNTRACKED}
 		IF clock # NIL THEN
 			cur := CurrentProcess();
 			IF cur # NIL THEN
-				ebp := S.GetFramePointer();
-				S.GET(ebp, n);
-				IF ODD(n) THEN S.GET(ebp + SIZEOF(ADDRESS), ebp) ELSE ebp := n END;
-				cur.gcContext.last[cur.gcContext.nextPos] := ebp;
-				INC(cur.gcContext.nextPos);				
+				ebp := CheckBP(S.GetFramePointer());
+				S.GET(ebp+SIZEOF(ADDRESS), pc);
+				S.GET(ebp, ebp);
+				cur.gcContext.last[cur.gcContext.nextPos*2] := ebp;
+				cur.gcContext.last[cur.gcContext.nextPos*2+1] := pc;
+				INC(cur.gcContext.nextPos);
 				ASSERT(cur.gcContext.nextPos < 255);
 			END;
 		END;
@@ -865,13 +906,14 @@ TYPE
 	PROCEDURE ReenterA2*;
 	VAR cur: Process;
 	BEGIN{UNTRACKED}
-		IF clock # NIL THEN 
+		IF clock # NIL THEN
 		cur := CurrentProcess();
 		IF cur # NIL THEN
 			IF (cur.gcContext.nextPos > 0) THEN
 				DEC(cur.gcContext.nextPos);
 			END;
-			cur.gcContext.last[cur.gcContext.nextPos] := NIL; (* returned *)
+			cur.gcContext.last[2*cur.gcContext.nextPos] := NIL; (* returned *)
+			cur.gcContext.last[2*cur.gcContext.nextPos+1] := NIL; (* returned *)
 		END;
 		END;
 	END ReenterA2;
