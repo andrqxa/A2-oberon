@@ -46,7 +46,7 @@ TYPE
 						INC(total)
 					END;
 					i := 0;
-					in.SkipLn;in.SkipSpaces; in.Token(token); Strings.HexStrToInt(token, length, r); in.SkipLn;
+					in.SkipLn;in.SkipSpaces; in.Token(token); Strings.HexStrToSize(token, length, r); in.SkipLn;
 				END;
 				len := total
 			ELSE
