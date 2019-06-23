@@ -417,13 +417,13 @@ TYPE
   				r_15		: HUGEINT;
   				r_di		: HUGEINT;
   				r_si		: HUGEINT;
-  				r_bp-		: HUGEINT;
+  				r_bp-		: ADDRESS;
   				r_bx-		: HUGEINT;
   				r_dx		: HUGEINT;
   				r_ax		: HUGEINT;
   				r_cx		: HUGEINT;
-  				r_sp-		: HUGEINT;
-  				r_pc-		: HUGEINT;
+  				r_sp-		: ADDRESS;
+  				r_pc-		: ADDRESS;
   				r_efl		: HUGEINT;
   				r_csgsfs	: HUGEINT;           (* Actually short cs, gs, fs, pad0.  *)
   				err-		: HUGEINT;
@@ -512,13 +512,13 @@ VAR
 	pthread_setcanceltype: PROCEDURE {C} (type: WORD; oldtype: ADDRESS): WORD;
 	sigaction: PROCEDURE {C} (signum: WORD; CONST act, oldact: ADDRESS): WORD;
 	sigemptyset: PROCEDURE {C} (set: ADDRESS);
-	sigfillset: PROCEDURE {C} (set: ADDRESS): WORD;
-	sigsuspend: PROCEDURE {C} (set: ADDRESS): WORD;
-	sigaddset: PROCEDURE {C} (set: ADDRESS; signo: WORD);
-	sigdelset: PROCEDURE {C} (set: ADDRESS; signo: WORD);
-	nanosleep: PROCEDURE {C} (req, rem: ADDRESS): WORD;
-	sigaltstack: PROCEDURE {C} (ss, oss: ADDRESS): WORD;
-	pthread_sigmask: PROCEDURE {C}(how: WORD; set: ADDRESS; oldset: ADDRESS): WORD;
+	sigfillset: PROCEDURE {C} (set: ADDRESS): LONGINT;
+	sigsuspend: PROCEDURE {C} (set: ADDRESS): LONGINT;
+	sigaddset: PROCEDURE {C} (set: ADDRESS; signo: LONGINT);
+	sigdelset: PROCEDURE {C} (set: ADDRESS; signo: LONGINT);
+	nanosleep-: PROCEDURE {C} (req, rem: ADDRESS): LONGINT;
+	sigaltstack: PROCEDURE {C} (ss, oss: ADDRESS): LONGINT;
+	pthread_sigmask: PROCEDURE {C}(how: LONGINT; set: ADDRESS; oldset: ADDRESS): LONGINT;
 
 	sem_init-: PROCEDURE {C} (sem: ADDRESS; pshared: WORD; value: WORD): WORD;
 	sem_wait-: PROCEDURE {C} (sem: ADDRESS): WORD;
@@ -708,7 +708,7 @@ VAR
 	END CondSignal;
 
 	PROCEDURE ThrThis*(): Thread_t;
-	BEGIN {UNCOOPERATIVE, UNCHECKED}
+	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		RETURN pthread_self( );
 	END ThrThis;
 
@@ -823,13 +823,13 @@ VAR
 		END;
 	END ThrSleep;
 
-	PROCEDURE NanoSleep(ns: LONGWORD);
+	PROCEDURE NanoSleep*(ns: LONGWORD);
 	VAR
 		sltime,rem: RECORD
 			tv_sec: LONGWORD;        (* seconds *)
 			tv_nsec: LONGWORD;       (* nanoseconds *)
      	END;
-	BEGIN {UNCOOPERATIVE, UNCHECKED}
+	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		sltime.tv_sec := ns DIV 1000000000;
 		sltime.tv_nsec := ns MOD 1000000000;
 		WHILE (nanosleep(ADDRESS OF sltime, ADDRESS OF rem) < 0) DO
@@ -856,7 +856,7 @@ VAR
 
 	PROCEDURE ThrResume*( thr: Thread_t );
 	VAR  res: WORD;
-	BEGIN {UNCOOPERATIVE, UNCHECKED}
+	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		res := pthread_mutex_lock(ADDRESS OF suspend_mutex );
 		resume_done := 0;
 		res := pthread_kill( thr, T_SIGRESUME );
@@ -1054,7 +1054,7 @@ VAR
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		sigemptyset(ADDRESS OF mask);
 		act.sa_mask := mask;
-		act.sa_flags :=  SA_SIGINFO +  SA_ONSTACK (* run on separate sig stack *) +  SA_NODEFER; 
+		act.sa_flags :=  SA_SIGINFO +  SA_ONSTACK (* run on separate sig stack *) +  SA_NODEFER;
 		act.sa_handler := ADDRESS OF SigHandler;
 		IF sigaction( sig, ADDRESS OF act, 0 ) # 0 THEN
 			Perror("sigaction");
