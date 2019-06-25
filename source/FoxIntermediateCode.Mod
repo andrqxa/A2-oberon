@@ -130,7 +130,7 @@ TYPE
 	VAR
 		instructions-: Instructions; (* array of instructions *)
 		pc-: LONGINT; (* points to next instruction = len *)
-		finally-: LONGINT; (* finally section starts at, -1 if none *)
+		finally-: SIZE; (* finally section starts at, -1 if none *)
 		resolved-, alias-: BinaryCode.Section; (* reference to section containing compiled byte array *) (* TODO: ret rid of that? *)
 		aliasOffset-: SIZE; (* for aliases *)
 
@@ -176,13 +176,13 @@ TYPE
 			alias := section; aliasOffset := offset;
 		END SetAlias;
 
-		PROCEDURE SetFinally*(atPc: LONGINT);
+		PROCEDURE SetFinally*(atPc: SIZE);
 		BEGIN finally := atPc
 		END SetFinally;
 
 		PROCEDURE GetSize*(): LONGINT;
 		VAR
-			i: LONGINT;
+			i: SIZE;
 			instruction: Instruction;
 		BEGIN
 			IF sizeInUnits = NotYetCalculatedSize THEN
@@ -286,7 +286,7 @@ TYPE
 			pc := 0;
 		END Reset;
 
-		PROCEDURE PatchOperands*(pc: LONGINT; op1,op2,op3: Operand);
+		PROCEDURE PatchOperands*(pc: SIZE; op1,op2,op3: Operand);
 		BEGIN instructions[pc].op1 := op1; instructions[pc].op2 := op2; instructions[pc].op3 := op3;
 		END PatchOperands;
 
