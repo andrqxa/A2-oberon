@@ -427,10 +427,10 @@ TYPE
 			IF ~open THEN res := Serials.Closed; RETURN; END;
 			IF Trace * TraceSend # {} THEN ShowModule("Sending "); KernelLog.Int(len, 0); KernelLog.String(" bytes"); KernelLog.Ln; END;
 			NEW (buffer, len); COPY (buf, buffer^);
-			status := driver.bulkOut.Transfer(TODO(len), TODO(ofs), buffer^);
+			status := driver.bulkOut.Transfer(len, ofs, buffer^);
 			IF status = Usbdi.Ok THEN
 				res := Serials.Ok;
-				charactersSent := charactersSent + TODO(len);
+				charactersSent := charactersSent + len;
 			ELSE
 				res := Serials.TransportError;
 				IF Debug THEN ShowModule("Transmission failed, res: "); KernelLog.Int(status, 0); KernelLog.Ln; END;

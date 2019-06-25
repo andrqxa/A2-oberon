@@ -964,10 +964,10 @@ TYPE
 			IF Trace * TraceSend # {} THEN ShowModule("Sending "); KernelLog.Int(len, 0); KernelLog.String(" bytes"); KernelLog.Ln; END;
 			IF ((sendBuffer = NIL) OR (LEN(sendBuffer) < len)) THEN NEW(sendBuffer, len) END;
 			SYSTEM.MOVE(ADDRESSOF(buf[ofs]), ADDRESSOF(sendBuffer[0]), len);
-			status := driver.bulkOut.Transfer(TODO(len), TODO(ofs), sendBuffer^);
+			status := driver.bulkOut.Transfer(len, ofs, sendBuffer^);
 			IF status = Usbdi.Ok THEN
 				res := Serials.Ok;
-				charactersSent := charactersSent + TODO(len);
+				charactersSent := charactersSent + len;
 			ELSE
 				res := Serials.TransportError;
 				IF Debug THEN ShowModule("Transmission failed, res: "); KernelLog.Int(status, 0); KernelLog.Ln; END;

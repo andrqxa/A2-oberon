@@ -340,7 +340,7 @@ BEGIN
 	END;
 	log.String (name);
 	Files.OpenReader(r, f, 0);
-	Module(PCS.InitWithReader(r, TODO(f.Length()),0), name, opt, pc, log, diagnostics, error);
+	Module(PCS.InitWithReader(r, f.Length()(SIZE),0), name, opt, pc, log, diagnostics, error);
 END CompileAsciiFile;
 
 PROCEDURE Compile*(context : Commands.Context);

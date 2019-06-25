@@ -320,7 +320,7 @@ TYPE
 				KernelLog.Exit;
 			END;
 
-			RETURN r.apos*BufSize + TODO(r.bpos);
+			RETURN r.apos*BufSize + r.bpos;
 		END Pos;
 
 		(** reads one byte from a file **)
@@ -763,7 +763,7 @@ BEGIN
 	fsCasted.stubs.Read(f.key, pos*BufSize, BufSize, buf.data.B, 0, received, errorcode);
 	IF errorcode = Ok THEN
 		IF pos < f.aleng THEN
-			buf.lim := TODO(received);
+			buf.lim := received(LONGINT);
 		ELSE
 			buf.lim := f.bleng;
 		END;
@@ -784,7 +784,7 @@ BEGIN
 		fsCasted.stubs.Read(f.key, pos*BufSize, BufSize, buf.data.B, 0, received, errorcode);
 		IF errorcode = Ok THEN
 			IF pos < f.aleng THEN
-				buf.lim := TODO(received);
+				buf.lim := received(LONGINT);
 			ELSE
 				buf.lim := f.bleng;
 			END;

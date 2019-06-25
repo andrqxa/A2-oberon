@@ -238,7 +238,7 @@ OSCBundle b:
 			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR i: SIZE;
 			BEGIN
-				Network.PutNet4(packet, pos, TODO(size)); INC(pos, 4);
+				Network.PutNet4(packet, pos, size(LONGINT)); INC(pos, 4);
 				FOR i:=0 TO size-1 DO
 					packet[pos+i] := blob[i];
 				END;
@@ -830,7 +830,7 @@ OSCBundle b:
 				exportString(OSCBundleIdent, packet, pos);
 				timetag.export(packet, pos);
 				FOR i := 0 TO messagescount-1 DO
-					Network.PutNet4(packet, pos, TODO(messages[i].GetSize())); INC(pos, 4);
+					Network.PutNet4(packet, pos, messages[i].GetSize()(LONGINT)); INC(pos, 4);
 					messages[i].export(packet, pos);
 				END;
 			END export;
