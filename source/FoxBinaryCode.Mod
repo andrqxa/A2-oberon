@@ -110,7 +110,7 @@ TYPE
 			SELF.offset := offset;
 		END SetFixupOffset;
 
-		PROCEDURE SetSymbol*(symbol: Sections.SectionName; fp: ObjectFile.Fingerprint; symbolOffset: LONGINT; displacement: Unit);
+		PROCEDURE SetSymbol*(symbol: Sections.SectionName; fp: ObjectFile.Fingerprint; symbolOffset: SIZE; displacement: Unit);
 		BEGIN
 			SELF.symbol.name := symbol;
 			SELF.symbol.fingerprint := fp;
@@ -711,7 +711,7 @@ TYPE
 		RETURN result
 	END ConvertToLongreal;
 
-	PROCEDURE NewFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset: SIZE; displacement: LONGINT; scale: Bits; fixupPattern: ObjectFile.FixupPatterns): Fixup;
+	PROCEDURE NewFixup*(mode: WORD; fixupOffset: Unit; symbol: ObjectFile.Identifier; symbolOffset: SIZE; displacement: Unit; scale: Bits; fixupPattern: ObjectFile.FixupPatterns): Fixup;
 	VAR fixup: Fixup;
 	BEGIN
 		NEW(fixup,mode,fixupOffset,symbol,symbolOffset,displacement,scale,fixupPattern); RETURN fixup
