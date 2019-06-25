@@ -1471,7 +1471,7 @@ BEGIN
 		sent := sent + len;
 		(*timer.Sleep(300);*) (* wtf *)
 	END;
-	IF Log THEN li("SendData ", TODO(sent)); END;
+	IF Log THEN li("SendData ", sent); END;
 END SendData;
 
 

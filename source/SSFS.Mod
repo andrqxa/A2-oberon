@@ -815,7 +815,7 @@ TYPE
 				inode.size := pos;
 				inodeModified := TRUE;
 			END;
-			r.res := TODO(len);
+			r.res := len;
 		END WriteBytes;
 
 		(** Return the current length of a file. *)

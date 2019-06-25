@@ -158,14 +158,14 @@ TYPE
 		END SendChar;
 
 		PROCEDURE Send*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD );
-		VAR r: SIZE; writeRes: LONGINT;
+		VAR r: SIZE;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + len );   (* array bound check not implemented in Kernel32.WriteFile *)
-			r := Unix.write( fd, ADDRESSOF(buf[ofs]), len );  writeRes := TODO( r );
-			IF writeRes < 0 THEN
+			r := Unix.write( fd, ADDRESSOF(buf[ofs]), len );
+			IF r < 0 THEN
 				res := Serials.TransportError;
 			ELSE
-				INC( charactersSent, writeRes );
+				INC( charactersSent, r );
 				res := Serials.Ok;
 			END;
 		END Send;

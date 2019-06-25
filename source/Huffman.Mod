@@ -171,9 +171,9 @@ TYPE
 			END PutCode;
 
 
-			PROCEDURE CompressBlock*( CONST source: ARRAY OF CHAR; len: LONGINT );
+			PROCEDURE CompressBlock*( CONST source: ARRAY OF CHAR; len: SIZE );
 			VAR
-				i: LONGINT;
+				i: SIZE;
 				pw: PatternWeights;
 			BEGIN
 				pw := CountPatterns( source, len );
