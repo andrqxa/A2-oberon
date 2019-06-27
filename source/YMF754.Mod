@@ -532,12 +532,12 @@ TYPE
 			drv: Driver; (* driver object *)
 			bufferListenerCaller: BufferListenerCaller; (* buffer listener call object *)
 			buffFirst, buffLast: ListBuffer; (* buffer queue (FIFO) *)
-			buffFirstPos: LONGINT; (* position in currently used buffer *)
+			buffFirstPos: SIZE; (* position in currently used buffer *)
 			playRecBuff: PlayRecBuffer; (* ring buffer for playing/recording *)
 			playRecBuffSize: LONGINT; (* size of ring buffer for playing/recording *)
 			playRecBuffPhys: LONGINT; (* physical address of ring buffer *)
-			playRecBuffPos: LONGINT; (* position marker in ring buffer in bytes *)
-			samplePosition: LONGINT; (* current absolute position in samples *)
+			playRecBuffPos: SIZE; (* position marker in ring buffer in bytes *)
+			samplePosition: SIZE; (* current absolute position in samples *)
 			bytesPerSampleExp: LONGINT; (* bytesPerSampleExp^2 = bytes per sample *)
 			running: BOOLEAN; (* is channel currently playing/recording? *)
 			closed: BOOLEAN; (* has channel been closed? *)
@@ -648,7 +648,7 @@ TYPE
 		PROCEDURE GetPosition*() : LONGINT;
 		BEGIN
 			ASSERT(~closed);
-			RETURN samplePosition;
+			RETURN TODO(samplePosition);
 		END GetPosition;
 
 		(** Start playing / recording *)
@@ -782,8 +782,8 @@ TYPE
 		(* Prepare data - this procedure is called for each channel every time PCI Audio generates an interrupt *)
 		PROCEDURE PrepareData;
 		VAR
-			curBuffPos: LONGINT; (* current recording position in ring buffer in bytes *)
-			copySize: LONGINT; (* size of next block to copy in bytes *)
+			curBuffPos: SIZE; (* current recording position in ring buffer in bytes *)
+			copySize: SIZE; (* size of next block to copy in bytes *)
 		BEGIN
 			IF ~running THEN RETURN END;
 			curBuffPos := LSH(playSlot[0][drv.inactiveBank].pgStart, bytesPerSampleExp);
@@ -819,7 +819,7 @@ TYPE
 
 		(* Init banks and start playback/record *)
 		PROCEDURE Activate;
-		VAR copySize, i, j: LONGINT;
+		VAR copySize, i, j: SIZE;
 		BEGIN
 			IF Logging THEN
 				KernelLog.String("YMF754 - Starting PlayerChannel number ");
@@ -963,8 +963,8 @@ TYPE
 		(* Prepare data - this procedure is called for each channel every time PCI Audio generates an interrupt *)
 		PROCEDURE PrepareData;
 		VAR
-			curBuffPos: LONGINT; (* current recording position in ring buffer in bytes *)
-			copySize: LONGINT; (* size of next block to copy in bytes *)
+			curBuffPos: SIZE; (* current recording position in ring buffer in bytes *)
+			copySize: SIZE; (* size of next block to copy in bytes *)
 		BEGIN
 			IF ~running THEN RETURN END;
 			curBuffPos := recSlot.recSlotADC[drv.inactiveBank].pgStartAdr;
