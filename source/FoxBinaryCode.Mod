@@ -197,9 +197,9 @@ TYPE
 		bigEndian-: BOOLEAN; (* endianess of bits (not bytes) *)
 		pc-: Unit; (* current position, in units *)
 
-		PROCEDURE GetPC(): TODO;
+		PROCEDURE GetPC(): Unit;
 		BEGIN
-			RETURN TODO(pc);
+			RETURN pc;
 		END GetPC;
 
 		PROCEDURE & InitBinarySection*(type: WORD; unit: Bits; CONST name:Basic.SegmentedName; dump: BOOLEAN; bigEndian: BOOLEAN);

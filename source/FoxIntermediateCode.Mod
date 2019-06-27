@@ -138,7 +138,7 @@ TYPE
 		sizeInUnits: LONGINT;
 		exported-: BOOLEAN;
 
-		PROCEDURE GetPC(): LONGINT;
+		PROCEDURE GetPC(): SIZE;
 		BEGIN RETURN pc
 		END GetPC;
 

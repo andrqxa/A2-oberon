@@ -146,9 +146,9 @@ TYPE
 
 	CommentStr* = POINTER TO ARRAY OF CHAR;
 	Comment* = OBJECT
-		VAR str-: CommentStr; strLen: LONGINT; pos-: LONGINT; nextComment-: Comment;
+		VAR str-: CommentStr; strLen: SIZE; pos-: SIZE; nextComment-: Comment;
 
-		PROCEDURE &Init*(pos: LONGINT);
+		PROCEDURE &Init*(pos: SIZE);
 		BEGIN
 			SELF.pos := pos;
 			NEW(str,32); strLen := 0;
@@ -199,7 +199,7 @@ TYPE
 
 	END Comment;
 
-	GetPCProcedure=PROCEDURE{DELEGATE}(): LONGINT;
+	GetPCProcedure=PROCEDURE{DELEGATE}(): SIZE;
 
 	CommentWriter*= OBJECT (Streams.Writer)
 	VAR
@@ -207,7 +207,7 @@ TYPE
 		getPC: GetPCProcedure;
 
 		PROCEDURE AppendToLine*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN;  VAR res: WORD );
-		VAR pos: LONGINT;
+		VAR pos: SIZE;
 		BEGIN
 			IF len = 0 THEN RETURN END;
 			pos := getPC();
