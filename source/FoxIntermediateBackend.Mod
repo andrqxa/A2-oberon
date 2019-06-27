@@ -150,7 +150,7 @@ TYPE
 			SELF.pc := pc;
 			WHILE(fixups # NIL) DO
 				at := fixups.pc;
-				section.PatchAddress(at,TODO(pc));
+				section.PatchAddress(at,pc);
 				fixups := fixups.nextFixup;
 			END;
 		END Resolve;

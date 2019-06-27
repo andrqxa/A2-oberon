@@ -290,7 +290,7 @@ TYPE
 		BEGIN instructions[pc].op1 := op1; instructions[pc].op2 := op2; instructions[pc].op3 := op3;
 		END PatchOperands;
 
-		PROCEDURE PatchAddress*(pc: SIZE; symbolOffset: LONGINT);
+		PROCEDURE PatchAddress*(pc: SIZE; symbolOffset: SIZE);
 		BEGIN
 			ASSERT((br <= instructions[pc].opcode) & (instructions[pc].opcode <= brlt));
 			ASSERT(instructions[pc].op1.symbol.name = SELF.name);

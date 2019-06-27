@@ -53,7 +53,7 @@ TYPE
 		VAR fixup: BinaryCode.Fixup; element: FixupElement; identifier: ObjectFile.Identifier;
 		BEGIN
 			identifier.name := section.name;
-			fixup := BinaryCode.NewFixup(BinaryCode.Absolute,0,identifier,0,TODO(displacement),0,NIL);
+			fixup := BinaryCode.NewFixup(BinaryCode.Absolute,0,identifier,0,displacement,0,NIL);
 			NEW(element); element.fixup := fixup; element.next := fixupList; fixupList := element;
 			RETURN fixup;
 		END GetFixup;
