@@ -110,12 +110,12 @@ END Write;
 PROCEDURE Close*(VAR w: Writer);
 VAR
 	done: BOOLEAN;
-	len: LONGINT;
+	len: SIZE;
 BEGIN
 	ASSERT(w.s.in.avail = 0, 110);
 	done := FALSE;
 	LOOP
-		len := TODO(BufSize - w.s.out.avail);
+		len := BufSize - w.s.out.avail;
 		IF len # 0 THEN
 			w.r.file.WriteBytes(w.r, w.out^, 0, len);
 			ZlibBuffers.Rewrite(w.s.out)

@@ -35,7 +35,7 @@ TYPE
 
 	AttributesBuf*=RECORD
 	 	attributes: POINTER TO ARRAY OF Texts.Attributes;
-		positions: POINTER TO ARRAY OF Streams.Position;
+		positions: POINTER TO ARRAY OF SIZE;
 		length: LONGINT;
 	END;
 
@@ -127,7 +127,7 @@ TYPE
 			IF attributesBuf.length = LEN(attributesBuf.attributes) THEN Update(); END;
 			i := attributesBuf.length;
 			attributesBuf.attributes[i] := attributes;
-			attributesBuf.positions[i] := Pos()-sent;
+			attributesBuf.positions[i] := (Pos()-sent)(SIZE);
 			INC(i);
 			attributesBuf.length := i;
 		END SetAttributes;
@@ -375,7 +375,7 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE LoadLibrary(buf: Strings.Buffer; pos: Streams.Position; VARflen:LONGINT);
+		PROCEDURE LoadLibrary(buf: Strings.Buffer; pos: SIZE; VARflen:LONGINT);
 		END LoadLibrary;
 
 		PROCEDURE IndexToColor(index: LONGINT): LONGINT;
@@ -386,7 +386,7 @@ TYPE
 					ASH(SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, index) * {0..1}), 7-1)
 		END IndexToColor;
 
-		PROCEDURE InsertPiece(ofs: Streams.Position; len : SIZE; attr : Texts.Attributes);
+		PROCEDURE InsertPiece(ofs, len : SIZE; attr : Texts.Attributes);
 		VAR i, j, m : SIZE; ch, last : CHAR; tempUCS32 : ARRAY 1024 OF Char32;
 			oldpos : SIZE;
 		BEGIN
@@ -421,8 +421,9 @@ TYPE
 			voff: SHORTINT;
 			lib :SHORTINT;
 			type, tag: CHAR;
-			len, flen, n, hlen, tlen, templen: LONGINT;
-			tempInt, off, pos: Streams.Position;
+			len, hlen, tlen, flen: LONGINT;
+			n, off: SIZE;
+			tempInt, pos: Streams.Position;
 			x, y, w, h: INTEGER;
 			temp: ARRAY 4096 OF CHAR;
 			name, lName: ARRAY 32 OF CHAR;
@@ -478,11 +479,11 @@ TYPE
 					sreader.SetPos(tempInt);
 					tag := sreader.Get();
 
-					IF tag = LibBlockId THEN LoadLibrary(buffer, pos - 1 + hlen + tlen + 1, flen) END;
+					IF tag = LibBlockId THEN LoadLibrary(buffer, pos(SIZE) - 1 + hlen + tlen + 1, flen) END;
 					INC(flen)
 				END;
 				n := 1;
-				off := pos - 1 + hlen;
+				off := pos(SIZE) - 1 + hlen;
 				WHILE reader.Pos() < pos - 1 + hlen - 5 DO
 					reader.RawSInt(lib);
 					IF lib = n THEN
@@ -648,7 +649,6 @@ TYPE
 			ch :Char32;
 			startPos, i, len : SIZE;
 			tempInt: Streams.Position;
-			length: SIZE;
 		BEGIN
 			(* define Oberon colors *)
 			oberonColors[0] := LONGINT(0FFFFFFFFH); oberonColors[1] := LONGINT(0FF0000FFH); oberonColors[2] := 000FF00FFH; oberonColors[3] := 00000FFFFH;
@@ -704,8 +704,8 @@ TYPE
 
 			(* write string to output stream *)
 			NEW(string, text.GetLength()+hLen);
-			w2.GetRaw(string^, length);
-			out.Bytes(string^, 0, length); out.Update;
+			w2.GetRaw(string^, len);
+			out.Bytes(string^, 0, len); out.Update;
 
 			text.ReleaseRead;
 			res := 0
