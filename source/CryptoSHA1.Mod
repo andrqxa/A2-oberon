@@ -83,7 +83,7 @@ TYPE
 			END;
 			p := BlockSize - 8;
 			WHILE cn < p  DO  cdata[cn] := 0X;  INC( cn )  END;
-			U.IntToBufferBE( TODO(Nh), cdata, p );  U.IntToBufferBE( TODO(Nl), cdata, p + 4 );
+			U.IntToBufferBE( Nh(LONGINT), cdata, p );  U.IntToBufferBE( Nl(LONGINT), cdata, p + 4 );
 
 			HashContextBlock;
 			U.BlockToBufferBE( hash, buf, pos )
