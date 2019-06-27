@@ -1965,7 +1965,7 @@ TYPE
 						emitter.code.CopyBits(resolved.os.bits,0,resolved.os.bits.GetSize());
 						emitterFixup := resolved.fixupList.firstFixup;
 						WHILE (emitterFixup # NIL) DO
-							newFixup := BinaryCode.NewFixup(emitterFixup.mode,emitterFixup.offset+pc,emitterFixup.symbol,emitterFixup.symbolOffset,TODO(emitterFixup.displacement),emitterFixup.scale,emitterFixup.pattern);
+							newFixup := BinaryCode.NewFixup(emitterFixup.mode,emitterFixup.offset+pc,emitterFixup.symbol,emitterFixup.symbolOffset,emitterFixup.displacement,emitterFixup.scale,emitterFixup.pattern);
 							out.fixupList.AddFixup(newFixup);
 							emitterFixup := emitterFixup.nextFixup;
 						END;

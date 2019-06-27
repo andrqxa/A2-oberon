@@ -706,7 +706,7 @@ TYPE
 									END;
 								*)
 								IF lastPass & (operands[addressOperand].symbol.name # "") THEN
-									AddFixup(BinaryCode.Absolute,4,TODO(code.pc),operands[addressOperand].symbol, operands[addressOperand].symbolOffset,operands[addressOperand].displacement)
+									AddFixup(BinaryCode.Absolute,4,code.pc,operands[addressOperand].symbol, operands[addressOperand].symbolOffset,operands[addressOperand].displacement)
 								END;
 								code.PutDWord (operands[addressOperand].displacement);
 							ELSE

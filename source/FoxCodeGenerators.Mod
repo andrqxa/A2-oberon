@@ -418,7 +418,7 @@ TYPE
 			Prepare;
 
 			FOR pc := 0 TO in.pc-1 DO
-				inPC := pc; outPC := TODO(out.pc);
+				inPC := pc; outPC := out.pc;
 				in.SetPC(pc, outPC);
 				IF pc = in.finally THEN out.SetFinally(out.pc) END;
 				instruction := in.instructions[pc];
@@ -483,10 +483,10 @@ TYPE
 		END GetDataSection;
 
 		PROCEDURE EmitData(CONST instruction: IntermediateCode.Instruction);
-			VAR type: IntermediateCode.Type; fixup: BinaryCode.Fixup; pc: LONGINT;fixupFormat: BinaryCode.FixupPatterns;
+			VAR type: IntermediateCode.Type; fixup: BinaryCode.Fixup; pc: SIZE;fixupFormat: BinaryCode.FixupPatterns;
 		BEGIN
 			type := instruction.op1.type;
-			pc := TODO(out.pc);
+			pc := out.pc;
 			IF type.form IN IntermediateCode.Integer THEN
 				out.PutBytes(instruction.op1.intValue,SHORT(type.sizeInBits DIV 8));
 			ELSE
