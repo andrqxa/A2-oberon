@@ -150,7 +150,7 @@ TYPE
 		END Dump;
 
 		PROCEDURE AllocateSection (s: Sections.Section);
-		VAR i: LONGINT; size: Size; section: Intermediate.Section;
+		VAR i: SIZE; size: Size; section: Intermediate.Section;
 		BEGIN
 			size := 0; section := s(Intermediate.Section);
 			FOR i := 0 TO section.pc - 1 DO INC (size, GetSizeOf (section.instructions[i])); END;
@@ -159,7 +159,7 @@ TYPE
 		END AllocateSection;
 
 		PROCEDURE InitializeSection (s: Sections.Section);
-		VAR i: LONGINT; address: Address; section: Intermediate.Section;
+		VAR i: SIZE; address: Address; section: Intermediate.Section;
 		BEGIN
 			section := s(Intermediate.Section);
 			address := section.offset;

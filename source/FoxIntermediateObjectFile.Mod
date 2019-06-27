@@ -122,7 +122,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END WriteInstruction;
 
 			PROCEDURE WriteSection(section: IntermediateCode.Section);
-			VAR i: LONGINT;
+			VAR i: SIZE;
 			BEGIN
 				w.RawLInt(section.type);
 				SectionName(section.name);
@@ -477,7 +477,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 		END ProcessInstruction;
 
 		PROCEDURE ProcessSection(section: IntermediateCode.Section);
-		VAR i: LONGINT; index: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			IF section.resolved # NIL THEN
 				poolMap.PutSegmentedName(section.name);

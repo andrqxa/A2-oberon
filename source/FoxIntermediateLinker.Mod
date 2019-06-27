@@ -267,7 +267,7 @@ TYPE
 		PROCEDURE MarkAsReachable*(section: Sections.Section);
 		VAR
 			intermediateCodeSection: IntermediateCode.Section;
-			i: LONGINT;
+			i: SIZE;
 			procedureName, moduleName: SyntaxTree.IdentifierString;
 			prefix: Basic.SegmentedName;
 		BEGIN

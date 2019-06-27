@@ -2781,7 +2781,7 @@ TYPE
 		END EmitFill;
 
 		PROCEDURE EmitBr (CONST instruction: IntermediateCode.Instruction);
-		VAR dest: SIZE; destPC,offset: LONGINT; target: Assembler.Operand;hit,fail: LONGINT; reverse: BOOLEAN;
+		VAR dest,destPC: SIZE; offset: LONGINT; target: Assembler.Operand;hit,fail: LONGINT; reverse: BOOLEAN;
 			(* jump operands *)  left,right,temp: Assembler.Operand;
 				failOp: Assembler.Operand; failPC: LONGINT;
 

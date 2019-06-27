@@ -1086,7 +1086,7 @@ TYPE
 
 		(* if the symbol has a statically known offset then return offset and set resulting section to nil, otherwise do not set resulting section to nil *)
 		PROCEDURE GetSymbolOffset(VAR vop: IntermediateCode.Operand; VAR sectionName: ObjectFile.Identifier): LONGINT;
-		VAR offset: LONGINT; section: Sections.Section;
+		VAR offset: SIZE; section: Sections.Section;
 		BEGIN
 			sectionName := vop.symbol;
 			Resolve(vop);
@@ -1098,7 +1098,7 @@ TYPE
 				END;
 				sectionName.name := "";
 			END;
-			RETURN offset
+			RETURN TODO(offset)
 		END GetSymbolOffset;
 
 		PROCEDURE GetMemory(VAR vop: IntermediateCode.Operand; part: LONGINT; VAR memoryOperand: InstructionSet.Operand; ticket: Ticket);
@@ -1799,7 +1799,7 @@ TYPE
 		END SetTarget;
 
 		PROCEDURE EmitBr (VAR instr: IntermediateCode.Instruction);
-		VAR dest: SIZE; destPC, offset: LONGINT; target: Operand; reverse: BOOLEAN;
+		VAR dest, destPC: SIZE; offset: LONGINT; target: Operand; reverse: BOOLEAN;
 			(* jump operands *)  op2, op3: Operand; hiHit, hiFail, lowHit: LONGINT;
 				failPC: LONGINT;
 					pattern: ObjectFile.FixupPatterns; fixup, failFixup: BinaryCode.Fixup;
@@ -2052,7 +2052,7 @@ TYPE
 		END EmitPop;
 
 		PROCEDURE EmitPush(VAR vop: IntermediateCode.Operand; part: LONGINT);
-		VAR mem: InstructionSet.Operand; reg: Operand; pc: LONGINT;
+		VAR mem: InstructionSet.Operand; reg: Operand; pc: SIZE;
 		BEGIN
 			MakeRegister(vop, part, reg);
 			IF pushChainLength = 0 THEN (* check for chain of pushes *)

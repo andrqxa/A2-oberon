@@ -112,7 +112,7 @@ TYPE
 		opcode-: SHORTINT; (* instruction opcode *)
 		subtype-: SHORTINT; (* for special backend instruction *)
 		textPosition-: Basic.Position; (* for error handling and tracking (findPC) *)
-		pc-: LONGINT; (* backend program counter (in bits) for debugging and for label fixups in backend *)
+		pc-: SIZE; (* backend program counter (in bits) for debugging and for label fixups in backend *)
 		scope-: SyntaxTree.Scope; (* will replace rules *)
 		op1*,op2*,op3*: Operand; (* first operand typically provides the result, if any *)
 	END;
@@ -129,7 +129,7 @@ TYPE
 	Section*= OBJECT (Sections.Section)
 	VAR
 		instructions-: Instructions; (* array of instructions *)
-		pc-: LONGINT; (* points to next instruction = len *)
+		pc-: SIZE; (* points to next instruction = len *)
 		finally-: SIZE; (* finally section starts at, -1 if none *)
 		resolved-, alias-: BinaryCode.Section; (* reference to section containing compiled byte array *) (* TODO: ret rid of that? *)
 		aliasOffset-: SIZE; (* for aliases *)
@@ -271,8 +271,8 @@ TYPE
 			sizeInUnits := NotYetCalculatedSize;
 		END Emit;
 
-		PROCEDURE EmitAt*(at: LONGINT; instruction: Instruction);
-		VAR oldpc: LONGINT;
+		PROCEDURE EmitAt*(at: SIZE; instruction: Instruction);
+		VAR oldpc: SIZE;
 		BEGIN
 			oldpc := pc;
 			pc := at; Assert(pc < LEN(instructions),"EmitAt only in existing code");
@@ -290,7 +290,7 @@ TYPE
 		BEGIN instructions[pc].op1 := op1; instructions[pc].op2 := op2; instructions[pc].op3 := op3;
 		END PatchOperands;
 
-		PROCEDURE PatchAddress*(pc: LONGINT; symbolOffset: LONGINT);
+		PROCEDURE PatchAddress*(pc: SIZE; symbolOffset: LONGINT);
 		BEGIN
 			ASSERT((br <= instructions[pc].opcode) & (instructions[pc].opcode <= brlt));
 			ASSERT(instructions[pc].op1.symbol.name = SELF.name);
@@ -300,13 +300,13 @@ TYPE
 			instructions[pc].op1.symbolOffset := symbolOffset;
 		END PatchAddress;
 
-		PROCEDURE SetPC*(at: LONGINT; pc: LONGINT);
+		PROCEDURE SetPC*(at: SIZE; pc: SIZE);
 		BEGIN instructions[at].pc := pc;
 		END SetPC;
 
-		PROCEDURE DumpCode*(w: Streams.Writer; from,to: LONGINT);
+		PROCEDURE DumpCode*(w: Streams.Writer; from,to: SIZE);
 		VAR
-			i: LONGINT;
+			i: SIZE;
 			c: Sections.Comment;
 		BEGIN
 			IF comments # NIL THEN
@@ -356,7 +356,7 @@ TYPE
 		END Dump;
 
 		PROCEDURE WriteRaw*(w: Streams.Writer);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			FOR i := 0 TO pc-1 DO
 				w.Int(i,2); w.String(": ");

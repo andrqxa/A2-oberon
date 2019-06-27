@@ -129,7 +129,7 @@ TYPE
 	END;
 
 	Fixup= POINTER TO RECORD
-		pc: LONGINT;
+		pc: SIZE;
 		nextFixup: Fixup;
 	END;
 
@@ -137,25 +137,25 @@ TYPE
 	VAR
 		fixups: Fixup;
 		section: IntermediateCode.Section;
-		pc: LONGINT;
+		pc: SIZE;
 
 		PROCEDURE &InitLabel(section: IntermediateCode.Section);
 		BEGIN
 			SELF.section := section; pc := -1;
 		END InitLabel;
 
-		PROCEDURE Resolve(pc: LONGINT);
-		VAR at: LONGINT;
+		PROCEDURE Resolve(pc: SIZE);
+		VAR at: SIZE;
 		BEGIN
 			SELF.pc := pc;
 			WHILE(fixups # NIL) DO
 				at := fixups.pc;
-				section.PatchAddress(at,pc);
+				section.PatchAddress(at,TODO(pc));
 				fixups := fixups.nextFixup;
 			END;
 		END Resolve;
 
-		PROCEDURE AddFixup(at: LONGINT);
+		PROCEDURE AddFixup(at: SIZE);
 		VAR fixup: Fixup;
 		BEGIN
 			ASSERT(pc=-1);
@@ -522,7 +522,7 @@ TYPE
 			prevScope: SyntaxTree.Scope;
 			inline, finalizer: BOOLEAN;
 			procedureType: SyntaxTree.ProcedureType;
-			pc: LONGINT;
+			pc: SIZE;
 			memorySize: Basic.Integer; stackSize: LONGINT;
 			name,baseObject: Basic.SegmentedName; ir: IntermediateCode.Section;
 			null,size,src,dest,fp,res: IntermediateCode.Operand;
@@ -1272,7 +1272,7 @@ TYPE
 
 		profile: BOOLEAN;
 		profileId, profileInit: IntermediateCode.Section;
-		profileInitPatchPosition: LONGINT;
+		profileInitPatchPosition: SIZE;
 		numberProcedures: LONGINT;
 		procedureResultDesignator : SyntaxTree.Designator;
 		operatorInitializationCodeSection: IntermediateCode.Section;
@@ -1288,7 +1288,7 @@ TYPE
 		NeedDescriptor : BOOLEAN;
 
 		cooperativeSwitches: BOOLEAN;
-		lastSwitchPC: LONGINT;
+		lastSwitchPC: SIZE;
 
 		isUnchecked: BOOLEAN;
 		isUntracked: BOOLEAN;
@@ -3524,7 +3524,7 @@ TYPE
 		END CallResetProcedure;
 
 		PROCEDURE ResetVariables (scope: SyntaxTree.ProcedureScope);
-		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter; previousScope: SyntaxTree.Scope; prevOffset: SIZE; pc: LONGINT;
+		VAR variable: SyntaxTree.Variable; parameter: SyntaxTree.Parameter; previousScope: SyntaxTree.Scope; prevOffset, pc: SIZE;
 
 			PROCEDURE Reset (symbol: SyntaxTree.Symbol);
 			VAR operand: Operand;
@@ -9513,7 +9513,7 @@ TYPE
 		VAR dereferenced: IntermediateCode.Operand; arrayDataOffset: LONGINT;
 
 			PROCEDURE NilCheck(CONST op: IntermediateCode.Operand);
-			VAR label: Label; pc: LONGINT;
+			VAR label: Label; pc: SIZE;
 			BEGIN
 				IF backend.cooperative & ~isUnchecked THEN
 					pc := section.pc;
@@ -9617,7 +9617,7 @@ TYPE
 
 		PROCEDURE DesignateSelfDesignator(x: SyntaxTree.SelfDesignator; VAR result: Operand);
 		VAR basereg: IntermediateCode.Operand; scope: SyntaxTree.Scope; dest: IntermediateCode.Operand;
-			moduleSection: IntermediateCode.Section; moduleOffset, parametersSize: LONGINT;
+			moduleSection: IntermediateCode.Section; moduleOffset: SIZE; parametersSize: LONGINT;
 			name: Basic.SegmentedName;
 			procedure: SyntaxTree.Procedure;
 			procedureType: SyntaxTree.ProcedureType;
@@ -10586,7 +10586,7 @@ TYPE
 		END Assign;
 
 		PROCEDURE EmitCooperativeSwitch;
-		VAR quantum, offset, zero: IntermediateCode.Operand; skip: Label; pc: LONGINT;
+		VAR quantum, offset, zero: IntermediateCode.Operand; skip: Label; pc: SIZE;
 		BEGIN
 			ASSERT (cooperativeSwitches);
 			pc := section.pc;
@@ -11234,7 +11234,7 @@ TYPE
 		END StatementSequence;
 
 		PROCEDURE PushSelfPointer;
-		VAR scope: SyntaxTree.Scope;  op: Operand; moduleSection: IntermediateCode.Section; moduleOffset, parametersSize: LONGINT; procedure: SyntaxTree.Procedure;
+		VAR scope: SyntaxTree.Scope;  op: Operand; moduleSection: IntermediateCode.Section; moduleOffset: SIZE; parametersSize: LONGINT; procedure: SyntaxTree.Procedure;
 			procedureType: SyntaxTree.ProcedureType;
 		BEGIN
 			scope := currentScope;
@@ -11649,8 +11649,8 @@ TYPE
 		moduleNamePoolSection: IntermediateCode.Section;
 		modulePointerSection: IntermediateCode.Section;
 		modulePointerSizePC: SIZE;
-		modulePointerSectionOffset: LONGINT;
-		modulePointers: LONGINT;
+		modulePointerSectionOffset: SIZE;
+		modulePointers: SIZE;
 
 		simple: BOOLEAN; (* simple = no module loading, no reflection *)
 
@@ -11660,8 +11660,8 @@ TYPE
 		TypeTags: LONGINT; (* type extension level support *)
 		TypeRecordBaseOffset: LONGINT; (* offset of type zero offset (without method entries) *)
 
-		patchInfoPC: LONGINT;
-		patchCRC: LONGINT;
+		patchInfoPC: SIZE;
+		patchCRC: SIZE;
 	CONST
 		EmptyBlockOffset = 2;
 
@@ -11699,7 +11699,7 @@ TYPE
 		END InitMetaDataGenerator;
 
 		PROCEDURE SetModule(module: Sections.Module);
-		VAR namePoolOffset,  offset: LONGINT; name: Basic.SegmentedName;
+		VAR namePoolOffset: SIZE; offset: LONGINT; name: Basic.SegmentedName;
 		BEGIN
 			SELF.module := module;
 			Global.GetModuleName(module.module,moduleName);
@@ -11722,7 +11722,7 @@ TYPE
 			END;
 		END SetModule;
 
-		PROCEDURE AddPointer(section: IntermediateCode.Section; offset: LONGINT);
+		PROCEDURE AddPointer(section: IntermediateCode.Section; offset: SIZE);
 		BEGIN
 			IF ~implementationEmitter.backend.cooperative THEN
 				NamedSymbol(modulePointerSection, section.name, NIL, offset, 0);
@@ -11843,7 +11843,7 @@ TYPE
 			section.PatchOperands(pc,op,noOperand,noOperand);
 		END PatchSize;
 
-		PROCEDURE PatchLongint(section: IntermediateCode.Section; pc: LONGINT; value: LONGINT);
+		PROCEDURE PatchLongint(section: IntermediateCode.Section; pc: SIZE; value: LONGINT);
 		VAR op,noOperand: IntermediateCode.Operand;
 		BEGIN
 			IntermediateCode.InitOperand(noOperand);
@@ -11851,7 +11851,7 @@ TYPE
 			section.PatchOperands(pc,op,noOperand,noOperand);
 		END PatchLongint;
 
-		PROCEDURE PatchSymbol(section: IntermediateCode.Section; pc: LONGINT; name: Basic.SegmentedName; symbol: SyntaxTree.Symbol; virtualOffset, realOffset: LONGINT);
+		PROCEDURE PatchSymbol(section: IntermediateCode.Section; pc: SIZE; name: Basic.SegmentedName; symbol: SyntaxTree.Symbol; virtualOffset: SIZE; realOffset: LONGINT);
 		VAR op, noOperand: IntermediateCode.Operand;
 		BEGIN
 			IntermediateCode.InitOperand(noOperand);
@@ -11901,7 +11901,7 @@ TYPE
 			section.Emit(Data(Basic.invalidPosition,op));
 		END NamedSymbol;
 
-		PROCEDURE NamedSymbolAt(section: IntermediateCode.Section; pc: LONGINT; name: Basic.SegmentedName; symbol: SyntaxTree.Symbol; virtualOffset: SIZE; realOffset: LONGINT);
+		PROCEDURE NamedSymbolAt(section: IntermediateCode.Section; pc: SIZE; name: Basic.SegmentedName; symbol: SyntaxTree.Symbol; virtualOffset: SIZE; realOffset: LONGINT);
 		VAR op: IntermediateCode.Operand;
 		BEGIN
 			IntermediateCode.InitAddress(op, IntermediateCode.GetType(module.system, module.system.addressType), name,implementationEmitter.GetFingerprint(symbol), virtualOffset);
@@ -12058,7 +12058,7 @@ TYPE
 			RETURN position;
 		END DynamicName;
 
-		PROCEDURE NamedBlock(CONST mName, typeName: ARRAY OF CHAR; name: Basic.SegmentedName; VAR offset: LONGINT): IntermediateCode.Section;
+		PROCEDURE NamedBlock(CONST mName, typeName: ARRAY OF CHAR; name: Basic.SegmentedName; VAR offset: SIZE): IntermediateCode.Section;
 		VAR section: IntermediateCode.Section;
 		BEGIN
 			section := IntermediateCode.NewSection(module.allSections, Sections.ConstSection, name, NIL, declarationEmitter.dump);
@@ -12088,7 +12088,7 @@ TYPE
 			RETURN section
 		END NamedBlock;
 
-		PROCEDURE Block(CONST mName, typeName, suffix: ARRAY OF CHAR; VAR offset: LONGINT): IntermediateCode.Section;
+		PROCEDURE Block(CONST mName, typeName, suffix: ARRAY OF CHAR; VAR offset: SIZE): IntermediateCode.Section;
 		VAR name: ARRAY 128 OF CHAR; pooledName: Basic.SegmentedName;
 		BEGIN
 			COPY(moduleName,name);
@@ -12145,7 +12145,7 @@ TYPE
 			sectionArray: POINTER TO ARRAY OF Sections.Section;
 			poolMap: Basic.HashTableInt;
 			namePool: IntermediateCode.Section;
-			namePoolOffset: LONGINT;
+			namePoolOffset: SIZE;
 
 			PROCEDURE Compare(VAR s1, s2: Sections.Section): BOOLEAN;
 			VAR n1, n2: Basic.SectionName; index: LONGINT; ch1, ch2: CHAR;
@@ -12203,7 +12203,7 @@ TYPE
 				fingerprinter: Fingerprinter.Fingerprinter;
 				symbol: Sections.Section;
 				name: StringPool.Index;
-				VAR patchAdr: LONGINT
+				VAR patchAdr: SIZE
 				): BOOLEAN;
 			VAR fingerprint: SyntaxTree.Fingerprint;
 			BEGIN
@@ -12240,16 +12240,16 @@ TYPE
 			PROCEDURE Export(CONST sections: ARRAY OF Sections.Section);
 			VAR level, olevel, s: LONGINT; prev, this: Basic.SegmentedName; name: ARRAY 256 OF CHAR;
 				scopes: ARRAY LEN(prev)+1 OF Scope; arrayName: ARRAY 32 OF CHAR;
-				sym: Sections.Section; offset: LONGINT; symbol: Sections.Section;
-				nextPatch: LONGINT;
+				sym: Sections.Section; offset: SIZE; symbol: Sections.Section;
+				nextPatch: SIZE;
 			TYPE
 				Scope = RECORD
 					elements: LONGINT;
 					gelements: LONGINT;
 					section: IntermediateCode.Section;
-					patchAdr: LONGINT;
+					patchAdr: SIZE;
 					arraySizePC: SIZE;
-					beginPC: LONGINT; (* current scope start pc *)
+					beginPC: SIZE; (* current scope start pc *)
 				END;
 			BEGIN
 				Basic.InitSegmentedName(prev);
@@ -13192,7 +13192,7 @@ TYPE
 		END MakeProcedureDescriptorTag;
 
 		PROCEDURE ProcedureDescriptorPointer(section: IntermediateCode.Section; procedureSection: IntermediateCode.Section);
-		VAR dest: IntermediateCode.Section; name: Basic.SegmentedName;  offset: LONGINT;
+		VAR dest: IntermediateCode.Section; name: Basic.SegmentedName;  offset: SIZE;
 		BEGIN
 			name := procedureSection.name;
 			Basic.SuffixSegmentedName(name, Basic.MakeString("@Descriptor"));
@@ -13400,7 +13400,7 @@ TYPE
 			typeInfoSection, procTableSection,  referenceSection : IntermediateCode.Section;
 			emptyArraySectionOffset, pointerSectionOffset, importSectionOffset,
 			exceptionSectionOffset, commandsSectionOffset, typeInfoSectionOffset, procTableSectionOffset,
-			referenceSectionOffset	: LONGINT;
+			referenceSectionOffset	: SIZE;
 			name: Basic.SegmentedName; offset: LONGINT;
 			numberPointers, numberProcs, temp: SIZE;
 			flags: SET;
@@ -13552,7 +13552,7 @@ TYPE
 			tir, tdInfo: IntermediateCode.Section; td: SyntaxTree.TypeDeclaration;
 			section: Sections.Section; cellType: SyntaxTree.CellType;
 
-			PROCEDURE NewTypeDescriptorInfo(tag: Sections.Section; offset: LONGINT; isProtected: BOOLEAN): IntermediateCode.Section;
+			PROCEDURE NewTypeDescriptorInfo(tag: Sections.Section; offset: SIZE; isProtected: BOOLEAN): IntermediateCode.Section;
 			VAR name: Basic.SegmentedName;source: IntermediateCode.Section;
 				moduleSection: IntermediateCode.Section; i: LONGINT; flags: SET;
 				sectionName: Basic.SectionName;
@@ -13607,7 +13607,7 @@ TYPE
 			VAR name: Basic.SegmentedName; op: IntermediateCode.Operand; source, base: IntermediateCode.Section;
 				procedure: SyntaxTree.Procedure; baseRecord: SyntaxTree.RecordType;
 				baseTD: SyntaxTree.TypeDeclaration; sym: SyntaxTree.Symbol;
-				numberPointers: SIZE;  padding, i: LONGINT;
+				numberPointers, padding, i: SIZE;
 
 			CONST MPO=-40000000H;
 
@@ -14111,15 +14111,15 @@ TYPE
 	VAR int8-, int16-, int32-, int64-, uint8-, uint16-, uint32-, uint64-, float32-, float64-: IntermediateCode.Type;
 		emptyOperand: IntermediateCode.Operand;
 		systemCalls: ARRAY NumberSystemCalls OF SyntaxTree.Symbol;
-		statCoopResetVariables: LONGINT;
-		statCoopModifyAssignments: LONGINT;
-		modifyAssignmentsPC : LONGINT;
-		statCoopNilCheck: LONGINT;
-		statCoopSwitch: LONGINT;
-		statCoopAssignProcedure: LONGINT;
-		statCoopTraceMethod: LONGINT;
-		statCoopResetProcedure: LONGINT;
-		statCoopTraceModule: LONGINT;
+		statCoopResetVariables: SIZE;
+		statCoopModifyAssignments: SIZE;
+		modifyAssignmentsPC : SIZE;
+		statCoopNilCheck: SIZE;
+		statCoopSwitch: SIZE;
+		statCoopAssignProcedure: SIZE;
+		statCoopTraceMethod: SIZE;
+		statCoopResetProcedure: SIZE;
+		statCoopTraceModule: SIZE;
 		ResultDesignatorName: SyntaxTree.Identifier;
 
 	PROCEDURE ResetStatistics*;

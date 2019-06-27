@@ -11,7 +11,7 @@ TYPE
 	(* ----------------------------------- register allocation ------------------------------------- *)
 
 	AllocationArray=POINTER TO ARRAY OF RECORD
-		first, last: LONGINT;
+		first, last: SIZE;
 	END;
 
 	RegisterAllocation*=OBJECT
@@ -19,7 +19,7 @@ TYPE
 		table: AllocationArray;
 
 		PROCEDURE &Init;
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			IF table = NIL THEN NEW(table,64) END;
 			FOR i := 0 TO LEN(table)-1 DO
@@ -29,7 +29,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Grow;
-		VAR new: AllocationArray; i: LONGINT;
+		VAR new: AllocationArray; i: SIZE;
 		BEGIN
 			NEW(new,LEN(table)*2);
 			FOR i := 0 TO LEN(table)-1 DO
@@ -42,7 +42,7 @@ TYPE
 			table := new;
 		END Grow;
 
-		PROCEDURE Use(register, pc: LONGINT);
+		PROCEDURE Use(register: WORD; pc: SIZE);
 		BEGIN
 			IF LEN(table) <= register THEN Grow END;
 			IF table[register].first >pc THEN table[register].first := pc END;
@@ -109,7 +109,7 @@ TYPE
 		module-: Sections.Module;
 		dump*: Streams.Writer;
 		in-: IntermediateCode.Section; out-: BinaryCode.Section;
-		inPC-, outPC-: LONGINT;
+		inPC-, outPC-: SIZE;
 
 		error* : BOOLEAN;
 		allocation: RegisterAllocation;
@@ -147,7 +147,7 @@ TYPE
 
 		(* generic *)
 		PROCEDURE Section*(in: IntermediateCode.Section; out: BinaryCode.Section);
-		VAR pc: LONGINT; name: Basic.SectionName; instruction: IntermediateCode.Instruction;
+		VAR pc: SIZE; name: Basic.SectionName; instruction: IntermediateCode.Instruction;
 			moduleName, procedureName: SyntaxTree.IdentifierString;
 
 			PROCEDURE ResolveLocalFixups;
@@ -193,7 +193,7 @@ TYPE
 			END ResolveLocalFixups;
 
 			PROCEDURE GetRegisterAllocation;
-			VAR pc: LONGINT;
+			VAR pc: SIZE;
 
 				PROCEDURE Use(CONST operand: IntermediateCode.Operand);
 				BEGIN
@@ -221,7 +221,7 @@ TYPE
 			TYPE
 				Entry= POINTER TO RECORD src, dest: LONGINT; next: Entry END;
 			VAR
-				pc: LONGINT;
+				pc: SIZE;
 				first: Entry;
 
 				PROCEDURE AddMap(src, dest: LONGINT);
@@ -443,12 +443,12 @@ TYPE
 			ResolveLocalFixups;
 		END Section;
 
-		PROCEDURE FirstUse*(virtualRegister: LONGINT): LONGINT;
+		PROCEDURE FirstUse*(virtualRegister: LONGINT): SIZE;
 		BEGIN
 			IF (virtualRegister > 0)  THEN RETURN allocation.table[virtualRegister].first ELSE RETURN None END;
 		END FirstUse;
 
-		PROCEDURE LastUse*(virtualRegister: LONGINT): LONGINT;
+		PROCEDURE LastUse*(virtualRegister: LONGINT): SIZE;
 		BEGIN
 			IF (virtualRegister > 0)  THEN RETURN allocation.table[virtualRegister].last ELSE RETURN None END;
 		END LastUse;
@@ -542,7 +542,7 @@ TYPE
 		next-: Ticket;
 		type-: IntermediateCode.Type;
 		class-: IntermediateCode.RegisterClass;
-		lastuse-: LONGINT;
+		lastuse-: SIZE;
 		spilled*, spillable*: BOOLEAN;
 		register*, offset*: LONGINT;
 		parts-: LONGINT;
@@ -559,7 +559,7 @@ TYPE
 		END Init;
 
 		(* enter a new ticket into the list of live tickets, sorted by lastuse *)
-		PROCEDURE Enter*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; spillable, spilled: BOOLEAN; offset: LONGINT; lastuse: LONGINT): Ticket;
+		PROCEDURE Enter*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; spillable, spilled: BOOLEAN; offset: LONGINT; lastuse: SIZE): Ticket;
 		VAR ticket,link: Ticket;
 		BEGIN
 			ASSERT(~spilled & (register # None) OR spilled & (offset # None));
@@ -1002,7 +1002,7 @@ TYPE
 			RETURN tempReg
 		END ForceFreeRegister;
 
-		PROCEDURE ReservePhysicalRegister*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; lastUse: LONGINT): Ticket;
+		PROCEDURE ReservePhysicalRegister*(CONST class: IntermediateCode.RegisterClass; CONST type: IntermediateCode.Type; register: LONGINT; lastUse: SIZE): Ticket;
 		VAR ticket: Ticket;
 		BEGIN
 			ticket := tickets.Enter(class, type,register,TRUE, FALSE,None,lastUse);
@@ -1029,9 +1029,9 @@ TYPE
 		(*-------------------  register mapping  ----------------------*)
 
 		PROCEDURE MapVirtualRegister*(virtualRegister: LONGINT; class: IntermediateCode.RegisterClass; type: IntermediateCode.Type; part: LONGINT);
-		VAR partType: IntermediateCode.Type; lastuse:LONGINT;
+		VAR partType: IntermediateCode.Type; lastuse:SIZE;
 
-			PROCEDURE MapTicket(CONST type: IntermediateCode.Type; lastuse:LONGINT);
+			PROCEDURE MapTicket(CONST type: IntermediateCode.Type; lastuse:SIZE);
 			VAR index,offset,size: LONGINT; ticket: Ticket;
 			BEGIN
 				index := physicalRegisters.NextFree(type);

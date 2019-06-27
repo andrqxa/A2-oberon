@@ -3637,7 +3637,7 @@ TYPE
 							displacement := TODO(resolved.pc);
 						ELSIF (symbolOffset # 0) THEN
 							ASSERT(in.pc > symbolOffset);
-							displacement := in.instructions[symbolOffset].pc;
+							displacement := TODO(in.instructions[symbolOffset].pc);
 						ELSE
 							displacement := 0;
 						END;
