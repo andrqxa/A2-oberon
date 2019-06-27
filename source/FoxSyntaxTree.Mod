@@ -1023,10 +1023,10 @@ TYPE
 	(** string literal type **)
 	StringType*= OBJECT(Type)
 	VAR
-		length-: LONGINT;
+		length-: SIZE;
 		baseType-: Type;
 
-		PROCEDURE & InitStringType(position: Position; baseType: Type; length: LONGINT);
+		PROCEDURE & InitStringType(position: Position; baseType: Type; length: SIZE);
 		BEGIN
 			InitType(position);
 			SetRealtime(TRUE);
@@ -1034,7 +1034,7 @@ TYPE
 			SELF.baseType := baseType;
 		END InitStringType;
 
-		PROCEDURE SetLength*(length: LONGINT);
+		PROCEDURE SetLength*(length: SIZE);
 		BEGIN SELF.length := length
 		END SetLength;
 
@@ -2599,7 +2599,7 @@ TYPE
 	StringValue* = OBJECT (Value)
 		VAR
 			value-: String;
-			length-: LONGINT;
+			length-: SIZE;
 
 		PROCEDURE & InitStringValue(position: Position; value: String);
 		BEGIN
@@ -2625,7 +2625,7 @@ TYPE
 				SELF.value := new
 			END;
 			Strings.Append(SELF.value^, value^);
-			length := TODO(len)
+			length := len;
 		END Append;
 
 		PROCEDURE AppendChar*(CONST ch: CHAR);
@@ -5269,7 +5269,7 @@ VAR
 		NEW(typeDeclaration,position,name); RETURN typeDeclaration
 	END NewTypeDeclaration;
 
-	PROCEDURE NewStringType*( position: Position; baseType: Type; length: LONGINT): StringType;
+	PROCEDURE NewStringType*( position: Position; baseType: Type; length: SIZE): StringType;
 	VAR stringType: StringType;
 	BEGIN
 		NEW( stringType, position, baseType, length);  RETURN stringType;

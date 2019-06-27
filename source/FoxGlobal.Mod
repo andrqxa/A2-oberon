@@ -631,7 +631,7 @@ TYPE
 				END;
 			ELSIF type IS SyntaxTree.StringType THEN
 				ASSERT(SyntaxTree.Resolved IN type.state);
-				size := type(SyntaxTree.StringType).length * SizeOf(type(SyntaxTree.StringType).baseType);
+				size := TODO(type(SyntaxTree.StringType).length) * SizeOf(type(SyntaxTree.StringType).baseType);
 			ELSIF type IS SyntaxTree.EnumerationType THEN
 				size := addressSize
 			ELSIF type = SyntaxTree.invalidType THEN size := 0

@@ -5337,7 +5337,7 @@ TYPE
 						(*! parameter alignment to be discussed ... *)
 
 						IF type IS SyntaxTree.StringType THEN (* source potentially shorter than destination *)
-							size := type(SyntaxTree.StringType).length;
+							size := TODO(type(SyntaxTree.StringType).length);
 						END;
 						IF backend.cooperative & parameter.NeedsTrace() THEN
 							dst := NewRegisterOperand (addressType);
@@ -9735,7 +9735,7 @@ TYPE
 		END DesignateMathArrayValue;
 
 		PROCEDURE DesignateStringValue(x: SyntaxTree.StringValue; VAR result: Operand);
-		VAR  i: LONGINT; name: Basic.SegmentedName;
+		VAR  i: SIZE; name: Basic.SegmentedName;
 			irv: IntermediateCode.Section; op: IntermediateCode.Operand;
 			const: SyntaxTree.Constant;
 		BEGIN
