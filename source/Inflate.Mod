@@ -289,8 +289,8 @@ MODULE Inflate; (** AUTHOR "ejz"; PURPOSE "Aos inflate stream"; *)
 								CopyData(win^)
 							END;
 							input.Bytes(win.data, win.in, i, length);
-							DEC(l, TODO(length)); INC(win.size, TODO(length));
-							win.in := (win.in + TODO(length)) MOD WindowSize
+							DEC(l, length(LONGINT)); INC(win.size, length(LONGINT));
+							win.in := (win.in + length(LONGINT)) MOD WindowSize
 						END
 					ELSIF bits < 3 THEN (* compressed *)
 						IF bits = 2 THEN

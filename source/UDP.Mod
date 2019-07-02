@@ -200,11 +200,11 @@ TYPE
 		BEGIN
 			(* set UDP header *)
 			Network.PutNet2(hdr, 2, fport); (* foreign port *)
-			Network.PutNet2(hdr, 4, TODO(len)+UDPHdrLen); (* UPD length *)
+			Network.PutNet2(hdr, 4, (len+UDPHdrLen)(LONGINT)); (* UPD length *)
 			Network.Put2(hdr, 6, 0); (* checksum := 0 *)
 			IF ~(Network.ChecksumUDP IN int.dev.calcChecksum) THEN
 				(* set pseudo header *)
-				pseudoHdrLen := int.WritePseudoHeader(pseudoHdr, int.localAdr, fip, IPTypeUDP, TODO(len+UDPHdrLen));
+				pseudoHdrLen := int.WritePseudoHeader(pseudoHdr, int.localAdr, fip, IPTypeUDP, (len+UDPHdrLen)(LONGINT));
 
 				sum := IP.Checksum1(pseudoHdr, 0, pseudoHdrLen, 0);
 				sum := IP.Checksum1(hdr, 0, UDPHdrLen, sum);
@@ -212,7 +212,7 @@ TYPE
 
 				Network.Put2(hdr, 6, sum); (* checksum := sum *)
 			END;
-			int.Send(IPTypeUDP, fip, hdr, data, UDPHdrLen, TODO(ofs), TODO(len), IP.MaxTTL);
+			int.Send(IPTypeUDP, fip, hdr, data, UDPHdrLen, ofs(LONGINT), len(LONGINT), IP.MaxTTL);
 		END DoSend;
 
 

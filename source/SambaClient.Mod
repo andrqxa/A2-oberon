@@ -571,7 +571,7 @@ TYPE
 	 			IF len > RWLimit THEN
 	 				adjLen := RWLimit;
 	 			ELSE
-	 				adjLen := SHORT(TODO(len));
+	 				adjLen := len(INTEGER);
 	 			END;
 
 			 	(* Send *)

@@ -130,11 +130,11 @@ TYPE
 			window := SELF;
 
 			channelList.model.Acquire;
-			channelList.model.SetNofRows(TODO(nofChannels));
+			channelList.model.SetNofRows(nofChannels(LONGINT));
 			FOR i := 0 TO nofChannels-1 DO
 				channel := TVChannels.channels.GetItem(i);
-				channelList.model.SetCellText(0, TODO(i), Strings.NewString(channel.name));
-				channelList.model.SetCellData(0, TODO(i), channel);
+				channelList.model.SetCellText(0, LONGINT(i), Strings.NewString(channel.name));
+				channelList.model.SetCellData(0, LONGINT(i), channel);
 			END;
 			channelList.model.Release;
 			channelList.Invalidate;

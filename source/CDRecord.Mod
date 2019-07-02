@@ -152,10 +152,10 @@ TYPE
 		PROCEDURE InitTrack;
 		BEGIN
 			padding := 0;
-			nofsecs := TODO(file.Length()) DIV secsize;
+			nofsecs := file.Length()(LONGINT) DIV secsize;
 			IF file.Length() MOD secsize # 0 THEN
 				INC(nofsecs);
-				padding := secsize - (TODO(file.Length()) MOD secsize);
+				padding := secsize - (file.Length()(LONGINT) MOD secsize);
 			END;
 			IF nofsecs < MinTrackSize THEN
 				INC(padding, (MinTrackSize - nofsecs) * secsize);
@@ -707,7 +707,7 @@ TYPE
 			timestamp := Kernel.GetTicks ();
 
 			REPEAT
-				count := TODO(reader.GetBuffer(buf));
+				count := reader.GetBuffer(buf)(LONGINT);
 				nofBlocks := count DIV track.secsize;
 
 				res := Write(op, startSec, nofBlocks, ADDRESSOF(buf^));

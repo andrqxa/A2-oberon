@@ -448,7 +448,7 @@ TYPE
 					ADDRESSOF(playBufferList[playCurrentBufferIndex].data[0]), BufferSize);
 
 				noOfSamples := LSH(playBufferList[playCurrentBufferIndex].len, -1);
-				DMAOut[playLastValidIndex].CmdAndLength := TODO(noOfSamples);
+				DMAOut[playLastValidIndex].CmdAndLength := noOfSamples(LONGINT);
 				SetBit(DMAOut[playLastValidIndex].CmdAndLength, 31);
 
 				NABMBAR.RegWrite8(BMROutBase + BMRLastValidIndexReg, playLastValidIndex)
