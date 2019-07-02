@@ -69,7 +69,7 @@ TYPE
 			IF (fip.usedProtocol = IP.IPv4) THEN
 				SYSTEM.MOVE( ADDRESSOF( fip ), ADDRESSOF( sadr.sinAddr ), IPAdrLen );
 				sadr.sinFamily := WSock32.PFINet;  sadr.sinPort := WSock32.htons( SHORT( fport ) );
-				winRes := WSock32.sendto( sock, data[ofs], len(LONGINT), 0, sadr, SIZEOF( WSock32.sockaddrIn ) );
+				winRes := WSock32.sendto( sock, data[ofs], len(WORD), {}, sadr, SIZEOF( WSock32.sockaddrIn ) );
 				(* account that sendto returns number of bytes sent to the socket (Alexey) *)
 				IF winRes = len THEN res := Ok; ELSE err := WSock32.WSAGetLastError(); res := unknown;  END;
 			ELSE res := unknown;
@@ -127,7 +127,7 @@ TYPE
 			END;
 
 			IF avail THEN
-				len := WSock32.recvfrom( sock, data[ofs], size(LONGINT), 0, sadr, l );
+				len := WSock32.recvfrom( sock, data[ofs], size(WORD), {}, sadr, l );
 				IF len < 0 THEN err := WSock32.WSAGetLastError(); (*  AosWinsock.DispError( err ); *)  res := unknown;
 				ELSE res := Ok;
 				END;
