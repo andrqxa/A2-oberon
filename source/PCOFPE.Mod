@@ -118,7 +118,7 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 		ExportFPList = POINTER TO ARRAY OF LONGINT;
 
 		SectionReader = OBJECT (Streams.Reader)
-			VAR sect: Section; org, ofs: LONGINT;
+			VAR sect: Section; org, ofs: SIZE;
 
 			PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 			BEGIN
@@ -126,7 +126,7 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 				IF len > 0 THEN
 					IF len > size THEN len := size END;
 					SYSTEM.MOVE(ADDRESSOF(sect.data[SELF.ofs]), ADDRESSOF(buf[ofs]), len);
-					INC(SELF.ofs, TODO(len))
+					INC(SELF.ofs, len)
 				END;
 				IF len < min THEN
 					res := Streams.EOF
@@ -143,7 +143,7 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 			PROCEDURE SetPos*(ofs: Streams.Position);
 			BEGIN
 				Reset();
-				SELF.org := TODO(ofs); SELF.ofs := TODO(ofs)
+				SELF.org := SIZE(ofs); SELF.ofs := SIZE(ofs)
 			END SetPos;
 
 			PROCEDURE &Open*(sect: Section; ofs: LONGINT);
@@ -159,9 +159,9 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 			PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
 			BEGIN
 				res := Streams.Ok; IF len <= 0 THEN RETURN END;
-				IF (SELF.ofs + len) > sect.len THEN sect.Resize(SELF.ofs + TODO(len)) END;
+				IF (SELF.ofs + len) > sect.len THEN sect.Resize(SELF.ofs + len(LONGINT)) END;
 				SYSTEM.MOVE(ADDRESSOF(buf[ofs]), ADDRESSOF(sect.data[SELF.ofs]), len);
-				INC(SELF.ofs, TODO(len));
+				INC(SELF.ofs, len(LONGINT));
 				IF SELF.ofs > sect.used THEN sect.used := SELF.ofs END
 			END Send;
 
@@ -173,7 +173,7 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 			PROCEDURE SetPos*(ofs: Streams.Position);
 			BEGIN
 				Update(); Reset();
-				SELF.org := TODO(ofs); SELF.ofs := TODO(ofs)
+				SELF.org := ofs(LONGINT); SELF.ofs := ofs(LONGINT);
 			END SetPos;
 
 			PROCEDURE &Open*(sect: Section; ofs: LONGINT);
@@ -957,7 +957,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 
 			PROCEDURE WriteType(W: SectionWriter; rec: PCT.Record);
 				VAR
-					size: PCBT.RecSize; pos, i, oldmth: LONGINT; base: PCT.Record; m: PCT.Method;
+					size: PCBT.RecSize; pos, i: Streams.Position; oldmth: LONGINT; base: PCT.Record; m: PCT.Method;
 					adr: PCBT.Method; bsym: PCOM.Struct; name, name2: Name;
 					basenr: INTEGER; baseid, nofptrs: LONGINT;
 			BEGIN
@@ -992,7 +992,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				W.RawInt(SHORT(size.nofMethods));	(*NofMethods*)
 				W.RawInt(SHORT(oldmth));	(*InheritedMethods*)
 				W.RawInt(SHORT(size.nofLocalMethods));	(*NewMethods*)
-				pos := TODO(W.Pos());
+				pos := W.Pos();
 				W.RawInt(0);
 				W.RawString(name);
 
@@ -1008,12 +1008,12 @@ ASSERT(code.data[offset-1] # 0E8X);
 				ASSERT(i = size.nofLocalMethods, 500);	(*sanity check*)
 
 				(* Ptrs in Record *)
-				i := TODO(W.Pos());
+				i := W.Pos();
 				PtrAdr(W, 0, rec, FALSE);
-				nofptrs := (TODO(W.Pos()) - i) DIV 4;
+				nofptrs := (W.Pos() - i)(LONGINT) DIV 4;
 				IF nofptrs > MAX(INTEGER) THEN PCM.Error(221, PCM.InvalidPosition, "") END;
 				IF nofptrs # 0 THEN
-					i := TODO(W.Pos()); W.SetPos(pos);
+					i := W.Pos(); W.SetPos(pos);
 					W.RawInt(SHORT(nofptrs));
 					W.SetPos(i)
 				END
@@ -1087,7 +1087,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				W.RawLInt(0);
 				AddOfsReloc(type, W.Pos(), edata);
 				W.RawLInt(0);
-				desc.iatfix := TODO(W.Pos());
+				desc.iatfix := W.Pos()(LONGINT);
 				sect := sects;
 				WHILE sect # NIL DO
 					r := sect.imports;
@@ -1216,10 +1216,10 @@ ASSERT(code.data[offset-1] # 0E8X);
 				WHILE i < SIZEOF(ImageImportDescriptor) DO
 					W.Char(0X); INC(i)
 				END;
-				optHdr.DataDirectory[ImageDirectoryEntryImport].Size := TODO(W.Pos());
+				optHdr.DataDirectory[ImageDirectoryEntryImport].Size := W.Pos()(LONGINT);
 				mod := imports;
 				WHILE mod # NIL DO
-					mod.desc.Characteristics := TODO(W.Pos());
+					mod.desc.Characteristics := W.Pos()(LONGINT);
 					obj := mod.objs;
 					WHILE obj # NIL DO
 						W.RawLInt(0); obj := obj.next
@@ -1231,7 +1231,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				optHdr.DataDirectory[ImageDirectoryEntryIAT].VirtualAddress := base + TODO(ofs);
 				mod := imports;
 				WHILE mod # NIL DO
-					mod.desc.FirstThunk := TODO(W.Pos());
+					mod.desc.FirstThunk := W.Pos()(LONGINT);
 					obj := mod.objs;
 					WHILE obj # NIL DO
 						W.RawLInt(0); obj := obj.next
@@ -1305,23 +1305,23 @@ ASSERT(code.data[offset-1] # 0E8X);
 				dir.AddressOfNameOrdinals := 0;
 				W := edata.W; W.SetPos(0);
 				WriteImageExportDirectory(W, dir);
-				dir.AddressOfFunctions := base + TODO(W.Pos());
+				dir.AddressOfFunctions := base + W.Pos()(LONGINT);
 				e := exports;
 				WHILE e # NIL DO
 					W.RawLInt(e.sect.head.VirtualAddress + e.ofs);
 					e := e.next
 				END;
-				dir.AddressOfNames := base + TODO(W.Pos());
+				dir.AddressOfNames := base + W.Pos()(LONGINT);
 				fix := W.Pos(); i := 0;
 				WHILE i < n DO
 					W.RawLInt(0); INC(i)
 				END;
-				dir.AddressOfNameOrdinals := base + TODO(W.Pos());
+				dir.AddressOfNameOrdinals := base + W.Pos()(LONGINT);
 				i := 0;
 				WHILE i < n DO
 					W.RawInt(SHORT(i)); INC(i)
 				END;
-				dir.Name := base + TODO(W.Pos());
+				dir.Name := base + W.Pos()(LONGINT);
 				PutName(W, name);
 				e := exports;
 				WHILE e # NIL DO
@@ -1430,9 +1430,9 @@ KernelLog.String("PCOFPE "); KernelLog.String(file);
 				F := Files.New(file);
 				Files.OpenWriter(W, F, 0);
 				W.RawInt(ImageDosSignature);
-				i := TODO(W.Pos()); WHILE i < 60 DO W.Char(0X); INC(i) END;
+				i := W.Pos()(LONGINT); WHILE i < 60 DO W.Char(0X); INC(i) END;
 				W.RawLInt(128);
-				i := TODO(W.Pos()); WHILE i < 128 DO W.Char(0X); INC(i) END;
+				i := W.Pos()(LONGINT); WHILE i < 128 DO W.Char(0X); INC(i) END;
 				size := 128 + 4 + SIZEOF(ImageFileHeader) + SIZEOF(ImageOptionalHeader) + SELF.fileHdr.NumberOfSections*SIZEOF(ImageSectionHeader);
 				size := Align(size, DefaultFileAlign);
 				SELF.optHdr.SizeOfHeaders := size;
@@ -1467,7 +1467,7 @@ KernelLog.String("PCOFPE "); KernelLog.String(file);
 					WriteImageSectionHeader(W, sect.head);
 					sect := sect.next
 				END;
-				i := TODO(W.Pos()); WHILE i < SELF.optHdr.SizeOfHeaders DO W.Char(0X); INC(i) END;
+				i := W.Pos()(LONGINT); WHILE i < SELF.optHdr.SizeOfHeaders DO W.Char(0X); INC(i) END;
 				sect := SELF.sects;
 				WHILE sect # NIL DO
 					IF sect.head.SizeOfRawData > 0 THEN
