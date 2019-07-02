@@ -348,14 +348,14 @@ TYPE
 
 		(* Enumerate canonical file names. mask may contain * wildcards.  For internal use only.  End users use Enumerator instead. *)
 		PROCEDURE Enumerate(file: File; par: Parameter): BOOLEAN;
-		VAR name: Filename; len: LONGINT; flags: SET;
+		VAR name: Filename; len: Files.Size; flags: SET;
 		BEGIN
 			WITH par: EnumParam DO
 				UTF8Strings.UpperCase(file.long, name);
 				IF (par.mask = "") OR Strings.Match(par.mask, name) THEN
 					Strings.Concat(par.path, file.long, name);
 					IF (faDirectory IN file.attr) THEN len := 0; flags := { Files.Directory }
-					ELSE len := TODO(file.Length()); flags := {}
+					ELSE len := file.Length(); flags := {}
 					END;
 					par.enum.PutEntry(name, flags, file.writeTime, file.writeDate, len)
 				END;
@@ -1418,20 +1418,20 @@ TYPE
 
 		PROCEDURE WriteFileHeaderX(f: File);
 		VAR data: ARRAY 32 OF CHAR; b, ro, writeLast: BOOLEAN;
-			i, numFree, s, ucs: LONGINT; ofs, k, len: SIZE; unicode: ARRAY 256 OF INTEGER;
-			r: Files.Rider; c, chksum: CHAR;
+			ofs, i, k, len, numFree, s, ucs: LONGINT; unicode: ARRAY 256 OF INTEGER;
+			r: Files.Rider; c, chksum: CHAR; p: SIZE;
 		BEGIN
 			IF (faReadOnly IN attr) THEN EXCL(attr, faReadOnly); ro := TRUE END;
 			IF f.modName THEN
-				len := NameLength(f.long);
+				len := NameLength(f.long)(LONGINT);
 
 				(* delete old name *)
 				IF (len > f.entry.len) THEN ofs := NotAssigned	(* new name is longer, find new position *)
 				ELSE ofs := f.entry.ofs											(* reuse old position *)
 				END;
 				RemoveFileHeaderX(f);
-				f.entry.ofs := TODO(ofs);
-				f.entry.len := TODO(len);
+				f.entry.ofs := ofs;
+				f.entry.len := len;
 				f.registered := TRUE;
 
 				IF (f.entry.ofs = NotAssigned) THEN (* find 'len' subsequent free entries *)
@@ -1441,13 +1441,13 @@ TYPE
 
 					numFree := 0;
 					WHILE ~r.eof & (numFree < len) DO
-						SetX(r, TODO(ofs)); ReadX(r, c);
+						SetX(r, ofs); ReadX(r, c);
 						IF (c = deFree) THEN
-							IF (f.entry.ofs = NotAssigned) THEN f.entry.ofs := TODO(ofs) END;
+							IF (f.entry.ofs = NotAssigned) THEN f.entry.ofs := ofs END;
 							INC(numFree)
 						ELSIF (c = deLast) THEN
-							IF (f.entry.ofs = NotAssigned) THEN f.entry.ofs := TODO(ofs) END;
-							numFree := TODO(len);
+							IF (f.entry.ofs = NotAssigned) THEN f.entry.ofs := ofs END;
+							numFree := len;
 							writeLast := TRUE
 						ELSE
 							f.entry.ofs := NotAssigned; numFree := 0
@@ -1473,9 +1473,9 @@ TYPE
 					GetShortName(f.long, f.short, chksum);
 
 					FOR i := 0 TO 255 DO unicode[i] := -1 END; (* = 0FFFFH *)
-					k := 0; i := 0;
+					p := 0; i := 0;
 					REPEAT
-						b := UTF8Strings.DecodeChar(f.long, k, ucs);
+						b := UTF8Strings.DecodeChar(f.long, p, ucs);
 						IF ~b OR (ucs < 0) OR (ucs > MAX(INTEGER)) THEN HALT(ErrInvalidFilename) END;
 						unicode[i] := SHORT(ucs); INC(i)
 					UNTIL (ucs = 0);
@@ -1487,9 +1487,9 @@ TYPE
 						data[13] := chksum;
 						FATVolumes.PutUnsignedInteger(data, 26, 0);
 						ofs := (len-2)*13;
-						FOR k := 0 TO 4 DO FATVolumes.PutUnsignedInteger(data, TODO(1+k*2), unicode[ofs+k]) END;
-						FOR k := 0 TO 5 DO FATVolumes.PutUnsignedInteger(data, TODO(14+k*2), unicode[ofs+5+k]) END;
-						FOR k := 0 TO 1 DO FATVolumes.PutUnsignedInteger(data, TODO(28+k*2), unicode[ofs+11+k]) END;
+						FOR k := 0 TO 4 DO FATVolumes.PutUnsignedInteger(data, 1+k*2, unicode[ofs+k]) END;
+						FOR k := 0 TO 5 DO FATVolumes.PutUnsignedInteger(data, 14+k*2, unicode[ofs+5+k]) END;
+						FOR k := 0 TO 1 DO FATVolumes.PutUnsignedInteger(data, 28+k*2, unicode[ofs+11+k]) END;
 						WriteBytesX(r, data, 0, 32);
 						IF (r.res # 0) THEN HALT(ErrIOError) END;
 						DEC(len)
@@ -1501,7 +1501,7 @@ TYPE
 			END;
 
 			(* create short entry *)
-			IF (faDirectory IN f.attr) THEN s := 0 ELSE s := TODO(f.Length()) END;
+			IF (faDirectory IN f.attr) THEN s := 0 ELSE s := f.Length()(LONGINT) END;
 			GetShortEntry(data, f.short, f.attr, f.NTres, f.cluster, s, f.time, f.date, f.writeTime, f.writeDate, f.accessDate);
 
 			(* wp: Pos(r) = position of short entry *)
@@ -1552,7 +1552,7 @@ TYPE
 						FOR i := 2 TO (dir.clusterSize DIV 32)-1 DO dir.WriteBytes(r, entry, 0, 32) END;
 
 						dir.Update;
-						res := TODO(r.res);
+						res := r.res(WORD);
 					ELSE dir := NIL	(* res is already set *)
 					END
 				ELSE
@@ -1734,7 +1734,7 @@ END PurgeFile;
 
 (* ValidateName - checks if 'name' is a valid long name and removes leading spaces and trailing spaces and periods *)
 PROCEDURE ValidateName(VAR name: ARRAY OF CHAR): BOOLEAN;
-VAR s: POINTER TO ARRAY OF CHAR; np, sp: LONGINT;
+VAR s: POINTER TO ARRAY OF CHAR; np, sp: SIZE;
 BEGIN
 	NEW(s, LEN(name));
 	COPY(name, s^);
@@ -1765,7 +1765,7 @@ END ValidShortChar;
 
 (* IsShortName - checks if a long name 'fn' can be stored in one "short" directory entry *)
 PROCEDURE IsShortName(CONST fn: Filename): BOOLEAN;
-VAR s: ARRAY 12 OF CHAR; i, k: INTEGER;
+VAR s: ARRAY 12 OF CHAR; i, k: SIZE;
 BEGIN
 	IF (fn = ".") OR (fn = "..") THEN RETURN TRUE
 	ELSIF (UTF8Strings.UTF8toASCII(fn, 0X, s) =  0) THEN
@@ -1782,7 +1782,7 @@ BEGIN
 END IsShortName;
 
 PROCEDURE CheckSum*(short: Shortname): CHAR;
-VAR chksum, i: LONGINT;
+VAR chksum: WORD; i: SIZE;
 BEGIN
 	chksum := 0;
 	FOR i := 0 TO 10 DO

@@ -277,7 +277,7 @@ TYPE
 								ELSE
 									NEW( f, SELF );
 									f.fd := fd;  f.dev := stat.dev;  f.ino := stat.ino;
-									f.mtime := stat.mtime.sec;  f.fsize := TODO(stat.size);  f.fpos := 0;
+									f.mtime := stat.mtime.sec;  f.fsize := stat.size;  f.fpos := 0;
 									f.state := Open;  f.swapper := -1;   (*all f.buf[i] = NIL*)
 									COPY( path, f.workName );  f.registerName := "";
 									f.tempFile := FALSE;
@@ -513,8 +513,7 @@ TYPE
 
 	Buffer =	POINTER TO RECORD (Files.Hint)
 					chg: BOOLEAN;
-					org: Files.Position;
-					size: SIZE;
+					org, size: SIZE;
 					data: ARRAY Bufsize OF CHAR;
 				END;
 
@@ -526,8 +525,7 @@ TYPE
 				dev: Unix.dev_t;
 				ino: Unix.ino_t;
 				mtime: HUGEINT;
-				fsize: Files.Size;
-				fpos: Files.Position;
+				fsize, fpos: SIZE;
 				bufs: ARRAY NBufs OF Buffer;
 				swapper: SIZE; state: LONGINT;
 
@@ -573,13 +571,13 @@ TYPE
 					IF buf.chg THEN
 						IF fd = NoDesc THEN  CreateUnixFile  END;
 						IF buf.org # fpos THEN
-							IF Unix.lseek( fd, TODO(buf.org), 0 ) = -1 THEN
+							IF Unix.lseek( fd, buf.org, 0 ) = -1 THEN
 								Halt( SELF, TRUE, "UnixFiles.File.Flush: lseek failed" )
 							END
 						END;
 						n := UnixWrite( fd, ADDRESSOF( buf.data ), buf.size );
 						IF n < 0 THEN  Halt( SELF, TRUE, "UnixFiles.File.Flush: write failed" )  END;
-						fpos := buf.org + TODO(buf.size);  buf.chg := FALSE;
+						fpos := buf.org + buf.size;  buf.chg := FALSE;
 						res := Unix.fstat( fd, stat );  mtime := stat.mtime.sec
 					END
 				END Flush;
@@ -591,13 +589,13 @@ TYPE
 				END Set;
 
 				PROCEDURE SetX( VAR r: Files.Rider;  p: Files.Position );
-				VAR  org: Files.Position; offset, i, n: SIZE;  buf: Buffer;
+				VAR  org, offset, i, n: SIZE;  buf: Buffer;
 				BEGIN
 					r.file := SELF;  r.fs := fs;
-					IF p > fsize THEN  p := fsize
+					IF p > fsize THEN  p := LONGINT(fsize)
 					ELSIF p < 0 THEN  p := 0
 					END;
-					offset := SIZE (p MOD Bufsize);  org := p - TODO(offset);
+					offset := SIZE(p) MOD Bufsize;  org := SIZE(p) - offset;
 					i := 0;
 					WHILE (i < NBufs) & (bufs[i] # NIL) & (org # bufs[i].org) DO  INC( i )  END;
 					IF i < NBufs THEN
@@ -618,7 +616,7 @@ TYPE
 						ELSE
 							IF fd = NoDesc THEN  CreateUnixFile  END;
 							IF fpos # org THEN
-								IF Unix.lseek( fd, TODO(org), 0 ) = -1 THEN
+								IF Unix.lseek( fd, org, 0 ) = -1 THEN
 									Halt( SELF, TRUE, "UnixFiles.File.Set: lseek failed" )
 								END
 							END;
@@ -628,7 +626,7 @@ TYPE
 								ELSE n := 0
 								END
 							END;
-							fpos := org + TODO(n);  buf.size := n
+							fpos := org + n;  buf.size := n
 						END;
 						buf.org := org;  buf.chg := FALSE
 					ELSE
@@ -642,7 +640,7 @@ TYPE
 
 				PROCEDURE Pos*( VAR r: Files.Rider ): Files.Position;
 				BEGIN
-					RETURN r.apos + TODO(r.bpos);
+					RETURN r.apos + r.bpos
 				END Pos;
 
 
@@ -651,13 +649,13 @@ TYPE
 				BEGIN  {EXCLUSIVE}
 					buf := r.hint(Buffer);  offset := r.bpos;
 					IF r.apos # buf.org THEN
-						SetX( r, r.apos + TODO(offset) );
+						SetX( r, r.apos + offset );
 						buf := r.hint(Buffer);  offset := r.bpos
 					END;
 					IF (offset < buf.size) THEN
 						x := buf.data[offset];  r.bpos := offset + 1
 					ELSIF r.apos + offset < fsize THEN
-						SetX( r, r.apos + TODO(offset) );
+						SetX( r, r.apos + offset );
 						x := r.hint(Buffer).data[0];  r.bpos := 1
 					ELSE
 						x := 0X;  r.eof := TRUE
@@ -692,7 +690,7 @@ TYPE
 				BEGIN  {EXCLUSIVE}
 					buf := r.hint(Buffer);  offset := r.bpos;
 					IF (r.apos # buf.org) OR (offset >= Bufsize) THEN
-						SetX( r, r.apos + TODO(offset) );
+						SetX( r, r.apos + offset );
 						buf := r.hint(Buffer);  offset := r.bpos
 					END;
 					buf.data[offset] := x;  buf.chg := TRUE;
@@ -706,15 +704,15 @@ TYPE
 					xpos := ofs;  buf := r.hint(Buffer);  offset := r.bpos;
 					WHILE len > 0 DO
 						IF (r.apos # buf.org) OR (offset >= Bufsize) THEN
-							SetX( r, r.apos + TODO(offset) );
+							SetX( r, r.apos + offset );
 							buf := r.hint(Buffer);  offset := r.bpos
 						END;
 						restInBuf := Bufsize - offset;
 						IF len > restInBuf THEN  min := restInBuf  ELSE  min := len  END;
 						S.MOVE( ADDRESSOF( x ) + xpos, ADDRESSOF( buf.data ) + offset, min );
-						INC( offset, TODO(min) );  r.bpos := offset;
+						INC( offset, min );  r.bpos := offset;
 						IF offset > buf.size THEN
-							INC( fsize, TODO(offset - buf.size) );  buf.size := offset
+							INC( fsize, offset - buf.size );  buf.size := offset
 						END;
 						INC( xpos, min );  DEC( len, min );  buf.chg := TRUE
 					END;
@@ -1015,7 +1013,7 @@ TYPE
 	PROCEDURE ResetBuffers( f: File;  VAR stat: Unix.Status );
 	VAR i: INTEGER;
 	BEGIN
-		f.fsize := TODO(stat.size);
+		f.fsize := stat.size;
 		IF (f.mtime # stat.mtime.sec) THEN
 			FOR i := 0 TO NBufs - 1 DO
 				IF f.bufs[i] # NIL THEN  f.bufs[i].org := -1;  f.bufs[i] := NIL  END;

@@ -689,7 +689,7 @@ TYPE
 		Less bytes will be read when reading over the end of the file.
 		r.res indicates the number of unread bytes. x must be big enough to hold all the bytes. *)
 		PROCEDURE ReadBytes*(VAR r:  Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
-		VAR dnode : Dnode; dataLeft, pos, res : LONGINT; nofBytes: SIZE; eof : BOOLEAN;
+		VAR dnode : Dnode; dataLeft, nofBytes, pos, res : LONGINT; eof : BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			ASSERT(r.file = SELF);
 			ASSERT(LEN(x) >= ofs + len); (* buffer big enough *)
@@ -703,13 +703,13 @@ TYPE
 						(* determine the number of bytes to be read from this dnode *)
 						dataLeft := BlockSize - LONGINT(r.apos); (* data in this dnode starting at offset r.apos *)
 						IF (len < dataLeft) THEN
-							nofBytes := len;
+							nofBytes := LONGINT(len);
 						ELSE
 							nofBytes := dataLeft;
 						END;
 
 						(* check against file length *)
-						pos := TODO(r.bpos) * BlockSize + LONGINT(r.apos);
+						pos := LONGINT(r.bpos) * BlockSize + LONGINT(r.apos);
 						IF (pos + nofBytes > inode.size) THEN
 							nofBytes := inode.size - pos;
 							IF (nofBytes < 0) THEN nofBytes := 0; END;
@@ -720,7 +720,7 @@ TYPE
 
 						len := len - nofBytes;
 						ofs := ofs + len;
-						r.apos := (LONGINT(r.apos) + TODO(nofBytes)) MOD BlockSize;
+						r.apos := (LONGINT(r.apos) + nofBytes) MOD BlockSize;
 						IF (nofBytes = dataLeft) THEN
 							r.bpos := r.bpos + 1; (* rider positioned at next dnode now *)
 						END;
@@ -783,7 +783,7 @@ TYPE
 					(* determine how much bytes we write to this dnode *)
 					spaceLeft := BlockSize - LONGINT(r.apos);
 					IF (len < spaceLeft) THEN
-						nofBytes := TODO(len);
+						nofBytes := LONGINT(len);
 					ELSE
 						nofBytes := spaceLeft;
 					END;
@@ -810,7 +810,7 @@ TYPE
 					END;
 				END;
 			END;
-			pos := TODO(r.bpos) * BlockSize + LONGINT(r.apos);
+			pos := LONGINT(r.bpos) * BlockSize + LONGINT(r.apos);
 			IF (pos > inode.size) THEN
 				inode.size := pos;
 				inodeModified := TRUE;

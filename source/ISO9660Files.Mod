@@ -217,7 +217,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 					src := ADDRESSOF(buf.data[pos]);  m := buf.lim-pos;
 					IF m > len THEN m := len END;
 					SYSTEM.MOVE(src, ADDRESSOF(x[ofs]), m);
-					DEC(len, m); INC(ofs, m); INC(r.apos, TODO(m));
+					DEC(len, m); INC(ofs, m); INC(r.apos, m);
 				END;
 				r.hint := buf
 			END ReadBytes;
@@ -406,7 +406,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 		f := R.file(File); fs := R.fs(FileSystem);
 		found := FALSE;
 		LOOP
-			pos := TODO(R.file.Pos(R));
+			pos := LONGINT(R.file.Pos(R));
 			IF debug THEN LogString("MatchFile; pos: "); LogInt(pos); LogLn END;
 			R.file.Read(R, buf[0]); entryLen := ORD(buf[0]);
 			IF debug THEN LogString("MatchFile; entryLen: "); LogInt(entryLen); LogLn END;
@@ -419,7 +419,7 @@ MODULE ISO9660Files;	(** AUTHOR "?/be"; PURPOSE "ISO 9660 File System (ported fr
 				GetDir(buf, fname, time, date, cl, len, attr);
 				found := Strings.Match(name, fname);
 			ELSE (* Directory entries may not cross sectors. Skip padding bytes *)
-				padding := SS - (TODO(R.file.Pos(R)) MOD SS);
+				padding := SS - (LONGINT(R.file.Pos(R)) MOD SS);
 				IF (padding > 0) & (padding <= 256) THEN
 					IF debug THEN LogString("MatchFile; skip padding: "); LogInt(padding); LogLn; END;
 					R.file.ReadBytes(R, buf, 0, padding); (* Skip padding *)
