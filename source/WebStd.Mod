@@ -2281,7 +2281,7 @@ TYPE
 	END ExternalizeDateTime;
 
 	(** externalize LONGINT 'number' to 'container' with XML element named 'elementName'. *)
-	PROCEDURE ExternalizeInteger*(number: LONGINT; container: XML.Container; elementName: ARRAY OF CHAR);
+	PROCEDURE ExternalizeInteger*(number: HUGEINT; container: XML.Container; elementName: ARRAY OF CHAR);
 	VAR elem: XML.Element; intStr: ARRAY 14 OF CHAR;
 	BEGIN
 		Strings.IntToStr(number, intStr);

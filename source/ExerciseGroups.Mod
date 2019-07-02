@@ -654,7 +654,7 @@ TYPE
 			WebStd.ExternalizeString(date, container, "Date");
 			WebStd.ExternalizeString(place, container, "Place");
 			WebStd.ExternalizeBoolean(openToJoin, container, "Open");
-			WebStd.ExternalizeInteger(TODO(maxPeople), container, "MaxPeople");
+			WebStd.ExternalizeInteger(maxPeople, container, "MaxPeople");
 			RETURN container
 		END Externalize;
 

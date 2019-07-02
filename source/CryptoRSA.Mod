@@ -199,8 +199,8 @@ VAR
 		cipher: Ciphers.Cipher;
 		md5: MD5.Hash;
 		digest: ARRAY 16 OF CHAR; pl: LONGINT;
-		buf: ARRAY 4096 OF CHAR; bl, magic: LONGINT;
-		n: SIZE; size: LONGINT;
+		buf: ARRAY 4096 OF CHAR; magic: LONGINT;
+		n, bl: SIZE; size: LONGINT;
 
 	BEGIN
 		NEW( k );
@@ -211,7 +211,7 @@ VAR
 		r.RawLInt( k.time );
 		r.RawLInt( k.date );
 
-		r.RawLInt( bl );
+		r.RawLInt( size ); bl := size;
 		r.Bytes( buf, 0, bl, n );
 		ASSERT( n = bl );
 
@@ -255,7 +255,7 @@ VAR
 		cipher: Ciphers.Cipher;
 		md5: MD5.Hash;
 		digest: ARRAY 16 OF CHAR; pl: LONGINT;
-		buf: ARRAY 4096 OF CHAR; bl: LONGINT;
+		buf: ARRAY 4096 OF CHAR; bl: SIZE;
 
 	BEGIN
 		ASSERT( k.private );
@@ -283,7 +283,7 @@ VAR
 		U.PutBigNumber( buf, bl, k.u );
 		INC( bl, (-bl) MOD 16 );
 		cipher.Encrypt( buf, 0, bl );
-		w.RawLInt( bl );
+		w.RawLInt( bl(LONGINT) );
 		w.Bytes( buf, 0, bl );
 
 		c := k.certificates;
@@ -296,7 +296,7 @@ VAR
 	END StorePrivateKey;
 
 	PROCEDURE StorePublicKey*( w: Streams.Writer; k: Key );	(* openssh format *)
-	VAR buf, encoded: ARRAY 4096 OF CHAR; pos: LONGINT;
+	VAR buf, encoded: ARRAY 4096 OF CHAR; pos: SIZE;
 	BEGIN
 		ASSERT( ~k.private );
 		w.String( "ssh-rsa " );
@@ -319,7 +319,7 @@ VAR
 	END LoadPublicKey;
 
 	PROCEDURE ExtractPublicKey*( r: Streams.Reader ): Key;
-	VAR buf: ARRAY 4096 OF CHAR; len, pos: LONGINT;
+	VAR buf: ARRAY 4096 OF CHAR; len: LONGINT; pos: SIZE;
 		str: ARRAY 64 OF CHAR;
 		k: Key;
 	BEGIN

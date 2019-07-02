@@ -70,7 +70,7 @@ VAR
 	END PrintHex;
 
 	PROCEDURE PrintBufferString*( CONST buf: ARRAY OF CHAR;  pos: LONGINT );
-	VAR i, p, len: LONGINT;
+	VAR i, p: SIZE; len: LONGINT;
 	BEGIN
 		p := pos;
 		GetLength( buf, p, len );
@@ -95,8 +95,8 @@ VAR
 	(*==========  packet buffer <---> program data  ===========*)
 
 
-	PROCEDURE PutLength*( VAR buf: ARRAY OF CHAR;  VAR pos: LONGINT;  len: LONGINT );
-	VAR i: INTEGER;
+	PROCEDURE PutLength*( VAR buf: ARRAY OF CHAR;  VAR pos: SIZE;  len: LONGINT );
+	VAR i: SIZE;
 	BEGIN
 		FOR i := 3 TO 0 BY -1 DO
 			buf[pos + i] := CHR( len MOD 256 );  len := len DIV 256
@@ -105,7 +105,7 @@ VAR
 	END PutLength;
 
 
-	PROCEDURE GetLength*( CONST buf: ARRAY OF CHAR;  VAR pos, len: LONGINT );
+	PROCEDURE GetLength*( CONST buf: ARRAY OF CHAR;  VAR pos: SIZE; VAR len: LONGINT );
 	BEGIN
 		len :=	ASH( LONG( ORD( buf[pos] ) ), 24 ) +
 				ASH( LONG( ORD( buf[pos + 1] ) ), 16 ) +
@@ -124,17 +124,17 @@ VAR
 	END GetInt;
 
 
-	PROCEDURE PutChar*( VAR buf: ARRAY OF CHAR;  VAR pos: LONGINT;  ch: CHAR );
+	PROCEDURE PutChar*( VAR buf: ARRAY OF CHAR;  VAR pos: SIZE;  ch: CHAR );
 	BEGIN
 		buf[pos] := ch;  INC( pos )
 	END PutChar;
 
-	PROCEDURE GetChar*( CONST buf: ARRAY OF CHAR;  VAR pos: LONGINT;  VAR ch: CHAR );
+	PROCEDURE GetChar*( CONST buf: ARRAY OF CHAR;  VAR pos: SIZE;  VAR ch: CHAR );
 	BEGIN
 		ch := buf[pos];  INC( pos )
 	END GetChar;
 
-	PROCEDURE PutString*( VAR buf: ARRAY OF CHAR;  VAR pos: LONGINT;  CONST str: ARRAY OF CHAR );
+	PROCEDURE PutString*( VAR buf: ARRAY OF CHAR;  VAR pos: SIZE;  CONST str: ARRAY OF CHAR );
 	VAR i, len: LONGINT;
 	BEGIN
 		len := 0;
@@ -143,7 +143,7 @@ VAR
 		FOR i := 0 TO len -1 DO buf[pos] := str[i];  INC( pos )  END ;
 	END PutString;
 
-	PROCEDURE GetString*( CONST buf: ARRAY OF CHAR;  VAR pos: LONGINT;  VAR str: ARRAY OF CHAR );
+	PROCEDURE GetString*( CONST buf: ARRAY OF CHAR;  VAR pos: SIZE;  VAR str: ARRAY OF CHAR );
 	VAR i, len: LONGINT;
 	BEGIN
 		GetLength( buf, pos, len );
@@ -152,16 +152,16 @@ VAR
 	END GetString;
 
 
-	PROCEDURE PutArray*(	VAR buf: ARRAY OF CHAR;  VAR pos: LONGINT;
-							CONST arr: ARRAY OF CHAR;  apos, len: LONGINT  );
-	VAR i: LONGINT;
+	PROCEDURE PutArray*(	VAR buf: ARRAY OF CHAR;  VAR pos: SIZE;
+							CONST arr: ARRAY OF CHAR;  apos, len: SIZE  );
+	VAR i: SIZE
 	BEGIN
-		PutLength( buf, pos, len );
+		PutLength( buf, pos, len(LONGINT) );
 		FOR i := 0 TO len -1 DO buf[pos] := arr[apos + i];  INC( pos )  END
 	END PutArray;
 
 
-	PROCEDURE PutBigNumber*( VAR buf: ARRAY OF CHAR;  VAR pos: LONGINT;  b: B.BigNumber );
+	PROCEDURE PutBigNumber*( VAR buf: ARRAY OF CHAR;  VAR pos: SIZE;  b: B.BigNumber );
 	VAR i, j: SIZE; len: LONGINT;  x: UNSIGNED32;  tmp: ARRAY 2048 OF CHAR;
 	BEGIN
 		len := 0;
@@ -181,7 +181,7 @@ VAR
 		FOR i := 0 TO len - 1 DO  buf[pos] := tmp[j + i];  INC( pos )  END;
 	END PutBigNumber;
 
-	PROCEDURE GetBigNumber*( CONST buf: ARRAY OF CHAR;  VAR pos: LONGINT;  VAR b: B.BigNumber );
+	PROCEDURE GetBigNumber*( CONST buf: ARRAY OF CHAR;  VAR pos: SIZE;  VAR b: B.BigNumber );
 	VAR
 		len: LONGINT;
 	BEGIN
