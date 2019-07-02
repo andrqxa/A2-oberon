@@ -448,7 +448,7 @@ TYPE
 
 		VAR
 			info : ARRAY 127 OF CHAR;
-			infoLength : TODO;
+			infoLength : LONGINT;
 			i : SIZE;
 
 		BEGIN

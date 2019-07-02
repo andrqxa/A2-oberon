@@ -170,7 +170,7 @@ TYPE
 
 				(** Receive SSH Packet into buf,  return packet type *)
 				PROCEDURE ReceivePacket*( VAR buf: ARRAY OF CHAR;  VAR size: SIZE ): CHAR;
-				VAR i, l: SIZE; l2: TODO; pos: SIZE; pad, trlen, cbs: LONGINT; res: WORD;
+				VAR i, l: SIZE; pos: SIZE; l2, pad, trlen, cbs: LONGINT; res: WORD;
 					seqno: ARRAY 4 OF CHAR; rmac, cmac: ARRAY 20 OF CHAR;
 					trbuf: ARRAY 8196 OF CHAR;
 					packType: LONGINT;
