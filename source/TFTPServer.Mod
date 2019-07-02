@@ -38,19 +38,19 @@ TYPE
 			timer: Kernel.Timer;
 
 		(* Log functions *)
-		PROCEDURE LogEnter(level: LONGINT);
+		PROCEDURE LogEnter(level: WORD);
 		BEGIN IF (TraceLevel >= level) THEN KernelLog.Enter END
 		END LogEnter;
 
-		PROCEDURE LogExit(level: LONGINT);
+		PROCEDURE LogExit(level: WORD);
 		BEGIN IF (TraceLevel >= level) THEN KernelLog.Exit END
 		END LogExit;
 
-		PROCEDURE Log(level: LONGINT; CONST s: ARRAY OF CHAR);
+		PROCEDURE Log(level: WORD; CONST s: ARRAY OF CHAR);
 		BEGIN IF (TraceLevel >= level) THEN KernelLog.String(s) END
 		END Log;
 
-		PROCEDURE LogInt(level, i: LONGINT);
+		PROCEDURE LogInt(level: WORD; i: SIZE);
 		BEGIN IF (TraceLevel >= level) THEN KernelLog.Int(i, 0) END
 		END LogInt;
 
@@ -155,11 +155,11 @@ TYPE
 			REPEAT
 				INC(retries);
 				LogEnter(3); Log(3, RRQId); Log(3, "sending block "); LogInt(3, blockNr);
-				Log(3, " ("); LogInt(3, BlockSize-TODO(r.res)); Log(3, " bytes) ");
+				Log(3, " ("); LogInt(3, BlockSize-r.res); Log(3, " bytes) ");
 				IF (retries > 1) THEN Log(3, "(retry "); LogInt(3, retries); Log(3, ")") END;
 				LogExit(3);
 
-				socket.Send(fip, fport, buf, 0, TODO(4 + BlockSize - r.res), res);
+				socket.Send(fip, fport, buf, 0, 4 + BlockSize - r.res, res);
 				wait := 0;
 				REPEAT
 					INC(wait);
@@ -375,7 +375,7 @@ TYPE
 
 VAR
 	tftpserver: TFTPServer;
-	TraceLevel: LONGINT;
+	TraceLevel: WORD;
 	errorMsg: ARRAY 8 OF ErrorMsg;
 	generator: Random.Generator;
 

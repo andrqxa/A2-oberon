@@ -231,10 +231,10 @@ TYPE
 	END Users;
 
 	Buffer* = OBJECT (Strings.Buffer)
-		PROCEDURE AddInt* (n, len: LONGINT);
+		PROCEDURE AddInt* (n, len: SIZE);
 		VAR
-			i: INTEGER;
-			b: LONGINT; res: WORD;
+			i: SIZE;
+			b: SIZE; res: WORD;
 			s: ARRAY 4 OF CHAR;
 		BEGIN
 			ASSERT (len <= 4);

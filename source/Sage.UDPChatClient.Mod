@@ -103,14 +103,14 @@ TYPE
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.ACK, seqNum, uin, sendBuf);
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_ACK;
 
 	PROCEDURE Client_NewUserReg (password, shortName, fullName, eMail: ARRAY OF CHAR;
 		VAR seqNum: INTEGER; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
-		len: LONGINT; res: WORD;
+		len: SIZE; res: WORD;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.NEW_USER_REG, seqNum, 0, sendBuf);
@@ -121,31 +121,31 @@ TYPE
 
 		INC (seqNum);
 
-		len := TODO(Strings.Length (password)) + 1;
+		len := Strings.Length (password) + 1;
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (password, 0, len, TRUE, res);
 
-		len := TODO(Strings.Length (shortName)) + 1;
+		len := Strings.Length (shortName) + 1;
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (shortName, 0, len, TRUE, res);
 
-		len := TODO(Strings.Length (fullName)) + 1;
+		len := Strings.Length (fullName) + 1;
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (fullName, 0, len, TRUE, res);
 
-		len := TODO(Strings.Length (eMail)) + 1;
+		len := Strings.Length (eMail) + 1;
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (eMail, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_NewUserReg;
 
 	PROCEDURE Client_Login (password: ARRAY OF CHAR;
 		VAR seqNum: INTEGER; uin: LONGINT; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
-		len: LONGINT; res: WORD;
+		len: SIZE; res: WORD;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.LOGIN, seqNum, uin, sendBuf);
@@ -156,12 +156,12 @@ TYPE
 
 		INC (seqNum);
 
-		len := TODO(Strings.Length (password)) + 1;
-		sendBuf.AddInt (TODO(len), 2);
+		len := Strings.Length (password) + 1;
+		sendBuf.AddInt (len, 2);
 		sendBuf.Add (password, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_Login;
 
 	PROCEDURE Client_InfoReq (userUIN: LONGINT; VAR seqNum: INTEGER;
@@ -182,7 +182,7 @@ TYPE
 		sendBuf.AddInt (userUIN, 4);
 
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_InfoReq;
 
 	PROCEDURE Client_SendMessage (
@@ -214,7 +214,7 @@ TYPE
 		sendBuf.Add (message^, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (serverIP, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (serverIP, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_SendMessage;
 
 	PROCEDURE Client_SendTextCode (code: String;
@@ -222,7 +222,7 @@ TYPE
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		string: String;
-		len: LONGINT; res: WORD;
+		len: SIZE; res: WORD;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.SEND_TEXT_CODE, seqNum, uin, sendBuf);
 
@@ -232,12 +232,12 @@ TYPE
 
 		INC (seqNum);
 
-		len := TODO(Strings.Length (code^)) + 1;
-		sendBuf.AddInt (len, 2);
+		len := Strings.Length (code^) + 1;
+		sendBuf.AddInt (len(LONGINT), 2);
 		sendBuf.Add (code^, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
-		s.Send (serverIP, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (serverIP, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_SendTextCode;
 
 	PROCEDURE Client_KeepAlive (VAR seqNum: INTEGER; uin: LONGINT; sendBuf: Base.Buffer;
@@ -255,7 +255,7 @@ TYPE
 		INC (seqNum);
 
 		string := sendBuf.GetString ();
-		s.Send (ip, Base.serverPort, string^, 0, TODO(sendBuf.GetLength ()), res);
+		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_KeepAlive;
 
 	PROCEDURE FindUserInfo (list: Base.List; uin: LONGINT): Base.UserInfo;
@@ -702,8 +702,8 @@ TYPE
 
 			editChat.text.AcquireWrite;
 			editChat.text.InsertUCS32 (len, ucs32^);
-			editChat.text.SetCharacterStyle (len, TODO(idx-1), cs);
-			editChat.text.SetParagraphStyle (len+2, TODO(idx-3), ps);
+			editChat.text.SetCharacterStyle (len, idx-1, cs);
+			editChat.text.SetParagraphStyle (len+2, idx-3, ps);
 			editChat.text.ReleaseWrite;
 
 			editChat.tv.End (TRUE, FALSE);

@@ -42,7 +42,7 @@ TYPE
 			crc32-: LONGINT; (*crc32 of uncompressed data*)
 			out : POINTER TO ARRAY BufSize OF CHAR;
 			flush: SHORTINT;
-			inputsize : LONGINT;
+			inputsize : SIZE;
 
 		PROCEDURE WriteHeader(w: Streams.Writer);
 		VAR
@@ -87,8 +87,8 @@ TYPE
 			ELSIF (SELF.res < ZlibDeflate.Ok) OR (len <= 0) THEN
 				res := SELF.res;
 			ELSE
-				ZlibBuffers.Init(SELF.s.in, buf, TODO(ofs), TODO(len), TODO(len));
-				INC(inputsize, TODO(len));
+				ZlibBuffers.Init(SELF.s.in, buf, ofs, len, len);
+				INC(inputsize, len);
 				WHILE (SELF.res = ZlibDeflate.Ok) & (SELF.s.in.avail # 0) DO
 					IF (SELF.s.out.avail = 0) THEN
 						writer.Bytes(SELF.out^, 0, BufSize);
@@ -99,7 +99,7 @@ TYPE
 						SELF.res := SELF.s.res
 					END
 				END;
-				SELF.crc32 := Zlib.CRC32(SELF.crc32, buf, TODO(ofs), TODO(len - SELF.s.in.avail));
+				SELF.crc32 := Zlib.CRC32(SELF.crc32, buf, ofs, len - SELF.s.in.avail);
 			END;
 			res := SELF.res;
 			IF propagate THEN
@@ -124,7 +124,7 @@ TYPE
 				ZlibDeflate.Close(SELF.s);
 				SELF.res := SELF.s.res;
 				writer.RawLInt(crc32);
-				writer.RawLInt(inputsize);
+				writer.RawLInt(inputsize(LONGINT));
 				writer.Update();
 			END;
 		END Send;
@@ -162,12 +162,11 @@ TYPE
 
 		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		VAR
-			intlen : LONGINT; length: SIZE;
+			intlen : LONGINT;
 		BEGIN
 			ASSERT((0 <= ofs) & (0 <= len) & (ofs + size <= LEN(buf)), 100);
 			IF transparent THEN
-				reader.Bytes(buf, ofs, size, length);
-				len := TODO (length);
+				reader.Bytes(buf, ofs, size, len);
 				IF len >= min THEN res := Streams.Ok ELSE res := Streams.EOF (* end of file *) END;
 			ELSE
 				IF ~s.open THEN
@@ -176,9 +175,8 @@ TYPE
 					ZlibBuffers.Init(s.out, buf, ofs, size, size);
 					WHILE (s.out.avail # 0) & (s.res.code # Zlib.StreamEnd) DO
 						IF s.in.avail = 0 THEN
-							reader.Bytes(in^, 0, BufSize, length);
-							intlen := TODO (length);
-							ZlibBuffers.Rewind(s.in, intlen);
+							reader.Bytes(in^, 0, BufSize, len);
+							ZlibBuffers.Rewind(s.in, len);
 							IF s.in.avail = 0 THEN
 								IF reader.res < 0 THEN
 									res := FileError
@@ -190,7 +188,7 @@ TYPE
 						END
 					END;
 					crc32 := Zlib.CRC32(crc32, buf, ofs, size - s.out.avail);
-					len := TODO(size - s.out.avail);
+					len := size - s.out.avail;
 				END;
 
 			END;
