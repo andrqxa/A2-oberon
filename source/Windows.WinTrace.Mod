@@ -15,7 +15,7 @@ PROCEDURE Send* (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; V
 VAR b: Kernel32.BOOL; written: Kernel32.DWORD;
 BEGIN
 	IF mode # none THEN
-		b := Kernel32.WriteFile (hout, buf[ofs], TODO(len), written, NIL);
+		b := Kernel32.WriteFile (hout, buf[ofs], len(Kernel32.DWORD), written, NIL);
 		IGNORE Kernel32.FlushFileBuffers(hout);
 	END;
 END Send;
@@ -25,7 +25,7 @@ PROCEDURE SendError* (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLE
 VAR b: Kernel32.BOOL; written: Kernel32.DWORD;
 BEGIN
 	IF mode # none THEN
-		b := Kernel32.WriteFile (herr, buf[ofs], TODO(len), written, NIL);
+		b := Kernel32.WriteFile (herr, buf[ofs], len(Kernel32.DWORD), written, NIL);
 		IGNORE Kernel32.FlushFileBuffers(herr);
 	END;
 END SendError;
@@ -36,10 +36,10 @@ PROCEDURE Receive* (VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE;
 VAR b: Kernel32.BOOL; tlen: LONGINT;
 BEGIN
 	tlen := 0;
-	b := Kernel32.ReadFile (hin, buf[ofs], TODO(size), tlen, NIL);
+	b := Kernel32.ReadFile (hin, buf[ofs], size(Kernel32.DWORD), tlen, NIL);
 	len := tlen; DEC(size, len);
 	WHILE (len < min) DO
-		b := Kernel32.ReadFile (hin, buf[ofs], TODO(size), tlen, NIL);
+		b := Kernel32.ReadFile (hin, buf[ofs], size(Kernel32.DWORD), tlen, NIL);
 		INC(len, tlen);
 		DEC(size, tlen);
 	END;

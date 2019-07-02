@@ -648,7 +648,7 @@ TYPE
 		PROCEDURE GetPosition*() : LONGINT;
 		BEGIN
 			ASSERT(~closed);
-			RETURN TODO(samplePosition);
+			RETURN samplePosition(LONGINT);
 		END GetPosition;
 
 		(** Start playing / recording *)

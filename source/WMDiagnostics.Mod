@@ -507,9 +507,9 @@ TYPE
 		BEGIN
 			Acquire;
 			IF (0 <= number) & (number <= nofEntries) THEN
-				SetSelection(0, TODO(number), 2, TODO(number));
+				SetSelection(0, number(LONGINT), 2, number(LONGINT));
 				IF moveTo THEN
-					SetTopPosition(0, TODO(number), TRUE);
+					SetTopPosition(0, number(LONGINT), TRUE);
 				END;
 			END;
 			Release;
