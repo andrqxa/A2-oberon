@@ -1996,7 +1996,7 @@ TYPE
 		END IsRightToLeft;
 
 		(* Gets the paragraph embedding level of the current position's line *)
-		PROCEDURE GetParagraphEmbeddingLevel*(pos : SIZE) : LONGINT;
+		PROCEDURE GetParagraphEmbeddingLevel*(pos : SIZE) : SIZE;
 		BEGIN
 			IF ~text.isUTF OR (layout.bidiFormatter = NIL) THEN
 				RETURN 0;

@@ -27,7 +27,7 @@ CONST
 	initialCacheElementSize	= 1000;
 
 TYPE
-	IntegerArray = POINTER TO ARRAY OF LONGINT;
+	IntegerArray = POINTER TO ARRAY OF SIZE;
 
 	CharArray = POINTER TO ARRAY OF Texts.Char32;
 
@@ -46,7 +46,7 @@ TYPE
 		(* simple stack for integers with some default stack functions *)
 	IntegerStack = OBJECT
 	VAR
-		top : INTEGER;
+		top : SIZE;
 		internalStack : IntegerArray;
 		internalStackSize : SIZE;
 
@@ -59,7 +59,7 @@ TYPE
 		END Init;
 
 		(* pushes a new element on top of the stack *)
-		PROCEDURE Push(i : LONGINT);
+		PROCEDURE Push(i : SIZE);
 		VAR
 			tempStack : IntegerArray;
 			j : SIZE;
@@ -83,7 +83,7 @@ TYPE
 		END Push;
 
 		(* returns the top element of the stack and removes it *)
-		PROCEDURE Pop() : LONGINT;
+		PROCEDURE Pop() : SIZE;
 		BEGIN
 			IF (top = 0) THEN
 				RETURN -1;
@@ -94,7 +94,7 @@ TYPE
 		END Pop;
 
 		(* returns the top element of the stack without removing it *)
-		PROCEDURE Top() : LONGINT;
+		PROCEDURE Top() : SIZE;
 		BEGIN
 			IF (top = 0) THEN
 				RETURN -1;
@@ -110,7 +110,7 @@ TYPE
 		END Purge;
 
 		(* returns the current number of elements on the stack *)
-		PROCEDURE Size() : INTEGER;
+		PROCEDURE Size() : SIZE;
 		BEGIN
 			RETURN top;
 		END Size;
@@ -394,7 +394,7 @@ TYPE
 		id : SIZE;
 		pos : SIZE;
 		lineLength : SIZE;
-		paragraphEmbeddingLevel : LONGINT;
+		paragraphEmbeddingLevel : SIZE;
 
 		textReaders : TextReaderArray;
 		dirty : BoolArray;
@@ -1050,13 +1050,13 @@ TYPE
 		PROCEDURE ApplyExplicitLevels(start, end : SIZE; VAR cacheElement : LineElement);
 		VAR
 			embeddingLevels : IntegerStack;
-			dummyEmbeddingLevel : LONGINT;
+			dummyEmbeddingLevel : SIZE;
 			overrideStati : IntegerStack;
-			dummyOverrideStatus : LONGINT;
+			dummyOverrideStatus : SIZE;
 			char : Texts.Char32;
 			charType : Strings.String;
-			nextLevel : LONGINT;
-			i : INTEGER;
+			nextLevel : SIZE;
+			i : SIZE;
 			lineLength : SIZE;
 			surplusLevels : LONGINT;
 			hlCharacterType  : Strings.String;
@@ -1197,8 +1197,8 @@ TYPE
 		(* Scans through the text and resolves all weak types *)
 		PROCEDURE ResolveWeakTypes(VAR cacheElement : LineElement);
 		VAR
-			i,nextI : SIZE;
-			pos, state, ENstate : LONGINT;
+			i, nextI, pos : SIZE;
+			state, ENstate : LONGINT;
 			passedBNs : IntegerStack;
 			charType : Strings.String;
 			lastCharType : Strings.String;
@@ -1303,7 +1303,7 @@ TYPE
 
 				(* push a BN onto the BN stack *)
 				ELSIF cacheElement.characterTypes[i]^ = "BN" THEN
-					passedBNs.Push(TODO(i));
+					passedBNs.Push(i);
 
 				(* W4. European Separator *)
 				ELSIF cacheElement.characterTypes[i]^ = "ES" THEN
@@ -1619,7 +1619,7 @@ TYPE
 			posArray, reversePosArray : PosArray;
 			i, newPos : SIZE;
 			relStart: SIZE;
-			maxLevel, minLevel : LONGINT;
+			maxLevel, minLevel : SIZE;
 			oneCharString : Texts.PUCS32String;
 			lastChar : Strings.String;
 		BEGIN
@@ -1827,7 +1827,7 @@ TYPE
 		END GetInternalPosition;
 
 		(* Returns the characters implicit level *)
-		PROCEDURE GetImplicitLevel*(pos : SIZE) : LONGINT;
+		PROCEDURE GetImplicitLevel*(pos : SIZE) : SIZE;
 		VAR
 			relPos : SIZE;
 			cacheElement : LineElement;
@@ -1857,7 +1857,7 @@ TYPE
 		END GetImplicitLevel;
 
 		(* Gets the embedding level of the pargraph the character is a part of *)
-		PROCEDURE GetParagraphEmbeddingLevel*(pos : SIZE) : LONGINT;
+		PROCEDURE GetParagraphEmbeddingLevel*(pos : SIZE) : SIZE;
 		VAR
 			cacheElement : LineElement;
 		BEGIN
@@ -2006,7 +2006,7 @@ TYPE
 
 		(* Mirrors a character if the rules allow it. A character is only mirrored if the current embedding level is odd
 			and the 'mirrored' property of the character is true. Consider HL6 if necessary. *)
-		PROCEDURE MirrorCharacter(VAR originalChar : Texts.Char32; embeddingLevel : LONGINT);
+		PROCEDURE MirrorCharacter(VAR originalChar : Texts.Char32; embeddingLevel : SIZE);
 		BEGIN
 			IF ODD(embeddingLevel) & unicodePropertyReader.IsMirroredChar(originalChar) THEN
 				originalChar := mirrorPropertyReader.GetMirroredChar(originalChar);
@@ -2017,7 +2017,7 @@ TYPE
 
 
 		(* Reverts all substrings between the minimum and the maximum level *)
-		PROCEDURE ReorderSubstrings(globalStart, fromLevel, toLevel : SIZE; CONST levels : ARRAY OF LONGINT; VAR posArray : PosArray; lastCharType : Strings.String);
+		PROCEDURE ReorderSubstrings(globalStart, fromLevel, toLevel : SIZE; CONST levels : ARRAY OF SIZE; VAR posArray : PosArray; lastCharType : Strings.String);
 		VAR
 			i, start, end : SIZE;
 		BEGIN
@@ -2086,9 +2086,9 @@ TYPE
 		END FillPositionArray;
 
 		(* Look through a level array and find its maximum entry *)
-		PROCEDURE GetHighestLevel(start, length : SIZE; CONST levels : ARRAY OF LONGINT) : LONGINT;
+		PROCEDURE GetHighestLevel(start, length : SIZE; CONST levels : ARRAY OF SIZE) : SIZE;
 		VAR
-			i: SIZE; max : LONGINT;
+			i, max: SIZE;
 		BEGIN
 			max := 0;
 			FOR i := start TO start+length - 1 DO
@@ -2104,9 +2104,9 @@ TYPE
 		END GetHighestLevel;
 
 		(* Look through a level array and find its minimum odd entry *)
-		PROCEDURE GetLowestOddLevel(start, length : SIZE; CONST levels : ARRAY OF LONGINT) : LONGINT;
+		PROCEDURE GetLowestOddLevel(start, length : SIZE; CONST levels : ARRAY OF SIZE) : SIZE;
 		VAR
-			i: SIZE; min : LONGINT;
+			i, min: SIZE;
 		BEGIN
 			min := 61;
 			FOR i := start TO start + length - 1 DO
@@ -2124,7 +2124,7 @@ TYPE
 
 
 		(* Computes the next even level which is not higher than 60 *)
-		PROCEDURE GetNextEvenEmbeddingLevel(thisLevel : LONGINT; VAR nextLevel : LONGINT);
+		PROCEDURE GetNextEvenEmbeddingLevel(thisLevel : SIZE; VAR nextLevel : SIZE);
 		BEGIN
 			IF thisLevel > 59 THEN
 				nextLevel := thisLevel;
@@ -2139,7 +2139,7 @@ TYPE
 		END GetNextEvenEmbeddingLevel;
 
 		(* Computes the next odd level which is not higher than 61 *)
-		PROCEDURE GetNextOddEmbeddingLevel(thisLevel : LONGINT; VAR nextLevel : LONGINT);
+		PROCEDURE GetNextOddEmbeddingLevel(thisLevel : SIZE; VAR nextLevel : SIZE);
 		BEGIN
 			IF thisLevel > 60 THEN
 				nextLevel := thisLevel;
@@ -2155,7 +2155,7 @@ TYPE
 
 
 		(* Returns the character type of the higher of two levels *)
-		PROCEDURE GetBorderOfRunCharacterType(thisLevel, otherLevel : LONGINT; VAR result : Strings.String);
+		PROCEDURE GetBorderOfRunCharacterType(thisLevel, otherLevel : SIZE; VAR result : Strings.String);
 		BEGIN
 			IF (ODD(MAX(thisLevel,otherLevel))) THEN
 				result^ := "R";
@@ -2350,7 +2350,7 @@ TYPE
 		END IsNeutralCharacterType;
 
 		(* Returns the directional type considering borders of a run *)
-		PROCEDURE GetFinalDirectionalType(charType : Strings.String; thisLevel, otherLevel : LONGINT; VAR result : Strings.String);
+		PROCEDURE GetFinalDirectionalType(charType : Strings.String; thisLevel, otherLevel : SIZE; VAR result : Strings.String);
 		BEGIN
 
 			(* if the current position is at a border run determine the sor *)
