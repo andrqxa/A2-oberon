@@ -1391,7 +1391,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				WHILE sect # NIL DO
 					r := sect.relocs;
 					WHILE r # NIL DO
-						x := sect.head.VirtualAddress + TODO(r.ofs);
+						x := sect.head.VirtualAddress + r.ofs(LONGINT);
 						ASSERT(x > bak);
 						IF x >= (blockva+PageSize) THEN
 							IF blockfix >= 0 THEN EndBlock(W, blockfix, blocksize) END;
