@@ -215,7 +215,7 @@ IMPORT
 			IF Debug THEN KernelLog.String("DemuxStream.SetAVIPos"); KernelLog.Ln; END;
 			r.SetPos(pos);
 			stuffByte := 0;
-			retPos := TODO(r.Pos());
+			retPos := r.Pos()(LONGINT);
 			Reset;
 		END SetAVIPos;
 
@@ -252,7 +252,7 @@ IMPORT
 		riffLength: LONGINT;
 
 		movieBeginPos: Streams.Position;
-		indexStart: LONGINT;
+		indexStart: Streams.Position;
 		videoFrames: LONGINT;
 		audioChunks: LONGINT;
 		videoIndex: IndexArrayPointer;
@@ -422,7 +422,7 @@ IMPORT
 							(* There is an index *)
 
 							(* Start of Index including idx1 Tag *)
-							indexStart := TODO(r.Pos())-4;
+							indexStart := r.Pos()-4;
 							ReadIndex();
 							IF Debug THEN
 								KernelLog.String("AVIDemux: Start of movie stream found " ); KernelLog.Ln()
@@ -485,7 +485,7 @@ IMPORT
 				IF CompareCharArrays(buf, videoStreamHeader.streamIdentifier, 3) THEN
 					i := i+1;
 					(* Not shure, wether this is necessary - but everything works fine with it *)
-					indexStart := TODO(r.Pos())-4;
+					indexStart := r.Pos()-4;
 					EXIT;
 				END;
 				IF i >= nidx THEN
