@@ -698,7 +698,7 @@ TYPE
 				COPY(info.filename, filename); Strings.Append(filename, ".Mod");
 				file := Files.Old(filename);
 				IF (file # NIL) THEN
-					owner.GotoFile(filename, TODO(info.position));
+					owner.GotoFile(filename, info.position(SIZE));
 				END;
 			END;
 		END OnGoToFile;
@@ -1659,7 +1659,7 @@ TYPE
 		END HandleDocumentInfo;
 
 		PROCEDURE UpdateState;
-		VAR tInt : LONGINT; tStr : ARRAY 16 OF CHAR;
+		VAR tInt : SIZE; tStr : ARRAY 16 OF CHAR;
 
 			PROCEDURE SetSplitted(splitted : BOOLEAN);
 			BEGIN
@@ -1698,7 +1698,7 @@ TYPE
 				findPCBtn.visible.Set(currentPage.compilerSettings.findPC);
 				currentPage.editor.tv.cursor.SetVisible(TRUE);
 				currentPage.editor.SetFocus;
-				tInt := TODO(currentPage.editor.tv.cursor.GetPosition()); Strings.IntToStr(tInt, tStr);
+				tInt := currentPage.editor.tv.cursor.GetPosition(); Strings.IntToStr(tInt, tStr);
 				positionEdit.SetAsString(tStr);
 				IF currentPage.editor.undoMgr # NIL THEN
 					NrUpdatesChanged(currentPage.editor.undoMgr.nrUndoUpdates, currentPage.editor.undoMgr.nrRedoUpdates);
@@ -2517,13 +2517,13 @@ TYPE
 
 			NEW(entry); entry.SetName("Editor");
 				WMRestorable.StoreLongint(entry, "firstLine", page.editor.tv.firstLine.Get());
-				WMRestorable.StoreLongint(entry, "cursorPos", TODO(page.editor.tv.cursor.GetPosition()));
+				WMRestorable.StoreLongint(entry, "cursorPos", page.editor.tv.cursor.GetPosition()(LONGINT));
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("SplitEditor");
 				WMRestorable.StoreBoolean(entry, "visible", page.splitPanel.visible.Get());
 				WMRestorable.StoreLongint(entry, "firstLine", page.splitEditor.tv.firstLine.Get());
-				WMRestorable.StoreLongint(entry, "cursorPos", TODO(page.splitEditor.tv.cursor.GetPosition()));
+				WMRestorable.StoreLongint(entry, "cursorPos", page.splitEditor.tv.cursor.GetPosition()(LONGINT));
 				WMRestorable.StoreLongint(entry, "height", page.splitPanel.bounds.GetHeight());
 			elem.AddContent(entry);
 
