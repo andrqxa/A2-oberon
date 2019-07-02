@@ -251,7 +251,7 @@ IMPORT
 		videoStreamHeader: AVIStreamHeader;
 		riffLength: LONGINT;
 
-		movieBeginPos: LONGINT;
+		movieBeginPos: Streams.Position;
 		indexStart: LONGINT;
 		videoFrames: LONGINT;
 		audioChunks: LONGINT;
@@ -309,7 +309,7 @@ IMPORT
 			len: SIZE;
 			done: BOOLEAN;
 			headerLength: LONGINT;
-			headerBeginPos: LONGINT;
+			headerBeginPos: Streams.Position;
 
 			tempHeader: AVIStreamHeader;
 			streamNumber: SHORTINT;
@@ -347,7 +347,7 @@ IMPORT
 					r.RawLInt(headerLength);
 
 					headerLength := headerLength + headerLength MOD 2;
-					headerBeginPos := TODO(r.Pos());
+					headerBeginPos := r.Pos();
 					r.Bytes( buf,0,4, len );
 
 					(* Main AVI Header *)
@@ -411,7 +411,7 @@ IMPORT
 						END;
 					ELSIF CompareCharArrays(buf, "movi",4) THEN
 						(* movie data begin, including movi Tag *)
-						movieBeginPos := TODO(r.Pos())-4;
+						movieBeginPos := r.Pos()-4;
 
 						(* this could be improved... *)
 						r.SetPos(headerLength+movieBeginPos);			(* headerLength); *)
@@ -570,7 +570,7 @@ IMPORT
 				IF (idxType = 1) THEN
 					ioff := 8;
 				ELSE
-					ioff := movieBeginPos;
+					ioff := movieBeginPos(LONGINT);
 				END;
 
 				i := 0;
@@ -613,12 +613,12 @@ IMPORT
 		VAR
 			aviHeader: MainAVIHeaderDesc;
 			headerLength: LONGINT;
-			startPos: LONGINT;
+			startPos: Streams.Position;
 		BEGIN
 			NEW( aviHeader );
 
 			r.RawLInt(headerLength);
-			startPos := TODO(r.Pos());
+			startPos := r.Pos();
 
 			r.RawLInt( aviHeader.microSecsPerFrame );
 			r.RawLInt( aviHeader.maxBytesPerSec );
@@ -648,14 +648,14 @@ IMPORT
 		VAR
 			header: AVIStreamHeader;
 			headerLength: LONGINT;
-			startPos: LONGINT;
+			startPos: Streams.Position;
 			len: SIZE;
 			temp: INTEGER;
 		BEGIN
 			NEW(header);
 
 			r.RawLInt(headerLength);
-			startPos := TODO(r.Pos());
+			startPos := r.Pos();
 
 			r.Bytes( header.fccType,0,4, len );
 			r.Bytes( header.fccHandler,0,4, len );
@@ -687,13 +687,13 @@ IMPORT
 		VAR
 			header: BitMapInfo;
 			headerLength: LONGINT;
-			startPos: LONGINT;
+			startPos: Streams.Position;
 			temp: INTEGER;
 		BEGIN
 			NEW(header);
 
 			r.RawLInt(headerLength);
-			startPos := TODO(r.Pos());
+			startPos := r.Pos();
 
 			r.RawLInt( header.size );
 			r.RawLInt( header.width );
@@ -708,7 +708,7 @@ IMPORT
 			r.RawLInt( header.clrImportant );
 
 			IF r.Pos() - startPos < headerLength THEN
-				r.SkipBytes( headerLength - ( TODO(r.Pos()) - startPos ) )
+				r.SkipBytes( headerLength - ( r.Pos() - startPos ) )
 			END;
 
 			RETURN header
@@ -719,13 +719,13 @@ IMPORT
 		VAR
 			header: WAVEFormatEx;
 			headerLength: LONGINT;
-			startPos: LONGINT;
+			startPos: Streams.Position;
 			temp: INTEGER;
 		BEGIN
 			NEW(header);
 
 			r.RawLInt(headerLength);
-			startPos := TODO(r.Pos());
+			startPos := r.Pos();
 
 			r.RawInt( temp ); header.formatTag := temp;
 			r.RawInt( temp ); header.channels := temp;
