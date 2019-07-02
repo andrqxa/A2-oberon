@@ -47,7 +47,7 @@ CONST
 	GC* = 8;
 	MaxLocks = 9;   (* { <= 32 } *)
 
-	StrongChecks = FALSE;
+	StrongChecks = TRUE;
 
 
 	MemBlockSize = 32*1024*1024; (* must be multiple of StaticBlockSize *)
@@ -112,6 +112,7 @@ VAR
 VAR
 	lock-: ARRAY MaxLocks OF CHAR;  (* not implemented as SET because of shared access *)
 	cs: ARRAY MaxLocks OF Kernel32.CriticalSection;
+	taken: ARRAY MaxLocks OF LONGINT;
 	defaultConfigFile, userConfigFile, traceName: ARRAY Kernel32.MaxPath OF CHAR;
 
 	gcThreshold-: SIZE;
@@ -749,22 +750,27 @@ END Init;
 	VAR i: LONGINT;
 	BEGIN
 		i := 0;
-		WHILE i < MaxLocks DO Kernel32.InitializeCriticalSection( cs[i] ); lock[i] := "N"; INC( i ) END;
+		WHILE i < MaxLocks DO Kernel32.InitializeCriticalSection( cs[i] ); lock[i] := "N"; taken[i] := 0; INC( i ) END;
 	END InitLocks;
 
 	PROCEDURE CleanupLocks*;
 	VAR i: LONGINT;
 	BEGIN
 		i := 0;
-		WHILE i < MaxLocks DO Kernel32.DeleteCriticalSection( cs[i] );  INC( i ) END;
+		WHILE i < MaxLocks DO Kernel32.DeleteCriticalSection( cs[i] ); taken[i] := 0; lock[i] := "N"; INC( i ) END;
 	END CleanupLocks;
 
 (** Acquire a spin-lock. *)
 	PROCEDURE Acquire*( level: LONGINT );   (* non reentrant lock  (non reentrance "ensured" by ASSERT statement ), CriticalSections are reentrant *)
+	VAR i: WORD;
 	BEGIN
 		Kernel32.EnterCriticalSection( cs[level] );
+		taken[level] := Kernel32.GetCurrentThreadId();
 		IF StrongChecks THEN
 			ASSERT ( lock[level] = "N", 1001 );
+			FOR i := 0 TO level-1 DO
+				ASSERT(taken[i] # taken[level]); 
+			END
 		ELSIF lock[level] # "N" THEN
 			Trace.String("warning: reentered non-reentrant lock"); Trace.Ln;
 		END;
@@ -776,10 +782,12 @@ END Init;
 	BEGIN
 		IF StrongChecks THEN
 			ASSERT ( lock[level] ="Y", 1002 );
+			ASSERT( taken[level] = Kernel32.GetCurrentThreadId());
 		ELSIF lock[level] # "Y" THEN
 			Trace.String("warning: reentered non-reentrant lock"); Trace.Ln;
 		END;
 		lock[level] := "N";
+		taken[level] := 0;
 		Kernel32.LeaveCriticalSection( cs[level] )
 	END Release;
 
@@ -819,11 +827,17 @@ END GetStaticHeap;
 
 (* returns if an address is a currently allocated heap address *)
 PROCEDURE ValidHeapAddress*(p: ADDRESS): BOOLEAN;
+VAR mb: MemoryBlock;
 BEGIN
-	RETURN (p >= memBlockHead.beginBlockAdr) & (p <= memBlockTail.endBlockAdr)
-		OR (p>=ADDRESS OF Kernel32.EntryPoint) & (p<=ADDRESSOF(LastAddress))
+	IF (p>=ADDRESS OF Kernel32.EntryPoint) & (p<=ADDRESSOF(LastAddress)) THEN RETURN TRUE END;
+	IF (p < memBlockHead.beginBlockAdr) OR (p>memBlockTail.endBlockAdr) THEN RETURN FALSE END; 
+	mb := memBlockHead;
+	WHILE mb # NIL DO
+		IF (p >= mb.beginBlockAdr) & (p <= mb.endBlockAdr) THEN  RETURN TRUE  END;
+		mb := mb.next;
+	END;
+	RETURN FALSE;
 END ValidHeapAddress;
-
 
 PROCEDURE GetFreeK* (VAR total, lowFree, highFree: SIZE);
 VAR

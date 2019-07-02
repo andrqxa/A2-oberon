@@ -1,15 +1,15 @@
- (* Aos, Copyright 2001, Pieter Muller, ETH Zurich; this module ported for the windows version, fof. *)
+(* Aos, Copyright 2001, Pieter Muller, ETH Zurich; this module ported for the windows version, fof. *)
 
 MODULE Objects;   (** AUTHOR "pjm, ejz, fof"; PURPOSE "Active object runtime support"; *)
 
-IMPORT SYSTEM, Trace, Kernel32, Machine, Modules, Heaps;
+	IMPORT SYSTEM, Trace, Kernel32, Machine, Modules, Heaps;
 
 CONST
 	HandleExcp = TRUE;   (* FALSE -> we asume that it is done correctly by Traps *)
 	TraceVerbose = FALSE;
-	StrongChecks = FALSE;  defaultStackSize = 0;
+	StrongChecks = TRUE;  defaultStackSize = 0;
 	TraceOpenClose = FALSE;
-	ConcurrentGC=FALSE; (* if TRUE then release needs to be compiled with --writeBarriers *)
+	ConcurrentGC=TRUE; (* if TRUE then release needs to be compiled with --writeBarriers *)
 
 CONST
 	(* Process flags *)
@@ -130,21 +130,23 @@ TYPE
 
 	GCContext = RECORD
 		nextPos: SIZE; (* 0 to start with *)
-		last: ARRAY 256 OF ADDRESS;
+		last: ARRAY 32 OF RECORD bp, pc, sp: ADDRESS END;
 
-		PROCEDURE AddContext(bp, pc: ADDRESS);
+		PROCEDURE AddContext(bp, pc, sp: ADDRESS);
 		BEGIN
-				last[nextPos*2] := bp;
-				last[nextPos*2+1] := pc;
-				INC(nextPos);
+			last[nextPos].bp := bp;
+			last[nextPos].pc := pc;
+			last[nextPos].sp := sp;
+			INC(nextPos);
 		END AddContext;
 
-		PROCEDURE GetNextContext(VAR pos: SIZE; VAR bp, pc: ADDRESS): BOOLEAN;
+		PROCEDURE GetNextContext(VAR pos: SIZE; VAR bp, pc, sp: ADDRESS): BOOLEAN;
 		BEGIN
 			IF pos < 1 THEN RETURN FALSE END;
 			DEC(pos);
-			bp := last[pos*2];
-			pc := last[pos*2+1];
+			bp := last[pos].bp;
+			pc := last[pos].pc;
+			sp := last[pos].sp;
 			RETURN TRUE;
 		END GetNextContext;
 
@@ -152,8 +154,9 @@ TYPE
 		BEGIN
 			IF nextPos > 0 THEN
 				DEC(nextPos);
-				last[nextPos*2] := NIL;
-				last[nextPos*2+1] := NIL;
+				last[nextPos].bp := NIL;
+				last[nextPos].pc := NIL;
+				last[nextPos].sp := NIL;
 			END;
 		END RemoveContext;
 	END;
@@ -183,11 +186,10 @@ TYPE
 		context: ANY; (* commands contect *)
 
 		PROCEDURE FindRoots;
-		VAR sp, bp, sb, n, a0, a1, adr, pc: ADDRESS; desc {UNTRACED}: Modules.ProcedureDescPointer; i: SIZE; p {UNTRACED}: ANY;
+		VAR sp, bp, sb, n, a0, a1, adr, pc: ADDRESS; desc {UNTRACED}, pdesc {UNTRACED}: Modules.ProcedureDescPointer; i: SIZE; p {UNTRACED}: ANY;
 			contextPos: SIZE; suspended: BOOLEAN;
 		BEGIN{UNTRACKED}
 			IF (mode < Running) OR (mode = Terminated) THEN RETURN END;
-
 			suspended := FALSE;
 			IF SELF = CurrentProcess() THEN
 				state.SP := SYSTEM.GetStackPointer( );
@@ -197,60 +199,52 @@ TYPE
 				suspended := TRUE;
 				Suspend(SELF);
 			END;
+			
 			sb := stackBottom;
 			contextPos := CAS(gcContext.nextPos,0,0);
 			sp := state.SP; bp := state.BP; pc := state.PC;  (* <---- might all be invalid, when A2 was left ! *)
-
+		
 			IF TraceProcessHook # NIL THEN (* stack trace *)
 				TraceProcessHook(SELF, pc, bp, sp, sb);
+			END;						
+				
+			IF Machine.ValidHeapAddress(pc) & (bp # NIL) THEN (* bp = NIL can happen when code has no procedure activation frame *)
+				(* ok, valid stack frame from A2, we can trace this *)
+			ELSE ASSERT( gcContext.GetNextContext(contextPos, bp, pc, sp) ); 
 			END;
-
 			IF contextPos >= 0 THEN (* this thread is currently active in A2 *)
 				IF Heaps.GCType = Heaps.HeuristicStackInspectionGC THEN
-					(* debugging info*)
-					IF (stackBottom # 0) & (bp < stackBottom) & (bp >= sp - SIZE OF ADDRESS) THEN
-						SYSTEM.GET( bp, n );
-						IF ODD( n ) THEN (* procedure descriptor at bp *)
-							IF n > 1024 THEN
-							desc := SYSTEM.VAL( Modules.ProcedureDescPointer, n-1 ); (* tracing !*)
-							END;
-						END;
-					END;
 					IF (stackBottom # 0) & (sp # 0) & (sp <= stackBottom) THEN
 						Heaps.RegisterCandidates( sp, stackBottom - sp );
 					END;
 				ELSIF Heaps.GCType = Heaps.MetaDataForStackGC THEN
 					LOOP
-						IF Machine.ValidHeapAddress(pc) THEN
+						IF Machine.ValidHeapAddress(pc) & (bp # NIL) THEN (* bp = NIL can happen when code has no procedure activation frame *)
 							(* ok, valid stack frame from A2, we can trace this *)
-						ELSIF gcContext.GetNextContext(contextPos, bp, pc) THEN
-								sp := bp;
+						ELSIF gcContext.GetNextContext(contextPos, bp, pc, sp) THEN
+								IF TraceProcessHook # NIL THEN (* stack trace *)
+									TraceProcessHook(SELF, pc, bp, sp-128, sb);
+								END;
 						ELSE
 								EXIT
 						END;
-						SYSTEM.GET( bp, n );
-						IF ODD( n ) THEN (* procedure descriptor at bp *)
-							IF (n > 1024) & (bp >= sp) THEN
-								desc := SYSTEM.VAL( Modules.ProcedureDescPointer, n-1 );
-								IF desc # NIL THEN
-									a0 := ADDRESSOF( desc.offsets );
-									a1 :=  SYSTEM.VAL( ADDRESS, desc.offsets );
-									ASSERT( a0+SIZEOF( ADDRESS ) = a1, 54321 );
-									FOR i := 0 TO LEN( desc.offsets ) - 1 DO
-										adr := bp + desc.offsets[i]; (* pointer at offset *)
-										SYSTEM.GET( adr, p ); (* load pointer *)
-										IF p # NIL THEN
-											Heaps.Mark( p );
-										END
+						IF bp > sp THEN
+							SYSTEM.GET( bp-SIZEOF(ADDRESS), desc );
+							IF desc # NIL THEN
+								a0 := ADDRESSOF( desc.offsets );
+								a1 :=  SYSTEM.VAL( ADDRESS, desc.offsets );
+								ASSERT( a0+SIZEOF( ADDRESS ) = a1, 54321 );
+								FOR i := 0 TO LEN( desc.offsets ) - 1 DO
+									adr := bp + desc.offsets[i]; (* pointer at offset *)
+									SYSTEM.GET( adr, p ); (* load pointer *)
+									IF p # NIL THEN
+										Heaps.Mark( p );
 									END
 								END
 							END;
-							SYSTEM.GET( bp + SIZEOF( ADDRESS ), bp );
-							SYSTEM.GET(bp + 2*SIZEOF(ADDRESS), pc);
-						ELSE (* classical stack frame *)
-							SYSTEM.GET(bp + SIZEOF(ADDRESS), pc);
-							bp := n;
 						END;
+						SYSTEM.GET(bp + SIZEOF(ADDRESS), pc);
+						SYSTEM.GET(bp, bp);
 					END; (* LOOP *)
 				END; (* gctype *)
 			END; (* contextpos *)
@@ -279,17 +273,27 @@ TYPE
 		BEGIN {UNTRACKED}
 			IF value THEN
 				time := Kernel32.GetTickCount();
-				Machine.Acquire(Machine.Objects);
-				Machine.Acquire(Machine.Heaps); (* to protect agains concurrent LazySweep *)
+					
 				IF ConcurrentGC THEN
+					Machine.Acquire(Machine.GC); 
+					Machine.Acquire(Machine.Heaps); (* to protect agains concurrent LazySweep *)
+					gcProcess := CurrentProcess(); 
 					Heaps.CollectGarbage( Modules.root );
+					gcProcess := NIL; 
+					Machine.Release(Machine.Heaps);
+					Machine.Release(Machine.GC); 
 				ELSE
+					Machine.Acquire(Machine.GC); 
+					Machine.Acquire(Machine.Heaps); (* to protect agains concurrent LazySweep *)
+					gcProcess := CurrentProcess(); 
 					SuspendActivities;
 					Heaps.CollectGarbage(Modules.root);
+					gcProcess := NIL; 
 					ResumeActivities;
+					Machine.Release(Machine.Heaps);
+					Machine.Release(Machine.GC); 
 				END;
-				Machine.Release(Machine.Heaps);
-				Machine.Release(Machine.Objects);
+
 				time := Kernel32.GetTickCount()-time;
 				IF Heaps.trace THEN Trace.String("GC Called -- duration "); Trace.Int(time,0); Trace.String(" ms."); Trace.Ln END;
 				IF finalizerCaller # NIL THEN finalizerCaller.Activate() END;
@@ -355,6 +359,7 @@ VAR
 	terminateProc: PROCEDURE;
 	ready: ProcessQueue;	(* contains running processes in this implementation *)
 	startedMainProcess := FALSE: BOOLEAN;
+	gcProcess : Process; 
 
 	numberOfProcessors: LONGINT; (* cached value of Machine.NumberOfProcessors() *)
 	finalizerCaller: FinalizerCaller; (* active object for finalizer process, regarded as aprt of GC *)
@@ -405,11 +410,26 @@ PROCEDURE Yield*;
 BEGIN
 	Kernel32.Sleep(0)
 END Yield;
-
+	
 (** Return current process. (DEPRECATED, use ActiveObject) *)
 PROCEDURE CurrentProcess*( ): Process;
-BEGIN{UNTRACKED} (* makes sure that Enter and Leave are not emitted *)
-	RETURN SYSTEM.VAL(Process, Kernel32.TlsGetValue(tlsIndex));
+(* The following code replaces RETURN Kernel32.TlsGetValue(tlsIndex) and does not need to leave A2 *)
+CODE
+#IF I386 THEN
+	MOV EAX, [tlsIndex]
+	MOV EDX, [FS:18H]
+	MOV EAX, [EDX + EAX * 4 + 0E10H]
+	MOV EDX, [EBP + RESULT]
+	MOV [EDX], EAX
+#ELSIF AMD64 THEN
+	MOV EAX, [tlsIndex]
+	MOV RDX, [GS:30H]
+	MOV RAX, [RDX + EAX * 8 + 1480H]
+	MOV RDX, [RBP + RESULT]
+	MOV [RDX], RAX
+#ELSE
+	unimlemented
+#END
 END CurrentProcess;
 
 PROCEDURE CurrentContext*(): ANY;
@@ -434,14 +454,6 @@ BEGIN
 	RETURN p.stackBottom
 END GetStackBottom;
 
-PROCEDURE CheckBP(bp: ADDRESS): ADDRESS;
-VAR n: ADDRESS;
-BEGIN
-	SYSTEM.GET(bp,n);
-	IF ODD(n) THEN  bp := bp + SIZEOF(ADDRESS) END;
-	RETURN bp;
-END CheckBP;
-
 PROCEDURE GetStack*(p: Process; VAR pc, bp, sp, sb: ADDRESS; VAR contextPos: SIZE);
 BEGIN
 	UpdateProcessState(p);
@@ -453,14 +465,13 @@ BEGIN
 
 	IF p = CurrentProcess() THEN
 		sp := SYSTEM.GetStackPointer();
-		bp := CheckBP(SYSTEM.GetFramePointer());
+		bp := SYSTEM.GetFramePointer();
 		SYSTEM.GET(bp, bp);
-		bp := CheckBP(bp);
 		SYSTEM.GET(bp+SIZEOF(ADDRESS), pc);
 	END;
 END GetStack;
 
-PROCEDURE NextValidStackSegment*(p: Process; VAR bp, pc: ADDRESS; VAR contextPos: SIZE): BOOLEAN;
+PROCEDURE NextValidStackSegment*(p: Process; VAR bp, pc, sp: ADDRESS; VAR contextPos: SIZE): BOOLEAN;
 BEGIN
 	IF contextPos > p.gcContext.nextPos THEN
 		contextPos := p.gcContext.nextPos;
@@ -468,8 +479,9 @@ BEGIN
 	bp := NIL;
 	WHILE (contextPos > 0) & (bp = NIL) DO
 		DEC(contextPos);
-		bp := p.gcContext.last[contextPos*2];
-		pc := p.gcContext.last[contextPos*2+1];
+		bp := p.gcContext.last[contextPos].bp;
+		pc := p.gcContext.last[contextPos].pc;
+		sp := p.gcContext.last[contextPos].sp;
 	END;
 	RETURN bp  # NIL;
 END NextValidStackSegment;
@@ -497,18 +509,14 @@ BEGIN
 	t := queue.head;
 	IF t = NIL THEN  (* zero elements in queue *)
 		(* skip *)
+		new := NIL;
 	ELSIF t = queue.tail THEN  (* one element in queue *)
+		new := t(Process);
 		queue.head := NIL; queue.tail := NIL  (* {(t.next = NIL) & (t.prev = NIL)} *)
 	ELSE  (* more than one element in queue *)
+		new := t(Process);
 		queue.head := t.next; t.next := NIL; queue.head.prev := NIL
 	END;
-	ASSERT((t = NIL) OR (t.next = NIL ) & (t.prev = NIL)); (* temp strong check *)
-	IF t = NIL THEN
-		new := NIL
-	ELSE
-		ASSERT(t IS Process);
-		new := t(Process)
-	END
 END Get;
 
 (* Put a process in a queue. Caller must hold lock for specific queue. *)
@@ -529,8 +537,8 @@ END Put;
 
 
 PROCEDURE {WINAPI} ExcpFrmHandler( CONST exceptionPointers: Kernel32.ExceptionPointers): Kernel32.DWORD ;
-VAR m: Modules.Module;  eip, ebp, stack: ADDRESS;  pc, handler, fp, sp: ADDRESS;  handled: BOOLEAN;  t: Process;
-BEGIN
+VAR m: Modules.Module;  eip, ebp, stack: ADDRESS;  pc, handler, fp, sp: ADDRESS;  handled: BOOLEAN;  t {UNTRACED}: Process;
+BEGIN{UNTRACKED}
 	handled := FALSE;
 
 	Kernel32.EnterCriticalSection( excplock );
@@ -540,9 +548,13 @@ BEGIN
 	in Windows XP not necessary if Kernel32.SetThreadContext is not used (better to return gracefully from this handler)
 	SetCurrent(excpFrame);
 	*)
-
-	t := CurrentProcess();
-
+	t := SYSTEM.VAL(Process, Kernel32.TlsGetValue(tlsIndex));
+	IF t = gcProcess THEN 
+		(*Machine.Release(Machine.GC); *)
+		Machine.Release(Machine.Heaps); 
+		Heaps.StopMarking 
+	END; 
+	
 	IF exceptionhandler = NIL THEN
 		Trace.StringLn ( "Objects: No exception handler installed" );
 		IF HandleExcp THEN
@@ -689,6 +701,7 @@ VAR hdr {UNTRACED}: Heaps.ProtRecBlock; res: Kernel32.BOOL; shutdown: BOOLEAN;
 BEGIN
 	IF t = NIL THEN RETURN END;
 	(* see Objects.TerminateThis *)
+	Machine.Acquire( Machine.GC ); 
 	Machine.Acquire( Machine.Objects );
 
 	IF TraceVerbose OR TraceOpenClose THEN
@@ -701,14 +714,14 @@ BEGIN
 	ELSIF t.mode = AwaitingLock THEN
 		SYSTEM.GET(SYSTEM.VAL(ADDRESS, t.waitingOn) + Heaps.HeapBlockOffset, hdr);
 		ASSERT(hdr IS Heaps.ProtRecBlock);
-		Remove( hdr.awaitingLock, t );  Machine.Release( Machine.Objects );
+		Remove( hdr.awaitingLock, t );  Machine.Release( Machine.Objects );Machine.Release(Machine.GC); 
 		HALT( 97 )
 	ELSIF t.mode = AwaitingCond THEN
 		SYSTEM.GET(SYSTEM.VAL(ADDRESS, t.waitingOn) + Heaps.HeapBlockOffset, hdr);
 		ASSERT(hdr IS Heaps.ProtRecBlock);
-		Remove( hdr.awaitingCond, t );  Machine.Release( Machine.Objects );
+		Remove( hdr.awaitingCond, t ); Machine.Release( Machine.Objects );Machine.Release(Machine.GC); 
 		HALT( 98 )
-	ELSE Machine.Release( Machine.Objects );
+	ELSE Machine.Release( Machine.Objects );Machine.Release(Machine.GC); 
 		HALT( 99 )
 	END;
 	t.mode := Terminated;   (* a process can also be "terminated" if the queue containing it is garbage collected *)
@@ -718,6 +731,7 @@ BEGIN
 	DEC( nProcs );  shutdown := (nProcs = 0);
 
 	Machine.Release( Machine.Objects );
+	Machine.Release( Machine.GC );
 	IF shutdown THEN
 		Trace.StringLn ( " Objects: shutdown" ); Modules.Shutdown( -1 );
 		Kernel32.ExitProcess( 0 )
@@ -729,8 +743,8 @@ VAR t: Process;  obj: ProtectedObject; res: Kernel32.BOOL; bp,sp: ADDRESS;
 BEGIN
 	(* it may happen that the garbage collector runs right here and ignores this procedure.
 	    This is not a problem since lpParameter (being a reference to a process) is protected by the process lists *)
+	Machine.Acquire(Machine.GC); 
 	Machine.Acquire(Machine.Objects);
-
 	res := Kernel32.TlsSetValue(tlsIndex, SYSTEM.VAL(ADDRESS, lpParameter));
 	t := lpParameter(Process);  obj := t.obj;
 	ASSERT(res # 0);
@@ -754,6 +768,7 @@ BEGIN
 	t.mode := Running;
 	(* now gc is enabled for this process stack *)
 	Machine.Release(Machine.Objects);
+	Machine.Release(Machine.GC);
 	(* loop all processes that the GC did not see during process suspending because they were in the very moment being generated (just before the locked section) *)
 
 	t.body(obj);
@@ -788,8 +803,9 @@ BEGIN
 			END;
 		 *)
 	END;
+	Machine.Acquire(Machine.GC);
 	p.mode := Terminated; (* fof for GC problem *)
-
+	Machine.Release(Machine.GC); 
 	IF p.handle # 0 THEN
 		res := Kernel32.CloseHandle(p.handle); p.handle := 0
 	END
@@ -820,12 +836,13 @@ BEGIN
 	END;
 
 	NEW(fn);   (* implicit call Heaps.NewRec -> might invoke GC *)
+	Heaps.AddFinalizer(t, fn); (* requires heaps lock *)
 
+	Machine.Acquire(Machine.GC); 
 	Machine.Acquire(Machine.Objects);
 	t.next := NIL; t.prev := NIL;
 	t.waitingOn := NIL; t.flags := flags; t.obj := obj; t.mode := Unknown;
 	t.body := body; t.event := 0; fn.finalizer := FinalizeProcess;
-	Heaps.AddFinalizer(t, fn);
 	IF Restart IN flags THEN  (* restart object body *)
 		t.restartPC := SYSTEM.VAL(ADDRESS, body);
 	ELSE  (* terminate process *)
@@ -860,6 +877,8 @@ BEGIN
 	IF Restart IN flags THEN INCL(flags, Resistant) END;   (* SAFE => Restart & Resistant *)
 	NewProcess(body, priority, flags, obj, t);  INC(nProcs);  (* acquires Machine.Objects lock *)
 	Machine.Release(Machine.Objects);
+	Machine.Release(Machine.GC);
+	
 END CreateProcess;
 
 
@@ -873,12 +892,13 @@ BEGIN  (* {called from user level} *)
 		ASSERT(hdr IS Heaps.ProtRecBlock); (* protected object *)
 		ASSERT(exclusive)	(* shared not implemented yet *)
 	END;
-	r := CurrentProcess();
+	Machine.Acquire(Machine.Objects);
+	globalRunning := CurrentProcess();
+	r := globalRunning;
 	IF StrongChecks THEN
 		ASSERT(hdr # NIL, 1001);
 		ASSERT(r # NIL, 1002);
 	END;
-	Machine.Acquire(Machine.Objects);
 	IF hdr.count = 0 THEN  (* not locked *)
 		hdr.count := -1; hdr.lockedBy := r;
 		Machine.Release(Machine.Objects)
@@ -895,11 +915,13 @@ BEGIN  (* {called from user level} *)
 		END;
 		r.waitingOn := obj;  r.mode := AwaitingLock;
 		Put(hdr.awaitingLock, r); INC(awl);
+		globalRunning := NIL;
 		Machine.Release(Machine.Objects);
 		res := Kernel32.WaitForSingleObject(r.event, Kernel32.Infinite); (* block execution *)
 		ASSERT(res = Kernel32.WaitObject0);
 		IF StrongChecks THEN
 			ASSERT(hdr.lockedBy = r); (* at this moment only this process can own the lock and only this process can release it*)
+			ASSERT(r.mode = Running); 
 		END;
 	END
 END Lock;
@@ -930,7 +952,9 @@ BEGIN
 	END;
 	ASSERT(hdr.count = -1);	(* exclusive locked *)
 	Machine.Acquire(Machine.Objects);
+	globalRunning := CurrentProcess(); (* protect current process *)
 
+	(* the running process remains reachable, no danger that c or t are not seen by the GC *)
 	IF hdr.awaitingCond.head # NIL THEN  (* evaluate the waiting conditions *)
 		(* we are holding the lock, so the queue can not change (to do: except in TerminateThis) *)
 		c := FindCondition(hdr.awaitingCond);   (* interrupts should be on during this call *)
@@ -946,8 +970,7 @@ BEGIN
 			hdr.lockedBy := NIL; hdr.count := 0
 		END
 	ELSE  (* true condition found, transfer the lock *)
-		c.waitingOn := NIL; hdr.lockedBy := c;
-		t := NIL
+		c.waitingOn := NIL; hdr.lockedBy := c; t := NIL
 	END;
 	IF c # NIL THEN
 		Put(ready, c); c.mode := Running; DEC(awc);
@@ -958,8 +981,13 @@ BEGIN
 		res := Kernel32.SetEvent(t.event);
 		ASSERT (res # 0, 1002);
 	END;
+	globalRunning := NIL;
 	Machine.Release( Machine.Objects )
 END Unlock;
+
+VAR globalRunning: Process; 
+	(* global in order to save a reference to the current processes somewhere when
+		it temporarily is not in any queue	 *)
 
 (* The procedure Lock, Unlock and Await do not use header locks since it turned out that the header locks sometimes were finalized
      too early. *)
@@ -975,8 +1003,9 @@ BEGIN
 	IF StrongChecks THEN
 		ASSERT(hdr IS Heaps.ProtRecBlock) (* protected object *)
 	END;
-	r := CurrentProcess();
 	Machine.Acquire(Machine.Objects);
+	globalRunning := CurrentProcess();
+	r := globalRunning;
 	IF hdr.lockedBy = r THEN  (* current process holds exclusive lock *)
 		IF StrongChecks THEN ASSERT(hdr.count = -1) END; (* exclusive locked *)
 		IF hdr.awaitingCond.head # NIL THEN	(* evaluate the waiting conditions *)
@@ -995,8 +1024,7 @@ BEGIN
 				hdr.lockedBy := t;
 			END;
 		ELSE
-			c.waitingOn := NIL; hdr.lockedBy := c;
-			t := NIL;
+			c.waitingOn := NIL; hdr.lockedBy := c;	t := NIL;
 		END;
 	ELSE  (* no lock, or some other process may hold the lock, but that's the user's indaba (may be monotonic condition) *)
 		Machine.Release(Machine.Objects);
@@ -1020,12 +1048,14 @@ BEGIN
 		ASSERT(res # 0, 1003);
 	END;
 	Put(hdr.awaitingCond, r); INC(awc);
+	globalRunning := NIL;
 	Machine.Release(Machine.Objects);
 	res := Kernel32.WaitForSingleObject(r.event, Kernel32.Infinite); (* block execution *)
 	ASSERT(res = Kernel32.WaitObject0);
 	IF StrongChecks THEN
 		ASSERT(cond(slink));
-		ASSERT(hdr.lockedBy = r) (* lock held again *)
+		ASSERT(hdr.lockedBy = r); (* lock held again *)
+		ASSERT(r.mode = Running); 
 	END
 END Await;
 
@@ -1101,7 +1131,7 @@ END Terminate;
 
 PROCEDURE Init;   (* can not use NEW *)
 VAR t: Process;  fn: Heaps.FinalizerNode;  proc: Kernel32.HANDLE;
-	res: Kernel32.BOOL;
+	res: Kernel32.BOOL;obj: ProtectedObject;
 BEGIN
 	Kernel32.AddVectoredExceptionHandler(1, ExcpFrmHandler);
 	Kernel32.InitializeCriticalSection(excplock);
@@ -1111,20 +1141,23 @@ BEGIN
 	EnterA2; (*! ExitA2 for the DLL loading thread will be called after execution of all module bodies (see Modules.Main) *)
 #ELSE
 	NEW(t);
+	NEW(obj);
+	t.obj := obj;
 	NEW(fn);
+	Heaps.AddFinalizer(t, fn);
 
+	Machine.Acquire(Machine.GC);
 	Machine.Acquire(Machine.Objects);
 	t.gcContext.nextPos := 0;
 	nProcs := 1;
 	t.next := NIL;  t.prev := NIL;
 	t.waitingOn := NIL;
 	t.flags := {};
-	t.obj := NIL;
+	t.obj := obj;
 	t.mode := Unknown; t.body := NIL;
 	t.priority := Normal;
 
 	fn.finalizer := FinalizeProcess;
-	Heaps.AddFinalizer(t, fn);
 
 	t.handle := Kernel32.GetCurrentThread();
 	t.id := Kernel32.GetCurrentThreadId();
@@ -1138,6 +1171,7 @@ BEGIN
 	Put( ready, t );
 	ASSERT(t.handle # 0);
 	Machine.Release(Machine.Objects);
+	Machine.Release(Machine.GC);
 #END;
 	ASSERT(~CAS(startedMainProcess, FALSE, TRUE));
 
@@ -1266,7 +1300,7 @@ END GetCpuCycles;
 (* suspend and store state *)
 PROCEDURE Suspend(p: Process);
 VAR res: WORD;
-BEGIN
+BEGIN{UNTRACKED}
 	res := Kernel32.SuspendThread(p.handle);
 	ASSERT(res >= 0);
 	p.state.ContextFlags := Kernel32.ContextControl + Kernel32.ContextInteger;
@@ -1337,10 +1371,10 @@ VAR GetProcedureName*: PROCEDURE (pc: ADDRESS; VAR n: ARRAY OF CHAR; VAR spc: AD
 		IF CAS(startedMainProcess,FALSE,FALSE) THEN
 			cur := CurrentProcess();
 			IF cur # NIL THEN
-				ebp := CheckBP(SYSTEM.GetFramePointer());
+				ebp := SYSTEM.GetFramePointer();
 				SYSTEM.GET(ebp+SIZEOF(ADDRESS), pc);
 				SYSTEM.GET(ebp, ebp);
-				cur.gcContext.AddContext(ebp, pc);
+				cur.gcContext.AddContext(ebp, pc, SYSTEM.GetStackPointer());
 			END;
 		END;
 	END LeaveA2;
@@ -1462,16 +1496,9 @@ VAR
 					Machine.Release(Machine.TraceOutput);
 				END;
 			ELSE
-				INC(cur.gcContext.nextPos);
-				cur.gcContext.last[2*cur.gcContext.nextPos] := NIL;
-				cur.gcContext.last[2*cur.gcContext.nextPos+1] := NIL;
+				cur.gcContext.AddContext(NIL, NIL, NIL);
 			END;
 		END;
-
-		(*
-		cur.gcContext.first[cur.gcContext.nextPos] := ebp; (* here our responsibility starts -- currently this field is not strictly required to be set valid *)
-		cur.gcContext.last[cur.gcContext.nextPos] := NIL; (* we do not know where it ends yet *)
-		*)
 	END EnterA2;
 
 	(* exit A2 should be called when a process exits a WINAPI procedure *)
@@ -1481,9 +1508,7 @@ VAR
 		cur := CurrentProcess();
 		ASSERT(cur # NIL);
 		IF cur.gcContext.nextPos > 0 THEN
-			DEC(cur.gcContext.nextPos);
-			cur.gcContext.last[2*cur.gcContext.nextPos] := NIL;
-			cur.gcContext.last[2*cur.gcContext.nextPos+1] := NIL;
+			cur.gcContext.RemoveContext();
 		ELSE
 			IF TraceVerbose THEN
 				Machine.Acquire(Machine.TraceOutput);
@@ -1651,6 +1676,8 @@ END Objects.
 
 
 
-		Linker.Link --fileFormat=PE32CUI --fileName=oberonn.exe --extension=GofW --displacement=401000H
+
+		Linker.Link --fileFormat=PE64CUI --fileName=oberon.exe --extension=GofWw --displacement=401000H
 			Builtins Trace Kernel32 Heaps Modules Objects Kernel KernelLog Streams Commands Files WinFS Clock Dates Reals Strings Diagnostics BitSets
-			StringPool ObjectFile GenericLinker Reflection Loader Shell StdIOShell Traps System ~
+			StringPool ObjectFile GenericLinker Reflection Traps Loader Shell StdIOShell System ~
+

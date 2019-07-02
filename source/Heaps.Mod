@@ -675,7 +675,7 @@ END RegisterCandidates;
 
 (* Check reachability of finalized objects. *)
 PROCEDURE CheckFinalizedObjects;
-VAR n, p, t: FinalizerNode; heapBlock {UNTRACED}: HeapBlock;
+VAR n {UNTRACED}, p{UNTRACED}, t{UNTRACED}: FinalizerNode; heapBlock {UNTRACED}: HeapBlock;
 
 	PROCEDURE MarkDelegate(p: Finalizer);
 	VAR pointer {UNTRACED}: ANY;
@@ -892,21 +892,12 @@ BEGIN
 	END;
 END NewBlock;
 
-PROCEDURE CheckBP(bp: ADDRESS): ADDRESS;
-VAR n: ADDRESS;
-BEGIN
-	SYSTEM.GET(bp,n);
-	IF ODD(n) THEN  bp := bp + SIZEOF(ADDRESS) END;
-	RETURN bp;
-END CheckBP;
-
 PROCEDURE SetPC*(p: DataBlockU);
 VAR bp: ADDRESS;
 BEGIN
 	IF p # NIL THEN
-		bp := CheckBP(SYSTEM.GetFramePointer());
+		bp := SYSTEM.GetFramePointer();
 		SYSTEM.GET(bp, bp);
-		bp := CheckBP(bp);
 		SYSTEM.GET(bp+SIZEOF(ADDRESS), p.heapBlock.heapBlock);
 	END;
 END SetPC;
@@ -1266,6 +1257,7 @@ PROCEDURE MarkPointer*(adr: ADDRESS);
 VAR any: Block;
 BEGIN
 	IF (adr # NIL) & CAS(marking, FALSE, FALSE) THEN
+		any := adr;
 		Mark(any);
 	END; 
 END MarkPointer;
@@ -1369,6 +1361,14 @@ BEGIN
 	GCType := MetaDataForStackGC;
 	Trace.String("GC mode : metadata"); Trace.Ln;
 END SetMetaData;
+
+
+PROCEDURE StopMarking-;
+(* helper function when GC traps --> switch off write barriers *)
+BEGIN
+	marking := FALSE;
+END StopMarking;
+
 
 BEGIN
 	(* The meta data stack inspection is more efficient than the heuristics *)

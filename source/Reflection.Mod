@@ -952,17 +952,6 @@ CONST
 		END;
 	END ModuleState;
 
-	PROCEDURE CheckBP(bp: ADDRESS): ADDRESS;
-	VAR n: ADDRESS;
-	BEGIN
-		IF bp # NIL THEN
-			SYSTEM.GET(bp, n);
-			IF ODD(n) THEN INC(bp, SIZEOF(ADDRESS)) END;
-		END;
-		RETURN bp;
-	END CheckBP;
-
-
 	(* Display call trackback. *)
 	PROCEDURE StackTraceBack*(w: Streams.Writer; pc, bp: ADDRESS; low,high: ADDRESS; long, overflow: BOOLEAN);
 	VAR count,offset: SIZE; base: ADDRESS; m: Modules.Module; refs: Modules.Bytes;
@@ -970,7 +959,7 @@ CONST
 		count := 0;	(* frame count *)
 		REPEAT
 			m := Modules.ThisModuleByAdr0(pc);
-			IF (ShowAllProcs OR (m # NIL) OR (count = 0)) & (bp # 0) & (bp >= low) & (bp < high) & (bp MOD SIZEOF(ADDRESS)=0) THEN
+			IF (ShowAllProcs OR (m # NIL) OR (count = 0)) & (bp # 0) & (bp >= low) & (bp <= high) & (bp MOD SIZEOF(ADDRESS)=0) THEN
 				IF CheckHeapAddress( pc ) THEN
 					WriteProc0(w, m, pc, bp, refs, offset, base); w.Ln;Wait(w); w.Update;
 					IF long & (~overflow OR (count > 0)) THEN	(* show variables *)
@@ -985,7 +974,6 @@ CONST
 				ELSE
 					w.String( "Unknown external procedure, pc = " );  w.Address( pc );  w.Ln; Wait(w);
 				END;
-				bp := CheckBP(bp);
 				SYSTEM.GET(bp + SIZEOF(ADDRESS), pc);	(* return addr from stack *)
 				SYSTEM.GET(bp, bp);	(* follow dynamic link *)
 				INC(count)
@@ -1337,7 +1325,8 @@ VAR trace: Streams.Writer;
 	VAR adr: ADDRESS;
 	BEGIN
 		trace.String("---------------------------------"); trace.Ln;
-		trace.String("Active Object: ");
+		trace.String("Process "); trace.Int(process.id,1); trace.Ln;
+		trace.String(" Active Object: ");
 		IF process.obj # NIL THEN
 			SYSTEM.GET(SYSTEM.VAL(ADDRESS, process.obj)-SIZEOF(ADDRESS), adr);
 			WriteType(trace, adr);
