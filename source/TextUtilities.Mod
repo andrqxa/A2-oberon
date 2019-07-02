@@ -640,7 +640,7 @@ TYPE
 			firstPiece := FALSE;
 			w.RawSInt(SHORT(SHORT(GetOberonColor(color))));
 			w.RawSInt(SHORT(SHORT(-voff)));
-			w.RawLInt(TODO(len));
+			w.RawLInt(len(LONGINT));
 		END WritePiece;
 
 		PROCEDURE WriteText*(text : Texts.Text; VAR res : WORD);
@@ -682,9 +682,9 @@ TYPE
 			UNTIL r.eot;
 			WritePiece(len + 1 - startPos);
 			w.Char(0X); (* ??? *)
-			w.RawLInt(TODO(len)); (* tLen ? *)
+			w.RawLInt(len(LONGINT)); (* tLen ? *)
 			w.Update;
-			hLen := TODO(w.Pos());
+			hLen := w.Pos()(LONGINT);
 
 			(* pure text ... *)
 			r.SetPosition(0);

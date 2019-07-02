@@ -1134,7 +1134,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 									W.RawInt(0)
 								END;
 								AddOfsReloc(type, W.Pos(), code);
-								W.RawLInt(TODO(r.ofs));
+								W.RawLInt(r.ofs(LONGINT));
 								AddOfsReloc(type, W.Pos(), idata);
 								W.RawLInt(r.obj.iat - idata.head.VirtualAddress)
 							ELSE
@@ -1183,7 +1183,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 					END;
 					ASSERT(p # NIL);
 					W.Char(0E9X); (* JMP Main *)
-					W.RawLInt(p.adr(PCBT.Procedure).codeoffset-(TODO(W.Pos())+4))
+					W.RawLInt(p.adr(PCBT.Procedure).codeoffset-(W.Pos()(LONGINT)+4))
 				END;
 				W.Update();
 				ModDesc()

@@ -744,7 +744,7 @@ TYPE
 					FOR i := 0 TO size-1 DO
 						outbuf[ i ] := data[ ofs + i ]
 					END;
-					SendRecord( outbuf, ApplicationData, 0, TODO(size) );
+					SendRecord( outbuf, ApplicationData, 0, size );
 					INC( ofs, size );
 					DEC( len, size )
 				END
