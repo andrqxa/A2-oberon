@@ -157,7 +157,7 @@ TYPE
 			END;
 
 			res := Streams.Ok;
-			err := WSock32.send( socket, data[ofs], TODO(len), {} );
+			err := WSock32.send( socket, data[ofs], len(WORD), {} );
 
 			IF (err < 0) OR ((err = 0) & (len > 0)) THEN
 				KernelLog.String( "TCP.Send :" );  WSock32.DispError;  res := NotConnected;
@@ -185,7 +185,7 @@ TYPE
 			END;
 
 			REPEAT
-				ret := WSock32.recv( socket, data[ofs], TODO(size), {} );
+				ret := WSock32.recv( socket, data[ofs], size(WORD), {} );
 				IF ret > 0 THEN INC( len, ret ); INC(ofs, ret); DEC(size, ret); END;
 			UNTIL (size <= 0) OR (len >= min) OR (ret <= 0);
 

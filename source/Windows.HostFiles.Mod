@@ -551,7 +551,7 @@ TYPE
 			pos := r.apos * BufferSize + r.bpos;
 			IF buffer.apos # r.apos THEN ReadBuffer( r.apos ) END;
 			buffer.data[r.bpos] := x;  INC( pos );
-			IF (r.bpos + 1) > buffer.len THEN buffer.len := TODO(r.bpos + 1) END;
+			IF (r.bpos + 1) > buffer.len THEN buffer.len := r.bpos + 1 END;
 			r.apos := pos DIV BufferSize;  r.bpos := SIZE( pos MOD BufferSize );
 			IF pos > fsize THEN fsize := pos END;
 			buffer.dirty := TRUE;
@@ -567,7 +567,7 @@ TYPE
 				n := BufferSize - r.bpos;
 				IF n > len THEN n := len END;
 				SYSTEM.MOVE( ADDRESSOF( x[ofs] ), ADDRESSOF( buffer.data[r.bpos] ), n );
-				IF (r.bpos + n) > buffer.len THEN buffer.len := TODO(r.bpos + n) END;
+				IF (r.bpos + n) > buffer.len THEN buffer.len := r.bpos + n END;
 				INC( pos, n );  INC( ofs, n );  DEC( len, n );  r.apos := pos DIV BufferSize;  r.bpos := SIZE( pos MOD BufferSize );
 				IF pos > fsize THEN fsize := pos END;
 				buffer.dirty := TRUE

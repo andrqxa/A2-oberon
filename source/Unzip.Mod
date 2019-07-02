@@ -19,11 +19,9 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 			VAR input: Streams.Reader; max: SIZE;
 
 			PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
-			VAR length: SIZE;
 			BEGIN
 				IF min > max THEN min := max END;
-				input.Bytes(buf, ofs, min, length);
-				len := TODO(length);
+				input.Bytes(buf, ofs, min, len);
 				DEC(max, len); res := input.res;
 				IF (max = 0) & (res = Streams.Ok) THEN
 					res := Streams.EOF
