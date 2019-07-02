@@ -1228,7 +1228,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 					mod := mod.next
 				END;
 				ofs := W.Pos();
-				optHdr.DataDirectory[ImageDirectoryEntryIAT].VirtualAddress := base + TODO(ofs);
+				optHdr.DataDirectory[ImageDirectoryEntryIAT].VirtualAddress := base + ofs(LONGINT);
 				mod := imports;
 				WHILE mod # NIL DO
 					mod.desc.FirstThunk := W.Pos()(LONGINT);
@@ -1240,7 +1240,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 					mod := mod.next
 				END;
 				W.Update();
-				optHdr.DataDirectory[ImageDirectoryEntryIAT].Size := TODO(W.Pos() - ofs);
+				optHdr.DataDirectory[ImageDirectoryEntryIAT].Size := (W.Pos() - ofs)(LONGINT);
 				mod := imports; i := 0;
 				WHILE mod # NIL DO
 					obj := mod.objs; j := 0;
