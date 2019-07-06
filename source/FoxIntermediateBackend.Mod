@@ -6822,7 +6822,7 @@ TYPE
 				END;
 				val := SHORT(dim.intValue);
 				IF type.form # SyntaxTree.Tensor THEN
-					t := SemanticChecker.ArrayBase(type,val);
+					t := SemanticChecker.ArrayBase(type,val(SIZE));
 					type := t.resolved(SyntaxTree.MathArrayType);
 					IF type.form = SyntaxTree.Static THEN
 						IF increment THEN
@@ -6835,7 +6835,7 @@ TYPE
 						RETURN;
 					END;
 				END;
-				offset := ToMemoryUnits(system, (val*2+offset)*addressType.sizeInBits);
+				offset := ToMemoryUnits(system, (val(SIZE)*2+offset)*addressType.sizeInBits);
 				MakeMemory(res,operand.tag,addressType,offset);
 				(*
 				res := IntermediateCode.Memory(addressType,operand.tag,offset);
@@ -6904,12 +6904,12 @@ TYPE
 			IF  dim.mode = IntermediateCode.ModeImmediate THEN
 				ASSERT(type.form IN {SyntaxTree.Open, SyntaxTree.SemiDynamic});
 				val := SHORT(dim.intValue);
-				t := SemanticChecker.ArrayBase(type,val);
+				t := SemanticChecker.ArrayBase(type,val(SIZE));
 				type := t.resolved(SyntaxTree.ArrayType);
 				IF type.form = SyntaxTree.Static THEN
 					res := IntermediateCode.Immediate(addressType,type.staticLength);
 				ELSE
-					offset := ToMemoryUnits(system, (offset-val)*addressType.sizeInBits);
+					offset := ToMemoryUnits(system, (offset-val(SIZE))*addressType.sizeInBits);
 					res := IntermediateCode.Memory(addressType,operand.tag,offset);
 				END;
 				UseIntermediateOperand(res);

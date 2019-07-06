@@ -609,7 +609,7 @@ TYPE
 			x.SetCellsAreObjects(cellsAreObjects);
 			x.SetSizeExpression(ResolveExpression(x.sizeExpression));
 			IF (x.sizeExpression # NIL) & CheckPositiveIntegerValue(x.sizeExpression,value,FALSE) THEN
-				x.SetSize(value);
+				x.SetSize(value(SIZE));
 			ELSE
 				x.SetSize(system.SizeOf(system.longintType));
 			END;
@@ -787,7 +787,7 @@ TYPE
 				END;
 			END;
 			IF HasFlag(modifiers, Global.NameNoReturn,position) THEN procedureType.SetNoReturn(TRUE) END;
-			IF HasValue(modifiers,Global.NameStackAligned,position,value) THEN procedureType.SetStackAlignment(value) END;
+			IF HasValue(modifiers,Global.NameStackAligned,position,value) THEN procedureType.SetStackAlignment(value(SIZE)) END;
 			IF HasFlag(modifiers, Global.NameDelegate,position) THEN procedureType.SetDelegate(TRUE) END;
 			IF HasFlag(modifiers, Global.NameRealtime,position) THEN procedureType.SetRealtime(TRUE) END;
 			CheckModifiers(modifiers, TRUE);
@@ -831,7 +831,7 @@ TYPE
 			hasPointers := FALSE;
 
 			modifiers := x.modifiers;
-			IF HasValue(modifiers,Global.NameAligned,position,value) THEN x.SetAlignmentInBits(value*system.dataUnit) END;
+			IF HasValue(modifiers,Global.NameAligned,position,value) THEN x.SetAlignmentInBits(value(SIZE)*system.dataUnit) END;
 			IF HasFlag(modifiers,Global.NameAbstract,position) THEN x.SetAbstract(TRUE) END;
 			CheckModifiers(modifiers, TRUE);
 
@@ -4831,7 +4831,7 @@ TYPE
 							Error(position, "invalid dimension");
 							base := SyntaxTree.invalidType;
 						ELSE
-							base := ArrayBase(base,i1);
+							base := ArrayBase(base,i1(SIZE));
 							IF (base # NIL) & Indexable(base) THEN
 							ELSE
 								Error(position, "len on no array");
@@ -5305,7 +5305,7 @@ TYPE
 							Error(position, "invalid dimension");
 							base := SyntaxTree.invalidType;
 						ELSE
-							base := ArrayBase(base,i1);
+							base := ArrayBase(base,i1(SIZE));
 							IF (base # NIL) & Indexable(base) THEN
 							ELSE
 								Error(position, "len on no array");
@@ -6108,21 +6108,21 @@ TYPE
 						IF ~PowerOf2(value) THEN
 							Error(position, "forbidden alignment - must be power of two");
 						ELSE
-							AdaptStackAlignment(variable.scope(SyntaxTree.ProcedureScope).ownerProcedure, value);
+							AdaptStackAlignment(variable.scope(SyntaxTree.ProcedureScope).ownerProcedure, value(SIZE));
 						END;
 					END;
-					variable.SetAlignment(FALSE,value);
+					variable.SetAlignment(FALSE,value(SIZE));
 				ELSIF HasValue(modifiers, Global.NameFixed,position, value) THEN
 					IF (variable.scope IS SyntaxTree.ProcedureScope) THEN
 						Error(position, "fixed position not possible in procedure");
 					END;
-					variable.SetAlignment(TRUE,value);
+					variable.SetAlignment(TRUE,value(SIZE));
 				ELSIF HasValue(modifiers, Global.NameFictive, position, value) THEN
 					IF (variable.scope IS SyntaxTree.ProcedureScope) THEN
 						Error(position,"fictive offset not possible in procedure");
 					END;
-					variable.SetFictive(value);
-					variable.SetOffset(value*system.dataUnit);
+					variable.SetFictive(value(SIZE));
+					variable.SetOffset(value(SIZE)*system.dataUnit);
 					IF ContainsPointer(variable.type) THEN variable.SetUntraced(TRUE) END;
 				END;
 				IF HasFlag(modifiers, Global.NameRegister, position) THEN variable.PreferRegister(TRUE) END;
@@ -6249,7 +6249,7 @@ TYPE
 				IF HasFlag(modifiers, Global.NameNoReturn, position) THEN
 					procedureType.SetNoReturn(TRUE);
 				END;
-				IF HasValue(modifiers, Global.NamePcOffset, position, value) THEN procedureType.SetPcOffset(value) END;
+				IF HasValue(modifiers, Global.NamePcOffset, position, value) THEN procedureType.SetPcOffset(value(SIZE)) END;
 
 				IF HasFlag(modifiers,Global.NameNoPAF,position) THEN procedureType.SetNoPAF(TRUE) END;
 				IF (procedure.scope IS SyntaxTree.ModuleScope) THEN
@@ -6257,14 +6257,14 @@ TYPE
 					ELSIF HasFlag(modifiers, Global.NameExit, position) THEN procedure.SetExit(TRUE);
 					END;
 				END;
-				IF HasValue(modifiers,Global.NameAligned,position,value) THEN procedure.SetAlignment(FALSE,value);
-				ELSIF HasValue(modifiers,Global.NameFixed,position,value) THEN procedure.SetAlignment(TRUE,value);
+				IF HasValue(modifiers,Global.NameAligned,position,value) THEN procedure.SetAlignment(FALSE,value(SIZE));
+				ELSIF HasValue(modifiers,Global.NameFixed,position,value) THEN procedure.SetAlignment(TRUE,value(SIZE));
 				END;
 				IF HasValue(modifiers,Global.NameStackAligned, position, value) THEN
 					IF ~PowerOf2(value) THEN
 						Error(position, "forbidden stack alignment - must be power of two");
 					ELSE
-						procedureType.SetStackAlignment(value);
+						procedureType.SetStackAlignment(value(SIZE));
 					END;
 				END;
 				IF HasFlag(modifiers,Global.NameRealtime,position) THEN procedureType.SetRealtime(TRUE) END;
