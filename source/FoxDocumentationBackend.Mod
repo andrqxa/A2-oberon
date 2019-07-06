@@ -945,7 +945,7 @@ TYPE
 			textElement.SetString(s);
 		END Int;
 
-		PROCEDURE Value(identifier: SyntaxTree.Identifier; value: LONGINT; VAR first: BOOLEAN);
+		PROCEDURE Value(identifier: SyntaxTree.Identifier; value: SIZE; VAR first: BOOLEAN);
 		BEGIN
 			Flag(identifier,first);
 			w.String("("); w.Int(value,1); w.String(")");ToText(w,current.text,ElementType.Default);

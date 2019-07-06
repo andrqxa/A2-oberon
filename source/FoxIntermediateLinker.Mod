@@ -20,7 +20,7 @@ TYPE
 	TYPE
 		ArrangementRestriction = RECORD
 			fixed: BOOLEAN;
-			positionOrAlignment: LONGINT;
+			positionOrAlignment: SIZE;
 		END;
 	VAR
 		backend-: Backend.Backend;
@@ -49,7 +49,7 @@ TYPE
 			isSorted := FALSE
 		END Init;
 
-		PROCEDURE PatchStackSize*(CONST typeName: SectionName; size: LONGINT);
+		PROCEDURE PatchStackSize*(CONST typeName: SectionName; size: SIZE);
 		VAR sectionName: SectionName; section: Sections.Section; pooledName: Basic.SegmentedName; op1, op2, op3: IntermediateCode.Operand; instruction: IntermediateCode.Instruction;
 		BEGIN
 			TRACE(size);
@@ -65,7 +65,7 @@ TYPE
 			section(IntermediateCode.Section).PatchOperands(0, op1, op2, op3);
 		END PatchStackSize;
 
-		PROCEDURE EmitAt(section: IntermediateCode.Section; index: LONGINT; CONST instruction: IntermediateCode.Instruction);
+		PROCEDURE EmitAt(section: IntermediateCode.Section; index: SIZE; CONST instruction: IntermediateCode.Instruction);
 		VAR reserve: IntermediateCode.Instruction; op: IntermediateCode.Operand;
 		BEGIN
 			IF index = section.pc THEN
@@ -82,7 +82,7 @@ TYPE
 			END
 		END EmitAt;
 
-		PROCEDURE PatchIntegerValue*(CONST sectionName: ARRAY OF CHAR; index: LONGINT; value: HUGEINT; type: SyntaxTree.Type): BOOLEAN;
+		PROCEDURE PatchIntegerValue*(CONST sectionName: ARRAY OF CHAR; index: SIZE; value: HUGEINT; type: SyntaxTree.Type): BOOLEAN;
 		VAR instruction: IntermediateCode.Instruction; section: Sections.Section; op1: IntermediateCode.Operand;
 			pooledName: Basic.SegmentedName; itype: IntermediateCode.Type;
 		BEGIN
@@ -99,7 +99,7 @@ TYPE
 			RETURN TRUE;
 		END PatchIntegerValue;
 
-		PROCEDURE PatchBooleanValue*(CONST sectionName: ARRAY OF CHAR;index: LONGINT; value: BOOLEAN): BOOLEAN;
+		PROCEDURE PatchBooleanValue*(CONST sectionName: ARRAY OF CHAR;index: SIZE; value: BOOLEAN): BOOLEAN;
 		VAR instruction: IntermediateCode.Instruction; section: Sections.Section; op1: IntermediateCode.Operand;
 			pooledName: Basic.SegmentedName; type: IntermediateCode.Type;
 		BEGIN
@@ -122,7 +122,7 @@ TYPE
 		PROCEDURE PatchStringValue*(CONST sectionName: ARRAY OF CHAR; CONST value: ARRAY OF CHAR): BOOLEAN;
 		VAR instruction: IntermediateCode.Instruction; section: Sections.Section; op1: IntermediateCode.Operand;
 			pooledName: Basic.SegmentedName; type: IntermediateCode.Type;
-			char: CHAR; i: LONGINT;
+			char: CHAR; i: SIZE;
 		BEGIN
 			Basic.ToSegmentedName(sectionName, pooledName);
 			section := allSections.FindByName(pooledName);
@@ -243,7 +243,7 @@ TYPE
 
 	(*
 		PROCEDURE ModuleIsReachable(CONST name: Basic.String): BOOLEAN;
-		VAR i: LONGINT; section: Sections.Section;
+		VAR i: SIZE; section: Sections.Section;
 		BEGIN
 			FOR i := 0 TO allSections.Length()-1 DO
 				section := allSections.GetSection(i);
@@ -354,7 +354,7 @@ TYPE
 		VAR
 			fixedDataSections, flexibleDataSections: Sections.SectionList;
 			section, fixedDataSection, flexibleDataSection: Sections.Section;
-			i, fixedDataSectionIndex: SIZE; currentAddress, nextOccupiedAddress, flexibleDataSectionIndex, startAddress, endAddress: LONGINT;
+			i, fixedDataSectionIndex, nextOccupiedAddress, currentAddress, flexibleDataSectionIndex, startAddress, endAddress: SIZE;
 			done: BOOLEAN;
 		BEGIN
 			(* sort sections if necessary *)
@@ -405,7 +405,7 @@ TYPE
 					nextOccupiedAddress := fixedDataSection.positionOrAlignment
 				ELSE
 					(* there is no more fixed data section *)
-					nextOccupiedAddress := MAX(LONGINT)
+					nextOccupiedAddress := MAX(SIZE)
 				END;
 
 				done := FALSE;
@@ -510,7 +510,7 @@ TYPE
 		PROCEDURE SectionPositionComparison(leftObject, rightObject: ANY): BOOLEAN;
 		VAR
 			leftSection, rightSection: Sections.Section;
-			leftPosition, rightPosition: LONGINT;
+			leftPosition, rightPosition: SIZE;
 		BEGIN
 			ASSERT((leftObject IS Sections.Section) & (rightObject IS Sections.Section));
 			leftSection := leftObject(Sections.Section);
@@ -519,12 +519,12 @@ TYPE
 			IF leftSection.fixed THEN
 				leftPosition := leftSection.positionOrAlignment
 			ELSE
-				leftPosition := MAX(LONGINT)
+				leftPosition := MAX(SIZE)
 			END;
 			IF rightSection.fixed THEN
 				rightPosition := rightSection.positionOrAlignment
 			ELSE
-				rightPosition := MAX(LONGINT)
+				rightPosition := MAX(SIZE)
 			END;
 			IF leftSection.IsCode() & rightSection.IsCode() THEN RETURN FALSE END;
 			RETURN leftPosition < rightPosition
@@ -537,7 +537,7 @@ TYPE
 		PROCEDURE SectionPositionAndSizeComparison(leftObject, rightObject: ANY): BOOLEAN;
 		VAR
 			leftSection, rightSection: Sections.Section;
-			leftPosition, rightPosition, leftSize, rightSize: LONGINT;
+			leftPosition, rightPosition, leftSize, rightSize: SIZE;
 		BEGIN
 			ASSERT((leftObject IS Sections.Section) & (rightObject IS Sections.Section));
 			leftSection := leftObject(Sections.Section);
@@ -546,12 +546,12 @@ TYPE
 			IF leftSection.fixed THEN
 				leftPosition := leftSection.positionOrAlignment
 			ELSE
-				leftPosition := MAX(LONGINT)
+				leftPosition := MAX(SIZE)
 			END;
 			IF rightSection.fixed THEN
 				rightPosition := rightSection.positionOrAlignment
 			ELSE
-				rightPosition := MAX(LONGINT)
+				rightPosition := MAX(SIZE)
 			END;
 
 			IF ~leftSection.IsCode() & rightSection.IsCode() THEN (* data sections first *)
@@ -574,8 +574,8 @@ TYPE
 				ASSERT(leftPosition = rightPosition); (* note: this is the case for sections without fixed positions *)
 				leftSize := leftSection.GetSize();
 				rightSize := rightSection.GetSize();
-				IF (leftSize = Sections.UnknownSize) OR (leftSize = 0) THEN leftSize := MAX(LONGINT) END;
-				IF (rightSize = Sections.UnknownSize) OR (rightSize = 0) THEN rightSize := MAX(LONGINT) END;
+				IF (leftSize = Sections.UnknownSize) OR (leftSize = 0) THEN leftSize := MAX(SIZE) END;
+				IF (rightSize = Sections.UnknownSize) OR (rightSize = 0) THEN rightSize := MAX(SIZE) END;
 				IF leftSize = rightSize THEN
 					RETURN leftSection.offset < rightSection.offset (* keeping order as provided by loader, cosmetic *)
 				ELSE
@@ -628,11 +628,11 @@ TYPE
 		(* generate binary code and write an object file with a desired module name *)
 		PROCEDURE GenerateObjectFile*(objectFileFormat: Formats.ObjectFileFormat; log: Streams.Writer; CONST desiredName: ARRAY OF CHAR): BOOLEAN;
 		VAR
-			count: LONGINT;
+			count: SIZE;
 			intermediateCodeModule: Sections.Module;
 			binaryModule: Formats.GeneratedModule;
 			result: BOOLEAN;
-			sizes: POINTER TO ARRAY OF BinaryCode.Unit; i: LONGINT;
+			sizes: POINTER TO ARRAY OF BinaryCode.Unit; i: SIZE;
 			objectFileExtension: ARRAY 32 OF CHAR; objectFileName: Files.FileName;
 		BEGIN
 			intermediateCodeModule := ExtractModuleWithName(desiredName);
@@ -751,12 +751,12 @@ TYPE
 			codeFileName, dataFileName: Files.FileName;
 			typeName, instanceName, linkRoot: SectionName;
 			code, data: Linker.Arrangement; linker: GenericLinker.Linker;
-			i: LONGINT;
+			i: SIZE;
 			logFile: Files.File; linkerLog: Files.Writer;
 			type: ActiveCells.Type;
 			msg: MessageString;
 			objectFileExtension: ARRAY 32 OF CHAR;
-			instructionMemorySize, dataMemorySize: LONGINT;
+			instructionMemorySize, dataMemorySize: SIZE;
 			parameter: ActiveCells.Parameter;
 			value: SyntaxTree.Value;
 			pooledName: Basic.SegmentedName;
@@ -943,7 +943,7 @@ TYPE
 	END FileNameToModuleName;
 
 	PROCEDURE SectionNameToFileName(CONST sectionName: ARRAY OF CHAR; VAR fileName: ARRAY OF CHAR);
-	VAR i: LONGINT;
+	VAR i: SIZE;
 	BEGIN
 		i := 0;
 		WHILE (sectionName[i] # 0X) & (sectionName[i] # ".") DO
@@ -953,7 +953,7 @@ TYPE
 		fileName[i] := 0X;
 	END SectionNameToFileName;
 
-	PROCEDURE GetPriority*(block: Sections.Section): LONGINT;
+	PROCEDURE GetPriority*(block: Sections.Section): WORD;
 	CONST Fixed=0; EntryCode=1;InitCode=2; ExitCode=3; BodyCode=4;Code=5; Data=6; Const=7; Empty =8;
 	BEGIN
 		IF block.fixed THEN RETURN Fixed END;
@@ -1024,12 +1024,12 @@ TYPE
 				codeFileName, dataFileName: Files.FileName;
 				typeName, instanceName, linkRoot: SectionName;
 				code, data: Linker.Arrangement; linker: GenericLinker.Linker;
-				i: LONGINT;
+				i: SIZE;
 				logFile: Files.File; linkerLog: Files.Writer;
 				type: ActiveCells.Type;
 				msg: MessageString;
 				objectFileExtension: ARRAY 32 OF CHAR;
-				instructionMemorySize, dataMemorySize: LONGINT;
+				instructionMemorySize, dataMemorySize: SIZE;
 				parameter: ActiveCells.Parameter;
 				value: SyntaxTree.Value;
 				pooledName: Basic.SegmentedName;

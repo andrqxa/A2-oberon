@@ -150,7 +150,7 @@ TYPE
 			PROCEDURE ExpectNumber(VAR int: Unit):BOOLEAN;
 			BEGIN
 				IF (token.symbol = Scanner.Number) THEN
-					int := TODO(token.integer); GetNextToken; RETURN TRUE
+					int := token.integer(Unit); GetNextToken; RETURN TRUE
 				ELSE RETURN FALSE
 				END;
 			END ExpectNumber;
