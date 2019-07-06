@@ -987,7 +987,7 @@ TYPE
 				offset := virtual.offset;
 				ASSERT(virtual.intValue = 0);
 			END;
-			Assembler.InitMem(physical, SHORTINT(type.length * type.sizeInBits DIV 8) , physicalRegister, TODO(offset)+ (cpuBits DIV 8) *part);
+			Assembler.InitMem(physical, SHORTINT(type.length * type.sizeInBits DIV 8) , physicalRegister, (offset + (cpuBits DIV 8) * part)(LONGINT));
 			IF (virtual.symbol.name # "") & (cpuBits # 64) THEN
 				Assembler.SetSymbol(physical,virtual.symbol.name,virtual.symbol.fingerprint,virtual.symbolOffset,virtual.offset+ (cpuBits DIV 8) *part);
 			END;
@@ -1026,7 +1026,7 @@ TYPE
 					ticket := NIL;
 				END;
 				IF Assembler.IsRegisterOperand(physical) & (type.sizeInBits > 8) THEN
-					Assembler.InitMem(physical,SHORTINT(type.length * type.sizeInBits DIV 8) , physical.register, TODO(virtual.offset));
+					Assembler.InitMem(physical,SHORTINT(type.length * type.sizeInBits DIV 8) , physical.register, virtual.offset(LONGINT));
 					emitter.Emit2(InstructionSet.opLEA, tmp,physical);
 				ELSE
 					emitter.Emit2(InstructionSet.opMOV,tmp,physical);
@@ -2431,7 +2431,7 @@ TYPE
 				Assembler.InitImm8(target,0);
 				emitter.Emit1(InstructionSet.opJGE, target);
 				emitter.Emit2( InstructionSet.opADD, remainder, op3);
-				emitter.code.PutByteAt(target.pc,TODO(emitter.code.pc -target.pc )-1);
+				emitter.code.PutByteAt(target.pc,(emitter.code.pc -target.pc - 1)(LONGINT));
 				emitter.Emit2(InstructionSet.opMOV, op1, remainder);
 			ELSE
 				imm := Assembler.NewImm8 (1);
@@ -2781,9 +2781,9 @@ TYPE
 		END EmitFill;
 
 		PROCEDURE EmitBr (CONST instruction: IntermediateCode.Instruction);
-		VAR dest,destPC: SIZE; offset: LONGINT; target: Assembler.Operand;hit,fail: LONGINT; reverse: BOOLEAN;
+		VAR dest,destPC, offset: SIZE; target: Assembler.Operand;hit,fail: LONGINT; reverse: BOOLEAN;
 			(* jump operands *)  left,right,temp: Assembler.Operand;
-				failOp: Assembler.Operand; failPC: LONGINT;
+				failOp: Assembler.Operand; failPC: SIZE;
 
 			PROCEDURE JmpDest(brop: LONGINT);
 			BEGIN
@@ -2791,7 +2791,7 @@ TYPE
 					IF instruction.op1.symbol.name = in.name THEN
 						dest := (instruction.op1.symbolOffset); (* this is the offset in the in-data section (intermediate code), it is not byte- *)
 						destPC := (in.instructions[dest].pc );
-						offset := TODO(destPC - (out.pc));
+						offset := destPC - out.pc;
 						IF dest > inPC THEN (* forward jump *)
 							Assembler.InitOffset32(target,0);
 							Assembler.SetSymbol(target,instruction.op1.symbol.name,instruction.op1.symbol.fingerprint,instruction.op1.symbolOffset,instruction.op1.offset);
@@ -2924,10 +2924,10 @@ TYPE
 					END;
 					IF hit # 0 THEN JmpDest(hit)	END;
 					IF fail # 0 THEN
-						failPC := TODO(out.pc); (* to avoid potential value overflow problem, will be patched anyway  *)
+						failPC := out.pc; (* to avoid potential value overflow problem, will be patched anyway  *)
 						Assembler.InitOffset8(failOp,failPC );
 						emitter.Emit1(fail,failOp);
-						failPC := TODO(failOp.pc);
+						failPC := failOp.pc;
 					END;
 					Cmp(Low,reverse);
 					CASE instruction.opcode OF
@@ -2941,7 +2941,7 @@ TYPE
 				END;
 			END;
 			JmpDest(hit);
-			IF failPC > 0 THEN out.PutByteAt(failPC,(TODO(out.pc)-failPC)-1); END;
+			IF failPC > 0 THEN out.PutByteAt(failPC,((out.pc-failPC)-1)(LONGINT)); END;
 		END EmitBr;
 
 		PROCEDURE EmitPush(CONST vop: IntermediateCode.Operand; part: LONGINT);

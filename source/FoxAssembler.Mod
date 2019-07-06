@@ -763,7 +763,7 @@ TYPE
 		END IgnoreNewLines;
 
 		PROCEDURE DoAssemble();
-		VAR result: Result; pos: Position; line,orgCodePos: LONGINT; identifier: Scanner.IdentifierString; context: Scanner.Context;
+		VAR result: Result; pos: Position; line: Streams.Position; orgCodePos: SIZE; identifier: Scanner.IdentifierString; context: Scanner.Context;
 		BEGIN
 			IF Trace THEN
 				D.Str("DoAssemble: ");
@@ -778,7 +778,7 @@ TYPE
 			IgnoreNewLines;
 			WHILE ~error & (token.symbol # Scanner.Period) & (token.symbol # Scanner.EndOfText) DO
 				IF ThisSymbol(Scanner.Number) THEN
-					line := TODO(token.integer);
+					line := token.integer;
 					IF ThisSymbol(Scanner.Colon) THEN (* line number *)
 					ELSE Error(token.position,"Identifier expected");
 					END;
@@ -794,7 +794,7 @@ TYPE
 				IgnoreNewLines;
 			END;
 
-			orgCodePos := TODO(code.pc);
+			orgCodePos := code.pc;
 			FOR pass := 1 TO MaxPasses DO
 				labels.ResetDisplacements; (* this is important as the displacement is corrected by code emission in a cummulative way *)
 				code.SetPC(orgCodePos);
@@ -802,7 +802,7 @@ TYPE
 				IgnoreNewLines;
 				WHILE ~error & (token.symbol # Scanner.EndOfText) & (token.symbol # Scanner.Period) DO
 					IF ThisSymbol(Scanner.Number) THEN
-						line := TODO(token.integer);
+						line := token.integer;
 						IF ThisSymbol(Scanner.Colon) THEN (* line number *)
 						ELSE Error(token.position,"Identifier expected");
 						END;

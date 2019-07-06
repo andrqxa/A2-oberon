@@ -124,7 +124,7 @@ TYPE
 		op: IntermediateCode.Operand;
 		tag: IntermediateCode.Operand;
 		extra: IntermediateCode.Operand; (* stores the step size of an array range *)
-		dimOffset: LONGINT;
+		dimOffset: SIZE;
 		availability: WORD; (* index *)
 	END;
 
@@ -3995,7 +3995,7 @@ TYPE
 			expression: SyntaxTree.Expression;
 			resultingType, leftType, baseType: SyntaxTree.Type;
 			skipLabel1: Label;
-			i: SIZE; indexListSize, indexDim, srcDimOffset, destDimOffset, targetArrayDimensionality: LONGINT;
+			i, indexListSize, indexDim, srcDimOffset, destDimOffset, targetArrayDimensionality: SIZE;
 			staticSourceLength, staticSourceIncrement, staticIndex, staticFirstIndex, staticLastIndex, staticStepSize, staticTargetLength: LONGINT;
 			variableOp: Operand;
 			variable: SyntaxTree.Variable;
@@ -4044,7 +4044,7 @@ TYPE
 				END
 			END;
 
-			indexListSize := TODO(x.parameters.Length());
+			indexListSize := x.parameters.Length();
 
 			CountIndices(x.parameters);
 			(*ASSERT(tensorRangeCount <= 1);*)
@@ -4573,7 +4573,7 @@ TYPE
 				ReleaseIntermediateOperand(result.tag);
 				IntermediateCode.InitImmediate(result.tag,addressType,type(SyntaxTree.ArrayType).staticLength);
 			ELSIF (type IS SyntaxTree.ArrayType)  THEN
-				result.tag := array.tag; UseIntermediateOperand(result.tag); result.dimOffset := array.dimOffset+TODO(maxDim);
+				result.tag := array.tag; UseIntermediateOperand(result.tag); result.dimOffset := array.dimOffset+maxDim;
 			END;
 			ReleaseOperand(array);
 		END IndexDesignator;
@@ -4686,7 +4686,7 @@ TYPE
 				END
 			END Pass;
 
-			PROCEDURE PushArrayLens(formalType,actualType: SyntaxTree.Type; dim: LONGINT);
+			PROCEDURE PushArrayLens(formalType,actualType: SyntaxTree.Type; dim: SIZE);
 			VAR tmp: IntermediateCode.Operand; actualArrayBase: SyntaxTree.Type;
 			BEGIN
 				formalType := formalType.resolved; actualType := actualType.resolved;
@@ -5336,7 +5336,7 @@ TYPE
 						(*! parameter alignment to be discussed ... *)
 
 						IF type IS SyntaxTree.StringType THEN (* source potentially shorter than destination *)
-							size := TODO(type(SyntaxTree.StringType).length);
+							size := type(SyntaxTree.StringType).length;
 						END;
 						IF backend.cooperative & parameter.NeedsTrace() THEN
 							dst := NewRegisterOperand (addressType);
@@ -6185,7 +6185,7 @@ TYPE
 				profileInit.Emit(Push(position,reg));
 				NEW(string, LEN(name)); COPY(name, string^);
 				sv := SyntaxTree.NewStringValue(Basic.invalidPosition,string);
-				type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,TODO(Strings.Length(name)));
+				type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,Strings.Length(name));
 				sv.SetType(type);
 				Designate(sv,result);
 				profileInit.Emit(Push(position,result.tag));
@@ -6206,7 +6206,7 @@ TYPE
 				profileInit.Emit(Nop(position)); (* placeholder, will be patched by number of procedures *)
 				NEW(string, LEN(name)); COPY(name, string^);
 				sv := SyntaxTree.NewStringValue(Basic.invalidPosition, string);
-				type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,TODO(Strings.Length(name)));
+				type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,Strings.Length(name));
 				sv.SetType(type);
 				Designate(sv,result);
 				profileInit.Emit(Push(position,result.tag));
@@ -6375,7 +6375,7 @@ TYPE
 				IF GetProcedure("String") THEN
 					NEW(string, LEN(s)); COPY(s, string^);
 					sv := SyntaxTree.NewStringValue(Basic.invalidPosition,string);
-					type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,TODO(Strings.Length(s)));
+					type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,Strings.Length(s));
 					sv.SetType(type);
 					Designate(sv,res);
 					Emit(Push(position,res.tag));
@@ -6803,8 +6803,8 @@ TYPE
 		END GetMathArrayIncrementAt;
 
 		PROCEDURE MathArrayLenOrIncr(type: SyntaxTree.MathArrayType; CONST operand: Operand; VAR dim: IntermediateCode.Operand; increment: BOOLEAN; check: BOOLEAN; VAR result: Operand );
-		VAR val: LONGINT; res,res2: IntermediateCode.Operand; end,next: Label; t: SyntaxTree.Type; imm: IntermediateCode.Operand; hasDynamicPart: BOOLEAN;
-			offset: LONGINT;
+		VAR val: HUGEINT; res,res2: IntermediateCode.Operand; end,next: Label; t: SyntaxTree.Type; imm: IntermediateCode.Operand; hasDynamicPart: BOOLEAN;
+			offset: SIZE;
 		BEGIN
 			IF increment THEN
 				offset := MathIncrOffset;
@@ -6897,8 +6897,8 @@ TYPE
 		END MathArrayLenOrIncr;
 
 		PROCEDURE ArrayLen(type: SyntaxTree.ArrayType; VAR operand: Operand; VAR dim: IntermediateCode.Operand; VAR result: Operand );
-		VAR val: LONGINT; res,res2: IntermediateCode.Operand; end,next: Label; t: SyntaxTree.Type; imm: IntermediateCode.Operand; hasDynamicPart: BOOLEAN;
-			offset: LONGINT;
+		VAR val: HUGEINT; res,res2: IntermediateCode.Operand; end,next: Label; t: SyntaxTree.Type; imm: IntermediateCode.Operand; hasDynamicPart: BOOLEAN;
+			offset: SIZE;
 		BEGIN
 			offset := operand.dimOffset+DynamicDim(type)-1;
 			IF  dim.mode = IntermediateCode.ModeImmediate THEN
@@ -7075,7 +7075,7 @@ TYPE
 		BEGIN
 			NEW(string, LEN(s)); COPY(s, string^);
 			sv := SyntaxTree.NewStringValue(Basic.invalidPosition,string);
-			type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,TODO(Strings.Length(s)));
+			type := SyntaxTree.NewStringType(Basic.invalidPosition,system.characterType,Strings.Length(s));
 			sv.SetType(type);
 			Designate(sv,res);
 			Emit(Push(position,res.tag));
@@ -13002,7 +13002,7 @@ TYPE
 
 				PROCEDURE WriteType(type : SyntaxTree.Type);
 				VAR typeDeclaration: SyntaxTree.TypeDeclaration; section: Sections.Section;
-					name: Basic.SegmentedName; offset: LONGINT;
+					name: Basic.SegmentedName; offset: SIZE;
 				BEGIN
 					IF type = NIL THEN
 						Address(source,0);
@@ -13026,7 +13026,7 @@ TYPE
 						IF implementationEmitter.backend.cooperative THEN
 							offset := 0;
 						ELSE
-							offset := 1 + TODO(type(SyntaxTree.RecordType).recordScope.numberMethods)+16+1;
+							offset := 1 + type(SyntaxTree.RecordType).recordScope.numberMethods+16+1;
 						END;
 						Symbol(source,section, 0, ToMemoryUnits(module.system,offset*module.system.addressSize));
 					END;

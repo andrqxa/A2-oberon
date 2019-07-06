@@ -826,12 +826,12 @@ TYPE
 						FOR i := 0 TO maxNumberOperands - 1 DO
 							IF (free[i]) & (operands[i].type = ioffset) THEN
 								IF Trace THEN KernelLog.String(" ioffset "); END;
-								offset := SHORT(TODO(operands[i].val - code.pc  - 1));
+								offset := (operands[i].val - code.pc  - 1)(LONGINT);
 								IF lastPass & ~ValueInByteRange (offset) THEN
 									Error( "value exceeds bounds");
 									RETURN FALSE;
 								END;
-								operands[i].pc := TODO(code.pc);
+								operands[i].pc := code.pc;
 								code.PutByte (offset);
 								free[i] := FALSE; i:= maxNumberOperands;
 							ELSIF (free[i]) & (operands[i].type = imm) THEN
@@ -841,7 +841,7 @@ TYPE
 									Error( "value exceeds bounds");
 									RETURN FALSE;
 								END;
-								operands[i].pc := TODO(code.pc);
+								operands[i].pc := code.pc;
 								code.PutByte (offset);
 								free[i] := FALSE; i:= maxNumberOperands;
 							END
@@ -851,11 +851,11 @@ TYPE
 						IF val # -1 THEN code.PutByte (val); val := -1 END;
 						FOR i := 0 TO maxNumberOperands - 1 DO
 							IF (free[i]) & (InstructionSet.instructions[instr].operands[i] = InstructionSet.rel16off) THEN
-								offset := SHORT(TODO(operands[i].val - code.pc) - 2);
+								offset := (operands[i].val - code.pc - 2)(LONGINT);
 								IF lastPass & ~ValueInWordRange (offset) THEN
 									Error( "value exceeds bounds");
 								END;
-								operands[i].pc := TODO(code.pc);
+								operands[i].pc := code.pc;
 								code.PutWord (offset);
 								free[i] := FALSE; i:= maxNumberOperands;
 							ELSIF (free[i]) & InstructionSet.IsImmediate16(InstructionSet.instructions[instr].operands[i]) THEN
@@ -880,7 +880,7 @@ TYPE
 									AddFixup(BinaryCode.Relative,4,code.pc,operands[i].symbol,operands[i].symbolOffset,operands[i].displacement-4);
 									code.PutDWord(SHORT(operands[i].val));
 								ELSE
-									code.PutDWord (SHORT (TODO(operands[i].val - code.pc) - 4));
+									code.PutDWord ((operands[i].val - code.pc - 4)(LONGINT));
 								END;
 
 								free[i] := FALSE; i:= maxNumberOperands;
@@ -935,7 +935,7 @@ TYPE
 
 								IF lastPass & (operands[i].symbol.name # "") THEN AddFixup(BinaryCode.Relative,4,code.pc,operands[i].symbol,operands[i].symbolOffset,operands[i].displacement-4)  END;
 
-								code.PutDWord (SHORT (TODO(operands[i].val - code.pc) - 4));
+								code.PutDWord ((operands[i].val - code.pc - 4)(LONGINT));
 								free[i] := FALSE; i:= maxNumberOperands;
 							ELSIF (free[i]) & InstructionSet.IsImmediate32(InstructionSet.instructions[instr].operands[i])  THEN
 								operands[i].pc := code.pc;
@@ -1675,9 +1675,9 @@ TYPE
 					Global.GetSymbolSegmentedName(scopeSymbol,name);
 					SetSymbol(operand,name,0,0,0);
 				ELSIF (scopeSymbol IS SyntaxTree.Variable) THEN (* local variable *)
-					operand.displacement := TODO(scopeSymbol.offsetInBits DIV 8)
+					operand.displacement := (scopeSymbol.offsetInBits DIV 8)(LONGINT);
 				ELSIF (scopeSymbol IS SyntaxTree.Parameter) THEN (* local parameter *)
-					operand.displacement := TODO(scopeSymbol.offsetInBits DIV 8)
+					operand.displacement := (scopeSymbol.offsetInBits DIV 8)(LONGINT);
 				ELSE
 					RETURN (* ? *)
 				END;
@@ -2631,7 +2631,7 @@ TYPE
 	BEGIN
 		operand.symbol.name := symbol;
 		operand.symbol.fingerprint := fingerprint;
-		operand.symbolOffset := symbolOffset; operand.displacement := TODO(displacement);
+		operand.symbolOffset := symbolOffset; operand.displacement := displacement(LONGINT);
 	END SetSymbol;
 
 	PROCEDURE InitImm* (VAR operand: Operand; size: SHORTINT; val: HUGEINT);

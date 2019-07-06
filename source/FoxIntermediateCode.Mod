@@ -975,13 +975,13 @@ TYPE
 	BEGIN InitAddress(op,type,symbol,fp, offset); RETURN op
 	END Address;
 
-	PROCEDURE InitMemory*(VAR op:Operand; type: Type; base: Operand; offset: LONGINT);
+	PROCEDURE InitMemory*(VAR op:Operand; type: Type; base: Operand; offset: SIZE);
 	BEGIN
 		Assert((base.mode = ModeRegister) OR (base.mode = ModeImmediate) & ((offset=0) OR (base.symbol.name#"")),"base operand must be register");
 		op := base; INC(op.offset,offset); MakeMemory(op,type);
 	END InitMemory;
 
-	PROCEDURE Memory*(type: Type; base: Operand; offset: LONGINT): Operand;
+	PROCEDURE Memory*(type: Type; base: Operand; offset: SIZE): Operand;
 	VAR op: Operand;
 	BEGIN InitMemory(op,type,base,offset); RETURN op
 	END Memory;
@@ -1088,7 +1088,7 @@ TYPE
 		op.register := reg; ASSERT(reg # 0);
 	END SetRegister;
 
-	PROCEDURE DecimalNumber(ch: CHAR; VAR nr: SIZE): BOOLEAN;
+	PROCEDURE DecimalNumber(ch: CHAR; VAR nr: LONGINT): BOOLEAN;
 	BEGIN
 		IF (ch < "0") OR (ch > "9") THEN RETURN FALSE
 		ELSE
@@ -1098,7 +1098,7 @@ TYPE
 		END;
 	END DecimalNumber;
 
-	PROCEDURE Numbers(CONST name: ARRAY OF CHAR; VAR pos: SIZE; VAR number: SIZE): BOOLEAN;
+	PROCEDURE Numbers(CONST name: ARRAY OF CHAR; VAR pos: SIZE; VAR number: LONGINT): BOOLEAN;
 	BEGIN
 		number := 0;
 		IF DecimalNumber(name[pos], number) THEN
@@ -1115,8 +1115,8 @@ TYPE
 		IF name[pos] = char THEN INC(pos); RETURN TRUE ELSE RETURN FALSE END;
 	END Character;
 
-	PROCEDURE DenotesRegister*(CONST name: ARRAY OF CHAR; VAR registerClass: RegisterClass; VAR register: SIZE): BOOLEAN;
-	VAR pos, registerNumber: SIZE;
+	PROCEDURE DenotesRegister*(CONST name: ARRAY OF CHAR; VAR registerClass: RegisterClass; VAR register: LONGINT): BOOLEAN;
+	VAR pos: SIZE; registerNumber: LONGINT;
 	BEGIN
 		pos := 0;
 		IF Character(name,pos,'r') THEN
@@ -1181,7 +1181,7 @@ TYPE
 
 	PROCEDURE DenotesType*(CONST name: ARRAY OF CHAR; VAR type: Type): BOOLEAN;
 	VAR
-		sizeInBits: SIZE; pos: SIZE;
+		sizeInBits: LONGINT; pos: SIZE;
 	BEGIN
 		pos := 0;
 		IF Character(name,pos,'s') THEN

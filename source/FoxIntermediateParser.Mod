@@ -88,9 +88,9 @@ TYPE
 			isNegated := ThisSymbol(Scanner.Minus);
 			IF ExpectSymbol(Scanner.Number) & (token.numberType = Scanner.Integer) THEN
 				IF isNegated THEN
-					integer := -TODO(token.integer)
+					integer := -token.integer(LONGINT)
 				ELSE
-					integer := TODO(token.integer)
+					integer := token.integer(LONGINT)
 				END;
 				result := TRUE
 			ELSE
@@ -104,7 +104,7 @@ TYPE
 			result: BOOLEAN;
 		BEGIN
 			IF ExpectSymbol(Scanner.Number) & (token.numberType = Scanner.Integer) THEN
-				integer := TODO(token.integer);
+				integer := token.integer(LONGINT);
 				result := TRUE
 			ELSE
 				result := FALSE
@@ -130,17 +130,17 @@ TYPE
 		END ExpectLineDelimiter;
 
 		(** parse an optional line number **)
-		PROCEDURE ParseLineNumber(expectedLineNumber: LONGINT);
+		PROCEDURE ParseLineNumber(expectedLineNumber: Streams.Position);
 		VAR
 			positionOfLine: Position;
-			specifiedLineNumber: LONGINT;
+			specifiedLineNumber: Streams.Position;
 			message, tempString: MessageString;
 		BEGIN
 			IF Trace THEN D.String(">>> ParseLineNumber"); D.Ln END;
 
 			positionOfLine := token.position;
 			IF ThisSymbol(Scanner.Number) THEN (* note: line numbers are optional *)
-				specifiedLineNumber := TODO(token.integer);
+				specifiedLineNumber := token.integer;
 				IF ExpectSymbol(Scanner.Colon) THEN
 					IF Strict & (specifiedLineNumber # expectedLineNumber) THEN
 						message := "invalid code line number (";
@@ -157,7 +157,7 @@ TYPE
 		(** parse an intermediate code operand **)
 		PROCEDURE ParseOperand(VAR operand: IntermediateCode.Operand; sectionList: Sections.SectionList);
 		VAR
-			positionOfOperand, pos: Position;  registerNumber: SIZE; symbolOffset, integer: LONGINT;
+			positionOfOperand, pos: Position; registerNumber, symbolOffset, integer: LONGINT;
 			someHugeint: HUGEINT;
 			hasTypeDescriptor, isMemoryOperand, lastWasIdentifier, isNegated: BOOLEAN;
 			someLongreal: LONGREAL;
@@ -191,7 +191,7 @@ TYPE
 			IF lastWasIdentifier THEN
 				IF IntermediateCode.DenotesRegister(identifier, registerClass, registerNumber) THEN
 					(* register *)
-					IntermediateCode.InitRegister(operand, type, registerClass, TODO(registerNumber));
+					IntermediateCode.InitRegister(operand, type, registerClass, registerNumber);
 				ELSE
 					(* TODO: handle assembly constants *)
 
@@ -344,7 +344,7 @@ TYPE
 		PROCEDURE ParseSectionContent*(scanner: Scanner.AssemblerScanner; section: IntermediateCode.Section; sectionList: Sections.SectionList);
 		VAR
 			instruction: IntermediateCode.Instruction;
-			lineNumber: LONGINT;
+			lineNumber: Streams.Position;
 		BEGIN
 			IF Trace THEN D.Ln; D.String(">>> ParseSectionContent"); D.Ln END;
 			SELF.scanner := scanner;
