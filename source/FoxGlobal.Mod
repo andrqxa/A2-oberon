@@ -909,7 +909,6 @@ TYPE
 		DeclareType(system.shortintType,"SHORTINT",system.globalScope);
 		DeclareType(system.integerType,"INTEGER",system.globalScope);
 		DeclareType(system.longintType,"LONGINT",system.globalScope);
-		DeclareType(system.longintType,"TODO",system.globalScope);
 		DeclareType(system.hugeintType,"HUGEINT",system.globalScope);
 		DeclareType(system.wordType,"WORD",system.globalScope);
 		DeclareType(system.longWordType,"LONGWORD",system.globalScope);
