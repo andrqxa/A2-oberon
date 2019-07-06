@@ -8105,7 +8105,7 @@ TYPE
 					ASSERT(~(type IS SyntaxTree.MathArrayType) OR (type(SyntaxTree.MathArrayType).form IN {SyntaxTree.Static,SyntaxTree.Tensor}));
 
 					IF isTensor THEN
-						baseType := SemanticChecker.ArrayBase(type,MAX(LONGINT));
+						baseType := SemanticChecker.ArrayBase(type,MAX(SIZE));
 					ELSE
 						baseType := SemanticChecker.ArrayBase(type,openDim);
 					END;
@@ -10228,8 +10228,8 @@ TYPE
 				SaveRegisters();ReleaseUsedRegisters(saved);
 				leftType := left.type.resolved(SyntaxTree.MathArrayType);
 				rightType := right.type.resolved(SyntaxTree.MathArrayType);
-				leftBase := SemanticChecker.ArrayBase(leftType,MAX(LONGINT));
-				rightBase := SemanticChecker.ArrayBase(rightType,MAX(LONGINT));
+				leftBase := SemanticChecker.ArrayBase(leftType,MAX(SIZE));
+				rightBase := SemanticChecker.ArrayBase(rightType,MAX(SIZE));
 				ASSERT(leftBase.resolved.SameType(rightBase.resolved));
 
 				IF leftType.form = SyntaxTree.Tensor THEN
