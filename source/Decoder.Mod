@@ -860,7 +860,7 @@ TYPE
 					opStart := opcodes.offset;
 					opEnd := opStart + opcodes.length - 1;
 					IF (markPC >= opStart) &	(markPC <= opEnd) THEN
-						pcPos := w.Pos()(TODO) + LONGINT((markPC-opStart)*3); (* text position within opcode bytes *)
+						pcPos := (w.Pos()+ (markPC-opStart)*3)(LONGINT); (* text position within opcode bytes *)
 					END
 				END;
 				opcodes.PrintOpcodeBytes(w); w.Char(9X);
