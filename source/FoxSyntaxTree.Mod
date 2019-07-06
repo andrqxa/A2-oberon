@@ -1733,10 +1733,10 @@ TYPE
 			selfParameter-: Parameter;
 
 			isDelegate-,isInterrupt-,noPAF-,noReturn-: BOOLEAN;
-			pcOffset-: LONGINT; (* PC offset: used for ARM interrupt procedures *)
+			pcOffset-: SIZE; (* PC offset: used for ARM interrupt procedures *)
 			callingConvention-: CallingConvention;
-			stackAlignment-: LONGINT;
-			parametersOffset-: LONGINT; (* stack parameter offset -- in units of addresses: one pointer = 1 *)
+			stackAlignment-: SIZE;
+			parametersOffset-: SIZE; (* stack parameter offset -- in units of addresses: one pointer = 1 *)
 
 		PROCEDURE & InitProcedureType( position: Position; scope: Scope);
 		BEGIN
@@ -1763,7 +1763,7 @@ TYPE
 		BEGIN SELF.noReturn := noReturn
 		END SetNoReturn;
 
-		PROCEDURE SetPcOffset*(pcOffset: LONGINT);
+		PROCEDURE SetPcOffset*(pcOffset: SIZE);
 		BEGIN SELF.pcOffset := pcOffset
 		END SetPcOffset;
 
@@ -1788,7 +1788,7 @@ TYPE
 			hasUntracedReturn := untraced;
 		END SetUntracedReturn;
 
-		PROCEDURE SetStackAlignment*(alignment: LONGINT);
+		PROCEDURE SetStackAlignment*(alignment: SIZE);
 		BEGIN
 			stackAlignment := alignment;
 		END SetStackAlignment;
@@ -2681,7 +2681,7 @@ TYPE
 		offsetInBits-: SIZE; (* offset in stack or heap, in bits *)
 		used-, written-: BOOLEAN;
 		fixed-: BOOLEAN;
-		alignment-: LONGINT;
+		alignment-: SIZE;
 
 		position-, end-: Position; state-: SET;
 		fingerprint-: Fingerprint;
@@ -2713,7 +2713,7 @@ TYPE
 			target.name := name;
 		END Copy;
 
-		PROCEDURE SetAlignment*(fix: BOOLEAN; align: LONGINT);
+		PROCEDURE SetAlignment*(fix: BOOLEAN; align: SIZE);
 		BEGIN SELF.alignment := align; fixed := fix;
 		END SetAlignment;
 
@@ -2901,7 +2901,7 @@ TYPE
 		nextVariable-: Variable;
 		untraced-: BOOLEAN;
 		fictive-: BOOLEAN; (* variable is not allocated but has a fixed offset *)
-		fictiveOffset-: LONGINT; (* offset of fictive as provided by the source code *)
+		fictiveOffset-: SIZE; (* offset of fictive as provided by the source code *)
 
 		registerNumber-: LONGINT;
 		inRegister-: BOOLEAN;
@@ -2970,7 +2970,7 @@ TYPE
 			registerNumber := reg
 		END RegisterNumber;
 
-		PROCEDURE SetFictive*(offset: LONGINT);
+		PROCEDURE SetFictive*(offset: SIZE);
 		BEGIN
 			fictive := TRUE;
 			fictiveOffset := offset;

@@ -30,7 +30,7 @@ TYPE
 		type-: SHORTINT; (* CodeSection, InlineCodeSection, ...  *)
 
 		fixed-: BOOLEAN; (* whether the position of the section is fixed, as opposed to being restricted by an alignment *)
-		positionOrAlignment-: LONGINT; (* the alignment OR the position *)
+		positionOrAlignment-: SIZE; (* the alignment OR the position *)
 		fingerprint-: Basic.Fingerprint; (* fingerprint of the corresponding syntax tree node *)
 		bitsPerUnit-: LONGINT; (* the unit size given in bits *)
 
@@ -73,7 +73,7 @@ TYPE
 		BEGIN RETURN ~fixed & (positionOrAlignment > 1)
 		END IsAligned;
 
-		PROCEDURE SetPositionOrAlignment*(isFixed: BOOLEAN; positionOrAlignment: LONGINT);
+		PROCEDURE SetPositionOrAlignment*(isFixed: BOOLEAN; positionOrAlignment: SIZE);
 		BEGIN
 			SELF.fixed := isFixed;
 			SELF.positionOrAlignment := positionOrAlignment
@@ -132,7 +132,7 @@ TYPE
 			w.RawInt(type);
 			Basic.WriteSegmentedName(w,name);
 			w.RawBool(fixed);
-			w.RawLInt(positionOrAlignment);
+			w.RawLInt(positionOrAlignment(LONGINT));
 			w.RawHInt(fingerprint);
 			w.RawLInt(bitsPerUnit);
 		END WriteRaw;

@@ -609,7 +609,7 @@ TYPE
 			x.SetCellsAreObjects(cellsAreObjects);
 			x.SetSizeExpression(ResolveExpression(x.sizeExpression));
 			IF (x.sizeExpression # NIL) & CheckPositiveIntegerValue(x.sizeExpression,value,FALSE) THEN
-				x.SetSize(LONGINT(value)) (* TODO: fix explicit integer truncation *)
+				x.SetSize(value);
 			ELSE
 				x.SetSize(system.SizeOf(system.longintType));
 			END;
@@ -787,7 +787,7 @@ TYPE
 				END;
 			END;
 			IF HasFlag(modifiers, Global.NameNoReturn,position) THEN procedureType.SetNoReturn(TRUE) END;
-			IF HasValue(modifiers,Global.NameStackAligned,position,value) THEN procedureType.SetStackAlignment(LONGINT (value)) END; (* TODO: fix explicit integer truncation *)
+			IF HasValue(modifiers,Global.NameStackAligned,position,value) THEN procedureType.SetStackAlignment(value) END;
 			IF HasFlag(modifiers, Global.NameDelegate,position) THEN procedureType.SetDelegate(TRUE) END;
 			IF HasFlag(modifiers, Global.NameRealtime,position) THEN procedureType.SetRealtime(TRUE) END;
 			CheckModifiers(modifiers, TRUE);
@@ -831,8 +831,7 @@ TYPE
 			hasPointers := FALSE;
 
 			modifiers := x.modifiers;
-			IF HasValue(modifiers,Global.NameAligned,position,value) THEN x.SetAlignmentInBits(LONGINT(value)*system.dataUnit) (* TODO: fix explicit integer truncation *)
-			END;
+			IF HasValue(modifiers,Global.NameAligned,position,value) THEN x.SetAlignmentInBits(value*system.dataUnit) END;
 			IF HasFlag(modifiers,Global.NameAbstract,position) THEN x.SetAbstract(TRUE) END;
 			CheckModifiers(modifiers, TRUE);
 
@@ -4832,7 +4831,7 @@ TYPE
 							Error(position, "invalid dimension");
 							base := SyntaxTree.invalidType;
 						ELSE
-							base := ArrayBase(base,LONGINT(i1)); (* TODO: fix explicit integer truncation *)
+							base := ArrayBase(base,i1);
 							IF (base # NIL) & Indexable(base) THEN
 							ELSE
 								Error(position, "len on no array");
@@ -5306,7 +5305,7 @@ TYPE
 							Error(position, "invalid dimension");
 							base := SyntaxTree.invalidType;
 						ELSE
-							base := ArrayBase(base,LONGINT(i1)); (* TODO: fix explicit integer truncation *)
+							base := ArrayBase(base,i1);
 							IF (base # NIL) & Indexable(base) THEN
 							ELSE
 								Error(position, "len on no array");
@@ -6048,12 +6047,12 @@ TYPE
 			END;
 		END ResolveConstant;
 
-		PROCEDURE AdaptStackAlignment(procedure: SyntaxTree.Procedure; alignment: LONGINT);
-		VAR procedureAlignment: LONGINT;
+		PROCEDURE AdaptStackAlignment(procedure: SyntaxTree.Procedure; alignment: SIZE);
+		VAR procedureAlignment: SIZE;
 
-			PROCEDURE LCM(a0,b0: LONGINT): LONGINT;
+			PROCEDURE LCM(a0,b0: SIZE): SIZE;
 			(* least common multiple *)
-			VAR a,b: LONGINT;
+			VAR a,b: SIZE;
 			BEGIN
 				a := a0; b := b0;
 				WHILE (a # b) DO
@@ -6109,21 +6108,21 @@ TYPE
 						IF ~PowerOf2(value) THEN
 							Error(position, "forbidden alignment - must be power of two");
 						ELSE
-							AdaptStackAlignment(variable.scope(SyntaxTree.ProcedureScope).ownerProcedure, LONGINT (value)); (* TODO: fix explicit integer truncation *)
+							AdaptStackAlignment(variable.scope(SyntaxTree.ProcedureScope).ownerProcedure, value);
 						END;
 					END;
-					variable.SetAlignment(FALSE,LONGINT(value)); (* TODO: fix explicit integer truncation *)
+					variable.SetAlignment(FALSE,value);
 				ELSIF HasValue(modifiers, Global.NameFixed,position, value) THEN
 					IF (variable.scope IS SyntaxTree.ProcedureScope) THEN
 						Error(position, "fixed position not possible in procedure");
 					END;
-					variable.SetAlignment(TRUE,LONGINT(value)); (* TODO: fix explicit integer truncation *)
+					variable.SetAlignment(TRUE,value);
 				ELSIF HasValue(modifiers, Global.NameFictive, position, value) THEN
 					IF (variable.scope IS SyntaxTree.ProcedureScope) THEN
 						Error(position,"fictive offset not possible in procedure");
 					END;
-					variable.SetFictive(LONGINT (value)); (* TODO: fix explicit integer truncation *)
-					variable.SetOffset(LONGINT(value)*system.dataUnit); (* TODO: fix explicit integer truncation *)
+					variable.SetFictive(value);
+					variable.SetOffset(value*system.dataUnit);
 					IF ContainsPointer(variable.type) THEN variable.SetUntraced(TRUE) END;
 				END;
 				IF HasFlag(modifiers, Global.NameRegister, position) THEN variable.PreferRegister(TRUE) END;
@@ -6250,7 +6249,7 @@ TYPE
 				IF HasFlag(modifiers, Global.NameNoReturn, position) THEN
 					procedureType.SetNoReturn(TRUE);
 				END;
-				IF HasValue(modifiers, Global.NamePcOffset, position, value) THEN procedureType.SetPcOffset(LONGINT(value)) (* TODO: fix explicit integer truncation *) END;
+				IF HasValue(modifiers, Global.NamePcOffset, position, value) THEN procedureType.SetPcOffset(value) END;
 
 				IF HasFlag(modifiers,Global.NameNoPAF,position) THEN procedureType.SetNoPAF(TRUE) END;
 				IF (procedure.scope IS SyntaxTree.ModuleScope) THEN
@@ -6258,14 +6257,14 @@ TYPE
 					ELSIF HasFlag(modifiers, Global.NameExit, position) THEN procedure.SetExit(TRUE);
 					END;
 				END;
-				IF HasValue(modifiers,Global.NameAligned,position,value) THEN procedure.SetAlignment(FALSE,LONGINT(value)) (* TODO: fix explicit integer truncation *)
-				ELSIF HasValue(modifiers,Global.NameFixed,position,value) THEN procedure.SetAlignment(TRUE,LONGINT(value)) (* TODO: fix explicit integer truncation *)
+				IF HasValue(modifiers,Global.NameAligned,position,value) THEN procedure.SetAlignment(FALSE,value);
+				ELSIF HasValue(modifiers,Global.NameFixed,position,value) THEN procedure.SetAlignment(TRUE,value);
 				END;
 				IF HasValue(modifiers,Global.NameStackAligned, position, value) THEN
 					IF ~PowerOf2(value) THEN
 						Error(position, "forbidden stack alignment - must be power of two");
 					ELSE
-						procedureType.SetStackAlignment(LONGINT(value)) (* TODO: fix explicit integer truncation *)
+						procedureType.SetStackAlignment(value);
 					END;
 				END;
 				IF HasFlag(modifiers,Global.NameRealtime,position) THEN procedureType.SetRealtime(TRUE) END;

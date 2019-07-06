@@ -261,7 +261,7 @@ TYPE
 		(* symbols *)
 
 		PROCEDURE Variable(x: SyntaxTree.Variable);
-		VAR name: Basic.SegmentedName; irv: IntermediateCode.Section; align,  dim, i: LONGINT;
+		VAR name: Basic.SegmentedName; irv: IntermediateCode.Section; align,  dim, i: SIZE;
 			size: SIZE; lastUpdated: SIZE; imm: IntermediateCode.Operand;
 
 			PROCEDURE TypeNeedsInitialization(type: SyntaxTree.Type): BOOLEAN;
@@ -404,7 +404,7 @@ TYPE
 		END Variable;
 
 		PROCEDURE Parameter(x: SyntaxTree.Parameter);
-		VAR name: Basic.SegmentedName; irv: IntermediateCode.Section; align, i: LONGINT;
+		VAR name: Basic.SegmentedName; irv: IntermediateCode.Section; align, i: SIZE;
 			size: LONGINT; lastUpdated: LONGINT;
 		BEGIN
 			ASSERT(currentScope IS SyntaxTree.CellScope);
@@ -1461,7 +1461,7 @@ TYPE
 			END;
 		END Emit;
 
-		PROCEDURE EmitTrap (position: Position; trapNo: LONGINT);
+		PROCEDURE EmitTrap (position: Position; trapNo: HUGEINT);
 		VAR saved: RegisterEntry;
 		BEGIN
 			IF backend.cooperative THEN
@@ -2818,7 +2818,7 @@ TYPE
 			IF Trace THEN TraceExit("Convert") END;
 		END Convert;
 
-		PROCEDURE TrapC(br: ConditionalBranch; left,right:IntermediateCode.Operand; trapNo: LONGINT);
+		PROCEDURE TrapC(br: ConditionalBranch; left,right:IntermediateCode.Operand; trapNo: HUGEINT);
 		VAR exit: Label;
 		BEGIN
 			Assert((left.mode # IntermediateCode.ModeImmediate) OR (right.mode # IntermediateCode.ModeImmediate),"trap emission with two immediates");
@@ -5556,7 +5556,7 @@ TYPE
 			variable: SyntaxTree.Variable;
 			i,  parametersSize : SIZE;
 			structuredReturnType: BOOLEAN;
-			gap, alignment: LONGINT; (*fld*)
+			gap, alignment: SIZE; (*fld*)
 			return: IntermediateCode.Operand;
 
 			parameterBackups: ARRAY 2 OF IntermediateCode.Operand;
@@ -8362,7 +8362,7 @@ TYPE
 
 		PROCEDURE DesignateBuiltinCallDesignator(x: SyntaxTree.BuiltinCallDesignator; VAR result: Operand);
 		VAR
-			p0,p1,p2: SyntaxTree.Expression; len: SIZE; val: LONGINT; l,r: Operand; res,adr,reg: IntermediateCode.Operand; type, componentType: SyntaxTree.Type;
+			p0,p1,p2: SyntaxTree.Expression; len: SIZE; val: HUGEINT; l,r: Operand; res,adr,reg: IntermediateCode.Operand; type, componentType: SyntaxTree.Type;
 			s0,s1,s2: Operand; hint: HUGEINT;
 			i: SIZE; formalParameter: SyntaxTree.Parameter;
 			tmp:IntermediateCode.Operand;
@@ -8587,7 +8587,7 @@ TYPE
 				END
 			(* ---- HALT, SYSTEM.HALT----- *)
 			|Global.Halt, Global.systemHalt:
-				val := LONGINT (p0.resolved(SyntaxTree.IntegerValue).value); (* TODO: fix explicit integer truncation *)
+				val := p0.resolved(SyntaxTree.IntegerValue).value;
 				EmitTrap (position, val);
 			(* ---- ASSERT ----- *)
 			|Global.Assert:
@@ -8595,7 +8595,7 @@ TYPE
 					trueL := NewLabel();
 					Condition(p0,trueL,TRUE);
 					IF p1 = NIL THEN val := AssertTrap
-					ELSE val := LONGINT(p1.resolved(SyntaxTree.IntegerValue).value); (* TODO: fix explicit integer truncation *)
+					ELSE val := p1.resolved(SyntaxTree.IntegerValue).value;
 					END;
 					EmitTrap(position,val);
 					SetLabel(trueL);
@@ -14143,8 +14143,8 @@ TYPE
 		statCoopTraceModule)
 	END Statistics;
 
-	PROCEDURE GCD(a,b: LONGINT): LONGINT;
-	VAR h: LONGINT;
+	PROCEDURE GCD(a,b: SIZE): SIZE;
+	VAR h: SIZE;
 	BEGIN
 		WHILE b # 0 DO
 			h := a MOD b;
@@ -14154,12 +14154,12 @@ TYPE
 		RETURN a
 	END GCD;
 
-	PROCEDURE SCM(a,b: LONGINT): LONGINT;
+	PROCEDURE SCM(a,b: SIZE): SIZE;
 	BEGIN
 		RETURN a*b DIV GCD(a,b)
 	END SCM;
 
-	PROCEDURE CommonAlignment(a,b: LONGINT): LONGINT;
+	PROCEDURE CommonAlignment(a,b: SIZE): SIZE;
 	BEGIN
 		(*TRACE(a,b);*)
 		IF a = 0 THEN RETURN b
@@ -14671,7 +14671,7 @@ TYPE
 		RETURN instruction
 	END Call;
 
-	PROCEDURE Exit(position: Basic.Position;pcOffset: LONGINT; callingConvention, unwind: LONGINT): IntermediateCode.Instruction;
+	PROCEDURE Exit(position: Basic.Position;pcOffset: SIZE; callingConvention, unwind: LONGINT): IntermediateCode.Instruction;
 	VAR op1, op2, op3: IntermediateCode.Operand;
 	VAR instruction: IntermediateCode.Instruction;
 	BEGIN
@@ -14696,7 +14696,7 @@ TYPE
 		RETURN instruction
 	END Result;
 
-	PROCEDURE Trap(position: Basic.Position;nr: LONGINT): IntermediateCode.Instruction;
+	PROCEDURE Trap(position: Basic.Position;nr: HUGEINT): IntermediateCode.Instruction;
 	VAR op1: IntermediateCode.Operand;
 	VAR instruction: IntermediateCode.Instruction;
 	BEGIN
