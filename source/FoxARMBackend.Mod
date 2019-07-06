@@ -113,7 +113,7 @@ TYPE
 	(* a citation of a symbol, i.e., an ARM instruction that requires a symbol's address *)
 	Citation = OBJECT
 	VAR
-		pc: LONGINT; (* program counter of the ARM instruction *)
+		pc: SIZE; (* program counter of the ARM instruction *)
 		bits: LONGINT;
 		shift: LONGINT; (* fixup shift ! *)
 		next: Citation;
@@ -136,7 +136,7 @@ TYPE
 			HALT(100);
 		END Emit;
 
-		PROCEDURE AddCitation(pc: LONGINT; bits: LONGINT; shift: LONGINT);
+		PROCEDURE AddCitation(pc: SIZE; bits: LONGINT; shift: LONGINT);
 		VAR
 			citation: Citation;
 		BEGIN
@@ -224,7 +224,7 @@ TYPE
 	VAR
 		firstReference, lastReference: Reference; (* linked list of all symbol references *)
 		size: LONGINT; (* length of the required fixup block *)
-		due: LONGINT; (* the PC at which the reference block has to be written (the latest) *)
+		due: SIZE; (* the PC at which the reference block has to be written (the latest) *)
 
 		PROCEDURE & Init;
 		BEGIN
@@ -233,8 +233,8 @@ TYPE
 			due := MAX(LONGINT);
 		END Init;
 
-		PROCEDURE UpdateDue(pc: LONGINT; bits: LONGINT; shift: LONGINT);
-		VAR max: LONGINT;
+		PROCEDURE UpdateDue(pc: SIZE; bits: LONGINT; shift: LONGINT);
+		VAR max: SIZE;
 		BEGIN
 			(* bits determine the address size in words *)
 			max := ASH(1, bits+shift) (* maximal fixup range *) + pc (* current pc *)  - size (* fixup block size as of now *) - 8 (* offset *) - 64 (* 16 instructions safety *);
@@ -243,7 +243,7 @@ TYPE
 			END;
 		END UpdateDue;
 
-		PROCEDURE AddCitation(reference: Reference; pc: LONGINT; bits: LONGINT; shift: LONGINT);
+		PROCEDURE AddCitation(reference: Reference; pc: SIZE; bits: LONGINT; shift: LONGINT);
 		BEGIN
 			reference.AddCitation(pc, bits, shift);
 			UpdateDue(pc, bits, shift);
@@ -257,7 +257,7 @@ TYPE
 			RETURN reference;
 		END AddReference;
 
-		PROCEDURE AddSymbol(symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; symbolOffset: SIZE; pc: LONGINT; bits: LONGINT);
+		PROCEDURE AddSymbol(symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; symbolOffset: SIZE; pc: SIZE; bits: LONGINT);
 		VAR
 			reference, foundReference: Reference; symbolReference: SymbolReference;
 		BEGIN
@@ -285,7 +285,7 @@ TYPE
 			AddCitation(reference, pc, bits, 0);
 		END AddSymbol;
 
-		PROCEDURE AddImmediate(value: LONGINT; pc: LONGINT; bits: LONGINT);
+		PROCEDURE AddImmediate(value: LONGINT; pc: SIZE; bits: LONGINT);
 		VAR
 			reference, foundReference: Reference; immediateReference: ImmediateReference;
 		BEGIN
@@ -313,7 +313,7 @@ TYPE
 			AddCitation(reference, pc, bits, 0);
 		END AddImmediate;
 
-		PROCEDURE AddHImmediate(value: HUGEINT; pc: LONGINT; bits: LONGINT);
+		PROCEDURE AddHImmediate(value: HUGEINT; pc: SIZE; bits: LONGINT);
 		VAR
 			reference, foundReference: Reference;  immediateHReference: ImmediateHReference;
 		BEGIN
@@ -1043,7 +1043,7 @@ TYPE
 			offset := spillStackStart + ticket.offset + 1; (* TODO: check this *)
 			ASSERT((0 <= offset) & (offset < InstructionSet.Bits12));
 
-			result := InstructionSet.NewImmediateOffsetMemory(PhysicalRegisterNumber(IntermediateCode.FP, Low), TODO(offset), {InstructionSet.Decrement});
+			result := InstructionSet.NewImmediateOffsetMemory(PhysicalRegisterNumber(IntermediateCode.FP, Low), LONGINT(offset), {InstructionSet.Decrement});
 
 			ASSERT(result.mode = InstructionSet.modeMemory);
 			RETURN result
@@ -1115,7 +1115,7 @@ TYPE
 		END IsRegisterForType;
 
 		(** get an ARM register that that is set off by a certain amount **)
-		PROCEDURE RegisterAfterAppliedOffset(register: Operand; offset: LONGINT; registerHint: Operand): Operand;
+		PROCEDURE RegisterAfterAppliedOffset(register: Operand; offset: SIZE; registerHint: Operand): Operand;
 		VAR
 			result, offsetOperand: Operand;
 		BEGIN
@@ -1123,7 +1123,7 @@ TYPE
 				result := register
 			ELSE
 				result := GetFreeRegisterOrHint(IntermediateCode.UnsignedIntegerType(32), registerHint);
-				offsetOperand := OperandFromValue(ABS(offset), result); (* might be immediate operand or register (tempRegister is given as a register hint) *)
+				offsetOperand := OperandFromValue(ABS(offset(LONGINT)), result); (* might be immediate operand or register (tempRegister is given as a register hint) *)
 				IF offset > 0 THEN
 					Emit3(opADD, result, register, offsetOperand)
 				ELSE
@@ -1143,7 +1143,7 @@ TYPE
 			ASSERT(irRegisterOperand.mode = IntermediateCode.ModeRegister);
 
 			result := InstructionSet.NewRegister(PhysicalRegisterNumber(irRegisterOperand.register, part), None, None, 0);
-			result := RegisterAfterAppliedOffset(result, TODO(irRegisterOperand.offset), registerHint);
+			result := RegisterAfterAppliedOffset(result, irRegisterOperand.offset, registerHint);
 
 			ASSERT(result.mode = InstructionSet.modeRegister);
 			RETURN result
@@ -1216,11 +1216,11 @@ TYPE
 
 			IF (irSection # NIL) & (irSection.resolved # NIL) & (irSection.resolved.os.fixed) THEN
 				(* optimization: if the IR section is already resolved and positioned at a fixed location, no fixup is required *)
-				address := TODO(irSection.resolved.os.alignment + irSection.instructions[symbolOffset].pc);
+				address := (irSection.resolved.os.alignment + irSection.instructions[symbolOffset].pc)(LONGINT);
 				result := RegisterFromValue(address, registerHint)
 			ELSE
 				result := GetFreeRegisterOrHint(IntermediateCode.UnsignedIntegerType(32), registerHint);
-				listOfReferences.AddSymbol(symbol, fingerprint, symbolOffset, TODO(out.pc), 12);
+				listOfReferences.AddSymbol(symbol, fingerprint, symbolOffset, out.pc, 12);
 				Emit2(opLDR, result, InstructionSet.NewImmediateOffsetMemory(opPC.register, 0, {InstructionSet.Increment})); (* LDR ..., [PC, #+???] *)
 			END;
 
@@ -1261,7 +1261,7 @@ TYPE
 			ASSERT(baseAddressRegisterNumber # None);
 
 			(* get offset of part in question *)
-			offset := TODO(irMemoryOperand.offset) + part * 4;
+			offset := (irMemoryOperand.offset + part * 4)(LONGINT);
 
 			(* determine indexing mode *)
 			IF offset >= 0 THEN indexingMode := {InstructionSet.Increment} ELSE indexingMode := {InstructionSet.Decrement} END;
@@ -1339,7 +1339,7 @@ TYPE
 				IF irOperand.symbol.name # "" THEN
 					Resolve(irOperand);
 					result := RegisterFromSymbol(irOperand.symbol.name, irOperand.symbol.fingerprint, irOperand.resolved, irOperand.symbolOffset, emptyOperand);
-					result := RegisterAfterAppliedOffset(result, TODO(irOperand.offset), registerHint);
+					result := RegisterAfterAppliedOffset(result, irOperand.offset, registerHint);
 				ELSE
 					ASSERT(irOperand.offset = 0);
 					IF IsInteger(irOperand) THEN result := RegisterFromValue(ValueOfPart(irOperand.intValue, part), registerHint)
@@ -1606,7 +1606,7 @@ TYPE
 					(* 1. patch all of the citations, i.e., the LDR instructions that use the symbol reference *)
 					citation := reference.firstCitation;
 					WHILE citation # NIL DO
-						patchValue := TODO(out.pc - 8 - citation.pc);
+						patchValue := (out.pc - 8 - citation.pc)(LONGINT);
 						patchValue := ASH(patchValue, -citation.shift); (* FLDS/VLDR reference counts number of words *)
 						ASSERT((0 <= patchValue) & (patchValue < ASH(1, citation.bits)));
 						out.PutBitsAt(citation.pc, patchValue, citation.bits);
@@ -1659,7 +1659,7 @@ TYPE
 			intValue := SYSTEM.VAL(HUGEINT, value);
 			(* alternative: integerValue := BinaryCode.ConvertReal(value) *)
 			result := GetFreeRegisterOrHint(IntermediateCode.FloatType(64), registerHint);
-			listOfReferences.AddHImmediate(intValue, TODO(out.pc), 8);
+			listOfReferences.AddHImmediate(intValue, out.pc, 8);
 			Emit2(opFLDD, result, InstructionSet.NewImmediateOffsetMemory(opPC.register, 0, {InstructionSet.Increment})); (* LDR ..., [PC, #+???] *)
 			ASSERT(result.mode = InstructionSet.modeRegister);
 			ASSERT((result.register >= InstructionSet.DR0) & (result.register <= InstructionSet.DR31));
@@ -1678,7 +1678,7 @@ TYPE
 				dummy := ValueComposition(value, TRUE, result);
 			ELSE
 				result := GetFreeRegisterOrHint(IntermediateCode.UnsignedIntegerType(32), registerHint);
-				listOfReferences.AddImmediate(value, TODO(out.pc), 12);
+				listOfReferences.AddImmediate(value, out.pc, 12);
 				Emit2(opLDR, result, InstructionSet.NewImmediateOffsetMemory(opPC.register, 0, {InstructionSet.Increment})); (* LDR ..., [PC, #+???] *)
 			END;
 
@@ -1695,7 +1695,7 @@ TYPE
 			operand, zero, count: InstructionSet.Operand; i: SIZE;
 		BEGIN
 			inStackAllocation := TRUE;
-			operand := OperandFromValue(ABS(TODO(allocationSize)), emptyOperand);
+			operand := OperandFromValue(ABS(allocationSize(LONGINT)), emptyOperand);
 			IF allocationSize > 0 THEN
 				IF clear THEN
 					zero := InstructionSet.NewRegister(0, None, None, 0);
@@ -1946,7 +1946,7 @@ TYPE
 				(* transfer the fixups *)
 				fixup := code.fixupList.firstFixup;
 				WHILE fixup # NIL DO
-					newFixup := BinaryCode.NewFixup(fixup.mode, fixup.offset + code.pc, fixup.symbol, fixup.symbolOffset, TODO(fixup.displacement), fixup.scale, fixup.pattern);
+					newFixup := BinaryCode.NewFixup(fixup.mode, fixup.offset + code.pc, fixup.symbol, fixup.symbolOffset, fixup.displacement, fixup.scale, fixup.pattern);
 					out.fixupList.AddFixup(newFixup);
 					fixup := fixup.nextFixup
 				END
@@ -2822,7 +2822,7 @@ TYPE
 
 				IF irInstruction.op1.symbolOffset <= inPC THEN
 					(* backward branch: calculate the branch distance *)
-					branchDistance := TODO(in.instructions[irInstruction.op1.symbolOffset].pc - out.pc - 8);
+					branchDistance := (in.instructions[irInstruction.op1.symbolOffset].pc - out.pc - 8)(LONGINT);
 					ASSERT((-33554432 <= branchDistance) & (branchDistance <= 0) & ((ABS(branchDistance) MOD 4) = 0), 200);
 				ELSE
 					(* forward branch: the distance is not yet known, use some placeholder and add a relative fixup *)
@@ -3624,7 +3624,7 @@ TYPE
 
 			(* recompute fixup positions and assign binary sections *)
 			PROCEDURE PatchFixups(section: BinaryCode.Section);
-			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; displacement: LONGINT; symbolOffset: SIZE; in: IntermediateCode.Section;
+			VAR resolved: BinaryCode.Section; fixup: BinaryCode.Fixup; displacement: SIZE; symbolOffset: SIZE; in: IntermediateCode.Section;
 				symbol: Sections.Section;
 			BEGIN
 				fixup := section.fixupList.firstFixup;
@@ -3635,10 +3635,10 @@ TYPE
 						in := symbol(IntermediateCode.Section);
 						symbolOffset := fixup.symbolOffset;
 						IF symbolOffset = in.pc THEN
-							displacement := TODO(resolved.pc);
+							displacement := resolved.pc;
 						ELSIF (symbolOffset # 0) THEN
 							ASSERT(in.pc > symbolOffset);
-							displacement := TODO(in.instructions[symbolOffset].pc);
+							displacement := in.instructions[symbolOffset].pc;
 						ELSE
 							displacement := 0;
 						END;
