@@ -932,7 +932,7 @@ TYPE
 
 			IF info THEN
 				BeginComment;
-				IF x.offsetInBits # MIN(LONGINT) THEN
+				IF x.offsetInBits # MIN(SIZE) THEN
 					w.String("@ofs="); w.Int(x.offsetInBits DIV 8,1);
 				ELSE
 					IF x.type # NIL THEN

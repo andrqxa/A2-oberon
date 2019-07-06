@@ -116,7 +116,7 @@ TYPE
 
 	Result*= RECORD
 		type*: INTEGER; (* ConstantInteger, ConstantFloat, Fixup, Offset *)
-		sizeInBits*: INTEGER;
+		sizeInBits*: SIZE;
 		value*: HUGEINT;
 		valueR*: LONGREAL;
 		fixup*: BinaryCode.Fixup;
@@ -356,7 +356,7 @@ TYPE
 				Error(pos,"incompatible constant");
 				RETURN FALSE;
 			END;
-			result.sizeInBits := SHORT(module.system.SizeOf(constant.type));
+			result.sizeInBits := module.system.SizeOf(constant.type);
 			RETURN TRUE
 		END ConstantSymbol;
 
@@ -379,7 +379,7 @@ TYPE
 			IF symbol.scope IS SyntaxTree.ModuleScope THEN (* symbol in module scope *)
 				IF symbol IS SyntaxTree.Variable THEN (* global variable *)
 					result.type := Fixup;
-					result.sizeInBits := SHORT(module.system.SizeOf(symbol.type));
+					result.sizeInBits := module.system.SizeOf(symbol.type);
 
 					(* generic fixup pattern list for generic implementation of data instruction etc. -- otherwise replaced during encoding *)
 					NEW(fixupPatternList, 1);
@@ -392,7 +392,7 @@ TYPE
 						Error(pos,"forbidden reference to inline procedure"); RETURN FALSE
 					ELSE
 						result.type := Fixup;
-						result.sizeInBits := SHORT(module.system.SizeOf(symbol.type));
+						result.sizeInBits := module.system.SizeOf(symbol.type);
 						(* generic fixup pattern list for generic implementation of data instruction etc. -- otherwise replaced during encoding *)
 						NEW(fixupPatternList, 1);
 						fixupPatternList[0].bits := result.sizeInBits;
@@ -410,7 +410,7 @@ TYPE
 						result.type := Offset;
 						result.value := symbol.offsetInBits DIV module.system.dataUnit;
 						ASSERT(symbol.offsetInBits MOD module.system.dataUnit = 0);
-						result.sizeInBits := SHORT(module.system.SizeOf(symbol.type));
+						result.sizeInBits := module.system.SizeOf(symbol.type);
 					ELSE Error(pos,"forbidden symbol in local scope");
 					END;
 				END
@@ -461,7 +461,7 @@ TYPE
 						result.type := ConstantInteger;
 						result.value := symbol.offsetInBits DIV module.system.dataUnit;
 						ASSERT(symbol.offsetInBits MOD module.system.dataUnit = 0);
-						result.sizeInBits := SHORT(module.system.SizeOf(symbol.type));
+						result.sizeInBits := module.system.SizeOf(symbol.type);
 						RETURN TRUE
 					END;
 				END;

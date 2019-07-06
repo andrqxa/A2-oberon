@@ -262,7 +262,7 @@ TYPE
 
 		PROCEDURE Variable(x: SyntaxTree.Variable);
 		VAR name: Basic.SegmentedName; irv: IntermediateCode.Section; align,  dim, i: LONGINT;
-			size: LONGINT; lastUpdated: LONGINT; imm: IntermediateCode.Operand;
+			size: SIZE; lastUpdated: SIZE; imm: IntermediateCode.Operand;
 
 			PROCEDURE TypeNeedsInitialization(type: SyntaxTree.Type): BOOLEAN;
 			BEGIN
@@ -297,8 +297,8 @@ TYPE
 				RETURN FALSE
 			END ScopeNeedsInitialization;
 
-			PROCEDURE SingleInitialize(CONST op: IntermediateCode.Operand; offset:LONGINT);
-			VAR size: LONGINT;
+			PROCEDURE SingleInitialize(CONST op: IntermediateCode.Operand; offset:SIZE);
+			VAR size: SIZE;
 			BEGIN
 					size := offset - lastUpdated;
 					IF size > 0 THEN
@@ -308,8 +308,8 @@ TYPE
 					lastUpdated := offset + ToMemoryUnits(system, op.type.sizeInBits);
 			END SingleInitialize;
 
-			PROCEDURE Initialize(type: SyntaxTree.Type; initializer: SyntaxTree.Expression; offset:LONGINT);
-			VAR op: Operand; baseType: SyntaxTree.Type; variable: SyntaxTree.Variable; i: LONGINT; size:LONGINT;
+			PROCEDURE Initialize(type: SyntaxTree.Type; initializer: SyntaxTree.Expression; offset:SIZE);
+			VAR op: Operand; baseType: SyntaxTree.Type; variable: SyntaxTree.Variable; i: SIZE; size:SIZE;
 			BEGIN
 				IF type = NIL THEN RETURN ELSE type := type.resolved END;
 				WITH type:
@@ -523,7 +523,7 @@ TYPE
 			inline, finalizer: BOOLEAN;
 			procedureType: SyntaxTree.ProcedureType;
 			pc: SIZE;
-			memorySize: Basic.Integer; stackSize: LONGINT;
+			memorySize: Basic.Integer; stackSize: SIZE;
 			name,baseObject: Basic.SegmentedName; ir: IntermediateCode.Section;
 			null,size,src,dest,fp,res: IntermediateCode.Operand;
 			callingConvention: LONGINT;
@@ -1245,7 +1245,7 @@ TYPE
 		destination: IntermediateCode.Operand;
 
 		arrayDestinationTag: IntermediateCode.Operand;
-		arrayDestinationDimension:LONGINT;
+		arrayDestinationDimension:SIZE;
 
 		currentLoop: Label; (* variable to hand over loop exit jump list *)
 		exitLabel: Label;
@@ -1649,7 +1649,7 @@ TYPE
 		(* dereference op. If op is already a memory operand then use auxiliary register to dereference
 			result will be registered as a new use of operand, op is not released (op must be released by caller)
 		*)
-		PROCEDURE MakeMemory(VAR res: IntermediateCode.Operand; op: IntermediateCode.Operand; type: IntermediateCode.Type; offset: LONGINT);
+		PROCEDURE MakeMemory(VAR res: IntermediateCode.Operand; op: IntermediateCode.Operand; type: IntermediateCode.Type; offset: SIZE);
 		BEGIN
 
 			ASSERT(op.mode # IntermediateCode.Undefined);
@@ -1664,7 +1664,7 @@ TYPE
 			IntermediateCode.MakeMemory(res,type);
 		END MakeMemory;
 
-		PROCEDURE ToMemory(VAR res: IntermediateCode.Operand; type: IntermediateCode.Type; offset: LONGINT);
+		PROCEDURE ToMemory(VAR res: IntermediateCode.Operand; type: IntermediateCode.Type; offset: SIZE);
 		VAR mem: IntermediateCode.Operand;
 		BEGIN
 			MakeMemory(mem,res,type,offset);
@@ -4663,11 +4663,11 @@ TYPE
 			operand, tmpOperand, variableOp, variable2Op: Operand;
 			baseReg, tmp, dimOp, null, dst: IntermediateCode.Operand;
 			variable, variable2: SyntaxTree.Variable;
-			dim, i, size: LONGINT;
+			dim, i, size: SIZE;
 
 			(* TODO: needed? *)
 			oldArrayDestinationTag: IntermediateCode.Operand;
-			oldArrayDestinationDimension: LONGINT;
+			oldArrayDestinationDimension: SIZE;
 			position: Position;
 			saved: RegisterEntry;
 
@@ -6564,9 +6564,9 @@ TYPE
 			END;
 		END SystemTrace;
 
-		PROCEDURE InitFields(type: SyntaxTree.Type; CONST adr: IntermediateCode.Operand; offset: LONGINT);
-		VAR baseType: SyntaxTree.Type; imm,mem: IntermediateCode.Operand; dim,size: LONGINT;
-			variable: SyntaxTree.Variable; i: LONGINT; initializerOp: Operand;
+		PROCEDURE InitFields(type: SyntaxTree.Type; CONST adr: IntermediateCode.Operand; offset: SIZE);
+		VAR baseType: SyntaxTree.Type; imm,mem: IntermediateCode.Operand; dim,size: SIZE;
+			variable: SyntaxTree.Variable; i: SIZE; initializerOp: Operand;
 		BEGIN
 			type := type.resolved;
 			IF type IS SyntaxTree.RecordType THEN
@@ -6722,7 +6722,7 @@ TYPE
 			END
 		END MathArrayDim;
 
-		PROCEDURE PutMathArrayField(base,value: IntermediateCode.Operand; fieldOffset: LONGINT);
+		PROCEDURE PutMathArrayField(base,value: IntermediateCode.Operand; fieldOffset: SIZE);
 		VAR mem: IntermediateCode.Operand; offset: LONGINT;
 		BEGIN
 			offset := ToMemoryUnits(system,fieldOffset*addressType.sizeInBits);
@@ -6731,7 +6731,7 @@ TYPE
 			ReleaseIntermediateOperand(mem);
 		END PutMathArrayField;
 
-		PROCEDURE PutMathArrayFieldOffset(base,value: IntermediateCode.Operand; fieldOffset, offset: LONGINT);
+		PROCEDURE PutMathArrayFieldOffset(base,value: IntermediateCode.Operand; fieldOffset, offset: SIZE);
 		VAR mem: IntermediateCode.Operand;
 		BEGIN
 			offset := offset + ToMemoryUnits(system,fieldOffset*addressType.sizeInBits);
@@ -6740,7 +6740,7 @@ TYPE
 			ReleaseIntermediateOperand(mem);
 		END PutMathArrayFieldOffset;
 
-		PROCEDURE GetMathArrayField(VAR value: IntermediateCode.Operand; base: IntermediateCode.Operand; offset: LONGINT);
+		PROCEDURE GetMathArrayField(VAR value: IntermediateCode.Operand; base: IntermediateCode.Operand; offset: SIZE);
 		BEGIN
 			offset := ToMemoryUnits(system,offset*addressType.sizeInBits);
 			MakeMemory(value,base,addressType,offset);
@@ -6768,12 +6768,12 @@ TYPE
 			END;
 		END PutMathArrayLenOrIncr;
 
-		PROCEDURE PutMathArrayLength(base,value: IntermediateCode.Operand; dim: LONGINT);
+		PROCEDURE PutMathArrayLength(base,value: IntermediateCode.Operand; dim: SIZE);
 		BEGIN
 			PutMathArrayField(base,value,MathLenOffset + dim * 2);
 		END PutMathArrayLength;
 
-		PROCEDURE PutMathArrayIncrement(base,value: IntermediateCode.Operand; dim: LONGINT);
+		PROCEDURE PutMathArrayIncrement(base,value: IntermediateCode.Operand; dim: SIZE);
 		BEGIN
 			PutMathArrayField(base,value,MathIncrOffset + dim * 2);
 		END PutMathArrayIncrement;
@@ -7008,7 +7008,7 @@ TYPE
 				ASSERT(~register);
 
 				variable(SyntaxTree.Variable).SetOffset(v.offsetInBits);
-				ASSERT((v.offsetInBits # 0) & (v.offsetInBits # MIN(LONGINT)));
+				ASSERT((v.offsetInBits # 0) & (v.offsetInBits # MIN(SIZE)));
 
 				scope.InsertVariable(variable(SyntaxTree.Variable), v);
 				scope.EnterSymbol(variable, duplicate);
@@ -7018,11 +7018,11 @@ TYPE
 			RETURN variable(SyntaxTree.Variable)
 		END GetTemporaryVariable;
 
-		PROCEDURE GetMathArrayDescriptorType(dimensions: LONGINT): SyntaxTree.Type;
+		PROCEDURE GetMathArrayDescriptorType(dimensions: SIZE): SyntaxTree.Type;
 		VAR name: ARRAY 32 OF CHAR; symbol: SyntaxTree.Symbol; typeDeclaration: SyntaxTree.TypeDeclaration;
 			recordType: SyntaxTree.RecordType; type: SyntaxTree.Type;
 			recordScope: SyntaxTree.RecordScope; parentScope: SyntaxTree.Scope; identifier: SyntaxTree.Identifier;
-			i: LONGINT; duplicate: BOOLEAN;
+			i: SIZE; duplicate: BOOLEAN;
 
 			PROCEDURE AddVariable(CONST name: ARRAY OF CHAR; type: SyntaxTree.Type);
 			VAR variable: SyntaxTree.Variable;
@@ -7102,7 +7102,7 @@ TYPE
 			ReleaseOperand(op);
 		END PushConstSet;
 
-		PROCEDURE PushConstInteger(v: LONGINT);
+		PROCEDURE PushConstInteger(v: SIZE);
 		VAR value: SyntaxTree.Value; op: Operand;
 		BEGIN
 			value := SyntaxTree.NewIntegerValue(Basic.invalidPosition, v);
@@ -10980,7 +10980,7 @@ TYPE
 			parameter: SyntaxTree.Parameter;
 			procedure: SyntaxTree.Procedure;
 			procedureType: SyntaxTree.ProcedureType;
-			returnTypeOffset: LONGINT;
+			returnTypeOffset: SIZE;
 			delegate: BOOLEAN;
 			callingConvention, parametersSize: LONGINT;
 			symbol: SyntaxTree.Symbol;
@@ -14564,7 +14564,7 @@ TYPE
 	END GetRecordTypeName;
 
 	PROCEDURE ParametersSize(system: Global.System; procedureType: SyntaxTree.ProcedureType; isNested: BOOLEAN): LONGINT;
-	VAR parSize: LONGINT; parameter: SyntaxTree.Parameter;
+	VAR parSize: SIZE; parameter: SyntaxTree.Parameter;
 	BEGIN
 		parSize := 0;
 
@@ -14908,7 +14908,7 @@ TYPE
 		RETURN instruction
 	END SpecialInstruction;
 
-	PROCEDURE Reserve(position: Basic.Position;units: LONGINT): IntermediateCode.Instruction;
+	PROCEDURE Reserve(position: Basic.Position;units: SIZE): IntermediateCode.Instruction;
 	VAR op1: IntermediateCode.Operand;
 	VAR instruction: IntermediateCode.Instruction;
 	BEGIN

@@ -1675,9 +1675,9 @@ TYPE
 					Global.GetSymbolSegmentedName(scopeSymbol,name);
 					SetSymbol(operand,name,0,0,0);
 				ELSIF (scopeSymbol IS SyntaxTree.Variable) THEN (* local variable *)
-					operand.displacement := (scopeSymbol.offsetInBits DIV 8)
+					operand.displacement := TODO(scopeSymbol.offsetInBits DIV 8)
 				ELSIF (scopeSymbol IS SyntaxTree.Parameter) THEN (* local parameter *)
-					operand.displacement := (scopeSymbol.offsetInBits DIV 8)
+					operand.displacement := TODO(scopeSymbol.offsetInBits DIV 8)
 				ELSE
 					RETURN (* ? *)
 				END;
@@ -2627,11 +2627,11 @@ TYPE
 	BEGIN  InitMem128 (operand,reg, displacement); RETURN operand
 	END NewMem128;
 
-	PROCEDURE SetSymbol*(VAR operand: Operand; symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; symbolOffset: SIZE; displacement: LONGINT);
+	PROCEDURE SetSymbol*(VAR operand: Operand; symbol: Sections.SectionName; fingerprint: Basic.Fingerprint; symbolOffset: SIZE; displacement: SIZE);
 	BEGIN
 		operand.symbol.name := symbol;
 		operand.symbol.fingerprint := fingerprint;
-		operand.symbolOffset := symbolOffset; operand.displacement := displacement;
+		operand.symbolOffset := symbolOffset; operand.displacement := TODO(displacement);
 	END SetSymbol;
 
 	PROCEDURE InitImm* (VAR operand: Operand; size: SHORTINT; val: HUGEINT);

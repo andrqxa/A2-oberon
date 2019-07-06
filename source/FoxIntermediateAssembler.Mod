@@ -17,7 +17,7 @@ TYPE
 			(* stub, must be overwritten by implementation *)
 			VAR operand: IntermediateCode.Operand;
 				result: FoxAssembler.Result;
-				register1,register2:LONGINT;
+				register1,register2:SIZE;
 				class1, class2: IntermediateCode.RegisterClass;
 				stop,memory: BOOLEAN;
 			BEGIN

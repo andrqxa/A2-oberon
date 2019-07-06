@@ -545,8 +545,8 @@ TYPE
 			isRealtime-: BOOLEAN;
 			recursion: BOOLEAN;
 
-			sizeInBits-: LONGINT; (* allocation size of this type in bits *)
-			alignmentInBits-: LONGINT;
+			sizeInBits-: SIZE; (* allocation size of this type in bits *)
+			alignmentInBits-: SIZE;
 
 		PROCEDURE & InitType*( position: Position);
 		BEGIN
@@ -555,18 +555,18 @@ TYPE
 			typeDeclaration := NIL;
 			scope := NIL;
 			resolved := SELF;
-			sizeInBits := MIN(LONGINT);
+			sizeInBits := MIN(SIZE);
 			alignmentInBits := 0;
 			isRealtime := FALSE;
 			recursion := FALSE;
 			hasPointers := FALSE;
 		END InitType;
 
-		PROCEDURE SetSize*(sizeInBits: LONGINT);
+		PROCEDURE SetSize*(sizeInBits: SIZE);
 		BEGIN SELF.sizeInBits := sizeInBits
 		END SetSize;
 
-		PROCEDURE SetAlignmentInBits*(alignmentInBits: LONGINT);
+		PROCEDURE SetAlignmentInBits*(alignmentInBits: SIZE);
 		BEGIN SELF.alignmentInBits := alignmentInBits
 		END SetAlignmentInBits;
 
@@ -639,7 +639,7 @@ TYPE
 	BasicType*= OBJECT(Type)
 	VAR name-: Identifier;
 
-		PROCEDURE & InitBasicType(CONST id: ARRAY OF CHAR; sizeInBits: LONGINT);
+		PROCEDURE & InitBasicType(CONST id: ARRAY OF CHAR; sizeInBits: SIZE);
 		VAR str: IdentifierString;
 		BEGIN
 			COPY(id, str);Basic.AppendNumber(str,sizeInBits); name := NewIdentifier(str);
@@ -664,7 +664,7 @@ TYPE
 	**)
 	ObjectType*=OBJECT(BasicType)
 
-		PROCEDURE & InitObjectType(sizeInBits: LONGINT);
+		PROCEDURE & InitObjectType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@Object",sizeInBits);
 			hasPointers := TRUE;
@@ -689,7 +689,7 @@ TYPE
 	**)
 	NilType*=OBJECT(BasicType)
 
-		PROCEDURE & InitNilType(sizeInBits: LONGINT);
+		PROCEDURE & InitNilType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@Nil",sizeInBits);
 			SetRealtime(TRUE);
@@ -715,7 +715,7 @@ TYPE
 	**)
 	AnyType*=OBJECT(BasicType)
 
-		PROCEDURE & InitAnyType(sizeInBits: LONGINT);
+		PROCEDURE & InitAnyType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@Any",sizeInBits);
 			hasPointers := TRUE;
@@ -740,7 +740,7 @@ TYPE
 	**)
 	ByteType*=OBJECT(BasicType)
 
-		PROCEDURE & InitByteType(sizeInBits: LONGINT);
+		PROCEDURE & InitByteType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@Byte",sizeInBits);
 			SetRealtime(TRUE);
@@ -761,7 +761,7 @@ TYPE
 	**)
 	AddressType*=OBJECT(BasicType)
 
-		PROCEDURE & InitAddressType(sizeInBits: LONGINT);
+		PROCEDURE & InitAddressType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@Address",sizeInBits);
 			SetRealtime(TRUE);
@@ -782,7 +782,7 @@ TYPE
 	**)
 	SizeType*=OBJECT(BasicType)
 
-		PROCEDURE & InitSizeType(sizeInBits: LONGINT);
+		PROCEDURE & InitSizeType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@Size",sizeInBits);
 			SetRealtime(TRUE);
@@ -803,7 +803,7 @@ TYPE
 	**)
 	BooleanType*=OBJECT(BasicType)
 
-		PROCEDURE & InitBooleanType(sizeInBits: LONGINT);
+		PROCEDURE & InitBooleanType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@Boolean",sizeInBits);
 			SetRealtime(TRUE);
@@ -824,7 +824,7 @@ TYPE
 	**)
 	SetType*=OBJECT(BasicType)
 
-		PROCEDURE & InitSetType(sizeInBits: LONGINT);
+		PROCEDURE & InitSetType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@Set",sizeInBits);
 			SetRealtime(TRUE);
@@ -845,7 +845,7 @@ TYPE
 	**)
 	CharacterType*=OBJECT(BasicType)
 
-		PROCEDURE & InitCharacterType(sizeInBits: LONGINT);
+		PROCEDURE & InitCharacterType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@Character", sizeInBits);
 			SetRealtime(TRUE);
@@ -865,7 +865,7 @@ TYPE
 		represented by basic type <<RANGE>>
 	**)
 	RangeType* = OBJECT(BasicType)
-		PROCEDURE & InitRangeType(sizeInBits: LONGINT);
+		PROCEDURE & InitRangeType(sizeInBits: SIZE);
 		BEGIN
 			InitBasicType("@RangeType",sizeInBits);
 			SetRealtime(TRUE);
@@ -888,7 +888,7 @@ TYPE
 	(* number types: IntegerType or FloatType *)
 	NumberType*=OBJECT(BasicType)
 
-		PROCEDURE & InitNumberType( CONST name: ARRAY OF CHAR; sizeInBits: LONGINT);
+		PROCEDURE & InitNumberType( CONST name: ARRAY OF CHAR; sizeInBits: SIZE);
 		BEGIN
 			InitBasicType(name, sizeInBits);
 			SetRealtime(TRUE);
@@ -902,7 +902,7 @@ TYPE
 	IntegerType*= OBJECT (NumberType)
 	VAR signed-: BOOLEAN;
 
-		PROCEDURE & InitIntegerType(sizeInBits: LONGINT; signed: BOOLEAN);
+		PROCEDURE & InitIntegerType(sizeInBits: SIZE; signed: BOOLEAN);
 		BEGIN
 			IF signed THEN
 				InitNumberType("@Integer",sizeInBits);
@@ -928,7 +928,7 @@ TYPE
 	**)
 	FloatType*= OBJECT (NumberType)
 
-		PROCEDURE & InitFloatType(sizeInBits: LONGINT);
+		PROCEDURE & InitFloatType(sizeInBits: SIZE);
 		BEGIN
 			InitNumberType("@Float",sizeInBits);
 		END InitFloatType;
@@ -1183,7 +1183,7 @@ TYPE
 			arrayBase-: Type;
 			length-: Expression;
 			staticLength-: LONGINT;
-			staticIncrementInBits-: LONGINT;
+			staticIncrementInBits-: SIZE;
 			form-: LONGINT;
 			isUnsafe-: BOOLEAN;
 
@@ -1228,7 +1228,7 @@ TYPE
 			END;
 		END SetLength;
 
-		PROCEDURE SetIncrement*(increment: LONGINT);
+		PROCEDURE SetIncrement*(increment: SIZE);
 		BEGIN staticIncrementInBits := increment
 		END SetIncrement;
 
@@ -1425,7 +1425,7 @@ TYPE
 		VAR
 			direction-: LONGINT;
 			sizeExpression-: Expression; (* generated by parser *)
-			sizeInBits-: LONGINT; (* computed by checker *)
+			sizeInBits-: SIZE; (* computed by checker *)
 			cellsAreObjects-: BOOLEAN;
 
 		PROCEDURE & InitPortType(position: Position; direction: LONGINT; sizeExpression: Expression; scope: Scope);
@@ -1437,7 +1437,7 @@ TYPE
 			cellsAreObjects := FALSE;
 		END InitPortType;
 
-		PROCEDURE SetSize*(size: LONGINT);
+		PROCEDURE SetSize*(size: SIZE);
 		BEGIN sizeInBits := size
 		END SetSize;
 
@@ -2678,7 +2678,7 @@ TYPE
 		access-: SET; (* access flags (exported, readonly etc.) *)
 		type-: Type; (* type of constant / variable / parameter / procedure return type *)
 		scope-:Scope; (* container of symbol *)
-		offsetInBits-: LONGINT; (* offset in stack or heap, in bits *)
+		offsetInBits-: SIZE; (* offset in stack or heap, in bits *)
 		used-, written-: BOOLEAN;
 		fixed-: BOOLEAN;
 		alignment-: LONGINT;
@@ -2699,7 +2699,7 @@ TYPE
 			type := NIL;
 			access := Internal;
 			state := Undefined;
-			offsetInBits := MIN(LONGINT);
+			offsetInBits := MIN(SIZE);
 			alignment := 0; (* take default *)
 			fixed := FALSE;
 			used := FALSE; written := FALSE;
@@ -2748,7 +2748,7 @@ TYPE
 			SELF.access := access;
 		END SetAccess;
 
-		PROCEDURE SetOffset*(ofs: LONGINT);
+		PROCEDURE SetOffset*(ofs: SIZE);
 		BEGIN offsetInBits := ofs
 		END SetOffset;
 
@@ -4206,7 +4206,7 @@ TYPE
 
 		ownerModule-: Module;
 
-		currentVariableOffset-, minVariableOffset-, maxVariableOffset-: LONGINT;
+		currentVariableOffset-, minVariableOffset-, maxVariableOffset-: SIZE;
 
 		PROCEDURE & InitScope(outer: Scope);
 		BEGIN
@@ -4227,12 +4227,12 @@ TYPE
 			NEW(symbolTable,11);
 		END InitScope;
 
-		PROCEDURE SetMinVariableOffset*(o: LONGINT);
+		PROCEDURE SetMinVariableOffset*(o: SIZE);
 		BEGIN
 			minVariableOffset := o;
 		END SetMinVariableOffset;
 
-		PROCEDURE SetCurrentVariableOffset*(o: LONGINT);
+		PROCEDURE SetCurrentVariableOffset*(o: SIZE);
 		BEGIN
 			currentVariableOffset := o;
 		END SetCurrentVariableOffset;
@@ -5184,61 +5184,61 @@ VAR
 		RETURN type
 	END NewType;
 
-	PROCEDURE NewByteType*(sizeInBits: LONGINT): ByteType;
+	PROCEDURE NewByteType*(sizeInBits: SIZE): ByteType;
 	VAR basicType: ByteType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;
 	END NewByteType;
 
-	PROCEDURE NewAnyType*(sizeInBits: LONGINT): AnyType;
+	PROCEDURE NewAnyType*(sizeInBits: SIZE): AnyType;
 	VAR basicType: AnyType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;
 	END NewAnyType;
 
-	PROCEDURE NewObjectType*(sizeInBits: LONGINT): ObjectType;
+	PROCEDURE NewObjectType*(sizeInBits: SIZE): ObjectType;
 	VAR basicType: ObjectType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;
 	END NewObjectType;
 
-	PROCEDURE NewNilType*(sizeInBits: LONGINT): NilType;
+	PROCEDURE NewNilType*(sizeInBits: SIZE): NilType;
 	VAR basicType: NilType;
 	BEGIN
 		NEW(basicType,  sizeInBits); RETURN basicType;
 	END NewNilType;
 
-	PROCEDURE NewAddressType*(sizeInBits: LONGINT): AddressType;
+	PROCEDURE NewAddressType*(sizeInBits: SIZE): AddressType;
 	VAR basicType: AddressType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;
 	END NewAddressType;
 
-	PROCEDURE NewSizeType*(sizeInBits: LONGINT): SizeType;
+	PROCEDURE NewSizeType*(sizeInBits: SIZE): SizeType;
 	VAR basicType: SizeType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;
 	END NewSizeType;
 
-	PROCEDURE NewBooleanType*(sizeInBits: LONGINT): BooleanType;
+	PROCEDURE NewBooleanType*(sizeInBits: SIZE): BooleanType;
 	VAR basicType: BooleanType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;
 	END NewBooleanType;
 
-	PROCEDURE NewSetType*(sizeInBits: LONGINT): SetType;
+	PROCEDURE NewSetType*(sizeInBits: SIZE): SetType;
 	VAR basicType: SetType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;
 	END NewSetType;
 
-	PROCEDURE NewCharacterType*(sizeInBits: LONGINT): CharacterType;
+	PROCEDURE NewCharacterType*(sizeInBits: SIZE): CharacterType;
 	VAR basicType: CharacterType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;
 	END NewCharacterType;
 
-	PROCEDURE NewRangeType*(sizeInBits: LONGINT): RangeType;
+	PROCEDURE NewRangeType*(sizeInBits: SIZE): RangeType;
 	VAR basicType: RangeType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;
@@ -5256,7 +5256,7 @@ VAR
 		NEW(basicType, size, signed); RETURN basicType;
 	END NewIntegerType;
 
-	PROCEDURE NewFloatType*(sizeInBits: LONGINT): FloatType;
+	PROCEDURE NewFloatType*(sizeInBits: SIZE): FloatType;
 	VAR basicType: FloatType;
 	BEGIN
 		NEW(basicType, sizeInBits); RETURN basicType;

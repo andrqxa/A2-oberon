@@ -157,7 +157,7 @@ TYPE
 		(** parse an intermediate code operand **)
 		PROCEDURE ParseOperand(VAR operand: IntermediateCode.Operand; sectionList: Sections.SectionList);
 		VAR
-			positionOfOperand, pos: Position;  registerNumber, symbolOffset, integer: LONGINT;
+			positionOfOperand, pos: Position;  registerNumber: SIZE; symbolOffset, integer: LONGINT;
 			someHugeint: HUGEINT;
 			hasTypeDescriptor, isMemoryOperand, lastWasIdentifier, isNegated: BOOLEAN;
 			someLongreal: LONGREAL;
@@ -191,7 +191,7 @@ TYPE
 			IF lastWasIdentifier THEN
 				IF IntermediateCode.DenotesRegister(identifier, registerClass, registerNumber) THEN
 					(* register *)
-					IntermediateCode.InitRegister(operand, type, registerClass, registerNumber);
+					IntermediateCode.InitRegister(operand, type, registerClass, TODO(registerNumber));
 				ELSE
 					(* TODO: handle assembly constants *)
 

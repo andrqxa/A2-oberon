@@ -1224,7 +1224,7 @@ VAR
 		RETURN obj;
 	END GetIntegerObj;
 
-	PROCEDURE Align*(VAR offset: LONGINT; alignment: LONGINT);
+	PROCEDURE Align*(VAR offset: SIZE; alignment: SIZE);
 	BEGIN
 		IF alignment >0  THEN
 			INC(offset,(-offset) MOD alignment);

@@ -87,7 +87,7 @@ TYPE
 		type-: Type; (* size and form *)
 		register-: LONGINT; (* (virtual) register number, equals None if no register *)
 		registerClass-: RegisterClass; (* normal register vs. special registers such as parameter registers *)
-		offset-: LONGINT; (* offset on register or immediate symbol, in units *)
+		offset-: SIZE; (* offset on register or immediate symbol, in units *)
 		intValue-: HUGEINT; (* integer value, if mode = ModeImmediate and type.form IN Integer or ModeNumber *)
 		floatValue-: LONGREAL; (* real value, if mode = ModeImmediate and type.form = Float *)
 
@@ -668,25 +668,25 @@ TYPE
 				w.RawLInt(operand.register);
 				w.RawSInt(operand.registerClass.class);
 				w.RawInt(operand.registerClass.number);
-				w.RawLInt(operand.offset);
+				w.RawLInt(operand.offset(LONGINT));
 			ELSIF operand.symbol.name # "" THEN
 				Basic.WriteSegmentedName(w,operand.symbol.name);
 				IF operand.symbol.fingerprint # 0 THEN w.RawHInt(operand.symbol.fingerprint);END;
 				w.RawLInt(operand.symbolOffset(LONGINT));
-				w.RawLInt(operand.offset);
+				w.RawLInt(operand.offset(LONGINT));
 			ELSE w.RawLInt(SHORT(operand.intValue));
 			END;
 		|ModeRegister:
 			w.RawLInt(operand.register);
 			w.RawSInt(operand.registerClass.class);
 			w.RawInt(operand.registerClass.number);
-			w.RawLInt(operand.offset);
+			w.RawLInt(operand.offset(LONGINT));
 		|ModeImmediate:
 			IF operand.symbol.name # "" THEN
 				Basic.WriteSegmentedName(w,operand.symbol.name);
 				IF operand.symbol.fingerprint # 0 THEN w.RawHInt(operand.symbol.fingerprint);END;
 				w.RawLInt(operand.symbolOffset(LONGINT));
-				w.RawLInt(operand.offset);
+				w.RawLInt(operand.offset(LONGINT));
 			ELSE
 				IF operand.type.form IN Integer THEN
 						w.RawLInt(SHORT(operand.intValue));
@@ -911,7 +911,7 @@ TYPE
 	BEGIN InitRegister(op,type,registerClass, register); SetOffset (op, offset); RETURN op
 	END RegisterOffset;
 
-	PROCEDURE AddOffset*(VAR op: Operand; offset: LONGINT);
+	PROCEDURE AddOffset*(VAR op: Operand; offset: SIZE);
 	BEGIN
 		Assert((op.mode = ModeRegister) OR (op.mode = ModeMemory) OR (op.mode = ModeImmediate) & (op.type.form IN {SignedInteger, UnsignedInteger}),"offset not on register or integer immediate");
 		IF (op.mode = ModeImmediate) & (op.symbol.name = "") THEN
@@ -1053,7 +1053,7 @@ TYPE
 		RETURN (op.mode = ModeRegister) & (op.type.length > 1);
 	END IsVectorRegister;
 
-	PROCEDURE InitRegisterClass*(VAR registerClass: RegisterClass; class: SHORTINT; number: LONGINT);
+	PROCEDURE InitRegisterClass*(VAR registerClass: RegisterClass; class: SHORTINT; number: SIZE);
 	BEGIN registerClass.class := class; registerClass.number := INTEGER(number)
 	END InitRegisterClass;
 
@@ -1088,7 +1088,7 @@ TYPE
 		op.register := reg; ASSERT(reg # 0);
 	END SetRegister;
 
-	PROCEDURE DecimalNumber(ch: CHAR; VAR nr: LONGINT): BOOLEAN;
+	PROCEDURE DecimalNumber(ch: CHAR; VAR nr: SIZE): BOOLEAN;
 	BEGIN
 		IF (ch < "0") OR (ch > "9") THEN RETURN FALSE
 		ELSE
@@ -1098,7 +1098,7 @@ TYPE
 		END;
 	END DecimalNumber;
 
-	PROCEDURE Numbers(CONST name: ARRAY OF CHAR; VAR pos: LONGINT; VAR number: LONGINT): BOOLEAN;
+	PROCEDURE Numbers(CONST name: ARRAY OF CHAR; VAR pos: SIZE; VAR number: SIZE): BOOLEAN;
 	BEGIN
 		number := 0;
 		IF DecimalNumber(name[pos], number) THEN
@@ -1110,20 +1110,20 @@ TYPE
 		END;
 	END Numbers;
 
-	PROCEDURE Character(CONST name: ARRAY OF CHAR; VAR pos: LONGINT; char: CHAR): BOOLEAN;
+	PROCEDURE Character(CONST name: ARRAY OF CHAR; VAR pos: SIZE; char: CHAR): BOOLEAN;
 	BEGIN
 		IF name[pos] = char THEN INC(pos); RETURN TRUE ELSE RETURN FALSE END;
 	END Character;
 
-	PROCEDURE DenotesRegister*(CONST name: ARRAY OF CHAR; VAR registerClass: RegisterClass; VAR register: LONGINT): BOOLEAN;
-	VAR pos, registerNumber: LONGINT;
+	PROCEDURE DenotesRegister*(CONST name: ARRAY OF CHAR; VAR registerClass: RegisterClass; VAR register: SIZE): BOOLEAN;
+	VAR pos, registerNumber: SIZE;
 	BEGIN
 		pos := 0;
 		IF Character(name,pos,'r') THEN
 			IF Numbers(name,pos,register) THEN
 				IF Character(name,pos,0X) THEN registerClass := GeneralPurposeRegister; RETURN TRUE
 				ELSIF Character(name,pos,':') & Character(name,pos,'p') & Numbers(name,pos,registerNumber) & Character(name,pos,0X) THEN
-					InitRegisterClass(registerClass, Parameter, SHORT(registerNumber));
+					InitRegisterClass(registerClass, Parameter, registerNumber);
 					RETURN TRUE
 				END
 			END;
@@ -1139,7 +1139,7 @@ TYPE
 		END;
 	END DenotesRegister;
 
-	PROCEDURE UnsignedIntegerType*(bits: LONGINT): Type;
+	PROCEDURE UnsignedIntegerType*(bits: SIZE): Type;
 	BEGIN
 		IF bits = 8 THEN RETURN uint8
 		ELSIF bits=16 THEN RETURN uint16
@@ -1149,7 +1149,7 @@ TYPE
 		END;
 	END UnsignedIntegerType;
 
-	PROCEDURE SignedIntegerType*(bits: LONGINT): Type;
+	PROCEDURE SignedIntegerType*(bits: SIZE): Type;
 	BEGIN
 		IF bits = 8 THEN RETURN int8
 		ELSIF bits=16 THEN RETURN int16
@@ -1159,7 +1159,7 @@ TYPE
 		END;
 	END SignedIntegerType;
 
-	PROCEDURE FloatType*(bits: LONGINT): Type;
+	PROCEDURE FloatType*(bits: SIZE): Type;
 	BEGIN
 		IF bits=32 THEN RETURN float32
 		ELSIF bits=64 THEN RETURN float64
@@ -1181,7 +1181,7 @@ TYPE
 
 	PROCEDURE DenotesType*(CONST name: ARRAY OF CHAR; VAR type: Type): BOOLEAN;
 	VAR
-		sizeInBits: LONGINT; pos: LONGINT;
+		sizeInBits: SIZE; pos: SIZE;
 	BEGIN
 		pos := 0;
 		IF Character(name,pos,'s') THEN

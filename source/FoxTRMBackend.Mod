@@ -897,7 +897,7 @@ TYPE
 
 		PROCEDURE EmitCall(VAR instruction: IntermediateCode.Instruction);
 		VAR op: InstructionSet.Operand; section: IntermediateCode.Section; code: BinaryCode.Section; symbol: ObjectFile.Identifier;
-			fixup, newFixup: BinaryCode.Fixup; pc: BinaryCode.Unit; regOp: Operand; offset,reloffset: LONGINT;
+			fixup, newFixup: BinaryCode.Fixup; pc: BinaryCode.Unit; regOp: Operand; offset,reloffset: SIZE;
 		BEGIN
 			IF (instruction.op1.symbol.name # "") & (instruction.op1.mode # IntermediateCode.ModeMemory) THEN
 				Resolve(instruction.op1);
@@ -1236,7 +1236,7 @@ TYPE
 
 			virtualRegister := virtual.register;
 
-			offset := virtual.offset;
+			offset := TODO(virtual.offset);
 			physicalRegister := PhysicalRegister(virtual.register,part,offset);
 			instructionSet.InitRegister(physical, physicalRegister);
 
@@ -2179,7 +2179,7 @@ TYPE
 
 	System = OBJECT (Global.System)
 
-		PROCEDURE SizeOf*(type: SyntaxTree.Type): LONGINT;
+		PROCEDURE SizeOf*(type: SyntaxTree.Type): SIZE;
 		BEGIN
 			type := type.resolved;
 			IF type IS SyntaxTree.BasicType THEN
@@ -2232,7 +2232,7 @@ TYPE
 
 		PROCEDURE GetSystem*(): Global.System;
 		VAR system: System; variableOffset: WORD;
-		BEGIN					
+		BEGIN
 			IF preciseGC THEN variableOffset := -32 ELSE variableOffset := 0 END;
 			NEW(system, 18, 32, 32, 32, 32, 32, 32, 64(* parameter offset 0: handled locally *), variableOffset,  cooperative);
 			Global.SetDefaultDeclarations(system,32);

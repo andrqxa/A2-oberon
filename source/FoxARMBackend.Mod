@@ -540,9 +540,9 @@ TYPE
 
 		listOfReferences: ListOfReferences;
 
-		spillStackStart, pushChainLength: LONGINT;
+		spillStackStart, pushChainLength: SIZE;
 
-		stackSize: LONGINT; (* the size of the current stack frame *)
+		stackSize: SIZE; (* the size of the current stack frame *)
 		stackSizeKnown: BOOLEAN; (* whether the size of the current stack frame is known at compile time *)
 
 		inStackAllocation: BOOLEAN;
@@ -1035,7 +1035,7 @@ TYPE
 		(** get an ARM memory operand that represents a spill location (from a ticket) **)
 		PROCEDURE GetSpillOperand(ticket: Ticket): Operand;
 		VAR
-			offset: LONGINT;
+			offset: SIZE;
 			result: Operand;
 		BEGIN
 			ASSERT(ticket.spilled);
@@ -1043,7 +1043,7 @@ TYPE
 			offset := spillStackStart + ticket.offset + 1; (* TODO: check this *)
 			ASSERT((0 <= offset) & (offset < InstructionSet.Bits12));
 
-			result := InstructionSet.NewImmediateOffsetMemory(PhysicalRegisterNumber(IntermediateCode.FP, Low), offset, {InstructionSet.Decrement});
+			result := InstructionSet.NewImmediateOffsetMemory(PhysicalRegisterNumber(IntermediateCode.FP, Low), TODO(offset), {InstructionSet.Decrement});
 
 			ASSERT(result.mode = InstructionSet.modeMemory);
 			RETURN result
@@ -1143,7 +1143,7 @@ TYPE
 			ASSERT(irRegisterOperand.mode = IntermediateCode.ModeRegister);
 
 			result := InstructionSet.NewRegister(PhysicalRegisterNumber(irRegisterOperand.register, part), None, None, 0);
-			result := RegisterAfterAppliedOffset(result, irRegisterOperand.offset, registerHint);
+			result := RegisterAfterAppliedOffset(result, TODO(irRegisterOperand.offset), registerHint);
 
 			ASSERT(result.mode = InstructionSet.modeRegister);
 			RETURN result
@@ -1261,7 +1261,7 @@ TYPE
 			ASSERT(baseAddressRegisterNumber # None);
 
 			(* get offset of part in question *)
-			offset := irMemoryOperand.offset + part * 4;
+			offset := TODO(irMemoryOperand.offset) + part * 4;
 
 			(* determine indexing mode *)
 			IF offset >= 0 THEN indexingMode := {InstructionSet.Increment} ELSE indexingMode := {InstructionSet.Decrement} END;
@@ -1339,7 +1339,7 @@ TYPE
 				IF irOperand.symbol.name # "" THEN
 					Resolve(irOperand);
 					result := RegisterFromSymbol(irOperand.symbol.name, irOperand.symbol.fingerprint, irOperand.resolved, irOperand.symbolOffset, emptyOperand);
-					result := RegisterAfterAppliedOffset(result, irOperand.offset, registerHint);
+					result := RegisterAfterAppliedOffset(result, TODO(irOperand.offset), registerHint);
 				ELSE
 					ASSERT(irOperand.offset = 0);
 					IF IsInteger(irOperand) THEN result := RegisterFromValue(ValueOfPart(irOperand.intValue, part), registerHint)
@@ -1690,12 +1690,12 @@ TYPE
 		(** allocate or deallocate on the stack
 			- note: updateStackSize is important as intermediate RETURNs should not change stack size
 		**)
-		PROCEDURE AllocateStack(allocationSize: LONGINT; doUpdateStackSize: BOOLEAN; clear: BOOLEAN);
+		PROCEDURE AllocateStack(allocationSize: SIZE; doUpdateStackSize: BOOLEAN; clear: BOOLEAN);
 		VAR
-			operand, zero, count: InstructionSet.Operand; i: LONGINT;
+			operand, zero, count: InstructionSet.Operand; i: SIZE;
 		BEGIN
 			inStackAllocation := TRUE;
-			operand := OperandFromValue(ABS(allocationSize), emptyOperand);
+			operand := OperandFromValue(ABS(TODO(allocationSize)), emptyOperand);
 			IF allocationSize > 0 THEN
 				IF clear THEN
 					zero := InstructionSet.NewRegister(0, None, None, 0);
@@ -1961,7 +1961,7 @@ TYPE
 
 		(* enter <callingConvention>, <pafSize>, <numRegParams> *)
 		PROCEDURE EmitEnter(CONST irInstruction: IntermediateCode.Instruction);
-		VAR allocationSize: LONGINT;
+		VAR allocationSize: SIZE;
 		BEGIN
 			(* store registers for interrupts, if required *)
 			IF (irInstruction.op1.intValue = SyntaxTree.InterruptCallingConvention) THEN (* TODO: needed? *)

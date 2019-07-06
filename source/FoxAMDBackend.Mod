@@ -936,7 +936,7 @@ TYPE
 		END GetImmediate;
 
 		PROCEDURE GetMemory(CONST virtual: IntermediateCode.Operand; part: LONGINT; VAR physical: Assembler.Operand);
-		VAR type: IntermediateCode.Type; virtualRegister, physicalRegister,offset: LONGINT; ticket,orig: Ticket; dest, source: Assembler.Operand;
+		VAR type: IntermediateCode.Type; virtualRegister, physicalRegister: LONGINT; offset: SIZE; ticket,orig: Ticket; dest, source: Assembler.Operand;
 		BEGIN
 			ASSERT(virtual.mode = IntermediateCode.ModeMemory);
 			GetPartType(virtual.type,part,type);
@@ -987,7 +987,7 @@ TYPE
 				offset := virtual.offset;
 				ASSERT(virtual.intValue = 0);
 			END;
-			Assembler.InitMem(physical, SHORTINT(type.length * type.sizeInBits DIV 8) , physicalRegister, offset+ (cpuBits DIV 8) *part);
+			Assembler.InitMem(physical, SHORTINT(type.length * type.sizeInBits DIV 8) , physicalRegister, TODO(offset)+ (cpuBits DIV 8) *part);
 			IF (virtual.symbol.name # "") & (cpuBits # 64) THEN
 				Assembler.SetSymbol(physical,virtual.symbol.name,virtual.symbol.fingerprint,virtual.symbolOffset,virtual.offset+ (cpuBits DIV 8) *part);
 			END;
@@ -1026,7 +1026,7 @@ TYPE
 					ticket := NIL;
 				END;
 				IF Assembler.IsRegisterOperand(physical) & (type.sizeInBits > 8) THEN
-					Assembler.InitMem(physical,SHORTINT(type.length * type.sizeInBits DIV 8) , physical.register, virtual.offset);
+					Assembler.InitMem(physical,SHORTINT(type.length * type.sizeInBits DIV 8) , physical.register, TODO(virtual.offset));
 					emitter.Emit2(InstructionSet.opLEA, tmp,physical);
 				ELSE
 					emitter.Emit2(InstructionSet.opMOV,tmp,physical);
@@ -1429,7 +1429,7 @@ TYPE
 		END EmitReturn;
 
 		PROCEDURE EmitMovFloat(CONST vdest,vsrc:IntermediateCode.Operand);
-		VAR dest,src, espm: Assembler.Operand; sizeInBytes: SHORTINT; stackSize: LONGINT; vcopy: IntermediateCode.Operand;
+		VAR dest,src, espm: Assembler.Operand; sizeInBytes: SHORTINT; stackSize: SIZE; vcopy: IntermediateCode.Operand;
 		BEGIN
 			sizeInBytes := SHORTINT(vdest.type.sizeInBits DIV 8);
 			stackSize := sizeInBytes;
@@ -1573,7 +1573,7 @@ TYPE
 		END EmitMov;
 
 		PROCEDURE EmitConvertFloat(CONST instruction: IntermediateCode.Instruction);
-		VAR destType, srcType, dtype: IntermediateCode.Type; dest,src,espm,imm: Assembler.Operand; sizeInBytes, index: LONGINT;
+		VAR destType, srcType, dtype: IntermediateCode.Type; dest,src,espm,imm: Assembler.Operand; sizeInBytes, index: SIZE;
 		temp, temp2, temp3, temp4, zero: Assembler.Operand; ticket: Ticket; vdest, vsrc: IntermediateCode.Operand;
 			unsigned: BOOLEAN;
 		BEGIN
@@ -2283,7 +2283,7 @@ TYPE
 		VAR
 			dividend,quotient,remainder,imm,target,memop: Assembler.Operand;
 			op1,op2,op3: Assembler.Operand; ra,rd: Ticket;
-			size: LONGINT;
+			size: SIZE;
 			value: HUGEINT; exp: LONGINT; iop3: IntermediateCode.Operand;
 			inst: IntermediateCode.Instruction;
 

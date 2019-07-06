@@ -207,7 +207,7 @@ TYPE
 						INC(codeSize,TODO((-codeSize) MOD binarySection.os.alignment));
 					END;
 					section.SetOffset(codeSize); INC(codeSize,TODO(binarySection.pc)); (* global constants: in code *)
-					Basic.Align(codeSize, 4); (* word alignment *)
+					(*TODO(Basic.Align(codeSize, 4);*) (* word alignment *)
 					(*ReportSection(section)*)
 				ELSIF (section.type = Sections.CodeSection) OR (section.type = Sections.BodyCodeSection) THEN
 					(*IF section.symbol = module.module.moduleScope.bodyProcedure THEN
@@ -215,7 +215,7 @@ TYPE
 					END;
 					*)
 					section.SetOffset(codeSize); INC(codeSize, TODO(binarySection.pc));
-					Basic.Align(codeSize, 4); (* word alignment *)
+					(*TODO(Basic.Align(codeSize, 4);*) (* word alignment *)
 					(*ReportSection(section)*)
 				ELSIF section.type = Sections.VarSection THEN
 					INC(varSize, TODO(binarySection.pc));

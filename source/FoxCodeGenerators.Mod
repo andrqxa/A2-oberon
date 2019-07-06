@@ -301,7 +301,7 @@ TYPE
 
 			PROCEDURE Emulate(VAR x: IntermediateCode.Instruction; CONST moduleName,procedureName: SyntaxTree.IdentifierString);
 			VAR
-				parSize: LONGINT; sectionName: Basic.SegmentedName; op: IntermediateCode.Operand;
+				parSize: SIZE; sectionName: Basic.SegmentedName; op: IntermediateCode.Operand;
 				symbol: SyntaxTree.Symbol; fp: Basic.Fingerprint;
 				hasDestination: BOOLEAN;
 
@@ -510,7 +510,7 @@ TYPE
 		VAR sizeInUnits,i: LONGINT;
 		BEGIN
 			sizeInUnits := SHORT(instruction.op1.intValue);
-			ASSERT(sizeInUnits >= 0); (* size is initialized to MIN(LONGINT), this checks if size field has been visited *)
+			ASSERT(sizeInUnits >= 0); (* size is initialized to MIN(SIZE), this checks if size field has been visited *)
 			FOR i := 0 TO sizeInUnits-1 DO
 				out.PutBits(0,out.os.unit);
 			END;
