@@ -20,7 +20,7 @@ TYPE
 		findSectionOffset-: LONGINT;
 		capabilities-: SET;
 		oberon07-: BOOLEAN;
-		instructionWidth -: LONGINT;
+		instructionWidth -: SIZE;
 		hasLinkRegister-: BOOLEAN;
 		name-: ARRAY 32 OF CHAR;
 
@@ -57,7 +57,7 @@ TYPE
 			hasLinkRegister := TRUE;
 		END SetHasLinkRegister;
 
-		PROCEDURE SetInstructionWidth* (instructionWidth: LONGINT);
+		PROCEDURE SetInstructionWidth* (instructionWidth: SIZE);
 		BEGIN
 			SELF.instructionWidth := instructionWidth;
 			(*TRACE(instructionWidth);*)

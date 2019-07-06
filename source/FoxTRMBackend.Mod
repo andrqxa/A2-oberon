@@ -911,7 +911,7 @@ TYPE
 					fixup := code.fixupList.firstFixup;
 					pc := code.pc;
 					WHILE (fixup # NIL) DO
-						newFixup := BinaryCode.NewFixup(fixup.mode, fixup.offset+pc, fixup.symbol, fixup.symbolOffset, TODO(fixup.displacement), fixup.scale, fixup.pattern);
+						newFixup := BinaryCode.NewFixup(fixup.mode, fixup.offset+pc, fixup.symbol, fixup.symbolOffset, fixup.displacement, fixup.scale, fixup.pattern);
 						out.fixupList.AddFixup(newFixup);
 						fixup := fixup.nextFixup;
 					END;
@@ -923,7 +923,7 @@ TYPE
 						Resolve(instruction.op1);
 						symbol := instruction.op1.symbol;
 					END;
-					reloffset := TODO(offset - out.pc-out.os.alignment-1);
+					reloffset := offset - out.pc-out.os.alignment-1;
 					IF symbol.name # "" THEN
 						fixup := BinaryCode.NewFixup(BinaryCode.Relative,out.pc,symbol, offset, 0, 0, NIL);
 						instructionSet.InitFixup(op, 32, fixup);
@@ -1092,13 +1092,13 @@ TYPE
 			Resolve(vop);
 			section := vop.resolved; offset := vop.offset;
 			IF (section # NIL) & (section(IntermediateCode.Section).resolved # NIL) & (section(IntermediateCode.Section).resolved.os.fixed) THEN
-				INC(offset, TODO(section(IntermediateCode.Section).resolved.os.alignment));
+				INC(offset, section(IntermediateCode.Section).resolved.os.alignment);
 				IF vop.symbolOffset > 0 THEN
 					INC(offset, section(IntermediateCode.Section).instructions[vop.symbolOffset].pc);
 				END;
 				sectionName.name := "";
 			END;
-			RETURN TODO(offset)
+			RETURN offset(LONGINT);
 		END GetSymbolOffset;
 
 		PROCEDURE GetMemory(VAR vop: IntermediateCode.Operand; part: LONGINT; VAR memoryOperand: InstructionSet.Operand; ticket: Ticket);
@@ -1236,7 +1236,7 @@ TYPE
 
 			virtualRegister := virtual.register;
 
-			offset := TODO(virtual.offset);
+			offset := virtual.offset(LONGINT);
 			physicalRegister := PhysicalRegister(virtual.register,part,offset);
 			instructionSet.InitRegister(physical, physicalRegister);
 
@@ -1719,7 +1719,7 @@ TYPE
 
 		PROCEDURE EmitCopy(VAR instr: IntermediateCode.Instruction);
 		VAR op1, op2, op3: Operand; mem1, mem2: InstructionSet.Operand; reg: Operand;
-			prevSize, i: LONGINT; ticket: Ticket;
+			prevSize: SIZE; i: LONGINT; ticket: Ticket;
 		BEGIN
 			MakeRegister(instr.op1, Low, op1);
 			MakeRegister(instr.op2, Low, op2);
@@ -1739,21 +1739,21 @@ TYPE
 				instructionSet.InitMemory(mem1, op1.register, 0);
 				instructionSet.InitMemory(mem2, op2.register, 0);
 
-				prevSize := TODO(out.pc);
+				prevSize := out.pc;
 				Emit2(opLD, reg, mem2);
 				Emit2(opST, reg, mem1);
 				Emit2N(opADD, op1, 1);
 				Emit2N(opADD, op2, 1);
 				Emit2N(opSUB, op3, 1);
 
-				Emit1N(opBGT, -TODO(out.pc-prevSize+1));
+				Emit1N(opBGT, -(out.pc-prevSize+1)(LONGINT));
 				UnmapTicket(ticket);
 			END;
 		END EmitCopy;
 
 		PROCEDURE EmitFill(VAR instr: IntermediateCode.Instruction; down: BOOLEAN);
 		VAR op1, op2, op3: Operand; mem1: InstructionSet.Operand;
-			prevSize: LONGINT; i: LONGINT; ticket: Ticket;
+			prevSize: SIZE; i: LONGINT; ticket: Ticket;
 		BEGIN
 			MakeRegister(instr.op1, Low, op1);
 			MakeRegister(instr.op2, Low, op2);
@@ -1766,7 +1766,7 @@ TYPE
 				MakeRegister(instr.op3, Low, op3);
 				instructionSet.InitMemory(mem1, op1.register, 0);
 
-				prevSize := TODO(out.pc);
+				prevSize := out.pc;
 				Emit2(opST, op2, mem1);
 				IF down THEN
 					Emit2N(opSUB, op1, 1);
@@ -1775,7 +1775,7 @@ TYPE
 				END;
 				Emit2N(opSUB, op3, 1);
 
-				Emit1N(opBGT, -TODO(out.pc-prevSize+1));
+				Emit1N(opBGT, -(out.pc-prevSize+1)(LONGINT));
 				UnmapTicket(ticket);
 			END;
 		END EmitFill;
@@ -1812,7 +1812,7 @@ TYPE
 					Assert(instr.op1.symbol.name # "", "branch without symbol destination");
 					dest := (instr.op1.symbolOffset); (* this is the offset in the in-data section (intermediate code), it is not byte-relative *)
 					destPC := in.instructions[dest].pc + instr.op1.offset;
-					offset := TODO(destPC - out.pc);
+					offset := (destPC - out.pc)(LONGINT);
 					fixup := BinaryCode.NewFixup(BinaryCode.Relative, out.pc, instr.op1.symbol, instr.op1.symbolOffset, instr.op1.offset,0,NIL);
 					IF (fixup.symbol.name = in.name) & (fixup.symbolOffset > inPC) THEN (* forward jump *)
 						forwardFixups.Enter(fixup, out.pc, instructionSet.RelativeBranchFixupBits);
@@ -1844,7 +1844,7 @@ TYPE
 							Emit2(opMOV,oldLR, opLR);
 							Emit1N(opBL,0);
 							(* exactly here we have the current PC in LR, so we compute the offset here *)
-							offset := TODO(out.pc-destPC);
+							offset := (out.pc-destPC)(LONGINT);
 							Emit2(opMOV, thisPC, opLR);
 							Emit2(opMOV, opLR, oldLR);
 							UnmapTicket(ticket1);
@@ -2221,11 +2221,11 @@ TYPE
 			recentInstructionWidth := Sections.UnknownSize;
 		END Initialize;
 
-		PROCEDURE SetInstructionWidth* (instructionWidth: LONGINT);  (*override*)
+		PROCEDURE SetInstructionWidth* (instructionWidth: SIZE);  (*override*)
 		BEGIN
 			IF SELF.instructionWidth # instructionWidth THEN
 				SetInstructionWidth^(instructionWidth);
-				NEW(myInstructionSet,instructionWidth);
+				NEW(myInstructionSet,instructionWidth(LONGINT));
 				cg.SetInstructionSet(myInstructionSet);
 			END;
 		END SetInstructionWidth;
@@ -2306,7 +2306,7 @@ TYPE
 					Basic.SegmentedNameToString(in.name, name);
 					out := ResolvedSection(in(IntermediateCode.Section));
 					cg.dump := out.comments;
-					SetInstructionWidth(TODO(out.os.unit));
+					SetInstructionWidth(out.os.unit);
 					cg.Section(in(IntermediateCode.Section), out);  (*compilation*)
 					IF in.symbol # NIL THEN
 						procedure := in.symbol(SyntaxTree.Procedure);
@@ -2324,7 +2324,7 @@ TYPE
 					in := module.allSections.GetSection(i);
 					IF (in.type # Sections.InlineCodeSection) (*& (in(IntermediateCode.Section).resolved = NIL) *) THEN
 						out := ResolvedSection(in(IntermediateCode.Section));
-						SetInstructionWidth(TODO(out.os.unit));
+						SetInstructionWidth(out.os.unit);
 						cg.Section(in(IntermediateCode.Section),out);
 					END
 				END
