@@ -826,7 +826,7 @@ TYPE
 						FOR i := 0 TO maxNumberOperands - 1 DO
 							IF (free[i]) & (operands[i].type = ioffset) THEN
 								IF Trace THEN KernelLog.String(" ioffset "); END;
-								offset := (operands[i].val - code.pc  - 1)(LONGINT);
+								offset := LONGINT(operands[i].val - code.pc  - 1);
 								IF lastPass & ~ValueInByteRange (offset) THEN
 									Error( "value exceeds bounds");
 									RETURN FALSE;
@@ -851,7 +851,7 @@ TYPE
 						IF val # -1 THEN code.PutByte (val); val := -1 END;
 						FOR i := 0 TO maxNumberOperands - 1 DO
 							IF (free[i]) & (InstructionSet.instructions[instr].operands[i] = InstructionSet.rel16off) THEN
-								offset := (operands[i].val - code.pc - 2)(LONGINT);
+								offset := LONGINT(operands[i].val - code.pc - 2);
 								IF lastPass & ~ValueInWordRange (offset) THEN
 									Error( "value exceeds bounds");
 								END;
@@ -880,7 +880,7 @@ TYPE
 									AddFixup(BinaryCode.Relative,4,code.pc,operands[i].symbol,operands[i].symbolOffset,operands[i].displacement-4);
 									code.PutDWord(SHORT(operands[i].val));
 								ELSE
-									code.PutDWord ((operands[i].val - code.pc - 4)(LONGINT));
+									code.PutDWord (LONGINT(operands[i].val - code.pc - 4));
 								END;
 
 								free[i] := FALSE; i:= maxNumberOperands;
@@ -935,7 +935,7 @@ TYPE
 
 								IF lastPass & (operands[i].symbol.name # "") THEN AddFixup(BinaryCode.Relative,4,code.pc,operands[i].symbol,operands[i].symbolOffset,operands[i].displacement-4)  END;
 
-								code.PutDWord ((operands[i].val - code.pc - 4)(LONGINT));
+								code.PutDWord (LONGINT(operands[i].val - code.pc - 4));
 								free[i] := FALSE; i:= maxNumberOperands;
 							ELSIF (free[i]) & InstructionSet.IsImmediate32(InstructionSet.instructions[instr].operands[i])  THEN
 								operands[i].pc := code.pc;
