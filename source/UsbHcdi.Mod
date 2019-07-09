@@ -1175,7 +1175,7 @@ TYPE
 		END ShowMessage;
 
 		PROCEDURE ShowData(CONST buffer : Usbdi.Buffer);
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			IF Debug.Trace THEN
 			KernelLog.String("[DATA: ");
@@ -1273,7 +1273,7 @@ END RegisterHostController;
 
 (** Remove all controllers with the specified description from the controllers registry *)
 PROCEDURE UnRegisterHostControllers*(CONST description : Plugins.Description);
-VAR table : Plugins.Table; hcd : Hcd; i : LONGINT;
+VAR table : Plugins.Table; hcd : Hcd; i : SIZE;
 BEGIN {EXCLUSIVE}
 	controllers.GetAll(table);
 	IF table # NIL THEN

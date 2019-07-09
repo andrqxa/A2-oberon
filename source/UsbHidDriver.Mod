@@ -113,7 +113,7 @@ TYPE
 		 * Sets the maximum possible amount of keys, the device is sending at one time
 		 * @param nofkeys: the number of keys maximumely sent by the device
 		 *)
-		PROCEDURE SetMaxKeycodes(nofKeys: LONGINT);
+		PROCEDURE SetMaxKeycodes(nofKeys: SIZE);
 		BEGIN
 			ASSERT(pressed=NIL);
 			ASSERT(tempPressed=NIL);

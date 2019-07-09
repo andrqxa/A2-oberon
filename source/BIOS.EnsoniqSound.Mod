@@ -83,7 +83,7 @@ TYPE
 		drv : Driver;
 
 		PROCEDURE &Constr*(drv: Driver; name, desc : ARRAY OF CHAR; reg : LONGINT);
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			SELF.drv := drv;
 			NEW(SELF.name, LEN(name));

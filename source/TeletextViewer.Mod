@@ -181,7 +181,7 @@ TYPE
 			IF ButtonsPerRow < 3 THEN
 				panel.bounds.SetWidth (Width)
 			ELSE
-				panel.bounds.SetWidth (LEN(panels) * ButtonWidth)
+				panel.bounds.SetWidth (LEN(panels)(LONGINT) * ButtonWidth)
 			END;
 
 			(* Create buttons for channel selection *)

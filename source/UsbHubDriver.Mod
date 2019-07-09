@@ -147,7 +147,7 @@ TYPE
 		 * @param buffer: Buffer where to put the descriptor in (at offset 0)
 		 * @return TRUE, if request succeeded, FALSE otherwise
 		 *)
-		PROCEDURE GetHubDescriptor(type, index, length : LONGINT; VAR buffer : Usbdi.Buffer) : BOOLEAN;
+		PROCEDURE GetHubDescriptor(type, index : LONGINT; length : SIZE; VAR buffer : Usbdi.Buffer) : BOOLEAN;
 		BEGIN HALT(301); RETURN FALSE; END GetHubDescriptor; (* abstract *)
 
 		(*
@@ -389,7 +389,7 @@ TYPE
 
 		(* Are there any device drivers associated to the specified device? *)
 		PROCEDURE DriversInstalled(dev : Usb.UsbDevice) : BOOLEAN;
-		VAR intf : Usb.InterfaceDescriptor; i : LONGINT;
+		VAR intf : Usb.InterfaceDescriptor; i : SIZE;
 		BEGIN (* locking? *)
 			FOR i := 0 TO LEN(dev.actConfiguration.interfaces)-1 DO
 				intf := dev.actConfiguration.interfaces[i] (Usb.InterfaceDescriptor);
@@ -1053,7 +1053,7 @@ TYPE
 		statusPipeRetries : LONGINT;
 
 		(* This hub class specific request returns the hub descriptor. *)
-		PROCEDURE GetHubDescriptor(type, index, length : LONGINT; VAR buffer : Usbdi.Buffer) : BOOLEAN;
+		PROCEDURE GetHubDescriptor(type , index : LONGINT; length : SIZE; VAR buffer : Usbdi.Buffer) : BOOLEAN;
 		BEGIN
 			ASSERT(length >= 2);
 			RETURN (hub.defaultpipe.Request(ToHost + Class + Device, GetDescriptor, index + type*100H, 0, length, buffer) = Usbdi.Ok) &
@@ -1263,7 +1263,7 @@ TYPE
 		 * it has been left in a busy state due to high-speed errors. This request is only defined for non-periodic endpoints.
 		 *)
 		PROCEDURE ClearTTBuffer(dev : Usb.UsbDevice; endpoint, port : LONGINT) : BOOLEAN;
-		VAR intf : Usb.InterfaceDescriptor; endp : Usb.EndpointDescriptor; wValue : SET; i, e : LONGINT;
+		VAR intf : Usb.InterfaceDescriptor; endp : Usb.EndpointDescriptor; wValue : SET; i, e : SIZE;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT((dev.speed # Usb.HighSpeed) & (dev.parent.speed = Usb.HighSpeed)); END;
 			(* Get the endpoint *)
@@ -1335,8 +1335,8 @@ TYPE
 		initialized : BOOLEAN;
 
 		(* Get the emulated hub descriptor. Ignore type and index parameters. *)
-		PROCEDURE GetHubDescriptor(type, index, length : LONGINT;  VAR buffer : Usbdi.Buffer) : BOOLEAN;
-		VAR i : LONGINT; hd : UsbHcdi.HubDescriptor;
+		PROCEDURE GetHubDescriptor(type , index : LONGINT; length : SIZE;  VAR buffer : Usbdi.Buffer) : BOOLEAN;
+		VAR i : SIZE; hd : UsbHcdi.HubDescriptor;
 		BEGIN
 			IF Debug.StrongChecks THEN ASSERT(LEN(buffer) <= length); END;
 			hd := device(Usb.UsbDevice).controller.GetHubDescriptor();
@@ -1348,7 +1348,7 @@ TYPE
 
 		(* Overwrites the emulated hub descriptor. Ignore type and index paramters. *)
 		 PROCEDURE SetHubDescriptor(type, index : LONGINT; buffer : Usbdi.Buffer) : BOOLEAN;
-		 VAR i : LONGINT; hd : UsbHcdi.HubDescriptor;
+		 VAR i : SIZE; hd : UsbHcdi.HubDescriptor;
 		 BEGIN
 		 	IF Debug.StrongChecks THEN ASSERT((LEN(buffer)>=8) & (ORD(buffer[0])=LEN(buffer)) & (ORD(buffer[1])=type)); END;
 		 	NEW(hd, LEN(buffer));

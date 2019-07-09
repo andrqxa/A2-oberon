@@ -911,7 +911,7 @@ TYPE
 
 			PROCEDURE &Constr*(driver : Driver; volumeReg : LONGINT; mute : BOOLEAN; name, desc : ARRAY OF CHAR);
 			VAR
-				i : LONGINT;
+				i : SIZE;
 			BEGIN
 				SELF.driver := driver;
 				SELF.volumeReg := volumeReg;

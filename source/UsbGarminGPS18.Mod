@@ -345,7 +345,7 @@ TYPE
 		END GetPvtData;
 
 		PROCEDURE HandlePacket(type, id : LONGINT; data : ARRAY OF CHAR);
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			IF Trace * TracePackets # {} THEN KernelLog.String("GPS18: packet received: "); ShowPacket(type, id); KernelLog.Ln; END;
 			IF  type = PacketTransport THEN
@@ -488,7 +488,7 @@ TYPE
 		END SendPacket;
 
 		PROCEDURE BuildPacket(type, id : LONGINT; data : Usbdi.BufferPtr) : Usbdi.BufferPtr;
-		VAR packet : Usbdi.BufferPtr; i : LONGINT;
+		VAR packet : Usbdi.BufferPtr; i : SIZE;
 		BEGIN
 			IF data=NIL THEN
 				NEW(packet, 12);
@@ -497,7 +497,7 @@ TYPE
 				FOR i := 0 TO LEN(data)-1 DO packet[i + 12] := data[i]; END;
 			END;
 			FOR i := 0 TO 11 DO packet[i] := CHR(0); END;
-			IF data # NIL THEN Put4(packet, 8, LEN(data)); END;
+			IF data # NIL THEN Put4(packet, 8, LEN(data)(LONGINT)); END;
 			packet[0] := CHR(type);
 			packet[4] := CHR(id);
 			RETURN packet;

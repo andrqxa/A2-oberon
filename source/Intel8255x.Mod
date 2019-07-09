@@ -803,7 +803,7 @@ BEGIN {EXCLUSIVE}
 END Install;
 
 PROCEDURE Remove*;
-VAR table: Plugins.Table; i: LONGINT;
+VAR table: Plugins.Table; i: SIZE;
 BEGIN {EXCLUSIVE}
 	Network.registry.GetAll(table);
 	IF table # NIL THEN

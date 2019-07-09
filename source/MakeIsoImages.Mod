@@ -1241,7 +1241,7 @@ TYPE
 
 			PROCEDURE CalcChecksum16(CONST buf: ARRAY OF CHAR): INTEGER;
 			VAR
-				checksum, i, numWords: LONGINT;
+				checksum: LONGINT; i, numWords: SIZE;
 			BEGIN
 				checksum := 0;
 				numWords := LEN(buf) DIV 2;
@@ -1535,7 +1535,7 @@ END SetTime;
 
 PROCEDURE SetStringWithPadding(CONST id: ARRAY OF CHAR; VAR dst : ARRAY OF CHAR; chr : CHAR; ucs2: BOOLEAN);
 VAR
-	i, len: LONGINT;
+	i, len: SIZE;
 BEGIN
 	i := 0;	len := LEN(dst);
 	WHILE (id[i] # 0X) & (i < len) DO

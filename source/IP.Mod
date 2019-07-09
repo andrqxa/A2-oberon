@@ -1668,8 +1668,8 @@ END RemoveInterface;
 (* Prints out a packet *)
 PROCEDURE PacketOut*(CONST title, buffer: ARRAY OF CHAR; all: BOOLEAN);
 VAR
-	i: LONGINT;
-	length: LONGINT;
+	i: SIZE;
+	length: SIZE;
 
 BEGIN
 	KernelLog.Ln;KernelLog.String("********************");KernelLog.Ln;

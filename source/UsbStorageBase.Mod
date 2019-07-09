@@ -1162,7 +1162,7 @@ END ShowRes;
 
 (** Shows all devices which are registered at the UsbStorage Disk Manager and the Disks.registry *)
 PROCEDURE Show*(context : Commands.Context);
-VAR table : Plugins.Table; i : LONGINT;
+VAR table : Plugins.Table; i : SIZE;
 BEGIN
 	(* show all devices which are registered at the UsbStorage disk manager *)
 	diskManager.Show;

@@ -793,7 +793,7 @@ TYPE
 			NEW(buf, SIZEOF(Lib.ATIPHeader) + SIZEOF(Lib.ATIPDescriptor));
 
 			adr := ADDRESSOF(buf[0]);
-			IF Lib.ReadToc(dev, FALSE, Lib.TCFormatATIP, 0, adr, LEN(buf^)) # ResOk THEN RETURN ResErr END;
+			IF Lib.ReadToc(dev, FALSE, Lib.TCFormatATIP, 0, adr, LEN(buf^)(LONGINT)) # ResOk THEN RETURN ResErr END;
 
 			descr := SYSTEM.VAL(Lib.ATIPDescriptorPtr, adr + SIZEOF(Lib.ATIPHeader));
 			ASSERT(ADDRESSOF(descr^) = SYSTEM.VAL(ADDRESS, descr));
@@ -1170,7 +1170,7 @@ PROCEDURE IdentifyRecorders*(VAR recorders: ARRAY OF CDRecorder): WORD;
 VAR
 	devTable: Plugins.Table;
 	device : ATADisks.DeviceATAPI;
-	i, cur: LONGINT;
+	i, cur: SIZE;
 	cap: Capabilities;
 	res : WORD;
 BEGIN
@@ -1301,9 +1301,9 @@ BEGIN
 	RETURN ResOk;
 END GetCapabilities;
 
-PROCEDURE InsertionSort(VAR arr: ARRAY OF LONGINT; size: LONGINT);
+PROCEDURE InsertionSort(VAR arr: ARRAY OF LONGINT; size: SIZE);
 VAR
-	i, j, index: LONGINT;
+	i, j: SIZE; index: LONGINT;
 BEGIN
 	FOR i := 1 TO size - 1 DO
 		index := arr[i]; j := i;

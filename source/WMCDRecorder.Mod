@@ -1959,7 +1959,7 @@ TYPE
 
 		PROCEDURE ListSpeeds(sender, data: ANY);
 		VAR
-			i: LONGINT;
+			i: SIZE;
 			recorder: CDRecord.CDRecorder;
 			tmp, entry: ARRAY MaxLen OF CHAR;
 			speed, max : LONGINT;
@@ -3211,7 +3211,7 @@ END GetFileSize;
 
 PROCEDURE RemoveSpecialChars(VAR str: ARRAY OF CHAR);
 VAR
-	i, j: LONGINT;
+	i, j: SIZE;
 BEGIN
 	j := 0;
 	FOR i := 0 TO LEN(str) - 1 DO

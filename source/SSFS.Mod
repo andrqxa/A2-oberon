@@ -255,7 +255,7 @@ TYPE
 		END Show;
 
 		PROCEDURE &Init*(fileSystem : FileSystem);
-		VAR bitmapSize : LONGINT; i : LONGINT;
+		VAR bitmapSize : LONGINT; i : SIZE;
 		BEGIN
 			ASSERT((fileSystem # NIL) & (fileSystem.volume # NIL));
 			ASSERT(BlockSize MOD BitsPerSET = 0); (* entries of bitmap must not cross block boundaries *)

@@ -718,7 +718,7 @@ END Install;
 (** Remove all device driver objects. *)
 
 PROCEDURE Remove*;
-VAR table: Plugins.Table; i: LONGINT;
+VAR table: Plugins.Table; i: SIZE;
 BEGIN {EXCLUSIVE}
 	Network.registry.GetAll(table);
 	IF table # NIL THEN
@@ -732,7 +732,7 @@ END Remove;
 (* Request an interrupt from every controller. *)
 
 PROCEDURE Kick*;
-VAR i, base: LONGINT; table: Plugins.Table;
+VAR i: SIZE; base: LONGINT; table: Plugins.Table;
 BEGIN
 	Network.registry.GetAll(table);
 	IF table # NIL THEN
@@ -749,7 +749,7 @@ END Kick;
 (* Dump all registers - may have side effects that influence the device's normal operation *)
 
 PROCEDURE Dump*;
-VAR i, base, win: LONGINT; int: INTEGER; table: Plugins.Table;
+VAR i: SIZE; base, win: LONGINT; int: INTEGER; table: Plugins.Table;
 
 	PROCEDURE Byte(reg: ARRAY OF CHAR; ofs: LONGINT);
 	VAR x: CHAR;

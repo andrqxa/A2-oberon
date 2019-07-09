@@ -1037,7 +1037,7 @@ TYPE
 
 (* Converts a string formatted as AA:BB:CC:DD:EE:FF:GG into a Network link address *)
 PROCEDURE StringToLinkAdr(CONST string : ARRAY OF CHAR; VAR linkAdr : Network.LinkAdr) : BOOLEAN;
-VAR stringArray : Strings.StringArray; value, i : LONGINT; res : WORD;
+VAR stringArray : Strings.StringArray; value : LONGINT; i : SIZE; res : WORD;
 BEGIN
 	stringArray := Strings.Split(string, ":");
 	IF LEN(stringArray) = 6 THEN

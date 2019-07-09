@@ -142,7 +142,7 @@ TYPE
 		END InitLinkDevice;
 
 		PROCEDURE GetPipes(VAR bulkInPipe, bulkOutPipe, interruptInPipe : Usbdi.Pipe);
-		VAR i : LONGINT; bulkInEndpoint, bulkOutEndpoint, interruptInEndpoint : LONGINT;
+		VAR i : SIZE; bulkInEndpoint, bulkOutEndpoint, interruptInEndpoint : LONGINT;
 		BEGIN
 			FOR i := 0 TO LEN(interface.endpoints)-1 DO
 				IF interface.endpoints[i].type = Usbdi.BulkIn THEN

@@ -1467,7 +1467,7 @@ TYPE
 			ASSERT(LEN(packet) <= LEN(command.packet));
 			ASSERT(size <= LEN(data)-ofs);	(* range check *)
 			command := cmdPacket;
-			command.packetLen := LEN(packet);
+			command.packetLen := LEN(packet)(LONGINT);
 			command.dev := dev; command.cmd := 0A0H;
 
 			IF dma THEN
@@ -1479,7 +1479,7 @@ TYPE
 			command.bufAdr := ADDRESSOF(data[ofs]);
 			command.size := size;
 
-			FOR i:= 0 TO LEN(command.packet)-1 DO
+			FOR i:= 0 TO command.packetLen-1 DO
 				command.packet[i] := packet[i];
 			END;
 			res := controller.ExecuteCommand(command, ATAPITimeout, status);
@@ -2349,7 +2349,7 @@ PROCEDURE GetOptions;
 VAR str : ARRAY 32 OF CHAR;
 
 	PROCEDURE CharacterInString(ch : CHAR; CONST string : ARRAY OF CHAR) : BOOLEAN;
-	VAR i : LONGINT;
+	VAR i : SIZE;
 	BEGIN
 		FOR i := 0 TO LEN(string)-1 DO
 			IF string[i] = ch THEN RETURN TRUE; END;

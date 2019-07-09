@@ -106,7 +106,7 @@ BEGIN
 END ParseOptions;
 
 PROCEDURE CreateDHCPDiscoverMsg(hwAdr: Network.LinkAdr; xid,secondsElapsed:LONGINT; VAR buf:ARRAY OF CHAR): LONGINT;
-VAR i:LONGINT;
+VAR i:SIZE;
 BEGIN
 	FOR i := 0 TO LEN(buf)-1 DO buf[i] := 0X END; (* Clear buffer contents *)
 
@@ -131,7 +131,7 @@ BEGIN
 END CreateDHCPDiscoverMsg;
 
 PROCEDURE CreateDHCPRequestMsg(hwAdr: Network.LinkAdr; xid, secondsElapsed:LONGINT; VAR buf:ARRAY OF CHAR; serverIP:IP.Adr; myNewIP :IP.Adr): LONGINT;
-VAR i:LONGINT;
+VAR i:SIZE;
 BEGIN
 	FOR i := 0 TO LEN(buf)-1 DO buf[i] := 0X END; (* Clear buffer contents *)
 
@@ -171,8 +171,8 @@ PROCEDURE InitDHCP(int: IP.Interface; VAR localAdr, maskAdr, gatewayAdr: IP.Adr;
 		VAR dns: ARRAY OF IP.Adr; VAR domain: ARRAY OF CHAR; VAR res: WORD);
 VAR
 	p: UDP.Socket;
-	fport, time, start, offerDelay, requestDelay, i: LONGINT;
-	len: SIZE;
+	fport, time, start, offerDelay, requestDelay: LONGINT;
+	i, len: SIZE;
 	fip, serverIP: IP.Adr;
 	msgType: CHAR;
 	xid, rxid, offerTries, requestTries: LONGINT;

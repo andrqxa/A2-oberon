@@ -578,7 +578,7 @@ TYPE
 	(** chnl:	channel to set (see range of channel set). *)
 	PROCEDURE SetChannel*(chnl: LONGINT);
 	VAR
-		i: LONGINT;
+		i: SIZE;
 		freq: LONGINT;
 	BEGIN
 		ASSERT(chnl <= freqTable[chnlSet].maxChnl);

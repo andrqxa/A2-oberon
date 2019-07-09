@@ -1697,7 +1697,7 @@ END Install;
 (** Called when unloading module *)
 PROCEDURE Close*;
 VAR
-	i: LONGINT;
+	i: SIZE;
 BEGIN
 	IF Logging THEN
 		KernelLog.String("Unloading driver module..."); KernelLog.Ln;
