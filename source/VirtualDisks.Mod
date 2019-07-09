@@ -154,7 +154,7 @@ TYPE
 			ASSERT(LEN(memory) MOD blockSize = 0);
 			Init(name, blockSize, cyls, hds, spt);
 			SELF.memory := memory;
-			SELF.size := LEN(memory) DIV blockSize;
+			SELF.size := LEN(memory)(LONGINT) DIV blockSize;
 			desc := "Ramdisk";
 		END New;
 
@@ -325,7 +325,7 @@ PROCEDURE Uninstall*(context : Commands.Context); (** diskname ~ *)
 VAR diskname : Plugins.Name; plugin : Plugins.Plugin;
 
 	PROCEDURE IsMounted(dev: Disks.Device): BOOLEAN;
-	VAR i: LONGINT;
+	VAR i: SIZE;
 	BEGIN
 		IF dev.table # NIL THEN
 			FOR i := 0 TO LEN(dev.table)-1 DO
@@ -354,7 +354,7 @@ BEGIN
 END Uninstall;
 
 PROCEDURE Cleanup;
-VAR disks : Plugins.Table; i : LONGINT;
+VAR disks : Plugins.Table; i : SIZE;
 BEGIN
 	Disks.registry.GetAll(disks);
 	IF (disks # NIL) THEN

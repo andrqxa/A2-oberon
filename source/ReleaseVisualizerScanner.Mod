@@ -143,7 +143,7 @@ TYPE
 		END Identifier;
 
 		PROCEDURE GetNumAsString*(VAR val: ARRAY OF CHAR);
-		VAR i, l: LONGINT;
+		VAR i, l: SIZE;
 		BEGIN
 			(*Strings.Copy(buffer^, numStartPos, numEndPos-numStartPos, val);*)
 			IF isNummer THEN

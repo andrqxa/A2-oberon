@@ -471,7 +471,7 @@ IMPORT
 
 	PROCEDURE Expand(VAR oldAry: ErrorMsgs);
 	VAR
-		len, i: LONGINT;
+		len, i: SIZE;
 		newAry: ErrorMsgs;
 	BEGIN
 		IF oldAry = NIL THEN RETURN END;

@@ -191,7 +191,7 @@ TYPE
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		string: String;
-		len: LONGINT; res: WORD;
+		len: SIZE; res: WORD;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.SEND_MESSAGE, seqNum, uin, sendBuf);
 

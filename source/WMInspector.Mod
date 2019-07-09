@@ -441,7 +441,7 @@ TYPE
 			root , node: WMTrees.TreeNode;
 			array: WMComponents.SelectionArray;
 			selection: WMComponents.SelectionList;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			ASSERT(tree # NIL);
 			IF (data # NIL) & (data IS WMComponents.SelectionList) THEN

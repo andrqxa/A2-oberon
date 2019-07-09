@@ -100,7 +100,7 @@ TYPE
 		 * diskValid: disk parameter valid?
 		 *)
 		PROCEDURE Synchronize;
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN (* diskModel must be locked *)
 			diskmodel.Acquire;
 			IF (diskmodel.disks # NIL) THEN

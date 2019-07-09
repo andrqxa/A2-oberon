@@ -467,7 +467,7 @@ VAR
 	only strings matching the tone are returned. If the pattern does not contain tone
 	information, strings with or without tone information will match. Spaces are ignored*)
 PROCEDURE MatchPinyin*(pattern, string : ARRAY OF CHAR; complete : BOOLEAN) : BOOLEAN;
-VAR i, j, lp, ls : LONGINT; match : BOOLEAN;
+VAR i, j, lp, ls : SIZE; match : BOOLEAN;
 BEGIN
 	lp := LEN(pattern); ls := LEN(string);
 	Strings.Trim(pattern, " "); Strings.Trim(string, " ");
@@ -488,7 +488,7 @@ BEGIN
 END MatchPinyin;
 
 PROCEDURE MatchPinyinFirstChars*(pattern, string : ARRAY OF CHAR; complete : BOOLEAN) : BOOLEAN;
-VAR i, j, ls : LONGINT; match : BOOLEAN;
+VAR i, j, ls : SIZE; match : BOOLEAN;
 BEGIN
 	ls := LEN(string);
 	Strings.Trim(pattern, " "); Strings.Trim(string, " ");

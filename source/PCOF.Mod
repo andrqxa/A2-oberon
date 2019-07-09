@@ -588,7 +588,7 @@ VAR commands: ARRAY 128 OF PCT.Proc;
 	END PointerBlock;
 
 	PROCEDURE ImportBlock;
-	VAR  i, j, k: LONGINT;  m: PCT.Module;  str: StringBuf; adr: PCBT.Module;
+	VAR  i, j, k: SIZE; m: PCT.Module;  str: StringBuf; adr: PCBT.Module;
 	BEGIN
 		PCM.ObjW(R, 85X);
 		IF mod.imports # NIL THEN
@@ -598,7 +598,7 @@ VAR commands: ARRAY 128 OF PCT.Proc;
 				m := mod.imports[i];
 				adr := m.adr(PCBT.Module);
 				IF adr.nr = -1 THEN
-					INC(j); adr.nr := SHORT(j);
+					INC(j); adr.nr := j(INTEGER);
 					StringPool.GetString(m.name, str); PCM.ObjWName(R, str);
 				END;
 				INC(i)

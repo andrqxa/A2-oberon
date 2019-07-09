@@ -526,8 +526,9 @@ TYPE
 			command : Strings.String;
 			filename, msg : ARRAY 512 OF CHAR;
 			filenames : Strings.StringArray;
-			mode, i : LONGINT;
+			mode : LONGINT;
 			send : BOOLEAN;
+			i : SIZE;
 		BEGIN
 			IF sender IS WMStandardComponents.Button THEN
 				button := sender (WMStandardComponents.Button);

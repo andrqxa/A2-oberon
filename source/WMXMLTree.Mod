@@ -165,7 +165,7 @@ TYPE
 
 		(* Return a copy of the errorList or NIL in case of no errors *)
 		PROCEDURE GetErrorList*() : ErrorList;
-		VAR result : ErrorList; i : LONGINT;
+		VAR result : ErrorList; i : SIZE;
 		BEGIN
 			IF errorList # NIL THEN
 				NEW(result, LEN(errorList));
@@ -177,7 +177,7 @@ TYPE
 		END GetErrorList;
 
 		PROCEDURE AddErrorToList(pos, line, row : Streams.Position; CONST msg : ARRAY OF CHAR);
-		VAR temp : ErrorList; i : LONGINT;
+		VAR temp : ErrorList; i : SIZE;
 		BEGIN
 			IF errorList = NIL THEN
 				i := 0;

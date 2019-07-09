@@ -34,7 +34,7 @@ CONST
 TYPE
 
 	Entry* = RECORD
-		type- : LONGINT;
+		type- : WORD;
 		source- : Files.FileName;
 		position-: Streams.Position;
 		message- : ARRAY 256 OF CHAR;
@@ -49,9 +49,9 @@ TYPE
 		entries : EntryArray;
 		nofEntries- : LONGINT;
 
-		nofInformations: LONGINT;
-		nofWarnings : LONGINT;
-		nofErrors : LONGINT;
+		nofInformations: SIZE;
+		nofWarnings : SIZE;
+		nofErrors : SIZE;
 
 		lock : Locks.RWLock;
 
@@ -131,7 +131,7 @@ TYPE
 
 		(* Make sure that <entries> cannot hold at least one more entry *)
 		PROCEDURE CheckEntriesSize;
-		VAR newEntries : EntryArray; i : LONGINT;
+		VAR newEntries : EntryArray; i : SIZE;
 		BEGIN
 			ASSERT(lock.HasWriteLock());
 			IF (entries = NIL) THEN
@@ -161,7 +161,7 @@ TYPE
 		END Information;
 
 		PROCEDURE Exists(type: WORD; position : Streams.Position; CONST message: ARRAY OF CHAR) : BOOLEAN;
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			i := 0;
 			WHILE (i < nofEntries) & ((entries[i].type # type) OR (entries[i].position # position) OR (entries[i].message # message)) DO
@@ -170,7 +170,7 @@ TYPE
 			RETURN (nofEntries > 0) & (i < nofEntries);
 		END Exists;
 
-		PROCEDURE Add(type: WORD; CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR; VAR counter: LONGINT);
+		PROCEDURE Add(type: WORD; CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR; VAR counter: SIZE);
 		BEGIN
 			AcquireWrite;
 			IF ~Exists(type, position, message) THEN
@@ -213,10 +213,10 @@ TYPE
 		END GetSummary;
 
 		PROCEDURE Synchronize(VAR entries : ViewEntryArray; VAR nofEntries : LONGINT);
-		VAR dest : LONGINT;
+		VAR dest : SIZE;
 
-			PROCEDURE Insert(type: LONGINT);
-			VAR i: LONGINT;
+			PROCEDURE Insert(type: WORD);
+			VAR i: SIZE;
 			BEGIN
 				FOR i := 0 TO nofEntries - 1 DO
 					IF SELF.entries[i].type = type THEN
@@ -247,7 +247,7 @@ TYPE
 
 TYPE
 
-	CompareProcedure = PROCEDURE(CONST entry1, entry2 : Entry) : LONGINT;
+	CompareProcedure = PROCEDURE(CONST entry1, entry2 : Entry) : WORD;
 
 
 	ViewEntry* = RECORD (Entry)
@@ -363,7 +363,7 @@ TYPE
 		END OnClickHandler;
 
 		PROCEDURE ShowMarkers(enable : BOOLEAN);
-		VAR i, j : LONGINT;
+		VAR i, j : SIZE;
 		BEGIN
 			Acquire;
 			IF (enable # showMarkersI) THEN
@@ -382,7 +382,7 @@ TYPE
 			Release;
 		END ShowMarkers;
 
-		PROCEDURE SortBy(mode : LONGINT);
+		PROCEDURE SortBy(mode : WORD);
 		BEGIN
 			ASSERT(
 				(mode = SortByTypeAscending) OR (mode = SortByTypeDescending) OR
@@ -418,7 +418,7 @@ TYPE
 		END GetCellData;
 
 		PROCEDURE AddPositionMarkers;
-		VAR picture : Files.FileName; i, j : LONGINT;
+		VAR picture : Files.FileName; i, j : SIZE;
 		BEGIN (* caller holds lock *)
 			IF (textViews # NIL) THEN
 				FOR i := 0 TO nofEntries - 1 DO
@@ -445,7 +445,7 @@ TYPE
 		END AddPositionMarkers;
 
 		PROCEDURE RemovePositionMarkers;
-		VAR i, j : LONGINT;
+		VAR i, j : SIZE;
 		BEGIN (* caller holds lock *)
 			IF (textViews # NIL) THEN
 				FOR i := 0 TO nofEntries-1 DO
@@ -460,7 +460,7 @@ TYPE
 		END RemovePositionMarkers;
 
 		PROCEDURE GetFirstPosition*(VAR positions : ARRAY OF SIZE; VAR type: LONGINT);
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			Acquire;
 			ASSERT((textViews # NIL) & (LEN(textViews) = LEN(positions)));
@@ -536,7 +536,7 @@ TYPE
 		END SortEntries;
 
 		PROCEDURE SetTextViews*(CONST textViews : ARRAY OF WMTextView.TextView);
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			Acquire;
 			RemovePositionMarkers;
@@ -634,8 +634,8 @@ VAR
 	PrototypeShowMarkers : WMProperties.BooleanProperty;
 	PrototypeSortBy : WMProperties.Int32Property;
 
-PROCEDURE CompareByPosition(CONST e1, e2 : Entry) : LONGINT;
-VAR result : LONGINT;
+PROCEDURE CompareByPosition(CONST e1, e2 : Entry) : WORD;
+VAR result : WORD;
 BEGIN
 	IF (e1.position < e2.position) THEN result := Less;
 	ELSIF (e1.position > e2.position) THEN result := Greater;
@@ -645,8 +645,8 @@ BEGIN
 	RETURN result;
 END CompareByPosition;
 
-PROCEDURE CompareByType(CONST e1, e2 : Entry) : LONGINT;
-VAR result : LONGINT;
+PROCEDURE CompareByType(CONST e1, e2 : Entry) : WORD;
+VAR result : WORD;
 BEGIN
 	IF (e1.type < e2.type) THEN result := Less;
 	ELSIF (e1.type > e2.type) THEN result := Greater;

@@ -82,7 +82,7 @@ TYPE
 		END Init;
 
 		PROCEDURE SetName(CONST name : ARRAY OF CHAR);
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			ASSERT(LEN(name) <= NamSiz);
 			FOR i := 0 TO LEN(name)-1 DO header.name[i] := name[i] END
@@ -555,7 +555,7 @@ TYPE
 	END OctStrToInt;
 
 	PROCEDURE IntToOctStr(val: HUGEINT; VAR str: ARRAY OF CHAR);
-		VAR i: LONGINT;
+		VAR i: SIZE;
 	BEGIN
 		i := LEN(str)-1; str[i] := 0X;
 		WHILE i > 0 DO
@@ -566,7 +566,7 @@ TYPE
 	END IntToOctStr;
 
 	PROCEDURE CopyArchiveName(CONST from : ARRAY OF CHAR; VAR to : ARRAY OF CHAR);
-	VAR i : LONGINT;
+	VAR i : SIZE;
 	BEGIN
 		IF LEN(from) < NamSiz THEN i := LEN(from)-1 ELSE i := NamSiz-1 END;
 		WHILE i > -1 DO to[i] := from[i]; DEC(i) END

@@ -2062,7 +2062,7 @@ TYPE
 	ComponentElement* = OBJECT(WMComponents.VisualComponent)
 	VAR
 		component : WMComponents.Component;
-		nofElements : LONGINT;
+		nofElements : SIZE;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -2075,7 +2075,7 @@ TYPE
 		PROCEDURE CountNofElements(component : WMComponents.Component);
 		END CountNofElements;
 
-		PROCEDURE GetNofElements*() : LONGINT;
+		PROCEDURE GetNofElements*() : SIZE;
 		BEGIN
 			RETURN nofElements;
 		END GetNofElements;
@@ -2121,7 +2121,7 @@ TYPE
 		END Init;
 
 		PROCEDURE CountNofElements(component : WMComponents.Component);
-		VAR propertyArray : WMProperties.PropertyArray;  i : LONGINT;
+		VAR propertyArray : WMProperties.PropertyArray;  i : SIZE;
 		BEGIN
 			nofElements := 0;
 			IF (component # NIL) THEN
@@ -2137,7 +2137,7 @@ TYPE
 		END CountNofElements;
 
 		PROCEDURE SetProperties(component : WMComponents.Component);
-		VAR propertyArray : WMProperties.PropertyArray; res: WORD; i : LONGINT;
+		VAR propertyArray : WMProperties.PropertyArray; res: WORD; i : SIZE;
 			init:WMProperties.BooleanProperty;
 		BEGIN
 			ASSERT(component # NIL);
@@ -2487,7 +2487,7 @@ TYPE
 			stringView : StringPropertyView;
 			colorView : ColorPropertyView;
 			unknownView : UnknownPropertyView;
-			height, i : LONGINT;
+			height : LONGINT; i : SIZE;
 		BEGIN
 			ASSERT(component # NIL);
 			list.RemoveAll;
@@ -2657,7 +2657,7 @@ TYPE
 		END CountNofElements;
 
 		PROCEDURE SetComponent*(component : WMComponents.Component);
-		VAR eventsArray : WMEvents.EventSourceArray; source : EventSourceView;  height, i : LONGINT;
+		VAR eventsArray : WMEvents.EventSourceArray; source : EventSourceView;  height : LONGINT; i : SIZE;
 		BEGIN
 			IF (component # SELF.component) THEN
 				height := 0; nofElements := 0;
@@ -2721,7 +2721,7 @@ TYPE
 		END CountNofElements;
 
 		PROCEDURE SetComponent*(component : WMComponents.Component);
-		VAR eventsArray : WMEvents.EventListenerArray; listener : EventListenerView; height, i : LONGINT;
+		VAR eventsArray : WMEvents.EventListenerArray; listener : EventListenerView; height : LONGINT; i : SIZE;
 		BEGIN
 			IF (component # SELF.component) THEN
 				height := 0; nofElements := 0;
@@ -3061,7 +3061,7 @@ TYPE
 		tabs : WMTabComponents.Tabs;
 		tabList : ARRAY NofTabs OF WMTabComponents.Tab;
 		tabPanels : ARRAY NofTabs OF ComponentElement;
-		tabNofElements : ARRAY NofTabs OF LONGINT;
+		tabNofElements : ARRAY NofTabs OF SIZE;
 		tabCaptions : ARRAY NofTabs OF ARRAY 128 OF CHAR;
 
 		tabPanel : WMScrollableComponents.ScrollableContainer;
@@ -3146,7 +3146,7 @@ TYPE
 		END Init;
 
 		PROCEDURE UpdateTabCaptions;
-		VAR caption : ARRAY 128 OF CHAR; nbr : ARRAY 8 OF CHAR; nofElements, i : LONGINT;
+		VAR caption : ARRAY 128 OF CHAR; nbr : ARRAY 8 OF CHAR; nofElements, i : SIZE;
 		BEGIN
 			FOR i := 0 TO NofTabs - 1 DO
 				CASE i OF
@@ -3816,8 +3816,8 @@ BEGIN
 	);
 END IsVisualComponentProperty;
 
-PROCEDURE CountExtendedProperties(component : WMComponents.Component) : LONGINT;
-VAR propertyArray : WMProperties.PropertyArray; nofElements, i : LONGINT;
+PROCEDURE CountExtendedProperties(component : WMComponents.Component) : SIZE;
+VAR propertyArray : WMProperties.PropertyArray; nofElements, i : SIZE;
 BEGIN
 	nofElements := 0;
 	IF (component # NIL) THEN

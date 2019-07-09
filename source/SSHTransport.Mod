@@ -650,13 +650,13 @@ VAR hexd: ARRAY 17 OF CHAR;
 
 
 	PROCEDURE Int2Chars( v: LONGINT;  VAR buf: ARRAY OF CHAR );
-	VAR i: INTEGER;
+	VAR i: SIZE;
 	BEGIN
 		FOR i := 3 TO 0 BY -1 DO buf[i] := CHR( v MOD 256 );  v := v DIV 256 END;
 	END Int2Chars;
 
 	PROCEDURE Head( CONST buf, s: ARRAY OF CHAR ): BOOLEAN;
-	VAR i: LONGINT;
+	VAR i: SIZE;
 	BEGIN
 		FOR i := 0 TO LEN( s ) - 1 DO
 			IF (buf[i] # s[i]) & (s[i] # 0X) THEN  RETURN FALSE  END

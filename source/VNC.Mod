@@ -608,7 +608,7 @@ BEGIN
 		KernelLog.Enter; KernelLog.String("Raw"); KernelLog.Int(x, 5); KernelLog.Int(y, 5);
 		KernelLog.Int(w, 5); KernelLog.Int(h, 5); KernelLog.Exit
 	END;
-	bh := LEN(c.imgbuf^) DIV (w*c.bytesPerPixel);	(* number of lines that will fit in buffer *)
+	bh := (LEN(c.imgbuf^) DIV (w*c.bytesPerPixel))(LONGINT);	(* number of lines that will fit in buffer *)
 	Raster.Init(c.nb, w, bh, c.fmt, w*c.bytesPerPixel, ADDRESSOF(c.imgbuf[0]));
 	WHILE h > 0 DO
 		IF h >= bh THEN h0 := bh ELSE h0 := h END;

@@ -1209,7 +1209,7 @@ TYPE
 		BEGIN
 			IF (current # NIL) THEN
 				IF current.hasVideo THEN
-					res := (current.video.GetCurrentFrame()-current.filler.NofFullBuffers());
+					res := (current.video.GetCurrentFrame()-current.filler.NofFullBuffers()(LONGINT));
 					IF current.hasAudio THEN
 						audioPos := ENTIER(current.maxTime/10*current.posRate*(res/current.maxFrames) -
 							ENTIER(current.maxTime/10*current.posRate*(res/current.maxFrames)) MOD 12);
@@ -1221,7 +1221,7 @@ TYPE
 			END;
 			IF (next # NIL) THEN
 				IF next.hasVideo THEN
-					res := (next.video.GetCurrentFrame()-next.filler.NofFullBuffers());
+					res := (next.video.GetCurrentFrame()-next.filler.NofFullBuffers()(LONGINT));
 					IF next.hasAudio THEN
 						audioPos := ENTIER(next.maxTime/10*next.posRate*(res/next.maxFrames) -
 							ENTIER(next.maxTime/10*next.posRate*(res/next.maxFrames)) MOD 12);

@@ -14,7 +14,7 @@ CONST
 
 (* Get the suffix of str. The suffix is started by the last sepchar in str. If sepchar does not occur in str, str is returned *)
 PROCEDURE GetSuffix(CONST str : ARRAY OF CHAR; VAR suf : ARRAY OF CHAR; sepchar: CHAR);
-VAR i, j, len, sep: LONGINT;
+VAR i, j, len, sep: SIZE;
 BEGIN
 	i := 0; sep := -1;
 	WHILE str[i] # 0X DO
@@ -33,7 +33,7 @@ END GetSuffix;
 
 (* Append this to to *)
 PROCEDURE Append(VAR to: ARRAY OF CHAR; CONST this: ARRAY OF CHAR);
-VAR i, j, l: LONGINT;
+VAR i, j, l: SIZE;
 BEGIN
 	i := 0;
 	WHILE to[i] # 0X DO

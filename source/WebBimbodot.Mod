@@ -294,7 +294,7 @@ TYPE
 		(* count the number of article versions in the archive file *)
 		PROCEDURE CountVersions;
 		VAR index : Archives.Index;
-			i, count : LONGINT;
+			i: SIZE; count : LONGINT;
 			n : String;
 		BEGIN
 			archive.Acquire;

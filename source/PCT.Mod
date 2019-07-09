@@ -732,7 +732,7 @@ VAR
 	(** ExtendModArray - Double structure size, copy elements into new structure *)
 
 	PROCEDURE ExtendModArray*(VAR a: ModuleArray);
-		VAR b: ModuleArray; i: LONGINT;
+		VAR b: ModuleArray; i: SIZE;
 	BEGIN
 		IF a = NIL THEN  NEW(a, 16)
 		ELSE
@@ -1311,7 +1311,7 @@ VAR
 	END FindIndexer;
 
 
-	PROCEDURE FindOperator*(current, search: Scope; parents: BOOLEAN; name: StringIndex; CONST pars: ARRAY OF Struct; parCount (*ug*), pos: LONGINT): Proc;
+	PROCEDURE FindOperator*(current, search: Scope; parents: BOOLEAN; name: StringIndex; CONST pars: ARRAY OF Struct; parCount: SIZE; pos: LONGINT): Proc;
 	VAR
 		p: Symbol;
 		hitProc: Proc;
@@ -1409,8 +1409,8 @@ VAR
 		KernelLog.String(str);
 	END PrintString;
 
-	PROCEDURE Distance(CONST pars: ARRAY OF Struct; param: Parameter; parCount: LONGINT (* ug *)): LONGINT;
-	VAR dist, res, i: LONGINT;
+	PROCEDURE Distance(CONST pars: ARRAY OF Struct; param: Parameter; parCount: SIZE (* ug *)): LONGINT;
+	VAR dist, res: LONGINT; i: SIZE;
 		baseA, baseF: Struct;
 	BEGIN
 		dist := 0;
@@ -1534,7 +1534,7 @@ VAR
 
 
 	PROCEDURE ChangeState*(scope: Scope;  state: SHORTINT;  pos: LONGINT);
-	VAR  rec, r, int: Record; rscope: RecScope; mth: Method; i: LONGINT; res: WORD;
+	VAR  rec, r, int: Record; rscope: RecScope; mth: Method; i: SIZE; res: WORD;
 	BEGIN
 		WHILE scope.state < state DO
 			CASE scope.state+1 OF

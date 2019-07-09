@@ -40,7 +40,7 @@ TYPE
 
 		PROCEDURE Grow;
 		VAR temp : NamedObjectArray;
-			i : LONGINT;
+			i : SIZE;
 		BEGIN
 			NEW(temp, LEN(items) * 2);
 			FOR i := 0 TO LEN(items) - 1 DO
@@ -72,7 +72,7 @@ TYPE
 
 		PROCEDURE Grow;
 		VAR temp : StringList;
-			i : LONGINT;
+			i : SIZE;
 		BEGIN
 			NEW(temp, LEN(items) * 2);
 			FOR i := 0 TO LEN(items) - 1 DO
@@ -615,7 +615,7 @@ VAR ch : CHAR;
 	inRange, inComment, lastInRange : BOOLEAN;
 	token : ARRAY 1024 OF CHAR;
 	filename, scopePath, name, path : ARRAY 1024 OF CHAR;
-	i : LONGINT;
+	i : SIZE;
 	referencedModule : TS.Module;
 CONST DoXml = TRUE;
 BEGIN

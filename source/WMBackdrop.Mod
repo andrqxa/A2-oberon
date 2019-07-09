@@ -150,7 +150,7 @@ TYPE
 		END Handle;
 
 		PROCEDURE Change(sender, data: ANY);
-		VAR index: LONGINT; img : WMGraphics.Image;
+		VAR index: SIZE; img : WMGraphics.Image;
 		BEGIN
 			IF imgList # NIL THEN
 

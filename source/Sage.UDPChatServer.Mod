@@ -190,7 +190,7 @@ TYPE
 		messageType: INTEGER; message: String; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		string: String;
-		res: WORD; len: LONGINT;
+		res: WORD; len: SIZE;
 	BEGIN {EXCLUSIVE}
 		Base.ServerPacketInit (Base.RECEIVE_MESSAGE, receiver.outSeqNum, sendBuf);
 

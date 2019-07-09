@@ -185,7 +185,7 @@ TYPE
 		END Pause;
 
 		PROCEDURE Resized*;
-		VAR width, height, w, add, i : LONGINT; newColWidth : WMGrids.Spacings;
+		VAR width, height, w, add : LONGINT; i : SIZE; newColWidth : WMGrids.Spacings;
 		BEGIN
 			width := bounds.GetWidth(); height := bounds.GetHeight();
 			NEW(newColWidth, LEN(colWidth));
@@ -466,7 +466,7 @@ TYPE
 		END Decision;
 
 		PROCEDURE HaltThread(unbreakable : BOOLEAN);
-		VAR selection : Selection; i : LONGINT;
+		VAR selection : Selection; i : SIZE;
 		BEGIN
 			selection := processSelector.GetSelection();
 			IF (selection # NIL) THEN
@@ -514,7 +514,7 @@ TYPE
 		END HandleSortPopup;
 
 		PROCEDURE HandleShowStack(sender, data : ANY);
-		VAR selection : Selection; w: Streams.Writer; i : LONGINT;
+		VAR selection : Selection; w: Streams.Writer; i : SIZE;
 		BEGIN
 			selection := processSelector.GetSelection();
 			IF (selection # NIL) THEN
@@ -529,7 +529,7 @@ TYPE
 		END HandleShowStack;
 
 		PROCEDURE HandleCpuLoad(sender, data : ANY);
-		VAR selection : Selection; i : LONGINT;
+		VAR selection : Selection; i : SIZE;
 		BEGIN
 			selection := processSelector.GetSelection();
 			IF (selection # NIL) THEN

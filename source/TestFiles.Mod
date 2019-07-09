@@ -336,7 +336,7 @@ TYPE
 		VAR
 			variable, to : ARRAY 32 OF CHAR;
 			charValue : CHAR; integerValue : LONGINT;  booleanValue : BOOLEAN; stringValue : Strings.String;
-			set, i : LONGINT; index : LONGINT;
+			set, index : LONGINT; i: SIZE;
 
 		BEGIN
 			r.SkipWhitespace; r.String(variable);
@@ -487,7 +487,7 @@ TYPE
 		PROCEDURE InitBuffer(length : LONGINT);
 
 			PROCEDURE Clear;
-			VAR i : LONGINT;
+			VAR i : SIZE;
 			BEGIN
 				FOR i := 0 TO LEN(buffer)-1 DO
 					buffer[i] := 0X;

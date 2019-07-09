@@ -335,8 +335,8 @@ TYPE
 
 (* BEGIN optimized routines for native font *)
 		(* find the range where a glyph is inside *)
-		PROCEDURE FindGlyphRange(code : LONGINT; VAR glyphRangeIndex : LONGINT) : BOOLEAN;
-		VAR a, b, m : LONGINT;
+		PROCEDURE FindGlyphRange(code : LONGINT; VAR glyphRangeIndex : SIZE) : BOOLEAN;
+		VAR a, b, m : SIZE;
 		BEGIN
 			glyphRangeIndex := 0;
 			a := 0; b := LEN(glyphRanges) - 1;
@@ -435,7 +435,7 @@ TYPE
 			FOR i := 0 TO range.lastCode - range.firstCode DO WritePackedGlyph(w, range.glyphs[i]) END;
 		END StoreRange;
 
-		PROCEDURE LoadRange(f : Files.File; rangeIndex : LONGINT);
+		PROCEDURE LoadRange(f : Files.File; rangeIndex : SIZE);
 		VAR r : Files.Reader;
 			size, i : LONGINT;
 			range : GlyphRange; (* because of too complex expression otherwise ;-) *)
@@ -454,7 +454,7 @@ TYPE
 		END LoadRange;
 
 		PROCEDURE GetGlyph(ucs, variant : LONGINT) : Glyph;
-		VAR rangeIndex : LONGINT; glyph : Glyph;
+		VAR rangeIndex : SIZE; glyph : Glyph;
 		BEGIN
 			IF FindGlyphRange(ucs, rangeIndex) THEN
 				IF glyphRanges[rangeIndex].glyphs = NIL THEN LoadRange(fontFile, rangeIndex) END;
@@ -477,13 +477,13 @@ TYPE
 		PROCEDURE Save(CONST fileName : ARRAY OF CHAR);
 		VAR f : Files.File;
 			w : Files.Writer;
-			i : LONGINT;
+			i : SIZE;
 		BEGIN
 			f := Files.New(fileName);
 			Files.Register(f);
 			Files.OpenWriter(w, f, 0);
 			(* number of ranges *)
-			w.Net32(LEN(glyphRanges));
+			w.Net32(LEN(glyphRanges)(LONGINT));
 			(* reserve space for ranges *)
 			FOR i := 0 TO LEN(glyphRanges) - 1 DO
 				w.Net32(0); w.Net32(0); w.Net32(0)

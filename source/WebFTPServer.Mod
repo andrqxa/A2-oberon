@@ -128,7 +128,7 @@ TYPE
 		END PasvTimeoutHandler;
 
 		PROCEDURE ReadCommand(VAR cmd, param: ARRAY OF CHAR);
-		VAR i,l: LONGINT; c: CHAR;
+		VAR i,l: SIZE; c: CHAR;
 		BEGIN
 			Objects.SetTimeout(timeout, TimeoutHandler, Timeout);
 			in.SkipSpaces;
@@ -1177,7 +1177,7 @@ PROCEDURE W3CLog(e: LogEntry);
 VAR s: ARRAY 36 OF CHAR;
 
 	PROCEDURE ToURI(ascii: ARRAY OF CHAR; VAR uri: ARRAY OF CHAR); (* cf. RFC 1738 *)
-	VAR i,k,l: LONGINT; c: CHAR;
+	VAR i,k,l: SIZE; c: CHAR;
 	BEGIN
 		i := 0; k := 0; l := LEN(uri)-1;
 		WHILE (k < l) & (ascii[i] # 0X) DO

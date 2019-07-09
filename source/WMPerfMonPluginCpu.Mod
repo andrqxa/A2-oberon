@@ -70,7 +70,7 @@ TYPE
 TYPE
 
 	CpuParameter* = POINTER TO RECORD (WMPerfMonPlugins.Parameter);
-		processorID* : LONGINT;
+		processorID* : SIZE;
 	END;
 
 	CpuLoad* = OBJECT(WMPerfMonPlugins.Plugin)
