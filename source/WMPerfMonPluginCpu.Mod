@@ -75,7 +75,7 @@ TYPE
 
 	CpuLoad* = OBJECT(WMPerfMonPlugins.Plugin)
 	VAR
-		processorID : LONGINT;
+		processorID : SIZE;
 		h : CpuLoadHelper;
 
 		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
