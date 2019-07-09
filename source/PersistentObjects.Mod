@@ -22,7 +22,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Grow;
-		VAR i: LONGINT; new: Table;
+		VAR i: SIZE; new: Table;
 		BEGIN
 			NEW(new, 2*LEN(table));
 			FOR i := 0 TO LEN(table)-1 DO new[i] := table[i] END;

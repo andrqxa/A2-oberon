@@ -870,7 +870,7 @@ BEGIN
 END SortFileList;
 
 PROCEDURE ResizeFilelist(VAR filelist : FileList);
-VAR temp : FileList; i : LONGINT;
+VAR temp : FileList; i : SIZE;
 BEGIN
 	NEW(temp, 2 * LEN(filelist));
 	FOR i := 0 TO LEN(filelist)-1 DO
@@ -900,8 +900,8 @@ BEGIN
 END InsertFiles;
 
 (* Count the number of occurences of the character 'ch' in the string 'string'. Case-Sensitive! *)
-PROCEDURE CountCharacters(CONST string : ARRAY OF CHAR; ch : CHAR) : LONGINT;
-VAR count, i : LONGINT;
+PROCEDURE CountCharacters(CONST string : ARRAY OF CHAR; ch : CHAR) : SIZE;
+VAR count, i : SIZE;
 BEGIN
 	count := 0;
 	FOR i := 0 TO LEN(string)-1 DO
@@ -958,7 +958,7 @@ VAR
 	targetName : ARRAY 1024 OF CHAR;
 	srcPrefix, srcPath, srcFilename, srcExtension : ARRAY 512 OF CHAR;
 	isExtension : BOOLEAN;
-	i, j, index : LONGINT;
+	i, j, index : SIZE;
 BEGIN
 	SplitFullName(sourceName, srcPrefix, srcPath, srcFilename, srcExtension);
 	index := 0;

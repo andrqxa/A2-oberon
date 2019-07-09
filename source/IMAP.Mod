@@ -266,7 +266,7 @@ TYPE
 			buffer: Strings.Buffer;
 			w: Streams.Writer;
 			path, string: String;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN {EXCLUSIVE}
 			IF (state # AUTH) & (state # SELECT) THEN RETURN BAD END;
 			NEW(buffer, 16);
@@ -336,7 +336,7 @@ TYPE
 		END Status;
 
 		(* Search after criteria, see RFC 2060 *)
-		PROCEDURE Search*(VAR criteria: ARRAY OF CHAR; VAR ret: Classes.List): LONGINT;
+		PROCEDURE Search*(CONST criteria: ARRAY OF CHAR; VAR ret: Classes.List): LONGINT;
 		VAR
 			buffer: Strings.Buffer;
 			w: Streams.Writer;
@@ -1100,7 +1100,7 @@ TYPE
 
 		PROCEDURE DBGLiteral(VAR text:String);
 		VAR
-			i,j: LONGINT;
+			i,j: SIZE;
 		BEGIN
 			KernelLog.String("processing Literal:");KernelLog.Ln;
 			j := IMAPUtilities.StringLength(text^);

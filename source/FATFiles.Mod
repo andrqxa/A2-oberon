@@ -1263,8 +1263,8 @@ TYPE
 			RETURN TRUE
 		END TailGenHandler;
 
-		PROCEDURE TailFinder(p: TailGenParam; VAR tail: LONGINT): BOOLEAN;
-		VAR delta,i,l,max: LONGINT;
+		PROCEDURE TailFinder(p: TailGenParam; VAR tail: SIZE): BOOLEAN;
+		VAR delta,max: LONGINT; i, l: SIZE;
 		BEGIN
 			(* calculate size of bit-array and initialize it *)
 			max := 0; delta := 10;
@@ -1298,7 +1298,7 @@ TYPE
 		END TailFinder;
 
 		PROCEDURE TailGeneration(VAR shortname: Shortname; TailNeeded: BOOLEAN);
-		VAR tp: TailGenParam; len, max, pos, tail: LONGINT; dummy: BOOLEAN;
+		VAR tp: TailGenParam; len, max, pos: LONGINT; tail: SIZE; dummy: BOOLEAN;
 		BEGIN
 			NEW(tp);
 			tp.short := shortname;

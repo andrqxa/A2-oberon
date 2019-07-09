@@ -661,7 +661,7 @@ TYPE
 
 		(** Replace the text *)
 		PROCEDURE SetText*(t : Texts.Text);
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			ASSERT(t # NIL);
 			(* Acquire; *)
@@ -681,7 +681,7 @@ TYPE
 
 (* BEGIN highlighting *)
 		PROCEDURE AddHighlight(highlight : Highlight);
-		VAR newHighlights : HighlightArray; i : LONGINT;
+		VAR newHighlights : HighlightArray; i : SIZE;
 		BEGIN
 			INC(nofHighlights);
 			IF nofHighlights > LEN(highlights) THEN
@@ -705,7 +705,7 @@ TYPE
 		END CreateHighlight;
 
 		PROCEDURE RemoveHighlight*(x : Highlight);
-		VAR i : LONGINT;
+		VAR i : SIZE;
 		BEGIN
 			(* Acquire; *)
 			i := 0; WHILE (i < nofHighlights) & (highlights[i] # x) DO INC(i) END;
@@ -771,7 +771,7 @@ TYPE
 
 (* BEGIN PositionMarkers *)
 		PROCEDURE AddPositionMarker(pm : PositionMarker);
-		VAR newPositionMarkers : PositionMarkerArray; i : LONGINT;
+		VAR newPositionMarkers : PositionMarkerArray; i : SIZE;
 		BEGIN
 			INC(nofPositionMarkers);
 			IF nofPositionMarkers > LEN(positionMarkers) THEN

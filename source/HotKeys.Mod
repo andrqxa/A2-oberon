@@ -62,7 +62,7 @@ VAR
 	manager : WMWindowManager.WindowManager;
 
 PROCEDURE ParseKeyString(keyString : XML.String; VAR ch : CHAR; VAR flags : SET; VAR keysym : LONGINT) : BOOLEAN;
-VAR keys : Strings.StringArray; i : LONGINT;
+VAR keys : Strings.StringArray; i : SIZE;
 BEGIN
 	ASSERT(keyString # NIL);
 	ch := 0X; flags := {}; keysym := NoKeysym;

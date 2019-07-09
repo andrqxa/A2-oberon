@@ -1992,7 +1992,7 @@ TYPE
 						(* Get the index of the first code-block in the precinct, i.e. the code-block at the upper left corner of the precinct *)
 						cblkInfoUpLeftIdx := cblkInfo[curTile][comp][reslevel][subbIdx][precX][0].index;
 						(* Get the index of the last code-block in the precinct, i.e. the code-block at the lower right corner of the precinct *)
-						lastIdx := LEN(cblkInfo[curTile][comp][reslevel][subbIdx][precX]^) - 1;
+						lastIdx := LEN(cblkInfo[curTile][comp][reslevel][subbIdx][precX]^)(LONGINT) - 1;
 						cblkInfoLowRightIdx := cblkInfo[curTile][comp][reslevel][subbIdx][precX][lastIdx].index;
 
 						IF (cblkInfoUpLeftIdx MOD subbInfo.nblocksx) > cblkSubbIdxX THEN
@@ -2020,7 +2020,7 @@ TYPE
 						(* Get the index of the first code-block in the precinct, i.e. the code-block at the upper left corner of the precinct *)
 						cblkInfoUpLeftIdx := cblkInfo[curTile][comp][reslevel][subbIdx][precFirstInRowIdx][0].index;
 						(* Get the index of the last code-block in the precinct, i.e. the code-block at the lower right corner of the precinct *)
-						lastIdx := LEN(cblkInfo[curTile][comp][reslevel][subbIdx][precFirstInRowIdx]^) - 1;
+						lastIdx := LEN(cblkInfo[curTile][comp][reslevel][subbIdx][precFirstInRowIdx]^)(LONGINT) - 1;
 						cblkInfoLowRightIdx := cblkInfo[curTile][comp][reslevel][subbIdx][precFirstInRowIdx][lastIdx].index;
 
 						IF (cblkInfoUpLeftIdx DIV subbInfo.nblocksx) > cblkSubbIdxY THEN
@@ -5594,7 +5594,7 @@ TYPE
 								WHILE locCurSubbIdx <= maxSubbIdx DO
 
 									curSubbType := J2KU.SubbandIndexToSubband(locCurRes, locCurSubbIdx);
-									maxSubbCblk := LEN(bufferedBlocks[curTile][locCurComp][locCurRes][locCurSubbIdx]^) - 1;
+									maxSubbCblk := LEN(bufferedBlocks[curTile][locCurComp][locCurRes][locCurSubbIdx]^)(LONGINT) - 1;
 
 									(* Loop over blocks in subband *)
 									WHILE locCurSubbCblk <= maxSubbCblk DO

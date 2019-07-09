@@ -89,10 +89,10 @@ TYPE
 	(* buffer pool for the video frames *)
 	VideoBufferPool = OBJECT
 	VAR
-		head, num: LONGINT;
+		head, num: SIZE;
 		buffer: POINTER TO ARRAY OF VideoBuffer;
 
-		PROCEDURE &Init*(n: LONGINT);
+		PROCEDURE &Init*(n: SIZE);
 		BEGIN
 			head := 0; num := 0; NEW(buffer, n)
 		END Init;
@@ -114,7 +114,7 @@ TYPE
 			RETURN x
 		END Remove;
 
-		PROCEDURE NofBuffers(): LONGINT;
+		PROCEDURE NofBuffers(): SIZE;
 		BEGIN {EXCLUSIVE}
 			RETURN num
 		END NofBuffers;
@@ -393,7 +393,7 @@ TYPE
 		END SeekFrame;
 
 		(* Returns the number of decoded frames available *)
-		PROCEDURE NofFullBuffers() : LONGINT;
+		PROCEDURE NofFullBuffers() : SIZE;
 		BEGIN
 			RETURN readyBufferPool.NofBuffers()
 		END NofFullBuffers;

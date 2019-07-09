@@ -107,7 +107,7 @@ TYPE
 
 
 			PROCEDURE WriteFrequencies( pw: PatternWeights );
-			VAR i, n: LONGINT;
+			VAR i, n: SIZE;
 				pc: PatternCounts;
 			BEGIN
 				n := LEN( pw^ );
@@ -280,7 +280,7 @@ TYPE
 
 	PROCEDURE BuildTree( pw: PatternWeights ): Node;
 	VAR
-		i, start, top: LONGINT;  node, n2: Node;
+		i, start, top: SIZE;  node, n2: Node;
 		a: POINTER TO ARRAY OF Node;
 		patt: LONGINT;
 	BEGIN

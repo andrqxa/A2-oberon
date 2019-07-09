@@ -240,7 +240,7 @@ BEGIN
 END ChangeDir;
 
 PROCEDURE Directory*(context : Commands.Context);
-VAR i : LONGINT;
+VAR i : SIZE;
 BEGIN
 	IF ftp = NIL THEN
 		context.out.String("not open"); context.out.Ln;

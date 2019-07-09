@@ -2644,7 +2644,7 @@ VAR
 	enum, enum2 : XMLObjects.Enumerator;
 	p, p2 : ANY;
 	name : String;
-	i : LONGINT;
+	i : SIZE;
 BEGIN
 	NEW(col);
 	name := root.GetName();
@@ -3108,7 +3108,7 @@ END IntToRomanString;
 PROCEDURE TransformCharEnt*(in : String) : String;
 VAR
 	ent : ARRAY 32 OF CHAR;
-	i, j : LONGINT;
+	i, j : SIZE;
 	rep, s1, s2 : String;
 	ds: DynamicStrings.DynamicString;
 BEGIN

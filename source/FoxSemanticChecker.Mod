@@ -4807,7 +4807,7 @@ TYPE
 					END;
 				(* ---- LEN ----- *)
 				ELSIF (id = Global.Len) & CheckArity(1,2) THEN
-					type := system.lenType;
+					type := system.sizeType;
 					base := type0;
 
 					IF (base IS SyntaxTree.PointerType) & (parameter0 IS SyntaxTree.Designator) THEN
@@ -4842,7 +4842,7 @@ TYPE
 							END;
 						END;
 						IF numberActualParameters=2 THEN
-							parameter1 := NewConversion(parameter1.position,parameter1,system.lenType,NIL);
+							parameter1 := NewConversion(parameter1.position,parameter1,system.sizeType,NIL);
 							actualParameters.SetExpression(1,parameter1);
 						ELSIF base IS SyntaxTree.MathArrayType THEN
 							Error(position, "missing dimension specification");
@@ -4869,7 +4869,7 @@ TYPE
 							END;
 						END;
 					ELSE
-						type := system.lenType;
+						type := system.sizeType;
 					END;
 				(* ---- FIRST ---- *)
 				ELSIF (id = Global.First) & CheckArity(1,1) THEN

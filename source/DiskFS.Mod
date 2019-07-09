@@ -925,7 +925,7 @@ TYPE
 		END Clear;
 
 		PROCEDURE Grow;
-		VAR old: DiskAdrArray; i,x: LONGINT; index: SIZE;
+		VAR old: DiskAdrArray; x: LONGINT; i, index: SIZE;
 		BEGIN
 			old := table;
 			NEW(table, LEN(old)*2); (* filled with zeroes -- ok *)

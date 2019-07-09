@@ -1195,7 +1195,7 @@ TYPE
 			temp: Folder;
 			path: String;
 			ret: Classes.List;
-			nameLen, pathLen: LONGINT;
+			nameLen, pathLen: SIZE;
 		BEGIN
 			(* set the alive flag of all the current subfolders to FALSE to elimitate dead subfolders later *)
 			i := 0;
@@ -1316,7 +1316,7 @@ TYPE
 			newName: String;
 			oldName: String;
 			r: LONGINT;
-			pathLen: LONGINT;
+			pathLen: SIZE;
 			ret: Classes.List;
 			parent: Folder;
 		BEGIN {EXCLUSIVE}
@@ -1399,7 +1399,7 @@ TYPE
 			r: LONGINT;
 			string: String;
 			newName: String;
-			len, pos: LONGINT;
+			len, pos: SIZE;
 			ret: Classes.List;
 		BEGIN {EXCLUSIVE}
 			IF status # ONLINE THEN
@@ -1431,7 +1431,7 @@ TYPE
 			RETURN r;
 		END Create;
 
-		PROCEDURE Search*(string: ARRAY OF CHAR): LONGINT;
+		PROCEDURE Search*(CONST string: ARRAY OF CHAR): SIZE;
 		VAR
 			r: LONGINT;
 			ret: Classes.List;
@@ -1458,7 +1458,7 @@ TYPE
 			RETURN LEN(searchResult);
 		END Search;
 
-		PROCEDURE OfflineSearch(string: ARRAY OF CHAR): LONGINT;
+		PROCEDURE OfflineSearch(CONST string: ARRAY OF CHAR): SIZE;
 		VAR
 			i, count: SIZE;
 			reader: Streams.StringReader;
@@ -2360,7 +2360,7 @@ TYPE
 		PROCEDURE GetPath*(): String;
 		VAR
 			path: String;
-			pathLen, nameLen: LONGINT;
+			pathLen, nameLen: SIZE;
 		BEGIN
 			pathLen := IMAPUtilities.StringLength(SELF.path^);
 			nameLen := IMAPUtilities.StringLength(SELF.name^);
