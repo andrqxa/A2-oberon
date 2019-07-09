@@ -408,7 +408,7 @@ VAR
 	name: AosFS.FileName;
 
 	PROCEDURE ReadString(VAR s: ARRAY OF CHAR);
-	VAR i, m: LONGINT;
+	VAR i, m: SIZE;
 	BEGIN
 		Texts.Read(R, ch);
 		WHILE ~R.eot & (R.lib IS Fonts.Font) & (ch <= " ") & (ch # 0DX) DO Texts.Read(R, ch) END;
@@ -620,7 +620,7 @@ BEGIN
 	Texts.Append(Oberon.Log, W.buf)
 END Watch;
 
-PROCEDURE GetNum(refs: Bytes;  VAR i, num: LONGINT);
+PROCEDURE GetNum(refs: Bytes;  VAR i: SIZE; VAR num: LONGINT);
 VAR n, s: LONGINT;  x: CHAR;
 BEGIN
 	s := 0;  n := 0;  x := refs[i];  INC(i);
@@ -646,8 +646,8 @@ END GetNum;
 
 (* FindProc - Find a procedure in the reference block.  Return index of name, or -1 if not found. *)
 
-PROCEDURE FindProc(refs: Bytes;  ofs: LONGINT): LONGINT;
-VAR i, m, t, proc: LONGINT;  ch: CHAR;
+PROCEDURE FindProc(refs: Bytes;  ofs: LONGINT): SIZE;
+VAR i, m, proc: SIZE; t: LONGINT;  ch: CHAR;
 BEGIN
 	proc := -1;  i := 0;  m := LEN(refs^);
 	ch := refs[i];  INC(i);
@@ -680,7 +680,7 @@ BEGIN
 	RETURN proc
 END FindProc;
 
-PROCEDURE WriteProc(mod: Modules.Module;  pc, fp: ADDRESS;  VAR refs: Bytes;  VAR refpos, base: LONGINT);
+PROCEDURE WriteProc(mod: Modules.Module;  pc, fp: ADDRESS;  VAR refs: Bytes;  VAR refpos: SIZE; VAR base: LONGINT);
 VAR ch: CHAR;
 BEGIN
 	refpos := -1;
@@ -706,9 +706,9 @@ BEGIN
 	END
 END WriteProc;
 
-PROCEDURE Variables(refs: Bytes;  i, base: LONGINT);
+PROCEDURE Variables(refs: Bytes;  i: SIZE; base: LONGINT);
 VAR
-	mode, ch: CHAR;  m, adr, type, n, lval, size, tmp1, tmp2, tdadr: LONGINT;  etc: BOOLEAN;
+	mode, ch: CHAR;  m, tmp1: SIZE; adr, type, n, lval, size, tmp2, tdadr: LONGINT;  etc: BOOLEAN;
 	sval: SHORTINT;  ival: INTEGER;  tmp: Bytes;  set: SET;
 	rval: REAL;  lrval: LONGREAL;
 BEGIN
@@ -809,7 +809,7 @@ BEGIN
 END Variables;
 
 PROCEDURE OutState (VAR name: ARRAY OF CHAR; t: Texts.Text);
-VAR mod: Modules.Module; refpos, i: LONGINT; refs: Bytes;  ch: CHAR;
+VAR mod: Modules.Module; refpos, i: SIZE; refs: Bytes;  ch: CHAR;
 BEGIN
 	i := 0;  WHILE (name[i] # 0X) & (name[i] # ".") DO INC(i) END;
 	name[i] := 0X;
@@ -1149,7 +1149,7 @@ PROCEDURE ShowActive*;	(** non-portable *)
 VAR
 	processes : ARRAY ProcessInfo.MaxNofProcesses OF AosActive.Process; nofProcesses : SIZE;
 	t: AosActive.Process;  i: SIZE; mode, adr: LONGINT;  T: Texts.Text;
-	pc, tmp1, tmp2: LONGINT; refs: Bytes;
+	tmp1: SIZE; pc, tmp2: LONGINT; refs: Bytes;
 BEGIN
 	ProcessInfo.GetProcesses(processes, nofProcesses);
 	ProcessInfo.Sort(processes, nofProcesses, ProcessInfo.SortByID);

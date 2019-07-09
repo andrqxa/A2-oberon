@@ -126,7 +126,7 @@ BEGIN
 END Unregister;
 
 PROCEDURE Mounted(dev: Disks.Device): BOOLEAN;
-VAR i: LONGINT;
+VAR i: SIZE;
 BEGIN
 	IF dev.table # NIL THEN
 		FOR i := 0 TO LEN(dev.table)-1 DO
@@ -138,7 +138,7 @@ END Mounted;
 
 (** Close the specified virtual disk device.  Be sure to first unmount any file system that has been mounted on the device, otherwise a trap will appear when the file system is accessed again. *)
 PROCEDURE Close*;	(** name *)
-VAR name: ARRAY 64 OF CHAR; dev: Plugins.Table; i: LONGINT; found: BOOLEAN;
+VAR name: ARRAY 64 OF CHAR; dev: Plugins.Table; i: SIZE; found: BOOLEAN;
 BEGIN
 	In.Open; In.Name(name);
 	IF In.Done THEN
@@ -161,7 +161,7 @@ BEGIN
 END Close;
 
 PROCEDURE Cleanup;
-VAR dev: Plugins.Table; i: LONGINT;
+VAR dev: Plugins.Table; i: SIZE;
 BEGIN
 	Disks.registry.GetAll(dev);
 	IF dev # NIL THEN
