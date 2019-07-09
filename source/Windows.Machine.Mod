@@ -411,8 +411,8 @@ VAR
 	BEGIN
 		COPY ("", val);
 
-		IF Kernel32.GetPrivateProfileString (ConfigKey, name, "", val, LEN (val), userConfigFile) # 0 THEN
-		ELSIF Kernel32.GetPrivateProfileString (ConfigKey, name, "", val, LEN (val), defaultConfigFile) # 0 THEN
+		IF Kernel32.GetPrivateProfileString (ConfigKey, name, "", val, LEN (val)(Kernel32.DWORD), userConfigFile) # 0 THEN
+		ELSIF Kernel32.GetPrivateProfileString (ConfigKey, name, "", val, LEN (val)(Kernel32.DWORD), defaultConfigFile) # 0 THEN
 		END;
 
 		IF (name = "ObjectFileExtension") & (val = "") THEN
@@ -669,7 +669,7 @@ END RemoveTraceFile;
 PROCEDURE ToExecutablePath(CONST name: ARRAY OF CHAR; VAR fullName: ARRAY OF CHAR);
 VAR i,j: LONGINT;
 BEGIN
-	IGNORE Kernel32.GetModuleFileName(Kernel32.hInstance, fullName, LEN( fullName ) );
+	IGNORE Kernel32.GetModuleFileName(Kernel32.hInstance, fullName, LEN( fullName )(Kernel32.DWORD) );
 	j := -1; i := 0;
 	WHILE fullName[i] # 0X DO
 		IF fullName[i] = '\' THEN j := i END;

@@ -934,8 +934,8 @@ VAR
 	PROCEDURE FindFile*( name: ARRAY OF CHAR;  VAR fullname: ARRAY OF CHAR ): BOOLEAN;
 	VAR ret: LONGINT;  fileName: Kernel32.LPSTR;
 	BEGIN
-		ret := Kernel32.SearchPath( workPath, name, NIL , LEN( fullname ), fullname, fileName );
-		IF (ret <= 0) THEN ret := Kernel32.SearchPath( searchPath, name, NIL , LEN( fullname ), fullname, fileName ) END;
+		ret := Kernel32.SearchPath( workPath, name, NIL , LEN( fullname )(Kernel32.DWORD), fullname, fileName );
+		IF (ret <= 0) THEN ret := Kernel32.SearchPath( searchPath, name, NIL , LEN( fullname )(Kernel32.DWORD), fullname, fileName ) END;
 		FixDriveLetter (fullname);
 		RETURN ret > 0;
 	END FindFile;

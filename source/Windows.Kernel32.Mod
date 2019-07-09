@@ -592,7 +592,7 @@ VAR
 	GetLogicalDrives-: PROCEDURE {WINAPI} ( ): WORDSET;
 	GetModuleFileName-: PROCEDURE {WINAPI} ( hModule: HMODULE;
 																				    VAR lpFileName: ARRAY   OF CHAR;
-																				    nSize: LONGINT ): LONGINT;
+																				    nSize: DWORD ): LONGINT;
 	(** The GetModuleHandle function returns a module handle for the specified module if the file has been mapped
 			into the address space of the calling process. *)
 	GetModuleHandle-: PROCEDURE {WINAPI} ( CONST lpModuleName: ARRAY   OF CHAR ): HMODULE;
@@ -606,7 +606,7 @@ VAR
 																			CONST lpKeyName: ARRAY OF CHAR;
 																			CONST lpDefault: ARRAY OF CHAR;
 																			VAR lpReturnedString: ARRAY OF CHAR;
-																			nSize: LONGINT;
+																			nSize: DWORD;
 																			CONST lpFileName: ARRAY OF CHAR): LONGINT;
 	(** The GetProcessAffinityMask function retrieves the process affinity mask for the specified process and the system affinity mask for the system. *)
 	GetProcessAffinityMask- : PROCEDURE {WINAPI} ( hProcess: HANDLE; lpProcessAffinityMask: ADDRESS;  lpSystemAffinityMask: ADDRESS ): BOOL;
@@ -761,7 +761,7 @@ VAR
 	ResumeThread-: PROCEDURE {WINAPI} ( hThread: HANDLE ): LONGINT;
 	(** The SearchPath function searches for the specified file. *)
 	SearchPath-: PROCEDURE {WINAPI} ( CONST lpPath, lpFileName, lpExtension: ARRAY   OF CHAR;
-																  nBufferLength: LONGINT;
+																  nBufferLength: DWORD;
 																  VAR lpBuffer: ARRAY   OF CHAR;
 																  VAR lpFilePart: LPSTR ): LONGINT;
 	(** The SetCommBreak function suspends character transmission for a specified communications device and places the transmission line in a break state until the ClearCommBreak function is called. *)

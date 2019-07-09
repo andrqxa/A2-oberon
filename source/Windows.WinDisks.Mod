@@ -155,7 +155,7 @@ VAR
 	END RemoveDisk;
 
 	PROCEDURE IsMounted( dev: Disks.Device ): BOOLEAN;
-	VAR i: LONGINT;
+	VAR i: SIZE;
 	BEGIN
 		IF dev.table # NIL THEN
 			FOR i := 0 TO LEN( dev.table ) - 1 DO
