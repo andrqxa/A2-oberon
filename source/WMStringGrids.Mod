@@ -100,7 +100,7 @@ TYPE
 		END AdjustRows;
 
 		PROCEDURE AdjustRow(row : Row);
-		VAR i : LONGINT; newCells : CellArray;
+		VAR i : SIZE; newCells : CellArray;
 		BEGIN
 			IF row.cells = NIL THEN NEW(row.cells, nofCols) END;
 			IF LEN(row.cells) # nofCols THEN

@@ -236,7 +236,7 @@ TYPE
 
 
 		PROCEDURE InitTable( VAR tab: ARRAY OF SET32 );
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			FOR i := 0 TO LEN( tab ) - 1 DO  tab[i] := buf.GetSet( )  END
 		END InitTable;

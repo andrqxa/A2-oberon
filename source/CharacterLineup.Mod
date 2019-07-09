@@ -107,7 +107,7 @@ TYPE
 			manager.Add(200, 200, SELF, {WM.FlagFrame, WM.FlagClose, WM.FlagMinimize});
 			SetContent(mainPanel);
 			LoadAllCharacters;
-			filterComponents.nofCols.Set(LEN(relevantSubcomponents));
+			filterComponents.nofCols.Set(LEN(relevantSubcomponents)(LONGINT));
 			characters.nofRows.Set(nofCharacters DIV NofCols + 1);
 			useFilter := TRUE; nofFilters := 0;
 			Filter(nofFilters, filterArray);

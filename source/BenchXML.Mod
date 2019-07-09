@@ -163,7 +163,7 @@ BEGIN
 END ShowUsage;
 
 PROCEDURE Cleanup;
-VAR i : LONGINT;
+VAR i : SIZE;
 BEGIN
 	IF (workers # NIL) THEN
 		FOR i := 0 TO LEN(workers)-1 DO

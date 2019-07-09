@@ -589,7 +589,7 @@ TYPE
 		END AnalyzeWideContext;
 
 		(* Analyzes the whole context for the character at a certain position and - if a certain rule applies - returns the result of that rule. *)
-		PROCEDURE AnalyzeWholeContext(thisPos : LONGINT; line : String) : Texts.Char32;
+		PROCEDURE AnalyzeWholeContext(thisPos : SIZE; line : String) : Texts.Char32;
 		VAR
 			thisChar : Texts.Char32;
 			done,contextFound,validContextFound : BOOLEAN;
@@ -654,9 +654,9 @@ TYPE
 		END CheckWideContext;
 
 		(* Checks if for a given context if - for each position one or more ranges are defined - any of these ranges fit the specific character *)
-		PROCEDURE CheckWholeContext(thisPos : LONGINT; line : String; context : GenericContext) : BOOLEAN;
+		PROCEDURE CheckWholeContext(thisPos : SIZE; line : String; context : GenericContext) : BOOLEAN;
 		VAR
-			i,j : LONGINT;
+			i,j : SIZE;
 		BEGIN
 			(* If there is no actual context, the (non-present) context rules are defined to apply *)
 			IF context = NIL THEN RETURN TRUE END;
@@ -999,7 +999,7 @@ TYPE
 		(* Parses a range string and puts the ranges into a range array *)
 		PROCEDURE ParseRangeString(rangeString : XML.String; base16, neg : BOOLEAN; VAR ranges : Ranges);
 		VAR
-			numberOfRanges, i, j, k: LONGINT; res : WORD;
+			numberOfRanges, i, j, k: SIZE; res : WORD;
 			tempString : XML.String;
 			range : Range;
 			theseRanges, oldRanges : RangeArray;
@@ -1175,7 +1175,7 @@ TYPE
 		VAR
 			lineCache, newLine : String;
 			ch,ch1,ch2,ch3,ch4 : Texts.Char32;
-			i : LONGINT;
+			i : SIZE;
 			analyzer : RangedContextAnalyzer;
 			newText : Texts.Text;
 			oneCharString : Texts.PUCS32String;

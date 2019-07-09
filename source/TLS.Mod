@@ -191,10 +191,10 @@ TYPE
 			NEW( hMac, hashname );
 		END Init;
 
-		PROCEDURE Expand( VAR secret, seed, outbuf: ARRAY OF CHAR; secretLen, seedLen, outLen: LONGINT );
+		PROCEDURE Expand( VAR secret, seed, outbuf: ARRAY OF CHAR; secretLen, seedLen, outLen: SIZE );
 			VAR
 				a: ARRAY 2 * MaxPHashSeed OF CHAR;
-				i, iterations: LONGINT;
+				i, iterations: SIZE;
 		BEGIN
 			ASSERT( seedLen <= ( MaxPHashSeed  ) );
 			ASSERT( outLen <= ( MaxPHashKernelLogput ) );
@@ -231,11 +231,11 @@ TYPE
 			END;
 		END Init;
 
-		PROCEDURE GetBytes( VAR secret, seed, outbuf: ARRAY OF CHAR; CONST label: ARRAY OF CHAR; secretLen, seedLen, outLen: LONGINT );
+		PROCEDURE GetBytes( VAR secret, seed, outbuf: ARRAY OF CHAR; CONST label: ARRAY OF CHAR; secretLen, seedLen, outLen: SIZE );
 			VAR
 				md5Result, shaResult: ARRAY MaxKeyBlock OF CHAR;
 				pSeed, s1, s2: ARRAY 140 OF CHAR;
-				i, j, l: LONGINT;
+				i, j, l: SIZE;
 		BEGIN
 			IF pHash = NIL THEN (* Use SHA1 XOR MD5 algo *)
 				(* pseed := label::seed *)
@@ -782,7 +782,7 @@ TYPE
 				prf: PRF;
 				keyBlock: ARRAY 136 OF CHAR;
 				seed: ARRAY 64 OF CHAR;
-				i, keyBlockLen, ofs, macSecretSize, cipherKeySize, cipherBlockSize: LONGINT;
+				i, keyBlockLen, ofs, macSecretSize, cipherKeySize, cipherBlockSize: SIZE;
 		BEGIN
 			(* calculate the needed amount of key-material *)
 			macSecretSize := SELF.pendingWriteState.mac.size;
@@ -986,7 +986,7 @@ TYPE
 			VAR
 				macInput: ARRAY 13 OF CHAR;
 				verify: ARRAY 20 OF CHAR;
-				i, padd, len, type, macSize, res, major, minor, ofs: LONGINT; length: SIZE;
+				i, padd, len, type, macSize, res, major, minor, ofs, length: SIZE;
 				badRecordMac: BOOLEAN; (* Send a bad_record_mac error *)
 		BEGIN
 			(* increment the number of received records *)

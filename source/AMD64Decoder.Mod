@@ -835,7 +835,7 @@ TYPE
 
 		PROCEDURE PrintOpcodeBytes*(w : Streams.Writer);
 		VAR
-			i : LONGINT;
+			i : SIZE;
 		BEGIN
 			FOR i := 0 TO LEN (code) - 1 DO
 				WriteHex8 (ORD (code[i]), w);

@@ -160,7 +160,7 @@ VAR log*: Streams.Writer;
 
 PROCEDURE PrintHexString*(w:Streams.Writer; CONST s: ARRAY OF CHAR);
 CONST hex="0123456789ABCDEF";
-VAR i:LONGINT; c:CHAR;
+VAR i:SIZE; c:CHAR;
 BEGIN
 	FOR i:=0 TO LEN(s)-1 DO
 		c:=s[i];
@@ -171,7 +171,7 @@ BEGIN
 END PrintHexString;
 
 PROCEDURE PrintNumericString*(w:Streams.Writer; CONST s: ARRAY OF CHAR);
-VAR i:LONGINT; c:CHAR;
+VAR i:SIZE; c:CHAR;
 BEGIN
 	w.String("  ");
 	FOR i:=0 TO LEN(s)-1 DO
@@ -182,7 +182,7 @@ BEGIN
 END PrintNumericString;
 
 PROCEDURE PrintString*(w:Streams.Writer; CONST s: ARRAY OF CHAR);
-VAR i:LONGINT; c:CHAR;
+VAR i:SIZE; c:CHAR;
 BEGIN
 	FOR i:=0 TO LEN(s)-1 DO
 		c:=s[i];

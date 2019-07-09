@@ -465,7 +465,7 @@ TYPE
 			END IsUID;
 
 			PROCEDURE RemoveAmpersand(VAR id : ARRAY OF CHAR);
-			VAR i : LONGINT;
+			VAR i : SIZE;
 			BEGIN
 				ASSERT(id[0] = "&");
 				FOR i := 0 TO LEN(id)-2 DO
@@ -607,7 +607,7 @@ TYPE
 		(** Internal interface of the message handler. This method may only be called via the Handle method.
 		Components that need to handle messages should implement HandleInternal. *)
 		PROCEDURE HandleInternal*(VAR msg : Messages.Message); (** PROTECTED *)
-		VAR pa : WMProperties.PropertyArray; i : LONGINT;
+		VAR pa : WMProperties.PropertyArray; i : SIZE;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
 			IF (msg.msgType = Messages.MsgSetLanguage) & (msg.ext # NIL) & (msg.ext IS LanguageExtension) THEN
@@ -2756,16 +2756,16 @@ BEGIN
 	RETURN ch <= " ";
 END IsWhiteSpace;
 
-PROCEDURE SkipWhiteSpace(CONST string : ARRAY OF CHAR; VAR index : LONGINT);
-VAR length : LONGINT;
+PROCEDURE SkipWhiteSpace(CONST string : ARRAY OF CHAR; VAR index : SIZE);
+VAR length : SIZE;
 BEGIN
 	length := LEN(string);
 	WHILE (index < length) & (string[index] # 0X) & IsWhiteSpace(string[index]) DO INC(index); END;
 	ASSERT(index < LEN(string));
 END SkipWhiteSpace;
 
-PROCEDURE ReadWord*(CONST string : ARRAY OF CHAR; VAR word : ARRAY OF CHAR; VAR index : LONGINT) : BOOLEAN;
-VAR length, wordLength, i : LONGINT;
+PROCEDURE ReadWord*(CONST string : ARRAY OF CHAR; VAR word : ARRAY OF CHAR; VAR index : SIZE) : BOOLEAN;
+VAR length, wordLength, i : SIZE;
 BEGIN
 	SkipWhiteSpace(string, index);
 	length := LEN(string);
@@ -2808,10 +2808,10 @@ END SplitMacroString;
 PROCEDURE ReportError(CONST text, argument1, argument2 : ARRAY OF CHAR);
 VAR
 	message : Events.Message;
-	textIdx, messageIdx : LONGINT;
+	textIdx, messageIdx : SIZE;
 	secondArgument : BOOLEAN;
 
-	PROCEDURE Append(VAR message : ARRAY OF CHAR; CONST argument : ARRAY OF CHAR; VAR index : LONGINT);
+	PROCEDURE Append(VAR message : ARRAY OF CHAR; CONST argument : ARRAY OF CHAR; VAR index : SIZE);
 	VAR i : LONGINT;
 	BEGIN
 		i := 0;
@@ -2844,8 +2844,8 @@ BEGIN
 	Events.AddEvent("Components", Events.Error, 0, 0, 0, message, FALSE);
 END ReportError;
 
-PROCEDURE GetArgumentStream*(command: Strings.String; offset: LONGINT; VAR arguments: Streams.StringReader);
-VAR i: LONGINT;
+PROCEDURE GetArgumentStream*(command: Strings.String; offset: SIZE; VAR arguments: Streams.StringReader);
+VAR i: SIZE;
 BEGIN
 	IF command = NIL THEN arguments := NIL; RETURN END;
 	i := offset;
@@ -2858,11 +2858,10 @@ BEGIN
 	END;
 END GetArgumentStream;
 
-PROCEDURE GenerateContext*(oldCommand, command : Strings.String; index : LONGINT; originator : Component; CONST event : Event) : EventContext;
+PROCEDURE GenerateContext*(oldCommand, command : Strings.String; index : SIZE; originator : Component; CONST event : Event) : EventContext;
 VAR
 	context : EventContext; pointerContext : PointerContext; keyContext : KeyContext;
 	arguments : Streams.StringReader;
-	i : LONGINT;
 BEGIN
 	ASSERT((command # NIL) & (0 <= index) & (index < LEN(command)));
 	ASSERT(originator # NIL);
@@ -2890,7 +2889,7 @@ VAR
 	newCommand : Strings.String;
 	context : EventContext;
 	msg : Events.Message;
-	index : LONGINT;
+	index : SIZE;
 BEGIN
 	ASSERT((originator # NIL) & (command # NIL));
 	index := 0;
@@ -2913,7 +2912,7 @@ BEGIN
 END HandleEvent;
 
 PROCEDURE ContainsMacros(CONST string : ARRAY OF CHAR) : BOOLEAN;
-VAR result : BOOLEAN; length, i : LONGINT;
+VAR result : BOOLEAN; length, i : SIZE;
 BEGIN
 	result := FALSE;
 	i := 0; length := LEN(string);
@@ -2944,8 +2943,8 @@ BEGIN
 	END;
 END WriteSelectionToStream;
 
-PROCEDURE SubstituteMacro(CONST command : Strings.String; VAR index : LONGINT; originator : Component; w : Streams.Writer);
-VAR oldIndex : LONGINT; macro, namespace, name : Macro; handler : MacroHandlerProcedure; handled : BOOLEAN;
+PROCEDURE SubstituteMacro(CONST command : Strings.String; VAR index : SIZE; originator : Component; w : Streams.Writer);
+VAR oldIndex : SIZE; macro, namespace, name : Macro; handler : MacroHandlerProcedure; handled : BOOLEAN;
 BEGIN
 	ASSERT((command # NIL) & (0 <= index) & (index < LEN(command)) & (command[index] = MacroCharacter));
 	ASSERT(originator # NIL);
@@ -2973,7 +2972,7 @@ BEGIN
 END SubstituteMacro;
 
 PROCEDURE SubstituteMacros*(CONST command : Strings.String; VAR newCommand : Strings.String; originator : Component);
-VAR index, oldIndex, length : LONGINT; w : Streams.Writer; buffer : Strings.Buffer;
+VAR index, oldIndex, length : SIZE; w : Streams.Writer; buffer : Strings.Buffer;
 BEGIN
 	ASSERT((command # NIL) & (originator # NIL));
 	IF ContainsMacros(command^) THEN

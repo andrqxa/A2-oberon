@@ -1302,7 +1302,7 @@ TYPE
 		END FromXML;
 
 		PROCEDURE ToXML*(VAR element: XML.Element);
-		VAR chars: XML.ArrayChars;s: String; w: Streams.StringWriter; res: WORD; len: LONGINT;
+		VAR chars: XML.ArrayChars;s: String; w: Streams.StringWriter; res: WORD; len: SIZE;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
 				ToXML^(element);

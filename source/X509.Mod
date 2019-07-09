@@ -444,7 +444,7 @@ VAR
 	(** Prints a certificate in human readable form *)
 	PROCEDURE PrintCertificate * (certificate: Certificate; writer: Streams.Writer);
 	VAR
-		count: LONGINT;
+		count: SIZE;
 		mod: ARRAY 16 * 4096 OF CHAR;
 	BEGIN
 		writer.String("== Begin of Certificate =="); writer.Ln;

@@ -122,7 +122,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 	(*--- File Directory ---*)
 
 	PROCEDURE Append(VAR to(** in/out *): ARRAY OF CHAR; this: ARRAY OF CHAR);
-		VAR i, j, l: LONGINT;
+		VAR i, j, l: SIZE;
 	BEGIN
 		i := 0;
 		WHILE to[i] # 0X DO

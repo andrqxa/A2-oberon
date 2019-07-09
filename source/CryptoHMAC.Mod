@@ -5,12 +5,12 @@ IMPORT Hashes := CryptoHashes, BIT;
 TYPE
 	HMac* = OBJECT
 		VAR
-			size-: LONGINT;		(** mac size in bytes *)
+			size-: SIZE;		(** mac size in bytes *)
 			name-: ARRAY 64 OF CHAR;
 			ih, oh: Hashes.Hash;
 
 		PROCEDURE & Init*( CONST hashmod: ARRAY OF CHAR );
-		VAR i, l: LONGINT; c: CHAR;
+		VAR i, l: SIZE; c: CHAR;
 		BEGIN
 			ih := Hashes.NewHash( hashmod );
 			oh := Hashes.NewHash( hashmod );
@@ -25,10 +25,10 @@ TYPE
 
 		(** Set a key, recommended key-length is the hash-size of the underlying hash-function.
 			This method has to be invoked for EACH mac to be calculated *)
-		PROCEDURE Initialize*( CONST key: ARRAY OF CHAR; keyLen: LONGINT );
+		PROCEDURE Initialize*( CONST key: ARRAY OF CHAR; keyLen: SIZE );
 		VAR
 			buf, buf2: ARRAY 64 OF CHAR;
-			i: LONGINT;
+			i: SIZE;
 		BEGIN
 			FOR i := 0 TO keyLen-1 DO  buf[i] := key[i]  END;
 			FOR i := keyLen TO 63 DO  buf[i] := 0X  END;

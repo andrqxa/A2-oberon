@@ -248,7 +248,7 @@ VAR
 
 
 	PROCEDURE XORBlock*( VAR block, iv: ARRAY OF S.BYTE );
-	VAR a1, a2: ADDRESS; s1, s2: SET32; i: LONGINT;
+	VAR a1, a2: ADDRESS; s1, s2: SET32; i: SIZE;
 	BEGIN
 		a1 := ADDRESSOF( block );  a2 := ADDRESSOF( iv );
 		FOR i := 1 TO LEN( block ) DIV 4 DO
