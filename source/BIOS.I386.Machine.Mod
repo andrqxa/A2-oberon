@@ -706,7 +706,7 @@ END InitAPICIDAdr;
 
 PROCEDURE InitBoot;
 VAR
-	largestFunction, i: LONGINT;
+	largestFunction, i: SIZE;
 	eax, ebx, ecx, edx : SET;
 	logicalProcessorCount : LONGINT;
 	u: ARRAY 8 OF CHAR; vendor : Vendor;
@@ -843,7 +843,7 @@ BEGIN
 END GetInit;
 
 (** Convert a string to an integer. Parameter i specifies where in the string scanning should begin (usually 0 in the first call). Scanning stops at the first non-valid character, and i returns the updated position. Parameter s is the string to be scanned. The value is returned as result, or 0 if not valid. Syntax: number = ["-"] digit {digit} ["H" | "h"] . digit = "0" | ... "9" | "A" .. "F" | "a" .. "f" . If the number contains any hexdecimal letter, or if it ends in "H" or "h", it is interpreted as hexadecimal. *)
-PROCEDURE StrToInt* (VAR i: LONGINT; CONST s: ARRAY OF CHAR): LONGINT;
+PROCEDURE StrToInt* (VAR i: SIZE; CONST s: ARRAY OF CHAR): LONGINT;
 VAR vd, vh, sgn, d: LONGINT; hex: BOOLEAN;
 BEGIN
 	vd := 0; vh := 0; hex := FALSE;
@@ -1064,7 +1064,7 @@ END IsRAM;
 (* Check amount of memory available and update memTop. *)
 PROCEDURE CheckMemory;
 CONST M = 100000H; ExtMemAdr = M; Step = M;
-VAR s: ARRAY 16 OF CHAR; adr: ADDRESS; i: LONGINT;
+VAR s: ARRAY 16 OF CHAR; adr: ADDRESS; i: SIZE;
 BEGIN
 	GetConfig("ExtMemSize", s);	(* in MB *)
 	IF s[0] # 0X THEN	(* override detection *)
@@ -1086,7 +1086,7 @@ END CheckMemory;
 
 (* Initialize locks. *)
 PROCEDURE InitLocks;
-VAR i: LONGINT; s: ARRAY 12 OF CHAR;
+VAR i: SIZE; s: ARRAY 12 OF CHAR;
 BEGIN
 	IF TimeCount # 0 THEN
 		GetConfig("LockTimeout", s);
@@ -3126,7 +3126,7 @@ END ParseProcessor;
 
 (* Parse MP configuration table. *)
 PROCEDURE ParseMPConfig;
-VAR adr, x: ADDRESS; i: LONGINT; entries: INTEGER; ch: CHAR; s: SET; str: ARRAY 8 OF CHAR;
+VAR adr, x: ADDRESS; i: SIZE; entries: INTEGER; ch: CHAR; s: SET; str: ARRAY 8 OF CHAR;
 BEGIN
 	localAPIC := 0; numProcessors := 1; allProcessors := {0};
 	FOR i := 0 TO LEN(idMap)-1 DO idMap[i] := -1 END;	(* all unassigned *)
@@ -3208,7 +3208,7 @@ BEGIN
 		x := idMap[i];
 		IF x # -1 THEN
 			ASSERT(revIDmap[x] = -1);	(* no duplicate APIC ids *)
-			revIDmap[x] := SHORT(SHORT(i))
+			revIDmap[x] := SHORTINT(i)
 		END
 	END;
 	(* timer configuration *)
@@ -3520,7 +3520,7 @@ VAR traceDelay: LONGINT;
 (* Initialise tracing. *)
 PROCEDURE InitTrace;
 CONST MaxPorts = 8;
-VAR i, p, bps: LONGINT; off: SIZE; s, name: ARRAY 32 OF CHAR;
+VAR i, p: SIZE; bps: LONGINT; off: SIZE; s, name: ARRAY 32 OF CHAR;
 	baselist: ARRAY MaxPorts OF LONGINT;
 BEGIN
 	GetConfig ("TraceMode", s);

@@ -611,7 +611,7 @@ PROCEDURE Install*;
 END Install;
 
 PROCEDURE Init;
-VAR  str: ARRAY 32 OF CHAR;  i: LONGINT;
+VAR  str: ARRAY 32 OF CHAR;  i: SIZE;
 BEGIN
 	Machine.GetConfig("SCSIDebug", str);
 	i := 0;

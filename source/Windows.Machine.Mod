@@ -121,7 +121,7 @@ VAR
 
 	(** Convert a string to an integer.  Parameter i specifies where in the string scanning should begin (usually 0 in the first call).  Scanning stops at the first non-valid character, and i returns the updated position.  Parameter s is the string to be scanned.  The value is returned as result, or 0 if not valid.  Syntax: number = ["-"] digit {digit} ["H" | "h"] .  digit = "0" | ... "9" | "A" .. "F" | "a" .. "f" .  If the number contains any hexdecimal letter, or if it ends in "H" or "h", it is interpreted as hexadecimal. *)
 
-	PROCEDURE StrToInt*( VAR i: LONGINT;  CONST s: ARRAY OF CHAR ): LONGINT;
+	PROCEDURE StrToInt*( VAR i: SIZE;  CONST s: ARRAY OF CHAR ): LONGINT;
 	VAR vd, vh, sgn, d: LONGINT;  hex: BOOLEAN;
 	BEGIN
 		vd := 0;  vh := 0;  hex := FALSE;
@@ -769,7 +769,7 @@ END Init;
 		IF StrongChecks THEN
 			ASSERT ( lock[level] = "N", 1001 );
 			FOR i := 0 TO level-1 DO
-				ASSERT(taken[i] # taken[level]); 
+				ASSERT(taken[i] # taken[level]);
 			END
 		ELSIF lock[level] # "N" THEN
 			Trace.String("warning: reentered non-reentrant lock"); Trace.Ln;
@@ -830,7 +830,7 @@ PROCEDURE ValidHeapAddress*(p: ADDRESS): BOOLEAN;
 VAR mb: MemoryBlock;
 BEGIN
 	IF (p>=ADDRESS OF Kernel32.EntryPoint) & (p<=ADDRESSOF(LastAddress)) THEN RETURN TRUE END;
-	IF (p < memBlockHead.beginBlockAdr) OR (p>memBlockTail.endBlockAdr) THEN RETURN FALSE END; 
+	IF (p < memBlockHead.beginBlockAdr) OR (p>memBlockTail.endBlockAdr) THEN RETURN FALSE END;
 	mb := memBlockHead;
 	WHILE mb # NIL DO
 		IF (p >= mb.beginBlockAdr) & (p <= mb.endBlockAdr) THEN  RETURN TRUE  END;

@@ -423,7 +423,7 @@ END InitAddress;
 (* Get the specified setting for the NIC currently being initialized (indexed by "installed"). *)
 
 PROCEDURE GetSetting(s: ARRAY OF CHAR): LONGINT;
-VAR i: LONGINT; name, val: ARRAY 32 OF CHAR;
+VAR i: SIZE; name, val: ARRAY 32 OF CHAR;
 BEGIN
 	i := 0; WHILE s[i] # 0X DO name[i] := s[i]; INC(i) END;
 	name[i] := CHR(ORD("0") + installed); name[i+1] := 0X;

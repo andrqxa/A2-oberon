@@ -96,7 +96,7 @@ VAR
 
 	(** Convert a string to an integer.  Parameter i specifies where in the string scanning should begin (usually 0 in the first call).  Scanning stops at the first non-valid character, and i returns the updated position.  Parameter s is the string to be scanned.  The value is returned as result, or 0 if not valid.  Syntax: number = ["-"] digit {digit} ["H" | "h"] .  digit = "0" | ... "9" | "A" .. "F" | "a" .. "f" .  If the number contains any hexdecimal letter, or if it ends in "H" or "h", it is interpreted as hexadecimal. *)
 
-	PROCEDURE StrToInt*( VAR i: LONGINT;  CONST s: ARRAY OF CHAR ): LONGINT;
+	PROCEDURE StrToInt*( VAR i: SIZE;  CONST s: ARRAY OF CHAR ): LONGINT;
 	VAR vd, vh, sgn, d: LONGINT;  hex: BOOLEAN;
 	BEGIN
 		vd := 0;  vh := 0;  hex := FALSE;

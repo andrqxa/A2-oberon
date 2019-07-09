@@ -825,7 +825,7 @@ BEGIN
 END GetInit;
 
 (** Convert a string to an integer. Parameter i specifies where in the string scanning should begin (usually 0 in the first call). Scanning stops at the first non-valid character, and i returns the updated position. Parameter s is the string to be scanned. The value is returned as result, or 0 if not valid. Syntax: number = ["-"] digit {digit} ["H" | "h"] . digit = "0" | ... "9" | "A" .. "F" | "a" .. "f" . If the number contains any hexdecimal letter, or if it ends in "H" or "h", it is interpreted as hexadecimal. *)
-PROCEDURE StrToInt* (VAR i: LONGINT; CONST s: ARRAY OF CHAR): LONGINT;
+PROCEDURE StrToInt* (VAR i: SIZE; CONST s: ARRAY OF CHAR): LONGINT;
 VAR vd, vh, sgn, d: LONGINT; hex: BOOLEAN;
 BEGIN
 	vd := 0; vh := 0; hex := FALSE;
@@ -3114,7 +3114,7 @@ END ParseProcessor;
 
 (* Parse MP configuration table. *)
 PROCEDURE ParseMPConfig;
-VAR adr, x: ADDRESS; i: LONGINT; entries: INTEGER; ch: CHAR; s: SET; str: ARRAY 8 OF CHAR;
+VAR adr, x: ADDRESS; i: SIZE; entries: INTEGER; ch: CHAR; s: SET; str: ARRAY 8 OF CHAR;
 BEGIN
 	localAPIC := 0; numProcessors := 1; allProcessors := {0};
 	FOR i := 0 TO LEN(idMap)-1 DO idMap[i] := -1 END;	(* all unassigned *)
