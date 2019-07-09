@@ -1046,7 +1046,7 @@ TYPE
 		END ImmediateToOperand;
 
 		PROCEDURE MakeRegister(VAR vop: IntermediateCode.Operand; part: LONGINT; VAR rop: Operand);
-		VAR virtualReg: LONGINT; tmp, imm: Operand; offset: LONGINT; symbol: ObjectFile.Identifier;
+		VAR virtualReg: SIZE; tmp, imm: Operand; offset: LONGINT; symbol: ObjectFile.Identifier;
 			sizeInBits: LONGINT;
 		BEGIN
 			(*InstructionSet.InitOperand(rop); *)
@@ -1102,7 +1102,7 @@ TYPE
 		END GetSymbolOffset;
 
 		PROCEDURE GetMemory(VAR vop: IntermediateCode.Operand; part: LONGINT; VAR memoryOperand: InstructionSet.Operand; ticket: Ticket);
-		VAR virtualReg: LONGINT; register: LONGINT; registerOperand, temporary: InstructionSet.Operand; symbol: ObjectFile.Identifier;
+		VAR virtualReg: SIZE; register: LONGINT; registerOperand, temporary: InstructionSet.Operand; symbol: ObjectFile.Identifier;
 			offset: LONGINT;
 		BEGIN
 			virtualReg := vop.register;
@@ -1199,7 +1199,7 @@ TYPE
 			RETURN GetTypedHardwareRegister(index, type)
 		END ParameterRegister;
 
-		PROCEDURE PhysicalRegister(virtualReg: LONGINT; part: LONGINT; VAR offset: LONGINT): LONGINT;
+		PROCEDURE PhysicalRegister(virtualReg: SIZE; part: LONGINT; VAR offset: LONGINT): LONGINT;
 		VAR register: LONGINT; fpOffset: LONGINT; ticket: Ticket;
 		BEGIN
 			IF virtualReg = IntermediateCode.FP THEN
@@ -1228,7 +1228,7 @@ TYPE
 		END PhysicalRegister;
 
 		PROCEDURE GetRegister(CONST virtual: IntermediateCode.Operand; part:LONGINT; VAR physical: Operand);
-		VAR type: IntermediateCode.Type; virtualRegister, physicalRegister: LONGINT;
+		VAR type: IntermediateCode.Type; virtualRegister: SIZE; physicalRegister: LONGINT;
 			tmp,imm: Operand; offset: LONGINT; ticket: Ticket; ops: LONGINT;
 		BEGIN
 			ASSERT(virtual.mode = IntermediateCode.ModeRegister);
