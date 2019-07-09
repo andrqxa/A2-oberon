@@ -1436,7 +1436,7 @@ BEGIN
 END FindCondition;
 
 (* Find highest priority in array of priority counts *)
-PROCEDURE MaxPrio(CONST priorityCounts: ARRAY OF WORD): WORD;
+PROCEDURE MaxPrio(CONST priorityCounts: ARRAY Heaps.NumPriorities OF WORD): WORD;
 VAR i: WORD;
 BEGIN
 	i := LEN(priorityCounts) - 1;
