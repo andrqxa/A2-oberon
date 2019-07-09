@@ -181,7 +181,7 @@ BEGIN
 END Align;
 
 PROCEDURE ReadObjectFile*(CONST moduleName, path, extension: ARRAY OF CHAR; linker: GenericLinker.Linker; moduleList: GenericLinker.HashTableSegmentedName);
-VAR fileName: Files.FileName; file: Files.File; reader: Files.Reader; i: LONGINT;
+VAR fileName: Files.FileName; file: Files.File; reader: Files.Reader; i: SIZE;
 offers, requires: ObjectFile.NameList;name: ARRAY 256 OF CHAR; sn: ObjectFile.SegmentedName;
 BEGIN
 	sn := moduleName;

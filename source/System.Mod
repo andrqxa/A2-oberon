@@ -618,7 +618,7 @@ with command line shell to act as simple CGI script this way:
 **)
 PROCEDURE RemoveFirstLineComment(string: Strings.String);
 VAR
-	i, j, len: LONGINT;
+	i, j, len: SIZE;
 BEGIN
 	IF string # NIL THEN
 		len := LEN(string^);

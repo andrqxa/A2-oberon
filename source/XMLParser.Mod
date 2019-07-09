@@ -1001,7 +1001,7 @@ VAR
 	predefinedEntities : ARRAY 5 OF RECORD name : ARRAY 5 OF CHAR; expanded : Strings.String; END;
 
 PROCEDURE IsPubidLiteral(CONST str: ARRAY OF CHAR): BOOLEAN;
-VAR i, len: LONGINT; ch: CHAR;
+VAR i, len: SIZE; ch: CHAR;
 BEGIN
 	i := 0; len := LEN(str); ch := str[0];
 	REPEAT

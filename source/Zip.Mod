@@ -113,8 +113,8 @@ BEGIN
 END ShowError;
 
 (* length of str *)
-PROCEDURE StringLength(CONST str: ARRAY OF CHAR): LONGINT;
-	VAR i, l: LONGINT;
+PROCEDURE StringLength(CONST str: ARRAY OF CHAR): SIZE;
+	VAR i, l: SIZE;
 BEGIN
 	l := LEN(str); i := 0;
 	WHILE (i < l) & (str[i] # 0X) DO
@@ -239,9 +239,9 @@ BEGIN
 	Files.WriteLInt(r, ent.crc32);	(* crc-32 *)
 	Files.WriteLInt(r, ent.compSize);	(* compressed size *)
 	Files.WriteLInt(r, ent.uncompSize);	(* uncompressed size *)
-	Files.WriteInt(r, SHORT(StringLength(ent.name)));	(* filename length *)
+	Files.WriteInt(r, INTEGER(StringLength(ent.name)));	(* filename length *)
 	IF ent.extraField # NIL THEN
-		Files.WriteInt(r, SHORT(LEN(ent.extraField^)))	(* extra field length *)
+		Files.WriteInt(r, INTEGER(LEN(ent.extraField^)))	(* extra field length *)
 	ELSE
 		Files.WriteInt(r, 0)
 	END;
@@ -265,16 +265,16 @@ BEGIN
 	Files.WriteLInt(r, ent.crc32);	(* crc-32 *)
 	Files.WriteLInt(r, ent.compSize);	(* compressed size *)
 	Files.WriteLInt(r, ent.uncompSize);	(* uncompressed size *)
-	Files.WriteInt(r, SHORT(StringLength(ent.name)));	(* filename length *)
+	Files.WriteInt(r, INTEGER(StringLength(ent.name)));	(* filename length *)
 	IF ent.extraField = NIL THEN
 		Files.WriteInt(r, 0)
 	ELSE
-		Files.WriteInt(r, SHORT(LEN(ent.extraField^)));	(* extra field length *)
+		Files.WriteInt(r, INTEGER(LEN(ent.extraField^)));	(* extra field length *)
 	END;
 	IF ent.comment = NIL THEN
 		Files.WriteInt(r, 0)
 	ELSE
-		Files.WriteInt(r, SHORT(LEN(ent.comment^)));	(* file comment length *)
+		Files.WriteInt(r, INTEGER(LEN(ent.comment^)));	(* file comment length *)
 	END;
 	Files.WriteInt(r, 0);	(* disk number start *)
 	Files.WriteInt(r, ent.intFileAttr);	(* internal file attributes *)
@@ -310,7 +310,7 @@ BEGIN
 	IF arc.comment = NIL THEN
 		Files.WriteInt(r, 0)	(* zipfile comment length *)
 	ELSE
-		Files.WriteInt(r, SHORT(LEN(arc.comment^)));	(* zipfile comment length *)
+		Files.WriteInt(r, INTEGER(LEN(arc.comment^)));	(* zipfile comment length *)
 		r.file.WriteBytes(r, arc.comment^, 0, LEN(arc.comment^))	(* zipfile comment *)
 	END
 END WriteEndOfCentDir;
