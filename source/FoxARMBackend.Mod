@@ -1008,7 +1008,7 @@ TYPE
 		END ValueComposition2;
 
 		(** get the physical register number that corresponds to a virtual register number and part **)
-		PROCEDURE PhysicalRegisterNumber(virtualRegisterNumber: LONGINT; part: LONGINT): LONGINT;
+		PROCEDURE PhysicalRegisterNumber(virtualRegisterNumber: SIZE; part: LONGINT): LONGINT;
 		VAR
 			ticket: Ticket;
 			result: LONGINT;

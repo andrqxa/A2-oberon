@@ -2903,7 +2903,7 @@ TYPE
 		fictive-: BOOLEAN; (* variable is not allocated but has a fixed offset *)
 		fictiveOffset-: SIZE; (* offset of fictive as provided by the source code *)
 
-		registerNumber-: LONGINT;
+		registerNumber-: SIZE;
 		inRegister-: BOOLEAN;
 		preferRegister-: BOOLEAN;
 
@@ -2965,7 +2965,7 @@ TYPE
 			inRegister := b;
 		END InRegister
 
-		PROCEDURE RegisterNumber*(reg: LONGINT);
+		PROCEDURE RegisterNumber*(reg: SIZE);
 		BEGIN
 			registerNumber := reg
 		END RegisterNumber;
@@ -3006,7 +3006,7 @@ TYPE
 		movable-: BOOLEAN;
 		selfParameter-: BOOLEAN;
 
-		registerNumber-: LONGINT;
+		registerNumber-: SIZE;
 		inRegister-: BOOLEAN;
 		preferRegister-: BOOLEAN;
 
@@ -3037,7 +3037,7 @@ TYPE
 			inRegister := b;
 		END InRegister
 
-		PROCEDURE RegisterNumber*(reg: LONGINT);
+		PROCEDURE RegisterNumber*(reg: SIZE);
 		BEGIN
 			registerNumber := reg
 		END RegisterNumber;

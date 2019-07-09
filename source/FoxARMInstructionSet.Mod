@@ -342,7 +342,7 @@ CONST
 		END;
 
 		Instruction*= RECORD
-			format: LONGINT;
+			format: SIZE;
 			condition: LONGINT;
 			flags: SET;
 			operands: ARRAY  MaxOperands OF Operand;
@@ -660,7 +660,7 @@ CONST
 	PROCEDURE MakeInstruction*(VAR instruction: Instruction; mnemonic, condition: LONGINT; flags: SET; CONST operands: ARRAY OF Operand): BOOLEAN;
 	VAR
 		format: InstructionFormat;
-		i, dummyEncoding: LONGINT;
+		i: SIZE; dummyEncoding: LONGINT;
 		result: BOOLEAN;
 
 		PROCEDURE OperandMatches(encoding: LONGINT; CONST operand: Operand): BOOLEAN;
@@ -862,7 +862,7 @@ CONST
 		*)
 		PROCEDURE SplittedUnsigned(val: LONGINT; positions: ARRAY OF INTEGER);
 		VAR
-			i, len: LONGINT;
+			i, len: SIZE;
 		BEGIN
 			ASSERT(LEN(positions) <= 32);
 			FOR i := 0 TO LEN(positions) - 1 DO ASSERT(positions[i] <= 32); ASSERT(positions[i] >= 0) END;

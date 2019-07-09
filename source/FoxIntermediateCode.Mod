@@ -85,7 +85,7 @@ TYPE
 	Operand* = RECORD
 		mode-: SHORTINT; (* Undefined, ModeRegister, ModeImmediate, ModeMemory, ModeNumber or ModeString *)
 		type-: Type; (* size and form *)
-		register-: LONGINT; (* (virtual) register number, equals None if no register *)
+		register-: SIZE; (* (virtual) register number, equals None if no register *)
 		registerClass-: RegisterClass; (* normal register vs. special registers such as parameter registers *)
 		offset-: SIZE; (* offset on register or immediate symbol, in units *)
 		intValue-: HUGEINT; (* integer value, if mode = ModeImmediate and type.form IN Integer or ModeNumber *)
@@ -531,7 +531,7 @@ TYPE
 		RETURN TRUE
 	END CheckInstruction;
 
-	PROCEDURE DumpRegister*(w: Streams.Writer; registerNumber: LONGINT; CONST registerClass: RegisterClass);
+	PROCEDURE DumpRegister*(w: Streams.Writer; registerNumber: SIZE; CONST registerClass: RegisterClass);
 	BEGIN
 		IF registerNumber = SP THEN
 			w.String("sp")
@@ -665,7 +665,7 @@ TYPE
 			Undefined:
 		|ModeMemory:
 			IF operand.register # None THEN
-				w.RawLInt(operand.register);
+				w.RawLInt(operand.register(LONGINT));
 				w.RawSInt(operand.registerClass.class);
 				w.RawInt(operand.registerClass.number);
 				w.RawLInt(operand.offset(LONGINT));
@@ -677,7 +677,7 @@ TYPE
 			ELSE w.RawLInt(SHORT(operand.intValue));
 			END;
 		|ModeRegister:
-			w.RawLInt(operand.register);
+			w.RawLInt(operand.register(LONGINT));
 			w.RawSInt(operand.registerClass.class);
 			w.RawInt(operand.registerClass.number);
 			w.RawLInt(operand.offset(LONGINT));
@@ -891,7 +891,7 @@ TYPE
 		op.symbolOffset := 0;
 	END InitOperand;
 
-	PROCEDURE InitRegister*(VAR op: Operand; type: Type; registerClass: RegisterClass;  register: LONGINT);
+	PROCEDURE InitRegister*(VAR op: Operand; type: Type; registerClass: RegisterClass;  register: SIZE);
 	BEGIN
 		Assert((register >0) OR (register = SP) OR (register = FP) OR (register = AP) OR (register = LR) OR (register <= HwRegister) ,"unmapped register number");
 		InitOperand(op);
@@ -901,12 +901,12 @@ TYPE
 		op.register := register;
 	END InitRegister;
 
-	PROCEDURE Register*(type: Type; registerClass: RegisterClass; register: LONGINT): Operand;
+	PROCEDURE Register*(type: Type; registerClass: RegisterClass; register: SIZE): Operand;
 	VAR op: Operand;
 	BEGIN InitRegister(op,type,registerClass, register); RETURN op
 	END Register;
 
-	PROCEDURE RegisterOffset*(type: Type; registerClass: RegisterClass; register, offset: LONGINT): Operand;
+	PROCEDURE RegisterOffset*(type: Type; registerClass: RegisterClass; register: SIZE; offset: LONGINT): Operand;
 	VAR op: Operand;
 	BEGIN InitRegister(op,type,registerClass, register); SetOffset (op, offset); RETURN op
 	END RegisterOffset;
@@ -1083,7 +1083,7 @@ TYPE
 		RETURN None;
 	END FindMnemonic;
 
-	PROCEDURE SetRegister*(VAR op: Operand; reg: LONGINT);
+	PROCEDURE SetRegister*(VAR op: Operand; reg: SIZE);
 	BEGIN
 		op.register := reg; ASSERT(reg # 0);
 	END SetRegister;

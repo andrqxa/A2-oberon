@@ -752,7 +752,7 @@ TYPE
 		(*-------------------  particular register mappings / operands  ----------------------*)
 
 		(* returns if a virtual register is mapped to the register set described by virtualRegisterMapping*)
-		PROCEDURE MappedTo(CONST virtualRegister: LONGINT; part:LONGINT; physicalRegister: LONGINT): BOOLEAN;
+		PROCEDURE MappedTo(CONST virtualRegister: SIZE; part:LONGINT; physicalRegister: LONGINT): BOOLEAN;
 		VAR ticket: Ticket;
 		BEGIN
 			IF (virtualRegister > 0) THEN
@@ -936,7 +936,7 @@ TYPE
 		END GetImmediate;
 
 		PROCEDURE GetMemory(CONST virtual: IntermediateCode.Operand; part: LONGINT; VAR physical: Assembler.Operand);
-		VAR type: IntermediateCode.Type; virtualRegister, physicalRegister: LONGINT; offset: SIZE; ticket,orig: Ticket; dest, source: Assembler.Operand;
+		VAR type: IntermediateCode.Type; virtualRegister: SIZE; physicalRegister: LONGINT; offset: SIZE; ticket,orig: Ticket; dest, source: Assembler.Operand;
 		BEGIN
 			ASSERT(virtual.mode = IntermediateCode.ModeMemory);
 			GetPartType(virtual.type,part,type);
@@ -994,7 +994,7 @@ TYPE
 		END GetMemory;
 
 		PROCEDURE GetRegister(CONST virtual: IntermediateCode.Operand; part:LONGINT; VAR physical: Assembler.Operand; VAR ticket: Ticket);
-		VAR type: IntermediateCode.Type; virtualRegister, tempReg: LONGINT;
+		VAR type: IntermediateCode.Type; virtualRegister: SIZE; tempReg: LONGINT;
 			tmp,imm: Assembler.Operand; index: LONGINT;
 		BEGIN
 			ASSERT(virtual.mode = IntermediateCode.ModeRegister);

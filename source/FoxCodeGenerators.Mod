@@ -42,7 +42,7 @@ TYPE
 			table := new;
 		END Grow;
 
-		PROCEDURE Use(register: WORD; pc: SIZE);
+		PROCEDURE Use(register: SIZE; pc: SIZE);
 		BEGIN
 			IF LEN(table) <= register THEN Grow END;
 			IF table[register].first >pc THEN table[register].first := pc END;
@@ -53,7 +53,7 @@ TYPE
 
 	RegisterEntry* = POINTER TO RECORD
 		prev,next: RegisterEntry;
-		register: LONGINT;
+		register: SIZE;
 		registerClass: IntermediateCode.RegisterClass;
 		type: IntermediateCode.Type;
 	END;
@@ -65,7 +65,7 @@ TYPE
 		BEGIN first := NIL; last := NIL; cache := NIL;
 		END Init;
 
-		PROCEDURE AddRegisterEntry(register: LONGINT; class: IntermediateCode.RegisterClass; type: IntermediateCode.Type);
+		PROCEDURE AddRegisterEntry(register: SIZE; class: IntermediateCode.RegisterClass; type: IntermediateCode.Type);
 		VAR new: RegisterEntry;
 		BEGIN
 			(* allocate *)
@@ -83,7 +83,7 @@ TYPE
 			END;
 		END AddRegisterEntry;
 
-		PROCEDURE RemoveRegisterEntry(register: LONGINT);
+		PROCEDURE RemoveRegisterEntry(register: SIZE);
 		VAR this: RegisterEntry;
 		BEGIN
 			(* search *)
@@ -219,12 +219,12 @@ TYPE
 
 			PROCEDURE Optimize;
 			TYPE
-				Entry= POINTER TO RECORD src, dest: LONGINT; next: Entry END;
+				Entry= POINTER TO RECORD src, dest: SIZE; next: Entry END;
 			VAR
 				pc: SIZE;
 				first: Entry;
 
-				PROCEDURE AddMap(src, dest: LONGINT);
+				PROCEDURE AddMap(src, dest: SIZE);
 				VAR entry: Entry;
 				BEGIN
 					NEW(entry); entry.src := src; entry.dest := dest;
@@ -257,7 +257,7 @@ TYPE
 				END CheckMapped;
 
 				PROCEDURE CheckMov(VAR instruction: IntermediateCode.Instruction);
-				VAR srcReg, destReg: LONGINT;
+				VAR srcReg, destReg: SIZE;
 				BEGIN
 					IF (instruction.opcode = IntermediateCode.mov) & (instruction.op1.mode = IntermediateCode.ModeRegister)
 						& (instruction.op2.mode = IntermediateCode.ModeRegister) & IntermediateCode.TypeEquals(instruction.op1.type, instruction.op2.type) THEN
@@ -443,12 +443,12 @@ TYPE
 			ResolveLocalFixups;
 		END Section;
 
-		PROCEDURE FirstUse*(virtualRegister: LONGINT): SIZE;
+		PROCEDURE FirstUse*(virtualRegister: SIZE): SIZE;
 		BEGIN
 			IF (virtualRegister > 0)  THEN RETURN allocation.table[virtualRegister].first ELSE RETURN None END;
 		END FirstUse;
 
-		PROCEDURE LastUse*(virtualRegister: LONGINT): SIZE;
+		PROCEDURE LastUse*(virtualRegister: SIZE): SIZE;
 		BEGIN
 			IF (virtualRegister > 0)  THEN RETURN allocation.table[virtualRegister].last ELSE RETURN None END;
 		END LastUse;
@@ -545,7 +545,7 @@ TYPE
 		lastuse-: SIZE;
 		spilled*, spillable*: BOOLEAN;
 		register*, offset*: LONGINT;
-		parts-: LONGINT;
+		parts-: SIZE;
 	END;
 
 	Tickets*=OBJECT
@@ -619,23 +619,23 @@ TYPE
 	VirtualRegisters*=OBJECT
 	VAR
 		tickets: VirtualRegisterMappings;
-		parts: LONGINT;
+		parts: SIZE;
 
-		firstMapped-, lastMapped-: LONGINT;
+		firstMapped-, lastMapped-: SIZE;
 
-		PROCEDURE &Init*(parts: LONGINT);
-		VAR i: LONGINT;
+		PROCEDURE &Init*(parts: SIZE);
+		VAR i: SIZE;
 		BEGIN
 			SELF.parts := parts;
 			IF tickets = NIL THEN NEW(tickets,64*parts) END;
 			FOR i := 0 TO LEN(tickets)-1 DO
 				tickets[i]:=NIL;
 			END;
-			firstMapped := MAX(LONGINT); lastMapped := -1;
+			firstMapped := MAX(SIZE); lastMapped := -1;
 		END Init;
 
 		PROCEDURE Grow;
-		VAR new: VirtualRegisterMappings; i: LONGINT;
+		VAR new: VirtualRegisterMappings; i: SIZE;
 		BEGIN
 			NEW(new,LEN(tickets)*2);
 			FOR i := 0 TO LEN(tickets)-1 DO
@@ -647,13 +647,13 @@ TYPE
 			tickets := new;
 		END Grow;
 
-		PROCEDURE Mapped*(register: LONGINT; part: LONGINT): Ticket;
+		PROCEDURE Mapped*(register: SIZE; part: SIZE): Ticket;
 		BEGIN
 			ASSERT((part >=0) & (part < parts));
 			IF (register > 0 ) & (register*parts < LEN(tickets)) THEN RETURN tickets[register * parts + part] ELSE RETURN NIL END;
 		END Mapped;
 
-		PROCEDURE SetMapped*(register: LONGINT; part: LONGINT; ticket: Ticket);
+		PROCEDURE SetMapped*(register: SIZE; part: SIZE; ticket: Ticket);
 		BEGIN
 			IF lastMapped < register THEN lastMapped := register END;
 			IF firstMapped > register THEN firstMapped := register END;
@@ -664,8 +664,8 @@ TYPE
 			INC(ticket.parts);
 		END SetMapped;
 
-		PROCEDURE Unmap*(register: LONGINT);
-		VAR i: LONGINT;
+		PROCEDURE Unmap*(register: SIZE);
+		VAR i: SIZE;
 		BEGIN
 			IF (register > 0) & (register*parts < LEN(tickets)) THEN
 				FOR i := 0 TO parts-1 DO
@@ -685,12 +685,12 @@ TYPE
 			END;
 		END Unmap;
 
-		PROCEDURE Parts*(): LONGINT;
+		PROCEDURE Parts*(): SIZE;
 		BEGIN RETURN parts
 		END Parts;
 
 		PROCEDURE Dump*(w: Streams.Writer);
-		VAR register,part: LONGINT; ticket: Ticket;
+		VAR register,part: SIZE; ticket: Ticket;
 		BEGIN
 			w.String("---- virtual register mapping ----- "); w.Ln;
 			register := 0;
@@ -1028,7 +1028,7 @@ TYPE
 
 		(*-------------------  register mapping  ----------------------*)
 
-		PROCEDURE MapVirtualRegister*(virtualRegister: LONGINT; class: IntermediateCode.RegisterClass; type: IntermediateCode.Type; part: LONGINT);
+		PROCEDURE MapVirtualRegister*(virtualRegister: SIZE; class: IntermediateCode.RegisterClass; type: IntermediateCode.Type; part: LONGINT);
 		VAR partType: IntermediateCode.Type; lastuse:SIZE;
 
 			PROCEDURE MapTicket(CONST type: IntermediateCode.Type; lastuse:SIZE);
@@ -1175,7 +1175,7 @@ TYPE
 		END ReserveTicketRegister;
 
 		PROCEDURE ReserveOperandRegisters*(CONST operand: IntermediateCode.Operand; reserved: BOOLEAN);
-		VAR i: LONGINT; ticket: Ticket;
+		VAR i: SIZE; ticket: Ticket;
 		BEGIN
 			FOR i := 0 TO virtualRegisters.Parts()-1 DO
 				ticket := virtualRegisters.Mapped(operand.register,i);

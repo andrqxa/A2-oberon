@@ -56,7 +56,7 @@ TYPE
 		PROCEDURE GetSpecialRegisterWithFields(VAR registerNumber: LONGINT; VAR fields: SET): BOOLEAN;
 		VAR
 			result: BOOLEAN;
-			i: LONGINT;
+			i: SIZE;
 			strings: Strings.StringArray;
 		BEGIN
 			result := FALSE;

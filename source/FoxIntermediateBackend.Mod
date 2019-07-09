@@ -1032,13 +1032,13 @@ TYPE
 
 	END DeclarationEmitter;
 
-	UsedArray=POINTER TO ARRAY OF RECORD count: LONGINT; map: LONGINT; type: IntermediateCode.Type; class: IntermediateCode.RegisterClass END;
+	UsedArray=POINTER TO ARRAY OF RECORD count: SIZE; map: SIZE; type: IntermediateCode.Type; class: IntermediateCode.RegisterClass END;
 
 	RegisterUsageCount=OBJECT
-	VAR used: UsedArray; count: LONGINT;
+	VAR used: UsedArray; count: SIZE;
 
 		PROCEDURE &Init;
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN
 			count := 0;
 			IF used = NIL THEN NEW(used,64); END;
@@ -1046,7 +1046,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Grow;
-		VAR new: UsedArray; size,i: LONGINT;
+		VAR new: UsedArray; size,i: SIZE;
 		BEGIN
 			size := LEN(used)*2;
 			NEW(new,size);
@@ -1059,7 +1059,7 @@ TYPE
 			used := new
 		END Grow;
 
-		PROCEDURE Next(type: IntermediateCode.Type; class: IntermediateCode.RegisterClass): LONGINT;
+		PROCEDURE Next(type: IntermediateCode.Type; class: IntermediateCode.RegisterClass): SIZE;
 		BEGIN
 			INC(count);
 			IF count = LEN(used) THEN Grow END;
@@ -1069,7 +1069,7 @@ TYPE
 			RETURN count;
 		END Next;
 
-		PROCEDURE IncUse(register: LONGINT);
+		PROCEDURE IncUse(register: SIZE);
 		BEGIN
 			INC(used[register].count);
 			(*
@@ -1079,13 +1079,13 @@ TYPE
 			*)
 		END IncUse;
 
-		PROCEDURE DecUse(register: LONGINT);
+		PROCEDURE DecUse(register: SIZE);
 		BEGIN
 			DEC(used[register].count);
 		END DecUse;
 
-		PROCEDURE Map(register: LONGINT): LONGINT;
-		VAR map : LONGINT;
+		PROCEDURE Map(register: SIZE): SIZE;
+		VAR map : SIZE;
 		BEGIN
 			IF register > 0 THEN
 				map := used[register].map;
@@ -1094,7 +1094,7 @@ TYPE
 			RETURN register
 		END Map;
 
-		PROCEDURE Use(register: LONGINT): LONGINT;
+		PROCEDURE Use(register: SIZE): SIZE;
 		BEGIN
 			IF register< LEN(used) THEN
 				RETURN used[register].count
@@ -1107,7 +1107,7 @@ TYPE
 
 	RegisterEntry = POINTER TO RECORD
 		prev,next: RegisterEntry;
-		register: LONGINT;
+		register: SIZE;
 		registerClass: IntermediateCode.RegisterClass;
 		type: IntermediateCode.Type;
 	END;
@@ -1395,8 +1395,8 @@ TYPE
 			RETURN section
 		END NewSection;
 
-		PROCEDURE AcquireRegister(CONST type: IntermediateCode.Type; class: IntermediateCode.RegisterClass): LONGINT;
-		VAR new: LONGINT;
+		PROCEDURE AcquireRegister(CONST type: IntermediateCode.Type; class: IntermediateCode.RegisterClass): SIZE;
+		VAR new: SIZE;
 		BEGIN
 			new :=  registerUsageCount.Next(type,class);
 			UseRegister(new);
@@ -2463,14 +2463,14 @@ TYPE
 		END EvaluateSet;
 
 		PROCEDURE NewRegisterOperand(type: IntermediateCode.Type): IntermediateCode.Operand;
-		VAR op: IntermediateCode.Operand; reg: LONGINT;
+		VAR op: IntermediateCode.Operand; reg: SIZE;
 		BEGIN
 			reg := AcquireRegister(type,IntermediateCode.GeneralPurposeRegister);
 			IntermediateCode.InitRegister(op, type, IntermediateCode.GeneralPurposeRegister,reg);
 			RETURN op
 		END NewRegisterOperand;
 
-		PROCEDURE UnuseRegister(register: LONGINT);
+		PROCEDURE UnuseRegister(register: SIZE);
 		BEGIN
 			IF (register > 0) THEN
 				register := registerUsageCount.Map(register);
@@ -2494,7 +2494,7 @@ TYPE
 			END;
 		END UnuseRegister;
 
-		PROCEDURE UseRegister(register: LONGINT);
+		PROCEDURE UseRegister(register: SIZE);
 		BEGIN
 			IF (register > 0) THEN
 				register := registerUsageCount.Map(register);
@@ -2610,7 +2610,7 @@ TYPE
 		END RestoreRegisterUse;
 
 		PROCEDURE CheckRegistersFree;
-		VAR r: RegisterEntry; warning: ARRAY 128 OF CHAR; i: LONGINT;
+		VAR r: RegisterEntry; warning: ARRAY 128 OF CHAR; i: SIZE;
 		BEGIN
 			IF usedRegisters # NIL THEN
 				r := usedRegisters;
@@ -9841,7 +9841,7 @@ TYPE
 
 		PROCEDURE DesignateVariable(x: SyntaxTree.Variable; VAR result (* in / out *): Operand);
 		VAR symbol: Sections.Section;  type: SyntaxTree.Type; recordType: SyntaxTree.RecordType;
-			name: Basic.SegmentedName; temp, basereg: IntermediateCode.Operand; reg: LONGINT;
+			name: Basic.SegmentedName; temp, basereg: IntermediateCode.Operand; reg: SIZE;
 			nm: ARRAY 256 OF CHAR;
 		BEGIN
 			IF Trace THEN TraceEnter("DesignateVariable");  END;
@@ -9953,7 +9953,7 @@ TYPE
 
 		PROCEDURE DesignateParameter(x: SyntaxTree.Parameter; VAR result: Operand);
 		VAR type: SyntaxTree.Type; basereg, mem: IntermediateCode.Operand; symbol: Sections.Section;
-			name: Basic.SegmentedName; ptype: SyntaxTree.Type; temp: IntermediateCode.Operand; reg: LONGINT;
+			name: Basic.SegmentedName; ptype: SyntaxTree.Type; temp: IntermediateCode.Operand; reg: SIZE;
 		BEGIN
 			type := x.type.resolved;
 			IF Trace THEN TraceEnter("DesignateParameter") END;
@@ -12237,7 +12237,7 @@ TYPE
 			END ExportDesc2;
 
 			PROCEDURE Export(CONST sections: ARRAY OF Sections.Section);
-			VAR level, olevel, s: LONGINT; prev, this: Basic.SegmentedName; name: ARRAY 256 OF CHAR;
+			VAR level, olevel, s: SIZE; prev, this: Basic.SegmentedName; name: ARRAY 256 OF CHAR;
 				scopes: ARRAY LEN(prev)+1 OF Scope; arrayName: ARRAY 32 OF CHAR;
 				sym: Sections.Section; offset: SIZE; symbol: Sections.Section;
 				nextPatch: SIZE;
@@ -14183,7 +14183,7 @@ TYPE
 		RETURN  ~parameter.type.IsComposite() OR PassBySingleReference(parameter,callingConvention)
 	END PassInRegister;
 
-	PROCEDURE AddRegisterEntry(VAR queue: RegisterEntry; register: LONGINT; class: IntermediateCode.RegisterClass; type: IntermediateCode.Type);
+	PROCEDURE AddRegisterEntry(VAR queue: RegisterEntry; register: SIZE; class: IntermediateCode.RegisterClass; type: IntermediateCode.Type);
 	VAR new: RegisterEntry;
 	BEGIN
 		NEW(new); new.register := register; new.registerClass := class; new.type := type; new.next := NIL; new.prev := NIL;
@@ -14196,7 +14196,7 @@ TYPE
 		END;
 	END AddRegisterEntry;
 
-	PROCEDURE RemoveRegisterEntry(VAR queue: RegisterEntry; register: LONGINT): BOOLEAN;
+	PROCEDURE RemoveRegisterEntry(VAR queue: RegisterEntry; register: SIZE): BOOLEAN;
 	VAR this: RegisterEntry;
 	BEGIN
 		this := queue;
