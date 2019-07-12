@@ -1159,7 +1159,7 @@ TYPE
 		keywordsLower, keywordsUpper: KeywordTable;
 
 	(** return a new scanner on a stream, error output via diagnostics  **)
-	PROCEDURE NewScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; position: LONGINT; diagnostics: Diagnostics.Diagnostics ): Scanner;
+	PROCEDURE NewScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; position: Streams.Position; diagnostics: Diagnostics.Diagnostics ): Scanner;
 	VAR s: Scanner; pos: Position;
 	BEGIN
 		pos.start := position;
@@ -1169,7 +1169,7 @@ TYPE
 		NEW( s, source, reader, pos, diagnostics );  RETURN s;
 	END NewScanner;
 
-	PROCEDURE NewAssemblerScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; position: LONGINT; diagnostics: Diagnostics.Diagnostics ): AssemblerScanner;
+	PROCEDURE NewAssemblerScanner*( CONST source: ARRAY OF CHAR; reader: Streams.Reader; position: Streams.Position; diagnostics: Diagnostics.Diagnostics ): AssemblerScanner;
 	VAR s: AssemblerScanner;pos: Position;
 	BEGIN
 		pos.start := position;
