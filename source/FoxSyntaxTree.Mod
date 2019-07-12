@@ -2670,7 +2670,7 @@ TYPE
 		BEGIN RETURN (v# NIL) & (v IS EnumerationValue) & (v(EnumerationValue).value = value); END Equals;
 
 	END EnumerationValue;
-	
+
 	ProcedureValue* = OBJECT (Value)
 	VAR
 		value-: Procedure;
@@ -2686,7 +2686,7 @@ TYPE
 
 		PROCEDURE Equals*(v: Expression):BOOLEAN;
 		BEGIN RETURN (v# NIL) & (v IS ProcedureValue) & (v(ProcedureValue).value = value); END Equals;
-		
+
 	END ProcedureValue;
 
 	(**** symbols ****)
@@ -3304,7 +3304,7 @@ TYPE
 			type := importType;
 			parameters := NIL;
 		END InitImport;
-		
+
 		PROCEDURE SetType*(type: Type);
 		BEGIN
 			ASSERT(type = importType);
@@ -3333,7 +3333,7 @@ TYPE
 		BEGIN
 			parameters := p;
 		END SetParameters;
-		
+
 
 	END Import;
 
@@ -4923,11 +4923,11 @@ TYPE
 	(** <<expression, expression, ...>> **)
 	Identifiers* = OBJECT
 	TYPE
-		IdentifierArray = POINTER TO ARRAY OF Identifier;	
-		VAR 
+		IdentifierArray = POINTER TO ARRAY OF Identifier;
+		VAR
 			list: IdentifierArray;
 			len: SIZE;
-	
+
 		PROCEDURE & InitList*;
 		BEGIN NEW( list,8 ); len := 0;
 		END InitList;

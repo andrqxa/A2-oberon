@@ -8,7 +8,7 @@ IMPORT SYSTEM, Trace, Glue, Unix, Machine, Heaps, Modules;
 CONST
 	ConcurrentGC = TRUE; (* if TRUE then release needs to be compiled with --writeBarriers *)
 	LinuxHost = Unix.Version = "Linux";
-	
+
 	(*! Process flags, meaningless in Unix ports !!! *)
 	PleaseHalt* = 10;		(* Process requested to Halt itself soon *)
 	Unbreakable*= 11;		(* FINALLY shall not catch HALT exception (PleaseHalt is also set) *)

@@ -65,7 +65,7 @@ CONST
 	StringTRMS*="TRMS";
 	StringBackend*="Backend";
 	StringRuntime*="Runtime";
-	
+
 	(* traps *)
 	WithTrap* = 1;
 	CaseTrap* = 2;
@@ -1864,9 +1864,9 @@ TYPE
 		NameUncooperative := SyntaxTree.NewIdentifier(StringUncooperative);
 		NameFingerprint := SyntaxTree.NewIdentifier(StringFingerprint);
 
-		NameGlobal := SyntaxTree.NewIdentifier("@GLOBAL"); 
-		Nameglobal := SyntaxTree.NewIdentifier("@global"); 
-		
+		NameGlobal := SyntaxTree.NewIdentifier("@GLOBAL");
+		Nameglobal := SyntaxTree.NewIdentifier("@global");
+
 
 		(* types *)
 		Boolean8 := SyntaxTree.NewBooleanType(8);

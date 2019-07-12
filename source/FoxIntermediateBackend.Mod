@@ -978,7 +978,7 @@ TYPE
 			(* add import names to the generated Sections.Module *)
 			import := x.moduleScope.firstImport;
 			WHILE import # NIL DO
-				IF import.parameters = NIL THEN 
+				IF import.parameters = NIL THEN
 					import.module.GetName(idstr);
 					module.imports.AddName(idstr);
 				ELSE
@@ -13934,7 +13934,7 @@ TYPE
 				END;
 			END
 		END CheckTypeDeclaration
-		
+
 
 	END MetaDataGenerator;
 
@@ -15004,7 +15004,7 @@ TYPE
 	BEGIN
 		RETURN (scope.ownerModule = module) OR (scope.ownerModule.moduleScope.outerScope = module.moduleScope);
 	END InThisModule;
-	
+
 
 BEGIN
 	Init;

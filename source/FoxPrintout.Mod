@@ -888,7 +888,7 @@ TYPE
 		PROCEDURE VisitEnumerationValue*(x: SyntaxTree.EnumerationValue);
 		BEGIN w.Int(x.value,1);
 		END VisitEnumerationValue;
-		
+
 		PROCEDURE VisitProcedureValue*(x: SyntaxTree.ProcedureValue);
 		BEGIN
 			Symbol(x.value);
@@ -1377,7 +1377,7 @@ TYPE
 					END;
 				END;
 				w.String(">");
-			END; 
+			END;
 			IF (x.context # SyntaxTree.invalidIdentifier) & (x.context#context) THEN
 				Keyword(" IN ");
 				Identifier(x.context)
@@ -1872,7 +1872,7 @@ TYPE
 						IF i < x.parameters.Length()-1 THEN
 							w.String(", ");
 						END;
-					END; 
+					END;
 					w.String(">");
 				END;
 				IF (x.context # SyntaxTree.invalidIdentifier) & (x.context#Global.A2Name) THEN
