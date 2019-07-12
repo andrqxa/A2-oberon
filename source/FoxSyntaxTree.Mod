@@ -290,6 +290,9 @@ TYPE
 		PROCEDURE VisitEnumerationValue*(x: EnumerationValue);
 		BEGIN HALT(100) (* abstract *) END VisitEnumerationValue;
 
+		PROCEDURE VisitProcedureValue*(x: ProcedureValue);
+		BEGIN HALT(100) (* abstract *) END VisitProcedureValue;
+
 		PROCEDURE VExpression*(x: Expression);
 		BEGIN
 			WITH x:
@@ -326,6 +329,7 @@ TYPE
 			| StringValue DO VisitStringValue(x)
 			| NilValue DO VisitNilValue(x)
 			| EnumerationValue DO VisitEnumerationValue(x);
+			| ProcedureValue DO VisitProcedureValue(x);
 			| Value DO VisitValue(x);
 			ELSE
 				VisitExpression(x)
@@ -2666,6 +2670,24 @@ TYPE
 		BEGIN RETURN (v# NIL) & (v IS EnumerationValue) & (v(EnumerationValue).value = value); END Equals;
 
 	END EnumerationValue;
+	
+	ProcedureValue* = OBJECT (Value)
+	VAR
+		value-: Procedure;
+
+		PROCEDURE & InitProcedureValue(position: Position; value: Procedure);
+		BEGIN
+			InitValue(position);  SELF.value := value;
+		END InitProcedureValue;
+
+		PROCEDURE SetValue*(value: Procedure);
+		BEGIN SELF.value := value
+		END SetValue;
+
+		PROCEDURE Equals*(v: Expression):BOOLEAN;
+		BEGIN RETURN (v# NIL) & (v IS ProcedureValue) & (v(ProcedureValue).value = value); END Equals;
+		
+	END ProcedureValue;
 
 	(**** symbols ****)
 
@@ -2787,6 +2809,7 @@ TYPE
 
 	END Symbol;
 
+
 	(** <<expression, expression, ...>> **)
 	Symbols* = OBJECT
 		VAR list: Basic.List;
@@ -2842,7 +2865,7 @@ TYPE
 		PROCEDURE SetDeclaredType*(type: Type);
 		BEGIN
 			declaredType := type;
-			IF ~(type IS BasicType) THEN
+			IF ~(type IS BasicType) & (type.typeDeclaration = NIL)  THEN
 				type.typeDeclaration := SELF;
 			END;
 		END SetDeclaredType;
@@ -3269,6 +3292,7 @@ TYPE
 			moduleName-: Identifier;
 			context-: Identifier;
 			direct-: BOOLEAN; (* direct import *)
+			parameters-: ExpressionList;
 
 		PROCEDURE & InitImport( position: Position;  name, moduleName: Identifier; direct: BOOLEAN );
 		BEGIN
@@ -3278,8 +3302,9 @@ TYPE
 			context := invalidIdentifier;
 			SELF.moduleName := moduleName;
 			type := importType;
+			parameters := NIL;
 		END InitImport;
-
+		
 		PROCEDURE SetType*(type: Type);
 		BEGIN
 			ASSERT(type = importType);
@@ -3303,6 +3328,12 @@ TYPE
 		BEGIN
 			SELF.context := context
 		END SetContext;
+
+		PROCEDURE SetParameters*(p: ExpressionList);
+		BEGIN
+			parameters := p;
+		END SetParameters;
+		
 
 	END Import;
 
@@ -4889,6 +4920,46 @@ TYPE
 
 	END ModuleScope;
 
+	(** <<expression, expression, ...>> **)
+	Identifiers* = OBJECT
+	TYPE
+		IdentifierArray = POINTER TO ARRAY OF Identifier;	
+		VAR 
+			list: IdentifierArray;
+			len: SIZE;
+	
+		PROCEDURE & InitList*;
+		BEGIN NEW( list,8 ); len := 0;
+		END InitList;
+
+		PROCEDURE Length*( ): SIZE;
+		BEGIN RETURN len;
+		END Length;
+
+		PROCEDURE Add*( d: Identifier );
+		VAR l: IdentifierArray; i: SIZE;
+		BEGIN
+			IF len = LEN(list) THEN
+				NEW(l, 2*len);
+				FOR i := 0 TO len-1 DO
+					l[i] := list[i];
+				END;
+			END;
+			list[len] := d;
+			INC(len);
+		END Add;
+
+		PROCEDURE Get*( index: SIZE ): Identifier;
+		BEGIN
+			RETURN list[index];
+		END Get;
+
+		PROCEDURE Set*(index: SIZE; symbol: Identifier);
+		BEGIN list[index] := symbol;
+		END Set;
+
+	END Identifiers;
+
 	(* << MODULE name ['in' context] moduleScope name '.' >>  *)
 	Module* = OBJECT (Symbol)
 		VAR
@@ -4899,6 +4970,7 @@ TYPE
 			isCellNet-: BOOLEAN;
 			closingComment-: Comment;
 			modifiers-: Modifier;
+			parameters-: Identifiers;
 
 		PROCEDURE & InitModule( CONST sourceName: ARRAY OF CHAR; position: Position; name: Identifier; scope: ModuleScope; case: LONGINT);
 		BEGIN
@@ -4913,6 +4985,7 @@ TYPE
 			closingComment := NIL;
 			isCellNet := FALSE;
 			modifiers := NIL;
+			parameters := NIL;
 		END InitModule;
 
 		PROCEDURE SetCase*(case: LONGINT);
@@ -4940,39 +5013,11 @@ TYPE
 		BEGIN SELF.modifiers := modifiers
 		END SetModifiers;
 
+		PROCEDURE SetParameters*(parameters: Identifiers);
+		BEGIN SELF.parameters := parameters;
+		END SetParameters;
+
 	END Module;
-
-	(** <<expression, expression, ...>> **)
-	SymbolList* = OBJECT
-		VAR list: Basic.List;
-
-		PROCEDURE & InitList*;
-		BEGIN NEW( list,8 );
-		END InitList;
-
-		PROCEDURE Length*( ): SIZE;
-		BEGIN RETURN list.Length();
-		END Length;
-
-		PROCEDURE AddSymbol*( d: Symbol );
-		BEGIN list.Add(d)
-		END AddSymbol;
-
-		PROCEDURE GetSymbol*( index: SIZE ): Symbol;
-		VAR p: ANY;
-		BEGIN
-			p := list.Get(index); RETURN p(Symbol);
-		END GetSymbol;
-
-		PROCEDURE SetSymbol*(index: SIZE; expression: Symbol);
-		BEGIN list.Set(index,expression)
-		END SetSymbol;
-
-		PROCEDURE RemoveSymbol*(i: SIZE);
-		BEGIN list.RemoveByIndex(i);
-		END RemoveSymbol;
-
-	END SymbolList;
 
 	ProcedureList* = OBJECT
 		VAR list: Basic.List;
@@ -5113,6 +5158,8 @@ VAR
 			result := NewNilValue(x.position);
 		| EnumerationValue DO
 			result := NewEnumerationValue(x.position, x.value);
+		| ProcedureValue DO
+			result := NewProcedureValue(x.position, x.value);
 		ELSE
 			HALT(100);
 		END;
@@ -5621,6 +5668,12 @@ VAR
 	BEGIN
 		NEW( enumeratorValue, position, value );  RETURN enumeratorValue
 	END NewEnumerationValue;
+
+	PROCEDURE NewProcedureValue*( position: Position; value: Procedure ): ProcedureValue;
+	VAR procedureValue: ProcedureValue;
+	BEGIN
+		NEW( procedureValue, position, value );  RETURN procedureValue
+	END NewProcedureValue;
 
 	PROCEDURE NewStatement*(outer: Statement): Statement; (* for error handling: invalid Statement *)
 	VAR statement: Statement;

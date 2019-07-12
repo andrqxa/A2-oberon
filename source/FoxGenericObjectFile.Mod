@@ -219,14 +219,14 @@ TYPE
 					import := module.module.moduleScope.firstImport;
 					numImports := 0;
 					WHILE import # NIL DO
-						IF import.direct THEN INC(numImports) END;
+						IF import.direct & (import.parameters = NIL) THEN INC(numImports) END;
 						import := import.nextImport;
 					END;
 					NEW(requires, numImports);
 					numImports := 0;
 					import := module.module.moduleScope.firstImport;
 					WHILE import # NIL DO
-						IF import.direct THEN
+						IF import.direct & (import.parameters = NIL) THEN
 							import.module.GetName(name);
 							requires[numImports] := name;
 							INC(numImports);
