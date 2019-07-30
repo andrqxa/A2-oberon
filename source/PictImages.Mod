@@ -35,7 +35,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 
 	(* pack/unpack procedures for 1 and 4 bit formats *)
 
-	PROCEDURE PackP1 (VAR fmt: Raster.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Raster.Pixel);
+	PROCEDURE PackP1 (VAR fmt: Raster.Format0; adr: ADDRESS; bit: SIZE; VAR pix: Raster.Pixel);
 		VAR b: CHAR;
 	BEGIN
 		SYSTEM.GET(adr, b);
@@ -50,7 +50,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 		END
 	END PackP1;
 
-	PROCEDURE UnpackP1 (VAR fmt: Raster.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Raster.Pixel);
+	PROCEDURE UnpackP1 (VAR fmt: Raster.Format0; adr: ADDRESS; bit: SIZE; VAR pix: Raster.Pixel);
 		VAR b: CHAR;
 	BEGIN
 		SYSTEM.GET(adr, b);
@@ -59,7 +59,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 		END
 	END UnpackP1;
 
-	PROCEDURE PackP4 (VAR fmt: Raster.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Raster.Pixel);
+	PROCEDURE PackP4 (VAR fmt: Raster.Format0; adr: ADDRESS; bit: SIZE; VAR pix: Raster.Pixel);
 		VAR b: CHAR; i: LONGINT;
 	BEGIN
 		SYSTEM.GET(adr, b);
@@ -69,7 +69,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 		END
 	END PackP4;
 
-	PROCEDURE UnpackP4 (VAR fmt: Raster.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Raster.Pixel);
+	PROCEDURE UnpackP4 (VAR fmt: Raster.Format0; adr: ADDRESS; bit: SIZE; VAR pix: Raster.Pixel);
 		VAR b: CHAR;
 	BEGIN
 		SYSTEM.GET(adr, b); pix := fmt.pal.col[ASH(ORD(b), -bit) MOD 10H]

@@ -81,7 +81,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 			pal*: Palette;	(** optional palette for indexed formats **)
 		END;
 
-		PackProc* = PROCEDURE (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+		PackProc* = PROCEDURE (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 
 		Format* = RECORD (Format0)
 			pack*: PackProc;	(** store supported pixel components at given address **)
@@ -108,7 +108,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 			map: POINTER TO ARRAY OF INTEGER;	(* color map for transfer between indexed formats *)
 		END;
 
-		TransferProc* = PROCEDURE (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+		TransferProc* = PROCEDURE (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 
 		Mode* = RECORD (Mode0)
 			transfer*: TransferProc;	(** procedure transfering pixels from source to destination **)
@@ -433,7 +433,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	(**--- Formats ---**)
 
 	(* A1 - one bit alpha, MSB leftmost *)
-	PROCEDURE PackA1 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackA1 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR b: CHAR;
 	BEGIN
 		SYSTEM.GET(adr, b);
@@ -442,7 +442,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END PackA1;
 
-	PROCEDURE UnpackA1 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackA1 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR b: CHAR;
 	BEGIN
 		SYSTEM.GET(adr, b);
@@ -452,12 +452,12 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END UnpackA1;
 
 	(* A8 - 8 bit alpha *)
-	PROCEDURE PackA8 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackA8 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 	BEGIN
 		SYSTEM.PUT(adr, pix[a])
 	END PackA8;
 
-	PROCEDURE UnpackA8 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackA8 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR alpha: LONGINT;
 	BEGIN
 		SYSTEM.GET(adr, pix[a]);
@@ -472,28 +472,28 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END UnpackA8;
 
 	(* P8 - 8 bit indexed format with custom palette *)
-	PROCEDURE PackP8 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackP8 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 	BEGIN
 		IF pix[a] # 0X THEN	(* model alpha as brightness *)
 			SYSTEM.PUT(adr, CHR(CLUTs.Match(fmt.pal.clut, ORD(pix[b]) + ASH(ORD(pix[g]), 8) + ASH(ORD(pix[r]), 16))))
 		END
 	END PackP8;
 
-	PROCEDURE UnpackP8 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackP8 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR idx: CHAR;
 	BEGIN
 		SYSTEM.GET(adr, idx); pix := fmt.pal.col[ORD(idx)]
 	END UnpackP8;
 
 	(* D8 - 8 bit indexed format with display palette *)
-	PROCEDURE PackD8 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackD8 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 	BEGIN
 		IF pix[a] # 0X THEN	(* model alpha as brightness *)
 			SYSTEM.PUT(adr, CHR(ColorToIndex(ORD(pix[b]) + ASH(ORD(pix[g]), 8) + ASH(ORD(pix[r]), 16))))
 		END
 	END PackD8;
 
-	PROCEDURE UnpackD8 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackD8 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR idx: CHAR; col: LONGINT;
 	BEGIN
 		SYSTEM.GET(adr, idx); col := IndexToColor(ORD(idx));
@@ -501,7 +501,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END UnpackD8;
 
 		(* P16 - 16 bit indexed format with custom palette *)
-	PROCEDURE PackP16 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackP16 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 	VAR val:LONGINT;
 	BEGIN
 		IF pix[a] # 0X THEN	(* model alpha as brightness *)
@@ -512,14 +512,14 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END PackP16;
 
-	PROCEDURE UnpackP16 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackP16 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 	BEGIN
 		pix := fmt.pal.col[SYSTEM.GET16(adr) MOD 1000H] 	(*unsigned 16 bit entity*)
 	END UnpackP16;
 
 
 	(* BGR555 - 16 hi-color with 5 bit blue, 5 bit green and 5 bit red in ascending order *)
-	PROCEDURE PackBGR555 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackBGR555 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR int: LONGINT;
 	BEGIN
 		IF pix[a] # 0X THEN	(* model alpha as brightness *)
@@ -528,7 +528,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END PackBGR555;
 
-	PROCEDURE UnpackBGR555 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackBGR555 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR lo, hi: CHAR; int: LONGINT;
 	BEGIN
 		SYSTEM.GET(adr, lo); SYSTEM.GET(adr+1, hi); int := ASH(ORD(hi), 8) + ORD(lo);
@@ -539,7 +539,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END UnpackBGR555;
 
 	(* BGR565 - 16 hi-color with 5 bit blue, 6 bit green and 5 bit red in ascending order *)
-	PROCEDURE PackBGR565 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackBGR565 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR int: LONGINT;
 	BEGIN
 		IF pix[a] # 0X THEN	(* model alpha as brightness *)
@@ -548,7 +548,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END PackBGR565;
 
-	PROCEDURE UnpackBGR565 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackBGR565 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR lo, hi: CHAR; int: LONGINT;
 	BEGIN
 		SYSTEM.GET(adr, lo); SYSTEM.GET(adr+1, hi); int := ASH(ORD(hi), 8) + ORD(lo);
@@ -559,7 +559,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END UnpackBGR565;
 
 	(* BGR466 - 16 hi-color with 4 bit blue, 6 bit green and 6 bit red in ascending order *)
-	PROCEDURE PackBGR466 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackBGR466 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR int: LONGINT;
 	BEGIN
 		IF pix[a] # 0X THEN	(* model alpha as brightness *)
@@ -568,7 +568,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END PackBGR466;
 
-	PROCEDURE UnpackBGR466 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackBGR466 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 		VAR lo, hi: CHAR; int: LONGINT;
 	BEGIN
 		SYSTEM.GET(adr, lo); SYSTEM.GET(adr+1, hi); int := ASH(ORD(hi), 8) + ORD(lo);
@@ -579,25 +579,25 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END UnpackBGR466;
 
 	(* BGR888 - 24 bit true color with blue in lower, green in middle, and red in upper byte *)
-	PROCEDURE PackBGR888 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackBGR888 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 	BEGIN
 		IF pix[a] # 0X THEN	(* model alpha as brightness *)
 			SYSTEM.MOVE(ADDRESSOF(pix[0]), adr, 3)
 		END
 	END PackBGR888;
 
-	PROCEDURE UnpackBGR888 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackBGR888 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 	BEGIN
 		SYSTEM.MOVE(adr, ADDRESSOF(pix[0]), 3); pix[a] := 0FFX
 	END UnpackBGR888;
 
 	(* BGRA8888 - 32 bit true color with blue in lowest, green in lower middle, red in upper middle, and alpha in top byte *)
-	PROCEDURE PackBGRA8888 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE PackBGRA8888 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 	BEGIN
 		SYSTEM.MOVE(ADDRESSOF(pix[0]), adr, 4)
 	END PackBGRA8888;
 
-	PROCEDURE UnpackBGRA8888 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
+	PROCEDURE UnpackBGRA8888 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
 	BEGIN
 		SYSTEM.MOVE(adr, ADDRESSOF(pix[0]), 4)
 	END UnpackBGRA8888;
@@ -801,7 +801,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(*--- General Transfer ---*)
 
-	PROCEDURE AnyBlendAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyBlendAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR spix, dpix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -819,7 +819,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(* --- invert --- *)
 
-	PROCEDURE InvAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE InvAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		WHILE len > 0 DO
 			mode.dst.unpack(mode.dst, dadr, dbit, mode.buf);
@@ -835,7 +835,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(* --- alpha invert --- *)
 
-	PROCEDURE InvOverAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE InvOverAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	VAR pix:Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -855,7 +855,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(*--- clear ---*)
 
-	PROCEDURE ClearAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE ClearAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR inc: LONGINT;
 	BEGIN
 		IF mode.dst.bpp MOD 8 = 0 THEN
@@ -873,7 +873,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END ClearAny;
 
-	PROCEDURE Clear1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Clear1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR out: CHAR;
 	BEGIN
 		IF (dbit > 0) OR (len < 8) THEN
@@ -901,7 +901,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END Clear1;
 
 	(*
-	PROCEDURE ClearBytes (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE ClearBytes (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		len := len * mode.dst.bpp DIV 8;
 		WHILE len >= 4 DO
@@ -913,7 +913,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END ClearBytes;
 	*)
 
-	PROCEDURE ClearBytes (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE ClearBytes (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	CODE
 	#IF I386 THEN
 		PUSH ECX
@@ -948,7 +948,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END ClearBytes;
 
 	(* len is nr of DWords*)
-	PROCEDURE Clear32 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Clear32 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	CODE
 	#IF I386 THEN
 		PUSH ECX
@@ -1129,7 +1129,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	(*--- srcCopy Transfer ---*)
 
 	(* constant values *)
-	PROCEDURE Set1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Set1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR out: CHAR;
 	BEGIN
 		IF (dbit > 0) OR (len < 8) THEN
@@ -1154,26 +1154,26 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END Set1;
 
-	PROCEDURE ConstCopy8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE ConstCopy8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		Fill8(dadr, len, ORD(mode.buf[0]))
 		(*WHILE len > 0 DO	SYSTEM.PUT(dadr, mode.buf[0]); INC(dadr); DEC(len) END*)
 	END ConstCopy8;
 
-	PROCEDURE ConstCopy16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE ConstCopy16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		Fill16(dadr, len, ORD(mode.buf[0])+ASH(ORD(mode.buf[1]),8))
 		(*WHILE len > 0 DO SYSTEM.MOVE(ADDRESSOF(mode.buf[0]), dadr, 2); INC(dadr, 2); DEC(len) END*)
 	END ConstCopy16;
 
-	PROCEDURE ConstCopy24 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE ConstCopy24 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		Fill24(dadr, len, ORD(mode.buf[0])+ASH(ORD(mode.buf[1]),8)+ASH(ORD(mode.buf[2]),16));
 		(*WHILE len > 0 DO	SYSTEM.MOVE(ADDRESSOF(mode.buf[0]), dadr, 3); INC(dadr, 3); DEC(len) END*)
 	END ConstCopy24;
 
 	(* identical formats *)
-	PROCEDURE Copy1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Copy1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in, out: CHAR;
 	BEGIN
 		SYSTEM.GET(sadr, in);
@@ -1207,12 +1207,12 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END Copy1;
 
-	PROCEDURE Copy8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Copy8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		SYSTEM.MOVE(sadr, dadr, len)
 	END Copy8;
 
-	PROCEDURE I8CopyI8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE I8CopyI8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR byte: CHAR;
 	BEGIN
 		WHILE len > 0 DO
@@ -1221,12 +1221,12 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END I8CopyI8;
 
-	PROCEDURE Copy16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Copy16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		SYSTEM.MOVE(sadr, dadr, 2*len)
 	END Copy16;
 
-	PROCEDURE I16CopyI16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE I16CopyI16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR val: INTEGER;
 	BEGIN
 		WHILE len > 0 DO
@@ -1236,14 +1236,14 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END I16CopyI16;
 
 
-	PROCEDURE Copy24 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Copy24 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		SYSTEM.MOVE(sadr, dadr, 3*len)
 	END Copy24;
 
 #IF ARM THEN
 
-	PROCEDURE Copy32(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Copy32(VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	CODE
 		LDR R0, [FP, #dadr]
 		LDR R1, [FP, #len]
@@ -1263,7 +1263,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 #ELSE
 
-	PROCEDURE Copy32 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Copy32 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		SYSTEM.MOVE(sadr, dadr, 4*len)
 	END Copy32;
@@ -1271,7 +1271,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #END
 
 	(* general methods *)
-	PROCEDURE AnyCopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyCopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1284,7 +1284,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END AnyCopyAny;
 
-	PROCEDURE AnyBytesCopyAnyBytes (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyBytesCopyAnyBytes (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR sinc, dinc: LONGINT; pix: Pixel;
 	BEGIN
 		sinc := mode.src.bpp DIV 8; dinc := mode.dst.bpp DIV 8;
@@ -1298,7 +1298,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 
 	(* A1 *)
-	PROCEDURE AnyCopyA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyCopyA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR out: CHAR; pix: Pixel;
 	BEGIN
 		SYSTEM.GET(dadr, out); pix[a] := 0FFX;
@@ -1316,7 +1316,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		SYSTEM.PUT(dadr, out)
 	END AnyCopyA1;
 
-	PROCEDURE A8CopyA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A8CopyA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR out, in: CHAR;
 	BEGIN
 		IF (dbit > 0) OR (len < 8) THEN
@@ -1341,7 +1341,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END A8CopyA1;
 
-	PROCEDURE BGRA8888CopyA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888CopyA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR out, in: CHAR;
 	BEGIN
 		INC(sadr, a);	(* only look at alpha component *)
@@ -1367,7 +1367,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGRA8888CopyA1;
 
-	PROCEDURE A1CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A1CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in: CHAR;
 	BEGIN
 		SYSTEM.GET(sadr, in);
@@ -1383,7 +1383,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END A1CopyAny;
 
-	PROCEDURE A1CopyA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A1CopyA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in: CHAR;
 	BEGIN
 		SYSTEM.GET(sadr, in);
@@ -1399,7 +1399,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END A1CopyA8;
 
-	PROCEDURE A1CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A1CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel; in: CHAR;
 	BEGIN
 		pix := mode.buf;
@@ -1419,7 +1419,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 
 	(* A8 *)
-	PROCEDURE AnyCopyA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyCopyA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		pix[a] := 0FFX;
@@ -1430,7 +1430,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END AnyCopyA8;
 
-	PROCEDURE BGRA8888CopyA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888CopyA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR byte: CHAR;
 	BEGIN
 		INC(sadr, 3);
@@ -1441,7 +1441,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGRA8888CopyA8;
 
-	PROCEDURE A8CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A8CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		pix := mode.buf;
@@ -1454,7 +1454,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 
 	(* P8 *)
-	PROCEDURE AnyCopyP8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyCopyP8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1465,7 +1465,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END AnyCopyP8;
 
-	PROCEDURE Any16CopyP8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Any16CopyP8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1475,7 +1475,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END Any16CopyP8;
 
-	PROCEDURE BGR888CopyP8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGR888CopyP8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1485,7 +1485,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGR888CopyP8;
 
-	PROCEDURE BGRA8888CopyP8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888CopyP8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1495,7 +1495,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGRA8888CopyP8;
 
-	PROCEDURE P8CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE P8CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR b: CHAR;
 	BEGIN
 		WHILE len > 0 DO
@@ -1505,7 +1505,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END P8CopyAny;
 
-	PROCEDURE P8CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE P8CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR b: CHAR;
 	BEGIN
 		WHILE len > 0 DO
@@ -1515,7 +1515,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END P8CopyAny16;
 
-	PROCEDURE P8CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE P8CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR b: CHAR;
 	BEGIN
 		WHILE len > 0 DO
@@ -1525,7 +1525,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END P8CopyBGR888;
 
-	PROCEDURE P8CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE P8CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR b: CHAR;
 	BEGIN
 		WHILE len > 0 DO
@@ -1537,7 +1537,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 
 	(* D8 *)
-	PROCEDURE AnyCopyD8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyCopyD8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1548,7 +1548,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END AnyCopyD8;
 
-	PROCEDURE Any16CopyD8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Any16CopyD8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1558,7 +1558,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END Any16CopyD8;
 
-	PROCEDURE BGR888CopyD8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGR888CopyD8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1568,7 +1568,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGR888CopyD8;
 
-	PROCEDURE BGRA8888CopyD8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888CopyD8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1578,7 +1578,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGRA8888CopyD8;
 
-	PROCEDURE D8CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE D8CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel; byte: CHAR; col: LONGINT;
 	BEGIN
 		pix[a] := 0FFX;
@@ -1590,7 +1590,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END D8CopyAny;
 
-	PROCEDURE D8CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE D8CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel; byte: CHAR; col: LONGINT;
 	BEGIN
 		pix[a] := 0FFX;
@@ -1602,7 +1602,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END D8CopyAny16;
 
-	PROCEDURE D8CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE D8CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR byte: CHAR; col: LONGINT; pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1613,7 +1613,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END D8CopyBGR888;
 
-	PROCEDURE D8CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE D8CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel; byte: CHAR; col: LONGINT;
 	BEGIN
 		pix[a] := 0FFX;
@@ -1627,7 +1627,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(*
 	(* P816*)
-	PROCEDURE AnyCopyP16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyCopyP16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1638,7 +1638,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END AnyCopyP16;
 
-	PROCEDURE Any16CopyP16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Any16CopyP16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1648,7 +1648,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END Any16CopyP16;
 
-	PROCEDURE BGR888CopyP16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGR888CopyP16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1658,7 +1658,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGR888CopyP16;
 
-	PROCEDURE BGRA8888CopyP16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888CopyP16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1668,7 +1668,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGRA8888CopyP16;
 
-	PROCEDURE P16CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE P16CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		WHILE len > 0 DO
 			mode.dst.pack(mode.dst, dadr, dbit, mode.src.pal.col[LONG(SYSTEM.GET16(sadr)) MOD 10000H]);
@@ -1676,7 +1676,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END P16CopyAny;
 
-	PROCEDURE P16CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE P16CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		WHILE len > 0 DO
 			mode.dst.pack(mode.dst, dadr, 0, mode.src.pal.col[LONG(SYSTEM.GET16(sadr)) MOD 10000H]);
@@ -1685,7 +1685,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END P16CopyAny16;
 	*)
 
-	PROCEDURE P16CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE P16CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		WHILE len > 0 DO
 			SYSTEM.MOVE(ADDRESSOF(mode.src.pal.col[LONG(SYSTEM.GET16(sadr)) MOD 10000H]), dadr, 3);
@@ -1693,7 +1693,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END P16CopyBGR888;
 
-	PROCEDURE P16CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE P16CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	VAR val:LONGINT;
 	BEGIN
 		WHILE len > 0 DO
@@ -1706,7 +1706,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 
 	(* BGR555, BGR565, BGR466 *)
-	PROCEDURE AnyCopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyCopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1717,7 +1717,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END AnyCopyAny16;
 
-	PROCEDURE Any16CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Any16CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1727,7 +1727,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END Any16CopyAny16;
 
-	PROCEDURE BGR888CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGR888CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		pix[a] := 0FFX;
@@ -1738,7 +1738,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGR888CopyAny16;
 
-	PROCEDURE BGRA8888CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888CopyAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1748,7 +1748,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGRA8888CopyAny16;
 
-	PROCEDURE Any16CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Any16CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1758,7 +1758,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END Any16CopyAny;
 
-	PROCEDURE Any16CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Any16CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1768,7 +1768,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END Any16CopyBGR888;
 
-	PROCEDURE Any16CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE Any16CopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1780,7 +1780,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 
 	(* BGR888 *)
-	PROCEDURE AnyCopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyCopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -1791,7 +1791,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END AnyCopyBGR888;
 
-	PROCEDURE BGRA8888CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		WHILE len > 0 DO
 			SYSTEM.MOVE(sadr, dadr, 3);
@@ -1800,7 +1800,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END BGRA8888CopyBGR888;
 
 #IF I386 OR AMD64 THEN
-	PROCEDURE SSE2BGRA8888CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE SSE2BGRA8888CopyBGR888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	CODE
 	#IF I386 THEN
 		PUSHFD
@@ -1877,12 +1877,12 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		MOV		RSI, [RBP + sadr]	; source adr
 		MOV 		RDI, [RBP + dadr]  ; source adr
 
-		MOV		ECX, [RBP + len]
+		MOV		RCX, [RBP + len]
 
 	loop:
-		CMP		ECX, 0
+		CMP		RCX, 0
 		JLE			end
-   		CMP 		ECX, 4
+   		CMP 		RCX, 4
 		 JL			singlepixel
 
 	fourpixel:
@@ -1914,7 +1914,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 		ADD 		RSI, 16
 		ADD 		RDI, 12
-		SUB 		ECX, 4
+		SUB 		RCX, 4
 		JG			loop
 		JMP 		end
 
@@ -1927,7 +1927,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 		ADD 		RSI, 4
 		ADD		RDI, 3
-		SUB 		ECX, 1
+		SUB 		RCX, 1
 		JG			loop
 
 	end:
@@ -1940,7 +1940,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END SSE2BGRA8888CopyBGR888;
 #END
 
-	PROCEDURE BGR888CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGR888CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		pix[a] := 0FFX;
@@ -1951,7 +1951,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGR888CopyAny;
 
-	PROCEDURE BGR888CopyBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGR888CopyBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		WHILE len > 0 DO
 			SYSTEM.MOVE(sadr, dadr, 3); SYSTEM.PUT(dadr+3, 0FFX);
@@ -1961,7 +1961,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END BGR888CopyBGRA8888;
 
 #IF I386 OR AMD64 THEN
-	PROCEDURE SSE2BGR888CopyBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE SSE2BGR888CopyBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	CODE
 	#IF I386 THEN
 		PUSHFD
@@ -2054,12 +2054,12 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		MOV		RSI, [RBP + sadr]	; source adr
 		MOV 		RDI, [RBP + dadr]  ; source adr
 
-		MOV		ECX, [RBP + len]
+		MOV		RCX, [RBP + len]
 
 	loop:
-		CMP		ECX, 0
+		CMP		RCX, 0
 		JLE			end
-   		CMP 		ECX, 4
+   		CMP 		RCX, 4
 		 JL			singlepixel
 
 	fourpixel:
@@ -2090,7 +2090,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 		MOVDQU 	[RDI], XMM2 ; set the pixels
 		ADD		RDI, 16	; inc adr
-		SUB 		ECX, 4
+		SUB 		RCX, 4
 		JG			loop
 		JMP 		end
 
@@ -2101,7 +2101,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		MOV 		[RDI], EBX
 
 		ADD		RDI, 4	; inc adr
-		SUB 		ECX, 1
+		SUB 		RCX, 1
 		JG			loop
 	end:
 		EMMS ; declare FPU registers free
@@ -2114,7 +2114,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #END
 
 	(* BGRA8888 *)
-	PROCEDURE AnyCopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyCopyBGRA8888 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -2125,7 +2125,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END AnyCopyBGRA8888;
 
-	PROCEDURE BGRA8888CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888CopyAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR pix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -2138,14 +2138,14 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(*--- dstCopy Transfer ---*)
 
-	PROCEDURE EmptyTransfer (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE EmptyTransfer (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	END EmptyTransfer;
 
 
 	(*--- srcOverDst Transfer ---*)
 
 	(* A1 *)
-	PROCEDURE AnyOverA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyOverA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR out: CHAR; pix: Pixel;
 	BEGIN
 		SYSTEM.GET(dadr, out);
@@ -2164,7 +2164,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		SYSTEM.PUT(dadr, out)
 	END AnyOverA1;
 
-	PROCEDURE A1OverA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A1OverA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in, out: CHAR;
 	BEGIN
 		SYSTEM.GET(sadr, in); SYSTEM.GET(dadr, out);
@@ -2186,7 +2186,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		SYSTEM.PUT(dadr, out)
 	END A1OverA1;
 
-	PROCEDURE A8OverA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A8OverA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in, out: CHAR;
 	BEGIN
 		SYSTEM.GET(dadr, out);
@@ -2205,7 +2205,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		SYSTEM.PUT(dadr, out)
 	END A8OverA1;
 
-	PROCEDURE BGRA8888OverA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888OverA1 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in, out: CHAR;
 	BEGIN
 		SYSTEM.GET(dadr, out);
@@ -2224,7 +2224,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		SYSTEM.PUT(dadr, out)
 	END BGRA8888OverA1;
 
-	PROCEDURE A1OverAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A1OverAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in: CHAR;
 	BEGIN
 		SYSTEM.GET(sadr, in);
@@ -2240,7 +2240,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END A1OverAny;
 
-	PROCEDURE A1OverConst8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A1OverConst8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in: CHAR;
 	BEGIN
 		SYSTEM.GET(sadr, in);
@@ -2256,7 +2256,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END A1OverConst8;
 
-	PROCEDURE A1OverConst16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A1OverConst16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in: CHAR;
 	BEGIN
 		SYSTEM.GET(sadr, in);
@@ -2272,7 +2272,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END A1OverConst16;
 
-	PROCEDURE A1OverConst24 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A1OverConst24 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in: CHAR;
 	BEGIN
 		SYSTEM.GET(sadr, in);
@@ -2288,7 +2288,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END A1OverConst24;
 
-	PROCEDURE A1OverConst32 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A1OverConst32 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in: CHAR;
 	BEGIN
 		SYSTEM.GET(sadr, in);
@@ -2306,7 +2306,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 
 	(* A8 *)
-	PROCEDURE AnyOverA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE AnyOverA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	VAR pix: Pixel; b: CHAR;
 	BEGIN
 		WHILE len > 0 DO
@@ -2321,7 +2321,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END AnyOverA8;
 
-	PROCEDURE A8OverAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A8OverAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	VAR spix, dpix: Pixel; alpha, rc,gc,bc,ac: CHAR;
 	BEGIN
 		ac := mode.col[a];
@@ -2351,7 +2351,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 #IF ARM THEN
 
-	PROCEDURE A8OverBGRA8888Asm(CONST col: Pixel; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A8OverBGRA8888Asm(CONST col: Pixel; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	CODE
 		LDR R0, [FP, #sadr]
 		LDR R1, [FP, #dadr]
@@ -2460,14 +2460,14 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	end:
 	END A8OverBGRA8888Asm;
 
-	PROCEDURE A8OverBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A8OverBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	BEGIN
 		A8OverBGRA8888Asm(mode.col,sadr,sbit,dadr,dbit,len);
 	END A8OverBGRA8888;
 
 #ELSE
 
-	PROCEDURE A8OverBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A8OverBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	VAR src , dst: Pixel; rc,gc,bc,ac, fd, fs: LONGINT;
 	BEGIN
 		rc := ORD(mode.col[r]);
@@ -2498,7 +2498,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 #END
 
-	PROCEDURE A8OverA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE A8OverA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in, out: CHAR;
 	BEGIN
 		WHILE len > 0 DO
@@ -2516,7 +2516,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #IF ARM THEN
 
 
-	PROCEDURE BGRA8888OverBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888OverBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	CODE
 		LDR R0, [FP, #sadr]
 		LDR R1, [FP, #dadr]
@@ -2608,7 +2608,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 #ELSE
 
-	PROCEDURE BGRA8888OverBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888OverBGRA8888(VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	VAR src, dst: Pixel; fd,t: LONGINT;
 	BEGIN
 		WHILE len > 0 DO
@@ -2644,7 +2644,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #END
 
 	(* BGRA8888 *)
-	PROCEDURE BGRA8888OverAny (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888OverAny (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR spix, dpix: Pixel;
 	BEGIN
 		WHILE len > 0 DO
@@ -2664,7 +2664,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGRA8888OverAny;
 
-	PROCEDURE BGRA8888OverA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888OverA8 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR in, out: CHAR;
 	BEGIN
 		WHILE len > 0 DO
@@ -2679,7 +2679,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGRA8888OverA8;
 
-	PROCEDURE BGRA8888OverAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888OverAny16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR src, dst: Pixel; fd, t: LONGINT;
 	BEGIN
 		WHILE len > 0 DO
@@ -2705,7 +2705,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		END
 	END BGRA8888OverAny16;
 
-	PROCEDURE BGRA8888Over565* (VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE BGRA8888Over565* (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 		VAR src, dst: Pixel; fd, t: LONGINT;
 	BEGIN
 		WHILE len > 0 DO
@@ -2736,7 +2736,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END BGRA8888Over565;
 
 #IF I386 OR AMD64 THEN
-	PROCEDURE MMXBGRA8888Over565(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE MMXBGRA8888Over565(VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	CODE
 	#IF I386 THEN
 		PUSHFD
@@ -2873,9 +2873,9 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		MOVD		MMX7, EAX
 		PUNPCKLBW MMX7, MMX0  ; 00FF00FF00FF00FF
 
-		MOV		ECX, [RBP + len]
+		MOV		RCX, [RBP + len]
 	loop:
-		CMP		ECX, 0
+		CMP		RCX, 0
 		JE 			 end
 
 		MOV		EAX, [RSI]
@@ -2977,7 +2977,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	empty:
 		ADD 		RSI, 4;
 		ADD 		RDI, 2;
-		DEC		ECX
+		DEC		RCX
 		JMP 		loop
 	end:
 		EMMS ; declare FPU registers free
@@ -2987,7 +2987,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	#END
 	END MMXBGRA8888Over565;
 
-	PROCEDURE SSE2BGRA8888Over565(VAR mode: Mode0; sadr: ADDRESS; sbit: LONGINT; dadr: ADDRESS; dbit, len: LONGINT);
+	PROCEDURE SSE2BGRA8888Over565(VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
 	CODE
 	#IF I386 THEN
 		PUSHFD
@@ -3419,7 +3419,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 		MOV 		RSI, [RBP + sadr]
 		MOV 		RDI, [RBP + dadr]
-		MOV 		ECX, [RBP + len]
+		MOV 		RCX, [RBP + len]
 
 		;  create masks
 
@@ -3443,11 +3443,11 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		; 		WHILE len > 0 DO
 
 	loop:
-		CMP 		ECX,0
-		JE 			end ; jump to end if ECX = 0
+		CMP 		RCX,0
+		JE 			end ; jump to end if RCX = 0
 
 		; if len < 8 then do one pixel at the time
-		CMP		ECX, 8
+		CMP		RCX, 8
 		JL 			 singlepixel
 		; else
 		; take 8 at the time
@@ -3718,7 +3718,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	endloop:
 		ADD 		RSI, 32 ; num of bytes
 		ADD 		RDI, 16
-		SUB 		ECX, 8
+		SUB 		RCX, 8
 		JMP 		loop
 
 	singlepixel: ; original code from MMXBGRA8888Over565, adjusted to fit this procedure
@@ -3802,7 +3802,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	empty:
 		ADD 		RSI, 4;
 		ADD 		RDI, 2;
-		DEC		ECX
+		DEC		RCX
 		JMP 		loop
 
 	end:
