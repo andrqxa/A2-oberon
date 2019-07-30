@@ -102,7 +102,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		(** transfer mode **)
 		Mode0* = RECORD
 			src*, dst*: Format;	(** source and destination format **)
-			op*: LONGINT;	(** compositing operation **)
+			op*: WORD;	(** compositing operation **)
 			col*: Pixel;	(** substitute color used when transfering from pure alpha formats to colored ones **)
 			buf: Pixel;	(* constant area for special-case moving *)
 			map: POINTER TO ARRAY OF INTEGER;	(* color map for transfer between indexed formats *)
@@ -140,7 +140,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #IF ARM THEN
 
 	(** set pixel to opaque RGB value **)
-	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: LONGINT);
+	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: WORD);
 	CODE
 		LDR R0, [FP, #pix] ; ADDRESSOF(pix[0])
 		LDRB R1, [FP, #blue]
@@ -169,7 +169,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #ELSE
 
 	(** set pixel to opaque RGB value **)
-	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: LONGINT);
+	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: WORD);
 	BEGIN
 		pix[b] := CHR(blue); pix[g] := CHR(green); pix[r] := CHR(red); pix[a] := 0FFX
 	END SetRGB;
@@ -179,7 +179,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #IF ARM THEN
 
 	(** set pixel to partly transparent RGB value **)
-	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: LONGINT);
+	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: WORD);
 	CODE
 		LDR R0, [FP, #pix] ; ADDRESSOF(pix[0])
 		LDRB R1, [FP, #blue]
@@ -220,7 +220,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #ELSE
 
 	(** set pixel to partly transparent RGB value **)
-	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: LONGINT);
+	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: WORD);
 	BEGIN
 		pix[b] := CHR(blue * alpha DIV 255);
 		pix[g] := CHR(green * alpha DIV 255);
@@ -231,7 +231,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 #END
 
 	(** retrieve RGB and alpha values from pixel **)
-	PROCEDURE GetRGBA* (pix: Pixel; VAR red, green, blue, alpha: LONGINT);
+	PROCEDURE GetRGBA* (pix: Pixel; VAR red, green, blue, alpha: WORD);
 	BEGIN
 		alpha := ORD(pix[a]);
 		IF alpha = 0 THEN	(* color has disappeared *)
@@ -250,7 +250,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	(**--- Palettes ---**)
 
 	(** return index of color in palette which approximates the requested color reasonably well **)
-	PROCEDURE PaletteIndex* (pal: Palette; red, green, blue: LONGINT): LONGINT;
+	PROCEDURE PaletteIndex* (pal: Palette; red, green, blue: WORD): LONGINT;
 	BEGIN
 		IF pal.used>256 THEN
 			RETURN CLUTs.Match(pal.clut, ASH(red, 16) + ASH(green, 8) +  blue) *pal.used DIV 256 (*PH090122*)
@@ -260,7 +260,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(** compute internal palette structures whenever palette colors have been modified **)
 	PROCEDURE InitPalette* (pal: Palette; used, bits: LONGINT);
-		VAR n, red, green, blue, alpha: LONGINT;
+		VAR n: SIZE; red, green, blue, alpha: WORD;
 	BEGIN
 		n := 0;
 		IF used>pal.used THEN NEW(pal.col,used);END;
@@ -458,7 +458,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END PackA8;
 
 	PROCEDURE UnpackA8 (VAR fmt: Format0; adr: ADDRESS; bit: SIZE; VAR pix: Pixel);
-		VAR alpha: LONGINT;
+		VAR alpha: WORD;
 	BEGIN
 		SYSTEM.GET(adr, pix[a]);
 		IF pix[a] = 0X THEN
@@ -733,7 +733,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END InitMode;
 
 	(** initialize transfer mode with color components for pure alpha sources **)
-	PROCEDURE InitModeColor* (VAR mode: Mode; op: SHORTINT; red, green, blue: LONGINT);
+	PROCEDURE InitModeColor* (VAR mode: Mode; op: SHORTINT; red, green, blue: WORD);
 	BEGIN
 		mode.op := op;
 		IF (mode.src.pal # NIL) & ((mode.map = NIL) OR (LEN(mode.map^) # mode.src.pal.used)) THEN
@@ -744,7 +744,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END InitModeColor;
 
 	(** set new source color for transfer mode **)
-	PROCEDURE SetModeColor* (VAR mode: Mode; red, green, blue: LONGINT);
+	PROCEDURE SetModeColor* (VAR mode: Mode; red, green, blue: WORD);
 	BEGIN
 		SetRGB(mode.col, red, green, blue);
 		IF (mode.src.pal # NIL) & ((mode.map = NIL) OR (LEN(mode.map^) # mode.src.pal.used)) THEN
