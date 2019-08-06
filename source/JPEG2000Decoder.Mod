@@ -5869,7 +5869,7 @@ MODULE JPEG2000Decoder;
 					END;
 			END Open;
 
-			PROCEDURE GetImageInfo*(VAR width, height, format, maxProgressionLevel : LONGINT);
+			PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : LONGINT);
 				VAR
 					imgInfo : J2KCS.ImageInfo;
 				BEGIN

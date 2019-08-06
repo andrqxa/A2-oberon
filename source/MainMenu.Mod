@@ -56,7 +56,7 @@ TYPE
 			manager.Add(0, view.height0 - GetHeight(), SELF, {WM.FlagNavigation, WM.FlagHidden});
 		END New;
 
-		PROCEDURE PointerMove*(x, y : LONGINT; keys : SET);
+		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
 		BEGIN
 			PointerMove^(x, y, keys);
 			moveToFront := FALSE;

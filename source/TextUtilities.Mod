@@ -43,7 +43,7 @@ TYPE
 	VAR text : Texts.Text;
 		ucs32buf : POINTER TO ARRAY OF LONGINT;
 		fontName : ARRAY 32 OF CHAR;
-		fontSize, x, fontVOff : LONGINT; fontColor, fontBgColor: WMGraphics.Color;
+		fontSize: SIZE; x, fontVOff : LONGINT; fontColor, fontBgColor: WMGraphics.Color;
 		fontStyle : SET;
 		currentAttributes- : Texts.Attributes;
 		oldBytes : ARRAY 7 OF CHAR;
@@ -832,7 +832,7 @@ TYPE
 				NEW(sr, LEN(stylename)); sr.Set(stylename);
 				sr.SkipWhitespace; sr.Token(token);												(* AdHoc *)
 				sr.SkipWhitespace; sr.Token(token); COPY(token, attr.fontInfo.name); 				(* family *)
-				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, attr.fontInfo.size);		(* size *)
+				sr.SkipWhitespace; sr.Token(token); Strings.StrToSize(token, attr.fontInfo.size);		(* size *)
 				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, tempInt); 					(* style *)
 				IF (tempInt = 0) THEN attr.fontInfo.style := {};
 				ELSIF (tempInt = 1) THEN attr.fontInfo.style := {0};
@@ -1019,7 +1019,7 @@ TYPE
 	*)
 		(* Attributes attributes *)
 		family, dfFamily : ARRAY 64 OF CHAR;
-		size, dfSize : LONGINT;
+		size, dfSize : SIZE;
 		style, dfStyle : LONGINT;							(* 0 = regular; 1 = bold; 2 = italic; 3 = bold-italic *)
 		voff, dfVoff : LONGINT;
 		color, dfColor : LONGINT;
@@ -2022,15 +2022,15 @@ BEGIN
 	RETURN (ch >= '0') & (ch <= '9')
 END IsDigit;
 
-PROCEDURE DecodeOberonFontName(CONST name : ARRAY OF CHAR; VAR fn : ARRAY OF CHAR; VAR size : LONGINT; VAR style : SET);
-VAR i, j: LONGINT; sizeStr : ARRAY 8 OF CHAR;
+PROCEDURE DecodeOberonFontName(CONST name : ARRAY OF CHAR; VAR fn : ARRAY OF CHAR; VAR size : SIZE; VAR style : SET);
+VAR i, j: SIZE; sizeStr : ARRAY 8 OF CHAR;
 BEGIN
 	(* first name in oberon font names is capital, all following are non-capital *)
 	fn[0] := name[0];
 	i := 1; WHILE ~IsDigit(name[i]) DO  fn[i] := name[i];  INC(i)  END;  fn[i] := 0X;
 	(* read the size *)
 	j := 0; WHILE IsDigit(name[i]) DO  sizeStr[j] := name[i];  INC(j); INC(i)  END;  sizeStr[j] := 0X;
-	Strings.StrToInt(sizeStr, size);
+	Strings.StrToSize(sizeStr, size);
 	style := {};
 	CASE CAP(name[i]) OF
 		| "I" : INCL(style, WMGraphics.FontItalic);
@@ -2039,7 +2039,7 @@ BEGIN
 	END
 END DecodeOberonFontName;
 
-PROCEDURE ToOberonFont(CONST name : ARRAY OF CHAR; size : LONGINT; style : SET; VAR oname : ARRAY OF CHAR) : BOOLEAN;
+PROCEDURE ToOberonFont(CONST name : ARRAY OF CHAR; size : SIZE; style : SET; VAR oname : ARRAY OF CHAR) : BOOLEAN;
 VAR str : ARRAY 32 OF CHAR; f: Files.File;
 BEGIN
 	COPY(name, oname);

@@ -92,7 +92,7 @@ TYPE
 		label : WMStandardComponents.Label;
 		toolbar : WMStandardComponents.Panel;
 		refreshBtn : WMStandardComponents.Button;
-		px, py : LONGINT;
+		px, py : SIZE;
 		draggedString : Strings.String;
 		showFiles : WMProperties.BooleanProperty;
 		showImagePreview : WMProperties.BooleanProperty;
@@ -242,7 +242,7 @@ TYPE
 		END RefreshHandler;
 
 		(* called when an object has been dropped on this treeView *)
-		PROCEDURE MyDragDropped(x, y : LONGINT; dragInfo : WM.DragInfo; VAR handled : BOOLEAN);
+		PROCEDURE MyDragDropped(x, y : SIZE; dragInfo : WM.DragInfo; VAR handled : BOOLEAN);
 		BEGIN
 			handled := TRUE;
 			DragDropped(x, y, dragInfo);
@@ -250,7 +250,7 @@ TYPE
 		END MyDragDropped;
 
 		(* called by MyDraggedDropped *)
-		PROCEDURE DragDropped*(x, y : LONGINT; dragInfo : WM.DragInfo);
+		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
 		VAR dropTarget : ArchiveDropTarget;
 			parent : WMTrees.TreeNode;
 			accept : BOOLEAN;
@@ -271,8 +271,8 @@ TYPE
 		END DragDropped;
 
 		(* pop up context-menu *)
-		PROCEDURE ContextMenu(sender : ANY; x, y: LONGINT);
-		VAR wmx, wmy : LONGINT;
+		PROCEDURE ContextMenu(sender : ANY; x, y: SIZE);
+		VAR wmx, wmy : SIZE;
 			node : WMTrees.TreeNode;
 			data : ANY;
 		BEGIN
@@ -294,7 +294,7 @@ TYPE
 
 		PROCEDURE CreateFolder(sender, data : ANY);
 		VAR node : WMTrees.TreeNode;
-			wmx, wmy : LONGINT;
+			wmx, wmy : SIZE;
 			name : ARRAY 128 OF CHAR;
 			input : WMDialogs.MiniStringInput;
 		BEGIN
@@ -329,7 +329,7 @@ TYPE
 
 		PROCEDURE RenameEntry(sender, data : ANY);
 		VAR rename : WMDialogs.MiniStringInput;
-			wmx, wmy : LONGINT;
+			wmx, wmy : SIZE;
 			name, caption : ARRAY 128 OF CHAR;
 			entryInfo : ANY;
 			s : Strings.String;
@@ -455,8 +455,8 @@ TYPE
 		END InsertTreeNode;
 
 		(* plug-in method for treeView *)
-		PROCEDURE DrawTreeNode(canvas : WMGraphics.Canvas; w, h : LONGINT; node : WMTrees.TreeNode; state : SET);
-		VAR dx, tdx, tdy, width, height : LONGINT; f : WMGraphics.Font;
+		PROCEDURE DrawTreeNode(canvas : WMGraphics.Canvas; w, h : SIZE; node : WMTrees.TreeNode; state : SET);
+		VAR dx, tdx, tdy, width, height : SIZE; f : WMGraphics.Font;
 			img : WMGraphics.Image;
 			caption : Strings.String;
 		BEGIN
@@ -486,7 +486,7 @@ TYPE
 		END DrawTreeNode;
 
 		(* plug-in method for treeView *)
-		PROCEDURE MeasureTreeNode(node : WMTrees.TreeNode; VAR w, h : LONGINT);
+		PROCEDURE MeasureTreeNode(node : WMTrees.TreeNode; VAR w, h : SIZE);
 		BEGIN
 			h := TreePreviewSize; w := 400
 		END MeasureTreeNode;
@@ -532,7 +532,7 @@ TYPE
 		nodeContent, selection : NodeList;
 		curArc : Archives.Archive;
 		popup : WMPopups.Popup;
-		px, py: LONGINT;
+		px, py: SIZE;
 		node : WMTrees.TreeNode;
 		curFiles, curFolders, curBytes : LONGINT;
 
@@ -626,7 +626,7 @@ TYPE
 			list.model.Release
 		END InitList;
 
-		PROCEDURE Resized*(width, height : LONGINT);
+		PROCEDURE Resized*(width, height : SIZE);
 		BEGIN
 			Resized^(width, height);
 			AdjustTabSize;
@@ -636,7 +636,7 @@ TYPE
 
 		(* adjusts the Tab sizes to the current windwo width *)
 		PROCEDURE AdjustTabSize;
-		VAR colWidths : WMGrids.Spacings; col0Width : LONGINT;
+		VAR colWidths : WMGrids.Spacings; col0Width : SIZE;
 		BEGIN
 			NEW(colWidths, 2);
 			col0Width := (list.bounds.GetWidth() DIV 6)*5;
@@ -770,7 +770,7 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE ContextMenu(sender : ANY; x, y: LONGINT);
+		PROCEDURE ContextMenu(sender : ANY; x, y: SIZE);
 		VAR curSel : NodeList;
 			w : SelectionWrapper;
 		BEGIN
@@ -792,7 +792,7 @@ TYPE
 
 		PROCEDURE GetSelection() : NodeList;
 		VAR selection : NodeList;
-			l, t, r, b, i, j : LONGINT;
+			l, t, r, b, i, j : SIZE;
 			p : ANY;
 		BEGIN
 			list.model.Acquire;
@@ -926,7 +926,7 @@ TYPE
 		(* ----- drag operations ----------------------------------------- *)
 
 		(* called when an object has been dropped on the file-list *)
-		PROCEDURE MyDragDropped(x, y : LONGINT; dragInfo : WM.DragInfo; VAR handled : BOOLEAN);
+		PROCEDURE MyDragDropped(x, y : SIZE; dragInfo : WM.DragInfo; VAR handled : BOOLEAN);
 		BEGIN
 			handled := TRUE;
 			ListDragDropped(x, y, dragInfo);
@@ -934,7 +934,7 @@ TYPE
 		END MyDragDropped;
 
 		(* called by MyDraggedDropped *)
-		PROCEDURE ListDragDropped(x, y : LONGINT; dragInfo : WM.DragInfo);
+		PROCEDURE ListDragDropped(x, y : SIZE; dragInfo : WM.DragInfo);
 		VAR dropTarget : ArchiveDropTarget;
 			parent : WMTrees.TreeNode;
 			accept : BOOLEAN;

@@ -11,7 +11,7 @@ TYPE
 		AcquireText*, ReleaseText* : PROCEDURE {DELEGATE};
 		InsertUCS32* : PROCEDURE {DELEGATE} (atPosition : SIZE; CONST string : Texts.UCS32String);
 		GetCursorPosition* : PROCEDURE {DELEGATE} () : SIZE;
-		GetCursorScreenPosition* : PROCEDURE {DELEGATE} (VAR x, y : LONGINT);
+		GetCursorScreenPosition* : PROCEDURE {DELEGATE} (VAR x, y : SIZE);
 		SetCursorInfo* : PROCEDURE {DELEGATE} (position : SIZE);
 	END;
 
@@ -45,13 +45,13 @@ TYPE
 			valid := interface.AcquireText # NIL;
 		END SetInterface;
 
-		PROCEDURE InsertChar*(ucs : LONGINT);
+		PROCEDURE InsertChar*(ucs : SIZE);
 		VAR buf : ARRAY 2 OF Texts.Char32;
 		BEGIN {EXCLUSIVE}
 			IF valid THEN
 				interface.AcquireText;
 				interface.SetCursorInfo(1);
-				buf[0] := ucs; buf[1] := 0;
+				buf[0] := ucs(Texts.Char32); buf[1] := 0;
 				interface.InsertUCS32(interface.GetCursorPosition(), buf);
 				interface.ReleaseText;
 			END;
@@ -103,7 +103,7 @@ TYPE
 			END;
 		END InsertUTF8String;
 
-		PROCEDURE GetCursorScreenPosition*(VAR x, y : LONGINT);
+		PROCEDURE GetCursorScreenPosition*(VAR x, y : SIZE);
 		BEGIN {EXCLUSIVE}
 			IF valid THEN
 				interface.GetCursorScreenPosition(x, y);
@@ -112,7 +112,7 @@ TYPE
 			END;
 		END GetCursorScreenPosition;
 
-		PROCEDURE KeyEvent*(ucs : LONGINT; flags : SET; keysym : LONGINT);
+		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 		END KeyEvent;
 
 		PROCEDURE Hide*;

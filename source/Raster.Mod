@@ -92,9 +92,9 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		Image* = OBJECT (* POINTER TO ImageDesc;
 		ImageDesc* = RECORD *)
 		VAR
-			width*, height*: LONGINT;	(** image dimensions **)
+			width*, height*: SIZE;	(** image dimensions **)
 			fmt*: Format;	(** pixel format **)
-			bpr*: LONGINT;	(** number of bytes per row (may be negative) **)
+			bpr*: SIZE;	(** number of bytes per row (may be negative) **)
 			adr*: ADDRESS;	(** address of lower left pixel **)
 			mem*: POINTER TO ARRAY OF CHAR;	(** block where pixels are stored; mem#NIL implies adr=ADR(mem[0]) **)
 		END Image;
@@ -648,14 +648,14 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	(**--- Images ---**)
 
 	(** initialize custom image **)
-	PROCEDURE Init* (img: Image; width, height: LONGINT; VAR fmt: Format; bpr: LONGINT; adr: ADDRESS);
+	PROCEDURE Init* (img: Image; width, height: SIZE; VAR fmt: Format; bpr: SIZE; adr: ADDRESS);
 	BEGIN
 		ASSERT((width > 0) & (height > 0), 100);
 		img.width := width; img.height := height; img.fmt := fmt; img.bpr := bpr; img.adr := adr
 	END Init;
 
 	(** initialize custom image on byte buffer **)
-	PROCEDURE InitBuf* (img: Image; width, height: LONGINT; VAR fmt: Format; bpr, offset: LONGINT; VAR buf: ARRAY OF CHAR);
+	PROCEDURE InitBuf* (img: Image; width, height: SIZE; VAR fmt: Format; bpr, offset: SIZE; VAR buf: ARRAY OF CHAR);
 	BEGIN
 		ASSERT((0 <= offset) & (offset + height * ABS(bpr) <= LEN(buf)), 100);
 		IF bpr >= 0 THEN Init(img, width, height, fmt, bpr, ADDRESSOF(buf[0]))
@@ -664,7 +664,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END InitBuf;
 
 	(** initialize image on rectangular area within existing image (lower left corner must fall on byte boundary) **)
-	PROCEDURE InitRect* (img, base: Image; x, y, w, h: LONGINT);
+	PROCEDURE InitRect* (img, base: Image; x, y, w, h: SIZE);
 	BEGIN
 		ASSERT((0 <= x) & (x + w <= base.width) & (0 <= y) & (y + h <= base.height), 100);
 		ASSERT(x * base.fmt.bpp MOD 8 = 0, 101);
@@ -672,8 +672,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END InitRect;
 
 	(** create image in requested format (allocating or reusing necessary memory) **)
-	PROCEDURE Create* (img: Image; width, height: LONGINT; fmt: Format);
-	VAR size: LONGINT; a0, a1: ADDRESS;
+	PROCEDURE Create* (img: Image; width, height: SIZE; fmt: Format);
+	VAR size: SIZE; a0, a1: ADDRESS;
 	BEGIN
 		ASSERT((width > 0) & (height > 0), 100);
 		img.width := width; img.height := height;
@@ -694,8 +694,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 		img.adr := ADDRESSOF(img.mem[0])
 	END Create;
 
-	PROCEDURE CreateWithBuffer*(img: Image; width, height: LONGINT; fmt: Format; mem: POINTER TO ARRAY OF CHAR; VAR adr: ADDRESS);
-	VAR size: LONGINT; a0, a1: ADDRESS;
+	PROCEDURE CreateWithBuffer*(img: Image; width, height: SIZE; fmt: Format; mem: POINTER TO ARRAY OF CHAR; VAR adr: ADDRESS);
+	VAR size: SIZE; a0, a1: ADDRESS;
 	BEGIN
 		ASSERT((width > 0) & (height > 0), 100);
 		img.width := width; img.height := height;
@@ -1285,7 +1285,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END AnyCopyAny;
 
 	PROCEDURE AnyBytesCopyAnyBytes (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
-		VAR sinc, dinc: LONGINT; pix: Pixel;
+		VAR sinc, dinc: SIZE; pix: Pixel;
 	BEGIN
 		sinc := mode.src.bpp DIV 8; dinc := mode.dst.bpp DIV 8;
 		WHILE len > 0 DO
@@ -4121,8 +4121,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	(**--- Image Operations ---**)
 
 	(** get pixel from image **)
-	PROCEDURE Get* (img: Image; x, y: LONGINT; VAR pix: Pixel; VAR mode: Mode);
-		VAR bit: LONGINT; adr: ADDRESS;
+	PROCEDURE Get* (img: Image; x, y: SIZE; VAR pix: Pixel; VAR mode: Mode);
+		VAR bit: SIZE; adr: ADDRESS;
 	BEGIN
 		ASSERT((0 <= x) & (x < img.width) & (0 <= y) & (y < img.height), 100);
 		bit := x * img.fmt.bpp; adr := img.adr + y * img.bpr + bit DIV 8; bit := bit MOD 8;
@@ -4133,8 +4133,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END Get;
 
 	(** put pixel into image **)
-	PROCEDURE Put* (img: Image; x, y: LONGINT; CONST pix: Pixel; VAR mode: Mode);
-		VAR bit: LONGINT; adr: ADDRESS;
+	PROCEDURE Put* (img: Image; x, y: SIZE; CONST pix: Pixel; VAR mode: Mode);
+		VAR bit: SIZE; adr: ADDRESS;
 	BEGIN
 		(*ASSERT((0 <= x) & (x < img.width) & (0 <= y) & (y < img.height), 100);*) (*avoid a HALT if roundoff errors from higher levels occur here*)
 		IF (0 > x) OR (x >= img.width) OR (0 > y) OR (y >= img.height) THEN RETURN END;
@@ -4144,8 +4144,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END Put;
 
 	(** fill rectangular area **)
-	PROCEDURE Fill* (img: Image; llx, lly, urx, ury: LONGINT; CONST pix: Pixel; VAR mode: Mode);
-		VAR bit, bb, x, c, t: LONGINT; m: Mode; adr, aa: ADDRESS;
+	PROCEDURE Fill* (img: Image; llx, lly, urx, ury: SIZE; CONST pix: Pixel; VAR mode: Mode);
+		VAR bit, bb, x, t: SIZE; c: LONGINT; m: Mode; adr, aa: ADDRESS;
 	BEGIN
 		ASSERT((0 <= llx) & (llx < urx) & (urx <= img.width) & (0 <= lly) & (lly < ury) & (ury <= img.height), 100);
 		bit := llx * img.fmt.bpp; adr := img.adr + lly * img.bpr + bit DIV 8; bit := bit MOD 8;
@@ -4209,8 +4209,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END Clear;
 
 	(** get several pixels and store them in array in requested format **)
-	PROCEDURE GetPixels* (img: Image; x, y, w: LONGINT; VAR fmt: Format; VAR buf: ARRAY OF CHAR; ofs : LONGINT; VAR mode: Mode);
-		VAR sbit: LONGINT; sadr: ADDRESS;
+	PROCEDURE GetPixels* (img: Image; x, y, w: SIZE; VAR fmt: Format; VAR buf: ARRAY OF CHAR; ofs : SIZE; VAR mode: Mode);
+		VAR sbit: SIZE; sadr: ADDRESS;
 	BEGIN
 		ASSERT((0 <= x) & (x + w <= img.width) & (0 <= y) & (y <= img.height), 100);
 		ASSERT(ofs + w * fmt.bpp DIV 8 <= LEN(buf), 101);
@@ -4220,8 +4220,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END GetPixels;
 
 	(** put several pixels from array in given format into image **)
-	PROCEDURE PutPixels* (img: Image; x, y, w: LONGINT; VAR fmt: Format; VAR buf: ARRAY OF CHAR; ofs : LONGINT; VAR mode: Mode);
-		VAR dbit: LONGINT; dadr: ADDRESS;
+	PROCEDURE PutPixels* (img: Image; x, y, w: SIZE; VAR fmt: Format; VAR buf: ARRAY OF CHAR; ofs : SIZE; VAR mode: Mode);
+		VAR dbit: SIZE; dadr: ADDRESS;
 	BEGIN
 		ASSERT((0 <= x) & (x + w <= img.width) & (0 <= y) & (y <= img.height), 100);
 		ASSERT(ofs + w * fmt.bpp DIV 8 <= LEN(buf), 101);
@@ -4231,8 +4231,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END PutPixels;
 
 	(** copy rectangular area to the same or another image in specified mode **)
-	PROCEDURE Copy* (src, dst: Image; llx, lly, urx, ury, dx, dy: LONGINT; VAR mode: Mode);
-		VAR w, h, sbit, dbit, slen, sb, db, len, l, w1, h1: LONGINT; sadr, dadr, sa, da: ADDRESS;
+	PROCEDURE Copy* (src, dst: Image; llx, lly, urx, ury, dx, dy: SIZE; VAR mode: Mode);
+		VAR w, h, sbit, dbit, slen, sb, db, len, l, w1, h1: SIZE; sadr, dadr, sa, da: ADDRESS;
 
 	BEGIN
 		ASSERT((0 <= llx) & (llx <= urx) & (urx <= src.width) & (0 <= lly) & (lly <= ury) & (ury <= src.height), 100);
@@ -4273,8 +4273,8 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END Copy;
 
 	(** replicate pattern within rectangular area of image using given mode **)
-	PROCEDURE FillPattern* (pat, dst: Image; llx, lly, urx, ury, px, py: LONGINT; VAR mode: Mode);
-		VAR pw, ph, olx, oby, ilx, olw, irw, dy, sy, dx, sx, ty: LONGINT;
+	PROCEDURE FillPattern* (pat, dst: Image; llx, lly, urx, ury, px, py: SIZE; VAR mode: Mode);
+		VAR pw, ph, olx, oby, ilx, olw, irw, dy, sy, dx, sx, ty: SIZE;
 	BEGIN
 		ASSERT((0 <= llx) & (llx <= urx) & (urx <= dst.width) & (0 <= lly) & (lly <= ury) & (ury <= dst.height), 100);
 		pw := pat.width; ph := pat.height;
@@ -4513,7 +4513,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 	(** write image to file rider **)
 	PROCEDURE Write* (VAR fr: Streams.Writer; img: Image);
-	VAR m: Image; h, w, len: LONGINT; adr, aa: ADDRESS; buf: ARRAY 256 OF CHAR;
+	VAR m: Image; h, w, len: SIZE; adr, aa: ADDRESS; buf: ARRAY 256 OF CHAR;
 			SrcCopy:Mode;
 	BEGIN
 		InitMode(SrcCopy, srcCopy);

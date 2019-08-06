@@ -342,7 +342,7 @@ TYPE
 		prefixSearch : WMProperties.BooleanProperty;
 		filterEdit, pathEdit : WMEditors.Editor;
 		popup: WMPopups.Popup;
-		px, py : LONGINT;
+		px, py : SIZE;
 		parent : FTPClient.FTPEntry;
 		selection : FTPClient.FTPListing;
 
@@ -426,7 +426,7 @@ TYPE
 			END
 		END ClickSelected;
 
-		PROCEDURE ContextMenu(sender : ANY; x, y: LONGINT);
+		PROCEDURE ContextMenu(sender : ANY; x, y: SIZE);
 		VAR curSel : FTPClient.FTPListing;
 			w : SelectionWrapper;
 		BEGIN
@@ -614,14 +614,14 @@ TYPE
 		(* -- Drag-Drop Handlers -----------------------------*)
 
 		(* called when an object has been dropped on this FTPList *)
-		PROCEDURE MyDragDropped(x, y : LONGINT; dragInfo : WMWindowManager.DragInfo; VAR handled : BOOLEAN);
+		PROCEDURE MyDragDropped(x, y : SIZE; dragInfo : WMWindowManager.DragInfo; VAR handled : BOOLEAN);
 		BEGIN
 			handled := TRUE;
 			DragDroppedList(x, y, dragInfo)
 		END MyDragDropped;
 
 		(* called by MyDraggedDropped *)
-		PROCEDURE DragDroppedList(x, y : LONGINT; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE DragDroppedList(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR dropTarget : FTPDropTarget;
 		BEGIN
 			NEW(dropTarget, owner.ftp);
@@ -717,7 +717,7 @@ TYPE
 
 		PROCEDURE GetSelection() : FTPClient.FTPListing;
 		VAR selection : FTPClient.FTPListing;
-			l, t, r, b, i, j : LONGINT;
+			l, t, r, b, i, j : SIZE;
 			p : ANY;
 		BEGIN
 			grid.model.Acquire;

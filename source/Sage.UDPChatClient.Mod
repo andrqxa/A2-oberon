@@ -678,7 +678,7 @@ TYPE
 			END;
 		END Close;
 
-		PROCEDURE KeyEvent*(ucs: LONGINT; flags: SET; keysym: LONGINT);
+		PROCEDURE KeyEvent*(ucs: SIZE; flags: SET; keysym: SIZE);
 		BEGIN
 			IF Inputs.Release IN flags THEN RETURN END;
 			IF (keysym = 0FF0DH) & (flags * Inputs.Ctrl # {})  THEN (* Ctrl + Enter *)
@@ -799,7 +799,7 @@ TYPE
 		VAR
 			vc: WMComponents.VisualComponent;
 			vp: WM.ViewPort;
-			i, j: LONGINT;
+			i, j: SIZE;
 			str: ARRAY 128 OF CHAR;
 		BEGIN
 

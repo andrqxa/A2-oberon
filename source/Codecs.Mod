@@ -254,7 +254,7 @@ TYPE
 		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
 		END Open;
 
-		PROCEDURE GetImageInfo*(VAR width, height, format, maxProgressionLevel : LONGINT);
+		PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : LONGINT);
 		END GetImageInfo;
 
 		(** Render will read and decode the image data up to progrssionLevel.
@@ -343,7 +343,7 @@ TYPE
 
 	ImageDescriptor* = OBJECT
 	VAR
-		left*, top*, width*, height*  : LONGINT;
+		left*, top*, width*, height*  : SIZE;
 		image* : Raster.Image;
 		delayTime* : LONGINT; (* in milliseconds *)
 		disposeMode* : LONGINT;
@@ -362,7 +362,7 @@ TYPE
 	END ImageDescriptor;
 
 	ImageSequence* = RECORD
-		width*, height* : LONGINT;
+		width*, height* : SIZE;
 		bgColor* : LONGINT;
 		images* : ImageDescriptor;
 	END;

@@ -43,7 +43,7 @@ TYPE
 		token* : AsyncToken;
 		event* : CompCommand;
 		msgType*, msgSubType* : LONGINT; (** generic message type *)
-		x*, y*, z*, dx*, dy*, dz* : LONGINT; (** in keyboard messages : ucs value in x, keysym in y *)
+		x*, y*, z*, dx*, dy*, dz* : SIZE; (** in keyboard messages : ucs value in x, keysym in y *)
 		flags* : SET; (** in pointer messages : keys in flags *)
 		ext* : ANY; (** extended message *)
 	END;
@@ -151,8 +151,8 @@ TYPE
 			MergeInvalidates = TRUE;
 			MergeInvokeEvents = FALSE;
 
-			PROCEDURE Merge(VAR x,y,dx,dy: LONGINT; X,Y,dX,dY: LONGINT);
-			VAR nx, ny, ndx, ndy: LONGINT;
+			PROCEDURE Merge(VAR x,y,dx,dy: SIZE; X,Y,dX,dY: SIZE);
+			VAR nx, ny, ndx, ndy: SIZE;
 			BEGIN
 				nx := MIN(x,X);
 				ny := MIN(y,Y);

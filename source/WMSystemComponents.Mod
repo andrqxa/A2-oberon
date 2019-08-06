@@ -188,7 +188,7 @@ TYPE
 			tree.Release
 		END NodeSelected;
 
-		PROCEDURE DragDropped*(x, y : LONGINT; dragInfo : WM.DragInfo);
+		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
 		VAR node : WMTrees.TreeNode;
 			dropTarget : FilesDropTarget;
 			p : ANY;
@@ -358,7 +358,7 @@ TYPE
 		dir : DirEntries;
 		selection : DirEntries;
 		nfiles: SIZE; nofRows : LONGINT;
-		px, py : LONGINT;
+		px, py : SIZE;
 		colWidths : WMGrids.Spacings;
 
 		PROCEDURE &Init*;
@@ -402,7 +402,7 @@ TYPE
 
 		PROCEDURE GetSelection*() : DirEntries;
 		VAR selection : DirEntries;
-			l, t, r, b, i, j : LONGINT;
+			l, t, r, b, i, j : SIZE;
 			p : ANY;
 		BEGIN
 			grid.model.Acquire;
@@ -484,8 +484,8 @@ TYPE
 			END;
 		END HandleCommands;
 
-		PROCEDURE ContextMenu(sender : ANY; x, y: LONGINT);
-		VAR wmx, wmy : LONGINT;
+		PROCEDURE ContextMenu(sender : ANY; x, y: SIZE);
+		VAR wmx, wmy : SIZE;
 			curSel : DirEntries;
 			w : SelectionWrapper;
 			sw : StringWrapper;
@@ -550,8 +550,8 @@ TYPE
 
 		PROCEDURE Rename(sender, data : ANY);
 		VAR  d : DirEntry; rename : WMDialogs.MiniStringInput;
-			wmx, wmy: LONGINT; res: WORD;
-			name, op, np : ARRAY FileNameLength (* was 128*) OF CHAR;
+			wmx, wmy: SIZE; res: WORD;
+			name, op, np : ARRAY FileNameLength OF CHAR;
 		BEGIN
 			IF popup # NIL THEN popup.Close; popup := NIL END;
 			IF (data # NIL) & (data IS SelectionWrapper) THEN
@@ -754,13 +754,13 @@ END Open;
 
 		*)
 
-		PROCEDURE MyDragDropped(x, y : LONGINT; dragInfo : WM.DragInfo; VAR handled : BOOLEAN);
+		PROCEDURE MyDragDropped(x, y : SIZE; dragInfo : WM.DragInfo; VAR handled : BOOLEAN);
 		BEGIN
 			handled := TRUE;
 			DragDropped(x, y, dragInfo)
 		END MyDragDropped;
 
-		PROCEDURE DragDropped*(x, y : LONGINT; dragInfo : WM.DragInfo);
+		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WM.DragInfo);
 		VAR dropTarget : FilesDropTarget;
 		BEGIN
 			NEW(dropTarget, path, Refresh);

@@ -691,13 +691,13 @@ TYPE
 			WriteReal(w, 1/72); w.String(" w"); w.Ln;
 		END Init;
 
-		PROCEDURE Transform(x, y : LONGINT; VAR rx, ry : REAL);
+		PROCEDURE Transform(x, y : SIZE; VAR rx, ry : REAL);
 		BEGIN
 			rx := x * scale;
 			ry := prb - y * scale
 		END Transform;
 
-		PROCEDURE WriteTrafoCoord(x, y : LONGINT);
+		PROCEDURE WriteTrafoCoord(x, y : SIZE);
 		VAR rx, ry : REAL;
 		BEGIN
 			Transform(x, y, rx, ry);
@@ -771,7 +771,7 @@ TYPE
 		END PDFSetFont;
 
 
-		PROCEDURE DrawString*(x, y: LONGINT; CONST text : ARRAY OF CHAR);
+		PROCEDURE DrawString*(x, y: SIZE; CONST text : ARRAY OF CHAR);
 		BEGIN
 			font := GetPDFFont(GetFont());
 			SetColrg(color);
@@ -784,10 +784,10 @@ TYPE
 		END DrawString;
 
 		(*ALEX 2005.10.26*)
-		PROCEDURE DrawStringMultiLine*(x, y, width,height: LONGINT; resizeHeight: BOOLEAN; CONST stext : ARRAY OF CHAR; VAR actualHeight: LONGINT);
+		PROCEDURE DrawStringMultiLine*(x, y, width,height: LONGINT; resizeHeight: BOOLEAN; CONST stext : ARRAY OF CHAR; VAR actualHeight: SIZE);
 		VAR i: LONGINT;
 			buf: ARRAY 2 OF CHAR;
-			sumW, sumH, strW, strH, lineH: LONGINT;
+			sumW, sumH, strW, strH, lineH: SIZE;
 			beginLine: LONGINT;
 			f : WMGraphics.Font;
 			overflowH: BOOLEAN;
@@ -858,7 +858,7 @@ TYPE
 			sz, i, j: SIZE;
 			overflow: BOOLEAN;
 			buf: ARRAY 2 OF CHAR;
-			sumW, sumWLeft, strW, strH: LONGINT;
+			sumW, sumWLeft, strW, strH: SIZE;
 			g: WMGraphics.GlyphSpacings;
 			lbRet: BOOLEAN;
 			text: Strings.String;
@@ -955,8 +955,8 @@ TYPE
 			w.String(str); w.String(" j");
 		END PDFSetLineJoin;
 
-		PROCEDURE PolyLine*(CONST points : ARRAY OF WMGraphics.Point2d; nofPoints : LONGINT; closed : BOOLEAN;  color : WMGraphics.Color; mode : LONGINT);
-		VAR i : LONGINT;
+		PROCEDURE PolyLine*(CONST points : ARRAY OF WMGraphics.Point2d; nofPoints : SIZE; closed : BOOLEAN;  color : WMGraphics.Color; mode : WORD);
+		VAR i : SIZE;
 		BEGIN
 			IF nofPoints < 2 THEN RETURN END;
 			ASSERT(nofPoints <= LEN(points));
@@ -982,7 +982,7 @@ TYPE
 			w.String("f*"); w.Ln
 		END FillPoly;
 
-		PROCEDURE Line*(x0, y0, x1, y1 : LONGINT; color : WMGraphics.Color; mode : LONGINT);
+		PROCEDURE Line*(x0, y0, x1, y1 : SIZE; color : WMGraphics.Color; mode : LONGINT);
 		BEGIN
 			SetColRG(color);
 			WriteTrafoCoord(x0, y0); w.String(" m ");

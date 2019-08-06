@@ -543,7 +543,7 @@ BEGIN
 	StrEventLog := Strings.NewString("EventLog");
 END InitStrings;
 
-PROCEDURE NewEditor(CONST caption : ARRAY OF CHAR; alignment, width : LONGINT; onEnter : WMEvents.EventListener) : WMEditors.Editor;
+PROCEDURE NewEditor(CONST caption : ARRAY OF CHAR; alignment : WORD; width : SIZE; onEnter : WMEvents.EventListener) : WMEditors.Editor;
 VAR editor : WMEditors.Editor;
 BEGIN
 	NEW(editor); editor.bounds.SetWidth(width); editor.alignment.Set(WMComponents.AlignLeft);

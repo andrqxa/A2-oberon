@@ -394,15 +394,15 @@ TYPE
 				END ReceiveLine;
 
 
-				PROCEDURE WindowChange*( width, height: LONGINT );
+				PROCEDURE WindowChange*( width, height: SIZE );
 				VAR p: T.Packet;
 				BEGIN
 					NEW( p, ChannelRequest, 512 );
 					p.AppInteger( rchan );
 					p.AppString( "window-change" );
 					p.AppChar( 0X );	(* false *)
-					p.AppInteger( width );
-					p.AppInteger( height );
+					p.AppInteger( width(LONGINT) );
+					p.AppInteger( height(LONGINT) );
 					p.AppInteger( 0 );	(* width, pixel *)
 					p.AppInteger( 0 );	(* height, pixel *)
 					SendPacket( p );

@@ -107,7 +107,7 @@ TYPE
 			RETURN panel
 		END CreateForm;
 
-		PROCEDURE &New*(text: Texts.Text; startPos, cursorPos: SIZE; x, y :LONGINT; CONST prefix : ARRAY OF CHAR; scope : TS.Scope; first: BOOLEAN);
+		PROCEDURE &New*(text: Texts.Text; startPos, cursorPos: SIZE; x, y :SIZE; CONST prefix : ARRAY OF CHAR; scope : TS.Scope; first: BOOLEAN);
 		VAR vc : WMComponents.VisualComponent;
 		BEGIN
 			vc := CreateForm();
@@ -130,14 +130,14 @@ TYPE
 			edit.SetFocus;
 		END New;
 
-		PROCEDURE ListKeyPressed(ucs : LONGINT; flags : SET; VAR keySym : LONGINT; VAR handled : BOOLEAN);
+		PROCEDURE ListKeyPressed(ucs : SIZE; flags : SET; VAR keySym : SIZE; VAR handled : BOOLEAN);
 		BEGIN
 			IF keySym = 0FF0DH THEN handled := TRUE; Ok(SELF, NIL); (*edit.SetFocus*)
 			ELSIF keySym = 0FF1BH THEN ScheduleHide
 			END;
 		END ListKeyPressed;
 
-		PROCEDURE EditKeyPressed(ucs : LONGINT; flags : SET; VAR keySym : LONGINT; VAR handled : BOOLEAN);
+		PROCEDURE EditKeyPressed(ucs : SIZE; flags : SET; VAR keySym : SIZE; VAR handled : BOOLEAN);
 		BEGIN
 			handled := TRUE;
 (*			IF keySym = 0FF08H THEN
@@ -163,7 +163,7 @@ TYPE
 		END ScheduleHide;
 
 		PROCEDURE WriteSelected;
-		VAR ac, ar, bc, br : LONGINT;
+		VAR ac, ar, bc, br : SIZE;
 			p : ANY;
 			index : SIZE;
 			str, newStr : ARRAY 1024 OF CHAR;
@@ -307,7 +307,7 @@ TYPE
 		END Init;
 
 		PROCEDURE OnStartDrag(sender, data : ANY);
-		VAR w, h: LONGINT; img: WMGraphics.Image; canvas: WMGraphics.BufferCanvas;
+		VAR w, h: SIZE; img: WMGraphics.Image; canvas: WMGraphics.BufferCanvas;
 		BEGIN
 			NEW(img);
 			treeView.MeasureNode(treeView.draggedNode, w, h);
@@ -398,7 +398,7 @@ TYPE
 			str : ARRAY 64 OF CHAR;
 			newStr : ARRAY 1024 OF CHAR;
 			signature : TS.ProcedureSignature;
-			x, y : LONGINT;
+			x, y : SIZE;
 			selector : SelectWindow;
 		BEGIN
 			IF ~IsCallFromSequencer() THEN
@@ -434,8 +434,8 @@ TYPE
 			tree.Release;
 		END Complete;
 
-		PROCEDURE ContextMenu(sender : ANY; x, y: LONGINT);
-		VAR wmx, wmy : LONGINT;
+		PROCEDURE ContextMenu(sender : ANY; x, y: SIZE);
+		VAR wmx, wmy : SIZE;
 			popup: WMPopups.Popup;
 		BEGIN
 			NEW(popup);

@@ -99,7 +99,7 @@ TYPE
 			vc : WMComponents.VisualComponent;
 			xml : XML.Element;
 			m : WMWindowManager.WindowManager;
-			indent : LONGINT;
+			indent : SIZE;
 		BEGIN
 			IncCount;
 			loadID := 0;

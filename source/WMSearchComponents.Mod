@@ -351,7 +351,7 @@ TYPE
 			RETURN FALSE;
 		END HandleTab;
 
-		PROCEDURE HandleShortcut*(ucs : LONGINT; flags : SET; keysym : LONGINT) : BOOLEAN;
+		PROCEDURE HandleShortcut*(ucs : SIZE; flags : SET; keysym : SIZE) : BOOLEAN;
 
 			PROCEDURE ControlKeyDown(flags : SET) : BOOLEAN;
 			BEGIN
@@ -683,7 +683,7 @@ TYPE
 			hasBeenClosed := TRUE;
 		END Close;
 
-		PROCEDURE HandleShortcut(ucs : LONGINT; flags : SET; keysym : LONGINT) : BOOLEAN;
+		PROCEDURE HandleShortcut(ucs : SIZE; flags : SET; keysym : SIZE) : BOOLEAN;
 
 			PROCEDURE ControlKeyDown(flags : SET) : BOOLEAN;
 			BEGIN

@@ -11,7 +11,7 @@ TYPE
 	DebugWindow = OBJECT(WMComponents.FormWindow);
 	VAR
 		dragging : BOOLEAN;
-		lastX, lastY : LONGINT;
+		lastX, lastY : SIZE;
 		debugComponent : DebugComponent;
 		contextMenu : WMPopups.Popup;
 
@@ -27,7 +27,7 @@ TYPE
 			WM.ExtAddWindow(SELF, 50, 50,{WM.FlagStayOnTop})
 		END New;
 
-		PROCEDURE PointerDown*(x, y:LONGINT; keys:SET);
+		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
 		BEGIN
 			lastX := bounds.l+x; lastY:=bounds.t+y;
 			IF keys = {0} THEN
@@ -47,8 +47,8 @@ TYPE
 			Close;
 		END HandleClose;
 
-		PROCEDURE PointerMove*(x,y:LONGINT; keys:SET);
-		VAR dx, dy : LONGINT;
+		PROCEDURE PointerMove*(x,y:SIZE; keys:SET);
+		VAR dx, dy : SIZE;
 		BEGIN
 			IF dragging THEN
 				x := bounds.l + x; y := bounds.t + y; dx := x - lastX; dy := y - lastY;
@@ -57,7 +57,7 @@ TYPE
 			END
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y:LONGINT; Keys:SET);
+		PROCEDURE PointerUp*(x, y:SIZE; Keys:SET);
 		BEGIN
 			dragging := FALSE
 		END PointerUp;

@@ -228,8 +228,8 @@ TYPE
 			IF (buttons * StoreButton # {}) THEN storeBtn.caption.SetAOC("Store") END;
 		END Store;
 
-		PROCEDURE FormatHandler(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
-		VAR rectangle : WMRectangles.Rectangle; left, top : LONGINT;
+		PROCEDURE FormatHandler(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
+		VAR rectangle : WMRectangles.Rectangle; left, top : SIZE;
 		BEGIN
 			IF (formatBtn = NIL) THEN RETURN END;
 			handled := TRUE;
@@ -394,7 +394,7 @@ TYPE
 			toolbar.visible.Set(TRUE);
 		END SetToolbar;
 
-		PROCEDURE HandleShortcut*(ucs : LONGINT; flags : SET; keysym : LONGINT) : BOOLEAN;
+		PROCEDURE HandleShortcut*(ucs : SIZE; flags : SET; keysym : SIZE) : BOOLEAN;
 		BEGIN
 			IF (buttons * StoreButton # {}) & (keysym = 13H) & ControlKeyDown(flags) THEN (* CTRL-S *)
 				StoreHandler(NIL, NIL);
@@ -421,7 +421,7 @@ TYPE
 			filenameEdit.GetAsString(filename);
 			WMRestorable.StoreString(config, "file", filename);
 			WMRestorable.StoreString(config, "codecFormat", codecFormat);
-			WMRestorable.StoreLongint(config, "firstLine", editor.tv.firstLine.Get());
+			WMRestorable.StoreLongint(config, "firstLine", editor.tv.firstLine.Get()(LONGINT));
 			WMRestorable.StoreLongint(config, "cursorPos", editor.tv.cursor.GetPosition()(LONGINT));
 			WMRestorable.StoreBoolean(config, "wordWrap", wordWrap);
 		END ToXml;

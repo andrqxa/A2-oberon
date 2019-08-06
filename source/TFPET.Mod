@@ -345,10 +345,10 @@ TYPE
 	Position = OBJECT
 	VAR
 		marker : WMTextView.PositionMarker;
-		ucs, keysym : LONGINT; flags : SET;
+		ucs, keysym : SIZE; flags : SET;
 		next : Position;
 
-		PROCEDURE &Init*(ucs, keysym : LONGINT; flags : SET);
+		PROCEDURE &Init*(ucs, keysym : SIZE; flags : SET);
 		BEGIN
 			SELF.ucs := ucs; SELF.keysym := keysym; SELF.flags := flags;
 			marker := NIL; next := NIL;
@@ -368,7 +368,7 @@ TYPE
 			SELF.textView := textView;
 		END Init;
 
-		PROCEDURE FindPosition(ucs, keysym : LONGINT; flags : SET) : Position;
+		PROCEDURE FindPosition(ucs, keysym : SIZE; flags : SET) : Position;
 		VAR p : Position;
 		BEGIN
 			p := positions;
@@ -379,7 +379,7 @@ TYPE
 		END FindPosition;
 
 		(* Associate current cursor position with the spec  ified key combination.  *)
-		PROCEDURE StoreCurrentPosition(ucs, keysym : LONGINT; flags : SET);
+		PROCEDURE StoreCurrentPosition(ucs, keysym : SIZE; flags : SET);
 		VAR newPosition : Position; intPos : SIZE;
 		BEGIN
 			ASSERT(flags * { Inputs.Release} = {});
@@ -395,7 +395,7 @@ TYPE
 			newPosition.marker.SetPosition(intPos);
 		END StoreCurrentPosition;
 
-		PROCEDURE RecallPosition(ucs, keysym : LONGINT; flags : SET);
+		PROCEDURE RecallPosition(ucs, keysym : SIZE; flags : SET);
 		VAR position : Position;
 		BEGIN
 			position := FindPosition(ucs, keysym, flags);
@@ -877,7 +877,7 @@ TYPE
 			IF (tree # NIL) THEN tree.SelectNodeByPos (position) END
 		END CursorChanged;
 
-		PROCEDURE HandleShortcut(ucs : LONGINT; flags : SET; keysym : LONGINT) : BOOLEAN;
+		PROCEDURE HandleShortcut(ucs : SIZE; flags : SET; keysym : SIZE) : BOOLEAN;
 		VAR pos : SIZE;
 
 			PROCEDURE HandlePreviousNext(forward : BOOLEAN);
@@ -1118,7 +1118,7 @@ TYPE
 			resizer : WMStandardComponents.Resizer;
 			posLabel : WMStandardComponents.Label;
 			font: WMGraphics.Font;
-			dx, dy: LONGINT;
+			dx, dy: SIZE;
 
 			PROCEDURE CreateToolbar() : WMComponents.VisualComponent;
 			VAR toolbar : WMStandardComponents.Panel;
@@ -1720,7 +1720,7 @@ TYPE
 			END;
 		END UpdateState;
 
-		PROCEDURE DragDroppedHandler(x, y : LONGINT; dragInfo : WMWindowManager.DragInfo; VAR handled : BOOLEAN);
+		PROCEDURE DragDroppedHandler(x, y : SIZE; dragInfo : WMWindowManager.DragInfo; VAR handled : BOOLEAN);
 		VAR dropTarget : URLDropTarget;
 		BEGIN
 			NEW(dropTarget, SELF);
@@ -1741,7 +1741,7 @@ TYPE
 			END
 		END PositionHandler;
 
-		PROCEDURE FormatHandler(x, y: LONGINT; keys: SET; VAR handled: BOOLEAN);
+		PROCEDURE FormatHandler(x, y: SIZE; keys: SET; VAR handled: BOOLEAN);
 		VAR rectangle: WMRectangles.Rectangle;
 		BEGIN
 			handled := TRUE;
@@ -2516,15 +2516,15 @@ TYPE
 			WMRestorable.StoreBoolean(elem, "wordWrap", page.editor.tv.wrapMode.Get() = WMTextView.WrapWord);
 
 			NEW(entry); entry.SetName("Editor");
-				WMRestorable.StoreLongint(entry, "firstLine", page.editor.tv.firstLine.Get());
+				WMRestorable.StoreLongint(entry, "firstLine", page.editor.tv.firstLine.Get()(LONGINT));
 				WMRestorable.StoreLongint(entry, "cursorPos", page.editor.tv.cursor.GetPosition()(LONGINT));
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("SplitEditor");
 				WMRestorable.StoreBoolean(entry, "visible", page.splitPanel.visible.Get());
-				WMRestorable.StoreLongint(entry, "firstLine", page.splitEditor.tv.firstLine.Get());
+				WMRestorable.StoreLongint(entry, "firstLine", page.splitEditor.tv.firstLine.Get()(LONGINT));
 				WMRestorable.StoreLongint(entry, "cursorPos", page.splitEditor.tv.cursor.GetPosition()(LONGINT));
-				WMRestorable.StoreLongint(entry, "height", page.splitPanel.bounds.GetHeight());
+				WMRestorable.StoreLongint(entry, "height", page.splitPanel.bounds.GetHeight()(LONGINT));
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("SearchPanel");
@@ -2541,19 +2541,19 @@ TYPE
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("LogPanel");
-				WMRestorable.StoreLongint(entry, "height", page.logPanel.bounds.GetHeight());
+				WMRestorable.StoreLongint(entry, "height", page.logPanel.bounds.GetHeight()(LONGINT));
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("SidePanel");
 				WMRestorable.StoreBoolean(entry, "visible", page.sidePanel.visible.Get());
-				WMRestorable.StoreLongint(entry, "width", page.sidePanel.bounds.GetWidth());
-				WMRestorable.StoreLongint(entry, "scratchHeight", page.scratchPanel.bounds.GetHeight());
+				WMRestorable.StoreLongint(entry, "width", page.sidePanel.bounds.GetWidth()(LONGINT));
+				WMRestorable.StoreLongint(entry, "scratchHeight", page.scratchPanel.bounds.GetHeight()(LONGINT));
 			elem.AddContent(entry);
 
 			RETURN elem;
 		END StorePage;
 
-		PROCEDURE HandleShortcut(ucs : LONGINT; flags : SET; keysym : LONGINT) : BOOLEAN;
+		PROCEDURE HandleShortcut(ucs : SIZE; flags : SET; keysym : SIZE) : BOOLEAN;
 		VAR filename : Filename; options : CompilerOptions;
 		BEGIN
 			modifierFlags := flags;

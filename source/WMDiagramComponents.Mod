@@ -386,7 +386,7 @@ TYPE
 			END;
 		END Update;
 
-		PROCEDURE Scale(factor, min : REAL; srcPoints : Dataset; tarPoints : LongintDataset; height, border : LONGINT);
+		PROCEDURE Scale(factor, min : REAL; srcPoints : Dataset; tarPoints : LongintDataset; height, border : SIZE);
 		VAR dim : SIZE;
 		BEGIN
 			FOR dim := 0 TO dimensions-1 DO
@@ -394,10 +394,10 @@ TYPE
 			END;
 		END Scale;
 
-		PROCEDURE DrawLines(canvas : WMGraphics.Canvas; w, h, border : LONGINT; VAR tmin, tmax : REAL);
+		PROCEDURE DrawLines(canvas : WMGraphics.Canvas; w, h, border : SIZE; VAR tmin, tmax : REAL);
 		VAR
 			nofPoints, nofVisible, index, dim : SIZE;
-			x, v0, v1 : LONGINT;
+			x, v0, v1 : SIZE;
 			factor : REAL;
 		BEGIN
 			model.Acquire;
@@ -438,10 +438,10 @@ TYPE
 			model.Release;
 		END DrawLines;
 
-		PROCEDURE DrawAreas(canvas : WMGraphics.Canvas; w, h, border : LONGINT; VAR tmin, tmax : REAL);
+		PROCEDURE DrawAreas(canvas : WMGraphics.Canvas; w, h, border : SIZE; VAR tmin, tmax : REAL);
 		VAR
 			nofPoints, nofVisible, nofStandalone, index, dim : SIZE;
-			x, y0, y1: LONGINT; colorLine, color : WMGraphics.Color;
+			x, y0, y1: SIZE; colorLine, color : WMGraphics.Color;
 			maxSumIdx : SIZE;
 			v0, v1 : LONGINT;
 			factor : REAL;
@@ -552,7 +552,7 @@ TYPE
 
 		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR
-			w, h, yborder, t, virtp : LONGINT; color: WMGraphics.Color;
+			w, h, yborder, t, virtp : SIZE; color: WMGraphics.Color;
 			mode : LONGINT;
 			tmin, tmax : REAL;
 			str : ARRAY 16 OF CHAR;
@@ -849,7 +849,7 @@ TYPE
 		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR boundary,rect: WMRectangles.Rectangle; i: LONGINT;
 
-			PROCEDURE Point2dToPoint(xr,yr: LONGREAL; VAR x,y: LONGINT);
+			PROCEDURE Point2dToPoint(xr,yr: LONGREAL; VAR x,y: SIZE);
 			BEGIN
 				x := ENTIER(boundary.l + (xr-c.l)/(c.r-c.l) * (boundary.r-boundary.l) +0.5);
 				y := ENTIER(boundary.b + (yr-c.b)/(c.t-c.b) * (boundary.t-boundary.b) +0.5);

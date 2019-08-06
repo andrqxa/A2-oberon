@@ -255,7 +255,7 @@ TYPE
 		END NewCode;
 
 		PROCEDURE SelectChar(sender, data :ANY);
-		VAR l, t, r, b, pos : LONGINT;
+		VAR l, t, r, b, pos : SIZE;
 		BEGIN
 			characters.GetSelection(l, t, r, b);
 			pos := t * NofCols + l;
@@ -273,7 +273,7 @@ TYPE
 		END SelectChar;
 
 		PROCEDURE FilterSelection(sender, data :ANY);
-		VAR l, t, r, b, pos : LONGINT;
+		VAR l, t, r, b, pos : SIZE;
 		BEGIN
 			filterComponents.GetSelection(l, t, r, b);
 			pos := l;
@@ -326,8 +326,8 @@ TYPE
 			winstance := NIL
 		END Close;
 
-		PROCEDURE DrawAll(canvas : WMGraphics.Canvas; w, h : LONGINT; state : SET; x, y : LONGINT);
-		VAR pos : LONGINT;
+		PROCEDURE DrawAll(canvas : WMGraphics.Canvas; w, h : SIZE; state : SET; x, y : SIZE);
+		VAR pos : SIZE;
 			points : ARRAY 2560 OF WMGraphics.Point2d;
 		BEGIN
 			IF WMGrids.CellHighlighted IN state THEN
@@ -353,8 +353,8 @@ TYPE
 			END
 		END DrawAll;
 
-		PROCEDURE DrawFilterComponents(canvas : WMGraphics.Canvas; w, h : LONGINT; state : SET; x, y : LONGINT);
-		VAR pos : LONGINT; g : WMCCGFonts.Glyph;
+		PROCEDURE DrawFilterComponents(canvas : WMGraphics.Canvas; w, h : SIZE; state : SET; x, y : SIZE);
+		VAR pos : SIZE; g : WMCCGFonts.Glyph;
 			points : ARRAY 2560 OF WMGraphics.Point2d;
 		BEGIN
 			pos := x;

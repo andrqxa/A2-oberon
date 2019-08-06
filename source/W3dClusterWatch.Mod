@@ -130,7 +130,7 @@ TYPE
 			lookat: Vectors.TVector3d;
 			radius, angle, height : LONGREAL;
 			mouseKeys : SET;
-			oldX, oldY : LONGINT;
+			oldX, oldY : SIZE;
 
 			(* 3d World *)
 			world : World.World;
@@ -254,7 +254,7 @@ TYPE
 			Invalidate(Rect.MakeRect(0,0,img.width, img.height))
 		END Render;
 
-		PROCEDURE PointerDown*(x, y:LONGINT; keys:SET);
+		PROCEDURE PointerDown*(x, y:SIZE; keys:SET);
 		BEGIN
 			mouseKeys := (keys * {0, 1, 2});
 			oldX := x; oldY := y;
@@ -263,7 +263,7 @@ TYPE
 			END
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y: LONGINT; keys : SET);
+		PROCEDURE PointerMove*(x, y: SIZE; keys : SET);
 		BEGIN
 			IF mouseKeys * {0} # {} THEN
 				IF mouseKeys * {2} # {} THEN
@@ -277,7 +277,7 @@ TYPE
 			oldX := x; oldY := y
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y:LONGINT; keys:SET);
+		PROCEDURE PointerUp*(x, y:SIZE; keys:SET);
 		BEGIN
 			mouseKeys := (keys * {0, 1, 2});
 		END PointerUp;

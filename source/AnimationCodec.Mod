@@ -130,11 +130,11 @@ TYPE
 		END Open;
 
 		PROCEDURE ProcessFrame(frame : XML.Element; VAR desc : Codecs.ImageDescriptor; VAR res : WORD);
-		VAR string, imageName : Strings.String; from, to, current : LONGINT; minDigits : SIZE; filename : Files.FileName; last, d : Codecs.ImageDescriptor;
+		VAR string, imageName : Strings.String; left, top, from, to, current : LONGINT; minDigits : SIZE; filename : Files.FileName; last, d : Codecs.ImageDescriptor;
 		BEGIN
 			NEW(desc);
-			IF ~GetInteger(frame, XmlLeft, desc.left) THEN desc.left := default.x; END;
-			IF ~GetInteger(frame, XmlTop, desc.top) THEN desc.top := default.y; END;
+			IF ~GetInteger(frame, XmlLeft, left) THEN desc.left := default.x; ELSE desc.left := left END;
+			IF ~GetInteger(frame, XmlTop, top) THEN desc.top := default.y; ELSE desc.top := top END;
 			IF ~GetInteger(frame, XmlDelayTime, desc.delayTime) THEN desc.delayTime := default.time; END;
 			IF ~GetInteger(frame, XmlDisposeMode, desc.disposeMode) THEN desc.disposeMode := default.mode; END;
 			IF ~GetInteger(frame, XmlFrom, from) THEN from := 0 END;

@@ -29,7 +29,7 @@ TYPE
 	VAR
 		fontcache* : ANY;
 		name* : ARRAY 32 OF CHAR;
-		size* : LONGINT;
+		size* : SIZE;
 		style* : SET;
 
 		PROCEDURE IsEqual*(f : FontInfo): BOOLEAN;
@@ -52,7 +52,7 @@ TYPE
 		voff* : LONGINT;
 		fontInfo* : FontInfo;
 
-		PROCEDURE Set* (color, bgcolor, voff : LONGINT; CONST name : ARRAY OF CHAR; size : LONGINT; style : SET);
+		PROCEDURE Set* (color, bgcolor, voff : LONGINT; CONST name : ARRAY OF CHAR; size : SIZE; style : SET);
 		BEGIN
 			SELF.color := color;
 			SELF.bgcolor := bgcolor;

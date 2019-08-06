@@ -36,10 +36,10 @@ TYPE
 			StoreString(window, "name", name);
 			StoreString(window, "loader", loader);
 
-			StoreLongint(window, "l", w.bounds.l);
-			StoreLongint(window, "t", w.bounds.t);
-			StoreLongint(window, "r", w.bounds.r);
-			StoreLongint(window, "b", w.bounds.b);
+			StoreLongint(window, "l", w.bounds.l(LONGINT));
+			StoreLongint(window, "t", w.bounds.t(LONGINT));
+			StoreLongint(window, "r", w.bounds.r(LONGINT));
+			StoreLongint(window, "b", w.bounds.b(LONGINT));
 
 			StoreSet(window, "flags", w.flags);
 

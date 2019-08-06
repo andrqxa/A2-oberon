@@ -1311,8 +1311,8 @@ TYPE
 	VAR
 		contentName* : Strings.String;
 		redrawProc* : PROCEDURE {DELEGATE};
-		updatePropsPosition*: PROCEDURE {DELEGATE} (x, y: LONGINT);
-		contentWidth*, contentHeight*: LONGINT;
+		updatePropsPosition*: PROCEDURE {DELEGATE} (x, y: SIZE);
+		contentWidth*, contentHeight*: SIZE;
 		zoomFactor* : REAL;
 		ownerDoc*: Document;
 		hasFocus- : BOOLEAN;
@@ -1334,7 +1334,7 @@ TYPE
 			RETURN newObj;
 		END Clone;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : LONGINT; zoomFactor: REAL; quality, preview: BOOLEAN);
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: REAL; quality, preview: BOOLEAN);
 		VAR color: LONGINT;
 		BEGIN
 			color := LONGINT(0FF0000FFH);
@@ -1351,12 +1351,12 @@ TYPE
 			END;
 		END Redraw;
 
-		PROCEDURE UpdatePosition*(x, y: LONGINT);
+		PROCEDURE UpdatePosition*(x, y: SIZE);
 		BEGIN
 			updatePropsPosition(x, y);
 		END UpdatePosition;
 
-		PROCEDURE SetSize*(w, h: LONGINT);
+		PROCEDURE SetSize*(w, h: SIZE);
 		BEGIN
 			contentWidth := w; contentHeight := h;
 		END SetSize;
@@ -1366,7 +1366,7 @@ TYPE
 			zoomFactor := zoomF;
 		END Resize;
 
-		PROCEDURE Show*(x, y: LONGINT);
+		PROCEDURE Show*(x, y: SIZE);
 		END Show;
 
 		PROCEDURE Hide*;
@@ -1397,13 +1397,13 @@ TYPE
 			RETURN manager.pointerStandard;
 		END GetPluginPointer;
 
-		PROCEDURE PointerDown*(x, y: LONGINT; keys: SET);
+		PROCEDURE PointerDown*(x, y: SIZE; keys: SET);
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y: LONGINT; keys: SET);
+		PROCEDURE PointerMove*(x, y: SIZE; keys: SET);
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y: LONGINT; keys: SET);
+		PROCEDURE PointerUp*(x, y: SIZE; keys: SET);
 		END PointerUp;
 
 		PROCEDURE PointerLeave*;
@@ -1414,7 +1414,7 @@ TYPE
 			RETURN TRUE;
 		END IsHit;
 
-		PROCEDURE KeyEvent*(ucs: LONGINT; flags: SET; VAR keyCode: LONGINT);
+		PROCEDURE KeyEvent*(ucs: SIZE; flags: SET; VAR keyCode: SIZE);
 		END KeyEvent;
 
 		PROCEDURE Start*;

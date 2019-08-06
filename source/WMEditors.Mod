@@ -135,8 +135,8 @@ TYPE
 
 		changeDue: BOOLEAN; (* if there is a change due and update must be performed on the model *)
 
-		renderOffsetX : LONGINT;
-		lastX, lastY : LONGINT;
+		renderOffsetX : SIZE;
+		lastX, lastY : SIZE;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -196,7 +196,7 @@ TYPE
 		PROCEDURE PropertyChanged*(sender, property : ANY);
 		VAR f: WMGraphics.Font;
 
-			PROCEDURE TextHeight(): LONGINT;
+			PROCEDURE TextHeight(): SIZE;
 			BEGIN
 				RETURN MAX (bounds.GetHeight()-2*textBorder.Get(),4);
 			END TextHeight;
@@ -332,7 +332,7 @@ TYPE
 		END Changed;
 
 		(* Determine the cursor character position given coordinate x in the component coordinate system *)
-		PROCEDURE GetCursorPosition(x: LONGINT) : LONGINT;
+		PROCEDURE GetCursorPosition(x: SIZE) : LONGINT;
 		VAR
 			cursorPosition, code, i : LONGINT;
 			found : BOOLEAN; lastDistance : REAL;
@@ -387,13 +387,13 @@ TYPE
 		CONST CursorWidth = 2; BorderWidth = 1;
 		VAR
 			font : WMGraphics.Font; g : WMGraphics.GlyphSpacings;
-			x, y : LONGINT; cursorX, selectionX0, selectionX1, tw, th: LONGINT; code, width, height : LONGINT;
+			x, y : SIZE; cursorX, selectionX0, selectionX1, tw, th: SIZE; code: LONGINT; width, height : SIZE;
 			i: SIZE;
 			selectionIsValid : BOOLEAN;
 			halign: LONGINT;
 			TextBorder: LONGINT;
 
-			PROCEDURE StringSize(VAR w,h: LONGINT);
+			PROCEDURE StringSize(VAR w,h: SIZE);
 			VAR code: LONGINT; i: SIZE;
 			BEGIN
 				w := 0; h := 0;
@@ -848,7 +848,7 @@ TYPE
 			END;
 		END Paste;
 
-		PROCEDURE KeyEvent*(ucs : LONGINT; flags : SET; VAR keySym : LONGINT);
+		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; VAR keySym : SIZE);
 		BEGIN
 			currentFlags := flags;
 			IF readOnlyI THEN RETURN END;
@@ -901,13 +901,13 @@ TYPE
 					SetIMEInterface(ime);
 					ime.KeyEvent(ucs, flags, keySym)
 				ELSIF (0 <= ucs) & (ucs <= 255) THEN
-					InsertChar(ucs);
+					InsertChar(ucs(LONGINT));
 				END;
 			END;
 			WMTextView.cursorBlinker.Show(SELF);
 		END KeyEvent;
 
-		PROCEDURE PointerDown*(x, y : LONGINT; keys : SET);
+		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
 		VAR newCursorPosition: SIZE; oldInterclick : LONGINT;
 		BEGIN
 			PointerDown^(x, y, keys);
@@ -953,7 +953,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerUp*(x, y : LONGINT; keys : SET);
+		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN
 			PointerUp^(x, y, keys);
 			selecting := FALSE;
@@ -968,7 +968,7 @@ TYPE
 			IF dragPossible THEN ResetSelection; dragPossible := FALSE; END;
 		END PointerUp;
 
-		PROCEDURE PointerMove*(x, y : LONGINT; keys : SET);
+		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
 		VAR posX : LONGINT; valid : BOOLEAN; start, end : SIZE;
 		BEGIN
 			IF dragPossible THEN
@@ -1004,7 +1004,7 @@ TYPE
 		VAR
 			image : WMGraphics.Image; canvas : WMGraphics.BufferCanvas;
 			font : WMGraphics.Font;
-			w, h : LONGINT;
+			w, h : SIZE;
 		BEGIN
 			IF GetSelectionAsString(dragString) THEN
 				w := 0; h := 0;
@@ -1080,7 +1080,7 @@ TYPE
 			END;
 		END DragWasAccepted;
 
-		PROCEDURE DragOver*(x, y : LONGINT; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE DragOver*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR pos : LONGINT; doInvalidate : BOOLEAN;
 		BEGIN
 			IF takesFocus.Get() THEN
@@ -1099,7 +1099,7 @@ TYPE
 			END;
 		END DragOver;
 
-		PROCEDURE DragDropped*(x, y : LONGINT; dragInfo : WMWindowManager.DragInfo);
+		PROCEDURE DragDropped*(x, y : SIZE; dragInfo : WMWindowManager.DragInfo);
 		VAR dt : DropTarget; pos : LONGINT;
 		BEGIN
 			IF takesFocus.Get() THEN
@@ -1132,7 +1132,7 @@ TYPE
 			RETURN cursorPosition;
 		END GetCurrentCursorPosition;
 
-		PROCEDURE GetCursorScreenPosition(VAR x, y : LONGINT);
+		PROCEDURE GetCursorScreenPosition(VAR x, y : SIZE);
 		BEGIN
 			Acquire;
 			x := GetCursorCoordinateX() + renderOffsetX;
@@ -1264,7 +1264,7 @@ TYPE
 	VAR
 		text* : Texts.Text;
 		cursor* : WMTextView.PositionMarker;
-		keySym* : LONGINT;
+		keySym* : SIZE;
 		flags* : SET;
 		handled* : BOOLEAN;
 	END MacroData;
@@ -1438,7 +1438,7 @@ TYPE
 			RETURN tv.GetInternalPos(tv.cursor.GetPosition());
 		END GetCursorPosition;
 
-		PROCEDURE GetCursorScreenPosition(VAR x, y : LONGINT);
+		PROCEDURE GetCursorScreenPosition(VAR x, y : SIZE);
 		BEGIN
 			tv.Acquire;
 			text.AcquireRead;
@@ -1661,7 +1661,7 @@ TYPE
 			text.ReleaseWrite
 		END IndentRight;
 
-		PROCEDURE MousePressed(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE MousePressed(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		VAR
 			pos, internalPos, a, b : SIZE; ch : Texts.Char32;
 			selectionText : Texts.Text;
@@ -1695,7 +1695,7 @@ TYPE
 			END
 		END MousePressed;
 
-		PROCEDURE KeyPressed*(ucs : LONGINT; flags : SET; VAR keySym : LONGINT; VAR handled : BOOLEAN);
+		PROCEDURE KeyPressed*(ucs : SIZE; flags : SET; VAR keySym : SIZE; VAR handled : BOOLEAN);
 		VAR
 			textChanged : BOOLEAN;
 
@@ -1804,7 +1804,7 @@ TYPE
 					macros.Call(macroData);
 					IF ~macroData.handled & (ucs > 26) THEN
 						textChanged := TRUE;
-						InsertChar(ucs);
+						InsertChar(ucs(Texts.Char32));
 					END
 				END;
 			END;

@@ -1742,7 +1742,7 @@ TYPE
 			ReleaseWrite;
 		END SetPassive;
 
-		PROCEDURE GetFont*(VAR name : ARRAY OF CHAR; VAR size : LONGINT; VAR style : SET);
+		PROCEDURE GetFont*(VAR name : ARRAY OF CHAR; VAR size : SIZE; VAR style : SET);
 		VAR font : WMGraphics.Font;
 		BEGIN
 			font := Get();
@@ -1786,7 +1786,7 @@ TYPE
 			COPY(font.name, name);
 		END GetFontName;
 
-		PROCEDURE SetSize*(size : LONGINT);
+		PROCEDURE SetSize*(size : SIZE);
 		VAR font : WMGraphics.Font;
 		BEGIN
 			AcquireWrite;
@@ -1804,7 +1804,7 @@ TYPE
 			ReleaseWrite;
 		END SetSize;
 
-		PROCEDURE GetSize*() : LONGINT;
+		PROCEDURE GetSize*() : SIZE;
 		VAR font : WMGraphics.Font;
 		BEGIN
 			font := Get();
@@ -1890,8 +1890,8 @@ TYPE
 		VAR new : WMGraphics.Point2d;
 		BEGIN
 			AcquireWrite;
-			r.SkipWhitespace; r.Int(new.x, FALSE);
-			r.SkipWhitespace; r.Int(new.y, FALSE);
+			r.SkipWhitespace; r.Size(new.x, FALSE);
+			r.SkipWhitespace; r.Size(new.y, FALSE);
 			NotDefault;
 			IF (new.x=value.x) & (new.y=value.y) THEN
 				value := new;
@@ -1942,7 +1942,7 @@ TYPE
 			ReleaseWrite
 		END SetPassive;
 
-		PROCEDURE SetCoordinate*(x,y : LONGINT);
+		PROCEDURE SetCoordinate*(x,y : SIZE);
 		BEGIN
 			AcquireWrite;
 			IF (x#value.x) OR (y#value.y) THEN
@@ -1953,32 +1953,32 @@ TYPE
 			ReleaseWrite
 		END SetCoordinate;
 
-		PROCEDURE GetCoordinate*(VAR x,y: LONGINT);
+		PROCEDURE GetCoordinate*(VAR x,y: SIZE);
 		BEGIN
 			x:=value.x; y:=value.y
 		END GetCoordinate;
 
 
-		PROCEDURE SetX*(x : LONGINT);
+		PROCEDURE SetX*(x : SIZE);
 		BEGIN
 			AcquireWrite;
 			IF value.x # x THEN value.x := x; Changed END; NotDefault;
 			ReleaseWrite
 		END SetX;
 
-		PROCEDURE SetY*(y : LONGINT);
+		PROCEDURE SetY*(y : SIZE);
 		BEGIN
 			AcquireWrite;
 			IF value.y # y THEN value.y := y; Changed END; NotDefault;
 			ReleaseWrite
 		END SetY;
 
-		PROCEDURE GetX*() : LONGINT;
+		PROCEDURE GetX*() : SIZE;
 		BEGIN
 			RETURN value.x
 		END GetX;
 
-		PROCEDURE GetY*(): LONGINT;
+		PROCEDURE GetY*(): SIZE;
 		BEGIN
 			RETURN value.y
 		END GetY;
@@ -2044,13 +2044,13 @@ TYPE
 		value : WMRectangles.Rectangle;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR new : WMRectangles.Rectangle;
+		VAR new : WMRectangles.Rectangle; v: LONGINT;
 		BEGIN
 			AcquireWrite;
-			r.SkipWhitespace; r.Int(new.l, FALSE);
-			r.SkipWhitespace; r.Int(new.t, FALSE);
-			r.SkipWhitespace; r.Int(new.r, FALSE);
-			r.SkipWhitespace; r.Int(new.b, FALSE);
+			r.SkipWhitespace; r.Int(v, FALSE); new.l := v;
+			r.SkipWhitespace; r.Int(v, FALSE); new.t := v;
+			r.SkipWhitespace; r.Int(v, FALSE); new.r := v;
+			r.SkipWhitespace; r.Int(v, FALSE); new.b := v;
 			NotDefault;
 			IF ~WMRectangles.IsEqual(new, value) THEN
 				value := new;
@@ -2103,98 +2103,98 @@ TYPE
 		END SetPassive;
 
 
-		PROCEDURE SetWidth*(w : LONGINT);
+		PROCEDURE SetWidth*(w : SIZE);
 		BEGIN
 			AcquireWrite;
 			IF GetWidth() # w THEN Changed END; value.r := value.l + w; NotDefault;
 			ReleaseWrite
 		END SetWidth;
 
-		PROCEDURE SetHeight*(h : LONGINT);
+		PROCEDURE SetHeight*(h : SIZE);
 		BEGIN
 			AcquireWrite;
 			IF GetHeight() # h THEN Changed END; value.b := value.t + h; NotDefault;
 			ReleaseWrite
 		END SetHeight;
 
-		PROCEDURE SetLeft*(l : LONGINT);
+		PROCEDURE SetLeft*(l : SIZE);
 		BEGIN
 			AcquireWrite;
 			IF value.l # l THEN Changed END; value.r := l + GetWidth(); value.l := l; NotDefault;
 			ReleaseWrite
 		END SetLeft;
 
-		PROCEDURE SetTop*(t : LONGINT);
+		PROCEDURE SetTop*(t : SIZE);
 		BEGIN
 			AcquireWrite;
 			IF value.t # t THEN Changed END; value.b := t + GetHeight(); value.t := t;  NotDefault;
 			ReleaseWrite
 		END SetTop;
 
-		PROCEDURE SetRight*(r : LONGINT);
+		PROCEDURE SetRight*(r : SIZE);
 		BEGIN
 			AcquireWrite;
 			IF value.r # r THEN Changed END; value.r := r;  NotDefault;
 			ReleaseWrite
 		END SetRight;
 
-		PROCEDURE SetBottom*(b : LONGINT);
+		PROCEDURE SetBottom*(b : SIZE);
 		BEGIN
 			AcquireWrite;
 			IF value.b # b THEN Changed END; value.b := b; NotDefault;
 			ReleaseWrite
 		END SetBottom;
 
-		PROCEDURE SetExtents*(w, h : LONGINT);
+		PROCEDURE SetExtents*(w, h : SIZE);
 		BEGIN
 			AcquireWrite; (* protective transaction *)
 			SetWidth(w); SetHeight(h);
 			ReleaseWrite
 		END SetExtents;
 
-		PROCEDURE GetWidth*() : LONGINT;
+		PROCEDURE GetWidth*() : SIZE;
 		VAR r : WMRectangles.Rectangle;
 		BEGIN
 			r := Get();
 			RETURN r.r - r.l;
 		END GetWidth;
 
-		PROCEDURE GetHeight*() : LONGINT;
+		PROCEDURE GetHeight*() : SIZE;
 		VAR r : WMRectangles.Rectangle;
 		BEGIN
 			r := Get();
 			RETURN r.b - r.t;
 		END GetHeight;
 
-		PROCEDURE GetLeft*() : LONGINT;
+		PROCEDURE GetLeft*() : SIZE;
 		VAR r : WMRectangles.Rectangle;
 		BEGIN
 			r := Get();
 			RETURN r.l;
 		END GetLeft;
 
-		PROCEDURE GetTop*() : LONGINT;
+		PROCEDURE GetTop*() : SIZE;
 		VAR r : WMRectangles.Rectangle;
 		BEGIN
 			r := Get();
 			RETURN r.t;
 		END GetTop;
 
-		PROCEDURE GetRight*() : LONGINT;
+		PROCEDURE GetRight*() : SIZE;
 		VAR r : WMRectangles.Rectangle;
 		BEGIN
 			r := Get();
 			RETURN r.r;
 		END GetRight;
 
-		PROCEDURE GetBottom*() : LONGINT;
+		PROCEDURE GetBottom*() : SIZE;
 		VAR r : WMRectangles.Rectangle;
 		BEGIN
 			r := Get();
 			RETURN r.b;
 		END GetBottom;
 
-		PROCEDURE GetExtents*(VAR width, height : LONGINT);
+		PROCEDURE GetExtents*(VAR width, height : SIZE);
 		VAR r : WMRectangles.Rectangle;
 		BEGIN
 			r := Get();

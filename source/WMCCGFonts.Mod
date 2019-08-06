@@ -44,7 +44,7 @@ TYPE
 	Font* = OBJECT (WMGraphics.Font)
 	VAR gf* : GenericFont;
 
-		PROCEDURE &New*(gf : GenericFont; size : LONGINT; style : SET);
+		PROCEDURE &New*(gf : GenericFont; size : SIZE; style : SET);
 		BEGIN
 			SELF.size := size;
 			SELF.style := style;

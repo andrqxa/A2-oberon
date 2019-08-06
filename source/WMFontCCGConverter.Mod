@@ -25,7 +25,7 @@ TYPE
 		font : RawCCGFont;
 		colWidths : WMGrids.Spacings;
 		scaler : Standard.Scrollbar;
-		scale : LONGINT;
+		scale : SIZE;
 
 		PROCEDURE &New*(f : RawCCGFont);
 		BEGIN
@@ -78,7 +78,7 @@ TYPE
 		END Rescale;
 
 		PROCEDURE GlyphSelected(sender, data : ANY);
-		VAR sc, sr, ec, er : LONGINT; ptr : ANY;
+		VAR sc, sr, ec, er : SIZE; ptr : ANY;
 		BEGIN
 			grid.GetSelection(sc, sr, ec, er);
 			IF font # NIL THEN
@@ -96,7 +96,7 @@ TYPE
 			IF selectedGlyph # NIL THEN RenderGlyphReal(canvas, selectedGlyph, 0, 0, scale, scale, 0, TRUE) END
 		END PaintBoxPaint;
 
-		PROCEDURE DrawCell(canvas : WMGraphics.Canvas; w, h : LONGINT; state : SET; x, y : LONGINT);
+		PROCEDURE DrawCell(canvas : WMGraphics.Canvas; w, h : SIZE; state : SET; x, y : SIZE);
 		VAR color : WMGraphics.Color; g : Glyph; ptr : ANY; str : ARRAY 32 OF CHAR;
 		BEGIN
 			color := WMGraphics.RGBAToColor(255, 255, 255, 255);

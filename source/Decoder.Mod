@@ -802,7 +802,7 @@ TYPE
 
 		PROCEDURE InitializeOutline (panel : WMStandardComponents.Panel) : Streams.Writer;
 		VAR
-			avgTabSize : LONGINT;
+			avgTabSize : SIZE;
 			tabStops : WMTextView.CustomTabStops;
 			tabPositions : WMTextView.TabPositions;
 		BEGIN

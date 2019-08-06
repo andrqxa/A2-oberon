@@ -119,7 +119,7 @@ TYPE Storage* = OBJECT
 			END
 		END GetHeader;
 
-		PROCEDURE ToFile*(nr : LONGINT; filename : ARRAY OF CHAR) : BOOLEAN;
+		PROCEDURE ToFile*(nr : SIZE; filename : ARRAY OF CHAR) : BOOLEAN;
 		VAR f : Files.File; r : Files.Reader; w : Files.Writer; str : ARRAY 1001 OF CHAR;
 		BEGIN
 			IF (nr >= 0) & (nr < nofItems) & (storageFile # NIL) THEN

@@ -97,27 +97,27 @@ CONST
 
 TYPE
 	(** Installable event preview handlers. Are called by the components sequencer thread *)
-	PointerHandler*  = PROCEDURE {DELEGATE} (x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+	PointerHandler*  = PROCEDURE {DELEGATE} (x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 	PointerLeaveHandler* = PROCEDURE {DELEGATE} (VAR handled : BOOLEAN);
-	DragDropHandler* = PROCEDURE {DELEGATE} (x, y : LONGINT; dragInfo : WM.DragInfo; VAR handled : BOOLEAN);
+	DragDropHandler* = PROCEDURE {DELEGATE} (x, y : SIZE; dragInfo : WM.DragInfo; VAR handled : BOOLEAN);
 	DragResultHandler* = PROCEDURE {DELEGATE} (accepted : BOOLEAN; recipient : ANY; dragInfo : WM.DragInfo; VAR handled : BOOLEAN);
 	DragAutoStartHandler* = PROCEDURE {DELEGATE} (VAR handled : BOOLEAN);
 	FocusHandler* = PROCEDURE {DELEGATE} (hasFocus : BOOLEAN);
-	ContextMenuHandler* = PROCEDURE {DELEGATE} (sender : ANY; x, y: LONGINT);
-	KeyEventHandler* = PROCEDURE {DELEGATE} (ucs : LONGINT; flags : SET; VAR keySym : LONGINT; VAR handled : BOOLEAN);
+	ContextMenuHandler* = PROCEDURE {DELEGATE} (sender : ANY; x, y: SIZE);
+	KeyEventHandler* = PROCEDURE {DELEGATE} (ucs : SIZE; flags : SET; VAR keySym : SIZE; VAR handled : BOOLEAN);
 	DrawHandler* = PROCEDURE {DELEGATE} (canvas : WMGraphics.Canvas);
 	Recursion*= ENUM None*, FromComponent*, FromBottom* END;
 
 TYPE
-	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; x,y : LONGINT; VAR res : WORD);
+	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; x,y : SIZE; VAR res : WORD);
 
 	DropTarget = OBJECT(WMDropTarget.DropTarget)
 	VAR
 		originator : ANY;
 		setString : SetStringProcedure;
-		x,y : LONGINT;
+		x,y : SIZE;
 
-		PROCEDURE &Init(originator : ANY; setString : SetStringProcedure; x,y : LONGINT);
+		PROCEDURE &Init(originator : ANY; setString : SetStringProcedure; x,y : SIZE);
 		BEGIN
 			ASSERT(setString # NIL);
 			SELF.originator := originator;
@@ -126,7 +126,7 @@ TYPE
 			SELF.y := y;
 		END Init;
 
-		PROCEDURE GetInterface*(type : LONGINT) : WMDropTarget.DropInterface;
+		PROCEDURE GetInterface*(type : WORD) : WMDropTarget.DropInterface;
 		VAR sdi : DropString;
 		BEGIN
 			IF (type = WMDropTarget.TypeString) THEN
@@ -142,9 +142,9 @@ TYPE
 	VAR
 		originator : ANY;
 		setString : SetStringProcedure;
-		x,y : LONGINT;
+		x,y : SIZE;
 
-		PROCEDURE &Init(originator : ANY; setString : SetStringProcedure; x,y : LONGINT);
+		PROCEDURE &Init(originator : ANY; setString : SetStringProcedure; x,y : SIZE);
 		BEGIN
 			ASSERT(setString # NIL);
 			SELF.originator := originator;
@@ -173,13 +173,13 @@ TYPE
 	END;
 
 	KeyPressedEvent* = RECORD(Event)
-		ucs- : LONGINT;
+		ucs- : SIZE;
 		flags- : SET;
-		keysym- : LONGINT;
+		keysym- : SIZE;
 	END;
 
 	PointerEvent* = RECORD(Event)
-		x-, y-, z- : LONGINT;
+		x-, y-, z- : SIZE;
 		keys- : SET;
 	END;
 
@@ -765,7 +765,7 @@ TYPE
 		aligning* : BOOLEAN;
 		pointerInfo : WM.PointerInfo;
 		editRegion: LONGINT;
-		editX, editY: LONGINT;
+		editX, editY: SIZE;
 		keyFlags: SET; (*! remove *)
 		oldPointerInfo : WM.PointerInfo;
 
@@ -1059,7 +1059,7 @@ TYPE
 
 	(** Locating *)
 		(** transform the local component coordinates into global window manager coordinates *)
-		PROCEDURE ToWMCoordinates*(x, y : LONGINT; VAR gx, gy : LONGINT);
+		PROCEDURE ToWMCoordinates*(x, y : SIZE; VAR gx, gy : SIZE);
 		VAR cr : Component; tc : XML.Element; r : Rectangles.Rectangle;
 		BEGIN
 			gx := x; gy := y; tc := SELF;
@@ -1078,13 +1078,13 @@ TYPE
 		END ToWMCoordinates;
 
 		(** Return if the component is hit at (x, y) in component coordinates *)
-		PROCEDURE IsHit*(x, y: LONGINT): BOOLEAN;
+		PROCEDURE IsHit*(x, y: SIZE): BOOLEAN;
 		BEGIN
 			RETURN visible.Get() & enabled.Get() &  Rectangles.PointInRect(x, y, GetClientRect())
 		END IsHit;
 
 		(** Return the topmost first child component at (x, y) *)
-		PROCEDURE GetPositionOwner*(x, y: LONGINT): VisualComponent;
+		PROCEDURE GetPositionOwner*(x, y: SIZE): VisualComponent;
 		VAR c: XML.Content; result, vc : VisualComponent; r : Rectangles.Rectangle;
 		BEGIN
 			Acquire;
@@ -1105,11 +1105,11 @@ TYPE
 		END GetPositionOwner;
 
 		(** DragOver is called via the message handler. The should call manager.SetDragAccept(SELF, .... *)
-		PROCEDURE DragOver*(x, y: LONGINT; dragInfo : WM.DragInfo);
+		PROCEDURE DragOver*(x, y: SIZE; dragInfo : WM.DragInfo);
 		END DragOver;
 
 		(** Dropped is called via the message handler to indicate an item has been dropped. *)
-		PROCEDURE DragDropped*(x, y: LONGINT; dragInfo : WM.DragInfo);
+		PROCEDURE DragDropped*(x, y: SIZE; dragInfo : WM.DragInfo);
 		BEGIN
 			IF dragInfo.onReject # NIL THEN dragInfo.onReject(SELF,dragInfo) END;
 		END DragDropped;
@@ -1141,7 +1141,7 @@ TYPE
 		*)
 
 
-		PROCEDURE AddVisualComponent(c :VisualComponent; x, y : LONGINT);
+		PROCEDURE AddVisualComponent(c :VisualComponent; x, y : SIZE);
 		VAR bounds : Rectangles.Rectangle;canvas: WMGraphics.BufferCanvas; relativeAlignment: BOOLEAN;
 		BEGIN
 			ASSERT(c # NIL);
@@ -1163,7 +1163,7 @@ TYPE
 			Release;
 		END AddVisualComponent;
 
-		PROCEDURE EditDragDropped(x,y: LONGINT; dragInfo: WM.DragInfo): BOOLEAN;
+		PROCEDURE EditDragDropped(x,y: SIZE; dragInfo: WM.DragInfo): BOOLEAN;
 		VAR data: ANY; e: ComponentListEntry; parent: XML.Element; dt: DropTarget; pos: LONGINT;
 		BEGIN
 			data := dragInfo.data;
@@ -1212,7 +1212,7 @@ TYPE
 			END;
 		END EditDragDropped;
 
-		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; x,y : LONGINT; VAR res : WORD);
+		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; x,y : SIZE; VAR res : WORD);
 		VAR gen: XML.GeneratorProcedure; moduleName, procedureName ,msg: Modules.Name; element: XML.Element;
 			context: Repositories.Context; repositoryName, componentName: ARRAY 265 OF CHAR; componentID: SIZE; object: Repositories.Component;
 		BEGIN
@@ -1246,7 +1246,7 @@ TYPE
 		END DragResult;
 
 		(** Start a drag operation. *)
-		PROCEDURE StartDrag*(data : ANY; img : WMGraphics.Image; offsetX, offsetY: LONGINT; onAccept, onReject : Messages.CompCommand) : BOOLEAN;
+		PROCEDURE StartDrag*(data : ANY; img : WMGraphics.Image; offsetX, offsetY: SIZE; onAccept, onReject : Messages.CompCommand) : BOOLEAN;
 		VAR rc : Component;
 		BEGIN
 			rc := GetVisualComponentRoot();
@@ -1275,7 +1275,7 @@ TYPE
 
 		(** Is called by the component if it detects a request for a context menu. The subclass should open the
 		context menu if applicable *)
-		PROCEDURE ShowContextMenu*(x, y : LONGINT);
+		PROCEDURE ShowContextMenu*(x, y : SIZE);
 		BEGIN
 			IF extContextMenu # NIL THEN extContextMenu(SELF, x, y) END;
 		END ShowContextMenu;
@@ -1339,7 +1339,7 @@ TYPE
 		END DrawForeground;
 
 		PROCEDURE DrawSelection(canvas : WMGraphics.Canvas);
-		VAR r,r0: Rectangles.Rectangle; x,y,x0,y0: LONGINT; color: WMGraphics.Color;
+		VAR r,r0: Rectangles.Rectangle; x,y,x0,y0: SIZE; color: WMGraphics.Color;
 
 			PROCEDURE MarkSelected(r: Rectangles.Rectangle; w: LONGINT; color: WMGraphics.Color);
 			VAR r0: Rectangles.Rectangle;
@@ -1434,8 +1434,8 @@ TYPE
 			Release
 		END SetFont;
 
-		PROCEDURE ScaleFont*(height: LONGINT; percent: LONGINT);
-		VAR fh,newSize: LONGINT; f: WMGraphics.Font;
+		PROCEDURE ScaleFont*(height: SIZE; percent: WORD);
+		VAR fh,newSize: SIZE; f: WMGraphics.Font;
 		BEGIN
 			IF height < 4 THEN height := 4 END;
 			IF percent <= 0 THEN RETURN END;
@@ -1673,7 +1673,7 @@ TYPE
 		coordinates.
 		May only be called from the sequencer thread.
 		Components interested in this message can override this method instead of searching for the message in HandleInternal. *)
-		PROCEDURE PointerDown*(x, y: LONGINT; keys: SET); (** PROTECTED *)
+		PROCEDURE PointerDown*(x, y: SIZE; keys: SET); (** PROTECTED *)
 		BEGIN ASSERT(IsCallFromSequencer());
 			IF keys = {2} THEN ShowContextMenu(x, y)
 			END;
@@ -1686,11 +1686,11 @@ TYPE
 		When using PointerMove to move the component itself within a context (window or parent component),
 		remember that Component.PointerMove are given in component coordinates (thus, a moving coordinate origin ...), but you want to move the component in context coordinates !
 		*)
-		PROCEDURE PointerMove*(x, y: LONGINT; keys: SET); (** PROTECTED *)
+		PROCEDURE PointerMove*(x, y: SIZE; keys: SET); (** PROTECTED *)
 		BEGIN ASSERT(IsCallFromSequencer());
 		END PointerMove;
 
-		PROCEDURE WheelMove*(dz: LONGINT); (** PROTECTED *)
+		PROCEDURE WheelMove*(dz: SIZE); (** PROTECTED *)
 		BEGIN ASSERT(IsCallFromSequencer());
 		END WheelMove;
 
@@ -1698,7 +1698,7 @@ TYPE
 		coordinates.
 		May only be called from the sequencer thread.
 		Components interested in this message can override this method instead of searching for the message in HandleInternal. *)
-		PROCEDURE PointerUp*(x, y: LONGINT; keys: SET); (** PROTECTED *)
+		PROCEDURE PointerUp*(x, y: SIZE; keys: SET); (** PROTECTED *)
 		BEGIN ASSERT(IsCallFromSequencer());
 		END PointerUp;
 
@@ -1707,11 +1707,11 @@ TYPE
 		send the generated unicode characters via KeyEvent.
 		May only be called from the sequencer thread.
 		Components interested in this message can override this method instead of searching for the message in HandleInternal. *)
-		PROCEDURE KeyEvent*(ucs : LONGINT; flags: SET; VAR keySym: LONGINT); (** PROTECTED *)
+		PROCEDURE KeyEvent*(ucs : SIZE; flags: SET; VAR keySym: SIZE); (** PROTECTED *)
 		BEGIN ASSERT(IsCallFromSequencer());
 		END KeyEvent;
 
-		PROCEDURE EditKeyEvents(ucs : LONGINT; flags: SET; VAR keySym: LONGINT): BOOLEAN; (** FINAL *)
+		PROCEDURE EditKeyEvents(ucs : SIZE; flags: SET; VAR keySym: SIZE): BOOLEAN; (** FINAL *)
 		VAR event : KeyPressedEvent; command : Strings.String; scale: LONGINT;
 			clone: Repositories.Component; parent: XML.Content; parentEditMode: BOOLEAN;
 			enum: XMLObjects.Enumerator; obj: ANY;
@@ -1779,7 +1779,7 @@ TYPE
 		END EditKeyEvents;
 
 
-		PROCEDURE CheckKeyEvents(ucs : LONGINT; flags: SET; VAR keySym: LONGINT); (** FINAL *)
+		PROCEDURE CheckKeyEvents(ucs : SIZE; flags: SET; VAR keySym: SIZE); (** FINAL *)
 		VAR event : KeyPressedEvent; command : Strings.String; scale: LONGINT; clone: Repositories.Component; parent: XML.Content;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
@@ -1802,7 +1802,7 @@ TYPE
 			END;
 		END CheckKeyEvents;
 
-		PROCEDURE CheckPointerEvent(x, y, z : LONGINT; keys : SET);
+		PROCEDURE CheckPointerEvent(x, y, z : SIZE; keys : SET);
 		VAR event : PointerEvent; command : Strings.String;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
@@ -1821,7 +1821,7 @@ TYPE
 			IF (command # NIL) THEN HandleEvent(event, SELF, command); END;
 		END CheckPointerEvent;
 
-		PROCEDURE CheckPointerUpEvent(x, y, z : LONGINT; keys : SET);
+		PROCEDURE CheckPointerUpEvent(x, y, z : SIZE; keys : SET);
 		VAR event : PointerEvent; command : Strings.String;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
@@ -1831,9 +1831,9 @@ TYPE
 			IF (command # NIL) THEN HandleEvent(event, SELF, command); END;
 		END CheckPointerUpEvent;
 
-		PROCEDURE InEditBounds(x,y: LONGINT): LONGINT;
+		PROCEDURE InEditBounds(x,y: SIZE): WORD;
 		CONST Border = 8;
-		VAR left, right, top, bottom: LONGINT;
+		VAR left, right, top, bottom: SIZE;
 		BEGIN
 			left := bounds.GetLeft();
 			right := bounds.GetRight();
@@ -1870,7 +1870,7 @@ TYPE
 		END InEditBounds;
 
 		PROCEDURE Edit(VAR msg: Messages.Message);
-		VAR region: LONGINT; dx,dy: LONGINT; b: Rectangles.Rectangle; manager: WM.WindowManager;
+		VAR region: LONGINT; dx,dy: SIZE; b: Rectangles.Rectangle; manager: WM.WindowManager;
 			w,h: LONGINT; img: WMGraphics.Image; canvas: WMGraphics.BufferCanvas; e: ComponentListEntry;
 			tr,or : Rectangles.Rectangle; enum: XMLObjects.Enumerator; obj: ANY;
 			alignRelative : BOOLEAN;
@@ -2189,7 +2189,7 @@ TYPE
 		END HandleInternal;
 	END VisualComponent;
 
-	GetPositionOwnerHandler* = PROCEDURE {DELEGATE} (x, y : LONGINT; VAR positionOwner : VisualComponent; VAR handled : BOOLEAN);
+	GetPositionOwnerHandler* = PROCEDURE {DELEGATE} (x, y : SIZE; VAR positionOwner : VisualComponent; VAR handled : BOOLEAN);
 
 TYPE
 
@@ -2288,7 +2288,7 @@ TYPE
 			ASSERT(disableUpdate # -1);	(* underflow *)
 		END EnableUpdate;
 
-		PROCEDURE Resized*( width, height: LONGINT);
+		PROCEDURE Resized*( width, height: SIZE);
 		BEGIN
 			IF ~scaling THEN
 				DisableUpdate;
@@ -2446,7 +2446,7 @@ TYPE
 		END InvalidateRect;
 
 		PROCEDURE PropertyChanged*(sender, property : ANY);
-		VAR w,h: LONGINT;
+		VAR w,h: SIZE;
 		BEGIN
 			IF property = bounds THEN
 				IF ~ Rectangles.IsEqual(window.bounds, bounds.Get()) THEN
@@ -2551,7 +2551,7 @@ TYPE
 
 	ComponentListEntry= POINTER TO RECORD
 		component: VisualComponent;
-		dx,dy: LONGINT;
+		dx,dy: SIZE;
 		next: ComponentListEntry
 	END;
 
@@ -2676,11 +2676,11 @@ TYPE
 		END Shift;
 
 		PROCEDURE ToImg(start: VisualComponent; VAR this: ComponentListEntry): WMGraphics.Image;
-		VAR l,t,r,b: LONGINT; e: ComponentListEntry; rect: Rectangles.Rectangle; img, image: WMGraphics.Image; w,h: LONGINT;
+		VAR l,t,r,b: SIZE; e: ComponentListEntry; rect: Rectangles.Rectangle; img, image: WMGraphics.Image; w,h: SIZE;
 			canvas: WMGraphics.BufferCanvas; srcCopy: Raster.Mode;
 		BEGIN
-			l := MAX(LONGINT); r := MIN(LONGINT);
-			t := MAX(LONGINT); b := MIN(LONGINT);
+			l := MAX(SIZE); r := MIN(SIZE);
+			t := MAX(SIZE); b := MIN(SIZE);
 			e := first;
 			WHILE e # NIL DO
 				rect := e.component(VisualComponent).bounds.Get();
@@ -3644,11 +3644,11 @@ BEGIN NEW(component, NIL); RETURN component
 END NewForm;
 
 PROCEDURE Align*(context: Commands.Context);
-VAR width,height,bwidth,bheight: LONGINT; entry: ComponentListEntry; b,rect: Rectangles.Rectangle; string: ARRAY 32 OF CHAR; l,t: LONGINT; done: BOOLEAN;
+VAR width,height,bwidth,bheight: SIZE; entry: ComponentListEntry; b,rect: Rectangles.Rectangle; string: ARRAY 32 OF CHAR; l,t: SIZE; done: BOOLEAN;
 BEGIN
 	entry := selection.first;
-	rect.l := MAX(LONGINT); rect.r := MIN(LONGINT);
-	rect.t := MAX(LONGINT); rect.b := MIN(LONGINT);
+	rect.l := MAX(SIZE); rect.r := MIN(SIZE);
+	rect.t := MAX(SIZE); rect.b := MIN(SIZE);
 	width := 0; height := 0;
 
 	WHILE entry # NIL DO

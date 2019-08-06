@@ -515,7 +515,7 @@ TYPE
 			END
 		END Open;
 
-		PROCEDURE GetImageInfo*(VAR width, height, format, maxProgressionLevel : LONGINT);
+		PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : LONGINT);
 		BEGIN
 			width := hdr.width;
 			height := hdr.height;

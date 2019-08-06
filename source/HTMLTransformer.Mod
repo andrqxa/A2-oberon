@@ -74,7 +74,7 @@ TYPE
 		baseAddress : String;
 		baseTarget : String;
 		sequencer : WMMessages.MsgSequencer;
-		initWidth : LONGINT;
+		initWidth : SIZE;
 		loadLink* : WMEvents.EventListener;
 		charset : String;
 		frameName : String;
@@ -107,7 +107,7 @@ TYPE
 		initAlignment : LONGINT;
 		isTableContent : BOOLEAN;
 
-		PROCEDURE &Init*(doc: XML.Container; url : String; initWidth : LONGINT; loadLink : WMEvents.EventListener; charset : String; frameName : String);
+		PROCEDURE &Init*(doc: XML.Container; url : String; initWidth : SIZE; loadLink : WMEvents.EventListener; charset : String; frameName : String);
 		VAR
 			crlf : ARRAY 5 OF CHAR;
 		BEGIN
@@ -1374,7 +1374,7 @@ TYPE
 	END Transformer;
 
 
-	CellSizes = POINTER TO ARRAY OF LONGINT;
+	CellSizes = POINTER TO ARRAY OF SIZE;
 
 	StringArray = POINTER TO ARRAY OF String;
 
@@ -1387,8 +1387,8 @@ TYPE
 	Table* = OBJECT (VisualComponent)
 	VAR
 		tableElem : XML.Element;
-		parentWidth : LONGINT;
-		align- : LONGINT;
+		parentWidth : SIZE;
+		align- : WORD;
 		textColor, linkColor, vlinkColor, alinkColor : LONGINT;
 		url : String;
 		loadLink : WMEvents.EventListener;
@@ -1411,11 +1411,11 @@ TYPE
 		colsCnt : LONGINT;
 		rowsCnt : LONGINT;
 		minCellWidths, maxCellWidths : CellSizes;
-		minTableWidth, maxTableWidth : LONGINT;
+		minTableWidth, maxTableWidth : SIZE;
 		x, y : LONGINT;
 		internalWidth, internalHeight : LONGINT;
 
-		PROCEDURE & New*(tableElem : XML.Element; parentWidth : LONGINT; align : LONGINT; textColor, linkColor, vlinkColor, alinkColor : LONGINT; url : String; loadLink : WMEvents.EventListener; charset : String; frameName : String; form : Form; baseAddress : String; baseTarget : String; seq : WMMessages.MsgSequencer; isSubtable : BOOLEAN);
+		PROCEDURE & New*(tableElem : XML.Element; parentWidth : SIZE; align : LONGINT; textColor, linkColor, vlinkColor, alinkColor : LONGINT; url : String; loadLink : WMEvents.EventListener; charset : String; frameName : String; form : Form; baseAddress : String; baseTarget : String; seq : WMMessages.MsgSequencer; isSubtable : BOOLEAN);
 		VAR
 			s : String; sequencer: Messages.MsgSequencer;
 		BEGIN
@@ -1536,7 +1536,7 @@ TYPE
 
 		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR
-			h, w, color, i : LONGINT;
+			h, w, i: SIZE; color : LONGINT;
 		BEGIN
 			DrawBackground^(canvas);
 
@@ -1724,7 +1724,7 @@ TYPE
 
 		PROCEDURE CalculateMinMaxTableWidth;
 		VAR
-			i, j, k : LONGINT;
+			i, j, k : SIZE;
 		BEGIN
 			NEW(minCellWidths, colsCnt);
 			NEW(maxCellWidths, colsCnt);
@@ -1770,13 +1770,13 @@ TYPE
 		PROCEDURE AlignCells;
 		VAR
 			cell : TableCell;
-			w, h, i, j, k : LONGINT;
-			W, D, d : LONGINT;
-			tableWidth, tableHeight : LONGINT;
-			targetWidth : LONGINT;
+			w, h, i, j, k : SIZE;
+			W, D, d : SIZE;
+			tableWidth, tableHeight : SIZE;
+			targetWidth : SIZE;
 			cellWidths, cellHeights : CellSizes;
 			fac : REAL;
-			leftIndent, topIndent : LONGINT;
+			leftIndent, topIndent : SIZE;
 		BEGIN
 
 			NEW(cellWidths, colsCnt);
@@ -1925,7 +1925,7 @@ TYPE
 
 		END AlignCells;
 
-		PROCEDURE ParentTvWidthChanged*(x : LONGINT);
+		PROCEDURE ParentTvWidthChanged*(x : SIZE);
 		BEGIN
 			parentWidth := x - 20;
 			IF parentWidth < 1 THEN parentWidth := 1 END;
@@ -1940,7 +1940,7 @@ TYPE
 		transformer : Transformer;
 		tv : WMTextView.TextView;
 		text : Texts.Text;
-		minWidth, maxWidth : LONGINT;
+		minWidth, maxWidth : SIZE;
 		width, height : LONGINT;
 		colspan, rowspan : LONGINT;
 		bgImage : WebBrowserComponents.TileImagePanel;
@@ -1956,7 +1956,7 @@ TYPE
 			rec : WMRectangles.Rectangle;
 			bgImageName : String;
 			item : EmbeddedObject;
-			dummy : LONGINT;
+			dummy : SIZE;
 		BEGIN
 			Init;
 			SetSequencer(seq);
@@ -2101,7 +2101,7 @@ TYPE
 			(*SetSequencer(seq); *)(*!??PH*)
 		END New;
 
-		PROCEDURE SetWidth(width : LONGINT);
+		PROCEDURE SetWidth(width : SIZE);
 		VAR
 			item : EmbeddedObject;
 		BEGIN
@@ -2235,7 +2235,7 @@ TYPE
 
 		PROCEDURE &Init*(name : String; value : String; proc : WMEvents.EventListener);
 		VAR
-			x, y : LONGINT;
+			x, y : SIZE;
 			font : WMGraphics.Font;
 		BEGIN
 			SELF.name := name;
@@ -2495,7 +2495,7 @@ TYPE
 			button.SetExtPointerDownHandler(MenuHandler);
 		END Init;
 
-		PROCEDURE MenuHandler(x, y: LONGINT; keys: SET; VAR handled: BOOLEAN);
+		PROCEDURE MenuHandler(x, y: SIZE; keys: SET; VAR handled: BOOLEAN);
 		BEGIN
 			handled := TRUE;
 			button.ToWMCoordinates(0, button.bounds.GetHeight(), x, y);

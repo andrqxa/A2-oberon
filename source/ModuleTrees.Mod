@@ -460,8 +460,8 @@ TYPE
 			tree.AddChildNodeAfter(parent, right, left);
 		END SwapSiblings;
 
-		PROCEDURE DrawNode(canvas: WMGraphics.Canvas; w, h: LONGINT; node: WMTrees.TreeNode; state: SET);
-		VAR dx, tdx, tdy : LONGINT; f : WMGraphics.Font; image : WMGraphics.Image;
+		PROCEDURE DrawNode(canvas: WMGraphics.Canvas; w, h: SIZE; node: WMTrees.TreeNode; state: SET);
+		VAR dx, tdx, tdy : SIZE; f : WMGraphics.Font; image : WMGraphics.Image;
 			caption: Strings.String;
 			ptr: ANY;
 		BEGIN

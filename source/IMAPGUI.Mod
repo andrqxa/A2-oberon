@@ -1534,7 +1534,7 @@ TYPE
 		colWidths : WMGrids.Spacings;
 		address: WMEditors.Editor;
 		popup: WMPopups.Popup;
-		px, py : LONGINT;
+		px, py : SIZE;
 		IconRead, IconAnswered, IconUnread, IconDeleted: WMGraphics.Image;
 		copyTarget: IMAPClient.Folder;
 		client: IMAPClient.Client;
@@ -1571,7 +1571,7 @@ TYPE
 		END New;
 
 		(* Wird aufgerufen, wenn das Fenster seine Groesse aendert *)
-		PROCEDURE Resized*(width, height : LONGINT);
+		PROCEDURE Resized*(width, height : SIZE);
 		BEGIN
 			Resized^(width, height);
 			ResizeGrid;
@@ -1837,7 +1837,7 @@ TYPE
 			RefreshDisplay();
 		END ChangeFolder;
 
-		PROCEDURE FolderContextMenu(sender : ANY; x, y: LONGINT);
+		PROCEDURE FolderContextMenu(sender : ANY; x, y: SIZE);
 		VAR
 			p: ANY;
 			folder: IMAPClient.Folder;
@@ -1991,7 +1991,7 @@ TYPE
 			END;
 		END TrashBin;
 
-		PROCEDURE MessagesDragDropped(x, y : LONGINT; dragInfo : WMWindowManager.DragInfo; VAR handled : BOOLEAN);
+		PROCEDURE MessagesDragDropped(x, y : SIZE; dragInfo : WMWindowManager.DragInfo; VAR handled : BOOLEAN);
 		VAR
 			selected: WMTrees.TreeNode;
 			p: ANY;
@@ -2090,7 +2090,7 @@ TYPE
 			END;
 		END DragArrivedList;
 
-		PROCEDURE MessageContextMenu(sender : ANY; x, y: LONGINT);
+		PROCEDURE MessageContextMenu(sender : ANY; x, y: SIZE);
 		VAR
 			list: Classes.List;
 		BEGIN
@@ -2109,7 +2109,7 @@ TYPE
 
 		PROCEDURE GetMessageSelection() : Classes.List;
 		VAR selection : Classes.List;
-			l, t, r, b, NofSel, i : LONGINT;
+			l, t, r, b, NofSel, i : SIZE;
 			p : ANY;
 			message: IMAPClient.Message;
 		BEGIN
@@ -2444,7 +2444,8 @@ TYPE
 		(* updates all the labels (statusLabel, currentFolderLabel, currentMessagesLabel) *)
 		PROCEDURE UpdateStatusLabels;
 		VAR
-			status, currentWork, nofMessages: LONGINT;
+			status, currentWork: LONGINT;
+			nofMessages: SIZE;
 			buffer: Strings.Buffer;
 			w: Streams.Writer;
 			string: String;

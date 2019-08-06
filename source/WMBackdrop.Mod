@@ -41,7 +41,7 @@ TYPE
 			SetTitle(Strings.NewString("Backdrop"));
 		END New;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h, q : LONGINT);
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : LONGINT);
 		BEGIN
 			IF img # NIL THEN
 				canvas.ScaleImage(img,
@@ -50,7 +50,7 @@ TYPE
 			END
 		END Draw;
 
-		PROCEDURE PointerDown*(x, y : LONGINT; keys : SET);
+		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
 		VAR view : WMWindowManager.ViewPort;
 			w, h : REAL; originator : ANY;
 			contextMenu : WMPopups.Popup;
@@ -215,7 +215,7 @@ VAR
 	windowList : TFClasses.List;
 	imgList: POINTER TO ARRAY OF ImageInfo;
 
-PROCEDURE GetImage(CONST name : ARRAY OF CHAR; w, h : LONGINT) : WMGraphics.Image;
+PROCEDURE GetImage(CONST name : ARRAY OF CHAR; w, h : SIZE) : WMGraphics.Image;
 VAR img, t : WMGraphics.Image;
 	i, count : SIZE; ptr : ANY;
 
@@ -246,7 +246,7 @@ BEGIN
 	RETURN img
 END GetImage;
 
-PROCEDURE GetResizedImage(image : WMGraphics.Image; width, height : LONGINT) : WMGraphics.Image;
+PROCEDURE GetResizedImage(image : WMGraphics.Image; width, height : SIZE) : WMGraphics.Image;
 VAR canvas : WMGraphics.BufferCanvas; resizedImage : WMGraphics.Image;
 BEGIN
 	ASSERT(image # NIL);
@@ -310,8 +310,9 @@ VAR
 	view : WMWindowManager.ViewPort;
 	bw : Window;
 	img : WMGraphics.Image;
-	x, y, width, height, tx, ty, tw, th : LONGINT;
+	x, y, tx, ty, tw, th : LONGINT;
 	fx, fy, fw, fh : LONGINT;
+	width, height : SIZE;
 	name : Files.FileName;
 BEGIN {EXCLUSIVE}
 	NEW(options);
@@ -352,14 +353,14 @@ BEGIN {EXCLUSIVE}
 				width := tw; context.arg.SkipBytes(1); context.arg.SkipWhitespace();
 			ELSE
 				width := 0;
-				IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-') THEN context.arg.Int(width, TRUE) END;
+				IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-') THEN context.arg.Size(width, TRUE) END;
 				context.arg.SkipWhitespace();
 			END;
 			IF context.arg.Peek() = '?' THEN
 				height := th; context.arg.SkipBytes(1); context.arg.SkipWhitespace();
 			ELSE
 				height := 0;
-				IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-') THEN context.arg.Int(height, TRUE) END;
+				IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-') THEN context.arg.Size(height, TRUE) END;
 				context.arg.SkipWhitespace();
 			END;
 		END;

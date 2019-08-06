@@ -41,7 +41,7 @@ CONST
 TYPE
 
 	NoWheelGrid* = OBJECT(WMStringGrids.StringGrid);
-		PROCEDURE WheelMove*(dz : LONGINT); (* do nothing *) END WheelMove;
+		PROCEDURE WheelMove*(dz : SIZE); (* do nothing *) END WheelMove;
 	END NoWheelGrid;
 
 	BevelPanel* = OBJECT(WMStandardComponents.Panel);
@@ -164,9 +164,9 @@ TYPE
 		scrollX, scrollY : LONGINT; (* current position of scrollbars *)
 
 		titleGrid : NoWheelGrid; (* prototype; for layouting only *)
-		maxWidths : ARRAY DiskOverviewTableColumns OF LONGINT; (* maximum cell widths per column*)
-		maxHeight : LONGINT; (* maximum height of test *)
-		minWidth, minHeight : LONGINT; (* of the diskoverview panel *)
+		maxWidths : ARRAY DiskOverviewTableColumns OF SIZE; (* maximum cell widths per column*)
+		maxHeight : SIZE; (* maximum height of test *)
+		minWidth, minHeight : SIZE; (* of the diskoverview panel *)
 
 		firstAlign : BOOLEAN;
 
@@ -315,7 +315,7 @@ TYPE
 		END PropertyChanged;
 
 		PROCEDURE GridClicked(sender, x : ANY);
-		VAR ignore, row, i : LONGINT; grid : NoWheelGrid;
+		VAR ignore, row, i : SIZE; grid : NoWheelGrid;
 		BEGIN
 			grid := sender (NoWheelGrid);
 			grid.GetSelection(ignore, row, ignore, ignore);
@@ -328,9 +328,9 @@ TYPE
 			model.Release;
 		END GridClicked;
 
-		PROCEDURE UpdateDiskOverview(disk : Disk;  top : LONGINT; updateContent : BOOLEAN): WMStandardComponents.Panel;
+		PROCEDURE UpdateDiskOverview(disk : Disk;  top : SIZE; updateContent : BOOLEAN): WMStandardComponents.Panel;
 		VAR
-			height : LONGINT;
+			height : SIZE;
 			msg : ARRAY 32 OF CHAR;
 			(* updateContent variables *)
 			dev : AosDisks.Device;
@@ -542,7 +542,7 @@ TYPE
 
 		PROCEDURE UpdateDiskPanel(disk  : Disk);
 		VAR
-			width, offset, extWidth, extOffset, totalWidth, extTotalWidth : LONGINT;
+			width, offset, extWidth, extOffset, totalWidth, extTotalWidth : SIZE;
 			fillColor : LONGINT;
 			text : ARRAY 32 OF CHAR;
 			primary, logical : LONGINT; (* nbr of primary/logical partitions on disk *)
@@ -600,7 +600,7 @@ TYPE
 						INC(logical);
 					END;
 
-					extTotalWidth := + disk.buttons[i].bounds.GetWidth() - 2*DiskPanelMarginH-(logical-1)*DiskPanelSpacer;
+					extTotalWidth := disk.buttons[i].bounds.GetWidth() - 2*DiskPanelMarginH-(logical-1)*DiskPanelSpacer;
 
 					logical := 0;
 					WHILE(i+logical+1 < LEN(disk.vtable)) & (disk.vtable[i+logical+1].flags * {AosDisks.Primary} = {}) DO
@@ -700,9 +700,9 @@ TYPE
 		VAR
 			panel : WMStandardComponents.Panel;
 			label : WMStandardComponents.Label;
-			top: LONGINT; i : SIZE;
-			minHeight, minWidth, min : LONGINT;
-			width, height : LONGINT;
+			top: SIZE; i : SIZE;
+			minHeight, minWidth, min : SIZE;
+			width, height : SIZE;
 		BEGIN
 			ASSERT(model.IsLocked());
 			diskOverviewScrollPanel.RemoveContent(diskOverviewPanel);
@@ -844,9 +844,9 @@ TYPE
 			fillColor : LONGINT;
 			grid : NoWheelGrid;
 			disk: SIZE; partition : LONGINT;
-			width, height : LONGINT;
+			width, height : SIZE;
 			minHeights : POINTER TO ARRAY OF LONGINT; (* minimum heights of each grid *)
-			col, row : LONGINT;
+			col, row : SIZE;
 			string : Strings.String;
 			font : WMGraphics.Font;
 		BEGIN
@@ -929,7 +929,7 @@ TYPE
 		END UpdateDiskGrids;
 
 		(* calculates the minimum width/height which is needed to display the disk panels correctly *)
-		PROCEDURE CalcDiskPanelBounds(VAR minWidth, minHeight : LONGINT);
+		PROCEDURE CalcDiskPanelBounds(VAR minWidth, minHeight : SIZE);
 		VAR i, j : SIZE;
 		BEGIN
 			ASSERT(model.IsLocked());
@@ -978,10 +978,10 @@ TYPE
 		(** calculates the length/height of the largest string per row/column *)
 		PROCEDURE SetGridBounds(VAR grid : NoWheelGrid);
 		VAR
-			col, row : LONGINT;
+			col, row : SIZE;
 			widths, heights : WMGrids.Spacings;
-			width, height: LONGINT;
-			spacer : LONGINT;
+			width, height: SIZE;
+			spacer : SIZE;
 		BEGIN
 			ASSERT(grid#NIL);
 			grid.Acquire;
@@ -1013,11 +1013,11 @@ TYPE
 			grid.Release;
 		END SetGridBounds;
 
-		PROCEDURE UpdateLayout(w, h : LONGINT; updateContent : BOOLEAN);
+		PROCEDURE UpdateLayout(w, h : SIZE; updateContent : BOOLEAN);
 		VAR
 			panel : WMStandardComponents.Panel;
-			min, top : LONGINT;
-			width, height : LONGINT;
+			min, top : SIZE;
+			width, height : SIZE;
 			i : SIZE;
 		BEGIN
 			ASSERT(model.IsLocked());
@@ -1097,7 +1097,7 @@ TYPE
 		END UpdateLayout;
 
 		(* UpdateSelection(-1,-1) means "no selection" *)
-		PROCEDURE UpdateSelection(disk, partition : LONGINT);
+		PROCEDURE UpdateSelection(disk, partition : SIZE);
 		VAR
 			caption, temp : ARRAY 128 OF CHAR;
 			selectionNone : LONGINT;
@@ -1105,7 +1105,7 @@ TYPE
 			i, j : SIZE;
 		BEGIN
 			ASSERT(model.IsLocked());
-			selection.partition := partition;
+			selection.partition := partition(LONGINT);
 
 			caption := "Selection: ";
 			IF (disk = -1) & (partition = -1) THEN (* selection: none *)
@@ -1156,8 +1156,8 @@ TYPE
 			onSelection.Call(wrapper);
 		END UpdateSelection;
 
-		PROCEDURE WheelMove*(dz : LONGINT);
-		VAR pos : LONGINT;
+		PROCEDURE WheelMove*(dz : SIZE);
+		VAR pos : SIZE;
 		BEGIN
 			IF scrollbarY.visible.Get() THEN
 				pos := scrollbarY.pos.Get() + Multiplier*dz;
@@ -1284,7 +1284,7 @@ TYPE
 		END GetSelection;
 
 		PROCEDURE GridClicked(sender, x : ANY);
-		VAR wrapper : OperationWrapper; grid : NoWheelGrid; ignore, row : LONGINT;
+		VAR wrapper : OperationWrapper; grid : NoWheelGrid; ignore, row : SIZE;
 		BEGIN
 			BEGIN {EXCLUSIVE} (* lock operations *)
 				grid := sender (NoWheelGrid);
@@ -1320,8 +1320,8 @@ TYPE
 		VAR
 			caption : ARRAY 128 OF CHAR;
 			operation : PartitionsLib.Operation;
-			width, height, minWidth : LONGINT;
-			row, i, ignore, cellHeight : LONGINT;
+			width, height, minWidth : SIZE;
+			row, i, ignore, cellHeight : SIZE;
 			font : WMGraphics.Font;
 			operationState : PartitionsLib.OperationState;
 			widths, heights : WMGrids.Spacings;
@@ -1453,8 +1453,8 @@ TYPE
 			UpdateGrid(TRUE);
 		END OperationEventHandler;
 
-		PROCEDURE WheelMove*(dz : LONGINT);
-		VAR pos : LONGINT;
+		PROCEDURE WheelMove*(dz : SIZE);
+		VAR pos : SIZE;
 		BEGIN
 			IF scrollbarY.visible.Get() THEN
 				pos := scrollbarY.pos.Get() + Multiplier*dz;

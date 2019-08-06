@@ -244,10 +244,10 @@ BEGIN
 	RETURN match;
 END FlagsAreEqual;
 
-PROCEDURE GetHotKey(ch : CHAR; flags : SET; keysym : LONGINT) : HotKey;
+PROCEDURE GetHotKey(ch : CHAR; flags : SET; keysym : SIZE) : HotKey;
 VAR hk : HotKey;
 
-	PROCEDURE FixMessage(VAR ch : CHAR; VAR keysym : LONGINT;  flags : SET);
+	PROCEDURE FixMessage(VAR ch : CHAR; VAR keysym : SIZE;  flags : SET);
 	BEGIN
 		IF (0 < keysym) & (keysym < 32) & (flags * Inputs.Ctrl # {}) THEN (* Reverse keyboard driver ctrl key mapping *)
 			IF (0 < ORD(ch)) & (ORD(ch) < 32) THEN

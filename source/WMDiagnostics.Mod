@@ -261,7 +261,7 @@ TYPE
 		entryValid- : BOOLEAN;
 		entry- : ViewEntry;
 
-		PROCEDURE &Init(entryValid : BOOLEAN; CONST entry : ViewEntry; column, row : LONGINT);
+		PROCEDURE &Init(entryValid : BOOLEAN; CONST entry : ViewEntry; column, row : SIZE);
 		BEGIN
 			SELF.entryValid := entryValid;
 			SELF.entry := entry;
@@ -328,7 +328,7 @@ TYPE
 
 		PROCEDURE OnClickHandler(sender, data : ANY);
 		CONST Position = 0;
-		VAR column, row, newMode : LONGINT;
+		VAR column, row : SIZE; newMode: WORD;
 		BEGIN
 			IF ~IsCallFromSequencer() THEN sequencer.ScheduleEvent(SELF.OnClickHandler, sender, data)
 			ELSE
@@ -402,7 +402,7 @@ TYPE
 			Release;
 		END SortBy;
 
-		PROCEDURE GetCellData*(column, row : LONGINT) : ANY; (* override *)
+		PROCEDURE GetCellData*(column, row : SIZE) : ANY; (* override *)
 		VAR info : CellInfo; entryValid : BOOLEAN; entry : ViewEntry;
 		BEGIN
 			Acquire;
@@ -575,7 +575,7 @@ TYPE
 			END;
 		END ModelChanged;
 
-		PROCEDURE DrawCell(canvas : WMGraphics.Canvas; w, h : LONGINT; state : SET; x, y : LONGINT);
+		PROCEDURE DrawCell(canvas : WMGraphics.Canvas; w, h : SIZE; state : SET; x, y : SIZE);
 		VAR color: WMGraphics.Color; str : ARRAY 128 OF CHAR;
 		BEGIN
 			color := WMGraphics.RGBAToColor(255, 255, 255, 255);
