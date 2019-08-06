@@ -946,6 +946,186 @@ TYPE
 
 	END IntegerProperty;
 
+	(** Accessor property to a size value. The range of possible values can be restricted. *)
+	SizeProperty* = OBJECT(Property)
+	VAR
+		value : SIZE;
+		min, max : SIZE;
+		bounded : BOOLEAN;
+
+		PROCEDURE UpdateProperty;
+		VAR integer: Types.Size; model: Models.Model; res: WORD;
+		BEGIN
+			IF GetModel(object, model) THEN
+				 model.GetGeneric(integer, res);
+				 IF res = 0 THEN Set(integer.value) END;
+			END;
+		END UpdateProperty;
+
+		PROCEDURE UpdateModel;
+		VAR type: Types.Size; model: Models.Model; res: WORD;
+		BEGIN
+			IF inLinkUpdate THEN RETURN END;
+			IF GetModel(object, model) THEN
+				type.value := value;
+				model.SetGeneric(type, res);
+			END;
+		END UpdateModel;
+
+		(** Confines the possible input values between min and max. Implicitly activates the bounds check. If the current value
+			lies outside the bounds, it is truncated to the nearest and a change notification is sent after the end of the transaction. *)
+		PROCEDURE SetBounds*(min, max : SIZE);
+		BEGIN
+			AcquireWrite;
+			SELF.min := min; SELF.max := max; bounded := TRUE;
+			Stamp;
+			Set(value);
+			ReleaseWrite
+		END SetBounds;
+
+		PROCEDURE GetBounds*(VAR min, max : SIZE);
+		BEGIN
+			AcquireRead;
+			min := SELF.min; max := SELF.max;
+			ReleaseRead;
+		END GetBounds;
+
+		(** enables or disables the bounds of the value. If enabled, a change notification is sent if the current value had to be
+			changed to lie within the bounds *)
+		PROCEDURE SetIsBounded*(isBounded : BOOLEAN);
+		BEGIN
+			AcquireWrite;
+			IF isBounded # bounded THEN
+				bounded := isBounded;
+				Stamp;
+				Set(value);
+			END;
+			ReleaseWrite
+		END SetIsBounded;
+
+		PROCEDURE GetIsBounded*(VAR isBounded : BOOLEAN);
+		BEGIN
+			AcquireRead;
+			isBounded := bounded;
+			ReleaseRead;
+		END GetIsBounded;
+
+		PROCEDURE Validate(v : SIZE) : SIZE;
+		BEGIN
+			IF bounded THEN RETURN MAX(min, MIN(max, v))
+			ELSE RETURN v
+			END
+		END Validate;
+
+		PROCEDURE FromStream*(r : Streams.Reader);
+		VAR v : HUGEINT;
+		BEGIN
+			AcquireWrite;
+			r.HInt(v, TRUE);
+			Set(v(SIZE));
+			ReleaseWrite
+		END FromStream;
+
+		PROCEDURE ToStream*(w : Streams.Writer);
+		BEGIN
+			AcquireRead;
+			w.Int(value, 0);
+			ReleaseRead
+		END ToStream;
+
+		PROCEDURE Get*() : SIZE;
+		VAR r : SIZE;
+		BEGIN
+			AcquireRead;
+			IF nonDefault OR (prototype = NIL) THEN r := value
+			ELSE r := prototype(SizeProperty).Get()
+			END;
+			ReleaseRead;
+			RETURN r
+		END Get;
+
+
+		PROCEDURE Set*(value : SIZE);
+		VAR v: SIZE;
+		BEGIN
+			v := Validate(value);
+			AcquireWrite;
+			IF v # SELF.value THEN
+				SELF.value := v;
+				Changed;
+				IF object # NIL THEN UpdateModel END;
+			ELSIF ~nonDefault THEN
+				Changed;
+			END;
+			NotDefault;
+			ReleaseWrite
+		END Set;
+
+		PROCEDURE SetPassive*(value : SIZE);
+		VAR v: SIZE;
+		BEGIN
+			v := Validate(value);
+			AcquireWrite;
+			IF v # SELF.value THEN
+				SELF.value := v;
+				NotDefault;
+			END;
+			ReleaseWrite
+		END SetPassive;
+
+
+		PROCEDURE FromXML*(xml : XML.Element);
+		VAR
+			en : XMLObjects.Enumerator;
+			p : ANY;
+			s, mins, maxs : String;
+		BEGIN
+			AcquireWrite; NotDefault;
+			mins := xml.GetAttributeValue("min");
+			maxs := xml.GetAttributeValue("max");
+			IF mins # NIL THEN Strings.StrToSize(mins^, min) ELSE min := MIN(SIZE) END;
+			IF maxs # NIL THEN Strings.StrToSize(maxs^, max) ELSE max := MAX(SIZE) END;
+			bounded := (mins # NIL) OR (maxs # NIL);
+			en := xml.GetContents();
+			IF en.HasMoreElements() THEN
+				p := en.GetNext();
+				IF IsLink(p) THEN
+				ELSIF p IS XML.Chars THEN
+					s := p(XML.Chars).GetStr();
+					IF s # NIL THEN Strings.StrToSize(s^, value); Set(value) END
+				END
+			END;
+			Stamp;
+			ReleaseWrite
+		END FromXML;
+
+		PROCEDURE ToXML*(VAR element: XML.Element);
+		VAR chars: XML.ArrayChars;s: ARRAY 20 OF CHAR;
+		BEGIN
+			IF (GetName # NIL) & nonDefault THEN
+				ToXML^(element);
+				element.SetAttributeValue("loader","WMProperties.NewSize");
+				element.AddContent(NewIntChars(value));
+			END;
+		END ToXML;
+
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : LONGINT);
+		VAR name : String;
+		BEGIN
+			name := GetName();
+			IF name = NIL THEN KernelLog.String("Nameless Integer property encountered. Ignored"); KernelLog.Ln; RETURN END;
+			IF nonDefault THEN
+				Indent(w, indent);
+				w.Char("<"); w.String(name^); w.String(' loader="WMProperties.NewSize"'); w.Char(">");
+				IF ~WriteLink(w,context,indent) THEN
+					w.Int(value, 0);
+				END;
+				w.String("</"); w.String(name^); w.Char(">"); w.Ln
+			END
+		END WriteXML;
+
+	END SizeProperty;
+
 TYPE
 
 	(** Accessor property to an real value. The range of possible values can be restricted. *)
@@ -2659,6 +2839,11 @@ PROCEDURE NewInteger*(): Property;
 VAR property: IntegerProperty;
 BEGIN NEW(property,NIL,NIL,NIL); RETURN property
 END NewInteger;
+
+PROCEDURE NewSize*(): Property;
+VAR property: SizeProperty;
+BEGIN NEW(property,NIL,NIL,NIL); RETURN property
+END NewSize;
 
 PROCEDURE NewReal*(): Property;
 VAR property: RealProperty;

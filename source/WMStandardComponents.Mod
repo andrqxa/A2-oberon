@@ -3411,7 +3411,7 @@ BEGIN
 	NEW(PrototypeSlClPressed, NIL, NewString("ClPressed"), NewString("Pressed color of slider"));
 	PrototypeSlClPressed.Set(0);
 	NEW(PrototypeSlClBar, NIL, NewString("ClBar"), NewString("Color of slider bar"));
-	PrototypeSlClBar.Set(0CCCCCCCCH);
+	PrototypeSlClBar.Set(LONGINT(0CCCCCCCCH));
 
 	NEW(PrototypeSlvertical, NIL, NewString("Vertical"),NewString("defines if the slider is vertical"));
 	PrototypeSlvertical.Set(TRUE);

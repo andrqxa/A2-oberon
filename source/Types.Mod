@@ -38,6 +38,10 @@ TYPE
 		value* : HUGEINT;
 	END;
 
+	Size* = RECORD(Any)
+		value* : SIZE;
+	END;
+
 	Real* = RECORD(Any)
 		value* : REAL;
 	END;
@@ -176,6 +180,8 @@ BEGIN
 		value := source(Integer).value;
 	ELSIF (source IS Hugeint) THEN
 		value := source(Hugeint).value(LONGINT);
+	ELSIF (source IS Size) THEN
+		value := source(Size).value(LONGINT);
 	ELSIF (source IS Real) THEN
 		value := ENTIER(source(Real).value);
 	ELSIF (source IS Longreal) THEN
@@ -214,6 +220,8 @@ BEGIN
 		target(Integer).value := value;
 	ELSIF (target IS Hugeint) THEN
 		target(Hugeint).value := value;
+	ELSIF (target IS Size) THEN
+		target(Size).value := value;
 	ELSIF (target IS Real) THEN
 		target(Real).value := value;
 	ELSIF (target IS Longreal) THEN
@@ -255,6 +263,8 @@ BEGIN
 		value := source(Integer).value;
 	ELSIF (source IS Hugeint) THEN
 		value := source(Hugeint).value;
+	ELSIF (source IS Size) THEN
+		value := source(Size).value;
 	ELSIF (source IS Real) THEN
 		value := ENTIER(source(Real).value);
 	ELSIF (source IS Longreal) THEN
@@ -293,6 +303,8 @@ BEGIN
 		target(Integer).value := value(LONGINT);
 	ELSIF (target IS Hugeint) THEN
 		target(Hugeint).value := value;
+	ELSIF (target IS Size) THEN
+		target(Size).value := value(SIZE);
 	ELSIF (target IS Real) THEN
 		target(Real).value := value;
 	ELSIF (target IS Longreal) THEN
@@ -326,6 +338,89 @@ BEGIN
 	END;
 END SetHugeint;
 
+PROCEDURE GetSize*(CONST source : Any; VAR value : SIZE; VAR res : WORD);
+VAR size : Size;
+BEGIN
+	res := Ok;
+	IF (source IS Integer) THEN
+		value := source(Integer).value;
+	ELSIF (source IS Hugeint) THEN
+		value := source(Hugeint).value(SIZE);
+	ELSIF (source IS Size) THEN
+		value := source(Size).value;
+	ELSIF (source IS Real) THEN
+		value := ENTIER(source(Real).value);
+	ELSIF (source IS Longreal) THEN
+		value := ENTIER(source(Longreal).value);
+	ELSIF (source IS String) THEN
+		IF (source(String).value # NIL) THEN
+			Strings.StrToSize(source(String).value^, value);
+		ELSE
+			res := ConversionError;
+		END;
+	ELSIF (source IS DynamicString) THEN
+		Strings.StrToSize(source(DynamicString).value^, value);
+	ELSIF (source IS String32) THEN
+		Strings.StrToSize(source(String32).value, value);
+	ELSIF (source IS String256) THEN
+		Strings.StrToSize(source(String256).value, value);
+	ELSIF (source IS Generic) THEN
+		IF (source(Generic).Get # NIL) THEN
+			source(Generic).Get(source(Generic), size, res);
+			IF (res = Ok) THEN
+				value := size.value;
+			END;
+		ELSE
+			res := CannotRead;
+		END;
+	ELSE
+		res := CannotConvert;
+	END;
+END GetSize;
+
+PROCEDURE SetSize*(VAR target : Any; value : SIZE;  VAR res : WORD);
+VAR size : Size;
+BEGIN
+	res := Ok;
+	IF (target IS Integer) THEN
+		target(Integer).value := value(LONGINT);
+	ELSIF (target IS Hugeint) THEN
+		target(Hugeint).value := value;
+	ELSIF (target IS Size) THEN
+		target(Size).value := value;
+	ELSIF (target IS Real) THEN
+		target(Real).value := value;
+	ELSIF (target IS Longreal) THEN
+		target(Longreal).value := value;
+	ELSIF (target IS String) THEN
+		EnsureStringLength(target(String).value, 11);
+		Strings.IntToStr(value, target(String).value^);
+		(*
+		IF (target(String).value # NIL) THEN
+			Strings.IntToStr(value, target(String).value^);
+		ELSE
+			res := ConversionError;
+		END;
+		*)
+	ELSIF (target IS DynamicString) THEN
+		EnsureLength(target(DynamicString), 11);
+		Strings.IntToStr(value, target(DynamicString).value^);
+	ELSIF (target IS String32) THEN
+		Strings.IntToStr(value, target(String32).value);
+	ELSIF (target IS String256) THEN
+		Strings.IntToStr(value, target(String256).value);
+	ELSIF (target IS Generic) THEN
+		IF (target(Generic).Set # NIL) THEN
+			size.value := value;
+			target(Generic).Set(target(Generic), size, res);
+		ELSE
+			res := CannotWrite;
+		END;
+	ELSE
+		res := CannotConvert;
+	END;
+END SetSize;
+
 PROCEDURE GetReal*(CONST source : Any; VAR value : REAL; VAR res : WORD);
 VAR longreal : LONGREAL; real : Real;
 BEGIN
@@ -338,6 +433,8 @@ BEGIN
 		value := source(Integer).value;
 	ELSIF (source IS Hugeint) THEN
 		value := source(Hugeint).value;
+	ELSIF (source IS Size) THEN
+		value := source(Size).value;
 	ELSIF (source IS String) THEN
 		IF (source(String).value # NIL) THEN
 			Strings.StrToFloat(source(String).value^, longreal);
@@ -380,6 +477,8 @@ BEGIN
 		target(Integer).value := ENTIER(value);
 	ELSIF (target IS Hugeint) THEN
 		target(Hugeint).value := ENTIER(value);
+	ELSIF (target IS Size) THEN
+		target(Size).value := ENTIER(value);
 	ELSIF (target IS String) THEN
 		EnsureStringLength(target(String).value, 32);
 		IF (target(String).value # NIL) THEN
@@ -422,6 +521,8 @@ BEGIN
 		value := source(Integer).value;
 	ELSIF (source IS Hugeint) THEN
 		value := source(Hugeint).value;
+	ELSIF (source IS Size) THEN
+		value := source(Size).value;
 	ELSIF (source IS String) THEN
 		IF (source(String).value # NIL) THEN
 			Strings.StrToFloat(source(String).value^, value);
@@ -460,6 +561,8 @@ BEGIN
 		target(Integer).value := ENTIER(value);
 	ELSIF (target IS Hugeint) THEN
 		target(Hugeint).value := ENTIER(value);
+	ELSIF (target IS Size) THEN
+		target(Size).value := ENTIER(value);
 	ELSIF (target IS String) THEN
 		IF (target(String).value # NIL) THEN
 			(*FloatToString(value, 8, target(String).value^);*)
@@ -590,6 +693,8 @@ BEGIN
 		Strings.IntToStr(source(Integer).value, value);
 	ELSIF (source IS Hugeint) THEN
 		Strings.IntToStr(source(Hugeint).value, value);
+	ELSIF (source IS Size) THEN
+		Strings.IntToStr(source(Size).value, value);
 	ELSIF (source IS Real) THEN
 		(* TODO *)
 	ELSIF (source IS Longreal) THEN
@@ -649,6 +754,8 @@ BEGIN
 		Strings.StrToInt(value, target(Integer).value);
 	ELSIF (target IS Hugeint) THEN
 		Strings.StrToHInt(value, target(Hugeint).value);
+	ELSIF (target IS Size) THEN
+		Strings.StrToSize(value, target(Size).value);
 	ELSIF (target IS Real) THEN
 		Strings.StrToFloat(value, temp);
 		target(Real).value := SHORT(temp);
@@ -691,6 +798,8 @@ BEGIN
 		Strings.IntToStr(source(Integer).value, value);
 	ELSIF (source IS Hugeint) THEN
 		Strings.IntToStr(source(Hugeint).value, value);
+	ELSIF (source IS Size) THEN
+		Strings.IntToStr(source(Size).value, value);
 	ELSIF (source IS Real) THEN
 		(* TODO *)
 	ELSIF (source IS Longreal) THEN
@@ -829,6 +938,8 @@ BEGIN
 		SetAsString(temp);
 	ELSIF (source IS Hugeint) THEN
 		Strings.IntToStr(source(Hugeint).value, temp);
+	ELSIF (source IS Size) THEN
+		Strings.IntToStr(source(Size).value, temp);
 		SetAsString(temp);
 	ELSIF (source IS Boolean) THEN
 		Strings.BoolToStr(source(Boolean).value, temp);
@@ -890,6 +1001,9 @@ BEGIN
 	ELSIF (target IS Hugeint) THEN
 		TextUtilities.TextToStr(value, temp);
 		Strings.StrToHInt(temp, target(Hugeint).value);
+	ELSIF (target IS Size) THEN
+		TextUtilities.TextToStr(value, temp);
+		Strings.StrToSize(temp, target(Size).value);
 	ELSIF (target IS Boolean) THEN
 		TextUtilities.TextToStr(value, temp);
 		Strings.StrToBool(temp, target(Boolean).value);
@@ -983,6 +1097,8 @@ BEGIN
 		SetInteger(to, from(Integer).value, res);
 	ELSIF (from IS Hugeint) THEN
 		SetHugeint(to, from(Hugeint).value, res);
+	ELSIF (from IS Size) THEN
+		SetSize(to, from(Size).value, res);
 	ELSIF (from IS Real) THEN
 		SetReal(to, from(Real).value, res);
 	ELSIF (from IS Longreal) THEN

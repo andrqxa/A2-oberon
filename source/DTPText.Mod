@@ -458,7 +458,7 @@ TYPE
 		properties: WMProperties.PropertyList;
 		props: TextPropWindow;
 
-		firstLine* : WMProperties.IntegerProperty;
+		firstLine* : WMProperties.SizeProperty;
 		firstLineI* : LONGINT;
 		firstPos* : SIZE;
 		firstIsFirstInP*: BOOLEAN;
