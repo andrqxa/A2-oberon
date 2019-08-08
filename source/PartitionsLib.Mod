@@ -2720,7 +2720,7 @@ TYPE
 			RETURN ~error;
 		END ParseStream;
 
-		PROCEDURE ChangeEntry*(pos : LONGINT; key, value : Strings.String);
+		PROCEDURE ChangeEntry*(pos : SIZE; key, value : Strings.String);
 		BEGIN {EXCLUSIVE}
 			IF (pos >= 0) & (pos < LEN(entries)) THEN
 				entries[pos].key := key;
@@ -2728,12 +2728,12 @@ TYPE
 			END;
 		END ChangeEntry;
 
-		PROCEDURE AddEntry*(pos : LONGINT; entry : ConfigEntry);
+		PROCEDURE AddEntry*(pos : SIZE; entry : ConfigEntry);
 		BEGIN {EXCLUSIVE}
 			AddEntryInternal(pos, entry);
 		END AddEntry;
 
-		PROCEDURE AddEntryInternal(pos : LONGINT; entry : ConfigEntry);
+		PROCEDURE AddEntryInternal(pos : SIZE; entry : ConfigEntry);
 		VAR newTable : Table; i, j : LONGINT;
 		BEGIN
 			ASSERT(pos >=0);
@@ -2756,12 +2756,12 @@ TYPE
 			END;
 		END AddEntryInternal;
 
-		PROCEDURE RemoveEntry*(entry : LONGINT);
+		PROCEDURE RemoveEntry*(entry : SIZE);
 		BEGIN {EXCLUSIVE}
 			RemoveEntryInternal(entry);
 		END RemoveEntry;
 
-		PROCEDURE RemoveEntryInternal(entry : LONGINT);
+		PROCEDURE RemoveEntryInternal(entry : SIZE);
 		VAR newTable : Table; i, j : SIZE;
 		BEGIN
 			IF (entries # NIL) THEN
@@ -2780,7 +2780,7 @@ TYPE
 			END;
 		END RemoveEntryInternal;
 
-		PROCEDURE SwapEntries*(i, j : LONGINT);
+		PROCEDURE SwapEntries*(i, j : SIZE);
 		VAR temp : ConfigEntry;
 		BEGIN {EXCLUSIVE}
 			IF (i >= 0) & (i < LEN(entries)) & (j >= 0) & (j < LEN(entries)) THEN

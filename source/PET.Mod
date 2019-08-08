@@ -2486,7 +2486,7 @@ TYPE
 			entries: XMLObjects.Enumerator;
 			entry : XML.Element;
 			s : Strings.String;
-			firstLine, cursorPos, width, height : LONGINT;
+			firstLine, cursorPos, width, height : SIZE;
 			options : CompilerOptions;
 			showLabels, wordWrap, visible, wrap, caseSensitive, backwards, highlightAll : BOOLEAN;
 			searchString, replaceString : WMSearchComponents.SearchString;
@@ -2512,15 +2512,15 @@ TYPE
 						s := entry.GetName();
 						IF (s # NIL) THEN
 							IF (s^ = "Editor") THEN
-								WMRestorable.LoadLongint(entry, "firstLine", firstLine);
-								WMRestorable.LoadLongint(entry, "cursorPos", cursorPos);
+								WMRestorable.LoadSize(entry, "firstLine", firstLine);
+								WMRestorable.LoadSize(entry, "cursorPos", cursorPos);
 								currentPage.editor.tv.firstLine.Set(firstLine);
 								currentPage.editor.tv.cursor.SetPosition(cursorPos);
 							ELSIF (s^ = "SplitEditor") THEN
-								WMRestorable.LoadLongint(entry, "firstLine", firstLine);
-								WMRestorable.LoadLongint(entry, "cursorPos", cursorPos);
+								WMRestorable.LoadSize(entry, "firstLine", firstLine);
+								WMRestorable.LoadSize(entry, "cursorPos", cursorPos);
 								WMRestorable.LoadBoolean(entry, "visible", visible);
-								WMRestorable.LoadLongint(entry, "height", height);
+								WMRestorable.LoadSize(entry, "height", height);
 								currentPage.splitEditor.tv.firstLine.Set(firstLine);
 								currentPage.splitEditor.tv.cursor.SetPosition(cursorPos);
 								currentPage.splitPanel.visible.Set(visible);
@@ -2528,8 +2528,8 @@ TYPE
 								currentPage.splitPanel.bounds.SetHeight(height);
 							ELSIF (s^ = "SidePanel") THEN
 								WMRestorable.LoadBoolean(entry, "visible", visible);
-								WMRestorable.LoadLongint(entry, "width", width);
-								WMRestorable.LoadLongint(entry, "scratchHeight", height);
+								WMRestorable.LoadSize(entry, "width", width);
+								WMRestorable.LoadSize(entry, "scratchHeight", height);
 								currentPage.sidePanel.visible.Set(visible);
 								currentPage.sidePanel.bounds.SetWidth(width);
 								currentPage.scratchPanel.bounds.SetHeight(height);
@@ -2546,7 +2546,7 @@ TYPE
 								currentPage.searchPanel.searchEdit.SetAsString(searchString);
 								currentPage.searchPanel.replEdit.SetAsString(replaceString);
 							ELSIF (s^ = "LogPanel") THEN
-								WMRestorable.LoadLongint(entry, "height", height);
+								WMRestorable.LoadSize(entry, "height", height);
 								currentPage.logPanel.bounds.SetHeight(height);
 							END;
 						END;
@@ -2570,15 +2570,15 @@ TYPE
 			WMRestorable.StoreBoolean(elem, "wordWrap", page.editor.tv.wrapMode.Get() = WMTextView.WrapWord);
 
 			NEW(entry); entry.SetName("Editor");
-				WMRestorable.StoreLongint(entry, "firstLine", page.editor.tv.firstLine.Get()(LONGINT));
-				WMRestorable.StoreLongint(entry, "cursorPos", page.editor.tv.cursor.GetPosition()(LONGINT));
+				WMRestorable.StoreSize(entry, "firstLine", page.editor.tv.firstLine.Get());
+				WMRestorable.StoreSize(entry, "cursorPos", page.editor.tv.cursor.GetPosition());
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("SplitEditor");
 				WMRestorable.StoreBoolean(entry, "visible", page.splitPanel.visible.Get());
-				WMRestorable.StoreLongint(entry, "firstLine", page.splitEditor.tv.firstLine.Get()(LONGINT));
-				WMRestorable.StoreLongint(entry, "cursorPos", page.splitEditor.tv.cursor.GetPosition()(LONGINT));
-				WMRestorable.StoreLongint(entry, "height", page.splitPanel.bounds.GetHeight()(LONGINT));
+				WMRestorable.StoreSize(entry, "firstLine", page.splitEditor.tv.firstLine.Get());
+				WMRestorable.StoreSize(entry, "cursorPos", page.splitEditor.tv.cursor.GetPosition());
+				WMRestorable.StoreSize(entry, "height", page.splitPanel.bounds.GetHeight());
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("SearchPanel");
@@ -2595,13 +2595,13 @@ TYPE
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("LogPanel");
-				WMRestorable.StoreLongint(entry, "height", page.logPanel.bounds.GetHeight()(LONGINT));
+				WMRestorable.StoreSize(entry, "height", page.logPanel.bounds.GetHeight());
 			elem.AddContent(entry);
 
 			NEW(entry); entry.SetName("SidePanel");
 				WMRestorable.StoreBoolean(entry, "visible", page.sidePanel.visible.Get());
-				WMRestorable.StoreLongint(entry, "width", page.sidePanel.bounds.GetWidth()(LONGINT));
-				WMRestorable.StoreLongint(entry, "scratchHeight", page.scratchPanel.bounds.GetHeight()(LONGINT));
+				WMRestorable.StoreSize(entry, "width", page.sidePanel.bounds.GetWidth());
+				WMRestorable.StoreSize(entry, "scratchHeight", page.scratchPanel.bounds.GetHeight());
 			elem.AddContent(entry);
 
 			RETURN elem;

@@ -345,7 +345,7 @@ TYPE
 			ApplyChange(changeInfo);
 		END SetCustomStyle;
 
-		PROCEDURE StyleDrop(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE StyleDrop(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		BEGIN
 			NEW(popup);
 			popup.Add("Regular", StylePopupHandler);
@@ -379,7 +379,7 @@ TYPE
 			END;
 		END StylePopupHandler;
 
-		PROCEDURE ColorHandler(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE ColorHandler(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		VAR colorPanel : WMPopups.ColorSwatchPopup;
 		BEGIN
 			NEW(colorPanel);
@@ -398,7 +398,7 @@ TYPE
 			colB.clDefault.Set(result);
 		END ColorPopupHandler;
 
-		PROCEDURE BGColorHandler(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE BGColorHandler(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		VAR colorPanel: WMPopups.ColorSwatchPopup;
 		BEGIN
 			NEW(colorPanel);
@@ -503,7 +503,7 @@ VAR
 	nofWindows : LONGINT;
 
 (* Actually, this is a hack... but for now, do it.  *)
-PROCEDURE GetNewSize(CONST fontname : ARRAY OF CHAR; mode, value, currentSize : LONGINT; VAR newSize : LONGINT);
+PROCEDURE GetNewSize(CONST fontname : ARRAY OF CHAR; mode, value : LONGINT; currentSize : SIZE; VAR newSize : SIZE);
 BEGIN
 	ASSERT((mode = Absolute) OR (mode = IncrementBy) OR (mode = DecrementBy));
 	IF (mode = Absolute) THEN

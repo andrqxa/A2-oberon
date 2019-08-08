@@ -273,7 +273,7 @@ BEGIN
 	RETURN index;
 END FindIndex;
 
-PROCEDURE DefaultPos(VAR x, y, w, h : LONGINT);
+PROCEDURE DefaultPos(VAR x, y, w, h : SIZE);
 VAR manager : WMWindowManager.WindowManager;
 	view : WMWindowManager.ViewPort;
 	s : WMWindowManager.WindowStyle;
@@ -310,7 +310,7 @@ VAR
 	view : WMWindowManager.ViewPort;
 	bw : Window;
 	img : WMGraphics.Image;
-	x, y, tx, ty, tw, th : LONGINT;
+	x, y, tx, ty, tw, th : SIZE;
 	fx, fy, fw, fh : LONGINT;
 	width, height : SIZE;
 	name : Files.FileName;
@@ -338,7 +338,7 @@ BEGIN {EXCLUSIVE}
 				x := tx; context.arg.SkipBytes(1); context.arg.SkipWhitespace();
 			ELSE
 				x := 0;
-				IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-') THEN context.arg.Int(x, TRUE) END;
+				IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-') THEN context.arg.Size(x, TRUE) END;
 				context.arg.SkipWhitespace();
 			END;
 
@@ -346,7 +346,7 @@ BEGIN {EXCLUSIVE}
 				y := ty; context.arg.SkipBytes(1); context.arg.SkipWhitespace();
 			ELSE
 				y := 0;
-				IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-') THEN context.arg.Int(y, TRUE) END;
+				IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-') THEN context.arg.Size(y, TRUE) END;
 				context.arg.SkipWhitespace();
 			END;
 			IF context.arg.Peek() = '?' THEN

@@ -82,7 +82,7 @@ TYPE
 		END InitNew;
 
 		(* Overwrite draw procedure because we do not want any interpolation *)
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h, q : LONGINT);
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : WORD);
 		BEGIN
 			Draw^(canvas, w, h, 0)
 		END Draw;

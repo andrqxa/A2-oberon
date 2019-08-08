@@ -24,7 +24,7 @@ TYPE
 VAR
 	manager : WMWindowManager.WindowManager;
 	viewPort : WMWindowManager.ViewPort;
-	w, h : LONGINT;
+	w, h : SIZE;
 	hw : LONGINT;
 	oldGUIBits : SET;
 	mouseGrabber : MouseGrabber;

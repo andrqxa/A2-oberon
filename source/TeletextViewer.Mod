@@ -149,7 +149,7 @@ TYPE
 
 		PROCEDURE &New *(browser : Browser; viewer: TeletextViewer);
 		VAR
-			i: SIZE; left, top: LONGINT;
+			i: SIZE; left, top: SIZE;
 			panel: Standard.Panel;
 			panels: POINTER TO ARRAY OF Standard.Panel;
 			channel: TVChannels.TVChannel;
@@ -258,7 +258,7 @@ TYPE
 		nrEditor, teleText: Editor.Editor;
 		browser-: Browser;
 		channelSwitcher : ChannelSwitcher;
-		l, t, refrMode : LONGINT;
+		l, t : SIZE; refrMode : LONGINT;
 		next: TeletextViewer;
 
 		PROCEDURE &New*;
@@ -649,7 +649,7 @@ TYPE
 
 		(** Overwrite standard 'Draw' routine: Move the channel selector window
 			   together with the viewer window. *)
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h, q : LONGINT);
+		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : WORD);
 		BEGIN
 			Draw^(canvas, w, h, q);
 			IF (channelSwitcher # NIL) & ((bounds.l # l) OR (bounds.t # t)) THEN

@@ -37,10 +37,10 @@ TYPE
 	PluginContainer* =  OBJECT(WMComponents.VisualComponent)
 	VAR
 		pluginViews : PluginView;
-		nbrOfPlugins : LONGINT;
+		nbrOfPlugins : SIZE;
 
 		PROCEDURE SetPluginHeights;
-		VAR p : PluginView; height, h : LONGINT; rect : WMRectangles.Rectangle;
+		VAR p : PluginView; height, h : SIZE; rect : WMRectangles.Rectangle;
 		BEGIN
 			IF pluginViews # NIL THEN
 				rect := bounds.Get(); h := rect.b - rect.t;
@@ -124,7 +124,7 @@ TYPE
 		alive, dead, update : BOOLEAN;
 
 		PROCEDURE Resized*;
-		VAR sum, w : LONGINT; i : SIZE; rect : WMRectangles.Rectangle;
+		VAR sum, w : SIZE; i : SIZE; rect : WMRectangles.Rectangle;
 		BEGIN
 			rect := bounds.Get(); w := rect.r - rect.l;
 			FOR i := 0 TO LEN(spacings)-1 DO sum := sum + spacings[i]; END;
@@ -143,7 +143,7 @@ TYPE
 		VAR
 			graphWindow : PluginGraphWindow; gridWindow : PluginGridWindow; chartWindow : PluginChartWindow;
 			p : Plugins.Plugin; changed : BOOLEAN;
-			scol, srow, ecol, erow, row : LONGINT;
+			scol, srow, ecol, erow, row : SIZE;
 			ptr : ANY;
 		BEGIN
 			ASSERT((viewType = GraphView) OR (viewType = GridView) OR (viewType = ChartView));
@@ -681,7 +681,7 @@ TYPE
 		END InitView;
 
 		PROCEDURE Resized*;
-		VAR sum, w : LONGINT; i: SIZE; rect : WMRectangles.Rectangle;
+		VAR sum, w : SIZE; i: SIZE; rect : WMRectangles.Rectangle;
 		BEGIN
 			rect := bounds.Get(); w := rect.r - rect.l - 20 (*scrollbar width*);
 			FOR i := 0 TO LEN(spacings)-1 DO
@@ -902,14 +902,14 @@ TYPE
 	PluginWindow* = OBJECT (WMComponents.FormWindow)
 	VAR
 		plugin : Plugins.Plugin;
-		width, height : LONGINT;
+		width, height : SIZE;
 
 		PROCEDURE CreateForm*() : WMComponents.VisualComponent;
 		BEGIN
 			HALT(301); RETURN NIL; (* abstract *)
 		END CreateForm;
 
-		PROCEDURE Resized*(width, height : LONGINT);
+		PROCEDURE Resized*(width, height : SIZE);
 		BEGIN
 			IF (width >= MinPwWidth) & (height >= MinPwHeight) THEN
 				scaling := FALSE;
@@ -941,8 +941,8 @@ TYPE
 				width := c.r - c.l; height :=  c.b - c.t;
 				size := WMRestorable.GetElement(c, "Data\Size");
 				IF size # NIL THEN
-					WMRestorable.LoadLongint(size, "Width", width);
-					WMRestorable.LoadLongint(size, "Height", height);
+					WMRestorable.LoadSize(size, "Width", width);
+					WMRestorable.LoadSize(size, "Height", height);
 					IF (width < MinPwWidth) OR (height < MinPwHeight) THEN
 						scale := TRUE;
 					END;
@@ -1000,8 +1000,8 @@ TYPE
 			WMRestorable.StoreBoolean(elem, "Active", plugin.IsActive());
 			WMRestorable.StoreBoolean(elem, "PerSecond", plugin.p.perSecond);
 			NEW(elem); elem.SetName("Size"); data.AddContent(elem);
-			WMRestorable.StoreLongint(elem, "Width", width);
-			WMRestorable.StoreLongint(elem, "Height", height);
+			WMRestorable.StoreSize(elem, "Width", width);
+			WMRestorable.StoreSize(elem, "Height", height);
 			RETURN data;
 		END StoreToXml;
 
@@ -1156,7 +1156,7 @@ TYPE
 
 		PROCEDURE ButtonHandler(sender, data : ANY);
 		VAR
-			ds : Plugins.DatasetDescriptor; scol, srow, ecol, erow, row : LONGINT;
+			ds : Plugins.DatasetDescriptor; scol, srow, ecol, erow, row : SIZE;
 			graphWindow : PluginGraphWindow;
 			nofHidden : SIZE;
 			hide : BOOLEAN;

@@ -299,7 +299,7 @@ TYPE
 	VAR
 		selecting, selectWords, dragPossible  : BOOLEAN;
 		lastPos : SIZE;
-		downX, downY : LONGINT;
+		downX, downY : SIZE;
 
 		utilreader : Texts.TextReader;
 
@@ -312,7 +312,7 @@ TYPE
 			NEW(utilreader, text);
 		END SetText;
 
-		PROCEDURE PointerDown*(x, y : LONGINT; keys : SET);
+		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
 		VAR pos : SIZE;
 		BEGIN
 			IF keys * {0, 1, 2} = {2} THEN
@@ -342,7 +342,7 @@ TYPE
 			END;
 		END PointerDown;
 
-		PROCEDURE PointerMove*(x, y : LONGINT; keys : SET);
+		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
 		CONST DragDist = 5;
 		VAR pos : SIZE;
 		BEGIN
@@ -368,7 +368,7 @@ TYPE
 			END
 		END PointerMove;
 
-		PROCEDURE PointerUp*(x, y : LONGINT; keys : SET);
+		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
 		BEGIN
 			selecting := FALSE;
 			IF dragPossible THEN selection.SetFromTo(0, 0); Texts.ClearLastSelection (* reset selection *) END;
@@ -444,7 +444,7 @@ TYPE
 		END Handle;
 
 		PROCEDURE HandleCommandMenuButton(sender, data : ANY);
-		VAR buttonBounds, panelBounds: WMRectangles.Rectangle; gx, gy : LONGINT;
+		VAR buttonBounds, panelBounds: WMRectangles.Rectangle; gx, gy : SIZE;
 		BEGIN
 			buttonBounds := commandMenuBtn.bounds.Get();
 			panelBounds := bounds.Get();
@@ -576,7 +576,7 @@ TYPE
 			END;
 		END HandleXYButtons;
 
-		PROCEDURE HandleShortcut(ucs : LONGINT; flags : SET; keySym : LONGINT)  : BOOLEAN;
+		PROCEDURE HandleShortcut(ucs : SIZE; flags : SET; keySym : SIZE)  : BOOLEAN;
 		VAR handled : BOOLEAN;
 		BEGIN
 			IF ControlKeyDown(flags) THEN
@@ -604,7 +604,7 @@ TYPE
 			RETURN handled;
 		END HandleShortcut;
 
-		PROCEDURE ExtKeyPressed(ucs : LONGINT; flags : SET; VAR keySym : LONGINT; VAR handled : BOOLEAN);
+		PROCEDURE ExtKeyPressed(ucs : SIZE; flags : SET; VAR keySym : SIZE; VAR handled : BOOLEAN);
 		BEGIN
 			textView.SetFlags(flags);
 			handled := TRUE;
@@ -872,7 +872,7 @@ TYPE
 		END Init;
 
 		(* Get global coordinates of the terminal panel *)
-		PROCEDURE GetPanelCoordinates(VAR gx, gy : LONGINT);
+		PROCEDURE GetPanelCoordinates(VAR gx, gy : SIZE);
 		VAR rect : WMRectangles.Rectangle;
 		BEGIN
 			rect := bounds.Get();
@@ -925,7 +925,7 @@ TYPE
 			progressInfo : ProgressInfo;
 			xysender : XYModem.Sender;
 			msg : ARRAY 32 OF CHAR;
-			x, y : LONGINT; res: WORD;
+			x, y : SIZE; res: WORD;
 		BEGIN
 			f := Files.Old(filename);
 			IF f # NIL THEN
@@ -972,7 +972,7 @@ TYPE
 			caption : ARRAY 128 OF CHAR;
 			xyreceiver : XYModem.Receiver;
 			msg : ARRAY 32 OF CHAR;
-			x, y : LONGINT; res: WORD;
+			x, y : SIZE; res: WORD;
 			awaitF : BOOLEAN;
 		BEGIN
 			IF filename # "" THEN
@@ -1286,7 +1286,7 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE &New*(vc : WMComponents.VisualComponent; x, y : LONGINT);
+		PROCEDURE &New*(vc : WMComponents.VisualComponent; x, y : SIZE);
 		BEGIN
 			IncCount;
 

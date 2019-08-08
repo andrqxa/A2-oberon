@@ -74,7 +74,8 @@ TYPE
 		VAR
 			processes : ARRAY ProcessInfo.MaxNofProcesses OF Objects.Process;
 			nofProcesses : SIZE;
-			scol, srow, ecol, erow, id, i : LONGINT;
+			scol, srow, ecol, erow, i : SIZE;
+			id: WORD;
 			selection : Selection;
 			str : Strings.String;
 		BEGIN
@@ -139,7 +140,7 @@ TYPE
 		VAR
 			grid : WMStringGrids.StringGrid;
 			str : ARRAY 256 OF CHAR;
-			i, dx, dy, minWidth : LONGINT;
+			i : WORD; dx, dy, minWidth : SIZE;
 			f : WMGraphics.Font;
 		BEGIN
 			NEW(grid); grid.alignment.Set(WMComponents.AlignClient);
@@ -185,7 +186,7 @@ TYPE
 		END Pause;
 
 		PROCEDURE Resized*;
-		VAR width, height, w, add : LONGINT; i : SIZE; newColWidth : WMGrids.Spacings;
+		VAR width, height, w, add : SIZE; i : SIZE; newColWidth : WMGrids.Spacings;
 		BEGIN
 			width := bounds.GetWidth(); height := bounds.GetHeight();
 			NEW(newColWidth, LEN(colWidth));
@@ -395,7 +396,7 @@ TYPE
 		toolbar- : WMStandardComponents.Panel;
 
 		PROCEDURE &Init*;
-		VAR font : WMGraphics.Font; dx, dy : LONGINT; sortInfo : SortInfo;
+		VAR font : WMGraphics.Font; dx, dy : SIZE; sortInfo : SortInfo;
 		BEGIN
 			Init^;
 			SetNameAsString(StrProcessManager);
@@ -496,7 +497,7 @@ TYPE
 		END HandleUnbreakableHalt;
 
 		PROCEDURE HandleSort(sender, data : ANY);
-		VAR gx, gy : LONGINT;
+		VAR gx, gy : SIZE;
 		BEGIN
 			sortBtn.ToWMCoordinates(0, sortBtn.bounds.GetBottom(), gx, gy);
 			sortPopup.Popup(gx, gy);
@@ -547,7 +548,7 @@ VAR
 	StrProcessSelector, StrProcessManager : Strings.String;
 	PrototypeSort : WMProperties.Int32Property;
 
-PROCEDURE GetTitleStr(col : LONGINT; VAR x : ARRAY OF CHAR);
+PROCEDURE GetTitleStr(col : WORD; VAR x : ARRAY OF CHAR);
 BEGIN
 	CASE col OF
 		| 0 : COPY("PID", x)

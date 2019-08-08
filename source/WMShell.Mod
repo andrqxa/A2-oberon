@@ -58,14 +58,14 @@ TYPE
 			Invalidate;
 		END Clear;
 
-		PROCEDURE ExtPointerUp(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE ExtPointerUp(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		BEGIN
 			text.AcquireRead;
 			editor.editor.tv.cursor.SetPosition(text.GetLength());
 			text.ReleaseRead;
 		END ExtPointerUp;
 
-		PROCEDURE ExtKeyPressed(ucs : LONGINT; flags : SET; VAR keySym : LONGINT; VAR handled : BOOLEAN);
+		PROCEDURE ExtKeyPressed(ucs : SIZE; flags : SET; VAR keySym : SIZE; VAR handled : BOOLEAN);
 		BEGIN
 			handled := FALSE;
 			IF editor.HandleShortcut(ucs, flags, keySym) THEN handled := TRUE; END;

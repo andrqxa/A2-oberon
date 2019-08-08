@@ -107,9 +107,9 @@ TYPE
 		network : NetworkComponent;
 		selection : WMPerfMonComponents.SelectionComponent;
 
-		width, height : LONGINT;
+		width, height : SIZE;
 
-		PROCEDURE Resized*(width, height : LONGINT);
+		PROCEDURE Resized*(width, height : SIZE);
 		BEGIN
 			IF (width >= MinWidth) & (height >= MinHeight) THEN
 				scaling := FALSE;
@@ -218,8 +218,8 @@ TYPE
 					WMRestorable.StoreLongint(elem, "ScreenInterval", WMPerfMonPlugins.updater.screenInterval);
 					WMRestorable.StoreString(elem, "CurrentTab", curTab.caption^);
 					NEW(elem); elem.SetName("Size"); data.AddContent(elem);
-					WMRestorable.StoreLongint(elem, "Width", width);
-					WMRestorable.StoreLongint(elem, "Height", height);
+					WMRestorable.StoreSize(elem, "Width", width);
+					WMRestorable.StoreSize(elem, "Height", height);
 					x.ext(WMRestorable.Storage).Add("WMPerfMon", "WMPerfMon.Restore", SELF, data);
 				ELSIF x.ext IS KillerMsg THEN
 					Close;
@@ -248,8 +248,8 @@ TYPE
 				width := c.r - c.l; height :=  c.b - c.t;
 				size := WMRestorable.GetElement(c, "Data\Size");
 				IF size # NIL THEN
-					WMRestorable.LoadLongint(size, "Width", width);
-					WMRestorable.LoadLongint(size, "Height", height);
+					WMRestorable.LoadSize(size, "Width", width);
+					WMRestorable.LoadSize(size, "Height", height);
 					IF (width < MinWidth) OR (height < MinHeight) THEN
 						scale := TRUE;
 					END;

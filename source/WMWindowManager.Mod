@@ -672,7 +672,7 @@ TYPE
 		range* : RealRect;
 
 		(* Width and height of viewport at 1:1 zoom. Will be set once in the constructor of the ViewPort implementation *)
-		width0*, height0* : LONGINT; (* read-only! *)
+		width0*, height0* : SIZE; (* read-only! *)
 
 		(** The WindowManager calls the Update Procedure in locked state. *)
 		PROCEDURE Update*(r : Rectangle; top : Window);

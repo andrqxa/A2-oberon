@@ -421,19 +421,19 @@ TYPE
 			filenameEdit.GetAsString(filename);
 			WMRestorable.StoreString(config, "file", filename);
 			WMRestorable.StoreString(config, "codecFormat", codecFormat);
-			WMRestorable.StoreLongint(config, "firstLine", editor.tv.firstLine.Get()(LONGINT));
-			WMRestorable.StoreLongint(config, "cursorPos", editor.tv.cursor.GetPosition()(LONGINT));
+			WMRestorable.StoreSize(config, "firstLine", editor.tv.firstLine.Get());
+			WMRestorable.StoreSize(config, "cursorPos", editor.tv.cursor.GetPosition());
 			WMRestorable.StoreBoolean(config, "wordWrap", wordWrap);
 		END ToXml;
 
 		PROCEDURE FromXml*(config : XML.Element);
-		VAR filename : Files.FileName; firstLine, cursorPos : LONGINT; wordWrap : BOOLEAN;
+		VAR filename : Files.FileName; firstLine, cursorPos : SIZE; wordWrap : BOOLEAN;
 		BEGIN
 			ASSERT(config # NIL);
 			WMRestorable.LoadString(config, "file", filename);
 			WMRestorable.LoadString(config, "codecFormat", codecFormat);
-			WMRestorable.LoadLongint(config, "firstLine", firstLine);
-			WMRestorable.LoadLongint(config, "cursorPos", cursorPos);
+			WMRestorable.LoadSize(config, "firstLine", firstLine);
+			WMRestorable.LoadSize(config, "cursorPos", cursorPos);
 			WMRestorable.LoadBoolean(config, "wordWrap", wordWrap);
 			Load(filename, codecFormat);
 			editor.tv.firstLine.Set(firstLine);

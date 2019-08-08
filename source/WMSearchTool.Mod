@@ -51,7 +51,7 @@ TYPE
 			END;
 		END FocusPrev;
 
-		PROCEDURE KeyPressed*(ucs : LONGINT; flags : SET; VAR keySym : LONGINT; VAR handled : BOOLEAN);
+		PROCEDURE KeyPressed*(ucs : SIZE; flags : SET; VAR keySym : SIZE; VAR handled : BOOLEAN);
 		BEGIN
 			IF (flags # {}) & (flags - Inputs.Shift = {}) THEN
 				withShift := TRUE;

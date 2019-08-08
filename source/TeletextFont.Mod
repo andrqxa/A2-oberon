@@ -257,7 +257,7 @@ TYPE
 
 		(** works up to 255x255x2 *)
 		PROCEDURE RasterToBWRLBytes(img : Raster.Image; VAR buf : ARRAY OF CHAR; VAR pos : LONGINT);
-		VAR i, count: LONGINT;
+		VAR i: SIZE; count: LONGINT;
 				p : Raster.Pixel;
 				pix, curpix : BOOLEAN; mode : Raster.Mode;
 		BEGIN

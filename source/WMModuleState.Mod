@@ -41,7 +41,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 	VAR  toolbar: WMStandardComponents.Panel;
 		load, clear : WMStandardComponents.Button;
 		font: WMGraphics.Font;
-		dx, dy: LONGINT;
+		dx, dy: SIZE;
 		bearing : WMRectangles.Rectangle;
 		label: WMStandardComponents.Label;
 	BEGIN

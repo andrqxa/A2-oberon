@@ -87,13 +87,13 @@ TYPE
 
 		(** Set the volume of the channel *)
 		(** 0 is silent, 255 is max *)
-		PROCEDURE SetVolume*(volume : LONGINT);
+		PROCEDURE SetVolume*(volume : WORD);
 		BEGIN HALT(99) (* abstract *)
 		END SetVolume;
 
 		(** Get the volume of the channel *)
 		(** 0 is silent, 255 is max *)
-		PROCEDURE GetVolume*() : LONGINT;
+		PROCEDURE GetVolume*() : WORD;
 		BEGIN HALT(99) (* abstract *)
 		END GetVolume;
 

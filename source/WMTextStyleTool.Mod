@@ -205,7 +205,7 @@ TYPE
 		PROCEDURE ShowList(sender, data: ANY);
 		VAR caption : Strings.String;
 			button : WMStandardComponents.Button;
-			width, height : LONGINT;
+			width, height : SIZE;
 		BEGIN
 			button :=  sender(WMStandardComponents.Button);
 			caption :=  button.caption.Get();
@@ -563,7 +563,7 @@ TYPE
 			END
 		END SetCustomStyle;
 
-		PROCEDURE StyleDrop(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE StyleDrop(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		BEGIN
 			NEW(popup);
 			popup.Add("Regular", StylePopupHandler);
@@ -597,7 +597,7 @@ TYPE
 			END;
 		END StylePopupHandler;
 
-		PROCEDURE ColorHandler(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE ColorHandler(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		VAR colorPanel : WMPopups.ColorSwatchPopup;
 		BEGIN
 			NEW(colorPanel);
@@ -615,7 +615,7 @@ TYPE
 			colorEdit.SetAsString(colorString);
 		END ColorPopupHandler;
 
-		PROCEDURE BGColorHandler(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE BGColorHandler(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		VAR colorPanel: WMPopups.ColorSwatchPopup;
 		BEGIN
 			NEW(colorPanel);
@@ -1685,7 +1685,7 @@ TYPE
 			UpdateList;
 		END ApplyCHandler;
 
-		PROCEDURE AlignHandler(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE AlignHandler(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		BEGIN
 			NEW(popup);
 			popup.AddParButton("Left", AlignPopupHandler, ctxAlignLeft);
@@ -1714,7 +1714,7 @@ TYPE
 			END;
 		END AlignPopupHandler;
 
-		PROCEDURE StyleHandler(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE StyleHandler(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		BEGIN
 			NEW(popup);
 			popup.AddParButton("Regular", StylePopupHandler, ctxRegular);
@@ -1746,7 +1746,7 @@ TYPE
 			END;
 		END StylePopupHandler;
 
-		PROCEDURE ColorHandler(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE ColorHandler(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		VAR colorPanel : WMPopups.ColorSwatchPopup;
 		BEGIN
 			NEW(colorPanel);
@@ -1766,7 +1766,7 @@ TYPE
 			previewLabel.textColor.Set(result); previewLabel.Invalidate;
 		END ColorPopupHandler;
 
-		PROCEDURE BGColorHandler(x, y : LONGINT; keys : SET; VAR handled : BOOLEAN);
+		PROCEDURE BGColorHandler(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
 		VAR colorPanel: WMPopups.ColorSwatchPopup;
 		BEGIN
 			NEW(colorPanel);
@@ -1793,7 +1793,7 @@ VAR
 	ctxAlignLeft, ctxAlignCenter, ctxAlignRight, ctxAlignJustified : ContextMenuData;
 	ctxRegular, ctxBold, ctxItalic, ctxBoldItalic : ContextMenuData;
 
-PROCEDURE CreateStyleName(CONST fontname : ARRAY OF CHAR; style : SET; size, fgColor, bgColor : LONGINT; VAR name : ARRAY OF CHAR);
+PROCEDURE CreateStyleName(CONST fontname : ARRAY OF CHAR; style : SET; size : SIZE; fgColor, bgColor : LONGINT; VAR name : ARRAY OF CHAR);
 VAR string : ARRAY 32 OF CHAR; styleInt : LONGINT;
 BEGIN
 	(* create AdHoc Name *)
@@ -1822,7 +1822,7 @@ BEGIN
 END EnsureAttribute;
 
 (* Actually, this is a hack... but for now, do it.  *)
-PROCEDURE GetNewSize(CONST fontname : ARRAY OF CHAR; mode, value, currentSize : LONGINT; VAR newSize : LONGINT);
+PROCEDURE GetNewSize(CONST fontname : ARRAY OF CHAR; mode, value: LONGINT; currentSize : SIZE; VAR newSize : SIZE);
 BEGIN
 	ASSERT((mode = Absolute) OR (mode = IncrementBy) OR (mode = DecrementBy));
 	IF (mode = Absolute) THEN

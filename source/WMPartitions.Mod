@@ -253,7 +253,7 @@ TYPE
 			fs : Files.FileSystem;
 			fstype : LONGINT;
 			doClose : BOOLEAN;
-			result : LONGINT; res : WORD;
+			result, res : WORD;
 		BEGIN
 			SELF.selection := selection;
 			IF IsValid(selection) THEN
@@ -569,8 +569,8 @@ TYPE
 		grid : WMPartitionsComponents.NoWheelGrid;
 		gridContainer : WMStandardComponents.Panel;
 		gridPanel : WMPartitionsComponents.BevelPanel;
-		selectedRow : LONGINT;
-		cellHeight : LONGINT;
+		selectedRow : SIZE;
+		cellHeight : SIZE;
 		scrollbarY : WMStandardComponents.Scrollbar;
 
 		(* edit panel *)
@@ -584,7 +584,7 @@ TYPE
 		toFile, toPartition : WMStandardComponents.Button; (* check boxes *)
 		editorFile, editorPartition : WMEditors.Editor;
 		target : LONGINT; (* ToFile | ToPartition *)
-		fileLeft : LONGINT; (* left offset from editorFile *)
+		fileLeft : SIZE; (* left offset from editorFile *)
 
 		statusLabel : WMStandardComponents.Label;
 
@@ -706,9 +706,9 @@ TYPE
 			RETURN res = Disks.Ok;
 		END SetSelection;
 
-		PROCEDURE WheelMove*(dz : LONGINT);
+		PROCEDURE WheelMove*(dz : SIZE);
 		CONST	Multiplier = 30;
-		VAR pos : LONGINT;
+		VAR pos : SIZE;
 		BEGIN
 			IF scrollbarY.visible.Get() THEN
 				pos := scrollbarY.pos.Get() + Multiplier*dz;
@@ -803,7 +803,7 @@ TYPE
 		END CheckboxHandler;
 
 		PROCEDURE GridClicked(sender, data : ANY);
-		VAR grid : WMPartitionsComponents.NoWheelGrid; ignore, row : LONGINT; string : Strings.String;
+		VAR grid : WMPartitionsComponents.NoWheelGrid; ignore, row : SIZE; string : Strings.String;
 		BEGIN
 			grid := sender (WMPartitionsComponents.NoWheelGrid);
 			grid.GetSelection(ignore, row, ignore, ignore);
@@ -817,7 +817,7 @@ TYPE
 		END GridClicked;
 
 		PROCEDURE UpdateGrid;
-		VAR row, height : LONGINT; spacings : WMGrids.Spacings; table : PartitionsLib.Table;
+		VAR row, height : SIZE; spacings : WMGrids.Spacings; table : PartitionsLib.Table;
 		BEGIN
 			table := configTable.GetEntries();
 			IF table # NIL THEN
@@ -849,8 +849,8 @@ TYPE
 			UpdateLayout(SELF.bounds.r - SELF.bounds.l, SELF.bounds.b - SELF.bounds.t);
 		END UpdateGrid;
 
-		PROCEDURE UpdateLayout(width, height : LONGINT);
-		VAR gridHeight : LONGINT; table : PartitionsLib.Table;
+		PROCEDURE UpdateLayout(width, height : SIZE);
+		VAR gridHeight : SIZE; table : PartitionsLib.Table;
 		BEGIN
 			DisableUpdate;
 			mainpanel.bounds.SetExtents(width, height);
@@ -888,15 +888,15 @@ TYPE
 			Close^; IF popup # NIL THEN popup.Close; END;
 		END Close;
 
-		PROCEDURE Resized*(width, height : LONGINT);
+		PROCEDURE Resized*(width, height : SIZE);
 		BEGIN
 			Resized^(width, height);
 			UpdateLayout(width, height);
 		END Resized;
 
-		PROCEDURE &Init*(width, height : LONGINT; alpha : BOOLEAN);
+		PROCEDURE &Init*(width, height : SIZE; alpha : BOOLEAN);
 		VAR
-			left, ignore : LONGINT;
+			left, ignore : SIZE;
 			spacings : WMGrids.Spacings;
 			font : WMGraphics.Font;
 			label : WMStandardComponents.Label;
@@ -2209,9 +2209,9 @@ TYPE
 
 		result : LONGINT;
 
-		width, height : LONGINT; (* of this popup window *)
+		width, height : SIZE; (* of this popup window *)
 
-		PROCEDURE &Init*(width, height : LONGINT; alpha : BOOLEAN);
+		PROCEDURE &Init*(width, height : SIZE; alpha : BOOLEAN);
 		VAR panel, line : WMStandardComponents.Panel;
 		BEGIN
 			SELF.width := width; SELF.height := height; scaling := FALSE;
@@ -2293,8 +2293,8 @@ TYPE
 		CONST MinSpacer = 5;
 		VAR
 			label, line : WMStandardComponents.Label;
-			width, labelwidth : LONGINT;
-			maxWidth, ignore : LONGINT;
+			width, labelwidth : SIZE;
+			maxWidth, ignore : SIZE;
 			font : WMGraphics.Font;
 			caption : ARRAY 128 OF CHAR;
 			i : SIZE;
@@ -2526,7 +2526,7 @@ TYPE
 		(* status bar *)
 		statusLabel : WMStandardComponents.Label;
 
-		width, height : LONGINT; (* caches "window size"; needed for correct update when downscaled *)
+		width, height : SIZE; (* caches "window size"; needed for correct update when downscaled *)
 
 		PROCEDURE &New*(c : WMRestorable.Context);
 		VAR configuration : WMRestorable.XmlElement; scale, showDetails : BOOLEAN;
@@ -2536,8 +2536,8 @@ TYPE
 				width := c.r - c.l; height := c.b - c.t;
 				configuration := WMRestorable.GetElement(c, "Configuration");
 				IF configuration # NIL THEN
-					WMRestorable.LoadLongint(configuration, "Width", width);
-					WMRestorable.LoadLongint(configuration, "Height", height);
+					WMRestorable.LoadSize(configuration, "Width", width);
+					WMRestorable.LoadSize(configuration, "Height", height);
 					WMRestorable.LoadBoolean(configuration, "Details", showDetails);
 					IF (width < WindowMinWidth) OR (height < WindowMinHeight) THEN
 						(* First render window in real size and then scale it down to the size specified by the context *)
@@ -2684,7 +2684,7 @@ TYPE
 			RETURN panel;
 		END CreateForm;
 
-		PROCEDURE Resized*(width, height : LONGINT);
+		PROCEDURE Resized*(width, height : SIZE);
 		BEGIN
 			IF (width >= WindowMinWidth) & (height >= WindowMinHeight) THEN
 				scaling := FALSE;
@@ -2742,7 +2742,7 @@ TYPE
 			PartitionsLib.diskModel.Update;
 		END Refresh;
 
-		PROCEDURE WheelMove*(dz : LONGINT);
+		PROCEDURE WheelMove*(dz : SIZE);
 		BEGIN
 			partitionSelector.WheelMove(dz);
 		END WheelMove;
@@ -2791,8 +2791,8 @@ TYPE
 			IF (x.msgType = WMMessages.MsgExt) & (x.ext # NIL) THEN
 				IF (x.ext IS WMRestorable.Storage) THEN
 					NEW(configuration); configuration.SetName("Configuration");
-					WMRestorable.StoreLongint(configuration, "Width", width);
-					WMRestorable.StoreLongint(configuration, "Height", height);
+					WMRestorable.StoreSize(configuration, "Width", width);
+					WMRestorable.StoreSize(configuration, "Height", height);
 					WMRestorable.StoreBoolean(configuration, "Details", showDetailsBtn.GetPressed());
 					x.ext(WMRestorable.Storage).Add("PartitionTool", "Restore", SELF, configuration);
 				ELSE Handle^(x)

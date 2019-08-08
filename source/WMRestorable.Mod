@@ -11,7 +11,7 @@ TYPE
 
 	Context* = OBJECT
 	VAR
-		l*, t*, r*, b* : LONGINT;
+		l*, t*, r*, b* : SIZE;
 		flags* : SET;
 		appData* : XML.Element;
 	END Context;
@@ -36,10 +36,10 @@ TYPE
 			StoreString(window, "name", name);
 			StoreString(window, "loader", loader);
 
-			StoreLongint(window, "l", w.bounds.l(LONGINT));
-			StoreLongint(window, "t", w.bounds.t(LONGINT));
-			StoreLongint(window, "r", w.bounds.r(LONGINT));
-			StoreLongint(window, "b", w.bounds.b(LONGINT));
+			StoreSize(window, "l", w.bounds.l);
+			StoreSize(window, "t", w.bounds.t);
+			StoreSize(window, "r", w.bounds.r);
+			StoreSize(window, "b", w.bounds.b);
 
 			StoreSet(window, "flags", w.flags);
 
@@ -134,10 +134,10 @@ BEGIN
 	l := w.GetAttributeValue("loader");
 	IF l # NIL THEN
 		NEW(context);
-		LoadLongint(w, "l", context.l);
-		LoadLongint(w, "t", context.t);
-		LoadLongint(w, "r", context.r);
-		LoadLongint(w, "b", context.b);
+		LoadSize(w, "l", context.l);
+		LoadSize(w, "t", context.t);
+		LoadSize(w, "r", context.r);
+		LoadSize(w, "b", context.b);
 		LoadSet(w, "flags", context.flags);
 		c := w.GetFirst();
 		IF (c # NIL) & (c IS XML.Element) THEN
@@ -259,12 +259,30 @@ BEGIN
 	END;
 END LoadLongint;
 
+PROCEDURE LoadSize*(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR value : SIZE);
+VAR string : String;
+BEGIN
+	string := elem.GetAttributeValue(name);
+	IF string # NIL THEN
+		Strings.StrToSize(string^, value);
+	ELSE
+		ShowLoadError("LoadLongint", elem, name);
+	END;
+END LoadSize;
+
 PROCEDURE StoreLongint*(elem : XML.Element; CONST name : ARRAY OF CHAR; value : LONGINT);
 VAR a : XML.Attribute; string : ARRAY 32 OF CHAR;
 BEGIN
 	NEW(a); a.SetName(name); Strings.IntToStr(value, string); a.SetValue(string);
 	elem.AddAttribute(a);
 END StoreLongint;
+
+PROCEDURE StoreSize*(elem : XML.Element; CONST name : ARRAY OF CHAR; value : SIZE);
+VAR a : XML.Attribute; string : ARRAY 32 OF CHAR;
+BEGIN
+	NEW(a); a.SetName(name); Strings.IntToStr(value, string); a.SetValue(string);
+	elem.AddAttribute(a);
+END StoreSize;
 
 PROCEDURE LoadString*(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR value : ARRAY OF CHAR);
 VAR string : String;

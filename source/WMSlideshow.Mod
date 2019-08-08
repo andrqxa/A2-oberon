@@ -318,7 +318,7 @@ TYPE SlideshowApp= OBJECT
 	VAR
 		view : WMWindowManager.ViewPort;
 		manager : WMWindowManager.WindowManager;
-		w, h : LONGINT;
+		w, h : SIZE;
 	BEGIN
 		IF (win = NIL) THEN RETURN; END;
 		fullscreen := ~fullscreen;
@@ -512,7 +512,7 @@ TYPE  SlideshowNavigation = OBJECT(WMComponents.FormWindow);
 		image : Image;
 		fact : REAL;
 		c : WMGraphics.BufferCanvas;
-		w, h : LONGINT;
+		w, h : SIZE;
 	BEGIN
 		(* End? -> indiacted with a white preview panel *)
 		IF (app.slideNr >= data.CountSlides()-1) THEN
@@ -577,7 +577,7 @@ TYPE  SlideshowNavigation = OBJECT(WMComponents.FormWindow);
 		app.Last();
 	END ButtonHandlerLast;
 
-	PROCEDURE KeyEvent*(ucs : LONGINT; flags : SET; keysym : LONGINT);
+	PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 	BEGIN
 		IF Inputs.Release IN flags THEN RETURN; END;
 		IF ucs = ORD("f") THEN
@@ -620,7 +620,7 @@ TYPE  SlideshowNavigation = OBJECT(WMComponents.FormWindow);
 	END KeyEvent;
 
 	(** Dropped is called via the message handler to indicate an item has been dropped. *)
-	PROCEDURE DragDropped*(x, y: LONGINT; dragInfo : WMWindowManager.DragInfo);
+	PROCEDURE DragDropped*(x, y: SIZE; dragInfo : WMWindowManager.DragInfo);
 	VAR
 		dropTarget : URLDropTarget;
 	BEGIN
@@ -691,7 +691,7 @@ TYPE  SlideshowWindow = OBJECT(WMWindowManager.DoubleBufferWindow);
 	END New;
 
 
-	PROCEDURE PointerDown*(x, y : LONGINT; keys : SET);
+	PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
 	BEGIN
 		IF (0 IN keys) THEN
 			(* Go to next Slide  *)
@@ -699,7 +699,7 @@ TYPE  SlideshowWindow = OBJECT(WMWindowManager.DoubleBufferWindow);
 		END;
 	END PointerDown;
 
-	PROCEDURE KeyEvent*(ucs : LONGINT; flags : SET; keysym : LONGINT);
+	PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keysym : SIZE);
 	BEGIN
 		IF Inputs.Release IN flags THEN RETURN; END;
 		IF ucs = ORD("f") THEN
@@ -802,7 +802,7 @@ TYPE  SlideshowWindow = OBJECT(WMWindowManager.DoubleBufferWindow);
 	VAR
 		tm : TransitionMask;
 		i, step: LONGINT;
-		w, h : LONGINT;
+		w, h : SIZE;
 	BEGIN
 		IF (DEBUG) THEN KernelLog.String("Mask transition: "); KernelLog.String(mask); KernelLog.Ln; END;
 		w := current.width; h := current.height;
@@ -827,7 +827,7 @@ TYPE  SlideshowWindow = OBJECT(WMWindowManager.DoubleBufferWindow);
 	VAR
 		tf : TransitionFade;
 		i,step : LONGINT;
-		w, h : LONGINT;
+		w, h : SIZE;
 	BEGIN
 		IF (DEBUG) THEN KernelLog.String("Fade transition"); KernelLog.Ln; END;
 		w := current.width; h := current.height;
@@ -854,7 +854,7 @@ TYPE  SlideshowWindow = OBJECT(WMWindowManager.DoubleBufferWindow);
 
 	PROCEDURE Update;
 	VAR s : Slide;
-		w, h : LONGINT;
+		w, h : SIZE;
 		manager : WMWindowManager.WindowManager;
 		img: Image;
 	BEGIN
@@ -1145,7 +1145,7 @@ END Cleanup;
  ****)
 PROCEDURE LoadImage(CONST name : ARRAY OF CHAR; fmt : Raster.Format): Image;
 VAR img : Image;
-	res: WORD; w, h, x : LONGINT;
+	res, x: WORD; w, h : SIZE;
 	decoder : Codecs.ImageDecoder;
 	in : Streams.Reader;
 	ext : ARRAY 16 OF CHAR;

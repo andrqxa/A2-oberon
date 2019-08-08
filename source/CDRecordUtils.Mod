@@ -550,7 +550,7 @@ TYPE
 		nofRows: LONGINT;
 		caption*: WMProperties.StringProperty;
 		label: WMStandardComponents.Label;
-		selected*: WMProperties.Int32Property;
+		selected*: WMProperties.SizeProperty;
 		onSelectionChanged* : WMEvents.EventSource;
 
 		PROCEDURE &Init*;
@@ -598,7 +598,7 @@ TYPE
 
 		PROCEDURE SelectionHandler*(sender, data: ANY);
 		VAR
-			scol, srow, ecol, erow: LONGINT;
+			scol, srow, ecol, erow: SIZE;
 		BEGIN
 			grid. GetSelection(scol, srow, ecol, erow );
 			selected.Set(srow);

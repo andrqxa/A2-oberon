@@ -134,7 +134,7 @@ TYPE
 		name* : ARRAY 128 OF CHAR;				(* name of the character style *)
 		family* : ARRAY 32 OF CHAR;				(* font family *)
 		style* : SET;									(* font style; 0 = bold, 1 = italic *)
-		size* : LONGINT;							(* font size [pt]; 1pt == 1/72inch == 0,3527777778mm *)
+		size* : SIZE;							(* font size [pt]; 1pt == 1/72inch == 0,3527777778mm *)
 		leading* : LONGINT;							(* baseline distance [pt] - usually 120% of font size *)
 		baselineShift* : LONGINT;					(* baseline shift up/down [pt] *)
 		tracking* : LONGINT;						(* character spacing [pt] *)

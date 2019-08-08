@@ -224,7 +224,7 @@ TYPE
 			END;
 		END ReadGlyph;
 
-		PROCEDURE Load(filename : ARRAY OF CHAR; size : LONGINT) : BOOLEAN;
+		PROCEDURE Load(filename : ARRAY OF CHAR; size : SIZE) : BOOLEAN;
 		VAR i, j, k, ngri, splitCount : LONGINT; res : INTEGER;
 			ascent, descent : LONGINT;
 		BEGIN
@@ -237,7 +237,7 @@ TYPE
 			NEW(glyph);
 			OpenType.InitGlyph(glyph, ofont);
 			res := ScreenDPI;
-			OpenType.GetInstance(ofont, 40H*size, res, res, OpenType.Identity, inst);					(* get instance *)
+			OpenType.GetInstance(ofont, (40H*size)(OpenType.F26D6), res, res, OpenType.Identity, inst);					(* get instance *)
 			IF inst = NIL THEN KernelLog.String("OT: Could not get Instance: "); KernelLog.String(filename);  KernelLog.Ln; RETURN FALSE END;
 
 			OpenType.GetName(ofont, 1, fname);													(* get Name *)
@@ -298,7 +298,7 @@ BEGIN
 	END
 END InitBitTable;
 
-PROCEDURE LoadFont(name : ARRAY OF CHAR; size : LONGINT) : Font;
+PROCEDURE LoadFont(name : ARRAY OF CHAR; size : SIZE) : Font;
 VAR font: Font;
 BEGIN
 	IF Debug THEN KernelLog.String("Loading Font: "); KernelLog.String(name); KernelLog.Ln END;
