@@ -1380,7 +1380,7 @@ TYPE
 
 					(* guaranteed by VisitRangeExpression: *)
 					ASSERT((left # NIL) & (right # NIL));
-					ASSERT(system.lenType.SameType(left.type.resolved) & system.lenType.SameType(right.type.resolved));
+					ASSERT(system.sizeType.SameType(left.type.resolved) & system.sizeType.SameType(right.type.resolved));
 
 				ELSE
 					(* the element is not a range expression *)
@@ -2824,7 +2824,7 @@ TYPE
 				END;
 				first := ResolveExpression(first);
 				IF IsIntegerType(first.type.resolved)  THEN
-					first := NewConversion(first.position, first, system.lenType, NIL)
+					first := NewConversion(first.position, first, system.sizeType, NIL)
 				ELSE
 					Error(first.position, "lower bound not integer");
 					hasError := TRUE
@@ -2872,7 +2872,7 @@ TYPE
 				END;
 				last := ResolveExpression(last);
 				IF IsIntegerType(last.type.resolved) THEN
-					last := NewConversion(last.position, last, system.lenType, NIL)
+					last := NewConversion(last.position, last, system.sizeType, NIL)
 				ELSE
 					Error(last.position, "upper bound not integer");
 					hasError := TRUE
@@ -2886,7 +2886,7 @@ TYPE
 				END;
 				step := ResolveExpression(step);
 				IF IsIntegerType(step.type.resolved) THEN
-					step := NewConversion(step.position, step, system.lenType, NIL)
+					step := NewConversion(step.position, step, system.sizeType, NIL)
 				ELSE
 					Error(step.position, "step size not integer");
 					hasError := TRUE
@@ -3300,9 +3300,9 @@ TYPE
 
 					(* add conversions to size type *)
 					(* TODO: needed? *)
-					rangeExpression.SetFirst(NewConversion(Basic.invalidPosition, first, system.lenType, NIL));
-					rangeExpression.SetLast(NewConversion(Basic.invalidPosition, last, system.lenType, NIL));
-					rangeExpression.SetStep(NewConversion(Basic.invalidPosition, step, system.lenType, NIL));
+					rangeExpression.SetFirst(NewConversion(Basic.invalidPosition, first, system.sizeType, NIL));
+					rangeExpression.SetLast(NewConversion(Basic.invalidPosition, last, system.sizeType, NIL));
+					rangeExpression.SetStep(NewConversion(Basic.invalidPosition, step, system.sizeType, NIL));
 				END;
 
 				IF indexDesignator.hasTensorRange THEN
@@ -4562,7 +4562,7 @@ TYPE
 								REPEAT
 									actualParameter := actualParameters.GetExpression(i);
 									IF CheckSizeType(actualParameter) THEN
-										actualParameter := NewConversion(Basic.invalidPosition,actualParameter,system.lenType,NIL);
+										actualParameter := NewConversion(Basic.invalidPosition,actualParameter,system.sizeType,NIL);
 										actualParameters.SetExpression(i,actualParameter);
 									END;
 									INC(i);
@@ -4881,19 +4881,19 @@ TYPE
 					END;
 				(* ---- FIRST ---- *)
 				ELSIF (id = Global.First) & CheckArity(1,1) THEN
-					type := system.lenType;
+					type := system.sizeType;
 					IF CheckRangeType(parameter0) THEN END;
 					result.SetAssignable(parameter0.assignable)
 
 				(* ---- LAST ---- *)
 				ELSIF (id = Global.Last) & CheckArity(1,1) THEN
-					type := system.lenType;
+					type := system.sizeType;
 					IF CheckRangeType(parameter0) THEN END;
 					result.SetAssignable(parameter0.assignable)
 
 				(* ---- STEP ---- *)
 				ELSIF (id = Global.Step) & CheckArity(1,1) THEN
-					type := system.lenType;
+					type := system.sizeType;
 					IF CheckRangeType(parameter0) THEN END;
 					result.SetAssignable(parameter0.assignable)
 
@@ -5305,7 +5305,7 @@ TYPE
 					type := system.addressType
 				(* ---- INCR ----- *)
 				ELSIF (id = Global.Incr) & CheckArity(1,2) THEN
-					type := system.lenType;
+					type := system.sizeType;
 					base := type0;
 					IF (numberActualParameters =2) & CheckSizeType(parameter1) THEN
 						IF ~IsIntegerValue(parameter1,i1) THEN i1 := 0 END;
@@ -5323,17 +5323,17 @@ TYPE
 								base := SyntaxTree.invalidType;
 							END;
 						END;
-						parameter1 := NewConversion(parameter1.position,parameter1,system.lenType,NIL);
+						parameter1 := NewConversion(parameter1.position,parameter1,system.sizeType,NIL);
 						actualParameters.SetExpression(1,parameter1);
 						IF (numberActualParameters =2) & (parameter1 IS SyntaxTree.IntegerValue) THEN
 							mathArrayType := base(SyntaxTree.MathArrayType);
 							IF (mathArrayType.form = SyntaxTree.Static) THEN
 								result := SyntaxTree.NewIntegerValue(position,ToMemoryUnits(system,mathArrayType.staticIncrementInBits));
-								type := system.lenType;
+								type := system.sizeType;
 							END;
 						END;
 					ELSE
-						type := system.lenType;
+						type := system.sizeType;
 					END;
 
 				(* ---- SUM ----- *)
@@ -5344,7 +5344,7 @@ TYPE
 					Error(position, "all operator not applicable");
 				(* ---- DIM ----- *)
 				ELSIF (id = Global.Dim) & CheckArity(1,1) THEN
-					type := system.lenType;
+					type := system.sizeType;
 					IF type0 IS SyntaxTree.MathArrayType THEN
 						IF type0(SyntaxTree.MathArrayType).form # SyntaxTree.Tensor THEN
 							i := Dimension(type0,{SyntaxTree.Open,SyntaxTree.Static});
