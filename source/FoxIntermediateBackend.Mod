@@ -4008,7 +4008,7 @@ TYPE
 			resultingType, leftType, baseType: SyntaxTree.Type;
 			skipLabel1: Label;
 			i, indexListSize, indexDim, srcDimOffset, destDimOffset, targetArrayDimensionality: SIZE;
-			staticSourceLength, staticSourceIncrement, staticIndex, staticFirstIndex, staticLastIndex, staticStepSize, staticTargetLength: LONGINT;
+			staticSourceLength, staticSourceIncrement, staticIndex, staticFirstIndex, staticLastIndex, staticStepSize, staticTargetLength: Basic.Integer;
 			variableOp: Operand;
 			variable: SyntaxTree.Variable;
 			prefixIndices, prefixRanges, suffixIndices, suffixRanges : LONGINT; tensorFound: BOOLEAN;
@@ -6768,7 +6768,7 @@ TYPE
 				offset := ToMemoryUnits(system,MathLenOffset*addressType.sizeInBits);
 			END;
 			IF dim.mode=IntermediateCode.ModeImmediate THEN
-				PutMathArrayField(base,value,offset + ToMemoryUnits(system,SHORT(dim.intValue) * 2 * addressType.sizeInBits));
+				PutMathArrayField(base,value,offset + ToMemoryUnits(system,dim.intValue(SIZE) * 2 * addressType.sizeInBits));
 			ELSE
 				IntermediateCode.InitRegister(reg,addressType,IntermediateCode.GeneralPurposeRegister,AcquireRegister(addressType,IntermediateCode.GeneralPurposeRegister));
 				Emit(Mov(position,reg,dim));
@@ -6816,7 +6816,7 @@ TYPE
 		END GetMathArrayIncrementAt;
 
 		PROCEDURE MathArrayLenOrIncr(type: SyntaxTree.MathArrayType; CONST operand: Operand; VAR dim: IntermediateCode.Operand; increment: BOOLEAN; check: BOOLEAN; VAR result: Operand );
-		VAR val: HUGEINT; res,res2: IntermediateCode.Operand; end,next: Label; t: SyntaxTree.Type; imm: IntermediateCode.Operand; hasDynamicPart: BOOLEAN;
+		VAR val: Basic.Integer; res,res2: IntermediateCode.Operand; end,next: Label; t: SyntaxTree.Type; imm: IntermediateCode.Operand; hasDynamicPart: BOOLEAN;
 			offset: SIZE;
 		BEGIN
 			IF increment THEN
@@ -6833,7 +6833,7 @@ TYPE
 				IF check & (type.form = SyntaxTree.Tensor) THEN
 					DimensionCheck(operand.tag,dim,BrltL);
 				END;
-				val := SHORT(dim.intValue);
+				val := dim.intValue;
 				IF type.form # SyntaxTree.Tensor THEN
 					t := SemanticChecker.ArrayBase(type,val(SIZE));
 					type := t.resolved(SyntaxTree.MathArrayType);
@@ -6910,13 +6910,13 @@ TYPE
 		END MathArrayLenOrIncr;
 
 		PROCEDURE ArrayLen(type: SyntaxTree.ArrayType; VAR operand: Operand; VAR dim: IntermediateCode.Operand; VAR result: Operand );
-		VAR val: HUGEINT; res,res2: IntermediateCode.Operand; end,next: Label; t: SyntaxTree.Type; imm: IntermediateCode.Operand; hasDynamicPart: BOOLEAN;
+		VAR val: Basic.Integer; res,res2: IntermediateCode.Operand; end,next: Label; t: SyntaxTree.Type; imm: IntermediateCode.Operand; hasDynamicPart: BOOLEAN;
 			offset: SIZE;
 		BEGIN
 			offset := operand.dimOffset+DynamicDim(type)-1;
 			IF  dim.mode = IntermediateCode.ModeImmediate THEN
 				ASSERT(type.form IN {SyntaxTree.Open, SyntaxTree.SemiDynamic});
-				val := SHORT(dim.intValue);
+				val := dim.intValue;
 				t := SemanticChecker.ArrayBase(type,val(SIZE));
 				type := t.resolved(SyntaxTree.ArrayType);
 				IF type.form = SyntaxTree.Static THEN
@@ -14393,9 +14393,9 @@ TYPE
 		RETURN procedure;
 	END GetConstructor;
 
-	PROCEDURE IsIntegerImmediate(CONST op: IntermediateCode.Operand; VAR value: LONGINT): BOOLEAN;
+	PROCEDURE IsIntegerImmediate(CONST op: IntermediateCode.Operand; VAR value: Basic.Integer): BOOLEAN;
 	BEGIN
-		value := SHORT(op.intValue);
+		value := op.intValue;
 		RETURN op.mode = IntermediateCode.ModeImmediate;
 	END IsIntegerImmediate;
 
