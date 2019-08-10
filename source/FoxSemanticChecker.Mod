@@ -1408,13 +1408,13 @@ TYPE
 						ELSIF (rightInteger<0) OR (rightInteger >= system.setType.sizeInBits) THEN
 							Error(right.position,"not allowed set integer value");
 						ELSE
-							IF (leftInteger > MAX(SET)) OR (rightInteger <0) THEN
+							IF (leftInteger > system.maxSet) OR (rightInteger <0) THEN
 								s := {};
 							ELSE
-								IF rightInteger > MAX(SET) THEN rightInteger := MAX(SET) END;
+								IF rightInteger > system.maxSet THEN rightInteger := system.maxSet END;
 								IF leftInteger < 0 THEN leftInteger := 0 END;
 								(*!!!!!!!!! this is a hack !!!!!!! *)
-								(*!	in case of MAX(SET) =31 and --bits=64 some kind of sign extension
+								(*!	in case of system.maxSet =31 and --bits=64 some kind of sign extension
 								extends the range  x..31  to  x..63 !!!!!! *)
 								s := s + {leftInteger..rightInteger};
 							END;
@@ -2241,7 +2241,7 @@ TYPE
 					result := NewProcedureCallDesignator(position, original, designator,actualParameters);
 					IF op = Scanner.Alias THEN (* hard type cast to same type *)
 						castReturnType := SyntaxTree.NewMathArrayType(Basic.invalidPosition, expression.type.scope,SyntaxTree.Tensor);
-						castReturnType.SetArrayBase(ArrayBase(leftExpression.type.resolved,MAX(SIZE)));
+						castReturnType.SetArrayBase(ArrayBase(leftExpression.type.resolved,Infinity));
 						result.SetType(castReturnType);
 					END;
 				ELSE
@@ -2865,9 +2865,9 @@ TYPE
 			ELSE (* ArrayIndex, SetElement *)
 				IF last = NIL THEN
 					IF x.context = SyntaxTree.ArrayIndex THEN
-						last := SyntaxTree.NewIntegerValue(x.position, MAX(SIZE))
+						last := SyntaxTree.NewIntegerValue(x.position, system.maxSize)
 					ELSE
-						last := SyntaxTree.NewIntegerValue(x.position, MAX(SET))
+						last := SyntaxTree.NewIntegerValue(x.position, system.maxSet)
 					END
 				END;
 				last := ResolveExpression(last);
@@ -3289,7 +3289,7 @@ TYPE
 					IF IsIntegerValue(first, firstValue) & (firstValue < 0) THEN
 						Error(indexListItem.position,"lower bound of array range too small")
 					END;
-					IF IsIntegerValue(last, lastValue) & (lastValue # MAX(SIZE)) THEN
+					IF IsIntegerValue(last, lastValue) & (lastValue # system.maxSize) THEN
 						IF (sourceArray.length # NIL) & IsIntegerValue(sourceArray.length, length) & (lastValue > (length - 1)) THEN
 							Error(indexListItem.position,"upper bound of array range too large")
 						END
@@ -3321,7 +3321,7 @@ TYPE
 								targetArray.SetIncrement(sourceArray.staticIncrementInBits)
 
 							ELSIF IsStaticRange(rangeExpression, firstValue, lastValue, stepValue) THEN
-								IF lastValue = MAX(SIZE) THEN
+								IF lastValue = system.maxSize THEN
 									IF IsIntegerValue(sourceArray.length, length) THEN
 										lastValue := length - 1;
 										isStaticTargetArrayLength := TRUE
@@ -4622,7 +4622,7 @@ TYPE
 								IF type1 IS SyntaxTree.MathArrayType THEN (* NEW(a, array) *)
 
 									(* use type checking facilities of procedure calls: artificially build parameters here and call checker *)
-									base := ArrayBase(type0,MAX(SIZE));
+									base := ArrayBase(type0,Infinity);
 
 									parameterType := SyntaxTree.NewMathArrayType(Basic.invalidPosition,currentScope,SyntaxTree.Tensor);
 									parameterType(SyntaxTree.MathArrayType).SetArrayBase(base);
@@ -5116,7 +5116,7 @@ TYPE
 						Error(parameter0.position,"is not a type symbol");
 					END
 				(* ---- SYSTEM.TRACE -----*)
-				ELSIF (id = Global.systemTrace) & CheckArity(1,MAX(SIZE)) THEN
+				ELSIF (id = Global.systemTrace) & CheckArity(1,Infinity) THEN
 					FOR i := 0 TO numberActualParameters-1 DO
 						parameter0 := actualParameters.GetExpression(i);
 						IF ~IsBasicType(parameter0.type) & ~IsStringType(parameter0.type) THEN
@@ -5376,7 +5376,7 @@ TYPE
 				ELSIF (id = Global.Reshape) & CheckArity(2,2) THEN
 					IF type0 IS SyntaxTree.MathArrayType THEN
 						(* use type checking facilities of procedure calls: artificially build parameters here and call checker *)
-						base := ArrayBase(type0,MAX(SIZE));
+						base := ArrayBase(type0,Infinity);
 						type := SyntaxTree.NewMathArrayType(Basic.invalidPosition,currentScope,SyntaxTree.Tensor);
 						type(SyntaxTree.MathArrayType).SetArrayBase(base);
 

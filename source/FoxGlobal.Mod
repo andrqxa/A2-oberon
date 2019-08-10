@@ -253,6 +253,9 @@ TYPE
 		cellsAreObjects-: BOOLEAN;
 		platformCallingConvention-: SyntaxTree.CallingConvention;
 
+		(* MAX values of commonly-used types *)
+		maxSize-, maxSet-: Basic.Integer;
+
 		PROCEDURE &InitSystem*(codeUnit, dataUnit: LONGINT; addressSize, minVarAlign, maxVarAlign, minParAlign, maxParAlign, offsetFirstPar, offsetFirstVar: LONGINT; cooperative: BOOLEAN);
 		VAR i: LONGINT;
 		BEGIN
@@ -855,6 +858,10 @@ TYPE
 		system.complexType := Complex64;
 		system.longcomplexType := Complex128;
 		system.setType := SyntaxTree.NewSetType(system.addressSize);
+
+		system.maxSize := MaxInteger(system, system.sizeType(SyntaxTree.BasicType), TRUE);
+		system.maxSet := system.SizeOf(system.setType) - 1;
+
 		(* type declarations *)
 		DeclareType(system.byteType,"BYTE",system.systemScope);
 		DeclareType(system.addressType,"ADDRESS",system.globalScope);

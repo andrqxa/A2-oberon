@@ -4151,11 +4151,11 @@ TYPE
 						Convert(stepSize, sizeType);
 
 						(* for dynamic upper bounds: add a runtime check, which repaces the upper bound with the largest valid index
-						if it is 'MAX(LONGINT)' *)
+						if it is 'MAX(SIZE)' *)
 						IF ~IsIntegerImmediate(lastIndex, staticLastIndex) THEN
 							TransferToRegister(lastIndex, lastIndex);
 							skipLabel1 := NewLabel();
-							BrneL(skipLabel1, lastIndex, IntermediateCode.Immediate(sizeType, MAX(LONGINT)));
+							BrneL(skipLabel1, lastIndex, IntermediateCode.Immediate(sizeType, system.maxSize));
 							Emit(MovReplace(position,lastIndex, sourceLength.op)); (* make sure that no new register is allocated *)
 							Emit(Sub(position,lastIndex, lastIndex, IntermediateCode.Immediate(sizeType, 1)));
 							SetLabel(skipLabel1)
@@ -4178,7 +4178,7 @@ TYPE
 						END;
 
 						(* check upper bound check *)
-						IF IsIntegerImmediate(lastIndex, staticLastIndex) & (staticLastIndex = MAX(LONGINT)) THEN
+						IF IsIntegerImmediate(lastIndex, staticLastIndex) & (staticLastIndex = system.maxSize) THEN
 							(* statically open range: nothing to do *)
 						ELSIF IsIntegerImmediate(lastIndex, staticLastIndex) & IsIntegerImmediate(sourceLength.op, staticSourceLength) THEN
 							ASSERT(staticLastIndex < staticSourceLength)
@@ -4191,7 +4191,7 @@ TYPE
 						(* 1. incorporate last index: *)
 						IF IsIntegerImmediate(lastIndex, staticLastIndex) THEN
 							(* last index is static *)
-							IF IsIntegerImmediate(lastIndex, staticLastIndex) & (staticLastIndex = MAX(LONGINT)) THEN
+							IF IsIntegerImmediate(lastIndex, staticLastIndex) & (staticLastIndex = system.maxSize) THEN
 								targetLength := sourceLength.op
 							ELSE
 								targetLength := IntermediateCode.Immediate(sizeType, staticLastIndex + 1)
@@ -10020,7 +10020,7 @@ TYPE
 					IntermediateCode.AddOffset(result.tag,ToMemoryUnits(system,x.offsetInBits+addressType.sizeInBits));
 					UseIntermediateOperand(result.tag);
 				ELSE
-					IntermediateCode.InitImmediate(result.tag,addressType,MAX(LONGINT)); (* non-Oberon procedure => unbounded array length *)
+					IntermediateCode.InitImmediate(result.tag,addressType,system.maxSize); (* non-Oberon procedure => unbounded array length *)
 				END;
 			ELSIF IsStaticArray(type) & (x.kind = SyntaxTree.ValueParameter) THEN
 				IntermediateCode.AddOffset(result.op,ToMemoryUnits(system,x.offsetInBits));
