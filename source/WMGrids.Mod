@@ -860,10 +860,10 @@ VAR
 	GSonSelect, GSonClick, GSonClickSelected,
 	GSonSelectInfo, GSonClickInfo, GSonClickSelectedInfo: String;
 	GSGenericGrid : String;
-	fixedColsProto, fixedRowsProto : WMProperties.Int32Property;
-	defaultColWidthProto, defaultRowHeightProto : WMProperties.Int32Property;
+	fixedColsProto, fixedRowsProto : WMProperties.SizeProperty;
+	defaultColWidthProto, defaultRowHeightProto : WMProperties.SizeProperty;
 	allowColResizeProto, allowRowResizeProto, adjustFocusPositionProto : WMProperties.BooleanProperty;
-	nofColsProto, nofRowsProto, cellDistProto : WMProperties.Int32Property;
+	nofColsProto, nofRowsProto, cellDistProto : WMProperties.SizeProperty;
 	showScrollXProto, showScrollYProto, alwaysShowScrollXProto, alwaysShowScrollYProto : WMProperties.BooleanProperty;
 
 PROCEDURE Init;

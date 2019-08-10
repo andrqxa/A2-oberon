@@ -3257,7 +3257,7 @@ TYPE
 
 (* --------------------------------------------------------------------------- *)
 VAR
-	PTVfirstLine : WMProperties.Int32Property;
+	PTVfirstLine : WMProperties.SizeProperty;
 	PTVborders, PTVbounds : WMProperties.RectangleProperty;
 
 PROCEDURE GenText*() : DTPData.ContentObject;

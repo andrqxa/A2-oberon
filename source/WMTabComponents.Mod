@@ -708,12 +708,13 @@ TYPE
 VAR
 	ColorPrototype, ProtoTcDefault*, ProtoTcHover*, ProtoTcSelected*, ProtoTcAttention*, ProtoTcSelectedAttention*,
 	ProtoTcTextDefault*, ProtoTcTextHover*, ProtoTcTextSelected*, ProtoTcTextAttention, ProtoTcTextSelectedAttention* : WMProperties.ColorProperty;
-	Int32Prototype, ProtoTcBorderWidth*, ProtoLineHeight : WMProperties.Int32Property;
+	Int32Prototype, ProtoTcBorderWidth* : WMProperties.Int32Property;
 	StringPrototype, ProtoTcBgLeftDefault, ProtoTcBgMiddleDefault, ProtoTcBgRightDefault,
 	ProtoTcBgLeftHover, ProtoTcBgMiddleHover, ProtoTcBgRightHover,
 	ProtoTcBgLeftSelected, ProtoTcBgMiddleSelected, ProtoTcBgRightSelected,
 	ProtoTcBgLeftAttention, ProtoTcBgMiddleAttention, ProtoTcBgRightAttention : WMProperties.StringProperty;
 	BooleanPrototype, ProtoTcUseBgBitmaps : WMProperties.BooleanProperty;
+	ProtoLineHeight : WMProperties.SizeProperty;
 
 	StrTabs, StrTabPanel, StrTab,
 	StrCaption, StrCaptionDescription, StrNoCaption,

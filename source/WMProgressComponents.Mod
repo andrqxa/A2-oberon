@@ -183,7 +183,7 @@ TYPE
 VAR
 
 	(** ProgressBar property prototypes *)
-	PrototypePbMin*, PrototypePbMax*: WMProperties.Int32Property;
+	PrototypePbMin*, PrototypePbMax*: WMProperties.IntegerProperty;
 	PrototypePbModel* : WMProperties.ReferenceProperty;
 	PrototypePbIsVertical* : WMProperties.BooleanProperty;
 	PrototypePbColor*, PrototypePbBorderColor* : WMProperties.ColorProperty;

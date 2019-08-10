@@ -4154,7 +4154,8 @@ VAR
 	PTVIsMultiLine, PTVIsPassword, PTVShowBorder, PTValwaysShowCursor, PTVShowLabels : WMProperties.BooleanProperty;
 	PTVAllowCommandExecution, PTVAllowTextSelection, PTVAllowPiemenu : WMProperties.BooleanProperty;
 	PTVWrapMode, PTVMouseWheelScrollSpeed, PVTtextAlignV : WMProperties.Int32Property;
-	PTVfirstLine, PTVleftShift, PTVPasswordChar : WMProperties.Int32Property;
+	PTVPasswordChar : WMProperties.Int32Property;
+	PTVfirstLine, PTVleftShift : WMProperties.SizeProperty;
 	PTVdefaultTextColor, PTVdefaultTextBgColor : WMProperties.ColorProperty;
 	PTVborders : WMProperties.RectangleProperty;
 	PTVonLinkClick, PTVonLinkClickInfo : Strings.String;

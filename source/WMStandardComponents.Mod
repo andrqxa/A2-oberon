@@ -1297,7 +1297,7 @@ TYPE
 		min-, max-, pos-, pageSize-, width- : WMProperties.SizeProperty;
 
 		vertical- : WMProperties.BooleanProperty;
-		minTrackerSize- : WMProperties.Int32Property;
+		minTrackerSize- : WMProperties.SizeProperty;
 
 		clDefault-, clHover-, clPressed- : WMProperties.ColorProperty;
 		clBtnDefault-, clBtnHover-, clBtnPressed- : WMProperties.ColorProperty;
@@ -2987,6 +2987,7 @@ VAR
 	 BooleanPrototype : WMProperties.BooleanProperty;
 	 StringPrototype : WMProperties.StringProperty;
 	 Int32Prototype : WMProperties.Int32Property;
+	 SizePrototype : WMProperties.SizeProperty;
 	 RectanglePrototype : WMProperties.RectangleProperty;
 	 PrototypeBlinking*: WMProperties.BooleanProperty;
 
@@ -3012,7 +3013,7 @@ VAR
 	 (* Scrollbar prototypes *)
 	 PrototypeSvertical* : WMProperties.BooleanProperty;
 	 PrototypeSmin*, PrototypeSmax*, PrototypeSpos*, PrototypeSpageSize*, PrototypeTrackerSize*, PrototypeSWidth*,
-	 PrototypeSMinTrackerSize* : WMProperties.Int32Property;
+	 PrototypeSMinTrackerSize* : WMProperties.SizeProperty;
 		 (* presentation : colors / images *)
 	 PrototypeSUseArrowImages*, PrototypeSUseTrackerImages*, PrototypeSRepeatMiddleBitmap* : WMProperties.BooleanProperty;
 	 	(* background *)
@@ -3270,13 +3271,13 @@ BEGIN
 	NEW(PrototypeTrackerSize, NIL, NewString("TrackerSize"), NewString("defines the tracker size"));
 	PrototypeTrackerSize.Set(20);
 		(* scrollbar width *)
-	NEW(Int32Prototype, NIL, NewString("Width"), NewString("defines the scrollbar width")); Int32Prototype.Set(14);
-	NEW(PrototypeSWidth, Int32Prototype, NIL, NIL); plScrollbar.Add(PrototypeSWidth);
+	NEW(SizePrototype, NIL, NewString("Width"), NewString("defines the scrollbar width")); SizePrototype.Set(14);
+	NEW(PrototypeSWidth, SizePrototype, NIL, NIL); plScrollbar.Add(PrototypeSWidth);
 
 	NEW(PrototypeSvertical, NIL, NewString("Vertical"),	NewString("defines if the scrollbar is vertical"));
 	PrototypeSvertical.Set(TRUE);
-	NEW(Int32Prototype, NIL, NewString("MinTrackerSize"), NewString("")); Int32Prototype.Set(5);
-	NEW(PrototypeSMinTrackerSize, Int32Prototype, NIL, NIL); plScrollbar.Add(PrototypeSMinTrackerSize);
+	NEW(SizePrototype, NIL, NewString("MinTrackerSize"), NewString("")); SizePrototype.Set(5);
+	NEW(PrototypeSMinTrackerSize, SizePrototype, NIL, NIL); plScrollbar.Add(PrototypeSMinTrackerSize);
 			(* color *)
 	NEW(ColorPrototype, NIL, NewString("ClDefault"), NewString("Default background color")); ColorPrototype.Set(000000077H);
 	NEW(PrototypeSClDefault, ColorPrototype, NIL, NIL); plScrollbar.Add(PrototypeSClDefault);
