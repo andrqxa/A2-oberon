@@ -1267,7 +1267,7 @@ TYPE
 
 		(* useful operands and types *)
 		nil,one,fp,sp,ap,lr,true,false: IntermediateCode.Operand;
-		bool,addressType,setType, sizeType, byteType: IntermediateCode.Type;
+		booleanType,addressType,setType, sizeType, byteType, characterType, longintType, hugeintType: IntermediateCode.Type;
 
 		commentPrintout: Printout.Printer;
 		dump: Streams.Writer;
@@ -1329,8 +1329,10 @@ TYPE
 			addressType := IntermediateCode.GetType(system,system.addressType);
 			setType := IntermediateCode.GetType(system,system.setType);
 			sizeType := IntermediateCode.GetType(system, system.sizeType);
-			sizeType := IntermediateCode.GetType(system, system.sizeType);
 			byteType := IntermediateCode.GetType(system, system.byteType);
+			characterType := IntermediateCode.GetType(system, system.characterType);
+			longintType := IntermediateCode.GetType(system, system.longintType);
+			hugeintType := IntermediateCode.GetType(system, system.hugeintType);
 
 			fp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.FP);
 			sp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.SP);
@@ -1348,9 +1350,9 @@ TYPE
 			SELF.emitLabels := emitLabels;
 			IntermediateCode.InitOperand(arrayDestinationTag);
 
-			bool := IntermediateCode.GetType(system,system.booleanType);
-			IntermediateCode.InitImmediate(false,bool,0);
-			IntermediateCode.InitImmediate(true,bool,1);
+			booleanType := IntermediateCode.GetType(system,system.booleanType);
+			IntermediateCode.InitImmediate(false,booleanType,0);
+			IntermediateCode.InitImmediate(true,booleanType,1);
 
 			indexCounter := 0;
 			NEW(registerUsageCount);
@@ -1689,9 +1691,9 @@ TYPE
 			type := type.resolved;
 			IF operand.mode = ModeReference THEN
 				IF type IS SyntaxTree.RangeType THEN
-					MakeMemory(firstOp, operand.op, IntermediateCode.GetType(system, system.sizeType), 0);
-					MakeMemory(lastOp, operand.op, IntermediateCode.GetType(system, system.sizeType), ToMemoryUnits(system, system.SizeOf(system.sizeType)));
-					MakeMemory(stepOp, operand.op, IntermediateCode.GetType(system, system.sizeType), 2 * ToMemoryUnits(system, system.SizeOf(system.sizeType)));
+					MakeMemory(firstOp, operand.op, sizeType, 0);
+					MakeMemory(lastOp, operand.op, sizeType, ToMemoryUnits(system, system.SizeOf(system.sizeType)));
+					MakeMemory(stepOp, operand.op, sizeType, 2 * ToMemoryUnits(system, system.SizeOf(system.sizeType)));
 					ReleaseOperand(operand);
 					operand.op := firstOp;
 					operand.tag := lastOp;
@@ -2363,7 +2365,7 @@ TYPE
 				ReleaseOperand(right); ReleaseOperand(left);
 				IntermediateCode.InitImmediate(one,setType,1);
 				Emit(And(position,result.op,result.op,one));
-				Convert(result.op,bool);
+				Convert(result.op,booleanType);
 			ELSE
 				IF (x.operator = Scanner.Questionmarks) OR (x.operator = Scanner.LessLessQ) & (x.right.type.resolved IS SyntaxTree.PortType) THEN
 					IF x.operator = Scanner.Questionmarks THEN
@@ -2390,7 +2392,7 @@ TYPE
 						CallThis(position,ChannelModuleName,"ReceiveNonBlocking",2);
 					END;
 					InitOperand(result, ModeValue);
-					result.op := NewRegisterOperand(bool);
+					result.op := NewRegisterOperand(booleanType);
 					Emit(Result(position,result.op));
 				ELSIF (x.operator = Scanner.ExclamationMarks) OR (x.operator = Scanner.LessLessQ) & (x.left.type.resolved IS SyntaxTree.PortType) THEN
 					leftExpression := x.left;
@@ -2412,7 +2414,7 @@ TYPE
 						CallThis(position,ChannelModuleName,"SendNonBlocking",2);
 					END;
 					InitOperand(result, ModeValue);
-					result.op := NewRegisterOperand(bool);
+					result.op := NewRegisterOperand(booleanType);
 					Emit(Result(position,result.op));
 				ELSE
 					HALT(100);
@@ -5870,7 +5872,7 @@ TYPE
 				(* IF dump # NIL THEN dump.String("push ID"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
 				ASSERT(x.left IS SyntaxTree.SymbolDesignator);
 				identifierNumber := Global.GetSymbol(module.module.case, x.left(SyntaxTree.SymbolDesignator).symbol.name);
-				Emit(Push(position,IntermediateCode.Immediate(IntermediateCode.GetType(system, system.longintType), identifierNumber)));
+				Emit(Push(position,IntermediateCode.Immediate(longintType, identifierNumber)));
 
 				formalParameter := procedureType.firstParameter;
 				FOR i := 0 TO parameters.Length() - 1 DO
@@ -5897,12 +5899,12 @@ TYPE
 						ELSE
 							(* push 'NonPointer' *)
 							(* IF dump # NIL THEN dump.String("push 'NonPointer'"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
-							Emit(Push(position,IntermediateCode.Immediate(IntermediateCode.GetType(system, system.longintType), NonPointer)));
+							Emit(Push(position,IntermediateCode.Immediate(longintType, NonPointer)));
 
 							(* push fingerprint *)
 							(* IF dump # NIL THEN dump.String("push fingerprint"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
 							fingerprint := fingerprinter.TypeFP(formalParameter.type.resolved);
-							Emit(Push(position,IntermediateCode.Immediate(IntermediateCode.GetType(system, system.hugeintType), fingerprint.public))) (* TODO: push the type's fingerprint *)
+							Emit(Push(position,IntermediateCode.Immediate(hugeintType, fingerprint.public))) (* TODO: push the type's fingerprint *)
 						END
 					END;
 					formalParameter := formalParameter.nextParameter
@@ -5912,11 +5914,11 @@ TYPE
 				IF procedureType.numberParameters < 2 THEN
 					(* push 'NonPointer' *)
 					(* IF dump # NIL THEN dump.String("push 'NonPointer'"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
-					Emit(Push(position,IntermediateCode.Immediate(IntermediateCode.GetType(system, system.longintType), NonPointer)));
+					Emit(Push(position,IntermediateCode.Immediate(longintType, NonPointer)));
 
 					(* push 'NoType' *)
 					(* IF dump # NIL THEN dump.String("push 'NoType'"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
-					Emit(Push(position,IntermediateCode.Immediate(IntermediateCode.GetType(system, system.longintType), NoType)));
+					Emit(Push(position,IntermediateCode.Immediate(longintType, NoType)));
 				END;
 
 				(* call operator selection procedure *)
@@ -6175,9 +6177,9 @@ TYPE
 			OR ~enter & GetRuntimeProcedure("FoxProfiler","ExitProcedure",procedure,TRUE)
 			THEN
 				IntermediateCode.InitAddress(reg, addressType, profileId.name , GetFingerprint(profileId.symbol), 0);
-				IntermediateCode.MakeMemory(reg, IntermediateCode.GetType(system,system.longintType));
+				IntermediateCode.MakeMemory(reg, longintType);
 				Emit(Push(position,reg));
-				IntermediateCode.InitImmediate(reg, IntermediateCode.GetType(system,system.longintType), procedureNumber);
+				IntermediateCode.InitImmediate(reg, longintType, procedureNumber);
 				Emit(Push(position,reg));
 				StaticCallOperand(procedure,result);
 				Emit(Call(position,result.op,ProcParametersSize(procedure)));
@@ -6190,9 +6192,9 @@ TYPE
 		BEGIN
 			IF GetRuntimeProcedure("FoxProfiler","AddProcedure",procedure,TRUE) THEN
 				IntermediateCode.InitAddress(reg, addressType, profileId.name , GetFingerprint(profileId.symbol), 0);
-				IntermediateCode.MakeMemory(reg, IntermediateCode.GetType(system,system.longintType));
+				IntermediateCode.MakeMemory(reg, longintType);
 				profileInit.Emit(Push(position,reg));
-				IntermediateCode.InitImmediate(reg, IntermediateCode.GetType(system,system.longintType), procedureNumber);
+				IntermediateCode.InitImmediate(reg, longintType, procedureNumber);
 				profileInit.Emit(Push(position,reg));
 				NEW(string, LEN(name)); COPY(name, string^);
 				sv := SyntaxTree.NewStringValue(Basic.invalidPosition,string);
@@ -6231,7 +6233,7 @@ TYPE
 		PROCEDURE ProfilerPatchInit;
 		VAR reg: IntermediateCode.Operand;
 		BEGIN
-			IntermediateCode.InitImmediate(reg, IntermediateCode.GetType(system,system.longintType), numberProcedures);
+			IntermediateCode.InitImmediate(reg, longintType, numberProcedures);
 			profileInit.EmitAt(profileInitPatchPosition,Push(position,reg));
 			EmitLeave(profileInit,position,NIL,0);
 			profileInit.Emit(Exit(position,0,0,0));
@@ -6256,7 +6258,7 @@ TYPE
 				IF type = NIL THEN
 					(* no type: push 'NoType' *)
 					(* IF dump # NIL THEN dump.String("push 'NoType'"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
-					arg := IntermediateCode.Immediate(IntermediateCode.GetType(system, system.longintType), NoType)
+					arg := IntermediateCode.Immediate(longintType, NoType)
 				ELSIF IsStrictlyPointerToRecord(type) THEN
 					(* pointer to record type: push typetag *)
 					(* IF dump # NIL THEN dump.String("push typetag"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
@@ -6266,7 +6268,7 @@ TYPE
 					(* non-pointer to record type: push fingerprint *)
 					(* IF dump # NIL THEN dump.String("push fingerprint"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
 					fingerprint := fingerprinter.TypeFP(type.resolved);
-					arg := IntermediateCode.Immediate(IntermediateCode.GetType(system, system.hugeintType), fingerprint.public)
+					arg := IntermediateCode.Immediate(hugeintType, fingerprint.public)
 				END;
 				operatorInitializationCodeSection.Emit(Push(position,arg))
 			END PushTypeInfo;
@@ -6306,7 +6308,7 @@ TYPE
 					(* push ID *)
 					(* IF dump # NIL THEN dump.String("push ID"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
 					id := Global.GetSymbol(module.module.case, operator.name);
-					operatorInitializationCodeSection.Emit(Push(position,IntermediateCode.Immediate(IntermediateCode.GetType(system, system.longintType), id)));
+					operatorInitializationCodeSection.Emit(Push(position,IntermediateCode.Immediate(longintType, id)));
 
 					(* push kind *)
 					(* IF dump # NIL THEN dump.String("push kind"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
@@ -7540,7 +7542,7 @@ TYPE
 							IF body.isSafe THEN
 								flags := 1;
 							END;
-							Emit(Push(position,IntermediateCode.Immediate(IntermediateCode.GetType(system,system.setType),flags)));
+							Emit(Push(position,IntermediateCode.Immediate(setType,flags)));
 							Emit(Push(position,self));
 							CallThis(position,"Objects","CreateProcess",4)
 						END;
@@ -8051,7 +8053,7 @@ TYPE
 						WHILE (type IS SyntaxTree.MathArrayType) & (type(SyntaxTree.MathArrayType).form # SyntaxTree.Static) DO
 							type := type(SyntaxTree.MathArrayType).arrayBase.resolved;
 						END;
-						tmp := IntermediateCode.Immediate(IntermediateCode.GetType(system, system.sizeType),ToMemoryUnits(system,system.SizeOf(type))); (* alignment *)
+						tmp := IntermediateCode.Immediate(sizeType,ToMemoryUnits(system,system.SizeOf(type))); (* alignment *)
 						Emit(Push(position,tmp));
 						(* *)
 						IF SemanticChecker.ContainsPointer(type) THEN
@@ -8323,7 +8325,7 @@ TYPE
 				pooledName[2] := -1;
 				source := NewSection(module.importedSections, Sections.VarSection, pooledName, NIL,commentPrintout # NIL);
 				IntermediateCode.InitAddress(mark, addressType, pooledName , 0, 0);
-				res := NewRegisterOperand(IntermediateCode.GetType(system, system.booleanType));
+				res := NewRegisterOperand(booleanType);
 				Emit(Cas(position, mark, false, false));
 				ReleaseIntermediateOperand(mark);
 				Emit(Result(position, res));
@@ -8544,9 +8546,9 @@ TYPE
 				ReuseCopy(reg,result.op);
 				ReleaseIntermediateOperand(result.op);
 				ignore := NewLabel();
-				BrltL(ignore, reg,IntermediateCode.Immediate(IntermediateCode.GetType(system,system.characterType),ORD("a")));
-				BrltL(ignore,IntermediateCode.Immediate(IntermediateCode.GetType(system,system.characterType),ORD("z")),reg);
-				Emit(And(position,reg,reg,IntermediateCode.Immediate(IntermediateCode.GetType(system,system.characterType),5FH)));
+				BrltL(ignore, reg,IntermediateCode.Immediate(characterType,ORD("a")));
+				BrltL(ignore,IntermediateCode.Immediate(characterType,ORD("z")),reg);
+				Emit(And(position,reg,reg,IntermediateCode.Immediate(characterType,5FH)));
 				SetLabel(ignore);
 				result.op := reg;
 			(* ---- CHR ----- *)
@@ -8581,7 +8583,7 @@ TYPE
 				Emit(And(position,res,result.op,IntermediateCode.Immediate(IntermediateCode.GetType(system,p0.type),1)));
 				ReleaseIntermediateOperand(result.op);
 				result.op := res;
-				Convert(result.op,bool);
+				Convert(result.op,booleanType);
 			(* ---- ORD ----- *)
 			|Global.Ord, Global.Ord32:
 				Evaluate(p0,result);
@@ -8758,7 +8760,7 @@ TYPE
 				Emit(Ror(position,res,res,s1.op));
 				ReleaseOperand(s1);
 				Emit(And(position,res,res,IntermediateCode.Immediate(IntermediateCode.GetType(system,p0.type),1)));
-				Convert(res,IntermediateCode.GetType(system,system.booleanType));
+				Convert(res,booleanType);
 				InitOperand(result,ModeValue);
 				result.op := res;
 			(* --- MSK ----*)
@@ -9162,9 +9164,9 @@ TYPE
 				ReuseCopy(reg,result.op);
 				ReleaseIntermediateOperand(result.op);
 				ignore := NewLabel();
-				BrltL(ignore, reg,IntermediateCode.Immediate(IntermediateCode.GetType(system,system.characterType),ORD("a")));
-				BrltL(ignore,IntermediateCode.Immediate(IntermediateCode.GetType(system,system.characterType),ORD("z")),reg);
-				Emit(And(position,reg,reg,IntermediateCode.Immediate(IntermediateCode.GetType(system,system.characterType),5FH)));
+				BrltL(ignore, reg,IntermediateCode.Immediate(characterType,ORD("a")));
+				BrltL(ignore,IntermediateCode.Immediate(characterType,ORD("z")),reg);
+				Emit(And(position,reg,reg,IntermediateCode.Immediate(characterType,5FH)));
 				SetLabel(ignore);
 				result.op := reg;
 			(* ---- CHR ----- *)
@@ -9199,7 +9201,7 @@ TYPE
 				Emit(And(position,res,result.op,IntermediateCode.Immediate(IntermediateCode.GetType(system,p0.type),1)));
 				ReleaseIntermediateOperand(result.op);
 				result.op := res;
-				Convert(result.op,bool);
+				Convert(result.op,booleanType);
 			(* ---- ORD ----- *)
 			|Global.Ord, Global.Ord32:
 				Evaluate(p0, result);
@@ -9306,7 +9308,7 @@ TYPE
 				Emit(Ror(position,res,res,s1.op));
 				ReleaseOperand(s1);
 				Emit(And(position,res,res,IntermediateCode.Immediate(IntermediateCode.GetType(system,p0.type),1)));
-				Convert(res,IntermediateCode.GetType(system,system.booleanType));
+				Convert(res,booleanType);
 				InitOperand(result,ModeValue);
 				result.op := res;
 			(* --- MSK ----*)
@@ -9759,7 +9761,7 @@ TYPE
 			END;
 			IF irv.pc = 0 THEN
 				FOR i := 0 TO x.length-1 DO
-					IntermediateCode.InitImmediate(op,IntermediateCode.GetType(system,system.characterType),ORD(x.value[i]));
+					IntermediateCode.InitImmediate(op,characterType,ORD(x.value[i]));
 					irv.Emit(Data(position,op));
 				END;
 			END;
@@ -10295,7 +10297,7 @@ TYPE
 			IntermediateCode.InitMemory (processor,  IntermediateCode.SignedIntegerType(addressType.sizeInBits), ap, ToMemoryUnits(system, ProcessorOffset * addressType.sizeInBits));
 			dst := NewRegisterOperand (addressType);
 			Emit(Mov(position,dst, processor));
-			IntermediateCode.InitMemory(mem,bool, dst, 0);
+			IntermediateCode.InitMemory(mem,booleanType, dst, 0);
 			Emit(Mov(position,mem, value));
 			ReleaseIntermediateOperand(dst);
 		END ModifyAssignments;
@@ -10437,17 +10439,17 @@ TYPE
 				Designate(left, leftO);(* The order is crucial. Do not reorder emission of left and right *)
 
 				(* first *)
-				MakeMemory(mem, leftO.op, IntermediateCode.GetType(system, system.sizeType), 0);
+				MakeMemory(mem, leftO.op, sizeType, 0);
 				Emit(Mov(position,mem, rightO.op));
 				ReleaseIntermediateOperand(mem);
 
 				(* last *)
-				MakeMemory(mem, leftO.op, IntermediateCode.GetType(system, system.sizeType), ToMemoryUnits(system, system.SizeOf(system.sizeType)));
+				MakeMemory(mem, leftO.op, sizeType, ToMemoryUnits(system, system.SizeOf(system.sizeType)));
 				Emit(Mov(position,mem, rightO.tag));
 				ReleaseIntermediateOperand(mem);
 
 				(* step *)
-				MakeMemory(mem, leftO.op, IntermediateCode.GetType(system, system.sizeType), 2 * ToMemoryUnits(system, system.SizeOf(system.sizeType)));
+				MakeMemory(mem, leftO.op, sizeType, 2 * ToMemoryUnits(system, system.SizeOf(system.sizeType)));
 				Emit(Mov(position,mem, rightO.extra));
 				ReleaseIntermediateOperand(mem);
 
@@ -11078,15 +11080,15 @@ TYPE
 						(* array range type *)
 						Evaluate(expression, right);
 
-						MakeMemory(mem, left, IntermediateCode.GetType(system, system.sizeType), 0);
+						MakeMemory(mem, left, sizeType, 0);
 						Emit(Mov(position,mem, right.op)); (* first *)
 						ReleaseIntermediateOperand(mem);
 
-						MakeMemory(mem, left, IntermediateCode.GetType(system, system.sizeType), ToMemoryUnits(system, system.SizeOf(system.sizeType)));
+						MakeMemory(mem, left, sizeType, ToMemoryUnits(system, system.SizeOf(system.sizeType)));
 						Emit(Mov(position,mem, right.tag)); (* last *)
 						ReleaseIntermediateOperand(mem);
 
-						MakeMemory(mem, left, IntermediateCode.GetType(system, system.sizeType), 2 * ToMemoryUnits(system, system.SizeOf(system.sizeType)));
+						MakeMemory(mem, left, sizeType, 2 * ToMemoryUnits(system, system.SizeOf(system.sizeType)));
 						Emit(Mov(position,mem, right.extra)); (* step *)
 						ReleaseIntermediateOperand(mem);
 
@@ -11206,12 +11208,12 @@ TYPE
 				GetCodeSectionNameForSymbol(proc,name);
 				symbol := NewSection(module.allSections, Sections.CodeSection, name,proc,commentPrintout # NIL);
 				IntermediateCode.InitAddress(call,addressType,name, GetFingerprint(proc), 0);
-				res := NewRegisterOperand(IntermediateCode.GetType(system,system.booleanType));
+				res := NewRegisterOperand(booleanType);
 				Emit(Call(position,call,ProcParametersSize(proc)));
 				Emit(Result(position,res));
 				(*
-				AcquireThisRegister(IntermediateCode.GetType(system,system.booleanType),IntermediateCode.Result);
-				IntermediateCode.InitRegister(res,IntermediateCode.GetType(system,system.booleanType),IntermediateCode.Result);
+				AcquireThisRegister(booleanType,IntermediateCode.Result);
+				IntermediateCode.InitRegister(res,booleanType,IntermediateCode.Result);
 				*)
 				InitOperand(result,ModeValue);
 				result.op := res;
