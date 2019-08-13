@@ -12203,7 +12203,7 @@ TYPE
 		fp*: HUGEINT;
 		name* {UNTRACED}: DynamicName;
 		adr*: ADDRESS;
-		exports*: LONGINT;
+		exports*: SIZE;
 		dsc* {UNTRACED}: ExportArray
 	END;
 	ExportArray* = POINTER {UNSAFE} TO ARRAY OF ExportDesc;
@@ -12238,8 +12238,7 @@ TYPE
 						Symbol(source, namePool, DynamicName(namePool, name, poolMap), 0); (* reference to dynamic name *)
 						Symbol(source, symbol,0,0);
 						patchAdr := source.pc;
-						Longint(source, 0);
-						IF module.system.addressType.sizeInBits = 64 THEN Longint(source, 0); END;
+						Size(source, 0);
 						Address(source,0);
 					END;
 					RETURN TRUE
@@ -12252,7 +12251,6 @@ TYPE
 			VAR level, olevel, s: SIZE; prev, this: Basic.SegmentedName; name: ARRAY 256 OF CHAR;
 				scopes: ARRAY LEN(prev)+1 OF Scope; arrayName: ARRAY 32 OF CHAR;
 				sym: Sections.Section; offset: SIZE; symbol: Sections.Section;
-				nextPatch: SIZE;
 			TYPE
 				Scope = RECORD
 					elements: LONGINT;
@@ -12280,11 +12278,8 @@ TYPE
 							WHILE level < olevel DO
 								(*TRACE("closing",olevel,scopes[olevel].elements); *)
 								IF olevel > 0 THEN
-									PatchLongint(scopes[olevel-1].section,scopes[olevel-1].patchAdr, scopes[olevel].elements);
-									nextPatch := scopes[olevel-1].patchAdr+1;
-									IF module.system.addressType.sizeInBits = 64 THEN INC(nextPatch) END;
-
-									PatchSymbol(scopes[olevel-1].section,nextPatch, scopes[olevel].section.name,  scopes[olevel].section.symbol, scopes[olevel].beginPC, 0);
+									PatchSize(scopes[olevel-1].section,scopes[olevel-1].patchAdr, scopes[olevel].elements);
+									PatchSymbol(scopes[olevel-1].section,scopes[olevel-1].patchAdr+1, scopes[olevel].section.name,  scopes[olevel].section.symbol, scopes[olevel].beginPC, 0);
 								END;
 								scopes[olevel].gelements := scopes[olevel].gelements + scopes[olevel].elements;
 								DEC(olevel);
@@ -12310,8 +12305,7 @@ TYPE
 									sym := NIL;
 								END;
 								(*IF level = 0 THEN D.TraceBack END;*)
-								IF ExportDesc2(scopes[level].section, namePool, fingerprinter, sym, this[level], scopes[level].patchAdr)
-								THEN
+								IF ExportDesc2(scopes[level].section, namePool, fingerprinter, sym, this[level], scopes[level].patchAdr) THEN
 									INC(scopes[olevel].elements);
 								END;
 								(* enter string in scope *)
@@ -12325,11 +12319,8 @@ TYPE
 				WHILE 0 <= olevel DO
 					(*TRACE("closing",olevel,scopes[olevel].elements); *)
 					IF olevel > 0 THEN
-						PatchLongint(scopes[olevel-1].section,scopes[olevel-1].patchAdr, scopes[olevel].elements);
-						nextPatch := scopes[olevel-1].patchAdr+1;
-						IF module.system.addressType.sizeInBits = 64 THEN INC(nextPatch) END;
-
-						PatchSymbol(scopes[olevel-1].section,nextPatch, scopes[olevel].section.name,  scopes[olevel].section.symbol, scopes[olevel].beginPC, 0);
+						PatchSize(scopes[olevel-1].section,scopes[olevel-1].patchAdr, scopes[olevel].elements);
+						PatchSymbol(scopes[olevel-1].section,scopes[olevel-1].patchAdr+1, scopes[olevel].section.name,  scopes[olevel].section.symbol, scopes[olevel].beginPC, 0);
 					END;
 					scopes[olevel].gelements := scopes[olevel].gelements + scopes[olevel].elements;
 					DEC(olevel);

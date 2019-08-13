@@ -55,7 +55,7 @@ TYPE
 		fp*: HUGEINT;
 		name* {UNTRACED}: DynamicName;
 		adr*: ADDRESS;
-		exports*: LONGINT; (* number of exports referenced by ExportArray *)
+		exports*: SIZE; (* number of exports referenced by ExportArray *)
 		dsc* {UNTRACED}: ExportArray; (* pointer to memory containing a raw array with "exports" entries *)
 	END;
 	ExportArray* = POINTER {UNSAFE,UNTRACED} TO ARRAY OF ExportDesc;

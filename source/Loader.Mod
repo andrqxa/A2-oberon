@@ -271,7 +271,7 @@ TYPE
 			any: ANY;
 
 			PROCEDURE TraverseScopes(CONST scope: Modules.ExportDesc; level: LONGINT);
-			VAR adr: ADDRESS; i: LONGINT;
+			VAR adr: ADDRESS; i: SIZE;
 			BEGIN
 				IF (level > 2) THEN RETURN END;
 				IF (scope.fp # 0) THEN
