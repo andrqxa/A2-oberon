@@ -318,7 +318,7 @@ VAR orgBlock: ADDRESS;(*: ADDRESS*); staticTypeBlock {UNTRACED}: StaticTypeBlock
 	currentArrayElemAdr, lastArrayElemAdr: ADDRESS; i: SIZE;
 	protected {UNTRACED}: ProtRecBlock;
 	b {UNTRACED}: POINTER {UNSAFE} TO RECORD p: ANY END;
-	meta {UNTRACED }: POINTER {UNSAFE} TO RECORD staticTypeBlock {FICTIVE=TypeDescOffset}: StaticTypeBlock; last, current, first: ADDRESS END;
+	meta {UNTRACED }: POINTER {UNSAFE} TO RECORD staticTypeBlock {FICTIVE=TypeDescOffset}: StaticTypeBlock; numElems: SIZE; current, first: ADDRESS END;
 	block {UNTRACED}: ANY;
 BEGIN{UNCHECKED} (* omit any range checks etc.*)
 	IF Stats THEN INC(Nmark) END;
@@ -339,7 +339,7 @@ BEGIN{UNCHECKED} (* omit any range checks etc.*)
 			ELSE
 				currentArrayElemAdr := meta.first;
 
-				lastArrayElemAdr := meta.first + meta.last * staticTypeBlock.recSize;
+				lastArrayElemAdr := meta.first + meta.numElems * staticTypeBlock.recSize;
 				WHILE currentArrayElemAdr < lastArrayElemAdr DO
 					FOR i := 0 TO LEN(staticTypeBlock.pointerOffsets) - 1 DO
 						b := currentArrayElemAdr + staticTypeBlock.pointerOffsets[i];
