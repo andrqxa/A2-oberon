@@ -13240,23 +13240,22 @@ TYPE
 				name*: Name;
 				init, published: BOOLEAN;
 				refcnt*: LONGINT; (* counts loaded modules that import this module *)
-				sb*: ADDRESS; <- should be zero as the static base in generic object file is indeed 0 !
-				entry*: POINTER TO ARRAY OF ADDRESS; <- not needed in new loader
+				sb*: ADDRESS; (* reference address between constants and local variables *)
+				entry*: POINTER TO ARRAY OF ADDRESS;
 				command*: POINTER TO ARRAY OF Command;
-				ptrAdr*: POINTER TO ARRAY OF ADDRESS;
+				ptrAdr*: POINTER TO ARRAY OF ADDRESS; (* traced explicitly in FindRoots *)
 				typeInfo*: POINTER TO ARRAY OF TypeDesc;
-				module*: POINTER TO ARRAY OF Module; <---- currently done by loader
-				procTable*: ProcTable; (* information inserted by loader, removed after use in Publish *)
-				ptrTable*: PtrTable;  (* information inserted by loader, removed after use in Publish *)
-				data*, code*: Bytes;
-				staticTypeDescs* (* ug *), refs*: Bytes; <- staticTypeDescs in data section, refs currently unsupported
+				module*: POINTER TO ARRAY OF Module; (* imported modules: for reference counting *)
+				procTable*: ProcedureDescs; (* information inserted by loader, sorted by pc after loading *)
+				data*, code*, staticTypeDescs* (* ug *), refs*: Bytes;
 				export*: ExportDesc;
 				term*: TerminationHandler;
 				exTable*: ExceptionTable;
-				noProcs*: LONGINT;
-				firstProc*: ADDRESS; <-   done by loader
-				maxPtrs*: LONGINT;
+				(* internal pointer array: to protect internal data structures from being GCed *)
+				internal-: POINTER TO ARRAY OF ANY;
 				crc*: LONGINT;
+				body*: PROCEDURE;
+				flags*: SET;	 (* e.g. compilation flags *)
 		*)
 
 		PROCEDURE BasePointer (section: IntermediateCode.Section);
@@ -13474,16 +13473,16 @@ TYPE
 			Address(moduleSection,0);
 			Info(moduleSection, "exTable*: ExceptionTable");
 			Symbol(moduleSection,exceptionSection,exceptionSectionOffset,0);
-			Info(moduleSection,"internal: POINTER TO ARRAY OF Pointer");
+			Info(moduleSection,"internal: POINTER TO ARRAY OF ANY");
 			Symbol(moduleSection, modulePointerSection, modulePointerSectionOffset, 0);
 			Info(moduleSection, "crc*: LONGINT");
 			patchCRC:= moduleSection.pc;
 			Longint(moduleSection, 0); (*!  must be implemented *)
 
 			IF module.system.addressType.sizeInBits = 64 THEN Longint(moduleSection, 0); END; (* padding *)
-			Info(moduleSection, "body*: ADDRESS");
+			Info(moduleSection, "body*: PROCEDURE");
 			Symbol(moduleSection, bodyProc, 0,0);
-			Info(moduleSection, "module flags");
+			Info(moduleSection, "flags*: SET");
 			flags := {};
 			IF  implementationEmitter.backend.preciseGC THEN INCL(flags,0) END;
 			Set( moduleSection, flags);
