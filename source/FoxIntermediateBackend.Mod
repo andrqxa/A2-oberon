@@ -23,9 +23,6 @@ CONST
 		MathLenOffset=5;
 		MathIncrOffset=6;
 
-		SysDataArrayOffset* = 0; (* array offset in system bl	ock, for 32 byte alignment *)
-		ArrDataArrayOffset*= 16*8; (* 16 bytes array offset in array block, to be compatible with the GC scheme of POINTER TO ARRAY OF ... *)
-
 		TensorFlag* = 0;   (* flag indicating a tensor array *)
 		RangeFlag* = 1;   (* flag indicating a range, e.g. an array derived from A[..,..] *)
 		StackFlag* = 2;   (* flag indicates temporary result *)
