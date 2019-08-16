@@ -11753,7 +11753,7 @@ TYPE
 		VAR offset: LONGINT; name: Basic.SegmentedName; symbol: SyntaxTree.Symbol;
 		BEGIN
 			(* change this when Heaps.HeapBlock is modified *)
-			INC(dataAdrOffset,7);
+			INC(dataAdrOffset,6);
 
 			Info(section,"headerAdr");
 			Address(section,0);
@@ -11763,13 +11763,8 @@ TYPE
 			offset := ToMemoryUnits(module.system,TypeRecordBaseOffset*module.system.addressSize);
 			NamedSymbol(section, name, symbol, 0, offset);
 
-			Info(section,"mark: LONGINT;");
-			Longint(section,-1);
-			Info(section,"padding");
-			Longint(section,0);
-			(*
-			IF module.system.addressType.sizeInBits = 64 THEN Longint(section, 0); INC(dataAdrOffset); END;
-			*)
+			Info(section,"mark: SIZE;");
+			Size(section,-1);
 
 			Info(section,"dataAdr-: ADDRESS");
 			Symbol(section,section, dataAdrOffset,0);

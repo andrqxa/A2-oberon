@@ -84,7 +84,7 @@ TYPE
 		heapBlock {FICTIVE =HeapBlockOffset}: ADDRESS;
 		typeDesc {FICTIVE =TypeDescOffset}: POINTER {UNSAFE,UNTRACED} TO StaticTypeDesc;
 		(* when this is changed --> change constant in Machine too and provide changes in FoxIntermediateBackend where noted *)
-		mark: WORD;
+		mark: SIZE;
 		dataAdr-: ADDRESS;
 		size-: SIZE;
 		nextMark {UNTRACED}: HeapBlock;
@@ -193,8 +193,8 @@ VAR
 	markStack: MarkStack;
 	GC*: PROCEDURE;	(** activate the garbage collector *)
 	initBlock {UNTRACED}: ANY;	(* anchor for init calls *)
-	currentMarkValue: LONGINT; (* all objects that have this value in their mark field are still used - initial value filled in by linker *)
-	sweepMarkValue: LONGINT; (* most recent mark value *)
+	currentMarkValue: SIZE; (* all objects that have this value in their mark field are still used - initial value filled in by linker *)
+	sweepMarkValue: SIZE; (* most recent mark value *)
 	sweepBlockAdr: ADDRESS;	(* where to resume sweeping *)
 	sweepMemBlock {UNTRACED}: Machine.MemoryBlock; (* where to resume sweeping *)
 	candidates: ARRAY MaxCandidates OF ADDRESS; (* procedure stack pointer candidates *)
@@ -402,7 +402,7 @@ VAR
 	lastFreeBlockAdr: ADDRESS;
 	lastFreeBlockSize: ADDRESS;
 	block : HeapBlockU ; freeBlock, lastFreeBlock: FreeBlockU;
-	blockMark: LONGINT; blockSize: SIZE;
+	blockMark: SIZE; blockSize: SIZE;
 	time1, time2: HUGEINT;
 CONST FreeBlockHeaderSize = SIZEOF(FreeBlockDesc) + BlockHeaderSize;
 CONST StrongChecks = FALSE;
@@ -824,7 +824,7 @@ BEGIN
 END LazySweepGC;
 
 (* initialize a free heap block *)
-PROCEDURE InitFreeBlock(freeBlock: FreeBlockU; mark: LONGINT; dataAdr: ADDRESS; size: SIZE);
+PROCEDURE InitFreeBlock(freeBlock: FreeBlockU; mark: SIZE; dataAdr: ADDRESS; size: SIZE);
 BEGIN
 	(* initialize heap block header *)
 	freeBlock.typeDesc := freeBlockTag;
