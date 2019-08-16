@@ -106,7 +106,7 @@ TYPE
 			typeInfo*: POINTER TO ARRAY OF TypeDesc;
 			module*: POINTER TO ARRAY OF Module; (* imported modules: for reference counting *)
 			procTable*: ProcedureDescs; (* information inserted by loader, sorted by pc after loading *)
-			data*, code*, staticTypeDescs* (* ug *), refs*: Bytes;
+			data*, code*, refs*: Bytes;
 			export*: ExportDesc;
 			term*: TerminationHandler;
 			exTable*: ExceptionTable;

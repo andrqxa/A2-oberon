@@ -10,7 +10,6 @@ CONST
 	FileNotFound = 3401;
 	CommandTrapped* = 3904; (* cf module Commands *)
 
-	SupportOldObjectFileFormat = FALSE;
 	TraceLoading = FALSE;
 TYPE
 
@@ -271,27 +270,15 @@ TYPE
 			any: ANY;
 
 			PROCEDURE TraverseScopes(CONST scope: Modules.ExportDesc; level: LONGINT);
-			VAR adr: ADDRESS; i: SIZE;
+			VAR i: SIZE;
 			BEGIN
 				IF (level > 2) THEN RETURN END;
 				IF (scope.fp # 0) THEN
-					adr := scope.adr;
-					IF SupportOldObjectFileFormat THEN
-						IF module.staticTypeDescs # testTypeDescs THEN (* old object file format *)
-							IF (adr = 0) & (scope.exports > 0)  THEN (* type in old object file format *)
-								adr := scope.dsc[0].adr;
-								SYSTEM.GET(module.sb + adr, adr);
-							ELSIF adr # 0 THEN
-								INC(adr,ADDRESSOF(module.code[0]));
-							END;
-						END;
-					END;
-					modList.Put(SIZE(scope.fp), adr)
+					modList.Put(scope.fp, scope.adr)
 				END;
 				FOR i := 0 TO scope.exports-1 DO
 					IF scope.dsc # NIL THEN TraverseScopes(scope.dsc[i],level+1) END;
 				END;
-				adr := 0;
 			END TraverseScopes;
 
 		BEGIN{EXCLUSIVE}
@@ -466,7 +453,6 @@ TYPE
 
 VAR
 	moduleList: ModuleList;
-	testTypeDescs: Modules.Bytes;
 	InternalModuleName: StringPool.Index;
 
 	PROCEDURE InitData(VAR data: Data);
@@ -561,7 +547,6 @@ VAR
 					ASSERT(heapBlockAdr = linker.moduleBlock.address+2*SIZEOF(ADDRESS));
 				#END
 				module := SYSTEM.VAL(Modules.Module,moduleAdr);
-				module.staticTypeDescs := testTypeDescs; (* trick to identify new object file loaded modules *)
 				module.data := arrangement.data.bytes;
 				module.code := arrangement.code.bytes;
 
@@ -615,7 +600,6 @@ VAR
 	END Remove;
 
 	BEGIN
-		NEW(testTypeDescs,1);
 		Modules.InstallTermHandler(Remove);
 		StringPool.GetIndex("@Module",InternalModuleName);
 		NEW(moduleList);

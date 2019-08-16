@@ -13246,7 +13246,7 @@ TYPE
 				typeInfo*: POINTER TO ARRAY OF TypeDesc;
 				module*: POINTER TO ARRAY OF Module; (* imported modules: for reference counting *)
 				procTable*: ProcedureDescs; (* information inserted by loader, sorted by pc after loading *)
-				data*, code*, staticTypeDescs* (* ug *), refs*: Bytes;
+				data*, code*, refs*: Bytes;
 				export*: ExportDesc;
 				term*: TerminationHandler;
 				exTable*: ExceptionTable;
@@ -13456,8 +13456,7 @@ TYPE
 			Symbol(moduleSection,importSection,importSectionOffset,0);
 			Info(moduleSection, "procTable*: ProcTable");
 			Symbol(moduleSection,procTableSection,procTableSectionOffset,0);
-			Info(moduleSection, "data*, code*, staticTypeDescs*, refs*: Bytes");
-			Address(moduleSection,0);
+			Info(moduleSection, "data*, code*, refs*: Bytes");
 			Address(moduleSection,0);
 			Address(moduleSection,0);
 			Symbol(moduleSection,referenceSection,referenceSectionOffset,0);
