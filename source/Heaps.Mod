@@ -125,7 +125,6 @@ TYPE
 	TypeInfo*= POINTER{UNSAFE,UNTRACED} TO TypeInfoDesc;
 	TypeInfoDesc = RECORD
 		descSize: SIZE;
-		sentinel: ADDRESS;	(* = MPO-4 *)
 		tag: ADDRESS; (* pointer to static type descriptor, only used by linker and loader *)
 		flags: SET;
 		mod: ADDRESS; (* module *)

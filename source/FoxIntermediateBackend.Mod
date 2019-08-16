@@ -13171,7 +13171,6 @@ TYPE
 			(*
 				TypeDesc* = POINTER TO RECORD   (* ug: adapt constant TypeDescRecSize if this type is changed !!! *)
 					descSize: SIZE;
-					sentinel: ADDRESS;	(* = MPO-4 *)
 					tag*: ADDRESS; (* pointer to static type descriptor, only used by linker and loader *)
 					flags*: SET;
 					mod*: Module;	(* hint only, because module may have been freed (at Heaps.ModOfs) *)
@@ -13179,7 +13178,6 @@ TYPE
 				END;
 			*)
 			Size(section, 0);
-			Address(section,0);
 			Address(section,0);
 			Set(section,{});
 			moduleSection := ModuleSection();
@@ -13351,7 +13349,6 @@ TYPE
 					(*
 						TypeDesc* = POINTER TO RECORD
 							descSize: SIZE;
-							sentinel: ADDRESS;	(* = MPO-4 *)
 							tag*: ADDRESS; (* pointer to static type descriptor, only used by linker and loader *)
 							flags*: SET;
 							mod*: Module;	(* hint only, because module may have been freed (at Heaps.ModOfs) *)
@@ -13373,8 +13370,8 @@ TYPE
 						ASSERT(source.pc = EmptyBlockOffset); (* sanity check *)
 					END;
 
-					Info(source, "type info size");	Address(source, 6*ToMemoryUnits(module.system,module.system.addressSize)+32);
-					Address(source,MPO-4);
+					Info(source, "type info size");
+					Size(source, 5*ToMemoryUnits(module.system,module.system.addressSize)+32);
 					Info(source, "type tag pointer");
 					Address( source,0);
 					Info(source, "type flags");
@@ -13557,7 +13554,6 @@ TYPE
 					(*
 						TypeDesc* = POINTER TO RECORD
 							descSize: SIZE;
-							sentinel: ADDRESS;	(* = MPO-4 *)
 							tag*: ADDRESS; (* pointer to static type descriptor, only used by linker and loader *)
 							flags*: SET;
 							mod*: Module;	(* hint only, because module may have been freed (at Heaps.ModOfs) *)
@@ -13575,8 +13571,8 @@ TYPE
 					Address(source,0);
 					ASSERT(source.pc = EmptyBlockOffset); (* sanity check *)
 
-					Info(source, "type info size");	Address(source, 6*ToMemoryUnits(module.system,module.system.addressSize)+32);
-					Info(source, "sentinel"); Address(source,MPO-4); (* should be removed ?? *)
+					Info(source, "type info size");
+					Size(source, 5*ToMemoryUnits(module.system,module.system.addressSize)+32);
 					Info(source, "type tag pointer");
 					Symbol( source, tag, offset, 0);
 					Info(source, "type flags");
