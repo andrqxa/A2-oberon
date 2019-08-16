@@ -198,7 +198,7 @@ VAR
 	sweepBlockAdr: ADDRESS;	(* where to resume sweeping *)
 	sweepMemBlock {UNTRACED}: Machine.MemoryBlock; (* where to resume sweeping *)
 	candidates: ARRAY MaxCandidates OF ADDRESS; (* procedure stack pointer candidates *)
-	numCandidates: LONGINT;
+	numCandidates: SIZE;
 	newSum: SIZE;
 	checkRoot: FinalizerNode;	(* list of checked objects (contains weak references to the checked objects) *)
 	finalizeRoot: FinalizerNode;	(* objects scheduled for finalization (contains references to scheduled objects) *)
@@ -208,21 +208,20 @@ VAR
 	(** Statistics. Will only be maintained if Stats = TRUE *)
 
 	(** Memory allocation statistics *)
-	Nnew- : LONGINT;			(** Number of times NewBlock has been called since system startup *)
+	Nnew- : SIZE;			(** Number of times NewBlock has been called since system startup *)
 	NnewBytes- : HUGEINT;		(** Number of bytes allocated by NewBlock since system startup *)
 
 	(** Garbage collection statistics *)
-	Ngc- : LONGINT; 			(** Number of GC cycles since system startup *)
+	Ngc- : SIZE; 			(** Number of GC cycles since system startup *)
 
 	(** Statistics considering the last GC cyle *)
-	Nmark-, Nmarked-, NfinalizeAlive-, NfinalizeDead-: LONGINT;
+	Nmark-, Nmarked-, NfinalizeAlive-, NfinalizeDead-: SIZE;
 	NgcCyclesMark-, NgcCyclesLastRun-, NgcCyclesMax-, NgcCyclesAllRuns- : HUGEINT;
 	NgcSweeps-, NgcSweepTime-, NgcSweepMax-: HUGEINT;
 
 	gcStatus*: GCStatus;
 
-	GCType*: LONGINT;
-	freeBlockFound-, freeBlockNotFound-: LONGINT;
+	GCType*: WORD;
 	trace-: BOOLEAN;
 
 	allocationLogger-: PROCEDURE(p: ANY);
@@ -725,7 +724,7 @@ END GetFinalizer;
 
 (** Check finalizers registered in the specified module, which is about to be freed or shut down. Remove all finalizer procedures in this module from the finalizer lists so they won't be called any more. *)
 PROCEDURE CleanupModuleFinalizers*(codeAdr: ADDRESS; codeLen: SIZE; CONST name: ARRAY OF CHAR);
-VAR n, p, t: FinalizerNode; codeEnd: ADDRESS; N1, N2: LONGINT;
+VAR n, p, t: FinalizerNode; codeEnd: ADDRESS; N1, N2: SIZE;
 BEGIN
 	codeEnd := codeAdr + codeLen; N1 := 0; N2 := 0;
 	Machine.Acquire(Machine.Heaps);
@@ -842,7 +841,7 @@ VAR throughput* := 0 : SIZE;
 
 (* NewBlock - Allocate a heap block. {(size MOD BlockSize = 0)}. Caller must hold Heap lock. *)
 PROCEDURE NewBlock(size: SIZE): ADDRESS;
-VAR try: LONGINT; p: FreeBlock; freeBlock : FreeBlockU; memBlock {UNTRACED}: Machine.MemoryBlock;
+VAR try: WORD; p: FreeBlock; freeBlock : FreeBlockU; memBlock {UNTRACED}: Machine.MemoryBlock;
 	beginHeapBlockAdr, endHeapBlockAdr: ADDRESS;
 BEGIN
 	try := 1;
@@ -1142,7 +1141,7 @@ END NewArray;
 
 (* obsolete for generic object file / required only for old loader *)
 PROCEDURE FillStaticType*(VAR staticTypeAddr: ADDRESS; startAddr, typeInfoAdr: ADDRESS; size, recSize: SIZE;
-							numPtrs, numSlots: LONGINT);
+							numPtrs, numSlots: SIZE);
 VAR p, offset: ADDRESS; staticTypeBlock {UNTRACED}: StaticTypeBlock;
 BEGIN
 	Machine.Acquire(Machine.Heaps);

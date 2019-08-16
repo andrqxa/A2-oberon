@@ -751,7 +751,7 @@ PROCEDURE EstimateCpuClockrate*(VAR clockrate : LONGINT) : BOOLEAN;
 VAR
 	timer : Kernel.Timer; milliTimer : Kernel.MilliTimer;
 	startTime, endTime, timeDiff : HUGEINT;
-	nbrOfGcRuns : LONGINT;
+	nbrOfGcRuns : SIZE;
 BEGIN
 	NEW(timer); nbrOfGcRuns := Heaps.Ngc;
 	Kernel.SetTimer(milliTimer, 1000);
