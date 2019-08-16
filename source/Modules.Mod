@@ -70,7 +70,7 @@ TYPE
 
 	TypeDesc* = POINTER  TO RECORD
 		descSize-: SIZE;
-		sentinel-: LONGINT;	(* = MPO-4 *)
+		sentinel-: ADDRESS;	(* = MPO-4 *)
 		tag-: ADDRESS; (* pointer to static type descriptor, only used by linker and loader *)
 		flags-: SET;
 		mod- {UNTRACED}: Module;	(* hint only, because module may have been freed *)
