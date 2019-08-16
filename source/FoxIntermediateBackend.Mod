@@ -13253,9 +13253,9 @@ TYPE
 				exTable*: ExceptionTable;
 				(* internal pointer array: to protect internal data structures from being GCed *)
 				internal-: POINTER TO ARRAY OF ANY;
-				crc*: LONGINT;
 				body*: PROCEDURE;
 				flags*: SET;	 (* e.g. compilation flags *)
+				crc*: LONGINT;
 		*)
 
 		PROCEDURE BasePointer (section: IntermediateCode.Section);
@@ -13475,17 +13475,15 @@ TYPE
 			Symbol(moduleSection,exceptionSection,exceptionSectionOffset,0);
 			Info(moduleSection,"internal: POINTER TO ARRAY OF ANY");
 			Symbol(moduleSection, modulePointerSection, modulePointerSectionOffset, 0);
-			Info(moduleSection, "crc*: LONGINT");
-			patchCRC:= moduleSection.pc;
-			Longint(moduleSection, 0); (*!  must be implemented *)
-
-			IF module.system.addressType.sizeInBits = 64 THEN Longint(moduleSection, 0); END; (* padding *)
 			Info(moduleSection, "body*: PROCEDURE");
 			Symbol(moduleSection, bodyProc, 0,0);
 			Info(moduleSection, "flags*: SET");
 			flags := {};
 			IF  implementationEmitter.backend.preciseGC THEN INCL(flags,0) END;
 			Set( moduleSection, flags);
+			Info(moduleSection, "crc*: LONGINT");
+			patchCRC:= moduleSection.pc;
+			Longint(moduleSection, 0); (*!  must be implemented *)
 
 			IF implementationEmitter.backend.cooperative THEN
 				PatchSymbol(moduleSection,MonitorOffset,moduleSection.name,NIL,moduleSection.pc,0);

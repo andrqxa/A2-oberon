@@ -113,9 +113,9 @@ TYPE
 			exTable*: ExceptionTable;
 			(* internal pointer array: to protect internal data structures from being GCed *)
 			internal-: POINTER TO ARRAY OF ANY;
-			crc*: LONGINT;
 			body*: PROCEDURE;
 			flags*: SET;	 (* e.g. compilation flags *)
+			crc*: LONGINT;
 
 		#IF ~COOP THEN
 			PROCEDURE FindRoots*;	(* override *)
