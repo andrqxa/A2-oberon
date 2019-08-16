@@ -98,7 +98,6 @@ TYPE
 		VAR
 			next*: Module;	(** once a module is published, all fields are read-only *)
 			name*: Name;
-			init, published: BOOLEAN;
 			refcnt*: LONGINT; (* counts loaded modules that import this module *)
 			sb*: ADDRESS; (* reference address between constants and local variables *)
 			entry*: POINTER TO ARRAY OF ADDRESS;
@@ -116,6 +115,7 @@ TYPE
 			body*: PROCEDURE;
 			flags*: SET;	 (* e.g. compilation flags *)
 			crc*: LONGINT;
+			init, published: BOOLEAN;
 
 		#IF ~COOP THEN
 			PROCEDURE FindRoots*;	(* override *)

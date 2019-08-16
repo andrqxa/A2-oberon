@@ -13238,7 +13238,6 @@ TYPE
 			VAR
 				next*: Module;	(** once a module is published, all fields are read-only *)
 				name*: Name;
-				init, published: BOOLEAN;
 				refcnt*: LONGINT; (* counts loaded modules that import this module *)
 				sb*: ADDRESS; (* reference address between constants and local variables *)
 				entry*: POINTER TO ARRAY OF ADDRESS;
@@ -13256,6 +13255,7 @@ TYPE
 				body*: PROCEDURE;
 				flags*: SET;	 (* e.g. compilation flags *)
 				crc*: LONGINT;
+				init, published: BOOLEAN;
 		*)
 
 		PROCEDURE BasePointer (section: IntermediateCode.Section);
@@ -13440,13 +13440,9 @@ TYPE
 			Address(moduleSection,0);
 			Info(moduleSection, "name*: Name");
 			Name(moduleSection,moduleName);
-			Info(moduleSection, "init, published: BOOLEAN");
-			Boolean(moduleSection,FALSE);
-			Boolean(moduleSection,FALSE);
-			Info(moduleSection,"filler"); (*! introduce alignment! *)
-			Boolean(moduleSection,FALSE);
-			Boolean(moduleSection,FALSE);
 			Info(moduleSection, "refcnt*: LONGINT");
+			Longint(moduleSection,0);
+			Info(moduleSection,"padding");
 			Longint(moduleSection,0);
 			Info(moduleSection, "sb*: ADDRESS");
 			Address(moduleSection,0);
@@ -13484,6 +13480,9 @@ TYPE
 			Info(moduleSection, "crc*: LONGINT");
 			patchCRC:= moduleSection.pc;
 			Longint(moduleSection, 0); (*!  must be implemented *)
+			Info(moduleSection, "init, published: BOOLEAN");
+			Boolean(moduleSection,FALSE);
+			Boolean(moduleSection,FALSE);
 
 			IF implementationEmitter.backend.cooperative THEN
 				PatchSymbol(moduleSection,MonitorOffset,moduleSection.name,NIL,moduleSection.pc,0);
