@@ -12,7 +12,7 @@ CONST
 		ModeValue = 2;
 
 		(* heap data offsets *)
-		ArrayDimTable = 3;	(* dimension table in dyn arrays *)
+		ArrayDimTable = 2;	(* dimension table in dyn arrays *)
 
 		(* math array offsets *)
 		MathPtrOffset=0;
@@ -9572,7 +9572,7 @@ TYPE
 						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,arrayDataOffset));
 						IntermediateCode.AddOffset(operand.tag,ToMemoryUnits(system,BaseArrayTypeSize*system.addressSize));
 					ELSE
-						arrayDataOffset := DynamicDim(type) * addressType.sizeInBits + 3 * addressType.sizeInBits;
+						arrayDataOffset := DynamicDim(type) * addressType.sizeInBits + 2 * addressType.sizeInBits;
 						INC(arrayDataOffset, (-arrayDataOffset) MOD ArrayAlignment);  (* round up to multiple of ArrayAlignment to ensure that first array element is aligned at 0 MOD ArrayAlignment *)
 						IntermediateCode.AddOffset(operand.op,ToMemoryUnits(system,arrayDataOffset));
 						IntermediateCode.AddOffset(operand.tag,ToMemoryUnits(system,ArrayDimTable*system.addressSize))
@@ -12121,7 +12121,6 @@ TYPE
 				Address(source,0);
 			ELSE
 				Address(source,0);
-				Address(source,0);
 				(* first pointer for GC *)
 				IF hasPointer THEN
 					(* points to first element in the array, this is NOT the base type descriptor *)
@@ -12141,7 +12140,7 @@ TYPE
 				PatchSize(section, pc, size);
 				PatchSize(section, pc + 3, size);
 			ELSE
-				PatchSize(section, pc-3, size); (* actually only for arrays with pointers, but does not harm... *)
+				PatchSize(section, pc-2, size); (* actually only for arrays with pointers, but does not harm... *)
 				PatchSize(section, pc, size);
 			END;
 		END PatchArray;

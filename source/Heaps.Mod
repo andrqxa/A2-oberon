@@ -154,7 +154,6 @@ TYPE
 	ArrayDataBlockU = POINTER {UNSAFE,UNTRACED} TO ArrayDataBlockDesc;
 	ArrayDataBlockDesc*= RECORD (DataBlockDesc)
 		numElems: SIZE;
-		current: ADDRESS; (* unused *)
 		first: ADDRESS;
 		(* len info *)
 		(* data *)
@@ -315,7 +314,7 @@ VAR orgBlock: ADDRESS;(*: ADDRESS*); staticTypeBlock {UNTRACED}: StaticTypeBlock
 	currentArrayElemAdr, lastArrayElemAdr: ADDRESS; i: SIZE;
 	protected {UNTRACED}: ProtRecBlock;
 	b {UNTRACED}: POINTER {UNSAFE} TO RECORD p: ANY END;
-	meta {UNTRACED }: POINTER {UNSAFE} TO RECORD staticTypeBlock {FICTIVE=TypeDescOffset}: StaticTypeBlock; numElems: SIZE; current, first: ADDRESS END;
+	meta {UNTRACED }: POINTER {UNSAFE} TO RECORD staticTypeBlock {FICTIVE=TypeDescOffset}: StaticTypeBlock; numElems: SIZE; first: ADDRESS END;
 	block {UNTRACED}: ANY;
 BEGIN{UNCHECKED} (* omit any range checks etc.*)
 	IF Stats THEN INC(Nmark) END;
@@ -1047,11 +1046,11 @@ BEGIN
 	arrSize := numElems * elemSize;
 
 	IF arrSize = 0 THEN
-		NewSys(p, numDims * AddressSize + 3 * AddressSize, isRealtime); (* no data, thus no specific alignment *)
+		NewSys(p, numDims * AddressSize + 2 * AddressSize, isRealtime); (* no data, thus no specific alignment *)
 		SetPC(p);
 	ELSE
 		ASSERT(BlockHeaderSize MOD ArrayAlignment = 0);
-		arrayDataOffset := numDims * AddressSize + 3 * AddressSize;
+		arrayDataOffset := numDims * AddressSize + 2 * AddressSize;
 		INC(arrayDataOffset, (-arrayDataOffset) MOD ArrayAlignment);  (* round up to multiple of ArrayAlignment to ensure that first array element is aligned at 0 MOD ArrayAlignment *)
 		ptrOfs := elemType.pointerOffsets;
 		IF ptrOfs = MinPtrOfs - AddressSize THEN (* no pointers in element type *)
@@ -1083,7 +1082,6 @@ BEGIN
 
 				firstElem := dataBlockAdr + arrayDataOffset;
 				dataBlock.numElems := numElems;
-				dataBlock.current := NIL;
 				dataBlock.first := firstElem;
 
 				SetPC(dataBlock);
@@ -1129,7 +1127,7 @@ VAR p: ANY; dim: SIZE;
 		(* static elements is requred for this case : POINTER TO ARRAY OF ARRAY X OF RecordWithPointer *)
 		dim := LEN( a,0 );
 		IF tag = NIL THEN
-			NewSys(p, GetSize() * elementSize + dim * SIZEOF(ADDRESS) + 3 *SIZEOF(ADDRESS) + (dim DIV 2) * 2 * SIZEOF(ADDRESS), FALSE);
+			NewSys(p, GetSize() * elementSize + dim * SIZEOF(ADDRESS) + 2 *SIZEOF(ADDRESS) + (dim DIV 2) * 2 * SIZEOF(ADDRESS), FALSE);
 		ELSE
 			NewArr(p, tag, GetSize(), dim, FALSE);
 		END;
