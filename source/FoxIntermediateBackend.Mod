@@ -13238,7 +13238,7 @@ TYPE
 			VAR
 				next*: Module;	(** once a module is published, all fields are read-only *)
 				name*: Name;
-				refcnt*: LONGINT; (* counts loaded modules that import this module *)
+				refcnt*: SIZE; (* counts loaded modules that import this module *)
 				sb*: ADDRESS; (* reference address between constants and local variables *)
 				entry*: POINTER TO ARRAY OF ADDRESS;
 				command*: POINTER TO ARRAY OF Command;
@@ -13440,10 +13440,8 @@ TYPE
 			Address(moduleSection,0);
 			Info(moduleSection, "name*: Name");
 			Name(moduleSection,moduleName);
-			Info(moduleSection, "refcnt*: LONGINT");
-			Longint(moduleSection,0);
-			Info(moduleSection,"padding");
-			Longint(moduleSection,0);
+			Info(moduleSection, "refcnt*: SIZE");
+			Size(moduleSection,0);
 			Info(moduleSection, "sb*: ADDRESS");
 			Address(moduleSection,0);
 			Info(moduleSection, "entry*: POINTER TO ARRAY OF ADDRESS");

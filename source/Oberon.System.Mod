@@ -340,7 +340,7 @@ BEGIN
 		SYSTEM.GET(SYSTEM.VAL(ADDRESS, M.code)- SIZEOF (ADDRESS), tag);	(* indirect tag *)
 		SYSTEM.GET(tag, size);
 		Texts.WriteString(W, M.name); Texts.WriteInt(W, LONGINT (size), 8);
-		Texts.WriteInt(W, M.refcnt, 4);
+		Texts.WriteInt(W, LONGINT (M.refcnt), 4);
 		Texts.WriteLn(W); M := M.next;
 		INC(n); INC(t, LONGINT (size))
 	END;

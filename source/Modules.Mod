@@ -98,7 +98,7 @@ TYPE
 		VAR
 			next*: Module;	(** once a module is published, all fields are read-only *)
 			name*: Name;
-			refcnt*: LONGINT; (* counts loaded modules that import this module *)
+			refcnt*: SIZE; (* counts loaded modules that import this module *)
 			sb*: ADDRESS; (* reference address between constants and local variables *)
 			entry*: POINTER TO ARRAY OF ADDRESS;
 			command*: POINTER TO ARRAY OF Command;
