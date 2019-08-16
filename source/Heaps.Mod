@@ -85,7 +85,6 @@ TYPE
 		typeDesc {FICTIVE =TypeDescOffset}: POINTER {UNSAFE,UNTRACED} TO StaticTypeDesc;
 		(* when this is changed --> change constant in Machine too and provide changes in FoxIntermediateBackend where noted *)
 		mark: WORD;
-		refCount: WORD;
 		dataAdr-: ADDRESS;
 		size-: SIZE;
 		nextMark {UNTRACED}: HeapBlock;
@@ -833,7 +832,6 @@ BEGIN
 	freeBlock.heapBlock := NIL;
 	(* initialize heap block fields *)
 	freeBlock.mark := mark;
-	freeBlock.refCount := 1;
 	freeBlock.dataAdr := dataAdr;
 	freeBlock.size := size;
 	(* initialize free block fields *)
@@ -919,7 +917,6 @@ BEGIN
 		dataBlock.typeDesc := NilVal;
 		dataBlock.heapBlock := systemBlock;
 		systemBlock.mark := currentMarkValue;
-		systemBlock.refCount := 0;
 		systemBlock.dataAdr := dataBlockAdr;
 		systemBlock.size := blockSize;
 		systemBlock.nextMark := NIL;
@@ -966,7 +963,6 @@ BEGIN
 			dataBlock.typeDesc := tag;
 			dataBlock.heapBlock := recordBlockAdr;
 			recordBlock.mark := currentMarkValue;
-			recordBlock.refCount := 0;
 			recordBlock.dataAdr := dataBlockAdr;
 			recordBlock.size := blockSize;
 			recordBlock.nextMark := NIL;
@@ -1010,7 +1006,6 @@ BEGIN
 		dataBlock.typeDesc := tag;
 		dataBlock.heapBlock := protRecBlockAdr;
 		protRecBlock.mark := currentMarkValue;
-		protRecBlock.refCount := 0;
 		protRecBlock.dataAdr := dataBlockAdr;
 		protRecBlock.size := blockSize;
 		protRecBlock.count := 0;
@@ -1079,7 +1074,6 @@ BEGIN
 				dataBlock.typeDesc := elemType;
 				dataBlock.heapBlock := arrayBlock;
 				arrayBlock.mark := currentMarkValue;
-				arrayBlock.refCount := 0;
 				arrayBlock.dataAdr := dataBlockAdr;
 				arrayBlock.size := blockSize;
 				arrayBlock.nextMark := NIL;

@@ -11765,7 +11765,7 @@ TYPE
 
 			Info(section,"mark: LONGINT;");
 			Longint(section,-1);
-			Info(section,"refCount: LONGINT;");
+			Info(section,"padding");
 			Longint(section,0);
 			(*
 			IF module.system.addressType.sizeInBits = 64 THEN Longint(section, 0); INC(dataAdrOffset); END;
