@@ -19,7 +19,7 @@ CONST
 	ParBoolean = 2;
 
 	(* Return values of Plugin.SelectionUpdated *)
-	SelectionValid = 1; (** selected partition seems to be of the exspected type *)
+	SelectionValid = 1; (** selected partition seems to be of the expected type *)
 	SelectionInvalid = 2; (** plugin will do nothing when user tries to apply it *)
 	SelectionMaybe = 3; (** plugin can't determine whether its application will be successful *)
 	SelectionNotSupported = 0; (** plugin doesn't care about this return value *)

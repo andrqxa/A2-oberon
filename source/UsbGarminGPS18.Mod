@@ -412,7 +412,7 @@ TYPE
 			error := FALSE;
 			IF actLen > 0 THEN byteCounter := byteCounter + actLen; END;
 			IF (status = Usbdi.Ok) OR (status = Usbdi.ShortPacket) THEN
-				IF fragLen > 0 THEN (* we exspect a fragment of the lenght fragLen *)
+				IF fragLen > 0 THEN (* we expect a fragment of the lenght fragLen *)
 					IF Trace * TraceEvents # {} THEN
 						KernelLog.String("GPS18: Handle fragment: "); ShowPacket(fragType, fragId);
 						KernelLog.String(" fragLen: "); KernelLog.Int(fragLen, 0); KernelLog.String(" fragOfs: "); KernelLog.Int(fragOfs, 0);
@@ -513,7 +513,7 @@ TYPE
 			waits : LONGINT;
 			i : LONGINT;
 		BEGIN
-			(* Exspected endpoints: 1 InterruptIn, 1 BulkIn, 1 Bulkout*)
+			(* Expected endpoints: 1 InterruptIn, 1 BulkIn, 1 Bulkout*)
 			LOOP
 				IF ((i >= LEN(interface.endpoints)) OR (epFound = 3)) THEN EXIT; END;
 				IF interface.endpoints[i].type = Usbdi.InterruptIn THEN
@@ -530,7 +530,7 @@ TYPE
 			END;
 
 			IF ~((epFound = 3) & (epInterruptIn # 0) & (epBulkIn # 0) & (epBulkOut # 0)) THEN
-				IF Debug THEN KernelLog.String("GPS18: Error: Exspected endpoints not found."); KernelLog.Ln; END;
+				IF Debug THEN KernelLog.String("GPS18: Error: Expected endpoints not found."); KernelLog.Ln; END;
 				RETURN FALSE;
 			END;
 

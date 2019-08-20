@@ -2871,7 +2871,7 @@ TYPE
 				(* skip whitespace *)
 				WHILE (j < LEN(table)) & (table[j] > 0X) & (table[j] <= " ") DO INC(j); END;
 
-				(* exspected character: "=" *)
+				(* expected character: "=" *)
 				IF (j >= LEN(table)) OR (table[j] # "=") THEN result := FALSE; EXIT END;
 				config[i] := 0X; INC(i); INC(j);
 
@@ -2884,7 +2884,7 @@ TYPE
 				(* read value *)
 				INC(j); WHILE (j < LEN(table)) & (table[j] # 22X) & (table[j] >= " ") DO config[i] := table[j]; INC(i); INC(j); END;
 
-				(* exspecting closing quote *)
+				(* expecting closing quote *)
 				IF (j >= LEN(table)) OR (table[j] # 22X) THEN result := FALSE; EXIT END;
 
 				config[i] := 0X; INC(i); INC(j);

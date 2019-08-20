@@ -927,7 +927,7 @@ TYPE
 				RETURN FALSE;
 			END;
 
-			(* Get address & FAT32 file system version check; version exspected to be 0:0;  *)
+			(* Get address & FAT32 file system version check; version expected to be 0:0;  *)
 			IF (bootsector[42] # 0X) OR (bootsector[43] # 0X) THEN
 				ReportError("Couldn't not load FSInfo block (Wrong FAT32 FS verion)");
 				RETURN FALSE;

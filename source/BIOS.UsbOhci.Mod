@@ -685,7 +685,7 @@ TYPE
 					restlen := restlen - curlen; offset := 0; INC(idx);
 					ASSERT(idx < numRanges);
 					(* The special thing here is, that, curlen must be a multiple of pipe.maxPacketSize if this is not the last TD in the chain. 	*)
-					(* Otherwise we would ask/sent for less data than device exspects to send/receive. 									*)
+					(* Otherwise we would ask/sent for less data than device expects to send/receive. 									*)
 					temp := PageSize - ((curlen + PageSize) MOD pipe.maxPacketSize); (* max amount of data that fits into second buffer *)
 					IF restlen > temp THEN (* Not last TD *)
 						(* There will be more TDs. *)

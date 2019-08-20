@@ -1084,7 +1084,7 @@ BEGIN
 					error := TRUE;
 				END;
 			ELSE
-				context.error.String("Command parsing error: Exspected => token, found: "); context.error.String(filename);
+				context.error.String("Command parsing error: Expected => token, found: "); context.error.String(filename);
 				context.error.Ln;
 				error := TRUE;
 			END;
