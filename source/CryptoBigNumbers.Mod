@@ -582,7 +582,7 @@ VAR
 	END div96;
 
 	PROCEDURE Div2*( a, b: BigNumber;  VAR q, r: BigNumber );   (** q = a div b;  r = a mod b *)
-	VAR td, sd, bd, qd: digits;  x: LONGINT; i, tl, bl, tail, ql, qi, sl: SIZE;
+	VAR td, sd, bd, qd: digits;  x: LONGINT; i, tail, bl, tl, sl, ql, qi: SIZE;
 		t3: dig3;  t2, d0: dig2;
 		aq, ar: ADDRESS;
 	BEGIN

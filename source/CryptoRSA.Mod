@@ -200,7 +200,7 @@ VAR
 		md5: MD5.Hash;
 		digest: ARRAY 16 OF CHAR; pl: LONGINT;
 		buf: ARRAY 4096 OF CHAR; magic: LONGINT;
-		n, bl: SIZE; size: LONGINT;
+		bl, n: SIZE; size: LONGINT;
 
 	BEGIN
 		NEW( k );

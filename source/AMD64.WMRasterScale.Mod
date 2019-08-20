@@ -715,7 +715,7 @@ END SSE2Q1BGR565BGR565;
 PROCEDURE Q1BGRA8888BGR565(srcadr, dstadr: ADDRESS; srcbpr, dstbpr, dl, dt, dr, db, sx, sy, sdx, sdy, sw, sh : SIZE);
 VAR x, y, xfleft, xfright, yftop, yfbottom : SIZE; yadr: ADDRESS; col, col0, col1, col2, col3 : LONGINT;
 	b0, g0, r0, a0, b1, g1, r1, a1, cb, cg, cr, ca, dstb, dstg, dstr : SIZE;
-	fx, fy, xadd0, xadd1: SIZE; yadd0, yadd1: SIZE;
+	fx, fy, xadd1, yadd1: SIZE; xadd0, yadd0: ADDRESS;
 BEGIN
 	yadr := dstadr + dl * 2 + dt * dstbpr;
 	fy := sy - 8000H; sx := sx - 8000H;

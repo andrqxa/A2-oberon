@@ -1461,7 +1461,7 @@ TYPE
 		PROCEDURE ExecuteCommand*(read: BOOLEAN; VAR packet, data: ARRAY OF CHAR; ofs, size: LONGINT; dma: BOOLEAN): WORD;
 		VAR
 			command: CommandPacket;
-			i: LONGINT; res: WORD;
+			i: SIZE; res: WORD;
 			status: SET;
 		BEGIN {EXCLUSIVE}
 			ASSERT(LEN(packet) <= LEN(command.packet));
@@ -1479,7 +1479,7 @@ TYPE
 			command.bufAdr := ADDRESSOF(data[ofs]);
 			command.size := size;
 
-			FOR i:= 0 TO command.packetLen-1 DO
+			FOR i:= 0 TO LEN(command.packet)-1 DO
 				command.packet[i] := packet[i];
 			END;
 			res := controller.ExecuteCommand(command, ATAPITimeout, status);
