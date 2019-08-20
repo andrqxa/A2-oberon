@@ -49,9 +49,8 @@ TYPE
 		parent- : Node;
 
 		PROCEDURE GetModule*() : Module;
-		VAR node : Node; module : Module;
+		VAR node : Node; module := NIL : Module;
 		BEGIN
-			module := NIL;
 			node := SELF;
 			WHILE (node # NIL) & (node.parent # node) DO node := node.parent; END;
 			IF (node # NIL) THEN
@@ -156,12 +155,10 @@ TYPE
 		formalPars*: FormalPars;
 
 		PROCEDURE FindProcDecl*(CONST name : ARRAY OF CHAR) : ProcDecl;
-		VAR procDecl : ProcDecl;
+		VAR procDecl := NIL : ProcDecl;
 		BEGIN
 			IF (declSeq # NIL) THEN
 				procDecl := declSeq.FindProcDecl(name);
-			ELSE
-				procDecl := NIL;
 			END;
 			RETURN procDecl;
 		END FindProcDecl;
@@ -177,12 +174,10 @@ TYPE
 		bodyPos- : Streams.Position;
 
 		PROCEDURE FindProcDecl*(CONST name : ARRAY OF CHAR) : ProcDecl;
-		VAR procDecl : ProcDecl;
+		VAR procDecl := NIL : ProcDecl;
 		BEGIN
 			IF (declSeq # NIL) THEN
 				procDecl := declSeq.FindProcDecl(name);
-			ELSE
-				procDecl := NIL;
 			END;
 			RETURN procDecl;
 		END FindProcDecl;
@@ -362,12 +357,10 @@ TYPE
 		resolved* : BOOLEAN;
 
 		PROCEDURE FindTypeDecl*(CONST name : ARRAY OF CHAR) : TypeDecl;
-		VAR typeDecl : TypeDecl;
+		VAR typeDecl := NIL : TypeDecl;
 		BEGIN
 			IF (declSeq # NIL) THEN
 				typeDecl := declSeq.FindTypeDecl(name);
-			ELSE
-				typeDecl := NIL;
 			END;
 			RETURN typeDecl;
 		END FindTypeDecl;
@@ -473,42 +466,44 @@ TYPE
 		PROCEDURE ImportListP(import: Import);
 		VAR newImport: Import;
 		BEGIN
-			NextToken;
-			WHILE token.symbol = FoxScanner.Identifier DO
-				NEW(import.ident);
-				import.ident.name := Strings.NewString(token.identifierString);
-				import.ident.pos := token.position.start;
-				NextToken;	(* avoids endless loop *)
-				IF token.symbol = FoxScanner.Becomes THEN
-					NextToken;
-					IF token.symbol = FoxScanner.Identifier THEN
-						NEW(import.alias);
-						import.alias.name := Strings.NewString(token.identifierString);
-						import.alias.pos := token.position.start;
+			WHILE token.symbol = FoxScanner.Import DO
+				NextToken;
+				WHILE token.symbol = FoxScanner.Identifier DO
+					NEW(import.ident);
+					import.ident.name := Strings.NewString(token.identifierString);
+					import.ident.pos := token.position.start;
+					NextToken;	(* avoids endless loop *)
+					IF token.symbol = FoxScanner.Becomes THEN
 						NextToken;
-					ELSE
-						(* Error *)
-						hasError := TRUE;
-						KernelLog.String("err2: "); KernelLog.Int(token.position.start, 0); KernelLog.Ln;
+						IF token.symbol = FoxScanner.Identifier THEN
+							NEW(import.alias);
+							import.alias.name := Strings.NewString(token.identifierString);
+							import.alias.pos := token.position.start;
+							NextToken;
+						ELSE
+							(* Error *)
+							hasError := TRUE;
+							KernelLog.String("err2: "); KernelLog.Int(token.position.start, 0); KernelLog.Ln;
+						END;
 					END;
-				END;
-				IF token.symbol = FoxScanner.In THEN
-					NextToken;
-					IF token.symbol = FoxScanner.Identifier THEN
-						NEW(import.context);
-						import.context.name := Strings.NewString(token.identifierString);
-						import.context.pos := token.position.start;
+					IF token.symbol = FoxScanner.In THEN
+						NextToken;
+						IF token.symbol = FoxScanner.Identifier THEN
+							NEW(import.context);
+							import.context.name := Strings.NewString(token.identifierString);
+							import.context.pos := token.position.start;
+						END;
+						Check (FoxScanner.Identifier);
 					END;
-					Check (FoxScanner.Identifier);
+					IF token.symbol = FoxScanner.Comma THEN
+						NextToken;
+					END;
+					NEW(newImport, import.parent);
+					import.next := newImport;
+					import := newImport;
 				END;
-				IF token.symbol = FoxScanner.Comma THEN
-					NextToken;
-				END;
-				NEW(newImport, import.parent);
-				import.next := newImport;
-				import := newImport;
+				Check(FoxScanner.Semicolon);
 			END;
-			Check(FoxScanner.Semicolon);
 		END ImportListP;
 
 		PROCEDURE DefinitionP(definition: Definition);
@@ -1050,7 +1045,7 @@ TYPE
 
 		PROCEDURE CellP(cell: Cell);
 		VAR declSeq: DeclSeq;
-			pos: Streams.Position;
+			pos := -1: Streams.Position;
 		(*?	qualident: Qualident; *)
 		BEGIN
 			SysFlag;
@@ -1058,7 +1053,6 @@ TYPE
 				NEW(cell.formalPars, cell);
 				FormalParsP(cell.formalPars);
 			END;
-			pos := -1;
 			WHILE (token.symbol # FoxScanner.Begin) & (token.symbol # FoxScanner.End) & (token.symbol # FoxScanner.EndOfText) DO
 					(* avoid endless-loop *)
 				IF pos = token.position.start THEN NextToken END;
@@ -1252,11 +1246,9 @@ TYPE
 		END ProcedureModifierP;
 
 		PROCEDURE BodyP(allowBody : BOOLEAN; VAR modifiers : SET);
-		VAR end: SIZE; lastSymbol: FoxScanner.Symbol; m : SET; first : BOOLEAN;
+		VAR end := 1: SIZE; lastSymbol: FoxScanner.Symbol; m : SET; first := TRUE : BOOLEAN;
 		BEGIN
 			IF token.symbol = FoxScanner.Begin THEN
-				end := 1;
-				first := TRUE;
 				REPEAT
 					lastSymbol := token.symbol;
 					NextToken;
@@ -1447,14 +1439,12 @@ BEGIN
 END AppendLast;
 
 PROCEDURE SplitName*(CONST name : ARRAY OF CHAR; VAR moduleName, typeName : ARRAY OF CHAR);
-VAR i, j : SIZE;
+VAR i := 0, j := 0 : SIZE;
 BEGIN
 	IF Strings.ContainsChar(name, ".", FALSE) THEN
-		i := 0;
 		WHILE (i < LEN(name)) & (name[i] # ".") DO moduleName[i] := name[i]; INC(i); END;
 		moduleName[i] := 0X;
 		INC(i); (* skip "." *)
-		j := 0;
 		WHILE (i < LEN(name)) & (name[i] # 0X) DO typeName[j] := name[i]; INC(i); INC(j); END;
 		typeName[j] := 0X;
 	ELSE
@@ -1586,15 +1576,18 @@ BEGIN
 END ResolveTypeHierarchy;
 
 PROCEDURE ResolveMethodOverwrites(module : Module; cache : ModuleCache);
-VAR typeDecl : TypeDecl; method, procDecl : ProcDecl; superClass : Object;
+VAR typeDecl := NIL: TypeDecl; method := NIL, procDecl := NIL: ProcDecl;
+VAR superClass := NIL: Object; superRecord := NIL: Record;
 BEGIN
 	IF module.resolved & (module.declSeq # NIL) & (module.declSeq.typeDecl # NIL) THEN
 		typeDecl := module.declSeq.typeDecl;
 		WHILE (typeDecl # NIL) DO
 			IF (typeDecl.type.object # NIL) & (typeDecl.type.object.declSeq # NIL) THEN
 				method := typeDecl.type.object.declSeq.procDecl;
+
 				WHILE (method # NIL) DO
 					superClass := typeDecl.type.object.superPtr;
+					
 					WHILE (superClass # NIL) DO
 						procDecl := superClass.FindProcDecl(method.head.identDef.ident.name^);
 						IF (procDecl # NIL) THEN
@@ -1608,8 +1601,29 @@ BEGIN
 					ELSE
 						method := NIL;
 					END;
-				END;
+				END;				
+			ELSIF (typeDecl.type.record # NIL) THEN
+				method := typeDecl.type.record.procDecl;
+
+				WHILE (method # NIL) DO
+					superRecord := typeDecl.type.record.superPtr;
+					
+					WHILE (superRecord # NIL) DO
+						procDecl := superRecord.FindProcDecl(method.head.identDef.ident.name^);
+						IF (procDecl # NIL) THEN
+							INCL(procDecl.head.modifiers, Overwritten);
+							INCL(method.head.modifiers, Overwrite)
+						END;
+						superRecord := superRecord.superPtr;
+					END;
+					IF (method.next # NIL) THEN
+						method := method.next (ProcDecl);
+					ELSE
+						method := NIL;
+					END;
+				END;				
 			END;
+
 			IF (typeDecl.next # NIL) THEN
 				typeDecl := typeDecl.next (TypeDecl);
 			ELSE
