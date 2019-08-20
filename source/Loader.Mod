@@ -27,13 +27,13 @@ TYPE
 	HashTableInt = OBJECT
 	VAR
 		table: HashIntArray;
-		size: LONGINT;
-		used-: LONGINT;
+		size: SIZE;
+		used-: SIZE;
 		maxLoadFactor: REAL;
 
 		(* Interface *)
 
-		PROCEDURE & Init* (initialSize: LONGINT);
+		PROCEDURE & Init* (initialSize: SIZE);
 		BEGIN
 			ASSERT(initialSize > 2);
 			NEW(table, initialSize);
@@ -66,11 +66,11 @@ TYPE
 			RETURN table[HashValue(key)].key = key;
 		END Has;
 
-		PROCEDURE Length*():LONGINT;
+		PROCEDURE Length*():SIZE;
 		BEGIN RETURN used; END Length;
 
 		PROCEDURE Clear*;
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN FOR i := 0 TO size - 1 DO table[i].key := 0; END; END Clear;
 
 		(* Internals *)
@@ -106,16 +106,16 @@ TYPE
 
 	END HashTableInt;
 
-	HashTableIntAny* = OBJECT
+	HashTableIntAny = OBJECT
 	VAR
 		table: HashIntAnyArray;
-		size: LONGINT;
-		used-: LONGINT;
+		size: SIZE;
+		used-: SIZE;
 		maxLoadFactor: REAL;
 
 		(* Interface *)
 
-		PROCEDURE & Init* (initialSize: LONGINT);
+		PROCEDURE & Init* (initialSize: SIZE);
 		BEGIN
 			ASSERT(initialSize > 2);
 			NEW(table, initialSize);
@@ -148,11 +148,11 @@ TYPE
 			RETURN table[HashValue(key)].key = key;
 		END Has;
 
-		PROCEDURE Length*():LONGINT;
+		PROCEDURE Length*():SIZE;
 		BEGIN RETURN used; END Length;
 
 		PROCEDURE Clear*;
-		VAR i: LONGINT;
+		VAR i: SIZE;
 		BEGIN FOR i := 0 TO size - 1 DO table[i].key := 0; END; END Clear;
 
 		(* Interface for integer values *)
@@ -195,7 +195,7 @@ TYPE
 	Arrangement* = OBJECT (GenericLinker.Arrangement);
 	VAR
 		code, data: Data;
-		(*moduleAdr: LONGINT;*)
+		(*moduleAdr: ADDRESS;*)
 		hasBody: BOOLEAN;
 		bodyAddress : ADDRESS;
 
@@ -269,12 +269,12 @@ TYPE
 		VAR modList: HashTableInt;
 			any: ANY;
 
-			PROCEDURE TraverseScopes(CONST scope: Modules.ExportDesc; level: LONGINT);
+			PROCEDURE TraverseScopes(CONST scope: Modules.ExportDesc; level: SIZE);
 			VAR i: SIZE;
 			BEGIN
 				IF (level > 2) THEN RETURN END;
 				IF (scope.fp # 0) THEN
-					modList.Put(scope.fp, scope.adr)
+					modList.Put(SIZE(scope.fp), scope.adr)
 				END;
 				FOR i := 0 TO scope.exports-1 DO
 					IF scope.dsc # NIL THEN TraverseScopes(scope.dsc[i],level+1) END;
@@ -332,7 +332,7 @@ TYPE
 		PROCEDURE ExportBlock*(block: GenericLinker.Block);
 		BEGIN
 			IF block.identifier.fingerprint # 0 THEN
-				hash.Put(SYSTEM.VAL(SIZE, block.identifier.fingerprint), block)
+				hash.Put(SIZE(block.identifier.fingerprint), block)
 			END;
 			IF (block.identifier.name[0] >= 0) & (block.identifier.name[1] >= 0)  THEN
 				IF (block.identifier.name[1] = InternalModuleName) & (block.identifier.name[2]<0) OR (block.identifier.name[2] = InternalModuleName) & (block.identifier.name[3] < 0) THEN
@@ -347,8 +347,8 @@ TYPE
 			s: ObjectFile.SectionName; isModule: BOOLEAN; identifier: ObjectFile.Identifier;
 			fp: HUGEINT;
 
-			PROCEDURE CheckName(n: StringPool.Index;  name {UNTRACED}: Modules.DynamicName): LONGINT;
-			VAR s: ObjectFile.SectionName; i: LONGINT;
+			PROCEDURE CheckName(n: StringPool.Index;  name {UNTRACED}: Modules.DynamicName): WORD;
+			VAR s: ObjectFile.SectionName; i: SIZE;
 			BEGIN
 				IF name = NIL THEN RETURN -1 END;
 				StringPool.GetString(n, s);
@@ -368,7 +368,7 @@ TYPE
 
 
 			(* stupid implementation: just search for fp in all exports *)
-			PROCEDURE CheckScope(CONST scope: Modules.ExportDesc; level: LONGINT): ADDRESS;
+			PROCEDURE CheckScope(CONST scope: Modules.ExportDesc; level: SIZE): ADDRESS;
 			VAR adr,lo,hi,m,res: SIZE;
 			BEGIN
 				adr := 0;
@@ -461,7 +461,7 @@ VAR
 	END InitData;
 
 	PROCEDURE IsPrefix(CONST prefix, of: ObjectFile.SegmentedName): BOOLEAN;
-	VAR prefixS, ofS: ObjectFile.SectionName; i: LONGINT;
+	VAR prefixS, ofS: ObjectFile.SectionName; i: SIZE;
 	BEGIN
 		i := 0;
 		WHILE (i< LEN(prefix)) & (prefix[i] = of[i]) DO INC(i) END;
@@ -613,7 +613,7 @@ VAR
 	startConcurrentLoad: BOOLEAN;
 
 	PROCEDURE ConcurrentLoad*;
-	VAR i: LONGINT;
+	VAR i: SIZE;
 		o: OBJECT 		VAR
 			mod: Modules.Module; res: WORD; msg: ARRAY 32 OF CHAR;
 		BEGIN{ACTIVE}

@@ -26,7 +26,7 @@ VAR
 	mhz : LONGINT;
 
 	start, stop : HUGEINT;
-	ngc : LONGINT;
+	ngc : SIZE;
 	data : POINTER TO ARRAY OF LONGINT;
 
 PROCEDURE InterruptHandler(VAR state: Machine.State);
@@ -48,7 +48,7 @@ END SoftwareInterrupt;
 
 (** Start the 1st Level Interrupt Handler latency benchmark *)
 PROCEDURE Bench*(context : Commands.Context); (** [nofSamples] ~ *)
-VAR nofSamples, oldNgc, ignore : LONGINT; index : SIZE;
+VAR nofSamples, ignore : LONGINT; oldNgc, index : SIZE;
 BEGIN {EXCLUSIVE}
 	context.arg.SkipWhitespace; context.arg.Int(nofSamples, FALSE);
 	IF (nofSamples < MinNofSamples) THEN nofSamples := MinNofSamples;
