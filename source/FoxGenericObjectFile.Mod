@@ -6,7 +6,6 @@ IMPORT
 	Fingerprinter := FoxFingerprinter, Files, Options, ObjectFile, SymbolFileFormat := FoxTextualSymbolFile, Strings, KernelLog, D := Debugging;
 
 CONST
-	Version = 6;
 	Trace = FALSE;
 	TraceAliases = FALSE;
 	WarnDuplicateFingerprints = FALSE;
@@ -414,9 +413,8 @@ TYPE
 	BEGIN NEW(objectFileFormat); RETURN objectFileFormat
 	END Get;
 
-	PROCEDURE ReadHeader(reader: Streams.Reader; VAR binary: BOOLEAN; VAR poolMap: ObjectFile.PoolMap; VAR offers, requires: ObjectFile.NameList): WORD;
-	VAR ch: CHAR; string: ARRAY 32 OF CHAR;
-	VAR version: WORD;
+	PROCEDURE ReadHeader(reader: Streams.Reader; VAR binary: BOOLEAN; VAR poolMap: ObjectFile.PoolMap; VAR offers, requires: ObjectFile.NameList);
+	VAR ch: CHAR; version: WORD; string: ARRAY 32 OF CHAR;
 	BEGIN
 		reader.String(string);
 		binary := string="FoxOFB";
@@ -424,7 +422,7 @@ TYPE
 		reader.SkipWhitespace;
 		reader.Char(ch); ASSERT(ch='v');
 		reader.Int(version,FALSE);
-		IF version < Version THEN KernelLog.String("warning: old object file encountered, recompile all sources"); KernelLog.Ln END;
+		IF version # ObjectFile.Version THEN KernelLog.String("warning: invalid object file encountered, recompile all sources"); KernelLog.Ln END;
 		reader.Char(ch); ASSERT(ch='.');
 		IF ~binary THEN reader.SkipWhitespace
 		ELSE
@@ -433,18 +431,15 @@ TYPE
 		END;
 		offers := NIL;
 		requires := NIL;
-		IF version >= 4 THEN
-			IF ~binary THEN
-				reader.String(string); ObjectFile.ReadNameList(reader, offers, binary, poolMap);
-				reader.SkipWhitespace;
-				reader.String(string); ObjectFile.ReadNameList(reader, requires, binary, poolMap);
-				reader.SkipWhitespace;
-			ELSE
-				ObjectFile.ReadNameList(reader, offers, binary, poolMap);
-				ObjectFile.ReadNameList(reader, requires, binary, poolMap);
-			END
-		END;
-		RETURN version;
+		IF ~binary THEN
+			reader.String(string); ObjectFile.ReadNameList(reader, offers, binary, poolMap);
+			reader.SkipWhitespace;
+			reader.String(string); ObjectFile.ReadNameList(reader, requires, binary, poolMap);
+			reader.SkipWhitespace;
+		ELSE
+			ObjectFile.ReadNameList(reader, offers, binary, poolMap);
+			ObjectFile.ReadNameList(reader, requires, binary, poolMap);
+		END
 	END ReadHeader;
 
 	PROCEDURE WriteHeader(writer: Streams.Writer; binary: BOOLEAN; sections: Sections.SectionList; VAR poolMap: ObjectFile.PoolMap; offers, requires: ObjectFile.NameList; fingerprinter:Fingerprinter.Fingerprinter);
@@ -489,7 +484,7 @@ TYPE
 		ELSE writer.String("FoxOFT");
 		END;
 		writer.Char(' ');
-		writer.Char('v'); writer.Int(Version,0); writer.Char(".");
+		writer.Char('v'); writer.Int(ObjectFile.Version,0); writer.Char(".");
 		IF ~binary THEN
 				writer.Ln;
 				writer.String("offers "); ObjectFile.WriteNameList(writer, offers, binary, poolMap);
@@ -544,17 +539,16 @@ TYPE
 		fileName: Files.FileName; file: Files.File; reader: Files.Reader; writer: Streams.Writer;
 		section: ObjectFile.Section; binary: BOOLEAN; poolMap, poolMapDummy: ObjectFile.PoolMap;
 		offers, requires: ObjectFile.NameList;
-		version: WORD;
 	BEGIN
 		IF context.arg.GetString(fileName) THEN
 			file := Files.Old(fileName);
 			IF file # NIL THEN
 				NEW(reader,file,0);
 				writer := Basic.GetWriter(Basic.GetDebugWriter(fileName));
-				version := ReadHeader(reader, binary, poolMap, offers, requires);
+				ReadHeader(reader, binary, poolMap, offers, requires);
 				WriteHeader(writer, FALSE, NIL, poolMapDummy, offers, requires, NIL);
 				WHILE reader.Peek () # 0X DO
-					ObjectFile.ReadSection (reader, version, section,binary, poolMap);
+					ObjectFile.ReadSection (reader, section,binary, poolMap);
 					ObjectFile.WriteSection(writer, section, FALSE, NIL); (* textual *)
 					reader.SkipWhitespace;
 				END;
@@ -579,7 +573,6 @@ TYPE
 		dest: Files.FileName;
 		writer: Files.Writer;
 		name: ObjectFile.SegmentedName;
-		version: WORD;
 		offers, requires: ObjectFile.NameList;
 	BEGIN
 		NEW(sectionList);
@@ -589,10 +582,10 @@ TYPE
 				file := Files.Old(fileName);
 				IF file # NIL THEN
 					NEW(reader,file,0);
-					version := ReadHeader(reader, binary, poolMap,offers, requires);
+					ReadHeader(reader, binary, poolMap,offers, requires);
 					WHILE reader.Peek () # 0X DO
 						ObjectFile.InitSection(section);
-						ObjectFile.ReadSection (reader, version, section, binary, poolMap);
+						ObjectFile.ReadSection (reader, section, binary, poolMap);
 						NEW(bs, SHORTINT(section.type) ,section.unit,name, FALSE, FALSE);
 						bs.os := section;
 						NEW(is, SHORTINT(bs.os.type),  bs.os.identifier.name,NIL, FALSE);

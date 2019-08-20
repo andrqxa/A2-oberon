@@ -452,7 +452,7 @@ BEGIN
 	HALT(100); (* undefined type *)
 END GetPriority;
 
-PROCEDURE ReadHeader(reader: Streams.Reader; linker: Linker; VAR binary: BOOLEAN; VAR poolMap: ObjectFile.PoolMap; VAR offers, requires: ObjectFile.NameList): WORD;
+PROCEDURE ReadHeader(reader: Streams.Reader; linker: Linker; VAR binary: BOOLEAN; VAR poolMap: ObjectFile.PoolMap; VAR offers, requires: ObjectFile.NameList);
 VAR ch: CHAR; version: WORD; string: ARRAY 32 OF CHAR;
 BEGIN
 	reader.String(string);
@@ -461,7 +461,7 @@ BEGIN
 	reader.SkipWhitespace;
 	reader.Char(ch); ASSERT(ch='v');
 	reader.Int(version,FALSE);
-	IF (version <2) & (linker # NIL) THEN linker.Error("","old object file version encountered. Recompile sources.") END;
+	IF (version # ObjectFile.Version) & (linker # NIL) THEN linker.Error("","invalid object file version encountered. Recompile sources.") END;
 	reader.Char(ch); ASSERT(ch='.');
 	IF ~binary THEN reader.SkipWhitespace
 	ELSE
@@ -471,36 +471,33 @@ BEGIN
 
 	offers := NIL;
 	requires := NIL;
-	IF version >= 4 THEN
-		IF ~binary THEN
-			reader.String(string);
-			ASSERT(string = "offers");
-			ObjectFile.ReadNameList(reader, offers, binary, poolMap);
-			reader.SkipWhitespace;
-			reader.String(string);
-			ASSERT(string = "requires");
-			ObjectFile.ReadNameList(reader, requires, binary, poolMap);
-			reader.SkipWhitespace;
-		ELSE
-			ObjectFile.ReadNameList(reader, offers, binary, poolMap);
-			ObjectFile.ReadNameList(reader, requires, binary, poolMap);
-		END
-	END;
-	RETURN version;
+	IF ~binary THEN
+		reader.String(string);
+		ASSERT(string = "offers");
+		ObjectFile.ReadNameList(reader, offers, binary, poolMap);
+		reader.SkipWhitespace;
+		reader.String(string);
+		ASSERT(string = "requires");
+		ObjectFile.ReadNameList(reader, requires, binary, poolMap);
+		reader.SkipWhitespace;
+	ELSE
+		ObjectFile.ReadNameList(reader, offers, binary, poolMap);
+		ObjectFile.ReadNameList(reader, requires, binary, poolMap);
+	END
 END ReadHeader;
 
 PROCEDURE OffersRequires*(reader: Streams.Reader; VAR offers, requires: ObjectFile.NameList);
-VAR binary: BOOLEAN; poolMap: ObjectFile.PoolMap;  version: WORD;
+VAR binary: BOOLEAN; poolMap: ObjectFile.PoolMap;
 BEGIN
-	version := ReadHeader(reader, NIL, binary, poolMap, offers, requires);
+	ReadHeader(reader, NIL, binary, poolMap, offers, requires);
 END OffersRequires;
 
 PROCEDURE Process* (reader: Streams.Reader; linker: Linker);
-VAR section: ObjectFile.Section; binary: BOOLEAN; poolMap: ObjectFile.PoolMap; offers, requires: ObjectFile.NameList; version: WORD;
+VAR section: ObjectFile.Section; binary: BOOLEAN; poolMap: ObjectFile.PoolMap; offers, requires: ObjectFile.NameList;
 BEGIN
-	version := ReadHeader(reader, linker, binary, poolMap, offers, requires);
+	ReadHeader(reader, linker, binary, poolMap, offers, requires);
 	WHILE reader.Peek () # 0X DO
-		ObjectFile.ReadSection (reader, version, section,binary,poolMap);
+		ObjectFile.ReadSection (reader, section,binary,poolMap);
 		reader.SkipWhitespace;
 		IF reader.res = Streams.Ok THEN linker.AddSection (section); END;
 	END;

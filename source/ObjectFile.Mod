@@ -3,6 +3,8 @@ MODULE ObjectFile;	(* AUTHOR "negelef"; PURPOSE "Generic Object File Representat
 IMPORT Streams, BitSets, StringPool;
 
 CONST
+	Version* = 7;
+
 	(* Fixup modes *)
 	Absolute* = 0;
 	Relative* = 1;
@@ -512,7 +514,7 @@ VAR
 		writer.Ln;
 	END WriteSectionTextual;
 
-	PROCEDURE ReadSectionTextual (reader: Streams.Reader; version: WORD; VAR section: Section);
+	PROCEDURE ReadSectionTextual (reader: Streams.Reader; VAR section: Section);
 	VAR i: SIZE; size: SIZE; char: CHAR; relocatibility, priority: WORD;
 
 		PROCEDURE ReadValueIdentifier (VAR value: WORD; CONST identifiers: ARRAY OF ARRAY OF CHAR);
@@ -605,14 +607,6 @@ VAR
 		ReadValueIdentifier(relocatibility, relocatabilities);
 		section.fixed := relocatibility = Fixed;
 		reader.SkipWhitespace; reader.Size (section.alignment, FALSE);
-		IF version < 5 THEN
-			reader.SkipWhitespace; reader.Int (priority, FALSE);
-			IF section.type = InitCode THEN
-				IF priority = -4 THEN section.type := EntryCode;
-				ELSIF priority = -1  THEN section.type := ExitCode;
-				END;
-			END;
-		END;
 		reader.SkipWhitespace; reader.Size (section.aliases, FALSE);
 		reader.SkipWhitespace; reader.Size (section.fixups, FALSE);
 		reader.SkipWhitespace; reader.Size (size, FALSE); size := size * section.unit;
@@ -878,7 +872,7 @@ VAR
 		END;
 	END WriteSectionBinary;
 
-	PROCEDURE ReadSectionBinary (reader: Streams.Reader; version: WORD; VAR section: Section; poolMap: PoolMap);
+	PROCEDURE ReadSectionBinary (reader: Streams.Reader; VAR section: Section; poolMap: PoolMap);
 	VAR i, size: SIZE; relocatibility, priority: WORD; ch: CHAR;;
 	CONST ByteSize=8;
 
@@ -998,22 +992,6 @@ VAR
 		ReadValueIdentifier(relocatibility, relocatabilities);
 		section.fixed := relocatibility = Fixed;
 		reader.RawSize (section.alignment);
-		IF version < 5 THEN
-			reader.RawNum (priority);
-			CASE section.type OF
-			0: section.type := InitCode;
-			|1:section.type := BodyCode;
-			|2:section.type := Code;
-			|3:section.type := Data;
-			|4:section.type := Const;
-			END;
-
-			IF section.type = InitCode THEN
-				IF priority = -4 THEN section.type := EntryCode;
-				ELSIF priority = -1  THEN section.type := ExitCode;
-				END;
-			END;
-		END;
 		reader.RawSize (section.aliases);
 		reader.RawSize (section.fixups);
 		reader.RawSize (size); size := size * section.unit;
@@ -1040,12 +1018,12 @@ VAR
 		END;
 	END ReadSectionBinary;
 
-	PROCEDURE ReadSection*(reader: Streams.Reader; version: WORD; VAR section: Section; binary: BOOLEAN; poolMap: PoolMap);
+	PROCEDURE ReadSection*(reader: Streams.Reader; VAR section: Section; binary: BOOLEAN; poolMap: PoolMap);
 	BEGIN
 		IF binary THEN
-			ReadSectionBinary(reader,version, section,poolMap)
+			ReadSectionBinary(reader,section,poolMap)
 		ELSE
-			ReadSectionTextual(reader,version,section);
+			ReadSectionTextual(reader,section);
 		END
 	END ReadSection;
 
