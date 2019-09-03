@@ -35,7 +35,7 @@ MODULE ImageDocs IN Oberon; (** portable **)	(* eos  *)
 	END LoadDoc;
 
 	PROCEDURE StoreDoc (doc: Documents.Document);
-		VAR lm: Objects.LinkMsg; img: Images.Image; bak: ARRAY 64 OF CHAR; res: INTEGER; done: BOOLEAN;
+		VAR lm: Objects.LinkMsg; img: Images.Image; bak: ARRAY 64 OF CHAR; res: SIGNED16; done: BOOLEAN;
 	BEGIN
 		lm.id := Objects.get; lm.name := "Model"; lm.res := -1; doc.dsc.handle(doc.dsc, lm);
 		IF (lm.res >= 0) & (lm.obj # NIL) & (lm.obj IS Images.Image) THEN

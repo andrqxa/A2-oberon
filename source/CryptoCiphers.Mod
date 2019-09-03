@@ -18,7 +18,7 @@ TYPE
 				blockSize-: LONGINT;   (** cipher block size (bytes) *)
 				isKeyInitialized*: BOOLEAN;
 				mode-: SIGNED8;   (** ECB, CBC *)
-				len1, len2: INTEGER;
+				len1, len2: SIGNED16;
 
 				PROCEDURE appsize( size: LONGINT );
 				VAR i, t, d: LONGINT;
@@ -33,7 +33,7 @@ TYPE
 				END appsize;
 
 				PROCEDURE appmode( CONST str: ARRAY OF CHAR );
-				VAR i, j: INTEGER;  c: CHAR;
+				VAR i, j: SIGNED16;  c: CHAR;
 				BEGIN
 					j := len2;  i := 0;
 					REPEAT  c := str[i];  INC( i );  name[j] := c;  INC( j )  UNTIL c = 0X;

@@ -66,17 +66,17 @@ MODULE ZlibInflate;	(** eos  **)
 		(* code parameters *)
 		Lengths = ARRAY OF SIGNED8;
 		Code = RECORD
-			bits: INTEGER;	(* number of lookup bits *)
-			offset: INTEGER;	(* offset in length array *)
-			size: INTEGER;	(* number of codes *)
-			simple: INTEGER;	(* number of simple codes *)
+			bits: SIGNED16;	(* number of lookup bits *)
+			offset: SIGNED16;	(* offset in length array *)
+			size: SIGNED16;	(* number of codes *)
+			simple: SIGNED16;	(* number of simple codes *)
 			extra: ARRAY MaxNonSimpleCodes OF SIGNED8;	(* number of extra bits for non-simple codes *)
-			base: ARRAY MaxNonSimpleCodes OF INTEGER;	(* base length/distance for non-simple codes *)
+			base: ARRAY MaxNonSimpleCodes OF SIGNED16;	(* base length/distance for non-simple codes *)
 		END;
 
 		(* tree nodes for decoding Huffman trees *)
 		Node = RECORD
-			base: INTEGER;	(* literal, length base, distance base, or table offset *)
+			base: SIGNED16;	(* literal, length base, distance base, or table offset *)
 			exop: SIGNED8;	(* number of extra bits or operation *)
 			bits: SIGNED8;	(* number of bits in this code or subcode *)
 		END;
@@ -90,7 +90,7 @@ MODULE ZlibInflate;	(** eos  **)
 		Tree = RECORD
 			node: Nodes;	(* nodes where tree is stored *)
 			base: LONGINT;	(* index of root table *)
-			bits: INTEGER;	(* number of lookup bits *)
+			bits: SIGNED16;	(* number of lookup bits *)
 		END;
 
 		(* memory containing last WindowSize bytes of output *)
@@ -117,9 +117,9 @@ MODULE ZlibInflate;	(** eos  **)
 
 			(* inflate state machine *)
 			inf: RECORD
-				state: INTEGER;	(* current state of stream *)
-				method: INTEGER;	(* method byte for state InfFlag *)
-				marker: INTEGER;	(* marker bytes for state InfBad *)
+				state: SIGNED16;	(* current state of stream *)
+				method: SIGNED16;	(* method byte for state InfFlag *)
+				marker: SIGNED16;	(* marker bytes for state InfBad *)
 				check: RECORD
 					calc: LONGINT;	(* calculated sum *)
 					stored: LONGINT;	(* stored sum *)
@@ -131,11 +131,11 @@ MODULE ZlibInflate;	(** eos  **)
 				state: SIGNED8;	(* current block state *)
 				last: BOOLEAN;	(* set for last block *)
 				left: SIZE;	(* bytes left to copy for non-compressed blocks *)
-				nlit: INTEGER;	(* number of literal/length codes *)
+				nlit: SIGNED16;	(* number of literal/length codes *)
 				ndist: SIGNED8;	(* number of distance codes *)
 				nclen: SIGNED8;	(* number of code lengths *)
 				clen: ARRAY MaxLitLenCodes + MaxDistCodes OF SIGNED8;	(* code lengths of bit, lit/len, or distance code *)
-				index: INTEGER;	(* index of next code length *)
+				index: SIGNED16;	(* index of next code length *)
 				nodes: Nodes;	(* memory for Huffman trees *)
 				btree: Tree;	(* bit decoding tree *)
 			END;
@@ -145,10 +145,10 @@ MODULE ZlibInflate;	(** eos  **)
 				state: SIGNED8;	(* current decode state *)
 				lltree, dtree: Tree;	(* literal/length and distance tree *)
 				tree: Tree;	(* current decoding table *)
-				lit: INTEGER;	(* decoded literal *)
-				extra: INTEGER;	(* extra bits to get *)
-				len: INTEGER;	(* decoded length *)
-				dist: INTEGER;	(* distance back to copy from *)
+				lit: SIGNED16;	(* decoded literal *)
+				extra: SIGNED16;	(* extra bits to get *)
+				len: SIGNED16;	(* decoded length *)
+				dist: SIGNED16;	(* distance back to copy from *)
 			END;
 		END;
 
@@ -172,7 +172,7 @@ MODULE ZlibInflate;	(** eos  **)
 
 	(*--- Huffman Decoding Tables ---*)
 
-	PROCEDURE MakeLitLenCode (VAR code: Code; bits, offset, size, simple: INTEGER);
+	PROCEDURE MakeLitLenCode (VAR code: Code; bits, offset, size, simple: SIGNED16);
 	BEGIN
 		code.bits := bits; code.offset := offset; code.size := size; code.simple := simple;
 		IF simple < size THEN
@@ -195,7 +195,7 @@ MODULE ZlibInflate;	(** eos  **)
 		END
 	END MakeLitLenCode;
 
-	PROCEDURE MakeDistCode (VAR code: Code; bits, offset, size, simple: INTEGER);
+	PROCEDURE MakeDistCode (VAR code: Code; bits, offset, size, simple: SIGNED16);
 	BEGIN
 		code.bits := bits; code.offset := offset; code.size := size; code.simple := simple;
 		IF simple < size THEN
@@ -244,11 +244,11 @@ MODULE ZlibInflate;	(** eos  **)
 		VAR
 			l, lbits, min, max, dbits, len, bits, b: LONGINT;	(* bit lengths *)
 			c, idx: LONGINT;	(* code index *)
-			codes: ARRAY maxLen+1 OF INTEGER;	(* number of codes of each length *)
+			codes: ARRAY maxLen+1 OF SIGNED16;	(* number of codes of each length *)
 			unused, size, count, entries: LONGINT;	(* code counts *)
-			offset: ARRAY maxLen+1 OF INTEGER;	(* offset into index table for each length *)
-			off: INTEGER;
-			index: ARRAY MaxLitLenCodes OF INTEGER;	(* symbol numbers ordered by code length *)
+			offset: ARRAY maxLen+1 OF SIGNED16;	(* offset into index table for each length *)
+			off: SIGNED16;
+			index: ARRAY MaxLitLenCodes OF SIGNED16;	(* symbol numbers ordered by code length *)
 			backup: ARRAY maxLen OF LONGINT;	(* projection of current pattern to each level *)
 			pat, p, inc: LONGINT;	(* current code pattern *)
 			tab, t: LONGINT;	(* pointers into Huffman nodes *)
@@ -495,7 +495,7 @@ MODULE ZlibInflate;	(** eos  **)
 		string length) and number of input bytes available (s.in.avail) at least ten.  The ten bytes
 		are six bytes for the longest length/distance pair plus four bytes for overloading the bit buffer. *)
 	PROCEDURE InflateFast (VAR s: Stream; VAR wavail: SIZE);
-		VAR inavail, index, len: SIZE; base, dist: LONGINT; byte: CHAR; node: Node; exop: INTEGER;
+		VAR inavail, index, len: SIZE; base, dist: LONGINT; byte: CHAR; node: Node; exop: SIGNED16;
 	BEGIN
 		inavail := s.in.avail;
 		REPEAT
@@ -591,7 +591,7 @@ MODULE ZlibInflate;	(** eos  **)
 	END InflateFast;
 
 	PROCEDURE InflateCodes (VAR s: Stream);
-		VAR wavail: SIZE; base: LONGINT; index: SIZE; node: Node; exop: INTEGER;
+		VAR wavail: SIZE; base: LONGINT; index: SIZE; node: Node; exop: SIGNED16;
 	BEGIN
 		IF s.write < s.read THEN wavail := s.read - s.write - 1
 		ELSE wavail := WindowSize - s.write
@@ -826,7 +826,7 @@ MODULE ZlibInflate;	(** eos  **)
 			| BlkTable:	(* get number of code lengths for each tree *)
 				IF ~Need(s, 14) THEN EXIT END;	(* 5 (#lit/len-257) + 5 (#dist-1) + 4 (#codelen-4) *)
 				t := s.buf MOD 4000H;
-				s.block.nlit := INTEGER(257 + t MOD 20H); t := t DIV 20H;
+				s.block.nlit := SIGNED16(257 + t MOD 20H); t := t DIV 20H;
 				s.block.ndist := SIGNED8(1 + t MOD 20H); t := t DIV 20H;
 				s.block.nclen := SIGNED8(4 + t);
 				IF (s.block.nlit > 286) OR (s.block.ndist > 30) THEN

@@ -34,7 +34,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 			nRecords*: LONGINT;
 			sizeRecord: LONGINT;
 			fields*: Field;
-			res*: INTEGER (** Done, CorruptedFile, OutOfRange, RecordDeleted *)
+			res*: SIGNED16 (** Done, CorruptedFile, OutOfRange, RecordDeleted *)
 		END;
 
 	PROCEDURE ReadDate(VAR R: Reader; VAR date: LONGINT);
@@ -53,7 +53,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 		Files.Read(R.R, ch); i := ASH(ORD(ch), 24) + i
 	END ReadLInt;
 
-	PROCEDURE ReadInt(VAR R: Reader; VAR i: INTEGER);
+	PROCEDURE ReadInt(VAR R: Reader; VAR i: SIGNED16);
 		VAR ch: CHAR;
 	BEGIN
 		Files.Read(R.R, ch); i := ORD(ch);
@@ -64,7 +64,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 		VAR
 			field: Field;
 			i, nFields, address, width: LONGINT;
-			sizeHead, sizeRecord: INTEGER;
+			sizeHead, sizeRecord: SIGNED16;
 			ch: CHAR;
 		PROCEDURE Error;
 		BEGIN
@@ -130,7 +130,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 	END Set;
 
 	PROCEDURE ToDate(VAR R: Reader; VAR value: FieldValue);
-		VAR y, m, d: INTEGER;
+		VAR y, m, d: SIGNED16;
 	BEGIN
 		d := ORD(value.character[6])-ORD("0");
 		d := 10*d+ORD(value.character[7])-ORD("0");

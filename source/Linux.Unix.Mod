@@ -362,7 +362,7 @@ TYPE
 	Dirent* = POINTER {UNSAFE, UNTRACED} TO RECORD
 				ino-		: ino_t;
 				off-		: off_t;
-				reclen-	: INTEGER;
+				reclen-	: SIGNED16;
 				typ-		: CHAR;
 				name-	: (*array of*) CHAR;
 			END;
@@ -954,7 +954,7 @@ VAR
 	END Dlsym;
 
 	PROCEDURE Dlopen*( CONST libname: ARRAY OF CHAR;  mode: LONGINT ): ADDRESS;
-	VAR h: ADDRESS;  i, j, k: INTEGER;
+	VAR h: ADDRESS;  i, j, k: SIGNED16;
 		p: ARRAY 256 OF CHAR;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF libname[0] = '/' THEN  h := Glue.dlopen( ADDRESSOF( libname ), mode );
@@ -991,7 +991,7 @@ VAR
 	END GetArg;
 
 	PROCEDURE GetArgval*(  CONST argName: ARRAY OF CHAR;  VAR val: ARRAY OF CHAR );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 		buf: ARRAY 40 OF CHAR;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		i := 1;
@@ -1006,11 +1006,11 @@ VAR
 
 
 	PROCEDURE getSysinfo;
-	VAR res: WORD;  p: INTEGER;
+	VAR res: WORD;  p: SIGNED16;
 		buf: ARRAY 4096 OF CHAR;
 
-		PROCEDURE copy( VAR p: INTEGER;  VAR dest: ARRAY OF CHAR );
-		VAR i: INTEGER;
+		PROCEDURE copy( VAR p: SIGNED16;  VAR dest: ARRAY OF CHAR );
+		VAR i: SIGNED16;
 		BEGIN {UNCOOPERATIVE, UNCHECKED}
 			WHILE buf[p] <= ' ' DO  INC( p )  END;
 			i := 0;

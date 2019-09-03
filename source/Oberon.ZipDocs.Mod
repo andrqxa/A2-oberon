@@ -26,14 +26,14 @@ MODULE ZipDocs IN Oberon; (** portable *)	(* ejz  *)
 		END;
 	END GetArcName;
 
-	PROCEDURE doExtract(action: INTEGER);
+	PROCEDURE doExtract(action: SIGNED16);
 	VAR
 		S: Texts.Scanner; T, T2: Texts.Text; beg, end, time: LONGINT;
 		D: Documents.Document;
 		arc: Zip.Archive; ent: Zip.Entry; arcname, name, tempname: ARRAY 256 OF CHAR;
 		line, res: LONGINT;
 		tempfile: Files.File;
-		res2 : INTEGER;
+		res2 : SIGNED16;
 	BEGIN
 		Oberon.GetSelection(T, beg, end, time);
 		D := Desktops.CurDoc(Gadgets.context);

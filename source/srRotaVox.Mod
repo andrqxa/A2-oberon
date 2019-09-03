@@ -41,7 +41,7 @@ PROCEDURE Shade*(VAR ray: Ray);
 VAR
 	a,b,c,dxyz:PT;
 	dc,x,y,z: REAL;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	(* advance ray to its intersection with the sphere of radius 1/2 centered in the voxel*)
 	a:=ray.lxyz;

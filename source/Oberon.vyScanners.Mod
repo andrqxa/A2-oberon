@@ -97,13 +97,13 @@ TYPE
 	tReservedTable = ARRAY maxReserved OF tName;
 
 	Scanner* = POINTER TO ScannerDesc;  (*= input redirection may switch scanner - always use as VAR parameter *)
-	tGetNext = PROCEDURE (VAR sc: Scanner): INTEGER;
+	tGetNext = PROCEDURE (VAR sc: Scanner): SIGNED16;
 	tSwitch = PROCEDURE (VAR sc: Scanner);
 
 	ScannerDesc* = RECORD (Texts.Reader)
 		(* public information *)
-		class*: INTEGER; 			(*= current token class. From token class *)
-		v*: INTEGER; 				(*= current token variant. Class dependent *)
+		class*: SIGNED16; 			(*= current token class. From token class *)
+		v*: SIGNED16; 				(*= current token variant. Class dependent *)
 		(* hooks to allow modification. These procedures are called by the scanner. *)
 		Switcher*: tSwitch; 			(*= Switch scanner input stream *)
 		GetNext*: tGetNext; 			(*= Get next token into scanner.
@@ -173,20 +173,20 @@ BEGIN	sc.ch := sc.chnext; sc.chpos := sc.chnextpos;
 END Ch;
 
 (** internal get routines, by type *)
-PROCEDURE getName (VAR sc: Scanner; pos: LONGINT;  len: INTEGER;  VAR s: ARRAY OF CHAR): BOOLEAN;
-	VAR i: INTEGER;  r: Texts.Reader; temp: BOOLEAN;
+PROCEDURE getName (VAR sc: Scanner; pos: LONGINT;  len: SIGNED16;  VAR s: ARRAY OF CHAR): BOOLEAN;
+	VAR i: SIGNED16;  r: Texts.Reader; temp: BOOLEAN;
 BEGIN
 	Texts.OpenReader(r, sc.text, pos);
-	IF len >= LEN(s) THEN len := INTEGER(LEN(s)) - 1;  temp := FALSE
+	IF len >= LEN(s) THEN len := SIGNED16(LEN(s)) - 1;  temp := FALSE
 	ELSE temp := TRUE END;
 	i := 0;  WHILE i < len DO Texts.Read(r, s[i]);  INC(i) END;
 	s[i] := 0X;
 	RETURN temp
 END getName;
 
-PROCEDURE getNumber (VAR sc: Scanner; pos: LONGINT;  len: INTEGER;
+PROCEDURE getNumber (VAR sc: Scanner; pos: LONGINT;  len: SIGNED16;
 neg: BOOLEAN; VAR x: LONGINT): BOOLEAN;
-	VAR i: INTEGER;  r: Texts.Reader;  res: BOOLEAN; c: CHAR;
+	VAR i: SIGNED16;  r: Texts.Reader;  res: BOOLEAN; c: CHAR;
 BEGIN
 	(*! add error check and perform proper test *)
 	Texts.OpenReader(r, sc.text, pos);
@@ -200,9 +200,9 @@ BEGIN
 END getNumber;
 
 
-PROCEDURE getReal (VAR sc: Scanner; pos: LONGINT;  len: INTEGER;
+PROCEDURE getReal (VAR sc: Scanner; pos: LONGINT;  len: SIGNED16;
 neg: BOOLEAN; VAR x: REAL): BOOLEAN;
-	VAR i: INTEGER;  r: Texts.Reader;  more, okSoFar, negex: BOOLEAN; c: CHAR; pre, post, exp, pow: LONGINT;
+	VAR i: SIGNED16;  r: Texts.Reader;  more, okSoFar, negex: BOOLEAN; c: CHAR; pre, post, exp, pow: LONGINT;
 	(*	xx:ARRAY 2 OF CHAR; *)
 BEGIN	Texts.OpenReader(r, sc.text, pos);
 	x := 0; okSoFar := TRUE; pre := 0; post := 0; exp := 0;  more := TRUE; pow := 1; negex := FALSE;
@@ -267,14 +267,14 @@ PROCEDURE GetReal* (VAR sc: Scanner; neg: BOOLEAN; VAR x: REAL): BOOLEAN;
 BEGIN	RETURN getReal(sc, sc.curTokPos, SHORT(sc.curTokLen), neg, x)
 END GetReal;
 
-PROCEDURE ExpectName* (VAR sc: Scanner; VAR s: ARRAY OF CHAR): BOOLEAN;  VAR c: INTEGER;
+PROCEDURE ExpectName* (VAR sc: Scanner; VAR s: ARRAY OF CHAR): BOOLEAN;  VAR c: SIGNED16;
 BEGIN c := sc.GetNext(sc);
 	IF (c = ctId) THEN
 		RETURN getName(sc, sc.curTokPos, SHORT(sc.curTokLen), s)
 	ELSE RETURN FALSE END
 END ExpectName;
 
-PROCEDURE ExpectNumber* (VAR sc: Scanner; VAR x: LONGINT): BOOLEAN;  VAR c: INTEGER;  sign: BOOLEAN;
+PROCEDURE ExpectNumber* (VAR sc: Scanner; VAR x: LONGINT): BOOLEAN;  VAR c: SIGNED16;  sign: BOOLEAN;
 BEGIN 	c := sc.GetNext(sc);
 	IF (c = ctSym) & (sc.v = csMinus) & ('0' <= sc.ch) & ('9' >= sc.ch)
 	THEN sign := TRUE;  c := sc.GetNext(sc) ELSE sign := FALSE END;
@@ -284,7 +284,7 @@ BEGIN 	c := sc.GetNext(sc);
 END ExpectNumber;
 
 PROCEDURE ExpectReal* (VAR sc: Scanner; VAR x: REAL): BOOLEAN;
-	VAR c: INTEGER; sign, b: BOOLEAN;  i: LONGINT;
+	VAR c: SIGNED16; sign, b: BOOLEAN;  i: LONGINT;
 BEGIN 	c := sc.GetNext(sc);
 	IF (c = ctSym) & (sc.v = csMinus) & ('0' <= sc.ch) & ('9' >= sc.ch)
 	THEN sign := TRUE;  c := sc.GetNext(sc) ELSE sign := FALSE END;
@@ -295,19 +295,19 @@ BEGIN 	c := sc.GetNext(sc);
 END ExpectReal;
 
 PROCEDURE AddReserved
- (n: ARRAY OF CHAR; tok: INTEGER;  R: tReserved; VAR t: tChTable);
+ (n: ARRAY OF CHAR; tok: SIGNED16;  R: tReserved; VAR t: tChTable);
 BEGIN	IF R # NIL THEN COPY(n, R[tok]) END;
 	t[ORD(n[0])] := ccResStart
 END AddReserved;
 
 PROCEDURE AddReservedSym
- (n: ARRAY OF CHAR; tok: INTEGER;  R: tReserved; VAR t: tChTable);
+ (n: ARRAY OF CHAR; tok: SIGNED16;  R: tReserved; VAR t: tChTable);
 BEGIN	IF R # NIL THEN COPY(n, R[tok]) END;
 	t[ORD(n[0])] := ccResSym
 END AddReservedSym;
 
 PROCEDURE SetupDefaults;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 BEGIN
 	FOR i := 0 TO 255 DO DefaultStart[i] := ccNOOP END; (* default *)
 	FOR i := ORD("A") TO ORD("Z") DO DefaultStart[i] := ccAlpha END;
@@ -354,7 +354,7 @@ BEGIN
 END SetupDefaults;
 
 PROCEDURE GetCurTok (VAR sc: Scanner);
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 BEGIN	i := 0;  sc.curTokid[i] := sc.ch; INC(i); 	sc.curTokPos := sc.chpos;
 	WHILE (sc.ch # 0X) & (sc.Stop[ORD(sc.ch)] = ccNOOP) & (i<maxNameLen) DO
 		Ch(sc); sc.curTokid[i] := sc.ch; INC(i);
@@ -452,7 +452,7 @@ BEGIN	IF ~IsSym(sc) THEN sc.v := csAny	END
 END Sym;
 
 PROCEDURE IsComment (VAR sc: Scanner): BOOLEAN;
-	VAR commentlevel: INTEGER;
+	VAR commentlevel: SIGNED16;
 BEGIN
 
 		IF  (sc.chnext = "*") THEN
@@ -481,16 +481,16 @@ BEGIN
 	RETURN FALSE
 END IsReserved;
 
-PROCEDURE StopGet(VAR sc: Scanner): INTEGER;
+PROCEDURE StopGet(VAR sc: Scanner): SIGNED16;
 BEGIN
 	sc.eot := TRUE; sc.class := ctEOT; sc.chnext := EOT;
 	RETURN ctEOT;
 END StopGet;
 
 
-PROCEDURE DefaultGetNext (VAR sc: Scanner): INTEGER;
+PROCEDURE DefaultGetNext (VAR sc: Scanner): SIGNED16;
 	(*= Scan in next token and return token class *)
-	VAR StartClass: INTEGER;
+	VAR StartClass: SIGNED16;
 	lastpos: LONGINT;
 BEGIN
 	sc.class := ctStuff; lastpos := sc.chpos; sc.curTokid[0] := 0X;
@@ -582,7 +582,7 @@ BEGIN
 	OpenScanner(sc, text, 0, MAX(LONGINT))
 END OpenNamedScanner;
 
-PROCEDURE NextToken* (VAR sc: Scanner): INTEGER;
+PROCEDURE NextToken* (VAR sc: Scanner): SIGNED16;
 	(*= scan; return token class *)
 BEGIN
 	sc.class := sc.GetNext(sc);
@@ -597,7 +597,7 @@ PROCEDURE SuperSwitch (VAR sc: Scanner);
 upon * insert switch to marked viewer
 upon  ^, switch permanent  *)
 (*! needs strict testing *)
-VAR scnew: Scanner; dummy: INTEGER;
+VAR scnew: Scanner; dummy: SIGNED16;
 BEGIN
 	CASE sc.v OF
 		csArrow: NewScanner(scnew); OpenSelXScanner(scnew);  IF scnew # NIL THEN sc := scnew END;   (* fof 0103xx *)
@@ -636,7 +636,7 @@ END vyScanners.
 Generic scanner model for voyager. The scanner takes a stream of characters and splits it into tokens. Tokens have a class (see CONST token classes) and, depending on their class, a variant.
 
 Basic usage:
-VAR sc:vyScanners.Scanner;class:INTEGER;
+VAR sc:vyScanners.Scanner;class:SIGNED16;
 ...
 vyScanners.NewScanner(sc);	(* create a new scanner variable, and initialize it *)
 vyScanners.OpenScanner(sc,t,beg,end);	(* open on Text t for range [beg,end[ *)
@@ -657,7 +657,7 @@ END; (* Case *)
 UNTIL sc.class=ctEOT; (* or some other stop condition *)
 
 A typical usage is:
-VAR sc:vyScanners.Scanner;class:INTEGER;
+VAR sc:vyScanners.Scanner;class:SIGNED16;
 name:tName;x:REAL; l:LONGINT; neg.negold,ok:BOOLEAN;
 ...
 vyScanners.NewScanner(sc);	(* create a new scanner variable, and initialize it *)

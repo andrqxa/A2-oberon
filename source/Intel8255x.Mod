@@ -150,7 +150,7 @@ TYPE
 			(* set data field *)
 			SYSTEM.MOVE(ADDRESSOF(dst[0]), actAdr + DataOfs, 6);	(* the first 6 bytes of data field are dst address *)
 			SYSTEM.MOVE(ADDRESSOF(local[0]), actAdr + DataOfs + 6, 6);
-			SYSTEM.PUT16(actAdr + DataOfs + 12, ROT(SYSTEM.VAL(INTEGER, SHORT(type)), 8));
+			SYSTEM.PUT16(actAdr + DataOfs + 12, ROT(SYSTEM.VAL(SIGNED16, SHORT(type)), 8));
 			i := 14;
 			IF h3len > 0 THEN SYSTEM.MOVE(ADDRESSOF(l3hdr[0]), actAdr + DataOfs + i, h3len); INC(i, h3len) END;
 			IF h4len > 0 THEN SYSTEM.MOVE(ADDRESSOF(l4hdr[0]), actAdr + DataOfs + i, h4len); INC(i, h4len) END;
@@ -276,7 +276,7 @@ TYPE
 		PROCEDURE SetMACAddress(VAR cmd: DataBlock);
 		CONST
 			MacAdrBase = 0;
-		VAR reg, i: INTEGER;
+		VAR reg, i: SIGNED16;
 		BEGIN
 			(* read permanent MAC address *)
 			FOR i := 0 TO 2 DO
@@ -506,7 +506,7 @@ TYPE
 			SYSTEM.PUT32(base + SCBGenPtr, val);
 		END WriteSCBGenPtr;
 
-		PROCEDURE ReadEEPROM(reg: INTEGER; VAR res: INTEGER);
+		PROCEDURE ReadEEPROM(reg: SIGNED16; VAR res: SIGNED16);
 		CONST
 			EESK = 0;
 			EECS = 1;
@@ -515,7 +515,7 @@ TYPE
 			ReadOpcode = 6;
 		VAR
 			x: SET;
-			bits: INTEGER;
+			bits: SIGNED16;
 
 			PROCEDURE RaiseClk(VAR x: SET);
 			VAR dummy: LONGINT;
@@ -535,9 +535,9 @@ TYPE
 				Delay(1);
 			END LowerClk;
 
-			PROCEDURE ShiftOutBits(data, count: INTEGER);
+			PROCEDURE ShiftOutBits(data, count: SIGNED16);
 			VAR
-				mask: INTEGER;
+				mask: SIGNED16;
 				x: SET;
 				dummy: LONGINT;
 			BEGIN
@@ -561,10 +561,10 @@ TYPE
 				SYSTEM.PUT16(base + SCBEeprom, SHORT(SYSTEM.VAL(LONGINT, x)));
 			END ShiftOutBits;
 
-			PROCEDURE ShiftInBits(): INTEGER;
+			PROCEDURE ShiftInBits(): SIGNED16;
 			VAR
 				x: SET;
-				d, i: INTEGER;
+				d, i: SIGNED16;
 			BEGIN
 				x := GetEEPROMReg();
 				EXCL(x, EEDO); EXCL(x, EEDI);
@@ -595,10 +595,10 @@ TYPE
 				returns number of bits in eeprom address
 				typically 6 or 8 bits according to eeprom size of 64 or 256 registers
 			*)
-			PROCEDURE GetEEPROMAdrSize(): INTEGER;
+			PROCEDURE GetEEPROMAdrSize(): SIGNED16;
 			VAR
 				x: SET;
-				size: INTEGER;
+				size: SIGNED16;
 				dummy: LONGINT;
 				err: BOOLEAN;
 			BEGIN

@@ -78,14 +78,14 @@ TYPE
 	String = Strings.String;
 
 	ACKRec* = POINTER TO RECORD
-		seqNum*: INTEGER;
+		seqNum*: SIGNED16;
 	END;
 
 	Client* = OBJECT
 	VAR
 		ip*: IP.Adr;
 		port*: LONGINT;
-		inSeqNum*, outSeqNum*: INTEGER;
+		inSeqNum*, outSeqNum*: SIGNED16;
 		uin*: LONGINT;
 
 		keepAliveTimer*: Kernel.MilliTimer;
@@ -413,7 +413,7 @@ TYPE
 
 PROCEDURE Code (s: ARRAY OF CHAR): LONGINT;
 VAR
-	i: INTEGER; a, b, c: LONGINT;
+	i: SIGNED16; a, b, c: LONGINT;
 BEGIN
 	a := 0; b := 0; i := 0;
 	WHILE s[i] # 0X DO
@@ -424,7 +424,7 @@ BEGIN
 	RETURN b * 65536 + a
 END Code;
 
-PROCEDURE ServerPacketInit* (command, seqnum: INTEGER; buf: Buffer);
+PROCEDURE ServerPacketInit* (command, seqnum: SIGNED16; buf: Buffer);
 BEGIN
 	buf.Clear;
 	buf.AddInt (VERSION, 2);
@@ -432,24 +432,24 @@ BEGIN
 	buf.AddInt (seqnum, 2);
 END ServerPacketInit;
 
-PROCEDURE ClientPacketInit* (command, seqnum: INTEGER; uin: LONGINT; buf: Buffer);
+PROCEDURE ClientPacketInit* (command, seqnum: SIGNED16; uin: LONGINT; buf: Buffer);
 BEGIN
 	ServerPacketInit (command, seqnum, buf);
 	buf.AddInt (uin, 4);
 END ClientPacketInit;
 
-PROCEDURE BufGetSInt* (buf: String; VAR receiveBufOffset: LONGINT): INTEGER;
+PROCEDURE BufGetSInt* (buf: String; VAR receiveBufOffset: LONGINT): SIGNED16;
 VAR
-	n: INTEGER;
+	n: SIGNED16;
 BEGIN
 	n := ORD (buf^[receiveBufOffset]);
 	INC (receiveBufOffset);
 	RETURN n;
 END BufGetSInt;
 
-PROCEDURE BufGetInt* (buf: String; VAR receiveBufOffset: LONGINT): INTEGER;
+PROCEDURE BufGetInt* (buf: String; VAR receiveBufOffset: LONGINT): SIGNED16;
 VAR
-	b, n, i: INTEGER;
+	b, n, i: SIGNED16;
 BEGIN
 	i := 0; b := 1; n := 0;
 	WHILE i < 2 DO
@@ -463,7 +463,7 @@ END BufGetInt;
 
 PROCEDURE BufGetLInt* (buf: String; VAR receiveBufOffset: LONGINT): LONGINT;
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 	b, n: LONGINT;
 BEGIN
 	i := 0; b := 1; n := 0;
@@ -488,7 +488,7 @@ BEGIN
 	RETURN string;
 END BufGetString;
 
-PROCEDURE isNextSeqNum* (current, previous: INTEGER): BOOLEAN;
+PROCEDURE isNextSeqNum* (current, previous: SIGNED16): BOOLEAN;
 BEGIN
 	IF (previous < current) OR ((previous > current) & (previous > 0) & (current < 0))  THEN
 		RETURN TRUE;
@@ -497,7 +497,7 @@ BEGIN
 	END;
 END isNextSeqNum;
 
-PROCEDURE SeqNumInACKList* (reqList: List; seqNum: INTEGER;
+PROCEDURE SeqNumInACKList* (reqList: List; seqNum: SIGNED16;
 	VAR req: ACKRec): BOOLEAN;
 VAR
 	i: LONGINT;
@@ -515,7 +515,7 @@ BEGIN
 	RETURN FALSE;
 END SeqNumInACKList;
 
-PROCEDURE CommandDecode* (command: INTEGER; VAR str: ARRAY OF CHAR);
+PROCEDURE CommandDecode* (command: SIGNED16; VAR str: ARRAY OF CHAR);
 BEGIN
 
 	CASE command OF

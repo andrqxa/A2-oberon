@@ -190,42 +190,42 @@ TYPE
 
 		(** Reset and enable the specified port *)
 		PROCEDURE ResetAndEnablePort*(port : LONGINT) : BOOLEAN;
-		VAR status : INTEGER; mtimer : Kernel.MilliTimer;
+		VAR status : SIGNED16; mtimer : Kernel.MilliTimer;
 		BEGIN
 			(* reset port *)
-			Machine.Portin16(ports[port], SYSTEM.VAL(INTEGER, status));
-			Machine.Portout16(ports[port], SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, status) + PortReset - PortChangeMask));
+			Machine.Portin16(ports[port], SYSTEM.VAL(SIGNED16, status));
+			Machine.Portout16(ports[port], SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, status) + PortReset - PortChangeMask));
 			Wait(UsbHcdi.PortResetTime); (* at least 10ms [USB2.0spec, 11.5.1.5 Resetting] *)
-			Machine.Portout16(ports[port], SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, status) - PortReset - PortChangeMask));
+			Machine.Portout16(ports[port], SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, status) - PortReset - PortChangeMask));
 			Wait(2); (* Nowhere specified, but doesn't work without *)
-			Machine.Portin16(ports[port], SYSTEM.VAL(INTEGER, status));
+			Machine.Portin16(ports[port], SYSTEM.VAL(SIGNED16, status));
 			IF SYSTEM.VAL(SET, status) * PortReset # {} THEN RETURN FALSE; END;
 			(* enable port *)
-			Machine.Portout16(ports[port], SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, status) + PortEnabled - PortChangeMask));
+			Machine.Portout16(ports[port], SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, status) + PortEnabled - PortChangeMask));
 			Kernel.SetTimer(mtimer, UsbHcdi.PortEnableTimeout);
 			REPEAT
-				Machine.Portin16(ports[port], SYSTEM.VAL(INTEGER, status));
+				Machine.Portin16(ports[port], SYSTEM.VAL(SIGNED16, status));
 			UNTIL (SYSTEM.VAL(SET, status) * PortEnabled # {}) OR Kernel.Expired(mtimer);
 
 			(* The HC will set PortConnectStatusChange & PortEnabledChange, clear it *)
-			Machine.Portout16(ports[port], SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, status) + PortChangeMask));
+			Machine.Portout16(ports[port], SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, status) + PortChangeMask));
 
 			RETURN SYSTEM.VAL(SET, status) * PortEnabled # {};
 		END ResetAndEnablePort;
 
 		(** Disables port number <port> on this root hub *)
 		PROCEDURE DisablePort*(port : LONGINT);
-		VAR status : INTEGER; mtimer : Kernel.MilliTimer;
+		VAR status : SIGNED16; mtimer : Kernel.MilliTimer;
 		BEGIN
-			Machine.Portin16(ports[port], SYSTEM.VAL(INTEGER, status));
-			Machine.Portout16(ports[port], SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, status) - PortEnabled - PortChangeMask));
+			Machine.Portin16(ports[port], SYSTEM.VAL(SIGNED16, status));
+			Machine.Portout16(ports[port], SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, status) - PortEnabled - PortChangeMask));
 			Kernel.SetTimer(mtimer, UsbHcdi.PortEnableTimeout);
 			REPEAT
-				Machine.Portin16(ports[port], SYSTEM.VAL(INTEGER, status));
+				Machine.Portin16(ports[port], SYSTEM.VAL(SIGNED16, status));
 			UNTIL (SYSTEM.VAL(SET, status) * PortEnabled = {}) OR Kernel.Expired(mtimer);
 
 			(* The HC will set PortConnectStatusChange & PortEnabledChange, clear it *)
-			Machine.Portout16(ports[port], SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, status) + PortChangeMask));
+			Machine.Portout16(ports[port], SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, status) + PortChangeMask));
 		END DisablePort;
 
 		(**
@@ -235,10 +235,10 @@ TYPE
 		PROCEDURE GetPortStatus*(port : LONGINT; ack : BOOLEAN):SET;
 		VAR status, s : SET;
 		BEGIN
-			Machine.Portin16(ports[port], SYSTEM.VAL(INTEGER, s));
+			Machine.Portin16(ports[port], SYSTEM.VAL(SIGNED16, s));
 
 			(* reset the PortEnabledChange and the PortConnectStatusChange bit *)
-			IF ack & (s * PortChangeMask # {}) THEN Machine.Portout16(ports[port], SYSTEM.VAL(INTEGER, s)); END;
+			IF ack & (s * PortChangeMask # {}) THEN Machine.Portout16(ports[port], SYSTEM.VAL(SIGNED16, s)); END;
 
 			status := UsbHcdi.PortStatusPowered; (* UHCI root hub ports are always powered *)
 			IF s * PortCurrentConnectStatus	# {} THEN status := status + UsbHcdi.PortStatusDevicePresent END;
@@ -266,17 +266,17 @@ TYPE
 		PROCEDURE Reset;
 		BEGIN {EXCLUSIVE}
 			(* do a global reset for 50ms, disconnect all devices *)
-			Machine.Portout16(iobase + UsbCmd, SYSTEM.VAL(INTEGER, CmdGlobalReset) ); Wait (50);
-			Machine.Portout16(iobase + UsbCmd, SYSTEM.VAL(INTEGER, 0) ); Wait (10);
+			Machine.Portout16(iobase + UsbCmd, SYSTEM.VAL(SIGNED16, CmdGlobalReset) ); Wait (50);
+			Machine.Portout16(iobase + UsbCmd, SYSTEM.VAL(SIGNED16, 0) ); Wait (10);
 		END Reset;
 
 		(* Returns the current frame number; the frame number is incremented by the Host Controller at the end of each frame time;
 		 * GetFrameNumber() is used for time stamps *)
 		PROCEDURE GetFrameNumber*() : LONGINT;
-		VAR frameNumber : INTEGER;
+		VAR frameNumber : SIGNED16;
 		BEGIN
 			Machine.Portin16(iobase + FrNum, frameNumber);
-			frameNumber := SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, frameNumber) * {0..10});
+			frameNumber := SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, frameNumber) * {0..10});
 			RETURN SYSTEM.VAL(LONGINT, frameNumber);
 		END GetFrameNumber;
 
@@ -576,12 +576,12 @@ TYPE
 		BEGIN (* works without being exclusive *)
 			IF Debug.Stats THEN INC(NnofInterrupts); END;
 			IF state >= UsbHcdi.Initialized THEN (* controller is active -> handle interrupts *)
-				Machine.Portin16(iobase + UsbSts, SYSTEM.VAL(INTEGER, s));
+				Machine.Portin16(iobase + UsbSts, SYSTEM.VAL(SIGNED16, s));
 				IF s # {} THEN
 					IF Debug.Stats THEN INC(NnofInterruptsHandled); END;
 					IF Debug.Trace & Debug.traceInterrupts THEN ShowInterrupts(s); END;
 					(* reset the USB status register *)
-					Machine.Portout16(iobase + UsbSts, SYSTEM.VAL(INTEGER, s));
+					Machine.Portout16(iobase + UsbSts, SYSTEM.VAL(SIGNED16, s));
 					IF s * StatusHChalted # {} THEN KernelLog.String("UsbUhci: Error: Host Controller halted"); KernelLog.Ln; SetState(UsbHcdi.Halted); END;
 					IF s * StatusProcessError # {} THEN KernelLog.String("UsbUhci: Host Controller process error"); KernelLog.Ln; END;
 					IF s * StatusSystemError # {} THEN KernelLog.String("UsbUhci: Host system error"); KernelLog.Ln; END;
@@ -845,26 +845,26 @@ TYPE
 		VAR t : LONGINT; s : SET;
 		BEGIN
 			(* Perform host controller reset *)
-			Machine.Portout16(iobase + UsbCmd, SYSTEM.VAL(INTEGER, CmdHostControllerReset) );
+			Machine.Portout16(iobase + UsbCmd, SYSTEM.VAL(SIGNED16, CmdHostControllerReset) );
 
 			(* The host controller will clear the CmdHostControllerReset Bit after about 64 bit times *)
 			t := 10000;
 			REPEAT
-				Machine.Portin16(iobase + UsbCmd, SYSTEM.VAL(INTEGER, s));
+				Machine.Portin16(iobase + UsbCmd, SYSTEM.VAL(SIGNED16, s));
 				DEC( t );
 			UNTIL ((t = 0) OR ( ~(1 IN s)));
 
 			IF t = 0 THEN (* ERROR: Host Controller should have cleared the Bit !! *) RETURN FALSE END;
 
 			(* Enable all interrupts, but remember: perhaps they are not being routed by the PIIX4 *)
-			Machine.Portout16(iobase + UsbIntr, SYSTEM.VAL(INTEGER, IntShortPacket + IntIOC + IntResume + IntTimeoutCRC) );
+			Machine.Portout16(iobase + UsbIntr, SYSTEM.VAL(SIGNED16, IntShortPacket + IntIOC + IntResume + IntTimeoutCRC) );
 
 			(* We start at frame 0 and also set the framelistbase address *)
-			Machine.Portout16(iobase + FrNum, SYSTEM.VAL(INTEGER, 0) ); (* 16 bit! *)
+			Machine.Portout16(iobase + FrNum, SYSTEM.VAL(SIGNED16, 0) ); (* 16 bit! *)
 			Machine.Portout32(iobase + FlBaseAdr, SYSTEM.VAL(LONGINT, framelist.framelistbase));
 
 			(* Start the controller, set max-packet size (64byte) and set the pseudo-semaphore which we don't need *)
-			Machine.Portout16(iobase + UsbCmd, SYSTEM.VAL(INTEGER, CmdRunStop + CmdConfigureFlag + CmdMaxPacket) );
+			Machine.Portout16(iobase + UsbCmd, SYSTEM.VAL(SIGNED16, CmdRunStop + CmdConfigureFlag + CmdMaxPacket) );
 
 			SetState(UsbHcdi.Operational);
 			RETURN TRUE;
@@ -916,11 +916,11 @@ TYPE
 		BEGIN
 			IF Debug.Trace THEN
 			Diag^;
-			Machine.Portin16 (iobase + FrNum, SYSTEM.VAL(INTEGER, framenum));
+			Machine.Portin16 (iobase + FrNum, SYSTEM.VAL(SIGNED16, framenum));
 			framenum := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, framenum) * {0..10});
 			KernelLog.String("  Frame 0"); KernelLog.Hex(framenum, 8);
 			KernelLog.String("    LastStatus: ");
-			Machine.Portin16 (iobase + UsbSts, SYSTEM.VAL(INTEGER, s));
+			Machine.Portin16 (iobase + UsbSts, SYSTEM.VAL(SIGNED16, s));
 			IF s # {} THEN
 				IF s * StatusHChalted # {} THEN KernelLog.String ("[HChalted]"); END;
 				IF s * StatusProcessError # {} THEN KernelLog.String ("[Process Error]"); END;
@@ -933,7 +933,7 @@ TYPE
 				KernelLog.String("[ok]"); KernelLog.Ln;
 			END;
 			KernelLog.String ("    IRQ enable status: ");
-			Machine.Portin16 (iobase + UsbIntr, SYSTEM.VAL(INTEGER, s));
+			Machine.Portin16 (iobase + UsbIntr, SYSTEM.VAL(SIGNED16, s));
 			IF s * IntShortPacket # {} THEN KernelLog.String("[Short Packet]"); END;
 			IF s * IntIOC # {} THEN KernelLog.String ("[IOC]"); END;
 			IF s * IntResume # {} THEN KernelLog.String ("[Resume]"); END;

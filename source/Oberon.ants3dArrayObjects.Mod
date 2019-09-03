@@ -193,13 +193,13 @@ VAR
 		a := NewArray( w, h, d );  Gen;  A := newobject;  Init( A );  A.depth := depth;  EmbedArray( a, A );  RETURN A
 	END NewObject;
 
-	PROCEDURE Min( x, y: INTEGER ): INTEGER;
+	PROCEDURE Min( x, y: SIGNED16 ): SIGNED16;
 	BEGIN
 		IF x < y THEN RETURN x ELSE RETURN y END
 	END Min;
 
-	PROCEDURE ChangeSize( o: tObject;  w, h, d: INTEGER );
-	VAR oldarray: tArray;  oldw, oldh, oldd, y, l: INTEGER;
+	PROCEDURE ChangeSize( o: tObject;  w, h, d: SIGNED16 );
+	VAR oldarray: tArray;  oldw, oldh, oldd, y, l: SIGNED16;
 	BEGIN
 		oldw := SHORT( o.w );  oldh := SHORT( o.h );  oldd := SHORT( o.d );
 		IF (w # o.w) OR (h # o.h) OR (d # o.d) THEN  (* ? preserve pict / array when shrinked ? *)
@@ -292,7 +292,7 @@ VAR
 	END LoadA;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR w, h, d, depth: LONGINT;  version: INTEGER;  objsub: Objects.Object;
+	VAR w, h, d, depth: LONGINT;  version: SIGNED16;  objsub: Objects.Object;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN

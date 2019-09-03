@@ -10,13 +10,13 @@ CONST
 
 VAR
 	R*: Files.Rider;
-	E: INTEGER;
+	E: SIGNED16;
 	elem: ARRAY 32, 32 OF CHAR;
 	W, X: Texts.Writer;
 	L: Objects.Library;
 	styleOk: BOOLEAN;
 	styles: ARRAY MaxStyles OF TextGadgets.Style;
-	nofStyles: INTEGER;
+	nofStyles: SIGNED16;
 
 	PROCEDURE Msg(s: ARRAY OF CHAR; cr: BOOLEAN);
 	BEGIN Texts.WriteString(X, s);
@@ -30,10 +30,10 @@ VAR
 		WHILE len > 0 DO Files.Read(R, ch); Texts.Write(W, ch); DEC(len) END
 	END WriteText;
 
-	PROCEDURE Parc(VAR R: Files.Rider; n: INTEGER);
+	PROCEDURE Parc(VAR R: Files.Rider; n: SIGNED16);
 	VAR
 		style: TextGadgets.Style;
-		ref: INTEGER;
+		ref: SIGNED16;
 		i, tabs: LONGINT;
 		opts: LONGINT;
 		x: LONGINT;
@@ -71,8 +71,8 @@ VAR
 		Texts.SetFont(W, L); Texts.Write(W, CHR(ref))
 	END Parc;
 
-	PROCEDURE PutObj(F: Display.Frame; w, h: INTEGER);
-		VAR ref: INTEGER; M: Display.ModifyMsg;
+	PROCEDURE PutObj(F: Display.Frame; w, h: SIGNED16);
+		VAR ref: SIGNED16; M: Display.ModifyMsg;
 	BEGIN
 		IF (F.W # w) OR (F.H # h) THEN
 			M.id := Display.extend; M.mode := Display.state;
@@ -88,7 +88,7 @@ VAR
 	PROCEDURE Elem(VAR R, S: Files.Rider; n: LONGINT);
 	VAR w, h, pos: LONGINT;
 		ch: CHAR;
-		proc, cmd: ARRAY 32 OF CHAR; res: INTEGER;
+		proc, cmd: ARRAY 32 OF CHAR; res: SIGNED16;
 	BEGIN Files.ReadLInt(R, w); Files.ReadLInt(R, h); Files.Read(R, ch);
 		IF ORD(ch) = E THEN
 			Files.ReadString(R, elem[E]); Files.ReadString(R, proc); Msg("   ", FALSE); Msg(elem[E], TRUE);
@@ -149,7 +149,7 @@ VAR
 	END Conv;
 
 	PROCEDURE Backup(name: ARRAY OF CHAR);
-	VAR bak: ARRAY 32 OF CHAR; i, res: INTEGER;
+	VAR bak: ARRAY 32 OF CHAR; i, res: SIGNED16;
 	BEGIN i := 0;
 		WHILE name[i] # 0X DO bak[i] := name[i]; INC(i) END;
 		bak[i] := "."; bak[i+1] := "B"; bak[i+2] := "a"; bak[i+3] := "k"; bak[i+4] := 0X;
@@ -162,7 +162,7 @@ VAR
 		S: Texts.Scanner; T: Texts.Text;
 		name: ARRAY 32 OF CHAR; x, y: CHAR;
 		bak: BOOLEAN;
-		i: INTEGER;
+		i: SIGNED16;
 	BEGIN
 		styleOk := FALSE; bak := FALSE;
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);

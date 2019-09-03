@@ -140,7 +140,7 @@ BEGIN
 END InitDialog;
 
 PROCEDURE ExecuteDialog*;
-VAR context,fileobj: Objects.Object; time: LONGINT; filestring: ARRAY 256 OF CHAR; res: INTEGER;
+VAR context,fileobj: Objects.Object; time: LONGINT; filestring: ARRAY 256 OF CHAR; res: SIGNED16;
 BEGIN
 	 context := Gadgets.context;
 	 Attributes.GetInt(context,"dialogtime",time);
@@ -167,7 +167,7 @@ END ExecuteDialog;
 
 
 PROCEDURE ShowDialog*(d: dialog);
-VAR res: INTEGER;
+VAR res: SIGNED16;
 BEGIN
 	thed := d;
 	 vyHost.CallWString("Desktops.OpenDoc","antsFiles.Panel",FALSE,res);
@@ -197,11 +197,11 @@ PROCEDURE TypesTypeOf*(p: ANY): Type;
 BEGIN RETURN vyPortability.TypeOf(p)
 END TypesTypeOf;
 
-PROCEDURE TypesLevelOf*(t: Type): INTEGER;
+PROCEDURE TypesLevelOf*(t: Type): SIGNED16;
 BEGIN RETURN SHORT(SYSTEM.VAL(LONGINT, t.flags) MOD AosModules.MaxTags)
 END TypesLevelOf;
 
-PROCEDURE TypesBaseOf*(t: Type; level: INTEGER): Type;
+PROCEDURE TypesBaseOf*(t: Type; level: SIGNED16): Type;
 (*not failsafe, but ok since is system part*)
 BEGIN
 	SYSTEM.GET(SYSTEM.VAL(LONGINT,t.tag)-8 -4*level, t);

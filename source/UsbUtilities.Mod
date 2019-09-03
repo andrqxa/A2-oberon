@@ -56,7 +56,7 @@ BEGIN
 END DecodeChar;
 
 PROCEDURE EncodeChar(ucs: LONGINT; VAR str: ARRAY OF CHAR; VAR i: SIZE): BOOLEAN;
-VAR len, j: SIZE; byte, mask, max: INTEGER; buf: ARRAY 6 OF CHAR;
+VAR len, j: SIZE; byte, mask, max: SIGNED16; buf: ARRAY 6 OF CHAR;
 BEGIN
 	len := LEN(str);
 

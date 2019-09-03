@@ -114,7 +114,7 @@ VAR
 	PROCEDURE AuthorizePasswd( ssh: Connection; CONST host, user: ARRAY OF CHAR ): BOOLEAN;
 	VAR
 		msg: ARRAY 2048 OF CHAR;
-		len: SIZE;  try: INTEGER;
+		len: SIZE;  try: SIGNED16;
 	BEGIN
 		try := 1;
 		RequestConnPW( ssh, user, host, try );

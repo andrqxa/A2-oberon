@@ -33,8 +33,8 @@ TYPE
 		col-: ARRAY 256 OF Colors.Color;
 		dcol-: ARRAY 256 OF LONGINT;   (* Cache for Display *)
 		icol-: ARRAY 256 OF Images.Pixel;   (* Cache for Images *)
-		used*: INTEGER;
-		first*, last*: INTEGER
+		used*: SIGNED16;
+		first*, last*: SIGNED16
 	END;
 	NewColMsg* = RECORD (Objects.ObjMsg)
 		pal*: Palette
@@ -47,7 +47,7 @@ VAR
 	standard1*, standard2*, current*: Palette;  index: Colors.Index;   (* current needed for Plot Routines to be called by Oberon.Call *)
 
 	PROCEDURE PHandleFileMsg( obj: Palette;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  i: INTEGER;  r, g, b: REAL;  version: INTEGER;
+	VAR objsub: Objects.Object;  i: SIGNED16;  r, g, b: REAL;  version: SIGNED16;
 	BEGIN
 		IF msg.id = Objects.store THEN
 			Files.WriteInt( msg.R, 0 );   (* version id *)
@@ -93,7 +93,7 @@ VAR
 	END PHandleAttributes;
 
 	PROCEDURE PHandler*( obj: Objects.Object;  VAR msg: Objects.ObjMsg );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		WITH obj: Palette DO
 			IF msg IS vyBase.UpdateMessage THEN
@@ -124,7 +124,7 @@ VAR
 		NEW( p );  p.handle := PHandler;  Objects.NewObj := p;
 	END PNew;
 
-	PROCEDURE SetCol*( p: Palette;  index: INTEGER;  col: LONGINT );
+	PROCEDURE SetCol*( p: Palette;  index: SIGNED16;  col: LONGINT );
 	VAR r, g, b: REAL;
 	BEGIN
 		IF index < p.used THEN
@@ -133,14 +133,14 @@ VAR
 		END;
 	END SetCol;
 
-	PROCEDURE GetRGBI( c: Colors.Color;  VAR r, g, b: INTEGER );
+	PROCEDURE GetRGBI( c: Colors.Color;  VAR r, g, b: SIGNED16 );
 	VAR rr, gr, br: REAL;
 	BEGIN
 		Colors.GetRGB( c, rr, gr, br );  r := SHORT( ENTIER( rr * 255 + 0.5 ) );  g := SHORT( ENTIER( gr * 255 + 0.5 ) );  b := SHORT( ENTIER( br * 255 + 0.5 ) );
 	END GetRGBI;
 
-	PROCEDURE RGBPath*( p: Palette;  first, last: INTEGER;  r1, g1, b1, r2, g2, b2: REAL );
-	VAR r, g, b: REAL;  i: INTEGER;
+	PROCEDURE RGBPath*( p: Palette;  first, last: SIGNED16;  r1, g1, b1, r2, g2, b2: REAL );
+	VAR r, g, b: REAL;  i: SIGNED16;
 	BEGIN
 		FOR i := first TO last DO
 			r := r1 + (r2 - r1) * (i - first) / (last - first);  g := g1 + (g2 - g1) * (i - first) / (last - first);
@@ -151,8 +151,8 @@ VAR
 		vyBase.Update( p );
 	END RGBPath;
 
-	PROCEDURE ShiftPath*( p: Palette;  tofirst, tolast: INTEGER );
-	VAR r, g, b: REAL;  i: INTEGER;  r1, r2, g1, g2, b1, b2: REAL;
+	PROCEDURE ShiftPath*( p: Palette;  tofirst, tolast: SIGNED16 );
+	VAR r, g, b: REAL;  i: SIGNED16;  r1, r2, g1, g2, b1, b2: REAL;
 	BEGIN
 		Colors.GetRGB( p.col[p.first], r1, g1, b1 );  Colors.GetRGB( p.col[p.last], r2, g2, b2 );  p.first := tofirst;  p.last := tolast;
 		FOR i := p.first TO p.last DO
@@ -164,7 +164,7 @@ VAR
 	END ShiftPath;
 
 	PROCEDURE PathFromTo*( from, to: Palette );
-	VAR this, i: INTEGER;  r, g, b: REAL;  dcol: LONGINT;
+	VAR this, i: SIGNED16;  r, g, b: REAL;  dcol: LONGINT;
 	BEGIN
 		FOR i := to.first TO to.last DO
 			this := SHORT( ENTIER( from.first + (i - to.first) / (to.last - to.first) * (from.last - from.first) + 0.5 ) );
@@ -191,21 +191,21 @@ VAR
 	END CopyPalette;
 
 	PROCEDURE InitConversion*( depth: LONGINT;  VAR p: Palette );
-	VAR i: INTEGER;
-		r, g, b: ARRAY 256 OF INTEGER;
+	VAR i: SIGNED16;
+		r, g, b: ARRAY 256 OF SIGNED16;
 	BEGIN
 		NEW( p );  InitPalette( p );  p.first := 0;  p.last := SHORT( depth - 1 );  DefaultPath( p );
 		FOR i := 0 TO p.last DO GetRGBI( p.col[i], r[i], g[i], b[i] );  END;
 		Colors.MakeIndex( index, 8, p.last + 1, r, g, b );   (* fof, changed Bits from 4 to 8 *)
 	END InitConversion;
 
-	PROCEDURE Convert*( r, g, b: INTEGER ): LONGINT;
+	PROCEDURE Convert*( r, g, b: SIGNED16 ): LONGINT;
 	BEGIN
 		RETURN Colors.Match( index, 8, r, g, b );
 	END Convert;
 
 	PROCEDURE InitPalette*( p: Palette );
-	VAR i: INTEGER;  r, g, b: REAL;
+	VAR i: SIGNED16;  r, g, b: REAL;
 	BEGIN
 		p.handle := PHandler;
 		FOR i := 0 TO 255 DO

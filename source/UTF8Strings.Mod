@@ -18,7 +18,7 @@ VAR
 (** Encode one UCS-32 value in ucs into one well-formed UTF-8 character at str[p..]. The parameter p is incremented by the number of
 	characters needed to encode the UCS-32 value. *)
 PROCEDURE EncodeChar*(ucs: LONGINT; VAR str: ARRAY OF CHAR; VAR i: SIZE): BOOLEAN;
-VAR len, j: SIZE; byte, mask, max: INTEGER;
+VAR len, j: SIZE; byte, mask, max: SIGNED16;
 	buf: ARRAY 6 OF CHAR;
 BEGIN
 	len := LEN(str);

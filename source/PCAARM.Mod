@@ -1559,7 +1559,7 @@ TYPE
 		BEGIN
 			IF (scanner.symbol = sNumber) THEN
 				REPEAT
-					IF (MIN(INTEGER) > scanner.number) OR (scanner.number > 2*MAX(INTEGER)+1) THEN
+					IF (MIN(SIGNED16) > scanner.number) OR (scanner.number > 2*MAX(SIGNED16)+1) THEN
 						Error(499) (* number too small/big *)
 					ELSE
 						PutData(scanner.number, 2)
@@ -1713,7 +1713,7 @@ TYPE
 		(* Error - reports an error to PCM *)
 		PROCEDURE Error(code: LONGINT);
 		BEGIN
-			IF (code = 499) THEN HALT(MAX(INTEGER)) END;
+			IF (code = 499) THEN HALT(MAX(SIGNED16)) END;
 			IF (scope # NIL) THEN PCM.Error(code, scanner.position, "")
 			ELSE
 				KernelLog.String("Error "); KernelLog.Int(code, 0); KernelLog.String(" at position "); KernelLog.Int(scanner.position, 0);

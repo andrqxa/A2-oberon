@@ -1438,7 +1438,7 @@ TYPE
 		END DoPrefixes;
 
 		PROCEDURE GetImm (bytes: LONGINT) : LONGINT;
-			VAR ch: CHAR; byte: INTEGER;
+			VAR ch: CHAR; byte: SIGNED16;
 		BEGIN
 			IF bytes = 1 THEN (* 8 bit *)
 				ch := ReadChar();
@@ -1518,7 +1518,7 @@ TYPE
 		END Type1;
 
 (*		PROCEDURE Add(opcode : IA32Opcode);
-			VAR reg, base, inx, d: INTEGER; scale, mode: SIGNED8; disp, imm: LONGINT;
+			VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
 		BEGIN
 			Type1(opcode,  mode, d, reg, base, inx, scale, disp, imm);
 			opcode.instr := opADD

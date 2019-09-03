@@ -31,7 +31,7 @@ MODULE GfxBuffer IN Oberon; (** portable *)	(* eos  *)
 		END;
 
 		RegData = RECORD (GfxRegions.EnumData)
-			dx, dy: INTEGER;
+			dx, dy: SIGNED16;
 			bc: Context;
 			mode: Images.Mode;
 		END;
@@ -43,14 +43,14 @@ MODULE GfxBuffer IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Rendering ---*)
 
-	PROCEDURE Color (llx, lly, urx, ury: INTEGER; VAR data: GfxRegions.EnumData);
+	PROCEDURE Color (llx, lly, urx, ury: SIGNED16; VAR data: GfxRegions.EnumData);
 		VAR bc: Context;
 	BEGIN
 		bc := data(RegData).bc;
 		Images.Fill(bc.img, llx, lly, urx, ury, bc.pix, Images.SrcCopy)
 	END Color;
 
-	PROCEDURE Tile (llx, lly, urx, ury: INTEGER; VAR data: GfxRegions.EnumData);
+	PROCEDURE Tile (llx, lly, urx, ury: SIGNED16; VAR data: GfxRegions.EnumData);
 		VAR bc: Context;
 	BEGIN
 		WITH data: RegData DO
@@ -60,7 +60,7 @@ MODULE GfxBuffer IN Oberon; (** portable *)	(* eos  *)
 	END Tile;
 
 	PROCEDURE Dot (rc: GfxRaster.Context; x, y: LONGINT);
-		VAR bc: Context; px, py: INTEGER; mode: Images.Mode;
+		VAR bc: Context; px, py: SIGNED16; mode: Images.Mode;
 	BEGIN
 		IF (rc.clipState = GfxRaster.In) OR
 			(rc.clipState = GfxRaster.InOut) & GfxRegions.RectInside(SHORT(x), SHORT(y), SHORT(x+1), SHORT(y+1), rc.clipReg)
@@ -127,7 +127,7 @@ MODULE GfxBuffer IN Oberon; (** portable *)	(* eos  *)
 	END ResetClip;
 
 	PROCEDURE Image (ctxt: Gfx.Context; x, y: REAL; img: Images.Image; VAR filter: GfxImages.Filter);
-		VAR bc: Context; m: GfxMatrix.Matrix; dx, dy, llx, lly, urx, ury: INTEGER; col: Images.Pixel;
+		VAR bc: Context; m: GfxMatrix.Matrix; dx, dy, llx, lly, urx, ury: SIGNED16; col: Images.Pixel;
 	BEGIN
 		bc := ctxt(Context);
 		GfxMatrix.Translate(bc.ctm, x, y, m);

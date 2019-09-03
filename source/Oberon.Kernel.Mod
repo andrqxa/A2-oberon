@@ -52,7 +52,7 @@ VAR
 	(*StackOrg* : LONGINT;*)	(** highest address on stack (single-process system) *)
 	(*bt*: LONGINT;*)	(** boot table *)
 	(*tspeed*: LONGINT;*)	(** =0: no tracing, >0: tspeed = speed of com output, <0: -tspeed = screen segment *)
-	(*tbase*: INTEGER;*)	(** trace base port, 3F8H=com1, 2F8H=com2, etc. *)
+	(*tbase*: SIGNED16;*)	(** trace base port, 3F8H=com1, 2F8H=com2, etc. *)
 	(*EnableGC*, DisableGC*: Proc;*)	(** Enable or Disable the GC *)
 	(*timer*: Proc;*)	(** for internal use *)
 	(*runtime*: ARRAY 5 OF LONGINT;*)	(** for internal use *)
@@ -178,13 +178,13 @@ END InstallLoop;*)
 	07	LPT1 or IRQ error
 *)
 
-PROCEDURE InstallIP*(p: Proc;  i: INTEGER);
+PROCEDURE InstallIP*(p: Proc;  i: SIGNED16);
 BEGIN
 END InstallIP;*)
 
 (*(** RemoveIP - Uninstall interrupt handler & disable IRQ if necessary *)
 
-PROCEDURE RemoveIP*(p: Proc;  i: INTEGER);
+PROCEDURE RemoveIP*(p: Proc;  i: SIGNED16);
 BEGIN
 END RemoveIP;*)
 
@@ -404,7 +404,7 @@ BEGIN
 		me := Objects.ActiveObject();
 		ok := (me = oberon) OR (lockedBy = me);
 	END;
-	IF ~ok THEN (* HALT(MAX(INTEGER)+1) *)
+	IF ~ok THEN (* HALT(MAX(SIGNED16)+1) *)
 		KernelLog.String("Oberon has been called before from an outside process. Don't do that!"); KernelLog.Ln;
 	END	(* to do: halt here *)
 END CheckOberonLock;

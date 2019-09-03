@@ -94,7 +94,7 @@ TYPE
 	END FrameLinks;
 
 	PROCEDURE HandleFileMsg( obj: tMean;  VAR msg: Objects.FileMsg );
-	VAR version: INTEGER;
+	VAR version: SIGNED16;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN Files.ReadInt( msg.R, version );  vyBase.objecthandle( obj, msg )

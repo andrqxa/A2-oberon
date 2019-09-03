@@ -233,7 +233,7 @@ TYPE
 					pipe.device := SELF;
 					pipe.ttPort := ttPort;
 					pipe.ttAddress := ttAddress;
-					pipe.type := SYSTEM.VAL(INTEGER,endpoint.bmAttributes *  {0,1});
+					pipe.type := SYSTEM.VAL(SIGNED16,endpoint.bmAttributes *  {0,1});
 					IF pipe.type = UsbHcdi.PipeControl THEN
 						pipe.direction := UsbHcdi.In;
 					ELSE

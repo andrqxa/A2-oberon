@@ -184,8 +184,8 @@ BEGIN
 	END
 END HandleAttributes;
 
-PROCEDURE Restore (F: Frame; Q: Display3.Mask; x, y, w, h: INTEGER);
-VAR sw, i, xx: INTEGER;
+PROCEDURE Restore (F: Frame; Q: Display3.Mask; x, y, w, h: SIGNED16);
+VAR sw, i, xx: SIGNED16;
 BEGIN
 	Display3.FilledRect3D(Q, Display3.bottomC, Display3.topC, backC, x, y, w, h, 1, Display.replace);
 	sw := (w - 2) DIV 32; xx := x + (w - 32*sw) DIV 2;
@@ -201,9 +201,9 @@ BEGIN
 END Restore;
 
 PROCEDURE Print (F: Frame; VAR M: Display.DisplayMsg);
-	VAR Q: Display3.Mask; i: LONGINT; x, y, w, h, sw: INTEGER;
+	VAR Q: Display3.Mask; i: LONGINT; x, y, w, h, sw: SIGNED16;
 
-	PROCEDURE P(x: INTEGER): INTEGER;
+	PROCEDURE P(x: SIGNED16): SIGNED16;
 	BEGIN RETURN SHORT(x * Display.Unit DIV Printer.Unit)
 	END P;
 
@@ -220,8 +220,8 @@ BEGIN
 	END
 END Print;
 
-PROCEDURE TrackFrame (F: Frame; x, y, w, h: INTEGER; VAR M: Oberon.InputMsg);
-VAR Q: Display3.Mask; keysum: SET; pos, xPos, sw: INTEGER;
+PROCEDURE TrackFrame (F: Frame; x, y, w, h: SIGNED16; VAR M: Oberon.InputMsg);
+VAR Q: Display3.Mask; keysum: SET; pos, xPos, sw: SIGNED16;
 BEGIN
 	sw := (w - 2) DIV 32; xPos := x + (w - 32*sw) DIV 2;
 	Gadgets.MakeMask(F, x, y, M.dlink, Q);
@@ -261,7 +261,7 @@ BEGIN to.val := from.val; Gadgets.CopyFrame(M, from, to)
 END CopyFrame;
 
 PROCEDURE FrameHandle* (F: Objects.Object; VAR M: Objects.ObjMsg);
-	VAR ver: LONGINT; x, y, w, h: INTEGER; F1: Frame; Q: Display3.Mask;
+	VAR ver: LONGINT; x, y, w, h: SIGNED16; F1: Frame; Q: Display3.Mask;
 BEGIN
 	WITH F: Frame DO
 		IF M IS Display.FrameMsg THEN

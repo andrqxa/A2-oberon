@@ -50,7 +50,7 @@ VAR
 	methods: Panels.Methods;
 
 PROCEDURE Parse(s: ARRAY OF CHAR; VAR l, t, r, b: LONGINT);
-VAR p: ARRAY 64 OF CHAR; i, j: INTEGER;
+VAR p: ARRAY 64 OF CHAR; i, j: SIGNED16;
 
 	PROCEDURE ReadNum(): LONGINT;
 	VAR x: LONGINT;
@@ -69,7 +69,7 @@ BEGIN
 END Parse;
 
 PROCEDURE ParseGeneral(s: ARRAY OF CHAR; VAR l, t, r, b: LONGINT; VAR lrel,trel,rrel,brel:LONGREAL);
-VAR p: ARRAY 64 OF CHAR; i, j: INTEGER;
+VAR p: ARRAY 64 OF CHAR; i, j: SIGNED16;
 
 	PROCEDURE ReadNum(VAR x:LONGINT; VAR y:LONGREAL);
 	VAR isReal:BOOLEAN;
@@ -110,7 +110,7 @@ BEGIN
 	END
 END HasGeneralConstraints;
 
-PROCEDURE SolveGadget*(PW, PH: INTEGER; f: Display.Frame; l, t, r, b: LONGINT; VAR X, Y, W, H: INTEGER);
+PROCEDURE SolveGadget*(PW, PH: SIGNED16; f: Display.Frame; l, t, r, b: LONGINT; VAR X, Y, W, H: SIGNED16);
 VAR ll, tt, rr, bb: LONGINT;
 BEGIN
 	IF l = DontCare THEN ll := f.X ELSIF l >= 0 THEN ll := l ELSE ll := PW + l END;
@@ -131,7 +131,7 @@ BEGIN
 	END
 END SolveGadget;
 
-PROCEDURE SolveGadgetGeneral*(PW, PH: INTEGER; f: Display.Frame; l, t, r, b: LONGINT; lrel,trel,rrel,brel:LONGREAL; VAR X, Y, W, H: INTEGER);
+PROCEDURE SolveGadgetGeneral*(PW, PH: SIGNED16; f: Display.Frame; l, t, r, b: LONGINT; lrel,trel,rrel,brel:LONGREAL; VAR X, Y, W, H: SIGNED16);
 VAR ll, tt, rr, bb: LONGINT;
 BEGIN
 	IF lrel#DontCareR THEN l := ENTIER(PW*lrel) END;
@@ -157,7 +157,7 @@ BEGIN
 	END
 END SolveGadgetGeneral;
 
-PROCEDURE Solve*(F: Panels.Panel; dX, dY, W, H: INTEGER; mode: INTEGER);
+PROCEDURE Solve*(F: Panels.Panel; dX, dY, W, H: SIGNED16; mode: SIGNED16);
 VAR f: Display.Frame; l, t, r, b: LONGINT; lrel, trel, rrel, brel:LONGREAL; M: Display.ModifyMsg;
 BEGIN
 	f := F.dsc;
@@ -176,7 +176,7 @@ BEGIN
 END Solve;
 
 PROCEDURE Handler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR l, t, r, b: LONGINT; lrel, trel, rrel, brel:LONGREAL; oX, oY, oW, oH, mode: INTEGER; f: Objects.Object; A: Display.ModifyMsg;
+VAR l, t, r, b: LONGINT; lrel, trel, rrel, brel:LONGREAL; oX, oY, oW, oH, mode: SIGNED16; f: Objects.Object; A: Display.ModifyMsg;
 BEGIN
 	WITH F: Panels.Panel DO
 		IF M IS Display.ModifyMsg THEN
@@ -235,15 +235,15 @@ BEGIN
 	END
 END Handler;
 
-(*PROCEDURE RestoreBackGround(F: Panels.Panel; x, y: INTEGER; R: Display3.Mask);
+(*PROCEDURE RestoreBackGround(F: Panels.Panel; x, y: SIGNED16; R: Display3.Mask);
 BEGIN
 	Panels.methods.RestoreBackGround(F, x, y, R);
 	Display3.Line(R, Display.FG, Display.solid, x + 1, y + F.H - 11, x + 10, y + F.H - 2, 1, Display.replace);
 	Display3.Line(R, Display.BG, Display.solid, x + 1, y + F.H - 12, x + 10, y + F.H - 3, 1, Display.replace)
 END RestoreBackGround;*)
 
-PROCEDURE InsertChild(F: Panels.Panel; f: Display.Frame; u, v: INTEGER);
-VAR l, t, r, b: LONGINT; lrel, trel, rrel, brel:LONGREAL; x, y, w, h: INTEGER;
+PROCEDURE InsertChild(F: Panels.Panel; f: Display.Frame; u, v: SIGNED16);
+VAR l, t, r, b: LONGINT; lrel, trel, rrel, brel:LONGREAL; x, y, w, h: SIGNED16;
 BEGIN
 	IF HasGeneralConstraints(f, l, t, r, b, lrel, trel, rrel, brel) THEN
 		SolveGadgetGeneral(F.W, F.H, f, l, t, r, b, lrel, trel, rrel, brel, x, y, w, h);
@@ -255,7 +255,7 @@ BEGIN
 END InsertChild;
 
 PROCEDURE TrackMouse(F: Panels.Panel; VAR M: Oberon.InputMsg);
-VAR T: Display.Frame; x, y, t, u, v: INTEGER; d: LONGINT; r:LONGREAL; Fdlink, Mdlink: Objects.Object; flags: SET;
+VAR T: Display.Frame; x, y, t, u, v: SIGNED16; d: LONGINT; r:LONGREAL; Fdlink, Mdlink: Objects.Object; flags: SET;
 BEGIN
 	x := M.x + F.X; y := M.y + F.Y; t := y + F.H - 1;
 	T := Panels.ThisChild(F, x, y, M.X, M.Y);

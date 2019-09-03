@@ -66,7 +66,7 @@ CONST
 	VAR TenM1, Ten7, Ten8: LONGREAL;
 	HexDig: ARRAY 17 OF CHAR;
 	(*
-	PROCEDURE Expo (x: REAL): INTEGER;
+	PROCEDURE Expo (x: REAL): SIGNED16;
 	(* Fix for Oberon f. Windows *)
 	VAR
 	L : LONGINT;
@@ -737,7 +737,7 @@ END RKSearch;
 
 PROCEDURE SeqName* (stub: ARRAY OF CHAR;  sep: CHAR;  seqnr: LONGINT;  VAR res: ARRAY OF CHAR);
 CONST cseqlen = 4;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 BEGIN
 	ASSERT(LEN(stub) + 1 + cseqlen < LEN(res), 100);
 	ASSERT((seqnr < 10000) & (seqnr >= 0), 101);
@@ -751,7 +751,7 @@ BEGIN
 END SeqName;
 
 PROCEDURE NameToSeq* (name: ARRAY OF CHAR;   sep: CHAR;  VAR stub: ARRAY OF CHAR;  VAR seqnr: LONGINT);
-	VAR i: INTEGER;  (*xname:ARRAY 32 OF CHAR;  xch:CHAR; *)
+	VAR i: SIGNED16;  (*xname:ARRAY 32 OF CHAR;  xch:CHAR; *)
 BEGIN
 	(*	COPY(name,xname); *)
 	seqnr := 0;

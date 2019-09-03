@@ -30,7 +30,7 @@ IMPORT  antsArrayObjects, antsCommands, vyBase, aM := antsMessages;
 PROCEDURE MakeEdges*;
 	VAR l: antsCommands.tScanList;   beta: LONGREAL;    obj, objh, objv: vyBase.Object;
 	A, hor, ver: antsArrayObjects.tINTEGERObject;  x, y: LONGINT;
-	pyx, pyxm, pymx : INTEGER;
+	pyx, pyxm, pymx : SIGNED16;
 BEGIN
 	l := antsCommands.ScanFromPar("from=OBJ ver=OBJ hor=OBJ threshold=REAL # make edge Arrays from Array ");
 	IF antsCommands.ExpectObjectFromKeyword(l, "from", obj) &

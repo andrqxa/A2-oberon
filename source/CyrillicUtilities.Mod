@@ -48,7 +48,7 @@ TYPE
 			ch: ARRAY ENCODINGS_HIGH + 1 OF CHAR;
 		END;
 
-	LowBound = ARRAY ENCODINGS_HIGH + 1 OF INTEGER;
+	LowBound = ARRAY ENCODINGS_HIGH + 1 OF SIGNED16;
 
 	CP1251Decoder = OBJECT(Codecs.TextDecoder)
 	VAR errors : BOOLEAN;
@@ -477,7 +477,7 @@ VAR
 
 	PROCEDURE hashSearch(encoding: SIGNED8; bAddAllowed: BOOLEAN; ucs32: Char32; VAR ch: CHAR): BOOLEAN;
 	VAR
-		d: INTEGER;
+		d: SIGNED16;
 		h: SIZE;
 		bFound, bExit: BOOLEAN;
 	BEGIN
@@ -542,7 +542,7 @@ VAR
 
 	PROCEDURE koi8rInit;
 	VAR
-		i: INTEGER; b: BOOLEAN;
+		i: SIGNED16; b: BOOLEAN;
 		c: CHAR;
 	BEGIN
 
@@ -693,7 +693,7 @@ VAR
 
 	PROCEDURE koi8uInit;
 	VAR
-		i: INTEGER; b: BOOLEAN;
+		i: SIGNED16; b: BOOLEAN;
 		c: CHAR;
 	BEGIN
 
@@ -844,7 +844,7 @@ VAR
 
 	PROCEDURE cp1251Init;
 	VAR
-		i: INTEGER; b: BOOLEAN;
+		i: SIGNED16; b: BOOLEAN;
 		c: CHAR;
 	BEGIN
 
@@ -995,7 +995,7 @@ VAR
 
 	PROCEDURE cp866Init;
 	VAR
-		i: INTEGER; b: BOOLEAN;
+		i: SIGNED16; b: BOOLEAN;
 		c: CHAR;
 	BEGIN
 
@@ -1145,7 +1145,7 @@ VAR
 
 	PROCEDURE iso88595Init;
 	VAR
-		i: INTEGER; b: BOOLEAN;
+		i: SIGNED16; b: BOOLEAN;
 		c: CHAR;
 	BEGIN
 
@@ -1348,7 +1348,7 @@ END ISO88595EncoderFactory;
 
 PROCEDURE Init;
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	FOR i := 0 TO PRIME - 1 DO
 		hash[i].ucs32 := 0;
@@ -1366,7 +1366,7 @@ END Init;
 
 PROCEDURE HashStat*(context: Commands.Context);
 VAR
-	i, n: INTEGER;
+	i, n: SIGNED16;
 BEGIN
 	n := 0;
 	FOR i := 0 TO PRIME - 1 DO

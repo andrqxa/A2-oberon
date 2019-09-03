@@ -743,7 +743,7 @@ TYPE
 		*)
 
 (*
-		PROCEDURE BaseToDivisor(baud:INTEGER ):LONGINT;
+		PROCEDURE BaseToDivisor(baud:SIGNED16 ):LONGINT;
 
 		VAR
 

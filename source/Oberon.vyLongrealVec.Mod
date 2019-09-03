@@ -24,7 +24,7 @@ Report any problems as soon as possible to voyager@statlab.uni-heidelberg.de
 
 
 
-(*base model. Generate INTEGER, LONGINT, LONGREAL, BOOLEAN from this module
+(*base model. Generate SIGNED16, LONGINT, LONGREAL, BOOLEAN from this module
 vy/src/common/vyBooleanVec.Mod
 vy/src/common/vyIntVec.Mod
 vy/src/common/vyLongintVec.Mod

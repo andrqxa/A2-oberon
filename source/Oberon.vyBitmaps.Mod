@@ -31,7 +31,7 @@ CONST
 	BUFSIZE = 1024;
 
 TYPE
-	Color* = RECORD r*, g*, b*: INTEGER  END;
+	Color* = RECORD r*, g*, b*: SIGNED16  END;
 	Colors* = ARRAY 256 OF Color;
 
 	PixelCluster = POINTER TO PixelClusterDesc;
@@ -51,7 +51,7 @@ TYPE
 	tBitmap* = POINTER TO tBitmapDesc;
 	tBitmapDesc* = RECORD
 		(vyBase.ObjDesc)
-		W-, H-, Depth-, ColorDepth-: INTEGER;
+		W-, H-, Depth-, ColorDepth-: SIGNED16;
 		PCluster: POINTER TO PClusterArray;
 		(* ECluster: POINTER TO EClusterArray; *)
 		colors-: Colors
@@ -61,12 +61,12 @@ VAR
 	NPOS, NCLUSTER, NSET, NBIT: LONGINT;
 	BUFFER:  ARRAY BUFSIZE OF CHAR;
 
-PROCEDURE exp2* (z: INTEGER): INTEGER;   VAR
+PROCEDURE exp2* (z: SIGNED16): SIGNED16;   VAR
 BEGIN
-	RETURN INTEGER(ASH(1, z))
+	RETURN SIGNED16(ASH(1, z))
 END exp2;
 
-PROCEDURE bit* (VAR pos: SIGNED8;  VAR number: INTEGER): INTEGER;
+PROCEDURE bit* (VAR pos: SIGNED8;  VAR number: SIGNED16): SIGNED16;
 BEGIN (* returns 1 if bit is set, else 0 *)
 	RETURN number MOD (exp2(pos + 1)) DIV (exp2(pos))
 END bit;
@@ -115,7 +115,7 @@ END GetPosition;
 
 
 PROCEDURE SetNextPixel* (Bitmap: tBitmap; val: LONGINT);
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 BEGIN
 	i := Bitmap.Depth - 1;
 	WHILE(i >= 0) DO
@@ -130,7 +130,7 @@ BEGIN
 END SetNextPixel;
 
 PROCEDURE SetAPixel* (Bitmap: tBitmap;  X, Y: LONGINT; val: LONGINT);
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 BEGIN
 	(*
 	NPOS := X* Bitmap.Depth+Bitmap.W*Y * Bitmap.Depth;
@@ -153,7 +153,7 @@ END SetAPixel;
 
 PROCEDURE SetARect* (Bitmap: tBitmap;  RectX, RectY, W, H: LONGINT; val: LONGINT);
 	(*! Optimize. Should we have global Bresenham ? *)
-	VAR i: INTEGER;  X, Y: LONGINT;
+	VAR i: SIGNED16;  X, Y: LONGINT;
 BEGIN
 	ASSERT((W > 0) & (H > 0), 110);
 	X := RectX; Y := RectY;  WHILE ((Y <= RectY + H) & (X <= RectX + W)) DO
@@ -202,7 +202,7 @@ BEGIN
 END SetALine;
 (*
 PROCEDURE GetNextPixel (Bitmap: tBitmap): LONGINT;
-VAR val: LONGINT; i: INTEGER;
+VAR val: LONGINT; i: SIGNED16;
 BEGIN
 i := Bitmap.Depth-1; val := 0;
 WHILE(i>=0) DO
@@ -217,7 +217,7 @@ RETURN val;
 END GetNextPixel;
 *)
 PROCEDURE GetAPixel* (Bitmap: tBitmap;  X, Y: LONGINT): LONGINT;
-	VAR val: LONGINT;  i: INTEGER;
+	VAR val: LONGINT;  i: SIGNED16;
 
 BEGIN
 	(*
@@ -239,7 +239,7 @@ BEGIN
 	RETURN val;
 END GetAPixel;
 
-PROCEDURE SetAColor* (Bitmap: tBitmap;  i: INTEGER;  col: Color);
+PROCEDURE SetAColor* (Bitmap: tBitmap;  i: SIGNED16;  col: Color);
 BEGIN Bitmap.colors[i] := col;
 END SetAColor;
 
@@ -272,7 +272,7 @@ END Write;
 PROCEDURE Read* (VAR RF: vyBase.FilesReader;  VAR Bitmap: tBitmap);
 VAR
 	NumOfBytes, NumOfColors, count: LONGINT;
-	W, H, Depth, ColorDepth : INTEGER;
+	W, H, Depth, ColorDepth : SIGNED16;
 BEGIN
 	Files.ReadInt(RF, W);  Files.ReadInt(RF, H);  Files.ReadInt(RF, Depth);
 	Files.ReadInt(RF, ColorDepth);
@@ -290,29 +290,29 @@ END Read;
 
 PROCEDURE ImportGIF* (VAR RF: vyBase.FilesReader;  VAR Bitmap: tBitmap);
 TYPE
-	codes = ARRAY 2 OF INTEGER;
+	codes = ARRAY 2 OF SIGNED16;
 VAR
 
 	chars: ARRAY 32 OF CHAR;
 	char : CHAR;
-	int: INTEGER;
-	count: INTEGER;
+	int: SIGNED16;
+	count: SIGNED16;
 
 	SW, SH: LONGINT;  (* screenwidth / height *)
 	SColors: Colors;
 	globalcolormap: BOOLEAN;
-	bitsofcolres, bitsperpixel, backgroundcolor: INTEGER;
+	bitsofcolres, bitsperpixel, backgroundcolor: SIGNED16;
 	IX, IY, IW, IH: LONGINT;
 	localcolormap, seqentialordered: BOOLEAN;
-	bitsperpixelinimage: INTEGER;
+	bitsperpixelinimage: SIGNED16;
 
-	minimumcodesize: INTEGER;
-	byte: INTEGER;
-	blocksize: INTEGER;
-	bytecount: INTEGER;
+	minimumcodesize: SIGNED16;
+	byte: SIGNED16;
+	blocksize: SIGNED16;
+	bytecount: SIGNED16;
 	bytepos: SIGNED8;
-	msgcount : INTEGER;
-	fpos : INTEGER;
+	msgcount : SIGNED16;
+	fpos : SIGNED16;
 
 PROCEDURE LoadBuffer;
 BEGIN
@@ -320,9 +320,9 @@ BEGIN
 END LoadBuffer;
 
 
-PROCEDURE getnextint (numberofbits: INTEGER): INTEGER;
+PROCEDURE getnextint (numberofbits: SIGNED16): SIGNED16;
 VAR
-	val: INTEGER;
+	val: SIGNED16;
 	intpos: SIGNED8;
 BEGIN
 	val := 0;
@@ -358,12 +358,12 @@ END getnextint;
 PROCEDURE decompress;
 VAR
 	stt : ARRAY 4096 OF codes;  (* code table *)
-	sttlen: INTEGER;  (* length of code table *)
-	codesize, rootsize: INTEGER;
-	cc, eoi, code, old: INTEGER;
+	sttlen: SIGNED16;  (* length of code table *)
+	codesize, rootsize: SIGNED16;
+	cc, eoi, code, old: SIGNED16;
 	(*	i: LONGINT; *)
 
-PROCEDURE output (VAR input: INTEGER);
+PROCEDURE output (VAR input: SIGNED16);
 
 BEGIN
 	ASSERT(input <= sttlen);
@@ -376,7 +376,7 @@ BEGIN
 END output;
 
 
-PROCEDURE findfirstchar (VAR input: INTEGER): INTEGER;
+PROCEDURE findfirstchar (VAR input: SIGNED16): SIGNED16;
 BEGIN
 	IF input <= rootsize THEN
 		RETURN input;
@@ -394,7 +394,7 @@ BEGIN
 	rootsize :=  exp2(minimumcodesize);
 	codesize := minimumcodesize + 1;
 	IF codesize = 2 THEN cc := 4;  eoi := 5;  codesize := 3;  sttlen := 6;  ELSE
-	cc := INTEGER(ASH(1, minimumcodesize));  eoi := cc + 1;  sttlen := cc + 2;  END;
+	cc := SIGNED16(ASH(1, minimumcodesize));  eoi := cc + 1;  sttlen := cc + 2;  END;
 
 	REPEAT
 		code := getnextint(codesize);
@@ -409,7 +409,7 @@ BEGIN
 		ELSIF code = cc THEN
 			codesize := minimumcodesize + 1;
 			IF codesize = 2 THEN cc := 4;  eoi := 5;  codesize := 3;  sttlen := 6;  ELSE
-			cc := INTEGER(ASH(1, minimumcodesize));  eoi := cc + 1;  sttlen := cc + 2;  END;
+			cc := SIGNED16(ASH(1, minimumcodesize));  eoi := cc + 1;  sttlen := cc + 2;  END;
 			code := getnextint(codesize);
 			IF code = eoi THEN  RETURN;  END;
 			SetNextPixel(Bitmap, code);
@@ -541,23 +541,23 @@ END ImportGIF;
 PROCEDURE ExportGIF* (VAR RF: vyBase.FilesWriter;  Bitmap: tBitmap);
 
 TYPE
-	codes = ARRAY 2 OF INTEGER;
+	codes = ARRAY 2 OF SIGNED16;
 VAR
 
 	filespos : LONGINT;
-	x, y: INTEGER;
+	x, y: SIGNED16;
 	chars: ARRAY 32 OF CHAR;
 	char : CHAR;
-	count: INTEGER;
+	count: SIGNED16;
 
 
 
-	minimumcodesize: INTEGER;
+	minimumcodesize: SIGNED16;
 
 
-	byte: INTEGER;
-	blocksize: INTEGER;
-	bytecount: INTEGER;
+	byte: SIGNED16;
+	blocksize: SIGNED16;
+	bytecount: SIGNED16;
 	bytepos: SIGNED8;
 
 
@@ -568,11 +568,11 @@ PROCEDURE compress;
 VAR
 
 	stt : ARRAY 4096 OF codes;  (* code table *)
-	sttlen: INTEGER;  (* length of code table *)
-	codesize: INTEGER;  (* codesize in pixel *)
-	cc: INTEGER;
-	eoi : INTEGER;
-	new: INTEGER;
+	sttlen: SIGNED16;  (* length of code table *)
+	codesize: SIGNED16;  (* codesize in pixel *)
+	cc: SIGNED16;
+	eoi : SIGNED16;
+	new: SIGNED16;
 	code : codes;
 	i: LONGINT;
 	fp: LONGINT;
@@ -596,7 +596,7 @@ BEGIN
 END resetstt;
 
 
-PROCEDURE getnextcol (): INTEGER;
+PROCEDURE getnextcol (): SIGNED16;
 
 BEGIN
 	x := SHORT(i MOD (Bitmap.W));
@@ -610,9 +610,9 @@ END getnextcol;
 
 
 
-PROCEDURE codeinstt (c: codes): INTEGER;
+PROCEDURE codeinstt (c: codes): SIGNED16;
 VAR
-	m: INTEGER;
+	m: SIGNED16;
 BEGIN
 	m := eoi + 1;
 	WHILE m < sttlen DO
@@ -630,7 +630,7 @@ BEGIN
 END storeinstt;
 
 
-PROCEDURE output (val, numberofbits: INTEGER);
+PROCEDURE output (val, numberofbits: SIGNED16);
 
 VAR
 	intpos: SIGNED8;
@@ -775,7 +775,7 @@ BEGIN
 END ExportGIF;
 
 PROCEDURE CopyColors* (source: tBitmap;  VAR dest: tBitmap);
-	VAR count : INTEGER;
+	VAR count : SIGNED16;
 BEGIN
 	count := 0;
 	WHILE(count < 256) DO dest.colors[count] := source.colors[count];  INC(count);  END;
@@ -795,8 +795,8 @@ BEGIN
 	END;
 END CopyBitmap;
 
-PROCEDURE ResizedBitmap* (source: tBitmap;  w, h: INTEGER): tBitmap;
-	VAR x, y, neww, newh: INTEGER;  dest: tBitmap;
+PROCEDURE ResizedBitmap* (source: tBitmap;  w, h: SIGNED16): tBitmap;
+	VAR x, y, neww, newh: SIGNED16;  dest: tBitmap;
 BEGIN
 	dest := NewBitmap(w, h, source.Depth, source.ColorDepth);
 	CopyColors(source, dest);

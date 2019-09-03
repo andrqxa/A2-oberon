@@ -54,7 +54,7 @@ VAR
 	END Recall;
 
 	PROCEDURE Responsible( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 	BEGIN
 		priority := vyEvents.PrioNone;
 		IF ((event.gesture = vyEvents.EvtIdent) OR (event.gesture = vyEvents.EvtSelect)) THEN priority := vyEvents.PrioNormal END;
@@ -78,7 +78,7 @@ VAR
 	END Prompt;
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR x, y, dx, dy: INTEGER;
+	VAR x, y, dx, dy: SIGNED16;
 		str: ARRAY 64 OF CHAR;
 	BEGIN
 		antsToolbox.StartDisplayHelp( "select button: Shows Coordinates under pointer" );  tempLayer := layer;
@@ -88,7 +88,7 @@ VAR
 	END Select;
 
 	PROCEDURE HandleFileMsg( obj: tLayer;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		IF msg.id = Objects.load THEN
 			Files.ReadInt( msg.R, version );  vyPort.LayerHandler( obj, msg );  Gadgets.ReadRef( msg.R, obj.lib, objsub );
@@ -129,13 +129,13 @@ VAR
 	END HandleLinks;
 
 	PROCEDURE View3d;
-	VAR res: INTEGER;
+	VAR res: SIGNED16;
 	BEGIN
 		vyHost.CallWString( "ants3D.View3d", "", FALSE , res )
 	END View3d;
 
 	PROCEDURE exchange;
-	VAR res: INTEGER;
+	VAR res: SIGNED16;
 	BEGIN
 		vyHost.CallWString( "antsLayerOps.Exchange", "", FALSE , res )
 	END exchange;
@@ -295,7 +295,7 @@ VAR
 	END DoShowR;
 
 	PROCEDURE DoShow*( obj: vyBase.Object );
-	VAR res: INTEGER;
+	VAR res: SIGNED16;
 	BEGIN
 		IF obj IS antsArrayObjects.tObject THEN
 			WITH obj: antsArrayObjects.tObject DO Oberon.Call( "antsArrayViews.Show", Oberon.Par, FALSE , res );

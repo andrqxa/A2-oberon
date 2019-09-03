@@ -16,7 +16,7 @@ CONST
 TYPE
 	CRC16Stream* = OBJECT(Streams.Writer)
 	VAR
-		crc* : INTEGER;
+		crc* : SIGNED16;
 
 		PROCEDURE  &InitStream*;
 		BEGIN
@@ -36,13 +36,13 @@ TYPE
 			res := Streams.Ok
 		END Send;
 
-		PROCEDURE SetCRC*(crc : INTEGER);
+		PROCEDURE SetCRC*(crc : SIGNED16);
 		BEGIN
 			Update();
 			SELF.crc := crc;
 		END SetCRC;
 
-		PROCEDURE GetCRC*(): INTEGER;
+		PROCEDURE GetCRC*(): SIGNED16;
 		BEGIN
 			Update();
 			RETURN crc

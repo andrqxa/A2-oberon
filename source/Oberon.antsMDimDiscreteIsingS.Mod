@@ -30,7 +30,7 @@ IMPORT antsObjects, antsFunctions, Objects, Files, Gadgets, antsNeighbourhoods, 
 	antsCaches, vyRanBase, Links;
 
 TYPE
-	intArray = POINTER TO ARRAY OF INTEGER;
+	intArray = POINTER TO ARRAY OF SIGNED16;
 	realArray = POINTER TO ARRAY OF LONGREAL;
 
 	tModel* = POINTER TO tModelDesc;
@@ -53,7 +53,7 @@ TYPE
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLInt( R, s.dim );  Gadgets.ReadRef( R, s.lib, objsub );
 		IF objsub # NIL THEN s.n := objsub( antsNeighbourhoods.Neighbours ) END;
@@ -68,7 +68,7 @@ TYPE
 	(* Potential Function U : *)
 (* values: Values in neighbourhood, v[0] is central pixel *)
 
-	PROCEDURE U( VAR values: ARRAY OF INTEGER;  M: tModel ): LONGREAL;
+	PROCEDURE U( VAR values: ARRAY OF SIGNED16;  M: tModel ): LONGREAL;
 	VAR i: LONGINT;  theta: LONGREAL;  pars: antsNeighbourhoods.pars;  fcache: realArray;
 	BEGIN
 		pars := M.n.cpar;  fcache := M.fcache;
@@ -82,7 +82,7 @@ TYPE
 	END U;
 
 	PROCEDURE GetNeighbourValues( o, orig: antsArrayObjects.tINTEGERObject;  n: antsNeighbourhoods.Neighbours;  y, x: LONGINT;
-														  VAR values: ARRAY OF INTEGER );
+														  VAR values: ARRAY OF SIGNED16 );
 	VAR i: LONGINT;
 	BEGIN
 		FOR i := 0 TO n.clen - 1 DO values[i] := o.A[(y + n.cy[i]) MOD o.h, (x + n.cx[i]) MOD o.w] END;
@@ -90,7 +90,7 @@ TYPE
 	END GetNeighbourValues;
 
 	PROCEDURE PseudoLikTab*( o: antsArrayObjects.tINTEGERObject;  M: tModel;  VAR values: ARRAY OF ARRAY OF LONGREAL );
-	VAR sum: LONGREAL;  x, y, x0, y0, w0, h0: LONGINT;  f: antsFunctions.Function;  u, z: LONGREAL;  count: INTEGER;  value: intArray;
+	VAR sum: LONGREAL;  x, y, x0, y0, w0, h0: LONGINT;  f: antsFunctions.Function;  u, z: LONGREAL;  count: SIGNED16;  value: intArray;
 	BEGIN
 		antsRegions.Get( M.region, o, x0, y0, w0, h0 );  DEC( w0 );  DEC( h0 );  MakeCaches( M, o.depth, FALSE );  Sync1( M );
 		value := M.current;
@@ -114,7 +114,7 @@ TYPE
 	END PseudoLikPrepare;
 
 	PROCEDURE PseudoLik*( o: antsNeighbourhoods.NeighbourTable;  M: tModel;  AIC: BOOLEAN ): LONGREAL;
-	VAR sum: LONGREAL;  u, z: LONGREAL;  len, i: LONGINT;  center: LONGINT;  count: INTEGER;  id: INTEGER;  fcache: realArray;  clen: LONGINT;  pars: antsNeighbourhoods.pars;
+	VAR sum: LONGREAL;  u, z: LONGREAL;  len, i: LONGINT;  center: LONGINT;  count: SIGNED16;  id: SIGNED16;  fcache: realArray;  clen: LONGINT;  pars: antsNeighbourhoods.pars;
 
 		PROCEDURE U( VAR value: ARRAY OF LONGINT ): LONGREAL;
 		VAR theta: LONGREAL;  i: LONGINT;
@@ -130,7 +130,7 @@ TYPE
 	BEGIN
 		fcache := M.fcache;  pars := M.n.cpar;
 
-		len := LONGINT( LEN( o[0] ) - 1 );  id := INTEGER( LEN( fcache ) - 1 );  clen := M.n.clen - 1;
+		len := LONGINT( LEN( o[0] ) - 1 );  id := SIGNED16( LEN( fcache ) - 1 );  clen := M.n.clen - 1;
 		ASSERT ( len - 1 = clen );
 
 		sum := 0;
@@ -150,7 +150,7 @@ TYPE
 (*
 made inline
 PROCEDURE Local (o,c,orig: antsArrayObjects.tINTEGERObject;      x, y: LONGINT;       M: tModel);
-VAR ran, u, z: LONGREAL;             count: INTEGER;       vals: realArray;      values: intArray;
+VAR ran, u, z: LONGREAL;             count: SIGNED16;       vals: realArray;      values: intArray;
 BEGIN
 vals := M.currentR;
 values := M.current;
@@ -177,7 +177,7 @@ c.A[(y) MOD o.h, (x) MOD o.w] := count
 END Local;
 
 PROCEDURE CLocal (o,c,orig: antsArrayObjects.tINTEGERObject;     x, y: LONGINT;     M: tModel);
-VAR    ran, u: LONGREAL;    count: INTEGER;     cv: intArray;     cpos: LONGINT;
+VAR    ran, u: LONGREAL;    count: SIGNED16;     cv: intArray;     cpos: LONGINT;
 BEGIN
 cv := M.current;
 
@@ -220,8 +220,8 @@ END CLocal;
 	END MakeCaches;
 
 	PROCEDURE Sync( m: tModel;  depth: LONGINT );
-	VAR i: INTEGER;  c: antsCaches.FullCache;
-		cv: POINTER TO ARRAY OF INTEGER;
+	VAR i: SIGNED16;  c: antsCaches.FullCache;
+		cv: POINTER TO ARRAY OF SIGNED16;
 		offset: LONGINT;  s: LONGREAL;
 	BEGIN
 		ASSERT ( m.fcache # NIL );
@@ -256,7 +256,7 @@ END CLocal;
 
 	PROCEDURE OneSweep*( M: antsKernel.samplingMsg );
 	VAR A, Orig: antsArrayObjects.tINTEGERObject;  model: tModel;  dim, x, y, w, h: LONGINT;  x0, y0, w0, h0: LONGINT;  orig: Objects.Object;
-		count: INTEGER;  uv: realArray;  nb: intArray;  z, cooling, ran: LONGREAL;  max: INTEGER;  cpos, nclen: LONGINT;  cache: antsCaches.FullCache;
+		count: SIGNED16;  uv: realArray;  nb: intArray;  z, cooling, ran: LONGREAL;  max: SIGNED16;  cpos, nclen: LONGINT;  cache: antsCaches.FullCache;
 		cx, cy: antsNeighbourhoods.Index;  i: LONGINT;  pars: antsNeighbourhoods.pars;  theta: LONGREAL;  fcache, datafcache: realArray;
 		position, posi: LONGINT;  s: antsKernel.Kernel;  visit: antsKernel.visitingScheme;  parallel: BOOLEAN;
 		destA, srcA: antsArrayObjects.tINTEGERArray;
@@ -639,7 +639,7 @@ END U;
 *)
 (*PROCEDURE Local (o: antsArrayObjects.tObject;   dim: LONGINT;   par: array;    x, y: LONGINT;   M: tModel;
 s: antsKernel.Kernel);
-VAR theta: LONGREAL;   k: LONGINT;   f: antsFunctions.Function;   ran, u, z: LONGREAL;   count: INTEGER;
+VAR theta: LONGREAL;   k: LONGINT;   f: antsFunctions.Function;   ran, u, z: LONGREAL;   count: SIGNED16;
 
 PROCEDURE U (y, x, val: LONGINT): LONGREAL;
 VAR i: LONGINT;

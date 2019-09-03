@@ -977,7 +977,7 @@ TYPE
 		(* Load some opacity attribute of element e *)
 		PROCEDURE LoadOpacity(e: XML.Element; name: ARRAY OF CHAR; VAR color: SVG.Color; onOmitted: SIGNED8; default: ARRAY OF CHAR);
 		VAR opacity: SVG.Length;
-			r,g,b,a: INTEGER;
+			r,g,b,a: SIGNED16;
 		BEGIN
 			LoadAttrNumber(e,name, opacity,SVG.DisallowPercentages, 0.0,  onOmitted, default);
 			IF opacity#1 THEN

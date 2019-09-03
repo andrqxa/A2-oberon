@@ -92,7 +92,7 @@ TYPE
 		END SendAck;
 
 		(* SendError - sends an error packet *)
-		PROCEDURE SendError(errNo: INTEGER; s: ErrorMsg; VAR res: WORD);
+		PROCEDURE SendError(errNo: SIGNED16; s: ErrorMsg; VAR res: WORD);
 		VAR errHdr: ARRAY BlockSize+4 OF CHAR; p, retries: LONGINT;
 		BEGIN
 			Put2(errHdr, 0, ERROR); Put2(errHdr, 2, errNo);

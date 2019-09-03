@@ -67,7 +67,7 @@ TYPE
 	END;
 
 VAR
-	selectionMode*: INTEGER;  lastDataSize: LONGINT;  newselector*: tSelector;
+	selectionMode*: SIGNED16;  lastDataSize: LONGINT;  newselector*: tSelector;
 
 	PROCEDURE New*;
 	BEGIN
@@ -121,7 +121,7 @@ VAR
 		END
 	END Handler;
 
-	PROCEDURE GetAttribute( n: LONGINT;  type: INTEGER;  name: vyName.tNameArray ): vyBase.tVector;
+	PROCEDURE GetAttribute( n: LONGINT;  type: SIGNED16;  name: vyName.tNameArray ): vyBase.tVector;
 	(*vs 0.0a1 *)  (* md  05.06.95 *)
 	VAR attr: vyBase.Object;
 
@@ -262,7 +262,7 @@ END ReturnToPicture;*)
 
 	PROCEDURE DoSelection( selector: tSelector;  VAR event: vyEvents.EventMsg );
 	(*vs 0.0a1	md  17.08.94 *)
-	VAR x0, y0, xOld, yOld, xNew, yNew, xLast, yLast: Coordinate;  gesture: INTEGER;
+	VAR x0, y0, xOld, yOld, xNew, yNew, xLast, yLast: Coordinate;  gesture: SIGNED16;
 	BEGIN
 		vyGraphBase.SetDisplayMode( vyGraphBase.invert );  vyPort.PictureHandleSetPicture( selector.picture );
 		x0 := event.x;  y0 := event.y;  xOld := x0;  yOld := y0;  xLast := x0;  yLast := y0;  xNew := event.x;  yNew := event.y;

@@ -170,7 +170,7 @@ TYPE
 		ch: WORD;
 
 		PROCEDURE ToHex(in: CHAR;VAR c1: CHAR; VAR c2: CHAR);
-			VAR i: INTEGER;
+			VAR i: SIGNED16;
 		BEGIN
 			i := ORD(in) DIV 16;
 			IF i < 10 THEN

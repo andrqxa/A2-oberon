@@ -18,7 +18,7 @@ BEGIN
 END GetValue;
 
 PROCEDURE Do*;
-VAR obj: Objects.Object; i: INTEGER; freqA, freqB: REAL;
+VAR obj: Objects.Object; i: SIGNED16; freqA, freqB: REAL;
 BEGIN
 	obj := Gadgets.FindObj(Gadgets.context, "Controller");
 	IF (obj # NIL) & (obj IS Complex.Complex) THEN

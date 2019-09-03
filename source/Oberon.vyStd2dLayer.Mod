@@ -55,7 +55,7 @@ VAR
 	PROCEDURE Recall( layer: tLayer;  msg: Display.DisplayMsg );
 	(*vs 0.0a1   md  03.07.95 *)
 	VAR method: ARRAY 64 OF CHAR;
-		res: INTEGER;
+		res: SIGNED16;
 	BEGIN
 		COPY( sourceModule, method );  vyHostStrings.Append( method, "." );
 		vyHostStrings.Append( method, layer.recallProcedure );  x := layer.x;

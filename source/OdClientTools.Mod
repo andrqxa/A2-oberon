@@ -38,7 +38,7 @@ PROCEDURE GetCbGames*; (* from to *)
 VAR reqHeader: WebHTTP.RequestHeader; resHeader: WebHTTP.ResponseHeader; res: WORD; con : AosTCP.Connection;
 	out : AosIO.Reader; url, target: ARRAY 128 OF CHAR;
 	f: AosFS.File;
-	num, from, to: INTEGER;
+	num, from, to: SIGNED16;
 BEGIN
 	In.Open; In.Int(from); In.Int(to);
 	IF In.Done THEN

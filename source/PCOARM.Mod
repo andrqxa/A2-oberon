@@ -663,7 +663,7 @@ END Init;
 
 PROCEDURE Code(opcode: SET);
 TYPE Bytes= ARRAY 4 OF CHAR;
-VAR b: Bytes; i: INTEGER;
+VAR b: Bytes; i: SIGNED16;
 BEGIN
 	ASSERT(codelen MOD 4 = 0); (* in case PutChar did not write 4x characters *)
 	(*Trace IF Trace & dcd THEN
@@ -703,7 +703,7 @@ BEGIN
 		SYSTEM.MOVE(ADDRESSOF(code[start]), ADDRESSOF(b[0]), codelen-start);
 		f.WriteBytes(r, b^, 0, codelen-start);
 		Files.Register(f);
-	ELSIF (codelen - start < 0) THEN HALT(MAX(INTEGER)) (* show stack*)
+	ELSIF (codelen - start < 0) THEN HALT(MAX(SIGNED16)) (* show stack*)
 	END;
 	f := NIL;
 END Close;

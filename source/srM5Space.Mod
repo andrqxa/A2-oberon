@@ -48,7 +48,7 @@ END bounds;
 
 PROCEDURE fill*(v: Voxel);
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 4 DO FOR j := 0 TO 4 DO FOR k:= 0 TO 4 DO
 		blox[i,j,k] := v
@@ -57,7 +57,7 @@ END fill;
 
 PROCEDURE erase*;
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 4 DO FOR j := 0 TO 4 DO FOR k:= 0 TO 4 DO
 		blox[i,j,k] := NIL; nblox[i,j,k].filled := FALSE; fiveblox[i,j,k] := NIL;
@@ -67,7 +67,7 @@ END erase;
 
 PROCEDURE fillwithprobability*(v: Voxel; p: SREAL);
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 4 DO FOR j := 0 TO 4 DO FOR k:= 0 TO 4 DO
 		IF srBase.rand.Uniform()<p THEN blox[i,j,k] := v END
@@ -76,7 +76,7 @@ END fillwithprobability;
 
 PROCEDURE fillchequer*(v,w: Voxel);
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 4 DO FOR j := 0 TO 4 DO FOR k:= 0 TO 4 DO
 		IF ODD(i+j+k) THEN blox[i,j,k] := v ELSE blox[i,j,k] := w END
@@ -86,7 +86,7 @@ END fillchequer;
 PROCEDURE color(VAR ray: Ray; cube:NCUBE);
 VAR
 	dot: SREAL;
-	nx, ny, nz: INTEGER;
+	nx, ny, nz: SIGNED16;
 	inside: BOOLEAN;
 BEGIN
 (*	dot := ABS(cube.normal.x*ray.dxyz.x + cube.normal.y*ray.dxyz.y+ cube.normal.z*ray.dxyz.z);
@@ -121,7 +121,7 @@ VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
 	drx, dry, drz, dr,rr,gr,br,bl: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 BEGIN
@@ -295,7 +295,7 @@ VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
 	drx, dry, drz: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 	killed: BOOLEAN;

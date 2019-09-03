@@ -429,7 +429,7 @@ TYPE
 		(** Loads the material needed to establish an rsa private key. Parameters p and q are two big prime numbers,
 			e is the public exponent of the public key of the rsa certificate to be used. p, q and e have to be hexadecimal strings.
 			pLen, qLen and eLen are the lengths of the hex strings *)
-		PROCEDURE LoadRsaPrivateKey*( pHex, qHex, eHex: ARRAY OF CHAR; pLen, qLen, eLen: INTEGER );
+		PROCEDURE LoadRsaPrivateKey*( pHex, qHex, eHex: ARRAY OF CHAR; pLen, qLen, eLen: SIGNED16 );
 			VAR
 				p, q, e: CryptoBigNumbers.BigNumber;
 				dummy: CryptoRSA.Key;
@@ -1919,7 +1919,7 @@ VAR
 	BEGIN
 		NEW(ctx, defaultCipherPolicy);
 		IF ctx.LoadRsaCertificate(certificate) # Ok THEN RETURN NIL END;
-		ctx.LoadRsaPrivateKey(pHex, qHex, eHex, INTEGER(pLen), INTEGER(qLen), INTEGER(eLen));
+		ctx.LoadRsaPrivateKey(pHex, qHex, eHex, SIGNED16(pLen), SIGNED16(qLen), SIGNED16(eLen));
 		NEW(con);
 		con.SetContext(ctx);
 		RETURN con

@@ -672,7 +672,7 @@ TYPE
 		BEGIN  w.RawSInt(x)
 		END RawSInt;
 
-		PROCEDURE RawInt*( x: INTEGER );
+		PROCEDURE RawInt*( x: SIGNED16 );
 		BEGIN  w.RawInt(x)
 		END RawInt;
 

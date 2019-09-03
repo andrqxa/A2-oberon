@@ -18,8 +18,8 @@ CONST
 
 TYPE
 	SocketAdr* = POINTER TO RECORD
-		family*		: INTEGER;
-		port*		: INTEGER;	(* in network byte order! *)
+		family*		: SIGNED16;
+		port*		: SIGNED16;	(* in network byte order! *)
 	END;
 
 	SocketAdrV4* = POINTER TO RECORD (SocketAdr)
@@ -362,14 +362,14 @@ VAR
 		RETURN err = 0
 	END NoDelay;
 
-	PROCEDURE NetToInt* (x: INTEGER): INTEGER;
+	PROCEDURE NetToInt* (x: SIGNED16): SIGNED16;
 	BEGIN
-		RETURN INTEGER(ntohs(x))
+		RETURN SIGNED16(ntohs(x))
 	END NetToInt;
 
-	PROCEDURE IntToNet* (x: INTEGER): INTEGER;
+	PROCEDURE IntToNet* (x: SIGNED16): SIGNED16;
 	BEGIN
-		RETURN INTEGER(htons(x))
+		RETURN SIGNED16(htons(x))
 	END IntToNet;
 
 	PROCEDURE NetToLInt* (x: LONGINT): LONGINT;

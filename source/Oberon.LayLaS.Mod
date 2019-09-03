@@ -69,8 +69,8 @@ BEGIN	p := Pos ();
 	ReadChar;
 END Comment;
 
-PROCEDURE ReadString (VAR sym : INTEGER);
-VAR i : INTEGER;
+PROCEDURE ReadString (VAR sym : SIGNED16);
+VAR i : SIGNED16;
 		quot : CHAR;
 		pos : LONGINT;
 BEGIN	quot := ch;
@@ -87,9 +87,9 @@ BEGIN	quot := ch;
 	ReadChar;
 END ReadString;
 
-PROCEDURE ReadNumber (VAR sym : INTEGER);
+PROCEDURE ReadNumber (VAR sym : SIGNED16);
 VAR  intE, realE : BOOLEAN;
-		n : INTEGER;
+		n : SIGNED16;
 		quotient : REAL;
 BEGIN	sym := Int;
 	int := 0;	real := 0;	intE := FALSE;	realE := FALSE;
@@ -117,8 +117,8 @@ BEGIN	sym := Int;
 	END
 END ReadNumber;
 
-PROCEDURE ReadIdent (VAR sym : INTEGER);
-VAR i : INTEGER;
+PROCEDURE ReadIdent (VAR sym : SIGNED16);
+VAR i : SIGNED16;
 BEGIN	sym := Ident;
 	i := 0;
 	WHILE ((CAP(ch) >= 'A') & (CAP(ch) <= 'Z')) OR ((ch >= '0') & (ch <= '9')) DO
@@ -136,7 +136,7 @@ BEGIN	sym := Ident;
 	IF i = idlen THEN Mark (Pos (), "Identifier too long"); ident[i-1] := 0X ELSE ident[i] := 0X END;
 END ReadIdent;
 
-PROCEDURE Get* (VAR sym : INTEGER);		(**	Get next symbol	*)
+PROCEDURE Get* (VAR sym : SIGNED16);		(**	Get next symbol	*)
 BEGIN
 	IF eot THEN Mark (Pos (), "end of text") END;
 	WHILE (ch <= ' ') & (~eot) DO ReadChar END;

@@ -28,7 +28,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 			next*: Parameter;
 			name*: ARRAY 64 OF CHAR;	(* parameter name *)
 			sym*: Scheme.Object;	(* parameter symbol *)
-			kind*: INTEGER;	(* parameter kind *)
+			kind*: SIGNED16;	(* parameter kind *)
 			imin*, imax*: LONGINT;	(* integer range *)
 			rmin*, rmax*: REAL;	(* real range *)
 		END;
@@ -70,7 +70,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END ColorToInt;
 
 	PROCEDURE IntToColor (i: LONGINT; VAR col: Scheme.Object);
-		VAR v: ARRAY 3 OF INTEGER; vec: Scheme.Object;
+		VAR v: ARRAY 3 OF SIGNED16; vec: Scheme.Object;
 	BEGIN
 		Display.GetColor(i, v[0], v[1], v[2]);
 		vec := Scheme.NewVector(3, Scheme.nil);
@@ -605,7 +605,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	PROCEDURE Integrate*;
 		VAR
 			s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; shape: Shape;
-			frame: Display.Frame; u, v: INTEGER; lm: Objects.LinkMsg; fig: Leonardo.Figure;
+			frame: Display.Frame; u, v: SIGNED16; lm: Objects.LinkMsg; fig: Leonardo.Figure;
 	BEGIN
 		Texts.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(s);
 		IF (s.class = Texts.Char) & (s.c = "^") THEN

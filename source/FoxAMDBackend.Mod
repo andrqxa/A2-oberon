@@ -2089,7 +2089,7 @@ TYPE
 		END PrepareOp3;
 
 		PROCEDURE PrepareOp2(CONST instruction: IntermediateCode.Instruction; part: LONGINT; VAR left: Assembler.Operand;VAR ticket: Ticket);
-		VAR op2: Assembler.Operand; imm: Assembler.Operand; sizeInBits: INTEGER; type: IntermediateCode.Type;
+		VAR op2: Assembler.Operand; imm: Assembler.Operand; sizeInBits: SIGNED16; type: IntermediateCode.Type;
 		BEGIN
 			ticket := NIL;
 			GetPartType(instruction.op1.type,part,type);

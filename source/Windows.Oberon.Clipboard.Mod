@@ -8,7 +8,7 @@ MODULE Clipboard IN Oberon; (** non-portable / source: Windows.Clipboard.Mod *)	
 
 	VAR
 		W: Texts.Writer;
-		CFOberon: INTEGER;
+		CFOberon: SIGNED16;
 
 	(** Copy a text stretch to the Clipboard. *)
 	PROCEDURE PutToClipboard*(T: Texts.Text; beg, end: LONGINT);

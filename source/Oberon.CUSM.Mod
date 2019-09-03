@@ -40,8 +40,8 @@ CONST
 TYPE
 
 	Addr=RECORD
-		family: INTEGER;
-		port: INTEGER;
+		family: SIGNED16;
+		port: SIGNED16;
 		addr: LONGINT;
 	END;
 
@@ -54,14 +54,14 @@ TYPE
 	VideoPacketHeaderDesc=RECORD
 		routing: Routing;
 		seqNum: LONGINT;
-		message: INTEGER;
-		dataType: INTEGER;
-		len: INTEGER;
+		message: SIGNED16;
+		dataType: SIGNED16;
+		len: SIGNED16;
 	END;
 
 	OpenContinueData = POINTER TO OpenContinueDataDesc;
 	OpenContinueDataDesc=RECORD
-		clientCount: INTEGER;
+		clientCount: SIGNED16;
 		seqNum: LONGINT;
 		name: ARRAY 20 OF CHAR;
 		sendMode: CHAR;
@@ -72,8 +72,8 @@ TYPE
 
 	Image= POINTER TO ImageDesc;
 	ImageDesc = RECORD
-		width: INTEGER;
-		height: INTEGER;
+		width: SIGNED16;
+		height: SIGNED16;
 		picture: Pictures.Picture;
 	END;
 
@@ -84,7 +84,7 @@ TYPE
 		clAdrStr: ARRAY 16 OF CHAR;
 		name: ARRAY 256 OF CHAR;
 		lastSeqNum: LONGINT;
-		sndBufOffset: INTEGER;
+		sndBufOffset: SIGNED16;
 		sender: BOOLEAN;
 		timeOut: SIGNED8;
 		wantVideo:BOOLEAN;
@@ -95,13 +95,13 @@ TYPE
 	ConnectionDesc = RECORD
 		reflAdr: LONGINT;
 		reflAdrStr: ARRAY 16 OF CHAR;
-		confID: INTEGER;
+		confID: SIGNED16;
 		connected:BOOLEAN;
-		timeOut: INTEGER;
+		timeOut: SIGNED16;
 		sndBuf: ARRAY MAXSNDBUFLEN OF CHAR;
-		sndBufLen: INTEGER;
-		vphSeqNum:INTEGER;
-		ocdSeqNum:INTEGER;
+		sndBufLen: SIGNED16;
+		vphSeqNum:SIGNED16;
+		ocdSeqNum:SIGNED16;
 		timeToSend,timeToUpdate: LONGINT;
 		clientsList: Client;
 		next: Connection;
@@ -122,13 +122,13 @@ VAR
 	hostName: BasicGadgets.String;
 	connectionsLog, videosLog*: Texts.Text;
 	(* IMAGE DECODE*)
-		intraRowBytes: ARRAY 16 OF INTEGER;
+		intraRowBytes: ARRAY 16 OF SIGNED16;
 		interRowDiff: ARRAY 16 OF LONGINT;
-		wordDiff: ARRAY 256 OF  INTEGER;
+		wordDiff: ARRAY 256 OF  SIGNED16;
 		longDiff: ARRAY 256 OF LONGINT;
-		conv4To8Bit: ARRAY 256 OF INTEGER;
+		conv4To8Bit: ARRAY 256 OF SIGNED16;
 (*		imAdr,imSize: LONGINT;*)
-		lumin,contr: INTEGER; (* luminosity and  contrast *)
+		lumin,contr: SIGNED16; (* luminosity and  contrast *)
 		gamma: REAL;
 
 
@@ -279,7 +279,7 @@ END NewVideosLog;
 (********** VIDEO DECODE **********)
 
 PROCEDURE SetPalette;
-VAR i,c,d,inc:INTEGER;
+VAR i,c,d,inc:SIGNED16;
 BEGIN
 	c:=lumin+contr;
 	inc:=contr DIV 16;
@@ -293,7 +293,7 @@ BEGIN
 END SetPalette;
 
 PROCEDURE InitVideo;
-VAR i,j,c,d,m,u:INTEGER;
+VAR i,j,c,d,m,u:SIGNED16;
 			a,b:LONGINT;
 			digit: ARRAY 8 OF LONGINT;
 BEGIN
@@ -353,20 +353,20 @@ BEGIN
 	SetPalette;	(* sets colors from 20 to 35 *)
 END InitVideo;
 
-PROCEDURE Decode*( VAR image: Image; VAR data: ARRAY OF CHAR; pos:INTEGER; imType: INTEGER; name:ARRAY OF CHAR);
+PROCEDURE Decode*( VAR image: Image; VAR data: ARRAY OF CHAR; pos:SIGNED16; imType: SIGNED16; name:ARRAY OF CHAR);
 VAR
-		dataLim: INTEGER;
-		width,height: INTEGER;
+		dataLim: SIGNED16;
+		width,height: SIGNED16;
 		ok: BOOLEAN;
 		rowData: LONGINT;
 (*		imPos: LONGINT;*)
-x, y, minx, miny, maxx, maxy: INTEGER;
+x, y, minx, miny, maxx, maxy: SIGNED16;
 
-	PROCEDURE DecodeRow(code:INTEGER);
+	PROCEDURE DecodeRow(code:SIGNED16);
 	VAR
-			i,col,intra: INTEGER;
+			i,col,intra: SIGNED16;
 			temp:LONGINT;
-			cols:INTEGER;
+			cols:SIGNED16;
 	BEGIN
 		IF code=0 THEN
 			rowData:=0;
@@ -412,10 +412,10 @@ DEC(y);
 
 	PROCEDURE DecodeSquare;
 	VAR
-		square: INTEGER;
-(*		x,y: INTEGER; (* square coord. *)*)
-		codePos,code: INTEGER;
-		i: INTEGER;
+		square: SIGNED16;
+(*		x,y: SIGNED16; (* square coord. *)*)
+		codePos,code: SIGNED16;
+		i: SIGNED16;
 	BEGIN
     	IF dataLim - pos < 6 THEN ok:=FALSE END;
 		square:= ORD(data[pos])*256 + ORD(data[pos+1]); INC(pos,2);  (* square number *)
@@ -544,7 +544,7 @@ END SetGamma;
 (*********** END  VIDEO ********)
 
 PROCEDURE StartSndTask;
-VAR res: INTEGER;
+VAR res: SIGNED16;
 BEGIN
 	IF ~sndScktStarted THEN
 		NetSystem.OpenSocket(sndSocket, SENDPORT, res);
@@ -567,7 +567,7 @@ BEGIN
 END StopSndTask;
 
 PROCEDURE  StartRcvTask;
-VAR res: INTEGER;
+VAR res: SIGNED16;
 BEGIN
 	IF ~ rcvScktStarted THEN
 		NetSystem.OpenSocket(rcvSocket, VIDPORT, res);
@@ -590,7 +590,7 @@ BEGIN
 END StopRcvTask;
 
 PROCEDURE ConvIpAdrLtoS(adr: LONGINT; VAR ip: ARRAY OF CHAR);
-	VAR k: INTEGER;
+	VAR k: SIGNED16;
 	PROCEDURE Write(i: LONGINT);
 	VAR
 			p, n: LONGINT;
@@ -771,7 +771,7 @@ END RemoveClient;
 PROCEDURE Turn(ipAdr:LONGINT):LONGINT;
 VAR
 		buf:ARRAY 4 OF CHAR;
-		pos:INTEGER;
+		pos:SIGNED16;
 BEGIN
 	pos:=0;
 	NetSystem.PutLInt(buf,pos,ipAdr); INC(pos, 4);
@@ -780,9 +780,9 @@ BEGIN
 	RETURN ipAdr
 END Turn;
 
-PROCEDURE FullSndBuf(con: Connection; conferenceID: INTEGER; VAR hostName: ARRAY OF CHAR);
+PROCEDURE FullSndBuf(con: Connection; conferenceID: SIGNED16; VAR hostName: ARRAY OF CHAR);
 VAR
-		pos,i: INTEGER;
+		pos,i: SIGNED16;
 		ch:CHAR;
 BEGIN
 	pos:= 0;
@@ -818,7 +818,7 @@ END FullSndBuf;
 PROCEDURE InsertClientInfo(con:Connection; ipAdr: LONGINT ;recv: BOOLEAN);
 VAR
 		ccl: LONGINT;
-		pos,p,cci:INTEGER;
+		pos,p,cci:SIGNED16;
 		src: Client;
 BEGIN
 	src:=SearchClientByAdr(con,ipAdr);
@@ -857,7 +857,7 @@ BEGIN
 	END
 END InsertClientInfo;
 
-PROCEDURE ReadVPH(VAR vph: VideoPacketHeader; VAR pos: INTEGER);
+PROCEDURE ReadVPH(VAR vph: VideoPacketHeader; VAR pos: SIGNED16);
 BEGIN
 	NetSystem.GetInt(rcvBuf,pos,vph.routing.dest.family); INC(pos, 2);
 	NetSystem.GetInt(rcvBuf,pos,vph.routing.dest.port); INC(pos, 2);
@@ -871,8 +871,8 @@ BEGIN
 	NetSystem.GetInt(rcvBuf,pos,vph.len); INC(pos, 2)
 END ReadVPH;
 
-PROCEDURE ReadOCD(VAR ocd: OpenContinueData; VAR pos: INTEGER);
-VAR i:INTEGER;
+PROCEDURE ReadOCD(VAR ocd: OpenContinueData; VAR pos: SIGNED16);
+VAR i:SIGNED16;
 BEGIN
 	NetSystem.GetInt(rcvBuf,pos,ocd.clientCount); INC(pos, 2);
 	NetSystem.GetLInt(rcvBuf,pos,ocd.seqNum); INC(pos, 4);
@@ -900,7 +900,7 @@ END UpdateClientsList;
 PROCEDURE Sender(me: Oberon.Task);
 VAR
 		t:LONGINT;
-		pos:INTEGER;
+		pos:SIGNED16;
 		curCon: Connection;
 		adr: NetSystem.IPAdr;
 BEGIN
@@ -928,10 +928,10 @@ BEGIN
 	END;
 END Sender;
 
-PROCEDURE OutMsg(mLen: INTEGER; pos: INTEGER);
+PROCEDURE OutMsg(mLen: SIGNED16; pos: SIGNED16);
 VAR
 		w: Texts.Writer;
-		i:INTEGER;
+		i:SIGNED16;
 BEGIN
 	Texts.OpenWriter(w);
 	FOR i := 0 TO mLen-1 DO
@@ -944,7 +944,7 @@ END OutMsg;
 PROCEDURE Receiver(me: Oberon.Task);
 	VAR
 		rAddr,len,t: LONGINT;
-		i, msgLen, pos, rPort: INTEGER;
+		i, msgLen, pos, rPort: SIGNED16;
 		src: Client;
 		curCon:Connection;
 		adr: NetSystem.IPAdr;
@@ -1137,7 +1137,7 @@ END SetConferenceID;
 
 PROCEDURE HandleReflectorLogClick*;
 	VAR
-		pos: INTEGER;
+		pos: SIGNED16;
 		s:Texts.Scanner;
 		con: Connection;
 		reflAdr: LONGINT;

@@ -35,7 +35,7 @@ MODULE VinciDocs IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Load (doc: Documents.Document);
 		VAR
-			text: Texts.Text; file: Files.File; r: Files.Rider; tag, x, y, w, h: INTEGER; gen: ARRAY 64 OF CHAR; ch: CHAR;
+			text: Texts.Text; file: Files.File; r: Files.Rider; tag, x, y, w, h: SIGNED16; gen: ARRAY 64 OF CHAR; ch: CHAR;
 			pos, len: LONGINT; body: Scheme.Object; tframe: TextGadgets.Frame;
 			gframe: VinciGadgets.Frame;
 	BEGIN
@@ -84,7 +84,7 @@ MODULE VinciDocs IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Store (doc: Documents.Document);
 		VAR
-			file: Files.File; bak: ARRAY 64 OF CHAR; res: INTEGER; r: Files.Rider; pos, len: LONGINT;
+			file: Files.File; bak: ARRAY 64 OF CHAR; res: SIGNED16; r: Files.Rider; pos, len: LONGINT;
 			obj: Objects.Object; frame: VinciGadgets.Frame;
 	BEGIN
 		Texts.WriteString(W, "Store ");

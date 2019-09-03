@@ -20,7 +20,7 @@ TYPE
 		P* : Pictures.Picture;	(** bitmap for double buffer rendering **)
 		camera*: Dim3Engine.Camera;	(** viewing parameters **)
 		navigate*: Navigator;	(** maps mouse movements to camera movements **)
-		absX*, absY*: INTEGER;	(** cached screen coordinates **)
+		absX*, absY*: SIGNED16;	(** cached screen coordinates **)
 	END;
 
 
@@ -29,13 +29,13 @@ VAR
 	W: Texts.Writer;
 	drawF: Frame;	(* temporary globals when rendering picture to display *)
 	drawM: Display3.Mask;
-	px, py: INTEGER;
+	px, py: SIGNED16;
 
 
 (*--- Display ---*)
 
-PROCEDURE DrawRect (x, y, w, h: INTEGER);
-VAR r, r1, t, t1: INTEGER;
+PROCEDURE DrawRect (x, y, w, h: SIGNED16);
+VAR r, r1, t, t1: SIGNED16;
 BEGIN
 	r := x + w - 1; r1 := drawM.X + drawM.W - 1; t := y + h - 1; t1 := drawM.Y + drawM.H - 1;
 	IF x < drawM.X THEN x := drawM.X END;
@@ -49,7 +49,7 @@ BEGIN
 	END
 END DrawRect;
 
-PROCEDURE RestoreFrame (F: Frame; R: Display3.Mask; x, y: INTEGER);
+PROCEDURE RestoreFrame (F: Frame; R: Display3.Mask; x, y: SIGNED16);
 VAR start: LONGINT;
 BEGIN
 	start := Oberon.Time();
@@ -68,13 +68,13 @@ END RestoreFrame;
 (**--- Flight Model Navigation ---**)
 
 (* run flight model on current camera view *)
-PROCEDURE RunFlightModel (F: Frame; X, Y: INTEGER; speed: REAL);
+PROCEDURE RunFlightModel (F: Frame; X, Y: SIGNED16; speed: REAL);
 CONST
 	minMove = 5; maxMove = 55; minAngle = 0.01;
 VAR
 	azi, pitch, roll, maxAngle, sinPitch, cosPitch, sinRoll, cosRoll, xAngle, yAngle: REAL;
 
-	PROCEDURE MapToAngle (x: INTEGER): REAL;
+	PROCEDURE MapToAngle (x: SIGNED16): REAL;
 	VAR dx: REAL;
 	BEGIN
 		IF ABS(x) < minMove THEN
@@ -144,7 +144,7 @@ END RunFlightModel;
 PROCEDURE FlightNavigator* (F: Frame; R: Display3.Mask; VAR M: Oberon.InputMsg);
 CONST
 	minSpeed = 0.0; maxSpeed = 50.0;
-VAR keys: SET; X, Y: INTEGER; ch: CHAR; speed: REAL;
+VAR keys: SET; X, Y: SIGNED16; ch: CHAR; speed: REAL;
 BEGIN
 	speed := minSpeed;
 	Input.Mouse(keys, X, Y);
@@ -183,7 +183,7 @@ END FlightNavigator;
 
 PROCEDURE SimpleNavigator* (F: Frame; R: Display3.Mask; VAR M: Oberon.InputMsg);
 CONST minSpeed = 5;
-VAR keys: SET; X, Y, oldX, oldY: INTEGER; ch: CHAR;
+VAR keys: SET; X, Y, oldX, oldY: SIGNED16; ch: CHAR;
 BEGIN
 	oldX := M.X;
 	Input.Mouse(keys, X, Y);
@@ -226,7 +226,7 @@ END SimpleNavigator;
 
 PROCEDURE TrackMouse (F: Frame; VAR M: Oberon.InputMsg);
 VAR
-	keys, keySum: SET; X, Y, oldX, oldY: INTEGER; R: Display3.Mask; poly: Dim3Engine.Polygon;
+	keys, keySum: SET; X, Y, oldX, oldY: SIGNED16; R: Display3.Mask; poly: Dim3Engine.Polygon;
 	shape, parent: Dim3Engine.Shape; x, y: REAL; w: Dim3Engine.World; sel: BOOLEAN; ch: CHAR;
 BEGIN
 	Gadgets.MakeMask(F, F.absX, F.absY, M.dlink, R);
@@ -366,7 +366,7 @@ END UpdateHorizonBox;
 
 (** default frame handler **)
 PROCEDURE FrameHandler* (F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR w, h, depth: INTEGER; f: Frame; R: Display3.Mask; world: Dim3Engine.World;
+VAR w, h, depth: SIGNED16; f: Frame; R: Display3.Mask; world: Dim3Engine.World;
 BEGIN
 	WITH F: Frame DO
 		IF M IS Display.FrameMsg THEN
@@ -654,7 +654,7 @@ END Poll;
 (** make benchmark test **)
 PROCEDURE Benchmark*;
 CONST nFrames = 160;
-VAR F: Frame; X, Y, i: INTEGER; start, time: LONGINT; R: Display3.Mask;
+VAR F: Frame; X, Y, i: SIGNED16; start, time: LONGINT; R: Display3.Mask;
 BEGIN
 	Texts.WriteString(W, "Dim3Frames.Benchmark: ");
 	GetFrame(F);

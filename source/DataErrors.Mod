@@ -93,7 +93,7 @@ CONST
 (* Write a simple variable value. *)
 
 	PROCEDURE WriteSimpleVar( adr, type, tdadr: LONGINT;  VAR col: LONGINT );
-	VAR ch: CHAR;  sval: SIGNED8;  ival: INTEGER;  lval: LONGINT;
+	VAR ch: CHAR;  sval: SIGNED8;  ival: SIGNED16;  lval: LONGINT;
 	BEGIN
 		CASE type OF
 		1, 3:  (* BYTE, CHAR *)
@@ -110,7 +110,7 @@ CONST
 				SYSTEM.GET( adr, sval );
 				W.Int( sval, 1 );  INC( col, 4 )
 				(*Streams.WriteString(w, " ("); Streams.WriteHex(w, sval, -3); Streams.WriteString(w, "H)")*)
-		| 5:    (* INTEGER *)
+		| 5:    (* SIGNED16 *)
 				SYSTEM.GET( adr, ival );
 				W.Int( ival, 1 );  INC( col, 5 )
 				(*Streams.WriteString(w, " ("); Streams.WriteHex(w, ival, 8); Streams.WriteString(w, "H)")*)

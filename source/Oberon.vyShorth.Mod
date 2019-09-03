@@ -61,7 +61,7 @@ VAR
 		END;
 	VAR lenv: vyBase.tVector;  xp, yp: REAL;  lenMin: REAL;  dataSpan: REAL;
 		penVec: ARRAY cPens + 1 OF tPoint;
-		yFac: REAL;  delta: INTEGER;  I, J, rightLim, leftLim, dataPoint, count: LONGINT;
+		yFac: REAL;  delta: SIGNED16;  I, J, rightLim, leftLim, dataPoint, count: LONGINT;
 	BEGIN
 		IF shorth.x # NIL THEN
 			count := shorth.x.nrData;

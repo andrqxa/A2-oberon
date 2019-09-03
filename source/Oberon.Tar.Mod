@@ -23,7 +23,7 @@ MODULE Tar IN Oberon; (** portable *)	(* Copyright (c) Jacques Supcik, 1995 / js
 		END;
 
 	PROCEDURE ExtractFileName(CONST buf: ARRAY OF CHAR; VAR name: ARRAY OF CHAR);
-		VAR i, j, k: INTEGER; ch: CHAR; lastDot: BOOLEAN;
+		VAR i, j, k: SIGNED16; ch: CHAR; lastDot: BOOLEAN;
 	BEGIN
 		i := 0; j := 345; lastDot := FALSE;
 		WHILE buf[j] # 0X DO

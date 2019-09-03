@@ -200,12 +200,12 @@ TYPE
 		alt- : REAL; 				(* altitude above WGS 84 ellipsoid (meters) *)
 		epe- : REAL; 				(* estimated position error, 2 sigma (meters) *)
 		eph-, epv- : REAL; 		(* epe, but horizontal rsp. vertical only (meters) *)
-		fix- : INTEGER; 			(* type of position fix: 0 = no fix; 1 = no fix; 2 = 2D; 3 = 3D; 4 = 2D differential, 5 = 3D differential *)
+		fix- : SIGNED16; 			(* type of position fix: 0 = no fix; 1 = no fix; 2 = 2D; 3 = 3D; 4 = 2D differential, 5 = 3D differential *)
 		tow- : LONGREAL; 		(* time of week (seconds) *)
 		posn- : RadianType;  		(* latitude and longitude (radians) *)
 		east-, north-, up- : REAL; 	(* velocity east, north & up (meters per second) *)
 		mslHeight- : REAL; 		(* height of WGS 84 ellipsoid above MSL (meters) *)
-		leapSeconds- : INTEGER; 	(* difference between GPS and UTC *)
+		leapSeconds- : SIGNED16; 	(* difference between GPS and UTC *)
 		wnDays- : LONGINT; 		(* week number days *)
 	END;
 

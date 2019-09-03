@@ -42,7 +42,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 	(** Base class for messages sent to a link scheme object. *)
 		LinkSchemeMsg* = RECORD (Objects.ObjMsg)
 			key*: LONGINT;
-			res*: INTEGER
+			res*: SIGNED16
 		END;
 		DefURL* = POINTER TO DefURLDesc;
 		DefURLDesc* = RECORD
@@ -51,7 +51,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			host*: ARRAY ServerStrLen OF CHAR;
 			path*: ARRAY PathStrLen OF CHAR;
 			label*: ARRAY 64 OF CHAR;
-			port*: INTEGER
+			port*: SIGNED16
 		END;
 
 	(** Reqeuest to a link scheme object to parse link and register its normalized form in the database.
@@ -102,16 +102,16 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		curKey, curID, loadingKey*: LONGINT;
 		history: Node;
 		context*: Context; (** Context for the current link. *)
-		linkC*, oldLinkC*: INTEGER; (** Default colors for text-links. *)
+		linkC*, oldLinkC*: SIGNED16; (** Default colors for text-links. *)
 		linkMethods*, linkPictMethods*: TextGadgets0.Methods; (** New methods for TextGadgets which handle underline for hyperlinks and background images. *)
 		link, cmpBuf: ARRAY MaxLink OF CHAR;
 		diskCache: Files.File;
 		linkBeg, linkEnd: LONGINT;
 		linkF: Gadgets.Frame;
-		docW*, docH*: INTEGER;
+		docW*, docH*: SIGNED16;
 		keepurls: BOOLEAN;
 
-	PROCEDURE HexVal(ch: CHAR): INTEGER;
+	PROCEDURE HexVal(ch: CHAR): SIGNED16;
 	BEGIN
 		IF (ch >= "0") & (ch <= "9") THEN
 			RETURN ORD(ch)-ORD("0")
@@ -122,7 +122,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END HexVal;
 
-	PROCEDURE HexDigit(i: INTEGER): CHAR;
+	PROCEDURE HexDigit(i: SIGNED16): CHAR;
 	BEGIN
 		IF i < 10 THEN
 			RETURN CHR(i+ORD("0"))
@@ -204,7 +204,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			R: Files.Rider;
 			i: LONGINT;
 			prefix: ARRAY PrefixStrLen OF CHAR;
-			res: INTEGER;
+			res: SIGNED16;
 			ch: CHAR;
 	BEGIN
 		BTrees.SearchLInt(keysIndex, key, i, res);
@@ -231,7 +231,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			R: Files.Rider;
 			org, key, cache, next, porg, l: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 			same: BOOLEAN;
 		PROCEDURE SameLink(): BOOLEAN;
 		BEGIN
@@ -330,7 +330,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			R: Files.Rider;
 			org: LONGINT; i, l: SIZE;
-			res: INTEGER;
+			res: SIGNED16;
 			ch: CHAR;
 	BEGIN
 		BTrees.SearchLInt(keysIndex, key, org, res);
@@ -356,7 +356,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			Rl: Files.Rider;
 			org: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 			ch: CHAR;
 	BEGIN
 		BTrees.SearchLInt(keysIndex, key, org, res);
@@ -592,7 +592,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			R: Files.Rider;
 			org: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 	BEGIN
 		BTrees.SearchLInt(keysIndex, key, org, res);
 		IF res = BTrees.Done THEN
@@ -874,7 +874,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END Back;
 
-	PROCEDURE LocateString(F: TextGadgets0.Frame; x, y, X, Y: INTEGER; VAR loc: TextGadgets0.Loc);
+	PROCEDURE LocateString(F: TextGadgets0.Frame; x, y, X, Y: SIGNED16; VAR loc: TextGadgets0.Loc);
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
@@ -883,7 +883,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			loc1, loc2: TextGadgets0.Loc;
 			line: TextGadgets0.Line;
 			pos, beg, end: LONGINT;
-			linkC, oldLinkC: INTEGER;
+			linkC, oldLinkC: SIGNED16;
 	BEGIN
 		Attributes.GetInt(F, "LinkColor", pos);
 		linkC := SHORT(pos);
@@ -964,13 +964,13 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			END;
 			IF Strings.IsAlpha(url[i]) & (url[i+1] = "|") THEN
 				path[0] := url[i]; path[1] := ":"; path[2] := "/"; path[3] := 0X;
-				j := 3; INC(i, 2); l := MAX(INTEGER)
+				j := 3; INC(i, 2); l := MAX(SIGNED16)
 			END
 		ELSE
 			i := 0 (* url has no "file:" prefix *)
 		END;
 		Blanks();
-		IF l < MAX(INTEGER) THEN
+		IF l < MAX(SIGNED16) THEN
 			j := i;
 			IF l >= 2 THEN
 				path[0] := "/"; j := 1
@@ -1040,7 +1040,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 	END SplitFileAdr;
 
 	PROCEDURE DecPath(VAR path, dpath: ARRAY OF CHAR);
-		VAR i, slash, lslash: INTEGER;
+		VAR i, slash, lslash: SIGNED16;
 	BEGIN
 		slash := -1; lslash := -2; i := 0;
 		WHILE path[i] # 0X DO
@@ -1278,7 +1278,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			R: Files.Rider;
 			org, len: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 	BEGIN
 		BTrees.SearchLInt(keysIndex, key, org, res);
 		IF res = BTrees.Done THEN
@@ -1307,7 +1307,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			oldLib, newLib: Objects.Library;
 			R: Files.Rider;
 			org, len: LONGINT;
-			oldRef, res: INTEGER;
+			oldRef, res: SIGNED16;
 	BEGIN
 		BTrees.SearchLInt(keysIndex, key, org, res);
 		IF res = BTrees.Done THEN
@@ -1367,7 +1367,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			R: Files.Rider;
 			org, len: LONGINT;
 			obj: Objects.Object;
-			res, refd, reff: INTEGER;
+			res, refd, reff: SIGNED16;
 			lib: Objects.Library;
 			doc: Documents.Document;
 			tag: CHAR;
@@ -1409,7 +1409,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			R: Files.Rider;
 			org, len: LONGINT;
 			text: Texts.Text;
-			res: INTEGER;
+			res: SIGNED16;
 			tag: CHAR;
 	BEGIN
 		text := NIL; BTrees.SearchLInt(keysIndex, key, org, res);
@@ -1435,7 +1435,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			R: Files.Rider;
 			key, org, min, max, cache: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 	BEGIN
 		diskCache := Files.New("");
 		BTrees.MinLIntKey(keysIndex, min, res);
@@ -1456,10 +1456,10 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END ClearCache;
 
-	PROCEDURE Background(F: TextGadgets0.Frame; R: Display3.Mask; X, Y, x, y, w, h: INTEGER);
+	PROCEDURE Background(F: TextGadgets0.Frame; R: Display3.Mask; X, Y, x, y, w, h: SIGNED16);
 		VAR
 			pict: Objects.Object;
-			cx, cy, cw, ch, px, py, pw, ph: INTEGER;
+			cx, cy, cw, ch, px, py, pw, ph: SIGNED16;
 	BEGIN
 		Links.GetLink(F, "Picture", pict);
 		cx := R.X; cy := R.Y; cw := R.W; ch := R.H;
@@ -1492,7 +1492,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			R: Files.Rider;
 			org: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 	BEGIN
 		BTrees.SearchLInt(keysIndex, key, org, res);
 		IF res = BTrees.Done THEN
@@ -1510,7 +1510,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 			R: Files.Rider;
 			org: LONGINT;
 			W: Texts.Writer;
-			res: INTEGER;
+			res: SIGNED16;
 	BEGIN
 		linksFile := Files.Old("URL.DB");
 		IF (linksFile = NIL) OR new THEN

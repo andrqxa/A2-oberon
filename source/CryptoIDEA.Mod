@@ -21,7 +21,7 @@ TYPE
 				END InitKey;
 
 				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
-				VAR i: INTEGER;
+				VAR i: SIGNED16;
 				BEGIN
 					SetIV^( src, mode );   (* set mode *)
 					FOR i := 0 TO 3 DO  iv[i] := ORD( src[2*i + 1] )*256 + ORD( src[2*i] )  END
@@ -119,7 +119,7 @@ TYPE
 
 	PROCEDURE CalcEncryptionKeys( CONST src: ARRAY OF CHAR;  VAR e: KeyBlock );
 	VAR s: ARRAY 54 OF CARD16;
-		i, j, p: INTEGER;
+		i, j, p: SIGNED16;
 	BEGIN
 		p := 0;
 		FOR i := 0 TO 7 DO  s[i] := ORD( src[p] )*256 + ORD( src[p + 1] );  INC( p, 2 )  END;
@@ -143,7 +143,7 @@ TYPE
 	END CalcEncryptionKeys;
 
 	PROCEDURE CalcDecryptionKeys( CONST  e: KeyBlock; VAR d: KeyBlock );
-	VAR i, j: INTEGER;  t: CARD16;
+	VAR i, j: SIGNED16;  t: CARD16;
 	BEGIN
 		j := 8;
 		FOR i := 0 TO 8 DO

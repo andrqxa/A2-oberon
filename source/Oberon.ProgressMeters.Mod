@@ -11,7 +11,7 @@ MODULE ProgressMeters IN Oberon;	(** portable *) (* ejz,  *)
 		Frame* = POINTER TO FrameDesc;
 		FrameDesc* = RECORD (Gadgets.FrameDesc)
 			min, max, val, step: LONGINT;
-			col: INTEGER;
+			col: SIGNED16;
 			marks, labels: BOOLEAN
 		END;
 		UpdateMsg = RECORD (Display.FrameMsg)
@@ -49,9 +49,9 @@ MODULE ProgressMeters IN Oberon;	(** portable *) (* ejz,  *)
 		RETURN A.res = 0
 	END UpdateValue;
 
-	PROCEDURE Restore(F: Frame; Q: Display3.Mask; x, y, w, h: INTEGER; back: BOOLEAN);
+	PROCEDURE Restore(F: Frame; Q: Display3.Mask; x, y, w, h: SIGNED16; back: BOOLEAN);
 		VAR
-			red, xm, ym, wm, hm, xma, diff, fw, fh, dsr: INTEGER;
+			red, xm, ym, wm, hm, xma, diff, fw, fh, dsr: SIGNED16;
 			mark, range: LONGINT;
 			cap: ARRAY 16 OF CHAR;
 			horz: BOOLEAN;
@@ -158,15 +158,15 @@ MODULE ProgressMeters IN Oberon;	(** portable *) (* ejz,  *)
 	PROCEDURE Print (F: Frame; VAR M: Display.DisplayMsg);
 		VAR
 			Q: Display3.Mask;
-			x, y, w, h, red, xm, ym, wm, hm, xma, diff, fw, fh, dsr: INTEGER;
+			x, y, w, h, red, xm, ym, wm, hm, xma, diff, fw, fh, dsr: SIGNED16;
 			mark, range: LONGINT;
 			cap: ARRAY 16 OF CHAR;
 			horz: BOOLEAN;
-		PROCEDURE P(x: INTEGER): INTEGER;
+		PROCEDURE P(x: SIGNED16): SIGNED16;
 		BEGIN
 			RETURN SHORT(x * Display.Unit DIV Printer.Unit)
 		END P;
-		PROCEDURE D(x: INTEGER): INTEGER;
+		PROCEDURE D(x: SIGNED16): SIGNED16;
 		BEGIN RETURN SHORT((LONG(x) * Printer.Unit + (Display.Unit DIV 2)) DIV Display.Unit)
 		END D;
 
@@ -270,7 +270,7 @@ MODULE ProgressMeters IN Oberon;	(** portable *) (* ejz,  *)
 
 	PROCEDURE FrameHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
 		VAR
-			x, y, w, h: INTEGER;
+			x, y, w, h: SIGNED16;
 			F1: Frame;
 			Q: Display3.Mask;
 			U: UpdateMsg;

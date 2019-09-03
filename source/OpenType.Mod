@@ -49,7 +49,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 		(** object cache **)
 		Cache* = RECORD
-			entries, max: INTEGER;								(* current and maximal number of entries *)
+			entries, max: SIGNED16;								(* current and maximal number of entries *)
 			sent: CacheObj;										(* sentinel of cached object list *)
 		END;
 
@@ -62,11 +62,11 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 		(** header table **)
 		FontHeader* = RECORD
-			flags: INTEGER;										(* only using bits 0..4 *)
-			unitsPerEm*: INTEGER;								(** in range 16..16384 **)
+			flags: SIGNED16;										(* only using bits 0..4 *)
+			unitsPerEm*: SIGNED16;								(** in range 16..16384 **)
 			xMin*, yMin*, xMax*, yMax*: FUnit;					(** bounding box of all glyphs **)
-			lowestRecPPEM*: INTEGER;							(** smallest readable size in pixels **)
-			indexToLocFormat: INTEGER;							(* 'loca' index format *)
+			lowestRecPPEM*: SIGNED16;							(** smallest readable size in pixels **)
+			indexToLocFormat: SIGNED16;							(* 'loca' index format *)
 		END;
 
 		(** horizontal header table **)
@@ -78,14 +78,14 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 		(* character map table *)
 		CharMapSegment* = RECORD
-			start*, end*, delta*, offset*: INTEGER;
+			start*, end*, delta*, offset*: SIGNED16;
 		END;
 		CharMapSegments* = POINTER TO ARRAY OF CharMapSegment;
 
-		CharMapGlyphs* = POINTER TO ARRAY OF INTEGER;
+		CharMapGlyphs* = POINTER TO ARRAY OF SIGNED16;
 
 		CharMap* = RECORD
-			segCount*: INTEGER;									(* number of segments *)
+			segCount*: SIGNED16;									(* number of segments *)
 			seg*: CharMapSegments;
 			glyph*: CharMapGlyphs;
 		END;
@@ -93,18 +93,18 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		(** maximum profile table **)
 		MaxProfile* = RECORD
 			numGlyphs*: LONGINT;								(** number of glyphs in font **)
-			maxPoints, maxContours: INTEGER;
-			maxCompositePoints, maxCompositeContours: INTEGER;
-			maxZones, maxTwilightPoints: INTEGER;
-			maxStorage: INTEGER;
-			maxFunctionDefs, maxInstructionDefs: INTEGER;
-			maxStackElements, maxSizeOfInstructions: INTEGER;
+			maxPoints, maxContours: SIGNED16;
+			maxCompositePoints, maxCompositeContours: SIGNED16;
+			maxZones, maxTwilightPoints: SIGNED16;
+			maxStorage: SIGNED16;
+			maxFunctionDefs, maxInstructionDefs: SIGNED16;
+			maxStackElements, maxSizeOfInstructions: SIGNED16;
 		END;
 
 		(* horizontal metrics *)
 		HorMetric = RECORD
-			aw: INTEGER;
-			lsb: INTEGER;
+			aw: SIGNED16;
+			lsb: SIGNED16;
 		END;
 		HorMetrics = POINTER TO ARRAY OF HorMetric;
 
@@ -119,7 +119,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 			inst*: Cache;										(** cached instances **)
 
 			table: ARRAY NumTables OF TableEntry;
-			numTables: INTEGER;
+			numTables: SIGNED16;
 			head*: FontHeader;
 			hhea*: HorHeader;
 			cmap*: CharMap;
@@ -145,7 +145,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		InstanceDesc* = RECORD (CacheObjDesc)
 			font*: Font;											(** font that instance is derived from **)
 			ptsize*: F26D6;										(** point size **)
-			xdpi*, ydpi*: INTEGER;								(** device resolution in dots per inch **)
+			xdpi*, ydpi*: SIGNED16;								(** device resolution in dots per inch **)
 			xppm*, yppm*: F26D6;								(** number of pixels per Em square **)
 			mat*: Matrix;										(** current transform matrix **)
 			xmin*, ymin*, xmax*, ymax*: F26D6;				(** union of all character bounding boxes **)
@@ -164,14 +164,14 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		Glyph* = POINTER TO GlyphDesc;
 		GlyphDesc* = RECORD
 			font*: Font;											(** font that glyph is compatible with **)
-			awx*, awy*: INTEGER;								(** advance vector **)
-			hbx*, hby*: INTEGER;								(** horizontal bearing (vector from origin to lower left corner of bounding box) **)
-			rw*, rh*: INTEGER;									(** raster width and height **)
+			awx*, awy*: SIGNED16;								(** advance vector **)
+			hbx*, hby*: SIGNED16;								(** horizontal bearing (vector from origin to lower left corner of bounding box) **)
+			rw*, rh*: SIGNED16;									(** raster width and height **)
 			xmin*, ymin*, xmax*, ymax*: F26D6;				(** outline bounding box **)
 			lppx, rppx: F26D6;									(* phantom point coordinates *)
 			outline, simple, comp: OpenTypeInt.Zone;				(* glyph outline *)
 			fixDropouts: BOOLEAN;
-			scanType: INTEGER;
+			scanType: SIGNED16;
 			store: OpenTypeInt.Store;
 			cvt: OpenTypeInt.CVT;
 		END;
@@ -181,13 +181,13 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		OutlineData* = RECORD (OutlineData0)
 			moveto*: PROCEDURE (x, y: F26D6; VAR data: OutlineData0);
 			lineto*: PROCEDURE (x, y: F26D6; VAR data: OutlineData0);
-			bezierto*: PROCEDURE (x, y: ARRAY OF F26D6; n: INTEGER; VAR data: OutlineData0);
+			bezierto*: PROCEDURE (x, y: ARRAY OF F26D6; n: SIGNED16; VAR data: OutlineData0);
 		END;
 
 		(** glyph raster enumeration **)
 		RasterData0* = RECORD (OpenTypeScan.EnumData) END;
 		RasterData* = RECORD (RasterData0)
-			rect*: PROCEDURE (llx, lly, urx, ury, opacity: INTEGER; VAR data: RasterData0);
+			rect*: PROCEDURE (llx, lly, urx, ury, opacity: SIGNED16; VAR data: RasterData0);
 		END;
 
 	(**--- Debug ---**)
@@ -250,10 +250,10 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	(* ------------------------------------- *)
 	VAR
 		FontCache*: Cache;										(** cache for font objects **)
-		CharToUnicode*: ARRAY 256 OF INTEGER;				(** mapping from Oberon character codes to Unicodes **)
+		CharToUnicode*: ARRAY 256 OF SIGNED16;				(** mapping from Oberon character codes to Unicodes **)
 		Identity*: Matrix;										(** matrix normally used for generating instances **)
 		CacheStamp: LONGINT;									(* next object stamp *)
-		MacChar, UniChar: ARRAY 256 OF INTEGER;				(* corresponding Mac and Unicode characters in ascending Unicode order *)
+		MacChar, UniChar: ARRAY 256 OF SIGNED16;				(* corresponding Mac and Unicode characters in ascending Unicode order *)
 		Log : DebugLog;
 		SharpenContours: BOOLEAN;
 
@@ -268,7 +268,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END InitCache;
 
 	(** set new maximal number of objects that are kept in a cache **)
-	PROCEDURE SetCacheSize* (VAR cache: Cache; max: INTEGER);
+	PROCEDURE SetCacheSize* (VAR cache: Cache; max: SIGNED16);
 	BEGIN
 		cache.max := max;
 		WHILE cache.entries > max DO
@@ -320,7 +320,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END FindTable;
 
 	(** read big endian 2 byte integer **)
-	PROCEDURE ReadInt* (VAR r: Files.Rider; VAR i: INTEGER);
+	PROCEDURE ReadInt* (VAR r: Files.Rider; VAR i: SIGNED16);
 		VAR c: ARRAY 2 OF CHAR;
 	BEGIN
 		r.file.ReadBytes(r, c, 0, 2);
@@ -344,7 +344,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END Read16U;
 
 	PROCEDURE LoadHeader (font: Font): BOOLEAN;
-		VAR pos, len, version, magic: LONGINT; r: Files.Rider; gformat: INTEGER;
+		VAR pos, len, version, magic: LONGINT; r: Files.Rider; gformat: SIGNED16;
 	BEGIN
 		IF ~FindTable(font, "head", pos, len) THEN RETURN FALSE END;
 		font.file.Set(r, pos); ReadLInt(r, version);
@@ -364,7 +364,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadHeader;
 
 	PROCEDURE LoadHorHeader (font: Font): BOOLEAN;
-		VAR pos, len, version: LONGINT; r: Files.Rider; mformat: INTEGER;
+		VAR pos, len, version: LONGINT; r: Files.Rider; mformat: SIGNED16;
 	BEGIN
 		IF ~FindTable(font, "hhea", pos, len) THEN RETURN FALSE END;
 		font.file.Set(r, pos); ReadLInt(r, version);
@@ -388,8 +388,8 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	PROCEDURE LoadCharMap (font: Font): BOOLEAN;
 		VAR
 			r: Files.Rider; pos, length, offset, s, p: LONGINT;
-			version, tables, t, platform, encoding, format, n, len, segCountX2, pad, off: INTEGER;
-			found: BOOLEAN; glyph: ARRAY 256 OF CHAR; uni: ARRAY CharMapSize OF INTEGER;
+			version, tables, t, platform, encoding, format, n, len, segCountX2, pad, off: SIGNED16;
+			found: BOOLEAN; glyph: ARRAY 256 OF CHAR; uni: ARRAY CharMapSize OF SIGNED16;
 	BEGIN
 		IF ~FindTable(font, "cmap", pos, length) THEN
 			IF Debug THEN Log.Add("CMAP Table not found"); Log.Flush END;
@@ -531,7 +531,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadMaxProfile;
 
 	PROCEDURE LoadHorMetrics (font: Font): BOOLEAN;
-		VAR pos, len: LONGINT; r: Files.Rider; aw: INTEGER; n: LONGINT;
+		VAR pos, len: LONGINT; r: Files.Rider; aw: SIGNED16; n: LONGINT;
 	BEGIN
 		IF ~FindTable(font, "hmtx", pos, len) THEN RETURN FALSE END;
 		NEW(font.hmtx, font.maxp.numGlyphs);
@@ -710,12 +710,12 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END Open;
 
 	(** get entry from name table; whenever possible, a string in English is returned **)
-	PROCEDURE GetName* (font: Font; id: INTEGER; VAR name: ARRAY OF CHAR);
+	PROCEDURE GetName* (font: Font; id: SIGNED16; VAR name: ARRAY OF CHAR);
 		VAR
 			pos, len, off: LONGINT;
 			r: Files.Rider;
 			unicode: BOOLEAN;
-			n, offset, platform, encoding, language, nameID, l, o: INTEGER;
+			n, offset, platform, encoding, language, nameID, l, o: SIGNED16;
 			dummy: CHAR;
 	BEGIN
 		name[0] := 0X;
@@ -782,7 +782,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 	(**--- Instances ---**)
 
-	PROCEDURE CalcPPEm (font: Font; ptsize: F26D6; xdpi, ydpi: INTEGER; VAR xppm, yppm: F26D6);
+	PROCEDURE CalcPPEm (font: Font; ptsize: F26D6; xdpi, ydpi: SIGNED16; VAR xppm, yppm: F26D6);
 	BEGIN
 		xppm := OpenTypeInt.MulDiv(ptsize, xdpi, 72);
 		yppm := OpenTypeInt.MulDiv(ptsize, ydpi, 72);
@@ -793,10 +793,10 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END CalcPPEm;
 
 	(** get an instance for an opened font (an instance has fixed point size and resolution) **)
-	PROCEDURE GetInstance* (font: Font; ptsize: F26D6; xdpi, ydpi: INTEGER; mat: Matrix; VAR inst: Instance);
+	PROCEDURE GetInstance* (font: Font; ptsize: F26D6; xdpi, ydpi: SIGNED16; mat: Matrix; VAR inst: Instance);
 		VAR
 			xppm, yppm, ppm, lo, hi, xmin, xmax, ymin, ymax: F26D6; obj: CacheObj; i, pos, len, size: LONGINT;
-			context: OpenTypeInt.Context; r: Files.Rider; version, n, maxPPM, flags: INTEGER; ch: CHAR;
+			context: OpenTypeInt.Context; r: Files.Rider; version, n, maxPPM, flags: SIGNED16; ch: CHAR;
 	BEGIN
 		CalcPPEm(font, ptsize, xdpi, ydpi, xppm, yppm);
 		obj := font.inst.sent;
@@ -918,9 +918,9 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		OpenTypeInt.NewCVT(glyph.cvt, font.cvtLen)
 	END InitGlyph;
 
-	PROCEDURE LoadSimpleOutline (VAR r: Files.Rider; glyph: Glyph; inst: Instance; num: LONGINT; contours: INTEGER; hinted, rotated, stretched: BOOLEAN);
+	PROCEDURE LoadSimpleOutline (VAR r: Files.Rider; glyph: Glyph; inst: Instance; num: LONGINT; contours: SIGNED16; hinted, rotated, stretched: BOOLEAN);
 		VAR
-			font: Font; zone: OpenTypeInt.Zone; pt: OpenTypeInt.Points; points, instrLen, xmin, ymin, xmax, ymax, i, j, val: INTEGER;
+			font: Font; zone: OpenTypeInt.Zone; pt: OpenTypeInt.Points; points, instrLen, xmin, ymin, xmax, ymax, i, j, val: SIGNED16;
 			flag: SIGNED8; byte: CHAR; x, y, aw, lsb: FUnit; dx: F26D6; context: OpenTypeInt.Context;
 			flags: ARRAY 512 OF SIGNED8;
 	BEGIN
@@ -1049,7 +1049,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	PROCEDURE LoadOutline (glyph: Glyph; inst: Instance; num: LONGINT; hinted, rotated, stretched: BOOLEAN);
 		VAR
 			font: Font; pos, len, beg, end, idx: LONGINT; r: Files.Rider;
-			int, contours, flags, arg1, arg2, firstc, firstp, i, lastc, lastp, instrLen, points: INTEGER; comp: OpenTypeInt.Zone;
+			int, contours, flags, arg1, arg2, firstc, firstp, i, lastc, lastp, instrLen, points: SIGNED16; comp: OpenTypeInt.Zone;
 			aw, lsb, xmin, ymin, xmax, ymax: FUnit; lppx, rppx, dx, dy: F26D6; m00, m01, m10, m11: F2D14;
 			scaled, rot: BOOLEAN; context: OpenTypeInt.Context;
 	BEGIN
@@ -1217,7 +1217,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	(** load glyph structure with appropriately scaled outline **)
 	PROCEDURE LoadGlyph* (inst: Instance; glyph: Glyph; VAR ras: OpenTypeScan.Rasterizer; num: LONGINT; mode: SET);
 		VAR
-			font: Font; aw, xmin, ymin, xmax, ymax: F26D6; n: INTEGER;
+			font: Font; aw, xmin, ymin, xmax, ymax: F26D6; n: SIGNED16;
 			cur: OpenTypeInt.Coord; rules: SET;
 	BEGIN {EXCLUSIVE}
 		ASSERT(inst.font = glyph.font, 100);
@@ -1311,7 +1311,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 	(** enumerate glyph outline **)
 	PROCEDURE EnumOutline* (glyph: Glyph; VAR data: OutlineData);
-		VAR pt: OpenTypeInt.Points; cont, beg, points, i, j, k, l: INTEGER; x, y: F26D6; xx, yy: ARRAY 2 OF F26D6;
+		VAR pt: OpenTypeInt.Points; cont, beg, points, i, j, k, l: SIGNED16; x, y: F26D6; xx, yy: ARRAY 2 OF F26D6;
 	BEGIN
 		pt := glyph.outline.pt;
 		cont := 0;
@@ -1346,7 +1346,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END EnumOutline;
 
 
-	PROCEDURE SharpenC(VAR x0,x1,a0,a1: INTEGER);
+	PROCEDURE SharpenC(VAR x0,x1,a0,a1: SIGNED16);
 	BEGIN
 		IF x0=x1 THEN
 			a0 := 0; a1 := 0; INC(x1)
@@ -1363,8 +1363,8 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		END;
 	END SharpenC;
 
-	PROCEDURE EnumRow (row: INTEGER; beg, end: F26D6; VAR data: OpenTypeScan.EnumData);
-	VAR x0, a0, x1, a1: INTEGER;
+	PROCEDURE EnumRow (row: SIGNED16; beg, end: F26D6; VAR data: OpenTypeScan.EnumData);
+	VAR x0, a0, x1, a1: SIGNED16;
 	BEGIN
 		WITH data: RasterData DO
 			x0 := SHORT(beg DIV 40H); a0 := SHORT(beg MOD 40H);
@@ -1389,8 +1389,8 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		END
 	END EnumRow;
 
-	PROCEDURE EnumCol (col: INTEGER; beg, end: F26D6; VAR data: OpenTypeScan.EnumData);
-		VAR y0, a0, y1, a1: INTEGER;
+	PROCEDURE EnumCol (col: SIGNED16; beg, end: F26D6; VAR data: OpenTypeScan.EnumData);
+		VAR y0, a0, y1, a1: SIGNED16;
 	BEGIN
 		WITH data: RasterData DO
 			y0 := SHORT(beg DIV 40H); a0 := SHORT(beg MOD 40H);
@@ -1426,7 +1426,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	(*--- Initialization ---*)
 
 	PROCEDURE InitCharMaps;
-		VAR i: INTEGER; l: LONGINT;
+		VAR i: SIGNED16; l: LONGINT;
 	BEGIN
 		FOR i := 0 TO 126 DO
 			UniChar[i] := i; MacChar[i] := i

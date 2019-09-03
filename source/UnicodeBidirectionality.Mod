@@ -579,7 +579,7 @@ TYPE
 		PROCEDURE PrintCache;
 		VAR
 			thisElement : LineElement;
-			i : INTEGER;
+			i : SIGNED16;
 		BEGIN
 			thisElement := first;
 			i := 0;
@@ -724,7 +724,7 @@ TYPE
 		PROCEDURE PrintCache;
 		VAR
 			thisElement : LineElement;
-			i : INTEGER;
+			i : SIGNED16;
 		BEGIN
 			thisElement := first;
 			i := 0;

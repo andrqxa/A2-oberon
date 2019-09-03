@@ -6,13 +6,13 @@ TYPE
 	ReadProc* = PROCEDURE {DELEGATE} ( ): CHAR;
 
 VAR
-	H, L: INTEGER;
+	H, L: SIGNED16;
 
 	(**	Scan a floating-point number.
 		EBNF: Real = Digit {Digit} '.' Digit {Digit} ['e'|'E' ['+'|'-'] Digit {Digit}]. *)
 	PROCEDURE ScanReal*( next: ReadProc ): LONGREAL;
 	VAR
-		e: INTEGER; y, g: LONGREAL; neg, negE: BOOLEAN; ch: CHAR;
+		e: SIGNED16; y, g: LONGREAL; neg, negE: BOOLEAN; ch: CHAR;
 	BEGIN
 		ch := next();
 		WHILE (ch = "0") DO  ch := next()  END;
@@ -53,7 +53,7 @@ VAR
 	(**	Convert a string to a floating-point number.
 		EBNF: Real = Digit {Digit} '.' Digit {Digit} ['e'|'E' ['+'|'-'] Digit {Digit}]. *)
 	PROCEDURE StringToReal*(CONST s: ARRAY OF CHAR; VAR r: LONGREAL);
-	VAR p, e: INTEGER; y, g: LONGREAL; neg, negE: BOOLEAN;
+	VAR p, e: SIGNED16; y, g: LONGREAL; neg, negE: BOOLEAN;
 	BEGIN
 		p := 0;
 		WHILE (s[p] = " ") OR (s[p] = "0") DO INC(p) END;
@@ -279,7 +279,7 @@ VAR
 	END Ten;
 
 	PROCEDURE InitHL;
-	VAR i: ADDRESS;  dmy: INTEGER;  littleEndian: BOOLEAN;
+	VAR i: ADDRESS;  dmy: SIGNED16;  littleEndian: BOOLEAN;
 	BEGIN
 		dmy := 1;  i := ADDRESSOF( dmy );
 		SYSTEM.GET( i, littleEndian );   (* indirection via i avoids warning on SUN cc -O *)

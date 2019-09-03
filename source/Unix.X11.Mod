@@ -22,12 +22,12 @@ TYPE
 	PatternPtr* = POINTER TO PatternDesc;
 	PatternDesc* = RECORD
 				x*, y*: LONGINT;
-				w*, h*: INTEGER;
+				w*, h*: SIGNED16;
 				pixmap*: Pixmap
 			END;
 
 	MetricDesc* = RECORD
-				dx*, x*, y*, filler: INTEGER;
+				dx*, x*, y*, filler: SIGNED16;
 				p*: PatternDesc
 	END;
 
@@ -76,14 +76,14 @@ TYPE
 			END;
 	Color* = RECORD
 				pixel*: LONGWORD;
-				red*, green*, blue*: INTEGER;
+				red*, green*, blue*: SIGNED16;
 				flags*, pad*: CHAR
 			END;
 	Point* = RECORD
-				x*, y*: INTEGER
+				x*, y*: SIGNED16
 			END;
 	Rectangle* = RECORD
-				x*, y*, w*, h*: INTEGER
+				x*, y*, w*, h*: SIGNED16
 			END;
 	Cursor* = ADDRESS;  KeySym* = ADDRESS;  KeyCode* = CHAR;
 	AnyEvent* = RECORD
@@ -186,7 +186,7 @@ TYPE
 
 	Data40 * = ARRAY 5 OF LONGWORD; (* max of these is 40 bytes*)
 	Data40b* = ARRAY 20 OF CHAR; (* 20x 8 bits *)
-	Data40s* = ARRAY 10 OF INTEGER; (* 10x 16 bits *)
+	Data40s* = ARRAY 10 OF SIGNED16; (* 10x 16 bits *)
 	Data40l* = ARRAY 5 OF LONGINT; (* 5x 32 bits *)
 
 	ClientMessageEvent * = RECORD
@@ -200,7 +200,7 @@ TYPE
 		data*: Data40;
 			(* any of these, union
 			b* : ARRAY 20 OF CHAR;
-			s* : ARRAY 10 OF INTEGER;
+			s* : ARRAY 10 OF SIGNED16;
 			l* : ARRAY 5 OF LONGINT;
 			*)
 	END;
@@ -357,12 +357,12 @@ TYPE
 
 	(* per character font metric information. *)
 	CharStruct* = RECORD
-		lbearing*: INTEGER;	(* origin to left edge of raster *)
-		rbearing*: INTEGER;	(* origin to right edge of raster *)
-		width*: INTEGER;		(* advance to next char's origin *)
-		ascent*: INTEGER;		(* baseline to top edge of raster *)
-		descent*: INTEGER;	(* baseline to bottom edge of raster *)
-		attributes*: INTEGER;	(* per char flags (not predefined) *)
+		lbearing*: SIGNED16;	(* origin to left edge of raster *)
+		rbearing*: SIGNED16;	(* origin to right edge of raster *)
+		width*: SIGNED16;		(* advance to next char's origin *)
+		ascent*: SIGNED16;		(* baseline to top edge of raster *)
+		descent*: SIGNED16;	(* baseline to bottom edge of raster *)
+		attributes*: SIGNED16;	(* per char flags (not predefined) *)
 	END;
 
 	(* To allow arbitrary information with fonts, there are additional properties returned. *)
@@ -779,7 +779,7 @@ TYPE
 
 VAR
 	ErrorText*: Buffer;
-	ErrorFlag*: BOOLEAN;  lastEventTime*: Time;  ioErrors: INTEGER;
+	ErrorFlag*: BOOLEAN;  lastEventTime*: Time;  ioErrors: SIGNED16;
 
 
 VAR

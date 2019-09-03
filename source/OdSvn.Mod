@@ -18,7 +18,7 @@ IMPORT OdClient, Log := TFLog, U := Strings, WebHTTP, Streams, XML, Files, OdUti
 VAR
 	log: Log.Log;
 	encTable: ARRAY 64 OF CHAR;
-	decTable: ARRAY 128 OF INTEGER;
+	decTable: ARRAY 128 OF SIGNED16;
 
 
 TYPE
@@ -272,8 +272,8 @@ TYPE
 
 	PROCEDURE DecodeIO(in: StringReader; out: Streams.Writer): BOOLEAN;
 	VAR
-		codes: ARRAY 4 OF INTEGER;
-		i: INTEGER;
+		codes: ARRAY 4 OF SIGNED16;
+		i: SIGNED16;
 		ch: CHAR;
 		ok, end: BOOLEAN;
 	BEGIN
@@ -343,7 +343,7 @@ TYPE
 		tvo, (* Target view offset. *)
 		istart: Files.Position;
 		read: SIZE;
-		iord, op: INTEGER; ch: CHAR;
+		iord, op: SIGNED16; ch: CHAR;
 		sourceF, targetF: Files.File;
 	BEGIN
 		log.Enter;
@@ -1588,7 +1588,7 @@ TYPE
 END OdSvn;
 
 	PROCEDURE InitTables;
-		VAR i, max: INTEGER;
+		VAR i, max: SIGNED16;
 	BEGIN
 		max := ORD("Z")-ORD("A");
 		FOR i := 0 TO max DO

@@ -82,7 +82,7 @@ TYPE
 		END Close;
 
 		PROCEDURE RotateBlock(VAR block:Block):Block;
-		VAR i, j : INTEGER; temp : Block;
+		VAR i, j : SIGNED16; temp : Block;
 		BEGIN
 			FOR i := 0 TO BlockSize - 1 DO FOR j := 0 TO BlockSize - 1 DO temp[j, i] := block[(BlockSize - 1) - i, j] END END;
 			RETURN temp

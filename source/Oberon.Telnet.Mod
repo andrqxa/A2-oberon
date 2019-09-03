@@ -49,7 +49,7 @@ END Send0;
 PROCEDURE Break0 (T: Terminals.Terminal);
 END Break0;
 
-PROCEDURE Sb (C: NetSystem.Connection; VAR l: INTEGER);
+PROCEDURE Sb (C: NetSystem.Connection; VAR l: SIGNED16);
 VAR
 	ch, ch0, ch1: CHAR;
 BEGIN NetSystem.Read(C, ch); l := 1;
@@ -69,7 +69,7 @@ BEGIN NetSystem.Read(C, ch); l := 1;
 	END
 END Sb;
 
-PROCEDURE Will (C: NetSystem.Connection; VAR l: INTEGER);
+PROCEDURE Will (C: NetSystem.Connection; VAR l: SIGNED16);
 VAR
 	ch: CHAR;
 BEGIN NetSystem.Write(C, 0FFX);
@@ -80,14 +80,14 @@ BEGIN NetSystem.Write(C, 0FFX);
 	END
 END Will;
 
-PROCEDURE Wont (C: NetSystem.Connection; VAR l: INTEGER);
+PROCEDURE Wont (C: NetSystem.Connection; VAR l: SIGNED16);
 VAR
 	ch: CHAR;
 BEGIN NetSystem.Write(C, 0FFX); NetSystem.Write(C, 0FEX);
 	NetSystem.Read(C, ch); l := 1; NetSystem.Write(C, ch)
 END Wont;
 
-PROCEDURE Do (C: NetSystem.Connection; VAR l: INTEGER);
+PROCEDURE Do (C: NetSystem.Connection; VAR l: SIGNED16);
 VAR
 	ch: CHAR;
 BEGIN NetSystem.Write(C, 0FFX);
@@ -98,7 +98,7 @@ BEGIN NetSystem.Write(C, 0FFX);
 	END
 END Do;
 
-PROCEDURE Dont (C: NetSystem.Connection; VAR l: INTEGER);
+PROCEDURE Dont (C: NetSystem.Connection; VAR l: SIGNED16);
 VAR
 	ch: CHAR;
 BEGIN NetSystem.Write(C, 0FFX); NetSystem.Write(C, 0FCX);
@@ -110,7 +110,7 @@ VAR
 	C: NetSystem.Connection;
 	T: Terminal;
 	ch: CHAR;
-	i, k: INTEGER;
+	i, k: SIGNED16;
 	l: LONGINT;
 BEGIN
 	WITH me: Task DO
@@ -168,7 +168,7 @@ VAR
 	task: Task;
 	T: Terminal;
 	text: Texts.Text;
-	x, y, res, port: INTEGER;
+	x, y, res, port: SIGNED16;
 	beg, end, time: LONGINT;
 		adr: NetSystem.IPAdr;
 BEGIN
@@ -298,7 +298,7 @@ VAR
 	F: TerminalFrames.Frame;
 	f: TextFrames.Frame;
 	new: TextFrame;
-	x, y: INTEGER;
+	x, y: SIGNED16;
 BEGIN
 	IF Oberon.Par.vwr.dsc.next IS TerminalFrames.Frame THEN
 		F := Oberon.Par.vwr.dsc.next(TerminalFrames.Frame);

@@ -72,13 +72,13 @@ CONST
 TYPE
 	Type*=RECORD
 		form-: SIGNED8; (* SignedInteger, UnsignedInteger or Float *)
-		sizeInBits-: INTEGER; (* size in bits *)
+		sizeInBits-: SIGNED16; (* size in bits *)
 		length-: LONGINT; (* vector length, if any. If zero then type is scalar *)
 	END;
 
 	RegisterClass*=RECORD
 		class-: SIGNED8;
-		number-: INTEGER;
+		number-: SIGNED16;
 	END;
 
 
@@ -1040,7 +1040,7 @@ TYPE
 	BEGIN InitString(op,string); RETURN op
 	END String;
 
-	PROCEDURE InitType*(VAR type: Type; form: SIGNED8; sizeInBits: INTEGER);
+	PROCEDURE InitType*(VAR type: Type; form: SIGNED8; sizeInBits: SIGNED16);
 	BEGIN type.form := form; type.sizeInBits := sizeInBits; type.length := 1;
 	END InitType;
 
@@ -1054,14 +1054,14 @@ TYPE
 	END IsVectorRegister;
 
 	PROCEDURE InitRegisterClass*(VAR registerClass: RegisterClass; class: SIGNED8; number: SIZE);
-	BEGIN registerClass.class := class; registerClass.number := INTEGER(number)
+	BEGIN registerClass.class := class; registerClass.number := SIGNED16(number)
 	END InitRegisterClass;
 
 	PROCEDURE InitParameterRegisterClass*(VAR registerClass: RegisterClass; number: LONGINT);
-	BEGIN registerClass.class := Parameter; registerClass.number := INTEGER(number)
+	BEGIN registerClass.class := Parameter; registerClass.number := SIGNED16(number)
 	END InitParameterRegisterClass;
 
-	PROCEDURE NewType*(form: SIGNED8; sizeInBits: INTEGER): Type;
+	PROCEDURE NewType*(form: SIGNED8; sizeInBits: SIGNED16): Type;
 	VAR type: Type;
 	BEGIN InitType(type, form, sizeInBits); RETURN type
 	END NewType;

@@ -120,7 +120,7 @@ PROCEDURE StreamLoad(r : Streams.Reader) : Font;
 VAR
 	font : Font;
 	famch, varch, idch, typech, ch : CHAR;
-	t, height, minX, maxX, minY, maxY, nofRuns, rbeg, rend : INTEGER;
+	t, height, minX, maxX, minY, maxY, nofRuns, rbeg, rend : SIGNED16;
 
 	runs : ARRAY 32 OF RECORD beg, end : LONGINT END;
 

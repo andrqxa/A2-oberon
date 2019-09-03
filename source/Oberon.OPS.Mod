@@ -18,7 +18,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		GetProc* = PROCEDURE (VAR sym: SIGNED8);
 
 		Token = POINTER TO RECORD	pos: LONGINT; sym: SIGNED8; next: Token	END;
-		IntToken = POINTER TO RECORD (Token)	intval: LONGINT; typ: INTEGER	END;
+		IntToken = POINTER TO RECORD (Token)	intval: LONGINT; typ: SIGNED16	END;
 		RealToken = POINTER TO RECORD (Token)	realval: REAL	END;
 		LRealToken = POINTER TO RECORD (Token)	lrlval: LONGREAL	END;
 		StrToken = POINTER TO RECORD (Token)	str: String; len: LONGINT	END;
@@ -31,7 +31,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 	VAR
 		name*: Name;
 		str*: String;
-		numtyp*: INTEGER; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
+		numtyp*: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
 		intval*: LONGINT;	(* integer value or string length *)
 		realval*: REAL;
 		lrlval*: LONGREAL;
@@ -77,7 +77,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		begin* =  60; code* =  61; const* =  62; type* =  63; var* =  64;
 		procedure* =  65; import* =  66; module* =  67; finally*=68; eof* =  69;
 
-	PROCEDURE err(n: INTEGER);
+	PROCEDURE err(n: SIGNED16);
 	BEGIN OPM.err(n)
 	END err;
 
@@ -128,7 +128,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 	END StartPlaying;
 
 	PROCEDURE Str(VAR sym: SIGNED8);
-		VAR i: INTEGER; och: CHAR;
+		VAR i: SIGNED16; och: CHAR;
 	BEGIN i := 0; och := ch;
 		LOOP OPM.Get(ch);
 			IF ch = och THEN EXIT END ;
@@ -144,7 +144,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 	END Str;
 
 	PROCEDURE Identifier(VAR sym: SIGNED8);
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 	BEGIN i := 0;
 		REPEAT
 			name[i] := ch; INC(i); OPM.Get(ch)
@@ -182,9 +182,9 @@ MODULE OPS IN Oberon;	(** non-portable *)
 	END CheckOperator;
 
 		PROCEDURE Number*;
-		VAR i, m, n, d, e: INTEGER; dig: ARRAY 24 OF CHAR; f: LONGREAL; expCh: CHAR; neg: BOOLEAN;
+		VAR i, m, n, d, e: SIGNED16; dig: ARRAY 24 OF CHAR; f: LONGREAL; expCh: CHAR; neg: BOOLEAN;
 
-		PROCEDURE Ten(e: INTEGER): LONGREAL;
+		PROCEDURE Ten(e: SIGNED16): LONGREAL;
 			VAR x, p: LONGREAL;
 		BEGIN x := 1; p := 10;
 			WHILE e > 0 DO
@@ -195,7 +195,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 			RETURN x
 		END Ten;
 
-		PROCEDURE Ord(ch: CHAR; hex: BOOLEAN): INTEGER;
+		PROCEDURE Ord(ch: CHAR; hex: BOOLEAN): SIGNED16;
 		BEGIN (* ("0" <= ch) & (ch <= "9") OR ("A" <= ch) & (ch <= "F") *)
 			IF ch <= "9" THEN RETURN ORD(ch) - ORD("0")
 			ELSIF hex THEN RETURN ORD(ch) - ORD("A") + 10
@@ -251,7 +251,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 				END;
 				IF ("0" <= ch) & (ch <= "9") THEN
 					REPEAT n := Ord(ch, FALSE); OPM.Get(ch);
-						IF e <= (MAX(INTEGER) - n) DIV 10 THEN e := e*10 + n
+						IF e <= (MAX(SIGNED16) - n) DIV 10 THEN e := e*10 + n
 						ELSE err(203)
 						END
 					UNTIL (ch < "0") OR ("9" < ch);

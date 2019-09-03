@@ -63,7 +63,7 @@ TYPE
 	END Copy;
 
 	PROCEDURE Recall( line: tLayer;  VAR msg: Display.DisplayMsg );
-	VAR x, y, w, h: INTEGER;  from, to, y2d: Real;
+	VAR x, y, w, h: SIGNED16;  from, to, y2d: Real;
 	BEGIN
 		vyPort.GetPictureScreenRegion( msg.dlink( vyPort.Picture ), x, y, w, h );  from := line.lBound;  to := line.rBound;
 		IF ~line.lBounded THEN vyGraphBase.PointToPoint2d( x, y, from, y2d ) END;
@@ -73,7 +73,7 @@ TYPE
 
 	PROCEDURE Respond( line: tLayer;  VAR event: vyEvents.EventMsg );
 	(** vs 0.0d0 *)  (* md  29.05.95 13:03:40 *)
-	VAR lx, ly: INTEGER;  id, val: vyName.tNameArray;
+	VAR lx, ly: SIGNED16;  id, val: vyName.tNameArray;
 	BEGIN
 		id := "y := ";  val := "";  vyHostStrings.AppendRealFix( line.a, 5, 3, 5, val );  vyHostStrings.Append( id, val );
 		vyHostStrings.Append( id, "*x + " );  val := "";  vyHostStrings.AppendRealFix( line.b, 5, 3, 5, val );
@@ -91,7 +91,7 @@ TYPE
 
 	PROCEDURE Responsible( line: tLayer;  VAR event: vyEvents.EventMsg );
 	CONST toleranz = 4;
-	VAR priority: INTEGER;  x, y: INTEGER;  x2d, y2d: Real;
+	VAR priority: SIGNED16;  x, y: SIGNED16;  x2d, y2d: Real;
 	BEGIN
 		priority := vyEvents.PrioNone;
 		IF (event.gesture = vyEvents.EvtIdent) THEN
@@ -180,7 +180,7 @@ TYPE
 	END Open;
 
 (*PROCEDURE Show*;
-VAR data: Objects.Object;  F: tLayer;  count: INTEGER;
+VAR data: Objects.Object;  F: tLayer;  count: SIGNED16;
 pict: vyPort.Picture;
 a, b : REAL;
 inconsistentConditions : BOOLEAN;

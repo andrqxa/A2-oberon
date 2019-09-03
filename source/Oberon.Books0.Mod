@@ -68,12 +68,12 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 		ContElemDesc* = RECORD (Gadgets.FrameDesc)
 			mode*: SIGNED8;
 			beg*, end*: LONGINT;
-			col: INTEGER;
+			col: SIGNED16;
 		END;
 
 		(* simple single color rectangle Gadget *)
 		BarDesc = RECORD (Gadgets.FrameDesc)
-			col: INTEGER;
+			col: SIGNED16;
 		END;
 
 	VAR
@@ -235,8 +235,8 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 
 (* a Gadget for contents-nodes *)
 
-	PROCEDURE RestoreContElem(F: ContElem; M: Display3.Mask; x, y, w, h: INTEGER);
-		VAR dw, dh, i: INTEGER;
+	PROCEDURE RestoreContElem(F: ContElem; M: Display3.Mask; x, y, w, h: SIGNED16);
+		VAR dw, dh, i: SIGNED16;
 	BEGIN
 		IF h >= 40 THEN dh := h DIV 10
 		ELSE dh := 3
@@ -296,7 +296,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 
 	PROCEDURE ContElemHandler(F: Objects.Object; VAR M: Objects.ObjMsg);
 		VAR
-			x, y, w, h: INTEGER;
+			x, y, w, h: SIGNED16;
 			F0: ContElem;
 			R: Display3.Mask;
 	BEGIN
@@ -419,7 +419,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 (* string operations*)
 
 	PROCEDURE StrConcat*(VAR str0: ARRAY OF CHAR; str1: ARRAY OF CHAR);
-			VAR i, j: INTEGER;
+			VAR i, j: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE str0[i] # 0X DO
@@ -434,7 +434,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 	END StrConcat;
 
 	PROCEDURE CutSuffix*(VAR str: ARRAY OF CHAR);
-		VAR i, dot: INTEGER;
+		VAR i, dot: SIGNED16;
 	BEGIN
 		dot := -1;
 		i := 0;
@@ -451,14 +451,14 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 
 (* a simple single color rectangle Gadget *)
 
-	PROCEDURE ColorBar*(F: Bar; col: INTEGER);
+	PROCEDURE ColorBar*(F: Bar; col: SIGNED16);
 	BEGIN
 		F.col := col;
 		Gadgets.Update(F)
 	END ColorBar;
 
-	PROCEDURE RestoreBarFrame(F: Bar; M: Display3.Mask; x, y, w, h: INTEGER);
-		(*VAR dw: INTEGER;*)
+	PROCEDURE RestoreBarFrame(F: Bar; M: Display3.Mask; x, y, w, h: SIGNED16);
+		(*VAR dw: SIGNED16;*)
 	BEGIN
 		Display3.ReplConst(M, F.col, x, y, w, h, Display.replace);
 		(* (* show "button" *)
@@ -473,7 +473,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 
 	PROCEDURE BarFrameHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
 		VAR
-			x, y, w, h: INTEGER;
+			x, y, w, h: SIGNED16;
 			F0: Bar;
 			R: Display3.Mask;
 	BEGIN

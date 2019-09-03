@@ -286,7 +286,7 @@ TYPE
 	END BodyBranch;
 
 	PROCEDURE ThisFile(name: ARRAY OF CHAR): Files.File;
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 	BEGIN i := 0;
 		WHILE name[i] # 0X DO INC(i) END ;
 		name[i] := "."; name[i+1] := "a"; name[i+2] := "r"; name[i+3] := "m"; name[i+4] := 0X;

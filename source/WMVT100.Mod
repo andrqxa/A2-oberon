@@ -491,7 +491,7 @@ MODULE WMVT100; (* ejz,  ph *)
 				canvas.Fill(canvas.clipRect, bg, WMGraphics.ModeCopy);
 				l := first;
 				WHILE l # top DO
-					l.t := MIN(INTEGER); l.b := MIN(INTEGER); l := l.next
+					l.t := MIN(SIGNED16); l.b := MIN(SIGNED16); l := l.next
 				END;
 				attr := NIL; bottom := dY + rows*boxH;
 				box.t := dY; box.b := dY + boxH; j := 0;
@@ -521,7 +521,7 @@ MODULE WMVT100; (* ejz,  ph *)
 					INC(box.t, boxH); INC(box.b, boxH)
 				END;
 				WHILE l # NIL DO
-					l.t := MAX(INTEGER); l.b := MAX(INTEGER); l := l.next
+					l.t := MAX(SIGNED16); l.b := MAX(SIGNED16); l := l.next
 				END;
 				IF hasFocus & (cursor.ofs >= 0) & (cursor.ofs < cols) THEN
 					l := cursor.line; box.t := l.t; box.b := l.b;

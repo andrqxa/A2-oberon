@@ -338,7 +338,7 @@ TYPE
 		END ErrorS;
 
 		(** report an error occured during scanning **)
-		PROCEDURE Error( code: INTEGER );
+		PROCEDURE Error( code: SIGNED16 );
 		BEGIN
 			Basic.ErrorC(diagnostics, source^, position, code, "");
 			error := TRUE;
@@ -761,7 +761,7 @@ TYPE
 					IF ("0" <= ch) & (ch <= "9") THEN
 						REPEAT
 							n := Decimal( ch );  token.identifierString[si] := ch;  INC( si );  GetNextCharacter;
-							IF e <= (MAX( INTEGER ) - n) DIV 10 THEN e := e * 10 + n ELSE Error( Basic.NumberTooLarge ) END
+							IF e <= (MAX( SIGNED16 ) - n) DIV 10 THEN e := e * 10 + n ELSE Error( Basic.NumberTooLarge ) END
 						UNTIL (ch < "0") OR ("9" < ch);
 						IF neg THEN e := -e END
 					ELSE Error( Basic.NumberIllegalCharacter )

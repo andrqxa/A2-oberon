@@ -67,7 +67,7 @@ TYPE
 
 	(** Message broadcast to indicate that a model object changed *)
 	UpdateMsg* = RECORD (Gadgets.UpdateMsg)
-		id*: INTEGER	(** insert, delete or state *)
+		id*: SIGNED16	(** insert, delete or state *)
 	END;
 
 VAR

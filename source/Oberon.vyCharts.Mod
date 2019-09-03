@@ -126,7 +126,7 @@ END Copy; *)
 	END Copy;
 
 	PROCEDURE Responsible( chart: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 	BEGIN
 		priority := vyEvents.PrioNone;
 		IF event.gesture = vyEvents.EvtIdent THEN priority := vyEvents.PrioNormal END;
@@ -397,7 +397,7 @@ END New;*)
 	END ShowP;
 
 	PROCEDURE ShowL*( list: vyLinks.Link );
-	VAR chart: tLayer;  pic: vyPort.Picture;  i: INTEGER;
+	VAR chart: tLayer;  pic: vyPort.Picture;  i: SIGNED16;
 	BEGIN
 		WHILE list # NIL DO
 			NEW( chart );  OpenL( chart, list );  pic := vyPort.InsertNewVecPicture( chart.x, chart.y );  vyPort.AddLayer( pic, chart );

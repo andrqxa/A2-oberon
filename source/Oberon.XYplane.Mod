@@ -20,10 +20,10 @@ VAR
 	F: XYframe;  V: MenuViewers.Viewer;
 	bitmap: POINTER TO ARRAY OF SET;
 	max: LONGINT;
-	W*, H*: INTEGER;	(** size of virtual screen in pixel *)
+	W*, H*: SIGNED16;	(** size of virtual screen in pixel *)
 
 PROCEDURE Modify(F: XYframe; VAR M: Display.ModifyMsg);
-VAR i, j: LONGINT; x, y: INTEGER;
+VAR i, j: LONGINT; x, y: SIGNED16;
 BEGIN
 	IF M.id = Display.extend THEN
 		Display.CopyBlock(F.X, F.Y, F.W, F.H, F.X, F.Y + M.dY, Display.replace);
@@ -71,7 +71,7 @@ BEGIN
 END Clear;
 
 PROCEDURE Open*;
-VAR menuF: TextFrames.Frame; X, Y: INTEGER;
+VAR menuF: TextFrames.Frame; X, Y: SIGNED16;
 BEGIN
 	IF V.state # displayed THEN
 		(* Oberon.OpenTrack(Oberon.Pointer.X, 0); *)
@@ -83,7 +83,7 @@ BEGIN
 	Clear
 END Open;
 
-PROCEDURE Dot*(x, y, mode: INTEGER);
+PROCEDURE Dot*(x, y, mode: SIGNED16);
 VAR k, i, j: LONGINT;
 BEGIN
 	IF (x >= 0) & (x < W) & (y >= 0) & (y < H) THEN
@@ -96,7 +96,7 @@ BEGIN
 	END
 END Dot;
 
-PROCEDURE IsDot*(x, y: INTEGER): BOOLEAN;
+PROCEDURE IsDot*(x, y: SIGNED16): BOOLEAN;
 VAR k, i, j: LONGINT;
 BEGIN
 	IF (x >= 0) & (x < W) & (y >= 0) & (y < H) THEN

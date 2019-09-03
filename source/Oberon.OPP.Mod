@@ -103,7 +103,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 	VAR
 		SignOnMessage*: ARRAY 80 OF CHAR;
 		sym, level: SIGNED8;
-		LoopLevel: INTEGER;
+		LoopLevel: SIGNED16;
 		TDinit, lastTDinit: OPT.Node;	(*global list of TDInit nodes*)
 		RecInit, lastRecInit: OPT.Node;	(*global list of Record Nodes (method code)*)
 		CondNodes: OPT.Node;
@@ -124,11 +124,11 @@ MODULE OPP IN Oberon;	(** non-portable *)
 		nofCheck, nofObjFix, nofTypFix: LONGINT;
 
 
-	PROCEDURE err(n: INTEGER);
+	PROCEDURE err(n: SIGNED16);
 	BEGIN OPM.err(n)
 	END err;
 
-	PROCEDURE CheckSym(s: INTEGER);
+	PROCEDURE CheckSym(s: SIGNED16);
 	BEGIN
 		IF sym = s THEN OPS.Get(sym) ELSE OPM.err(s) END
 	END CheckSym;
@@ -989,7 +989,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 	END ActualParameters;
 
 
-	PROCEDURE Await(VAR x: OPT.Node; VAR n: INTEGER);
+	PROCEDURE Await(VAR x: OPT.Node; VAR n: SIGNED16);
 		VAR proc, self: OPT.Object; exp, cond: OPT.Node; name: OPS.Name; i: LONGINT; ts: OPS.TokenStream;
 	BEGIN
 		self := GetSelf();
@@ -1040,7 +1040,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 	END Await;
 
 	PROCEDURE StandProcCall(VAR x: OPT.Node);
-		VAR y: OPT.Node; m: SIGNED8; n: INTEGER;
+		VAR y: OPT.Node; m: SIGNED8; n: SIGNED16;
 			flag, flag1: BOOLEAN;
 	BEGIN m := SHORT(SHORT(x^.obj^.adr)); n := 0;
 		IF ((m = sizefn) OR (m = lenfn)) & (OPB.verify # NIL) THEN
@@ -1580,8 +1580,8 @@ MODULE OPP IN Oberon;	(** non-portable *)
 		END;
 	END ProcedureDeclaration;
 
-	PROCEDURE CaseLabelList(VAR lab: OPT.Node; LabelForm: INTEGER; VAR n: INTEGER; VAR tab: CaseTable);
-		VAR x, y, lastlab: OPT.Node; i, f: INTEGER; xval, yval: LONGINT;
+	PROCEDURE CaseLabelList(VAR lab: OPT.Node; LabelForm: SIGNED16; VAR n: SIGNED16; VAR tab: CaseTable);
+		VAR x, y, lastlab: OPT.Node; i, f: SIGNED16; xval, yval: LONGINT;
 	BEGIN lab := NIL; lastlab := NIL;
 		LOOP ConstExpression(x); f := x^.typ^.form;
 			IF f IN intSet + {Char} THEN  xval := x^.conval^.intval
@@ -1769,7 +1769,7 @@ OPM.LogWStr("  failed");*)
 				ts: OPS.TokenStream;
 
 		PROCEDURE CasePart(VAR x: OPT.Node);
-			VAR n: INTEGER; low, high: LONGINT; e: BOOLEAN;
+			VAR n: SIGNED16; low, high: LONGINT; e: BOOLEAN;
 					tab: CaseTable; cases, lab, y, lastcase: OPT.Node;
 		BEGIN
 			FixPhase := TRUE; Expression(x); FixPhase := FALSE; pos := OPM.errpos;

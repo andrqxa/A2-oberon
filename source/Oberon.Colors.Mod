@@ -24,22 +24,22 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 
 		(** inverse color lookup table **)
 		Index* = RECORD
-			bits: INTEGER;	(* number of bits per component in color cube *)
+			bits: SIGNED16;	(* number of bits per component in color cube *)
 			cube: POINTER TO ARRAY OF CHAR;	(* maps RGB triples to palette indices, size is (2^bits)^3 *)
 		END;
 
 
 	VAR
 		DisplayIndex*: Index;	(** inverse color lookup table for display palette **)
-		DisplayBits*: INTEGER;	(** number of bits used for DisplayIndex **)
-		Red*, Green*, Blue*: ARRAY 256 OF INTEGER;	(** copy of display palette (faster lookup) **)
+		DisplayBits*: SIGNED16;	(** number of bits used for DisplayIndex **)
+		Red*, Green*, Blue*: ARRAY 256 OF SIGNED16;	(** copy of display palette (faster lookup) **)
 
 
 	(**--- Inverse Color Lookup ---**)
 
 	(** return index of best match in inverse color lookup table **)
-	PROCEDURE Match* (index: Index; bits, red, green, blue: INTEGER): LONGINT;
-		VAR shift: INTEGER;
+	PROCEDURE Match* (index: Index; bits, red, green, blue: SIGNED16): LONGINT;
+		VAR shift: SIGNED16;
 	BEGIN
 		IF bits > 6 THEN bits := 6 END;
 		shift := bits-8;
@@ -47,18 +47,18 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 	END Match;
 
 	(** initialize inverse color lookup table **)
-	PROCEDURE MakeIndex* (VAR index: Index; bits: INTEGER; colors: LONGINT; VAR red, green, blue: ARRAY OF INTEGER);
+	PROCEDURE MakeIndex* (VAR index: Index; bits: SIGNED16; colors: LONGINT; VAR red, green, blue: ARRAY OF SIGNED16);
 		VAR
 			cur : LONGINT;
-			nbits, x, colormax, rcol, gcol, bcol: INTEGER;
+			nbits, x, colormax, rcol, gcol, bcol: SIGNED16;
 			xsqr, txsqr, rstride, gstride, size, i, rdist, gdist, bdist, cdist: LONGINT;
 			dbuf: POINTER TO ARRAY OF LONGINT;
-			rcenter, gcenter, bcenter, ghere, bhere, gmin, bmin, gmax, bmax: INTEGER;
+			rcenter, gcenter, bcenter, ghere, bhere, gmin, bmin, gmax, bmax: SIGNED16;
 			incr, incg, incb, p, rp, gp: LONGINT;
 			ginc, binc: LONGINT;
 
 		PROCEDURE blueloop(): BOOLEAN;
-			VAR detect: BOOLEAN; blue: INTEGER; bp, bdist, bxx: LONGINT;
+			VAR detect: BOOLEAN; blue: SIGNED16; bp, bdist, bxx: LONGINT;
 		BEGIN
 			detect := FALSE;
 			blue := bhere; bp := gp; bdist := gdist; bxx := binc;
@@ -94,7 +94,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		END blueloop;
 
 		PROCEDURE greenloop(): BOOLEAN;
-			VAR detect: BOOLEAN; green: INTEGER; ggp, ggdist, gxx: LONGINT;
+			VAR detect: BOOLEAN; green: SIGNED16; ggp, ggdist, gxx: LONGINT;
 		BEGIN
 			detect := FALSE;
 			bhere := bcenter; bmin := 0; bmax := colormax; binc := incb;	(* restart blueloop *)
@@ -134,7 +134,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		END greenloop;
 
 		PROCEDURE redloop;
-			VAR detect: BOOLEAN; red: INTEGER; rxx: LONGINT;
+			VAR detect: BOOLEAN; red: SIGNED16; rxx: LONGINT;
 		BEGIN
 			(* red up loop *)
 			detect := FALSE;
@@ -162,8 +162,8 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		(* uses Spencer W. Thomas' algorithm from Graphics Gems II (ugly as it is) *)
 		ASSERT(colors <= 10000H, 100);
 		IF bits > 6 THEN bits := 6 END;	(* (2^6)^3 = 262144! *)
-		nbits := 8-bits; x := INTEGER(ASH(1, nbits)); xsqr := ASH(1, 2*nbits); txsqr := 2*xsqr;
-		colormax := INTEGER(ASH(1, bits)); rstride := ASH(1, 2*bits); gstride := colormax;
+		nbits := 8-bits; x := SIGNED16(ASH(1, nbits)); xsqr := ASH(1, 2*nbits); txsqr := 2*xsqr;
+		colormax := SIGNED16(ASH(1, bits)); rstride := ASH(1, 2*bits); gstride := colormax;
 
 		(* fill buffer with maximal distance *)
 		size := ASH(1, 3*bits); NEW(dbuf, size);
@@ -173,9 +173,9 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 
 		cur := 0;
 		WHILE cur < colors DO
-			rcol := red[cur]; rcenter := INTEGER(ASH(rcol, -nbits)); rdist := rcol - (rcenter * x + x DIV 2);
-			gcol := green[cur]; gcenter := INTEGER(ASH(gcol, -nbits)); gdist := gcol - (gcenter * x + x DIV 2);
-			bcol := blue[cur]; bcenter := INTEGER(ASH(bcol, -nbits)); bdist := bcol - (bcenter * x + x DIV 2);
+			rcol := red[cur]; rcenter := SIGNED16(ASH(rcol, -nbits)); rdist := rcol - (rcenter * x + x DIV 2);
+			gcol := green[cur]; gcenter := SIGNED16(ASH(gcol, -nbits)); gdist := gcol - (gcenter * x + x DIV 2);
+			bcol := blue[cur]; bcenter := SIGNED16(ASH(bcol, -nbits)); bdist := bcol - (bcenter * x + x DIV 2);
 			cdist := rdist * rdist + gdist * gdist + bdist * bdist;
 			incr := 2*((rcenter+1) * xsqr - rcol * x); incg := 2*((gcenter+1) * xsqr - gcol * x); incb := 2*((bcenter+1) * xsqr - bcol * x);
 			p := rcenter * rstride + gcenter * gstride + bcenter;
@@ -186,7 +186,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 
 	(** update the inverse color lookup table for the display palette **)
 	PROCEDURE Update*;
-		VAR colors, n: INTEGER; p: Plugins.Plugin; d: Displays.Display; col: LONGINT;
+		VAR colors, n: SIGNED16; p: Plugins.Plugin; d: Displays.Display; col: LONGINT;
 	BEGIN
 		p := Displays.registry.Await("");	(* default display *)
 		IF p # NIL THEN d := p(Displays.Display) ELSE d := NIL END;
@@ -194,13 +194,13 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 			IF d.IndexToColor(0) = d.IndexToColor(16) THEN colors := 16 ELSE colors := 256 END;
 			FOR n := 0 TO colors-1 DO
 				col := d.IndexToColor(n);
-				Red[n] := INTEGER(ASH(col, -16) MOD 100H);
-				Green[n] := INTEGER(ASH(col, -8) MOD 100H);
+				Red[n] := SIGNED16(ASH(col, -16) MOD 100H);
+				Green[n] := SIGNED16(ASH(col, -8) MOD 100H);
 				Blue[n] := SHORT(col MOD 100H)
 			END;
 			MakeIndex(DisplayIndex, DisplayBits, colors, Red, Green, Blue)
 		ELSE
-			colors := INTEGER(ASH(1, Display.Depth(Display.ColLeft)));
+			colors := SIGNED16(ASH(1, Display.Depth(Display.ColLeft)));
 			IF colors > 256 THEN colors := 256 END;
 			FOR n := 0 TO colors-1 DO
 				Display.GetColor(n, Red[n], Green[n], Blue[n])
@@ -214,7 +214,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 
 	(** Oberon display model **)
 	PROCEDURE DisplayToRGB* (dcol: Display.Color; VAR r, g, b: REAL);
-		VAR dr, dg, db: INTEGER;
+		VAR dr, dg, db: SIGNED16;
 	BEGIN
 		IF dcol < 0 THEN Display.GetColor(dcol, dr, dg, db)
 		ELSE dr := Red[dcol]; dg := Green[dcol]; db := Blue[dcol]
@@ -334,7 +334,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 
 	(** message handler **)
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR col, copy: Color; x, y, z, w: REAL; lib: Objects.Library; ref: INTEGER; ver: LONGINT;
+		VAR col, copy: Color; x, y, z, w: REAL; lib: Objects.Library; ref: SIGNED16; ver: LONGINT;
 	BEGIN
 		col := obj(Color);
 		IF msg IS Objects.AttrMsg THEN

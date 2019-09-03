@@ -27,7 +27,7 @@ MODULE GfxDemo IN Oberon; (** portable *)	(* eos  *)
 		Frame* = POINTER TO FrameDesc;
 		FrameDesc* = RECORD (Gadgets.FrameDesc)
 			fgCol*, bgCol*: Gfx.Color;	(** colors used **)
-			maxIter*: INTEGER;	(** number of iterations **)
+			maxIter*: SIGNED16;	(** number of iterations **)
 		END;
 
 
@@ -103,13 +103,13 @@ MODULE GfxDemo IN Oberon; (** portable *)	(* eos  *)
 	END Render;
 
 	(* add a single rectangle to the global clip region *)
-	PROCEDURE AddMaskRect (x, y, w, h: INTEGER);
+	PROCEDURE AddMaskRect (x, y, w, h: SIGNED16);
 	BEGIN
 		GfxRegions.AddRect(ClipReg, x, y, x + w, y + h)
 	END AddMaskRect;
 
 	(* restore frame within given region *)
-	PROCEDURE RestoreFrame (frame: Frame; x, y, w, h, fx, fy: INTEGER; mask: Display3.Mask);
+	PROCEDURE RestoreFrame (frame: Frame; x, y, w, h, fx, fy: SIGNED16; mask: Display3.Mask);
 		VAR llx, lly, urx, ury: REAL;
 	BEGIN
 		(* remove marks from area where we will draw *)
@@ -146,7 +146,7 @@ MODULE GfxDemo IN Oberon; (** portable *)	(* eos  *)
 
 	(* print frame *)
 	PROCEDURE PrintFrame (frame: Frame; VAR msg: Display.DisplayMsg);
-		VAR pc: GfxPrinter.Context; mask: Display3.Mask; w, h: INTEGER;
+		VAR pc: GfxPrinter.Context; mask: Display3.Mask; w, h: SIGNED16;
 	BEGIN
 		(* set up printer context *)
 		NEW(pc); GfxPrinter.Init(pc);
@@ -181,7 +181,7 @@ MODULE GfxDemo IN Oberon; (** portable *)	(* eos  *)
 	END PrintFrame;
 
 	PROCEDURE HandleFrame* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR frame, copy: Frame; fx, fy: INTEGER; mask: Display3.Mask; ver: LONGINT; ch: CHAR;
+		VAR frame, copy: Frame; fx, fy: SIGNED16; mask: Display3.Mask; ver: LONGINT; ch: CHAR;
 	BEGIN
 		frame := obj(Frame);
 		IF msg IS Display.FrameMsg THEN
@@ -278,7 +278,7 @@ MODULE GfxDemo IN Oberon; (** portable *)	(* eos  *)
 		END
 	END HandleFrame;
 
-	PROCEDURE InitFrame* (frame: Frame; fgCol, bgCol: Gfx.Color; maxIter: INTEGER);
+	PROCEDURE InitFrame* (frame: Frame; fgCol, bgCol: Gfx.Color; maxIter: SIGNED16);
 	BEGIN
 		frame.handle := HandleFrame; frame.W := 300; frame.H := 300;
 		frame.fgCol := fgCol; frame.bgCol := bgCol; frame.maxIter := maxIter

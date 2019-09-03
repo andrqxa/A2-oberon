@@ -24,7 +24,7 @@ TYPE
 	EnumAlarmHandler* = PROCEDURE (alarm: Alarm; t, d: LONGINT; VAR handled: BOOLEAN);
 
 	TickMsg* = RECORD (Display.FrameMsg)
-		id* : INTEGER;
+		id* : SIGNED16;
 		date*, time* : LONGINT
 	END;
 
@@ -32,7 +32,7 @@ TYPE
 	ClockDesc* = RECORD (Gadgets.FrameDesc)
 		date, time, timeDiff: LONGINT;
 		state0: SET;
-		col: INTEGER
+		col: SIGNED16
 	END;
 
 VAR
@@ -46,7 +46,7 @@ VAR
 (* ------------ Oberon date convertion ------------ *)
 
 PROCEDURE ToLinearForm (t, d: LONGINT): LONGINT;
-	VAR h, m, s: INTEGER;
+	VAR h, m, s: SIGNED16;
 BEGIN
 	Dates.ToHMS(t, h, m, s);
 	RETURN (Dates.NumberOfDays(d) - zeroY)*Day + LONG(s) + LONG(m)*Minute + LONG(h)*Hour
@@ -67,7 +67,7 @@ END GetClock;
 (* ------------ alarm ------------ *)
 
 PROCEDURE AlarmTask(me : Oberon.Task);
-	VAR a, p : Alarm; now, t, d: LONGINT; M : TickMsg; hour,min,sec : INTEGER; handled : BOOLEAN;
+	VAR a, p : Alarm; now, t, d: LONGINT; M : TickMsg; hour,min,sec : SIGNED16; handled : BOOLEAN;
 BEGIN
 	IF alarms & (Input.Time() - lastAlarm > Input.TimeUnit) THEN
 		lastAlarm := Input.Time();
@@ -174,8 +174,8 @@ BEGIN
 	END;
 END ClockAttr;
 
-PROCEDURE Line2(M: Display3.Mask; ang: INTEGER; x0, y0, r1, r2, color: INTEGER);
-	VAR x1, y1, x2, y2: INTEGER; s,c,a : REAL;
+PROCEDURE Line2(M: Display3.Mask; ang: SIGNED16; x0, y0, r1, r2, color: SIGNED16);
+	VAR x1, y1, x2, y2: SIGNED16; s,c,a : REAL;
 BEGIN
 	ang := (15-ang) MOD 60;
 	a := 2 * Math.pi / 60 * ang;
@@ -187,10 +187,10 @@ BEGIN
 	Display3.Line(M,color,Display.solid,x0+x1, y0+y1, x0+x2, y0+y2,  1, Display.replace)
 END Line2;
 
-PROCEDURE RestoreClock(F: Clock; M: Display3.Mask; x, y, w, h: INTEGER; alarm : BOOLEAN);
+PROCEDURE RestoreClock(F: Clock; M: Display3.Mask; x, y, w, h: SIGNED16; alarm : BOOLEAN);
 	VAR
 		time, date: LONGINT;
-		rh, rm, i ,x0, y0, r, hour, min, sec, year, month, day, dow, col: INTEGER;
+		rh, rm, i ,x0, y0, r, hour, min, sec, year, month, day, dow, col: SIGNED16;
 		s : ARRAY 32 OF CHAR;
 BEGIN
 	Oberon.RemoveMarks(x,y,w,h);
@@ -252,16 +252,16 @@ END RestoreClock;
 PROCEDURE PrintClock(F: Clock; VAR M: Display.DisplayMsg);
 	VAR
 		time, date: LONGINT;
-		r, rh, rm, x0, y0, i, hour,min,sec, year,month,day,dow,col: INTEGER;
+		r, rh, rm, x0, y0, i, hour,min,sec, year,month,day,dow,col: SIGNED16;
 		s : ARRAY 32 OF CHAR;
 		Q: Display3.Mask;
 
-	PROCEDURE P (X: INTEGER): INTEGER;
+	PROCEDURE P (X: SIGNED16): SIGNED16;
 	BEGIN RETURN SHORT(Display.Unit*X DIV Printer.Unit)
 	END P;
 
-	PROCEDURE PLine(ang: INTEGER; x0, y0, r1, r2, color: INTEGER);
-		VAR x1, y1, x2, y2: INTEGER; s,c,a : REAL;
+	PROCEDURE PLine(ang: SIGNED16; x0, y0, r1, r2, color: SIGNED16);
+		VAR x1, y1, x2, y2: SIGNED16; s,c,a : REAL;
 	BEGIN
 		ang := (15-ang) MOD 60;
 		a := 2 * Math.pi / 60 * ang;
@@ -321,7 +321,7 @@ BEGIN
 END CopyClock;
 
 PROCEDURE ClockHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR x, y, w, h, u, v: INTEGER; F0: Clock; R: Display3.Mask;
+VAR x, y, w, h, u, v: SIGNED16; F0: Clock; R: Display3.Mask;
 BEGIN
 	WITH F: Clock DO
 		IF M IS Objects.AttrMsg THEN

@@ -28,7 +28,7 @@ IMPORT antsObjects, antsFunctions, Objects, Files, Gadgets, antsNeighbourhoods, 
 	Math := MathL IN A2, antsKernel, antsModels, antsCommands, vyName, vyBase, antsCaches, vyRanBase, Links, antsGlobals, aM := antsMessages;
 
 TYPE
-	intArray = POINTER TO ARRAY OF INTEGER;
+	intArray = POINTER TO ARRAY OF SIGNED16;
 	realArray = POINTER TO ARRAY OF LONGREAL;
 
 	tModel* = POINTER TO tModelDesc;
@@ -47,7 +47,7 @@ TYPE
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLInt( R, s.dim );  Gadgets.ReadRef( R, s.lib, objsub );
 		IF objsub # NIL THEN s.n := objsub( antsNeighbourhoods.Neighbours ) END;
@@ -76,8 +76,8 @@ TYPE
 	END MakeCaches;
 
 	PROCEDURE Sync( m: tModel;  depth: LONGINT );
-	VAR i: INTEGER;  c: antsCaches.FullCache;
-		cv: POINTER TO ARRAY OF INTEGER;
+	VAR i: SIGNED16;  c: antsCaches.FullCache;
+		cv: POINTER TO ARRAY OF SIGNED16;
 		cvr: POINTER TO ARRAY OF LONGREAL;
 		offset: LONGINT;  s: LONGREAL;
 	BEGIN
@@ -109,7 +109,7 @@ TYPE
 
 	PROCEDURE OneSweep*( M: antsKernel.samplingMsg );
 	VAR A, Orig: antsArrayObjects.tINTEGERObject;  model: tModel;  dim, x, y, w, h: LONGINT;  x0, y0, w0, h0: LONGINT;  orig: Objects.Object;
-		count: INTEGER;  uv: realArray;  nb: realArray;  z, cooling, ran: LONGREAL;  max: INTEGER;  cpos, nclen: LONGINT;  cache: antsCaches.FullCache;
+		count: SIGNED16;  uv: realArray;  nb: realArray;  z, cooling, ran: LONGREAL;  max: SIGNED16;  cpos, nclen: LONGINT;  cache: antsCaches.FullCache;
 		cx, cy: antsNeighbourhoods.Index;  i: LONGINT;  pars: antsNeighbourhoods.pars;  theta: LONGREAL;  position, posi: LONGINT;  s: antsKernel.Kernel;
 		visit: antsKernel.visitingScheme;  parallel: BOOLEAN;  destA, srcA: antsArrayObjects.tINTEGERArray;  nbi: intArray;
 	BEGIN

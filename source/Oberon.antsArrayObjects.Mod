@@ -66,7 +66,7 @@ VAR
 
 	ra*: POINTER TO ARRAY OF LONGREAL;
 	la*: POINTER TO ARRAY OF LONGINT;
-	ia*: POINTER TO ARRAY OF INTEGER;
+	ia*: POINTER TO ARRAY OF SIGNED16;
 
 
 	(** top is EXCLUSIVE ! i.e. top = 2 => max = 1 *)
@@ -88,7 +88,7 @@ VAR
 	(*antsRandom.gen.GetRandomLV(antsRandom.gen,top,LEN(a),a,0); *)
 	END Uniform1dL;
 
-	PROCEDURE Uniform1dI* (VAR a: ARRAY OF INTEGER; x,w: LONGINT; top: INTEGER);
+	PROCEDURE Uniform1dI* (VAR a: ARRAY OF SIGNED16; x,w: LONGINT; top: SIGNED16);
 	VAR xx: LONGINT;
 	BEGIN
 	IF (la=NIL) OR (LEN(la^)#w) THEN NEW(la,w) END;
@@ -100,7 +100,7 @@ VAR
 	*)
 
 (*
-	PROCEDURE UniformINTEGERArray* (A: tINTEGERArray; top: INTEGER; x,y,w,h: LONGINT);
+	PROCEDURE UniformINTEGERArray* (A: tINTEGERArray; top: SIGNED16; x,y,w,h: LONGINT);
 	VAR  y0: LONGINT ;
 	BEGIN
 	FOR y0 := y TO y+h-1 DO
@@ -194,7 +194,7 @@ VAR
 		FOR y := 0 TO h - 1 DO
 			FOR x := 0 TO w - 1 DO
 				A[y, x] := a[sy + y, sx + x];
-				IF A[dy + y, dx + x] < 0 THEN A[y, x] := 2 * MAX( INTEGER ) + A[dy + y, dx + x] END
+				IF A[dy + y, dx + x] < 0 THEN A[y, x] := 2 * MAX( SIGNED16 ) + A[dy + y, dx + x] END
 			END
 		END
 	END CopyUnsignedIL;
@@ -237,7 +237,7 @@ VAR
 		FOR y := 0 TO h - 1 DO
 			FOR x := 0 TO w - 1 DO
 				A[dy + y, dx + x] := a[sy + y, sx + x];
-				IF A[dy + y, dx + x] < 0 THEN A[y, x] := 2 * MAX( INTEGER ) + A[dy + y, dx + x] END
+				IF A[dy + y, dx + x] < 0 THEN A[y, x] := 2 * MAX( SIGNED16 ) + A[dy + y, dx + x] END
 			END
 		END
 	END CopyUnsignedIR;
@@ -262,7 +262,7 @@ VAR
 		END
 	END CopyRR;
 
-	PROCEDURE FillIntArray*( val: INTEGER;  A: tINTEGERArray;  x, y, w, h: LONGINT );
+	PROCEDURE FillIntArray*( val: SIGNED16;  A: tINTEGERArray;  x, y, w, h: LONGINT );
 	VAR curline: LONGINT;
 	BEGIN
 		FOR curline := y TO y + h - 1 DO vyInteger.Fill( w, A[curline], x, val ) END
@@ -352,25 +352,25 @@ VAR
 		RETURN res;
 	END "/";
 
-	OPERATOR "/"*( a: tLONGREALArray;  b: INTEGER ): tLONGREALArray;
+	OPERATOR "/"*( a: tLONGREALArray;  b: SIGNED16 ): tLONGREALArray;
 	VAR bb: LONGREAL;
 	BEGIN
 		bb := b;  RETURN a / bb;
 	END "/";
 
-	OPERATOR "*"*( a: tLONGREALArray;  b: INTEGER ): tLONGREALArray;
+	OPERATOR "*"*( a: tLONGREALArray;  b: SIGNED16 ): tLONGREALArray;
 	VAR bb: LONGREAL;
 	BEGIN
 		bb := b;  RETURN a * bb;
 	END "*";
 
-	OPERATOR "+"*( a: tLONGREALArray;  b: INTEGER ): tLONGREALArray;
+	OPERATOR "+"*( a: tLONGREALArray;  b: SIGNED16 ): tLONGREALArray;
 	VAR bb: LONGREAL;
 	BEGIN
 		bb := b;  RETURN a + bb;
 	END "+";
 
-	OPERATOR "-"*( a: tLONGREALArray;  b: INTEGER ): tLONGREALArray;
+	OPERATOR "-"*( a: tLONGREALArray;  b: SIGNED16 ): tLONGREALArray;
 	VAR bb: LONGREAL;
 	BEGIN
 		bb := b;  RETURN a - bb;
@@ -384,7 +384,7 @@ VAR
 		FOR y := 0 TO LEN( a ) - 1 DO vyLongreal.Fill( LEN( a[0] ), res[y], 0, b ) END;
 	END ":=";
 
-	OPERATOR ":="*( VAR o: tObject;  val: INTEGER );
+	OPERATOR ":="*( VAR o: tObject;  val: SIGNED16 );
 	BEGIN
 		IF o IS tLONGREALObject THEN
 			WITH o: tLONGREALObject DO FillLongrealArray( val, o.A, 0, 0, o.w, o.h );
@@ -426,7 +426,7 @@ VAR
 	PROCEDURE GenINTEGERObj*;
 	VAR obj: tINTEGERObject;
 	BEGIN
-		aM.cmd;  NEW( obj );  Init( obj );  obj.depth := MAX( INTEGER );  Objects.NewObj := obj
+		aM.cmd;  NEW( obj );  Init( obj );  obj.depth := MAX( SIGNED16 );  Objects.NewObj := obj
 	END GenINTEGERObj;
 
 	PROCEDURE GenLONGINTObj*;
@@ -750,7 +750,7 @@ VAR
 	END FrameLinks;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR w, h, depth: LONGINT;  version: INTEGER;  rdepth: LONGREAL;
+	VAR w, h, depth: LONGINT;  version: SIGNED16;  rdepth: LONGREAL;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN
@@ -887,7 +887,7 @@ VAR
 	END ObjectCopy;
 
 	PROCEDURE upsidedown;
-	VAR temp: INTEGER;  y, x: LONGINT;
+	VAR temp: SIGNED16;  y, x: LONGINT;
 	BEGIN
 		IF globalobj # NIL THEN
 			WITH globalobj: tINTEGERObject DO
@@ -903,7 +903,7 @@ VAR
 	END upsidedown;
 
 	PROCEDURE leftsideright;
-	VAR temp: INTEGER;  y, x: LONGINT;
+	VAR temp: SIGNED16;  y, x: LONGINT;
 	BEGIN
 		IF globalobj # NIL THEN
 			WITH globalobj: tINTEGERObject DO
@@ -1082,7 +1082,7 @@ VAR
 
 	PROCEDURE ReadPGMAscii*( VAR A: tINTEGERObject;  VAR FR: Files.Rider ): BOOLEAN;
 	VAR name: ARRAY 64 OF CHAR;
-		ch: CHAR;  pos: LONGINT;  w, h, d: LONGINT;  x, y: LONGINT;  R: antsFiles.Rider;  int: INTEGER;  lint: LONGINT;
+		ch: CHAR;  pos: LONGINT;  w, h, d: LONGINT;  x, y: LONGINT;  R: antsFiles.Rider;  int: SIGNED16;  lint: LONGINT;
 	BEGIN
 		NEW(R); R.Enter( FR );  R.SetAscii;  R.ReadString( name );
 		IF (R.err) OR (name # "P2") THEN aM.eSS( "could not load PGM Ascii image, header=", name );  RETURN FALSE ELSE aM.S( "Loading PGM Ascii" );  END;
@@ -1128,7 +1128,7 @@ VAR
 		globalLA := NIL;  CopyUnsignedIL( A, globalLA, 0, 0, LEN( A[0] ), LEN( A ), 0, 0 );  StoreDialoged( globalLA, depth, name )
 	END StoreDialogedI;
 
-	PROCEDURE GetSel( VAR x, y, w, h: INTEGER );
+	PROCEDURE GetSel( VAR x, y, w, h: SIGNED16 );
 	VAR sel: antsPictCoordinate.Selection;
 	BEGIN
 		sel := antsPictCoordinate.currentsel;  w := SHORT( globalobj.w );  h := SHORT( globalobj.h );  x := 0;  y := 0;
@@ -1137,7 +1137,7 @@ VAR
 
 	PROCEDURE storepgmsel;
 	VAR name: ARRAY 256 OF CHAR;
-		x, y, w, h: INTEGER;  A: tINTEGERArray;
+		x, y, w, h: SIGNED16;  A: tINTEGERArray;
 	BEGIN
 		IF globalobj # NIL THEN
 			IF globalobj IS tINTEGERObject THEN
@@ -1154,7 +1154,7 @@ VAR
 	END storepgmsel;
 
 	PROCEDURE cutsel;
-	VAR x, y, w, h: INTEGER;  A: tINTEGERArray;
+	VAR x, y, w, h: SIGNED16;  A: tINTEGERArray;
 	BEGIN
 		IF globalobj # NIL THEN
 			WITH globalobj: tINTEGERObject DO
@@ -1314,11 +1314,11 @@ VAR
 
 (* Interaktive Routine zum Anzeigen der Zeilen und Spalten eines 2d-Bildes *)
 	PROCEDURE InteractiveGetRowCol*( row, col: vyBase.tVector;  r, c: vyBase.Object );
-	VAR msg: antsToolbox.GetCoordMsg;  x, y: LONGINT;  o: tObject;  xm, ym: INTEGER;  keys: SET;  layer: Objects.Object;
+	VAR msg: antsToolbox.GetCoordMsg;  x, y: LONGINT;  o: tObject;  xm, ym: SIGNED16;  keys: SET;  layer: Objects.Object;
 		coords: ARRAY 64 OF CHAR;
 	BEGIN
 		x := MAX( LONGINT );  y := MAX( LONGINT );  msg.layer := NIL;  msg.update := TRUE;  antsToolbox.InteractiveMsg( msg );  layer := msg.layer;
-		Input.Mouse( keys, xm, ym );  msg.x := MAX( INTEGER );  msg.y := MAX( INTEGER );
+		Input.Mouse( keys, xm, ym );  msg.x := MAX( SIGNED16 );  msg.y := MAX( SIGNED16 );
 		WHILE (keys # {}) DO
 			IF (msg.x # xm) OR (msg.y # ym) THEN
 				msg.x := xm;  msg.y := ym;  msg.update := FALSE;  msg.layer := NIL;  antsToolbox.MsgToTypedXY( xm, ym, msg, "antsViews.tLayerDesc" );

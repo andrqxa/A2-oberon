@@ -3524,7 +3524,7 @@ VAR
 			lastReboot := RebootPowerOn;
 			Trace.StringLn("Starting after power on")
 		END;
-		error := SYSTEM.VAL(INTEGER, val);
+		error := SYSTEM.VAL(SIGNED16, val);
 		IF error # 0 THEN
 			Trace.String("BootROM error code: "); Trace.Int(error, 0); Trace.Ln
 		END;

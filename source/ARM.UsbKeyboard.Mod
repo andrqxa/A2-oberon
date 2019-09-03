@@ -593,7 +593,7 @@ VAR
 	a: ADDRESS;
 	s1: CHAR;
 	s : SET;
-	k: INTEGER;
+	k: SIGNED16;
 	dkn: SIGNED8;
 BEGIN
 	IF (c = 46X) & (flags * Inputs.Ctrl # {}) THEN RETURN -2 END;  (* Ctrl-Break - break *)

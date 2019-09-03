@@ -15,12 +15,12 @@ TYPE
 		chunkWAVE: Chunk; 									(* must be "WAVE" *)
 		chunkfmt: Chunk; 									(* must be "fmt " *)
 		waveFormatSize: LONGINT; 							(* must be 16 for PCM wave *)
-		formatTag: INTEGER; 								(* must be 1 for PCM wave *)
-		nofCh: INTEGER; 									(* number of channels *)
+		formatTag: SIGNED16; 								(* must be 1 for PCM wave *)
+		nofCh: SIGNED16; 									(* number of channels *)
 		sRate: LONGINT; 									(* sampling rate *)
 		bRate: LONGINT; 									(* byte rate *)
-		blockAlign: INTEGER; 								(* bytes per sample *)
-		bitsPerSample: INTEGER; 							(* sampling resolution = bits per sample for 1 channel *)
+		blockAlign: SIGNED16; 								(* bytes per sample *)
+		bitsPerSample: SIGNED16; 							(* sampling resolution = bits per sample for 1 channel *)
 		chunkdata: Chunk; 									(* must be "data" *)
 		fileSize: LONGINT;									(* size of the whole file minus 8 byte *)
 		dataSize: LONGINT; 									(* size of PCM data in byte = file size minus header size *)
@@ -356,7 +356,7 @@ TYPE
 	END PCMDecoder;
 
 (* Routines for reading and writing numbers in Intel's big endian format *)
-PROCEDURE ReadRawBEInteger(VAR r: Streams.Reader; VAR value: INTEGER);
+PROCEDURE ReadRawBEInteger(VAR r: Streams.Reader; VAR value: SIGNED16);
 BEGIN
 	value := ORD(r.Get()) + 100H *ORD(r.Get());
 END ReadRawBEInteger;
@@ -367,7 +367,7 @@ BEGIN
 		+ 10000H * LONG(ORD(r.Get())) + 1000000H * LONG(ORD(r.Get()));
 END ReadRawBELongInt;
 
-PROCEDURE WriteRawBEInteger(VAR w: Streams.Writer; value: INTEGER);
+PROCEDURE WriteRawBEInteger(VAR w: Streams.Writer; value: SIGNED16);
 BEGIN
 	w.Char(CHR(value MOD 100H));
 	w.Char(CHR(value DIV 100H));

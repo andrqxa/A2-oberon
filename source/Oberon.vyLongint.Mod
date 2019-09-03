@@ -908,7 +908,7 @@ BEGIN
 	RETURN maxdist
 END DistSupPat;
 
-PROCEDURE Short* (len: index;  VAR x: ARRAY OF LONGINT;  start: index;  VAR result: ARRAY OF INTEGER);
+PROCEDURE Short* (len: index;  VAR x: ARRAY OF LONGINT;  start: index;  VAR result: ARRAY OF SIGNED16);
 	(*=  result[ ]:=SHORT(x[ ]) *)
 	VAR end: index;
 BEGIN
@@ -918,7 +918,7 @@ BEGIN
 	WHILE start < end DO result[start] := SHORT(x[start]);  INC(start) END
 END Short;
 
-PROCEDURE Long* (len: index;  VAR x: ARRAY OF INTEGER;  start: index;  VAR result: ARRAY OF LONGINT);
+PROCEDURE Long* (len: index;  VAR x: ARRAY OF SIGNED16;  start: index;  VAR result: ARRAY OF LONGINT);
 	(*=  result[ ]:=LONG(x[ ]) *)
 	VAR end: index;
 BEGIN

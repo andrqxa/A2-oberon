@@ -114,7 +114,7 @@ VAR
 	END StoreF;
 
 	PROCEDURE LoadF( VAR R: Files.Rider;  o: tObject );
-	VAR version: INTEGER;
+	VAR version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version )
 	END LoadF;
@@ -268,7 +268,7 @@ VAR
 		IF antsCommands.ExpectStringFromKeyword( l, "attr", attribute ) THEN
 			model := BasicModel( obj, attribute, class );
 			IF class = classInteger THEN
-				aM.vS( "antsObjects: Attribute IS INTEGER" );  l.spos := 3;
+				aM.vS( "antsObjects: Attribute IS SIGNED16" );  l.spos := 3;
 				IF antsCommands.ExpectNumberFromKeyword( l, "val", num ) THEN Attributes.SetInt( obj1, attribute, num ) END
 			ELSIF class = classReal THEN
 				aM.vS( "antsObjects: Attribute IS REAL" );  l.spos := 3;
@@ -398,7 +398,7 @@ END SetGen;
 	END ListAttributes;
 
 	PROCEDURE ListList*;
-	VAR l: vyCommandMenus.List;  keys: SET;  x, y: INTEGER;  event: vyEvents.EventMsg;
+	VAR l: vyCommandMenus.List;  keys: SET;  x, y: SIGNED16;  event: vyEvents.EventMsg;
 	BEGIN
 		vyCommandMenus.Add( l, ListInspect, "Inspect" );  vyCommandMenus.Add( l, ListAttributes, "View Attributes" );
 		vyCommandMenus.Add( l, ListView, "View as ... " );  Input.Mouse( keys, x, y );

@@ -84,7 +84,7 @@ BEGIN
 END MakeBuf;
 
 PROCEDURE CheckLen (VAR s: ARRAY OF CHAR;  VAR len: LONGINT);
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 BEGIN
 	i := 0;
 	WHILE (i < len) & (s[i] # 0X) DO INC(i) END;

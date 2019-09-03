@@ -62,7 +62,7 @@ VAR
 	END Copy;
 
 	PROCEDURE Recall( scatter: tLayer );
-	VAR nrData, i: LONGINT;  sel: vyBase.tVector;  xx, yy: Coordinate;  b, lastb: BOOLEAN;  lastx, lasty: Coordinate;  width: INTEGER;
+	VAR nrData, i: LONGINT;  sel: vyBase.tVector;  xx, yy: Coordinate;  b, lastb: BOOLEAN;  lastx, lasty: Coordinate;  width: SIGNED16;
 		pattern: ARRAY 256 OF CHAR;
 	BEGIN
 		Attributes.GetString( scatter, "plotpattern", pattern );
@@ -192,7 +192,7 @@ VAR
 	END Prompt;
 
 	PROCEDURE Responsible( scatter: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 
 		PROCEDURE InScatter( x, y: Coordinate ): BOOLEAN;
 		CONST eps = 3;
@@ -312,7 +312,7 @@ VAR
 	END Store0;
 
 	PROCEDURE Load0( obj: tLayer;  VAR M: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		version := 0;  dlink := M.dlink;  Gadgets.ReadRef( M.R, obj.lib, objsub );
 		IF objsub = NIL THEN Files.ReadInt( M.R, version );  Gadgets.ReadRef( M.R, obj.lib, objsub ) END;
@@ -488,7 +488,7 @@ END Init;*)
 	END ShowP;
 
 	PROCEDURE ShowL*( list: vyLinks.Link );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		WHILE list # NIL DO
 			New;  Init( newlayer, list.obj );

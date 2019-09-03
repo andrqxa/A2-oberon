@@ -37,7 +37,7 @@ TYPE
       len: LONGINT;
       obj: Objects.Object;
       lib: Objects.Library;
-      ref: INTEGER; (* ref no in obs lib *)
+      ref: SIGNED16; (* ref no in obs lib *)
       col: SIGNED8;
       voff: SIGNED8;
       prev, next: Piece
@@ -82,8 +82,8 @@ TYPE
 
     Scanner* = RECORD (Reader)	(** Scanner for symbol streams. *)
       nextCh*: CHAR;	(** Character immediately following the last symbol scanned. *)
-      line*: INTEGER;	(** # carriage returns scanned so far. *)
-      class*: INTEGER;	(** Scan result: Int, Real, String etc. *)
+      line*: SIGNED16;	(** # carriage returns scanned so far. *)
+      class*: SIGNED16;	(** Scan result: Int, Real, String etc. *)
       i*: LONGINT;
       x*: REAL;
       y*: LONGREAL;
@@ -117,9 +117,9 @@ TYPE
   PROCEDURE LoadAscii* (T: Text; f: Files.File);
     VAR Q, q: Piece; len: LONGINT;
   BEGIN len := Files.Length(f);
-    NEW(Q); Q.f := Wfile; Q.off := 0; Q.len := 1; Q.ref := MIN(INTEGER);
+    NEW(Q); Q.f := Wfile; Q.off := 0; Q.len := 1; Q.ref := MIN(SIGNED16);
     Q.lib := NIL; Q.col := 127; Q.voff := 0;
-    NEW(q); q.f := f; q.off := 0; q.len := len; q.ref := MIN(INTEGER);
+    NEW(q); q.f := f; q.off := 0; q.len := len; q.ref := MIN(SIGNED16);
     q.lib := Fonts.Default; q.col := 15; q.voff := 0;
     Q.next := q; q.prev := Q; q.next := Q; Q.prev := q;
     T.handle := H; T.obs := NIL;
@@ -128,7 +128,7 @@ TYPE
   END LoadAscii;
 
   PROCEDURE ReadDocHeader(VAR R: Files.Rider; VAR ch: CHAR);
-    VAR len: LONGINT; x, y, w, h: INTEGER; name: ARRAY 256 OF CHAR;
+    VAR len: LONGINT; x, y, w, h: SIGNED16; name: ARRAY 256 OF CHAR;
   BEGIN Files.Read(R, ch);
     Files.ReadString(R, name);
     Files.ReadInt(R, x); Files.ReadInt(R, y);
@@ -152,9 +152,9 @@ TYPE
       type, ref, tag: CHAR;
       LName: ARRAY 256 OF CHAR;
       Dict: ARRAY 64 OF Objects.Library;
-      i: INTEGER;
+      i: SIGNED16;
   BEGIN
-      NEW(Q); Q.f := Wfile; Q.off := 0; Q.len := 1; Q.ref := MIN(INTEGER);
+      NEW(Q); Q.f := Wfile; Q.off := 0; Q.len := 1; Q.ref := MIN(SIGNED16);
       Q.lib := NIL; Q.col := 127; Q.voff := 0;
       p := Q;
       Files.Set(R, f, pos);
@@ -184,7 +184,7 @@ TYPE
         IF ~(q.lib IS Fonts.Font) THEN
           Files.Set(S, f, off); Files.Read(S, ref); (*q.lib.GetObj(q.lib, ORD(ref), q.obj)*) q.ref := ORD(ref)
         ELSE
-          q.ref := MIN(INTEGER)
+          q.ref := MIN(SIGNED16)
         END;
         Files.Read(R, q.col);
         Files.Read(R, q.voff);
@@ -249,7 +249,7 @@ TYPE
       p, q: Piece;
       R, W: Files.Rider;
       hlen, flen, rlen, m: LONGINT;
-      id, i: INTEGER;
+      id, i: SIGNED16;
       N, n: SIGNED8;
       type, ch: CHAR;
       obj: Objects.Object;
@@ -361,7 +361,7 @@ TYPE
   PROCEDURE GenNew (T: Text);
     VAR Q: Piece;
   BEGIN
-    NEW(Q); Q.f := Wfile; Q.off := 0; Q.len := 1; Q.ref := MIN(INTEGER);
+    NEW(Q); Q.f := Wfile; Q.off := 0; Q.len := 1; Q.ref := MIN(SIGNED16);
     Q.lib := NIL; Q.col := 127; Q.voff := 0;
     Q.next := Q; Q.prev := Q;
     T.handle := H; T.obs := NIL;
@@ -404,7 +404,7 @@ TYPE
   PROCEDURE SplitPiece (p: Piece; off: LONGINT; VAR pr: Piece);
     VAR q: Piece;
   BEGIN
-    IF off > 0 THEN NEW(q); q.ref := MIN(INTEGER);
+    IF off > 0 THEN NEW(q); q.ref := MIN(SIGNED16);
       q.lib := p.lib; q.col := p.col; q.voff := p.voff;
       q.len := p.len - off;
       q.f := p.f; q.off := p.off + off;
@@ -534,7 +534,7 @@ TYPE
 
 (** Open a new text buffer B. *)
   PROCEDURE OpenBuf* (B: Buffer);
-  BEGIN NEW(B.header); (*null piece*) B.header.ref := MIN(INTEGER);
+  BEGIN NEW(B.header); (*null piece*) B.header.ref := MIN(SIGNED16);
     B.last := B.header; B.len := 0
   END OpenBuf;
 
@@ -544,13 +544,13 @@ TYPE
   BEGIN
     IF beg < end THEN
       FindPiece(T, beg, org, p); SyncPiece(T, p);
-      NEW(qb); qb^ := p^; qb.ref := MIN(INTEGER);
+      NEW(qb); qb^ := p^; qb.ref := MIN(SIGNED16);
       qb.len := qb.len - (beg - org);
       qb.off := qb.off + (beg - org);
       qe := qb;
       WHILE end > org + p.len DO
         org := org + p.len; p := p.next; SyncPiece(T, p);
-        NEW(q); q^ := p^; q.ref := MIN(INTEGER);
+        NEW(q); q^ := p^; q.ref := MIN(SIGNED16);
        qe.next := q; q.prev := qe; qe := q
       END;
       qe.next := NIL; qe.len := qe.len - (org + p.len - end);
@@ -565,7 +565,7 @@ TYPE
   BEGIN
     p := SB.header; Q := DB.last;
     WHILE p # SB.last DO p := p.next;
-      NEW(q); q.ref := MIN(INTEGER); q^ := p^; Q.next := q; q.prev := Q; Q := q
+      NEW(q); q.ref := MIN(SIGNED16); q^ := p^; Q.next := q; q.prev := Q; Q := q
     END;
     DB.last := Q; DB.len := DB.len + SB.len
   END Copy;
@@ -577,7 +577,7 @@ TYPE
 
 (** Default handler for text objects. This handler understands Objects.AttrMsg(for Gen attribute), Objects.CopyMsg, Objects.BindMsg, and Objects.FileMsg only. *)
   PROCEDURE Handle* (obj: Objects.Object; VAR M: Objects.ObjMsg);
-    VAR T: Text; B: Buffer; len: LONGINT; id: INTEGER; ch: CHAR;
+    VAR T: Text; B: Buffer; len: LONGINT; id: SIGNED16; ch: CHAR;
   BEGIN
     WITH obj: Text DO
       IF M IS Objects.AttrMsg THEN
@@ -853,7 +853,7 @@ information about the last character read. *)
     VAR p, q: Piece;
   BEGIN p := W.buf.last;
     IF ~(W.lib IS Fonts.Font) OR (W.lib # p.lib) OR (W.col # p.col) OR (W.voff # p.voff) OR (Files.Base(W.R) # p.f) THEN
-      NEW(q); q.ref := MIN(INTEGER);
+      NEW(q); q.ref := MIN(SIGNED16);
       IF ~(W.lib IS Fonts.Font) THEN W.lib.GetObj(W.lib, ORD(ch), q.obj) END;
       q.f := Files.Base(W.R); q.off := Files.Pos(W.R); q.len := 0;
       q.lib := W.lib; q.col := W.col; q.voff:= W.voff;

@@ -717,7 +717,7 @@ Server * = OBJECT
 	PROCEDURE freezeConfiguration(mode, conf, hist: OdUtil.Line; log: OdVCSBase.TLog; flags: SET);(* BASELINE-CONTROL  *)
 		CONST PLog = FALSE;
 		VAR subconf: OdUtil.Line; subconfs: OdUtil.Lines; textLen: LONGINT; allFrozen: BOOLEAN; props: VersionProperties;
-			f: Files.File; r: Files.Rider; erg: INTEGER; fileName: OdUtil.Line; w: Files.Writer;
+			f: Files.File; r: Files.Rider; erg: SIGNED16; fileName: OdUtil.Line; w: Files.Writer;
 		BEGIN
 			fileName := ConfDataFileName(conf);
 			IF PLog THEN OdUtil.Msg3("freezeConfiguration.ConfDataFileName:", conf, fileName); END;
@@ -1183,7 +1183,7 @@ $END*)
 	(* Create the vcc.baseline-collection information. Just as data in memory at the moment. Checkout just the configuration
 		data to ConfBase = "temp/<confName>(0..9)_". Create the datastructure which also can can contain subbaselines. In this case
 		it's necessary to have baseline data files of different levels. *)
-	PROCEDURE reportBaseline*(confName, baselineUrl: OdUtil.Line; vccList: VccList; level: INTEGER; VAR statusCode: LONGINT);
+	PROCEDURE reportBaseline*(confName, baselineUrl: OdUtil.Line; vccList: VccList; level: SIGNED16; VAR statusCode: LONGINT);
 		(* PROPFIND vcc.baseline-collection  *)
 		CONST PLog = FALSE;
 		VAR confPropFileName, confDataFileName, line, res, ver: OdUtil.Line;
@@ -1758,7 +1758,7 @@ VAR
 	RepoPath: ARRAY 256 OF CHAR;
 
 	frozenDeleted: BOOLEAN;
-	preCond*, postCond*: INTEGER; (* pre and post condition codes of repository functions (DAVDeltavBase.Server) *)
+	preCond*, postCond*: SIGNED16; (* pre and post condition codes of repository functions (DAVDeltavBase.Server) *)
 	repMan: RepositoryManager;
 	workMan * : WorkspaceManager;
 	hostName * : ARRAY 64 OF CHAR;
@@ -1811,7 +1811,7 @@ BEGIN
 END splitConfRes;
 (* confResVer = '<conf><res>.<ver>' conf has a trailing CollCh *)
 PROCEDURE splitConfResVer*(confResVer: OdUtil.Line; VAR conf, res, ver: OdUtil.Line);
-VAR resVer: OdUtil.Line; verPos: INTEGER; pos: LONGINT;
+VAR resVer: OdUtil.Line; verPos: SIGNED16; pos: LONGINT;
 BEGIN
 	splitConfRes(confResVer, conf, resVer);
 	(* find version number *)
@@ -1823,7 +1823,7 @@ BEGIN
 	Slice(resVer, verPos+1, Strings.Length(resVer)-verPos-1, ver);
 END splitConfResVer;
 PROCEDURE splitDirBase(dirBase: OdUtil.Line; VAR dir, base: OdUtil.Line);
-VAR resVer: OdUtil.Line; basePos: INTEGER; pos: LONGINT;
+VAR resVer: OdUtil.Line; basePos: SIGNED16; pos: LONGINT;
 BEGIN
 	(* find version number *)
 	basePos:= -1;

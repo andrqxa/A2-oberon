@@ -68,13 +68,13 @@ CONST
 	(*	allKeys   = pointKeys+cmdKeys+selectKeys;*)
 TYPE
 	EventMsg* = RECORD (Objects.ObjMsg)
-		gesture- : INTEGER;
-		x- , y- : INTEGER;
+		gesture- : SIGNED16;
+		x- , y- : SIGNED16;
 		time- : LONGINT;
 		keys: SET;
 		callForResponder* : BOOLEAN;  (*= sent to poll for a responder *)
 		responder* : Objects.Object; (*= reply to poll for a responder *)
-		priority* : INTEGER(*= reply to poll for a responder *)
+		priority* : SIGNED16(*= reply to poll for a responder *)
 
 	END;
 
@@ -83,7 +83,7 @@ TYPE
 	doubleClickTime*: LONGINT;
 
 PROCEDURE GetWheelEvent*(VAR event: EventMsg; up: BOOLEAN);
-VAR keys: SET; x,y: INTEGER;
+VAR keys: SET; x,y: SIGNED16;
 BEGIN
 	Input.Mouse (keys, x, y);  vyHostDisplay.DrawCursor (x, y);
 	IF keys = {} THEN
@@ -110,7 +110,7 @@ END GetWheelEvent;
 PROCEDURE GetEvent* (VAR nextEvent: EventMsg);  (*vs 0.0a2 md  20.06.95 09:59:20 & FOF 1996*)
 	(*= poll for an event and translate it to Voyager event *)
 
-	VAR keys: SET;  x, y: INTEGER;
+	VAR keys: SET;  x, y: SIGNED16;
 BEGIN
 	Input.Mouse (keys, x, y);  vyHostDisplay.DrawCursor (x, y);
 	IF keys = context.keys THEN nextEvent.gesture := context.gesture

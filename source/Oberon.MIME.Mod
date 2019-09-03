@@ -439,7 +439,7 @@ MODULE MIME IN Oberon; (** portable *)
 		VAR
 			len: SIZE; i, day, year, month, hour, min, sec: LONGINT;
 			mo, zone: ARRAY 16 OF CHAR;
-			j: INTEGER;
+			j: SIGNED16;
 	BEGIN
 		time := 0; date := 0;
 		len := LEN(h.fields^);

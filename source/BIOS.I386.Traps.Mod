@@ -82,7 +82,7 @@ VAR
 				|16: w.String("procedure returned")
 				|17: w.String("nil pointer access")
 				ELSE
-					IF (exc.halt > MAX(INTEGER)+1) OR (exc.halt < MIN(INTEGER)) THEN
+					IF (exc.halt > MAX(SIGNED16)+1) OR (exc.halt < MIN(SIGNED16)) THEN
 						w.String("module freed?")
 					END
 			END;
@@ -273,9 +273,9 @@ VAR
 		handled := FALSE;
 		Machine.GetExceptionState(int, exc);
 		user := (int.CS MOD 4 > Machine.KernelLevel);
-		traceTrap := (exc.locks = {}) & (exc.halt >= MAX(INTEGER)) & (exc.halt <= MAX(INTEGER)+1);
+		traceTrap := (exc.locks = {}) & (exc.halt >= MAX(SIGNED16)) & (exc.halt <= MAX(SIGNED16)+1);
 
-		Show(t, int, exc, exc.halt # MAX(INTEGER)+1);	(* Always show the trap info!*)
+		Show(t, int, exc, exc.halt # MAX(SIGNED16)+1);	(* Always show the trap info!*)
 
 		IF exc.halt = haltUnbreakable THEN
 			Unbreakable(t, int, exc, handled)

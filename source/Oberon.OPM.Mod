@@ -18,7 +18,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 		BoolSize* = 1;	(* BOOLEAN *)
 		SetSize* = 4;	(* SET *)
 		SIntSize* = 1;	(* SIGNED8 *)
-		IntSize* = 2;	(* INTEGER *)
+		IntSize* = 2;	(* SIGNED16 *)
 		LIntSize* = 4;	(* LONGINT *)
 		HIntSize* = 8;	(* HUGEINT *)
 		RealSize* = 4;	(* REAL *)
@@ -185,7 +185,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	END Get;
 
 	PROCEDURE MakeFileName(VAR path, prefix, modName, fileName: ARRAY OF CHAR; ext: ARRAY OF CHAR);
-		VAR i, j: INTEGER; ch: CHAR;
+		VAR i, j: SIGNED16; ch: CHAR;
 	BEGIN	i:=0; ch:=path[0];
 		WHILE	ch#0X	DO	fileName[i]:=ch; INC(i); ch:=path[i]	END;
 (*
@@ -223,7 +223,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	(* zero compressed strings don't like UTF-8 encoding *)
 
 	PROCEDURE WString(VAR R: Files.Rider; VAR s: ARRAY OF CHAR);
-		VAR i: INTEGER; ch: CHAR;
+		VAR i: SIGNED16; ch: CHAR;
 	BEGIN
 		i:=0; ch:=s[i];
 		IF	ch=0X	THEN	Files.Write(R, 0X); RETURN	END;
@@ -259,7 +259,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 		Texts.WriteLn(W); Texts.Append(Log, W.buf)
 	END LogWLn;
 
-	PROCEDURE ErrorMsg(n: INTEGER);
+	PROCEDURE ErrorMsg(n: SIGNED16);
 	VAR s: Texts.Scanner; ch: CHAR;  e: ARRAY 127 OF CHAR;  i: SIGNED8;
 	BEGIN
 		IF (n >= NumErrors) OR ~((n MOD SetLen) IN errors[n DIV SetLen]) THEN
@@ -281,7 +281,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 		END
 	END ErrorMsg;
 
-	PROCEDURE Mark*(n: INTEGER; pos: LONGINT);
+	PROCEDURE Mark*(n: SIGNED16; pos: LONGINT);
 	BEGIN
 		IF n >= 0 THEN
 			noerr := FALSE;
@@ -306,7 +306,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 		END
 	END Mark;
 
-	PROCEDURE err*(n: INTEGER);
+	PROCEDURE err*(n: SIGNED16);
 	BEGIN Mark(n, errpos)
 	END err;
 
@@ -320,7 +320,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	BEGIN Files.Write(newSymF, ch)
 	END SymWCh;
 
-	PROCEDURE SymWTag*(k: INTEGER);
+	PROCEDURE SymWTag*(k: SIGNED16);
 	BEGIN Files.Write(newSymF, CHR(k))
 	END SymWTag;
 
@@ -375,7 +375,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	BEGIN Files.Write(ObjF, ch)
 	END ObjW;
 
-	PROCEDURE ObjWInt*(i: INTEGER);
+	PROCEDURE ObjWInt*(i: SIGNED16);
 	BEGIN Files.WriteInt(ObjF, i)
 	END ObjWInt;
 
@@ -397,11 +397,11 @@ MODULE OPM IN Oberon;	(** non-portable *)
 
 	PROCEDURE ObjAllocInt*(): LONGINT;
 		VAR pos: LONGINT;
-	BEGIN	pos:=Files.Pos(ObjF); Files.WriteInt(ObjF, SYSTEM.VAL(INTEGER, 0));
+	BEGIN	pos:=Files.Pos(ObjF); Files.WriteInt(ObjF, SYSTEM.VAL(SIGNED16, 0));
 		RETURN pos;
 	END ObjAllocInt;
 
-	PROCEDURE ObjFillInt*(pos: LONGINT; int: INTEGER);
+	PROCEDURE ObjFillInt*(pos: LONGINT; int: SIGNED16);
 		VAR savepos: LONGINT;
 	BEGIN	savepos:=Files.Pos(ObjF);
 		Files.Set(ObjF, ObjFile, pos); Files.WriteBytes(ObjF, int, 2);

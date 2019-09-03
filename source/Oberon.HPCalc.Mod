@@ -243,7 +243,7 @@ BEGIN
 	END;
 END ChangeMode;
 
-PROCEDURE GetModelValue (F: CalcModel; pos: INTEGER; VAR s: ARRAY OF CHAR): INTEGER;	(* get textual value from stack *)
+PROCEDURE GetModelValue (F: CalcModel; pos: SIGNED16; VAR s: ARRAY OF CHAR): SIGNED16;	(* get textual value from stack *)
 	VAR	lr: LONGREAL; l, h: LONGINT;
 BEGIN
 	(* Check Range *)
@@ -557,7 +557,7 @@ END RemoveFunctions;
 (** Append the functions buttons to the main panel *)
 PROCEDURE ShowFunctions*;
 	VAR class, tmp: ARRAY 32 OF CHAR; f: Functions; obj: Panels.Panel; S: Texts.Scanner; v, o: Objects.Object;
-			x, y: INTEGER; ctxt, new: Display.Frame; locked: BOOLEAN; h: INTEGER;
+			x, y: SIGNED16; ctxt, new: Display.Frame; locked: BOOLEAN; h: SIGNED16;
 			cm: Display.ConsumeMsg; mm: Display.ModifyMsg; ctrl: Display.ControlMsg;
 			m: CalcModel;
 
@@ -660,9 +660,9 @@ END NewView;
 
 (** HPCalc Panel generation *)
 PROCEDURE New*;	(* create a new HPCalc panel *)
-	VAR	p: Panels.Panel; c: CalcModel; v: Gadgets.Frame; f: FunctionClass; x, y: INTEGER; cmd: ARRAY 64 OF CHAR;
+	VAR	p: Panels.Panel; c: CalcModel; v: Gadgets.Frame; f: FunctionClass; x, y: SIGNED16; cmd: ARRAY 64 OF CHAR;
 
-	PROCEDURE NewCommand (msg: ARRAY OF CHAR; x, y: INTEGER);
+	PROCEDURE NewCommand (msg: ARRAY OF CHAR; x, y: SIGNED16);
 		VAR v: Objects.Object;
 	BEGIN
 		v := NewButton (msg, cmd); Panels.InsertChild (p, v(Gadgets.Frame), x, y);

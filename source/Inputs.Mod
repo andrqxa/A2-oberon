@@ -242,7 +242,7 @@ TYPE
 	OberonInput* = OBJECT (Plugins.Plugin)
 		VAR timer-: Kernel.Timer;
 
-		PROCEDURE Mouse*(VAR x, y: INTEGER; VAR keys:SET);
+		PROCEDURE Mouse*(VAR x, y: SIGNED16; VAR keys:SET);
 		BEGIN
 			HALT(99)	(* abstract *)
 		END Mouse;
@@ -252,7 +252,7 @@ TYPE
 			HALT(99)	(* abstract *)
 		END Read;
 
-		PROCEDURE Available*(VAR num: INTEGER; VAR break: BOOLEAN);
+		PROCEDURE Available*(VAR num: SIGNED16; VAR break: BOOLEAN);
 		BEGIN
 			HALT(99)	(* abstract *)
 		END Available;

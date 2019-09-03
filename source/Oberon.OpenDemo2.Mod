@@ -16,7 +16,7 @@ IMPORT Out, Files, Objects, Gadgets, Panels, Documents, Desktops;
 PROCEDURE LoadPanel*(D: Documents.Document);
 VAR obj: Objects.Object; main: Gadgets.Frame;
 	F: Files.File; R: Files.Rider; name: ARRAY 64 OF CHAR; ch: CHAR;
-	tag: INTEGER; len: LONGINT; lib: Objects.Library;
+	tag: SIGNED16; len: LONGINT; lib: Objects.Library;
 BEGIN
 	main := NIL; D.W := 300; D.H := 200;
 

@@ -35,19 +35,19 @@ MODULE HTTPDocs0 IN Oberon;	(** portable *)
 		END;
 		WorkerDesc* = RECORD (Oberon.TaskDesc)
 			entry*: Entry;
-			state*: INTEGER; (* 0: connect, 1: reading response, 2: reading data, 3: open doc, 4: kill, 5: retry later *)
+			state*: SIGNED16; (* 0: connect, 1: reading response, 2: reading data, 3: open doc, 4: kill, 5: retry later *)
 			local*: BOOLEAN
 		END;
 		Proxy* = POINTER TO ProxyDesc;
 		ProxyDesc* = RECORD
 			host*: ARRAY 64 OF CHAR;
-			port*: INTEGER
+			port*: SIGNED16
 		END;
 
 	VAR
 		buf: ARRAY 2048 OF CHAR;
 		entries*: Entry;
-		noWorkers: INTEGER;
+		noWorkers: SIGNED16;
 		ImgHandle*: Objects.Handler;
 		W: Texts.Writer;
 		curNode*: HyperDocs.Node;
@@ -67,7 +67,7 @@ MODULE HTTPDocs0 IN Oberon;	(** portable *)
 	END StripLoc;
 
 (** Register a new http url. *)
-	PROCEDURE RegisterHTTPAdr*(VAR host, path, label: ARRAY OF CHAR; VAR port: INTEGER): LONGINT;
+	PROCEDURE RegisterHTTPAdr*(VAR host, path, label: ARRAY OF CHAR; VAR port: SIGNED16): LONGINT;
 		VAR portS: ARRAY 8 OF CHAR;
 	BEGIN
 		buf := "http://";
@@ -91,7 +91,7 @@ MODULE HTTPDocs0 IN Oberon;	(** portable *)
 	END RegisterHTTPAdr;
 
 (** Parsing of an http url. *)
-	PROCEDURE SplitHTTPAdr*(VAR url, host, path, label: ARRAY OF CHAR; VAR port: INTEGER): LONGINT;
+	PROCEDURE SplitHTTPAdr*(VAR url, host, path, label: ARRAY OF CHAR; VAR port: SIGNED16): LONGINT;
 		VAR
 			i, j, l: SIZE;
 			key: LONGINT;

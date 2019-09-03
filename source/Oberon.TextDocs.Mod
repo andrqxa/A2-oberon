@@ -40,18 +40,18 @@ TYPE
 
 VAR
 	sPat: ARRAY MaxPatLen OF CHAR;	(* search pattern [read only] *)
-	sDv: ARRAY MaxPatLen + 1 OF INTEGER;	(* displacement vector for search pattern *)
-	sPatLen: INTEGER;	(* number of valid characters in sPat [read only] *)
+	sDv: ARRAY MaxPatLen + 1 OF SIGNED16;	(* displacement vector for search pattern *)
+	sPatLen: SIGNED16;	(* number of valid characters in sPat [read only] *)
 	lTime: LONGINT;	(* most recent time for sPat and/or rBuf *)
 	rBuf: Texts.Buffer;	(* replace buffer [read only] *)
-	InitW, InitH, InitLogW, InitLogH: INTEGER;
-	sCol: INTEGER;
+	InitW, InitH, InitLogW, InitLogH: SIGNED16;
+	sCol: SIGNED16;
 	W: Texts.Writer;
 	FixedDocs: BOOLEAN;
 
-PROCEDURE open(D: Documents.Document; T: Texts.Text; name: ARRAY OF CHAR; VAR w, h: INTEGER);
-VAR F: Files.File; R: Files.Rider; tag: INTEGER; ch: CHAR; s: ARRAY 64 OF CHAR; len: LONGINT;
-	x, y: INTEGER; CM: Gadgets.CmdMsg;
+PROCEDURE open(D: Documents.Document; T: Texts.Text; name: ARRAY OF CHAR; VAR w, h: SIGNED16);
+VAR F: Files.File; R: Files.Rider; tag: SIGNED16; ch: CHAR; s: ARRAY 64 OF CHAR; len: LONGINT;
+	x, y: SIGNED16; CM: Gadgets.CmdMsg;
 BEGIN
 	w := InitW; h := InitH;
 	F := Files.Old(name);
@@ -111,7 +111,7 @@ BEGIN
 END LoadAttrs;
 
 PROCEDURE LoadTextDocument(D: Documents.Document);
-	VAR w, h: INTEGER; T: Texts.Text; main: TextGadgets.Frame;
+	VAR w, h: SIGNED16; T: Texts.Text; main: TextGadgets.Frame;
 BEGIN
 	NEW(T); open(D, T, D.name, w, h);
 	NEW(main); TextGadgets.Init(main, T, FALSE);
@@ -131,7 +131,7 @@ BEGIN
 END StoreAttrs;
 
 PROCEDURE StoreTextDocument(D: Documents.Document);
-	VAR new: ARRAY 128 OF CHAR; i: INTEGER; f: Files.File; len: LONGINT; F: Display.Frame; R: Files.Rider;
+	VAR new: ARRAY 128 OF CHAR; i: SIGNED16; f: Files.File; len: LONGINT; F: Display.Frame; R: Files.Rider;
 		M: StoreMsg;
 BEGIN
 	F := D.dsc;
@@ -322,7 +322,7 @@ BEGIN
 END LogHandler;
 
 PROCEDURE LoadLog(D: Documents.Document);
-VAR f: Files.File; R: Files.Rider; name: ARRAY 64 OF CHAR; x, y, w, h, id: INTEGER; main: TextGadgets.Frame;
+VAR f: Files.File; R: Files.Rider; name: ARRAY 64 OF CHAR; x, y, w, h, id: SIGNED16; main: TextGadgets.Frame;
 	CM: Gadgets.CmdMsg; ch: CHAR;
 BEGIN
 	w := InitLogW; h := InitLogH;
@@ -488,7 +488,7 @@ END Controls;
 	END MarkPatPos;
 
 	PROCEDURE CalcDispVec(time: LONGINT);
-		VAR i, j, d: INTEGER;
+		VAR i, j, d: SIGNED16;
 	BEGIN
 		lTime := time;
 		i := 1; d := 1;	(* calculate displacement vector *)
@@ -502,7 +502,7 @@ END Controls;
 	PROCEDURE SPatFound(text: Texts.Text; VAR pos:LONGINT): BOOLEAN;
 	(* searches the next position for the search pattern sPat begining at position pos *)
 	(* in the text text; resturns result accordingly *)
-		VAR R: Texts.Reader;	l: LONGINT;	i: INTEGER;	ch: CHAR;
+		VAR R: Texts.Reader;	l: LONGINT;	i: SIGNED16;	ch: CHAR;
 	BEGIN
 		IF sPatLen > 0 THEN
 			Texts.OpenReader(R, text, pos); Texts.Read(R, ch); INC(pos);
@@ -520,7 +520,7 @@ END Controls;
 	END SPatFound;
 
 	PROCEDURE search(VAR S: Attributes.Scanner; tF: TextGadgets.Frame);
-		VAR R: Texts.Reader; text: Texts.Text; pos, beg, end, time: LONGINT; i: INTEGER;
+		VAR R: Texts.Reader; text: Texts.Text; pos, beg, end, time: LONGINT; i: SIGNED16;
 	BEGIN
 		IF S.class IN {Attributes.Name, Attributes.String} THEN
 			COPY(S.s, sPat); sPatLen := S.len; CalcDispVec(Oberon.Time())	(* calculate displacement vector *)
@@ -560,7 +560,7 @@ END Controls;
 
 	PROCEDURE replace(all: BOOLEAN);
 	VAR tF: TextGadgets.Frame; R: Texts.Reader; tBuf: Texts.Buffer; T, text: Texts.Text;
-		pos, beg, end, time, p, len: LONGINT; i: INTEGER; ch: CHAR; M: Oberon.CaretMsg;
+		pos, beg, end, time, p, len: LONGINT; i: SIGNED16; ch: CHAR; M: Oberon.CaretMsg;
 		S: Attributes.Scanner; doc: Documents.Document;
 	BEGIN
 		tF := NIL;
@@ -646,7 +646,7 @@ END Controls;
 (** Used in the form: TextDocs.Show M.P
 	Shows the module M at the position where P occurs for the first time *)
 PROCEDURE Show*;
-VAR S: Attributes.Scanner; name: ARRAY 86 OF CHAR; i, j, k, M: INTEGER; pos: LONGINT; D: Documents.Document;
+VAR S: Attributes.Scanner; name: ARRAY 86 OF CHAR; i, j, k, M: SIGNED16; pos: LONGINT; D: Documents.Document;
 	F: TextGadgets0.Frame;
 BEGIN
 	Attributes.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
@@ -897,7 +897,7 @@ END ReplaceColor;
 (** Set all styles to paper width *)
 PROCEDURE AdjustStyles*;
 	VAR D: Documents.Document; F: TextGadgets.Frame; obj: Objects.Object;
-			f: Texts.Finder; W: INTEGER; A: Display.ModifyMsg;
+			f: Texts.Finder; W: SIGNED16; A: Display.ModifyMsg;
 BEGIN
 	D := Documents.MarkedDoc();
 	IF (D # NIL) & (D.dsc # NIL) & (D.dsc IS TextGadgets.Frame) THEN
@@ -965,7 +965,7 @@ BEGIN
 END PrintSetup;
 
 (** Open a text in a TextDoc. W, H is used to determine the original size of the document. *)
-PROCEDURE ShowText*(title: ARRAY OF CHAR; T: Texts.Text; W, H: INTEGER);
+PROCEDURE ShowText*(title: ARRAY OF CHAR; T: Texts.Text; W, H: SIGNED16);
 VAR D: Documents.Document; menu: ARRAY 128 OF CHAR; mf: Display.Frame; f: TextGadgets.Frame; i, j: LONGINT; log: BOOLEAN;
 BEGIN
 	i := 0; WHILE (title[i] # 0X) & (title[i] # "|") DO INC(i) END;

@@ -63,7 +63,7 @@ TYPE
 		R*: Reader;		(** Scanner operates with this reader. *)
 		eot*: BOOLEAN;	(** End of text reached? *)
 		nextCh*: CHAR;	(** Character located immediately after scanned token. *)
-		class*: INTEGER;		(** Scanner classes. Scanned tokens are returned in the record fields below. *)
+		class*: SIGNED16;		(** Scanner classes. Scanned tokens are returned in the record fields below. *)
 		i*: LONGINT;
 		x*: REAL;
 		y*: LONGREAL;
@@ -104,7 +104,7 @@ VAR
 
 (** Convert a string to a text. *)
 PROCEDURE StrToTxt*(s: ARRAY OF CHAR; VAR T: Texts.Text);
-VAR newtext :Texts.Text; i:INTEGER;
+VAR newtext :Texts.Text; i:SIGNED16;
 BEGIN
 	i := 0;
 	WHILE (s[i] # 0X) DO Texts.Write(W, s[i]); INC(i); END;
@@ -114,7 +114,7 @@ END StrToTxt;
 
 (** Convert a text to a string. The string might be terminated early if the text is too long to fit. *)
 PROCEDURE TxtToStr*(T: Texts.Text; VAR s: ARRAY OF CHAR);
-VAR R:Texts.Reader; i:INTEGER; ch:CHAR;
+VAR R:Texts.Reader; i:SIGNED16; ch:CHAR;
 BEGIN
 	i:= 0;
 	IF T # NIL THEN
@@ -218,7 +218,7 @@ END OpenScanner;
     VAR ch, E: CHAR;
       neg, negE, hex, old: BOOLEAN;
       i, j, h: SIGNED8;
-      e: INTEGER; k: LONGINT;
+      e: SIGNED16; k: LONGINT;
       y: LONGREAL;
       d: ARRAY maxD OF CHAR;
 	  k1, k2, k3: LONGINT;

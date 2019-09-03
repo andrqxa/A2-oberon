@@ -35,7 +35,7 @@ TYPE
 
 VAR
 	refSize: LONGINT;
-	nofCmds, nofImp, nofVarCons, nofLinks: INTEGER;
+	nofCmds, nofImp, nofVarCons, nofLinks: SIGNED16;
 	dsize: LONGINT;
 
 	globR: PCM.Rider;	(* used for OutReference *)
@@ -345,7 +345,7 @@ VAR commands: ARRAY 128 OF PCT.Proc;
 					IF bsym.mod # scope.owner THEN UseModule(bsym.mod.adr(PCBT.Module)) END
 				END;
 				rec := rec.link;
-				ASSERT(rec # scope.records, MAX(INTEGER));
+				ASSERT(rec # scope.records, MAX(SIGNED16));
 					(* Fix bug, sometimes this assertion fails. *)
 					(* fof 070920: done, cf. PCC.MakeTD *)
 			END
@@ -583,7 +583,7 @@ VAR commands: ARRAY 128 OF PCT.Proc;
 			END;
 			p := p.nextVar
 		END;
-		IF nofptrs > MAX(INTEGER) THEN PCM.Error(222, 0, "") END;
+		IF nofptrs > MAX(SIGNED16) THEN PCM.Error(222, 0, "") END;
 		IF nofptrs # 0 THEN PCM.ObjWLIntAt(R, PtrPos, nofptrs) END;
 	END PointerBlock;
 
@@ -598,7 +598,7 @@ VAR commands: ARRAY 128 OF PCT.Proc;
 				m := mod.imports[i];
 				adr := m.adr(PCBT.Module);
 				IF adr.nr = -1 THEN
-					INC(j); adr.nr := j(INTEGER);
+					INC(j); adr.nr := j(SIGNED16);
 					StringPool.GetString(m.name, str); PCM.ObjWName(R, str);
 				END;
 				INC(i)
@@ -840,12 +840,12 @@ VAR commands: ARRAY 128 OF PCT.Proc;
 	*)
 	PROCEDURE ExportBlock;
 	TYPE ExpList = POINTER TO ARRAY OF LONGINT;
-	VAR count, nofstr: INTEGER;  pos: Files.Position;
+	VAR count, nofstr: SIGNED16;  pos: Files.Position;
 		explist: ExpList; exppos, explen: LONGINT;
 		v: PCT.Variable; p: PCT.Proc; t: PCT.Type; c: PCT.Value;
 
 		PROCEDURE ExportType(t: PCT.Struct);
-		VAR count: INTEGER;  pos: Files.Position;  sym: PCOM.Struct;  p: PCT.Proc; v: PCT.Variable;
+		VAR count: SIGNED16;  pos: Files.Position;  sym: PCOM.Struct;  p: PCT.Proc; v: PCT.Variable;
 		BEGIN
 			WHILE (t IS PCT.Pointer) OR (t IS PCT.Array) DO
 				IF t IS PCT.Pointer THEN  t := t(PCT.Pointer).base  ELSE  t := t(PCT.Array).base  END
@@ -997,7 +997,7 @@ VAR commands: ARRAY 128 OF PCT.Proc;
 	CONST MaxTags = 16; (* ug: temporary solution, Modules.MaxTags *)
 	VAR  size: PCBT.RecSize;  nofptrsPos, tdSizePos: Files.Position; oldmth: LONGINT;  base: PCT.Record;  m: PCT.Method;
 		adr: PCBT.Method;  bsym: PCOM.Struct;  name, name2: StringBuf;
-		basenr: INTEGER; baseid: LONGINT;
+		basenr: SIGNED16; baseid: LONGINT;
 		upperPartTdSize, lowerPartTdSize: LONGINT;
 	BEGIN
 		PCT.GetTypeName(rec, name);
@@ -1057,7 +1057,7 @@ VAR commands: ARRAY 128 OF PCT.Proc;
 		(* Ptrs in Record *)
 		nofptrs := 0;
 		OutPtrs(0, rec, FALSE);  (* debug = FALSE *)
-		IF nofptrs > MAX(INTEGER) THEN PCM.Error(221, 0, "") END;
+		IF nofptrs > MAX(SIGNED16) THEN PCM.Error(221, 0, "") END;
 		IF nofptrs # 0 THEN PCM.ObjWLIntAt(R, nofptrsPos, nofptrs) END;
 
 (* ug *)	upperPartTdSize := AddressSize * (MaxTags + size.nofMethods + 1 + 1); (* tags, methods, methods end marker (sentinel), address of TypeInfo *)
@@ -1291,7 +1291,7 @@ END PCOF.
 	06.06.01	prk	use string pool for object names
 	29.05.01    be	syscall structures moved to backend (PCLIR & code generators)
 	28.05.01	prk	don't insert invisible symbols in the "use" section
-	28.05.01	prk	issue error 221/222 when more than MAX(INTEGER) pointers in global data / record
+	28.05.01	prk	issue error 221/222 when more than MAX(SIGNED16) pointers in global data / record
 	03.05.01	be	Installable code generators
 	26.03.01	prk	New Reference Section format
 	25.03.01	prk	limited HUGEINT implementation (as abstract type)

@@ -78,7 +78,7 @@ TYPE	(* svr *)
 		serial: LONGINT;	(* serial number *)
 		label: ARRAY 12 OF CHAR;	(* volume label *)
 		fatdirty: BOOLEAN;
-		fat: POINTER TO ARRAY OF INTEGER;
+		fat: POINTER TO ARRAY OF SIGNED16;
 		dir: POINTER TO ARRAY OF CHAR;
 	END;
 	Handle0 = RECORD
@@ -129,7 +129,7 @@ TYPE
 		handle: Handle0;
 		registered: BOOLEAN;
 		mod: BOOLEAN;
-		nofbufs: INTEGER;
+		nofbufs: SIGNED16;
 		firstbuf: Buffer;
 	END;
 
@@ -205,7 +205,7 @@ PROCEDURE GetUWord(VAR buf : ARRAY OF SYSTEM.BYTE; idx : LONGINT): LONGINT;
 VAR val: LONGINT;
 BEGIN
 	val := 0;
-	SYSTEM.GET(ADDRESSOF(buf[idx]), SYSTEM.VAL(INTEGER, val));
+	SYSTEM.GET(ADDRESSOF(buf[idx]), SYSTEM.VAL(SIGNED16, val));
 	RETURN val
 END GetUWord;
 
@@ -258,7 +258,7 @@ BEGIN
 		IF even THEN even := FALSE
 		ELSE val := ASH(val, 4) + (ORD(b[j DIV 2]) MOD 100H); even := TRUE
 		END;
-		SYSTEM.PUT(ADDRESSOF(b[j DIV 2]), SYSTEM.VAL(INTEGER, val));
+		SYSTEM.PUT(ADDRESSOF(b[j DIV 2]), SYSTEM.VAL(SIGNED16, val));
 		INC(j, 3)
 	END;
 	WriteSectors(d, d.fatsec + copy*d.spf, d.spf, b, res)
@@ -296,7 +296,7 @@ BEGIN
 		d.fat[1] := ORD(b[2]);
 		val := 0;  j := 2*3;  even := TRUE;
 		FOR i := 2 TO d.fatsize-1 DO
-			SYSTEM.GET(ADDRESSOF(b[j DIV 2]), SYSTEM.VAL(INTEGER, val));
+			SYSTEM.GET(ADDRESSOF(b[j DIV 2]), SYSTEM.VAL(SIGNED16, val));
 			IF even THEN val := val MOD 1000H;  even := FALSE
 			ELSE val := ASH(val, -4);  even := TRUE
 			END;
@@ -1447,7 +1447,7 @@ END ReadBytes;
 Portable routines to read the standard Oberon types.
 *)
 
-	PROCEDURE ReadInt*(VAR R: Rider; VAR x: INTEGER; VAR res: WORD);
+	PROCEDURE ReadInt*(VAR R: Rider; VAR x: SIGNED16; VAR res: WORD);
 		VAR x0, x1: SIGNED8;
 	BEGIN Read(R, x0, res); IF res = 0 THEN Read(R, x1, res) END;
 		x := LONG(x1) * 100H + LONG(x0) MOD 100H
@@ -1475,7 +1475,7 @@ Portable routines to read the standard Oberon types.
 	END ReadLReal;
 
 	PROCEDURE ReadString*(VAR R: Rider; VAR x: ARRAY OF CHAR; VAR res: WORD);
-		VAR i: INTEGER; ch: CHAR;
+		VAR i: SIGNED16; ch: CHAR;
 	BEGIN i := 0;
 		LOOP
 			Read(R, ch, res); x[i] := ch; INC(i);
@@ -1490,7 +1490,7 @@ Portable routines to read the standard Oberon types.
 (** Reads a number in compressed variable length notation using the minimum amount of bytes. *)
 
 	PROCEDURE ReadNum*(VAR R: Rider; VAR x: LONGINT; VAR res: WORD);
-		VAR ch: CHAR; n: INTEGER; y: LONGINT;
+		VAR ch: CHAR; n: SIGNED16; y: LONGINT;
 	BEGIN n := 0; y := 0; Read(R, ch, res);
 		WHILE (res = 0) & (ch >= 80X) DO
 			INC(y, LSH(LONG(ORD(ch)) - 128, n)); INC(n, 7); Read(R, ch, res)
@@ -1581,7 +1581,7 @@ END WriteBytes;
 Portable routines to write the standard Oberon types.
 *)
 
-	PROCEDURE WriteInt*(VAR R: Rider; x: INTEGER; VAR res: WORD);
+	PROCEDURE WriteInt*(VAR R: Rider; x: SIGNED16; VAR res: WORD);
 	BEGIN Write(R, SHORT(x), res);
 		IF res = 0 THEN Write(R, SHORT(x DIV 100H), res) END
 	END WriteInt;
@@ -1608,7 +1608,7 @@ Portable routines to write the standard Oberon types.
 	END WriteLReal;
 
 	PROCEDURE WriteString*(VAR R: Rider; x: ARRAY OF CHAR; VAR res: WORD);
-		VAR i: INTEGER; ch: CHAR;
+		VAR i: SIGNED16; ch: CHAR;
 	BEGIN i := 0;
 		LOOP ch := x[i]; Write(R, ch, res); INC(i);
 			IF (ch = 0X) OR (res # 0) THEN EXIT END;

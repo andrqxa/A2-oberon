@@ -9,7 +9,7 @@ MODULE Array1dInt;   (** AUTHOR "adf, fof"; PURPOSE "Basic operations on type AR
 IMPORT SYSTEM, Array1dBytes, DataErrors, NbrInt, NbrInt64, NbrRe;
 
 TYPE
-	Value* = NbrInt.Integer;  LongerValue* = NbrInt64.Integer;  ShorterValue* = INTEGER;  RealValue* = NbrRe.Real;
+	Value* = NbrInt.Integer;  LongerValue* = NbrInt64.Integer;  ShorterValue* = SIGNED16;  RealValue* = NbrRe.Real;
 
 	Array* = POINTER TO ARRAY OF Value;
 	Index* = LONGINT;

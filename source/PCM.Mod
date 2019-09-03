@@ -150,7 +150,7 @@ IMPORT
 	END MakeFileName;
 
 	PROCEDURE WriteString(w: Streams.Writer; CONST s: ARRAY OF CHAR);
-		VAR i: INTEGER; ch: CHAR;
+		VAR i: SIGNED16; ch: CHAR;
 	BEGIN
 		i:=0; ch:=s[0];
 		WHILE ch # 0X DO
@@ -221,11 +221,11 @@ IMPORT
 	BEGIN R.obj.RawNum(i)
 	END ObjWNum;
 
-	PROCEDURE ObjWInt*(VAR R: Rider; i: INTEGER);
+	PROCEDURE ObjWInt*(VAR R: Rider; i: SIGNED16);
 	BEGIN R.obj.RawInt(i)
 	END ObjWInt;
 
-	PROCEDURE ObjWIntAt*(VAR R: Rider; pos: LONGINT; i: INTEGER);
+	PROCEDURE ObjWIntAt*(VAR R: Rider; pos: LONGINT; i: SIGNED16);
 		VAR w: Files.Writer;
 	BEGIN
 		R.obj.Update;

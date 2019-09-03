@@ -506,7 +506,7 @@ void Variables(HWND hWnd, LPVOID mod, LPVOID refs, LONGINT reflen, LONGINT i, LO
 							ch = Get((LPVOID)adr, &k);
 							wsprintf(msg, "%i", ch);
 							break;
-						case 5: // INTEGER
+						case 5: // SIGNED16
 							si = GetInt((LPVOID)adr, &k);
 							wsprintf(msg, "%i", si);
 							break;

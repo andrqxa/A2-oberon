@@ -467,7 +467,7 @@ TYPE
 		VAR
 			owner-: Module;
 			records-: Record;
-			nofRecs-: INTEGER;
+			nofRecs-: SIGNED16;
 
 		PROCEDURE CreateVar*(name: StringIndex;  vis, flags: SET;  type: Struct; pos: LONGINT; (*fof*) info: ANY; (*ug*) VAR res: WORD);
 			VAR v: GlobalVar;
@@ -1698,7 +1698,7 @@ VAR
 		VAR type: Struct;
 	BEGIN
 		IF (MIN(SIGNED8) <= i) & (i <= MAX(SIGNED8)) THEN  type := Int8
-		ELSIF (MIN(INTEGER) <= i) & (i <= MAX(INTEGER)) THEN  type := Int16
+		ELSIF (MIN(SIGNED16) <= i) & (i <= MAX(SIGNED16)) THEN  type := Int16
 		ELSE  type := Int32
 		END;
 		RETURN type
@@ -2227,12 +2227,12 @@ VAR
 			IF (boundTo.ptr # NIL) & ((p.super = NIL) OR ~p.super.self.ref) THEN
 				IF name = 0 THEN
 					PCM.LogWLn; PCM.LogWStr("PtrSelf "); PCM.LogWStr0(name); PCM.LogWNum(name);
-					HALT(MAX(INTEGER))
+					HALT(MAX(SIGNED16))
 				END;
 				scope.CreatePar(Internal, FALSE, SelfName, {}, boundTo.ptr, 0,(* fof *)  res)
 			ELSE
 				PCM.LogWLn; PCM.LogWStr("RecSelf "); PCM.LogWStr0(name); PCM.LogWNum(name);
-				HALT(MAX(INTEGER));
+				HALT(MAX(SIGNED16));
 				scope.CreatePar(Internal, TRUE, SelfName, {}, boundTo, 0,(* fof *)  res)
 			END
 		END;
@@ -2505,7 +2505,7 @@ VAR
 			CharType[2] := NewBasic(Universe, "CHAR32"); Char32 := CharType[2]
 		END;
 		NumericType[0] := NewBasic(Universe, "SIGNED8"); Int8 := NumericType[0];
-		NumericType[1] := NewBasic(Universe, "INTEGER"); Int16 := NumericType[1];
+		NumericType[1] := NewBasic(Universe, "SIGNED16"); Int16 := NumericType[1];
 		NumericType[2] := NewBasic(Universe, "LONGINT"); Int32 := NumericType[2];
 		NumericType[3] := NewBasic(Universe, "HUGEINT"); Int64 := NumericType[3];
 		NumericType[4] := NewBasic(Universe, "REAL"); Float32 := NumericType[4];

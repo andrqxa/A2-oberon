@@ -413,7 +413,7 @@ PROCEDURE ConstSize(c: LONGINT; allow16: BOOLEAN): SIGNED8;
 BEGIN
 	IF (c >= MIN(SIGNED8)) & (c <= MAX(SIGNED8)) THEN
 		RETURN 1
-	ELSIF allow16 & (c >= MIN(INTEGER)) & (c <= MAX(INTEGER)) THEN
+	ELSIF allow16 & (c >= MIN(SIGNED16)) & (c <= MAX(SIGNED16)) THEN
 		RETURN 2
 	ELSE
 		RETURN 4
@@ -597,7 +597,7 @@ PROCEDURE AliveAdd(VAR set: AliveSet;  reg: LONGINT;  size: PCLIR.Size);
 VAR i, j: LONGINT; mask: SET;
 BEGIN
 	IF reg <= 0 THEN RETURN END;
-	IF (reg = 0) THEN HALT(MAX(INTEGER)) END;
+	IF (reg = 0) THEN HALT(MAX(SIGNED16)) END;
 (*PCM.LogWLn; PCM.LogWStr("Add "); PCM.LogWNum(reg);*)
 	i := 0; j := -1;
 	WHILE (i < LEN(set)) & (set[i].reg # reg) DO
@@ -2592,7 +2592,7 @@ BEGIN
 END GenShift;
 
 PROCEDURE GenMoveDown(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT);
-VAR  src, dst: Register;  size: RealAddress;  step: INTEGER;
+VAR  src, dst: Register;  size: RealAddress;  step: SIGNED16;
 BEGIN
 	UseRegister(code, instr.src1, src); ForceRegister(code, src, ESI, MakeMask(EDI)+MakeMask(ECX));
 	UseRegister(code, instr.src2, dst); ForceRegister(code, dst, EDI, MakeMask(ESI)+MakeMask(ECX));
@@ -2624,7 +2624,7 @@ BEGIN
 END GenMoveDown;
 
 PROCEDURE GenMove(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT);
-VAR  src, dst, tmp: Register;  size: RealAddress;  step: INTEGER;
+VAR  src, dst, tmp: Register;  size: RealAddress;  step: SIGNED16;
 BEGIN
 	UseRegister(code, instr.src1, src); ForceRegister(code, src, ESI, MakeMask(EDI)+MakeMask(ECX));
 	UseRegister(code, instr.src2, dst); ForceRegister(code, dst, EDI, MakeMask(ESI)+MakeMask(ECX));
@@ -2704,8 +2704,8 @@ END GenInline;
 (* CaseTable Format
 	location: at offset "table" in the const section
 	CaseTable = ARRAY table size OF RECORD
-		pc-offset: INTEGER;	(*address(rel to code base) to jump to*)
-		next: INTEGER		(*next entry offset (used by the linker to patch addresses)*)
+		pc-offset: SIGNED16;	(*address(rel to code base) to jump to*)
+		next: SIGNED16		(*next entry offset (used by the linker to patch addresses)*)
 	END;
 *)
 

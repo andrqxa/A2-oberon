@@ -73,8 +73,8 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 		Scanner = RECORD
 			ctxt: Scheme.Context;
 			ch: CHAR;
-			token: INTEGER;
-			errors: INTEGER;
+			token: SIGNED16;
+			errors: SIGNED16;
 			obj: Object;
 			pos, prev: LONGINT;
 		END;
@@ -1490,7 +1490,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalColorsGray;
 
 	PROCEDURE EvalColorsIndex (c: Scheme.Context; args: Object; VAR res: Object);
-		VAR i: LONGINT; r, g, b: INTEGER;
+		VAR i: LONGINT; r, g, b: SIGNED16;
 	BEGIN
 		i := Ops.IntVal(c, args); Ops.CheckNull(c, args);
 		Display.GetColor(i, r, g, b);

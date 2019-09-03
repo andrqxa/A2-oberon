@@ -140,7 +140,7 @@ END PutByte;
 
 (* GetResults - Get results from controller, returns length of result *)
 
-PROCEDURE GetResults(): INTEGER;
+PROCEDURE GetResults(): SIGNED16;
 VAR t: AosKernel.MilliTimer;  s: SET;  i: SIGNED8;
 BEGIN
 	IF state # Reset THEN
@@ -512,7 +512,7 @@ BEGIN
 END StrToInt;
 
 PROCEDURE Init;
-VAR s: ARRAY 12 OF CHAR;  b10, b14: INTEGER;
+VAR s: ARRAY 12 OF CHAR;  b10, b14: SIGNED16;
 BEGIN
 	Kernel.GetConfig("TraceDiskette", s);
 	IF s[0] # 0X THEN trace := SHORT(ORD(s[0])-ORD("0")) ELSE trace := 0 END;
@@ -523,7 +523,7 @@ BEGIN
 		b14 := ORD(Machine.GetNVByte(14H))
 	ELSE
 		b10 := SHORT(StrToInt(s) MOD 100H);
-		b14 := INTEGER(ASH(StrToInt(s), -8))
+		b14 := SIGNED16(ASH(StrToInt(s), -8))
 	END;
 	IF trace > 0 THEN
 		Kernel.WriteString("Diskette config:");  Kernel.WriteHex(b10, -3);

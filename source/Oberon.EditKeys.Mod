@@ -33,7 +33,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 		END;
 		SequenceDesc = RECORD
 			next: Sequence;
-			sym: INTEGER;
+			sym: SIGNED16;
 			cmd: CHAR;
 			def: Definition;
 			stretch: Texts.Buffer
@@ -42,7 +42,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 	VAR
 		defs, dmy: Definition;
 		ch, cmd, hotKey: CHAR;
-		sym, errs: INTEGER;
+		sym, errs: SIGNED16;
 		errpos: LONGINT;
 		name, trig: Ident;
 		stretch, buf, indent: Texts.Buffer;
@@ -71,7 +71,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 	END OpenText;
 
 	PROCEDURE Flip (VAR src, dst: ARRAY OF CHAR);
-		VAR i, j: INTEGER;
+		VAR i, j: SIGNED16;
 	BEGIN i := -1; j := 0;
 		REPEAT INC(i) UNTIL src[i] = 0X;
 		WHILE i > 0 DO DEC(i); dst[j] := src[i]; INC(j) END;
@@ -104,7 +104,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 	END Ln;
 
 	PROCEDURE Char (ch: CHAR);
-		VAR pat: Display.Pattern; i, n, dx, x, y, w, h: INTEGER;
+		VAR pat: Display.Pattern; i, n, dx, x, y, w, h: SIGNED16;
 			d: ARRAY 3 OF CHAR;
 	BEGIN Fonts.GetChar(W.lib(Fonts.Font), ch, dx, x, y, w, h, pat);
 		IF h > 0 THEN Ch(ch); Str(" (* ") END;
@@ -126,7 +126,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 	(* table handler *)
 
 	PROCEDURE Find (VAR name, trig: Ident; insert: BOOLEAN): Definition;
-		VAR p, q, d, x: Definition; i: INTEGER;
+		VAR p, q, d, x: Definition; i: SIGNED16;
 	BEGIN Flip(name, trig); p := defs; d := p.right; q := NIL; x := NIL;
 		WHILE d # NIL DO i := 0;
 			WHILE (trig[i] # 0X) & (trig[i] = d.trig[i]) DO INC(i) END;
@@ -164,7 +164,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 	END ResetDefs;
 
 	PROCEDURE Trigger (VAR trig: Ident): Definition;
-		VAR d, x: Definition; i: INTEGER;
+		VAR d, x: Definition; i: SIGNED16;
 	BEGIN d := defs.right; x := NIL;
 		WHILE d # NIL DO i := 0;
 			WHILE (trig[i] # 0X) & (trig[i] = d.trig[i]) DO INC(i) END;
@@ -191,14 +191,14 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 	END GetCh;
 
 	PROCEDURE CharCode;
-		VAR c: INTEGER;
+		VAR c: SIGNED16;
 	BEGIN c := 0;
 		WHILE ("0" <= ch) & (ch <= "9") DO c := c * 10 + SHORT(ORD(ch) - 30H); GetCh END;
 		name[0] := CHR(c); name[1] := 0X	(*unchecked*)
 	END CharCode;
 
 	PROCEDURE Name;
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 	BEGIN i := 0;
 		REPEAT name[i] := ch; INC(i); GetCh
 		UNTIL (ch <= " ") OR (ch = "(") OR (ch = ")") OR R.eot OR (i = IdentLen-1);
@@ -354,7 +354,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 	END GetArguments;
 
 	PROCEDURE Expand (def: Definition; VAR stack, args, params: Sequence);
-		VAR d: Definition; seq, u: Sequence; B: Texts.Buffer; S: Texts.Scanner; par: Oberon.ParList; res: INTEGER;
+		VAR d: Definition; seq, u: Sequence; B: Texts.Buffer; S: Texts.Scanner; par: Oberon.ParList; res: SIGNED16;
 	BEGIN
 		IF ~def.in THEN def.in := TRUE; seq := def.seq;
 			WHILE (errs = 0) & (seq # NIL) DO
@@ -553,7 +553,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 			beg, end, time: LONGINT;
 
 		PROCEDURE Sort(VAR d: Definition; VAR pat: ARRAY OF CHAR; VAR tree: Definition);
-			VAR i: INTEGER; t: Definition; n: Ident;
+			VAR i: SIGNED16; t: Definition; n: Ident;
 
 			PROCEDURE Ins(VAR tree: Definition; t: Definition; VAR n: Ident);
 				VAR m: Ident;

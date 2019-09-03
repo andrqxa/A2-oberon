@@ -21,7 +21,7 @@ BEGIN
 END This;
 
 (** Return the type extension level level of type t. *)
-PROCEDURE BaseOf* (t: Type; level: INTEGER): Type;
+PROCEDURE BaseOf* (t: Type; level: SIGNED16): Type;
 BEGIN
 	S.GET(S.VAL(LONGINT,t.tag) - 8 - 4*level, t);
 	IF t # NIL THEN
@@ -31,9 +31,9 @@ BEGIN
 END BaseOf;
 
 (** What is the extension level of t? *)
-PROCEDURE LevelOf* (t: Type): INTEGER;
+PROCEDURE LevelOf* (t: Type): SIGNED16;
 BEGIN
-	RETURN S.VAL(INTEGER,t.flags-{Modules.ProtTypeBit})
+	RETURN S.VAL(SIGNED16,t.flags-{Modules.ProtTypeBit})
 END LevelOf;
 
 (*

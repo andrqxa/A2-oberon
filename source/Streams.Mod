@@ -134,8 +134,8 @@ TYPE
 			Char( SYSTEM.VAL( CHAR, x ) )
 		END RawSInt;
 
-	(** Write an INTEGER. *)
-		PROCEDURE RawInt*( x: INTEGER );
+	(** Write an SIGNED16. *)
+		PROCEDURE RawInt*( x: SIGNED16 );
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes2, x ), 0, 2 )
 		END RawInt;
@@ -570,8 +570,8 @@ TYPE
 			x := SYSTEM.VAL( SIGNED8, Get() )
 		END RawSInt;
 
-	(** Read an INTEGER. *)
-		PROCEDURE RawInt*( VAR x: INTEGER );
+	(** Read an SIGNED16. *)
+		PROCEDURE RawInt*( VAR x: SIGNED16 );
 		VAR x0, x1: CHAR;
 		BEGIN
 			x0 := Get();  x1 := Get();   (* defined order *)

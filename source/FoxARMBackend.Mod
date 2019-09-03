@@ -2771,7 +2771,7 @@ TYPE
 				register := RegisterFromIrOperand(instruction.op1, Low, emptyOperand); (*  register = address of x *)
 				register2 := RegisterFromIrOperand(instruction.op2, Low, emptyOperand); (*  register2 = value of y *)
 
-				register3 := GetFreeRegister(IntermediateCode.UnsignedIntegerType(32)); (* a temporary INTEGER (!) register that is used to store a float *)
+				register3 := GetFreeRegister(IntermediateCode.UnsignedIntegerType(32)); (* a temporary SIGNED16 (!) register that is used to store a float *)
 				Emit2(opLDR, register3, InstructionSet.NewImmediateOffsetMemory(register.register, 0, {InstructionSet.Increment})); (* register3 = value of x *)
 				Emit3(opADD, register3, register3, InstructionSet.NewRegister(register2.register, InstructionSet.shiftLSL, None, 23)); (* increase the (biased) exponent of x by y*)
 				Emit2(opSTR, register3, InstructionSet.NewImmediateOffsetMemory(register.register, 0, {InstructionSet.Increment})) (* store new value of x *)
@@ -2782,7 +2782,7 @@ TYPE
 				*)
 				register := RegisterFromIrOperand(instruction.op1, Low, emptyOperand); (*  register = address of x *)
 				register2 := RegisterFromIrOperand(instruction.op2, Low, emptyOperand); (*  register2 = address of y *)
-				register3 := GetFreeRegister(IntermediateCode.UnsignedIntegerType(32)); (* a temporary INTEGER (!) register that is used to store a float *)
+				register3 := GetFreeRegister(IntermediateCode.UnsignedIntegerType(32)); (* a temporary SIGNED16 (!) register that is used to store a float *)
 				Emit2(opLDR, register3, InstructionSet.NewImmediateOffsetMemory(register.register, 0, {InstructionSet.Increment})); (* register3 = value of x *)
 				register4 := GetFreeRegister(IntermediateCode.UnsignedIntegerType(32));
 				Emit2(opMOV, register4, InstructionSet.NewRegister(register3.register, InstructionSet.shiftLSR, None, 23)); (* register4 = biased exponent (and sign) of x *)
@@ -3157,7 +3157,7 @@ TYPE
 						SignOrZeroExtendOperand(source[Low], partType);
 						MovIfDifferent(destination[Low], source[Low])
 					ELSIF IsSinglePrecisionFloat(irSource) THEN
-						(* REAL --> INTEGER *)
+						(* REAL --> SIGNED16 *)
 						ASSERT(backend.useFPU32);
 						(* single precision float to non-complex integer: *)
 						temp := GetFreeRegister(IntermediateCode.FloatType(32));
@@ -3173,7 +3173,7 @@ TYPE
 						ResetRounding(fpstatus);
 						Emit2(opFMRS, destination[Low], temp)
 					ELSIF IsDoublePrecisionFloat(irSource) THEN
-						(* LONGREAL --> INTEGER *)
+						(* LONGREAL --> SIGNED16 *)
 						ASSERT(backend.useFPU64);
 						(* single precision float to non-complex integer: *)
 						temp := GetFreeRegister(IntermediateCode.FloatType(32));
@@ -3570,10 +3570,10 @@ TYPE
 
 				IF oberon07 THEN
 					IF Trace THEN D.String("Oberon07"); D.Ln END;
-					Global.SetDefaultDeclarations(system, 32) (* each basic type uses at least 32 bits -> INTEGER will be 32 bits long *)
+					Global.SetDefaultDeclarations(system, 32) (* each basic type uses at least 32 bits -> SIGNED16 will be 32 bits long *)
 				ELSE
 					IF Trace THEN D.String("not Oberon07"); D.Ln END;
-					Global.SetDefaultDeclarations(system, 8) (* INTEGER will be 16 bits long *)
+					Global.SetDefaultDeclarations(system, 8) (* SIGNED16 will be 16 bits long *)
 				END;
 
 				Global.SetDefaultOperators(system);

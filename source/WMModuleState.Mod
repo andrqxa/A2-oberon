@@ -273,7 +273,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 		adr, tmp2: ADDRESS;
 		etc: BOOLEAN;
 		sval: SIGNED8;
-		ival: INTEGER;
+		ival: SIGNED16;
 		tmp: Bytes;
 		set: SET;
 		rval: REAL;
@@ -344,7 +344,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 								END
 							|4:	(* SIGNED8 *)
 								SYSTEM.GET(adr, sval);  w.Int( sval, 1)
-							|5:	(* INTEGER *)
+							|5:	(* SIGNED16 *)
 								SYSTEM.GET(adr, ival);  w.Int( ival, 1)
 							|6:	(* LONGINT *)
 								SYSTEM.GET(adr, lval);  w.Int( lval, 1)

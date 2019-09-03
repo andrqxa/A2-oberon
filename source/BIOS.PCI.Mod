@@ -45,7 +45,7 @@ MODULE PCI;	 (** author: fof -- PCI without using PCI bios (using PCI tables des
 		END;
 		(*
 		RouteBuffer = RECORD
-			BufferSize, SegSelector: INTEGER;
+			BufferSize, SegSelector: SIGNED16;
 			DataBufferAdr: ADDRESS
 		END;
 		*)
@@ -340,7 +340,7 @@ MODULE PCI;	 (** author: fof -- PCI without using PCI bios (using PCI tables des
 	END PCIReadConfig32;
 
 	PROCEDURE PCIReadConfig16(pciBus, pciDev, pciFn, reg: LONGINT; VAR val: LONGINT): WORD;
-	VAR adr, dataAdr: LONGINT; state: SET; res: WORD; int: INTEGER;
+	VAR adr, dataAdr: LONGINT; state: SET; res: WORD; int: SIGNED16;
 	BEGIN
 		IF pciEnabled THEN
 			state := Machine.DisableInterrupts();

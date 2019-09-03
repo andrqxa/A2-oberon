@@ -74,7 +74,7 @@ PROCEDURE UpdateMatrix(A: antsArrayObjects.tINTEGERObject;  VAR m: vyRealVec.tMa
 	VAR min, max: LONGINT;  x, y: LONGINT;
 BEGIN
 	IF scaleminmax THEN
-		min := MAX(INTEGER);  max := MIN(INTEGER);
+		min := MAX(SIGNED16);  max := MIN(SIGNED16);
 		FOR y := y0 TO y0 + h0 - 1 DO
 			FOR x := x0 TO x0 + w0 - 1 DO
 				IF A.A[y, x] > max THEN max := A.A[y, x] END;

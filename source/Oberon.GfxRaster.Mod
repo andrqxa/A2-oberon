@@ -64,8 +64,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 			useRegion, lateStroke: BOOLEAN;	(* flags for path operations *)
 			cp: GfxPaths.Path;	(* current path if lateStroke is set *)
 			pathReg: GfxRegions.Region;	(* region surrounded by current path *)
-			plx, ply, prx, puy: INTEGER;	(* rectangle around last point *)
-			border: INTEGER;	(* safety border in proportion to style limit around points *)
+			plx, ply, prx, puy: SIGNED16;	(* rectangle around last point *)
+			border: SIGNED16;	(* safety border in proportion to style limit around points *)
 			devWidth: REAL;	(* half the line width in device space *)
 			u, v: REAL;	(* current position in device space *)
 			su, sv: REAL;	(* position of first point for thick lines *)
@@ -148,7 +148,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		GfxRegions.Copy(clip(ClipArea).reg, ctxt(Context).clipReg)
 	END SetClip;
 
-	PROCEDURE InitClipState (rc: Context; x, y: INTEGER);
+	PROCEDURE InitClipState (rc: Context; x, y: SIGNED16);
 	BEGIN
 		rc.plx := x - rc.border; rc.ply := y - rc.border;
 		rc.prx := x + rc.border; rc.puy := y + rc.border;
@@ -161,8 +161,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END InitClipState;
 
-	PROCEDURE UpdateClipState (rc: Context; x, y: INTEGER);
-		VAR plx, ply, prx, puy: INTEGER;
+	PROCEDURE UpdateClipState (rc: Context; x, y: SIGNED16);
+		VAR plx, ply, prx, puy: SIGNED16;
 	BEGIN
 		plx := x - rc.border; ply := y - rc.border; prx := x + rc.border; puy := y + rc.border;
 		GfxRegions.IncludeRect(rc.plx, rc.ply, rc.prx, rc.puy, plx, ply, prx, puy);
@@ -241,7 +241,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 	END HairLineTo;
 
 	PROCEDURE HairCircle (rc: Context; mx, my, r: LONGINT);
-		VAR llx, lly, urx, ury: INTEGER; x, y, d, de, dse: LONGINT;
+		VAR llx, lly, urx, ury: SIGNED16; x, y, d, de, dse: LONGINT;
 	BEGIN
 		llx := SHORT(mx - r); lly := SHORT(my - r); urx := SHORT(mx + r + 1); ury := SHORT(my + r + 1);
 		IF GfxRegions.RectOverlaps(llx, lly, urx, ury, rc.clipReg) THEN
@@ -265,7 +265,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 	END HairCircle;
 
 	PROCEDURE HairEllipse (rc: Context; mx, my, rx, ry: LONGINT);
-		VAR llx, lly, urx, ury: INTEGER; x, y, aa, bb, da, db, dy, dx, d: LONGINT;
+		VAR llx, lly, urx, ury: SIGNED16; x, y, aa, bb, da, db, dy, dx, d: LONGINT;
 	BEGIN
 		llx := SHORT(mx - rx); lly := SHORT(my - ry); urx := SHORT(mx + rx + 1); ury := SHORT(my + ry + 1);
 		IF GfxRegions.RectOverlaps(llx, lly, urx, ury, rc.clipReg) THEN
@@ -403,7 +403,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END AddEllipse;
 
-	PROCEDURE EnumRegion (lx, ly, rx, uy: INTEGER; VAR data: GfxRegions.EnumData);
+	PROCEDURE EnumRegion (lx, ly, rx, uy: SIGNED16; VAR data: GfxRegions.EnumData);
 		VAR rc: Context;
 	BEGIN
 		rc := data(RegData).context;
@@ -1234,7 +1234,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 	END Render;
 
 	PROCEDURE Rect* (ctxt: Gfx.Context; x0, y0, x1, y1: REAL);
-		VAR rc: Context; u0, v0, u1, v1, t: REAL; enter, exit, llx, lly, urx, ury: INTEGER;
+		VAR rc: Context; u0, v0, u1, v1, t: REAL; enter, exit, llx, lly, urx, ury: SIGNED16;
 	BEGIN
 		IF ~(Gfx.Record IN ctxt.mode) & ~GfxMatrix.Rotated(ctxt.ctm) THEN
 			rc := ctxt(Context);

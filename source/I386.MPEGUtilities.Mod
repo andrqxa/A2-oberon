@@ -1968,7 +1968,7 @@ TYPE
 			y, u, v: LONGINT;
 
 		BEGIN
-			strideDiff := (strideOut - widthY)*SIZEOF(INTEGER); (* expressed in bytes *)
+			strideDiff := (strideOut - widthY)*SIZEOF(SIGNED16); (* expressed in bytes *)
 
 			IF heightY < 0 THEN
 				(* we are flipping our output upside-down *)
@@ -2001,10 +2001,10 @@ TYPE
 					IF g > 255 THEN g := 255; ELSIF g < 0 THEN g := 0 END;
 					IF b > 255 THEN b := 255; ELSIF b < 0 THEN b := 0 END;
 
-					SYSTEM.PUT16( pusOut,  SYSTEM.VAL( INTEGER, SYSTEM.VAL( SET, r DIV 8 ) + SYSTEM.VAL( SET, ( g DIV 4 ) * 32 ) +
+					SYSTEM.PUT16( pusOut,  SYSTEM.VAL( SIGNED16, SYSTEM.VAL( SET, r DIV 8 ) + SYSTEM.VAL( SET, ( g DIV 4 ) * 32 ) +
 																SYSTEM.VAL( SET, (b DIV 8 ) * 2048 ) ) );
 
-					pusOut := pusOut + SIZEOF( INTEGER );
+					pusOut := pusOut + SIZEOF( SIGNED16 );
 				END;
 
 				pucYBaseOffset := pucYBaseOffset + strideY;
@@ -2464,7 +2464,7 @@ TYPE
 			PACKSSDW MMX0, [EAX+8]		; Pack next 8 bytes (two LONGINT) together with mm0
 			MOVQ MMX1, [EAX+16]
 			PACKSSDW MMX1, [EAX+24]
-			PACKUSWB MMX0, MMX1			; Pack 4 INTEGER with another 4 INTEGER into mm0
+			PACKUSWB MMX0, MMX1			; Pack 4 SIGNED16 with another 4 SIGNED16 into mm0
 			MOVQ [EBX], MMX0				; Write mm0 to dest
 			ADD EBX, EDI					; Add stride to dest
 			ADD EAX, 32					; next source

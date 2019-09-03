@@ -41,7 +41,7 @@ TYPE
 
 VAR
 	colorEntry: ColorEntry;
-	colorMap: ARRAY 256 OF INTEGER;
+	colorMap: ARRAY 256 OF SIGNED16;
 	charMap: POINTER TO ARRAY OF CHAR;
 	xpmLogo,noColor: ARRAY 10 OF CHAR;
 	credit: BOOLEAN;
@@ -126,7 +126,7 @@ PROCEDURE MagicString(VAR R: Rider): BOOLEAN;
 	(* check for the magic string *)
 VAR
 	c: CHAR;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	i:= 0;
 	REPEAT R.Read(R,c); UNTIL R.eof OR ((c # CR) & (c # LF));
@@ -168,7 +168,7 @@ PROCEDURE XpmName(VAR R: Rider; VAR name: ARRAY OF CHAR);
 	(* Read the Pixmap's internal name *)
 VAR
 	c: CHAR;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	i:= 0;
 	WHILE ~R.eof & (ScanChar(R) # "*") DO END;
@@ -179,12 +179,12 @@ BEGIN
 	name[i]:= 0X;
 END XpmName;
 
-PROCEDURE XpmAttr(VAR R: Rider; VAR w,h,c,p: INTEGER);
+PROCEDURE XpmAttr(VAR R: Rider; VAR w,h,c,p: SIGNED16);
 	(* Read the Pixmap's attributes: width, height, color, chars/pixel *)
 VAR
 	ch: CHAR;
 
-	PROCEDURE ReadNum(): INTEGER;
+	PROCEDURE ReadNum(): SIGNED16;
 	VAR
 		i: LONGINT;
 		s: ARRAY 64 OF CHAR;
@@ -205,21 +205,21 @@ BEGIN
 	WHILE ~R.eof & (ch # ",") DO ch:= ScanChar(R); END;
 END XpmAttr;
 
-PROCEDURE XpmColor(VAR R: Rider; pict: Pictures.Picture; nrColor,pixChr,traCol: INTEGER; conversion: BOOLEAN);
+PROCEDURE XpmColor(VAR R: Rider; pict: Pictures.Picture; nrColor,pixChr,traCol: SIGNED16; conversion: BOOLEAN);
 	(* Read the Pixmap's color entries. Only the color entry (specification 'c') is supported.
 	entries starting with '#' are treated as a X color definition, % (HSV) is not supported and
 	all others are treated as symbolic colors. The color conversion part is copied from BMP.Mod *)
 VAR
-	r,g,b,i,j,k: INTEGER;
+	r,g,b,i,j,k: SIGNED16;
 	x0,x1,x2: REAL;
 	C: LONGINT;
 	ok: BOOLEAN;
 	ch,key,spec: CHAR;
 	cval: ARRAY 60 OF CHAR;
 
-	PROCEDURE Value(col: ARRAY OF CHAR; pos,len: INTEGER): REAL;
+	PROCEDURE Value(col: ARRAY OF CHAR; pos,len: SIGNED16): REAL;
 	VAR
-		i: INTEGER;
+		i: SIGNED16;
 		v,w: LONGINT;
 	BEGIN
 		v:= 0; w:= 0;
@@ -290,11 +290,11 @@ BEGIN
 	charMap[i*pixChr]:= 0X;
 END XpmColor;
 
-PROCEDURE XpmLine(VAR R: Rider; y,w,cpp: INTEGER; pict: Pictures.Picture);
+PROCEDURE XpmLine(VAR R: Rider; y,w,cpp: SIGNED16; pict: Pictures.Picture);
 	(* Read a Xpm Scan Line and set the pictures pixels according to the color map *)
 VAR
 	pat: ARRAY 16 OF CHAR;
-	i,j: INTEGER;
+	i,j: SIGNED16;
 	k: SIZE;
 	c: CHAR;
 BEGIN
@@ -310,10 +310,10 @@ BEGIN
 	REPEAT c:= ScanChar(R); UNTIL R.eof OR (c = ",") OR (c = "}");
 END XpmLine;
 
-PROCEDURE LoadXPM(VAR R: Rider; transparentCol: INTEGER; colorConversion: BOOLEAN; pict: Pictures.Picture);
+PROCEDURE LoadXPM(VAR R: Rider; transparentCol: SIGNED16; colorConversion: BOOLEAN; pict: Pictures.Picture);
 VAR
 	pos: LONGINT;
-	w,h,col,cpp,y: INTEGER;
+	w,h,col,cpp,y: SIGNED16;
 	name: ARRAY 60 OF CHAR;
 BEGIN
 	pos:= R.Pos(R);

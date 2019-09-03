@@ -1216,7 +1216,7 @@ TYPE
 			END SkipBlanks;
 
 			PROCEDURE GetNumber (VAR intval: HUGEINT);
-			VAR i, m, n: INTEGER; dig: ARRAY 24 OF CHAR;
+			VAR i, m, n: SIGNED16; dig: ARRAY 24 OF CHAR;
 			BEGIN
 				i := 0; m := 0; n := 0;
 				WHILE ('0' <= char) & (char <= '9') OR ('A' <= CAP (char)) & (CAP (char) <= 'F') DO
@@ -2209,11 +2209,11 @@ TYPE
 
 	VAR kernelWriter: Streams.Writer;
 
-	PROCEDURE Ord (ch: CHAR): INTEGER;
+	PROCEDURE Ord (ch: CHAR): SIGNED16;
 	BEGIN RETURN ORD (ch) - ORD ("0")
 	END Ord;
 
-	PROCEDURE HexOrd (ch: CHAR): INTEGER;
+	PROCEDURE HexOrd (ch: CHAR): SIGNED16;
 	BEGIN
 	IF ch <= "9" THEN RETURN ORD (ch) - ORD ("0")
 		ELSE RETURN ORD (CAP (ch)) - ORD ("A") + 10
@@ -2521,7 +2521,7 @@ TYPE
 	END ValueInByteRange;
 
 	PROCEDURE ValueInWordRange (value: HUGEINT): BOOLEAN;
-	BEGIN RETURN SYSTEM.VAL (INTEGER, value) = value
+	BEGIN RETURN SYSTEM.VAL (SIGNED16, value) = value
 	END ValueInWordRange;
 
 	PROCEDURE InitOperand*(VAR operand: Operand);

@@ -37,7 +37,7 @@ BEGIN
 	NEW(len, dims); FOR i := 0 TO dims - 1 DO Files.ReadLInt(R, len[i]) END
 END ReadArrayDesc;
 
-PROCEDURE ReadInt* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF INTEGER;  start, count: LONGINT);
+PROCEDURE ReadInt* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF SIGNED16;  start, count: LONGINT);
 	VAR i: LONGINT;
 BEGIN	FOR i := start TO count DO Files.ReadInt(R, x[i]) END
 END ReadInt;
@@ -88,7 +88,7 @@ BEGIN
 	NEW(len, dims); FOR i := 0 TO dims - 1 DO Files.WriteLInt(R, len[i]) END
 END WriteArrayDesc;
 
-PROCEDURE WriteInt* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF INTEGER;  start, count: LONGINT);
+PROCEDURE WriteInt* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF SIGNED16;  start, count: LONGINT);
 	VAR i: LONGINT;
 BEGIN	FOR i := start TO count DO Files.WriteInt(R, x[i]) END
 END WriteInt;

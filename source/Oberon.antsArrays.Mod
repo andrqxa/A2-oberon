@@ -27,12 +27,12 @@ IMPORT vyLongreal, vyLongrealVec, vyInteger, vyIntVec, vyLongint, vyLongintVec, 
 
 
 TYPE
-	I1d* = POINTER TO ARRAY OF INTEGER;
+	I1d* = POINTER TO ARRAY OF SIGNED16;
 	R1d* = POINTER TO ARRAY OF REAL;
 	X1d* = POINTER TO ARRAY OF LONGREAL;
 	L1d* = POINTER TO ARRAY OF LONGINT;
 
-	I2d* = POINTER TO ARRAY OF ARRAY OF INTEGER;
+	I2d* = POINTER TO ARRAY OF ARRAY OF SIGNED16;
 	R2d* = POINTER TO ARRAY OF ARRAY OF REAL;
 	X2d* = POINTER TO ARRAY OF ARRAY OF LONGREAL;
 	L2d* = POINTER TO ARRAY OF ARRAY OF LONGINT;
@@ -104,12 +104,12 @@ BEGIN
 	RETURN a[k]
 END kSmallestL;
 
-PROCEDURE kSmallestI* (VAR a: ARRAY OF INTEGER;   n, k: LONGINT): INTEGER;
+PROCEDURE kSmallestI* (VAR a: ARRAY OF SIGNED16;   n, k: LONGINT): SIGNED16;
 	(** caution: modifies a*)
 	(* algorithm of Nikolaus Wirth *)
-	VAR i, j, l, m: LONGINT;    x: INTEGER;
-PROCEDURE swap (VAR x, y: INTEGER);
-	VAR z : INTEGER;
+	VAR i, j, l, m: LONGINT;    x: SIGNED16;
+PROCEDURE swap (VAR x, y: SIGNED16);
+	VAR z : SIGNED16;
 BEGIN
 	z := x;   x := y;   y := z
 END swap;
@@ -135,7 +135,7 @@ BEGIN
 	vyLongreal.Copy(n, a, 0, ra^, 0)
 END Use1dX;
 
-PROCEDURE Use1dI (VAR a: ARRAY OF INTEGER;  n: LONGINT);
+PROCEDURE Use1dI (VAR a: ARRAY OF SIGNED16;  n: LONGINT);
 BEGIN
 	IF (ia = NIL) OR (LEN(ia) < n) THEN NEW(ia, n) END;
 	vyInteger.Copy(n, a, 0, ia^, 0)
@@ -167,7 +167,7 @@ BEGIN
 	END
 END Median1dL;
 
-PROCEDURE Median1dI* (VAR a: ARRAY OF INTEGER;   n: LONGINT): INTEGER;
+PROCEDURE Median1dI* (VAR a: ARRAY OF SIGNED16;   n: LONGINT): SIGNED16;
 BEGIN
 	Use1dI(a, n);
 	IF ODD(n) THEN
@@ -243,7 +243,7 @@ BEGIN
 	(*antsRandom.gen.GetRandomLV(antsRandom.gen,top,LEN(a),a,0); *)
 END Uniform1dL;
 
-PROCEDURE Uniform1dI* (VAR a: ARRAY OF INTEGER;  x, w: LONGINT;  top: INTEGER);
+PROCEDURE Uniform1dI* (VAR a: ARRAY OF SIGNED16;  x, w: LONGINT;  top: SIGNED16);
 	VAR xx: LONGINT;
 BEGIN
 	IF (la = NIL) OR (LEN(la^) # w) THEN NEW(la, w) END;
@@ -253,7 +253,7 @@ BEGIN
 	END
 END Uniform1dI;
 
-PROCEDURE Uniform2dI* (VAR A: ARRAY OF ARRAY OF INTEGER ;  top: INTEGER;  x, y, w, h: LONGINT);
+PROCEDURE Uniform2dI* (VAR A: ARRAY OF ARRAY OF SIGNED16 ;  top: SIGNED16;  x, y, w, h: LONGINT);
 	VAR  y0: LONGINT ;
 BEGIN
 	FOR y0 := y TO y + h - 1 DO
@@ -277,7 +277,7 @@ BEGIN
 	END
 END Uniform2dX;
 
-PROCEDURE Uniform3dI* (VAR A: I3d;  top: INTEGER);
+PROCEDURE Uniform3dI* (VAR A: I3d;  top: SIGNED16);
 	VAR l: LONGINT;
 BEGIN
 	FOR l := 0 TO LEN(A) - 1 DO
@@ -285,7 +285,7 @@ BEGIN
 	END
 END Uniform3dI;
 
-PROCEDURE Uniform4dI* (VAR A: I4d;  top: INTEGER);
+PROCEDURE Uniform4dI* (VAR A: I4d;  top: SIGNED16);
 	VAR l: LONGINT;
 BEGIN
 	FOR l := 0 TO LEN(A) - 1 DO
@@ -293,7 +293,7 @@ BEGIN
 	END
 END Uniform4dI;
 
-PROCEDURE FindFirstI* (VAR f: ARRAY OF INTEGER;  value: INTEGER): LONGINT;
+PROCEDURE FindFirstI* (VAR f: ARRAY OF SIGNED16;  value: SIGNED16): LONGINT;
 	VAR i: LONGINT;
 BEGIN
 	i := 0;
@@ -374,7 +374,7 @@ BEGIN
 	RETURN v
 END VecFromArrayL;
 
-PROCEDURE VecFromArrayI* (VAR a: ARRAY OF INTEGER): vyIntVec.tVector;
+PROCEDURE VecFromArrayI* (VAR a: ARRAY OF SIGNED16): vyIntVec.tVector;
 	VAR v: vyIntVec.tVector;
 BEGIN
 	v := vyIntVec.New(LEN(a));

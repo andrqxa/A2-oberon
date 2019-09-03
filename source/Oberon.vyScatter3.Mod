@@ -58,7 +58,7 @@ VAR
 	END Copy;
 
 	PROCEDURE Recall( scatter: tLayer );
-	VAR i: LONGINT;  nrData: LONGINT;  sel: vyBase.tVector;  error: INTEGER;  xx, yy: Coordinate;  lastx, lasty: Coordinate;  b, lastb: BOOLEAN;  boxed: BOOLEAN;
+	VAR i: LONGINT;  nrData: LONGINT;  sel: vyBase.tVector;  error: SIGNED16;  xx, yy: Coordinate;  lastx, lasty: Coordinate;  b, lastb: BOOLEAN;  boxed: BOOLEAN;
 	BEGIN
 		lastx := MAX( Coordinate );  nrData := scatter.x.nrData;
 		IF scatter.highlight = NIL THEN vyHighlight.AdjustHighlight( scatter ) END;
@@ -161,7 +161,7 @@ VAR
 	PROCEDURE Actor( layer: vyPort.tLayer;  sel: vyBase.tVector;  x0O, y0O, x1O, y1O, x0N, y0N, x1N, y1N: Real;
 								VAR somethingChanged: BOOLEAN );
 	(*vs 0.0a1	md  16.08.94 *)
-	VAR scatter: tLayer;  error: INTEGER;  nrData, i: LONGINT;  new: BOOLEAN;  X, Y, Z, vx, vy, vz: Real;
+	VAR scatter: tLayer;  error: SIGNED16;  nrData, i: LONGINT;  new: BOOLEAN;  X, Y, Z, vx, vy, vz: Real;
 
 		PROCEDURE PointInRect( x, y, x0, y0, x1, y1: Real ): BOOLEAN;
 		BEGIN
@@ -193,7 +193,7 @@ VAR
 	(*? should be supported as the selections with an abstract identifier *)
 	(*vs 0.0a1 *)  (* md  04.06.95 *)
 	CONST toleranz = 2;
-	VAR found, i, nrData: LONGINT;  r: Real;  error: INTEGER;  lx, ly, x0, y0: Coordinate;  id, val: vyName.tNameArray;
+	VAR found, i, nrData: LONGINT;  r: Real;  error: SIGNED16;  lx, ly, x0, y0: Coordinate;  id, val: vyName.tNameArray;
 	BEGIN
 		found := -1;  nrData := scatter.x.nrData;  id := "";
 		WHILE event.gesture = vyEvents.EvtIdent DO
@@ -220,7 +220,7 @@ VAR
 	END Prompt;
 
 	PROCEDURE Responsible( scatter: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 
 		PROCEDURE InScatter( x, y: Coordinate ): BOOLEAN;
 		(*! not yet implemented *)
@@ -392,7 +392,7 @@ VAR
 	END ShowP;
 
 	PROCEDURE ShowL*( list: vyLinks.Link );
-	VAR c: vyLayers3d.tCoordinate3d;  pict: vyPort.Picture;  minX, maxX, minY, maxY, minZ, maxZ: Real;  nans: LONGINT;  i: INTEGER;
+	VAR c: vyLayers3d.tCoordinate3d;  pict: vyPort.Picture;  minX, maxX, minY, maxY, minZ, maxZ: Real;  nans: LONGINT;  i: SIGNED16;
 	BEGIN
 		WHILE list # NIL DO New;
 

@@ -61,7 +61,7 @@ VAR
 	END Command;
 
 	PROCEDURE Call*;
-	VAR sc: Texts.Scanner; res: INTEGER;
+	VAR sc: Texts.Scanner; res: SIGNED16;
 	BEGIN
 	Texts.OpenScanner(sc, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(sc);
@@ -85,7 +85,7 @@ VAR
 
 	PROCEDURE OpenScript* (t: Texts.Text; pos, num: LONGINT; executorObj, context: Objects.Object): BOOLEAN; BEGIN RETURN FALSE END OpenScript;
 
-	PROCEDURE SetProgress* (i: INTEGER); END SetProgress; (* for interactive visualization of progress *)
+	PROCEDURE SetProgress* (i: SIGNED16); END SetProgress; (* for interactive visualization of progress *)
 
 	PROCEDURE Init*; END Init;
 
@@ -178,7 +178,7 @@ System.Time
 
 (*
 PROCEDURE Test*;
-VAR ok,keys: SET; x,y: INTEGER; res: INTEGER;
+VAR ok,keys: SET; x,y: SIGNED16; res: SIGNED16;
 BEGIN
 Input.Mouse(ok,x,y); keys := ok;
 WHILE(ok=keys) DO
@@ -193,7 +193,7 @@ SYSTEM.GET(ADDRESSOF(Exceptions.displayTrap),oldtrapper); trapName := "Cause: Sy
 END Test2;
 
 PROCEDURE Test3*;
-VAR ok,keys: SET; x,y: INTEGER;time : LONGINT;
+VAR ok,keys: SET; x,y: SIGNED16;time : LONGINT;
 BEGIN
 HALT(99);
 END Test3;
@@ -271,7 +271,7 @@ TestBM(A^);
 END TestBigMatrix;
 
 PROCEDURE ShowPar*;
-VAR sc: Texts.Reader; ch: CHAR; i: INTEGER;
+VAR sc: Texts.Reader; ch: CHAR; i: SIGNED16;
 BEGIN
 Texts.OpenReader(sc,Oberon.Par.text,Oberon.Par.pos);
 i := 0; Texts.Read(sc,ch);

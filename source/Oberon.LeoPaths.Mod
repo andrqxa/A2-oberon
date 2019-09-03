@@ -524,7 +524,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END ConsumePath;
 
 	PROCEDURE RenderPath (path: Path; VAR msg: Leonardo.RenderMsg);
-		VAR state: Gfx.State; rm: RenderMsg; id: INTEGER;
+		VAR state: Gfx.State; rm: RenderMsg; id: SIGNED16;
 
 		PROCEDURE corner (x, y: REAL);
 		BEGIN
@@ -2834,7 +2834,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE ReadLegacyCurves (VAR r: Files.Rider; path: Path);
 		VAR
-			n, i, succ, pred, j, m: LONGINT; key: INTEGER; name: ARRAY 64 OF CHAR; obj: Objects.Object;
+			n, i, succ, pred, j, m: LONGINT; key: SIGNED16; name: ARRAY 64 OF CHAR; obj: Objects.Object;
 			cv: ARRAY 64 OF Segment; last: ARRAY 64 OF LONGINT; p: Leonardo.Shape;
 			curve: Segment; cm: Objects.CopyMsg;
 	BEGIN
@@ -2896,7 +2896,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END ReadLegacyCurves;
 
 	PROCEDURE HandleLegacyPath (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR path: Path; ver: LONGINT; i: INTEGER; real: REAL; cm: Objects.CopyMsg; s: Leonardo.Shape; bool: BOOLEAN;
+		VAR path: Path; ver: LONGINT; i: SIGNED16; real: REAL; cm: Objects.CopyMsg; s: Leonardo.Shape; bool: BOOLEAN;
 	BEGIN
 		IF msg IS Objects.FileMsg THEN
 			WITH msg: Objects.FileMsg DO

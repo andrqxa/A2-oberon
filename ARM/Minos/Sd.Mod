@@ -498,10 +498,10 @@ TYPE
 	HcRegisters = POINTER {UNSAFE,UNTRACED} TO RECORD
 		SDMASystemAddress {ALIGNED(1)}: LONGINT;				(** offset = 0H *)
 		BlockSize {ALIGNED(1)},										(** offset = 4H *)
-		BlockCount {ALIGNED(1)}: INTEGER;							(** offset = 6H *)
+		BlockCount {ALIGNED(1)}: SIGNED16;							(** offset = 6H *)
 		Argument1 {ALIGNED(1)}: LONGINT;							(** offset = 8H *)
 		TransferMode {ALIGNED(1)},									(** offset = 0CH *)
-		Command {ALIGNED(1)}: INTEGER;							(** offset = 0EH *)
+		Command {ALIGNED(1)}: SIGNED16;							(** offset = 0EH *)
 		Response {ALIGNED(1)}: ARRAY 4 OF LONGINT;			(** offset = 10H *)
 		BufferData {ALIGNED(1)}: LONGINT;
 		PresentState {ALIGNED(1)}: SET;
@@ -509,27 +509,27 @@ TYPE
 		PowerControl {ALIGNED(1)},
 		BlockGapControl {ALIGNED(1)},
 		WakeupControl {ALIGNED(1)}: SIGNED8;
-		ClockControl {ALIGNED(1)}: INTEGER;
+		ClockControl {ALIGNED(1)}: SIGNED16;
 		TimeoutControl {ALIGNED(1)},
 		SoftwareReset {ALIGNED(1)}: SIGNED8;
 		InterruptStatus {ALIGNED(1)},
 		InterruptStatusEnable {ALIGNED(1)},
 		InterruptSignalEnable {ALIGNED(1)}: SET;
 		AutoCmdErrorStatus {ALIGNED(1)},
-		HostControl2 {ALIGNED(1)}: INTEGER;
+		HostControl2 {ALIGNED(1)}: SIGNED16;
 		Capabilities {ALIGNED(1)}: ARRAY 2 OF SET;
 		MaximumCurrentCapabilities {ALIGNED(1)}: HUGEINT;
 		ForceEventAutoCmdErrorStatus {ALIGNED(1)},
-		ForceEventErrorInterruptStatus {ALIGNED(1)}: INTEGER;
+		ForceEventErrorInterruptStatus {ALIGNED(1)}: SIGNED16;
 		AdmaErrorStatus {ALIGNED(1)}: SIGNED8;
 		padding0 {ALIGNED(1)}: ARRAY 3 OF SIGNED8;
 		AdmaSystemAddress {ALIGNED(1)}: HUGEINT;
-		PresetValues {ALIGNED(1)}: ARRAY 8 OF INTEGER;
+		PresetValues {ALIGNED(1)}: ARRAY 8 OF SIGNED16;
 		padding1 {ALIGNED(1)}: ARRAY 28 OF LONGINT;
 		SharedBusControl {ALIGNED(1)}: LONGINT;
 		padding2 {ALIGNED(1)}: ARRAY 6 OF LONGINT;
 		SlotInterruptStatus {ALIGNED(1)},
-		HostControllerVersion {ALIGNED(1)}: INTEGER;
+		HostControllerVersion {ALIGNED(1)}: SIGNED16;
 	END;
 
 VAR
@@ -734,11 +734,11 @@ VAR
 				(command.command = CMD_WRITE_BLOCK) OR (command.command = CMD_WRITE_MULTIPLE_BLOCK) OR
 				(command.command = 53)(* SDIO Command *)) THEN
 			IF len <= BlockSize THEN
-				hc.regs.BlockSize := INTEGER(len);
+				hc.regs.BlockSize := SIGNED16(len);
 				hc.regs.BlockCount := 1
 			ELSE
 				hc.regs.BlockSize := BlockSize;
-				hc.regs.BlockCount := INTEGER(len DIV BlockSize)
+				hc.regs.BlockCount := SIGNED16(len DIV BlockSize)
 			END;
 
 			IF Trace THEN
@@ -883,11 +883,11 @@ VAR
 				(command.command = CMD_WRITE_BLOCK) OR (command.command = CMD_WRITE_MULTIPLE_BLOCK) OR
 				(command.command = 53)(* SDIO Command *))*) THEN
 			IF len <= BlockSize THEN
-				hc.regs.BlockSize := INTEGER(len);
+				hc.regs.BlockSize := SIGNED16(len);
 				hc.regs.BlockCount := 1
 			ELSE
 				hc.regs.BlockSize := BlockSize;
-				hc.regs.BlockCount := INTEGER(len DIV BlockSize)
+				hc.regs.BlockCount := SIGNED16(len DIV BlockSize)
 			END;
 
 			IF Trace THEN
@@ -1146,11 +1146,11 @@ VAR
 		IF val >= 8 THEN val := 7 END;
 		ASSERT(val < 8);
 		(*val := divisor * 2;*)
-		hc.regs.ClockControl := INTEGER(LSH(LSH(LONGINT(1), val), 8) + SYSTEM.VAL(INTEGER, {ClockControl_InternalClockEnable}));
+		hc.regs.ClockControl := SIGNED16(LSH(LSH(LONGINT(1), val), 8) + SYSTEM.VAL(SIGNED16, {ClockControl_InternalClockEnable}));
 		hc.frequency := hc.baseFrequency DIV (LSH(LONGINT(1), val));
 		REPEAT val := hc.regs.ClockControl UNTIL ClockControl_InternalClockState IN SYSTEM.VAL(SET, val);
 		val := hc.regs.ClockControl;
-		hc.regs.ClockControl := SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, val) + {ClockControl_SdClockEnable});
+		hc.regs.ClockControl := SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, val) + {ClockControl_SdClockEnable});
 		IF Trace THEN
 			SdEnvironment.String("[SD] Selecting Bus Clock Frequency: ");
 			SdEnvironment.Int(hc.frequency, 0);
@@ -1655,9 +1655,9 @@ VAR
 				SdEnvironment.Ln
 			END;
 			IF dma THEN INCL(txFlags, TransferMode_DmaEnable) END;
-			hc.regs.TransferMode := SYSTEM.VAL(INTEGER, txFlags)
+			hc.regs.TransferMode := SYSTEM.VAL(SIGNED16, txFlags)
 		END;
-		hc.regs.Command := SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, reg + LSH(cmd, Command_CommandIndexOffset)) + flags);
+		hc.regs.Command := SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, reg + LSH(cmd, Command_CommandIndexOffset)) + flags);
 
 		(* 7 *)
 		RETURN WaitForCompletion(hc, ~abort, status, result)

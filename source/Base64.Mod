@@ -4,12 +4,12 @@ IMPORT Streams, KernelLog;
 
 VAR
 		encTable: ARRAY 64 OF CHAR;
-		decTable: ARRAY 128 OF INTEGER;
+		decTable: ARRAY 128 OF SIGNED16;
 
 PROCEDURE Decode*(R: Streams.Reader; W:Streams.Writer);
 		VAR
-			codes: ARRAY 4 OF INTEGER;
-			i: INTEGER;
+			codes: ARRAY 4 OF SIGNED16;
+			i: SIGNED16;
 			ch: CHAR;
 			ok, end: BOOLEAN;
 	BEGIN
@@ -95,7 +95,7 @@ PROCEDURE Decode*(R: Streams.Reader; W:Streams.Writer);
 	END Encode;
 
 	PROCEDURE InitTables;
-		VAR i, max: INTEGER;
+		VAR i, max: SIGNED16;
 	BEGIN
 		max := ORD("Z")-ORD("A");
 		FOR i := 0 TO max DO encTable[i] := CHR(i+ORD("A")) END;

@@ -65,7 +65,7 @@ MODULE HTMLForms IN Oberon; (** portable *)	(* ejz  *)
 	PROCEDURE GetButCap(attrs: HTMLDocs.TagAttr; obj: Objects.Object; cap: ARRAY OF CHAR);
 		VAR
 			attr: HTMLDocs.TagAttr;
-			dsr, w, h: INTEGER;
+			dsr, w, h: SIGNED16;
 	BEGIN
 		attr := HTMLDocs.FindAttr(attrs, "ALT");
 		IF attr # NIL THEN

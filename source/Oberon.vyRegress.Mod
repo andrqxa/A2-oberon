@@ -141,7 +141,7 @@ END CalcRegress;
 
 PROCEDURE DoRegress* (response, regressor: vyBase.tVector;    inSim: BOOLEAN);
 VAR
-	Err: INTEGER;
+	Err: SIGNED16;
 	nrData, nans: LONGINT;
 	minX, maxX, minY, maxY: Real;
 	xyScatter, resScatter: vyScatter2.tLayer;

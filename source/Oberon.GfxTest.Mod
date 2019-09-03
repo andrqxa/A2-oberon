@@ -32,7 +32,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Init;
 
 	PROCEDURE Colors*;
-		VAR i, j: INTEGER; col: Gfx.Color;
+		VAR i, j: SIGNED16; col: Gfx.Color;
 	BEGIN
 		Gfx.Reset(Ctxt);
 		FOR i := 0 TO 255 BY 8 DO
@@ -238,7 +238,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Circles;
 
 	PROCEDURE Fractal*;
-		PROCEDURE arrow (depth: INTEGER; x, y: REAL);
+		PROCEDURE arrow (depth: SIGNED16; x, y: REAL);
 			CONST sqrt2 = 1.414;
 			VAR ctm: GfxMatrix.Matrix; lw: REAL;
 		BEGIN
@@ -361,7 +361,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Dashes;
 
 	PROCEDURE Image*;
-		VAR img: Images.Image; b0, b1: ARRAY 8 OF CHAR; i: INTEGER;
+		VAR img: Images.Image; b0, b1: ARRAY 8 OF CHAR; i: SIGNED16;
 	BEGIN
 		Gfx.Reset(Ctxt);
 		NEW(img); Images.Create(img, 8, 8, Images.D8);
@@ -451,7 +451,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Typefaces;
 
 	PROCEDURE Zip*;
-		VAR grey: INTEGER; col: Gfx.Color;
+		VAR grey: SIGNED16; col: Gfx.Color;
 	BEGIN
 		Gfx.Reset(Ctxt);
 		Gfx.SetFontName(Ctxt, FontName, 24);
@@ -472,7 +472,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	PROCEDURE Binky*;
 		VAR dx, dy: REAL;
 		PROCEDURE fillPage (str: ARRAY OF CHAR);
-			VAR i: INTEGER; char: ARRAY 2 OF CHAR;
+			VAR i: SIGNED16; char: ARRAY 2 OF CHAR;
 		BEGIN
 			i := 0; char[1] := 0X;
 			WHILE Ctxt.cpy > -13 DO
@@ -514,7 +514,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Font;
 
 	PROCEDURE Adobe*;
-		VAR phi: INTEGER; ctm: GfxMatrix.Matrix;
+		VAR phi: SIGNED16; ctm: GfxMatrix.Matrix;
 	BEGIN
 		Gfx.Reset(Ctxt);
 		Gfx.SetFontName(Ctxt, BoldFontName, 30);
@@ -560,7 +560,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	PROCEDURE Patterns*;
 		VAR img: Images.Image; done: BOOLEAN;
 
-		PROCEDURE rect (pat: Display.Pattern; x, y, w, h: INTEGER);
+		PROCEDURE rect (pat: Display.Pattern; x, y, w, h: SIGNED16);
 		BEGIN
 			PictImages.PatternToImage(pat, img);
 			Gfx.SetFillPattern(Ctxt, Gfx.NewPattern(Ctxt, img, 0, 0));
@@ -635,7 +635,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Show;
 
 	PROCEDURE ImgCmd*;
-		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; tmpCtxt: Gfx.Context; res: INTEGER;
+		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; tmpCtxt: Gfx.Context; res: SIGNED16;
 	BEGIN
 		text := Oberon.Par.text;
 		Texts.OpenScanner(s, text, Oberon.Par.pos);
@@ -658,7 +658,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END ImgCmd;
 
 	PROCEDURE PrtCmd*;
-		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; tmpCtxt: Gfx.Context; w, h, res: INTEGER;
+		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; tmpCtxt: Gfx.Context; w, h, res: SIGNED16;
 	BEGIN
 		text := Oberon.Par.text;
 		Texts.OpenScanner(s, text, Oberon.Par.pos);
@@ -688,7 +688,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END PrtCmd;
 
 	PROCEDURE PSCmd*;
-		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; tmpCtxt: Gfx.Context; res: INTEGER;
+		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; tmpCtxt: Gfx.Context; res: SIGNED16;
 	BEGIN
 		text := Oberon.Par.text;
 		Texts.OpenScanner(s, text, Oberon.Par.pos);

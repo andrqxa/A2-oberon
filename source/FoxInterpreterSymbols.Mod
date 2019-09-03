@@ -219,7 +219,7 @@ TYPE
 			p.i := i;
 		END PushL;
 
-		PROCEDURE PushI(i: INTEGER);
+		PROCEDURE PushI(i: SIGNED16);
 		BEGIN
 			PushL(i);
 		END PushI;
@@ -419,7 +419,7 @@ TYPE
 
 		PROCEDURE PushTyped*(o: Result; mode: CHAR; refs: Modules.Bytes; VAR offset: SIZE): BOOLEAN;
 		VAR ofs: SIZE;
-			s: SIGNED8; i: INTEGER; l: LONGINT; h: HUGEINT;
+			s: SIGNED8; i: SIGNED16; l: LONGINT; h: HUGEINT;
 			r: REAL; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
@@ -464,7 +464,7 @@ TYPE
 							END;
 						| Reflection.sfTypeINTEGER,Reflection.sfTypeSIGNED16 :
 							IF v.GetInt(h) THEN
-								i:= INTEGER(h); stack.PushI(i);
+								i:= SIGNED16(h); stack.PushI(i);
 								RETURN TRUE;
 							END;
 						| Reflection.sfTypeLONGINT,Reflection.sfTypeSIGNED32:
@@ -519,7 +519,7 @@ TYPE
 
 		PROCEDURE Push*(o: Result): BOOLEAN;
 		VAR
-			s: SIGNED8; i: INTEGER; l: LONGINT; h: HUGEINT;
+			s: SIGNED8; i: SIGNED16; l: LONGINT; h: HUGEINT;
 			r: REAL; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
@@ -556,7 +556,7 @@ TYPE
 					NEW(int, SIGNED8(stack.CallH(address)));
 					RETURN int;
 			| Reflection.sfTypeINTEGER,Reflection.sfTypeSIGNED16 :
-					NEW(int,  INTEGER(stack.CallH(address)));
+					NEW(int,  SIGNED16(stack.CallH(address)));
 					RETURN int;
 			| Reflection.sfTypeLONGINT,Reflection.sfTypeSIGNED32:
 					NEW(int,  LONGINT(stack.CallH(address)));
@@ -608,7 +608,7 @@ TYPE
 		PROCEDURE Evaluate*(): Value;
 		VAR
 			s: SIGNED8;
-			i: INTEGER;
+			i: SIGNED16;
 			l: LONGINT;
 			h: HUGEINT;
 
@@ -647,7 +647,7 @@ TYPE
 
 		PROCEDURE SetV*(v: Value): BOOLEAN;
 		VAR
-			s: SIGNED8; i: INTEGER; l: LONGINT; h: HUGEINT;
+			s: SIGNED8; i: SIGNED16; l: LONGINT; h: HUGEINT;
 			r: REAL; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
@@ -664,7 +664,7 @@ TYPE
 				END;
 			|Reflection.sfTypeINTEGER, Reflection.sfTypeSIGNED16:
 				IF v.GetInt(h) THEN
-					i:= INTEGER(h); SYSTEM.PUT(address, i);
+					i:= SIGNED16(h); SYSTEM.PUT(address, i);
 					RETURN TRUE;
 				END;
 			|Reflection.sfTypeLONGINT, Reflection.sfTypeSIGNED32:

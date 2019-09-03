@@ -802,7 +802,7 @@ TYPE
 		PROCEDURE CreateDevice(devNum: LONGINT): WORD;
 		VAR status: SET;
 			res: WORD; dev, devATA: Device; devATAPI: DeviceATAPI; ch: CHAR;
-			buf: ARRAY BS DIV 2 OF INTEGER;
+			buf: ARRAY BS DIV 2 OF SIGNED16;
 			command: Command;
 			devReg: SET;
 			c1, c2: CHAR;
@@ -1240,7 +1240,7 @@ TYPE
 		END NewCommandLBA48;
 
 		(* Identify an ATA device. *)
-		PROCEDURE IdentifyDevice(buf: ARRAY OF INTEGER): WORD;
+		PROCEDURE IdentifyDevice(buf: ARRAY OF SIGNED16): WORD;
 		VAR res, size1, hsize: LONGINT;
 		BEGIN
 			(* ATA 4 or older *)
@@ -1350,7 +1350,7 @@ TYPE
 			KernelLog.Ln;
 		END ShowDevice;
 
-		PROCEDURE &Create*(acontroller: Controller; adev: LONGINT; identifyDevice: ARRAY OF INTEGER);
+		PROCEDURE &Create*(acontroller: Controller; adev: LONGINT; identifyDevice: ARRAY OF SIGNED16);
 		VAR
 			name: Plugins.Name;
 			str: ARRAY 32 OF CHAR;
@@ -1798,7 +1798,7 @@ TYPE
 			RETURN command;
 		END NewCommandPacket;
 
-		PROCEDURE IdentifyDevice(buf: ARRAY OF INTEGER): WORD;
+		PROCEDURE IdentifyDevice(buf: ARRAY OF SIGNED16): WORD;
 		VAR res : WORD;
 		BEGIN
 			maxTransfer := 65535;
@@ -1877,7 +1877,7 @@ TYPE
 			KernelLog.Ln;
 		END ShowDevice;
 
-		PROCEDURE &Create*(acontroller: Controller; adev: LONGINT; identifyDevice: ARRAY OF INTEGER);
+		PROCEDURE &Create*(acontroller: Controller; adev: LONGINT; identifyDevice: ARRAY OF SIGNED16);
 		VAR res: WORD;
 		BEGIN
 			INCL(id.type, AtapiBit);
@@ -2018,7 +2018,7 @@ BEGIN
 END KernelLogHex;
 
 (* Convert an ATA identify string to a readable format. *)
-PROCEDURE GetATAString(VAR buf: ARRAY OF INTEGER; from, to: LONGINT; VAR s: ARRAY OF CHAR);
+PROCEDURE GetATAString(VAR buf: ARRAY OF SIGNED16; from, to: LONGINT; VAR s: ARRAY OF CHAR);
 VAR i, j: LONGINT;
 BEGIN
 	FOR i := from TO to DO
@@ -2038,7 +2038,7 @@ BEGIN
 	s[j] := 0X
 END GetATAString;
 
-PROCEDURE IdentifyMajorVersion(buf: ARRAY OF INTEGER; VAR id: ID): LONGINT;
+PROCEDURE IdentifyMajorVersion(buf: ARRAY OF SIGNED16; VAR id: ID): LONGINT;
 VAR
 	a, i: LONGINT;
 BEGIN
@@ -2054,7 +2054,7 @@ BEGIN
 	RETURN Res_OK;
 END IdentifyMajorVersion;
 
-PROCEDURE IdentifyDMA(buf: ARRAY OF INTEGER; VAR id: ID): LONGINT;
+PROCEDURE IdentifyDMA(buf: ARRAY OF SIGNED16; VAR id: ID): LONGINT;
 VAR a, i: LONGINT;
 BEGIN
 	(* Determine the maximum Multiword DMA mode supported *)

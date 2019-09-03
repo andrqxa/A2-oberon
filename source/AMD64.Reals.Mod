@@ -41,7 +41,7 @@ VAR
 	tene: ARRAY 23 OF LONGREAL; (* e = 0..22: exact values of 10^e *)
 	ten: ARRAY 27 OF LONGREAL;
 	eq, gr: ARRAY 20 OF SET;
-	H, L: INTEGER;
+	H, L: SIGNED16;
 
 (** Returns the shifted binary exponent (0 <= e < 256). *)
 PROCEDURE Expo* (x: REAL): LONGINT;
@@ -218,7 +218,7 @@ BEGIN
 END RealX;
 
 PROCEDURE InitHL;
-	VAR i: ADDRESS; dmy: INTEGER; littleEndian: BOOLEAN;
+	VAR i: ADDRESS; dmy: SIGNED16; littleEndian: BOOLEAN;
 BEGIN
 	DefaultFCR := Machine.fcr;
 

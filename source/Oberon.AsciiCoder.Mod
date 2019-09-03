@@ -69,7 +69,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 	END Expand;
 
 	PROCEDURE Code*(from: Files.File; to: Texts.Text);
-		VAR byte, rest, div, factor, packs: INTEGER; ch: CHAR; r: Files.Rider;
+		VAR byte, rest, div, factor, packs: SIGNED16; ch: CHAR; r: Files.Rider;
 	BEGIN Files.Set(r, from, 0); Files.Read(r, ch); byte := ORD(ch); rest := 0; div := 64; factor  := 1; packs := 0;
 		WHILE ~r.eof DO Texts.Write(w, CHR(Base + rest + (byte MOD div) * factor)); rest := byte DIV div;
 			IF div = 4 THEN Texts.Write(w, CHR(Base + rest));
@@ -87,7 +87,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 	END Code;
 
 	PROCEDURE Decode*(from: Texts.Text; VAR pos: LONGINT; to: Files.File; VAR ok: BOOLEAN);
-		VAR rest, div, factor, byte: INTEGER; ch: CHAR; r: Texts.Reader; w: Files.Rider;
+		VAR rest, div, factor, byte: SIGNED16; ch: CHAR; r: Texts.Reader; w: Files.Rider;
 	BEGIN Texts.OpenReader(r, from, pos); Files.Set(w, to, 0); factor := 1; div := 256; rest := 0;
 		REPEAT Texts.Read(r, ch) UNTIL (ch > " ") OR r.eot;
 		WHILE ~r.eot & (ch >= CHR(Base)) & (ch < CHR(Base + 64)) DO byte := ORD(ch) - Base;
@@ -160,7 +160,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 	END CodeFiles;
 
 	PROCEDURE DecodeFiles*;
-		VAR pos, beg, end, time: LONGINT; i, res: INTEGER; ch: CHAR; ok, compress: BOOLEAN;
+		VAR pos, beg, end, time: LONGINT; i, res: SIGNED16; ch: CHAR; ok, compress: BOOLEAN;
 			f, f1: Files.File; text: Texts.Text; s: Texts.Scanner; names: NameList; bakname: ARRAY 256 OF CHAR;
 	BEGIN text := Oberon.Par.text; pos := Oberon.Par.pos; compress := FALSE;
 		Texts.OpenScanner(s, text, pos); Texts.Scan(s);

@@ -54,13 +54,13 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 
 	TYPE
 		ImageFileHeader = RECORD
-			Machine: INTEGER;
-			NumberOfSections: INTEGER;
+			Machine: SIGNED16;
+			NumberOfSections: SIGNED16;
 			TimeDateStamp: LONGINT;
 			PointerToSymbolTable: LONGINT;
 			NumberOfSymbols: LONGINT;
-			SizeOfOptionalHeader: INTEGER;
-			Characteristics: INTEGER
+			SizeOfOptionalHeader: SIGNED16;
+			Characteristics: SIGNED16
 		END;
 
 		ImageDataDirectory = RECORD
@@ -68,7 +68,7 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 		END;
 
 		ImageOptionalHeader = RECORD
-			Magic: INTEGER;
+			Magic: SIGNED16;
 			MajorLinkerVersion, MinorLinkerVersion: CHAR;
 			SizeOfCode, SizeOfInitializedData, SizeOfUninitializedData,
 			AddressOfEntryPoint,
@@ -76,12 +76,12 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 			SectionAlignment, FileAlignment: LONGINT;
 			MajorOperatingSystemVersion, MinorOperatingSystemVersion,
 			MajorImageVersion, MinorImageVersion,
-			MajorSubsystemVersion, MinorSubsystemVersion: INTEGER;
+			MajorSubsystemVersion, MinorSubsystemVersion: SIGNED16;
 			Win32VersionValue,
 			SizeOfImage, SizeOfHeaders,
 			CheckSum: LONGINT;
 			Subsystem,
-			DllCharacteristics: INTEGER;
+			DllCharacteristics: SIGNED16;
 			SizeOfStackReserve, SizeOfStackCommit,
 			SizeOfHeapReserve, SizeOfHeapCommit,
 			LoaderFlags, NumberOfRvaAndSizes: LONGINT;
@@ -96,14 +96,14 @@ MODULE PCOFPE; (** AUTHOR "ejz"; PURPOSE "Parallel Compiler: PE object file plug
 			PointerToRawData: LONGINT;
 			PointerToRelocations: LONGINT;
 			PointerToLinenumbers: LONGINT;
-			NumberOfRelocations: INTEGER;
-			NumberOfLinenumbers: INTEGER;
+			NumberOfRelocations: SIGNED16;
+			NumberOfLinenumbers: SIGNED16;
 			Characteristics: SET
 		END;
 
 		ImageExportDirectory = RECORD
 			Characteristics, TimeDateStamp: LONGINT;
-			MajorVersion, MinorVersion: INTEGER;
+			MajorVersion, MinorVersion: SIGNED16;
 			Name, Base, NumberOfFunctions, NumberOfNames,
 			AddressOfFunctions, AddressOfNames, AddressOfNameOrdinals: LONGINT
 		END;
@@ -861,7 +861,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 
 			PROCEDURE ImportVars(W: SectionWriter; m: PCT.Module; i: LONGINT; imp: ImportMod);
 				VAR
-					p: PCBT.GlobalVariable; v: PCT.Variable; e: LONGINT; obj: ImportObj; nofVarCons: INTEGER;
+					p: PCBT.GlobalVariable; v: PCT.Variable; e: LONGINT; obj: ImportObj; nofVarCons: SIGNED16;
 					l: PCBT.Fixup; offset: LONGINT; F: SectionWriter;
 			BEGIN
 				nofVarCons := 1;
@@ -959,7 +959,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				VAR
 					size: PCBT.RecSize; pos, i: Streams.Position; oldmth: LONGINT; base: PCT.Record; m: PCT.Method;
 					adr: PCBT.Method; bsym: PCOM.Struct; name, name2: Name;
-					basenr: INTEGER; baseid, nofptrs: LONGINT;
+					basenr: SIGNED16; baseid, nofptrs: LONGINT;
 			BEGIN
 				PCT.GetTypeName(rec, name);
 				size := rec.size(PCBT.RecSize);
@@ -1011,7 +1011,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 				i := W.Pos();
 				PtrAdr(W, 0, rec, FALSE);
 				nofptrs := (W.Pos() - i)(LONGINT) DIV 4;
-				IF nofptrs > MAX(INTEGER) THEN PCM.Error(221, PCM.InvalidPosition, "") END;
+				IF nofptrs > MAX(SIGNED16) THEN PCM.Error(221, PCM.InvalidPosition, "") END;
 				IF nofptrs # 0 THEN
 					i := W.Pos(); W.SetPos(pos);
 					W.RawInt(SHORT(nofptrs));
@@ -1500,7 +1500,7 @@ KernelLog.String("PCOFPE "); KernelLog.String(file);
 				ELSE
 					HALT(99)
 				END;
-				SELF.fileHdr.Characteristics := SYSTEM.VAL(INTEGER, s);
+				SELF.fileHdr.Characteristics := SYSTEM.VAL(SIGNED16, s);
 				SELF.optHdr.Magic := ImageOptionalMagic;
 				SELF.optHdr.MajorLinkerVersion := MajorLinkerVersion;
 				SELF.optHdr.MinorLinkerVersion := MinorLinkerVersion;

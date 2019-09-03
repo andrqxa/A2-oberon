@@ -400,7 +400,7 @@ TYPE	Base64Writer* = OBJECT (Streams.Writer);
 	Base64Reader* = OBJECT(Streams.Reader)
 		VAR in: Streams.Reader;
 			i, rest, group: SIZE;
-			code: INTEGER;
+			code: SIGNED16;
 			done:BOOLEAN;
 
 		PROCEDURE &Init*(in: Streams.Reader);
@@ -479,11 +479,11 @@ TYPE DumpWriter*= OBJECT(Streams.Writer);
 
 	VAR (*tables for Base64*)
 		etab: ARRAY 64 OF CHAR;
-		dtab: ARRAY 128 OF INTEGER;
+		dtab: ARRAY 128 OF SIGNED16;
 		tablesReady:BOOLEAN;
 
 	PROCEDURE InitTables;
-		VAR i, max: INTEGER;
+		VAR i, max: SIGNED16;
 		BEGIN
 			max := ORD("Z") - ORD("A");
 			FOR i := 0 TO max DO

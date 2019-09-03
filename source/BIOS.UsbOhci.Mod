@@ -371,9 +371,9 @@ TYPE
 		END GetPortStatus;
 
 		(* Returns the current frame number; the frame number is incremented by the Host Controller at the end of each frame time *)
-		PROCEDURE GetFrameNumber*() : INTEGER;
+		PROCEDURE GetFrameNumber*() : SIGNED16;
 		BEGIN
-			RETURN SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, hcca.data[hcca.base + HccaFrameNumber]) * {0..15});
+			RETURN SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, hcca.data[hcca.base + HccaFrameNumber]) * {0..15});
 		END GetFrameNumber;
 
 		(* Build and then insert the endpoint descriptor of the pipe into the host controller schedule *)

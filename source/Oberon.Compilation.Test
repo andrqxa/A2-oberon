@@ -1435,28 +1435,28 @@ negative: await statement missing condition without parentheses
 negative: assignment missing left hand side
 
 	MODULE Test;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	BEGIN := 0;
 	END Test;
 
 negative: assignment missing assign
 
 	MODULE Test;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	BEGIN variable 0;
 	END Test;
 
 negative: assignment missing right hand side
 
 	MODULE Test;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	BEGIN variable := ;
 	END Test;
 
 negative: cascaded assignment
 
 	MODULE Test;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	BEGIN variable := variable := 5;
 	END Test;
 
@@ -1469,63 +1469,63 @@ negative: for statement missing counter
 negative: for statement missing assignment
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i 0 TO 10 DO END
 	END Test.
 
 negative: for statement missing start counter
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := TO 10 DO END
 	END Test.
 
 negative: for statement missing to
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 10 DO END
 	END Test.
 
 negative: for statement missing end counter
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO DO END
 	END Test.
 
 negative: for statement missing do
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 END
 	END Test.
 
 negative: for statement missing end
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 DO
 	END Test.
 
 positive: for statement without increment
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 DO END
 	END Test.
 
 negative: for statement with increment missing by
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 1 DO END
 	END Test.
 
 negative: for statement with increment missing increment
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 BY DO END
 	END Test.
 
@@ -2055,35 +2055,35 @@ negative: increment statement missing integer
 negative: increment statement missing opening parenthesis
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC integer)
 	END Test.
 
 negative: increment statement missing closing parenthesis
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer
 	END Test.
 
 negative: increment statement missing comma
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer 5)
 	END Test.
 
 negative: increment statement missing increment
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer,)
 	END Test.
 
 positive: increment statement missing increment and comma
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer)
 	END Test.
 
@@ -2102,35 +2102,35 @@ negative: decrement statement missing integer
 negative: decrement statement missing opening parenthesis
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC integer)
 	END Test.
 
 negative: decrement statement missing closing parenthesis
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer
 	END Test.
 
 negative: decrement statement missing comma
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer 5)
 	END Test.
 
 negative: decrement statement missing increment
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer,)
 	END Test.
 
 positive: decrement statement missing increment and comma
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer)
 	END Test.
 
@@ -2491,7 +2491,7 @@ negative: redefining incl
 negative: redefining integer
 
 	MODULE Test;
-	CONST INTEGER = 0;
+	CONST SIGNED16 = 0;
 	END Test.
 
 negative: redefining is
@@ -2853,27 +2853,27 @@ negative: type as import
 
 	MODULE Test;
 	IMPORT Import := Type;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	END Test.
 
 negative: variable as import
 
 	MODULE Test;
 	IMPORT Import := variable;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	END Test.
 
 negative: procedure as import
 
 	MODULE Test;
 	IMPORT Import := Procedure;
-	PROCEDURE Procedure; INTEGER;
+	PROCEDURE Procedure; SIGNED16;
 	END Test.
 
 negative: parameter as import
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter: INTEGER);
+	PROCEDURE Procedure (parameter: SIGNED16);
 	IMPORT Import := parameter;
 	END Procedure;
 	END Test.
@@ -3343,27 +3343,27 @@ negative: type as constant
 
 	MODULE Test;
 	CONST Constant = Type;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	END Test.
 
 negative: variable as constant
 
 	MODULE Test;
 	CONST Constant = variable;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	END Test.
 
 negative: procedure as constant
 
 	MODULE Test;
 	CONST Constant = Procedure;
-	PROCEDURE Procedure; INTEGER;
+	PROCEDURE Procedure; SIGNED16;
 	END Test.
 
 negative: parameter as constant
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter: INTEGER);
+	PROCEDURE Procedure (parameter: SIGNED16);
 	CONST Constant = parameter;
 	END Procedure;
 	END Test.
@@ -3371,7 +3371,7 @@ negative: parameter as constant
 negative: const parameter as constant
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST parameter: INTEGER);
+	PROCEDURE Procedure (CONST parameter: SIGNED16);
 	CONST Constant = parameter;
 	END Procedure;
 	END Test.
@@ -4229,14 +4229,14 @@ negative: type test on constant integers
 positive: type test on constant integer
 
 	MODULE Test;
-	CONST Result = 4 IS INTEGER
+	CONST Result = 4 IS SIGNED16
 	BEGIN ASSERT (Result = TRUE);
 	END Test.
 
 positive: type test on constant integer type
 
 	MODULE Test;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	CONST Result = 4 IS Type
 	BEGIN ASSERT (Result = TRUE);
 	END Test.
@@ -4257,21 +4257,21 @@ negative: indirect type guard on constant integers
 positive: type guard on constant integer
 
 	MODULE Test;
-	CONST Result = 5(INTEGER)
+	CONST Result = 5(SIGNED16)
 	END Test.
 
 positive: indirect type guard on constant integer
 
 	MODULE Test;
 	CONST Constant = 5
-	CONST Result = Constant(INTEGER)
+	CONST Result = Constant(SIGNED16)
 	BEGIN ASSERT (Result = 5);
 	END Test.
 
 positive: type guard on constant integer type
 
 	MODULE Test;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	CONST Result = 5(Type)
 	END Test.
 
@@ -4279,7 +4279,7 @@ positive: indirect guard test on constant integer type
 
 	MODULE Test;
 	CONST Constant = 5
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	CONST Result = Constant(Type)
 	BEGIN ASSERT (Result = 5);
 	END Test.
@@ -4332,13 +4332,13 @@ negative: capital letter of constant integer
 positive: minimal value of integer
 
 	MODULE Test;
-	CONST A = MIN (SIGNED8); B = MIN (INTEGER); C = MIN (LONGINT); D = MIN (HUGEINT)
+	CONST A = MIN (SIGNED8); B = MIN (SIGNED16); C = MIN (LONGINT); D = MIN (HUGEINT)
 	END Test.
 
 positive: maximal value of integer
 
 	MODULE Test;
-	CONST A = MAX (SIGNED8); B = MAX (INTEGER); C = MAX (LONGINT); D = MAX (HUGEINT)
+	CONST A = MAX (SIGNED8); B = MAX (SIGNED16); C = MAX (LONGINT); D = MAX (HUGEINT)
 	END Test.
 
 positive: arithmetic left shift of constant integers
@@ -4509,21 +4509,21 @@ negative: calling constant integer indirectly with parentheses
 positive: calling procedure with parameter and constant integer argument
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (0);
 	END Test.
 
 negative: calling procedure with variable parameter and constant integer argument
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (1);
 	END Test.
 
 positive: calling procedure with constant parameter and constant integer argument
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST value: INTEGER); END Procedure;
+	PROCEDURE Procedure (CONST value: SIGNED16); END Procedure;
 	BEGIN Procedure (2);
 	END Test.
 
@@ -6839,7 +6839,7 @@ negative: variable as type
 
 	MODULE Test;
 	TYPE Type = variable;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	END Test.
 
 negative: procedure as type
@@ -6852,7 +6852,7 @@ negative: procedure as type
 negative: parameter as type
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter: INTEGER);
+	PROCEDURE Procedure (parameter: SIGNED16);
 	TYPE Type = parameter;
 	END Procedure;
 	END Test.
@@ -6881,7 +6881,7 @@ positive: predefined basic short integer type
 positive: predefined basic integer type
 
 	MODULE Test;
-	TYPE BasicType = INTEGER;
+	TYPE BasicType = SIGNED16;
 	END Test.
 
 positive: predefined basic long integer type
@@ -7043,7 +7043,7 @@ positive: array of basic short integer type
 positive: array of basic integer type
 
 	MODULE Test;
-	TYPE Array = ARRAY 10 OF INTEGER;
+	TYPE Array = ARRAY 10 OF SIGNED16;
 	END Test.
 
 positive: array of basic long integer type
@@ -7302,7 +7302,7 @@ positive: pointer to record containing record containing record containing the p
 positive: record containing basic types
 
 	MODULE Test;
-	TYPE Record = RECORD i: INTEGER; s: SET; b: BOOLEAN END;
+	TYPE Record = RECORD i: SIGNED16; s: SET; b: BOOLEAN END;
 	END Test.
 
 positive: record containing an array
@@ -7474,7 +7474,7 @@ positive: nested object containing itself indirectly
 positive: object containing basic types
 
 	MODULE Test;
-	TYPE Object = OBJECT VAR i: INTEGER; s: SET; b: BOOLEAN END Object;
+	TYPE Object = OBJECT VAR i: SIGNED16; s: SET; b: BOOLEAN END Object;
 	END Test.
 
 positive: object containing an array
@@ -7611,7 +7611,7 @@ negative: pointer to basic short integer type
 negative: pointer to basic integer type
 
 	MODULE Test;
-	TYPE Pointer = POINTER TO INTEGER;
+	TYPE Pointer = POINTER TO SIGNED16;
 	END Test.
 
 negative: pointer to basic long integer type
@@ -7775,7 +7775,7 @@ positive: procedure type returning basic short integer type
 positive: procedure type returning basic integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (): INTEGER;
+	TYPE Procedure = PROCEDURE (): SIGNED16;
 	END Test.
 
 positive: procedure type returning basic long integer type
@@ -8087,43 +8087,43 @@ positive: procedure type with intermixed parameters of short integer type
 positive: procedure type with a parameter of basic integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (parameter: INTEGER);
+	TYPE Procedure = PROCEDURE (parameter: SIGNED16);
 	END Test.
 
 positive: procedure type with parameters of basic integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (a, b, c: INTEGER);
+	TYPE Procedure = PROCEDURE (a, b, c: SIGNED16);
 	END Test.
 
 positive: procedure type with a parameter of variable integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (VAR parameter: INTEGER);
+	TYPE Procedure = PROCEDURE (VAR parameter: SIGNED16);
 	END Test.
 
 positive: procedure type with parameters of variable integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (VAR a, b, c: INTEGER);
+	TYPE Procedure = PROCEDURE (VAR a, b, c: SIGNED16);
 	END Test.
 
 positive: procedure type with a parameter of constant integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (CONST parameter: INTEGER);
+	TYPE Procedure = PROCEDURE (CONST parameter: SIGNED16);
 	END Test.
 
 positive: procedure type with parameters of constant integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (CONST a, b, c: INTEGER);
+	TYPE Procedure = PROCEDURE (CONST a, b, c: SIGNED16);
 	END Test.
 
 positive: procedure type with intermixed parameters of integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (a: INTEGER; VAR b: INTEGER; CONST c: INTEGER);
+	TYPE Procedure = PROCEDURE (a: SIGNED16; VAR b: SIGNED16; CONST c: SIGNED16);
 	END Test.
 
 positive: procedure type with a parameter of basic long integer type
@@ -9026,7 +9026,7 @@ positive: unmarked variable
 positive: initializing unmarked variable
 
 	MODULE Test;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	BEGIN variable := 0
 	END Test.
 
@@ -9042,7 +9042,7 @@ positive: initializing unmarked variable within procedure
 
 	MODULE Test;
 	PROCEDURE Procedure;
-		VAR variable: INTEGER;
+		VAR variable: SIGNED16;
 		BEGIN variable := 0
 	END Procedure;
 	END Test.
@@ -9062,7 +9062,7 @@ positive: initializing unmarked variable within nested procedure
 	MODULE Test;
 	PROCEDURE Procedure;
 		PROCEDURE Procedure;
-			VAR variable: INTEGER;
+			VAR variable: SIGNED16;
 			BEGIN variable := 0
 		END Procedure;
 	END Procedure;
@@ -9080,7 +9080,7 @@ positive: initializing unmarked variable within record
 
 	MODULE Test;
 	TYPE Record = RECORD
-		variable: INTEGER;
+		variable: SIGNED16;
 	END;
 	VAR record: Record;
 	BEGIN record.variable := 0
@@ -9098,7 +9098,7 @@ positive: initializing unmarked variable within object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR variable: INTEGER;
+		VAR variable: SIGNED16;
 		BEGIN variable := 0
 	END Object;
 	END Test.
@@ -9118,7 +9118,7 @@ positive: initializing unmarked variable within record in procedure
 	MODULE Test;
 	PROCEDURE Procedure;
 		TYPE Record = RECORD
-			variable: INTEGER;
+			variable: SIGNED16;
 		END;
 		VAR record: Record;
 		BEGIN record.variable := 0
@@ -9140,7 +9140,7 @@ positive: initializing unmarked variable within object in procedure
 	MODULE Test;
 	PROCEDURE Procedure;
 		TYPE Object = OBJECT
-			VAR variable: INTEGER;
+			VAR variable: SIGNED16;
 			BEGIN variable := 0
 		END Object;
 	END Procedure;
@@ -9161,7 +9161,7 @@ positive: initializing unmarked variable within procedure in object
 	MODULE Test;
 	TYPE Object = OBJECT
 		PROCEDURE Procedure;
-			VAR variable: INTEGER;
+			VAR variable: SIGNED16;
 			BEGIN variable := 0
 		END Procedure;
 	END Object;
@@ -9176,7 +9176,7 @@ positive: variable marked as exported
 positive: initializing variable marked as exported
 
 	MODULE Test;
-	VAR variable*: INTEGER;
+	VAR variable*: SIGNED16;
 	BEGIN variable := 0
 	END Test.
 
@@ -9210,7 +9210,7 @@ positive: initializing variable marked as exported within record
 
 	MODULE Test;
 	TYPE Record = RECORD
-		variable*: INTEGER;
+		variable*: SIGNED16;
 	END;
 	VAR record: Record;
 	BEGIN record.variable := 0
@@ -9228,7 +9228,7 @@ positive: initializing variable marked as exported within object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR variable*: INTEGER;
+		VAR variable*: SIGNED16;
 		BEGIN variable := 0
 	END Object;
 	END Test.
@@ -9272,7 +9272,7 @@ positive: variable marked as read-only
 positive: initializing variable marked as read-only
 
 	MODULE Test;
-	VAR variable-: INTEGER;
+	VAR variable-: SIGNED16;
 	BEGIN variable := 0
 	END Test.
 
@@ -9306,7 +9306,7 @@ positive: initializing variable marked as read-only within record
 
 	MODULE Test;
 	TYPE Record = RECORD
-		variable-: INTEGER;
+		variable-: SIGNED16;
 	END;
 	VAR record: Record;
 	BEGIN record.variable := 0
@@ -9324,7 +9324,7 @@ positive: initializing variable marked as read-only within object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR variable-: INTEGER;
+		VAR variable-: SIGNED16;
 		BEGIN variable := 0
 	END Object;
 	END Test.
@@ -9524,7 +9524,7 @@ negative: constant as variable
 positive: type as variable
 
 	MODULE Test;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	VAR variable: Type;
 	END Test.
 
@@ -9538,7 +9538,7 @@ negative: procedure as variable
 negative: parameter as variable
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter: INTEGER);
+	PROCEDURE Procedure (parameter: SIGNED16);
 	VAR variable: parameter;
 	END Procedure;
 	END Test.
@@ -9564,7 +9564,7 @@ positive: variable of basic short integer type
 positive: variable of basic integer type
 
 	MODULE Test;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	END Test.
 
 positive: variable of basic long integer type
@@ -9844,14 +9844,14 @@ negative: modification of self in nested procedure in object
 negative: reading self in module
 
 	MODULE Test;
-	VAR a: INTEGER;
+	VAR a: SIGNED16;
 	BEGIN a := SELF.a;
 	END Test.
 
 negative: reading self in procedure
 
 	MODULE Test;
-	VAR a: INTEGER;
+	VAR a: SIGNED16;
 	PROCEDURE Procedure;
 	BEGIN a := SELF.a;
 	END Procedure;
@@ -9861,7 +9861,7 @@ positive: reading self in object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR a: INTEGER;
+		VAR a: SIGNED16;
 		BEGIN a := SELF.a;
 	END Object;
 	END Test.
@@ -9870,7 +9870,7 @@ positive: reading self in procedure in object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR a: INTEGER;
+		VAR a: SIGNED16;
 		PROCEDURE Procedure;
 		BEGIN a := SELF.a;
 		END Procedure;
@@ -9881,7 +9881,7 @@ positive: reading self in nested procedure in object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR a: INTEGER;
+		VAR a: SIGNED16;
 		PROCEDURE Procedure;
 			PROCEDURE Procedure;
 			BEGIN a := SELF.a;
@@ -9893,14 +9893,14 @@ positive: reading self in nested procedure in object
 negative: writing self in module
 
 	MODULE Test;
-	VAR a: INTEGER;
+	VAR a: SIGNED16;
 	BEGIN SELF.a := a;
 	END Test.
 
 negative: writing self in procedure
 
 	MODULE Test;
-	VAR a: INTEGER;
+	VAR a: SIGNED16;
 	PROCEDURE Procedure;
 	BEGIN SELF.a := a;
 	END Procedure;
@@ -9910,7 +9910,7 @@ positive: writing self in object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR a: INTEGER;
+		VAR a: SIGNED16;
 		BEGIN SELF.a := a;
 	END Object;
 	END Test.
@@ -9919,7 +9919,7 @@ positive: writing self in procedure in object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR a: INTEGER;
+		VAR a: SIGNED16;
 		PROCEDURE Procedure;
 		BEGIN SELF.a := a;
 		END Procedure;
@@ -9930,7 +9930,7 @@ positive: writing self in nested procedure in object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR a: INTEGER;
+		VAR a: SIGNED16;
 		PROCEDURE Procedure;
 			PROCEDURE Procedure;
 			BEGIN SELF.a := a;
@@ -10008,14 +10008,14 @@ positive: usage of self as base object in nested procedure in object
 positive: dummy module exporting variables
 
 	MODULE Dummy;
-	VAR exported*, readonly-, private: INTEGER;
+	VAR exported*, readonly-, private: SIGNED16;
 	END Dummy.
 
 positive: importing exported variable
 
 	MODULE Test;
 	IMPORT Dummy;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := Dummy.exported;
 	END Test.
 
@@ -10030,7 +10030,7 @@ positive: importing read-only variable
 
 	MODULE Test;
 	IMPORT Dummy;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := Dummy.readonly;
 	END Test.
 
@@ -10045,7 +10045,7 @@ negative: importing private variable
 
 	MODULE Test;
 	IMPORT Dummy;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := Dummy.private;
 	END Test.
 
@@ -10060,7 +10060,7 @@ negative: importing invalid variable
 
 	MODULE Test;
 	IMPORT Dummy;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := Dummy.invalid;
 	END Test.
 
@@ -10539,14 +10539,14 @@ positive: calling procedure with no parameters with no arguments
 negative: calling procedure with one parameter with no arguments
 
 	MODULE Test;
-	PROCEDURE Procedure (one: INTEGER); END Procedure;
+	PROCEDURE Procedure (one: SIGNED16); END Procedure;
 	BEGIN Procedure
 	END Test.
 
 negative: calling procedure with two parameter with no arguments
 
 	MODULE Test;
-	PROCEDURE Procedure (one, two: INTEGER); END Procedure;
+	PROCEDURE Procedure (one, two: SIGNED16); END Procedure;
 	BEGIN Procedure
 	END Test.
 
@@ -10560,14 +10560,14 @@ negative: calling procedure with no parameters with one argument
 positive: calling procedure with one parameter with one argument
 
 	MODULE Test;
-	PROCEDURE Procedure (one: INTEGER); END Procedure;
+	PROCEDURE Procedure (one: SIGNED16); END Procedure;
 	BEGIN Procedure (0)
 	END Test.
 
 negative: calling procedure with two parameter with one argument
 
 	MODULE Test;
-	PROCEDURE Procedure (one, two: INTEGER); END Procedure;
+	PROCEDURE Procedure (one, two: SIGNED16); END Procedure;
 	BEGIN Procedure (0)
 	END Test.
 
@@ -10581,14 +10581,14 @@ negative: calling procedure with no parameters with two arguments
 negative: calling procedure with one parameter with two arguments
 
 	MODULE Test;
-	PROCEDURE Procedure (one: INTEGER); END Procedure;
+	PROCEDURE Procedure (one: SIGNED16); END Procedure;
 	BEGIN Procedure (1, 2)
 	END Test.
 
 positive: calling procedure with two parameter with two arguments
 
 	MODULE Test;
-	PROCEDURE Procedure (one, two: INTEGER); END Procedure;
+	PROCEDURE Procedure (one, two: SIGNED16); END Procedure;
 	BEGIN Procedure (1, 2)
 	END Test.
 
@@ -10602,14 +10602,14 @@ positive: calling procedure variable with no parameters with no arguments
 negative: calling procedure variable with one parameter with no arguments
 
 	MODULE Test;
-	VAR procedure: PROCEDURE (one: INTEGER);
+	VAR procedure: PROCEDURE (one: SIGNED16);
 	BEGIN procedure
 	END Test.
 
 negative: calling procedure variable with two parameter with no arguments
 
 	MODULE Test;
-	VAR procedure: PROCEDURE (one, two: INTEGER);
+	VAR procedure: PROCEDURE (one, two: SIGNED16);
 	BEGIN procedure
 	END Test.
 
@@ -10623,14 +10623,14 @@ negative: calling procedure variable with no parameters with one argument
 positive: calling procedure variable with one parameter with one argument
 
 	MODULE Test;
-	VAR procedure: PROCEDURE (one: INTEGER);
+	VAR procedure: PROCEDURE (one: SIGNED16);
 	BEGIN procedure (0)
 	END Test.
 
 negative: calling procedure variable with two parameter with one argument
 
 	MODULE Test;
-	VAR procedure: PROCEDURE (one, two: INTEGER);
+	VAR procedure: PROCEDURE (one, two: SIGNED16);
 	BEGIN procedure (0)
 	END Test.
 
@@ -10644,14 +10644,14 @@ negative: calling procedure variable with no parameters with two arguments
 negative: calling procedure variable with one parameter with two arguments
 
 	MODULE Test;
-	VAR procedure: PROCEDURE (one: INTEGER);
+	VAR procedure: PROCEDURE (one: SIGNED16);
 	BEGIN procedure (1, 2)
 	END Test.
 
 positive: calling procedure variable with two parameter with two arguments
 
 	MODULE Test;
-	VAR procedure: PROCEDURE (one, two: INTEGER);
+	VAR procedure: PROCEDURE (one, two: SIGNED16);
 	BEGIN procedure (1, 2)
 	END Test.
 
@@ -10682,7 +10682,7 @@ positive: procedure returning basic short integer type
 positive: procedure returning basic integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (): INTEGER;
+	PROCEDURE Procedure (): SIGNED16;
 	END Procedure;
 	END Test.
 
@@ -11064,49 +11064,49 @@ positive: procedure with intermixed parameters of short integer type
 positive: procedure with a parameter of basic integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter: INTEGER);
+	PROCEDURE Procedure (parameter: SIGNED16);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of basic integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (a, b, c: INTEGER);
+	PROCEDURE Procedure (a, b, c: SIGNED16);
 	END Procedure;
 	END Test.
 
 positive: procedure with a parameter of variable integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR parameter: INTEGER);
+	PROCEDURE Procedure (VAR parameter: SIGNED16);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of variable integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR a, b, c: INTEGER);
+	PROCEDURE Procedure (VAR a, b, c: SIGNED16);
 	END Procedure;
 	END Test.
 
 positive: procedure with a parameter of constant integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST parameter: INTEGER);
+	PROCEDURE Procedure (CONST parameter: SIGNED16);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of constant integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST a, b, c: INTEGER);
+	PROCEDURE Procedure (CONST a, b, c: SIGNED16);
 	END Procedure;
 	END Test.
 
 positive: procedure with intermixed parameters of integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (a: INTEGER; VAR b: INTEGER; CONST c: INTEGER);
+	PROCEDURE Procedure (a: SIGNED16; VAR b: SIGNED16; CONST c: SIGNED16);
 	END Procedure;
 	END Test.
 
@@ -12077,7 +12077,7 @@ positive: short integer parameter assignment
 positive: integer parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR value: INTEGER); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); BEGIN value := value; END Procedure;
 	END Test.
 
 positive: long integer parameter assignment
@@ -12143,7 +12143,7 @@ positive: record parameter assignment
 positive: record parameter member assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (value: RECORD member: INTEGER END); BEGIN value.member := value.member; END Procedure;
+	PROCEDURE Procedure (value: RECORD member: SIGNED16 END); BEGIN value.member := value.member; END Procedure;
 	END Test.
 
 positive: object parameter assignment
@@ -12155,7 +12155,7 @@ positive: object parameter assignment
 positive: object parameter member assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (value: OBJECT VAR member: INTEGER END); BEGIN value.member := value.member; END Procedure;
+	PROCEDURE Procedure (value: OBJECT VAR member: SIGNED16 END); BEGIN value.member := value.member; END Procedure;
 	END Test.
 
 positive: base object parameter assignment
@@ -12197,7 +12197,7 @@ positive: pointer to record parameter assignment
 positive: pointer to record parameter member assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (value: POINTER TO RECORD member: INTEGER END); BEGIN value.member := value.member; END Procedure;
+	PROCEDURE Procedure (value: POINTER TO RECORD member: SIGNED16 END); BEGIN value.member := value.member; END Procedure;
 	END Test.
 
 positive: procedure parameter assignment
@@ -12227,7 +12227,7 @@ positive: variable short integer parameter assignment
 positive: variable integer parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR value: INTEGER); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); BEGIN value := value; END Procedure;
 	END Test.
 
 positive: variable long integer parameter assignment
@@ -12293,7 +12293,7 @@ positive: variable record parameter assignment
 positive: variable record parameter member assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR value: RECORD member: INTEGER END); BEGIN value.member := value.member; END Procedure;
+	PROCEDURE Procedure (VAR value: RECORD member: SIGNED16 END); BEGIN value.member := value.member; END Procedure;
 	END Test.
 
 positive: variable object parameter assignment
@@ -12305,7 +12305,7 @@ positive: variable object parameter assignment
 positive: variable object parameter member assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR value: OBJECT VAR member: INTEGER END); BEGIN value.member := value.member; END Procedure;
+	PROCEDURE Procedure (VAR value: OBJECT VAR member: SIGNED16 END); BEGIN value.member := value.member; END Procedure;
 	END Test.
 
 positive: variable base object parameter assignment
@@ -12347,7 +12347,7 @@ positive: variable pointer to record parameter assignment
 positive: variable pointer to record parameter member assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR value: POINTER TO RECORD member: INTEGER END); BEGIN value.member := value.member; END Procedure;
+	PROCEDURE Procedure (VAR value: POINTER TO RECORD member: SIGNED16 END); BEGIN value.member := value.member; END Procedure;
 	END Test.
 
 positive: variable procedure parameter assignment
@@ -12377,7 +12377,7 @@ negative: constant short integer parameter assignment
 negative: constant integer parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST value: INTEGER); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (CONST value: SIGNED16); BEGIN value := value; END Procedure;
 	END Test.
 
 negative: constant long integer parameter assignment
@@ -12443,7 +12443,7 @@ negative: constant record parameter assignment
 negative: constant record parameter member assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST value: RECORD member: INTEGER END); BEGIN value.member := value.member; END Procedure;
+	PROCEDURE Procedure (CONST value: RECORD member: SIGNED16 END); BEGIN value.member := value.member; END Procedure;
 	END Test.
 
 negative: constant object parameter assignment
@@ -12455,7 +12455,7 @@ negative: constant object parameter assignment
 positive: constant object parameter member assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST value: OBJECT VAR member: INTEGER END); BEGIN value.member := value.member; END Procedure;
+	PROCEDURE Procedure (CONST value: OBJECT VAR member: SIGNED16 END); BEGIN value.member := value.member; END Procedure;
 	END Test.
 
 negative: constant base object parameter assignment
@@ -12497,7 +12497,7 @@ negative: constant pointer to record parameter assignment
 positive: constant pointer to record parameter member assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST value: POINTER TO RECORD member: INTEGER END); BEGIN value.member := value.member; END Procedure;
+	PROCEDURE Procedure (CONST value: POINTER TO RECORD member: SIGNED16 END); BEGIN value.member := value.member; END Procedure;
 	END Test.
 
 negative: constant procedure parameter assignment
@@ -12533,7 +12533,7 @@ negative: calling procedure with boolean parameter with short integer argument
 negative: calling procedure with boolean parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: BOOLEAN); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12661,7 +12661,7 @@ negative: calling procedure with character parameter with short integer argument
 negative: calling procedure with character parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12789,7 +12789,7 @@ positive: calling procedure with short integer parameter with short integer argu
 negative: calling procedure with short integer parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12894,7 +12894,7 @@ negative: calling procedure with integer parameter with boolean argument
 
 	MODULE Test;
 	VAR argument: BOOLEAN;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12902,7 +12902,7 @@ negative: calling procedure with integer parameter with character argument
 
 	MODULE Test;
 	VAR argument: CHAR;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12910,15 +12910,15 @@ positive: calling procedure with integer parameter with short integer argument
 
 	MODULE Test;
 	VAR argument: SIGNED8;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
 positive: calling procedure with integer parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	VAR argument: SIGNED16;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12926,7 +12926,7 @@ negative: calling procedure with integer parameter with long integer argument
 
 	MODULE Test;
 	VAR argument: LONGINT;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12934,7 +12934,7 @@ negative: calling procedure with integer parameter with huge integer argument
 
 	MODULE Test;
 	VAR argument: HUGEINT;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12942,7 +12942,7 @@ negative: calling procedure with integer parameter with real argument
 
 	MODULE Test;
 	VAR argument: REAL;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12950,7 +12950,7 @@ negative: calling procedure with integer parameter with long real argument
 
 	MODULE Test;
 	VAR argument: LONGREAL;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12958,7 +12958,7 @@ negative: calling procedure with integer parameter with set argument
 
 	MODULE Test;
 	VAR argument: SET;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12966,7 +12966,7 @@ negative: calling procedure with integer parameter with array argument
 
 	MODULE Test;
 	VAR argument: ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12974,7 +12974,7 @@ negative: calling procedure with integer parameter with record argument
 
 	MODULE Test;
 	VAR argument: RECORD END;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12982,7 +12982,7 @@ negative: calling procedure with integer parameter with object argument
 
 	MODULE Test;
 	VAR argument: OBJECT END;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12990,7 +12990,7 @@ negative: calling procedure with integer parameter with base object argument
 
 	MODULE Test;
 	VAR argument: OBJECT;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12998,7 +12998,7 @@ negative: calling procedure with integer parameter with pointer to array argumen
 
 	MODULE Test;
 	VAR argument: POINTER TO ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13006,7 +13006,7 @@ negative: calling procedure with integer parameter with pointer to record argume
 
 	MODULE Test;
 	VAR argument: POINTER TO RECORD END;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13014,7 +13014,7 @@ negative: calling procedure with integer parameter with procedure argument
 
 	MODULE Test;
 	VAR argument: PROCEDURE;
-	PROCEDURE Procedure (value: INTEGER); END Procedure;
+	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13045,7 +13045,7 @@ positive: calling procedure with long integer parameter with short integer argum
 positive: calling procedure with long integer parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: LONGINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13173,7 +13173,7 @@ positive: calling procedure with huge integer parameter with short integer argum
 positive: calling procedure with huge integer parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: HUGEINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13301,7 +13301,7 @@ positive: calling procedure with real parameter with short integer argument
 positive: calling procedure with real parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: REAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13429,7 +13429,7 @@ positive: calling procedure with long real parameter with short integer argument
 positive: calling procedure with long real parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: LONGREAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13557,7 +13557,7 @@ negative: calling procedure with set parameter with short integer argument
 negative: calling procedure with set parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: SET); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13685,7 +13685,7 @@ negative: calling procedure with array parameter with short integer argument
 negative: calling procedure with array parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13836,7 +13836,7 @@ negative: calling procedure with open array parameter with short integer argumen
 negative: calling procedure with open array parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: ARRAY OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13971,7 +13971,7 @@ negative: calling procedure with record parameter with short integer argument
 negative: calling procedure with record parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14118,7 +14118,7 @@ negative: calling procedure with object parameter with short integer argument
 negative: calling procedure with object parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: OBJECT END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14265,7 +14265,7 @@ negative: calling procedure with base object parameter with short integer argume
 negative: calling procedure with base object parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: OBJECT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14393,7 +14393,7 @@ negative: calling procedure with pointer to array parameter with short integer a
 negative: calling procedure with pointer to array parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14521,7 +14521,7 @@ negative: calling procedure with pointer to record parameter with short integer 
 negative: calling procedure with pointer to record parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: POINTER TO RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14668,7 +14668,7 @@ negative: calling procedure with procedure parameter with short integer argument
 negative: calling procedure with procedure parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (value: PROCEDURE); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14796,7 +14796,7 @@ negative: calling procedure with boolean variable parameter with short integer a
 negative: calling procedure with boolean variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: BOOLEAN); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14924,7 +14924,7 @@ negative: calling procedure with character variable parameter with short integer
 negative: calling procedure with character variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15052,7 +15052,7 @@ positive: calling procedure with short integer variable parameter with short int
 negative: calling procedure with short integer variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15157,7 +15157,7 @@ negative: calling procedure with integer variable parameter with boolean argumen
 
 	MODULE Test;
 	VAR argument: BOOLEAN;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15165,7 +15165,7 @@ negative: calling procedure with integer variable parameter with character argum
 
 	MODULE Test;
 	VAR argument: CHAR;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15173,15 +15173,15 @@ negative: calling procedure with integer variable parameter with short integer a
 
 	MODULE Test;
 	VAR argument: SIGNED8;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
 positive: calling procedure with integer variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	VAR argument: SIGNED16;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15189,7 +15189,7 @@ negative: calling procedure with integer variable parameter with long integer ar
 
 	MODULE Test;
 	VAR argument: LONGINT;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15197,7 +15197,7 @@ negative: calling procedure with integer variable parameter with huge integer ar
 
 	MODULE Test;
 	VAR argument: HUGEINT;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15205,7 +15205,7 @@ negative: calling procedure with integer variable parameter with real argument
 
 	MODULE Test;
 	VAR argument: REAL;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15213,7 +15213,7 @@ negative: calling procedure with integer variable parameter with long real argum
 
 	MODULE Test;
 	VAR argument: LONGREAL;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15221,7 +15221,7 @@ negative: calling procedure with integer variable parameter with set argument
 
 	MODULE Test;
 	VAR argument: SET;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15229,7 +15229,7 @@ negative: calling procedure with integer variable parameter with array argument
 
 	MODULE Test;
 	VAR argument: ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15237,7 +15237,7 @@ negative: calling procedure with integer variable parameter with record argument
 
 	MODULE Test;
 	VAR argument: RECORD END;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15245,7 +15245,7 @@ negative: calling procedure with integer variable parameter with object argument
 
 	MODULE Test;
 	VAR argument: OBJECT END;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15253,7 +15253,7 @@ negative: calling procedure with integer variable parameter with base object arg
 
 	MODULE Test;
 	VAR argument: OBJECT;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15261,7 +15261,7 @@ negative: calling procedure with integer variable parameter with pointer to arra
 
 	MODULE Test;
 	VAR argument: POINTER TO ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15269,7 +15269,7 @@ negative: calling procedure with integer variable parameter with pointer to reco
 
 	MODULE Test;
 	VAR argument: POINTER TO RECORD END;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15277,7 +15277,7 @@ negative: calling procedure with integer variable parameter with procedure argum
 
 	MODULE Test;
 	VAR argument: PROCEDURE;
-	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15308,7 +15308,7 @@ negative: calling procedure with long integer variable parameter with short inte
 negative: calling procedure with long integer variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15436,7 +15436,7 @@ negative: calling procedure with huge integer variable parameter with short inte
 negative: calling procedure with huge integer variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: HUGEINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15564,7 +15564,7 @@ negative: calling procedure with real variable parameter with short integer argu
 negative: calling procedure with real variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: REAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15692,7 +15692,7 @@ negative: calling procedure with long real variable parameter with short integer
 negative: calling procedure with long real variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15820,7 +15820,7 @@ negative: calling procedure with set variable parameter with short integer argum
 negative: calling procedure with set variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: SET); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15948,7 +15948,7 @@ negative: calling procedure with array variable parameter with short integer arg
 negative: calling procedure with array variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16084,7 +16084,7 @@ negative: calling procedure with open array variable parameter with short intege
 negative: calling procedure with open array variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: ARRAY OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16212,7 +16212,7 @@ negative: calling procedure with record variable parameter with short integer ar
 negative: calling procedure with record variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16359,7 +16359,7 @@ negative: calling procedure with object variable parameter with short integer ar
 negative: calling procedure with object variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: OBJECT END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16506,7 +16506,7 @@ negative: calling procedure with base object variable parameter with short integ
 negative: calling procedure with base object variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: OBJECT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16634,7 +16634,7 @@ negative: calling procedure with pointer to array variable parameter with short 
 negative: calling procedure with pointer to array variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: POINTER TO ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16762,7 +16762,7 @@ negative: calling procedure with pointer to record variable parameter with short
 negative: calling procedure with pointer to record variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: POINTER TO RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16909,7 +16909,7 @@ negative: calling procedure with procedure variable parameter with short integer
 negative: calling procedure with procedure variable parameter with integer argument
 
 	MODULE Test;
-	VAR argument: INTEGER;
+	VAR argument: SIGNED16;
 	PROCEDURE Procedure (VAR value: PROCEDURE); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -17041,14 +17041,14 @@ positive: ignoring procedure call returning character
 negative: calling procedure returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (): INTEGER; END Procedure;
+	PROCEDURE Procedure (): SIGNED16; END Procedure;
 	BEGIN Procedure ()
 	END Test.
 
 positive: ignoring procedure call returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (): INTEGER; END Procedure;
+	PROCEDURE Procedure (): SIGNED16; END Procedure;
 	BEGIN IGNORE Procedure ()
 	END Test.
 
@@ -17765,7 +17765,7 @@ negative: while statement with condition of type short integer
 negative: while statement with condition of type integer
 
 	MODULE Test;
-	VAR condition: INTEGER;
+	VAR condition: SIGNED16;
 	BEGIN WHILE condition DO END;
 	END Test.
 
@@ -17928,7 +17928,7 @@ negative: repeat statement with condition of type short integer
 negative: repeat statement with condition of type integer
 
 	MODULE Test;
-	VAR condition: INTEGER;
+	VAR condition: SIGNED16;
 	BEGIN REPEAT UNTIL condition;
 	END Test.
 
@@ -18126,7 +18126,7 @@ negative: await statement with condition of type short integer
 negative: await statement with condition of type integer
 
 	MODULE Test;
-	VAR condition: INTEGER;
+	VAR condition: SIGNED16;
 	BEGIN {EXCLUSIVE} AWAIT (condition);
 	END Test.
 
@@ -18496,98 +18496,98 @@ negative: procedure to variable short integer assignment
 negative: constant boolean to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := TRUE;
 	END Test.
 
 negative: constant character to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := 'f';
 	END Test.
 
 positive: constant short integer to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := 10H;
 	END Test.
 
 negative: constant short integer to temporary integer assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): INTEGER;
+	VAR result: PROCEDURE (): SIGNED16;
 	BEGIN result () := 10H;
 	END Test.
 
 positive: constant integer to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := 1000H;
 	END Test.
 
 negative: constant integer to temporary integer assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): INTEGER;
+	VAR result: PROCEDURE (): SIGNED16;
 	BEGIN result () := 1000H;
 	END Test.
 
 negative: constant long integer to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := 100000H;
 	END Test.
 
 negative: constant huge integer to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := 10000000000H;
 	END Test.
 
 negative: constant real to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := 5.4;
 	END Test.
 
 negative: constant long real to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := 5.4D100;
 	END Test.
 
 negative: constant set to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := {5};
 	END Test.
 
 negative: string to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := "string";
 	END Test.
 
 negative: nil pointer to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	BEGIN result := NIL;
 	END Test.
 
 negative: procedure to variable integer assignment
 
 	MODULE Test;
-	VAR result: INTEGER;
+	VAR result: SIGNED16;
 	PROCEDURE Procedure; END Procedure;
 	BEGIN result := Procedure;
 	END Test.
@@ -19266,7 +19266,7 @@ negative: string to variable array of short integer assignment
 negative: string to variable array of integer assignment
 
 	MODULE Test;
-	VAR result: ARRAY 10 OF INTEGER;
+	VAR result: ARRAY 10 OF SIGNED16;
 	BEGIN result := "string";
 	END Test.
 
@@ -19711,15 +19711,15 @@ negative: nil pointer to temporary procedure assignment
 positive: procedure with one equal parameter to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (a: INTEGER);
-	PROCEDURE Procedure (b: INTEGER); END Procedure;
+	VAR result: PROCEDURE (a: SIGNED16);
+	PROCEDURE Procedure (b: SIGNED16); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
 negative: procedure with one compatible parameter to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (a: INTEGER);
+	VAR result: PROCEDURE (a: SIGNED16);
 	PROCEDURE Procedure (b: LONGINT); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
@@ -19735,31 +19735,31 @@ negative: procedure with one incompatible parameter to procedure assignment
 negative: procedure with one equal variable parameter to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (VAR a: INTEGER);
-	PROCEDURE Procedure (b: INTEGER); END Procedure;
+	VAR result: PROCEDURE (VAR a: SIGNED16);
+	PROCEDURE Procedure (b: SIGNED16); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
 negative: procedure with one equal constant parameter to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (CONST a: INTEGER);
-	PROCEDURE Procedure (b: INTEGER); END Procedure;
+	VAR result: PROCEDURE (CONST a: SIGNED16);
+	PROCEDURE Procedure (b: SIGNED16); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
 positive: procedure with two equal parameters to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (a, b: INTEGER);
-	PROCEDURE Procedure (c, d: INTEGER); END Procedure;
+	VAR result: PROCEDURE (a, b: SIGNED16);
+	PROCEDURE Procedure (c, d: SIGNED16); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
 negative: procedure with two compatible parameters to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (a, b: INTEGER);
+	VAR result: PROCEDURE (a, b: SIGNED16);
 	PROCEDURE Procedure (c, d: LONGINT); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
@@ -19775,32 +19775,32 @@ negative: procedure with two incompatible parameters to procedure assignment
 negative: procedure with two equal variable parameters to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (VAR a, b: INTEGER);
-	PROCEDURE Procedure (c, d: INTEGER); END Procedure;
+	VAR result: PROCEDURE (VAR a, b: SIGNED16);
+	PROCEDURE Procedure (c, d: SIGNED16); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
 negative: procedure with two equal constant parameters to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (CONST a, b: INTEGER);
-	PROCEDURE Procedure (c, d: INTEGER); END Procedure;
+	VAR result: PROCEDURE (CONST a, b: SIGNED16);
+	PROCEDURE Procedure (c, d: SIGNED16); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
 positive: procedure with several equal parameters to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (CONST a: SET; VAR i: INTEGER; o: OBJECT);
-	PROCEDURE Procedure (CONST a: SET; VAR i: INTEGER; o: OBJECT); END Procedure;
+	VAR result: PROCEDURE (CONST a: SET; VAR i: SIGNED16; o: OBJECT);
+	PROCEDURE Procedure (CONST a: SET; VAR i: SIGNED16; o: OBJECT); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
 positive: procedure with equal return type to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): INTEGER;
-	PROCEDURE Procedure (): INTEGER; BEGIN RETURN 0 END Procedure;
+	VAR result: PROCEDURE (): SIGNED16;
+	PROCEDURE Procedure (): SIGNED16; BEGIN RETURN 0 END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
@@ -19808,7 +19808,7 @@ negative: procedure with compatible return type to procedure assignment
 
 	MODULE Test;
 	VAR result: PROCEDURE (): LONGINT;
-	PROCEDURE Procedure (): INTEGER; BEGIN RETURN 0 END Procedure;
+	PROCEDURE Procedure (): SIGNED16; BEGIN RETURN 0 END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
@@ -19816,7 +19816,7 @@ negative: procedure with incompatible return type to procedure assignment
 
 	MODULE Test;
 	VAR result: PROCEDURE (): SET;
-	PROCEDURE Procedure (): INTEGER; BEGIN RETURN 0 END Procedure;
+	PROCEDURE Procedure (): SIGNED16; BEGIN RETURN 0 END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
@@ -19824,8 +19824,8 @@ positive: procedure with several equal parameters and equal return type to proce
 
 	MODULE Test;
 	TYPE Record = RECORD END;
-	VAR result: PROCEDURE (CONST a: SET; VAR i: INTEGER; o: OBJECT): POINTER TO Record;
-	PROCEDURE Procedure (CONST a: SET; VAR i: INTEGER; o: OBJECT): POINTER TO Record; END Procedure;
+	VAR result: PROCEDURE (CONST a: SET; VAR i: SIGNED16; o: OBJECT): POINTER TO Record;
+	PROCEDURE Procedure (CONST a: SET; VAR i: SIGNED16; o: OBJECT): POINTER TO Record; END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
@@ -19964,7 +19964,7 @@ negative: variable short integer to variable boolean assignment
 negative: variable integer to variable boolean assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: BOOLEAN;
+	VAR variable: SIGNED16; result: BOOLEAN;
 	BEGIN result := variable;
 	END Test.
 
@@ -20083,7 +20083,7 @@ negative: variable short integer to variable character assignment
 negative: variable integer to variable character assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: CHAR;
+	VAR variable: SIGNED16; result: CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -20202,7 +20202,7 @@ negative: variable short integer to temporary short integer assignment
 negative: variable integer to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: SIGNED8;
+	VAR variable: SIGNED16; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
@@ -20293,126 +20293,126 @@ negative: type to variable short integer assignment
 negative: variable boolean to variable integer assignment
 
 	MODULE Test;
-	VAR variable: BOOLEAN; result: INTEGER;
+	VAR variable: BOOLEAN; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable character to variable integer assignment
 
 	MODULE Test;
-	VAR variable: CHAR; result: INTEGER;
+	VAR variable: CHAR; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 positive: variable short integer to variable integer assignment
 
 	MODULE Test;
-	VAR variable: SIGNED8; result: INTEGER;
+	VAR variable: SIGNED8; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable short integer to temporary integer assignment
 
 	MODULE Test;
-	VAR variable: SIGNED8; result: PROCEDURE (): INTEGER;
+	VAR variable: SIGNED8; result: PROCEDURE (): SIGNED16;
 	BEGIN result () := variable;
 	END Test.
 
 positive: variable integer to variable integer assignment
 
 	MODULE Test;
-	VAR variable, result: INTEGER;
+	VAR variable, result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable integer to temporary integer assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: PROCEDURE (): INTEGER;
+	VAR variable: SIGNED16; result: PROCEDURE (): SIGNED16;
 	BEGIN result () := variable;
 	END Test.
 
 negative: variable long integer to variable integer assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: INTEGER;
+	VAR variable: LONGINT; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable huge integer to variable integer assignment
 
 	MODULE Test;
-	VAR variable: HUGEINT; result: INTEGER;
+	VAR variable: HUGEINT; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable real to variable integer assignment
 
 	MODULE Test;
-	VAR variable: REAL; result: INTEGER;
+	VAR variable: REAL; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long real to variable integer assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: INTEGER;
+	VAR variable: LONGREAL; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable set to variable integer assignment
 
 	MODULE Test;
-	VAR variable: SET; result: INTEGER;
+	VAR variable: SET; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array to variable integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF CHAR; result: INTEGER;
+	VAR variable: ARRAY 10 OF CHAR; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: record to variable integer assignment
 
 	MODULE Test;
-	VAR variable: RECORD END; result: INTEGER;
+	VAR variable: RECORD END; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: object to variable integer assignment
 
 	MODULE Test;
-	VAR variable: OBJECT; result: INTEGER;
+	VAR variable: OBJECT; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: pointer to variable integer assignment
 
 	MODULE Test;
-	VAR variable: POINTER TO RECORD END; result: INTEGER;
+	VAR variable: POINTER TO RECORD END; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable eto variable integer assignment
 
 	MODULE Test;
-	VAR variable: PROCEDURE; result: INTEGER;
+	VAR variable: PROCEDURE; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: import to variable integer assignment
 
 	MODULE Test;
-	IMPORT variable := Dummy; VAR result: INTEGER;
+	IMPORT variable := Dummy; VAR result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: type to variable integer assignment
 
 	MODULE Test;
-	TYPE Type = INTEGER; VAR result: Type;
+	TYPE Type = SIGNED16; VAR result: Type;
 	BEGIN result := Type;
 	END Test.
 
@@ -20447,14 +20447,14 @@ negative: variable short integer to temporary long integer assignment
 positive: variable integer to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: LONGINT;
+	VAR variable: SIGNED16; result: LONGINT;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable integer to temporary long integer assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: PROCEDURE (): LONGINT;
+	VAR variable: SIGNED16; result: PROCEDURE (): LONGINT;
 	BEGIN result () := variable;
 	END Test.
 
@@ -20580,14 +20580,14 @@ negative: variable short integer to temporary huge integer assignment
 positive: variable integer to variable huge integer assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: HUGEINT;
+	VAR variable: SIGNED16; result: HUGEINT;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable integer to temporary huge integer assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: PROCEDURE (): HUGEINT;
+	VAR variable: SIGNED16; result: PROCEDURE (): HUGEINT;
 	BEGIN result () := variable;
 	END Test.
 
@@ -20720,14 +20720,14 @@ negative: variable short integer to temporary real assignment
 positive: variable integer to variable real assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: REAL;
+	VAR variable: SIGNED16; result: REAL;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable integer to temporary real assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: PROCEDURE (): REAL;
+	VAR variable: SIGNED16; result: PROCEDURE (): REAL;
 	BEGIN result () := variable;
 	END Test.
 
@@ -20867,14 +20867,14 @@ negative: variable short integer to temporary long real assignment
 positive: variable integer to variable long real assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: LONGREAL;
+	VAR variable: SIGNED16; result: LONGREAL;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable integer to temporary long real assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: PROCEDURE (): LONGREAL;
+	VAR variable: SIGNED16; result: PROCEDURE (): LONGREAL;
 	BEGIN result () := variable;
 	END Test.
 
@@ -21014,7 +21014,7 @@ negative: variable short integer to variable set assignment
 negative: variable integer to variable set assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: SET;
+	VAR variable: SIGNED16; result: SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -21133,7 +21133,7 @@ negative: variable short integer to array assignment
 negative: variable integer to array assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: ARRAY 10 OF CHAR;
+	VAR variable: SIGNED16; result: ARRAY 10 OF CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -21242,7 +21242,7 @@ negative: array of short integer to array of boolean assignment
 negative: array of integer to array of boolean assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF BOOLEAN;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF BOOLEAN;
 	BEGIN result := variable;
 	END Test.
 
@@ -21401,7 +21401,7 @@ negative: array of short integer to array of character assignment
 negative: array of integer to array of character assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF CHAR;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -21545,7 +21545,7 @@ negative: array of short integer to dereferenced open array of short integer ass
 negative: array of integer to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF SIGNED8;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
@@ -21622,57 +21622,57 @@ negative: array of procedure to array of short integer assignment
 negative: array of boolean to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF BOOLEAN; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF BOOLEAN; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of character to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF CHAR; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF CHAR; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of short integer to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 positive: array of integer to array of integer assignment
 
 	MODULE Test;
-	VAR variable, result: ARRAY 10 OF INTEGER;
+	VAR variable, result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of integer to temporary array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: PROCEDURE (): ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF SIGNED16; result: PROCEDURE (): ARRAY 10 OF SIGNED16;
 	BEGIN result () := variable;
 	END Test.
 
 negative: array of integer to longer array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 20 OF INTEGER;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 20 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of integer to shorter array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 5 OF INTEGER;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 5 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of integer to open array of integer assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR result: ARRAY OF INTEGER);
-	VAR variable: ARRAY 10 OF INTEGER;
+	PROCEDURE Procedure (VAR result: ARRAY OF SIGNED16);
+	VAR variable: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Procedure;
 	END Test.
@@ -21680,8 +21680,8 @@ negative: array of integer to open array of integer assignment
 negative: open array of integer to array of integer assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR variable: ARRAY OF INTEGER);
-	VAR result: ARRAY 10 OF INTEGER;
+	PROCEDURE Procedure (VAR variable: ARRAY OF SIGNED16);
+	VAR result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Procedure;
 	END Test.
@@ -21689,77 +21689,77 @@ negative: open array of integer to array of integer assignment
 negative: array of integer to dereferenced open array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: POINTER TO ARRAY OF INTEGER;
+	VAR variable: ARRAY 10 OF SIGNED16; result: POINTER TO ARRAY OF SIGNED16;
 	BEGIN result^ := variable;
 	END Test.
 
 negative: array of long integer to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of huge integer to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF HUGEINT; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF HUGEINT; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of real to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF REAL; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF REAL; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long real to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of set to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SET; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF SET; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of array to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF ARRAY 10 OF SET; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF ARRAY 10 OF SET; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of record to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF RECORD END; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF RECORD END; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of object to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF OBJECT; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF OBJECT; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of pointer to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF POINTER TO RECORD END; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF POINTER TO RECORD END; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of procedure to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF PROCEDURE; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF PROCEDURE; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
@@ -21787,7 +21787,7 @@ negative: array of short integer to array of long integer assignment
 negative: array of integer to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF LONGINT;
 	BEGIN result := variable;
 	END Test.
 
@@ -21931,7 +21931,7 @@ negative: array of short integer to array of huge integer assignment
 negative: array of integer to array of huge integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF HUGEINT;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF HUGEINT;
 	BEGIN result := variable;
 	END Test.
 
@@ -22075,7 +22075,7 @@ negative: array of short integer to array of real assignment
 negative: array of integer to array of real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF REAL;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF REAL;
 	BEGIN result := variable;
 	END Test.
 
@@ -22219,7 +22219,7 @@ negative: array of short integer to array of long real assignment
 negative: array of integer to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF LONGREAL;
 	BEGIN result := variable;
 	END Test.
 
@@ -22363,7 +22363,7 @@ negative: array of short integer to array of set assignment
 negative: array of integer to array of set assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF SET;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -22500,7 +22500,7 @@ negative: array of short integer to array of array assignment
 negative: array of integer to array of array assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF ARRAY 10 OF SET;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF ARRAY 10 OF SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -22644,7 +22644,7 @@ negative: array of short integer to array of record assignment
 negative: array of integer to array of record assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF RECORD END;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -22794,7 +22794,7 @@ negative: array of short integer to array of object assignment
 negative: array of integer to array of object assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF OBJECT END;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF OBJECT END;
 	BEGIN result := variable;
 	END Test.
 
@@ -22944,7 +22944,7 @@ negative: array of short integer to array of pointer assignment
 negative: array of integer to array of pointer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF POINTER TO RECORD END;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF POINTER TO RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23094,7 +23094,7 @@ negative: array of short integer to array of procedure assignment
 negative: array of integer to array of procedure assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF PROCEDURE;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF PROCEDURE;
 	BEGIN result := variable;
 	END Test.
 
@@ -23280,7 +23280,7 @@ negative: variable short integer to record assignment
 negative: variable integer to record assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: RECORD END;
+	VAR variable: SIGNED16; result: RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23458,7 +23458,7 @@ negative: variable short integer to object assignment
 negative: variable integer to object assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: OBJECT END;
+	VAR variable: SIGNED16; result: OBJECT END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23608,7 +23608,7 @@ negative: variable short integer to pointer assignment
 negative: variable integer to pointer assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: POINTER TO RECORD END;
+	VAR variable: SIGNED16; result: POINTER TO RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23833,7 +23833,7 @@ negative: variable short integer to procedure assignment
 negative: variable integer to procedure assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: PROCEDURE;
+	VAR variable: SIGNED16; result: PROCEDURE;
 	BEGIN result := variable;
 	END Test.
 
@@ -23941,15 +23941,15 @@ negative: procedure to procedure assignment
 positive: variable procedure to variable procedure with same parameter assignment
 
 	MODULE Test;
-	VAR variable: PROCEDURE (integer: INTEGER); result: PROCEDURE (integer: INTEGER);
+	VAR variable: PROCEDURE (integer: SIGNED16); result: PROCEDURE (integer: SIGNED16);
 	BEGIN result := variable;
 	END Test.
 
 positive: procedure to variable procedure with same parameter assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (integer: INTEGER);
-	PROCEDURE variable (integer: INTEGER); END variable;
+	VAR result: PROCEDURE (integer: SIGNED16);
+	PROCEDURE variable (integer: SIGNED16); END variable;
 	BEGIN result := variable;
 	END Test.
 
@@ -23986,15 +23986,15 @@ negative: procedure to variable procedure with incompatible parameter assignment
 positive: variable procedure to variable procedure with same return type assignment
 
 	MODULE Test;
-	VAR variable: PROCEDURE (): INTEGER; result: PROCEDURE (): INTEGER;
+	VAR variable: PROCEDURE (): SIGNED16; result: PROCEDURE (): SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
 positive: procedure to variable procedure with same return type assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): INTEGER;
-	PROCEDURE variable (): INTEGER; END variable;
+	VAR result: PROCEDURE (): SIGNED16;
+	PROCEDURE variable (): SIGNED16; END variable;
 	BEGIN result := variable;
 	END Test.
 
@@ -24216,7 +24216,7 @@ negative: variable integer to import assignment
 
 	MODULE Test;
 	IMPORT result := Dummy;
-	VAR variable: INTEGER;
+	VAR variable: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
@@ -24338,7 +24338,7 @@ negative: variable short integer to type assignment
 negative: variable integer to type assignment
 
 	MODULE Test;
-	TYPE result = INTEGER; VAR variable: result;
+	TYPE result = SIGNED16; VAR variable: result;
 	BEGIN result := variable;
 	END Test.
 
@@ -24474,7 +24474,7 @@ negative: multiplication on variable booleans
 negative: integer division on variable booleans
 
 	MODULE Test;
-	VAR boolean: BOOLEAN; result: INTEGER;
+	VAR boolean: BOOLEAN; result: SIGNED16;
 	BEGIN result := boolean DIV boolean
 	END Test.
 
@@ -24488,7 +24488,7 @@ negative: real division on variable booleans
 negative: modulo on variable booleans
 
 	MODULE Test;
-	VAR boolean: BOOLEAN; result: INTEGER;
+	VAR boolean: BOOLEAN; result: SIGNED16;
 	BEGIN result := boolean MOD boolean
 	END Test.
 
@@ -24602,7 +24602,7 @@ positive: logical or on variable booleans
 negative: ordinal value of variable boolean
 
 	MODULE Test;
-	VAR boolean: BOOLEAN; result: INTEGER;
+	VAR boolean: BOOLEAN; result: SIGNED16;
 	BEGIN result := ORD (boolean)
 	END Test.
 
@@ -24752,7 +24752,7 @@ negative: multiplication on variable characters
 negative: integer division on variable characters
 
 	MODULE Test;
-	VAR character: CHAR; result: INTEGER;
+	VAR character: CHAR; result: SIGNED16;
 	BEGIN result := character DIV character
 	END Test.
 
@@ -24766,7 +24766,7 @@ negative: real division on variable characters
 negative: modulo on variable characters
 
 	MODULE Test;
-	VAR character: CHAR; result: INTEGER;
+	VAR character: CHAR; result: SIGNED16;
 	BEGIN result := character MOD character
 	END Test.
 
@@ -24880,7 +24880,7 @@ negative: logical or on variable characters
 positive: ordinal value of variable character
 
 	MODULE Test;
-	VAR character: CHAR; result: INTEGER;
+	VAR character: CHAR; result: SIGNED16;
 	BEGIN result := ORD (character)
 	END Test.
 
@@ -24988,140 +24988,140 @@ negative: calling variable character
 positive: arithmetic negation on variable integer
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := -integer;
 	END Test.
 
 positive: multiple arithmetic negations on variable integer
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := -(-(-integer));
 	END Test.
 
 negative: logical negation on variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := ~integer;
 	END Test.
 
 negative: dereferencing variable integer
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := integer^;
 	END Test.
 
 positive: addition on variable integers
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := integer + integer;
 	END Test.
 
 positive: subtraction on variable integers
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := integer - integer
 	END Test.
 
 positive: multiplication on variable integers
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := integer * integer
 	END Test.
 
 positive: integer division on variable integers
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := integer DIV integer
 	END Test.
 
 positive: real division on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: REAL;
+	VAR integer: SIGNED16; result: REAL;
 	BEGIN result := integer / integer
 	END Test.
 
 positive: modulo on variable integers
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := integer MOD integer
 	END Test.
 
 positive: equal relation on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer = integer
 	END Test.
 
 positive: unequal relation on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer # integer
 	END Test.
 
 positive: less relation on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer < integer
 	END Test.
 
 positive: less or equal relation on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer <= integer
 	END Test.
 
 positive: greater relation on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer > integer
 	END Test.
 
 positive: greater or equal relation on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer >= integer
 	END Test.
 
 negative: set membership on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer IN integer
 	END Test.
 
 negative: type test on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer IS integer
 	END Test.
 
 positive: type test on variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
-	BEGIN result := integer IS INTEGER
+	VAR integer: SIGNED16; result: BOOLEAN;
+	BEGIN result := integer IS SIGNED16
 	END Test.
 
 positive: type test on integer type
 
 	MODULE Test;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	VAR integer: Type; result: BOOLEAN;
 	BEGIN result := integer IS Type
 	END Test.
@@ -25129,21 +25129,21 @@ positive: type test on integer type
 negative: type guard on variable integers
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := integer(integer)
 	END Test.
 
 positive: type guard on variable integer
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
-	BEGIN result := integer(INTEGER)
+	VAR integer, result: SIGNED16;
+	BEGIN result := integer(SIGNED16)
 	END Test.
 
 positive: type guard on integer type
 
 	MODULE Test;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	VAR integer, result: Type;
 	BEGIN result := integer(Type)
 	END Test.
@@ -25151,56 +25151,56 @@ positive: type guard on integer type
 negative: logical and on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer & integer
 	END Test.
 
 negative: logical or on variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := integer OR integer
 	END Test.
 
 negative: ordinal value of variable integer
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := ORD (integer)
 	END Test.
 
 positive: character value of variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER; result: CHAR;
+	VAR integer: SIGNED16; result: CHAR;
 	BEGIN result := CHR (integer)
 	END Test.
 
 positive: absolute value of variable integer
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := ABS (integer)
 	END Test.
 
 positive: odd test on variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER; result: BOOLEAN;
+	VAR integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := ODD (integer)
 	END Test.
 
 negative: capital letter of variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER; result: CHAR;
+	VAR integer: SIGNED16; result: CHAR;
 	BEGIN result := CAP (integer)
 	END Test.
 
 positive: arithmetic shift of variable integers
 
 	MODULE Test;
-	VAR integer: INTEGER; result: LONGINT;
+	VAR integer: SIGNED16; result: LONGINT;
 	BEGIN result := ASH (integer, integer)
 	END Test.
 
@@ -25214,7 +25214,7 @@ negative: short on variable short integer
 positive: short on variable integer
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := SHORT (integer)
 	END Test.
 
@@ -25242,7 +25242,7 @@ positive: long on variable short integer
 positive: long on variable integer
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := SHORT (LONG (integer))
 	END Test.
 
@@ -25270,35 +25270,35 @@ negative: entier on variable integer
 negative: unary length of variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER; result: SIZE;
+	VAR integer: SIGNED16; result: SIZE;
 	BEGIN result := LEN (integer)
 	END Test.
 
 negative: binary length of variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER; result: SIZE;
+	VAR integer: SIGNED16; result: SIZE;
 	BEGIN result := LEN (integer, 0)
 	END Test.
 
 negative: indexing variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER; result: CHAR;
+	VAR integer: SIGNED16; result: CHAR;
 	BEGIN result := integer[0]
 	END Test.
 
 positive: variable integer as index
 
 	MODULE Test;
-	VAR array: ARRAY 10 OF CHAR; result: CHAR; integer: INTEGER;
+	VAR array: ARRAY 10 OF CHAR; result: CHAR; integer: SIGNED16;
 	BEGIN result := array[integer]
 	END Test.
 
 positive: variable integer as index in two-dimensional array
 
 	MODULE Test;
-	VAR array: ARRAY 5, 10 OF CHAR; result: CHAR; integer: INTEGER;
+	VAR array: ARRAY 5, 10 OF CHAR; result: CHAR; integer: SIGNED16;
 	BEGIN result := array[integer, integer]
 	END Test.
 
@@ -25306,7 +25306,7 @@ positive: variable integer as index in two-dimensional open array
 
 	MODULE Test;
 	PROCEDURE Procedure (CONST array: ARRAY OF ARRAY OF CHAR);
-	VAR result: CHAR; integer: INTEGER;
+	VAR result: CHAR; integer: SIGNED16;
 	BEGIN result := array[integer, integer]; result := array[integer][integer]
 	END Procedure;
 	END Test.
@@ -25314,14 +25314,14 @@ positive: variable integer as index in two-dimensional open array
 negative: member selection on variable integer
 
 	MODULE Test;
-	VAR integer, result: INTEGER;
+	VAR integer, result: SIGNED16;
 	BEGIN result := integer.member
 	END Test.
 
 negative: calling variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN integer
 	END Test.
 
@@ -25380,7 +25380,7 @@ positive: multiplication on variable reals
 negative: integer division on variable reals
 
 	MODULE Test;
-	VAR real: REAL; result: INTEGER;
+	VAR real: REAL; result: SIGNED16;
 	BEGIN result := real DIV real
 	END Test.
 
@@ -25394,7 +25394,7 @@ positive: real division on variable reals
 negative: modulo on variable reals
 
 	MODULE Test;
-	VAR real: REAL; result: INTEGER;
+	VAR real: REAL; result: SIGNED16;
 	BEGIN result := real MOD real
 	END Test.
 
@@ -25508,7 +25508,7 @@ negative: logical or on variable reals
 negative: ordinal value of variable real
 
 	MODULE Test;
-	VAR real: REAL; result: INTEGER;
+	VAR real: REAL; result: SIGNED16;
 	BEGIN result := ORD (real)
 	END Test.
 
@@ -25651,7 +25651,7 @@ negative: variable character as set element
 positive: variable integer variable as set element
 
 	MODULE Test;
-	VAR integer: INTEGER; result: SET;
+	VAR integer: SIGNED16; result: SET;
 	BEGIN result := {integer};
 	END Test.
 
@@ -25672,35 +25672,35 @@ negative: variable set as set element
 positive: several equal variable set elements
 
 	MODULE Test;
-	VAR integer: INTEGER; result: SET;
+	VAR integer: SIGNED16; result: SET;
 	BEGIN result := {integer, integer, integer};
 	END Test.
 
 positive: several different variable set elements
 
 	MODULE Test;
-	VAR integer: INTEGER; result: SET;
+	VAR integer: SIGNED16; result: SET;
 	BEGIN result := {integer, integer, integer};
 	END Test.
 
 positive: variable set element range
 
 	MODULE Test;
-	VAR integer: INTEGER; result: SET;
+	VAR integer: SIGNED16; result: SET;
 	BEGIN result := {integer..integer};
 	END Test.
 
 positive: variable set element range with single element
 
 	MODULE Test;
-	VAR integer: INTEGER; result: SET;
+	VAR integer: SIGNED16; result: SET;
 	BEGIN result := {integer..integer};
 	END Test.
 
 positive: empty variable set element range
 
 	MODULE Test;
-	VAR integer: INTEGER; result: SET;
+	VAR integer: SIGNED16; result: SET;
 	BEGIN result := {integer..integer};
 	END Test.
 
@@ -25756,7 +25756,7 @@ positive: intersection on variable sets
 negative: integer division on variable sets
 
 	MODULE Test;
-	VAR set: SET; result: INTEGER;
+	VAR set: SET; result: SIGNED16;
 	BEGIN result := set DIV set
 	END Test.
 
@@ -25770,7 +25770,7 @@ positive: symmetric difference on variable sets
 negative: modulo on variable sets
 
 	MODULE Test;
-	VAR set: SET; result: INTEGER;
+	VAR set: SET; result: SIGNED16;
 	BEGIN result := set MOD set
 	END Test.
 
@@ -25826,7 +25826,7 @@ negative: set membership on variable sets
 positive: set membership on integer and variable set
 
 	MODULE Test;
-	VAR integer: INTEGER; set: SET; result: BOOLEAN;
+	VAR integer: SIGNED16; set: SET; result: BOOLEAN;
 	BEGIN result := integer IN set
 	END Test.
 
@@ -25891,7 +25891,7 @@ negative: logical or on variable sets
 negative: ordinal value of variable set
 
 	MODULE Test;
-	VAR set: SET; result: INTEGER;
+	VAR set: SET; result: SIGNED16;
 	BEGIN result := ORD (set)
 	END Test.
 
@@ -26041,7 +26041,7 @@ negative: multiplication on variable arrays
 negative: integer division on variable arrays
 
 	MODULE Test;
-	VAR array: ARRAY 10 OF SET; result: INTEGER;
+	VAR array: ARRAY 10 OF SET; result: SIGNED16;
 	BEGIN result := array DIV array
 	END Test.
 
@@ -26055,7 +26055,7 @@ negative: real division on variable arrays
 negative: modulo on variable arrays
 
 	MODULE Test;
-	VAR array: ARRAY 10 OF SET; result: INTEGER;
+	VAR array: ARRAY 10 OF SET; result: SIGNED16;
 	BEGIN result := array MOD array
 	END Test.
 
@@ -26253,7 +26253,7 @@ negative: logical or on variable arrays
 negative: ordinal value of variable array
 
 	MODULE Test;
-	VAR array: ARRAY 10 OF SET; result: INTEGER;
+	VAR array: ARRAY 10 OF SET; result: SIGNED16;
 	BEGIN result := ORD (array)
 	END Test.
 
@@ -26398,7 +26398,7 @@ negative: binary length of variable array with invalid dimension index
 positive: binary length of variable array with variable dimension index
 
 	MODULE Test;
-	VAR array: ARRAY 10 OF CHAR; result: SIZE; dimension: INTEGER;
+	VAR array: ARRAY 10 OF CHAR; result: SIZE; dimension: SIGNED16;
 	BEGIN result := LEN (array, dimension);
 	END Test.
 
@@ -26419,7 +26419,7 @@ negative: binary length of variable array with character as dimension index
 positive: binary length of variable array with integer as dimension index
 
 	MODULE Test;
-	VAR array: ARRAY 10 OF CHAR; result: SIZE; dimension: INTEGER;
+	VAR array: ARRAY 10 OF CHAR; result: SIZE; dimension: SIGNED16;
 	BEGIN result := LEN (array, dimension);
 	END Test.
 
@@ -26582,21 +26582,21 @@ negative: changing indexed temporary character array
 positive: indexing variable integer array
 
 	MODULE Test;
-	VAR array: ARRAY 10 OF INTEGER; result: INTEGER;
+	VAR array: ARRAY 10 OF SIGNED16; result: SIGNED16;
 	BEGIN result := array[0]
 	END Test.
 
 positive: indexing temporary integer array
 
 	MODULE Test;
-	VAR array: PROCEDURE (): ARRAY 10 OF INTEGER; result: INTEGER;
+	VAR array: PROCEDURE (): ARRAY 10 OF SIGNED16; result: SIGNED16;
 	BEGIN result := array()[0]
 	END Test.
 
 negative: changing indexed temporary integer array
 
 	MODULE Test;
-	VAR array: PROCEDURE (): ARRAY 10 OF INTEGER;
+	VAR array: PROCEDURE (): ARRAY 10 OF SIGNED16;
 	BEGIN array()[0] := 5;
 	END Test.
 
@@ -26690,7 +26690,7 @@ negative: changing indexed temporary record array
 negative: changing member of indexed temporary record array
 
 	MODULE Test;
-	TYPE Record = RECORD i: INTEGER END;
+	TYPE Record = RECORD i: SIGNED16 END;
 	VAR array: PROCEDURE (): ARRAY 10 OF Record;
 	BEGIN array()[0].i := 5;
 	END Test.
@@ -26722,7 +26722,7 @@ negative: changing indexed temporary object array
 positive: changing member of indexed temporary object array
 
 	MODULE Test;
-	TYPE Object = OBJECT VAR i: INTEGER END Object;
+	TYPE Object = OBJECT VAR i: SIGNED16 END Object;
 	VAR array: PROCEDURE (): ARRAY 10 OF Object;
 	BEGIN array()[0].i := 5;
 	END Test.
@@ -26803,7 +26803,7 @@ negative: changing indexed temporary array of pointer to record
 positive: changing element of indexed temporary array of pointer to record
 
 	MODULE Test;
-	VAR array: PROCEDURE (): ARRAY 10 OF POINTER TO RECORD i: INTEGER END;
+	VAR array: PROCEDURE (): ARRAY 10 OF POINTER TO RECORD i: SIGNED16 END;
 	BEGIN array()[0].i := 5;
 	END Test.
 
@@ -26897,7 +26897,7 @@ negative: multiplication on variable records
 negative: integer division on variable records
 
 	MODULE Test;
-	VAR record: RECORD END; result: INTEGER;
+	VAR record: RECORD END; result: SIGNED16;
 	BEGIN result := record DIV record
 	END Test.
 
@@ -26911,7 +26911,7 @@ negative: real division on variable records
 negative: modulo on variable records
 
 	MODULE Test;
-	VAR record: RECORD END; result: INTEGER;
+	VAR record: RECORD END; result: SIGNED16;
 	BEGIN result := record MOD record
 	END Test.
 
@@ -27087,7 +27087,7 @@ negative: logical or on variable records
 negative: ordinal value of variable record
 
 	MODULE Test;
-	VAR record: RECORD END; result: INTEGER;
+	VAR record: RECORD END; result: SIGNED16;
 	BEGIN result := ORD (record)
 	END Test.
 
@@ -27258,7 +27258,7 @@ negative: multiplication on variable objects
 negative: integer division on variable objects
 
 	MODULE Test;
-	VAR object: OBJECT END; result: INTEGER;
+	VAR object: OBJECT END; result: SIGNED16;
 	BEGIN result := object DIV object
 	END Test.
 
@@ -27272,7 +27272,7 @@ negative: real division on variable objects
 negative: modulo on variable objects
 
 	MODULE Test;
-	VAR object: OBJECT END; result: INTEGER;
+	VAR object: OBJECT END; result: SIGNED16;
 	BEGIN result := object MOD object
 	END Test.
 
@@ -27525,7 +27525,7 @@ negative: logical or on variable objects
 negative: ordinal value of variable object
 
 	MODULE Test;
-	VAR object: OBJECT END; result: INTEGER;
+	VAR object: OBJECT END; result: SIGNED16;
 	BEGIN result := ORD (object)
 	END Test.
 
@@ -27696,7 +27696,7 @@ negative: multiplication on variable base objects
 negative: integer division on variable base objects
 
 	MODULE Test;
-	VAR object: OBJECT; result: INTEGER;
+	VAR object: OBJECT; result: SIGNED16;
 	BEGIN result := object DIV object
 	END Test.
 
@@ -27710,7 +27710,7 @@ negative: real division on variable base objects
 negative: modulo on variable base objects
 
 	MODULE Test;
-	VAR object: OBJECT; result: INTEGER;
+	VAR object: OBJECT; result: SIGNED16;
 	BEGIN result := object MOD object
 	END Test.
 
@@ -27870,7 +27870,7 @@ negative: logical or on variable base objects
 negative: ordinal value of variable base object
 
 	MODULE Test;
-	VAR object: OBJECT; result: INTEGER;
+	VAR object: OBJECT; result: SIGNED16;
 	BEGIN result := ORD (object)
 	END Test.
 
@@ -28021,7 +28021,7 @@ negative: multiplication on variable pointers to record
 negative: integer division on variable pointers to record
 
 	MODULE Test;
-	VAR pointer: POINTER TO RECORD END; result: INTEGER;
+	VAR pointer: POINTER TO RECORD END; result: SIGNED16;
 	BEGIN result := pointer DIV pointer
 	END Test.
 
@@ -28035,7 +28035,7 @@ negative: real division on variable pointers to record
 negative: modulo on variable pointers to record
 
 	MODULE Test;
-	VAR pointer: POINTER TO RECORD END; result: INTEGER;
+	VAR pointer: POINTER TO RECORD END; result: SIGNED16;
 	BEGIN result := pointer MOD pointer
 	END Test.
 
@@ -28241,7 +28241,7 @@ negative: logical or on variable pointers to record
 negative: ordinal value of variable pointer to record
 
 	MODULE Test;
-	VAR pointer: POINTER TO RECORD END; result: INTEGER;
+	VAR pointer: POINTER TO RECORD END; result: SIGNED16;
 	BEGIN result := ORD (pointer)
 	END Test.
 
@@ -28441,7 +28441,7 @@ negative: multiplication on variable pointers to array
 negative: integer division on variable pointers to array
 
 	MODULE Test;
-	VAR pointer: POINTER TO ARRAY 10 OF CHAR; result: INTEGER;
+	VAR pointer: POINTER TO ARRAY 10 OF CHAR; result: SIGNED16;
 	BEGIN result := pointer DIV pointer
 	END Test.
 
@@ -28455,7 +28455,7 @@ negative: real division on variable pointers to array
 negative: modulo on variable pointers to array
 
 	MODULE Test;
-	VAR pointer: POINTER TO ARRAY 10 OF CHAR; result: INTEGER;
+	VAR pointer: POINTER TO ARRAY 10 OF CHAR; result: SIGNED16;
 	BEGIN result := pointer MOD pointer
 	END Test.
 
@@ -28611,7 +28611,7 @@ negative: logical or on variable pointers to array
 negative: ordinal value of variable pointer to array
 
 	MODULE Test;
-	VAR pointer: POINTER TO ARRAY 10 OF CHAR; result: INTEGER;
+	VAR pointer: POINTER TO ARRAY 10 OF CHAR; result: SIGNED16;
 	BEGIN result := ORD (pointer)
 	END Test.
 
@@ -28772,42 +28772,42 @@ positive: changing dereferenced indexed temporary pointer to character array
 positive: indexing variable pointer to integer array
 
 	MODULE Test;
-	VAR array: POINTER TO ARRAY 10 OF INTEGER; result: INTEGER;
+	VAR array: POINTER TO ARRAY 10 OF SIGNED16; result: SIGNED16;
 	BEGIN result := array[0]
 	END Test.
 
 positive: indexing temporary pointer to integer array
 
 	MODULE Test;
-	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF INTEGER; result: INTEGER;
+	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF SIGNED16; result: SIGNED16;
 	BEGIN result := array()[0]
 	END Test.
 
 positive: changing indexed temporary pointer to integer array
 
 	MODULE Test;
-	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF INTEGER;
+	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF SIGNED16;
 	BEGIN array()[0] := 5;
 	END Test.
 
 positive: indexing dereferenced variable pointer to integer array
 
 	MODULE Test;
-	VAR array: POINTER TO ARRAY 10 OF INTEGER; result: INTEGER;
+	VAR array: POINTER TO ARRAY 10 OF SIGNED16; result: SIGNED16;
 	BEGIN result := array^[0]
 	END Test.
 
 positive: indexing dereferenced temporary pointer to integer array
 
 	MODULE Test;
-	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF INTEGER; result: INTEGER;
+	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF SIGNED16; result: SIGNED16;
 	BEGIN result := array()^[0]
 	END Test.
 
 positive: changing dereferenced indexed temporary pointer to integer array
 
 	MODULE Test;
-	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF INTEGER;
+	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF SIGNED16;
 	BEGIN array()^[0] := 5;
 	END Test.
 
@@ -28964,7 +28964,7 @@ positive: changing indexed temporary pointer to record array
 positive: changing member of indexed temporary pointer to record array
 
 	MODULE Test;
-	TYPE Record = RECORD i: INTEGER END;
+	TYPE Record = RECORD i: SIGNED16 END;
 	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF Record;
 	BEGIN array()[0].i := 5;
 	END Test.
@@ -28996,7 +28996,7 @@ positive: changing dereferenced indexed temporary pointer to array of record
 positive: changing member of dereferenced indexed temporary pointer to array of record
 
 	MODULE Test;
-	TYPE Record = RECORD i: INTEGER END;
+	TYPE Record = RECORD i: SIGNED16 END;
 	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF Record;
 	BEGIN array()^[0].i := 5;
 	END Test.
@@ -29028,7 +29028,7 @@ positive: changing indexed temporary pointer to object array
 positive: changing member of indexed temporary pointer to object array
 
 	MODULE Test;
-	TYPE Object = OBJECT VAR i: INTEGER END Object;
+	TYPE Object = OBJECT VAR i: SIGNED16 END Object;
 	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF Object;
 	BEGIN array()[0].i := 5;
 	END Test.
@@ -29060,7 +29060,7 @@ positive: changing dereferenced indexed temporary pointer to object array
 positive: changing member of dereferenced indexed temporary pointer to object array
 
 	MODULE Test;
-	TYPE Object = OBJECT VAR i: INTEGER END Object;
+	TYPE Object = OBJECT VAR i: SIGNED16 END Object;
 	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF Object;
 	BEGIN array()^[0].i := 5;
 	END Test.
@@ -29190,7 +29190,7 @@ positive: changing indexed temporary pointer to pointer to record array
 positive: changing element of indexed temporary pointer to pointer to record array
 
 	MODULE Test;
-	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF POINTER TO RECORD i: INTEGER END;
+	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF POINTER TO RECORD i: SIGNED16 END;
 	BEGIN array()[0].i := 5;
 	END Test.
 
@@ -29221,7 +29221,7 @@ positive: changing dereferenced indexed temporary pointer to pointer to record a
 positive: changing element of dereferenced indexed temporary pointer to pointer to record array
 
 	MODULE Test;
-	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF POINTER TO RECORD i: INTEGER END;
+	VAR array: PROCEDURE (): POINTER TO ARRAY 10 OF POINTER TO RECORD i: SIGNED16 END;
 	BEGIN array()^[0].i := 5;
 	END Test.
 
@@ -29343,7 +29343,7 @@ negative: multiplication on procedure variables
 negative: integer division on procedure variables
 
 	MODULE Test;
-	VAR procedure: PROCEDURE; result: INTEGER;
+	VAR procedure: PROCEDURE; result: SIGNED16;
 	BEGIN result := procedure DIV procedure
 	END Test.
 
@@ -29357,7 +29357,7 @@ negative: real division on procedure variables
 negative: modulo on procedure variables
 
 	MODULE Test;
-	VAR procedure: PROCEDURE; result: INTEGER;
+	VAR procedure: PROCEDURE; result: SIGNED16;
 	BEGIN result := procedure MOD procedure
 	END Test.
 
@@ -29499,7 +29499,7 @@ negative: logical or on procedure variables
 negative: ordinal value of procedure variable
 
 	MODULE Test;
-	VAR procedure: PROCEDURE; result: INTEGER;
+	VAR procedure: PROCEDURE; result: SIGNED16;
 	BEGIN result := ORD (procedure)
 	END Test.
 
@@ -29639,14 +29639,14 @@ positive: ignoring procedure variable returning character
 negative: calling procedure variable returning integer
 
 	MODULE Test;
-	VAR procedure: PROCEDURE (): INTEGER;
+	VAR procedure: PROCEDURE (): SIGNED16;
 	BEGIN procedure ()
 	END Test.
 
 positive: ignoring procedure variable returning integer
 
 	MODULE Test;
-	VAR procedure: PROCEDURE (): INTEGER;
+	VAR procedure: PROCEDURE (): SIGNED16;
 	BEGIN IGNORE procedure ()
 	END Test.
 
@@ -29782,7 +29782,7 @@ positive: ignoring procedure variable returning procedure
 positive: implicit variable short to integer conversion
 
 	MODULE Test;
-	VAR shortint: SIGNED8; integer, result: INTEGER;
+	VAR shortint: SIGNED8; integer, result: SIGNED16;
 	BEGIN result := shortint + integer
 	END Test.
 
@@ -29803,35 +29803,35 @@ positive: implicit variable short to huge integer conversion
 positive: implicit variable integer to long integer conversion
 
 	MODULE Test;
-	VAR integer: INTEGER; longint, result: LONGINT;
+	VAR integer: SIGNED16; longint, result: LONGINT;
 	BEGIN result := integer - longint
 	END Test.
 
 positive: implicit variable integer to huge integer conversion
 
 	MODULE Test;
-	VAR integer: INTEGER; hugeint, result: HUGEINT;
+	VAR integer: SIGNED16; hugeint, result: HUGEINT;
 	BEGIN result := integer * hugeint
 	END Test.
 
 positive: implicit variable long to huge integer conversion
 
 	MODULE Test;
-	VAR longint: INTEGER; hugeint, result: HUGEINT;
+	VAR longint: SIGNED16; hugeint, result: HUGEINT;
 	BEGIN result := hugeint + longint
 	END Test.
 
 positive: implicit variable integer to real conversion
 
 	MODULE Test;
-	VAR integer: INTEGER; real, result: REAL;
+	VAR integer: SIGNED16; real, result: REAL;
 	BEGIN result := real + integer
 	END Test.
 
 positive: implicit variable integer to long real conversion
 
 	MODULE Test;
-	VAR integer: INTEGER; longreal, result: LONGREAL;
+	VAR integer: SIGNED16; longreal, result: LONGREAL;
 	BEGIN result := integer / longreal
 	END Test.
 
@@ -29852,7 +29852,7 @@ negative: implicit conversion between variable boolean and character
 negative: implicit conversion between variable boolean and integer
 
 	MODULE Test;
-	VAR boolean, result: BOOLEAN; integer: INTEGER;
+	VAR boolean, result: BOOLEAN; integer: SIGNED16;
 	BEGIN result := boolean # integer
 	END Test.
 
@@ -29873,7 +29873,7 @@ negative: implicit conversion between variable boolean and set
 negative: implicit conversion between variable character and integer
 
 	MODULE Test;
-	VAR character: CHAR; integer: INTEGER; result: BOOLEAN;
+	VAR character: CHAR; integer: SIGNED16; result: BOOLEAN;
 	BEGIN result := character # integer
 	END Test.
 
@@ -29894,14 +29894,14 @@ negative: implicit conversion between variable character and set
 positive: implicit conversion between variable integer and real
 
 	MODULE Test;
-	VAR integer: INTEGER; real: REAL; result: BOOLEAN;
+	VAR integer: SIGNED16; real: REAL; result: BOOLEAN;
 	BEGIN result := integer # real
 	END Test.
 
 negative: implicit conversion between variable integer and set
 
 	MODULE Test;
-	VAR integer: INTEGER; set: SET; result: BOOLEAN;
+	VAR integer: SIGNED16; set: SET; result: BOOLEAN;
 	BEGIN result := integer = set
 	END Test.
 
@@ -29932,14 +29932,14 @@ negative: explicit short conversion on variable short integer
 negative: explicit long conversion on variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN integer := LONG (integer);
 	END Test.
 
 positive: explicit short conversion on variable integer
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN integer := SHORT (integer);
 	END Test.
 
@@ -29974,7 +29974,7 @@ positive: explicit short conversion on variable huge integer
 positive: explicit variable short integer to integer conversion
 
 	MODULE Test;
-	VAR shortint: SIGNED8; integer: INTEGER;
+	VAR shortint: SIGNED8; integer: SIGNED16;
 	BEGIN integer := LONG (shortint);
 	END Test.
 
@@ -29995,21 +29995,21 @@ positive: explicit variable short to huge integer conversion
 positive: explicit variable integer to short integer conversion
 
 	MODULE Test;
-	VAR integer: INTEGER; shortint: SIGNED8;
+	VAR integer: SIGNED16; shortint: SIGNED8;
 	BEGIN integer := SHORT (integer);
 	END Test.
 
 positive: explicit variable integer to long integer conversion
 
 	MODULE Test;
-	VAR integer: INTEGER; longint: LONGINT;
+	VAR integer: SIGNED16; longint: LONGINT;
 	BEGIN longint := LONG (integer);
 	END Test.
 
 positive: explicit variable integer to huge integer conversion
 
 	MODULE Test;
-	VAR integer: INTEGER; hugeint: HUGEINT;
+	VAR integer: SIGNED16; hugeint: HUGEINT;
 	BEGIN hugeint := LONG (LONG (integer));
 	END Test.
 
@@ -30023,7 +30023,7 @@ positive: explicit variable long to short integer conversion
 positive: explicit variable long to integer conversion
 
 	MODULE Test;
-	VAR longint: LONGINT; integer: INTEGER;
+	VAR longint: LONGINT; integer: SIGNED16;
 	BEGIN integer := SHORT (longint);
 	END Test.
 
@@ -30044,7 +30044,7 @@ positive: explicit variable huge to short integer conversion
 positive: explicit variable huge to integer conversion
 
 	MODULE Test;
-	VAR hugeint: HUGEINT; integer: INTEGER;
+	VAR hugeint: HUGEINT; integer: SIGNED16;
 	BEGIN integer := SHORT (SHORT (hugeint));
 	END Test.
 
@@ -30065,7 +30065,7 @@ negative: explicit variable real to short integer conversion
 negative: explicit variable real to integer conversion
 
 	MODULE Test;
-	VAR real: REAL; integer: INTEGER;
+	VAR real: REAL; integer: SIGNED16;
 	BEGIN integer := ENTIER (real);
 	END Test.
 
@@ -30093,7 +30093,7 @@ negative: explicit variable long real to short integer conversion
 negative: explicit variable long real to integer conversion
 
 	MODULE Test;
-	VAR longreal: LONGREAL; integer: INTEGER;
+	VAR longreal: LONGREAL; integer: SIGNED16;
 	BEGIN integer := ENTIER (longreal);
 	END Test.
 
@@ -30137,14 +30137,14 @@ negative: for statement with type as counter
 positive: for statement with variable as counter
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 DO END
 	END Test.
 
 positive: for statement with parameter as counter
 
 	MODULE Test;
-	PROCEDURE Procedure (i: INTEGER);
+	PROCEDURE Procedure (i: SIGNED16);
 	BEGIN FOR i := 0 TO 10 DO END
 	END Procedure;
 	END Test.
@@ -30159,56 +30159,56 @@ negative: for statement with procedure as counter
 negative: for statement with constant counter
 
 	MODULE Test;
-	VAR s, e: INTEGER;
+	VAR s, e: SIGNED16;
 	BEGIN FOR 0 := s TO e DO END
 	END Test.
 
 positive: for statement with constant start counter
 
 	MODULE Test;
-	VAR i, e: INTEGER;
+	VAR i, e: SIGNED16;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 positive: for statement with constant end counter
 
 	MODULE Test;
-	VAR i, s: INTEGER;
+	VAR i, s: SIGNED16;
 	BEGIN FOR i := s TO 0 DO END
 	END Test.
 
 positive: for statement with variable counter
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 DO END
 	END Test.
 
 positive: for statement with variable start counter
 
 	MODULE Test;
-	VAR i, s: INTEGER;
+	VAR i, s: SIGNED16;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 positive: for statement with variable end counter
 
 	MODULE Test;
-	VAR i, e: INTEGER;
+	VAR i, e: SIGNED16;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 negative: for statement with variable increment
 
 	MODULE Test;
-	VAR i, s: INTEGER;
+	VAR i, s: SIGNED16;
 	BEGIN FOR i := 0 TO 10 BY s DO END
 	END Test.
 
 positive: for statement with parameter counter
 
 	MODULE Test;
-	PROCEDURE P (i: INTEGER);
+	PROCEDURE P (i: SIGNED16);
 	BEGIN FOR i := 0 TO 10 DO END
 	END P;
 	END Test.
@@ -30216,7 +30216,7 @@ positive: for statement with parameter counter
 positive: for statement with variable parameter counter
 
 	MODULE Test;
-	PROCEDURE P (VAR i: INTEGER);
+	PROCEDURE P (VAR i: SIGNED16);
 	BEGIN FOR i := 0 TO 10 DO END
 	END P;
 	END Test.
@@ -30224,7 +30224,7 @@ positive: for statement with variable parameter counter
 negative: for statement with constant parameter counter
 
 	MODULE Test;
-	PROCEDURE P (CONST i: INTEGER);
+	PROCEDURE P (CONST i: SIGNED16);
 	BEGIN FOR i := 0 TO 10 DO END
 	END P;
 	END Test.
@@ -30232,8 +30232,8 @@ negative: for statement with constant parameter counter
 positive: for statement with parameter start counter
 
 	MODULE Test;
-	VAR i: INTEGER;
-	PROCEDURE P (s: INTEGER);
+	VAR i: SIGNED16;
+	PROCEDURE P (s: SIGNED16);
 	BEGIN FOR i := s TO 10 DO END
 	END P;
 	END Test.
@@ -30241,8 +30241,8 @@ positive: for statement with parameter start counter
 positive: for statement with variable parameter start counter
 
 	MODULE Test;
-	VAR i: INTEGER;
-	PROCEDURE P (VAR s: INTEGER);
+	VAR i: SIGNED16;
+	PROCEDURE P (VAR s: SIGNED16);
 	BEGIN FOR i := s TO 10 DO END
 	END P;
 	END Test.
@@ -30250,8 +30250,8 @@ positive: for statement with variable parameter start counter
 positive: for statement with constant parameter start counter
 
 	MODULE Test;
-	VAR i: INTEGER;
-	PROCEDURE P (CONST s: INTEGER);
+	VAR i: SIGNED16;
+	PROCEDURE P (CONST s: SIGNED16);
 	BEGIN FOR i := s TO 10 DO END
 	END P;
 	END Test.
@@ -30259,8 +30259,8 @@ positive: for statement with constant parameter start counter
 positive: for statement with parameter end counter
 
 	MODULE Test;
-	VAR i: INTEGER;
-	PROCEDURE P (e: INTEGER);
+	VAR i: SIGNED16;
+	PROCEDURE P (e: SIGNED16);
 	BEGIN FOR i := 0 TO e DO END
 	END P;
 	END Test.
@@ -30268,8 +30268,8 @@ positive: for statement with parameter end counter
 positive: for statement with variable parameter end counter
 
 	MODULE Test;
-	VAR i: INTEGER;
-	PROCEDURE P (VAR e: INTEGER);
+	VAR i: SIGNED16;
+	PROCEDURE P (VAR e: SIGNED16);
 	BEGIN FOR i := 0 TO e DO END
 	END P;
 	END Test.
@@ -30277,8 +30277,8 @@ positive: for statement with variable parameter end counter
 positive: for statement with constant parameter end counter
 
 	MODULE Test;
-	VAR i: INTEGER;
-	PROCEDURE P (CONST e: INTEGER);
+	VAR i: SIGNED16;
+	PROCEDURE P (CONST e: SIGNED16);
 	BEGIN FOR i := 0 TO e DO END
 	END P;
 	END Test.
@@ -30286,8 +30286,8 @@ positive: for statement with constant parameter end counter
 negative: for statement with parameter increment
 
 	MODULE Test;
-	VAR i: INTEGER;
-	PROCEDURE P (s: INTEGER);
+	VAR i: SIGNED16;
+	PROCEDURE P (s: SIGNED16);
 	BEGIN FOR i := 0 TO 10 BY s DO END
 	END P;
 	END Test.
@@ -30295,8 +30295,8 @@ negative: for statement with parameter increment
 negative: for statement with variable parameter increment
 
 	MODULE Test;
-	VAR i: INTEGER;
-	PROCEDURE P (VAR s: INTEGER);
+	VAR i: SIGNED16;
+	PROCEDURE P (VAR s: SIGNED16);
 	BEGIN FOR i := 0 TO 10 BY s DO END
 	END P;
 	END Test.
@@ -30304,8 +30304,8 @@ negative: for statement with variable parameter increment
 negative: for statement with constant parameter increment
 
 	MODULE Test;
-	VAR i: INTEGER;
-	PROCEDURE P (CONST s: INTEGER);
+	VAR i: SIGNED16;
+	PROCEDURE P (CONST s: SIGNED16);
 	BEGIN FOR i := 0 TO 10 BY s DO END
 	END P;
 	END Test.
@@ -30313,21 +30313,21 @@ negative: for statement with constant parameter increment
 positive: for statement with positive constant increment
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 BY 1 DO END
 	END Test.
 
 positive: for statement with negative constant increment
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 BY -1 DO END
 	END Test.
 
 negative: for statement with zero increment
 
 	MODULE Test;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN FOR i := 0 TO 10 BY 0 DO END
 	END Test.
 
@@ -30355,7 +30355,7 @@ positive: for statement with counter of type short integer
 positive: for statement with counter of type integer
 
 	MODULE Test;
-	VAR i, s, e: INTEGER;
+	VAR i, s, e: SIGNED16;
 	BEGIN FOR i := s TO e DO END
 	END Test.
 
@@ -30439,7 +30439,7 @@ positive: for statement with short integer counter and short integer start count
 negative: for statement with short integer counter and integer start counter
 
 	MODULE Test;
-	VAR i: SIGNED8; s: INTEGER;
+	VAR i: SIGNED8; s: SIGNED16;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30460,28 +30460,28 @@ negative: for statement with short integer counter and huge integer start counte
 positive: for statement with integer counter and short integer start counter
 
 	MODULE Test;
-	VAR i: INTEGER; s: SIGNED8;
+	VAR i: SIGNED16; s: SIGNED8;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 positive: for statement with integer counter and integer start counter
 
 	MODULE Test;
-	VAR i, s: INTEGER;
+	VAR i, s: SIGNED16;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 negative: for statement with integer counter and long integer start counter
 
 	MODULE Test;
-	VAR i: INTEGER; s: LONGINT;
+	VAR i: SIGNED16; s: LONGINT;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 negative: for statement with integer counter and huge integer start counter
 
 	MODULE Test;
-	VAR i: INTEGER; s: HUGEINT;
+	VAR i: SIGNED16; s: HUGEINT;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30495,7 +30495,7 @@ positive: for statement with long integer counter and short integer start counte
 positive: for statement with long integer counter and integer start counter
 
 	MODULE Test;
-	VAR i: LONGINT; s: INTEGER;
+	VAR i: LONGINT; s: SIGNED16;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30523,7 +30523,7 @@ positive: for statement with huge integer counter and short integer start counte
 positive: for statement with huge integer counter and integer start counter
 
 	MODULE Test;
-	VAR i: HUGEINT; s: INTEGER;
+	VAR i: HUGEINT; s: SIGNED16;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30551,7 +30551,7 @@ positive: for statement with short integer counter and short integer end counter
 negative: for statement with short integer counter and integer end counter
 
 	MODULE Test;
-	VAR i: SIGNED8; e: INTEGER;
+	VAR i: SIGNED8; e: SIGNED16;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30572,28 +30572,28 @@ negative: for statement with short integer counter and huge integer end counter
 positive: for statement with integer counter and short integer end counter
 
 	MODULE Test;
-	VAR i: INTEGER; e: SIGNED8;
+	VAR i: SIGNED16; e: SIGNED8;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 positive: for statement with integer counter and integer end counter
 
 	MODULE Test;
-	VAR i, e: INTEGER;
+	VAR i, e: SIGNED16;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 negative: for statement with integer counter and long integer end counter
 
 	MODULE Test;
-	VAR i: INTEGER; e: LONGINT;
+	VAR i: SIGNED16; e: LONGINT;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 negative: for statement with integer counter and huge integer end counter
 
 	MODULE Test;
-	VAR i: INTEGER; e: HUGEINT;
+	VAR i: SIGNED16; e: HUGEINT;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30607,7 +30607,7 @@ positive: for statement with long integer counter and short integer end counter
 positive: for statement with long integer counter and integer end counter
 
 	MODULE Test;
-	VAR i: LONGINT; e: INTEGER;
+	VAR i: LONGINT; e: SIGNED16;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30635,7 +30635,7 @@ positive: for statement with huge integer counter and short integer end counter
 positive: for statement with huge integer counter and integer end counter
 
 	MODULE Test;
-	VAR i: HUGEINT; e: INTEGER;
+	VAR i: HUGEINT; e: SIGNED16;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30687,7 +30687,7 @@ positive: return statement without value in object body
 positive: return statement with value in procedure with return type
 
 	MODULE Test;
-	PROCEDURE Procedure (): INTEGER;
+	PROCEDURE Procedure (): SIGNED16;
 	BEGIN RETURN 0
 	END Procedure;
 	END Test.
@@ -30695,7 +30695,7 @@ positive: return statement with value in procedure with return type
 negative: return statement without value in procedure with return type
 
 	MODULE Test;
-	PROCEDURE Procedure (): INTEGER;
+	PROCEDURE Procedure (): SIGNED16;
 	BEGIN RETURN
 	END Procedure;
 	END Test.
@@ -30731,7 +30731,7 @@ negative: procedure with boolean as return type returning character
 negative: procedure with boolean as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): BOOLEAN; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): BOOLEAN; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with boolean as return type returning real
@@ -30803,7 +30803,7 @@ positive: procedure with character as return type returning character
 negative: procedure with character as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): CHAR; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): CHAR; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with character as return type returning real
@@ -30881,7 +30881,7 @@ positive: procedure with short integer as return type returning short integer
 negative: procedure with short integer as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): SIGNED8; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning long integer
@@ -30953,91 +30953,91 @@ negative: procedure with short integer as return type returning procedure
 negative: procedure with integer as return type returning boolean
 
 	MODULE Test;
-	PROCEDURE Procedure (value: BOOLEAN): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: BOOLEAN): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning character
 
 	MODULE Test;
-	PROCEDURE Procedure (value: CHAR): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: CHAR): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with integer as return type returning short integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SIGNED8): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED8): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with integer as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning long integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGINT): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: LONGINT): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning huge integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: HUGEINT): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: HUGEINT): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning real
 
 	MODULE Test;
-	PROCEDURE Procedure (value: REAL): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: REAL): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning set
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SET): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SET): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning array
 
 	MODULE Test;
-	PROCEDURE Procedure (value: ARRAY 10 OF CHAR): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: ARRAY 10 OF CHAR): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning record
 
 	MODULE Test;
-	PROCEDURE Procedure (value: RECORD END): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: RECORD END): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning object
 
 	MODULE Test;
-	PROCEDURE Procedure (value: OBJECT END): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: OBJECT END): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning base object
 
 	MODULE Test;
-	PROCEDURE Procedure (value: OBJECT): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: OBJECT): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning pointer to array
 
 	MODULE Test;
-	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning pointer to record
 
 	MODULE Test;
-	PROCEDURE Procedure (value: POINTER TO RECORD END): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: POINTER TO RECORD END): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning procedure
 
 	MODULE Test;
-	PROCEDURE Procedure (value: PROCEDURE): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: PROCEDURE): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning boolean
@@ -31061,7 +31061,7 @@ positive: procedure with long integer as return type returning short integer
 positive: procedure with long integer as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): LONGINT; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long integer as return type returning long integer
@@ -31151,7 +31151,7 @@ positive: procedure with huge integer as return type returning short integer
 positive: procedure with huge integer as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): HUGEINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): HUGEINT; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with huge integer as return type returning long integer
@@ -31241,7 +31241,7 @@ positive: procedure with real as return type returning short integer
 positive: procedure with real as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): REAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): REAL; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with real as return type returning long integer
@@ -31337,7 +31337,7 @@ positive: procedure with long real as return type returning short integer
 positive: procedure with long real as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): LONGREAL; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long real as return type returning long integer
@@ -31427,7 +31427,7 @@ negative: procedure with set as return type returning character
 negative: procedure with set as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): SET; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): SET; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with set as return type returning real
@@ -31499,7 +31499,7 @@ negative: procedure with array as return type returning character
 negative: procedure with array as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): ARRAY 10 OF CHAR; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): ARRAY 10 OF CHAR; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with array as return type returning real
@@ -31583,7 +31583,7 @@ negative: procedure with record as return type returning character
 negative: procedure with record as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): RECORD END; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): RECORD END; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with record as return type returning real
@@ -31670,7 +31670,7 @@ negative: procedure with object as return type returning character
 negative: procedure with object as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): OBJECT END; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): OBJECT END; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with object as return type returning real
@@ -31763,7 +31763,7 @@ negative: procedure with base object as return type returning character
 negative: procedure with base object as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): OBJECT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): OBJECT; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with base object as return type returning real
@@ -31841,7 +31841,7 @@ negative: procedure with pointer to array as return type returning character
 negative: procedure with pointer to array as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): POINTER TO ARRAY 10 OF CHAR; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): POINTER TO ARRAY 10 OF CHAR; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with pointer to array as return type returning real
@@ -31925,7 +31925,7 @@ negative: procedure with pointer to record as return type returning character
 negative: procedure with pointer to record as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): POINTER TO RECORD END; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): POINTER TO RECORD END; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with pointer to record as return type returning real
@@ -32018,7 +32018,7 @@ negative: procedure with procedure as return type returning character
 negative: procedure with procedure as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): PROCEDURE; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): PROCEDURE; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with procedure as return type returning real
@@ -32078,7 +32078,7 @@ positive: procedure with procedure as return type returning compatible procedure
 negative: procedure with procedure as return type returning incompatible procedure
 
 	MODULE Test;
-	PROCEDURE Procedure (value: PROCEDURE (value: INTEGER)): PROCEDURE; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: PROCEDURE (value: SIGNED16)): PROCEDURE; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with procedure as return type returning itself
@@ -32238,7 +32238,7 @@ negative: assert statement with condition of type short integer
 negative: assert statement with condition of type integer
 
 	MODULE Test;
-	VAR condition: INTEGER;
+	VAR condition: SIGNED16;
 	BEGIN ASSERT (condition);
 	END Test.
 
@@ -32386,7 +32386,7 @@ negative: assert statement with number of type short integer
 negative: assert statement with number of type integer
 
 	MODULE Test;
-	VAR number: INTEGER;
+	VAR number: SIGNED16;
 	BEGIN ASSERT (TRUE, number);
 	END Test.
 
@@ -32470,7 +32470,7 @@ negative: assert statement with import as number
 negative: assert statement with type as number
 
 	MODULE Test;
-	TYPE number = INTEGER
+	TYPE number = SIGNED16
 	BEGIN ASSERT (TRUE, number);
 	END Test.
 
@@ -32549,7 +32549,7 @@ negative: if statement with condition of type short integer
 negative: if statement with condition of type integer
 
 	MODULE Test;
-	VAR condition: INTEGER;
+	VAR condition: SIGNED16;
 	BEGIN IF condition THEN END;
 	END Test.
 
@@ -32709,7 +32709,7 @@ negative: else if statement with condition of type short integer
 negative: else if statement with condition of type integer
 
 	MODULE Test;
-	VAR condition: INTEGER;
+	VAR condition: SIGNED16;
 	BEGIN IF TRUE THEN ELSIF condition THEN END;
 	END Test.
 
@@ -32860,7 +32860,7 @@ negative: halt statement with number of type short integer
 negative: halt statement with number of type integer
 
 	MODULE Test;
-	VAR number: INTEGER;
+	VAR number: SIGNED16;
 	BEGIN HALT (number);
 	END Test.
 
@@ -32944,7 +32944,7 @@ negative: halt statement with import as number
 negative: halt statement with type as number
 
 	MODULE Test;
-	TYPE number = INTEGER;
+	TYPE number = SIGNED16;
 	BEGIN HALT (number);
 	END Test.
 
@@ -33071,7 +33071,7 @@ positive: case statement with variable short integer value
 positive: case statement with variable integer value
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 10: END
 	END Test.
 
@@ -33169,7 +33169,7 @@ negative: case statement with import value
 negative: case statement with type value
 
 	MODULE Test;
-	TYPE value = INTEGER;
+	TYPE value = SIGNED16;
 	BEGIN CASE value OF value: END
 	END Test.
 
@@ -33274,7 +33274,7 @@ negative: character case statement with variable short integer case
 negative: character case statement with variable integer case
 
 	MODULE Test;
-	VAR value: CHAR; case: INTEGER;
+	VAR value: CHAR; case: SIGNED16;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33373,7 +33373,7 @@ negative: character case statement with import case
 negative: character case statement with type as case
 
 	MODULE Test;
-	TYPE case = INTEGER;
+	TYPE case = SIGNED16;
 	VAR value: CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
@@ -33479,7 +33479,7 @@ negative: short integer case statement with variable short integer case
 negative: short integer case statement with variable integer case
 
 	MODULE Test;
-	VAR value: SIGNED8; case: INTEGER;
+	VAR value: SIGNED8; case: SIGNED16;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33577,210 +33577,210 @@ negative: short integer case statement with import case
 negative: short integer case statement with type as case
 
 	MODULE Test;
-	TYPE case = INTEGER; VAR value: case;
+	TYPE case = SIGNED16; VAR value: case;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with constant boolean case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF TRUE: END
 	END Test.
 
 negative: integer case statement with constant character case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 'a': END
 	END Test.
 
 positive: integer case statement with constant short integer case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 10H: END
 	END Test.
 
 positive: integer case statement with constant integer case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 1000H: END
 	END Test.
 
 negative: integer case statement with constant long integer case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 100000H: END
 	END Test.
 
 negative: integer case statement with constant huge integer case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 100000000H: END
 	END Test.
 
 negative: integer case statement with constant real case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 1.0: END
 	END Test.
 
 negative: integer case statement with constant long real case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 1.D0: END
 	END Test.
 
 negative: integer case statement with constant set case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF {}: END
 	END Test.
 
 negative: integer case statement with constant string case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF "value": END
 	END Test.
 
 negative: integer case statement with nil pointer case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF NIL: END
 	END Test.
 
 negative: integer case statement variable boolean case
 
 	MODULE Test;
-	VAR value: INTEGER; case: BOOLEAN;
+	VAR value: SIGNED16; case: BOOLEAN;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable character case
 
 	MODULE Test;
-	VAR value: INTEGER; case: CHAR;
+	VAR value: SIGNED16; case: CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable short integer case
 
 	MODULE Test;
-	VAR value: INTEGER; case: SIGNED8;
+	VAR value: SIGNED16; case: SIGNED8;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable integer case
 
 	MODULE Test;
-	VAR value, case: INTEGER;
+	VAR value, case: SIGNED16;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable long integer case
 
 	MODULE Test;
-	VAR value: INTEGER; case: LONGINT;
+	VAR value: SIGNED16; case: LONGINT;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable huge integer case
 
 	MODULE Test;
-	VAR value: INTEGER; case: HUGEINT;
+	VAR value: SIGNED16; case: HUGEINT;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable real case
 
 	MODULE Test;
-	VAR value: INTEGER; case: REAL;
+	VAR value: SIGNED16; case: REAL;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable long real case
 
 	MODULE Test;
-	VAR value: INTEGER; case: LONGREAL;
+	VAR value: SIGNED16; case: LONGREAL;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable set case
 
 	MODULE Test;
-	VAR value: INTEGER; case: SET;
+	VAR value: SIGNED16; case: SET;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable array case
 
 	MODULE Test;
-	VAR value: INTEGER; case: ARRAY 10 OF CHAR;
+	VAR value: SIGNED16; case: ARRAY 10 OF CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable record case
 
 	MODULE Test;
-	VAR value: INTEGER; case: RECORD END;
+	VAR value: SIGNED16; case: RECORD END;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable object case
 
 	MODULE Test;
-	VAR value: INTEGER; case: OBJECT END;
+	VAR value: SIGNED16; case: OBJECT END;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable base object case
 
 	MODULE Test;
-	VAR value: INTEGER; case: OBJECT;
+	VAR value: SIGNED16; case: OBJECT;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable pointer to record case
 
 	MODULE Test;
-	VAR value: INTEGER; case: POINTER TO RECORD END;
+	VAR value: SIGNED16; case: POINTER TO RECORD END;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable pointer to array case
 
 	MODULE Test;
-	VAR value: INTEGER; case: POINTER TO ARRAY OF CHAR;
+	VAR value: SIGNED16; case: POINTER TO ARRAY OF CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with variable procedure case
 
 	MODULE Test;
-	VAR value: INTEGER; case: PROCEDURE;
+	VAR value: SIGNED16; case: PROCEDURE;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with import case
 
 	MODULE Test;
-	IMPORT case := Dummy; VAR value: INTEGER;
+	IMPORT case := Dummy; VAR value: SIGNED16;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: integer case statement with type as case
 
 	MODULE Test;
-	TYPE case = INTEGER; VAR value: case;
+	TYPE case = SIGNED16; VAR value: case;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33885,7 +33885,7 @@ negative: long integer case statement with variable short integer case
 negative: long integer case statement with variable integer case
 
 	MODULE Test;
-	VAR value: LONGINT; case: INTEGER;
+	VAR value: LONGINT; case: SIGNED16;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -34088,7 +34088,7 @@ negative: huge integer case statement with variable short integer case
 negative: huge integer case statement with variable integer case
 
 	MODULE Test;
-	VAR value: HUGEINT; case: INTEGER;
+	VAR value: HUGEINT; case: SIGNED16;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -34263,91 +34263,91 @@ positive: nested character case statement
 positive: integer case statement with negative case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF -10: END;
 	END Test.
 
 positive: integer case statement with zero case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 0: END;
 	END Test.
 
 positive: integer case statement with positive case
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 10: END;
 	END Test.
 
 positive: integer case statement with multiple case range
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 0..10, 11..20: END;
 	END Test.
 
 positive: integer case statement with empty case range
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 10..10: END;
 	END Test.
 
 negative: integer case statement with invalid case range
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 10..0: END;
 	END Test.
 
 negative: integer case statement with duplicated cases within same label
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 10, 10: END;
 	END Test.
 
 negative: integer case statement with duplicated case ranges within same label
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 0..10, 10..20: END;
 	END Test.
 
 negative: integer case statement with duplicated cases within different label
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 10: | 10: END;
 	END Test.
 
 negative: integer case statement with duplicated case ranges within different label
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 0..10: | 10..20: END;
 	END Test.
 
 positive: integer case statement with ascending cases
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 0..5, 6, 7..7, 8, 9: | 10..20, 21: | 22, 23..29, 30: END;
 	END Test.
 
 positive: integer case statement with descending cases
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 30, 23..29, 22: | 21, 10..20: | 0..5, 6, 7..7, 8, 9: END;
 	END Test.
 
 positive: nested integer case statement
 
 	MODULE Test;
-	VAR value: INTEGER;
+	VAR value: SIGNED16;
 	BEGIN CASE value OF 0..10: CASE value OF 0..10: END END;
 	END Test.
 
@@ -34413,13 +34413,13 @@ negative: with statement with indirect constant character value type
 negative: with statement with constant integer value
 
 	MODULE Test;
-	BEGIN WITH 0 : INTEGER DO END;
+	BEGIN WITH 0 : SIGNED16 DO END;
 	END Test.
 
 negative: with statement with constant integer value type
 
 	MODULE Test;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	BEGIN WITH 0 : Type DO END;
 	END Test.
 
@@ -34427,14 +34427,14 @@ negative: with statement with indirect constant integer value
 
 	MODULE Test;
 	CONST Constant = 0;
-	BEGIN WITH Constant : INTEGER DO END;
+	BEGIN WITH Constant : SIGNED16 DO END;
 	END Test.
 
 negative: with statement with indirect constant integer value type
 
 	MODULE Test;
 	CONST Constant = 0;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	BEGIN WITH Constant : Type DO END;
 	END Test.
 
@@ -34599,14 +34599,14 @@ negative: with statement with variable short integer value type
 negative: with statement with variable integer value
 
 	MODULE Test;
-	VAR value: INTEGER;
-	BEGIN WITH value : INTEGER DO END;
+	VAR value: SIGNED16;
+	BEGIN WITH value : SIGNED16 DO END;
 	END Test.
 
 negative: with statement with variable integer value type
 
 	MODULE Test;
-	TYPE Type = INTEGER;
+	TYPE Type = SIGNED16;
 	VAR value: Type;
 	BEGIN WITH value : Type DO END;
 	END Test.
@@ -35133,7 +35133,7 @@ negative: new statement on character
 negative: new statement on integer
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN NEW (integer);
 	END Test.
 
@@ -35235,7 +35235,7 @@ negative: new statement on object with complex initializer and no argument
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		PROCEDURE &Initializer (i: INTEGER); END Initializer;
+		PROCEDURE &Initializer (i: SIGNED16); END Initializer;
 	END Object;
 	VAR object: Object;
 	BEGIN NEW (object);
@@ -35245,7 +35245,7 @@ positive: new statement on object with complex initializer and one argument
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		PROCEDURE &Initializer (i: INTEGER); END Initializer;
+		PROCEDURE &Initializer (i: SIGNED16); END Initializer;
 	END Object;
 	VAR object: Object;
 	BEGIN NEW (object, 5);
@@ -35255,7 +35255,7 @@ positive: new statement on object with complex initializer and matching argument
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		PROCEDURE &Initializer (i, j: INTEGER; b: BOOLEAN); END Initializer;
+		PROCEDURE &Initializer (i, j: SIGNED16; b: BOOLEAN); END Initializer;
 	END Object;
 	VAR object: Object;
 	BEGIN NEW (object, 5, 6, TRUE);
@@ -35265,7 +35265,7 @@ negative: new statement on object with complex initializer and incompatible argu
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		PROCEDURE &Initializer (i: INTEGER); END Initializer;
+		PROCEDURE &Initializer (i: SIGNED16); END Initializer;
 	END Object;
 	VAR object: Object;
 	BEGIN NEW (object, TRUE);
@@ -35295,7 +35295,7 @@ negative: new statement on object with complex inherited initializer and no argu
 
 	MODULE Test;
 	TYPE Base = OBJECT
-		PROCEDURE &Initializer (i: INTEGER); END Initializer;
+		PROCEDURE &Initializer (i: SIGNED16); END Initializer;
 	END Base;
 	VAR object: OBJECT (Base) END;
 	BEGIN NEW (object);
@@ -35305,7 +35305,7 @@ positive: new statement on object with complex inherited initializer and one arg
 
 	MODULE Test;
 	TYPE Base = OBJECT
-		PROCEDURE &Initializer (i: INTEGER); END Initializer;
+		PROCEDURE &Initializer (i: SIGNED16); END Initializer;
 	END Base;
 	VAR object: OBJECT (Base) END;
 	BEGIN NEW (object, 5);
@@ -35315,7 +35315,7 @@ positive: new statement on object with complex inherited initializer and matchin
 
 	MODULE Test;
 	TYPE Base = OBJECT
-		PROCEDURE &Initializer(i, j: INTEGER; b: BOOLEAN); END Initializer;
+		PROCEDURE &Initializer(i, j: SIGNED16; b: BOOLEAN); END Initializer;
 	END Base;
 	VAR object: OBJECT (Base) END;
 	BEGIN NEW (object, 5, 6, TRUE);
@@ -35325,7 +35325,7 @@ positive: new statement on object with simple overridden initializer
 
 	MODULE Test;
 	TYPE Base = OBJECT
-		PROCEDURE &InitBase (i: INTEGER); END InitBase;
+		PROCEDURE &InitBase (i: SIGNED16); END InitBase;
 	END Base;
 	TYPE Object = OBJECT (Base)
 		PROCEDURE &InitObject; BEGIN InitBase (5) END InitObject;
@@ -35338,7 +35338,7 @@ negative: new statement on object with simple overridden initializer and one arg
 
 	MODULE Test;
 	TYPE Base = OBJECT
-		PROCEDURE &InitBase (i: INTEGER); END InitBase;
+		PROCEDURE &InitBase (i: SIGNED16); END InitBase;
 	END Base;
 	TYPE Object = OBJECT (Base)
 		PROCEDURE &InitObject; END InitObject;
@@ -35354,7 +35354,7 @@ negative: new statement on object with complex overridden initializer and no arg
 		PROCEDURE &InitBase; END InitBase;
 	END Base;
 	TYPE Object = OBJECT (Base)
-		PROCEDURE &InitObject (i: INTEGER); END InitObject;
+		PROCEDURE &InitObject (i: SIGNED16); END InitObject;
 	END Object;
 	VAR object: Object;
 	BEGIN NEW (object);
@@ -35367,7 +35367,7 @@ positive: new statement on object with complex overridden initializer and one ar
 		PROCEDURE &InitBase; END InitBase;
 	END Base;
 	TYPE Object = OBJECT (Base)
-		PROCEDURE &InitObject (i: INTEGER); BEGIN InitBase END InitObject;
+		PROCEDURE &InitObject (i: SIGNED16); BEGIN InitBase END InitObject;
 	END Object;
 	VAR object: Object;
 	BEGIN NEW (object, 5);
@@ -35380,7 +35380,7 @@ positive: new statement on object with complex overridden initializer and matchi
 		PROCEDURE &InitBase (r: REAL; s: SET); END InitBase;
 	END Base;
 	TYPE Object = OBJECT (Base)
-		PROCEDURE &InitObject (i, j: INTEGER; b: BOOLEAN); BEGIN InitBase (0, {}) END InitObject;
+		PROCEDURE &InitObject (i, j: SIGNED16; b: BOOLEAN); BEGIN InitBase (0, {}) END InitObject;
 	END Object;
 	VAR object: Object;
 	BEGIN NEW (object, 5, 6, TRUE);
@@ -35601,7 +35601,7 @@ positive: increment statement on short integer
 positive: increment statement on integer
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer);
 	END Test.
 
@@ -35622,7 +35622,7 @@ positive: increment statement on huge integer
 positive: increment statement on integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (integer: INTEGER);
+	PROCEDURE Procedure (integer: SIGNED16);
 	BEGIN INC (integer);
 	END Procedure;
 	END Test.
@@ -35630,7 +35630,7 @@ positive: increment statement on integer parameter
 positive: increment statement on variable integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR integer: INTEGER);
+	PROCEDURE Procedure (VAR integer: SIGNED16);
 	BEGIN INC (integer);
 	END Procedure;
 	END Test.
@@ -35638,7 +35638,7 @@ positive: increment statement on variable integer parameter
 negative: increment statement on constant integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST integer: INTEGER);
+	PROCEDURE Procedure (CONST integer: SIGNED16);
 	BEGIN INC (integer);
 	END Procedure;
 	END Test.
@@ -35703,7 +35703,7 @@ negative: increment statement with constant boolean as increment
 
 	MODULE Test;
 	CONST Constant = TRUE;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, Constant);
 	END Test.
 
@@ -35711,7 +35711,7 @@ negative: increment statement with constant character as increment
 
 	MODULE Test;
 	CONST Constant = 'a';
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, Constant);
 	END Test.
 
@@ -35719,28 +35719,28 @@ positive: increment statement with constant integer as increment
 
 	MODULE Test;
 	CONST Constant = 42;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, Constant);
 	END Test.
 
 positive: increment statement with constant negative integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, -5);
 	END Test.
 
 positive: increment statement with zero as increment
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, 0);
 	END Test.
 
 positive: increment statement with constant positive integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, 5);
 	END Test.
 
@@ -35748,7 +35748,7 @@ negative: increment statement with constant real as increment
 
 	MODULE Test;
 	CONST Constant = 0.1;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, Constant);
 	END Test.
 
@@ -35756,7 +35756,7 @@ negative: increment statement with constant set as increment
 
 	MODULE Test;
 	CONST Constant = {};
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, Constant);
 	END Test.
 
@@ -35764,7 +35764,7 @@ negative: increment statement with constant string as increment
 
 	MODULE Test;
 	CONST Constant = "string";
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, Constant);
 	END Test.
 
@@ -35772,21 +35772,21 @@ negative: increment statement with nil pointer as increment
 
 	MODULE Test;
 	CONST Constant = NIL;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, Constant);
 	END Test.
 
 negative: increment statement with boolean as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: BOOLEAN;
+	VAR integer: SIGNED16; increment: BOOLEAN;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement with character as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: CHAR;
+	VAR integer: SIGNED16; increment: CHAR;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35800,7 +35800,7 @@ positive: increment statement on short integer with short integer as increment
 negative: increment statement on short integer with integer as increment
 
 	MODULE Test;
-	VAR integer: SIGNED8; increment: INTEGER;
+	VAR integer: SIGNED8; increment: SIGNED16;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35821,28 +35821,28 @@ negative: increment statement on short integer with huge integer as increment
 positive: increment statement on integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: SIGNED8;
+	VAR integer: SIGNED16; increment: SIGNED8;
 	BEGIN INC (integer, increment);
 	END Test.
 
 positive: increment statement on integer with integer as increment
 
 	MODULE Test;
-	VAR integer, increment: INTEGER;
+	VAR integer, increment: SIGNED16;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement on integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: LONGINT;
+	VAR integer: SIGNED16; increment: LONGINT;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement on integer with huge integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: HUGEINT;
+	VAR integer: SIGNED16; increment: HUGEINT;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35856,7 +35856,7 @@ positive: increment statement on long integer with short integer as increment
 positive: increment statement on long integer with integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: INTEGER;
+	VAR integer: LONGINT; increment: SIGNED16;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35884,7 +35884,7 @@ positive: increment statement on huge integer with short integer as increment
 positive: increment statement on huge integer with integer as increment
 
 	MODULE Test;
-	VAR integer: HUGEINT; increment: INTEGER;
+	VAR integer: HUGEINT; increment: SIGNED16;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35905,8 +35905,8 @@ positive: increment statement on huge integer with huge integer as increment
 positive: increment statement with integer parameter as increment
 
 	MODULE Test;
-	PROCEDURE Procedure (increment: INTEGER);
-	VAR integer: INTEGER;
+	PROCEDURE Procedure (increment: SIGNED16);
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, increment);
 	END Procedure;
 	END Test.
@@ -35914,8 +35914,8 @@ positive: increment statement with integer parameter as increment
 positive: increment statement with variable integer parameter as increment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR increment: INTEGER);
-	VAR integer: INTEGER;
+	PROCEDURE Procedure (VAR increment: SIGNED16);
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, increment);
 	END Procedure;
 	END Test.
@@ -35923,8 +35923,8 @@ positive: increment statement with variable integer parameter as increment
 positive: increment statement with constant integer parameter as increment
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST increment: INTEGER);
-	VAR integer: INTEGER;
+	PROCEDURE Procedure (CONST increment: SIGNED16);
+	VAR integer: SIGNED16;
 	BEGIN INC (integer, increment);
 	END Procedure;
 	END Test.
@@ -35932,56 +35932,56 @@ positive: increment statement with constant integer parameter as increment
 negative: increment statement with real as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: REAL;
+	VAR integer: SIGNED16; increment: REAL;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement with set as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: SET;
+	VAR integer: SIGNED16; increment: SET;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement with array as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: ARRAY 10 OF CHAR;
+	VAR integer: SIGNED16; increment: ARRAY 10 OF CHAR;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement with record as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: RECORD END;
+	VAR integer: SIGNED16; increment: RECORD END;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement with object as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: OBJECT END;
+	VAR integer: SIGNED16; increment: OBJECT END;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement with pointer to array as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: POINTER TO ARRAY 10 OF CHAR;
+	VAR integer: SIGNED16; increment: POINTER TO ARRAY 10 OF CHAR;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement with pointer to record as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: POINTER TO ARRAY 10 OF CHAR;
+	VAR integer: SIGNED16; increment: POINTER TO ARRAY 10 OF CHAR;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement with procedure as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: PROCEDURE;
+	VAR integer: SIGNED16; increment: PROCEDURE;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -36061,7 +36061,7 @@ positive: decrement statement on short integer
 positive: decrement statement on integer
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer);
 	END Test.
 
@@ -36082,7 +36082,7 @@ positive: decrement statement on huge integer
 positive: decrement statement on integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (integer: INTEGER);
+	PROCEDURE Procedure (integer: SIGNED16);
 	BEGIN DEC (integer);
 	END Procedure;
 	END Test.
@@ -36090,7 +36090,7 @@ positive: decrement statement on integer parameter
 positive: decrement statement on variable integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR integer: INTEGER);
+	PROCEDURE Procedure (VAR integer: SIGNED16);
 	BEGIN DEC (integer);
 	END Procedure;
 	END Test.
@@ -36098,7 +36098,7 @@ positive: decrement statement on variable integer parameter
 negative: decrement statement on constant integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST integer: INTEGER);
+	PROCEDURE Procedure (CONST integer: SIGNED16);
 	BEGIN DEC (integer);
 	END Procedure;
 	END Test.
@@ -36163,7 +36163,7 @@ negative: decrement statement with constant boolean as increment
 
 	MODULE Test;
 	CONST Constant = TRUE;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, Constant);
 	END Test.
 
@@ -36171,7 +36171,7 @@ negative: decrement statement with constant character as increment
 
 	MODULE Test;
 	CONST Constant = 'a';
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, Constant);
 	END Test.
 
@@ -36179,28 +36179,28 @@ positive: decrement statement with constant integer as increment
 
 	MODULE Test;
 	CONST Constant = 42;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, Constant);
 	END Test.
 
 positive: decrement statement with constant negative integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, -5);
 	END Test.
 
 positive: decrement statement with zero as increment
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, 0);
 	END Test.
 
 positive: decrement statement with constant positive integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, 5);
 	END Test.
 
@@ -36208,7 +36208,7 @@ negative: decrement statement with constant real as increment
 
 	MODULE Test;
 	CONST Constant = 0.1;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, Constant);
 	END Test.
 
@@ -36216,7 +36216,7 @@ negative: decrement statement with constant set as increment
 
 	MODULE Test;
 	CONST Constant = {};
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, Constant);
 	END Test.
 
@@ -36224,7 +36224,7 @@ negative: decrement statement with constant string as increment
 
 	MODULE Test;
 	CONST Constant = "string";
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, Constant);
 	END Test.
 
@@ -36232,21 +36232,21 @@ negative: decrement statement with nil pointer as increment
 
 	MODULE Test;
 	CONST Constant = NIL;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, Constant);
 	END Test.
 
 negative: decrement statement with boolean as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: BOOLEAN;
+	VAR integer: SIGNED16; increment: BOOLEAN;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement with character as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: CHAR;
+	VAR integer: SIGNED16; increment: CHAR;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36260,7 +36260,7 @@ positive: decrement statement on short integer with short integer as increment
 negative: decrement statement on short integer with integer as increment
 
 	MODULE Test;
-	VAR integer: SIGNED8; increment: INTEGER;
+	VAR integer: SIGNED8; increment: SIGNED16;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36281,28 +36281,28 @@ negative: decrement statement on short integer with huge integer as increment
 positive: decrement statement on integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: SIGNED8;
+	VAR integer: SIGNED16; increment: SIGNED8;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 positive: decrement statement on integer with integer as increment
 
 	MODULE Test;
-	VAR integer, increment: INTEGER;
+	VAR integer, increment: SIGNED16;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement on integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: LONGINT;
+	VAR integer: SIGNED16; increment: LONGINT;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement on integer with huge integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: HUGEINT;
+	VAR integer: SIGNED16; increment: HUGEINT;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36316,7 +36316,7 @@ positive: decrement statement on long integer with short integer as increment
 positive: decrement statement on long integer with integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: INTEGER;
+	VAR integer: LONGINT; increment: SIGNED16;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36344,7 +36344,7 @@ positive: decrement statement on huge integer with short integer as increment
 positive: decrement statement on huge integer with integer as increment
 
 	MODULE Test;
-	VAR integer: HUGEINT; increment: INTEGER;
+	VAR integer: HUGEINT; increment: SIGNED16;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36365,8 +36365,8 @@ positive: decrement statement on huge integer with huge integer as increment
 positive: decrement statement with integer parameter as increment
 
 	MODULE Test;
-	PROCEDURE Procedure (increment: INTEGER);
-	VAR integer: INTEGER;
+	PROCEDURE Procedure (increment: SIGNED16);
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, increment);
 	END Procedure;
 	END Test.
@@ -36374,8 +36374,8 @@ positive: decrement statement with integer parameter as increment
 positive: decrement statement with variable integer parameter as increment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR increment: INTEGER);
-	VAR integer: INTEGER;
+	PROCEDURE Procedure (VAR increment: SIGNED16);
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, increment);
 	END Procedure;
 	END Test.
@@ -36383,8 +36383,8 @@ positive: decrement statement with variable integer parameter as increment
 positive: decrement statement with constant integer parameter as increment
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST increment: INTEGER);
-	VAR integer: INTEGER;
+	PROCEDURE Procedure (CONST increment: SIGNED16);
+	VAR integer: SIGNED16;
 	BEGIN DEC (integer, increment);
 	END Procedure;
 	END Test.
@@ -36392,56 +36392,56 @@ positive: decrement statement with constant integer parameter as increment
 negative: decrement statement with real as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: REAL;
+	VAR integer: SIGNED16; increment: REAL;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement with set as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: SET;
+	VAR integer: SIGNED16; increment: SET;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement with array as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: ARRAY 10 OF CHAR;
+	VAR integer: SIGNED16; increment: ARRAY 10 OF CHAR;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement with record as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: RECORD END;
+	VAR integer: SIGNED16; increment: RECORD END;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement with object as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: OBJECT END;
+	VAR integer: SIGNED16; increment: OBJECT END;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement with pointer to array as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: POINTER TO ARRAY 10 OF CHAR;
+	VAR integer: SIGNED16; increment: POINTER TO ARRAY 10 OF CHAR;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement with pointer to record as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: POINTER TO ARRAY 10 OF CHAR;
+	VAR integer: SIGNED16; increment: POINTER TO ARRAY 10 OF CHAR;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement with procedure as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: PROCEDURE;
+	VAR integer: SIGNED16; increment: PROCEDURE;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36514,7 +36514,7 @@ negative: include statement on character
 negative: include statement on integer
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN INCL (integer, 0);
 	END Test.
 
@@ -36594,7 +36594,7 @@ negative: include statement on constant set parameter
 positive: include statement on set with integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (integer: INTEGER);
+	PROCEDURE Procedure (integer: SIGNED16);
 	VAR set: SET;
 	BEGIN INCL (set, integer);
 	END Procedure;
@@ -36603,7 +36603,7 @@ positive: include statement on set with integer parameter
 positive: include statement on set with variable integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR integer: INTEGER);
+	PROCEDURE Procedure (VAR integer: SIGNED16);
 	VAR set: SET;
 	BEGIN INCL (set, integer);
 	END Procedure;
@@ -36612,7 +36612,7 @@ positive: include statement on set with variable integer parameter
 positive: include statement on set with constant integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST integer: INTEGER);
+	PROCEDURE Procedure (CONST integer: SIGNED16);
 	VAR set: SET;
 	BEGIN INCL (set, integer);
 	END Procedure;
@@ -36670,7 +36670,7 @@ positive: include statement on set with short integer
 positive: include statement on set with integer
 
 	MODULE Test;
-	VAR set: SET; integer: INTEGER;
+	VAR set: SET; integer: SIGNED16;
 	BEGIN INCL (set, integer);
 	END Test.
 
@@ -36806,7 +36806,7 @@ negative: exclude statement on character
 negative: exclude statement on integer
 
 	MODULE Test;
-	VAR integer: INTEGER;
+	VAR integer: SIGNED16;
 	BEGIN EXCL (integer, 0);
 	END Test.
 
@@ -36886,7 +36886,7 @@ negative: exclude statement on constant set parameter
 positive: exclude statement on set with integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (integer: INTEGER);
+	PROCEDURE Procedure (integer: SIGNED16);
 	VAR set: SET;
 	BEGIN EXCL (set, integer);
 	END Procedure;
@@ -36895,7 +36895,7 @@ positive: exclude statement on set with integer parameter
 positive: exclude statement on set with variable integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR integer: INTEGER);
+	PROCEDURE Procedure (VAR integer: SIGNED16);
 	VAR set: SET;
 	BEGIN EXCL (set, integer);
 	END Procedure;
@@ -36904,7 +36904,7 @@ positive: exclude statement on set with variable integer parameter
 positive: exclude statement on set with constant integer parameter
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST integer: INTEGER);
+	PROCEDURE Procedure (CONST integer: SIGNED16);
 	VAR set: SET;
 	BEGIN EXCL (set, integer);
 	END Procedure;
@@ -36962,7 +36962,7 @@ positive: exclude statement on set with short integer
 positive: exclude statement on set with integer
 
 	MODULE Test;
-	VAR set: SET; integer: INTEGER;
+	VAR set: SET; integer: SIGNED16;
 	BEGIN EXCL (set, integer);
 	END Test.
 
@@ -37049,7 +37049,7 @@ negative: copy statement on character
 negative: copy statement on integer
 
 	MODULE Test;
-	VAR source, dest: INTEGER;
+	VAR source, dest: SIGNED16;
 	BEGIN COPY (source, dest);
 	END Test.
 
@@ -37278,7 +37278,7 @@ negative: copy statement with string as source and open constant array of charac
 negative: copy statement on array of integer
 
 	MODULE Test;
-	VAR source, dest: ARRAY 10 OF INTEGER;
+	VAR source, dest: ARRAY 10 OF SIGNED16;
 	BEGIN COPY (source, dest);
 	END Test.
 
@@ -37799,12 +37799,12 @@ positive: signature matching extension of object
 	MODULE Test;
 	TYPE O=OBJECT
 			PROCEDURE P; END P;
-			PROCEDURE Q(i: INTEGER); END Q;
+			PROCEDURE Q(i: SIGNED16); END Q;
 			PROCEDURE R(i: LONGINT): LONGINT; END R;
 		END O;
 	TYPE OO=OBJECT(O);
 			PROCEDURE P; END P;
-			PROCEDURE Q(i: INTEGER); END Q;
+			PROCEDURE Q(i: SIGNED16); END Q;
 			PROCEDURE R(i: LONGINT): LONGINT; END R;
 		END OO;
 	END Test.
@@ -37813,7 +37813,7 @@ negative: extension of objects with nonmatching signature: parameter incompatibl
 
 	MODULE Test;
 	TYPE O=OBJECT
-			PROCEDURE P(i: INTEGER); END P;
+			PROCEDURE P(i: SIGNED16); END P;
 	END O;
 	TYPE OO=OBJECT(O)
 			PROCEDURE P(i: LONGINT); END P;
@@ -37999,7 +37999,7 @@ positive: realtime object containing basic type fields
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE A = OBJECT {REALTIME}
-		VAR a0: CHAR; a1: SIGNED8; a2: INTEGER; a3: LONGINT; a4: HUGEINT; a5: REAL;
+		VAR a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: LONGINT; a4: HUGEINT; a5: REAL;
 			a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END A;
 	END Test.
@@ -38009,7 +38009,7 @@ positive: realtime pointer to record that contains basic type fields
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE A = POINTER {REALTIME} TO RECORD
-		a0: CHAR; a1: SIGNED8; a2: INTEGER; a3: LONGINT; a4: HUGEINT; a5: REAL;
+		a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: LONGINT; a4: HUGEINT; a5: REAL;
 		a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END;
 	END Test.
@@ -38019,7 +38019,7 @@ positive: realtime pointer to array where the elements contain basic type fields
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE A0 = POINTER {REALTIME} TO ARRAY OF RECORD
-		a0: CHAR; a1: SIGNED8; a2: INTEGER; a3: LONGINT; a4: HUGEINT; a5: REAL;
+		a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: LONGINT; a4: HUGEINT; a5: REAL;
 		a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END;
 	END Test.
@@ -38080,7 +38080,7 @@ negative: realtime object containing non-realtime object reference
 positive: realtime object containing record variable with realtime fields
 
 	MODULE Test;
-	TYPE A = OBJECT {REALTIME} VAR a: RECORD k: SIGNED8; l: INTEGER; m: A END END A;
+	TYPE A = OBJECT {REALTIME} VAR a: RECORD k: SIGNED8; l: SIGNED16; m: A END END A;
 	END Test.
 
 positive: realtime object containing record variable with realtime pointers
@@ -38119,7 +38119,7 @@ positive: extension of realtime object declared as realtime object
 
 	MODULE Test;
 	TYPE A = OBJECT {REALTIME} VAR a0: CHAR; a1: SET; END A;
-	B = OBJECT {REALTIME} (A) VAR b0: INTEGER; b1: LONGINT; END B;
+	B = OBJECT {REALTIME} (A) VAR b0: SIGNED16; b1: LONGINT; END B;
 	END Test.
 
 positive: variable of realtime pointer to record type
@@ -38138,21 +38138,21 @@ negative: realtime extension of non-realtime object
 
 	MODULE Test;
 	TYPE A = OBJECT VAR a0: CHAR; a1: SET; END A;
-	B = OBJECT {REALTIME} (A) VAR b0: INTEGER; b1: LONGINT; END B;
+	B = OBJECT {REALTIME} (A) VAR b0: SIGNED16; b1: LONGINT; END B;
 	END Test.
 
 negative: non-realtime extension of realtime object
 
 	MODULE Test;
 	TYPE A = OBJECT {REALTIME} VAR a0: CHAR; a1: SET; END A;
-	B = OBJECT (A) VAR b0: INTEGER; b1: LONGINT; END B;
+	B = OBJECT (A) VAR b0: SIGNED16; b1: LONGINT; END B;
 	END Test.
 
 positive: record extensions - both record types are implicit realtime objects
 
 	MODULE Test;
 	TYPE A = RECORD a0: CHAR; a1: SET; END;
-	B = RECORD (A) b0: INTEGER; b1: LONGINT; END;
+	B = RECORD (A) b0: SIGNED16; b1: LONGINT; END;
 	AP = POINTER {REALTIME} TO A;
 	BP = POINTER {REALTIME} TO B;
 	END Test.
@@ -38161,7 +38161,7 @@ negative: record extensions - only base type is realtime object
 
 	MODULE Test;
 	TYPE A = RECORD a0: CHAR; a1: SET; END;
-	B = RECORD (A) b0: INTEGER; b1: ANY; END;
+	B = RECORD (A) b0: SIGNED16; b1: ANY; END;
 	AP = POINTER {REALTIME} TO A;
 	BP = POINTER {REALTIME} TO B;
 	END Test.
@@ -38696,7 +38696,7 @@ positive: system.val
 
 	MODULE Test;
 	IMPORT SYSTEM;
-	VAR a: LONGINT; b: REAL; c: POINTER TO ARRAY OF CHAR; i: INTEGER; ch: CHAR;
+	VAR a: LONGINT; b: REAL; c: POINTER TO ARRAY OF CHAR; i: SIGNED16; ch: CHAR;
 	BEGIN
 		a := SYSTEM.VAL(LONGINT,a);
 		a := SYSTEM.VAL(LONGINT,c);
@@ -38835,7 +38835,7 @@ negative: SYSTEM.TYPECODE with basic type
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE
-		T = INTEGER;
+		T = SIGNED16;
 	VAR
 		a: LONGINT;
 
@@ -39266,7 +39266,7 @@ positive: use string length with different lengths (to check side-effects on len
 		END PutBareName;
 
 		PROCEDURE AddUserToName (VAR thisName : String);
-		VAR pos : INTEGER;
+		VAR pos : SIGNED16;
 		BEGIN
 			IF pos < LEN (thisName)  THEN END;
 		END AddUserToName;
@@ -39308,7 +39308,7 @@ positive: use a value for a the address in SYSTEM.GET
 	VAR adr: ADDRESS;
 	BEGIN
 	adr := 0;
-	SYSTEM.GET (040EH, SYSTEM.VAL (INTEGER, adr));	(* EBDA address *)
+	SYSTEM.GET (040EH, SYSTEM.VAL (SIGNED16, adr));	(* EBDA address *)
 	END P;
 
 	END Test.
@@ -39534,7 +39534,7 @@ positive: tests of MIN and MAX
 	PROCEDURE TestMinMax*();
 	BEGIN
 	    ASSERT(-128 = MIN(SIGNED8)); ASSERT(127 = MAX(SIGNED8));
-	    ASSERT(-32768 = MIN(INTEGER)); ASSERT(32767 = MAX(INTEGER));
+	    ASSERT(-32768 = MIN(SIGNED16)); ASSERT(32767 = MAX(SIGNED16));
 	    ASSERT(-2147483648 = MIN(LONGINT)); ASSERT(2147483647 = MAX(LONGINT));
 	    ASSERT(-9223372036854775807-1 = MIN(HUGEINT)); ASSERT(9223372036854775807 = MAX(HUGEINT));
 

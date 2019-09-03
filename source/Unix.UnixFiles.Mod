@@ -19,7 +19,7 @@ CONST
 	Trace = {};
 	Separator = 0AX;
 VAR
-	tempno: INTEGER;
+	tempno: SIGNED16;
 	openfiles: LONGINT;
 
 	searchPath: ARRAY 1024 OF CHAR;
@@ -412,11 +412,11 @@ TYPE
 				VAR
 					path, filemask: Filename;
 					isPath: BOOLEAN;
-					i, j: INTEGER;  dirName, fileName, fullName, xName: Filename;
+					i, j: SIGNED16;  dirName, fileName, fullName, xName: Filename;
 					checkSet: NameSet;  ent: Unix.Dirent;
 
 					PROCEDURE GetEntryName;
-					VAR i: INTEGER;  adr: ADDRESS;
+					VAR i: SIGNED16;  adr: ADDRESS;
 					BEGIN
 						i := -1;  adr := ADDRESSOF( ent.name );
 						REPEAT  INC( i );  S.GET( adr, fileName[i] );  INC( adr )  UNTIL fileName[i] = 0X
@@ -878,7 +878,7 @@ TYPE
 (*===================================================================*)
 
 	PROCEDURE StripPath*( CONST path: ARRAY OF CHAR;  VAR name: ARRAY OF CHAR );
-	VAR i, p: INTEGER;  c: CHAR;
+	VAR i, p: SIGNED16;  c: CHAR;
 	BEGIN
 		i := 0;  p := 0;
 		REPEAT
@@ -896,7 +896,7 @@ TYPE
 		../aaa  ==>  CWD/../aaa  ==>  . . .
 	*)
 	VAR
-		i, prevNameStart, nameStart: INTEGER;
+		i, prevNameStart, nameStart: SIGNED16;
 		c1, c2, c3: CHAR;
 
 		PROCEDURE prependCWD;
@@ -911,7 +911,7 @@ TYPE
 			i := -1;  prevNameStart := -1;
 		END restart;
 
-		PROCEDURE shift( p0, p1: INTEGER );
+		PROCEDURE shift( p0, p1: SIGNED16 );
 		VAR c: CHAR;
 		BEGIN
 			REPEAT  c := path[p1];  path[p0] := c;  INC( p0 );  INC( p1 )  UNTIL c = 0X;
@@ -948,7 +948,7 @@ TYPE
 	END CleanPath;
 
 
-	PROCEDURE Match( CONST name, pat: ARRAY OF CHAR;  i, j: INTEGER ): BOOLEAN;
+	PROCEDURE Match( CONST name, pat: ARRAY OF CHAR;  i, j: SIGNED16 ): BOOLEAN;
 	BEGIN
 		IF (name[i] = 0X) & (pat[j] = 0X) THEN  RETURN TRUE
 		ELSIF pat[j] # "*" THEN  RETURN (name[i] = pat[j]) & Match( name, pat, i + 1, j + 1 )
@@ -988,7 +988,7 @@ TYPE
 
 
 	PROCEDURE IsFullName( CONST name: ARRAY OF CHAR ): BOOLEAN;
-	VAR i: INTEGER;  ch: CHAR;
+	VAR i: SIGNED16;  ch: CHAR;
 	BEGIN
 		i := 0;  ch := name[0];
 		WHILE (ch # 0X) & (ch # "/") DO  INC( i );  ch := name[i]  END;
@@ -1011,7 +1011,7 @@ TYPE
 
 
 	PROCEDURE ResetBuffers( f: File;  VAR stat: Unix.Status );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		f.fsize := stat.size;
 		IF (f.mtime # stat.mtime.sec) THEN
@@ -1024,7 +1024,7 @@ TYPE
 
 
 	PROCEDURE MakePath( CONST dir, name: ARRAY OF CHAR;  VAR dest: ARRAY OF CHAR );
-	VAR i, j: INTEGER;
+	VAR i, j: SIGNED16;
 	BEGIN
 		i := 0;  j := 0;
 		WHILE dir[i] # 0X DO  dest[i] := dir[i];  INC( i )  END;
@@ -1074,7 +1074,7 @@ TYPE
 
 
 	PROCEDURE Initialize;
-	VAR a: ADDRESS;  i: INTEGER;  ch: CHAR;
+	VAR a: ADDRESS;  i: SIGNED16;  ch: CHAR;
 	BEGIN
 		(* get current working directory *)
 		a := Unix.getenv( ADDRESSOF( "PWD" ) );

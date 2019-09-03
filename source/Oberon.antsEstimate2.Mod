@@ -41,7 +41,7 @@ VAR
 	lasttime: LONGINT;
 
 	PROCEDURE Handler*( o: Objects.Object;  VAR M: Objects.ObjMsg );
-	VAR version: INTEGER;  objsub: Objects.Object;
+	VAR version: SIGNED16;  objsub: Objects.Object;
 	BEGIN
 		WITH o: tClass DO
 			IF M IS Objects.AttrMsg THEN

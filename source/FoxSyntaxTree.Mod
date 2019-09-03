@@ -900,7 +900,7 @@ TYPE
 
 	END NumberType;
 
-	(** <<SIGNED8, INTEGER, LONGINT, HUGEINT>>
+	(** <<SIGNED8, SIGNED16, LONGINT, HUGEINT>>
 		integer types
 	**)
 	IntegerType*= OBJECT (NumberType)

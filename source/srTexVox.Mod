@@ -28,7 +28,7 @@ VAR
 	X,Y: SREAL;
 	r,g,b: SREAL;
 	a, lx, ly: SREAL;
-	nx, ny, nz: INTEGER;
+	nx, ny, nz: SIGNED16;
 	dot: SREAL;
 	inside: BOOLEAN;
 BEGIN
@@ -94,7 +94,7 @@ VAR
 	r,g,b: SREAL;
 	dr,dg,db: SREAL;
 	lx, ly: SREAL;
-	nx, ny, nz: INTEGER;
+	nx, ny, nz: SIGNED16;
 	dot: SREAL;
 	inside: BOOLEAN;
 BEGIN
@@ -152,7 +152,7 @@ VAR
 	copy : Raster.Mode;
 	w,h, bpr,adr: SIZE;
 	transparent: BOOLEAN;
-	off: INTEGER;
+	off: SIGNED16;
 
 PROCEDURE & init*(n: Name);
 BEGIN
@@ -168,7 +168,7 @@ VAR
 	x,y: SIZE;
 	r,g,b: SREAL;
 	lx, ly: SREAL;
-	nx, ny, nz: INTEGER;
+	nx, ny, nz: SIGNED16;
 	dot: SREAL;
 	inside: BOOLEAN;
 BEGIN
@@ -221,7 +221,7 @@ VAR
 	copy : Raster.Mode;
 	w,h, bpr,adr: SIZE;
 	done: BOOLEAN;
-	off: INTEGER;
+	off: SIGNED16;
 
 PROCEDURE & init*(n,m: Name);
 BEGIN
@@ -266,7 +266,7 @@ END Shade;
 
 PROCEDURE tick*;
 BEGIN
-	off := INTEGER((off+1) MOD w);
+	off := SIGNED16((off+1) MOD w);
 END tick;
 
 END interfereVox;
@@ -337,7 +337,7 @@ PROCEDURE Shade*(VAR ray: Ray);
 VAR
 	x,y,z, th,ph,r2, radius, r,g,b: SREAL;
 	ax, ay, az, bx, by, bz : SREAL;
-	i: INTEGER;
+	i: SIGNED16;
 	p: Raster.Pixel;
 	X,Y: SIZE;
 BEGIN

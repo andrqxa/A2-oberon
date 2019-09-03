@@ -47,14 +47,14 @@ CONST
 TYPE
 	Rider* = OBJECT
 	VAR R*: Files.Rider;
-		type*: INTEGER;
+		type*: SIGNED16;
 
 		reverse*: BOOLEAN;
 		ignoreNL*, noExponent*: BOOLEAN;   (** skip new line characters before reading a line *)
 		eot*, err*: BOOLEAN;
 		nextCh: CHAR;   (** Character immediately following the last symbol scanned. *)
 		line*: LONGINT;   (** # carriage returns scanned so far. *)
-		class: INTEGER;   (** Scan result: Int, Real, String etc. *)
+		class: SIGNED16;   (** Scan result: Int, Real, String etc. *)
 		i: LONGINT;
 		x: REAL;
 		y: LONGREAL;
@@ -98,7 +98,7 @@ TYPE
 			SELF.eot := SELF.R.eof
 		END ReadBytes;
 
-		PROCEDURE  (* VAR R: Rider*) ReadInt*( VAR x: INTEGER );
+		PROCEDURE  (* VAR R: Rider*) ReadInt*( VAR x: SIGNED16 );
 		BEGIN
 			CASE SELF.type OF
 			bin:  BinReadInt( SELF, x )
@@ -107,7 +107,7 @@ TYPE
 			END
 		END ReadInt;
 
-		PROCEDURE  (* VAR R: Rider*) ReadIntsFix*( VAR x: ARRAY OF INTEGER;  num: LONGINT );
+		PROCEDURE  (* VAR R: Rider*) ReadIntsFix*( VAR x: ARRAY OF SIGNED16;  num: LONGINT );
 		VAR i: LONGINT;
 		BEGIN
 			i := 0;
@@ -115,7 +115,7 @@ TYPE
 		END ReadIntsFix;
 
 		PROCEDURE  (* VAR R: Rider*) ReadIntsLine*( VAR x: vyIntVec.tVector );
-		VAR num: LONGINT;  val: INTEGER;
+		VAR num: LONGINT;  val: SIGNED16;
 		BEGIN
 			IF x = NIL THEN x := vyIntVec.New( 0 ) ELSE vyIntVec.SetLen( x, 0 ) END;
 			StartReading( SELF );  num := 0;
@@ -251,7 +251,7 @@ END ReadLn;
 			Files.WriteBytes( SELF.R, ch, num )
 		END WriteBytes;
 
-		PROCEDURE  (* VAR R: Rider*) WriteInt*( x: INTEGER );
+		PROCEDURE  (* VAR R: Rider*) WriteInt*( x: SIGNED16 );
 		BEGIN
 			CASE SELF.type OF
 			bin:  BinWriteInt( SELF, x )
@@ -269,7 +269,7 @@ END ReadLn;
 			END
 		END WriteEmptyLine;
 
-		PROCEDURE  (* VAR R: Rider*) WriteIntsFix*( VAR x: ARRAY OF INTEGER;  num: LONGINT );
+		PROCEDURE  (* VAR R: Rider*) WriteIntsFix*( VAR x: ARRAY OF SIGNED16;  num: LONGINT );
 		VAR i: LONGINT;
 		BEGIN
 			i := 0;
@@ -382,7 +382,7 @@ END ReadLn;
 			Files.Set( SELF.R, Files.Base( SELF.R ), pos )
 		END SetPos;
 
-		PROCEDURE  (* VAR R: Rider*) Set*( type: INTEGER );
+		PROCEDURE  (* VAR R: Rider*) Set*( type: SIGNED16 );
 		BEGIN
 			aM.dSI( "antsFiles: SetRider to type", type );  SELF.type := type;  SELF.scanneropen := FALSE
 		END Set;
@@ -522,7 +522,7 @@ VAR
 		REPEAT DEC( i );  W.Write( a[i] ) UNTIL i = 0
 	END WriteInt;
 
-	PROCEDURE AsciiWriteInt( W: Rider;  x: INTEGER );
+	PROCEDURE AsciiWriteInt( W: Rider;  x: SIGNED16 );
 	BEGIN
 		WriteInt( W, x, 0 );  W.Write( TAB )
 	END AsciiWriteInt;
@@ -930,21 +930,21 @@ D the fixed exponent (printed only when D # 0). *)
 		RETURN ((c = CR) OR (c = LF) OR (c = TAB) OR (c = " "))
 	END WhiteSpace;
 
-	PROCEDURE AsciiReadInt( R: Rider;  VAR x: INTEGER );   (* Read Integer Value ignoring Names *)
+	PROCEDURE AsciiReadInt( R: Rider;  VAR x: SIGNED16 );   (* Read Integer Value ignoring Names *)
 	VAR pos: LONGINT;
 	BEGIN
 		pos := R.Pos();  Scan( R );
 		WHILE (R.class = Texts.Name) & (~R.eot) DO Scan( R ) END;
 		IF R.class = Texts.Int THEN
-			IF R.i > MAX( INTEGER ) THEN HALT( 100 )
-			ELSIF R.i < MIN( INTEGER ) THEN HALT( 101 )
+			IF R.i > MAX( SIGNED16 ) THEN HALT( 100 )
+			ELSIF R.i < MIN( SIGNED16 ) THEN HALT( 101 )
 			END;
 			x := SHORT( R.i )
 		ELSE R.err := TRUE;  R.SetPos( pos )
 		END
 	END AsciiReadInt;
 
-	PROCEDURE BinReadInt( R: Rider;  VAR x: INTEGER );   (* Read Integer Value ignoring Names *)
+	PROCEDURE BinReadInt( R: Rider;  VAR x: SIGNED16 );   (* Read Integer Value ignoring Names *)
 	BEGIN
 		R.ReadBytes( x, 2 )
 	END BinReadInt;
@@ -1029,7 +1029,7 @@ D the fixed exponent (printed only when D # 0). *)
 		FOR i := 0 TO ((num - 1) DIV 2) DO c := ch[i];  ch[i] := ch[num - 1 - i];  ch[num - 1 - i] := c END
 	END Turn;
 
-	PROCEDURE BinWriteInt( R: Rider;  x: INTEGER );
+	PROCEDURE BinWriteInt( R: Rider;  x: SIGNED16 );
 	BEGIN
 		R.WriteBytes( x, 2 )
 	END BinWriteInt;
@@ -1055,7 +1055,7 @@ D the fixed exponent (printed only when D # 0). *)
 	END BinWriteString;
 
 	PROCEDURE ReadDocHeader( VAR R: Files.Rider;  VAR ch: CHAR );
-	VAR len: LONGINT;  x, y, w, h: INTEGER;
+	VAR len: LONGINT;  x, y, w, h: SIGNED16;
 		name: ARRAY 32 OF CHAR;
 	BEGIN
 		Files.Read( R, ch );

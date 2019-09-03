@@ -136,23 +136,23 @@ TYPE
 	ModDesc* = RECORD (ObjDesc)
 		publics*: Object;
 		directImp*: BOOLEAN;
-		nofimp: INTEGER;
+		nofimp: SIGNED16;
 		import: ModArr;
-		nofstr: INTEGER;
+		nofstr: SIGNED16;
 		struct: StructArr;
-		nofreimp: INTEGER;
+		nofreimp: SIGNED16;
 		reimp: StructArr;
 	END;
 
 	StrDesc* = RECORD
 		form*, comp*, extlev*: SIGNED8;
 		mno*: LONGINT;
-		ref*: INTEGER;
+		ref*: SIGNED16;
 		align*, sysflag*: SIGNED8;
 		rectest*, n*, size*, tdadr*, offset*, txtpos*, txtpos2*: LONGINT;
 		BaseTyp*: Struct;
 		link*, strobj*: Object;
-		fpdone*, sref*, oref*: INTEGER;
+		fpdone*, sref*, oref*: SIGNED16;
 		pvused*, pbused*: BOOLEAN;
 		fp*, pvfp*, pbfp*: LONGINT;
 		incomplete*: BOOLEAN;   (* structure not checked for consistency *)
@@ -179,7 +179,7 @@ VAR
 
 	SYSimported*: BOOLEAN;
 	nofmod*: LONGINT;  modules*: ModArr;   (*global for each module being compiled*)
-	nofemod: SIGNED8;  emodules: ModArr;  modNo*: INTEGER;   (*global for each module being compiled*)
+	nofemod: SIGNED8;  emodules: ModArr;  modNo*: SIGNED16;   (*global for each module being compiled*)
 	universe, syslink: Object;
 
 	strucForm: ARRAY (* SFtypProcTyp*) SFtypEnhArray (*fof*)  + 1 OF SIGNED8;   (*forms of structures*)
@@ -190,17 +190,17 @@ VAR
 
 	export: BOOLEAN;
 	exp: ARRAY Operator + 1 OF Object;
-	nofstruc: INTEGER;  newSF, extSF, symNew, symExtended, sfpresent, impSelf, expGlobal: BOOLEAN;  typSize*: PROCEDURE ( typ: Struct;
+	nofstruc: SIGNED16;  newSF, extSF, symNew, symExtended, sfpresent, impSelf, expGlobal: BOOLEAN;  typSize*: PROCEDURE ( typ: Struct;
 																																										    allocDesc: BOOLEAN );
 	ToBeFixed*: Struct;
 
-	PROCEDURE err( n: INTEGER );
+	PROCEDURE err( n: SIGNED16 );
 	BEGIN
 		OPM.err( n )
 	END err;
 
 	PROCEDURE Close*;   (* garbage collection *)
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		topScope := NIL;  objects := NIL;  i := 0;
 		WHILE i < LEN( modules^ ) DO modules[i] := NIL;  INC( i ) END;
@@ -608,7 +608,7 @@ VAR
 (* ----- Fingerprinting ----- *)
 
 	PROCEDURE FPrintName( VAR fp: LONGINT;  VAR name: ARRAY OF CHAR );
-	VAR i: INTEGER;  ch: CHAR;
+	VAR i: SIGNED16;  ch: CHAR;
 	BEGIN
 		i := 0;
 		REPEAT ch := name[i];  OPM.FPrint( fp, ORD( ch ) );  INC( i ) UNTIL ch = 0X
@@ -706,7 +706,7 @@ VAR
 	END FPrintTyp;
 
 	PROCEDURE FPrintObj*( obj: Object );
-	VAR fp, fp1: LONGINT;  rval: REAL;  f, m: INTEGER;  ext: ConstExt;  n: Node;
+	VAR fp, fp1: LONGINT;  rval: REAL;  f, m: SIGNED16;  ext: ConstExt;  n: Node;
 	BEGIN
 		fp := 0;  OPM.FPrint( fp, obj.mode );  FPrintName( fp, obj.name );  OPM.FPrint( fp, obj.vis );
 		IF TraceFP THEN fp1 := fp END;
@@ -749,7 +749,7 @@ VAR
 	END FPrintObj;
 
 	PROCEDURE FPrintErr( obj: Object );
-	VAR errNo: INTEGER;
+	VAR errNo: SIGNED16;
 	BEGIN
 		IF expGlobal THEN
 			IF obj.history = removed THEN errNo := 450
@@ -841,7 +841,7 @@ VAR
 (* ----- read sym file ----- *)
 
 	PROCEDURE ReadString( VAR R: Files.Rider;  VAR string: ARRAY OF CHAR );
-	VAR i: INTEGER;  ch: CHAR;
+	VAR i: SIGNED16;  ch: CHAR;
 	BEGIN
 		i := 0;
 		LOOP
@@ -859,14 +859,14 @@ VAR
 	END ReadString;
 
 	PROCEDURE ReadStringNoZeroCompress( VAR R: Files.Rider;  VAR string: ARRAY OF CHAR );
-	VAR i: INTEGER;  ch: CHAR;
+	VAR i: SIGNED16;  ch: CHAR;
 	BEGIN
 		i := 0;
 		REPEAT Files.Read( R, ch );  string[i] := ch;  INC( i );  UNTIL ch = 0X;
 	END ReadStringNoZeroCompress;
 
 	PROCEDURE Imp( VAR impName, modName: OPS.Name;  VAR M: Module );
-	VAR R: Files.Rider;  i: INTEGER;  tag: LONGINT;  done: BOOLEAN;  mode: SIGNED8;  obj, last: Object;  tdum: Struct;  new, operator, zeroCompress: BOOLEAN;
+	VAR R: Files.Rider;  i: SIGNED16;  tag: LONGINT;  done: BOOLEAN;  mode: SIGNED8;  obj, last: Object;  tdum: Struct;  new, operator, zeroCompress: BOOLEAN;
 		readString: ReadStringProc;   flag: SET; (* fof *)
 
 		PROCEDURE GetImports;
@@ -966,7 +966,7 @@ VAR
 		END InRecord;
 
 		PROCEDURE InStruct( VAR typ: Struct;  par: BOOLEAN );
-		VAR typtag, typadr: LONGINT;  vis: SIGNED8;  tobj: Object;  btyp: Struct;  typname: OPS.Name;  mod: Module;  i: INTEGER;  ch: CHAR;  pos: LONGINT;
+		VAR typtag, typadr: LONGINT;  vis: SIGNED8;  tobj: Object;  btyp: Struct;  typname: OPS.Name;  mod: Module;  i: SIGNED16;  ch: CHAR;  pos: LONGINT;
 		BEGIN
 			IF tag <= 0 THEN   DEC( tag );
 				ASSERT ( tag > -LEN( M.struct^ ) );
@@ -1055,7 +1055,7 @@ VAR
 		END InCProc;
 
 		PROCEDURE InConst;
-		VAR conval: Const;  s: INTEGER;  r: REAL;
+		VAR conval: Const;  s: SIGNED16;  r: REAL;
 		BEGIN
 			NEW( conval );  obj.conval := conval;
 			CASE tag OF
@@ -1435,7 +1435,7 @@ VAR
 		Insert( name, obj );  obj^.conval := NewConst();  obj^.mode := Con;  obj^.typ := sinttyp;  obj^.conval^.intval := value
 	END EnterIntConst;
 
-	PROCEDURE EnterTyp( name: ARRAY OF CHAR;  form: SIGNED8;  size: INTEGER;  VAR res: Struct;  sref: SIGNED8 );
+	PROCEDURE EnterTyp( name: ARRAY OF CHAR;  form: SIGNED8;  size: SIGNED16;  VAR res: Struct;  sref: SIGNED8 );
 	VAR obj: Object;  typ: Struct;
 	BEGIN
 		Insert( name, obj );  typ := NewStr( form, Basic );  obj^.mode := Typ;  obj^.typ := typ;  obj^.vis := external;
@@ -1449,7 +1449,7 @@ VAR
 		Insert( name, obj );  obj^.mode := Typ;  obj^.typ := typ;  obj^.vis := external
 	END EnterTypAlias;
 
-	PROCEDURE EnterProc( name: ARRAY OF CHAR;  num: INTEGER );
+	PROCEDURE EnterProc( name: ARRAY OF CHAR;  num: SIGNED16 );
 	VAR obj: Object;
 	BEGIN
 		Insert( name, obj );  obj.mode := SProc;  obj.typ := notyp;  obj.adr := num
@@ -1478,7 +1478,7 @@ BEGIN
 	syslink := topScope.right;  universe := topScope;  topScope.right := NIL;
 
 	EnterTyp( "CHAR", Char, OPM.CharSize, chartyp, SFtypChar );  EnterTyp( "SET", Set, OPM.SetSize, settyp, SFtypSet );
-	EnterTyp( "REAL", Real, OPM.RealSize, realtyp, SFtypReal );  EnterTyp( "INTEGER", Int, OPM.IntSize, inttyp, SFtypInt );
+	EnterTyp( "REAL", Real, OPM.RealSize, realtyp, SFtypReal );  EnterTyp( "SIGNED16", Int, OPM.IntSize, inttyp, SFtypInt );
 	EnterTyp( "LONGINT", LInt, OPM.LIntSize, linttyp, SFtypLInt );  EnterTyp( "HUGEINT", HInt, OPM.HIntSize, hinttyp, SFtypHInt );
 	EnterTyp( "LONGREAL", LReal, OPM.LRealSize, lrltyp, SFtypLReal );  EnterTyp( "SIGNED8", SInt, OPM.SIntSize, sinttyp, SFtypSInt );
 	EnterTyp( "BOOLEAN", Bool, OPM.BoolSize, booltyp, SFtypBool );

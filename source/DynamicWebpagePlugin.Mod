@@ -407,7 +407,7 @@ TYPE
 
 	(* returns true iff the transformation worked without an error *)
 	PROCEDURE TransformXMLTree(file: Files.File; VAR n: XML.Content; VAR request: HTTPSupport.HTTPRequest;
-		transformationDepth: INTEGER;  w: Streams.Writer) : BOOLEAN;
+		transformationDepth: SIGNED16;  w: Streams.Writer) : BOOLEAN;
 	VAR enum, resultEnum: XMLObjects.Enumerator; pChild, pResultChild: ANY; elem: XML.Element;
 		child, newChild, resultChild: XML.Content; errormsg: ARRAY 256 OF CHAR; wasTransformed: BOOLEAN;
 		elemName : Strings.String; container, snapshot, resultContainer: XML.Container;

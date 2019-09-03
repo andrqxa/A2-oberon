@@ -96,8 +96,8 @@ BEGIN
 	IF (~caching) & (code # 0) THEN errcode := code;  HALT(ErrBase) END
 END AddErr;
 
-PROCEDURE Atom (lib: Objects.Library;   name: ARRAY OF CHAR): INTEGER;
-	VAR ref: INTEGER;
+PROCEDURE Atom (lib: Objects.Library;   name: ARRAY OF CHAR): SIGNED16;
+	VAR ref: SIGNED16;
 BEGIN
 	Objects.GetKey(lib.dict, name, ref);   RETURN ref
 END Atom;
@@ -125,7 +125,7 @@ BEGIN
 END WriteRef;
 
 PROCEDURE ReadRef (VAR r: Files.Rider;   lib: Objects.Library;   VAR obj: Objects.Object);
-	VAR i, l: INTEGER;   F: Objects.Library;   name: ARRAY 32 OF CHAR;
+	VAR i, l: SIGNED16;   F: Objects.Library;   name: ARRAY 32 OF CHAR;
 BEGIN
 	Files.ReadInt(r, i);
 	IF i = - 1 THEN obj := NIL
@@ -551,7 +551,7 @@ END IsEmptyQueue;
 (** Support routines, to avoid import of Strings *)
 PROCEDURE SeqName* (stub: ARRAY OF CHAR; sep: CHAR; seqnr: LONGINT; VAR res: ARRAY OF CHAR);
 CONST cseqlen = 4;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 BEGIN
 	ASSERT(LEN(stub) + 1 + cseqlen < LEN(res), 100);
 	ASSERT((seqnr < 10000) & (seqnr >= 0), 101);
@@ -565,7 +565,7 @@ BEGIN
 END SeqName;
 
 PROCEDURE NameToSeq* (name: ARRAY OF CHAR;  sep: CHAR; VAR stub: ARRAY OF CHAR; VAR seqnr: LONGINT);
-	VAR i: INTEGER; xname: ARRAY 32 OF CHAR;  xch: CHAR;
+	VAR i: SIGNED16; xname: ARRAY 32 OF CHAR;  xch: CHAR;
 BEGIN
 	COPY(name, xname);
 	seqnr := 0;

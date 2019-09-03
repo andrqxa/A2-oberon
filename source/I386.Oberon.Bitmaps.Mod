@@ -19,7 +19,7 @@ CONST
 TYPE
 	Bitmap* = POINTER TO BitmapDesc;
 	BitmapDesc* = RECORD	(* cf. Display.DisplayBlock  *)
-		width*, height*, depth*: INTEGER;	(* offset 0, 2, 4 *)
+		width*, height*, depth*: SIGNED16;	(* offset 0, 2, 4 *)
 		wth*, size: LONGINT;	(* offset 8, 12 *)
 		address*: ADDRESS;	(* offset 16 *)
 	END;
@@ -29,7 +29,7 @@ TYPE
 VAR
 	buffer: POINTER TO Buffer;
 
-PROCEDURE Define*(B: Bitmap; width, height, depth: INTEGER; address: ADDRESS);
+PROCEDURE Define*(B: Bitmap; width, height, depth: SIGNED16; address: ADDRESS);
 BEGIN
 	B.width := width;
 	B.wth := width;
@@ -39,7 +39,7 @@ BEGIN
 	B.size := LONG(width)*height
 END Define;
 
-PROCEDURE Get*(B: Bitmap; X, Y: INTEGER): INTEGER;
+PROCEDURE Get*(B: Bitmap; X, Y: SIGNED16): SIGNED16;
 VAR ofs: LONGINT; ch: CHAR;
 BEGIN
 	ofs := Y*B.wth + X;  ASSERT((ofs >= 0) & (ofs < B.size));
@@ -58,7 +58,7 @@ BEGIN
 	WHILE size > 0 DO SYSTEM.PUT(adr, 0X);  INC(adr);  DEC(size) END
 END Clear;
 
-PROCEDURE Dot*(B: Bitmap; col, X, Y, mode: INTEGER);
+PROCEDURE Dot*(B: Bitmap; col, X, Y, mode: SIGNED16);
 VAR adr: ADDRESS;  ch: CHAR;
 BEGIN
 	adr := Y*B.wth + X;  ASSERT((adr >= 0) & (adr < B.size));
@@ -81,7 +81,7 @@ BEGIN
 	END
 END CopyBlock0;
 
-PROCEDURE CopyBlock*(sB, dB: Bitmap; SX, SY, W, H, DX, DY, mode: INTEGER);
+PROCEDURE CopyBlock*(sB, dB: Bitmap; SX, SY, W, H, DX, DY, mode: SIGNED16);
 VAR SourceWth, DestWth, sx, sy, w, h, dx, dy, w0, h0, dx0, dy0, src, dst, n, bufLines: LONGINT;
 BEGIN	(* only the destination block is clipped *)
 	SourceWth := sB.wth; DestWth := dB.wth;
@@ -182,7 +182,7 @@ BEGIN
 	UNTIL w = 0
 END CopyPattern1;
 
-PROCEDURE CopyPattern*(B: Bitmap; col: INTEGER; pat: Display.Pattern; X, Y, mode: INTEGER);
+PROCEDURE CopyPattern*(B: Bitmap; col: SIGNED16; pat: Display.Pattern; X, Y, mode: SIGNED16);
 VAR x, y, x2, y2, w, w0, h: LONGINT; src, dst: ADDRESS;  ch: CHAR;
 BEGIN
 	SYSTEM.GET(pat, ch);  w := ORD(ch);
@@ -207,7 +207,7 @@ BEGIN
 	END
 END CopyPattern;
 
-PROCEDURE ReplConst*(B: Bitmap; col, X, Y, W, H, mode: INTEGER);
+PROCEDURE ReplConst*(B: Bitmap; col, X, Y, W, H, mode: SIGNED16);
 VAR addr, addr0: ADDRESS; pat, w: LONGINT; s: SET;
 BEGIN
 	addr := B.address + B.wth*Y + X;
@@ -288,7 +288,7 @@ BEGIN
 	END
 END FillPattern0;
 
-PROCEDURE ReplPattern*(B: Bitmap; col: INTEGER; pat: LONGINT; X, Y, W, H, mode: INTEGER);
+PROCEDURE ReplPattern*(B: Bitmap; col: SIGNED16; pat: LONGINT; X, Y, W, H, mode: SIGNED16);
 VAR px, pw, ph, x, y, x2, y2, w, w0, h: LONGINT; src0, src, dst: ADDRESS;  ch: CHAR;
 BEGIN
 	x := X;  y := Y;  w := W;  h := H;
@@ -312,12 +312,12 @@ BEGIN
 	END
 END ReplPattern;
 
-PROCEDURE DisplayBlock*(B: Bitmap; SX, SY, W, H, DX, DY, mode: INTEGER; VAR colortable: ARRAY OF LONGINT (* fof *));
+PROCEDURE DisplayBlock*(B: Bitmap; SX, SY, W, H, DX, DY, mode: SIGNED16; VAR colortable: ARRAY OF LONGINT (* fof *));
 BEGIN
 	Display.DisplayBlock(B, SX, SY, W, H, DX, DY, mode,colortable);
 END DisplayBlock;
 
-PROCEDURE GetPix*(VAR addr: ADDRESS; VAR buf: SYSTEM.BYTE; depth: INTEGER);
+PROCEDURE GetPix*(VAR addr: ADDRESS; VAR buf: SYSTEM.BYTE; depth: SIGNED16);
 VAR s1, s2, s3: SIGNED8;
 BEGIN
 	IF depth = 8 THEN SYSTEM.GET(addr, buf); INC(addr)
@@ -329,7 +329,7 @@ BEGIN
 	END;
 END GetPix;
 
-PROCEDURE PutPix*(VAR addr: ADDRESS; border: ADDRESS; buf: SYSTEM.BYTE; depth: INTEGER);
+PROCEDURE PutPix*(VAR addr: ADDRESS; border: ADDRESS; buf: SYSTEM.BYTE; depth: SIGNED16);
 VAR s1: SIGNED8;
 BEGIN
 	IF (depth = 8) & (addr < border) THEN SYSTEM.PUT(addr, buf); INC(addr)
@@ -374,8 +374,8 @@ while1:
 	POP EAX
 END Copy0;
 
-PROCEDURE Copy*(sB, dB: Bitmap; SX, SY, SW, SH, DX, DY, DW, DH, mode: INTEGER);
-VAR hx, hy, DW2, SW2: LONGINT; src, dst: ADDRESS; i: LONGINT; dy: INTEGER; ch: CHAR;
+PROCEDURE Copy*(sB, dB: Bitmap; SX, SY, SW, SH, DX, DY, DW, DH, mode: SIGNED16);
+VAR hx, hy, DW2, SW2: LONGINT; src, dst: ADDRESS; i: LONGINT; dy: SIGNED16; ch: CHAR;
 BEGIN
 	IF (SX >= 0) & (SY >= 0) & (SX+SW <= sB.width) & (SY+SH <= sB.height) &
 			(DX >= 0) & (DY >= 0) & (DX+DW <= dB.width) & (DY+DH <= dB.height) &
@@ -403,7 +403,7 @@ BEGIN
 	END
 END Copy;
 
-PROCEDURE PutLine*(B: Bitmap; VAR data: ARRAY OF INTEGER; X, Y, W: INTEGER);
+PROCEDURE PutLine*(B: Bitmap; VAR data: ARRAY OF SIGNED16; X, Y, W: SIGNED16);
 VAR dst, src: ADDRESS; i: LONGINT; ch: CHAR;
 BEGIN
 	IF (X >= 0) & (X+W <= B.width) & (Y >= 0) & (Y < B.height) & (W <= LEN(data)) THEN
@@ -418,7 +418,7 @@ BEGIN
 	END
 END PutLine;
 
-PROCEDURE GetLine*(B: Bitmap; VAR data: ARRAY OF INTEGER; X, Y, W: INTEGER);
+PROCEDURE GetLine*(B: Bitmap; VAR data: ARRAY OF SIGNED16; X, Y, W: SIGNED16);
 VAR dst, src: ADDRESS; i: LONGINT; ch: CHAR;
 BEGIN
 	IF (X >= 0) & (X+W <= B.width) & (Y >= 0) & (Y < B.height) & (W <= LEN(data)) THEN

@@ -66,7 +66,7 @@ MODULE HyperDocTools IN Oberon;	(** portable *) (* ejz,  *)
 			beg, end, time, pos: LONGINT;
 			R: Texts.Reader;
 			obj: Objects.Object;
-			col: INTEGER;
+			col: SIGNED16;
 			ch: CHAR;
 	BEGIN
 		label := NIL; link := NIL;
@@ -385,7 +385,7 @@ MODULE HyperDocTools IN Oberon;	(** portable *) (* ejz,  *)
 			R: Texts.Reader;
 			style: TextGadgets.Style;
 			label: ARRAY 64 OF CHAR;
-			i, col: INTEGER;
+			i, col: SIGNED16;
 			ch: CHAR;
 	BEGIN
 		T := Oberon.MarkedText();

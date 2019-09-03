@@ -60,7 +60,7 @@ MODULE GZip IN Oberon;	(** eos  **)
 	PROCEDURE Unzip*;
 		VAR
 			S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT; overwrite, oldfilefound: BOOLEAN;
-			suffix, infile, outfile, newname: ARRAY 256 OF CHAR; in, out: Files.File; res: WORD; res2: INTEGER;
+			suffix, infile, outfile, newname: ARRAY 256 OF CHAR; in, out: Files.File; res: WORD; res2: SIGNED16;
 	BEGIN
 		T := Oberon.Par.text;
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);

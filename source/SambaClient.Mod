@@ -17,7 +17,7 @@ TYPE
 	Connection = POINTER TO RECORD
 		out: Streams.Writer;
 		in: Streams.Reader;
-		tid, uid, sid: INTEGER;
+		tid, uid, sid: SIGNED16;
 		ipaddr: ARRAY 16 OF CHAR;
 		user, pw: ARRAY 64 OF CHAR;
 		path, mask, fnLast: ARRAY 256 OF CHAR;
@@ -101,10 +101,10 @@ TYPE
 
 			lock.Acquire();
 			(* SEND *)
-			SendSMBHeader(INTEGER(39 + Strings.Length(nameTrimmed)), 06X, c);
+			SendSMBHeader(SIGNED16(39 + Strings.Length(nameTrimmed)), 06X, c);
 			c.out.Net8(1);								(* Word count *)
 			c.out.RawInt(22);							(* search attributes *)
-			c.out.RawInt(INTEGER(2 + Strings.Length(nameTrimmed)));
+			c.out.RawInt(SIGNED16(2 + Strings.Length(nameTrimmed)));
 			c.out.Net8(4);								(* ascii *)
 			c.out.RawString(nameTrimmed);						(* name *)
 			c.out.Update();
@@ -146,10 +146,10 @@ TYPE
 
 			lock.Acquire();
 			(* SEND *)
-			SendSMBHeader(INTEGER(41 + Strings.Length(new1) + Strings.Length(old1)), 07X, c);
+			SendSMBHeader(SIGNED16(41 + Strings.Length(new1) + Strings.Length(old1)), 07X, c);
 			c.out.Net8(1);			(* Word count *)
 			c.out.RawInt(22);		(* search attributes *)
-			c.out.RawInt(INTEGER(4 + Strings.Length(new1) + Strings.Length(old1)));
+			c.out.RawInt(SIGNED16(4 + Strings.Length(new1) + Strings.Length(old1)));
 			c.out.Net8(4);			(* ascii *)
 			c.out.RawString(old1);	(* old name *)
 			c.out.Net8(4);			(* ascii *)
@@ -173,7 +173,7 @@ TYPE
 		PROCEDURE Enumerate0*(CONST mask: ARRAY OF CHAR; flags: SET; enum: Files.Enumerator);
 		VAR
 			check, endOfSearch, findFirst: BOOLEAN;
-			byteCount, dataOff, paraOff, eos: INTEGER;
+			byteCount, dataOff, paraOff, eos: SIGNED16;
 			fileFlags : SET;
 			curPos: Files.Position;
 			attr, nextEntryOff, progress: LONGINT; maskLen: SIZE;
@@ -340,9 +340,9 @@ TYPE
 
 			lock.Acquire();
 			(* SEND *)
-			SendSMBHeader(INTEGER(37+ Strings.Length(name)), 00X, c);
+			SendSMBHeader(SIGNED16(37+ Strings.Length(name)), 00X, c);
 			c.out.Net8(0);											(* Word count *)
-			c.out.RawInt(INTEGER(2 + Strings.Length(name)));			(* byte count *)
+			c.out.RawInt(SIGNED16(2 + Strings.Length(name)));			(* byte count *)
 			c.out.Net8(4);											(* buffer format *)
 			c.out.RawString(name);
 			c.out.Update();
@@ -372,9 +372,9 @@ TYPE
 
 			lock.Acquire();
 			(* SEND *)
-			SendSMBHeader(INTEGER(37+ Strings.Length(name)), 01X, c);
+			SendSMBHeader(SIGNED16(37+ Strings.Length(name)), 01X, c);
 			c.out.Net8(0);											(* Word count *)
-			c.out.RawInt(INTEGER(2 + Strings.Length(name)));			(* byte count *)
+			c.out.RawInt(SIGNED16(2 + Strings.Length(name)));			(* byte count *)
 			c.out.Net8(4);											(* buffer format *)
 			c.out.RawString(name);
 			c.out.Update();
@@ -438,10 +438,10 @@ TYPE
 		PROCEDURE ReadBytes*(VAR r: Files.Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR
 			check: BOOLEAN;
-			dataOff, byteCount, padding: INTEGER;
+			dataOff, byteCount, padding: SIGNED16;
 			i : SIZE;
-			adjLen, adjOff: INTEGER;
-			localKey: INTEGER;
+			adjLen, adjOff: SIGNED16;
+			localKey: SIGNED16;
 		BEGIN
 			IF Trace THEN KernelLog.String("File.ReadBytes - Read AndX"); KernelLog.Ln(); END;
 
@@ -466,7 +466,7 @@ TYPE
 	 			IF len > RWLimit THEN
 	 				adjLen := RWLimit;
 	 			ELSE
-	 				adjLen := INTEGER(len);
+	 				adjLen := SIGNED16(len);
 	 			END;
 
 			 	(* SEND *)
@@ -538,9 +538,9 @@ TYPE
 		PROCEDURE WriteBytes*(VAR r: Files.Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 		VAR
 			check: BOOLEAN;
-			bytesWritten: INTEGER;
-			adjLen, adjOff: INTEGER;
-			localKey: INTEGER;
+			bytesWritten: SIGNED16;
+			adjLen, adjOff: SIGNED16;
+			localKey: SIGNED16;
 		BEGIN
 			fs(FileSystem).lock.Acquire();
 
@@ -571,7 +571,7 @@ TYPE
 	 			IF len > RWLimit THEN
 	 				adjLen := RWLimit;
 	 			ELSE
-	 				adjLen := len(INTEGER);
+	 				adjLen := len(SIGNED16);
 	 			END;
 
 			 	(* Send *)
@@ -636,9 +636,9 @@ TYPE
 			END;
 
 		 	(* SEND *)
-		 	SendSMBHeader(37 + INTEGER(Strings.Length(filename)), 08X, c);
+		 	SendSMBHeader(37 + SIGNED16(Strings.Length(filename)), 08X, c);
 			c.out.Net8(0);											(* word count *)
-			c.out.RawInt(INTEGER(Strings.Length(filename)) + 1);		(* byte count *)
+			c.out.RawInt(SIGNED16(Strings.Length(filename)) + 1);		(* byte count *)
 			c.out.Net8(4);											(* buffer format ascii *)
 			c.out.RawString(filename);								(* filename *)
 			c.out.Update();
@@ -724,7 +724,7 @@ TYPE
 
 	END TCPSender;
 
-PROCEDURE SendSMBHeader(ntb: INTEGER; cmd: CHAR; c: Connection);
+PROCEDURE SendSMBHeader(ntb: SIGNED16; cmd: CHAR; c: Connection);
 BEGIN
 	(* NETBIOS *)
 	c.out.Net16(0);
@@ -749,7 +749,7 @@ END SendSMBHeader;
 PROCEDURE RecieveResponse(cmd: CHAR; c: Connection): BOOLEAN;
 VAR
 	check: BOOLEAN;
-	variable: INTEGER;
+	variable: SIGNED16;
 BEGIN
 	check := FALSE;
 	c.in.Reset();
@@ -891,13 +891,13 @@ END NegotiateProtocol;
 
 PROCEDURE SessionSetup(c: Connection): BOOLEAN;
 VAR
-	byteCount: INTEGER;
+	byteCount: SIGNED16;
 	check : BOOLEAN;
 BEGIN
 	IF Trace THEN KernelLog.String("Session Setup"); KernelLog.Ln(); END;
 
 	(* SEND *)
-	byteCount := INTEGER(
+	byteCount := SIGNED16(
 		Strings.Length(c.user)
 		+ Strings.Length(c.pw)
 		+ Strings.Length(PrimaryDomain)
@@ -913,7 +913,7 @@ BEGIN
 	c.out.RawInt(2);			(* mpx *)
 	c.out.RawInt(0);			(* Vc *)
 	c.out.Net32(0);			(* session key *)
-	c.out.RawInt(INTEGER(Strings.Length(c.pw)+1));	(* ANSI len *)
+	c.out.RawInt(SIGNED16(Strings.Length(c.pw)+1));	(* ANSI len *)
 	c.out.RawInt(0);	(* UNICODE len *)
 	c.out.Net32(0);			(* reserved *)
 	c.out.Net32(268435456);	(* capabilities *)
@@ -944,14 +944,14 @@ BEGIN
 	IF Trace THEN KernelLog.String("Tree Connect"); KernelLog.Ln(); END;
 
 	(* SEND *)
-	SendSMBHeader(54 + INTEGER(Strings.Length(c.ipaddr) + Strings.Length(c.path) + Strings.Length(c.pw)), 75X, c);
+	SendSMBHeader(54 + SIGNED16(Strings.Length(c.ipaddr) + Strings.Length(c.path) + Strings.Length(c.pw)), 75X, c);
 	c.out.Net8(4);			(* Word count *)
 	c.out.Net8(255);		(* no andx *)
 	c.out.Net8(0);			(* reserved *)
 	c.out.RawInt(0);			(* andx offset *)
 	c.out.RawInt(0);			(* disconnected tid *)
-	c.out.RawInt(INTEGER(Strings.Length(c.pw)+1));	(* pw length *)
-	c.out.RawInt(INTEGER(11 + Strings.Length(c.ipaddr) + Strings.Length(c.path) + Strings.Length(c.pw)));		(* bcc *)
+	c.out.RawInt(SIGNED16(Strings.Length(c.pw)+1));	(* pw length *)
+	c.out.RawInt(SIGNED16(11 + Strings.Length(c.ipaddr) + Strings.Length(c.path) + Strings.Length(c.pw)));		(* bcc *)
 	c.out.RawString(c.pw);
 	c.out.String("\\");
 	c.out.String(c.ipaddr);
@@ -972,18 +972,18 @@ BEGIN
 	RETURN TRUE;
 END TreeConnect;
 
-PROCEDURE Trans2Find(c: Connection; cmd: INTEGER): BOOLEAN;
+PROCEDURE Trans2Find(c: Connection; cmd: SIGNED16): BOOLEAN;
 VAR
 	check : BOOLEAN;
-	len: INTEGER;
+	len: SIGNED16;
 BEGIN
 	IF Trace THEN KernelLog.String("TRANS 2 - "); END;
 
 	IF cmd = 1 THEN			(* FIND FIRST *)
-		len := INTEGER(Strings.Length(c.mask));
+		len := SIGNED16(Strings.Length(c.mask));
 		IF Trace THEN KernelLog.String("FIND FIRST"); KernelLog.Ln; END;
 	ELSIF cmd = 2 THEN		(* FIND NEXT *)
-		len := INTEGER(Strings.Length(c.fnLast));
+		len := SIGNED16(Strings.Length(c.fnLast));
 		IF Trace THEN KernelLog.String("FIND NEXT"); KernelLog.Ln; END;
 	ELSE
 		RETURN FALSE;
@@ -1042,10 +1042,10 @@ BEGIN
 	RETURN TRUE;
 END Trans2Find;
 
-PROCEDURE OpenAndX(c: Connection; name: ARRAY OF CHAR; access: INTEGER; create: BOOLEAN): INTEGER;
+PROCEDURE OpenAndX(c: Connection; name: ARRAY OF CHAR; access: SIGNED16; create: BOOLEAN): SIGNED16;
 VAR
 	check: BOOLEAN;
-	fid: INTEGER;
+	fid: SIGNED16;
 BEGIN
 	IF Trace THEN
 		KernelLog.String("Open AndX"); KernelLog.Ln();
@@ -1057,7 +1057,7 @@ BEGIN
 	ReplaceSlash(name);
 
 	(* SEND *)
-	SendSMBHeader(66 + INTEGER(Strings.Length(name)), 2DX, c);
+	SendSMBHeader(66 + SIGNED16(Strings.Length(name)), 2DX, c);
 	c.out.Net8(15);			(* word count *)
 	c.out.Net8(255);		(* andx*)
 	c.out.Net8(0); 			(* reserved *)
@@ -1077,7 +1077,7 @@ BEGIN
 	c.out.Net32(0);			(* allocation size *)
 	c.out.Net32(0);			(* timeout *)
 	c.out.Net32(0);			(* reserved *)
-	c.out.RawInt(1 + INTEGER(Strings.Length(name)));	(* byte count *)
+	c.out.RawInt(1 + SIGNED16(Strings.Length(name)));	(* byte count *)
 	c.out.RawString(name);
 	c.out.Update();
 

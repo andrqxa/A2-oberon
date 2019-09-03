@@ -52,7 +52,7 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR version: INTEGER;  i: LONGINT;  ref: Objects.Object;
+	VAR version: SIGNED16;  i: LONGINT;  ref: Objects.Object;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLInt( R, s.points );  NEW( s.pointsx, s.points );  NEW( s.pointsy, s.points );
 		NEW( s.mass, s.points );
@@ -70,7 +70,7 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
 	VAR w, h: LONGINT;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  i: LONGINT;  x, y: LONGREAL;
-		xi, yi: INTEGER;  xa, ya, mass: LRA;  dr: LONGREAL;  K1, K: LONGREAL;  nuM, variance: LONGREAL;  vv: INTEGER;
+		xi, yi: SIGNED16;  xa, ya, mass: LRA;  dr: LONGREAL;  K1, K: LONGREAL;  nuM, variance: LONGREAL;  vv: SIGNED16;
 
 		PROCEDURE drift( mass: LONGREAL ): LONGREAL;
 		BEGIN
@@ -101,8 +101,8 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	END OneSweep;
 
 	PROCEDURE Uniform( s: antsKernel.Kernel );
-	VAR i: LONGINT;  model: tModel;  A: antsArrayObjects.tINTEGERObject;  gen: vyRanBase.tRandom;  xi, yi: INTEGER;  x, y: LONGREAL;
-		minmass, maxmass, meanmass: LONGREAL;  vv: INTEGER;
+	VAR i: LONGINT;  model: tModel;  A: antsArrayObjects.tINTEGERObject;  gen: vyRanBase.tRandom;  xi, yi: SIGNED16;  x, y: LONGREAL;
+		minmass, maxmass, meanmass: LONGREAL;  vv: SIGNED16;
 	BEGIN
 				minmass := MAX( LONGREAL );  maxmass := MIN( LONGREAL );  meanmass := 0;  gen := vyRanBase.RandomGenerator;  model := s.par( tModel );
 		A := s.A( antsArrayObjects.tINTEGERObject );  antsArrayObjects.FillIntArray( 0, A.A, 0, 0, A.w, A.h );

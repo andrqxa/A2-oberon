@@ -319,9 +319,9 @@ TYPE
 	LongEntry = OBJECT(Entry)
 	VAR
 		(* FAT Long Directory Entry Structure *)
-		order : INTEGER;   (* in cluster chain *)
+		order : SIGNED16;   (* in cluster chain *)
 		name: ARRAY 13 OF LONGINT;  (* unicode *)
-		type : INTEGER;
+		type : SIGNED16;
 		chksum : LONGINT;
 		FstClusLO : LONGINT;
 
@@ -330,7 +330,7 @@ TYPE
 
 		PROCEDURE ParseRawEntry;
 		VAR
-			i,j : INTEGER;
+			i,j : SIGNED16;
 		BEGIN
 			(* last cluster in the chain ? *)
 			IF FATVolumes.AND(40H, ORD(rawEntry[0])) = 40H THEN
@@ -523,7 +523,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Append(CONST dirname : ARRAY OF CHAR);
-		VAR temp, new : PathName; i : INTEGER;
+		VAR temp, new : PathName; i : SIGNED16;
 		BEGIN
 			NEW(new); NEW(new.name,LEN(dirname));
 			i:=0;
@@ -1308,12 +1308,12 @@ TYPE
 		VAR
 			chksum : LONGINT;
 			temp : LongEntry;
-			order : INTEGER;
+			order : SIGNED16;
 			longName : ARRAY 256 OF CHAR;  (*  maximum length of a long file name: 255 characters + NUL *)
 			unicode : ARRAY 256 OF LONGINT;
 			lastFound : BOOLEAN;
-			padding : BOOLEAN; firstPadding : INTEGER;
-			i : INTEGER;
+			padding : BOOLEAN; firstPadding : SIGNED16;
+			i : SIGNED16;
 		BEGIN
 			IF Details THEN KernelLog.String("CheckLongEntries of "); KernelLog.String(shortEntry.shortName); KernelLog.String("..."); END;
 			chksum := shortEntry.GetChecksum(); order := 0; lastFound := FALSE;

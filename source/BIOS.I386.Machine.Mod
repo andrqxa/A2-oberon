@@ -180,7 +180,7 @@ CONST
 	(* low level tracing *)
 	TraceV24 = 2; TraceScreen = 0;
 	TraceWidth = 80; TraceHeight = 25;
-	TraceLen = TraceWidth * SIZEOF (INTEGER);
+	TraceLen = TraceWidth * SIZEOF (SIGNED16);
 	TraceSize = TraceLen * TraceHeight;
 
 TYPE
@@ -210,8 +210,8 @@ TYPE
 		EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI: LONGINT;
 		ES, CS, SS, DS, FS, GS: LONGINT;	(* lower 16 bits significant *)
 		LDT: LONGINT;	(* lower 16 bits significant *)
-		TaskAttributes: INTEGER;
-		IOBitmapOffset: INTEGER
+		TaskAttributes: SIGNED16;
+		IOBitmapOffset: SIGNED16
 	(* Implicit: IOBitmap: ARRAY 8192 DIV 4 OF SET *)
 	END;
 
@@ -257,10 +257,10 @@ TYPE
 	END;
 
 	GateDescriptor = RECORD
-		offsetBits0to15: INTEGER;
-		selector: INTEGER;
-		gateType: INTEGER;
-		offsetBits16to31: INTEGER
+		offsetBits0to15: SIGNED16;
+		selector: SIGNED16;
+		gateType: SIGNED16;
+		offsetBits16to31: SIGNED16
 	END;
 	IDT = ARRAY IDTSize OF GateDescriptor;
 
@@ -1003,7 +1003,7 @@ PROCEDURE SearchMP;
 VAR adr: ADDRESS;
 BEGIN
 	adr := 0;
-	SYSTEM.GET (040EH, SYSTEM.VAL (INTEGER, adr));	(* EBDA address *)
+	SYSTEM.GET (040EH, SYSTEM.VAL (SIGNED16, adr));	(* EBDA address *)
 	adr := adr*16;
 	IF adr < 100000H THEN adr := SearchMem(adr, 1024)	(* 1. look in EBDA *)
 	ELSE adr := NilAdr
@@ -2418,12 +2418,12 @@ BEGIN
 	IF int.INT = BP THEN	(* breakpoint (HALT) *)
 		IF level0 THEN
 			exc.halt := int.SP	(* get halt code *)
-			(* if HALT(MAX(INTEGER)), leave halt code on stack when returning, but not serious problem.*)
+			(* if HALT(MAX(SIGNED16)), leave halt code on stack when returning, but not serious problem.*)
 		ELSE
 			SYSTEM.GET (int.SP, exc.halt);	(* get halt code from outer stack *)
-			IF exc.halt >= MAX(INTEGER) THEN INC (int.SP, AddressSize) END	(* pop halt code from outer stack *)
+			IF exc.halt >= MAX(SIGNED16) THEN INC (int.SP, AddressSize) END	(* pop halt code from outer stack *)
 		END;
-		IF exc.halt < MAX(INTEGER) THEN DEC (int.PC) END;	(* point to the INT 3 instruction (assume 0CCX, not 0CDX 3X) *)
+		IF exc.halt < MAX(SIGNED16) THEN DEC (int.PC) END;	(* point to the INT 3 instruction (assume 0CCX, not 0CDX 3X) *)
 	ELSIF int.INT = OVF THEN	(* overflow *)
 		DEC (int.PC)	(* point to the INTO instruction (assume 0CEX, not 0CDX 4X) *)
 	ELSIF int.INT = PF THEN	(* page fault *)
@@ -2631,17 +2631,17 @@ BEGIN
 		IF (i > 31) OR ~(i IN {8, 10..14, 17}) THEN a := ADDRESSOF(glue[i][0])	(* include PUSH 0 *)
 		ELSE a := ADDRESSOF(glue[i][2])	(* skip PUSH 0, processor supplies error code *)
 		END;
-		idt[i].offsetBits0to15 := INTEGER(a MOD 10000H);
+		idt[i].offsetBits0to15 := SIGNED16(a MOD 10000H);
 		(* IRQ0 must be at level 0 because time slicing in Objects needs to set interrupted process' ESP *)
 		(* all irq's are handled at level 0, because of priority experiment in Objects.FieldIRQ *)
 		IF TRUE (* (i < IRQ0) OR (i > IRQ15) OR (i = IRQ0) OR (i = IRQ0 + 1)*) THEN
 			idt[i].selector := KernelCodeSel;	(* gdt[1] -> non-conformant segment => level 0 *)
-			idt[i].gateType := SYSTEM.VAL (INTEGER, 0EE00H)	(* present, DPL 3, system, 386 interrupt *)
+			idt[i].gateType := SYSTEM.VAL (SIGNED16, 0EE00H)	(* present, DPL 3, system, 386 interrupt *)
 		ELSE	(* {IRQ0..IRQ15} - {IRQ0 + 1} *)
 			idt[i].selector := UserCodeSel;	(* gdt[3] -> conformant segment => level 0 or 3 *)
-			idt[i].gateType := SYSTEM.VAL (INTEGER, 08E00H)	(* present, DPL 0, system, 386 interrupt *)
+			idt[i].gateType := SYSTEM.VAL (SIGNED16, 08E00H)	(* present, DPL 0, system, 386 interrupt *)
 		END;
-		idt[i].offsetBits16to31 := INTEGER(a DIV 10000H)
+		idt[i].offsetBits16to31 := SIGNED16(a DIV 10000H)
 	END
 END InitInterrupts;
 
@@ -2762,7 +2762,7 @@ CODE{SYSTEM.i386}
 	MOV [ECX], AL
 END Portin8;
 
-PROCEDURE  Portin16*(port: LONGINT; VAR val: INTEGER);
+PROCEDURE  Portin16*(port: LONGINT; VAR val: SIGNED16);
 CODE{SYSTEM.i386}
 	MOV EDX,[EBP+port]
 	IN AX, DX
@@ -2785,7 +2785,7 @@ CODE{SYSTEM.i386}
 	OUT DX,AL
 END Portout8;
 
-PROCEDURE  Portout16*(port: LONGINT; val: INTEGER);
+PROCEDURE  Portout16*(port: LONGINT; val: SIGNED16);
 CODE{SYSTEM.i386}
 	MOV AX,[EBP+val]
 	MOV EDX,[EBP+port]
@@ -3126,7 +3126,7 @@ END ParseProcessor;
 
 (* Parse MP configuration table. *)
 PROCEDURE ParseMPConfig;
-VAR adr, x: ADDRESS; i: SIZE; entries: INTEGER; ch: CHAR; s: SET; str: ARRAY 8 OF CHAR;
+VAR adr, x: ADDRESS; i: SIZE; entries: SIGNED16; ch: CHAR; s: SET; str: ARRAY 8 OF CHAR;
 BEGIN
 	localAPIC := 0; numProcessors := 1; allProcessors := {0};
 	FOR i := 0 TO LEN(idMap)-1 DO idMap[i] := -1 END;	(* all unassigned *)
@@ -3480,7 +3480,7 @@ VAR status: SIGNED8;
 		adr := traceBase + TraceLen;
 		SYSTEM.MOVE (adr, adr - TraceLen, TraceSize - TraceLen);
 		adr := traceBase + TraceSize - TraceLen;
-		FOR off := 0 TO TraceLen - SIZEOF(INTEGER) BY SIZEOF(INTEGER) DO SYSTEM.PUT16 (adr + off, 100H * 7H + 32) END
+		FOR off := 0 TO TraceLen - SIZEOF(SIGNED16) BY SIZEOF(SIGNED16) DO SYSTEM.PUT16 (adr + off, 100H * 7H + 32) END
 	END Scroll;
 
 BEGIN
@@ -3506,7 +3506,7 @@ BEGIN
 				DEC (tracePos, TraceLen)
 			END;
 			SYSTEM.PUT16 (traceBase + tracePos, 100H * traceColor + ORD (c));
-			INC (tracePos, SIZEOF(INTEGER))
+			INC (tracePos, SIZEOF(SIGNED16))
 		END
 	END
 END TraceChar;
@@ -3529,7 +3529,7 @@ BEGIN
 		GetConfig ("TraceMem", s);
 		p := 0; traceBase := SYSTEM.VAL (ADDRESS, StrToInt (p, s));
 		IF traceBase = 0 THEN traceBase := 0B8000H END;	(* default screen buffer *)
-		FOR off := 0 TO TraceSize - SIZEOF(INTEGER) BY SIZEOF(INTEGER) DO SYSTEM.PUT16 (traceBase + off, 100H * 7H + 32) END;
+		FOR off := 0 TO TraceSize - SIZEOF(SIGNED16) BY SIZEOF(SIGNED16) DO SYSTEM.PUT16 (traceBase + off, 100H * 7H + 32) END;
 		tracePos := 0;
 		Portout8(3D4H, 0EX);
 		Portout8(3D5H, CHR((TraceWidth*TraceHeight) DIV 100H));

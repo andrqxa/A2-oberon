@@ -57,7 +57,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 
 		(** color type **)
 		Color* = RECORD
-			r*, g*, b*, a*: INTEGER;
+			r*, g*, b*, a*: SIGNED16;
 		END;
 
 		(** fill patterns **)
@@ -462,7 +462,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 	END SetFont;
 
 	(** set current font using name and size **)
-	PROCEDURE SetFontName* (ctxt: Context; fontname: ARRAY OF CHAR; size: INTEGER);
+	PROCEDURE SetFontName* (ctxt: Context; fontname: ARRAY OF CHAR; size: SIGNED16);
 		VAR font: GfxFonts.Font;
 	BEGIN
 		font := GfxFonts.OpenSize(fontname, size);
@@ -1339,7 +1339,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 	(*--- Initialization of Standard Colors ---*)
 
 	PROCEDURE InitColors;
-		PROCEDURE init (VAR col: Color; r, g, b: INTEGER);
+		PROCEDURE init (VAR col: Color; r, g, b: SIGNED16);
 		BEGIN
 			col.r := r; col.g := g; col.b := b; col.a := 255
 		END init;

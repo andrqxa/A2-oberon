@@ -69,7 +69,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 
 		ConnectMsg = RECORD (ListRiders.ConnectMsg)
 			query: QueryString;
-			sortBy: INTEGER; (* SortByDateTime, SortByReplyTo, SortBySubject *)
+			sortBy: SIGNED16; (* SortByDateTime, SortByReplyTo, SortBySubject *)
 			ascending: BOOLEAN
 		END;
 
@@ -322,7 +322,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		SendCmd(S, "APOP", login)
 	END APOP;
 
-	PROCEDURE OpenPOP(VAR S: NetTools.Session; host, user, passwd: ARRAY OF CHAR; port: INTEGER; apop: BOOLEAN);
+	PROCEDURE OpenPOP(VAR S: NetTools.Session; host, user, passwd: ARRAY OF CHAR; port: SIGNED16; apop: BOOLEAN);
 		VAR hostIP: NetSystem.IPAdr; login: BOOLEAN;
 	BEGIN
 		IF trace THEN
@@ -380,7 +380,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		VAR
 			buffer: ARRAY BufLen OF CHAR;
 			len, rlen, i, offs: LONGINT;
-			state: INTEGER;
+			state: SIGNED16;
 			ch, old: CHAR;
 	BEGIN
 		old := 0X; offs := 1;
@@ -440,7 +440,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		VAR
 			arg: ARRAY 12 OF CHAR;
 			size: LONGINT;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		NrToArg(no, arg); SendCmd(S, "LIST", arg);
 		IF ReadState(S) THEN
@@ -1267,7 +1267,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 			R: Files.Rider;
 			msg, bak: FileDir.FileName;
 			beg, end, offs, i: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 			ch, old: CHAR;
 		PROCEDURE Copy;
 			VAR
@@ -1364,7 +1364,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE Re*(VAR W: Texts.Writer; VAR t: ARRAY OF CHAR);
 		VAR
 			i, j, re, oldre: LONGINT;
-			p: INTEGER;
+			p: SIGNED16;
 			end: BOOLEAN;
 		PROCEDURE Blanks;
 		BEGIN
@@ -1708,7 +1708,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 			f: Files.File; r: Files.Rider;
 			t0, d0, len0, key, i, t, d, len: LONGINT;
 
-		PROCEDURE err(n: INTEGER);
+		PROCEDURE err(n: SIGNED16);
 		BEGIN
 			Texts.WriteString(W, "Reparsing Mail: ");
 			CASE n OF
@@ -2000,7 +2000,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE Desc(R, old: ListRiders.Rider): ListRiders.Rider;
 	END Desc;
 
-	PROCEDURE Less(VAR i, j: MsgHead; sortBy: INTEGER): BOOLEAN;
+	PROCEDURE Less(VAR i, j: MsgHead; sortBy: SIGNED16): BOOLEAN;
 	BEGIN
 		CASE sortBy OF
 			SortByDateTime: IF i.date < j.date THEN
@@ -2028,7 +2028,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		RETURN i.pos < j.pos
 	END Less;
 
-	PROCEDURE QuickSort(sort: SortList; noMsgs: LONGINT; sortBy: INTEGER);
+	PROCEDURE QuickSort(sort: SortList; noMsgs: LONGINT; sortBy: SIGNED16);
 		PROCEDURE Sort(lo, hi: LONGINT);
 			VAR
 				i, j: LONGINT;
@@ -2267,7 +2267,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		BEGIN
 			factor := Factor();
 			WHILE (sym = and) & ~Q.error DO
-				NEW(term); term.field := MAX(INTEGER); term.op := and;
+				NEW(term); term.field := MAX(SIGNED16); term.op := and;
 				term.next := Q.conds; Q.conds := term; term.left := factor;
 				Next(); term.right := Factor(); factor := term
 			END;
@@ -2280,7 +2280,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		BEGIN
 			term := Term();
 			WHILE (sym = or) & ~Q.error DO
-				NEW(expr); expr.field := MAX(INTEGER); expr.op := or;
+				NEW(expr); expr.field := MAX(SIGNED16); expr.op := or;
 				expr.next := Q.conds; Q.conds := expr; expr.left := term;
 				Next(); expr.right := Expr(); term := expr
 			END;
@@ -2541,11 +2541,11 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		L.w := F.W; L.h := F.fnt.height; L.dsr := -F.fnt.minY; L.dx := 0
 	END FormatLine;
 
-	PROCEDURE DisplayLine(F: ListGadgets.Frame; Q: Display3.Mask; x, y, w, h: INTEGER; R: ListRiders.Rider; L: ListGadgets.Line);
+	PROCEDURE DisplayLine(F: ListGadgets.Frame; Q: Display3.Mask; x, y, w, h: SIGNED16; R: ListRiders.Rider; L: ListGadgets.Line);
 		VAR
 			Q2: Display3.Mask;
 			str: ValueString;
-			textC: INTEGER;
+			textC: SIGNED16;
 	BEGIN
 		Display3.ReplConst(Q, F.backC, x, y, w-50, h, Display.replace);
 		WITH R: Rider DO
@@ -2585,7 +2585,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		VAR
 			F1: Frame;
 			obj: Objects.Object;
-			ver: INTEGER;
+			ver: SIGNED16;
 	BEGIN
 		WITH F: Frame DO
 			IF M IS Display.FrameMsg THEN
@@ -2950,7 +2950,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		END
 	END CloseSMTP;
 
-	PROCEDURE OpenSMTP*(VAR S: SMTPSession; host, from: ARRAY OF CHAR; port: INTEGER);
+	PROCEDURE OpenSMTP*(VAR S: SMTPSession; host, from: ARRAY OF CHAR; port: SIGNED16);
 	BEGIN
 		IF trace THEN
 			Texts.WriteString(W, "--- SMTP");

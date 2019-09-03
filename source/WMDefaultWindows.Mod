@@ -205,10 +205,10 @@ TYPE
 		VAR
 			ow, oh, snapWidth, snapHeight : SIZE;
 
-			PROCEDURE Pow2(x : INTEGER) : LONGINT;
+			PROCEDURE Pow2(x : SIGNED16) : LONGINT;
 			VAR
 				r : LONGINT;
-				i : INTEGER;
+				i : SIGNED16;
 			BEGIN
 				r := 1;
 				FOR i := 1 TO x DO

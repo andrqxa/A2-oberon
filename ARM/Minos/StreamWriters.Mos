@@ -113,8 +113,8 @@ VAR
 		Char(wr, SYSTEM.VAL( CHAR, x ) )
 	END RawSInt;
 
-	(** Write an INTEGER. *)
-	PROCEDURE RawInt*(VAR wr: Writer; x: INTEGER );
+	(** Write an SIGNED16. *)
+	PROCEDURE RawInt*(VAR wr: Writer; x: SIGNED16 );
 	BEGIN
 		Char(wr,CHR(SYSTEM.MSK(x,0FFH)));
 		x := ROT(x,-8);

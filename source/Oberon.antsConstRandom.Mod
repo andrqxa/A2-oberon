@@ -107,7 +107,7 @@ TYPE
 	END HandleAttributes;
 
 	PROCEDURE HandleFileMsg( obj: tRandom;  VAR msg: Objects.FileMsg );
-	VAR version: INTEGER;
+	VAR version: SIGNED16;
 	BEGIN
 		IF msg.id = Objects.load THEN
 			Files.ReadInt( msg.R, version );  vyRanBase.Handler( obj, msg );  Files.ReadLInt( msg.R, obj.max );

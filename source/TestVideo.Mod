@@ -16,7 +16,7 @@ TYPE
 	LabelInfo* = RECORD
 		firstPos : LONGINT;
 		nofPixels : LONGINT;
-		label : INTEGER;
+		label : SIGNED16;
 	END;
 
 	Point = RECORD
@@ -25,8 +25,8 @@ TYPE
 
 VAR
 	threshold, pixThreshold : LONGINT;
-	labelBuffer : POINTER TO ARRAY OF INTEGER;
-	equivalence : ARRAY 32*1024 OF INTEGER;
+	labelBuffer : POINTER TO ARRAY OF SIGNED16;
+	equivalence : ARRAY 32*1024 OF SIGNED16;
 	labelInfo : ARRAY 32*1024 OF LabelInfo;
 	labelColor : ARRAY 32*1024 OF LONGINT;
 	g : WMGraphics.BufferCanvas;
@@ -274,16 +274,16 @@ END CheckFields;
 	equivalenceBuffer : storage space for maxLabels label;
 	colorThreshold : ...
 	*)
-PROCEDURE BinaryLabler*(buffer : Raster.Image; VAR labelBuffer, equivalence : ARRAY OF INTEGER; colorThreshold, pixelThreshold, maxLabels : LONGINT;
+PROCEDURE BinaryLabler*(buffer : Raster.Image; VAR labelBuffer, equivalence : ARRAY OF SIGNED16; colorThreshold, pixelThreshold, maxLabels : LONGINT;
 	VAR labelInfo : ARRAY OF LabelInfo;
 	unifyLabels : BOOLEAN; VAR nofFLabels : LONGINT; VAR res : WORD);
 VAR i, x, y, w, h: SIZE; color: LONGINT;
 	tr, tg, tb, ta  : LONGINT;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
-	nofLabels : INTEGER;
+	nofLabels : SIGNED16;
 	lbufpos, lastLineLbufPos, minClass : LONGINT;
-	lastsum, sum, cl, ctl, ct, ctr, tlabel : INTEGER;
+	lastsum, sum, cl, ctl, ct, ctr, tlabel : SIGNED16;
 	adr : ADDRESS;
 	ch : CHAR;
 
@@ -305,13 +305,13 @@ VAR i, x, y, w, h: SIZE; color: LONGINT;
 	END NewLabel;
 
 BEGIN
-	ASSERT(maxLabels <= MAX(INTEGER));
+	ASSERT(maxLabels <= MAX(SIGNED16));
 	ASSERT(LEN(equivalence) >= maxLabels);
 	ASSERT(LEN(labelBuffer) >= w*h);
 	res := Ok;
 	w := buffer.width; h := buffer.height;
 	(* initialize equivalences *)
-	FOR i := 0 TO LEN( equivalence) - 1 DO equivalence[i] := INTEGER(i) END;
+	FOR i := 0 TO LEN( equivalence) - 1 DO equivalence[i] := SIGNED16(i) END;
 
 	Raster.InitMode(mode, Raster.srcCopy);
 
@@ -420,7 +420,7 @@ BEGIN
 END BinaryLabler;
 
 (* trace a region in the label buffer. The image buffer is used for the width and height and debug output.*)
-PROCEDURE Trace(buffer : Raster.Image; CONST labelBuffer : ARRAY OF INTEGER; VAR labelInfo :  LabelInfo;
+PROCEDURE Trace(buffer : Raster.Image; CONST labelBuffer : ARRAY OF SIGNED16; VAR labelInfo :  LabelInfo;
 			VAR length : LONGINT; VAR path : ARRAY OF Point;
 			VAR res : WORD);
 VAR x, y, tx, ty : SIZE;

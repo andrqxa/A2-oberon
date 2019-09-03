@@ -31,7 +31,7 @@ CONST
 TYPE
 	Connection* = POINTER TO ConnectionDesc;	(** handle for TCP connections *)
 	ConnectionDesc* = RECORD
-		res*: INTEGER;	(** result of last operation on a connection (error indication) *)
+		res*: SIGNED16;	(** result of last operation on a connection (error indication) *)
 		pcb: TCP.Connection
 	END;
 
@@ -39,7 +39,7 @@ TYPE
 
 	Socket* = POINTER TO SocketDesc;	(** handle for UDP "connections" *)
 	SocketDesc* = RECORD
-		res*: INTEGER;	(** result of last operation on a connection (error indication) *)
+		res*: SIGNED16;	(** result of last operation on a connection (error indication) *)
 		pcb: UDP.Socket
 	END;
 
@@ -61,7 +61,7 @@ VAR
 	started: BOOLEAN;
 	passwords: Password;
 	w: Texts.Writer;
-	state: ARRAY TCP.NumStates OF INTEGER;
+	state: ARRAY TCP.NumStates OF SIGNED16;
 
 (** -- Adressing/Naming section. *)
 
@@ -111,7 +111,7 @@ END GetName;
 
 (** OpenConnection opens a connection. locPort, remPort, remIP are contained in the quadrupel <locIP, remIP, locPort, remPort> which determines a connection uniquely. As locIP is always the current machine, it is omitted. If remPort is equal to anyport or remIP is equal to anyIP, a passive connection will be opened. After execution, C is a brand new connection. res indicates any error. *)
 
-PROCEDURE OpenConnection* (VAR C: Connection; locPort: INTEGER; remIP: IPAdr; remPort: INTEGER; VAR res: INTEGER);
+PROCEDURE OpenConnection* (VAR C: Connection; locPort: SIGNED16; remIP: IPAdr; remPort: SIGNED16; VAR res: SIGNED16);
 BEGIN
 	AsyncOpenConnection(C, locPort, remIP, remPort, res);
 	IF res = done THEN
@@ -130,7 +130,7 @@ END OpenConnection;
 
 (** Like OpenConnection, but this procedure may return immediately and delay the actual opening of the connection.  In this case State() should be checked to wait for the connection status to change from waitCon. *)
 
-PROCEDURE AsyncOpenConnection*(VAR C: Connection; locPort: INTEGER; remIP: IPAdr; remPort:INTEGER; VAR res: INTEGER);
+PROCEDURE AsyncOpenConnection*(VAR C: Connection; locPort: SIGNED16; remIP: IPAdr; remPort:SIGNED16; VAR res: SIGNED16);
 VAR err: LONGINT;
 BEGIN
 	NEW(C); NEW(C.pcb);
@@ -197,7 +197,7 @@ END Requested;
 
 (** Procedure accepts a new waiting, active connection (newC) on a passive one (State(C) = listen). If no connection is 	waiting, accept blocks until there is one or an error occurs. If C is not a passive connection, Accept does nothing but res is set to Done. *)
 
-PROCEDURE Accept* (C: Connection; VAR newC: Connection; VAR res: INTEGER);
+PROCEDURE Accept* (C: Connection; VAR newC: Connection; VAR res: SIGNED16);
 VAR client: TCP.Connection; err: LONGINT;
 BEGIN
 	C.pcb.Accept(client, err);
@@ -212,7 +212,7 @@ END Accept;
 
 (** Procedure returns the state of a connection (see constant section).  Even if a connection is closed, data can still be available in the local buffer. *)
 
-PROCEDURE State* (C: Connection): INTEGER;
+PROCEDURE State* (C: Connection): SIGNED16;
 BEGIN
 	IF C.pcb # NIL THEN RETURN state[C.pcb.State()] ELSE RETURN closed END
 END State;
@@ -245,7 +245,7 @@ END ReadBytes;
 
 (** Blocking read two bytes in network byte ordering. *)
 
-PROCEDURE ReadInt* (C: Connection; VAR x: INTEGER);
+PROCEDURE ReadInt* (C: Connection; VAR x: SIGNED16);
 VAR buf: ARRAY 2 OF CHAR; res: WORD; len: SIZE;
 BEGIN
 	C.pcb.Receive(buf, 0, 2, 2, len, res);
@@ -305,7 +305,7 @@ END WriteBytes;
 
 (** Blocking write two bytes in network byte ordering to C. *)
 
-PROCEDURE WriteInt* (C: Connection; x: INTEGER);
+PROCEDURE WriteInt* (C: Connection; x: SIGNED16);
 VAR res: WORD; buf: ARRAY 2 OF CHAR;
 BEGIN
 	buf[0] := CHR(x DIV 100H MOD 100H); buf[1] := CHR(x MOD 100H);
@@ -341,7 +341,7 @@ END WriteString;
 
 (** Procedure delivers the ip-number and port number of a connection's remote partner. *)
 
-PROCEDURE GetPartner* (C: Connection; VAR remIP: IPAdr; VAR remPort: INTEGER);
+PROCEDURE GetPartner* (C: Connection; VAR remIP: IPAdr; VAR remPort: SIGNED16);
 BEGIN
 	IF C.pcb # NIL THEN
 		remIP := C.pcb.fip; remPort := SHORT(C.pcb.fport)
@@ -356,7 +356,7 @@ END GetPartner;
 
 (** Opens a socket which is dedicated to datagram services. locPort is registered to receive datagrams from any port and any host. *)
 
-PROCEDURE OpenSocket* (VAR S: Socket; locPort: INTEGER; VAR res: INTEGER);
+PROCEDURE OpenSocket* (VAR S: Socket; locPort: SIGNED16; VAR res: SIGNED16);
 VAR err: LONGINT;
 BEGIN
 	NEW(S); NEW(S.pcb, LONG(locPort) MOD 10000H, err);
@@ -374,7 +374,7 @@ END CloseSocket;
 
 (** Sends len bytes of data (beginning at pos in buf) to the host specified by remIP and remPort. *)
 
-PROCEDURE SendDG* (S: Socket; remIP: IPAdr; remPort: INTEGER; pos, len: LONGINT; VAR buf: ARRAY OF SYSTEM.BYTE);
+PROCEDURE SendDG* (S: Socket; remIP: IPAdr; remPort: SIGNED16; pos, len: LONGINT; VAR buf: ARRAY OF SYSTEM.BYTE);
 VAR res: WORD;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));	(* index check *)
@@ -384,7 +384,7 @@ END SendDG;
 
 (** Stores an entire datagram in buf beginning at pos. On success (S.res = done), remIP and remPort indicate the sender, 	len indicates the length of valid data. *)
 
-PROCEDURE ReceiveDG*(S: Socket; VAR remIP: IPAdr; VAR remPort: INTEGER; pos: LONGINT; VAR len: LONGINT;
+PROCEDURE ReceiveDG*(S: Socket; VAR remIP: IPAdr; VAR remPort: SIGNED16; pos: LONGINT; VAR len: LONGINT;
 	VAR buf: ARRAY OF SYSTEM.BYTE);
 VAR res, fport: LONGINT; length: SIZE;
 BEGIN
@@ -405,7 +405,7 @@ END AvailableDG;
 
 (** Write 2 bytes in network byte ordering to buf[pos]. *)
 
-PROCEDURE PutInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: INTEGER; x: INTEGER);
+PROCEDURE PutInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: SIGNED16; x: SIGNED16);
 BEGIN
 	buf[pos] := CHR(x DIV 100H MOD 100H);
 	buf[pos+1] := CHR(x MOD 100H)
@@ -413,7 +413,7 @@ END PutInt;
 
 (** Write 4 bytes in network byte ordering to buf[pos]. *)
 
-PROCEDURE PutLInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: INTEGER; x: LONGINT);
+PROCEDURE PutLInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: SIGNED16; x: LONGINT);
 BEGIN
 	buf[pos] := CHR(x DIV 1000000H MOD 100H);
 	buf[pos+1] := CHR(x DIV 10000H MOD 100H);
@@ -423,14 +423,14 @@ END PutLInt;
 
 (** Read 2 bytes in network byte ordering from buf[pos]. *)
 
-PROCEDURE GetInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: INTEGER; VAR x: INTEGER);
+PROCEDURE GetInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: SIGNED16; VAR x: SIGNED16);
 BEGIN
 	x := ORD(buf[pos])*100H + ORD(buf[pos+1])
 END GetInt;
 
 (** Read 4 bytes in network byte ordering from buf[pos]. *)
 
-PROCEDURE GetLInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: INTEGER; VAR x: LONGINT);
+PROCEDURE GetLInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: SIGNED16; VAR x: LONGINT);
 BEGIN
 	x := ORD(buf[pos])*1000000H + ORD(buf[pos+1])*10000H + ORD(buf[pos+2])*100H + ORD(buf[pos+3])
 END GetLInt;

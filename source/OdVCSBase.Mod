@@ -387,7 +387,7 @@ END NameToDelta;
 
 PROCEDURE NameToBak(name: TFileName; VAR df: TFileName);
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	i := 0;
 	WHILE (name[i] # 0X) DO
@@ -620,10 +620,10 @@ BEGIN
 END GetDelta;
 
 (** set log data for a version *)
-PROCEDURE SetLog*(name: TFileName; n: INTEGER; log: TLog);
+PROCEDURE SetLog*(name: TFileName; n: SIGNED16; log: TLog);
 
 VAR
-	nrOfDeltas: INTEGER;
+	nrOfDeltas: SIGNED16;
 	fPos: LONGINT;
 	dFileName: TFileName;
 	oldLog: TLog;
@@ -656,11 +656,11 @@ BEGIN
 END SetLog;
 
 (** not yet implemented *)
-PROCEDURE GetDeltaList*(name: TFileName; VAR list: TDList): INTEGER;
+PROCEDURE GetDeltaList*(name: TFileName; VAR list: TDList): SIGNED16;
 
 VAR
 	log: TLog;
-	i: INTEGER;
+	i: SIGNED16;
 
 BEGIN
 	i := 1;

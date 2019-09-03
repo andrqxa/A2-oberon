@@ -42,7 +42,7 @@ TYPE
 		text: Texts.Text;
 		buf: ARRAY BufLen OF CHAR;
 		begPos: LONGINT;
-		last, next: INTEGER;
+		last, next: SIGNED16;
 		beg: BOOLEAN
 	END;
 
@@ -55,8 +55,8 @@ VAR
 	para: Texts.Text;	(* parameter text for Call *)
 	log: RECORD f: Files.File; r: Files.Rider END;		(* for names of stored texts *)
 	sPat: ARRAY MaxPatLen OF CHAR;	(* search pattern [read only] *)
-	sDv: ARRAY MaxPatLen + 1 OF INTEGER;	(* displacement vector for search pattern *)
-	sPatLen: INTEGER;	(* number of valid characters in sPat [read only] *)
+	sDv: ARRAY MaxPatLen + 1 OF SIGNED16;	(* displacement vector for search pattern *)
+	sPatLen: SIGNED16;	(* number of valid characters in sPat [read only] *)
 	rBuf: Texts.Buffer;	(* replace buffer [read only] *)
 	lTime: LONGINT;	(* most recent time for sPat and/or rBuf *)
 	inFnt: Fonts.Font;	(* input font *)
@@ -64,8 +64,8 @@ VAR
 	menuAvail: BOOLEAN;	(* true if modul Menu is available *)
 	filter: BOOLEAN;	(* filter compiler warnings *)
 	mStr: ARRAY 6 OF MenuStr;	(* menu strings: 0=user / 1=system / 2=log / 3=userascii / 4=systemascii *)
-	sX, sY: INTEGER;	(* saved coordinates for new viewer [used in Marker and ExchangeMenu] *)
-	ii: INTEGER;
+	sX, sY: SIGNED16;	(* saved coordinates for new viewer [used in Marker and ExchangeMenu] *)
+	ii: SIGNED16;
 
 	PROCEDURE Min(i, j: LONGINT): LONGINT;
 	BEGIN
@@ -85,7 +85,7 @@ VAR
 		END
 	END OpenScanner;
 
-	PROCEDURE ScanName(DX: INTEGER; VAR X, Y: INTEGER; VAR S: Texts.Scanner);
+	PROCEDURE ScanName(DX: SIGNED16; VAR X, Y: SIGNED16; VAR S: Texts.Scanner);
 		VAR text: Texts.Text;	beg, end, time: LONGINT;
 	BEGIN
 		IF DX = Oberon.SystemTrack(DX) THEN Oberon.AllocateSystemViewer(DX, X, Y)
@@ -126,7 +126,7 @@ VAR
 	END ScanPara;
 
 	PROCEDURE ScanQuote(VAR S: Texts.Scanner; VAR s: ARRAY  OF CHAR);
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE (S.nextCh # Quote) & (S.nextCh # CR) & ~ S.eot DO Texts.Read(S, S.nextCh) END;
@@ -190,13 +190,13 @@ VAR
 		IF W.lib # Fonts.Default THEN Texts.SetFont(W, Fonts.Default) END
 	END SetDefFont;
 
-	PROCEDURE LinesOf(tF: TextFrames.Frame): INTEGER;
+	PROCEDURE LinesOf(tF: TextFrames.Frame): SIGNED16;
 	BEGIN
 		RETURN (tF.H - tF.top - tF.bot) DIV tF.lsp
 	END LinesOf;
 
 	PROCEDURE OpenBackRdr(VAR bR: BackRdr; text: Texts.Text; pos: LONGINT);
-		VAR R: Texts.Reader;	i: INTEGER;	ch: CHAR;
+		VAR R: Texts.Reader;	i: SIGNED16;	ch: CHAR;
 	BEGIN
 		bR.text := text; bR.beg := FALSE; bR.next := BufLen - 1;
 		IF pos >= BufLen THEN
@@ -226,9 +226,9 @@ VAR
 		END
 	END RPos;
 
-	PROCEDURE LinesUp(text: Texts.Text; pos: LONGINT; nbr: INTEGER): LONGINT;
+	PROCEDURE LinesUp(text: Texts.Text; pos: LONGINT; nbr: SIGNED16): LONGINT;
 	(* returns the start position of nbr lines above line containing pos *)
-		VAR bR: BackRdr;	l: INTEGER;	ch: CHAR;
+		VAR bR: BackRdr;	l: SIGNED16;	ch: CHAR;
 	BEGIN
 		OpenBackRdr(bR, text, pos); l := 0;
 		REPEAT
@@ -268,8 +268,8 @@ VAR
 		END
 	END SendTabs;
 
-	PROCEDURE ScrollFrame(tF: TextFrames.Frame; X, Y: INTEGER; keys: SET);
-		VAR mm, mr, ml: BOOLEAN;	pos: LONGINT;	lPos: INTEGER;
+	PROCEDURE ScrollFrame(tF: TextFrames.Frame; X, Y: SIGNED16; keys: SET);
+		VAR mm, mr, ml: BOOLEAN;	pos: LONGINT;	lPos: SIGNED16;
 	BEGIN
 		ml := FALSE; mm := FALSE; mr := FALSE;
 		IF keys = {ML} THEN
@@ -307,8 +307,8 @@ VAR
 		END
 	END ScrollFrame;
 
-	PROCEDURE DisplayMenu(tF: TextFrames.Frame; X, Y: INTEGER; text: Texts.Text; pos: LONGINT);
-		VAR cmd: ARRAY 32 OF CHAR;	res: INTEGER;
+	PROCEDURE DisplayMenu(tF: TextFrames.Frame; X, Y: SIGNED16; text: Texts.Text; pos: LONGINT);
+		VAR cmd: ARRAY 32 OF CHAR;	res: SIGNED16;
 	BEGIN
 		IF menuAvail THEN
 			cmd := "Menu.ShowCmd";
@@ -319,7 +319,7 @@ VAR
 		END
 	END DisplayMenu;
 
-	PROCEDURE TrackedMM(tF: TextFrames.Frame; X, Y: INTEGER; keys: SET): BOOLEAN;
+	PROCEDURE TrackedMM(tF: TextFrames.Frame; X, Y: SIGNED16; keys: SET): BOOLEAN;
 		VAR R: Texts.Reader;	bR: BackRdr;	T: Texts.Text;	ch: CHAR;
 	BEGIN
 		T := tF.text;
@@ -431,7 +431,7 @@ VAR
 		RETURN f
 	END PredSelFrame;
 
-	PROCEDURE PreHandleMR(tF: TextFrames.Frame; VAR X, Y: INTEGER; keys: SET);
+	PROCEDURE PreHandleMR(tF: TextFrames.Frame; VAR X, Y: SIGNED16; keys: SET);
 		VAR pF: TextFrames.Frame;	newPos, endPos: LONGINT;
 	BEGIN
 		IF (X >= tF.X  + Min(tF.left, TextFrames.barW)) THEN	(* not in scrollbar *)
@@ -570,7 +570,7 @@ VAR
 	END Handle;
 
 	PROCEDURE AsciiText(name: ARRAY OF CHAR): Texts.Text;
-		VAR text: Texts.Text;	res: INTEGER;	ch, pch: CHAR;
+		VAR text: Texts.Text;	res: SIGNED16;	ch, pch: CHAR;
 			f, g : Files.File;	Rf, Rg : Files.Rider;
 	BEGIN
 		f := Files.Old(name);
@@ -590,7 +590,7 @@ VAR
 		RETURN text
 	END AsciiText;
 
-	PROCEDURE NewMF(mTitle: ARRAY OF CHAR; typ: INTEGER; VAR menuH: INTEGER): TextFrames.Frame;
+	PROCEDURE NewMF(mTitle: ARRAY OF CHAR; typ: SIGNED16; VAR menuH: SIGNED16): TextFrames.Frame;
 		VAR F: TextFrames.Frame;
 	BEGIN
 		menuH := TextFrames.menuH;
@@ -608,8 +608,8 @@ VAR
 	END NewETF;
 
 	PROCEDURE OpenViewer(text: Texts.Text; title: ARRAY OF CHAR; pos: LONGINT;
-												X, Y: INTEGER; kind: SIGNED8): Viewers.Viewer;
-		VAR mF: TextFrames.Frame;	menuH: INTEGER;
+												X, Y: SIGNED16; kind: SIGNED8): Viewers.Viewer;
+		VAR mF: TextFrames.Frame;	menuH: SIGNED16;
 	BEGIN
 		IF text = NIL THEN text := TextFrames.Text("") END;
 		mF := NewMF(title, kind, menuH);
@@ -617,21 +617,21 @@ VAR
 	END OpenViewer;
 
 	PROCEDURE New*;
-		VAR V: Viewers.Viewer;	X, Y: INTEGER;
+		VAR V: Viewers.Viewer;	X, Y: SIGNED16;
 	BEGIN
 		Oberon.AllocateUserViewer(Oberon.UserTrack(Oberon.Par.vwr.X), X, Y);
 		V := OpenViewer(NIL, "ET.New", 0, X, Y, 0)
 	END New;
 
 	PROCEDURE NewSys*;
-		VAR V: Viewers.Viewer;	X, Y: INTEGER;
+		VAR V: Viewers.Viewer;	X, Y: SIGNED16;
 	BEGIN
 		Oberon.AllocateSystemViewer(Oberon.SystemTrack(Oberon.Par.vwr.X), X, Y);
 		V := OpenViewer(NIL, "ET.NewSys", 0, X, Y, 1)
 	END NewSys;
 
 	PROCEDURE Open*;
-		VAR V: Viewers.Viewer;	X, Y: INTEGER;	text: Texts.Text;	S: Texts.Scanner;
+		VAR V: Viewers.Viewer;	X, Y: SIGNED16;	text: Texts.Text;	S: Texts.Scanner;
 	BEGIN
 		ScanName(Oberon.UserTrack(Oberon.Par.vwr.X), X, Y, S);
 		IF S.class = Texts.Name THEN text := TextFrames.Text(S.s); V := OpenViewer(text, S.s, 0, X, Y, 0)
@@ -640,7 +640,7 @@ VAR
 	END Open;
 
 	PROCEDURE OpenSys*;
-		VAR V: Viewers.Viewer;	X, Y: INTEGER;	text: Texts.Text;	S: Texts.Scanner;
+		VAR V: Viewers.Viewer;	X, Y: SIGNED16;	text: Texts.Text;	S: Texts.Scanner;
 	BEGIN
 		ScanName(Oberon.SystemTrack(Oberon.Par.vwr.X), X, Y, S);
 		IF S.class = Texts.Name THEN text := TextFrames.Text(S.s); V := OpenViewer(text, S.s, 0, X, Y, 1)
@@ -649,7 +649,7 @@ VAR
 	END OpenSys;
 
 	PROCEDURE OpenAscii*;
-		VAR V: Viewers.Viewer;	X, Y: INTEGER;	S: Texts.Scanner;
+		VAR V: Viewers.Viewer;	X, Y: SIGNED16;	S: Texts.Scanner;
 	BEGIN
 		ScanName(Oberon.UserTrack(Oberon.Par.vwr.X), X, Y, S);
 		IF S.class = Texts.Name THEN V := OpenViewer(AsciiText(S.s), S.s, 0, X, Y, 3)
@@ -658,7 +658,7 @@ VAR
 	END OpenAscii;
 
 	PROCEDURE OpenSysAscii*;
-		VAR V: Viewers.Viewer;	X, Y: INTEGER;	S: Texts.Scanner;
+		VAR V: Viewers.Viewer;	X, Y: SIGNED16;	S: Texts.Scanner;
 	BEGIN
 		ScanName(Oberon.SystemTrack(Oberon.Par.vwr.X), X, Y, S);
 		IF S.class = Texts.Name THEN V := OpenViewer(AsciiText(S.s), S.s, 0, X, Y, 4)
@@ -667,7 +667,7 @@ VAR
 	END OpenSysAscii;
 
 	PROCEDURE CalcDispVec(time: LONGINT);
-		VAR i, j, d: INTEGER;
+		VAR i, j, d: SIGNED16;
 	BEGIN
 		lTime := time;
 		i := 1; d := 1;	(* calculate displacement vector *)
@@ -681,7 +681,7 @@ VAR
 	PROCEDURE SPatFound(tF: TextFrames.Frame; text: Texts.Text; VAR pos:LONGINT): BOOLEAN;
 	(* searches the next position for the search pattern sPat begining at position pos *)
 	(* in the text text; resturns result accordingly *)
-		VAR R: Texts.Reader;	l: LONGINT;	i: INTEGER;	ch: CHAR;
+		VAR R: Texts.Reader;	l: LONGINT;	i: SIGNED16;	ch: CHAR;
 	BEGIN
 		IF sPatLen > 0 THEN
 			IF tF # NIL THEN TextFrames.Mark(tF, -1) END;
@@ -704,7 +704,7 @@ VAR
 	(** specification needed: "text.pattern"; loads the text text, searches the pattern *)
 	(** pattern and shows it in a viewer *)
 		VAR text: Texts.Text;	S: Texts.Scanner;	V: Viewers.Viewer;
-			X, Y, i, j, M: INTEGER;	pos: LONGINT;	name: ARRAY 35 OF CHAR;
+			X, Y, i, j, M: SIGNED16;	pos: LONGINT;	name: ARRAY 35 OF CHAR;
 	BEGIN
 		ScanName(Oberon.UserTrack(Oberon.Par.vwr.X), X, Y, S);
 		IF S.class # Texts.Name THEN RETURN END;	(* ### *)
@@ -743,7 +743,7 @@ VAR
 	END WriteDate;
 
 	PROCEDURE UpdateNameLog(name: ARRAY OF CHAR; typ: CHAR);
-		VAR t, d: LONGINT;	i: INTEGER;
+		VAR t, d: LONGINT;	i: SIGNED16;
 	BEGIN
 		IF log.f # NIL THEN
 			Oberon.GetClock (t, d); WriteDate(log.r, t, d);
@@ -756,7 +756,7 @@ VAR
 	END UpdateNameLog;
 
 	PROCEDURE RenameOld(name: ARRAY OF CHAR);
-		VAR bck: ARRAY 32 OF CHAR;	i, res: INTEGER;
+		VAR bck: ARRAY 32 OF CHAR;	i, res: SIGNED16;
 	BEGIN
 		i := 0; WHILE (i < 32-5) & (name[i]# 0X) DO bck[i] := name[i]; INC(i) END;
 		bck[i] := "."; INC(i); bck[i] := "B"; INC(i); bck[i] := "a"; INC(i); bck[i] := "k"; INC(i); bck[i] := 0X;
@@ -814,7 +814,7 @@ VAR
 
 	PROCEDURE StoreAscii*; BEGIN store("a") END StoreAscii;
 
-	PROCEDURE Cleartrack(X: INTEGER);
+	PROCEDURE Cleartrack(X: SIGNED16);
 		VAR V, lV: Viewers.Viewer;
 	BEGIN
 		Oberon.RemoveMarks(X, Display.Bottom, Display.Width, Display.Height);
@@ -831,13 +831,13 @@ VAR
 	PROCEDURE ClearTrack*; BEGIN Cleartrack(Oberon.UserTrack(Oberon.Par.vwr.X)) END ClearTrack;
 	PROCEDURE ClearSysTrack*; BEGIN Cleartrack(Oberon.SystemTrack(Oberon.Par.vwr.X)) END ClearSysTrack;
 
-	PROCEDURE ValidX(X: INTEGER): BOOLEAN;
+	PROCEDURE ValidX(X: SIGNED16): BOOLEAN;
 	BEGIN
 		RETURN (0 <= X) & (X < Display.Width)
 				OR (Display.ColLeft <= X) & (X < Display.ColLeft + Display.Width)
 	END ValidX;
 
-	PROCEDURE ValidY(Y: INTEGER): BOOLEAN;
+	PROCEDURE ValidY(Y: SIGNED16): BOOLEAN;
 	BEGIN
 		RETURN (Display.Bottom <= Y) & (Y < Display.Bottom + Display.Height)
 	END ValidY;
@@ -898,7 +898,7 @@ VAR
 	PROCEDURE Search*;
 		VAR tF: TextFrames.Frame;	V: Viewers.Viewer;
 			R: Texts.Reader;	text: Texts.Text;
-			pos, beg, end, time: LONGINT; 	i: INTEGER;
+			pos, beg, end, time: LONGINT; 	i: SIGNED16;
 	BEGIN
 		IF (Oberon.Par.vwr # NIL) & (Oberon.Par.frame = Oberon.Par.vwr.dsc) THEN V := Oberon.Par.vwr
 		ELSE V := FocusViewer()
@@ -946,7 +946,7 @@ VAR
 	PROCEDURE replace(): BOOLEAN;
 		VAR tF: TextFrames.Frame;	V: Viewers.Viewer;
 			R: Texts.Reader;	tBuf: Texts.Buffer;	text: Texts.Text;
-			pos, beg, end, time, p, len: LONGINT; 	i: INTEGER;	ch: CHAR;	T: Texts.Text;
+			pos, beg, end, time, p, len: LONGINT; 	i: SIGNED16;	ch: CHAR;	T: Texts.Text;
 	BEGIN
 		V := FocusViewer();
 		IF (V.dsc = NIL) OR ~ (V.dsc.next IS TextFrames.Frame) THEN RETURN FALSE END;	(* ### *)
@@ -1005,7 +1005,7 @@ VAR
 
 	PROCEDURE Error*;
 		VAR text: Texts.Text;	S: Texts.Scanner;	V: Viewers.Viewer;
-			X, Y, i: INTEGER;	pos, beg, end, time: LONGINT;
+			X, Y, i: SIGNED16;	pos, beg, end, time: LONGINT;
 	BEGIN
 		text := NIL; Oberon.GetSelection(text, beg, end, time);
 		IF (text # NIL) & (time # -1) THEN
@@ -1047,7 +1047,7 @@ VAR
 	END MenuExchange;
 
 	PROCEDURE Init*;
-		VAR V: Viewers.Viewer;	S: Texts.Scanner;	typ: INTEGER;	h1,h2 : Handler;
+		VAR V: Viewers.Viewer;	S: Texts.Scanner;	typ: SIGNED16;	h1,h2 : Handler;
 	BEGIN
 		ScanPara(S); V := NIL;
 		IF (S.class = Texts.Name) & (S.s = "saved") THEN
@@ -1125,14 +1125,14 @@ VAR
 		END
 	END Move;
 
-	PROCEDURE LogOpen(X, Y: INTEGER);
+	PROCEDURE LogOpen(X, Y: SIGNED16);
 		VAR V: Viewers.Viewer;
 	BEGIN
 		V := OpenViewer(Oberon.Log, "System.Log", 0, X, Y, 2);
 	 END LogOpen;
 
 	PROCEDURE OpenLog*;
-		VAR X, Y: INTEGER;
+		VAR X, Y: SIGNED16;
 	BEGIN
 		Oberon.AllocateSystemViewer(Oberon.SystemTrack(Oberon.Par.vwr.X), X, Y);
 		LogOpen(X, Y)
@@ -1167,7 +1167,7 @@ VAR
 
 	PROCEDURE Font*;
 		VAR S: Texts.Scanner;	text: Texts.Text;	ext: ARRAY 12 OF CHAR;
-			beg, end, time: LONGINT;	i, j: INTEGER;
+			beg, end, time: LONGINT;	i, j: SIGNED16;
 	BEGIN
 		ScanPara(S); IF S.class # Texts.Name THEN RETURN END;	(* ### *)
 		i := 0; WHILE (S.s[i] # 0X) & (S.s[i] # ".") DO INC(i) END;
@@ -1197,7 +1197,7 @@ VAR
     END Color;
 
 	PROCEDURE Do*;
-		VAR S: Texts.Scanner;	text: Texts.Text;	pos: LONGINT;	res: INTEGER;
+		VAR S: Texts.Scanner;	text: Texts.Text;	pos: LONGINT;	res: SIGNED16;
 
 		PROCEDURE NextLine(text: Texts.Text; pos: LONGINT): LONGINT;
 			VAR tR: Texts.Reader;	ch: CHAR;
@@ -1226,7 +1226,7 @@ VAR
 	END Do;
 
 	PROCEDURE Process(text: Texts.Text; beg, end: LONGINT; s: ARRAY OF CHAR);
-		VAR S: Texts.Scanner;	pos: LONGINT;	i: INTEGER;
+		VAR S: Texts.Scanner;	pos: LONGINT;	i: SIGNED16;
 	BEGIN
 		i := 0; WHILE (s[i] # 0X) & (s[i] # "*") DO INC(i) END;
 		IF s[i] = 0X THEN
@@ -1257,7 +1257,7 @@ VAR
 	(* expected parameters: M.P  {Processor} *)
 	(* Processor: specified as string; "*" -> specifies name of list *)
 		VAR S: Texts.Scanner;	text: Texts.Text;	beg, end, time: LONGINT;
-			cmd: ARRAY 32 OF CHAR;	res: INTEGER;
+			cmd: ARRAY 32 OF CHAR;	res: SIGNED16;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		IF S.class # Texts.Name THEN RETURN END;	(* ### *)
@@ -1276,7 +1276,7 @@ VAR
 
 	PROCEDURE ListNames*;
 		VAR S, S0: Texts.Scanner;	text: Texts.Text;
-			V: Viewers.Viewer;	X, Y: INTEGER;
+			V: Viewers.Viewer;	X, Y: SIGNED16;
 	BEGIN
 		ScanPara(S); IF S.class # Texts.Name THEN RETURN END;	(* ### *)
 		text := TextFrames.Text("");
@@ -1297,7 +1297,7 @@ VAR
 	END ListNames;
 
 	PROCEDURE Para*;
-		VAR V: Viewers.Viewer;	X, Y: INTEGER;
+		VAR V: Viewers.Viewer;	X, Y: SIGNED16;
 	BEGIN
 		Oberon.AllocateUserViewer(Oberon.UserTrack(Oberon.Par.vwr.X), X, Y);
 		V := OpenViewer(para, "ET.Para", 0, X, Y, 0)
@@ -1411,8 +1411,8 @@ VAR
 		str[pos] := 0X
 	END StrDelete;
 
-	PROCEDURE ShowText(title: ARRAY OF CHAR; T: Texts.Text; W, H: INTEGER);
-		VAR X, Y: INTEGER; V: Viewers.Viewer; pos: LONGINT;
+	PROCEDURE ShowText(title: ARRAY OF CHAR; T: Texts.Text; W, H: SIGNED16);
+		VAR X, Y: SIGNED16; V: Viewers.Viewer; pos: LONGINT;
 	BEGIN
 		IF T = Oberon.Log THEN
 			Oberon.AllocateSystemViewer(Oberon.SystemTrack(Oberon.Par.vwr.X), X, Y);

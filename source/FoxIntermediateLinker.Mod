@@ -463,7 +463,7 @@ TYPE
 				(* BOOLEAN *)
 				IF syntaxTreeValue(SyntaxTree.BooleanValue).value THEN hugeintValue := 1 ELSE hugeintValue := 0 END
 			ELSIF syntaxTreeValue IS SyntaxTree.IntegerValue THEN
-				(* INTEGER *)
+				(* SIGNED16 *)
 				hugeintValue := syntaxTreeValue(SyntaxTree.IntegerValue).value;
 			ELSE
 				HALT(100)

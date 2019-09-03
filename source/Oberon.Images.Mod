@@ -62,7 +62,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 		Palette* = OBJECT
 			VAR col*: POINTER TO ARRAY OF Pixel;	(** color table **)
 			used*: LONGINT;	(** number of valid entries in color table **)
-			bits: INTEGER;	(* number of bits used for each component in index *)
+			bits: SIGNED16;	(* number of bits used for each component in index *)
 			index: Colors.Index;	(* inverse color mapping for palette *)
 			PROCEDURE &New*; BEGIN NEW(col,256) END New;
 		END Palette;
@@ -86,7 +86,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 		(** raster image **)
 		Image* = POINTER TO ImageDesc;
 		ImageDesc* = RECORD (Objects.ObjDesc)
-			width*, height*: INTEGER;	(** image dimensions **)
+			width*, height*: SIGNED16;	(** image dimensions **)
 			fmt*: Format;	(** pixel format **)
 			bpr*: LONGINT;	(** number of bytes per row (may be negative) **)
 			adr*: ADDRESS;	(** address of lower left pixel **)
@@ -96,7 +96,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 		(** transfer mode **)
 		Mode0* = RECORD
 			src*, dst*: Format;	(** source and destination format **)
-			op*: INTEGER;	(** compositing operation **)
+			op*: SIGNED16;	(** compositing operation **)
 			col*: Pixel;	(** substitute color used when transfering from pure alpha formats to colored ones **)
 			buf: Pixel;	(* constant area for special-case moving *)
 			map: POINTER TO ARRAY  OF CHAR;	(* color map for transfer between indexed formats; implementation limit to 256 colors *)
@@ -111,7 +111,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 		(** message for updating map rectangle **)
 		UpdateMsg* = RECORD (Display.FrameMsg)
 			img*: Image;	(** affected image **)
-			llx*, lly*, urx*, ury*: INTEGER;	(** area to update within image **)
+			llx*, lly*, urx*, ury*: SIGNED16;	(** area to update within image **)
 		END;
 
 
@@ -132,13 +132,13 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	(**--- Color/Pixel conversions ---**)
 
 	(** set pixel to opaque RGB value **)
-	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: INTEGER);
+	PROCEDURE SetRGB* (VAR pix: Pixel; red, green, blue: SIGNED16);
 	BEGIN
 		pix[b] := CHR(blue); pix[g] := CHR(green); pix[r] := CHR(red); pix[a] := 0FFX
 	END SetRGB;
 
 	(** set pixel to partly transparent RGB value **)
-	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: INTEGER);
+	PROCEDURE SetRGBA* (VAR pix: Pixel; red, green, blue, alpha: SIGNED16);
 	BEGIN
 		pix[b] := CHR(LONG(blue) * alpha DIV 255);
 		pix[g] := CHR(LONG(green) * alpha DIV 255);
@@ -147,7 +147,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END SetRGBA;
 
 	(** retrieve RGB and alpha values from pixel **)
-	PROCEDURE GetRGBA* (pix: Pixel; VAR red, green, blue, alpha: INTEGER);
+	PROCEDURE GetRGBA* (pix: Pixel; VAR red, green, blue, alpha: SIGNED16);
 	BEGIN
 		alpha := ORD(pix[a]);
 		IF alpha = 0 THEN	(* color has disappeared *)
@@ -166,14 +166,14 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	(**--- Palettes ---**)
 
 	(** return index of color in palette which approximates the requested color reasonably well **)
-	PROCEDURE PaletteIndex* (pal: Palette; red, green, blue: INTEGER): LONGINT;
+	PROCEDURE PaletteIndex* (pal: Palette; red, green, blue: SIGNED16): LONGINT;
 	BEGIN
 		RETURN Colors.Match(pal.index, pal.bits, red, green, blue)
 	END PaletteIndex;
 
 	(** compute internal palette structures whenever palette colors have been modified **)
-	PROCEDURE InitPalette* (pal: Palette; used: LONGINT; bits: INTEGER);
-		VAR n: LONGINT; alpha: INTEGER; red, green, blue: POINTER TO ARRAY OF INTEGER;
+	PROCEDURE InitPalette* (pal: Palette; used: LONGINT; bits: SIGNED16);
+		VAR n: LONGINT; alpha: SIGNED16; red, green, blue: POINTER TO ARRAY OF SIGNED16;
 	BEGIN
 		IF (pal.col = NIL) OR (LEN(pal.col) < used) THEN NEW(pal.col, used) END;
 		NEW(red, used); NEW(green, used); NEW(blue, used);
@@ -187,7 +187,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END InitPalette;
 
 	(** compute and initialize a pseudo-optimal palette for an image (in hi-color or true-color format) **)
-	PROCEDURE ComputePalette* (img: Image; pal: Palette; reservedcols, maxcols: LONGINT; bits: INTEGER);
+	PROCEDURE ComputePalette* (img: Image; pal: Palette; reservedcols, maxcols: LONGINT; bits: SIGNED16);
 		(*
 			uses octree-quantization
 		*)
@@ -202,11 +202,11 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 			END;
 
 		VAR
-			sent, root: Node; reducible: ARRAY 8 OF Node; colors, maxDepth, y, x: INTEGER; used: LONGINT;
+			sent, root: Node; reducible: ARRAY 8 OF Node; colors, maxDepth, y, x: SIGNED16; used: LONGINT;
 			adr, aa: ADDRESS; bb: LONGINT; pix: Pixel;
 
-		PROCEDURE insert (VAR node: Node; depth: INTEGER; pix: Pixel);
-			VAR idx, bit: INTEGER;
+		PROCEDURE insert (VAR node: Node; depth: SIGNED16; pix: Pixel);
+			VAR idx, bit: SIGNED16;
 		BEGIN
 			IF node = NIL THEN
 				NEW(node);
@@ -233,7 +233,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 		END insert;
 
 		PROCEDURE reduce;
-			VAR d, n, i: INTEGER; node, prev, dsc: Node; min: LONGINT;
+			VAR d, n, i: SIGNED16; node, prev, dsc: Node; min: LONGINT;
 		BEGIN
 			d := maxDepth-1;
 			WHILE reducible[d] = NIL DO
@@ -263,7 +263,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 		END reduce;
 
 		PROCEDURE traverse (node: Node);
-			VAR i: INTEGER;
+			VAR i: SIGNED16;
 		BEGIN
 			IF node # NIL THEN
 				IF node.leaf THEN
@@ -388,7 +388,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	PROCEDURE PackP16 (VAR fmt: Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Pixel);
 	BEGIN
 		IF pix[a] # 0X THEN	(* model alpha as brightness *)
-			SYSTEM.PUT16(adr, PaletteIndex(fmt.pal, ORD(pix[r]), ORD(pix[g]), ORD(pix[b])))	(*INTEGER*)
+			SYSTEM.PUT16(adr, PaletteIndex(fmt.pal, ORD(pix[r]), ORD(pix[g]), ORD(pix[b])))	(*SIGNED16*)
 		END
 	END PackP16;
 
@@ -516,14 +516,14 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	(**--- Images ---**)
 
 	(** initialize custom image **)
-	PROCEDURE Init* (img: Image; width, height: INTEGER; VAR fmt: Format; bpr: LONGINT; adr: ADDRESS);
+	PROCEDURE Init* (img: Image; width, height: SIGNED16; VAR fmt: Format; bpr: LONGINT; adr: ADDRESS);
 	BEGIN
 		ASSERT((width > 0) & (height > 0), 100);
 		img.handle := Handle; img.width := width; img.height := height; img.fmt := fmt; img.bpr := bpr; img.adr := adr
 	END Init;
 
 	(** initialize custom image on byte buffer **)
-	PROCEDURE InitBuf* (img: Image; width, height: INTEGER; VAR fmt: Format; bpr, offset: LONGINT; VAR buf: ARRAY OF CHAR);
+	PROCEDURE InitBuf* (img: Image; width, height: SIGNED16; VAR fmt: Format; bpr, offset: LONGINT; VAR buf: ARRAY OF CHAR);
 	BEGIN
 		ASSERT((0 <= offset) & (offset + height * ABS(bpr) <= LEN(buf)), 100);
 		IF bpr >= 0 THEN Init(img, width, height, fmt, bpr, ADDRESSOF(buf[0]))
@@ -532,7 +532,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END InitBuf;
 
 	(** initialize image on rectangular area within existing image (lower left corner must fall on byte boundary) **)
-	PROCEDURE InitRect* (img, base: Image; x, y, w, h: INTEGER);
+	PROCEDURE InitRect* (img, base: Image; x, y, w, h: SIGNED16);
 	BEGIN
 		ASSERT((0 <= x) & (x + w <= base.width) & (0 <= y) & (y + h <= base.height), 100);
 		ASSERT(x * base.fmt.bpp MOD 8 = 0, 101);
@@ -540,7 +540,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END InitRect;
 
 	(** create image in requested format (allocating or reusing necessary memory) **)
-	PROCEDURE Create* (img: Image; width, height: INTEGER; VAR fmt: Format);
+	PROCEDURE Create* (img: Image; width, height: SIGNED16; VAR fmt: Format);
 		VAR size: LONGINT; a0, a1: ADDRESS;
 	BEGIN
 		ASSERT((width > 0) & (height > 0), 100);
@@ -578,7 +578,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END GetExtension;
 
 	PROCEDURE Install (VAR s: Texts.Scanner; VAR ext: ARRAY OF CHAR);
-		VAR str: ARRAY 64 OF CHAR; res: INTEGER;
+		VAR str: ARRAY 64 OF CHAR; res: SIGNED16;
 	BEGIN
 		ASSERT(s.class IN {Texts.Name, Texts.String});
 		COPY(s.s, str); Texts.Scan(s);
@@ -649,7 +649,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	(**--- Transfer Modes ---**)
 
 	(** initialize transfer mode **)
-	PROCEDURE InitMode* (VAR mode: Mode; op: INTEGER);
+	PROCEDURE InitMode* (VAR mode: Mode; op: SIGNED16);
 	BEGIN
 		mode.op := op;
 		SetRGB(mode.col, 255, 255, 255);
@@ -660,7 +660,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END InitMode;
 
 	(** initialize transfer mode with color components for pure alpha sources **)
-	PROCEDURE InitModeColor* (VAR mode: Mode; op, red, green, blue: INTEGER);
+	PROCEDURE InitModeColor* (VAR mode: Mode; op, red, green, blue: SIGNED16);
 	BEGIN
 		mode.op := op;
 		SetRGB(mode.col, red, green, blue);
@@ -671,7 +671,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END InitModeColor;
 
 	(** set new source color for transfer mode **)
-	PROCEDURE SetModeColor* (VAR mode: Mode; red, green, blue: INTEGER);
+	PROCEDURE SetModeColor* (VAR mode: Mode; red, green, blue: SIGNED16);
 	BEGIN
 		SetRGB(mode.col, red, green, blue);
 		IF (mode.src.pal # NIL) & ((mode.map = NIL) OR (LEN(mode.map^) # mode.src.pal.used)) THEN
@@ -681,7 +681,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END SetModeColor;
 
 	(** blend source pixel into destination pixel according to compositing operation **)
-	PROCEDURE Blend* (op: INTEGER; VAR src, dst: Pixel);
+	PROCEDURE Blend* (op: SIGNED16; VAR src, dst: Pixel);
 		VAR fs, fd, i: LONGINT;
 	BEGIN
 		CASE op OF
@@ -1753,7 +1753,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 
 	(** find (optimized) pixel transfer procedure for transfer mode and given source and destination formats **)
 	PROCEDURE Bind* (VAR mode: Mode; VAR src, dst: Format);
-		VAR op: INTEGER; i: LONGINT;
+		VAR op: SIGNED16; i: LONGINT;
 	BEGIN
 		IF Same(src, mode.src) & Same(dst, mode.dst) THEN
 			ASSERT(mode.transfer # NIL, 120);
@@ -1983,7 +1983,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	(**--- Image Operations ---**)
 
 	(** get pixel from image **)
-	PROCEDURE Get* (img: Image; x, y: INTEGER; VAR pix: Pixel; VAR mode: Mode);
+	PROCEDURE Get* (img: Image; x, y: SIGNED16; VAR pix: Pixel; VAR mode: Mode);
 		VAR bit: LONGINT; adr: ADDRESS;
 	BEGIN
 		ASSERT((0 <= x) & (x < img.width) & (0 <= y) & (y < img.height), 100);
@@ -1993,7 +1993,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END Get;
 
 	(** put pixel into image **)
-	PROCEDURE Put* (img: Image; x, y: INTEGER; pix: Pixel; VAR mode: Mode);
+	PROCEDURE Put* (img: Image; x, y: SIGNED16; pix: Pixel; VAR mode: Mode);
 		VAR bit: LONGINT; adr: ADDRESS;
 	BEGIN
 		ASSERT((0 <= x) & (x < img.width) & (0 <= y) & (y < img.height), 100);
@@ -2003,8 +2003,8 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END Put;
 
 	(** fill rectangular area **)
-	PROCEDURE Fill* (img: Image; llx, lly, urx, ury: INTEGER; pix: Pixel; VAR mode: Mode);
-		VAR bit, bb: LONGINT; adr, aa: ADDRESS; m: Mode; x: INTEGER;
+	PROCEDURE Fill* (img: Image; llx, lly, urx, ury: SIGNED16; pix: Pixel; VAR mode: Mode);
+		VAR bit, bb: LONGINT; adr, aa: ADDRESS; m: Mode; x: SIGNED16;
 	BEGIN
 		ASSERT((0 <= llx) & (llx < urx) & (urx <= img.width) & (0 <= lly) & (lly < ury) & (ury <= img.height), 100);
 		bit := LONG(llx) * img.fmt.bpp; adr := img.adr + lly * img.bpr + bit DIV 8; bit := bit MOD 8;
@@ -2058,7 +2058,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END Clear;
 
 	(** get several pixels and store them in array in requested format **)
-	PROCEDURE GetPixels* (img: Image; x, y, w: INTEGER; VAR fmt: Format; VAR buf: ARRAY OF CHAR; VAR mode: Mode);
+	PROCEDURE GetPixels* (img: Image; x, y, w: SIGNED16; VAR fmt: Format; VAR buf: ARRAY OF CHAR; VAR mode: Mode);
 		VAR sbit: LONGINT; sadr: ADDRESS;
 	BEGIN
 		ASSERT((0 <= x) & (x + w <= img.width) & (0 <= y) & (y <= img.height), 100);
@@ -2069,7 +2069,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END GetPixels;
 
 	(** put several pixels from array in given format into image **)
-	PROCEDURE PutPixels* (img: Image; x, y, w: INTEGER; VAR fmt: Format; VAR buf: ARRAY OF CHAR; VAR mode: Mode);
+	PROCEDURE PutPixels* (img: Image; x, y, w: SIGNED16; VAR fmt: Format; VAR buf: ARRAY OF CHAR; VAR mode: Mode);
 		VAR dbit: LONGINT; dadr: ADDRESS;
 	BEGIN
 		ASSERT((0 <= x) & (x + w <= img.width) & (0 <= y) & (y <= img.height), 100);
@@ -2080,8 +2080,8 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END PutPixels;
 
 	(** copy rectangular area to the same or another image in specified mode **)
-	PROCEDURE Copy* (src, dst: Image; llx, lly, urx, ury, dx, dy: INTEGER; VAR mode: Mode);
-		VAR w, h: INTEGER; sbit, dbit, slen, sb, db, len, l: LONGINT; sadr, dadr, sa, da: ADDRESS;
+	PROCEDURE Copy* (src, dst: Image; llx, lly, urx, ury, dx, dy: SIGNED16; VAR mode: Mode);
+		VAR w, h: SIGNED16; sbit, dbit, slen, sb, db, len, l: LONGINT; sadr, dadr, sa, da: ADDRESS;
 	BEGIN
 		ASSERT((0 <= llx) & (llx <= urx) & (urx <= src.width) & (0 <= lly) & (lly <= ury) & (ury <= src.height), 100);
 		ASSERT((0 <= dx) & (dx + urx - llx <= dst.width) & (0 <= dy) & (dy + ury - lly <= dst.height), 101);
@@ -2121,8 +2121,8 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END Copy;
 
 	(** replicate pattern within rectangular area of image using given mode **)
-	PROCEDURE FillPattern* (pat, dst: Image; llx, lly, urx, ury, px, py: INTEGER; VAR mode: Mode);
-		VAR pw, ph, olx, oby, ilx, olw, irw, dy, sy, dx, sx, ty: INTEGER;
+	PROCEDURE FillPattern* (pat, dst: Image; llx, lly, urx, ury, px, py: SIGNED16; VAR mode: Mode);
+		VAR pw, ph, olx, oby, ilx, olw, irw, dy, sy, dx, sx, ty: SIGNED16;
 	BEGIN
 		ASSERT((0 <= llx) & (llx <= urx) & (urx <= dst.width) & (0 <= lly) & (lly <= ury) & (ury <= dst.height), 100);
 		pw := pat.width; ph := pat.height;
@@ -2181,7 +2181,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 
 	(** darken image while maintaining coverage **)
 	PROCEDURE Darken* (img: Image; factor: REAL);
-		VAR s, i, j, k, bit: LONGINT; adr: ADDRESS; clamp: ARRAY 256 OF CHAR; y, x: INTEGER; pix: Pixel;
+		VAR s, i, j, k, bit: LONGINT; adr: ADDRESS; clamp: ARRAY 256 OF CHAR; y, x: SIGNED16; pix: Pixel;
 	BEGIN
 		s := ABS(ENTIER(255*factor + 0.5));
 		IF (s # 255) & (img.fmt.components # {alpha}) THEN
@@ -2207,7 +2207,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 
 	(** fade image **)
 	PROCEDURE Fade* (img: Image; factor: REAL);
-		VAR s, i, j, k, bit: LONGINT; adr: ADDRESS; clamp: ARRAY 256 OF CHAR; y, x: INTEGER; pix: Pixel;
+		VAR s, i, j, k, bit: LONGINT; adr: ADDRESS; clamp: ARRAY 256 OF CHAR; y, x: SIGNED16; pix: Pixel;
 	BEGIN
 		s := ABS(ENTIER(255*factor + 0.5));
 		IF s = 0 THEN
@@ -2236,7 +2236,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 
 	(** make image brighter and more transparent; Opaque(I, f) = Darken(Fade(I, f), 1/f) **)
 	PROCEDURE Opaque* (img: Image; factor: REAL);
-		VAR s, i, j, k, bit: LONGINT; adr: ADDRESS; clamp: ARRAY 256 OF CHAR; y, x: INTEGER; pix: Pixel;
+		VAR s, i, j, k, bit: LONGINT; adr: ADDRESS; clamp: ARRAY 256 OF CHAR; y, x: SIGNED16; pix: Pixel;
 	BEGIN
 		s := ABS(ENTIER(255*factor + 0.5));
 		IF s = 0 THEN
@@ -2264,7 +2264,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 
 	(** add components of two (faded) images **)
 	PROCEDURE Add* (i, j, res: Image);
-		VAR y, x: INTEGER; iadr, jadr, radr: ADDRESS; ibit, jbit, rbit, k: LONGINT; ipix, jpix, rpix: Pixel;
+		VAR y, x: SIGNED16; iadr, jadr, radr: ADDRESS; ibit, jbit, rbit, k: LONGINT; ipix, jpix, rpix: Pixel;
 	BEGIN
 		ASSERT((i.width = j.width) & (i.height = j.height) & (i.width <= res.width) & (i.height <= res.height), 100);
 		y := 0;
@@ -2288,9 +2288,9 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	(** copy image to another using error diffusion dithering (Floyd-Steinberg) **)
 	PROCEDURE Dither* (src, dst: Image);
 		TYPE
-			error = RECORD r, g, b: INTEGER END;
+			error = RECORD r, g, b: SIGNED16 END;
 		VAR
-			e351: POINTER TO ARRAY OF error; y, x, ex, e, e3, e5: INTEGER;
+			e351: POINTER TO ARRAY OF error; y, x, ex, e, e3, e5: SIGNED16;
 			sadr, dadr, sa, da: ADDRESS; sb, db: LONGINT; e7, e51, e1: error; spix, dpix: Pixel;
 	BEGIN
 		ASSERT((src.width <= dst.width) & (src.height <= dst.height), 100);
@@ -2397,7 +2397,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 
 	(** read image from file rider **)
 	PROCEDURE Read* (VAR fr: Files.Rider; img: Image);
-		VAR ver, code, w, h, bpr, len: LONGINT; adr, aa: ADDRESS; fmt: Format; buf: ARRAY 256 OF CHAR; used8 : INTEGER; used: LONGINT;
+		VAR ver, code, w, h, bpr, len: LONGINT; adr, aa: ADDRESS; fmt: Format; buf: ARRAY 256 OF CHAR; used8 : SIGNED16; used: LONGINT;
 	BEGIN
 		ASSERT(img#NIL,100);
 		Files.ReadNum(fr, ver);	(* only know version 1 & 2, check below *)
@@ -2449,7 +2449,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 
 	(** image handler **)
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR img, copy: Image; lib: Objects.Library; ref: INTEGER;
+		VAR img, copy: Image; lib: Objects.Library; ref: SIGNED16;
 	BEGIN
 		img := obj(Image);
 		IF msg IS Objects.AttrMsg THEN
@@ -2506,7 +2506,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END New;
 
 	(** update part of an image **)
-	PROCEDURE Update* (img: Image; llx, lly, urx, ury: INTEGER);
+	PROCEDURE Update* (img: Image; llx, lly, urx, ury: SIGNED16);
 		VAR um: UpdateMsg;
 	BEGIN
 		um.F := NIL; um.img := img; um.llx := llx; um.lly := lly; um.urx := urx; um.ury := ury;

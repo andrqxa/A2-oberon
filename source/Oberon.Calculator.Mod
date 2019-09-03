@@ -30,7 +30,7 @@ TYPE
 	Reference = POINTER TO ReferenceDesc;	(* Element of the list of known operators *)
 	ReferenceDesc = RECORD
 		name: Objects.Name;	(* "+", "-", "sqrt", "log", etc. *)
-		weight: INTEGER;	(* the operator's weight, 0 is minor *)
+		weight: SIGNED16;	(* the operator's weight, 0 is minor *)
 		next: Reference;
 	END;
 
@@ -66,7 +66,7 @@ TYPE
 	Expression* = POINTER TO ExpressionDesc;	(** the expression tree *)
 	ExpressionDesc* = RECORD
 		root,curr: Node;
-		res*,nest,last: INTEGER;	(** error flag *)
+		res*,nest,last: SIGNED16;	(** error flag *)
 	END;
 VAR
 	F,D: LONGINT;	(* fraction and decimals *)
@@ -123,7 +123,7 @@ END Fac;
 
 (* ********************************************************** *)
 
-PROCEDURE Calc(node: Node; VAR res: INTEGER): LONGREAL;
+PROCEDURE Calc(node: Node; VAR res: SIGNED16): LONGREAL;
 	(* rekursive calculation of node results *)
 VAR
 	val,val0: LONGREAL;
@@ -152,10 +152,10 @@ BEGIN
 	RETURN(val);
 END Calc;
 
-PROCEDURE Weight(node: Node): INTEGER;
+PROCEDURE Weight(node: Node): SIGNED16;
 	(* determine an operator's weight, starting at 0 *)
 VAR
-	weight: INTEGER;
+	weight: SIGNED16;
 BEGIN
 	IF (node # NIL) THEN
 		IF node IS Result THEN
@@ -241,7 +241,7 @@ PROCEDURE AppendOperator*(VAR exp: Expression; op: ARRAY OF CHAR);
 VAR
 	rider: Reference;
 	eval: Operator;
-	weight: INTEGER;
+	weight: SIGNED16;
 BEGIN
 	rider:= ref;
 	WHILE (rider # NIL) & (rider.name # op) DO rider:= rider.next; END;
@@ -250,7 +250,7 @@ BEGIN
 	ELSE
 		NEW(eval); InitNode(eval); eval.ref:= rider;
 		weight:= Weight(eval);
-		IF (weight = MIN(INTEGER)) THEN
+		IF (weight = MIN(SIGNED16)) THEN
 			exp.last:= POSTFIX;
 			IF (exp.curr.up = NIL) THEN
 				exp.res:= MisplacedOperator;
@@ -262,7 +262,7 @@ BEGIN
 					eval.up.right:= eval;
 				END;
 			END;
-		ELSIF (weight = MAX(INTEGER)) THEN
+		ELSIF (weight = MAX(SIGNED16)) THEN
 			exp.last:= PREFIX;
 			IF (exp.curr IS Operator) OR (exp.curr IS Result) THEN
 				eval.up:= exp.curr;
@@ -299,7 +299,7 @@ END AppendOperand;
 PROCEDURE Scan*(VAR exp: Expression; VAR S: Texts.Scanner);
 VAR
 	val: Value;
-	last: INTEGER;
+	last: SIGNED16;
 BEGIN
 	exp.last:= 0; last:= 0; Texts.Scan(S);
 	IF ~S.eot & ~((S.class = Texts.Char) & (S.c = EOC)) THEN
@@ -444,7 +444,7 @@ BEGIN
 	WHILE (rider # NIL) & (rider.name # name) DO rider:= rider.next; END;
 	IF (rider = NIL) THEN
 		NEW(op); op.next:= ref; COPY(name,op.name);
-		op.weight:= MAX(INTEGER); op.op:= f; ref:= op;
+		op.weight:= MAX(SIGNED16); op.op:= f; ref:= op;
 	ELSE
 		WITH rider: PrefixOperator DO rider.op:= f; END;
 	END;
@@ -461,7 +461,7 @@ operator modulo
 
 		Calculator.AddInfixOperator("mod",0,modulo);
 *)
-PROCEDURE AddInfixOperator*(name: ARRAY OF CHAR; w: INTEGER; f: BinaryFunc);
+PROCEDURE AddInfixOperator*(name: ARRAY OF CHAR; w: SIGNED16; f: BinaryFunc);
 VAR
 	op: InfixOperator;
 	rider: Reference;
@@ -506,7 +506,7 @@ BEGIN
 	WHILE (rider # NIL) & (rider.name # name) DO rider:= rider.next; END;
 	IF (rider = NIL) THEN
 		NEW(op); op.next:= ref; COPY(name,op.name);
-		op.weight:= MIN(INTEGER); op.op:= f; ref:= op;
+		op.weight:= MIN(SIGNED16); op.op:= f; ref:= op;
 	ELSE
 		WITH rider: PrefixOperator DO rider.op:= f; END;
 	END;

@@ -233,7 +233,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				symbolSection: Sections.Section;
 
 				PROCEDURE Type(VAR t: IntermediateCode.Type);
-				VAR form: SIGNED8; sizeInBits: INTEGER;
+				VAR form: SIGNED8; sizeInBits: SIGNED16;
 				BEGIN
 					r.RawSInt(form);
 					r.RawInt(sizeInBits);
@@ -241,7 +241,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				END Type;
 
 				PROCEDURE RegisterClass(VAR c: IntermediateCode.RegisterClass);
-				VAR class: SIGNED8; number: INTEGER;
+				VAR class: SIGNED8; number: SIGNED16;
 				BEGIN
 					r.RawSInt(class);
 					r.RawInt(number);

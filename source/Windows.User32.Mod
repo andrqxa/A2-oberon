@@ -249,7 +249,7 @@ MODULE User32; (** non-portable / source: Windows.User32.Mod *)	(* ejz  *)
 
 		(** The ACCEL structure defines an accelerator key used in an accelerator table. *)
 		Accel* = RECORD  			fVirt*: CHAR;
-			key*, cmd*: INTEGER
+			key*, cmd*: SIGNED16
 		END;
 
 		(** Proctype for SetWindowsHook(Ex) *)
@@ -310,7 +310,7 @@ MODULE User32; (** non-portable / source: Windows.User32.Mod *)	(* ejz  *)
 		EqualRect-: PROCEDURE {WINAPI} (lprc1, lprc2: Rect): Kernel32.BOOL;
 		(** The GetAsyncKeyState function determines whether a key is up or down at the time the function is called, and
 			whether the key was pressed after a previous call to GetAsyncKeyState. *)
-		GetAsyncKeyState-: PROCEDURE {WINAPI} (vKey: LONGINT): INTEGER;
+		GetAsyncKeyState-: PROCEDURE {WINAPI} (vKey: LONGINT): SIGNED16;
 		(** The GetClientRect function retrieves the coordinates of a window's client area. *)
 		GetClientRect-: PROCEDURE {WINAPI} (hWnd: HWND; VAR lpRect: Rect): Kernel32.BOOL;
 		(** The GetClipboardData function retrieves data from the clipboard in a specified format. *)
@@ -328,7 +328,7 @@ MODULE User32; (** non-portable / source: Windows.User32.Mod *)	(* ejz  *)
 		(** Retrieves a handle to the foreground window (the window with which the user is currently working). The system assigns a slightly higher priority to the thread that creates the foreground window than it does to other threads.  *)
 		GetForegroundWindow-: PROCEDURE {WINAPI} (): HWND;
 		(** The GetKeyState function retrieves the status of the specified virtual key. *)
-		GetKeyState-: PROCEDURE {WINAPI} (vKey: LONGINT): INTEGER;
+		GetKeyState-: PROCEDURE {WINAPI} (vKey: LONGINT): SIGNED16;
 		(** The GetMenu function retrieves a handle to the menu assigned to the specified window. *)
 		GetMenu-: PROCEDURE {WINAPI} (hWnd: HWND): HMenu;
 		(** The GetMenuItemInfo function retrieves information about a menu item. *)
@@ -407,7 +407,7 @@ MODULE User32; (** non-portable / source: Windows.User32.Mod *)	(* ejz  *)
 		(** The RegisterClipboardFormat function registers a new clipboard format. *)
 		RegisterHotKey-: PROCEDURE{WINAPI} (hWnd: HWND; id: LONGINT; fsmodifiers,vk: LONGINT): Kernel32.BOOL;
 		(*The RegisterHotKey function defines a system-wide hot key *)
-		RegisterClipboardFormat-: PROCEDURE {WINAPI} (VAR lpszFormat: ARRAY   OF CHAR): INTEGER;
+		RegisterClipboardFormat-: PROCEDURE {WINAPI} (VAR lpszFormat: ARRAY   OF CHAR): SIGNED16;
 		(** The RegisterWindowMessage function defines a new window message that is guaranteed to be
 			unique throughout the system. *)
 		RegisterWindowMessage-: PROCEDURE {WINAPI} (VAR lpString: ARRAY   OF CHAR): LONGINT;

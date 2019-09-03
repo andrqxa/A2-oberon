@@ -15,9 +15,9 @@ TYPE
 		VAR
 			rpcConn: TCP.Connection;
 			host: ARRAY MaxNameLen OF CHAR;
-			port: INTEGER;
+			port: SIGNED16;
 
-		PROCEDURE &Init*(host: ARRAY OF CHAR; port: INTEGER);
+		PROCEDURE &Init*(host: ARRAY OF CHAR; port: SIGNED16);
 			VAR len: LONGINT;
 		BEGIN
 			len := Len(host);

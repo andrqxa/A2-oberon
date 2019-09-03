@@ -17,7 +17,7 @@ TYPE
 		placeholderimg : WMGraphics.Image;
 
 		idch, typech, famch, varch : CHAR;
-		height, minX, maxX, minY, maxY, nofRuns : INTEGER;
+		height, minX, maxX, minY, maxY, nofRuns : SIGNED16;
 
 		runs : ARRAY 32 OF RECORD beg, end : LONGINT END;
 
@@ -119,7 +119,7 @@ PROCEDURE StreamLoad(r : Streams.Reader) : Font;
 VAR
 	font : Font;
 	ch : CHAR;
-	minY, maxY, t, rbeg, rend : INTEGER;
+	minY, maxY, t, rbeg, rend : SIGNED16;
 	nofGlyphs, i, j, run, bits, b, pos, xw : LONGINT;
 	p1 : Raster.Pixel;
 	mode : Raster.Mode;
@@ -250,8 +250,8 @@ BEGIN
 	w.RawInt(font.height);
 	w.RawInt(font.minX);
 	w.RawInt(font.maxX);
-	w.RawInt(-INTEGER(font.descent));
-	w.RawInt(INTEGER(font.ascent));
+	w.RawInt(-SIGNED16(font.descent));
+	w.RawInt(SIGNED16(font.ascent));
 	w.RawInt(font.nofRuns);
 
 	nofGlyphs := 0; i := 0;

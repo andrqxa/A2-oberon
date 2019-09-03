@@ -12,7 +12,7 @@ MODULE PlugInDocs IN Oberon; (** portable *)	(* ejz  *)
 		END;
 
 	PROCEDURE Exchange(old, new: Documents.Document);
-		VAR name: Objects.Name; w, h: INTEGER;
+		VAR name: Objects.Name; w, h: SIGNED16;
 	BEGIN
 		Gadgets.GetObjName(old, name); w := old.W; h := old.H;
 		old^ := new^;

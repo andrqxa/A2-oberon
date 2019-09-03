@@ -37,7 +37,7 @@ TYPE
 	tLayerDesc* = RECORD (vyPort.tLayerDesc);
 		n-: antsNeighbourhoods.Neighbours;
 		maxx, maxy: LONGINT;
-		dim: INTEGER;
+		dim: SIGNED16;
 		isotropic: BOOLEAN;
 		commands: vyCommandMenus.List;
 		viewnum: BOOLEAN;
@@ -85,7 +85,7 @@ VAR
 	END Recall;
 
 	PROCEDURE Responsible( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 	BEGIN
 		priority := vyEvents.PrioNone;
 		IF ((event.gesture = vyEvents.EvtSelect) OR (event.gesture = vyEvents.EvtLoc) OR
@@ -107,10 +107,10 @@ VAR
 	END Prompt;
 
 	PROCEDURE OnLayer( layer: tLayer;  VAR event: vyEvents.EventMsg ): BOOLEAN;
-	VAR i, j: INTEGER;  cells: LONGINT;  cellsize: LONGREAL;
+	VAR i, j: SIGNED16;  cells: LONGINT;  cellsize: LONGREAL;
 
-		PROCEDURE InCell( x, y: LONGINT;  cx, cy: INTEGER ): BOOLEAN;
-		VAR rx, ry, rw, rh: INTEGER;
+		PROCEDURE InCell( x, y: LONGINT;  cx, cy: SIGNED16 ): BOOLEAN;
+		VAR rx, ry, rw, rh: SIGNED16;
 		BEGIN
 			vyGraphBase.Rect2dToRect( x * cellsize - cellsize / 2, y * cellsize - cellsize / 2, cellsize, cellsize, rx, ry, rw, rh );
 			IF vyRectangles.PointInRect( cx, cy, rx, ry, rw, rh ) THEN RETURN TRUE ELSE RETURN FALSE END
@@ -129,10 +129,10 @@ VAR
 	END OnLayer;
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;  origx, origy: INTEGER;  gesture: INTEGER;  oldx: INTEGER;
+	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;
 
-		PROCEDURE InCell( x, y: LONGINT;  cx, cy: INTEGER ): BOOLEAN;
-		VAR rx, ry, rw, rh: INTEGER;
+		PROCEDURE InCell( x, y: LONGINT;  cx, cy: SIGNED16 ): BOOLEAN;
+		VAR rx, ry, rw, rh: SIGNED16;
 		BEGIN
 			vyGraphBase.Rect2dToRect( x * cellsize - cellsize / 2, y * cellsize - cellsize / 2, cellsize, cellsize, rx, ry, rw, rh );
 			IF vyRectangles.PointInRect( cx, cy, rx, ry, rw, rh ) THEN RETURN TRUE ELSE RETURN FALSE END
@@ -140,7 +140,7 @@ VAR
 
 	BEGIN
 		IF layer.maxx > layer.maxy THEN cells := layer.maxx ELSE cells := layer.maxy END;
-		cellsize := 1 / (cells + 1);  oldx := MAX( INTEGER );
+		cellsize := 1 / (cells + 1);  oldx := MAX( SIGNED16 );
 		FOR i := 0 TO layer.n.dim - 1 DO
 			IF layer.n.par[i] # MIN( LONGREAL ) THEN
 				FOR j := 0 TO layer.n.count[i] - 1 DO
@@ -171,10 +171,10 @@ VAR
 	END Select;
 
 	PROCEDURE Wheel( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;  origx, origy: INTEGER;  gesture: INTEGER;  oldx: INTEGER;  add, val: LONGREAL;
+	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;  add, val: LONGREAL;
 
-		PROCEDURE InCell( x, y: LONGINT;  cx, cy: INTEGER ): BOOLEAN;
-		VAR rx, ry, rw, rh: INTEGER;
+		PROCEDURE InCell( x, y: LONGINT;  cx, cy: SIGNED16 ): BOOLEAN;
+		VAR rx, ry, rw, rh: SIGNED16;
 		BEGIN
 			vyGraphBase.Rect2dToRect( x * cellsize - cellsize / 2, y * cellsize - cellsize / 2, cellsize, cellsize, rx, ry, rw, rh );
 			IF vyRectangles.PointInRect( cx, cy, rx, ry, rw, rh ) THEN RETURN TRUE ELSE RETURN FALSE END
@@ -182,7 +182,7 @@ VAR
 
 	BEGIN
 		IF layer.maxx > layer.maxy THEN cells := layer.maxx ELSE cells := layer.maxy END;
-		cellsize := 1 / (cells + 1);  oldx := MAX( INTEGER );
+		cellsize := 1 / (cells + 1);  oldx := MAX( SIGNED16 );
 		FOR i := 0 TO layer.n.dim - 1 DO
 			IF layer.n.par[i] # MIN( LONGREAL ) THEN
 				FOR j := 0 TO layer.n.count[i] - 1 DO
@@ -199,7 +199,7 @@ VAR
 	END Wheel;
 
 	PROCEDURE HandleFileMsg( obj: tLayer;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 
 	BEGIN
 		IF msg.id = Objects.load THEN

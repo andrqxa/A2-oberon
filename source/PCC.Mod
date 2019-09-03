@@ -277,7 +277,7 @@ BEGIN
 		PCLIR.EmitLoadAddr( code, x.adr, x.offs, x.var );
 	(** << fof  *)
 	ELSE
-		HALT(MAX(INTEGER));
+		HALT(MAX(SIGNED16));
 		PCM.LogWLn; PCM.LogWStr("LoadAdr, unimplemented mode: "); PCM.LogWNum(x.mode);
 		PCDebug.ToDo(PCDebug.NotImplemented);
 	END;
@@ -530,7 +530,7 @@ BEGIN
 		ELSIF mode = PCT.static THEN
 			MakeIntConst(size, GetStaticSize(t), PCT.Int32)
 		ELSE
-			PCDebug.GetTypeName(t, name); HALT(MAX(INTEGER));
+			PCDebug.GetTypeName(t, name); HALT(MAX(SIGNED16));
 			PCDebug.ToDo(PCDebug.NotImplemented);
 			MakeIntConst(size, 4, PCT.Int32)
 		END
@@ -545,13 +545,13 @@ BEGIN
 			MakeSizeConst( size, GetStaticSize( t ))
 			(*fof*)
 		ELSE
-			PCDebug.GetTypeName( t, name );  HALT( MAX( INTEGER ) );
+			PCDebug.GetTypeName( t, name );  HALT( MAX( SIGNED16 ) );
 			PCDebug.ToDo( PCDebug.NotImplemented );
 			MakeSizeConst( size, PCT.AddressSize )
 		END
 		(** << fof  *)
 	ELSE
-		PCDebug.GetTypeName(t, name); HALT(MAX(INTEGER));
+		PCDebug.GetTypeName(t, name); HALT(MAX(SIGNED16));
 		PCDebug.ToDo(PCDebug.NotImplemented);
 		MakeIntConst(size, 4, PCT.Int32)
 	END

@@ -13,17 +13,17 @@ MODULE Streams IN Oberon;	(** portable *)
 		StreamDesc* = RECORD
 			ReadBytes*, WriteBytes*: PROCEDURE (S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: LONGINT);
 			Available*: PROCEDURE (S: Stream): LONGINT; (** returns the number of bytes which may read without blocking *)
-			State*: PROCEDURE (S: Stream): INTEGER; (** closed, error, in, out, inout *)
+			State*: PROCEDURE (S: Stream): SIGNED16; (** closed, error, in, out, inout *)
 			Flush*: PROCEDURE (S: Stream); (** flush all buffers of the stream *)
 			Close*: PROCEDURE (S: Stream); (** close the stream *)
 			res*: LONGINT; (** bytes requested but not read/written *)
-			mode*: INTEGER; (** binary, oberon, iso8859 *)
+			mode*: SIGNED16; (** binary, oberon, iso8859 *)
 			eos*, buffer*: BOOLEAN (** set, when either the end of the stream is reached or the stream is closed. *)
 		END;
 		FileStream* = POINTER TO FileStreamDesc;
 		FileStreamDesc = RECORD (StreamDesc)
 			R: Files.Rider;
-			state: INTEGER;
+			state: SIGNED16;
 			ch: CHAR
 		END;
 
@@ -50,7 +50,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		S.ReadBytes(S, x, 1)
 	END ReadBool;
 
-	PROCEDURE ReadInt*(S: Stream; VAR x: INTEGER);
+	PROCEDURE ReadInt*(S: Stream; VAR x: SIGNED16);
 	BEGIN
 		S.ReadBytes(S, x, 2)
 	END ReadInt;
@@ -104,7 +104,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		S.WriteBytes(S, x, 1)
 	END WriteBool;
 
-	PROCEDURE WriteInt*(S: Stream; x: INTEGER);
+	PROCEDURE WriteInt*(S: Stream; x: SIGNED16);
 	BEGIN
 		S.WriteBytes(S, x, 2)
 	END WriteInt;
@@ -156,7 +156,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		RETURN 0
 	END NULLAvailable;
 
-	PROCEDURE NULLState(S: Stream): INTEGER;
+	PROCEDURE NULLState(S: Stream): SIGNED16;
 	BEGIN
 		RETURN error
 	END NULLState;
@@ -195,7 +195,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		END
 	END FileAvailable;
 
-	PROCEDURE FileState(S: Stream): INTEGER;
+	PROCEDURE FileState(S: Stream): SIGNED16;
 	BEGIN
 		WITH S: FileStream DO
 			RETURN S.state
@@ -269,7 +269,7 @@ MODULE Streams IN Oberon;	(** portable *)
 	END Copy;
 
 BEGIN
-	NEW(NULL); NULL.mode := binary; NULL.eos := FALSE; NULL.res := MAX(INTEGER);
+	NEW(NULL); NULL.mode := binary; NULL.eos := FALSE; NULL.res := MAX(SIGNED16);
 	NULL.ReadBytes := NULLReadBytes; NULL.WriteBytes := NULLWriteBytes;
 	NULL.Available := NULLAvailable; NULL.State := NULLState;
 	NULL.Flush := NULLFlush; NULL.Close := NULLClose; NULL.buffer := FALSE

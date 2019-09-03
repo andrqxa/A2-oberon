@@ -484,8 +484,8 @@ TYPE
 			RETURN current.code[pc - pcOffset - 1];
 		END GetByte;
 
-		PROCEDURE GetWord* (): INTEGER;
-		VAR word: INTEGER;
+		PROCEDURE GetWord* (): SIGNED16;
+		VAR word: SIGNED16;
 		BEGIN
 			word := ORD (GetByte ());
 			INC (word, ORD (GetByte ()) * 100H);
@@ -585,7 +585,7 @@ TYPE
 			END SkipBlanks;
 
 			PROCEDURE GetNumber (VAR intval: LONGINT);
-			VAR i, m, n: INTEGER; dig: ARRAY 24 OF CHAR;
+			VAR i, m, n: SIGNED16; dig: ARRAY 24 OF CHAR;
 			BEGIN
 				i := 0; m := 0; n := 0;
 				WHILE ('0' <= scanner.ch) & (scanner.ch <= '9') OR ('A' <= CAP (scanner.ch)) & (CAP (scanner.ch) <= 'F') DO
@@ -2005,11 +2005,11 @@ BEGIN
 	destFile[i+j] := 0X;
 END ReplaceSuffix;
 
-PROCEDURE Ord (ch: CHAR): INTEGER;
+PROCEDURE Ord (ch: CHAR): SIGNED16;
 BEGIN RETURN ORD (ch) - ORD ("0")
 END Ord;
 
-PROCEDURE HexOrd (ch: CHAR): INTEGER;
+PROCEDURE HexOrd (ch: CHAR): SIGNED16;
 BEGIN
 	IF ch <= "9" THEN RETURN ORD (ch) - ORD ("0")
 	ELSE RETURN ORD (CAP (ch)) - ORD ("A") + 10
@@ -2021,7 +2021,7 @@ BEGIN RETURN SYSTEM.VAL (SIGNED8, value) = value
 END ValueInByteRange;
 
 PROCEDURE ValueInWordRange (value: HUGEINT): BOOLEAN;
-BEGIN RETURN SYSTEM.VAL (INTEGER, value) = value
+BEGIN RETURN SYSTEM.VAL (SIGNED16, value) = value
 END ValueInWordRange;
 
 PROCEDURE NewReg (type, index: LONGINT): Reg;

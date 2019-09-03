@@ -66,7 +66,7 @@ TYPE
 		visit-: visitingScheme;
 		parallel-: BOOLEAN;
 		ModelClass*: vyLinks.Link;
-		ModelClassCount*: INTEGER;
+		ModelClassCount*: SIGNED16;
 		makeTemperature*: temperatureScheme;
 		cacheSize*: LONGINT;
 		temperature*: LONGREAL;
@@ -243,7 +243,7 @@ END Metropolis;
 	END Store;
 
 	PROCEDURE Load( VAR R: Files.Rider;  s: Kernel );
-	VAR objsub: Objects.Object;  coolint: INTEGER;  version: INTEGER;
+	VAR objsub: Objects.Object;  coolint: SIGNED16;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Gadgets.ReadRef( R, s.lib, objsub );
 		IF objsub # NIL THEN s.A := objsub( vyBase.Object ) END;

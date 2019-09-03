@@ -599,7 +599,7 @@ TYPE
 		END ProcessCommand;
 
 		PROCEDURE Handle*(r: Streams.Reader; pos : Streams.Position; CONST name: ARRAY OF CHAR; testType: TestSuite.TestType): WORD;
-		VAR result: INTEGER; error, parseError, finished, trapped: BOOLEAN;
+		VAR result: SIGNED16; error, parseError, finished, trapped: BOOLEAN;
 		BEGIN
 			trapped := TRUE;
 			Reset;

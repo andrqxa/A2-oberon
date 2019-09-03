@@ -90,7 +90,7 @@ CONST
 	END HandleAttributes;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN
@@ -151,7 +151,7 @@ CONST
 	END Handler;
 
 	PROCEDURE A2P*( o: Objects.Object );
-	VAR x, y: LONGINT;  r, b, g: INTEGER;  obj: tObject;  pix: Images.Pixel;  val: LONGINT;  valr: LONGREAL;  temp: LONGREAL;  len: LONGINT;
+	VAR x, y: LONGINT;  r, b, g: SIGNED16;  obj: tObject;  pix: Images.Pixel;  val: LONGINT;  valr: LONGREAL;  temp: LONGREAL;  len: LONGINT;
 	BEGIN
 		obj := o( tObject );
 		IF obj.A.depth > maxHistogramLen THEN len := maxHistogramLen ELSE len := obj.A.depth END;
@@ -271,7 +271,7 @@ CONST
 	END ShowHistogram;
 
 	PROCEDURE Test*;
-	VAR A: antsArrayObjects.tINTEGERObject;  obj: tObject;  i: INTEGER;
+	VAR A: antsArrayObjects.tINTEGERObject;  obj: tObject;  i: SIGNED16;
 	BEGIN
 		A := antsArrayObjects.NewINTEGERObject( 200, 200, 65535 );
 		FOR i := 0 TO 32000 DO A.A[i MOD 200, i DIV 200] := i;  END;

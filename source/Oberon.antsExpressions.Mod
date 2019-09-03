@@ -133,7 +133,7 @@ VAR
 	map: ARRAY 17 OF CHAR;
 	sym: SIGNED8;  W: Texts.Writer;
 	ptrTab: PtrTable;   (* pointer table *)
-	nofptrs: INTEGER;  foundSTRING: BOOLEAN;
+	nofptrs: SIGNED16;  foundSTRING: BOOLEAN;
 	strings: StringStack;   (* need this chain to keep objects consistent while evaluating *)
 	debug*, Note*: BOOLEAN;  enableCR*: BOOLEAN;  itnr: LONGINT;  WLog: PROCEDURE;
 
@@ -158,7 +158,7 @@ VAR
 		vyHostTexts.InsertLog( W.buf )
 	END WLogToCaret;
 
-	PROCEDURE err( n: INTEGER );
+	PROCEDURE err( n: SIGNED16 );
 	BEGIN
 		WLog;  OPM.err( n )
 	END err;
@@ -184,7 +184,7 @@ VAR
 	END Nt;
 
 	PROCEDURE WChar( ch: CHAR );
-	VAR pat: Display.Pattern;  i, n, dx, x, y, w, h: INTEGER;
+	VAR pat: Display.Pattern;  i, n, dx, x, y, w, h: SIGNED16;
 		d: ARRAY 3 OF CHAR;
 	BEGIN
 		IF (~debug) & (~Note) THEN RETURN END;
@@ -205,12 +205,12 @@ VAR
 		IF debug OR Note THEN Str( "  " ) END
 	END Gap;
 
-	PROCEDURE WReal( x: REAL;  n: INTEGER );
+	PROCEDURE WReal( x: REAL;  n: SIGNED16 );
 	BEGIN
 		IF debug OR Note THEN Texts.WriteReal( W, x, n ) END
 	END WReal;
 
-	PROCEDURE WLongReal*( x: LONGREAL;  n: INTEGER );
+	PROCEDURE WLongReal*( x: LONGREAL;  n: SIGNED16 );
 	BEGIN
 		IF debug OR Note THEN Texts.WriteLongReal( W, x, n ) END
 	END WLongReal;
@@ -220,7 +220,7 @@ VAR
 		IF debug OR Note THEN Texts.WriteInt( W, i, n ) END
 	END WInt;
 
-	PROCEDURE WClass( c: INTEGER );
+	PROCEDURE WClass( c: SIGNED16 );
 	BEGIN
 		CASE c OF
 		0:     Str( "Undef" );
@@ -251,7 +251,7 @@ VAR
 		END
 	END WClass;
 
-	PROCEDURE WMode( c: INTEGER );
+	PROCEDURE WMode( c: SIGNED16 );
 	BEGIN
 		CASE c OF
 		0:     Str( "Undef" );
@@ -282,7 +282,7 @@ VAR
 		END
 	END WMode;
 
-	PROCEDURE WComp( c: INTEGER );
+	PROCEDURE WComp( c: SIGNED16 );
 	BEGIN
 		CASE c OF
 		0:     Str( "Undef" );
@@ -297,7 +297,7 @@ VAR
 	END WComp;
 
 	PROCEDURE OutType*( p: ANY );
-	VAR t: Types.Type;  level: INTEGER;
+	VAR t: Types.Type;  level: SIGNED16;
 	BEGIN
 		IF p = NIL THEN Ln;  Str( "NIL" );  RETURN END;
 		t := Types.TypeOf( p );  Ln;  Str( "OutType of ptr: " );  WInt( SYSTEM.VAL( LONGINT, p ), 10 );  Str( " at adr " );  WInt( ADDRESSOF( p ), 10 );
@@ -471,7 +471,7 @@ VAR
 		val := NewV( stack );  val.val.class := SInt;  val.val.i := i
 	END PushSInt;
 
-	PROCEDURE PushInt*( VAR stack: Stack;  i: INTEGER );
+	PROCEDURE PushInt*( VAR stack: Stack;  i: SIGNED16 );
 	VAR val: ValueItem;
 	BEGIN
 		val := NewV( stack );  val.val.class := Int;  val.val.i := i
@@ -1081,7 +1081,7 @@ VAR
 
 	PROCEDURE IsTypeOf*( t: Types.Type;  ref: ARRAY OF CHAR ): BOOLEAN;
 	VAR tname: ARRAY 128 OF CHAR;
-		mod: Modules.Module;  thistype: Types.Type;  level: INTEGER;
+		mod: Modules.Module;  thistype: Types.Type;  level: SIGNED16;
 	BEGIN
 		SplitName( ref, mod, tname );
 		IF mod # NIL THEN
@@ -1242,7 +1242,7 @@ VAR
 	PROCEDURE ShortInt( VAR val: Value );
 	BEGIN
 		IF (val.i >= MIN( SIGNED8 )) & (val.i <= MAX( SIGNED8 )) THEN val.class := SInt
-		ELSIF (val.i >= MIN( INTEGER )) & (val.i <= MAX( INTEGER )) THEN val.class := Int
+		ELSIF (val.i >= MIN( SIGNED16 )) & (val.i <= MAX( SIGNED16 )) THEN val.class := Int
 		ELSE val.class := LInt
 		END
 	END ShortInt;
@@ -1517,7 +1517,7 @@ VAR
 	END PushLIntPar;
 
 	PROCEDURE PushStringPar( VAR call: CallStack;  VAR s: ARRAY OF CHAR;  len: LONGINT ): BOOLEAN;
-	VAR i, slen, long: LONGINT;  j: INTEGER;  ord: LONGINT;
+	VAR i, slen, long: LONGINT;  j: SIGNED16;  ord: LONGINT;
 
 		PROCEDURE StringSize( s: ARRAY OF CHAR ): LONGINT;
 		(* returns string size of s INCLUDING the terminator 0X *)
@@ -2064,7 +2064,7 @@ END EvalProcObj;
 (** Keyboard handler **)
 
 	PROCEDURE Key( frame: TextGadgets.Frame;  ch: CHAR;  VAR handled: BOOLEAN );
-	VAR pos, pos0, pos1, beg: LONGINT;  ch1: CHAR;  T: Texts.Text;  keys: SET;  R: Texts.Reader;  w: Texts.Writer;  res: INTEGER;  SelT: Texts.Text;
+	VAR pos, pos0, pos1, beg: LONGINT;  ch1: CHAR;  T: Texts.Text;  keys: SET;  R: Texts.Reader;  w: Texts.Writer;  res: SIGNED16;  SelT: Texts.Text;
 		end, time: LONGINT;  sc: Texts.Scanner;
 		proc: ARRAY 128 OF CHAR;
 		Mod: Modules.Module;  Proc: Modules.Command;  i: LONGINT;  cmsg: Oberon.CaretMsg;

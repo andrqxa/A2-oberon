@@ -24,7 +24,7 @@ IMPORT SYSTEM, Display, Display3, Effects, Objects, Oberon, Pictures, Gadgets,
 
 TYPE
 	PositionMsg = RECORD (Display.FrameMsg)
-		FX, FY, FW, FH: INTEGER;
+		FX, FY, FW, FH: SIGNED16;
 	END;
 
 VAR
@@ -36,8 +36,8 @@ VAR
 	END;
 	rm, gm, bm, rs, gs: LONGINT;
 
-PROCEDURE CopyBlock(p: Pictures.Picture;  x, y, w, h: INTEGER);
-VAR xi, yi: INTEGER;
+PROCEDURE CopyBlock(p: Pictures.Picture;  x, y, w, h: SIGNED16);
+VAR xi, yi: SIGNED16;
 BEGIN
 	FOR xi := x TO x+w-1 DO
 		FOR yi := y TO y+h-1 DO
@@ -47,7 +47,7 @@ BEGIN
 END CopyBlock;
 
 PROCEDURE InitPal(p: Pictures.Picture);
-VAR i, r, g, b: INTEGER;
+VAR i, r, g, b: SIGNED16;
 BEGIN
 	FOR i := 0 TO 255 DO
 		Pictures.GetColor(p, i, r, g, b);
@@ -201,7 +201,7 @@ PROCEDURE Screen*;
 	VAR
 		P: Pictures.Picture;
 		x, y: LONGINT;
-		r, g, b, i: INTEGER;
+		r, g, b, i: SIGNED16;
 BEGIN
 	NEW(P); Pictures.Create(P, Display.Width, Display.Height, 8);
 	FOR i := 0 TO 255 DO

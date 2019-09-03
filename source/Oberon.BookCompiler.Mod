@@ -23,7 +23,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 
 		(* list of chapters/pages *)
 		ChapterDesc = RECORD
-			nObj: INTEGER;
+			nObj: SIGNED16;
 			text: Texts.Text;
 			ind: LONGINT;
 			next: Chapter
@@ -71,11 +71,11 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 		inText, callText, noteText: Texts.Text;
 		R: Texts.Reader;
 		W, Wr: Texts.Writer;
-		sym, width, heigth: INTEGER;
+		sym, width, heigth: SIGNED16;
 		ch: CHAR;
 		number: LONGINT;
 		begId, endId, lastPos, oldPos, nextChap: LONGINT;
-		sections: ARRAY Books.maxSect OF INTEGER;
+		sections: ARRAY Books.maxSect OF SIGNED16;
 		eol, expand, error: BOOLEAN;
 		options, styleMode: SET;
 		iconStr: ARRAY 2*Books0.nameLen OF CHAR;
@@ -381,7 +381,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 
 (* adds a chapter of level s to the contents tree *)
 
-	PROCEDURE Visit(VAR n: SectNode; d: INTEGER);
+	PROCEDURE Visit(VAR n: SectNode; d: SIGNED16);
 	BEGIN
 		IF (n.desc # NIL) & (d > 0) THEN
 			n := n.desc;
@@ -392,9 +392,9 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 		END
 	END Visit;
 
-	PROCEDURE DefSection(s: INTEGER; e: BOOLEAN);
+	PROCEDURE DefSection(s: SIGNED16; e: BOOLEAN);
 		VAR
-			i: INTEGER;
+			i: SIGNED16;
 			obj: Books0.LocFrame;
 			beg: LONGINT;
 			cl: Label;
@@ -460,7 +460,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 	PROCEDURE DefChapter(e: BOOLEAN);
 		VAR
 			chap: Chapter;
-			i: INTEGER;
+			i: SIGNED16;
 			obj: Books0.LocFrame;
 			beg: LONGINT;
 			style: TextGadgets.Style;
@@ -540,7 +540,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 
 (* adds an index entry *)
 
-	PROCEDURE Compare(a, b: Node): INTEGER;
+	PROCEDURE Compare(a, b: Node): SIGNED16;
 		VAR
 			R0, R1: Texts.Reader;
 			ch0, ch1: CHAR;
@@ -567,7 +567,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 	PROCEDURE DefIndex(pos: LONGINT; mode: SIGNED8);
 		VAR
 			n, cur, prev: Node;
-			res: INTEGER;
+			res: SIGNED16;
 			pl, pl2: PosList;
 			npl: NotePosList;
 	BEGIN
@@ -762,7 +762,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 
 	PROCEDURE Ident(VAR c: CHAR);
 		VAR
-			i: INTEGER;
+			i: SIGNED16;
 			cc: CHAR;
 	BEGIN
 		i := 0;
@@ -807,7 +807,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 	END GetIdent;
 
 	PROCEDURE GetNumber;
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE (i < Books0.identLen) & isChar(R) & isDigit(ch) DO
@@ -853,7 +853,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 		END
 	END Get;
 
-	PROCEDURE SymToName(s: INTEGER; VAR na: ARRAY OF CHAR);
+	PROCEDURE SymToName(s: SIGNED16; VAR na: ARRAY OF CHAR);
 		VAR name: ARRAY Books0.identLen OF CHAR;
 	BEGIN
 		CASE s OF
@@ -882,7 +882,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 		COPY(name, na)
 	END SymToName;
 
-	PROCEDURE Check(sy: INTEGER);
+	PROCEDURE Check(sy: SIGNED16);
 		VAR name: ARRAY Books0.identLen OF CHAR;
 	BEGIN
 		Get();
@@ -926,7 +926,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 
 	PROCEDURE GetName(VAR name: ARRAY OF CHAR): BOOLEAN;
 		VAR
-			i: INTEGER;
+			i: SIGNED16;
 			dot: BOOLEAN;
 	BEGIN
 		dot := FALSE;
@@ -1016,7 +1016,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 
 	PROCEDURE GetBookName(VAR lname, name, ident: ARRAY OF CHAR);
 		VAR
-			i, d: INTEGER;
+			i, d: SIGNED16;
 	BEGIN
 		i := 0; d := -1;
 		WHILE lname[i] # 0X DO
@@ -1663,7 +1663,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 			VAR
 				R: Texts.Reader;
 				ch: CHAR;
-				i: INTEGER;
+				i: SIGNED16;
 		BEGIN
 			i := 0;
 			Texts.OpenReader(R, t, 0);

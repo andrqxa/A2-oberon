@@ -29,7 +29,7 @@ TYPE
 		dt: Dates.DateTime;
 		running, terminated: BOOLEAN;
 		ip: IP.Adr;
-		branch, command, seqNum, messageType: INTEGER;
+		branch, command, seqNum, messageType: SIGNED16;
 		uin, receiverUin, port, receiveBufOffset: LONGINT;
 		len: SIZE; res: WORD;
 		user: Base.User;
@@ -109,7 +109,7 @@ TYPE
 
 
 	PROCEDURE Server_NewUserReply (ip: IP.Adr; port: LONGINT; uin: LONGINT;
-		seqNum: INTEGER; sendBuf: Base.Buffer; s: UDP.Socket);
+		seqNum: SIGNED16; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		res: WORD;
 		string: String;
@@ -167,7 +167,7 @@ TYPE
 	END Server_ACK;
 
 	PROCEDURE Server_UserStatus (client, receiver: Base.Client;
-		status: INTEGER; sendBuf: Base.Buffer; s: UDP.Socket);
+		status: SIGNED16; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		res: WORD;
 		string: String;
@@ -187,7 +187,7 @@ TYPE
 	END Server_UserStatus;
 
 	PROCEDURE Server_ReceiveMessage (client, receiver: Base.Client; dt: Dates.DateTime;
-		messageType: INTEGER; message: String; sendBuf: Base.Buffer; s: UDP.Socket);
+		messageType: SIGNED16; message: String; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		string: String;
 		res: WORD; len: SIZE;
@@ -223,7 +223,7 @@ TYPE
 
 	PROCEDURE MulticastStatus (clients: Base.List;
 		client: Base.Client;
-		status: INTEGER; sendBuf: Base.Buffer; s: UDP.Socket);
+		status: SIGNED16; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		i: LONGINT;
 		p: ANY;
@@ -244,7 +244,7 @@ TYPE
 	END MulticastStatus;
 
 	PROCEDURE MulticastMessage (clients: Base.List;
-		client: Base.Client; dt: Dates.DateTime; messageType: INTEGER; message: String;
+		client: Base.Client; dt: Dates.DateTime; messageType: SIGNED16; message: String;
 		sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		i: LONGINT;

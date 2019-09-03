@@ -51,15 +51,15 @@ TYPE
 		iff: LONGINT;
 
 		PROCEDURE  (*VAR seed: tSeedDesc*) Store*( VAR r: Files.Rider );
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 		BEGIN
 			Files.WriteLInt( r, SELF.ix1 );  Files.WriteLInt( r, SELF.ix2 );  Files.WriteLInt( r, SELF.ix3 );
 			FOR i := 0 TO 97 DO Files.WriteLReal( r, SELF.r[i] ) END;
 			Files.WriteLInt( r, SELF.iff )
 		END Store;
 
-		PROCEDURE  (*VAR seed: tSeedDesc*) Load*( VAR r: Files.Rider;  seedVersion: INTEGER );
-		VAR i: INTEGER;
+		PROCEDURE  (*VAR seed: tSeedDesc*) Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
+		VAR i: SIGNED16;
 		BEGIN
 			Files.ReadLInt( r, SELF.ix1 );  Files.ReadLInt( r, SELF.ix2 );  Files.ReadLInt( r, SELF.ix3 );
 			FOR i := 0 TO 97 DO Files.ReadLReal( r, SELF.r[i] ) END;
@@ -161,7 +161,7 @@ TYPE
 	(* jb 30.11.00 - no longer needed *)
 (*
 PROCEDURE Store (obj: tRandom; VAR M: Objects.FileMsg);
-VAR i:INTEGER;
+VAR i:SIGNED16;
 BEGIN
 Files.WriteLInt(M.R, obj.seed(tSeed).val);
 Files.WriteLInt(M.R, obj.seed(tSeed).ix1);
@@ -173,7 +173,7 @@ vyRanBase.Handler(obj, M)
 END Store;
 
 PROCEDURE Load (obj: tRandom; VAR M: Objects.FileMsg);
-VAR i:INTEGER;
+VAR i:SIGNED16;
 BEGIN
 Files.ReadLInt(M.R, obj.seed(tSeed).val);
 Files.ReadLInt(M.R, obj.seed(tSeed).ix1);

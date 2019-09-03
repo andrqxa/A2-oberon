@@ -121,9 +121,9 @@ TYPE
 							dy := -(LONG(SYSTEM.VAL(SIGNED8, mbuf[2])) + LONG(SYSTEM.VAL(SIGNED8, mbuf[4])));
 						|MM, Logi:
 							keys := mbuf[0] * {0..2};
-							dx := SYSTEM.VAL(INTEGER, mbuf[1]);
+							dx := SYSTEM.VAL(SIGNED16, mbuf[1]);
 							IF ~(4 IN mbuf[0]) THEN dx := -dx END;
-							dy := SYSTEM.VAL(INTEGER, mbuf[2]);
+							dy := SYSTEM.VAL(SIGNED16, mbuf[2]);
 							IF 3 IN mbuf[0] THEN dy := -dy END;
 						|MSI:
 							keys := {};
@@ -248,7 +248,7 @@ VAR
 
 (* Set mouse speed *)
 PROCEDURE SetSpeed(port : Serials.Port; mouseType, oldBPS, newBPS: LONGINT);
-VAR word, stop, par : INTEGER; c : CHAR;  res : WORD;
+VAR word, stop, par : SIGNED16; c : CHAR;  res : WORD;
 BEGIN
 	ASSERT(port # NIL);
 	port.Close();

@@ -100,7 +100,7 @@ TYPE
 	Task = POINTER TO TaskDesc;
 	TaskDesc = RECORD (Oberon.TaskDesc)
 		f: Display.Frame;
-		w, h: INTEGER
+		w, h: SIGNED16
 	END;
 
 	contentList = POINTER TO contentListDesc;
@@ -118,7 +118,7 @@ VAR
 
 	PROCEDURE Parse( s: ARRAY OF CHAR;  VAR l, t, r, b: LONGINT );
 	VAR p: ARRAY 64 OF CHAR;
-		i, j: INTEGER;
+		i, j: SIGNED16;
 
 		PROCEDURE ReadNum( ): LONGINT;
 		VAR x: LONGINT;
@@ -141,9 +141,9 @@ VAR
 		RETURN ENTIER( x + 0.5 )
 	END Round;
 
-	PROCEDURE fParse( pw, ph: INTEGER;  w, h: INTEGER;  s: ARRAY OF CHAR;  VAR l, t, r, b: LONGINT );
+	PROCEDURE fParse( pw, ph: SIGNED16;  w, h: SIGNED16;  s: ARRAY OF CHAR;  VAR l, t, r, b: LONGINT );
 	VAR p: ARRAY 64 OF CHAR;
-		i, j: INTEGER;  xr, yr, x2r, y2r: LONGREAL;
+		i, j: SIGNED16;  xr, yr, x2r, y2r: LONGREAL;
 
 		PROCEDURE ReadNum( ): LONGREAL;
 		VAR x: LONGREAL;
@@ -175,7 +175,7 @@ VAR
 		IF b < 0 THEN b := 0 END;
 	END fParse;
 
-	PROCEDURE HasConstraints*( f: Display.Frame;  pw, ph: INTEGER;  VAR l, t, r, b: LONGINT ): BOOLEAN;
+	PROCEDURE HasConstraints*( f: Display.Frame;  pw, ph: SIGNED16;  VAR l, t, r, b: LONGINT ): BOOLEAN;
 	VAR A: Objects.AttrMsg;
 	BEGIN
 		IF (f.W = 1) & (f.H = 1) THEN RETURN FALSE END;
@@ -186,7 +186,7 @@ VAR
 		RETURN FALSE;
 	END HasConstraints;
 
-	PROCEDURE SolveGadget*( PW, PH: INTEGER;  f: Display.Frame;  l, t, r, b: LONGINT;  VAR X, Y, W, H: INTEGER );
+	PROCEDURE SolveGadget*( PW, PH: SIGNED16;  f: Display.Frame;  l, t, r, b: LONGINT;  VAR X, Y, W, H: SIGNED16 );
 	VAR ll, tt, rr, bb: LONGINT;
 	BEGIN
 		IF l = DontCare THEN ll := f.X
@@ -219,7 +219,7 @@ VAR
 		END
 	END SolveGadget;
 
-	PROCEDURE Solve*( F: Panels.Panel;  dX, dY, W, H: INTEGER;  pw, ph: INTEGER;  mode: INTEGER );
+	PROCEDURE Solve*( F: Panels.Panel;  dX, dY, W, H: SIGNED16;  pw, ph: SIGNED16;  mode: SIGNED16 );
 	VAR f: Display.Frame;  l, t, r, b: LONGINT;  M: Display.ModifyMsg;
 	BEGIN
 		f := F.dsc;
@@ -236,7 +236,7 @@ VAR
 		END;
 	END Solve;
 
-	PROCEDURE minSize( F: Display.Frame;  VAR w, h: INTEGER ): BOOLEAN;
+	PROCEDURE minSize( F: Display.Frame;  VAR w, h: SIGNED16 ): BOOLEAN;
 	VAR W, H: LONGINT;
 	BEGIN
 		Attributes.GetInt( F, "minSizeX", W );  Attributes.GetInt( F, "minSizeY", H );  w := SHORT( W );  h := SHORT( H );
@@ -250,19 +250,19 @@ VAR
 		Oberon.Remove( t );
 	END toMin;
 
-	PROCEDURE InstallSizer( F: Display.Frame;  w, h: INTEGER );
+	PROCEDURE InstallSizer( F: Display.Frame;  w, h: SIGNED16 );
 	VAR task: Task;
 	BEGIN
 		NEW( task );  task.w := w;  task.h := h;  task.f := F;  task.handle := toMin;  task.time := Oberon.Time();  Oberon.Install( task );
 	END InstallSizer;
 
-	PROCEDURE Max( x, y: INTEGER ): INTEGER;
+	PROCEDURE Max( x, y: SIGNED16 ): SIGNED16;
 	BEGIN
 		IF x > y THEN RETURN x ELSE RETURN y END;
 	END Max;
 
 	PROCEDURE Handler*( F: Objects.Object;  VAR M: Objects.ObjMsg );
-	VAR l, t, r, b: LONGINT;  oX, oY, oW, oH, mode: INTEGER;  f: Objects.Object;  A: Display.ModifyMsg;  hadselection: BOOLEAN;
+	VAR l, t, r, b: LONGINT;  oX, oY, oW, oH, mode: SIGNED16;  f: Objects.Object;  A: Display.ModifyMsg;  hadselection: BOOLEAN;
 		fontname: ARRAY 256 OF CHAR;
 		bool: BOOLEAN;  stdFont: Fonts.Font;
 	BEGIN
@@ -366,15 +366,15 @@ VAR
 	END TryMakeFontSizes;
 
 
-(*PROCEDURE RestoreBackGround (F: Panels.Panel; x, y: INTEGER; R: Display3.Mask);
+(*PROCEDURE RestoreBackGround (F: Panels.Panel; x, y: SIGNED16; R: Display3.Mask);
 BEGIN
 Panels.methods.RestoreBackGround(F, x, y, R);
 Display3.Line(R, Display.FG, Display.solid, x + 1, y + F.H - 11, x + 10, y + F.H - 2, 1, Display.replace);
 Display3.Line(R, Display.BG, Display.solid, x + 1, y + F.H - 12, x + 10, y + F.H - 3, 1, Display.replace)
 END RestoreBackGround;*)
 
-	PROCEDURE InsertChild( F: Panels.Panel;  f: Display.Frame;  u, v: INTEGER );
-	VAR l, t, r, b: LONGINT;  x, y, w, h: INTEGER;
+	PROCEDURE InsertChild( F: Panels.Panel;  f: Display.Frame;  u, v: SIGNED16 );
+	VAR l, t, r, b: LONGINT;  x, y, w, h: SIGNED16;
 	BEGIN
 		IF HasConstraints( f, F.W, F.H, l, t, r, b ) THEN
 			SolveGadget( F.W, F.H, f, l, t, r, b, x, y, w, h );
@@ -384,7 +384,7 @@ END RestoreBackGround;*)
 	END InsertChild;
 
 	PROCEDURE TrackMouse( F: Panels.Panel;  VAR M: Oberon.InputMsg );
-	VAR T: Display.Frame;  x, y, t, u, v: INTEGER;  d: LONGINT;  Fdlink, Mdlink: Objects.Object;  flags: SET;
+	VAR T: Display.Frame;  x, y, t, u, v: SIGNED16;  d: LONGINT;  Fdlink, Mdlink: Objects.Object;  flags: SET;
 	BEGIN
 		x := M.x + F.X;  y := M.y + F.Y;  t := y + F.H - 1;  T := Panels.ThisChild( F, x, y, M.X, M.Y );
 
@@ -500,8 +500,8 @@ END RestoreBackGround;*)
 
 (* -----------------  font sizes  ------------------ *)
 
-	PROCEDURE SplitFontName( fn: ARRAY OF CHAR;  VAR i, j, size: INTEGER );   (* from EditTools.Mod *)
-	VAR k: INTEGER;
+	PROCEDURE SplitFontName( fn: ARRAY OF CHAR;  VAR i, j, size: SIGNED16 );   (* from EditTools.Mod *)
+	VAR k: SIGNED16;
 	BEGIN
 		i := 0;  size := 0;
 		WHILE (fn[i] # 0X) & ((fn[i] < "0") OR ("9" < fn[i])) DO INC( i ) END;
@@ -511,8 +511,8 @@ END RestoreBackGround;*)
 		WHILE k < j DO size := size * 10 + ORD( fn[k] ) - 30H;  INC( k ) END
 	END SplitFontName;
 
-	PROCEDURE CombineFontName( prefix, suffix: ARRAY OF CHAR;  i, j, size: INTEGER;  VAR fn: ARRAY OF CHAR );   (* from EditTools.Mod *)
-	VAR k: INTEGER;  ch: CHAR;
+	PROCEDURE CombineFontName( prefix, suffix: ARRAY OF CHAR;  i, j, size: SIGNED16;  VAR fn: ARRAY OF CHAR );   (* from EditTools.Mod *)
+	VAR k: SIGNED16;  ch: CHAR;
 		dig: ARRAY 10 OF CHAR;
 	BEGIN
 		COPY( prefix, fn );  k := 0;
@@ -531,8 +531,8 @@ END RestoreBackGround;*)
 		IF (fnt = Fonts.Default) & (fnt.name # name) THEN RETURN NIL ELSE RETURN fnt END
 	END ThisFont;
 
-	PROCEDURE MakeFontSize*( F: Objects.Object;  ratio: LONGREAL;  offset: INTEGER );
-	VAR Font, this: Objects.Name;  i, j, size, i1, j1, size1, newsize: INTEGER;  fnt: Fonts.Font;  fn: Objects.Name;
+	PROCEDURE MakeFontSize*( F: Objects.Object;  ratio: LONGREAL;  offset: SIGNED16 );
+	VAR Font, this: Objects.Name;  i, j, size, i1, j1, size1, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;
 		updmsg: Display.DisplayMsg;  diff: LONGINT;
 	BEGIN
 		IF (ratio = 1) & (offset = 0) THEN  (* reset to original font *)
@@ -583,7 +583,7 @@ END RestoreBackGround;*)
 
 	PROCEDURE MakeFontSizes*( F: Objects.Object );
 	VAR Font: ARRAY 256 OF CHAR;
-		w, h: LONGINT;  i, j, size, newsize: INTEGER;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: LONGINT;  ratio: LONGREAL;
+		w, h: LONGINT;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: LONGINT;  ratio: LONGREAL;
 		list: contentList;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
@@ -610,7 +610,7 @@ END RestoreBackGround;*)
 
 	PROCEDURE ResetFontSizes*( F: Objects.Object );
 	VAR Font: ARRAY 256 OF CHAR;
-		w, h: LONGINT;  i, j, size, newsize: INTEGER;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: LONGINT;  ratio: LONGREAL;
+		w, h: LONGINT;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: LONGINT;  ratio: LONGREAL;
 		list: contentList;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
@@ -627,9 +627,9 @@ END RestoreBackGround;*)
 		END;
 	END ResetFontSizes;
 
-	PROCEDURE IncFontSizes*( F: Objects.Object;  by: INTEGER );
+	PROCEDURE IncFontSizes*( F: Objects.Object;  by: SIGNED16 );
 	VAR Font: ARRAY 256 OF CHAR;
-		i, j, size: INTEGER;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: LONGINT;
+		i, j, size: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: LONGINT;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
 			(*
@@ -646,7 +646,7 @@ END RestoreBackGround;*)
 		END;
 	END IncFontSizes;
 
-	PROCEDURE FontSizeDiff*( F: Objects.Object ): INTEGER;
+	PROCEDURE FontSizeDiff*( F: Objects.Object ): SIGNED16;
 	VAR diff: LONGINT;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
@@ -674,7 +674,7 @@ END RestoreBackGround;*)
 		END;
 	END SetMinSize;
 
-	PROCEDURE ResizeTo( F: Gadgets.Frame;  W, H: INTEGER );
+	PROCEDURE ResizeTo( F: Gadgets.Frame;  W, H: SIGNED16 );
 	VAR M: Display.ModifyMsg;
 	BEGIN
 		IF W > F.W THEN M.id := Display.extend;  ELSE M.id := Display.reduce END;
@@ -711,7 +711,7 @@ END RestoreBackGround;*)
 	END DoToMin;
 
 	PROCEDURE SetSize*;
-	VAR F: Display.Frame;  w, h: INTEGER;  sc: Texts.Scanner;
+	VAR F: Display.Frame;  w, h: SIGNED16;  sc: Texts.Scanner;
 	BEGIN
 		IF Oberon.Pointer.on THEN
 			F := Oberon.MarkedFrame();
@@ -727,7 +727,7 @@ END RestoreBackGround;*)
 	END SetSize;
 
 	PROCEDURE IncPanelTextSizes*;
-	VAR o, text: Objects.Object;  dsize: INTEGER;  sc: Texts.Scanner;
+	VAR o, text: Objects.Object;  dsize: SIGNED16;  sc: Texts.Scanner;
 	TYPE mylist = POINTER TO RECORD
 			next: mylist;
 			text: Texts.Text
@@ -777,7 +777,7 @@ END RestoreBackGround;*)
 	END ReplaceSuffix;
 
 	PROCEDURE OpenHelp*;
-	VAR res: INTEGER;  obj: Objects.Object;
+	VAR res: SIGNED16;  obj: Objects.Object;
 		name: ARRAY 256 OF CHAR;
 	BEGIN
 		obj := Gadgets.context;
@@ -817,7 +817,7 @@ xxxx remove adjust
 *)
 
 	PROCEDURE MakeConstraints*;
-	VAR M: Display.SelectMsg;  obj: Objects.Object;  X, Y, W, H, x, y, w, h: INTEGER;
+	VAR M: Display.SelectMsg;  obj: Objects.Object;  X, Y, W, H, x, y, w, h: SIGNED16;
 		xstr, ystr, wstr, hstr, str, name: ARRAY 64 OF CHAR;
 		d: Display.DisplayMsg;  S: Attributes.Scanner;
 	CONST left = 0;  top = 1;  right = 2;  bottom = 3;

@@ -36,14 +36,14 @@ TYPE
 		weights: antsNeighbourhoods.Neighbours;
 		fct: antsFunctions.Function;
 		(* size: LONGINT; *)  (* is dim of Nieghbourhood *)
-		type: INTEGER (* mean or median *)
+		type: SIGNED16 (* mean or median *)
 	END;
 
 CONST
 	mean = 0;  median = 1;  inf = 2;  sup = 3;
 
 	PROCEDURE HandleFileMsg( obj: tFilter;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		IF msg.id = Objects.load THEN
 			Files.ReadInt( msg.R, version );  vyBase.objecthandle( obj, msg );  Files.ReadInt( msg.R, obj.type );
@@ -233,10 +233,10 @@ CONST
 	END ApplyFilter;
 
 (*bestimmt den min und max Eintrag in der Matrix S (und deren Position)*)
-	PROCEDURE MinMax( VAR S: ARRAY OF ARRAY OF INTEGER;  VAR min, max: INTEGER );
-	VAR h, i, minpos, currentminpos, maxpos, currentmaxpos, na: LONGINT;  currentmax, currentmin: INTEGER;
+	PROCEDURE MinMax( VAR S: ARRAY OF ARRAY OF SIGNED16;  VAR min, max: SIGNED16 );
+	VAR h, i, minpos, currentminpos, maxpos, currentmaxpos, na: LONGINT;  currentmax, currentmin: SIGNED16;
 	BEGIN
-		h := LEN( S );  min := MAX( INTEGER );  max := MIN( INTEGER );
+		h := LEN( S );  min := MAX( SIGNED16 );  max := MIN( SIGNED16 );
 		FOR i := 0 TO h - 1 DO
 			vyInteger.MinMax( LEN( S[i] ), S[i], 0, currentmin, currentminpos, currentmax, currentmaxpos, na );
 			IF currentmin < min THEN min := currentmin;  minpos := currentminpos END;
@@ -245,7 +245,7 @@ CONST
 	END MinMax;
 
 	PROCEDURE Rescale*( A: antsArrayObjects.tINTEGERArray;  VAR depth: LONGINT );
-	VAR min, max: INTEGER;  y, x: LONGINT;
+	VAR min, max: SIGNED16;  y, x: LONGINT;
 	BEGIN
 		MinMax( A^, min, max );
 		IF (min >= 0) & (max < depth) THEN RETURN END;

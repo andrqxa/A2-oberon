@@ -38,10 +38,10 @@ BEGIN Texts.WriteString(w, str);   vyHostTexts.InsertLog(w.buf) END String;
 PROCEDURE Int* (i, n: LONGINT);
 BEGIN Texts.WriteInt(w, i, n);   vyHostTexts.InsertLog(w.buf) END Int;
 
-PROCEDURE Real* (x: REAL;   n: INTEGER);
+PROCEDURE Real* (x: REAL;   n: SIGNED16);
 BEGIN Texts.WriteReal(w, x, n);   vyHostTexts.InsertLog(w.buf) END Real;
 
-PROCEDURE LongReal* (x: LONGREAL;   n: INTEGER);
+PROCEDURE LongReal* (x: LONGREAL;   n: SIGNED16);
 BEGIN Texts.WriteLongReal(w, x, n);   vyHostTexts.InsertLog(w.buf) END LongReal;
 
 PROCEDURE Ln*;

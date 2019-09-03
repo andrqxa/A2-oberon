@@ -46,7 +46,7 @@ V vector
 M Matrix
 B BOOLEAN
 S SIGNED8
-I INTEGER
+I SIGNED16
 L LONGINT
 R REAL
 X LONGREAL
@@ -76,7 +76,7 @@ TYPE
 	we had something like an Oberon interpreter, extended to ARRAYS and other more complex structures *)
 	(*	tStatus = SET;
 	(*	tFormat= SET;
-	tType=INTEGER;*)
+	tType=SIGNED16;*)
 
 	(*= abstract voyager data types *)
 	tData* = POINTER TO tDataDesc;
@@ -409,7 +409,7 @@ END GetIndex;
 (** Minimum and maximum *)
 
 	PROCEDURE VGetMinMax*( v: vyBase.tVector;  VAR min, max: LONGREAL;  VAR nrNaNs: LONGINT );
-	VAR imin, imax: INTEGER;  lmin, lmax: LONGINT;
+	VAR imin, imax: SIGNED16;  lmin, lmax: LONGINT;
 	BEGIN
 		IF v = NIL THEN min := MIN( LONGREAL );  max := MAX( LONGREAL );  nrNaNs := 0;  RETURN END;
 		(*! check and propagate to other types *)
@@ -430,7 +430,7 @@ END GetIndex;
 
 	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: REAL;  VAR nrNaNs: LONGINT );
 	(*! check. if ok: move this model to other variants *)
-	VAR xmin, xmax: LONGREAL;  imin, imax: INTEGER;  lmin, lmax: LONGINT;
+	VAR xmin, xmax: LONGREAL;  imin, imax: SIGNED16;  lmin, lmax: LONGINT;
 	BEGIN
 		xmin := MAX( LONGREAL );  xmax := MIN( LONGREAL );  nrNaNs := 0;
 		ASSERT ( v # NIL , 100 );
@@ -452,7 +452,7 @@ END GetIndex;
 	END VGetMinMaxR;
 
 	PROCEDURE VGetMinMaxX*( v: vyBase.tVector;  VAR min, max: LONGREAL;  VAR nrNaNs: LONGINT );
-	VAR imin, imax: INTEGER;  lmin, lmax: LONGINT;  rmin, rmax: LONGREAL;
+	VAR imin, imax: SIGNED16;  lmin, lmax: LONGINT;  rmin, rmax: LONGREAL;
 	BEGIN
 		min := MAX( LONGREAL );  max := MIN( LONGREAL );  nrNaNs := 0;
 		IF v IS vyLongrealVec.tVector THEN
@@ -560,7 +560,7 @@ END RCopyM;
 	(** Fill routines *)
 
 	(*
-PROCEDURE VectorType* (v: vyBase.tVector): INTEGER;
+PROCEDURE VectorType* (v: vyBase.tVector): SIGNED16;
 BEGIN
 IF  v = NIL THEN RETURN cUNDEF END;
 IF v.buf IS vyRealVec.tBuf THEN RETURN cREAL END;
@@ -570,7 +570,7 @@ END VectorType;
 *)
 (** Enquiry *)
 	PROCEDURE SameLayout( a, b: vyBase.tVector ): BOOLEAN;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		IF (a.Layout = NIL ) & (b.Layout = NIL ) THEN RETURN TRUE
 		ELSIF a.Layout.dim # b.Layout.dim THEN RETURN FALSE

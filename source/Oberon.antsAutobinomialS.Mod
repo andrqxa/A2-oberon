@@ -28,7 +28,7 @@ IMPORT antsObjects, Objects, Files, Gadgets, antsNeighbourhoods, antsRegions, an
 	antsArrayObjects, Math := MathL IN A2, antsKernel, antsModels, antsCommands, vyName, vyBase, vyRanBase, Links;
 
 TYPE
-	intArray = POINTER TO ARRAY OF INTEGER;
+	intArray = POINTER TO ARRAY OF SIGNED16;
 
 	tModel* = POINTER TO tModelDesc;
 	tModelDesc* = RECORD (antsModels.tModelDesc);
@@ -46,7 +46,7 @@ VAR
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLInt( R, s.dim );  Gadgets.ReadRef( R, s.lib, objsub );
 		IF objsub # NIL THEN s.n := objsub( antsNeighbourhoods.Neighbours ) END
@@ -67,8 +67,8 @@ VAR
 		m.synced := TRUE
 	END Sync;
 
-	PROCEDURE Binomial( n: LONGINT;  p: LONGREAL ): INTEGER;
-	VAR i: LONGINT;  res: INTEGER;
+	PROCEDURE Binomial( n: LONGINT;  p: LONGREAL ): SIGNED16;
+	VAR i: LONGINT;  res: SIGNED16;
 	BEGIN
 		res := 0;  vyRanBase.RandomUVX( n, rans, 0 );
 		FOR i := 0 TO n - 1 DO
@@ -79,7 +79,7 @@ VAR
 
 	PROCEDURE OneSweep*( s: antsKernel.Kernel;  visit: antsKernel.visitingScheme );
 	VAR A, Orig: antsArrayObjects.tINTEGERObject;  AA: antsArrayObjects.tINTEGERArray;  model: tModel;  dim, x, y, w, h: LONGINT;
-		x0, y0, w0, h0: LONGINT;  orig: Objects.Object;  count: INTEGER;  nb: intArray;  cooling: LONGREAL;  max: INTEGER;  nclen: LONGINT;
+		x0, y0, w0, h0: LONGINT;  orig: Objects.Object;  count: SIGNED16;  nb: intArray;  cooling: LONGREAL;  max: SIGNED16;  nclen: LONGINT;
 		cx, cy: antsNeighbourhoods.Index;  i: LONGINT;  pars: antsNeighbourhoods.pars;  theta: LONGREAL;  position, posi: LONGINT;
 	BEGIN
 		A := s.A( antsArrayObjects.tINTEGERObject );  AA := A.A;  w := A.w;  h := A.h;  model := s.par( tModel );
@@ -253,7 +253,7 @@ END U;
 *)
 (*PROCEDURE Local (o: antsArrayObjects.tObject;   dim: LONGINT;   par: array;    x, y: LONGINT;   M: tModel;
 s: antsKernel.Kernel);
-VAR theta: LONGREAL;   k: LONGINT;   f: antsFunctions.Function;   ran, u, z: LONGREAL;   count: INTEGER;
+VAR theta: LONGREAL;   k: LONGINT;   f: antsFunctions.Function;   ran, u, z: LONGREAL;   count: SIGNED16;
 
 PROCEDURE U (y, x, val: LONGINT): LONGREAL;
 VAR i: LONGINT;

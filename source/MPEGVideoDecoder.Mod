@@ -143,7 +143,7 @@ TYPE
 		mbAddress: LONGINT;								(* Address of the current macroblock *)
 		mbAddressLast: LONGINT;							(* Address of the last coded macroblock *)
 		mbAddressLastIntra: LONGINT;
-		macroblockNr: INTEGER;								(* number of the macroblock currently decoded (in slice) *)
+		macroblockNr: SIGNED16;								(* number of the macroblock currently decoded (in slice) *)
 
 		(* local in macroblock *)
 		frameMotionType: LONGINT;
@@ -1696,7 +1696,7 @@ TYPE
 						(* negative difference: invert all bits and make number negative *)
 						tmp := stream.GetBits(size);
 						IF tmp < 0 THEN hasMoreFrames := FALSE; RETURN FALSE END;
-						dcDiff := -(SYSTEM.VAL(INTEGER, ((-SYSTEM.VAL(SET, tmp)) * {0..(size-1)})));
+						dcDiff := -(SYSTEM.VAL(SIGNED16, ((-SYSTEM.VAL(SET, tmp)) * {0..(size-1)})));
 					ELSE
 						(* positive difference *)
 						dcDiff := stream.GetBits(size);
@@ -1817,7 +1817,7 @@ TYPE
 						(* negative difference: invert all bits and make number negative *)
 						bits := stream.GetBits(size);
 						IF bits < 0 THEN hasMoreFrames := FALSE; RETURN FALSE END;
-						dcDiff := -(SYSTEM.VAL(INTEGER, ((-SYSTEM.VAL(SET, bits)) * {0..(size-1)})));
+						dcDiff := -(SYSTEM.VAL(SIGNED16, ((-SYSTEM.VAL(SET, bits)) * {0..(size-1)})));
 					ELSE
 						(* positive difference *)
 						dcDiff := stream.GetBits(size);
@@ -2408,7 +2408,7 @@ TYPE
 
 	PROCEDURE GotoNextMarker(VAR stream: Util.BitStream; VAR marker: CHAR): BOOLEAN;
 	VAR
-		i: INTEGER;
+		i: SIGNED16;
 		DEBUG: BOOLEAN;
 	BEGIN
 		DEBUG := FALSE;

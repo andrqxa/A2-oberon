@@ -4,7 +4,7 @@ IMPORT Gadgets, Display3, Display, Objects, Printer, Fonts, Strings, Printer3, T
 TYPE
 	ErrorGadget* = POINTER TO ErrorGadgetDesc;
 	ErrorGadgetDesc* = RECORD (Gadgets.FrameDesc)
-		errno*: INTEGER;
+		errno*: SIGNED16;
 		showstr: BOOLEAN;
 		str*: ARRAY 64 OF CHAR;
 	END;
@@ -37,7 +37,7 @@ BEGIN
 		Gadgets.framehandle(F, M)
 	END
 END ErrorGadgetAttr;
-PROCEDURE RestoreErrorGadget(F: ErrorGadget; M: Display3.Mask; x, y, w, h: INTEGER);
+PROCEDURE RestoreErrorGadget(F: ErrorGadget; M: Display3.Mask; x, y, w, h: SIGNED16);
 VAR s: ARRAY 128 OF CHAR;
 BEGIN
 (*
@@ -57,10 +57,10 @@ END RestoreErrorGadget;
 
 PROCEDURE PrintErrorGadget(F: ErrorGadget; VAR M: Display.DisplayMsg);
 	VAR
-		R: Display3.Mask; x, y, w, h: INTEGER;
+		R: Display3.Mask; x, y, w, h: SIGNED16;
 		s: ARRAY 32 OF CHAR;
 
-	PROCEDURE P(x: INTEGER): INTEGER;
+	PROCEDURE P(x: SIGNED16): SIGNED16;
 	BEGIN RETURN SHORT(x * Display.Unit DIV Printer.Unit)
 	END P;
 
@@ -85,7 +85,7 @@ BEGIN
 END CopyErrorGadget;
 
 PROCEDURE FlipMsg(F: ErrorGadget);
-VAR w, h, dsr: INTEGER; A: Display.ModifyMsg;
+VAR w, h, dsr: SIGNED16; A: Display.ModifyMsg;
 BEGIN
 	F.showstr := ~F.showstr;
 	IF F.showstr  THEN
@@ -101,7 +101,7 @@ END FlipMsg;
 
 
 PROCEDURE ErrorGadgetHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR x, y, w, h: INTEGER; F0: ErrorGadget; R: Display3.Mask; keysum: SET;
+VAR x, y, w, h: SIGNED16; F0: ErrorGadget; R: Display3.Mask; keysum: SET;
 BEGIN
 	WITH F: ErrorGadget DO
 		IF M IS Display.FrameMsg THEN
@@ -174,7 +174,7 @@ VAR F: ErrorGadget;
 BEGIN NEW(F); F.W := 20; F.H := 14; F.errno := 255;F.handle := ErrorGadgetHandler; Objects.NewObj := F
 END NewErrorGadget;
 
-PROCEDURE MarkErrorPos(T: Texts.Text; pos: LONGINT; err: INTEGER; str: ARRAY OF CHAR);
+PROCEDURE MarkErrorPos(T: Texts.Text; pos: LONGINT; err: SIGNED16; str: ARRAY OF CHAR);
 VAR obj: Objects.Object;
 BEGIN
 	NewErrorGadget; obj := Objects.NewObj; obj(ErrorGadget).errno := err; COPY(str,obj(ErrorGadget).str);
@@ -220,7 +220,7 @@ END RemoveErrors;
 *)
 
 PROCEDURE markErrors*(VAR S: Texts.Scanner; errtext: Texts.Text; par: Display.Frame);
-VAR c, err: INTEGER; pos, beg, l,line, k: LONGINT; C: Oberon.CaretMsg;  warn: BOOLEAN;
+VAR c, err: SIGNED16; pos, beg, l,line, k: LONGINT; C: Oberon.CaretMsg;  warn: BOOLEAN;
 	marked: ARRAY MaxErrors OF LONGINT;str: ARRAY 64 OF CHAR; R: Texts.Reader; ch: CHAR; i,endpos: LONGINT; valid: BOOLEAN;
 BEGIN
 	WHILE (~S.eot) & ((S.class # Texts.Name) OR (S.s # "compiling"))  DO

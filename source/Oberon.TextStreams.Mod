@@ -381,7 +381,7 @@ MODULE TextStreams IN Oberon;	(** portable *)
 		END
 	END ReaderAvailable;
 
-	PROCEDURE ReaderState(S: Streams.Stream): INTEGER;
+	PROCEDURE ReaderState(S: Streams.Stream): SIGNED16;
 	BEGIN
 		WITH S: ReaderStream DO
 			IF S.T # NIL THEN
@@ -425,7 +425,7 @@ MODULE TextStreams IN Oberon;	(** portable *)
 		END
 	END WriteTextBytes;
 
-	PROCEDURE WriterState(S: Streams.Stream): INTEGER;
+	PROCEDURE WriterState(S: Streams.Stream): SIGNED16;
 	BEGIN
 		WITH S: WriterStream DO
 			IF S.T # NIL THEN

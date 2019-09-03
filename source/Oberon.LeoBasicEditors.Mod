@@ -79,7 +79,7 @@ MODULE LeoBasicEditors IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE TrackRect (frame: LeoFrames.Frame; VAR msg: Oberon.InputMsg);
 		VAR
-			tool: LeoTools.Tool; fx, fy, hx, hy, len, mx, my, l, x, y: INTEGER; x0, y0, x1, y1, px, py: REAL; s: ARRAY 128 OF CHAR;
+			tool: LeoTools.Tool; fx, fy, hx, hy, len, mx, my, l, x, y: SIGNED16; x0, y0, x1, y1, px, py: REAL; s: ARRAY 128 OF CHAR;
 			mask: Display3.Mask; state, keysum, keys: SET; rect: LeoBasic.Rectangle; fig: Leonardo.Figure;
 	BEGIN
 		IF msg.keys = {} THEN
@@ -245,7 +245,7 @@ MODULE LeoBasicEditors IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE TrackEllipse (frame: LeoFrames.Frame; VAR msg: Oberon.InputMsg);
 		VAR
-			tool: LeoTools.Tool; fx, fy, hx, hy, len, mx, my, l, x, y: INTEGER; x0, y0, x1, y1, px, py: REAL; s: ARRAY 128 OF CHAR;
+			tool: LeoTools.Tool; fx, fy, hx, hy, len, mx, my, l, x, y: SIGNED16; x0, y0, x1, y1, px, py: REAL; s: ARRAY 128 OF CHAR;
 			mask: Display3.Mask; state, keysum, keys: SET; e: LeoBasic.Ellipse; fig: Leonardo.Figure;
 	BEGIN
 		IF msg.keys = {} THEN

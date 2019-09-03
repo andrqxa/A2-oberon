@@ -463,7 +463,7 @@ IMPORT
 			buf2 : ARRAY 8 OF CHAR;
 			indexLength: LONGINT;
 			nidx: LONGINT;
-			idxType: INTEGER;
+			idxType: SIGNED16;
 			i: LONGINT;
 			pos: LONGINT;
 			length: LONGINT;
@@ -650,7 +650,7 @@ IMPORT
 			headerLength: LONGINT;
 			startPos: Streams.Position;
 			len: SIZE;
-			temp: INTEGER;
+			temp: SIGNED16;
 		BEGIN
 			NEW(header);
 
@@ -688,7 +688,7 @@ IMPORT
 			header: BitMapInfo;
 			headerLength: LONGINT;
 			startPos: Streams.Position;
-			temp: INTEGER;
+			temp: SIGNED16;
 		BEGIN
 			NEW(header);
 
@@ -720,7 +720,7 @@ IMPORT
 			header: WAVEFormatEx;
 			headerLength: LONGINT;
 			startPos: Streams.Position;
-			temp: INTEGER;
+			temp: SIGNED16;
 		BEGIN
 			NEW(header);
 
@@ -1006,7 +1006,7 @@ IMPORT
 		(* Could be optimized, as we assume videostream beeing at index 0 and that there is only one *)
 		PROCEDURE GetStreamInfo*(streamNr: LONGINT): Codecs.AVStreamInfo;
 		VAR streamInfo : Codecs.AVStreamInfo;
-			i: INTEGER;
+			i: SIGNED16;
 			tag : ARRAY 4 OF CHAR;
 		BEGIN
 

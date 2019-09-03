@@ -351,7 +351,7 @@ TYPE
 		PROCEDURE GetProperty*(char : Texts.Char32; pos : SIZE; VAR res : ARRAY OF CHAR);
 		VAR
 			thisChar, thisInt : Texts.Char32;
-			i,j : INTEGER;
+			i,j : SIGNED16;
 			dummyVal : WORD;
 		BEGIN
 			text.AcquireRead;
@@ -471,7 +471,7 @@ TYPE
 		VAR
 			sourceString : ARRAY 7 OF CHAR;
 			sourceInt, tempChar : Texts.Char32;
-			i : INTEGER;
+			i : SIGNED16;
 			res : WORD;
 		BEGIN
 			sourceInt := -1;
@@ -500,7 +500,7 @@ TYPE
 		VAR
 			targetString : ARRAY 7 OF CHAR;
 			targetInt, tempChar : Texts.Char32;
-			i : INTEGER;
+			i : SIGNED16;
 			res : WORD;
 		BEGIN
 			targetInt := -1;

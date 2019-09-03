@@ -150,7 +150,7 @@ TYPE
       tfmFile: Files.File; tfm: Files.Rider;
       checksum: LONGINT; (* tfm-checksum of the font *)
       w: POINTER TO ARRAY OF LONGREAL;
-      wIndex: ARRAY 256 OF INTEGER;
+      wIndex: ARRAY 256 OF SIGNED16;
       headerLength,begin,end,widthNr,i: LONGINT;
 
       PROCEDURE OpenTFMFile(VAR fontName: ARRAY OF CHAR): Files.File;

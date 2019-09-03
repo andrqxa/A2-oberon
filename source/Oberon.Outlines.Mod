@@ -19,15 +19,15 @@ CONST
 TYPE
 	Outline* = POINTER TO OutlineDesc;
 	OutlineDesc* = RECORD (Gadgets.FrameDesc)
-		fstate* : INTEGER;
+		fstate* : SIGNED16;
 		len*: LONGINT;
 		buf* : Texts.Buffer;
 	END;
 
 	FindInfo = RECORD
 		sPat: ARRAY MaxPatLen OF CHAR;	(* search pattern [read only] *)
-		sDv: ARRAY MaxPatLen + 1 OF INTEGER;	(* displacement vector for search pattern *)
-		sLen: INTEGER;	(* number of valid characters in sPat [read only] *)
+		sDv: ARRAY MaxPatLen + 1 OF SIGNED16;	(* displacement vector for search pattern *)
+		sLen: SIGNED16;	(* number of valid characters in sPat [read only] *)
 		time: LONGINT;	(* most recent time for sPat and/or rBuf *)
 		rBuf: Texts.Buffer;	(* replace buffer [read only] *)
 	END;
@@ -39,7 +39,7 @@ VAR
 	insertT: Texts.Text;
 	saveB: Texts.Buffer;
 
-PROCEDURE MakeOutline*(state: INTEGER) : Outline;
+PROCEDURE MakeOutline*(state: SIGNED16) : Outline;
 VAR F: Outline;
 BEGIN
 	NEW(F); F.state := {Gadgets.lockedsize}; F.W := FW; F.H := FH; F.handle := handle; F.fstate := state; F.len:= 1;
@@ -109,7 +109,7 @@ BEGIN
 END FindBefore;
 
 PROCEDURE CloseForward(F: Outline; T: Texts.Text; pos: LONGINT);
-VAR f: Texts.Finder; o: Objects.Object; pos0: LONGINT; cnt : INTEGER;
+VAR f: Texts.Finder; o: Objects.Object; pos0: LONGINT; cnt : SIGNED16;
 BEGIN
 	F.len:= 0;
 	Texts.OpenFinder(f, T, pos+1);
@@ -138,7 +138,7 @@ BEGIN
 END CloseForward;
 
 PROCEDURE CloseBackward(F: Outline; T: Texts.Text; pos: LONGINT);
-VAR obj: Objects.Object; pos0: LONGINT; cnt : INTEGER;
+VAR obj: Objects.Object; pos0: LONGINT; cnt : SIGNED16;
 BEGIN
 	obj := F; cnt := 1;
 	LOOP
@@ -181,7 +181,7 @@ BEGIN
 	F.fstate := open; Gadgets.Update(F)
 END Open;
 
-PROCEDURE Fold(F: Outline; x, y, w, h: INTEGER; VAR M: Oberon.InputMsg; R: Display3.Mask);
+PROCEDURE Fold(F: Outline; x, y, w, h: SIGNED16; VAR M: Oberon.InputMsg; R: Display3.Mask);
 VAR f: Texts.Finder; o: Objects.Object; T: Texts.Text; pos: LONGINT; found: BOOLEAN;
 	FF: Display.Frame;
 BEGIN
@@ -260,8 +260,8 @@ END CollapseAll;
 
 (*	----------------------------	Gadgets Stuff	----------------------------	*)
 
-PROCEDURE DTriangle (R: Display3.Mask; x, y, dim: INTEGER; open: BOOLEAN);
-VAR h, max: INTEGER;
+PROCEDURE DTriangle (R: Display3.Mask; x, y, dim: SIGNED16; open: BOOLEAN);
+VAR h, max: SIGNED16;
 BEGIN
 	max := 1 + 2*(dim DIV 2);
 	IF open THEN
@@ -281,8 +281,8 @@ BEGIN
 	END
 END DTriangle;
 
-PROCEDURE RestoreOutline(F: Outline; R: Display3.Mask; x, y, w, h: INTEGER);
-VAR cx, cy, cw, ch: INTEGER;
+PROCEDURE RestoreOutline(F: Outline; R: Display3.Mask; x, y, w, h: SIGNED16);
+VAR cx, cy, cw, ch: SIGNED16;
 BEGIN
 	Display3.ReplConst(R, Display3.groupC, x, y, w, h, Display.replace);
 	cx := x + w DIV 4; cy := y + h DIV 4; cw := w DIV 2; ch := h DIV 2;
@@ -295,12 +295,12 @@ BEGIN
 	IF Gadgets.selected IN F.state THEN Display3.FillPattern(R, 15, Display3.selectpat, x, y, x, y, w, h, Display.paint) END
 END RestoreOutline;
 
-PROCEDURE P(x: INTEGER): INTEGER;
+PROCEDURE P(x: SIGNED16): SIGNED16;
 BEGIN RETURN SHORT(x * Display.Unit DIV Printer.Unit)
 END P;
 
-PROCEDURE PTriangle (R: Display3.Mask; x, y, dim: INTEGER; open: BOOLEAN);
-VAR h, max: INTEGER;
+PROCEDURE PTriangle (R: Display3.Mask; x, y, dim: SIGNED16; open: BOOLEAN);
+VAR h, max: SIGNED16;
 BEGIN
 	max := 1 + 2*(dim DIV 2);
 	IF open THEN
@@ -321,7 +321,7 @@ BEGIN
 END PTriangle;
 
 PROCEDURE PrintOutline(F: Outline; M: Display.DisplayMsg);
-VAR R: Display3.Mask; x, y, w, h: INTEGER;
+VAR R: Display3.Mask; x, y, w, h: SIGNED16;
 
 BEGIN
 	Gadgets.MakePrinterMask(F, M.x, M.y, M.dlink, R);
@@ -366,7 +366,7 @@ BEGIN
 END Attr;
 
 PROCEDURE OutlineHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR file: Files.File; text: Texts.Text; pos, len: LONGINT; x, y, w, h, version: INTEGER; F0: Outline;
+VAR file: Files.File; text: Texts.Text; pos, len: LONGINT; x, y, w, h, version: SIGNED16; F0: Outline;
 		R: Display3.Mask; ch: CHAR;
 BEGIN
 	WITH F: Outline DO
@@ -555,7 +555,7 @@ BEGIN
 END MarkPatPos;
 
 PROCEDURE CalcDispVec (time: LONGINT);
-VAR i, j, d: INTEGER;
+VAR i, j, d: SIGNED16;
 BEGIN
 	inf.time := time;
 	i := 1; d := 1; (* calculate displacement vector *)
@@ -567,7 +567,7 @@ BEGIN
 END CalcDispVec;
 
 PROCEDURE SPatFound (text: Texts.Text; VAR pos: LONGINT): BOOLEAN;
-VAR root, obj: Objects.Object; bpos, fpos, l: LONGINT; i: INTEGER; f: Texts.Finder; R: Texts.Reader; ch: CHAR;
+VAR root, obj: Objects.Object; bpos, fpos, l: LONGINT; i: SIGNED16; f: Texts.Finder; R: Texts.Reader; ch: CHAR;
 
 	PROCEDURE Append (o: Objects.Object);
 	VAR cur: Objects.Object;
@@ -652,7 +652,7 @@ BEGIN
 END SPatFound;
 
 PROCEDURE Search*;
-VAR F: Display.Frame; T: Texts.Text; pos: LONGINT; i: INTEGER; R: Texts.Reader;
+VAR F: Display.Frame; T: Texts.Text; pos: LONGINT; i: SIGNED16; R: Texts.Reader;
 		aS: Attributes.Scanner; C: Oberon.CaretMsg; S: Oberon.SelectMsg;
 BEGIN
 	F:= GetFrame();

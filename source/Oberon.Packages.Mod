@@ -11,7 +11,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	instructions and version information.
 
 	Package file format: DocHead Compress ( PackHead { Data | URL | Cmd } ) .
-		DocHead = Documents.Id "Packages.NewDoc" (INTEGER) 0 0 0 0 Attachments .
+		DocHead = Documents.Id "Packages.NewDoc" (SIGNED16) 0 0 0 0 Attachments .
 		PackHead = HeadTag Resource gen options .
 		Data = DataTag Resource len data .
 		URL = URLTag Resource url options .
@@ -32,7 +32,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		Resource = RECORD
 			name: FileDir.FileName;
 			time, date, pos: LONGINT;
-			minor, major: INTEGER;
+			minor, major: SIGNED16;
 			next: ResourcePtr
 		END;
 
@@ -80,7 +80,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		END
 	END OpenScanner;
 
-	PROCEDURE WriteResource(VAR R: Files.Rider; VAR res: Resource; tag: INTEGER; dLen: SIZE);
+	PROCEDURE WriteResource(VAR R: Files.Rider; VAR res: Resource; tag: SIGNED16; dLen: SIZE);
 	BEGIN
 		Files.WriteInt(R, tag); Files.WriteString(R, res.name); Files.WriteLInt(R, dLen(LONGINT)+12);
 		Files.WriteLInt(R, res.time); Files.WriteLInt(R, res.date);
@@ -293,7 +293,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		Texts.Append(Oberon.Log, W.buf)
 	END Build;
 
-	PROCEDURE ReadResource(VAR R: Files.Rider; VAR res: Resource; VAR tag: INTEGER; VAR dLen: LONGINT);
+	PROCEDURE ReadResource(VAR R: Files.Rider; VAR res: Resource; VAR tag: SIGNED16; VAR dLen: LONGINT);
 		VAR p: LONGINT;
 	BEGIN
 		p := Files.Pos(R);
@@ -304,7 +304,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	END ReadResource;
 
 	PROCEDURE FindResource(CONST name: ARRAY OF CHAR; VAR res: Resource);
-		VAR R: Files.Rider; org: LONGINT; err: INTEGER;
+		VAR R: Files.Rider; org: LONGINT; err: SIGNED16;
 	BEGIN
 		BTrees.SearchStr(index, name, org, err);
 		IF err = BTrees.Done THEN
@@ -318,7 +318,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	END FindResource;
 
 	PROCEDURE RegisterResource(VAR res: Resource; package: ARRAY OF CHAR);
-		VAR R: Files.Rider; org: LONGINT; err: INTEGER;
+		VAR R: Files.Rider; org: LONGINT; err: SIGNED16;
 	BEGIN
 		BTrees.SearchStr(index, res.name, org, err);
 		IF err # BTrees.Done THEN
@@ -390,7 +390,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	END SystemName;
 
 	PROCEDURE ReadDocHeader(VAR R: Files.Rider; VAR ch: CHAR);
-		VAR len: LONGINT; x, y, w, h: INTEGER; name: ARRAY 32 OF CHAR;
+		VAR len: LONGINT; x, y, w, h: SIGNED16; name: ARRAY 32 OF CHAR;
 	BEGIN
 		Files.Read(R, ch);
 		Files.ReadString(R, name);
@@ -407,7 +407,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 
 	PROCEDURE OpenPackage(VAR pack: Package; F: Files.File): BOOLEAN;
 		VAR
-			R: Files.Rider; h: Compress.Header; i: INTEGER;
+			R: Files.Rider; h: Compress.Header; i: SIGNED16;
 			attr, attrs: Attributes.Attr; links: Links.Link; ch: CHAR;
 	BEGIN
 		Files.Set(pack.R, F, 0); Files.ReadInt(pack.R, i);
@@ -445,7 +445,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 			options: FileDir.FileName;
 			pack: Package; resl, res: ResourcePtr;
 			R: Files.Rider; regT: Texts.Text;
-			p, l, v, urls: LONGINT; i: INTEGER;
+			p, l, v, urls: LONGINT; i: SIGNED16;
 			ch: CHAR; restore: BOOLEAN;
 		PROCEDURE StoreState;
 		BEGIN
@@ -474,7 +474,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 			Files.WriteBytes(R, buf, len)
 		END CopyData;
 		PROCEDURE Backup(VAR res: Resource);
-			VAR bak: FileDir.FileName; err: INTEGER;
+			VAR bak: FileDir.FileName; err: SIGNED16;
 		BEGIN
 			IF Files.Old(res.name) # NIL THEN
 				COPY(res.name, bak); Strings.Append(bak, ".Bak");
@@ -486,7 +486,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 				key, file, value: FileDir.FileName;
 				i, j, v: LONGINT; res: ResourcePtr; cRes: Resource;
 				F2, F3: Files.File; R, R2: Files.Rider; ok: BOOLEAN;
-				T: Texts.Text; r: Texts.Reader; re: INTEGER;
+				T: Texts.Text; r: Texts.Reader; re: SIGNED16;
 		BEGIN
 			Files.Set(R, F, cmd.pos); Files.ReadString(R, file); Files.ReadString(R, value);
 			IF cmd.name # "MSG" THEN
@@ -823,7 +823,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 			F: Files.File; R: Files.Rider;
 			pack: Package; res: Resource;
 			options, file, value: FileDir.FileName;
-			p, l: LONGINT; i: INTEGER;
+			p, l: LONGINT; i: SIGNED16;
 	BEGIN
 		OpenScanner(T, S);
 		IF S.class IN {Texts.Name, Texts.String} THEN

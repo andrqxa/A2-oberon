@@ -37,16 +37,16 @@ VAR
 
 	(* string primitives *)
 
-	PROCEDURE SplitFontName (CONST fn: ARRAY OF CHAR; VAR i, j, size: INTEGER);
-		VAR k: INTEGER;
+	PROCEDURE SplitFontName (CONST fn: ARRAY OF CHAR; VAR i, j, size: SIGNED16);
+		VAR k: SIGNED16;
 	BEGIN i := 0; size := 0;
 		WHILE (fn[i] # 0X) & ((fn[i] < "0") OR ("9" < fn[i])) DO INC(i) END;
 		j := i; WHILE ("0" <= fn[j]) & (fn[j] <= "9") DO INC(j) END;
 		k := i; WHILE k < j DO size := size * 10 + ORD(fn[k]) - 30H; INC(k) END
 	END SplitFontName;
 
-	PROCEDURE CombineFontName (CONST prefix, suffix: ARRAY OF CHAR; i, j, size: INTEGER; VAR fn: ARRAY OF CHAR);
-		VAR k: INTEGER; ch: CHAR; dig: ARRAY 10 OF CHAR;
+	PROCEDURE CombineFontName (CONST prefix, suffix: ARRAY OF CHAR; i, j, size: SIGNED16; VAR fn: ARRAY OF CHAR);
+		VAR k: SIGNED16; ch: CHAR; dig: ARRAY 10 OF CHAR;
 	BEGIN COPY(prefix, fn); k := 0;
 		IF size < 6 THEN size := 6 ELSIF size > 128 THEN size := 128 END;
 		REPEAT dig[k] := CHR(size MOD 10 + 30H); size := size DIV 10; INC(k) UNTIL size = 0;
@@ -71,9 +71,9 @@ VAR
 
 	(** text manipulation **)
 
-	PROCEDURE IncFontSize* (T: Texts.Text; beg, end: LONGINT; delta: INTEGER);
+	PROCEDURE IncFontSize* (T: Texts.Text; beg, end: LONGINT; delta: SIGNED16);
 		CONST MinSize = 6; MaxSize = 96;
-		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, size: INTEGER; ch: CHAR;
+		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, size: SIGNED16; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg;
 			fnt := R.lib;
@@ -87,8 +87,8 @@ VAR
 		END
 	END IncFontSize;
 
-	PROCEDURE ChangeFontSize* (T: Texts.Text; beg, end: LONGINT; old, new: INTEGER);
-		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, size: INTEGER; ch: CHAR;
+	PROCEDURE ChangeFontSize* (T: Texts.Text; beg, end: LONGINT; old, new: SIGNED16);
+		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, size: SIGNED16; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg; fnt := R.lib;
 			WHILE ~R.eot & (beg < end) & (R.lib = fnt) DO INC(beg); Texts.Read(R, ch) END;
@@ -103,7 +103,7 @@ VAR
 	END ChangeFontSize;
 
 	PROCEDURE ChangeFontFamily* (T: Texts.Text; beg, end: LONGINT; CONST old, new: ARRAY OF CHAR);
-		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, i1, j, j1, size, size1: INTEGER; ch: CHAR;
+		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, i1, j, j1, size, size1: SIGNED16; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg; fnt := R.lib;
 			WHILE ~R.eot & (beg < end) & (R.lib = fnt) DO INC(beg); Texts.Read(R, ch) END;
@@ -117,7 +117,7 @@ VAR
 	END ChangeFontFamily;
 
 	PROCEDURE ChangeFontStyle* (T: Texts.Text; beg, end: LONGINT; old, new: CHAR);
-		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, k, size: INTEGER; ch: CHAR;
+		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, k, size: SIGNED16; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg; fnt := R.lib;
 			WHILE ~R.eot & (beg < end) & (R.lib = fnt) DO INC(beg); Texts.Read(R, ch) END;
@@ -164,7 +164,7 @@ VAR
 	(** change font size of selected text (from => to) *)
 	PROCEDURE ChangeSize*;	(** {old "=>" new}, selection **)
 		CONST MinSize = 6; MaxSize = 96;
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: INTEGER;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: SIGNED16;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.line = 0) THEN
@@ -227,8 +227,8 @@ VAR
 		END
 	END Change;
 
-	PROCEDURE ChangeCol* (T: Texts.Text; beg, end: LONGINT; old, new: INTEGER);
-		VAR R: Texts.Reader; org: LONGINT; color: INTEGER; ch: CHAR;
+	PROCEDURE ChangeCol* (T: Texts.Text; beg, end: LONGINT; old, new: SIGNED16);
+		VAR R: Texts.Reader; org: LONGINT; color: SIGNED16; ch: CHAR;
 	BEGIN
 		Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO
@@ -243,7 +243,7 @@ VAR
 	(** change color of selected text *)
 	PROCEDURE ChangeColor*;	(** {old "=>" new}, selection / old may be "?" / Color = 0 .. 255 **)
 		CONST Range=256;
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: INTEGER;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: SIGNED16;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.line = 0) THEN
@@ -257,8 +257,8 @@ VAR
 		END
 	END ChangeColor;
 
-	PROCEDURE Changevoff* (T: Texts.Text; beg, end: LONGINT; old, new: INTEGER);
-		VAR R: Texts.Reader; org: LONGINT; voff: INTEGER; ch: CHAR;
+	PROCEDURE Changevoff* (T: Texts.Text; beg, end: LONGINT; old, new: SIGNED16);
+		VAR R: Texts.Reader; org: LONGINT; voff: SIGNED16; ch: CHAR;
 	BEGIN
 		Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO
@@ -274,7 +274,7 @@ VAR
 	PROCEDURE ChangeVoff*;	(** {old "=>" new}, selection / old may be "?" / Voff = -32 .. 32 **)
 		CONST Range=32;
 
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: INTEGER;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: SIGNED16;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.line = 0) THEN
@@ -288,8 +288,8 @@ VAR
 		END
 	END ChangeVoff;
 
-	PROCEDURE Incvoff* (T: Texts.Text; beg, end: LONGINT; delta: INTEGER);
-		VAR R: Texts.Reader; org: LONGINT; voff: INTEGER; ch: CHAR;
+	PROCEDURE Incvoff* (T: Texts.Text; beg, end: LONGINT; delta: SIGNED16);
+		VAR R: Texts.Reader; org: LONGINT; voff: SIGNED16; ch: CHAR;
 	BEGIN
 		Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO
@@ -489,7 +489,7 @@ VAR
 	PROCEDURE StoreDoc(D: Documents.Document; os: SIGNED8);
 	VAR L: Objects.LinkMsg;
 		R: Texts.Reader; F: Files.File; r: Files.Rider; bak: ARRAY 64 OF CHAR; ch: CHAR;
-		i, res: INTEGER;
+		i, res: SIGNED16;
 	BEGIN
 		IF (D # NIL) & (D.dsc # NIL) THEN
 			Texts.WriteString(W, "EditTools.Store");
@@ -672,7 +672,7 @@ VAR
 			col, voff: SIGNED8;
 			ch: CHAR;
 
-		PROCEDURE Voff (obj: Objects.Object): INTEGER;
+		PROCEDURE Voff (obj: Objects.Object): SIGNED16;
 		VAR A: Objects.AttrMsg;
 		BEGIN
 			A.id := Objects.get; A.name := "LineupHY"; A.class := Objects.Inval; A.res := -1;

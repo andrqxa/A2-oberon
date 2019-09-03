@@ -202,9 +202,9 @@ TYPE
 			RETURN ch
 		END ReadChar;
 
-		PROCEDURE ReadInt* () : INTEGER;
+		PROCEDURE ReadInt* () : SIGNED16;
 		VAR
-			i : INTEGER;
+			i : SIGNED16;
 		BEGIN
 			reader.RawInt(i);
 			IF reader.res = Streams.Ok THEN
@@ -260,7 +260,7 @@ TYPE
 				| 2H : w.String("BOOLEAN")
 				| 3H : w.String("CHAR")
 				| 4H : w.String("SIGNED8")
-				| 5H : w.String("INTEGER")
+				| 5H : w.String("SIGNED16")
 				| 6H : w.String("LONGINT")
 				| 7H : w.String("REAL")
 				| 8H : w.String("LONGREAL")

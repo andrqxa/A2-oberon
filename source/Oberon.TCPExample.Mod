@@ -25,7 +25,7 @@ MODULE TCPExample IN Oberon;	(** portable *)
 			C: NetSystem.Connection;
 			str: ARRAY 64 OF CHAR;
 			n, time: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 	BEGIN
 	(* connect to TimeHost:TimePort *)
 		NetSystem.GetIP(TimeHost, IP);

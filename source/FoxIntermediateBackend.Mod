@@ -12609,7 +12609,7 @@ TYPE
 									IF RefInfo THEN Info(section,"SIGNED8") END;
 									Char(section, sfTypeSHORTINT)
 								ELSIF (type = module.system.integerType) THEN
-									IF RefInfo THEN Info(section,"INTEGER") END;
+									IF RefInfo THEN Info(section,"SIGNED16") END;
 									Char(section, sfTypeINTEGER)
 								ELSIF (type = module.system.longintType) THEN
 									IF RefInfo THEN Info(section,"LONGINT") END;

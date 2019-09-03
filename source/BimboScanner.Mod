@@ -102,7 +102,7 @@ TYPE
 			ch-: CHAR;	(**look-ahead *)
 			str-: ARRAY 1024 OF CHAR;
 			sym- : LONGINT;
-			numtyp-: INTEGER; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
+			numtyp-: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
 			intval-: LONGINT;	(* integer value or string length *)
 			longintval-: HUGEINT;
 			realval-: REAL;
@@ -119,7 +119,7 @@ TYPE
 			cw := commentStr.GetWriter()
 		END Init;
 
-		PROCEDURE err(n: INTEGER);
+		PROCEDURE err(n: SIGNED16);
 		BEGIN
 		END err;
 
@@ -162,9 +162,9 @@ TYPE
 		END Identifier;
 
 		PROCEDURE Number;
-		VAR i, m, n, d, e: INTEGER; dig: ARRAY 24 OF CHAR; f: LONGREAL; expCh: CHAR; neg, long: BOOLEAN;
+		VAR i, m, n, d, e: SIGNED16; dig: ARRAY 24 OF CHAR; f: LONGREAL; expCh: CHAR; neg, long: BOOLEAN;
 
-			PROCEDURE Ten(e: INTEGER): LONGREAL;
+			PROCEDURE Ten(e: SIGNED16): LONGREAL;
 				VAR x, p: LONGREAL;
 			BEGIN x := 1; p := 10;
 				WHILE e > 0 DO
@@ -175,7 +175,7 @@ TYPE
 				RETURN x
 			END Ten;
 
-			PROCEDURE Ord(ch: CHAR; hex: BOOLEAN): INTEGER;
+			PROCEDURE Ord(ch: CHAR; hex: BOOLEAN): SIGNED16;
 			BEGIN (* ("0" <= ch) & (ch <= "9") OR ("A" <= ch) & (ch <= "F") *)
 				IF ch <= "9" THEN RETURN ORD(ch) - ORD("0")
 				ELSIF hex THEN RETURN ORD(ch) - ORD("A") + 10
@@ -259,7 +259,7 @@ TYPE
 					END;
 					IF ("0" <= ch) & (ch <= "9") THEN
 						REPEAT n := Ord(ch, FALSE); NextChar;
-							IF e <= (MAX(INTEGER) - n) DIV 10 THEN e := e*10 + n
+							IF e <= (MAX(SIGNED16) - n) DIV 10 THEN e := e*10 + n
 							ELSE err(203)
 							END
 						UNTIL (ch < "0") OR ("9" < ch);

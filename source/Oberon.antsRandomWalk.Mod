@@ -47,7 +47,7 @@ VAR
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  o: tModel );
-	VAR version: INTEGER;  ref: Objects.Object;
+	VAR version: SIGNED16;  ref: Objects.Object;
 	BEGIN
 		Files.ReadInt( R, version );
 		(*Load*)

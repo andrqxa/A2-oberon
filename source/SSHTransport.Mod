@@ -678,10 +678,10 @@ VAR hexd: ARRAY 17 OF CHAR;
 
 	PROCEDURE algoMatch( CONST cstr, sstr: ARRAY OF CHAR;  VAR match: ARRAY OF CHAR );
 	VAR
-		si, ci: INTEGER;  matched: BOOLEAN;  tmp: ARRAY 64 OF CHAR;
+		si, ci: SIGNED16;  matched: BOOLEAN;  tmp: ARRAY 64 OF CHAR;
 
-		PROCEDURE nextSuit( CONST buf: ARRAY OF CHAR;  VAR i: INTEGER;  VAR suit: ARRAY OF CHAR );
-		VAR j: INTEGER;
+		PROCEDURE nextSuit( CONST buf: ARRAY OF CHAR;  VAR i: SIGNED16;  VAR suit: ARRAY OF CHAR );
+		VAR j: SIGNED16;
 		BEGIN
 			WHILE (i < LEN( buf )) & (buf[i] # 0X) & ((buf[i] = ',') OR (buf[i] = ' ')) DO  INC( i )  END;
 			j := 0;

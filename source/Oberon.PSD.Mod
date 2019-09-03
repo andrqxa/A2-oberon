@@ -9,7 +9,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 	TYPE
 		Header = RECORD
 			width, height: LONGINT;
-			channels, depth, mode: INTEGER;
+			channels, depth, mode: SIGNED16;
 			data: LONGINT;
 			pal: ARRAY 256 OF Display.Color
 		END;
@@ -23,7 +23,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 		Files.Read(R, ch); i := ORD(ch)+LSH(i, 8)
 	END ReadLInt;
 
-	PROCEDURE ReadInt(VAR R: Files.Rider; VAR i: INTEGER);
+	PROCEDURE ReadInt(VAR R: Files.Rider; VAR i: SIGNED16);
 		VAR ch: CHAR;
 	BEGIN
 		Files.Read(R, ch); i := ORD(ch);
@@ -31,7 +31,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 	END ReadInt;
 
 	PROCEDURE CheckFormat(VAR R: Files.Rider): BOOLEAN;
-		VAR sig: LONGINT; ver: INTEGER;
+		VAR sig: LONGINT; ver: SIGNED16;
 	BEGIN
 		ReadLInt(R, sig);
 		IF sig # 038425053H THEN RETURN FALSE END;
@@ -78,7 +78,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 	END SkipSection;
 
 	PROCEDURE CopyPal(VAR h: Header; P: Pictures.Picture);
-		VAR i: LONGINT; r, g, b: INTEGER;
+		VAR i: LONGINT; r, g, b: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE i < 256 DO
@@ -89,7 +89,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 	END CopyPal;
 
 	PROCEDURE LoadRLEInd8(VAR R: Files.Rider; VAR h: Header; P: Pictures.Picture);
-		VAR F: Files.File; pos: LONGINT; n, nb, x, y, py: INTEGER; rle: SIGNED8; ch: CHAR;
+		VAR F: Files.File; pos: LONGINT; n, nb, x, y, py: SIGNED16; rle: SIGNED8; ch: CHAR;
 	BEGIN
 		Pictures.Create(P, SHORT(h.width), SHORT(h.height), 8);
 		CopyPal(h, P); F := Files.Base(R);
@@ -122,7 +122,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 	END LoadRLEInd8;
 
 	PROCEDURE Load(VAR R: Files.Rider; VAR P: Pictures.Picture);
-		VAR h: Header; comp: INTEGER;
+		VAR h: Header; comp: SIGNED16;
 	BEGIN
 		IF CheckFormat(R) THEN
 			ReadHeader(R, h);

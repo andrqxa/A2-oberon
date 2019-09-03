@@ -64,7 +64,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		Pattern = POINTER TO PatternDesc;
 		PatternDesc = RECORD (Gfx.PatternDesc)
 			next: Pattern;
-			no: INTEGER;
+			no: SIGNED16;
 		END;
 
 		T1Font = POINTER TO T1FontDesc;
@@ -92,7 +92,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 			cp: GfxPaths.Path;	(* current path if Record flag isn't set *)
 			llx, lly, urx, ury: REAL;	(* document bounding box *)
 			fileLen: LONGINT;	(* number of bytes relevant for output pages *)
-			pages: INTEGER;	(* number of pages written *)
+			pages: SIGNED16;	(* number of pages written *)
 			defMatrix: GfxMatrix.Matrix;	(* default matrix *)
 			clip: ClipPath;	(* current list of clip paths *)
 			sx, sy, cx, cy: REAL;	(* current subpath parameters *)
@@ -107,7 +107,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		END;
 
 		RLEData = RECORD
-			len, n: INTEGER;
+			len, n: SIGNED16;
 			buf: ARRAY RLEBufLen OF CHAR;
 		END;
 
@@ -410,13 +410,13 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Maps ---*)
 
-	PROCEDURE Grey (r, g, b: INTEGER): INTEGER;
+	PROCEDURE Grey (r, g, b: SIGNED16): SIGNED16;
 	BEGIN
 		RETURN (3*r + 6*g + b + 5) DIV 10
 	END Grey;
 
-	PROCEDURE PatternNo (psc: Context; pattern: Gfx.Pattern): INTEGER;
-		VAR pat: Pattern; no: INTEGER;
+	PROCEDURE PatternNo (psc: Context; pattern: Gfx.Pattern): SIGNED16;
+		VAR pat: Pattern; no: SIGNED16;
 	BEGIN
 		pat := psc.patterns; no := 0;
 		WHILE (pat # NIL) & (pat # pattern) DO
@@ -427,7 +427,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END PatternNo;
 
 	PROCEDURE ImageMask (VAR r: Files.Rider; mask: Images.Image);
-		VAR y, x, w, i, n: INTEGER; buf: ARRAY 36 OF CHAR;
+		VAR y, x, w, i, n: SIGNED16; buf: ARRAY 36 OF CHAR;
 	BEGIN
 		y := 0;
 		WHILE y < mask.height DO
@@ -477,7 +477,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END DPalette;
 
 	PROCEDURE DefImage (psc: Context; img: Images.Image);
-		VAR mode: Images.Mode; y, x, byte: INTEGER; pix: Images.Pixel; fmt: Images.Format;
+		VAR mode: Images.Mode; y, x, byte: SIGNED16; pix: Images.Pixel; fmt: Images.Format;
 	BEGIN
 		IF ~psc.level2 THEN Ch(psc.out, "{") END;
 		Ch(psc.out, "<");
@@ -531,8 +531,8 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		Ln(psc.out)
 	END DefImage;
 
-	PROCEDURE UseImage (psc: Context; img: Images.Image; no: INTEGER);
-		VAR mode: Images.Mode; rle: RLEData; y, x: INTEGER; pix: Images.Pixel; fmt: Images.Format;
+	PROCEDURE UseImage (psc: Context; img: Images.Image; no: SIGNED16);
+		VAR mode: Images.Mode; rle: RLEData; y, x: SIGNED16; pix: Images.Pixel; fmt: Images.Format;
 	BEGIN
 		Int(psc.out, img.width); Blank(psc.out); Int(psc.out, img.height);
 		IF img.fmt.components = {Images.alpha} THEN
@@ -610,11 +610,11 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		Ln(psc.out)
 	END UseImage;
 
-	PROCEDURE RegisterImage (psc: Context; VAR img: Images.Image; VAR no: INTEGER);
+	PROCEDURE RegisterImage (psc: Context; VAR img: Images.Image; VAR no: SIGNED16);
 		VAR i: Image; copy: Images.Image;
 
 		PROCEDURE same (m, n: Images.Image): BOOLEAN;
-			VAR y, x, len, l: INTEGER; mbuf, nbuf: ARRAY 4*128 OF CHAR;
+			VAR y, x, len, l: SIGNED16; mbuf, nbuf: ARRAY 4*128 OF CHAR;
 		BEGIN
 			IF (m.width # n.width) OR (m.height # n.height) THEN
 				RETURN FALSE
@@ -1866,7 +1866,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	(*--- Images and Patterns ---*)
 
 	PROCEDURE ImageM (ctxt: Gfx.Context; x, y: REAL; img: Images.Image; VAR filter: GfxImages.Filter);
-		VAR psc: Context; no: INTEGER; llx, lly, urx, ury: REAL;
+		VAR psc: Context; no: SIGNED16; llx, lly, urx, ury: REAL;
 	BEGIN
 		psc := ctxt(Context);
 		IF (x # 0) OR (y # 0) THEN
@@ -1883,7 +1883,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END ImageM;
 
 	PROCEDURE NewPattern (ctxt: Gfx.Context; img: Images.Image; px, py: REAL): Gfx.Pattern;
-		VAR psc: Context; no: INTEGER; pat: Pattern;
+		VAR psc: Context; no: SIGNED16; pat: Pattern;
 	BEGIN
 		psc := ctxt(Context);
 		RegisterImage(psc, img, no);

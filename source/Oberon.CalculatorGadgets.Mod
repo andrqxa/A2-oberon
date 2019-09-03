@@ -26,7 +26,7 @@ CONST
 TYPE
 	Operand = RECORD	(* a value *)
 		value: LONGREAL;
-		factor,base,angle: INTEGER;
+		factor,base,angle: SIGNED16;
 	END;
 
 	Button* = POINTER TO ButtonDesc;
@@ -37,7 +37,7 @@ TYPE
 	Engine* = POINTER TO EngineDesc;	(** the model gadget *)
 	EngineDesc* = RECORD(Gadgets.ObjDesc)
 		expr*: Calculator.Expression;
-		state: INTEGER;
+		state: SIGNED16;
 		op: ARRAY CalcUndoOp OF Operand;
 		mem: ARRAY CalcMem OF LONGREAL;
 		undo: ARRAY CalcUndoKey OF LONGREAL;
@@ -96,7 +96,7 @@ BEGIN
 	RETURN(SYSTEM.VAL(LONGINT,setx / {MIN(SET)..MAX(SET)}));
 END not;
 
-PROCEDURE Rad(value: LONGREAL; angle: INTEGER): LONGREAL;
+PROCEDURE Rad(value: LONGREAL; angle: SIGNED16): LONGREAL;
 BEGIN
 	CASE angle OF
 	|	DEG:
@@ -108,7 +108,7 @@ BEGIN
 	END;
 END Rad;
 
-PROCEDURE Deg(value: LONGREAL; angle: INTEGER): LONGREAL;
+PROCEDURE Deg(value: LONGREAL; angle: SIGNED16): LONGREAL;
 BEGIN
 	CASE angle OF
 	|	DEG:
@@ -153,12 +153,12 @@ END tan;
 
 (* ********************************************************** *)
 
-PROCEDURE InitOperand(VAR O: Operand; base: INTEGER);
+PROCEDURE InitOperand(VAR O: Operand; base: SIGNED16);
 BEGIN
 	O.value:= 0.0; O.factor:= 0; O.base:= base; O.angle:= 0;
 END InitOperand;
 
-PROCEDURE OperandToDisplay(O: Operand; w: INTEGER; VAR s: ARRAY OF CHAR);
+PROCEDURE OperandToDisplay(O: Operand; w: SIGNED16; VAR s: ARRAY OF CHAR);
 	(* transform an Operand to ARRAY OF CHAR depending on it's base *)
 VAR
 	len,max,ndx: SIZE;
@@ -183,7 +183,7 @@ PROCEDURE AddDigit(E: Engine; c: CHAR): BOOLEAN;
 VAR
 	ok: BOOLEAN;
 	val,inp: LONGREAL;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	ok:= TRUE; val:= E.op[0].value; inp:= MAX(LONGREAL);
 	IF Strings.IsDigit(c) THEN
@@ -212,7 +212,7 @@ END AddDigit;
 
 PROCEDURE RemDigit(E: Engine): BOOLEAN;
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	E.op[0].value:= E.undo[0];
 	FOR i:= 0 TO CalcUndoKey-2 DO E.undo[i]:= E.undo[i+1]; END;
@@ -224,7 +224,7 @@ PROCEDURE ApplyFunction(E: Engine; s: ARRAY OF CHAR): BOOLEAN;
 VAR
 	ok: BOOLEAN;
 	op: Operand;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	ok:= FALSE; op:= E.op[0];
 	IF (s = "arccos") THEN
@@ -278,7 +278,7 @@ PROCEDURE AddSpecial(E: Engine; s: ARRAY OF CHAR): BOOLEAN;
 VAR
 	ok,keep: BOOLEAN;
 	op: Operand;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	ok:= FALSE; keep:= FALSE; op:= E.op[0];
 	IF (s = "POINT") THEN
@@ -354,7 +354,7 @@ END AddConstant;
 
 PROCEDURE AddOperator(E: Engine; s: ARRAY OF CHAR): BOOLEAN;
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	FOR i:= CalcUndoOp-1 TO 2 BY -1 DO E.op[i]:= E.op[i-1]; END;
 	E.op[1]:= E.op[0]; E.state:= 1;
@@ -557,7 +557,7 @@ END ButtonHandler;
 (** Initialize a calculator model *)
 PROCEDURE InitEngine*(E: Engine);
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	NEW(E.expr); Calculator.InitExpression(E.expr);
 	FOR i:= 0 TO CalcUndoOp-1 DO InitOperand(E.op[i],10); END;

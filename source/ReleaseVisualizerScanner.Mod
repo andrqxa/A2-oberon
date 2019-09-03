@@ -100,7 +100,7 @@ TYPE
 			cw := commentStr.GetWriter()
 		END Init;
 
-		PROCEDURE err(n: INTEGER);
+		PROCEDURE err(n: SIGNED16);
 		BEGIN
 		END err;
 

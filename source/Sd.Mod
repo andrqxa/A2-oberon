@@ -563,10 +563,10 @@ TYPE
 	HcRegisters * = POINTER {UNSAFE,UNTRACED} TO RECORD
 		SDMASystemAddress * {ALIGNED(1)}: LONGINT; (** offset = 0H *)
 		BlockSize * {ALIGNED(1)}, (** offset = 4H *)
-		BlockCount * {ALIGNED(1)}: INTEGER; (** offset = 6H *)
+		BlockCount * {ALIGNED(1)}: SIGNED16; (** offset = 6H *)
 		Argument1 * {ALIGNED(1)}: LONGINT; (** offset = 8H *)
 		TransferMode * {ALIGNED(1)}, (** offset = 0CH *)
-		Command * {ALIGNED(1)}: INTEGER; (** offset = 0EH *)
+		Command * {ALIGNED(1)}: SIGNED16; (** offset = 0EH *)
 		Response * {ALIGNED(1)}: ARRAY 4 OF LONGINT; (** offset = 10H *)
 		BufferData * {ALIGNED(1)}: LONGINT;
 		PresentState * {ALIGNED(1)}: SET;
@@ -574,27 +574,27 @@ TYPE
 		PowerControl * {ALIGNED(1)},
 		BlockGapControl * {ALIGNED(1)},
 		WakeupControl * {ALIGNED(1)}: SIGNED8;
-		ClockControl * {ALIGNED(1)}: INTEGER;
+		ClockControl * {ALIGNED(1)}: SIGNED16;
 		TimeoutControl * {ALIGNED(1)},
 		SoftwareReset * {ALIGNED(1)}: SIGNED8;
 		InterruptStatus * {ALIGNED(1)},
 		InterruptStatusEnable * {ALIGNED(1)},
 		InterruptSignalEnable * {ALIGNED(1)}: SET;
 		AutoCmdErrorStatus * {ALIGNED(1)},
-		HostControl2 * {ALIGNED(1)}: INTEGER;
+		HostControl2 * {ALIGNED(1)}: SIGNED16;
 		Capabilities * {ALIGNED(1)}: ARRAY 2 OF SET;
 		MaximumCurrentCapabilities * {ALIGNED(1)}: HUGEINT;
 		ForceEventAutoCmdErrorStatus * {ALIGNED(1)},
-		ForceEventErrorInterruptStatus * {ALIGNED(1)}: INTEGER;
+		ForceEventErrorInterruptStatus * {ALIGNED(1)}: SIGNED16;
 		AdmaErrorStatus * {ALIGNED(1)}: SIGNED8;
 		padding0 * {ALIGNED(1)}: ARRAY 3 OF SIGNED8;
 		AdmaSystemAddress * {ALIGNED(1)}: HUGEINT;
-		PresetValues * {ALIGNED(1)}: ARRAY 8 OF INTEGER;
+		PresetValues * {ALIGNED(1)}: ARRAY 8 OF SIGNED16;
 		padding1 * {ALIGNED(1)}: ARRAY 28 OF LONGINT;
 		SharedBusControl * {ALIGNED(1)}: LONGINT;
 		padding2 * {ALIGNED(1)}: ARRAY 6 OF LONGINT;
 		SlotInterruptStatus * {ALIGNED(1)},
-		HostControllerVersion * {ALIGNED(1)}: INTEGER;
+		HostControllerVersion * {ALIGNED(1)}: SIGNED16;
 	END;
 
 VAR
@@ -851,11 +851,11 @@ VAR
 				(command.command = CMD_WRITE_BLOCK) OR (command.command = CMD_WRITE_MULTIPLE_BLOCK) OR
 				(command.command = 53)(* SDIO Command *)) THEN
 			IF len <= BlockSize THEN
-				hc.regs.BlockSize := INTEGER(len);
+				hc.regs.BlockSize := SIGNED16(len);
 				hc.regs.BlockCount := 1
 			ELSE
 				hc.regs.BlockSize := BlockSize;
-				hc.regs.BlockCount := INTEGER(len DIV BlockSize)
+				hc.regs.BlockCount := SIGNED16(len DIV BlockSize)
 			END;
 
 			IF EnableTrace THEN
@@ -1044,13 +1044,13 @@ VAR
 		END;
 		IF FlagData IN command.flags THEN
 			IF txlen <= blockSize THEN
-				hc.regs.BlockSize := INTEGER(txlen);
+				hc.regs.BlockSize := SIGNED16(txlen);
 				hc.regs.BlockCount := 1;
 				blocks := 1
 			ELSE
-				hc.regs.BlockSize := INTEGER(blockSize);
+				hc.regs.BlockSize := SIGNED16(blockSize);
 				blocks := txlen DIV blockSize;
-				hc.regs.BlockCount := INTEGER(blocks)
+				hc.regs.BlockCount := SIGNED16(blocks)
 			END;
 
 			(* Set data timeout *)
@@ -1231,9 +1231,9 @@ VAR
 				Log.Ln
 			END;
 			IF dma THEN INCL(txFlags, TransferMode_DmaEnable) END;
-			hc.regs.TransferMode := SYSTEM.VAL(INTEGER, txFlags)
+			hc.regs.TransferMode := SYSTEM.VAL(SIGNED16, txFlags)
 		END;
-		hc.regs.Command := SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, reg + LSH(cmd, Command_CommandIndexOffset)) + flags);
+		hc.regs.Command := SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, reg + LSH(cmd, Command_CommandIndexOffset)) + flags);
 
 		(* 7 *)
 		RETURN WaitForCompletion(hc, ~abort, status, result)
@@ -1521,16 +1521,16 @@ VAR
 				Log.Ln
 			END;
 
-			hc.regs.ClockControl := INTEGER(LSH(LSH(LONGINT(1), val-1), 8) + SYSTEM.VAL(INTEGER, {ClockControl_InternalClockEnable}));
+			hc.regs.ClockControl := SIGNED16(LSH(LSH(LONGINT(1), val-1), 8) + SYSTEM.VAL(SIGNED16, {ClockControl_InternalClockEnable}));
 			hc.frequency := LSH(hc.baseFrequency, -val);
 		ELSE
-			hc.regs.ClockControl := SYSTEM.VAL(INTEGER, {ClockControl_InternalClockEnable});
+			hc.regs.ClockControl := SYSTEM.VAL(SIGNED16, {ClockControl_InternalClockEnable});
 			hc.frequency := hc.baseFrequency;
 		END;
 
 		REPEAT val := hc.regs.ClockControl UNTIL ClockControl_InternalClockState IN SYSTEM.VAL(SET, val);
 		val := hc.regs.ClockControl;
-		hc.regs.ClockControl := SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, val) + {ClockControl_SdClockEnable});
+		hc.regs.ClockControl := SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, val) + {ClockControl_SdClockEnable});
 		IF EnableTrace THEN
 			Log.String("[SD] Selecting Bus Clock Frequency: ");
 			Log.Int(hc.frequency, 0); Log.String(" Hz");
@@ -2509,11 +2509,11 @@ TYPE
 		IF EnableTrace THEN
 			Log.String("[SD] HC registers status:"); Log.Ln;
 			Log.String("[SD] 	SDMASystemAddress: 0x"); Log.Hex(regs.SDMASystemAddress,-SIZEOF(LONGINT)*2); Log.Ln;
-			Log.String("[SD] 	BlockSize: 0x"); Log.Hex(regs.BlockSize,-SIZEOF(INTEGER)*2); Log.Ln;
-			Log.String("[SD] 	BlockCount: 0x"); Log.Hex(regs.BlockCount,-SIZEOF(INTEGER)*2); Log.Ln;
+			Log.String("[SD] 	BlockSize: 0x"); Log.Hex(regs.BlockSize,-SIZEOF(SIGNED16)*2); Log.Ln;
+			Log.String("[SD] 	BlockCount: 0x"); Log.Hex(regs.BlockCount,-SIZEOF(SIGNED16)*2); Log.Ln;
 			Log.String("[SD] 	Argument1: 0x"); Log.Hex(regs.Argument1,-SIZEOF(LONGINT)*2); Log.Ln;
-			Log.String("[SD] 	TransferMode: 0x"); Log.Hex(regs.TransferMode,-SIZEOF(INTEGER)*2); Log.Ln;
-			Log.String("[SD] 	Command: 0x"); Log.Hex(regs.Command,-SIZEOF(INTEGER)*2); Log.Ln;
+			Log.String("[SD] 	TransferMode: 0x"); Log.Hex(regs.TransferMode,-SIZEOF(SIGNED16)*2); Log.Ln;
+			Log.String("[SD] 	Command: 0x"); Log.Hex(regs.Command,-SIZEOF(SIGNED16)*2); Log.Ln;
 
 			Log.String("[SD] 	Response: 0x");
 			Log.Hex(regs.Response[0],-SIZEOF(LONGINT)*2); Log.String(" 0x");
@@ -2527,38 +2527,38 @@ TYPE
 			Log.String("[SD] 	PowerControl: 0x"); Log.Hex(regs.PowerControl,-SIZEOF(SIGNED8)*2); Log.Ln;
 			Log.String("[SD] 	BlockGapControl: 0x"); Log.Hex(regs.BlockGapControl,-SIZEOF(SIGNED8)*2); Log.Ln;
 			Log.String("[SD] 	WakeupControl: 0x"); Log.Hex(regs.WakeupControl,-SIZEOF(SIGNED8)*2); Log.Ln;
-			Log.String("[SD] 	ClockControl: 0x"); Log.Hex(regs.ClockControl,-SIZEOF(INTEGER)*2); Log.Ln;
+			Log.String("[SD] 	ClockControl: 0x"); Log.Hex(regs.ClockControl,-SIZEOF(SIGNED16)*2); Log.Ln;
 			Log.String("[SD] 	TimeoutControl: 0x"); Log.Hex(regs.TimeoutControl,-SIZEOF(SIGNED8)*2); Log.Ln;
 			Log.String("[SD] 	SoftwareReset: 0x"); Log.Hex(regs.SoftwareReset,-SIZEOF(SIGNED8)*2); Log.Ln;
 			Log.String("[SD] 	InterruptStatus: "); Log.Set(regs.InterruptStatus); Log.Ln;
 			Log.String("[SD] 	InterruptStatusEnable: "); Log.Set(regs.InterruptStatusEnable); Log.Ln;
 			Log.String("[SD] 	InterruptSignalEnable: "); Log.Set(regs.InterruptSignalEnable); Log.Ln;
-			Log.String("[SD] 	AutoCmdErrorStatus: 0x"); Log.Hex(regs.AutoCmdErrorStatus,-SIZEOF(INTEGER)*2); Log.Ln;
-			Log.String("[SD] 	HostControl2: 0x"); Log.Hex(regs.HostControl2,-SIZEOF(INTEGER)*2); Log.Ln;
+			Log.String("[SD] 	AutoCmdErrorStatus: 0x"); Log.Hex(regs.AutoCmdErrorStatus,-SIZEOF(SIGNED16)*2); Log.Ln;
+			Log.String("[SD] 	HostControl2: 0x"); Log.Hex(regs.HostControl2,-SIZEOF(SIGNED16)*2); Log.Ln;
 
 			Log.String("[SD] 	Capabilities: ");
 			Log.Set(regs.Capabilities[0]); Log.String(" ");
 			Log.Set(regs.Capabilities[1]); Log.Ln;
 
 			(*Log.String("[SD] 	MaximumCurrentCapabilities: 0x"); Log.Hex(regs.MaximumCurrentCapabilities,-SIZEOF(HUGEINT)*2); Log.Ln;
-			Log.String("[SD] 	ForceEventAutoCmdErrorStatus: 0x"); Log.Hex(regs.ForceEventAutoCmdErrorStatus,-SIZEOF(INTEGER)*2); Log.Ln;
-			Log.String("[SD] 	ForceEventErrorInterruptStatus: 0x"); Log.Hex(regs.ForceEventErrorInterruptStatus,-SIZEOF(INTEGER)*2); Log.Ln;
+			Log.String("[SD] 	ForceEventAutoCmdErrorStatus: 0x"); Log.Hex(regs.ForceEventAutoCmdErrorStatus,-SIZEOF(SIGNED16)*2); Log.Ln;
+			Log.String("[SD] 	ForceEventErrorInterruptStatus: 0x"); Log.Hex(regs.ForceEventErrorInterruptStatus,-SIZEOF(SIGNED16)*2); Log.Ln;
 			Log.String("[SD] 	AdmaErrorStatus: 0x"); Log.Hex(regs.AdmaErrorStatus,-SIZEOF(SIGNED8)*2); Log.Ln;
 			Log.String("[SD] 	AdmaSystemAddress: 0x"); Log.Hex(regs.AdmaSystemAddress,-SIZEOF(HUGEINT)*2); Log.Ln;*)
 
 			Log.String("[SD] 	PresetValues: 0x");
-			Log.Hex(regs.PresetValues[0],-SIZEOF(INTEGER)*2); Log.String(" 0x");
-			Log.Hex(regs.PresetValues[1],-SIZEOF(INTEGER)*2); Log.String(" 0x");
-			Log.Hex(regs.PresetValues[2],-SIZEOF(INTEGER)*2); Log.String(" 0x");
-			Log.Hex(regs.PresetValues[3],-SIZEOF(INTEGER)*2); Log.String(" 0x");
-			Log.Hex(regs.PresetValues[4],-SIZEOF(INTEGER)*2); Log.String(" 0x");
-			Log.Hex(regs.PresetValues[5],-SIZEOF(INTEGER)*2); Log.String(" 0x");
-			Log.Hex(regs.PresetValues[6],-SIZEOF(INTEGER)*2); Log.String(" 0x");
-			Log.Hex(regs.PresetValues[7],-SIZEOF(INTEGER)*2); Log.Ln;
+			Log.Hex(regs.PresetValues[0],-SIZEOF(SIGNED16)*2); Log.String(" 0x");
+			Log.Hex(regs.PresetValues[1],-SIZEOF(SIGNED16)*2); Log.String(" 0x");
+			Log.Hex(regs.PresetValues[2],-SIZEOF(SIGNED16)*2); Log.String(" 0x");
+			Log.Hex(regs.PresetValues[3],-SIZEOF(SIGNED16)*2); Log.String(" 0x");
+			Log.Hex(regs.PresetValues[4],-SIZEOF(SIGNED16)*2); Log.String(" 0x");
+			Log.Hex(regs.PresetValues[5],-SIZEOF(SIGNED16)*2); Log.String(" 0x");
+			Log.Hex(regs.PresetValues[6],-SIZEOF(SIGNED16)*2); Log.String(" 0x");
+			Log.Hex(regs.PresetValues[7],-SIZEOF(SIGNED16)*2); Log.Ln;
 
 			Log.String("[SD] 	SharedBusControl: 0x"); Log.Hex(regs.SharedBusControl,-SIZEOF(LONGINT)*2); Log.Ln;
-			Log.String("[SD] 	SlotInterruptStatus: 0x"); Log.Hex(regs.SlotInterruptStatus,-SIZEOF(INTEGER)*2); Log.Ln;
-			Log.String("[SD] 	HostControllerVersion: 0x"); Log.Hex(regs.HostControllerVersion,-SIZEOF(INTEGER)*2); Log.Ln
+			Log.String("[SD] 	SlotInterruptStatus: 0x"); Log.Hex(regs.SlotInterruptStatus,-SIZEOF(SIGNED16)*2); Log.Ln;
+			Log.String("[SD] 	HostControllerVersion: 0x"); Log.Hex(regs.HostControllerVersion,-SIZEOF(SIGNED16)*2); Log.Ln
 		END
 	END PrintHcRegisters;
 

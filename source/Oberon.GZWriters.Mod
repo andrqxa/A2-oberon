@@ -33,7 +33,7 @@ TYPE
 
 PROCEDURE WriteHeader(VAR w: Writer; VAR r: Files.Rider);
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	Files.Write(r, 1FX); INC(w.start);	(* ID1 *)
 	Files.Write(r, 8BX); INC(w.start);	(* ID2 *)

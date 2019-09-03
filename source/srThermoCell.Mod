@@ -21,7 +21,7 @@ BEGIN
 	v:=voxel
 END setatomvox;
 PROCEDURE bang;
-VAR i:INTEGER;
+VAR i:SIGNED16;
 BEGIN
 	NEW(space);
 	FOR i:=0 TO N-1 DO

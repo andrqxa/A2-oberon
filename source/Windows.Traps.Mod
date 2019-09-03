@@ -282,7 +282,7 @@ VAR
 
 		traceTrap := FALSE;
 
-		Show( t, int, exc,  (* exc.halt # MAX(INTEGER)+1*) TRUE );   (* Always show the trap info!*)
+		Show( t, int, exc,  (* exc.halt # MAX(SIGNED16)+1*) TRUE );   (* Always show the trap info!*)
 
 		IF exchalt = haltUnbreakable THEN Unbreakable( t, int, exc, handled )
 		ELSIF ~traceTrap THEN HandleException( int, exc, handled )

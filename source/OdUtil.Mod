@@ -30,7 +30,7 @@ TYPE
 (* $IF ~eth THEN *)
 		w : Streams.Writer;
 		fsw : Files.Writer;
-		mode: INTEGER;
+		mode: SIGNED16;
 (* $ELSE
 		w : Files.Writer;
 $END *)

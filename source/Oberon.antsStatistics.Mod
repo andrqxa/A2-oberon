@@ -31,7 +31,7 @@ VAR
 	v1, v2: vyBase.tVector;  t1d, t2d, ph1, ph2: LONGREAL;  wd, hd: LONGINT;
 	t1, t2: POINTER TO ARRAY OF LONGREAL;
 
-	PROCEDURE bin( x: INTEGER ): INTEGER;
+	PROCEDURE bin( x: SIGNED16 ): SIGNED16;
 	BEGIN
 		RETURN 2 * x - 1
 	END bin;

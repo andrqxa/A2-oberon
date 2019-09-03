@@ -8,7 +8,7 @@ MODULE FTPFS; (** AUTHOR "be/pjm"; PURPOSE "Simple FTP-based file system"; *)
  *Writing back to server not implemented.
  *Recommend extensions to directory when writeback is implemented:
  *	Dirty : BOOLEAN;
- *	Version : INTEGER;
+ *	Version : SIGNED16;
  *)
 IMPORT SYSTEM, Machine, Streams, KernelLog, Modules, Clock, Files, Objects,
 	FTP := FTPClient, DNS, UTF8Strings (*alm 7/23/04*);

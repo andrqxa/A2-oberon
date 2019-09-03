@@ -57,10 +57,10 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		END;
 
 		WSAData* = RECORD
-			wVersion*, wHighVersion*: INTEGER;
+			wVersion*, wHighVersion*: SIGNED16;
 			szDescription*: ARRAY WSADescriptionLen+1 OF CHAR;
 			szSystemStatus*: ARRAY WSASysStatusLen+1 OF CHAR;
-			iMaxSockets*, iMaxUdpDg*: INTEGER;
+			iMaxSockets*, iMaxUdpDg*: SIGNED16;
 			lpVendorInfo*: ADDRESS
 		END;
 
@@ -68,7 +68,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		PsockaddrIn* = POINTER TO sockaddrIn;
 		sockaddrIn* = RECORD
-			sinFamily*, sinPort*: INTEGER;
+			sinFamily*, sinPort*: SIGNED16;
 			sinAddr*: inAddr;
 			inZero: ARRAY 8 OF CHAR
 		END;
@@ -105,7 +105,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		Hostent* = RECORD
 			hName*:ADDRESS; (* pointer to array of char *)
 			hAliases*: ADDRESS; (* pointer to array of pointer to array of char *)
-			hAddrtype*, hLength*: INTEGER;
+			hAddrtype*, hLength*: SIGNED16;
 			hAddrList*: ADDRESS;(* pointer to array of pointer of address (with len hLength) *)
 		END;
 
@@ -145,7 +145,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		WSASocket-: PROCEDURE {WINAPI} (af, type, protocol: WORD; VAR lpProtocolInfo: WSAProtocolInfo; g: Group; dwFlags: DWORD): Socket;
 
 		(** The Windows Sockets WSAStartup function initiates use of Ws2_32.dll by a process. *)
-		WSAStartup-: PROCEDURE {WINAPI} (wVersionRequested: INTEGER; VAR lpWSAData: WSAData): WORD;
+		WSAStartup-: PROCEDURE {WINAPI} (wVersionRequested: SIGNED16; VAR lpWSAData: WSAData): WORD;
 
 		WSAIoctl-: PROCEDURE {WINAPI} (s: Socket; ioControlCode:DWORD; VAR in: DWORD; inSize:DWORD;
 				VAR outBuffer:ARRAY OF CHAR; outBufLen: DWORD; VAR lenReturned:DWORD;  Overlapped: ADDRESS; completionRoutine: ADDRESS): WORD;
@@ -184,7 +184,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		(** The Windows Sockets htons function converts a u_short from host to TCP/IP network byte order
 			(which is big-endian). *)
-		htons-: PROCEDURE {WINAPI} (x: INTEGER): INTEGER;
+		htons-: PROCEDURE {WINAPI} (x: SIGNED16): SIGNED16;
 
 		(** The Windows Sockets ioctlsocket function controls the I/O mode of a socket. *)
 		ioctlsocket-: PROCEDURE {WINAPI} (s: Socket; cmd: LONGWORD; VAR argp: LONGINT): WORD;
@@ -198,7 +198,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		(** The Windows Sockets ntohs function converts a u_short from TCP/IP network byte order to host byte order
 			(which is little-endian on Intel processors). *)
-		ntohs-: PROCEDURE {WINAPI} (x: INTEGER): INTEGER;
+		ntohs-: PROCEDURE {WINAPI} (x: SIGNED16): SIGNED16;
 
 		(** The Windows Sockets recv function receives data from a connected socket. *)
 		recv-: PROCEDURE {WINAPI} (s: Socket; VAR buf: ARRAY   OF SYSTEM.BYTE; len: WORD; flags: WORDSET): WORD;

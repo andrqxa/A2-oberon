@@ -91,7 +91,7 @@ CONST
 	END HandleAttributes;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN
@@ -152,7 +152,7 @@ CONST
 	END Handler;
 
 	PROCEDURE A2P*( o: Objects.Object );
-	VAR x, y: LONGINT;  obj: tObject;   (* pix: Images.Pixel; *) val: LONGINT;  valr: LONGREAL;  len: LONGINT;  r: INTEGER;
+	VAR x, y: LONGINT;  obj: tObject;   (* pix: Images.Pixel; *) val: LONGINT;  valr: LONGREAL;  len: LONGINT;  r: SIGNED16;
 	BEGIN
 
 		obj := o( tObject );
@@ -224,7 +224,7 @@ CONST
 	END AdjustCurve;
 
 	PROCEDURE FromArray*( obj: tObject;  A: antsArrayObjects.tINTEGERObject );
-	VAR r, g, b: INTEGER;  i: LONGINT;   (* pal: Images.Palette; fmt: Images.Format; *)
+	VAR r, g, b: SIGNED16;  i: LONGINT;   (* pal: Images.Palette; fmt: Images.Format; *)
 	BEGIN
 		obj.A := A;  obj.w := A.w;  obj.h := A.h;  obj.depth := Min( A.depth, 256 );  NEW( obj.pict );
 		Pictures.Create( obj.pict, SHORT( obj.w ), SHORT( obj.h ), 8 );
@@ -297,7 +297,7 @@ CONST
 	END ShowHistogram;
 
 	PROCEDURE Test*;
-	VAR A: antsArrayObjects.tINTEGERObject;  obj: tObject;  i: INTEGER;
+	VAR A: antsArrayObjects.tINTEGERObject;  obj: tObject;  i: SIGNED16;
 	BEGIN
 		A := antsArrayObjects.NewINTEGERObject( 200, 200, 65535 );
 		FOR i := 0 TO 32000 DO A.A[i MOD 200, i DIV 200] := i END;

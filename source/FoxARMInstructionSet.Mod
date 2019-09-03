@@ -326,19 +326,19 @@ CONST
 
 		Mnemonic= RECORD
 			name: Name;
-			number: INTEGER;
+			number: SIGNED16;
 			firstInstructionFormat, lastInstructionFormat: LONGINT; (* instructionFormats *)
 		END;
 
 		InstructionFormat= RECORD
-			mnemonic: INTEGER;
+			mnemonic: SIGNED16;
 			opcode, mask: SET;
 			flags: SET;
-			operands: ARRAY MaxOperands OF INTEGER;
+			operands: ARRAY MaxOperands OF SIGNED16;
 			(* NEON specific *)
 			isNEON: BOOLEAN;
 			Unsigned, Quadword, Length, Float, Operation: SET;
-			SizeH: INTEGER; (* The lower bit is SizeH - 1 *)
+			SizeH: SIGNED16; (* The lower bit is SizeH - 1 *)
 		END;
 
 		Instruction*= RECORD
@@ -349,16 +349,16 @@ CONST
 		END;
 
 		Operand*= RECORD
-			mode*: INTEGER;
+			mode*: SIGNED16;
 			register*: LONGINT;
 			immediate*, shiftImmediate: LONGINT;
 			shiftRegister: LONGINT;
-			shiftMode: INTEGER;
+			shiftMode: SIGNED16;
 			offsetImmediate: LONGINT;
 			offsetRegister: LONGINT;
 			indexing: SET; (* Increment, Decrement, PostIndexed PreIndexed*)
 			registerList: SET;
-			coprocessor: INTEGER;
+			coprocessor: SIGNED16;
 			opcode: LONGINT;
 			fields: SET;
 			option: LONGINT;
@@ -860,7 +860,7 @@ CONST
 			end of the array
 			a position has value 32
 		*)
-		PROCEDURE SplittedUnsigned(val: LONGINT; positions: ARRAY OF INTEGER);
+		PROCEDURE SplittedUnsigned(val: LONGINT; positions: ARRAY OF SIGNED16);
 		VAR
 			i, len: SIZE;
 		BEGIN
@@ -963,7 +963,7 @@ CONST
 		PROCEDURE EncodeOperand(operandEncoding: LONGINT; CONST operand: Operand);
 		VAR
 			imm, rot, firstRegister, num, shiftMode, shiftImmediate: LONGINT;
-			NEONRegisterPos: ARRAY 5 OF INTEGER;
+			NEONRegisterPos: ARRAY 5 OF SIGNED16;
 
 			PROCEDURE Fixup(from, to: LONGINT);
 			VAR patterns: ObjectFile.FixupPatterns; displacement: LONGINT; mode: SIGNED8;
@@ -1447,7 +1447,7 @@ CONST
 		PROCEDURE EncodeNEONTypes(format: InstructionFormat; instruction: Instruction);
 		VAR
 			normalSizeEncoding: BOOLEAN;
-			i, immOperand: INTEGER;
+			i, immOperand: SIGNED16;
 		BEGIN
 			IF ~format.isNEON THEN RETURN END;
 			(* Set the Unsigned bit *)
@@ -1878,17 +1878,17 @@ CONST
 	VAR
 		i, instructionCount, conditionEntryCount, registerEntryCount: LONGINT;
 
-		PROCEDURE EnterCoprocessor(number: INTEGER; CONST name: ARRAY OF CHAR);
+		PROCEDURE EnterCoprocessor(number: SIGNED16; CONST name: ARRAY OF CHAR);
 		BEGIN
 			COPY(name, coprocessorNames[number])
 		END EnterCoprocessor;
 
-		PROCEDURE EnterShift(number: INTEGER; CONST name: ARRAY OF CHAR);
+		PROCEDURE EnterShift(number: SIGNED16; CONST name: ARRAY OF CHAR);
 		BEGIN
 			COPY(name, shiftNames[number]);
 		END EnterShift;
 
-		PROCEDURE EnterRegister(number: INTEGER; CONST name: ARRAY OF CHAR);
+		PROCEDURE EnterRegister(number: SIGNED16; CONST name: ARRAY OF CHAR);
 		VAR
 			registerEntry: Entry;
 		BEGIN
@@ -1898,7 +1898,7 @@ CONST
 			INC(registerEntryCount);
 		END EnterRegister;
 
-		PROCEDURE EnterMnemonic(number: INTEGER; CONST name: ARRAY OF CHAR);
+		PROCEDURE EnterMnemonic(number: SIGNED16; CONST name: ARRAY OF CHAR);
 		VAR mnemonic: Mnemonic;
 		BEGIN
 			COPY(name, mnemonic.name);
@@ -1907,7 +1907,7 @@ CONST
 			mnemonics[number] := mnemonic;
 		END EnterMnemonic;
 
-		PROCEDURE EnterInstruction(mnemonic: INTEGER; opcode, mask: SET; flags: SET; op0, op1, op2, op3, op4, op5: INTEGER);
+		PROCEDURE EnterInstruction(mnemonic: SIGNED16; opcode, mask: SET; flags: SET; op0, op1, op2, op3, op4, op5: SIGNED16);
 		VAR format: InstructionFormat;
 		BEGIN
 			format.mnemonic := mnemonic;
@@ -2000,7 +2000,7 @@ CONST
 		PROCEDURE UpdateNEONInstruction(U, Q, S, L, F, O: SET);
 		VAR
 			last: LONGINT;
-			i: INTEGER;
+			i: SIGNED16;
 		BEGIN
 			(*ASSERT(instructionCount # 0);*)
 			last := instructionCount - 1;
@@ -2021,11 +2021,11 @@ CONST
 
 		(** Enter a NEON Instruction, using a string format descriptor.
 		*)
-		PROCEDURE EnterNEONInstruction(mnemonic: INTEGER; CONST format: ARRAY OF CHAR; flags: SET; op0, op1, op2, op3, op4, op5: INTEGER);
+		PROCEDURE EnterNEONInstruction(mnemonic: SIGNED16; CONST format: ARRAY OF CHAR; flags: SET; op0, op1, op2, op3, op4, op5: SIGNED16);
 		VAR
 			opcode, mask, U, Q, S, L, F, o: SET;
 			last: LONGINT;
-			i: INTEGER;
+			i: SIGNED16;
 		BEGIN
 			(* Enter instruction *)
 			ParseInstructionFormat(format, opcode, mask, U, Q, S, L, F, o);

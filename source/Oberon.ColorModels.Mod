@@ -17,15 +17,15 @@ TYPE
 	END;
 VAR
 	RGBcolor,HSVcolor,CMYcolor: ColorSym;	(* supported color symbols *)
-	depth: INTEGER;	(* current color depth *)
-	dr,dg,db: ARRAY RGBtop+1 OF INTEGER;	(* current color tables *)
+	depth: SIGNED16;	(* current color depth *)
+	dr,dg,db: ARRAY RGBtop+1 OF SIGNED16;	(* current color tables *)
 
-PROCEDURE LoadPalette(VAR d: INTEGER; VAR r,g,b: ARRAY OF INTEGER);
+PROCEDURE LoadPalette(VAR d: SIGNED16; VAR r,g,b: ARRAY OF SIGNED16);
 	(* scan the currently loaded RGB values of the palette *)
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
-	d:= INTEGER(ASH(1,Display.Depth(0))-1);
+	d:= SIGNED16(ASH(1,Display.Depth(0))-1);
 	FOR i:= 0 TO d DO Display.GetColor(i,dr[i],dg[i],db[i]); END;
 END LoadPalette;
 
@@ -167,7 +167,7 @@ END CMYToRGB;
 
 (** transform a RedGreenBlue color specification to Display values,
 no color transformation is done. *)
-PROCEDURE RGBToColor*(r,g,b: REAL; VAR R,G,B: INTEGER);
+PROCEDURE RGBToColor*(r,g,b: REAL; VAR R,G,B: SIGNED16);
 BEGIN
 	R:= SHORT(ENTIER(r * RGBtop));
 	G:= SHORT(ENTIER(g * RGBtop));
@@ -178,9 +178,9 @@ END RGBToColor;
 Color transformation is performed by using the euclidic distance.
 If scanpal is TRUE, the currently active palette is rescanned, otherwise the latest loaded values are used.
 With C the index of the best fitting palette entry is returned, R,G and B hold the RGB values of C *)
-PROCEDURE RGBToPalette*(r,g,b: REAL; VAR C,R,G,B: INTEGER; scanpal: BOOLEAN);
+PROCEDURE RGBToPalette*(r,g,b: REAL; VAR C,R,G,B: SIGNED16; scanpal: BOOLEAN);
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 	d,m,x,y,z: REAL;
 BEGIN
 	C:= -1; R:= -1; G:= -1; B:= -1; m:= MAX(REAL);

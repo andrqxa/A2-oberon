@@ -81,7 +81,7 @@ VAR
 	END ConvertText;
 
 	PROCEDURE ExecuteCommandText( b: Object;  VAR context: Objects.Object );
-	VAR obj: Objects.Object;  text: Texts.Text;  sc: Texts.Scanner;  res: INTEGER;  ntext: Texts.Text;
+	VAR obj: Objects.Object;  text: Texts.Text;  sc: Texts.Scanner;  res: SIGNED16;  ntext: Texts.Text;
 	BEGIN
 		Gadgets.context := context;  Links.GetLink( b, cmdTextName, obj );
 		IF (obj # NIL ) & (obj IS Texts.Text) THEN text := obj( Texts.Text )
@@ -188,7 +188,7 @@ All that complicated stuff is done since antsCommandList can handle objects as r
 	END LoadTextList;
 
 	PROCEDURE CopyText*( VAR M: Objects.CopyMsg;  from, to: Object );
-	VAR id: INTEGER;  obj: Objects.Object;
+	VAR id: SIGNED16;  obj: Objects.Object;
 	BEGIN
 		(*
 	IF M.id = Objects.deep THEN RETURN END;

@@ -28,7 +28,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 
 		Char* = POINTER TO CharDesc;
 		CharDesc* = RECORD								(** The objects in a font library. *)	(* Note: offset used in GetCharObj *)
-			dx*, x*, y*, w*, h*: INTEGER;					(** Character width, pattern offset (x, y), pattern size (w, h). *)
+			dx*, x*, y*, w*, h*: SIGNED16;					(** Character width, pattern offset (x, y), pattern size (w, h). *)
 			pat*: LONGINT									(** Character raster data. *)
 		END;
 
@@ -39,8 +39,8 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 
 
 	(* fill rectangle in pattern *)
-	PROCEDURE FillRect*(llx, lly, urx, ury, opacity: INTEGER; VAR data: OType.RasterData0);
-		VAR x0, x1, h, n: INTEGER; adr, a: ADDRESS; mask: SET; byte: CHAR;
+	PROCEDURE FillRect*(llx, lly, urx, ury, opacity: SIGNED16; VAR data: OType.RasterData0);
+		VAR x0, x1, h, n: SIGNED16; adr, a: ADDRESS; mask: SET; byte: CHAR;
 	BEGIN
 		WITH data: RasterData DO
 			x0 := llx DIV 8; x1 := urx DIV 8;
@@ -87,8 +87,8 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 		CONST
 			mode = {OType.Hinted, OType.Width, OType.Raster};
 		VAR
-			file: Files.File; r, m: Files.Rider; font: OType.Font; i, chars, ranges, xmin, ymin, xmax, ymax, j: INTEGER;
-			beg, end: ARRAY 64 OF INTEGER; data: RasterData; no, bytes, k: LONGINT;
+			file: Files.File; r, m: Files.Rider; font: OType.Font; i, chars, ranges, xmin, ymin, xmax, ymax, j: SIGNED16;
+			beg, end: ARRAY 64 OF SIGNED16; data: RasterData; no, bytes, k: LONGINT;
 			ras: OpenTypeScan.Rasterizer;
 	BEGIN
 		file := Files.New(name);
@@ -129,7 +129,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 			INC(i)
 		END;
 
-		xmin := MAX(INTEGER); ymin := MAX(INTEGER); xmax := MIN(INTEGER); ymax := MIN(INTEGER);
+		xmin := MAX(SIGNED16); ymin := MAX(SIGNED16); xmax := MIN(SIGNED16); ymax := MIN(SIGNED16);
 		i := 0;
 		WHILE i < ranges DO
 			j := beg[i];
@@ -184,7 +184,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 	VAR
 		temp : ARRAY 256 OF CHAR; tempInt : LONGINT;
 		font: OType.Font; name, fname, str: ARRAY 32 OF CHAR; style: ARRAY 3 OF CHAR; sizes, i: LONGINT;
-		size: ARRAY 16 OF LONGINT; res: INTEGER; inst: OType.Instance;
+		size: ARRAY 16 OF LONGINT; res: SIGNED16; inst: OType.Instance;
 	BEGIN
 		context.arg.SkipWhitespace; context.arg.String(name);
 		context.out.String(name); context.out.Ln;

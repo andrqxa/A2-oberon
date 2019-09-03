@@ -32,7 +32,7 @@ IMPORT
 		saiAcLeftIndex: ARRAY 8 OF LONGINT;
 		vld: VLD;
 		log: Streams.Writer;
-		srcBlock, dstBlock*: POINTER TO ARRAY 68 OF INTEGER;
+		srcBlock, dstBlock*: POINTER TO ARRAY 68 OF SIGNED16;
 
 	PROCEDURE & init*( state: DT.MP4State; logWriter: Streams.Writer );
 	BEGIN

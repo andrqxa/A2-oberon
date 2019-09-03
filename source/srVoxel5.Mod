@@ -112,7 +112,7 @@ VAR varray: ARRAY 10 OF Voxel;
 PROCEDURE &init*;
 VAR
 	x: srVoxel.TransparaVox;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	FOR i := 0 TO 9 DO
 		NEW(x);
@@ -135,7 +135,7 @@ VAR
 PROCEDURE & init*;
 VAR
 	x: srVoxel.TransparaVox;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	FOR i := 0 TO 6 DO
 		NEW(x);
@@ -153,7 +153,7 @@ VAR
 PROCEDURE & init*;
 VAR
 	x: srVoxel.TransparaVox;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	FOR i := 0 TO 12 DO
 		NEW(x);

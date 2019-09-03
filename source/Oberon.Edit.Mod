@@ -12,10 +12,10 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 	VAR
 		W: Texts.Writer;
 		time: LONGINT;
-		M: INTEGER;
+		M: SIGNED16;
 		pat: ARRAY maxlen OF CHAR;
-		d: ARRAY 256 OF INTEGER;
-        textX, pagenoX, headerY, topY, botY: INTEGER;
+		d: ARRAY 256 OF SIGNED16;
+        textX, pagenoX, headerY, topY, botY: SIGNED16;
 
 	PROCEDURE Max (i, j: LONGINT): LONGINT;
 	BEGIN IF i >= j THEN RETURN i ELSE RETURN j END
@@ -26,7 +26,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 		T: Texts.Text;
 		S: Texts.Scanner;
 		V: Viewers.Viewer;
-		X, Y: INTEGER;
+		X, Y: SIGNED16;
 		beg, end, time: LONGINT;
 	BEGIN
 		par := Oberon.Par;
@@ -50,16 +50,16 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			R: Texts.Reader;
 			S: Texts.Scanner;
 			V: Viewers.Viewer;
-			X, Y, n, i, j: INTEGER;
+			X, Y, n, i, j: SIGNED16;
 			pos, len, beg, end, time: LONGINT;
 			buf: ARRAY 32 OF CHAR;
 			name: ARRAY 35 OF CHAR;
-			M: INTEGER;
+			M: SIGNED16;
 			pat: ARRAY maxlen OF CHAR;
-			d: ARRAY 256 OF INTEGER;
+			d: ARRAY 256 OF SIGNED16;
 
-		PROCEDURE Forward (n: INTEGER);
-			VAR m: INTEGER; j: INTEGER;
+		PROCEDURE Forward (n: SIGNED16);
+			VAR m: SIGNED16; j: SIGNED16;
 		BEGIN m := M - n;
 			j := 0;
 			WHILE j # m DO buf[j] := buf[n + j]; INC(j) END;
@@ -119,7 +119,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			beg, end, time, len: LONGINT;
 
 		PROCEDURE Backup (VAR name: ARRAY OF CHAR);
-			VAR res, i: INTEGER; bak: ARRAY 32 OF CHAR;
+			VAR res, i: SIGNED16; bak: ARRAY 32 OF CHAR;
 		BEGIN i := 0;
 			WHILE name[i] # 0X DO bak[i] := name[i]; INC(i) END;
 			bak[i] := "."; bak[i+1] := "B"; bak[i+2] := "a"; bak[i+3] := "k"; bak[i+4] := 0X;
@@ -164,7 +164,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			v: Viewers.Viewer;
 			F: Display.Frame;
 			beg, end: LONGINT;
-			X, Y: INTEGER;
+			X, Y: SIGNED16;
 			ch: CHAR;
 	BEGIN
 		v := Oberon.MarkedViewer(); F := v.dsc;
@@ -216,11 +216,11 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			V: Viewers.Viewer;
 			R: Texts.Reader;
 			T: Texts.Text;
-			pos, beg, end, prevTime, len: LONGINT; n, i, j: INTEGER;
+			pos, beg, end, prevTime, len: LONGINT; n, i, j: SIGNED16;
 			buf: ARRAY 32 OF CHAR;
 
-		PROCEDURE Forward (n: INTEGER);
-			VAR m: INTEGER; j: INTEGER;
+		PROCEDURE Forward (n: SIGNED16);
+			VAR m: SIGNED16; j: SIGNED16;
 		BEGIN m := M - n;
 			j := 0;
 			WHILE j # m DO buf[j] := buf[n + j]; INC(j) END;
@@ -321,7 +321,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
     PROCEDURE RemovePrefix*;
       VAR  V: Viewers.Viewer;
         S: Texts.Scanner; R: Texts.Reader; T: TextFrames.Frame;
-        pos, beg, end, time: LONGINT; i: INTEGER; ch: CHAR;
+        pos, beg, end, time: LONGINT; i: SIGNED16; ch: CHAR;
     BEGIN
       Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
       IF (S.class = Texts.Char) & (S.c = "^") THEN
@@ -364,7 +364,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			V: Viewers.Viewer;
 			ch: CHAR;
 			pageno: SIGNED8; listing: BOOLEAN;
-			nofcopies, lsp, Y: INTEGER;
+			nofcopies, lsp, Y: SIGNED16;
 			beg, end, time: LONGINT;
 			server, options: ARRAY 32 OF CHAR;
 			font: Fonts.Font;
@@ -379,7 +379,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 
 		PROCEDURE PrintUnit (source: Texts.Text; pos: LONGINT);
 			CONST BufSize = 200;
-			VAR i: INTEGER; new: BOOLEAN;
+			VAR i: SIGNED16; new: BOOLEAN;
 				buf: ARRAY BufSize OF CHAR;
 		BEGIN Texts.WriteString(W, S.s);
 			IF source.len # 0 THEN
@@ -513,7 +513,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 	END Print;
 
 	PROCEDURE InitPattern;
-		VAR j: INTEGER;
+		VAR j: SIGNED16;
 	BEGIN
 		pat[0] := " "; M := 1; time := -1; j := 0;
 		WHILE j # 256 DO d[j] := M; INC(j) END

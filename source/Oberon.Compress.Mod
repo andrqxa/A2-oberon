@@ -50,7 +50,7 @@ MODULE Compress IN Oberon; (** portable *)	(* ejz  *)
 
 	TYPE
 		Node = RECORD
-			parent, smallerChild, largerChild: INTEGER
+			parent, smallerChild, largerChild: SIGNED16
 		END;
 		Name* = ARRAY 32 OF CHAR;
 		Header* = RECORD
@@ -71,7 +71,7 @@ MODULE Compress IN Oberon; (** portable *)	(* ejz  *)
 			next: HeaderList
 		END;
 		EnumProc* = PROCEDURE (h: Header; VAR stop: BOOLEAN);
-		CryptProc* = PROCEDURE (VAR Rin: Files.Rider; nIn: LONGINT; VAR Rout: Files.Rider; key: ARRAY OF CHAR; VAR res: INTEGER);
+		CryptProc* = PROCEDURE (VAR Rin: Files.Rider; nIn: LONGINT; VAR Rout: Files.Rider; key: ARRAY OF CHAR; VAR res: SIGNED16);
 
 	VAR
 		W: Texts.Writer;
@@ -86,7 +86,7 @@ MODULE Compress IN Oberon; (** portable *)	(* ejz  *)
 		curKey: ARRAY 64 OF CHAR;
 
 	PROCEDURE ReadHeader(VAR R: Files.Rider; VAR h: Header; VAR err: BOOLEAN);
-		VAR chk, pos: LONGINT; i: INTEGER;
+		VAR chk, pos: LONGINT; i: SIGNED16;
 	BEGIN
 		pos := Files.Pos(R);
 		Files.ReadBytes(R, h.name, 32);
@@ -504,7 +504,7 @@ MODULE Compress IN Oberon; (** portable *)	(* ejz  *)
 	PROCEDURE CopyToArc*(VAR Ri, Ro: Files.Rider; len: LONGINT; VAR h: Header);
 		VAR
 			F: Files.File; R: Files.Rider;
-			len0: LONGINT; res: INTEGER;
+			len0: LONGINT; res: SIGNED16;
 	BEGIN
 		len0 := len; INC(len); Len := 0;
 		BufferPtr := 0; CurBitNr := 7; CurByte := 0;
@@ -527,7 +527,7 @@ MODULE Compress IN Oberon; (** portable *)	(* ejz  *)
 	res:
 		Done
 		ErrorInArchive: error in compressed data *)
-	PROCEDURE CopyFromArc*(VAR Ri, Ro: Files.Rider; VAR h: Header; VAR res: INTEGER);
+	PROCEDURE CopyFromArc*(VAR Ri, Ro: Files.Rider; VAR h: Header; VAR res: SIGNED16);
 		VAR F: Files.File; R: Files.Rider;
 	BEGIN
 		Len := 0;
@@ -764,7 +764,7 @@ TextFrames *)
 			Done
 			ArchiveNotFound: archive-file not found
 			ErrorInArchive: internal error in archive-file *)
-	PROCEDURE Enumerate*(archive: ARRAY OF CHAR; enumProc: EnumProc; sorted: BOOLEAN; VAR res: INTEGER);
+	PROCEDURE Enumerate*(archive: ARRAY OF CHAR; enumProc: EnumProc; sorted: BOOLEAN; VAR res: SIGNED16);
 		VAR
 			F: Files.File; R: Files.Rider;
 			h: Header; err, stop: BOOLEAN;
@@ -808,7 +808,7 @@ TextFrames *)
 			Done
 			ArchiveNotFound: archive-file not found
 			ErrorInArchive: internal error in archive-file *)
-	PROCEDURE AddFile*(archive: ARRAY OF CHAR; VAR file: ARRAY OF CHAR; VAR R: Files.Rider; len: LONGINT; VAR res: INTEGER);
+	PROCEDURE AddFile*(archive: ARRAY OF CHAR; VAR file: ARRAY OF CHAR; VAR R: Files.Rider; len: LONGINT; VAR res: SIGNED16);
 		VAR
 			ArcF: Files.File;
 			Ra: Files.Rider;
@@ -876,7 +876,7 @@ TextFrames *)
 			ArchiveNotFound: archive-file not found
 			ErrorInArchive: internal error in archive-file
 			EntryNotFound: no such entry (entry) found *)
-	PROCEDURE DeleteFile*(archive, file: ARRAY OF CHAR; VAR res: INTEGER);
+	PROCEDURE DeleteFile*(archive, file: ARRAY OF CHAR; VAR res: SIGNED16);
 		VAR
 			ArcF, TmpF: Files.File;
 			Ra, Rt: Files.Rider;
@@ -927,7 +927,7 @@ TextFrames *)
 			ArchiveNotFound: archive-file not found
 			ErrorInArchive: internal error in archive-file
 			EntryNotFound no such entry (entry) found *)
-	PROCEDURE ExtractFile*(archive, file: ARRAY OF CHAR; VAR R: Files.Rider; VAR res: INTEGER);
+	PROCEDURE ExtractFile*(archive, file: ARRAY OF CHAR; VAR R: Files.Rider; VAR res: SIGNED16);
 		VAR
 			ArcF: Files.File;
 			Ra: Files.Rider;
@@ -966,7 +966,7 @@ TextFrames *)
 			ArchiveNotFound: archive-file not found
 			ErrorInArchive: internal error in archive-file
 			FileError: an entry file could not be created *)
-	PROCEDURE ExtractAllFiles*(archive: ARRAY OF CHAR; VAR res: INTEGER);
+	PROCEDURE ExtractAllFiles*(archive: ARRAY OF CHAR; VAR res: SIGNED16);
 		VAR
 			ArcF, AddF: Files.File;
 			Ra, RF: Files.Rider;
@@ -1011,7 +1011,7 @@ TextFrames *)
 			Done
 			ArchiveExists: archive allready existed
 			FileError: archive-file could not be created *)
-	PROCEDURE CreateArchive*(archive: ARRAY OF CHAR; VAR res: INTEGER);
+	PROCEDURE CreateArchive*(archive: ARRAY OF CHAR; VAR res: SIGNED16);
 		VAR
 			ArcF: Files.File;
 			R: Files.Rider;
@@ -1098,7 +1098,7 @@ TextFrames *)
 
 	PROCEDURE LoadDoc(D: Documents.Document);
 		VAR
-			res: INTEGER;
+			res: SIGNED16;
 			T: Texts.Text;
 			L: Objects.LinkMsg;
 			A: Objects.AttrMsg;
@@ -1202,7 +1202,7 @@ TextFrames *)
 	PROCEDURE Directory*;
 		VAR
 			nameList: List;
-			res, x, y: INTEGER;
+			res, x, y: SIGNED16;
 			T: Texts.Text;
 			V: MenuViewers.Viewer;
 	BEGIN
@@ -1376,7 +1376,7 @@ TextFrames *)
 			R, Rt: Files.Rider;
 			h: Header;
 			pos, beg: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 			err, changed: BOOLEAN;
 	BEGIN
 		GetArgs(nameList);
@@ -1481,13 +1481,13 @@ TextFrames *)
 			pos: LONGINT;
 			err: BOOLEAN;
 			dot, j: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 			temp: ARRAY 32 OF CHAR;
 			(* TextDocs *)
 			D: Documents.Document;
 			(* TextDocs *)
 			(* TextFrames
-			x, y: INTEGER;
+			x, y: SIGNED16;
 			T: Texts.Text;
 			V: MenuViewers.Viewer;
 			TextFrames *)
@@ -1606,7 +1606,7 @@ TextFrames *)
 			R, RF: Files.Rider;
 			h: Header;
 			pos: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 			err: BOOLEAN;
 	BEGIN
 		GetArgs(nameList);
@@ -1682,7 +1682,7 @@ TextFrames *)
 			he: Header;
 			name: Name;
 			pos: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 			err: BOOLEAN;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
@@ -1765,7 +1765,7 @@ TextFrames *)
 			R, RF: Files.Rider;
 			h: Header;
 			pos: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 			err: BOOLEAN;
 	BEGIN
 		GetArgs(nameList); err := FALSE;

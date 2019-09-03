@@ -308,7 +308,7 @@ TYPE
 				IF (r.free = 0) THEN reg := r.id
 				ELSE (* not enough registers *)
 					PCM.Error(215, PCM.InvalidPosition, "Not enough registers.");
-					HALT(MAX(INTEGER));
+					HALT(MAX(SIGNED16));
 					HALT(INTERNALERROR)
 				END;
 				IF (content # NIL) THEN Invalidate(content); r.AddContent(content)
@@ -448,7 +448,7 @@ END SpecialReg;
 PROCEDURE NewMemContent*(pc, rBase, offset, size: LONGINT): MemoryContent;
 VAR c: MemoryContent;
 BEGIN
-	IF (size = 0) THEN HALT(MAX(INTEGER)) END;
+	IF (size = 0) THEN HALT(MAX(SIGNED16)) END;
 	IF (rBase = PC) THEN RETURN NewPCRelMemContent(pc, offset, size)
 	ELSE NEW(c, rBase, offset, size); RETURN c
 	END
@@ -456,7 +456,7 @@ END NewMemContent;
 
 PROCEDURE NewPCRelMemContent*(pc, offset, size: LONGINT): PCRelMemContent;
 VAR c: PCRelMemContent;
-BEGIN 	IF (size = 0) THEN HALT(MAX(INTEGER)) END;
+BEGIN 	IF (size = 0) THEN HALT(MAX(SIGNED16)) END;
 NEW(c, pc, offset, size); RETURN c
 END NewPCRelMemContent;
 

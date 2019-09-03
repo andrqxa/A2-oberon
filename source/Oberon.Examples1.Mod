@@ -17,7 +17,7 @@ CONST
 TYPE
 	Frame* = POINTER TO FrameDesc;
 	FrameDesc* = RECORD (Gadgets.FrameDesc)
-		x: INTEGER;
+		x: SIGNED16;
 		ptr0, ptr1: Gadgets.Frame; (* Two pointers to frames *)
 	END;
 

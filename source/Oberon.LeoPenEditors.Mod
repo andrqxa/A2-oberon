@@ -253,7 +253,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	(**--- Default Pens ---**)
 
 	PROCEDURE FindPen (CONST name: ARRAY OF CHAR): LeoPens.Pen;
-		VAR ref: INTEGER; obj: Objects.Object;
+		VAR ref: SIGNED16; obj: Objects.Object;
 	BEGIN
 		Objects.GetRef(PenLib.dict, name, ref);
 		IF ref >= 0 THEN
@@ -281,7 +281,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END Find;
 
 	PROCEDURE Register* (pen: LeoPens.Pen; CONST name: ARRAY OF CHAR);
-		VAR ref: INTEGER;
+		VAR ref: SIGNED16;
 	BEGIN
 		Objects.GetRef(PenLib.dict, name, ref);
 		IF ref < 0 THEN
@@ -416,7 +416,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END SetBool;
 
 	PROCEDURE SetColor* (fig: Leonardo.Figure; pen: LeoPens.Pen; col: LONGINT);
-		VAR r, g, b: INTEGER;
+		VAR r, g, b: SIGNED16;
 	BEGIN
 		Display.GetColor(col, r, g, b);
 		SetInt(fig, pen, "Red", r); SetInt(fig, pen, "Green", g); SetInt(fig, pen, "Blue", b)
@@ -437,7 +437,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END InitPenLib;
 
 	PROCEDURE MakePenList (list: Objects.Object);
-		VAR cm: ListRiders.ConnectMsg; ref: INTEGER; obj: Objects.Object; name: ARRAY 64 OF CHAR; sd: ListRiders.String;
+		VAR cm: ListRiders.ConnectMsg; ref: SIGNED16; obj: Objects.Object; name: ARRAY 64 OF CHAR; sd: ListRiders.String;
 	BEGIN
 		IF list # NIL THEN
 			Objects.Stamp(cm); cm.R := NIL; list.handle(list, cm);
@@ -461,7 +461,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END MakePenList;
 
 	PROCEDURE StorePenLib*;
-		VAR s: Attributes.Scanner; file: Files.File; bm: Objects.BindMsg; ref: INTEGER; obj: Objects.Object; len: LONGINT;
+		VAR s: Attributes.Scanner; file: Files.File; bm: Objects.BindMsg; ref: SIGNED16; obj: Objects.Object; len: LONGINT;
 	BEGIN
 		Oberon.Defocus;
 		Attributes.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Attributes.Scan(s);
@@ -501,7 +501,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END LoadPenLib;
 
 	PROCEDURE SelListPen*;
-		VAR s: Attributes.Scanner; ref: INTEGER; obj: Objects.Object; e: LeoPanels.Editor;
+		VAR s: Attributes.Scanner; ref: SIGNED16; obj: Objects.Object; e: LeoPanels.Editor;
 	BEGIN
 		Attributes.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Attributes.Scan(s);
 		IF s.class IN {Attributes.Name, Attributes.String} THEN
@@ -541,7 +541,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END AddListPen;
 
 	PROCEDURE DelListPen*;
-		VAR e: LeoPanels.Editor; name: ARRAY 64 OF CHAR; ref: INTEGER; obj: Objects.Object;
+		VAR e: LeoPanels.Editor; name: ARRAY 64 OF CHAR; ref: SIGNED16; obj: Objects.Object;
 	BEGIN
 		e := LeoPanels.FindEditor(Gadgets.context);
 		IF e # NIL THEN
@@ -670,7 +670,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE TrackPreview (prev: Preview; VAR msg: Oberon.InputMsg);
 		VAR
-			px, py, mx, my, x, y, u, v: INTEGER; mask: Display3.Mask; keysum, keys: SET; obj: Objects.Object;
+			px, py, mx, my, x, y, u, v: SIGNED16; mask: Display3.Mask; keysum, keys: SET; obj: Objects.Object;
 			cm: Objects.CopyMsg; target: Display.Frame; dm: DropMsg;
 	BEGIN
 		px := msg.x + prev.X; py := msg.y + prev.Y;
@@ -720,7 +720,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 		pen.do.end(pen)
 	END RenderPreview;
 
-	PROCEDURE RestorePreview (prev: Preview; px, py: INTEGER; mask: Display3.Mask);
+	PROCEDURE RestorePreview (prev: Preview; px, py: SIGNED16; mask: Display3.Mask);
 		VAR obj: Objects.Object; pen: LeoPens.Pen; bw, d, w, h: REAL; scale: LONGINT; s, t: ARRAY 16 OF CHAR;
 	BEGIN
 		Display3.FilledRect3D(mask, Display3.bottomC, Display3.topC, Display3.textbackC, px, py, prev.W, prev.H, 1, Display.replace);
@@ -750,7 +750,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE PrintPreview (prev: Preview; VAR msg: Display.DisplayMsg);
 		VAR
-			pw, ph, pix: INTEGER; mask: Display3.Mask; obj: Objects.Object; pen: LeoPens.Pen;
+			pw, ph, pix: SIGNED16; mask: Display3.Mask; obj: Objects.Object; pen: LeoPens.Pen;
 			bw, d, w, h: REAL; scale: LONGINT; ctxt: GfxPrinter.Context; s, t: ARRAY 16 OF CHAR;
 	BEGIN
 		pw := SHORT(LONG(prev.W) * Display.Unit DIV Printer.Unit);
@@ -790,7 +790,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END CopyPreview;
 
 	PROCEDURE HandlePreview* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR prev, copy: Preview; px, py: INTEGER; mask: Display3.Mask; ver: LONGINT;
+		VAR prev, copy: Preview; px, py: SIGNED16; mask: Display3.Mask; ver: LONGINT;
 	BEGIN
 		prev := obj(Preview);
 		IF msg IS Display.FrameMsg THEN

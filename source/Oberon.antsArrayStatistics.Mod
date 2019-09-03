@@ -93,7 +93,7 @@ TYPE
 	END Store;
 
 	PROCEDURE Load( VAR R: Files.Rider;  s: tObject );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Gadgets.ReadRef( R, s.lib, objsub );
 		IF objsub # NIL THEN s.from := objsub( antsArrayObjects.tINTEGERObject ) END;

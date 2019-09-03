@@ -196,7 +196,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 
 		Token = RECORD
 			pos: LONGINT;
-			kind: INTEGER;
+			kind: SIGNED16;
 			bool: BOOLEAN;
 			char: CHAR;
 			num, denom: LONGINT;
@@ -1546,7 +1546,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 		END
 	END Fail;
 
-	PROCEDURE FailCode* (ctxt: Context; code: INTEGER; obj: Object);
+	PROCEDURE FailCode* (ctxt: Context; code: SIGNED16; obj: Object);
 	BEGIN
 		CASE code OF
 		| errEval: Fail(ctxt, "cannot evaluate object", obj)
@@ -2521,7 +2521,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 		END str;
 
 		PROCEDURE int (x: LONGINT);
-			VAR j: LONGINT; d: ARRAY 32 OF INTEGER;
+			VAR j: LONGINT; d: ARRAY 32 OF SIGNED16;
 		BEGIN
 			IF x = MIN(LONGINT) THEN
 				IF radix = 2 THEN str("-10000000000000000000000000000000")

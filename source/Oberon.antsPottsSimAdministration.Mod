@@ -48,9 +48,9 @@ CONST
 VAR
 	globalStat: antsBellman.Statistic;  globalGamma: LONGREAL;
 
-	PROCEDURE DoSetMonotone*( monotone: ARRAY OF CHAR ): INTEGER;
+	PROCEDURE DoSetMonotone*( monotone: ARRAY OF CHAR ): SIGNED16;
 
-	VAR type: INTEGER;
+	VAR type: SIGNED16;
 
 	BEGIN
 		IF monotone = "MeanMonotone" THEN type := cMedianMonotone;
@@ -64,9 +64,9 @@ VAR
 		RETURN type;
 	END DoSetMonotone;
 
-	PROCEDURE DoSetNoise*( noise: ARRAY OF CHAR ): INTEGER;
+	PROCEDURE DoSetNoise*( noise: ARRAY OF CHAR ): SIGNED16;
 
-	VAR type: INTEGER;
+	VAR type: SIGNED16;
 
 	BEGIN
 		IF noise = "Gauss" THEN type := cGauss;
@@ -79,9 +79,9 @@ VAR
 		RETURN type;
 	END DoSetNoise;
 
-	PROCEDURE DoSetReko*( reko: ARRAY OF CHAR ): INTEGER;
+	PROCEDURE DoSetReko*( reko: ARRAY OF CHAR ): SIGNED16;
 
-	VAR type: INTEGER;
+	VAR type: SIGNED16;
 
 	BEGIN
 		IF reko = "Mean" THEN type := cMean;
@@ -96,9 +96,9 @@ VAR
 		RETURN type;
 	END DoSetReko;
 
-	PROCEDURE DoSetGamma*( gamma: ARRAY OF CHAR ): INTEGER;
+	PROCEDURE DoSetGamma*( gamma: ARRAY OF CHAR ): SIGNED16;
 
-	VAR type: INTEGER;
+	VAR type: SIGNED16;
 
 	BEGIN
 		IF gamma = "AIC" THEN type := cAIC;
@@ -321,7 +321,7 @@ VAR
 									  gamma: LONGREAL;  VAR actgamma: LONGREAL );
 	(* Berechnet eine Datenrekonstruktion abhängig von rekotype und gammatype. *)
 
-	VAR statistic1: antsPotts1DSurvey.StatisticObj;  statistic2: antsTautString.Statistic;  type1, type2: INTEGER;  vec1, vec2: vyBase.Object;  len, i: LONGINT;
+	VAR statistic1: antsPotts1DSurvey.StatisticObj;  statistic2: antsTautString.Statistic;  type1, type2: SIGNED16;  vec1, vec2: vyBase.Object;  len, i: LONGINT;
 		rstern: antsArrays.I1d;  bellman: antsArrays.X1d;
 
 	BEGIN
@@ -416,7 +416,7 @@ VAR
 	PROCEDURE DoAddNoise*( x: antsArrays.X1d;  VAR y: antsArrays.X1d;  parameter: LONGREAL;  noisetype: ARRAY OF CHAR );
 	(* Verrauscht Daten. *)
 
-	VAR type: INTEGER;  vec1, vec2: vyBase.tVector;  len: LONGINT;  par: LONGREAL;
+	VAR type: SIGNED16;  vec1, vec2: vyBase.tVector;  len: LONGINT;  par: LONGREAL;
 
 	BEGIN
 		type := DoSetNoise( noisetype );  len := LEN( x );  vec1 := vyLongrealVec.New( len );  vyLongrealVec.CopyToVec( x^, vec1, len, 0, 0 );

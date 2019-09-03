@@ -258,7 +258,7 @@ PROCEDURE CopyTo*;	(** dstprefix srcprefix ( &file | { file [=> file]} ) ~ *)
 CONST BufSize = 32768;
 VAR
 	S: Texts.Scanner;  sf: NatFiles.File;  df: Files.File;  sr: NatFiles.Rider;  dr: Files.Rider;
-	sLen, dLen, i: INTEGER;  ch: CHAR;  src, dest: ARRAY 64 OF CHAR;  t: Texts.Text;
+	sLen, dLen, i: SIGNED16;  ch: CHAR;  src, dest: ARRAY 64 OF CHAR;  t: Texts.Text;
 	buf: ARRAY BufSize OF CHAR;
 BEGIN
 	StartScan(S);

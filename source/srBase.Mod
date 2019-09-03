@@ -25,7 +25,7 @@ TYPE PT*= RECORD
 END;
 
 TYPE IPT*=RECORD
-	i*,j*,k*: INTEGER
+	i*,j*,k*: SIGNED16
 END;
 
 TYPE BOX*=RECORD
@@ -49,7 +49,7 @@ TYPE V*= OBJECT
 PROCEDURE tick*;
 END tick;
 PROCEDURE register*;
-VAR i: INTEGER;
+VAR i: SIGNED16;
 BEGIN
 	i := 0;
 	WHILE voxelist[i] # NIL DO INC(i) END;
@@ -63,11 +63,11 @@ TYPE Ray* = RECORD
 	theta*, phi*: SREAL;
 	xyz*, dxyz*, ddxyz*, lxyz*,origin*: PT;
 	r*, g*, b*, ra*, ga*, ba*, a*: SREAL;
-	i*, j*, k*, recursion*: INTEGER;
+	i*, j*, k*, recursion*: SIGNED16;
 	scale*: SREAL;
 	length*: SREAL;
 	changed*,traced*: BOOLEAN;
-	face*: INTEGER;
+	face*: SIGNED16;
 	normal*: PT;   (* For lighting/shading; see mcell in srMSpace.Mod *)
 END;
 
@@ -79,7 +79,7 @@ TYPE LIMAGE*= ARRAY LW+2,LH+2 OF COLOR;
 TYPE Voxel*=OBJECT(V)
 VAR
 	passable*: BOOLEAN;
-	rlimit*: INTEGER;
+	rlimit*: SIGNED16;
 	complex*:BOOLEAN;
 PROCEDURE Shade*(VAR ray: Ray);
 END Shade;
@@ -162,7 +162,7 @@ END Voxel;
 VAR
 	voxelist: ARRAY 100 OF V;
 	fog*:REAL;
-	rlimit*: INTEGER;
+	rlimit*: SIGNED16;
 	iterlimit*: LONGINT;
 	frame*: LONGINT;
 	img*: Raster.Image;
@@ -184,7 +184,7 @@ VAR
 	world*: Voxel;
 
 PROCEDURE clearvoxelist*;
-VAR i: INTEGER;
+VAR i: SIGNED16;
 BEGIN
 	FOR i:=0 TO 99 DO voxelist[i]:=NIL END
 END clearvoxelist;
@@ -256,7 +256,7 @@ BEGIN
 END fzz3;
 
 PROCEDURE tick*;
-VAR i: INTEGER;
+VAR i: SIGNED16;
 BEGIN
   IF TRUE OR  ~STOP THEN
 	i := 0;

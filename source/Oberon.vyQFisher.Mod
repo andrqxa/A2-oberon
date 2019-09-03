@@ -27,7 +27,7 @@ Report any problems as soon as possible to voyager@statlab.uni-heidelberg.de
 IMPORT MathL IN A2, Texts, In, vyBase, vyHostTexts;
 TYPE
 	Stattyp* = RECORD
-		Count*: INTEGER;
+		Count*: SIGNED16;
 		Mean*: LONGREAL;
 		Ssq*: LONGREAL
 	END;
@@ -50,8 +50,8 @@ TYPE
 
 	**********************************************************)
 
-	PROCEDURE Qfisher* (N, M: INTEGER;
-Percentage: LONGREAL; VAR ErrCode: INTEGER): LONGREAL;
+	PROCEDURE Qfisher* (N, M: SIGNED16;
+Percentage: LONGREAL; VAR ErrCode: SIGNED16): LONGREAL;
 CONST
 	Accuracy = 1.0E-6;
 	K1 = 2.30753;
@@ -86,11 +86,11 @@ Accuracy=1.0E-6.
 
 ********************************************************************)
 
-PROCEDURE Pffisher (N, M: INTEGER;
-X: LONGREAL; VAR Err: INTEGER): LONGREAL;
+PROCEDURE Pffisher (N, M: SIGNED16;
+X: LONGREAL; VAR Err: SIGNED16): LONGREAL;
 
 VAR
-	A, B, I, J: INTEGER;
+	A, B, I, J: SIGNED16;
 	W, Y, Z, D, P: LONGREAL;
 
 BEGIN (*PFFISHER*)
@@ -230,7 +230,7 @@ BEGIN (*Function QFISHER*)
 
 END Qfisher;  (*Function Qfisher*)
 
-PROCEDURE QF*;  VAR N, M: INTEGER; RP: REAL; X, P: LONGREAL; Err: INTEGER;
+PROCEDURE QF*;  VAR N, M: SIGNED16; RP: REAL; X, P: LONGREAL; Err: SIGNED16;
 BEGIN
 	In.Open; In.Int(N); In.Int(M); In.Real(RP); P := RP;
 	X := Qfisher(N, M, P, Err);

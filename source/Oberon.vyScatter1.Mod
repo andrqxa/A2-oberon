@@ -147,7 +147,7 @@ VAR
 	END Prompt;
 
 	PROCEDURE Responsible( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 
 		PROCEDURE InScatter( X, Y: Coordinate ): BOOLEAN;
 		VAR xMin, xMax, yMin, yMax: Coordinate;  min, max: Real;  nans: LONGINT;

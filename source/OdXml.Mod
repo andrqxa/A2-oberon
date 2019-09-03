@@ -1000,7 +1000,7 @@ END XmlDecl;
 
 (* Get character data of an element. *)
 PROCEDURE GetCharData*(parent: XML.Element; VAR charData: ARRAY OF CHAR);
-VAR enum: XMLObjects.Enumerator; p: ANY; cd: XML.ArrayChars; s: XML.String; i: INTEGER;
+VAR enum: XMLObjects.Enumerator; p: ANY; cd: XML.ArrayChars; s: XML.String; i: SIGNED16;
 BEGIN
 	charData[0] := 0X;
 	IF parent # NIL THEN

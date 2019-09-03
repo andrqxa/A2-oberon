@@ -302,7 +302,7 @@ Finding the highest gain in the variance comparing the difference of two subsequ
 in the gamma-scanning
 (depending on type maximum likelihood estimator or the common unbiased variance estimator 1/(N-1) \sum_{i=1}^N (y_i - \bar{y} )^2 is taken)
 *)
-	PROCEDURE VarianceGain( type: INTEGER;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  VAR kstern: LONGINT );
+	PROCEDURE VarianceGain( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  VAR kstern: LONGINT );
 	VAR k, N: LONGINT;  jumpN: LONGINT;  Vals: antsArrays.X1d;  diff: LONGREAL;  b: LONGREAL;
 	BEGIN
 		jumpN := LEN( jumps^ );  NEW( Vals, jumpN );  b := EstimatedVariance( Xstern^[jumps^[0]], data^, type );
@@ -318,7 +318,7 @@ in the gamma-scanning
 (*
 estimator for the variance (depending on type maximum likelihood estimator or an unbiased estimator) of y if x is assumed to be the real signal
 *)
-	PROCEDURE EstimatedVariance*( VAR x, y: ARRAY OF LONGREAL;  type: INTEGER ): LONGREAL;
+	PROCEDURE EstimatedVariance*( VAR x, y: ARRAY OF LONGREAL;  type: SIGNED16 ): LONGREAL;
 	BEGIN
 		IF type = cGaussML THEN RETURN vyLongreal.Dist2Sq( LEN( x ), x, 0, y, 0 ) / LEN( x )
 		ELSIF type = cLaplaceML THEN
@@ -331,7 +331,7 @@ estimator for the variance (depending on type maximum likelihood estimator or an
 The estimated variances (depending on type the maximum likelihood estimator or an unbiased estimator is taken)
 for the reconstructions in the gamma-scanning
 *)
-	PROCEDURE VarianceEstimatorScanning( type: INTEGER;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;
+	PROCEDURE VarianceEstimatorScanning( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;
 																	  gamma: antsArrays.X1d;  gammalen: LONGINT;  VAR Vals: antsArrays.X1d );
 	VAR k: LONGINT;
 	BEGIN
@@ -343,7 +343,7 @@ for the reconstructions in the gamma-scanning
 Depending on type the unbiased estimator 1/(N-1) sum_{i=1}^N (y_i - bar{y} )^2 or the maximum likelihood estimator for the variance is taken
 for every number of intervals and check for which number of intervals this estimator is closest to the given variance
 *)
-	PROCEDURE VarianceTest( type: INTEGER;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  variance: LONGREAL );
+	PROCEDURE VarianceTest( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  variance: LONGREAL );
 	VAR k, N: LONGINT;
 	BEGIN
 		N := LEN( data^ );
@@ -356,7 +356,7 @@ Depending on type the unbiased estimator 1/(N-1) sum_{i=1}^N (y_i - bar{y} )^2 o
 only for number of intervals appearing in the scanning
 and check for which number of intervals this estimator is closest to the given variance
 *)
-	PROCEDURE VarianceTestScanning( type: INTEGER;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;
+	PROCEDURE VarianceTestScanning( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;
 															 VAR Vals: antsArrays.X1d;  variance: LONGREAL );
 	VAR k, jumpN: LONGINT;
 	BEGIN
@@ -426,7 +426,7 @@ Using MAD estimator for the variance and the Davies/Kovac criterion for the wave
 *)
 	PROCEDURE MultiResCheck( data: ARRAY OF LONGREAL;  mad: LONGREAL;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  factor: LONGREAL;
 												 VAR ksterndl: LONGINT );
-	VAR const: LONGREAL;  N: LONGINT;  xsterndl: antsArrays.X1d;  i, j, k: LONGINT;  toobig: BOOLEAN;  kstern: INTEGER;  Coeff: antsArrays.X2d;  estimatedsigma: LONGREAL;
+	VAR const: LONGREAL;  N: LONGINT;  xsterndl: antsArrays.X1d;  i, j, k: LONGINT;  toobig: BOOLEAN;  kstern: SIGNED16;  Coeff: antsArrays.X2d;  estimatedsigma: LONGREAL;
 
 	BEGIN
 		N := LEN( Xstern );
@@ -640,7 +640,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	PROCEDURE DoViewScannings( degraded: vyBase.Object;  statistic: StatisticObj );
 	VAR N, i, jumpN: LONGINT;  intervals: antsArrays.X1d;  index: antsArrays.L1d;  maxquot: LONGREAL;  maxquotpos: LONGINT;
 		name: ARRAY 64 OF CHAR;
-		type: INTEGER;
+		type: SIGNED16;
 	BEGIN
 		vyHostTexts.DoOpenLog( "antsViewScannings.Text" );  vyHostTexts.SetCaret;  ViewVector( degraded( vyLongrealVec.tVector ), "antsPointPlot" );
 
@@ -736,7 +736,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		END
 	END Header;
 
-	PROCEDURE MLOrNot( VAR type: INTEGER );
+	PROCEDURE MLOrNot( VAR type: SIGNED16 );
 	VAR obj: vyBase.Object;
 		kindofnoise: ARRAY 64 OF CHAR;
 	BEGIN
@@ -897,7 +897,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		AppendValue( statistic.scanningLogOpt, statvec )
 	END MakeMaxIntervalLog;
 
-	PROCEDURE DoVarianceGain*( statistic: StatisticObj;  vec: vyBase.Object;  type: INTEGER );
+	PROCEDURE DoVarianceGain*( statistic: StatisticObj;  vec: vyBase.Object;  type: SIGNED16 );
 	BEGIN
 		antsBellman.gammaScanning( statistic.Bellman, statistic.jumps, statistic.gamma );
 		VarianceGain( type, statistic.data, statistic.Xstern, statistic.jumps, statistic.scanningVarOpt );
@@ -905,7 +905,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END DoVarianceGain;
 
 	PROCEDURE MakeVarianceGain*;
-	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  type: INTEGER;
+	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  type: SIGNED16;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 
@@ -916,14 +916,14 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		AppendValue( statistic.scanningVarOpt, statvec )
 	END MakeVarianceGain;
 
-	PROCEDURE DoVarianceTest*( statistic: StatisticObj;  vec: vyBase.Object;  variance: LONGREAL;  type: INTEGER );
+	PROCEDURE DoVarianceTest*( statistic: StatisticObj;  vec: vyBase.Object;  variance: LONGREAL;  type: SIGNED16 );
 	BEGIN
 		VarianceTest( type, statistic.data, statistic.Xstern, statistic.XVarDiff, variance );
 		Minimize( statistic.XVarDiff^, statistic.VarDiffOpt );  LineToVec( statistic.Xstern[statistic.VarDiffOpt], vec )
 	END DoVarianceTest;
 
 	PROCEDURE MakeVarianceTest*;
-	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  variance: LONGREAL;  type: INTEGER;
+	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  variance: LONGREAL;  type: SIGNED16;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 
@@ -937,14 +937,14 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		AppendValue( statistic.VarDiffOpt, statvec )
 	END MakeVarianceTest;
 
-	PROCEDURE DoVarianceTestScanning*( statistic: StatisticObj;  vec: vyBase.Object;  variance: LONGREAL;  type: INTEGER );
+	PROCEDURE DoVarianceTestScanning*( statistic: StatisticObj;  vec: vyBase.Object;  variance: LONGREAL;  type: SIGNED16 );
 	BEGIN
 		VarianceTestScanning( type, statistic.data, statistic.Xstern, statistic.jumps, statistic.XVarDiff, variance );
 		Minimize( statistic.XVarDiff^, statistic.VarDiffOpt );  LineToVec( statistic.Xstern[statistic.VarDiffOpt], vec )
 	END DoVarianceTestScanning;
 
 	PROCEDURE MakeVarianceTestScanning*;
-	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  variance: LONGREAL;  type: INTEGER;
+	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  variance: LONGREAL;  type: SIGNED16;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 
@@ -1012,7 +1012,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		AppendValue( statistic.aicEstOpt, statvec )
 	END MakeLongestRun;
 
-	PROCEDURE DoIterativePotts*( input: vyBase.Object;  vec, res: vyLongrealVec.tVector;  type: INTEGER;  factor: LONGREAL );
+	PROCEDURE DoIterativePotts*( input: vyBase.Object;  vec, res: vyLongrealVec.tVector;  type: SIGNED16;  factor: LONGREAL );
 	VAR i, N, j, k: LONGINT;  alarm: LONGINT;
 		(* ch: CHAR; *)
 		msg: vyPort.AdjustCoordMsg;
@@ -1097,7 +1097,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	PROCEDURE MakeIterativePotts*;
 	VAR degraded: vyBase.Object;  vec, res: vyBase.Object;
 		vecname, resname: ARRAY 64 OF CHAR;
-		type: INTEGER;  factor: LONGREAL;
+		type: SIGNED16;  factor: LONGREAL;
 	BEGIN
 		antsCommands.InitScan( "data=OBJ (vec=OBJ | (vec=NAME res=NAME |create))" );
 		IF antsCommands.ExpectObject( "data", degraded ) & antsCommands.GetObject( "vec", vec ) & antsCommands.GetObject( "res", res ) THEN
@@ -1133,7 +1133,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	PROCEDURE VarianceCurve*;
 	VAR statistic: StatisticObj;  sobj, obj: vyBase.Object;  curve: vyBase.Object;
 		name: ARRAY 64 OF CHAR;
-		VarEstOnly: antsArrays.X1d;  gammalen: LONGINT;  type: INTEGER;
+		VarEstOnly: antsArrays.X1d;  gammalen: LONGINT;  type: SIGNED16;
 	BEGIN
 		antsCommands.InitScan( "statistic=OBJ (curve=OBJ | (curve=NAME >create) )" );
 
@@ -1169,7 +1169,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 
 	PROCEDURE MakeModiMatrix*;
 	VAR slicename, matrixname: ARRAY 64 OF CHAR;
-		dimx, dimy: LONGINT;  Matrix: antsArrays.X2d;  columns: LONGINT;  from, to: LONGINT;  type: INTEGER;  offset: LONGINT;  R: antsReadWrite.Rider;
+		dimx, dimy: LONGINT;  Matrix: antsArrays.X2d;  columns: LONGINT;  from, to: LONGINT;  type: SIGNED16;  offset: LONGINT;  R: antsReadWrite.Rider;
 	BEGIN
 		antsCommands.InitScan( "slice=STR nx=INT ny=INT matrix=STR [from=INT to=INT] [offset=INT] (>median|>mean)" );
 
@@ -1202,7 +1202,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		DoModiMatrix( columns, offset, dimx, dimy, Matrix, type, from, to, matrixname )
 	END MakeModiMatrix;
 
-	PROCEDURE DoModiMatrix( columns, offset: LONGINT;  dimx, dimy: LONGINT;  Matrix: antsArrays.X2d;  type: INTEGER;  from, to: LONGINT;
+	PROCEDURE DoModiMatrix( columns, offset: LONGINT;  dimx, dimy: LONGINT;  Matrix: antsArrays.X2d;  type: SIGNED16;  from, to: LONGINT;
 											   matrixname: ARRAY OF CHAR );
 	VAR pixeldata: vyLongrealVec.tVector;  nx, ny, t, rownum: LONGINT;  statistic: StatisticObj;  vec: vyBase.Object;  modi: LONGINT;
 		OrderMatrix: antsArrays.I2d;  R: antsReadWrite.Rider;
@@ -1237,7 +1237,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		R.WriteType;  R.WriteI2d( OrderMatrix );  R.Close
 	END DoModiMatrix;
 
-	PROCEDURE DoRecursiveScanning( degraded: vyBase.Object;  vec, res: vyLongrealVec.tVector;  type: INTEGER );
+	PROCEDURE DoRecursiveScanning( degraded: vyBase.Object;  vec, res: vyLongrealVec.tVector;  type: SIGNED16 );
 	VAR i, N: LONGINT;  alarm: LONGINT;  ch: CHAR;  msg: vyPort.AdjustCoordMsg;  NumOfJumps: LONGINT;  lastval: LONGREAL;  statistic: StatisticObj;
 	BEGIN
 		alarm := 0;  Input.Read( ch );
@@ -1272,8 +1272,8 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		END
 	END DoRecursiveScanning;
 
-	PROCEDURE sgn*( x: LONGREAL ): INTEGER;
-	VAR number: INTEGER;
+	PROCEDURE sgn*( x: LONGREAL ): SIGNED16;
+	VAR number: SIGNED16;
 	BEGIN
 		IF x > 0 THEN number := 1
 		ELSIF x < 0 THEN number := -1
@@ -1283,7 +1283,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END sgn;
 
 	PROCEDURE MaxRun( x: ARRAY OF LONGREAL ): LONGINT;
-	VAR i, N: LONGINT;  runlength: LONGINT;  last, this: INTEGER;  startpoint: LONGINT;  len: LONGINT;
+	VAR i, N: LONGINT;  runlength: LONGINT;  last, this: SIGNED16;  startpoint: LONGINT;  len: LONGINT;
 	CONST invalid = -1;
 	BEGIN
 		N := LEN( x );  runlength := 1;  len := 1;  last := sgn( x[0] );
@@ -1301,7 +1301,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	PROCEDURE RecursiveScanning*;
 	VAR degraded: vyBase.Object;  vec, res: vyBase.Object;
 		vecname, resname: ARRAY 64 OF CHAR;
-		type: INTEGER;
+		type: SIGNED16;
 	BEGIN
 		antsCommands.InitScan( "data=OBJ (vec=OBJ | (vec=NAME res=NAME |create))" );
 		IF antsCommands.ExpectObject( "data", degraded ) & antsCommands.GetObject( "vec", vec ) & antsCommands.GetObject( "res", res ) THEN
@@ -1336,7 +1336,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	VAR obj1: vyBase.Object;  variance: LONGREAL;
 		(*N, *) n: LONGINT;  vv2, vv: vyLongrealVec.tVector;
 		varname, gammaname: ARRAY 64 OF CHAR;
-		type, type2: INTEGER;
+		type, type2: SIGNED16;
 	BEGIN
 		antsCommands.InitScan( "data=OBJ var=REAL samples=INT varvec=NAME gammavec=NAME (>median|>mean) [>abs|>log]" );
 		IF antsCommands.ExpectObject( "data", obj1 ) & antsCommands.ExpectReal( "var", variance ) &
@@ -1363,7 +1363,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		DoEmpiricalVariance( obj1, variance, n, type, type2, vv2, vv )
 	END EmpiricalVariance;
 
-	PROCEDURE DoEmpiricalVariance( obj1: vyBase.Object;  variance: LONGREAL;  n: LONGINT;  type, type2: INTEGER;  vv2, vv: vyLongrealVec.tVector );
+	PROCEDURE DoEmpiricalVariance( obj1: vyBase.Object;  variance: LONGREAL;  n: LONGINT;  type, type2: SIGNED16;  vv2, vv: vyLongrealVec.tVector );
 	VAR i, m, N: LONGINT;  statistic: StatisticObj;  gammalen: LONGINT;  obj2: vyBase.Object;
 	BEGIN
 		N := vyLongrealVec.Len( obj1( vyLongrealVec.tVector ) );  obj2 := vyLongrealVec.New( N );
@@ -1475,7 +1475,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END ConsistencySimulation;
 
 	PROCEDURE EmpiricalGamma*;
-	VAR obj1, obj2: vyBase.Object;  variance: LONGREAL;  N, n: LONGINT;  vv1, vv2, vv3: vyLongrealVec.tVector;  type, type2: INTEGER;
+	VAR obj1, obj2: vyBase.Object;  variance: LONGREAL;  N, n: LONGINT;  vv1, vv2, vv3: vyLongrealVec.tVector;  type, type2: SIGNED16;
 		gammavecname, numbervecname, partivecname: ARRAY 64 OF CHAR;
 		this, old: Texts.Text;
 	BEGIN
@@ -1522,7 +1522,7 @@ Then it computes the statistic and and does the gamma-scanning. From the gamma-v
 and write this into lens. From this vector the mean and the sum of squares are computed. The largest gamma is written into gamma0vector.
 This whole procedure is repeated with the signal n times. The gamma_vector could then plotted as histogram to get an idea of the distribution of gamma0.
 *)
-	PROCEDURE DoEmpiricalGamma( obj1, obj2: vyBase.Object;  variance: LONGREAL;  n: LONGINT;  type, type2: INTEGER;  vv2: vyLongrealVec.tVector;
+	PROCEDURE DoEmpiricalGamma( obj1, obj2: vyBase.Object;  variance: LONGREAL;  n: LONGINT;  type, type2: SIGNED16;  vv2: vyLongrealVec.tVector;
 													    vecname: ARRAY OF CHAR;  intervalnumbervec: vyLongrealVec.tVector;
 													    numbervecname: ARRAY OF CHAR;  partivec: vyLongrealVec.tVector;  partivecname: ARRAY OF CHAR );
 	VAR i, j: LONGINT;  statistic: StatisticObj;  mean, ssq, median: LONGREAL;  maxjump: LONGREAL;  lens: antsArrays.X1d;  nrNaNs: LONGINT;  maxjumpPos: LONGINT;
@@ -1629,7 +1629,7 @@ This whole procedure is repeated with the signal n times. The gamma_vector could
 (*
 Survey of different properties of the gamma values in the scanning
 *)
-	PROCEDURE DoGammaStatistics( from, to, step, n, jumps1: LONGINT;  variance: LONGREAL;  type: INTEGER );
+	PROCEDURE DoGammaStatistics( from, to, step, n, jumps1: LONGINT;  variance: LONGREAL;  type: SIGNED16 );
 	VAR minmean, maxmean, meanmean, minvar, maxvar, meanvar, MeanLenMean, MeanLenVar, max2mean, max2var: LONGREAL;
 		i, j, k: LONGINT;  statistic: StatisticObj;  lengamma: LONGINT;  truejumpInter: LONGINT;  IntervalLen, TrueIntervalLen: LONGREAL;
 		min, max, max2, mean, Ratio, MeanLen: LONGREAL;  MaxInt, Max2Int: LONGREAL;
@@ -1746,7 +1746,7 @@ Survey of different properties of the gamma values in the scanning
 	END DoGammaStatistics;
 
 	PROCEDURE GammaStatistics*;
-	VAR n: LONGINT;  variance: LONGREAL;  jumps1: LONGINT;  from, to, step: LONGINT;  type: INTEGER;
+	VAR n: LONGINT;  variance: LONGREAL;  jumps1: LONGINT;  from, to, step: LONGINT;  type: SIGNED16;
 	BEGIN
 		antsCommands.InitScan( "samples=INT var=REAL jumps=INT (>median|>mean) [from=INT to=INT step=INT]" );
 		IF antsCommands.ExpectNumber( "samples", n ) & antsCommands.ExpectReal( "var", variance ) &
@@ -1772,7 +1772,7 @@ Survey of different properties of the gamma values in the scanning
 (*
 Survey of the reconstruction for fixed gamma for increasing length of the signal
 *)
-PROCEDURE DoFixedGammaStatistics (from, to, step, n, jumps1: LONGINT ; variance: LONGREAL; type: INTEGER );
+PROCEDURE DoFixedGammaStatistics (from, to, step, n, jumps1: LONGINT ; variance: LONGREAL; type: SIGNED16 );
 VAR (*minmean, maxmean, meanmean, minvar, maxvar, meanvar, MeanLenMean, MeanLenVar, max2mean, max2var: LONGREAL; *)
 i, j, k: LONGINT;
 statistic: StatisticObj;

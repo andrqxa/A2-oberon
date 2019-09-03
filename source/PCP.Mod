@@ -1181,7 +1181,7 @@ TYPE
 			END Convert;
 
 			PROCEDURE FillConst( a: PCB.ArrayQ );
-			VAR s: SIGNED8;  i: INTEGER;  l: LONGINT;  r: REAL;  x: LONGREAL;  con: PCT.Const;
+			VAR s: SIGNED8;  i: SIGNED16;  l: LONGINT;  r: REAL;  x: LONGREAL;  con: PCT.Const;
 			BEGIN
 				WHILE (a # NIL ) DO
 					IF a.e IS PCB.ArrayExpression  THEN FillConst( a.e(PCB.ArrayExpression).array )
@@ -1821,7 +1821,7 @@ TYPE
 								PCB.CallProc(code, suppress, d, param, scopelevel);
 							END;
 						ELSE
-							HALT(MAX(INTEGER));
+							HALT(MAX(SIGNED16));
 						END (* if -> proccall *);
 						indexer := FALSE;
 				| if:

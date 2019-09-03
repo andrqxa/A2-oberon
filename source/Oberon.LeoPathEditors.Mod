@@ -155,12 +155,12 @@ MODULE LeoPathEditors IN Oberon; (** portable **)	(* eos  *)
 	END ApplyTool;
 
 	PROCEDURE DragPoint* (
-		tool: LeoTools.Tool; fx, fy: INTEGER; mask: Display3.Mask; c: Leonardo.Container;
+		tool: LeoTools.Tool; fx, fy: SIGNED16; mask: Display3.Mask; c: Leonardo.Container;
 		ox, oy: REAL; CONST str: ARRAY OF CHAR; VAR keys: SET
 	);
 		VAR
 			frame: LeoFrames.Frame; fig: Leonardo.Figure; rm: Leonardo.RenderMsg; p: LeoPaths.Point;
-			mkeys, keystate, kstate: SET; x0, y0, x1, y1, len, mx, my: INTEGER; tol: REAL; s: ARRAY 128 OF CHAR;
+			mkeys, keystate, kstate: SET; x0, y0, x1, y1, len, mx, my: SIGNED16; tol: REAL; s: ARRAY 128 OF CHAR;
 	BEGIN
 		frame := tool.frame; fig := frame.obj(Leonardo.Figure);
 		Oberon.FadeCursor(Oberon.Mouse);
@@ -209,7 +209,7 @@ MODULE LeoPathEditors IN Oberon; (** portable **)	(* eos  *)
 		CONST
 			status = " +MM: insert point";
 		VAR
-			tool: LeoTools.Tool; fx, fy, x, y: INTEGER; px, py, tol: REAL; k, keysum, keys: SET; mask: Display3.Mask;
+			tool: LeoTools.Tool; fx, fy, x, y: SIGNED16; px, py, tol: REAL; k, keysum, keys: SET; mask: Display3.Mask;
 			closed, connect: BOOLEAN; pen: LeoPens.Pen; p0, p1, p: LeoPaths.Point; poly: LeoPaths.Segment;
 			fig: Leonardo.Figure; sm: LeoPaths.SplitMsg; recv: Leonardo.Shape;
 	BEGIN
@@ -332,7 +332,7 @@ MODULE LeoPathEditors IN Oberon; (** portable **)	(* eos  *)
 		CONST
 			status = " +MM: insert point";
 		VAR
-			tool: LeoTools.Tool; fx, fy, x, y: INTEGER; px, py, tol: REAL; k, keysum, keys: SET; mask: Display3.Mask;
+			tool: LeoTools.Tool; fx, fy, x, y: SIGNED16; px, py, tol: REAL; k, keysum, keys: SET; mask: Display3.Mask;
 			closed, connect: BOOLEAN; pen: LeoPens.Pen; p0, p1, p: LeoPaths.Point; bez: LeoPaths.Segment;
 			fig: Leonardo.Figure; sm: LeoPaths.SplitMsg; recv: Leonardo.Shape;
 	BEGIN
@@ -453,7 +453,7 @@ MODULE LeoPathEditors IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE TrackArc (frame: LeoFrames.Frame; VAR msg: Oberon.InputMsg);
 		VAR
-			tool: LeoTools.Tool; fx, fy, hx, hy, len, mx, my, l, x, y: INTEGER; x0, y0, x1, y1, px, py: REAL; s: ARRAY 128 OF CHAR;
+			tool: LeoTools.Tool; fx, fy, hx, hy, len, mx, my, l, x, y: SIGNED16; x0, y0, x1, y1, px, py: REAL; s: ARRAY 128 OF CHAR;
 			mask: Display3.Mask; state, keysum, keys: SET; closed: BOOLEAN; pen: LeoPens.Pen; arc: LeoPaths.Arc; fig: Leonardo.Figure;
 	BEGIN
 		IF msg.keys = {} THEN

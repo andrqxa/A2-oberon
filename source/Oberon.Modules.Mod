@@ -11,12 +11,12 @@ TYPE
 	ModuleName* = Modules.Name;
 
 VAR
-	res*: INTEGER;
+	res*: SIGNED16;
 	resMsg*: ARRAY 256 OF CHAR;
 	extension*: ARRAY 8 OF CHAR;
 
 PROCEDURE CreateContext (VAR context: ARRAY OF CHAR; CONST name: ARRAY OF CHAR);
-VAR i: INTEGER;
+VAR i: SIGNED16;
 BEGIN
 	context := "Oberon-"; i := 0;
 	WHILE name[i] # 0X DO context[i + 7] := name[i]; INC (i) END;

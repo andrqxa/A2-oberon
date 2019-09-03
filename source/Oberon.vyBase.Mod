@@ -278,7 +278,7 @@ TYPE
 	(*= Data are objects which allow operations, such as arithmetic or logical operations. These operations should be supported by the handler. The handler should operate quietly, leaving error reports to explicit inspections. *)
 	tStatus* = SET;
 	(*	tFormat= SET;
-	tType=INTEGER;*)
+	tType=SIGNED16;*)
 	tData* = POINTER TO tDataDesc;
 	tDataDesc* = RECORD (ObjDesc)
 		status* : tStatus;
@@ -326,7 +326,7 @@ TYPE
 	tLayout* = POINTER TO tLayoutDesc;
 	tLayoutDesc* = RECORD
 		(*! defunct. replace by type struct *)
-		dim*: INTEGER;
+		dim*: SIGNED16;
 		transposed*: BOOLEAN
 	END;
 	(* abstract layouts *)
@@ -423,8 +423,8 @@ TYPE
 		gadget: Frame	(*= back link. obj.gadget.vyobj= obj *)(*? not used ?*)(*? frame?*)
 	END;
 	FrameDesc* = RECORD (Gadgets.FrameDesc) (*? or use Gadgets.View ? *)
-		(*		defunctx*, defuncty* : INTEGER;       (* cached absolute location, is updated by frame's handler. defunct. use messages *) *)
-		borderW* : INTEGER;
+		(*		defunctx*, defuncty* : SIGNED16;       (* cached absolute location, is updated by frame's handler. defunct. use messages *) *)
+		borderW* : SIGNED16;
 		hotupdate* : BOOLEAN;
 
 		vyobj: FrameObject;     (*= 	allow inheritance form Objjects.
@@ -463,7 +463,7 @@ VAR
 	w* : 	TextsWriter;      	(*= a general writer. Output goes to Log *)
 	werr* : 	TextsWriter;      (* =a writer for exception messages. Output goes to Log *)
 	Log* : Text;      (*= a persistent text. May be mapped to Oberon.Log *)
-	slow*: INTEGER;     	(*= slow motion factor. All deltas are multiplied by this factor *)
+	slow*: SIGNED16;     	(*= slow motion factor. All deltas are multiplied by this factor *)
 	lastmsg-: Objects.ObjMsg;
 	ProcToCall: ProcQPtr;
 	countTask: Oberon.Task;
@@ -471,7 +471,7 @@ VAR
 
 	(* global buffer used for PROCEDURE Show *)
 	showParameter* : vyLinks.Link;
-	parameterCount* : INTEGER;
+	parameterCount* : SIGNED16;
 
 	recurse: BOOLEAN;
 
@@ -1558,7 +1558,7 @@ END Pos;
 (** Abstract variable types *)
 
 (** Enquiry Routines *)
-PROCEDURE Len* (v: tData;      dim: INTEGER): LONGINT;
+PROCEDURE Len* (v: tData;      dim: SIGNED16): LONGINT;
 	(*! should work for any data structure which has a matrix representation *)
 BEGIN
 	IF v IS tVector THEN WITH
@@ -1802,7 +1802,7 @@ BEGIN NEW(l);       l.dim := 2;       l.transposed := FALSE;       l.lens[0] := 
 END MatrixLayout;
 
 PROCEDURE SetArrayLayout* (sizes: ARRAY OF LONGINT;       v: tVector;       VAR total: LONGINT);
-	VAR l: tArray;       i, dim: INTEGER;
+	VAR l: tArray;       i, dim: SIGNED16;
 BEGIN
 	NEW(l);       i := 0;        WHILE ( i < LEN(sizes)) & (sizes[i] # 0) DO INC(i) END;
 	(*ASSERT(i <= vyHost.maxdims);*)
@@ -1824,7 +1824,7 @@ BEGIN
 END Clear;
 (*
 PROCEDURE HexToStr (pre:ARRAY OF CHAR;i: LONGINT; VAR s: ARRAY OF CHAR);
-VAR k, j, c: INTEGER; a: ARRAY 10 OF CHAR;
+VAR k, j, c: SIGNED16; a: ARRAY 10 OF CHAR;
 BEGIN
 j := 0;
 WHILE pre[j]#0X DO s[j]:=pre[j]; INC(j) END;
@@ -1836,7 +1836,7 @@ END HexToStr;
 
 *)
 PROCEDURE HexToStr (pre: ARRAY OF CHAR;     i: LONGINT;      VAR s: ARRAY OF CHAR);
-	VAR k, j, c: INTEGER;      a: ARRAY 10 OF CHAR;
+	VAR k, j, c: SIGNED16;      a: ARRAY 10 OF CHAR;
 BEGIN
 	j := 0;
 	WHILE pre[j] # 0X DO s[j] := pre[j];      INC(j) END;
@@ -1844,8 +1844,8 @@ BEGIN
 	REPEAT DEC(k);      s[j] := a[k];      INC(j)  UNTIL k = 0;      s[j] := "H";      s[j + 1] := 0X
 END HexToStr;
 
-PROCEDURE StringSize (s: ARRAY OF CHAR;      VAR w, h: INTEGER);
-	VAR r: Objects.Object;      p: INTEGER;
+PROCEDURE StringSize (s: ARRAY OF CHAR;      VAR w, h: SIGNED16);
+	VAR r: Objects.Object;      p: SIGNED16;
 BEGIN
 	w := 6;      h := 0;
 	p := 0;
@@ -1859,7 +1859,7 @@ END StringSize;
 (*
 (** Icons *)
 PROCEDURE IconHandler* (F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR objadr:LONGINT;VAR w, h: INTEGER;
+VAR objadr:LONGINT;VAR w, h: SIGNED16;
 BEGIN WITH F:Icons.Icon DO
 IF M IS Objects.LinkMsg THEN WITH M: Objects.LinkMsg DO
 IF (M.id = Objects.set) & (M.name = "Model") & (M.obj#NIL) THEN
@@ -1894,7 +1894,7 @@ END NewIcon;
 *)
 (** Buttons *)
 PROCEDURE ButtonHandler* (F: Objects.Object;      VAR M: Objects.ObjMsg);
-	VAR objadr: ADDRESS;     VAR w, h: INTEGER;
+	VAR objadr: ADDRESS;     VAR w, h: SIGNED16;
 BEGIN WITH F: BasicGadgets.Button DO
 		IF M IS Objects.LinkMsg THEN WITH M: Objects.LinkMsg DO
 				IF (M.id = Objects.set) & (M.name = "Model") & (M.obj # NIL) THEN
@@ -2094,9 +2094,9 @@ BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYSHORT;
 
-PROCEDURE COPYI* (VAR src: ARRAY OF INTEGER;      srcoffs, len: LONGINT;
-VAR dest: ARRAY OF INTEGER;     destoffs: LONGINT);
-CONST sz = SIZEOF(INTEGER);
+PROCEDURE COPYI* (VAR src: ARRAY OF SIGNED16;      srcoffs, len: LONGINT;
+VAR dest: ARRAY OF SIGNED16;     destoffs: LONGINT);
+CONST sz = SIZEOF(SIGNED16);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
 	ASSERT((len >= 0) & (len < (MAX(LONGINT) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
@@ -2133,7 +2133,7 @@ BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
 	ASSERT((len >= 0) & (len < (MAX(LONGINT) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYSET;
-PROCEDURE CallWString* (caller, name, pars: ARRAY OF CHAR;    new: BOOLEAN;    VAR res: INTEGER);
+PROCEDURE CallWString* (caller, name, pars: ARRAY OF CHAR;    new: BOOLEAN;    VAR res: SIGNED16);
 BEGIN
 	(*IF pre[0]=0X THEN vyHost.CallWString(name,pars,new, res);
 	ELSE*)	 vyHost.CallWStringX(name, vy, pars, new, res);
@@ -2160,9 +2160,9 @@ BEGIN  IF obj = NIL THEN RETURN NIL END;
 END GetVFromObj;
 
 
-PROCEDURE Show* (list: vyLinks.Link;    obCount: INTEGER;    as: ARRAY OF CHAR);
+PROCEDURE Show* (list: vyLinks.Link;    obCount: SIGNED16;    as: ARRAY OF CHAR);
 	(*vs 0.0a1	md  05.07.94 *)
-	VAR res: INTEGER;    asCmd: ARRAY 255 OF CHAR;
+	VAR res: SIGNED16;    asCmd: ARRAY 255 OF CHAR;
 BEGIN
 	showParameter := list;    parameterCount := obCount;
 	(*debug $IF debug THEN *)

@@ -89,7 +89,7 @@ VAR
 
 	PROCEDURE TryCommand( ): BOOLEAN;
 	VAR
-		cmd: ARRAY 128 OF CHAR; ci: INTEGER;
+		cmd: ARRAY 128 OF CHAR; ci: SIGNED16;
 		modName, cmdName: Modules.Name;
 
 		PROCEDURE IsCharacter( c: CHAR ): BOOLEAN;

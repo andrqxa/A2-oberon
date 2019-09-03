@@ -76,10 +76,10 @@ TYPE
 TYPE
 	HuffmanCoder = OBJECT
 		TYPE
-			Index = INTEGER;		(* 16-bit integer to keep the table small *)
-			Pattern = INTEGER;
+			Index = SIGNED16;		(* 16-bit integer to keep the table small *)
+			Pattern = SIGNED16;
 			Node = RECORD
-				weight: INTEGER;		(* node weight	*)
+				weight: SIGNED16;		(* node weight	*)
 				pattern: Pattern;		(* node pattern (if weight is even, leaf node)	*)
 				up: Index;				(* next node up the tree	*)
 				down: Index			(* pair of down nodes (if weight is odd, internal node)	*)
@@ -123,11 +123,11 @@ TYPE
 
 
 		PROCEDURE GetPattern(  ): Pattern;
-		VAR  i: INTEGER;  patt: Pattern;
+		VAR  i: SIGNED16;  patt: Pattern;
 		BEGIN
 			patt := 0;
 			FOR i := 0 TO 7 DO
-				IF in.Bit() = 1 THEN  patt := patt + INTEGER(ASH( 1, i ))  END;
+				IF in.Bit() = 1 THEN  patt := patt + SIGNED16(ASH( 1, i ))  END;
 			END;
 			RETURN patt
 		END GetPattern;
@@ -242,10 +242,10 @@ TYPE
 		(*  scale all weights and rebalance the tree,
 		    zero weight nodes are removed from the tree	*)
 		PROCEDURE Scale;
-		VAR  node, prev: Index;  weight: INTEGER;
+		VAR  node, prev: Index;  weight: SIGNED16;
 
-			PROCEDURE Weight( idx: Index ): INTEGER;
-			VAR w: INTEGER;
+			PROCEDURE Weight( idx: Index ): SIGNED16;
+			VAR w: SIGNED16;
 			BEGIN
 				w := table[idx].weight;
 				IF ODD( w ) THEN  RETURN w - 1  ELSE  RETURN w  END

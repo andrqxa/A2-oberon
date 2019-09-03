@@ -396,7 +396,7 @@ MODULE Strings IN Oberon;	(** portable *) (* ejz,  *)
 
 (** Convert the substring beginning at position i in str into an integer. Any leading whitespace characters are ignored.
 	After the conversion i pointes to the first character after the integer. *)
-	PROCEDURE StrToIntPos*(CONST str: ARRAY OF CHAR; VAR val: LONGINT; VAR i: INTEGER);
+	PROCEDURE StrToIntPos*(CONST str: ARRAY OF CHAR; VAR val: LONGINT; VAR i: SIGNED16);
 		VAR noStr: ARRAY 16 OF CHAR;
 	BEGIN
 		WHILE (str[i] # 0X) & (str[i] <= " ") DO
@@ -567,7 +567,7 @@ END RealToFixStr;
 
 (** Convert a string into a real. Precondition: s has a well defined real syntax. Scientific notation with D and E to indicate exponents is allowed. *)
 PROCEDURE StrToReal*(CONST s: ARRAY OF CHAR; VAR r: LONGREAL);
-VAR p: SIZE; e: INTEGER; y, g: LONGREAL; neg, negE: BOOLEAN;
+VAR p: SIZE; e: SIGNED16; y, g: LONGREAL; neg, negE: BOOLEAN;
 BEGIN
 	p := 0;
 	WHILE (s[p] = " ") OR (s[p] = "0") DO INC(p) END;
@@ -651,7 +651,7 @@ END StrToReal;
 
 (** Convert a set to a string *)
 	PROCEDURE SetToStr* (set: SET; VAR str: ARRAY OF CHAR);
-	VAR i, j, k: INTEGER; noFirst: BOOLEAN;
+	VAR i, j, k: SIGNED16; noFirst: BOOLEAN;
 	BEGIN
 		str[0] := "{"; i := 0; k := 1; noFirst := FALSE;
 		WHILE i <= MAX(SET) DO
@@ -737,14 +737,14 @@ END StrToReal;
 	END DateToStr;
 
 (** Returns a month's name (set short to get the abbreviation) *)
-	PROCEDURE MonthToStr* (month: INTEGER; VAR str: ARRAY OF CHAR; short: BOOLEAN);
+	PROCEDURE MonthToStr* (month: SIGNED16; VAR str: ARRAY OF CHAR; short: BOOLEAN);
 	BEGIN
 		month := (month - 1) MOD 12;
 		IF short THEN COPY(sMonthName[month], str) ELSE COPY(lMonthName[month], str) END
 	END MonthToStr;
 
 (** Returns a day's name (set short to get the abbreviation) *)
-	PROCEDURE DayToStr* (day: INTEGER; VAR str: ARRAY OF CHAR; short: BOOLEAN);
+	PROCEDURE DayToStr* (day: SIGNED16; VAR str: ARRAY OF CHAR; short: BOOLEAN);
 	BEGIN
 		IF short THEN COPY(sDayName[day MOD 7], str) ELSE COPY(lDayName[day MOD 7], str) END
 	END DayToStr;
@@ -799,7 +799,7 @@ END StrToReal;
 	PROCEDURE StrToTime*(CONST str: ARRAY OF CHAR; VAR time: LONGINT);
 		VAR
 			h, m, s: LONGINT;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE (str[i] # 0X) & ((str[i] < "0") OR (str[i] > "9")) DO INC(i) END;
@@ -815,7 +815,7 @@ END StrToReal;
 	PROCEDURE StrToDate*(CONST str: ARRAY OF CHAR; VAR date: LONGINT);
 		VAR
 			d, m, y: LONGINT;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE (str[i] # 0X) & ((str[i] < "0") OR (str[i] > "9")) DO INC(i) END;

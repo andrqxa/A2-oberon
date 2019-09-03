@@ -159,19 +159,19 @@ TYPE
 	BCValidationEntry = RECORD
 		HeaderId: CHAR;
 		PlatformId: CHAR;
-		Reserved: INTEGER;
+		Reserved: SIGNED16;
 		IdString: ARRAY 24 OF CHAR;
-		Checksum: INTEGER;
+		Checksum: SIGNED16;
 		KeyBytes: ARRAY 2 OF CHAR;
 	END;
 
 	BCInitialDefaultEntry = RECORD
 		BootIndicator: CHAR;
 		BootMediaType: CHAR;
-		LoadSegment: INTEGER;
+		LoadSegment: SIGNED16;
 		SystemType: CHAR;
 		Unused1: CHAR;
-		SectorCount: INTEGER;
+		SectorCount: SIGNED16;
 		LoadRBA: LONGINT;
 		Unused2: ARRAY 20 OF CHAR;
 	END;
@@ -1239,14 +1239,14 @@ TYPE
 				RETURN ResOk;
 			END WriteImages;
 
-			PROCEDURE CalcChecksum16(CONST buf: ARRAY OF CHAR): INTEGER;
+			PROCEDURE CalcChecksum16(CONST buf: ARRAY OF CHAR): SIGNED16;
 			VAR
 				checksum: LONGINT; i, numWords: SIZE;
 			BEGIN
 				checksum := 0;
 				numWords := LEN(buf) DIV 2;
 				FOR i := 0 TO numWords - 1 DO
-					checksum := (checksum + SYSTEM.VAL(INTEGER, buf[i * 2])) MOD 10000H;
+					checksum := (checksum + SYSTEM.VAL(SIGNED16, buf[i * 2])) MOD 10000H;
 				END;
 				RETURN SHORT(10000H - checksum);
 			END CalcChecksum16;
@@ -1501,7 +1501,7 @@ BEGIN
 	descr.FileStructVer := 1X;
 END InitPSVolumeDescriptor;
 
-PROCEDURE SetBothByteOrder16(x: INTEGER; VAR dst: ARRAY OF CHAR);
+PROCEDURE SetBothByteOrder16(x: SIGNED16; VAR dst: ARRAY OF CHAR);
 BEGIN
 	dst[0] := CHR(x MOD 100H);
 	dst[1] := CHR(x DIV 100H MOD 100H);

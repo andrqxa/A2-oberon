@@ -111,7 +111,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	END Str;
 
 	PROCEDURE WrHex (n: LONGREAL);
-		VAR x, y: LONGINT; i: INTEGER;
+		VAR x, y: LONGINT; i: SIGNED16;
 			a: ARRAY 10 OF CHAR;
 	BEGIN x := entier(n);
 		i := 0; Texts.Write(W, " ");

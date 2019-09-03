@@ -97,7 +97,7 @@ CONST
 VAR
 	a, b, d, e, etemp: LONGREAL;
 	fu, fv, fw, fx: LONGREAL;
-	iter: INTEGER;
+	iter: SIGNED16;
 	p, q, r, tol1, tol2: LONGREAL;
 	u, v, w, x, xm: LONGREAL;
 

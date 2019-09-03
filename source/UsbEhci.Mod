@@ -491,9 +491,9 @@ TYPE
 
 		(**	Return the current frame number.
 		 	The micro-frame number is incremented each micro-frame, i.e. per 125us. There are 8 micro-frames per frame *)
-		PROCEDURE GetFrameNumber*() : INTEGER;
+		PROCEDURE GetFrameNumber*() : SIGNED16;
 		BEGIN
-			RETURN SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, LSH(SYSTEM.GET32(iobase + HcFrIndex), -3)) * {0..10});
+			RETURN SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, LSH(SYSTEM.GET32(iobase + HcFrIndex), -3)) * {0..10});
 		END GetFrameNumber;
 
 		(*

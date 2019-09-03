@@ -30,7 +30,7 @@ TYPE
 		cache-: POINTER TO ARRAY OF ARRAY OF CHAR;
 	END;
 
-	PROCEDURE FillRect*(llx, lly, urx, ury, opacity: INTEGER; VAR data: OpenType.RasterData0);
+	PROCEDURE FillRect*(llx, lly, urx, ury, opacity: SIGNED16; VAR data: OpenType.RasterData0);
 	VAR x,y: LONGINT;
 	BEGIN
 		WITH data: RasterData DO
@@ -225,7 +225,7 @@ TYPE
 		END ReadGlyph;
 
 		PROCEDURE Load(filename : ARRAY OF CHAR; size : SIZE) : BOOLEAN;
-		VAR i, j, k, ngri, splitCount : LONGINT; res : INTEGER;
+		VAR i, j, k, ngri, splitCount : LONGINT; res : SIGNED16;
 			ascent, descent : LONGINT;
 		BEGIN
 

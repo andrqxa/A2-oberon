@@ -175,7 +175,7 @@ VAR
 	(*vs 0.0a1   md  14.02.95 *)
 	VAR
 
-		xr, yr, epsx, epsy: LONGREAL;  pos: LONGINT;  gesture: INTEGER;
+		xr, yr, epsx, epsy: LONGREAL;  pos: LONGINT;  gesture: SIGNED16;
 	BEGIN
 		(*
 	Out.Ln; Out.String("edit");
@@ -201,7 +201,7 @@ VAR
 	END Edit;
 
 	PROCEDURE Responsible( editor: tView;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;  xr, yr, epsx, epsy: LONGREAL;
+	VAR priority: SIGNED16;  xr, yr, epsx, epsy: LONGREAL;
 
 	BEGIN
 		IF event.gesture = vyEvents.EvtIdent THEN priority := vyEvents.PrioHigh
@@ -218,7 +218,7 @@ VAR
 	END Responsible;
 
 	PROCEDURE Recall( layer: tView );
-	VAR i: LONGINT;  len: LONGINT;  x0, y0, x1, y1: INTEGER;
+	VAR i: LONGINT;  len: LONGINT;  x0, y0, x1, y1: SIGNED16;
 	BEGIN
 		IF layer.o = NIL THEN RETURN END;
 		len := vyLongrealVec.Len( layer.o.x );
@@ -274,7 +274,7 @@ VAR
 	END StoreV0;
 
 	PROCEDURE LoadV0( obj: tView;  VAR M: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( M.R, version );  vyPort.LayerHandler( obj, M );  Gadgets.ReadRef( M.R, obj.lib, objsub );
 		IF objsub # NIL THEN obj.o := objsub( tObject ) END
@@ -392,7 +392,7 @@ VAR
 	END ObjectCopy;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR version: INTEGER;  objsub: Objects.Object;
+	VAR version: SIGNED16;  objsub: Objects.Object;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN

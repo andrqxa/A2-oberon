@@ -78,7 +78,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 	(* load Oberon picture from file *)
 	PROCEDURE LoadPict (img: Raster.Image; VAR fname: ARRAY OF CHAR; VAR done: BOOLEAN);
 		VAR
-			file: Files.File; r: Files.Reader; id, w, h, depth: INTEGER; gen: ARRAY 64 OF CHAR; i, n: LONGINT;
+			file: Files.File; r: Files.Reader; id, w, h, depth: SIGNED16; gen: ARRAY 64 OF CHAR; i, n: LONGINT;
 			adr, a: ADDRESS; pal: Raster.Palette; red, green, blue, byte: CHAR; fmt: Raster.Format;
 	BEGIN
 		file := Files.Old(fname);
@@ -148,7 +148,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 	PROCEDURE StorePict (img: Raster.Image; VAR fname: ARRAY OF CHAR; VAR done: BOOLEAN);
 		TYPE Bytes129 = ARRAY 129 OF CHAR;
 		VAR
-			file: Files.File; w: Files.Writer; pal: Raster.Palette; i, y, inc, x: SIZE; fmt: Raster.Format; depth: INTEGER;
+			file: Files.File; w: Files.Writer; pal: Raster.Palette; i, y, inc, x: SIZE; fmt: Raster.Format; depth: SIGNED16;
 			pix: POINTER TO ARRAY OF CHAR; buf: ARRAY 129 OF SIGNED8;
 			SrcCopy: Raster.Mode;
 	BEGIN
@@ -157,7 +157,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 			Raster.InitMode(SrcCopy, Raster.srcCopy);
 			Files.OpenWriter(w, file, 0);
 			w.RawInt(-4093);	(* Pictures.PictFileId *)
-			w.RawInt(INTEGER(img.width)); w.RawInt(INTEGER(img.height));
+			w.RawInt(SIGNED16(img.width)); w.RawInt(SIGNED16(img.height));
 
 			(* find out which format to use *)
 			pal := img.fmt.pal;
@@ -258,7 +258,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 
 	(** create image from Oberon pattern (format=A1) **)
 	PROCEDURE PatternToImage* (pat: ADDRESS): Raster.Image;
-		VAR w, h: INTEGER; byte: CHAR; img: Raster.Image;
+		VAR w, h: SIGNED16; byte: CHAR; img: Raster.Image;
 	BEGIN
 		ASSERT(pat # 0, 100);
 		IF (1 <= pat) & (pat <= 8) THEN RETURN PrntPat[pat] END;

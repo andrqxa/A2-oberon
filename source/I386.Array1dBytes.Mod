@@ -411,7 +411,7 @@ Array1dBytes.Test ~
 		END;
 	END FillCharPat;
 
-	PROCEDURE FillInt( VAR a: ARRAY OF INTEGER;  i: INTEGER );
+	PROCEDURE FillInt( VAR a: ARRAY OF SIGNED16;  i: SIGNED16 );
 	CODE {SYSTEM.i386}
 
 		MOV	EDI, a[EBP] (* address of array in destination index*)
@@ -423,7 +423,7 @@ Array1dBytes.Test ~
 		STOSW (* store word in ax to destination *)
 	END FillInt;
 
-	PROCEDURE FillInt2( VAR a: ARRAY OF INTEGER;  i: INTEGER );   (* nearly same speed as FillInt *)
+	PROCEDURE FillInt2( VAR a: ARRAY OF SIGNED16;  i: SIGNED16 );   (* nearly same speed as FillInt *)
 	BEGIN
 		FillW( ADDRESSOF( a ), SYSTEM.VAL( Word, i ), LEN( a ) );
 	END FillInt2;
@@ -563,10 +563,10 @@ TYPE
 
 		PROCEDURE TFill;
 		CONST maxtries = 1000;  maxlen = 100000;
-		VAR ints: POINTER TO ARRAY OF INTEGER;
+		VAR ints: POINTER TO ARRAY OF SIGNED16;
 			longreals: POINTER TO ARRAY OF LONGREAL;
 			chars: POINTER TO ARRAY OF CHAR;
-			int: INTEGER;  r: LONGREAL;
+			int: SIGNED16;  r: LONGREAL;
 		BEGIN
 			(*
 			NEW( longreals, 256 );  longreal := 1.23456789E-20;

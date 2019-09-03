@@ -16,7 +16,7 @@ VAR
 	w: Texts.Writer;
 
 PROCEDURE GetTime(server: ARRAY OF CHAR; VAR time: ARRAY OF CHAR);
-VAR s: NetSystem.Socket; res, remport: INTEGER; adr, remadr: NetSystem.IPAdr; len, target, try: LONGINT;
+VAR s: NetSystem.Socket; res, remport: SIGNED16; adr, remadr: NetSystem.IPAdr; len, target, try: LONGINT;
 BEGIN
 	time[0] := 0X;
 	NetSystem.OpenSocket(s, NetSystem.anyport, res);

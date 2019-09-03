@@ -141,7 +141,7 @@ TYPE
 			BEGIN
 				ASSERT( len <= BlockSize );  length := len;
 				FOR i := 0 TO length - 1 DO  sbuf[i] := buf[i];  sbuf[i+length] := buf[i]  END;
-				FOR i := 0 TO length - 1 DO  rotation[i] := INTEGER( i )  END;
+				FOR i := 0 TO length - 1 DO  rotation[i] := SIGNED16( i )  END;
 				SortR( 0, length - 1 );
 				(* find index of the original row *)
 				index := 0;  WHILE rotation[index] # 0 DO  INC( index )  END;
@@ -161,7 +161,7 @@ TYPE
 		VAR
 			mtf: MTF;
 			f, l: ARRAY BlockSize OF CHAR;
-			lc, fc: ARRAY BlockSize OF INTEGER;
+			lc, fc: ARRAY BlockSize OF SIGNED16;
 
 			PROCEDURE &New*;
 			BEGIN
@@ -202,7 +202,7 @@ TYPE
 			PROCEDURE DecodeBlock*( VAR buf: ARRAY OF CHAR; len, index: SIZE );
 			VAR
 				i, j: SIZE; n: LONGINT;  ch: CHAR;
-				xn: ARRAY 256 OF INTEGER;
+				xn: ARRAY 256 OF SIGNED16;
 			BEGIN
 				ASSERT( len <= BlockSize );
 				mtf.Decode( buf, len );

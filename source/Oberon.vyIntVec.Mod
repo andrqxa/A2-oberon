@@ -29,14 +29,14 @@ IMPORT Files, Objects, vyBase,  (*vyHost, *) vyHostTexts, vyinteger := vyInteger
 CONST
 	idversion* = "vvyIntVec 0.0a4";   (* may be maintained or changed by tools *)
 TYPE
-	(* INTEGER *)
-	index* = LONGINT;  integer* = INTEGER;
+	(* SIGNED16 *)
+	index* = LONGINT;  integer* = SIGNED16;
 
 	tVector* = POINTER TO tVectorDesc;
 	tVectorDesc* = RECORD (vyBase.tVectorDesc) END;
 	tINTEGER* = POINTER TO tINTEGERDesc;
 	tINTEGERDesc* = RECORD (vyBase.tDataDesc)
-		i*: INTEGER
+		i*: SIGNED16
 	END;
 	tMinMaxCache = POINTER TO tMinMaxCacheDesc;
 	tMinMaxCacheDesc = RECORD (vyBase.tCacheDesc)
@@ -51,19 +51,19 @@ TYPE
 
 	tBuf* = POINTER TO tBufDesc;
 	tBufDesc* = RECORD (vyBase.tBufDesc)
-		data: POINTER TO ARRAY OF INTEGER
+		data: POINTER TO ARRAY OF SIGNED16
 	END;
-	ArrayOp1Function* = PROCEDURE ( VAR arg: ARRAY OF INTEGER );
-	ArrayOp2Function* = PROCEDURE ( VAR arg1, arg2: ARRAY OF INTEGER );
+	ArrayOp1Function* = PROCEDURE ( VAR arg: ARRAY OF SIGNED16 );
+	ArrayOp2Function* = PROCEDURE ( VAR arg1, arg2: ARRAY OF SIGNED16 );
 
 	(*
-	tINTEGER128 = ARRAY 128 OF INTEGER;    	(*generic small chunk *)
+	tINTEGER128 = ARRAY 128 OF SIGNED16;    	(*generic small chunk *)
 	tINTEGER128Chunk = POINTER TO tINTEGER128ChunkDesc;
 	tINTEGER128ChunkDesc = RECORD (tBufDesc) data: tINTEGER128 END;
-	tINTEGER1024 = ARRAY 1024 OF INTEGER;    	(*for time series people*)
+	tINTEGER1024 = ARRAY 1024 OF SIGNED16;    	(*for time series people*)
 	tINTEGER1024Chunk = POINTER TO tINTEGER1024ChunkDesc;
 	tINTEGER1024ChunkDesc = RECORD (tBufDesc) data: tINTEGER1024 END;
-	tINTEGER8192 = ARRAY 8192 OF INTEGER;    	(*for simulations*)
+	tINTEGER8192 = ARRAY 8192 OF SIGNED16;    	(*for simulations*)
 	tINTEGER8192Chunk = POINTER TO tINTEGER8192ChunkDesc;
 	tINTEGER8192ChunkDesc = RECORD (tBufDesc) data: tINTEGER8192 END;
 	*)
@@ -77,7 +77,7 @@ TYPE
 	PROCEDURE generic (ch: tBuf;     len: LONGINT);
 	BEGIN NEW(ch.data,len); ch.str := vyBase.dynintarray;
 	vyBase.GenericCatBuf(ch, len, size, first, last);
-	ch.mean := 0;     ch.ssq := invalSsq;     ch.min := MAX(INTEGER);     ch.max := MIN(INTEGER);
+	ch.mean := 0;     ch.ssq := invalSsq;     ch.min := MAX(SIGNED16);     ch.max := MIN(SIGNED16);
 	ch.nans:=invalNrNans;
 	END generic;
 
@@ -109,7 +109,7 @@ TYPE
 	BEGIN NEW (o); o.handle := Handler; Objects.NewObj := o
 	END GenIntegerObject;
 
-	PROCEDURE NewIntegerObject* (i: INTEGER): tINTEGER;
+	PROCEDURE NewIntegerObject* (i: SIGNED16): tINTEGER;
 	VAR o: tINTEGER;
 	BEGIN
 	GenIntegerObject;
@@ -405,7 +405,7 @@ TYPE
 		new := New( model.nrData );  new.Layout := vyBase.CloneLayout( model );  RETURN new
 	END NewAlikeVector;
 
-	PROCEDURE Append*( x: INTEGER;  v: vyBase.tVector );
+	PROCEDURE Append*( x: SIGNED16;  v: vyBase.tVector );
 	(* Add a data point to a chunk. Append new chunk if necessary *)
 	(*! defensive programming *)
 	VAR l: LONGINT;  chunk: tBuf;
@@ -422,7 +422,7 @@ TYPE
 		INC( v.nrData )
 	END Append;
 
-	PROCEDURE GetMinMax*( v: vyBase.tVector;  VAR min, max: INTEGER;  VAR nrNaNs: LONGINT );
+	PROCEDURE GetMinMax*( v: vyBase.tVector;  VAR min, max: SIGNED16;  VAR nrNaNs: LONGINT );
 	VAR buf: vyBase.tBuf;  mmCache: tMinMaxCache;  cache: vyBase.tCache;
 	BEGIN
 		min := MAX( integer );  max := MIN( integer );  buf := v.buf;  nrNaNs := 0;
@@ -484,7 +484,7 @@ TYPE
 		END  (*WITH*)
 	END GetMeanSsq;
 
-	PROCEDURE Get*( v: vyBase.tVector;  pos: LONGINT ): INTEGER;
+	PROCEDURE Get*( v: vyBase.tVector;  pos: LONGINT ): SIGNED16;
 	VAR chunk: vyBase.tBuf;  loc: LONGINT;
 	BEGIN
 		vyBase.Loc( pos, v, chunk, loc );
@@ -493,7 +493,7 @@ TYPE
 		RETURN chunk( tBuf ).data[loc]
 	END Get;
 
-	PROCEDURE Set*( val: INTEGER;  v: vyBase.tVector;  pos: LONGINT );
+	PROCEDURE Set*( val: SIGNED16;  v: vyBase.tVector;  pos: LONGINT );
 	VAR chunk: vyBase.tBuf;  loc: LONGINT;
 	BEGIN
 		IF pos >= v.nrData THEN vyBase.MarkUsed( pos + 1, v ) END;
@@ -535,13 +535,13 @@ TYPE
 		END  (*WITH*)
 	END SetIndexed;
 
-	PROCEDURE Fill*( v: vyBase.tVector;  val: INTEGER;  offs, count: LONGINT );
+	PROCEDURE Fill*( v: vyBase.tVector;  val: SIGNED16;  offs, count: LONGINT );
 	VAR i: LONGINT;
 	BEGIN
 		FOR i := offs TO offs + count - 1 DO Set( val, v, i ) END
 	END Fill;
 
-	PROCEDURE NewFilledNamed*( count: LONGINT;  val: INTEGER;  name: ARRAY OF CHAR ): tVector;
+	PROCEDURE NewFilledNamed*( count: LONGINT;  val: SIGNED16;  name: ARRAY OF CHAR ): tVector;
 	VAR v: tVector;
 	BEGIN
 		v := New( count );  Fill( v, val, 0, count );  vyName.Register( vyName.NameBase, v, name );  RETURN v
@@ -572,7 +572,7 @@ TYPE
 		FlushVecCaches( dest );   (*! remove. keep consistent on per buffer basis *)
 	END CopyData;
 
-	PROCEDURE CopyToVec*( VAR A: ARRAY OF INTEGER;  v: vyBase.tVector;  len: LONGINT;  srcoffs, destoffs: LONGINT );
+	PROCEDURE CopyToVec*( VAR A: ARRAY OF SIGNED16;  v: vyBase.tVector;  len: LONGINT;  srcoffs, destoffs: LONGINT );
 	VAR i, j, lim: LONGINT;
 	BEGIN
 		ASSERT ( LEN( A ) <= v.nrData );
@@ -586,7 +586,7 @@ TYPE
 		WHILE i < lim DO Set( A[i], v, j );  INC( i );  INC( j ) END
 	END CopyToVec;
 
-	PROCEDURE CopyToArray*( v: vyBase.tVector;  VAR A: ARRAY OF INTEGER );
+	PROCEDURE CopyToArray*( v: vyBase.tVector;  VAR A: ARRAY OF SIGNED16 );
 	VAR offs: LONGINT;  buf: vyBase.tBuf;
 	BEGIN
 		offs := 0;
@@ -601,7 +601,7 @@ TYPE
 
 	PROCEDURE DoArrayOp1*( v: vyBase.tVector;  op1: ArrayOp1Function );
 	VAR v1: tVector;
-		a: POINTER TO ARRAY OF INTEGER;
+		a: POINTER TO ARRAY OF SIGNED16;
 	BEGIN
 		ASSERT ( v IS tVector, 100 );
 		IF v.buf.next = NIL THEN v1 := v( tVector );  op1( v1.buf( tBuf ).data^ )
@@ -613,7 +613,7 @@ TYPE
 	PROCEDURE DoArrayOp2*( v1, v2: vyBase.tVector;  op2: ArrayOp2Function );
 	(*!Hack*)
 
-	VAR a, b: POINTER TO ARRAY OF INTEGER;
+	VAR a, b: POINTER TO ARRAY OF SIGNED16;
 
 	BEGIN
 		ASSERT ( v1 IS tVector, 100 );
@@ -655,10 +655,10 @@ TYPE
 	(* d is really a NEW Chunk, i.e. memory is really allocated, be careful with iterative techinques,
 	one could think of changing s1,s2 *)
 
-	VAR i1, i2, length, i: LONGINT;  c1, c2, d: tBuf;  done, c1ended, c2ended, c2used, sorted: BOOLEAN;  r1, r2, lastr: INTEGER;  cinter: vyBase.tBuf;
+	VAR i1, i2, length, i: LONGINT;  c1, c2, d: tBuf;  done, c1ended, c2ended, c2used, sorted: BOOLEAN;  r1, r2, lastr: SIGNED16;  cinter: vyBase.tBuf;
 		v, v1: tVector;
 
-		PROCEDURE GetNextInteger( VAR c: tBuf;  VAR i: LONGINT;  VAR r: INTEGER ): BOOLEAN;
+		PROCEDURE GetNextInteger( VAR c: tBuf;  VAR i: LONGINT;  VAR r: SIGNED16 ): BOOLEAN;
 		VAR ctemp: tBuf;
 		BEGIN
 			IF c = NIL THEN RETURN FALSE END;
@@ -672,7 +672,7 @@ TYPE
 			RETURN TRUE
 		END GetNextInteger;
 
-		PROCEDURE store( r: INTEGER ): BOOLEAN;
+		PROCEDURE store( r: SIGNED16 ): BOOLEAN;
 		BEGIN
 			v.buf := d;  Append( r, v );
 			IF lastr <= r THEN lastr := r;  RETURN TRUE ELSE lastr := r;  RETURN FALSE END
@@ -681,7 +681,7 @@ TYPE
 	BEGIN
 		i1 := 0;  i2 := 0;  c1 := s1;  c2 := s2;  done := FALSE;  sorted := TRUE;
 		length := vyBase.GetUsedEntries( c1 ) + vyBase.GetUsedEntries( c2 );  d := NewBufs( length );
-		c1ended := ~GetNextInteger( c1, i1, r1 );  c2ended := ~GetNextInteger( c2, i2, r2 );  lastr := MIN( INTEGER );  NEW( v );
+		c1ended := ~GetNextInteger( c1, i1, r1 );  c2ended := ~GetNextInteger( c2, i2, r2 );  lastr := MIN( SIGNED16 );  NEW( v );
 		REPEAT
 			IF c1ended THEN
 				IF c2ended THEN done := TRUE ELSE sorted := (store( r2 ) & sorted);  c2ended := ~GetNextInteger( c2, i2, r2 ) END
@@ -695,7 +695,7 @@ TYPE
 		IF ~sorted THEN RETURN FALSE END;
 		c1 := s1;  c2 := s2;  c2used := FALSE;
 		WHILE (c1 # NIL ) DO
-			(* c1.min := MAX(INTEGER);   c1.max := MIN(INTEGER); *)
+			(* c1.min := MAX(SIGNED16);   c1.max := MIN(SIGNED16); *)
 			c1.cache := NIL;  c1.usedentries := 0;
 			IF vyBase.NextBuf( c1 ) = NIL THEN
 				IF ~c2used THEN c1.next := c2;  c2used := TRUE END
@@ -718,9 +718,9 @@ TYPE
 	one could think of changing s1,s2 *)
 
 	VAR i1, i2, r1id, r2id, length, i: LONGINT;  c1, c2, d: tBuf;  c1id, c2id, did: vyLongintVec.tBuf;
-		done, c1ended, c2ended, c2used, sorted: BOOLEAN;  r1, r2, lastr: INTEGER;  cinter: vyBase.tBuf;  v, v1: tVector;
+		done, c1ended, c2ended, c2used, sorted: BOOLEAN;  r1, r2, lastr: SIGNED16;  cinter: vyBase.tBuf;  v, v1: tVector;
 
-		PROCEDURE GetNextInteger( VAR c: tBuf;  VAR cid: vyLongintVec.tBuf;  VAR i: LONGINT;  VAR r: INTEGER;  VAR rid: LONGINT ): BOOLEAN;
+		PROCEDURE GetNextInteger( VAR c: tBuf;  VAR cid: vyLongintVec.tBuf;  VAR i: LONGINT;  VAR r: SIGNED16;  VAR rid: LONGINT ): BOOLEAN;
 		VAR ctemp: tBuf;  ctempid: vyLongintVec.tBuf;
 		BEGIN
 			IF c = NIL THEN RETURN FALSE END;
@@ -738,7 +738,7 @@ TYPE
 			RETURN TRUE
 		END GetNextInteger;
 
-		PROCEDURE store( r: INTEGER;  rid: LONGINT ): BOOLEAN;
+		PROCEDURE store( r: SIGNED16;  rid: LONGINT ): BOOLEAN;
 		BEGIN
 			v.buf := d;  Append( r, v );  v.buf := did;  vyLongintVec.Append( rid, v );
 			IF lastr <= r THEN lastr := r;  RETURN TRUE ELSE lastr := r;  RETURN FALSE END
@@ -748,7 +748,7 @@ TYPE
 		i1 := 0;  i2 := 0;  c1 := s1;  c2 := s2;  c1id := s1id;  c2id := s2id;  done := FALSE;  sorted := TRUE;
 		length := vyBase.GetUsedEntries( c1 ) + vyBase.GetUsedEntries( c2 );  d := NewBufs( length );
 		did := vyLongintVec.NewBufs( length );  c1ended := ~GetNextInteger( c1, c1id, i1, r1, r1id );
-		c2ended := ~GetNextInteger( c2, c2id, i2, r2, r2id );  lastr := MIN( INTEGER );  NEW( v );
+		c2ended := ~GetNextInteger( c2, c2id, i2, r2, r2id );  lastr := MIN( SIGNED16 );  NEW( v );
 		REPEAT
 			IF c1ended THEN
 				IF c2ended THEN done := TRUE

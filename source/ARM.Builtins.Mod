@@ -22,9 +22,9 @@ TYPE
 	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, result, dummy); RETURN SIGNED8(result)
 	END DivS8;
 
-	PROCEDURE DivS16*(left, right: INTEGER): INTEGER;
+	PROCEDURE DivS16*(left, right: SIGNED16): SIGNED16;
 	VAR result, dummy: LONGINT;
-	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, result, dummy); RETURN INTEGER(result)
+	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, result, dummy); RETURN SIGNED16(result)
 	END DivS16;
 
 	PROCEDURE DivS32*(left, right: LONGINT): LONGINT;
@@ -47,9 +47,9 @@ TYPE
 	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, dummy, result); RETURN SIGNED8(result)
 	END ModS8;
 
-	PROCEDURE ModS16*(left, right: INTEGER): INTEGER;
+	PROCEDURE ModS16*(left, right: SIGNED16): SIGNED16;
 	VAR result, dummy: LONGINT;
-	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, dummy, result); RETURN INTEGER(result)
+	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, dummy, result); RETURN SIGNED16(result)
 	END ModS16;
 
 	PROCEDURE ModS32*(left, right: LONGINT): LONGINT;
@@ -409,13 +409,13 @@ TYPE
 	END ConvF64S32;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE ConvF64S16*(x: INTEGER): FLOAT64;
+	PROCEDURE ConvF64S16*(x: SIGNED16): FLOAT64;
 	VAR flt: FLOAT64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Float(x, SYSTEM.VAL(FPE64.Float64,flt)); RETURN flt
 	END ConvF64S16;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE ConvF32S16*(x: INTEGER): FLOAT32;
+	PROCEDURE ConvF32S16*(x: SIGNED16): FLOAT32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		RETURN ConvF32S32(LONGINT(x))
 	END ConvF32S16;
@@ -423,13 +423,13 @@ TYPE
 	(* only called when no FPU32 is available *)
 	PROCEDURE ConvF32S8*(x: SIGNED8): FLOAT32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
-		RETURN ConvF32S16(INTEGER(x))
+		RETURN ConvF32S16(SIGNED16(x))
 	END ConvF32S8;
 
 	(* only called when no FPU64 is available *)
 	PROCEDURE ConvF64S8*(x: SIGNED8): FLOAT64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
-		RETURN ConvF64S16(INTEGER(x))
+		RETURN ConvF64S16(SIGNED16(x))
 	END ConvF64S8;
 
 	(* only called when no FPU32 is available *)

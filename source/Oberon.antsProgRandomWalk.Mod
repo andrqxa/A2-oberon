@@ -32,7 +32,7 @@ TYPE
 		v3: vyBase.Object;
 		v2: vyBase.Object;
 		v1: vyBase.Object;
-		modeltype: INTEGER (* 0: Linie, 1: Gitter, 2: Wabe *)
+		modeltype: SIGNED16 (* 0: Linie, 1: Gitter, 2: Wabe *)
 	END;
 
 	function* = PROCEDURE ( VAR v1, v2, v3: LONGREAL );
@@ -51,7 +51,7 @@ VAR
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  o: tModel );
-	VAR version: INTEGER;  ref: Objects.Object;
+	VAR version: SIGNED16;  ref: Objects.Object;
 	BEGIN
 		Files.ReadInt( R, version );
 		(*Load*)

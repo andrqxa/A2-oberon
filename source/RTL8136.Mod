@@ -363,15 +363,15 @@ TYPE
 		rxPacktes: HUGEINT;
 		txErrors: HUGEINT;
 		rxErrors: LONGINT;
-		rxMissed: INTEGER;
-		alignErrors: INTEGER;
+		rxMissed: SIGNED16;
+		alignErrors: SIGNED16;
 		txOneCollision: LONGINT;
 		txMultiCollision: LONGINT;
 		rxUnicast: HUGEINT;
 		rxBroadcast: HUGEINT;
 		rxMulticast: LONGINT;
-		txAborted: INTEGER;
-		txUnderrun: INTEGER;
+		txAborted: SIGNED16;
+		txUnderrun: SIGNED16;
 	END;
 
 	(* LinkDevice: interface to Bluebottle *)
@@ -2536,7 +2536,7 @@ TYPE
 			(* set source mac address (6 bytes @ offset 6 of eth frame) *)
 			S.MOVE(ADDRESSOF(dev.local[0]), bufBase + 6, 6);
 			(* set upper layer type, bring type from host to network byte order *)
-			S.PUT16(bufBase + 12, ROT(S.VAL(INTEGER, SHORT(type)), 8));
+			S.PUT16(bufBase + 12, ROT(S.VAL(SIGNED16, SHORT(type)), 8));
 
 			offset := 14; (* eth header has 14 bytes *)
 			(* move layer 3 and layer 4 headers, data *)
@@ -2622,7 +2622,7 @@ TYPE
 
 		PROCEDURE Write16(reg: LONGINT; val: SET);
 		BEGIN
-			S.PUT16(base+reg,INTEGER(S.VAL(LONGINT,val)));
+			S.PUT16(base+reg,SIGNED16(S.VAL(LONGINT,val)));
 			(*KernelLog.String("W16 0x"); KernelLog.Hex(reg,-2);
 			KernelLog.String(" 0x"); KernelLog.Hex(S.VAL(LONGINT,val),-4);
 			KernelLog.Ln;*)

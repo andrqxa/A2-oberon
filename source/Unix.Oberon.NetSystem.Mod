@@ -327,8 +327,8 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 	END Available;
 
 
-	PROCEDURE OpenConnection* ( VAR conn: Connection; locPort: INTEGER; remIP: IPAdr; remPort: INTEGER;
-													VAR res: INTEGER );
+	PROCEDURE OpenConnection* ( VAR conn: Connection; locPort: SIGNED16; remIP: IPAdr; remPort: SIGNED16;
+													VAR res: SIGNED16 );
 	VAR r: LONGINT;
 	BEGIN
 		IF remPort = anyport THEN remIP := anyIP END;
@@ -337,8 +337,8 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		IF r = TCP.Ok THEN res := done  ELSE  res := error  END
 	END OpenConnection;
 
-	PROCEDURE AsyncOpenConnection* (  VAR conn: Connection; locPort: INTEGER; remIP: IPAdr; remPort: INTEGER;
-																 VAR res: INTEGER );
+	PROCEDURE AsyncOpenConnection* (  VAR conn: Connection; locPort: SIGNED16; remIP: IPAdr; remPort: SIGNED16;
+																 VAR res: SIGNED16 );
 	BEGIN
 		OpenConnection( conn, locPort, remIP, remPort, res )
 	END AsyncOpenConnection;
@@ -354,14 +354,14 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		RETURN (conn.state = listening) & conn.Requested()
 	END Requested;
 
-	PROCEDURE Accept* ( conn: Connection; VAR newC: Connection; VAR res: INTEGER );
+	PROCEDURE Accept* ( conn: Connection; VAR newC: Connection; VAR res: SIGNED16 );
 	VAR r: LONGINT;
 	BEGIN
 		conn.Accept( newC, r );
 		IF r = TCP.Ok THEN res := done  ELSE  res := error  END
 	END Accept;
 
-	PROCEDURE State* (conn: Connection): INTEGER;
+	PROCEDURE State* (conn: Connection): SIGNED16;
 	BEGIN
 		CASE conn.state OF
 		| TCP.Closed:		RETURN closed
@@ -372,7 +372,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		END
 	END State;
 
-	PROCEDURE GetPartner* (conn:Connection; VAR remIP: IPAdr; VAR remPort: INTEGER);
+	PROCEDURE GetPartner* (conn:Connection; VAR remIP: IPAdr; VAR remPort: SIGNED16);
 	BEGIN
 		remIP := conn.fip;
 		remPort := SHORT( conn.fport )
@@ -398,7 +398,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		conn.Receive( S.VAL( Bytes, b ), 0, 1, 1, l, r );
 	END ReadBool;
 
-	PROCEDURE ReadInt* ( conn: Connection; VAR x: INTEGER );
+	PROCEDURE ReadInt* ( conn: Connection; VAR x: SIGNED16 );
 	VAR buf: ARRAY 4 OF CHAR; len: SIZE; res: WORD;
 	BEGIN
 		conn.Receive( buf, 0, 2, 2, len, res );
@@ -460,7 +460,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		conn.Send( S.VAL( Bytes, b ), 0, 1, TRUE, r )
 	END WriteBool;
 
-	PROCEDURE WriteInt* (conn: Connection; x: INTEGER);
+	PROCEDURE WriteInt* (conn: Connection; x: SIGNED16);
 	VAR buf: ARRAY 2 OF CHAR; r: LONGINT;
 	BEGIN
 		buf[0] := CHR(x DIV 100H MOD 100H);
@@ -492,7 +492,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 (******************************** UDP **************************************)
 
 
-	PROCEDURE OpenSocket* ( VAR soc: Socket; locPort: INTEGER; VAR res: INTEGER );
+	PROCEDURE OpenSocket* ( VAR soc: Socket; locPort: SIGNED16; VAR res: SIGNED16 );
 	VAR r: LONGINT;
 	BEGIN
 		NEW( soc, LONG( locPort ) MOD 10000H, r );
@@ -509,13 +509,13 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 		RETURN 0
 	END AvailableDG;
 
-	PROCEDURE SendDG* ( soc: Socket; remIP: IPAdr; remport: INTEGER; pos, len: LONGINT; CONST buf: ARRAY OF S.BYTE );
+	PROCEDURE SendDG* ( soc: Socket; remIP: IPAdr; remport: SIGNED16; pos, len: LONGINT; CONST buf: ARRAY OF S.BYTE );
 	VAR res: WORD;
 	BEGIN
 		soc.Send( remIP, LONG(remport) MOD 10000H, S.VAL( Bytes, buf ), pos, len, res )
 	END SendDG;
 
-	PROCEDURE ReceiveDG* ( soc: Socket; VAR remIP: IPAdr; VAR remport: INTEGER;
+	PROCEDURE ReceiveDG* ( soc: Socket; VAR remIP: IPAdr; VAR remport: SIGNED16;
 							pos: LONGINT; VAR len: LONGINT; VAR buf: ARRAY OF S.BYTE );
 	VAR res, port: LONGINT; length: SIZE;
 	BEGIN
@@ -527,7 +527,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 
 	(** Write 2 bytes in network byte ordering to buf[pos]. *)
 
-	PROCEDURE PutInt* (VAR buf: ARRAY OF S.BYTE; pos: INTEGER; x: INTEGER);
+	PROCEDURE PutInt* (VAR buf: ARRAY OF S.BYTE; pos: SIGNED16; x: SIGNED16);
 	BEGIN
 		buf[pos] := CHR(x DIV 100H MOD 100H);
 		buf[pos+1] := CHR(x MOD 100H)
@@ -535,7 +535,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 
 	(** Write 4 bytes in network byte ordering to buf[pos]. *)
 
-	PROCEDURE PutLInt* (VAR buf: ARRAY OF S.BYTE; pos: INTEGER; x: LONGINT);
+	PROCEDURE PutLInt* (VAR buf: ARRAY OF S.BYTE; pos: SIGNED16; x: LONGINT);
 	BEGIN
 		buf[pos] := CHR(x DIV 1000000H MOD 100H);
 		buf[pos+1] := CHR(x DIV 10000H MOD 100H);
@@ -545,7 +545,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 
 	(** Read 2 bytes in network byte ordering from buf[pos]. *)
 
-	PROCEDURE GetInt* (CONST buf: ARRAY OF S.BYTE; pos: INTEGER; VAR x: INTEGER);
+	PROCEDURE GetInt* (CONST buf: ARRAY OF S.BYTE; pos: SIGNED16; VAR x: SIGNED16);
 	BEGIN
 		x := ORD(buf[pos])*100H +
 			ORD(buf[pos+1])
@@ -553,7 +553,7 @@ IMPORT S := SYSTEM, IP IN A2, DNS := DNS IN A2, TCP := TCP IN A2,  UDP := UDP IN
 
 	(** Read 4 bytes in network byte ordering from buf[pos]. *)
 
-	PROCEDURE GetLInt* (CONST buf: ARRAY OF S.BYTE; pos: INTEGER; VAR x: LONGINT);
+	PROCEDURE GetLInt* (CONST buf: ARRAY OF S.BYTE; pos: SIGNED16; VAR x: LONGINT);
 	BEGIN
 		x := ORD( buf[pos] )*1000000H +
 			ORD( buf[pos+1] )*10000H +

@@ -76,7 +76,7 @@ VAR
 
 
 	PROCEDURE GetCipherList*( VAR list: ARRAY OF CHAR );
-	VAR n: INTEGER;
+	VAR n: SIGNED16;
 		x: ARRAY 64 OF CHAR;
 	BEGIN
 		IF buf = NIL THEN  buf := GetConfigBuffer()  END;
@@ -94,7 +94,7 @@ VAR
 	END GetCipherList;
 
 	PROCEDURE GetHMacList*( VAR list: ARRAY OF CHAR );
-	VAR n: INTEGER;
+	VAR n: SIGNED16;
 		x: ARRAY 64 OF CHAR;
 	BEGIN
 		IF buf = NIL THEN  buf := GetConfigBuffer()  END;

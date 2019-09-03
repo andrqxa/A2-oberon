@@ -115,7 +115,7 @@ TYPE
 	END NamedLabelList;
 
 	Result*= RECORD
-		type*: INTEGER; (* ConstantInteger, ConstantFloat, Fixup, Offset *)
+		type*: SIGNED16; (* ConstantInteger, ConstantFloat, Fixup, Offset *)
 		sizeInBits*: SIZE;
 		value*: HUGEINT;
 		valueR*: LONGREAL;

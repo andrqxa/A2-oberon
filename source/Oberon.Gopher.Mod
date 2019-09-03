@@ -25,7 +25,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 	VAR
 		W: Texts.Writer;
 		proxyHost: ARRAY NetTools.ServerStrLen OF CHAR;
-		proxyPort: INTEGER;
+		proxyPort: SIGNED16;
 		proxy: BOOLEAN;
 
 	PROCEDURE TextDoc(D: Documents.Document; C: NetSystem.Connection);
@@ -47,7 +47,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 			T: Texts.Text;
 			line: ARRAY NetTools.MaxLine OF CHAR;
 			res, val: LONGINT;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		Texts.Append(Oberon.Log, W.buf);
 		NEW(T);
@@ -108,7 +108,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 		line[i] := 0X
 	END ReadLine;
 
-	PROCEDURE RegisterGopherAdr(host, selector, search: ARRAY OF CHAR; type: CHAR; port: INTEGER): LONGINT;
+	PROCEDURE RegisterGopherAdr(host, selector, search: ARRAY OF CHAR; type: CHAR; port: SIGNED16): LONGINT;
 		VAR
 			url: ARRAY NetTools.MaxLine OF CHAR;
 			portS: ARRAY 8 OF CHAR;
@@ -366,7 +366,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 			ch: CHAR;
 			error: BOOLEAN;
 			status: ARRAY 16 OF CHAR;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		error := TRUE;
 		i := -1;
@@ -460,7 +460,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END MimeDoc;
 
-	PROCEDURE Connect(VAR C: NetSystem.Connection; host, selector: ARRAY OF CHAR; port: INTEGER; plus: CHAR; crlf: BOOLEAN): BOOLEAN;
+	PROCEDURE Connect(VAR C: NetSystem.Connection; host, selector: ARRAY OF CHAR; port: SIGNED16; plus: CHAR; crlf: BOOLEAN): BOOLEAN;
 	BEGIN
 		IF NetTools.Connect(C, port, host, FALSE) THEN
 			NetTools.SendString(C, selector);
@@ -510,7 +510,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END DocHandler;
 
-	PROCEDURE Request(D: Documents.Document; key: LONGINT; VAR host, selector, search: ARRAY OF CHAR; VAR type: CHAR; VAR port: INTEGER);
+	PROCEDURE Request(D: Documents.Document; key: LONGINT; VAR host, selector, search: ARRAY OF CHAR; VAR type: CHAR; VAR port: SIGNED16);
 		VAR
 			C: NetSystem.Connection;
 			obj: Objects.Object;
@@ -589,7 +589,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END Request;
 
-	PROCEDURE SplitGopherAdr(VAR url, host, selector, search: ARRAY OF CHAR; VAR type: CHAR; VAR port: INTEGER): LONGINT;
+	PROCEDURE SplitGopherAdr(VAR url, host, selector, search: ARRAY OF CHAR; VAR type: CHAR; VAR port: SIGNED16): LONGINT;
 		VAR
 			key: LONGINT;
 			i, j, l: SIZE;
@@ -711,7 +711,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 			R: Texts.Reader;
 			line: ARRAY NetTools.MaxLine OF CHAR;
 			attr, mime: ARRAY 32 OF CHAR;
-			i: INTEGER;
+			i: SIGNED16;
 			ch, old: CHAR;
 			host: ARRAY NetTools.ServerStrLen OF CHAR;
 			selector: ARRAY NetTools.PathStrLen OF CHAR;
@@ -860,7 +860,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 			host: ARRAY NetTools.ServerStrLen OF CHAR;
 			selector: ARRAY NetTools.PathStrLen OF CHAR;
 			C: NetSystem.Connection;
-			port: INTEGER;
+			port: SIGNED16;
 			mail, err: BOOLEAN;
 			T, OutT: Texts.Text;
 	BEGIN
@@ -908,7 +908,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 (** The gopher protocol object. *)
 	PROCEDURE LinkSchemeHandler(L: Objects.Object; VAR M: Objects.ObjMsg);
 		VAR
-			port: INTEGER;
+			port: SIGNED16;
 			line: ARRAY NetTools.MaxLine OF CHAR;
 			host: ARRAY NetTools.ServerStrLen OF CHAR;
 			selector, search: ARRAY NetTools.PathStrLen OF CHAR;
@@ -988,7 +988,7 @@ MODULE Gopher IN Oberon;	(** portable *) (* ejz,  *)
 			P: NetTools.ProxyMsg;
 			S: HyperDocs.LinkScheme;
 			D2: Documents.Document;
-			port: INTEGER;
+			port: SIGNED16;
 			type: CHAR;
 	BEGIN
 		D.dsc := NIL;

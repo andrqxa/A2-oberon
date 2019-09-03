@@ -12,7 +12,7 @@ MODULE HTMLImages IN Oberon;	(** portable *)
 		Area = POINTER TO AreaDesc;
 		AreaDesc = RECORD
 			key: LONGINT;
-			x, y: INTEGER;
+			x, y: SIGNED16;
 			next: Area
 		END;
 		Map = POINTER TO MapDesc;
@@ -23,7 +23,7 @@ MODULE HTMLImages IN Oberon;	(** portable *)
 		END;
 		RectArea = POINTER TO RectAreaDesc;
 		RectAreaDesc = RECORD (AreaDesc)
-			x2, y2: INTEGER
+			x2, y2: SIGNED16
 		END;
 		Icon = POINTER TO IconDesc;
 		IconDesc = RECORD (Rembrandt.FrameDesc)
@@ -132,7 +132,7 @@ Gadgets.objecthandle(obj, M);
 			val: LONGINT;
 			obj: Objects.Object;
 			curMap: Map;
-			pos: INTEGER;
+			pos: SIGNED16;
 	BEGIN
 		IF on THEN
 			Links.GetLink(S.page, "CurMap", obj);
@@ -472,11 +472,11 @@ HALT(99)
 			ismap: BOOLEAN;
 			obj: Objects.Object;
 			form: HTMLDocs.Form;
-			border: INTEGER;
+			border: SIGNED16;
 			E: HTTPDocs0.Entry;
 			sattr: Attributes.StringAttr;
 			battr: Attributes.BoolAttr;
-			w, h, x, i, dsr: INTEGER;
+			w, h, x, i, dsr: SIGNED16;
 			icon: Display.Frame;
 			iCon: Icon;
 			C: Objects.CopyMsg;
@@ -696,10 +696,10 @@ HALT(99)
 		RETURN map
 	END FindMap;
 
-	PROCEDURE EditArea(map: Map; F: Rembrandt.Frame; Q: Display3.Mask; VAR M: Oberon.InputMsg; x, y: INTEGER): BOOLEAN;
+	PROCEDURE EditArea(map: Map; F: Rembrandt.Frame; Q: Display3.Mask; VAR M: Oberon.InputMsg; x, y: SIGNED16): BOOLEAN;
 		VAR
 			area: Area;
-			u, v: INTEGER;
+			u, v: SIGNED16;
 			keysum: SET;
 		PROCEDURE FindArea;
 		BEGIN
@@ -772,7 +772,7 @@ Attributes.SetString(F, "Cmd", "HyperDocs.FollowLink  % R  #UseMapKey");
 		RETURN FALSE
 	END EditArea;
 
-(*	PROCEDURE Restore(map: Map; F: Rembrandt.Frame; Q: Display3.Mask; x, y: INTEGER);
+(*	PROCEDURE Restore(map: Map; F: Rembrandt.Frame; Q: Display3.Mask; x, y: SIGNED16);
 		VAR area: Area;
 	BEGIN
 		area := map.areas;
@@ -789,7 +789,7 @@ Attributes.SetString(F, "Cmd", "HyperDocs.FollowLink  % R  #UseMapKey");
 	PROCEDURE ImgHandle(F: Objects.Object; VAR M: Objects.ObjMsg);
 		VAR
 			Q: Display3.Mask;
-			x, y: INTEGER;
+			x, y: SIGNED16;
 			link: Links.Link;
 			name: ARRAY 64 OF CHAR;
 			map: Map;

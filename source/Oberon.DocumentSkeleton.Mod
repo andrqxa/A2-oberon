@@ -20,7 +20,7 @@ BEGIN
 	END
 END Cycle;
 
-PROCEDURE NextColor (doc: Documents.Document; col: INTEGER);
+PROCEDURE NextColor (doc: Documents.Document; col: SIGNED16);
 	VAR F: Gadgets.Frame;
 BEGIN
 	F := doc.dsc(Gadgets.Frame);
@@ -31,7 +31,7 @@ END NextColor;
 PROCEDURE Load (D: Documents.Document);
 	VAR
 	obj: Objects.Object;
-	tag, x, y, w, h, col: INTEGER;
+	tag, x, y, w, h, col: SIGNED16;
 	name: ARRAY 64 OF CHAR; F: Files.File; R: Files.Rider; ch: CHAR;
 	CM: Gadgets.CmdMsg;
 BEGIN

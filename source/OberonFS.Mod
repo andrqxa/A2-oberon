@@ -47,7 +47,7 @@ TYPE
 	FileHeader = RECORD (DiskSector)   (* allocated in the first page of each file on disk *)
 		mark: LONGINT;
 		name: FileName;
-		aleng, bleng: INTEGER;
+		aleng, bleng: SIGNED16;
 		date, time: LONGINT;
 		ext: ExtensionTable;
 		sec: SectorTable;
@@ -70,7 +70,7 @@ TYPE
 
 	DirPage = RECORD (DiskSector)
 		mark: LONGINT;
-		m: INTEGER;
+		m: SIGNED16;
 		p0: DiskAdr; (*sec no of left descendant in directory*)
 		fill: ARRAY FillerSize OF CHAR;
 		e: ARRAY DirPgSize OF DirEntry

@@ -43,13 +43,13 @@ CONST
 TYPE
 	writeProc= PROCEDURE(buf: Texts.Buffer);
 VAR
-	mode*: INTEGER; debug*: BOOLEAN;
+	mode*: SIGNED16; debug*: BOOLEAN;
 	write: writeProc;
 	w: Texts.Writer;
 	sPatLen: LONGINT; lTime: LONGINT; sPat : ARRAY 256 OF CHAR;
-			sDv: ARRAY 256 + 1 OF INTEGER;	(* displacement vector for search pattern *)
+			sDv: ARRAY 256 + 1 OF SIGNED16;	(* displacement vector for search pattern *)
 
-PROCEDURE Init(m: INTEGER): BOOLEAN;
+PROCEDURE Init(m: SIGNED16): BOOLEAN;
 BEGIN
 	IF m > mode THEN RETURN FALSE END;
 	CASE m OF
@@ -72,13 +72,13 @@ BEGIN
 	Texts.Append(Oberon.Log,buf);
 END writeLog;
 
-PROCEDURE wS*(mode: INTEGER; s: ARRAY OF CHAR );
+PROCEDURE wS*(mode: SIGNED16; s: ARRAY OF CHAR );
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w,s); Texts.WriteLn(w); write(w.buf);
 END wS;
 
-PROCEDURE wSB(mode: INTEGER; s: ARRAY OF CHAR; bool: BOOLEAN );
+PROCEDURE wSB(mode: SIGNED16; s: ARRAY OF CHAR; bool: BOOLEAN );
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w,s);
@@ -86,19 +86,19 @@ BEGIN
 	Texts.WriteLn(w); write(w.buf);
 END wSB;
 
-PROCEDURE wSS*(mode: INTEGER; s1,s2: ARRAY OF CHAR );
+PROCEDURE wSS*(mode: SIGNED16; s1,s2: ARRAY OF CHAR );
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w,s1) ;Texts.WriteString(w,sep); Texts.WriteString(w,s2);  Texts.WriteLn(w); write(w.buf);
 END wSS;
 
-PROCEDURE wSSS*(mode: INTEGER; s1,s2,s3: ARRAY OF CHAR );
+PROCEDURE wSSS*(mode: SIGNED16; s1,s2,s3: ARRAY OF CHAR );
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w,s1) ;Texts.WriteString(w,sep);Texts.WriteString(w,s2);Texts.WriteString(w,sep);Texts.WriteString(w,s3);  Texts.WriteLn(w); write(w.buf);
 END wSSS;
 
-PROCEDURE wSSSS*(mode: INTEGER; s1,s2,s3,s4: ARRAY OF CHAR );
+PROCEDURE wSSSS*(mode: SIGNED16; s1,s2,s3,s4: ARRAY OF CHAR );
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w,s1) ;Texts.WriteString(w,sep);Texts.WriteString(w,s2);Texts.WriteString(w,sep);Texts.WriteString(w,s3);  Texts.WriteString(w,sep);
@@ -106,19 +106,19 @@ BEGIN
 END wSSSS;
 
 
-PROCEDURE wSI*(mode: INTEGER; s1: ARRAY OF CHAR; i: LONGINT);
+PROCEDURE wSI*(mode: SIGNED16; s1: ARRAY OF CHAR; i: LONGINT);
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w,s1); Texts.WriteString(w,sep); Texts.WriteInt(w,i,0);  Texts.WriteLn(w); write(w.buf);
 END wSI;
 
-PROCEDURE wSR*(mode: INTEGER; s: ARRAY OF CHAR; r: LONGREAL);
+PROCEDURE wSR*(mode: SIGNED16; s: ARRAY OF CHAR; r: LONGREAL);
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w,s); Texts.WriteString(w,sep); Texts.WriteReal(w, SHORT(r), 20); Texts.WriteLn(w); write(w.buf);
 END wSR;
 
-PROCEDURE wSISI* (mode: INTEGER; s1: ARRAY OF CHAR;    i1: LONGINT;    s2: ARRAY OF CHAR;    i2: LONGINT );
+PROCEDURE wSISI* (mode: SIGNED16; s1: ARRAY OF CHAR;    i1: LONGINT;    s2: ARRAY OF CHAR;    i2: LONGINT );
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w,s1);Texts.WriteString(w,sep);  Texts.WriteInt(w,i1,0);  Texts.WriteString(w,sep);
@@ -126,7 +126,7 @@ BEGIN
 	Texts.WriteLn(w); write(w.buf);
 END wSISI;
 
-PROCEDURE wSRSR* (mode: INTEGER; s1: ARRAY OF CHAR;    r1: LONGREAL;   s2: ARRAY OF CHAR;    r2: LONGREAL);
+PROCEDURE wSRSR* (mode: SIGNED16; s1: ARRAY OF CHAR;    r1: LONGREAL;   s2: ARRAY OF CHAR;    r2: LONGREAL);
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w, s1);
@@ -379,7 +379,7 @@ END ToEnd;
 
 
 PROCEDURE Lines(F: TextGadgets.Frame;lines: LONGINT);
-VAR pos: LONGINT; text: Objects.Object; line: INTEGER; R: Texts.Reader; ch: CHAR;
+VAR pos: LONGINT; text: Objects.Object; line: SIGNED16; R: Texts.Reader; ch: CHAR;
 BEGIN
 	Links.GetLink(F,"Model",text);
 	IF (text # NIL ) & (text IS Texts.Text) THEN
@@ -581,7 +581,7 @@ END ClearLog;
 
 
 	PROCEDURE CalcDispVec(time: LONGINT);
-		VAR i, j, d: INTEGER;
+		VAR i, j, d: SIGNED16;
 	BEGIN
 		lTime := time;
 		i := 1; d := 1;	(* calculate displacement vector *)
@@ -595,7 +595,7 @@ END ClearLog;
 	PROCEDURE SPatFound(text: Texts.Text; VAR pos:LONGINT): BOOLEAN;
 	(* searches the next position for the search pattern sPat begining at position pos *)
 	(* in the text text; resturns result accordingly *)
-		VAR R: Texts.Reader;	l: LONGINT;	i: INTEGER;	ch: CHAR;
+		VAR R: Texts.Reader;	l: LONGINT;	i: SIGNED16;	ch: CHAR;
 	BEGIN
 		IF sPatLen > 0 THEN
 			Texts.OpenReader(R, text, pos); Texts.Read(R, ch); INC(pos);
@@ -613,7 +613,7 @@ END ClearLog;
 	END SPatFound;
 
 	PROCEDURE search(VAR S: Attributes.Scanner; tF: TextGadgets.Frame);
-		VAR R: Texts.Reader; text: Texts.Text; pos, beg, end, time: LONGINT; i: INTEGER;
+		VAR R: Texts.Reader; text: Texts.Text; pos, beg, end, time: LONGINT; i: SIGNED16;
 	BEGIN
 		IF S.class IN {Attributes.Name, Attributes.String} THEN
 			COPY(S.s, sPat); sPatLen := S.len; CalcDispVec(Oberon.Time())	(* calculate displacement vector *)

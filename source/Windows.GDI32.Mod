@@ -100,7 +100,7 @@ TYPE
 	(** The BITMAPINFOHEADER structure contains information about the dimensions and color format of a DIB. *)
 	BitmapInfoHeader* = RECORD
 		biSize*, biWidth*, biHeight*: LONGINT;
-		biPlanes*, biBitCount*: INTEGER;
+		biPlanes*, biBitCount*: SIGNED16;
 		biCompression*, biSizeImage*: LONGINT;
 		biXPelsPerMeter*, biYPelsPerMeter*: LONGINT;
 		biClrUsed*, biClrImportant*: LONGINT
@@ -126,7 +126,7 @@ TYPE
 
 	(** The LOGPALETTE structure defines a logical palette. *)
 	LogPalette* = RECORD
-		palVersion*, palNumEntries*: INTEGER;
+		palVersion*, palNumEntries*: SIGNED16;
 		palPalEntry*: ARRAY 1 OF PaletteEntry
 	END;
 
@@ -135,12 +135,12 @@ TYPE
 	GlyphMetrics* = RECORD
 		gmBlackBoxX*, gmBlackBoxY*: LONGINT;
 		gmptGlyphOrigin*: User32.Point;
-		gmCellIncX*, gmCellIncY*: INTEGER
+		gmCellIncX*, gmCellIncY*: SIGNED16
 	END;
 
 	(** The FIXED structure contains the integral and fractional parts of a fixed-point real number. *)
 	Fixed* = RECORD
-		fract*, value*: INTEGER
+		fract*, value*: SIGNED16
 	END;
 
 	(** The MAT2 structure contains the values for a transformation matrix used by the GetGlyphOutline function. *)

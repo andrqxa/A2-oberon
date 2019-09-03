@@ -31,7 +31,7 @@ MODULE HTTPDocs IN Oberon;	(** portable *) (* ejz,  *)
 			host: ARRAY NetTools.ServerStrLen OF CHAR;
 			path: ARRAY NetTools.PathStrLen OF CHAR;
 			coded: ARRAY 64 OF CHAR;
-			port: INTEGER;
+			port: SIGNED16;
 			next: Authorization
 		END;
 		Cookie = POINTER TO CookieDesc;
@@ -45,7 +45,7 @@ MODULE HTTPDocs IN Oberon;	(** portable *) (* ejz,  *)
 	VAR
 		W: Texts.Writer;
 		buf: ARRAY NetTools.BufLen OF CHAR;
-		noWorkers: INTEGER;
+		noWorkers: SIGNED16;
 		encTable: ARRAY 64 OF CHAR;
 		authorizations: Authorization;
 		cookies: Cookie;
@@ -108,7 +108,7 @@ MODULE HTTPDocs IN Oberon;	(** portable *) (* ejz,  *)
 		dest[d] := 0X
 	END EncBase64;
 
-	PROCEDURE GetAuthorization(VAR host, path: ARRAY OF CHAR; port: INTEGER): Authorization;
+	PROCEDURE GetAuthorization(VAR host, path: ARRAY OF CHAR; port: SIGNED16): Authorization;
 		VAR aut: Authorization;
 	BEGIN
 		aut := authorizations;
@@ -263,7 +263,7 @@ END ListCookies;
 			i, j: LONGINT;
 			aut: Authorization;
 			cookie: Cookie;
-			port: INTEGER;
+			port: SIGNED16;
 			ch: CHAR;
 	BEGIN
 		aut := NIL;
@@ -398,7 +398,7 @@ END ListCookies;
 			pos, len, time, status: LONGINT;
 			base: HyperDocs.DefURL;
 			h: MIME.Header;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		NEW(base); HyperDocs.RetrieveLink(key, buf);
 		key := HTTPDocs0.SplitHTTPAdr(buf, base.host, base.path, base.label, base.port);
@@ -504,7 +504,7 @@ END ListCookies;
 			location: ARRAY NetTools.MaxLine OF CHAR;
 			host: ARRAY NetTools.ServerStrLen OF CHAR;
 			base: HyperDocs.DefURL;
-			port: INTEGER;
+			port: SIGNED16;
 	BEGIN
 		status := 0; HyperDocs.RetrieveLink(key, location);
 		NetTools.SplitHostPort(location, host, port);
@@ -579,7 +579,7 @@ END ListCookies;
 			status: LONGINT;
 			proxy: HTTPDocs0.Proxy;
 			T: Texts.Text;
-			port: INTEGER;
+			port: SIGNED16;
 			useProxy: BOOLEAN;
 	BEGIN
 		WITH L: HyperDocs.LinkScheme DO
@@ -681,7 +681,7 @@ END ListCookies;
 			F: Files.File;
 			location: ARRAY 1024 OF CHAR;
 			T: Texts.Text;
-			state: INTEGER;
+			state: SIGNED16;
 	BEGIN
 		WITH me: Worker DO
 			IF me.local THEN RETURN END;
@@ -1013,7 +1013,7 @@ END ListCookies;
 	END NewDoc;
 
 	PROCEDURE InitTables;
-		VAR i, max: INTEGER;
+		VAR i, max: SIGNED16;
 	BEGIN
 		max := ORD("Z")-ORD("A");
 		FOR i := 0 TO max DO

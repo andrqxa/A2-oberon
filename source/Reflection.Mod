@@ -346,7 +346,7 @@ CONST
 	VAR
 		b: BOOLEAN;
 		c: CHAR;
-		s: SIGNED8; i: INTEGER; l: LONGINT; h: HUGEINT;
+		s: SIGNED8; i: SIGNED16; l: LONGINT; h: HUGEINT;
 		sz: SIZE; a, pc: ADDRESS;
 		word: WORD; lword: LONGWORD;
 		s8: SIGNED8; s16: SIGNED16; s32: SIGNED32; s64: SIGNED64;
@@ -382,7 +382,7 @@ CONST
 			size := SIZEOF(SIGNED8);
 			SYSTEM.GET(adr, s); Signed(s);
 		| sfTypeINTEGER:
-			size := SIZEOF(INTEGER);
+			size := SIZEOF(SIGNED16);
 			SYSTEM.GET(adr, i); Signed(i);
 		| sfTypeLONGINT:
 			size := SIZEOF(LONGINT);
@@ -1103,7 +1103,7 @@ TYPE
 		| sfTypeBOOLEAN: w.String("BOOLEAN");
 		| sfTypeCHAR: w.String("CHAR");
 		| sfTypeSHORTINT: w.String("SIGNED8");
-		| sfTypeINTEGER: w.String("INTEGER");
+		| sfTypeINTEGER: w.String("SIGNED16");
 		| sfTypeLONGINT: w.String("LONGINT");
 		| sfTypeHUGEINT: w.String("HUGEINT");
 		| sfTypeWORD: w.String("WORD");

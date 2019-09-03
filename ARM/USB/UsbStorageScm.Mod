@@ -32,9 +32,9 @@ TYPE
 		buffer : Usbdi.BufferPtr;
 		timer : Kernel.Timer;
 
-		PROCEDURE ScmShortPack(p1, p2 : CHAR) : INTEGER;
+		PROCEDURE ScmShortPack(p1, p2 : CHAR) : SIGNED16;
 		BEGIN
-			RETURN SYSTEM.VAL(INTEGER, SYSTEM.VAL(SET, ORD(p2)*256) + SYSTEM.VAL(SET, ORD(p1)));
+			RETURN SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, ORD(p2)*256) + SYSTEM.VAL(SET, ORD(p1)));
 		END ScmShortPack;
 
 		PROCEDURE ScmSendControl(dir : SET; req, reqtyp, value, index : LONGINT; VAR buffer : Usbdi.Buffer;
@@ -268,12 +268,12 @@ TYPE
 		END ScmWriteBlock;
 
 		PROCEDURE ScmRWBlockTest(access : CHAR; VAR registers, dataout : ARRAY OF CHAR;
-			numregs :INTEGER; datareg, statusreg, atapitimeout, qualifier : CHAR; dir : SET; VAR content : Usbdi.Buffer;
+			numregs :SIGNED16; datareg, statusreg, atapitimeout, qualifier : CHAR; dir : SET; VAR content : Usbdi.Buffer;
 			ofs, contentlen: LONGINT; VAR tlen : LONGINT; timeout : LONGINT): LONGINT;
 		VAR
 			tmpreg : CHAR;
 			status : CHAR;
-			i, msgindex, msglen : INTEGER;
+			i, msgindex, msglen : SIGNED16;
 			tmplen : LONGINT;
 			res : LONGINT;
 		BEGIN
@@ -357,7 +357,7 @@ TYPE
 		END ScmRWBlockTest;
 
 		PROCEDURE ScmSelectAndTestRegisters() : BOOLEAN;
-		VAR selector : INTEGER; status : CHAR;
+		VAR selector : SIGNED16; status : CHAR;
 		BEGIN
 			FOR selector := 0A0H TO 0B0H BY 10H DO (* actually, test 0A0H and 0B0H *)
 				IF ScmWrite(ScmATA, 16X, CHR(selector), 1000) # Base.ResOk THEN RETURN FALSE END;

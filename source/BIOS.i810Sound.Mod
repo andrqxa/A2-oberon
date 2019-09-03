@@ -124,12 +124,12 @@ MODULE i810Sound; (** AUTHOR "krijo210@student.liu.se"; PURPOSE "Intel 810 Sound
 				RETURN SYSTEM.VAL(SIGNED8, res)
 			END RegRead8;
 
-			PROCEDURE RegRead16(offset : LONGINT) : INTEGER;
+			PROCEDURE RegRead16(offset : LONGINT) : SIGNED16;
 			VAR
-				res : INTEGER;
+				res : SIGNED16;
 			BEGIN
 				Machine.Portin16(base + offset, res);
-				RETURN SYSTEM.VAL(INTEGER, res)
+				RETURN SYSTEM.VAL(SIGNED16, res)
 			END RegRead16;
 
 			PROCEDURE RegRead32(offset : LONGINT) : LONGINT;
@@ -148,7 +148,7 @@ MODULE i810Sound; (** AUTHOR "krijo210@student.liu.se"; PURPOSE "Intel 810 Sound
 
 			PROCEDURE RegWrite16(offset : LONGINT; val : LONGINT);
 			BEGIN
-				Machine.Portout16(base + offset, SYSTEM.VAL(INTEGER, val))
+				Machine.Portout16(base + offset, SYSTEM.VAL(SIGNED16, val))
 			END RegWrite16;
 
 			PROCEDURE RegWrite32(offset : LONGINT; val : LONGINT);
@@ -526,18 +526,18 @@ TYPE
 
 				FOR i := 0 TO buffer.len-1 DO
 					(* Lineary interpolate two samples *)
-					sample1 := SYSTEM.VAL(INTEGER, buffer.data[i]);
-					sample2 := SYSTEM.VAL(INTEGER, buffer2.data[i]);
+					sample1 := SYSTEM.VAL(SIGNED16, buffer.data[i]);
+					sample2 := SYSTEM.VAL(SIGNED16, buffer2.data[i]);
 
 					(* Lower volume to try to avoid clipping *)
 					mix := sample1+sample2;
 
 					(* Clip *)
-					IF mix > MAX(INTEGER) THEN
-						mix := MAX(INTEGER);
+					IF mix > MAX(SIGNED16) THEN
+						mix := MAX(SIGNED16);
 					END;
-					IF mix < MIN(INTEGER) THEN
-						mix := MIN(INTEGER);
+					IF mix < MIN(SIGNED16) THEN
+						mix := MIN(SIGNED16);
 					END;
 
 
@@ -1055,8 +1055,8 @@ TYPE
 				IF (volume < 0) THEN volume := 0 END;
 				IF (volume > 255) THEN volume := 255 END;
 
-				left := SYSTEM.VAL(INTEGER, sample);
-				right := SYSTEM.VAL(INTEGER, sample[2]);
+				left := SYSTEM.VAL(SIGNED16, sample);
+				right := SYSTEM.VAL(SIGNED16, sample[2]);
 
 				(* Multiply volume with a number between 0 and 1. *)
 
@@ -1400,8 +1400,8 @@ TYPE
 				mix, left, right : LONGINT;
 			BEGIN
 				(* Take average of left and right channel *)
-				left := SYSTEM.VAL(INTEGER, sample);
-				right := SYSTEM.VAL(INTEGER, sample[2]);
+				left := SYSTEM.VAL(SIGNED16, sample);
+				right := SYSTEM.VAL(SIGNED16, sample[2]);
 				mix := LSH(left + right, -1);
 
 				sample[0] := CHR(mix);

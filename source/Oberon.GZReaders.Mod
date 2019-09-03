@@ -36,7 +36,7 @@ MODULE GZReaders IN Oberon;	(** Stefan Walthert  **)
 		CONST
 			headCRC = 2; extraField = 4; origName = 8; comment = 10H; reserved = 20H;
 		VAR
-			ch, method, flags: CHAR; len: INTEGER;
+			ch, method, flags: CHAR; len: SIGNED16;
 	BEGIN
 		Files.Read(fr, ch);
 		IF fr.eof THEN

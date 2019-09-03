@@ -133,7 +133,7 @@ MODULE PCDebug; (** AUTHOR "prk"; PURPOSE "Parallel Compiler: low-level trace fu
 			GetProcedure(pc, name); KernelLog.String(name);
 		END;
 		IF class = NotImplemented THEN
-			HALT(MAX(INTEGER))
+			HALT(MAX(SIGNED16))
 		END
 	END ToDo;
 

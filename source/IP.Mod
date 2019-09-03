@@ -1076,7 +1076,7 @@ END Checksum1;
 
 (** 	Continue a checksum operation. len can be zero or odd. chk1 can be the result of Checksum1 for
 	the immediately preceding data, or 0 for contiguous data. *)
-PROCEDURE Checksum2*(CONST data: ARRAY OF CHAR; ofs, len: SIZE; chk1: LONGINT): INTEGER;
+PROCEDURE Checksum2*(CONST data: ARRAY OF CHAR; ofs, len: SIZE; chk1: LONGINT): SIGNED16;
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP+chk1]

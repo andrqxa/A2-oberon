@@ -38,7 +38,7 @@ TYPE
 		f: antsFunctions.Function;
 		xr, yr, wr, hr: Real;
 		dx: Real;
-		grid: INTEGER;
+		grid: SIGNED16;
 		inedit: BOOLEAN;   (* temp *)
 		viewEditWin: BOOLEAN;
 		fcache: antsFunctions.Array;   (* temp *)
@@ -122,7 +122,7 @@ VAR
 	(*vs 0.0a1   md  14.02.95 *)
 	VAR x2d, y2d, oldy2d, oldx2d: Real;  i, oldi: LONGINT;
 		sx2d, sy2d, soldy2d, soldx2d: Real;  si, soldi: LONGINT;  symmetric: BOOLEAN;   (* if symmetric *)
-		out: BOOLEAN;  changed: BOOLEAN;  c: vyGraphBase.tCoordinate2d;  x, y, w, h: INTEGER;  gesture: INTEGER;
+		out: BOOLEAN;  changed: BOOLEAN;  c: vyGraphBase.tCoordinate2d;  x, y, w, h: SIGNED16;  gesture: SIGNED16;
 
 		PROCEDURE Get2dLocation( x, y: Coordinate;  VAR X, Y: Real );
 		BEGIN
@@ -180,7 +180,7 @@ VAR
 	END Edit;
 
 	PROCEDURE Responsible( editor: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 
 		PROCEDURE Check( x, y: Coordinate ): BOOLEAN;
 		VAR X, Y: LONGREAL;
@@ -215,7 +215,7 @@ VAR
 	END Store0;
 
 	PROCEDURE Load0( obj: tLayer;  VAR M: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( M.R, version );  Gadgets.ReadRef( M.R, obj.lib, objsub );
 		IF objsub # NIL THEN obj.f := objsub( antsFunctions.Function ) END;

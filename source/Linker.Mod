@@ -353,7 +353,7 @@ PROCEDURE WriteTRMDataFile* (linker: GenericLinker.Linker; arrangement: Arrangem
 BEGIN WriteTRMFile (arrangement, writer, 32,512);
 END WriteTRMDataFile;
 
-PROCEDURE WritePEFile (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer; bitmode, subSystem: INTEGER; isDLL: BOOLEAN);
+PROCEDURE WritePEFile (linker: GenericLinker.Linker; arrangement: Arrangement; writer: Files.Writer; bitmode, subSystem: SIGNED16; isDLL: BOOLEAN);
 CONST DOSText = "This program cannot be run in DOS mode.$";
 CONST DOSHeaderSize = 64; DOSCodeSize = 14; DOSTextSize = 40; DOSStubSize = ((DOSHeaderSize + DOSCodeSize + DOSTextSize + 15) DIV 16) * 16;
 CONST FileAlignment = 200H; SectionAlignment = 1000H; HeaderSize = 24; SectionHeaderSize = 40; DirectoryEntries = 16;
@@ -798,7 +798,7 @@ CONST BaseAddress = 000010E8H;
 	END Write;
 
 	PROCEDURE WriteName (CONST name: ARRAY OF CHAR);
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN i := 0; WHILE name[i] # 0X DO writer.Char (name[i]); INC (i); END;
 		WHILE i # 16 DO writer.Char (0X); INC (i); END;
 	END WriteName;

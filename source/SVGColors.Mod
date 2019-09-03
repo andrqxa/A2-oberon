@@ -358,7 +358,7 @@ BEGIN
 END Parse;
 
 (* Split a color into r, g, b and a values *)
-PROCEDURE Split*(color: Color; VAR r, g, b, a: INTEGER);
+PROCEDURE Split*(color: Color; VAR r, g, b, a: SIGNED16);
 BEGIN
 	r := SHORT((color DIV 01000000H) MOD 0100H);
 	g := SHORT((color DIV 010000H) MOD 0100H);
@@ -388,7 +388,7 @@ END BlendAndPremultiply;
 
 (* Convert a color to a pixel *)
 PROCEDURE ColorToPixel*(c: Color; VAR p: Raster.Pixel);
-VAR r,g,b,a: INTEGER;
+VAR r,g,b,a: SIGNED16;
 BEGIN
 	Split(c, r,g,b,a);
 	p[0] := CHR(b);

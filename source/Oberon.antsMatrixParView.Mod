@@ -38,7 +38,7 @@ TYPE
 		commands: vyCommandMenus.List;
 		viewnum: BOOLEAN;
 		symmetric: BOOLEAN;
-		method: INTEGER
+		method: SIGNED16
 	END;
 VAR
 	tempLayer: tLayer;
@@ -90,7 +90,7 @@ VAR
 	END Recall;
 
 	PROCEDURE Responsible( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 	BEGIN
 		priority := vyEvents.PrioNone;
 		IF ((event.gesture = vyEvents.EvtSelect) OR (event.gesture = vyEvents.EvtIdent)) THEN priority := vyEvents.PrioNormal END;
@@ -108,10 +108,10 @@ VAR
 	END Prompt;
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;  origx, origy: INTEGER;
+	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;  origx, origy: SIGNED16;
 
-		PROCEDURE InCell( x, y: LONGINT;  cx, cy: INTEGER ): BOOLEAN;
-		VAR rx, ry, rw, rh: INTEGER;
+		PROCEDURE InCell( x, y: LONGINT;  cx, cy: SIGNED16 ): BOOLEAN;
+		VAR rx, ry, rw, rh: SIGNED16;
 		BEGIN
 			vyGraphBase.Rect2dToRect( x * cellsize - cellsize / 2, y * cellsize - cellsize / 2, cellsize, cellsize, rx, ry, rw, rh );
 			IF vyRectangles.PointInRect( cx, cy, rx, ry, rw, rh ) THEN RETURN TRUE ELSE RETURN FALSE END
@@ -164,7 +164,7 @@ VAR
 	END Select;
 
 	PROCEDURE HandleFileMsg( obj: tLayer;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 
 	BEGIN
 		IF msg.id = Objects.load THEN

@@ -154,7 +154,7 @@ TYPE
 		(* Insert a certain marker into the currently active text *)
 		PROCEDURE InsertMarker(sender, data : ANY);
 		VAR
-			res : INTEGER;
+			res : SIGNED16;
 		BEGIN
 			IF sender = leftRightMarkerButton THEN
 				res := WMTextView.InsertChar(200EH);

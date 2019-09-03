@@ -9,15 +9,15 @@ CONST debug = FALSE;
 			outermost = 1;
 
 
-VAR sym : INTEGER;
+VAR sym : SIGNED16;
 		curtext : Texts.Text;
 		W : Texts.Writer;
 
 PROCEDURE Size (outermost : BOOLEAN) : Layouts.Node;
-VAR min, factor : INTEGER;
+VAR min, factor : SIGNED16;
 BEGIN
 	IF sym = LayLa2S.Int THEN min := SHORT (LayLa2S.int); LayLa2S.Get (sym)
-	ELSIF sym = LayLa2S.Default THEN min := MIN (INTEGER); LayLa2S.Get (sym)
+	ELSIF sym = LayLa2S.Default THEN min := MIN (SIGNED16); LayLa2S.Get (sym)
 	ELSIF sym # LayLa2S.lbrak THEN min := 0; LayLa2S.Mark (LayLa2S.Pos (), "Integer expected")
 	END;
 	IF sym = LayLa2S.lbrak THEN	LayLa2S.Get (sym);
@@ -30,7 +30,7 @@ BEGIN
 	RETURN Layouts.NewSize (min, factor)
 END Size;
 
-PROCEDURE Def (flag : INTEGER) : Layouts.Node;
+PROCEDURE Def (flag : SIGNED16) : Layouts.Node;
 VAR name : Objects.Name;
 		node : Layouts.Node;
 BEGIN	LayLa2S.Get (sym);
@@ -42,7 +42,7 @@ BEGIN	LayLa2S.Get (sym);
 	RETURN node;
 END Def;
 
-PROCEDURE SetList (op : INTEGER) : Layouts.Node;
+PROCEDURE SetList (op : SIGNED16) : Layouts.Node;
 VAR list, node : Layouts.Node;
 BEGIN	LayLa2S.Get (sym);
 	IF debug THEN Out.String ("SetList"); Out.Int (sym, 5); Out.Ln END;
@@ -143,7 +143,7 @@ BEGIN	LayLa2S.Get (sym);
 	RETURN node
 END MakeObj;
 
-PROCEDURE Break (flag : INTEGER) : Layouts.Node;
+PROCEDURE Break (flag : SIGNED16) : Layouts.Node;
 VAR break, node : Layouts.Node;
 BEGIN	LayLa2S.Get (sym);
 	break := Layouts.NewBreak ();
@@ -157,9 +157,9 @@ BEGIN	LayLa2S.Get (sym);
 	RETURN break
 END Break;
 
-PROCEDURE Span (flag : INTEGER) : Layouts.Node;
+PROCEDURE Span (flag : SIGNED16) : Layouts.Node;
 VAR span, node : Layouts.Node;
-		rows, cols : INTEGER;
+		rows, cols : SIGNED16;
 BEGIN	LayLa2S.Get (sym);
 	IF debug THEN Out.String ("Span"); Out.Int (sym, 5); Out.Ln END;
 	IF sym = LayLa2S.Int THEN rows := SHORT (LayLa2S.int)
@@ -190,7 +190,7 @@ BEGIN
 	RETURN config
 END Config;
 
-PROCEDURE Eval (flag : INTEGER) : Layouts.Node;
+PROCEDURE Eval (flag : SIGNED16) : Layouts.Node;
 VAR node : Layouts.Node;
 		Ident : ARRAY 64 OF CHAR;
 BEGIN	node := NIL;

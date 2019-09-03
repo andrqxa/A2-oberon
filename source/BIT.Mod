@@ -8,7 +8,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 
 	TYPE
 		SHORTCARD* = SIGNED8;
-		CARDINAL* = INTEGER;
+		CARDINAL* = SIGNED16;
 		LONGCARD* = LONGINT;
 
 	CONST
@@ -24,7 +24,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 	BEGIN RETURN SHORT(SHORT(S.VAL(LONGINT, S.VAL(SET, LONG(LONG(x))) / S.VAL(SET, LONG(LONG(y))))))
 	END SXOR;
 
-	PROCEDURE IXOR*(x, y: INTEGER): INTEGER;
+	PROCEDURE IXOR*(x, y: SIGNED16): SIGNED16;
 	BEGIN RETURN SHORT(S.VAL(LONGINT, S.VAL(SET, LONG(x)) / S.VAL(SET, LONG(y))))
 	END IXOR;
 
@@ -42,7 +42,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 	BEGIN RETURN SHORT(SHORT(S.VAL(LONGINT, S.VAL(SET, LONG(LONG(x))) + S.VAL(SET, LONG(LONG(y))))))
 	END SOR;
 
-	PROCEDURE IOR*(x, y: INTEGER): INTEGER;
+	PROCEDURE IOR*(x, y: SIGNED16): SIGNED16;
 	BEGIN RETURN SHORT(S.VAL(LONGINT, S.VAL(SET, LONG(x)) + S.VAL(SET, LONG(y))))
 	END IOR;
 
@@ -60,7 +60,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 	BEGIN RETURN SHORT(SHORT(S.VAL(LONGINT, S.VAL(SET, LONG(LONG(x))) * S.VAL(SET, LONG(LONG(y))))))
 	END SAND;
 
-	PROCEDURE IAND*(x, y: INTEGER): INTEGER;
+	PROCEDURE IAND*(x, y: SIGNED16): SIGNED16;
 	BEGIN RETURN SHORT(S.VAL(LONGINT, S.VAL(SET, LONG(x)) * S.VAL(SET, LONG(y))))
 	END IAND;
 
@@ -82,7 +82,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 		ELSE RETURN LSH(x, n) END
 	END SLSH;
 
-	PROCEDURE ILSH*(x: INTEGER; n: SIGNED8): INTEGER;
+	PROCEDURE ILSH*(x: SIGNED16; n: SIGNED8): SIGNED16;
 	BEGIN
 		IF risc THEN RETURN SHORT(LSH(S.VAL(LONGINT, S.VAL(SET, LONG(x)) * S.VAL(SET, 0FFFFH)), n))
 		ELSE RETURN LSH(x, n) END
@@ -95,7 +95,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 
 	(** bitwise rotation: x rotatated by n bits *)
 	PROCEDURE CROT*(x: CHAR; n: SIGNED8): CHAR;
-		VAR s0, s1: SET; i: INTEGER;
+		VAR s0, s1: SET; i: SIGNED16;
 	BEGIN
 		IF risc THEN
 			s0 := S.VAL(SET, ORD(x)); s1 := {};
@@ -115,7 +115,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 	END CROT;
 
 	PROCEDURE SROT*(x: SIGNED8; n: SIGNED8): SIGNED8;
-		VAR s0, s1: SET; i: INTEGER;
+		VAR s0, s1: SET; i: SIGNED16;
 	BEGIN
 		IF risc THEN
 			s0 := S.VAL(SET, LONG(LONG(x))); s1 := {};
@@ -134,8 +134,8 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 		ELSE RETURN ROT(x, n) END;
 	END SROT;
 
-	PROCEDURE IROT*(x: INTEGER; n: SIGNED8): INTEGER;
-		VAR s0, s1: SET; i: INTEGER;
+	PROCEDURE IROT*(x: SIGNED16; n: SIGNED8): SIGNED16;
+		VAR s0, s1: SET; i: SIGNED16;
 	BEGIN
 		IF risc THEN
 			s0 := S.VAL(SET, LONG(x)); s1 := {};
@@ -160,9 +160,9 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 
 
 	(** swap bytes to change byteordering *)
-	PROCEDURE ISWAP*(x: INTEGER): INTEGER;
+	PROCEDURE ISWAP*(x: SIGNED16): SIGNED16;
 		TYPE integer = ARRAY 2 OF CHAR; VAR a, b: integer;
-	BEGIN a := S.VAL(integer, x); b[0] := a[1]; b[1] := a[0]; RETURN S.VAL(INTEGER, b)
+	BEGIN a := S.VAL(integer, x); b[0] := a[1]; b[1] := a[0]; RETURN S.VAL(SIGNED16, b)
 	END ISWAP;
 
 	PROCEDURE LSWAP*(x: LONGINT): LONGINT;
@@ -196,7 +196,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 		i := LONG(LONG(x)); IF rbo THEN INCL(S.VAL(SET, i), 31-n) ELSE INCL(S.VAL(SET, i), n) END; x := SHORT(SHORT(i))
 	END SSETBIT;
 
-	PROCEDURE ISETBIT*(VAR x: INTEGER; n: SIGNED8);
+	PROCEDURE ISETBIT*(VAR x: SIGNED16; n: SIGNED8);
 		VAR i: LONGINT;
 	BEGIN ASSERT((n >= 0) & (n <= 15));
 		i := LONG(x); IF rbo THEN INCL(S.VAL(SET, i), 31-n) ELSE INCL(S.VAL(SET, i), n) END; x := SHORT(i)
@@ -221,7 +221,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 		i := LONG(LONG(x)); IF rbo THEN EXCL(S.VAL(SET, i), 31-n) ELSE EXCL(S.VAL(SET, i), n) END; x := SHORT(SHORT(i))
 	END SCLRBIT;
 
-	PROCEDURE ICLRBIT*(VAR x: INTEGER; n: SIGNED8);
+	PROCEDURE ICLRBIT*(VAR x: SIGNED16; n: SIGNED8);
 		VAR i: LONGINT;
 	BEGIN ASSERT(ABS(n) < 16);
 		i := LONG(x); IF rbo THEN EXCL(S.VAL(SET, i), 31-n) ELSE EXCL(S.VAL(SET, i), n) END; x := SHORT(i)

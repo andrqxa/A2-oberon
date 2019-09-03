@@ -119,14 +119,14 @@ TYPE
 	Score = RECORD
 		name: Objects.Name;
 		points: LONGINT;
-		level,rows: INTEGER;
+		level,rows: SIGNED16;
 	END;
 
 	(* The game model *)
 	FieldDesc = RECORD(Gadgets.ObjDesc)
 		score: ARRAY Ranks OF Score;
 		curr,next,angle,line,row,rank,mult: SIGNED8;
-		delay,figures: INTEGER;
+		delay,figures: SIGNED16;
 		focus,match,preview,paused: BOOLEAN;
 		lap1,lap2: LONGINT;
 		timer: Timer;
@@ -136,31 +136,31 @@ TYPE
 	(* Score displaying (name, score, level, rows) *)
 	ScoreField = POINTER TO ScoreFieldDesc;
 	ScoreFieldDesc = RECORD(TextFields.TextFieldDesc)
-		ndx,xofs: INTEGER;		(* needed for aligning *)
+		ndx,xofs: SIGNED16;		(* needed for aligning *)
 	END;
 
 	(* Resizeable drawing area *)
 	Frame = POINTER TO FrameDesc;
 	FrameDesc = RECORD(Panels.PanelDesc)
-		scale: INTEGER;
+		scale: SIGNED16;
 		blank: BOOLEAN;
 	END;
 
 	(* Message extension for Gadgets alignment *)
 	AlignMsg = RECORD(Objects.ObjMsg)
-		X,Y,W,H: INTEGER;
+		X,Y,W,H: SIGNED16;
 	END;
 
 	(* Change Backdrop Message (if level increases) *)
 	BackdropMsg = RECORD(Display.FrameMsg)
 		model: Object;
-		ndx: INTEGER;
+		ndx: SIGNED16;
 	END;
 
 	(* Figure Draw Message *)
 	FigureMsg = RECORD(Display.FrameMsg)
 		model: Object;
-		id: INTEGER;	(* 0 create, 1 move, 2 drop, 3 whole pot *)
+		id: SIGNED16;	(* 0 create, 1 move, 2 drop, 3 whole pot *)
 		ndx,angle0,line0,row0,angle1,line1,row1: SIGNED8;
 	END;
 VAR
@@ -168,7 +168,7 @@ VAR
 	color,xofs,yofs: ARRAY Figures OF SIGNED8;
 	clrpot: Pot;
 	timers: Timer;
-	delay: ARRAY Levels OF INTEGER;
+	delay: ARRAY Levels OF SIGNED16;
 	backdrop: ARRAY Levels OF Objects.Name;
 	fudge: LONGINT;
 
@@ -215,11 +215,11 @@ BEGIN
 	INC(F.figures);
 END NextFigure;
 
-PROCEDURE IncScore(F: Field; score,bonus: INTEGER);
+PROCEDURE IncScore(F: Field; score,bonus: SIGNED16);
 (* Increment the score and resort the highscore list if neccessary *)
 VAR
 	sum: LONGINT;
-	level,rows: INTEGER;
+	level,rows: SIGNED16;
 	rank: SIGNED8;
 BEGIN
 	rank:= F.rank;
@@ -233,7 +233,7 @@ BEGIN
 	IF ~F.preview THEN F.mult:= 2; END;
 END IncScore;
 
-PROCEDURE IncRows(F: Field; rows: INTEGER);
+PROCEDURE IncRows(F: Field; rows: SIGNED16);
 (* Increment the amount of filled rows *)
 BEGIN
 	INC(F.score[F.rank].rows,rows);
@@ -256,7 +256,7 @@ BEGIN
 	score.name:= ""; score.points:= 0; score.level:= 0; score.rows:= 0;
 END ResetScore;
 
-PROCEDURE UpdSelection(M: Display3.Mask; state: SET; x,y,w,h: INTEGER);
+PROCEDURE UpdSelection(M: Display3.Mask; state: SET; x,y,w,h: SIGNED16);
 BEGIN
 	IF (Gadgets.selected IN state) THEN
 		Display3.FillPattern(M,Display3.white,Display3.selectpat,x,y,x,y,w,h,paint);
@@ -272,19 +272,19 @@ BEGIN
 	WITH model: Field DO RETURN(model); END;
 END Model;
 
-PROCEDURE PX(R: Frame; dX,row,offs: INTEGER): INTEGER;
+PROCEDURE PX(R: Frame; dX,row,offs: SIGNED16): SIGNED16;
 (* Calculate the X-Position for figure drawing *)
 BEGIN
 	RETURN(R.X + dX + ((row+offs-FigRows) * R.scale));
 END PX;
 
-PROCEDURE PY(R: Frame; dY,line,offs: INTEGER): INTEGER;
+PROCEDURE PY(R: Frame; dY,line,offs: SIGNED16): SIGNED16;
 (* Calculate the Y-Position for figure drawing *)
 BEGIN
 	RETURN(R.Y + dY + ((line-offs-FigLines) * R.scale));
 END PY;
 
-PROCEDURE DrawBlock(R: Frame; c,x,y: INTEGER);
+PROCEDURE DrawBlock(R: Frame; c,x,y: SIGNED16);
 (* Draw or remove one block *)
 BEGIN
 	IF (c = R.col) THEN
@@ -294,10 +294,10 @@ BEGIN
 	END;
 END DrawBlock;
 
-PROCEDURE DrawLine(R: Frame; line: ARRAY OF CHAR; dX,dY,l: INTEGER);
+PROCEDURE DrawLine(R: Frame; line: ARRAY OF CHAR; dX,dY,l: SIGNED16);
 (* Draw line l of the pot *)
 VAR
-	c,j: INTEGER;
+	c,j: SIGNED16;
 BEGIN
 	j:= 0;
 	WHILE (j < ScrnRows) DO
@@ -311,7 +311,7 @@ BEGIN
 	END;
 END DrawLine;
 
-PROCEDURE DrawFigure(R: Frame; fig: Figure; dX,dY,c,r,l: INTEGER);
+PROCEDURE DrawFigure(R: Frame; fig: Figure; dX,dY,c,r,l: SIGNED16);
 (* Draw or remove figure fig. c is color, r row and l line *)
 VAR
 	i,j: SIGNED8;
@@ -328,7 +328,7 @@ BEGIN
 	END;
 END DrawFigure;
 
-PROCEDURE DrawDrop(R: Frame; fig: Figure; dX,dY,c,r,l: INTEGER);
+PROCEDURE DrawDrop(R: Frame; fig: Figure; dX,dY,c,r,l: SIGNED16);
 (* Do not remove and redraw to avoid flickering at fast droppping *)
 VAR
 	i,j,k: SIGNED8;
@@ -354,7 +354,7 @@ BEGIN
 	END;
 END DrawDrop;
 
-PROCEDURE DrawPot(R: Frame; dX,dY: INTEGER; pot: Pot);
+PROCEDURE DrawPot(R: Frame; dX,dY: SIGNED16; pot: Pot);
 (* Draw the whole pot *)
 VAR
 	i: SIGNED8;
@@ -364,11 +364,11 @@ BEGIN
 	WHILE (i < PotLines) DO DrawLine(R,pot[i],dX,dY,i); INC(i); END;
 END DrawPot;
 
-PROCEDURE DrawPreview(R: Frame; fig: Figure; xofs,yofs,c: INTEGER);
+PROCEDURE DrawPreview(R: Frame; fig: Figure; xofs,yofs,c: SIGNED16);
 (* Draw or remove the figure in the preview panel *)
 VAR
 	i,j: SIGNED8;
-	ox,oy: INTEGER;
+	ox,oy: SIGNED16;
 BEGIN
 	ox:= R.mask.X + 5;
 	oy:= R.mask.Y + R.H - R.scale - 5;
@@ -391,7 +391,7 @@ END DrawPreview;
 PROCEDURE MatchFigure(F: Field; fig: Figure; r,l: SIGNED8): BOOLEAN;
 (* Check, if there is space in the pot to put figure fig at position r,l *)
 VAR
-	i,j: INTEGER;
+	i,j: SIGNED16;
 	b: BOOLEAN;
 BEGIN
 	b:= FALSE; j:= 0;
@@ -409,7 +409,7 @@ END MatchFigure;
 PROCEDURE SetFigure(F: Field; fig: Figure; r,l: SIGNED8; c: CHAR);
 (* Place Figure fig into the pot at position r,l - color c *)
 VAR
-	i,j: INTEGER;
+	i,j: SIGNED16;
 BEGIN
 	i:= 0;
 	WHILE (i < FigLines) DO
@@ -454,11 +454,11 @@ BEGIN
 	END;
 END InitPot;
 
-PROCEDURE CheckPot(VAR pot: Pot): INTEGER;
+PROCEDURE CheckPot(VAR pot: Pot): SIGNED16;
 (* Search for filled lines in the pot, drop upper part if found *)
 VAR
 	i,j,k: SIGNED8;
-	full: INTEGER;
+	full: SIGNED16;
 	b: BOOLEAN;
 BEGIN
 	i:= FigLines; k:= PotLines; full:= 0;
@@ -479,7 +479,7 @@ END CheckPot;
 PROCEDURE LogPot(pot: ARRAY OF ARRAY OF CHAR);
 (* Print the pot content (for debugging purpose) *)
 VAR
-	i,j: INTEGER;
+	i,j: SIGNED16;
 BEGIN
 	i:= PotLines-1;
 	WHILE (i >= 0) DO
@@ -532,7 +532,7 @@ END Move;
 PROCEDURE Drop(F: Field);
 (* Drop Figure by incrementing the line index *)
 VAR
-	full: INTEGER;
+	full: SIGNED16;
 	lap: LONGINT;
 	M: FigureMsg;
 BEGIN
@@ -742,7 +742,7 @@ END PotCopy;
 PROCEDURE PotDisplay(R: Frame; VAR M: DisplayMsg);
 VAR
 	obj: Object;
-	mx,my: INTEGER;
+	mx,my: SIGNED16;
 	mask: Display3.Mask;	(* needed for MakeMask *)
 BEGIN
 	Panels.PanelHandler(R,M);
@@ -879,7 +879,7 @@ END PreviewCopy;
 PROCEDURE PreviewDisplay(P: Frame; VAR M: DisplayMsg);
 VAR
 	F: Object;
-	mx,my: INTEGER;
+	mx,my: SIGNED16;
 	show: BOOLEAN;
 	next: SIGNED8;
 	mask: Display3.Mask;	(* needed for MakeMask *)
@@ -1229,7 +1229,7 @@ END DocHandler;
 
 (*** Document Creation ***)
 
-PROCEDURE NewTop(txt: ARRAY OF CHAR; len,ofs: INTEGER): Object;
+PROCEDURE NewTop(txt: ARRAY OF CHAR; len,ofs: SIGNED16): Object;
 (* Creates a topline for the score array - should be editable *)
 VAR
 	obj: Object;
@@ -1242,7 +1242,7 @@ BEGIN
 	RETURN(obj);
 END NewTop;
 
-PROCEDURE NewScore(c: CHAR; num,len,ofs: INTEGER; model: Object): Object;
+PROCEDURE NewScore(c: CHAR; num,len,ofs: SIGNED16; model: Object): Object;
 (* Creates one score field (c holds the attribute, indexed by num) *)
 VAR
 	obj: Object;
@@ -1262,7 +1262,7 @@ PROCEDURE ScoreArray(model: Object): Object;
 (* Creates the score array visible by the user, Objects are linked by slink *)
 VAR
 	first,this,obj: Object;
-	ofs: INTEGER;
+	ofs: SIGNED16;
 	i: SIGNED8;
 BEGIN
 	i:= 0;
@@ -1311,7 +1311,7 @@ PROCEDURE OldDocument(F: Files.File; D: Document; VAR f: Gadgets.Frame);
 (* Restore an old Tetris document from file *)
 VAR
 	obj: Objects.Object;
-	tag: INTEGER;
+	tag: SIGNED16;
 	len: LONGINT;
 	id: CHAR;
 	str: Objects.Name;
@@ -1436,7 +1436,7 @@ END StoreDocument;
 PROCEDURE NewField*;
 VAR
 	F: Field;
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	NEW(F); NEW(F.timer); ResetField(F);
 	FOR i:= 1 TO Ranks DO ResetScore(F.score[i-1]); END;
@@ -1538,7 +1538,7 @@ END NewGame;
 PROCEDURE Backdrop*;
 (* Change an entry in the array of backdrop picture names *)
 VAR
-	level: INTEGER;
+	level: SIGNED16;
 	file: Objects.Name;
 BEGIN
 	In.Open();
@@ -1554,7 +1554,7 @@ END Backdrop;
 PROCEDURE Delay*;
 (* Change the drop impulse delay time *)
 VAR
-	level,value: INTEGER;
+	level,value: SIGNED16;
 BEGIN
 	In.Open();
 	REPEAT

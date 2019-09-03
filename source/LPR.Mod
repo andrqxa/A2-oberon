@@ -24,7 +24,7 @@ MODULE LPR; (* AUTHOR "ejz"; PURPOSE "RFC 1179" *)
 
 
 	VAR
-		jobNr: INTEGER;
+		jobNr: SIGNED16;
 
 
 
@@ -40,7 +40,7 @@ MODULE LPR; (* AUTHOR "ejz"; PURPOSE "RFC 1179" *)
 			reader: Streams.Reader;
 			writer: Streams.Writer;
 			fadr: IP.Adr;
-			locport: INTEGER;
+			locport: SIGNED16;
 			connres: WORD; len : SIZE;
 			conn: TCP.Connection;
 			buf : ARRAY 10000 OF CHAR;
@@ -162,7 +162,7 @@ PROCEDURE ShowJobs*(out: Streams.Writer; CONST host, queue : ARRAY OF CHAR; VAR 
 			reader: Streams.Reader;
 			writer: Streams.Writer;
 			fadr: IP.Adr;
-			locport: INTEGER;
+			locport: SIGNED16;
 	BEGIN
 		DNS.HostByName(host, fadr, connres);
 		IF connres = DNS.Ok THEN
@@ -200,7 +200,7 @@ PROCEDURE ShowJobs*(out: Streams.Writer; CONST host, queue : ARRAY OF CHAR; VAR 
 		reader: Streams.Reader;
 		writer : Streams.Writer;
 		fadr: IP.Adr;
-		locport: INTEGER;
+		locport: SIGNED16;
 	BEGIN
 		DNS.HostByName(host, fadr, connres);
 		IF connres = DNS.Ok THEN

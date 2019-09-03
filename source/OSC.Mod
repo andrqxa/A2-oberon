@@ -83,7 +83,7 @@ OSCBundle b:
 		Trace* = FALSE;
 
 	VAR
-		MonthToDays : ARRAY 13 OF INTEGER; (* copied from Dates.Mod *)
+		MonthToDays : ARRAY 13 OF SIGNED16; (* copied from Dates.Mod *)
 
 		SysStartSeconds-: LONGINT; (* stores the current bootuptimestamp (secs sincs 1st Jan 1900), when an overflow of Objects.ticks is detected,
 										the timestamp will be adjusted *)
@@ -494,7 +494,7 @@ OSCBundle b:
 			(* Sets the OSCTimeTag to the time represented with a Year, Month, ...
 				Note: This function doesn't check if the date is really valid *)
 			PROCEDURE SetLow*(year (* >=1900 *), month (* 1..12 *), day (* 1..31 *),
-				hour (* 0..23 *), min (* 0..59 *), sec (* 0..59 *), msec (* 0..999 *): INTEGER);
+				hour (* 0..23 *), min (* 0..59 *), sec (* 0..59 *), msec (* 0..999 *): SIGNED16);
 			BEGIN
 				seconds := TTGetSecondsLow(year, month, day, hour, min, sec);
 				miliseconds := msec;
@@ -613,7 +613,7 @@ OSCBundle b:
 		OSCMessage* = OBJECT(OSCPacket)
 			VAR
 				address-: String;
-				argumentcount-: INTEGER;
+				argumentcount-: SIGNED16;
 				arguments-: ParamArray;
 				noTypeTagString-: BOOLEAN; (* is TRUE, iff the received packet doesn't contain an OSC Type Tag String *)
 				argumentData-: Blob; (* this holds all the argument data, if noTypeTagString is TRUE *)
@@ -631,7 +631,7 @@ OSCBundle b:
 			PROCEDURE grow;
 			VAR
 				newargs: ParamArray;
-				i: INTEGER;
+				i: SIGNED16;
 			BEGIN
 				NEW(newargs, LEN(arguments)*2);
 				FOR i:=0 TO argumentcount-1 DO
@@ -863,7 +863,7 @@ OSCBundle b:
 		Note: This function doesn't honor the users current timezone.
 		Note: The timezone of a timetag isn't specified in the OSC specification v 1.0 by Matt Wright*)
 	PROCEDURE TTGetSecondsNow*(): LONGINT;
-		VAR year, month, day, hour,minute, second: INTEGER;
+		VAR year, month, day, hour,minute, second: SIGNED16;
 		date, time: LONGINT;
 	BEGIN
 		Clock.Get(time, date);
@@ -880,10 +880,10 @@ OSCBundle b:
 
 	(* Returns the number of seconds from midnight January 1, 1900 to the specified date and time *)
 	PROCEDURE TTGetSecondsLow*(year (* >=1900 *), month (* 1..12 *), day (* 1..31 *),
-		hour (* 0..23 *), min (* 0..59 *), sec (* 0..59 *): INTEGER): LONGINT;
+		hour (* 0..23 *), min (* 0..59 *), sec (* 0..59 *): SIGNED16): LONGINT;
 	VAR
 		days, seconds: LONGINT;
-		i: INTEGER;
+		i: SIGNED16;
 	BEGIN
 		days := 0;
 		FOR i := 1900 TO year-1 DO

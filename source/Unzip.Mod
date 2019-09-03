@@ -104,7 +104,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 			END Extract;
 
 			PROCEDURE &New*(F: Files.File; VAR res: WORD);
-				VAR R: Files.Reader; r, e: Entry; pos: Files.Position; sig, l, j: LONGINT; i: INTEGER;
+				VAR R: Files.Reader; r, e: Entry; pos: Files.Position; sig, l, j: LONGINT; i: SIGNED16;
 			BEGIN
 				res := Streams.Ok; SELF.F := NIL; root := NIL; entries := 0;
 				pos := F.Length()-20; sig := 0;
@@ -155,7 +155,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 	END DosToOberonDate;
 
 	PROCEDURE ReadEntry(R: Streams.Reader; entry: Entry; local: BOOLEAN);
-		VAR l, nl, xl, t, d: LONGINT; i: INTEGER;
+		VAR l, nl, xl, t, d: LONGINT; i: SIGNED16;
 	BEGIN
 		IF local THEN
 			R.RawInt(i);

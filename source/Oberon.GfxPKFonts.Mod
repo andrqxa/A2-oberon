@@ -21,7 +21,7 @@ MODULE GfxPKFonts IN Oberon; (** portable *)	(* eos  *)
 		BaseDesc = RECORD
 			next: Base;
 			name: ARRAY 32 OF CHAR;	(* TeX font file name *)
-			ptsize: INTEGER;	(* original point size of TeX font *)
+			ptsize: SIGNED16;	(* original point size of TeX font *)
 			scale: REAL;	(* scale factor from default to font coordinates (dpi/91.44) *)
 			xmin, ymin, xmax, ymax: LONGINT;	(* union of character bounding boxes *)
 			(*wscale: REAL;*)	(* scale factor for character widths *)
@@ -345,7 +345,7 @@ MODULE GfxPKFonts IN Oberon; (** portable *)	(* eos  *)
 		END
 	END EnumFile;
 
-	PROCEDURE OpenBase (VAR name: ARRAY OF CHAR; ptsize: INTEGER; scale: REAL): Base;
+	PROCEDURE OpenBase (VAR name: ARRAY OF CHAR; ptsize: SIGNED16; scale: REAL): Base;
 		VAR size: ARRAY 6 OF CHAR; pat: ARRAY 64 OF CHAR; base: Base;
 	BEGIN
 		(* first try with correct point size *)
@@ -387,7 +387,7 @@ MODULE GfxPKFonts IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Fonts ---*)
 
-	PROCEDURE Derive (gfont: GfxFonts.Font; ptsize: INTEGER; VAR mat: GfxMatrix.Matrix): GfxFonts.Font;
+	PROCEDURE Derive (gfont: GfxFonts.Font; ptsize: SIGNED16; VAR mat: GfxMatrix.Matrix): GfxFonts.Font;
 	BEGIN
 		RETURN NIL	(* base cache avoids multiple loading of same file *)
 	END Derive;
@@ -441,7 +441,7 @@ MODULE GfxPKFonts IN Oberon; (** portable *)	(* eos  *)
 		END
 	END GetOutline;
 
-	PROCEDURE Open* (VAR family, style: ARRAY OF CHAR; ptsize: INTEGER; VAR mat: GfxMatrix.Matrix): GfxFonts.Font;
+	PROCEDURE Open* (VAR family, style: ARRAY OF CHAR; ptsize: SIGNED16; VAR mat: GfxMatrix.Matrix): GfxFonts.Font;
 		VAR font: Font; name: ARRAY 64 OF CHAR; scale, xmin, ymin, xmax, ymax: REAL; base: Base;
 	BEGIN
 		font := NIL;

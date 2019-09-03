@@ -40,7 +40,7 @@ BEGIN
 END WriteLogString;
 
 PROCEDURE Logger(me: Oberon.Task);
-VAR ip: NetSystem.IPAdr; port: INTEGER; len: LONGINT; buf: ARRAY BufSize OF CHAR;
+VAR ip: NetSystem.IPAdr; port: SIGNED16; len: LONGINT; buf: ARRAY BufSize OF CHAR;
 BEGIN
 	IF NetSystem.AvailableDG(sock) # 0 THEN
 		len := BufSize;
@@ -55,7 +55,7 @@ BEGIN
 END Logger;
 
 PROCEDURE Start*;
-VAR res: INTEGER;
+VAR res: SIGNED16;
 BEGIN
 	IF task = NIL THEN
 		NetSystem.OpenSocket(sock, Port, res);

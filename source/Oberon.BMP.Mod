@@ -16,15 +16,15 @@ MODULE BMP IN Oberon; (** portable *)
 		FileHeader = RECORD
 			type: ARRAY 4 OF CHAR;	(* must be "BM" *)
 			size: LONGINT;	(* filesize in double words *)
-			res1, res2: INTEGER;	(* reserved, must be 0 *)
+			res1, res2: SIGNED16;	(* reserved, must be 0 *)
 			offBits: LONGINT	(* offset in bytes from the FileHeader to the bitmap data *)
 		END;
 
 		BitmapHeader = RECORD
 			size: LONGINT;	(* size of this record *)
 			width, height: LONGINT;	(* image's width and height *)
-			planes: INTEGER;	(* must be 1 *)
-			depth: INTEGER;	(* number of bits per pixel [1, 4, 8, 16, 24 or 32] *)
+			planes: SIGNED16;	(* must be 1 *)
+			depth: SIGNED16;	(* number of bits per pixel [1, 4, 8, 16, 24 or 32] *)
 			compression: LONGINT;	(* type of compression *)
 			sizeImage: LONGINT;	(* can be 0 if bitmap is not compressed *)
 			Xppm, Yppm: LONGINT;	(* pixels per meter *)
@@ -33,7 +33,7 @@ MODULE BMP IN Oberon; (** portable *)
 		END;
 
 	VAR
-		ColorMap: ARRAY 256 OF INTEGER;
+		ColorMap: ARRAY 256 OF SIGNED16;
 		W: Texts.Writer;
 		error: BOOLEAN;
 
@@ -66,7 +66,7 @@ BEGIN
 END ScanBitmapHeader;
 
 PROCEDURE ScanCol (VAR R: Files.Rider; pict: Pictures.Picture; nrColor: LONGINT; conversion: BOOLEAN);
-VAR Red, Green, Blue, c: CHAR; C, min, d, x, y, z: LONGINT; i, j, minj: INTEGER; r, g, b: ARRAY 256 OF INTEGER;
+VAR Red, Green, Blue, c: CHAR; C, min, d, x, y, z: LONGINT; i, j, minj: SIGNED16; r, g, b: ARRAY 256 OF SIGNED16;
 BEGIN
 	C := ASH(1, Display.Depth(0)) - 1;
 	IF nrColor > C THEN nrColor := C ELSE DEC(nrColor) END;
@@ -96,7 +96,7 @@ BEGIN
 END ScanCol;
 
 PROCEDURE LoadRLE8 (VAR R: Files.Rider; pict: Pictures.Picture);
-VAR count, x, y, i: INTEGER; b: CHAR;
+VAR count, x, y, i: SIGNED16; b: CHAR;
 BEGIN
 	x:= 0; y:= 0;
 	WHILE ~R.eof DO
@@ -126,7 +126,7 @@ BEGIN
 END LoadRLE8;
 
 PROCEDURE LoadRLE4 (VAR R: Files.Rider; pict: Pictures.Picture);
-VAR count, x, y, i, clr1, clr2: INTEGER; b: CHAR;
+VAR count, x, y, i, clr1, clr2: SIGNED16; b: CHAR;
 BEGIN
 	x:= 0; y:= 0;
 	WHILE ~R.eof DO
@@ -166,7 +166,7 @@ BEGIN
 END LoadRLE4;
 
 PROCEDURE LoadRGB8 (VAR R: Files.Rider; pict: Pictures.Picture);
-VAR x, y: INTEGER; b: CHAR;
+VAR x, y: SIGNED16; b: CHAR;
 BEGIN
 	x:= 0; y:= 0;
 	WHILE ~R.eof DO
@@ -177,7 +177,7 @@ BEGIN
 END LoadRGB8;
 
 PROCEDURE LoadRGB4 (VAR R: Files.Rider; pict: Pictures.Picture);
-VAR x, y: INTEGER; b: CHAR;
+VAR x, y: SIGNED16; b: CHAR;
 BEGIN
 	x:= 0; y:= 0;
 	WHILE ~R.eof DO
@@ -189,7 +189,7 @@ BEGIN
 END LoadRGB4;
 
 PROCEDURE LoadRGB1 (VAR R: Files.Rider; pict: Pictures.Picture);
-VAR p: LONGINT; i, x, y: INTEGER; b: CHAR;
+VAR p: LONGINT; i, x, y: SIGNED16; b: CHAR;
 BEGIN
 	x := 0; y := 0;
 	WHILE ~R.eof DO

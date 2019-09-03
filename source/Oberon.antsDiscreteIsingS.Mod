@@ -158,7 +158,7 @@ END CachedE;
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR card: LONGINT;  version: INTEGER;
+	VAR card: LONGINT;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLReal( R, s.h );  Files.ReadLReal( R, s.beta );  Files.ReadLInt( R, card );
 		Files.ReadString( R, s.dist );  s.card := 0;  Open( s, s.beta, s.h );  NewDepth( s, s.card )
@@ -172,8 +172,8 @@ END CachedE;
 	END CheckDepth;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, w, h: LONGINT;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  p: RandomArray;  xv: INTEGER;  v1, v2, v3, v4: LONGINT;  cdf: LONGREAL;
-		AO: antsArrayObjects.tINTEGERObject;  t1, t2, t3, t4: LONGINT;  ran: LONGREAL;  d: INTEGER;
+	VAR x, y, w, h: LONGINT;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  p: RandomArray;  xv: SIGNED16;  v1, v2, v3, v4: LONGINT;  cdf: LONGREAL;
+		AO: antsArrayObjects.tINTEGERObject;  t1, t2, t3, t4: LONGINT;  ran: LONGREAL;  d: SIGNED16;
 
 		PROCEDURE DistriFromLocalChar( VAR x, y: LONGINT );
 		BEGIN

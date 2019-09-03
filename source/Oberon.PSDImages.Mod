@@ -9,7 +9,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 	TYPE
 		Header = RECORD
 			width, height: LONGINT;
-			channels, depth, mode: INTEGER;
+			channels, depth, mode: SIGNED16;
 			data: LONGINT;
 			pal: Images.Palette
 		END;
@@ -23,7 +23,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 		Files.Read(R, ch); i := ORD(ch)+LSH(i, 8)
 	END ReadLInt;
 
-	PROCEDURE ReadInt(VAR R: Files.Rider; VAR i: INTEGER);
+	PROCEDURE ReadInt(VAR R: Files.Rider; VAR i: SIGNED16);
 		VAR ch: CHAR;
 	BEGIN
 		Files.Read(R, ch); i := ORD(ch);
@@ -31,7 +31,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 	END ReadInt;
 
 	PROCEDURE CheckFormat(VAR R: Files.Rider): BOOLEAN;
-		VAR sig: LONGINT; ver: INTEGER;
+		VAR sig: LONGINT; ver: SIGNED16;
 	BEGIN
 		ReadLInt(R, sig);
 		IF sig # 038425053H THEN RETURN FALSE END;
@@ -84,7 +84,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 	END SkipSection;
 
 	PROCEDURE LoadRLEInd8(VAR R: Files.Rider; VAR h: Header; img: Images.Image);
-		VAR F: Files.File; pos, pix: LONGINT; i, n, nb, x, y: INTEGER; rle: SIGNED8; ch: CHAR;
+		VAR F: Files.File; pos, pix: LONGINT; i, n, nb, x, y: SIGNED16; rle: SIGNED8; ch: CHAR;
 	BEGIN
 		F := Files.Base(R);
 		pos := h.data + h.channels*h.height*2;
@@ -120,7 +120,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 	END LoadRLEInd8;
 
 	PROCEDURE LoadRLERGB888(VAR R: Files.Rider; VAR h: Header; img: Images.Image);
-		VAR F: Files.File; pos, pix, c: LONGINT; i, n, nb, x, y: INTEGER; rle: SIGNED8; ch: CHAR;
+		VAR F: Files.File; pos, pix, c: LONGINT; i, n, nb, x, y: SIGNED16; rle: SIGNED8; ch: CHAR;
 	BEGIN
 		F := Files.Base(R);
 		pos := h.data + h.channels*h.height*2;
@@ -160,7 +160,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 	END LoadRLERGB888;
 
 	PROCEDURE Load(img: Images.Image; VAR fname: ARRAY OF CHAR; VAR done: BOOLEAN);
-		VAR F: Files.File; R: Files.Rider; h: Header; comp: INTEGER; fmt: Images.Format;
+		VAR F: Files.File; R: Files.Rider; h: Header; comp: SIGNED16; fmt: Images.Format;
 	BEGIN
 		done := FALSE;
 		F := Files.Old(fname); Files.Set(R, F, 0);

@@ -64,8 +64,8 @@ TYPE
 		rParsCache, cParsCache: pars
 	END;
 
-	tIntGetProc = PROCEDURE ( me: tMatrix;  row, col: LONGINT ): INTEGER;
-	tIntSetProc = PROCEDURE ( val: INTEGER;  me: tMatrix;  row, col: LONGINT );
+	tIntGetProc = PROCEDURE ( me: tMatrix;  row, col: LONGINT ): SIGNED16;
+	tIntSetProc = PROCEDURE ( val: SIGNED16;  me: tMatrix;  row, col: LONGINT );
 	tIntMatrix = POINTER TO tIntMatrixDesc;
 	tIntMatrixDesc = RECORD (tMatrixDesc)
 		Get: tIntGetProc;
@@ -84,7 +84,7 @@ TYPE
 
 	(*! substituting COPY for copyLabel yields a compiler crash in MacOberon S3R2.1 OPL *)
 	PROCEDURE copyLabel( VAR l1, l2: label );
-	VAR t: INTEGER;
+	VAR t: SIGNED16;
 	BEGIN
 		t := 0;
 		WHILE (l1[t] # 0X) DO l2[t] := l1[t];  INC( t ) END;
@@ -187,14 +187,14 @@ TYPE
 		FOR t := at TO M.columns - 1 DO copyLabel( M.collabels[t + 1], M.collabels[t] ) END
 	END DeleteColumn;
 (** Integer **)
-	PROCEDURE GetInt*( me: tMatrix;  row, col: LONGINT ): INTEGER;
+	PROCEDURE GetInt*( me: tMatrix;  row, col: LONGINT ): SIGNED16;
 	BEGIN
 		ASSERT ( me IS tIntMatrix, 100 );
 		WITH me: tIntMatrix DO RETURN me.Get( me, row, col )
 		END
 	END GetInt;
 
-	PROCEDURE SetInt*( val: INTEGER;  me: tMatrix;  row, col: LONGINT );
+	PROCEDURE SetInt*( val: SIGNED16;  me: tMatrix;  row, col: LONGINT );
 	BEGIN
 		ASSERT ( me IS tIntMatrix, 100 );
 		WITH me: tIntMatrix DO me.Set( val, me, row, col )
@@ -409,7 +409,7 @@ TYPE
 	END setCLabel;
 
 	PROCEDURE getRLabel*( VAR s: ARRAY OF CHAR;  M: tMatrix;  row: LONGINT );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE (M.rowlabels[row][i] # 0X) DO s[i] := M.rowlabels[row][i];  INC( i ) END;
@@ -417,7 +417,7 @@ TYPE
 	END getRLabel;
 
 	PROCEDURE getCLabel*( VAR s: ARRAY OF CHAR;  M: tMatrix;  col: LONGINT );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE (M.collabels[col][i] # 0X) DO s[i] := M.collabels[col][i];  INC( i ) END;

@@ -63,24 +63,24 @@ CONST
 TYPE
 	(* Huffman trees *)
 	Node = RECORD
-		freqOrCode: INTEGER;	(* frequency count / bit string *)
-		dadOrLen: INTEGER	(* father node on Huffman tree / length of bit string *)
+		freqOrCode: SIGNED16;	(* frequency count / bit string *)
+		dadOrLen: SIGNED16	(* father node on Huffman tree / length of bit string *)
 	END;
 	Nodes = POINTER TO ARRAY OF Node;
 
-	Bits = POINTER TO ARRAY OF INTEGER;
+	Bits = POINTER TO ARRAY OF SIGNED16;
 
 	StaticTree = RECORD
 		node: Nodes;
 		bits: Bits;	(* extra bits for each code *)
-		base: INTEGER;	(* base index for Bits *)
-		elems: INTEGER;	(* max number of elements in the tree *)
-		maxLength: INTEGER	(* max bit length for the codes *)
+		base: SIGNED16;	(* base index for Bits *)
+		elems: SIGNED16;	(* max number of elements in the tree *)
+		maxLength: SIGNED16	(* max bit length for the codes *)
 	END;
 
 	Tree = RECORD
 		node: Nodes;	(* dynamic tree *)
-		maxCode: INTEGER;	(* largest code with non-zero frequency *)
+		maxCode: SIGNED16;	(* largest code with non-zero frequency *)
 		static: StaticTree	(* corresponding static tree *)
 	END;
 
@@ -123,17 +123,17 @@ TYPE
 		(* trees *)
 		ltree, dtree, btree: Tree;	(* trees for literals/lengths, distances and bit lengths *)
 		lnode, dnode, bnode: Nodes;	(* corresponding nodes *)
-		bitLenCount: ARRAY MaxBits + 1 OF INTEGER;	(* number of codes at each bit length for optimal tree *)
-		heap: ARRAY HeapSize OF INTEGER;	(* heap used to build Huffman tree *)
-		heapLen: INTEGER;	(* number of elements in the heap *)
-		heapMax: INTEGER;	(* heap element of largest frequency *)
-		depth: ARRAY HeapSize OF INTEGER;	(* depth of each subtree for deciding between trees of equal frequency *)
+		bitLenCount: ARRAY MaxBits + 1 OF SIGNED16;	(* number of codes at each bit length for optimal tree *)
+		heap: ARRAY HeapSize OF SIGNED16;	(* heap used to build Huffman tree *)
+		heapLen: SIGNED16;	(* number of elements in the heap *)
+		heapMax: SIGNED16;	(* heap element of largest frequency *)
+		depth: ARRAY HeapSize OF SIGNED16;	(* depth of each subtree for deciding between trees of equal frequency *)
 		lbuf: POINTER TO ARRAY LitBufSize OF CHAR;	(* buffer for literals/lengths *)
-		dbuf: POINTER TO ARRAY LitBufSize OF INTEGER;	(* buffer for distances *)
+		dbuf: POINTER TO ARRAY LitBufSize OF SIGNED16;	(* buffer for distances *)
 		lastLit: LONGINT;	(* running index in lbuf *)
 		buf: LONGINT;	(* bit buffer *)
-		bits: INTEGER;	(* number of valid bits in bit buffer *)
-		lastEobLen: INTEGER;	(* bit length of End Of Block code for last block *)
+		bits: SIGNED16;	(* number of valid bits in bit buffer *)
+		lastEobLen: SIGNED16;	(* bit length of End Of Block code for last block *)
 		optLen: LONGINT;	(* bit length of current block with optimal trees *)
 		staticLen: LONGINT;	(* bit length of current block with static trees *)
 	END;
@@ -143,16 +143,16 @@ TYPE
 VAR
 	ExtraLenBits, ExtraDistBits, ExtraBitBits: Bits;
 	LTree, DTree, BTree: StaticTree;
-	BaseLength: ARRAY LengthCodes OF INTEGER;
-	BaseDist: ARRAY DistCodes OF INTEGER;
+	BaseLength: ARRAY LengthCodes OF SIGNED16;
+	BaseDist: ARRAY DistCodes OF SIGNED16;
 	LengthCode: ARRAY MaxMatch - MinMatch + 1 OF CHAR;
 	DistCode: ARRAY DistCodeLen OF CHAR;
 	BitOrder: ARRAY BitCodes OF SIGNED8;
 	ConfigTable: ARRAY 10 OF RECORD
-		GoodLen: INTEGER;	(* reduce lazy search above this match length *)
-		MaxLazy: INTEGER;	(* do not perform lazy search above this match length *)
-		NiceLen: INTEGER;	(* quit search above this match length *)
-		MaxChain: INTEGER;	(* maximal number of hash entries considered *)
+		GoodLen: SIGNED16;	(* reduce lazy search above this match length *)
+		MaxLazy: SIGNED16;	(* do not perform lazy search above this match length *)
+		NiceLen: SIGNED16;	(* quit search above this match length *)
+		MaxChain: SIGNED16;	(* maximal number of hash entries considered *)
 		Compress: Compressor;	(* block compress procedure *)
 	END;
 
@@ -186,9 +186,9 @@ BEGIN
 END Put32BitsMSB;
 
 (* Reverse the first len bits of a code, using straightforward code *)
-PROCEDURE ReverseBits(code, len: INTEGER): INTEGER;
+PROCEDURE ReverseBits(code, len: SIGNED16): SIGNED16;
 VAR
-	res: INTEGER;
+	res: SIGNED16;
 BEGIN
 	res := 0;
 	REPEAT
@@ -199,7 +199,7 @@ BEGIN
 END ReverseBits;
 
 (* Send a value on a given number of bits *)
-PROCEDURE SendBits(VAR stream: Stream; val: LONGINT; len: INTEGER);
+PROCEDURE SendBits(VAR stream: Stream; val: LONGINT; len: SIGNED16);
 BEGIN
 	INC(stream.buf, ASH(val, stream.bits)); INC(stream.bits, len);
 	IF stream.bits > BitBufSize THEN
@@ -265,14 +265,14 @@ BEGIN
 END SetDataType;
 
 (* Generate the codes for a given tree and bit counts (which need not to be optimal) *)
-PROCEDURE GenCodes(VAR node: Nodes; maxCode: INTEGER; VAR count: ARRAY OF INTEGER);
+PROCEDURE GenCodes(VAR node: Nodes; maxCode: SIGNED16; VAR count: ARRAY OF SIGNED16);
 VAR
-	nextCode: ARRAY MaxBits + 1 OF INTEGER;	(* next code value for each bit length *)
-	code, bits, n, len : INTEGER;
+	nextCode: ARRAY MaxBits + 1 OF SIGNED16;	(* next code value for each bit length *)
+	code, bits, n, len : SIGNED16;
 BEGIN
 	code := 0;
 	FOR bits := 1 TO MaxBits DO
-		code := INTEGER(ASH(code + count[bits - 1], 1));
+		code := SIGNED16(ASH(code + count[bits - 1], 1));
 		nextCode[bits] := code
 	END;
 	ASSERT(code + count[MaxBits] - 1 = ASH(1, MaxBits) - 1, 110);	(* inconsistent bit counts *)
@@ -289,7 +289,7 @@ PROCEDURE GenBitLen(VAR stream: Stream; VAR tree: Tree);
 VAR
 	node: Nodes;
 	stree: StaticTree;
-	bits, h, n, m, overflow, xbits : INTEGER;
+	bits, h, n, m, overflow, xbits : SIGNED16;
 	freq: LONGINT;
 BEGIN
 	node := tree.node;
@@ -345,12 +345,12 @@ END GenBitLen;
 
 (* Restore heap property by moving down the tree starting at node k, exchanging a node with smallest child if necessary,
 	stopping when heap property is re-established (each father smaller than its two children *)
-PROCEDURE Sift(VAR stream: Stream; VAR node: Nodes; k: INTEGER);
+PROCEDURE Sift(VAR stream: Stream; VAR node: Nodes; k: SIGNED16);
 VAR
-	v, i: INTEGER;
+	v, i: SIGNED16;
 
 	(* Compare subtrees, using tree depth as tie breaker when subtrees have equal frequency -> minimizes worst case length *)
-	PROCEDURE Smaller(n, m: INTEGER): BOOLEAN;
+	PROCEDURE Smaller(n, m: SIGNED16): BOOLEAN;
 	BEGIN
 		RETURN (node[n].freqOrCode < node[m].freqOrCode) OR
 			((node[n].freqOrCode = node[m].freqOrCode) & (stream.depth[n] <= stream.depth[m]))
@@ -379,7 +379,7 @@ PROCEDURE BuildTree(VAR stream: Stream; VAR tree: Tree);
 VAR
 	node: Nodes;
 	stree: StaticTree;
-	n, m, maxCode, next: INTEGER;
+	n, m, maxCode, next: SIGNED16;
 BEGIN
 	node := tree.node; stree := tree.static; maxCode := -1;
 
@@ -439,15 +439,15 @@ BEGIN
 END BuildTree;
 
 (* Scan a literal or distance tree to determine the frequencies of the codes in the bit length tree. *)
-PROCEDURE ScanTree(VAR stream: Stream; node: Nodes; max: INTEGER);
+PROCEDURE ScanTree(VAR stream: Stream; node: Nodes; max: SIGNED16);
 VAR
-	n, prevLen, curLen, nextLen, count, maxCount, minCount: INTEGER;
+	n, prevLen, curLen, nextLen, count, maxCount, minCount: SIGNED16;
 BEGIN
 	prevLen := -1; nextLen := node[0].dadOrLen; count := 0;
 	IF nextLen = 0 THEN maxCount := 138; minCount := 3
 	ELSE maxCount := 7; minCount := 4
 	END;
-	node[max + 1].dadOrLen := MAX(INTEGER);	(* sentinel *)
+	node[max + 1].dadOrLen := MAX(SIGNED16);	(* sentinel *)
 	FOR n := 0 TO max DO
 		curLen := nextLen; nextLen := node[n + 1].dadOrLen;
 		INC(count);
@@ -472,9 +472,9 @@ BEGIN
 END ScanTree;
 
 (* Construct the Huffman tree for the bit lengths and return the index in BitOrder of the last bit length code to send. *)
-PROCEDURE BuildBitLenTree(VAR stream: Stream): INTEGER;
+PROCEDURE BuildBitLenTree(VAR stream: Stream): SIGNED16;
 VAR
-	max: INTEGER;	(* index of last bit length code of non zero frequency *)
+	max: SIGNED16;	(* index of last bit length code of non zero frequency *)
 BEGIN
 	(* determine the bit length frequencies for literal and distance trees *)
 	ScanTree(stream, stream.ltree.node, stream.ltree.maxCode);
@@ -492,14 +492,14 @@ END BuildBitLenTree;
 
 (* Send a literal or distance tree in compressed form, using the codes in stream.bnode.
 	tree: the tree to be scanned; max: its largest code of non zero frequency *)
-PROCEDURE SendTree(VAR stream: Stream; node: Nodes; max: INTEGER);
+PROCEDURE SendTree(VAR stream: Stream; node: Nodes; max: SIGNED16);
 VAR
-	n, prevLen, curLen, nextLen, count, maxCount, minCount: INTEGER;
+	n, prevLen, curLen, nextLen, count, maxCount, minCount: SIGNED16;
 BEGIN
 	prevLen := -1; nextLen := node[0].dadOrLen; count := 0;
 	IF nextLen = 0 THEN maxCount := 138; minCount := 3
 	ELSE maxCount := 7; minCount := 4 END;
-	node[max + 1].dadOrLen := MAX(INTEGER);	(* sentinel *)
+	node[max + 1].dadOrLen := MAX(SIGNED16);	(* sentinel *)
 	FOR n := 0 TO max DO
 		curLen := nextLen; nextLen := node[n + 1].dadOrLen;
 		INC(count);
@@ -532,9 +532,9 @@ END SendTree;
 (* Send the header for a block using dynamic Huffman trees: the counts, the lengths of the bit length codes, the literal tree
 	and the distance tree.
 	lcodes, dcodes, blcodes: number of codes for each tree *)
-PROCEDURE SendAllTrees(VAR stream: Stream; lcodes, dcodes, blcodes: INTEGER);
+PROCEDURE SendAllTrees(VAR stream: Stream; lcodes, dcodes, blcodes: SIGNED16);
 VAR
-	rank: INTEGER;	(* index in BitOrder *)
+	rank: SIGNED16;	(* index in BitOrder *)
 BEGIN
 	ASSERT((lcodes >= 257) & (dcodes >= 1) & (blcodes >= 4), 100);	(* not enough codes *)
 	ASSERT((lcodes <= LitLenCodes) & (dcodes <= DistCodes) & (blcodes <= BitCodes), 101);	(* too many codes *)
@@ -550,8 +550,8 @@ END SendAllTrees;
 PROCEDURE InitStaticTrees;
 VAR
 	n, code: LONGINT;
-	length, dist: INTEGER;
-	count: ARRAY MaxBits + 1 OF INTEGER;	(* number of codes at each bit length for an optimal tree *)
+	length, dist: SIGNED16;
+	count: ARRAY MaxBits + 1 OF SIGNED16;	(* number of codes at each bit length for an optimal tree *)
 BEGIN
 	NEW(ExtraLenBits, LengthCodes);
 	FOR n := 0 TO 3 DO ExtraLenBits[n] := 0 END;
@@ -593,9 +593,9 @@ BEGIN
 	END;
 	ASSERT(dist = 256, 111);
 
-	dist := INTEGER(ASH(dist, -7));	(* from now on, all distances are divided by 128 *)
+	dist := SIGNED16(ASH(dist, -7));	(* from now on, all distances are divided by 128 *)
 	FOR code := 16 TO DistCodes - 1 DO
-		BaseDist[code] := INTEGER(ASH(dist, 7));
+		BaseDist[code] := SIGNED16(ASH(dist, 7));
 		FOR n := 0 TO ASH(1, ExtraDistBits[code] - 7) - 1 DO
 			DistCode[256 + dist] := CHR(code); INC(dist)
 		END
@@ -705,10 +705,10 @@ END StoreBlock;
 (* Send the block data compressed using the given Huffman trees *)
 PROCEDURE CompressBlock(VAR stream: Stream; lnode, dnode: Nodes);
 VAR
-	dist: INTEGER;	(* distance of matched string *)
-	lc: INTEGER;	(* match length or unmatched char (if dist = 0) *)
-	code: INTEGER;	(* the code to send *)
-	extra: INTEGER;	(* number of extra bits to send *)
+	dist: SIGNED16;	(* distance of matched string *)
+	lc: SIGNED16;	(* match length or unmatched char (if dist = 0) *)
+	code: SIGNED16;	(* the code to send *)
+	extra: SIGNED16;	(* number of extra bits to send *)
 	lx: LONGINT;	(* running index in lbuf and dbuf *)
 BEGIN
 	IF stream.lastLit # 0 THEN
@@ -754,7 +754,7 @@ END CompressBlock;
 	IN assertion: stream.string is set to the end of the current match *)
 PROCEDURE FlushBlock(VAR stream: Stream; VAR buf: ARRAY OF CHAR; pos, len: SIZE; eof: BOOLEAN);
 VAR
-	max: INTEGER;	(* index of last bit length code of non zero freqency *)
+	max: SIGNED16;	(* index of last bit length code of non zero freqency *)
 	optLen, staticLen: SIZE;	(* optLen and staticLen in bytes *)
 	value: LONGINT;
 BEGIN
@@ -805,7 +805,7 @@ BEGIN
 END TallyLit;
 
 (* Put a distance/length pair in the distance and the length buffer (stream.dbuf, stream.lbuf) *)
-PROCEDURE TallyDistLen(VAR stream: Stream; dist, len: INTEGER): BOOLEAN;
+PROCEDURE TallyDistLen(VAR stream: Stream; dist, len: SIGNED16): BOOLEAN;
 BEGIN
 	ASSERT(len < 256, 99);
 	stream.lbuf[stream.lastLit] := CHR(len);
@@ -1074,7 +1074,7 @@ BEGIN
 		END;
 		IF stream.matchLen >= MinMatch THEN
 			CheckMatch(stream, stream.string, stream.match, stream.matchLen);
-			mustFlush := TallyDistLen(stream, INTEGER(stream.string - stream.match), INTEGER(stream.matchLen - MinMatch));
+			mustFlush := TallyDistLen(stream, SIGNED16(stream.string - stream.match), SIGNED16(stream.matchLen - MinMatch));
 			DEC(stream.lookAhead, stream.matchLen);
 			(* Insert new strings in the hash table only if the match length is not too large.
 				This saves time but degrades compression *)
@@ -1161,7 +1161,7 @@ BEGIN
 		IF (stream.prevLen >= MinMatch) & (stream.matchLen <= stream.prevLen) THEN
 			maxIns := stream.string + stream.lookAhead - MinMatch;	(* do not insert strings in hash table beyond this *)
 			CheckMatch(stream, stream.string - 1, stream.prevMatch, stream.prevLen);
-			mustFlush := TallyDistLen(stream, INTEGER(stream.string - 1 - stream.prevMatch), INTEGER(stream.prevLen - MinMatch));
+			mustFlush := TallyDistLen(stream, SIGNED16(stream.string - 1 - stream.prevMatch), SIGNED16(stream.prevLen - MinMatch));
 
 			(* Insert in hash table all strings up to the end of the match. stream.string - 1 and stream.string are already inserted.
 				If there is not enough stream.lookAhead, the last two strings are not inserted in the hash table. *)

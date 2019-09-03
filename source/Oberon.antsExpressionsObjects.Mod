@@ -451,7 +451,7 @@ IMPORT vyBase, vyLongrealVec, vyRealVec, Objects, vyIntVec, vyLongintVec, vyType
 		RETURN -x
 	END NegL;
 
-	PROCEDURE NegI( x: INTEGER ): INTEGER;
+	PROCEDURE NegI( x: SIGNED16 ): SIGNED16;
 	BEGIN
 		RETURN -x
 	END NegI;
@@ -581,7 +581,7 @@ IMPORT vyBase, vyLongrealVec, vyRealVec, Objects, vyIntVec, vyLongintVec, vyType
 		RETURN FALSE
 	END AssignLongint;
 
-	PROCEDURE AssignInt*( x: INTEGER;  adr: LONGINT;  name: ARRAY OF CHAR ): BOOLEAN;
+	PROCEDURE AssignInt*( x: SIGNED16;  adr: LONGINT;  name: ARRAY OF CHAR ): BOOLEAN;
 	VAR xx: vyIntVec.tINTEGER;  p: ANY;
 	BEGIN
 		IF adr = 0 THEN xx := vyIntVec.NewIntegerObject( x );  vyName.RegisterNamed( xx, name );  RETURN TRUE

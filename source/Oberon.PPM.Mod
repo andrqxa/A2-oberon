@@ -37,10 +37,10 @@ TYPE
 		Set: PROCEDURE(VAR R: Rider; pos: LONGINT);	(* seek to given file position *)
 	END;
 VAR
-	map,r0,g0,b0,r1,g1,b1: ARRAY 256 OF INTEGER;
+	map,r0,g0,b0,r1,g1,b1: ARRAY 256 OF SIGNED16;
 	mode: CHAR;
 	depth: LONGINT;
-	delta: INTEGER;
+	delta: SIGNED16;
 	credit: BOOLEAN;
 
 (* Rider Methods *)
@@ -83,7 +83,7 @@ PROCEDURE OpenRider(VAR FR: Files.Rider; VAR R: Rider; pos: LONGINT);
 VAR
 	c: CHAR;
 	len: LONGINT;
-	val: INTEGER;
+	val: SIGNED16;
 	line: Objects.Name;
 BEGIN
 	Files.Read(FR,c);
@@ -134,7 +134,7 @@ BEGIN
 	RETURN(b);
 END MagicNumber;
 
-PROCEDURE Value(VAR R: Rider): INTEGER;
+PROCEDURE Value(VAR R: Rider): SIGNED16;
 	(* return an integer value read from the text stream *)
 VAR
 	c: ARRAY 71 OF CHAR;
@@ -157,7 +157,7 @@ PROCEDURE ScanGrayMap(pict: Pictures.Picture; nrColor: LONGINT; conversion: BOOL
 VAR
 	Gray: CHAR;
 	min,d,x,y,z: LONGINT;
-	i,j,k,minj: INTEGER;
+	i,j,k,minj: SIGNED16;
 BEGIN
 	IF conversion THEN
 		i:= 0;
@@ -186,11 +186,11 @@ BEGIN
 	END;
 END ScanGrayMap;
 
-PROCEDURE ScanColor(pict: Pictures.Picture; i,red,green,blue: INTEGER; conversion: BOOLEAN): INTEGER;
+PROCEDURE ScanColor(pict: Pictures.Picture; i,red,green,blue: SIGNED16; conversion: BOOLEAN): SIGNED16;
 	(* build a colormap by using the read values of red,green and blue *)
 VAR
 	min,d,x,y,z: LONGINT;
-	j,k,minj: INTEGER;
+	j,k,minj: SIGNED16;
 BEGIN
 	IF conversion THEN
 		k:= 0;
@@ -217,10 +217,10 @@ BEGIN
 	END;
 END ScanColor;
 
-PROCEDURE LoadPPM(VAR R: Rider; transparentCol: INTEGER; colorConversion: BOOLEAN; pict: Pictures.Picture);
+PROCEDURE LoadPPM(VAR R: Rider; transparentCol: SIGNED16; colorConversion: BOOLEAN; pict: Pictures.Picture);
 VAR
 	p,pos: LONGINT;
-	i,w,h,x,y,v0,v1,v2: INTEGER;
+	i,w,h,x,y,v0,v1,v2: SIGNED16;
 	c,red,green,blue: CHAR;
 	eol: BOOLEAN;
 

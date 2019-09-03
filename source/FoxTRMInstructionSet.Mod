@@ -66,8 +66,8 @@ CONST
 	*)
 
 TYPE
-	OperandType = INTEGER;
-	OperandFormatType = INTEGER;
+	OperandType = SIGNED16;
+	OperandFormatType = SIGNED16;
 	RegisterIndex = LONGINT;
 
 	InstructionFormat* = RECORD
@@ -941,7 +941,7 @@ TYPE
 	PROCEDURE DumpInstructionFormats*(context: Commands.Context);
 	VAR i, j, k, mnemNum: LONGINT; instr: InstructionFormat; first: BOOLEAN; mnemonic: Mnemonic; options: Options.Options; sorted: BOOLEAN;
 
-		PROCEDURE DumpType(type: INTEGER);
+		PROCEDURE DumpType(type: SIGNED16);
 		BEGIN
 			IF type = None THEN RETURN END;
 			IF first THEN context.out.String(" "); first := FALSE; ELSE context.out.String(", ") END;

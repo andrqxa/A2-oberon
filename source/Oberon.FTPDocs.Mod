@@ -48,11 +48,11 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 			dataC: NetSystem.Connection;
 			log: Texts.Text;
 			curDir: ARRAY NetTools.PathStrLen OF CHAR;
-			system, dataPort: INTEGER;
+			system, dataPort: SIGNED16;
 			dataIP: NetSystem.IPAdr;
 			portIPAddress: ARRAY 64 OF CHAR;
 			usr, passw, host: ARRAY NetTools.ServerStrLen OF CHAR;
-			port: INTEGER;
+			port: SIGNED16;
 			ack, bin: BOOLEAN
 		END;
 		EnumProc* = PROCEDURE (entry: ARRAY OF CHAR);
@@ -62,14 +62,14 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 		END;
 
 	VAR
-		system: INTEGER;
+		system: SIGNED16;
 		W, dirW: Texts.Writer;
 		line, link: ARRAY NetTools.MaxLine OF CHAR;
 		cacheS, curS: Session;
 		curF: Frame;
 		message: BOOLEAN;
 		proxyHost: ARRAY NetTools.ServerStrLen OF CHAR;
-		proxyPort, dataPort: INTEGER;
+		proxyPort, dataPort: SIGNED16;
 		proxy: BOOLEAN;
 
 	PROCEDURE ReadResponse(S: Session; VAR sline: ARRAY OF CHAR);
@@ -205,7 +205,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 		NotReady: the server is busy, retry later
 		NotConnected: server not found
 		Failed: NetSystem.hostIP not set *)
-	PROCEDURE Open*(server, user, passwd: ARRAY OF CHAR; port: INTEGER; log: Texts.Text; VAR S: Session);
+	PROCEDURE Open*(server, user, passwd: ARRAY OF CHAR; port: SIGNED16; log: Texts.Text; VAR S: Session);
 	BEGIN
 		NEW(S); S.dataC := NIL;
 		COPY(server, S.host); S.port := port; S.dataPort := -1;
@@ -282,7 +282,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 	END ChangeDir;
 
 	PROCEDURE SetDataPort(S: Session);
-		VAR str: ARRAY 4 OF CHAR; p0, p1: LONGINT; i, j, k: INTEGER; done: BOOLEAN;
+		VAR str: ARRAY 4 OF CHAR; p0, p1: LONGINT; i, j, k: SIGNED16; done: BOOLEAN;
 	BEGIN
 		SendCmd(S, "PASV"); ReadResponse(S, line);
 		IF (S.status >= CommandOk) & (S.status < 300) THEN
@@ -419,7 +419,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 
 	PROCEDURE ScanLen(VAR reply: ARRAY OF CHAR; VAR len: LONGINT);
 		VAR
-			i, d: INTEGER;
+			i, d: SIGNED16;
 			last: BOOLEAN;
 	BEGIN
 		last := FALSE; d := -1; i := 0;
@@ -677,7 +677,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 			Done: all ok
 			Failed: see S.reply(Line) *)
 	PROCEDURE GetCurDir*(S: Session; VAR curdir: ARRAY OF CHAR);
-		VAR i, j: INTEGER;
+		VAR i, j: SIGNED16;
 	BEGIN
 		SendCmd(S, "PWD");
 		ReadResponse(S, S.reply);
@@ -777,7 +777,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 	END DocHandler;
 
 (** Register a ftp URL and get a unique key for it. *)
-	PROCEDURE RegisterFTPAdr*(host, path, user, passwd: ARRAY OF CHAR; type: CHAR; port: INTEGER): LONGINT;
+	PROCEDURE RegisterFTPAdr*(host, path, user, passwd: ARRAY OF CHAR; type: CHAR; port: SIGNED16): LONGINT;
 		VAR
 			portS: ARRAY 8 OF CHAR;
 			key: LONGINT;
@@ -808,7 +808,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 	END RegisterFTPAdr;
 
 (** Parsing of an ftp url. *)
-	PROCEDURE SplitFTPAdr*(VAR url, host, path, user, passwd: ARRAY OF CHAR; VAR type: CHAR; VAR port: INTEGER): LONGINT;
+	PROCEDURE SplitFTPAdr*(VAR url, host, path, user, passwd: ARRAY OF CHAR; VAR type: CHAR; VAR port: SIGNED16): LONGINT;
 		VAR
 			key: LONGINT;
 			i, j, l: SIZE;
@@ -954,7 +954,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 		VAR
 			usr, passw, host: ARRAY NetTools.ServerStrLen OF CHAR;
 			path: ARRAY NetTools.PathStrLen OF CHAR;
-			port: INTEGER;
+			port: SIGNED16;
 			type: CHAR;
 	BEGIN
 		WITH L: HyperDocs.LinkScheme DO
@@ -1035,7 +1035,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 	END NewLinkScheme;
 
 	PROCEDURE TrimmVMS(VAR name: ARRAY OF CHAR);
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE (name[i] # 0X) & (name[i] # ";") DO
@@ -1262,7 +1262,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 			pos: LONGINT;
 			msgW: Texts.Writer;
 			U: Gadgets.UpdateMsg;
-			h: INTEGER;
+			h: SIGNED16;
 			oldBin: BOOLEAN;
 	BEGIN
 		Texts.Delete(F.text, 0, F.text.len);
@@ -1622,7 +1622,7 @@ MODULE FTPDocs IN Oberon; (** portable *)	(* ejz, , some tips by bh & pm *)
 			D2: Documents.Document;
 			T: Texts.Text;
 			new: HyperDocs.Node;
-			port: INTEGER;
+			port: SIGNED16;
 			P: NetTools.ProxyMsg;
 			S: HyperDocs.LinkScheme;
 			type: CHAR;

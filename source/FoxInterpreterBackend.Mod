@@ -15,7 +15,7 @@ TYPE
 	END;
 
 	Int1 = SIGNED8;
-	Int2 = INTEGER;
+	Int2 = SIGNED16;
 	Int4 = LONGINT;
 	Int8 = HUGEINT;
 	Float4 = REAL;
@@ -709,7 +709,7 @@ Compiler.Compile -b=Interpreter Test.Mod ~
 TextCompiler.CompileSelection -b=Interpreter ~
 
 	MODULE Test;
-	VAR a: INTEGER;
+	VAR a: SIGNED16;
 	BEGIN
 		a := 0;
 		ASSERT(a = 0);

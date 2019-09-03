@@ -31,13 +31,13 @@ TYPE
 	NeighbourTable* = antsArrayObjects.tLONGINTArray;
 
 	pars* = antsGlobals.Parameters;
-	NumOFN* = POINTER TO ARRAY OF INTEGER;
+	NumOFN* = POINTER TO ARRAY OF SIGNED16;
 	Index* = NumOFN;
-	NeighbArray* = POINTER TO ARRAY OF ARRAY 8 OF INTEGER;
+	NeighbArray* = POINTER TO ARRAY OF ARRAY 8 OF SIGNED16;
 
 	Neighbours* = POINTER TO NeighboursDesc;
 	NeighboursDesc* = RECORD (vyBase.ObjDesc)
-		dim-: INTEGER;   (* number of neighbourhoods to be parametrized*)
+		dim-: SIGNED16;   (* number of neighbourhoods to be parametrized*)
 		count-: NumOFN;   (* number of neighbours per neighbourhood (max 8)*)
 		x-, y-: NeighbArray;   (* neighbours in x, y direction *)
 		isotropic-: BOOLEAN;
@@ -45,11 +45,11 @@ TYPE
 		parnames: antsGlobals.ParameterNames;
 		cx-, cy-: Index;   (* cache for fast access in Sampling methods, one to one correspondence of masked pixels to pars *)
 		cpar-: pars;
-		clen-: INTEGER
+		clen-: SIGNED16
 	END;
 
 	PROCEDURE FillParCache*( n: Neighbours );
-	VAR len, i, j: INTEGER;
+	VAR len, i, j: SIGNED16;
 	BEGIN
 		len := 0;
 		FOR i := 0 TO n.dim - 1 DO
@@ -58,7 +58,7 @@ TYPE
 	END FillParCache;
 
 	PROCEDURE FillCache*( n: Neighbours );
-	VAR len, i, j: INTEGER;
+	VAR len, i, j: SIGNED16;
 	BEGIN
 		len := 0;
 		FOR i := 0 TO n.dim - 1 DO len := len + n.count[i] END;
@@ -78,14 +78,14 @@ TYPE
 	END WritePars;
 
 	PROCEDURE ReadPars( VAR R: Files.Rider;  VAR par: pars );
-	VAR len, i: LONGINT;  version: INTEGER;
+	VAR len, i: LONGINT;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLInt( R, len );  NEW( par, len );
 		FOR i := 0 TO len - 1 DO Files.ReadLReal( R, par[i] ) END
 	END ReadPars;
 
 	PROCEDURE WriteNeighbours( VAR R: Files.Rider;  n: Neighbours );
-	VAR i, j: INTEGER;
+	VAR i, j: SIGNED16;
 	BEGIN
 		Files.WriteInt( R, 0 );  Files.WriteInt( R, n.dim );
 		FOR i := 0 TO n.dim - 1 DO
@@ -96,7 +96,7 @@ TYPE
 	END WriteNeighbours;
 
 	PROCEDURE ReadNeighbours( VAR R: Files.Rider;  VAR n: Neighbours );
-	VAR dim, i, j: INTEGER;  version: INTEGER;
+	VAR dim, i, j: SIGNED16;  version: SIGNED16;
 
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadInt( R, dim );  n.dim := dim;  NEW( n.count, dim );  NEW( n.x, dim );  NEW( n.y, dim );
@@ -152,14 +152,14 @@ TYPE
 		END  (* tVector*)
 	END Handler;
 
-	PROCEDURE swap( VAR x, y: INTEGER );
-	VAR temp: INTEGER;
+	PROCEDURE swap( VAR x, y: SIGNED16 );
+	VAR temp: SIGNED16;
 	BEGIN
 		temp := x;  x := y;  y := temp
 	END swap;
 
 	PROCEDURE OpenL2*( n: Neighbours;  dim: LONGINT;  isotropic: BOOLEAN );
-	VAR x, y: INTEGER;  pos: LONGINT;  dist: LONGINT;  len: INTEGER;  par: pars;  i: LONGINT;
+	VAR x, y: SIGNED16;  pos: LONGINT;  dist: LONGINT;  len: SIGNED16;  par: pars;  i: LONGINT;
 	BEGIN
 		NEW( n.x, dim );  NEW( n.y, dim );  NEW( n.count, dim );  n.dim := SHORT( dim );  n.isotropic := isotropic;  pos := 0;  x := 0;  y := 0;  dist := 0;
 		NEW( par, n.dim );
@@ -242,7 +242,7 @@ TYPE
 		IF x < y THEN RETURN x ELSE RETURN y END
 	END Min;
 
-	PROCEDURE ChangeDim*( n: Neighbours;  newdim: INTEGER );
+	PROCEDURE ChangeDim*( n: Neighbours;  newdim: SIGNED16 );
 	VAR i: LONGINT;  par: pars;
 	BEGIN
 		IF newdim > 55 THEN newdim := 55 END;

@@ -46,7 +46,7 @@ PROCEDURE Break0(T: Terminals.Terminal);
 END Break0;
 
 PROCEDURE WriteString(T: Terminals.Terminal; str: ARRAY OF CHAR);
-VAR i: INTEGER;
+VAR i: SIGNED16;
 BEGIN i := 0;
 	WHILE str[i] # 0X DO Terminals.Receive(T,str[i]); INC(i); END;
 END WriteString;
@@ -240,7 +240,7 @@ END Cleanup;
 *)
 
 	PROCEDURE SendString(T: Terminals.Terminal; VAR s: ARRAY OF CHAR);
-		VAR i: INTEGER; ch: CHAR;
+		VAR i: SIGNED16; ch: CHAR;
 	BEGIN i := 0;
 		WHILE s[i] # 0X DO
 			ch := s[i]; INC(i);
@@ -271,14 +271,14 @@ END Cleanup;
 	VAR
 		adr, size, x: LONGINT;
 		buf: ARRAY 8 OF LONGINT;
-		i, sum: INTEGER;
+		i, sum: SIGNED16;
 
 		PROCEDURE Write(ch: CHAR);
 		BEGIN
 			Terminals.Send(T, ch)
 		END Write;
 
-		PROCEDURE WriteHexByte(x: INTEGER);
+		PROCEDURE WriteHexByte(x: SIGNED16);
 		BEGIN
 			IF x DIV 16 > 9 THEN Write(CHR((x DIV 16) MOD 16 - 10 + 65))
 			ELSE Write(CHR(x DIV 16 + 48))
@@ -291,14 +291,14 @@ END Cleanup;
 
 		PROCEDURE WriteHex(x: LONGINT);
 		BEGIN
-			WriteHexByte(INTEGER(ASH(x, -24) MOD 100H));
-			WriteHexByte(INTEGER(ASH(x, -16) MOD 100H));
-			WriteHexByte(INTEGER(ASH(x, -8) MOD 100H));
+			WriteHexByte(SIGNED16(ASH(x, -24) MOD 100H));
+			WriteHexByte(SIGNED16(ASH(x, -16) MOD 100H));
+			WriteHexByte(SIGNED16(ASH(x, -8) MOD 100H));
 			WriteHexByte(SHORT(x MOD 100H))
 		END WriteHex;
 
 		PROCEDURE Flush(ch: CHAR);
-		VAR j: INTEGER;
+		VAR j: SIGNED16;
 		BEGIN
 			j := 0;  sum := 0;  Write("S");  Write(ch);
 			WriteHexByte(4+i*4+1);  WriteHex(adr);

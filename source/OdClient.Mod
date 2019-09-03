@@ -533,7 +533,7 @@ TYPE
 		server*: ARRAY 32 OF CHAR; (* Special servers: svn, .... *)
 		reqLocation*: ARRAY 256 OF CHAR;(* E.g. for CHECKOUT. *)
 
-		xmlInCount: INTEGER;
+		xmlInCount: SIGNED16;
 
 		xml* : OdXml.OdXml;
 

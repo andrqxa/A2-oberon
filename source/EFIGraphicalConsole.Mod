@@ -14,12 +14,12 @@ TYPE
 	Buffer = ADDRESS;
 
 	Char = RECORD
-		dx*,x*,y*,w*,h*: INTEGER;
+		dx*,x*,y*,w*,h*: SIGNED16;
 		buffer*: Buffer;
 	END;
 
 	Font = RECORD
-		height*, minX*, maxX*, minY*, maxY*: INTEGER;
+		height*, minX*, maxX*, minY*, maxY*: SIGNED16;
 		char: ARRAY 256 OF Char;
 	END;
 
@@ -48,7 +48,7 @@ TYPE
 	VAR buf: Buffer; pos: LONGINT;
 		PROCEDURE SetBuf(VAR p: Buffer); BEGIN p := ADDRESSOF(buffer[pos]) END SetBuf;
 		PROCEDURE Put1(ch: CHAR); BEGIN buffer[pos] := ch; INC(pos) END Put1;
-		PROCEDURE Dimensions(VAR char: Char; dx,x,y,w,h: INTEGER); BEGIN char.dx := dx; char.x := x; char.y := y; char.w := w; char.h := h END Dimensions;
+		PROCEDURE Dimensions(VAR char: Char; dx,x,y,w,h: SIGNED16); BEGIN char.dx := dx; char.x := x; char.y := y; char.w := w; char.h := h END Dimensions;
 	BEGIN
 		font.height := 15;
 		font.minX := 0;
@@ -484,12 +484,12 @@ TYPE
 	END;
 
 	Char = RECORD
-		dx*,x*,y*,w*,h*: INTEGER;
+		dx*,x*,y*,w*,h*: SIGNED16;
 		pat*: POINTER TO ARRAY OF CHAR;
 	END;
 
 	Font = RECORD
-		height*, minX*, maxX*, minY*, maxY*: INTEGER;
+		height*, minX*, maxX*, minY*, maxY*: SIGNED16;
 		char: ARRAY 256 OF Char
 	END;
 
@@ -497,8 +497,8 @@ PROCEDURE Do*(context: Commands.Context);
 VAR
 	name: ARRAY 64 OF CHAR; l,i: LONGINT; file: Files.File; r: Files.Reader; font: Fonts.Font; p: PatternPtr;
 	pw, ph,stride: LONGINT;
-	dx,dy,x,y,w,h: INTEGER;
-	dx2,dy2,x2,y2,w2,h2: INTEGER;
+	dx,dy,x,y,w,h: SIGNED16;
+	dx2,dy2,x2,y2,w2,h2: SIGNED16;
 	pat,pat2: Display.Pattern; j: LONGINT; done: BOOLEAN; len: LONGINT;
 
 	PROCEDURE Mask(VAR buf: ARRAY OF CHAR; bitof, stride, x, y, w, h: LONGINT);
@@ -546,7 +546,7 @@ BEGIN
 		out.String("VAR buf: Buffer; pos: LONGINT;");out.Ln;
 		out.String("PROCEDURE SetBuf(VAR p: Buffer); BEGIN p := ADDRESSOF(buffer[pos]) END SetBuf;"); out.Ln;
 		out.String("PROCEDURE Put1(ch: CHAR); BEGIN buffer[pos] := ch; INC(pos) END Put1;"); out.Ln;
-		out.String("PROCEDURE Dimensions(VAR char: Char; dx,x,y,w,h: INTEGER); BEGIN char.dx := dx; char.x := x; char.y := y; char.w := w; char.h := h END Dimensions;"); out.Ln;
+		out.String("PROCEDURE Dimensions(VAR char: Char; dx,x,y,w,h: SIGNED16); BEGIN char.dx := dx; char.x := x; char.y := y; char.w := w; char.h := h END Dimensions;"); out.Ln;
 		out.String("BEGIN");out.Ln;
 		*)
 		out.String("font.height := "); out.Int(font.height,1); out.String(";"); out.Ln;

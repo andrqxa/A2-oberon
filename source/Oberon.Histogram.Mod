@@ -13,7 +13,7 @@ TYPE
 	Histogram* = POINTER TO HistogramDesc;
 	HistogramDesc* = RECORD (Gadgets.FrameDesc)
 		count: ARRAY Bins OF LONGINT; (* Counting bins *)
-		nrBins: INTEGER; (* Visible bins *)
+		nrBins: SIGNED16; (* Visible bins *)
 		offs,width,top: LONGREAL;
 		toosmall,toolarge,nans: LONGINT; (* special counters *)
 		nrobs,maxcount: LONGINT;
@@ -32,7 +32,7 @@ PROCEDURE IsNaN (x:LONGREAL): BOOLEAN; (*! replace by portable version *)
 BEGIN RETURN (Reals.ExpoL(x) = 2047)
 END IsNaN;
 
-PROCEDURE NaN (code:INTEGER): LONGREAL;
+PROCEDURE NaN (code:SIGNED16): LONGREAL;
 VAR x: LONGREAL;
 BEGIN
 	(*! code not yet supported *)
@@ -67,7 +67,7 @@ BEGIN U.obj := H; U.F := NIL; H.upd := FALSE; Display.Broadcast(U)
 END Update;
 
 PROCEDURE ClearHistCounts (H: Histogram);
-VAR i : INTEGER;
+VAR i : SIGNED16;
 BEGIN
 	H.toosmall := 0; H.toolarge := 0; H.nans := 0; H.maxcount := 0;
 	FOR i := 0 TO Bins-1 DO H.count[i] := 0 END;
@@ -86,7 +86,7 @@ BEGIN
 END Reset;
 
 PROCEDURE AddHistCounts (H: Histogram; x: LONGREAL);
-VAR bin: INTEGER;
+VAR bin: SIGNED16;
 BEGIN
 	ASSERT(H.width >= 0, 100);
 	IF IsNaN(x) THEN INC(H.nans)
@@ -94,7 +94,7 @@ BEGIN
 	ELSIF x >= H.top THEN INC(H.toolarge)
 	ELSIF H.width = 0 THEN INC(H.count[0])
 	ELSE
-		ASSERT(((x - H.offs) / H.width) < MAX(INTEGER), 101);
+		ASSERT(((x - H.offs) / H.width) < MAX(SIGNED16), 101);
 		bin := SHORT(ENTIER((x - H.offs) / H.width));
 		INC(H.count[bin]);
 		IF H.count[bin] > H.maxcount THEN H.maxcount := H.count[bin] END;
@@ -116,7 +116,7 @@ BEGIN
 END GetHistCounts;
 
 PROCEDURE AddPoint* (H: Histogram; x: LONGREAL);
-VAR bin,i,nr: LONGINT; xorig,w,min,max: LONGREAL; tempbins: INTEGER;
+VAR bin,i,nr: LONGINT; xorig,w,min,max: LONGREAL; tempbins: SIGNED16;
 BEGIN
 	IF H.logtransform THEN x := MathL.ln(x) END;
 	IF H.diff THEN
@@ -163,9 +163,9 @@ BEGIN
 	END (* ~H.suspended *)
  END AddPoint;
 
-PROCEDURE RestoreFrame (H: Histogram; M: Display3.Mask; x, y, w, h: INTEGER);
+PROCEDURE RestoreFrame (H: Histogram; M: Display3.Mask; x, y, w, h: SIGNED16);
 CONST specialwidth = 2;
-VAR count: LONGINT; yfact,xfact,curmax: LONGREAL; s: ARRAY 16 OF CHAR; i, width, p, xpos, col, freew: INTEGER;
+VAR count: LONGINT; yfact,xfact,curmax: LONGREAL; s: ARRAY 16 OF CHAR; i, width, p, xpos, col, freew: SIGNED16;
 BEGIN
 	Oberon.RemoveMarks(x, y, w, h);
 	freew := w - 2 - 4*specialwidth;
@@ -223,14 +223,14 @@ BEGIN
 	END
 END RestoreFrame;
 
-PROCEDURE Dev (x: INTEGER): INTEGER;
+PROCEDURE Dev (x: SIGNED16): SIGNED16;
 BEGIN RETURN SHORT(LONG(x) * Display.Unit DIV Printer.Unit)
 END Dev;
 
 PROCEDURE PrintFrame (H: Histogram; VAR Msg: Display.DisplayMsg);
 CONST specialwidth=2;
-VAR i, mode,width,p,xpos: INTEGER; s: ARRAY 16 OF CHAR; freew:INTEGER;M: Display3.Mask; x, y, w, h: INTEGER;
-	count:LONGINT;yfact,xfact,curmax:LONGREAL;col:INTEGER;
+VAR i, mode,width,p,xpos: SIGNED16; s: ARRAY 16 OF CHAR; freew:SIGNED16;M: Display3.Mask; x, y, w, h: SIGNED16;
+	count:LONGINT;yfact,xfact,curmax:LONGREAL;col:SIGNED16;
 BEGIN
 	x := Msg.x; y := Msg.y; w := Dev(H.W); h := Dev(H.H);
 	Gadgets.MakePrinterMask(H, x, y, Msg.dlink, M);
@@ -412,7 +412,7 @@ BEGIN
 END CopyFrame;
 
 PROCEDURE FrameHandler* (F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR F1: Histogram; x, y, w, h: INTEGER; R : Display3.Mask;
+VAR F1: Histogram; x, y, w, h: SIGNED16; R : Display3.Mask;
 BEGIN
 	WITH F: Histogram DO
 		IF M IS Display.FrameMsg THEN

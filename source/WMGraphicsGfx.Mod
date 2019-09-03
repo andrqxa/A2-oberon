@@ -75,10 +75,10 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 		PROCEDURE ColorToGfxColor(color:WMGraphics.Color):Gfx.Color;
 			VAR gfxcolor:Gfx.Color;
 		BEGIN
-			gfxcolor.a := INTEGER(color MOD 100H);
-			gfxcolor.b := INTEGER(color DIV 100H MOD 100H);
-			gfxcolor.g := INTEGER(color DIV 10000H MOD 100H);
-			gfxcolor.r := INTEGER(color DIV 1000000H MOD 100H);
+			gfxcolor.a := SIGNED16(color MOD 100H);
+			gfxcolor.b := SIGNED16(color DIV 100H MOD 100H);
+			gfxcolor.g := SIGNED16(color DIV 10000H MOD 100H);
+			gfxcolor.r := SIGNED16(color DIV 1000000H MOD 100H);
 			RETURN gfxcolor
 		END ColorToGfxColor;
 

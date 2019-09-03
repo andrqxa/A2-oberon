@@ -19,8 +19,8 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 	TYPE
 		CLUT* = RECORD
 			col*: ARRAY colors OF LONGINT;	(** blue: bit 0..7; green: bit 8..15; red: bit 16..23 **)
-			size*: INTEGER;	(** number of valid colors **)
-			bits: INTEGER;	(* number of bits per component in color cube *)
+			size*: SIGNED16;	(** number of valid colors **)
+			bits: SIGNED16;	(* number of bits per component in color cube *)
 			cube: POINTER TO ARRAY OF CHAR;	(* maps RGB triples to indices, size is (2^bits)^3 *)
 		END;
 
@@ -158,8 +158,8 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 		IF bits <= 0 THEN RETURN END;	(* no reverse lookup table *)
 
 		IF bits > 6 THEN bits := 6 END;	(* (2^6)^3 = 262144! *)
-		nbits := 8-bits; x := INTEGER(ASH(1, nbits)); xsqr := ASH(1, 2*nbits); txsqr := 2*xsqr;
-		colormax := INTEGER(ASH(1, bits)); rstride := ASH(1, 2*bits); gstride := colormax;
+		nbits := 8-bits; x := SIGNED16(ASH(1, nbits)); xsqr := ASH(1, 2*nbits); txsqr := 2*xsqr;
+		colormax := SIGNED16(ASH(1, bits)); rstride := ASH(1, 2*bits); gstride := colormax;
 
 		(* fill buffer with maximal distance *)
 		bsize := ASH(1, 3*bits); NEW(dbuf, bsize);
@@ -171,9 +171,9 @@ MODULE CLUTs; (** portable *)	(* eos  **)
 		WHILE cur < size DO
 			col := clut.col[cur];
 			rcol := ASH(col, -16) MOD 100H; gcol := ASH(col, -8) MOD 100H; bcol := col MOD 100H;
-			rcenter := INTEGER(ASH(rcol, -nbits)); rdist := rcol - (rcenter * x + x DIV 2);
-			gcenter := INTEGER(ASH(gcol, -nbits)); gdist := gcol - (gcenter * x + x DIV 2);
-			bcenter := INTEGER(ASH(bcol, -nbits)); bdist := bcol - (bcenter * x + x DIV 2);
+			rcenter := SIGNED16(ASH(rcol, -nbits)); rdist := rcol - (rcenter * x + x DIV 2);
+			gcenter := SIGNED16(ASH(gcol, -nbits)); gdist := gcol - (gcenter * x + x DIV 2);
+			bcenter := SIGNED16(ASH(bcol, -nbits)); bdist := bcol - (bcenter * x + x DIV 2);
 			cdist := rdist * rdist + gdist * gdist + bdist * bdist;
 			incr := 2*((rcenter+1) * xsqr - rcol * x); incg := 2*((gcenter+1) * xsqr - gcol * x); incb := 2*((bcenter+1) * xsqr - bcol * x);
 			p := rcenter * rstride + gcenter * gstride + bcenter;

@@ -907,7 +907,7 @@ By enumerating the mask and adding the enumerated rectangles to the region:
 <PRE>
   VAR R: GfxRegions.Region;
   
-  PROCEDURE AddRect (x, y, w, h: INTEGER);
+  PROCEDURE AddRect (x, y, w, h: SIGNED16);
   BEGIN
     GfxRegions.AddRect(R, x, y, x + w, y + h)
   END AddRect;

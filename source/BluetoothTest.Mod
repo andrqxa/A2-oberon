@@ -101,7 +101,7 @@ TYPE
 			END
 		END SendString;
 
-		PROCEDURE Poll(cid: LONGINT; size: INTEGER; VAR off: INTEGER; VAR data: ARRAY OF CHAR);
+		PROCEDURE Poll(cid: LONGINT; size: SIGNED16; VAR off: SIGNED16; VAR data: ARRAY OF CHAR);
 		VAR buf: ARRAY 256 OF CHAR; i, res, len: LONGINT;
 		BEGIN
 			REPEAT
@@ -112,7 +112,7 @@ TYPE
 			UNTIL (res # 0)
 		END Poll;
 
-		PROCEDURE PollBytes(cid: LONGINT; size: INTEGER; VAR off: INTEGER; VAR data: ARRAY OF CHAR);
+		PROCEDURE PollBytes(cid: LONGINT; size: SIGNED16; VAR off: SIGNED16; VAR data: ARRAY OF CHAR);
 		VAR buf: ARRAY 256 OF CHAR; i, res, len: LONGINT;
 		BEGIN
 			REPEAT

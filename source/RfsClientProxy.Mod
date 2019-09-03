@@ -122,11 +122,11 @@ TYPE
 		VAR
 			connection: RfsConnection.Connection;
 			user, passwd, host, path: ARRAY MaxNameLen OF CHAR;
-			port : INTEGER;
+			port : SIGNED16;
 			buf, backupBuf: ARRAY BufSize OF CHAR;
 
 
-		PROCEDURE &InitProxy*(VAR user, passwd, host, path: ARRAY OF CHAR; port: INTEGER);
+		PROCEDURE &InitProxy*(VAR user, passwd, host, path: ARRAY OF CHAR; port: SIGNED16);
 			VAR lenHost, lenUser, lenPasswd, lenPath: LONGINT;
 		BEGIN
 			lenUser := Len(user);

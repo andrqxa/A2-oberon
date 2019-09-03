@@ -32,7 +32,7 @@ MODULE Diff IN Oberon; (** portable *)	(** PS  **)
 			pos: LONGINT;
 			hash: HashEntry;
 			next, list, corr: Line;
-			nr, absNr: INTEGER
+			nr, absNr: SIGNED16
 		END;
 
 		HashEntryDesc = RECORD
@@ -47,19 +47,19 @@ MODULE Diff IN Oberon; (** portable *)	(** PS  **)
 			root: HashEntry;
 			line: Line;
 			name: ARRAY 64 OF CHAR;
-			total, inserted: INTEGER
+			total, inserted: SIGNED16
 		END;
 
 	VAR
 		R: Texts.Reader;
 		W: Texts.Writer;
 		opts: SET;
-		nrSyncs: INTEGER;
+		nrSyncs: SIGNED16;
 
 (* *************** STATISTIC OUTPUT *************** *)
 
 PROCEDURE HashStat (T: Text);
-VAR cur: HashEntry; curL: Line; same, nrVals, perVal: INTEGER;
+VAR cur: HashEntry; curL: Line; same, nrVals, perVal: SIGNED16;
 BEGIN
 	Texts.WriteString(W, "Statistic for text '"); Texts.WriteString(W, T.name); Texts.Write(W, "'"); Texts.WriteLn(W);
 	cur := T.root.next;
@@ -87,7 +87,7 @@ BEGIN
 END HashStat;
 
 PROCEDURE DiffStat (T1, T2: Text);
-VAR curL: Line; corr: INTEGER;
+VAR curL: Line; corr: SIGNED16;
 BEGIN
 	Texts.WriteString(W, "Comparing text '"); Texts.WriteString(W, T1.name);
 	Texts.WriteString(W, "' to '"); Texts.WriteString(W, T2.name); Texts.Write(W, "'"); Texts.WriteLn(W);
@@ -107,7 +107,7 @@ PROCEDURE HashLine (L: Line; VAR hash: LONGINT; VAR done: BOOLEAN);
 VAR obj: Objects.Object; ch: CHAR;
 
 	PROCEDURE HashObj (obj: Objects.Object; VAR hash: LONGINT);
-	VAR gen: ARRAY 64 OF CHAR; i: INTEGER;
+	VAR gen: ARRAY 64 OF CHAR; i: SIGNED16;
 	BEGIN
 		Attributes.GetString(obj, "Gen", gen);
 		IF gen[0] # 0X THEN
@@ -146,7 +146,7 @@ BEGIN cur := root; line.list := NIL;
 END Insert;
 
 PROCEDURE HashText (T: Text);
-VAR old, line: Line; hash: LONGINT; inserted, total: INTEGER; done: BOOLEAN;
+VAR old, line: Line; hash: LONGINT; inserted, total: SIGNED16; done: BOOLEAN;
 BEGIN
 	NEW(T.root); T.root.next := NIL; NEW(line);
 	T.line := line; old := NIL;
@@ -203,7 +203,7 @@ VAR L1, L2: Line;
 		IF L # NIL THEN L.corr := curH.list END
 	END SkipSingleLines;
 
-	PROCEDURE LookAhead (L: Line; VAR nrL: INTEGER);
+	PROCEDURE LookAhead (L: Line; VAR nrL: SIGNED16);
 	VAR l: Line;
 	BEGIN
 		nrL := 0; l := L.corr;
@@ -213,7 +213,7 @@ VAR L1, L2: Line;
 	END LookAhead;
 
 	PROCEDURE SyncLines;
-	VAR nrL1, nrL2: INTEGER;
+	VAR nrL1, nrL2: SIGNED16;
 	BEGIN
 		LookAhead(L1, nrL1); LookAhead(L2, nrL2);
 		IF nrL1 = nrL2 THEN	(* sync to shortest distance *)
@@ -254,7 +254,7 @@ END Compare;
 (* *************** PREPARE TEXTS TO SHOW *************** *)
 
 PROCEDURE PrepareTexts (d1, d2: Text);
-VAR l1, l2: Line; dL, dL1, dL2: INTEGER;
+VAR l1, l2: Line; dL, dL1, dL2: SIGNED16;
 
 	PROCEDURE InsertCR (text: Texts.Text; pos, dPos, cnt: LONGINT);
 	BEGIN
@@ -396,7 +396,7 @@ END Do;
 
 (** locates a line in the marked document (line number from stat. output) *)
 PROCEDURE LocateLine*;
-VAR T: Texts.Text; cnt: INTEGER; ch: CHAR; newL: BOOLEAN; S: Attributes.Scanner;
+VAR T: Texts.Text; cnt: SIGNED16; ch: CHAR; newL: BOOLEAN; S: Attributes.Scanner;
 		L: Display.LocateMsg; M: Objects.LinkMsg; Sel: Oberon.SelectMsg;
 BEGIN
 	SetScanner(S);

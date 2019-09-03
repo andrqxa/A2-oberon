@@ -93,7 +93,7 @@ VAR
 
 	PROCEDURE Random*( ): LONGREAL;
 	(*vs 0.0a1 *)  (* md  14.02.95 *)
-	VAR x, y, x1, x2, y1, y2, dx, dindx, offset: REAL;  i: INTEGER;  ok: BOOLEAN;
+	VAR x, y, x1, x2, y1, y2, dx, dindx, offset: REAL;  i: SIGNED16;  ok: BOOLEAN;
 	BEGIN
 		ok := FALSE;
 

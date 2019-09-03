@@ -39,7 +39,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		FocusMsg* = RECORD (Leonardo.LocalizedMsg)
 			id*: SIGNED8;	(** consume/accept/release **)
 			char*: CHAR;	(** character to consume **)
-			res*: INTEGER;	(** result for consume **)
+			res*: SIGNED16;	(** result for consume **)
 			fx*, fy*: REAL;	(** focus coordinates (in figure space) **)
 			gdm*: GfxMatrix.Matrix;	(** transforms global to device coordinates **)
 			shape*: Leonardo.Shape;	(** shape accepting the focus **)
@@ -76,7 +76,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		END
 	END Release;
 
-	PROCEDURE Consume* (fig: Leonardo.Figure; shape: Leonardo.Shape; ch: CHAR; VAR res: INTEGER);
+	PROCEDURE Consume* (fig: Leonardo.Figure; shape: Leonardo.Shape; ch: CHAR; VAR res: SIGNED16);
 		VAR fm: FocusMsg;
 	BEGIN
 		fm.id := consume; fm.char := ch; fm.res := -1;
@@ -473,7 +473,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Copy;
 
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR cap, copy: Caption; key, ptsize: INTEGER; ver: LONGINT; name: ARRAY 64 OF CHAR; ch: CHAR;
+		VAR cap, copy: Caption; key, ptsize: SIGNED16; ver: LONGINT; name: ARRAY 64 OF CHAR; ch: CHAR;
 	BEGIN
 		cap := obj(Caption);
 		IF msg IS Leonardo.ShapeMsg THEN

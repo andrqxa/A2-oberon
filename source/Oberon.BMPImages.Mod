@@ -262,7 +262,7 @@ MODULE BMPImages IN Oberon; (** portable **)	(* eos  *)
 		VAR
 			file: Files.File; r: Files.Rider; type: ARRAY 2 OF CHAR;
 			size, reserved, offset, width, height, compression, colors, importantColors, col, redMask, greenMask, blueMask: LONGINT;
-			planes, bpp: INTEGER; pal: Images.Palette; pix: Images.Pixel; ch: CHAR;
+			planes, bpp: SIGNED16; pal: Images.Palette; pix: Images.Pixel; ch: CHAR;
 	BEGIN
 		file := Files.Old(fname);
 		IF file = NIL THEN RETURN END;

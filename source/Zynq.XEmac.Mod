@@ -673,7 +673,7 @@ TYPE
 			(*txFrame[6]:=000X;txFrame[7]:=00AX;txFrame[8]:=035X;txFrame[9]:=000X;txFrame[10]:=001X;txFrame[11]:=002X;*)
 
 			(* set upper layer type, bring type from host to network byte order *)
-			SYSTEM.PUT16(bufferAdr + 12, ROT(SYSTEM.VAL(INTEGER, SHORT(type)), 8));
+			SYSTEM.PUT16(bufferAdr + 12, ROT(SYSTEM.VAL(SIGNED16, SHORT(type)), 8));
 
 			(*IF Trace THEN
 				KernelLog.Buffer(txFrame, 0, txLen);
@@ -747,7 +747,7 @@ TYPE
 			len, i: LONGINT;
 			reg: SET;
 			buf: Network.Buffer;
-			type: INTEGER;
+			type: SIGNED16;
 		BEGIN
 			(*IF Trace THEN KernelLog.String("Receiving frame"); KernelLog.Ln END;*)
 			currentBd := lastRxQBar;
@@ -789,7 +789,7 @@ TYPE
 
 					SYSTEM.MOVE(adr+6,ADDRESSOF(buf.src[0]),6);
 
-					type := INTEGER(SYSTEM.GET8(adr + 12)) * 100H + INTEGER(SYSTEM.GET8(adr + 13));
+					type := SIGNED16(SYSTEM.GET8(adr + 12)) * 100H + SIGNED16(SYSTEM.GET8(adr + 13));
 					SYSTEM.MOVE(adr,ADDRESSOF(buf.data[0]),len);
 					dev.QueueBuffer(buf, type)
 				END

@@ -27,7 +27,7 @@ VAR
 	sep: CHAR;
 
 PROCEDURE S(s: ARRAY OF CHAR);
-VAR i: INTEGER;
+VAR i: SIGNED16;
 BEGIN
 	i := 0;
 	WHILE s[i] # 0X DO Files.Write(out, s[i]); INC(i) END
@@ -54,7 +54,7 @@ END MatchFont;
 
 (* Delimit a paragraph: begins at lastnl and ends at end *)
 PROCEDURE GetPara(T: Texts.Text; VAR R: Texts.Reader; VAR beg, end: LONGINT; VAR typ: SIGNED8);
-VAR ch, firstch: CHAR; firstfnt: Objects.Library; firstcol: INTEGER; lastnl: LONGINT;
+VAR ch, firstch: CHAR; firstfnt: Objects.Library; firstcol: SIGNED16; lastnl: LONGINT;
 BEGIN
 	beg := Texts.Pos(R); end := beg; lastnl := beg;
 
@@ -131,8 +131,8 @@ BEGIN
 END WriteStretch;
 
 PROCEDURE WritePara(T: Texts.Text; beg, end: LONGINT);
-VAR R: Texts.Reader; ch: CHAR; col: INTEGER;
-	pos, lstart: LONGINT; anchor: ARRAY 512 OF CHAR; apos: INTEGER;
+VAR R: Texts.Reader; ch: CHAR; col: SIGNED16;
+	pos, lstart: LONGINT; anchor: ARRAY 512 OF CHAR; apos: SIGNED16;
 BEGIN col := -1; pos := beg; anchor := "";
 	Texts.OpenReader(R, T, beg);
 	Texts.Read(R, ch);
@@ -162,7 +162,7 @@ BEGIN col := -1; pos := beg; anchor := "";
 END WritePara;
 
 PROCEDURE GetPrefix(T: Texts.Text; VAR beg, end: LONGINT; VAR s: ARRAY OF CHAR);
-VAR R: Texts.Reader; old: LONGINT; ch: CHAR; i: INTEGER;
+VAR R: Texts.Reader; old: LONGINT; ch: CHAR; i: SIGNED16;
 BEGIN
 	old := beg; i := 0;
 	Texts.OpenReader(R, T, beg);
@@ -300,7 +300,7 @@ PROCEDURE Compile*;
 
 	PROCEDURE CompileT;
 		VAR R: Texts.Reader; beg, end: LONGINT; typ: SIGNED8;
-				res, i: INTEGER; bak: ARRAY 64 OF CHAR;
+				res, i: SIGNED16; bak: ARRAY 64 OF CHAR;
 	BEGIN
 		IF T.len > 0 THEN
 		(* Get the file name from the source text, at the beginning i.e. pos 0 *)

@@ -84,7 +84,7 @@ TYPE
 	END Store;
 
 	PROCEDURE Load( VAR R: Files.Rider;  s: tModel );
-	VAR version: INTEGER;
+	VAR version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );   (* version control *)
 		Files.ReadLReal( R, s.coolingTemp );  Files.ReadBool( R, s.synced );

@@ -14,8 +14,8 @@ TYPE
 	FrameDesc* = RECORD (Gadgets.FrameDesc)
 		points*: ARRAY Max OF LONGINT;
 		min, max: LONGINT;
-		maxPoints : INTEGER;
-		beg, end: INTEGER;
+		maxPoints : SIGNED16;
+		beg, end: SIGNED16;
 	END;
 
 VAR
@@ -114,7 +114,7 @@ END Deinstall;
 (* --------- *)
 
 PROCEDURE AddPoint(F: Frame; x: LONGINT);
-VAR i: INTEGER;
+VAR i: SIGNED16;
 BEGIN
 	IF F.W -2 > Max THEN F.maxPoints := Max ELSE F.maxPoints  := F.W -2 END;
 	F.points[F.end] := x;
@@ -128,8 +128,8 @@ BEGIN
 	IF ABS(F.max - F.min) = 0 THEN F.max := F.min + 1 END
 END AddPoint;
 
-PROCEDURE RestoreFrame(F: Frame; M: Display3.Mask; x, y, w, h: INTEGER);
-VAR i, j, mode: INTEGER; p: LONGINT; s: ARRAY 16 OF CHAR;
+PROCEDURE RestoreFrame(F: Frame; M: Display3.Mask; x, y, w, h: SIGNED16);
+VAR i, j, mode: SIGNED16; p: LONGINT; s: ARRAY 16 OF CHAR;
 BEGIN
 	Oberon.RemoveMarks(x, y, w, h);
 	Display3.Rect3D(M, Display3.bottomC,Display3.topC, x, y, w, h, 1, Display.replace);
@@ -154,9 +154,9 @@ BEGIN
 END RestoreFrame;
 
 PROCEDURE PrintFrame(F: Frame; VAR M: Display.DisplayMsg);
-VAR i, j, x, y, w, h, p: INTEGER; s: ARRAY 12 OF CHAR; Q: Display3.Mask;
+VAR i, j, x, y, w, h, p: SIGNED16; s: ARRAY 12 OF CHAR; Q: Display3.Mask;
 
-	PROCEDURE P (X: INTEGER): INTEGER;
+	PROCEDURE P (X: SIGNED16): SIGNED16;
 	BEGIN RETURN SHORT(Display.Unit*X DIV Printer.Unit)
 	END P;
 
@@ -193,7 +193,7 @@ BEGIN
 END FrameAttr;
 
 PROCEDURE FrameHandler(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR x, y, w, h: INTEGER; F0: Frame; R : Display3.Mask;
+VAR x, y, w, h: SIGNED16; F0: Frame; R : Display3.Mask;
 BEGIN
 	WITH F: Frame DO
 		IF M IS Objects.AttrMsg THEN

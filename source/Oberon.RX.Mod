@@ -31,7 +31,7 @@ CONST
 
 VAR
 	w: Texts.Writer;
-	sbeg, send, errorvar : INTEGER;
+	sbeg, send, errorvar : SIGNED16;
 	sdfa : RXA.DFA;
 	stext : Texts.Text;
 	stextpos, slinelen : LONGINT;
@@ -68,7 +68,7 @@ PROCEDURE MyCAP( ch : CHAR ) : CHAR;
 BEGIN IF ("a" <= ch ) & ( ch <= "z" ) THEN RETURN CAP( ch ) ELSE RETURN ch END;
 END MyCAP;
 
-PROCEDURE ThisFrame(X, Y: INTEGER; VAR F: Display.Frame);
+PROCEDURE ThisFrame(X, Y: SIGNED16; VAR F: Display.Frame);
 	VAR M: Display.LocateMsg;
 BEGIN	M.X := X; M.Y := Y; M.F := NIL; M.loc := NIL; Display.Broadcast(M); F := M.loc
 END ThisFrame;
@@ -112,7 +112,7 @@ END GetOption;
 
 PROCEDURE GetStr( VAR reader : Texts.Reader; VAR str : ARRAY OF CHAR );
 	VAR strfull, inquotes, first : BOOLEAN;
-		strind : INTEGER;
+		strind : SIGNED16;
 
 	PROCEDURE Append( chr : CHAR );
 	BEGIN
@@ -134,7 +134,7 @@ BEGIN
 	IF strfull THEN errorvar := strtoolong END;
 END GetStr;
 
-PROCEDURE RXAErrorHandler( error, pos : INTEGER );
+PROCEDURE RXAErrorHandler( error, pos : SIGNED16 );
 BEGIN
 	CASE error OF
 		RXA.noposfree : Texts.WriteString( w,"regular expression too long ( position table full )") |
@@ -177,7 +177,7 @@ PROCEDURE ParseTexts( text : Texts.Text; name : ARRAY OF CHAR; dfa : RXA.DFA; op
 		ch : CHAR;
 		r : Texts.Reader;
 		line, linec : ARRAY(nofline+1) OF CHAR;
-		lineind, i, beg, end : INTEGER;
+		lineind, i, beg, end : SIGNED16;
 		wtext: Texts.Text;
 		linefull : BOOLEAN;
 
@@ -221,7 +221,7 @@ PROCEDURE Grep*;
 	VAR
 		opti : BOOLEAN;
 		rx : ARRAY(nofline+1) OF CHAR;
-		error, erpos : INTEGER;
+		error, erpos : SIGNED16;
 		dfa : RXA.DFA;
 		s : Texts.Scanner;
 		text : Texts.Text;
@@ -247,7 +247,7 @@ PROCEDURE SetSearch*;
 	VAR
 		opti : BOOLEAN;
 		rx : ARRAY(nofline+1) OF CHAR;
-		error, erpos : INTEGER;
+		error, erpos : SIGNED16;
 		r : Texts.Reader;
 BEGIN
 	Texts.OpenReader( r, Oberon.Par.text, Oberon.Par.pos );
@@ -277,7 +277,7 @@ END SetReplace;
 PROCEDURE SearchPattern( text : Texts.Text; textpos : LONGINT );
 	VAR
 	r : Texts.Reader;
-	beg, end, lineind : INTEGER;
+	beg, end, lineind : SIGNED16;
 	ch : CHAR;
 	line : ARRAY(nofline+1) OF CHAR;
 	linelen : LONGINT;
@@ -342,7 +342,7 @@ END Search;
 
 PROCEDURE Replace*;
 	VAR
-		error, pos, i : INTEGER;
+		error, pos, i : SIGNED16;
 		frame: Display.Frame;
 		text: Texts.Text;
 		textpos : LONGINT;
@@ -443,7 +443,7 @@ PROCEDURE ReplaceAll*;
 	VAR
 		text: Texts.Text;
 		textpos : LONGINT;
-		error, pos, i : INTEGER;
+		error, pos, i : SIGNED16;
 		name: ARRAY 128 OF CHAR;
 		lastArg, firstArg: BOOLEAN;
 		S: Texts.Scanner;

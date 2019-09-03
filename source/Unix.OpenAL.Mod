@@ -12,7 +12,7 @@ TYPE
 
 
   ALbyte    * =  CHAR;  (* 1-byte signed *)
-  ALshort   * =  INTEGER;  (* 2-byte signed *)
+  ALshort   * =  SIGNED16;  (* 2-byte signed *)
   ALint     * =  LONGINT;  (* 4-byte signed *)
 
   ALfloat   * =  REAL;
@@ -20,7 +20,7 @@ TYPE
   ALboolean * =  BOOLEAN;
 
   ALubyte   * =  CHAR;     (* 1-byte unsigned *)
-  ALushort  * =  INTEGER;     (* 2-byte unsigned *)
+  ALushort  * =  SIGNED16;     (* 2-byte unsigned *)
   ALuint    * =  LONGINT;    (* 4-byte signed *)
 
   ALsizei   * =  LONGINT;  (* 4-byte signed *)
@@ -265,7 +265,7 @@ CONST
 
 TYPE
   ALCbyte    * =  CHAR; (* 1-byte signed *)
-  ALCshort   * =  INTEGER;  (* 2-byte signed *)
+  ALCshort   * =  SIGNED16;  (* 2-byte signed *)
   ALCint     * =  LONGINT;  (* 4-byte signed *)
 
   ALCfloat   * =  REAL;
@@ -273,7 +273,7 @@ TYPE
   ALCboolean * =  BOOLEAN;
 
   ALCubyte   * =  CHAR;     (* 1-byte unsigned *)
-  ALCushort  * =  INTEGER;     (* 2-byte unsigned *)
+  ALCushort  * =  SIGNED16;     (* 2-byte unsigned *)
   ALCuint    * =  LONGINT;    (* 4-byte signed *)
 
   ALCsizei   * =  LONGINT;  (* 4-byte signed *)

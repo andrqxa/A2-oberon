@@ -47,7 +47,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 		ElemBlockDesc = RECORD
 			next: ElemBlock;
 			elem: ARRAY ElemBlockSize OF SIGNED8;
-			coords: INTEGER;
+			coords: SIGNED16;
 		END;
 
 		CoordBlock = POINTER TO CoordBlockDesc;
@@ -59,7 +59,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 		(** path abstraction **)
 		Path* = POINTER TO PathDesc;
 		PathDesc* = RECORD
-			elems*, coords*: INTEGER;	(** number of elements/coordinate pairs in path **)
+			elems*, coords*: SIGNED16;	(** number of elements/coordinate pairs in path **)
 			firstEB, lastEB: ElemBlock;	(* path element types *)
 			firstCB, lastCB: CoordBlock;	(* path element coordinates *)
 		END;
@@ -67,19 +67,19 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 		(** path scanner **)
 		Scanner* = RECORD
 			path*: Path;	(** visited path **)
-			pos*: INTEGER;	(** element position **)
-			elem*: INTEGER;	(** current path element **)
+			pos*: SIGNED16;	(** element position **)
+			elem*: SIGNED16;	(** current path element **)
 			x*, y*: REAL;	(** current end coordinates **)
 			dx*, dy*: REAL;	(** direction vector **)
 			x0*, y0*, x1*, y1*, x2*, y2*: REAL;	(** additional control point coordinates **)
 			curEB: ElemBlock;	(* current element block *)
 			curCB: CoordBlock;	(* current coordinate block *)
-			epos, cpos: INTEGER;	(* next element and coordinate position within current block *)
+			epos, cpos: SIGNED16;	(* next element and coordinate position within current block *)
 		END;
 
 		(** path enumeration **)
 		EnumData* = RECORD
-			elem*: INTEGER;	(** current path element **)
+			elem*: SIGNED16;	(** current path element **)
 			x*, y*, dx*, dy*, x0*, y0*, x1*, y1*, x2*, y2*: REAL;	(** element parameters **)
 		END;
 
@@ -154,7 +154,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 	(**--- Path Construction ---**)
 
 	PROCEDURE AddElem (path: Path; elem: SIGNED8);
-		VAR elems: INTEGER; eb: ElemBlock;
+		VAR elems: SIGNED16; eb: ElemBlock;
 	BEGIN
 		elems := path.elems MOD ElemBlockSize;
 		IF (elems = 0) & (path.elems > 0) THEN
@@ -165,7 +165,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 	END AddElem;
 
 	PROCEDURE AddCoord (path: Path; x, y: REAL);
-		VAR coords: INTEGER; cb: CoordBlock;
+		VAR coords: SIGNED16; cb: CoordBlock;
 	BEGIN
 		coords := path.coords MOD CoordBlockSize;
 		IF (coords = 0) & (path.coords > 0) THEN
@@ -237,7 +237,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 
 	(** append one path to another **)
 	PROCEDURE Append* (to, from: Path);
-		VAR pos, epos, cpos, n: INTEGER; eb: ElemBlock; cb: CoordBlock; elem: SIGNED8;
+		VAR pos, epos, cpos, n: SIGNED16; eb: ElemBlock; cb: CoordBlock; elem: SIGNED8;
 	BEGIN
 		pos := 0; epos := 0; cpos := 0; eb := from.firstEB; cb := from.firstCB;
 		WHILE pos < from.elems DO
@@ -268,7 +268,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 	**)
 
 	(** open scanner on path and load parameters of element at given position **)
-	PROCEDURE Open* (VAR s: Scanner; path: Path; pos: INTEGER);
+	PROCEDURE Open* (VAR s: Scanner; path: Path; pos: SIGNED16);
 		PROCEDURE get (VAR x, y: REAL);
 		BEGIN
 			IF s.cpos = CoordBlockSize THEN
@@ -487,7 +487,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 			END
 		END draw;
 
-		PROCEDURE solve (a, b, c: REAL; VAR t1, t2: REAL; VAR n: INTEGER);
+		PROCEDURE solve (a, b, c: REAL; VAR t1, t2: REAL; VAR n: SIGNED16);
 			VAR d, e, t: REAL;
 		BEGIN
 			n := 0; d := b * b - a * c;
@@ -511,7 +511,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 		END solve;
 
 		PROCEDURE norm2y (x1, y1, x2, y2, x, y: REAL);
-			VAR t1, t2, x01, x11, x12, x22, x23, y01, y11, y12, y22, y23: REAL; n: INTEGER;
+			VAR t1, t2, x01, x11, x12, x22, x23, y01, y11, y12, y22, y23: REAL; n: SIGNED16;
 		BEGIN
 			solve(y - data.y + 3*(y1 - y2), data.y - 2*y1 + y2, y1 - data.y, t1, t2, n);
 			IF n = 0 THEN
@@ -531,7 +531,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 		END norm2y;
 
 		PROCEDURE norm2x (x1, y1, x2, y2, x, y: REAL);
-			VAR t1, t2, x01, x11, x12, x22, x23, y01, y11, y12, y22, y23: REAL; n: INTEGER;
+			VAR t1, t2, x01, x11, x12, x22, x23, y01, y11, y12, y22, y23: REAL; n: SIGNED16;
 		BEGIN
 			solve(x - data.x + 3*(x1 - x2), data.x - 2*x1 + x2, x1 - data.x, t1, t2, n);
 			IF n = 0 THEN
@@ -723,7 +723,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 
 	(** enumerate path elements **)
 	PROCEDURE Enumerate* (path: Path; enum: Enumerator; VAR data: EnumData);
-		VAR eb: ElemBlock; cb: CoordBlock; pos, epos, cpos: INTEGER;
+		VAR eb: ElemBlock; cb: CoordBlock; pos, epos, cpos: SIGNED16;
 
 		PROCEDURE get (VAR x, y: REAL);
 		BEGIN
@@ -755,7 +755,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 
 	(** enumerate flattened path, i.e. arcs and bezier curves will be approximated with lines **)
 	PROCEDURE EnumFlattened* (path: Path; flatness: REAL; enum: Enumerator; VAR data: EnumData);
-		VAR eb: ElemBlock; cb: CoordBlock; pos, epos, cpos: INTEGER; x0, y0, x1, y1, x2, y2, x, y: REAL;
+		VAR eb: ElemBlock; cb: CoordBlock; pos, epos, cpos: SIGNED16; x0, y0, x1, y1, x2, y2, x, y: REAL;
 
 		PROCEDURE get (VAR x, y: REAL);
 		BEGIN
@@ -974,7 +974,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 	(** put reversed source path into destination path; dst remains unchanged if src is empty **)
 	PROCEDURE Reverse* (src, dst: Path);
 		VAR
-			elems, sepos, scpos, depos, dcpos: INTEGER; dstEB, nextEB, srcEB, eb: ElemBlock;
+			elems, sepos, scpos, depos, dcpos: SIGNED16; dstEB, nextEB, srcEB, eb: ElemBlock;
 			dstCB, nextCB, srcCB: CoordBlock; dx, dy, x, y, x0, y0, x1, y1, x2, y2: REAL;
 
 		PROCEDURE get (VAR x, y: REAL);
@@ -1062,7 +1062,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 
 	(** return copy of source path in destination path **)
 	PROCEDURE Copy* (src, dst: Path);
-		VAR srcEB, dstEB: ElemBlock; n: INTEGER; srcCB, dstCB: CoordBlock;
+		VAR srcEB, dstEB: ElemBlock; n: SIGNED16; srcCB, dstCB: CoordBlock;
 	BEGIN
 		IF src # dst THEN
 			IF dst.firstEB = NIL THEN NEW(dst.firstEB) END;
@@ -1101,9 +1101,9 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 
 	(** apply transformation to all coordinates in path **)
 	PROCEDURE Apply* (path: Path; VAR mat: GfxMatrix.Matrix);
-		VAR eb: ElemBlock; cb: CoordBlock; pos, epos, cpos: INTEGER;
+		VAR eb: ElemBlock; cb: CoordBlock; pos, epos, cpos: SIGNED16;
 
-		PROCEDURE point (VAR b: CoordBlock; VAR idx: INTEGER);
+		PROCEDURE point (VAR b: CoordBlock; VAR idx: SIGNED16);
 		BEGIN
 			IF idx = CoordBlockSize THEN
 				b := b.next; idx := 0
@@ -1112,7 +1112,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 			INC(idx)
 		END point;
 
-		PROCEDURE vector (VAR b: CoordBlock; VAR idx: INTEGER);
+		PROCEDURE vector (VAR b: CoordBlock; VAR idx: SIGNED16);
 		BEGIN
 			IF idx = CoordBlockSize THEN
 				b := b.next; idx := 0
@@ -1156,7 +1156,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 			eps = 0.001;
 
 		VAR
-			pos, epos, cpos, p, spos: INTEGER; eb: ElemBlock; cb, b, sb: CoordBlock; dx, dy, cx, cy, sx, sy, sdx, sdy, x, y, edx, edy: REAL;
+			pos, epos, cpos, p, spos: SIGNED16; eb: ElemBlock; cb, b, sb: CoordBlock; dx, dy, cx, cy, sx, sy, sdx, sdy, x, y, edx, edy: REAL;
 			data: DirData;
 
 		PROCEDURE get (VAR x, y: REAL);

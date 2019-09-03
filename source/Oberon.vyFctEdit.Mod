@@ -181,7 +181,7 @@ VAR
 	END Edit;
 
 	PROCEDURE Responsible( editor: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 	BEGIN
 		priority := vyEvents.PrioHigh;
 

@@ -7,15 +7,15 @@ MODULE Base64 IN Oberon;	(** portable *) (* ejz,  *)
 
 	VAR
 		encTable: ARRAY 64 OF CHAR;
-		decTable: ARRAY 128 OF INTEGER;
+		decTable: ARRAY 128 OF SIGNED16;
 		W: Texts.Writer;
 
 	PROCEDURE DecodeText*(T: Texts.Text; beg: LONGINT; F: Files.File): BOOLEAN;
 		VAR
 			R: Texts.Reader;
-			codes: ARRAY 4 OF INTEGER;
+			codes: ARRAY 4 OF SIGNED16;
 			Ri: Files.Rider;
-			i: INTEGER;
+			i: SIGNED16;
 			ch: CHAR;
 			ok, end: BOOLEAN;
 	BEGIN
@@ -173,7 +173,7 @@ MODULE Base64 IN Oberon;	(** portable *) (* ejz,  *)
 	END Encode;
 
 	PROCEDURE InitTables;
-		VAR i, max: INTEGER;
+		VAR i, max: SIGNED16;
 	BEGIN
 		max := ORD("Z")-ORD("A");
 		FOR i := 0 TO max DO

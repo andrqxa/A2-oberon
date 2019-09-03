@@ -26,10 +26,10 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 			Escape*: PROCEDURE (P: Printer.Printer; s: ARRAY OF CHAR);
 			printF*: Files.File;
 			eps*: BOOLEAN; (** Is EPS output being written? *)
-			pno*: INTEGER; (** Current page being printer on (starts with 1) *)
+			pno*: SIGNED16; (** Current page being printer on (starts with 1) *)
 
 			l, t, r, b: LONGINT;
-			sx, sy: INTEGER; (* current string pos *)
+			sx, sy: SIGNED16; (* current string pos *)
 			mode, location: SIGNED8;
 			duplex: BOOLEAN; (* Print duplex pages *)
 			anonymous: BOOLEAN
@@ -48,25 +48,25 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		FontDefDesc = RECORD
 			name: ARRAY 64 OF CHAR;
 			family: ARRAY 32 OF CHAR;
-			size: INTEGER;
+			size: SIGNED16;
 			attr: CHAR;
 			next: FontDef
 		END;
 
 	VAR
 		fontTable: ARRAY maxFonts OF FontDesc;
-		fontIndex, curFont: INTEGER;
+		fontIndex, curFont: SIGNED16;
 		listFont: Name;
 		headerT: Texts.Text;
 		bodyF: Files.File;
 		bodyR: Files.Rider;
 		ppos: LONGINT;
 		hexArray: ARRAY 17 OF CHAR;
-		curR, curG, curB, setR, setG, setB: INTEGER;
+		curR, curG, curB, setR, setG, setB: SIGNED16;
 
 		metric: Objects.Library;
 		fontMapDict: FontDef;
-		fontMapDictN: INTEGER;
+		fontMapDictN: SIGNED16;
 		default: Objects.Name;
 
 	(* -- Output procedures -- *)
@@ -77,7 +77,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END Ch;
 
 	PROCEDURE Str (VAR R: Files.Rider; s: ARRAY OF CHAR);
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE s[i] # 0X DO Ch(R, s[i]); INC(i) END;
@@ -100,7 +100,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 
 	PROCEDURE Real(VAR R: Files.Rider; x: REAL);
 	VAR
-		n, i, xi: INTEGER;
+		n, i, xi: SIGNED16;
 		d: ARRAY 4 OF CHAR;
 	BEGIN
 		xi := SHORT(ENTIER(x));
@@ -155,22 +155,22 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		Ln(fontR); Ln(fontR);
 	END SetMappedFont;
 
-	PROCEDURE SetBitmapFont(VAR fontR, R: Files.Rider; fd: FontDesc; pRes: INTEGER);
+	PROCEDURE SetBitmapFont(VAR fontR, R: Files.Rider; fd: FontDesc; pRes: SIGNED16);
 		TYPE
-			RunRec = RECORD beg, end: INTEGER END;
-			Metrics = RECORD dx, x, y, w, h: INTEGER END;
+			RunRec = RECORD beg, end: SIGNED16 END;
+			Metrics = RECORD dx, x, y, w, h: SIGNED16 END;
 
 		VAR
 			ch: CHAR;
 			pixmapDX, n, b: LONGINT;
-			k, m: INTEGER;
-			height, minX, maxX, minY, maxY: INTEGER;
-			nOfBoxes, nOfRuns: INTEGER;
+			k, m: SIGNED16;
+			height, minX, maxX, minY, maxY: SIGNED16;
+			nOfBoxes, nOfRuns: SIGNED16;
 			run: ARRAY 16 OF RunRec;
 			metrics: ARRAY 256 OF Metrics;
 
 		PROCEDURE Flip(ch: CHAR): CHAR;
-			VAR i, s, d: INTEGER;
+			VAR i, s, d: SIGNED16;
 		BEGIN
 			i := 0; s := ORD(ch); d := 0;
 			WHILE i < 8 DO
@@ -181,7 +181,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 			RETURN CHR(d);
 		END Flip;
 
-		PROCEDURE Name(m: INTEGER);
+		PROCEDURE Name(m: SIGNED16);
 		BEGIN
 			CASE m OF
 			| 9: Str(fontR, "tab")
@@ -357,7 +357,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	PROCEDURE DefineFont(VAR fontR: Files.Rider; fd: FontDesc; echo: BOOLEAN);
 		VAR
 			family, name: ARRAY 32 OF CHAR;
-			i, size, dpi: INTEGER;
+			i, size, dpi: SIGNED16;
 			f: Files.File; R: Files.Rider;
 			fontDef: FontDef;
 			attr: CHAR;
@@ -398,7 +398,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	(* -- Metric Font loading -- *)
 
 	PROCEDURE ParseName (VAR name, family: ARRAY OF CHAR; VAR size: LONGINT; VAR style: SET; VAR class: ARRAY OF CHAR);
-	VAR i, j: INTEGER;
+	VAR i, j: SIGNED16;
 	BEGIN
 		size := 0; style := {}; i := 0;
 		WHILE (name[i] > "9") OR (name[i] = " ") DO family[i] := name[i]; INC(i) END;
@@ -420,7 +420,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 
 	(* -- Exported Procedures -- *)
 
-	PROCEDURE GetDim(P: Printer.Printer; label: ARRAY OF CHAR; def: INTEGER; VAR val: INTEGER);
+	PROCEDURE GetDim(P: Printer.Printer; label: ARRAY OF CHAR; def: SIGNED16; VAR val: SIGNED16);
 	VAR v: REAL; S: Texts.Scanner;
 	BEGIN
 		Oberon.OpenScanner(S, label);
@@ -443,8 +443,8 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END GetDim;
 
-	PROCEDURE Swap(VAR x, y: INTEGER);
-	VAR t: INTEGER;
+	PROCEDURE Swap(VAR x, y: SIGNED16);
+	VAR t: SIGNED16;
 	BEGIN
 		t := x; x := y; y := t
 	END Swap;
@@ -561,7 +561,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END Escape;
 
-	PROCEDURE ReplConst*(P: Printer.Printer; x, y, w, h: INTEGER);
+	PROCEDURE ReplConst*(P: Printer.Printer; x, y, w, h: SIGNED16);
 	BEGIN
 		WITH P: PSPrinter DO
 			(* Don't make more that one page when making eps *)
@@ -577,8 +577,8 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END ReplConst;
 
-	PROCEDURE StringSize(VAR s: ARRAY OF CHAR; fnt: Fonts.Font; VAR w, h, dsr: INTEGER);
-	VAR p: INTEGER; obj: Objects.Object;
+	PROCEDURE StringSize(VAR s: ARRAY OF CHAR; fnt: Fonts.Font; VAR w, h, dsr: SIGNED16);
+	VAR p: SIGNED16; obj: Objects.Object;
 	BEGIN
 		w := 0; h := 0; dsr := 0;
 		p := 0;
@@ -595,7 +595,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END StringSize;
 
 	PROCEDURE ContString*(P: Printer.Printer; s: ARRAY OF CHAR; fnt: Fonts.Font);
-		VAR fNo, i, n, w, h, dsr: INTEGER; ch: CHAR; family: ARRAY 7 OF CHAR;
+		VAR fNo, i, n, w, h, dsr: SIGNED16; ch: CHAR; family: ARRAY 7 OF CHAR;
 
 		PROCEDURE Use(ch: CHAR);
 		BEGIN
@@ -645,8 +645,8 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END ContString;
 
-	PROCEDURE String*(P: Printer.Printer; x, y: INTEGER; s: ARRAY OF CHAR; fnt: Fonts.Font);
-	VAR w, h, dsr: INTEGER;
+	PROCEDURE String*(P: Printer.Printer; x, y: SIGNED16; s: ARRAY OF CHAR; fnt: Fonts.Font);
+	VAR w, h, dsr: SIGNED16;
 	BEGIN
 		WITH P: PSPrinter DO
 			(* Don't make more that one page when making eps *)
@@ -661,7 +661,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END String;
 
-	PROCEDURE ReplPattern*(P: Printer.Printer; x, y, w, h, col: INTEGER);
+	PROCEDURE ReplPattern*(P: Printer.Printer; x, y, w, h, col: SIGNED16);
 	BEGIN
 		WITH P: PSPrinter DO
 			(* Don't make more that one page when making eps *)
@@ -677,22 +677,22 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END ReplPattern;
 
 	(* mode is not used *)
-	PROCEDURE Picture*(P: Printer.Printer; pict: Pictures.Picture; sx, sy, sw, sh, dx, dy, dw, dh, mode: INTEGER);
+	PROCEDURE Picture*(P: Printer.Printer; pict: Pictures.Picture; sx, sy, sw, sh, dx, dy, dw, dh, mode: SIGNED16);
 	VAR
-		x, y: INTEGER;
-		n, h0, h1, k, i: INTEGER;
-		h: ARRAY 128 OF INTEGER;
+		x, y: SIGNED16;
+		n, h0, h1, k, i: SIGNED16;
+		h: ARRAY 128 OF SIGNED16;
 
-		PROCEDURE WColTab(n: INTEGER);
-		VAR i, r, g, b: INTEGER;
+		PROCEDURE WColTab(n: SIGNED16);
+		VAR i, r, g, b: SIGNED16;
 		BEGIN
 			i := 0; WHILE i < n DO Pictures.GetColor(pict, i, r, g, b); Hex2(bodyR, CHR(r)); INC(i) END; Ln(bodyR);
 			i := 0; WHILE i < n DO Pictures.GetColor(pict, i, r, g, b); Hex2(bodyR, CHR(g)); INC(i) END; Ln(bodyR);
 			i := 0; WHILE i < n DO Pictures.GetColor(pict, i, r, g, b); Hex2(bodyR, CHR(b)); INC(i) END; Ln(bodyR);
 		END WColTab;
 
-		PROCEDURE H(n: INTEGER);
-		VAR d0, d1: INTEGER;
+		PROCEDURE H(n: SIGNED16);
+		VAR d0, d1: SIGNED16;
 		BEGIN
 			d0 := n MOD 16; IF d0 > 9 THEN INC(d0, 7) END;
 			d1 := n DIV 16; IF d1 > 9 THEN INC(d1, 7) END;
@@ -756,7 +756,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END Picture;
 
-	PROCEDURE Circle*(P: Printer.Printer; x0, y0, r: INTEGER);
+	PROCEDURE Circle*(P: Printer.Printer; x0, y0, r: SIGNED16);
 	BEGIN
 		WITH P: PSPrinter DO
 			(* Don't make more that one page when making eps *)
@@ -771,7 +771,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END Circle;
 
-	PROCEDURE Ellipse*(P: Printer.Printer; x0, y0, a, b: INTEGER);
+	PROCEDURE Ellipse*(P: Printer.Printer; x0, y0, a, b: SIGNED16);
 	BEGIN
 		WITH P: PSPrinter DO
 			(* Don't make more that one page when making eps *)
@@ -786,7 +786,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END Ellipse;
 
-	PROCEDURE Line*(P: Printer.Printer; x0, y0, x1, y1: INTEGER);
+	PROCEDURE Line*(P: Printer.Printer; x0, y0, x1, y1: SIGNED16);
 	BEGIN
 		WITH P: PSPrinter DO
 			(* Don't make more that one page when making eps *)
@@ -801,15 +801,15 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END Line;
 
-	PROCEDURE UseColor*(P: Printer.Printer; red, green, blue: INTEGER);
+	PROCEDURE UseColor*(P: Printer.Printer; red, green, blue: SIGNED16);
 	BEGIN
 		curR := red; curG := green; curB := blue
 	END UseColor;
 
 	(* -- Spline computation -- *)
 
-	PROCEDURE SolveTriDiag(VAR a, b, c, y: RealVector; n: INTEGER);
-		VAR i: INTEGER; t, tt: REAL;
+	PROCEDURE SolveTriDiag(VAR a, b, c, y: RealVector; n: SIGNED16);
+		VAR i: SIGNED16; t, tt: REAL;
 	BEGIN (*a, b, c of tri-diag matrix T; solve Ty' = y for y', assign y' to y*)
 		i := 1;
 		WHILE i < n DO t := y[i-1]; y[i] := y[i] - c[i-1]*t; INC(i) END ;
@@ -817,8 +817,8 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		WHILE i > 0 DO DEC(i); t := a[i]; tt := b[i]*y[i+1]; y[i] := (y[i] - tt)/t END
 	END SolveTriDiag;
 
-	PROCEDURE OpenSpline(VAR x, y, d: RealVector; n: INTEGER);
-		VAR i: INTEGER; d1, d2: REAL;
+	PROCEDURE OpenSpline(VAR x, y, d: RealVector; n: SIGNED16);
+		VAR i: SIGNED16; d1, d2: REAL;
 			a, b, c: RealVector;
 	BEGIN (*from x, y compute d = y'*)
 		b[0] := 1.0/(x[1] - x[0]); a[0] := 2.0*b[0]; c[0] := b[0];
@@ -835,8 +835,8 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		SolveTriDiag(a, b, c, d, n)
 	END OpenSpline;
 
-	PROCEDURE ClosedSpline(VAR x, y, d: RealVector; n: INTEGER);
-		VAR i: INTEGER; d1, d2, hn, dn: REAL;
+	PROCEDURE ClosedSpline(VAR x, y, d: RealVector; n: SIGNED16);
+		VAR i: SIGNED16; d1, d2, hn, dn: REAL;
 			a, b, c, w: RealVector;
 	BEGIN (*from x, y compute d = y'*)
 		hn := 1.0/(x[n-1] - x[n-2]);
@@ -896,8 +896,8 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		Ln(bodyR);
 	END PrintPoly;
 
-	PROCEDURE Spline*(P: Printer.Printer; x0, y0, n, open: INTEGER; VAR X, Y: ARRAY OF INTEGER);
-		VAR i: INTEGER; dx, dy, ds: REAL;
+	PROCEDURE Spline*(P: Printer.Printer; x0, y0, n, open: SIGNED16; VAR X, Y: ARRAY OF SIGNED16);
+		VAR i: SIGNED16; dx, dy, ds: REAL;
 			x, xd, y, yd, s: RealVector;
 			p, q: PolyVector;
 	BEGIN
@@ -938,7 +938,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		END
 	END Spline;
 
-	PROCEDURE Page*(P: Printer.Printer; nofcopies: INTEGER);
+	PROCEDURE Page*(P: Printer.Printer; nofcopies: SIGNED16);
 	VAR x, y: LONGINT;
 	BEGIN
 		WITH P: PSPrinter DO
@@ -980,7 +980,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		CONST bufSize = 4*1024;
 		VAR
 			dpi: LONGINT;
-			i: INTEGER;
+			i: SIGNED16;
 			printR, srcR: Files.Rider; buffer: ARRAY bufSize OF CHAR;
 			S: Texts.Scanner;
 			R: Texts.Reader; ch: CHAR;
@@ -1127,7 +1127,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END Close;
 
 	PROCEDURE GetMetric* (P: Printer.Printer; fnt: Fonts.Font): Fonts.Font;
-	VAR name: ARRAY 32 OF CHAR; i: INTEGER; metric: Fonts.Font;
+	VAR name: ARRAY 32 OF CHAR; i: SIGNED16; metric: Fonts.Font;
 	BEGIN
 		COPY(fnt.name, name);
 		i := 0; WHILE (name[i] # ".") & (name[i] # 0X) DO INC(i) END;

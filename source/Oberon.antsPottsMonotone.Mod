@@ -40,7 +40,7 @@ TYPE
 
 	PROCEDURE MakeMonotoneRec*;
 	VAR name: ARRAY 64 OF CHAR;
-		obj, degraded: vyBase.Object;  type: INTEGER;  vec: vyLongrealVec.tVector;
+		obj, degraded: vyBase.Object;  type: SIGNED16;  vec: vyLongrealVec.tVector;
 	BEGIN
 		antsCommands.InitScan( "data=OBJ (vec=OBJ ) | (vec=NAME >create)" );
 		IF antsCommands.ExpectObject( "data", degraded ) & antsCommands.GetObject( "vec", obj ) THEN
@@ -58,7 +58,7 @@ TYPE
 
 	END MakeMonotoneRec;
 
-	PROCEDURE DoMonotone( degraded: vyBase.Object;  type: INTEGER;  VAR vec: vyLongrealVec.tVector );
+	PROCEDURE DoMonotone( degraded: vyBase.Object;  type: SIGNED16;  VAR vec: vyLongrealVec.tVector );
 	VAR N, i, j: LONGINT;  data: antsArrays.X1d;  pos: LONGINT;  multi: antsArrays.L1d;  start, end: LONGINT;  mean, ssq: LONGREAL;  nrNaNs: LONGINT;
 		len: LONGINT;  interval: vyLongrealVec.tVector;
 	BEGIN
@@ -137,7 +137,7 @@ this generates a new vector where the value at position is dropped out
 		END
 	END DropL1d;
 
-	PROCEDURE TestMonotone( VAR vector: ARRAY OF LONGREAL;  montype: INTEGER ): BOOLEAN;
+	PROCEDURE TestMonotone( VAR vector: ARRAY OF LONGREAL;  montype: SIGNED16 ): BOOLEAN;
 	VAR i, N: LONGINT;  flag: BOOLEAN;
 	BEGIN
 		N := LEN( vector );  i := 0;  flag := TRUE;
@@ -167,7 +167,7 @@ this generates a new vector where the value at position is dropped out
 
 	END MakeMatrix;
 
-	PROCEDURE LastMonotone*( VAR matrix: antsArrays.X2d;  montype: INTEGER;  VAR lastmon: antsArrays.X1d );
+	PROCEDURE LastMonotone*( VAR matrix: antsArrays.X2d;  montype: SIGNED16;  VAR lastmon: antsArrays.X1d );
 	VAR N, i, jumpN: LONGINT;
 		(* flag : BOOLEAN;*)
 	BEGIN
@@ -213,7 +213,7 @@ this generates a new vector where the value at position is dropped out
 
 	PROCEDURE FindLastMonotone*;
 	VAR statistic: antsPotts1DSurvey.StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  matrix: antsArrays.X2d;  lastmon: antsArrays.X1d;
-		montype: INTEGER;
+		montype: SIGNED16;
 	BEGIN
 		IF ~antsPotts1DSurvey.Header( statistic, vec ) THEN RETURN END;
 
@@ -247,7 +247,7 @@ this generates a new vector where the value at position is dropped out
 
 	PROCEDURE ApproxMonotone*;
 	VAR datain, dataout: ARRAY 64 OF CHAR;
-		Matrix: antsArrays.X2d;  MatrixOut: antsArrays.X2d;  type: INTEGER;  R: antsReadWrite.Rider;
+		Matrix: antsArrays.X2d;  MatrixOut: antsArrays.X2d;  type: SIGNED16;  R: antsReadWrite.Rider;
 	BEGIN
 		antsCommands.InitScan( "DataIn=STR  DataOut=STR (>median|>mean)" );
 
@@ -272,7 +272,7 @@ this generates a new vector where the value at position is dropped out
 
 	END ApproxMonotone;
 
-	PROCEDURE DoApproxMonotonePotts( VAR Matrix: antsArrays.X2d;  type: INTEGER;  VAR MatrixOut: antsArrays.X2d );
+	PROCEDURE DoApproxMonotonePotts( VAR Matrix: antsArrays.X2d;  type: SIGNED16;  VAR MatrixOut: antsArrays.X2d );
 	VAR i, j, rows, columns: LONGINT;  spotdata: vyLongrealVec.tVector;  statistic: antsPotts1DSurvey.StatisticObj;  ScanningMatrix: antsArrays.X2d;
 		lastmon: antsArrays.X1d;
 	BEGIN

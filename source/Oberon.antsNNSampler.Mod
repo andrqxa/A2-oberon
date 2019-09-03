@@ -49,7 +49,7 @@ VAR
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  o: tModel );
-	VAR version: INTEGER;  ref: Objects.Object;
+	VAR version: SIGNED16;  ref: Objects.Object;
 	BEGIN
 		Files.ReadInt( R, version );
 		(*Load*)
@@ -66,7 +66,7 @@ VAR
 	A: antsArrayObjects.tArray
 	*)
 		A: antsArrayObjects.tINTEGERObject;  Ao: antsArrayObjects.tINTEGERObject;
-		AA, AAo: antsArrayObjects.tINTEGERArray;  y, W, H: LONGINT;  ran: LONGREAL;  depth: LONGINT;  n1, n2, n3, n4, nd, nh: INTEGER;  h, h1, h2, cooling: LONGREAL;
+		AA, AAo: antsArrayObjects.tINTEGERArray;  y, W, H: LONGINT;  ran: LONGREAL;  depth: LONGINT;  n1, n2, n3, n4, nd, nh: SIGNED16;  h, h1, h2, cooling: LONGREAL;
 		gen: vyRanBase.tRandom;  zvax, zvay, zva: LONGINT;  orig: Objects.Object;
 
 	BEGIN
@@ -101,7 +101,7 @@ VAR
 	A: antsArrayObjects.tArray
 	*)
 		A: antsArrayObjects.tINTEGERObject;  Ao: antsArrayObjects.tINTEGERObject;
-		AA, AAo: antsArrayObjects.tINTEGERArray;  y, x, W, H: LONGINT;  ran, this, z: LONGREAL;  depth, i: LONGINT;  n1, n2, n3, n4, nd: INTEGER;
+		AA, AAo: antsArrayObjects.tINTEGERArray;  y, x, W, H: LONGINT;  ran, this, z: LONGREAL;  depth, i: LONGINT;  n1, n2, n3, n4, nd: SIGNED16;
 		orig: Objects.Object;
 	BEGIN
 		o := s.par( tModel );  A := s.A( antsArrayObjects.tINTEGERObject );  Links.GetLink( A, "orig", orig );

@@ -947,7 +947,7 @@ TYPE
 		END PDFSetLineWidth;
 
 		(*Default : lines not joined => param := 0; joined lines => param := 1;*)
-		PROCEDURE PDFSetLineJoin*(param : INTEGER);
+		PROCEDURE PDFSetLineJoin*(param : SIGNED16);
 		VAR
 			str : ARRAY 15 OF CHAR;
 		BEGIN

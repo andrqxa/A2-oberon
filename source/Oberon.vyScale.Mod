@@ -50,7 +50,7 @@ TYPE
 
 	tLayer* = POINTER TO tLayerDesc;
 	tLayerDesc* = RECORD (vyPort.tLayerDesc)
-		hdigits, vdigits: INTEGER;
+		hdigits, vdigits: SIGNED16;
 		haxe: vyAxis.tAxe;
 		vaxe: vyAxis.tAxe;
 		ow, oh: Coordinate;
@@ -64,12 +64,12 @@ TYPE
 VAR
 	newlayer-: tLayer;
 
-	PROCEDURE Min( a, b: INTEGER ): INTEGER;
+	PROCEDURE Min( a, b: SIGNED16 ): SIGNED16;
 	BEGIN
 		IF a < b THEN RETURN a ELSE RETURN b END
 	END Min;
 
-	PROCEDURE Max( a, b: INTEGER ): INTEGER;
+	PROCEDURE Max( a, b: SIGNED16 ): SIGNED16;
 	BEGIN
 		IF a > b THEN RETURN a ELSE RETURN b END
 	END Max;
@@ -204,7 +204,7 @@ VAR
 	END DoControl2;
 
 	PROCEDURE Responsible( scale: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 	BEGIN
 		priority := vyEvents.PrioNone;
 		IF ((event.gesture = vyEvents.EvtIdent) OR (event.gesture = vyEvents.EvtSelect)) &

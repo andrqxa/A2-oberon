@@ -53,7 +53,7 @@ VAR
 	time0, date0: LONGINT;
 
 PROCEDURE OpenText(title: ARRAY OF CHAR; T: Texts.Text; system: BOOLEAN);
-VAR W: INTEGER;
+VAR W: SIGNED16;
 BEGIN
 	IF system THEN W := Display.Width DIV 8*3 ELSE W := 400 END;
 	Oberon.OpenText(title, T, W, 240)
@@ -243,7 +243,7 @@ BEGIN
 END Copy;
 
 PROCEDURE Grow*;
-VAR par: Oberon.ParList; V, V1: Viewers.Viewer; M: Objects.CopyMsg; N: Display.ControlMsg; DW, DH: INTEGER;
+VAR par: Oberon.ParList; V, V1: Viewers.Viewer; M: Objects.CopyMsg; N: Display.ControlMsg; DW, DH: SIGNED16;
 BEGIN
 	par := Oberon.Par;
 	IF par.frame = par.vwr.dsc THEN V := par.vwr
@@ -517,7 +517,7 @@ BEGIN
 END CopyFiles;
 
 PROCEDURE RenameFile (name: ARRAY OF CHAR; VAR S: Texts.Scanner);
-VAR res: INTEGER;
+VAR res: SIGNED16;
 BEGIN
 	Texts.Scan(S);
 	IF (S.class = Texts.Char) & (S.c = "=") THEN
@@ -555,7 +555,7 @@ BEGIN
 END RenameFiles;
 
 PROCEDURE DeleteFile(VAR name: ARRAY OF CHAR;  VAR S: Texts.Scanner);
-VAR res: INTEGER;
+VAR res: SIGNED16;
 BEGIN
 	Texts.WriteString(W, name); Texts.WriteString(W, " deleting");
 	Texts.Append(Oberon.Log, W.buf); Files.Delete(name, res);
@@ -709,7 +709,7 @@ END WriteProc;
 PROCEDURE Variables(refs: Bytes;  i: SIZE; base: LONGINT);
 VAR
 	mode, ch: CHAR;  m, tmp1: SIZE; adr, type, n, lval, size, tmp2, tdadr: LONGINT;  etc: BOOLEAN;
-	sval: SIGNED8;  ival: INTEGER;  tmp: Bytes;  set: SET;
+	sval: SIGNED8;  ival: SIGNED16;  tmp: Bytes;  set: SET;
 	rval: REAL;  lrval: LONGREAL;
 BEGIN
 	m := LEN(refs^);  mode := refs[i];  INC(i);
@@ -774,7 +774,7 @@ BEGIN
 							END
 						|4:	(* SIGNED8 *)
 							SYSTEM.GET(adr, sval);  Texts.WriteInt(W, sval, 1)
-						|5:	(* INTEGER *)
+						|5:	(* SIGNED16 *)
 							SYSTEM.GET(adr, ival);  Texts.WriteInt(W, ival, 1)
 						|6:	(* LONGINT *)
 							SYSTEM.GET(adr, lval);  Texts.WriteInt(W, lval, 1)
@@ -846,7 +846,7 @@ BEGIN
 END State;
 
 PROCEDURE ShowCommands*;
-VAR M: Modules.Module; beg, end, time: LONGINT; T: Texts.Text; S: Texts.Scanner; i: INTEGER;
+VAR M: Modules.Module; beg, end, time: LONGINT; T: Texts.Text; S: Texts.Scanner; i: SIGNED16;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 	IF (S.class = Texts.Char) & (S.c = "^") THEN
@@ -934,7 +934,7 @@ BEGIN
 			|26: Texts.WriteString(W, "Not a valid volume")
 			|27: Texts.WriteString(W, "Cannot contact server ")
 		ELSE
-			IF error = MAX(INTEGER) THEN Texts.WriteString(W, "Trace ");  Texts.WriteInt(W, trap, 1);  INC(trap)
+			IF error = MAX(SIGNED16) THEN Texts.WriteString(W, "Trace ");  Texts.WriteInt(W, trap, 1);  INC(trap)
 			ELSE Texts.WriteString(W, "HALT statement")
 			END
 		END
@@ -969,7 +969,7 @@ BEGIN
 		trapped := 1;
 		Display.ResetClip;
 		IF Kernel.copro THEN Reals.SetFCR(Reals.DefaultFCR) ELSE resetfp() END;
-		IF error # MAX(INTEGER) THEN Viewers.Close(NIL) END;	(* close offending viewer, if any *)
+		IF error # MAX(SIGNED16) THEN Viewers.Close(NIL) END;	(* close offending viewer, if any *)
 		T := TextFrames.Text("");
 		mod := AosModules.ThisModuleByAdr(pc);
 		WriteTrap(W, error, page); Texts.WriteLn(W);

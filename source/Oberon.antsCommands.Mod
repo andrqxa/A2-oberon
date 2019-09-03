@@ -159,7 +159,7 @@ VAR
 	END ReadString;
 
 	PROCEDURE Qualifier( VAR scanner: vyScanners.Scanner;  VAR start, pos: LONGINT ): BOOLEAN;
-	VAR sc: vyScanners.Scanner;  tok: INTEGER;
+	VAR sc: vyScanners.Scanner;  tok: SIGNED16;
 	BEGIN
 		NEW( sc );  sc^ := scanner^;  start := sc.curTokPos;  tok := sc.GetNext( sc );
 		IF (sc.class = vyScanners.ctSym) & (GetSymbol( sc ) = "=") THEN
@@ -169,7 +169,7 @@ VAR
 	END Qualifier;
 
 	PROCEDURE Qualifier2( VAR scanner: vyScanners.Scanner;  VAR start, pos: LONGINT;  VAR name: ARRAY OF CHAR ): BOOLEAN;
-	VAR sc: vyScanners.Scanner;  tok: INTEGER;
+	VAR sc: vyScanners.Scanner;  tok: SIGNED16;
 	BEGIN
 		NEW( sc );  sc^ := scanner^;  start := sc.curTokPos;  tok := sc.GetNext( sc );
 		IF (sc.class = vyScanners.ctId) THEN
@@ -189,7 +189,7 @@ VAR
 	PROCEDURE Scan*( VAR sc: vyScanners.Scanner ): tScanList;
 	VAR anchor, this: tScanList;  Real: tReal;  Number: tNumber;  Name: tName;  sstring: tString;  Symbol: tSymbol;
 		name: vyName.tNameArray;  pos, num: LONGINT;  real: REAL;  object: vyBase.Object;  Object: tObject;  negative: BOOLEAN;  count: LONGINT;  start: LONGINT;
-		eot: BOOLEAN;  strpos: LONGINT;  tok: INTEGER;  s: CHAR;
+		eot: BOOLEAN;  strpos: LONGINT;  tok: SIGNED16;  s: CHAR;
 		string: ARRAY 1024 OF CHAR;
 		temppos: LONGINT;  text: Texts.Text;  noscanonce: BOOLEAN;  objsc: Texts.Scanner;  objpos: LONGINT;  s3obj, vyobj: Objects.Object;
 

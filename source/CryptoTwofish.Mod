@@ -52,7 +52,7 @@ TYPE
 				END InitKey;
 
 				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
-				VAR i: INTEGER;
+				VAR i: SIGNED16;
 				BEGIN
 					SetIV^( src, mode );   (* set mode *)
 					FOR i := 0 TO 3 DO  iv[i] := U.SetFromBufferLE( src, 4*i )  END;

@@ -115,7 +115,7 @@ END Basic;
 
 VAR
 	encTable: ARRAY 64 OF CHAR;
-	decTable: ARRAY 128 OF INTEGER;
+	decTable: ARRAY 128 OF SIGNED16;
 	defaultAuth * : Basic;
 	defaultHost * : ARRAY 64 OF CHAR;
 
@@ -171,7 +171,7 @@ END GetAdditionalFieldVals;
 (* Base64 Utilities. Copied from Oberon.Base64.Mod because it's an Oberon module using Text,Files. *)
 
 PROCEDURE InitTables;
-	VAR i, max: INTEGER;
+	VAR i, max: SIGNED16;
 BEGIN
 	max := ORD("Z")-ORD("A");
 	FOR i := 0 TO max DO

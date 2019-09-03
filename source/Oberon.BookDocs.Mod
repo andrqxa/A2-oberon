@@ -67,7 +67,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		B: Texts.Buffer;
 		tmpT: Texts.Text;
 		(* printer coordinates (here for A4) *)
-		printerTop, printerRight, printerWMiddle, printerPageW, printerTab: INTEGER;
+		printerTop, printerRight, printerWMiddle, printerPageW, printerTab: SIGNED16;
 		(* default fonts *)
 		titleFont*, textFont*, noteFont*, linkFont*, callFont*: Fonts.Font;
 		sectionFonts*: ARRAY Books.maxSect OF Fonts.Font;
@@ -76,19 +76,19 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		(* variables used for printing *)
 		Tcont, T, Tindex, Tnotes: TextGadgets.Frame;
 		pageNr, maxWi, maxWc: LONGINT;
-		oldW: INTEGER;
+		oldW: SIGNED16;
 		prMode: SET;
 		(* global variables for searching *)
 		sPat: ARRAY MaxPatLen OF CHAR;
-		sDv: ARRAY MaxPatLen + 1 OF INTEGER;
-		sPatLen: INTEGER;
+		sDv: ARRAY MaxPatLen + 1 OF SIGNED16;
+		sPatLen: SIGNED16;
 		lTime: LONGINT;
 		lastDoc: Documents.Document;
 		lastDeep, docList: DocList;
 
 (* initialize DefaultFonts *)
 	PROCEDURE GetFonts;
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 		PROCEDURE Font(name: ARRAY OF CHAR): Fonts.Font;
 			VAR fnt: Fonts.Font;
 		BEGIN
@@ -117,7 +117,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 (* load/store of tutorial-documents *)
 
 	(* create a new BasicGadgets.Button *)
-	PROCEDURE Button(X, Y: INTEGER; cmdStr, caption, name: ARRAY OF CHAR): Objects.Object;
+	PROCEDURE Button(X, Y: SIGNED16; cmdStr, caption, name: ARRAY OF CHAR): Objects.Object;
 		VAR
 			obj: Objects.Object;
 			A: Objects.AttrMsg;
@@ -188,7 +188,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END MakeButtonBar;
 
 	(* create the main-text *)
-	PROCEDURE MakeText(P: Books.Panel; h: INTEGER): Objects.Object;
+	PROCEDURE MakeText(P: Books.Panel; h: SIGNED16): Objects.Object;
 		VAR obj: Objects.Object;
 	BEGIN
 		Books.NewText(P);
@@ -205,7 +205,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END MakeText;
 
 	(* create the footnotes-text *)
-	PROCEDURE MakeNote(P: Books.Panel; h: INTEGER): Objects.Object;
+	PROCEDURE MakeNote(P: Books.Panel; h: SIGNED16): Objects.Object;
 		VAR obj: Objects.Object;
 	BEGIN
 		Books.NewText(P);
@@ -226,7 +226,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		VAR
 			P: Books.Panel;
 			R: Display3.Mask;
-			x1, w, y1, y2, lastY: INTEGER;
+			x1, w, y1, y2, lastY: SIGNED16;
 			msg: Display.ModifyMsg;
 	BEGIN
 		IF (M.dlink # NIL) & (M.dlink IS Books.Panel) THEN
@@ -291,7 +291,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END BarHandler;
 
 	(* create a new Books0.Bar *)
-	PROCEDURE Bar(P: Books.Panel; Y, H: INTEGER; name: ARRAY OF CHAR): Objects.Object;
+	PROCEDURE Bar(P: Books.Panel; Y, H: SIGNED16; name: ARRAY OF CHAR): Objects.Object;
 		VAR obj: Objects.Object;
 	BEGIN
 		Books0.NewBar();
@@ -307,7 +307,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END Bar;
 
 	(* the black bars used by tutorials *)
-	PROCEDURE MakeBars(P: Books.Panel; hT: INTEGER): Objects.Object;
+	PROCEDURE MakeBars(P: Books.Panel; hT: SIGNED16): Objects.Object;
 		VAR obj, old: Objects.Object;
 	BEGIN
 		obj := Bar(P, Books.barH+P.noteH+Books.barH+hT, Books.barH, "bar0");
@@ -325,7 +325,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	PROCEDURE BuildInterface(P: Books.Panel);
 		VAR
 			C: Display.ConsumeMsg;
-			hT, hN, buttonH: INTEGER;
+			hT, hN, buttonH: SIGNED16;
 	BEGIN
 		BooksHelp.SetTutorial(P, "Tutorials.Book Open");
 		IF P.W < (8*Books.buttonW-2) THEN
@@ -380,7 +380,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END BuildInterface;
 
 	(* write a tutorial-document-file-header *)
-	PROCEDURE WriteHeader*(VAR R: Files.Rider; x, y, w, h: INTEGER; ind, pos: LONGINT; options: SET; iconStr: ARRAY OF CHAR);
+	PROCEDURE WriteHeader*(VAR R: Files.Rider; x, y, w, h: SIGNED16; ind, pos: LONGINT; options: SET; iconStr: ARRAY OF CHAR);
 	BEGIN
 		Files.WriteInt(R, Documents.Id);
 		Files.WriteString(R, "BookDocs.NewDoc");
@@ -408,7 +408,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	(* skip over a tutorial-document-file-header *)
 	PROCEDURE SkipHeader*(VAR R: Files.Rider): BOOLEAN;
 		VAR
-			i: INTEGER;
+			i: SIGNED16;
 			li: LONGINT;
 			name: ARRAY 2*Books0.nameLen OF CHAR;
 			s: SET;
@@ -529,7 +529,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	PROCEDURE LoadDoc(D: Documents.Document): BOOLEAN;
 		VAR
 			P: Books.Panel;
-			tag, x, y, w, h: INTEGER;
+			tag, x, y, w, h: SIGNED16;
 			F: Files.File;
 			R: Files.Rider;
 			name: ARRAY 2*Books0.nameLen OF CHAR;
@@ -735,7 +735,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END SearchFrame;
 
 	(* print number at (X, Y) *)
-	PROCEDURE PrintInt(nr: LONGINT; X, Y: INTEGER);
+	PROCEDURE PrintInt(nr: LONGINT; X, Y: SIGNED16);
 		VAR
 			str: ARRAY 8 OF CHAR;
 	BEGIN
@@ -744,7 +744,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END PrintInt;
 
 	(* overridden PrintLine-"method" for TextGadgets.Frame; translates Books0.Frame to page numbers *)
-	PROCEDURE PrintLine(F: TextGadgets0.Frame; M: Display3.Mask; x, y: INTEGER; org: LONGINT; L: TextGadgets0.Line; dlink: Objects.Object);
+	PROCEDURE PrintLine(F: TextGadgets0.Frame; M: Display3.Mask; x, y: SIGNED16; org: LONGINT; L: TextGadgets0.Line; dlink: Objects.Object);
 		VAR
 			Fi: Texts.Finder;
 			obj: Objects.Object;
@@ -804,7 +804,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		VAR
 			org, oldOrg: LONGINT;
 			L: TextGadgets0.Line;
-			Y: INTEGER;
+			Y: SIGNED16;
 			output: BOOLEAN;
 			R: Display3.Mask;
 			break: BOOLEAN;
@@ -969,11 +969,11 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END CopyNotes;
 
 	(* count tabs beginning at beg *)
-	PROCEDURE CountTabs(t: Texts.Text; beg: LONGINT): INTEGER;
+	PROCEDURE CountTabs(t: Texts.Text; beg: LONGINT): SIGNED16;
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		i := 0;
 		Texts.OpenReader(R, t, beg);
@@ -986,11 +986,11 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END CountTabs;
 
 	(* add nTabs tabs to each line beginning in the text stretch (beg, end) in t *)
-	PROCEDURE AddTabs(t: Texts.Text; beg, end: LONGINT; nTabs: INTEGER);
+	PROCEDURE AddTabs(t: Texts.Text; beg, end: LONGINT; nTabs: SIGNED16);
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		Texts.OpenReader(R, t, beg);
 		Texts.Read(R, ch);
@@ -1061,7 +1061,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		VAR
 			P: Books.Panel;
 			Tf: Books.TGFrame;
-			nTabs: INTEGER;
+			nTabs: SIGNED16;
 			Fi, Fi2: Texts.Finder;
 			lF: FrameList;
 			tl: Books0.TextList;
@@ -1332,7 +1332,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	(* handler for tutorial documents *)
 	PROCEDURE DocHandler*(D: Objects.Object; VAR M: Objects.ObjMsg);
 		VAR
-			x, y, H, butH: INTEGER;
+			x, y, H, butH: SIGNED16;
 			T, Tn: Books.TGFrame;
 			P: Books.Panel;
 			il: Books0.ImpList;
@@ -1693,7 +1693,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END MarkPatPos;
 
 	(* mark colored text found *)
-	PROCEDURE MarkColPos(P: Books.Panel; tF: TextGadgets.Frame; VAR pos: LONGINT; col: INTEGER);
+	PROCEDURE MarkColPos(P: Books.Panel; tF: TextGadgets.Frame; VAR pos: LONGINT; col: SIGNED16);
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
@@ -1726,7 +1726,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 
 	(* calculate displacement vector *)
 	PROCEDURE CalcDispVec(time: LONGINT);
-		VAR i, j, d: INTEGER;
+		VAR i, j, d: SIGNED16;
 	BEGIN
 		lTime := time;
 		i := 1; d := 1;
@@ -1743,8 +1743,8 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END CalcDispVec;
 
 	(* returns string length *)
-	PROCEDURE StrLen(VAR str: ARRAY OF CHAR): INTEGER;
-		VAR i: INTEGER;
+	PROCEDURE StrLen(VAR str: ARRAY OF CHAR): SIGNED16;
+		VAR i: SIGNED16;
 	BEGIN
 		i := 0;
 		WHILE (i < LEN(str)) & (str[i] # 0X) DO
@@ -1754,7 +1754,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END StrLen;
 
 	(* searches the next position for the color col, begining at position pos *)
-	PROCEDURE SearchColor(text: Texts.Text; VAR pos: LONGINT; col: INTEGER): BOOLEAN;
+	PROCEDURE SearchColor(text: Texts.Text; VAR pos: LONGINT; col: SIGNED16): BOOLEAN;
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
@@ -1777,11 +1777,11 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END SearchColor;
 
 	(* searches the next position for the search pattern sPat (and col), begining at position pos *)
-	PROCEDURE SPatFound(text: Texts.Text; VAR pos: LONGINT; mode: SET; col: INTEGER): BOOLEAN;
+	PROCEDURE SPatFound(text: Texts.Text; VAR pos: LONGINT; mode: SET; col: SIGNED16): BOOLEAN;
 		VAR
 			R: Texts.Reader;
 			l: LONGINT;
-			i: INTEGER;
+			i: SIGNED16;
 			ch: CHAR;
 	BEGIN
 		IF sPatLen > 0 THEN
@@ -1815,7 +1815,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END SPatFound;
 
 	(* searches for the next object (newProc, name, col) in the text, begining at position pos *)
-	PROCEDURE SearchObj(T: Texts.Text; VAR pos: LONGINT; mode: SET; VAR newProc, name: ARRAY OF CHAR; col: INTEGER; VAR obj: Objects.Object): BOOLEAN;
+	PROCEDURE SearchObj(T: Texts.Text; VAR pos: LONGINT; mode: SET; VAR newProc, name: ARRAY OF CHAR; col: SIGNED16; VAR obj: Objects.Object): BOOLEAN;
 		VAR
 			Fi: Texts.Finder;
 			match: BOOLEAN;
@@ -1863,10 +1863,10 @@ MODULE BookDocs IN Oberon;	(** portable *)
 			R: Texts.Reader;
 			t: Texts.Text;
 			beg, end, time: LONGINT;
-			i: INTEGER;
+			i: SIGNED16;
 			mode: SET;
 			Text, Object: ARRAY MaxPatLen OF CHAR;
-			Color: INTEGER;
+			Color: SIGNED16;
 			obj: Objects.Object;
 		PROCEDURE TextField(name: ARRAY OF CHAR; VAR text: ARRAY OF CHAR);
 			VAR obj: Objects.Object;
@@ -1878,14 +1878,14 @@ MODULE BookDocs IN Oberon;	(** portable *)
 				text[0] := 0X
 			END
 		END TextField;
-		PROCEDURE Rect(name: ARRAY OF CHAR): INTEGER;
+		PROCEDURE Rect(name: ARRAY OF CHAR): SIGNED16;
 			VAR obj: Objects.Object;
 		BEGIN
 			obj := Gadgets.FindObj(Gadgets.context, name);
 			IF (obj # NIL) & (obj IS Gadgets.Frame) THEN
 				RETURN (* !!! obj(Gadgets.Frame).col *) Display.FG
 			ELSE
-				RETURN MIN(INTEGER)
+				RETURN MIN(SIGNED16)
 			END
 		END Rect;
 		PROCEDURE Next(VAR tl: Books0.TextList);
@@ -1925,7 +1925,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		IF T # NIL THEN
 			lastDoc := P.doc;
 			mode := {};
-			Text := ""; Color := MIN(INTEGER); Object := "";
+			Text := ""; Color := MIN(SIGNED16); Object := "";
 			Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 			Texts.Scan(S);
 			IF (S.class = Texts.Char) & (S.c = "*") THEN

@@ -157,7 +157,7 @@ TYPE
 			END
 		END ReadMatrixL;
 
-		PROCEDURE  (*VAR R: Rider*) WriteMatrixI*( VAR A: ARRAY OF ARRAY OF INTEGER );
+		PROCEDURE  (*VAR R: Rider*) WriteMatrixI*( VAR A: ARRAY OF ARRAY OF SIGNED16 );
 		VAR row, i: LONGINT;
 		BEGIN
 			IF SELF.type = antsFiles.bin THEN
@@ -170,7 +170,7 @@ TYPE
 			END
 		END WriteMatrixI;
 
-		PROCEDURE  (*VAR R: Rider*) ReadMatrixI*( VAR A: ARRAY OF ARRAY OF INTEGER );
+		PROCEDURE  (*VAR R: Rider*) ReadMatrixI*( VAR A: ARRAY OF ARRAY OF SIGNED16 );
 		VAR i, rows, cols: LONGINT;  v: vyIntVec.tVector;
 		BEGIN
 			IF SELF.type = antsFiles.bin THEN
@@ -226,7 +226,7 @@ TYPE
 			IF SELF.type = antsFiles.bin THEN
 				SELF.ReadLInt( rows );  SELF.ReadLInt( cols );
 				IF row >= rows THEN v := NIL;  RETURN END;
-				SELF.SetPos( SELF.Pos() + row * cols * SIZEOF( INTEGER ) );  NEW( A, cols );  SELF.ReadIntsFix( A^, cols );
+				SELF.SetPos( SELF.Pos() + row * cols * SIZEOF( SIGNED16 ) );  NEW( A, cols );  SELF.ReadIntsFix( A^, cols );
 				IF v = NIL THEN v := vyIntVec.New( cols ) ELSE vyIntVec.SetLen( v, cols ) END;
 				vyIntVec.CopyToVec( A^, v, cols, 0, 0 )
 			ELSE
@@ -288,7 +288,7 @@ TYPE
 		END ReadColL;
 
 		PROCEDURE  (*VAR R: Rider*) ReadColI*( VAR v: vyIntVec.tVector;  col: LONGINT );
-		VAR r, rows, cols: LONGINT;  v2: vyIntVec.tVector;  x: INTEGER;
+		VAR r, rows, cols: LONGINT;  v2: vyIntVec.tVector;  x: SIGNED16;
 		BEGIN
 			IF v = NIL THEN v := vyIntVec.New( 0 ) ELSE vyIntVec.SetLen( v, 0 ) END;
 			IF SELF.type = antsFiles.bin THEN
@@ -381,7 +381,7 @@ TYPE
 
 	PROCEDURE ReadPGM*( VAR A: antsArrays.L2d;  fname: ARRAY OF CHAR;  VAR d: LONGINT ): BOOLEAN;
 	VAR name: ARRAY 64 OF CHAR;
-		ch: CHAR;  pos: LONGINT;  w, h: LONGINT;  x, y: LONGINT;  R: antsFiles.Rider;  int: INTEGER;  lint: LONGINT;
+		ch: CHAR;  pos: LONGINT;  w, h: LONGINT;  x, y: LONGINT;  R: antsFiles.Rider;  int: SIGNED16;  lint: LONGINT;
 	BEGIN
 		IF ~R.Old( fname ) THEN aM.eSS( "could not open ", fname );  RETURN FALSE END;
 		R.SetAscii;  R.ReadString( name );
@@ -572,7 +572,7 @@ Output is number of rows and columns.
 Read Row or Column with
 
 antsReadWrite.Read filename vector - name [row = |col = ] num ~
-(filename = identifier | "identifier", name = identifier , num = INTEGER)
+(filename = identifier | "identifier", name = identifier , num = SIGNED16)
 
 Voyager.Show TestImage as antsImageViews ~
 
@@ -593,7 +593,7 @@ Scan
 (******************************* old stuff
 PROCEDURE Scan (T: Texts.Text;    VAR r,c: LONGINT;    v: vyLongrealVec.tVector;    VAR len: LONGINT;    analyze: BOOLEAN);
 VAR   sc: Texts.Scanner;  row,col,thisline: LONGINT;
-pos: LONGINT;  num: LONGREAL; columns,rows: LONGINT; 	type: INTEGER;
+pos: LONGINT;  num: LONGREAL; columns,rows: LONGINT; 	type: SIGNED16;
 CONST cnumber=0;    cname =1;    cunknown =2;
 BEGIN
 columns := MAX(LONGINT);
@@ -684,7 +684,7 @@ END DoReadBinaryRow;
 
 PROCEDURE DoReadMatrix (T: Texts.Text;    fr,tr,fc,tc: LONGINT;   VAR A: ARRAY OF ARRAY OF LONGREAL);
 VAR   sc: Texts.Scanner;  row,col,thisline: LONGINT;
-pos: LONGINT;  num: LONGREAL; columns: LONGINT; 	type: INTEGER;
+pos: LONGINT;  num: LONGREAL; columns: LONGINT; 	type: SIGNED16;
 CONST cnumber=0;    cname =1;    cunknown =2;
 BEGIN
 columns := MAX(LONGINT);
@@ -826,8 +826,8 @@ END;
 Texts.WriteLn(w);   Texts.Write(w,0AX);
 END AppendRowAT;
 
-PROCEDURE AppendRowATI (VAR w: Texts.Writer;  VAR A: ARRAY OF INTEGER;    len: LONGINT);
-VAR   i: LONGINT;       x: INTEGER;
+PROCEDURE AppendRowATI (VAR w: Texts.Writer;  VAR A: ARRAY OF SIGNED16;    len: LONGINT);
+VAR   i: LONGINT;       x: SIGNED16;
 BEGIN
 FOR i := 0 TO len-1 DO
 x := A[i];
@@ -849,7 +849,7 @@ WriteAscii(T,f);
 RETURN TRUE;
 END WriteMatrix;
 
-PROCEDURE WriteMatrixI* (f: ARRAY OF CHAR;    VAR A: ARRAY OF ARRAY OF INTEGER): BOOLEAN;
+PROCEDURE WriteMatrixI* (f: ARRAY OF CHAR;    VAR A: ARRAY OF ARRAY OF SIGNED16): BOOLEAN;
 VAR w: Texts.Writer;   i: LONGINT;    T: Texts.Text;
 BEGIN
 NEW(T); Texts.Open(T,"");

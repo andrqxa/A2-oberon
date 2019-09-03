@@ -23,15 +23,15 @@ TYPE
 	END;
 
 	ILBMHD = RECORD
-		w,h,x,y: INTEGER;	(* picture dimension *)
+		w,h,x,y: SIGNED16;	(* picture dimension *)
 		planes,	(* amount of bit planes *)
 		masking,compression: CHAR;	(* mask and compression *)
-		transparentCol: INTEGER;
+		transparentCol: SIGNED16;
 		xAspect,yAspect: CHAR;	(* relation width to height *)
-		pageWidth,pageHeight: INTEGER;	(* width and height of page *)
+		pageWidth,pageHeight: SIGNED16;	(* width and height of page *)
 	END;
 VAR
-	ColorMap: ARRAY 256 OF INTEGER;
+	ColorMap: ARRAY 256 OF SIGNED16;
 
 PROCEDURE ReadChunkId(VAR R: Files.Rider; VAR id: ChunkId);
 BEGIN
@@ -60,7 +60,7 @@ END ReadILBMHD;
 
 PROCEDURE ScanCol (VAR R: Files.Rider; pict: Pictures.Picture; nrColor: LONGINT; conversion: BOOLEAN);
 	(* copied from BMP.Mod *)
-VAR Red, Green, Blue: CHAR; C, min, d, x, y, z: LONGINT; i, j, minj: INTEGER; r, g, b: ARRAY 256 OF INTEGER;
+VAR Red, Green, Blue: CHAR; C, min, d, x, y, z: LONGINT; i, j, minj: SIGNED16; r, g, b: ARRAY 256 OF SIGNED16;
 BEGIN
 	C := ASH(1, Display.Depth(0)) - 1;
 	IF nrColor > C THEN nrColor := C ELSE DEC(nrColor) END;
@@ -89,7 +89,7 @@ BEGIN
 	END
 END ScanCol;
 
-PROCEDURE LoadIFF(VAR R: Files.Rider; transparentCol: INTEGER; colorConversion: BOOLEAN; pict: Pictures.Picture);
+PROCEDURE LoadIFF(VAR R: Files.Rider; transparentCol: SIGNED16; colorConversion: BOOLEAN; pict: Pictures.Picture);
 	(* Load the IFF picture information into an Oberon Pictures.Picture *)
 VAR
 	hd: ChunkHeader;
@@ -98,7 +98,7 @@ VAR
 	c,k,z: SIGNED8;
 	line: POINTER TO ARRAY OF CHAR;
 	start,bpos,cpos,hpos,size: LONGINT;
-	p,w,h,x,y,cols,rep,cnt: INTEGER;
+	p,w,h,x,y,cols,rep,cnt: SIGNED16;
 BEGIN
 	start:= Files.Pos(R);
 	ReadChunkHeader(R,hd);

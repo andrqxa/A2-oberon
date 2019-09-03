@@ -66,7 +66,7 @@ TYPE
 	GlobalVariable* = OBJECT (Variable)
 		VAR
 			owner-: Module;
-			entryNo*: INTEGER;	(** object-file information set by PCOF *)
+			entryNo*: SIGNED16;	(** object-file information set by PCOF *)
 
 			link-: Fixup;	(** occourencies of var in code *)
 			next-: GlobalVariable;	(** next GVar in the list *)
@@ -142,9 +142,9 @@ TYPE
 	Module* = OBJECT (Attribute)
 		VAR
 			locsize*: LONGINT;			(** data section size*)
-			constsize*: INTEGER;			(** const section size*)
-			casetablesize*: INTEGER;  	(** length of case table within const section *) (* ug *)
-			nr*: INTEGER;
+			constsize*: SIGNED16;			(** const section size*)
+			casetablesize*: SIGNED16;  	(** length of case table within const section *) (* ug *)
+			nr*: SIGNED16;
 
 			const*: ConstArray;
 

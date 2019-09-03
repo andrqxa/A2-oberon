@@ -232,7 +232,7 @@ BEGIN
 END FPrintLReal;
 
 PROCEDURE FPrintName*(VAR fp: LONGINT; name: ARRAY OF CHAR);
-	VAR i: INTEGER; ch: CHAR;
+	VAR i: SIGNED16; ch: CHAR;
 BEGIN i:=0; REPEAT ch:=name[i]; FPrint(fp, ORD(ch)); INC(i) UNTIL ch=0X
 END FPrintName;
 
@@ -1132,7 +1132,7 @@ END AddImport;
 (* ReadString - Read a 0X compressed string *)
 
 PROCEDURE ReadString(VAR R: PCM.SymReader; VAR string: ARRAY OF CHAR);
-	VAR i: INTEGER; ch: CHAR;
+	VAR i: SIGNED16; ch: CHAR;
 BEGIN i := 0;
 	LOOP R.Char(ch);
 		IF ch = 0X THEN string[i] := 0X; RETURN
@@ -1147,7 +1147,7 @@ BEGIN i := 0;
 END ReadString;
 
 PROCEDURE ReadStringNoZeroCompress(VAR R: PCM.SymReader; VAR string: ARRAY OF CHAR);
-	VAR i: INTEGER; ch: CHAR;
+	VAR i: SIGNED16; ch: CHAR;
 BEGIN
 	i := 0;
 	REPEAT

@@ -16,7 +16,7 @@ TYPE
 		height,	(* Height, in pixels, of the image *)
 		colorCount: CHAR;	(* Number of colors in image, 0 if >= 8bpp *)
 		planes,	(* Color Planes *)
-		bitCount: INTEGER;	(* Bits per Pixel *)
+		bitCount: SIGNED16;	(* Bits per Pixel *)
 		bytesInRes,	(* how many bytes in this resource *)
 		imageOffset: LONGINT;	(* where in the file is this image? *)
 	END;
@@ -26,7 +26,7 @@ TYPE
 		width,	(* width of the bitmap in Pixels *)
 		height: LONGINT;	(* height of the bitmap in Pixels *)
 		planes,	(* # of planes for the target device, must be 1 *)
-		bitCount: INTEGER;	(* Bits per Pixels, should be 1,4 or 8 *)
+		bitCount: SIGNED16;	(* Bits per Pixels, should be 1,4 or 8 *)
 		compression,	(* not used*)
 		sizeImage: LONGINT;	(* Imagesize in bytes *)
 		xPelsPerMeter,	(* not used *)
@@ -35,13 +35,13 @@ TYPE
 		clrImportant: LONGINT;	(* not used *)
 	END;
 VAR
-	colorMap: ARRAY 256 OF INTEGER;
-	iconIndex: INTEGER;
+	colorMap: ARRAY 256 OF SIGNED16;
+	iconIndex: SIGNED16;
 
-PROCEDURE ReadDir(VAR R: Files.Rider): INTEGER;
+PROCEDURE ReadDir(VAR R: Files.Rider): SIGNED16;
 	(* Read the File's Directory *)
 VAR
-	val: INTEGER;
+	val: SIGNED16;
 BEGIN
 	Files.ReadInt(R,val);	(* Reserved, must be 0 *)
 	IF (val # 0) THEN RETURN(-1); END;
@@ -84,7 +84,7 @@ END ReadBitmapInfoHeader;
 
 PROCEDURE ScanCol (VAR R: Files.Rider; pict: Pictures.Picture; nrColor: LONGINT; conversion: BOOLEAN);
 	(* copied from BMP.Mod *)
-VAR Red, Green, Blue, c: CHAR; C, min, d, x, y, z: LONGINT; i, j, minj: INTEGER; r, g, b: ARRAY 256 OF INTEGER;
+VAR Red, Green, Blue, c: CHAR; C, min, d, x, y, z: LONGINT; i, j, minj: SIGNED16; r, g, b: ARRAY 256 OF SIGNED16;
 BEGIN
 	C := ASH(1, Display.Depth(0)) - 1;
 	IF nrColor > C THEN nrColor := C ELSE DEC(nrColor) END;
@@ -113,7 +113,7 @@ BEGIN
 	END
 END ScanCol;
 
-PROCEDURE LoadIcon(VAR R: Files.Rider; ndx,transparentCol: INTEGER; colorConversion: BOOLEAN; pict: Pictures.Picture);
+PROCEDURE LoadIcon(VAR R: Files.Rider; ndx,transparentCol: SIGNED16; colorConversion: BOOLEAN; pict: Pictures.Picture);
 VAR
 	dir: IconDirEntry;
 	bmih: BitmapInfoHeader;
@@ -121,12 +121,12 @@ VAR
 	k: SIGNED8;
 	i,length: LONGINT;
 
-	PROCEDURE PosX(ndx: LONGINT): INTEGER;
+	PROCEDURE PosX(ndx: LONGINT): SIGNED16;
 	BEGIN
 		RETURN(SHORT(ndx MOD bmih.width));
 	END PosX;
 
-	PROCEDURE PosY(ndx: LONGINT): INTEGER;
+	PROCEDURE PosY(ndx: LONGINT): SIGNED16;
 	BEGIN
 		RETURN(SHORT(ndx DIV bmih.width));
 	END PosY;
@@ -183,7 +183,7 @@ END LoadIcon;
 PROCEDURE Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg);
 VAR
 	pos: LONGINT;
-	icons,this: INTEGER;
+	icons,this: SIGNED16;
 BEGIN
 	WITH obj: Pictures.Picture DO
 		IF msg IS Objects.AttrMsg THEN

@@ -5,7 +5,7 @@ IMPORT Streams;
 
 VAR
 	etab: ARRAY 64 OF CHAR;
-	dtab: ARRAY 128 OF INTEGER;
+	dtab: ARRAY 128 OF SIGNED16;
 
 
 	PROCEDURE Encode*( CONST image: ARRAY OF CHAR; len: SIZE;
@@ -148,7 +148,7 @@ VAR
 	CONST
 		letters = 26;  digits = 10;
 	VAR
-		i, j: INTEGER;
+		i, j: SIGNED16;
 	BEGIN
 		j := 0;
 		FOR i := 0 TO letters - 1 DO  etab[j] := CHR( i + ORD("A") );  INC( j )  END;

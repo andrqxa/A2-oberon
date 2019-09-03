@@ -3481,7 +3481,7 @@ TYPE
 					a[x, |, y] -> a[x, y] (otherwise, combine into single one)
 
 				- if a pointer is indexed over, splitting and auto-dereferencing takes place:
-					a[x, y] -> a[x]^[y] (a: ARRAY OF POINTER TO ARRAY OF INTEGER)
+					a[x, y] -> a[x]^[y] (a: ARRAY OF POINTER TO ARRAY OF SIGNED16)
 
 				- if an array-structured object type is indexed over, create procedure call designator
 					e.g.: a[x, y] -> a^."[]"(x, y)

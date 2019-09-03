@@ -139,7 +139,7 @@ BEGIN
 	RETURN (x >= MIN(REAL)) & (x <= MAX(REAL))
 END InRealRange;
 
-PROCEDURE WReal* (VAR w: Texts.Writer;   x: LONGREAL;   prec: INTEGER);
+PROCEDURE WReal* (VAR w: Texts.Writer;   x: LONGREAL;   prec: SIGNED16);
 BEGIN
 	IF (x >= MIN(REAL)) & (x <= MAX(REAL)) THEN	Texts.WriteReal(w, SHORT(x), prec) ELSE Texts.WriteLongReal(w, x, prec) END
 END WReal;
@@ -162,13 +162,13 @@ BEGIN
 	END
 END WriteRealFix;
 
-PROCEDURE InsertErrW* (level: INTEGER;   TB: Texts.Writer);   	(*vs 0.1d1 fof *)
+PROCEDURE InsertErrW* (level: SIGNED16;   TB: Texts.Writer);   	(*vs 0.1d1 fof *)
 	(* Append buffer text to error log *)
 	(*! should become fail-safe *)
 	(*! force level attributes. So far, level is not supported. *)
 BEGIN	Texts.Append(Log, TB.buf) END InsertErrW;
 
-PROCEDURE InsertErr* (level: INTEGER;   buf: Texts.Buffer);   	(*vs 0.1d1 fof *)
+PROCEDURE InsertErr* (level: SIGNED16;   buf: Texts.Buffer);   	(*vs 0.1d1 fof *)
 	(* Append buffer text to error log *)
 	(*! should become fail-safe *)
 	(*! force level attributes. So far, level is not supported. *)
@@ -194,7 +194,7 @@ END;
 END ParcBeforeInsertion; *)(* s3 *)
 (*____________________________________________________*)
 
-PROCEDURE NoteAttrib (VAR  tw: Texts.Writer;   level: INTEGER);
+PROCEDURE NoteAttrib (VAR  tw: Texts.Writer;   level: SIGNED16);
 
 	(*! use font styles as well  for visually impaired *)
 	(*! copy alerts and warnings to log *)
@@ -229,19 +229,19 @@ END Show;
 
 (** Diagnostic messages *)
 
-PROCEDURE Note* (level: INTEGER;   s: ARRAY OF CHAR);   	(*vs 0.1d0 gs *)
+PROCEDURE Note* (level: SIGNED16;   s: ARRAY OF CHAR);   	(*vs 0.1d0 gs *)
 BEGIN NoteAttrib(werr, level);
 	Texts.WriteString(werr, s);   Texts.WriteLn(werr);   AppendToText(Log, werr);
 NoteAttrib(werr, 0) END Note;
 
-PROCEDURE NoteSS* (level: INTEGER;   s1, s2: ARRAY OF CHAR);   	(*vs 0.1d0 gs *)
+PROCEDURE NoteSS* (level: SIGNED16;   s1, s2: ARRAY OF CHAR);   	(*vs 0.1d0 gs *)
 BEGIN NoteAttrib(werr, level);
 	Texts.WriteString(werr, s1);   Texts.Write(werr, msgsep);
 	Texts.WriteString(werr, s2);
 	Texts.WriteLn(werr);   AppendToText(Log, werr);
 NoteAttrib(werr, 0) END NoteSS;
 
-PROCEDURE NoteSSS* (level: INTEGER;   s1, s2, s3: ARRAY OF CHAR);   	(*vs 0.1d0 gs *)
+PROCEDURE NoteSSS* (level: SIGNED16;   s1, s2, s3: ARRAY OF CHAR);   	(*vs 0.1d0 gs *)
 BEGIN NoteAttrib(werr, level);
 	Texts.WriteString(werr, s1);   Texts.Write(werr, msgsep);
 	Texts.WriteString(werr, s2);   Texts.Write(werr, msgsep);
@@ -249,14 +249,14 @@ BEGIN NoteAttrib(werr, level);
 	Texts.WriteLn(werr);   AppendToText(Log, werr);
 NoteAttrib(werr, 0) END NoteSSS;
 
-PROCEDURE NoteSI* (level: INTEGER;   s: ARRAY OF CHAR;   i: LONGINT);   	(*vs 0.1d0 gs *)
+PROCEDURE NoteSI* (level: SIGNED16;   s: ARRAY OF CHAR;   i: LONGINT);   	(*vs 0.1d0 gs *)
 	(* string integer string integer *)
 BEGIN NoteAttrib(werr, level);
 	Texts.WriteString(werr, s);   Texts.WriteInt(werr, i, 0);   Texts.Write(werr, ' ');
 	Texts.WriteLn(werr);   AppendToText(Log, werr);
 NoteAttrib(werr, 0) END NoteSI;
 
-PROCEDURE NoteSIS* (level: INTEGER;   s: ARRAY OF CHAR;   i: LONGINT;   s1: ARRAY OF CHAR);   	(*vs 0.1d0 gs *)
+PROCEDURE NoteSIS* (level: SIGNED16;   s: ARRAY OF CHAR;   i: LONGINT;   s1: ARRAY OF CHAR);   	(*vs 0.1d0 gs *)
 	(* string integer string integer *)
 BEGIN NoteAttrib(werr, level);
 	Texts.WriteString(werr, s);   Texts.WriteInt(werr, i, 0);   Texts.Write(werr, ' ');
@@ -264,7 +264,7 @@ BEGIN NoteAttrib(werr, level);
 	Texts.WriteLn(werr);   AppendToText(Log, werr);
 NoteAttrib(werr, 0) END NoteSIS;
 
-PROCEDURE NoteSISI* (level: INTEGER;   s: ARRAY OF CHAR;   i: LONGINT;   s1: ARRAY OF CHAR;   i1: LONGINT);   	(*vs 0.1d0 gs *)
+PROCEDURE NoteSISI* (level: SIGNED16;   s: ARRAY OF CHAR;   i: LONGINT;   s1: ARRAY OF CHAR;   i1: LONGINT);   	(*vs 0.1d0 gs *)
 	(* string integer string integer *)
 BEGIN NoteAttrib(werr, level);
 	Texts.WriteString(werr, s);   Texts.Write(werr, msgsep);
@@ -371,7 +371,7 @@ PROCEDURE WriteTableStyle* (VAR W: Texts.Writer);
 CONST ctabdist = 60;
 	VAR prevfont: FontItem;
 	obj: Objects.Object;      BM: Objects.BindMsg;      oldfnt: Objects.Library;       OL: Objects.Library;
-	i: INTEGER;
+	i: SIGNED16;
 
 BEGIN
 	(*! insert style parc or gadget *)
@@ -400,7 +400,7 @@ END WritePrevStyle;
 PROCEDURE WriteInt* (VAR W: Texts.Writer;   i: LONGINT);
 	(*! replace by smatrt choice *)
 BEGIN
-	IF (i >= MIN(INTEGER)) & (i <= MAX(INTEGER)) THEN
+	IF (i >= MIN(SIGNED16)) & (i <= MAX(SIGNED16)) THEN
 		Texts.WriteInt(W, i, 6)
 	ELSE
 		Texts.WriteInt(W, i, 12)
@@ -416,7 +416,7 @@ BEGIN
 END WriteLongIntTab;
 
 
-PROCEDURE WriteIntTab* (VAR W: Texts.Writer;   len: LONGINT;   x: ARRAY OF INTEGER;   start: LONGINT;   n: LONGINT);
+PROCEDURE WriteIntTab* (VAR W: Texts.Writer;   len: LONGINT;   x: ARRAY OF SIGNED16;   start: LONGINT;   n: LONGINT);
 BEGIN
 	IF len <= 0 THEN RETURN END;
 	Texts.WriteInt(W, x[start], n);
@@ -670,7 +670,7 @@ BEGIN
 	(*ASSERT(G.lib#NIL); *)
 END InsertGadget;
 
-PROCEDURE GetCurWidth* (): INTEGER;
+PROCEDURE GetCurWidth* (): SIGNED16;
 	VAR OutTF: Display.Frame;   OutText: Texts.Text;   OutPos : LONGINT;   b: BOOLEAN;   s: TextGadgets.Style;
 BEGIN
 	GetInsertionPoint(OutTF, OutText, OutPos, b);
@@ -717,7 +717,7 @@ PROCEDURE MsgI* ( i: LONGINT);   	(*vs 0.1d0 gs *)
 BEGIN Texts.WriteInt(w, i, 0);   Texts.WriteLn(w);   InsertLog(w.buf) END MsgI;
 
 PROCEDURE MsgSHex* ( s1: ARRAY OF CHAR; i: LONGINT);
-	VAR s2: ARRAY 32 OF CHAR; j: INTEGER;
+	VAR s2: ARRAY 32 OF CHAR; j: SIGNED16;
 BEGIN s2 := '0000000000H';
 	FOR j := 9 TO 1 BY - 1 DO
 	s2[j] := hexchars[(i MOD 16) ];  i := i DIV 16  END;
@@ -777,7 +777,7 @@ BEGIN
 	Texts.WriteLn(w); WritePrevStyle(w)
 END DumpBool;
 
-PROCEDURE DumpReal* (VAR w: Texts.Writer;    VAR a: ARRAY OF REAL;   prec: INTEGER);
+PROCEDURE DumpReal* (VAR w: Texts.Writer;    VAR a: ARRAY OF REAL;   prec: SIGNED16);
 	VAR i, count: SIZE;
 BEGIN   WriteTableStyle(w);
 	count := LEN(a); i := 0;
@@ -787,7 +787,7 @@ BEGIN   WriteTableStyle(w);
 	Texts.WriteLn(w); WritePrevStyle(w)
 END DumpReal;
 
-PROCEDURE DumpLongreal* (VAR w: Texts.Writer;     VAR a: ARRAY OF LONGREAL;   prec: INTEGER);
+PROCEDURE DumpLongreal* (VAR w: Texts.Writer;     VAR a: ARRAY OF LONGREAL;   prec: SIGNED16);
 	VAR i, count: SIZE;
 BEGIN   WriteTableStyle(w);
 	count := LEN(a); i := 0;
@@ -797,7 +797,7 @@ BEGIN   WriteTableStyle(w);
 	Texts.WriteLn(w); WritePrevStyle(w)
 END DumpLongreal;
 
-PROCEDURE DumpInteger* (VAR w: Texts.Writer;     VAR a: ARRAY OF INTEGER;   prec: INTEGER);
+PROCEDURE DumpInteger* (VAR w: Texts.Writer;     VAR a: ARRAY OF SIGNED16;   prec: SIGNED16);
 	VAR i, count: SIZE;
 BEGIN WriteTableStyle(w);
 	count := LEN(a);   i := 0;
@@ -807,7 +807,7 @@ BEGIN WriteTableStyle(w);
 	Texts.WriteLn(w); WritePrevStyle(w)
 END DumpInteger;
 
-PROCEDURE DumpLongint* (VAR w: Texts.Writer;    VAR a: ARRAY OF LONGINT;   prec: INTEGER);
+PROCEDURE DumpLongint* (VAR w: Texts.Writer;    VAR a: ARRAY OF LONGINT;   prec: SIGNED16);
 	VAR i, count: SIZE;
 BEGIN   WriteTableStyle(w);
 	count := LEN(a); i := 0;
@@ -829,7 +829,7 @@ BEGIN Texts.WriteString(w, "Summary for boolean array");   Texts.WriteLn(w);   i
 	Texts.WriteLn(w)
 END SummaryBool;
 
-PROCEDURE SummaryReal* (VAR w: Texts.Writer;   count: LONGINT;   VAR a: ARRAY OF REAL;   prec: INTEGER);
+PROCEDURE SummaryReal* (VAR w: Texts.Writer;   count: LONGINT;   VAR a: ARRAY OF REAL;   prec: SIGNED16);
 	VAR i: LONGINT;
 BEGIN Texts.WriteString(w, "Summary for real array ");
 	Texts.WriteString(w, " count=");   Texts.WriteInt(w, count, 0);
@@ -840,7 +840,7 @@ BEGIN Texts.WriteString(w, "Summary for real array ");
 	Texts.WriteLn(w)
 END SummaryReal;
 
-PROCEDURE SummaryLongreal* (VAR w: Texts.Writer;   count: LONGINT;   VAR a: ARRAY OF LONGREAL;   prec: INTEGER);
+PROCEDURE SummaryLongreal* (VAR w: Texts.Writer;   count: LONGINT;   VAR a: ARRAY OF LONGREAL;   prec: SIGNED16);
 	VAR i: LONGINT;
 BEGIN Texts.WriteString(w, "Summary for longreal array ");
 	Texts.WriteString(w, " count=");   Texts.WriteInt(w, count, 0);
@@ -851,7 +851,7 @@ BEGIN Texts.WriteString(w, "Summary for longreal array ");
 	Texts.WriteLn(w)
 END SummaryLongreal;
 
-PROCEDURE SummaryInteger* (VAR w: Texts.Writer;   count: LONGINT;   VAR a: ARRAY OF INTEGER;   prec: INTEGER);
+PROCEDURE SummaryInteger* (VAR w: Texts.Writer;   count: LONGINT;   VAR a: ARRAY OF SIGNED16;   prec: SIGNED16);
 	VAR i: LONGINT;
 BEGIN Texts.WriteString(w, "Summary for integer array ");
 	Texts.WriteString(w, " count=");   Texts.WriteInt(w, count, 0);
@@ -862,7 +862,7 @@ BEGIN Texts.WriteString(w, "Summary for integer array ");
 	Texts.WriteLn(w)
 END SummaryInteger;
 
-PROCEDURE SummaryLongint* (VAR w: Texts.Writer;   count: LONGINT;   VAR a: ARRAY OF LONGINT;   prec: INTEGER);
+PROCEDURE SummaryLongint* (VAR w: Texts.Writer;   count: LONGINT;   VAR a: ARRAY OF LONGINT;   prec: SIGNED16);
 	VAR i: LONGINT;
 BEGIN Texts.WriteString(w, "Summary for longinteger array ");
 	Texts.WriteString(w, " count=");   Texts.WriteInt(w, count, 0);

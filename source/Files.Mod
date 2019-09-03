@@ -1216,7 +1216,7 @@ BEGIN
 	r.file.Read(r, SYSTEM.VAL(CHAR, x))
 END ReadSInt;
 
-PROCEDURE ReadInt*(VAR r: Rider; VAR x: INTEGER);
+PROCEDURE ReadInt*(VAR r: Rider; VAR x: SIGNED16);
 BEGIN
 	r.file.ReadBytes(r, SYSTEM.VAL(Bytes2, x), 0, 2)
 END ReadInt;
@@ -1302,7 +1302,7 @@ BEGIN
 	r.file.Write(r, SYSTEM.VAL(CHAR, x))
 END WriteSInt;
 
-PROCEDURE WriteInt*(VAR r: Rider; x: INTEGER);
+PROCEDURE WriteInt*(VAR r: Rider; x: SIGNED16);
 BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes2, x), 0, 2)
 END WriteInt;

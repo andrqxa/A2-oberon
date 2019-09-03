@@ -51,14 +51,14 @@ TYPE
 	Entry* = POINTER TO EntryDesc;	(** description of a file stored in the zip-archive **)
 	EntryDesc* = RECORD
 		name-: ARRAY 256 OF CHAR;	(** name of file stored in the zip-archive **)
-		method: INTEGER;	(* compression method *)
+		method: SIGNED16;	(* compression method *)
 		time-, date-: LONGINT;	(** (Oberon) time and date when file was last modified **)
 		crc32: LONGINT;	(* checksum of uncompressed file data *)
 		compSize-, uncompSize-: LONGINT;	(** size of compressed / uncompressed file **)
-		intFileAttr: INTEGER;	(* internal file attributes, not used in this implementation *)
+		intFileAttr: SIGNED16;	(* internal file attributes, not used in this implementation *)
 		extFileAttr: LONGINT;	(* external file attributes, not used in this implementation *)
 		extraField (* for future expansions *), comment-: POINTER TO ARRAY OF CHAR;	(** comment for this file **)
-		genPurpBitFlag: INTEGER;
+		genPurpBitFlag: SIGNED16;
 		support: SIGNED8;
 		dataDescriptor: BOOLEAN;	(* if set, data descriptor after (compressed) file data *)
 		offsetLocal: LONGINT;	(* offset of file header in central directory *)
@@ -69,7 +69,7 @@ TYPE
 
 	Archive* = POINTER TO ArchiveDesc;	(** description of a zipfile **)
 	ArchiveDesc* = RECORD
-		nofEntries-: INTEGER;	(** total number of files stored in the zipfile **)
+		nofEntries-: SIGNED16;	(** total number of files stored in the zipfile **)
 		comment-: POINTER TO ARRAY OF CHAR;	(** comment for zipfile **)
 		file: Files.File;	(* pointer to the according zip-file *)
 		offset: LONGINT;	(* offset of end of central dir record *)
@@ -106,25 +106,25 @@ BEGIN
 END StringLength;
 
 (* Converts Oberon time into MS-DOS time *)
-PROCEDURE OberonToDosTime(t: LONGINT): INTEGER;
+PROCEDURE OberonToDosTime(t: LONGINT): SIGNED16;
 BEGIN
 	RETURN SHORT(t DIV 1000H MOD 20H * 800H + t DIV 40H MOD 40H * 20H + t MOD 40H DIV 2)
 END OberonToDosTime;
 
 (* Converts Oberon date into MS-DOS time *)
-PROCEDURE OberonToDosDate(d: LONGINT): INTEGER;
+PROCEDURE OberonToDosDate(d: LONGINT): SIGNED16;
 BEGIN
 	RETURN SHORT((d DIV 200H + 1900 - 1980) * 200H + d MOD 200H)
 END OberonToDosDate;
 
 (* Converts MS-DOS time into Oberon time *)
-PROCEDURE DosToOberonTime(t: INTEGER): LONGINT;
+PROCEDURE DosToOberonTime(t: SIGNED16): LONGINT;
 BEGIN
 	RETURN LONG(t) DIV 800H MOD 20H * 1000H + t DIV 20H MOD 40H * 40H + t MOD 20H * 2
 END DosToOberonTime;
 
 (* Converts MS-DOS date into Oberon date *)
-PROCEDURE DosToOberonDate(d: INTEGER): LONGINT;
+PROCEDURE DosToOberonDate(d: SIGNED16): LONGINT;
 BEGIN
 	RETURN (LONG(d) DIV 200H MOD 80H + 1980 - 1900) * 200H + d MOD 200H
 END DosToOberonDate;
@@ -153,7 +153,7 @@ END Copy;
 PROCEDURE ReadEntry(VAR r: Files.Rider): Entry;
 VAR
 	ent: Entry;
-	intDummy, nameLen, extraLen, commentLen: INTEGER;
+	intDummy, nameLen, extraLen, commentLen: SIGNED16;
 	longDummy: LONGINT;
 BEGIN
 	Files.ReadLInt(r, longDummy);
@@ -221,9 +221,9 @@ BEGIN
 	Files.WriteLInt(r, ent.crc32);	(* crc-32 *)
 	Files.WriteLInt(r, ent.compSize);	(* compressed size *)
 	Files.WriteLInt(r, ent.uncompSize);	(* uncompressed size *)
-	Files.WriteInt(r, INTEGER(StringLength(ent.name)));	(* filename length *)
+	Files.WriteInt(r, SIGNED16(StringLength(ent.name)));	(* filename length *)
 	IF ent.extraField # NIL THEN
-		Files.WriteInt(r, INTEGER(LEN(ent.extraField^)))	(* extra field length *)
+		Files.WriteInt(r, SIGNED16(LEN(ent.extraField^)))	(* extra field length *)
 	ELSE
 		Files.WriteInt(r, 0)
 	END;
@@ -247,16 +247,16 @@ BEGIN
 	Files.WriteLInt(r, ent.crc32);	(* crc-32 *)
 	Files.WriteLInt(r, ent.compSize);	(* compressed size *)
 	Files.WriteLInt(r, ent.uncompSize);	(* uncompressed size *)
-	Files.WriteInt(r, INTEGER(StringLength(ent.name)));	(* filename length *)
+	Files.WriteInt(r, SIGNED16(StringLength(ent.name)));	(* filename length *)
 	IF ent.extraField = NIL THEN
 		Files.WriteInt(r, 0)
 	ELSE
-		Files.WriteInt(r, INTEGER(LEN(ent.extraField^)));	(* extra field length *)
+		Files.WriteInt(r, SIGNED16(LEN(ent.extraField^)));	(* extra field length *)
 	END;
 	IF ent.comment = NIL THEN
 		Files.WriteInt(r, 0)
 	ELSE
-		Files.WriteInt(r, INTEGER(LEN(ent.comment^)));	(* file comment length *)
+		Files.WriteInt(r, SIGNED16(LEN(ent.comment^)));	(* file comment length *)
 	END;
 	Files.WriteInt(r, 0);	(* disk number start *)
 	Files.WriteInt(r, ent.intFileAttr);	(* internal file attributes *)
@@ -292,7 +292,7 @@ BEGIN
 	IF arc.comment = NIL THEN
 		Files.WriteInt(r, 0)	(* zipfile comment length *)
 	ELSE
-		Files.WriteInt(r, INTEGER(LEN(arc.comment^)));	(* zipfile comment length *)
+		Files.WriteInt(r, SIGNED16(LEN(arc.comment^)));	(* zipfile comment length *)
 		Files.WriteBytes(r, arc.comment^, LEN(arc.comment^)(LONGINT))	(* zipfile comment *)
 	END
 END WriteEndOfCentDir;
@@ -323,7 +323,7 @@ VAR
 	f: Files.File;
 	r: Files.Rider;
 	longDummy: LONGINT;
-	intDummy: INTEGER;
+	intDummy: SIGNED16;
 BEGIN
 	res := Ok;
 	f := Files.Old(name);

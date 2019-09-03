@@ -125,7 +125,7 @@ MODULE PCA386; (** AUTHOR "prk"; PURPOSE "Parallel Compiler: i80386 assembler pa
 
 		InstrDesc = RECORD
 					name: Mnemo;
-					start, end: INTEGER;	 (* index in the opcode-tab *)
+					start, end: SIGNED16;	 (* index in the opcode-tab *)
 					target: SET;
 				END;
 
@@ -135,18 +135,18 @@ MODULE PCA386; (** AUTHOR "prk"; PURPOSE "Parallel Compiler: i80386 assembler pa
 				if opc # -1 => modr/m . opc = opc. ( extension of the opcode )
 		*)
 		OpCode = RECORD
-				op: ARRAY 3 OF INTEGER;		(* mode of the dst/src operands, if needed *)
-				op0, op1, op2: INTEGER;	   (* opcode *)
-				opc: INTEGER;			(* value stored in reg/opcode of modr/m. -1 = none *)
-				reg: INTEGER;			(* where is the register stored: none / rm /op *)
+				op: ARRAY 3 OF SIGNED16;		(* mode of the dst/src operands, if needed *)
+				op0, op1, op2: SIGNED16;	   (* opcode *)
+				opc: SIGNED16;			(* value stored in reg/opcode of modr/m. -1 = none *)
+				reg: SIGNED16;			(* where is the register stored: none / rm /op *)
 			END;
 
 		Operand = RECORD
 					mode: LONGINT;		(* the mode: Reg8.... *)
 					imm: LONGINT;		(* the constant *)
 					disp: LONGINT;
-					index, base, reg: INTEGER;
-					seg, scale: INTEGER;	(* segment override *)
+					index, base, reg: SIGNED16;
+					seg, scale: SIGNED16;	(* segment override *)
 					obj: Symbol;			(* the jmp label for forward jumps / the object referenced *)
 				END;
 
@@ -222,11 +222,11 @@ VAR
 		END
 	END ModeSize;
 
-	PROCEDURE ConstSize(i: LONGINT; signed: BOOLEAN):INTEGER;
+	PROCEDURE ConstSize(i: LONGINT; signed: BOOLEAN):SIGNED16;
 	BEGIN
 		IF (MIN(SIGNED8) <= i) & (MAX(SIGNED8) >= i) OR (~signed & (AND(i,LONGINT(0FFFFFF00H))=0)) THEN
 			RETURN(1)
-		ELSIF (MIN(INTEGER) <= i) & (MAX(INTEGER) >= i) OR (~signed & (AND(i,LONGINT(0FFFF0000H))=0))THEN
+		ELSIF (MIN(SIGNED16) <= i) & (MAX(SIGNED16) >= i) OR (~signed & (AND(i,LONGINT(0FFFF0000H))=0))THEN
 			RETURN(2)
 		ELSE
 			RETURN(4)
@@ -628,9 +628,9 @@ VAR
 		END Str;
 
 		PROCEDURE Number(VAR intval: LONGINT);
-		VAR i, m, n, d: INTEGER; dig: ARRAY 24 OF CHAR;
+		VAR i, m, n, d: SIGNED16; dig: ARRAY 24 OF CHAR;
 
-			PROCEDURE Ord(ch: CHAR; hex: BOOLEAN): INTEGER;
+			PROCEDURE Ord(ch: CHAR; hex: BOOLEAN): SIGNED16;
 			BEGIN (* ("0" <= ch) & (ch <= "9") OR ("A" <= ch) & (ch <= "F") *)
 				IF ch <= "9" THEN RETURN ORD(ch) - ORD("0")
 				ELSIF hex THEN RETURN ORD(ch) - ORD("A") + 10
@@ -1411,7 +1411,7 @@ END Assemble;
 
 
 	PROCEDURE BodyInit;
-		VAR s: INTEGER; i: LONGINT; f: Files.File; r: Files.Reader;
+		VAR s: SIGNED16; i: LONGINT; f: Files.File; r: Files.Reader;
 
 		PROCEDURE InsertTarget(name: ARRAY OF CHAR; flag: SET);
 		BEGIN

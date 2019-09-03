@@ -459,7 +459,7 @@ TYPE
 			w.Int(index,1);
 			w.String(" name="); w.String(name);
 			w.String(" type=");
-			IF parameterType = Integer THEN w.String("INTEGER")
+			IF parameterType = Integer THEN w.String("SIGNED16")
 			ELSIF parameterType=Boolean THEN w.String("BOOLEAN")
 			ELSIF parameterType=String THEN w.String("STRING");
 			END;
@@ -478,7 +478,7 @@ TYPE
 		BEGIN
 			IF r.GetInteger(index,FALSE) & CheckItem(r,"name") & GetString(r,name)
 				&CheckItem(r,"type") & GetString(r,s) & CheckItem(r,"value") THEN
-					IF s= "INTEGER" THEN parameterType := Integer
+					IF s= "SIGNED16" THEN parameterType := Integer
 					ELSIF s = "BOOLEAN" THEN parameterType := Boolean
 					ELSIF s = "STRING" THEN parameterType := String
 					ELSE RETURN FALSE

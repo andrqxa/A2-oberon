@@ -46,7 +46,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 		MarkerFG, MarkerBG: Display.Pattern;
 		Enum: RECORD
 			img: Images.Image;
-			x, y: INTEGER;	(* map origin on device *)
+			x, y: SIGNED16;	(* map origin on device *)
 		END;
 
 
@@ -69,8 +69,8 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 		RETURN phi
 	END atan2;
 
-	PROCEDURE RestoreRuns (x, y, w, h: INTEGER);
-		VAR x0, len, l, i, j: INTEGER; line: ARRAY 512 OF CHAR; b: CHAR;
+	PROCEDURE RestoreRuns (x, y, w, h: SIGNED16);
+		VAR x0, len, l, i, j: SIGNED16; line: ARRAY 512 OF CHAR; b: CHAR;
 	BEGIN
 		x0 := x;
 		WHILE h > 0 DO
@@ -91,15 +91,15 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 		END
 	END RestoreRuns;
 
-	PROCEDURE RestoreBlock (x, y, w, h: INTEGER);
+	PROCEDURE RestoreBlock (x, y, w, h: SIGNED16);
 		VAR offset: LONGINT;
 	BEGIN
 		offset := (y - Enum.y) * Enum.img.bpr + (x - Enum.x) * Enum.img.fmt.bpp DIV 8;
 		Display.TransferBlock(Enum.img.mem^, offset, Enum.img.bpr, x, y, w, h, Display.set)
 	END RestoreBlock;
 
-	PROCEDURE RestoreImageRect (img: Images.Image; x, y, w, h, dx, dy: INTEGER; mask: Display3.Mask);
-		VAR xw, yh: INTEGER;
+	PROCEDURE RestoreImageRect (img: Images.Image; x, y, w, h, dx, dy: SIGNED16; mask: Display3.Mask);
+		VAR xw, yh: SIGNED16;
 	BEGIN
 		INC(x, dx); INC(y, dy);
 		xw := x + w; yh := y + h;
@@ -120,7 +120,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(**--- Wells ---**)
 
-	PROCEDURE DrawMarker (x, y: INTEGER);
+	PROCEDURE DrawMarker (x, y: SIGNED16);
 	BEGIN
 		DEC(x, 3); DEC(y);
 		Effects.OpenCursor(x, y, 16, 17);
@@ -128,7 +128,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 		Display.CopyPattern(Display3.black, MarkerFG, x, y, Display.paint)
 	END DrawMarker;
 
-	PROCEDURE FadeMarker (x, y: INTEGER);
+	PROCEDURE FadeMarker (x, y: SIGNED16);
 	BEGIN
 		Effects.CloseCursor
 	END FadeMarker;
@@ -149,7 +149,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE TrackWell (well: Well; VAR msg: Oberon.InputMsg);
 		VAR
-			fx, fy, x, y, u, v, r, g, b: INTEGER; mask: Display3.Mask; marker: Oberon.Marker; keysum, keys: SET;
+			fx, fy, x, y, u, v, r, g, b: SIGNED16; mask: Display3.Mask; marker: Oberon.Marker; keysum, keys: SET;
 			frame: Display.Frame; lm: Objects.LinkMsg; am: Objects.AttrMsg; cm: Objects.CopyMsg;
 	BEGIN
 		fx := msg.x + well.X; fy := msg.y + well.Y;
@@ -207,8 +207,8 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 		msg.res := 0
 	END TrackWell;
 
-	PROCEDURE RestoreWell (well: Well; fx, fy: INTEGER; mask: Display3.Mask);
-		VAR w, h, r, g, b: INTEGER; dcol: Display.Color;
+	PROCEDURE RestoreWell (well: Well; fx, fy: SIGNED16; mask: Display3.Mask);
+		VAR w, h, r, g, b: SIGNED16; dcol: Display.Color;
 	BEGIN
 		w := well.W; h := well.H;
 		Oberon.RemoveMarks(fx, fy, w, h);
@@ -226,9 +226,9 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END RestoreWell;
 
 	PROCEDURE PrintWell (well: Well; VAR msg: Display.DisplayMsg);
-		VAR mask: Display3.Mask; x, y, w, h, one, two: INTEGER;
+		VAR mask: Display3.Mask; x, y, w, h, one, two: SIGNED16;
 
-		PROCEDURE pc (x: LONGINT): INTEGER;
+		PROCEDURE pc (x: LONGINT): SIGNED16;
 		BEGIN
 			RETURN SHORT(x * Display.Unit DIV Printer.Unit)
 		END pc;
@@ -245,7 +245,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END PrintWell;
 
 	PROCEDURE UpdateWell (well: Well; VAR msg: Display.FrameMsg);
-		VAR am: Objects.AttrMsg; fx, fy: INTEGER; mask: Display3.Mask;
+		VAR am: Objects.AttrMsg; fx, fy: SIGNED16; mask: Display3.Mask;
 	BEGIN
 		IF well.obj # NIL THEN
 			Attributes.GetString(well, "Field", am.name);
@@ -324,7 +324,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END CopyWell;
 
 	PROCEDURE HandleWell* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR well, copy: Well; fx, fy: INTEGER; mask: Display3.Mask; ver: LONGINT;
+		VAR well, copy: Well; fx, fy: SIGNED16; mask: Display3.Mask; ver: LONGINT;
 	BEGIN
 		well := obj(Well);
 		IF msg IS Display.FrameMsg THEN
@@ -423,7 +423,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(**--- Discs ---**)
 
-	PROCEDURE GetDiscCoords (disc: Disc; VAR x, y: INTEGER);
+	PROCEDURE GetDiscCoords (disc: Disc; VAR x, y: SIGNED16);
 	BEGIN
 		IF disc.sat < 0.001 THEN
 			x := disc.W DIV 2;
@@ -451,7 +451,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END UpdateDiscModel;
 
 	PROCEDURE TrackDisc (disc: Disc; VAR msg: Oberon.InputMsg);
-		VAR fx, fy, px, py, mx, my, x, y: INTEGER; mask: Display3.Mask; hue, sat, dx, dy: REAL; keysum, keys: SET;
+		VAR fx, fy, px, py, mx, my, x, y: SIGNED16; mask: Display3.Mask; hue, sat, dx, dy: REAL; keysum, keys: SET;
 	BEGIN
 		fx := msg.x + disc.X; fy := msg.y + disc.Y;
 		Gadgets.MakeMask(disc, fx, fy, msg.dlink, mask);
@@ -487,7 +487,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END TrackDisc;
 
 	PROCEDURE RestoreDiscImage (disc: Disc);
-		VAR r, g, b, j, i: INTEGER; pix: Images.Pixel; dx, dy, y, x, sat, hue, rr, gg, bb: REAL;
+		VAR r, g, b, j, i: SIGNED16; pix: Images.Pixel; dx, dy, y, x, sat, hue, rr, gg, bb: REAL;
 	BEGIN
 		IF disc.img = NIL THEN
 			NEW(disc.img)
@@ -516,8 +516,8 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 		END
 	END RestoreDiscImage;
 
-	PROCEDURE RestoreDisc (disc: Disc; fx, fy: INTEGER; mask: Display3.Mask);
-		VAR x, y: INTEGER;
+	PROCEDURE RestoreDisc (disc: Disc; fx, fy: SIGNED16; mask: Display3.Mask);
+		VAR x, y: SIGNED16;
 	BEGIN
 		RestoreDiscImage(disc);
 		RestoreImageRect(disc.img, 0, 0, disc.W, disc.H, fx, fy, mask);
@@ -529,7 +529,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END RestoreDisc;
 
 	PROCEDURE PrintDisc (disc: Disc; VAR msg: Display.DisplayMsg);
-		VAR mask: Display3.Mask; w, h, j, i: INTEGER; dx, dy, y, x, sat, hue, r, g, b: REAL;
+		VAR mask: Display3.Mask; w, h, j, i: SIGNED16; dx, dy, y, x, sat, hue, r, g, b: REAL;
 	BEGIN
 		Gadgets.MakePrinterMask(disc, msg.x, msg.y, msg.dlink, mask);
 		w := SHORT(disc.W * Display.Unit DIV Printer.Unit);
@@ -559,7 +559,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END PrintDisc;
 
 	PROCEDURE UpdateDisc (disc: Disc; VAR msg: Display.FrameMsg);
-		VAR hue, sat: REAL; fld: ARRAY 32 OF CHAR; fx, fy: INTEGER; mask: Display3.Mask;
+		VAR hue, sat: REAL; fld: ARRAY 32 OF CHAR; fx, fy: SIGNED16; mask: Display3.Mask;
 	BEGIN
 		IF disc.obj # NIL THEN
 			hue := disc.hue; sat := disc.sat;
@@ -635,7 +635,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END CopyDisc;
 
 	PROCEDURE HandleDisc* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR disc, copy: Disc; fx, fy: INTEGER; mask: Display3.Mask; ver: LONGINT;
+		VAR disc, copy: Disc; fx, fy: SIGNED16; mask: Display3.Mask; ver: LONGINT;
 	BEGIN
 		disc := obj(Disc);
 		IF msg IS Display.FrameMsg THEN
@@ -731,7 +731,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(**--- Wedges ---**)
 
-	PROCEDURE GetWedgeCoords (wedge: Wedge; VAR x, y: INTEGER);
+	PROCEDURE GetWedgeCoords (wedge: Wedge; VAR x, y: SIGNED16);
 	BEGIN
 		IF wedge.hue < 0 THEN
 			x := 0
@@ -758,7 +758,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END UpdateWedgeModel;
 
 	PROCEDURE TrackWedge (wedge: Wedge; VAR msg: Oberon.InputMsg);
-		VAR fx, fy, px, py, mx, my, x, y: INTEGER; mask: Display3.Mask; sat, val: REAL; keysum, keys: SET;
+		VAR fx, fy, px, py, mx, my, x, y: SIGNED16; mask: Display3.Mask; sat, val: REAL; keysum, keys: SET;
 	BEGIN
 		fx := msg.x + wedge.X; fy := msg.y + wedge.Y;
 		Gadgets.MakeMask(wedge, fx, fy, msg.dlink, mask);
@@ -800,7 +800,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END TrackWedge;
 
 	PROCEDURE RestoreWedgeImage (wedge: Wedge);
-		VAR r, g, b, j, i: INTEGER; bg, pix: Images.Pixel; val, dval, sat, dsat, rr, gg, bb: REAL;
+		VAR r, g, b, j, i: SIGNED16; bg, pix: Images.Pixel; val, dval, sat, dsat, rr, gg, bb: REAL;
 	BEGIN
 		IF wedge.img = NIL THEN
 			NEW(wedge.img)
@@ -834,8 +834,8 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 		END
 	END RestoreWedgeImage;
 
-	PROCEDURE RestoreWedge (wedge: Wedge; fx, fy: INTEGER; mask: Display3.Mask);
-		VAR x, y: INTEGER;
+	PROCEDURE RestoreWedge (wedge: Wedge; fx, fy: SIGNED16; mask: Display3.Mask);
+		VAR x, y: SIGNED16;
 	BEGIN
 		RestoreWedgeImage(wedge);
 		RestoreImageRect(wedge.img, 0, 0, wedge.W, wedge.H, fx, fy, mask);
@@ -847,7 +847,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END RestoreWedge;
 
 	PROCEDURE PrintWedge (wedge: Wedge; VAR msg: Display.DisplayMsg);
-		VAR mask: Display3.Mask; w, h, j, i, x0, x1: INTEGER; val, dval, sat, dsat, r, g, b: REAL;
+		VAR mask: Display3.Mask; w, h, j, i, x0, x1: SIGNED16; val, dval, sat, dsat, r, g, b: REAL;
 	BEGIN
 		Gadgets.MakePrinterMask(wedge, msg.x, msg.y, msg.dlink, mask);
 		w := SHORT(wedge.W * Display.Unit DIV Printer.Unit);
@@ -891,7 +891,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END PrintWedge;
 
 	PROCEDURE UpdateWedge (wedge: Wedge; VAR msg: Display.FrameMsg);
-		VAR hue, sat, val: REAL; fld: ARRAY 32 OF CHAR; fx, fy: INTEGER; mask: Display3.Mask;
+		VAR hue, sat, val: REAL; fld: ARRAY 32 OF CHAR; fx, fy: SIGNED16; mask: Display3.Mask;
 	BEGIN
 		IF wedge.obj # NIL THEN
 			hue := wedge.hue; sat := wedge.sat; val := wedge.val;
@@ -972,7 +972,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END CopyWedge;
 
 	PROCEDURE HandleWedge* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR wedge, copy: Wedge; fx, fy: INTEGER; mask: Display3.Mask; ver: LONGINT;
+		VAR wedge, copy: Wedge; fx, fy: SIGNED16; mask: Display3.Mask; ver: LONGINT;
 	BEGIN
 		wedge := obj(Wedge);
 		IF msg IS Display.FrameMsg THEN
@@ -1071,7 +1071,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(** set selected text color **)
 	PROCEDURE SetText*;
-		VAR text: Texts.Text; beg, end, time: LONGINT; s: Attributes.Scanner; r, g, b, col: INTEGER;
+		VAR text: Texts.Text; beg, end, time: LONGINT; s: Attributes.Scanner; r, g, b, col: SIGNED16;
 	BEGIN
 		Oberon.GetSelection(text, beg, end, time);
 		IF time # -1 THEN
@@ -1116,7 +1116,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(** set attribute (1.) of selected objects to color value (2.) **)
 	PROCEDURE SetAttr*;
-		VAR sel: Objects.Object; time: LONGINT; s: Attributes.Scanner; am: Objects.AttrMsg; r, g, b: INTEGER;
+		VAR sel: Objects.Object; time: LONGINT; s: Attributes.Scanner; am: Objects.AttrMsg; r, g, b: SIGNED16;
 	BEGIN
 		Gadgets.GetSelection(sel, time);
 		IF (time # -1) & (sel # NIL) THEN

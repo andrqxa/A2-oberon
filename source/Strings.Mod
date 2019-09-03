@@ -800,7 +800,7 @@ END StrToFloat;
 
 (** converts a set to a string *)
 PROCEDURE SetToStr*(set: SET; VAR s: ARRAY OF CHAR);
-VAR i, j, k: INTEGER; noFirst: BOOLEAN;
+VAR i, j, k: SIGNED16; noFirst: BOOLEAN;
 BEGIN
 	s[0] := "{"; i := 0; k := 1; noFirst := FALSE;
 	WHILE i <= MAX(SET) DO
@@ -824,7 +824,7 @@ END SetToStr;
 
 (** converts a string to a set *)
 PROCEDURE StrToSet*(CONST str: ARRAY OF CHAR; VAR set: SET);
-VAR i, d, d1: INTEGER; dot: BOOLEAN;
+VAR i, d, d1: SIGNED16; dot: BOOLEAN;
 BEGIN
 	set := {}; dot := FALSE;
 	i := 0;

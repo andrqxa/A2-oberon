@@ -112,7 +112,7 @@ TYPE
 				END F;
 
 				PROCEDURE encrypt0( xl, xr: SET32;  VAR yl, yr: SET32 );
-				VAR t: SET32;  i: INTEGER;
+				VAR t: SET32;  i: SIGNED16;
 				BEGIN
 					FOR i := 0 TO N - 1 DO
 						xl := xl/p[i];  xr := F( S.VAL( LONGINT, xl ) )/xr;
@@ -123,7 +123,7 @@ TYPE
 				END encrypt0;
 
 				PROCEDURE decrypt0( xl, xr: SET32;  VAR yl, yr: SET32 );
-				VAR t: SET32;  i: INTEGER;
+				VAR t: SET32;  i: SIGNED16;
 				BEGIN
 					FOR i := N + 1 TO 2 BY -1 DO
 						xl := xl/p[i];  xr := F( S.VAL( LONGINT, xl ) )/xr;

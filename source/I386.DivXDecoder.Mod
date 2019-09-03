@@ -380,7 +380,7 @@ TYPE MacroBlock *= OBJECT
 					ELSE
 						SYSTEM.PUT8( d, sum )
 					END;
-					s := s + SIZEOF( INTEGER);
+					s := s + SIZEOF( SIGNED16);
 					d := d + SIZEOF( CHAR );
 
 					IF DT.Debug THEN
@@ -444,7 +444,7 @@ TYPE MacroBlock *= OBJECT
 					ELSIF val <  0 THEN SYSTEM.PUT8( d, 0 )
 					ELSE SYSTEM.PUT8( d, val )
 					END;
-					s := s + SIZEOF(INTEGER);
+					s := s + SIZEOF(SIGNED16);
 					d := d + SIZEOF( CHAR );
 
 					IF DT.Debug THEN
@@ -468,11 +468,11 @@ TYPE MacroBlock *= OBJECT
 			MOV EDX, -8
 
 		loop:
-			MOVQ MMX0,  [EAX]					; eight bytes (four INTEGER) of source into mm0
+			MOVQ MMX0,  [EAX]					; eight bytes (four SIGNED16) of source into mm0
 ; 			PACKSSDW MMX0, 8[EAX]			; Pack next 8 bytes (two LONGINT) together with mm0
 			MOVQ MMX1, [EAX+8]
 ;			PACKSSDW MMX1, 24[EAX]
-			PACKUSWB MMX0, MMX1				; Pack 4 INTEGER with another 4 INTEGER into mm0
+			PACKUSWB MMX0, MMX1				; Pack 4 SIGNED16 with another 4 SIGNED16 into mm0
 			MOVQ [EBX], MMX0					; Write mm0 to dest
 			ADD EBX, EDI						; Add stride to dest
 			ADD EAX, 16						; next source
@@ -1522,7 +1522,7 @@ TYPE ColorSpace = OBJECT
 			r, g, b: LONGINT;
 			y, u, v: LONGINT;
 		BEGIN
-			strideDiff := (strideOut - widthY)*SIZEOF(INTEGER); (* expressed in bytes *)
+			strideDiff := (strideOut - widthY)*SIZEOF(SIGNED16); (* expressed in bytes *)
 
 			IF heightY < 0 THEN
 				(* we are flipping our output upside-down *)
@@ -1555,16 +1555,16 @@ TYPE ColorSpace = OBJECT
 					IF g > 255 THEN g := 255; ELSIF g < 0 THEN g := 0 END;
 					IF b > 255 THEN b := 255; ELSIF b < 0 THEN b := 0 END;
 
-(*					SYSTEM.PUT16( pusOut, SYSTEM.VAL( INTEGER,
+(*					SYSTEM.PUT16( pusOut, SYSTEM.VAL( SIGNED16,
 						( SYSTEM.VAL( SET, LSH( b, 8 ) ) * SYSTEM.VAL( SET, 0F800H ) ) +
 						( SYSTEM.VAL( SET, LSH( g, 3 ) ) * SYSTEM.VAL( SET, 07E0H ) ) +
 						( SYSTEM.VAL( SET, LSH( r, -3 ) ) * SYSTEM.VAL( SET, 001FH ) ) ) );
 *)
 
-					SYSTEM.PUT16( pusOut,  SYSTEM.VAL( INTEGER, SYSTEM.VAL( SET, r DIV 8 ) + SYSTEM.VAL( SET, ( g DIV 4 ) * 32 ) +
+					SYSTEM.PUT16( pusOut,  SYSTEM.VAL( SIGNED16, SYSTEM.VAL( SET, r DIV 8 ) + SYSTEM.VAL( SET, ( g DIV 4 ) * 32 ) +
 																SYSTEM.VAL( SET, (b DIV 8 ) * 2048 ) ) );
 
-					pusOut := pusOut + SIZEOF( INTEGER );
+					pusOut := pusOut + SIZEOF( SIGNED16 );
 				END;
 
 				pucYBaseOffset := pucYBaseOffset + strideY;

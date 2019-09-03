@@ -38,7 +38,7 @@ TYPE
 		r-: antsRegions.tRegion;
 		mapping: antsFunctions.Function;
 		maxx, maxy: LONGINT;
-		dim: INTEGER;
+		dim: SIGNED16;
 		Correlations: POINTER TO ARRAY OF antsArrayObjects.tLONGINTArray;
 		isotropic: BOOLEAN
 	END;
@@ -141,7 +141,7 @@ VAR
 	END Recall;
 
 	PROCEDURE Responsible( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 	BEGIN
 		priority := vyEvents.PrioNone;
 		IF ((event.gesture = vyEvents.EvtSelect)) THEN priority := vyEvents.PrioNormal END;
@@ -155,10 +155,10 @@ VAR
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
 	(*	VAR         cells: LONGINT;   cellsize : LONGREAL;   i, j: LONGINT;
-	origx, origy: INTEGER;
+	origx, origy: SIGNED16;
 
-	PROCEDURE InCell (x, y: LONGINT;   cx, cy: INTEGER ): BOOLEAN;
-	VAR rx, ry, rw, rh: INTEGER;
+	PROCEDURE InCell (x, y: LONGINT;   cx, cy: SIGNED16 ): BOOLEAN;
+	VAR rx, ry, rw, rh: SIGNED16;
 	BEGIN
 	vyGraphBase.Rect2dToRect(x * cellsize - cellsize / 2, y * cellsize - cellsize / 2, cellsize, cellsize, rx, ry, rw, rh);
 	IF vyRectangles.PointInRect(cx, cy, rx, ry, rw, rh) THEN RETURN TRUE ELSE RETURN FALSE END
@@ -194,7 +194,7 @@ VAR
 	END Select;
 
 	PROCEDURE HandleFileMsg( obj: tLayer;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 
 	BEGIN
 		IF msg.id = Objects.load THEN

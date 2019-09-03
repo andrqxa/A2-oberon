@@ -217,7 +217,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 
 	(** create editor gadget for object **)
 	PROCEDURE Create* (obj: Objects.Object): Gadgets.Frame;
-		VAR key, gen: ARRAY 64 OF CHAR; res: INTEGER; f: Gadgets.Frame; e: Objects.Object; editor: Editor;
+		VAR key, gen: ARRAY 64 OF CHAR; res: SIGNED16; f: Gadgets.Frame; e: Objects.Object; editor: Editor;
 	BEGIN
 		Attributes.GetString(obj, "Item", key); gen := "";
 		IF key # "" THEN
@@ -249,12 +249,12 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 
 	(** get public object from "Leonardo.Lib" **)
 	PROCEDURE FindObj* (CONST name: ARRAY OF CHAR): Objects.Object;
-		VAR lib: Objects.Library; obj: Objects.Object; ref: INTEGER;
+		VAR lib: Objects.Library; obj: Objects.Object; ref: SIGNED16;
 	BEGIN
 		lib := Objects.ThisLibrary("Leonardo.Lib"); obj := NIL;
 		IF lib # NIL THEN
 			Objects.GetRef(lib.dict, name, ref);
-			IF ref # MIN(INTEGER) THEN
+			IF ref # MIN(SIGNED16) THEN
 				lib.GetObj(lib, ref, obj)
 			END
 		END;
@@ -277,7 +277,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 
 	(** open editor gadget in new document (at top of current context frame) **)
 	PROCEDURE Open* (f: Gadgets.Frame; context: Objects.Object);
-		VAR doc: Documents.Document; df: Display.Frame; x, y, h: INTEGER; dlink: Objects.Object;
+		VAR doc: Documents.Document; df: Display.Frame; x, y, h: SIGNED16; dlink: Objects.Object;
 	BEGIN
 		IF f = NIL THEN RETURN END;
 		NEW(doc); InitDoc(doc, f);
@@ -643,7 +643,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE OpenDoc*;
 		VAR
-			doc, panel: Documents.Document; s: Attributes.Scanner; frame: Display.Frame; x, y: INTEGER;
+			doc, panel: Documents.Document; s: Attributes.Scanner; frame: Display.Frame; x, y: SIGNED16;
 			model: Objects.Object; fig: Leonardo.Figure;
 	BEGIN
 		doc := NIL;
@@ -733,7 +733,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 
 	(**--- Export ---**)
 
-	PROCEDURE ExportFigure (fig: Leonardo.Figure; x0, y0, x1, y1: INTEGER);
+	PROCEDURE ExportFigure (fig: Leonardo.Figure; x0, y0, x1, y1: SIGNED16);
 		VAR
 			copy: BOOLEAN; cm: Objects.CopyMsg; frame: LeoFrames.Frame; dm: Display.ConsumeMsg;
 			doc: Documents.Document;
@@ -753,9 +753,9 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 		END
 	END ExportFigure;
 
-	PROCEDURE ExportImage (fig: Leonardo.Figure; x0, y0, x1, y1: INTEGER);
+	PROCEDURE ExportImage (fig: Leonardo.Figure; x0, y0, x1, y1: SIGNED16);
 		VAR
-			img: Images.Image; frame: Gadgets.Frame; r, g, b: INTEGER; pix: Images.Pixel; ctxt: GfxBuffer.Context;
+			img: Images.Image; frame: Gadgets.Frame; r, g, b: SIGNED16; pix: Images.Pixel; ctxt: GfxBuffer.Context;
 			gad: ImageGadgets.Frame; dm: Display.ConsumeMsg; doc: Documents.Document;
 	BEGIN
 		NEW(img); Images.Create(img, x1 - x0, y1 - y0, Images.DisplayFormat);
@@ -776,7 +776,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 		END
 	END ExportImage;
 
-	PROCEDURE ExportEPS (fig: Leonardo.Figure; x0, y0, x1, y1: INTEGER);
+	PROCEDURE ExportEPS (fig: Leonardo.Figure; x0, y0, x1, y1: SIGNED16);
 		VAR level2: BOOLEAN; dpi: LONGINT; name: ARRAY 64 OF CHAR; file: Files.File; eps: GfxPS.Context;
 	BEGIN
 		Attributes.GetBool(PSLevel2, "Value", level2);
@@ -798,7 +798,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END ExportEPS;
 
 	PROCEDURE Export*;
-		VAR fig: Leonardo.Figure; mode: LONGINT; border, llx, lly, urx, ury, bw: REAL; x0, y0, x1, y1: INTEGER;
+		VAR fig: Leonardo.Figure; mode: LONGINT; border, llx, lly, urx, ury, bw: REAL; x0, y0, x1, y1: SIGNED16;
 	BEGIN
 		fig := FindFigure(Gadgets.context);
 		IF fig # NIL THEN
@@ -1513,7 +1513,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END RevertFocus;
 
 	PROCEDURE ApplyFocus (e: Editor);
-		VAR frame: LeoFrames.Frame; kind, dir: LONGINT; pts: INTEGER; tool: LeoTools.Tool; x, y, phi, dx, dy: REAL;
+		VAR frame: LeoFrames.Frame; kind, dir: LONGINT; pts: SIGNED16; tool: LeoTools.Tool; x, y, phi, dx, dy: REAL;
 	BEGIN
 		IF e # NIL THEN
 			IF (e.frame # LeoTools.Focus.frame) OR LeoTools.Focus.visible THEN

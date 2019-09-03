@@ -57,7 +57,7 @@ TYPE
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR version: INTEGER;  i: LONGINT;
+	VAR version: SIGNED16;  i: LONGINT;
 	BEGIN
 		Files.ReadInt( R, version );
 		FOR i := 0 TO 5 DO Files.ReadLReal( R, s.a[i] ) END

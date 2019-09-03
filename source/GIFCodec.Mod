@@ -54,7 +54,7 @@ TYPE
 		PROCEDURE WriteScrDesc(w: Streams.Writer; img: Raster.Image);
 		VAR i: LONGINT;
 		BEGIN
-			w.RawInt(INTEGER(img.width)); w.RawInt(INTEGER(img.height));
+			w.RawInt(SIGNED16(img.width)); w.RawInt(SIGNED16(img.height));
 			i := ASH(7+ 8 (*img.fmt.bpp*), 4); i := i+ 8 (*img.fmt.bpp*) - 1;
 			w.Char( CHR(i) );
 			w.Char( 0X );
@@ -80,7 +80,7 @@ TYPE
 		BEGIN
 			w.Char(2CX);
 			w.RawInt( 0); w.RawInt(0);
-			w.RawInt(INTEGER(img.width)); w.RawInt(INTEGER(img.height));
+			w.RawInt(SIGNED16(img.width)); w.RawInt(SIGNED16(img.height));
 			w.Char(CHR(8 (*img.fmt.bpp*) - 1));
 		END WriteImageDesc;
 
@@ -120,7 +120,7 @@ TYPE
 						temp := ASH(code, byteLen-bitsfree) MOD 256;
 						buffer[bufpos] := CHR(ORD(buffer[bufpos]) + temp);
 						INC(bufpos); buffer[bufpos] := 0X;
-						code := INTEGER(ASH(code, -bitsfree));
+						code := SIGNED16(ASH(code, -bitsfree));
 						bitsleft := bitsleft - bitsfree; bitsfree := byteLen
 					END;
 					IF bufpos = 255 THEN
@@ -133,7 +133,7 @@ TYPE
 		BEGIN
 			codelen := 8 (*img.fmt.bpp*); IF codelen < 2 THEN codelen := 2 END;
 			w.Char(CHR(codelen));
-			clearCode := INTEGER(ASH(1, codelen)); endCode := clearCode + 1;
+			clearCode := SIGNED16(ASH(1, codelen)); endCode := clearCode + 1;
 			codept := endCode + 1; lastBlock[codept] := Dummy;
 
 			startSize := codelen;
@@ -145,7 +145,7 @@ TYPE
 			Raster.Get(img, x, y, pix, mode);
 			prefix := Raster.PaletteIndex(pal, ORD(pix[Raster.r]), ORD(pix[Raster.g]), ORD(pix[Raster.b]));
 			INC(x); bufpos := 0; buffer[0] := 0X; bitsfree := 8;
-			len := INTEGER(ASH(1, codelen));
+			len := SIGNED16(ASH(1, codelen));
 
 			WriteCode(clearCode);
 			LOOP
@@ -161,11 +161,11 @@ TYPE
 				IF (i2 = Dummy) OR ((page.ref = Dummy) & (page.code # in)) THEN
 					WriteCode(prefix);
 					IF codept = len THEN
-						INC(codelen); len := INTEGER(ASH(1, codelen))
+						INC(codelen); len := SIGNED16(ASH(1, codelen))
 					END;
 					IF codept >= 4095 THEN
 							WriteCode(clearCode);
-							codelen := startSize; InitCodeBook(codelen); INC(codelen); len := INTEGER(ASH(1, codelen));
+							codelen := startSize; InitCodeBook(codelen); INC(codelen); len := SIGNED16(ASH(1, codelen));
 							codept := endCode+1
 					ELSE
 						cb[codept].ref := lastBlock[prefix]; cb[codept].code := in; lastBlock[prefix] := codept;
@@ -223,7 +223,7 @@ TYPE
 			ch : CHAR;
 			n, size : LONGINT;
 			length : SIZE;
-			w, h : INTEGER;
+			w, h : SIGNED16;
 		BEGIN
 			IF in = NIL THEN Error("Input Stream is NIL"); RETURN END;
 			SELF.r := in;
@@ -283,7 +283,7 @@ TYPE
 		(* return the image in Raster format that best matches the format *)
 		PROCEDURE GetNativeImage*(VAR img : Raster.Image);
 		VAR
-			images, w, h, left, top : INTEGER;
+			images, w, h, left, top : SIGNED16;
 			label, ch, transPix, idFlags : CHAR;
 			n, size : LONGINT;
 			error : BOOLEAN;
@@ -377,7 +377,7 @@ TYPE
 			ch : CHAR;
 			n, size: LONGINT;
 			length: SIZE;
-			w, h : INTEGER;
+			w, h : SIGNED16;
 		BEGIN
 			IF in = NIL THEN Error("Input Stream is NIL"); RETURN END;
 			SELF.r := in;
@@ -425,7 +425,7 @@ TYPE
 			first, last, current : Codecs.ImageDescriptor;
 			label, ch, transPix, idFlags : CHAR;
 			n, size : LONGINT;
-			temp, delayTime, disposeMode : INTEGER;
+			temp, delayTime, disposeMode : SIGNED16;
 			valid, userInput, error : BOOLEAN;
 		BEGIN
 			res := Codecs.ResFailed;
@@ -510,15 +510,15 @@ TYPE
 	END GIFAnimationDecoder;
 
 VAR
-	red, green, blue : ARRAY 256 OF INTEGER;
+	red, green, blue : ARRAY 256 OF SIGNED16;
 
 PROCEDURE LoadData (r : Streams.Reader; pal : Raster.Palette; img: Raster.Image; interlaced: BOOLEAN; VAR error : BOOLEAN);
 VAR
 	ch: CHAR;
-	codeBits, clearCode, endCode, curBits, maxCode, nextCode, bits, x, y, lines, prevCode, curCode, seq, len: INTEGER;
+	codeBits, clearCode, endCode, curBits, maxCode, nextCode, bits, x, y, lines, prevCode, curCode, seq, len: SIGNED16;
 	n, buf, blkPos, blkSize, ptr: LONGINT; bytesRead: SIZE;
 	pix, run: ARRAY 1000H OF CHAR;
-	prev: ARRAY 1000H OF INTEGER;
+	prev: ARRAY 1000H OF SIGNED16;
 	block: ARRAY 255 OF CHAR;
 
 	PROCEDURE Dot (pix: CHAR);
@@ -532,7 +532,7 @@ VAR
 		IF x = img.width THEN
 			IF interlaced THEN
 				IF lines >= 8 THEN INC(y, 8) ELSE INC(y, lines) END;
-				WHILE y > INTEGER(img.height-1) DO
+				WHILE y > SIGNED16(img.height-1) DO
 					lines := lines DIV 2; y := lines DIV 2
 				END
 			ELSE
@@ -545,7 +545,7 @@ VAR
 BEGIN
 	error := FALSE;
 	r.Char(ch); codeBits := ORD(ch);
-	clearCode := INTEGER(ASH(1, codeBits)); endCode := clearCode+1;
+	clearCode := SIGNED16(ASH(1, codeBits)); endCode := clearCode+1;
 	n := 0;
 	WHILE n < clearCode DO
 		pix[n] := CHR(n); prev[n] := -1; INC(n)
@@ -553,7 +553,7 @@ BEGIN
 	WHILE n <= endCode DO
 		pix[n] := 0X; prev[n] := -1; INC(n)
 	END;
-	curBits := codeBits + 1; maxCode := INTEGER(ASH(1, curBits)); nextCode := endCode+1;
+	curBits := codeBits + 1; maxCode := SIGNED16(ASH(1, curBits)); nextCode := endCode+1;
 	buf := 0; bits := 0; blkPos := 0; blkSize := 0;	(* bit buffer and current block are empty *)
 	x := 0; y := 0; ptr := 0;
 	IF interlaced THEN lines := 16 END;
@@ -576,7 +576,7 @@ BEGIN
 		buf := ASH(buf, -curBits); DEC(bits, curBits);
 
 		IF curCode = clearCode THEN
-			curBits := codeBits+1; maxCode := INTEGER(ASH(1, curBits)); nextCode := endCode+1
+			curBits := codeBits+1; maxCode := SIGNED16(ASH(1, curBits)); nextCode := endCode+1
 		ELSIF curCode = endCode THEN
 			EXIT
 		ELSIF prevCode = clearCode THEN
@@ -598,7 +598,7 @@ BEGIN
 			(* the sequence just output gets a new code *)
 			pix[nextCode] := pix[seq]; prev[nextCode] := prevCode; INC(nextCode);
 			IF (nextCode = maxCode) & (curBits < 12) THEN
-				INC(curBits); maxCode := INTEGER(ASH(1, curBits))
+				INC(curBits); maxCode := SIGNED16(ASH(1, curBits))
 			END
 		END;
 		prevCode := curCode

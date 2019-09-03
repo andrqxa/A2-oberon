@@ -293,7 +293,7 @@ VAR offset: LONGINT; addrMode, address: SET;
 BEGIN
 	IF bimboTrace THEN
 		Hex(PCO.GetCodePos(), 8); WriteLn(" LoadAddress");
-		IF (PCO.GetCodePos() = 90H) THEN HALT(MAX(INTEGER)) END;
+		IF (PCO.GetCodePos() = 90H) THEN HALT(MAX(SIGNED16)) END;
 	END;
 
 	IF Trace THEN KernelLog.Enter END;
@@ -609,7 +609,7 @@ BEGIN
 	| PCLIR.tne: cond := NE
 	END;
 	PCO.SWI(cond, instr.val);
-	IF (instr.op = PCLIR.trap) & (instr.val # MAX(INTEGER)) THEN pool.Flush(PCO.GetCodePos()) END
+	IF (instr.op = PCLIR.trap) & (instr.val # MAX(SIGNED16)) THEN pool.Flush(PCO.GetCodePos()) END
 END Trap;
 
 PROCEDURE SaveRegisters(code: PCLIR.Code; VAR instr: PCLIR.Instruction; pc: LONGINT);

@@ -160,7 +160,7 @@ TYPE
 	BOOL* = LONGINT;
 
 	HANDLE* = ADDRESS;  HMODULE* = ADDRESS;
-	HINSTANCE* = ADDRESS;  ATOM* = INTEGER;  HGLOBAL* = HANDLE;
+	HINSTANCE* = ADDRESS;  ATOM* = SIGNED16;  HGLOBAL* = HANDLE;
 	LPSTR* = ADDRESS;
 	DWORD* = LONGINT;
 
@@ -182,13 +182,13 @@ TYPE
 	(** The SYSTEMTIME structure represents a date and time using individual members for the month, day, year, weekday,
 			hour, minute, second, and millisecond. *)
 	SystemTime* = RECORD
-		wYear*, wMonth*, wDayOfWeek*, wDay*: INTEGER;
-		wHour*, wMinute*, wSecond*, wMilliseconds*: INTEGER
+		wYear*, wMonth*, wDayOfWeek*, wDay*: SIGNED16;
+		wHour*, wMinute*, wSecond*, wMilliseconds*: SIGNED16
 	END;
 
 	(** The SMALL_RECT structure defines the coordinates of the upper left and lower right corners of a rectangle. *)
 	SmallRect* = RECORD
-		left*, top*, right*, bottom*: INTEGER
+		left*, top*, right*, bottom*: SIGNED16
 	END;
 
 
@@ -282,7 +282,7 @@ TYPE
 		dwXCountChars*, dwYCountChars*: LONGINT;
 		dwFillAttribute*: LONGINT;
 		dwFlags*: SET;
-		wShowWindow*, cbReserved2*: INTEGER;
+		wShowWindow*, cbReserved2*: SIGNED16;
 		lpReserved2*: ADDRESS;
 		hStdInput*, hStdOutput*, hStdError*: HANDLE
 	END;
@@ -305,9 +305,9 @@ TYPE
 	DCB* = RECORD
 		DCBlength*, BaudRate*: LONGINT;
 		flags*: SET;
-		wReserved*, XonLim*, XoffLim*: INTEGER;
+		wReserved*, XonLim*, XoffLim*: SIGNED16;
 		ByteSize*, Parity*, StopBits*, XonChar*, XoffChar*, ErrorChar*, EofChar*, EvtChar*: CHAR;
-		wReserved1*: INTEGER
+		wReserved1*: SIGNED16
 	END;
 
 	ComStat* = RECORD
@@ -316,8 +316,8 @@ TYPE
 	END;
 
 	SystemInfo* = RECORD
-		wProcessorArchitecture*: INTEGER;
-		wReserved: INTEGER;
+		wProcessorArchitecture*: SIGNED16;
+		wReserved: SIGNED16;
 		dwPageSize*: LONGINT;
 		lpMinimumApplicationAddress*: LONGINT;
 		lpMaximumApplicationAddress*: LONGINT;
@@ -325,17 +325,17 @@ TYPE
 		dwNumberOfProcessors*: LONGINT;
 		dwProcessorType*: LONGINT;
 		dwAllocationGranularity*: LONGINT;
-		wProcessorLevel*: INTEGER;
-		wProcessorRevision*: INTEGER;
+		wProcessorLevel*: SIGNED16;
+		wProcessorRevision*: SIGNED16;
 	END;
 
 	(*ALEX 2005.10.18 The TIME_ZONE_INFORMATION as defined in winbase.h*)
 	TimeZoneInformation* = RECORD
 		Bias*: LONGINT;
-		StandardName*: ARRAY 32 OF INTEGER;
+		StandardName*: ARRAY 32 OF SIGNED16;
 		StandardDate*: SystemTime;
 		StandardBias*: LONGINT;
-		DaylightName*: ARRAY 32 OF INTEGER;
+		DaylightName*: ARRAY 32 OF SIGNED16;
 		DaylightDate*: SystemTime;
 		DaylightBias*: LONGINT;
 	END;
@@ -694,7 +694,7 @@ VAR
 	SetCommTimeouts-: PROCEDURE {WINAPI} ( hFile: HANDLE;
 																			    VAR lpCommTimeouts: CommTimeouts ): BOOL;
 	(** the SetConsoleCursorPosition  sets the cursor position in the specified console screen buffer. *)
-	SetConsoleCursorPosition-: PROCEDURE {WINAPI} ( hConsoleOutput: HANDLE;  dwCursorPosition:  (* imitate Coord=RECORD x,y: INTEGER END; *) LONGINT ): BOOL;
+	SetConsoleCursorPosition-: PROCEDURE {WINAPI} ( hConsoleOutput: HANDLE;  dwCursorPosition:  (* imitate Coord=RECORD x,y: SIGNED16 END; *) LONGINT ): BOOL;
 	(** The SetConsoleScreenBufferSize function changes the size of the specified console screen buffer. *)
 	SetConsoleScreenBufferSize-: PROCEDURE {WINAPI} ( hConsoleOuput: HANDLE;
 																							   dwSize: LONGINT ): BOOL;

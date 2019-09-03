@@ -66,7 +66,7 @@ VAR
 
 	currentRegisters: RegisterSet;
 	savedRegisters: ARRAY 10 OF RegisterSet;
-	saveLevel : INTEGER;
+	saveLevel : SIGNED16;
 
 PROCEDURE IsFloat (size: PCLIR.Size): BOOLEAN;
 BEGIN RETURN (size = PCLIR.Float32) OR (size = PCLIR.Float64)

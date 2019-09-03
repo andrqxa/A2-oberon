@@ -40,7 +40,7 @@ TYPE
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR version: INTEGER;
+	VAR version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version )
 	END LoadM;
@@ -240,7 +240,7 @@ TYPE
 
 tModel* = POINTER TO tModelDesc ;
 tModelDesc* = RECORD (antsGibbs.tParameterDesc);
-MA: POINTER TO ARRAY OF ARRAY OF INTEGER;
+MA: POINTER TO ARRAY OF ARRAY OF SIGNED16;
 END;
 
 

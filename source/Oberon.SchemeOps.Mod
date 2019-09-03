@@ -934,7 +934,7 @@ MODULE SchemeOps IN Oberon; (** portable *)	(* eos  *)
 	END New;
 
 	PROCEDURE LibObj (c: Context; args: Object; VAR res: Object);
-		VAR str: Object; lname, oname: ARRAY 32 OF CHAR; lib: Objects.Library; obj: Objects.Object; ref: INTEGER;
+		VAR str: Object; lname, oname: ARRAY 32 OF CHAR; lib: Objects.Library; obj: Objects.Object; ref: SIGNED16;
 	BEGIN
 		str := StringArg(c, args); Scheme.GetString(str, 0, Scheme.StringLen(str), lname);
 		str := StringArg(c, args); Scheme.GetString(str, 0, Scheme.StringLen(str), oname);
@@ -943,7 +943,7 @@ MODULE SchemeOps IN Oberon; (** portable *)	(* eos  *)
 		lib := Objects.ThisLibrary(lname); obj := NIL;
 		IF lib # NIL THEN
 			Objects.GetRef(lib.dict, oname, ref);
-			IF ref # MIN(INTEGER) THEN
+			IF ref # MIN(SIGNED16) THEN
 				lib.GetObj(lib, ref, obj)
 			END
 		END;

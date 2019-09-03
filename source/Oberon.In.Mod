@@ -39,11 +39,11 @@ BEGIN
 END Char;
 
 (** Scan an integer. *)
-PROCEDURE Int*(VAR i: INTEGER);
+PROCEDURE Int*(VAR i: SIGNED16);
 BEGIN
 	IF Done THEN
 		Texts.Scan(S);
-		IF (S.class = Texts.Int) & (MIN(INTEGER) <= S.i) & (S.i <= MAX(INTEGER)) THEN
+		IF (S.class = Texts.Int) & (MIN(SIGNED16) <= S.i) & (S.i <= MAX(SIGNED16)) THEN
 			i := SHORT(S.i)
 		ELSE
 			Done := FALSE

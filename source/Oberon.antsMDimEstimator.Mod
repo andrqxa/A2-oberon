@@ -40,9 +40,9 @@ TYPE
 		Isotropic: vyLinks.Link;   (*antsNeighbourhoods.Neighbours will be Inserted in this queue*)
 		NonIsotropic: vyLinks.Link;
 		nisoAIC, isoAIC: vyBase.tVector;
-		nisoAICMin, isoAICMin: INTEGER;
+		nisoAICMin, isoAICMin: SIGNED16;
 		nisoAICMinTotal, isoAICMinTotal: BOOLEAN;
-		current: INTEGER
+		current: SIGNED16
 	END;
 
 VAR
@@ -101,7 +101,7 @@ VAR
 	END StoreF;
 
 	PROCEDURE LoadF( VAR R: Files.Rider;  s: Estimator );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLInt( R, s.lowdim );  Files.ReadLInt( R, s.highdim );
 		vyLinks.LoadLinks( R, s.lib, s.Isotropic );  vyLinks.LoadLinks( R, s.lib, s.NonIsotropic );
@@ -266,7 +266,7 @@ VAR
 
 	PROCEDURE DoShow( e: Estimator );
 	VAR ni, nn: antsNeighbourhoods.Neighbours;  listi, listn: vyLinks.Link;  dim: LONGINT;  mindim, maxdim: LONGINT;
-		port1, port2: vyPort.Frame;  picture: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  w, h: INTEGER;  fact: LONGREAL;  width: INTEGER;
+		port1, port2: vyPort.Frame;  picture: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  w, h: SIGNED16;  fact: LONGREAL;  width: SIGNED16;
 	BEGIN
 		w := SHORT( e.highdim - e.lowdim + 1 );  h := 1;  width := vyHostTexts.GetCurWidth();
 		IF width = 0 THEN width := 200 END;

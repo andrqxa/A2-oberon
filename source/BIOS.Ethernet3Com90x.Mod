@@ -66,7 +66,7 @@ TYPE
 			dataLen: LONGINT	(* 0CH, 14H, 1CH, 24H, 2CH *)
 		END;
 		dst, src: ARRAY 6 OF CHAR;
-		type: INTEGER;
+		type: SIGNED16;
 			(* end fixed-layout *)
 		physAdr: LONGINT;	(* assume physical address of dpd^ will not change *)
 	END;
@@ -81,7 +81,7 @@ TYPE
 			dataLen: LONGINT	(* 0CH, 14H, 1CH *)
 		END;
 		dst, src: ARRAY 6 OF CHAR;
-		type: INTEGER;
+		type: SIGNED16;
 			(* end fixed-layout *)
 		physAdr: LONGINT;	(* assume physical address of upd^ will not change *)
 		buffer: Network.Buffer;
@@ -133,11 +133,11 @@ TYPE
 			timer: Timer;
 
 		PROCEDURE HandleInterrupt;
-		VAR type, len: LONGINT; status: SET; int: INTEGER; ch: CHAR; buf: Network.Buffer;
+		VAR type, len: LONGINT; status: SET; int: SIGNED16; ch: CHAR; buf: Network.Buffer;
 		BEGIN
 			interrupted := TRUE;
 			Machine.AtomicInc(Ninterrupt);
-			Machine.Portin16(base+0EH, SYSTEM.VAL(INTEGER, status));	(* IntStatus (p. 8-3) *)
+			Machine.Portin16(base+0EH, SYSTEM.VAL(SIGNED16, status));	(* IntStatus (p. 8-3) *)
 			IF 1 IN status THEN	(* hostError *)
 				Machine.AtomicInc(NintHostError)
 				(* to do: reset *)
@@ -219,14 +219,14 @@ TYPE
 							IF 24 IN upd.status THEN Machine.AtomicInc(NupOverflow) END
 						END;
 						upd.status := {}; upd := upd.next;
-						Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 3001H))	(* UpUnstall (p. 10-8) *)
+						Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 3001H))	(* UpUnstall (p. 10-8) *)
 					UNTIL ~(15 IN upd.status)
 				ELSE
 					Machine.AtomicInc(NspuriousComplete)
 				END
 			END;
 			IF status * {0, 5, 6, 9, 10} # {} THEN
-				Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, SHORT(6800H +
+				Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, SHORT(6800H +
 						SYSTEM.VAL(LONGINT, status * {0, 5, 6, 9, 10}))))	(* AcknowledgeInterrupt 10 (p. 10-9) *)
 			END
 		END HandleInterrupt;
@@ -253,7 +253,7 @@ TYPE
 			Network.registry.Add(dev, res);
 			ASSERT(res = Plugins.Ok);
 			INC(installed);
-			Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 6000H));	(* RequestInterrupt (p. 10-9) *)
+			Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 6000H));	(* RequestInterrupt (p. 10-9) *)
 			i := 0;
 			WHILE (i < 100) & ~interrupted DO
 				Objects.Yield;
@@ -357,7 +357,7 @@ TYPE
 			ASSERT((len >= 14) & (len <= MaxPkt));	(* packet size *)
 			dpd.status := SYSTEM.VAL(SET, len);
 			Machine.Portout32(base+24H, dpd.physAdr);	(* DnListPtr (p. 6-17) *)
-			Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 3003H));	(* DnUnstall (p. 10-5) *)
+			Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 3003H));	(* DnUnstall (p. 10-5) *)
 
 			(* wait for download to finish, so that buffer is free afterwards *)
 			Kernel.SetTimer(t, SendTimeout);
@@ -381,18 +381,18 @@ TYPE
 PROCEDURE SetWindow(base, window: LONGINT);
 BEGIN
 	ASSERT((0 <= window) & (window <= 7));
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, SHORT(800H + window)))
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, SHORT(800H + window)))
 END SetWindow;
 
 (* Read a 16-bit value from the EEPROM (chapter 5). *)
 
-PROCEDURE ReadConfig(base, reg: LONGINT; flags: SET; VAR word: INTEGER);
-VAR x: INTEGER;
+PROCEDURE ReadConfig(base, reg: LONGINT; flags: SET; VAR word: SIGNED16);
+VAR x: SIGNED16;
 BEGIN
 	ASSERT((0 <= reg) & (reg < 64));
 	SetWindow(base, 0);
 	IF Eprom230 IN flags THEN INC(reg, 230H) ELSE INC(reg, 80H) END;
-	Machine.Portout16(base+0AH, SYSTEM.VAL(INTEGER, SHORT((*80H + *)reg)));	(* Read Register - 162 us *)
+	Machine.Portout16(base+0AH, SYSTEM.VAL(SIGNED16, SHORT((*80H + *)reg)));	(* Read Register - 162 us *)
 	REPEAT
 		Machine.Portin16(base+0AH, x)
 	UNTIL ~(15 IN SYSTEM.VAL(SET, LONG(x)));	(*  Wait till ~eepromBusy *)
@@ -402,7 +402,7 @@ END ReadConfig;
 (* Initialize the local address. *)
 
 PROCEDURE InitAddress(d: LinkDevice);
-VAR base, i: LONGINT; flags: SET; word: ARRAY 3 OF INTEGER;
+VAR base, i: LONGINT; flags: SET; word: ARRAY 3 OF SIGNED16;
 BEGIN
 	base := d.ctrl.base;
 	flags := d.ctrl.flags;
@@ -415,7 +415,7 @@ BEGIN
 		d.local[2*i] := CHR(word[i] MOD 100H);
 		d.local[2*i+1] := CHR(word[i] DIV 100H MOD 100H);
 		Machine.Portout16(base+2*i, word[i]);	(* StationAddress *)
-		Machine.Portout16(base+6+2*i, SYSTEM.VAL(INTEGER, 0))	(* StationMask *)
+		Machine.Portout16(base+6+2*i, SYSTEM.VAL(SIGNED16, 0))	(* StationMask *)
 	END;
 	FOR i := 0 TO 5 DO d.broadcast[i] := 0FFX END
 END InitAddress;
@@ -462,9 +462,9 @@ END InitInterface;
 (* Issue a command and wait for completion. *)
 
 PROCEDURE IssueCommand(base, cmd: LONGINT);
-VAR word: INTEGER;
+VAR word: SIGNED16;
 BEGIN
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, SHORT(cmd)));
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, SHORT(cmd)));
 	REPEAT
 		Machine.Portin16(base+0EH, word)
 	UNTIL ~(12 IN SYSTEM.VAL(SET, LONG(word)))
@@ -483,15 +483,15 @@ BEGIN
 	IssueCommand(base, 2800H);	(* RxReset (p. 10-3) *)
 	IF setThresh THEN
 		IF EarlyThresh DIV 4 > 7FFH THEN
-			Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 8FFFH));	(* SetRxEarlyThresh (p. 10-7) *)
+			Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 8FFFH));	(* SetRxEarlyThresh (p. 10-7) *)
 			Machine.Portout32(base+20H, SYSTEM.VAL(LONGINT, 0H))	(* DmaCtrl (p. 6-14) *)
 		ELSE
-			Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 8800H + EarlyThresh DIV 4));
+			Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 8800H + EarlyThresh DIV 4));
 			Machine.Portout32(base+20H, SYSTEM.VAL(LONGINT, 20H))	(* DmaCtrl (p. 6-14) - upRxEarlyEnable *)
 		END
 	END;
 	Machine.Portout32(base+38H, ctrl.upd.physAdr);	(* UpListPtr (p. 7-14) *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 8007H))	(* SetRxFilter (p. 10-8) - Individual, Multicast, Broadcast *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 8007H))	(* SetRxFilter (p. 10-8) - Individual, Multicast, Broadcast *)
 END ResetRx;
 
 (* Check the transmitter and reset it if required. *)
@@ -512,7 +512,7 @@ BEGIN
 		Machine.Portout8(base+1BH, ch)	(* advance *)
 	END;
 	IF reset THEN IssueCommand(base, 5800H); enable := TRUE END;	(* TxReset (p. 10-4) *)
-	IF enable THEN Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 4800H)) END	(* TxEnable (p. 10-6) *)
+	IF enable THEN Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 4800H)) END	(* TxEnable (p. 10-6) *)
 END CheckTransmission;
 
 (* Allocate a DPD.  Assume the physical address of the record will not change (beware copying GC). *)
@@ -601,7 +601,7 @@ END BufferToUPD;
 (* Initialize the registers. *)
 
 PROCEDURE InitRegisters(ctrl: Controller);
-VAR base, duplex, i: LONGINT; word: INTEGER; full: BOOLEAN; ch: CHAR; flags: SET;
+VAR base, duplex, i: LONGINT; word: SIGNED16; full: BOOLEAN; ch: CHAR; flags: SET;
 BEGIN
 	base := ctrl.base;
 	flags := ctrl.flags;
@@ -613,9 +613,9 @@ BEGIN
 		KernelLog.Enter; KernelLog.String("Invert MII Power "); KernelLog.Hex(word, 0); KernelLog.Exit;
 	END;
 	IF ctrl.media = Base10Coax THEN
-		Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 1000H))	(* EnableDcConverter (p. 10-10) *)
+		Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 1000H))	(* EnableDcConverter (p. 10-10) *)
 	ELSE
-		Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 0B800H))	(* DisableDcConverter (p. 10-10) *)
+		Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 0B800H))	(* DisableDcConverter (p. 10-10) *)
 	END;
 	duplex := GetSetting("3C90xDuplex");
 	IF duplex = 0 THEN
@@ -627,10 +627,10 @@ BEGIN
 	SetWindow(base, 3);
 	IF full THEN
 		KernelLog.Enter; KernelLog.String(ctrl.dev.name); KernelLog.String(" full-duplex"); KernelLog.Exit;
-		Machine.Portout16(base+6, SYSTEM.VAL(INTEGER, 20H))	(* MacControl (p. 12-2) *)
+		Machine.Portout16(base+6, SYSTEM.VAL(SIGNED16, 20H))	(* MacControl (p. 12-2) *)
 	ELSE	(* half-duplex *)
 		KernelLog.Enter; KernelLog.String(ctrl.dev.name); KernelLog.String(" half-duplex"); KernelLog.Exit;
-		Machine.Portout16(base+6, SYSTEM.VAL(INTEGER, 0))
+		Machine.Portout16(base+6, SYSTEM.VAL(SIGNED16, 0))
 	END;
 	ResetTx(base);
 	ResetRx(ctrl, TRUE);
@@ -639,11 +639,11 @@ BEGIN
 		Machine.Portout8(base+2FH, CHR((MaxPkt+255) DIV 256))	(* TxFreeThresh (p. 6-20) *)
 	END;
 		(* clear all interrupts & indications *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 7FF6H));	(* SetIndicationEnable (p. 10-9) - all *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, SYSTEM.VAL(LONGINT, {1, 6, 7, 10}) + 7000H));	(* SetInterruptEnable (p. 10-10, 8-4) *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 6F69H));	(* AcknowledgeInterrupt (p. 10-9) - all *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 7FF6H));	(* SetIndicationEnable (p. 10-9) - all *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, SYSTEM.VAL(LONGINT, {1, 6, 7, 10}) + 7000H));	(* SetInterruptEnable (p. 10-10, 8-4) *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 6F69H));	(* AcknowledgeInterrupt (p. 10-9) - all *)
 		(* clear all statistics *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 0B000H));	(* StatisticsDisable (p. 10-11) *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 0B000H));	(* StatisticsDisable (p. 10-11) *)
 	SetWindow(base, 5);
 	Machine.Portin16(base+0AH, word);
 	KernelLog.Enter; KernelLog.String("IntEnable = "); KernelLog.Hex(word, 4); KernelLog.Exit;
@@ -654,19 +654,19 @@ BEGIN
 	SetWindow(base, 4);
 (*
 	Machine.Portin8(base+0AH, word);
-	Machine.Portout8(base+0AH, SYSTEM.VAL(INTEGER, SHORT(SYSTEM.VAL(LONGINT,
+	Machine.Portout8(base+0AH, SYSTEM.VAL(SIGNED16, SHORT(SYSTEM.VAL(LONGINT,
 			SYSTEM.VAL(SET, LONG(word)) - {7}))));	(* MediaStatus: disable linkBeatEnable *)
 *)
 	Machine.Portin8(base+0CH, ch);
 	Machine.Portin8(base+0DH, ch);
 	Machine.Portin16(base+6, word);	(* NetworkDiagnostic (p. 9-8) *)
-	Machine.Portout16(base+6, SYSTEM.VAL(INTEGER, SHORT(SYSTEM.VAL(LONGINT,
+	Machine.Portout16(base+6, SYSTEM.VAL(SIGNED16, SHORT(SYSTEM.VAL(LONGINT,
 			SYSTEM.VAL(SET, LONG(word)) + {6}))));	(* upperBytesEnable *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 0A800H));	(* StatisticsEnable (p. 10-11) *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 0A800H));	(* StatisticsEnable (p. 10-11) *)
 		(* start the NIC *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 2000H));	(* RxEnable (p. 10-6) *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 4800H));	(* TxEnable (p. 10-6) *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 3001H))	(* UpUnstall (p. 10-8) *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 2000H));	(* RxEnable (p. 10-6) *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 4800H));	(* TxEnable (p. 10-6) *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 3001H))	(* UpUnstall (p. 10-8) *)
 END InitRegisters;
 
 (* Scan the PCI bus for the specified card. *)
@@ -740,7 +740,7 @@ BEGIN
 			IF table[i] IS LinkDevice THEN
 				base := table[i](LinkDevice).ctrl.base;
 				KernelLog.Enter; KernelLog.String(table[i].name); KernelLog.Exit;
-				Machine.Portout16(base+0EH, SYSTEM.VAL(INTEGER, 6000H));	(* RequestInterrupt (p. 10-9) *)
+				Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 6000H));	(* RequestInterrupt (p. 10-9) *)
 			END
 		END
 	END;
@@ -749,7 +749,7 @@ END Kick;
 (* Dump all registers - may have side effects that influence the device's normal operation *)
 
 PROCEDURE Dump*;
-VAR i: SIZE; base, win: LONGINT; int: INTEGER; table: Plugins.Table;
+VAR i: SIZE; base, win: LONGINT; int: SIGNED16; table: Plugins.Table;
 
 	PROCEDURE Byte(reg: ARRAY OF CHAR; ofs: LONGINT);
 	VAR x: CHAR;
@@ -760,7 +760,7 @@ VAR i: SIZE; base, win: LONGINT; int: INTEGER; table: Plugins.Table;
 	END Byte;
 
 	PROCEDURE Word(reg: ARRAY OF CHAR; ofs: LONGINT);
-	VAR x: INTEGER;
+	VAR x: SIGNED16;
 	BEGIN
 		KernelLog.String(reg); KernelLog.Char("=");
 		Machine.Portin16(base+ofs, x);

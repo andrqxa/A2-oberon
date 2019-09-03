@@ -648,7 +648,7 @@ TYPE
 		END ReadWrite12; *)
 
 		(* Generic Transport Handler  *)
-		PROCEDURE InvokeTransport (CONST cmd : ARRAY OF CHAR; cmdlen : INTEGER; dir : SET;
+		PROCEDURE InvokeTransport (CONST cmd : ARRAY OF CHAR; cmdlen : SIGNED16; dir : SET;
 			VAR data : ARRAY OF CHAR; ofs, datalen : LONGINT; VAR tlen : LONGINT; timeout : LONGINT) : LONGINT;
 		VAR
 			sensecmdlen, res, retry, i : LONGINT; forceRetry : BOOLEAN;

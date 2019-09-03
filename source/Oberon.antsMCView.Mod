@@ -59,7 +59,7 @@ TYPE
 	tLayer* = POINTER TO tLayerDesc;
 	tLayerDesc* = RECORD (vyPort.tLayerDesc)
 		c: Chain;
-		type: INTEGER
+		type: SIGNED16
 	END;
 
 CONST
@@ -160,7 +160,7 @@ VAR
 	END StoreMapQueue;
 
 	PROCEDURE LoadMapQueue( VAR R: Files.Rider;  VAR q: MapQueue );
-	VAR ver, ident: INTEGER;  m: MapQueue;
+	VAR ver, ident: SIGNED16;  m: MapQueue;
 	BEGIN
 		Files.ReadInt( R, ver );  Files.ReadInt( R, ident );
 		WHILE (ident # 0) DO
@@ -182,7 +182,7 @@ VAR
 	END StoreMapper;
 
 	PROCEDURE LoadMapper( VAR R: Files.Rider;  VAR m: Mapper );
-	VAR type: INTEGER;
+	VAR type: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, type );
 		IF type = 1 THEN m := DefaultMapper
@@ -198,7 +198,7 @@ VAR
 	END StoreChain;
 
 	PROCEDURE LoadChain( VAR R: Files.Rider;  VAR c: Chain );
-	VAR ver: INTEGER;
+	VAR ver: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, ver );  LoadMapQueue( R, c.q );  Files.ReadLInt( R, c.qlen );  LoadMapper( R, c.m );
 		LoadMatrix( R, c.A );  LoadMatrix( R, c.cA );  Files.ReadLInt( R, c.dim );  LoadVector( R, c.ran )
@@ -272,7 +272,7 @@ VAR
 	END MapperIt;
 
 	PROCEDURE PaintPoint( dim: LONGINT;  at: LONGINT;  q: MapQueue );
-	VAR i: LONGINT;  x, y: INTEGER;
+	VAR i: LONGINT;  x, y: SIGNED16;
 	BEGIN
 		vyGraphBase.SetForeColor( templ.style.fcol );
 		FOR i := 0 TO dim - 1 DO
@@ -285,7 +285,7 @@ VAR
 	END PaintPoint;
 
 	PROCEDURE PaintPoint2( dim: LONGINT;  at: LONGINT;  q: MapQueue );
-	VAR i: LONGINT;  x, y: INTEGER;
+	VAR i: LONGINT;  x, y: SIGNED16;
 	BEGIN
 		vyGraphBase.SetForeColor( templ.style.fcol );
 		FOR i := 0 TO dim - 1 DO
@@ -320,7 +320,7 @@ VAR
 	END PaintChain;
 
 	PROCEDURE PaintMatrix( c: Chain );
-	VAR x, y: INTEGER;  i, j: INTEGER;  q: MapQueue;
+	VAR x, y: SIGNED16;  i, j: SIGNED16;  q: MapQueue;
 	BEGIN
 		IF c.backwards THEN q := c.q
 		ELSE
@@ -375,7 +375,7 @@ VAR
 	END Recall;
 
 	PROCEDURE HandleFileMsg( obj: tLayer;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 
 	BEGIN
 		IF msg.id = Objects.load THEN

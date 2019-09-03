@@ -87,7 +87,7 @@ IMPORT antsArrayImages, antsArrayPictures, Files, antsCommands, antsToolbox, Str
 	END Grey;
 
 	PROCEDURE Put*;
-	VAR msg: antsArrayPictures.setPictMsg;  obj: vyBase.Object;  keys: SET;  dx, dy: INTEGER;  pict: Pictures.Picture;  i, r, g, b: INTEGER;
+	VAR msg: antsArrayPictures.setPictMsg;  obj: vyBase.Object;  keys: SET;  dx, dy: SIGNED16;  pict: Pictures.Picture;  i, r, g, b: SIGNED16;
 		copy: antsArrayObjects.tINTEGERArray;  orig: Objects.Object;
 	BEGIN
 		antsCommands.InitScan( "from=OBJ ~# Interactively put obj <from> to some Port" );

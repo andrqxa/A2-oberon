@@ -74,7 +74,7 @@ VAR
 
 	PROCEDURE UniformA*( A: tArray;  top: LONGINT;  x, w: LONGINT );
 	VAR adri, adrl, adrw: LONGINT;  val: LONGINT;
-	CONST stepi = SIZEOF( INTEGER );  stepl = SIZEOF( LONGINT );
+	CONST stepi = SIZEOF( SIGNED16 );  stepl = SIZEOF( LONGINT );
 	BEGIN
 		UniformL( w, top );  adri := ADDRESSOF( A[x] );  adrl := ADDRESSOF( RandomL[0] );  adrw := adri + w * stepi;
 		WHILE (adri < adrw) DO SYSTEM.GET( adrl, val );  SYSTEM.PUT( adri, SHORT( val ) );  INC( adri, stepi );  INC( adrl, stepl ) END
@@ -85,15 +85,15 @@ VAR
 		IF o # NIL THEN UniformA( o.A, o.depth, 0, o.w ) END
 	END UniformO;
 
-	PROCEDURE FillA*( A: tArray;  val: INTEGER;  x, w: LONGINT );
+	PROCEDURE FillA*( A: tArray;  val: SIGNED16;  x, w: LONGINT );
 	VAR adr, adrw: LONGINT;
-	CONST step = SIZEOF( INTEGER );
+	CONST step = SIZEOF( SIGNED16 );
 	BEGIN
 		adr := ADDRESSOF( A[x] );  adrw := adr + w * step;
 		WHILE (adr < adrw) DO SYSTEM.PUT( adr, val );  INC( adr, step ) END
 	END FillA;
 
-	PROCEDURE FillO*( o: tObject;  val: INTEGER );
+	PROCEDURE FillO*( o: tObject;  val: SIGNED16 );
 	BEGIN
 		FillA( o.A, val, 0, o.w )
 	END FillO;
@@ -159,7 +159,7 @@ VAR
 	END Min;
 
 	PROCEDURE ChangeSize( o: tObject;  w: LONGINT );
-	VAR oldarray: tArray;  oldw: INTEGER;
+	VAR oldarray: tArray;  oldw: SIGNED16;
 	BEGIN
 		oldw := SHORT( o.w );
 		IF (w # o.w) THEN  (* ? preserve pict / array when shrinked ? *)
@@ -225,7 +225,7 @@ VAR
 	END LoadA;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR w, depth: LONGINT;  version: INTEGER;
+	VAR w, depth: LONGINT;  version: SIGNED16;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN
@@ -319,14 +319,14 @@ VAR
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME from=OBJ [depth=INT] # copy vec to new object  <name>" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectObjectFromKeyword( l, "from", bobj ) THEN
-			IF ~antsCommands.GetNumberFromKeyword( l, "depth", depth ) THEN depth := MAX( INTEGER ) END;
+			IF ~antsCommands.GetNumberFromKeyword( l, "depth", depth ) THEN depth := MAX( SIGNED16 ) END;
 			WITH bobj: vyLongrealVec.tVector DO
 				aobj := vyName.FindObj( name );
 				IF aobj = NIL THEN obj := NewObject( vyLongrealVec.Len( bobj ), depth );  vyName.RegisterNamed( obj, name )
 				ELSE
 					obj := aobj( tObject );
 					IF obj( tObject ).w # vyLongrealVec.Len( bobj ) THEN ChangeSize( obj( tObject ), vyLongrealVec.Len( bobj ) ) END;
-					IF depth # MAX( INTEGER ) THEN SetDepth( obj( tObject ), depth ) END
+					IF depth # MAX( SIGNED16 ) THEN SetDepth( obj( tObject ), depth ) END
 				END;
 				FOR i := 0 TO vyLongrealVec.Len( bobj ) - 1 DO obj( tObject ).A[i] := SHORT( ENTIER( vyLongrealVec.Get( bobj, i ) + 0.5 ) ) END;
 				vyBase.Update( obj )

@@ -34,7 +34,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 
 		RegData = RECORD (GfxRegions.EnumData)
 			pc: Context;
-			dx, dy: INTEGER;
+			dx, dy: SIGNED16;
 			img: Images.Image;
 			col: Images.Pixel;
 		END;
@@ -55,7 +55,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 		END
 	END UseColor;
 
-	PROCEDURE Color (llx, lly, urx, ury: INTEGER; VAR data: GfxRegions.EnumData);
+	PROCEDURE Color (llx, lly, urx, ury: SIGNED16; VAR data: GfxRegions.EnumData);
 	BEGIN
 		WITH data: RegData DO
 			UseColor(data.pc, data.pc.col);
@@ -63,8 +63,8 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 		END
 	END Color;
 
-	PROCEDURE Tile (llx, lly, urx, ury: INTEGER; VAR data: GfxRegions.EnumData);
-		VAR mw, mh, mx, my, y, x, len, r, g, b, a: INTEGER; col: Gfx.Color; bit: LONGINT; adr: ADDRESS; pix: Images.Pixel;
+	PROCEDURE Tile (llx, lly, urx, ury: SIGNED16; VAR data: GfxRegions.EnumData);
+		VAR mw, mh, mx, my, y, x, len, r, g, b, a: SIGNED16; col: Gfx.Color; bit: LONGINT; adr: ADDRESS; pix: Images.Pixel;
 	BEGIN
 		WITH data: RegData DO
 			mw := data.img.width; mh := data.img.height;
@@ -114,7 +114,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 	END Tile;
 
 	PROCEDURE Dot (rc: GfxRaster.Context; x, y: LONGINT);
-		VAR pc: Context; mode: Images.Mode; px, py: INTEGER; pix: Images.Pixel; col: Gfx.Color;
+		VAR pc: Context; mode: Images.Mode; px, py: SIGNED16; pix: Images.Pixel; col: Gfx.Color;
 	BEGIN
 		IF (rc.clipState = GfxRaster.In) OR
 			(rc.clipState = GfxRaster.InOut) & GfxRegions.RectInside(SHORT(x), SHORT(y), SHORT(x+1), SHORT(y+1), rc.clipReg)
@@ -190,7 +190,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 	PROCEDURE Show (ctxt: Gfx.Context; x, y: REAL; VAR str: ARRAY OF CHAR);
 		VAR
 			mat, m: GfxMatrix.Matrix; font: GfxFonts.Font; pc: Context; u, v, du, dv: REAL; metric: Fonts.Font;
-			i, aw, dx, bx, by, w, h, px, py: INTEGER; pat: Display.Pattern;
+			i, aw, dx, bx, by, w, h, px, py: SIGNED16; pat: Display.Pattern;
 	BEGIN
 		GfxMatrix.Concat(ctxt.font.mat, ctxt.ctm, mat);
 		GfxMatrix.Scale(mat, Printer.Unit/Display.Unit, Printer.Unit/Display.Unit, m);	(* check for screen font *)
@@ -222,7 +222,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Image (ctxt: Gfx.Context; x, y: REAL; img: Images.Image; VAR filter: GfxImages.Filter);
 		VAR
-			pc: Context; tmp: Images.Image; m: GfxMatrix.Matrix; dx, dy, x0, y0, x1, y1, op, j, i: INTEGER; llx, lly, urx, ury: REAL;
+			pc: Context; tmp: Images.Image; m: GfxMatrix.Matrix; dx, dy, x0, y0, x1, y1, op, j, i: SIGNED16; llx, lly, urx, ury: REAL;
 			col: Gfx.Color; mode: Images.Mode; pix: Images.Pixel; p: LONGINT; data: RegData;
 	BEGIN
 		pc := ctxt(Context); tmp := NIL;
@@ -279,7 +279,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 	END Image;
 
 	PROCEDURE NewPattern (ctxt: Gfx.Context; img: Images.Image; px, py: REAL): Gfx.Pattern;
-		VAR scale: REAL; pat: Gfx.Pattern; w, h: INTEGER;
+		VAR scale: REAL; pat: Gfx.Pattern; w, h: SIGNED16;
 	BEGIN
 		scale := 10000/Printer.Unit;
 		NEW(pat); pat.px := scale * px; pat.py := scale * py;
@@ -318,7 +318,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 	(*--- Exported Interface ---*)
 
 	(** set default clip region to rectangle **)
-	PROCEDURE SetClipRect* (pc: Context; llx, lly, urx, ury: INTEGER);
+	PROCEDURE SetClipRect* (pc: Context; llx, lly, urx, ury: SIGNED16);
 	BEGIN
 		GfxRegions.SetToRect(pc.defClip, llx, lly, urx, ury)
 	END SetClipRect;

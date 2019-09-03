@@ -36,7 +36,7 @@ VAR W*: Texts.Writer;
 	END FixHex;
 
 	PROCEDURE Hex(n: LONGINT);
-		VAR i, j: INTEGER; s, t : ARRAY 10 OF CHAR;
+		VAR i, j: SIGNED16; s, t : ARRAY 10 OF CHAR;
 	BEGIN
 		i := 0;
 		REPEAT

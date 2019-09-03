@@ -21,8 +21,8 @@ TYPE Voxel = srBase.Voxel;
 TYPE LifeVox*= OBJECT(Voxel);
 VAR
 	m : ARRAY M,N OF BOOLEAN;
-	n: ARRAY M,N OF INTEGER;
-	gen: INTEGER;
+	n: ARRAY M,N OF SIGNED16;
+	gen: SIGNED16;
 	i:LONGINT;
 
 PROCEDURE &init*;
@@ -72,7 +72,7 @@ PROCEDURE Shade*(VAR ray: srBase.Ray);
 VAR
 	x,y: LONGINT;
 	lx, ly: SREAL;
-	nx, ny, nz: INTEGER;
+	nx, ny, nz: SIGNED16;
 	dot: SREAL;
 	inside: BOOLEAN;
 BEGIN
@@ -145,7 +145,7 @@ END LifeVox;
 TYPE RDVox*= OBJECT(Voxel);
 VAR
 		m1,m2,n1,n2 : ARRAY M,N OF REAL;
-		gen: INTEGER;
+		gen: SIGNED16;
 		i:LONGINT;
 		BLUE, RED: Voxel;
 		Cell: srM5Space.cell;
@@ -159,7 +159,7 @@ PROCEDURE Shade*(VAR ray: srBase.Ray);
 VAR
 	lx, ly: SREAL;
 	color: srBase.COLOR;
-	nx, ny, nz: INTEGER;
+	nx, ny, nz: SIGNED16;
 	dot: SREAL;
 	inside: BOOLEAN;
 BEGIN
@@ -234,9 +234,9 @@ END RDMirror;
 TYPE RDVolVox*=OBJECT(Voxel);
 VAR
 	m1*,m2,n1,n2: ARRAY V,V,V OF REAL;
-	gen: INTEGER;
+	gen: SIGNED16;
 	i:LONGINT;
-	tock*: INTEGER;
+	tock*: SIGNED16;
 	BLUE: Voxel;
 	RED: Voxel;
 	YELLOW: Voxel;
@@ -356,7 +356,7 @@ PROCEDURE Shade*(VAR ray: srBase.Ray);
 VAR
 	oldxyz: srBase.PT;
 	drx, dry, drz: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	ijk: srBase.IPT;
 	color: LONGINT;

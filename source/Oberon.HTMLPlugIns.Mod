@@ -239,7 +239,7 @@ MODULE HTMLPlugIns IN Oberon; (** portable *)	(* ejz  *)
 	END EMBED;
 
 	PROCEDURE ClearCache;
-		VAR res: INTEGER;
+		VAR res: SIGNED16;
 	BEGIN
 		WHILE cache # NIL DO
 			IF ~Strings.Prefix("file", cache.stream.url) THEN
@@ -266,7 +266,7 @@ MODULE HTMLPlugIns IN Oberon; (** portable *)	(* ejz  *)
 	PROCEDURE install(VAR V: View; create: BOOLEAN): BOOLEAN;
 		VAR
 			url: PlugIns.URLStr; plugin: PlugIns.PlugIn; s: HyperDocs.LinkScheme;
-			label: ARRAY 64 OF CHAR; port: INTEGER; F: Files.File;
+			label: ARRAY 64 OF CHAR; port: SIGNED16; F: Files.File;
 			i: LONGINT; R: Texts.Reader; ch, end: CHAR;
 	BEGIN
 		Texts.OpenReader(R, Oberon.Par.text, Oberon.Par.pos);

@@ -85,11 +85,11 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	VAR
 		typSize*: PROCEDURE(typ: OPT.Struct; allocDesc: BOOLEAN);
 		verify*: PROCEDURE(VAR obj: OPT.Object);
-		exp: INTEGER;	(*side effect of log*)
+		exp: SIGNED16;	(*side effect of log*)
 		maxExp: LONGINT;	(* max n in ASH(1, n) on this machine *)
 		InitPar: OPT.Object;		(* list of parameters in the current initialiser, used by NEW, only for active compiler *)
 
-	PROCEDURE err(n: INTEGER);
+	PROCEDURE err(n: SIGNED16);
 	BEGIN OPM.err(n)
 	END err;
 
@@ -213,7 +213,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		x^.conval := OPT.NewConst(); x^.conval^.intval := OPM.nilval; RETURN x
 	END Nil;
 
-	PROCEDURE BoolConst*(value: INTEGER): OPT.Node;
+	PROCEDURE BoolConst*(value: SIGNED16): OPT.Node;
 		VAR x: OPT.Node;
 	BEGIN
 		x := OPT.NewNode(Nconst); x^.typ := OPT.booltyp;
@@ -295,7 +295,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END DeRef;
 
 	PROCEDURE Index*(VAR x: OPT.Node; y: OPT.Node);
-		VAR f: INTEGER; typ: OPT.Struct;
+		VAR f: SIGNED16; typ: OPT.Struct;
 	BEGIN
 		f := y^.typ^.form;
 		IF x^.class >= Nconst THEN err(79)
@@ -368,7 +368,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END TypTest;
 
 	PROCEDURE In*(VAR x: OPT.Node; y: OPT.Node);
-		VAR f: INTEGER; k: LONGINT;
+		VAR f: SIGNED16; k: LONGINT;
 	BEGIN f := x^.typ^.form;
 		IF (x^.class = Ntype) OR (x^.class = Nproc) OR (y^.class = Ntype) OR (y^.class = Nproc) THEN err(126)
 		ELSIF (f IN intSet) & (y^.typ^.form = Set) THEN
@@ -393,7 +393,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		RETURN x
 	END log;
 
-	PROCEDURE CheckRealType(f, nr: INTEGER; x: OPT.Const);
+	PROCEDURE CheckRealType(f, nr: SIGNED16; x: OPT.Const);
 		VAR min, max, r: LONGREAL;
 	BEGIN
 		IF f = Real THEN min := OPM.MinReal; max := OPM.MaxReal
@@ -408,7 +408,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END CheckRealType;
 
 	PROCEDURE MOp*(op: SIGNED8; VAR x: OPT.Node);
-		VAR f: INTEGER; typ: OPT.Struct; z: OPT.Node;
+		VAR f: SIGNED16; typ: OPT.Struct; z: OPT.Node;
 
 		PROCEDURE NewOp(op: SIGNED8; typ: OPT.Struct; z: OPT.Node): OPT.Node;
 			VAR node: OPT.Node;
@@ -504,7 +504,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END MOp;
 
 	PROCEDURE CheckPtr(VAR x, y: OPT.Node);
-		VAR g: INTEGER; p, q, t: OPT.Struct;
+		VAR g: SIGNED16; p, q, t: OPT.Struct;
 	BEGIN g := y^.typ^.form;	(* x.typ # y.typ , x is pointer, otherwise it wouldn't enter here! *)
 		IF g = Pointer THEN
 			p := x^.typ^.BaseTyp; q := y^.typ^.BaseTyp;
@@ -586,12 +586,12 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		END
 	END CheckProc;
 
-	PROCEDURE ConstOp(op: INTEGER; x, y: OPT.Node);
-		VAR f, g: INTEGER; xval, yval: OPT.Const; xv, yv: LONGINT;
+	PROCEDURE ConstOp(op: SIGNED16; x, y: OPT.Node);
+		VAR f, g: SIGNED16; xval, yval: OPT.Const; xv, yv: LONGINT;
 				temp: BOOLEAN; (* temp avoids err 215 *)
 
-		PROCEDURE ConstCmp(): INTEGER;
-			VAR res: INTEGER;
+		PROCEDURE ConstCmp(): SIGNED16;
+			VAR res: SIGNED16;
 		BEGIN
 			CASE f OF
 			  Undef:
@@ -800,7 +800,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END ConstOp;
 
 	PROCEDURE Convert(VAR x: OPT.Node; typ: OPT.Struct);
-		VAR node: OPT.Node; f, g: INTEGER; k: LONGINT; r: LONGREAL;
+		VAR node: OPT.Node; f, g: SIGNED16; k: LONGINT; r: LONGREAL;
 	BEGIN f := x^.typ^.form; g := typ^.form;
 		IF x^.class = Nconst THEN
 			IF f IN intSet THEN
@@ -831,7 +831,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END Convert;
 
 	PROCEDURE Val(VAR x: OPT.Node;  typ: OPT.Struct);	(*SYSTEM.VAL, change type, no convertion only projection*)
-	VAR  t: OPT.Node;  f: INTEGER;  r: REAL;
+	VAR  t: OPT.Node;  f: SIGNED16;  r: REAL;
 	BEGIN
 		f := x.typ.form;
 		IF (x^.class = Ntype) OR (x^.class = Nproc) OR
@@ -871,7 +871,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END Val;
 
 	PROCEDURE Op*(op: SIGNED8; VAR x: OPT.Node; y: OPT.Node);
-		VAR f, g: INTEGER; t, z: OPT.Node; typ: OPT.Struct; do: BOOLEAN; val: LONGINT;
+		VAR f, g: SIGNED16; t, z: OPT.Node; typ: OPT.Struct; do: BOOLEAN; val: LONGINT;
 
 		PROCEDURE NewOp(op: SIGNED8; typ: OPT.Struct; VAR x: OPT.Node; y: OPT.Node);
 			VAR node: OPT.Node;
@@ -1098,7 +1098,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END SetElem;
 
 	PROCEDURE CheckAssign(x: OPT.Struct; ynode: OPT.Node);	(* x := y *)
-		VAR f, g: INTEGER; y, p, q: OPT.Struct;
+		VAR f, g: SIGNED16; y, p, q: OPT.Struct;
 	BEGIN
 		y := ynode^.typ; f := x^.form; g := y^.form;
 		IF (ynode^.class = Ntype) OR (ynode^.class = Nproc) & (f # ProcTyp) THEN err(126)
@@ -1177,8 +1177,8 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		END
 	END CheckLeaf;
 
-	PROCEDURE StPar0*(VAR par0: OPT.Node; fctno: INTEGER);	(* par0: first param of standard proc *)
-		VAR f: INTEGER; t, ptr, typ: OPT.Struct; x: OPT.Node;
+	PROCEDURE StPar0*(VAR par0: OPT.Node; fctno: SIGNED16);	(* par0: first param of standard proc *)
+		VAR f: SIGNED16; t, ptr, typ: OPT.Struct; x: OPT.Node;
 	BEGIN x := par0; f := x^.typ^.form;
 		CASE fctno OF
 		  haltfn, shalt: (*HALT*)
@@ -1416,7 +1416,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END StPar0;
 
 	PROCEDURE StPar1*(VAR par0: OPT.Node; x: OPT.Node; fctno: SIGNED8);	(* x: second parameter of standard proc *)
-		VAR f, L: INTEGER; typ: OPT.Struct; p, t: OPT.Node; i: LONGINT;
+		VAR f, L: SIGNED16; typ: OPT.Struct; p, t: OPT.Node; i: LONGINT;
 
 		PROCEDURE NewOp(class, subcl: SIGNED8; left, right: OPT.Node): OPT.Node;
 			VAR node: OPT.Node;
@@ -1606,8 +1606,8 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		par0 := p
 	END StPar1;
 
-	PROCEDURE StParN*(VAR par0: OPT.Node; x: OPT.Node; fctno, n: INTEGER);	(* x: n+1-th param of standard proc *)
-		VAR node: OPT.Node; f: INTEGER; p: OPT.Node;
+	PROCEDURE StParN*(VAR par0: OPT.Node; x: OPT.Node; fctno, n: SIGNED16);	(* x: n+1-th param of standard proc *)
+		VAR node: OPT.Node; f: SIGNED16; p: OPT.Node;
 	BEGIN p := par0; f := x^.typ^.form;
 		IF fctno = newfn THEN (*NEW(p, ..., x...*)
 			IF InitPar # NIL THEN
@@ -1633,8 +1633,8 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		par0 := p
 	END StParN;
 
-	PROCEDURE StFct*(VAR par0: OPT.Node; fctno: SIGNED8; parno: INTEGER);
-		VAR dim: INTEGER; x, p, r: OPT.Node;
+	PROCEDURE StFct*(VAR par0: OPT.Node; fctno: SIGNED8; parno: SIGNED16);
+		VAR dim: SIGNED16; x, p, r: OPT.Node;
 				obj: OPT.Object; typ: OPT.Struct;
 	BEGIN p := par0;
 		IF (fctno <= ashfn) OR (fctno = shalt) THEN
@@ -1724,7 +1724,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END StFct;
 
 	PROCEDURE OpenArrParCheck(ftyp, atyp: OPT.Struct; fvarpar: BOOLEAN);
-		VAR f: INTEGER;
+		VAR f: SIGNED16;
 	BEGIN (* ftyp^.comp = OpenArr *)
 		f := atyp^.comp; ftyp := ftyp^.BaseTyp; atyp := atyp^.BaseTyp;
 		IF (*fvarpar &*) (ftyp = OPT.bytetyp) THEN (* ok, but ... *)	(* 2. Appendix C, 2nd paragraph *)

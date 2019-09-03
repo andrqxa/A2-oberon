@@ -357,9 +357,9 @@ References:
 	TYPE
 		Instruction* = RECORD
 			scale*, reg*: SIGNED8;
-			op*: INTEGER;
+			op*: SIGNED16;
 			dest*, src1*, src2*, inx*, pc*, hint*: LONGINT; (* pc: PC on the target machine, used for jumps *)
-			link*, used*: INTEGER;
+			link*, used*: SIGNED16;
 			node*: OPT.Node;
 			abs*: BOOLEAN;	(* absolute address, should not be fixed. Def = FALSE. *)		(* GetPut *)
 		END;
@@ -443,7 +443,7 @@ References:
 		sInt = OPO.sInt;	(* short integer 32 bit *)
 
 		noBase = OPO.noBase; noInx = OPO.noInx; noImm = OPO.noImm;
-		free = -1; Occupied = MIN (INTEGER); Splitted = Occupied + 1; (* Register *)
+		free = -1; Occupied = MIN (SIGNED16); Splitted = Occupied + 1; (* Register *)
 
 	(* opcodes used for generating i386 code *)
 
@@ -489,27 +489,27 @@ References:
 
 	TYPE
 		LinkRec = RECORD
-			offset, mod, entry: INTEGER;
+			offset, mod, entry: SIGNED16;
 		END;
 
 		VarConsRec = RECORD
 			mod : LONGINT;
-			entry, noflinks, index: INTEGER
+			entry, noflinks, index: SIGNED16
 		END;
 		VarConsTable = POINTER TO ARRAY OF VarConsRec;
 
 		VarConsLinkRec = RECORD
-			offset, next: INTEGER
+			offset, next: SIGNED16
 		END;
 		VarConsLinkTable = POINTER TO ARRAY OF VarConsLinkRec;
 
 		SavedRegRec = RECORD
-			reg, sreg, freg: ARRAY 8 OF INTEGER
+			reg, sreg, freg: ARRAY 8 OF SIGNED16
 		END;
 
 		PtrTable = POINTER TO ARRAY OF LONGINT;
 		RecTable = POINTER TO ARRAY OF OPT.Struct;
-		EntryTable = POINTER TO ARRAY OF INTEGER;
+		EntryTable = POINTER TO ARRAY OF SIGNED16;
 		ExpTable = POINTER TO ARRAY OF LONGINT;
 
 		ExTableEntry = POINTER TO RECORD
@@ -525,14 +525,14 @@ References:
 	varConsLink: VarConsTable;	(* variable / constant link table *)
 	link: ARRAY LinkLength OF LinkRec;	(* link table *)
 	varConsTab: VarConsLinkTable;	(* variable / constant table *)
-	nofVarCons, noVarEntries, nofEntries, (*nofptrs,*) nofVarConsLinks, nofLinks, nofrecs: INTEGER;
+	nofVarCons, noVarEntries, nofEntries, (*nofptrs,*) nofVarConsLinks, nofLinks, nofrecs: SIGNED16;
 	nofptrs: LONGINT;
 	ConstErr, RegErr, VarEntryErr, LinkErr: BOOLEAN;
 
 	(* i386 code generator *)
 	regTab, sregTab, fregTab: ARRAY 8 OF LONGINT; (* regTab: 32/16 bit; sregTab: 8 Bit; fregTab: floating points *)
 	savedRegs: ARRAY MaxSaveLevel OF SavedRegRec;
-	nofSavedLevel: INTEGER;	(* number of saved register sets *)
+	nofSavedLevel: SIGNED16;	(* number of saved register sets *)
 	ftop: SIGNED8;	(* floating point top of stack *)
 	trapFixupTab: ARRAY nofTrapFixups OF LONGINT;
 	JmpConvert: ARRAY Jnc-Je+1 OF SIGNED8;
@@ -542,7 +542,7 @@ References:
 	exTableLen: LONGINT;
 	exTable: ExTableEntry;
 
-	nofStr: INTEGER;
+	nofStr: SIGNED16;
 	linkTable*: LONGINT;
 	gVarLink*: LONGINT;
 
@@ -1079,7 +1079,7 @@ References:
 	END Store;
 
 	PROCEDURE GenPortIO (VAR instr: Instruction);					(* New Functions *)
-			VAR size: INTEGER; pin : BOOLEAN;
+			VAR size: SIGNED16; pin : BOOLEAN;
 	BEGIN
 		size := instr.op MOD 8 * 8; pin := instr.op DIV 32 = In;
 		IF pin THEN
@@ -2488,7 +2488,7 @@ ASSERT(~loaded(instr.dest));
 		END
 	END GenAsm;
 
-	PROCEDURE GenCode* (pSize: INTEGER);
+	PROCEDURE GenCode* (pSize: SIGNED16);
 		VAR
 			obj, list: OPT.Object;
 			i, k: LONGINT;
@@ -2690,7 +2690,7 @@ ASSERT(~loaded(instr.dest));
 
 (* object file *)
 
-	PROCEDURE NewVarCons* (mod: LONGINT; entry: INTEGER; VAR index: LONGINT);
+	PROCEDURE NewVarCons* (mod: LONGINT; entry: SIGNED16; VAR index: LONGINT);
 	VAR i: SIZE;  var: VarConsTable;
 	BEGIN
 		IF nofVarCons >= LEN(varConsLink) THEN
@@ -2901,7 +2901,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE OutRefName* (name: ARRAY OF CHAR);
 		VAR
 			ch: CHAR;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		i := 0;
 		REPEAT
@@ -2911,7 +2911,7 @@ ASSERT(~loaded(instr.dest));
 	END OutRefName;
 
 	PROCEDURE OutRefs* (obj: OPT.Object);
-		VAR f: INTEGER;
+		VAR f: SIGNED16;
 	BEGIN
 		IF obj # NIL THEN
 			OutRefs (obj.left);
@@ -2970,10 +2970,10 @@ ASSERT(~loaded(instr.dest));
 		RETURN SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, x) * SYSTEM.VAL(SET, 0FFFFH))
 	END LSW;
 
-	PROCEDURE Export(obj: OPT.Object; VAR nofExp: INTEGER);
+	PROCEDURE Export(obj: OPT.Object; VAR nofExp: SIGNED16);
 		VAR typ: OPT.Struct; i: LONGINT; tmp: ExpTable;
 
-		PROCEDURE ExportMeth(fld: OPT.Object; basetyp: OPT.Struct; VAR noFld: INTEGER);
+		PROCEDURE ExportMeth(fld: OPT.Object; basetyp: OPT.Struct; VAR noFld: SIGNED16);
 		BEGIN
 			IF fld#NIL THEN ExportMeth(fld.left, basetyp, noFld);
 				IF (fld.mode=TProc) & (fld.vis#internal) THEN
@@ -2984,7 +2984,7 @@ ASSERT(~loaded(instr.dest));
 		END ExportMeth;
 
 		PROCEDURE ExportRecord(typ: OPT.Struct);
-			VAR fld: OPT.Object; pos: LONGINT; nofld: INTEGER;
+			VAR fld: OPT.Object; pos: LONGINT; nofld: SIGNED16;
 		BEGIN
 			IF typ.mno=0 THEN
 				OPM.ObjW(EURecord);
@@ -3103,7 +3103,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE OutCode*(VAR modName: ARRAY OF CHAR);
 		VAR
 			i, k, pos: LONGINT;
-			nofcmds, nofnewmth, nofinhmth, linkCorrection, nofExp, nofImp: INTEGER;
+			nofcmds, nofnewmth, nofinhmth, linkCorrection, nofExp, nofImp: SIGNED16;
 			obj: OPT.Object;
 			typ, btyp: OPT.Struct;
 			commandTab: ARRAY MaxCommands OF OPT.Object;
@@ -3111,7 +3111,7 @@ ASSERT(~loaded(instr.dest));
 			modMap: ARRAY 4096 OF SIGNED8;
 
 		PROCEDURE WriteName (VAR name: ARRAY OF CHAR);
-			VAR i: INTEGER; ch: CHAR;
+			VAR i: SIGNED16; ch: CHAR;
 		BEGIN
 			i := 0;
 			REPEAT
@@ -3229,7 +3229,7 @@ ASSERT(~loaded(instr.dest));
 		i := 0;
 	(* header block *)
 		OPM.ObjWInt (nofEntries); OPM.ObjWInt (nofcmds);
-		IF nofptrs > MAX(INTEGER) THEN OPM.err(222) END;
+		IF nofptrs > MAX(SIGNED16) THEN OPM.err(222) END;
 		OPM.ObjWInt (SHORT(nofptrs)); OPM.ObjWInt (nofrecs);
 		OPM.ObjWInt (nofImp);
 		OPM.ObjWInt (nofVarCons); OPM.ObjWInt (nofLinks-linkCorrection);
@@ -3342,7 +3342,7 @@ ASSERT(~loaded(instr.dest));
 			nofnewmth := 0;
 			FindNewMths (typ.strobj);
 			OPM.ObjWInt (nofnewmth);
-			IF nofptrs > MAX(INTEGER) THEN OPM.err(221) END;
+			IF nofptrs > MAX(SIGNED16) THEN OPM.err(221) END;
 			OPM.ObjWInt (SHORT(nofptrs));
 			IF (typ.strobj # NIL) & (typ.strobj.mnolev = 0) THEN
 				IF typ.ptr # NIL THEN

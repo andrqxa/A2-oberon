@@ -495,13 +495,13 @@ TYPE
 TYPE
 	RetrievedList = RECORD
 		data : ARRAY RListSize OF WMSystemComponents.DirEntry;
-		noEl : INTEGER;
+		noEl : SIGNED16;
 	END;
 
 	ListBuffer = OBJECT
 	VAR
 		data : ARRAY RListSize OF WMSystemComponents.DirEntry;
-		in, out, maxNoEl : INTEGER;
+		in, out, maxNoEl : SIGNED16;
 		finished : BOOLEAN;
 
 		PROCEDURE &Init*;
@@ -528,7 +528,7 @@ TYPE
 		END Finished;
 
 		PROCEDURE Get(VAR rlist : RetrievedList);
-		VAR i, j : INTEGER;
+		VAR i, j : SIGNED16;
 		BEGIN {EXCLUSIVE}
 			AWAIT((in - out >= maxNoEl) OR finished);
 			i := 0;

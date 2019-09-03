@@ -112,7 +112,7 @@ PROCEDURE Shade*(VAR ray: Ray);
 VAR
 	oldxyz: srBase.PT;
 	drx, dry, drz, dr: SREAL;
-	iter, di, dj, dk: INTEGER;
+	iter, di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 	ijk: srBase.IPT;
@@ -220,7 +220,7 @@ END bounds;
 PROCEDURE flipx*;
 VAR
 	b: AR3 ;
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 2  DO FOR j := 0 TO 2 DO FOR k := 0 TO 2 DO
 		b[2-i,j,k] := blox[i,j,k];
@@ -233,7 +233,7 @@ END flipx;
 PROCEDURE flipy*;
 VAR
 	b: AR3 ;
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 2  DO FOR j := 0 TO 2 DO FOR k := 0 TO 2 DO
 		b[i,2-j,k] := blox[i,j,k];
@@ -246,7 +246,7 @@ END flipy;
 PROCEDURE flipz*;
 VAR
 	b: AR3 ;
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 2  DO FOR j := 0 TO 2 DO FOR k := 0 TO 2 DO
 		b[i,j,2-k] := blox[i,j,k];
@@ -258,7 +258,7 @@ END flipz;
 
 PROCEDURE fill(v: Voxel);
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 FOR i:=0 TO 2 DO FOR j:=0 TO 2 DO FOR k:=0 TO 2 DO
 	blox[i,j,k]:=v
@@ -300,7 +300,7 @@ PROCEDURE Shade*(VAR ray: Ray);
 VAR
 	oldxyz: srBase.PT;
 	drx, dry, drz: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 	ijk: srBase.IPT;
@@ -388,7 +388,7 @@ PROCEDURE probeShade*(VAR ray: Ray; VAR dx,dy,dz: SREAL);
 VAR
 	ijk: srBase.IPT;
 	drx, dry, drz: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 BEGIN
@@ -478,7 +478,7 @@ END bounds;
 
 PROCEDURE fill*(v: Voxel);
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 4 DO FOR j := 0 TO 4 DO FOR k:= 0 TO 4 DO
 		blox[i,j,k] := v
@@ -488,7 +488,7 @@ END fill;
 (*PROCEDURE flipx*;
 VAR
 	b: AR3 ;
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 4  DO FOR j := 0 TO 4 DO FOR k := 0 TO 4 DO
 		b[2-i,j,k] := blox[i,j,k];
@@ -501,7 +501,7 @@ END flipx;
 PROCEDURE flipy*;
 VAR
 	b: AR3 ;
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 4  DO FOR j := 0 TO 4 DO FOR k := 0 TO 4 DO
 		b[i,2-j,k] := blox[i,j,k];
@@ -514,7 +514,7 @@ END flipy;
 PROCEDURE flipz*;
 VAR
 	b: AR3 ;
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 4  DO FOR j := 0 TO 4 DO FOR k := 0 TO 4 DO
 		b[i,j,2-k] := blox[i,j,k];
@@ -529,7 +529,7 @@ VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
 	drx, dry, drz, dr,rr,gr,br,bl: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 BEGIN
@@ -663,7 +663,7 @@ VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
 	drx, dry, drz: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 	killed: BOOLEAN;
@@ -796,7 +796,7 @@ END SetColor;
 
 PROCEDURE fill*(v: Voxel);
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i:=0 TO 9 DO
 		FOR j:=0 TO 9 DO
@@ -809,7 +809,7 @@ END fill;
 
 (*PROCEDURE tick;
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 BEGIN
 	FOR i := 0 TO 100 DO tickit END
 END tick;
@@ -861,7 +861,7 @@ VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
 	drx, dry, drz, dr,rr,gr,br,bl: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 BEGIN
@@ -979,7 +979,7 @@ VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
 	drx, dry, drz: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 	killed: BOOLEAN;
@@ -1093,7 +1093,7 @@ PROCEDURE probeShade*(VAR ray: Ray; VAR dx,dy,dz: SREAL);
 VAR
 	ijk: srBase.IPT;
 	drx, dry, drz: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 BEGIN

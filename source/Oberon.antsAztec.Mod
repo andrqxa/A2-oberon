@@ -40,16 +40,16 @@ TYPE
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR version: INTEGER;
+	VAR version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );
 		IF version > 0 THEN Files.ReadLReal( R, s.horprob ) ELSE s.horprob := 0.5 END
 	END LoadM;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y: INTEGER;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  copy: antsArrayObjects.tINTEGERArray;
+	VAR x, y: SIGNED16;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  copy: antsArrayObjects.tINTEGERArray;
 
-		PROCEDURE movestep( A: antsArrayObjects.tINTEGERObject;  y, x: INTEGER ): INTEGER;
+		PROCEDURE movestep( A: antsArrayObjects.tINTEGERObject;  y, x: SIGNED16 ): SIGNED16;
 		BEGIN
 			IF (A.A[y, (x + 1) MOD A.w] = 3) & (A.A[y, x] # 1) THEN RETURN 3
 			ELSIF (A.A[y, (x - 1) MOD A.w] = 1) & (A.A[y, x] # 3) THEN RETURN 1

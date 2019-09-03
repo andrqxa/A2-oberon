@@ -28,7 +28,7 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT Out,aM := antsMessages;
 CONST debug = FALSE;
 TYPE
-	Function* = PROCEDURE (VAR A: ARRAY OF INTEGER): LONGREAL;
+	Function* = PROCEDURE (VAR A: ARRAY OF SIGNED16): LONGREAL;
 
 	FullCache* = OBJECT (* POINTER TO FullCacheDesc;
 	FullCacheDesc* = RECORD
@@ -39,19 +39,19 @@ TYPE
 		len-: POINTER TO ARRAY OF LONGINT;
 		d-, size-: LONGINT;
 
-		PROCEDURE (*c: FullCache*) Offset* (VAR point: ARRAY OF INTEGER;  level: LONGINT): LONGINT;
+		PROCEDURE (*c: FullCache*) Offset* (VAR point: ARRAY OF SIGNED16;  level: LONGINT): LONGINT;
 	VAR i: LONGINT;  offset: LONGINT;
 BEGIN
 	offset := 0;  FOR i := level TO SELF.d - 1 DO INC(offset, point[i] *  SELF.offset[i]) END;
 	RETURN offset
 END Offset;
 
-PROCEDURE (*c: FullCache*) Point* (offset: LONGINT;  VAR point: ARRAY OF INTEGER);
+PROCEDURE (*c: FullCache*) Point* (offset: LONGINT;  VAR point: ARRAY OF SIGNED16);
 	VAR i: LONGINT;
 BEGIN
 	FOR i := SELF.d - 1 TO 0 BY - 1 DO point [i] := SHORT(offset DIV SELF.offset[i]);   offset := offset MOD SELF.offset[i]  END
 END Point;
-PROCEDURE (*c: FullCache*) NextPoint* (VAR offset: LONGINT;  VAR point: ARRAY OF INTEGER;  level: LONGINT): BOOLEAN;
+PROCEDURE (*c: FullCache*) NextPoint* (VAR offset: LONGINT;  VAR point: ARRAY OF SIGNED16;  level: LONGINT): BOOLEAN;
 	(* move to next point, INC offset and point values, offset=-1 initializes to 0 *)
 	VAR i: LONGINT;
 BEGIN
@@ -97,7 +97,7 @@ BEGIN
 	NEW(c.offset, d);  FOR i := 0 TO d - 1 DO c.offset[i] := 0 END
 END Create;
 
-PROCEDURE Cuboid* (d: LONGINT;  VAR len: ARRAY OF INTEGER;  maxsize: LONGINT): FullCache;
+PROCEDURE Cuboid* (d: LONGINT;  VAR len: ARRAY OF SIGNED16;  maxsize: LONGINT): FullCache;
 	VAR i: LONGINT;  offset: LONGINT;  c: FullCache;
 BEGIN
 	IF ~enabled THEN RETURN NIL END;
@@ -121,8 +121,8 @@ BEGIN
 	ELSE RETURN NIL END
 END Cuboid;
 
-PROCEDURE  Cube* (d: LONGINT;  len: INTEGER;  maxsize: LONGINT): FullCache;
-	VAR lenA: POINTER TO ARRAY OF INTEGER;  i: LONGINT;
+PROCEDURE  Cube* (d: LONGINT;  len: SIGNED16;  maxsize: LONGINT): FullCache;
+	VAR lenA: POINTER TO ARRAY OF SIGNED16;  i: LONGINT;
 BEGIN
 	IF debug THEN
 		Out.String("Trying Cache .. ");  Out.Int(d, 20);  Out.Int(len, 20);  Out.Ln()
@@ -147,7 +147,7 @@ BEGIN
 END Enable;
 
 PROCEDURE Test*;
-	VAR c: FullCache; i: LONGINT;   len: ARRAY 5 OF INTEGER;  offset: LONGINT;
+	VAR c: FullCache; i: LONGINT;   len: ARRAY 5 OF SIGNED16;  offset: LONGINT;
 BEGIN
 	c := Cube(5, 3, 10000);
 	IF c # NIL THEN
@@ -226,7 +226,7 @@ l := 1;  FOR i :=0 TO dimension-1 DO l := l*size END;
 RETURN l;
 END len;
 
-PROCEDURE pos0 (VAR c: FullCache; VAR A: ARRAY OF INTEGER): LONGINT;
+PROCEDURE pos0 (VAR c: FullCache; VAR A: ARRAY OF SIGNED16): LONGINT;
 VAR i: LONGINT; l: LONGINT; size: LONGINT; bv: LONGINT;
 BEGIN
 l := 0; size := c.size; bv := c.dimensions-1;
@@ -236,8 +236,8 @@ END;
 RETURN l;
 END pos0;
 
-PROCEDURE (c: FullCache) next* (VAR A: ARRAY OF INTEGER): BOOLEAN;
-	VAR i: INTEGER;
+PROCEDURE (c: FullCache) next* (VAR A: ARRAY OF SIGNED16): BOOLEAN;
+	VAR i: SIGNED16;
 BEGIN
 	i := 0; WHILE( i < c.dimensions) DO
 		INC(A[i]);
@@ -276,7 +276,7 @@ BEGIN
 	RETURN offset
 END cachedArrayAddr;
 
-PROCEDURE (c: FullCache)  cacheArray* ( VAR v: ARRAY OF INTEGER; VAR A: ARRAY OF LONGREAL);
+PROCEDURE (c: FullCache)  cacheArray* ( VAR v: ARRAY OF SIGNED16; VAR A: ARRAY OF LONGREAL);
 	VAR i: LONGINT; pos, mv: LONGINT;
 BEGIN
 	pos := pos0(c, v); mv := c.size - 1;

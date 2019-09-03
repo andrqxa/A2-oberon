@@ -46,7 +46,7 @@ TYPE
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLInt( R, s.dim );  Gadgets.ReadRef( R, s.lib, objsub );
 		IF objsub # NIL THEN s.n := objsub( antsNeighbourhoods.Neighbours ) END;
@@ -63,7 +63,7 @@ TYPE
 (*! implement cache, general: speed up *)
 
 	PROCEDURE Local( o, c: antsArrayObjects.tINTEGERObject;  dim: LONGINT;  par: array;  x, y: LONGINT;  M: tModel;  s: antsKernel.Kernel );
-	VAR theta: LONGREAL;  f: antsMatrixPar.Matrix;  ran, u, z: LONGREAL;  count: INTEGER;
+	VAR theta: LONGREAL;  f: antsMatrixPar.Matrix;  ran, u, z: LONGREAL;  count: SIGNED16;
 
 		PROCEDURE U( y, x, val: LONGINT ): LONGREAL;
 		VAR i: LONGINT;
@@ -103,7 +103,7 @@ END Penalize;
 	END Sync;
 
 	PROCEDURE OneSweep*( s: antsKernel.Kernel );
-	VAR A, Cache: antsArrayObjects.tINTEGERObject;  par: array;  model: tModel;  dim, x, y: LONGINT;  x0, y0, w0, h0: INTEGER;
+	VAR A, Cache: antsArrayObjects.tINTEGERObject;  par: array;  model: tModel;  dim, x, y: LONGINT;  x0, y0, w0, h0: SIGNED16;
 
 	BEGIN
 		A := s.A( antsArrayObjects.tINTEGERObject );  model := s.par( tModel );  x0 := 0;  y0 := 0;  w0 := SHORT( A.w - 1 );

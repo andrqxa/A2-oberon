@@ -54,9 +54,9 @@ VAR
 	TYPE tPoint = RECORD
 			H, V: REAL
 		END;
-	VAR lenv, recordv: vyBase.tVector;  xp, yp: REAL;  recordCount: INTEGER;  lenMin: REAL;  dataSpan: REAL;
+	VAR lenv, recordv: vyBase.tVector;  xp, yp: REAL;  recordCount: SIGNED16;  lenMin: REAL;  dataSpan: REAL;
 		penVec: ARRAY cPens + 1 OF tPoint;
-		yFac: REAL;  delta: INTEGER;  I, J, rightLim, leftLim, dataPoint, count: LONGINT;
+		yFac: REAL;  delta: SIGNED16;  I, J, rightLim, leftLim, dataPoint, count: LONGINT;
 	BEGIN
 		IF maxMass.x # NIL THEN
 			count := maxMass.x.nrData;

@@ -34,7 +34,7 @@ TYPE
 
 	Statistic* = POINTER TO StatisticDesc;
 	StatisticDesc* = RECORD
-		type*: INTEGER;    (* median, mean *)
+		type*: SIGNED16;    (* median, mean *)
 		m*, s*: antsArrays.X2d;    (* m= mean, s=ssq for type = cMean; m=median, s=sumabs for type = cMedian*)
 		n*, N*: LONGINT;             (* N: Size of Data , n: Number of current Observation *)
 		(*
@@ -64,7 +64,7 @@ IF i < j THEN RETURN i ELSE RETURN j END
 END Min;
 
 	(*! für Katrin Modul: Indexverschiebung in der Statistik! *)
-PROCEDURE Step (VAR argmin: ARRAY OF INTEGER;     VAR min: ARRAY OF LONGREAL;      n, minw, maxw : LONGINT;     p: Function);
+PROCEDURE Step (VAR argmin: ARRAY OF SIGNED16;     VAR min: ARRAY OF LONGREAL;      n, minw, maxw : LONGINT;     p: Function);
 VAR i, minpos: LONGINT;     minv, current: LONGREAL;         from, to: LONGINT;
 BEGIN
 	minv := MAX(LONGREAL);     from := Max(0, n - maxw);     to := Min(n - 1, n - minw);
@@ -91,7 +91,7 @@ BEGIN
 	IF (min = NIL) OR (LEN(min) # N + 1) THEN
 		NEW(min, N + 1);                               NEW(argmin, N + 1)
 	END;
-	argmin[0] := MIN(INTEGER);    argmin[1] := 0;
+	argmin[0] := MIN(SIGNED16);    argmin[1] := 0;
 	min[0] := initvalue;     min[1] := 0;
 	FOR i := 2 TO (N - 1) DO (* vorsicht: Index-Verschiebung durch den Startwert der Bellman-Fkt *)
 		min[i] := 0;
@@ -101,7 +101,7 @@ BEGIN
 END Bellman;
 
 PROCEDURE BellmanMatrix* ( VAR argmin: antsArrays.I2d;    VAR min:  antsArrays.X2d;     N: LONGINT;    p: Function );
-VAR n, k, r : LONGINT;             mini, H, ssq: LONGREAL;             rsterndl: INTEGER;
+VAR n, k, r : LONGINT;             mini, H, ssq: LONGREAL;             rsterndl: SIGNED16;
 BEGIN
 	IF (min = NIL ) OR (LEN( min ) # N) THEN NEW( min, N, N ) END;
 	(* min[k,l] = Fehler bei k+1 Intervallen und l+1 Punkten,
@@ -137,7 +137,7 @@ BEGIN
 END BellmanMatrix;
 
 PROCEDURE PartitionMatrix* (argmin: antsArrays.I2d;   VAR result: antsArrays.X2d;   p: Function);
-VAR k, l, N: LONGINT;            start, stop: INTEGER;            mean: LONGREAL;
+VAR k, l, N: LONGINT;            start, stop: SIGNED16;            mean: LONGREAL;
 BEGIN
 	N := LEN(argmin);
 	IF (result = NIL) OR (LEN(result) # N) THEN NEW(result, N, N) END;
@@ -166,7 +166,7 @@ BEGIN
 END PartitionMatrix;
 
 PROCEDURE IntervalLenMatrix* (argmin: antsArrays.I2d;   VAR result: antsArrays.I2d);
-VAR k, l, N: LONGINT;            start, stop: INTEGER;
+VAR k, l, N: LONGINT;            start, stop: SIGNED16;
 	(* writes the length of intervals consecutive in result, first row of result corresponds to one interval, last row to N intervals *)
 BEGIN
 	N := LEN(argmin);
@@ -188,7 +188,7 @@ END IntervalLenMatrix;
 
 PROCEDURE InterVarMatrix* ( rstern: antsArrays.I2d;               s: Statistic;               VAR intVar: antsArrays.X2d );
 	(** compute the unbiased  variance estimator for every interval in the minimizing partiton*)
-VAR k, l, N: LONGINT;               start, stop: INTEGER;               length: LONGINT;
+VAR k, l, N: LONGINT;               start, stop: SIGNED16;               length: LONGINT;
 BEGIN
 	N := s.N;
 	IF (intVar = NIL ) OR (LEN( intVar ) # N) THEN NEW( intVar, N, N ) END;

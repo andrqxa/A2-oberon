@@ -21,9 +21,9 @@ CONST
 		HALT( 99 );
 	END error;
 
-	PROCEDURE Hex2Bin( CONST  hex: ARRAY OF CHAR; VAR bin: ARRAY OF CHAR; len: INTEGER );
+	PROCEDURE Hex2Bin( CONST  hex: ARRAY OF CHAR; VAR bin: ARRAY OF CHAR; len: SIGNED16 );
 	VAR
-		i, j: INTEGER;
+		i, j: SIGNED16;
 		h, b: LONGINT;
 		c: CHAR;
 	BEGIN

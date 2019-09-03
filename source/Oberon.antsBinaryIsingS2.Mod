@@ -52,14 +52,14 @@ TYPE
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR version: INTEGER;
+	VAR version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );
 		IF version < 1 THEN Files.ReadLReal( R, s.par[0] );  Files.ReadLReal( R, s.par[1] );  Files.ReadLReal( R, s.par[2] ) END;
 		Open( s )
 	END LoadM;
 
-	PROCEDURE U( m: tModel;  a: ARRAY OF INTEGER ): LONGREAL;
+	PROCEDURE U( m: tModel;  a: ARRAY OF SIGNED16 ): LONGREAL;
 	VAR theta: LONGREAL;  sum: LONGREAL;
 	BEGIN
 		theta := 0;
@@ -75,8 +75,8 @@ TYPE
 	END U;
 
 	PROCEDURE Cache( m: tModel );
-	VAR cv: ARRAY 6 OF INTEGER;
-		c: antsCaches.FullCache;  offset: LONGINT;  s: LONGREAL;  i: INTEGER;
+	VAR cv: ARRAY 6 OF SIGNED16;
+		c: antsCaches.FullCache;  offset: LONGINT;  s: LONGREAL;  i: SIGNED16;
 	BEGIN
 		m.MCache := antsCaches.Cube( 6, 2, m.maxCacheSize );  m.ccool := m.coolingTemp;  c := m.MCache;  offset := -1;
 		WHILE (c.NextPoint( offset, cv, 1 )) DO
@@ -95,7 +95,7 @@ TYPE
 	VAR x, y, w, h, maxx, maxy: LONGINT;  A, AOrig: antsArrayObjects.tINTEGERArray;  model: tModel;
 		AO: antsArrayObjects.tINTEGERObject;  Random: RandomArray;  ran: LONGREAL;  cpos: LONGINT;  u: LONGREAL;  orig: Objects.Object;
 		checkerboard: BOOLEAN;
-		a: ARRAY 6 OF INTEGER;
+		a: ARRAY 6 OF SIGNED16;
 	BEGIN
 		model := s.par( tModel );
 		IF model.ccool # model.coolingTemp THEN model.synced := FALSE END;

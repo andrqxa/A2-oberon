@@ -42,7 +42,7 @@ BEGIN
 			|16: w.String(" procedure returned")
 			|17: w.String(" nil pointer access")
 			ELSE
-				IF (number > MAX(INTEGER)+1) OR (number < MIN(INTEGER)) THEN
+				IF (number > MAX(SIGNED16)+1) OR (number < MIN(SIGNED16)) THEN
 					w.String(" module freed?")
 				END
 		END;

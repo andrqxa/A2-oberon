@@ -342,9 +342,9 @@ VAR
 		handled := FALSE;
 		Machine.GetExceptionState(int, exc);
 		user := TRUE;
-		traceTrap := (exc.locks = {}) & (exc.halt >= MAX(INTEGER)) & (exc.halt <= MAX(INTEGER)+1);
+		traceTrap := (exc.locks = {}) & (exc.halt >= MAX(SIGNED16)) & (exc.halt <= MAX(SIGNED16)+1);
 
-		Show(t, int, exc, (exc.halt # MAX(INTEGER)+1) & (trapState[Machine.ID()] = 0));	(* Always show the trap info!*)
+		Show(t, int, exc, (exc.halt # MAX(SIGNED16)+1) & (trapState[Machine.ID()] = 0));	(* Always show the trap info!*)
 
 		IF exc.halt = haltUnbreakable THEN
 			Unbreakable(t, int, exc, handled)

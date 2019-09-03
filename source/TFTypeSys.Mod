@@ -521,7 +521,7 @@ BEGIN
 	NEW(expression);
 	expression.kind := ExpressionPrimitive;
 	IF (value >= -128) & (value <= 127) THEN expression.basicType:= BasicInt8
-	ELSIF (value >= MIN(INTEGER)) & (value <= MAX(INTEGER)) THEN expression.basicType := BasicInt16
+	ELSIF (value >= MIN(SIGNED16)) & (value <= MAX(SIGNED16)) THEN expression.basicType := BasicInt16
 	ELSIF (value >= MIN(LONGINT)) & (value <= MAX(LONGINT)) THEN expression.basicType := BasicInt32
 	ELSE expression.basicType := BasicInt64
 	END;
@@ -583,7 +583,7 @@ BEGIN
 	RETURN expression
 END IllegalExpression;
 
-PROCEDURE UnaryExpression*(op : INTEGER; exp : Expression) : Expression;
+PROCEDURE UnaryExpression*(op : SIGNED16; exp : Expression) : Expression;
 VAR expression : Expression;
 BEGIN
 	NEW(expression);

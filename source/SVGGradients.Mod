@@ -60,7 +60,7 @@ TYPE
 
 		(* Add a stop *)
 		PROCEDURE AddStop*(offset: SVG.Length; color:  SVG.Color);
-		VAR r,g,b,a: INTEGER;
+		VAR r,g,b,a: SIGNED16;
 			p: Raster.Pixel;
 		BEGIN
 			SVGColors.Split(color, r, g, b, a);

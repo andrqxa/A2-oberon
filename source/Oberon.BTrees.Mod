@@ -31,7 +31,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 		PageDesc = RECORD
 			org: LONGINT; (* pos of this page *)
 			p0: LONGINT; (* pos of left page *)
-			m: INTEGER; (* number of entries *)
+			m: SIGNED16; (* number of entries *)
 			dirty: BOOLEAN; (* page changed *)
 			discard: BOOLEAN; (* TRUE: page is deleted *)
 			next: Page (* next page in cache *)
@@ -43,9 +43,9 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 			org: LONGINT; (* pos of btree header *)
 			root: LONGINT; (* pos of root page *)
 			free: LONGINT; (* pos of first free page *)
-			class: INTEGER; (* 0: LInt, 1: Str *)
-			noCache: INTEGER; (* number of pages in cache *)
-			maxCache: INTEGER (* max. number of pages in cache *)
+			class: SIGNED16; (* 0: LInt, 1: Str *)
+			noCache: SIGNED16; (* number of pages in cache *)
+			maxCache: SIGNED16 (* max. number of pages in cache *)
 		END;
 
 		Entry = RECORD
@@ -191,7 +191,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END ReadLIntPage;
 
 (** Search for key in T. If the key could be found res = Done else res = NotFound. *)
-	PROCEDURE SearchLInt*(T: Tree; key: LONGINT; VAR org: LONGINT; VAR res: INTEGER);
+	PROCEDURE SearchLInt*(T: Tree; key: LONGINT; VAR org: LONGINT; VAR res: SIGNED16);
 		VAR
 			i, L, R: LONGINT;
 			a: LIntPage;
@@ -224,7 +224,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END SearchLInt;
 
-	PROCEDURE insertLInt(T: Tree; key, org: LONGINT; a: LIntPage; VAR h: BOOLEAN; VAR v: LIntEntry; VAR res: INTEGER);
+	PROCEDURE insertLInt(T: Tree; key, org: LONGINT; a: LIntPage; VAR h: BOOLEAN; VAR v: LIntEntry; VAR res: SIGNED16);
 		VAR
 			i, L, R: LONGINT;
 			b: LIntPage;
@@ -301,7 +301,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END insertLInt;
 
 (** Insert a new key into T. If a new key was inserted, res = Done else res = EntryChanged. *)
-	PROCEDURE InsertLInt*(T: Tree; key, org: LONGINT; VAR res: INTEGER);
+	PROCEDURE InsertLInt*(T: Tree; key, org: LONGINT; VAR res: SIGNED16);
 		VAR
 			u: LIntEntry;
 			r, q: LIntPage;
@@ -389,7 +389,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END underflowLInt;
 
-	PROCEDURE deleteLInt(T: Tree; key: LONGINT; a: LIntPage; VAR h: BOOLEAN; VAR res: INTEGER);
+	PROCEDURE deleteLInt(T: Tree; key: LONGINT; a: LIntPage; VAR h: BOOLEAN; VAR res: SIGNED16);
 		VAR
 			i, L, R: LONGINT;
 			q: LIntPage;
@@ -442,7 +442,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END deleteLInt;
 
 (** Delete key from T. If key was deleted res = Done else res = NotFound. *)
-	PROCEDURE DeleteLInt*(T: Tree; key: LONGINT; VAR res: INTEGER);
+	PROCEDURE DeleteLInt*(T: Tree; key: LONGINT; VAR res: SIGNED16);
 		VAR
 			p: Page;
 			r, r0: LIntPage;
@@ -527,7 +527,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END minLIntKey;
 
 (** Searches the smallest key used in T. *)
-	PROCEDURE MinLIntKey*(T: Tree; VAR key: LONGINT; VAR res: INTEGER);
+	PROCEDURE MinLIntKey*(T: Tree; VAR key: LONGINT; VAR res: SIGNED16);
 		VAR r: LIntPage;
 	BEGIN
 		ASSERT(T.class = LInt);
@@ -549,7 +549,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END maxLIntKey;
 
 (** Searches the biggest key used in T. *)
-	PROCEDURE MaxLIntKey*(T: Tree; VAR key: LONGINT; VAR res: INTEGER);
+	PROCEDURE MaxLIntKey*(T: Tree; VAR key: LONGINT; VAR res: SIGNED16);
 		VAR r: LIntPage;
 	BEGIN
 		ASSERT(T.class = LInt);
@@ -563,7 +563,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 
 (** Create a new b-tree with longint keys. The tree is written to F starting at org.
 		cache gives the minumum number of keys which should fit into the page cache. *)
-	PROCEDURE NewLInt*(F: Files.File; org: LONGINT; cache: INTEGER): Tree;
+	PROCEDURE NewLInt*(F: Files.File; org: LONGINT; cache: SIGNED16): Tree;
 		VAR
 			T: Tree;
 			R: Files.Rider;
@@ -675,7 +675,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END ReadStrPage;
 
 (** Search for key in T. If the key could be found res = Done else res = NotFound. *)
-	PROCEDURE SearchStr*(T: Tree; key: ARRAY OF CHAR; VAR org: LONGINT; VAR res: INTEGER);
+	PROCEDURE SearchStr*(T: Tree; key: ARRAY OF CHAR; VAR org: LONGINT; VAR res: SIGNED16);
 		VAR
 			i, L, R: LONGINT;
 			a: StrPage;
@@ -709,7 +709,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END SearchStr;
 
-	PROCEDURE insertStr(T: Tree; VAR key: ARRAY OF CHAR; org: LONGINT; a: StrPage; VAR h: BOOLEAN; VAR v: StrEntry; VAR res: INTEGER);
+	PROCEDURE insertStr(T: Tree; VAR key: ARRAY OF CHAR; org: LONGINT; a: StrPage; VAR h: BOOLEAN; VAR v: StrEntry; VAR res: SIGNED16);
 		VAR
 			i, L, R: LONGINT;
 			b: StrPage;
@@ -786,7 +786,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END insertStr;
 
 (** Insert a new key into T. If a new key was inserted, res = Done else res = EntryChanged. *)
-	PROCEDURE InsertStr*(T: Tree; key: ARRAY OF CHAR; org: LONGINT; VAR res: INTEGER);
+	PROCEDURE InsertStr*(T: Tree; key: ARRAY OF CHAR; org: LONGINT; VAR res: SIGNED16);
 		VAR
 			u: StrEntry;
 			r, q: StrPage;
@@ -875,7 +875,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END underflowStr;
 
-	PROCEDURE deleteStr(T: Tree; VAR key: ARRAY OF CHAR; a: StrPage; VAR h: BOOLEAN; VAR res: INTEGER);
+	PROCEDURE deleteStr(T: Tree; VAR key: ARRAY OF CHAR; a: StrPage; VAR h: BOOLEAN; VAR res: SIGNED16);
 		VAR
 			i, L, R: LONGINT;
 			q: StrPage;
@@ -928,7 +928,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END deleteStr;
 
 (** Delete key from T. If key was deleted res = Done else res = NotFound. *)
-	PROCEDURE DeleteStr*(T: Tree; key: ARRAY OF CHAR; VAR res: INTEGER);
+	PROCEDURE DeleteStr*(T: Tree; key: ARRAY OF CHAR; VAR res: SIGNED16);
 		VAR
 			p: Page;
 			r, r0: StrPage;
@@ -1015,7 +1015,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END minStrKey;
 
 (** Searches the smallest key used in T. *)
-	PROCEDURE MinStrKey*(T: Tree; VAR key: ARRAY OF CHAR; VAR res: INTEGER);
+	PROCEDURE MinStrKey*(T: Tree; VAR key: ARRAY OF CHAR; VAR res: SIGNED16);
 		VAR r: StrPage;
 	BEGIN
 		ASSERT(T.class = Str);
@@ -1037,7 +1037,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 	END maxStrKey;
 
 (** Searches the biggest key used in T. *)
-	PROCEDURE MaxStrKey*(T: Tree; VAR key: ARRAY OF CHAR; VAR res: INTEGER);
+	PROCEDURE MaxStrKey*(T: Tree; VAR key: ARRAY OF CHAR; VAR res: SIGNED16);
 		VAR r: StrPage;
 	BEGIN
 		ASSERT(T.class = Str);
@@ -1051,7 +1051,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 
 (** Create a new b-tree with string keys. The tree is written to F starting at org.
 		cache gives the minumum number of keys which should fit into the page cache. *)
-	PROCEDURE NewStr*(F: Files.File; org: LONGINT; cache: INTEGER): Tree;
+	PROCEDURE NewStr*(F: Files.File; org: LONGINT; cache: SIGNED16): Tree;
 		VAR
 			T: Tree;
 			R: Files.Rider;
@@ -1079,7 +1079,7 @@ MODULE BTrees IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			T: Tree;
 			R: Files.Rider;
-			tag: INTEGER;
+			tag: SIGNED16;
 	BEGIN
 		NEW(T); T.F := F; T.org := org;
 		Files.Set(R, F, org);

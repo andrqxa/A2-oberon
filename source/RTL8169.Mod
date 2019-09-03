@@ -251,7 +251,7 @@ TYPE
 			(* set source mac address (6 bytes @ offset 6 of eth frame) *)
 			SYSTEM.MOVE(ADDRESSOF(dev.local[0]), bufBase + 6, 6);
 			(* set upper layer type, bring type from host to network byte order *)
-			SYSTEM.PUT16(bufBase + 12, ROT(SYSTEM.VAL(INTEGER, SHORT(type)), 8));
+			SYSTEM.PUT16(bufBase + 12, ROT(SYSTEM.VAL(SIGNED16, SHORT(type)), 8));
 
 			offset := 14; (* eth header has 14 bytes *)
 			(* move layer 3 and layer 4 headers, data *)
@@ -397,7 +397,7 @@ TYPE
 
 		PROCEDURE ReadMACAddress;
 		VAR
-			i: INTEGER;
+			i: SIGNED16;
 			res: WORD;
 		BEGIN
 			(* MAC address is in registers 00H - 05H *)
@@ -430,7 +430,7 @@ TYPE
 			SYSTEM.PUT8(base + reg, SHORT(SHORT(val)));
 		END Write8;
 
-		PROCEDURE Read16(reg: LONGINT): INTEGER;
+		PROCEDURE Read16(reg: LONGINT): SIGNED16;
 		BEGIN
 			RETURN SYSTEM.GET16(base + reg);
 		END Read16;

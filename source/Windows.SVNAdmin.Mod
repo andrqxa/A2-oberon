@@ -370,7 +370,7 @@ TYPE
 
 		PROCEDURE ReadData* ( VAR res : WORD );
 		VAR
-			i : INTEGER;
+			i : SIGNED16;
 			tmp : ARRAY 256 OF CHAR;
 			start: ARRAY 2 OF CHAR;
 		BEGIN

@@ -102,7 +102,7 @@ TYPE
 		text*: Texts.Text;
 		buf: ARRAY buflen OF CHAR;
 		start: LONGINT;
-		last, next: INTEGER;
+		last, next: SIGNED16;
 		eot: BOOLEAN;
 	END;
 
@@ -115,7 +115,7 @@ TYPE
 	Loc* = RECORD
 		org*: LONGINT;		(** start of the line *)
 		pos*: LONGINT;		(** actual postition *)
-		x*, y*, dx*: INTEGER;		(** rel coords and character width at this point *)
+		x*, y*, dx*: SIGNED16;		(** rel coords and character width at this point *)
 		line*: Line;		(** which line *)
 	END;
 
@@ -123,36 +123,36 @@ TYPE
 		next*: Box;		(** from left to right in line *)
 		org*: LONGINT;		(** offset from beginning of line *)
 		f*: Display.Frame;		(** the frame itself *)
-		x*, voff*: INTEGER;		(** rel x coordinate and verticall offset *)
+		x*, voff*: SIGNED16;		(** rel x coordinate and verticall offset *)
 	END;
 
 	LineDesc* = RECORD
 		next*: Line;		(** ring from top to bottom, with sentinel	*)
-		base*: INTEGER;		(** rel base line position, negative distance from top of TG *)
-		w*, h*, dsr*, asr*: INTEGER;		(** true text metrics, no formatting *)
-		left*, right*: INTEGER; 		(** area that should be covered by the selection *)
+		base*: SIGNED16;		(** rel base line position, negative distance from top of TG *)
+		w*, h*, dsr*, asr*: SIGNED16;		(** true text metrics, no formatting *)
+		left*, right*: SIGNED16; 		(** area that should be covered by the selection *)
 		len*: LONGINT;		(** length of line in characters *)
 		box*: Box;		(** list of boxes *)
 		eot*: BOOLEAN;		(** last line of text *)
 		draw*: LONGINT;
 		(* extra info *)
-		spaces*: INTEGER;		(** number of spaces in line *)
+		spaces*: SIGNED16;		(** number of spaces in line *)
 		obj*: Objects.Object;	(** hang special things on here *)
 		extra*: LONGINT;		(** useful dummy field *)
 	END;
 
 	MethodBlock* = RECORD
-		Background*: PROCEDURE (F: Frame; R: Display3.Mask; X, Y, x, y, w, h: INTEGER);
+		Background*: PROCEDURE (F: Frame; R: Display3.Mask; X, Y, x, y, w, h: SIGNED16);
 		Format*: PROCEDURE(F: Frame; org: LONGINT; L: Line);
 		InSync*: PROCEDURE(F: Frame; L1, L2: Line): BOOLEAN;
 
-		Display*: PROCEDURE(F: Frame; M: Display3.Mask; x, y: INTEGER; org: LONGINT; L: Line; dlink: Objects.Object);
-		LocateChar*: PROCEDURE(F: Frame; x, y, X, Y: INTEGER; VAR loc: Loc);
+		Display*: PROCEDURE(F: Frame; M: Display3.Mask; x, y: SIGNED16; org: LONGINT; L: Line; dlink: Objects.Object);
+		LocateChar*: PROCEDURE(F: Frame; x, y, X, Y: SIGNED16; VAR loc: Loc);
 		LocatePos*: PROCEDURE(F: Frame; pos: LONGINT; VAR loc: Loc);
-		LocateString*: PROCEDURE(F: Frame; x, y, X, Y: INTEGER; VAR loc: Loc);
+		LocateString*: PROCEDURE(F: Frame; x, y, X, Y: SIGNED16; VAR loc: Loc);
 
 		PrintFormat*: PROCEDURE(F: Frame; org: LONGINT; L: Line; VAR pagebreak: BOOLEAN);
-		Print*: PROCEDURE(F: Frame; M: Display3.Mask; x, y: INTEGER; org: LONGINT; L: Line; dlink: Objects.Object);
+		Print*: PROCEDURE(F: Frame; M: Display3.Mask; x, y: SIGNED16; org: LONGINT; L: Line; dlink: Objects.Object);
 
 		Call*: PROCEDURE (F: Frame; pos: LONGINT; keysum: SET; dlink: Objects.Object);
 	END;
@@ -160,21 +160,21 @@ TYPE
 	DrawDesc* = RECORD
 		org0, org1, org2, org3, org4, orgL: LONGINT;
 		L0, L1, L2, L3, L4, LL: Line;
-		Y0, Y1, Y2, Y3, Y4, t: INTEGER;
+		Y0, Y1, Y2, Y3, Y4, t: SIGNED16;
 	END;
 
 	FrameDesc* = RECORD (Gadgets.ViewDesc)
 		state0*: SET;
 		text*: Texts.Text;
 		org*, time*, frametime: LONGINT;
-		left*, right*, top*, bottom*: INTEGER;
-		linespacing*,asr*,dsr*,h*,boxdsr*:INTEGER;	(**used for formatting of lines in frame*)
+		left*, right*, top*, bottom*: SIGNED16;
+		linespacing*,asr*,dsr*,h*,boxdsr*:SIGNED16;	(**used for formatting of lines in frame*)
 		trailer*: Line;
 		do*: Methods;
 
-		car*: BOOLEAN; carpos*: Loc; carX: INTEGER;
+		car*: BOOLEAN; carpos*: Loc; carX: SIGNED16;
 		sel*: BOOLEAN; selbeg*, selend*: Loc;
-		col*, invertC*: INTEGER;
+		col*, invertC*: SIGNED16;
 		desc: DrawDesc;
 	END;
 
@@ -191,9 +191,9 @@ TYPE
 	END;
 
 VAR
-	PrintertopY*, PrinterbotY*, PrinterleftX*, PagenoX*, HeaderY*: INTEGER;
+	PrintertopY*, PrinterbotY*, PrinterleftX*, PagenoX*, HeaderY*: SIGNED16;
 	W, Wmsg: Texts.Writer;
-	myfnt: Fonts.Font; mycol, myvoff: INTEGER;
+	myfnt: Fonts.Font; mycol, myvoff: SIGNED16;
 	dummyFrame: Gadgets.Frame;
 	scrollhint: BOOLEAN;
 	printOpts*: SET; (** 0: page number, 1: document name *)
@@ -204,7 +204,7 @@ PROCEDURE Max(x, y: LONGINT): LONGINT;
 BEGIN IF x > y THEN RETURN x ELSE RETURN y END
 END Max;
 
-PROCEDURE ConvertMsg(VAR M: Texts.UpdateMsg; VAR id: INTEGER; VAR beg, end: LONGINT);
+PROCEDURE ConvertMsg(VAR M: Texts.UpdateMsg; VAR id: SIGNED16; VAR beg, end: LONGINT);
 BEGIN
 	IF M.len = 0 THEN id := delete; beg := M.beg; end := M.end
 	ELSIF M.end = M.beg THEN id := insert; beg := M.beg; end := M.beg + M.len
@@ -220,7 +220,7 @@ END InSync;
 (* ---------------------- back reader ---------- *)
 
 PROCEDURE OpenBackRd*(VAR R: BackRd; text: Texts.Text; pos: LONGINT);
-VAR R0: Texts.Reader; i: INTEGER; ch: CHAR;
+VAR R0: Texts.Reader; i: SIGNED16; ch: CHAR;
 BEGIN
 	R.text := text; R.next := buflen - 1; R.eot := FALSE;
 	IF pos >= buflen THEN
@@ -258,8 +258,8 @@ BEGIN
 	END;
 END RdPos;
 
-PROCEDURE LinesUp*(T: Texts.Text; pos: LONGINT; no: INTEGER): LONGINT;
-VAR br: BackRd; ch: CHAR; l: INTEGER; lpos: LONGINT;
+PROCEDURE LinesUp*(T: Texts.Text; pos: LONGINT; no: SIGNED16): LONGINT;
+VAR br: BackRd; ch: CHAR; l: SIGNED16; lpos: LONGINT;
 BEGIN
 	OpenBackRd(br, T, pos); l := 0;
 	REPEAT
@@ -283,8 +283,8 @@ BEGIN
 	Display.Broadcast(M)
 END NewMask;
 
-PROCEDURE ToBoxes*(F: Frame; x, y : INTEGER; VAR M: Objects.ObjMsg);
-VAR L, trailer: Line; b, n: Box; u, v, cx: INTEGER;
+PROCEDURE ToBoxes*(F: Frame; x, y : SIGNED16; VAR M: Objects.ObjMsg);
+VAR L, trailer: Line; b, n: Box; u, v, cx: SIGNED16;
 BEGIN
 	IF (F.trailer = NIL) OR (F.trailer.next = NIL) THEN RETURN END;
 	IF M IS Display.FrameMsg THEN
@@ -311,7 +311,7 @@ BEGIN
 END ToBoxes;
 
 (* is this a hack *)
-PROCEDURE FindLine(F: Frame; y, Y: INTEGER; VAR org: LONGINT; VAR L: Line);
+PROCEDURE FindLine(F: Frame; y, Y: SIGNED16; VAR org: LONGINT; VAR L: Line);
 BEGIN
 	L := NIL;
 	IF F.trailer # NIL THEN
@@ -321,7 +321,7 @@ BEGIN
 	END
 END FindLine;
 
-PROCEDURE LocateBox*(F: Frame; X, Y, x, y, w, h: INTEGER; VAR L: Line): Box;
+PROCEDURE LocateBox*(F: Frame; X, Y, x, y, w, h: SIGNED16; VAR L: Line): Box;
 VAR b: Box; org: LONGINT;
 BEGIN
 	org := F.org; FindLine(F, y, Y, org, L);
@@ -337,7 +337,7 @@ END LocateBox;
 
 (* --- Caret tracking ---- *)
 
-PROCEDURE FlipCaret(F: Frame; R: Display3.Mask; x, y, w, h: INTEGER; loc: Loc);
+PROCEDURE FlipCaret(F: Frame; R: Display3.Mask; x, y, w, h: SIGNED16; loc: Loc);
 BEGIN
 	(* Oberon.FadeCursor(Oberon.Mouse); *)
 	Oberon.RemoveMarks(x + loc.x, y + h - 1 + loc.y - 10, 10, 10);
@@ -356,7 +356,7 @@ BEGIN
 END RemoveCaret;
 
 PROCEDURE SetFont(text: Texts.Text; cpos: LONGINT);
-VAR R: Texts.Reader; tries: INTEGER; ch: CHAR;
+VAR R: Texts.Reader; tries: SIGNED16; ch: CHAR;
 BEGIN
 	IF cpos < 0 THEN cpos := 0 END;
 	Texts.OpenReader(R, text, cpos);
@@ -415,8 +415,8 @@ BEGIN
 	FlipCaretMsg(F, F.carpos)
 END SetCaret;
 
-PROCEDURE TrackCaret*(F: Frame; R: Display3.Mask; VAR keysum: SET; x, y, w, h: INTEGER; VAR loc: Loc);
-VAR o, l: Loc; X, Y: INTEGER; keys: SET;
+PROCEDURE TrackCaret*(F: Frame; R: Display3.Mask; VAR keysum: SET; x, y, w, h: SIGNED16; VAR loc: Loc);
+VAR o, l: Loc; X, Y: SIGNED16; keys: SET;
 BEGIN
 	Oberon.FadeCursor(Oberon.Mouse);
 	Input.Mouse(keys, X, Y); keysum := keys;
@@ -433,8 +433,8 @@ BEGIN
 	Oberon.FadeCursor(Oberon.Mouse); FlipCaret(F, R, x, y, w, h, o); loc := o;
 END TrackCaret;
 
-PROCEDURE TrackWord*(F: Frame; R: Display3.Mask; VAR keysum: SET; x, y, w, h: INTEGER; VAR pos: LONGINT);
-VAR o, l: Loc; X, Y: INTEGER; keys: SET;
+PROCEDURE TrackWord*(F: Frame; R: Display3.Mask; VAR keysum: SET; x, y, w, h: SIGNED16; VAR pos: LONGINT);
+VAR o, l: Loc; X, Y: SIGNED16; keys: SET;
 BEGIN
 	Input.Mouse(keys, X, Y); keysum := keys;
 	F.do.LocateString(F, x, y, X, Y, o);
@@ -456,8 +456,8 @@ BEGIN
 	pos := o.pos;
 END TrackWord;
 
-PROCEDURE TrackLine*(F: Frame; R: Display3.Mask; VAR keysum: SET; x, y: INTEGER; VAR org: LONGINT; VAR L: Line);
-VAR keys: SET; X, Y, W, t: INTEGER; oL, nL: Line; pos: LONGINT;
+PROCEDURE TrackLine*(F: Frame; R: Display3.Mask; VAR keysum: SET; x, y: SIGNED16; VAR org: LONGINT; VAR L: Line);
+VAR keys: SET; X, Y, W, t: SIGNED16; oL, nL: Line; pos: LONGINT;
 BEGIN
 	t := y + F.H - 1;
 	Input.Mouse(keys, X, Y);
@@ -481,8 +481,8 @@ BEGIN
 	L := oL;
 END TrackLine;
 
-PROCEDURE LinesOf*(F: Frame): INTEGER;
-VAR c: INTEGER; L: Line;
+PROCEDURE LinesOf*(F: Frame): SIGNED16;
+VAR c: SIGNED16; L: Line;
 BEGIN
 	c := 0; L := F.trailer.next;
 	WHILE L # F.trailer DO
@@ -491,8 +491,8 @@ BEGIN
 	RETURN c;
 END LinesOf;
 
-PROCEDURE ClipAgainst(VAR x, y, w, h: INTEGER; x1, y1, w1, h1: INTEGER);
-VAR r, t, r1, t1: INTEGER;
+PROCEDURE ClipAgainst(VAR x, y, w, h: SIGNED16; x1, y1, w1, h1: SIGNED16);
+VAR r, t, r1, t1: SIGNED16;
 BEGIN
 	r := x + w - 1; r1 := x1 + w1 - 1; t := y + h - 1; t1 := y1 + h1 - 1;
 	IF x < x1 THEN x := x1 END;
@@ -511,8 +511,8 @@ BEGIN
 	END
 END ScrollTo;
 
-PROCEDURE RestoreSlider(F: Frame; M: Display3.Mask; x, y, w, h: INTEGER);
-VAR pos: INTEGER;
+PROCEDURE RestoreSlider(F: Frame; M: Display3.Mask; x, y, w, h: SIGNED16);
+VAR pos: SIGNED16;
 BEGIN
 	IF (F.left > sliderW) & (mayscroll IN F.state0) THEN
 		F.do.Background(F, M, x, y, 0, -F.H + 1, sliderW, F.H); (* left border *)
@@ -537,8 +537,8 @@ END RestoreSlider;
 	 L3 - L4 part to draw new
 	 Y0 - start background restore from here
 *)
-PROCEDURE DrawScrollChanges(F: Frame; pos, stamp: LONGINT; dlink: Objects.Object; x, y, w, h: INTEGER; VAR d: DrawDesc);
-VAR M, clipM: Display3.Mask; copy: BOOLEAN; cx, cy, cw, ch: INTEGER; org: LONGINT; L: Line;
+PROCEDURE DrawScrollChanges(F: Frame; pos, stamp: LONGINT; dlink: Objects.Object; x, y, w, h: SIGNED16; VAR d: DrawDesc);
+VAR M, clipM: Display3.Mask; copy: BOOLEAN; cx, cy, cw, ch: SIGNED16; org: LONGINT; L: Line;
 BEGIN
 	Oberon.RemoveMarks(x, y, w, h);
 	Gadgets.MakeMask(F, x, y, dlink, M);
@@ -589,9 +589,9 @@ BEGIN
 END DrawScrollChanges;
 
 PROCEDURE ScrollUpdate(F: Frame; pos, stamp: LONGINT; VAR d: DrawDesc);
-VAR tY, bY, nY, Y: INTEGER; org, org0: LONGINT; L, L0: Line;
+VAR tY, bY, nY, Y: SIGNED16; org, org0: LONGINT; L, L0: Line;
 
-	PROCEDURE FormatFrom(Lx: Line; VAR Y: INTEGER; pos: LONGINT);
+	PROCEDURE FormatFrom(Lx: Line; VAR Y: SIGNED16; pos: LONGINT);
 	VAR org: LONGINT;
 	BEGIN
 		NEW(Lx.next); Lx := Lx.next; d.L3 := Lx; d.org3 := pos; d.Y3 := Y; org := pos;
@@ -672,22 +672,22 @@ END ScrollUpdate;
 
 (* ---- Selections ---- *)
 
-PROCEDURE Below(x, y: INTEGER): INTEGER;
+PROCEDURE Below(x, y: SIGNED16): SIGNED16;
 BEGIN
 	IF x < y THEN RETURN y - x; ELSE RETURN 0 END;
 END Below;
 
-PROCEDURE Above(x, y: INTEGER): INTEGER;
+PROCEDURE Above(x, y: SIGNED16): SIGNED16;
 BEGIN
 	IF x > y THEN RETURN x - y; ELSE RETURN 0 END;
 END Above;
 
-PROCEDURE FlipSelection(F: Frame; R: Display3.Mask; x, y: INTEGER; s, e: Loc);
-VAR t: INTEGER; l: Line; cx, cy, cw, ch, ex: INTEGER; org: LONGINT;
+PROCEDURE FlipSelection(F: Frame; R: Display3.Mask; x, y: SIGNED16; s, e: Loc);
+VAR t: SIGNED16; l: Line; cx, cy, cw, ch, ex: SIGNED16; org: LONGINT;
 
 (* forward *)
-	PROCEDURE Flip(L: Line; sx, ex: INTEGER; org, beg, end: LONGINT);
-	VAR b: Box; e, w: INTEGER;
+	PROCEDURE Flip(L: Line; sx, ex: SIGNED16; org, beg, end: LONGINT);
+	VAR b: Box; e, w: SIGNED16;
 	BEGIN
 		IF L.h > 0 THEN
 			b := L.box;
@@ -752,8 +752,8 @@ BEGIN
 	F.time := Oberon.Time();
 END SetSelection;
 
-PROCEDURE TrackSelection*(F: Frame; VAR keysum: SET; x, y: INTEGER; VAR beg, end: Loc; dlink: Objects.Object);
-VAR F0: Frame; s, e, l: Loc; X, Y: INTEGER; keys, modKeys: SET; M: Oberon.SelectMsg;
+PROCEDURE TrackSelection*(F: Frame; VAR keysum: SET; x, y: SIGNED16; VAR beg, end: Loc; dlink: Objects.Object);
+VAR F0: Frame; s, e, l: Loc; X, Y: SIGNED16; keys, modKeys: SET; M: Oberon.SelectMsg;
 BEGIN
 	Input.Mouse(keys, X, Y); keysum := keys;
 	F.do.LocateChar(F, x, y, X, Y, s);
@@ -881,7 +881,7 @@ BEGIN
 	END
 END CopyOver;
 
-PROCEDURE CopyList*(obj: Objects.Object; depth: INTEGER; VAR obj0: Objects.Object);
+PROCEDURE CopyList*(obj: Objects.Object; depth: SIGNED16; VAR obj0: Objects.Object);
 VAR C: Objects.CopyMsg;
 BEGIN
 	obj0 := NIL; Objects.Stamp(C);
@@ -947,8 +947,8 @@ BEGIN
 END HasCmdAttr;
 
   PROCEDURE Call* (F: Frame; pos: LONGINT; keysum: SET; dlink: Objects.Object);
-    VAR S: Texts.Scanner; res, i: INTEGER; oldcontext, obj: Objects.Object;
-    cx, cy, cw, chl: INTEGER; par: Oberon.ParList; A: Objects.AttrMsg;
+    VAR S: Texts.Scanner; res, i: SIGNED16; oldcontext, obj: Objects.Object;
+    cx, cy, cw, chl: SIGNED16; par: Oberon.ParList; A: Objects.AttrMsg;
     R: Texts.Reader; ch: CHAR;
     cmd: ARRAY 256 OF CHAR;
   BEGIN
@@ -1019,7 +1019,7 @@ END HasCmdAttr;
 
  (* scroll in such a manner that L is at the bottom of the frame *)
 PROCEDURE ScrollUp(F: Frame; org: LONGINT);
-VAR heightUsed: INTEGER; begpos, startpos, p: LONGINT; K, L: Line;
+VAR heightUsed: SIGNED16; begpos, startpos, p: LONGINT; K, L: Line;
 BEGIN
 	IF org >= F.text.len THEN (* last line *)
 		org := LinesUp(F.text, F.text.len, 0); (* one line back *)
@@ -1052,8 +1052,8 @@ BEGIN
 	ScrollTo(F, begpos)
 END ScrollUp;
 
-PROCEDURE EditSlider*(F: Frame; R: Display3.Mask; VAR M: Oberon.InputMsg; x, y, w, h: INTEGER);
-VAR L: Line; keysum, keys: SET; pos, org: LONGINT; X, Y: INTEGER;
+PROCEDURE EditSlider*(F: Frame; R: Display3.Mask; VAR M: Oberon.InputMsg; x, y, w, h: SIGNED16);
+VAR L: Line; keysum, keys: SET; pos, org: LONGINT; X, Y: SIGNED16;
 BEGIN
 	IF M.keys # {} THEN
 		IF M.keys = {2} THEN (* scroll up *)
@@ -1132,7 +1132,7 @@ BEGIN
 	END
 END RestoreCaret;
 
-PROCEDURE Pos (F: Frame; x, y, X, Y: INTEGER): LONGINT;
+PROCEDURE Pos (F: Frame; x, y, X, Y: SIGNED16): LONGINT;
 VAR loc: Loc;
 BEGIN
 	F.do.LocateChar(F, x, y, X, Y, loc);
@@ -1140,7 +1140,7 @@ BEGIN
 END Pos;
 
 PROCEDURE Lines(F: Frame;lines: LONGINT);
-VAR pos: LONGINT; line: INTEGER; R: Texts.Reader; ch: CHAR;
+VAR pos: LONGINT; line: SIGNED16; R: Texts.Reader; ch: CHAR;
 BEGIN
 			pos := F.org;
 
@@ -1162,7 +1162,7 @@ BEGIN
 			END;
 END Lines;
 
-PROCEDURE Edit*(F: Frame; R: Display3.Mask; x, y, w, h: INTEGER; VAR M: Oberon.InputMsg);
+PROCEDURE Edit*(F: Frame; R: Display3.Mask; x, y, w, h: SIGNED16; VAR M: Oberon.InputMsg);
 VAR keysum: SET; text: Texts.Text; tbeg, tend, time, objtime, pos: LONGINT; C: Oberon.ConsumeMsg;
 	RR: Texts.Reader; chr: CHAR; g: Gadgets.Frame; S: Display.SelectMsg;
 	b: Box; L: Line; I: Oberon.InputMsg; obj, obj0: Objects.Object; PM: Gadgets.PriorityMsg;car : BOOLEAN;
@@ -1373,8 +1373,8 @@ BEGIN
 	END
 END Copy;
 
-PROCEDURE Write(F: Frame; dlink: Objects.Object; x, y: INTEGER; ch: CHAR; fnt: Objects.Library; col, voff: INTEGER);
-VAR pos, hpos, flushpos, len: LONGINT; loc: Loc; L: Line; carX: INTEGER; setCarX, ctrl: BOOLEAN; buf: Texts.Buffer;
+PROCEDURE Write(F: Frame; dlink: Objects.Object; x, y: SIGNED16; ch: CHAR; fnt: Objects.Library; col, voff: SIGNED16);
+VAR pos, hpos, flushpos, len: LONGINT; loc: Loc; L: Line; carX: SIGNED16; setCarX, ctrl: BOOLEAN; buf: Texts.Buffer;
 
 	PROCEDURE InsertTabs(VAR pos: LONGINT);
 	VAR pos0: LONGINT; R: Texts.Reader;
@@ -1386,7 +1386,7 @@ VAR pos, hpos, flushpos, len: LONGINT; loc: Loc; L: Line; carX: INTEGER; setCarX
 		END;
 	END InsertTabs;
 
-	PROCEDURE InsertChar(F: Frame; ch: CHAR; fnt: Objects.Library; col, voff: INTEGER);
+	PROCEDURE InsertChar(F: Frame; ch: CHAR; fnt: Objects.Library; col, voff: SIGNED16);
 	BEGIN
 		WITH F: Frame DO
 			IF myfnt = NIL THEN W.lib := fnt; W.col := SHORT(col); W.voff := SHORT(voff)
@@ -1523,7 +1523,7 @@ BEGIN
 		ELSIF ch = 0A9X THEN (* END *)
 			Flush;
 			pos := F.carpos.org + F.carpos.line.len - 1;
-			carX := MAX(INTEGER) DIV 2; setCarX := TRUE
+			carX := MAX(SIGNED16) DIV 2; setCarX := TRUE
 		ELSIF ch = 0A6X THEN (* F3: Search *)
 			Gadgets.Execute("TextDocs.Search", F, dlink, NIL, NIL);
 			RETURN
@@ -1584,10 +1584,10 @@ BEGIN
 	SetCaret(F, pos)
 END Recall;
 
-PROCEDURE Update*(F: Frame; dlink: Objects.Object; id: INTEGER; beg, end: LONGINT; x, y, w, h: INTEGER; stamp: LONGINT;
+PROCEDURE Update*(F: Frame; dlink: Objects.Object; id: SIGNED16; beg, end: LONGINT; x, y, w, h: SIGNED16; stamp: LONGINT;
 	VAR d: DrawDesc);
 VAR corr: LONGINT;
-	prevL: Line; prevorg: LONGINT; prevY: INTEGER;
+	prevL: Line; prevorg: LONGINT; prevY: SIGNED16;
 	(*
 		0 - first formatted line/Y0 is top boundary
 		1 - last formatted line/Y1 is bottom boundary/org1 on next line
@@ -1628,7 +1628,7 @@ BEGIN
 			d.L0 := d.L0.next
 		END;
 
-		IF d.L0 = F.trailer THEN d.L0 := NIL; d.Y4 := MIN(INTEGER);
+		IF d.L0 = F.trailer THEN d.L0 := NIL; d.Y4 := MIN(SIGNED16);
 		ELSIF d.L0 = NIL THEN
 		ELSE
 			(* [org0, Y0, L0] = update starts *)
@@ -1706,9 +1706,9 @@ BEGIN
 	END
 END Update;
 
-PROCEDURE DrawChanges(F: Frame; dlink: Objects.Object; id: INTEGER; beg, end: LONGINT; x, y, w, h: INTEGER;
+PROCEDURE DrawChanges(F: Frame; dlink: Objects.Object; id: SIGNED16; beg, end: LONGINT; x, y, w, h: SIGNED16;
 	stamp: LONGINT; d: DrawDesc);
-VAR L: Line; org: LONGINT; M, clipM: Display3.Mask; cx, cy, cw, ch: INTEGER; copy: BOOLEAN;
+VAR L: Line; org: LONGINT; M, clipM: Display3.Mask; cx, cy, cw, ch: SIGNED16; copy: BOOLEAN;
 
 BEGIN
 	IF F.trailer = NIL THEN RETURN END;
@@ -1778,10 +1778,10 @@ BEGIN
 	END
 END DrawChanges;
 
-PROCEDURE AdjustChild*(F: Frame; x, y: INTEGER; VAR M: Display.ModifyMsg);
+PROCEDURE AdjustChild*(F: Frame; x, y: SIGNED16; VAR M: Display.ModifyMsg);
 VAR L, trailer: Line; b: Box; org: LONGINT; isChild: BOOLEAN;
 	min, max: LONGINT;
-	xx, yy, oldmode, fw, fh: INTEGER;
+	xx, yy, oldmode, fw, fh: SIGNED16;
 BEGIN
 	isChild := FALSE; min := MAX(LONGINT); max := MIN(LONGINT);
 	trailer := F.trailer;
@@ -1827,9 +1827,9 @@ BEGIN
 	END;
 END AdjustChild;
 
-PROCEDURE UpdateChild*(F: Frame; x, y: INTEGER; VAR M: Gadgets.UpdateMsg);
+PROCEDURE UpdateChild*(F: Frame; x, y: SIGNED16; VAR M: Gadgets.UpdateMsg);
 VAR L, trailer: Line; b: Box; org: LONGINT; isChild: BOOLEAN;
-	min, max: LONGINT;  u, v: INTEGER; o: Objects.Object;
+	min, max: LONGINT;  u, v: SIGNED16; o: Objects.Object;
 BEGIN
 	u := M.x; v := M.y;
 	isChild := FALSE; min := MAX(LONGINT); max := MIN(LONGINT);
@@ -1862,7 +1862,7 @@ BEGIN
 	M.x := u; M.y := v;
 END UpdateChild;
 
-PROCEDURE RemoveChild*(F: Frame; x, y: INTEGER; VAR M: Display.ControlMsg);
+PROCEDURE RemoveChild*(F: Frame; x, y: SIGNED16; VAR M: Display.ControlMsg);
 VAR f: Texts.Finder; o, obj: Objects.Object; first: LONGINT;
 BEGIN
 	first := -1;
@@ -1896,7 +1896,7 @@ BEGIN
 END InsertObj;
 
 PROCEDURE FormatFrame*(F: Frame);
-VAR Y: INTEGER; org: LONGINT; L: Line;
+VAR Y: SIGNED16; org: LONGINT; L: Line;
 BEGIN
 	Y := -F.top + 1;
 	IF F.org > F.text.len THEN F.org := 0 END;
@@ -1913,8 +1913,8 @@ BEGIN
 	L.next := F.trailer;
 END FormatFrame;
 
-PROCEDURE RestoreFrame*(F: Frame; M: Display3.Mask; x, y, w, h: INTEGER; dlink: Objects.Object);
-VAR Y: INTEGER; org: LONGINT; L: Line;
+PROCEDURE RestoreFrame*(F: Frame; M: Display3.Mask; x, y, w, h: SIGNED16; dlink: Objects.Object);
+VAR Y: SIGNED16; org: LONGINT; L: Line;
 BEGIN
 	IF F.trailer = NIL THEN FormatFrame(F) END;
 	F.do.Background(F, M, x, y, 0, -F.H + 1, F.W, F.H);	(* erase background *)
@@ -1937,8 +1937,8 @@ BEGIN
 	IF Gadgets.selected IN F.state THEN Display3.FillPattern(M, Display3.white, Display3.selectpat, x, y, x, y, w, h, Display.paint) END;
 END RestoreFrame;
 
-PROCEDURE RestoreFrameArea*(F: Frame; M: Display3.Mask; x, y, w, h, U, V, W, H: INTEGER; dlink: Objects.Object);
-VAR Y: INTEGER; org: LONGINT; L: Line;
+PROCEDURE RestoreFrameArea*(F: Frame; M: Display3.Mask; x, y, w, h, U, V, W, H: SIGNED16; dlink: Objects.Object);
+VAR Y: SIGNED16; org: LONGINT; L: Line;
 BEGIN
 	Oberon.RemoveMarks(x + U, y + F.H - 1 + V, W, H);
 	IF F.trailer = NIL THEN FormatFrame(F) END;
@@ -1964,7 +1964,7 @@ BEGIN
 	IF Gadgets.selected IN F.state THEN Display3.FillPattern(M, Display3.white, Display3.selectpat, x, y, x, y, w, h, Display.paint) END;
 END RestoreFrameArea;
 
-PROCEDURE ChildRestore(F: Frame; VAR M: Display.DisplayMsg; x, y: INTEGER; dlink: Objects.Object);
+PROCEDURE ChildRestore(F: Frame; VAR M: Display.DisplayMsg; x, y: SIGNED16; dlink: Objects.Object);
 VAR L: Line; b: Box; R: Display3.Mask;
 BEGIN
 	IF F.trailer # NIL THEN
@@ -1984,7 +1984,7 @@ BEGIN
 	END
 END ChildRestore;
 
-PROCEDURE ChildRestoreSelection(F: Frame; VAR M: Display.DisplayMsg; x, y: INTEGER; dlink: Objects.Object);
+PROCEDURE ChildRestoreSelection(F: Frame; VAR M: Display.DisplayMsg; x, y: SIGNED16; dlink: Objects.Object);
 VAR L: Line; b: Box; R: Display3.Mask; org: LONGINT;
 BEGIN
 	IF F.trailer # NIL THEN
@@ -2005,7 +2005,7 @@ BEGIN
 	END
 END ChildRestoreSelection;
 
-PROCEDURE ChildUpdate(F: Frame; VAR M: Gadgets.UpdateMsg; x, y: INTEGER; dlink: Objects.Object);
+PROCEDURE ChildUpdate(F: Frame; VAR M: Gadgets.UpdateMsg; x, y: SIGNED16; dlink: Objects.Object);
 VAR L: Line; b: Box; R: Display3.Mask;
 BEGIN
 	R := NIL;
@@ -2086,7 +2086,7 @@ BEGIN
 END FrameLink;
 
 (** Return the size in which the frame's text will fit exactly *)
-PROCEDURE Dimensions*(F: Frame; VAR w, h: INTEGER);
+PROCEDURE Dimensions*(F: Frame; VAR w, h: SIGNED16);
 VAR l: Line;  end: LONGINT; R: Texts.Reader;
 BEGIN
 	h := 0; w := 0;
@@ -2109,8 +2109,8 @@ BEGIN
 	h := h + F.top + F.bottom + 2;
 END Dimensions;
 
-PROCEDURE OptimalSize(F: Frame; VAR w, h: INTEGER);
-VAR W, H: INTEGER;
+PROCEDURE OptimalSize(F: Frame; VAR w, h: SIGNED16);
+VAR W, H: SIGNED16;
 BEGIN
 	w := F.W; h := F.H;
 	IF (sizeadjust IN F.state0) & ~(Gadgets.lockedsize IN F.state) THEN
@@ -2125,7 +2125,7 @@ BEGIN
 	END
 END OptimalSize;
 
-PROCEDURE AdjustSize(F: Frame; w, h: INTEGER);
+PROCEDURE AdjustSize(F: Frame; w, h: SIGNED16);
 VAR car: BOOLEAN; A: Display.ModifyMsg; pos: LONGINT;
 BEGIN
 	IF (w # F.W) OR (h # F.H) THEN
@@ -2146,7 +2146,7 @@ BEGIN
 	END
 END Title;
 
-PROCEDURE Pageno(pageno: INTEGER);
+PROCEDURE Pageno(pageno: SIGNED16);
 VAR pno: ARRAY 8 OF CHAR;
 BEGIN
 	Strings.IntToStr(pageno, pno);
@@ -2155,7 +2155,7 @@ BEGIN
 END Pageno;
 
 PROCEDURE PrintText*(F: Frame; VAR headertext: ARRAY OF CHAR);
-VAR org: LONGINT; L: Line; Y: INTEGER; output, pagebreak: BOOLEAN; R: Display3.Mask; pageno: INTEGER;
+VAR org: LONGINT; L: Line; Y: SIGNED16; output, pagebreak: BOOLEAN; R: Display3.Mask; pageno: SIGNED16;
 BEGIN
 	InitPagePosition;
 	R := NIL; F.mask := NIL; F.absX := 0; F.absY := 0;
@@ -2186,12 +2186,12 @@ BEGIN
 	IF output THEN Printer.Page(1) END;
 END PrintText;
 
-PROCEDURE P(x: INTEGER): INTEGER;
+PROCEDURE P(x: SIGNED16): SIGNED16;
 BEGIN RETURN SHORT(x * Display.Unit DIV Printer.Unit)
 END P;
 
 PROCEDURE PrintTextGadget(F: Frame; VAR M: Display.DisplayMsg);
-VAR R: Display3.Mask; L: Line; Y, left, pos: INTEGER; org: LONGINT; pagebreak: BOOLEAN;
+VAR R: Display3.Mask; L: Line; Y, left, pos: SIGNED16; org: LONGINT; pagebreak: BOOLEAN;
 
 BEGIN
 	Gadgets.MakePrinterMask(F, M.x, M.y, M.dlink, R);
@@ -2220,7 +2220,7 @@ BEGIN
 	END;
 END PrintTextGadget;
 
-PROCEDURE Print(F: Frame; x, y: INTEGER; VAR M: Display.DisplayMsg);
+PROCEDURE Print(F: Frame; x, y: SIGNED16; VAR M: Display.DisplayMsg);
 VAR s: ARRAY 2 OF CHAR;
 BEGIN
 	IF M.id = Display.contents THEN
@@ -2229,13 +2229,13 @@ BEGIN
 	END
 END Print;
 
-PROCEDURE InScrollBar(F: Frame; X, Y, x, y: INTEGER): BOOLEAN;
+PROCEDURE InScrollBar(F: Frame; X, Y, x, y: SIGNED16): BOOLEAN;
 BEGIN
 	RETURN (mayscroll IN F.state0) & Effects.Inside(X, Y, x, y, F.left, F.H);
 END InScrollBar;
 
 PROCEDURE LocateMsg(F: Frame; VAR M: Display.LocateMsg);
-VAR b: Box; L: Line; x, y: INTEGER;
+VAR b: Box; L: Line; x, y: SIGNED16;
 BEGIN
 	b := LocateBox(F, M.X, M.Y, M.x + F.X, M.y + F.Y, F.W, F.H, L);
 	IF b # NIL THEN
@@ -2249,7 +2249,7 @@ BEGIN
 END LocateMsg;
 
 PROCEDURE ModifyFrame(F: Frame; VAR M: Display.ModifyMsg);
-VAR Y, y, h: INTEGER; org: LONGINT; L: Line; D: Display.DisplayMsg; O: Display3.OverlapMsg; mask: Display3.Mask;
+VAR Y, y, h: SIGNED16; org: LONGINT; L: Line; D: Display.DisplayMsg; O: Display3.OverlapMsg; mask: Display3.Mask;
 BEGIN
 	RemoveCaret(F); RemoveSelection(F);
 	(* data structure adjust *)
@@ -2343,7 +2343,7 @@ BEGIN
 	END
 END FindObj;
 
-PROCEDURE Consume (F: Frame; x, y: INTEGER; VAR M: Display.ConsumeMsg);
+PROCEDURE Consume (F: Frame; x, y: SIGNED16; VAR M: Display.ConsumeMsg);
 VAR pos: LONGINT; f: Display.Frame; loc: Loc; MM: Display.ModifyMsg; C: Display.ControlMsg;
 BEGIN
 	pos := -1;
@@ -2375,8 +2375,8 @@ BEGIN
 	END
 END Consume;
 
-PROCEDURE UpdateText (F: Frame; x, y, w, h: INTEGER; VAR M: Texts.UpdateMsg);
-VAR beg, end: LONGINT; id, fw, fh: INTEGER; sel: BOOLEAN;
+PROCEDURE UpdateText (F: Frame; x, y, w, h: SIGNED16; VAR M: Texts.UpdateMsg);
+VAR beg, end: LONGINT; id, fw, fh: SIGNED16; sel: BOOLEAN;
 BEGIN
 	ToBoxes(F, x, y, M);
 	IF M.text = F.text THEN
@@ -2398,7 +2398,7 @@ BEGIN
 	END
 END UpdateText;
 
-PROCEDURE TGSelect (F: Frame; x, y: INTEGER; VAR M: SelectMsg);
+PROCEDURE TGSelect (F: Frame; x, y: SIGNED16; VAR M: SelectMsg);
 VAR R: Display3.Mask;
 BEGIN
 	IF M.F = F THEN
@@ -2408,7 +2408,7 @@ BEGIN
 	END
 END TGSelect;
 
-PROCEDURE DSelect (F: Frame; x, y: INTEGER; VAR M: Display.SelectMsg);
+PROCEDURE DSelect (F: Frame; x, y: SIGNED16; VAR M: Display.SelectMsg);
 VAR obj: Objects.Object;
 BEGIN
 	IF M.id = Display.get THEN
@@ -2427,7 +2427,7 @@ BEGIN
 	END
 END DSelect;
 
-PROCEDURE OSelect (F: Frame; x, y: INTEGER; VAR M: Oberon.SelectMsg);
+PROCEDURE OSelect (F: Frame; x, y: SIGNED16; VAR M: Oberon.SelectMsg);
 BEGIN
 	IF (M.F = NIL) OR (M.F = F) THEN
 		IF (M.id = Oberon.get) & F.sel THEN
@@ -2445,7 +2445,7 @@ BEGIN
 	END
 END OSelect;
 
-PROCEDURE DControl (F: Frame; x, y: INTEGER; VAR M: Display.ControlMsg);
+PROCEDURE DControl (F: Frame; x, y: SIGNED16; VAR M: Display.ControlMsg);
 BEGIN
 	IF M.id = Display.remove THEN
 		IF M.stamp # F.stamp THEN F.stamp := M.stamp; RemoveChild(F, x, y, M) END;
@@ -2456,7 +2456,7 @@ BEGIN
 	END
 END DControl;
 
-PROCEDURE OControl (F: Frame; x, y: INTEGER; VAR M: Oberon.ControlMsg);
+PROCEDURE OControl (F: Frame; x, y: SIGNED16; VAR M: Oberon.ControlMsg);
 BEGIN
 	IF M.id = Oberon.defocus THEN
 		ToBoxes(F, x, y, M);
@@ -2472,7 +2472,7 @@ BEGIN
 END OControl;
 
 PROCEDURE FrameHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR x, y, w, h, u, v: INTEGER; R: Display3.Mask;
+VAR x, y, w, h, u, v: SIGNED16; R: Display3.Mask;
 BEGIN
 	WITH F: Frame DO
 		IF M IS Objects.AttrMsg THEN
@@ -2622,7 +2622,7 @@ BEGIN
 	F.invertC := SHORT(Max(0, 15 - F.col));
 	IF (F.invertC = 0) OR (Display.TrueColor(0)) THEN F.invertC := Display3.invertC END;
 	F.handle := FrameHandler; F.state0 := {mayselect .. autoindent};
-	F.text := T; F.org := 0; F.time := Input.Time()-MAX(INTEGER); F.frametime := F.time
+	F.text := T; F.org := 0; F.time := Input.Time()-MAX(SIGNED16); F.frametime := F.time
 END InitFrame;
 
 PROCEDURE InitPagePosition;

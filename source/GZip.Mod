@@ -46,7 +46,7 @@ TYPE
 
 		PROCEDURE WriteHeader(w: Streams.Writer);
 		VAR
-			i: INTEGER;
+			i: SIGNED16;
 		BEGIN
 			w.Char(1FX);
 			w.Char(8BX);
@@ -199,7 +199,7 @@ TYPE
 		CONST
 			headCRC = 2; extraField = 4; origName = 8; comment = 10H; reserved = 20H;
 		VAR
-			ch, method, flags: CHAR; len: INTEGER;
+			ch, method, flags: CHAR; len: SIGNED16;
 		BEGIN
 			ch := reader.Get();
 			IF reader.res = Streams.EOF THEN

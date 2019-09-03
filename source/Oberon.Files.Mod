@@ -263,7 +263,7 @@ END ReadBytes;
 Portable routines to read the standard Oberon types.
 *)
 
-PROCEDURE ReadInt*(VAR r: Rider; VAR x: INTEGER);
+PROCEDURE ReadInt*(VAR r: Rider; VAR x: SIGNED16);
 VAR x0, x1: SIGNED8;
 BEGIN
 	Read(r, x0); Read(r, x1);
@@ -297,7 +297,7 @@ BEGIN
 END ReadLReal;
 
 PROCEDURE ReadString*(VAR r: Rider; VAR x: ARRAY OF CHAR);
-VAR i: INTEGER; ch: CHAR;
+VAR i: SIGNED16; ch: CHAR;
 BEGIN i := 0;
 	LOOP
 		Read(r, ch); x[i] := ch; INC(i);
@@ -311,7 +311,7 @@ END ReadString;
 
 (** Reads a number in compressed variable length notation using the minimum amount of bytes. *)
 PROCEDURE ReadNum*(VAR r: Rider; VAR x: LONGINT);
-VAR ch: CHAR; n: INTEGER; y: LONGINT;
+VAR ch: CHAR; n: SIGNED16; y: LONGINT;
 BEGIN
 	n := 0; y := 0; Read(r, ch);
 	WHILE ch >= 80X DO INC(y, LSH(LONG(ORD(ch)) - 128, n)); INC(n, 7); Read(r, ch) END;
@@ -395,7 +395,7 @@ END WriteBytes;
 Portable routines to write the standard Oberon types.
 *)
 
-PROCEDURE WriteInt*(VAR r: Rider; x: INTEGER);
+PROCEDURE WriteInt*(VAR r: Rider; x: SIGNED16);
 BEGIN
 	Write(r, SHORT(x)); Write(r, SHORT(x DIV 100H))
 END WriteInt;
@@ -426,7 +426,7 @@ BEGIN
 END WriteLReal;
 
 PROCEDURE WriteString*(VAR r: Rider; CONST x: ARRAY OF CHAR);
-VAR i: INTEGER; ch: CHAR;
+VAR i: SIGNED16; ch: CHAR;
 BEGIN
 	i := 0;
 	LOOP ch := x[i]; Write(r, ch); INC(i);
@@ -443,19 +443,19 @@ BEGIN
 END WriteNum;
 
 (** Deletes a file. res = 0 indicates success. *)
-PROCEDURE Delete*(name: ARRAY OF CHAR; VAR res: INTEGER);
+PROCEDURE Delete*(name: ARRAY OF CHAR; VAR res: SIGNED16);
 VAR r: LONGINT;
 BEGIN
 	Files.Delete(name, r);
-	IF (r >= MIN(INTEGER)) & (r <= MAX(INTEGER)) THEN res := SHORT(r) ELSE res := -1 END
+	IF (r >= MIN(SIGNED16)) & (r <= MAX(SIGNED16)) THEN res := SHORT(r) ELSE res := -1 END
 END Delete;
 
 (** Renames a file. res = 0 indicates success. *)
-PROCEDURE Rename*(CONST old, new: ARRAY OF CHAR; VAR res: INTEGER);
+PROCEDURE Rename*(CONST old, new: ARRAY OF CHAR; VAR res: SIGNED16);
 VAR r: LONGINT;
 BEGIN
 	Files.Rename(old, new, r);
-	IF (r >= MIN(INTEGER)) & (r <= MAX(INTEGER)) THEN res := SHORT(r) ELSE res := -1 END
+	IF (r >= MIN(SIGNED16)) & (r <= MAX(SIGNED16)) THEN res := SHORT(r) ELSE res := -1 END
 END Rename;
 
 (** Returns the full name of a file. *)

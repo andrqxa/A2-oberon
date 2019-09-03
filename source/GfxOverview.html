@@ -414,7 +414,7 @@ which is used for transforming graphical context attributes
     END;
   
   PROCEDURE SetFont(ctxt: Context; font: GfxFonts.Font);
-  PROCEDURE SetFontName(ctxt: Context; fontname: ARRAY OF CHAR; size: INTEGER);
+  PROCEDURE SetFontName(ctxt: Context; fontname: ARRAY OF CHAR; size: SIGNED16);
   PROCEDURE GetStringWidth(ctxt: Context; str: ARRAY OF CHAR; VAR dx, dy: REAL);
   
   PROCEDURE ShowAt(ctxt: Context; x, y: REAL; str: ARRAY OF CHAR);
@@ -460,9 +460,9 @@ needed, which is encapsulated in module GfxFonts.
     Font = POINTER TO FontDesc;
     FontDesc = RECORD
       name: FontName;  (* e.g. "Oberon-Bold" *)
-      ptsize: INTEGER;	(* point size *)
+      ptsize: SIGNED16;	(* point size *)
       mat: GfxMatrix.Matrix;  (* font matrix *)
-      xmin, ymin, xmax, ymax: INTEGER;  (* union of character bounding boxes *)
+      xmin, ymin, xmax, ymax: SIGNED16;  (* union of character bounding boxes *)
       rfont: Fonts.Font;  (* Oberon raster font (if available) *)
       niceMaps: BOOLEAN;  (* true if returned maps look better than just filled outlines *)
     END;
@@ -470,8 +470,8 @@ needed, which is encapsulated in module GfxFonts.
   VAR
     Default: Font;
   
-  PROCEDURE Open(name: ARRAY OF CHAR; ptsize: INTEGER; mat: GfxMatrix.Matrix): Font;
-  PROCEDURE OpenSize(name: ARRAY OF CHAR; ptsize: INTEGER): Font;
+  PROCEDURE Open(name: ARRAY OF CHAR; ptsize: SIGNED16; mat: GfxMatrix.Matrix): Font;
+  PROCEDURE OpenSize(name: ARRAY OF CHAR; ptsize: SIGNED16): Font;
   PROCEDURE GetWidth(font: Font; ch: CHAR; VAR dx, dy: REAL);
   PROCEDURE GetMap(font: Font; ch: CHAR; VAR x, y, dx, dy: REAL; VAR map: Images.Image);
   PROCEDURE GetOutline(font: Font; ch: CHAR; x, y: REAL; path: GfxPaths.Path);

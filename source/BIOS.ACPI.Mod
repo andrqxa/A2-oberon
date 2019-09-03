@@ -33,7 +33,7 @@ TYPE HPET* = RECORD (Header)
 		addressHigh-: Address;
 	END;
 	hpetNumber-: SIGNED8;
-	mainCounterMinimum-: INTEGER;
+	mainCounterMinimum-: SIGNED16;
 	oemAttribute-: SIGNED8;
 END;
 
@@ -78,7 +78,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END GetTable;
 
 PROCEDURE Initialize-;
-TYPE BiosEBDA = POINTER {UNSAFE} TO RECORD val: INTEGER END;
+TYPE BiosEBDA = POINTER {UNSAFE} TO RECORD val: SIGNED16 END;
 VAR address := 0E0000H: ADDRESS; size := 020000H: SIZE; biosEBDA {UNTRACED}: BiosEBDA;
 
 BEGIN {UNCOOPERATIVE, UNCHECKED}

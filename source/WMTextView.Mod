@@ -865,7 +865,7 @@ TYPE
 
 		(* Inserts a character directly into the text. This should be used by external tools that insert character
 			without the usage of the keyboard, e.g. WMUnicodeMarkerTool) *)
-		PROCEDURE InsertChar(char : Char32) : INTEGER;
+		PROCEDURE InsertChar(char : Char32) : SIGNED16;
 		VAR oneCharString : ARRAY 2 OF Texts.Char32;
 		BEGIN
 			(* Only insert a character into a valid text, that is either utf-formatted or gets a simple ASCII-character
@@ -4361,7 +4361,7 @@ BEGIN
 END TextViewFactory;
 
 (* Inserts a ocharacter from the outside into the current textView's text at its current position *)
-PROCEDURE InsertChar*(newChar : Char32) : INTEGER;
+PROCEDURE InsertChar*(newChar : Char32) : SIGNED16;
 BEGIN
 	IF currentTextView # NIL THEN
 		RETURN currentTextView.InsertChar(newChar);

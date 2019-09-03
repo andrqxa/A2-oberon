@@ -51,7 +51,7 @@ BEGIN
 END Append;
 
 PROCEDURE NewStyle(width: LONGINT; tabs: ARRAY OF CHAR): Objects.Object;
-VAR obj: Objects.Object; res: INTEGER; a: Objects.AttrMsg;
+VAR obj: Objects.Object; res: SIGNED16; a: Objects.AttrMsg;
 BEGIN
 	Objects.NewObj := NIL;
 	Oberon.Call("TextGadgets.NewStyleProc", Oberon.Par, FALSE, res);	(* ignore res *)
@@ -71,7 +71,7 @@ VAR
 	style: Objects.Object;
 	arc: Zip.Archive;
 	ent: Zip.Entry;
-	width: INTEGER;
+	width: SIGNED16;
 	ratio: LONGINT;
 BEGIN
 	arc := Zip.OpenArchive(archive, res);
@@ -123,7 +123,7 @@ PROCEDURE Directory*;
 VAR
 	S: Texts.Scanner; T1, T2: Texts.Text; beg, end, time: LONGINT;
 	details, tabs: BOOLEAN;	(* show details of Entries *)
-	res: WORD; width: INTEGER;
+	res: WORD; width: SIGNED16;
 BEGIN
 	details := FALSE; tabs := FALSE;
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
@@ -150,12 +150,12 @@ BEGIN
 	END
 END Directory;
 
-PROCEDURE doExtract(action: INTEGER;
+PROCEDURE doExtract(action: SIGNED16;
 						arc: Zip.Archive; ent: Zip.Entry; name: ARRAY OF CHAR; VAR tempfile: Files.File;
 						path, overwrite,show: BOOLEAN; VAR res: WORD);
 VAR
 	f, of: Files.File; r: Files.Rider;
-	bakname, temp: ARRAY 256 OF CHAR; res2: INTEGER;
+	bakname, temp: ARRAY 256 OF CHAR; res2: SIGNED16;
 	suf: ARRAY 32 OF CHAR;
 	T : Texts.Text;
 BEGIN
@@ -235,7 +235,7 @@ BEGIN
 	doExtract(OPEN,arc,ent,name,tempfile,path,overwrite,show,res);
 END OpenFile;
 
-PROCEDURE cmdOpenExtract (action: INTEGER);
+PROCEDURE cmdOpenExtract (action: SIGNED16);
 VAR
 	S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT;
 	arc: Zip.Archive; ent: Zip.Entry; name: ARRAY 256 OF CHAR;

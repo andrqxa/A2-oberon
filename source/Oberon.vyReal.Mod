@@ -36,7 +36,7 @@ Report any problems as soon as possible to voyager@statlab.uni-heidelberg.de
 (*! all procedures should include gentle support for NaNs, eg. report nr of NaNs *)
 
 (*base model.  Including  BLAS machar.
-Generate INTEGER, LONGINT, LONGREAL, BOOLEAN from this module
+Generate SIGNED16, LONGINT, LONGREAL, BOOLEAN from this module
 Automatic.Do
 Edit.Open 	:vy:vyBoolean.v0r0a2.Mod
 Edit.Open 	:vy:vyBits.v0r0a2.Mod
@@ -185,7 +185,7 @@ TYPE
 	-----------------------------------------------------------------------*)
 	VAR IBETA-, IEXP-, IRND-, IT-
 	, MACHEP-, MAXEXP-,
-	MINEXP-, NEGEP-, NGRD-: INTEGER;
+	MINEXP-, NEGEP-, NGRD-: SIGNED16;
 	(*S    REAL D    DOUBLE PRECISION*)
 	(*CONV,*)EPS-,
 	EPSNEG-, XMAX-, XMIN-: real;
@@ -193,7 +193,7 @@ TYPE
 
 PROCEDURE Machar;
 	VAR I, J, K, ITEMP, IZ,
-	MX, NXRES: INTEGER;
+	MX, NXRES: SIGNED16;
 	(*S    REAL D    DOUBLE PRECISION*)
 	A, B, BETA, BETAIN, BETAH, ONE, T, TEMP, TEMPA,
 	TEMP1, TWO, Y, Z, ZERO: real;
@@ -204,12 +204,12 @@ PROCEDURE Machar;
 	S    CONV(I) = REAL(I)
 	D    CONV(I) = DBLE(I)*)
 
-PROCEDURE CONV (i: INTEGER): real;
+PROCEDURE CONV (i: SIGNED16): real;
 BEGIN
 	RETURN i
 END CONV;
 
-PROCEDURE INT (r: real): INTEGER;
+PROCEDURE INT (r: real): SIGNED16;
 BEGIN
 	RETURN SHORT(ENTIER(r));  (*! check FORTRAN INT. Watfor uses INT(r)=0 for |r|<1 *)
 END INT;

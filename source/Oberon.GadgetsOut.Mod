@@ -18,7 +18,7 @@ VAR
 	sent to the model.  If gadget = "", output is sent to Oberon.Log. *)
 
 PROCEDURE Open*(gadget: ARRAY OF CHAR);
-VAR obj: Objects.Object;  m: Objects.LinkMsg;  a: Objects.AttrMsg;  i, j: INTEGER;
+VAR obj: Objects.Object;  m: Objects.LinkMsg;  a: Objects.AttrMsg;  i, j: SIGNED16;
 BEGIN
 	IF gadget = "" THEN
 		text := Oberon.Log;  outobj := NIL

@@ -991,7 +991,7 @@ END GetLongint;
 
 (** PutLongint - writes a long integer at offset 'ofs' in 'b' which is assumed to be little endian *)
 PROCEDURE PutLongint*(VAR b: ARRAY OF CHAR; ofs, value: LONGINT);
-VAR i : INTEGER;
+VAR i : SIGNED16;
 BEGIN
 	FOR i := 0 TO 3 DO b[ofs+i] := CHR(value); value := value DIV 100H END
 END PutLongint;

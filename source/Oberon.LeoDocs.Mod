@@ -31,7 +31,7 @@ MODULE LeoDocs IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE Load (doc: Documents.Document);
 		VAR
-			main: LeoFrames.Frame; file: Files.File; r: Files.Rider; tag, ref: INTEGER; name: ARRAY 64 OF CHAR; ch: CHAR;
+			main: LeoFrames.Frame; file: Files.File; r: Files.Rider; tag, ref: SIGNED16; name: ARRAY 64 OF CHAR; ch: CHAR;
 			lib: Objects.Library; len: LONGINT; obj: Objects.Object; ff: Gadgets.Frame; fig: Leonardo.Figure;
 	BEGIN
 		main := NIL;
@@ -69,7 +69,7 @@ MODULE LeoDocs IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE Store (doc: Documents.Document);
 		VAR
-			bak, gen: ARRAY 64 OF CHAR; res: INTEGER; frame: Display.Frame; main: LeoFrames.Frame;
+			bak, gen: ARRAY 64 OF CHAR; res: SIGNED16; frame: Display.Frame; main: LeoFrames.Frame;
 			bm: Objects.BindMsg; file: Files.File; r: Files.Rider; len: LONGINT; sm: StoreMsg;
 	BEGIN
 		Texts.WriteString(W, "Store ");

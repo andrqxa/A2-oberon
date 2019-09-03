@@ -44,7 +44,7 @@ TYPE
 	END Store0;
 
 	PROCEDURE Load0( o: tSamplingScheme;  VAR M: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( M.R, version );  Gadgets.ReadRef( M.R, o.lib, objsub );
 		IF objsub # NIL THEN o.c := objsub( antsMC.Chain ) END;

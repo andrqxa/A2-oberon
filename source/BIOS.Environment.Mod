@@ -14,7 +14,7 @@ CONST MaxMemTop = 80000000H;
 
 CONST TraceV24 = 2; TraceScreen = 0;
 CONST TraceWidth = 80; TraceHeight = 25;
-CONST TraceLen = TraceWidth * SIZEOF (INTEGER);
+CONST TraceLen = TraceWidth * SIZEOF (SIGNED16);
 CONST TraceSize = TraceLen * TraceHeight;
 
 VAR memory: SIZE;
@@ -178,7 +178,7 @@ VAR status: SIZE;
 		adr := traceBase + TraceLen;
 		SYSTEM.MOVE (adr, adr - TraceLen, TraceSize - TraceLen);
 		adr := traceBase + TraceSize - TraceLen;
-		FOR off := 0 TO TraceLen - SIZEOF(INTEGER) BY SIZEOF(INTEGER) DO SYSTEM.PUT16 (adr + off, 100H * 7H + 32) END
+		FOR off := 0 TO TraceLen - SIZEOF(SIGNED16) BY SIZEOF(SIGNED16) DO SYSTEM.PUT16 (adr + off, 100H * 7H + 32) END
 	END Scroll;
 
 BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -204,7 +204,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 				DEC (tracePos, TraceLen)
 			END;
 			SYSTEM.PUT16 (traceBase + tracePos, 100H * traceColor + ORD (c));
-			INC (tracePos, SIZEOF(INTEGER))
+			INC (tracePos, SIZEOF(SIGNED16))
 		END
 	END
 END TraceChar;
@@ -224,7 +224,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 		GetString ("TraceMem", s);
 		p := 0; traceBase := SYSTEM.VAL (ADDRESS, StrToInt (p, s));
 		IF traceBase = 0 THEN traceBase := 0B8000H END;	(* default screen buffer *)
-		FOR off := 0 TO TraceSize - SIZEOF(INTEGER) BY SIZEOF(INTEGER) DO SYSTEM.PUT16 (traceBase + off, 100H * 7H + 32) END;
+		FOR off := 0 TO TraceSize - SIZEOF(SIGNED16) BY SIZEOF(SIGNED16) DO SYSTEM.PUT16 (traceBase + off, 100H * 7H + 32) END;
 		tracePos := 0;
 		CPU.OutByte(3D4H, 0EH);
 		CPU.OutByte(3D5H, (TraceWidth*TraceHeight) DIV 100H);

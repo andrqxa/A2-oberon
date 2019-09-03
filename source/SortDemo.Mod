@@ -14,7 +14,7 @@ CONST
 
 TYPE
 	ElementType = LONGINT;
-	Index = INTEGER;
+	Index = SIGNED16;
 	SortValues = ARRAY N OF ElementType;
 
 	SortArray =  OBJECT (WM.BufferWindow)
@@ -179,7 +179,7 @@ TYPE
 		END Highlight2;
 
 
-		PROCEDURE Randomize( n: INTEGER );
+		PROCEDURE Randomize( n: SIGNED16 );
 		VAR i, j, k: Index;
 			random: Random.Generator;
 			t, d: LONGINT;

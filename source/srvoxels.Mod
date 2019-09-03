@@ -13,7 +13,7 @@ TYPE SREAL=srBase.SREAL;
 
 TYPE marshrunner=OBJECT(srBase.V);
 VAR
-	i,j,k,ii,jj,kk,iii,jjj,kkk,t: INTEGER;
+	i,j,k,ii,jj,kk,iii,jjj,kkk,t: SIGNED16;
 	cost: SREAL;
 	p,q,qq: srBase.PT;
 	corridor, pillar,sky,cage,building,FLOWER, CRIMSONFLOWER, DAISY, BLOOM: MSpace.cell;
@@ -374,9 +374,9 @@ BEGIN
 	srBase.world:=cage;
 END init;
 
-PROCEDURE cylinder(target: MSpace.cell; start, end: PT;  radius: REAL; t:INTEGER; color:COLOR);
+PROCEDURE cylinder(target: MSpace.cell; start, end: PT;  radius: REAL; t:SIGNED16; color:COLOR);
 VAR
-	i: INTEGER;
+	i: SIGNED16;
 	sin,cos: REAL;
 	p,q,normal: PT;
 BEGIN

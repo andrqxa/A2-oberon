@@ -114,7 +114,7 @@ TYPE
 		antsArrayObjects.UniformO( F.V )
 	END DoUniform;
 
-	PROCEDURE EGetENeighboursV*( F: tField;  y, x: LONGINT;  VAR e, p1, p2: INTEGER );
+	PROCEDURE EGetENeighboursV*( F: tField;  y, x: LONGINT;  VAR e, p1, p2: SIGNED16 );
 	BEGIN
 		(*
 	(*
@@ -132,12 +132,12 @@ TYPE
 		e := F.Ev.A[y, x];  p1 := F.A.A[y, x];  p2 := F.A.A[y, (x - 1) MOD F.w]
 	END EGetENeighboursV;
 
-	PROCEDURE EGetENeighboursH*( F: tField;  y, x: LONGINT;  VAR e, p1, p2: INTEGER );
+	PROCEDURE EGetENeighboursH*( F: tField;  y, x: LONGINT;  VAR e, p1, p2: SIGNED16 );
 	BEGIN
 		e := F.Eh.A[y, x];  p1 := F.A.A[y, x];  p2 := F.A.A[(y - 1) MOD F.h, x]
 	END EGetENeighboursH;
 
-	PROCEDURE EGetPNeighbours*( F: tField;  y, x: LONGINT;  VAR p, p1, p2, p3, p4, e1, e2, e3, e4: INTEGER );
+	PROCEDURE EGetPNeighbours*( F: tField;  y, x: LONGINT;  VAR p, p1, p2, p3, p4, e1, e2, e3, e4: SIGNED16 );
 	VAR w, h: LONGINT;
 		(*
 	0    0    1     1	2     2
@@ -153,7 +153,7 @@ TYPE
 		e3 := F.Eh.A[y, x];  e4 := F.Eh.A[(y + 1) MOD h, x]
 	END EGetPNeighbours;
 
-	PROCEDURE ESetPNeighbours*( F: tField;  y, x: LONGINT;  p, p1, p2, p3, p4, e1, e2, e3, e4: INTEGER );
+	PROCEDURE ESetPNeighbours*( F: tField;  y, x: LONGINT;  p, p1, p2, p3, p4, e1, e2, e3, e4: SIGNED16 );
 	VAR w, h: LONGINT;
 	BEGIN
 		w := F.w;  h := F.h;  F.A.A[y, x] := p;  F.A.A[y, (x - 1) MOD w] := p1;  F.A.A[y, (x + 1) MOD w] := p2;
@@ -173,22 +173,22 @@ TYPE
 		END
 	END EEdgeBetween;
 
-	PROCEDURE EVGetENeighboursH*( F: tField;  y, x: LONGINT;  VAR e, p1, p2, v1, v2: INTEGER );
+	PROCEDURE EVGetENeighboursH*( F: tField;  y, x: LONGINT;  VAR e, p1, p2, v1, v2: SIGNED16 );
 	BEGIN
 		EGetENeighboursH( F, y, x, e, p1, p2 );  v1 := F.V.A[y, x];  v2 := F.V.A[y, (x + 1) MOD F.w]
 	END EVGetENeighboursH;
 
-	PROCEDURE EVGetENeighboursV*( F: tField;  y, x: LONGINT;  VAR e, p1, p2, v1, v2: INTEGER );
+	PROCEDURE EVGetENeighboursV*( F: tField;  y, x: LONGINT;  VAR e, p1, p2, v1, v2: SIGNED16 );
 	BEGIN
 		EGetENeighboursH( F, y, x, e, p1, p2 );  v1 := F.V.A[y, x];  v2 := F.V.A[(y + 1) MOD F.h, x]
 	END EVGetENeighboursV;
 
-	PROCEDURE EVGetVNeighbours*( F: tField;  y, x: LONGINT;  VAR v, e1, e2, e3, e4: INTEGER );
+	PROCEDURE EVGetVNeighbours*( F: tField;  y, x: LONGINT;  VAR v, e1, e2, e3, e4: SIGNED16 );
 	BEGIN
 		v := F.V.A[y, x];  e1 := F.Eh.A[y, (x - 1) MOD F.w];  e2 := F.Eh.A[y, x];  e3 := F.Ev.A[(y - 1) MOD F.h, x];  e4 := F.Ev.A[y, x]
 	END EVGetVNeighbours;
 
-	PROCEDURE E2GetENeighboursH*( F: tField;  y, x: LONGINT;  VAR e, e1, e2, e3, e4, e5, e6, e7, e8: INTEGER );
+	PROCEDURE E2GetENeighboursH*( F: tField;  y, x: LONGINT;  VAR e, e1, e2, e3, e4, e5, e6, e7, e8: SIGNED16 );
 	VAR w, h: LONGINT;
 	BEGIN
 		w := F.w;  h := F.h;  e := F.Eh.A[y, x];  e1 := F.Eh.A[y, (x - 1) MOD w];  e2 := F.Eh.A[y, (x + 1) MOD w];
@@ -196,7 +196,7 @@ TYPE
 		e6 := F.Ev.A[y, (x + 1) MOD w];  e7 := F.Eh.A[(y - 1) MOD h, x];  e8 := F.Eh.A[(y + 1) MOD h, x]
 	END E2GetENeighboursH;
 
-	PROCEDURE E2GetENeighboursV*( F: tField;  y, x: LONGINT;  VAR e, e1, e2, e3, e4, e5, e6, e7, e8: INTEGER );
+	PROCEDURE E2GetENeighboursV*( F: tField;  y, x: LONGINT;  VAR e, e1, e2, e3, e4, e5, e6, e7, e8: SIGNED16 );
 	VAR w, h: LONGINT;
 	BEGIN
 		w := F.w;  h := F.h;  e := F.Ev.A[y, x];  e1 := F.Ev.A[(y - 1) MOD h, x];  e2 := F.Ev.A[(y + 1) MOD h, x];
@@ -219,7 +219,7 @@ TYPE
 	END Gen;
 
 	PROCEDURE HandleFileMsg( obj: tField;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 
 	BEGIN
 		IF msg.id = Objects.load THEN

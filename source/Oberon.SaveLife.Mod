@@ -77,24 +77,24 @@ CONST
 	numPseudos = 4;
 
 TYPE
-	RGB = ARRAY 3 OF INTEGER;
-	Fader = ARRAY maxFadeSteps OF INTEGER;
+	RGB = ARRAY 3 OF SIGNED16;
+	Fader = ARRAY maxFadeSteps OF SIGNED16;
 	Generation = POINTER TO ARRAY OF SIGNED8;
 	DisplayList = POINTER TO DisplayListDesc;
 	DisplayListDesc = RECORD
 		next: DisplayList;
-		x, y: INTEGER;	(* position *)
+		x, y: SIGNED16;	(* position *)
 		c: Fader;	(* color table indexes *)
 	END;
 
 VAR
 	savedCmap: ARRAY 256 OF RGB;
 
-	cellWidth, cellHeight: INTEGER;	(* in pixels, of cells drawn to screen *)
+	cellWidth, cellHeight: SIGNED16;	(* in pixels, of cells drawn to screen *)
 
-	screenWidth, screenHeight: INTEGER;	(* in pixels from Display.Width, Display.Height *)
-	xOffset, yOffset: INTEGER;	(* for centering the display incase cellX doesn't divide screenX evenly *)
-	cols, rows: INTEGER;	(* # cells across and down on the screen *)
+	screenWidth, screenHeight: SIGNED16;	(* in pixels from Display.Width, Display.Height *)
+	xOffset, yOffset: SIGNED16;	(* for centering the display incase cellX doesn't divide screenX evenly *)
+	cols, rows: SIGNED16;	(* # cells across and down on the screen *)
 
 	(* offsets to neighbors in 6 of the  8 directions, east and west are constants *)
 	nw, nn, ne : LONGINT;	(* north-west, north, north-east *)
@@ -111,8 +111,8 @@ VAR
 	offscreen: Pictures.Picture;
 
 	(* simulation control *)
-	state: INTEGER;	(* generate | drawList | makeList | update *)
-	step: INTEGER;	(* drawing step, for fading in/out cells *)
+	state: SIGNED16;	(* generate | drawList | makeList | update *)
+	step: SIGNED16;	(* drawing step, for fading in/out cells *)
 	generations: LONGINT;	(* nr of complete generations simulated so far *)
 	times: ARRAY 4 OF LONGINT;	(* time required for generate, draw, update. unit: Input.TimeUnit *)
 	timeStarted: LONGINT;	(* time at which Start was last called, unit Input.TimeUnit() *)
@@ -123,8 +123,8 @@ VAR
 	nrCellsChangedLimit: LONGINT;	(* randomize when nrCellsChanged < nrCellsChangedLimit*)
 
 	timing: BOOLEAN;	(* should timing information be printed out when fader stops? *)
-	frameRate: INTEGER;
-	offscreenMode: INTEGER;	(* 0=never; 1=auto; 2=always *)
+	frameRate: SIGNED16;
+	offscreenMode: SIGNED16;	(* 0=never; 1=auto; 2=always *)
 
 	(* lookup tables for liveness and color: [ liveness (0 or 1),  nr neighbors (0..8) ] *)
 	alive: ARRAY 2, 9 OF SIGNED8;
@@ -132,21 +132,21 @@ VAR
 
 	pseudoToRGBColor: ARRAY numPseudos OF RGB;	(* map pseudo-color to RGB Color *)
 	faderTable: ARRAY numPseudos, numPseudos OF Fader;
-	curFadeSteps: INTEGER;
+	curFadeSteps: SIGNED16;
 	m: REAL; (* with value m [0..1], screen brightness appears at 50%, see CreateMonochromeFade *)
 
 
 	PROCEDURE SetRGB(VAR color: RGB; n: LONGINT);
 	BEGIN ASSERT( (0 <= n) & (n <= 0FFFFFFH), 101);
 		color[2] := SHORT(n MOD 256);
-		color[1] := INTEGER(ASH(n, -8) MOD 256);
-		color[0] := INTEGER(ASH(n, -16));
+		color[1] := SIGNED16(ASH(n, -8) MOD 256);
+		color[0] := SIGNED16(ASH(n, -16));
 	END SetRGB;
 
 	(*------------ Color Map Mangling --------------*)
 
 	PROCEDURE SaveCMap;
-	VAR c: INTEGER;
+	VAR c: SIGNED16;
 	BEGIN
 		FOR c := 0 TO 255 DO
 			Display.GetColor(c, savedCmap[c,0], savedCmap[c,1], savedCmap[c,2])
@@ -155,7 +155,7 @@ VAR
 
 
 	PROCEDURE RestoreCMap;
-	VAR c: INTEGER;
+	VAR c: SIGNED16;
 	BEGIN
 		FOR c := 0 TO 255 DO
 			Display.SetColor(c, savedCmap[c,0], savedCmap[c,1], savedCmap[c,2])
@@ -165,25 +165,25 @@ VAR
 
 	PROCEDURE CustomizeCMap;
 	CONST cmapBase = 16;	(* first writable value of color map *)
-	VAR base: INTEGER;	(* first free color map entry, changes as colormap is filled *)
+	VAR base: SIGNED16;	(* first free color map entry, changes as colormap is filled *)
 
-		PROCEDURE MakeFader(from, to: (* pseudo *) INTEGER);
+		PROCEDURE MakeFader(from, to: (* pseudo *) SIGNED16);
 		TYPE
 			MonochromeFade = ARRAY maxFadeSteps OF REAL;
 		VAR
 			F, T: RGB;
 			fade: ARRAY 3 OF MonochromeFade;
-			i: INTEGER;
-			r, g, b: INTEGER;
+			i: SIGNED16;
+			r, g, b: SIGNED16;
 
 			PROCEDURE CreateMonochromeFade(fromValue, toValue: REAL; VAR f: MonochromeFade);
 			VAR
-				i: INTEGER;
+				i: SIGNED16;
 				fromBrite, toBrite: REAL;
 				dBrite: REAL;
 
 				PROCEDURE Reverse(VAR f: MonochromeFade);
-				VAR i: INTEGER; t: REAL;
+				VAR i: SIGNED16; t: REAL;
 				BEGIN
 					FOR i := 0 TO curFadeSteps DIV 2 - 1 DO
 						t := f[i]; f[i] := f[curFadeSteps-1-i]; f[curFadeSteps-1-i] := t;
@@ -255,7 +255,7 @@ VAR
 
 
 	PROCEDURE MakeDisplayList(all: BOOLEAN);
-	VAR r, c: INTEGER; oldColor, newColor: INTEGER; i: LONGINT;
+	VAR r, c: SIGNED16; oldColor, newColor: SIGNED16; i: LONGINT;
 	BEGIN
 		dlistEnd := dlist;
 		i := cols+2;
@@ -277,9 +277,9 @@ VAR
 	END MakeDisplayList;
 
 
-	PROCEDURE DrawDisplayList(step: INTEGER);
+	PROCEDURE DrawDisplayList(step: SIGNED16);
 
-		PROCEDURE DrawOffscreen(step: INTEGER);
+		PROCEDURE DrawOffscreen(step: SIGNED16);
 		VAR d: DisplayList;
 		BEGIN
 			d := dlist;
@@ -289,7 +289,7 @@ VAR
 			END;
 		END DrawOffscreen;
 
-		PROCEDURE DrawOnscreen(step: INTEGER);
+		PROCEDURE DrawOnscreen(step: SIGNED16);
 		VAR d: DisplayList;
 		BEGIN
 			d := dlist;
@@ -334,9 +334,9 @@ VAR
 	PROCEDURE Randomize(proportion: REAL);
 	CONST range = 10000;
 	VAR
-		r,c: INTEGER;
+		r,c: SIGNED16;
 		i: LONGINT;
-		limit: INTEGER;
+		limit: SIGNED16;
 	BEGIN
 		ASSERT( (0.0 <= proportion) & (proportion <= 1.0), 101);
 		limit := SHORT(ENTIER(range*proportion));
@@ -356,7 +356,7 @@ VAR
 	PROCEDURE RecomputeNeighbors;
 	VAR
 		i: LONGINT;
-		r, c: INTEGER;
+		r, c: SIGNED16;
 		(* neighbor sum for g0[i] *)
 		sum: SIGNED8;
 	BEGIN
@@ -456,7 +456,7 @@ VAR
 
 	PROCEDURE Generate;
 	VAR
-		r,c: INTEGER;
+		r,c: SIGNED16;
 		a: SIGNED8;
 		i: LONGINT;
 		t: Generation;
@@ -508,7 +508,7 @@ VAR
 	*)
 
 	PROCEDURE Calibrate*;
-	VAR ch: CHAR; showingPat: BOOLEAN; level: INTEGER;
+	VAR ch: CHAR; showingPat: BOOLEAN; level: SIGNED16;
 
 		PROCEDURE BWPattern;
 		BEGIN
@@ -517,7 +517,7 @@ VAR
 				Display.replace);
 		END BWPattern;
 
-		PROCEDURE GreyLevel(level: INTEGER);
+		PROCEDURE GreyLevel(level: SIGNED16);
 		BEGIN
 			ASSERT( (0 <= level) & (level <= 255), 101);
 			Display.SetColor(255, level, level, level);
@@ -576,7 +576,7 @@ VAR
 
 
 	PROCEDURE Step;
-	VAR ostate: INTEGER; t: LONGINT;
+	VAR ostate: SIGNED16; t: LONGINT;
 	BEGIN
 		ostate := state;
 		t := Input.Time();
@@ -649,7 +649,7 @@ VAR
 
 
 	PROCEDURE Install*;
-	VAR r: REAL; n: INTEGER; name: ARRAY 64 OF CHAR; color: LONGINT;
+	VAR r: REAL; n: SIGNED16; name: ARRAY 64 OF CHAR; color: LONGINT;
 	BEGIN
 		SaveScreen.InstallFader(Start, Step, Stop);
 

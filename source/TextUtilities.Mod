@@ -424,7 +424,7 @@ TYPE
 			len, hlen, tlen, flen: LONGINT;
 			n, off: SIZE;
 			tempInt, pos: Streams.Position;
-			x, y, w, h: INTEGER;
+			x, y, w, h: SIGNED16;
 			temp: ARRAY 4096 OF CHAR;
 			name, lName: ARRAY 32 OF CHAR;
 			oberonColors : ARRAY 16 OF LONGINT;

@@ -19,8 +19,8 @@ TYPE
 
 
 	(* fill rectangle in pattern *)
-	PROCEDURE FillRect( llx, lly, urx, ury, opacity: INTEGER; VAR data: OType.RasterData0 );
-		VAR x0, x1, h, n: INTEGER;  adr, a: ADDRESS;  mask: SET;  byte: CHAR;
+	PROCEDURE FillRect( llx, lly, urx, ury, opacity: SIGNED16; VAR data: OType.RasterData0 );
+		VAR x0, x1, h, n: SIGNED16;  adr, a: ADDRESS;  mask: SET;  byte: CHAR;
 	BEGIN
 		WITH data: RasterData DO
 			x0 := llx DIV 8;  x1 := urx DIV 8;
@@ -67,8 +67,8 @@ TYPE
 		CONST
 			mode = {OType.Hinted, OType.Width, OType.Raster};
 		VAR
-			file: Files.File;  font: OType.Font;  i, chars, ranges, xmin, ymin, xmax, ymax, j: INTEGER;
-			beg, end: ARRAY 64 OF INTEGER;  data: RasterData;  no, bytes, k: LONGINT;
+			file: Files.File;  font: OType.Font;  i, chars, ranges, xmin, ymin, xmax, ymax, j: SIGNED16;
+			beg, end: ARRAY 64 OF SIGNED16;  data: RasterData;  no, bytes, k: LONGINT;
 			ras: OpenTypeScan.Rasterizer;
 			w: Files.Writer;  ipos, apos: Files.Position;
 			pattern: ARRAY 360*360 DIV 8 OF CHAR;				(* enough for 36 point at 720 dpi *)
@@ -110,7 +110,7 @@ TYPE
 			INC( i )
 		END;
 
-		xmin := MAX(INTEGER); ymin := MAX(INTEGER); xmax := MIN(INTEGER); ymax := MIN(INTEGER);
+		xmin := MAX(SIGNED16); ymin := MAX(SIGNED16); xmax := MIN(SIGNED16); ymax := MIN(SIGNED16);
 		i := 0;
 		WHILE i < ranges DO
 			j := beg[i];
@@ -163,7 +163,7 @@ TYPE
 		RETURN (c >= '0') & (c <= '9')
 	END IsDigit;
 
-	PROCEDURE MakeTtfName( CONST oname: ARRAY OF CHAR; VAR ttfname: Name; VAR size, res: INTEGER );
+	PROCEDURE MakeTtfName( CONST oname: ARRAY OF CHAR; VAR ttfname: Name; VAR size, res: SIGNED16 );
 	VAR i: LONGINT; c: CHAR;
 	BEGIN
 		IF Strings.EndsWith( ".Scn.Fnt", oname ) THEN  res := ScreenDPI
@@ -190,7 +190,7 @@ TYPE
 
 	PROCEDURE ProvideFont*( CONST oname: ARRAY OF CHAR );
 	VAR
-		ttfname: Name;  size, res: INTEGER;  f: Files.File;
+		ttfname: Name;  size, res: SIGNED16;  f: Files.File;
 		font: OType.Font;  inst: OType.Instance;  glyph: OType.Glyph;
 	BEGIN
 		f := Files.Old( oname );
@@ -214,7 +214,7 @@ TYPE
 
 
 	PROCEDURE Allocatable*( CONST oname: ARRAY OF CHAR ): BOOLEAN;
-	VAR f: Files.File;  ttfname: Name;  size, res: INTEGER;
+	VAR f: Files.File;  ttfname: Name;  size, res: SIGNED16;
 	BEGIN
 		f := Files.Old( oname );
 		IF f # NIL THEN  RETURN TRUE

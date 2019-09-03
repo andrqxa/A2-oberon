@@ -34,7 +34,7 @@ TYPE
 	SortList = POINTER TO SortListDesc;
 	SortListDesc = RECORD (vyLinks.LinkDesc)
 		pos: LONGINT;
-		size: INTEGER;
+		size: SIGNED16;
 		frames: vyLinks.Link
 	END;
 
@@ -46,7 +46,7 @@ VAR
 		IF l.link = NIL THEN RETURN NIL ELSE RETURN l.link( SortList ) END
 	END Next;
 
-	PROCEDURE InsertSorted( VAR list: SortList;  f: Display.Frame;  pos: LONGINT;  VAR size: INTEGER );
+	PROCEDURE InsertSorted( VAR list: SortList;  f: Display.Frame;  pos: LONGINT;  VAR size: SIGNED16 );
 	VAR this, next: SortList;  insert: SortList;
 	BEGIN
 		IF list = NIL THEN NEW( list );  list.pos := pos;  list.size := size;  vyLinks.InsertObj( list.frames, f )
@@ -72,7 +72,7 @@ VAR
 		msg.id := outofboundsmodify;  msg.mode := Display.display;  msg.F := f;  msg.res := -1
 	END InitMsg;
 
-	PROCEDURE ShiftTo( f: Display.Frame;  x, y: INTEGER );
+	PROCEDURE ShiftTo( f: Display.Frame;  x, y: SIGNED16 );
 	VAR msg: Display.ModifyMsg;
 	BEGIN
 		InitMsg( f, msg );  msg.dX := x - msg.X;  msg.dY := y - msg.Y;  msg.X := x;  msg.Y := y;
@@ -85,7 +85,7 @@ VAR
 		umsg.F := f;  umsg.id := Display.full;  umsg.device := Display.screen;  umsg.res := -1;  Display.Broadcast( umsg )
 	END Update;
 
-	PROCEDURE Resize*( f: Display.Frame;  w, h: INTEGER );
+	PROCEDURE Resize*( f: Display.Frame;  w, h: SIGNED16 );
 	VAR msg: Display.ModifyMsg;
 	BEGIN
 		IF (f.W = w) & (f.H = h) THEN RETURN END;
@@ -116,7 +116,7 @@ VAR
 
 	PROCEDURE MakePosLists( F: Display.Frame;  VAR xlist, ylist, undeflist: SortList );
 	(* guarantees consitency of width and heights *)
-	VAR c: Display.Frame;  w, h: INTEGER;  posx, posy: LONGINT;
+	VAR c: Display.Frame;  w, h: SIGNED16;  posx, posy: LONGINT;
 	BEGIN
 		c := F.dsc;
 		WHILE c # NIL DO
@@ -136,7 +136,7 @@ VAR
 		RETURN NIL
 	END GetPosList;
 
-	PROCEDURE SizeOfFrame( ref: Display.Frame;  xlist, ylist: SortList;  VAR w, h: INTEGER );
+	PROCEDURE SizeOfFrame( ref: Display.Frame;  xlist, ylist: SortList;  VAR w, h: SIGNED16 );
 	BEGIN
 		w := 0;  h := 0;
 		WHILE xlist # NIL DO
@@ -150,22 +150,22 @@ VAR
 		INC( w, 2 * ref( Panels.Panel ).borderW );  INC( h, 2 * ref( Panels.Panel ).borderW )
 	END SizeOfFrame;
 
-	PROCEDURE SameWidth( link: vyLinks.Link;  width: INTEGER );
+	PROCEDURE SameWidth( link: vyLinks.Link;  width: SIGNED16 );
 	BEGIN
 		WHILE link # NIL DO Resize( link.obj( Display.Frame ), width, link.obj( Display.Frame ).H );  link := link.link END
 	END SameWidth;
 
-	PROCEDURE SameHeight( link: vyLinks.Link;  height: INTEGER );
+	PROCEDURE SameHeight( link: vyLinks.Link;  height: SIGNED16 );
 	BEGIN
 		WHILE link # NIL DO Resize( link.obj( Display.Frame ), link.obj( Display.Frame ).W, height );  link := link.link END
 	END SameHeight;
 
-	PROCEDURE SameXPos( link: vyLinks.Link;  posx: INTEGER );
+	PROCEDURE SameXPos( link: vyLinks.Link;  posx: SIGNED16 );
 	BEGIN
 		WHILE link # NIL DO ShiftTo( link.obj( Display.Frame ), posx, link.obj( Display.Frame ).Y );  link := link.link END
 	END SameXPos;
 
-	PROCEDURE SameYPos( link: vyLinks.Link;  posy: INTEGER );
+	PROCEDURE SameYPos( link: vyLinks.Link;  posy: SIGNED16 );
 	BEGIN
 		WHILE link # NIL DO ShiftTo( link.obj( Display.Frame ), link.obj( Display.Frame ).X, posy );  link := link.link END
 	END SameYPos;
@@ -204,7 +204,7 @@ VAR
 	END NextFreePosition;
 
 	PROCEDURE Position( ref: Panels.Panel;  center: Display.Frame );
-	VAR X, Y, W, H: INTEGER;  xl, yl, ul: SortList;
+	VAR X, Y, W, H: SIGNED16;  xl, yl, ul: SortList;
 	BEGIN
 		MakePosLists( ref, xl, yl, ul );  SizeOfFrame( ref, xl, yl, W, H );  Resize( ref, W, H );  X := ref.borderW;
 		Y := -ref.H + ref.borderW + 1;
@@ -222,7 +222,7 @@ VAR
 	END AdjustPosition;
 
 	PROCEDURE AdjustPositionFromL( ref: Display.Frame;  center: Display.Frame;  x, y: LONGINT );
-	VAR xl, yl, ul: SortList;  l: vyLinks.Link;  W, H: INTEGER;
+	VAR xl, yl, ul: SortList;  l: vyLinks.Link;  W, H: SIGNED16;
 	BEGIN
 		W := center.W;  H := center.H;  MakePosLists( ref, xl, yl, ul );  l := GetPosList( xl, x );
 		IF l # NIL THEN W := xl.size END;

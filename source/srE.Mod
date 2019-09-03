@@ -8,14 +8,14 @@ TYPE SREAL=srBase.SREAL;
 PROCEDURE E*(VAR p: srBase.PT; VAR ijk: srBase.IPT);
 VAR
 	in: ARRAY 3 OF SREAL;
-	out: ARRAY 3 OF INTEGER;
+	out: ARRAY 3 OF SIGNED16;
 BEGIN
 	in[0]:=p.x;in[1]:=p.y; in[2]:=p.z;
 	Eprime(in,out);
 	ijk.i:=out[0]; ijk.j:=out[1]; ijk.k:=out[2];
 END E;
 
-PROCEDURE Eprime(VAR in:ARRAY OF SREAL; VAR out: ARRAY OF INTEGER);
+PROCEDURE Eprime(VAR in:ARRAY OF SREAL; VAR out: ARRAY OF SIGNED16);
 CODE
 #IF I386 THEN
    PUSH  ECX
@@ -38,7 +38,7 @@ Ok:
 Loop:
    DEC   ECX
    FLD   DWORD [ESI+ECX*4]  ; in: SREAL
-   FISTP WORD [EDI+ECX*2]   ; out: INTEGER
+   FISTP WORD [EDI+ECX*2]   ; out: SIGNED16
    FWAIT
 Check:
    CMP   ECX, 0
@@ -69,7 +69,7 @@ Ok:
 Loop:
    DEC   RCX
    FLD   DWORD [RSI+RCX*4]  ; in: SREAL
-   FISTP WORD [RDI+RCX*2]   ; out: INTEGER
+   FISTP WORD [RDI+RCX*2]   ; out: SIGNED16
    FWAIT
 Check:
    CMP   RCX, 0

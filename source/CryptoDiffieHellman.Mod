@@ -9,7 +9,7 @@ TYPE
 				priv: B.BigNumber;
 				initstate: SET32;
 
-				PROCEDURE & Init*( prkeybits: INTEGER;  CONST pname: ARRAY OF CHAR );
+				PROCEDURE & Init*( prkeybits: SIGNED16;  CONST pname: ARRAY OF CHAR );
 				BEGIN
 					ASSERT( (prkeybits > 0) OR (pname # "") );
 					IF pname # "" THEN

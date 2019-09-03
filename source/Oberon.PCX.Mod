@@ -18,14 +18,14 @@ TYPE
 		encoding,	(* 1=Runlength Encoding *)
 		bits: CHAR;	(* Bits/Pixel *)
 		xMin,yMin,xMax,yMax,	(* logical Picture Coordinates *)
-		hRes,vRes: INTEGER;	(* Resolution of the origin device *)
+		hRes,vRes: SIGNED16;	(* Resolution of the origin device *)
 		palPos,picPos: LONGINT;	(* File positon of palette and picture data *)
 		vMode,planes: CHAR;	(* not used *)
 		bytesPerLine,	(* Bytes per Scan-Line *)
-		paletteInfo: INTEGER;	(* Colorinfo: 1=Color, 2=Grayscale *)
+		paletteInfo: SIGNED16;	(* Colorinfo: 1=Color, 2=Grayscale *)
 	END;
 VAR
-	colorMap: ARRAY 256 OF INTEGER;
+	colorMap: ARRAY 256 OF SIGNED16;
 
 PROCEDURE ReadPCXHeader(VAR R: Files.Rider; VAR pcxh: PCXHeader): BOOLEAN;
 	(* Scan the PCX File Header *)
@@ -57,7 +57,7 @@ END ReadPCXHeader;
 
 PROCEDURE ScanCol (VAR R: Files.Rider; pict: Pictures.Picture; nrColor: LONGINT; conversion: BOOLEAN);
 	(* copied from BMP.Mod *)
-VAR Red, Green, Blue: CHAR; C, min, d, x, y, z: LONGINT; i, j, minj: INTEGER; r, g, b: ARRAY 256 OF INTEGER;
+VAR Red, Green, Blue: CHAR; C, min, d, x, y, z: LONGINT; i, j, minj: SIGNED16; r, g, b: ARRAY 256 OF SIGNED16;
 BEGIN
 	C := ASH(1, Display.Depth(0)) - 1;
 	IF nrColor > C THEN nrColor := C ELSE DEC(nrColor) END;
@@ -86,12 +86,12 @@ BEGIN
 	END
 END ScanCol;
 
-PROCEDURE LoadPCX(VAR R: Files.Rider; transparentCol: INTEGER; colorConversion: BOOLEAN; pict: Pictures.Picture);
+PROCEDURE LoadPCX(VAR R: Files.Rider; transparentCol: SIGNED16; colorConversion: BOOLEAN; pict: Pictures.Picture);
 	(* Load the PCX picture information into an Oberon Pictures.Picture *)
 VAR
 	pcxh: PCXHeader;
 	line: POINTER TO ARRAY OF CHAR;
-	x,y,z,w,h,rep: INTEGER;
+	x,y,z,w,h,rep: SIGNED16;
 	k,p: SIGNED8;
 	c: CHAR;
 BEGIN

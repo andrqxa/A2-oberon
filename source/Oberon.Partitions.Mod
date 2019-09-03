@@ -1197,7 +1197,7 @@ BEGIN
 	IF res # Ok THEN
 		Kernel.WriteMemory(ADDRESSOF(buf1[i])-64, 128);
 		Kernel.WriteMemory(ADDRESSOF(buf2[i])-64, 128);
-		HALT(MAX(INTEGER))
+		HALT(MAX(SIGNED16))
 	END
 *)
 END CheckFile;

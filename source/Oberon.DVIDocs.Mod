@@ -114,7 +114,7 @@ CONST
    END Copy;
 
    PROCEDURE Grow*;
-   VAR obj: Objects.Object; DW: INTEGER;
+   VAR obj: Objects.Object; DW: SIGNED16;
    BEGIN
       obj := Gadgets.context;
       WHILE (obj # NIL) & ~((obj IS Desktops.DocGadget) OR

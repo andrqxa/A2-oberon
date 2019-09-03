@@ -49,20 +49,20 @@ TYPE
 	tClass*= POINTER TO tClassDesc;
 	tClassDesc*= RECORD (vyBase.ObjDesc)
 	models: vyLinks.Link;
-	modelcount: INTEGER;
+	modelcount: SIGNED16;
 	END;
 	*)
 
 	tArrayChain* = POINTER TO tArrayChainDesc;
 	tArrayChainDesc* = RECORD
 		A: POINTER TO ARRAY OF ARRAY OF LONGREAL;
-		msize: INTEGER;
+		msize: SIGNED16;
 		next: tArrayChain
 	END;
 
 	(*
 	PROCEDURE Handler* (o: Objects.Object;   VAR M: Objects.ObjMsg);
-	VAR version: INTEGER;
+	VAR version: SIGNED16;
 	BEGIN
 	WITH o: tClass DO
 	WITH M: Objects.AttrMsg DO
@@ -157,8 +157,8 @@ END Try;
 (*
 PROCEDURE GoThrough*;
 VAR A: antsArrayObjects.tObject; m: antsMDimDiscreteIsingS.tModel; link: vyLinks.Link;  (* c: tClass; *) region: antsRegions.tRegion;
-l: antsCommands.tScanList;   obj1,obj2: vyBase.Object; i: INTEGER; min,val: LONGREAL; mini: INTEGER;
-y,x: INTEGER;
+l: antsCommands.tScanList;   obj1,obj2: vyBase.Object; i: SIGNED16; min,val: LONGREAL; mini: SIGNED16;
+y,x: SIGNED16;
 B : antsArrayObjects.tObject;
 c: antsKernel.Kernel;
 BEGIN
@@ -200,8 +200,8 @@ END GoThrough;
 
 PROCEDURE GoThroughSel*;
 	VAR A: antsArrayObjects.tINTEGERObject;   m: antsMDimDiscreteIsingS.tModel;   link: vyLinks.Link;    (* c: tClass; *)region: antsRegions.tRegion;
-	l: antsCommands.tScanList;     obj1: vyBase.Object;   i: INTEGER;   min, val: LONGREAL;   mini: INTEGER;   size, to, curs: LONGINT;
-	y, x: INTEGER;   ty, tx: LONGINT;
+	l: antsCommands.tScanList;     obj1: vyBase.Object;   i: SIGNED16;   min, val: LONGREAL;   mini: SIGNED16;   size, to, curs: LONGINT;
+	y, x: SIGNED16;   ty, tx: LONGINT;
 	B : antsArrayObjects.tINTEGERObject;   tac, taccur: tArrayChain;
 	c: antsKernel.Kernel;
 BEGIN

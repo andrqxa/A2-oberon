@@ -11,7 +11,7 @@ TYPE
 	Clock = OBJECT
 		VAR
 			clockmode: LONGINT;
-			second, minute, hour, day, month, year: INTEGER;
+			second, minute, hour, day, month, year: SIGNED16;
 
 		PROCEDURE ReadClock;
 		BEGIN
@@ -124,7 +124,7 @@ BEGIN
 	RETURN (x DIV 16) * 10 + x MOD 16
 END BCDToInt;
 
-PROCEDURE IntToBCD(x: LONGINT): INTEGER;
+PROCEDURE IntToBCD(x: LONGINT): SIGNED16;
 BEGIN
 	RETURN SHORT((x DIV 10) * 16 + x MOD 10)
 END IntToBCD;

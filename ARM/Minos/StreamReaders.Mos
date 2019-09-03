@@ -139,8 +139,8 @@ TYPE
 		x := SYSTEM.VAL( SIGNED8, Get(r) )
 	END RawSInt;
 
-	(** Read an INTEGER. *)
-	PROCEDURE RawInt*(VAR r: Reader; VAR x: INTEGER );
+	(** Read an SIGNED16. *)
+	PROCEDURE RawInt*(VAR r: Reader; VAR x: SIGNED16 );
 	VAR x0, x1: CHAR;
 	BEGIN
 		x0 := Get(r);  x1 := Get(r);   (* defined order *)

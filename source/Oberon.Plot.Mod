@@ -25,7 +25,7 @@ BEGIN
 END GetValue;
 
 PROCEDURE Plot*;
-VAR y: BasicGadgets.Integer; i: INTEGER;
+VAR y: BasicGadgets.Integer; i: SIGNED16;
 	AmpA, FreqA, AmpB, FreqB, tmp: REAL;
 BEGIN
 	AmpA := GetValue("AmpA", 200); FreqA := GetValue("FreqA", 40);

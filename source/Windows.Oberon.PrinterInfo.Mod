@@ -122,7 +122,7 @@ MODULE PrinterInfo IN Oberon; (** portable *)	(* ejz  *)
 	PROCEDURE Update*;
 		VAR
 			S: Texts.Scanner;
-			res: INTEGER;
+			res: SIGNED16;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 		Texts.Scan(S);
@@ -142,7 +142,7 @@ MODULE PrinterInfo IN Oberon; (** portable *)	(* ejz  *)
 			P: Printer.Printer;
 			t, d: LONGINT;
 			pict: Pictures.Picture;
-			cm1, cm4, left, left1, left2, FrameTop, y, dy, i, r, g, b: INTEGER;
+			cm1, cm4, left, left1, left2, FrameTop, y, dy, i, r, g, b: SIGNED16;
 			cm: BOOLEAN;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);

@@ -632,7 +632,7 @@ END ChangeByteOrder;
 		MOV [EBX], AL
 	END Portin8;
 
-	PROCEDURE Portin16*(port: LONGINT; VAR val: INTEGER);
+	PROCEDURE Portin16*(port: LONGINT; VAR val: SIGNED16);
 	CODE
 		MOV EDX, [EBP+port]
 		IN AX, DX
@@ -655,7 +655,7 @@ END ChangeByteOrder;
 		OUT DX, AL
 	END Portout8;
 
-	PROCEDURE Portout16*(port: LONGINT; val: INTEGER);
+	PROCEDURE Portout16*(port: LONGINT; val: SIGNED16);
 	CODE
 		MOV AX, [EBP+val]
 		MOV EDX, [EBP+port]
@@ -711,7 +711,7 @@ END ChangeByteOrder;
 		MOV [RCX], AL
 	END Portin8;
 
-	PROCEDURE Portin16*(port: LONGINT; VAR val: INTEGER);
+	PROCEDURE Portin16*(port: LONGINT; VAR val: SIGNED16);
 	CODE
 		MOV EDX, [RBP+port]
 		IN AX, DX
@@ -734,7 +734,7 @@ END ChangeByteOrder;
 		OUT DX, AL
 	END Portout8;
 
-	PROCEDURE Portout16*(port: LONGINT; val: INTEGER);
+	PROCEDURE Portout16*(port: LONGINT; val: SIGNED16);
 	CODE
 		MOV AX, [RBP+val]
 		MOV EDX, [RBP+port]

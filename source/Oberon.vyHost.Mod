@@ -113,8 +113,8 @@ CONST idversion* = "vyHost Oberon S3 0.1d3";   (* may be maintained or changed b
 TYPE
 	(** voyager specific **)
 	Index* = LONGINT;  	(*= index type for open arrays *)
-	(*	Coordinate*=INTEGER; 	(*= type used for output coordinates *)
-	Color*= INTEGER;
+	(*	Coordinate*=SIGNED16; 	(*= type used for output coordinates *)
+	Color*= SIGNED16;
 	RealNumber*=LONGREAL;  (*= base type for numerics and 2d coordinates*)
 
 	FilesReader*=Files.Rider;
@@ -126,7 +126,7 @@ TYPE
 	(** basic graphic types *)
 	tCoordinate* = POINTER TO tCoordinateDesc;
 	tCoordinateDesc* = RECORD
-	x0*, y0*,w0*,h0*: INTEGER
+	x0*, y0*,w0*,h0*: SIGNED16
 	END;
 	tRegion2d* = POINTER TO tRegion2dDesc;
 	tRegion2dDesc* = RECORD
@@ -136,10 +136,10 @@ TYPE
 
 	tCoordinate2d* = POINTER TO tCoordinate2dDesc;
 	tCoordinate2dDesc* = RECORD (tCoordinateDesc)
-	x*, y*, w*, h*: INTEGER; 			(* screen region *)
+	x*, y*, w*, h*: SIGNED16; 			(* screen region *)
 	x2d*, y2d*, w2d*, h2d*: RealNumber; 	(* real world region *)
 	xFact*, yFact*: RealNumber;
-	x02d*, y02d*: INTEGER;
+	x02d*, y02d*: SIGNED16;
 	zoomCache*: tRegion2d;
 	END;
 	*)
@@ -183,7 +183,7 @@ TYPE
 VAR
 	(*	ProcToCall:ProcQPtr;
 	countTask: Oberon.Task; *)
-	(*	slow*: INTEGER; 	(*= slow motion factor. All deltas are multiplied by this factor *) *)
+	(*	slow*: SIGNED16; 	(*= slow motion factor. All deltas are multiplied by this factor *) *)
 	ticks-: LONGINT;
 	w: Texts.Writer;
 	(*	(*= basic types, copied from OPT. A generic module will not need to access OPT, but can use these copies *)
@@ -312,7 +312,7 @@ PROCEDURE StringAppendInt* (x, n: LONGINT;  VAR dest: ARRAY OF CHAR;  VAR pos: I
 	(*= LONGINT to character string.
 	append x as string at pos of dest; if n>0, fill with leading spaces;
 	pos is moved to new end *)
-	VAR i: INTEGER;   x0: LONGINT;
+	VAR i: SIGNED16;   x0: LONGINT;
 	a: ARRAY 11 OF CHAR;
 BEGIN
 	i := 0;   (* FOF changed *)
@@ -333,7 +333,7 @@ END StringAppendInt;
 
 PROCEDURE StringAppendHex* (x: LONGINT;  VAR dest: ARRAY OF CHAR;   VAR pos: Index);
 	(* no leading space used *)
-	VAR i: INTEGER;   y: LONGINT;
+	VAR i: SIGNED16;   y: LONGINT;
 	a: ARRAY 10 OF CHAR;
 BEGIN
 	i := 0;
@@ -443,7 +443,7 @@ END Run;
 
 (** For module Oberon **)
 
-PROCEDURE CallWString* (name: ARRAY OF CHAR;   pars: ARRAY OF CHAR;   new: BOOLEAN;   VAR res: INTEGER);
+PROCEDURE CallWString* (name: ARRAY OF CHAR;   pars: ARRAY OF CHAR;   new: BOOLEAN;   VAR res: SIGNED16);
 	(*= call an Oberon command with parameters passed as a string *)
 	VAR par: Oberon.ParList;  	w: Texts.Writer;
 BEGIN Texts.OpenWriter(w);
@@ -461,11 +461,11 @@ BEGIN Texts.OpenWriter(w);
 	Oberon.Call(name, par, new, res)
 END CallWString;
 
-PROCEDURE CallWStringX* (name, pre: ARRAY OF CHAR;   pars: ARRAY OF CHAR;   new: BOOLEAN;   VAR res: INTEGER);
+PROCEDURE CallWStringX* (name, pre: ARRAY OF CHAR;   pars: ARRAY OF CHAR;   new: BOOLEAN;   VAR res: SIGNED16);
 	(*= call an Oberon command with parameters passed as a string.
 	If res is FALSE,add prefix  and try again *)
 	VAR 	name2: ARRAY 32 OF CHAR;
-	i, j: INTEGER;
+	i, j: SIGNED16;
 BEGIN CallWString(name, pars, new, res);   IF res = 0 THEN RETURN END;
 	i := 0;   j := 0;   WHILE pre[i] # 0X DO name2[i] := pre[i];   INC(i) END;
 	j := 0;   WHILE name[j] # 0X DO  name2[i] := name[j];   INC(i);   INC(j) END;
@@ -490,14 +490,14 @@ BEGIN
 RETURN (Reals.IsNaNL(x))
 END IsNaN;
 
-PROCEDURE NaNCode* (x: LONGREAL): INTEGER;
+PROCEDURE NaNCode* (x: LONGREAL): SIGNED16;
 VAR h, l: LONGINT;
 BEGIN
 Reals.NaNCodeL(x, h, l);
 RETURN  SHORT(l)	(*! code high part not yet supported *)
 END NaNCode;
 
-PROCEDURE NaN* (code: INTEGER): LONGREAL;
+PROCEDURE NaN* (code: SIGNED16): LONGREAL;
 VAR x: LONGREAL;
 BEGIN
 RETURN Reals.NaN(code) (*! hack: Reals.NaNL not yet supported in MacOberon 2.3 *)
@@ -511,7 +511,7 @@ END NoNumberNaN;
 
 *)
 
-PROCEDURE XpwrI* (x: REAL;   i: INTEGER): REAL;
+PROCEDURE XpwrI* (x: REAL;   i: SIGNED16): REAL;
 	VAR z: REAL;
 BEGIN IF i < 0 THEN  x := 1 / x;  i := - i END;
 	z := 1;
@@ -535,7 +535,7 @@ BEGIN IF i < 0 THEN  x := 1 / x;  i := - i END;
 	RETURN z
 END XLpwrIL;
 
-PROCEDURE Ten* (i: INTEGER): REAL;
+PROCEDURE Ten* (i: SIGNED16): REAL;
 	(* special case of XpwrI(10.0,i) -- optimize ! Use Reals.Ten*)
 	VAR x, z: REAL;
 BEGIN
@@ -568,18 +568,18 @@ These are high risk routines. They expect that all position and sizes are valid,
 text segment is of expected type*)
 
 PROCEDURE GetString*
- (VAR text: Texts.Text;  pos: LONGINT;   len: INTEGER;   VAR s: ARRAY OF CHAR): BOOLEAN;
-	VAR i: INTEGER;   r: Texts.Reader;  temp: BOOLEAN;
+ (VAR text: Texts.Text;  pos: LONGINT;   len: SIGNED16;   VAR s: ARRAY OF CHAR): BOOLEAN;
+	VAR i: SIGNED16;   r: Texts.Reader;  temp: BOOLEAN;
 BEGIN Texts.OpenReader(r, text, pos);
-	IF len >= LEN(s) THEN len := INTEGER(LEN(s)) - 1;   temp := FALSE
+	IF len >= LEN(s) THEN len := SIGNED16(LEN(s)) - 1;   temp := FALSE
 	ELSE temp := TRUE END;
 	i := 0;   WHILE i < len DO Texts.Read(r, s[i]);   INC(i) END;
 	s[i] := 0X;
 	RETURN temp
 END GetString;
 
-PROCEDURE GetLInt* (VAR text: Texts.Text;  pos: LONGINT;   len: INTEGER;  VAR x: LONGINT): BOOLEAN;
-	VAR i: INTEGER;   r: Texts.Reader;   neg, res: BOOLEAN;  c: CHAR;
+PROCEDURE GetLInt* (VAR text: Texts.Text;  pos: LONGINT;   len: SIGNED16;  VAR x: LONGINT): BOOLEAN;
+	VAR i: SIGNED16;   r: Texts.Reader;   neg, res: BOOLEAN;  c: CHAR;
 BEGIN IF (text = NIL) OR ((pos < 0) OR (len <= 0)) THEN x := 0;   RETURN FALSE END;
 
 	(*! add error check and perform proper test *)
@@ -598,7 +598,7 @@ BEGIN IF (text = NIL) OR ((pos < 0) OR (len <= 0)) THEN x := 0;   RETURN FALSE E
 	RETURN res
 END GetLInt;
 
-PROCEDURE GetInt* (VAR text: Texts.Text;  pos: LONGINT;   len: INTEGER;  VAR x: INTEGER): BOOLEAN;
+PROCEDURE GetInt* (VAR text: Texts.Text;  pos: LONGINT;   len: SIGNED16;  VAR x: SIGNED16): BOOLEAN;
 	VAR res: BOOLEAN;  xl: LONGINT;
 BEGIN res := GetLInt(text, pos, len, xl);
 	IF res THEN 	(*! Add range check *)
@@ -606,7 +606,7 @@ BEGIN res := GetLInt(text, pos, len, xl);
 	ELSE RETURN FALSE END
 END GetInt;
 
-PROCEDURE GetSInt* (VAR text: Texts.Text;  pos: LONGINT;   len: INTEGER;  VAR x: SIGNED8): BOOLEAN;
+PROCEDURE GetSInt* (VAR text: Texts.Text;  pos: LONGINT;   len: SIGNED16;  VAR x: SIGNED8): BOOLEAN;
 	VAR res: BOOLEAN;  xl: LONGINT;
 BEGIN res := GetLInt(text, pos, len, xl);
 	IF res THEN 	(*! Add range check *)
@@ -614,9 +614,9 @@ BEGIN res := GetLInt(text, pos, len, xl);
 	ELSE RETURN FALSE END
 END GetSInt;
 
-PROCEDURE GetLReal* (VAR text: Texts.Text;  pos: LONGINT;   len: INTEGER;
+PROCEDURE GetLReal* (VAR text: Texts.Text;  pos: LONGINT;   len: SIGNED16;
 VAR x: LONGREAL): BOOLEAN;
-	VAR i: INTEGER;   r: Texts.Reader;   more, res, negex: BOOLEAN;  c: CHAR;  pre, post, exp, pow: LONGINT;
+	VAR i: SIGNED16;   r: Texts.Reader;   more, res, negex: BOOLEAN;  c: CHAR;  pre, post, exp, pow: LONGINT;
 	(*xx:ARRAY 2 OF CHAR; *)neg: BOOLEAN;
 BEGIN IF (text = NIL) OR ((pos < 0) OR (len <= 0)) THEN x := 0;   RETURN FALSE END;
 	Texts.OpenReader(r, text, pos);  (*xx[1]:=0X;*)
@@ -671,7 +671,7 @@ BEGIN IF (text = NIL) OR ((pos < 0) OR (len <= 0)) THEN x := 0;   RETURN FALSE E
 		RETURN res;   (**! dummy *)
 	END GetLReal;
 
-	PROCEDURE GetReal* (VAR text: Texts.Text;  pos: LONGINT;   len: INTEGER;
+	PROCEDURE GetReal* (VAR text: Texts.Text;  pos: LONGINT;   len: SIGNED16;
 VAR x: REAL): BOOLEAN;
 	VAR xl: LONGREAL;   res: BOOLEAN;
 BEGIN res := GetLReal(text, pos, len, xl);
@@ -689,7 +689,7 @@ BEGIN
 	(*!show logo*)
 END ShowId;
 
-PROCEDURE DisplayNewPattern* ( x, y: INTEGER;   VAR img: ARRAY OF SET): ADDRESS;
+PROCEDURE DisplayNewPattern* ( x, y: SIGNED16;   VAR img: ARRAY OF SET): ADDRESS;
 BEGIN
 	RETURN Display.NewPattern(x, y, img)
 END  DisplayNewPattern;

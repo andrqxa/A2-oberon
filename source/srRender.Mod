@@ -13,7 +13,7 @@ TYPE SNAP = RECORD
 	lookphi, looktheta : SREAL;
 	aperture: Aperture;
 	x,y,z,cdroll: SREAL;
-	detail: INTEGER;
+	detail: SIGNED16;
 END;
 
 TYPE VoxWindow = OBJECT(WMWindowManager.DoubleBufferWindow)
@@ -34,7 +34,7 @@ VAR
 	movemode: CHAR;
 	raysperframe: LONGINT;
 
-PROCEDURE & New*(W,H, i,j: INTEGER; large: BOOLEAN);
+PROCEDURE & New*(W,H, i,j: SIGNED16; large: BOOLEAN);
 BEGIN
 	Init(W, H, TRUE);
 	raysperframe:=W*H;
@@ -197,11 +197,11 @@ VAR
 	cam: srBase.PT;
 	mode : Raster.Mode;
 	pixel: Raster.Pixel;
-	W,H: INTEGER;
+	W,H: SIGNED16;
 	XLOOK,YLOOK: LONGINT;
 	large: BOOLEAN;
 
-PROCEDURE & init *(w: VoxWindow; width, height: INTEGER; l: BOOLEAN);
+PROCEDURE & init *(w: VoxWindow; width, height: SIGNED16; l: BOOLEAN);
 BEGIN
 	window := w;
 	large:=l;
@@ -616,7 +616,7 @@ VAR
 	cdroll: SREAL;
 	lookray: Ray;
 	rand: Random.Generator;
-	wcount: INTEGER;
+	wcount: SIGNED16;
 	frame, tickframe: LONGINT;
 	frames: ARRAY 10000 OF SNAP;
 	movierecording, movieplaying: BOOLEAN;

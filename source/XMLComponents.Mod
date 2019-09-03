@@ -1099,7 +1099,7 @@ TYPE
 	END NewString;
 
 (*	PROCEDURE DrawClipRect*(ctxt: Gfx.Context; x, y, w, h: LONGINT);
-	VAR llx, lly, urx, ury: INTEGER;
+	VAR llx, lly, urx, ury: SIGNED16;
 	BEGIN
 		IF ctxt IS GfxRaster.Context THEN
 			WITH ctxt: GfxRaster.Context DO

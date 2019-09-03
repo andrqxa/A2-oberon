@@ -729,7 +729,7 @@ BEGIN
 	IF neg THEN val := -val END
 END StrToInt;
 
-PROCEDURE StrToIntPos(VAR str: ARRAY OF CHAR; VAR i: INTEGER): LONGINT;
+PROCEDURE StrToIntPos(VAR str: ARRAY OF CHAR; VAR i: SIGNED16): LONGINT;
 VAR noStr: ARRAY 16 OF CHAR;
 		j: LONGINT;
 BEGIN
@@ -747,7 +747,7 @@ BEGIN
 END StrToIntPos;
 
 PROCEDURE SplitPort(parm: ARRAY OF CHAR;  VAR adr: IP.Adr;  VAR port: LONGINT);
-	VAR pos: INTEGER; i, n: LONGINT;
+	VAR pos: SIGNED16; i, n: LONGINT;
 BEGIN
 	pos := 0;
 	FOR i := 0 TO 3 DO n := StrToIntPos(parm, pos); parm[pos] := '.'; INC(pos) END;
@@ -835,7 +835,7 @@ BEGIN
 END ASCIITransfer;
 
 PROCEDURE Code(VAR s: ARRAY OF CHAR): LONGINT;
-VAR i: INTEGER; a, b, c: LONGINT;
+VAR i: SIGNED16; a, b, c: LONGINT;
 BEGIN
 	a := 0; b := 0; i := 0;
 	WHILE s[i] # 0X DO

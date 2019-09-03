@@ -19,19 +19,19 @@ of characters, each character being a pattern and and metric data.
 		Font* = POINTER TO FontDesc;
 
 		CharDesc* = RECORD (Objects.ObjDesc)	(** The objects in a font library. *)	(* Note: offset used in GetCharObj *)
-			dx*, x*, y*, w*, h*: INTEGER;	(** Character width, pattern offset (x, y), pattern size (w, h). *)
+			dx*, x*, y*, w*, h*: SIGNED16;	(** Character width, pattern offset (x, y), pattern size (w, h). *)
 			pat*: Display.Pattern	(** Character raster data. *)
 		END;
 
 		FontDesc* = RECORD (Objects.LibDesc)
 			type*: SIGNED8;	(** Substitute, font, or metric. *)
-			height*, minX*, maxX*, minY*, maxY*: INTEGER	(** Font height, extremal values of characters in font. *)
+			height*, minX*, maxX*, minY*, maxY*: SIGNED16	(** Font height, extremal values of characters in font. *)
 		END;
 
-		RunRec = RECORD beg, end: INTEGER END;
+		RunRec = RECORD beg, end: SIGNED16 END;
 
 		BoxRec = RECORD
-			dx, x, y, w, h: INTEGER
+			dx, x, y, w, h: SIGNED16
 		END;
 
 	VAR FontId*: CHAR;	(** Initial character of font files (.Fnt). *)
@@ -39,13 +39,13 @@ of characters, each character being a pattern and and metric data.
 			theChar: Char;
 			conv: BOOLEAN;
 
-	PROCEDURE Put1 (VAR a: ADDRESS; x: INTEGER);
+	PROCEDURE Put1 (VAR a: ADDRESS; x: SIGNED16);
 	VAR y: SIGNED8;
 	BEGIN y := SHORT(x); SYSTEM.PUT(a, y); INC(a)
 	END Put1;
 
 	PROCEDURE Put2 (VAR a: ADDRESS; x: LONGINT);
-	VAR y: INTEGER;
+	VAR y: SIGNED16;
 	BEGIN y := SHORT(x); SYSTEM.PUT(a, y); a := a + 2
 	END Put2;
 
@@ -53,13 +53,13 @@ of characters, each character being a pattern and and metric data.
 	BEGIN SYSTEM.PUT(a, x); a := a + SIZE OF ADDRESS
 	END PutAdr;
 
-	PROCEDURE ReadInt (VAR R: Files.Rider; VAR x: INTEGER);
+	PROCEDURE ReadInt (VAR R: Files.Rider; VAR x: SIGNED16);
 	VAR c0: CHAR; s1: SIGNED8;
 	BEGIN Files.Read(R, c0); Files.Read(R, s1); x := s1; x := x * 100H + ORD(c0)
 	END ReadInt;
 
 (*
-	PROCEDURE GetCharObj (L: Objects.Library; ref: INTEGER; VAR obj: Objects.Object);
+	PROCEDURE GetCharObj (L: Objects.Library; ref: SIGNED16; VAR obj: Objects.Object);
 	CODE {SYSTEM.i386}
 		MOV EAX, L[EBP]
 		MOV EAX, 4[EAX]	; Objects.LibDesc ind
@@ -82,7 +82,7 @@ of characters, each character being a pattern and and metric data.
 	END GetCharObj;
 *)
 	(* portable version *)
-	PROCEDURE GetCharObj (L: Objects.Library; ref: INTEGER; VAR obj: Objects.Object);
+	PROCEDURE GetCharObj (L: Objects.Library; ref: SIGNED16; VAR obj: Objects.Object);
 	VAR m: ADDRESS; h1: SIGNED8; h2: ADDRESS; ch: CHAR;
 	BEGIN
 		m := L.ind;
@@ -97,7 +97,7 @@ of characters, each character being a pattern and and metric data.
 	END GetCharObj;
 
 (** Return the character and data of ch in a font. *)
-	PROCEDURE GetChar* (F: Font; ch: CHAR; VAR dx, x, y, w, h: INTEGER; VAR pat: Display.Pattern);
+	PROCEDURE GetChar* (F: Font; ch: CHAR; VAR dx, x, y, w, h: SIGNED16; VAR pat: Display.Pattern);
 	VAR obj: Objects.Object;
 	BEGIN F.GetObj(F, ORD(ch), obj);
 		WITH obj: Char DO
@@ -107,7 +107,7 @@ of characters, each character being a pattern and and metric data.
 
 	PROCEDURE Internalize (F: Font; VAR R: Files.Rider; type: SIGNED8);
 	VAR ch: CHAR;
-			NofRuns, NofBoxes, i, k, l, m: INTEGER;
+			NofRuns, NofBoxes, i, k, l, m: SIGNED16;
 			NofBytes: LONGINT; RasterBase, A, a: ADDRESS;
 			run: ARRAY MaxRuns OF RunRec;
 			box: ARRAY 256 OF BoxRec;

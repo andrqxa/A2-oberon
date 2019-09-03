@@ -289,7 +289,7 @@ TYPE
 	END StoreFXd;
 
 	PROCEDURE LoadFXd( VAR R: Files.Rider;  s: FunctionXd );
-	VAR version: INTEGER;
+	VAR version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadString( R, s.Mapping );
 		IF antsOnTheFly.SetXd( "", s.Mapping ) THEN
@@ -304,7 +304,7 @@ TYPE
 	END StoreF;
 
 	PROCEDURE LoadF( VAR R: Files.Rider;  s: Function );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Gadgets.ReadRef( R, s.lib, objsub );
 		IF objsub # NIL THEN s.of := objsub( Function ) END;

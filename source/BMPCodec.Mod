@@ -16,7 +16,7 @@ TYPE
 	VAR errors : BOOLEAN;
 		in : Streams.Reader;
 		size, reserved, offset, width, height, compression, colors, importantColors, col, redMask, greenMask, blueMask: LONGINT;
-		planes, bpp: INTEGER; pal: Raster.Palette;
+		planes, bpp: SIGNED16; pal: Raster.Palette;
 		img : Raster.Image;
 		decoded : BOOLEAN;
 
@@ -147,7 +147,7 @@ TYPE
 		PROCEDURE WriteImage*(img : Raster.Image; VAR res : WORD);
 		VAR
 			col, redMask, greenMask, blueMask: LONGINT;
-			palentries, dataSize: LONGINT; bpp: INTEGER;
+			palentries, dataSize: LONGINT; bpp: SIGNED16;
 			sm: Strings.Buffer;
 			buf : Streams.Writer;
 			data : Strings.String;

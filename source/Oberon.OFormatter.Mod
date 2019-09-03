@@ -34,7 +34,7 @@ TYPE
 		lastchanged: LONGINT;
 	END;
 VAR
-	sym, level: SIGNED8;  noerr: BOOLEAN;  inFormPar: BOOLEAN;  exprdepth: INTEGER;  sline: INTEGER;  found: BOOLEAN;  silent, notrap: BOOLEAN;
+	sym, level: SIGNED8;  noerr: BOOLEAN;  inFormPar: BOOLEAN;  exprdepth: SIGNED16;  sline: SIGNED16;  found: BOOLEAN;  silent, notrap: BOOLEAN;
 	forceNL: BOOLEAN;  nobp: BreakPoint;
 
 	PROCEDURE debug( s: ARRAY OF CHAR );
@@ -42,22 +42,22 @@ VAR
 		Out.String( s );  Out.Ln;
 	END debug;
 
-	PROCEDURE clearBPS( bps: ssBP;  k: INTEGER );
-	VAR i: INTEGER;
+	PROCEDURE clearBPS( bps: ssBP;  k: SIGNED16 );
+	VAR i: SIGNED16;
 	BEGIN
 		IF bps = NIL THEN RETURN END;
 		FOR i := k TO 9 DO IO.clearBP( bps.bp[i] ) END
 	END clearBPS;
 
 	PROCEDURE DecExprdepth( bps: ssBP );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		DEC( exprdepth );
 		IF exprdepth = 1 THEN clearBPS( bps, 6 ) END
 	END DecExprdepth;
 
 	PROCEDURE getBP( bps: ssBP;  k: SIGNED8 );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		IF bps = NIL THEN RETURN END;
 		CASE k OF
@@ -73,7 +73,7 @@ VAR
 	END getBP;
 
 	PROCEDURE checkLine( bps: ssBP );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		IF (bps # NIL ) & (IO.width >= IO.MaxLineLength) THEN
 			IO.breakLine( bps.fbp );  sline := IO.curLine;
@@ -91,18 +91,18 @@ VAR
 	END checkLine;
 
 	PROCEDURE doForcedNL;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		IF IO.forceNL THEN IO.prepNL;  IO.forceNL := FALSE END
 	END doForcedNL;
 
 	PROCEDURE markIndent;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		IF exprdepth IN {1, 2} THEN IO.markIndent( exprdepth ) END
 	END markIndent;
 
-	PROCEDURE err( n: INTEGER );
+	PROCEDURE err( n: SIGNED16 );
 	BEGIN
 		IF ~silent THEN
 			IO.err( n );  noerr := FALSE;
@@ -110,7 +110,7 @@ VAR
 		END;
 	END err;
 
-	PROCEDURE CheckSym( s: INTEGER );
+	PROCEDURE CheckSym( s: SIGNED16 );
 	BEGIN
 		IF sym = s THEN IO.Get( sym ) ELSE err( s ) END
 	END CheckSym;
@@ -226,7 +226,7 @@ VAR
 	END PointerType;
 
 	PROCEDURE FormalParameters;
-	VAR indent: INTEGER;  bp: BreakPoint;
+	VAR indent: SIGNED16;  bp: BreakPoint;
 	BEGIN
 		IO.prepSP;  inFormPar := TRUE;  exprdepth := 1;  IO.markIndent( exprdepth );  bp := NIL;
 		IF (sym = ident) OR (sym = var) OR (sym = const) THEN
@@ -318,7 +318,7 @@ VAR
 	END Type;
 
 	PROCEDURE ActualParameters( bps: ssBP );
-	VAR line: INTEGER;
+	VAR line: SIGNED16;
 	BEGIN
 		IF sym # rparen THEN
 			IO.prepSP;  line := IO.curLine;  INC( exprdepth );  markIndent;
@@ -552,10 +552,10 @@ VAR
 	END CaseLabelList;
 
 	PROCEDURE StatSeq( bp: BreakPoint;  adj: BOOLEAN );
-	VAR cst: BOOLEAN;  line: INTEGER;  bp1: BreakPoint;  prevbps: ssBP;  withpos: LONGINT;
+	VAR cst: BOOLEAN;  line: SIGNED16;  bp1: BreakPoint;  prevbps: ssBP;  withpos: LONGINT;
 
 		PROCEDURE CasePart;
-		VAR n: INTEGER;  low, high: LONGINT;  e: BOOLEAN;  bp: BreakPoint;
+		VAR n: SIGNED16;  low, high: LONGINT;  e: BOOLEAN;  bp: BreakPoint;
 		BEGIN
 			Expression( NIL );  CheckSym( of );  IO.prepNL;
 			LOOP
@@ -566,7 +566,7 @@ VAR
 		END CasePart;
 
 		PROCEDURE ExpressionAndSym( sym: SIGNED8 );
-		VAR line: INTEGER;
+		VAR line: SIGNED16;
 		BEGIN
 			line := IO.curLine;  exprdepth := 1;  markIndent;  Expression( IO.curbp );  checkLine( IO.curbp );  clearBPS( IO.curbp, 2 );
 			IF sym # null THEN CheckSym( sym ) END;
@@ -700,7 +700,7 @@ VAR
 	END StatSeq;
 
 	PROCEDURE Code;
-	VAR il: LONGINT;  n: INTEGER;  skippedspaces: BOOLEAN;  curline: INTEGER;
+	VAR il: LONGINT;  n: SIGNED16;  skippedspaces: BOOLEAN;  curline: SIGNED16;
 	BEGIN
 		skippedspaces := FALSE;
 		IF sym = lbrace THEN
@@ -897,7 +897,7 @@ VAR
 	VAR caret: Oberon.CaretMsg;  find: Display.LocateMsg;
 	BEGIN
 		WITH t: Task DO
-			find.loc := t.frame;  find.X := MIN( INTEGER );  Display.Broadcast( find );
+			find.loc := t.frame;  find.X := MIN( SIGNED16 );  Display.Broadcast( find );
 			IF ~CheckOnDisplay( t ) THEN Out.String( "OFormatter: Text lost" );  Out.Ln;  Oberon.Remove( t )
 			ELSE
 				caret.id := Oberon.get;  Display.Broadcast( caret );
@@ -952,9 +952,9 @@ VAR
 	END GetOptions;
 
 	PROCEDURE Format*;
-	VAR par: Oberon.ParList;  T: Texts.Text;  F: Files.File;  Sc: Texts.Scanner;  R: Texts.Reader;  res: INTEGER;  beg, end, time: LONGINT;
+	VAR par: Oberon.ParList;  T: Texts.Text;  F: Files.File;  Sc: Texts.Scanner;  R: Texts.Reader;  res: SIGNED16;  beg, end, time: LONGINT;
 		name: ARRAY 256 OF CHAR;
-		print: BOOLEAN;  ch: CHAR;  i: INTEGER;  caret: Oberon.CaretMsg;  color: BOOLEAN;  large: BOOLEAN;  prefix: CHAR;  uppercase, lowercase: BOOLEAN;
+		print: BOOLEAN;  ch: CHAR;  i: SIGNED16;  caret: Oberon.CaretMsg;  color: BOOLEAN;  large: BOOLEAN;  prefix: CHAR;  uppercase, lowercase: BOOLEAN;
 	BEGIN
 		notrap := FALSE;  silent := FALSE;  print := FALSE;  color := TRUE;  forceNL := FALSE;  uppercase := FALSE;  lowercase := FALSE;
 		Texts.OpenScanner( Sc, Oberon.Par.text, Oberon.Par.pos );  Texts.Scan( Sc );  GetOptions( Sc, print, large, color, lowercase, uppercase );

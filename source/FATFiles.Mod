@@ -1231,7 +1231,7 @@ TYPE
 
 		(* TailGeneration - generates a short name that does not collide with an existing long or short name *)
 		PROCEDURE TailGenHandler(f: File; p: Parameter): BOOLEAN;
-		VAR i,k: INTEGER;
+		VAR i,k: SIGNED16;
 			tail: LONGINT;
 		BEGIN
 			WITH p: TailGenParam DO
@@ -1418,7 +1418,7 @@ TYPE
 
 		PROCEDURE WriteFileHeaderX(f: File);
 		VAR data: ARRAY 32 OF CHAR; b, ro, writeLast: BOOLEAN;
-			ofs, i, k, len, numFree, s, ucs: LONGINT; unicode: ARRAY 256 OF INTEGER;
+			ofs, i, k, len, numFree, s, ucs: LONGINT; unicode: ARRAY 256 OF SIGNED16;
 			r: Files.Rider; c, chksum: CHAR; p: SIZE;
 		BEGIN
 			IF (faReadOnly IN attr) THEN EXCL(attr, faReadOnly); ro := TRUE END;
@@ -1476,7 +1476,7 @@ TYPE
 					p := 0; i := 0;
 					REPEAT
 						b := UTF8Strings.DecodeChar(f.long, p, ucs);
-						IF ~b OR (ucs < 0) OR (ucs > MAX(INTEGER)) THEN HALT(ErrInvalidFilename) END;
+						IF ~b OR (ucs < 0) OR (ucs > MAX(SIGNED16)) THEN HALT(ErrInvalidFilename) END;
 						unicode[i] := SHORT(ucs); INC(i)
 					UNTIL (ucs = 0);
 

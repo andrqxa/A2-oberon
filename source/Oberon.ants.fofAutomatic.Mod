@@ -74,7 +74,7 @@ TYPE
 	END;
 
 VAR
-	diag: BOOLEAN;  mintime, maxtime, minchecktime: LONGINT;  tempX: INTEGER;  lastcontext: Objects.Object;  found: BOOLEAN;  tasks: Task;
+	diag: BOOLEAN;  mintime, maxtime, minchecktime: LONGINT;  tempX: SIGNED16;  lastcontext: Objects.Object;  found: BOOLEAN;  tasks: Task;
 	current*, stopped*, demon*: Oberon.Task;  locked*: BOOLEAN;
 
 	PROCEDURE NextLine( text: Texts.Text;  pos: LONGINT ): LONGINT;
@@ -101,7 +101,7 @@ END Equal;
 *)
 
 	PROCEDURE NextCommand( VAR text: Texts.Text;  VAR pos: LONGINT;  execute: BOOLEAN;  VAR bt: LONGINT );
-	VAR S: Texts.Scanner;  res: INTEGER;  time, stop: LONGINT;
+	VAR S: Texts.Scanner;  res: SIGNED16;  time, stop: LONGINT;
 	BEGIN
 		IF current = stopped THEN RETURN END;
 		Oberon.Par.text := text;  Texts.OpenScanner( S, text, pos );
@@ -218,7 +218,7 @@ END Equal;
 	END TCopy;
 
 	PROCEDURE Do*;
-	VAR l: antsCommands.tScanList;  num: LONGINT;  pos: LONGINT;  keys: SET;  x, y: INTEGER;
+	VAR l: antsCommands.tScanList;  num: LONGINT;  pos: LONGINT;  keys: SET;  x, y: SIGNED16;
 		filename: ARRAY 128 OF CHAR;
 		text: Texts.Text;  task: Task;  context: Objects.Object;  timex: LONGINT;
 	BEGIN
@@ -288,8 +288,8 @@ END Equal;
 
 	(*
 PROCEDURE Do*;
-VAR S: Texts.Scanner;  res: INTEGER;  lastpos: LONGINT;  lasttext: Texts.Text;  l: antsCommands.tScanList;  i,num: LONGINT;
-pos: LONGINT;  diag: BOOLEAN;  interactive: BOOLEAN;  keys: SET;  x,y: INTEGER;  filename: ARRAY 128 OF CHAR;
+VAR S: Texts.Scanner;  res: SIGNED16;  lastpos: LONGINT;  lasttext: Texts.Text;  l: antsCommands.tScanList;  i,num: LONGINT;
+pos: LONGINT;  diag: BOOLEAN;  interactive: BOOLEAN;  keys: SET;  x,y: SIGNED16;  filename: ARRAY 128 OF CHAR;
 text: Texts.Text;  adr: LONGINT; orig,new: User32.Rect; disp: Displays.Display; event: Displays.Event;
 BEGIN
 l := antsCommands.ScanFromPar();
@@ -364,8 +364,8 @@ END Do;
 
 (* should be unused *)
 	PROCEDURE Schedule*;
-	VAR S: Texts.Scanner;  res: INTEGER;  lastpos: LONGINT;  lasttext: Texts.Text;  l: antsCommands.tScanList;  i, num: LONGINT;  pos: LONGINT;  diag: BOOLEAN;  keys: SET;
-		x, y: INTEGER;
+	VAR S: Texts.Scanner;  res: SIGNED16;  lastpos: LONGINT;  lasttext: Texts.Text;  l: antsCommands.tScanList;  i, num: LONGINT;  pos: LONGINT;  diag: BOOLEAN;  keys: SET;
+		x, y: SIGNED16;
 		filename: ARRAY 128 OF CHAR;
 		text: Texts.Text;  etime, time: LONGINT;
 	BEGIN
@@ -419,7 +419,7 @@ END Do;
 	END Schedule;
 
 	PROCEDURE Pause*;
-	VAR l: antsCommands.tScanList;  time, etime, num: LONGREAL;  keys: SET;  x, y: INTEGER;
+	VAR l: antsCommands.tScanList;  time, etime, num: LONGREAL;  keys: SET;  x, y: SIGNED16;
 	BEGIN
 		l := antsCommands.ScanFromPar( "[time=INT]" );
 		IF antsCommands.GetRealFromKeyword( l, "time", num ) THEN

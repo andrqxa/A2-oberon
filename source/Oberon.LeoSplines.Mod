@@ -41,7 +41,7 @@ MODULE LeoSplines IN Oberon; (** portable **)	(* eos  *)
 		END;
 
 
-	PROCEDURE GetCoords (s: Spline; VAR xc, yc: ARRAY OF REAL; VAR n: INTEGER);
+	PROCEDURE GetCoords (s: Spline; VAR xc, yc: ARRAY OF REAL; VAR n: SIGNED16);
 		VAR p: Leonardo.Shape;
 	BEGIN
 		p := s.bottom; n := 0;
@@ -86,7 +86,7 @@ MODULE LeoSplines IN Oberon; (** portable **)	(* eos  *)
 	END IncludeElem;
 
 	PROCEDURE CalcBox (s: Spline; VAR mat: GfxMatrix.Matrix);
-		VAR xc, yc: ARRAY GfxPaths.MaxSplinePoints OF REAL; n: INTEGER; data: BoxData; bw: REAL;
+		VAR xc, yc: ARRAY GfxPaths.MaxSplinePoints OF REAL; n: SIGNED16; data: BoxData; bw: REAL;
 	BEGIN
 		Leonardo.GetComponentsBox(s.bottom, s.llx, s.lly, s.urx, s.ury, s.bw);
 		GetCoords(s, xc, yc, n);
@@ -148,7 +148,7 @@ MODULE LeoSplines IN Oberon; (** portable **)	(* eos  *)
 	END DrawElem;
 
 	PROCEDURE Draw (s: Spline; pen: LeoPens.Pen);
-		VAR xc, yc: ARRAY GfxPaths.MaxSplinePoints OF REAL; n: INTEGER; data: DrawData; dx, dy: REAL;
+		VAR xc, yc: ARRAY GfxPaths.MaxSplinePoints OF REAL; n: SIGNED16; data: DrawData; dx, dy: REAL;
 	BEGIN
 		IF (s.bottom # NIL) & (s.bottom # s.top) THEN
 			GetCoords(s, xc, yc, n);
@@ -175,7 +175,7 @@ MODULE LeoSplines IN Oberon; (** portable **)	(* eos  *)
 	END DragElem;
 
 	PROCEDURE Drag (s: Spline; ctxt: Gfx.Context);
-		VAR p: Leonardo.Shape; xc, yc: ARRAY GfxPaths.MaxSplinePoints OF REAL; n: INTEGER; data: DrawData;
+		VAR p: Leonardo.Shape; xc, yc: ARRAY GfxPaths.MaxSplinePoints OF REAL; n: SIGNED16; data: DrawData;
 	BEGIN
 		IF (s.bottom # NIL) & (s.bottom # s.top) THEN
 			p := s.bottom;
@@ -234,7 +234,7 @@ MODULE LeoSplines IN Oberon; (** portable **)	(* eos  *)
 	END ProjectElem;
 
 	PROCEDURE Project (s: Spline; x, y, llx, lly, urx, ury: REAL; VAR px, py: REAL): BOOLEAN;
-		VAR xc, yc: ARRAY GfxPaths.MaxSplinePoints OF REAL; n: INTEGER; data: ProjectData;
+		VAR xc, yc: ARRAY GfxPaths.MaxSplinePoints OF REAL; n: SIGNED16; data: ProjectData;
 	BEGIN
 		IF (s.bottom # NIL) & (s.bottom # s.top) THEN
 			GetCoords(s, xc, yc, n);
@@ -362,7 +362,7 @@ MODULE LeoSplines IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE HandleSpline (obj: Objects.Object; VAR msg: Objects.ObjMsg);
 		VAR
-			c: Spline; ver: LONGINT; i: INTEGER; real, x0, y0, x1, y1, bw: REAL; cm: Objects.CopyMsg;
+			c: Spline; ver: LONGINT; i: SIGNED16; real, x0, y0, x1, y1, bw: REAL; cm: Objects.CopyMsg;
 			s: Leonardo.Shape; bool: BOOLEAN;
 	BEGIN
 		IF msg IS Objects.FileMsg THEN

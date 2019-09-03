@@ -15,7 +15,7 @@ MODULE MultiMail IN Oberon;	(** portable *) (* ejz,  *)
 			i, l, sPatLen: SIZE;
 			R: Texts.Reader;
 			sPat: ARRAY MaxPatLen OF CHAR;
-			sDv: ARRAY MaxPatLen + 1 OF INTEGER;
+			sDv: ARRAY MaxPatLen + 1 OF SIGNED16;
 			ch: CHAR;
 		PROCEDURE CalcDispVec;
 			VAR i, j, d: LONGINT;

@@ -73,7 +73,7 @@ TYPE
 	tFace = POINTER TO tFaceDesc;
 
 	tVertexDesc = RECORD
-		i, j: INTEGER;      		(* vertex coordinates in matrix indices *)
+		i, j: SIGNED16;      		(* vertex coordinates in matrix indices *)
 		between: BOOLEAN;      (* center point *)
 		x, y, z: Real;      		(* vertex coordinates in VRS *)
 		nx, ny, nz: Real;      	(* vertex coordinates in NPS *)
@@ -115,7 +115,7 @@ TYPE
 
 VAR
 	theHLHSRroutine: tPlotRoutine;
-	PHIGS3DError: INTEGER;
+	PHIGS3DError: SIGNED16;
 	lightDirX, lightDirY, lightDirZ: Real;      	(* light direction: this vector have to be normed to 1 *)
 	maxFaces: LONGINT;
 	faceDepths: POINTER TO ARRAY OF LONGREAL;
@@ -126,7 +126,7 @@ VAR
 	(**  general help routines  *)
 
 PROCEDURE StoreMap* (VAR R: Files.Rider;  lib: Objects.Library;  m: tMap);
-	VAR id: INTEGER;
+	VAR id: SIGNED16;
 BEGIN
 	IF m = NIL THEN Files.WriteInt(R, - 1) ELSE Files.WriteInt(R, 0) END;
 	GetRendering(m, id);   Files.WriteInt(R, id);
@@ -141,7 +141,7 @@ BEGIN
 END StoreMap;
 
 PROCEDURE LoadMap* (VAR R: Files.Rider;  lib: Objects.Library;  VAR m: tMap);
-	VAR objsub: Objects.Object;  ver: INTEGER;  id: INTEGER;
+	VAR objsub: Objects.Object;  ver: SIGNED16;  id: SIGNED16;
 BEGIN
 	Files.ReadInt(R, ver);
 	IF ver < 0 THEN m := NIL;  RETURN END;
@@ -159,7 +159,7 @@ BEGIN
 END LoadMap;
 
 PROCEDURE LoadObj* (VAR R: Files.Rider;  lib: Objects.Library;  VAR m: tObject);
-	VAR ver: INTEGER;  map: tMap;
+	VAR ver: SIGNED16;  map: tMap;
 BEGIN
 	Files.ReadInt(R, ver);
 	IF ver < 0 THEN m := NIL;  RETURN END;
@@ -189,7 +189,7 @@ Files.WriteLReal(R,v.nz);
 END WriteVertex0;
 
 PROCEDURE ReadVertex0 (VAR R: Files.Rider; VAR v: tVertex);
-VAR ver: INTEGER;
+VAR ver: SIGNED16;
 BEGIN
 Files.ReadInt(R,ver); IF ver < 0 THEN v := NIL; RETURN END;
 NEW(v);
@@ -348,7 +348,7 @@ END PrefFaceConnection;
 (** ------------  installation of a surface as a geometrical and topological object ------------ *)
 PROCEDURE InstallHalfEdgeDesc (map: tMap;      update: BOOLEAN);
 	(* *)
-	VAR m: vyRealVec.tMatrixChunk;      row, col, i, j: INTEGER;      dx, dy: Real;
+	VAR m: vyRealVec.tMatrixChunk;      row, col, i, j: SIGNED16;      dx, dy: Real;
 	face, lastFace: tFace;      lastVertex: tVertex;     faces: LONGINT; n: LONGINT;
 
 PROCEDURE UpdateSurface;
@@ -382,13 +382,13 @@ BEGIN m := map.mdata.buf;
 END UpdateSurface;
 
 
-PROCEDURE NewFace (i, j: INTEGER;      part: INTEGER): tFace;
+PROCEDURE NewFace (i, j: SIGNED16;      part: SIGNED16): tFace;
 	VAR face: tFace;      sx, sy, sz: Real;         (* triangulating. fof 020527 *)
 
-PROCEDURE NewHalfEdge (i, j, direction: INTEGER): tHalfEdge;
+PROCEDURE NewHalfEdge (i, j, direction: SIGNED16): tHalfEdge;
 	VAR edge: tHalfEdge;
 
-PROCEDURE NewVertex (i, j: INTEGER): tVertex;
+PROCEDURE NewVertex (i, j: SIGNED16): tVertex;
 	(*! region defintion *)
 	VAR v: tVertex;
 BEGIN
@@ -403,7 +403,7 @@ BEGIN
 	RETURN v
 END NewVertex;
 
-PROCEDURE NewCenterVertex (i, j: INTEGER): tVertex;
+PROCEDURE NewCenterVertex (i, j: SIGNED16): tVertex;
 	VAR v: tVertex;
 BEGIN
 	NEW (v);
@@ -853,7 +853,7 @@ END HiddenLineMap;
 (** ------------  the painters algorithm ------------ *)
 PROCEDURE ReplPainter (map: tMap);
 	(*vs 0.0d0   md  10.04.95 12:28:33 *)
-	VAR  face: tFace;     x, y: ARRAY 10 OF Real;     i: INTEGER;     he: tHalfEdge;
+	VAR  face: tFace;     x, y: ARRAY 10 OF Real;     i: SIGNED16;     he: tHalfEdge;
 
 BEGIN ResetDoneMarker (map);
 	face := map.lastFace;
@@ -946,7 +946,7 @@ END SetFaceColor;
 
 PROCEDURE ReplLighting (map: tMap);
 	(*vs 0.0d0   md  10.04.95 12:28:33 *)
-	VAR  face: tFace;     x, y: ARRAY 10 OF Real;     i: INTEGER;     he: tHalfEdge;
+	VAR  face: tFace;     x, y: ARRAY 10 OF Real;     i: SIGNED16;     he: tHalfEdge;
 
 BEGIN
 
@@ -1022,7 +1022,7 @@ END LightingMap;
 (** ------------  painters smooth ligthing plot ------------ *)
 PROCEDURE ReplSmoothLighting (map: tMap);
 	(*vs 0.0d0   md  10.04.95 12:28:33 *)
-	VAR  face: tFace;     xa, ya: ARRAY 10 OF Real;     i: INTEGER;     he: tHalfEdge;
+	VAR  face: tFace;     xa, ya: ARRAY 10 OF Real;     i: SIGNED16;     he: tHalfEdge;
 
 PROCEDURE PaintFace (f: tFace);
 	(*vs 0.0d0   md  19.04.95 09:28:22 *)
@@ -1123,7 +1123,7 @@ END SetFaceNiveauColor;
 
 PROCEDURE ReplNiveauColoring (map: tMap);
 	(*vs 0.0d0   md  10.04.95 12:28:33 *)
-	VAR  face: tFace;     x, y: ARRAY 10 OF Real;     i: INTEGER;     he: tHalfEdge;
+	VAR  face: tFace;     x, y: ARRAY 10 OF Real;     i: SIGNED16;     he: tHalfEdge;
 	m: vyRealVec.tMatrixChunk;     row, col, k, l: LONGINT;     r, min, max: Real;
 BEGIN ResetDoneMarker (map);
 	face := map.lastFace;
@@ -1254,7 +1254,7 @@ BEGIN
 END OpenMap;
 
 (** ------------  set plot attributes ------------ *)
-PROCEDURE SetHLHSRIdentifier* (HLHSRidentifier: INTEGER);
+PROCEDURE SetHLHSRIdentifier* (HLHSRidentifier: SIGNED16);
 	(*vs 0.0d0   md  05.04.95 10:09:39 *)
 BEGIN
 	IF HLHSRidentifier = wireFrameId THEN theHLHSRroutine := WireFrameMap
@@ -1270,12 +1270,12 @@ BEGIN
 	END;
 END SetHLHSRIdentifier;
 
-PROCEDURE SetRendering* (map: tObject;     HLHSRidentifier: INTEGER);
+PROCEDURE SetRendering* (map: tObject;     HLHSRidentifier: SIGNED16);
 	VAR oldmap : tPlotRoutine;
 BEGIN oldmap := theHLHSRroutine;  SetHLHSRIdentifier (HLHSRidentifier);     map.plot := theHLHSRroutine;    theHLHSRroutine := oldmap;
 END SetRendering;
 
-PROCEDURE GetRendering (map: tObject;    VAR HLHSRidentifier: INTEGER);
+PROCEDURE GetRendering (map: tObject;    VAR HLHSRidentifier: SIGNED16);
 	VAR wireFrameMap, niveauLineMap, backFaceColoringMap, painterMap, lightingMap, smoothLightingMap, hiddenLineMap, niveauColoringMap: tPlotRoutine;
 BEGIN
 	wireFrameMap := WireFrameMap ;
@@ -1308,7 +1308,7 @@ BEGIN vyPort.onTheFly := switch END SetInteractiveMode;
 (** ------------- palette stuff ---------------- *)
 
 PROCEDURE InitColorMap;
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 BEGIN
 	FOR i := 0 TO LEN(colorTable) - 1 DO
 		Display.GetColor(colorTable[i], i, i, i)
@@ -1317,7 +1317,7 @@ END InitColorMap;
 
 
 PROCEDURE SetColorMap* (colors: ARRAY OF LONGINT);
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 BEGIN
 	ASSERT(LEN(colors) >= LEN(colorTable));
 	FOR i := 0 TO LEN(colorTable) - 1 DO

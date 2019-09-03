@@ -80,7 +80,7 @@ MODULE SSHClient; 	(** AUTHOR "G.F.";  PURPOSE "Secure Shell"; *)
 
 
 			PROCEDURE EFill;
-		(*	VAR i, j, w: INTEGER; line: Line; char: Char;	*)
+		(*	VAR i, j, w: SIGNED16; line: Line; char: Char;	*)
 			BEGIN
 				(*
 				i := 1; w := cols; char.ch := "E"; char.attr := none;
@@ -451,7 +451,7 @@ Out.String("attr "); Out.Int(attrs[i], 0); Out.Ln()
 				canvas.Fill( canvas.clipRect, bg, WMG.ModeCopy );
 				l := first;
 				WHILE l # top DO
-					l.t := MIN(INTEGER); l.b := MIN(INTEGER); l := l.next
+					l.t := MIN(SIGNED16); l.b := MIN(SIGNED16); l := l.next
 				END;
 				attr := NIL; bottom := dY + rows*boxH;
 				box.t := dY; box.b := dY + boxH; j := 0;
@@ -483,7 +483,7 @@ Out.String("attr "); Out.Int(attrs[i], 0); Out.Ln()
 				END;
 
 				WHILE l # NIL DO
-					l.t := MAX(INTEGER); l.b := MAX(INTEGER); l := l.next
+					l.t := MAX(SIGNED16); l.b := MAX(SIGNED16); l := l.next
 				END;
 
 				IF hasFocus & (cursor.ofs >= 0) & (cursor.ofs < cols) THEN

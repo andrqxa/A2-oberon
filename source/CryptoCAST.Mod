@@ -97,11 +97,11 @@ TYPE
 	PROCEDURE InitKeys( VAR keys: Keys;  CONST src: ARRAY OF CHAR;  len: LONGINT );
 	VAR buf: ARRAY 16 OF CHAR;
 		X, Z: ARRAY 4 OF SET32;
-		x, z: ARRAY 16 OF INTEGER;
+		x, z: ARRAY 16 OF SIGNED16;
 		k: ARRAY 32 OF SET32;
 		i, j: LONGINT;
 
-		PROCEDURE Zz( i: INTEGER;  s: SET32 );
+		PROCEDURE Zz( i: SIGNED16;  s: SET32 );
 		VAR l: LONGINT;
 		BEGIN
 			Z[i DIV 4] := s;  l := S.VAL( LONGINT, s );
@@ -111,7 +111,7 @@ TYPE
 			z[i + 0] := SHORT( l MOD 256 );
 		END Zz;
 
-		PROCEDURE Xx( i: INTEGER;  s: SET32 );
+		PROCEDURE Xx( i: SIGNED16;  s: SET32 );
 		VAR l: LONGINT;
 		BEGIN
 			X[i DIV 4] := s;  l := S.VAL( LONGINT, s );

@@ -28,7 +28,7 @@ TYPE
 VAR
 	Months-: ARRAY 12 OF ARRAY 10 OF CHAR;	(** month's names (January = 0....December=11) *)
 	Days-: ARRAY 7 OF ARRAY 10 OF CHAR;	(** day's names (Moday = 0, .... Sunday = 6) *)
-	NoDays: ARRAY 12 OF INTEGER;
+	NoDays: ARRAY 12 OF SIGNED16;
 	ZeroDateUnix-, ZeroDateRFC868-, ZeroDateNTP-: DateTime;
 
 (** Date and Time functions *)

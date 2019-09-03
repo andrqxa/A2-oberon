@@ -110,7 +110,7 @@ TYPE
 			SELF.vol := vol;
 			resl := 31-SELF.vol DIV 8;
 			resl := resl+256*resl;
-			drv.EsWrCd(reg, SYSTEM.VAL(INTEGER, resl));
+			drv.EsWrCd(reg, SYSTEM.VAL(SIGNED16, resl));
 			CallListener
 		END SetVolume;
 
@@ -155,7 +155,7 @@ TYPE
 		BEGIN
 			IF SELF.muted # muted THEN (* change mute state *)
 				IF muted THEN
-					drv.EsWrCd(reg, SYSTEM.VAL(INTEGER, 8000H))
+					drv.EsWrCd(reg, SYSTEM.VAL(SIGNED16, 8000H))
 				ELSE
 					SetVolume(vol)
 				END;
@@ -174,7 +174,7 @@ TYPE
 			SELF.vol := vol;
 			resl := 63-vol DIV 4;
 			resl := resl+256*resl;
-			drv.EsWrCd(reg, SYSTEM.VAL(INTEGER, resl)); (* Master Out *)
+			drv.EsWrCd(reg, SYSTEM.VAL(SIGNED16, resl)); (* Master Out *)
 			CallListener
 		END SetVolume;
 	END PlayMixerChannel;
@@ -188,7 +188,7 @@ TYPE
 			SELF.vol := vol;
 			resl := vol DIV 16;
 			resl := resl+256*resl;
-			drv.EsWrCd(reg, SYSTEM.VAL(INTEGER, resl)); (* Record Gain *)
+			drv.EsWrCd(reg, SYSTEM.VAL(SIGNED16, resl)); (* Record Gain *)
 			CallListener
 		END SetVolume;
 	END RecMixerChannel;
@@ -197,7 +197,7 @@ TYPE
 	VAR active, free: BOOLEAN;
 		first, last: POINTER TO Bufferlist; (* fast access to buffers *)
 		blistener : SoundDevices.BufferListener;
-		vol : INTEGER;
+		vol : SIGNED16;
 		ratedone : LONGINT; (* for sample rate conversion *)
 
 		pos : LONGINT; (* actual position in buffer *)
@@ -439,9 +439,9 @@ TYPE
 
 		(** Change the Record Source*)
 		(** 0: Microphone, 1: CD IN, 4: LINE IN, 5: STEREO MIX (DEFAULT) *)
-		PROCEDURE SetRecordSource*(i: INTEGER);
+		PROCEDURE SetRecordSource*(i: SIGNED16);
 		BEGIN
-			EsWrCd(1AH, SYSTEM.VAL(INTEGER, i+i*256))
+			EsWrCd(1AH, SYSTEM.VAL(SIGNED16, i+i*256))
 		END SetRecordSource;
 
 		PROCEDURE &Constructor*(irq, base: LONGINT);
@@ -697,7 +697,7 @@ TYPE
 			Machine.Portout32(base+Es1371RegSmprate, SYSTEM.VAL(LONGINT, Es1371DisSrc));
 
 			FOR i := 0 TO 07FH DO
-				EsSrcWrite(SYSTEM.VAL(INTEGER, i), 0)
+				EsSrcWrite(SYSTEM.VAL(SIGNED16, i), 0)
 			END;
 			EsSrcWrite(EsSmpregDac1, SYSTEM.VAL(LONGINT, {8}));
 			EsSrcWrite(EsSmpregDac1+1, SYSTEM.VAL(LONGINT, {14}));
@@ -784,14 +784,14 @@ TYPE
 			EsWrCd(10H, 4040H); (*Line In*)
 			EsWrCd(18H, 4040H); (*PCM Out*)
 
-			EsWrCd(1AH, SYSTEM.VAL(INTEGER, 5+5*256)); (*Record Source Stereo Mix*)
-			EsWrCd(1CH, SYSTEM.VAL(INTEGER, 0+0*256)); (*Record Gain*)
-			EsWrCd(1EH, SYSTEM.VAL(INTEGER, 0)); (*Record Gain Mic*)
+			EsWrCd(1AH, SYSTEM.VAL(SIGNED16, 5+5*256)); (*Record Source Stereo Mix*)
+			EsWrCd(1CH, SYSTEM.VAL(SIGNED16, 0+0*256)); (*Record Gain*)
+			EsWrCd(1EH, SYSTEM.VAL(SIGNED16, 0)); (*Record Gain Mic*)
 
 	(* alternatives:
-			EsWrCd(1AH, SYSTEM.VAL(INTEGER, 0)); (* Record Source Micro *)
-			EsWrCd(1CH, SYSTEM.VAL(INTEGER, 15+15*256)); (*Record Gain*)
-			EsWrCd(1EH, SYSTEM.VAL(INTEGER, 15)); (*Record Gain Mic*)
+			EsWrCd(1AH, SYSTEM.VAL(SIGNED16, 0)); (* Record Source Micro *)
+			EsWrCd(1CH, SYSTEM.VAL(SIGNED16, 15+15*256)); (*Record Gain*)
+			EsWrCd(1EH, SYSTEM.VAL(SIGNED16, 15)); (*Record Gain Mic*)
 	*)
 
 			IF Trace THEN KernelLog.String("Volume initialized"); KernelLog.Ln END
@@ -1087,11 +1087,11 @@ TYPE
 		(* make sure amplitude is in the allowed range *)
 		PROCEDURE Clip(VAR lsigned: LONGINT);
 		BEGIN
-			IF lsigned >MAX(INTEGER) THEN
-				lsigned := MAX(INTEGER)
+			IF lsigned >MAX(SIGNED16) THEN
+				lsigned := MAX(SIGNED16)
 			END;
-			IF lsigned <MIN(INTEGER) THEN
-				lsigned := MIN(INTEGER)
+			IF lsigned <MIN(SIGNED16) THEN
+				lsigned := MIN(SIGNED16)
 			END
 		END Clip;
 
@@ -1123,7 +1123,7 @@ TYPE
 
 			(* fills first or second half of intern buffer *)
 			PROCEDURE Playcopy(from, to : LONGINT);
-			VAR signed : INTEGER;
+			VAR signed : SIGNED16;
 				lsigned, i, j, l : LONGINT;
 				nr : LONGINT; (* ratedone MOD 48000 *)
 				temp : LONGINT;
@@ -1208,9 +1208,9 @@ TYPE
 
 							IF first THEN (* don't have to mix *)
 								FOR l := 0 TO 1 DO
-									signed := SYSTEM.VAL(INTEGER, driver.playchannels[j].sample[2*l]);
+									signed := SYSTEM.VAL(SIGNED16, driver.playchannels[j].sample[2*l]);
 									lsigned := LONG(signed);
-									signed := SYSTEM.VAL(INTEGER, driver.playchannels[j].oldsample[2*l]);
+									signed := SYSTEM.VAL(SIGNED16, driver.playchannels[j].oldsample[2*l]);
 									lsigned := ENTIER((1-driver.playchannels[j].ratedone/48000)*
 									LONG(signed)+(driver.playchannels[j].ratedone/48000)*lsigned+0.5);
 
@@ -1223,15 +1223,15 @@ TYPE
 								END
 							ELSE (* mix with current buffercontent *)
 								FOR l := 0 TO 1 DO
-									signed := SYSTEM.VAL(INTEGER, driver.playchannels[j].sample[2*l]);
+									signed := SYSTEM.VAL(SIGNED16, driver.playchannels[j].sample[2*l]);
 									lsigned := LONG(signed);
-									signed := SYSTEM.VAL(INTEGER, driver.playchannels[j].oldsample[2*l]);
+									signed := SYSTEM.VAL(SIGNED16, driver.playchannels[j].oldsample[2*l]);
 									lsigned := ENTIER((1-driver.playchannels[j].ratedone/48000)*
 									LONG(signed)+(driver.playchannels[j].ratedone/48000)*lsigned+0.5);
 
 									lsigned := lsigned*(driver.playchannels[j].vol) DIV 256 (*DIV 32*);
 
-									signed := SYSTEM.VAL(INTEGER, driver.p2[i+2*l]);
+									signed := SYSTEM.VAL(SIGNED16, driver.p2[i+2*l]);
 									lsigned := LONG(signed) + lsigned;
 
 									Clip(lsigned);
@@ -1268,7 +1268,7 @@ TYPE
 
 			PROCEDURE Reccopy(from, to: LONGINT);
 			VAR sample : Sample;
-				signed : INTEGER;
+				signed : SIGNED16;
 				lsigned, i, j, l : LONGINT;
 				nr : LONGINT; (* ratedone MOD 48000 *)
 
@@ -1301,7 +1301,7 @@ TYPE
 									sample[3] := driver.pr2[i+3];
 
 									FOR l := 0 TO 1 DO
-										signed := SYSTEM.VAL(INTEGER, sample[2*l]);
+										signed := SYSTEM.VAL(SIGNED16, sample[2*l]);
 										lsigned := LONG(signed);
 										lsigned := lsigned*(driver.recordchannels[j].vol) DIV 256;
 										Clip(lsigned);
@@ -1324,8 +1324,8 @@ TYPE
 										END
 									ELSE
 										IF driver.recordchannels[j].nofSubChannels=1 THEN
-											lsigned := SYSTEM.VAL(INTEGER, sample[0]);
-											lsigned := lsigned+SYSTEM.VAL(INTEGER, sample[2]);
+											lsigned := SYSTEM.VAL(SIGNED16, sample[0]);
+											lsigned := lsigned+SYSTEM.VAL(SIGNED16, sample[2]);
 											signed := SHORT(lsigned DIV 2);
 											driver.recordchannels[j].first.content.data[driver.recordchannels[j].pos]
 											:= CHR(signed MOD 256);

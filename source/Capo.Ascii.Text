@@ -33,7 +33,7 @@ Numeric computations deal with numbers. These numbers belong to one of four basi
 This module exports a low-level integer type with 8-bit length, i.e., a SIGNED8.   
 
 1.2 NbrInt16.Mod
-This module exports a low-level integer type with 16-bit length, i.e., an INTEGER.  It has the same structure as that of NbrInt8.
+This module exports a low-level integer type with 16-bit length, i.e., an SIGNED16.  It has the same structure as that of NbrInt8.
 
 1.3 NbrInt32.Mod
 This module exports a low-level integer type with 32-bit length, i.e., a LONGINT.  

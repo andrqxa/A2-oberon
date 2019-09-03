@@ -61,7 +61,7 @@ TYPE
 	tLayerDesc* = RECORD (vyPort.tLayerDesc)
 		bins-: ARRAY maxBins+4096  OF LONGINT;  (* patch fof 0711 *)
 		selectBins-: ARRAY maxBins+4096  OF LONGINT;  (* patch fof 0711 *)
-		nrBins-: INTEGER;
+		nrBins-: SIGNED16;
 		maxBinHeight: LONGINT;
 		leftBound-, rightBound-, offset-: Real;   (* preset left border  , right border ,offset for bins*)
 		leftHist-, rightHist-, width-: Real;   (* used left and right border *)
@@ -102,7 +102,7 @@ VAR
 	END SelectionActor;
 
 	PROCEDURE InstallBins( hist: tLayer );
-	VAR dataRec, sel: vyBase.tVector;  i: LONGINT;  bin: INTEGER;  r, x0, dx: Real;  max, min, maxh, minh: Real;  nans: LONGINT;
+	VAR dataRec, sel: vyBase.tVector;  i: LONGINT;  bin: SIGNED16;  r, x0, dx: Real;  max, min, maxh, minh: Real;  nans: LONGINT;
 	BEGIN
 		IF hist.x # NIL THEN
 			dataRec := hist.x;  vyTypes.VGetMinMax( dataRec, min, max, nans );  hist.nans := nans;
@@ -263,7 +263,7 @@ VAR
 
 	PROCEDURE Respond( hist: tLayer;  VAR event: vyEvents.EventMsg );
 	(*vs 0.0a1 *)  (* md  29.05.95 *)
-	VAR x, y: Coordinate;  x2d, y2d: Real;  pict: vyPort.Picture;  this: INTEGER;
+	VAR x, y: Coordinate;  x2d, y2d: Real;  pict: vyPort.Picture;  this: SIGNED16;
 	BEGIN
 		this := event.gesture;
 		IF (this # vyEvents.EvtLoc) & (this # vyEvents.EvtIdent) THEN RETURN END;
@@ -313,7 +313,7 @@ VAR
 	END Respond;
 
 	PROCEDURE Responsible( histogram: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR priority: INTEGER;
+	VAR priority: SIGNED16;
 	BEGIN
 		priority := vyEvents.PrioNone;
 		IF (event.gesture = vyEvents.EvtIdent) OR (event.gesture = vyEvents.EvtLoc) THEN
@@ -415,7 +415,7 @@ VAR
 	END HandleLinks;
 
 	PROCEDURE Store0( obj: tLayer;  VAR M: Objects.FileMsg );
-	VAR i: INTEGER;
+	VAR i: SIGNED16;
 	BEGIN
 		Gadgets.WriteRef( M.R, obj.lib, obj.x );
 		FOR i := 0 TO maxBins - 1 DO Files.WriteLInt( M.R, obj.bins[i] ) END;
@@ -436,7 +436,7 @@ VAR
 	END Store0;
 
 	PROCEDURE Load0( obj: tLayer;  VAR M: Objects.FileMsg );
-	VAR objsub: Objects.Object;  i: INTEGER;
+	VAR objsub: Objects.Object;  i: SIGNED16;
 	BEGIN
 		dlink := M.dlink;  Gadgets.ReadRef( M.R, obj.lib, objsub );
 		IF (objsub # NIL ) & (objsub IS vyBase.tVector) THEN obj.x := objsub( vyBase.tVector ) END;

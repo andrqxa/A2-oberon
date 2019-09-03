@@ -20,7 +20,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 			fig: Leonardo.Figure;	(* figure containing focus shape *)
 			shape: Leonardo.Shape;	(* focus shape *)
 			px, py: REAL;	(* figure coordinates of caret *)
-			x, y: INTEGER;	(* screen position of caret *)
+			x, y: SIGNED16;	(* screen position of caret *)
 			visible: BOOLEAN;
 		END;
 
@@ -92,7 +92,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 
 	(**--- Tool ---**)
 
-	PROCEDURE DrawCursor (x, y: INTEGER);
+	PROCEDURE DrawCursor (x, y: SIGNED16);
 	BEGIN
 		DEC(x, 4); DEC(y, 6);
 		Effects.OpenCursor(x, y, 9, 20);
@@ -100,7 +100,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 		Display.CopyPattern(Display3.black, CursorFG, x, y, Display.paint)
 	END DrawCursor;
 
-	PROCEDURE FadeCursor (x, y: INTEGER);
+	PROCEDURE FadeCursor (x, y: SIGNED16);
 	BEGIN
 		Effects.CloseCursor
 	END FadeCursor;
@@ -119,8 +119,8 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 		Cursor.Draw := DrawCursor; Cursor.Fade := FadeCursor
 	END InitCursor;
 
-	PROCEDURE FlipCaret (fx, fy: INTEGER; mask: Display3.Mask);
-		VAR mx, my, mw, mh, w, h: INTEGER;
+	PROCEDURE FlipCaret (fx, fy: SIGNED16; mask: Display3.Mask);
+		VAR mx, my, mw, mh, w, h: SIGNED16;
 	BEGIN
 		mx := mask.X; my := mask.Y; mw := mask.W; mh := mask.H;
 		LeoTools.AdjustMask(mask, Focus.frame, fx, fy);
@@ -130,18 +130,18 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 		Focus.visible := ~Focus.visible
 	END FlipCaret;
 
-	PROCEDURE ShowCaret (fx, fy: INTEGER; mask: Display3.Mask);
+	PROCEDURE ShowCaret (fx, fy: SIGNED16; mask: Display3.Mask);
 	BEGIN
 		IF ~Focus.visible THEN FlipCaret(fx, fy, mask) END
 	END ShowCaret;
 
-	PROCEDURE HideCaret (fx, fy: INTEGER; mask: Display3.Mask);
+	PROCEDURE HideCaret (fx, fy: SIGNED16; mask: Display3.Mask);
 	BEGIN
 		IF Focus.visible THEN FlipCaret(fx, fy, mask) END
 	END HideCaret;
 
 	PROCEDURE Show (frame: LeoFrames.Frame; VAR msg: Display.FrameMsg);
-		VAR fx, fy: INTEGER; mask: Display3.Mask;
+		VAR fx, fy: SIGNED16; mask: Display3.Mask;
 	BEGIN
 		IF ~Focus.visible THEN
 			fx := msg.x + frame.X; fy := msg.y + frame.Y;
@@ -151,7 +151,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 	END Show;
 
 	PROCEDURE Hide (frame: LeoFrames.Frame; VAR msg: Display.FrameMsg);
-		VAR fx, fy: INTEGER; mask: Display3.Mask;
+		VAR fx, fy: SIGNED16; mask: Display3.Mask;
 	BEGIN
 		IF Focus.visible THEN
 			fx := msg.x + frame.X; fy := msg.y + frame.Y;
@@ -174,7 +174,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 	END GetText;
 
 	PROCEDURE ConsumeText (fig: Leonardo.Figure; text: Texts.Text; beg, end: LONGINT);
-		VAR r: Texts.Reader; ch: CHAR; res: INTEGER;
+		VAR r: Texts.Reader; ch: CHAR; res: SIGNED16;
 	BEGIN
 		IF fig = Focus.fig THEN
 			Leonardo.DisableUpdate(fig); Leonardo.BeginCommand(fig);
@@ -223,7 +223,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE Track (frame: LeoFrames.Frame; VAR msg: Oberon.InputMsg);
 		VAR
-			fx, fy, mx, my, x, y, len: INTEGER; px, py: REAL; keysum, keys, state: SET; done: BOOLEAN; text: Texts.Text;
+			fx, fy, mx, my, x, y, len: SIGNED16; px, py: REAL; keysum, keys, state: SET; done: BOOLEAN; text: Texts.Text;
 			beg, end, time: LONGINT; tool: LeoTools.Tool; mask: Display3.Mask; s: ARRAY 128 OF CHAR;
 	BEGIN
 		IF msg.keys = {} THEN

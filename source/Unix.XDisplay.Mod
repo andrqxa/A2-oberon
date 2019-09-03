@@ -28,7 +28,7 @@ VAR
 TYPE
 
 	RGB =	RECORD
-				r, g, b: INTEGER
+				r, g, b: SIGNED16
 			END;
 
 
@@ -310,7 +310,7 @@ TYPE
 					END;
 				END IndexToColor;
 
-				PROCEDURE SetColor*( col, red, green, blue: INTEGER );   (* 0 <= col, red, green, blue < 256 *)
+				PROCEDURE SetColor*( col, red, green, blue: SIGNED16 );   (* 0 <= col, red, green, blue < 256 *)
 				VAR xcol: X11.Color;  res: WORD;
 				BEGIN
 					IF (col < 0) OR (col > 255) THEN  RETURN   END;
@@ -327,7 +327,7 @@ TYPE
 					Machine.Release( Machine.X11 )
 				END SetColor;
 
-				PROCEDURE GetColor*( col: INTEGER;  VAR red, green, blue: INTEGER );
+				PROCEDURE GetColor*( col: SIGNED16;  VAR red, green, blue: SIGNED16 );
 				BEGIN
 					IF (0 <= col) & (col <= 255) THEN
 						red := rgb[col].r;  green := rgb[col].g;  blue := rgb[col].b
@@ -455,8 +455,8 @@ VAR
 	imgBuffer: POINTER TO ARRAY OF CHAR;
 
 
-	PROCEDURE ColorToIndex0( disp: Display; col: LONGINT ): INTEGER;
-	VAR idx, i: INTEGER;  r, g, b, min, x, y, z, d: LONGINT;  rc: RGB;
+	PROCEDURE ColorToIndex0( disp: Display; col: LONGINT ): SIGNED16;
+	VAR idx, i: SIGNED16;  r, g, b, min, x, y, z, d: LONGINT;  rc: RGB;
 	BEGIN
 		r := ASH( col, -16 ) MOD 100H;  g := ASH( col, -8 ) MOD 100H;  b := col MOD 100H;
 		i := 0;  idx := 0;  min := MAX( LONGINT );
@@ -594,7 +594,7 @@ VAR
 
 	PROCEDURE NewPattern( d: Display;
 							CONST image: ARRAY OF SET;
-							width, height: INTEGER ): X11.Pattern;
+							width, height: SIGNED16 ): X11.Pattern;
 	VAR
 		pixmap: X11.Pixmap;  pat {UNTRACED}: X11.PatternPtr;
 		w, h, i, j, b, dest, srcw, destb, srci, desti: LONGINT;
@@ -648,7 +648,7 @@ VAR
 	END InitNames;
 
 	PROCEDURE getDisplayName;
-	VAR adr: ADDRESS;  i: INTEGER;  ch: CHAR;
+	VAR adr: ADDRESS;  i: SIGNED16;  ch: CHAR;
 	BEGIN
 		Unix.GetArgval( "-display", dispname );
 		IF dispname = "" THEN
@@ -683,7 +683,7 @@ VAR
 
 
 	PROCEDURE CreateColors( d: Display );
-	VAR col: INTEGER;
+	VAR col: SIGNED16;
 		visualInfo: X11.VisualInfo;
 	BEGIN
 		Machine.Acquire( Machine.X11 );
@@ -711,7 +711,7 @@ VAR
 
 
 	PROCEDURE InitPalette( d: Display );
-	VAR f: Files.File;  r: Files.Reader;  red, green, blue: CHAR;  i, cols: INTEGER;
+	VAR f: Files.File;  r: Files.Reader;  red, green, blue: CHAR;  i, cols: SIGNED16;
 	BEGIN
 		IF d.depth >= 8 THEN cols := 256 ELSE cols := 16 END;
 		f := Files.Old( "Default.Pal" );
@@ -729,7 +729,7 @@ VAR
 	PROCEDURE SuppressX11Cursors( d: Display );
 	VAR
 		fg, bg: X11.Color;  src {UNTRACED}, msk {UNTRACED}: X11.PatternPtr;
-		image: ARRAY 17 OF SET;  i: INTEGER;
+		image: ARRAY 17 OF SET;  i: SIGNED16;
 		noCursor: X11.Cursor;
 	BEGIN
 		fg.red := 256*d.rgb[FG].r;  fg.green := 256*d.rgb[FG].g;  fg.blue := 256*d.rgb[FG].b;

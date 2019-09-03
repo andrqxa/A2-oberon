@@ -105,7 +105,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 			op*: WORD;	(** compositing operation **)
 			col*: Pixel;	(** substitute color used when transfering from pure alpha formats to colored ones **)
 			buf: Pixel;	(* constant area for special-case moving *)
-			map: POINTER TO ARRAY OF INTEGER;	(* color map for transfer between indexed formats *)
+			map: POINTER TO ARRAY OF SIGNED16;	(* color map for transfer between indexed formats *)
 		END;
 
 		TransferProc* = PROCEDURE (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
@@ -1227,7 +1227,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END Copy16;
 
 	PROCEDURE I16CopyI16 (VAR mode: Mode0; sadr: ADDRESS; sbit: SIZE; dadr: ADDRESS; dbit, len: SIZE);
-		VAR val: INTEGER;
+		VAR val: SIGNED16;
 	BEGIN
 		WHILE len > 0 DO
 			val:=SYSTEM.GET16(sadr); SYSTEM.PUT16(dadr, mode.map[val MOD 10000H]);

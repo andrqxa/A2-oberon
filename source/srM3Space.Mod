@@ -49,7 +49,7 @@ END bounds;
 
 PROCEDURE fill*(v: Voxel);
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 2 DO FOR j := 0 TO 2 DO FOR k:= 0 TO 2 DO
 		blox[i,j,k] := v
@@ -58,7 +58,7 @@ END fill;
 
 PROCEDURE erase*;
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 2 DO FOR j := 0 TO 2 DO FOR k:= 0 TO 2 DO
 		blox[i,j,k] := NIL; nblox[i,j,k].filled := FALSE; threeblox[i,j,k] := NIL;
@@ -68,7 +68,7 @@ END erase;
 
 PROCEDURE fillwithprobability*(v: Voxel; p: SREAL);
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 2 DO FOR j := 0 TO 2 DO FOR k:= 0 TO 2 DO
 		IF srBase.rand.Uniform()<p THEN blox[i,j,k] := v END
@@ -77,7 +77,7 @@ END fillwithprobability;
 
 PROCEDURE fillchequer*(v,w: Voxel);
 VAR
-	i,j,k: INTEGER;
+	i,j,k: SIGNED16;
 BEGIN
 	FOR i := 0 TO 2 DO FOR j := 0 TO 2 DO FOR k:= 0 TO 2 DO
 		IF ODD(i+j+k) THEN blox[i,j,k] := v ELSE blox[i,j,k] := w END
@@ -117,7 +117,7 @@ VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
 	drx, dry, drz, dr,rr,gr,br,bl: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 BEGIN
@@ -289,7 +289,7 @@ VAR
 	oldxyz: srBase.PT;
 	ijk: srBase.IPT;
 	drx, dry, drz: SREAL;
-	di, dj, dk: INTEGER;
+	di, dj, dk: SIGNED16;
 	out: BOOLEAN;
 	v: Voxel;
 	killed: BOOLEAN;

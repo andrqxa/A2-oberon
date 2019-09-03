@@ -13,22 +13,22 @@ CONST
 
 TYPE
 	FontInfo = RECORD	(* Version 2.0 *)
-		version: INTEGER;
+		version: SIGNED16;
 		size: LONGINT;
 		copyright: ARRAY 60 OF CHAR;
-		type: INTEGER;
-		points: INTEGER;
-		vertRes, horizRes: INTEGER;
-		ascent: INTEGER;
-		internalLeading, externalLeading: INTEGER;
+		type: SIGNED16;
+		points: SIGNED16;
+		vertRes, horizRes: SIGNED16;
+		ascent: SIGNED16;
+		internalLeading, externalLeading: SIGNED16;
 		italic, underline, strikeOut: CHAR;
-		weight: INTEGER;
+		weight: SIGNED16;
 		charSet: CHAR;
-		pixWidth, pixHeight: INTEGER;
+		pixWidth, pixHeight: SIGNED16;
 		pitchAndFamily: CHAR;
-		avgWidth, maxWidth: INTEGER;
+		avgWidth, maxWidth: SIGNED16;
 		firstChar, lastChar, defaultChar, breakChar: CHAR;
-		widthBytes: INTEGER;
+		widthBytes: SIGNED16;
 		device: LONGINT;
 		face: LONGINT;
 		bitsPointer: LONGINT;
@@ -37,15 +37,15 @@ TYPE
 	END;
 
 	CharEntry = RECORD
-		width: INTEGER;
-		offs: INTEGER;
+		width: SIGNED16;
+		offs: SIGNED16;
 	END;
 
 VAR
 	oname: ARRAY 64 OF CHAR;
 	Info: FontInfo;
 	CharTab: ARRAY 257 OF CharEntry; (* one dummy entry at the end *)
-	PowTwo: ARRAY 9 OF INTEGER; (* 2^0 .. 2^8 *)
+	PowTwo: ARRAY 9 OF SIGNED16; (* 2^0 .. 2^8 *)
 	C: ARRAY 50 OF LONGINT;	(* DOS Stub and New Executable Header *)
 
 PROCEDURE Append (VAR s: ARRAY OF CHAR; suff: ARRAY OF CHAR);
@@ -57,34 +57,34 @@ BEGIN
 	s[i] := 0X;
 END Append;
 
-PROCEDURE WriteStringFix (VAR out: Files.Rider; s: ARRAY OF CHAR; len: INTEGER);
-	VAR i: INTEGER; ch: CHAR;
+PROCEDURE WriteStringFix (VAR out: Files.Rider; s: ARRAY OF CHAR; len: SIGNED16);
+	VAR i: SIGNED16; ch: CHAR;
 BEGIN i := 0;
 	REPEAT ch := s[i]; Files.Write(out, ch); INC(i) UNTIL ch = 0X;
 	ASSERT(i < len);
 	WHILE i < len DO Files.Write(out, 0X); INC(i) END;
 END WriteStringFix;
 
-PROCEDURE Do (VAR R, out: Files.Rider; face: ARRAY OF CHAR; size: INTEGER; style: INTEGER; res: INTEGER);
+PROCEDURE Do (VAR R, out: Files.Rider; face: ARRAY OF CHAR; size: SIGNED16; style: SIGNED16; res: SIGNED16);
 	CONST
 		True = 1X; False = 0X;
 	TYPE
-		RunRec = RECORD beg, end: INTEGER END;
-		BoxRec = RECORD dx, x, y, w, h: INTEGER END;
+		RunRec = RECORD beg, end: SIGNED16 END;
+		BoxRec = RECORD dx, x, y, w, h: SIGNED16 END;
 	VAR
-		height, minX, maxX, minY, maxY, maxDX: INTEGER;
-		NofRuns, NofBoxes: INTEGER;
-		i, j, k, l, m, n, r, dx, x, y, w, h: INTEGER;
-		ascii: INTEGER;
+		height, minX, maxX, minY, maxY, maxDX: SIGNED16;
+		NofRuns, NofBoxes: SIGNED16;
+		i, j, k, l, m, n, r, dx, x, y, w, h: SIGNED16;
+		ascii: SIGNED16;
 		run: ARRAY 16 OF RunRec;
 		box: ARRAY 256 OF BoxRec;
 		ch, raster: CHAR;
 		map: POINTER TO ARRAY OF ARRAY OF CHAR;	(* raster font bitmap *)
-		bitmapH: INTEGER;	(* height of map in pixels *)
-		bitmapW: INTEGER;	(* width of map in bytes *)
-		bitmapX: INTEGER;	(* current offset in map from left, in bytes *)
-		charW: INTEGER;
-		bitY, bitX: INTEGER;
+		bitmapH: SIGNED16;	(* height of map in pixels *)
+		bitmapW: SIGNED16;	(* width of map in bytes *)
+		bitmapX: SIGNED16;	(* current offset in map from left, in bytes *)
+		charW: SIGNED16;
+		bitY, bitX: SIGNED16;
 		fix: Files.Rider;
 		FaceFixup1, FaceFixup2, FONTSizeFixup1, FONTSizeFixup2, BitsFixup, mapPos: LONGINT;
 		FontDirStartFix, FontStartFixup: LONGINT;
@@ -135,7 +135,7 @@ BEGIN
 	Info.breakChar := SPC;
 
 	l := 0;
-	maxDX := MIN(INTEGER); bitmapW := 0;
+	maxDX := MIN(SIGNED16); bitmapW := 0;
 	WHILE l # NofBoxes DO
 		Files.ReadInt(R, dx); box[l].dx := dx;
 		IF maxDX < dx THEN maxDX := dx END;
@@ -334,8 +334,8 @@ BEGIN
 END Do;
 
 
-PROCEDURE ParseName (VAR name, faceName: ARRAY OF CHAR; VAR res, size, style: INTEGER);
-	VAR i, j: INTEGER; fonttype: ARRAY 6 OF CHAR;
+PROCEDURE ParseName (VAR name, faceName: ARRAY OF CHAR; VAR res, size, style: SIGNED16);
+	VAR i, j: SIGNED16; fonttype: ARRAY 6 OF CHAR;
 BEGIN
 	(* face name in Windows raster font is Oberon font name *)
 	COPY(name, faceName);
@@ -366,7 +366,7 @@ END ParseName;
 
 PROCEDURE Convert*;	(** { OberonFontFile => [Path]WindowsFontFile } ~ **)
 	VAR F, f: Files.File; R, r: Files.Rider;
-		size, res, style: INTEGER; ch: CHAR;
+		size, res, style: SIGNED16; ch: CHAR;
 		face, wname: ARRAY 64 OF CHAR;
 		S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT;
 BEGIN

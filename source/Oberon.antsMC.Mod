@@ -337,7 +337,7 @@ END RSetSeed;
 	END StoreSeed;
 
 	PROCEDURE LoadSeed( VAR R: Files.Rider;  VAR s: Seed;  allocs: vyRanBase.tRandom );
-	VAR pos, val: LONGINT;  insert: Seed;  version: INTEGER;
+	VAR pos, val: LONGINT;  insert: Seed;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );
 		IF version < 1 THEN
@@ -358,7 +358,7 @@ END RSetSeed;
 	END LoadSeed;
 
 	PROCEDURE Load( VAR R: Files.Rider;  s: Chain );
-	VAR objsub: Objects.Object;  version: INTEGER;
+	VAR objsub: Objects.Object;  version: SIGNED16;
 	BEGIN
 		IF stop THEN HALT( 100 ) END;
 		Files.ReadInt( R, version );  Gadgets.ReadRef( R, s.lib, objsub );

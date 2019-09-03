@@ -40,7 +40,7 @@ TYPE
 		END New;
 
 		PROCEDURE GetPacket16(pos : LONGINT) : LONGINT;
-		VAR int16 : INTEGER;
+		VAR int16 : SIGNED16;
 		BEGIN
 			int16 := ORD(packet[pos]) * 256 + ORD(packet[pos + 1]);
 			RETURN int16

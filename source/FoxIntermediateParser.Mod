@@ -239,7 +239,7 @@ TYPE
 						IF isNegated THEN someLongreal := -token.real ELSE someLongreal := token.real END;
 						(* if no type description was included: use float type with same amount of bits as address type *)
 						IF ~hasTypeDescriptor THEN
-							IntermediateCode.InitType(type, IntermediateCode.Float, INTEGER(system.addressSize))
+							IntermediateCode.InitType(type, IntermediateCode.Float, SIGNED16(system.addressSize))
 						END;
 						IF type.form IN IntermediateCode.Integer THEN
 							Error(positionOfOperand, "floating point immediate value not applicable")
@@ -272,7 +272,7 @@ TYPE
 			IF isMemoryOperand & ExpectSymbol(Scanner.RightBracket) THEN
 				IntermediateCode.SetType(operand, IntermediateCode.UnsignedIntegerType(system.addressSize)); (* set the type of the inner operand to the platform's address type *)
 				IF ~hasTypeDescriptor THEN
-					IntermediateCode.InitType(type, IntermediateCode.SignedInteger, INTEGER(system.addressSize)) (* default: signed integer type of address size *)
+					IntermediateCode.InitType(type, IntermediateCode.SignedInteger, SIGNED16(system.addressSize)) (* default: signed integer type of address size *)
 				END;
 				IntermediateCode.InitMemory(operand, type, operand, 0) (* TODO: add offset? *)
 			END

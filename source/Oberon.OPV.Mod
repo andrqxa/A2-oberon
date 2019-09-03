@@ -110,7 +110,7 @@ Statements
 	VAR
 		dumpCode*: BOOLEAN; (* set by OP2 *)
 		ProcName*: OPS.Name; (* accessed by OPI (read only) *)
-		EntryNr*: INTEGER; (* accessed by OPI (read only) *)
+		EntryNr*: SIGNED16; (* accessed by OPI (read only) *)
 		ExitChain: OPC.Label;
 		UnlockOnExit: BOOLEAN;
 		allocTd: BOOLEAN; 	(* allocTd used only by OM *)
@@ -118,7 +118,7 @@ Statements
 		ParamAdr: ARRAY 6 OF  ParamAdrProc;
 
 	PROCEDURE Init* (bpc: LONGINT);
-		VAR res: INTEGER;
+		VAR res: SIGNED16;
 	BEGIN
 		allocTd := TRUE;			(* allocTd used only by OM *)
 		IF (OPM.findpc IN OPM.parserOptions) THEN OPM.breakpc := bpc ELSE OPM.breakpc := MAX(LONGINT) END;
@@ -202,7 +202,7 @@ Statements
 	END RecursionTest;
 
 	PROCEDURE TypSize* (typ: OPT.Struct; allocDesc: BOOLEAN);
-		VAR f, c: INTEGER; offset, size, dummy: LONGINT;
+		VAR f, c: SIGNED16; offset, size, dummy: LONGINT;
 			fld: OPT.Object; btyp, ftyp: OPT.Struct; sizeUndef, doAlloc: BOOLEAN;		(* ftyp, OM only *)
 			BEGIN
 		IF typ = OPT.undftyp THEN OPM.err(58)		(* MH 26.1.94; bug fix RC 17.6.93 *)
@@ -618,7 +618,7 @@ Statements
 	END AllocAddEntries;
 
 	PROCEDURE AdrAndSize* (topScope: OPT.Object);
-	VAR i: INTEGER; dsize: LONGINT;
+	VAR i: SIGNED16; dsize: LONGINT;
 	BEGIN
 		OPM.errpos := topScope^.adr;	(* text position of scope used if error *)
 		OPO.dsize := 0;
@@ -874,7 +874,7 @@ Statements
 	END Call;
 
 	PROCEDURE Expression (n: OPT.Node; VAR z: OPC.Item; selfForUnlock: OPT.Node);
-		VAR x, y: OPC.Item; f: INTEGER; real: REAL; con: OPT.Const; typ: OPT.Struct;
+		VAR x, y: OPC.Item; f: SIGNED16; real: REAL; con: OPT.Const; typ: OPT.Struct;
 
 		PROCEDURE AllocConst (VAR bytes: ARRAY OF SYSTEM.BYTE; len, align: LONGINT);
 			VAR con1, con2: OPT.Const;
@@ -1061,7 +1061,7 @@ Statements
 			proc, par: OPT.Object;
 			name: ARRAY 64 OF CHAR;
 			i, j: LONGINT;
-			res: INTEGER;
+			res: SIGNED16;
 			prevUnlockOnExit: BOOLEAN;
 	BEGIN
 		WHILE ~OPO.CodeErr & (n # NIL) DO

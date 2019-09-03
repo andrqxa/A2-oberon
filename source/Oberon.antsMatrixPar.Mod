@@ -33,12 +33,12 @@ TYPE
 
 	Matrix* = POINTER TO MatrixDesc;
 	MatrixDesc* = RECORD (vyBase.ObjDesc)
-		dimx-, dimy-: INTEGER;   (* number of rows and columns*)
+		dimx-, dimy-: SIGNED16;   (* number of rows and columns*)
 		par*: MatrixArray
 	END;
 
 	PROCEDURE WriteMatrix( VAR R: Files.Rider;  n: Matrix );
-	VAR y, x: INTEGER;
+	VAR y, x: SIGNED16;
 	BEGIN
 		Files.WriteInt( R, 0 );  Files.WriteInt( R, n.dimy );  Files.WriteInt( R, n.dimx );
 		FOR y := 0 TO n.dimy - 1 DO
@@ -47,7 +47,7 @@ TYPE
 	END WriteMatrix;
 
 	PROCEDURE ReadMatrix( VAR R: Files.Rider;  VAR n: Matrix );
-	VAR y, x: INTEGER;  version: INTEGER;
+	VAR y, x: SIGNED16;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadInt( R, n.dimy );  Files.ReadInt( R, n.dimx );  NEW( n.par, n.dimy, n.dimx );
 		FOR y := 0 TO n.dimy - 1 DO
@@ -94,20 +94,20 @@ TYPE
 		aM.cmd;  NEW( m );  m.handle := Handler;  Objects.NewObj := m;  antsObjects.Register( m )
 	END Gen;
 
-	PROCEDURE DoNew*( dimy, dimx: INTEGER ): Matrix;
+	PROCEDURE DoNew*( dimy, dimx: SIGNED16 ): Matrix;
 	VAR n: Matrix;
 	BEGIN
 		Gen;  n := Objects.NewObj( Matrix );  n.handle := Handler;  n.dimy := dimy;  n.dimx := dimx;  NEW( n.par, dimy, dimx );
 		Fill( n.par, 0 );  RETURN n
 	END DoNew;
 
-	PROCEDURE Min( x, y: INTEGER ): INTEGER;
+	PROCEDURE Min( x, y: SIGNED16 ): SIGNED16;
 	BEGIN
 		IF x < y THEN RETURN x ELSE RETURN y END
 	END Min;
 
 	PROCEDURE CopyMatrixArray( n: Matrix;  from: MatrixArray );
-	VAR y, x: INTEGER;
+	VAR y, x: SIGNED16;
 	BEGIN
 		FOR y := 0 TO n.dimy - 1 DO
 			FOR x := 0 TO n.dimx - 1 DO n.par[y, x] := from[y, x] END
@@ -122,7 +122,7 @@ TYPE
 		END
 	END Fill;
 
-	PROCEDURE ChangeDim*( n: Matrix;  dimy, dimx: INTEGER );
+	PROCEDURE ChangeDim*( n: Matrix;  dimy, dimx: SIGNED16 );
 	VAR par: MatrixArray;
 	BEGIN
 		IF (dimy < 1) OR (dimx < 1) THEN RETURN END;

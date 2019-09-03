@@ -49,48 +49,48 @@ TYPE
 	Frame* = POINTER TO FrameDesc;	(** Base type of all displayable objects. *)
 	FrameDesc* = RECORD (Objects.ObjDesc)
 		next*, dsc*: Frame;	(** Sibling, child pointers. *)
-		X*, Y*, W*, H*: INTEGER	(** Coordinates. *)
+		X*, Y*, W*, H*: SIGNED16	(** Coordinates. *)
 	END;
 
 	FrameMsg* = RECORD (Objects.ObjMsg)	(** Base type of messages sent to frames. *)
 		F*: Frame; (*target*)	(** Message target, NIL for broadcast. *)
-		x*, y*: INTEGER;	(** Message origin. *)
-		res*: INTEGER	(** Result code: <0 = error or no response, >=0 response. *)
+		x*, y*: SIGNED16;	(** Message origin. *)
+		res*: SIGNED16	(** Result code: <0 = error or no response, >=0 response. *)
 	END;
 
 	ControlMsg* = RECORD (FrameMsg)
-		id*: INTEGER	(** remove, suspend, restore. *)
+		id*: SIGNED16	(** remove, suspend, restore. *)
 	END;
 
 	ModifyMsg* = RECORD (FrameMsg)	(** Change coordinates in container frame. *)
-		id*: INTEGER;	(** reduce, extend, move. *)
-		mode*: INTEGER;	(** Modes display, state. *)
-		dX*, dY*, dW*, dH*: INTEGER;	(** Change from old coordinates (delta). *)
-		X*, Y*, W*, H*: INTEGER	(** New coordinates. *)
+		id*: SIGNED16;	(** reduce, extend, move. *)
+		mode*: SIGNED16;	(** Modes display, state. *)
+		dX*, dY*, dW*, dH*: SIGNED16;	(** Change from old coordinates (delta). *)
+		X*, Y*, W*, H*: SIGNED16	(** New coordinates. *)
 	END;
 
 	DisplayMsg* = RECORD (FrameMsg)	(** Display a frame, a part of it or its contents. *)
-		device*: INTEGER;	(** screen, printer *)
-		id*: INTEGER;	(** full, area, contents. *)
-		u*, v*, w*, h*: INTEGER	(** Area to be restored. *)
+		device*: SIGNED16;	(** screen, printer *)
+		id*: SIGNED16;	(** full, area, contents. *)
+		u*, v*, w*, h*: SIGNED16	(** Area to be restored. *)
 	END;
 
 	LocateMsg* = RECORD (FrameMsg)	(** Locate frame in display space. *)
 		loc*: Frame;	(** Result. *)
-		X*, Y*: INTEGER;	(** Absolute location. *)
-		u*, v*: INTEGER	(** Relative coordinates in loc. *)
+		X*, Y*: SIGNED16;	(** Absolute location. *)
+		u*, v*: SIGNED16	(** Relative coordinates in loc. *)
 	END;
 
 	SelectMsg* = RECORD (FrameMsg)	(** Selection control. *)
-		id*: INTEGER;	(** get, set, reset. *)
+		id*: SIGNED16;	(** get, set, reset. *)
 		time*: LONGINT;	(** Time of selection. *)
 		sel*: Frame;	(** Parent of selection. *)
 		obj*: Objects.Object	(** List of objects involved, linked with slink. *)
 	END;
 
 	ConsumeMsg* = RECORD (FrameMsg)	(** Drop, integrate frames. *)
-		id*: INTEGER;	(** drop, integrate. *)
-		u*, v*: INTEGER;	(** Relative coordinates in destination when drop. *)
+		id*: SIGNED16;	(** drop, integrate. *)
+		u*, v*: SIGNED16;	(** Relative coordinates in destination when drop. *)
 		obj*: Objects.Object	(** List of objects to be consumed, linked with slink. *)
 	END;
 
@@ -104,7 +104,7 @@ VAR
 	Bottom*, (** Bottom of primary map. *)
 	UBottom*, (** Bottom of offscreen area (negative), 0 if not supported. *)
 	Width*, (** Display width. *)
-	Height*: INTEGER; (** Display height. *)
+	Height*: SIGNED16; (** Display height. *)
 
 	arrow*, 	(** Oberon cursor. *)
 	star*, 	(** Star marker to mark documents and viewers. *)
@@ -130,11 +130,11 @@ BEGIN
 END SetColor;
 
 (** Retrieve color palette entry or color components. 0 <= red, green, blue < 256. *)
-PROCEDURE GetColor*(col: Color; VAR red, green, blue: INTEGER);
+PROCEDURE GetColor*(col: Color; VAR red, green, blue: SIGNED16);
 BEGIN
 	IF col >= 0 THEN col := palette[col] END;
-	red := INTEGER(ASH(col, -16) MOD 256);
-	green := INTEGER(ASH(col, -8) MOD 256);
+	red := SIGNED16(ASH(col, -16) MOD 256);
+	green := SIGNED16(ASH(col, -8) MOD 256);
 	blue := SHORT(col MOD 256)
 END GetColor;
 
@@ -145,7 +145,7 @@ BEGIN
 END RGB;
 
 (** Returns the number of bits per pixel for the given x coordinate. Typical values are 1, 4, 8 (maximum 8). *)
-PROCEDURE Depth*(x: LONGINT): INTEGER;
+PROCEDURE Depth*(x: LONGINT): SIGNED16;
 BEGIN
 	RETURN 8
 END Depth;
@@ -157,7 +157,7 @@ BEGIN
 END TrueColor;
 
 (** Get the current clip rectangle. *)
-PROCEDURE GetClip*(VAR x, y, w, h: INTEGER);
+PROCEDURE GetClip*(VAR x, y, w, h: SIGNED16);
 BEGIN
 	x := SHORT(clipX1); y := SHORT(clipY1);
 	w := SHORT(clipX2-clipX1+1); h := SHORT(clipY2-clipY1+1)
@@ -341,7 +341,7 @@ BEGIN
 END Dot;
 
 (** Returns the dimensions of a pattern. *)
-PROCEDURE GetDim*(pat: Pattern; VAR w, h: INTEGER);
+PROCEDURE GetDim*(pat: Pattern; VAR w, h: SIGNED16);
 BEGIN
 	w := SYSTEM.GET8(pat); h := SYSTEM.GET8(pat+1)
 END GetDim;
@@ -601,7 +601,7 @@ BEGIN
 		IF rdx > clipX2 THEN DEC(w, rdx-clipX2) END;
 		IF tdy > clipY2 THEN DEC(h, tdy-clipY2) END;
 		IF (w > 0) & (h > 0) THEN
-			pd := 0; SYSTEM.GET(adr+4, SYSTEM.VAL(INTEGER, pd));
+			pd := 0; SYSTEM.GET(adr+4, SYSTEM.VAL(SIGNED16, pd));
 			IF pd = 8 THEN
 				SYSTEM.GET(adr+8, pw); SYSTEM.GET(adr+16, src);
 				INC(src, (dy+h-1)*pw + dx);	(* top left corner *)

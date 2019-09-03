@@ -301,7 +301,7 @@ VAR
 PROCEDURE  Portin8*(port: LONGINT; VAR val: CHAR);
 END Portin8;
 
-PROCEDURE  Portin16*(port: LONGINT; VAR val: INTEGER);
+PROCEDURE  Portin16*(port: LONGINT; VAR val: SIGNED16);
 END Portin16;
 
 PROCEDURE  Portin32*(port: LONGINT; VAR val: LONGINT);
@@ -310,7 +310,7 @@ END Portin32;
 PROCEDURE  Portout8*(port: LONGINT; val: CHAR);
 END Portout8;
 
-PROCEDURE  Portout16*(port: LONGINT; val: INTEGER);
+PROCEDURE  Portout16*(port: LONGINT; val: SIGNED16);
 END Portout16;
 
 PROCEDURE  Portout32*(port: LONGINT; val: LONGINT);

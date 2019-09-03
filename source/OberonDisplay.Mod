@@ -43,7 +43,7 @@ TYPE
 		BEGIN RETURN TRUE;
 		END IsHit;
 
-		PROCEDURE Mouse(VAR x, y : INTEGER; VAR keys : SET);
+		PROCEDURE Mouse(VAR x, y : SIGNED16; VAR keys : SET);
 		BEGIN {EXCLUSIVE}
 			keys := {};
 			IF 0 IN curKeys THEN INCL(keys, 2) END;
@@ -51,8 +51,8 @@ TYPE
 			IF 2 IN curKeys THEN INCL(keys, 0) END;
 			IF 30 IN curKeys THEN IF curKeys={30} THEN INCL(keys, 30); END; curKeys := curKeys - {30} END; (*fof*)
 			IF 31 IN curKeys THEN IF curKeys={31} THEN INCL(keys, 31); END; curKeys := curKeys - {31}  END;
-			x := INTEGER(curX);
-			y := INTEGER(curY)
+			x := SIGNED16(curX);
+			y := SIGNED16(curY)
 		END Mouse;
 
 		PROCEDURE PointerMove*(x, y : SIZE; keys :SET);
@@ -122,7 +122,7 @@ TYPE
 			b := break; break := FALSE
 		END Read;
 
-		PROCEDURE Available(VAR num : INTEGER; VAR b : BOOLEAN);
+		PROCEDURE Available(VAR num : SIGNED16; VAR b : BOOLEAN);
 		BEGIN {EXCLUSIVE}
 			num := SHORT((keytail-keyhead) MOD KeyBufSize);
 			b := break; break := FALSE
@@ -139,7 +139,7 @@ TYPE
 	OberonInput = OBJECT (Inputs.OberonInput)
 		VAR window : OberonWindow;
 
-		PROCEDURE Mouse*(VAR x, y : INTEGER; VAR keys : SET);
+		PROCEDURE Mouse*(VAR x, y : SIGNED16; VAR keys : SET);
 		BEGIN
 			window.Mouse(x, y, keys)
 		END Mouse;
@@ -149,7 +149,7 @@ TYPE
 			window.Read(ch, b)
 		END Read;
 
-		PROCEDURE Available*(VAR num : INTEGER; VAR b : BOOLEAN);
+		PROCEDURE Available*(VAR num : SIGNED16; VAR b : BOOLEAN);
 		BEGIN
 			window.Available(num, b)
 		END Available;

@@ -89,7 +89,7 @@ BEGIN
 			vyHostTexts.NoteSI(vyHostTexts.cNotify, "Producing random vector, length: ", size);
 			X := vyIntVec.New(0);
 			FOR i := 1 TO size DO
-				vyIntVec.Append(SHORT(ENTIER(vyRandom.Uniform() * MAX(INTEGER))), X);
+				vyIntVec.Append(SHORT(ENTIER(vyRandom.Uniform() * MAX(SIGNED16))), X);
 				IF i MOD (size DIV show) = 0 THEN vyHostTexts.NoteSI(vyHostTexts.cNotify, " = ", vyIntVec.Get(X, i - 1) )END
 			END;
 			vyHostTexts.Note(vyHostTexts.cNotify, "Sorting Vector");
@@ -248,7 +248,7 @@ END TestLongRealWId;
 
 PROCEDURE TestIntegerWId*;
 	VAR size, i, j, count: LONGINT;   sc: vyParser.Scanner;   X, Xcopy: vyBase.tVector;   temp, tempcopy: vyBase.tVector;
-	XA: POINTER TO ARRAY OF INTEGER;   tempA: POINTER TO ARRAY OF LONGINT;   failed: BOOLEAN;
+	XA: POINTER TO ARRAY OF SIGNED16;   tempA: POINTER TO ARRAY OF LONGINT;   failed: BOOLEAN;
 BEGIN
 	failed := FALSE;
 	NEW(sc);   vyParser.OpenParScanner(sc);
@@ -385,7 +385,7 @@ vyHostTexts.NoteSI(vyHostTexts.cNotify,"Producing random vector, length: ", size
 X := vyIntVec.NewIntegerVector(0);
 temp := vyLongintVec.New(0);
 FOR i := 1 TO size DO
-vyIntVec.Append(SHORT(ENTIER(vyRandom.Uniform()*MAX(INTEGER))),X);
+vyIntVec.Append(SHORT(ENTIER(vyRandom.Uniform()*MAX(SIGNED16))),X);
 vyLongintVec.Append(i,temp);
 IF i MOD (size DIV show) = 0 THEN vyHostTexts.NoteSI(vyHostTexts.cNotify," = ",vyIntVec.Get(X,i-1) )END;
 END;

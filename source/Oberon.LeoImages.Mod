@@ -21,7 +21,7 @@ MODULE LeoImages IN Oberon; (** portable **)	(* eos  *)
 			img*: Images.Image;
 			mat*: GfxMatrix.Matrix;
 			quick*: BOOLEAN;
-			filter*: INTEGER;
+			filter*: SIGNED16;
 			color*: Gfx.Color;
 		END;
 

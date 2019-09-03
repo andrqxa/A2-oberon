@@ -9,7 +9,7 @@ IMPORT
 
 TYPE
 	Int8* = SIGNED8;
-	Int16* = INTEGER;
+	Int16* = SIGNED16;
 	Int32* = LONGINT;
 
 	Int* = SIZE; (** system signed integer type *)

@@ -61,9 +61,9 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 			seltime*: LONGINT;	(** time of current selection, negative for empty selection **)
 			damage: GfxRegions.Region;	(* accumulated area that should be updated *)
 			bw: REAL;	(* maximal border width around damage area *)
-			lockLevel: INTEGER;	(* number of times updates have been disabled *)
-			cmdLevel: INTEGER;	(* number of nested commands that are currently open *)
-			maxCmds, nofCmds: INTEGER;	(* maximal and current number of undoable commands retained *)
+			lockLevel: SIGNED16;	(* number of times updates have been disabled *)
+			cmdLevel: SIGNED16;	(* number of nested commands that are currently open *)
+			maxCmds, nofCmds: SIGNED16;	(* maximal and current number of undoable commands retained *)
 			curCmd: Command;	(* current command *)
 			firstCmd: Command;	(* first command that can still be undone *)
 			undoCmd: Command;	(* command to undo next *)
@@ -126,18 +126,18 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		END;
 
 		SelectMsg* = RECORD (ShapeMsg)
-			id*: INTEGER;	(** get/reset/validate **)
+			id*: SIGNED16;	(** get/reset/validate **)
 			res*: Shape;	(** linked list of shapes which handled 'get' (in top-down order) **)
 		END;
 
 		ControlMsg* = RECORD (ShapeMsg)
-			id*: INTEGER;	(** integrate/delete/clone **)
+			id*: SIGNED16;	(** integrate/delete/clone **)
 			bottom*, top*: Shape;	(** shape list for consume (in) and clone (out) **)
 			cont*, up*, down*: Shape;	(** position where to integrate **)
 		END;
 
 		OrderMsg* = RECORD (ShapeMsg)
-			id*: INTEGER;	(** up/down/top/bottom/reverse **)
+			id*: SIGNED16;	(** up/down/top/bottom/reverse **)
 		END;
 
 		(** shape messages transporting a local coordinate system **)
@@ -161,14 +161,14 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		END;
 
 		RenderMsg* = RECORD (LocalizedMsg)
-			id*: INTEGER;	(** active/passive/marksonly/marked **)
+			id*: SIGNED16;	(** active/passive/marksonly/marked **)
 			ctxt*: Gfx.Context;	(** associated context **)
 			gsm*: GfxMatrix.Matrix;	(** conversion from global to standard coordinates **)
 			llx*, lly*, urx*, ury*: REAL;	(** clip rectangle (in global coordinates) **)
 		END;
 
 		LocateMsg* = RECORD (LocalizedMsg)
-			id*: INTEGER;	(** inside/overlap/project **)
+			id*: SIGNED16;	(** inside/overlap/project **)
 			llx*, lly*, urx*, ury*: REAL;	(** rectangle within which to locate (in global coordinates) **)
 			res*: Shape;	(** linked list of shapes which handled message (in top-down order) **)
 			x*, y*: REAL;	(** point to project **)
@@ -176,7 +176,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		END;
 
 		TransformMsg* = RECORD (LocalizedMsg)
-			id*: INTEGER;	(** apply/notify **)
+			id*: SIGNED16;	(** apply/notify **)
 			notify*: BOOLEAN;	(** to be set by receiver if additional notify cycle is necessary **)
 			mat*: GfxMatrix.Matrix;	(** transformation matrix in global coordinates **)
 		END;
@@ -228,7 +228,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 
 	(** update rectangle **)
 	PROCEDURE UpdateRect* (fig: Figure; llx, lly, urx, ury, bw: REAL);
-		VAR llu, llv, uru, urv: INTEGER;
+		VAR llu, llv, uru, urv: SIGNED16;
 	BEGIN
 		IF (llx < urx) & (lly < ury) THEN
 			llu := SHORT(ENTIER(llx)); llv := SHORT(ENTIER(lly));
@@ -565,7 +565,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 
 	(** set color value with undoable action **)
 	PROCEDURE SetColor* (fig: Figure; shape: Shape; col: Display.Color);
-		VAR r, g, b: INTEGER;
+		VAR r, g, b: SIGNED16;
 	BEGIN
 		Display.GetColor(col, r, g, b);
 		SetInt(fig, shape, "Red", r); SetInt(fig, shape, "Green", g); SetInt(fig, shape, "Blue", b)
@@ -573,7 +573,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 
 	(** set matrix value with undoable action; element numbers are appended to base name **)
 	PROCEDURE SetMatrix* (fig: Figure; shape: Shape; name: ARRAY OF CHAR; mat: GfxMatrix.Matrix);
-		VAR l, row, col: INTEGER; attr: ARRAY 66 OF CHAR;
+		VAR l, row, col: SIGNED16; attr: ARRAY 66 OF CHAR;
 	BEGIN
 		l := 0; WHILE name[l] # 0X DO attr[l] := name[l]; INC(l) END; attr[l+2] := 0X;
 		FOR row := 0 TO 2 DO
@@ -731,7 +731,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	(**--- Render ---**)
 
 	(** render figure on context **)
-	PROCEDURE Render* (fig: Figure; id: INTEGER; ctxt: Gfx.Context);
+	PROCEDURE Render* (fig: Figure; id: SIGNED16; ctxt: Gfx.Context);
 		VAR rm: RenderMsg; gdm, dsm: GfxMatrix.Matrix;
 	BEGIN
 		Objects.Stamp(rm); rm.id := id; rm.ctxt := ctxt;
@@ -747,7 +747,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	(**--- Locate ---**)
 
 	(** locate shapes in figure **)
-	PROCEDURE Locate* (fig: Figure; id: INTEGER; llx, lly, urx, ury: REAL): Shape;
+	PROCEDURE Locate* (fig: Figure; id: SIGNED16; llx, lly, urx, ury: REAL): Shape;
 		VAR lm: LocateMsg;
 	BEGIN
 		Objects.Stamp(lm); lm.id := id; lm.llx := llx; lm.lly := lly; lm.urx := urx; lm.ury := ury; lm.res := NIL;
@@ -934,7 +934,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END CopyShape;
 
 	PROCEDURE HandleShape* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR shape, copy: Shape; cm: Objects.CopyMsg; am: Objects.AttrMsg; ver: LONGINT; int: INTEGER; real: REAL;
+		VAR shape, copy: Shape; cm: Objects.CopyMsg; am: Objects.AttrMsg; ver: LONGINT; int: SIGNED16; real: REAL;
 	BEGIN
 		shape := obj(Shape);
 		IF msg IS UnmarkMsg THEN

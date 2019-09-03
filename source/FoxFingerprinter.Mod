@@ -1337,7 +1337,7 @@ TYPE
 
 	(* fp = fp {<*> str[i]} *)
 	PROCEDURE FPString*(VAR fp: Basic.Fingerprint; CONST str: ARRAY OF CHAR);
-	VAR i: INTEGER; ch: CHAR;
+	VAR i: SIGNED16; ch: CHAR;
 	BEGIN i:=0; REPEAT ch:=str[i]; FPNumber(fp, ORD(ch)); INC(i) UNTIL ch=0X
 	END FPString;
 

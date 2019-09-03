@@ -57,7 +57,7 @@ TYPE DES* = OBJECT
 					VAR
 						raw0,raw1 : LONGINT;
 						rawi,KnLi : LONGINT;
-						i : INTEGER;
+						i : SIGNED16;
 					BEGIN
 						rawi := 0;KnLi := 0;
 						FOR i := 0 TO 15 DO (* Java code has for (i=0, rawi=0,KnLi=0;i<16;i++) *)
@@ -120,9 +120,9 @@ TYPE DES* = OBJECT
 				DESKey(FALSE,decryptKeys)
 			END SetKey;
 
-			PROCEDURE squashBytesToInts(inBytes : ARRAY OF CHAR;inOffset : INTEGER;
-				VAR outInts : ARRAY OF LONGINT; outOffset : INTEGER;Length : INTEGER);
-			VAR i : INTEGER;
+			PROCEDURE squashBytesToInts(inBytes : ARRAY OF CHAR;inOffset : SIGNED16;
+				VAR outInts : ARRAY OF LONGINT; outOffset : SIGNED16;Length : SIGNED16);
+			VAR i : SIGNED16;
 			BEGIN
 				FOR i := 0 TO Length - 1 DO
 					outInts[outOffset + i] := ASH(ORD(inBytes[inOffset + (i * 4)]),24) +
@@ -132,9 +132,9 @@ TYPE DES* = OBJECT
 				END
 			END squashBytesToInts;
 
-			PROCEDURE spreadIntsToBytes(inInts : ARRAY OF LONGINT;inOffset : INTEGER;
-																	VAR outBytes : ARRAY OF CHAR; outOffset : INTEGER;Length : INTEGER);
-			VAR i : INTEGER;
+			PROCEDURE spreadIntsToBytes(inInts : ARRAY OF LONGINT;inOffset : SIGNED16;
+																	VAR outBytes : ARRAY OF CHAR; outOffset : SIGNED16;Length : SIGNED16);
+			VAR i : SIGNED16;
 			BEGIN
 				FOR i := 0 TO Length - 1 DO
 					outBytes[outOffset + (i * 4)      ] := CHR(BIT.LAND(RotateRight(inInts[inOffset + i], 24),0FFH));
@@ -240,16 +240,16 @@ TYPE DES* = OBJECT
 
 
 
-			PROCEDURE Encrypt*(clearText : ARRAY OF CHAR; clearOff : INTEGER;
-									VAR cipherText : ARRAY OF CHAR; cipherOff : INTEGER);
+			PROCEDURE Encrypt*(clearText : ARRAY OF CHAR; clearOff : SIGNED16;
+									VAR cipherText : ARRAY OF CHAR; cipherOff : SIGNED16);
 			BEGIN
 				squashBytesToInts(clearText,clearOff,tempints,0,2);
 				des(tempints,tempints,encryptKeys);
 				spreadIntsToBytes(tempints,0,cipherText,cipherOff,2)
 			END Encrypt;
 
-			PROCEDURE Decrypt*(cipherText : ARRAY OF CHAR; cipherOff : INTEGER;
-				   				VAR clearText : ARRAY OF CHAR; clearOff : INTEGER);
+			PROCEDURE Decrypt*(cipherText : ARRAY OF CHAR; cipherOff : SIGNED16;
+				   				VAR clearText : ARRAY OF CHAR; clearOff : SIGNED16);
 			BEGIN
 				squashBytesToInts(cipherText,cipherOff,tempints,0,2);
 				des(tempints,tempints,decryptKeys);

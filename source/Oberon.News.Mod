@@ -61,7 +61,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		line: ARRAY 2*NetTools.MaxLine OF CHAR;
 		newsFont: Fonts.Font;
 
-	PROCEDURE ScanInt(VAR S: Texts.Scanner; VAR i: INTEGER);
+	PROCEDURE ScanInt(VAR S: Texts.Scanner; VAR i: SIGNED16);
 	BEGIN
 		IF S.class = Texts.Int THEN
 			i := SHORT(S.i);
@@ -72,7 +72,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END ScanInt;
 
 	PROCEDURE ScanDate(VAR S: Texts.Scanner; VAR date: LONGINT);
-		VAR day, month, year: INTEGER;
+		VAR day, month, year: SIGNED16;
 	BEGIN
 		ScanInt(S, day); ScanInt(S, month); ScanInt(S, year);
 		IF year < 100 THEN
@@ -86,13 +86,13 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END ScanDate;
 
 	PROCEDURE ScanTime(VAR S: Texts.Scanner; VAR time: LONGINT);
-		VAR hour, min, sec: INTEGER;
+		VAR hour, min, sec: SIGNED16;
 	BEGIN
 		ScanInt(S, hour); ScanInt(S, min); ScanInt(S, sec);
 		time := Dates.ToTime(hour, min, sec)
 	END ScanTime;
 
-	PROCEDURE TwoDigit(i: INTEGER; VAR str: ARRAY OF CHAR);
+	PROCEDURE TwoDigit(i: SIGNED16; VAR str: ARRAY OF CHAR);
 	BEGIN
 		str[0] := CHR((i DIV 10)+ORD("0"));
 		str[1] := CHR((i MOD 10)+ORD("0"));
@@ -102,7 +102,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE ConcatDate(VAR line: ARRAY OF CHAR; VAR date: LONGINT);
 		VAR
 			str: ARRAY 8 OF CHAR;
-			day, month, year: INTEGER;
+			day, month, year: SIGNED16;
 	BEGIN
 		Dates.ToYMD(date, year, month, day);
 		IF year < 2000 THEN
@@ -120,7 +120,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE ConcatTime(VAR line: ARRAY OF CHAR; VAR time: LONGINT);
 		VAR
 			str: ARRAY 8 OF CHAR;
-			hour, min, sec: INTEGER;
+			hour, min, sec: SIGNED16;
 	BEGIN
 		Dates.ToHMS(time, hour, min, sec);
 		TwoDigit(hour, str);
@@ -212,7 +212,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END LoadInitText;
 
 	PROCEDURE WriteDate(VAR W: Texts.Writer; VAR date: LONGINT);
-		VAR day, month, year: INTEGER;
+		VAR day, month, year: SIGNED16;
 	BEGIN
 		Dates.ToYMD(date, year, month, day);
 		Texts.WriteInt(W, day, 0);
@@ -223,7 +223,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END WriteDate;
 
 	PROCEDURE WriteTime(VAR W: Texts.Writer; VAR time: LONGINT);
-		VAR hour, min, sec: INTEGER;
+		VAR hour, min, sec: SIGNED16;
 	BEGIN
 		Dates.ToHMS(time, hour, min, sec);
 		Texts.WriteInt(W, hour, 0);
@@ -385,7 +385,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END ReadResponse;
 
 (** Open a new session to nntp-host host on ort port. *)
-	PROCEDURE Open*(VAR S: Session; host: ARRAY OF CHAR; port: INTEGER);
+	PROCEDURE Open*(VAR S: Session; host: ARRAY OF CHAR; port: SIGNED16);
 	BEGIN
 		NEW(S);
 		IF NetTools.Connect(S.C, port, host, FALSE) THEN
@@ -413,7 +413,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE Connect(VAR S: Session): BOOLEAN;
 		VAR
 			NNTPHost: ARRAY 64 OF CHAR;
-			NNTPPort: INTEGER;
+			NNTPPort: SIGNED16;
 	BEGIN
 		NetTools.GetHostPort("NNTP", NNTPHost, NNTPPort, DefPort);
 		IF NNTPHost # "" THEN
@@ -640,7 +640,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		VAR
 			R: Files.Rider;
 			a, org, sorg, porg: LONGINT;
-			re: INTEGER;
+			re: SIGNED16;
 	BEGIN
 		NEW(marked, MaxMessages);
 		FOR a := 0 TO MaxMessages-1 DO
@@ -683,7 +683,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			msgid: ARRAY 128 OF CHAR;
 			dummy: ARRAY 256 OF CHAR;
 			R: Files.Rider;
-			i, j, iRef, bres: INTEGER;
+			i, j, iRef, bres: SIGNED16;
 	BEGIN
 		line := "GROUP ";
 		Strings.Append(line, group);
@@ -883,7 +883,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			val: ARRAY 256 OF CHAR;
 			pos: LONGINT;
 			mT: Texts.Text;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		out := TextStreams.OpenWriter(T);
 		MIME.ReadHeader(S.S, out, h, pos); out.Flush(out);
@@ -1059,7 +1059,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		VAR
 			end: LONGINT;
 			art: ArtNrs;
-			i: INTEGER;
+			i: SIGNED16;
 	BEGIN
 		line := "GROUP ";
 		Strings.Append(line, group.name);
@@ -1316,7 +1316,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			obj, t: Objects.Object;
 			F: Texts.Finder;
 			article: BOOLEAN;
-			sPos: INTEGER;
+			sPos: SIGNED16;
 	BEGIN
 		S := NIL;
 		article := FALSE;

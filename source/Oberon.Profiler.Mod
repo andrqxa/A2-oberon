@@ -366,7 +366,7 @@ END HandleTimer;
 *)
 PROCEDURE Profile*;
 VAR times, n, max, i: LONGINT; s: Texts.Scanner; call: ARRAY 256 OF CHAR;
-		res: INTEGER;
+		res: SIGNED16;
 BEGIN
 	(*parse parameters*)
 	Texts.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(s);

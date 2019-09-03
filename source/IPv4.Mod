@@ -677,7 +677,7 @@ TYPE
 
 VAR
 	(* Module variables *)
-	nextID: INTEGER;
+	nextID: SIGNED16;
 
 	(* ARP *)
 	arpProto: ARRAY ARPHdrLen OF CHAR;
@@ -847,7 +847,7 @@ END IsARPPacketValid;
 
 
 (* Return a unique datagram ID *)
-PROCEDURE GetNextID*(): INTEGER;
+PROCEDURE GetNextID*(): SIGNED16;
 BEGIN {EXCLUSIVE}
 	INC(nextID);
 	RETURN nextID;

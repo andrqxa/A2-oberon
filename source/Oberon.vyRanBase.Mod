@@ -80,7 +80,7 @@ TYPE
 		HALT( 100 )
 	END Store;
 
-	PROCEDURE (* VAR seed: tSeedDesc*)Load*( VAR r: Files.Rider;  seedVersion: INTEGER );
+	PROCEDURE (* VAR seed: tSeedDesc*)Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
 	(* if you do not store seeds without storing the whole generator, i. e. if you do not call seed.Store and
 	seed.Load yourself, you do not have to worry about seed versions; otherwise the seed version code must be
 	stored somewhere in the file and passed to this procedure as parameter seedVersion *)
@@ -111,7 +111,7 @@ TYPE
 
 
 	tRandomNumberDesc* = RECORD (Gadgets.ObjDesc)
-		seedVersion*: INTEGER;
+		seedVersion*: SIGNED16;
 		seed-: tSeed;
 		(** This information should be supplied to allow identification **)
 		shortid*: tShortIdStr;   (*= a short string to identify the generator in synthetic names *)
@@ -174,7 +174,7 @@ TYPE
 			Files.WriteLInt( r, (*seed.*)val )
 		END Store;
 
-		PROCEDURE  (*VAR seed: tLongintSeedDesc*) Load*( VAR r: Files.Rider;  seedVersion: INTEGER );
+		PROCEDURE  (*VAR seed: tLongintSeedDesc*) Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
 		BEGIN
 			IF seedVersion # cLongintSeedVersion THEN HALT( 100 ) END;
 			Files.ReadLInt( r, (*seed.*)val )
@@ -201,7 +201,7 @@ VAR
 
 	(* must be implemented in derived types  *)
 
-	PROCEDURE WriteSeedVersion*( VAR r: Files.Rider;  seedVersion: INTEGER );   (* jb 5.5.01 *)
+	PROCEDURE WriteSeedVersion*( VAR r: Files.Rider;  seedVersion: SIGNED16 );   (* jb 5.5.01 *)
 	BEGIN
 		Files.WriteInt( r, seedVersion )
 	END WriteSeedVersion;
@@ -213,13 +213,13 @@ VAR
 	END Store;
 	*)
 
-	PROCEDURE ReadSeedVersion*( VAR r: Files.Rider;  VAR seedVersion: INTEGER );   (* jb 5.5.01 *)
+	PROCEDURE ReadSeedVersion*( VAR r: Files.Rider;  VAR seedVersion: SIGNED16 );   (* jb 5.5.01 *)
 	BEGIN
 		Files.ReadInt( r, seedVersion )
 	END ReadSeedVersion;
 
 	(*
-	PROCEDURE ( VAR seed: tSeedDesc)Load*( VAR r: Files.Rider;  seedVersion: INTEGER );
+	PROCEDURE ( VAR seed: tSeedDesc)Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
 	(* if you do not store seeds without storing the whole generator, i. e. if you do not call seed.Store and
 	seed.Load yourself, you do not have to worry about seed versions; otherwise the seed version code must be
 	stored somewhere in the file and passed to this procedure as parameter seedVersion *)
@@ -453,13 +453,13 @@ END DefaultRandomV;
 		END
 	END HandleAttributes;
 
-	PROCEDURE StoreVersionInformation( VAR r: Files.Rider;  shortid: tShortIdStr;  seedVersion: INTEGER );
+	PROCEDURE StoreVersionInformation( VAR r: Files.Rider;  shortid: tShortIdStr;  seedVersion: SIGNED16 );
 	BEGIN
 		Files.WriteString( r, cMagic );  Files.WriteString( r, shortid );  Files.WriteInt( r, cBaseVersion );
 		Files.WriteInt( r, seedVersion )
 	END StoreVersionInformation;
 
-	PROCEDURE LoadVersionInformation( VAR r: Files.Rider;  VAR shortid: tShortIdStr;  VAR baseVersion, seedVersion: INTEGER );
+	PROCEDURE LoadVersionInformation( VAR r: Files.Rider;  VAR shortid: tShortIdStr;  VAR baseVersion, seedVersion: SIGNED16 );
 	VAR dummy: tIdStr;
 	BEGIN
 		Files.ReadString( r, shortid );
@@ -486,7 +486,7 @@ END Store;
 	END Store;
 
 	PROCEDURE Load( obj: tRandom;  VAR M: Objects.FileMsg );
-	VAR shortid: tShortIdStr;  baseVersion, seedVersion: INTEGER;  seed: tSeed;
+	VAR shortid: tShortIdStr;  baseVersion, seedVersion: SIGNED16;  seed: tSeed;
 	BEGIN
 		LoadVersionInformation( M.R, shortid, baseVersion, seedVersion );
 		IF shortid # obj.shortid THEN HALT( 100 ) END;
@@ -549,7 +549,7 @@ END Store;
 	END Combo;
 
 	PROCEDURE SetInitSeeds;
-	VAR res: WORD;  i: INTEGER;
+	VAR res: WORD;  i: SIGNED16;
 	BEGIN
 		initSeed1 := Oberon.Time();  Oberon.GetClock( initSeed2, initSeed3 );
 		FOR i := 1 TO 10 DO res := Combo( initSeed1, initSeed2, initSeed3 ) END
@@ -598,7 +598,7 @@ END Store;
 		Files.WriteLInt( r, seed.val )
 	END Store;
 
-	PROCEDURE ( VAR seed: tLongintSeedDesc)Load*( VAR r: Files.Rider;  seedVersion: INTEGER );
+	PROCEDURE ( VAR seed: tLongintSeedDesc)Load*( VAR r: Files.Rider;  seedVersion: SIGNED16 );
 	BEGIN
 		IF seedVersion # cLongintSeedVersion THEN HALT( 100 ) END;
 		Files.ReadLInt( r, seed.val )

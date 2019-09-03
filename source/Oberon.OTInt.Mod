@@ -18,8 +18,8 @@ MODULE OTInt IN Oberon;	(** eos  **)
 
 	TYPE
 		F26D6* = LONGINT;	(** fixed point format 26.6 used for fractional pixel coordinates **)
-		F2D14* = INTEGER;	(** fixed point format 2.14 used for unit vectors **)
-		FUnit* = INTEGER;	(** unscaled point coordinates **)
+		F2D14* = SIGNED16;	(** fixed point format 2.14 used for unit vectors **)
+		FUnit* = SIGNED16;	(** unscaled point coordinates **)
 		Fixed* = LONGINT;	(** fixed point format 16.16 used for scalar fixed point numbers **)
 
 		INT64 = ARRAY 8 OF CHAR;	(* huge integers for extended precision arithmetic *)
@@ -51,7 +51,7 @@ MODULE OTInt IN Oberon;	(** eos  **)
 		Frame* = RECORD
 			ret*: Address;	(* return address *)
 			start*: LONGINT;	(* starting pc of function (within context.code) *)
-			count*: INTEGER;	(* number of times the function has to be evaluated *)
+			count*: SIGNED16;	(* number of times the function has to be evaluated *)
 		END;
 		CallStack* = POINTER TO ARRAY OF Frame;
 
@@ -62,7 +62,7 @@ MODULE OTInt IN Oberon;	(** eos  **)
 		CVT* = POINTER TO ARRAY OF F26D6;
 
 		(** glyph zone **)
-		Contours* = POINTER TO ARRAY OF INTEGER;
+		Contours* = POINTER TO ARRAY OF SIGNED16;
 		Coord* = ARRAY 2 OF F26D6;
 		Point* = RECORD
 			org*, cur*: Coord;	(** original and current point coordinates **)
@@ -73,7 +73,7 @@ MODULE OTInt IN Oberon;	(** eos  **)
 
 		Zone* = POINTER TO ZoneDesc;
 		ZoneDesc* = RECORD
-			contours*: INTEGER;	(** number of contours in this zone **)
+			contours*: SIGNED16;	(** number of contours in this zone **)
 			first*: Contours;	(** starting points of each contour; first[contours] contains total number of points in zone **)
 			pt*: Points;	(** points in this zone **)
 		END;
@@ -90,8 +90,8 @@ MODULE OTInt IN Oberon;	(** eos  **)
 			stack*: Stack;	(** program stack **)
 			callStack*: CallStack;	(** call stack of program **)
 			pc*: LONGINT;	(* current position within code *)
-			tos*: INTEGER;	(* stack pointer *)
-			ctos*: INTEGER;	(* call stack pointer *)
+			tos*: SIGNED16;	(* stack pointer *)
+			ctos*: SIGNED16;	(* call stack pointer *)
 
 			func*: Functions;	(** user defined functions **)
 			instr*: Instructions;	(** user defined instructions **)
@@ -101,25 +101,25 @@ MODULE OTInt IN Oberon;	(** eos  **)
 
 			ptsize*: F26D6;	(** current point size **)
 			xppm*, yppm*, ppm: F26D6;	(** number of pixels per Em in x/y direction **)
-			upm*: INTEGER;	(** units per Em **)
+			upm*: SIGNED16;	(** units per Em **)
 			rotated*, stretched*: BOOLEAN;	(* glyph transformation info *)
 			xratio, yratio, ratio*: Fixed;	(** aspect ratio **)
 
 			minDist*: F26D6;	(** feature preserving minimum distance **)
 			cvtCutIn*: F26D6;	(** control value table cut in **)
 			swVal*, swCutIn*: F26D6;	(** single width cut in and single width value **)
-			deltaBase*, deltaShift*: INTEGER;	(** delta exception parameters **)
+			deltaBase*, deltaShift*: SIGNED16;	(** delta exception parameters **)
 			autoFlip*: BOOLEAN;	(** whether to make CVT entries sign independent **)
 			inhibitFit*, ignorePrep*: BOOLEAN;	(** instruction control flags **)
 			fixDropouts*: BOOLEAN;	(** scan control flag **)
-			scanType*: INTEGER;	(** current scan type **)
+			scanType*: SIGNED16;	(** current scan type **)
 
-			rp0*, rp1*, rp2*: INTEGER;	(** reference points **)
-			gep0*, gep1*, gep2*: INTEGER;	(** zone indices **)
+			rp0*, rp1*, rp2*: SIGNED16;	(** reference points **)
+			gep0*, gep1*, gep2*: SIGNED16;	(** zone indices **)
 			zp0, zp1, zp2: Zone;	(* zone pointers, equal to zone[gepN] *)
 			free*, proj*, proj2*: Vector;	(** freedom vector, projection vector, and dual projection vector **)
 			period*, phase*, threshold*: F26D6;	(** parameters of current round state **)
-			loop*: INTEGER;	(** number of times to execute the next loop-aware instruction **)
+			loop*: SIGNED16;	(** number of times to execute the next loop-aware instruction **)
 		END;
 
 		(** static part of graphics state **)
@@ -127,11 +127,11 @@ MODULE OTInt IN Oberon;	(** eos  **)
 			minDist: F26D6;
 			cvtCutIn: F26D6;
 			swVal, swCutIn: F26D6;
-			deltaBase, deltaShift: INTEGER;
+			deltaBase, deltaShift: SIGNED16;
 			autoFlip: BOOLEAN;
 			inhibitFit, ignorePrep: BOOLEAN;
 			fixDropouts: BOOLEAN;
-			scanType: INTEGER;
+			scanType: SIGNED16;
 		END;
 
 		(** debug upcalls **)
@@ -717,7 +717,7 @@ MODULE OTInt IN Oberon;	(** eos  **)
 
 	(* set reference point i *)
 	PROCEDURE SRPi (VAR c: Context);
-		VAR rp: INTEGER;
+		VAR rp: SIGNED16;
 	BEGIN
 		rp := SHORT(c.stack[c.tos]); DEC(c.tos);
 		CASE c.code[c.pc] OF
@@ -730,7 +730,7 @@ MODULE OTInt IN Oberon;	(** eos  **)
 
 	(* set zone pointer i *)
 	PROCEDURE SZPi (VAR c: Context);
-		VAR gep: INTEGER;
+		VAR gep: SIGNED16;
 	BEGIN
 		gep := SHORT(c.stack[c.tos]); DEC(c.tos);
 		CASE c.code[c.pc] OF
@@ -865,7 +865,7 @@ MODULE OTInt IN Oberon;	(** eos  **)
 
 	(* scan type *)
 	PROCEDURE SCANTYPE (VAR c: Context);
-		VAR st: INTEGER;
+		VAR st: SIGNED16;
 	BEGIN
 		st := SHORT(c.stack[c.tos]); DEC(c.tos);
 		IF st IN {3, 6, 7} THEN st := 2 END;
@@ -2006,7 +2006,7 @@ MODULE OTInt IN Oberon;	(** eos  **)
 		IF size > 0 THEN NEW(cvt, size) ELSE cvt := NIL END
 	END NewCVT;
 
-	PROCEDURE NewZone* (VAR zone: Zone; contours, points: INTEGER);
+	PROCEDURE NewZone* (VAR zone: Zone; contours, points: SIGNED16);
 	BEGIN
 		NEW(zone); zone.contours := contours;
 		NEW(zone.first, contours+1);
@@ -2027,7 +2027,7 @@ MODULE OTInt IN Oberon;	(** eos  **)
 	END SetStructures;
 
 	(** set instance specific context parameters **)
-	PROCEDURE SetResolution* (VAR c: Context; ptsize, xppm, yppm: F26D6; upm: INTEGER; rotated, stretched: BOOLEAN);
+	PROCEDURE SetResolution* (VAR c: Context; ptsize, xppm, yppm: F26D6; upm: SIGNED16; rotated, stretched: BOOLEAN);
 	BEGIN
 		c.ptsize := ptsize; c.xppm := xppm; c.yppm := yppm;
 		IF xppm >= yppm THEN

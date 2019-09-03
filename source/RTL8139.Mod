@@ -79,7 +79,7 @@ TYPE
 			bufAdr:=ADDRESSOF(ctrl.txBuffers[ctrl.nextTxBuffer]^[0]);
 			SYSTEM.MOVE(ADDRESSOF(dst[0]), bufAdr, 6);
 			SYSTEM.MOVE(ADDRESSOF(local[0]), bufAdr+6, 6);
-			SYSTEM.PUT16(bufAdr+12, ROT(SYSTEM.VAL(INTEGER, SHORT(type)), 8));
+			SYSTEM.PUT16(bufAdr+12, ROT(SYSTEM.VAL(SIGNED16, SHORT(type)), 8));
 			i:=14;
 			IF h3len > 0 THEN SYSTEM.MOVE(ADDRESSOF(l3hdr[0]),  bufAdr+i, h3len); INC(i, h3len) END;
 			IF h4len > 0 THEN SYSTEM.MOVE(ADDRESSOF(l4hdr[0]),  bufAdr+i, h4len); INC(i, h4len) END;

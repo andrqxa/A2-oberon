@@ -6,7 +6,7 @@ MODULE UUDecoder IN Oberon; (** portable *)	(* ejz  *)
 
 	VAR
 		encTable: ARRAY 64 OF CHAR;
-		decTable: ARRAY 97 OF INTEGER;
+		decTable: ARRAY 97 OF SIGNED16;
 		W: Texts.Writer;
 
 	PROCEDURE GetName*(T: Texts.Text; VAR beg: LONGINT; VAR name: ARRAY OF CHAR): BOOLEAN;
@@ -35,7 +35,7 @@ MODULE UUDecoder IN Oberon; (** portable *)	(* ejz  *)
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
-			bytes, chars, c0, c1, c2, c3: INTEGER;
+			bytes, chars, c0, c1, c2, c3: SIGNED16;
 			Ri: Files.Rider;
 			ok: BOOLEAN;
 	BEGIN
@@ -163,7 +163,7 @@ MODULE UUDecoder IN Oberon; (** portable *)	(* ejz  *)
 	END Decode;
 
 	PROCEDURE InitUUTables;
-		VAR i: INTEGER;
+		VAR i: SIGNED16;
 	BEGIN
 		FOR i := 0 TO 63 DO
 			encTable[i] := CHR(i+32)

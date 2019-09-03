@@ -14,7 +14,7 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
   TYPE FileName = ARRAY 32 OF CHAR;
 
   VAR W: Texts.Writer;
-  		port: INTEGER;
+  		port: SIGNED16;
 
 	PROCEDURE OpenScanner(VAR S: Texts.Scanner);
 		VAR
@@ -92,7 +92,7 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
 
 	PROCEDURE GetSize (VAR name: ARRAY OF CHAR; VAR varSize: LONGINT;
 		VAR constSize: LONGINT; VAR codeSize: LONGINT; T: Texts.Text);
-		VAR f: Files.File; R: Files.Rider; x: INTEGER; ch1, ch2: CHAR;  size: LONGINT;
+		VAR f: Files.File; R: Files.Rider; x: SIGNED16; ch1, ch2: CHAR;  size: LONGINT;
 	BEGIN
 		Texts.WriteString(W, name);  Texts.Append(T, W.buf);
 		varSize := 0;  constSize := 0;  codeSize := 0;
@@ -253,7 +253,7 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
   PROCEDURE MakeDOSText*;	(** non-portable *)
     CONST MaxWord = 128;
     VAR R: Texts.Reader; S: Texts.Scanner; T: Texts.Text;
-          g: Files.File; Wg: Files.Rider; termCh: CHAR; pos, len, i: INTEGER;
+          g: Files.File; Wg: Files.Rider; termCh: CHAR; pos, len, i: SIGNED16;
           name: ARRAY 32 OF CHAR; buf: ARRAY MaxWord OF CHAR;
   BEGIN
     Texts.WriteString(W, "Miscellaneous.MakeDOSText"); Texts.WriteLn(W);
@@ -362,8 +362,8 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
 		END
 	END PrintFiles;
 
-  PROCEDURE ExtName (i: INTEGER; VAR org, new: ARRAY OF CHAR);
-    VAR j: INTEGER; strnum: ARRAY 10 OF CHAR; ch : CHAR;
+  PROCEDURE ExtName (i: SIGNED16; VAR org, new: ARRAY OF CHAR);
+    VAR j: SIGNED16; strnum: ARRAY 10 OF CHAR; ch : CHAR;
   BEGIN j := 0;
     WHILE org[j] # 0X DO new[j] := org[j]; INC(j) END;
     Strings.IntToStr(i,strnum);
@@ -377,7 +377,7 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
 
 (** Copy the specified file "File" into subfiles named "File0", "File1" etc., maximally 700k each *)
   PROCEDURE SplitFile*;
-    VAR S: Texts.Scanner; f, g: Files.File; Rf, Rg: Files.Rider; i: INTEGER; n: LONGINT; ch: CHAR;
+    VAR S: Texts.Scanner; f, g: Files.File; Rf, Rg: Files.Rider; i: SIGNED16; n: LONGINT; ch: CHAR;
       name: ARRAY 32 OF CHAR;
   BEGIN
     OpenScanner(S);
@@ -397,7 +397,7 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
 
 (** Copy subfiles "File0", "File1" etc. to a combined file "File".  Specify only parameter "File". *)
   PROCEDURE JoinFiles*;
-    VAR S: Texts.Scanner; f, g: Files.File; Rf, Rg: Files.Rider; i: INTEGER; ch: CHAR;
+    VAR S: Texts.Scanner; f, g: Files.File; Rf, Rg: Files.Rider; i: SIGNED16; ch: CHAR;
       name: ARRAY 32 OF CHAR;
   BEGIN
     OpenScanner(S);

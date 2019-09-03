@@ -53,7 +53,7 @@ MODULE Books IN Oberon; (** portable *)	(* ejz  *)
 			imps*: Books0.ImpList;
 			options*: SET;
 			curC: Books0.ContElem;
-			noteH*: INTEGER
+			noteH*: SIGNED16
 		END;
 
 		(* stack of changes to a tutorial *)
@@ -99,7 +99,7 @@ MODULE Books IN Oberon; (** portable *)	(* ejz  *)
 	END GetNote;
 
 (* resize all TextGadgets.Style to w in a tutorial (P) *)
-	PROCEDURE ResizeControls*(P: Panel; T: TGFrame; w: INTEGER);
+	PROCEDURE ResizeControls*(P: Panel; T: TGFrame; w: SIGNED16);
 		VAR
 			Fi: Texts.Finder;
 			t: Books0.TextList;
@@ -131,7 +131,7 @@ MODULE Books IN Oberon; (** portable *)	(* ejz  *)
 
 (* redisplay a tutorial panel *)
 
-	PROCEDURE MoveBar(P: Panel; M: Display.ModifyMsg; name: ARRAY OF CHAR; Y, mode: INTEGER; broadcast: BOOLEAN);
+	PROCEDURE MoveBar(P: Panel; M: Display.ModifyMsg; name: ARRAY OF CHAR; Y, mode: SIGNED16; broadcast: BOOLEAN);
 		VAR
 			obj: Objects.Object;
 			msg: Display.ModifyMsg;
@@ -158,9 +158,9 @@ MODULE Books IN Oberon; (** portable *)	(* ejz  *)
 		END
 	END MoveBar;
 
-	PROCEDURE ReDisplay*(VAR M: Display.ModifyMsg; mode: INTEGER; broadcast: BOOLEAN);
+	PROCEDURE ReDisplay*(VAR M: Display.ModifyMsg; mode: SIGNED16; broadcast: BOOLEAN);
 		VAR
-			butH: INTEGER;
+			butH: SIGNED16;
 			T, Tn: TGFrame;
 			P: Panel;
 			msg: Display.ModifyMsg;
@@ -254,10 +254,10 @@ MODULE Books IN Oberon; (** portable *)	(* ejz  *)
 			obj: Objects.Object;
 			P, F0: Panel;
 			T, T0, Tn: TGFrame;
-			butH, x, y, h: INTEGER;
+			butH, x, y, h: SIGNED16;
 			R: Display3.Mask;
 			tl, tl2: Books0.TextList;
-			PROCEDURE MoveButton(name: ARRAY OF CHAR; dX, dY, nH: INTEGER);
+			PROCEDURE MoveButton(name: ARRAY OF CHAR; dX, dY, nH: SIGNED16);
 				VAR msg: Display.ModifyMsg;
 			BEGIN
 				obj := Gadgets.FindObj(P, name);
@@ -486,7 +486,7 @@ MODULE Books IN Oberon; (** portable *)	(* ejz  *)
 			F0: TGFrame;
 			name: ARRAY 64 OF CHAR;
 			obj: Objects.Object;
-			x, y: INTEGER;
+			x, y: SIGNED16;
 	BEGIN
 		WITH F: TGFrame DO
 			IF M IS Objects.CopyMsg THEN
@@ -959,7 +959,7 @@ MODULE Books IN Oberon; (** portable *)	(* ejz  *)
 	PROCEDURE GotoText*(P: Panel; ind, pos: LONGINT; sel: BOOLEAN);
 		VAR
 			t: Books0.TextList;
-			i: INTEGER;
+			i: SIGNED16;
 			T: TGFrame;
 	BEGIN
 		i := 0;
@@ -1061,7 +1061,7 @@ MODULE Books IN Oberon; (** portable *)	(* ejz  *)
 			P: Panel;
 			S: Texts.Scanner;
 			par: Oberon.ParList;
-			res: INTEGER;
+			res: SIGNED16;
 			beg, pos2: LONGINT;
 			T: TGFrame;
 			style: TextGadgets.Style;
@@ -1138,7 +1138,7 @@ MODULE Books IN Oberon; (** portable *)	(* ejz  *)
 	END Call;
 
 (* overridden LocateString-"method" for TGFrame, handels underlining of strings *)
-	PROCEDURE LocateString(F: TextGadgets0.Frame; x, y, X, Y: INTEGER; VAR loc: TextGadgets0.Loc);
+	PROCEDURE LocateString(F: TextGadgets0.Frame; x, y, X, Y: SIGNED16; VAR loc: TextGadgets0.Loc);
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;

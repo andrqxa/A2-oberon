@@ -87,7 +87,7 @@ TYPE
 	END FrameLinks;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  w, h, depth: LONGINT;  version: INTEGER;
+	VAR objsub: Objects.Object;  w, h, depth: LONGINT;  version: SIGNED16;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN
@@ -106,7 +106,7 @@ TYPE
 	END HandleFileMsg;
 
 	PROCEDURE CheckDimensions( obj: tObject );
-	VAR pict: Pictures.Picture;  col: INTEGER;  r, g, b: INTEGER;
+	VAR pict: Pictures.Picture;  col: SIGNED16;  r, g, b: SIGNED16;
 	BEGIN
 		IF (obj.w # obj.A.w) OR (obj.h # obj.A.h) THEN
 			obj.w := obj.A.w;  obj.h := obj.A.h;  pict := obj.pict;  Pictures.Create( obj.pict, SHORT( obj.w ), SHORT( obj.h ), 8 );
@@ -119,7 +119,7 @@ TYPE
 	END CheckDimensions;
 
 	PROCEDURE Sync*( obj: tObject );
-	VAR x, y: INTEGER;  A: antsArrayObjects.tINTEGERArray;
+	VAR x, y: SIGNED16;  A: antsArrayObjects.tINTEGERArray;
 	BEGIN
 		IF obj.A # NIL THEN
 			CheckDimensions( obj );  A := obj.A.A;
@@ -215,7 +215,7 @@ TYPE
 	END Gen;
 
 	PROCEDURE FromArray*( obj: tObject;  A: antsArrayObjects.tINTEGERObject );
-	VAR r, g, b: INTEGER;  i: LONGINT;
+	VAR r, g, b: SIGNED16;  i: LONGINT;
 	BEGIN
 		obj.A := A;  obj.w := A.w;  obj.h := A.h;  obj.depth := A.depth;
 
@@ -240,7 +240,7 @@ TYPE
 	END New;
 
 	PROCEDURE P2A( obj: tObject;  depth: LONGINT );
-	VAR x, y: INTEGER;  r, g, b: INTEGER;  ncm: vyColorPalettes.NewColMsg;  img: Pictures.Picture;
+	VAR x, y: SIGNED16;  r, g, b: SIGNED16;  ncm: vyColorPalettes.NewColMsg;  img: Pictures.Picture;
 	BEGIN
 		aM.vSI( "Pict Array Conversion, depth = ", depth );  img := obj.pict;  vyColorPalettes.InitConversion( depth, ncm.pal );
 		FOR y := 0 TO img.height - 1 DO

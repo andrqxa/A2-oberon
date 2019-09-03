@@ -19,7 +19,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		END;
 
 		Frame* = POINTER TO RECORD (Gadgets.FrameDesc)
-			col*: INTEGER;
+			col*: SIGNED16;
 			age*: LONGINT
 		END;
 
@@ -33,7 +33,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		Fig: ARRAY MaxN OF Icon;
 
 	PROCEDURE EmptyFig;
-		VAR j: INTEGER;
+		VAR j: SIGNED16;
 	BEGIN N := 1; j := 1;
 		WHILE j < Side DO
 			Fig[0, 0].image[j] := {};
@@ -45,7 +45,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 	END EmptyFig;
 
 	PROCEDURE LoadFig (file: ARRAY OF CHAR); (* read portable file format *)
-		VAR F: Files.File; R: Files.Rider; i, j: INTEGER;
+		VAR F: Files.File; R: Files.Rider; i, j: SIGNED16;
 
 		PROCEDURE ReadInt (VAR x: LONGINT);
 			VAR n: LONGINT; i: SIGNED8; ch: CHAR;
@@ -55,7 +55,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		END ReadInt;
 
 		PROCEDURE ReadSet (VAR s: SET);
-			VAR x: LONGINT; i: INTEGER;
+			VAR x: LONGINT; i: SIGNED16;
 		BEGIN ReadInt(x); s := {}; i := 0;
 			WHILE i < 32 DO
 				IF ODD(x) THEN INCL(s, i) END;
@@ -81,22 +81,22 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		END
 	END LoadFig;
 
-	PROCEDURE Draw (M: Display3.Mask; VAR icn: Icon; x, y, color: INTEGER);
+	PROCEDURE Draw (M: Display3.Mask; VAR icn: Icon; x, y, color: SIGNED16);
 	BEGIN
 		Oberon.RemoveMarks(x, y, Side, Side);
 		Display3.CopyPattern(M, color, icn[0].addr, x, y, Display.paint);
 		Display3.CopyPattern(M, color, icn[1].addr, x + HSide, y, Display.paint)
 	END Draw;
 
-	PROCEDURE P(x: INTEGER): INTEGER;
+	PROCEDURE P(x: SIGNED16): SIGNED16;
 	BEGIN RETURN SHORT((x*Display.Unit + Display.Unit DIV 2) DIV Printer.Unit)
 	END P;
 
-	PROCEDURE PrintIcn (VAR icn: Icon; x, y: INTEGER);
-		VAR i: INTEGER;
+	PROCEDURE PrintIcn (VAR icn: Icon; x, y: SIGNED16);
+		VAR i: SIGNED16;
 
-		PROCEDURE PrintLine (x, y: INTEGER; line: SET);
-			VAR i, i0: INTEGER;
+		PROCEDURE PrintLine (x, y: SIGNED16; line: SET);
+			VAR i, i0: SIGNED16;
 		BEGIN i := 0;
 			WHILE i < HSide DO
 				IF i IN line THEN i0 := i; INC(i);
@@ -115,11 +115,11 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		END
 	END PrintIcn;
 
-	PROCEDURE HotSpot (X, Y, W, H, X0, Y0: INTEGER);
+	PROCEDURE HotSpot (X, Y, W, H, X0, Y0: SIGNED16);
 		CONST d = 6;
-		VAR dx, dy: LONGINT; r: INTEGER;
+		VAR dx, dy: LONGINT; r: SIGNED16;
 
-		PROCEDURE Block (x, y, w, h, col, mode: INTEGER);
+		PROCEDURE Block (x, y, w, h, col, mode: SIGNED16);
 		BEGIN
 			IF x < X THEN DEC(w, X-x); x := X END;
 			IF x+w > X+W THEN w := X+W-x END;
@@ -130,7 +130,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 			Display.ReplConst(col, x, y, w, h, mode)
 		END Block;
 
-		PROCEDURE Dot4 (x1, x2, y1, y2, col, mode: INTEGER);
+		PROCEDURE Dot4 (x1, x2, y1, y2, col, mode: SIGNED16);
 			CONST r = (d+1) DIV 2;
 		BEGIN
 			Block(x1-r, y1-r, 2*r+1, 2*r+1, col, mode);
@@ -139,8 +139,8 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 			Block(x2-r, y2-r, 2*r+1, 2*r+1, col, mode)
 		END Dot4;
 
-		PROCEDURE Circle (X, Y, R, col, mode: INTEGER);
-			VAR x, y, dx, dy, d: INTEGER;
+		PROCEDURE Circle (X, Y, R, col, mode: SIGNED16);
+			VAR x, y, dx, dy, d: SIGNED16;
 		BEGIN
 			x := R; y := 0; dx := 8*(x-1); dy := 8*y+4; d := 1 - 4*R;
 			WHILE x > y DO
@@ -161,8 +161,8 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		END
 	END HotSpot;
 
-	PROCEDURE SaveScreen (x0, y0: INTEGER; keys: SET; col: INTEGER; VAR State: LONGINT);
-		VAR sum: SET; x, y, w, h: INTEGER; msg: Display.ControlMsg; wakeUp: LONGINT;
+	PROCEDURE SaveScreen (x0, y0: SIGNED16; keys: SET; col: SIGNED16; VAR State: LONGINT);
+		VAR sum: SET; x, y, w, h: SIGNED16; msg: Display.ControlMsg; wakeUp: LONGINT;
 	BEGIN
 		Oberon.RemoveMarks(x0, y0, 52, 52);
 		Display.ReplConst(Display3.black, x0, y0, 52, 52, Display.invert); sum := keys;
@@ -211,7 +211,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		END
 	END FrameAttr;
 
-PROCEDURE RestoreFrame(F: Frame; M: Display3.Mask; x, y, w, h: INTEGER);
+PROCEDURE RestoreFrame(F: Frame; M: Display3.Mask; x, y, w, h: SIGNED16);
 BEGIN
 	Display3.ReplConst(M, F.col, x, y, w, h, Display.replace);
 	Draw(M, Fig[F.age MOD N], x, y, Display3.black);
@@ -234,7 +234,7 @@ BEGIN
 END CopyFrame;
 
 PROCEDURE FrameHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR x, y, w, h: INTEGER; F0: Frame; R: Display3.Mask;
+VAR x, y, w, h: SIGNED16; F0: Frame; R: Display3.Mask;
 BEGIN
 	WITH F: Frame DO
 		IF M IS Display.FrameMsg THEN

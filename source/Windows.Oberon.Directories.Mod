@@ -51,7 +51,7 @@ VAR
 	mMethod: ListRiders.Method;
 	vMethod: ListGadgets.Method;
 	drvPicts: ARRAY Picts OF Pictures.Picture;
-	maxW: INTEGER;
+	maxW: SIGNED16;
 
 	drv: Objects.Object;
 	StringHandler: Objects.Handler;
@@ -119,7 +119,7 @@ END InsertItem;
 PROCEDURE Enum (path, name: ARRAY OF CHAR; time, date, size: LONGINT; attrs: SET);
 VAR new, cur: Item;
 
-	PROCEDURE CAPCompare (VAR s1, s2: ARRAY OF CHAR): INTEGER;
+	PROCEDURE CAPCompare (VAR s1, s2: ARRAY OF CHAR): SIGNED16;
 	VAR i: LONGINT;
 	BEGIN
 		i := 0;
@@ -400,7 +400,7 @@ BEGIN
 	L.dx := maxW + 2 + L.lev*F.tab
 END FormatLine;
 
-PROCEDURE DisplayLine (F: ListGadgets.Frame; Q: Display3.Mask; x, y, w, h: INTEGER; R: ListRiders.Rider; L: ListGadgets.Line);
+PROCEDURE DisplayLine (F: ListGadgets.Frame; Q: Display3.Mask; x, y, w, h: SIGNED16; R: ListRiders.Rider; L: ListGadgets.Line);
 VAR d: Data; pict: Pictures.Picture; str: ARRAY 64 OF CHAR;
 BEGIN
 	Display3.ReplConst(Q, F.backC, x, y, w, h, Display.replace);
@@ -419,7 +419,7 @@ BEGIN
 	Display3.String(Q, F.textC, x, y + L.dsr, F.fnt, str, Display.paint)
 END DisplayLine;
 
-PROCEDURE P (x: LONGINT): INTEGER;
+PROCEDURE P (x: LONGINT): SIGNED16;
 BEGIN RETURN SHORT((x * Display.Unit) DIV Printer.Unit)
 END P;
 
@@ -439,7 +439,7 @@ BEGIN
 	L.dx := P(maxW + 2 + L.lev*F.tab)
 END PrintFormatLine;
 
-PROCEDURE PrintLine (F: ListGadgets.Frame; Q: Display3.Mask; x, y, w, h: INTEGER; R: ListRiders.Rider; L: ListGadgets.Line);
+PROCEDURE PrintLine (F: ListGadgets.Frame; Q: Display3.Mask; x, y, w, h: SIGNED16; R: ListRiders.Rider; L: ListGadgets.Line);
 VAR d: Data; pict: Pictures.Picture; str: ARRAY 64 OF CHAR;
 BEGIN
 	Printer3.ReplConst(Q, F.backC, x, y, w, h, Display.replace);

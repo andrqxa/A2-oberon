@@ -226,7 +226,7 @@ TYPE
         END ErrorS;
 
         (** report an error occured during scanning **)
-        PROCEDURE Error(code: INTEGER);
+        PROCEDURE Error(code: SIGNED16);
         BEGIN
             Basic.ErrorC(diagnostics, source^, position, code, "");
             error := TRUE;
@@ -685,7 +685,7 @@ TYPE
                             n := Digit(ch);
                             Append(ch);
                             GetNextCharacter;
-                            IF e <= (MAX(INTEGER) - n) DIV 10 THEN
+                            IF e <= (MAX(SIGNED16) - n) DIV 10 THEN
                                 e := e * 10 + n
                             ELSE
                                 Error(Basic.NumberTooLarge)
