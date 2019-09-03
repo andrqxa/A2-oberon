@@ -2002,7 +2002,7 @@ PROCEDURE GetSMBTimeStamp(dtNow:Dates.DateTime; VAR t: ARRAY OF SIGNED32);
 VAR
 	dtOld : Dates.DateTime;
 	diffDay, diffHour, diffMinute, diffSecond: SIGNED32;
-	tsNow : HUGEINT;
+	tsNow : SIGNED64;
 BEGIN
 	dtOld.year := 1601;
 	dtOld.month := 1;

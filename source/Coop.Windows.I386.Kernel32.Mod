@@ -245,7 +245,7 @@ TYPE
 	(** A 64-bit signed integer value. *)
 	LargeInteger* = RECORD
 		LowPart*, HighPart*: SIGNED32;
-		QuadPart*{ FICTIVE = 0 }: HUGEINT;
+		QuadPart*{ FICTIVE = 0 }: SIGNED64;
 	END;
 
 	(** A 64-bit unsigned integer value. *)
@@ -256,13 +256,13 @@ TYPE
 		  dwLength*: SIGNED32;
 		  dwMemoryLoad*: SIGNED32;
 
-		  ullTotalPhys*: HUGEINT;
-		  ullAvailPhys*: HUGEINT;
-		  ullTotalPageFile*: HUGEINT;
-		  ullAvailPageFile*: HUGEINT;
-		  ullTotalVirtual*: HUGEINT;
-		  ullAvailVirtual*: HUGEINT;
-		  ullAvailExtendedVirtual*: HUGEINT;
+		  ullTotalPhys*: SIGNED64;
+		  ullAvailPhys*: SIGNED64;
+		  ullTotalPageFile*: SIGNED64;
+		  ullAvailPageFile*: SIGNED64;
+		  ullTotalVirtual*: SIGNED64;
+		  ullAvailVirtual*: SIGNED64;
+		  ullAvailExtendedVirtual*: SIGNED64;
 	END;
 
 	(** CreateThread *)
@@ -657,7 +657,7 @@ VAR
 	QueryPerformanceFrequency-: PROCEDURE {WINAPI} ( VAR lpFrequency: LargeInteger ): BOOL;
 
 	(** Retrieves the cycle time for the specified thread (both user and kernel mode, Windows Vista and newer) *)
-	QueryThreadCycleTime- : PROCEDURE {WINAPI} (hThread : HANDLE; VAR cycleTime : HUGEINT) : BOOL;
+	QueryThreadCycleTime- : PROCEDURE {WINAPI} (hThread : HANDLE; VAR cycleTime : SIGNED64) : BOOL;
 	(** The ReadFile function reads data from a file, starting at the position indicated by the file pointer. *)
 	ReadFile-: PROCEDURE {WINAPI} ( hFile: HANDLE;
 															  VAR lpBuffer: ARRAY   OF SYSTEM.BYTE;

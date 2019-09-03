@@ -1070,7 +1070,7 @@ TYPE
 			RETURN controller.ExecuteCommand(cmd, IOTimeout, status) = Res_OK;
 		END SetWriteCache;
 
-		PROCEDURE TransferEx(op: SIGNED32; lba: HUGEINT; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): WORD;
+		PROCEDURE TransferEx(op: SIGNED32; lba: SIGNED64; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): WORD;
 		VAR command: Command; status: SET;
 		BEGIN {EXCLUSIVE}
 			IF (op # Disks.Read) & (op # Disks.Write) THEN RETURN Disks.Unsupported; END;
@@ -1164,7 +1164,7 @@ TYPE
 			RETURN command;
 		END NewCommand;
 
-		PROCEDURE NewCommandTransfer(op: SIGNED32; lba: HUGEINT; count: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): Command;
+		PROCEDURE NewCommandTransfer(op: SIGNED32; lba: SIGNED64; count: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): Command;
 		VAR
 			CMD: ARRAY 8 OF SIGNED32;
 			idx: SIGNED32;
@@ -1229,7 +1229,7 @@ TYPE
 			RETURN command;
 		END NewCommandLBA;
 
-		PROCEDURE NewCommandLBA48(cmd: SIGNED32; lba: HUGEINT; count: SIGNED32): CommandLBA48;
+		PROCEDURE NewCommandLBA48(cmd: SIGNED32; lba: SIGNED64; count: SIGNED32): CommandLBA48;
 		VAR command: CommandLBA48;
 		BEGIN
 			command := cmdLBA48;
@@ -1506,7 +1506,7 @@ TYPE
 			END;
 		END ProcessSense;
 
-		PROCEDURE TransferEx*(op: SIGNED32; lba: HUGEINT; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): WORD;
+		PROCEDURE TransferEx*(op: SIGNED32; lba: SIGNED64; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): WORD;
 		VAR
 			command: Command;
 			res: WORD; timeout: SIGNED32;
@@ -1730,7 +1730,7 @@ TYPE
 			RETURN res
 		END ReadCapacity;
 
-		PROCEDURE NewCommandPacketTransfer(op: SIGNED32; lba: HUGEINT; count: SIGNED32; bufAdr: ADDRESS; size: SIGNED32; dma: BOOLEAN): CommandPacket;
+		PROCEDURE NewCommandPacketTransfer(op: SIGNED32; lba: SIGNED64; count: SIGNED32; bufAdr: ADDRESS; size: SIGNED32; dma: BOOLEAN): CommandPacket;
 		VAR
 			command: CommandPacket;
 			i, lbaLow, lbaHigh: SIGNED32;

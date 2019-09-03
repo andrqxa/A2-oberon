@@ -1298,7 +1298,7 @@ BEGIN
 	AddBasicType(Universe, "SIGNED16", TS.BasicInt16);
 	AddBasicType(Universe, "SIGNED32", TS.BasicInt32);
 	AddBasicType(Universe, "SET", TS.BasicInt32);
-	AddBasicType(Universe, "HUGEINT", TS.BasicInt64);
+	AddBasicType(Universe, "SIGNED64", TS.BasicInt64);
 	AddBasicType(Universe, "CHAR", TS.BasicChar8);
 	AddBasicType(Universe, "REAL", TS.BasicReal32);
 	AddBasicType(Universe, "LONGREAL", TS.BasicReal64);

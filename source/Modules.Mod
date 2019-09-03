@@ -52,7 +52,7 @@ TYPE
 	END;
 
 	ExportDesc* = RECORD
-		fp*: HUGEINT;
+		fp*: SIGNED64;
 		name* {UNTRACED}: DynamicName;
 		adr*: ADDRESS;
 		exports*: SIZE; (* number of exports referenced by ExportArray *)
@@ -516,11 +516,11 @@ BEGIN
 	RETURN m
 END ThisModuleByAdr;
 
-CONST ModuleInitTimeout = HUGEINT(3000000000); (* Timeout for waiting until a module get initialized, 3 seconds for 1 GHz CPU *)
+CONST ModuleInitTimeout = SIGNED64(3000000000); (* Timeout for waiting until a module get initialized, 3 seconds for 1 GHz CPU *)
 
 (*	Retrieve a procedure given a module name, the procedure name and some type information (kernel call) *)
 PROCEDURE GetProcedure*(CONST moduleName, procedureName : ARRAY OF CHAR; argTdAdr, retTdAdr : ADDRESS; VAR entryAdr : ADDRESS);
-VAR module : Module; ignoreMsg : ARRAY 32 OF CHAR; i: SIZE; res : WORD; t: HUGEINT;
+VAR module : Module; ignoreMsg : ARRAY 32 OF CHAR; i: SIZE; res : WORD; t: SIGNED64;
 BEGIN
 	module := ThisModule(moduleName, res, ignoreMsg);
 	IF (res = Ok) THEN

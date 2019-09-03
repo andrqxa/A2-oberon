@@ -1509,7 +1509,7 @@ TYPE
 			numRanges, idx, offset: SIGNED32;
 			sgList: POINTER TO ARRAY OF Machine.Range;
 			buf: ADDRESS;
-			t: HUGEINT;
+			t: SIGNED64;
 		BEGIN
 			ASSERT((pipe.maxRetries >= 0) & (pipe.maxRetries <= 3));
 
@@ -2329,7 +2329,7 @@ TYPE
 		PROCEDURE Init * (iobase , irq  :  SIGNED32) : BOOLEAN;
 		VAR
 			reg  : SIGNED32;
-			dword : SET; qword : HUGEINT;
+			dword : SET; qword : SIGNED64;
 			ignore : BOOLEAN;
 			i : SIGNED32;
 		BEGIN

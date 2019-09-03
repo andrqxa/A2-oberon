@@ -77,7 +77,7 @@ VAR
 	prioLow-, prioHigh-: WORD;	(* permitted thread priorities *)
 
 	fcr-: SET;	(** default floating-point control register value (default rounding mode is towards -infinity, for ENTIER) *)
-	mhz-: HUGEINT;	(** clock rate of GetTimer in MHz, or 0 if not known *)
+	mhz-: SIGNED64;	(** clock rate of GetTimer in MHz, or 0 if not known *)
 
 	gcThreshold-: SIZE;
 	memBlockHead-{UNTRACED}, memBlockTail-{UNTRACED}: MemoryBlock; (* head and tail of sorted list of memory blocks *)
@@ -88,7 +88,7 @@ VAR
 	logfile: WORD;
 	traceHeap: BOOLEAN;
 
-	timer0	: HUGEINT;
+	timer0	: SIGNED64;
 
 	(** Return current processor ID (0 to MaxNum-1). *)
 	PROCEDURE  ID* (): SIGNED32;
@@ -447,7 +447,7 @@ CODE
 #END
 END CurrentPC;
 
-PROCEDURE -GetTimer* (): HUGEINT;
+PROCEDURE -GetTimer* (): SIGNED64;
 CODE
 #IF I386 THEN
 	RDTSC	; set EDX:EAX
@@ -842,7 +842,7 @@ END GetTimer;
 	END InitThreads;
 
 	PROCEDURE CPUSpeed;
-	VAR t0, t1: HUGEINT;
+	VAR t0, t1: SIGNED64;
 	BEGIN
 		t0 := GetTimer();  Unix.ThrSleep( 100 );  t1 := GetTimer();
 		mhz := (t1 - t0) DIV 100000;

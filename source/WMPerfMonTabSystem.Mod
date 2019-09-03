@@ -20,8 +20,8 @@ TYPE
 
 		(* Timers *)
 		milliTimer : Kernel.MilliTimer;
-		lastTimestamp : HUGEINT;
-		lastGcCyclesAllRuns : HUGEINT;
+		lastTimestamp : SIGNED64;
+		lastGcCyclesAllRuns : SIGNED64;
 		lastNgc : SIZE;
 		started : BOOLEAN;
 		startBtn : WMStandardComponents.Button;
@@ -66,7 +66,7 @@ TYPE
 		PROCEDURE HandleGcButton(sender, data : ANY);
 		VAR
 			string, nbr : ARRAY 128 OF CHAR;
-			lastGcCyclesTot : HUGEINT;
+			lastGcCyclesTot : SIGNED64;
 			w : Streams.StringWriter;
 		BEGIN
 			IF clockrate = -1 THEN clockrate := EstimateClockRate(); END;

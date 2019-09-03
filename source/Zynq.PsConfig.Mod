@@ -36,7 +36,7 @@ CONST
 	IoI2c* = 9;
 
 VAR
-	psRefClockHz: HUGEINT;
+	psRefClockHz: SIGNED64;
 
 	(**
 		Get clock frequency of a given PLL clock source
@@ -46,12 +46,12 @@ VAR
 
 		Returns the frequency in Hz
 	*)
-	PROCEDURE GetPllClockFrequency*(srcSel: SIGNED32; VAR res: WORD): HUGEINT;
+	PROCEDURE GetPllClockFrequency*(srcSel: SIGNED32; VAR res: WORD): SIGNED64;
 	BEGIN
 		CASE srcSel OF
-			|IoPll: RETURN HUGEINT(LSH(SYSTEM.MSK(Platform.slcr.IO_PLL_CTRL,0x7F000),-12)) * psRefClockHz;
-			|ArmPll: RETURN HUGEINT(LSH(SYSTEM.MSK(Platform.slcr.ARM_PLL_CTRL,0x7F000),-12)) * psRefClockHz;
-			|DdrPll: RETURN HUGEINT(LSH(SYSTEM.MSK(Platform.slcr.DDR_PLL_CTRL,0x7F000),-12)) * psRefClockHz;
+			|IoPll: RETURN SIGNED64(LSH(SYSTEM.MSK(Platform.slcr.IO_PLL_CTRL,0x7F000),-12)) * psRefClockHz;
+			|ArmPll: RETURN SIGNED64(LSH(SYSTEM.MSK(Platform.slcr.ARM_PLL_CTRL,0x7F000),-12)) * psRefClockHz;
+			|DdrPll: RETURN SIGNED64(LSH(SYSTEM.MSK(Platform.slcr.DDR_PLL_CTRL,0x7F000),-12)) * psRefClockHz;
 		ELSE
 			res := InvalidClockSource; RETURN 0;
 		END;
@@ -119,7 +119,7 @@ VAR
 
 		Returns the frequency in Hz
 	*)
-	PROCEDURE GetPlClockFrequency*(channel: SIGNED32; VAR res: WORD): HUGEINT;
+	PROCEDURE GetPlClockFrequency*(channel: SIGNED32; VAR res: WORD): SIGNED64;
 	VAR
 		d, srcSel, divisor0, divisor1: SIGNED32;
 	BEGIN
@@ -249,9 +249,9 @@ VAR
 		RETURN TRUE;
 	END StartPlClocks;
 
-	PROCEDURE GetIoClockFrequency*(module: SIGNED32; VAR res: WORD): HUGEINT;
+	PROCEDURE GetIoClockFrequency*(module: SIGNED32; VAR res: WORD): SIGNED64;
 	VAR
-		baseFreq: HUGEINT;
+		baseFreq: SIGNED64;
 		val: SIGNED32;
 	BEGIN
 		CASE module OF
@@ -316,9 +316,9 @@ VAR
 		RETURN pll
 	END GetIoClockSource;
 
-	PROCEDURE SetIoClockFrequency*(module: SIGNED32; freq: HUGEINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE SetIoClockFrequency*(module: SIGNED32; freq: SIGNED64; VAR res: WORD): BOOLEAN;
 	VAR
-		baseFreq: HUGEINT;
+		baseFreq: SIGNED64;
 		val, div: SIGNED32;
 	BEGIN
 		res := Ok;

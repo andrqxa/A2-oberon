@@ -17,7 +17,7 @@ TYPE
 	Int1 = SIGNED8;
 	Int2 = SIGNED16;
 	Int4 = SIGNED32;
-	Int8 = HUGEINT;
+	Int8 = SIGNED64;
 	Float4 = REAL;
 	Float8 = LONGREAL;
 

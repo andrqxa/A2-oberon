@@ -58,7 +58,7 @@ TYPE
 			(** statistics *)
 			NbytesRead*, NbytesWritten*, (** successfully tranfered bytes *)
 			NnofReads*, NnofWrites*, NnofOthers*, (** operation count *)
-			NnofErrors* : HUGEINT; (** read/write errors *)
+			NnofErrors* : SIGNED64; (** read/write errors *)
 
 		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
 		BEGIN

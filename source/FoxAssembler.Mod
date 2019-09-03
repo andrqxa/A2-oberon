@@ -117,7 +117,7 @@ TYPE
 	Result*= RECORD
 		type*: SIGNED16; (* ConstantInteger, ConstantFloat, Fixup, Offset *)
 		sizeInBits*: SIZE;
-		value*: HUGEINT;
+		value*: SIGNED64;
 		valueR*: LONGREAL;
 		fixup*: BinaryCode.Fixup;
 	END;
@@ -700,7 +700,7 @@ TYPE
 		END Reserve;
 
 		(** if the assembler is at the last pass: put bits into the binary code section, otherwise only increment the PC **)
-		PROCEDURE PutBitsIfLastPass(data: HUGEINT; size: BinaryCode.Bits);
+		PROCEDURE PutBitsIfLastPass(data: SIGNED64; size: BinaryCode.Bits);
 		VAR
 			oldPC: BinaryCode.Unit;
 		BEGIN

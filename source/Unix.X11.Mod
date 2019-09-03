@@ -305,7 +305,7 @@ TYPE
 		END;
 
 	TYPE XSizeHints* = RECORD
-			flags*: LONGWORD;	(* marks which fields in this structure are defined *) (* HUGEINT ?*)
+			flags*: LONGWORD;	(* marks which fields in this structure are defined *) (* SIGNED64 ?*)
 			x*, y*: WORD;		(* obsolete for new window mgrs, but clients *)
 			width*, height*: WORD;	(* should set so old wm's don't mess up *)
 			minWidth*, minHeight*: WORD;

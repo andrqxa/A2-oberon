@@ -394,7 +394,7 @@ TYPE
 		timer : Kernel.Timer;
 
 		(* Performance monitoring *)
-		NbytesTransfered- : HUGEINT;
+		NbytesTransfered- : SIGNED64;
 
 		(* HC statistics *)
 		NnofTransfers-,

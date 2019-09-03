@@ -577,7 +577,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 			ELSIF (name = "LONG") OR (name = "SHORT") OR (name = "ENTIER") THEN Str(name); RETURN
 			ELSIF (name = "c") OR (name = "winapi") OR (name = "notag") OR (name = "untraced") THEN Str(name); RETURN
 			ELSIF (name = "PTR") THEN Str(name); RETURN
-			ELSIF (name = "HUGEINT") THEN Str(name); RETURN
+			ELSIF (name = "SIGNED64") THEN Str(name); RETURN
 			ELSE obj:= FindIdent(name);
 				(* check whether object is exported or not *)
 				IF (obj = NIL) THEN (* exported => write control *) SetColor(LinkCol); Str(name); Control("", GotoCmd, name)

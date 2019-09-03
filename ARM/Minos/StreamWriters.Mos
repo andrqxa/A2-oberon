@@ -132,8 +132,8 @@ VAR
 		END;
 	END RawLInt;
 
-	(** Write a HUGEINT. *)
-	PROCEDURE RawHInt*(VAR wr: Writer; x: HUGEINT );
+	(** Write a SIGNED64. *)
+	PROCEDURE RawHInt*(VAR wr: Writer; x: SIGNED64 );
 	VAR xx: Hugeint;
 	BEGIN
 		xx := SYSTEM.VAL(Hugeint,x);
@@ -180,7 +180,7 @@ VAR
 	(** Write a LONGREAL. *)
 	PROCEDURE RawLReal*(VAR wr: Writer; x: LONGREAL );
 	BEGIN
-		RawHInt(wr,SYSTEM.VAL(HUGEINT,x));
+		RawHInt(wr,SYSTEM.VAL(SIGNED64,x));
 	END RawLReal;
 
 	(** Write a 0X-terminated string, including the 0X terminator *)
@@ -314,7 +314,7 @@ VAR
 		WHILE w > i DO Char(wr,filler);  DEC(w); END;
 		REPEAT DEC(i); Char(wr,a[i]); UNTIL i = 0;
 
-	(*VAR filler: CHAR; i,maxw: SIGNED32; a: ARRAY 20 OF CHAR; y: HUGEINT;
+	(*VAR filler: CHAR; i,maxw: SIGNED32; a: ARRAY 20 OF CHAR; y: SIGNED64;
 	BEGIN
 		IF w < 0 THEN filler := '0'; w := -w; maxw := w ELSE filler := ' '; maxw := 16 END;
 		i := 0;

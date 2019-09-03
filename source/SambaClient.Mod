@@ -1177,7 +1177,7 @@ END StartClient;
 PROCEDURE GetDateTime(t: ARRAY OF SIGNED32; VAR datetime: Dates.DateTime);
 VAR
 	second, minute, hour, day, month, year, totalDays, NofDaysMnth: SIGNED32;
-	tsh: HUGEINT;
+	tsh: SIGNED64;
 	ts: SIGNED32;
 	continue: BOOLEAN;
 BEGIN

@@ -24,7 +24,7 @@ TYPE
 	VAR
 		process : Objects.Process; (* warning: reference may keep object alive *)
 		lastCycles, currentCycles : Objects.CpuCyclesArray;
-		lastTimer : HUGEINT;
+		lastTimer : SIGNED64;
 		lastSamplesValid : BOOLEAN;
 
 		PROCEDURE Init*(p : WMPerfMonPlugins.Parameter);
@@ -76,7 +76,7 @@ TYPE
 
 		PROCEDURE UpdateDataset*;
 		VAR
-			i : SIZE; timer : HUGEINT;
+			i : SIZE; timer : SIGNED64;
 			pAll, timeDiff, cyclesDiff : LONGREAL;
 		BEGIN
 			Objects.GetCpuCycles(process, currentCycles, TRUE);

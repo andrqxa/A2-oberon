@@ -1238,7 +1238,7 @@ TYPE
 		END VisitCharacterValue;
 
 		PROCEDURE VisitSetValue* (expression: SyntaxTree.SetValue);
-		VAR i: SIGNED16; mask, value: HUGEINT;
+		VAR i: SIGNED16; mask, value: SIGNED64;
 		BEGIN
 			mask := 1; value := 0;
 			FOR i := MIN (SET) TO MAX (SET) DO IF i IN expression.value THEN INC (value, mask); END; INC (mask, mask); END;

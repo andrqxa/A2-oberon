@@ -296,9 +296,9 @@ TYPE
 						END;
 						Join( curPath, "/", FD.cFileName, longname );
 						IF ~(Kernel32.FileAttributeDirectory IN FD.dwFileAttributes) THEN
-							enum.PutEntry( longname, {}, t, d, HUGEINT(UNSIGNED64( FD.nFileSizeHigh ) * UNSIGNED64( 0x100000000 ) + UNSIGNED64( FD.nFileSizeLow )))
+							enum.PutEntry( longname, {}, t, d, SIGNED64(UNSIGNED64( FD.nFileSizeHigh ) * UNSIGNED64( 0x100000000 ) + UNSIGNED64( FD.nFileSizeLow )))
 						ELSIF (FD.cFileName # ".") & (FD.cFileName # "..") THEN
-							enum.PutEntry( longname, {Files.Directory}, t, d, HUGEINT(UNSIGNED64( FD.nFileSizeHigh ) * UNSIGNED64( 0x100000000 ) + UNSIGNED64( FD.nFileSizeLow )))
+							enum.PutEntry( longname, {Files.Directory}, t, d, SIGNED64(UNSIGNED64( FD.nFileSizeHigh ) * UNSIGNED64( 0x100000000 ) + UNSIGNED64( FD.nFileSizeLow )))
 						END;
 					UNTIL Kernel32.FindNextFile( h, FD ) = Kernel32.False;
 					IGNORE Kernel32.FindClose( h )

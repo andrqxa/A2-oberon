@@ -50,7 +50,7 @@ TYPE
 			res: WORD;
 			c: TCP.Connection; num, num0: SIZE; port: SIGNED32; fip: IP.Adr;
 			timer: Kernel.MilliTimer; sender: Sender; server: ARRAY 64 OF CHAR;
-			total, len: SIZE; time: HUGEINT;
+			total, len: SIZE; time: SIGNED64;
 
 		PROCEDURE &Init*(CONST server: ARRAY OF CHAR; num, port: SIGNED32);
 		BEGIN
@@ -68,7 +68,7 @@ TYPE
 				IF port=TimePort THEN
 					c.Receive(buf^, 0, 4, 4, len, res);
 					total:=len;
-					time:=((HUGEINT(ORD(buf[0]))*256+ORD(buf[1]))*256 + ORD(buf[2]))*256 + ORD(buf[3]);
+					time:=((SIGNED64(ORD(buf[0]))*256+ORD(buf[1]))*256 + ORD(buf[2]))*256 + ORD(buf[3]);
 					KernelLog.String("ClientTime: "); KernelLog.Int(time,6); KernelLog.String(" : ");
 					KernelLog.Int(time MOD 60,6); time:=time DIV 60; KernelLog.String("sec");
 					KernelLog.Int(time MOD 60,6); time:=time DIV 60; KernelLog.String("min");

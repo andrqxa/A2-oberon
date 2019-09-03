@@ -581,7 +581,7 @@ TYPE
 		type-: Struct;
 		int-: SIGNED32;
 		real-: LONGREAL;
-		long-: HUGEINT;
+		long-: SIGNED64;
 		set-: SET;
 		bool-: BOOLEAN;
 		ptr-: ANY;
@@ -1723,7 +1723,7 @@ VAR
 	BEGIN NEW(c); c.int := i; c.type := type; RETURN c
 	END NewIntConst;
 
-	PROCEDURE NewInt64Const*(i: HUGEINT): Const;
+	PROCEDURE NewInt64Const*(i: SIGNED64): Const;
 	VAR c: Const;
 	BEGIN NEW(c); c.long := i; c.type := Int64; RETURN c
 	END NewInt64Const;
@@ -2507,7 +2507,7 @@ VAR
 		NumericType[0] := NewBasic(Universe, "SIGNED8"); Int8 := NumericType[0];
 		NumericType[1] := NewBasic(Universe, "SIGNED16"); Int16 := NumericType[1];
 		NumericType[2] := NewBasic(Universe, "SIGNED32"); Int32 := NumericType[2];
-		NumericType[3] := NewBasic(Universe, "HUGEINT"); Int64 := NumericType[3];
+		NumericType[3] := NewBasic(Universe, "SIGNED64"); Int64 := NumericType[3];
 		NumericType[4] := NewBasic(Universe, "REAL"); Float32 := NumericType[4];
 		NumericType[5]:= NewBasic(Universe, "LONGREAL"); Float64 := NumericType[5];
 		Set := NewBasic(Universe, "SET");

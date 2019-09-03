@@ -415,7 +415,7 @@ IMPORT
 	BEGIN log.Hex(i, 0)
 	END LogWHex;
 
-	PROCEDURE LogWNum* (i: HUGEINT);
+	PROCEDURE LogWNum* (i: SIGNED64);
 	BEGIN log.Int(i, 0)
 	END LogWNum;
 

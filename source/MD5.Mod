@@ -79,28 +79,28 @@ under a public-key cryptosystem such as RSA. *)
 		RETURN SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, y) / (SYSTEM.VAL(SET, x)+(-SYSTEM.VAL(SET, z))))
 	END F4;
 
-	PROCEDURE STEP1(VAR w: SIGNED32; x, y, z, data: SIGNED32; add: HUGEINT;  s: SIGNED32);
+	PROCEDURE STEP1(VAR w: SIGNED32; x, y, z, data: SIGNED32; add: SIGNED64;  s: SIGNED32);
 	BEGIN
 		w := w+F1(x, y, z)+data+SHORT(add);
 		w := ROT(w, s);
 		INC(w, x)
 	END STEP1;
 
-	PROCEDURE STEP2(VAR w: SIGNED32; x, y, z, data: SIGNED32; add: HUGEINT; s: SIGNED32);
+	PROCEDURE STEP2(VAR w: SIGNED32; x, y, z, data: SIGNED32; add: SIGNED64; s: SIGNED32);
 	BEGIN
 		w := w+F2(x, y, z)+data+SHORT(add);
 		w := ROT(w, s);
 		INC(w, x)
 	END STEP2;
 
-	PROCEDURE STEP3(VAR w: SIGNED32; x, y, z, data: SIGNED32; add: HUGEINT; s: SIGNED32);
+	PROCEDURE STEP3(VAR w: SIGNED32; x, y, z, data: SIGNED32; add: SIGNED64; s: SIGNED32);
 	BEGIN
 		w := w+F3(x, y, z)+data+SHORT(add);
 		w := ROT(w, s);
 		INC(w, x)
 	END STEP3;
 
-	PROCEDURE STEP4(VAR w: SIGNED32; x, y, z, data: SIGNED32; add: HUGEINT; s: SIGNED32);
+	PROCEDURE STEP4(VAR w: SIGNED32; x, y, z, data: SIGNED32; add: SIGNED64; s: SIGNED32);
 	BEGIN
 		w := w+F4(x, y, z)+data+SHORT(add);
 		w := ROT(w, s);

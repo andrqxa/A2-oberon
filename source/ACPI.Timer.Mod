@@ -8,9 +8,9 @@ IMPORT ACPI, SYSTEM;
 TYPE Counter* = SIGNED32;
 
 VAR frequency: Counter;
-VAR counter {UNTRACED}: POINTER {UNSAFE} TO RECORD value: HUGEINT END;
+VAR counter {UNTRACED}: POINTER {UNSAFE} TO RECORD value: SIGNED64 END;
 
-PROCEDURE - GetInstructionTimer(): HUGEINT;
+PROCEDURE - GetInstructionTimer(): SIGNED64;
 CODE
 	RDTSC
 END GetInstructionTimer;

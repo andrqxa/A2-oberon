@@ -128,7 +128,7 @@ TYPE
 		BEGIN HALT(99) (* abstract *)
 		END GetVolume;
 
-		(** GetPosition return the current position in samples. MAY CHANGE TO HUGEINT*)
+		(** GetPosition return the current position in samples. MAY CHANGE TO SIGNED64*)
 		PROCEDURE GetPosition*() : SIGNED32;
 		BEGIN HALT(99) (* abstract *)
 		END GetPosition;

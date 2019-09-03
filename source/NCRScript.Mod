@@ -59,7 +59,7 @@ MODULE NCRScript;	(** non-portable *)	(* Contributed by P. Ryser to the System 3
 		ASSERT(SYSTEM.VAL (SIGNED32, adr) MOD 4 = 0, 100)
 	END CheckAlign;
 
-	PROCEDURE SetUnsigned(VAR integer: SIGNED32; hugeint: HUGEINT);
+	PROCEDURE SetUnsigned(VAR integer: SIGNED32; hugeint: SIGNED64);
 	BEGIN
 		integer := SHORT(hugeint);
 	END SetUnsigned;
@@ -159,7 +159,7 @@ MODULE NCRScript;
 		Script*: ARRAY 201 OF SIGNED32;
 
 
-	PROCEDURE SetUnsigned(VAR integer: SIGNED32; hugeint: HUGEINT);
+	PROCEDURE SetUnsigned(VAR integer: SIGNED32; hugeint: SIGNED64);
 	BEGIN
 		integer := SHORT(hugeint);
 	END SetUnsigned;

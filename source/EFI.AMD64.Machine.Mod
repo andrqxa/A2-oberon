@@ -201,9 +201,9 @@ TYPE
 	(* task state segment *)
 	TSSDesc = RECORD	(* 1, p. 485 and p. 612 for required fields *)
 		Reserved1: SIGNED32;
-		RSP0 {ALIGNED(4)}, RSP1{ALIGNED(4)}, RSP2{ALIGNED(4)}: HUGEINT;
+		RSP0 {ALIGNED(4)}, RSP1{ALIGNED(4)}, RSP2{ALIGNED(4)}: SIGNED64;
 		Reserved2, Reserved3: SIGNED32;
-		IST1 {ALIGNED(4)}, IST2 {ALIGNED(4)}, IST3 {ALIGNED(4)}, IST4{ALIGNED(4)}, IST5{ALIGNED(4)}, IST6{ALIGNED(4)}, IST7{ALIGNED(4)}: HUGEINT;
+		IST1 {ALIGNED(4)}, IST2 {ALIGNED(4)}, IST3 {ALIGNED(4)}, IST4{ALIGNED(4)}, IST5{ALIGNED(4)}, IST6{ALIGNED(4)}, IST7{ALIGNED(4)}: SIGNED64;
 		Reserved4, Reserved5: SIGNED32;
 		Reserved6, IOMapBaseAddress: SIGNED16;
 	(* Implicit: IOBitmap: ARRAY 8192 DIV 4 OF SET *)
@@ -224,11 +224,11 @@ TYPE
 TYPE
 	(** processor state, ordering of record fields is predefined! *)
 	State* = RECORD					(* offsets used in FieldInterrupt, FieldIRQ and Objects.RestoreState *)
-		R15*, R14*, R13*, R12*, R11*, R10*, R9*, R8*: HUGEINT;
-		RDI*, RSI*, ERR*, RSP0*, RBX*, RDX*, RCX*, RAX*: HUGEINT;	(** RSP0 = ADR(s.INT) *)
-		INT*, BP*, PC*, CS*: HUGEINT;	(* RBP and ERR are exchanged by glue code, for procedure link *)
+		R15*, R14*, R13*, R12*, R11*, R10*, R9*, R8*: SIGNED64;
+		RDI*, RSI*, ERR*, RSP0*, RBX*, RDX*, RCX*, RAX*: SIGNED64;	(** RSP0 = ADR(s.INT) *)
+		INT*, BP*, PC*, CS*: SIGNED64;	(* RBP and ERR are exchanged by glue code, for procedure link *)
 		FLAGS*: SET;
-		SP*, SS*: HUGEINT;
+		SP*, SS*: SIGNED64;
 	END;
 
 	(** exception state, ordering of record fields is predefined! *)
@@ -237,8 +237,8 @@ TYPE
 		pf*: ADDRESS;	(** page fault address *)
 		locks*: SET;	(** active locks *)
 		SP*: ADDRESS;	(** actual RSP value at time of interrupt *)
-		CR*: ARRAY 16 OF HUGEINT;	(** control registers *)
-		DR*: ARRAY 16 OF HUGEINT;	(** debug registers *)
+		CR*: ARRAY 16 OF SIGNED64;	(** control registers *)
+		DR*: ARRAY 16 OF SIGNED64;	(** debug registers *)
 		FPU*: ARRAY 7 OF SET	(** floating-point state *)
 	END;
 
@@ -276,7 +276,7 @@ TYPE
 	Message* = POINTER TO RECORD END;	(** Broadcast message. *)
 	BroadcastHandler = PROCEDURE (id: SIGNED32; CONST state: State; msg: Message);
 
-	TimeArray = ARRAY MaxCPU OF HUGEINT;
+	TimeArray = ARRAY MaxCPU OF SIGNED64;
 
 	Address32* = SIGNED32;
 
@@ -296,12 +296,12 @@ VAR
 
 	features-, features2-: SET;	(** processor features *)
 	fcr*: SET;	(** default floating-point control register value (default rounding mode is towards -infinity, for ENTIER) *)
-	mhz*: HUGEINT;	(** clock rate of GetTimer in MHz, or 0 if not known *)
+	mhz*: SIGNED64;	(** clock rate of GetTimer in MHz, or 0 if not known *)
 
 	chs: ARRAY MaxDisks OF RECORD cyls, hds, spt: SIGNED32 END;
-	initRegs0, initRegs1: HUGEINT;
+	initRegs0, initRegs1: SIGNED64;
 	fbadr*, fbInfoPtr*: ADDRESS;
-	initRegs: ARRAY 2 OF HUGEINT;	(* kernel parameters *)
+	initRegs: ARRAY 2 OF SIGNED64;	(* kernel parameters *)
 	config: ARRAY 2048 OF CHAR;	(* config strings *)
 	bootFlag: ADDRESS;
 
@@ -340,7 +340,7 @@ Every element in the proc array belongs to one processor. It is therefore suffic
 	padding : ARRAY 92 OF CHAR;
 
 	trapLocksBusy-: SET;
-	maxTime: HUGEINT;
+	maxTime: SIGNED64;
 
 VAR
 	gdt: GDT;					(* global descriptor table *)
@@ -352,22 +352,22 @@ VAR
 	kernelPML4: ADDRESS;	(* physical address of page directory *)
 
 	freeLowPage: ADDRESS;	(* free low page stack pointer (link at offset 0 in page). All addresses physical. NIL = -1 *)
-	freeLowPages, freeHighPages, totalPages: HUGEINT;	(* number of free pages and total number of pages *)
+	freeLowPages, freeHighPages, totalPages: SIGNED64;	(* number of free pages and total number of pages *)
 
 	mapTop: ADDRESS;	(* virtual address of end of memory mapping area *)
 	heapEndAdr: ADDRESS;	(* virtual address of end of heap (page aligned) *)
 
-	topPageNum: HUGEINT;		(* page containing byte memTop-1 *)
+	topPageNum: SIGNED64;		(* page containing byte memTop-1 *)
 	pageHeapAdr: ADDRESS;	(* address (physical and virtual) of bottom of page heap area *)
 	pageStackAdr: ADDRESS;	(* virtual address of top page of free page stack *)
 
 	freeStack: ARRAY (MaxUserStacks+SetSize-1) DIV SetSize OF SET;	(* free stack bitmap *)
-	freeStackIndex: HUGEINT;	(* current position in bitmap (rotates) *)
+	freeStackIndex: SIGNED64;	(* current position in bitmap (rotates) *)
 
 	Nbigskips-: SIGNED32;	(* number of times a stack was extended leaving a hole *)
 	Nfilled-: SIGNED32;	(* number of times a "hole" in a stack was filled *)
 	NnewStacks-, NnewStackLoops-, NnewStackInnerLoops-, NdisposeStacks-,
-	NlostPages-, NreservePagesUsed-, NmaxUserStacks-: HUGEINT;
+	NlostPages-, NreservePagesUsed-, NmaxUserStacks-: SIGNED64;
 
 VAR
 	idt: IDT;	(* interrupt descriptor table *)
@@ -459,7 +459,7 @@ END Fill32;
 (** Return timer value of the current processor, or 0 if not available. *)
 
 (* e.g. ARM does not have a fine-grained timer *)
-PROCEDURE -GetTimer* (): HUGEINT;
+PROCEDURE -GetTimer* (): SIGNED64;
 CODE {SYSTEM.AMD64}
 	XOR RAX, RAX
 	RDTSC	; set EDX:EAX
@@ -1177,7 +1177,7 @@ END AcquireSpinTimeout;
 
 (** Acquire a spin-lock and disable interrupts. *)
 PROCEDURE Acquire* (level: SIGNED32);
-VAR id, i: SIGNED32; flags: SET; start: HUGEINT;
+VAR id, i: SIGNED32; flags: SET; start: SIGNED64;
 BEGIN
 	id := AcquirePreemption ();
 	flags := GetFlags ();	(* store state of interrupt flag *)
@@ -1744,7 +1744,7 @@ END ExtendStack;
 
 (** Allocate a stack. Parameter initSP returns initial stack pointer value. *)
 PROCEDURE NewStack*(VAR s: Stack; process: ANY; VAR initSP: ADDRESS);
-VAR adr, phys: ADDRESS; old: HUGEINT; free: SET;
+VAR adr, phys: ADDRESS; old: SIGNED64; free: SET;
 BEGIN
 	ASSERT(InitUserStackSize = PS);	(* for now *)
 	Acquire(Memory);
@@ -1848,7 +1848,7 @@ END GetKernelStacks;
 
 (* Init page tables (paging still disabled until EnableMM is called). *)
 PROCEDURE InitPages;
-VAR i, j: HUGEINT; phys, lTop, mTop: ADDRESS;
+VAR i, j: SIGNED64; phys, lTop, mTop: ADDRESS;
 BEGIN
 	(* get top of high and low memory *)
 	mTop := memTop;
@@ -2260,7 +2260,7 @@ END InvalidateICacheRange;
 
 (* Unexpected - Default interrupt handler *)
 PROCEDURE Unexpected(VAR state: State);
-VAR int: HUGEINT; isr, irr: CHAR;
+VAR int: SIGNED64; isr, irr: CHAR;
 BEGIN
 	int := state.INT;
 	IF HandleSpurious & ((int >= IRQ0) & (int <= MaxIRQ) OR (int = MPSPU)) THEN	(* unexpected IRQ, get more info *)
@@ -2295,7 +2295,7 @@ BEGIN
 END Unexpected;
 
 (* InEnableIRQ - Enable a hardware interrupt (caller must hold module lock). *)
-PROCEDURE -InEnableIRQ (int: HUGEINT);
+PROCEDURE -InEnableIRQ (int: SIGNED64);
 CODE {SYSTEM.AMD64}
 	POP RBX
 	CMP RBX, IRQ7
@@ -2314,7 +2314,7 @@ end:
 END InEnableIRQ;
 
 (* InDisableIRQ - Disable a hardware interrupt (caller must hold module lock). *)
-PROCEDURE -InDisableIRQ (int: HUGEINT);
+PROCEDURE -InDisableIRQ (int: SIGNED64);
 CODE {SYSTEM.AMD64}
 	POP RBX
 	CMP RBX, IRQ7
@@ -2333,7 +2333,7 @@ end:
 END InDisableIRQ;
 
 (** EnableIRQ - Enable a hardware interrupt (also done automatically by InstallHandler). *)
-PROCEDURE EnableIRQ* (int: HUGEINT);
+PROCEDURE EnableIRQ* (int: SIGNED64);
 BEGIN
 (*	ASSERT((int >= IRQ0) & (int <= IRQ15) & (int # IRQ2)); *)
 	Acquire(Interrupts);	(* protect interrupt mask register *)
@@ -2342,7 +2342,7 @@ BEGIN
 END EnableIRQ;
 
 (** DisableIRQ - Disable a hardware interrupt. *)
-PROCEDURE DisableIRQ* (int: HUGEINT);
+PROCEDURE DisableIRQ* (int: SIGNED64);
 BEGIN
 	ASSERT((int >= IRQ0) & (int <= IRQ15) & (int # IRQ2));
 	Acquire(Interrupts);	(* protect interrupt mask register *)
@@ -2411,7 +2411,7 @@ BEGIN
 END RemoveHandler;
 
 (* Get control registers. *)
-PROCEDURE GetCR0to4(VAR cr: ARRAY OF HUGEINT);
+PROCEDURE GetCR0to4(VAR cr: ARRAY OF SIGNED64);
 CODE {SYSTEM.AMD64, SYSTEM.Privileged}
 	MOV RDI, [RBP + cr]
 	MOV RAX, CR0
@@ -2427,7 +2427,7 @@ CODE {SYSTEM.AMD64, SYSTEM.Privileged}
 END GetCR0to4;
 
 (* GetDR0to7 - Get debug registers. *)
-PROCEDURE GetDR0to7(VAR dr: ARRAY OF HUGEINT);
+PROCEDURE GetDR0to7(VAR dr: ARRAY OF SIGNED64);
 CODE {SYSTEM.AMD64, SYSTEM.Privileged}
 	MOV RDI, [RBP + dr]
 	MOV RAX, DR0
@@ -3262,7 +3262,7 @@ END HandleGetTimestamp;
 
 (** Get timestamp on all processors (for testing). *)
 PROCEDURE GlobalGetTimestamp;
-VAR t: TimeArray; i: SIGNED32; mean, var, n: HUGEINT;
+VAR t: TimeArray; i: SIGNED32; mean, var, n: SIGNED64;
 BEGIN
 	Acquire(Processors);
 	LocalBroadcast(HandleGetTimestamp, NIL, {Self, FrontBarrier});

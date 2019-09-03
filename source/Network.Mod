@@ -82,7 +82,7 @@ TYPE
 			broadcast*: LinkAdr; (** link address for sending a broadcast *)
 			mtu-: SIGNED32; (** largest packet size in bytes *)
 			adrSize*: SIGNED32; (** link address size in bytes *)
-			sendCount*, recvCount-: HUGEINT; (** number of bytes sent and received *)
+			sendCount*, recvCount-: SIGNED64; (** number of bytes sent and received *)
 			calcChecksum*: SET; (** these checksums are calculated by the device hardware when sending. *)
 
 			typeList: TypeList; (* List of types i.e. 0800X for IP, holds all receiver for a certain type *)

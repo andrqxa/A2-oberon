@@ -167,7 +167,7 @@ TYPE
         string*: StringType;
         stringLength*: SIZE;
         numberType*: FoxScanner.SubType;
-        integer*: HUGEINT;
+        integer*: SIGNED64;
         character*: CHAR;
         real*: LONGREAL;
     END;
@@ -464,7 +464,7 @@ TYPE
                 dig: ARRAY 24 OF CHAR;
                 f: LONGREAL;
                 hex, neg, long: BOOLEAN;
-                hugeint, tenh, nextInt: HUGEINT;
+                hugeint, tenh, nextInt: SIGNED64;
                 result: Symbol;
 
             PROCEDURE Append(ch: CHAR);
@@ -621,8 +621,8 @@ TYPE
                             (* restart computation *)
                             (*
                                 ACHTUNG: Reportedly, Fox has or had certain limitations
-                                    working with HUGEINT that affected the original code.
-                                    Furthermore, at present Ronin supports HUGEINT as
+                                    working with SIGNED64 that affected the original code.
+                                    Furthermore, at present Ronin supports SIGNED64 as
                                     a mere alias to SIGNED32, therefore the following code
                                     is just reserved for the future and long integer
                                     constants are not yet supported.

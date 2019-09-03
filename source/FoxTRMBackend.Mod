@@ -343,7 +343,7 @@ TYPE
 		END Section;
 
 		PROCEDURE Supported*(CONST instr: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
-		VAR sizeInBits: SIGNED32; form: SIGNED32; opcode: SIGNED32; value: HUGEINT; exp: SIGNED32;
+		VAR sizeInBits: SIGNED32; form: SIGNED32; opcode: SIGNED32; value: SIGNED64; exp: SIGNED32;
 		BEGIN
 			opcode := instr.opcode;
 			form := instr.op1.type.form;
@@ -1002,7 +1002,7 @@ TYPE
 			RETURN ops
 		END GetImmediate32;
 
-		PROCEDURE ImmediateToOperand(imm: HUGEINT; part: SIGNED32; signed: BOOLEAN; bits: SIGNED32; VAR op: Operand);
+		PROCEDURE ImmediateToOperand(imm: SIGNED64; part: SIGNED32; signed: BOOLEAN; bits: SIGNED32; VAR op: Operand);
 		VAR immOp: InstructionSet.Operand; maxImmValue, minImmValue : SIGNED32;
 
 			PROCEDURE ImmediateToOp32(imm: SIGNED32; VAR op: InstructionSet.Operand);
@@ -1444,7 +1444,7 @@ TYPE
 		PROCEDURE EmitMul(VAR instruction: IntermediateCode.Instruction);
 		VAR negate: BOOLEAN;
 			op1Low, op2Low, op3Low, op1High, op2High, op3High, destLow, destHigh: Operand;
-			value: HUGEINT; exp: SIGNED32; iop3: IntermediateCode.Operand;
+			value: SIGNED64; exp: SIGNED32; iop3: IntermediateCode.Operand;
 			inst: IntermediateCode.Instruction;
 		BEGIN
 			IF IntermediateCode.IsConstantInteger(instruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
@@ -1488,7 +1488,7 @@ TYPE
 
 		PROCEDURE EmitDiv(CONST instruction: IntermediateCode.Instruction);
 		VAR
-			value: HUGEINT; exp: SIGNED32; iop3: IntermediateCode.Operand;
+			value: SIGNED64; exp: SIGNED32; iop3: IntermediateCode.Operand;
 			inst: IntermediateCode.Instruction;
 		BEGIN
 			IF instruction.opcode = IntermediateCode.div THEN
@@ -1505,7 +1505,7 @@ TYPE
 		(* undefined for float and huegint, huegint version as library *)
 		PROCEDURE EmitMod(CONST instruction: IntermediateCode.Instruction);
 		VAR
-			value: HUGEINT;exp: SIGNED32; op3:IntermediateCode.Operand; inst: IntermediateCode.Instruction;
+			value: SIGNED64;exp: SIGNED32; op3:IntermediateCode.Operand; inst: IntermediateCode.Instruction;
 		BEGIN
 			IF IntermediateCode.IsConstantInteger(instruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
 				IntermediateCode.InitImmediate(op3, instruction.op3.type, value-1);

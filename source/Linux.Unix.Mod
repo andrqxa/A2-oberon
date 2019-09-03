@@ -275,7 +275,7 @@ TYPE
 
 
 TYPE
-	dev_t*		= HUGEINT;
+	dev_t*		= SIGNED64;
 	ino_t*		= LONGWORD;
 	nlink_t*	= LONGWORD;
 	mode_t*	= WORD;
@@ -407,29 +407,29 @@ TYPE
 				oldmask	: SIGNED32;
 				cr2			: SIGNED32
 			#ELSIF AMD64 THEN
-				r_8-			: HUGEINT;
-  				r_9-			: HUGEINT;
-  				r_10-		: HUGEINT;
-  				r_11-		: HUGEINT;
-  				r_12-		: HUGEINT;
-  				r_13-		: HUGEINT;
-  				r_14-		: HUGEINT;
-  				r_15-		: HUGEINT;
-  				r_di-		: HUGEINT;
-  				r_si-		: HUGEINT;
+				r_8-			: SIGNED64;
+  				r_9-			: SIGNED64;
+  				r_10-		: SIGNED64;
+  				r_11-		: SIGNED64;
+  				r_12-		: SIGNED64;
+  				r_13-		: SIGNED64;
+  				r_14-		: SIGNED64;
+  				r_15-		: SIGNED64;
+  				r_di-		: SIGNED64;
+  				r_si-		: SIGNED64;
   				r_bp-		: ADDRESS;
-  				r_bx-		: HUGEINT;
-  				r_dx-		: HUGEINT;
-  				r_ax-		: HUGEINT;
-  				r_cx-		: HUGEINT;
+  				r_bx-		: SIGNED64;
+  				r_dx-		: SIGNED64;
+  				r_ax-		: SIGNED64;
+  				r_cx-		: SIGNED64;
   				r_sp-		: ADDRESS;
   				r_pc-		: ADDRESS;
-  				r_efl		: HUGEINT;
-  				r_csgsfs	: HUGEINT;           (* Actually short cs, gs, fs, pad0.  *)
-  				err-		: HUGEINT;
-  				trapno-	: HUGEINT;
-  				oldmask	: HUGEINT;
-  				cr2			: HUGEINT;
+  				r_efl		: SIGNED64;
+  				r_csgsfs	: SIGNED64;           (* Actually short cs, gs, fs, pad0.  *)
+  				err-		: SIGNED64;
+  				trapno-	: SIGNED64;
+  				oldmask	: SIGNED64;
+  				cr2			: SIGNED64;
   			#ELSE
   				unimplemented
   			#END

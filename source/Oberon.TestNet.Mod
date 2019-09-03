@@ -40,7 +40,7 @@ BEGIN
 			Texts.WriteString(w, s); Texts.Write(w, " ");
 			Texts.WriteInt(w, dev.mtu, 1); Texts.Write(w, " ");
 
-			(* does not work with HUGEINT:
+			(* does not work with SIGNED64:
 			Texts.WriteInt(w, dev.sendCount, 1); Texts.Write(w, " ");
 			Texts.WriteInt(w, dev.recvCount, 1);
 			*)

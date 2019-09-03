@@ -153,11 +153,11 @@ ELSE (*
 			InternalString(buf)
 		END Hex;
 
-		PROCEDURE Int*(x: HUGEINT; w: SIGNED32);
-		VAR i: SIGNED32; x0: HUGEINT; a: ARRAY 21 OF CHAR;
+		PROCEDURE Int*(x: SIGNED64; w: SIGNED32);
+		VAR i: SIGNED32; x0: SIGNED64; a: ARRAY 21 OF CHAR;
 		BEGIN {EXCLUSIVE}
 			IF x < 0 THEN
-				IF x = MIN( HUGEINT ) THEN
+				IF x = MIN( SIGNED64 ) THEN
 					DEC(w, 20);
 					WHILE w > 0 DO Char(" "); DEC(w) END;
 					 a := "-9223372036854775808"; InternalString(a);

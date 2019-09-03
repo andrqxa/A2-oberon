@@ -1491,7 +1491,7 @@ TYPE
 		PROCEDURE Init * (iobase , irq  :  SIGNED32) : BOOLEAN;
 		VAR
 			reg  : SIGNED32;
-			dword : SET; qword : HUGEINT;
+			dword : SET; qword : SIGNED64;
 			ignore : BOOLEAN;
 			i : SIGNED32;
 		BEGIN

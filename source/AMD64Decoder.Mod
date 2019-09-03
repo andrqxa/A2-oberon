@@ -733,9 +733,9 @@ TYPE
 	(* Immediate argument *)
 	ArgImm = OBJECT (Arg)
 		VAR
-			imm : HUGEINT;
+			imm : SIGNED64;
 
-		PROCEDURE &New *(imm : HUGEINT);
+		PROCEDURE &New *(imm : SIGNED64);
 		BEGIN SELF.imm := imm;
 		END New;
 
@@ -763,9 +763,9 @@ TYPE
 	(* memory reference argument *)
 	ArgMem = OBJECT (Arg)
 		VAR
-			segment, reg, scale, base: SIGNED32; disp : HUGEINT;
+			segment, reg, scale, base: SIGNED32; disp : SIGNED64;
 
-		PROCEDURE &New *(segment, reg, scale , base: SIGNED32; disp : HUGEINT);
+		PROCEDURE &New *(segment, reg, scale , base: SIGNED32; disp : SIGNED64);
 		BEGIN
 			SELF.segment := segment;
 			SELF.reg := reg;
@@ -1439,7 +1439,7 @@ TYPE
 				RETURN ReadLInt ();
 			END ReadImm32;
 
-			PROCEDURE ReadImm64 (): HUGEINT;
+			PROCEDURE ReadImm64 (): SIGNED64;
 			BEGIN
 				RETURN ReadHInt ();
 			END ReadImm64;
@@ -1467,14 +1467,14 @@ TYPE
 				RETURN ReadLInt ();
 			END ReadOffset32;
 
-			PROCEDURE ReadOffset64 (): HUGEINT;
+			PROCEDURE ReadOffset64 (): SIGNED64;
 			BEGIN
 				RETURN ReadHInt ();
 			END ReadOffset64;
 
-			PROCEDURE ReadHInt (): HUGEINT;
+			PROCEDURE ReadHInt (): SIGNED64;
 			VAR
-				value: HUGEINT;
+				value: SIGNED64;
 			BEGIN
 				SYSTEM.PUT (ADDRESSOF (value), ReadLInt ());
 				SYSTEM.PUT (ADDRESSOF (value) + 4, ReadLInt ());
@@ -1627,7 +1627,7 @@ TYPE
 				END
 			END GetAddressReg;
 
-			PROCEDURE  AddImm (imm: HUGEINT);
+			PROCEDURE  AddImm (imm: SIGNED64);
 			VAR
 				argImm: ArgImm;
 			BEGIN
@@ -1646,7 +1646,7 @@ TYPE
 				ModRM; AddReg (GetReg (base, reg, prREXR IN opc.prefixes));
 			END AddRMReg;
 
-			PROCEDURE  AddMem (segment, reg, scale , base: SIGNED32; disp: HUGEINT);
+			PROCEDURE  AddMem (segment, reg, scale , base: SIGNED32; disp: SIGNED64);
 			VAR
 				argMem: ArgMem;
 			BEGIN
@@ -3215,7 +3215,7 @@ BEGIN
 	END
 END PrintReg;
 
-PROCEDURE PrintImm (n: HUGEINT; w : Streams.Writer);
+PROCEDURE PrintImm (n: SIGNED64; w : Streams.Writer);
 VAR high, low: SIGNED32;
 BEGIN
 	IF (n >= -80H) & (n < 100H) THEN

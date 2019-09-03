@@ -58,7 +58,7 @@ TYPE BitSet* = OBJECT
 		RETURN pos MOD Elements IN data[pos DIV Elements];
 	END GetBit;
 
-	PROCEDURE SetBits* (startPos, bits: Bits; value: HUGEINT);
+	PROCEDURE SetBits* (startPos, bits: Bits; value: SIGNED64);
 	VAR adr: ADDRESS;
 	BEGIN
 		ASSERT (startPos >= 0); ASSERT (startPos+bits <= size);

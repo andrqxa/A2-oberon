@@ -33,10 +33,10 @@ TYPE Packet=RECORD
 	RootDelay*:SIGNED32;
 	RootDispersion*:SIGNED32;
 	ReferenceIdentifier*:SIGNED32;
-	ReferenceTimestamp*:HUGEINT;
-	OriginTimestamp*:HUGEINT;
-	ReceiveTimestamp*:HUGEINT;
-	TransmitTimestamp*:HUGEINT;
+	ReferenceTimestamp*:SIGNED64;
+	OriginTimestamp*:SIGNED64;
+	ReceiveTimestamp*:SIGNED64;
+	TransmitTimestamp*:SIGNED64;
 	Extensions: ANY;
 END;
 
@@ -90,9 +90,9 @@ BEGIN
 END Get;
 
 (* timeZone and daylightSaving is difference to UTC in minutes*)
-PROCEDURE SetSystemTime*(time: HUGEINT; timeZone, daylightSaving:SIGNED32);
+PROCEDURE SetSystemTime*(time: SIGNED64; timeZone, daylightSaving:SIGNED32);
 VAR st: Kernel32.SystemTime;retBOOL: Kernel32.BOOL;
-	dt: Dates.DateTime; frac: HUGEINT;
+	dt: Dates.DateTime; frac: SIGNED64;
 BEGIN {EXCLUSIVE}
 
 	frac:=time MOD 100000000H;
@@ -144,7 +144,7 @@ END SynchronizeSNTP;
 
 
 PROCEDURE GetSimpleTime*(context:Commands.Context);
-VAR ipstr: ARRAY 64 OF CHAR; port, res, i:SIGNED32;machineTimer1,machineTimer2: HUGEINT; fip: IP.Adr; packet:Packet;
+VAR ipstr: ARRAY 64 OF CHAR; port, res, i:SIGNED32;machineTimer1,machineTimer2: SIGNED64; fip: IP.Adr; packet:Packet;
 BEGIN
 
 	IF ~context.arg.GetString(ipstr) THEN	Configuration.Get("NTP.Server0",ipstr,res); END;

@@ -271,7 +271,7 @@ TYPE
 				| 0DH : w.String("PTR")
 				| 0EH : w.String("PROC")
 				| 0FH : w.String("STRING")
-				| 10H : w.String("HUGEINT")
+				| 10H : w.String("SIGNED64")
 				| 16H : w.String("RECORD")
 				| 1DH : w.String("OBJECT")
 			ELSE

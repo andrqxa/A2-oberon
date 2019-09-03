@@ -211,7 +211,7 @@ CODE {SYSTEM.i386, SYSTEM.FPU}
 	POP EBX	; drop rest of parameter
 END RoundL;
 
-PROCEDURE RealX (hh, hl: HUGEINT; adr: ADDRESS);
+PROCEDURE RealX (hh, hl: SIGNED64; adr: ADDRESS);
 VAR h,l: SIGNED32;
 BEGIN
 	h := SHORT(hh); l := SHORT(hl);

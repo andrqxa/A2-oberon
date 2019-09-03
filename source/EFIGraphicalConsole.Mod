@@ -421,7 +421,7 @@ TYPE
 
 	PROCEDURE SetupConsole*(graphicsModeInfo: ADDRESS; frameBufferAdr: ADDRESS);
 	VAR i: ADDRESS;
-	VAR tmp: HUGEINT;
+	VAR tmp: SIGNED64;
 	BEGIN
 		Trace.String("Graphical Console, info = "); Trace.Address(graphicsModeInfo); Trace.Ln;
 		Trace.String("Graphical Console, address = "); Trace.Address(frameBufferAdr); Trace.Ln;

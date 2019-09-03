@@ -64,11 +64,11 @@ END Char;
 
 (** Write "x" as a decimal number. "w" is the field width. *)
 
-PROCEDURE Int*(x: HUGEINT; w: WORD);
-VAR i: SIZE; x0: HUGEINT; a: ARRAY 21 OF CHAR;
+PROCEDURE Int*(x: SIGNED64; w: WORD);
+VAR i: SIZE; x0: SIGNED64; a: ARRAY 21 OF CHAR;
 BEGIN
 	IF x < 0 THEN
-		IF x = MIN(HUGEINT) THEN
+		IF x = MIN(SIGNED64) THEN
 			DEC(w, 20);
 			WHILE w > 0 DO Char(" "); DEC(w) END;
 			String ("-9223372036854775808");
@@ -95,7 +95,7 @@ END Boolean;
 
 (** Write "x" as a decimal number with a power-of-two multiplier (K, M or G), followed by "suffix". "w" is the field width, excluding "suffix". *)
 
-PROCEDURE IntSuffix*(x: HUGEINT; w: WORD; CONST suffix: ARRAY OF CHAR);
+PROCEDURE IntSuffix*(x: SIGNED64; w: WORD; CONST suffix: ARRAY OF CHAR);
 CONST K = 1024; M = K*K; G = K*M;
 VAR mult: CHAR;
 BEGIN
@@ -113,7 +113,7 @@ END IntSuffix;
 (*
 (** Write "x" as a hexadecimal number. The absolute value of "w" is the field width. If "w" is negative, two hex digits are printed (x MOD 100H), otherwise 8 digits are printed. *)
 
-PROCEDURE Hex*(x: HUGEINT; w: WORD);
+PROCEDURE Hex*(x: SIGNED64; w: WORD);
 VAR i, j: SIZE; buf: ARRAY 10 OF CHAR;
 BEGIN
 	IF w >= 0 THEN j := 8 ELSE j := 2; w := -w END;
@@ -133,7 +133,7 @@ END Hex;
 (**	Write an integer in hexadecimal right-justified in a field of at least ABS(w) characters.
 	If w < 0, the w least significant hex digits of x are written (potentially including leading zeros)
 *)
-PROCEDURE Hex*( x: HUGEINT;  w: WORD );
+PROCEDURE Hex*( x: SIGNED64;  w: WORD );
 VAR filler: CHAR; i, maxi, y: WORD;  buf: ARRAY 20 OF CHAR;
 BEGIN
 	IF w < 0 THEN  filler := '0';  w := -w;  maxi := w  ELSE  filler := ' ';  maxi := 16  END;
@@ -164,7 +164,7 @@ END Size;
 
 (** Write "x" as a hexadecimal number.  "w" is the field width.  Always prints 16 digits. *)
 
-PROCEDURE HIntHex*(x: HUGEINT; w: WORD);
+PROCEDURE HIntHex*(x: SIGNED64; w: WORD);
 BEGIN
 	Hex( x, w )
 END HIntHex;

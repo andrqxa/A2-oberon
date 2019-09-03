@@ -1498,7 +1498,7 @@ VAR
 
 BEGIN
 	KernelLog.String("UsbVideo@Body"); KernelLog.Ln;
-	TRACE(SIZEOF(ProbeCommitCtl), SIZEOF(SIGNED8), SIZEOF(SIGNED16), SIZEOF(SIGNED32), SIZEOF(HUGEINT));
+	TRACE(SIZEOF(ProbeCommitCtl), SIZEOF(SIGNED8), SIZEOF(SIGNED16), SIZEOF(SIGNED32), SIZEOF(SIGNED64));
 	Modules.InstallTermHandler(Cleanup);
 	Usbdi.drivers.Add(Probe, Name, Description, Priority);
 	NEW(frame, Size)

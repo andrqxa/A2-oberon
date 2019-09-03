@@ -1457,7 +1457,7 @@ TYPE
 			END;
 		END Emit;
 
-		PROCEDURE EmitTrap (position: Position; trapNo: HUGEINT);
+		PROCEDURE EmitTrap (position: Position; trapNo: SIGNED64);
 		VAR saved: RegisterEntry;
 		BEGIN
 			IF backend.cooperative THEN
@@ -2815,7 +2815,7 @@ TYPE
 			IF Trace THEN TraceExit("Convert") END;
 		END Convert;
 
-		PROCEDURE TrapC(br: ConditionalBranch; left,right:IntermediateCode.Operand; trapNo: HUGEINT);
+		PROCEDURE TrapC(br: ConditionalBranch; left,right:IntermediateCode.Operand; trapNo: SIGNED64);
 		VAR exit: Label;
 		BEGIN
 			Assert((left.mode # IntermediateCode.ModeImmediate) OR (right.mode # IntermediateCode.ModeImmediate),"trap emission with two immediates");
@@ -8366,8 +8366,8 @@ TYPE
 
 		PROCEDURE DesignateBuiltinCallDesignator(x: SyntaxTree.BuiltinCallDesignator; VAR result: Operand);
 		VAR
-			p0,p1,p2: SyntaxTree.Expression; len: SIZE; val: HUGEINT; l,r: Operand; res,adr,reg: IntermediateCode.Operand; type, componentType: SyntaxTree.Type;
-			s0,s1,s2: Operand; hint: HUGEINT;
+			p0,p1,p2: SyntaxTree.Expression; len: SIZE; val: SIGNED64; l,r: Operand; res,adr,reg: IntermediateCode.Operand; type, componentType: SyntaxTree.Type;
+			s0,s1,s2: Operand; hint: SIGNED64;
 			i: SIZE; formalParameter: SyntaxTree.Parameter;
 			tmp:IntermediateCode.Operand;
 			size: SIGNED32;
@@ -9054,7 +9054,7 @@ TYPE
 		PROCEDURE EvaluateBuiltinCallDesignator(x: SyntaxTree.BuiltinCallDesignator; VAR result: Operand);
 		VAR
 			p0,p1,p2: SyntaxTree.Expression; len: SIZE; l: Operand; res,reg: IntermediateCode.Operand; type, componentType: SyntaxTree.Type;
-			s0,s1,s2: Operand; hint: HUGEINT;
+			s0,s1,s2: Operand; hint: SIGNED64;
 			i: SIZE; formalParameter: SyntaxTree.Parameter;
 			tmp:IntermediateCode.Operand;
 			t0,t1,t2: SyntaxTree.Type; ignore: Label;
@@ -10888,7 +10888,7 @@ TYPE
 
 		PROCEDURE ForStatement(x: SyntaxTree.ForStatement);
 		VAR
-			binary: SyntaxTree.BinaryExpression; startL,falseL : Label; cmp: SIGNED32; by: HUGEINT;
+			binary: SyntaxTree.BinaryExpression; startL,falseL : Label; cmp: SIGNED32; by: SIGNED64;
 			temporaryVariable: SyntaxTree.Variable;
 			temporaryVariableDesignator : SyntaxTree.Designator;
 		BEGIN
@@ -11796,7 +11796,7 @@ TYPE
 			section.Emit(Data(Basic.invalidPosition,op));
 		END Longint;
 
-		PROCEDURE Hugeint(section: IntermediateCode.Section; value: HUGEINT);
+		PROCEDURE Hugeint(section: IntermediateCode.Section; value: SIGNED64);
 		VAR op: IntermediateCode.Operand;
 		BEGIN
 			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, module.system.hugeintType),value);
@@ -12156,7 +12156,7 @@ TYPE
 
 	(*
 	ExportDesc* = RECORD
-		fp*: HUGEINT;
+		fp*: SIGNED64;
 		name* {UNTRACED}: DynamicName;
 		adr*: ADDRESS;
 		exports*: SIZE;
@@ -12615,7 +12615,7 @@ TYPE
 									IF RefInfo THEN Info(section,"SIGNED32") END;
 									Char(section, sfTypeLONGINT)
 								ELSIF (type = module.system.hugeintType) THEN
-									IF RefInfo THEN Info(section,"HUGEINT") END;
+									IF RefInfo THEN Info(section,"SIGNED64") END;
 									Char(section, sfTypeHUGEINT)
 								ELSIF (type = module.system.wordType) THEN
 									IF RefInfo THEN Info(section,"WORD") END;
@@ -14322,7 +14322,7 @@ TYPE
 		RETURN (recordType.recordScope.firstProcedure # NIL) & Basic.StringEqual (Basic.MakeString ("Trace"), recordType.recordScope.firstProcedure.name);
 	END HasExplicitTraceMethod;
 
-	PROCEDURE IsIntegerConstant(expression: SyntaxTree.Expression; VAR val: HUGEINT): BOOLEAN;
+	PROCEDURE IsIntegerConstant(expression: SyntaxTree.Expression; VAR val: SIGNED64): BOOLEAN;
 	BEGIN
 		IF expression.resolved # NIL THEN expression := expression.resolved END;
 
@@ -14334,7 +14334,7 @@ TYPE
 		END;
 	END IsIntegerConstant;
 
-	PROCEDURE PowerOf2*(val: HUGEINT;  VAR exp: SIGNED32): BOOLEAN;
+	PROCEDURE PowerOf2*(val: SIGNED64;  VAR exp: SIGNED32): BOOLEAN;
 	BEGIN
 		IF val <= 0 THEN RETURN FALSE END;
 		exp := 0;
@@ -14649,7 +14649,7 @@ TYPE
 		RETURN instruction
 	END Result;
 
-	PROCEDURE Trap(position: Basic.Position;nr: HUGEINT): IntermediateCode.Instruction;
+	PROCEDURE Trap(position: Basic.Position;nr: SIGNED64): IntermediateCode.Instruction;
 	VAR op1: IntermediateCode.Operand;
 	VAR instruction: IntermediateCode.Instruction;
 	BEGIN

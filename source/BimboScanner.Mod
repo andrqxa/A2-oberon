@@ -104,7 +104,7 @@ TYPE
 			sym- : SIGNED32;
 			numtyp-: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
 			intval-: SIGNED32;	(* integer value or string length *)
-			longintval-: HUGEINT;
+			longintval-: SIGNED64;
 			realval-: REAL;
 			lrlval-: LONGREAL;
 			numStartPos, numEndPos: SIGNED32;

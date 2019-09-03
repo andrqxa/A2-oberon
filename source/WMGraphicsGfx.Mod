@@ -84,7 +84,7 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 
 		PROCEDURE GfxColorToColor(gfxColor:Gfx.Color):WMGraphics.Color;
 		BEGIN
-			RETURN SIGNED32 (((HUGEINT(gfxColor.r*100H)+gfxColor.g)*100H+gfxColor.b)*100H+gfxColor.a)
+			RETURN SIGNED32 (((SIGNED64(gfxColor.r*100H)+gfxColor.g)*100H+gfxColor.b)*100H+gfxColor.a)
 		END GfxColorToColor;
 
 		(* ????

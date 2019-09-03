@@ -1660,7 +1660,7 @@ CONST
 	ultraFlags = {FlagPageSCB, FlagNewEepromFMT, FlagBiosEnabled};
 	ultra2Features = {FeatMoreSRAM, FeatUltra2, FeatCmdChan, FeatQueueRegs, FeatSGPreload};
 
-	PROCEDURE Card(i: SIGNED32; sig: HUGEINT;  chip: SIGNED8;  flags, features: SET;  name: ARRAY OF CHAR);
+	PROCEDURE Card(i: SIGNED32; sig: SIGNED64;  chip: SIGNED8;  flags, features: SET;  name: ARRAY OF CHAR);
 	BEGIN
 		card[i].signature := SHORT(sig);
 		card[i].chip := chip;

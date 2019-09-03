@@ -190,7 +190,7 @@ TYPE
 		data: ARRAY 1024 OF CHAR;
 		pos: SIZE;
 		size: SIZE;
-		H: HUGEINT; (* result in register *)
+		H: SIGNED64; (* result in register *)
 
 		pPos: SIGNED32;
 
@@ -205,10 +205,10 @@ TYPE
 			RETURN ADDRESSOF(data[pos]);
 		END Next;
 
-		PROCEDURE PushH(h: HUGEINT);
-		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD h: HUGEINT END;
+		PROCEDURE PushH(h: SIGNED64);
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD h: SIGNED64 END;
 		BEGIN
-			p := Next(SIZEOF(HUGEINT));
+			p := Next(SIZEOF(SIGNED64));
 			p.h := h;
 		END PushH;
 
@@ -293,11 +293,11 @@ TYPE
 			SYSTEM.SetStackPointer(esp);
 		END Call;
 
-		PROCEDURE CallH(adr: ADDRESS): HUGEINT;
+		PROCEDURE CallH(adr: ADDRESS): SIGNED64;
 		TYPE
-			P = PROCEDURE(): HUGEINT;
+			P = PROCEDURE(): SIGNED64;
 		VAR
-			res: HUGEINT; esp: ADDRESS;
+			res: SIGNED64; esp: ADDRESS;
 			p: P;
 		BEGIN
 			p := SYSTEM.VAL(P, adr);
@@ -419,7 +419,7 @@ TYPE
 
 		PROCEDURE PushTyped*(o: Result; mode: CHAR; refs: Modules.Bytes; VAR offset: SIZE): BOOLEAN;
 		VAR ofs: SIZE;
-			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: HUGEINT;
+			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
 			r: REAL; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
@@ -519,7 +519,7 @@ TYPE
 
 		PROCEDURE Push*(o: Result): BOOLEAN;
 		VAR
-			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: HUGEINT;
+			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
 			r: REAL; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
@@ -610,7 +610,7 @@ TYPE
 			s: SIGNED8;
 			i: SIGNED16;
 			l: SIGNED32;
-			h: HUGEINT;
+			h: SIGNED64;
 
 			int: IntegerValue;
 			a: ANY;
@@ -647,7 +647,7 @@ TYPE
 
 		PROCEDURE SetV*(v: Value): BOOLEAN;
 		VAR
-			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: HUGEINT;
+			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
 			r: REAL; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
@@ -810,7 +810,7 @@ TYPE
 			RETURN SELF;
 		END Evaluate;
 
-		PROCEDURE GetInt*(VAR h: HUGEINT): BOOLEAN;
+		PROCEDURE GetInt*(VAR h: SIGNED64): BOOLEAN;
 		BEGIN
 			RETURN FALSE;
 		END GetInt;
@@ -928,7 +928,7 @@ TYPE
 		END Enumerate;
 
 		PROCEDURE Set*(CONST name: ARRAY OF CHAR; index: SIZE; c: Content);
-		VAR int: HUGEINT;
+		VAR int: SIGNED64;
 		BEGIN
 			IF name = StrValue THEN c.GetInteger(int); value := ADDRESS(int);
 			ELSE Set^(name, index, c);
@@ -959,9 +959,9 @@ TYPE
 	END AddressValue;
 
 	IntegerValue*=OBJECT(Value)
-	VAR value*: HUGEINT;
+	VAR value*: SIGNED64;
 
-		PROCEDURE & InitInteger*(value: HUGEINT);
+		PROCEDURE & InitInteger*(value: SIGNED64);
 		BEGIN InitValue; SELF.value := value; type := "IntegerValue";
 		END InitInteger;
 
@@ -970,7 +970,7 @@ TYPE
 		END Enumerate;
 
 		PROCEDURE Set*(CONST name: ARRAY OF CHAR; index: SIZE; c: Content);
-		VAR val: HUGEINT;
+		VAR val: SIGNED64;
 		BEGIN
 			IF name = StrValue THEN c.GetInteger(val); value := val;
 			ELSE Set^(name, index, c);
@@ -984,7 +984,7 @@ TYPE
 			END;
 		END Get;
 
-		PROCEDURE GetInt*(VAR v: HUGEINT): BOOLEAN;
+		PROCEDURE GetInt*(VAR v: SIGNED64): BOOLEAN;
 		BEGIN
 			v := value; RETURN TRUE;
 		END GetInt;
@@ -1250,9 +1250,9 @@ TYPE
 	END CharValue;
 
 	EnumValue*=OBJECT(Value)
-	VAR value: HUGEINT; translation: PersistentObjects.Translation;
+	VAR value: SIGNED64; translation: PersistentObjects.Translation;
 
-		PROCEDURE & InitEnumValue*(trans: PersistentObjects.Translation; v: HUGEINT);
+		PROCEDURE & InitEnumValue*(trans: PersistentObjects.Translation; v: SIGNED64);
 		BEGIN InitValue; value := v;  translation := trans; type := "EnumValue";
 		END InitEnumValue;
 
@@ -1519,7 +1519,7 @@ TYPE
 		c.GetObject(o); IF o = NIL THEN RETURN NIL ELSE RETURN o(Value) END;
 	END ContentGetValue;
 
-	PROCEDURE NewIntegerValue(value: HUGEINT): IntegerValue;
+	PROCEDURE NewIntegerValue(value: SIGNED64): IntegerValue;
 	VAR obj: IntegerValue;
 	BEGIN
 		NEW(obj, value); RETURN obj
@@ -1567,7 +1567,7 @@ TYPE
 		NEW(obj, value); RETURN obj
 	END NewSetValue;
 
-	PROCEDURE NewEnumValue(translation: PersistentObjects.Translation; value: HUGEINT): EnumValue;
+	PROCEDURE NewEnumValue(translation: PersistentObjects.Translation; value: SIGNED64): EnumValue;
 	VAR obj: EnumValue;
 	BEGIN
 		NEW(obj, translation, value);

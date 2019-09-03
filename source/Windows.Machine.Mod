@@ -103,8 +103,8 @@ VAR
 	version*: ARRAY 64 OF CHAR;   (** Aos version *)
 	features*,features2*: SET;   (** processor features *)
 	fcr*: SET;   (** default floating-point control register value (default rounding mode is towards -infinity, for ENTIER) *)
-	mhz*: HUGEINT;   (** clock rate of GetTimer() in MHz, or 0 if not known *)
-	boottime-: HUGEINT; (** in timer units *)
+	mhz*: SIGNED64;   (** clock rate of GetTimer() in MHz, or 0 if not known *)
+	boottime-: SIGNED64; (** in timer units *)
 
 	commandLine-: ARRAY 256 OF CHAR;
 	hin, hout: Kernel32.HANDLE;
@@ -441,7 +441,7 @@ VAR
 	END Shutdown;
 
 (* Dan: from new Machine *)
-PROCEDURE -GetTimer*(): HUGEINT;
+PROCEDURE -GetTimer*(): SIGNED64;
 CODE {SYSTEM.Pentium}
 	RDTSC	; set EDX:EAX
 END GetTimer;

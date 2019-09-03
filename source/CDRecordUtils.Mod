@@ -488,7 +488,7 @@ TYPE
 			NEW(cur, NIL, NIL, NIL);
 		END Init;
 
-		PROCEDURE SetPos*(pos: HUGEINT);
+		PROCEDURE SetPos*(pos: SIGNED64);
 		BEGIN
 			IF pos < start.Get() THEN
 				pos := start.Get();
@@ -499,12 +499,12 @@ TYPE
 			Invalidate();
 		END SetPos;
 
-		PROCEDURE GetPos*(): HUGEINT;
+		PROCEDURE GetPos*(): SIGNED64;
 		BEGIN
 			RETURN cur.Get();
 		END GetPos;
 
-		PROCEDURE SetRange*(start, end: HUGEINT);
+		PROCEDURE SetRange*(start, end: SIGNED64);
 		BEGIN
 			SELF.start.Set(start);
 			SELF.end.Set(end);

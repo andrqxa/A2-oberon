@@ -304,7 +304,7 @@ VAR
 	remainder : SIZE;
 	blocksOf8Bytes : SIZE;
 	adra, adrb, adrr : ADDRESS;
-	alpha64, maskRed64, maskGreen64, maskBlue64 : HUGEINT;
+	alpha64, maskRed64, maskGreen64, maskBlue64 : SIGNED64;
 	alpha32 : SIGNED32;
 	tmpA, tmpB : SIGNED32;
 	ar, ag, ab, br, bg, bb, cr, cg, cb : SIGNED32;
@@ -320,7 +320,7 @@ BEGIN
 	maskGreen64	:= 007E007E007E007E0H;
 	maskBlue64		:= 0001F001F001F001FH;
 
-	(* Compose the quadruple alpha value and pack it in a 64bit HUGEINT *)
+	(* Compose the quadruple alpha value and pack it in a 64bit SIGNED64 *)
 	alpha64 := 0;
 	alpha32 := BIT.LOR( per255, ASH(per255,16) );
 	SYSTEM.PUT32( ADDRESSOF(alpha64), alpha32);
@@ -366,7 +366,7 @@ END Calc565MMX;
  * Helper Function for Calc565MMX: :Calculate fade for just one line using assembler code (MMX technology)
  *
  *** *)
-PROCEDURE Calc565MMXLine (adra, adrb, adrr: ADDRESS; i : SIZE; alpha : SIGNED32; a64, mr64, mg64, mb64 : HUGEINT);
+PROCEDURE Calc565MMXLine (adra, adrb, adrr: ADDRESS; i : SIZE; alpha : SIGNED32; a64, mr64, mg64, mb64 : SIGNED64);
 CODE
 #IF I386 THEN
 	;
@@ -691,7 +691,7 @@ VAR
 	y : SIZE; (* current image coordinates *)
 	height, width : SIZE;
 	adra, adrb, adrr : ADDRESS;
-	alpha64, mask64 : HUGEINT;
+	alpha64, mask64 : SIGNED64;
 BEGIN
 	IF (DEBUG) THEN KernelLog.String("Fade in 565-Format (MMX)"); KernelLog.Ln; END;
 	height := a.height; width := a.width;
@@ -699,7 +699,7 @@ BEGIN
 	(* Set a general bit masks *)
 	mask64 :=  0000000000FFFFFFH;
 
-	(* Compose the triple alpha value and pack it in a 64bit HUGEINT *)
+	(* Compose the triple alpha value and pack it in a 64bit SIGNED64 *)
 	alpha64 := 0;
 	SYSTEM.PUT32( ADDRESSOF(alpha64), BIT.LOR( per255, ASH(per255,16)) );
 	SYSTEM.PUT32( ADDRESSOF(alpha64)+4, per255);
@@ -717,7 +717,7 @@ END Calc888MMX;
  * Helper Function for Calc888MMX: :Calculate fade for just one line using assembler code (MMX technology)
  *
  *** *)
-PROCEDURE Calc888MMXLine (adra, adrb, adrr: ADDRESS; i : SIZE; a64, m64 : HUGEINT);
+PROCEDURE Calc888MMXLine (adra, adrb, adrr: ADDRESS; i : SIZE; a64, m64 : SIGNED64);
 CODE
 #IF I386 THEN
 	; (re)load the width counter

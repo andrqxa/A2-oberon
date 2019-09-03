@@ -2396,7 +2396,7 @@ VAR  size: PCLIR.Size;  remainder, dividend, result, temp: Register;  src2: Real
 BEGIN
 	ASSERT((instr.op = PCLIR.div) OR (instr.op = PCLIR.mod));
 	IF instr.dstSize = PCLIR.Int64 THEN
-		PCM.Error(200, PCO.errpos, "HUGEINT DIV/MOD");
+		PCM.Error(200, PCO.errpos, "SIGNED64 DIV/MOD");
 	ELSIF instr.dstSize IN PCLIR.FloatSize THEN
 		GenFtyp1(code, instr, pc)
 	ELSE

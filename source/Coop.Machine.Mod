@@ -84,8 +84,8 @@ VAR
 	version*: ARRAY 64 OF CHAR;   (** Aos version *)
 	features*,features2*: SET;   (** processor features *)
 	fcr*: SET;   (** default floating-point control register value (default rounding mode is towards -infinity, for ENTIER) *)
-	mhz*: HUGEINT;   (** clock rate of GetTimer() in MHz, or 0 if not known *)
-	boottime-: HUGEINT; (** in timer units *)
+	mhz*: SIGNED64;   (** clock rate of GetTimer() in MHz, or 0 if not known *)
+	boottime-: SIGNED64; (** in timer units *)
 
 VAR
 	lock-: ARRAY MaxLocks OF CHAR;  (* not implemented as SET because of shared access *)
@@ -350,7 +350,7 @@ BEGIN HALT (1234);
 END Sti;
 
 (* Dan: from new Machine *)
-PROCEDURE -GetTimer*(): HUGEINT;
+PROCEDURE -GetTimer*(): SIGNED64;
 CODE
 #IF I386 THEN
 	RDTSC	; set EDX:EAX
@@ -671,35 +671,35 @@ END ChangeByteOrder;
 
 #ELSIF AMD64 THEN
 
-	PROCEDURE -GetRAX*(): HUGEINT;
+	PROCEDURE -GetRAX*(): SIGNED64;
 	CODE
 	END GetRAX;
 
-	PROCEDURE -GetRCX*(): HUGEINT;
+	PROCEDURE -GetRCX*(): SIGNED64;
 	CODE MOV RAX, RCX
 	END GetRCX;
 
-	PROCEDURE -SetRAX*(n: HUGEINT);
+	PROCEDURE -SetRAX*(n: SIGNED64);
 	CODE POP RAX
 	END SetRAX;
 
-	PROCEDURE -SetRBX*(n: HUGEINT);
+	PROCEDURE -SetRBX*(n: SIGNED64);
 	CODE POP RBX
 	END SetRBX;
 
-	PROCEDURE -SetRCX*(n: HUGEINT);
+	PROCEDURE -SetRCX*(n: SIGNED64);
 	CODE POP RCX
 	END SetRCX;
 
-	PROCEDURE -SetRDX*(n: HUGEINT);
+	PROCEDURE -SetRDX*(n: SIGNED64);
 	CODE POP RDX
 	END SetRDX;
 
-	PROCEDURE -SetRSI*(n: HUGEINT);
+	PROCEDURE -SetRSI*(n: SIGNED64);
 	CODE POP RSI
 	END SetRSI;
 
-	PROCEDURE -SetRDI*(n: HUGEINT);
+	PROCEDURE -SetRDI*(n: SIGNED64);
 	CODE POP RDI
 	END SetRDI;
 

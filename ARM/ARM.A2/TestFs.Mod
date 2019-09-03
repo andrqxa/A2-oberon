@@ -10,12 +10,12 @@ TYPE
 		id: SIGNED32;
 		file: Files.File;
 		fw: Files.Writer;
-		fileSize: HUGEINT;
-		byteCount: HUGEINT;
+		fileSize: SIGNED64;
+		byteCount: SIGNED64;
 		rndData, rndUpdate: Random.Generator;
 
 		tStart: Kernel.MilliTimer;
-		startByteCount: HUGEINT;
+		startByteCount: SIGNED64;
 
 		fileName0: Files.FileName;
 		partNum: SIGNED32;
@@ -23,7 +23,7 @@ TYPE
 
 		run := FALSE, exited := FALSE: BOOLEAN;
 
-		PROCEDURE &InitWriter(id: SIGNED32; CONST fileName: ARRAY OF CHAR; fileSize: HUGEINT);
+		PROCEDURE &InitWriter(id: SIGNED32; CONST fileName: ARRAY OF CHAR; fileSize: SIGNED64);
 		BEGIN
 			ASSERT(~exited);
 
@@ -158,11 +158,11 @@ TYPE
 		file: Files.File;
 		fr: Files.Reader;
 		rndData: Random.Generator;
-		byteCount: HUGEINT;
+		byteCount: SIGNED64;
 		run, exited: BOOLEAN;
 
 		tStart: Kernel.MilliTimer;
-		startByteCount: HUGEINT;
+		startByteCount: SIGNED64;
 
 		fileName0: Files.FileName;
 		partNum: SIGNED32;

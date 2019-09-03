@@ -1475,8 +1475,8 @@ TYPE
 		UNTIL ch = 0X;
 	END Small;
 
-	PROCEDURE Hex(w: Streams.Writer; x: HUGEINT);
-	VAR i: SIGNED32; a: ARRAY 20 OF CHAR; y: HUGEINT;
+	PROCEDURE Hex(w: Streams.Writer; x: SIGNED64);
+	VAR i: SIGNED32; a: ARRAY 20 OF CHAR; y: SIGNED64;
 	BEGIN
 		i := 0;
 		REPEAT

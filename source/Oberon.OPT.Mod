@@ -1479,7 +1479,7 @@ BEGIN
 
 	EnterTyp( "CHAR", Char, OPM.CharSize, chartyp, SFtypChar );  EnterTyp( "SET", Set, OPM.SetSize, settyp, SFtypSet );
 	EnterTyp( "REAL", Real, OPM.RealSize, realtyp, SFtypReal );  EnterTyp( "SIGNED16", Int, OPM.IntSize, inttyp, SFtypInt );
-	EnterTyp( "SIGNED32", LInt, OPM.LIntSize, linttyp, SFtypLInt );  EnterTyp( "HUGEINT", HInt, OPM.HIntSize, hinttyp, SFtypHInt );
+	EnterTyp( "SIGNED32", LInt, OPM.LIntSize, linttyp, SFtypLInt );  EnterTyp( "SIGNED64", HInt, OPM.HIntSize, hinttyp, SFtypHInt );
 	EnterTyp( "LONGREAL", LReal, OPM.LRealSize, lrltyp, SFtypLReal );  EnterTyp( "SIGNED8", SInt, OPM.SIntSize, sinttyp, SFtypSInt );
 	EnterTyp( "BOOLEAN", Bool, OPM.BoolSize, booltyp, SFtypBool );
 	(*

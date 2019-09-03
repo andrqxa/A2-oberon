@@ -67,8 +67,8 @@ VAR
 	MemMap : ARRAY approxMemMapSize OF EFI.MemoryDescriptor;
 	MemMapElement : EFI.MemoryDescriptorPointer;
 	i, numEntries : EFI.Int;
-	hi, numcritEntries : HUGEINT;
-	memsize : HUGEINT;
+	hi, numcritEntries : SIGNED64;
+	memsize : SIGNED64;
 	tmp : EFI.PhysicalAddress;
 BEGIN
 	MemMapSize := LEN(MemMap)*SIZEOF(EFI.MemoryDescriptor);

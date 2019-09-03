@@ -25,7 +25,7 @@ Report any problems as soon as possible to ants@AntsInFields.de
 
 
 (* -----bluebottle module -------*)
-(* implementation of HUGEINT is quick and dirty, only used for one demonstrational issue (antsRandom),
+(* implementation of SIGNED64 is quick and dirty, only used for one demonstrational issue (antsRandom),
 when MathH available use MathH instead *)
 
 IMPORT Display,Objects,Strings,vyHost,Gadgets,antsCommandInvoker,Oberon, Modules, SYSTEM,
@@ -47,12 +47,12 @@ TYPE
 	Type*= vyPortability.Type;
 	FileEnum*  = PROCEDURE (path, name: ARRAY OF CHAR;              time, date, size: SIGNED32;              attrs: SET);
 
-	Hugeint*= HUGEINT;
+	Hugeint*= SIGNED64;
 
 VAR dialogtime: SIGNED32; (* to prevent from execution of old "forgotten" dialogs, we do not force the user to close open dialogs, do a warning ? *)
 thed: dialog;
  PathChar*: CHAR;
- ONE* :HUGEINT;
+ ONE* :SIGNED64;
 
 PROCEDURE SetMousePointDisplay*;
 (* do nothing, there is only one display in Native Oberon *)
@@ -225,23 +225,23 @@ VAR notyetimplemented: BOOLEAN;
 BEGIN notyetimplemented := TRUE; HALT(100);
 END EnumerateFiles;
 
-	PROCEDURE HIToLR*( h: HUGEINT ): LONGREAL;
+	PROCEDURE HIToLR*( h: SIGNED64 ): LONGREAL;
 	BEGIN
 		RETURN h;
 		(*
 		RETURN 1.0D0 * h.low + 1.0D0 * h.hi * MAX( SIGNED32 );
 		*)
 	END HIToLR;
-	PROCEDURE LRToHI*( l: LONGREAL ): HUGEINT;
-	VAR h: HUGEINT;
+	PROCEDURE LRToHI*( l: LONGREAL ): SIGNED64;
+	VAR h: SIGNED64;
 	BEGIN
 		RETURN ENTIER(l);
 		(*
 		h.hi := ENTIER( l / MAX( SIGNED32 ) );  h.low := ENTIER( l - 1.0D0 * h.hi * MAX( SIGNED32 ) + 0.5 );  RETURN h;
 		*)
 	END LRToHI;
-	PROCEDURE LIToHI*( l: SIGNED32 ): HUGEINT;
-	VAR h: HUGEINT;
+	PROCEDURE LIToHI*( l: SIGNED32 ): SIGNED64;
+	VAR h: SIGNED64;
 	BEGIN
 		RETURN l;
 		(*
@@ -249,7 +249,7 @@ END EnumerateFiles;
 		*)
 	END LIToHI;
 
-PROCEDURE Modulus*(x,y: HUGEINT): HUGEINT;
+PROCEDURE Modulus*(x,y: SIGNED64): SIGNED64;
 VAR xr,yr,mod: LONGREAL;
 BEGIN
 	xr := HIToLR(x);
@@ -258,17 +258,17 @@ BEGIN
 	RETURN LRToHI(mod);
 END Modulus;
 
-PROCEDURE Multiply*(x,y: HUGEINT): HUGEINT;
+PROCEDURE Multiply*(x,y: SIGNED64): SIGNED64;
 BEGIN
 	RETURN LRToHI(HIToLR(x)*HIToLR(y));
 END Multiply;
 
-PROCEDURE Add*(x,y: HUGEINT): HUGEINT;
+PROCEDURE Add*(x,y: SIGNED64): SIGNED64;
 BEGIN
 	RETURN LRToHI(HIToLR(x)+HIToLR(y));
 END Add;
 
-	PROCEDURE Equal*( x, y: HUGEINT ): BOOLEAN;
+	PROCEDURE Equal*( x, y: SIGNED64 ): BOOLEAN;
 	BEGIN
 		RETURN x=y;
 		(*
@@ -280,7 +280,7 @@ END Add;
 
 (*
 PROCEDURE Test*;
-VAR l: LONGREAL; h: HUGEINT;
+VAR l: LONGREAL; h: SIGNED64;
 BEGIN
 	l := 1.2345D13;
 	aM.SR("l = ",l);

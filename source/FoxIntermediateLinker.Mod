@@ -82,7 +82,7 @@ TYPE
 			END
 		END EmitAt;
 
-		PROCEDURE PatchIntegerValue*(CONST sectionName: ARRAY OF CHAR; index: SIZE; value: HUGEINT; type: SyntaxTree.Type): BOOLEAN;
+		PROCEDURE PatchIntegerValue*(CONST sectionName: ARRAY OF CHAR; index: SIZE; value: SIGNED64; type: SyntaxTree.Type): BOOLEAN;
 		VAR instruction: IntermediateCode.Instruction; section: Sections.Section; op1: IntermediateCode.Operand;
 			pooledName: Basic.SegmentedName; itype: IntermediateCode.Type;
 		BEGIN
@@ -454,7 +454,7 @@ TYPE
 			section: Sections.Section;
 			emptyOperand, dataOperand: IntermediateCode.Operand;
 			dataInstruction: IntermediateCode.Instruction;
-			hugeintValue: HUGEINT;
+			hugeintValue: SIGNED64;
 		BEGIN
 			section := allSections.FindByName(sectionName);
 			ASSERT(section # NIL);

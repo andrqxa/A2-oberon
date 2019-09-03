@@ -824,7 +824,7 @@ TYPE
 		END BuildSkeleton;
 
 		PROCEDURE GetSizeString(nbrOfBlocks, blockSize : SIGNED32) : Strings.String;
-		VAR sizeKB : HUGEINT; caption : ARRAY 128 OF CHAR;
+		VAR sizeKB : SIGNED64; caption : ARRAY 128 OF CHAR;
 		BEGIN
 			sizeKB := (LONG(nbrOfBlocks) * LONG(blockSize)) DIV  1024;
 			IF sizeKB > 4*1024 THEN

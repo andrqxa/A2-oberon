@@ -1522,7 +1522,7 @@ TYPE
 		(* Later versions of Codecs will probably adapt this										*)
 		(* @params: none																			*)
 		(* @returns: audioTime in milliseconds or microseconds										*)
-		PROCEDURE GetAudioTime*():HUGEINT;
+		PROCEDURE GetAudioTime*():SIGNED64;
 		BEGIN
 			KernelLog.String("AudioTime calculation must be done in Playerapplication!"); KernelLog.Ln();
 			RETURN -1;

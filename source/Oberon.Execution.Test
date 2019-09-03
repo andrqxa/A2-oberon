@@ -144,7 +144,7 @@ positive: Hugeint stored in PAF
 	MODULE Test;
 
 	PROCEDURE Hugeint;
-	VAR a,b: HUGEINT;
+	VAR a,b: SIGNED64;
 	BEGIN
 		a := 70800;
 		b := a;
@@ -775,7 +775,7 @@ positive: relational operations on long integers
 positive: relational operations on huge integers
 
 	MODULE Test;
-	VAR value: HUGEINT;
+	VAR value: SIGNED64;
 	BEGIN
 		value := 5;
 		ASSERT (value = 5); ASSERT (~(value = 6)); ASSERT (value = value);
@@ -870,7 +870,7 @@ positive: negation on long integers
 positive: negation on huge integers
 
 	MODULE Test;
-	VAR value: HUGEINT;
+	VAR value: SIGNED64;
 	BEGIN value := 5; ASSERT (-value = -5); ASSERT (-(-value) = 5); ASSERT (-(-value) = value)
 	END Test.
 
@@ -928,7 +928,7 @@ positive: absolute value of long integer
 positive: absolute value of huge integer
 
 	MODULE Test;
-	VAR value: HUGEINT;
+	VAR value: SIGNED64;
 	BEGIN
 		value := 5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = value); ASSERT (ABS (-value) = value);
 		value := -5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = -value); ASSERT (ABS (-value) = -value);
@@ -1086,7 +1086,7 @@ positive: character value of long integer
 positive: character value of huge integer
 
 	MODULE Test;
-	VAR value: HUGEINT;
+	VAR value: SIGNED64;
 	BEGIN
 		value := ORD ('0'); ASSERT (CHR (value) = '0');
 		value := ORD ('9'); ASSERT (CHR (value) = '9');
@@ -1365,7 +1365,7 @@ positive: long integers as set elements
 positive: huge integer as set element
 
 	MODULE Test;
-	VAR element: HUGEINT; set: SET;
+	VAR element: SIGNED64; set: SET;
 	BEGIN
 		element := MIN (SET); set := {element}; ASSERT (element IN set); ASSERT (set - {element} = {});
 		element := MAX (SET); set := {element}; ASSERT (element IN set); ASSERT (set - {element} = {});
@@ -1374,21 +1374,21 @@ positive: huge integer as set element
 negative: huge integer as too small set element
 
 	MODULE Test;
-	VAR element: HUGEINT; set: SET;
+	VAR element: SIGNED64; set: SET;
 	BEGIN element := MIN (SET) - 1; set := {element};
 	END Test.
 
 negative: huge integer as too large set element
 
 	MODULE Test;
-	VAR element: HUGEINT; set: SET;
+	VAR element: SIGNED64; set: SET;
 	BEGIN element := MAX (SET) + 1; set := {element};
 	END Test.
 
 positive: huge integer as first set element
 
 	MODULE Test;
-	VAR element: HUGEINT; set: SET;
+	VAR element: SIGNED64; set: SET;
 	BEGIN
 		element := MIN (SET); set := {element .. MAX (SET)}; ASSERT (element IN set); ASSERT (set = {MIN (SET) .. MAX (SET)}); ASSERT (-set = {});
 		element := MIN (SET); set := {element .. MIN (SET)}; ASSERT (element IN set); ASSERT (set = {MIN (SET) .. MIN (SET)}); ASSERT (set = {element}); ASSERT (set = {MIN (SET)});
@@ -1399,21 +1399,21 @@ positive: huge integer as first set element
 negative: huge integer as too small first set element
 
 	MODULE Test;
-	VAR element: HUGEINT; set: SET;
+	VAR element: SIGNED64; set: SET;
 	BEGIN element := MIN (SET) - 1;set := {element .. MAX (SET)};
 	END Test.
 
 negative: huge integer as too large first set element
 
 	MODULE Test;
-	VAR element: HUGEINT; set: SET;
+	VAR element: SIGNED64; set: SET;
 	BEGIN element := MAX (SET) + 1;set := {element .. MAX (SET)};
 	END Test.
 
 positive: huge integer as last set element
 
 	MODULE Test;
-	VAR element: HUGEINT; set: SET;
+	VAR element: SIGNED64; set: SET;
 	BEGIN
 		element := MAX (SET); set := {MIN (SET) .. element}; ASSERT (element IN set); ASSERT (set = {MIN (SET) .. MAX (SET)}); ASSERT (-set = {});
 		element := MAX (SET); set := {MAX (SET) .. element}; ASSERT (element IN set); ASSERT (set = {MAX (SET) .. MAX (SET)}); ASSERT (set = {MAX (SET)});
@@ -1424,21 +1424,21 @@ positive: huge integer as last set element
 negative: huge integer as too small last set element
 
 	MODULE Test;
-	VAR element: HUGEINT; set: SET;
+	VAR element: SIGNED64; set: SET;
 	BEGIN element := MIN (SET) - 1;set := {MIN (SET) .. element};
 	END Test.
 
 negative: huge integer as too large last set element
 
 	MODULE Test;
-	VAR element: HUGEINT; set: SET;
+	VAR element: SIGNED64; set: SET;
 	BEGIN element := MAX (SET) + 1;set := {MIN (SET) .. element};
 	END Test.
 
 positive: huge integers as set elements
 
 	MODULE Test;
-	VAR first, last: HUGEINT; set: SET;
+	VAR first, last: SIGNED64; set: SET;
 	BEGIN
 		first := MIN (SET); last := MAX (SET); set := {first .. last}; ASSERT (set = {MIN (SET) .. MAX (SET)});
 		ASSERT (first IN set); ASSERT (last IN set); ASSERT (-set = {});
@@ -1485,7 +1485,7 @@ positive: odd test on long integer
 positive: odd test on huge integer
 
 	MODULE Test;
-	VAR value: HUGEINT;
+	VAR value: SIGNED64;
 	BEGIN
 		value := 0; ASSERT (~ODD (value)); ASSERT (ODD (value + 1));
 		value := 5; ASSERT (ODD (value)); ASSERT (~ODD (value + 1));
@@ -1533,8 +1533,8 @@ positive: short on long integer
 positive: short on huge integer
 
 	MODULE Test;
-	VAR value: HUGEINT;
-	BEGIN value := 1122334455667788H; ASSERT (SHORT (value) = SHORT (HUGEINT(1122334455667788H)));
+	VAR value: SIGNED64;
+	BEGIN value := 1122334455667788H; ASSERT (SHORT (value) = SHORT (SIGNED64(1122334455667788H)));
 	END Test.
 
 positive: entier on reals
@@ -1603,13 +1603,13 @@ positive: addition on long integers
 positive: addition on huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT;
+	VAR a, b: SIGNED64;
 	BEGIN
 		a := 3; b := 2; ASSERT (a + b = +5); ASSERT (a + b = 3 + 2);
 		a := -3; b := 2; ASSERT (a + b = -1); ASSERT (a + b = (-3) + 2);
 		a := 3; b := -2; ASSERT (a + b = +1); ASSERT (a + b = 3 + (-2));
 		a := -3; b := -2; ASSERT (a + b = -5); ASSERT (a + b = (-3) + (-2));
-		a := MAX (HUGEINT); b := MIN (HUGEINT) + 1; ASSERT (a + b = 0); ASSERT (a + b = MAX (HUGEINT) + MIN (HUGEINT) + 1);
+		a := MAX (SIGNED64); b := MIN (SIGNED64) + 1; ASSERT (a + b = 0); ASSERT (a + b = MAX (SIGNED64) + MIN (SIGNED64) + 1);
 	END Test.
 
 positive: addition on reals
@@ -1674,13 +1674,13 @@ positive: subtraction on long integers
 positive: subtraction on huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT;
+	VAR a, b: SIGNED64;
 	BEGIN
 		a := 3; b := 2; ASSERT (a - b = +1); ASSERT (a - b = 3 - 2);
 		a := -3; b := 2; ASSERT (a - b = -5); ASSERT (a - b = (-3) - 2);
 		a := 3; b := -2; ASSERT (a - b = +5); ASSERT (a - b = 3 - (-2));
 		a := -3; b := -2; ASSERT (a - b = -1); ASSERT (a - b = (-3) - (-2));
-		a := MIN (HUGEINT) + 1; b := MAX (HUGEINT); ASSERT (a - b = 2); ASSERT (a - b = MIN (HUGEINT) + 1 - MAX (HUGEINT));
+		a := MIN (SIGNED64) + 1; b := MAX (SIGNED64); ASSERT (a - b = 2); ASSERT (a - b = MIN (SIGNED64) + 1 - MAX (SIGNED64));
 	END Test.
 
 positive: subtraction on reals
@@ -1739,19 +1739,19 @@ positive: multiplication on long integers
 		a := 3; b := -2; ASSERT (a * b = -6); ASSERT (a * b = 3 * (-2));
 		a := -3; b := -2; ASSERT (a * b = +6); ASSERT (a * b = (-3) * (-2));
 		a := MAX (SIGNED32); b := MAX (SIGNED32); ASSERT (a * b = 1);
-		(*ASSERT (a * b = SHORT (HUGEINT(MAX (SIGNED32) * MAX (SIGNED32))));*)
+		(*ASSERT (a * b = SHORT (SIGNED64(MAX (SIGNED32) * MAX (SIGNED32))));*)
 	END Test.
 
 positive: multiplication on huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT;
+	VAR a, b: SIGNED64;
 	BEGIN
 		a := 3; b := 2; ASSERT (a * b = +6); ASSERT (a * b = 3 * 2);
 		a := -3; b := 2; ASSERT (a * b = -6); ASSERT (a * b = (-3) * 2);
 		a := 3; b := -2; ASSERT (a * b = -6); ASSERT (a * b = 3 * (-2));
 		a := -3; b := -2; ASSERT (a * b = +6); ASSERT (a * b = (-3) * (-2));
-		a := MAX (HUGEINT); b := MAX (HUGEINT); ASSERT (a * b = 1); ASSERT (a * b = MAX (HUGEINT) * MAX (HUGEINT));
+		a := MAX (SIGNED64); b := MAX (SIGNED64); ASSERT (a * b = 1); ASSERT (a * b = MAX (SIGNED64) * MAX (SIGNED64));
 	END Test.
 
 positive: multiplication on reals
@@ -1861,19 +1861,19 @@ negative: integer division by zero on long integer
 positive: integer division on huge integers with positive divisor
 
 	MODULE Test;
-	VAR a, b: HUGEINT;
+	VAR a, b: SIGNED64;
 	BEGIN
 		a := 3; b := 2; ASSERT (a DIV b = +1); ASSERT (a DIV b = 3 DIV 2);
 		a := -3; b := 2; ASSERT (a DIV b = -2); ASSERT (a DIV b = (-3) DIV 2);
 		a := 2; b := 3; ASSERT (a DIV b = +0); ASSERT (a DIV b = 2 DIV 3);
 		a := -2; b := 3; ASSERT (a DIV b = -1); ASSERT (a DIV b = (-2) DIV 3);
-		a := MAX (HUGEINT); b := MAX (HUGEINT); ASSERT (a DIV b = 1); ASSERT (a DIV b = MAX (HUGEINT) DIV MAX (HUGEINT));
+		a := MAX (SIGNED64); b := MAX (SIGNED64); ASSERT (a DIV b = 1); ASSERT (a DIV b = MAX (SIGNED64) DIV MAX (SIGNED64));
 	END Test.
 
 negative: integer division on huge integers with negative divisor
 
 	MODULE Test;
-	VAR a, b, c: HUGEINT;
+	VAR a, b, c: SIGNED64;
 	BEGIN
 		a := 3; b := -2; c := a DIV b;
 	END Test.
@@ -1881,7 +1881,7 @@ negative: integer division on huge integers with negative divisor
 negative: integer division by zero on huge integer
 
 	MODULE Test;
-	VAR a, b, r: HUGEINT;
+	VAR a, b, r: SIGNED64;
 	BEGIN a := 3; b := 0; r := a DIV b;
 	END Test.
 
@@ -1909,7 +1909,7 @@ positive: real division on long integers
 positive: real division on huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT;
+	VAR a, b: SIGNED64;
 	BEGIN a := 3; b := 2; ASSERT (a / b = 1.5); ASSERT (a / b = 3 / 2);
 	END Test.
 
@@ -1988,19 +1988,19 @@ negative: modulo by zero on long integer
 positive: modulo on huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT;
+	VAR a, b: SIGNED64;
 	BEGIN
 		a := 3; b := 2; ASSERT (a MOD b = +1); ASSERT (3 MOD b = +1); ASSERT (a MOD 2 = +1); ASSERT (a MOD b = 3 MOD 2);
 		a := -3; b := 2; ASSERT (a MOD b = +1); ASSERT ((-3) MOD b = +1); ASSERT (a MOD 2 = +1); ASSERT (a MOD b = (-3) MOD 2);
 		a := 2; b := 3; ASSERT (a MOD b = +2); ASSERT (2 MOD b = +2); ASSERT (a MOD 3 = +2); ASSERT (a MOD b = 2 MOD 3);
 		a := -2; b := 3; ASSERT (a MOD b = 1); ASSERT ((-2) MOD b = 1); ASSERT (a MOD 3 = 1); ASSERT (a MOD b = (-2) MOD 3);
-		a := MAX (HUGEINT); b := MAX (HUGEINT); ASSERT (a MOD b = 0); ASSERT (a MOD b = MAX (HUGEINT) MOD MAX (HUGEINT));
+		a := MAX (SIGNED64); b := MAX (SIGNED64); ASSERT (a MOD b = 0); ASSERT (a MOD b = MAX (SIGNED64) MOD MAX (SIGNED64));
 	END Test.
 
 negative: modulo by zero on huge integer
 
 	MODULE Test;
-	VAR a, b, r: HUGEINT;
+	VAR a, b, r: SIGNED64;
 	BEGIN a := 3; b := 0; r := a MOD b;
 	END Test.
 
@@ -2037,7 +2037,7 @@ positive: arithmetic shift on long integer
 positive: arithmetic shift on huge integer
 
 	MODULE Test;
-	VAR a, b: HUGEINT;
+	VAR a, b: SIGNED64;
 	BEGIN
 		a := 6; b := 2; ASSERT (ASH (a, b) = 24); ASSERT (ASH (a, b) = ASH (a, 2)); ASSERT (ASH (a, b) = ASH (6, 2));
 		a := 6; b := 0; ASSERT (ASH (a, b) = 6); ASSERT (ASH (a, b) = ASH (a, 0)); ASSERT (ASH (a, b) = ASH (6, 0));
@@ -5407,7 +5407,7 @@ positive: increment statement with long integers
 positive: increment statement with huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT; c: SIGNED32; d: SIGNED16; e: SIGNED8;
+	VAR a, b: SIGNED64; c: SIGNED32; d: SIGNED16; e: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5; e := -6;
 		INC (a); ASSERT (a = 1); DEC (a); ASSERT (a = 0);
 		INC (a, 2); ASSERT (a = 2); INC (a, -2); ASSERT (a = 0);
@@ -5457,7 +5457,7 @@ positive: decrement statement with long integers
 positive: decrement statement with huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT; c: SIGNED32; d: SIGNED16; e: SIGNED8;
+	VAR a, b: SIGNED64; c: SIGNED32; d: SIGNED16; e: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5; e := -6;
 		DEC (a); ASSERT (a = -1); INC (a); ASSERT (a = 0);
 		DEC (a, 2); ASSERT (a = -2); DEC (a, -2); ASSERT (a = 0);
@@ -5548,7 +5548,7 @@ negative: include statement with too large long integer as set element
 positive: include statement with huge integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: HUGEINT;
+	VAR set: SET; element: SIGNED64;
 	BEGIN
 		set := {}; element := MIN (SET); INCL (set, element); ASSERT (set = {element}); ASSERT (set = {MIN (SET)}); ASSERT (element IN set);
 		set := {}; element := MAX (SET); INCL (set, element); ASSERT (set = {element}); ASSERT (set = {MAX (SET)}); ASSERT (element IN set);
@@ -5559,14 +5559,14 @@ positive: include statement with huge integer as set element
 negative: include statement with too small huge integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: HUGEINT;
+	VAR set: SET; element: SIGNED64;
 	BEGIN set := {}; element := MIN (SET) - 1; INCL (set, element);
 	END Test.
 
 negative: include statement with too large huge integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: HUGEINT;
+	VAR set: SET; element: SIGNED64;
 	BEGIN set := {}; element := MAX (SET) + 1; INCL (set, element);
 	END Test.
 
@@ -5651,7 +5651,7 @@ negative: exclude statement with too large long integer as set element
 positive: exclude statement with huge integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: HUGEINT;
+	VAR set: SET; element: SIGNED64;
 	BEGIN
 		set := {}; element := MIN (SET); EXCL (set, element); ASSERT (set = {}); ASSERT (~(element IN set));
 		set := {}; element := MAX (SET); EXCL (set, element); ASSERT (set = {}); ASSERT (~(element IN set));
@@ -5662,14 +5662,14 @@ positive: exclude statement with huge integer as set element
 negative: exclude statement with too small huge integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: HUGEINT;
+	VAR set: SET; element: SIGNED64;
 	BEGIN set := {}; element := MIN (SET) - 1; EXCL (set, element);
 	END Test.
 
 negative: exclude statement with too large huge integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: HUGEINT;
+	VAR set: SET; element: SIGNED64;
 	BEGIN set := {}; element := MAX (SET) + 1; EXCL (set, element);
 	END Test.
 
@@ -7140,7 +7140,7 @@ positive: negate hugeint zero
 
 	MODULE Test;
 	PROCEDURE Test;
-	VAR x: SIGNED16; h,j: HUGEINT;
+	VAR x: SIGNED16; h,j: SIGNED64;
 	BEGIN
 		h := 0;
 		j := -h;
@@ -7360,7 +7360,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 
 	IMPORT SYSTEM;
 
-	VAR r: REAL; x: LONGREAL;  l: SIGNED32; h: HUGEINT;
+	VAR r: REAL; x: LONGREAL;  l: SIGNED32; h: SIGNED64;
 
 	PROCEDURE Real(): SIGNED32;
 	VAR r: REAL; l: SIGNED32;
@@ -7371,12 +7371,12 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 		RETURN l;
 	END Real;
 
-	PROCEDURE Longreal(): HUGEINT;
-	VAR r: LONGREAL; l: HUGEINT;
+	PROCEDURE Longreal(): SIGNED64;
+	VAR r: LONGREAL; l: SIGNED64;
 	BEGIN
 		r := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
-		SYSTEM.MOVE(SYSTEM.ADR(r),SYSTEM.ADR(l),SIZEOF(HUGEINT));
+		SYSTEM.MOVE(SYSTEM.ADR(r),SYSTEM.ADR(l),SIZEOF(SIGNED64));
 		RETURN l;
 	END Longreal;
 
@@ -7390,7 +7390,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 	END Longint;
 
 	PROCEDURE Hugeint(): LONGREAL;
-	VAR r: LONGREAL; l: HUGEINT;
+	VAR r: LONGREAL; l: SIGNED64;
 	BEGIN
 		l := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
@@ -7406,7 +7406,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 		ASSERT(x = 10);
 		l := SYSTEM.VAL(SIGNED32, Longint());
 		ASSERT(l=10);
-		h := SYSTEM.VAL(HUGEINT, Hugeint());
+		h := SYSTEM.VAL(SIGNED64, Hugeint());
 		ASSERT(h=10);
 	END Test.
 
@@ -7804,7 +7804,7 @@ positive: pass three-dimensional arrays A[x,y,z] with missing dimensions, e.g. A
 positive: check push of UNSIGNED constants
 
 	MODULE Test;
-		PROCEDURE Check(value: HUGEINT);
+		PROCEDURE Check(value: SIGNED64);
 		BEGIN
 			ASSERT(value>0);
 		END Check;
@@ -7884,7 +7884,7 @@ positive: return string as static array of char
 
 positive: hugeint comparison with positive 32-bit value out of signed 32-bit integer range
 	MODULE Test;
-	VAR x: HUGEINT;
+	VAR x: SIGNED64;
 	BEGIN
 		x := 0;
 		ASSERT(~(x > 0C0000000H));

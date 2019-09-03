@@ -228,7 +228,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 
 			PROCEDURE ReadOperand(VAR operand: IntermediateCode.Operand);
 			VAR type: IntermediateCode.Type; mode, subMode: SIGNED32; register: SIGNED32; registerClass: IntermediateCode.RegisterClass;
-				offset: SIGNED32; int: HUGEINT; real: LONGREAL; name: ObjectFile.SegmentedName; symbolOffset: SIGNED32;
+				offset: SIGNED32; int: SIGNED64; real: LONGREAL; name: ObjectFile.SegmentedName; symbolOffset: SIGNED32;
 				string: Strings.String; len: SIGNED32;
 				symbolSection: Sections.Section;
 

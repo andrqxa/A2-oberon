@@ -120,7 +120,7 @@ TYPE
 			str*: String;
 			numtyp-: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
 			intval-: SIGNED32;	(* integer value or string length *)
-			longintval-: HUGEINT;
+			longintval-: SIGNED64;
 			realval-: REAL;
 			lrlval-: LONGREAL;
 			numStartPos, numEndPos: SIGNED32;
@@ -187,7 +187,7 @@ TYPE
 		END Identifier;
 
 		PROCEDURE Number;
-		VAR i, m, n, d, e: SIGNED16; dig: ARRAY 24 OF CHAR; f: LONGREAL; expCh: CHAR; neg: BOOLEAN; longintval: HUGEINT;
+		VAR i, m, n, d, e: SIGNED16; dig: ARRAY 24 OF CHAR; f: LONGREAL; expCh: CHAR; neg: BOOLEAN; longintval: SIGNED64;
 
 			PROCEDURE Ten(e: SIGNED16): LONGREAL;
 				VAR x, p: LONGREAL;

@@ -14,7 +14,7 @@ CONST
 	ControlPrescalerMask = {8 .. 15};
 
 VAR
-	frequency: HUGEINT;
+	frequency: SIGNED64;
 
 	(** Start the private watchdog with the given mode and delay *)
 	PROCEDURE Start * (mode: BOOLEAN; delay: SIGNED32);
@@ -45,7 +45,7 @@ VAR
 	(** Feed the watchdog: overwrites its count with the given delay *)
 	PROCEDURE Feed * (delay: SIGNED32);
 	BEGIN
-		Platform.mpcore.Watchdog_Load_Register := SIGNED32(HUGEINT(delay) * frequency);
+		Platform.mpcore.Watchdog_Load_Register := SIGNED32(SIGNED64(delay) * frequency);
 	END Feed;
 
 	(** Check if the watchdog has been triggered *)
@@ -55,7 +55,7 @@ VAR
 	END Triggered;
 
 	(** Initialise watchdog reference frequency (CPU freq / 2) *)
-	PROCEDURE Init * (timerFrequency: HUGEINT);
+	PROCEDURE Init * (timerFrequency: SIGNED64);
 	BEGIN
 		frequency := timerFrequency
 	END Init;

@@ -332,7 +332,7 @@ TYPE
 		VAR name: Modules.Name; res: WORD;
 			msg: ARRAY 128 OF CHAR; module: Modules.Module; adr: ADDRESS; m: HashTableInt;
 			s: ObjectFile.SectionName; isModule: BOOLEAN; identifier: ObjectFile.Identifier;
-			fp: HUGEINT;
+			fp: SIGNED64;
 
 			PROCEDURE CheckName(n: StringPool.Index;  name {UNTRACED}: Modules.DynamicName): WORD;
 			VAR s: ObjectFile.SectionName; i: SIZE;

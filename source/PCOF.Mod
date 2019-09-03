@@ -1294,7 +1294,7 @@ END PCOF.
 	28.05.01	prk	issue error 221/222 when more than MAX(SIGNED16) pointers in global data / record
 	03.05.01	be	Installable code generators
 	26.03.01	prk	New Reference Section format
-	25.03.01	prk	limited HUGEINT implementation (as abstract type)
+	25.03.01	prk	limited SIGNED64 implementation (as abstract type)
 	14.03.01	prk	OutRefs, don't list ARRAYs of user defined types
 	14.03.01	prk	OutRefs, don't list inlined procedures
 *)

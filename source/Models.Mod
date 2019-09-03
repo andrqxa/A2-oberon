@@ -307,7 +307,7 @@ TYPE
 
 	Hugeint* = OBJECT(Model)
 	VAR
-		value : HUGEINT;
+		value : SIGNED64;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -317,7 +317,7 @@ TYPE
 			SetGenerator("Models.GenHugeint");
 		END Init;
 
-		PROCEDURE Set*(value : HUGEINT);
+		PROCEDURE Set*(value : SIGNED64);
 		BEGIN
 			AcquireWrite;
 			IF (SELF.value # value) THEN
@@ -327,8 +327,8 @@ TYPE
 			ReleaseWrite;
 		END Set;
 
-		PROCEDURE Get*() : HUGEINT;
-		VAR value : HUGEINT;
+		PROCEDURE Get*() : SIGNED64;
+		VAR value : SIGNED64;
 		BEGIN
 			AcquireRead;
 			value := SELF.value;
@@ -336,7 +336,7 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE Add*(value : HUGEINT);
+		PROCEDURE Add*(value : SIGNED64);
 		BEGIN
 			IF (value # 0) THEN
 				AcquireWrite;
@@ -347,14 +347,14 @@ TYPE
 		END Add;
 
 		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
-		VAR newValue : HUGEINT;
+		VAR newValue : SIGNED64;
 		BEGIN
 			Types.GetHugeint(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
 		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
-		VAR currentValue : HUGEINT;
+		VAR currentValue : SIGNED64;
 		BEGIN
 			currentValue := Get();
 			Types.SetHugeint(value, currentValue, res);

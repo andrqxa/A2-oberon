@@ -346,7 +346,7 @@ CONST
 	VAR
 		b: BOOLEAN;
 		c: CHAR;
-		s: SIGNED8; i: SIGNED16; l: SIGNED32; h: HUGEINT;
+		s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
 		sz: SIZE; a, pc: ADDRESS;
 		word: WORD; lword: LONGWORD;
 		s8: SIGNED8; s16: SIGNED16; s32: SIGNED32; s64: SIGNED64;
@@ -357,12 +357,12 @@ CONST
 		set: SET;
 		procedure: ARRAY 256 OF CHAR;
 
-		PROCEDURE Signed(i: HUGEINT);
+		PROCEDURE Signed(i: SIGNED64);
 		BEGIN
 			w.Int(i,1);
 		END Signed;
 
-		PROCEDURE Unsigned(i: HUGEINT; size: SIZE);
+		PROCEDURE Unsigned(i: SIGNED64; size: SIZE);
 		BEGIN
 			w.Hex(i,-2*size);
 		END Unsigned;
@@ -388,7 +388,7 @@ CONST
 			size := SIZEOF(SIGNED32);
 			SYSTEM.GET(adr, l); Signed(l);
 		| sfTypeHUGEINT:
-			size := SIZEOF(HUGEINT);
+			size := SIZEOF(SIGNED64);
 			SYSTEM.GET(adr, h); Signed(h);
 		| sfTypeWORD:
 			size := SIZEOF(WORD);
@@ -1105,7 +1105,7 @@ TYPE
 		| sfTypeSHORTINT: w.String("SIGNED8");
 		| sfTypeINTEGER: w.String("SIGNED16");
 		| sfTypeLONGINT: w.String("SIGNED32");
-		| sfTypeHUGEINT: w.String("HUGEINT");
+		| sfTypeHUGEINT: w.String("SIGNED64");
 		| sfTypeWORD: w.String("WORD");
 		| sfTypeLONGWORD: w.String("LONGWORD");
 		| sfTypeSIGNED8: w.String("SIGNED8");

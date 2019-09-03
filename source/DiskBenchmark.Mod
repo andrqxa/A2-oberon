@@ -31,8 +31,8 @@ TYPE
 		blocksizes : SET;				(* Which block sizes should be benchmarked? *)
 
 		(* progress status *)
-		cur : HUGEINT; 				(* how many sectors have been processed *)
-		max : HUGEINT;				(* how many sectors must be processed in total *)
+		cur : SIGNED64; 				(* how many sectors have been processed *)
+		max : SIGNED64;				(* how many sectors must be processed in total *)
 
 		(* AosDiskdevice information *)
 		start : SIGNED32;			 	(* First sector in partition *)
@@ -145,7 +145,7 @@ TYPE
 		VAR
 			string :Lib.String;
 			block, sectors : SIGNED32;
-			nbrOfBytes : HUGEINT;
+			nbrOfBytes : SIGNED64;
 			avgDuration : REAL;
 			milliTimer : Kernel.MilliTimer;
 			time : SIGNED32;
@@ -195,7 +195,7 @@ TYPE
 		VAR
 			string : Lib.String;
 			block, sectors : SIGNED32;
-			nbrOfBytes : HUGEINT;
+			nbrOfBytes : SIGNED64;
 			milliTimer : Kernel.MilliTimer;
 			time : SIGNED32;
 			i : SIGNED32; res : WORD;

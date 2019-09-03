@@ -107,13 +107,13 @@ VAR
 	(*
 		Get a string representation of an integer (in decimal format)
 	*)
-	PROCEDURE IntToStr(x: HUGEINT; VAR str: ARRAY OF CHAR);
+	PROCEDURE IntToStr(x: SIGNED64; VAR str: ARRAY OF CHAR);
 	VAR
 		i, j: SIGNED32;
 		ch: CHAR;
 	BEGIN
 		IF x < 0 THEN
-			IF x = MIN(HUGEINT) THEN
+			IF x = MIN(SIGNED64) THEN
 				str := "-9223372036854775808";
 				RETURN;
 			ELSE

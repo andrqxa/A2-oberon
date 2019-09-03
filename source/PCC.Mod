@@ -40,7 +40,7 @@ TYPE
 
     Reg    Register       regNo  -       -
                           regNo (procAddr)               self   type = procedure
-                          lowVal                         HiVal  type = HUGEINT
+                          lowVal                         HiVal  type = SIGNED64
 
     RegRel Reg Relative   regNo  -       offset
 
@@ -413,7 +413,7 @@ BEGIN
 END MakeStackItem;
 
 PROCEDURE MakeConst*(VAR x: Item;  o: PCT.Const;  type: PCT.Struct);
-VAR	t: PCT.Struct;  adr: PCBT.GlobalVariable; r: REAL;  lr: LONGREAL; h: HUGEINT;
+VAR	t: PCT.Struct;  adr: PCBT.GlobalVariable; r: REAL;  lr: LONGREAL; h: SIGNED64;
 BEGIN
 	x.mode := Const; t := o.type;
 	IF (t = PCT.Int8) OR (t = PCT.Int16) OR (t = PCT.Int32)  THEN
@@ -4347,7 +4347,7 @@ END PCC.
 	25.04.01	prk	array allocation: if length < 0 then trap PCM.ArraySizeTrap
 	20.04.01	prk	CAP fixed, HOTBuiltinCAP1.Mod HOTBuiltinCAP2.Mod passed now
 	11.04.01	prk	Allow SYSTEM.VAL(static array, int const), used in Raster.Mod
-	25.03.01	prk	limited HUGEINT implementation (as abstract type)
+	25.03.01	prk	limited SIGNED64 implementation (as abstract type)
 	25.03.01	prk	NewSysBlock, NewArray: force sizes to be LInt
 	15.03.01	prk	delegates: return
 	14.03.01	prk	improved delegates implementation

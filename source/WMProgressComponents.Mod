@@ -9,7 +9,7 @@ TYPE
 	VAR
 		min-, max- : WMProperties.IntegerProperty;
 
-		current : HUGEINT;
+		current : SIGNED64;
 
 		model- : WMProperties.ReferenceProperty;
 		modelI : Models.Model;
@@ -39,7 +39,7 @@ TYPE
 			SetGenerator("WMProgressComponents.GenProgressBar");
 		END Init;
 
-		PROCEDURE SetRange*(min, max : HUGEINT);
+		PROCEDURE SetRange*(min, max : SIGNED64);
 		BEGIN
 			Acquire;
 			SELF.min.Set(min);
@@ -48,13 +48,13 @@ TYPE
 			Invalidate;
 		END SetRange;
 
-		PROCEDURE SetCurrent*(current : HUGEINT);
+		PROCEDURE SetCurrent*(current : SIGNED64);
 		BEGIN
 			SetInternal(current, TRUE);
 		END SetCurrent;
 
-		PROCEDURE SetInternal(current : HUGEINT; updateModel : BOOLEAN);
-		VAR changed : BOOLEAN; min, max : HUGEINT;
+		PROCEDURE SetInternal(current : SIGNED64; updateModel : BOOLEAN);
+		VAR changed : BOOLEAN; min, max : SIGNED64;
 		BEGIN
 			min := SELF.min.Get(); max := SELF.max.Get();
 			IF (current < min) THEN current := min; ELSIF (current > max) THEN current := max; END;
@@ -70,7 +70,7 @@ TYPE
 		END SetInternal;
 
 		PROCEDURE IncPos*;
-		VAR max : HUGEINT;
+		VAR max : SIGNED64;
 		BEGIN
 			max := SELF.max.Get();
 			Acquire;
@@ -94,7 +94,7 @@ TYPE
 			END;
 		END RecacheProperties;
 
-		PROCEDURE UpdateModel(value : HUGEINT);
+		PROCEDURE UpdateModel(value : SIGNED64);
 		VAR integer : Types.Hugeint; res : WORD; model : Models.Model;
 		BEGIN
 			model := modelI;
@@ -135,7 +135,7 @@ TYPE
 			rect: WMRectangles.Rectangle;
 			width: SIGNED32;
 			string : ARRAY 32 OF CHAR;
-			min, max, cur: HUGEINT; percent : WORD; color: WMGraphics.Color;
+			min, max, cur: SIGNED64; percent : WORD; color: WMGraphics.Color;
 			isVertical : BOOLEAN;
 		BEGIN
 			min := SELF.min.Get();

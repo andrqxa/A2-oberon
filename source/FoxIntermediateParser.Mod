@@ -158,7 +158,7 @@ TYPE
 		PROCEDURE ParseOperand(VAR operand: IntermediateCode.Operand; sectionList: Sections.SectionList);
 		VAR
 			positionOfOperand, pos: Position; registerNumber, symbolOffset, integer: SIGNED32;
-			someHugeint: HUGEINT;
+			someHugeint: SIGNED64;
 			hasTypeDescriptor, isMemoryOperand, lastWasIdentifier, isNegated: BOOLEAN;
 			someLongreal: LONGREAL;
 			identifier: SyntaxTree.IdentifierString;

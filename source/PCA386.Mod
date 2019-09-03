@@ -1490,5 +1490,5 @@ END PCA386.
 	11.07.01	prk	support for fields and methods with same name in scope
 	02.07.01	prk	access flags, new design
 	30.05.01	prk	destination (\d) compiler-option to install the back-end
-	30.05.01	pjm	support for HUGEINT types (by pjm)
+	30.05.01	pjm	support for SIGNED64 types (by pjm)
 *)

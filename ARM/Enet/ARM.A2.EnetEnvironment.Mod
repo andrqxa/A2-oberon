@@ -8,7 +8,7 @@ IMPORT
 	Platform, BootConfig, Machine, Objects, KernelLog;
 
 TYPE
-	Time* = HUGEINT; (* Time type used in EnetTiming *)
+	Time* = SIGNED64; (* Time type used in EnetTiming *)
 
 	(* The prototype of an interrupt handler *)
 	InterruptHandler* = PROCEDURE();

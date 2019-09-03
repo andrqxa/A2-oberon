@@ -178,7 +178,7 @@ TYPE
 			item.object := a; value := TRUE;
 		END VisitMathArrayExpression;
 
-		PROCEDURE NewInt(i: HUGEINT);
+		PROCEDURE NewInt(i: SIGNED64);
 		VAR v: Integer;
 		BEGIN
 			NEW(v, i); item.object := v; value := TRUE
@@ -221,7 +221,7 @@ TYPE
 		END NewChar;
 
 		PROCEDURE VisitUnaryExpression*(x: SyntaxTree.UnaryExpression);
-		VAR value: Value; i: HUGEINT; r: LONGREAL; b: BOOLEAN; operator: SIGNED32;
+		VAR value: Value; i: SIGNED64; r: LONGREAL; b: BOOLEAN; operator: SIGNED32;
 		BEGIN
 			operator := x.operator;
 			IF ~GetValue(x.left, value) THEN
@@ -259,7 +259,7 @@ TYPE
 		END VisitUnaryExpression;
 
 		PROCEDURE VisitBinaryExpression*(x: SyntaxTree.BinaryExpression);
-		VAR left, right: Value; operator: SIGNED32; li, ri: HUGEINT; lr, rr: LONGREAL; lb, rb:  BOOLEAN; sl, sr: SET;
+		VAR left, right: Value; operator: SIGNED32; li, ri: SIGNED64; lr, rr: LONGREAL; lb, rb:  BOOLEAN; sl, sr: SET;
 		BEGIN
 			operator := x.operator;
 			IF ~GetValue(x.left, left) OR ~GetValue(x.right, right) THEN RETURN END;
@@ -347,7 +347,7 @@ TYPE
 		END VisitBinaryExpression;
 
 		PROCEDURE VisitRangeExpression*(x: SyntaxTree.RangeExpression);
-		VAR first,last,step: HUGEINT; value: Integer;
+		VAR first,last,step: SIGNED64; value: Integer;
 		BEGIN
 			IF ~ExpectInteger(x.first, value) THEN RETURN END;
 			first := value.value;
@@ -1117,7 +1117,7 @@ TYPE
 		END VisitRepeatStatement;
 
 		PROCEDURE VisitForStatement*(x: SyntaxTree.ForStatement);
-		VAR fromV, toV, byV: Integer; from, to, by,i: HUGEINT; int: Integer;
+		VAR fromV, toV, byV: Integer; from, to, by,i: SIGNED64; int: Integer;
 		BEGIN
 			IF ExpectInteger(x.from, fromV) & ExpectInteger(x.to, toV) THEN
 				from := fromV.value;

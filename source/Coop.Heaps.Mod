@@ -127,15 +127,15 @@ VAR
 
 	(** Memory allocation statistics *)
 	Nnew- : SIGNED32;			(** Number of times NewBlock has been called since system startup *)
-	NnewBytes- : HUGEINT;		(** Number of bytes allocated by NewBlock since system startup *)
+	NnewBytes- : SIGNED64;		(** Number of bytes allocated by NewBlock since system startup *)
 
 	(** Garbage collection statistics *)
 	Ngc- : SIGNED32; 			(** Number of GC cycles since system startup *)
 
 	(** Statistics considering the last GC cyle *)
 	Nmark-, Nmarked-, NfinalizeAlive-, NfinalizeDead-: SIGNED32;
-	NgcCyclesMark-, NgcCyclesLastRun-, NgcCyclesMax-, NgcCyclesAllRuns- : HUGEINT;
-	NgcSweeps-, NgcSweepTime-, NgcSweepMax-: HUGEINT;
+	NgcCyclesMark-, NgcCyclesLastRun-, NgcCyclesMax-, NgcCyclesAllRuns- : SIGNED64;
+	NgcSweeps-, NgcSweepTime-, NgcSweepMax-: SIGNED64;
 
 	freeBlockFound-, freeBlockNotFound-: SIGNED32;
 

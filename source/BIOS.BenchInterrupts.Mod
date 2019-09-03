@@ -25,7 +25,7 @@ CONST
 VAR
 	mhz : SIGNED32;
 
-	start, stop : HUGEINT;
+	start, stop : SIGNED64;
 	ngc : SIZE;
 	data : POINTER TO ARRAY OF SIGNED32;
 
@@ -72,12 +72,12 @@ BEGIN {EXCLUSIVE}
 	context.out.String("done."); context.out.Ln;
 END Bench;
 
-PROCEDURE CyclesToMs(cycles : HUGEINT; mhz : SIGNED32) : LONGREAL;
+PROCEDURE CyclesToMs(cycles : SIGNED64; mhz : SIGNED32) : LONGREAL;
 BEGIN
 	RETURN LONGREAL(cycles) / (1000*mhz);
 END CyclesToMs;
 
-PROCEDURE ShowMs(cycles : HUGEINT; out : Streams.Writer);
+PROCEDURE ShowMs(cycles : SIGNED64; out : Streams.Writer);
 BEGIN
 	IF (mhz # 0) THEN
 		out.String(" ("); out.FloatFix(CyclesToMs(cycles, mhz), 0, 6, 0); out.String(" ms)");
@@ -87,7 +87,7 @@ END ShowMs;
 (** Show the results of the last benchmark run *)
 PROCEDURE Show*(context : Commands.Context); (** mhz ~ *)
 VAR
-	nofSamples, min, avg, max : SIGNED32; i : SIZE; sum : HUGEINT;
+	nofSamples, min, avg, max : SIGNED32; i : SIZE; sum : SIGNED64;
 	diff, diffSum, standardDeviation : LONGREAL;
 BEGIN {EXCLUSIVE}
 	context.arg.SkipWhitespace; context.arg.Int(mhz, FALSE);

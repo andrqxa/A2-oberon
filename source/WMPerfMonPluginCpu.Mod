@@ -23,8 +23,8 @@ TYPE
 		cpuLoad : ARRAY Machine.MaxCPU OF REAL; (* in % *)
 		nbrOfCpus : SIGNED32;
 
-		lastTimeStamp, timestamp : HUGEINT;
-		lastCycles : ARRAY Machine.MaxCPU OF HUGEINT;
+		lastTimeStamp, timestamp : SIGNED64;
+		lastCycles : ARRAY Machine.MaxCPU OF SIGNED64;
 
 		PROCEDURE Update;
 		VAR cpuNbr : SIGNED32; dCycles, total : LONGREAL;

@@ -137,7 +137,7 @@ VAR
 	parameter: MemToMemParams;
 	output: AcAxisIo.Output;
 	input: AcAxisIo.Input;
-	freq: HUGEINT;
+	freq: SIGNED64;
 	res: SIGNED32;
 
 	PROCEDURE Execute *;
@@ -215,7 +215,7 @@ VAR
 
 	PROCEDURE TestHeapToHeap (param: ANY): BOOLEAN;
 	VAR
-		tstart, tstop: HUGEINT;
+		tstart, tstop: SIGNED64;
 		program: DMA330ProgramWriter.Program;
 		txParams: MemToMemParams;
 		src, dst: POINTER TO ARRAY OF CHAR;
@@ -487,7 +487,7 @@ VAR
 
 	PROCEDURE TestPlFifoSimultaneous (param: ANY): BOOLEAN;
 	VAR
-		tstart, tstop: HUGEINT;
+		tstart, tstop: SIGNED64;
 		programWr, programRd: DMA330ProgramWriter.Program;
 		channelWr, channelRd: ChannelId;
 		txParams: MemToMemParams;
@@ -682,7 +682,7 @@ VAR
 		size = 4 * 32 * 1024;
 		alignment = 8;
 	VAR
-		tstart, tstop: HUGEINT;
+		tstart, tstop: SIGNED64;
 		program: DMA330ProgramWriter.Program;
 		dst: POINTER TO ARRAY OF CHAR;
 		dstOfs: ADDRESS;
@@ -750,7 +750,7 @@ VAR
 
 	PROCEDURE ResetPl;
 	VAR
-		t: HUGEINT;
+		t: SIGNED64;
 		res: SIGNED32;
 	BEGIN
 		(* Reset PL *)

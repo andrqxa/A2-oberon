@@ -154,8 +154,8 @@ TYPE
 		Bytes(r,SYSTEM.VAL( Bytes4, x ), 0, 4, ignore )
 	END RawLInt;
 
-	(** Read a HUGEINT. *)
-	PROCEDURE RawHInt*(VAR r: Reader; VAR x: HUGEINT );
+	(** Read a SIGNED64. *)
+	PROCEDURE RawHInt*(VAR r: Reader; VAR x: SIGNED64 );
 	VAR ignore: SIZE;
 	BEGIN
 		Bytes(r,SYSTEM.VAL( Bytes8, x ), 0, 8, ignore )

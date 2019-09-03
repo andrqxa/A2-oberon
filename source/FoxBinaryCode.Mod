@@ -283,7 +283,7 @@ TYPE
 			INC(pc,len DIV os.unit);
 		END CopyBits;
 
-		PROCEDURE PutBits*(d: HUGEINT; size: Bits);
+		PROCEDURE PutBits*(d: SIGNED64; size: Bits);
 		BEGIN
 			(*ASSERT(size MOD unit = 0);*)
 			CheckSize(size);
@@ -291,7 +291,7 @@ TYPE
 			INC(pc,size DIV os.unit);
 		END PutBits;
 
-		PROCEDURE PutBitsAt*(at: Unit; d: HUGEINT; size: Bits);
+		PROCEDURE PutBitsAt*(at: Unit; d: SIGNED64; size: Bits);
 		VAR oldpc: Unit;
 		BEGIN
 			oldpc := pc;
@@ -345,7 +345,7 @@ TYPE
 			INC(pc,(4*Byte) DIV os.unit);
 		END PutDWord;
 
-		PROCEDURE PutQWord* (q: HUGEINT);
+		PROCEDURE PutQWord* (q: SIGNED64);
 		VAR c: ARRAY 8 OF WORD; i: WORD;
 		BEGIN
 			ASSERT((8*Byte) MOD os.unit = 0);
@@ -403,7 +403,7 @@ TYPE
 			pc := oldpc;
 		END PutDWordAt;
 
-		PROCEDURE PutQWordAt*(at: Unit; d: HUGEINT);
+		PROCEDURE PutQWordAt*(at: Unit; d: SIGNED64);
 		VAR oldpc: Unit;
 		BEGIN
 			oldpc := pc;
@@ -412,7 +412,7 @@ TYPE
 			pc := oldpc;
 		END PutQWordAt;
 
-		PROCEDURE PutBytes* (data: HUGEINT; bytes: WORD);
+		PROCEDURE PutBytes* (data: SIGNED64; bytes: WORD);
 		BEGIN
 			CASE bytes OF
 			1: PutByte (SHORT(data));
@@ -453,8 +453,8 @@ TYPE
 			END
 		END GetDWord;
 
-		PROCEDURE GetQWord*(pc: Unit): HUGEINT;
-		VAR i: WORD; h: HUGEINT;
+		PROCEDURE GetQWord*(pc: Unit): SIGNED64;
+		VAR i: WORD; h: SIGNED64;
 		BEGIN
 			h := 0;
 			IF bigEndian THEN
@@ -637,9 +637,9 @@ TYPE
 		RETURN result;
 	END ConvertReal;
 
-	PROCEDURE ConvertLongreal*(value: LONGREAL): HUGEINT;
+	PROCEDURE ConvertLongreal*(value: LONGREAL): SIGNED64;
 	CONST Exponent = 11; Significant = 52;
-	VAR result: HUGEINT; VAR exponent, i: WORD;
+	VAR result: SIGNED64; VAR exponent, i: WORD;
 	BEGIN
 		(*! NaN code missing, we need an extra - machine specific - functionality for that  / cf. Streams.NaNCode *)
 		IF value = 0 THEN RETURN 0 END;
@@ -683,7 +683,7 @@ TYPE
 		RETURN result
 	END ConvertToReal;
 
-	PROCEDURE ConvertToLongreal*(x: HUGEINT): LONGREAL;
+	PROCEDURE ConvertToLongreal*(x: SIGNED64): LONGREAL;
 	VAR result: LONGREAL; e,i: SIGNED32;
 
 		PROCEDURE Bit(bit: SIGNED32): BOOLEAN;

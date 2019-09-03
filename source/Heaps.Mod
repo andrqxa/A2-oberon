@@ -208,15 +208,15 @@ VAR
 
 	(** Memory allocation statistics *)
 	Nnew- : SIZE;			(** Number of times NewBlock has been called since system startup *)
-	NnewBytes- : HUGEINT;		(** Number of bytes allocated by NewBlock since system startup *)
+	NnewBytes- : SIGNED64;		(** Number of bytes allocated by NewBlock since system startup *)
 
 	(** Garbage collection statistics *)
 	Ngc- : SIZE; 			(** Number of GC cycles since system startup *)
 
 	(** Statistics considering the last GC cyle *)
 	Nmark-, Nmarked-, NfinalizeAlive-, NfinalizeDead-: SIZE;
-	NgcCyclesMark-, NgcCyclesLastRun-, NgcCyclesMax-, NgcCyclesAllRuns- : HUGEINT;
-	NgcSweeps-, NgcSweepTime-, NgcSweepMax-: HUGEINT;
+	NgcCyclesMark-, NgcCyclesLastRun-, NgcCyclesMax-, NgcCyclesAllRuns- : SIGNED64;
+	NgcSweeps-, NgcSweepTime-, NgcSweepMax-: SIGNED64;
 
 	gcStatus*: GCStatus;
 
@@ -402,7 +402,7 @@ VAR
 	lastFreeBlockSize: ADDRESS;
 	block : HeapBlockU ; freeBlock, lastFreeBlock: FreeBlockU;
 	blockMark: SIZE; blockSize: SIZE;
-	time1, time2: HUGEINT;
+	time1, time2: SIGNED64;
 CONST FreeBlockHeaderSize = SIZEOF(FreeBlockDesc) + BlockHeaderSize;
 CONST StrongChecks = FALSE;
 BEGIN{UNCHECKED}
@@ -763,7 +763,7 @@ END CleanupModuleFinalizers;
 (* interruptible garbage collector for native A2 *)
 PROCEDURE CollectGarbage*(root : RootObject);
 VAR
-	time1, time2: HUGEINT;
+	time1, time2: SIGNED64;
 BEGIN
 	(* do never use any low level locks as the garbage collector process has a very high priority and may thus be blocked by lower level processes -> potential deadlock *)
 	(*! Do not use windows functionality such as  trace here in general -- can lead to deadlock when stopped processes are in writing to a file *)

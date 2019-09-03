@@ -156,7 +156,7 @@ TYPE
 		symbol- : ObjectFile.Identifier; (* for imm and mem *)
 		symbolOffset-: SIZE; (* offset in immediate code (source) for a fixup *)
 
-		val-: HUGEINT; (* for imm and moffset  *)
+		val-: SIGNED64; (* for imm and moffset  *)
 		pc-: SIZE;
 
 		selector-, offset-: SIGNED32; (* for pntr1616 / pntr1632 *)
@@ -1179,7 +1179,7 @@ TYPE
 		VAR
 			symbol, reg: SIGNED32;
 			ident, idents: Name;
-			val, times: HUGEINT;
+			val, times: SIGNED64;
 
 			currentLabel: NamedLabel;
 			labels: NamedLabelList;
@@ -1187,8 +1187,8 @@ TYPE
 			prevPC: SIZE;
 			pass: SIGNED32;
 			absoluteMode: BOOLEAN;
-			absoluteOffset: HUGEINT;
-			orgOffset: HUGEINT;
+			absoluteOffset: SIGNED64;
+			orgOffset: SIGNED64;
 			char: CHAR;
 			orgReaderPos: Streams.Position;
 			orgCodePos: SIZE;
@@ -1215,7 +1215,7 @@ TYPE
 				END;
 			END SkipBlanks;
 
-			PROCEDURE GetNumber (VAR intval: HUGEINT);
+			PROCEDURE GetNumber (VAR intval: SIGNED64);
 			VAR i, m, n: SIGNED16; dig: ARRAY 24 OF CHAR;
 			BEGIN
 				i := 0; m := 0; n := 0;
@@ -1385,7 +1385,7 @@ TYPE
 
 			END GetCPU;
 
-			PROCEDURE Factor (VAR x: HUGEINT; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
+			PROCEDURE Factor (VAR x: SIGNED64; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
 			VAR label: NamedLabel; l: SIZE;
 			BEGIN
 				IF symbol = symNumber THEN
@@ -1409,7 +1409,7 @@ TYPE
 						type := ioffset;
 						currentLabel := label;
 						(*
-						IF x = MAX(HUGEINT) THEN
+						IF x = MAX(SIGNED64) THEN
 							x := -label.index;
 							currentFixup := in;
 						END;
@@ -1443,8 +1443,8 @@ TYPE
 				RETURN FALSE
 			END Factor;
 
-			PROCEDURE Term (VAR x: HUGEINT; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
-			VAR y: HUGEINT; op : WORD;
+			PROCEDURE Term (VAR x: SIGNED64; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
+			VAR y: SIGNED64; op : WORD;
 			BEGIN
 				IF Factor (x, critical,type) THEN
 					WHILE (symbol = symTimes) OR (symbol = symDiv) OR (symbol = symMod) DO
@@ -1464,8 +1464,8 @@ TYPE
 				END;
 			END Term;
 
-			PROCEDURE Expression (VAR x: HUGEINT; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
-			VAR y: HUGEINT; op : WORD;
+			PROCEDURE Expression (VAR x: SIGNED64; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
+			VAR y: SIGNED64; op : WORD;
 			BEGIN
 				IF symbol = symMinus THEN
 					op := symbol; NextSymbol;
@@ -1512,7 +1512,7 @@ TYPE
 			END Align;
 
 			PROCEDURE PutData (size: Size): BOOLEAN;
-			VAR i: SIZE; x: HUGEINT; type: OperandType; ofs: Operand;
+			VAR i: SIZE; x: SIGNED64; type: OperandType; ofs: Operand;
 			BEGIN
 				NextSymbol;
 
@@ -1601,7 +1601,7 @@ TYPE
 			END Duplicate;
 
 			PROCEDURE Reserve (size: Size) : BOOLEAN;
-			VAR type : OperandType; x: HUGEINT;
+			VAR type : OperandType; x: SIGNED64;
 			BEGIN
 				IF Expression (x, TRUE, type) THEN
 					absoluteOffset := absoluteOffset + x * size;
@@ -1638,7 +1638,7 @@ TYPE
 				RETURN sym
 			END GetScopeSymbol;
 
-			PROCEDURE GetValue(CONST ident: ARRAY OF CHAR; VAR x: HUGEINT): BOOLEAN;
+			PROCEDURE GetValue(CONST ident: ARRAY OF CHAR; VAR x: SIGNED64): BOOLEAN;
 			VAR scopeSymbol:SyntaxTree.Symbol;
 			BEGIN
 				scopeSymbol := GetScopeSymbol (ident);
@@ -1708,7 +1708,7 @@ TYPE
 			PROCEDURE AdaptOperandSizes(VAR operands: ARRAY OF Operand);
 			VAR i: SIGNED32;
 
-				PROCEDURE OffsetSize(val: HUGEINT): SIGNED8;
+				PROCEDURE OffsetSize(val: SIGNED64): SIGNED8;
 				BEGIN
 					DEC(val,emitter.code.pc);
 					IF (val > MIN(SIGNED8)+2) & (val < MAX(SIGNED8)) THEN
@@ -1750,7 +1750,7 @@ TYPE
 				mem: Operand;
 				offset: Operand;
 				i: SIGNED32;
-				x: HUGEINT;
+				x: SIGNED64;
 				type: OperandType;
 			BEGIN
 				position := errPos;
@@ -2516,11 +2516,11 @@ TYPE
 		END;
 	END Matches;
 
-	PROCEDURE ValueInByteRange (value: HUGEINT): BOOLEAN;
+	PROCEDURE ValueInByteRange (value: SIGNED64): BOOLEAN;
 	BEGIN RETURN SYSTEM.VAL (SIGNED8, value) = value
 	END ValueInByteRange;
 
-	PROCEDURE ValueInWordRange (value: HUGEINT): BOOLEAN;
+	PROCEDURE ValueInWordRange (value: SIGNED64): BOOLEAN;
 	BEGIN RETURN SYSTEM.VAL (SIGNED16, value) = value
 	END ValueInWordRange;
 
@@ -2634,82 +2634,82 @@ TYPE
 		operand.symbolOffset := symbolOffset; operand.displacement := displacement(SIGNED32);
 	END SetSymbol;
 
-	PROCEDURE InitImm* (VAR operand: Operand; size: SIGNED8; val: HUGEINT);
+	PROCEDURE InitImm* (VAR operand: Operand; size: SIGNED8; val: SIGNED64);
 	BEGIN InitOperand(operand); operand.type := imm; operand.sizeInBytes := size; operand.val := val;
 	END InitImm;
 
-	PROCEDURE InitImm8* (VAR operand: Operand; val: HUGEINT);
+	PROCEDURE InitImm8* (VAR operand: Operand; val: SIGNED64);
 	BEGIN InitImm (operand, bits8, val);
 	END InitImm8;
 
-	PROCEDURE NewImm8*(val: HUGEINT): Operand;
+	PROCEDURE NewImm8*(val: SIGNED64): Operand;
 	VAR operand: Operand;
 	BEGIN InitImm8(operand,val); RETURN operand
 	END NewImm8;
 
-	PROCEDURE InitImm16* (VAR operand: Operand; val: HUGEINT);
+	PROCEDURE InitImm16* (VAR operand: Operand; val: SIGNED64);
 	BEGIN  InitImm (operand, bits16, val);
 	END InitImm16;
 
-	PROCEDURE NewImm16*(val: HUGEINT): Operand;
+	PROCEDURE NewImm16*(val: SIGNED64): Operand;
 	VAR operand:Operand;
 	BEGIN InitImm16(operand,val); RETURN operand
 	END NewImm16;
 
-	PROCEDURE InitImm32* (VAR operand: Operand; val: HUGEINT);
+	PROCEDURE InitImm32* (VAR operand: Operand; val: SIGNED64);
 	BEGIN  InitImm (operand, bits32, val);
 	END InitImm32;
 
-	PROCEDURE NewImm32*(val: HUGEINT): Operand;
+	PROCEDURE NewImm32*(val: SIGNED64): Operand;
 	VAR operand: Operand;
 	BEGIN InitImm32(operand,val); RETURN operand
 	END NewImm32;
 
-	PROCEDURE InitImm64* (VAR operand: Operand; val: HUGEINT);
+	PROCEDURE InitImm64* (VAR operand: Operand; val: SIGNED64);
 	BEGIN  InitImm (operand, bits64, val);
 	END InitImm64;
 
-	PROCEDURE NewImm64*(val: HUGEINT): Operand;
+	PROCEDURE NewImm64*(val: SIGNED64): Operand;
 	VAR operand: Operand;
 	BEGIN InitImm64(operand,val); RETURN operand
 	END NewImm64;
 
-	PROCEDURE InitOffset* (VAR operand: Operand; size: SIGNED8; val: HUGEINT);
+	PROCEDURE InitOffset* (VAR operand: Operand; size: SIGNED8; val: SIGNED64);
 	BEGIN InitOperand(operand); operand.type := ioffset; operand.sizeInBytes := size; operand.val := val;
 	END InitOffset;
 
-	PROCEDURE InitOffset8* (VAR operand: Operand; val: HUGEINT);
+	PROCEDURE InitOffset8* (VAR operand: Operand; val: SIGNED64);
 	BEGIN  InitOffset (operand, bits8, val);
 	END InitOffset8;
 
-	PROCEDURE NewOffset8*(val: HUGEINT): Operand;
+	PROCEDURE NewOffset8*(val: SIGNED64): Operand;
 	VAR operand: Operand;
 	BEGIN InitOffset8(operand,val); RETURN operand
 	END NewOffset8;
 
-	PROCEDURE InitOffset16* (VAR operand: Operand; val: HUGEINT);
+	PROCEDURE InitOffset16* (VAR operand: Operand; val: SIGNED64);
 	BEGIN  InitOffset (operand, bits16, val);
 	END InitOffset16;
 
-	PROCEDURE NewOffset16*(val: HUGEINT): Operand;
+	PROCEDURE NewOffset16*(val: SIGNED64): Operand;
 	VAR operand: Operand;
 	BEGIN InitOffset16(operand,val); RETURN operand
 	END NewOffset16;
 
-	PROCEDURE InitOffset32* (VAR operand: Operand; val: HUGEINT);
+	PROCEDURE InitOffset32* (VAR operand: Operand; val: SIGNED64);
 	BEGIN  InitOffset (operand, bits32, val);
 	END InitOffset32;
 
-	PROCEDURE NewOffset32*(val: HUGEINT): Operand;
+	PROCEDURE NewOffset32*(val: SIGNED64): Operand;
 	VAR operand: Operand;
 	BEGIN InitOffset32(operand,val); RETURN operand
 	END NewOffset32;
 
-	PROCEDURE InitOffset64* (VAR operand: Operand; val: HUGEINT);
+	PROCEDURE InitOffset64* (VAR operand: Operand; val: SIGNED64);
 	BEGIN  InitOffset (operand, bits64, val);
 	END InitOffset64;
 
-	PROCEDURE NewOffset64*(val: HUGEINT): Operand;
+	PROCEDURE NewOffset64*(val: SIGNED64): Operand;
 	VAR operand: Operand;
 	BEGIN InitOffset64(operand,val); RETURN operand
 	END NewOffset64;

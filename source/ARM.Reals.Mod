@@ -201,7 +201,7 @@ END Round;
 PROCEDURE RoundL*(x: LONGREAL): SIGNED32;	(** non-portable *)
 END RoundL;
 
-PROCEDURE RealX (hh, hl: HUGEINT; adr: ADDRESS);
+PROCEDURE RealX (hh, hl: SIGNED64; adr: ADDRESS);
 VAR h,l: SIGNED32;
 BEGIN
 	h := SHORT(hh); l := SHORT(hl);

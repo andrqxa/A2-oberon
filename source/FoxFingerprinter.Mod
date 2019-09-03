@@ -1312,19 +1312,19 @@ TYPE
 	END IsOberonProcedure;
 
 	(* fp = fp <*> val *)
-	PROCEDURE FPNumber*(VAR fp: Basic.Fingerprint; val: HUGEINT);
+	PROCEDURE FPNumber*(VAR fp: Basic.Fingerprint; val: SIGNED64);
 	BEGIN
 		fp:=SYSTEM.VAL(Basic.Fingerprint, SYSTEM.VAL(SET64, ROT(fp, 7)) / SYSTEM.VAL(SET64, val))
 	END FPNumber;
 
 	(* fp = fp <*> set *)
 	PROCEDURE FPSet*(VAR fp: Basic.Fingerprint; set: SET64);
-	BEGIN FPNumber(fp, SYSTEM.VAL(HUGEINT, set))
+	BEGIN FPNumber(fp, SYSTEM.VAL(SIGNED64, set))
 	END FPSet;
 
 	(* fp = fp <*> real *)
 	PROCEDURE FPReal*(VAR fp: Basic.Fingerprint; real: LONGREAL);
-	BEGIN FPNumber(fp, SYSTEM.VAL(HUGEINT, real))
+	BEGIN FPNumber(fp, SYSTEM.VAL(SIGNED64, real))
 	END FPReal;
 
 	(* fp = fp -> String *)

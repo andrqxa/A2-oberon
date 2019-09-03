@@ -19,7 +19,7 @@ MODULE PartitionsLib; (** AUTHOR "staubesv"; PURPOSE "Partitioning and formattin
  *	12.12.2005	Operation object uses exception handling to release ressources -> more stable, adapted operations (staubesv)
  *	12.12.2005	Implemented Reader/Writer locks (staubesv)
  *	15.12.2005	DiskModel.Update now also calls DiskModel.OnChanged (staubesv)
- *	16.12.2005	Operation.state.min/cur/max type change to HUGEINT to prevent overflows (staubesv)
+ *	16.12.2005	Operation.state.min/cur/max type change to SIGNED64 to prevent overflows (staubesv)
  *	19.12.2005	Fixed DeletePartition/CreatePartition (staubesv)
  *	06.01.2006	Fixed nn fsRes handling (staubesv)
  *	17.01.2006	Made output more appropriate for Partitions front-end, fixed Configuration.ParseConfig (staubesv)
@@ -908,7 +908,7 @@ TYPE
 
 		(** progress *)
 		progressValid- : BOOLEAN; (* IF progressValid= TRUE the variables min, cur & max contain meaningful values *)
-		min-, cur-, max- : HUGEINT;
+		min-, cur-, max- : SIGNED64;
 	END;
 
 TYPE
@@ -985,13 +985,13 @@ TYPE
 			RETURN state;
 		END GetState;
 
-		PROCEDURE SetStatus*(status : SET; CONST statusString : String; min, cur, max : HUGEINT; valid : BOOLEAN);
+		PROCEDURE SetStatus*(status : SET; CONST statusString : String; min, cur, max : SIGNED64; valid : BOOLEAN);
 		BEGIN {EXCLUSIVE}
 			state.status := status; state.statusString := statusString;
 			state.min := min; state.cur := cur; state.max := max; state.progressValid := valid;
 		END SetStatus;
 
-		PROCEDURE SetCurrentProgress*(cur :HUGEINT);
+		PROCEDURE SetCurrentProgress*(cur :SIGNED64);
 		BEGIN {EXCLUSIVE}
 			state.cur := cur;
 		END SetCurrentProgress;

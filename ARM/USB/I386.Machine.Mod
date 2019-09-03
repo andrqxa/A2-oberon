@@ -281,7 +281,7 @@ TYPE
 	Message* = POINTER TO RECORD END;	(** Broadcast message. *)
 	BroadcastHandler = PROCEDURE (id: SIGNED32; CONST state: State; msg: Message);
 
-	TimeArray = ARRAY MaxCPU OF HUGEINT;
+	TimeArray = ARRAY MaxCPU OF SIGNED64;
 
 	Address32* = SIGNED32;
 
@@ -307,7 +307,7 @@ VAR
 
 	features-, features2-: SET;	(** processor features *)
 	fcr*: SET;	(** default floating-point control register value (default rounding mode is towards -infinity, for ENTIER) *)
-	mhz*: HUGEINT;	(** clock rate of GetTimer in MHz, or 0 if not known *)
+	mhz*: SIGNED64;	(** clock rate of GetTimer in MHz, or 0 if not known *)
 
 	chs: ARRAY MaxDisks OF RECORD cyls, hds, spt: SIGNED32 END;
 	initRegs: ARRAY 2 OF SIGNED32;	(* kernel parameters *)
@@ -464,7 +464,7 @@ END Fill32;
 (** Return timer value of the current processor, or 0 if not available. *)
 
 (* e.g. ARM does not have a fine-grained timer *)
-PROCEDURE -GetTimer* (): HUGEINT;
+PROCEDURE -GetTimer* (): SIGNED64;
 CODE {SYSTEM.Pentium}
 	RDTSC	; set EDX:EAX
 END GetTimer;
@@ -1179,7 +1179,7 @@ END AcquireSpinTimeout;
 
 (** Acquire a spin-lock and disable interrupts. *)
 PROCEDURE  Acquire* (level: SIGNED32);
-VAR id, i: SIGNED32; flags: SET; start: HUGEINT;
+VAR id, i: SIGNED32; flags: SET; start: SIGNED64;
 BEGIN
 	id := AcquirePreemption ();
 	flags := GetFlags ();	(* store state of interrupt flag *)
@@ -3115,7 +3115,7 @@ END HandleGetTimestamp;
 
 (** Get timestamp on all processors (for testing). *)
 PROCEDURE GlobalGetTimestamp;
-VAR t: TimeArray; i: SIGNED32; mean, var, n: HUGEINT;
+VAR t: TimeArray; i: SIGNED32; mean, var, n: SIGNED64;
 BEGIN
 	Acquire(Processors);
 	LocalBroadcast(HandleGetTimestamp, NIL, {Self, FrontBarrier});

@@ -37,7 +37,7 @@ TYPE
 		colWidth : WMGrids.Spacings;
 		grid : WMStringGrids.StringGrid;
 
-		lastProcTime : HUGEINT;
+		lastProcTime : SIGNED64;
 
 		sw : Streams.StringWriter; (* Only use in procedure Update *)
 
@@ -211,7 +211,7 @@ TYPE
 			i, posP, beg : SIGNED32;
 			mod : Modules.Module;
 			str : ARRAY 256 OF CHAR;
-			t0, t1 : HUGEINT;
+			t0, t1 : SIGNED64;
 
 			pc, relpc : ADDRESS;
 			mode: SIGNED32;

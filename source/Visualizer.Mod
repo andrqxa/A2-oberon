@@ -1363,7 +1363,7 @@ END GetTypeName;
 PROCEDURE IsBasicType(CONST string : ARRAY OF CHAR) : BOOLEAN;
 BEGIN
 	RETURN (string = "CHAR") OR (string = "ANY") OR (string = "BOOLEAN") OR (string = "SET")
-		OR (string = "SIGNED8") OR (string = "SIGNED16") OR (string = "SIGNED32") OR (string = "HUGEINT")
+		OR (string = "SIGNED8") OR (string = "SIGNED16") OR (string = "SIGNED32") OR (string = "SIGNED64")
 		OR (string = "REAL") OR (string = "LONGREAL")
 		OR (string = "ADDRESS") OR (string = "SIZE") OR (string = "SYSTEM.BYTE");
 END IsBasicType;

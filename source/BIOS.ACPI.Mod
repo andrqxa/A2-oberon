@@ -38,7 +38,7 @@ TYPE HPET* = RECORD (Header)
 END;
 
 TYPE RDSP* = RECORD
-	signature-: HUGEINT;
+	signature-: SIGNED64;
 	checksum-: SIGNED8;
 	oemID-: ARRAY 6 OF CHAR;
 	revision-: SIGNED8;

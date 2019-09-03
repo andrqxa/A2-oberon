@@ -22,7 +22,7 @@ CONST
 	CR = 0DX;  LF = 0AX;  TAB = 9X;  SP = 20X;
 
 TYPE
-	Position* = HUGEINT; (* position in the stream *)
+	Position* = SIGNED64; (* position in the stream *)
 
 	(** Any stream output procedure or method. *)
 	Sender* = PROCEDURE {DELEGATE} ( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
@@ -146,14 +146,14 @@ TYPE
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4 )
 		END RawLInt;
 
-	(** Write a HUGEINT. *)
-		PROCEDURE RawHInt*( x: HUGEINT );
+	(** Write a SIGNED64. *)
+		PROCEDURE RawHInt*( x: SIGNED64 );
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes8, x ), 0, 8 )
 		END RawHInt;
 
 	(** Write a 64 bit value in network byte order (most significant byte first) *)
-		PROCEDURE Net64*( x: HUGEINT );
+		PROCEDURE Net64*( x: SIGNED64 );
 		BEGIN
 			Net32(SIGNED32( x DIV 100000000H MOD 100000000H ));
 			Net32(SIGNED32( x MOD 100000000H ));
@@ -222,7 +222,7 @@ TYPE
 		END RawString;
 
 	(** Write a number in a compressed format. *)
-		PROCEDURE RawNum*( x: HUGEINT );
+		PROCEDURE RawNum*( x: SIGNED64 );
 		BEGIN
 			WHILE (x < -64) OR (x > 63) DO Char( CHR( x MOD 128 + 128 ) );  x := x DIV 128 END;
 			Char( CHR( x MOD 128 ) )
@@ -245,12 +245,12 @@ TYPE
 		END String;
 
 	(** Write an integer in decimal right-justified in a field of at least w characters. *)
-		PROCEDURE Int*( x: HUGEINT; w: SIZE );
-		VAR i: SIZE; x0: HUGEINT;
+		PROCEDURE Int*( x: SIGNED64; w: SIZE );
+		VAR i: SIZE; x0: SIGNED64;
 			a: ARRAY 21 OF CHAR;
 		BEGIN
 			IF x < 0 THEN
-				IF x = MIN( HUGEINT ) THEN
+				IF x = MIN( SIGNED64 ) THEN
 					DEC( w, 20 );
 					WHILE w > 0 DO Char( " " );  DEC( w ) END;
 					String( "-9223372036854775808" );  RETURN
@@ -289,8 +289,8 @@ TYPE
 			Write an integer in hexadecimal right-justified in a field of at least ABS(w) characters.
 			If w < 0 THEN w least significant hex digits of x are written (potentially including leading zeros)
 		*)
-		PROCEDURE Hex*(x: HUGEINT; w: SIZE);
-		VAR filler: CHAR; i,maxw: SIZE; a: ARRAY 20 OF CHAR; y: HUGEINT;
+		PROCEDURE Hex*(x: SIGNED64; w: SIZE);
+		VAR filler: CHAR; i,maxw: SIZE; a: ARRAY 20 OF CHAR; y: SIGNED64;
 		BEGIN
 			IF w < 0 THEN filler := '0'; w := -w; maxw := w ELSE filler := ' '; maxw := 16 END;
 			i := 0;
@@ -585,15 +585,15 @@ TYPE
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4, ignore )
 		END RawLInt;
 
-	(** Read a HUGEINT. *)
-		PROCEDURE RawHInt*( VAR x: HUGEINT );
+	(** Read a SIGNED64. *)
+		PROCEDURE RawHInt*( VAR x: SIGNED64 );
 		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes8, x ), 0, 8, ignore )
 		END RawHInt;
 
 		(** Read a 64 bit value in network byte order (most significant byte first) *)
-		PROCEDURE Net64*( ): HUGEINT;
+		PROCEDURE Net64*( ): SIGNED64;
 		BEGIN
 			RETURN Net32() * 100000000H + Net32()
 		END Net64;
@@ -678,12 +678,12 @@ TYPE
 		END RawNum;
 
 	(** Read a huge number in a compressed format. *)
-		PROCEDURE RawHNum*( VAR x: HUGEINT );
-		VAR ch: CHAR;  n, y: HUGEINT;
+		PROCEDURE RawHNum*( VAR x: SIGNED64 );
+		VAR ch: CHAR;  n, y: SIGNED64;
 		BEGIN
 			n := 0;  y := 0;  ch := Get();
-			WHILE ch >= 80X DO INC( y, LSH( HUGEINT( ORD( ch ) ) - 128, n ) );  INC( n, 7 );  ch := Get() END;
-			x := ASH( LSH( HUGEINT( ORD( ch ) ), 57 ), n - 57 ) + y
+			WHILE ch >= 80X DO INC( y, LSH( SIGNED64( ORD( ch ) ) - 128, n ) );  INC( n, 7 );  ch := Get() END;
+			x := ASH( LSH( SIGNED64( ORD( ch ) ), 57 ), n - 57 ) + y
 		END RawHNum;
 
 	(** Read a size in a compressed format. *)
@@ -723,8 +723,8 @@ TYPE
 
 	 (** Read a huge integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
 
-		PROCEDURE HInt*( VAR x: HUGEINT;  hex: BOOLEAN );
-		VAR vd, vh: HUGEINT; sgn, d: WORD;  ch: CHAR;  ok: BOOLEAN;
+		PROCEDURE HInt*( VAR x: SIGNED64;  hex: BOOLEAN );
+		VAR vd, vh: SIGNED64; sgn, d: WORD;  ch: CHAR;  ok: BOOLEAN;
 		BEGIN
 			vd := 0;  vh := 0;  sgn := 1;  ok := FALSE;
 			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;

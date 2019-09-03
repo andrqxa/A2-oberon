@@ -160,7 +160,7 @@ TYPE
 		testCount : SIGNED32;
 		testedOffsets : POINTER TO ARRAY OF BOOLEAN;
 		testedSectors : POINTER TO ARRAY OF BOOLEAN;
-		blocksRead : HUGEINT;
+		blocksRead : SIGNED64;
 
 		buffer : POINTER TO ARRAY OF CHAR;
 		random : Random.Generator;
@@ -194,7 +194,7 @@ TYPE
 		PROCEDURE WriteSummary;
 		VAR i, val : SIZE;
 
-			PROCEDURE WriteB(b: HUGEINT; w : Streams.Writer);
+			PROCEDURE WriteB(b: SIGNED64; w : Streams.Writer);
 			VAR suffix: ARRAY 3 OF CHAR;
 			BEGIN
 				IF b > 1024*1024*1024 THEN suffix := "GB"; b := b DIV (1024*1024*1024);

@@ -444,8 +444,8 @@ TYPE
 			RETURN set;
 		END IntToSet;
 
-		PROCEDURE SetToInt(set:SET):HUGEINT;
-		VAR i:SIGNED32; int:HUGEINT; s: String;
+		PROCEDURE SetToInt(set:SET):SIGNED64;
+		VAR i:SIGNED32; int:SIGNED64; s: String;
 		BEGIN
 			NEW(s, 18);
 			FOR i:=31 TO 0 BY -1 DO
@@ -769,8 +769,8 @@ TYPE
 	(** Accessor property to an integer value. The range of possible values can be restricted. *)
 	IntegerProperty* = OBJECT(Property)
 	VAR
-		value : HUGEINT;
-		min, max : HUGEINT;
+		value : SIGNED64;
+		min, max : SIGNED64;
 		bounded : BOOLEAN;
 
 		PROCEDURE UpdateProperty;
@@ -794,7 +794,7 @@ TYPE
 
 		(** Confines the possible input values between min and max. Implicitly activates the bounds check. If the current value
 			lies outside the bounds, it is truncated to the nearest and a change notification is sent after the end of the transaction. *)
-		PROCEDURE SetBounds*(min, max : HUGEINT);
+		PROCEDURE SetBounds*(min, max : SIGNED64);
 		BEGIN
 			AcquireWrite;
 			SELF.min := min; SELF.max := max; bounded := TRUE;
@@ -803,7 +803,7 @@ TYPE
 			ReleaseWrite
 		END SetBounds;
 
-		PROCEDURE GetBounds*(VAR min, max : HUGEINT);
+		PROCEDURE GetBounds*(VAR min, max : SIGNED64);
 		BEGIN
 			AcquireRead;
 			min := SELF.min; max := SELF.max;
@@ -830,7 +830,7 @@ TYPE
 			ReleaseRead;
 		END GetIsBounded;
 
-		PROCEDURE Validate(v : HUGEINT) : HUGEINT;
+		PROCEDURE Validate(v : SIGNED64) : SIGNED64;
 		BEGIN
 			IF bounded THEN RETURN MAX(min, MIN(max, v))
 			ELSE RETURN v
@@ -838,7 +838,7 @@ TYPE
 		END Validate;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR v : HUGEINT;
+		VAR v : SIGNED64;
 		BEGIN
 			AcquireWrite;
 			r.HInt(v, TRUE);
@@ -853,8 +853,8 @@ TYPE
 			ReleaseRead
 		END ToStream;
 
-		PROCEDURE Get*() : HUGEINT;
-		VAR r : HUGEINT;
+		PROCEDURE Get*() : SIGNED64;
+		VAR r : SIGNED64;
 		BEGIN
 			AcquireRead;
 			IF nonDefault OR (prototype = NIL) THEN r := value
@@ -865,8 +865,8 @@ TYPE
 		END Get;
 
 
-		PROCEDURE Set*(value : HUGEINT);
-		VAR v: HUGEINT;
+		PROCEDURE Set*(value : SIGNED64);
+		VAR v: SIGNED64;
 		BEGIN
 			v := Validate(value);
 			AcquireWrite;
@@ -881,8 +881,8 @@ TYPE
 			ReleaseWrite
 		END Set;
 
-		PROCEDURE SetPassive*(value : HUGEINT);
-		VAR v: HUGEINT;
+		PROCEDURE SetPassive*(value : SIGNED64);
+		VAR v: SIGNED64;
 		BEGIN
 			v := Validate(value);
 			AcquireWrite;
@@ -903,8 +903,8 @@ TYPE
 			AcquireWrite; NotDefault;
 			mins := xml.GetAttributeValue("min");
 			maxs := xml.GetAttributeValue("max");
-			IF mins # NIL THEN Strings.StrToHInt(mins^, min) ELSE min := MIN(HUGEINT) END;
-			IF maxs # NIL THEN Strings.StrToHInt(maxs^, max) ELSE max := MAX(HUGEINT) END;
+			IF mins # NIL THEN Strings.StrToHInt(mins^, min) ELSE min := MIN(SIGNED64) END;
+			IF maxs # NIL THEN Strings.StrToHInt(maxs^, max) ELSE max := MAX(SIGNED64) END;
 			bounded := (mins # NIL) OR (maxs # NIL);
 			en := xml.GetContents();
 			IF en.HasMoreElements() THEN
@@ -1018,7 +1018,7 @@ TYPE
 		END Validate;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR v : HUGEINT;
+		VAR v : SIGNED64;
 		BEGIN
 			AcquireWrite;
 			r.HInt(v, TRUE);
@@ -1592,7 +1592,7 @@ TYPE
 			RETURN r
 		END Get;
 
-		PROCEDURE Set*(value : HUGEINT);
+		PROCEDURE Set*(value : SIGNED64);
 		BEGIN
 			AcquireWrite;
 			IF SHORT(value) # SELF.value THEN
@@ -1604,7 +1604,7 @@ TYPE
 			ReleaseWrite
 		END Set;
 
-		PROCEDURE SetPassive*(value : HUGEINT);
+		PROCEDURE SetPassive*(value : SIGNED64);
 		BEGIN
 			AcquireWrite;
 			IF SHORT(value) # SELF.value THEN
@@ -2810,7 +2810,7 @@ BEGIN
 	RETURN value
 END ReadCharDataInt;
 
-PROCEDURE NewIntChars(i: HUGEINT): XML.Chars;
+PROCEDURE NewIntChars(i: SIGNED64): XML.Chars;
 VAR chars: XML.ArrayChars; s: ARRAY 32 OF CHAR;
 BEGIN
 	NEW(chars);

@@ -542,7 +542,7 @@ BEGIN
 			rT := regs.AllocReg(RA.NewIntConst(1), valid, 1);
 			IF ~valid THEN PCO.MOV(AL, PCO.A1Imm, rT, PCO.A1Immediate1, {}) END;
 
-			IF (type = PCLIR.Int64) THEN (* HUGEINT *)
+			IF (type = PCLIR.Int64) THEN (* SIGNED64 *)
 				rBx := regs.AllocReg(NIL, valid, 1);
 				dummy := PCO.MakeA1Immediate(32, imm); ASSERT(dummy);
 				(*
@@ -565,7 +565,7 @@ BEGIN
 				PCO.TST(PCO.GE, PCO.A1Reg, rA.High, PCO.MakeA1RegSHIFTReg(rT, rBx, PCO.Lsl));
 				(* end *)
 				regs.FreeReg(rBx)
-			ELSE	(* # HUGEINT *)
+			ELSE	(* # SIGNED64 *)
 				(*
 					cc <- rA.Low & (1 << rB.Low)
 				*)
@@ -573,7 +573,7 @@ BEGIN
 			END;
 			regs.FreeReg(rT)
 		ELSE
-			IF (type = PCLIR.Int64) THEN (* HUGEINT *)
+			IF (type = PCLIR.Int64) THEN (* SIGNED64 *)
 				(*
 					cc <- rA.High = rB.High
 					if equal:
@@ -1672,7 +1672,7 @@ BEGIN
 	(* if this is a floating point DIV/MOD, we are in the wrong place...*)
 	IF (instr.dstSize IN PCLIR.FloatSize) THEN
 		FloatingPointDPI(code, instr, pc)
-	ELSE (* TODO: HUGEINT *)
+	ELSE (* TODO: SIGNED64 *)
 		(* since the ARM does support neither DIV nor MOD, these are implemented as system calls
 			MEM[SP...] <- used registers, SP <- SP + (nof registers saved)*4
 			SP <- SP - 4, MEM[SP..SP+3] <- rA
@@ -1803,7 +1803,7 @@ BEGIN
 			IF (FSrc1 IN info.flags) THEN regs.FreeReg(rA.Low) END;
 			IF (FSrc2 IN info.flags) THEN regs.FreeReg(rB.Low) END;
 			IF (FSrc3 IN info.flags) THEN regs.FreeReg(rC.Low) END
-		ELSIF (type = PCLIR.Int64) THEN (* HUGEINT: do not forget Carry Poppins *)
+		ELSIF (type = PCLIR.Int64) THEN (* SIGNED64: do not forget Carry Poppins *)
 			ASSERT({FDst, FSrc1} * info.flags = {FDst, FSrc1}, INTERNALERROR);
 			ASSERT(~(FVal IN info.flags), INTERNALERROR);
 			ASSERT((rA.High # -1) & ((rB.High # -1) OR ((instr.op = PCLIR.bsh) OR (instr.op = PCLIR.ash) OR (instr.op = PCLIR.rot))), INTERNALERROR);
@@ -2534,7 +2534,7 @@ BEGIN
 
 			ELSIF (type IN PCLIR.FloatSize) THEN
 
-			ELSE (* HUGEINT *)
+			ELSE (* SIGNED64 *)
 
 			END
 
@@ -2985,7 +2985,7 @@ BEGIN
 	PCLIR.CG.SysCallMap[DivIndex] := CHR(241);
 	PCLIR.CG.SysCallMap[ModIndex] := CHR(242);
 
-	(* HUGEINT syscalls *)
+	(* SIGNED64 syscalls *)
 	PCLIR.CG.SysCallMap[Int64LSH] := CHR(190);
 	PCLIR.CG.SysCallMap[Int64ASH] := CHR(191);
 

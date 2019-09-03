@@ -1206,7 +1206,7 @@ TYPE
 		installer : Installer.Installer;
 		notifyProc : NotifyProc;
 
-		last : HUGEINT;
+		last : SIGNED64;
 		timer : Kernel.Timer;
 		alive, dead : BOOLEAN;
 

@@ -270,8 +270,8 @@ OSCBundle b:
 		(* int64: OSC Type Tag 'h' *)
 		OSCParamInteger64* = OBJECT(OSCParamObject)
 			VAR
-				integer: HUGEINT;
-			PROCEDURE &InitInt64*(i: HUGEINT);
+				integer: SIGNED64;
+			PROCEDURE &InitInt64*(i: SIGNED64);
 			BEGIN
 				integer := i;
 				tag := 'h';
@@ -1083,7 +1083,7 @@ OSCBundle b:
 	VAR
 		p: OSCParamInteger64;
 		h, l: SIGNED32;
-		bigint: HUGEINT;
+		bigint: SIGNED64;
 	BEGIN
 		IF Trace THEN KernelLog.String('parseOSCParamInteger64: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;
 		IF (ofs+8) > endofs THEN RETURN NIL END;

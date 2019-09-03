@@ -153,9 +153,9 @@ TYPE
 			END GetBit;
 
 			(* get a hugeint *)
-			PROCEDURE GetHugeInt(): HUGEINT;
+			PROCEDURE GetHugeInt(): SIGNED64;
 			VAR
-				huge: HUGEINT;
+				huge: SIGNED64;
 			BEGIN
 				huge := GetBits(16);
 				huge := huge + 10000H * GetBits(16);
@@ -263,9 +263,9 @@ TYPE
 		END GetBits;
 
 		(* get a hugeint *)
-		PROCEDURE GetHugeInt(VAR buf: ARRAY OF CHAR): HUGEINT;
+		PROCEDURE GetHugeInt(VAR buf: ARRAY OF CHAR): SIGNED64;
 		VAR
-			huge: HUGEINT;
+			huge: SIGNED64;
 		BEGIN
 			huge := GetBits(buf, 16);
 			huge := huge + 10000H * GetBits(buf, 16);
@@ -275,9 +275,9 @@ TYPE
 		END GetHugeInt;
 
 		(* get a 32 bit unsigned integer *)
-		PROCEDURE Get32UnsignedBits (VAR buf: ARRAY OF CHAR): HUGEINT;
+		PROCEDURE Get32UnsignedBits (VAR buf: ARRAY OF CHAR): SIGNED64;
 		VAR
-			res: HUGEINT;
+			res: SIGNED64;
 			tmp: SIGNED32;
 			BEGIN
 			tmp := 1;
@@ -294,7 +294,7 @@ TYPE
 
 	OggPageHeader = RECORD
 		headerTypeFlag, pageSegments,pageSize,headerLength, streamSerialNo: SIGNED32;
-		pageNo, checksum, absGranulePos: HUGEINT;
+		pageNo, checksum, absGranulePos: SIGNED64;
 		segTable: ARRAY MaxNrOfSegments OF SIGNED32
 	END;
 
@@ -691,7 +691,7 @@ TYPE
 			END
 		END GetLookupTable;
 
-		PROCEDURE ApplyWindow(VAR data: ARRAY OF HUGEINT; VAR decState: DecoderState);
+		PROCEDURE ApplyWindow(VAR data: ARRAY OF SIGNED64; VAR decState: DecoderState);
 		VAR i, rIdx, lIdx, n: SIGNED32;
 		BEGIN
 			lIdx := GetLookupTable(leftSize);
@@ -845,7 +845,7 @@ TYPE
 		PROCEDURE DecodePacket(VAR bufReader: BufferReader; VAR buf: ARRAY OF CHAR; VAR decState: DecoderState): SIGNED32;
 	(*	VAR
 			amplitude, booknumber, lookupOffset: SIGNED32;
-			lastFP: HUGEINT;
+			lastFP: SIGNED64;
 			codebook: Codebook; *)
 		BEGIN
 		(*
@@ -1510,9 +1510,9 @@ TYPE
 		VAR
 			entries*, dimensions*, lookupType*, valueBits*, lookupValues*: SIGNED32;
 			sequenceP*: BOOLEAN;
-			minimumValueFP*, deltaValueFP*: HUGEINT; (* fixed-point values *)
+			minimumValueFP*, deltaValueFP*: SIGNED64; (* fixed-point values *)
 			codewordLengths*: OGGUtilities.IntList;
-			multiplicandsFP, valuelistFP*: ARRAY MaxNumberOfMultiplicands OF HUGEINT;
+			multiplicandsFP, valuelistFP*: ARRAY MaxNumberOfMultiplicands OF SIGNED64;
 			huffmanTree*: OGGUtilities.HuffmanTree;
 			valid*: BOOLEAN;
 			cbNumber-: SIGNED32;
@@ -1544,7 +1544,7 @@ TYPE
 		PROCEDURE DecodeHeader(VAR bufReader: BufferReader; VAR buf: ARRAY OF CHAR; nr: SIGNED32): BOOLEAN;
 		VAR
 			curEntry, curLength, number, i, j, k, sparsecount, indexDiv, index: SIGNED32;
-			valFP, lastFP: HUGEINT;
+			valFP, lastFP: SIGNED64;
 			newEntry: OGGUtilities.IntElement;
 			ordered, sparse, flag: BOOLEAN;
 			codewords: OGGUtilities.IntList;
@@ -1724,7 +1724,7 @@ TYPE
 		(* build the list of codewods from a list of lengths (algorithm from Tremor-source code) *)
 		PROCEDURE MakeCodewords(VAR list: OGGUtilities.IntList; sparsecount: SIGNED32; VAR res: OGGUtilities.IntList);
 		VAR
-			i: HUGEINT; j, count, length, entry, tmp: SIGNED32;
+			i: SIGNED64; j, count, length, entry, tmp: SIGNED32;
 			marker: ARRAY OGGUtilities.MaxCodewordLength OF SIGNED32;
 			cur, curRes: OGGUtilities.IntElement;
 		BEGIN
@@ -1840,7 +1840,7 @@ TYPE
 
 	CommentListElement = OBJECT (OGGUtilities.ListElement)
 		VAR
-			length*: HUGEINT;
+			length*: SIGNED64;
 			text*: ARRAY MaxCommentLength OF CHAR;
 
 			PROCEDURE Print;
@@ -1851,7 +1851,7 @@ TYPE
 
 	 CommentList = OBJECT (OGGUtilities.List)
 		 VAR
-			vendorLength*: HUGEINT;
+			vendorLength*: SIGNED64;
 			vendorString*: ARRAY MaxVendorLength OF CHAR;
 			(* other comment fields are already defined in OGGUtilities.List *)
 
@@ -1876,7 +1876,7 @@ TYPE
 
 	Info = OBJECT
 	VAR
-		version, sampleRate: HUGEINT;
+		version, sampleRate: SIGNED64;
 		channels, bitrateMax, bitrateNom, bitrateMin: SIGNED32;
 		blocksizes: ARRAY 2 OF SIGNED32;
 		comment: CommentList;
@@ -1900,7 +1900,7 @@ TYPE
 	END Info;
 
 	(* buffer for the inverse MDCT *)
-	MdctBufferT = ARRAY OGGUtilities.MaxBlocksize DIV 2 OF HUGEINT;
+	MdctBufferT = ARRAY OGGUtilities.MaxBlocksize DIV 2 OF SIGNED64;
 	MdctBuffer = POINTER TO MdctBufferT;
 
 	(** does nothing except printing arguments of Decode()-procedure *)
@@ -1978,9 +1978,9 @@ TYPE
 		END Init;
 
 		(** performs the inverse MDCT *)
-		PROCEDURE Backward(VAR data: ARRAY OF HUGEINT);
+		PROCEDURE Backward(VAR data: ARRAY OF SIGNED64);
 		VAR n2, n4, n8, inO, xO, a, i, xx, b, o1, o2, o3, o4: SIGNED32;
-			temp1, temp2: HUGEINT;
+			temp1, temp2: SIGNED64;
 		BEGIN
 			n2 := n DIV 2;
 			n4 := n DIV 4;
@@ -2064,7 +2064,7 @@ TYPE
 		(* step 2 *)
 		PROCEDURE KernelStep1(n2, n4: SIGNED32);
 		VAR xA, xB, w2, a, i: SIGNED32;
-			x0, x1: HUGEINT;
+			x0, x1: SIGNED64;
 		BEGIN
 			xA := n4;
 			xB := 0;
@@ -2093,7 +2093,7 @@ TYPE
 		(* step 3 *)
 		PROCEDURE KernelStep2(n2: SIGNED32);
 		VAR i, s, r, w1, w2, k0, k1, a, wbase, sEnd: SIGNED32;
-			wA, wB, aev, aov: HUGEINT;
+			wA, wB, aev, aov: SIGNED64;
 		BEGIN
 			FOR i := 0 TO log2n - 3 - 1 DO
 				k0 := LSH(n, -(i + 2));
@@ -2132,7 +2132,7 @@ TYPE
 		(* step 4, 5, 6, 7 *)
 		PROCEDURE KernelStep3(n2, n8: SIGNED32);
 		VAR c, bit, x1, x2, t1, t2, i: SIGNED32;
-			wa, wb, wc, wd, wace, waco, wbce, wbco: HUGEINT;
+			wa, wb, wc, wd, wace, waco, wbce, wbco: SIGNED64;
 		BEGIN
 			c := n;
 			bit := 0;
@@ -2284,7 +2284,7 @@ TYPE
 			- upsizes with the max amplitude
 			- does the clipping
 		*)
-		PROCEDURE GetSample(sample: HUGEINT): SIGNED32;
+		PROCEDURE GetSample(sample: SIGNED64): SIGNED32;
 		VAR retSample: SIGNED32;
 		BEGIN
 			(* can do a normal multiplication here *)
@@ -2540,7 +2540,7 @@ TYPE
 
 		PROCEDURE DecodeCommentHeader(): SIGNED32;
 		VAR
-			i, j: HUGEINT;
+			i, j: SIGNED64;
 			commentElement: CommentListElement;
 		BEGIN
 			info.comment.vendorLength := bufReader.Get32UnsignedBits(buf);
@@ -2830,7 +2830,7 @@ TYPE
 
 		PROCEDURE DotProduct;
 		VAR i, n, chptr: SIGNED32;
-			residueVal, floorVal: HUGEINT;
+			residueVal, floorVal: SIGNED64;
 		BEGIN
 			(* multiply each element of the floor-vector with each element of the residue-vector *)
 			n := decState.n DIV 2;
@@ -2852,7 +2852,7 @@ TYPE
 		PROCEDURE InverseCoupling;
 		VAR
 			i, j, angIdx, magIdx: SIGNED32;
-			newM, newA, m, a: HUGEINT; (* all fixed-point *)
+			newM, newA, m, a: SIGNED64; (* all fixed-point *)
 		BEGIN
 			IF (Trace IN Debug) THEN
 				OGGUtilities.String("@InverseCoupling()")

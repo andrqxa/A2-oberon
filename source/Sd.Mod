@@ -515,7 +515,7 @@ TYPE
 
 		baseFrequency, (** Base hc clock frequency *)
 		frequency, (** Bus frequency *)
-		timeoutFrequency: HUGEINT; (** Timeout clock frequency *)
+		timeoutFrequency: SIGNED64; (** Timeout clock frequency *)
 		lastRca: SIGNED32; (** Last RCA selected by the controller. *)
 
 		handle: EventHandler; (** Card event handler *)
@@ -525,7 +525,7 @@ TYPE
 		regs-: HcRegisters; (** Memory-mapped I/O registers *)
 		cards: Card; (** List of cards on this HC *)
 		next: HostController; (** Linked list of controllers for interrupt handling *)
-		desc{ALIGNED(32)}: ARRAY 32 OF HUGEINT; (** DMA descriptor *)
+		desc{ALIGNED(32)}: ARRAY 32 OF SIGNED64; (** DMA descriptor *)
 	END;
 
 	(**
@@ -583,12 +583,12 @@ TYPE
 		AutoCmdErrorStatus * {ALIGNED(1)},
 		HostControl2 * {ALIGNED(1)}: SIGNED16;
 		Capabilities * {ALIGNED(1)}: ARRAY 2 OF SET;
-		MaximumCurrentCapabilities * {ALIGNED(1)}: HUGEINT;
+		MaximumCurrentCapabilities * {ALIGNED(1)}: SIGNED64;
 		ForceEventAutoCmdErrorStatus * {ALIGNED(1)},
 		ForceEventErrorInterruptStatus * {ALIGNED(1)}: SIGNED16;
 		AdmaErrorStatus * {ALIGNED(1)}: SIGNED8;
 		padding0 * {ALIGNED(1)}: ARRAY 3 OF SIGNED8;
-		AdmaSystemAddress * {ALIGNED(1)}: HUGEINT;
+		AdmaSystemAddress * {ALIGNED(1)}: SIGNED64;
 		PresetValues * {ALIGNED(1)}: ARRAY 8 OF SIGNED16;
 		padding1 * {ALIGNED(1)}: ARRAY 28 OF SIGNED32;
 		SharedBusControl * {ALIGNED(1)}: SIGNED32;
@@ -605,10 +605,10 @@ VAR
 	NbyteRead -,
 	NbyteWritten -,
 	Nread -,
-	Nwrite -: HUGEINT;
+	Nwrite -: SIGNED64;
 	Tread -,
-	Twrite -: HUGEINT;
-	start, stop: HUGEINT;
+	Twrite -: SIGNED64;
+	start, stop: SIGNED64;
 
 	(* ==================== Host Controller (Low-Level) Interface ==================== *)
 	(**
@@ -689,7 +689,7 @@ VAR
 	END InitHostController;
 
 	(** Set external clock for a host controller. Host state must be HcConfiguring. bus is the SD bus clock frequency, timeout is the timeout clock frequency. *)
-	PROCEDURE SetExternalClock * (hc: HostController; bus, timeout: HUGEINT; VAR result: WORD): BOOLEAN;
+	PROCEDURE SetExternalClock * (hc: HostController; bus, timeout: SIGNED64; VAR result: WORD): BOOLEAN;
 	BEGIN
 		IF hc.state # HcConfiguring THEN
 			result := ErrorInvalidParameters;
@@ -965,7 +965,7 @@ VAR
 		blocks, blockSize, desc, txlen, l, tx: SIGNED32;
 		padd: BOOLEAN; (* Padd transfer to next block length? *)
 
-		PROCEDURE WriteAdma2Desc (address: ADDRESS; len: SIGNED32; flags: SET): HUGEINT;
+		PROCEDURE WriteAdma2Desc (address: ADDRESS; len: SIGNED32; flags: SET): SIGNED64;
 		BEGIN
 			IF EnableTrace THEN
 				Log.String("[SD] ADMA2 Entry; address = "); Log.Hex(address, -8); Log.String(", size = "); Log.Int(len, 0);
@@ -981,7 +981,7 @@ VAR
 			END;
 			ASSERT(address MOD 4 = 0);
 			ASSERT((len > 0) OR (flags * Adma2ActMask # Adma2Trans));
-			RETURN LSH(HUGEINT(address), 32) + LSH(len MOD 65536, 16) + SYSTEM.VAL(SIGNED32, flags)
+			RETURN LSH(SIGNED64(address), 32) + LSH(len MOD 65536, 16) + SYSTEM.VAL(SIGNED32, flags)
 		END WriteAdma2Desc;
 
 	BEGIN
@@ -1137,7 +1137,7 @@ VAR
 	(** Issue an SD Card Transaction. [Simplified specs. 3.7.1.1 pp. 106-108] *)
 	PROCEDURE StartCommand (hc: HostController; cmd, argument, responseType: SIGNED32; read, dma, busy, abort: BOOLEAN; VAR status: SET; VAR result: WORD): BOOLEAN;
 	VAR
-		t: HUGEINT;
+		t: SIGNED64;
 		reg: SIGNED32;
 		flags, txFlags: SET;
 	BEGIN
@@ -1721,7 +1721,7 @@ TYPE
 		dataBusWidth -: SIGNED32; (** Number of DAT bus lines currently used by card *)
 		securedMode -: BOOLEAN; (** Is card in secured mode? *)
 		cardType -: SIGNED32; (** Card type, one of Category* *)
-		sizeProtArea -: HUGEINT; (** Size of the protected area, in bytes *)
+		sizeProtArea -: SIGNED64; (** Size of the protected area, in bytes *)
 		perfMove -: SIGNED32; (** Performance of move, in MB/s. 0 means 'sequential write', 255 means 'infinity' *)
 		eraseSize -: SIGNED32; (** Numbers of AUs erased at a time. 0 means not supported *)
 		eraseTimeout -: SIGNED32; (** Erase timeout value in second, per erase unit. 0 means not supported *)
@@ -1758,7 +1758,7 @@ TYPE
 	(* Card Registers *)
 	Csd * = RECORD
 		(* Card properties *)
-		capacity -: HUGEINT; (** Card capacity in bytes *)
+		capacity -: SIGNED64; (** Card capacity in bytes *)
 		commandClasses -: SET; (** Command classes supported by the card *)
 
 		(* Timing info *)
@@ -1994,7 +1994,7 @@ TYPE
 	PROCEDURE Write * (card: Card; firstBlock, len: SIGNED32; VAR data: ARRAY OF SYSTEM.BYTE; ofs: SIZE; VAR result: WORD): BOOLEAN;
 	VAR
 		command: Command;
-		start, stop: HUGEINT;
+		start, stop: SIGNED64;
 		ret: BOOLEAN;
 	BEGIN
 		result := ErrorNone;
@@ -2046,7 +2046,7 @@ TYPE
 	PROCEDURE Read * (card: Card; firstBlock, len: SIGNED32; VAR data: ARRAY OF SYSTEM.BYTE; ofs: SIZE; VAR result: WORD): BOOLEAN;
 	VAR
 		command: Command;
-		start, stop: HUGEINT;
+		start, stop: SIGNED64;
 		ret: BOOLEAN;
 	BEGIN
 		IF Synchronize THEN card.acquire END;
@@ -2376,7 +2376,7 @@ TYPE
 			sizeMult := LSH(SIGNED32(2), ReadBitfield(raw, CardCsd_CSizeMultOfs1, CardCsd_CSizeMultWidth1));
 			csd.capacity := sizeMult * (1 + ReadBitfield(raw, CardCsd_CSizeOfs1, CardCsd_CSizeWidth1)) * 512;
 		ELSE
-			csd.capacity := 512 * 1024 * (HUGEINT(ReadBitfield(raw, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
+			csd.capacity := 512 * 1024 * (SIGNED64(ReadBitfield(raw, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
 		END;
 
 		csd.commandClasses := SYSTEM.VAL(SET, ReadBitfield(raw, CardCsd_CccOfs, CardCsd_CccWidth));
@@ -2540,11 +2540,11 @@ TYPE
 			Log.Set(regs.Capabilities[0]); Log.String(" ");
 			Log.Set(regs.Capabilities[1]); Log.Ln;
 
-			(*Log.String("[SD] 	MaximumCurrentCapabilities: 0x"); Log.Hex(regs.MaximumCurrentCapabilities,-SIZEOF(HUGEINT)*2); Log.Ln;
+			(*Log.String("[SD] 	MaximumCurrentCapabilities: 0x"); Log.Hex(regs.MaximumCurrentCapabilities,-SIZEOF(SIGNED64)*2); Log.Ln;
 			Log.String("[SD] 	ForceEventAutoCmdErrorStatus: 0x"); Log.Hex(regs.ForceEventAutoCmdErrorStatus,-SIZEOF(SIGNED16)*2); Log.Ln;
 			Log.String("[SD] 	ForceEventErrorInterruptStatus: 0x"); Log.Hex(regs.ForceEventErrorInterruptStatus,-SIZEOF(SIGNED16)*2); Log.Ln;
 			Log.String("[SD] 	AdmaErrorStatus: 0x"); Log.Hex(regs.AdmaErrorStatus,-SIZEOF(SIGNED8)*2); Log.Ln;
-			Log.String("[SD] 	AdmaSystemAddress: 0x"); Log.Hex(regs.AdmaSystemAddress,-SIZEOF(HUGEINT)*2); Log.Ln;*)
+			Log.String("[SD] 	AdmaSystemAddress: 0x"); Log.Hex(regs.AdmaSystemAddress,-SIZEOF(SIGNED64)*2); Log.Ln;*)
 
 			Log.String("[SD] 	PresetValues: 0x");
 			Log.Hex(regs.PresetValues[0],-SIZEOF(SIGNED16)*2); Log.String(" 0x");
@@ -2819,7 +2819,7 @@ TYPE
 	(** Print the CSD of a card to the log. *)
 	PROCEDURE PrintCardCsd * (CONST csd: ARRAY OF SIGNED32);
 	VAR
-		cap: HUGEINT;
+		cap: SIGNED64;
 		val, version, sizeMult: SIGNED32;
 	BEGIN
 		IF EnableTrace THEN
@@ -2878,7 +2878,7 @@ TYPE
 				sizeMult := LSH(SIGNED32(2), ReadBitfield(csd, CardCsd_CSizeMultOfs1, CardCsd_CSizeMultWidth1));
 				cap := sizeMult * (1 + ReadBitfield(csd, CardCsd_CSizeOfs1, CardCsd_CSizeWidth1)) * 512;
 			ELSE
-				cap := 512 * 1024 * (HUGEINT(ReadBitfield(csd, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
+				cap := 512 * 1024 * (SIGNED64(ReadBitfield(csd, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
 			END;
 			Log.String("[SD] "); Log.String("	Card Capacity: "); Log.Int(cap, 0); Log.String(" B"); Log.Ln;
 			Log.String("[SD] "); Log.String("	DSR Implemented: "); Log.Boolean(ReadBitfield(csd, CardCsd_DsrImp, 1) = 1); Log.Ln;
@@ -3000,7 +3000,7 @@ TYPE
 	END PrintCardScr;
 
 	(** Helper to write a size in a human-readable format *)
-	PROCEDURE PrintSize (size: HUGEINT);
+	PROCEDURE PrintSize (size: SIGNED64);
 	VAR
 		prefix: ARRAY 8 OF CHAR;
 		i: SIGNED32;

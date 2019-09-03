@@ -44,7 +44,7 @@ CONST
 	AddressSize = SIZEOF(ADDRESS);
 
 TYPE
-	CpuCyclesArray* = ARRAY Machine.MaxCPU OF HUGEINT;
+	CpuCyclesArray* = ARRAY Machine.MaxCPU OF SIGNED64;
 
 	EventHandler* = PROCEDURE {DELEGATE};
 
@@ -391,8 +391,8 @@ VAR
 
 	(* Performance monitoring *)
 	idlecount*: ARRAY Machine.MaxCPU OF SIGNED32; (** count of idle process timeslice interrupts *)
-	idleCycles- : ARRAY Machine.MaxCPU OF HUGEINT; (** CPU cycles of idle threads *)
-	perfTsc: ARRAY Machine.MaxCPU OF HUGEINT;
+	idleCycles- : ARRAY Machine.MaxCPU OF SIGNED64; (** CPU cycles of idle threads *)
+	perfTsc: ARRAY Machine.MaxCPU OF SIGNED64;
 
 	(* Statistics *)
 	Nlock-, Nunlock-, Nawait-, NawaitNoIF-, NawaitTrue-, Ncreate-, Nterminate-,
@@ -814,15 +814,15 @@ BEGIN
 	END;
 END GetCpuCycles;
 
-PROCEDURE CurrentProcessTime*(): HUGEINT;
-VAR result: HUGEINT; process: Process; i: SIGNED32;
+PROCEDURE CurrentProcessTime*(): SIGNED64;
+VAR result: SIGNED64; process: Process; i: SIGNED32;
 BEGIN
 	process := CurrentProcess();
 	FOR i := 0 TO Machine.MaxCPU-1 DO result := result + process.cpuCycles[i]; END;
 	RETURN result;
 END CurrentProcessTime;
 
-PROCEDURE TimerFrequency*(): HUGEINT;
+PROCEDURE TimerFrequency*(): SIGNED64;
 BEGIN
 	RETURN 1000000000;
 END TimerFrequency;

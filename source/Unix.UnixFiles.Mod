@@ -524,7 +524,7 @@ TYPE
 				tempFile: BOOLEAN;
 				dev: Unix.dev_t;
 				ino: Unix.ino_t;
-				mtime: HUGEINT;
+				mtime: SIGNED64;
 				fsize, fpos: SIZE;
 				bufs: ARRAY NBufs OF Buffer;
 				swapper: SIZE; state: SIGNED32;

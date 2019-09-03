@@ -72,8 +72,8 @@ VAR
 	version*: ARRAY 64 OF CHAR;   (** Aos version *)
 	features*,features2*: SET;   (** processor features *)
 	fcr*: SET;   (** default floating-point control register value (default rounding mode is towards -infinity, for ENTIER) *)
-	mhz*: HUGEINT;   (** clock rate of GetTimer() in MHz, or 0 if not known *)
-	boottime-: HUGEINT; (** in timer units *)
+	mhz*: SIGNED64;   (** clock rate of GetTimer() in MHz, or 0 if not known *)
+	boottime-: SIGNED64; (** in timer units *)
 
 VAR
 	lock-: ARRAY MaxLocks OF CHAR;  (* not implemented as SET because of shared access *)
@@ -188,7 +188,7 @@ BEGIN HALT (1234);
 END Sti;
 
 (* Dan: from new Machine *)
-PROCEDURE GetTimer*(): HUGEINT;
+PROCEDURE GetTimer*(): SIGNED64;
 BEGIN RETURN Timer.GetCounter ();
 END GetTimer;
 

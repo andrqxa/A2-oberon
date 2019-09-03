@@ -791,7 +791,7 @@ BEGIN
 							IF lval = 0 THEN Texts.WriteString(W, "NIL")
 							ELSE WriteProc(AosModules.ThisModuleByAdr(lval), lval, -1, tmp, tmp1, tmp2)
 							END
-						|16:	(* HUGEINT *)
+						|16:	(* SIGNED64 *)
 							Texts.WriteHex(W, SYSTEM.GET32(adr+4));
 							Texts.WriteHex(W, SYSTEM.GET32(adr))
 						|22:	(* RECORD *)

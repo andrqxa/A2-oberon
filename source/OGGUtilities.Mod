@@ -27,12 +27,12 @@ VAR
 	f: Files.File;
 	w*: Files.Writer;
 	Ny: SIGNED32;
-	ScaleFactor: HUGEINT;
+	ScaleFactor: SIGNED64;
 
 TYPE
 	(** object for holding PCM buffer data (may also be used for floor-data (24 bits)) *)
 	PCMBuffer* = OBJECT
-		VAR data*: ARRAY MaxBlocksize OF HUGEINT;
+		VAR data*: ARRAY MaxBlocksize OF SIGNED64;
 
 		PROCEDURE Print*(name: ARRAY OF CHAR; len: SIGNED32);
 		BEGIN
@@ -82,7 +82,7 @@ TYPE
 
 		(** check if the length list represents a valid huffman-tree *)
 		PROCEDURE IsValidLengthList*(VAR list: IntList; unused: SIGNED32): BOOLEAN;
-		VAR limit, sum: HUGEINT;
+		VAR limit, sum: SIGNED64;
 		BEGIN
 			IF (Trace IN Debug) THEN
 				String("@MyUtilities::HuffmanTree::IsValidLengthList()")
@@ -94,7 +94,7 @@ TYPE
 
 		(** check if the list of length represents an overspecified huffman-tree *)
 		PROCEDURE IsOverspecified*(VAR list: IntList; unused: SIGNED32): BOOLEAN;
-		VAR limit, sum: HUGEINT;
+		VAR limit, sum: SIGNED64;
 		BEGIN
 			GetSumAndLimit(list, sum, limit, unused);
 			RETURN (sum > limit)
@@ -102,16 +102,16 @@ TYPE
 
 		(** check if the list of length represents an underspecified huffman-tree *)
 		PROCEDURE IsUnderspecified*(VAR list: IntList; unused: SIGNED32): BOOLEAN;
-		VAR limit, sum: HUGEINT;
+		VAR limit, sum: SIGNED64;
 		BEGIN
 			GetSumAndLimit(list, sum, limit, unused);
 			RETURN (sum > limit)
 		END IsUnderspecified;
 
 		(* background: Kraft-McMillan's Theorem - sum(1,n, 1 / (2^l[i])) <= 1  <=> l[i] represents a valid HuffmanTree *)
-		PROCEDURE GetSumAndLimit(VAR list: IntList; VAR sum, limit: HUGEINT; unused: SIGNED32);
+		PROCEDURE GetSumAndLimit(VAR list: IntList; VAR sum, limit: SIGNED64; unused: SIGNED32);
 		VAR
-			i: HUGEINT;
+			i: SIGNED64;
 			cur: ListElement;
 		BEGIN
 			limit := PowerH(2, MaxCodewordLength);
@@ -128,7 +128,7 @@ TYPE
 		(* check wether the list has any used entries *)
 		PROCEDURE HasUsedEntries*(VAR list: IntList; unused: SIGNED32): BOOLEAN;
 		VAR
-			i: HUGEINT;
+			i: SIGNED64;
 			cur: ListElement;
 		BEGIN
 			cur := list.start;
@@ -256,7 +256,7 @@ TYPE
 	Vector* = OBJECT
 		VAR
 			capacity, len: SIGNED32;
-			data: ARRAY BaseVectorSize OF HUGEINT;
+			data: ARRAY BaseVectorSize OF SIGNED64;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -270,7 +270,7 @@ TYPE
 		END Print;
 
 		(** add a value at the end *)
-		PROCEDURE Add*(value: HUGEINT);
+		PROCEDURE Add*(value: SIGNED64);
 		BEGIN
 			IF (len >= capacity) THEN
 				KernelLog.String("ASSERTION failed - vector exceeds size"); KernelLog.Ln
@@ -281,7 +281,7 @@ TYPE
 		END Add;
 
 		(** increase each value by inc *)
-		PROCEDURE Increase(inc: HUGEINT);
+		PROCEDURE Increase(inc: SIGNED64);
 		VAR i: SIGNED32;
 		BEGIN
 			FOR i := 0 TO len - 1 DO
@@ -296,13 +296,13 @@ TYPE
 		END GetLen;
 
 		(** get the last element *)
-		PROCEDURE GetLast(): HUGEINT;
+		PROCEDURE GetLast(): SIGNED64;
 		BEGIN
 			RETURN data[len]
 		END GetLast;
 
 		(** get value at a certain position *)
-		PROCEDURE GetValueAt*(idx: SIGNED32): HUGEINT;
+		PROCEDURE GetValueAt*(idx: SIGNED32): SIGNED64;
 		BEGIN
 			IF (idx >= len) THEN
 				KernelLog.String("ASSERTION failed - access to invalid vector element"); KernelLog.Ln
@@ -311,12 +311,12 @@ TYPE
 			RETURN data[idx]
 		END GetValueAt;
 
-		PROCEDURE IncValueAt(inc: HUGEINT; idx: SIGNED32);
+		PROCEDURE IncValueAt(inc: SIGNED64; idx: SIGNED32);
 		BEGIN
 			SetValueAt(inc + GetValueAt(idx), idx)
 		END IncValueAt;
 
-		PROCEDURE SetValueAt(val: HUGEINT; idx: SIGNED32);
+		PROCEDURE SetValueAt(val: SIGNED64; idx: SIGNED32);
 		BEGIN
 			IF (idx >= len) THEN
 				KernelLog.String("ASSERTION failed - access to invalid vector element"); KernelLog.Ln
@@ -337,7 +337,7 @@ TYPE
 
 	List* = OBJECT
 		VAR
-			length*: HUGEINT;
+			length*: SIGNED64;
 			start-, last-: ListElement;
 
 		PROCEDURE &Init*(first: ListElement);
@@ -461,7 +461,7 @@ TYPE
 
 	(** translate the packed binary representation of a Vorbis codebook float value into the
 			representation used by the decoder for floating point numbers *)
-	PROCEDURE Float32Unpack*(val: SIGNED32): HUGEINT;
+	PROCEDURE Float32Unpack*(val: SIGNED32): SIGNED64;
 	VAR
 		mantissa, sign, exponent, one: SIGNED32;
 		res: REAL;
@@ -537,7 +537,7 @@ TYPE
 	END RenderPoint;
 
 	(** construct an integer floor curve for contiguous piecewise line segments *)
-	PROCEDURE RenderLine*(x0, y0, x1, y1: SIGNED32; VAR v: ARRAY OF HUGEINT);
+	PROCEDURE RenderLine*(x0, y0, x1, y1: SIGNED32; VAR v: ARRAY OF SIGNED64);
 	VAR dy, adx, ady, x, y, err, base, sy: SIGNED32;
 	BEGIN
 		dy := y1 - y0;
@@ -615,8 +615,8 @@ TYPE
 	END Power;
 
 	(** return x to the power of n (ASSERT(n>=0)) *)
-	PROCEDURE PowerH(x: HUGEINT; n: SIGNED32): HUGEINT;
-	VAR res: HUGEINT;
+	PROCEDURE PowerH(x: SIGNED64; n: SIGNED32): SIGNED64;
+	VAR res: SIGNED64;
 	BEGIN
 		IF (n < 0) THEN
 			KernelLog.String("ASSERTION failed - power of negative numbers are not allowed"); KernelLog.Ln
@@ -667,7 +667,7 @@ TYPE
 		RETURN res
 	END Log2n;
 (*
-	PROCEDURE HighestBit(h: HUGEINT): SIGNED32;
+	PROCEDURE HighestBit(h: SIGNED64): SIGNED32;
 	VAR res, i: SIGNED32;
 	BEGIN
 		IF h < 0 THEN h := -1 * h END;
@@ -684,8 +684,8 @@ TYPE
 	(** fix-point arithmetic procedures *)
 
 	(** fixed-point multiplication, result same format as input with fraction n*)
-	PROCEDURE MultHugeFP*(a, b: HUGEINT): HUGEINT;
-	VAR sign, res: HUGEINT;
+	PROCEDURE MultHugeFP*(a, b: SIGNED64): SIGNED64;
+	VAR sign, res: SIGNED64;
 	BEGIN
 		IF ((a = 0) OR (b = 0)) THEN
 			RETURN 0
@@ -706,8 +706,8 @@ TYPE
 	END MultHugeFP;
 
 	(** fixed-point multiplication for "dot product" of residue and floor *)
-	PROCEDURE MultDotProductFP*(residue, floor: HUGEINT): HUGEINT;
-	VAR sign: HUGEINT;
+	PROCEDURE MultDotProductFP*(residue, floor: SIGNED64): SIGNED64;
+	VAR sign: SIGNED64;
 	BEGIN
 		IF (residue = 0) OR (floor = 0) THEN
 			RETURN 0
@@ -729,7 +729,7 @@ TYPE
 	END MultDotProductFP;
 
 	(** fixed-point multiplication, result same format as input with constant fraction Nx*)
-	PROCEDURE MultFP*(a, b: HUGEINT): HUGEINT;
+	PROCEDURE MultFP*(a, b: SIGNED64): SIGNED64;
 	VAR divident, n: SIGNED32;
 	BEGIN
 		IF (a = 0) OR (b = 0) THEN
@@ -750,8 +750,8 @@ TYPE
 	END DivFP;
 
 	(** scales a float up for fix-point representation with fraction Ny *)
-	PROCEDURE ScaleUpHuge*(r: REAL): HUGEINT;
-	VAR tmp: HUGEINT;
+	PROCEDURE ScaleUpHuge*(r: REAL): SIGNED64;
+	VAR tmp: SIGNED64;
 	BEGIN
 		tmp := ENTIERH(0.5 + r * ScaleFactor);
 		RETURN tmp
@@ -766,8 +766,8 @@ TYPE
 	END ScaleUp;
 
 	(** scales a float up for fix-point representation with fraction Ny *)
-	PROCEDURE ScaleUpRealToHuge*(r: LONGREAL): HUGEINT;
-	VAR tmp: HUGEINT;
+	PROCEDURE ScaleUpRealToHuge*(r: LONGREAL): SIGNED64;
+	VAR tmp: SIGNED64;
 	BEGIN
 		tmp := ENTIERH(0.5 + r * ScaleFactor);
 		RETURN tmp
@@ -783,8 +783,8 @@ TYPE
 	END ScaleUpInt;
 
 	(** scales an huge integer up for fix-point representation with constant fraction Ny *)
-	PROCEDURE ScaleUpHugeInt*(i: HUGEINT): HUGEINT;
-	VAR tmp: HUGEINT;
+	PROCEDURE ScaleUpHugeInt*(i: SIGNED64): SIGNED64;
+	VAR tmp: SIGNED64;
 	BEGIN
 		tmp := i * ScaleFactor;
 		RETURN tmp
@@ -792,13 +792,13 @@ TYPE
 
 
 	(** scales a hugeint down for fix-point representation (rounded) with constant fraction Ny*)
-	PROCEDURE ScaleDownRoundedHuge*(i: HUGEINT): SIGNED32;
+	PROCEDURE ScaleDownRoundedHuge*(i: SIGNED64): SIGNED32;
 	BEGIN
 		RETURN SHORT((i + ScaleFactor DIV 2) DIV ScaleFactor)
 	END ScaleDownRoundedHuge;
 
 	(** scales a hugeint down for fix-point representation  with constant fraction Ny*)
-	PROCEDURE ScaleDownHuge(i: HUGEINT): HUGEINT;
+	PROCEDURE ScaleDownHuge(i: SIGNED64): SIGNED64;
 	BEGIN
 		RETURN i DIV ScaleFactor
 	END ScaleDownHuge;
@@ -848,12 +848,12 @@ TYPE
 		ArrayLen(name, a, LEN(a))
 	END Array;
 
-	PROCEDURE ArrayHuge*(name: ARRAY OF CHAR; VAR a: ARRAY OF HUGEINT);
+	PROCEDURE ArrayHuge*(name: ARRAY OF CHAR; VAR a: ARRAY OF SIGNED64);
 	BEGIN
 		ArrayHugeLen(name, a, LEN(a))
 	END ArrayHuge;
 
-	PROCEDURE ArrayHugeLen*(name: ARRAY OF CHAR; VAR a: ARRAY OF HUGEINT; n: SIZE);
+	PROCEDURE ArrayHugeLen*(name: ARRAY OF CHAR; VAR a: ARRAY OF SIGNED64; n: SIZE);
 	VAR i: SIZE;
 	BEGIN
 		IF (n > LEN(a)) THEN
@@ -932,7 +932,7 @@ TYPE
 	END Var;
 
 	(** print a varname with its value, type must be a hugeint *)
-	PROCEDURE VarH*(name: ARRAY OF CHAR; value: HUGEINT);
+	PROCEDURE VarH*(name: ARRAY OF CHAR; value: SIGNED64);
 	BEGIN
 		w.String(name); w.String(": ");
 		VarH2(value);
@@ -940,7 +940,7 @@ TYPE
 	END VarH;
 
 	(** print a hugeint *)
-	PROCEDURE VarH2*(value: HUGEINT);
+	PROCEDURE VarH2*(value: SIGNED64);
 	VAR sign: SIGNED32;
 	BEGIN
 		IF (value < 0) THEN sign := -1; value := -1 * value ELSE sign := 1 END;

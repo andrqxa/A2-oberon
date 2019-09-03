@@ -404,7 +404,7 @@ TYPE
 			IF ~first THEN w.String("} ") END;
 		END FlagEnd;
 
-		PROCEDURE Value(identifier: SyntaxTree.Identifier; value: HUGEINT; VAR first: BOOLEAN);
+		PROCEDURE Value(identifier: SyntaxTree.Identifier; value: SIGNED64; VAR first: BOOLEAN);
 		BEGIN
 			Flag(identifier,first);
 			w.String("("); w.Int(value,1); w.String(")");
@@ -776,8 +776,8 @@ TYPE
 			END
 		END VisitBooleanValue;
 
-		PROCEDURE Hex(x: HUGEINT);
-		VAR i: SIGNED32; a: ARRAY 20 OF CHAR; y: HUGEINT;
+		PROCEDURE Hex(x: SIGNED64);
+		VAR i: SIGNED32; a: ARRAY 20 OF CHAR; y: SIGNED64;
 		BEGIN
 			i := 0;
 			REPEAT

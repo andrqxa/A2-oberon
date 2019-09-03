@@ -403,34 +403,34 @@ TYPE
 				r_ss		: SIGNED32;
 				fpc-		: ADDRESS;
 			#ELSIF AMD64 THEN
-				r_15-		: HUGEINT;
-				r_14-		: HUGEINT;
-				r_13-		: HUGEINT;
-				r_12-		: HUGEINT;
-				r_11-		: HUGEINT;
-				r_10-		: HUGEINT;
-				r_9-		: HUGEINT;
-				r_8-		: HUGEINT;
-				r_di-		: HUGEINT;
-				r_si-		: HUGEINT;
-				r_bp-		: HUGEINT;
-				r_bx-		: HUGEINT;
-				r_dx-		: HUGEINT;
-				r_cx-		: HUGEINT;
-				r_ax-		: HUGEINT;
-				r_trapno-	: HUGEINT;
-				r_err-		: HUGEINT;
-				r_pc-		: HUGEINT;
-				r_cs-		: HUGEINT;
-				r_fl-		: HUGEINT;
-				r_sp-		: HUGEINT;
-				r_ss-		: HUGEINT;
-				r_fs-		: HUGEINT;
-				r_gs-		: HUGEINT;
-				r_es-		: HUGEINT;
-				r_ds-		: HUGEINT;
-				r_fsbase-	: HUGEINT;
-				r_gsbase-: HUGEINT
+				r_15-		: SIGNED64;
+				r_14-		: SIGNED64;
+				r_13-		: SIGNED64;
+				r_12-		: SIGNED64;
+				r_11-		: SIGNED64;
+				r_10-		: SIGNED64;
+				r_9-		: SIGNED64;
+				r_8-		: SIGNED64;
+				r_di-		: SIGNED64;
+				r_si-		: SIGNED64;
+				r_bp-		: SIGNED64;
+				r_bx-		: SIGNED64;
+				r_dx-		: SIGNED64;
+				r_cx-		: SIGNED64;
+				r_ax-		: SIGNED64;
+				r_trapno-	: SIGNED64;
+				r_err-		: SIGNED64;
+				r_pc-		: SIGNED64;
+				r_cs-		: SIGNED64;
+				r_fl-		: SIGNED64;
+				r_sp-		: SIGNED64;
+				r_ss-		: SIGNED64;
+				r_fs-		: SIGNED64;
+				r_gs-		: SIGNED64;
+				r_es-		: SIGNED64;
+				r_ds-		: SIGNED64;
+				r_fsbase-	: SIGNED64;
+				r_gsbase-: SIGNED64
 			#ELSE
 				unimplemented
 			#END

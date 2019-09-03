@@ -1265,7 +1265,7 @@ TYPE
 		imports-: SymbolList;
 		frequencyDivider-: SIGNED32;
 
-		PROCEDURE AddDevice*(CONST name: ARRAY OF CHAR; adr: HUGEINT);
+		PROCEDURE AddDevice*(CONST name: ARRAY OF CHAR; adr: SIGNED64);
 		VAR device: Device;
 		BEGIN
 			NEW(device, name, SELF, SIGNED32(adr)); supportedDevices.AddDevice(device);
@@ -1445,7 +1445,7 @@ TYPE
 	END Specification;
 
 	(*
-	PROCEDURE ReadHugeint(r: Streams.Reader; VAR x: HUGEINT): BOOLEAN;
+	PROCEDURE ReadHugeint(r: Streams.Reader; VAR x: SIGNED64): BOOLEAN;
 	VAR low, high: SIGNED32;
 	BEGIN
 		IF r.GetInteger(high, FALSE) & r.GetInteger(low, FALSE) THEN
@@ -1456,7 +1456,7 @@ TYPE
 		END
 	END ReadHugeint;
 
-	PROCEDURE WriteHugeint(r: Streams.Writer; x: HUGEINT);
+	PROCEDURE WriteHugeint(r: Streams.Writer; x: SIGNED64);
 	VAR low, high: SIGNED32;
 	BEGIN
 		low := SHORT(x); high := SHORT(x DIV 100000000H);

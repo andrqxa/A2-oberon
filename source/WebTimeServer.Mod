@@ -9,13 +9,13 @@ TYPE
 	TimeAgent = OBJECT (TCPServices.Agent)
 		VAR
 			days,hours,minutes,seconds: SIGNED32;
-			t: HUGEINT;
+			t: SIGNED64;
 			w: Streams.Writer;
 
 	BEGIN {ACTIVE}
 		Streams.OpenWriter(w, client.Send);
 		Dates.TimeDifference(Dates.ZeroDateRFC868, Dates.Now(), days,hours,minutes,seconds);
-		t:=((HUGEINT(days)*24+hours)*60+minutes)*60+seconds; (* the leap seconds are handled implicitely: http://www.eecis.udel.edu/~mills/leap.html *)
+		t:=((SIGNED64(days)*24+hours)*60+minutes)*60+seconds; (* the leap seconds are handled implicitely: http://www.eecis.udel.edu/~mills/leap.html *)
 		w.Net32(SIGNED32(t));
 		w.Update;
 		Terminate

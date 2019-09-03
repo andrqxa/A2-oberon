@@ -94,7 +94,7 @@ TYPE
 
 	Expression* = POINTER TO RECORD
 		kind*, op*, basicType* : SIGNED32;
-		intValue* : HUGEINT;
+		intValue* : SIGNED64;
 		strValue* : Strings.String;
 		setValue* : Set;
 		a*, b* : Expression;
@@ -515,7 +515,7 @@ BEGIN
 	RETURN no(TypeDecl).type
 END FindType;
 
-PROCEDURE PrimitiveExpressionInt*(value : HUGEINT) : Expression;
+PROCEDURE PrimitiveExpressionInt*(value : SIGNED64) : Expression;
 VAR expression : Expression;
 BEGIN
 	NEW(expression);

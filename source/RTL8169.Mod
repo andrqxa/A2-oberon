@@ -104,8 +104,8 @@ TYPE
 
 			nofFreeTx: SIGNED32; (* number of free tx descriptors *)
 
-			nRxOverflow: HUGEINT;
-			nTxOverflow: HUGEINT;
+			nRxOverflow: SIGNED64;
+			nTxOverflow: SIGNED64;
 			nRxFrames, nTxFrames: SIGNED32;
 			nRxErrorFrames: SIGNED32;
 			nTxErrorFrames: SIGNED32;

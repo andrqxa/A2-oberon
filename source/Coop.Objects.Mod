@@ -31,7 +31,7 @@ CONST
 	haltUnbreakable* = 2223;
 
 TYPE
-	CpuCyclesArray* = ARRAY Machine.MaxCPU OF HUGEINT;
+	CpuCyclesArray* = ARRAY Machine.MaxCPU OF SIGNED64;
 
 	ProtectedObject = POINTER TO RECORD END;   (* protected object (10000) *)
 
@@ -348,12 +348,12 @@ BEGIN
 	END;
 END GetCpuCycles;
 
-PROCEDURE CurrentProcessTime*(): HUGEINT;
+PROCEDURE CurrentProcessTime*(): SIGNED64;
 BEGIN
 	RETURN Activities.GetProcessTime();
 END CurrentProcessTime;
 
-PROCEDURE TimerFrequency*(): HUGEINT;
+PROCEDURE TimerFrequency*(): SIGNED64;
 BEGIN
 	RETURN TimerModule.GetFrequency();
 END TimerFrequency;

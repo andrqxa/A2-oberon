@@ -8,7 +8,7 @@ CONST
 TYPE
 	Generator* = OBJECT
 	VAR
-		x, a: HUGEINT; c: SIGNED32;
+		x, a: SIGNED64; c: SIGNED32;
 
 		PROCEDURE & Init*;
 		BEGIN
@@ -35,7 +35,7 @@ TYPE
 			RETURN SHORT( x DIV 10000H )
 		END Mrand48;
 
-		PROCEDURE Xrand48*(): HUGEINT;		(* [0 .. 2^48-1] *)
+		PROCEDURE Xrand48*(): SIGNED64;		(* [0 .. 2^48-1] *)
 		BEGIN
 			x := (x*a + c) MOD m;
 			RETURN x
@@ -48,15 +48,15 @@ TYPE
 
 
 
-		PROCEDURE Seed48*( seed: HUGEINT ): HUGEINT;
-		VAR lastx: HUGEINT;
+		PROCEDURE Seed48*( seed: SIGNED64 ): SIGNED64;
+		VAR lastx: SIGNED64;
 		BEGIN
 			lastx := x;
 			x := seed MOD m;  a := A;
 			RETURN lastx
 		END Seed48;
 
-		PROCEDURE Lcong48*( par: ARRAY OF HUGEINT );
+		PROCEDURE Lcong48*( par: ARRAY OF SIGNED64 );
 		BEGIN
 			x := par[0] MOD m;
 			a := par[1] MOD m;
@@ -107,7 +107,7 @@ TYPE
 			Next;  RETURN x[2]*B + x[1]
 		END Mrand48;
 
-		PROCEDURE Xrand48*(): HUGEINT;		(* [0 .. 2^48-1] *)
+		PROCEDURE Xrand48*(): SIGNED64;		(* [0 .. 2^48-1] *)
 		BEGIN
 			Next;  RETURN ASH( LONG( x[2] ), 32 ) + x[1]*B + x[0]
 		END Xrand48;

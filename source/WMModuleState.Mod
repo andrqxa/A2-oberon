@@ -361,7 +361,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 								IF lval = 0 THEN w.String("NIL")
 								ELSE WriteProc(Modules.ThisModuleByAdr(lval), lval, -1, tmp, tmp1, tmp2, w)
 								END
-							|16:	(* HUGEINT *)
+							|16:	(* SIGNED64 *)
 								w.Hex( SYSTEM.GET32(adr+4), 0);
 								w.Hex( SYSTEM.GET32(adr), 0)
 							|22:	(* RECORD *)

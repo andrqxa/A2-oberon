@@ -68,7 +68,7 @@ CONST
 
 	(* Default parameters *)
 	IntfMacAddr				= "00:0A:35:00:01:03";		(** Board MAC address *)
-	Guid						= HUGEINT(0);
+	Guid						= SIGNED64(0);
 	CommandPort				= 5999;						(** Port used for UDP command channel *)
 	InitializationScript			= 'init.txt';					(** Name of the initialization script *)
 	AutoScript					= 'auto.txt';				(** Name of the automatic execution script *)

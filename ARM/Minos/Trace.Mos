@@ -114,11 +114,11 @@ BEGIN
 	REPEAT DEC (i); Char (a[i]) UNTIL i = 0
 END Int;
 
-PROCEDURE HInt*( x : HUGEINT; w: SIGNED32 );
-VAR i: SIZE; x0: HUGEINT; a: ARRAY 32 OF CHAR;
+PROCEDURE HInt*( x : SIGNED64; w: SIGNED32 );
+VAR i: SIZE; x0: SIGNED64; a: ARRAY 32 OF CHAR;
 BEGIN
 	IF x < 0 THEN
-		IF x = MIN (HUGEINT) THEN
+		IF x = MIN (SIGNED64) THEN
 			DEC (w, 20);
 			WHILE w > 0 DO Char (' '); DEC (w) END;
 			String ("-tm");

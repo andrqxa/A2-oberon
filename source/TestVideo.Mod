@@ -560,16 +560,16 @@ BEGIN
 	 nofPoints := nofLines;
 END ExtractLines;
 
-PROCEDURE GetTimer():HUGEINT;
-VAR t : HUGEINT;
+PROCEDURE GetTimer():SIGNED64;
+VAR t : SIGNED64;
 	res : Kernel32.BOOL;
 BEGIN
 	res := Kernel32.QueryPerformanceCounter(SYSTEM.VAL(Kernel32.LargeInteger, t));
 	RETURN t;
 END GetTimer;
 
-PROCEDURE GetFreq():HUGEINT;
-VAR t : HUGEINT;
+PROCEDURE GetFreq():SIGNED64;
+VAR t : SIGNED64;
 	res : Kernel32.BOOL;
 BEGIN
 	res := Kernel32.QueryPerformanceFrequency(SYSTEM.VAL(Kernel32.LargeInteger, t));
@@ -581,7 +581,7 @@ VAR nof, length, i, j : SIGNED32; w, h: SIZE; res: WORD;
 	path : ARRAY 1024*4 OF Point;
 	poly : ARRAY 40 OF Point;
 	nofPoints : SIGNED32;
-	t0, t1, labeltime,  tracetime, linetime : HUGEINT;
+	t0, t1, labeltime,  tracetime, linetime : SIGNED64;
 	f  : LONGREAL;
 	gp : ARRAY 50 OF WMGraphics.Point2d;
 	PROCEDURE Sqr(x: LONGREAL):LONGREAL;

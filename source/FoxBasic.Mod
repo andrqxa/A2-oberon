@@ -680,7 +680,7 @@ TYPE
 		BEGIN  w.RawLInt(x)
 		END RawLInt;
 
-		PROCEDURE RawHInt*( x: HUGEINT );
+		PROCEDURE RawHInt*( x: SIGNED64 );
 		BEGIN  w.RawHInt(x)
 		END RawHInt;
 
@@ -716,7 +716,7 @@ TYPE
 		BEGIN  w.RawString(x)
 		END RawString;
 
-		PROCEDURE RawNum*( x: HUGEINT );
+		PROCEDURE RawNum*( x: SIGNED64 );
 		BEGIN  w.RawNum(x)
 		END RawNum;
 
@@ -728,7 +728,7 @@ TYPE
 		BEGIN Indent; w.String(x)
 		END String;
 
-		PROCEDURE Int*( x: HUGEINT; wd: SIZE );
+		PROCEDURE Int*( x: SIGNED64; wd: SIZE );
 		BEGIN Indent; w.Int(x,wd)
 		END Int;
 
@@ -736,7 +736,7 @@ TYPE
 		BEGIN Indent; w.Set(s)
 		END Set;
 
-		PROCEDURE Hex*(x: HUGEINT; wd: SIZE );
+		PROCEDURE Hex*(x: SIGNED64; wd: SIZE );
 		BEGIN Indent; w.Hex(x,wd)
 		END Hex;
 
@@ -1004,7 +1004,7 @@ VAR
 		SetErrorMessage(n,err);
 	END SetErrorExpected;
 
-	PROCEDURE AppendNumber*(VAR s: ARRAY OF CHAR; num: HUGEINT);
+	PROCEDURE AppendNumber*(VAR s: ARRAY OF CHAR; num: SIGNED64);
 	VAR nums: ARRAY 32 OF CHAR;
 	BEGIN
 		Strings.IntToStr(num,nums);

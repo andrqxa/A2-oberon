@@ -1323,7 +1323,7 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 									c := PCT.NewIntConst(i, PCT.Int32)
 			| SFtypInt64:	R.RawLReal(lr);
 									IF TraceImport THEN PCM.LogWLn; PCM.LogWStr("InConst / HInt / ") END;
-									c := PCT.NewInt64Const(SYSTEM.VAL(HUGEINT, lr))
+									c := PCT.NewInt64Const(SYSTEM.VAL(SIGNED64, lr))
 			| SFtypSet:	R.RawNum(SYSTEM.VAL(SIGNED32, set));
 									IF TraceImport THEN PCM.LogWLn; PCM.LogWStr("InConst / Set / "); PCM.LogWHex(SYSTEM.VAL(SIGNED32, set)) END;
 									c := PCT.NewSetConst(set)
@@ -1906,7 +1906,7 @@ END PCOM.
 	26.04.01	prk	separation of RECORD and OBJECT in the parser
 	02.04.01	prk	ExtendModArray, ExtendStructArray exported
 	30.03.01	prk	object file version changed to 01X
-	25.03.01	prk	limited HUGEINT implementation (as abstract type)
+	25.03.01	prk	limited SIGNED64 implementation (as abstract type)
 	22.02.01	prk	self reference for methods: use pointer-based self if possible (i.e. if object is dynamic and method
 								definitions in super-class is not record-based).
 *)

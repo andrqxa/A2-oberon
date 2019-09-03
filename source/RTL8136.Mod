@@ -359,16 +359,16 @@ TYPE
 
 	(* Statistics counters as specified by Realtek *)
 	TallyCounters = RECORD
-		txPackets: HUGEINT;
-		rxPacktes: HUGEINT;
-		txErrors: HUGEINT;
+		txPackets: SIGNED64;
+		rxPacktes: SIGNED64;
+		txErrors: SIGNED64;
 		rxErrors: SIGNED32;
 		rxMissed: SIGNED16;
 		alignErrors: SIGNED16;
 		txOneCollision: SIGNED32;
 		txMultiCollision: SIGNED32;
-		rxUnicast: HUGEINT;
-		rxBroadcast: HUGEINT;
+		rxUnicast: SIGNED64;
+		rxBroadcast: SIGNED64;
 		rxMulticast: SIGNED32;
 		txAborted: SIGNED16;
 		txUnderrun: SIGNED16;
@@ -416,8 +416,8 @@ TYPE
 
 		nofFreeTx: SIGNED32; (* number of free tx descriptors *)
 
-		nRxOverflow: HUGEINT;
-		nTxOverflow: HUGEINT;
+		nRxOverflow: SIGNED64;
+		nTxOverflow: SIGNED64;
 		nRxFrames, nTxFrames: SIGNED32;
 		nRxErrorFrames: SIGNED32;
 		nTxErrorFrames: SIGNED32;
@@ -1772,15 +1772,15 @@ TYPE
 
 				ASSERT(i < 10);
 
-				IF len = 1 THEN mask := S.VAL(SET,LSH(HUGEINT(0xFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
-				ELSIF len = 2 THEN mask := S.VAL(SET,LSH(HUGEINT(0xFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
-				ELSIF len = 3 THEN mask := S.VAL(SET,LSH(HUGEINT(0xFFFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
-				ELSE mask := S.VAL(SET,LSH(HUGEINT(0xFFFFFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
+				IF len = 1 THEN mask := S.VAL(SET,LSH(SIGNED64(0xFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
+				ELSIF len = 2 THEN mask := S.VAL(SET,LSH(SIGNED64(0xFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
+				ELSIF len = 3 THEN mask := S.VAL(SET,LSH(SIGNED64(0xFFFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
+				ELSE mask := S.VAL(SET,LSH(SIGNED64(0xFFFFFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
 				END;
 
 				value1 := Read32(ERIDR) * mask;
-				value1 := S.VAL(SET,LSH(S.VAL(HUGEINT,value1),-val_shift*8));
-				value1 := S.VAL(SET,LSH(S.VAL(HUGEINT,value1),shift*8));
+				value1 := S.VAL(SET,LSH(S.VAL(SIGNED64,value1),-val_shift*8));
+				value1 := S.VAL(SET,LSH(S.VAL(SIGNED64,value1),shift*8));
 				value2 := value2 + value1;
 
 				IF len <= 4 - val_shift THEN
@@ -1810,14 +1810,14 @@ TYPE
 				val_shift := addr MOD ERIAR_Addr_Align;
 				addr := S.VAL(SIGNED32,S.VAL(SET,addr)-S.VAL(SET,0x3));
 
-				IF len = 1 THEN mask := S.VAL(SET,LSH(HUGEINT(0xFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
-				ELSIF len = 2 THEN mask := S.VAL(SET,LSH(HUGEINT(0xFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
-				ELSIF len = 3 THEN mask := S.VAL(SET,LSH(HUGEINT(0xFFFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
-				ELSE mask := S.VAL(SET,LSH(HUGEINT(0xFFFFFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
+				IF len = 1 THEN mask := S.VAL(SET,LSH(SIGNED64(0xFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
+				ELSIF len = 2 THEN mask := S.VAL(SET,LSH(SIGNED64(0xFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
+				ELSIF len = 3 THEN mask := S.VAL(SET,LSH(SIGNED64(0xFFFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
+				ELSE mask := S.VAL(SET,LSH(SIGNED64(0xFFFFFFFF),val_shift * 8)) * S.VAL(SET,0xFFFFFFFF);
 				END;
 
-  				value1 := S.VAL(SET,LSH(S.VAL(HUGEINT,value),val_shift*8));
-				value1 := S.VAL(SET,LSH(S.VAL(HUGEINT,value1),-shift*8));
+  				value1 := S.VAL(SET,LSH(S.VAL(SIGNED64,value),val_shift*8));
+				value1 := S.VAL(SET,LSH(S.VAL(SIGNED64,value1),-shift*8));
 
 				value1 := value1 + eri_read(addr,4,type) - mask;
 

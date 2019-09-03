@@ -63,7 +63,7 @@ END TestHexConversion;
 PROCEDURE TestNegativeHexConversion*(context : Commands.Context);
 VAR i : SIGNED32;
 
-	PROCEDURE Test(number : HUGEINT);
+	PROCEDURE Test(number : SIGNED64);
 	VAR string, signedString : ARRAY 16 OF CHAR; val, idx: SIGNED32; res: WORD;
 	BEGIN
 		Strings.IntToHexStr(number, 8, string);

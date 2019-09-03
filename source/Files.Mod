@@ -1226,7 +1226,7 @@ BEGIN
 	r.file.ReadBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
 END ReadLInt;
 
-PROCEDURE ReadHInt*(VAR r: Rider; VAR x: HUGEINT);
+PROCEDURE ReadHInt*(VAR r: Rider; VAR x: SIGNED64);
 BEGIN
 	r.file.ReadBytes(r, SYSTEM.VAL(Bytes8, x), 0, 8)
 END ReadHInt;
@@ -1312,7 +1312,7 @@ BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
 END WriteLInt;
 
-PROCEDURE WriteHInt*(VAR r: Rider; x: HUGEINT);
+PROCEDURE WriteHInt*(VAR r: Rider; x: SIGNED64);
 BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes8, x), 0, 8)
 END WriteHInt;
@@ -1348,7 +1348,7 @@ END WriteString;
 
 (* Writes a number in a compressed format. *)
 
-PROCEDURE WriteNum*(VAR r: Rider; x: HUGEINT);
+PROCEDURE WriteNum*(VAR r: Rider; x: SIGNED64);
 VAR f: File;
 BEGIN
 	f := r.file;

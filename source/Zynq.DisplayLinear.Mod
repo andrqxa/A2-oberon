@@ -169,7 +169,7 @@ VAR
 	PROCEDURE SetupClocks;
 	VAR
 		res: SIGNED32;
-		freq: HUGEINT;
+		freq: SIGNED64;
 	BEGIN
 		(*
 			Setup DMA frequency

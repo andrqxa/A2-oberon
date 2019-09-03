@@ -13,7 +13,7 @@ CONST
 VAR
 	Char *: PROCEDURE (c: CHAR);
 	String *: PROCEDURE (CONST str: ARRAY OF CHAR);
-	Int *: PROCEDURE (i: HUGEINT; w: SIGNED32);
+	Int *: PROCEDURE (i: SIGNED64; w: SIGNED32);
 	Hex *: PROCEDURE (i: SIGNED32; w: SIGNED32);
 	Address *: PROCEDURE (a: ADDRESS);
 	Set *: PROCEDURE (s: SET);
@@ -26,7 +26,7 @@ VAR
 	handlers: ARRAY MaxHandlers OF RECORD irq: SIGNED32; handle: PROCEDURE END;
 
 TYPE
-	Time * = HUGEINT;
+	Time * = SIGNED64;
 
 	PROCEDURE InstallHandler * (handler: PROCEDURE; irq: SIGNED32);
 	VAR

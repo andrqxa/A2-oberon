@@ -72,7 +72,7 @@ TYPE
 		mtx, enter: ADDRESS;
 	END;
 
-	CpuCyclesArray* = ARRAY Machine.MaxCPU OF HUGEINT;
+	CpuCyclesArray* = ARRAY Machine.MaxCPU OF SIGNED64;
 
 	ProtectedObject = POINTER TO RECORD END;
 
@@ -220,7 +220,7 @@ TYPE
 		state-			: Machine.State;
 		state0	: ARRAY 2048 OF CHAR;		(* thread state at body start, used for restart after trap *)
 		context: ANY; (* commands context *)
-		lastThreadTimes: HUGEINT;
+		lastThreadTimes: SIGNED64;
 		gcContext: GCContext;
 
 		PROCEDURE SetMode (mode: WORD);
@@ -658,7 +658,7 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 
 
 	PROCEDURE GetCpuCycles*( process : Process; VAR cpuCycles: CpuCyclesArray; all: BOOLEAN );
-	VAR temp : HUGEINT;
+	VAR temp : SIGNED64;
 	BEGIN
 		ASSERT(process # NIL);
 		cpuCycles[0] := Machine.GetTimer();
@@ -891,12 +891,12 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 		LOOP Sleep( 100 ) END
 	END GCLoop;
 
-	PROCEDURE CurrentProcessTime*(): HUGEINT;
+	PROCEDURE CurrentProcessTime*(): SIGNED64;
 	BEGIN
 		RETURN  Machine.GetTimer()
 	END CurrentProcessTime;
 
-	PROCEDURE TimerFrequency*(): HUGEINT;
+	PROCEDURE TimerFrequency*(): SIGNED64;
 	BEGIN
 		RETURN Machine.mhz * 1000000
 	END TimerFrequency;

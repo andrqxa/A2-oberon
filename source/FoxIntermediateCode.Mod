@@ -88,7 +88,7 @@ TYPE
 		register-: SIZE; (* (virtual) register number, equals None if no register *)
 		registerClass-: RegisterClass; (* normal register vs. special registers such as parameter registers *)
 		offset-: SIZE; (* offset on register or immediate symbol, in units *)
-		intValue-: HUGEINT; (* integer value, if mode = ModeImmediate and type.form IN Integer or ModeNumber *)
+		intValue-: SIGNED64; (* integer value, if mode = ModeImmediate and type.form IN Integer or ModeNumber *)
 		floatValue-: LONGREAL; (* real value, if mode = ModeImmediate and type.form = Float *)
 
 		symbol-: ObjectFile.Identifier; (* referenced symbol, only valid for mode = ModeImmediate or mode = ModeMemory *)
@@ -939,7 +939,7 @@ TYPE
 	END SetScope;
 
 
-	PROCEDURE SetIntValue*(VAR op: Operand; intValue: HUGEINT);
+	PROCEDURE SetIntValue*(VAR op: Operand; intValue: SIGNED64);
 	BEGIN op.intValue := intValue
 	END SetIntValue;
 
@@ -986,7 +986,7 @@ TYPE
 	BEGIN InitMemory(op,type,base,offset); RETURN op
 	END Memory;
 
-	PROCEDURE IsConstantInteger*(CONST op: Operand; VAR value: HUGEINT): BOOLEAN;
+	PROCEDURE IsConstantInteger*(CONST op: Operand; VAR value: SIGNED64): BOOLEAN;
 	BEGIN
 		IF (op.mode = ModeImmediate) & (op.type.form IN Integer) & (op.symbol.name = "") THEN
 			value := op.intValue;
@@ -996,13 +996,13 @@ TYPE
 		END;
 	END IsConstantInteger;
 
-	PROCEDURE InitImmediate*(VAR op: Operand; type: Type; value: HUGEINT);
+	PROCEDURE InitImmediate*(VAR op: Operand; type: Type; value: SIGNED64);
 	BEGIN
 		Assert(type.form IN Integer,"operand type does not match value type");
 		InitOperand(op); op.mode := ModeImmediate; op.type := type; op.intValue := value;
 	END InitImmediate;
 
-	PROCEDURE Immediate*(type: Type; value: HUGEINT): Operand;
+	PROCEDURE Immediate*(type: Type; value: SIGNED64): Operand;
 	VAR op: Operand;
 	BEGIN InitImmediate(op,type,value); RETURN op
 	END Immediate;
@@ -1018,11 +1018,11 @@ TYPE
 	BEGIN InitFloatImmediate(op,type,value); RETURN op
 	END FloatImmediate;
 
-	PROCEDURE InitNumber*(VAR op: Operand; value: HUGEINT);
+	PROCEDURE InitNumber*(VAR op: Operand; value: SIGNED64);
 	BEGIN InitOperand(op); op.mode := ModeNumber; op.intValue := value;
 	END InitNumber;
 
-	PROCEDURE Number*(value: HUGEINT): Operand;
+	PROCEDURE Number*(value: SIGNED64): Operand;
 	VAR op: Operand;
 	BEGIN InitNumber(op,value); RETURN op
 	END Number;

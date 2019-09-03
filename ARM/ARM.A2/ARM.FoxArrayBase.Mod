@@ -11,7 +11,7 @@ TYPE
 	GenericUnaryAALoopS = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED8): SIGNED8 );
 	GenericUnaryAALoopI = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED16): SIGNED16 );
 	GenericUnaryAALoopL = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED32): SIGNED32 );
-	GenericUnaryAALoopH = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: HUGEINT): HUGEINT );
+	GenericUnaryAALoopH = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED64): SIGNED64 );
 	GenericUnaryAALoopR = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: REAL): REAL );
 	GenericUnaryAALoopX = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: LONGREAL): LONGREAL );
 	GenericUnaryAALoopZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX): COMPLEX );
@@ -670,8 +670,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ApplyGenericUnaryAAOpL;
 	
-	(** apply unary operator to array:  array HUGEINT -> array HUGEINT *)
-	PROCEDURE ApplyGenericUnaryAAOpH( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopH; op: PROCEDURE(x: HUGEINT): HUGEINT );
+	(** apply unary operator to array:  array SIGNED64 -> array SIGNED64 *)
+	PROCEDURE ApplyGenericUnaryAAOpH( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopH; op: PROCEDURE(x: SIGNED64): SIGNED64 );
 	VAR loopd, looplen, loopli, loopdi: SIZE;  p: ANY;  glen: SIZE;
 		origdest: SIZE;  modes: SET;
 	VAR dest, left: ADDRESS;  dim: SIZE;
@@ -2124,9 +2124,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END GenericLoopL;
 
-(** HUGEINT *)
-	PROCEDURE GenericLoopH( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: HUGEINT): HUGEINT );
-	VAR lval: HUGEINT;
+(** SIGNED64 *)
+	PROCEDURE GenericLoopH( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED64): SIGNED64 );
+	VAR lval: SIGNED64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, op(lval) );  INC( ladr, linc );  INC( dadr, dinc );
@@ -10219,9 +10219,9 @@ TYPE
 		RETURN RESULT;
 	END "ALL";
 	
-	OPERATOR "ALL"*(CONST x: ARRAY [?] OF HUGEINT; op: PROCEDURE(x: HUGEINT): HUGEINT): ARRAY[?] OF HUGEINT; (*should also accept operator ?*)
+	OPERATOR "ALL"*(CONST x: ARRAY [?] OF SIGNED64; op: PROCEDURE(x: SIGNED64): SIGNED64): ARRAY[?] OF SIGNED64; (*should also accept operator ?*)
 	BEGIN
-		ApplyGenericUnaryAAOpH(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(HUGEINT),GenericLoopH,op);
+		ApplyGenericUnaryAAOpH(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(SIGNED64),GenericLoopH,op);
 		RETURN RESULT;
 	END "ALL";
 

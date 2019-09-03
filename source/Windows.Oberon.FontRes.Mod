@@ -407,7 +407,7 @@ BEGIN
 	END
 END Convert;
 
-PROCEDURE SetUnsigned(VAR dest: SIGNED32; src: HUGEINT);
+PROCEDURE SetUnsigned(VAR dest: SIGNED32; src: SIGNED64);
 BEGIN
 	dest := SHORT(src);
 END SetUnsigned;

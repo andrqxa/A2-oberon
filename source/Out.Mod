@@ -29,12 +29,12 @@ BEGIN
 	Commands.GetContext().out.Set(s);
 END Set;
 
-PROCEDURE Int*(i: HUGEINT; n = 1: WORD);
+PROCEDURE Int*(i: SIGNED64; n = 1: WORD);
 BEGIN
 	Commands.GetContext().out.Int(i,n);
 END Int;
 
-PROCEDURE Hex*(i: HUGEINT; n = -16: WORD);
+PROCEDURE Hex*(i: SIGNED64; n = -16: WORD);
 BEGIN
 	Commands.GetContext().out.Hex(i,n);
 END Hex;

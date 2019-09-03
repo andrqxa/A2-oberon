@@ -554,7 +554,7 @@ TYPE
 		END
 	END OctStrToInt;
 
-	PROCEDURE IntToOctStr(val: HUGEINT; VAR str: ARRAY OF CHAR);
+	PROCEDURE IntToOctStr(val: SIGNED64; VAR str: ARRAY OF CHAR);
 		VAR i: SIZE;
 	BEGIN
 		i := LEN(str)-1; str[i] := 0X;

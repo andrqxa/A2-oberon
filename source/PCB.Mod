@@ -3053,7 +3053,7 @@ END RealtimeCompatible;
 		 NEW(con, pos, PCT.NewIntConst(i, type));  RETURN con
 	END NewIntValue;
 
-	PROCEDURE NewLongIntValue*(pos: SIGNED32; i: HUGEINT): Const;
+	PROCEDURE NewLongIntValue*(pos: SIGNED32; i: SIGNED64): Const;
 		VAR  con: Const;
 	BEGIN
 		 NEW(con, pos, PCT.NewInt64Const(i));  RETURN con

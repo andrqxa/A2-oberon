@@ -10,7 +10,7 @@ TYPE
 	GenericUnaryAALoopS = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: SIGNED8): SIGNED8 );
 	GenericUnaryAALoopI = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: SIGNED16): SIGNED16 );
 	GenericUnaryAALoopL = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: SIGNED32): SIGNED32 );
-	GenericUnaryAALoopH = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: HUGEINT): HUGEINT );
+	GenericUnaryAALoopH = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: SIGNED64): SIGNED64 );
 	GenericUnaryAALoopR = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: REAL): REAL );
 	GenericUnaryAALoopX = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: LONGREAL): LONGREAL );
 	GenericUnaryAALoopZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: COMPLEX): COMPLEX );
@@ -643,8 +643,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ApplyGenericUnaryAAOpL;
 
-	(** apply unary operator to array:  array HUGEINT -> array HUGEINT *)
-	PROCEDURE ApplyGenericUnaryAAOpH(VAR dest: UnsafeArrayT; CONST left: UnsafeArrayT;  elementSize: SIZE; Loop: GenericUnaryAALoopH; op: PROCEDURE {DELEGATE}(x: HUGEINT): HUGEINT );
+	(** apply unary operator to array:  array SIGNED64 -> array SIGNED64 *)
+	PROCEDURE ApplyGenericUnaryAAOpH(VAR dest: UnsafeArrayT; CONST left: UnsafeArrayT;  elementSize: SIZE; Loop: GenericUnaryAALoopH; op: PROCEDURE {DELEGATE}(x: SIGNED64): SIGNED64 );
 		VAR loopd, looplen, loopli, loopdi: SIZE;  p: ANY;  glen: SIZE;
 			origdest: ADDRESS;  modes: SET;
 			dim: SIZE;
@@ -2034,9 +2034,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END GenericLoopL;
 
-(** HUGEINT *)
-	PROCEDURE GenericLoopH( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE}(x: HUGEINT): HUGEINT );
-	VAR lval: HUGEINT;
+(** SIGNED64 *)
+	PROCEDURE GenericLoopH( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE}(x: SIGNED64): SIGNED64 );
+	VAR lval: SIGNED64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, op(lval) );  INC( ladr, linc );  INC( dadr, dinc );
@@ -2294,9 +2294,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "+";
 
-(** HUGEINT *)
+(** SIGNED64 *)
 	PROCEDURE AddAHAHLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: HUGEINT;
+	VAR lval, rval: SIGNED64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval + rval );
@@ -2304,10 +2304,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddAHAHLoop;
 
-	OPERATOR "+"*(CONST left,right: ARRAY [?] OF HUGEINT): ARRAY {UNSAFE} [?] OF HUGEINT;
+	OPERATOR "+"*(CONST left,right: ARRAY [?] OF SIGNED64): ARRAY {UNSAFE} [?] OF SIGNED64;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
-										SIZEOF( HUGEINT ), AddAHAHLoop);
+										SIZEOF( SIGNED64 ), AddAHAHLoop);
 		RETURN RESULT
 	END "+";
 
@@ -2500,9 +2500,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "+";
 
-(** HUGEINT *)
+(** SIGNED64 *)
 	PROCEDURE AddAHSHLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: HUGEINT;
+	VAR lval, rval: SIGNED64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2511,16 +2511,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddAHSHLoop;
 
-	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF HUGEINT; right: HUGEINT ): ARRAY {UNSAFE} [ ? ] OF HUGEINT;
+	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF SIGNED64; right: SIGNED64 ): ARRAY {UNSAFE} [ ? ] OF SIGNED64;
 	BEGIN
-		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ), SIZEOF( HUGEINT ),
+		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ), SIZEOF( SIGNED64 ),
 										AddAHSHLoop );
 		RETURN RESULT
 	END "+";
 
-	OPERATOR "+"*(left: HUGEINT; CONST right: ARRAY [ ? ] OF HUGEINT): ARRAY {UNSAFE} [ ? ] OF HUGEINT;
+	OPERATOR "+"*(left: SIGNED64; CONST right: ARRAY [ ? ] OF SIGNED64): ARRAY {UNSAFE} [ ? ] OF SIGNED64;
 	BEGIN
-		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ), SIZEOF( HUGEINT ),
+		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ), SIZEOF( SIGNED64 ),
 										AddAHSHLoop );
 		RETURN RESULT
 	END "+";
@@ -8420,9 +8420,9 @@ TYPE
 		ApplyUnarySAOp(dest, ADDRESSOF( right ), AssignSYAYLoop );
 	END ":=";
 
-(** HUGEINT *)
+(** SIGNED64 *)
 	PROCEDURE AssignSHAHLoop( ladr, dadr: ADDRESS; dinc, len: SIZE );
-	VAR dval: POINTER{UNSAFE,UNTRACED} TO RECORD val: HUGEINT END;	lval: HUGEINT;
+	VAR dval: POINTER{UNSAFE,UNTRACED} TO RECORD val: SIGNED64 END;	lval: SIGNED64;
 	BEGIN
 		dval := dadr;
 		SYSTEM.GET( ladr, lval );
@@ -8433,7 +8433,7 @@ TYPE
 		END;
 	END AssignSHAHLoop;
 
-	OPERATOR ":="*(VAR dest: ARRAY {UNSAFE} [?] OF HUGEINT; right: HUGEINT);
+	OPERATOR ":="*(VAR dest: ARRAY {UNSAFE} [?] OF SIGNED64; right: SIGNED64);
 	BEGIN
 		ApplyUnarySAOp(dest, ADDRESSOF( right ), AssignSHAHLoop );
 	END ":=";
@@ -10586,9 +10586,9 @@ TYPE
 		RETURN RESULT;
 	END "ALL";
 
-	OPERATOR "ALL"*(CONST x: ARRAY {UNSAFE} [?] OF HUGEINT; op: PROCEDURE {DELEGATE}(x: HUGEINT): HUGEINT): ARRAY {UNSAFE} [?] OF HUGEINT; (*should also accept operator ?*)
+	OPERATOR "ALL"*(CONST x: ARRAY {UNSAFE} [?] OF SIGNED64; op: PROCEDURE {DELEGATE}(x: SIGNED64): SIGNED64): ARRAY {UNSAFE} [?] OF SIGNED64; (*should also accept operator ?*)
 	BEGIN
-		ApplyGenericUnaryAAOpH(RESULT,x,SIZEOF(HUGEINT),GenericLoopH,op);
+		ApplyGenericUnaryAAOpH(RESULT,x,SIZEOF(SIGNED64),GenericLoopH,op);
 		RETURN RESULT;
 	END "ALL";
 
@@ -10637,7 +10637,7 @@ TYPE
 		RETURN RESULT;
 	END "ALL";
 
-	OPERATOR "ALL"*(CONST x: ARRAY [?] OF HUGEINT; map: PROCEDURE( ladr, dadr: ADDRESS; linc, dinc, len: SIZE)): ARRAY {UNSAFE}[?]  OF HUGEINT;
+	OPERATOR "ALL"*(CONST x: ARRAY [?] OF SIGNED64; map: PROCEDURE( ladr, dadr: ADDRESS; linc, dinc, len: SIZE)): ARRAY {UNSAFE}[?]  OF SIGNED64;
 	VAR elementSize: SIZE;
 	BEGIN
 		ApplyUnaryAAOp(RESULT,x,GetSize(x),map);

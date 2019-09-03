@@ -1726,12 +1726,12 @@ TYPE
 
 	TYPE MMXConsts = POINTER TO MMXConstsDesc;
 	TYPE MMXConstsDesc = RECORD
-		mmwMultY, mmwMultUG, mmwMultUB, mmwMultVR, mmwMultVG: HUGEINT;
+		mmwMultY, mmwMultUG, mmwMultUB, mmwMultVR, mmwMultVG: SIGNED64;
 
 		(* various masks and other constants *)
-		mmb10, mmw0080, mmw00ff, mmwCutRed, mmwCutGreen, mmwCutBlue: HUGEINT;
+		mmb10, mmw0080, mmw00ff, mmwCutRed, mmwCutGreen, mmwCutBlue: SIGNED64;
 
-		mask5, mask6, maskBlue: HUGEINT;
+		mask5, mask6, maskBlue: SIGNED64;
 	END;
 
 	(* Convert colorspace (copied and slightly edited from the DivXPlayer) *)

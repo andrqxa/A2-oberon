@@ -14,7 +14,7 @@ CONST
 
 TYPE
 	DISK_GEOMETRY = RECORD
-		Cylinders: HUGEINT;
+		Cylinders: SIGNED64;
 		MediaType: SIGNED32;
 		TracksPerCylinder: SIGNED32;
 		SectorsPerTrack: SIGNED32;
@@ -24,8 +24,8 @@ TYPE
 	DISK_EXTENT = RECORD   (* immer auf größten Member aligniert *)
 		DiskNumber: SIGNED32;
 		padding: SIGNED32;
-		StartingOffset: HUGEINT;
-		ExtentLength: HUGEINT;
+		StartingOffset: SIGNED64;
+		ExtentLength: SIGNED64;
 	END;
 
 	VOLUME_DISK_EXTENTS = RECORD    (* immer auf größten Member aligniert: hugeint *)
@@ -58,7 +58,7 @@ TYPE
 		END Finish;
 
 		PROCEDURE Transfer*( op, block, num: SIGNED32;  VAR data: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD );
-		VAR bool, n,err: SIGNED32;  pos: HUGEINT;  poslow, poshigh: SIGNED32;  large: Kernel32.LargeInteger;
+		VAR bool, n,err: SIGNED32;  pos: SIGNED64;  poslow, poshigh: SIGNED32;  large: Kernel32.LargeInteger;
 		BEGIN {EXCLUSIVE}
 			IF (block < 0) OR (num < 1) OR (block + num > size) THEN res := BlockNumberInvalid;  RETURN;  END;
 

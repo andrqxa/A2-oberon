@@ -1469,31 +1469,31 @@ TYPE
 		RETURN level
 	END Level;
 
-	PROCEDURE ConvertSigned*(this: HUGEINT; bits: SIZE): HUGEINT;
+	PROCEDURE ConvertSigned*(this: SIGNED64; bits: SIZE): SIGNED64;
 	BEGIN
 		bits := 64-bits;
 		RETURN ASH (ASH (this, bits), -bits);
 	END ConvertSigned;
 
-	PROCEDURE ConvertUnsigned*(this: HUGEINT; bits: SIZE): HUGEINT;
+	PROCEDURE ConvertUnsigned*(this: SIGNED64; bits: SIZE): SIGNED64;
 	BEGIN
 		bits := 64-bits;
 		RETURN LSH (LSH (this, bits), -bits);
 	END ConvertUnsigned;
 
-	PROCEDURE MaxInteger*(system: System; type: SyntaxTree.BasicType; signed: BOOLEAN): HUGEINT;
+	PROCEDURE MaxInteger*(system: System; type: SyntaxTree.BasicType; signed: BOOLEAN): SIGNED64;
 	BEGIN
 		IF signed THEN
-			RETURN ASH (HUGEINT(1), system.SizeOf (type) - 1) - 1;
+			RETURN ASH (SIGNED64(1), system.SizeOf (type) - 1) - 1;
 		ELSE
-			RETURN LSH (HUGEINT(-1), system.SizeOf (type) - 64);
+			RETURN LSH (SIGNED64(-1), system.SizeOf (type) - 64);
 		END;
 	END MaxInteger;
 
-	PROCEDURE MinInteger*(system: System; type: SyntaxTree.BasicType; signed: BOOLEAN): HUGEINT;
+	PROCEDURE MinInteger*(system: System; type: SyntaxTree.BasicType; signed: BOOLEAN): SIGNED64;
 	BEGIN
 		IF signed THEN
-			RETURN -ASH (HUGEINT(1), system.SizeOf (type) - 1);
+			RETURN -ASH (SIGNED64(1), system.SizeOf (type) - 1);
 		ELSE
 			RETURN 0
 		END;
@@ -1516,21 +1516,21 @@ TYPE
 		RETURN this;
 	END ConvertSet;
 
-	PROCEDURE IsUnsignedInteger*(this: HUGEINT; sizeInBits: SIZE): BOOLEAN;
-	VAR m: HUGEINT;
+	PROCEDURE IsUnsignedInteger*(this: SIGNED64; sizeInBits: SIZE): BOOLEAN;
+	VAR m: SIGNED64;
 	BEGIN
-		m := ASH(HUGEINT(1),sizeInBits);
+		m := ASH(SIGNED64(1),sizeInBits);
 		RETURN (this >= 0) & (this < m)
 	END IsUnsignedInteger;
 
-	PROCEDURE IsSignedInteger*(this: HUGEINT; sizeInBits: SIZE): BOOLEAN;
-	VAR m: HUGEINT;
+	PROCEDURE IsSignedInteger*(this: SIGNED64; sizeInBits: SIZE): BOOLEAN;
+	VAR m: SIGNED64;
 	BEGIN
-			m := ASH(HUGEINT(1),sizeInBits-1);
+			m := ASH(SIGNED64(1),sizeInBits-1);
 			RETURN (this < m) & (-this <= m)
 	END IsSignedInteger;
 
-	PROCEDURE GetSignedIntegerType*(system: System; this: HUGEINT): SyntaxTree.IntegerType;
+	PROCEDURE GetSignedIntegerType*(system: System; this: SIGNED64): SyntaxTree.IntegerType;
 
 		(* code snippets for unsigned
 		ELSE
@@ -1538,12 +1538,12 @@ TYPE
 			RETURN (this >= 0) & (this < m)
 		END;
 
-		PROCEDURE Bits(x: HUGEINT): BOOLEAN;
+		PROCEDURE Bits(x: SIGNED64): BOOLEAN;
 		BEGIN
 			WHILE x > 0 DO INC(bits); x := x DIV 2 END;
 		END Bits;
 
-		IF a = MIN(HUGEINT) THEN (* -a does not work on lowest possible number, ~a+1 would overflow *)
+		IF a = MIN(SIGNED64) THEN (* -a does not work on lowest possible number, ~a+1 would overflow *)
 			RETURN Integer[64]
 		ELSIF a < 0 THEN
 			RETURN Integer[Bits(-a-1)+1]
@@ -1560,7 +1560,7 @@ TYPE
 		END;
 	END GetSignedIntegerType;
 
-	PROCEDURE GetIntegerType*(system: System; this: HUGEINT): SyntaxTree.IntegerType;
+	PROCEDURE GetIntegerType*(system: System; this: SIGNED64): SyntaxTree.IntegerType;
 	BEGIN
 		IF IsSignedInteger(this,8) THEN RETURN Signed8
 				(* system.SizeOf(...) = 8 : detect special backends with no sizes smaller than 32 *)
@@ -1573,7 +1573,7 @@ TYPE
 		END;
 	END GetIntegerType;
 
-	PROCEDURE NewIntegerValue*(system: System; position: Position; hugeint: HUGEINT): SyntaxTree.Value;
+	PROCEDURE NewIntegerValue*(system: System; position: Position; hugeint: SIGNED64): SyntaxTree.Value;
 	VAR value: SyntaxTree.IntegerValue;
 	BEGIN
 		value := SyntaxTree.NewIntegerValue(position,hugeint);

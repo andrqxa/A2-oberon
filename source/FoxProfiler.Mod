@@ -17,14 +17,14 @@ TYPE
 
 	ProcedureTime= RECORD
 		calls:SIGNED32;
-		time,brut: HUGEINT;
+		time,brut: SIGNED64;
 	END;
 	ProcedureTimes= ARRAY MaxProcedures OF ProcedureTime;
 
 	Process= OBJECT
 	VAR
 		stackPosition: SIGNED32;
-		startTime, correcture: ARRAY MaxStackSize OF HUGEINT; (* correcture: time taken for calls to other profiled procedures *)
+		startTime, correcture: ARRAY MaxStackSize OF SIGNED64; (* correcture: time taken for calls to other profiled procedures *)
 		module, procedure: ARRAY MaxStackSize OF SIGNED32;
 		modules: ARRAY MaxModules OF ProcedureTimes;
 
@@ -40,7 +40,7 @@ TYPE
 			END;
 		END Init;
 
-		PROCEDURE Enter(moduleId, procedureId: SIGNED32; enterTime: HUGEINT);
+		PROCEDURE Enter(moduleId, procedureId: SIGNED32; enterTime: SIGNED64);
 		BEGIN
 			IF TraceEnter THEN log.String("stack position "); log.Int(stackPosition,1); log.Ln; END;
 			IF (moduleId < MaxModules) & (procedureId < MaxProcedures) THEN
@@ -63,7 +63,7 @@ TYPE
 			INC(stackPosition);
 		END Enter;
 
-		PROCEDURE Exit(moduleId, procedureId: SIGNED32; enterTime: HUGEINT);
+		PROCEDURE Exit(moduleId, procedureId: SIGNED32; enterTime: SIGNED64);
 		BEGIN
 			DEC(stackPosition);
 			IF stackPosition < MaxStackSize THEN
@@ -175,13 +175,13 @@ VAR
 		COPY(name,modules[moduleId,procedureId]);
 	END AddProcedure;
 
-	PROCEDURE GetTimer(): HUGEINT;
+	PROCEDURE GetTimer(): SIGNED64;
 	BEGIN
 		RETURN Objects.CurrentProcessTime();
 	END GetTimer;
 
 	PROCEDURE EnterProcedure*(moduleId, procedureId: SIGNED32);
-	VAR time: HUGEINT; p: Process;
+	VAR time: SIGNED64; p: Process;
 	BEGIN
 		time:= GetTimer();
 		IF TraceEnter THEN log.String("Enter procedure: "); log.Int(moduleId,1); log.String(", "); log.Int(procedureId,1); log.Ln; log.Update END;
@@ -190,7 +190,7 @@ VAR
 	END EnterProcedure;
 
 	PROCEDURE ExitProcedure*(moduleId, procedureId: SIGNED32);
-	VAR time: HUGEINT; p: Process;
+	VAR time: SIGNED64; p: Process;
 	BEGIN
 		time:= GetTimer();
 		IF TraceEnter THEN log.String("Exit procedure: "); log.Int(moduleId,1); log.String(", "); log.Int(procedureId,1); log.Ln; log.Update END;
@@ -209,12 +209,12 @@ VAR
 	TYPE
 		Record=RECORD
 			name: ARRAY 256 OF CHAR;
-			calls:SIGNED32; time,brut: HUGEINT
+			calls:SIGNED32; time,brut: SIGNED64
 		END;
 		Records=POINTER TO ARRAY OF Record;
 
 	VAR
-		i,j,k: SIZE; records: Records; time,brut: HUGEINT; calls: SIGNED32; recordNumber: SIZE;
+		i,j,k: SIZE; records: Records; time,brut: SIGNED64; calls: SIGNED32; recordNumber: SIZE;
 		option: ARRAY 32 OF CHAR;
 		log: Streams.Writer;
 		all,done: BOOLEAN; sort: SIGNED32;

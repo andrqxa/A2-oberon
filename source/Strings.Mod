@@ -106,7 +106,7 @@ TYPE
 		RETURN str
 	END "+";
 
-	OPERATOR "+"*( a: String; b: HUGEINT ): String;
+	OPERATOR "+"*( a: String; b: SIGNED64 ): String;
 	VAR
 		digits: ARRAY 32 OF CHAR;
 		str: String;
@@ -394,7 +394,7 @@ BEGIN ConcatX (s, appendix, s)
 END AppendX;
 
 (** appends an integer number to a string *)
-PROCEDURE AppendInt*(VAR s: ARRAY OF CHAR; num: HUGEINT);
+PROCEDURE AppendInt*(VAR s: ARRAY OF CHAR; num: SIGNED64);
 VAR number: ARRAY 21 OF CHAR;
 BEGIN
 	IntToStr(num,number); Append(s,number);
@@ -569,11 +569,11 @@ BEGIN b := CAP(s[0]) = "T"
 END StrToBool;
 
 (** converts an integer value to a string *)
-PROCEDURE IntToStr*(x: HUGEINT; VAR s: ARRAY OF CHAR);
-VAR i, j: SIZE; x0: HUGEINT; digits: ARRAY 21 OF CHAR;
+PROCEDURE IntToStr*(x: SIGNED64; VAR s: ARRAY OF CHAR);
+VAR i, j: SIZE; x0: SIGNED64; digits: ARRAY 21 OF CHAR;
 BEGIN
 	IF x < 0 THEN
-		IF x = MIN( HUGEINT ) THEN
+		IF x = MIN( SIGNED64 ) THEN
 			COPY("-9223372036854775808", s) ;
 			RETURN;
 		ELSE
@@ -615,8 +615,8 @@ BEGIN
 END StrToInt;
 
 (** converts a string to a huge integer. Leading whitespace is ignored *)
-PROCEDURE StrToHInt*(CONST str: ARRAY OF CHAR; VAR val: HUGEINT);
-VAR i: SIZE; d: HUGEINT; neg: BOOLEAN;
+PROCEDURE StrToHInt*(CONST str: ARRAY OF CHAR; VAR val: SIGNED64);
+VAR i: SIZE; d: SIGNED64; neg: BOOLEAN;
 BEGIN
 	i := 0; WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
 	neg := FALSE;
@@ -627,10 +627,10 @@ BEGIN
 	val := 0;
 	WHILE (str[i] >= "0") & (str[i] <= "9") DO
 		d := ORD(str[i])-ORD("0");
-		IF (val <= ((MAX(HUGEINT)-d) DIV 10)) THEN val := 10*val+d
+		IF (val <= ((MAX(SIGNED64)-d) DIV 10)) THEN val := 10*val+d
 		ELSIF neg & (val = 922337203685477580) & (d = 8) & ((str[i+1] < "0") OR (str[i+1] > "9")) THEN
-			(* HUGEINT range: -9223372036854775808 ... 9223372036854775807 _> need special handling for -9223372036854775808 here *)
-			val := MIN(HUGEINT); neg := FALSE
+			(* SIGNED64 range: -9223372036854775808 ... 9223372036854775807 _> need special handling for -9223372036854775808 here *)
+			val := MIN(SIGNED64); neg := FALSE
 		ELSE
 			HALT(99)
 		END;
@@ -682,7 +682,7 @@ END StrToIntPos;
 
 (** Convert the substring beginning at position i in str into a huge integer. Leading whitespace is ignored.
 	After the conversion i points to the first character after the integer. *)
-PROCEDURE StrToHIntPos*(CONST str: ARRAY OF CHAR; VAR val: HUGEINT; VAR i: SIZE);
+PROCEDURE StrToHIntPos*(CONST str: ARRAY OF CHAR; VAR val: SIGNED64; VAR i: SIZE);
 VAR noStr: ARRAY 32 OF CHAR;
 BEGIN
 	WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
@@ -713,7 +713,7 @@ BEGIN
 END StrToSizePos;
 
 (** converts an integer value to a hex string *)
-PROCEDURE IntToHexStr*(h : HUGEINT; width: WORD; VAR s: ARRAY OF CHAR);
+PROCEDURE IntToHexStr*(h : SIGNED64; width: WORD; VAR s: ARRAY OF CHAR);
 VAR c: CHAR;
 BEGIN
 	IF (width <= 0) THEN width := 8 END;

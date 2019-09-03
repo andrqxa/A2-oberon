@@ -310,7 +310,7 @@ TYPE
 	(** A 64-bit signed integer value. *)
 	LargeInteger* = RECORD
 		LowPart*, HighPart*: SIGNED32;
-		QuadPart*{ FICTIVE = 0 }: HUGEINT;
+		QuadPart*{ FICTIVE = 0 }: SIGNED64;
 	END;
 
 	(** A 64-bit unsigned integer value. *)
@@ -321,13 +321,13 @@ TYPE
 		  dwLength*: SIGNED32;
 		  dwMemoryLoad*: SIGNED32;
 
-		  ullTotalPhys*: HUGEINT;
-		  ullAvailPhys*: HUGEINT;
-		  ullTotalPageFile*: HUGEINT;
-		  ullAvailPageFile*: HUGEINT;
-		  ullTotalVirtual*: HUGEINT;
-		  ullAvailVirtual*: HUGEINT;
-		  ullAvailExtendedVirtual*: HUGEINT;
+		  ullTotalPhys*: SIGNED64;
+		  ullAvailPhys*: SIGNED64;
+		  ullTotalPageFile*: SIGNED64;
+		  ullAvailPageFile*: SIGNED64;
+		  ullTotalVirtual*: SIGNED64;
+		  ullAvailVirtual*: SIGNED64;
+		  ullAvailExtendedVirtual*: SIGNED64;
 	END;
 
 	(** CreateThread *)
@@ -568,7 +568,7 @@ VAR
 	GetFileAttributes-: PROCEDURE {WINAPI} ( CONST lpFileName: ARRAY   OF CHAR ): WORDSET;
 	(** The GetFileSize function retrieves the size, in bytes, of the specified file. *)
 	GetFileSize-: PROCEDURE {WINAPI} ( hFile: HANDLE;  VAR lpFileSizeHigh: SIGNED32 ): SIGNED32;
-	GetFileSizeEx-: PROCEDURE {WINAPI} ( hFile: HANDLE;  VAR lpFileSize: HUGEINT ): BOOL;
+	GetFileSizeEx-: PROCEDURE {WINAPI} ( hFile: HANDLE;  VAR lpFileSize: SIGNED64 ): BOOL;
 	(** The GetFileTime function retrieves the date and time that a file was created, last accessed, and last modified. *)
 	GetFileTime-: PROCEDURE {WINAPI} ( hFile: HANDLE;
 																	VAR lpCreationTime, lpLastAccessTime, lpLastWriteTime: FileTime ): BOOL;
@@ -733,7 +733,7 @@ VAR
 	QueryPerformanceFrequency-: PROCEDURE {WINAPI} ( VAR lpFrequency: LargeInteger ): BOOL;
 
 	(** Retrieves the cycle time for the specified thread (both user and kernel mode, Windows Vista and newer) *)
-	QueryThreadCycleTime- : PROCEDURE {WINAPI} (hThread : HANDLE; VAR cycleTime : HUGEINT) : BOOL;
+	QueryThreadCycleTime- : PROCEDURE {WINAPI} (hThread : HANDLE; VAR cycleTime : SIGNED64) : BOOL;
 	(** The ReadFile function reads data from a file, starting at the position indicated by the file pointer. *)
 	ReadFile-: PROCEDURE {WINAPI} ( hFile: HANDLE;
 															  VAR lpBuffer: ARRAY OF SYSTEM.BYTE;
@@ -803,8 +803,8 @@ VAR
 	SetFilePointer-: PROCEDURE {WINAPI} ( hFile: HANDLE;  lDistanceToMove: SIGNED32;
 																	    VAR lpDistanceToMoveHigh: SIGNED32;
 																	    dwMoveMethod: SIGNED32 ): SIGNED32;
-	SetFilePointerEx-: PROCEDURE {WINAPI} ( hFile: HANDLE;  lDistanceToMove: HUGEINT;
-																		VAR lpNewFilePointer: HUGEINT;
+	SetFilePointerEx-: PROCEDURE {WINAPI} ( hFile: HANDLE;  lDistanceToMove: SIGNED64;
+																		VAR lpNewFilePointer: SIGNED64;
 																		dwMoveMethod: SIGNED32 ): BOOL;
 	(** The SetFileTime function sets the date and time that a file was created, last accessed, or last modified. *)
 	SetFileTime-: PROCEDURE {WINAPI} ( hFile: HANDLE;

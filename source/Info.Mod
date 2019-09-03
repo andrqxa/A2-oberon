@@ -312,11 +312,11 @@ TYPE
 
 VAR
 	currentMarkValueAddress : ADDRESS;
-	recentAllocators*: ARRAY AllocatorHistorySize OF RECORD pc*: ARRAY 3 OF ADDRESS; time*: HUGEINT END;
+	recentAllocators*: ARRAY AllocatorHistorySize OF RECORD pc*: ARRAY 3 OF ADDRESS; time*: SIGNED64 END;
 	numRecentAllocators*: SIGNED32;
 
 PROCEDURE LogAlloc(p: ANY);
-VAR time: HUGEINT; bp: ADDRESS; i: SIGNED32;pc: ADDRESS;
+VAR time: SIGNED64; bp: ADDRESS; i: SIGNED32;pc: ADDRESS;
 BEGIN
 	time := Machine.GetTimer();
 
@@ -485,12 +485,12 @@ BEGIN
 	END;
 END AllObjects;
 
-PROCEDURE ShowRecentAllocators*(out: Streams.Writer; scale: HUGEINT);
+PROCEDURE ShowRecentAllocators*(out: Streams.Writer; scale: SIGNED64);
 VAR
 	i,from,to,num, pcs: SIGNED32;
 	pc,startpc: ADDRESS;
 	module: Modules.Module; name: ARRAY 256 OF CHAR;
-	time: HUGEINT;
+	time: SIGNED64;
 	timer: Kernel.MilliTimer;
 BEGIN
 	time := Machine.GetTimer();
@@ -561,7 +561,7 @@ END AddAllocatorLogger;
 PROCEDURE RecentAllocators*(context : Commands.Context); (** [Options] mask ~ *)
 VAR
 	options : Options.Options;
-	scale: HUGEINT;
+	scale: SIGNED64;
 	num: SIGNED32;
 BEGIN
 	NEW(options);

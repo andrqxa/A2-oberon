@@ -746,7 +746,7 @@ TYPE
 		END TypeDecl;
 
 		PROCEDURE ConstDecl;
-			VAR i: IdentDefDesc; x: PCB.Const; pos: SIGNED32; res: WORD; long: HUGEINT;
+			VAR i: IdentDefDesc; x: PCB.Const; pos: SIGNED32; res: WORD; long: SIGNED64;
 		BEGIN
 			pos := scanner.errpos;
 			IdentDef(i, FALSE);  Check(eql);  ConstExpr(x);

@@ -177,16 +177,16 @@ BEGIN
 	END;
 END SimulateImage;
 
-PROCEDURE GetTimer():HUGEINT;
-VAR t : HUGEINT;
+PROCEDURE GetTimer():SIGNED64;
+VAR t : SIGNED64;
 	res : Kernel32.BOOL;
 BEGIN
 	res := Kernel32.QueryPerformanceCounter(SYSTEM.VAL(Kernel32.LargeInteger, t));
 	RETURN t;
 END GetTimer;
 
-PROCEDURE GetFreq():HUGEINT;
-VAR t : HUGEINT;
+PROCEDURE GetFreq():SIGNED64;
+VAR t : SIGNED64;
 	res : Kernel32.BOOL;
 BEGIN
 	res := Kernel32.QueryPerformanceFrequency(SYSTEM.VAL(Kernel32.LargeInteger, t));
@@ -196,7 +196,7 @@ END GetFreq;
 PROCEDURE {WINAPI} FrameReceived (hWnd : VfW.HWND; VAR lpVHdr : VfW.VHdr) : User32.LResult;
 VAR y : SIZE;
 	i : ADDRESS;
-	t0, t1 : HUGEINT;
+	t0, t1 : SIGNED64;
 	t, f : LONGREAL;
 	trap : BOOLEAN;
 	bytesperpixel:SIGNED32;

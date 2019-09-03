@@ -1448,7 +1448,7 @@ PROCEDURE ls(CONST prompt, string: ARRAY OF CHAR);
 BEGIN
 	log.Enter; log.String(prompt); log.String(string); log.Exit;
 END ls;
-PROCEDURE li(CONST prompt: ARRAY OF CHAR; i: HUGEINT);
+PROCEDURE li(CONST prompt: ARRAY OF CHAR; i: SIGNED64);
 BEGIN
 	log.Enter; log.String(prompt); log.Int(i,1); log.Exit;
 END li;

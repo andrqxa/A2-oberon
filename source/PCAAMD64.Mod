@@ -335,11 +335,11 @@ TYPE
 	Imm* = OBJECT (Operand)
 	VAR
 		size: Size;
-		val-: HUGEINT;
+		val-: SIGNED64;
 		pc-: SIGNED32;
 		fixup: PCM.Attribute;
 
-		PROCEDURE &New *(s: Size; v: HUGEINT);
+		PROCEDURE &New *(s: Size; v: SIGNED64);
 		BEGIN size:= s; val := v; pc := -1
 		END New;
 
@@ -517,7 +517,7 @@ TYPE
 			PutByte ((d DIV 1000000H) MOD 100H);
 		END PutDWord;
 
-		PROCEDURE PutQWord* (q: HUGEINT);
+		PROCEDURE PutQWord* (q: SIGNED64);
 		VAR d: SIGNED32;
 		BEGIN
 			SYSTEM.GET (ADDRESSOF (q), d);
@@ -2016,11 +2016,11 @@ BEGIN
 	END
 END HexOrd;
 
-PROCEDURE ValueInByteRange (value: HUGEINT): BOOLEAN;
+PROCEDURE ValueInByteRange (value: SIGNED64): BOOLEAN;
 BEGIN RETURN SYSTEM.VAL (SIGNED8, value) = value
 END ValueInByteRange;
 
-PROCEDURE ValueInWordRange (value: HUGEINT): BOOLEAN;
+PROCEDURE ValueInWordRange (value: SIGNED64): BOOLEAN;
 BEGIN RETURN SYSTEM.VAL (SIGNED16, value) = value
 END ValueInWordRange;
 
@@ -2140,49 +2140,49 @@ PROCEDURE NewMem128* (reg: Reg; displacement: SIGNED32): Mem;
 BEGIN RETURN NewMem (size128, reg, displacement);
 END NewMem128;
 
-PROCEDURE NewImm* (size: SIGNED32; val: HUGEINT): Imm;
+PROCEDURE NewImm* (size: SIGNED32; val: SIGNED64): Imm;
 VAR imm: Imm;
 BEGIN
 	NEW (imm, size, val);
 	RETURN imm;
 END NewImm;
 
-PROCEDURE NewImm8* (val: HUGEINT): Imm;
+PROCEDURE NewImm8* (val: SIGNED64): Imm;
 BEGIN RETURN NewImm (size8, val);
 END NewImm8;
 
-PROCEDURE NewImm16* (val: HUGEINT): Imm;
+PROCEDURE NewImm16* (val: SIGNED64): Imm;
 BEGIN RETURN NewImm (size16, val);
 END NewImm16;
 
-PROCEDURE NewImm32* (val: HUGEINT): Imm;
+PROCEDURE NewImm32* (val: SIGNED64): Imm;
 BEGIN RETURN NewImm (size32, val);
 END NewImm32;
 
-PROCEDURE NewImm64* (val: HUGEINT): Imm;
+PROCEDURE NewImm64* (val: SIGNED64): Imm;
 BEGIN RETURN NewImm (size64, val);
 END NewImm64;
 
-PROCEDURE NewOffset* (size: SIGNED32; val: HUGEINT): Offset;
+PROCEDURE NewOffset* (size: SIGNED32; val: SIGNED64): Offset;
 VAR offset: Offset;
 BEGIN
 	NEW (offset, size, val);
 	RETURN offset;
 END NewOffset;
 
-PROCEDURE NewOffset8* (val: HUGEINT): Offset;
+PROCEDURE NewOffset8* (val: SIGNED64): Offset;
 BEGIN RETURN NewOffset (size8, val);
 END NewOffset8;
 
-PROCEDURE NewOffset16* (val: HUGEINT): Offset;
+PROCEDURE NewOffset16* (val: SIGNED64): Offset;
 BEGIN RETURN NewOffset (size16, val);
 END NewOffset16;
 
-PROCEDURE NewOffset32* (val: HUGEINT): Offset;
+PROCEDURE NewOffset32* (val: SIGNED64): Offset;
 BEGIN RETURN NewOffset (size32, val);
 END NewOffset32;
 
-PROCEDURE NewOffset64* (val: HUGEINT): Offset;
+PROCEDURE NewOffset64* (val: SIGNED64): Offset;
 BEGIN RETURN NewOffset (size64, val);
 END NewOffset64;
 

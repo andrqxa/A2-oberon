@@ -47,7 +47,7 @@ TYPE Activity* = OBJECT {DISPOSABLE} (Queues.Item)
 	VAR object-: BaseTypes.Object;
 	VAR bound := FALSE: BOOLEAN;
 	VAR startTime-: Timer.Counter;
-	VAR time- := 0: HUGEINT;
+	VAR time- := 0: SIGNED64;
 	VAR stack {UNTRACED}: Stack;
 	VAR context*: OBJECT;
 
@@ -150,7 +150,7 @@ VAR awaiting*: Counters.AlignedCounter;
 
 PROCEDURE StoreActivity EXTERN "Environment.StoreActivity";
 
-PROCEDURE GetProcessTime-(): HUGEINT;
+PROCEDURE GetProcessTime-(): SIGNED64;
 VAR activity: Activity; diff: Timer.Counter;
 BEGIN{UNCOOPERATIVE, UNCHECKED}
 	activity := SYSTEM.GetActivity ()(Activity);

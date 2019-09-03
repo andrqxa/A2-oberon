@@ -147,7 +147,7 @@ TYPE
 
 	(** NEON Coprocessor state *)
 	NEONState* = RECORD
-		D*: ARRAY 32 OF HUGEINT; (* 32 64-bits registers *)
+		D*: ARRAY 32 OF SIGNED64; (* 32 64-bits registers *)
 		FPSCR*: ADDRESS;
 		FPEXC*: ADDRESS;
 	END;
@@ -1063,14 +1063,14 @@ VAR
 		MOV R0, PC
 	END CurrentPC;
 
-	PROCEDURE GetTimer*(): HUGEINT;
+	PROCEDURE GetTimer*(): SIGNED64;
 	VAR t: ARRAY 2 OF SIGNED32;
 	BEGIN
 		REPEAT
 			t[1] := SYSTEM.GET32(Platform.GlobalTimerCounterRegister1);
 			t[0] := SYSTEM.GET32(Platform.GlobalTimerCounterRegister0);
 		UNTIL t[1] = SYSTEM.GET32(Platform.GlobalTimerCounterRegister1);
-		RETURN SYSTEM.VAL(HUGEINT,t);
+		RETURN SYSTEM.VAL(SIGNED64,t);
 	END GetTimer;
 
 	(* ===== Multiprocessor booting ===== *)
@@ -3347,12 +3347,12 @@ VAR
 		BootConfig.GetValue(name, res)
 	END GetConfig;
 
-	PROCEDURE MulH * (x, y: HUGEINT): HUGEINT;
+	PROCEDURE MulH * (x, y: SIGNED64): SIGNED64;
 	BEGIN
 		RETURN SIGNED32(x) * SIGNED32(y)
 	END MulH;
 
-	PROCEDURE DivH * (x, y: HUGEINT): HUGEINT;
+	PROCEDURE DivH * (x, y: SIGNED64): SIGNED64;
 	BEGIN
 		RETURN x DIV y
 	END DivH;

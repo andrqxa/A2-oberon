@@ -425,7 +425,7 @@ TYPE
 		next: HostController;				(** Linked list of controllers for interrupt handling *)
 		dmaBuf: POINTER TO ARRAY OF CHAR;
 		dmaBufAdr: ADDRESS;
-		desc: ARRAY 5 OF HUGEINT;					(** DMA descriptor *)
+		desc: ARRAY 5 OF SIGNED64;					(** DMA descriptor *)
 		descOfs: SIGNED32;
 	END;
 
@@ -466,7 +466,7 @@ TYPE
 	(* Card Registers *)
 	Csd * = RECORD
 		(* Card properties *)
-		capacity *: HUGEINT;							(** Card capacity in bytes *)
+		capacity *: SIGNED64;							(** Card capacity in bytes *)
 		sectorSize *: SIGNED32;						(** Size of a sector in bytes *)
 		commandClasses *: SET;						(** Command classes supported by the card *)
 
@@ -518,12 +518,12 @@ TYPE
 		AutoCmdErrorStatus {ALIGNED(1)},
 		HostControl2 {ALIGNED(1)}: SIGNED16;
 		Capabilities {ALIGNED(1)}: ARRAY 2 OF SET;
-		MaximumCurrentCapabilities {ALIGNED(1)}: HUGEINT;
+		MaximumCurrentCapabilities {ALIGNED(1)}: SIGNED64;
 		ForceEventAutoCmdErrorStatus {ALIGNED(1)},
 		ForceEventErrorInterruptStatus {ALIGNED(1)}: SIGNED16;
 		AdmaErrorStatus {ALIGNED(1)}: SIGNED8;
 		padding0 {ALIGNED(1)}: ARRAY 3 OF SIGNED8;
-		AdmaSystemAddress {ALIGNED(1)}: HUGEINT;
+		AdmaSystemAddress {ALIGNED(1)}: SIGNED64;
 		PresetValues {ALIGNED(1)}: ARRAY 8 OF SIGNED16;
 		padding1 {ALIGNED(1)}: ARRAY 28 OF SIGNED32;
 		SharedBusControl {ALIGNED(1)}: SIGNED32;
@@ -591,7 +591,7 @@ VAR
 				INC(hc.regs.HostControl1, 10H);
 				NEW(hc.dmaBuf, TxBufferSize + TxBufferAlign);
 				hc.dmaBufAdr := ADDRESSOF(hc.dmaBuf[0]) + (TxBufferAlign) - ADDRESSOF(hc.dmaBuf[0]) MOD (TxBufferAlign);
-				hc.descOfs := (TxBufferAlign - ADDRESSOF(hc.desc[0]) MOD TxBufferAlign) DIV SIZEOF(HUGEINT);
+				hc.descOfs := (TxBufferAlign - ADDRESSOF(hc.desc[0]) MOD TxBufferAlign) DIV SIZEOF(SIGNED64);
 
 				ASSERT(hc.dmaBufAdr MOD TxBufferAlign = 0);
 				(*! NOT IMPLEMENTED YET *)(*ELSIF (Capabilities_SDMA IN hc.regs.Capabilities[0]) THEN
@@ -830,9 +830,9 @@ VAR
 	TYPE
 		QWord = ARRAY 2 OF ADDRESS;
 	VAR
-		(*!DBG*)t: HUGEINT;
+		(*!DBG*)t: SIGNED64;
 		hc: HostController;
-		desc: HUGEINT;
+		desc: SIGNED64;
 		r1, status: SET;
 		address: ADDRESS;
 	BEGIN
@@ -1788,7 +1788,7 @@ VAR
 			sizeMult := LSH(SIGNED32(2), ReadBitfield(raw, CardCsd_CSizeMultOfs1, CardCsd_CSizeMultWidth1));
 			csd.capacity := sizeMult * (1 + ReadBitfield(raw, CardCsd_CSizeOfs1, CardCsd_CSizeWidth1)) * 512;
 		ELSE
-			csd.capacity := 1024 * (HUGEINT(ReadBitfield(raw, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
+			csd.capacity := 1024 * (SIGNED64(ReadBitfield(raw, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
 		END;
 
 		csd.commandClasses := SYSTEM.VAL(SET, ReadBitfield(raw, CardCsd_CccOfs, CardCsd_CccWidth));
@@ -2067,7 +2067,7 @@ VAR
 
 	PROCEDURE PrintCardCsd * (CONST csd: ARRAY OF SIGNED32);
 	VAR
-		cap: HUGEINT;
+		cap: SIGNED64;
 		val, version, sizeMult: SIGNED32;
 	BEGIN
 		IF Trace THEN
@@ -2126,7 +2126,7 @@ VAR
 				sizeMult := LSH(SIGNED32(2), ReadBitfield(csd, CardCsd_CSizeMultOfs1, CardCsd_CSizeMultWidth1));
 				cap := sizeMult * (1 + ReadBitfield(csd, CardCsd_CSizeOfs1, CardCsd_CSizeWidth1)) * 512;
 			ELSE
-				cap := 1024 * (HUGEINT(ReadBitfield(csd, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
+				cap := 1024 * (SIGNED64(ReadBitfield(csd, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
 			END;
 			SdEnvironment.String("[SD] "); SdEnvironment.String("	Card Capacity: "); SdEnvironment.Int(cap, 0); SdEnvironment.String(" B"); SdEnvironment.Ln;
 			SdEnvironment.String("[SD] "); SdEnvironment.String("	DSR Implemented: "); SdEnvironment.Boolean(ReadBitfield(csd, CardCsd_DsrImp, 1) = 1); SdEnvironment.Ln;

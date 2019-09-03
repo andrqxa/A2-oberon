@@ -114,7 +114,7 @@ VAR
 	PROCEDURE  Show*(p: Objects.Process; VAR int: Machine.State; VAR exc: Machine.ExceptionState; long: BOOLEAN);
 	VAR id: SIGNED32; overflow: BOOLEAN; w: Streams.Writer;
 
-		PROCEDURE Val(CONST s: ARRAY OF CHAR; val: HUGEINT);
+		PROCEDURE Val(CONST s: ARRAY OF CHAR; val: SIGNED64);
 		BEGIN
 			w.Char(" "); w.String(s); w.Char("="); w.Hex(val, -8)
 		END Val;

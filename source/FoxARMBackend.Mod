@@ -168,9 +168,9 @@ TYPE
 	END ImmediateReference;
 
 	ImmediateHReference = OBJECT (Reference)
-	VAR value: HUGEINT;
+	VAR value: SIGNED64;
 
-		PROCEDURE & InitImm(v: HUGEINT);
+		PROCEDURE & InitImm(v: SIGNED64);
 		BEGIN
 			Init(8);
 			SELF.value := v;
@@ -313,7 +313,7 @@ TYPE
 			AddCitation(reference, pc, bits, 0);
 		END AddImmediate;
 
-		PROCEDURE AddHImmediate(value: HUGEINT; pc: SIZE; bits: SIGNED32);
+		PROCEDURE AddHImmediate(value: SIGNED64; pc: SIZE; bits: SIGNED32);
 		VAR
 			reference, foundReference: Reference;  immediateHReference: ImmediateHReference;
 		BEGIN
@@ -632,7 +632,7 @@ TYPE
 		if not, the location of a runtime is returned **)
 		PROCEDURE Supported*(CONST irInstruction: IntermediateCode.Instruction; VAR moduleName, procedureName: ARRAY OF CHAR): BOOLEAN;
 		VAR
-			result: BOOLEAN; value: HUGEINT; exp: SIGNED32;
+			result: BOOLEAN; value: SIGNED64; exp: SIGNED32;
 		BEGIN
 			CASE irInstruction.opcode OF
 			| IntermediateCode.add, IntermediateCode.sub, IntermediateCode.mul, IntermediateCode.abs, IntermediateCode.neg:
@@ -646,9 +646,9 @@ TYPE
 				result := result OR IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp)
 
 			| IntermediateCode.conv:
-				IF IsInteger64(irInstruction.op1) & IsFloat(irInstruction.op2) THEN  (* ENTIERH: REAL/LONGREAL --> HUGEINT*)
+				IF IsInteger64(irInstruction.op1) & IsFloat(irInstruction.op2) THEN  (* ENTIERH: REAL/LONGREAL --> SIGNED64*)
 					result := FALSE
-				ELSIF IsInteger64(irInstruction.op2) & IsFloat(irInstruction.op1) THEN (* HUGEINT --> REAL / HUGEINT --> LONGREAL *)
+				ELSIF IsInteger64(irInstruction.op2) & IsFloat(irInstruction.op1) THEN (* SIGNED64 --> REAL / SIGNED64 --> LONGREAL *)
 					result := FALSE;
 				ELSE
 					result := ~IsFloat(irInstruction.op1) & ~IsFloat(irInstruction.op2)
@@ -1444,7 +1444,7 @@ TYPE
 		END GetPartType;
 
 		(** the value of a 32 bit part **)
-		PROCEDURE ValueOfPart(value: HUGEINT; part: SIGNED32): SIGNED32;
+		PROCEDURE ValueOfPart(value: SIGNED64; part: SIGNED32): SIGNED32;
 		VAR
 			result: SIGNED32;
 		BEGIN
@@ -1653,10 +1653,10 @@ TYPE
 		(** get a single precision VFP register that holds a certain floating point value **)
 		PROCEDURE DoublePrecisionFloatRegisterFromValue(value: LONGREAL; registerHint: Operand): Operand;
 		VAR
-			intValue: HUGEINT; dummy: SIGNED32;
+			intValue: SIGNED64; dummy: SIGNED32;
 			result, temp: Operand;
 		BEGIN
-			intValue := SYSTEM.VAL(HUGEINT, value);
+			intValue := SYSTEM.VAL(SIGNED64, value);
 			(* alternative: integerValue := BinaryCode.ConvertReal(value) *)
 			result := GetFreeRegisterOrHint(IntermediateCode.FloatType(64), registerHint);
 			listOfReferences.AddHImmediate(intValue, out.pc, 8);
@@ -2200,7 +2200,7 @@ TYPE
 		PROCEDURE EmitMul(VAR irInstruction: IntermediateCode.Instruction);
 		VAR
 			destination, left, right: ARRAY 2 OF Operand; inst: IntermediateCode.Instruction;
-			value: HUGEINT;exp: SIGNED32; op3:IntermediateCode.Operand;
+			value: SIGNED64;exp: SIGNED32; op3:IntermediateCode.Operand;
 			temp: Operand;
 		BEGIN
 			IF IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
@@ -2247,7 +2247,7 @@ TYPE
 		PROCEDURE EmitDiv(VAR irInstruction: IntermediateCode.Instruction);
 		VAR
 			destination, left, right, float, leftd, rightd, fpstatus: Operand;
-			value: HUGEINT; exp: SIGNED32; op3: IntermediateCode.Operand;
+			value: SIGNED64; exp: SIGNED32; op3: IntermediateCode.Operand;
 			inst: IntermediateCode.Instruction;
 		BEGIN
 			IF IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
@@ -2305,7 +2305,7 @@ TYPE
 
 		PROCEDURE EmitMod(CONST irInstruction: IntermediateCode.Instruction);
 		VAR
-			value: HUGEINT;exp: SIGNED32; op3:IntermediateCode.Operand; inst: IntermediateCode.Instruction;
+			value: SIGNED64;exp: SIGNED32; op3:IntermediateCode.Operand; inst: IntermediateCode.Instruction;
 		BEGIN
 			IF IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
 				IntermediateCode.InitImmediate(op3, irInstruction.op3.type, value-1);
@@ -3904,9 +3904,9 @@ VAR
 	(** write an integer in binary right-justified in a field of at least ABS(w) characters.
 		If w < 0 THEN ABS(w) least significant hex digits of 'value' are written (potentially including leading zeros or ones)
 	**)
-	PROCEDURE DBin*(value: HUGEINT; numberDigits: SIGNED32);
+	PROCEDURE DBin*(value: SIGNED64; numberDigits: SIGNED32);
 	CONST
-		MaxBitSize = SIZEOF(HUGEINT) * 8;
+		MaxBitSize = SIZEOF(SIGNED64) * 8;
 	VAR
 		i, firstRelevantPos: SIGNED32;
 		prefixWithSpaces: BOOLEAN;

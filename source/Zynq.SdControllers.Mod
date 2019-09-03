@@ -23,7 +23,7 @@ TYPE
 		card: Sd.Card;
 		halted: BOOLEAN;
 
-		PROCEDURE & Init (base: ADDRESS; int: SIGNED32; clock: HUGEINT);
+		PROCEDURE & Init (base: ADDRESS; int: SIGNED32; clock: SIGNED64);
 		VAR
 			result: WORD;
 		BEGIN
@@ -159,8 +159,8 @@ VAR
 	PROCEDURE Statistics * (c: Commands.Context);
 	VAR
 		accesses: SIGNED32;
-		byteRead, byteWritten, read, write: HUGEINT;
-		tread, twrite: HUGEINT;
+		byteRead, byteWritten, read, write: SIGNED64;
+		tread, twrite: SIGNED64;
 		speedR, speedW: LONGREAL;
 	BEGIN
 		byteRead := Sd.NbyteRead;

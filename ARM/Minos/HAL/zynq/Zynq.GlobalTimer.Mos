@@ -125,11 +125,11 @@ BEGIN
 	RETURN low;
 END GetTimerLowValue;
 
-PROCEDURE GetTime*(): HUGEINT;
+PROCEDURE GetTime*(): SIGNED64;
 TYPE
 	Hugeint = ARRAY 2 OF SIGNED32;
 VAR
-	time: HUGEINT;
+	time: SIGNED64;
 BEGIN
 	GetTimerValue(SYSTEM.VAL(Hugeint, time)[1], SYSTEM.VAL(Hugeint, time)[0]);
 	RETURN time

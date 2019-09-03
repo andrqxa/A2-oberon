@@ -40,7 +40,7 @@ VAR
 	cBlockSize*: SIGNED32;  nrProcesses*: SIGNED32;
 	lastUsedBlockSize*: SIGNED32;
 
-	allocT-, copyT-, zeroT-, compT-: HUGEINT;
+	allocT-, copyT-, zeroT-, compT-: SIGNED64;
 
 TYPE
 	Cache = POINTER TO RECORD
@@ -60,7 +60,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Acquire( size: SIGNED32 ): Cache;
-		VAR c: Cache;  t: HUGEINT;
+		VAR c: Cache;  t: SIGNED64;
 		BEGIN {EXCLUSIVE}
 			IF size = 0 THEN RETURN first END;
 			Tic( t );
@@ -4437,7 +4437,7 @@ VAR
 	PROCEDURE CopyAX( matrixA, dest: SIGNED32;
 									    IncA, StrideA: SIGNED32;
 									    K, M, L2BlockK, L2BlockM: SIGNED32 );
-	VAR m, k, adrA: SIGNED32;  t: HUGEINT;
+	VAR m, k, adrA: SIGNED32;  t: SIGNED64;
 
 		PROCEDURE CopyMK( matrixA, M, K: SIGNED32 );
 		VAR rest: SIGNED32;
@@ -4479,7 +4479,7 @@ VAR
 	PROCEDURE CopyAR( matrixA, dest: SIGNED32;
 									    IncA, StrideA: SIGNED32;
 									    K, M, L2BlockK, L2BlockM: SIGNED32 );
-	VAR m, k, adrA: SIGNED32;  t: HUGEINT;
+	VAR m, k, adrA: SIGNED32;  t: SIGNED64;
 
 		PROCEDURE CopyMK( matrixA, M, K: SIGNED32 );
 		VAR rest: SIGNED32;
@@ -4517,7 +4517,7 @@ VAR
 	PROCEDURE CopyBX( matrixB, dest: SIGNED32;
 									    IncB, StrideB: SIGNED32;
 									    N, K, L2BlockN, L2BlockK: SIGNED32 );
-	VAR n, k: SIGNED32;  adrB: SIGNED32;  t: HUGEINT;
+	VAR n, k: SIGNED32;  adrB: SIGNED32;  t: SIGNED64;
 
 		PROCEDURE Copy5x2k( matrixB, k: SIGNED32 );
 		VAR i, adrB, rest: SIGNED32;
@@ -4593,7 +4593,7 @@ VAR
 	PROCEDURE CopyBR( matrixB, dest: SIGNED32;
 									    IncB, StrideB: SIGNED32;
 									    N, K, L2BlockN, L2BlockK: SIGNED32 );
-	VAR n, k: SIGNED32;  adrB: SIGNED32;  t: HUGEINT;
+	VAR n, k: SIGNED32;  adrB: SIGNED32;  t: SIGNED64;
 
 		PROCEDURE Copy5x4k( matrixB, k: SIGNED32 );
 		VAR i, adrB, rest, k4: SIGNED32;
@@ -4718,18 +4718,18 @@ VAR
 	END DispMX;
 	*)
 
-	PROCEDURE -GetTimer( ): HUGEINT;
+	PROCEDURE -GetTimer( ): SIGNED64;
 	CODE {SYSTEM.Pentium}
 		CPUID	;
 		RDTSC
 	END GetTimer;
 
-	PROCEDURE Tic( VAR t: HUGEINT );
+	PROCEDURE Tic( VAR t: SIGNED64 );
 	BEGIN
 		t := GetTimer();
 	END Tic;
 
-	PROCEDURE Toc( VAR t, addto: HUGEINT );
+	PROCEDURE Toc( VAR t, addto: SIGNED64 );
 	BEGIN
 		INC( addto, GetTimer() - t );  t := GetTimer();
 	END Toc;
@@ -4738,7 +4738,7 @@ VAR
 										  IncA, StrideA, IncB, StrideB, IncC, StrideC: SIGNED32;
 										  add: BOOLEAN );
 	VAR lenA, lenB, adrA, adrB, adrC, m: SIGNED32;
-		M1, M2, i: SIGNED32;  val: LONGREAL;  t: HUGEINT;
+		M1, M2, i: SIGNED32;  val: LONGREAL;  t: SIGNED64;
 		inc: SIGNED32;
 		obj: POINTER TO ARRAY OF MultiplyObjectX;
 		cache: Cache;
@@ -4798,7 +4798,7 @@ VAR
 	VAR lenA, lenB, adrA, adrB, adrC, m: SIGNED32;
 		M1, M2, i: SIGNED32;  val: REAL;  inc: SIGNED32;
 		obj: POINTER TO ARRAY OF MultiplyObjectR;
-		t: HUGEINT;  cache: Cache;
+		t: SIGNED64;  cache: Cache;
 	BEGIN
 		NEW(obj,nrProcesses+1);
 		lenA := M * Align4( K ) * 4;  lenB := N * Align4( K ) * 4;
@@ -5021,7 +5021,7 @@ VAR
 
 	(*
 	PROCEDURE Times*;
-	VAR all: HUGEINT;
+	VAR all: SIGNED64;
 	BEGIN
 		all := allocT + copyT + zeroT + compT;  KernelLog.String( "alloc=" );
 		KernelLog.LongRealFix( allocT / 1000000, 0, 20 );  KernelLog.String( "[" );
@@ -5201,7 +5201,7 @@ VAR
 	END MatMulHBlockX;
 
 	PROCEDURE CopyDataR( src, dest, incSrc, strideSrc, incDest, strideDest, rows, cols: SIGNED32 );   (*! optimize *)
-	VAR i: SIGNED32;  t: HUGEINT;
+	VAR i: SIGNED32;  t: SIGNED64;
 	BEGIN
 		Tic( t );
 		FOR i := 0 TO rows - 1 DO
@@ -5212,7 +5212,7 @@ VAR
 	END CopyDataR;
 
 	PROCEDURE CopyDataX( src, dest, incSrc, strideSrc, incDest, strideDest, rows, cols: SIGNED32 );   (*! optimize *)
-	VAR i: SIGNED32;  t: HUGEINT;
+	VAR i: SIGNED32;  t: SIGNED64;
 	BEGIN
 		Tic( t );
 		FOR i := 0 TO rows - 1 DO
@@ -5227,7 +5227,7 @@ VAR
 	VAR stride, adrB, adrC: SIGNED32;
 		proc: POINTER TO ARRAY OF MatMulHObjR;
 		from, to0, i: SIGNED32;  cacheA, cacheB: Cache;
-		t: HUGEINT;
+		t: SIGNED64;
 
 	BEGIN
 		NEW(proc,nrProcesses);
@@ -5283,7 +5283,7 @@ VAR
 	VAR stride, adrB, adrC: SIGNED32;
 		proc: POINTER TO ARRAY OF MatMulHObjX;
 		from, to0, i: SIGNED32;  cacheA, cacheB: Cache;
-		t: HUGEINT;
+		t: SIGNED64;
 	BEGIN
 		NEW(proc,nrProcesses);
 		ASSERT( ColsA = RowsB );
@@ -5340,7 +5340,7 @@ VAR
 	VAR sum: REAL;  CbFrom, i, j, k: SIGNED32;  valA, valB: REAL;
 		adrA, adrB, adrC: SIGNED32;
 		cacheA, cacheB, cacheC: Cache;
-		matrixCO, StrideCO, IncCO: SIGNED32;  t: HUGEINT;
+		matrixCO, StrideCO, IncCO: SIGNED32;  t: SIGNED64;
 		(*VAR fromA, toA: SIGNED32;  *)
 	BEGIN
 		IF (IncA # SIZEOF( REAL )) THEN
@@ -5437,7 +5437,7 @@ VAR
 	VAR sum: LONGREAL;  CbFrom, i, j, k: SIGNED32;
 		valA, valB: LONGREAL;  adrA, adrB, adrC: SIGNED32;
 		cacheA, cacheB, cacheC: Cache;
-		matrixCO, StrideCO, IncCO: SIGNED32;  t: HUGEINT;
+		matrixCO, StrideCO, IncCO: SIGNED32;  t: SIGNED64;
 	BEGIN
 		IF (IncA # SIZEOF( LONGREAL )) THEN
 			cacheA :=
@@ -5542,7 +5542,7 @@ VAR
 		C is M x N matrix; M=rows(C); N=cols(C);
 	*)
 	VAR adrA, adrB, innerB, adrC, i, j, k: SIGNED32;
-		val1, val2, sum: REAL;  t: HUGEINT;
+		val1, val2, sum: REAL;  t: SIGNED64;
 	BEGIN
 		Tic( t );
 		FOR i := 1 TO M DO
@@ -5572,7 +5572,7 @@ VAR
 		C is M x N matrix; M=rows(C); N=cols(C);
 	*)
 	VAR adrA, adrB, innerB, adrC, i, j, k: SIGNED32;
-		val1, val2, sum: LONGREAL;  t: HUGEINT;
+		val1, val2, sum: LONGREAL;  t: SIGNED64;
 	BEGIN
 		Tic( t );
 		FOR i := 1 TO M DO

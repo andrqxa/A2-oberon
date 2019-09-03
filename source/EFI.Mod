@@ -70,7 +70,7 @@ TYPE Int* = SIZE; (* size of Int architecture dependant (e.g. 32bit on i386, 64b
 TYPE Int8* = SIGNED8; (* Int8, Int16, Int32, Int64 NOT architecture dependant *)
 TYPE Int16* = SIGNED16;
 TYPE Int32* = SIGNED32;
-TYPE Int64* = HUGEINT;
+TYPE Int64* = SIGNED64;
 TYPE Address*= ADDRESS;
 
 TYPE Status* = Int;

@@ -8,7 +8,7 @@ IMPORT
 	Unix, KernelLog;
 
 TYPE
-	Counter* = HUGEINT; (** Timer counter value type *)
+	Counter* = SIGNED64; (** Timer counter value type *)
 
 CONST
 	(*
@@ -48,7 +48,7 @@ VAR
 	VAR t: Timespec;
 	BEGIN
 		IF clock_gettime(clockType, t) = 0 THEN
-			RETURN HUGEINT(t.sec)*1000000000 + HUGEINT(t.nsec);
+			RETURN SIGNED64(t.sec)*1000000000 + SIGNED64(t.nsec);
 		ELSE
 			RETURN 0;
 		END;

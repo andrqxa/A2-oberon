@@ -30,7 +30,7 @@ TYPE
 	Unit* = SIZE;
 	Bits* = SIZE;
 
-	Fingerprint* = HUGEINT;
+	Fingerprint* = SIGNED64;
 
 	SegmentedName*= ARRAY 8 OF StringPool.Index;
 	SectionName* = ARRAY 128 OF CHAR;

@@ -208,7 +208,7 @@ VAR
 
 	PROCEDURE InitPl;
 	VAR
-		freq: HUGEINT;
+		freq: SIGNED64;
 		res: SIGNED32;
 	BEGIN
 		freq := PsConfig.GetPllClockFrequency(PsConfig.IoPll,res);
@@ -228,7 +228,7 @@ VAR
 
 	PROCEDURE ResetPl;
 	VAR
-		t: HUGEINT;
+		t: SIGNED64;
 		res: SIGNED32;
 	BEGIN
 		(* Reset PL *)

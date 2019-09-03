@@ -13,7 +13,7 @@ CONST
 
 TYPE
 
-	ProcessTimeArray = POINTER TO ARRAY ProcessInfo.MaxNofProcesses OF HUGEINT;
+	ProcessTimeArray = POINTER TO ARRAY ProcessInfo.MaxNofProcesses OF SIGNED64;
 
 	Callback = PROCEDURE (id : SIGNED32; process : Objects.Process; pc, bp, lowAdr, highAdr : ADDRESS);
 
@@ -49,7 +49,7 @@ TYPE
 			FOR i := 0 TO LEN(array)-1 DO array[i] := 0; END;
 		END Clear;
 
-		PROCEDURE RanMeanwhile(process : Objects.Process; currentCycles : HUGEINT) : BOOLEAN;
+		PROCEDURE RanMeanwhile(process : Objects.Process; currentCycles : SIGNED64) : BOOLEAN;
 		VAR i : SIZE;
 		BEGIN
 

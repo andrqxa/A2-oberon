@@ -72,7 +72,7 @@ TYPE
 
 		object*: Object;
 		char*: CHAR;
-		integer*: HUGEINT;
+		integer*: SIGNED64;
 		float*: LONGREAL;
 		boolean*: BOOLEAN;
 		translation*: Translation;
@@ -176,7 +176,7 @@ TYPE
 			SELF.class := Class.Name; COPY(name, SELF.name);success := TRUE; persistent := TRUE;
 		END SetName;
 
-		PROCEDURE GetInteger*(VAR integer: HUGEINT);
+		PROCEDURE GetInteger*(VAR integer: SIGNED64);
 		BEGIN
 			IF SELF.class = Class.Integer THEN integer := SELF.integer; success := TRUE ELSE HALT(200) END;
 		END GetInteger;
@@ -196,13 +196,13 @@ TYPE
 			SELF.class := Class.Set; SELF.set := set;success := TRUE; persistent := TRUE;
 		END SetSet;
 
-		PROCEDURE GetEnum*(translation: Translation; VAR integer: HUGEINT);
+		PROCEDURE GetEnum*(translation: Translation; VAR integer: SIGNED64);
 		BEGIN
 			SELF.translation := translation;
 			IF SELF.class = Class.Enum THEN integer := SELF.integer; success := TRUE ELSE HALT(200) END;
 		END GetEnum;
 
-		PROCEDURE SetEnum*(translation: Translation; integer: HUGEINT);
+		PROCEDURE SetEnum*(translation: Translation; integer: SIGNED64);
 		BEGIN
 			SELF.translation := translation;
 			SELF.class := Class.Enum; SELF.integer := integer;  success := TRUE; persistent := TRUE;
@@ -618,7 +618,7 @@ TYPE
 			IF NameAttribute(name, s) THEN value := (s="true") OR (s="1") OR (s="yes") OR (s="TRUE"); RETURN TRUE ELSE RETURN FALSE END;
 		END BooleanAttribute;
 
-		PROCEDURE IntegerAttribute*(CONST name: ARRAY OF CHAR; VAR value: HUGEINT): BOOLEAN;
+		PROCEDURE IntegerAttribute*(CONST name: ARRAY OF CHAR; VAR value: SIGNED64): BOOLEAN;
 		VAR s: ARRAY 64 OF CHAR; v: SIGNED32;
 		BEGIN
 			IF NameAttribute(name, s) THEN Strings.StrToInt(s, v); value := v; RETURN TRUE ELSE RETURN FALSE END;
@@ -635,7 +635,7 @@ TYPE
 			END
 		END FloatAttribute;
 
-		PROCEDURE EnumAttribute*(CONST name: ARRAY OF CHAR; translation: Translation; VAR value:HUGEINT): BOOLEAN;
+		PROCEDURE EnumAttribute*(CONST name: ARRAY OF CHAR; translation: Translation; VAR value:SIGNED64): BOOLEAN;
 		VAR str: ARRAY 32 OF CHAR; v: SIGNED32;
 		BEGIN
 			IF NameAttribute(name, str) & translation.Key(str, v) THEN value := v; RETURN TRUE ELSE RETURN FALSE END;
@@ -705,7 +705,7 @@ TYPE
 			END;
 		END StringAttribute;
 
-		PROCEDURE IntegerAttribute*(CONST name: ARRAY OF CHAR; value: HUGEINT);
+		PROCEDURE IntegerAttribute*(CONST name: ARRAY OF CHAR; value: SIGNED64);
 		VAR str: ARRAY 64 OF CHAR;
 		BEGIN
 			Strings.IntToStr(SIGNED32(value), str);
@@ -724,7 +724,7 @@ TYPE
 			IF value THEN NameAttribute(name,"true") ELSE NameAttribute(name,"false") END;
 		END BooleanAttribute;
 
-		PROCEDURE EnumAttribute*(CONST name: ARRAY OF CHAR; translation: Translation; value: HUGEINT);
+		PROCEDURE EnumAttribute*(CONST name: ARRAY OF CHAR; translation: Translation; value: SIGNED64);
 		VAR str: ARRAY 32 OF CHAR;
 		BEGIN
 			IF translation.Name(SIGNED32(value), str) THEN NameAttribute(name, str) ELSE NameAttribute(name, "unknown") END;
@@ -830,7 +830,7 @@ TYPE
 		BEGIN Add(o);
 		END Enter;
 
-		PROCEDURE GetObject(index: HUGEINT): Object;
+		PROCEDURE GetObject(index: SIGNED64): Object;
 		BEGIN RETURN Get(SIGNED32(index))(Object)
 		END GetObject;
 
@@ -1098,7 +1098,7 @@ TYPE
 		END CheckUse;
 
 		PROCEDURE ReadObject*(CONST name, optionalType: ARRAY OF CHAR; index: SIGNED32; VAR o: Object): BOOLEAN;
-		VAR type: ARRAY 32 OF CHAR; id: HUGEINT;
+		VAR type: ARRAY 32 OF CHAR; id: SIGNED64;
 		BEGIN
 			(*IF err THEN RETURN FALSE END;*)
 

@@ -276,7 +276,7 @@ TYPE
 		PROCEDURE ClippedLine(x0,y0,x1,y1: SIZE; r: Rectangle; color : Color; mode : WORD);
 		VAR
 			dsx,dsy,stx,sty,xd,yd,dx2,dy2,rem,term,e: SIZE;
-			tmp: HUGEINT;
+			tmp: SIGNED64;
 			rev,setx: BOOLEAN;
 		BEGIN
 			(* standardization && trivial reject *)
@@ -318,7 +318,7 @@ TYPE
 			setx := TRUE;
 			IF (y0 < r.t) THEN
 				(* window horizontal entry *)
-				tmp := HUGEINT(dx2) *(r.t-y0)-dsx;
+				tmp := SIGNED64(dx2) *(r.t-y0)-dsx;
 				INC(xd,SIZE(tmp DIV dy2));
 				rem := SIZE(tmp MOD dy2);
 				IF ( xd>r.r ) THEN RETURN END;
@@ -331,7 +331,7 @@ TYPE
 
 			IF setx & ( x0 < r.l )  THEN
 				(* window vertical entry *)
-				tmp := HUGEINT(dy2) * (r.l-x0);
+				tmp := SIGNED64(dy2) * (r.l-x0);
 				INC(yd, SIZE(tmp DIV dx2));
 				rem := SIZE(tmp MOD dx2);
 				IF ( yd>r.b) OR (yd=r.b) & (rem>=dsx) THEN RETURN END;
@@ -341,7 +341,7 @@ TYPE
 
 			IF ( y1 > r.b )  THEN
 				(* window exit *)
-				tmp := HUGEINT(dx2)*(r.b-y0)+dsx;
+				tmp := SIGNED64(dx2)*(r.b-y0)+dsx;
 				term := x0+SIZE(tmp DIV dy2);
 				rem := SIZE(tmp MOD dy2);
 				IF ( rem=0 ) THEN DEC(term) END;

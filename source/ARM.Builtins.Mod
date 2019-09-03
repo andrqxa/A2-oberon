@@ -10,9 +10,9 @@ CONST
 
 TYPE
 	ULONGINT = SIGNED32; (* alias to make distinction between signed and unsigned more clear *)
-	UHUGEINT = HUGEINT;
+	UHUGEINT = SIGNED64;
 	FLOAT32 = SIGNED32; (* alias to make clear that the integer actually contains a IEEE 32 bit float *)
-	FLOAT64= HUGEINT;
+	FLOAT64= SIGNED64;
 	DoubleWord = RECORD
 		low*: UNSIGNED32; high*: SIGNED32;
 	END;
@@ -37,8 +37,8 @@ TYPE
 	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModU32(left, right, result, dummy); RETURN result
 	END DivU32;
 
-	PROCEDURE DivS64*(left, right: HUGEINT): HUGEINT;
-	VAR result, dummy: HUGEINT;
+	PROCEDURE DivS64*(left, right: SIGNED64): SIGNED64;
+	VAR result, dummy: SIGNED64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS64(left, right, result, dummy); RETURN result
 	END DivS64;
 
@@ -62,13 +62,13 @@ TYPE
 	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModU32(left, right, dummy, result); RETURN result
 	END ModU32;
 
-	PROCEDURE ModS64*(left, right: HUGEINT): HUGEINT;
-	VAR result, dummy: HUGEINT;
+	PROCEDURE ModS64*(left, right: SIGNED64): SIGNED64;
+	VAR result, dummy: SIGNED64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 			DivModS64(left, right, dummy, result); RETURN result
 	END ModS64;
 
-	PROCEDURE RolS64*(source: HUGEINT; amount: ULONGINT): HUGEINT;
+	PROCEDURE RolS64*(source: SIGNED64; amount: ULONGINT): SIGNED64;
 	CODE
 		LDR R2, [FP, #+8] ; R2 := amount
 		LDR R3, [FP, #+12] ; R3 := source[Low]
@@ -98,15 +98,15 @@ TYPE
 		; result = R1:R0
 	END RolS64;
 
-	PROCEDURE RolU64*(source: HUGEINT; amount: ULONGINT): HUGEINT;
+	PROCEDURE RolU64*(source: SIGNED64; amount: ULONGINT): SIGNED64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN RolS64(source, amount)
 	END RolU64;
 
-	PROCEDURE RorS64*(source: HUGEINT; amount: ULONGINT): HUGEINT;
+	PROCEDURE RorS64*(source: SIGNED64; amount: ULONGINT): SIGNED64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN RolS64(source, 64 - (amount MOD 64))
 	END RorS64;
 
-	PROCEDURE RorU64*(source: HUGEINT; amount: ULONGINT): HUGEINT;
+	PROCEDURE RorU64*(source: SIGNED64; amount: ULONGINT): SIGNED64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN RolS64(source, 64 - (amount MOD 64))
 	END RorU64;
 
@@ -177,7 +177,7 @@ TYPE
 	(* signed division and modulus
 	- note: this implements the mathematical definition of DIV and MOD in contrast to the symmetric one
 	*)
-	PROCEDURE DivModS64*(dividend, divisor: HUGEINT; VAR quotient, remainder: HUGEINT);
+	PROCEDURE DivModS64*(dividend, divisor: SIGNED64; VAR quotient, remainder: SIGNED64);
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		ASSERT(divisor > 0);
 		IF dividend >= 0 THEN
@@ -350,11 +350,11 @@ TYPE
 	BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN FPE64.Fix(SYSTEM.VAL(FPE64.Float64,x))
 	END ConvS32F64;
 
-	PROCEDURE ConvS64F64*(x: FLOAT64): HUGEINT;
+	PROCEDURE ConvS64F64*(x: FLOAT64): SIGNED64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN FPE64.FixInt64(SYSTEM.VAL(FPE64.Float64,x))
 	END ConvS64F64;
 
-	PROCEDURE ConvS64F32*(x: FLOAT32): HUGEINT;
+	PROCEDURE ConvS64F32*(x: FLOAT32): SIGNED64;
 	VAR d: FPE64.Float64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		FPE64.Double(x, d);
@@ -381,7 +381,7 @@ TYPE
 	END ConvF64F32;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE ConvF64S64*(x: HUGEINT): FLOAT64;
+	PROCEDURE ConvF64S64*(x: SIGNED64): FLOAT64;
 	VAR flt: FLOAT64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		FPE64.FloatInt64(x, SYSTEM.VAL(FPE64.Float64, flt)); RETURN flt
@@ -551,7 +551,7 @@ TYPE
 	END ConvF32S32;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE ConvF32S64*(x: HUGEINT): FLOAT32;
+	PROCEDURE ConvF32S64*(x: SIGNED64): FLOAT32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		RETURN ConvF32F64(ConvF64S64(x))
 	END ConvF32S64;

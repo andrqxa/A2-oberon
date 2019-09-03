@@ -182,7 +182,7 @@ TYPE
 		string*: StringType;  (* string or identifier *)
 		stringLength*: SIZE; (* length of string, if stringLength = 2 then this may be interpreted as character and integer = ORD(ch) *)
 		numberType*: SubType;  (* Integer, HugeInteger, Real or Longreal *)
-		integer*: HUGEINT;
+		integer*: SIGNED64;
 		character*: CHAR;
 		real*: LONGREAL;
 	END;
@@ -598,7 +598,7 @@ TYPE
 			dig: ARRAY 24 OF CHAR;
 			f: LONGREAL;  expCh: CHAR;  neg, long: BOOLEAN;
 			result: Symbol;
-			hugeint, tenh, number, nextInt: HUGEINT;
+			hugeint, tenh, number, nextInt: SIGNED64;
 			digits: SIGNED32;
 
 			(** 10^e **)
@@ -739,7 +739,7 @@ TYPE
 							token.numberType := Hugeint;
 							WHILE i < n DO
 								d := Decimal( dig[i] );  INC( i );
-								IF hugeint > MAX(HUGEINT) DIV 10 THEN Error( Basic.NumberTooLarge) END;
+								IF hugeint > MAX(SIGNED64) DIV 10 THEN Error( Basic.NumberTooLarge) END;
 								hugeint := hugeint * tenh + d;
 								IF hugeint < 0 THEN Error( Basic.NumberTooLarge ) END
 							END;

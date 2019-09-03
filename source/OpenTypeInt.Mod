@@ -185,7 +185,7 @@ BEGIN
 END MulDiv;
 
 PROCEDURE Norm*( x, y: F26D6 ): F26D6;
-	VAR n, r, b, t: SIGNED32; nh, rh, bh, th: HUGEINT;
+	VAR n, r, b, t: SIGNED32; nh, rh, bh, th: SIGNED64;
 BEGIN
 	IF (-8000H <= x) & (x < 8000H) & (-8000H <= y) & (y < 8000H) THEN
 		(* x*x + y*y representable in 32 bits *)
@@ -1133,8 +1133,8 @@ BEGIN
 	INC(c.pc)
 END ALIGNRP;
 
-PROCEDURE DivHL( a,  b: HUGEINT ): SIGNED32;
-VAR q: HUGEINT; positive: BOOLEAN;
+PROCEDURE DivHL( a,  b: SIGNED64 ): SIGNED32;
+VAR q: SIGNED64; positive: BOOLEAN;
 BEGIN
 	positive := TRUE;
 	IF a < 0 THEN  positive := ~positive;  a := -a  END;
@@ -1149,7 +1149,7 @@ PROCEDURE ISECT (VAR c: Context);
 	VAR
 		b1, b0, a1, a0, p: SIGNED32; pt: Points;
 		ax0, ay0, ax1, ay1, bx0, by0, bx1, by1: F26D6;
-		dxa, dya, dxb, dyb, dx, dy, v, det: HUGEINT;
+		dxa, dya, dxb, dyb, dx, dy, v, det: SIGNED64;
 BEGIN
 	b1 := c.stack[c.tos];  DEC(c.tos);
 	b0 := c.stack[c.tos];  DEC(c.tos);

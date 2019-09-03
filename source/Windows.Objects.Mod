@@ -42,7 +42,7 @@ CONST
 
 
 TYPE
-	CpuCyclesArray* = ARRAY Machine.MaxCPU OF HUGEINT;
+	CpuCyclesArray* = ARRAY Machine.MaxCPU OF SIGNED64;
 
 	ProtectedObject = POINTER TO RECORD END;   (* protected object (10000) *)
 
@@ -181,7 +181,7 @@ TYPE
 		restartPC-: ADDRESS;   (** entry point of body, for SAFE exception recovery *)
 		restartSP-: ADDRESS;   (** stack level at start of body, for SAFE exception recovery *)
 
-		lastThreadTimes: HUGEINT;   (*ALEX 2005.12.12*)
+		lastThreadTimes: SIGNED64;   (*ALEX 2005.12.12*)
 		gcContext: GCContext;
 		context: ANY; (* commands contect *)
 
@@ -1281,7 +1281,7 @@ END NumReady;
 	return the number of cycles since the process has been created. If FALSE, return the number of cycles
 	consumed since the last time asked. *)
 PROCEDURE GetCpuCycles*(process : Process; VAR cpuCycles : CpuCyclesArray; all : BOOLEAN);
-VAR res : Kernel32.BOOL; temp : HUGEINT;
+VAR res : Kernel32.BOOL; temp : SIGNED64;
 BEGIN
 	ASSERT(process # NIL);
 	IF (Kernel32.QueryThreadCycleTime # NIL) THEN
@@ -1346,8 +1346,8 @@ BEGIN{UNTRACKED}
 END ResumeActivities;
 
 
-PROCEDURE CurrentProcessTime*(): HUGEINT;
-VAR res: WORD; result: HUGEINT;
+PROCEDURE CurrentProcessTime*(): SIGNED64;
+VAR res: WORD; result: SIGNED64;
 BEGIN
 	IF (Kernel32.QueryThreadCycleTime # NIL) THEN
 		res := Kernel32.QueryThreadCycleTime(CurrentProcess().handle, result);
@@ -1357,7 +1357,7 @@ BEGIN
 	RETURN result;
 END CurrentProcessTime;
 
-PROCEDURE TimerFrequency*(): HUGEINT;
+PROCEDURE TimerFrequency*(): SIGNED64;
 BEGIN
 	RETURN 1000000000;
 END TimerFrequency;

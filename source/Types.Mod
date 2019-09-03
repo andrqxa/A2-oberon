@@ -35,7 +35,7 @@ TYPE
 	END;
 
 	Hugeint* = RECORD(Any)
-		value* : HUGEINT;
+		value* : SIGNED64;
 	END;
 
 	Size* = RECORD(Any)
@@ -255,7 +255,7 @@ BEGIN
 	END;
 END SetInteger;
 
-PROCEDURE GetHugeint*(CONST source : Any; VAR value : HUGEINT; VAR res : WORD);
+PROCEDURE GetHugeint*(CONST source : Any; VAR value : SIGNED64; VAR res : WORD);
 VAR hugeint : Hugeint;
 BEGIN
 	res := Ok;
@@ -295,7 +295,7 @@ BEGIN
 	END;
 END GetHugeint;
 
-PROCEDURE SetHugeint*(VAR target : Any; value : HUGEINT;  VAR res : WORD);
+PROCEDURE SetHugeint*(VAR target : Any; value : SIGNED64;  VAR res : WORD);
 VAR hugeint : Hugeint;
 BEGIN
 	res := Ok;

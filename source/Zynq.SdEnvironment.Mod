@@ -8,15 +8,15 @@ IMPORT
 	Machine, Objects, KernelLog, Strings, Locks, PsConfig, BootConfig;
 
 TYPE
-	Time* = HUGEINT; (* Time type *)
+	Time* = SIGNED64; (* Time type *)
 
 VAR
 	InstallHandler *: PROCEDURE (handler: Objects.EventHandler; irq: SIGNED32);
 
 	Char *: PROCEDURE (c: CHAR);
 	String *: PROCEDURE (CONST str: ARRAY OF CHAR);
-	Int *: PROCEDURE (i: HUGEINT; w: SIGNED32);
-	Hex *: PROCEDURE (i: HUGEINT; w: SIGNED32);
+	Int *: PROCEDURE (i: SIGNED64; w: SIGNED32);
+	Hex *: PROCEDURE (i: SIGNED64; w: SIGNED32);
 	Address *: PROCEDURE (a: ADDRESS);
 	Set *: PROCEDURE (s: SET);
 	Boolean *: PROCEDURE (b: BOOLEAN);

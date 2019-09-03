@@ -882,25 +882,25 @@ TYPE
 		END GetImmediateMem;
 
 		PROCEDURE GetImmediate(CONST virtual: IntermediateCode.Operand; part: SIGNED32; VAR physical: Assembler.Operand; forbidden16Bit,push: BOOLEAN);
-		VAR type: IntermediateCode.Type; temp: Assembler.Operand; size: SIGNED8; value: HUGEINT;
+		VAR type: IntermediateCode.Type; temp: Assembler.Operand; size: SIGNED8; value: SIGNED64;
 
-			PROCEDURE IsImm8(value: HUGEINT): BOOLEAN;
+			PROCEDURE IsImm8(value: SIGNED64): BOOLEAN;
 			BEGIN
 				RETURN (value >= -80H) & (value < 80H)
 			END IsImm8;
 
-			PROCEDURE IsImm16(value: HUGEINT): BOOLEAN;
+			PROCEDURE IsImm16(value: SIGNED64): BOOLEAN;
 			BEGIN
 				RETURN (value >= -8000H) & (value < 10000H)
 			END IsImm16;
 
-			PROCEDURE IsImm32(value: HUGEINT): BOOLEAN;
+			PROCEDURE IsImm32(value: SIGNED64): BOOLEAN;
 			BEGIN
 				value := value DIV 10000H DIV 10000H;
 				RETURN (value = 0) OR (value=-1);
 			END IsImm32;
 
-			PROCEDURE IsSignedImm32(value: HUGEINT): BOOLEAN;
+			PROCEDURE IsSignedImm32(value: SIGNED64): BOOLEAN;
 			BEGIN
 				RETURN (value <= MAX(SIGNED32)) & (value >= MIN(SIGNED32));
 			END IsSignedImm32;
@@ -1088,7 +1088,7 @@ TYPE
 			END;
 		END SpecialMove;
 
-		PROCEDURE ModifyStackPointer(sizeInBytes: HUGEINT);
+		PROCEDURE ModifyStackPointer(sizeInBytes: SIGNED64);
 		VAR sizeOp: Assembler.Operand; opcode: SIGNED32;
 		BEGIN
 			ASSERT(sizeInBytes MOD (cpuBits DIV 8) = 0);
@@ -2195,7 +2195,7 @@ TYPE
 
 		PROCEDURE EmitMul(CONST instruction: IntermediateCode.Instruction);
 		VAR op1,op2,op3,temp: Assembler.Operand; ra,rd: Ticket;
-			value: HUGEINT; exp: SIGNED32; iop3: IntermediateCode.Operand;
+			value: SIGNED64; exp: SIGNED32; iop3: IntermediateCode.Operand;
 			inst: IntermediateCode.Instruction;
 		BEGIN
 			IF IntermediateCode.IsConstantInteger(instruction.op3,value) & IntermediateBackend.PowerOf2(value,exp) THEN
@@ -2284,7 +2284,7 @@ TYPE
 			dividend,quotient,remainder,imm,target,memop: Assembler.Operand;
 			op1,op2,op3: Assembler.Operand; ra,rd: Ticket;
 			size: SIZE;
-			value: HUGEINT; exp: SIGNED32; iop3: IntermediateCode.Operand;
+			value: SIGNED64; exp: SIGNED32; iop3: IntermediateCode.Operand;
 			inst: IntermediateCode.Instruction;
 
 		BEGIN
@@ -2591,7 +2591,7 @@ TYPE
 		END EmitCas;
 
 		PROCEDURE EmitCopy(CONST instruction: IntermediateCode.Instruction);
-		VAR op1,op2,op3: Assembler.Operand; rs, rd, rc, t: Ticket; temp,imm: Assembler.Operand; source, dest: IntermediateCode.Operand; size: HUGEINT;type: IntermediateCode.Type;
+		VAR op1,op2,op3: Assembler.Operand; rs, rd, rc, t: Ticket; temp,imm: Assembler.Operand; source, dest: IntermediateCode.Operand; size: SIGNED64;type: IntermediateCode.Type;
 		BEGIN
 			IF IntermediateCode.IsConstantInteger(instruction.op3, size) & ((size=8)  OR (size = 4) OR (size = 2) OR (size=1)) & (size * 8 <= cpuBits) THEN
 				MakeRegister(instruction.op1,Low,op1);

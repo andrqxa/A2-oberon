@@ -318,7 +318,7 @@ BEGIN
 END Buffer;
 
 (** Write "x" as a hexadecimal number.  "w" is the field width.  Always prints 16 digits. *)
-PROCEDURE HIntHex*(x : HUGEINT; w : SIGNED32);
+PROCEDURE HIntHex*(x : SIGNED64; w : SIGNED32);
 VAR
 	out : Streams.Writer;
 BEGIN {EXCLUSIVE}

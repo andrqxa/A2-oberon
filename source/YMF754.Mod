@@ -644,7 +644,7 @@ TYPE
 			RETURN SELF.volume;
 		END GetVolume;
 
-		(** GetPosition returns the current position in samples. MAY CHANGE TO HUGEINT*)
+		(** GetPosition returns the current position in samples. MAY CHANGE TO SIGNED64*)
 		PROCEDURE GetPosition*() : SIGNED32;
 		BEGIN
 			ASSERT(~closed);

@@ -45,7 +45,7 @@ CONST
 	ReturnStackDisplacement = 2 * AddressSize;
 
 TYPE
-	CpuCyclesArray* = ARRAY Machine.MaxCPU OF HUGEINT;
+	CpuCyclesArray* = ARRAY Machine.MaxCPU OF SIGNED64;
 
 	EventHandler* = PROCEDURE {DELEGATE};
 
@@ -400,8 +400,8 @@ VAR
 
 	(* Performance monitoring *)
 	idlecount*: ARRAY Machine.MaxCPU OF SIGNED32; (** count of idle process timeslice interrupts *)
-	idleCycles- : ARRAY Machine.MaxCPU OF HUGEINT; (** CPU cycles of idle threads *)
-	perfTsc-: ARRAY Machine.MaxCPU OF HUGEINT;
+	idleCycles- : ARRAY Machine.MaxCPU OF SIGNED64; (** CPU cycles of idle threads *)
+	perfTsc-: ARRAY Machine.MaxCPU OF SIGNED64;
 
 	(* Statistics *)
 	Nlock-, Nunlock-, Nawait-, NawaitNoIF-, NawaitTrue-, Ncreate-, Nterminate-,
@@ -820,9 +820,9 @@ END GetCpuCycles;
 
 (*! DEBUG *)
 VAR
-	currentProcessTime- : HUGEINT;
-PROCEDURE CurrentProcessTime * (): HUGEINT;
-VAR result: HUGEINT; process: Process; i: SIGNED32;
+	currentProcessTime- : SIGNED64;
+PROCEDURE CurrentProcessTime * (): SIGNED64;
+VAR result: SIGNED64; process: Process; i: SIGNED32;
 BEGIN
 	currentProcessTime := Machine.GetTimer();
 	result := currentProcessTime - perfTsc[Machine.ID()];
@@ -831,7 +831,7 @@ BEGIN
 	RETURN result;
 END CurrentProcessTime;
 
-PROCEDURE TimerFrequency * (): HUGEINT;
+PROCEDURE TimerFrequency * (): SIGNED64;
 BEGIN
 	RETURN 333000000
 END TimerFrequency;

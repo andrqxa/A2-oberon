@@ -84,7 +84,7 @@ MODULE SymbiosASPI;	(** non-portable *)
 		PageSize = 4096;
 
 	TYPE
-		Time* = HUGEINT;
+		Time* = SIGNED64;
 
 		(* Data structure for measuring *)
 		Measure* = POINTER TO MeasureDesc;

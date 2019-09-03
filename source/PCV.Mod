@@ -395,7 +395,7 @@ END AllocateGlobals;
 
 PROCEDURE PreAllocate*(context, scope: PCT.Scope);
 VAR proc: PCT.Proc; adr: PCBT.Procedure; madr: PCBT.Method;
-	gadr: PCBT.GlobalVariable; zero: HUGEINT; imported, visible: BOOLEAN;
+	gadr: PCBT.GlobalVariable; zero: SIGNED64; imported, visible: BOOLEAN;
 	mod: PCBT.Module;
 BEGIN
 	IF (scope IS PCT.ProcScope) THEN
@@ -623,6 +623,6 @@ END PCV.
 	06.06.01	prk	use string pool for object names
 	17.05.01	prk	Delegates
 	07.05.01	be	register sign information added in the back-end
-	25.03.01	prk	limited HUGEINT implementation (as abstract type)
+	25.03.01	prk	limited SIGNED64 implementation (as abstract type)
 	22.02.01	prk	delegates
 *)

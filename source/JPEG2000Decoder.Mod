@@ -4877,7 +4877,7 @@ MODULE JPEG2000Decoder;
 
 	(*
 		(* This shall be the interface for applications requesting data contained in boxes. 'data' will only contain raw data, but no subboxes *)
-		JP2BoxHandler* = PROCEDURE {DELEGATE} (boxType : SIGNED32; boxData : J2K.ByteArrayPtr; boxDataLen : HUGEINT; VAR abort : BOOLEAN);
+		JP2BoxHandler* = PROCEDURE {DELEGATE} (boxType : SIGNED32; boxData : J2K.ByteArrayPtr; boxDataLen : SIGNED64; VAR abort : BOOLEAN);
 	*)
 
 		JP2Box = OBJECT
@@ -4904,7 +4904,7 @@ MODULE JPEG2000Decoder;
 				initError : BOOLEAN;
 				lastBoxFound, jp2HeaderBoxFound : BOOLEAN;
 				curBoxType : SIGNED32;
-				curBoxLen, curBoxContLen : HUGEINT;	(* current box length: total & content length *)
+				curBoxLen, curBoxContLen : SIGNED64;	(* current box length: total & content length *)
 
 			PROCEDURE & InitNew *(s : Streams.Reader);
 				BEGIN
@@ -5013,7 +5013,7 @@ MODULE JPEG2000Decoder;
 			PROCEDURE ReadFileTypeBox () : BOOLEAN;
 				VAR
 					br, minV : SIGNED32;
-					clLength : HUGEINT;	(* Length of compatibility list (i.e. the number of list entries) *)
+					clLength : SIGNED64;	(* Length of compatibility list (i.e. the number of list entries) *)
 					jp2Comp : BOOLEAN;
 				BEGIN
 
@@ -5061,7 +5061,7 @@ MODULE JPEG2000Decoder;
 
 			PROCEDURE ReadJP2HeaderBox (VAR box : JP2Box) : BOOLEAN;
 				VAR
-					headerBoxLen, nColSpecBox : HUGEINT;
+					headerBoxLen, nColSpecBox : SIGNED64;
 					ok : BOOLEAN;
 				BEGIN
 					(* We just skip the header *)
@@ -5175,7 +5175,7 @@ MODULE JPEG2000Decoder;
 					RETURN ~initError & ~lastBoxFound & (s.Available() >= 8);
 			END HasNextBox;
 
-			PROCEDURE NextBox (VAR boxtype : SIGNED32; VAR length : HUGEINT) : BOOLEAN;
+			PROCEDURE NextBox (VAR boxtype : SIGNED32; VAR length : SIGNED64) : BOOLEAN;
 				BEGIN
 					IF ~HasNextBox() THEN
 						KernelLog.String("ERROR (JP2FileFormatReader.NextBox): No (more) JP2 boxes available");
@@ -5276,7 +5276,7 @@ MODULE JPEG2000Decoder;
 					noCodestream : BOOLEAN;
 					box : JP2Box;
 					boxType : SIGNED32;
-					boxLen : HUGEINT;
+					boxLen : SIGNED64;
 				BEGIN
 					s := NIL;
 					noCodestream := TRUE;

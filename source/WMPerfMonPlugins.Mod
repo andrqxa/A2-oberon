@@ -395,7 +395,7 @@ TYPE
 	 	notifiers : Notifiers;
 
 	 	(* Fields related to CPU time consumption calculation of the Updater obj *)
-	 	lastCycles, lastTimestamp : HUGEINT;
+	 	lastCycles, lastTimestamp : SIGNED64;
 	 	sample : SIGNED32; sampleBuffer : POINTER TO ARRAY OF REAL;
 	 	me : Objects.Process; (* Process associated to this active object *)
 
@@ -672,7 +672,7 @@ TYPE
 
 		(* Calculates % CPU time consumed by this process. Updates field perf *)
 		PROCEDURE UpdatePerf;
-		VAR timestamp, cycles : HUGEINT; cpuCycles : Objects.CpuCyclesArray; i : SIGNED32; value, sum : REAL;
+		VAR timestamp, cycles : SIGNED64; cpuCycles : Objects.CpuCyclesArray; i : SIGNED32; value, sum : REAL;
 		BEGIN {EXCLUSIVE}
 			timestamp := Machine.GetTimer();
 			IF lastTimestamp # 0 THEN
@@ -750,7 +750,7 @@ VAR
 PROCEDURE EstimateCpuClockrate*(VAR clockrate : SIGNED32) : BOOLEAN;
 VAR
 	timer : Kernel.Timer; milliTimer : Kernel.MilliTimer;
-	startTime, endTime, timeDiff : HUGEINT;
+	startTime, endTime, timeDiff : SIGNED64;
 	nbrOfGcRuns : SIZE;
 BEGIN
 	NEW(timer); nbrOfGcRuns := Heaps.Ngc;
@@ -772,7 +772,7 @@ END EstimateCpuClockrate;
 	@param mhz: CPU clockrate in MHz
 	@return: Number of milliseconds
 *)
-PROCEDURE CyclesToMs*(cycles : HUGEINT; mhz : SIGNED32) : SIGNED32;
+PROCEDURE CyclesToMs*(cycles : SIGNED64; mhz : SIGNED32) : SIGNED32;
 BEGIN
 	RETURN SHORT (ABS(cycles) DIV (1000*ABS(mhz)));
 END CyclesToMs;
