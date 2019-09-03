@@ -34,7 +34,7 @@ BEGIN
 END Rotation4x4;
 
 PROCEDURE MulMat*(A, B: Matrix4x4):Matrix4x4;
-VAR x, y, t: LONGINT;
+VAR x, y, t: SIGNED32;
 		result : Matrix4x4;
 BEGIN
   FOR x := 0 TO 3 DO FOR y := 0 TO 3 DO

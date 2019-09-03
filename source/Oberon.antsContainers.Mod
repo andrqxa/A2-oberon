@@ -33,7 +33,7 @@ TYPE
 
 	SortList = POINTER TO SortListDesc;
 	SortListDesc = RECORD (vyLinks.LinkDesc)
-		pos: LONGINT;
+		pos: SIGNED32;
 		size: SIGNED16;
 		frames: vyLinks.Link
 	END;
@@ -46,7 +46,7 @@ VAR
 		IF l.link = NIL THEN RETURN NIL ELSE RETURN l.link( SortList ) END
 	END Next;
 
-	PROCEDURE InsertSorted( VAR list: SortList;  f: Display.Frame;  pos: LONGINT;  VAR size: SIGNED16 );
+	PROCEDURE InsertSorted( VAR list: SortList;  f: Display.Frame;  pos: SIGNED32;  VAR size: SIGNED16 );
 	VAR this, next: SortList;  insert: SortList;
 	BEGIN
 		IF list = NIL THEN NEW( list );  list.pos := pos;  list.size := size;  vyLinks.InsertObj( list.frames, f )
@@ -95,14 +95,14 @@ VAR
 		IF (msg.W # f.W) OR (msg.H # f.H) THEN f.handle( f, msg ) END  (* in case is not in Display *)
 	END Resize;
 
-	PROCEDURE SetPosition( f: Objects.Object;  posx, posy: LONGINT );
+	PROCEDURE SetPosition( f: Objects.Object;  posx, posy: SIGNED32 );
 	VAR setc: Objects.AttrMsg;
 	BEGIN
 		setc.id := Objects.set;  setc.name := "PosX";  setc.res := -1;  setc.class := Objects.Int;  setc.i := posx;  f.handle( f, setc );
 		setc.id := Objects.set;  setc.name := "PosY";  setc.res := -1;  setc.class := Objects.Int;  setc.i := posy;  f.handle( f, setc )
 	END SetPosition;
 
-	PROCEDURE GetPosition( f: Objects.Object;  VAR posx, posy: LONGINT ): BOOLEAN;
+	PROCEDURE GetPosition( f: Objects.Object;  VAR posx, posy: SIGNED32 ): BOOLEAN;
 	VAR getc: Objects.AttrMsg;
 	BEGIN
 		getc.id := Objects.get;  getc.name := "PosX";  getc.res := -1;  f.handle( f, getc );
@@ -116,7 +116,7 @@ VAR
 
 	PROCEDURE MakePosLists( F: Display.Frame;  VAR xlist, ylist, undeflist: SortList );
 	(* guarantees consitency of width and heights *)
-	VAR c: Display.Frame;  w, h: SIGNED16;  posx, posy: LONGINT;
+	VAR c: Display.Frame;  w, h: SIGNED16;  posx, posy: SIGNED32;
 	BEGIN
 		c := F.dsc;
 		WHILE c # NIL DO
@@ -127,7 +127,7 @@ VAR
 		END
 	END MakePosLists;
 
-	PROCEDURE GetPosList( VAR list: SortList;  pos: LONGINT ): vyLinks.Link;
+	PROCEDURE GetPosList( VAR list: SortList;  pos: SIGNED32 ): vyLinks.Link;
 	BEGIN
 		WHILE list # NIL DO
 			IF pos = list.pos THEN RETURN list.frames END;
@@ -170,8 +170,8 @@ VAR
 		WHILE link # NIL DO ShiftTo( link.obj( Display.Frame ), link.obj( Display.Frame ).X, posy );  link := link.link END
 	END SameYPos;
 
-	PROCEDURE FindItemWithPosition( f: Display.Frame;  posx, posy: LONGINT ): BOOLEAN;
-	VAR o: Display.Frame;  tposx, tposy: LONGINT;
+	PROCEDURE FindItemWithPosition( f: Display.Frame;  posx, posy: SIGNED32 ): BOOLEAN;
+	VAR o: Display.Frame;  tposx, tposy: SIGNED32;
 	BEGIN
 		o := f.dsc;
 		WHILE o # NIL DO
@@ -181,13 +181,13 @@ VAR
 		RETURN FALSE
 	END FindItemWithPosition;
 
-	PROCEDURE Max( x, y: LONGINT ): LONGINT;
+	PROCEDURE Max( x, y: SIGNED32 ): SIGNED32;
 	BEGIN
 		IF x > y THEN RETURN x ELSE RETURN y END
 	END Max;
 
-	PROCEDURE NextFreePosition( f: Display.Frame;  VAR posx, posy: LONGINT );
-	VAR x, y: LONGINT;  max: LONGINT;
+	PROCEDURE NextFreePosition( f: Display.Frame;  VAR posx, posy: SIGNED32 );
+	VAR x, y: SIGNED32;  max: SIGNED32;
 	BEGIN
 		x := posx;  y := posy;  max := Max( ABS( x ), ABS( y ) );
 		WHILE FindItemWithPosition( f, x, y ) DO
@@ -213,7 +213,7 @@ VAR
 	END Position;
 
 	PROCEDURE AdjustPosition( ref: Display.Frame;  center: Display.Frame );
-	VAR x, y: LONGINT;  xl, yl, ul: SortList;  l: vyLinks.Link;
+	VAR x, y: SIGNED32;  xl, yl, ul: SortList;  l: vyLinks.Link;
 	BEGIN
 		IF GetPosition( center, x, y ) THEN
 			MakePosLists( ref, xl, yl, ul );  l := GetPosList( xl, x );  SameWidth( l, center.W );  xl.size := center.W;
@@ -221,7 +221,7 @@ VAR
 		END
 	END AdjustPosition;
 
-	PROCEDURE AdjustPositionFromL( ref: Display.Frame;  center: Display.Frame;  x, y: LONGINT );
+	PROCEDURE AdjustPositionFromL( ref: Display.Frame;  center: Display.Frame;  x, y: SIGNED32 );
 	VAR xl, yl, ul: SortList;  l: vyLinks.Link;  W, H: SIGNED16;
 	BEGIN
 		W := center.W;  H := center.H;  MakePosLists( ref, xl, yl, ul );  l := GetPosList( xl, x );
@@ -232,7 +232,7 @@ VAR
 	END AdjustPositionFromL;
 
 	PROCEDURE FindCentral( o: Display.Frame ): Display.Frame;
-	VAR obj: Display.Frame;  x, y: LONGINT;
+	VAR obj: Display.Frame;  x, y: SIGNED32;
 	BEGIN
 		obj := o.dsc;
 		WHILE obj # NIL DO
@@ -243,7 +243,7 @@ VAR
 	END FindCentral;
 
 	PROCEDURE handler( F: Objects.Object;  VAR M: Objects.ObjMsg );
-	VAR o: Display.Frame;  posx, posy: LONGINT;
+	VAR o: Display.Frame;  posx, posy: SIGNED32;
 	BEGIN
 		WITH F: Panels.Panel DO
 			IF M IS Display.DisplayMsg THEN
@@ -349,8 +349,8 @@ VAR
 		END
 	END GetContext;
 
-	PROCEDURE StickOn*( F: Display.Frame;  sticker: Display.Frame;  posx, posy: LONGINT );
-	VAR f: Display.Frame;  c: Display.ConsumeMsg;  x, y: LONGINT;
+	PROCEDURE StickOn*( F: Display.Frame;  sticker: Display.Frame;  posx, posy: SIGNED32 );
+	VAR f: Display.Frame;  c: Display.ConsumeMsg;  x, y: SIGNED32;
 	BEGIN
 		f := GetContext( F );
 		IF ~(f IS Panels.Panel) THEN RETURN
@@ -360,7 +360,7 @@ VAR
 	END StickOn;
 
 	PROCEDURE Embed*;
-	VAR F, f: Display.Frame;  x, y: LONGINT;
+	VAR F, f: Display.Frame;  x, y: SIGNED32;
 	BEGIN
 		IF Oberon.Pointer.on THEN
 			F := Oberon.MarkedFrame();  f := GetContext( F );

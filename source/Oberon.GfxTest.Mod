@@ -119,7 +119,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Squares2;
 
 	PROCEDURE Star1*;
-		VAR col: Gfx.Color; i: LONGINT;
+		VAR col: Gfx.Color; i: SIGNED32;
 	BEGIN
 		Gfx.Reset(Ctxt);
 		col.r := 127; col.g := 127; col.b := 127;
@@ -138,7 +138,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Star1;
 
 	PROCEDURE Star2*;
-		VAR i: LONGINT; col: Gfx.Color;
+		VAR i: SIGNED32; col: Gfx.Color;
 	BEGIN
 		Gfx.Reset(Ctxt);
 		Gfx.Begin(Ctxt, {Gfx.Record});
@@ -176,7 +176,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Arcs;
 
 	PROCEDURE Ellipses*;
-		VAR ctm: GfxMatrix.Matrix; j, i: LONGINT;
+		VAR ctm: GfxMatrix.Matrix; j, i: SIGNED32;
 	BEGIN
 		Gfx.Reset(Ctxt); Gfx.SetLineWidth(Ctxt, 2);
 		Gfx.SetFlatness(Ctxt, 0.25);
@@ -196,7 +196,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Ellipses;
 
 	PROCEDURE Trapezoids*;
-		VAR factor: REAL; col: Gfx.Color; i: LONGINT; ctm: GfxMatrix.Matrix;
+		VAR factor: REAL; col: Gfx.Color; i: SIGNED32; ctm: GfxMatrix.Matrix;
 	BEGIN
 		Gfx.Reset(Ctxt);
 		Gfx.Translate(Ctxt, 250, 350);
@@ -265,7 +265,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Fractal;
 
 	PROCEDURE Triangle*;
-		VAR clip: Gfx.ClipArea; i: LONGINT;
+		VAR clip: Gfx.ClipArea; i: SIGNED32;
 	BEGIN
 		Gfx.Reset(Ctxt);
 		clip := Gfx.GetClip(Ctxt);
@@ -330,7 +330,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Joints;
 
 	PROCEDURE Dashes*;
-		PROCEDURE doLine (n: LONGINT; d0, d1, d2, d3, phase, y: REAL);
+		PROCEDURE doLine (n: SIGNED32; d0, d1, d2, d3, phase, y: REAL);
 			VAR on, off: ARRAY 2 OF REAL;
 		BEGIN
 			IF n > 0 THEN
@@ -378,7 +378,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Image;
 
 	PROCEDURE Helicopter*;
-		VAR img, simg: Images.Image; pix: Images.Pixel; i: LONGINT;
+		VAR img, simg: Images.Image; pix: Images.Pixel; i: SIGNED32;
 	BEGIN
 		Gfx.Reset(Ctxt);
 		NEW(img); Images.Create(img, 16, 6, Images.A1);
@@ -635,7 +635,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END Show;
 
 	PROCEDURE ImgCmd*;
-		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; tmpCtxt: Gfx.Context; res: SIGNED16;
+		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; tmpCtxt: Gfx.Context; res: SIGNED16;
 	BEGIN
 		text := Oberon.Par.text;
 		Texts.OpenScanner(s, text, Oberon.Par.pos);
@@ -658,7 +658,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END ImgCmd;
 
 	PROCEDURE PrtCmd*;
-		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; tmpCtxt: Gfx.Context; w, h, res: SIGNED16;
+		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; tmpCtxt: Gfx.Context; w, h, res: SIGNED16;
 	BEGIN
 		text := Oberon.Par.text;
 		Texts.OpenScanner(s, text, Oberon.Par.pos);
@@ -688,7 +688,7 @@ MODULE GfxTest IN Oberon; (** portable *)	(* eos  *)
 	END PrtCmd;
 
 	PROCEDURE PSCmd*;
-		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; tmpCtxt: Gfx.Context; res: SIGNED16;
+		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; tmpCtxt: Gfx.Context; res: SIGNED16;
 	BEGIN
 		text := Oberon.Par.text;
 		Texts.OpenScanner(s, text, Oberon.Par.pos);

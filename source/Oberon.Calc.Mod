@@ -20,7 +20,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		END;
 
 	VAR
-		lastTime: LONGINT;
+		lastTime: SIGNED32;
 		W: Texts.Writer;
 		S: Texts.Scanner;
 		syms: Symbol;
@@ -54,7 +54,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	BEGIN RETURN SHORT(n + Eps0)
 	END short;
 
-	PROCEDURE entier (n: LONGREAL): LONGINT;
+	PROCEDURE entier (n: LONGREAL): SIGNED32;
 	BEGIN RETURN ENTIER(n + Eps0)
 	END entier;
 
@@ -111,7 +111,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	END Str;
 
 	PROCEDURE WrHex (n: LONGREAL);
-		VAR x, y: LONGINT; i: SIGNED16;
+		VAR x, y: SIGNED32; i: SIGNED16;
 			a: ARRAY 10 OF CHAR;
 	BEGIN x := entier(n);
 		i := 0; Texts.Write(W, " ");
@@ -140,7 +140,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	PROCEDURE WrReal (n: LONGREAL);
 		VAR x: LONGREAL;
 	BEGIN
-		IF (MIN(LONGINT) <= n) & (n <= MAX(LONGINT)) THEN x := ABS(n - ENTIER(SHORT(n)));
+		IF (MIN(SIGNED32) <= n) & (n <= MAX(SIGNED32)) THEN x := ABS(n - ENTIER(SHORT(n)));
 			IF x < Eps THEN WrInt(n); RETURN END
 		END;
 		IF (MIN(REAL) <= n) & (n <= MAX(REAL)) THEN x := ABS(n - SHORT(n));
@@ -158,7 +158,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		VAR x: LONGREAL;
 	BEGIN
 		Str(" ="); WrReal(n);
-		IF (MIN(LONGINT) <= n) & (n <= MAX(LONGINT)) THEN x := ABS(n - ENTIER(SHORT(n)));
+		IF (MIN(SIGNED32) <= n) & (n <= MAX(SIGNED32)) THEN x := ABS(n - ENTIER(SHORT(n)));
 			IF x < Eps THEN Str(" ="); WrHex(n); Str(" ="); WrInt(n);
 				IF (0 <= n) & (n < 256) & (entier(n) = n) THEN Str(" ="); WrChar(n) END
 			END
@@ -172,8 +172,8 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 
 	PROCEDURE Scan (VAR S: Texts.Scanner);
 
-		PROCEDURE hex (n: LONGINT): LONGINT;
-			VAR x, i: LONGINT; d: ARRAY 8 OF LONGINT;
+		PROCEDURE hex (n: SIGNED32): SIGNED32;
+			VAR x, i: SIGNED32; d: ARRAY 8 OF SIGNED32;
 		BEGIN x := 0; i := 0;
 			REPEAT d[i] := n MOD 10; n := n DIV 10; INC(i) UNTIL n = 0;
 			WHILE i > 0 DO DEC(i); x := 16*x + d[i] END;
@@ -194,7 +194,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	END Scan;
 
 	PROCEDURE OpenScanner (VAR S: Texts.Scanner);
-		VAR text: Texts.Text; beg, end, time: LONGINT;
+		VAR text: Texts.Text; beg, end, time: SIGNED32;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Scan(S);
 		IF (S.class = Texts.Char) & (S.c = "^") & (S.line = 0) THEN
 			Oberon.GetSelection(text, beg, end, time);

@@ -48,12 +48,12 @@ MODULE StyleGadgets IN Oberon; (** portable *)	(* RS, Wed, 9-Jun-1993 *)
 
 (* document coordinate stuff *)
 
-	PROCEDURE Screen(x: LONGINT): SIGNED16;
+	PROCEDURE Screen(x: SIGNED32): SIGNED16;
 	BEGIN
 		RETURN SHORT(x DIV ScnUnit)
 	END Screen;
 
-	PROCEDURE Doc(x: SIGNED16): LONGINT;
+	PROCEDURE Doc(x: SIGNED16): SIGNED32;
 	BEGIN
 		RETURN LONG(x)*ScnUnit;
 	END Doc;
@@ -132,7 +132,7 @@ MODULE StyleGadgets IN Oberon; (** portable *)	(* RS, Wed, 9-Jun-1993 *)
 
 	PROCEDURE CheckTab(style: Styles.Style; i: SIGNED16);
 	VAR
-		tab: LONGINT;
+		tab: SIGNED32;
 		j: SIGNED16;
 	BEGIN
 		tab := style.tab[i]; j := i;
@@ -476,7 +476,7 @@ MODULE StyleGadgets IN Oberon; (** portable *)	(* RS, Wed, 9-Jun-1993 *)
 	PROCEDURE Init;
 		VAR
 		img: ARRAY 32 OF SET;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		img[0] := {0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30}; (*055555555H*)
 		FOR i := 1 TO 31 DO

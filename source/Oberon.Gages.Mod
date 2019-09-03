@@ -12,8 +12,8 @@ CONST
 TYPE
 	Frame* = POINTER TO FrameDesc;
 	FrameDesc* = RECORD (Gadgets.FrameDesc)
-		points*: ARRAY Max OF LONGINT;
-		min, max: LONGINT;
+		points*: ARRAY Max OF SIGNED32;
+		min, max: SIGNED32;
 		maxPoints : SIGNED16;
 		beg, end: SIGNED16;
 	END;
@@ -21,8 +21,8 @@ TYPE
 VAR
 	Mem, Load, Lap: BasicGadgets.Integer;
 	task : Oberon.Task;
-	time, lastmem: LONGINT;
-	maxLoad, loadtime,load, laptime: LONGINT;
+	time, lastmem: SIGNED32;
+	maxLoad, loadtime,load, laptime: SIGNED32;
 
 (* -------- models ---------- *)
 
@@ -79,7 +79,7 @@ BEGIN
 END HandleLap;
 
 PROCEDURE TaskHandle(me : Oberon.Task);
-VAR M: Gadgets.UpdateMsg; tm : LONGINT;
+VAR M: Gadgets.UpdateMsg; tm : SIGNED32;
 BEGIN
 	INC(load); tm := Oberon.Time();
 	IF tm - laptime > Input.TimeUnit DIV 2 THEN
@@ -113,14 +113,14 @@ END Deinstall;
 
 (* --------- *)
 
-PROCEDURE AddPoint(F: Frame; x: LONGINT);
+PROCEDURE AddPoint(F: Frame; x: SIGNED32);
 VAR i: SIGNED16;
 BEGIN
 	IF F.W -2 > Max THEN F.maxPoints := Max ELSE F.maxPoints  := F.W -2 END;
 	F.points[F.end] := x;
 	F.end := (F.end + 1) MOD F.maxPoints;
 	IF F.end = F.beg THEN F.beg := (F.beg + 1) MOD F.maxPoints END;
-	i := F.beg; F.min := MAX(LONGINT); F.max := MIN(LONGINT);
+	i := F.beg; F.min := MAX(SIGNED32); F.max := MIN(SIGNED32);
 	WHILE i # F.end DO
 		IF F.points[i] < F.min THEN F.min := F.points[i] END; IF F.points[i] > F.max THEN F.max := F.points[i] END;
 		i := (i + 1) MOD F.maxPoints
@@ -129,7 +129,7 @@ BEGIN
 END AddPoint;
 
 PROCEDURE RestoreFrame(F: Frame; M: Display3.Mask; x, y, w, h: SIGNED16);
-VAR i, j, mode: SIGNED16; p: LONGINT; s: ARRAY 16 OF CHAR;
+VAR i, j, mode: SIGNED16; p: SIGNED32; s: ARRAY 16 OF CHAR;
 BEGIN
 	Oberon.RemoveMarks(x, y, w, h);
 	Display3.Rect3D(M, Display3.bottomC,Display3.topC, x, y, w, h, 1, Display.replace);

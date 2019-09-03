@@ -20,7 +20,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 
 		Frame* = POINTER TO RECORD (Gadgets.FrameDesc)
 			col*: SIGNED16;
-			age*: LONGINT
+			age*: SIGNED32
 		END;
 
 		NotifyMsg = RECORD (Display.FrameMsg) END;
@@ -28,7 +28,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		SyncMsg = RECORD (Display.FrameMsg) END;
 
 	VAR
-		N: LONGINT; (* no. of figurs *)
+		N: SIGNED32; (* no. of figurs *)
 		Task: Oberon.Task;
 		Fig: ARRAY MaxN OF Icon;
 
@@ -47,15 +47,15 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 	PROCEDURE LoadFig (file: ARRAY OF CHAR); (* read portable file format *)
 		VAR F: Files.File; R: Files.Rider; i, j: SIGNED16;
 
-		PROCEDURE ReadInt (VAR x: LONGINT);
-			VAR n: LONGINT; i: SIGNED8; ch: CHAR;
+		PROCEDURE ReadInt (VAR x: SIGNED32);
+			VAR n: SIGNED32; i: SIGNED8; ch: CHAR;
 		BEGIN i := 0; n := 0; Files.Read(R, ch);
 			WHILE ORD(ch) >= 128 DO INC(n, ASH(ORD(ch) - 128, i)); INC(i, 7); Files.Read(R, ch) END;
 			x := n + ASH(ORD(ch) MOD 64 - ORD(ch) DIV 64 * 64, i)
 		END ReadInt;
 
 		PROCEDURE ReadSet (VAR s: SET);
-			VAR x: LONGINT; i: SIGNED16;
+			VAR x: SIGNED32; i: SIGNED16;
 		BEGIN ReadInt(x); s := {}; i := 0;
 			WHILE i < 32 DO
 				IF ODD(x) THEN INCL(s, i) END;
@@ -117,7 +117,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 
 	PROCEDURE HotSpot (X, Y, W, H, X0, Y0: SIGNED16);
 		CONST d = 6;
-		VAR dx, dy: LONGINT; r: SIGNED16;
+		VAR dx, dy: SIGNED32; r: SIGNED16;
 
 		PROCEDURE Block (x, y, w, h, col, mode: SIGNED16);
 		BEGIN
@@ -161,8 +161,8 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		END
 	END HotSpot;
 
-	PROCEDURE SaveScreen (x0, y0: SIGNED16; keys: SET; col: SIGNED16; VAR State: LONGINT);
-		VAR sum: SET; x, y, w, h: SIGNED16; msg: Display.ControlMsg; wakeUp: LONGINT;
+	PROCEDURE SaveScreen (x0, y0: SIGNED16; keys: SET; col: SIGNED16; VAR State: SIGNED32);
+		VAR sum: SET; x, y, w, h: SIGNED16; msg: Display.ControlMsg; wakeUp: SIGNED32;
 	BEGIN
 		Oberon.RemoveMarks(x0, y0, 52, 52);
 		Display.ReplConst(Display3.black, x0, y0, 52, 52, Display.invert); sum := keys;

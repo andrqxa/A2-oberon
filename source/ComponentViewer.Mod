@@ -7,7 +7,7 @@ IMPORT
 CONST
 	DefaultWidth = 320;
 	DefaultHeight = 240;
-	InvalidPosition* =MIN(LONGINT);
+	InvalidPosition* =MIN(SIGNED32);
 	FlagMoveable* = 20;
 	FlagSmoothGraphics* = 21;
 
@@ -220,7 +220,7 @@ PROCEDURE Open*(context : Commands.Context); (** [Options] <RepositoryName:Compo
 VAR
 	options : Options.Options;
 	filename : ARRAY 128 OF CHAR;
-	x,y, width, height: LONGINT;
+	x,y, width, height: SIGNED32;
 	flags: SET;
 	c: WMComponents.Component;
 	properties: ARRAY 256 OF CHAR;

@@ -15,21 +15,21 @@ MODULE BMP IN Oberon; (** portable *)
 	TYPE
 		FileHeader = RECORD
 			type: ARRAY 4 OF CHAR;	(* must be "BM" *)
-			size: LONGINT;	(* filesize in double words *)
+			size: SIGNED32;	(* filesize in double words *)
 			res1, res2: SIGNED16;	(* reserved, must be 0 *)
-			offBits: LONGINT	(* offset in bytes from the FileHeader to the bitmap data *)
+			offBits: SIGNED32	(* offset in bytes from the FileHeader to the bitmap data *)
 		END;
 
 		BitmapHeader = RECORD
-			size: LONGINT;	(* size of this record *)
-			width, height: LONGINT;	(* image's width and height *)
+			size: SIGNED32;	(* size of this record *)
+			width, height: SIGNED32;	(* image's width and height *)
 			planes: SIGNED16;	(* must be 1 *)
 			depth: SIGNED16;	(* number of bits per pixel [1, 4, 8, 16, 24 or 32] *)
-			compression: LONGINT;	(* type of compression *)
-			sizeImage: LONGINT;	(* can be 0 if bitmap is not compressed *)
-			Xppm, Yppm: LONGINT;	(* pixels per meter *)
-			clrUsed: LONGINT;	(* colors used by actual bitmap *)
-			clrImportant: LONGINT	(* number of colors that are considered important *)
+			compression: SIGNED32;	(* type of compression *)
+			sizeImage: SIGNED32;	(* can be 0 if bitmap is not compressed *)
+			Xppm, Yppm: SIGNED32;	(* pixels per meter *)
+			clrUsed: SIGNED32;	(* colors used by actual bitmap *)
+			clrImportant: SIGNED32	(* number of colors that are considered important *)
 		END;
 
 	VAR
@@ -65,8 +65,8 @@ BEGIN
 	Files.ReadLInt(R, header.clrUsed); Files.ReadLInt(R, header.clrImportant)
 END ScanBitmapHeader;
 
-PROCEDURE ScanCol (VAR R: Files.Rider; pict: Pictures.Picture; nrColor: LONGINT; conversion: BOOLEAN);
-VAR Red, Green, Blue, c: CHAR; C, min, d, x, y, z: LONGINT; i, j, minj: SIGNED16; r, g, b: ARRAY 256 OF SIGNED16;
+PROCEDURE ScanCol (VAR R: Files.Rider; pict: Pictures.Picture; nrColor: SIGNED32; conversion: BOOLEAN);
+VAR Red, Green, Blue, c: CHAR; C, min, d, x, y, z: SIGNED32; i, j, minj: SIGNED16; r, g, b: ARRAY 256 OF SIGNED16;
 BEGIN
 	C := ASH(1, Display.Depth(0)) - 1;
 	IF nrColor > C THEN nrColor := C ELSE DEC(nrColor) END;
@@ -74,7 +74,7 @@ BEGIN
 		FOR i := 0 TO SHORT(C) DO Display.GetColor(i, r[i], g[i], b[i]) END;
 		FOR i := 0 TO SHORT(nrColor) DO
 			Files.Read(R, Blue); Files.Read(R, Green); Files.Read(R, Red); Files.Read(R, c);
-			min := MAX(LONGINT);
+			min := MAX(SIGNED32);
 			FOR j := 0 TO SHORT(C) DO
 				x := ABS(ORD(Red) - r[j]); y := ABS(ORD(Green) - g[j]); z := ABS(ORD(Blue) - b[j]);
 				d := x;
@@ -189,7 +189,7 @@ BEGIN
 END LoadRGB4;
 
 PROCEDURE LoadRGB1 (VAR R: Files.Rider; pict: Pictures.Picture);
-VAR p: LONGINT; i, x, y: SIGNED16; b: CHAR;
+VAR p: SIGNED32; i, x, y: SIGNED16; b: CHAR;
 BEGIN
 	x := 0; y := 0;
 	WHILE ~R.eof DO
@@ -214,7 +214,7 @@ END CheckFile;
 (** Read BMP file.  colorConversion indicates if the BMP file palette and contents should be converted to
 the current physical palette. Color matching is done by euclidean distance *)
 PROCEDURE LoadBmp* (VAR R: Files.Rider; colorConversion: BOOLEAN; pict: Pictures.Picture);
-VAR F: Files.File; pos: LONGINT; fHeader: FileHeader; bHeader: BitmapHeader;
+VAR F: Files.File; pos: SIGNED32; fHeader: FileHeader; bHeader: BitmapHeader;
 BEGIN
 	pos := Files.Pos(R); F := Files.Base(R);
 	ScanFileHeader(R, fHeader);
@@ -244,7 +244,7 @@ BEGIN
 END LoadBmp;
 
 PROCEDURE Handle* (obj: Objects.Object; VAR M: Objects.ObjMsg);
-	VAR pos: LONGINT;
+	VAR pos: SIGNED32;
 BEGIN
 	WITH obj: Pictures.Picture DO
 		IF M IS Objects.AttrMsg THEN

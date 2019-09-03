@@ -111,10 +111,10 @@ VAR
 		InstrTab: POINTER TO ARRAY OF InstrDesc;	(* Table with the instructions !!Hash *)
 		OpTabLen, InstrTabLen: SIGNED16;
 
-		Clash: ARRAY 32 OF LONGINT;
+		Clash: ARRAY 32 OF SIGNED32;
 
 		(*statistic informations*)
-		InstrCount, Average: LONGINT;		(* debug: access average *)
+		InstrCount, Average: SIGNED32;		(* debug: access average *)
 
 		(*docu mode*)
 		Docu: BOOLEAN;
@@ -126,7 +126,7 @@ VAR
 	END Message;
 
 	(** converts an integer value to a hex string (taken from Strings.Mod) *)
-	PROCEDURE IntToHexStr(h, width: LONGINT; VAR s: ARRAY OF CHAR);
+	PROCEDURE IntToHexStr(h, width: SIGNED32; VAR s: ARRAY OF CHAR);
 	VAR c: CHAR;
 	BEGIN
 		IF (width <= 0) THEN width := 8 END;
@@ -2059,7 +2059,7 @@ VAR
 	END InsertSSE4;
 
 PROCEDURE Insert(nofInstr, nofOps: SIGNED16);
-VAR k: LONGINT;
+VAR k: SIGNED32;
 BEGIN
 	InstrTabLen := nofInstr;  OpTabLen := nofOps;
 	OpTabN := 0; Average := 0; InstrCount := 0;
@@ -2080,14 +2080,14 @@ END Insert;
 (* Commands *)
 
 PROCEDURE FindSize*;		(** min-size max-size OpTableSize *)
-VAR j, min, max: SIGNED16; S: Texts.Scanner; bestV, best: LONGINT;
+VAR j, min, max: SIGNED16; S: Texts.Scanner; bestV, best: SIGNED32;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(S); min := SHORT(S.i);
 	Texts.Scan(S); max := SHORT(S.i);
 	Texts.Scan(S); OpTabLen := SHORT(S.i);
 
-	bestV := MAX(LONGINT);
+	bestV := MAX(SIGNED32);
 	Texts.WriteString(W, "Table Size (KB)   Avg Search Len"); Texts.WriteLn(W);
 	FOR j := min TO max DO
 		Insert(j, OpTabLen);
@@ -2104,7 +2104,7 @@ BEGIN
 END FindSize;
 
 PROCEDURE FillTable*;		(** InstrTableSize OpTableSize *)
-VAR k, j: LONGINT; S: Texts.Scanner; lr: LONGREAL;
+VAR k, j: SIGNED32; S: Texts.Scanner; lr: LONGREAL;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(S); k := SHORT(S.i);
@@ -2134,7 +2134,7 @@ BEGIN
 END FillTable;
 
 PROCEDURE ExportTables*;
-VAR f: Files.File; r: Files.Rider; i: LONGINT; name: ARRAY 64 OF CHAR;
+VAR f: Files.File; r: Files.Rider; i: SIGNED32; name: ARRAY 64 OF CHAR;
 BEGIN
 	Texts.WriteString(W, "Creating ");
 	f := Files.Old(FileName);
@@ -2170,7 +2170,7 @@ BEGIN
 END ExportTables;
 	PROCEDURE DumpInstructions*;
 	VAR f: Files.File; r: Files.Rider; t: Texts.Text;
-		low, best: Mnemo; size, i, j, bestIdx, count: LONGINT;
+		low, best: Mnemo; size, i, j, bestIdx, count: SIGNED32;
 		cur: CHAR; Pad: Texts.Writer; target: SET;
 		s: ARRAY 32 OF CHAR;
 BEGIN

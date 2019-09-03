@@ -2515,7 +2515,7 @@ negative: redefining long
 negative: redefining longint
 
 	MODULE Test;
-	CONST LONGINT = 0;
+	CONST SIGNED32 = 0;
 	END Test.
 
 negative: redefining longreal
@@ -4332,13 +4332,13 @@ negative: capital letter of constant integer
 positive: minimal value of integer
 
 	MODULE Test;
-	CONST A = MIN (SIGNED8); B = MIN (SIGNED16); C = MIN (LONGINT); D = MIN (HUGEINT)
+	CONST A = MIN (SIGNED8); B = MIN (SIGNED16); C = MIN (SIGNED32); D = MIN (HUGEINT)
 	END Test.
 
 positive: maximal value of integer
 
 	MODULE Test;
-	CONST A = MAX (SIGNED8); B = MAX (SIGNED16); C = MAX (LONGINT); D = MAX (HUGEINT)
+	CONST A = MAX (SIGNED8); B = MAX (SIGNED16); C = MAX (SIGNED32); D = MAX (HUGEINT)
 	END Test.
 
 positive: arithmetic left shift of constant integers
@@ -6887,7 +6887,7 @@ positive: predefined basic integer type
 positive: predefined basic long integer type
 
 	MODULE Test;
-	TYPE BasicType = LONGINT;
+	TYPE BasicType = SIGNED32;
 	END Test.
 
 positive: predefined basic huge integer type
@@ -7049,7 +7049,7 @@ positive: array of basic integer type
 positive: array of basic long integer type
 
 	MODULE Test;
-	TYPE Array = ARRAY 10 OF LONGINT;
+	TYPE Array = ARRAY 10 OF SIGNED32;
 	END Test.
 
 positive: array of basic huge integer type
@@ -7138,7 +7138,7 @@ negative: record extending a variable
 negative: record extending a basic type
 
 	MODULE Test;
-	TYPE Record = RECORD (LONGINT) END;
+	TYPE Record = RECORD (SIGNED32) END;
 	END Test.
 
 negative: record extending an array
@@ -7368,7 +7368,7 @@ negative: object extending a variable
 negative: object extending a basic type
 
 	MODULE Test;
-	TYPE Object = OBJECT (LONGINT) END Object;
+	TYPE Object = OBJECT (SIGNED32) END Object;
 	END Test.
 
 negative: object extending an array
@@ -7617,7 +7617,7 @@ negative: pointer to basic integer type
 negative: pointer to basic long integer type
 
 	MODULE Test;
-	TYPE Pointer = POINTER TO LONGINT;
+	TYPE Pointer = POINTER TO SIGNED32;
 	END Test.
 
 negative: pointer to basic huge integer type
@@ -7781,7 +7781,7 @@ positive: procedure type returning basic integer type
 positive: procedure type returning basic long integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (): LONGINT;
+	TYPE Procedure = PROCEDURE (): SIGNED32;
 	END Test.
 
 positive: procedure type returning basic huge integer type
@@ -8129,43 +8129,43 @@ positive: procedure type with intermixed parameters of integer type
 positive: procedure type with a parameter of basic long integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (parameter: LONGINT);
+	TYPE Procedure = PROCEDURE (parameter: SIGNED32);
 	END Test.
 
 positive: procedure type with parameters of basic long integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (a, b, c: LONGINT);
+	TYPE Procedure = PROCEDURE (a, b, c: SIGNED32);
 	END Test.
 
 positive: procedure type with a parameter of variable long integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (VAR parameter: LONGINT);
+	TYPE Procedure = PROCEDURE (VAR parameter: SIGNED32);
 	END Test.
 
 positive: procedure type with parameters of variable long integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (VAR a, b, c: LONGINT);
+	TYPE Procedure = PROCEDURE (VAR a, b, c: SIGNED32);
 	END Test.
 
 positive: procedure type with a parameter of constant long integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (CONST parameter: LONGINT);
+	TYPE Procedure = PROCEDURE (CONST parameter: SIGNED32);
 	END Test.
 
 positive: procedure type with parameters of constant long integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (CONST a, b, c: LONGINT);
+	TYPE Procedure = PROCEDURE (CONST a, b, c: SIGNED32);
 	END Test.
 
 positive: procedure type with intermixed parameters of long integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (a: LONGINT; VAR b: LONGINT; CONST c: LONGINT);
+	TYPE Procedure = PROCEDURE (a: SIGNED32; VAR b: SIGNED32; CONST c: SIGNED32);
 	END Test.
 
 positive: procedure type with a parameter of basic huge integer type
@@ -9362,7 +9362,7 @@ negative: variable marked as read-only within procedure in object
 negative: duplicated variable
 
 	MODULE Test;
-	VAR variable: LONGINT;
+	VAR variable: SIGNED32;
 	VAR variable: RECORD END;
 	END Test.
 
@@ -9370,7 +9370,7 @@ negative: duplicated variable within procedure
 
 	MODULE Test;
 	PROCEDURE Procedure;
-		VAR variable: LONGINT;
+		VAR variable: SIGNED32;
 		VAR variable: RECORD END;
 	END Procedure;
 	END Test.
@@ -9380,7 +9380,7 @@ negative: duplicated variable within nested procedure
 	MODULE Test;
 	PROCEDURE Procedure;
 		PROCEDURE Procedure;
-			VAR variable: LONGINT;
+			VAR variable: SIGNED32;
 			VAR variable: RECORD END;
 		END Procedure;
 	END Procedure;
@@ -9390,7 +9390,7 @@ negative: duplicated variable within record
 
 	MODULE Test;
 	TYPE Record = RECORD
-		variable: LONGINT;
+		variable: SIGNED32;
 		variable: RECORD END;
 	END;
 	END Test.
@@ -9399,7 +9399,7 @@ negative: duplicated variable within object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR variable: LONGINT;
+		VAR variable: SIGNED32;
 		VAR variable: RECORD END;
 	END Object;
 	END Test.
@@ -9409,7 +9409,7 @@ negative: duplicated variable within record in procedure
 	MODULE Test;
 	PROCEDURE Procedure;
 		TYPE Record = RECORD
-			variable: LONGINT;
+			variable: SIGNED32;
 			variable: RECORD END;
 		END;
 	END Procedure;
@@ -9420,7 +9420,7 @@ negative: duplicated variable within object in procedure
 	MODULE Test;
 	PROCEDURE Procedure;
 		TYPE Object = OBJECT
-			VAR variable: LONGINT;
+			VAR variable: SIGNED32;
 			VAR variable: RECORD END;
 		END Object;
 	END Procedure;
@@ -9431,7 +9431,7 @@ negative: duplicated variable within procedure in object
 	MODULE Test;
 	TYPE Object = OBJECT
 		PROCEDURE Procedure;
-			VAR variable: LONGINT;
+			VAR variable: SIGNED32;
 			VAR variable: RECORD END;
 		END Procedure;
 	END Object;
@@ -9440,14 +9440,14 @@ negative: duplicated variable within procedure in object
 negative: duplicated variable in same declaration
 
 	MODULE Test;
-	VAR variable, variable: LONGINT;
+	VAR variable, variable: SIGNED32;
 	END Test.
 
 negative: duplicated variable in same declaration within procedure
 
 	MODULE Test;
 	PROCEDURE Procedure;
-		VAR variable, variable: LONGINT;
+		VAR variable, variable: SIGNED32;
 	END Procedure;
 	END Test.
 
@@ -9456,7 +9456,7 @@ negative: duplicated variable in same declaration within nested procedure
 	MODULE Test;
 	PROCEDURE Procedure;
 		PROCEDURE Procedure;
-			VAR variable, variable: LONGINT;
+			VAR variable, variable: SIGNED32;
 		END Procedure;
 	END Procedure;
 	END Test.
@@ -9465,7 +9465,7 @@ negative: duplicated variable in same declaration within record
 
 	MODULE Test;
 	TYPE Record = RECORD
-		variable, variable: LONGINT;
+		variable, variable: SIGNED32;
 	END;
 	END Test.
 
@@ -9473,7 +9473,7 @@ negative: duplicated variable in same declaration within object
 
 	MODULE Test;
 	TYPE Object = OBJECT
-		VAR variable, variable: LONGINT;
+		VAR variable, variable: SIGNED32;
 	END Object;
 	END Test.
 
@@ -9482,7 +9482,7 @@ negative: duplicated variable in same declaration within record in procedure
 	MODULE Test;
 	PROCEDURE Procedure;
 		TYPE Record = RECORD
-			variable, variable: LONGINT;
+			variable, variable: SIGNED32;
 		END;
 	END Procedure;
 	END Test.
@@ -9492,7 +9492,7 @@ negative: duplicated variable in same declaration within object in procedure
 	MODULE Test;
 	PROCEDURE Procedure;
 		TYPE Object = OBJECT
-			VAR variable, variable: LONGINT;
+			VAR variable, variable: SIGNED32;
 		END Object;
 	END Procedure;
 	END Test.
@@ -9502,7 +9502,7 @@ negative: duplicated variable in same declaration within procedure in object
 	MODULE Test;
 	TYPE Object = OBJECT
 		PROCEDURE Procedure;
-			VAR variable, variable: LONGINT;
+			VAR variable, variable: SIGNED32;
 		END Procedure;
 	END Object;
 	END Test.
@@ -9570,7 +9570,7 @@ positive: variable of basic integer type
 positive: variable of basic long integer type
 
 	MODULE Test;
-	VAR variable: LONGINT;
+	VAR variable: SIGNED32;
 	END Test.
 
 positive: variable of basic huge integer type
@@ -10689,7 +10689,7 @@ positive: procedure returning basic integer type
 positive: procedure returning basic long integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (): LONGINT;
+	PROCEDURE Procedure (): SIGNED32;
 	END Procedure;
 	END Test.
 
@@ -10853,14 +10853,14 @@ negative: parameter marked as read-only
 negative: duplicated parameters
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter: LONGINT; parameter: LONGINT);
+	PROCEDURE Procedure (parameter: SIGNED32; parameter: SIGNED32);
 	END Procedure;
 	END Test.
 
 negative: duplicated parameters in same declaration
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter, parameter: LONGINT);
+	PROCEDURE Procedure (parameter, parameter: SIGNED32);
 	END Procedure;
 	END Test.
 
@@ -11113,49 +11113,49 @@ positive: procedure with intermixed parameters of integer type
 positive: procedure with a parameter of basic long integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter: LONGINT);
+	PROCEDURE Procedure (parameter: SIGNED32);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of basic long integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (a, b, c: LONGINT);
+	PROCEDURE Procedure (a, b, c: SIGNED32);
 	END Procedure;
 	END Test.
 
 positive: procedure with a parameter of variable long integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR parameter: LONGINT);
+	PROCEDURE Procedure (VAR parameter: SIGNED32);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of variable long integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR a, b, c: LONGINT);
+	PROCEDURE Procedure (VAR a, b, c: SIGNED32);
 	END Procedure;
 	END Test.
 
 positive: procedure with a parameter of constant long integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST parameter: LONGINT);
+	PROCEDURE Procedure (CONST parameter: SIGNED32);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of constant long integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST a, b, c: LONGINT);
+	PROCEDURE Procedure (CONST a, b, c: SIGNED32);
 	END Procedure;
 	END Test.
 
 positive: procedure with intermixed parameters of long integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (a: LONGINT; VAR b: LONGINT; CONST c: LONGINT);
+	PROCEDURE Procedure (a: SIGNED32; VAR b: SIGNED32; CONST c: SIGNED32);
 	END Procedure;
 	END Test.
 
@@ -12044,7 +12044,7 @@ negative: procedure with parameter and local variable with same name
 
 	MODULE Test;
 	PROCEDURE Procedure (parameter: SET);
-	VAR parameter: LONGINT;
+	VAR parameter: SIGNED32;
 	END Procedure;
 	END Test.
 
@@ -12083,7 +12083,7 @@ positive: integer parameter assignment
 positive: long integer parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGINT); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); BEGIN value := value; END Procedure;
 	END Test.
 
 positive: huge integer parameter assignment
@@ -12233,7 +12233,7 @@ positive: variable integer parameter assignment
 positive: variable long integer parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR value: LONGINT); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); BEGIN value := value; END Procedure;
 	END Test.
 
 positive: variable huge integer parameter assignment
@@ -12383,7 +12383,7 @@ negative: constant integer parameter assignment
 negative: constant long integer parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST value: LONGINT); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (CONST value: SIGNED32); BEGIN value := value; END Procedure;
 	END Test.
 
 negative: constant huge integer parameter assignment
@@ -12541,7 +12541,7 @@ negative: calling procedure with boolean parameter with integer argument
 negative: calling procedure with boolean parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: BOOLEAN); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12669,7 +12669,7 @@ negative: calling procedure with character parameter with integer argument
 negative: calling procedure with character parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12797,7 +12797,7 @@ negative: calling procedure with short integer parameter with integer argument
 negative: calling procedure with short integer parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12925,7 +12925,7 @@ positive: calling procedure with integer parameter with integer argument
 negative: calling procedure with integer parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13022,7 +13022,7 @@ negative: calling procedure with long integer parameter with boolean argument
 
 	MODULE Test;
 	VAR argument: BOOLEAN;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13030,7 +13030,7 @@ negative: calling procedure with long integer parameter with character argument
 
 	MODULE Test;
 	VAR argument: CHAR;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13038,7 +13038,7 @@ positive: calling procedure with long integer parameter with short integer argum
 
 	MODULE Test;
 	VAR argument: SIGNED8;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13046,15 +13046,15 @@ positive: calling procedure with long integer parameter with integer argument
 
 	MODULE Test;
 	VAR argument: SIGNED16;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
 positive: calling procedure with long integer parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	VAR argument: SIGNED32;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13062,7 +13062,7 @@ negative: calling procedure with long integer parameter with huge integer argume
 
 	MODULE Test;
 	VAR argument: HUGEINT;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13070,7 +13070,7 @@ negative: calling procedure with long integer parameter with real argument
 
 	MODULE Test;
 	VAR argument: REAL;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13078,7 +13078,7 @@ negative: calling procedure with long integer parameter with long real argument
 
 	MODULE Test;
 	VAR argument: LONGREAL;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13086,7 +13086,7 @@ negative: calling procedure with long integer parameter with set argument
 
 	MODULE Test;
 	VAR argument: SET;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13094,7 +13094,7 @@ negative: calling procedure with long integer parameter with array argument
 
 	MODULE Test;
 	VAR argument: ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13102,7 +13102,7 @@ negative: calling procedure with long integer parameter with record argument
 
 	MODULE Test;
 	VAR argument: RECORD END;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13110,7 +13110,7 @@ negative: calling procedure with long integer parameter with object argument
 
 	MODULE Test;
 	VAR argument: OBJECT END;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13118,7 +13118,7 @@ negative: calling procedure with long integer parameter with base object argumen
 
 	MODULE Test;
 	VAR argument: OBJECT;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13126,7 +13126,7 @@ negative: calling procedure with long integer parameter with pointer to array ar
 
 	MODULE Test;
 	VAR argument: POINTER TO ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13134,7 +13134,7 @@ negative: calling procedure with long integer parameter with pointer to record a
 
 	MODULE Test;
 	VAR argument: POINTER TO RECORD END;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13142,7 +13142,7 @@ negative: calling procedure with long integer parameter with procedure argument
 
 	MODULE Test;
 	VAR argument: PROCEDURE;
-	PROCEDURE Procedure (value: LONGINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13181,7 +13181,7 @@ positive: calling procedure with huge integer parameter with integer argument
 positive: calling procedure with huge integer parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: HUGEINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13309,7 +13309,7 @@ positive: calling procedure with real parameter with integer argument
 positive: calling procedure with real parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: REAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13437,7 +13437,7 @@ positive: calling procedure with long real parameter with integer argument
 positive: calling procedure with long real parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: LONGREAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13565,7 +13565,7 @@ negative: calling procedure with set parameter with integer argument
 negative: calling procedure with set parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: SET); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13693,7 +13693,7 @@ negative: calling procedure with array parameter with integer argument
 negative: calling procedure with array parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13844,7 +13844,7 @@ negative: calling procedure with open array parameter with integer argument
 negative: calling procedure with open array parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: ARRAY OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13979,7 +13979,7 @@ negative: calling procedure with record parameter with integer argument
 negative: calling procedure with record parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14126,7 +14126,7 @@ negative: calling procedure with object parameter with integer argument
 negative: calling procedure with object parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: OBJECT END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14273,7 +14273,7 @@ negative: calling procedure with base object parameter with integer argument
 negative: calling procedure with base object parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: OBJECT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14401,7 +14401,7 @@ negative: calling procedure with pointer to array parameter with integer argumen
 negative: calling procedure with pointer to array parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14529,7 +14529,7 @@ negative: calling procedure with pointer to record parameter with integer argume
 negative: calling procedure with pointer to record parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: POINTER TO RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14676,7 +14676,7 @@ negative: calling procedure with procedure parameter with integer argument
 negative: calling procedure with procedure parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (value: PROCEDURE); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14804,7 +14804,7 @@ negative: calling procedure with boolean variable parameter with integer argumen
 negative: calling procedure with boolean variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: BOOLEAN); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14932,7 +14932,7 @@ negative: calling procedure with character variable parameter with integer argum
 negative: calling procedure with character variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15060,7 +15060,7 @@ negative: calling procedure with short integer variable parameter with integer a
 negative: calling procedure with short integer variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15188,7 +15188,7 @@ positive: calling procedure with integer variable parameter with integer argumen
 negative: calling procedure with integer variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15285,7 +15285,7 @@ negative: calling procedure with long integer variable parameter with boolean ar
 
 	MODULE Test;
 	VAR argument: BOOLEAN;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15293,7 +15293,7 @@ negative: calling procedure with long integer variable parameter with character 
 
 	MODULE Test;
 	VAR argument: CHAR;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15301,7 +15301,7 @@ negative: calling procedure with long integer variable parameter with short inte
 
 	MODULE Test;
 	VAR argument: SIGNED8;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15309,15 +15309,15 @@ negative: calling procedure with long integer variable parameter with integer ar
 
 	MODULE Test;
 	VAR argument: SIGNED16;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
 positive: calling procedure with long integer variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	VAR argument: SIGNED32;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15325,7 +15325,7 @@ negative: calling procedure with long integer variable parameter with huge integ
 
 	MODULE Test;
 	VAR argument: HUGEINT;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15333,7 +15333,7 @@ negative: calling procedure with long integer variable parameter with real argum
 
 	MODULE Test;
 	VAR argument: REAL;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15341,7 +15341,7 @@ negative: calling procedure with long integer variable parameter with long real 
 
 	MODULE Test;
 	VAR argument: LONGREAL;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15349,7 +15349,7 @@ negative: calling procedure with long integer variable parameter with set argume
 
 	MODULE Test;
 	VAR argument: SET;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15357,7 +15357,7 @@ negative: calling procedure with long integer variable parameter with array argu
 
 	MODULE Test;
 	VAR argument: ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15365,7 +15365,7 @@ negative: calling procedure with long integer variable parameter with record arg
 
 	MODULE Test;
 	VAR argument: RECORD END;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15373,7 +15373,7 @@ negative: calling procedure with long integer variable parameter with object arg
 
 	MODULE Test;
 	VAR argument: OBJECT END;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15381,7 +15381,7 @@ negative: calling procedure with long integer variable parameter with base objec
 
 	MODULE Test;
 	VAR argument: OBJECT;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15389,7 +15389,7 @@ negative: calling procedure with long integer variable parameter with pointer to
 
 	MODULE Test;
 	VAR argument: POINTER TO ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15397,7 +15397,7 @@ negative: calling procedure with long integer variable parameter with pointer to
 
 	MODULE Test;
 	VAR argument: POINTER TO RECORD END;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15405,7 +15405,7 @@ negative: calling procedure with long integer variable parameter with procedure 
 
 	MODULE Test;
 	VAR argument: PROCEDURE;
-	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15444,7 +15444,7 @@ negative: calling procedure with huge integer variable parameter with integer ar
 negative: calling procedure with huge integer variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: HUGEINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15572,7 +15572,7 @@ negative: calling procedure with real variable parameter with integer argument
 negative: calling procedure with real variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: REAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15700,7 +15700,7 @@ negative: calling procedure with long real variable parameter with integer argum
 negative: calling procedure with long real variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15828,7 +15828,7 @@ negative: calling procedure with set variable parameter with integer argument
 negative: calling procedure with set variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: SET); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15956,7 +15956,7 @@ negative: calling procedure with array variable parameter with integer argument
 negative: calling procedure with array variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16092,7 +16092,7 @@ negative: calling procedure with open array variable parameter with integer argu
 negative: calling procedure with open array variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: ARRAY OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16220,7 +16220,7 @@ negative: calling procedure with record variable parameter with integer argument
 negative: calling procedure with record variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16367,7 +16367,7 @@ negative: calling procedure with object variable parameter with integer argument
 negative: calling procedure with object variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: OBJECT END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16514,7 +16514,7 @@ negative: calling procedure with base object variable parameter with integer arg
 negative: calling procedure with base object variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: OBJECT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16642,7 +16642,7 @@ negative: calling procedure with pointer to array variable parameter with intege
 negative: calling procedure with pointer to array variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: POINTER TO ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16770,7 +16770,7 @@ negative: calling procedure with pointer to record variable parameter with integ
 negative: calling procedure with pointer to record variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: POINTER TO RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16917,7 +16917,7 @@ negative: calling procedure with procedure variable parameter with integer argum
 negative: calling procedure with procedure variable parameter with long integer argument
 
 	MODULE Test;
-	VAR argument: LONGINT;
+	VAR argument: SIGNED32;
 	PROCEDURE Procedure (VAR value: PROCEDURE); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -17772,7 +17772,7 @@ negative: while statement with condition of type integer
 negative: while statement with condition of type long integer
 
 	MODULE Test;
-	VAR condition: LONGINT;
+	VAR condition: SIGNED32;
 	BEGIN WHILE condition DO END;
 	END Test.
 
@@ -17935,7 +17935,7 @@ negative: repeat statement with condition of type integer
 negative: repeat statement with condition of type long integer
 
 	MODULE Test;
-	VAR condition: LONGINT;
+	VAR condition: SIGNED32;
 	BEGIN REPEAT UNTIL condition;
 	END Test.
 
@@ -18133,7 +18133,7 @@ negative: await statement with condition of type integer
 negative: await statement with condition of type long integer
 
 	MODULE Test;
-	VAR condition: LONGINT;
+	VAR condition: SIGNED32;
 	BEGIN {EXCLUSIVE} AWAIT (condition);
 	END Test.
 
@@ -18595,105 +18595,105 @@ negative: procedure to variable integer assignment
 negative: constant boolean to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := TRUE;
 	END Test.
 
 negative: constant character to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := 'f';
 	END Test.
 
 positive: constant short integer to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := 10H;
 	END Test.
 
 negative: constant short integer to temporary long integer assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGINT;
+	VAR result: PROCEDURE (): SIGNED32;
 	BEGIN result () := 10H;
 	END Test.
 
 positive: constant integer to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := 1000H;
 	END Test.
 
 negative: constant integer to temporary long integer assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGINT;
+	VAR result: PROCEDURE (): SIGNED32;
 	BEGIN result () := 1000H;
 	END Test.
 
 positive: constant long integer to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := 100000H;
 	END Test.
 
 negative: constant long integer to temporary long integer assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGINT;
+	VAR result: PROCEDURE (): SIGNED32;
 	BEGIN result () := 100000H;
 	END Test.
 
 negative: constant huge integer to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := 10000000000H;
 	END Test.
 
 negative: constant real to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := 5.4;
 	END Test.
 
 negative: constant long real to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := 5.4D100;
 	END Test.
 
 negative: constant set to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := {5};
 	END Test.
 
 negative: string to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := "string";
 	END Test.
 
 negative: nil pointer to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN result := NIL;
 	END Test.
 
 negative: procedure to variable long integer assignment
 
 	MODULE Test;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	PROCEDURE Procedure; END Procedure;
 	BEGIN result := Procedure;
 	END Test.
@@ -19273,7 +19273,7 @@ negative: string to variable array of integer assignment
 negative: string to variable array of long integer assignment
 
 	MODULE Test;
-	VAR result: ARRAY 10 OF LONGINT;
+	VAR result: ARRAY 10 OF SIGNED32;
 	BEGIN result := "string";
 	END Test.
 
@@ -19720,7 +19720,7 @@ negative: procedure with one compatible parameter to procedure assignment
 
 	MODULE Test;
 	VAR result: PROCEDURE (a: SIGNED16);
-	PROCEDURE Procedure (b: LONGINT); END Procedure;
+	PROCEDURE Procedure (b: SIGNED32); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
@@ -19728,7 +19728,7 @@ negative: procedure with one incompatible parameter to procedure assignment
 
 	MODULE Test;
 	VAR result: PROCEDURE (a: SET);
-	PROCEDURE Procedure (b: LONGINT); END Procedure;
+	PROCEDURE Procedure (b: SIGNED32); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
@@ -19760,7 +19760,7 @@ negative: procedure with two compatible parameters to procedure assignment
 
 	MODULE Test;
 	VAR result: PROCEDURE (a, b: SIGNED16);
-	PROCEDURE Procedure (c, d: LONGINT); END Procedure;
+	PROCEDURE Procedure (c, d: SIGNED32); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
@@ -19768,7 +19768,7 @@ negative: procedure with two incompatible parameters to procedure assignment
 
 	MODULE Test;
 	VAR result: PROCEDURE (a, b: SET);
-	PROCEDURE Procedure (c, d: LONGINT); END Procedure;
+	PROCEDURE Procedure (c, d: SIGNED32); END Procedure;
 	BEGIN result := Procedure;
 	END Test.
 
@@ -19807,7 +19807,7 @@ positive: procedure with equal return type to procedure assignment
 negative: procedure with compatible return type to procedure assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGINT;
+	VAR result: PROCEDURE (): SIGNED32;
 	PROCEDURE Procedure (): SIGNED16; BEGIN RETURN 0 END Procedure;
 	BEGIN result := Procedure;
 	END Test.
@@ -19971,7 +19971,7 @@ negative: variable integer to variable boolean assignment
 negative: variable long integer to variable boolean assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: BOOLEAN;
+	VAR variable: SIGNED32; result: BOOLEAN;
 	BEGIN result := variable;
 	END Test.
 
@@ -20090,7 +20090,7 @@ negative: variable integer to variable character assignment
 negative: variable long integer to variable character assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: CHAR;
+	VAR variable: SIGNED32; result: CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -20209,7 +20209,7 @@ negative: variable integer to variable short integer assignment
 negative: variable long integer to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: SIGNED8;
+	VAR variable: SIGNED32; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
@@ -20335,7 +20335,7 @@ negative: variable integer to temporary integer assignment
 negative: variable long integer to variable integer assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: SIGNED16;
+	VAR variable: SIGNED32; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
@@ -20419,133 +20419,133 @@ negative: type to variable integer assignment
 negative: variable boolean to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: BOOLEAN; result: LONGINT;
+	VAR variable: BOOLEAN; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable character to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: CHAR; result: LONGINT;
+	VAR variable: CHAR; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 positive: variable short integer to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: SIGNED8; result: LONGINT;
+	VAR variable: SIGNED8; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable short integer to temporary long integer assignment
 
 	MODULE Test;
-	VAR variable: SIGNED8; result: PROCEDURE (): LONGINT;
+	VAR variable: SIGNED8; result: PROCEDURE (): SIGNED32;
 	BEGIN result () := variable;
 	END Test.
 
 positive: variable integer to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: SIGNED16; result: LONGINT;
+	VAR variable: SIGNED16; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable integer to temporary long integer assignment
 
 	MODULE Test;
-	VAR variable: SIGNED16; result: PROCEDURE (): LONGINT;
+	VAR variable: SIGNED16; result: PROCEDURE (): SIGNED32;
 	BEGIN result () := variable;
 	END Test.
 
 positive: variable long integer to variable long integer assignment
 
 	MODULE Test;
-	VAR variable, result: LONGINT;
+	VAR variable, result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long integer to temporary long integer assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: PROCEDURE (): LONGINT;
+	VAR variable: SIGNED32; result: PROCEDURE (): SIGNED32;
 	BEGIN result () := variable;
 	END Test.
 
 negative: variable huge integer to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: HUGEINT; result: LONGINT;
+	VAR variable: HUGEINT; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable real to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: REAL; result: LONGINT;
+	VAR variable: REAL; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long real to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: LONGINT;
+	VAR variable: LONGREAL; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable set to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: SET; result: LONGINT;
+	VAR variable: SET; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF CHAR; result: LONGINT;
+	VAR variable: ARRAY 10 OF CHAR; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: record to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: RECORD END; result: LONGINT;
+	VAR variable: RECORD END; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: object to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: OBJECT; result: LONGINT;
+	VAR variable: OBJECT; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: pointer to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: POINTER TO RECORD END; result: LONGINT;
+	VAR variable: POINTER TO RECORD END; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable procedure to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: PROCEDURE; result: LONGINT;
+	VAR variable: PROCEDURE; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: import to variable long integer assignment
 
 	MODULE Test;
-	IMPORT variable := Dummy; VAR result: LONGINT;
+	IMPORT variable := Dummy; VAR result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: type to variable long integer assignment
 
 	MODULE Test;
-	TYPE Type = LONGINT; VAR result: Type;
+	TYPE Type = SIGNED32; VAR result: Type;
 	BEGIN result := Type;
 	END Test.
 
@@ -20594,14 +20594,14 @@ negative: variable integer to temporary huge integer assignment
 positive: variable long integer to variable huge integer assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: HUGEINT;
+	VAR variable: SIGNED32; result: HUGEINT;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long integer to temporary huge integer assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: PROCEDURE (): HUGEINT;
+	VAR variable: SIGNED32; result: PROCEDURE (): HUGEINT;
 	BEGIN result () := variable;
 	END Test.
 
@@ -20734,14 +20734,14 @@ negative: variable integer to temporary real assignment
 positive: variable long integer to variable real assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: REAL;
+	VAR variable: SIGNED32; result: REAL;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long integer to temporary real assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: PROCEDURE (): REAL;
+	VAR variable: SIGNED32; result: PROCEDURE (): REAL;
 	BEGIN result () := variable;
 	END Test.
 
@@ -20881,14 +20881,14 @@ negative: variable integer to temporary long real assignment
 positive: variable long integer to variable long real assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: LONGREAL;
+	VAR variable: SIGNED32; result: LONGREAL;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long integer to temporary long real assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: PROCEDURE (): LONGREAL;
+	VAR variable: SIGNED32; result: PROCEDURE (): LONGREAL;
 	BEGIN result () := variable;
 	END Test.
 
@@ -21021,7 +21021,7 @@ negative: variable integer to variable set assignment
 negative: variable long integer to variable set assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: SET;
+	VAR variable: SIGNED32; result: SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -21140,7 +21140,7 @@ negative: variable integer to array assignment
 negative: variable long integer to array assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: ARRAY 10 OF CHAR;
+	VAR variable: SIGNED32; result: ARRAY 10 OF CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -21249,7 +21249,7 @@ negative: array of integer to array of boolean assignment
 negative: array of long integer to array of boolean assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF BOOLEAN;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF BOOLEAN;
 	BEGIN result := variable;
 	END Test.
 
@@ -21408,7 +21408,7 @@ negative: array of integer to array of character assignment
 negative: array of long integer to array of character assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF CHAR;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -21552,7 +21552,7 @@ negative: array of integer to array of short integer assignment
 negative: array of long integer to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF SIGNED8;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
@@ -21696,7 +21696,7 @@ negative: array of integer to dereferenced open array of integer assignment
 negative: array of long integer to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF SIGNED16;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
@@ -21766,64 +21766,64 @@ negative: array of procedure to array of integer assignment
 negative: array of boolean to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF BOOLEAN; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF BOOLEAN; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of character to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF CHAR; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF CHAR; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of short integer to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of integer to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 positive: array of long integer to array of long integer assignment
 
 	MODULE Test;
-	VAR variable, result: ARRAY 10 OF LONGINT;
+	VAR variable, result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long integer to temporary array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: PROCEDURE (): ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF SIGNED32; result: PROCEDURE (): ARRAY 10 OF SIGNED32;
 	BEGIN result () := variable;
 	END Test.
 
 negative: array of long integer to longer array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 20 OF LONGINT;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 20 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long integer to shorter array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 5 OF LONGINT;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 5 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long integer to open array of long integer assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR result: ARRAY OF LONGINT);
-	VAR variable: ARRAY 10 OF LONGINT;
+	PROCEDURE Procedure (VAR result: ARRAY OF SIGNED32);
+	VAR variable: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Procedure;
 	END Test.
@@ -21831,8 +21831,8 @@ negative: array of long integer to open array of long integer assignment
 negative: open array of long integer to array of long integer assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR variable: ARRAY OF LONGINT);
-	VAR result: ARRAY 10 OF LONGINT;
+	PROCEDURE Procedure (VAR variable: ARRAY OF SIGNED32);
+	VAR result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Procedure;
 	END Test.
@@ -21840,70 +21840,70 @@ negative: open array of long integer to array of long integer assignment
 negative: array of long integer to dereferenced open array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: POINTER TO ARRAY OF LONGINT;
+	VAR variable: ARRAY 10 OF SIGNED32; result: POINTER TO ARRAY OF SIGNED32;
 	BEGIN result^ := variable;
 	END Test.
 
 negative: array of huge integer to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF HUGEINT; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF HUGEINT; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of real to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF REAL; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF REAL; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long real to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of set to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SET; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF SET; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of array to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF ARRAY 10 OF SET; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF ARRAY 10 OF SET; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of record to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF RECORD END; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF RECORD END; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of object to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF OBJECT; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF OBJECT; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of pointer to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF POINTER TO RECORD END; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF POINTER TO RECORD END; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of procedure to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF PROCEDURE; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF PROCEDURE; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
@@ -21938,7 +21938,7 @@ negative: array of integer to array of huge integer assignment
 negative: array of long integer to array of huge integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF HUGEINT;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF HUGEINT;
 	BEGIN result := variable;
 	END Test.
 
@@ -22082,7 +22082,7 @@ negative: array of integer to array of real assignment
 negative: array of long integer to array of real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF REAL;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF REAL;
 	BEGIN result := variable;
 	END Test.
 
@@ -22226,7 +22226,7 @@ negative: array of integer to array of long real assignment
 negative: array of long integer to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF LONGREAL;
 	BEGIN result := variable;
 	END Test.
 
@@ -22370,7 +22370,7 @@ negative: array of integer to array of set assignment
 negative: array of long integer to array of set assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF SET;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -22507,7 +22507,7 @@ negative: array of integer to array of array assignment
 negative: array of long integer to array of array assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF ARRAY 10 OF SET;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF ARRAY 10 OF SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -22651,7 +22651,7 @@ negative: array of integer to array of record assignment
 negative: array of long integer to array of record assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF RECORD END;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -22801,7 +22801,7 @@ negative: array of integer to array of object assignment
 negative: array of long integer to array of object assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF OBJECT END;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF OBJECT END;
 	BEGIN result := variable;
 	END Test.
 
@@ -22951,7 +22951,7 @@ negative: array of integer to array of pointer assignment
 negative: array of long integer to array of pointer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF POINTER TO RECORD END;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF POINTER TO RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23101,7 +23101,7 @@ negative: array of integer to array of procedure assignment
 negative: array of long integer to array of procedure assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF PROCEDURE;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF PROCEDURE;
 	BEGIN result := variable;
 	END Test.
 
@@ -23287,7 +23287,7 @@ negative: variable integer to record assignment
 negative: variable long integer to record assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: RECORD END;
+	VAR variable: SIGNED32; result: RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23465,7 +23465,7 @@ negative: variable integer to object assignment
 negative: variable long integer to object assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: OBJECT END;
+	VAR variable: SIGNED32; result: OBJECT END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23615,7 +23615,7 @@ negative: variable integer to pointer assignment
 negative: variable long integer to pointer assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: POINTER TO RECORD END;
+	VAR variable: SIGNED32; result: POINTER TO RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23840,7 +23840,7 @@ negative: variable integer to procedure assignment
 negative: variable long integer to procedure assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: PROCEDURE;
+	VAR variable: SIGNED32; result: PROCEDURE;
 	BEGIN result := variable;
 	END Test.
 
@@ -24224,7 +24224,7 @@ negative: variable long integer to import assignment
 
 	MODULE Test;
 	IMPORT result := Dummy;
-	VAR variable: LONGINT;
+	VAR variable: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
@@ -24345,7 +24345,7 @@ negative: variable integer to type assignment
 negative: variable long integer to type assignment
 
 	MODULE Test;
-	TYPE result = LONGINT; VAR variable: result;
+	TYPE result = SIGNED32; VAR variable: result;
 	BEGIN result := variable;
 	END Test.
 
@@ -25200,7 +25200,7 @@ negative: capital letter of variable integer
 positive: arithmetic shift of variable integers
 
 	MODULE Test;
-	VAR integer: SIGNED16; result: LONGINT;
+	VAR integer: SIGNED16; result: SIGNED32;
 	BEGIN result := ASH (integer, integer)
 	END Test.
 
@@ -25221,7 +25221,7 @@ positive: short on variable integer
 positive: short on variable long integer
 
 	MODULE Test;
-	VAR longint, result: LONGINT;
+	VAR longint, result: SIGNED32;
 	BEGIN result := SHORT (longint)
 	END Test.
 
@@ -25249,7 +25249,7 @@ positive: long on variable integer
 positive: long on variable long integer
 
 	MODULE Test;
-	VAR longint, result: LONGINT;
+	VAR longint, result: SIGNED32;
 	BEGIN result := SHORT (LONG (longint))
 	END Test.
 
@@ -25263,7 +25263,7 @@ negative: long on variable huge integer
 negative: entier on variable integer
 
 	MODULE Test;
-	VAR integer, result: LONGINT;
+	VAR integer, result: SIGNED32;
 	BEGIN result := ENTIER (integer)
 	END Test.
 
@@ -29789,7 +29789,7 @@ positive: implicit variable short to integer conversion
 positive: implicit variable short to long integer conversion
 
 	MODULE Test;
-	VAR shortint: SIGNED8; longint, result: LONGINT;
+	VAR shortint: SIGNED8; longint, result: SIGNED32;
 	BEGIN result := shortint * longint
 	END Test.
 
@@ -29803,7 +29803,7 @@ positive: implicit variable short to huge integer conversion
 positive: implicit variable integer to long integer conversion
 
 	MODULE Test;
-	VAR integer: SIGNED16; longint, result: LONGINT;
+	VAR integer: SIGNED16; longint, result: SIGNED32;
 	BEGIN result := integer - longint
 	END Test.
 
@@ -29946,14 +29946,14 @@ positive: explicit short conversion on variable integer
 negative: explicit long conversion on variable long integer
 
 	MODULE Test;
-	VAR longint: LONGINT;
+	VAR longint: SIGNED32;
 	BEGIN longint := LONG (longint);
 	END Test.
 
 positive: explicit short conversion on variable long integer
 
 	MODULE Test;
-	VAR longint: LONGINT;
+	VAR longint: SIGNED32;
 	BEGIN longint := SHORT (longint);
 	END Test.
 
@@ -29981,7 +29981,7 @@ positive: explicit variable short integer to integer conversion
 positive: explicit variable short to long integer conversion
 
 	MODULE Test;
-	VAR shortint: SIGNED8; longint: LONGINT;
+	VAR shortint: SIGNED8; longint: SIGNED32;
 	BEGIN longint := LONG (LONG (shortint));
 	END Test.
 
@@ -30002,7 +30002,7 @@ positive: explicit variable integer to short integer conversion
 positive: explicit variable integer to long integer conversion
 
 	MODULE Test;
-	VAR integer: SIGNED16; longint: LONGINT;
+	VAR integer: SIGNED16; longint: SIGNED32;
 	BEGIN longint := LONG (integer);
 	END Test.
 
@@ -30016,21 +30016,21 @@ positive: explicit variable integer to huge integer conversion
 positive: explicit variable long to short integer conversion
 
 	MODULE Test;
-	VAR longint: LONGINT; shortint: SIGNED8;
+	VAR longint: SIGNED32; shortint: SIGNED8;
 	BEGIN shortint := SHORT (SHORT (longint));
 	END Test.
 
 positive: explicit variable long to integer conversion
 
 	MODULE Test;
-	VAR longint: LONGINT; integer: SIGNED16;
+	VAR longint: SIGNED32; integer: SIGNED16;
 	BEGIN integer := SHORT (longint);
 	END Test.
 
 positive: explicit variable long to huge integer conversion
 
 	MODULE Test;
-	VAR longint: LONGINT; hugeint: HUGEINT;
+	VAR longint: SIGNED32; hugeint: HUGEINT;
 	BEGIN hugeint := LONG (longint);
 	END Test.
 
@@ -30051,7 +30051,7 @@ positive: explicit variable huge to integer conversion
 positive: explicit variable huge to long integer conversion
 
 	MODULE Test;
-	VAR hugeint: HUGEINT; longint: LONGINT;
+	VAR hugeint: HUGEINT; longint: SIGNED32;
 	BEGIN hugeint := SHORT (hugeint);
 	END Test.
 
@@ -30072,7 +30072,7 @@ negative: explicit variable real to integer conversion
 positive: explicit variable real to long integer conversion
 
 	MODULE Test;
-	VAR real: REAL; longint: LONGINT;
+	VAR real: REAL; longint: SIGNED32;
 	BEGIN longint := ENTIER (real);
 	END Test.
 
@@ -30100,7 +30100,7 @@ negative: explicit variable long real to integer conversion
 positive: explicit variable long real to long integer conversion
 
 	MODULE Test;
-	VAR longreal: LONGREAL; longint: LONGINT;
+	VAR longreal: LONGREAL; longint: SIGNED32;
 	BEGIN longint := ENTIER (longreal);
 	END Test.
 
@@ -30130,7 +30130,7 @@ negative: for statement with constant as counter
 negative: for statement with type as counter
 
 	MODULE Test;
-	TYPE i = LONGINT;
+	TYPE i = SIGNED32;
 	BEGIN FOR i := 0 TO 10 DO END
 	END Test.
 
@@ -30362,7 +30362,7 @@ positive: for statement with counter of type integer
 positive: for statement with counter of type long integer
 
 	MODULE Test;
-	VAR i, s, e: LONGINT;
+	VAR i, s, e: SIGNED32;
 	BEGIN FOR i := s TO e DO END
 	END Test.
 
@@ -30446,7 +30446,7 @@ negative: for statement with short integer counter and integer start counter
 negative: for statement with short integer counter and long integer start counter
 
 	MODULE Test;
-	VAR i: SIGNED8; s: LONGINT;
+	VAR i: SIGNED8; s: SIGNED32;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30474,7 +30474,7 @@ positive: for statement with integer counter and integer start counter
 negative: for statement with integer counter and long integer start counter
 
 	MODULE Test;
-	VAR i: SIGNED16; s: LONGINT;
+	VAR i: SIGNED16; s: SIGNED32;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30488,28 +30488,28 @@ negative: for statement with integer counter and huge integer start counter
 positive: for statement with long integer counter and short integer start counter
 
 	MODULE Test;
-	VAR i: LONGINT; s: SIGNED8;
+	VAR i: SIGNED32; s: SIGNED8;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 positive: for statement with long integer counter and integer start counter
 
 	MODULE Test;
-	VAR i: LONGINT; s: SIGNED16;
+	VAR i: SIGNED32; s: SIGNED16;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 positive: for statement with long integer counter and long integer start counter
 
 	MODULE Test;
-	VAR i, s: LONGINT;
+	VAR i, s: SIGNED32;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 negative: for statement with long integer counter and huge integer start counter
 
 	MODULE Test;
-	VAR i: LONGINT; s: HUGEINT;
+	VAR i: SIGNED32; s: HUGEINT;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30530,7 +30530,7 @@ positive: for statement with huge integer counter and integer start counter
 positive: for statement with huge integer counter and long integer start counter
 
 	MODULE Test;
-	VAR i: HUGEINT; s: LONGINT;
+	VAR i: HUGEINT; s: SIGNED32;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30558,7 +30558,7 @@ negative: for statement with short integer counter and integer end counter
 negative: for statement with short integer counter and long integer end counter
 
 	MODULE Test;
-	VAR i: SIGNED8; e: LONGINT;
+	VAR i: SIGNED8; e: SIGNED32;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30586,7 +30586,7 @@ positive: for statement with integer counter and integer end counter
 negative: for statement with integer counter and long integer end counter
 
 	MODULE Test;
-	VAR i: SIGNED16; e: LONGINT;
+	VAR i: SIGNED16; e: SIGNED32;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30600,28 +30600,28 @@ negative: for statement with integer counter and huge integer end counter
 positive: for statement with long integer counter and short integer end counter
 
 	MODULE Test;
-	VAR i: LONGINT; e: SIGNED8;
+	VAR i: SIGNED32; e: SIGNED8;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 positive: for statement with long integer counter and integer end counter
 
 	MODULE Test;
-	VAR i: LONGINT; e: SIGNED16;
+	VAR i: SIGNED32; e: SIGNED16;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 positive: for statement with long integer counter and long integer end counter
 
 	MODULE Test;
-	VAR i, e: LONGINT;
+	VAR i, e: SIGNED32;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 negative: for statement with long integer counter and huge integer end counter
 
 	MODULE Test;
-	VAR i: LONGINT; e: HUGEINT;
+	VAR i: SIGNED32; e: HUGEINT;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30642,7 +30642,7 @@ positive: for statement with huge integer counter and integer end counter
 positive: for statement with huge integer counter and long integer end counter
 
 	MODULE Test;
-	VAR i: HUGEINT; e: LONGINT;
+	VAR i: HUGEINT; e: SIGNED32;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30887,7 +30887,7 @@ negative: procedure with short integer as return type returning integer
 negative: procedure with short integer as return type returning long integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGINT): SIGNED8; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED32): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning huge integer
@@ -30977,7 +30977,7 @@ positive: procedure with integer as return type returning integer
 negative: procedure with integer as return type returning long integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGINT): SIGNED16; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED32): SIGNED16; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning huge integer
@@ -31043,91 +31043,91 @@ negative: procedure with integer as return type returning procedure
 negative: procedure with long integer as return type returning boolean
 
 	MODULE Test;
-	PROCEDURE Procedure (value: BOOLEAN): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: BOOLEAN): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning character
 
 	MODULE Test;
-	PROCEDURE Procedure (value: CHAR): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: CHAR): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long integer as return type returning short integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SIGNED8): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED8): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long integer as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SIGNED16): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long integer as return type returning long integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGINT): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED32): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning huge integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: HUGEINT): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: HUGEINT): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning real
 
 	MODULE Test;
-	PROCEDURE Procedure (value: REAL): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: REAL): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning set
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SET): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SET): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning array
 
 	MODULE Test;
-	PROCEDURE Procedure (value: ARRAY 10 OF CHAR): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: ARRAY 10 OF CHAR): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning record
 
 	MODULE Test;
-	PROCEDURE Procedure (value: RECORD END): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: RECORD END): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning object
 
 	MODULE Test;
-	PROCEDURE Procedure (value: OBJECT END): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: OBJECT END): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning base object
 
 	MODULE Test;
-	PROCEDURE Procedure (value: OBJECT): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: OBJECT): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning pointer to array
 
 	MODULE Test;
-	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning pointer to record
 
 	MODULE Test;
-	PROCEDURE Procedure (value: POINTER TO RECORD END): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: POINTER TO RECORD END): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long integer as return type returning procedure
 
 	MODULE Test;
-	PROCEDURE Procedure (value: PROCEDURE): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: PROCEDURE): SIGNED32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with huge integer as return type returning boolean
@@ -31157,7 +31157,7 @@ positive: procedure with huge integer as return type returning integer
 positive: procedure with huge integer as return type returning long integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGINT): HUGEINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED32): HUGEINT; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with huge integer as return type returning huge integer
@@ -31247,7 +31247,7 @@ positive: procedure with real as return type returning integer
 positive: procedure with real as return type returning long integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGINT): REAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED32): REAL; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with real as return type returning huge integer
@@ -31343,7 +31343,7 @@ positive: procedure with long real as return type returning integer
 positive: procedure with long real as return type returning long integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGINT): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED32): LONGREAL; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long real as return type returning huge integer
@@ -32245,7 +32245,7 @@ negative: assert statement with condition of type integer
 negative: assert statement with condition of type long integer
 
 	MODULE Test;
-	VAR condition: LONGINT;
+	VAR condition: SIGNED32;
 	BEGIN ASSERT (condition);
 	END Test.
 
@@ -32393,7 +32393,7 @@ negative: assert statement with number of type integer
 negative: assert statement with number of type long integer
 
 	MODULE Test;
-	VAR number: LONGINT;
+	VAR number: SIGNED32;
 	BEGIN ASSERT (TRUE, number);
 	END Test.
 
@@ -32556,7 +32556,7 @@ negative: if statement with condition of type integer
 negative: if statement with condition of type long integer
 
 	MODULE Test;
-	VAR condition: LONGINT;
+	VAR condition: SIGNED32;
 	BEGIN IF condition THEN END;
 	END Test.
 
@@ -32716,7 +32716,7 @@ negative: else if statement with condition of type integer
 negative: else if statement with condition of type long integer
 
 	MODULE Test;
-	VAR condition: LONGINT;
+	VAR condition: SIGNED32;
 	BEGIN IF TRUE THEN ELSIF condition THEN END;
 	END Test.
 
@@ -32867,7 +32867,7 @@ negative: halt statement with number of type integer
 negative: halt statement with number of type long integer
 
 	MODULE Test;
-	VAR number: LONGINT;
+	VAR number: SIGNED32;
 	BEGIN HALT (number);
 	END Test.
 
@@ -33078,7 +33078,7 @@ positive: case statement with variable integer value
 positive: case statement with variable long integer value
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF 9: END
 	END Test.
 
@@ -33281,7 +33281,7 @@ negative: character case statement with variable integer case
 negative: character case statement with variable long integer case
 
 	MODULE Test;
-	VAR value: CHAR; case: LONGINT;
+	VAR value: CHAR; case: SIGNED32;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33486,7 +33486,7 @@ negative: short integer case statement with variable integer case
 negative: short integer case statement with variable long integer case
 
 	MODULE Test;
-	VAR value: SIGNED8; case: LONGINT;
+	VAR value: SIGNED8; case: SIGNED32;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33689,7 +33689,7 @@ negative: integer case statement with variable integer case
 negative: integer case statement with variable long integer case
 
 	MODULE Test;
-	VAR value: SIGNED16; case: LONGINT;
+	VAR value: SIGNED16; case: SIGNED32;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33787,203 +33787,203 @@ negative: integer case statement with type as case
 negative: long integer case statement with constant boolean case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF TRUE: END
 	END Test.
 
 negative: long integer case statement with constant character case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF 'a': END
 	END Test.
 
 positive: long integer case statement with constant short integer case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF 10H: END
 	END Test.
 
 positive: long integer case statement with constant integer case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF 1000H: END
 	END Test.
 
 positive: long integer case statement with constant long integer case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF 100000H: END
 	END Test.
 
 negative: long integer case statement with constant huge integer case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF 100000000H: END
 	END Test.
 
 negative: long integer case statement with constant real case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF 1.0: END
 	END Test.
 
 negative: long integer case statement with constant long real case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF 1.D0: END
 	END Test.
 
 negative: long integer case statement with constant set case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF {}: END
 	END Test.
 
 negative: long integer case statement with constant string case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF "value": END
 	END Test.
 
 negative: long integer case statement with nil pointer case
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN CASE value OF NIL: END
 	END Test.
 
 negative: long integer case statement variable boolean case
 
 	MODULE Test;
-	VAR value: LONGINT; case: BOOLEAN;
+	VAR value: SIGNED32; case: BOOLEAN;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable character case
 
 	MODULE Test;
-	VAR value: LONGINT; case: CHAR;
+	VAR value: SIGNED32; case: CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable short integer case
 
 	MODULE Test;
-	VAR value: LONGINT; case: SIGNED8;
+	VAR value: SIGNED32; case: SIGNED8;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable integer case
 
 	MODULE Test;
-	VAR value: LONGINT; case: SIGNED16;
+	VAR value: SIGNED32; case: SIGNED16;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable long integer case
 
 	MODULE Test;
-	VAR value, case: LONGINT;
+	VAR value, case: SIGNED32;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable huge integer case
 
 	MODULE Test;
-	VAR value: LONGINT; case: HUGEINT;
+	VAR value: SIGNED32; case: HUGEINT;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable real case
 
 	MODULE Test;
-	VAR value: LONGINT; case: REAL;
+	VAR value: SIGNED32; case: REAL;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable long real case
 
 	MODULE Test;
-	VAR value: LONGINT; case: LONGREAL;
+	VAR value: SIGNED32; case: LONGREAL;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable set case
 
 	MODULE Test;
-	VAR value: LONGINT; case: SET;
+	VAR value: SIGNED32; case: SET;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable array case
 
 	MODULE Test;
-	VAR value: LONGINT; case: ARRAY 10 OF CHAR;
+	VAR value: SIGNED32; case: ARRAY 10 OF CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable record case
 
 	MODULE Test;
-	VAR value: LONGINT; case: RECORD END;
+	VAR value: SIGNED32; case: RECORD END;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable object case
 
 	MODULE Test;
-	VAR value: LONGINT; case: OBJECT END;
+	VAR value: SIGNED32; case: OBJECT END;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable base object case
 
 	MODULE Test;
-	VAR value: LONGINT; case: OBJECT;
+	VAR value: SIGNED32; case: OBJECT;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable pointer to record case
 
 	MODULE Test;
-	VAR value: LONGINT; case: POINTER TO RECORD END;
+	VAR value: SIGNED32; case: POINTER TO RECORD END;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable pointer to array case
 
 	MODULE Test;
-	VAR value: LONGINT; case: POINTER TO ARRAY OF CHAR;
+	VAR value: SIGNED32; case: POINTER TO ARRAY OF CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with variable procedure case
 
 	MODULE Test;
-	VAR value: LONGINT; case: PROCEDURE;
+	VAR value: SIGNED32; case: PROCEDURE;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with import case
 
 	MODULE Test;
-	IMPORT case := Dummy; VAR value: LONGINT;
+	IMPORT case := Dummy; VAR value: SIGNED32;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: long integer case statement with type as case
 
 	MODULE Test;
-	TYPE case = LONGINT; VAR value: case;
+	TYPE case = SIGNED32; VAR value: case;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -34095,7 +34095,7 @@ negative: huge integer case statement with variable integer case
 negative: huge integer case statement with variable long integer case
 
 	MODULE Test;
-	VAR value: HUGEINT; case: LONGINT;
+	VAR value: HUGEINT; case: SIGNED32;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -34614,14 +34614,14 @@ negative: with statement with variable integer value type
 negative: with statement with variable long integer value
 
 	MODULE Test;
-	VAR value: LONGINT;
-	BEGIN WITH value : LONGINT DO END;
+	VAR value: SIGNED32;
+	BEGIN WITH value : SIGNED32 DO END;
 	END Test.
 
 negative: with statement with variable long integer value type
 
 	MODULE Test;
-	TYPE Type = LONGINT;
+	TYPE Type = SIGNED32;
 	VAR value: Type;
 	BEGIN WITH value : Type DO END;
 	END Test.
@@ -35608,7 +35608,7 @@ positive: increment statement on integer
 positive: increment statement on long integer
 
 	MODULE Test;
-	VAR integer: LONGINT;
+	VAR integer: SIGNED32;
 	BEGIN INC (integer);
 	END Test.
 
@@ -35807,7 +35807,7 @@ negative: increment statement on short integer with integer as increment
 negative: increment statement on short integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: SIGNED8; increment: LONGINT;
+	VAR integer: SIGNED8; increment: SIGNED32;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35835,7 +35835,7 @@ positive: increment statement on integer with integer as increment
 negative: increment statement on integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: SIGNED16; increment: LONGINT;
+	VAR integer: SIGNED16; increment: SIGNED32;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35849,28 +35849,28 @@ negative: increment statement on integer with huge integer as increment
 positive: increment statement on long integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: SIGNED8;
+	VAR integer: SIGNED32; increment: SIGNED8;
 	BEGIN INC (integer, increment);
 	END Test.
 
 positive: increment statement on long integer with integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: SIGNED16;
+	VAR integer: SIGNED32; increment: SIGNED16;
 	BEGIN INC (integer, increment);
 	END Test.
 
 positive: increment statement on long integer with long integer as increment
 
 	MODULE Test;
-	VAR integer, increment: LONGINT;
+	VAR integer, increment: SIGNED32;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement on long integer with huge integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: HUGEINT;
+	VAR integer: SIGNED32; increment: HUGEINT;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35891,7 +35891,7 @@ positive: increment statement on huge integer with integer as increment
 positive: increment statement on huge integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: HUGEINT; increment: LONGINT;
+	VAR integer: HUGEINT; increment: SIGNED32;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -36068,7 +36068,7 @@ positive: decrement statement on integer
 positive: decrement statement on long integer
 
 	MODULE Test;
-	VAR integer: LONGINT;
+	VAR integer: SIGNED32;
 	BEGIN DEC (integer);
 	END Test.
 
@@ -36267,7 +36267,7 @@ negative: decrement statement on short integer with integer as increment
 negative: decrement statement on short integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: SIGNED8; increment: LONGINT;
+	VAR integer: SIGNED8; increment: SIGNED32;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36295,7 +36295,7 @@ positive: decrement statement on integer with integer as increment
 negative: decrement statement on integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: SIGNED16; increment: LONGINT;
+	VAR integer: SIGNED16; increment: SIGNED32;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36309,28 +36309,28 @@ negative: decrement statement on integer with huge integer as increment
 positive: decrement statement on long integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: SIGNED8;
+	VAR integer: SIGNED32; increment: SIGNED8;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 positive: decrement statement on long integer with integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: SIGNED16;
+	VAR integer: SIGNED32; increment: SIGNED16;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 positive: decrement statement on long integer with long integer as increment
 
 	MODULE Test;
-	VAR integer, increment: LONGINT;
+	VAR integer, increment: SIGNED32;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement on long integer with huge integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: HUGEINT;
+	VAR integer: SIGNED32; increment: HUGEINT;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36351,7 +36351,7 @@ positive: decrement statement on huge integer with integer as increment
 positive: decrement statement on huge integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: HUGEINT; increment: LONGINT;
+	VAR integer: HUGEINT; increment: SIGNED32;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36677,7 +36677,7 @@ positive: include statement on set with integer
 positive: include statement on set with long integer
 
 	MODULE Test;
-	VAR set: SET; integer: LONGINT;
+	VAR set: SET; integer: SIGNED32;
 	BEGIN INCL (set, integer);
 	END Test.
 
@@ -36969,7 +36969,7 @@ positive: exclude statement on set with integer
 positive: exclude statement on set with long integer
 
 	MODULE Test;
-	VAR set: SET; integer: LONGINT;
+	VAR set: SET; integer: SIGNED32;
 	BEGIN EXCL (set, integer);
 	END Test.
 
@@ -37725,7 +37725,7 @@ positive: pointer to record variable marked untraced
 negative: non-pointer variable marked untraced
 
 	MODULE Test;
-	VAR a {UNTRACED}: LONGINT;
+	VAR a {UNTRACED}: SIGNED32;
 	END Test.
 
 negative: variable marked delegate
@@ -37742,7 +37742,7 @@ positive: delegate procedure type
 positive: delegate procedure type with arguments
 
 	MODULE Test;
-	TYPE TP=PROCEDURE{DELEGATE}(a: LONGINT): LONGINT;
+	TYPE TP=PROCEDURE{DELEGATE}(a: SIGNED32): SIGNED32;
 	END Test.
 
 positive: delegate procedure variable assignment
@@ -37800,12 +37800,12 @@ positive: signature matching extension of object
 	TYPE O=OBJECT
 			PROCEDURE P; END P;
 			PROCEDURE Q(i: SIGNED16); END Q;
-			PROCEDURE R(i: LONGINT): LONGINT; END R;
+			PROCEDURE R(i: SIGNED32): SIGNED32; END R;
 		END O;
 	TYPE OO=OBJECT(O);
 			PROCEDURE P; END P;
 			PROCEDURE Q(i: SIGNED16); END Q;
-			PROCEDURE R(i: LONGINT): LONGINT; END R;
+			PROCEDURE R(i: SIGNED32): SIGNED32; END R;
 		END OO;
 	END Test.
 
@@ -37816,7 +37816,7 @@ negative: extension of objects with nonmatching signature: parameter incompatibl
 			PROCEDURE P(i: SIGNED16); END P;
 	END O;
 	TYPE OO=OBJECT(O)
-			PROCEDURE P(i: LONGINT); END P;
+			PROCEDURE P(i: SIGNED32); END P;
 	END OO;
 	END Test.
 
@@ -37846,7 +37846,7 @@ positive: non-exported constructor used in same module
 
 	MODULE Dummy;
 	TYPE O*=OBJECT
-		PROCEDURE & Init (x: LONGINT; CONST y: ARRAY OF CHAR);
+		PROCEDURE & Init (x: SIGNED32; CONST y: ARRAY OF CHAR);
 		END Init;
 	END O;
 	VAR o:O;
@@ -37877,7 +37877,7 @@ positive: non-exported constructor overwritten by new constructor with different
 	MODULE Test;
 	IMPORT Dummy;
 	TYPE O=OBJECT (Dummy.O)
-		PROCEDURE & InitX(a,b: LONGINT); END InitX;
+		PROCEDURE & InitX(a,b: SIGNED32); END InitX;
 	END O;
 	VAR a: O;
 	BEGIN
@@ -37889,7 +37889,7 @@ positive: non-exported constructor overwritten by new constructor with same name
 	MODULE Test;
 	IMPORT Dummy;
 	TYPE O=OBJECT (Dummy.O)
-		PROCEDURE & Init(a,b: LONGINT); END Init;
+		PROCEDURE & Init(a,b: SIGNED32); END Init;
 	END O;
 	VAR a: O;
 	BEGIN
@@ -37900,7 +37900,7 @@ positive: exported constructor used in same module
 
 	MODULE Dummy;
 	TYPE O*=OBJECT
-		PROCEDURE & Init* (x: LONGINT; CONST y: ARRAY OF CHAR);
+		PROCEDURE & Init* (x: SIGNED32; CONST y: ARRAY OF CHAR);
 		END Init;
 	END O;
 	VAR o:O;
@@ -37931,7 +37931,7 @@ positive: exported constructor overwritten by new constructor with different nam
 	MODULE Test;
 	IMPORT Dummy;
 	TYPE O=OBJECT (Dummy.O)
-		PROCEDURE & InitX(a,b: LONGINT); END InitX;
+		PROCEDURE & InitX(a,b: SIGNED32); END InitX;
 	END O;
 	VAR a: O;
 	BEGIN
@@ -37943,7 +37943,7 @@ negative: non-exported constructor overwritten by new constructor with same name
 	MODULE Test;
 	IMPORT Dummy;
 	TYPE O=OBJECT (Dummy.O)
-		PROCEDURE & Init(a,b: LONGINT); END Init;
+		PROCEDURE & Init(a,b: SIGNED32); END Init;
 	END O;
 	END Test.
 
@@ -37952,7 +37952,7 @@ positive: non-exported constructor overwritten by new constructor with same name
 	MODULE Test;
 	IMPORT Dummy;
 	TYPE O=OBJECT (Dummy.O)
-		PROCEDURE & Init(a: LONGINT; CONST name: ARRAY OF CHAR); END Init;
+		PROCEDURE & Init(a: SIGNED32; CONST name: ARRAY OF CHAR); END Init;
 	END O;
 	VAR a: O;
 	BEGIN
@@ -37999,7 +37999,7 @@ positive: realtime object containing basic type fields
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE A = OBJECT {REALTIME}
-		VAR a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: LONGINT; a4: HUGEINT; a5: REAL;
+		VAR a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: SIGNED32; a4: HUGEINT; a5: REAL;
 			a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END A;
 	END Test.
@@ -38009,7 +38009,7 @@ positive: realtime pointer to record that contains basic type fields
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE A = POINTER {REALTIME} TO RECORD
-		a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: LONGINT; a4: HUGEINT; a5: REAL;
+		a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: SIGNED32; a4: HUGEINT; a5: REAL;
 		a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END;
 	END Test.
@@ -38019,7 +38019,7 @@ positive: realtime pointer to array where the elements contain basic type fields
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE A0 = POINTER {REALTIME} TO ARRAY OF RECORD
-		a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: LONGINT; a4: HUGEINT; a5: REAL;
+		a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: SIGNED32; a4: HUGEINT; a5: REAL;
 		a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END;
 	END Test.
@@ -38111,7 +38111,7 @@ negative: realtime object containing record variable with a non-realtime array p
 positive: non-realtime object containing reference to realtime object
 
 	MODULE Test;
-	TYPE A = OBJECT {REALTIME} VAR a0: LONGINT; a1: CHAR; END A;
+	TYPE A = OBJECT {REALTIME} VAR a0: SIGNED32; a1: CHAR; END A;
 	B = OBJECT VAR a: A; END B;
 	END Test.
 
@@ -38119,13 +38119,13 @@ positive: extension of realtime object declared as realtime object
 
 	MODULE Test;
 	TYPE A = OBJECT {REALTIME} VAR a0: CHAR; a1: SET; END A;
-	B = OBJECT {REALTIME} (A) VAR b0: SIGNED16; b1: LONGINT; END B;
+	B = OBJECT {REALTIME} (A) VAR b0: SIGNED16; b1: SIGNED32; END B;
 	END Test.
 
 positive: variable of realtime pointer to record type
 
 	MODULE Test;
-	VAR p: POINTER {REALTIME} TO RECORD k, l: LONGINT END;
+	VAR p: POINTER {REALTIME} TO RECORD k, l: SIGNED32 END;
 	END Test.
 
 positive: variable of realtime pointer to array type
@@ -38138,21 +38138,21 @@ negative: realtime extension of non-realtime object
 
 	MODULE Test;
 	TYPE A = OBJECT VAR a0: CHAR; a1: SET; END A;
-	B = OBJECT {REALTIME} (A) VAR b0: SIGNED16; b1: LONGINT; END B;
+	B = OBJECT {REALTIME} (A) VAR b0: SIGNED16; b1: SIGNED32; END B;
 	END Test.
 
 negative: non-realtime extension of realtime object
 
 	MODULE Test;
 	TYPE A = OBJECT {REALTIME} VAR a0: CHAR; a1: SET; END A;
-	B = OBJECT (A) VAR b0: SIGNED16; b1: LONGINT; END B;
+	B = OBJECT (A) VAR b0: SIGNED16; b1: SIGNED32; END B;
 	END Test.
 
 positive: record extensions - both record types are implicit realtime objects
 
 	MODULE Test;
 	TYPE A = RECORD a0: CHAR; a1: SET; END;
-	B = RECORD (A) b0: SIGNED16; b1: LONGINT; END;
+	B = RECORD (A) b0: SIGNED16; b1: SIGNED32; END;
 	AP = POINTER {REALTIME} TO A;
 	BP = POINTER {REALTIME} TO B;
 	END Test.
@@ -38169,20 +38169,20 @@ negative: record extensions - only base type is realtime object
 positive: extension of realtime pointer
 
 	MODULE Test;
-	TYPE R = RECORD r0, r1: LONGINT; END;
+	TYPE R = RECORD r0, r1: SIGNED32; END;
 	P = POINTER {REALTIME} TO Q;
-	Q = RECORD (R) q0, q1: LONGINT; END;
-	S = OBJECT {REALTIME} (P) VAR s0, s1: LONGINT; END S;
+	Q = RECORD (R) q0, q1: SIGNED32; END;
+	S = OBJECT {REALTIME} (P) VAR s0, s1: SIGNED32; END S;
 	END Test.
 
 positive: module Dummy for realtime and non-realtime types
 
 	MODULE Dummy;
-	TYPE RTRec* = RECORD r0: LONGINT; r1: CHAR; END;
-	NRTRec* = RECORD n0: LONGINT; n1: ANY; END;
+	TYPE RTRec* = RECORD r0: SIGNED32; r1: CHAR; END;
+	NRTRec* = RECORD n0: SIGNED32; n1: ANY; END;
 	RTO* = OBJECT {REALTIME} VAR m0: SET; END RTO;
 	NRTO0* = OBJECT VAR p: ANY; END NRTO0;
-	NRTO1* = OBJECT VAR k: LONGINT; END NRTO1;
+	NRTO1* = OBJECT VAR k: SIGNED32; END NRTO1;
 	END Dummy.
 
 positive: realtime pointer to (realtime) record from imported module
@@ -38224,7 +38224,7 @@ negative: non-realtime extension of imported realtime object
 
 	MODULE Test;
 	IMPORT Dummy;
-	TYPE NRTE = OBJECT (Dummy.RTO) VAR k: LONGINT; END NRTE;
+	TYPE NRTE = OBJECT (Dummy.RTO) VAR k: SIGNED32; END NRTE;
 	END Test.
 
 positive: non-realtime extension of imported non-realtime object that contains non-realtime fields
@@ -38430,7 +38430,7 @@ positive: exporting realtime procedure
 	MODULE Dummy;
 	PROCEDURE {REALTIME} P*;
 	BEGIN END P;
-	PROCEDURE {REALTIME} Pp*(i: LONGINT);
+	PROCEDURE {REALTIME} Pp*(i: SIGNED32);
 	BEGIN END Pp;
 	PROCEDURE Q*;
 	BEGIN END Q;
@@ -38460,7 +38460,7 @@ negative: using imported non-realtime procedure in realtime procedure
 positive: use of basic type realtime variables and parameters in realtime procedure
 
 	MODULE Test;
-	PROCEDURE {REALTIME} P(VAR k: LONGINT);
+	PROCEDURE {REALTIME} P(VAR k: SIGNED32);
 	VAR l: SET;
 	BEGIN l:= {}; k:= 5;
 	END P;
@@ -38469,7 +38469,7 @@ positive: use of basic type realtime variables and parameters in realtime proced
 positive: use of structured realtime variables in realtime procedure
 
 	MODULE Test;
-	TYPE A = OBJECT {REALTIME} VAR k, l: LONGINT END A;
+	TYPE A = OBJECT {REALTIME} VAR k, l: SIGNED32 END A;
 	PROCEDURE {REALTIME} P(VAR a: A);
 	BEGIN a.k := 0; a.l := 0;
 	END P;
@@ -38479,7 +38479,7 @@ negative: use of non-realtime variables in realtime procedure
 
 	MODULE Test;
 	PROCEDURE {REALTIME} P(VAR a: POINTER TO ARRAY OF CHAR);
-	VAR i: LONGINT
+	VAR i: SIGNED32
 	BEGIN FOR i := 0 TO LEN(a) DO a[i] := '' END;
 	END P;
 	END Test.
@@ -38496,7 +38496,7 @@ positive: use of string constant (of implicit realtime type) in realtime procedu
 positive: module Dummy for realtime and non-realtime types and variables
 
 	MODULE Dummy;
-	TYPE RTRec* = RECORD i*: LONGINT; END;
+	TYPE RTRec* = RECORD i*: SIGNED32; END;
 	NRTRec* = RECORD p*: ANY; END;
 	RTO* = OBJECT {REALTIME} VAR s: SET; END RTO;
 	NRTO* = OBJECT VAR p: ANY; END NRTO;
@@ -38631,7 +38631,7 @@ positive: untraced flag on delegate procedure
 negative: untraced flag on basic type
 
 	MODULE Test;
-	TYPE P=LONGINT;
+	TYPE P=SIGNED32;
 	VAR x{UNTRACED}: P;
 	END Test.
 
@@ -38656,7 +38656,7 @@ positive: system address type size
 
 	MODULE Test;
 	IMPORT SYSTEM;
-	VAR a: LONGINT;
+	VAR a: SIGNED32;
 	BEGIN a := SIZEOF(ADDRESS)
 	END Test.
 
@@ -38687,7 +38687,7 @@ positive: unsigned system address function
 positive: mixture of 32 and 8 bit types implying high register pressure by using an array
 
 	MODULE Test;
-	VAR b: ARRAY 2 OF CHAR; a: LONGINT; ch: CHAR;
+	VAR b: ARRAY 2 OF CHAR; a: SIGNED32; ch: CHAR;
 	BEGIN
 		b[a] := CHR(((a MOD 0AH) + 30H))
 	END Test.
@@ -38696,13 +38696,13 @@ positive: system.val
 
 	MODULE Test;
 	IMPORT SYSTEM;
-	VAR a: LONGINT; b: REAL; c: POINTER TO ARRAY OF CHAR; i: SIGNED16; ch: CHAR;
+	VAR a: SIGNED32; b: REAL; c: POINTER TO ARRAY OF CHAR; i: SIGNED16; ch: CHAR;
 	BEGIN
-		a := SYSTEM.VAL(LONGINT,a);
-		a := SYSTEM.VAL(LONGINT,c);
-		a := SYSTEM.VAL(LONGINT,b);
-		a := SYSTEM.VAL(LONGINT,i);
-		a := SYSTEM.VAL(LONGINT,ch);
+		a := SYSTEM.VAL(SIGNED32,a);
+		a := SYSTEM.VAL(SIGNED32,c);
+		a := SYSTEM.VAL(SIGNED32,b);
+		a := SYSTEM.VAL(SIGNED32,i);
+		a := SYSTEM.VAL(SIGNED32,ch);
 	END Test.
 
 positive: shift of unsigned type by signed value
@@ -38718,7 +38718,7 @@ positive: shift of unsigned type by signed variable
 
 	MODULE Test;
 	IMPORT SYSTEM;
-	VAR ebx: SET; a: LONGINT;
+	VAR ebx: SET; a: SIGNED32;
 	BEGIN
 		ebx := LSH(ebx, a)
 	END Test.
@@ -38727,9 +38727,9 @@ positive: assignment of converted unsigned type to signed type
 
 	MODULE Test;
 	IMPORT SYSTEM;
-	VAR ebx: SET; a,i: LONGINT;
+	VAR ebx: SET; a,i: SIGNED32;
 	BEGIN
-		i := SYSTEM.VAL(LONGINT, LSH(ebx * {16..23}, -16));
+		i := SYSTEM.VAL(SIGNED32, LSH(ebx * {16..23}, -16));
 	END Test.
 
 positive: getprocedure builtin call
@@ -38772,7 +38772,7 @@ negative: procedure call designator returning nil as index
 negative: procedure call designator returning nil in binary expression
 
 	MODULE Test;
-	VAR a,b: LONGINT;
+	VAR a,b: SIGNED32;
 
 	PROCEDURE P;
 	BEGIN
@@ -38786,14 +38786,14 @@ positive: module exporting procedure variable with return type
 
 	MODULE Dummy;
 	VAR
-		p-: PROCEDURE(a,b: LONGINT): LONGINT;
+		p-: PROCEDURE(a,b: SIGNED32): SIGNED32;
 	END Dummy.
 
 positive: module importing procedure variable with return type
 
 	MODULE Test;
 	IMPORT Dummy;
-	VAR a: LONGINT;
+	VAR a: SIGNED32;
 	BEGIN
 		a := a + Dummy.p(0,0);
 	END Test.
@@ -38837,7 +38837,7 @@ negative: SYSTEM.TYPECODE with basic type
 	TYPE
 		T = SIGNED16;
 	VAR
-		a: LONGINT;
+		a: SIGNED32;
 
 	BEGIN
 		a:= SYSTEM.TYPECODE(T);
@@ -38850,7 +38850,7 @@ negative: SYSTEM.TYPECODE with ANY type
 	TYPE
 		T = ANY;
 	VAR
-		a: LONGINT;
+		a: SIGNED32;
 
 	BEGIN
 		a:= SYSTEM.TYPECODE(T);
@@ -38864,7 +38864,7 @@ negative: SYSTEM.TYPECODE with OBJECT type
 	TYPE
 		T = OBJECT;
 	VAR
-		a: LONGINT;
+		a: SIGNED32;
 
 	BEGIN
 		a:= SYSTEM.TYPECODE(T);
@@ -38878,7 +38878,7 @@ negative: SYSTEM.TYPECODE with static array
 	TYPE
 		T = ARRAY 32 OF CHAR;
 	VAR
-		a: LONGINT;
+		a: SIGNED32;
 
 	BEGIN
 		a:= SYSTEM.TYPECODE(T);
@@ -38889,9 +38889,9 @@ negative: SYSTEM.TYPECODE with pointer to static array
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE
-		T = POINTER TO ARRAY 32 OF LONGINT;
+		T = POINTER TO ARRAY 32 OF SIGNED32;
 	VAR
-		a: LONGINT;
+		a: SIGNED32;
 
 	BEGIN
 		a:= SYSTEM.TYPECODE(T);
@@ -38902,9 +38902,9 @@ negative: SYSTEM.TYPECODE with pointer to dynamic array without pointers
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE
-		T = POINTER TO ARRAY OF LONGINT;
+		T = POINTER TO ARRAY OF SIGNED32;
 	VAR
-		a: LONGINT;
+		a: SIGNED32;
 
 	BEGIN
 		a:= SYSTEM.TYPECODE(T);
@@ -39007,7 +39007,7 @@ positive: new on pointer to array containing pointers (any)
 positive: new on pointer to array containing pointers (delegates)
 
 	MODULE Test;
-	TYPE delegate = PROCEDURE{DELEGATE}(x: LONGINT);
+	TYPE delegate = PROCEDURE{DELEGATE}(x: SIGNED32);
 	VAR a: POINTER TO ARRAY OF delegate;
 	BEGIN NEW(a,10) END Test.
 
@@ -39020,9 +39020,9 @@ positive: new on pointer to array containing pointers (objects)
 positive: new on pointer to array containing pointers (record with pointer)
 	MODULE Test;
 	TYPE
-		r1 = RECORD a: LONGINT; b: POINTER TO r1 END;
+		r1 = RECORD a: SIGNED32; b: POINTER TO r1 END;
 		r2 = RECORD r: r1 END;
-		record = RECORD (r2) b: LONGINT END;
+		record = RECORD (r2) b: SIGNED32 END;
 	VAR a: POINTER TO ARRAY OF record;
 	BEGIN NEW(a,10) END Test.
 
@@ -39031,7 +39031,7 @@ positive: export object with field
 	MODULE Dummy;
 	TYPE
 		Volume* = OBJECT
-		VAR size-: LONGINT
+		VAR size-: SIGNED32
 		END Volume;
 	END Dummy.
 
@@ -39044,7 +39044,7 @@ positive: import object with field
 		VAR
 		vol: Dummy.Volume;
 		PROCEDURE P;
-		VAR size: LONGINT;
+		VAR size: SIGNED32;
 		BEGIN
 		size := vol.size;
 		END P;
@@ -39087,7 +39087,7 @@ positive: formal array of system.byte parameter used with basic actual parameter
 	MODULE Test;
 	IMPORT SYSTEM;
 
-	VAR a: ARRAY 32 OF CHAR; b: LONGINT;
+	VAR a: ARRAY 32 OF CHAR; b: SIGNED32;
 
 	PROCEDURE P(CONST a: ARRAY OF SYSTEM.BYTE);
 	BEGIN
@@ -39117,7 +39117,7 @@ positive: binary MIN function
 
 	MODULE Test;
 	CONST min = MIN(10,20);
-	VAR a,b: LONGINT; r1,r2: REAL;
+	VAR a,b: SIGNED32; r1,r2: REAL;
 	BEGIN
 		a := MIN(a,b);
 		r1 := MIN(r1,r2);
@@ -39133,7 +39133,7 @@ positive: binary MAX function
 
 	MODULE Test;
 	CONST min = MAX(10,20);
-	VAR a,b: LONGINT; r1,r2: REAL;
+	VAR a,b: SIGNED32; r1,r2: REAL;
 	BEGIN
 		a := MAX(a,b);
 		r1 := MAX(r1,r2);
@@ -39218,7 +39218,7 @@ positive: shortint variable multiplied by shortint value (8bit multiply)
 positive: with statement on object field
 
 	MODULE Test;
-	TYPE Object = OBJECT VAR a: LONGINT; END Object;
+	TYPE Object = OBJECT VAR a: SIGNED32; END Object;
 	TYPE Object2 = OBJECT (Object) VAR a: Object; END Object2;
 	TYPE Object3 = OBJECT VAR a: Object; BEGIN WITH a: Object2 DO a.a.a := a.a.a; END; END Object3;
 	END Test.
@@ -39260,7 +39260,7 @@ positive: use string length with different lengths (to check side-effects on len
 		String = ARRAY 128 OF CHAR;
 
 		PROCEDURE PutBareName ( VAR name : String);
-		VAR ix : LONGINT;
+		VAR ix : SIGNED32;
 		BEGIN
 			WHILE (ix<LEN(name)) DO END;
 		END PutBareName;
@@ -39340,7 +39340,7 @@ positive: negative values in address in SYSTEM.GET
 
 	MODULE Test;
 	IMPORT SYSTEM;
-	VAR a: LONGINT;
+	VAR a: SIGNED32;
 	BEGIN
 		SYSTEM.GET(-1,a)
 	END Test.
@@ -39351,16 +39351,16 @@ positive: ugly system.val with records
 
 	IMPORT SYSTEM;
 
-	TYPE Record= RECORD a,b: LONGINT END;
+	TYPE Record= RECORD a,b: SIGNED32 END;
 
 	PROCEDURE P(VAR r: Record);
-	VAR a: LONGINT;
+	VAR a: SIGNED32;
 	BEGIN
 		P(SYSTEM.VAL(Record,a));
 	END P;
 
 	PROCEDURE Q(r: Record);
-	VAR a: LONGINT;
+	VAR a: SIGNED32;
 	BEGIN
 		Q(SYSTEM.VAL(Record,a));
 	END Q;
@@ -39482,7 +39482,7 @@ positive: use ADDRESS as array index
 positive: long jumps (backend test for TRM)
 	MODULE Test;
 	PROCEDURE LongJumpBackwards;
-	VAR a,b,c: LONGINT;
+	VAR a,b,c: SIGNED32;
 	BEGIN
 		REPEAT
 			a := b + c; a := b + c;	a := b + c; a := b + c;	a := b + c; a := b + c; a := b + c;	a := b + c; a := b + c;	a := b + c; a := b + c; a := b + c;	a := b + c; a := b + c;	a := b + c;
@@ -39496,7 +39496,7 @@ positive: long jumps (backend test for TRM)
 		UNTIL a<b
 	END LongJumpBackwards;
 	PROCEDURE LongJumpForwards;
-	VAR a,b,c: LONGINT;
+	VAR a,b,c: SIGNED32;
 	BEGIN
 		IF a>=b THEN
 			a := b + c; a := b + c;	a := b + c; a := b + c;	a := b + c; a := b + c; a := b + c;	a := b + c; a := b + c;	a := b + c; a := b + c; a := b + c;	a := b + c; a := b + c;	a := b + c;
@@ -39535,7 +39535,7 @@ positive: tests of MIN and MAX
 	BEGIN
 	    ASSERT(-128 = MIN(SIGNED8)); ASSERT(127 = MAX(SIGNED8));
 	    ASSERT(-32768 = MIN(SIGNED16)); ASSERT(32767 = MAX(SIGNED16));
-	    ASSERT(-2147483648 = MIN(LONGINT)); ASSERT(2147483647 = MAX(LONGINT));
+	    ASSERT(-2147483648 = MIN(SIGNED32)); ASSERT(2147483647 = MAX(SIGNED32));
 	    ASSERT(-9223372036854775807-1 = MIN(HUGEINT)); ASSERT(9223372036854775807 = MAX(HUGEINT));
 
 	    ASSERT(-128 = MIN(SIGNED8)); ASSERT(127 = MAX(SIGNED8));
@@ -39563,12 +39563,12 @@ negative: conversion float to unsigned data type
 negative: use array of size for array size
 	MODULE Test;
 	CONST Data = [10,20];
-	VAR a: ARRAY LEN(Data) OF LONGINT;
+	VAR a: ARRAY LEN(Data) OF SIGNED32;
 	END Test.
 
 positive: use array size for array size
 	MODULE Test;
 	CONST Data = [10,20];
-	VAR a: ARRAY LEN(Data,0) OF LONGINT;
+	VAR a: ARRAY LEN(Data,0) OF SIGNED32;
 	END Test.
 

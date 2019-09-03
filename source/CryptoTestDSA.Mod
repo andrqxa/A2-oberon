@@ -24,7 +24,7 @@ CONST
 	PROCEDURE Hex2Bin( CONST  hex: ARRAY OF CHAR; VAR bin: ARRAY OF CHAR; len: SIGNED16 );
 	VAR
 		i, j: SIGNED16;
-		h, b: LONGINT;
+		h, b: SIGNED32;
 		c: CHAR;
 	BEGIN
 		i := 0;  j := 0;

@@ -519,7 +519,7 @@ MODULE Finder IN Oberon;	(** portable *) (* ejz 3.1.95 / jm - adapted for ver 1.
 	(**
 		Reads the Gadgets.FinderTemplates section *)
 	PROCEDURE UpdateTemplates*;
-	VAR s: Texts.Scanner;  i: LONGINT;  name: ARRAY 64 OF CHAR;
+	VAR s: Texts.Scanner;  i: SIGNED32;  name: ARRAY 64 OF CHAR;
 	BEGIN
 		templates := NIL;
 		Oberon.OpenScanner(s, "Gadgets.FinderTemplates");

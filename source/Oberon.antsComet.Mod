@@ -34,7 +34,7 @@ TYPE
 	tModel* = POINTER TO tModelDesc;
 	tModelDesc* = RECORD (antsModels.tModelDesc)
 		pointsx, pointsy, mass: LRA;
-		points: LONGINT;
+		points: SIGNED32;
 		vertmassv: vyBase.tVector
 	END;
 
@@ -42,7 +42,7 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	localModel: tModel;
 
 	PROCEDURE StoreM( VAR R: Files.Rider;  s: tModel );
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		Files.WriteInt( R, 3 );  Files.WriteLInt( R, s.points );
 		FOR i := 0 TO s.points - 1 DO
@@ -52,7 +52,7 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR version: SIGNED16;  i: LONGINT;  ref: Objects.Object;
+	VAR version: SIGNED16;  i: SIGNED32;  ref: Objects.Object;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLInt( R, s.points );  NEW( s.pointsx, s.points );  NEW( s.pointsy, s.points );
 		NEW( s.mass, s.points );
@@ -63,13 +63,13 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 
 	END LoadM;
 
-	PROCEDURE Range( x, y, w, h: LONGINT ): BOOLEAN;
+	PROCEDURE Range( x, y, w, h: SIGNED32 ): BOOLEAN;
 	BEGIN
 		IF (x < 0) OR (y < 0) OR (x >= w) OR (y >= h) THEN RETURN FALSE ELSE RETURN TRUE END
 	END Range;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR w, h: LONGINT;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  i: LONGINT;  x, y: LONGREAL;
+	VAR w, h: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  i: SIGNED32;  x, y: LONGREAL;
 		xi, yi: SIGNED16;  xa, ya, mass: LRA;  dr: LONGREAL;  K1, K: LONGREAL;  nuM, variance: LONGREAL;  vv: SIGNED16;
 
 		PROCEDURE drift( mass: LONGREAL ): LONGREAL;
@@ -101,7 +101,7 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	END OneSweep;
 
 	PROCEDURE Uniform( s: antsKernel.Kernel );
-	VAR i: LONGINT;  model: tModel;  A: antsArrayObjects.tINTEGERObject;  gen: vyRanBase.tRandom;  xi, yi: SIGNED16;  x, y: LONGREAL;
+	VAR i: SIGNED32;  model: tModel;  A: antsArrayObjects.tINTEGERObject;  gen: vyRanBase.tRandom;  xi, yi: SIGNED16;  x, y: LONGREAL;
 		minmass, maxmass, meanmass: LONGREAL;  vv: SIGNED16;
 	BEGIN
 				minmass := MAX( LONGREAL );  maxmass := MIN( LONGREAL );  meanmass := 0;  gen := vyRanBase.RandomGenerator;  model := s.par( tModel );
@@ -139,13 +139,13 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 
 	END Uniform;
 
-	PROCEDURE Min( a, b: LONGINT ): LONGINT;
+	PROCEDURE Min( a, b: SIGNED32 ): SIGNED32;
 	BEGIN
 		IF a < b THEN RETURN a ELSE RETURN b END;
 	END Min;
 
-	PROCEDURE ChangePoints( m: tModel;  points: LONGINT ): BOOLEAN;
-	VAR x, y, mass: LRA;  i: LONGINT;
+	PROCEDURE ChangePoints( m: tModel;  points: SIGNED32 ): BOOLEAN;
+	VAR x, y, mass: LRA;  i: SIGNED32;
 	BEGIN
 		IF m.points = points THEN RETURN TRUE
 		ELSIF m.points <= 0 THEN RETURN FALSE
@@ -201,7 +201,7 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 		END;   (* tVector*)
 	END Handler;
 
-	PROCEDURE OpenModel*( M: tModel;  name: vyName.tNameArray;  points: LONGINT );
+	PROCEDURE OpenModel*( M: tModel;  name: vyName.tNameArray;  points: SIGNED32 );
 	BEGIN
 		vyName.RegisterNamed( M, name );  M.points := points;  NEW( M.pointsx, points );  NEW( M.pointsy, points );
 		NEW( M.mass, points );
@@ -224,7 +224,7 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	END Gen;
 
 	PROCEDURE NewModel*;
-	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  points: LONGINT;
+	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  points: SIGNED32;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name= NAME points=INT" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectNumberFromKeyword( l, "points", points ) THEN

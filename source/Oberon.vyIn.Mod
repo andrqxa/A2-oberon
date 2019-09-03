@@ -45,12 +45,12 @@ PROCEDURE Char* (VAR ch: CHAR);
 BEGIN	IF Done THEN ch := S.ch;  Done := ~S.eot;  vyScanners.Ch(S) END
 END Char;
 
-PROCEDURE LongInt* (VAR i: LONGINT);
+PROCEDURE LongInt* (VAR i: SIGNED32);
 BEGIN	IF Done THEN Done := vyParser.Number(S, i) END
 END LongInt;
 
 PROCEDURE Int* (VAR i: SIGNED16);
-	VAR l: LONGINT;
+	VAR l: SIGNED32;
 BEGIN	IF Done THEN LongInt(l);  i := SHORT(l) END
 END Int;
 

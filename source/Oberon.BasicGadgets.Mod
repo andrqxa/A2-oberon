@@ -40,7 +40,7 @@ CONST
 	outofboundsmodify = 4;
 
 	MaxLen = 256;
-	CONST	DontCare = MAX(LONGINT); DontCareR = MAX(LONGREAL);
+	CONST	DontCare = MAX(SIGNED32); DontCareR = MAX(LONGREAL);
 
 
 TYPE
@@ -58,7 +58,7 @@ TYPE
 
 	Integer* = POINTER TO IntegerDesc;
 	IntegerDesc* = RECORD (Gadgets.ObjDesc)
-		val*: LONGINT;
+		val*: SIGNED32;
 	END;
 
 	Real* = POINTER TO RealDesc;
@@ -89,7 +89,7 @@ TYPE
 
 	Slider* = POINTER TO SliderDesc;
 	SliderDesc* = RECORD (Gadgets.FrameDesc)
-		min*, max*, val*: LONGINT;	(** Minimum, maximum and current value *)
+		min*, max*, val*: SIGNED32;	(** Minimum, maximum and current value *)
 		B, BW: SIGNED16;
 	END;
 
@@ -115,7 +115,7 @@ BEGIN Files.WriteNum(R, VersionNo);
 END WriteVersion;
 
 PROCEDURE ReadVersion(VAR R: Files.Rider);
-VAR x: LONGINT;
+VAR x: SIGNED32;
 BEGIN Files.ReadNum(R, x);
 	IF x # VersionNo THEN
 		Texts.WriteString(W, "Version "); Texts.WriteInt(W, VersionNo, 3);
@@ -132,7 +132,7 @@ BEGIN
 END CopyBoolean;
 
 PROCEDURE BooleanHandler*(obj: Objects.Object; VAR M: Objects.ObjMsg);
-VAR obj2: Boolean; x: SIGNED16; ver: LONGINT;
+VAR obj2: Boolean; x: SIGNED16; ver: SIGNED32;
 BEGIN
 	WITH obj: Boolean DO
 		IF M IS Objects.AttrMsg THEN
@@ -196,7 +196,7 @@ BEGIN Gadgets.CopyObject(M, from, to); COPY(from.val, to.val);
 END CopyString;
 
 PROCEDURE StringHandler*(obj: Objects.Object; VAR M: Objects.ObjMsg);
-VAR obj2: String; ver: LONGINT;
+VAR obj2: String; ver: SIGNED32;
 BEGIN
 	WITH obj: String DO
 		IF M IS Objects.AttrMsg THEN
@@ -263,7 +263,7 @@ BEGIN Gadgets.CopyObject(M, from, to); to.val := from.val;
 END CopyInteger;
 
 PROCEDURE IntegerHandler*(obj: Objects.Object; VAR M: Objects.ObjMsg);
-VAR obj2: Integer; ver: LONGINT;
+VAR obj2: Integer; ver: SIGNED32;
 BEGIN
 	WITH obj: Integer DO
 		IF M IS Objects.AttrMsg THEN
@@ -332,7 +332,7 @@ BEGIN Gadgets.CopyObject(M, from, to); to.val := from.val;
 END CopyReal;
 
 PROCEDURE RealHandler*(obj: Objects.Object; VAR M: Objects.ObjMsg);
-VAR obj2: Real; ver: LONGINT;
+VAR obj2: Real; ver: SIGNED32;
 BEGIN
 	WITH obj: Real DO
 		IF M IS Objects.AttrMsg THEN
@@ -681,10 +681,10 @@ BEGIN
 	to.downC:=from.downC; to.upC:=from.upC; to.bottomC:=from.bottomC; to.topC:=from.topC;
 END CopyButton;
 
-PROCEDURE ParseConstraints(CONST s: ARRAY OF CHAR; VAR l, t, r, b: LONGINT; VAR lrel,trel,rrel,brel:LONGREAL);
+PROCEDURE ParseConstraints(CONST s: ARRAY OF CHAR; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:LONGREAL);
 VAR p: ARRAY 64 OF CHAR; i, j: SIGNED16;
 
-	PROCEDURE ReadNum(VAR x:LONGINT; VAR y:LONGREAL);
+	PROCEDURE ReadNum(VAR x:SIGNED32; VAR y:LONGREAL);
 	VAR isReal:BOOLEAN;
 	BEGIN
 		isReal:=FALSE;
@@ -705,7 +705,7 @@ BEGIN
 	ReadNum(l,lrel); ReadNum(t,trel); ReadNum(r,rrel); ReadNum(b,brel);
 END ParseConstraints;
 
-PROCEDURE Constraints(f: Display.Frame; VAR l, t, r, b: LONGINT; VAR lrel,trel,rrel,brel:LONGREAL): BOOLEAN;
+PROCEDURE Constraints(f: Display.Frame; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:LONGREAL): BOOLEAN;
 VAR A: Objects.AttrMsg;
 BEGIN
 	A.id := Objects.get; A.name := "Constraints"; A.res := -1; Gadgets.framehandle(f, A);
@@ -717,7 +717,7 @@ BEGIN
 END Constraints;
 
 PROCEDURE Constrain(F:Button):BOOLEAN;
-VAR l,r,t,b:LONGINT; lrel,rrel,trel,brel:LONGREAL;
+VAR l,r,t,b:SIGNED32; lrel,rrel,trel,brel:LONGREAL;
 BEGIN
 	IF (F.look#NIL) &Constraints(F.look(Display.Frame),l,t,r,b,lrel,trel,rrel,brel) THEN (*constraints must be positive*)
 		IF (l#DontCare) & (r#DontCare) THEN
@@ -739,7 +739,7 @@ BEGIN
 	END;
 END Constrain;
 
-PROCEDURE ComputeColors(F:Button; col:LONGINT);	(*adapt shade of button border to button color *)
+PROCEDURE ComputeColors(F:Button; col:SIGNED32);	(*adapt shade of button border to button color *)
 VAR r,g,b:REAL; f:SIGNED16;
 BEGIN
 	F.upC:=SHORT(col);
@@ -759,7 +759,7 @@ END ComputeColors;
 
 PROCEDURE ButtonHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
 VAR F2: Button; x, y, w, h: SIGNED16;
-	keysum: SET; ver: LONGINT; f: Gadgets.Frame; R: Display3.Mask;
+	keysum: SET; ver: SIGNED32; f: Gadgets.Frame; R: Display3.Mask;
 	A: Display.ModifyMsg;
 BEGIN
 	WITH F: Button DO
@@ -1144,7 +1144,7 @@ BEGIN Gadgets.CopyFrame(M, from, to); to.val := from.val; to.setval := from.setv
 END CopyCheckBox;
 
 PROCEDURE CheckBoxHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR x, y, w, h, u, v: SIGNED16; ver: LONGINT; F0: CheckBox; R: Display3.Mask; keysum: SET;
+VAR x, y, w, h, u, v: SIGNED16; ver: SIGNED32; F0: CheckBox; R: Display3.Mask; keysum: SET;
 BEGIN
 	WITH F: CheckBox DO
 		IF M IS Objects.AttrMsg THEN

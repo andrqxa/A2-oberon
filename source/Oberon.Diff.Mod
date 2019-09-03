@@ -29,7 +29,7 @@ MODULE Diff IN Oberon; (** portable *)	(** PS  **)
 		HashEntry = POINTER TO HashEntryDesc;
 
 		LineDesc = RECORD
-			pos: LONGINT;
+			pos: SIGNED32;
 			hash: HashEntry;
 			next, list, corr: Line;
 			nr, absNr: SIGNED16
@@ -37,7 +37,7 @@ MODULE Diff IN Oberon; (** portable *)	(** PS  **)
 
 		HashEntryDesc = RECORD
 			next: HashEntry;
-			hash: LONGINT;
+			hash: SIGNED32;
 			list: Line
 		END;
 
@@ -103,10 +103,10 @@ END DiffStat;
 
 (* *************** HASHING *************** *)
 
-PROCEDURE HashLine (L: Line; VAR hash: LONGINT; VAR done: BOOLEAN);
+PROCEDURE HashLine (L: Line; VAR hash: SIGNED32; VAR done: BOOLEAN);
 VAR obj: Objects.Object; ch: CHAR;
 
-	PROCEDURE HashObj (obj: Objects.Object; VAR hash: LONGINT);
+	PROCEDURE HashObj (obj: Objects.Object; VAR hash: SIGNED32);
 	VAR gen: ARRAY 64 OF CHAR; i: SIGNED16;
 	BEGIN
 		Attributes.GetString(obj, "Gen", gen);
@@ -132,7 +132,7 @@ BEGIN
 	END
 END HashLine;
 
-PROCEDURE Insert (root: HashEntry; line: Line; hash: LONGINT);
+PROCEDURE Insert (root: HashEntry; line: Line; hash: SIGNED32);
 VAR cur, new: HashEntry; curL: Line;
 BEGIN cur := root; line.list := NIL;
 	WHILE (cur.next # NIL) & (cur.next.hash <= hash) DO cur := cur.next END;
@@ -146,7 +146,7 @@ BEGIN cur := root; line.list := NIL;
 END Insert;
 
 PROCEDURE HashText (T: Text);
-VAR old, line: Line; hash: LONGINT; inserted, total: SIGNED16; done: BOOLEAN;
+VAR old, line: Line; hash: SIGNED32; inserted, total: SIGNED16; done: BOOLEAN;
 BEGIN
 	NEW(T.root); T.root.next := NIL; NEW(line);
 	T.line := line; old := NIL;
@@ -187,7 +187,7 @@ VAR L1, L2: Line;
 	END RemoveLine;
 
 	PROCEDURE SkipSingleLines (rFrom, rIn: HashEntry; VAR L: Line);
-	VAR curH: HashEntry; hash: LONGINT;
+	VAR curH: HashEntry; hash: SIGNED32;
 	BEGIN
 		curH := NIL;
 		LOOP
@@ -256,13 +256,13 @@ END Compare;
 PROCEDURE PrepareTexts (d1, d2: Text);
 VAR l1, l2: Line; dL, dL1, dL2: SIGNED16;
 
-	PROCEDURE InsertCR (text: Texts.Text; pos, dPos, cnt: LONGINT);
+	PROCEDURE InsertCR (text: Texts.Text; pos, dPos, cnt: SIGNED32);
 	BEGIN
 		REPEAT Texts.Write(W, CR); DEC(cnt) UNTIL cnt = 0;
 		Texts.Insert(text, pos+dPos, W.buf)
 	END InsertCR;
 
-	PROCEDURE ColorText (text: Texts.Text; line: Line; dPos: LONGINT);
+	PROCEDURE ColorText (text: Texts.Text; line: Line; dPos: SIGNED32);
 	BEGIN
 		IF line.next # NIL THEN
 			Texts.ChangeLooks(text, line.pos+dPos, line.next.pos+dPos, {1}, NIL, 3, 0)
@@ -271,7 +271,7 @@ VAR l1, l2: Line; dL, dL1, dL2: SIGNED16;
 		END
 	END ColorText;
 
-	(*PROCEDURE ColorText (text: Texts.Text; p1, p2, dPos: LONGINT);
+	(*PROCEDURE ColorText (text: Texts.Text; p1, p2, dPos: SIGNED32);
 	BEGIN
 		Texts.ChangeLooks(text, p1+dPos, p2+dPos, {1}, NIL, 3, 0)
 	END ColorText;*)
@@ -333,7 +333,7 @@ END ShowTexts;
 (* *************** USER INTERFACE *************** *)
 
 PROCEDURE SetScanner (VAR S: Attributes.Scanner);
-VAR beg, end, time: LONGINT; T: Texts.Text;
+VAR beg, end, time: SIGNED32; T: Texts.Text;
 BEGIN
 	opts := {};
 	Attributes.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Attributes.Scan(S);
@@ -428,7 +428,7 @@ END LocateLine;
 
 (** hashes a line, starts at begin of selection *)
 PROCEDURE HashThis*;
-VAR beg, end, time, hash: LONGINT; T: Texts.Text; l: Line; done: BOOLEAN;
+VAR beg, end, time, hash: SIGNED32; T: Texts.Text; l: Line; done: BOOLEAN;
 BEGIN
 	Oberon.GetSelection(T, beg, end, time);
 	IF time >= 0 THEN

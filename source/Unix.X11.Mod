@@ -21,7 +21,7 @@ TYPE
 	Pattern* = ADDRESS (* = PatternPtr *) ;
 	PatternPtr* = POINTER TO PatternDesc;
 	PatternDesc* = RECORD
-				x*, y*: LONGINT;
+				x*, y*: SIGNED32;
 				w*, h*: SIGNED16;
 				pixmap*: Pixmap
 			END;
@@ -34,7 +34,7 @@ TYPE
 	Font* = POINTER TO Bytes;
 	Bytes* = RECORD
 				metrics*: ARRAY 256 OF MetricDesc;
-				xid*: LONGINT
+				xid*: SIGNED32
 			END;
 
 	XID* = ADDRESS;
@@ -45,7 +45,7 @@ CONST
 TYPE
 	Buffer* = ARRAY BufferSize OF CHAR;
 	ComposeStatus* = RECORD
-		opaque: ARRAY 6 OF LONGINT
+		opaque: ARRAY 6 OF SIGNED32
 	END;
 	Modifiers* = ARRAY 8 OF KeySym;
 
@@ -187,7 +187,7 @@ TYPE
 	Data40 * = ARRAY 5 OF LONGWORD; (* max of these is 40 bytes*)
 	Data40b* = ARRAY 20 OF CHAR; (* 20x 8 bits *)
 	Data40s* = ARRAY 10 OF SIGNED16; (* 10x 16 bits *)
-	Data40l* = ARRAY 5 OF LONGINT; (* 5x 32 bits *)
+	Data40l* = ARRAY 5 OF SIGNED32; (* 5x 32 bits *)
 
 	ClientMessageEvent * = RECORD
 		typ* : WORD;
@@ -201,7 +201,7 @@ TYPE
 			(* any of these, union
 			b* : ARRAY 20 OF CHAR;
 			s* : ARRAY 10 OF SIGNED16;
-			l* : ARRAY 5 OF LONGINT;
+			l* : ARRAY 5 OF SIGNED32;
 			*)
 	END;
 
@@ -220,8 +220,8 @@ TYPE
 	END;
 
 	ErrorEventPtr* = POINTER {UNSAFE,UNTRACED} TO ErrorEvent;
-	ErrorHandler* = PROCEDURE ( d: DisplayPtr;  err: ErrorEventPtr; p3, p4: LONGINT ): LONGINT;
-	IOErrorHandler = PROCEDURE ( d: DisplayPtr; p2, p3, p4: LONGINT ): LONGINT;
+	ErrorHandler* = PROCEDURE ( d: DisplayPtr;  err: ErrorEventPtr; p3, p4: SIGNED32 ): SIGNED32;
+	IOErrorHandler = PROCEDURE ( d: DisplayPtr; p2, p3, p4: SIGNED32 ): SIGNED32;
 
 	PChar* = POINTER TO ARRAY OF CHAR;
 
@@ -344,7 +344,7 @@ TYPE
 
 	(* Extensions need a way to hang private data on some structures.
 	called to free private storage
-		free_private_proc* = PROCEDURE (extension: ExtData): LONGINT;*)
+		free_private_proc* = PROCEDURE (extension: ExtData): SIGNED32;*)
 
 	ExtData* = POINTER {UNTRACED, UNSAFE} TO ExtDataDesc;
 	ExtDataDesc* = RECORD
@@ -1120,7 +1120,7 @@ VAR
 
 	END LinkToX;
 
-	PROCEDURE MyErrorHandler( d: DisplayPtr;  err {UNTRACED}: ErrorEventPtr ): LONGINT;
+	PROCEDURE MyErrorHandler( d: DisplayPtr;  err {UNTRACED}: ErrorEventPtr ): SIGNED32;
 	BEGIN
 		ErrorFlag := TRUE;
 		GetErrorText( d, ORD( err.errorCode ), ErrorText, BufferSize );
@@ -1128,7 +1128,7 @@ VAR
 		RETURN 0
 	END MyErrorHandler;
 
-	PROCEDURE MyIOErrorHandler( d: DisplayPtr): LONGINT;
+	PROCEDURE MyIOErrorHandler( d: DisplayPtr): SIGNED32;
 	BEGIN
 		ErrorFlag := TRUE;  ErrorText := "X11 I/O Error";
 		Trace.StringLn( ErrorText );

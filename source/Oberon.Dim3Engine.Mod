@@ -123,7 +123,7 @@ TYPE
 		ambient*: REAL;	(** intensity of ambient light **)
 		skyCol*, gndCol*: SIGNED16;	(** color numbers for sky and ground **)
 		horizon*: BOOLEAN;	(** flag whether to draw horizon or not **)
-		time*: LONGINT;	(** time of selection **)
+		time*: SIGNED32;	(** time of selection **)
 		selCount*: SIGNED16;	(** number of selected shapes **)
 		selShape*: Shape;	(** selected shape (if only one selected) **)
 	END;

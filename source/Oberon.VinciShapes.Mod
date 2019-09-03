@@ -29,7 +29,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 			name*: ARRAY 64 OF CHAR;	(* parameter name *)
 			sym*: Scheme.Object;	(* parameter symbol *)
 			kind*: SIGNED16;	(* parameter kind *)
-			imin*, imax*: LONGINT;	(* integer range *)
+			imin*, imax*: SIGNED32;	(* integer range *)
 			rmin*, rmax*: REAL;	(* real range *)
 		END;
 
@@ -56,8 +56,8 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Color Conversion ---*)
 
-	PROCEDURE ColorToInt (col: Scheme.Object; VAR i: LONGINT);
-		VAR vec: Scheme.Object; r, g, b: LONGINT; exact: BOOLEAN;
+	PROCEDURE ColorToInt (col: Scheme.Object; VAR i: SIGNED32);
+		VAR vec: Scheme.Object; r, g, b: SIGNED32; exact: BOOLEAN;
 	BEGIN
 		i := 15;
 		IF Scheme.IsPair(col) & (Scheme.Car(col) = colorSym) THEN
@@ -69,7 +69,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 		END
 	END ColorToInt;
 
-	PROCEDURE IntToColor (i: LONGINT; VAR col: Scheme.Object);
+	PROCEDURE IntToColor (i: SIGNED32; VAR col: Scheme.Object);
 		VAR v: ARRAY 3 OF SIGNED16; vec: Scheme.Object;
 	BEGIN
 		Display.GetColor(i, v[0], v[1], v[2]);
@@ -92,7 +92,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END Evaluate;
 
 	PROCEDURE IsMatrix (obj: Scheme.Object): BOOLEAN;
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		IF ~Scheme.IsVector(obj) OR (Scheme.VectorLen(obj) # 6) THEN RETURN FALSE END;
 		FOR i := 0 TO 5 DO
@@ -102,7 +102,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END IsMatrix;
 
 	PROCEDURE GetMatrix (s: Shape; VAR m: GfxMatrix.Matrix);
-		VAR val, res: Scheme.Object; ctxt: Vinci.Context; i: LONGINT; x: LONGREAL;
+		VAR val, res: Scheme.Object; ctxt: Vinci.Context; i: SIGNED32; x: LONGREAL;
 	BEGIN
 		m := GfxMatrix.Identity;
 		IF Scheme.LookupVariable(matrix, s.env, val) THEN
@@ -121,7 +121,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE GetBox (s: Shape; VAR m: GfxMatrix.Matrix; VAR llx, lly, urx, ury, bw: REAL);
 		VAR
-			val, res, obj: Scheme.Object; ctxt: Vinci.Context; len, i: LONGINT; x: LONGREAL; b: ARRAY 5 OF REAL;
+			val, res, obj: Scheme.Object; ctxt: Vinci.Context; len, i: SIGNED32; x: LONGREAL; b: ARRAY 5 OF REAL;
 			x0, y0, x1, y1: REAL;
 	BEGIN
 		Leonardo.GetComponentsBox(s.bottom, llx, lly, urx, ury, bw);
@@ -475,7 +475,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END BindParams;
 
 	PROCEDURE WriteParams (s: Shape; VAR r: Files.Rider);
-		VAR par: Parameter; res: BOOLEAN; val: Scheme.Object; l: LONGINT; x: LONGREAL; str: ARRAY 64 OF CHAR;
+		VAR par: Parameter; res: BOOLEAN; val: Scheme.Object; l: SIGNED32; x: LONGREAL; str: ARRAY 64 OF CHAR;
 	BEGIN
 		par := s.par;
 		WHILE par # NIL DO
@@ -495,7 +495,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE ReadParams (s: Shape; VAR r: Files.Rider);
 		VAR
-			par: Parameter; b: BOOLEAN; val: Scheme.Object; l: LONGINT; x: REAL; str: ARRAY 64 OF CHAR;
+			par: Parameter; b: BOOLEAN; val: Scheme.Object; l: SIGNED32; x: REAL; str: ARRAY 64 OF CHAR;
 			obj: Objects.Object;
 	BEGIN
 		par := s.par;
@@ -529,7 +529,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END ReadParams;
 
 	PROCEDURE HandleShape (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR s, copy: Shape; ver: LONGINT; top: Leonardo.Shape;
+		VAR s, copy: Shape; ver: SIGNED32; top: Leonardo.Shape;
 	BEGIN
 		s := obj(Shape);
 		IF msg IS Leonardo.ShapeMsg THEN
@@ -604,7 +604,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Integrate*;
 		VAR
-			s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; shape: Shape;
+			s: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; shape: Shape;
 			frame: Display.Frame; u, v: SIGNED16; lm: Objects.LinkMsg; fig: Leonardo.Figure;
 	BEGIN
 		Texts.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(s);
@@ -640,7 +640,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END CopyFrame;
 
 	PROCEDURE HandleFrame* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR frame, copy: Frame; mat, lgm, inv: GfxMatrix.Matrix; llx, lly, urx, ury: REAL; ver: LONGINT;
+		VAR frame, copy: Frame; mat, lgm, inv: GfxMatrix.Matrix; llx, lly, urx, ury: REAL; ver: SIGNED32;
 	BEGIN
 		frame := obj(Frame);
 		IF msg IS Leonardo.ShapeMsg THEN
@@ -844,7 +844,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END EvalPoint;
 
 	PROCEDURE EvalMatrix (ctxt: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
-		VAR c: Vinci.Context; s: Leonardo.Shape; m: GfxMatrix.Matrix; i: LONGINT;
+		VAR c: Vinci.Context; s: Leonardo.Shape; m: GfxMatrix.Matrix; i: SIGNED32;
 	BEGIN
 		c := ctxt(Vinci.Context); s := ShapeArg(c, args); Ops.CheckNull(c, args);
 		IF s # NIL THEN
@@ -882,7 +882,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	PROCEDURE EvalInteger (ctxt: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
 		VAR par: Parameter; obj: Scheme.Object; vs: Shape;
 	BEGIN
-		NEW(par); par.kind := int; par.imin := MIN(LONGINT); par.imax := MAX(LONGINT);
+		NEW(par); par.kind := int; par.imin := MIN(SIGNED32); par.imax := MAX(SIGNED32);
 		par.sym := Scheme.StringToSymbol(Ops.StringArg(ctxt, args));
 		obj := Ops.StringArg(ctxt, args); Scheme.GetString(obj, 0, Scheme.StringLen(obj), par.name);
 		IF Scheme.IsPair(args) THEN par.imin := Ops.IntVal(ctxt, args) END;
@@ -976,7 +976,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END EvalName;
 
 	PROCEDURE EvalRectInit (ctxt: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		res := Scheme.NewVector(4, Scheme.nil);
 		FOR i := 0 TO 3 DO Scheme.SetVectorAt(res, i, Ops.NumArg(ctxt, args)) END;

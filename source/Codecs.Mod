@@ -27,13 +27,13 @@ CONST
 
 TYPE
 	AVStreamInfo* = RECORD
-		streamType* : LONGINT;
+		streamType* : SIGNED32;
 		seekability* : SET;
 		contentType* : ARRAY 16 OF CHAR;
 
-		length* : LONGINT;
-		frames* : LONGINT;
-		rate*: LONGINT;
+		length* : SIGNED32;
+		frames* : SIGNED32;
+		rate*: SIGNED32;
 	END;
 
 	FileInputStream* = OBJECT(Streams.Reader)
@@ -49,7 +49,7 @@ TYPE
 			IF len >= min THEN res := Streams.Ok ELSE res := Streams.EOF (* end of file *) END
 		END Receive;
 
-		PROCEDURE &InitFileReader*(f : Files.File; pos: LONGINT);
+		PROCEDURE &InitFileReader*(f : Files.File; pos: SIGNED32);
 		BEGIN
 			InitReader(SELF.Receive, 4096);
 			SELF.f := f;
@@ -76,31 +76,31 @@ TYPE
 		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
 		END Open;
 
-		PROCEDURE GetNumberOfStreams*() : LONGINT;
+		PROCEDURE GetNumberOfStreams*() : SIGNED32;
 		BEGIN
 			RETURN 0
 		END GetNumberOfStreams;
 
-		PROCEDURE GetStreamType*(streamNr : LONGINT): LONGINT;
+		PROCEDURE GetStreamType*(streamNr : SIGNED32): SIGNED32;
 		BEGIN
 			RETURN -1;
 		END GetStreamType;
 
-		PROCEDURE GetStreamInfo*(streamNr : LONGINT): AVStreamInfo;
+		PROCEDURE GetStreamInfo*(streamNr : SIGNED32): AVStreamInfo;
 		END GetStreamInfo;
 
 		(* get stream streamNr *)
-		PROCEDURE GetStream*(streamNr: LONGINT): DemuxStream;
+		PROCEDURE GetStream*(streamNr: SIGNED32): DemuxStream;
 		END GetStream;
 
 		(* read data from streamNr, store it into buffer buf starting at offset ofs, store size bytes if possible, block if not read min bytes at least. Return number of read bytes in len and return code res *)
 		(* this procedure should not be directly called - it is called by the DemuxStream object! *)
-		PROCEDURE GetData*(streamNr : LONGINT; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE GetData*(streamNr : SIGNED32; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		END GetData;
 
 		(* seek the streamNr to position pos (defined bz seekType), res = 0 if Ok, otherwise an error number *)
 		(* this procedure should not be directly called - it is called by the DemuxStream object! *)
-		PROCEDURE SetStreamPos*(streamNr : LONGINT; seekType : LONGINT; pos : LONGINT; VAR itemSize : LONGINT; VAR res : WORD);
+		PROCEDURE SetStreamPos*(streamNr : SIGNED32; seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32; VAR res : WORD);
 		END SetStreamPos;
 
 	END AVDemultiplexer;
@@ -108,10 +108,10 @@ TYPE
 	DemuxStream* = OBJECT(Streams.Reader)
 	VAR
 		demultiplexer* : AVDemultiplexer;
-		streamNr* : LONGINT;
+		streamNr* : SIGNED32;
 		streamInfo* : AVStreamInfo;
 
-		PROCEDURE& Open*(demultiplexer : AVDemultiplexer; streamNr : LONGINT);
+		PROCEDURE& Open*(demultiplexer : AVDemultiplexer; streamNr : SIGNED32);
 		BEGIN
 			SELF.demultiplexer := demultiplexer;
 			SELF.streamNr := streamNr;
@@ -124,15 +124,15 @@ TYPE
 		END Receive;
 
 		PROCEDURE SetPos*(pos : Streams.Position);
-		VAR  seekType, itemSize: LONGINT; res: WORD;
+		VAR  seekType, itemSize: SIGNED32; res: WORD;
 		BEGIN
 			seekType := SeekByte;
-			demultiplexer.SetStreamPos(streamNr, seekType, pos(LONGINT), itemSize, res);
+			demultiplexer.SetStreamPos(streamNr, seekType, pos(SIGNED32), itemSize, res);
 			Reset
 		END SetPos;
 
 		(* seek the streamNr to position pos with seekType. itemSize contains the size of the element seeked to, if known and applicable; res = 0 if Ok, otherwise an error number *)
-		PROCEDURE SetPosX*(seekType : LONGINT; pos : LONGINT; VAR itemSize : LONGINT; VAR res : WORD);
+		PROCEDURE SetPosX*(seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32; VAR res : WORD);
 		BEGIN
 			demultiplexer.SetStreamPos(streamNr, seekType, pos, itemSize, res);
 			Reset
@@ -147,35 +147,35 @@ TYPE
 		PROCEDURE HasMoreData*():BOOLEAN;
 		END HasMoreData;
 
-		PROCEDURE GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample : LONGINT);
+		PROCEDURE GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample : SIGNED32);
 		END GetAudioInfo;
 
-		PROCEDURE SetAudioInfo*(nofChannels, samplesPerSecond, bitsPerSample : LONGINT);
+		PROCEDURE SetAudioInfo*(nofChannels, samplesPerSecond, bitsPerSample : SIGNED32);
 		END SetAudioInfo;
 
 		PROCEDURE CanSeek*() : BOOLEAN;
 		BEGIN RETURN FALSE
 		END CanSeek;
 
-		PROCEDURE GetCurrentSample*() : LONGINT;
+		PROCEDURE GetCurrentSample*() : SIGNED32;
 		BEGIN HALT(301); RETURN 0
 		END GetCurrentSample;
 
-		PROCEDURE GetTotalSamples*() : LONGINT;
+		PROCEDURE GetTotalSamples*() : SIGNED32;
 		BEGIN HALT(301); RETURN 0
 		END GetTotalSamples;
 
-		PROCEDURE GetCurrentTime*() : LONGINT;
+		PROCEDURE GetCurrentTime*() : SIGNED32;
 		BEGIN HALT(301); RETURN 0
 		END GetCurrentTime;
 
-		PROCEDURE SetStreamLength*(length : LONGINT);
+		PROCEDURE SetStreamLength*(length : SIGNED32);
 		END SetStreamLength;
 
-		PROCEDURE SeekSample*(sample: LONGINT; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
 		END SeekSample;
 
-		PROCEDURE SeekMillisecond*(millisecond : LONGINT; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
 		END SeekMillisecond;
 
 		(** Prepare the next audio bytes not yet filled into a buffer *)
@@ -189,7 +189,7 @@ TYPE
 
 	AudioEncoder* = OBJECT
 		(* open the encoder *)
-		PROCEDURE Open*(out : Streams.Writer; sRate, sRes, nofCh: LONGINT; VAR res : WORD);
+		PROCEDURE Open*(out : Streams.Writer; sRate, sRes, nofCh: SIGNED32; VAR res : WORD);
 		END Open;
 
 		PROCEDURE Write*(buffer : SoundDevices.Buffer; VAR res : WORD);
@@ -208,23 +208,23 @@ TYPE
 		PROCEDURE HasMoreData*():BOOLEAN;
 		END HasMoreData;
 
-		PROCEDURE GetVideoInfo*(VAR width, height, millisecondsPerFrame : LONGINT);
+		PROCEDURE GetVideoInfo*(VAR width, height, millisecondsPerFrame : SIGNED32);
 		END GetVideoInfo;
 
 		PROCEDURE CanSeek*() : BOOLEAN;
 		BEGIN RETURN FALSE
 		END CanSeek;
 
-		PROCEDURE GetCurrentFrame*() : LONGINT;
+		PROCEDURE GetCurrentFrame*() : SIGNED32;
 		END GetCurrentFrame;
 
-		PROCEDURE GetCurrentTime*() : LONGINT;
+		PROCEDURE GetCurrentTime*() : SIGNED32;
 		END GetCurrentTime;
 
-		PROCEDURE SeekFrame*(frame : LONGINT; goKeyFrame : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : WORD);
 		END SeekFrame;
 
-		PROCEDURE SeekMillisecond*(millisecond : LONGINT; goKeyFrame : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeyFrame : BOOLEAN; VAR res : WORD);
 		END SeekMillisecond;
 
 		(** Prepare the next frame *)
@@ -254,7 +254,7 @@ TYPE
 		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
 		END Open;
 
-		PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : LONGINT);
+		PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
 		END GetImageInfo;
 
 		(** Render will read and decode the image data up to progrssionLevel.
@@ -263,7 +263,7 @@ TYPE
 			SetProgressionLevel, the level is assumed to be maxProgressionLevel of the image,
 			which corresponds to best image quality.
 		 *)
-		PROCEDURE SetProgressionLevel*(progressionLevel: LONGINT);
+		PROCEDURE SetProgressionLevel*(progressionLevel: SIGNED32);
 		END SetProgressionLevel;
 
 		(* return the image in Raster format that best matches the format *)
@@ -282,7 +282,7 @@ TYPE
 		PROCEDURE Open*(out : Streams.Writer);
 		END Open;
 
-		PROCEDURE SetQuality*(quality : LONGINT);
+		PROCEDURE SetQuality*(quality : SIGNED32);
 		END SetQuality;
 
 		PROCEDURE WriteImage*(img : Raster.Image; VAR res : WORD);
@@ -345,8 +345,8 @@ TYPE
 	VAR
 		left*, top*, width*, height*  : SIZE;
 		image* : Raster.Image;
-		delayTime* : LONGINT; (* in milliseconds *)
-		disposeMode* : LONGINT;
+		delayTime* : SIGNED32; (* in milliseconds *)
+		disposeMode* : SIGNED32;
 		flags* : SET;
 		previous*, next* : ImageDescriptor;
 
@@ -363,7 +363,7 @@ TYPE
 
 	ImageSequence* = RECORD
 		width*, height* : SIZE;
-		bgColor* : LONGINT;
+		bgColor* : SIGNED32;
 		images* : ImageDescriptor;
 	END;
 

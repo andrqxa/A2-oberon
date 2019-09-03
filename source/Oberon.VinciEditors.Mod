@@ -164,7 +164,7 @@ MODULE VinciEditors IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Revert (e: LeoPanels.Editor);
 		VAR
-			obj, link: Objects.Object; vs: VinciShapes.Shape; par: VinciShapes.Parameter; b: BOOLEAN; i: LONGINT;
+			obj, link: Objects.Object; vs: VinciShapes.Shape; par: VinciShapes.Parameter; b: BOOLEAN; i: SIGNED32;
 			r: REAL; s: ARRAY 64 OF CHAR;
 	BEGIN
 		Links.GetLink(e, "Model", obj);
@@ -187,7 +187,7 @@ MODULE VinciEditors IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Apply (e: LeoPanels.Editor);
 		VAR
-			obj, link: Objects.Object; vs: VinciShapes.Shape; par: VinciShapes.Parameter; b: BOOLEAN; i: LONGINT;
+			obj, link: Objects.Object; vs: VinciShapes.Shape; par: VinciShapes.Parameter; b: BOOLEAN; i: SIGNED32;
 			r: REAL; s: ARRAY 64 OF CHAR;
 	BEGIN
 		Links.GetLink(e, "Model", obj);

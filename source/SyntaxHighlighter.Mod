@@ -56,7 +56,7 @@ CONST
 
 	Statistics = TRUE;
 
-	NOTCLOSED = MAX(LONGINT) - 128; (* some safety distance to protect against overflow *)
+	NOTCLOSED = MAX(SIGNED32) - 128; (* some safety distance to protect against overflow *)
 
 	MaxOpenLength = 32;
 	MaxCloseLength = 32;
@@ -102,7 +102,7 @@ TYPE
 		defined- : SET;
 		next : Style;
 
-		PROCEDURE &Init(CONST name : Identifier; color, bgcolor, voff : LONGINT; CONST fontname : ARRAY OF CHAR; fontsize : LONGINT; fontstyle : SET);
+		PROCEDURE &Init(CONST name : Identifier; color, bgcolor, voff : SIGNED32; CONST fontname : ARRAY OF CHAR; fontsize : SIGNED32; fontstyle : SET);
 		BEGIN
 			ASSERT(name # "");
 			SELF.name := name;
@@ -405,9 +405,9 @@ TYPE
 
 		entry : DataEntry;
 
-		level : LONGINT;
+		level : SIGNED32;
 
-		state : LONGINT;
+		state : SIGNED32;
 		firstPosition : SIZE;
 
 		next : RegionMatcher;
@@ -462,7 +462,7 @@ TYPE
 			RETURN length = openLength;
 		END CheckOpen;
 
-		PROCEDURE FeedChar(char32 : Texts.Char32; position : SIZE; VAR newState : LONGINT);
+		PROCEDURE FeedChar(char32 : Texts.Char32; position : SIZE; VAR newState : SIGNED32);
 		VAR char : CHAR; openMatch, closeMatch : BOOLEAN;
 
 			PROCEDURE AddToCircularBuffer(char : CHAR; VAR buffer : ARRAY OF CHAR; VAR first, length, maxLength : SIZE);
@@ -647,7 +647,7 @@ TYPE
 		PROCEDURE Scan(reader : Texts.TextReader; from, to : SIZE; CONST state : State; VAR match : BOOLEAN);
 		VAR
 			matcher, owner, oldOwner : RegionMatcher; char32 : Texts.Char32; continue : BOOLEAN; entry : DataEntry; oldPosition, position : SIZE;
-			mstate, tempState: LONGINT; nofMatching : SIZE;
+			mstate, tempState: SIGNED32; nofMatching : SIZE;
 
 			PROCEDURE CheckLongestMatch(VAR owner : RegionMatcher);
 			VAR matcher : RegionMatcher; length, maxLength : SIZE;
@@ -1170,7 +1170,7 @@ TYPE
 				WHILE (word # NIL) DO out.String(word.name); out.String(" "); word := word.next; END;
 			END DumpWordList;
 
-			PROCEDURE DumpTokens(out : Streams.Writer; level : LONGINT);
+			PROCEDURE DumpTokens(out : Streams.Writer; level : SIGNED32);
 			VAR i, j : SIZE;
 			BEGIN
 				ASSERT(out # NIL);
@@ -1238,7 +1238,7 @@ VAR
 
 	global_highlighters : Highlighters;
 
-	traceLevel : LONGINT;
+	traceLevel : SIGNED32;
 
 	(* Statistics (not thread-safe) *)
 	NnofRebuildRegions, NnofPatchRegions,
@@ -1366,8 +1366,8 @@ BEGIN
 	RETURN i = length;
 END Equal;
 
-PROCEDURE Indent(out : Streams.Writer; level : LONGINT);
-VAR i : LONGINT;
+PROCEDURE Indent(out : Streams.Writer; level : SIGNED32);
+VAR i : SIGNED32;
 BEGIN
 	ASSERT(out # NIL);
 	FOR i := 1 TO level DO out.Char(" "); END;
@@ -1413,7 +1413,7 @@ VAR
 	style : Style; string : Strings.String;
 	styleName : Identifier;
 	fontname : ARRAY 128 OF CHAR;
-	fontsize, color, bgcolor, voff : LONGINT;
+	fontsize, color, bgcolor, voff : SIGNED32;
 	fontstyle : SET;
 	defined : SET;
 	res : WORD;
@@ -1538,7 +1538,7 @@ END ParseStyles;
 
 PROCEDURE ParseGroup(
 	CONST element : XML.Element; CONST highlighter : Highlighter; CONST styles : Styles;
-	CONST type : LONGINT;
+	CONST type : SIGNED32;
 	CONST source : ARRAY OF CHAR; CONST diagnostics : Diagnostics.Diagnostics; VAR error : BOOLEAN);
 VAR
 	string : Strings.String; ptr : ANY;
@@ -1991,7 +1991,7 @@ PROCEDURE Highlight*(context : Commands.Context); (** filename highlighterName ~
 VAR
 	file : Files.File; filename : Files.FileName; highlighterName : Identifier;
 	highlighter : Highlighter;
-	text : Texts.Text; format: LONGINT; res: WORD;
+	text : Texts.Text; format: SIGNED32; res: WORD;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(filename);
 	context.arg.SkipWhitespace; context.arg.String(highlighterName);

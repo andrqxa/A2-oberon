@@ -42,7 +42,7 @@ scheduling of tasks, cursor handling and command execution.
       frame*: Display.Frame;	(** Frame of vwr from where command is executed. *)
       obj*: Objects.Object;	(** Object in vwr executing command. *)
       text*: Texts.Text;	(** Text parameter to be passed to command. *)
-      pos*: LONGINT	(** Starting position in text of parameter. *)
+      pos*: SIGNED32	(** Starting position in text of parameter. *)
     END;
 
     ControlMsg* = RECORD (Display.FrameMsg)
@@ -63,20 +63,20 @@ scheduling of tasks, cursor handling and command execution.
       id*: SIGNED16;	(** get, set, reset *)
       car*: Display.Frame;	(** Destination frame, returned frame. *)
       text*: Texts.Text;	(** Text represented by car. *)
-      pos*: LONGINT	(** Caret position. *)
+      pos*: SIGNED32	(** Caret position. *)
     END;
 
     SelectMsg* = RECORD (Display.FrameMsg)	(** Text selection handling. *)
       id*: SIGNED16;	(** get, set, reset *)
-      time*: LONGINT;	(** Time of the selection. *)
+      time*: SIGNED32;	(** Time of the selection. *)
       sel*: Display.Frame;	(** Destination frame, returned frame. *)
       text*: Texts.Text;	(** Text represented by sel. *)
-      beg*, end*: LONGINT	(** Text stretch of the selection. *)
+      beg*, end*: SIGNED32	(** Text stretch of the selection. *)
     END;
 
     ConsumeMsg* = RECORD (Display.FrameMsg)	(** Drag and drop control of text. *)
       text*: Texts.Text;	(** Text to be inserted. *)
-      beg*, end*: LONGINT	(** Text stretch to be inserted. *)
+      beg*, end*: SIGNED32	(** Text stretch to be inserted. *)
     END;
 
     RecallMsg* = RECORD (Display.FrameMsg)
@@ -88,7 +88,7 @@ scheduling of tasks, cursor handling and command execution.
 
     TaskDesc* = RECORD
       next*: Task;	(** for internal use. *)
-      time*: LONGINT;	(** Earliest time to schedule task. *)
+      time*: SIGNED32;	(** Earliest time to schedule task. *)
       safe*: BOOLEAN;	(** Don't remove from task queue when a trap occurs. *)
       handle*: Handler	(** Task handler. *)
     END;
@@ -119,7 +119,7 @@ scheduling of tasks, cursor handling and command execution.
 	FillerColor: SIGNED8;
 
 	conftext: Texts.Text;
-	conftime, confdate: LONGINT;
+	conftime, confdate: SIGNED32;
 
 	fido: Fido.Watchdog;
 
@@ -129,17 +129,17 @@ scheduling of tasks, cursor handling and command execution.
 
 (** Get time (t) and date (d).  day = d MOD 32, month = d DIV 32 MOD 16, year = 1900+d DIV 512,
 	hour = t DIV 4096 MOD 32, minute = t DIV 64 MOD 64, second = t MOD 64 *)
-     PROCEDURE GetClock* (VAR t, d: LONGINT);
+     PROCEDURE GetClock* (VAR t, d: SIGNED32);
      BEGIN Kernel.GetClock(t, d)
      END GetClock;
 
  (** Set time (t) and date (d). *)
-    PROCEDURE SetClock* (t, d: LONGINT);
+    PROCEDURE SetClock* (t, d: SIGNED32);
      BEGIN Kernel.SetClock(t, d)
      END SetClock;
 
  (** Return the number of timer ticks since Oberon startup. (See module Input for frequency) *)
-    PROCEDURE Time* (): LONGINT;
+    PROCEDURE Time* (): SIGNED32;
      BEGIN RETURN Input.Time()
      END Time;
 
@@ -391,7 +391,7 @@ if the module M should be reloaded from disk (obly possible if M is a "top"
 module, i.e. it has no clients. Res indicates success (res = 0) or failure (res # 0).
 Modules.resMsg contains an explanation of what went wrong when res # 0. *)
     PROCEDURE Call* (name: ARRAY OF CHAR; par: ParList; new: BOOLEAN; VAR res: SIGNED16);
-      VAR Mod: Modules.Module; P: Modules.Command; i, j: LONGINT;
+      VAR Mod: Modules.Module; P: Modules.Command; i, j: SIGNED32;
     BEGIN res := 1;
       i := 0; j := 0;
       WHILE name[j] # 0X DO
@@ -425,7 +425,7 @@ Modules.resMsg contains an explanation of what went wrong when res # 0. *)
 
 (** Returns the selected stretch [beg, end[ of the current selected text T.
 Time indicates the time of selection; time = -1 indicates that no text is currently selected. *)
-    PROCEDURE GetSelection* (VAR text: Texts.Text; VAR beg, end, time: LONGINT);
+    PROCEDURE GetSelection* (VAR text: Texts.Text; VAR beg, end, time: SIGNED32);
       VAR M: SelectMsg;
     BEGIN
         M.F := NIL; M.id := get; M.time := -1; M.text := NIL; Display.Broadcast(M);
@@ -502,7 +502,7 @@ by calling its handler when the system has nothing else to do. *)
 
   PROCEDURE OpenScanner* (VAR S: Texts.Scanner; name: ARRAY OF CHAR);
     VAR i, j: SIGNED16; done, eos: BOOLEAN; part: ARRAY 32 OF CHAR;
-    	f: Files.File;  t, d: LONGINT;
+    	f: Files.File;  t, d: SIGNED32;
   BEGIN
     f := Files.Old(OberonText);
     IF f = NIL THEN t := 0; d := 0 ELSE Files.GetDate(f, t, d) END;
@@ -602,7 +602,7 @@ the garbage collector, if no mouse or keyboard events are arriving. *)
    PROCEDURE Loop*;
       VAR V: Viewers.Viewer; M: InputMsg; N: ControlMsg;
        X, Y: SIGNED16; keys, shift, oldshift: SET; ch: CHAR;
-       mint, cur, t: LONGINT;  task, min: Task;
+       mint, cur, t: SIGNED32;  task, min: Task;
     BEGIN
       Kernel.LockOberon;
       IF (CurTask # NIL) & ~CurTask.safe THEN Remove(CurTask) END;
@@ -666,7 +666,7 @@ the garbage collector, if no mouse or keyboard events are arriving. *)
             (*Kernel.Idle(0);*)
           (* find first expired task, or task that will expire soonest *)
             cur := Input.Time();
-            task := NextTask;  min := NIL;  mint := MAX(LONGINT);
+            task := NextTask;  min := NIL;  mint := MAX(SIGNED32);
             LOOP
             	t := task.time-cur;	(* time left *)
             	IF t <= 0 THEN	(* found expired task *)

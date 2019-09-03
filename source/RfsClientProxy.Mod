@@ -46,7 +46,7 @@ CONST
 
 (* Dummy Types for Files.Volume interface *)
 TYPE
-	Address* = LONGINT;
+	Address* = SIGNED32;
 
 
 
@@ -56,7 +56,7 @@ TYPE
 		VAR
 			first*: Dirent;
 			last*: Dirent;
-			nbrOfEntrys*: LONGINT;
+			nbrOfEntrys*: SIGNED32;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -66,7 +66,7 @@ TYPE
 		END Init;
 
 		(** insert tuple name, time, date and size. name is at offset off in Array **)
-		PROCEDURE Insert*(VAR name: ARRAY OF CHAR; off, len, time, date, size: LONGINT);
+		PROCEDURE Insert*(VAR name: ARRAY OF CHAR; off, len, time, date, size: SIGNED32);
 			VAR entry: Dirent;
 		BEGIN
 			NEW(entry);
@@ -89,8 +89,8 @@ TYPE
 		END Insert;
 
 		(** Get next tuple from Object **)
-		PROCEDURE Get*(VAR name: ARRAY OF CHAR; VAR time, date, size: LONGINT);
-			VAR len: LONGINT;
+		PROCEDURE Get*(VAR name: ARRAY OF CHAR; VAR time, date, size: SIGNED32);
+			VAR len: SIGNED32;
 		BEGIN
 			IF first # NIL THEN
 				len := Len(first.name);
@@ -111,7 +111,7 @@ TYPE
 	Dirent* = OBJECT
 		VAR
 			name: ARRAY MaxNameLen OF CHAR;
-			time, date, size: LONGINT;
+			time, date, size: SIGNED32;
 			next: Dirent;
 	END Dirent;
 
@@ -127,7 +127,7 @@ TYPE
 
 
 		PROCEDURE &InitProxy*(VAR user, passwd, host, path: ARRAY OF CHAR; port: SIGNED16);
-			VAR lenHost, lenUser, lenPasswd, lenPath: LONGINT;
+			VAR lenHost, lenUser, lenPasswd, lenPath: SIGNED32;
 		BEGIN
 			lenUser := Len(user);
 			lenPasswd := Len(passwd);
@@ -147,7 +147,7 @@ TYPE
 
 		(** does nothing, just for benchmarking **)
 		PROCEDURE Error*(VAR errorcode: WORD);
-			VAR procID, testID: LONGINT; msgBytes, dataBytes, received: SIZE; res: WORD;
+			VAR procID, testID: SIGNED32; msgBytes, dataBytes, received: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := ERROR;
@@ -178,8 +178,8 @@ TYPE
 		END Error;
 
 		(** retrieves fileLength, time and date of a file identified by fileID **)
-		PROCEDURE GetAttr*(fileID: LONGINT; VAR fileLen, time, date: LONGINT; VAR errorcode: WORD);
-			VAR procID, testID: LONGINT; msgBytes, dataBytes, received: SIZE; res: WORD;
+		PROCEDURE GetAttr*(fileID: SIGNED32; VAR fileLen, time, date: SIGNED32; VAR errorcode: WORD);
+			VAR procID, testID: SIGNED32; msgBytes, dataBytes, received: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := GETATTR;
@@ -220,8 +220,8 @@ TYPE
 		END GetAttr;
 
 		(** Sets the attributes time and date of a file identified by filename **)
-		PROCEDURE SetAttr*(VAR filename: ARRAY OF CHAR; time, date: LONGINT; VAR errorcode: LONGINT);
-			VAR procID, testID, filenameLen: LONGINT; msgBytes, dataBytes, received: SIZE; res: WORD;
+		PROCEDURE SetAttr*(VAR filename: ARRAY OF CHAR; time, date: SIGNED32; VAR errorcode: SIGNED32);
+			VAR procID, testID, filenameLen: SIGNED32; msgBytes, dataBytes, received: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := SETATTR;
@@ -255,8 +255,8 @@ TYPE
 		END SetAttr;
 
 		(** transforms a filename into a fileID **)
-		PROCEDURE Lookup*(VAR filename : ARRAY OF CHAR; VAR fileID: LONGINT; VAR errorcode: WORD);
-			VAR filenameLen, procID, testID, fileIDLen: LONGINT; msgBytes, received, dataBytes: SIZE; res: WORD;
+		PROCEDURE Lookup*(VAR filename : ARRAY OF CHAR; VAR fileID: SIGNED32; VAR errorcode: WORD);
+			VAR filenameLen, procID, testID, fileIDLen: SIGNED32; msgBytes, received, dataBytes: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := LOOKUP;
@@ -298,8 +298,8 @@ TYPE
 
 
 		(** Reads len Bytes of data from a given offset off in a file identified by fileID and returns the data in buf at offset dstOff **)
-		PROCEDURE Read*(fileID, off, len: LONGINT; VAR buffer: ARRAY OF CHAR; dstOff: LONGINT; VAR received: SIZE; VAR errorcode: WORD);
-			VAR procID, testID, fileLen: LONGINT; msgBytes, dataBytes: SIZE; res: WORD;
+		PROCEDURE Read*(fileID, off, len: SIGNED32; VAR buffer: ARRAY OF CHAR; dstOff: SIGNED32; VAR received: SIZE; VAR errorcode: WORD);
+			VAR procID, testID, fileLen: SIGNED32; msgBytes, dataBytes: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := READ;
@@ -341,8 +341,8 @@ TYPE
 		END Read;
 
 		(** Writes len Bytes of data beginning off bytes from the beginning of file into a file identified by fileID **)
-		PROCEDURE Write*(fileID, off, len: LONGINT; VAR buffer: ARRAY OF CHAR; VAR written: LONGINT; VAR errorcode: WORD);
-			VAR procID, testID: LONGINT; msgBytes, dataBytes, received: SIZE; res: WORD;
+		PROCEDURE Write*(fileID, off, len: SIGNED32; VAR buffer: ARRAY OF CHAR; VAR written: SIGNED32; VAR errorcode: WORD);
+			VAR procID, testID: SIGNED32; msgBytes, dataBytes, received: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := WRITE;
@@ -382,8 +382,8 @@ TYPE
 		END Write;
 
 		(** Creates a file with name filename and return a fileID for it **)
-		PROCEDURE Create*(VAR filename : ARRAY OF CHAR; VAR fileID: LONGINT; VAR errorcode: WORD);
-			VAR filenameLen, procID, testID, fileIDLen: LONGINT; msgBytes, received, dataBytes: SIZE; res: WORD;
+		PROCEDURE Create*(VAR filename : ARRAY OF CHAR; VAR fileID: SIGNED32; VAR errorcode: WORD);
+			VAR filenameLen, procID, testID, fileIDLen: SIGNED32; msgBytes, received, dataBytes: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := CREATE;
@@ -425,7 +425,7 @@ TYPE
 
 		(** Deletes a File with name filename **)
 		PROCEDURE Remove*(VAR filename : ARRAY OF CHAR; VAR errorcode: WORD);
-			VAR filenameLen, procID, testID: LONGINT; msgBytes, received, dataBytes: SIZE; res: WORD;
+			VAR filenameLen, procID, testID: SIGNED32; msgBytes, received, dataBytes: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := REMOVE;
@@ -459,7 +459,7 @@ TYPE
 
 		(** Renames a file with name filenemFrom into a new name filenameTo **)
 		PROCEDURE Rename*(VAR filenameFrom, filenameTo: ARRAY OF CHAR; VAR errorcode: WORD);
-			VAR filenameLenFrom, filenameLenTo, procID, testID: LONGINT; msgBytes, received, dataBytes: SIZE; res: WORD;
+			VAR filenameLenFrom, filenameLenTo, procID, testID: SIGNED32; msgBytes, received, dataBytes: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := RENAME;
@@ -497,8 +497,8 @@ TYPE
 		(** Retrieves a variable number of entries with names matching the mask string from a directory identified by filename.
 			  the detail is set to 1 if time, data and size information is also to be retrieved. the offset value tells how many entries
 			  should be skip first **)
-		PROCEDURE ReadDir*(CONST filename, mask : ARRAY OF CHAR; detail, cookie: LONGINT; dir: Dir; VAR endOfDir: LONGINT; VAR errorcode: WORD);
-			VAR filenameLen, procID, testID, currentIndex, maskLen, time, date, size: LONGINT; msgBytes, received, dataBytes: SIZE; res: WORD;
+		PROCEDURE ReadDir*(CONST filename, mask : ARRAY OF CHAR; detail, cookie: SIGNED32; dir: Dir; VAR endOfDir: SIGNED32; VAR errorcode: WORD);
+			VAR filenameLen, procID, testID, currentIndex, maskLen, time, date, size: SIGNED32; msgBytes, received, dataBytes: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := READDIR;
@@ -564,8 +564,8 @@ TYPE
 		END ReadDir;
 
 		(** Creates a temporary File on the server and returns the name for it **)
-		PROCEDURE CreateTmp*(VAR filename : ARRAY OF CHAR; VAR hashval: LONGINT; VAR errorcode: WORD);
-			VAR filenameLen, procID, testID, hashvalLen: LONGINT; msgBytes, received, dataBytes: SIZE; res: WORD;
+		PROCEDURE CreateTmp*(VAR filename : ARRAY OF CHAR; VAR hashval: SIGNED32; VAR errorcode: WORD);
+			VAR filenameLen, procID, testID, hashvalLen: SIGNED32; msgBytes, received, dataBytes: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := CREATETMP;
@@ -614,7 +614,7 @@ TYPE
 
 		(** Changes the Directory of the corresponding rfsServerProxy Process **)
 		PROCEDURE ChDir*(VAR dir : ARRAY OF CHAR; VAR errorcode: WORD);
-			VAR dirLen, procID, testID: LONGINT; msgBytes, received, dataBytes: SIZE; res: WORD;
+			VAR dirLen, procID, testID: SIGNED32; msgBytes, received, dataBytes: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := CHDIR;
@@ -649,7 +649,7 @@ TYPE
 
 		(** cleans the open file structure on the server an kills the process **)
 		PROCEDURE Kill*(VAR errorcode: WORD);
-			VAR procID, testID: LONGINT; msgBytes, dataBytes, received: SIZE; res: WORD;
+			VAR procID, testID: SIGNED32; msgBytes, dataBytes, received: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := KILL;
@@ -680,7 +680,7 @@ TYPE
 
 		(** Authenticates the session. User and Passwd are sending in plainttext **)
 		PROCEDURE Authent*(VAR user, passwd, path: ARRAY OF CHAR; VAR errorcode: WORD);
-			VAR userLen, passwdLen, pathLen, procID: LONGINT; msgBytes, received, dataBytes: SIZE; res: WORD;
+			VAR userLen, passwdLen, pathLen, procID: SIGNED32; msgBytes, received, dataBytes: SIZE; res: WORD;
 		BEGIN
 			(*prepare params and send*)
 			procID := AUTHENT;
@@ -750,15 +750,15 @@ TYPE
 		PROCEDURE Marked*(adr: Address): BOOLEAN;
 		END Marked;
 
-		PROCEDURE Available*(): LONGINT;
+		PROCEDURE Available*(): SIGNED32;
 		BEGIN
 			RETURN 0;
 		END Available;
 
-		PROCEDURE GetBlock*(adr: LONGINT; VAR blk: ARRAY OF CHAR);
+		PROCEDURE GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
 		END GetBlock;
 
-		PROCEDURE PutBlock*(adr: LONGINT; VAR blk: ARRAY OF CHAR);
+		PROCEDURE PutBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
 		END PutBlock;
 
 	END Proxy;
@@ -768,7 +768,7 @@ TYPE
 PROCEDURE New*(context : Files.Parameters);
 VAR
 	server, user, passwd, path: ARRAY MaxNameLen OF CHAR;
-	i: SIZE; errorcode: WORD; ch: CHAR; port: LONGINT; newVol: Proxy;
+	i: SIZE; errorcode: WORD; ch: CHAR; port: SIGNED32; newVol: Proxy;
 
 BEGIN
 	context.arg.SkipWhitespace;
@@ -875,14 +875,14 @@ BEGIN
 END Int2Char;
 
 (** four bytes of an array of characters are casted into an integer **)
-PROCEDURE Char2Int*(buf: ARRAY OF CHAR; off: LONGINT; VAR int: LONGINT);
+PROCEDURE Char2Int*(buf: ARRAY OF CHAR; off: SIGNED32; VAR int: SIGNED32);
 BEGIN
 	int := Network.GetNet4(buf, off);
 END Char2Int;
 
 
-PROCEDURE ReadInteger*(connection: RfsConnection.Connection; VAR res: WORD): LONGINT;
-	VAR val: LONGINT; received: SIZE; buf: ARRAY 4 OF CHAR;
+PROCEDURE ReadInteger*(connection: RfsConnection.Connection; VAR res: WORD): SIGNED32;
+	VAR val: SIGNED32; received: SIZE; buf: ARRAY 4 OF CHAR;
 BEGIN
 	connection.Receive(buf, 0, 4, received, res);
 	IF received # 4 THEN
@@ -895,8 +895,8 @@ BEGIN
 END ReadInteger;
 
 
-PROCEDURE Len(x: ARRAY OF CHAR): LONGINT;
-	VAR j: LONGINT;
+PROCEDURE Len(x: ARRAY OF CHAR): SIGNED32;
+	VAR j: SIGNED32;
 BEGIN
 	j := 0;
 	WHILE x[j] # 0X DO

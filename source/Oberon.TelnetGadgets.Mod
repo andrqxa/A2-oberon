@@ -41,7 +41,7 @@ VAR
 	END Connected;
 
 PROCEDURE Send0(T: Terminals.Terminal; ch: CHAR);
-	VAR len, l: LONGINT;
+	VAR len, l: SIGNED32;
 BEGIN
 	WITH T: Terminal DO
 		IF Connected(T.C) THEN
@@ -130,7 +130,7 @@ BEGIN NetSystem.Write(C, 0FFX); NetSystem.Write(C, 0FCX);
 END Dont;
 
 PROCEDURE Receiver(me: Oberon.Task);
-	VAR l: LONGINT; k: SIGNED16;
+	VAR l: SIGNED32; k: SIGNED16;
 		C: NetSystem.Connection;
 		ch: CHAR;
 BEGIN
@@ -234,9 +234,9 @@ END SetUp;
 		END
 	END OpenConn;
 
-	PROCEDURE SplitTelnetAdr(VAR url, host, user, passwd: ARRAY OF CHAR; VAR port: SIGNED16; prefix: BOOLEAN): LONGINT;
+	PROCEDURE SplitTelnetAdr(VAR url, host, user, passwd: ARRAY OF CHAR; VAR port: SIGNED16; prefix: BOOLEAN): SIGNED32;
 		VAR
-			key: LONGINT;
+			key: SIGNED32;
 			i, j, l: SIZE;
 			iskey: BOOLEAN;
 			str: ARRAY 8 OF CHAR;
@@ -569,7 +569,7 @@ END SetUp;
 		VAR
 			i, j: SIGNED16;
 			print: ARRAY 2 OF CHAR;
-		PROCEDURE P(x: LONGINT): SIGNED16;
+		PROCEDURE P(x: SIGNED32): SIGNED16;
 		BEGIN
 			RETURN SHORT((x * Display.Unit + Printer.Unit DIV 2) DIV Printer.Unit)
 		END P;
@@ -665,7 +665,7 @@ END SetUp;
 			host: ARRAY NetTools.ServerStrLen OF CHAR;
 			user, passwd: ARRAY NetTools.PathStrLen OF CHAR;
 			port: SIGNED16;
-			key: LONGINT;
+			key: SIGNED32;
 			T: Terminal;
 			text: Texts.Text;
 			F: TerminalGadgets.Frame;

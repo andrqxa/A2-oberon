@@ -51,7 +51,7 @@ VAR
 
 (* not portable
 	PROCEDURE NewPattern*(pat: Display.Pattern): Display.Pattern;
-		VAR x, y, b, l, r, t, w, h, i, W, H : SIGNED16; s : SET; d : ARRAY 256, 4 OF SET; p, s0 : LONGINT; D, P : LONGINT;
+		VAR x, y, b, l, r, t, w, h, i, W, H : SIGNED16; s : SET; d : ARRAY 256, 4 OF SET; p, s0 : SIGNED32; D, P : SIGNED32;
 			k : SIGNED8;
 			ptr : POINTER TO RECORD END;
 	BEGIN
@@ -64,7 +64,7 @@ VAR
 		(* zoom pattern *)
 		D := Display.Unit; P := Unit;
 		Display.GetDim(pat, w, h);
-		p := SYSTEM.VAL(LONGINT,pat) + 2;
+		p := SYSTEM.VAL(SIGNED32,pat) + 2;
 		y := 0;
 		WHILE y < h DO x := 0;
 			SYSTEM.GET(p,s);
@@ -90,7 +90,7 @@ VAR
 		H := SHORT(h * D DIV P);
 		W := SHORT(w * D DIV P);
 		SYSTEM.NEW(ptr, (W +7) DIV 8 * 8 * H + 8);
-		p := SYSTEM.VAL(LONGINT,ptr);
+		p := SYSTEM.VAL(SIGNED32,ptr);
 		k := SHORT(W); SYSTEM.PUT(p,k); INC(p);
 		k := SHORT(H); SYSTEM.PUT(p,k); INC(p);
 		y := 0;
@@ -102,7 +102,7 @@ VAR
 			END;
 			INC(y);
 		END ;
-		RETURN SYSTEM.VAL(LONGINT,ptr);
+		RETURN SYSTEM.VAL(SIGNED32,ptr);
 	END NewPattern;
 *)
 
@@ -125,7 +125,7 @@ VAR
 
 	PROCEDURE IntersectLine(VAR x1, y1, x2, y2: SIGNED16; X, Y, W, H: SIGNED16): BOOLEAN;
 		CONST left=0; right=1; bottom=2; top=3;
-		VAR c1, c2: SET; R, T, x0, y0 : SIGNED16; dx,dy : LONGINT;
+		VAR c1, c2: SET; R, T, x0, y0 : SIGNED16; dx,dy : SIGNED32;
 
 		PROCEDURE Code(x, y: SIGNED16): SET;
 			VAR c: SET;
@@ -494,7 +494,7 @@ END Poly;
 
 (** Print an ellipse of horizontal radius a and vertical radius b at position X, Y. Implementation restriction: Ellipses cannot be filled or drawn with a thick brush. *)
 PROCEDURE Ellipse*(M: Display3.Mask; col: Display.Color; pat: Display.Pattern; X, Y, a, b, width: SIGNED16; style: SET; mode: SIGNED16);
-VAR x1, y1: SIGNED16; d, dx, dy, x2, y2, a1, a2, a8, b1, b2, b8: LONGINT;
+VAR x1, y1: SIGNED16; d, dx, dy, x2, y2, a1, a2, a8, b1, b2, b8: SIGNED32;
 
 	PROCEDURE Dot4(x1, x2, y1, y2: SIGNED16; col: Display.Color; mode: SIGNED16);
 	BEGIN

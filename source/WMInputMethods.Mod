@@ -57,7 +57,7 @@ TYPE
 			END;
 		END InsertChar;
 
-		PROCEDURE InsertMultiChar*(CONST ucs : ARRAY OF LONGINT);
+		PROCEDURE InsertMultiChar*(CONST ucs : ARRAY OF SIGNED32);
 		VAR buf : ARRAY 2 OF Texts.Char32; pos, i : SIZE;
 		BEGIN {EXCLUSIVE}
 			IF valid THEN

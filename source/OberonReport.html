@@ -216,7 +216,7 @@ the indicated sections:
 <PRE>
   ABS       (10.2)   LEN       (10.2)
   ASH       (10.2)   LONG      (10.2)
-  BOOLEAN   (6.1)    LONGINT   (6.1)
+  BOOLEAN   (6.1)    SIGNED32   (6.1)
   CAP       (10.2)   LONGREAL  (10.2)
   CHAR      (6.1)    MAX       (10.2)
   CHR       (10.2)   MIN       (10.2)
@@ -293,7 +293,7 @@ The values of a given basic type are the following:
 <LI>CHAR the characters of the extended ASCII set  (0X ... 0FFX).
 <LI>SIGNED8 the integers between MIN(SIGNED8) and MAX(SIGNED8).
 <LI>SIGNED16 the integers between MIN(SIGNED16) and MAX(SIGNED16).
-<LI>LONGINT the integers between MIN(LONGINT) and MAX(LONGINT).
+<LI>SIGNED32 the integers between MIN(SIGNED32) and MAX(SIGNED32).
 <LI>REAL real numbers between MIN(REAL) and MAX(REAL).
 <LI>LONGREAL real numbers between MIN(LONGREAL) and MAX(LONGREAL).
 <LI>SET the sets of integers between 0 and MAX(SET).
@@ -302,7 +302,7 @@ Types 3 to 5 are <EM>integer</EM> types, 6 and 7 are <EM>real</EM> types,
 and together they are called <EM>numeric</EM> types. They form a hierarchy;
 the larger type <EM>includes</EM> (the values of) the smaller type:
 <P>
-&nbsp; &nbsp; LONGREAL  &gt;=  REAL  &gt;=  LONGINT  &gt;=  SIGNED16  &gt;=  SIGNED8
+&nbsp; &nbsp; LONGREAL  &gt;=  REAL  &gt;=  SIGNED32  &gt;=  SIGNED16  &gt;=  SIGNED8
 <P>Note: &gt;= stands here for "is superset of or equal to".
 
 <H3>6.2. Array types</H3>
@@ -1008,13 +1008,13 @@ value</TD></TR>
 1</TD></TR>
 <TR><TD>CAP(x)</TD><TD>CHAR</TD><TD>CHAR</TD><TD>corresponding capital
 letter</TD></TR>
-<TR><TD>ASH(x, n)</TD><TD>x, n: integer type</TD><TD>LONGINT</TD><TD>x * 2n,
+<TR><TD>ASH(x, n)</TD><TD>x, n: integer type</TD><TD>SIGNED32</TD><TD>x * 2n,
 arithmetic
 shift</TD></TR>
 <TR><TD>LEN(v, n)</TD><TD>v: array<BR>n: integer
-type</TD><TD>LONGINT</TD><TD>length
+type</TD><TD>SIGNED32</TD><TD>length
 of v in dimension n</TD></TR>
-<TR><TD>LEN(v)</TD><TD>array type</TD><TD>LONGINT</TD><TD>LEN(v, 0)</TD></TR>
+<TR><TD>LEN(v)</TD><TD>array type</TD><TD>SIGNED32</TD><TD>LEN(v, 0)</TD></TR>
 <TR><TD>MAX(T)</TD><TD>T = basic type<BR>T = SET</TD><TD>T<BR>SIGNED16</TD>
 <TD>maximum value of type T<BR>maximum element of sets</TD></TR>
 <TR><TD>MIN(T)</TD><TD>T = basic type<BR>T = SET</TD><TD>T<BR>SIGNED16</TD>
@@ -1032,12 +1032,12 @@ x</TD></TR>
 <TR><TD>CHR(x)</TD><TD>integer type</TD><TD>CHAR</TD><TD>character with
 ordinal
 number x</TD></TR>
-<TR><TD>SHORT(x)</TD><TD>LONGINT<BR>SIGNED16<BR>LONGREAL</TD>
+<TR><TD>SHORT(x)</TD><TD>SIGNED32<BR>SIGNED16<BR>LONGREAL</TD>
 <TD>SIGNED16<BR>SIGNED8<BR>REAL</TD><TD>identity (truncation
 possible)</TD></TR>
 <TR><TD>LONG(x)</TD><TD>SIGNED8<BR>SIGNED16<BR>REAL</TD>
-<TD>SIGNED16<BR>LONGINT<BR>LONGREAL</TD><TD>identity</TD></TR>
-<TR><TD>ENTIER(x)</TD><TD>real type</TD><TD>LONGINT</TD><TD>largest integer
+<TD>SIGNED16<BR>SIGNED32<BR>LONGREAL</TD><TD>identity</TD></TR>
+<TR><TD>ENTIER(x)</TD><TD>real type</TD><TD>SIGNED32</TD><TD>largest integer
 not greater than x.<BR>Note that  ENTIER(i/j)  =  i DIV j</TD></TR></TABLE>
 
 <H4>Proper procedures</H4>
@@ -1097,7 +1097,7 @@ MODULE Out;
   PROCEDURE Write*(ch: CHAR);
   BEGIN Texts.Write(W, ch)
   END ;
-  PROCEDURE WriteInt*(x, n: LONGINT);
+  PROCEDURE WriteInt*(x, n: SIGNED32);
     VAR i: SIGNED16; a: ARRAY 16 OF CHAR;
   BEGIN i := 0;
     IF x &lt; 0 THEN Texts.Write(W, "-"); x := -x END ;
@@ -1152,9 +1152,9 @@ x, y, a, and n for expressions, and T for a type.
 types</B></TD>
 <TD><B>Result type</B></TD>
 <TD><B>Function</B></TD></TR>
-<TR><TD>ADR(v)</TD><TD>any</TD><TD>LONGINT</TD><TD>address of variable
+<TR><TD>ADR(v)</TD><TD>any</TD><TD>SIGNED32</TD><TD>address of variable
 v</TD></TR>
-<TR><TD>BIT(a, n)</TD><TD>a: LONGINT<BR>n: integer type</TD><TD>BOOLEAN</TD>
+<TR><TD>BIT(a, n)</TD><TD>a: SIGNED32<BR>n: integer type</TD><TD>BOOLEAN</TD>
 <TD>bit n of Mem[a]</TD></TR>
 <TR><TD>CC(n)</TD><TD>integer constant</TD><TD>BOOLEAN</TD><TD>Condition n
 (0 &lt;= n &lt; 16)</TD></TR>
@@ -1168,11 +1168,11 @@ as of type T</TD></TR></TABLE>
 <TABLE BORDER CELLPADDING=3><TR><TD><B>Name</B></TD><TD><B>Argument
 types</B></TD>
 <TD><B>Function</B></TD></TR>
-<TR><TD>GET(a, v)</TD><TD>a: LONGINT<BR>v: any basic type</TD><TD>v :=
+<TR><TD>GET(a, v)</TD><TD>a: SIGNED32<BR>v: any basic type</TD><TD>v :=
 Mem[a]</TD></TR>
-<TR><TD>PUT(a, x)</TD><TD>a: LONGINT<BR>x: any basic type</TD><TD>Mem[a] :=
+<TR><TD>PUT(a, x)</TD><TD>a: SIGNED32<BR>x: any basic type</TD><TD>Mem[a] :=
 x</TD></TR>
-<TR><TD>MOVE(s, d, n)</TD><TD>s, d: LONGINT<BR>n: integer
+<TR><TD>MOVE(s, d, n)</TD><TD>s, d: SIGNED32<BR>n: integer
 type</TD><TD>Mem[d]
 ... Mem[d+n-1]<BR>
 := Mem[s] ... Mem[s+n-1]</TD></TR>

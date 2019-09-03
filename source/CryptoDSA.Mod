@@ -227,7 +227,7 @@ VAR
 
 
 	PROCEDURE LoadPublicKey*( r: Streams.Reader ): Key;
-	VAR buf: ARRAY 4096 OF CHAR; len: LONGINT; pos: SIZE;
+	VAR buf: ARRAY 4096 OF CHAR; len: SIGNED32; pos: SIZE;
 		str: ARRAY 64 OF CHAR;
 		k: Key;
 	BEGIN

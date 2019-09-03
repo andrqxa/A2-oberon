@@ -30,7 +30,7 @@ END WriteVersion;
 
 (* Check the version number *)
 PROCEDURE ReadVersion(VAR R: Files.Rider);
-VAR x: LONGINT;
+VAR x: SIGNED32;
 BEGIN Files.ReadNum(R, x);
 	IF x # VersionNo THEN
 		Texts.WriteString(W, "Version "); Texts.WriteInt(W, VersionNo, 3); Texts.WriteString(W, " of ");

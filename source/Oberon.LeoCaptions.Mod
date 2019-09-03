@@ -25,14 +25,14 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		Caption* = POINTER TO CaptionDesc;
 		CaptionDesc* = RECORD (Leonardo.ShapeDesc)
 			text*: Text;	(** characters defining caption **)
-			len*: LONGINT;	(** number of characters in caption **)
+			len*: SIGNED32;	(** number of characters in caption **)
 			font*: GfxFonts.Font;	(** caption font (instanced at 300 dpi for calculating metrics) **)
 			mat*: GfxMatrix.Matrix;	(** transform from font to local coordinates **)
 			color*: Gfx.Color;	(** caption color **)
 			width: REAL;	(* advance width in figure space along baseline *)
-			caret: LONGINT;	(* logical caret position, negative if not holding focus *)
+			caret: SIGNED32;	(* logical caret position, negative if not holding focus *)
 			update: SIGNED8;	(* kind of update *)
-			from, to: LONGINT;	(* update stretch *)
+			from, to: SIGNED32;	(* update stretch *)
 		END;
 
 		(** message for managing the focus shape **)
@@ -48,7 +48,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		EditAction = POINTER TO EditActionDesc;
 		EditActionDesc = RECORD (Leonardo.ActionDesc)
 			cap: Caption;
-			pos: LONGINT;
+			pos: SIGNED32;
 			update: SIGNED8;
 			char: CHAR;
 		END;
@@ -89,7 +89,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 
 	(**--- Captions ---**)
 
-	PROCEDURE GetOffset (cap: Caption; len: LONGINT; font: GfxFonts.Font; VAR x, y: REAL);
+	PROCEDURE GetOffset (cap: Caption; len: SIGNED32; font: GfxFonts.Font; VAR x, y: REAL);
 		VAR ch: CHAR;
 	BEGIN
 		IF len > 0 THEN
@@ -101,8 +101,8 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		END
 	END GetOffset;
 
-	PROCEDURE Set (cap: Caption; VAR text: ARRAY OF CHAR; len: LONGINT);
-		VAR size: LONGINT;
+	PROCEDURE Set (cap: Caption; VAR text: ARRAY OF CHAR; len: SIGNED32);
+		VAR size: SIGNED32;
 	BEGIN
 		size := len+1;	(* additional space for 0X *)
 		IF (cap.text = NIL) OR (size > LEN(cap.text^)) THEN
@@ -125,7 +125,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE Validate (cap: Caption; VAR msg: Leonardo.ValidateMsg);
 		VAR lgm: GfxMatrix.Matrix;
 
-		PROCEDURE update (from, to: LONGINT);
+		PROCEDURE update (from, to: SIGNED32);
 			VAR fx, y, tx, llx, lly, urx, ury: REAL;
 		BEGIN
 			GetOffset(cap, from, cap.font, fx, y);
@@ -172,7 +172,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Validate;
 
 	PROCEDURE Outline (cap: Caption; VAR msg: LeoPaths.RenderMsg);
-		VAR pen: LeoPens.Pen; path: GfxPaths.Path; i: LONGINT; x, y, dx, dy: REAL; scan: GfxPaths.Scanner;
+		VAR pen: LeoPens.Pen; path: GfxPaths.Path; i: SIGNED32; x, y, dx, dy: REAL; scan: GfxPaths.Scanner;
 	BEGIN
 		pen := msg.pen; NEW(path);
 		i := 0; x := 0; y := 0;
@@ -279,7 +279,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Transform;
 
 	PROCEDURE DoEditAction (fig: Leonardo.Figure; a: Leonardo.Action);
-		VAR act: EditAction; cap: Caption; i, j: LONGINT;
+		VAR act: EditAction; cap: Caption; i, j: SIGNED32;
 	BEGIN
 		act := a(EditAction); cap := act.cap;
 		IF act.update = delete THEN	(* delete character *)
@@ -308,7 +308,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		cap.marked := TRUE; cap.sel := TRUE
 	END DoEditAction;
 
-	PROCEDURE AddCommand (fig: Leonardo.Figure; cap: Caption; update: SIGNED8; pos: LONGINT; char: CHAR);
+	PROCEDURE AddCommand (fig: Leonardo.Figure; cap: Caption; update: SIGNED8; pos: SIGNED32; char: CHAR);
 		VAR act: EditAction;
 	BEGIN
 		Leonardo.BeginCommand(fig);
@@ -318,7 +318,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		Leonardo.EndCommand(fig)
 	END AddCommand;
 
-	PROCEDURE Update (fig: Leonardo.Figure; cap: Caption; from, to: LONGINT);
+	PROCEDURE Update (fig: Leonardo.Figure; cap: Caption; from, to: SIGNED32);
 	BEGIN
 		cap.marked := TRUE; cap.update := caret; cap.caret := to; cap.from := from; cap.to := to;
 		Leonardo.Validate(fig)
@@ -350,7 +350,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Edit;
 
 	PROCEDURE Focus (cap: Caption; VAR msg: FocusMsg);
-		VAR fx, fy, x0, x1, y, xm: REAL; car, p0, p1, pm: LONGINT; m, mm, inv: GfxMatrix.Matrix; font: GfxFonts.Font;
+		VAR fx, fy, x0, x1, y, xm: REAL; car, p0, p1, pm: SIGNED32; m, mm, inv: GfxMatrix.Matrix; font: GfxFonts.Font;
 	BEGIN
 		IF (msg.id = consume) & (cap.caret >= 0) THEN
 			Edit(msg.fig, cap, msg.char); msg.res := 0
@@ -396,7 +396,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Focus;
 
 	PROCEDURE HandleAttr (cap: Caption; VAR msg: Objects.AttrMsg);
-		VAR len: LONGINT; font: GfxFonts.Font;
+		VAR len: SIGNED32; font: GfxFonts.Font;
 	BEGIN
 		IF msg.id = Objects.enum THEN
 			msg.Enum("Text"); msg.Enum("Font"); msg.Enum("Size");
@@ -473,7 +473,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Copy;
 
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR cap, copy: Caption; key, ptsize: SIGNED16; ver: LONGINT; name: ARRAY 64 OF CHAR; ch: CHAR;
+		VAR cap, copy: Caption; key, ptsize: SIGNED16; ver: SIGNED32; name: ARRAY 64 OF CHAR; ch: CHAR;
 	BEGIN
 		cap := obj(Caption);
 		IF msg IS Leonardo.ShapeMsg THEN
@@ -549,7 +549,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Handle;
 
 	PROCEDURE Init* (cap: Caption; x, y: REAL; text: ARRAY OF CHAR; font: GfxFonts.Font; col: Gfx.Color);
-		VAR len: LONGINT;
+		VAR len: SIGNED32;
 	BEGIN
 		cap.handle := Handle;
 		len := 0; WHILE text[len] # 0X DO INC(len) END;

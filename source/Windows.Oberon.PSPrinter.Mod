@@ -28,7 +28,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 			eps*: BOOLEAN; (** Is EPS output being written? *)
 			pno*: SIGNED16; (** Current page being printer on (starts with 1) *)
 
-			l, t, r, b: LONGINT;
+			l, t, r, b: SIGNED32;
 			sx, sy: SIGNED16; (* current string pos *)
 			mode, location: SIGNED8;
 			duplex: BOOLEAN; (* Print duplex pages *)
@@ -60,7 +60,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		headerT: Texts.Text;
 		bodyF: Files.File;
 		bodyR: Files.Rider;
-		ppos: LONGINT;
+		ppos: SIGNED32;
 		hexArray: ARRAY 17 OF CHAR;
 		curR, curG, curB, setR, setG, setB: SIGNED16;
 
@@ -83,8 +83,8 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		WHILE s[i] # 0X DO Ch(R, s[i]); INC(i) END;
 	END Str;
 
-	PROCEDURE Int (VAR R: Files.Rider; i: LONGINT);
-		VAR j: LONGINT;
+	PROCEDURE Int (VAR R: Files.Rider; i: SIGNED32);
+		VAR j: SIGNED32;
 	BEGIN
 		IF i = 0 THEN Ch(R, "0") ELSIF i < 0 THEN i := -i; Ch(R, "-") END;
 		j := 1;
@@ -130,12 +130,12 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 
 	(* -- Bounding Box -- *)
 
-	PROCEDURE Min(x, y: LONGINT): LONGINT;
+	PROCEDURE Min(x, y: SIGNED32): SIGNED32;
 	BEGIN IF x < y THEN RETURN x ELSE RETURN y END
 	END Min;
 
 	(* Increase the size of the bounding box. *)
-	PROCEDURE Box*(P: PSPrinter; x, y, w, h: LONGINT);
+	PROCEDURE Box*(P: PSPrinter; x, y, w, h: SIGNED32);
 	BEGIN
 		IF x < P.l THEN P.l := x END;
 		IF x + w - 1 > P.r THEN P.r := x + w - 1 END;
@@ -162,7 +162,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 
 		VAR
 			ch: CHAR;
-			pixmapDX, n, b: LONGINT;
+			pixmapDX, n, b: SIGNED32;
 			k, m: SIGNED16;
 			height, minX, maxX, minY, maxY: SIGNED16;
 			nOfBoxes, nOfRuns: SIGNED16;
@@ -397,7 +397,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 
 	(* -- Metric Font loading -- *)
 
-	PROCEDURE ParseName (VAR name, family: ARRAY OF CHAR; VAR size: LONGINT; VAR style: SET; VAR class: ARRAY OF CHAR);
+	PROCEDURE ParseName (VAR name, family: ARRAY OF CHAR; VAR size: SIGNED32; VAR style: SET; VAR class: ARRAY OF CHAR);
 	VAR i, j: SIGNED16;
 	BEGIN
 		size := 0; style := {}; i := 0;
@@ -471,7 +471,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END InitMetrics;
 
 	PROCEDURE GetSuffix(VAR str(** in *), suf(** out *): ARRAY OF CHAR);
-		VAR i, j, dot: LONGINT;
+		VAR i, j, dot: SIGNED32;
 	BEGIN
 		dot := -1; i := 0;
 		WHILE str[i] # 0X DO
@@ -507,7 +507,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END ResetColor;
 
 	PROCEDURE Open*(P: Printer.Printer; printer, options: ARRAY OF CHAR);
-	VAR suffix: ARRAY 32 OF CHAR; i: LONGINT;
+	VAR suffix: ARRAY 32 OF CHAR; i: SIGNED32;
 	BEGIN
 		WITH P: PSPrinter DO
 			ResetColor;
@@ -532,7 +532,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 			END;
 			InitMetrics(P);
 			fontMapDict := NIL; fontMapDictN := 0;
-			P.l := MAX(LONGINT); P.r := MIN(LONGINT); P.t := MIN(LONGINT); P.b := MAX(LONGINT);
+			P.l := MAX(SIGNED32); P.r := MIN(SIGNED32); P.t := MIN(SIGNED32); P.b := MAX(SIGNED32);
 
 			NEW(headerT); Texts.Open(headerT, headerFileName);
 			IF headerT.len > 0 THEN
@@ -864,7 +864,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 
 	PROCEDURE PrintPoly(P: PSPrinter; VAR p, q: Poly; lim: REAL);
 		VAR x0, y0, x1, y1, x2, y2, x3, y3: REAL;
-			xx0, yy0, xx1, yy1, xx2, yy2, xx3, yy3: LONGINT;
+			xx0, yy0, xx1, yy1, xx2, yy2, xx3, yy3: SIGNED32;
 
 	BEGIN
 		x0 := p.d;
@@ -939,7 +939,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END Spline;
 
 	PROCEDURE Page*(P: Printer.Printer; nofcopies: SIGNED16);
-	VAR x, y: LONGINT;
+	VAR x, y: SIGNED32;
 	BEGIN
 		WITH P: PSPrinter DO
 			ResetColor;
@@ -979,7 +979,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	PROCEDURE Close*(P: Printer.Printer);
 		CONST bufSize = 4*1024;
 		VAR
-			dpi: LONGINT;
+			dpi: SIGNED32;
 			i: SIGNED16;
 			printR, srcR: Files.Rider; buffer: ARRAY bufSize OF CHAR;
 			S: Texts.Scanner;
@@ -1172,7 +1172,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END Install;
 
 	PROCEDURE Init;
-		VAR class: Objects.Name; size: LONGINT; style: SET;
+		VAR class: Objects.Name; size: SIGNED32; style: SET;
 	BEGIN
 		ParseName(Fonts.Default.name, default, size, style, class)
 	END Init;

@@ -111,7 +111,7 @@ VAR
 	T: Terminal;
 	ch: CHAR;
 	i, k: SIGNED16;
-	l: LONGINT;
+	l: SIGNED32;
 BEGIN
 	WITH me: Task DO
 		T := me.T; C := T.C;
@@ -169,7 +169,7 @@ VAR
 	T: Terminal;
 	text: Texts.Text;
 	x, y, res, port: SIGNED16;
-	beg, end, time: LONGINT;
+	beg, end, time: SIGNED32;
 		adr: NetSystem.IPAdr;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
@@ -226,7 +226,7 @@ PROCEDURE Send*;	(* ^ | { string | name | number } *)
 VAR
 	S: Texts.Scanner;
 	text: Texts.Text;
-	beg, end, time: LONGINT;
+	beg, end, time: SIGNED32;
 	M: Oberon.ConsumeMsg;
 	T: Terminals.Terminal;
 BEGIN
@@ -248,7 +248,7 @@ END Send;
 
 PROCEDURE SetCaret (F: TextFrames.Frame);
 VAR
-	pos: LONGINT;
+	pos: SIGNED32;
 BEGIN pos := TextFrames.Pos(F, F.X + F.W, F.Y);
 	IF ~(F.car > 0) OR (F.carloc.pos # pos) THEN TextFrames.SetCaret(F, pos) END
 END SetCaret;
@@ -257,7 +257,7 @@ PROCEDURE Handle (F: Objects.Object; VAR msg: Objects.ObjMsg);
 VAR
 	F1: TextFrame;
 	text: Texts.Text;
-	beg, end, time: LONGINT;
+	beg, end, time: SIGNED32;
 	hasCar: BOOLEAN;
 BEGIN
 	WITH F: TextFrame DO

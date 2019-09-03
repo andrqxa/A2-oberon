@@ -70,7 +70,7 @@ TYPE
 	EventMsg* = RECORD (Objects.ObjMsg)
 		gesture- : SIGNED16;
 		x- , y- : SIGNED16;
-		time- : LONGINT;
+		time- : SIGNED32;
 		keys: SET;
 		callForResponder* : BOOLEAN;  (*= sent to poll for a responder *)
 		responder* : Objects.Object; (*= reply to poll for a responder *)
@@ -79,8 +79,8 @@ TYPE
 	END;
 
 	VAR 	context: EventMsg;
-	lastloc: LONGINT;  (* fof 020624 *)
-	doubleClickTime*: LONGINT;
+	lastloc: SIGNED32;  (* fof 020624 *)
+	doubleClickTime*: SIGNED32;
 
 PROCEDURE GetWheelEvent*(VAR event: EventMsg; up: BOOLEAN);
 VAR keys: SET; x,y: SIGNED16;

@@ -10,7 +10,7 @@ IMPORT
 TYPE
 	Int8* = SIGNED8;
 	Int16* = SIGNED16;
-	Int32* = LONGINT;
+	Int32* = SIGNED32;
 
 	Int* = SIZE; (** system signed integer type *)
 	UInt* = ADDRESS; (** system unsigned integer type *)

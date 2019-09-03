@@ -98,7 +98,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
 	END HexVal;
 
 	PROCEDURE WriteStringI2O(VAR W: Texts.Writer; VAR str: ARRAY OF CHAR; quoted: BOOLEAN);
-	VAR i: LONGINT; ch: CHAR;
+	VAR i: SIGNED32; ch: CHAR;
 	BEGIN i := 0;
 		WHILE str[i] # 0X DO ch := str[i];
 			IF iso THEN
@@ -250,8 +250,8 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
         END
 	END Directory;
 
-	PROCEDURE LocateMail (VAR text: Texts.Text; VAR pos: LONGINT);
-	VAR f: Display.Frame; F: TextFrames.Frame; end, time: LONGINT;
+	PROCEDURE LocateMail (VAR text: Texts.Text; VAR pos: SIGNED32);
+	VAR f: Display.Frame; F: TextFrames.Frame; end, time: SIGNED32;
 	BEGIN f := Oberon.Par.frame;
 		IF Oberon.Par.vwr.dsc = f THEN	(*menu frame*)
 			f := f.next;
@@ -262,7 +262,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
         END
 	END LocateMail;
 
-	PROCEDURE MailNo (text: Texts.Text; pos: LONGINT; VAR mail: SIGNED16; VAR beg, end: LONGINT);
+	PROCEDURE MailNo (text: Texts.Text; pos: SIGNED32; VAR mail: SIGNED16; VAR beg, end: SIGNED32);
 	  VAR R: Texts.Reader; ch: CHAR;
 	BEGIN mail := 0;
         Texts.OpenReader(R, text, 0); Texts.Read(R, ch); end := 0;
@@ -284,7 +284,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
 
 	PROCEDURE delete;
 	VAR Mail: NS.Connection;
-			text: Texts.Text; pos, beg, end: LONGINT;
+			text: Texts.Text; pos, beg, end: SIGNED32;
 			n, mails: SIGNED16;
 			done: BOOLEAN;
 	BEGIN
@@ -309,7 +309,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
 
 	PROCEDURE deleteAll;
 	VAR Mail: NS.Connection;
-			text: Texts.Text; pos, beg, end: LONGINT;
+			text: Texts.Text; pos, beg, end: SIGNED32;
 			mails, n, d: SIGNED16;
 			done: BOOLEAN;
 	BEGIN
@@ -343,7 +343,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
 	END ReceiveMail;
 
 	PROCEDURE show;
-	VAR Mail: NS.Connection; text: Texts.Text; pos, d: LONGINT; n, mails: SIGNED16;
+	VAR Mail: NS.Connection; text: Texts.Text; pos, d: SIGNED32; n, mails: SIGNED16;
 	BEGIN
 		LocateMail(text, pos); MailNo(text, pos, n, d, d);
 		IF (n > 0) & OpenPop(Mail, host, mails) THEN
@@ -368,7 +368,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
 
 	PROCEDURE getAll;
 	VAR Mail: NS.Connection; f: Files.File;
-			S: Texts.Scanner; text: Texts.Text; mpos, pos, len, d: LONGINT;
+			S: Texts.Scanner; text: Texts.Text; mpos, pos, len, d: SIGNED32;
 			n, mails: SIGNED16;
 	BEGIN
         Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
@@ -399,7 +399,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
 	END GetAll;
 
     PROCEDURE Store*;
-	  VAR S: Texts.Scanner; T: Texts.Text; f: Files.File; len: LONGINT;
+	  VAR S: Texts.Scanner; T: Texts.Text; f: Files.File; len: SIGNED32;
 	BEGIN
       Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
       IF S.class = Texts.Name THEN T := MarkedText();
@@ -415,7 +415,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
     VAR
       par: Oberon.ParList; S: Texts.Scanner; T: Texts.Text; RT: Texts.Reader;
       this: Files.File; R: Files.Rider;
-      i, j, n: SIGNED16; beg, end, time, pos, fpos, len: LONGINT; ch: CHAR;
+      i, j, n: SIGNED16; beg, end, time, pos, fpos, len: SIGNED32; ch: CHAR;
       name, buf: ARRAY 32 OF CHAR;
 
       PROCEDURE Forward (n: SIGNED16);
@@ -483,7 +483,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
 		S: Texts.Scanner;
 		V: Viewers.Viewer;
 		X, Y: SIGNED16;
-		beg, end, time, pos, len: LONGINT;
+		beg, end, time, pos, len: SIGNED32;
         f: Files.File;
   BEGIN
     Oberon.GetSelection(T, beg, end, time);
@@ -625,7 +625,7 @@ MODULE TextMail IN Oberon;	(** portable *)	(*RS/ARD/JG, 12.10.97*)
 
     PROCEDURE Cite*;
       VAR  V: Viewers.Viewer; R: Texts.Reader; T: TextFrames.Frame;
-        pos, end: LONGINT; ch: CHAR;
+        pos, end: SIGNED32; ch: CHAR;
     BEGIN
       V := Oberon.MarkedViewer();
       IF (V.dsc # NIL) & (V.dsc.next IS TextFrames.Frame) THEN

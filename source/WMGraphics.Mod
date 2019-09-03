@@ -17,19 +17,19 @@ CONST
 	(** FontStyles *)
 	FontBold* = 0; FontItalic* = 1;
 
-	Black* = 0FFH; White* = LONGINT(0FFFFFFFFH); Transparent*=0H;
-	Gray*=LONGINT(0777777FFH);
-	Red* = LONGINT(0FF0000FFH);
-	DarkRed* = LONGINT(08C0000FFH);
+	Black* = 0FFH; White* = SIGNED32(0FFFFFFFFH); Transparent*=0H;
+	Gray*=SIGNED32(0777777FFH);
+	Red* = SIGNED32(0FF0000FFH);
+	DarkRed* = SIGNED32(08C0000FFH);
 	Green* = 000FF00FFH; Blue* = 0FFFFH;
-	Yellow* = LONGINT(0FFFF00FFH);
-	Magenta* = LONGINT(0FF00FFFFH);
+	Yellow* = SIGNED32(0FFFF00FFH);
+	Magenta* = SIGNED32(0FF00FFFFH);
 	Cyan* = 00FFFFFFH;
-	Gold* = LONGINT(0FFD700FFH);
+	Gold* = SIGNED32(0FFD700FFH);
 
 TYPE
 	Real* = REAL;
-	Char32 = LONGINT;
+	Char32 = SIGNED32;
 	Point2d* = RECORD x*, y* : SIZE END;
 	Image* = OBJECT(Raster.Image)
 	VAR
@@ -37,7 +37,7 @@ TYPE
 	END Image;
 
 	Rectangle* = Rectangles.Rectangle;
-	Color* = LONGINT;
+	Color* = SIGNED32;
 
 	GlyphSpacings* = RECORD
 		bearing* : Rectangle;
@@ -93,7 +93,7 @@ TYPE
 
 		(** Render an UTF8 string to a canvas *)
 		PROCEDURE RenderString*(canvas : Canvas ; x, y : Real; CONST text : ARRAY OF CHAR);
-		VAR i, len: SIZE; code : LONGINT; g : GlyphSpacings;
+		VAR i, len: SIZE; code : SIGNED32; g : GlyphSpacings;
 		BEGIN
 			len := LEN(text); i := 0;
 			WHILE (i < len) & (text[i] # 0X) DO
@@ -113,7 +113,7 @@ TYPE
 
 		(** Render an UTF8 string to a canvas *)
 		PROCEDURE GetStringSize*(CONST text : ARRAY OF CHAR; VAR dx, dy : SIZE);
-		VAR i, len: SIZE; code : LONGINT; g : GlyphSpacings;
+		VAR i, len: SIZE; code : SIGNED32; g : GlyphSpacings;
 		BEGIN
 			len := LEN(text); i := 0; dx := 0; dy := GetHeight();
 			WHILE (i < len) & (text[i] # 0X) DO
@@ -138,11 +138,11 @@ TYPE
 		END RenderChar;
 
 		(** return a bitmap of character code *)
-		PROCEDURE GetGlyphMap*(code : LONGINT; VAR map : Image);
+		PROCEDURE GetGlyphMap*(code : SIGNED32; VAR map : Image);
 		END GetGlyphMap;
 
 		(** return spacing of character code *)
-		PROCEDURE GetGlyphSpacings*(code : LONGINT; VAR glyphSpacings : GlyphSpacings);
+		PROCEDURE GetGlyphSpacings*(code : SIGNED32; VAR glyphSpacings : GlyphSpacings);
 		END GetGlyphSpacings;
 	END Font;
 
@@ -740,7 +740,7 @@ BEGIN
 	result.l := l; result.t := t; result.r := r; result.b := b; RETURN result
 END MakeRectangle;
 
-PROCEDURE ColorToRGBA*(color : Color; VAR r, g, b, a : LONGINT);
+PROCEDURE ColorToRGBA*(color : Color; VAR r, g, b, a : SIGNED32);
 BEGIN
 	r := (color DIV 1000000H) MOD 100H;
 	g := (color DIV 10000H) MOD 100H;
@@ -748,7 +748,7 @@ BEGIN
 	a :=	color MOD 100H
 END ColorToRGBA;
 
-PROCEDURE RGBAToColor*(r, g, b, a: LONGINT): Color;
+PROCEDURE RGBAToColor*(r, g, b, a: SIGNED32): Color;
 BEGIN
 	RETURN r * 1000000H + g * 10000H + b * 100H + a
 END RGBAToColor;
@@ -760,7 +760,7 @@ BEGIN
 	c := 100H * c + MAX(0, (color DIV 10000H) MOD 100H - 40H);
 	c := 100H * c +MAX(0, (color DIV 100H) MOD 100H-40H);
 	c := 100H * c + color MOD 100H;
-	RETURN LONGINT(c);
+	RETURN SIGNED32(c);
 END Dark;
 
 PROCEDURE Light*(color:Color):Color;
@@ -770,7 +770,7 @@ BEGIN
 	c := 100H * c + MIN(0FFH, (color DIV 10000H) MOD 100H + 40H);
 	c := 100H * c +MIN(0FFH, (color DIV 100H) MOD 100H + 40H);
 	c := 100H * c + color MOD 100H;
-	RETURN LONGINT(c);
+	RETURN SIGNED32(c);
 END Light;
 
 PROCEDURE CheckImage(obj: ANY; VAR cont: BOOLEAN);
@@ -806,7 +806,7 @@ END GetExtension;
 *)
 PROCEDURE LoadImage*(CONST name : ARRAY OF CHAR; shared : BOOLEAN): Image;
 VAR img : Image;
-	res: WORD; w, h : SIZE; x : LONGINT;
+	res: WORD; w, h : SIZE; x : SIGNED32;
 	decoder : Codecs.ImageDecoder;
 	in : Streams.Reader;
 	ext : ARRAY 16 OF CHAR;
@@ -953,13 +953,13 @@ BEGIN
 		Strings.IntToStr(char,str); Strings.Concat("U", str, str);
 		f.GetStringSize(str, w, h);
 		r := Rectangles.MakeRect(ENTIER(x), ENTIER(y) - f.ascent, ENTIER(x) + w, ENTIER(y) + f.descent);
-		canvas.Fill(r, LONGINT(0CCCC00FFH), ModeCopy);
+		canvas.Fill(r, SIGNED32(0CCCC00FFH), ModeCopy);
 		f.RenderString(canvas, x, y, str)
 	END
 END FBRenderChar;
 
 (** return the fallback spacing of character code *)
-PROCEDURE FBGetGlyphSpacings*(code : LONGINT; VAR glyphSpacings : GlyphSpacings);
+PROCEDURE FBGetGlyphSpacings*(code : SIGNED32; VAR glyphSpacings : GlyphSpacings);
 VAR i : SIZE; f : Font; found : BOOLEAN; str : ARRAY 16 OF CHAR;
 BEGIN
 	i := 0; found := FALSE;
@@ -981,7 +981,7 @@ END FBGetGlyphSpacings;
 
 (** Tools *)
 (* Return true if the alpha value at pos x, y in img is >= threshold. Returns false if x, y are out of image *)
-PROCEDURE IsBitmapHit*(x, y: SIZE; threshold: LONGINT; img: Raster.Image) : BOOLEAN;
+PROCEDURE IsBitmapHit*(x, y: SIZE; threshold: SIGNED32; img: Raster.Image) : BOOLEAN;
 VAR pix : Raster.Pixel;
 	mode : Raster.Mode;
 BEGIN
@@ -993,7 +993,7 @@ BEGIN
 	END
 END IsBitmapHit;
 
-PROCEDURE IsScaledBitmapHit*(x,y,w,h: SIZE; threshold: LONGINT; img: Raster.Image): BOOLEAN;
+PROCEDURE IsScaledBitmapHit*(x,y,w,h: SIZE; threshold: SIGNED32; img: Raster.Image): BOOLEAN;
 BEGIN
 	RETURN IsBitmapHit(x*img.width DIV w, y*img.height DIV h, threshold,img);
 END IsScaledBitmapHit;

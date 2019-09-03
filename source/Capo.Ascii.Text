@@ -36,7 +36,7 @@ This module exports a low-level integer type with 8-bit length, i.e., a SIGNED8.
 This module exports a low-level integer type with 16-bit length, i.e., an SIGNED16.  It has the same structure as that of NbrInt8.
 
 1.3 NbrInt32.Mod
-This module exports a low-level integer type with 32-bit length, i.e., a LONGINT.  
+This module exports a low-level integer type with 32-bit length, i.e., a SIGNED32.  
 
 1.4 NbrInt64.Mod
 This module exports a low-level integer type with 64-bit length, i.e., a HUGEINT. It is largely MathH.Mod, originally written by Patrik Reali, with some procedures added, some altered, and others removed. 
@@ -53,7 +53,7 @@ This module exports a low-level real type with 64-bit length, i.e., a LONGREAL. 
 1.7 NbrInt.Mod
 This module defines the base-type: Integer. Other than the definition of type, the interface is devoid of type size. There is just one kind of integer used in CAPO; it is: NbrInt.Integer. 
 	Here NbrInt32.Integer is implemented as the default integer type. This could be changed easily to an integer of different size by an appropriate reassignment of NbrInt.Integer to a different type, say NbrInt64.Integer, and by also changing the internal constructs of the procedures within NbrInt.Mod, NbrRat.Mod, NbrRe.Mod and NbrCplx.Mod, as appropriate.
-	Instances of type LONGINT do appear here and there in our interfaces. When they do it is because they reflect system-specific needs, like memory addresses, array indices, etc. which are LONGINT's by Aos implementation.
+	Instances of type SIGNED32 do appear here and there in our interfaces. When they do it is because they reflect system-specific needs, like memory addresses, array indices, etc. which are SIGNED32's by Aos implementation.
 
 1.8 NbrRat.Mod
 This module defines a base type for fixed-point Rationals.

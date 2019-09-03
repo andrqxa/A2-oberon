@@ -156,7 +156,7 @@ TYPE
 
 	Selector* = OBJECT
 		VAR
-			a, b, c: LONGINT;
+			a, b, c: SIGNED32;
 			simpleSelectors: Objects.Collection;
 			lastSimpleSel: SimpleSelector;
 
@@ -167,7 +167,7 @@ TYPE
 			NEW(arrColl); simpleSelectors := arrColl
 		END Init;
 
-		PROCEDURE GetSpecifity*(VAR a, b, c: LONGINT);
+		PROCEDURE GetSpecifity*(VAR a, b, c: SIGNED32);
 		BEGIN
 			a := SELF.a; b := SELF.b; c := SELF.c
 		END GetSpecifity;
@@ -479,7 +479,7 @@ TYPE
 		VAR
 			operator, unaryOperator: SIGNED8;
 			type: SIGNED8;
-			intVal: LONGINT;
+			intVal: SIGNED32;
 			realVal: LONGREAL;
 			stringVal: String;
 			unit: SIGNED8;
@@ -558,12 +558,12 @@ TYPE
 			SELF.type := type
 		END SetType;
 
-		PROCEDURE GetIntVal*(): LONGINT;
+		PROCEDURE GetIntVal*(): SIGNED32;
 		BEGIN
 			RETURN intVal
 		END GetIntVal;
 
-		PROCEDURE SetIntVal*(intVal: LONGINT);
+		PROCEDURE SetIntVal*(intVal: SIGNED32);
 		BEGIN
 			SELF.intVal := intVal
 		END SetIntVal;
@@ -593,7 +593,7 @@ TYPE
 			RETURN (type = StringIdent) & (stringVal # NIL) & (stringVal^ = ident)
 		END IsStringIdent;
 
-		PROCEDURE IsIdent*(ident: LONGINT): BOOLEAN;
+		PROCEDURE IsIdent*(ident: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN (type = Ident) & (intVal = ident)
 		END IsIdent;
@@ -729,7 +729,7 @@ TYPE
 
 	END FontFace;
 
-	PROCEDURE IntToRGBA*(color: LONGINT; VAR r, g, b, a: CHAR);
+	PROCEDURE IntToRGBA*(color: SIGNED32; VAR r, g, b, a: CHAR);
 	BEGIN
 			a := CHR(color DIV 1000000H);
 			r := CHR(color DIV 10000H MOD 100H);
@@ -737,7 +737,7 @@ TYPE
 			b := CHR(color MOD 100H)
 	END IntToRGBA;
 
-	PROCEDURE RGBAToInt*(r, g, b, a: CHAR; VAR color: LONGINT);
+	PROCEDURE RGBAToInt*(r, g, b, a: CHAR; VAR color: SIGNED32);
 	BEGIN
 		color := ASH(ORD(a), 24) + ASH(ORD(r), 16) + ASH(ORD(g), 8) + ORD(b)
 	END RGBAToInt;

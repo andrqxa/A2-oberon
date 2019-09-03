@@ -50,7 +50,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE ApplySel*;
 		VAR
 			fig: Leonardo.Figure; editor: LeoPanels.Editor; obj: Objects.Object; cap: LeoCaptions.Caption;
-			font: ARRAY 64 OF CHAR; size, col: LONGINT;
+			font: ARRAY 64 OF CHAR; size, col: SIGNED32;
 	BEGIN
 		fig := LeoPanels.FindFigure(Gadgets.context);
 		editor := LeoPanels.FindEditor(Gadgets.context);
@@ -73,7 +73,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 	END ApplySel;
 
 	PROCEDURE RevertTool (editor: LeoPanels.Editor);
-		VAR s: ARRAY 64 OF CHAR; i: LONGINT;
+		VAR s: ARRAY 64 OF CHAR; i: SIGNED32;
 	BEGIN
 		Attributes.GetString(Font, "Value", s); Attributes.SetString(editor, "Font", s);
 		Attributes.GetInt(Size, "Value", i); Attributes.SetInt(editor, "Size", i);
@@ -82,7 +82,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 	END RevertTool;
 
 	PROCEDURE ApplyTool (editor: LeoPanels.Editor);
-		VAR s: ARRAY 64 OF CHAR; i: LONGINT;
+		VAR s: ARRAY 64 OF CHAR; i: SIGNED32;
 	BEGIN
 		Attributes.GetString(editor, "Font", s); Attributes.SetString(Font, "Value", s);
 		Attributes.GetInt(editor, "Size", i); Attributes.SetInt(Size, "Value", i);
@@ -106,7 +106,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 	END FadeCursor;
 
 	PROCEDURE InitCursor;
-		VAR p: ARRAY 20 OF SET; i: LONGINT;
+		VAR p: ARRAY 20 OF SET; i: SIGNED32;
 	BEGIN
 		p[0] := {}; p[1] := {2..3, 5..6}; p[2] := {1, 4, 7};
 		FOR i := 3 TO 16 DO p[i] := {4} END; p[6] := {2..6};
@@ -160,8 +160,8 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 		END
 	END Hide;
 
-	PROCEDURE GetText (text: Texts.Text; beg, end: LONGINT; VAR s: ARRAY OF CHAR);
-		VAR r: Texts.Reader; i: LONGINT; ch: CHAR;
+	PROCEDURE GetText (text: Texts.Text; beg, end: SIGNED32; VAR s: ARRAY OF CHAR);
+		VAR r: Texts.Reader; i: SIGNED32; ch: CHAR;
 	BEGIN
 		Texts.OpenReader(r, text, beg);
 		Texts.Read(r, ch); i := 0;
@@ -173,7 +173,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 		s[i] := 0X
 	END GetText;
 
-	PROCEDURE ConsumeText (fig: Leonardo.Figure; text: Texts.Text; beg, end: LONGINT);
+	PROCEDURE ConsumeText (fig: Leonardo.Figure; text: Texts.Text; beg, end: SIGNED32);
 		VAR r: Texts.Reader; ch: CHAR; res: SIGNED16;
 	BEGIN
 		IF fig = Focus.fig THEN
@@ -204,7 +204,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE Integrate (frame: LeoFrames.Frame; CONST s: ARRAY OF CHAR);
 		VAR
-			fig: Leonardo.Figure; name: ARRAY 64 OF CHAR; size, col: LONGINT; font: GfxFonts.Font; color: Gfx.Color;
+			fig: Leonardo.Figure; name: ARRAY 64 OF CHAR; size, col: SIGNED32; font: GfxFonts.Font; color: Gfx.Color;
 			cap: LeoCaptions.Caption; done: BOOLEAN;
 	BEGIN
 		fig := frame.obj(Leonardo.Figure);
@@ -224,7 +224,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE Track (frame: LeoFrames.Frame; VAR msg: Oberon.InputMsg);
 		VAR
 			fx, fy, mx, my, x, y, len: SIGNED16; px, py: REAL; keysum, keys, state: SET; done: BOOLEAN; text: Texts.Text;
-			beg, end, time: LONGINT; tool: LeoTools.Tool; mask: Display3.Mask; s: ARRAY 128 OF CHAR;
+			beg, end, time: SIGNED32; tool: LeoTools.Tool; mask: Display3.Mask; s: ARRAY 128 OF CHAR;
 	BEGIN
 		IF msg.keys = {} THEN
 			LeoTools.TrackTool(LeoTools.Current(frame), "caption", Cursor, msg)
@@ -408,7 +408,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 	END Revert;
 
 	PROCEDURE Apply (editor: LeoPanels.Editor);
-		VAR obj: Objects.Object; cap: LeoCaptions.Caption; s: ARRAY 64 OF CHAR; i: LONGINT;
+		VAR obj: Objects.Object; cap: LeoCaptions.Caption; s: ARRAY 64 OF CHAR; i: SIGNED32;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoCaptions.Caption) & (editor.fig # NIL) THEN

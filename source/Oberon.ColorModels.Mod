@@ -137,7 +137,7 @@ END RGBToHSV;
 (** convert a HueSaturationValue color specification to RedGreenBlue *)
 PROCEDURE HSVToRGB*(h,s,v: REAL; VAR r,g,b: REAL);
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 	f,p1,p2,p3: REAL;
 BEGIN
 	IF h = 360.0 THEN h:= 0.0; ELSE h:= h / 60.0; END;	(* convert h to be in [0,6] *)

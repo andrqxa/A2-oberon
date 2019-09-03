@@ -37,7 +37,7 @@ END WriteVersion;
 (* ----------- Color Picker ---------- *)
 
 PROCEDURE Parse(VAR s: ARRAY OF CHAR; VAR n: SIGNED16; VAR values: ARRAY OF SIGNED16);
-VAR i: SIGNED16; val: LONGINT; neg: BOOLEAN;
+VAR i: SIGNED16; val: SIGNED32; neg: BOOLEAN;
 BEGIN
 	n := 0;
 	i := 0;
@@ -61,8 +61,8 @@ END Parse;
 PROCEDURE Unparse(n: SIGNED16; VAR values: ARRAY OF SIGNED16; VAR s: ARRAY OF CHAR);
 VAR i, j: SIGNED16;
 
-	PROCEDURE Out(i: LONGINT);
-	VAR k: SIGNED16; x0: LONGINT; a: ARRAY 10 OF CHAR;
+	PROCEDURE Out(i: SIGNED32);
+	VAR k: SIGNED16; x0: SIGNED32; a: ARRAY 10 OF CHAR;
 	BEGIN k := 0;
 		IF i < 0 THEN x0 := -i
 		ELSE x0 := i
@@ -248,7 +248,7 @@ BEGIN
 END CopyColorPicker;
 
 PROCEDURE ColorPickerHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR x, y, w, h, u, v: SIGNED16; F0: ColorPicker; R: Display3.Mask; ver: LONGINT;
+VAR x, y, w, h, u, v: SIGNED16; F0: ColorPicker; R: Display3.Mask; ver: SIGNED32;
 BEGIN
 	WITH F: ColorPicker DO
 		IF M IS Objects.AttrMsg THEN

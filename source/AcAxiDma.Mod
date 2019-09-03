@@ -18,8 +18,8 @@ CONST
 
 TYPE
 
-	Address* = LONGINT;
-	Size* = LONGINT;
+	Address* = SIGNED32;
+	Size* = SIGNED32;
 
 	(**
 		ActiveCells AXI DMA component controller
@@ -69,9 +69,9 @@ TYPE
 		END SetCount;
 
 		PROCEDURE SetBurstLen*(len: WORD);
-		VAR d: LONGINT;
+		VAR d: SIGNED32;
 		BEGIN{EXCLUSIVE}
-			d := (burstLen-1) + LSH(LONGINT(burstLen)*dataSize,4);
+			d := (burstLen-1) + LSH(SIGNED32(burstLen)*dataSize,4);
 			cfgCmd << CmdSetBurstLen;
 			cfgData << d;
 			burstLen := len;
@@ -119,7 +119,7 @@ TYPE
 		END GetCurrentCount;
 
 		PROCEDURE IsTransferPending*(): BOOLEAN;
-		VAR d: LONGINT;
+		VAR d: SIGNED32;
 		BEGIN{EXCLUSIVE}
 			cfgCmd << CmdGetPendingFlag;
 			cfgData << 0;

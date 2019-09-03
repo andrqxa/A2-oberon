@@ -67,7 +67,7 @@ TYPE
 		END SaveOperation;
 
 		PROCEDURE InsertText*(pos: SIZE; text: Texts.Text);
-		VAR i: InsertUpdateInfo; u:UpdateInfo; tr: Texts.TextReader; ucs32: LONGINT;
+		VAR i: InsertUpdateInfo; u:UpdateInfo; tr: Texts.TextReader; ucs32: SIGNED32;
 		BEGIN
 			ResetRedo;
 			text.AcquireRead;

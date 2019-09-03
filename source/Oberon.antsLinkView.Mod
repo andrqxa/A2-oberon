@@ -166,7 +166,7 @@ VAR
 	END Copy;
 
 	PROCEDURE InstallGraph*( level: tLayer;  debug: BOOLEAN );
-	VAR graph: vyGraph.tGraph;  i: SIGNED16;  vtroot: tNode;  e: vyGraph.tEdge;  name: vyName.tNameArray;  count: LONGINT;
+	VAR graph: vyGraph.tGraph;  i: SIGNED16;  vtroot: tNode;  e: vyGraph.tEdge;  name: vyName.tNameArray;  count: SIGNED32;
 		installed, cur: antsObjects.tlinkList;
 
 		PROCEDURE MarkInstalled( obj: Objects.Object );

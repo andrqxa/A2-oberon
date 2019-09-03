@@ -15,7 +15,7 @@ TYPE
 		commandFlags: SET;
 		command, prolog, epilog: Command;
 		fileName: Files.FileName;
-		dots: LONGINT;
+		dots: SIGNED32;
 
 		PROCEDURE &InitTester (log, logFileWriter: Streams.Writer;  diagnostics: Diagnostics.Diagnostics; mayTrap: BOOLEAN; CONST prolog, command, epilog: Command; CONST fileName: ARRAY OF CHAR);
 		BEGIN
@@ -216,7 +216,7 @@ TYPE
 PROCEDURE RunTests(
 	text : Texts.Text;
 	CONST source: ARRAY OF CHAR;
-	pos: LONGINT; (* ignore *)
+	pos: SIGNED32; (* ignore *)
 	CONST pc,opt: ARRAY OF CHAR;
 	log: Streams.Writer; diagnostics : Diagnostics.Diagnostics; VAR error: BOOLEAN);
 VAR

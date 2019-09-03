@@ -52,18 +52,18 @@ TYPE
 	EntryDesc* = RECORD
 		name-: ARRAY 256 OF CHAR;	(** name of file stored in the zip-archive **)
 		method: SIGNED16;	(* compression method *)
-		time-, date-: LONGINT;	(** (Oberon) time and date when file was last modified **)
-		crc32: LONGINT;	(* checksum of uncompressed file data *)
-		compSize-, uncompSize-: LONGINT;	(** size of compressed / uncompressed file **)
+		time-, date-: SIGNED32;	(** (Oberon) time and date when file was last modified **)
+		crc32: SIGNED32;	(* checksum of uncompressed file data *)
+		compSize-, uncompSize-: SIGNED32;	(** size of compressed / uncompressed file **)
 		intFileAttr: SIGNED16;	(* internal file attributes, not used in this implementation *)
-		extFileAttr: LONGINT;	(* external file attributes, not used in this implementation *)
+		extFileAttr: SIGNED32;	(* external file attributes, not used in this implementation *)
 		extraField (* for future expansions *), comment-: POINTER TO ARRAY OF CHAR;	(** comment for this file **)
 		genPurpBitFlag: SIGNED16;
 		support: SIGNED8;
 		dataDescriptor: BOOLEAN;	(* if set, data descriptor after (compressed) file data *)
-		offsetLocal: LONGINT;	(* offset of file header in central directory *)
-		offsetFileData: LONGINT;	(* offset of (compressed) file data *)
-		offsetCentralDir: LONGINT;	(* offset of local file header *)
+		offsetLocal: SIGNED32;	(* offset of file header in central directory *)
+		offsetFileData: SIGNED32;	(* offset of (compressed) file data *)
+		offsetCentralDir: SIGNED32;	(* offset of local file header *)
 		next: Entry
 	END;
 
@@ -72,7 +72,7 @@ TYPE
 		nofEntries-: SIGNED16;	(** total number of files stored in the zipfile **)
 		comment-: POINTER TO ARRAY OF CHAR;	(** comment for zipfile **)
 		file-: Files.File;	(* pointer to the according zip-file *)
-		offset: LONGINT;	(* offset of end of central dir record *)
+		offset: SIGNED32;	(* offset of end of central dir record *)
 		firstEntry, lastEntry: Entry	(* first and last Entry of Archive *)
 	END;
 
@@ -86,7 +86,7 @@ TYPE
 	UncompReader = POINTER TO UncompReaderDesc;
 	UncompReaderDesc = RECORD (ReaderDesc)	(* structur for reading from a uncompressed entry *)
 		fr: Files.Rider;
-		crc32: LONGINT;	(* crc32 of uncomressed data *)
+		crc32: SIGNED32;	(* crc32 of uncomressed data *)
 	END;
 
 	DefReader = POINTER TO DefReaderDesc;
@@ -124,35 +124,35 @@ BEGIN
 END StringLength;
 
 (* Converts Oberon time into MS-DOS time *)
-PROCEDURE OberonToDosTime(t: LONGINT): SIGNED16;
+PROCEDURE OberonToDosTime(t: SIGNED32): SIGNED16;
 BEGIN
 	RETURN SHORT(t DIV 1000H MOD 20H * 800H + t DIV 40H MOD 40H * 20H + t MOD 40H DIV 2)
 END OberonToDosTime;
 
 (* Converts Oberon date into MS-DOS time *)
-PROCEDURE OberonToDosDate(d: LONGINT): SIGNED16;
+PROCEDURE OberonToDosDate(d: SIGNED32): SIGNED16;
 BEGIN
 	RETURN SHORT((d DIV 200H + 1900 - 1980) * 200H + d MOD 200H)
 END OberonToDosDate;
 
 (* Converts MS-DOS time into Oberon time *)
-PROCEDURE DosToOberonTime(t: SIGNED16): LONGINT;
+PROCEDURE DosToOberonTime(t: SIGNED16): SIGNED32;
 BEGIN
 	RETURN LONG(t) DIV 800H MOD 20H * 1000H + t DIV 20H MOD 40H * 40H + t MOD 20H * 2
 END DosToOberonTime;
 
 (* Converts MS-DOS date into Oberon date *)
-PROCEDURE DosToOberonDate(d: SIGNED16): LONGINT;
+PROCEDURE DosToOberonDate(d: SIGNED16): SIGNED32;
 BEGIN
 	RETURN (LONG(d) DIV 200H MOD 80H + 1980 - 1900) * 200H + d MOD 200H
 END DosToOberonDate;
 
 (* Copy len bytes from src to dst; if compCRC32 is set, then the crc 32-checksum is computed *)
-PROCEDURE Copy(VAR src, dst: Files.Rider; len: LONGINT; compCRC32: BOOLEAN; VAR crc32: LONGINT);
+PROCEDURE Copy(VAR src, dst: Files.Rider; len: SIGNED32; compCRC32: BOOLEAN; VAR crc32: SIGNED32);
 CONST
 	BufSize = 4000H;
 VAR
-	n: LONGINT;
+	n: SIGNED32;
 	buf: ARRAY BufSize OF CHAR;
 BEGIN
 	IF compCRC32 THEN crc32 := Zlib.CRC32(0, buf, -1, -1) END;
@@ -172,12 +172,12 @@ PROCEDURE ReadEntry(VAR r: Files.Rider): Entry;
 VAR
 	ent: Entry;
 	intDummy, nameLen, extraLen, commentLen: SIGNED16;
-	longDummy: LONGINT; position: Streams.Position;
+	longDummy: SIGNED32; position: Streams.Position;
 BEGIN
 	Files.ReadLInt(r, longDummy);
 	IF longDummy = CentralFileHeaderSignature THEN
 		NEW(ent);
-		ent.offsetCentralDir := r.file.Pos(r)(LONGINT) - 4;
+		ent.offsetCentralDir := r.file.Pos(r)(SIGNED32) - 4;
 		ent.support := 0;
 		Files.ReadInt(r, intDummy);	(* version made by *)
 		Files.ReadInt(r, intDummy);	(* version needed to extract *)
@@ -254,7 +254,7 @@ END WriteLocalFileHeader;
 (* Writes file header in central directory, updates ent.offsetCentralDir *)
 PROCEDURE WriteFileHeader(ent: Entry; VAR r: Files.Rider);
 BEGIN
-	ent.offsetCentralDir := r.file.Pos(r)(LONGINT);
+	ent.offsetCentralDir := r.file.Pos(r)(SIGNED32);
 	Files.WriteLInt(r, CentralFileHeaderSignature);	(* central file header signature *)
 	Files.WriteInt(r, CompatibleVersions * 10);	(* version made by *)
 	Files.WriteInt(r, CompatibleVersions * 10);	(* version needed to extract *)
@@ -325,7 +325,7 @@ BEGIN
 		WriteFileHeader(ent, r);
 		ent := ent.next
 	END;
-	arc.offset := r.file.Pos(r)(LONGINT);
+	arc.offset := r.file.Pos(r)(SIGNED32);
 	WriteEndOfCentDir(arc, r)
 END WriteCentralDirectory;
 
@@ -340,7 +340,7 @@ VAR
 	ent: Entry;
 	f: Files.File;
 	r: Files.Rider;
-	longDummy: LONGINT;
+	longDummy: SIGNED32;
 	intDummy: SIGNED16;
 BEGIN
 	res := Ok;
@@ -361,7 +361,7 @@ BEGIN
 		ELSE
 			NEW(arc);
 			arc.file := f;
-			arc.offset := f.Pos(r)(LONGINT) - 4;
+			arc.offset := f.Pos(r)(SIGNED32) - 4;
 			Files.ReadInt(r, intDummy);	(* number of this disk *)
 			Files.ReadInt(r, intDummy);	(* number of the disk with the start of the central directory *)
 			Files.ReadInt(r, intDummy);	(* total number of entries in the central dir on this disk *)
@@ -473,7 +473,7 @@ END GetEntry;
 	- BadName: entry has a bad file name **)
 PROCEDURE ExtractEntry*(arc: Archive; ent: Entry; VAR dst: Files.Rider; VAR res: WORD);
 VAR
-	src: Files.Rider; crc32: LONGINT;
+	src: Files.Rider; crc32: SIGNED32;
 BEGIN
 	IF arc = NIL THEN
 		res := NotZipArchiveError
@@ -516,9 +516,9 @@ END ExtractEntry;
 	- EntryAlreadyExists: there is already an Entry in arc with the same name
 	- DataError: error during compression
 	- BadName: src is not based on a valid file **)
-PROCEDURE AddEntry*(arc: Archive; CONST name: ARRAY OF CHAR; VAR src: Files.Rider; len: LONGINT; level, strategy: SIGNED8; VAR res: WORD);
+PROCEDURE AddEntry*(arc: Archive; CONST name: ARRAY OF CHAR; VAR src: Files.Rider; len: SIGNED32; level, strategy: SIGNED8; VAR res: WORD);
 VAR
-	dst: Files.Rider; ent: Entry; start: LONGINT;
+	dst: Files.Rider; ent: Entry; start: SIGNED32;
 BEGIN
 	IF arc = NIL THEN
 		res := NotZipArchiveError
@@ -549,9 +549,9 @@ BEGIN
 		END;
 		arc.file.Set(dst, ent.offsetLocal);
 		WriteLocalFileHeader(ent, dst);
-		ent.offsetFileData := dst.file.Pos(dst)(LONGINT);
+		ent.offsetFileData := dst.file.Pos(dst)(SIGNED32);
 		arc.file.Update();
-		start := src.file.Pos(src)(LONGINT);
+		start := src.file.Pos(src)(SIGNED32);
 		IF level = 0 THEN
 			Copy(src, dst, len, TRUE, ent.crc32);
 			ent.compSize := len;
@@ -565,7 +565,7 @@ BEGIN
 			END
 		END;
 		IF res = Ok THEN
-			ent.uncompSize := src.file.Pos(src)(LONGINT) - start;
+			ent.uncompSize := src.file.Pos(src)(SIGNED32) - start;
 			arc.file.Update();
 			arc.file.Set(dst, ent.offsetLocal + 14);
 			Files.WriteLInt(dst, ent.crc32);
@@ -596,7 +596,7 @@ VAR
 	f: Files.File; r1, r2: Files.Rider;
 	ent2: Entry;
 	arcname: ARRAY 256 OF CHAR;
-	offset, diff: LONGINT;
+	offset, diff: SIGNED32;
 BEGIN
 	IF arc = NIL THEN
 		res := NotZipArchiveError

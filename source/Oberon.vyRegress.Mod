@@ -50,7 +50,7 @@ TYPE
 	Real = vyBase.Real;
 	tRegression = RECORD
 		slope, intercept, errvar: LONGREAL;
-		count: LONGINT;
+		count: SIGNED32;
 		ymean, yssq: LONGREAL
 	END;
 	tFBandParameter = POINTER TO tFBandParameterDesc;
@@ -101,7 +101,7 @@ END FBand;
 
 PROCEDURE NewResidualsAndFit* (response, regressor: vyBase.tVector;   offs, slope: LONGREAL;
 VAR residuals, fit: vyBase.tVector);
-	VAR i, nrData: LONGINT;   curfit: Real;
+	VAR i, nrData: SIGNED32;   curfit: Real;
 BEGIN
 	ASSERT(regressor IS vyRealVec.tVector , vyBase.precc);
 	ASSERT( (regressor.nrData > 0), 101);
@@ -122,7 +122,7 @@ BEGIN
 END NewResidualsAndFit;
 
 PROCEDURE CalcRegress (response, regressor: vyBase.tVector;    VAR regression: tRegression);
-	VAR	XYSSQ: LONGREAL;    stx, sty: vyQFisher.Stattyp;    nrData, i: LONGINT;
+	VAR	XYSSQ: LONGREAL;    stx, sty: vyQFisher.Stattyp;    nrData, i: SIGNED32;
 BEGIN
 	ASSERT(response.nrData = regressor.nrData, 100);
 	nrData := response.nrData;
@@ -142,7 +142,7 @@ END CalcRegress;
 PROCEDURE DoRegress* (response, regressor: vyBase.tVector;    inSim: BOOLEAN);
 VAR
 	Err: SIGNED16;
-	nrData, nans: LONGINT;
+	nrData, nans: SIGNED32;
 	minX, maxX, minY, maxY: Real;
 	xyScatter, resScatter: vyScatter2.tLayer;
 	regLine, nullLine: vyLine.tLayer;

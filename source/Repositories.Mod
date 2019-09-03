@@ -101,7 +101,7 @@ TYPE
 	VAR
 		repository : Repository; name : Strings.String; refNum : SIZE;
 		flags : SET;
-		timestamp- : LONGINT;
+		timestamp- : SIGNED32;
 		onChanged* : WMEvents.EventSource; (* for update mechanisms, basically every component needs a feature to inform about updates *)
 
 		PROCEDURE &Init*;
@@ -765,7 +765,7 @@ TYPE
 		filename- : Files.FileName;
 		archive : Archives.Archive;
 
-		timestamp- : LONGINT;
+		timestamp- : SIGNED32;
 
 		modified : BOOLEAN;
 		nextID : SIZE;
@@ -1254,7 +1254,7 @@ VAR
 	registry- : Registry;
 	indexRegistry : IndexRegistry;
 	repositories : Repository;
-	globalTimestamp : LONGINT;
+	globalTimestamp : SIGNED32;
 
 	StrNoName,
 	StrRepository, StrComponent, StrApplication, StrDictionary : Strings.String;
@@ -1326,18 +1326,18 @@ BEGIN
 	RETURN NIL;
 END FindChild;
 
-PROCEDURE IncrementTimestamp*(VAR timestamp : LONGINT);
+PROCEDURE IncrementTimestamp*(VAR timestamp : SIGNED32);
 BEGIN {EXCLUSIVE}
 	INC(timestamp);
 	INC(globalTimestamp);
 END IncrementTimestamp;
 
-PROCEDURE GetTimestamp*() : LONGINT;
+PROCEDURE GetTimestamp*() : SIGNED32;
 BEGIN
 	RETURN globalTimestamp;
 END GetTimestamp;
 
-PROCEDURE AwaitChange*(VAR curTimestamp : LONGINT);
+PROCEDURE AwaitChange*(VAR curTimestamp : SIGNED32);
 BEGIN {EXCLUSIVE}
 	AWAIT(curTimestamp # globalTimestamp);
 	curTimestamp := globalTimestamp;

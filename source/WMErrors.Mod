@@ -38,7 +38,7 @@ BEGIN
 END ShowMessage;
 
 PROCEDURE Test*(context : Commands.Context);
-VAR errorCode : LONGINT;
+VAR errorCode : SIGNED32;
 BEGIN
 	IF context.arg.GetInteger(errorCode, FALSE) THEN
 		Show(errorCode);

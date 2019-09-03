@@ -84,19 +84,19 @@ VAR
 		vyGraphBase.FrameRect( x, y, w, h );  dx := x1 - x0;  dy := y1 - y0;  vyGraphBase.SetDisplayMode( oldm )
 	END GrowRectangleRL;
 
-	PROCEDURE Min( a, b: LONGINT ): LONGINT;
+	PROCEDURE Min( a, b: SIGNED32 ): SIGNED32;
 	BEGIN
 		IF a < b THEN RETURN a ELSE RETURN b END
 	END Min;
 
-	PROCEDURE Max( a, b: LONGINT ): LONGINT;
+	PROCEDURE Max( a, b: SIGNED32 ): SIGNED32;
 	BEGIN
 		IF a > b THEN RETURN a ELSE RETURN b END
 	END Max;
 
 	PROCEDURE ShiftCoordinate( c: tCoordinate;  event: vyEvents.EventMsg );
 	VAR x0, y0, dx, dy: SIGNED16;  zoom: vyDisplay2d.CoordZoomMessage;  vX, vY, vW, vH: SIGNED16;  pW, pH, pX, pY: SIGNED16;
-		xp0, yp0, xp1, yp1, wp, hp: LONGINT;  sizey, sizex: LONGINT;  msg: Display.DisplayMsg;
+		xp0, yp0, xp1, yp1, wp, hp: SIGNED32;  sizey, sizex: SIGNED32;  msg: Display.DisplayMsg;
 	BEGIN
 		(* antsToolbox.StartDisplayHelp("hold LM to shift, LM+MM: zoom out, LM+RM: zoom in");*)
 		x0 := event.x;  y0 := event.y;
@@ -295,7 +295,7 @@ END keepsel;
 	END GetXY;
 
 	PROCEDURE ZoomIn( c: tCoordinate;  x, y, w, h: SIGNED16 );
-	VAR lastzoom: tZoom;  newx, newy, newdx, newdy: LONGREAL;  a, b: SIGNED16;  time: LONGINT;
+	VAR lastzoom: tZoom;  newx, newy, newdx, newdy: LONGREAL;  a, b: SIGNED16;  time: SIGNED32;
 	VAR fact: LONGREAL;
 	BEGIN
 		lastzoom := c.zoom;

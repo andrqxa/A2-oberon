@@ -213,7 +213,7 @@ VAR
 	END capsarg;
 (* jb 20.8.01 *)
 	PROCEDURE NextDot( VAR str: ARRAY OF CHAR;  VAR i: SIGNED16;  VAR part: ARRAY OF CHAR ): BOOLEAN;
-	VAR c: CHAR;  partlen: LONGINT;  j: LONGINT;
+	VAR c: CHAR;  partlen: SIGNED32;  j: SIGNED32;
 	BEGIN
 		partlen := LEN( part );
 		IF i >= LEN( str ) THEN COPY( "", part );  RETURN FALSE END;
@@ -516,7 +516,7 @@ END Show;
 	END Random;
 
 	PROCEDURE NewSampleMd*;
-	VAR tempobj: vyBase.Object;  i: LONGINT;  msg: vyBase.UpdateMessage;
+	VAR tempobj: vyBase.Object;  i: SIGNED32;  msg: vyBase.UpdateMessage;
 	BEGIN
 		tempobj := gobjects( vyBase.Object );
 		IF gobjects IS vyBase.tVector THEN
@@ -534,7 +534,7 @@ END Show;
 	END NewSampleMd;
 
 	PROCEDURE NewSample*;
-	VAR tempobj: vyBase.Object;  i: LONGINT;
+	VAR tempobj: vyBase.Object;  i: SIGNED32;
 	BEGIN
 		tempobj := gobjects( vyBase.Object );
 		IF gobjects IS vyBase.tVector THEN

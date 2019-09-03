@@ -9,13 +9,13 @@ IMPORT
 
 	PROCEDURE Test*;
 	VAR
-		degree: LONGINT;
+		degree: SIGNED32;
 		closed: BOOLEAN;
 		curve: BSplineCurves.Curve;
-		i, N: LONGINT;
+		i, N: SIGNED32;
 		d, t: LONGREAL;
 		kx, ky, x, y: ARRAY [*] OF LONGREAL;
-		t1, t2, t3: LONGINT;
+		t1, t2, t3: SIGNED32;
 		timer: Kernel.MilliTimer;
 	BEGIN
 

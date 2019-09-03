@@ -92,7 +92,7 @@ TYPE
 
 VAR
 	r, u: Files.Rider;
-	Unit: LONGINT;
+	Unit: SIGNED32;
 	Depth, Width, Height: SIGNED16;
 	CurFont, PrevFont: SIGNED8;
 	M: POINTER TO ARRAY HPPageHeight OF Set;
@@ -120,20 +120,20 @@ END LookupFont;
 
 (* Set procedures *)
 
-PROCEDURE New(VAR s: Set;  len: LONGINT);
-VAR i, size: LONGINT;
+PROCEDURE New(VAR s: Set;  len: SIGNED32);
+VAR i, size: SIGNED32;
 BEGIN
 	size := (len + 31) DIV 32;	(* size in SET elements *)
 	NEW(s, size); (* size in bytes *)
 	i:= 0;  WHILE i < size DO s[i] := {};  INC(i) END
 END New;
 
-PROCEDURE Incl(s: Set;  e1: LONGINT);
+PROCEDURE Incl(s: Set;  e1: SIGNED32);
 BEGIN
 	INCL(s[e1 DIV 32], e1 MOD 32);
 END Incl;
 
-PROCEDURE In(s: Set;  e1: LONGINT): BOOLEAN;
+PROCEDURE In(s: Set;  e1: SIGNED32): BOOLEAN;
 BEGIN
 	RETURN e1 MOD 32 IN s[e1 DIV 32]
 END In;
@@ -161,7 +161,7 @@ END Reverse;
 (* Write procedures *)
 
 PROCEDURE WriteString(VAR s: ARRAY OF CHAR);
-VAR i: LONGINT;
+VAR i: SIGNED32;
 BEGIN
 	i:= 0;
 	WHILE s[i] # 0X DO
@@ -178,7 +178,7 @@ BEGIN
 END WriteString;
 
 PROCEDURE WriteInt(x: SIGNED16);
-VAR i, xx: LONGINT;  s: ARRAY 7 OF CHAR;
+VAR i, xx: SIGNED32;  s: ARRAY 7 OF CHAR;
 BEGIN
 	i := 0;  xx := ABS(x);
 	REPEAT
@@ -510,7 +510,7 @@ BEGIN
 END circle;
 
 PROCEDURE ellipse(x0, y0, a, b: SIGNED16);
-VAR a2, b2, ex, ey, q: LONGINT; x, y: SIGNED16;
+VAR a2, b2, ex, ey, q: SIGNED32; x, y: SIGNED16;
 BEGIN
 	IF (a <= 800) & (b <= 800) THEN (* longint range guard *)
 		a2 := LONG(a) * a; b2 := LONG(b) * b;
@@ -724,8 +724,8 @@ BEGIN
 END ReplPattern;
 
 PROCEDURE Picture*(print: Printer.Printer; P: Pictures.Picture; px, py, pw, ph, X, Y, W, H, mode: SIGNED16);
-CONST Shift = 100000;	(* max device distance: MAX(LONGINT) DIV Shift *)
-VAR scaleX, scaleY: LONGINT;  trailer, run: RunP;  x0, x, y, col: SIGNED16;  colored: BOOLEAN;
+CONST Shift = 100000;	(* max device distance: MAX(SIGNED32) DIV Shift *)
+VAR scaleX, scaleY: SIGNED32;  trailer, run: RunP;  x0, x, y, col: SIGNED16;  colored: BOOLEAN;
 
 	PROCEDURE RGBToPatNr(red, green, blue: SIGNED16; VAR pNr: SIGNED16);
 	(* pNr: 0..ColSubdiv-1  [white, light ...dark, black] *)
@@ -736,7 +736,7 @@ VAR scaleX, scaleY: LONGINT;  trailer, run: RunP;  x0, x, y, col: SIGNED16;  col
 		IF pNr >= ColSubDiv THEN pNr := ColSubDiv - 1 ELSIF pNr < 0 THEN pNr := 0 END
 	END RGBToPatNr;
 
-	PROCEDURE Scale(pixel, scale: LONGINT): SIGNED16;
+	PROCEDURE Scale(pixel, scale: SIGNED32): SIGNED16;
 	BEGIN
 		RETURN SHORT(pixel * scale DIV Shift)
 	END Scale;

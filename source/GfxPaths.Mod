@@ -92,7 +92,7 @@ MODULE GfxPaths; (** portable *)	(* eos  *)
 			llx, lly, urx, ury: REAL;	(* query rectangle *)
 			sx, sy: REAL;	(* previous coordinates *)
 			code: SET;	(* clip code of previous point *)
-			sum: LONGINT;	(* number of ray crossings for inside test *)
+			sum: SIGNED32;	(* number of ray crossings for inside test *)
 			hit, thorough: BOOLEAN;
 		END;
 
@@ -582,8 +582,8 @@ MODULE GfxPaths; (** portable *)	(* eos  *)
 	 * and closed splines.
 	 *)
 
-	PROCEDURE SolveClosed (n: LONGINT; VAR x, y, d: ARRAY OF REAL);
-		VAR hn, dn, d0, d1, t1, t2: REAL; a, b, c, u: ARRAY MaxSplinePoints OF REAL; i: LONGINT;
+	PROCEDURE SolveClosed (n: SIGNED32; VAR x, y, d: ARRAY OF REAL);
+		VAR hn, dn, d0, d1, t1, t2: REAL; a, b, c, u: ARRAY MaxSplinePoints OF REAL; i: SIGNED32;
 	BEGIN
 		hn := 1/(x[n - 1] - x[n - 2]); dn := 3 * (y[n - 1] - y[n - 2]) * hn * hn;
 		b[0] := 1/(x[1] - x[0]); a[0] := hn + 2*b[0]; c[0] := b[0];
@@ -633,8 +633,8 @@ MODULE GfxPaths; (** portable *)	(* eos  *)
 		d[n - 1] := d[0]
 	END SolveClosed;
 
-	PROCEDURE Solve (n: LONGINT; VAR x, y, d: ARRAY OF REAL);
-		VAR a, b, c: ARRAY MaxSplinePoints OF REAL; d0, d1, t: REAL; i: LONGINT;
+	PROCEDURE Solve (n: SIGNED32; VAR x, y, d: ARRAY OF REAL);
+		VAR a, b, c: ARRAY MaxSplinePoints OF REAL; d0, d1, t: REAL; i: SIGNED32;
 	BEGIN
 		b[0] := 1/(x[1] - x[0]); a[0] := 2*b[0]; c[0] := b[0];
 		d0 := 3 * (y[1] - y[0]) * b[0] * b[0]; d[0] := d0;
@@ -668,8 +668,8 @@ MODULE GfxPaths; (** portable *)	(* eos  *)
 	END Solve;
 
 	(** enumerate natural spline as sequence of path elements; current point must be in (data.x, data.y) **)
-	PROCEDURE EnumSpline* (VAR x, y: ARRAY OF REAL; n: LONGINT; closed: BOOLEAN; enum: Enumerator; VAR data: EnumData);
-		VAR s, xp, yp: ARRAY MaxSplinePoints OF REAL; i: LONGINT; dx, dy, ds, ds2, bx, by, t: REAL;
+	PROCEDURE EnumSpline* (VAR x, y: ARRAY OF REAL; n: SIGNED32; closed: BOOLEAN; enum: Enumerator; VAR data: EnumData);
+		VAR s, xp, yp: ARRAY MaxSplinePoints OF REAL; i: SIGNED32; dx, dy, ds, ds2, bx, by, t: REAL;
 	BEGIN
 		ASSERT((n >= 2) & (n <= MaxSplinePoints));
 		ASSERT(~closed OR (x[0] = x[n - 1]) & (y[0] = y[n - 1]));
@@ -1291,7 +1291,7 @@ MODULE GfxPaths; (** portable *)	(* eos  *)
 	END IntersectLines;
 
 	(** compute intersection(s) of line with circle; returns number of solutions in nsol **)
-	PROCEDURE IntersectLineCircle* (sx, sy, tx, ty, mx, my, r: REAL; VAR x1, y1, x2, y2: REAL; VAR nsol: LONGINT);
+	PROCEDURE IntersectLineCircle* (sx, sy, tx, ty, mx, my, r: REAL; VAR x1, y1, x2, y2: REAL; VAR nsol: SIGNED32);
 		VAR dx, dy, cx, cy, a2, b, c, d, t: REAL;
 	BEGIN
 		dx := tx - sx; dy := ty - sy;

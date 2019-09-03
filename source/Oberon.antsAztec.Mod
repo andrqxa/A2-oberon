@@ -93,7 +93,7 @@ TYPE
 	END OneSweep;
 
 	PROCEDURE Uniform( s: antsKernel.Kernel );
-	VAR x, y: LONGINT;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  O: antsArrayObjects.tObject;
+	VAR x, y: SIGNED32;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  O: antsArrayObjects.tObject;
 	BEGIN
 		model := s.par( tModel );  AO := s.A( antsArrayObjects.tINTEGERObject );  O:= AO; O := 0;
 

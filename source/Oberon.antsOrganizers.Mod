@@ -110,18 +110,18 @@ TYPE
 	END;
 
 CONST
-	outofboundsmodify = 3;  DontCare = MAX( LONGINT );
+	outofboundsmodify = 3;  DontCare = MAX( SIGNED32 );
 
 VAR
 	methods: Panels.Methods;  thispanel: Panels.Panel;  restrictive*: BOOLEAN;  fallbackfont: Fonts.Font;  globallist: contentList;
 	inupdate: Panels.Panel;
 
-	PROCEDURE Parse( s: ARRAY OF CHAR;  VAR l, t, r, b: LONGINT );
+	PROCEDURE Parse( s: ARRAY OF CHAR;  VAR l, t, r, b: SIGNED32 );
 	VAR p: ARRAY 64 OF CHAR;
 		i, j: SIGNED16;
 
-		PROCEDURE ReadNum( ): LONGINT;
-		VAR x: LONGINT;
+		PROCEDURE ReadNum( ): SIGNED32;
+		VAR x: SIGNED32;
 		BEGIN
 			WHILE (s[i] # 0X) & (s[i] <= " ") DO INC( i ) END;
 			IF s[i] = 0X THEN RETURN 0
@@ -136,12 +136,12 @@ VAR
 		i := 0;  l := ReadNum();  t := ReadNum();  r := ReadNum();  b := ReadNum()
 	END Parse;
 
-	PROCEDURE Round( x: LONGREAL ): LONGINT;
+	PROCEDURE Round( x: LONGREAL ): SIGNED32;
 	BEGIN
 		RETURN ENTIER( x + 0.5 )
 	END Round;
 
-	PROCEDURE fParse( pw, ph: SIGNED16;  w, h: SIGNED16;  s: ARRAY OF CHAR;  VAR l, t, r, b: LONGINT );
+	PROCEDURE fParse( pw, ph: SIGNED16;  w, h: SIGNED16;  s: ARRAY OF CHAR;  VAR l, t, r, b: SIGNED32 );
 	VAR p: ARRAY 64 OF CHAR;
 		i, j: SIGNED16;  xr, yr, x2r, y2r: LONGREAL;
 
@@ -175,7 +175,7 @@ VAR
 		IF b < 0 THEN b := 0 END;
 	END fParse;
 
-	PROCEDURE HasConstraints*( f: Display.Frame;  pw, ph: SIGNED16;  VAR l, t, r, b: LONGINT ): BOOLEAN;
+	PROCEDURE HasConstraints*( f: Display.Frame;  pw, ph: SIGNED16;  VAR l, t, r, b: SIGNED32 ): BOOLEAN;
 	VAR A: Objects.AttrMsg;
 	BEGIN
 		IF (f.W = 1) & (f.H = 1) THEN RETURN FALSE END;
@@ -186,8 +186,8 @@ VAR
 		RETURN FALSE;
 	END HasConstraints;
 
-	PROCEDURE SolveGadget*( PW, PH: SIGNED16;  f: Display.Frame;  l, t, r, b: LONGINT;  VAR X, Y, W, H: SIGNED16 );
-	VAR ll, tt, rr, bb: LONGINT;
+	PROCEDURE SolveGadget*( PW, PH: SIGNED16;  f: Display.Frame;  l, t, r, b: SIGNED32;  VAR X, Y, W, H: SIGNED16 );
+	VAR ll, tt, rr, bb: SIGNED32;
 	BEGIN
 		IF l = DontCare THEN ll := f.X
 		ELSIF l >= 0 THEN ll := l
@@ -220,7 +220,7 @@ VAR
 	END SolveGadget;
 
 	PROCEDURE Solve*( F: Panels.Panel;  dX, dY, W, H: SIGNED16;  pw, ph: SIGNED16;  mode: SIGNED16 );
-	VAR f: Display.Frame;  l, t, r, b: LONGINT;  M: Display.ModifyMsg;
+	VAR f: Display.Frame;  l, t, r, b: SIGNED32;  M: Display.ModifyMsg;
 	BEGIN
 		f := F.dsc;
 		WHILE f # NIL DO
@@ -237,7 +237,7 @@ VAR
 	END Solve;
 
 	PROCEDURE minSize( F: Display.Frame;  VAR w, h: SIGNED16 ): BOOLEAN;
-	VAR W, H: LONGINT;
+	VAR W, H: SIGNED32;
 	BEGIN
 		Attributes.GetInt( F, "minSizeX", W );  Attributes.GetInt( F, "minSizeY", H );  w := SHORT( W );  h := SHORT( H );
 		IF (w > 0) & (h > 0) THEN RETURN TRUE ELSE RETURN FALSE END;
@@ -262,7 +262,7 @@ VAR
 	END Max;
 
 	PROCEDURE Handler*( F: Objects.Object;  VAR M: Objects.ObjMsg );
-	VAR l, t, r, b: LONGINT;  oX, oY, oW, oH, mode: SIGNED16;  f: Objects.Object;  A: Display.ModifyMsg;  hadselection: BOOLEAN;
+	VAR l, t, r, b: SIGNED32;  oX, oY, oW, oH, mode: SIGNED16;  f: Objects.Object;  A: Display.ModifyMsg;  hadselection: BOOLEAN;
 		fontname: ARRAY 256 OF CHAR;
 		bool: BOOLEAN;  stdFont: Fonts.Font;
 	BEGIN
@@ -374,7 +374,7 @@ Display3.Line(R, Display.BG, Display.solid, x + 1, y + F.H - 12, x + 10, y + F.H
 END RestoreBackGround;*)
 
 	PROCEDURE InsertChild( F: Panels.Panel;  f: Display.Frame;  u, v: SIGNED16 );
-	VAR l, t, r, b: LONGINT;  x, y, w, h: SIGNED16;
+	VAR l, t, r, b: SIGNED32;  x, y, w, h: SIGNED16;
 	BEGIN
 		IF HasConstraints( f, F.W, F.H, l, t, r, b ) THEN
 			SolveGadget( F.W, F.H, f, l, t, r, b, x, y, w, h );
@@ -384,7 +384,7 @@ END RestoreBackGround;*)
 	END InsertChild;
 
 	PROCEDURE TrackMouse( F: Panels.Panel;  VAR M: Oberon.InputMsg );
-	VAR T: Display.Frame;  x, y, t, u, v: SIGNED16;  d: LONGINT;  Fdlink, Mdlink: Objects.Object;  flags: SET;
+	VAR T: Display.Frame;  x, y, t, u, v: SIGNED16;  d: SIGNED32;  Fdlink, Mdlink: Objects.Object;  flags: SET;
 	BEGIN
 		x := M.x + F.X;  y := M.y + F.Y;  t := y + F.H - 1;  T := Panels.ThisChild( F, x, y, M.X, M.Y );
 
@@ -533,7 +533,7 @@ END RestoreBackGround;*)
 
 	PROCEDURE MakeFontSize*( F: Objects.Object;  ratio: LONGREAL;  offset: SIGNED16 );
 	VAR Font, this: Objects.Name;  i, j, size, i1, j1, size1, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;
-		updmsg: Display.DisplayMsg;  diff: LONGINT;
+		updmsg: Display.DisplayMsg;  diff: SIGNED32;
 	BEGIN
 		IF (ratio = 1) & (offset = 0) THEN  (* reset to original font *)
 			Attributes.GetString( F, "OrigFont", Font );
@@ -583,7 +583,7 @@ END RestoreBackGround;*)
 
 	PROCEDURE MakeFontSizes*( F: Objects.Object );
 	VAR Font: ARRAY 256 OF CHAR;
-		w, h: LONGINT;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: LONGINT;  ratio: LONGREAL;
+		w, h: SIGNED32;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: SIGNED32;  ratio: LONGREAL;
 		list: contentList;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
@@ -610,7 +610,7 @@ END RestoreBackGround;*)
 
 	PROCEDURE ResetFontSizes*( F: Objects.Object );
 	VAR Font: ARRAY 256 OF CHAR;
-		w, h: LONGINT;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: LONGINT;  ratio: LONGREAL;
+		w, h: SIGNED32;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: SIGNED32;  ratio: LONGREAL;
 		list: contentList;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
@@ -629,7 +629,7 @@ END RestoreBackGround;*)
 
 	PROCEDURE IncFontSizes*( F: Objects.Object;  by: SIGNED16 );
 	VAR Font: ARRAY 256 OF CHAR;
-		i, j, size: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: LONGINT;
+		i, j, size: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: SIGNED32;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
 			(*
@@ -647,7 +647,7 @@ END RestoreBackGround;*)
 	END IncFontSizes;
 
 	PROCEDURE FontSizeDiff*( F: Objects.Object ): SIGNED16;
-	VAR diff: LONGINT;
+	VAR diff: SIGNED32;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
 			Attributes.GetInt( F, "FontDiff", diff );  RETURN -SHORT( diff );
@@ -686,7 +686,7 @@ END RestoreBackGround;*)
 	END ResizeTo;
 
 	PROCEDURE ToMinSize*;
-	VAR F: Display.Frame;  w, h: LONGINT;
+	VAR F: Display.Frame;  w, h: SIGNED32;
 	BEGIN
 		IF Oberon.Pointer.on THEN
 			F := Oberon.MarkedFrame();
@@ -700,7 +700,7 @@ END RestoreBackGround;*)
 	END ToMinSize;
 
 	PROCEDURE DoToMin( F: Objects.Object );
-	VAR w, h: LONGINT;
+	VAR w, h: SIGNED32;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
 			Attributes.GetInt( F, "minSizeX", w );  Attributes.GetInt( F, "minSizeY", h );
@@ -742,7 +742,7 @@ END RestoreBackGround;*)
 	END IncPanelTextSizes;
 
 	PROCEDURE ToggleVisibility*;
-	VAR o: Objects.Object;  w, h: LONGINT;  sc: Texts.Scanner;
+	VAR o: Objects.Object;  w, h: SIGNED32;  sc: Texts.Scanner;
 	BEGIN
 		Texts.OpenScanner( sc, Oberon.Par.text, Oberon.Par.pos );  Texts.Scan( sc );
 		IF (sc.class = Texts.String) OR (sc.class = Texts.Name) THEN
@@ -758,7 +758,7 @@ END RestoreBackGround;*)
 	END ToggleVisibility;
 
 	PROCEDURE ReplaceSuffix( VAR name: ARRAY OF CHAR;  suffix: ARRAY OF CHAR );   (* replace suffix by stdsuffix will be appended *)
-	VAR i, j, start, pos: LONGINT;
+	VAR i, j, start, pos: SIGNED32;
 		name2: ARRAY 256 OF CHAR;
 	BEGIN
 		i := 0;  start := 0;  pos := LEN( name ) - 1;

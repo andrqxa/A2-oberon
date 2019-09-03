@@ -11,12 +11,12 @@ MODULE Streams IN Oberon;	(** portable *)
 	TYPE
 		Stream* = POINTER TO StreamDesc;
 		StreamDesc* = RECORD
-			ReadBytes*, WriteBytes*: PROCEDURE (S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: LONGINT);
-			Available*: PROCEDURE (S: Stream): LONGINT; (** returns the number of bytes which may read without blocking *)
+			ReadBytes*, WriteBytes*: PROCEDURE (S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32);
+			Available*: PROCEDURE (S: Stream): SIGNED32; (** returns the number of bytes which may read without blocking *)
 			State*: PROCEDURE (S: Stream): SIGNED16; (** closed, error, in, out, inout *)
 			Flush*: PROCEDURE (S: Stream); (** flush all buffers of the stream *)
 			Close*: PROCEDURE (S: Stream); (** close the stream *)
-			res*: LONGINT; (** bytes requested but not read/written *)
+			res*: SIGNED32; (** bytes requested but not read/written *)
 			mode*: SIGNED16; (** binary, oberon, iso8859 *)
 			eos*, buffer*: BOOLEAN (** set, when either the end of the stream is reached or the stream is closed. *)
 		END;
@@ -55,7 +55,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		S.ReadBytes(S, x, 2)
 	END ReadInt;
 
-	PROCEDURE ReadLInt*(S: Stream; VAR x: LONGINT);
+	PROCEDURE ReadLInt*(S: Stream; VAR x: SIGNED32);
 	BEGIN
 		S.ReadBytes(S, x, 4)
 	END ReadLInt;
@@ -65,9 +65,9 @@ MODULE Streams IN Oberon;	(** portable *)
 		S.ReadBytes(S, x, 8)
 	END ReadLReal;
 
-	PROCEDURE ReadNum*(S: Stream; VAR x: LONGINT);
+	PROCEDURE ReadNum*(S: Stream; VAR x: SIGNED32);
 		VAR
-			s, n: LONGINT;
+			s, n: SIGNED32;
 			ch: CHAR;
 	BEGIN
 		s := 0; n := 0;
@@ -90,7 +90,7 @@ MODULE Streams IN Oberon;	(** portable *)
 
 	PROCEDURE ReadString*(S: Stream; VAR x: ARRAY OF CHAR);
 		VAR
-			i: LONGINT;
+			i: SIGNED32;
 			ch: CHAR;
 	BEGIN
 		i := 0;
@@ -109,7 +109,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		S.WriteBytes(S, x, 2)
 	END WriteInt;
 
-	PROCEDURE WriteLInt*(S: Stream; x: LONGINT);
+	PROCEDURE WriteLInt*(S: Stream; x: SIGNED32);
 	BEGIN
 		S.WriteBytes(S, x, 4)
 	END WriteLInt;
@@ -119,7 +119,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		S.WriteBytes(S, x, 8)
 	END WriteLReal;
 
-	PROCEDURE WriteNum*(S: Stream; x: LONGINT);
+	PROCEDURE WriteNum*(S: Stream; x: SIGNED32);
 	BEGIN
 		WHILE (x < - 64) OR (x > 63) DO
 			Write(S, CHR(x MOD 128 + 128)); x := x DIV 128
@@ -138,20 +138,20 @@ MODULE Streams IN Oberon;	(** portable *)
 	END WriteSet;
 
 	PROCEDURE WriteString*(S: Stream; x: ARRAY OF CHAR);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE x[i] # 0X DO INC(i) END;
 		S.WriteBytes(S, x, i+1)
 	END WriteString;
 
-	PROCEDURE NULLReadBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: LONGINT);
+	PROCEDURE NULLReadBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32);
 	END NULLReadBytes;
 
-	PROCEDURE NULLWriteBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: LONGINT);
+	PROCEDURE NULLWriteBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32);
 	END NULLWriteBytes;
 
-	PROCEDURE NULLAvailable(S: Stream): LONGINT;
+	PROCEDURE NULLAvailable(S: Stream): SIGNED32;
 	BEGIN
 		RETURN 0
 	END NULLAvailable;
@@ -167,8 +167,8 @@ MODULE Streams IN Oberon;	(** portable *)
 	PROCEDURE NULLClose(S: Stream);
 	END NULLClose;
 
-	PROCEDURE ReadFileBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: LONGINT);
-		VAR pos: LONGINT;
+	PROCEDURE ReadFileBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32);
+		VAR pos: SIGNED32;
 	BEGIN
 		WITH S: FileStream DO
 			pos := 0;
@@ -180,7 +180,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		END
 	END ReadFileBytes;
 
-	PROCEDURE WriteFileBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: LONGINT);
+	PROCEDURE WriteFileBytes(S: Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32);
 	BEGIN
 		WITH S: FileStream DO
 			Files.WriteBytes(S.R, x, n);
@@ -188,7 +188,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		END
 	END WriteFileBytes;
 
-	PROCEDURE FileAvailable(S: Stream): LONGINT;
+	PROCEDURE FileAvailable(S: Stream): SIGNED32;
 	BEGIN
 		WITH S: FileStream DO
 			RETURN Files.Length(Files.Base(S.R)) - Files.Pos(S.R)
@@ -219,7 +219,7 @@ MODULE Streams IN Oberon;	(** portable *)
 	END FileClose;
 
 (** Opens a stream reading on file F starting at postion pos. *)
-	PROCEDURE OpenFileReader*(F: Files.File; pos: LONGINT): Stream;
+	PROCEDURE OpenFileReader*(F: Files.File; pos: SIGNED32): Stream;
 		VAR S: FileStream;
 	BEGIN
 		NEW(S); S.mode := binary; S.state := out;
@@ -235,7 +235,7 @@ MODULE Streams IN Oberon;	(** portable *)
 	END OpenFileReader;
 
 (** Opens a stream writeing on file F starting at postion pos. *)
-	PROCEDURE OpenFileWriter*(F: Files.File; pos: LONGINT): Stream;
+	PROCEDURE OpenFileWriter*(F: Files.File; pos: SIGNED32): Stream;
 		VAR S: FileStream;
 	BEGIN
 		NEW(S); S.mode := binary; S.state := in; S.buffer := FALSE;
@@ -249,7 +249,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		RETURN S
 	END OpenFileWriter;
 
-	PROCEDURE FilePos*(S: FileStream): LONGINT;
+	PROCEDURE FilePos*(S: FileStream): SIGNED32;
 	BEGIN
 		RETURN Files.Pos(S.R)
 	END FilePos;
@@ -257,7 +257,7 @@ MODULE Streams IN Oberon;	(** portable *)
 	PROCEDURE Copy*(src, dest: Stream);
 		VAR
 			buf: ARRAY 128 OF CHAR;
-			len: LONGINT;
+			len: SIGNED32;
 	BEGIN
 		WHILE ~src.eos DO
 			len := src.Available(src);

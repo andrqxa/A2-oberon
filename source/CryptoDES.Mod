@@ -15,7 +15,7 @@ CONST
 TYPE
 	Sandbox = ARRAY 64 OF SET32;
 	BitSwap = ARRAY 16 OF SET32;
-	Ind4* = RECORD a-, b-, c-, d-: LONGINT END;
+	Ind4* = RECORD a-, b-, c-, d-: SIGNED32 END;
 
 VAR
 	sb1-, sb2-, sb3-, sb4-, sb5-, sb6-, sb7-, sb8-: Sandbox;
@@ -24,11 +24,11 @@ VAR
 TYPE
 	Cipher* = OBJECT (Ciphers.Cipher)
 	VAR
-		ske, skd: ARRAY 32 OF SET32;  ki: LONGINT;
+		ske, skd: ARRAY 32 OF SET32;  ki: SIGNED32;
 		ivx, ivy: SET32;
 
-		PROCEDURE InitKey*( CONST src: ARRAY OF CHAR;  keybits: LONGINT );
-		VAR X, Y: SET32;  i: LONGINT;
+		PROCEDURE InitKey*( CONST src: ARRAY OF CHAR;  keybits: SIGNED32 );
+		VAR X, Y: SET32;  i: SIGNED32;
 		BEGIN
 			ASSERT( keybits = 64 );
 			InitKey^( src, keybits );
@@ -127,10 +127,10 @@ TYPE
 	(* temporarily disabled the inlining -- the compiler inliner still provides problems with the scope symbols *)
 	PROCEDURE Split*( x: SET32; VAR i4: Ind4 );
 	BEGIN
-		i4.a := S.VAL( LONGINT, x ) MOD 40H;
-		i4.b := S.VAL( LONGINT, x ) DIV 100H MOD 40H;
-		i4.c := S.VAL( LONGINT, x ) DIV 10000H MOD 40H;
-		i4.d := S.VAL( LONGINT, x ) DIV 1000000H MOD 40H
+		i4.a := S.VAL( SIGNED32, x ) MOD 40H;
+		i4.b := S.VAL( SIGNED32, x ) DIV 100H MOD 40H;
+		i4.c := S.VAL( SIGNED32, x ) DIV 10000H MOD 40H;
+		i4.d := S.VAL( SIGNED32, x ) DIV 1000000H MOD 40H
 	END Split;
 
 
@@ -168,17 +168,17 @@ TYPE
 
 
 
-	PROCEDURE ComputeSubkeys*( x, y: SET32;  VAR sk: ARRAY OF SET32; ofs: LONGINT );
-	VAR t: SET32; i: LONGINT;
+	PROCEDURE ComputeSubkeys*( x, y: SET32;  VAR sk: ARRAY OF SET32; ofs: SIGNED32 );
+	VAR t: SET32; i: SIGNED32;
 
-		PROCEDURE sms( CONST LRHs: BitSwap;  x: SET32; rs, ls: LONGINT ): SET32;
-		VAR i: LONGINT;
+		PROCEDURE sms( CONST LRHs: BitSwap;  x: SET32; rs, ls: SIGNED32 ): SET32;
+		VAR i: SIGNED32;
 		BEGIN
-			i := S.VAL( LONGINT, LSH( x, -rs ) ) MOD 16;
+			i := S.VAL( SIGNED32, LSH( x, -rs ) ) MOD 16;
 			RETURN LSH( LRHs[i], ls )
 		END sms;
 
-		PROCEDURE sm( b: SET32; shift, mask: LONGINT ): SET32;
+		PROCEDURE sm( b: SET32; shift, mask: SIGNED32 ): SET32;
 		BEGIN
 			RETURN LSH( b, shift ) * S.VAL( SET32,  mask )
 		END sm;

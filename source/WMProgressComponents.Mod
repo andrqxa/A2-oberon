@@ -133,7 +133,7 @@ TYPE
 		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
 		VAR
 			rect: WMRectangles.Rectangle;
-			width: LONGINT;
+			width: SIGNED32;
 			string : ARRAY 32 OF CHAR;
 			min, max, cur: HUGEINT; percent : WORD; color: WMGraphics.Color;
 			isVertical : BOOLEAN;

@@ -502,7 +502,7 @@ PROCEDURE Shade*(VAR ray: Ray);
 VAR
 	x,y,z: SREAL;
 	ax, ay, az, bx, by, bz : SREAL;
-	i: LONGINT;
+	i: SIGNED32;
 	nx,ny,nz: SREAL;
 BEGIN
 	ax := ray.lxyz.x; ay := ray.lxyz.y; az := ray.lxyz.z;

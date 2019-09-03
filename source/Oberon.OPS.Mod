@@ -17,11 +17,11 @@ MODULE OPS IN Oberon;	(** non-portable *)
 
 		GetProc* = PROCEDURE (VAR sym: SIGNED8);
 
-		Token = POINTER TO RECORD	pos: LONGINT; sym: SIGNED8; next: Token	END;
-		IntToken = POINTER TO RECORD (Token)	intval: LONGINT; typ: SIGNED16	END;
+		Token = POINTER TO RECORD	pos: SIGNED32; sym: SIGNED8; next: Token	END;
+		IntToken = POINTER TO RECORD (Token)	intval: SIGNED32; typ: SIGNED16	END;
 		RealToken = POINTER TO RECORD (Token)	realval: REAL	END;
 		LRealToken = POINTER TO RECORD (Token)	lrlval: LONGREAL	END;
-		StrToken = POINTER TO RECORD (Token)	str: String; len: LONGINT	END;
+		StrToken = POINTER TO RECORD (Token)	str: String; len: SIGNED32	END;
 		NameToken = POINTER TO RECORD (Token)	name: Name	END;
 
 		TokenStream* = Token;
@@ -32,7 +32,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		name*: Name;
 		str*: String;
 		numtyp*: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
-		intval*: LONGINT;	(* integer value or string length *)
+		intval*: SIGNED32;	(* integer value or string length *)
 		realval*: REAL;
 		lrlval*: LONGREAL;
 		Get*: GetProc;
@@ -235,7 +235,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 					END
 				ELSE (* decimal *) numtyp := integer;
 					WHILE i < n DO d := Ord(dig[i], FALSE); INC(i);
-						IF intval <= (MAX(LONGINT) - d) DIV 10 THEN intval := intval*10 + d
+						IF intval <= (MAX(SIGNED32) - d) DIV 10 THEN intval := intval*10 + d
 						ELSE err(203)
 						END
 					END

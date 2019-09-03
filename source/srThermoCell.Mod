@@ -30,7 +30,7 @@ BEGIN
 	END
 END bang;
 PROCEDURE tick*;
-VAR i: LONGINT;
+VAR i: SIGNED32;
 BEGIN
 	NEW(space);
 	FOR i:=0 TO N-1 DO
@@ -70,7 +70,7 @@ TYPE spectrum=OBJECT(srBase.Voxel);
 VAR
 	space: srM3Space.cell;
 	v: srVoxel.DiffuseVox;
-	frame: LONGINT;
+	frame: SIGNED32;
 
 PROCEDURE & init*;
 BEGIN

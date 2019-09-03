@@ -30,9 +30,9 @@ TYPE Packet=RECORD
 	Stratum*: SIGNED8;
 	Poll*:SIGNED8;
 	Precision*:SIGNED8;
-	RootDelay*:LONGINT;
-	RootDispersion*:LONGINT;
-	ReferenceIdentifier*:LONGINT;
+	RootDelay*:SIGNED32;
+	RootDispersion*:SIGNED32;
+	ReferenceIdentifier*:SIGNED32;
 	ReferenceTimestamp*:HUGEINT;
 	OriginTimestamp*:HUGEINT;
 	ReceiveTimestamp*:HUGEINT;
@@ -43,13 +43,13 @@ END;
 
 
 (** get a single time record from an NTP time server. *)
-PROCEDURE Get*(fip:IP.Adr; fport:LONGINT; VAR p:Packet; VAR res:WORD);
-VAR socket: UDP.Socket; len, high, low:LONGINT;
+PROCEDURE Get*(fip:IP.Adr; fport:SIGNED32; VAR p:Packet; VAR res:WORD);
+VAR socket: UDP.Socket; len, high, low:SIGNED32;
 	buf: ARRAY 1024 OF CHAR;
 	sw:Streams.StringWriter;
 	sr: Streams.StringReader;
 	packet:Packet;
-	fip1:IP.Adr; fport1:LONGINT;
+	fip1:IP.Adr; fport1:SIGNED32;
 BEGIN
 	NEW(socket, UDP.NilPort, res);
 	IF res=UDP.Ok THEN (* send a NTP client record *)
@@ -61,10 +61,10 @@ BEGIN
 		sw.Net32(packet.RootDelay);
 		sw.Net32(packet.RootDispersion);
 		sw.Net32(packet.ReferenceIdentifier);
-		sw.Net32(LONGINT(packet.ReferenceTimestamp DIV 100000000H)); sw.Net32(LONGINT(packet.ReferenceTimestamp MOD 100000000H));
-		sw.Net32(LONGINT(packet.OriginTimestamp DIV 100000000H));           sw.Net32(LONGINT(packet.OriginTimestamp MOD 100000000H));
-		sw.Net32(LONGINT(packet.ReceiveTimestamp DIV 100000000H));        sw.Net32(LONGINT(packet.ReceiveTimestamp MOD 100000000H));
-		sw.Net32(LONGINT(packet.TransmitTimestamp DIV 100000000H));    sw.Net32(LONGINT(packet.TransmitTimestamp MOD 100000000H));
+		sw.Net32(SIGNED32(packet.ReferenceTimestamp DIV 100000000H)); sw.Net32(SIGNED32(packet.ReferenceTimestamp MOD 100000000H));
+		sw.Net32(SIGNED32(packet.OriginTimestamp DIV 100000000H));           sw.Net32(SIGNED32(packet.OriginTimestamp MOD 100000000H));
+		sw.Net32(SIGNED32(packet.ReceiveTimestamp DIV 100000000H));        sw.Net32(SIGNED32(packet.ReceiveTimestamp MOD 100000000H));
+		sw.Net32(SIGNED32(packet.TransmitTimestamp DIV 100000000H));    sw.Net32(SIGNED32(packet.TransmitTimestamp MOD 100000000H));
 		sw.Update;
 		sw.GetRaw(buf, len);
 		socket.Send( fip, fport, buf, 0, 48, res );
@@ -90,7 +90,7 @@ BEGIN
 END Get;
 
 (* timeZone and daylightSaving is difference to UTC in minutes*)
-PROCEDURE SetSystemTime*(time: HUGEINT; timeZone, daylightSaving:LONGINT);
+PROCEDURE SetSystemTime*(time: HUGEINT; timeZone, daylightSaving:SIGNED32);
 VAR st: Kernel32.SystemTime;retBOOL: Kernel32.BOOL;
 	dt: Dates.DateTime; frac: HUGEINT;
 BEGIN {EXCLUSIVE}
@@ -99,9 +99,9 @@ BEGIN {EXCLUSIVE}
 	time:=time DIV 100000000H MOD 100000000H;
 	dt:=Dates.ZeroDateNTP;
 
-	Dates.AddSeconds(dt, LONGINT(time MOD (LONGINT(60)*60*24)));
+	Dates.AddSeconds(dt, SIGNED32(time MOD (SIGNED32(60)*60*24)));
 	Dates.AddMinutes(dt, timeZone+daylightSaving);
-	Dates.AddDays(dt, LONGINT(time DIV (LONGINT(60)*60*24)));
+	Dates.AddDays(dt, SIGNED32(time DIV (SIGNED32(60)*60*24)));
 
 	st.wDay := SHORT(dt.day);
 	st.wMonth := SHORT(dt.month);
@@ -119,7 +119,7 @@ END SynchronizeNTP;
 
 (* to be done: SNTP synchronization algo from RFC 4330; parametrization of timeZone and daylightSaving*)
 PROCEDURE SynchronizeSNTP*(context:Commands.Context);
-VAR fip: IP.Adr; port, res:LONGINT; packet:Packet;
+VAR fip: IP.Adr; port, res:SIGNED32; packet:Packet;
 (* SNTP algorithm:
  The roundtrip delay d and system clock offset t are defined as:
       d = (T4 - T1) - (T3 - T2)     t = ((T2 - T1) + (T3 - T4)) / 2.
@@ -144,7 +144,7 @@ END SynchronizeSNTP;
 
 
 PROCEDURE GetSimpleTime*(context:Commands.Context);
-VAR ipstr: ARRAY 64 OF CHAR; port, res, i:LONGINT;machineTimer1,machineTimer2: HUGEINT; fip: IP.Adr; packet:Packet;
+VAR ipstr: ARRAY 64 OF CHAR; port, res, i:SIGNED32;machineTimer1,machineTimer2: HUGEINT; fip: IP.Adr; packet:Packet;
 BEGIN
 
 	IF ~context.arg.GetString(ipstr) THEN	Configuration.Get("NTP.Server0",ipstr,res); END;

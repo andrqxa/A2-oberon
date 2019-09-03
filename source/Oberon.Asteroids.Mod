@@ -189,7 +189,7 @@ TYPE
 		ship: Ship;
 		started,changed,paused: BOOLEAN;
 		ships,ufos,frames: SIGNED16;
-		score,high0,high: LONGINT;
+		score,high0,high: SIGNED32;
 		line0,line: ARRAY 80 OF CHAR;
 		objects: SpaceObj;
 	END;
@@ -574,7 +574,7 @@ END FileDetonation;
 
 PROCEDURE FileMass(VAR R: Files.Rider; id: SIGNED16; obj: Mass; root: SpaceObj);
 VAR
-	i,j: LONGINT;
+	i,j: SIGNED32;
 BEGIN
 	FileSpaceObj(R,id,obj,root);
 	IF (id = Objects.store) THEN
@@ -584,7 +584,7 @@ BEGIN
 		Files.WriteReal(R,obj.rotvel); Files.WriteInt(R,obj.n0);
 		Files.WriteInt(R,obj.u); Files.WriteInt(R,obj.v);
 		Files.WriteInt(R,obj.w); Files.WriteInt(R,obj.h);
-		j:= LEN(obj.px0^)(LONGINT); Files.WriteLInt(R,j);
+		j:= LEN(obj.px0^)(SIGNED32); Files.WriteLInt(R,j);
 		FOR i:= 0 TO j-1 DO
 			Files.WriteInt(R,obj.px0[i]); Files.WriteInt(R,obj.py0[i]);
 			Files.WriteInt(R,obj.px1[i]); Files.WriteInt(R,obj.py1[i]);
@@ -1161,7 +1161,7 @@ END Step2;
 PROCEDURE TimerHandler(me: Oberon.Task);
 	(* tick task handler *)
 VAR
-	time: LONGINT;
+	time: SIGNED32;
 	model: Field;
 	amt: SIGNED16;
 	r1: REAL;
@@ -1557,7 +1557,7 @@ PROCEDURE OldDocument(F: Files.File; D: Document; VAR f: Gadgets.Frame);
 VAR
 	obj: Objects.Object;
 	tag: SIGNED16;
-	len: LONGINT;
+	len: SIGNED32;
 	id: CHAR;
 	str: Objects.Name;
 	lib: Objects.Library;
@@ -1629,7 +1629,7 @@ VAR
 	R: Files.Rider;
 	B: Objects.BindMsg;
 	str: Objects.Name;
-	len: LONGINT;
+	len: SIGNED32;
 BEGIN
 	IF (D.name # "") & (D.dsc # NIL) THEN
 		Out.String("Store ");

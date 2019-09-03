@@ -36,7 +36,7 @@ TYPE
 
 	LineDesc* = RECORD
 		next*, prev*: Line;		(** ring from top to bottom, with sentinel	*)
-		key*: LONGINT;		(** key of represented item *)
+		key*: SIGNED32;		(** key of represented item *)
 		dx*, w*, h*, dsr*: SIGNED16;		(** true text metrics *)
 		n*, lev*: SIGNED16;		(** N: line number / lev: ident level *)
 		sel*: BOOLEAN;		(** line is selected or not *)
@@ -55,7 +55,7 @@ TYPE
 	FrameDesc* = RECORD (Gadgets.FrameDesc)
 		R*: ListRiders.Rider;
 		state0*: SET;
-		time*: LONGINT;
+		time*: SIGNED32;
 		left*, right*, top*, bottom*: SIGNED16;
 		hoff, levs, tab*: SIGNED16;
 		textC*, pointC*, backC*: SIGNED16;
@@ -76,13 +76,13 @@ TYPE
 
 VAR
 	methods*: Method;
-	WaitTime, mayscroll: LONGINT;
+	WaitTime, mayscroll: SIGNED32;
 	W: Texts.Writer;
 	pointText: Texts.Text;
     saved: Oberon.CaretMsg;
 
 (* ------------ aux. procs ------------ *)
-PROCEDURE P (x: LONGINT): SIGNED16;
+PROCEDURE P (x: SIGNED32): SIGNED16;
 BEGIN RETURN SHORT(x * Display.Unit DIV Printer.Unit)
 END P;
 
@@ -197,7 +197,7 @@ BEGIN
 END SetHRange;
 
 PROCEDURE FormatLevel (F: Frame; R: ListRiders.Rider; level: SIGNED16; L: Line);
-VAR last: Line; stamp: LONGINT; n: SIGNED16;
+VAR last: Line; stamp: SIGNED32; n: SIGNED16;
 BEGIN
 	stamp := ListRiders.Stamp(); n := L.n; last := L.next;
 	WHILE ~R.eol & (R.do.GetStamp(R) # stamp) DO
@@ -215,7 +215,7 @@ BEGIN
 END FormatLevel;
 
 PROCEDURE UpdateLevel (F: Frame; R: ListRiders.Rider; VAR L: Line; level: SIGNED16);
-VAR fL: Line; stamp, key: LONGINT;
+VAR fL: Line; stamp, key: SIGNED32;
 BEGIN
 	R.do.Set(R, 0); stamp := ListRiders.Stamp();
 	WHILE ~R.eol & (R.do.GetStamp(R) # stamp) DO
@@ -338,10 +338,10 @@ BEGIN
 END WritePath;
 
 PROCEDURE GetSelection (F: Frame; VAR T: Texts.Text);
-VAR L: Line; cnt: LONGINT; R: ListRiders.Rider; str: ARRAY 64 OF CHAR; incl: BOOLEAN;
+VAR L: Line; cnt: SIGNED32; R: ListRiders.Rider; str: ARRAY 64 OF CHAR; incl: BOOLEAN;
 
 	PROCEDURE Space (s: ARRAY OF CHAR): BOOLEAN;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		i := 0; WHILE (s[i] # 0X) & (s[i] # " ") & (s[i] # 9X) DO INC(i) END;
 		RETURN s[i] # 0X;
@@ -570,7 +570,7 @@ BEGIN
 	END
 END ToggleLine;
 
-PROCEDURE InsertItems (F: Frame; T: Texts.Text; beg, end: LONGINT; L: Line);
+PROCEDURE InsertItems (F: Frame; T: Texts.Text; beg, end: SIGNED32; L: Line);
 VAR R: ListRiders.Rider; d: ListRiders.String; S: Texts.Scanner; update: BOOLEAN;
 BEGIN
 	R := F.do.GetRider(F, FALSE);
@@ -826,7 +826,7 @@ BEGIN
 END TrackSelection;
 
 PROCEDURE TrackPoint (F: Frame; x, y: SIGNED16; VAR M: Oberon.InputMsg);
-VAR Q: Display3.Mask; R: ListRiders.Rider; oldorg: LONGINT; keysum: SET;
+VAR Q: Display3.Mask; R: ListRiders.Rider; oldorg: SIGNED32; keysum: SET;
 		left, top, w, ox, oy, ow, dy, cnt: SIGNED16; update: BOOLEAN; loc: Loc;
 BEGIN
 	update := FALSE; oldorg := F.first.n;
@@ -904,7 +904,7 @@ BEGIN
 END TrackWheel;
 
 PROCEDURE TrackCaret (F: Frame; x, y: SIGNED16; VAR M: Oberon.InputMsg);
-VAR Q: Display3.Mask; T: Texts.Text; keysum: SET; oldorg, time, beg, end: LONGINT; oy, dy, cnt: SIGNED16; loc: Loc;
+VAR Q: Display3.Mask; T: Texts.Text; keysum: SET; oldorg, time, beg, end: SIGNED32; oy, dy, cnt: SIGNED16; loc: Loc;
 BEGIN
 	LocateLine(F, y, M.Y, loc, cnt);
 	IF Oberon.New & F.car & (F.carloc.line.n = loc.line.n) THEN
@@ -1059,7 +1059,7 @@ BEGIN
 END Consume;
 
 PROCEDURE UpdateModel (F: Frame);
-VAR oldlevs, key: LONGINT; L: Line; R: ListRiders.Rider;
+VAR oldlevs, key: SIGNED32; L: Line; R: ListRiders.Rider;
 BEGIN
 	R := F.do.GetRider(F, TRUE);	(* get a new rider *)
 	IF R # NIL THEN
@@ -1081,7 +1081,7 @@ BEGIN
 END UpdateModel;
 
 PROCEDURE UpdateFrame (F: Frame; M: Gadgets.UpdateMsg);
-VAR val, n: LONGINT; dy: SIGNED16; D: Display.DisplayMsg;
+VAR val, n: SIGNED32; dy: SIGNED16; D: Display.DisplayMsg;
 BEGIN
 	IF F.obj # NIL THEN F.obj.handle(F.obj, M) END;
 	IF F.vPos # NIL THEN F.vPos.handle(F.vPos, M) END;
@@ -1153,7 +1153,7 @@ BEGIN
 				END
 			END
 		ELSIF M.name = "PointKey" THEN
-			M.class := Objects.Int; M.i := MIN(LONGINT); M.res := 0;
+			M.class := Objects.Int; M.i := MIN(SIGNED32); M.res := 0;
 			IF F.point # NIL THEN M.i := F.point.key END
 		ELSIF M.name = "Sel" THEN
 			M.class := Objects.String; M.s := ""; M.res := 0;
@@ -1166,7 +1166,7 @@ BEGIN
 				END
 			END
 		ELSIF M.name = "SelKey" THEN
-			M.class := Objects.Int; M.i := MIN(LONGINT); M.res := 0;
+			M.class := Objects.Int; M.i := MIN(SIGNED32); M.res := 0;
 			IF F.sel THEN
 				l := F.first;
 				WHILE (l # F.lines) & ~l.sel DO l := l.next END;
@@ -1289,7 +1289,7 @@ BEGIN
 	to.textC := from.textC; to.pointC := from.pointC; to.backC := from.backC;
 	to.left := from.left; to.top := from.top; to.right := from.right; to.bottom := from.bottom;
 	to.R := NIL;
-	NEW(nL); nL.key := MIN(LONGINT); nL.n := -1; nL.lev := 0; nL.hasSub := FALSE;
+	NEW(nL); nL.key := MIN(SIGNED32); nL.n := -1; nL.lev := 0; nL.hasSub := FALSE;
 	to.lines := nL;
 	L := from.lines.next;
 	WHILE L # from.lines DO
@@ -1333,7 +1333,7 @@ BEGIN
 END StoreFrame;
 
 PROCEDURE LoadFrame (F: Frame; VAR M: Objects.FileMsg);
-VAR L: Line; ver: LONGINT; n: SIGNED16; fntname: ARRAY 32 OF CHAR;
+VAR L: Line; ver: SIGNED32; n: SIGNED16; fntname: ARRAY 32 OF CHAR;
 BEGIN
 	Gadgets.framehandle(F, M);
 	Files.ReadNum(M.R, ver);
@@ -1472,7 +1472,7 @@ VAR L: Line;
 BEGIN
 	F.W := 100; F.H := 100; F.handle := FrameHandler; F.do := methods;
 	NEW(L); L.next := L; L.prev := L;
-	L.hasSub := FALSE; L.lev := 0; L.n := -1; L.key := MIN(LONGINT);
+	L.hasSub := FALSE; L.lev := 0; L.n := -1; L.key := MIN(SIGNED32);
 	F.lines := L; F.first := L;
 	F.state0 := {multisel, exponpoint}; F.R := NIL; F.car := FALSE; F.sel := FALSE;
 	F.left := 4; F.top := 4; F.right := 2; F.bottom := 2;

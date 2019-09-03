@@ -1090,7 +1090,7 @@ END Poly;
 
 (** Draw an ellipse. Implementation restriction: cannot fill an ellipse or draw an ellipse with line width > 1 *)
 PROCEDURE Ellipse*(M: Mask; col: Display.Color; pat: Display.Pattern; X, Y, a, b, width: SIGNED16; style: SET; mode: SIGNED16);
-VAR x1, y1: SIGNED16;  d, dx, dy, x2, y2, a1, a2, a8, b1, b2, b8: LONGINT;
+VAR x1, y1: SIGNED16;  d, dx, dy, x2, y2, a1, a2, a8, b1, b2, b8: SIGNED32;
 
 	PROCEDURE Dot4(x1, x2, y1, y2: SIGNED16);
 	BEGIN

@@ -35,7 +35,7 @@ MODULE SSHClient; 	(** AUTHOR "G.F.";  PURPOSE "Secure Shell"; *)
 
 		Char = RECORD
 			attr: Attribute;
-			char: LONGINT
+			char: SIGNED32
 		END;
 
 		Data = POINTER TO ARRAY OF Char;
@@ -360,7 +360,7 @@ MODULE SSHClient; 	(** AUTHOR "G.F.";  PURPOSE "Secure Shell"; *)
 				END
 			END EraseLine;
 
-			PROCEDURE Erase( mode: CHAR;  CONST par: ARRAY OF LONGINT;  n: SIZE );
+			PROCEDURE Erase( mode: CHAR;  CONST par: ARRAY OF SIGNED32;  n: SIZE );
 			BEGIN {EXCLUSIVE}
 				CASE mode OF
 				|"J":
@@ -422,7 +422,7 @@ Out.String("Dim"); Out.Ln()
 				END
 			END Dim;
 
-			PROCEDURE SetAttributes( CONST attrs: ARRAY OF LONGINT; n: SIZE );
+			PROCEDURE SetAttributes( CONST attrs: ARRAY OF SIGNED32; n: SIZE );
 			VAR c: WMG.Color; i: SIZE;
 			BEGIN {EXCLUSIVE}
 				NewAttr();
@@ -535,7 +535,7 @@ Out.String("attr "); Out.Int(attrs[i], 0); Out.Ln()
 
 			PROCEDURE ESCSequence(ch: CHAR);
 			VAR
-				par: ARRAY 4 OF LONGINT; i, n: SIZE;
+				par: ARRAY 4 OF SIGNED32; i, n: SIZE;
 			BEGIN
 				r.Char( ch );
 				IF ch = "[" THEN
@@ -698,7 +698,7 @@ Out.Ln;
 
 			PROCEDURE Copy;
 			VAR
-				l: Line; apos, pos, ofs, end: SIZE; buf: ARRAY 2 OF LONGINT;
+				l: Line; apos, pos, ofs, end: SIZE; buf: ARRAY 2 OF SIGNED32;
 				attr: Attribute; tattr: Texts.Attributes;
 			BEGIN {EXCLUSIVE}
 				IF sel.beg.line = NIL THEN RETURN END;
@@ -746,7 +746,7 @@ Out.Ln;
 			END Copy;
 
 			PROCEDURE Paste;
-			VAR R: Texts.TextReader; ch: LONGINT;
+			VAR R: Texts.TextReader; ch: SIGNED32;
 			BEGIN {EXCLUSIVE}
 				Texts.clipboard.AcquireRead();
 				NEW( R, Texts.clipboard );
@@ -1008,12 +1008,12 @@ Out.Ln;
 				NEW( panel );
 					panel.bounds.SetWidth( 2*Border + TerminalWidth*BoxW );
 					panel.bounds.SetHeight( 2*Border + TerminalHeight*BoxH + 20 );
-					panel.fillColor.Set( LONGINT( 0FFFFFFFFH ) );
+					panel.fillColor.Set( SIGNED32( 0FFFFFFFFH ) );
 
 				NEW( toolbar );
 					toolbar.bounds.SetHeight( 20 );
 					toolbar.alignment.Set( WMComponents.AlignTop );
-					toolbar.fillColor.Set( LONGINT( 0CCCCCCFFH ) );
+					toolbar.fillColor.Set( SIGNED32( 0CCCCCCFFH ) );
 
 				NEW( label );
 					label.bounds.SetWidth( 40 );
@@ -1027,7 +1027,7 @@ Out.Ln;
 					address.alignment.Set( WMComponents.AlignLeft );
 					address.tv.textAlignV.Set(WMG.AlignCenter);
 					address.multiLine.Set( FALSE );
-					address.fillColor.Set( LONGINT( 0FFFFFFFFH ) );
+					address.fillColor.Set( SIGNED32( 0FFFFFFFFH ) );
 					address.tv.showBorder.Set( TRUE );
 					address.tv.borders.Set( WMRectangles.MakeRect( 3,3,1,1 ) );
 					address.onEnter.Add( ConnectHandler );
@@ -1046,7 +1046,7 @@ Out.Ln;
 					user.alignment.Set( WMComponents.AlignLeft );
 					user.tv.textAlignV.Set(WMG.AlignCenter);
 					user.multiLine.Set( FALSE );
-					user.fillColor.Set( LONGINT( 0FFFFFFFFH ) );
+					user.fillColor.Set( SIGNED32( 0FFFFFFFFH ) );
 					user.tv.showBorder.Set( TRUE );
 					user.tv.borders.Set( WMRectangles.MakeRect( 3,3,1,1 ) );
 					user.onEnter.Add( ConnectHandler );

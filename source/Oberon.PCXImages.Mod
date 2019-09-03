@@ -16,7 +16,7 @@ TYPE
 		bits: CHAR;	(* Bits/Pixel - 1, 2, 4 or 8 *)
 		xMin, yMin, xMax, yMax,	(* Logical image coordinates *)
 		hRes, vRes: SIGNED16;	(* Resolution of the origin device in dpi *)
-		palPos, picPos: LONGINT;	(* File position of palette and picture data *)
+		palPos, picPos: SIGNED32;	(* File position of palette and picture data *)
 		vMode, planes: CHAR;	(* not used *)
 		bytesPerLine,	(* Bytes per Scan Line *)
 		paletteInfo: SIGNED16	(* Color info: 0 = ?, 1 = Color, 2 = Grayscale *)
@@ -82,7 +82,7 @@ VAR
 	line: ARRAY 4 OF POINTER TO ARRAY OF CHAR;
 	x, y, z, w, h, rep, pcount: SIGNED16;
 	k, p: SIGNED8;
-	c: CHAR; fmt: Images.Format; pix, thispix: Images.Pixel; col: SIGNED16; colors: LONGINT;
+	c: CHAR; fmt: Images.Format; pix, thispix: Images.Pixel; col: SIGNED16; colors: SIGNED32;
 BEGIN
 	IF ReadPCXHeader(R,pcxh) THEN
 		w := pcxh.xMax-pcxh.xMin; h := pcxh.yMax-pcxh.yMin;
@@ -181,7 +181,7 @@ PROCEDURE StorePCX(VAR R: Files.Rider; img: Images.Image);
 VAR
 	x, y, h, depth, inc, col, runcount, plane, maxplane: SIGNED16;
 	fmt: Images.Format;
-	count: LONGINT;
+	count: SIGNED32;
 	lastCh: CHAR;
 	row: ARRAY 3 OF POINTER TO ARRAY OF CHAR; thisred, thisgreen, thisblue, thisalpha: SIGNED16; thispix: Images.Pixel;
 

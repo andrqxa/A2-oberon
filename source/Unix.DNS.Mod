@@ -18,8 +18,8 @@ TYPE
 	Hostent = POINTER {UNSAFE, UNTRACED} TO RECORD
 			name		: POINTER {UNSAFE, UNTRACED} TO Name;
 			aliases	: ADDRESS;
-			addrtype	: LONGINT;
-			length		: LONGINT;
+			addrtype	: SIGNED32;
+			length		: SIGNED32;
 			addrlist	: ADDRESS
 		END;
 
@@ -29,12 +29,12 @@ VAR
 
 	nlib: ADDRESS;
 
-	gethostbyaddr	: PROCEDURE {C} ( adr: ADDRESS; len, typ: LONGINT ): Hostent;
+	gethostbyaddr	: PROCEDURE {C} ( adr: ADDRESS; len, typ: SIGNED32 ): Hostent;
 	gethostbyname	: PROCEDURE {C} ( name: ADDRESS ): Hostent;
-	gethostname		: PROCEDURE {C} ( name: ADDRESS; len: SIZE ): LONGINT;
+	gethostname		: PROCEDURE {C} ( name: ADDRESS; len: SIZE ): SIGNED32;
 
 	(* Statistic variables *)
-	NDNSReceived-, NDNSSent-, NDNSMismatchID-, NDNSError-: LONGINT;
+	NDNSReceived-, NDNSSent-, NDNSMismatchID-, NDNSError-: SIGNED32;
 
 	(** Find the host responsible for mail exchange of the specified domain. *)
 	PROCEDURE MailHostByDomain*( CONST domain: ARRAY OF CHAR;  VAR hostname: ARRAY OF CHAR;  VAR res: WORD );
@@ -90,7 +90,7 @@ VAR
 
 	(* none portable, Unix ports only! *)
 	PROCEDURE GetHostName*( VAR name: ARRAY OF CHAR;  VAR res: WORD );
-	VAR x: LONGINT;
+	VAR x: SIGNED32;
 	BEGIN
 		x := gethostname( ADDRESSOF( name ), LEN( name ) );
 		IF x >= 0 THEN  res := Ok  ELSE  res := NotFound  END

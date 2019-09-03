@@ -9,7 +9,7 @@ TYPE
 	CATAgent = OBJECT (TCPServices.Agent)
 		VAR in: Streams.Reader; out: Streams.Writer;
 			token : ARRAY 16 OF CHAR;
-			x : LONGINT;
+			x : SIGNED32;
 	BEGIN {ACTIVE}
 		(* open streams *)
 		Streams.OpenReader(in, client.Receive);

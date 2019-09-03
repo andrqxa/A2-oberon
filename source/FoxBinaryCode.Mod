@@ -619,9 +619,9 @@ TYPE
 
 	END Section;
 
-	PROCEDURE ConvertReal* (value: REAL): LONGINT;
+	PROCEDURE ConvertReal* (value: REAL): SIGNED32;
 	CONST Exponent = 8; Significant = 23;
-	VAR result: LONGINT; VAR exponent, i: WORD;
+	VAR result: SIGNED32; VAR exponent, i: WORD;
 	BEGIN
 		(*! NaN code missing, we need an extra - machine specific - functionality for that  / cf. Streams.NaNCode *)
 		IF value = 0 THEN RETURN 0 END;
@@ -655,10 +655,10 @@ TYPE
 		RETURN result;
 	END ConvertLongreal;
 
-	PROCEDURE ConvertToReal*(x: LONGINT): REAL;
-	VAR result: REAL; e,i: LONGINT;
+	PROCEDURE ConvertToReal*(x: SIGNED32): REAL;
+	VAR result: REAL; e,i: SIGNED32;
 
-		PROCEDURE Bit(bit: LONGINT): BOOLEAN;
+		PROCEDURE Bit(bit: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN ODD(ASH(x,-bit))
 		END Bit;
@@ -684,9 +684,9 @@ TYPE
 	END ConvertToReal;
 
 	PROCEDURE ConvertToLongreal*(x: HUGEINT): LONGREAL;
-	VAR result: LONGREAL; e,i: LONGINT;
+	VAR result: LONGREAL; e,i: SIGNED32;
 
-		PROCEDURE Bit(bit: LONGINT): BOOLEAN;
+		PROCEDURE Bit(bit: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN ODD(ASH(x,-bit))
 		END Bit;

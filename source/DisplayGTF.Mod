@@ -25,17 +25,17 @@ TYPE
 	END;
 
 	GTFHCRTC = RECORD
-		hTotal: LONGINT;	(* Horizontal total *)
-		hDisp: LONGINT;	(* Horizontal displayed *)
-		hSyncStart: LONGINT;	(* Horizontal sync start *)
-		hSyncEnd: LONGINT;	(* Horizontal sync end *)
+		hTotal: SIGNED32;	(* Horizontal total *)
+		hDisp: SIGNED32;	(* Horizontal displayed *)
+		hSyncStart: SIGNED32;	(* Horizontal sync start *)
+		hSyncEnd: SIGNED32;	(* Horizontal sync end *)
 	END;
 
 	GTFVCRTC = RECORD
-		vTotal: LONGINT;	(* Vertical total *)
-		vDisp: LONGINT;	(* Vertical displayed *)
-		vSyncStart: LONGINT;	(* Vertical sync start *)
-		vSyncEnd: LONGINT;	(* Vertical sync end *)
+		vTotal: SIGNED32;	(* Vertical total *)
+		vDisp: SIGNED32;	(* Vertical displayed *)
+		vSyncStart: SIGNED32;	(* Vertical sync start *)
+		vSyncEnd: SIGNED32;	(* Vertical sync end *)
 	END;
 
 	GTFTimings = RECORD
@@ -51,7 +51,7 @@ VAR
 	conf*: ARRAY 512 OF CHAR;
 	hex: ARRAY 17 OF CHAR;
 
-PROCEDURE pow(x: LONGREAL; n: LONGINT): LONGREAL;
+PROCEDURE pow(x: LONGREAL; n: SIGNED32): LONGREAL;
 VAR s: LONGREAL;
 BEGIN
 	s := 1;
@@ -94,7 +94,7 @@ wantInterlace - TRUE if interlaced timings to be generated
 t - Place to store the resulting timings
 *)
 
-PROCEDURE GTFCalcTimings(hPixels, vLines, freq: LONGREAL; type: LONGINT; wantMargins, wantInterlace: BOOLEAN; VAR t: GTFTimings);
+PROCEDURE GTFCalcTimings(hPixels, vLines, freq: LONGREAL; type: SIGNED32; wantMargins, wantInterlace: BOOLEAN; VAR t: GTFTimings);
 VAR
 	interlace,vFieldRate,hPeriod: LONGREAL;
 	topMarginLines,botMarginLines: LONGREAL;
@@ -262,10 +262,10 @@ BEGIN
 	t.vSyncPol := '+'
 END GTFCalcTimings;
 
-PROCEDURE VesaConf(mode, width, height, depth, hz: LONGINT; VAR conf: ARRAY OF CHAR);
-VAR mode1: LONGINT; flags: SET; t: GTFTimings; valstr : ARRAY 10 OF CHAR; cr : ARRAY 2 OF CHAR;
+PROCEDURE VesaConf(mode, width, height, depth, hz: SIGNED32; VAR conf: ARRAY OF CHAR);
+VAR mode1: SIGNED32; flags: SET; t: GTFTimings; valstr : ARRAY 10 OF CHAR; cr : ARRAY 2 OF CHAR;
 
-	PROCEDURE HexByte(x: LONGINT);
+	PROCEDURE HexByte(x: SIGNED32);
 	VAR s: ARRAY 3 OF CHAR;
 	BEGIN
 		s[0] := hex[x DIV 10H];
@@ -274,12 +274,12 @@ VAR mode1: LONGINT; flags: SET; t: GTFTimings; valstr : ARRAY 10 OF CHAR; cr : A
 		Strings.Append(conf, s);
 	END HexByte;
 
-	PROCEDURE HexWord(x: LONGINT);
+	PROCEDURE HexWord(x: SIGNED32);
 	BEGIN
 		HexByte(x MOD 100H); HexByte(x DIV 100H)
 	END HexWord;
 
-	PROCEDURE HexDWord(x: LONGINT);
+	PROCEDURE HexDWord(x: SIGNED32);
 	BEGIN
 		HexWord(x MOD 10000H); HexWord(x DIV 10000H)
 	END HexDWord;
@@ -303,7 +303,7 @@ BEGIN
 		IF t.interlace = "I" THEN INCL(flags, 1) END;
 		IF t.hSyncPol = "-" THEN INCL(flags, 2) END;
 		IF t.vSyncPol = "-" THEN INCL(flags, 3) END;
-		Strings.Append(conf, "26c6450c"); HexByte(SYSTEM.VAL(LONGINT, flags));	(* mov [es:di+0CH], val *)
+		Strings.Append(conf, "26c6450c"); HexByte(SYSTEM.VAL(SIGNED32, flags));	(* mov [es:di+0CH], val *)
 		Strings.Append(conf, "2666894d0d26c74511"); HexWord(hz*100);	(* mov [es:di+0DH], ecx; mov [es:di+11H], val *)
 		Strings.Append(conf, cr);
 
@@ -341,7 +341,7 @@ BEGIN
 		HexWord(t.v.vTotal);
 		HexWord(t.v.vSyncStart);
 		HexWord(t.v.vSyncEnd);
-		HexByte(SYSTEM.VAL(LONGINT, flags));
+		HexByte(SYSTEM.VAL(SIGNED32, flags));
 	ELSE	(* VESA 2.0 *)
 		HexWord(hz*100);
 		HexWord(mode1);
@@ -355,7 +355,7 @@ END VesaConf;
 	the VBE mode m to operate at a default 60Hz refresh rate. *)
 PROCEDURE Mode*(context : Commands.Context);	(* mode (in decimal) DWidth DHeight Frequency *)
 VAR display: ARRAY 512 OF CHAR;
-	m, w, h, d, f: LONGINT;
+	m, w, h, d, f: SIGNED32;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.Int(m, FALSE); context.out.Int(m, 5);
 	context.arg.SkipWhitespace; context.arg.Int(w, FALSE); context.out.Int(w, 5);

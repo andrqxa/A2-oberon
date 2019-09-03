@@ -115,7 +115,7 @@ TYPE
 	END CopyMatrixArray;
 
 	PROCEDURE Fill( a: MatrixArray;  with: LONGREAL );
-	VAR y, x: LONGINT;
+	VAR y, x: SIGNED32;
 	BEGIN
 		FOR y := 0 TO LEN( a ) - 1 DO
 			FOR x := 0 TO LEN( a[0] ) - 1 DO a[y, x] := with END
@@ -133,7 +133,7 @@ TYPE
 	END ChangeDim;
 
 	PROCEDURE Symmetry*( n: Matrix );
-	VAR y, x: LONGINT;
+	VAR y, x: SIGNED32;
 	BEGIN
 		FOR y := 0 TO n.dimy - 1 DO
 			FOR x := 0 TO n.dimx - 1 DO n.par[x, y] := n.par[y, x] END
@@ -141,7 +141,7 @@ TYPE
 	END Symmetry;
 
 	PROCEDURE MinMax*( n: Matrix;  VAR min, max: LONGREAL );
-	VAR y, x: LONGINT;
+	VAR y, x: SIGNED32;
 	BEGIN
 		min := MAX( LONGREAL );  max := MIN( LONGREAL );
 		FOR y := 0 TO n.dimy - 1 DO
@@ -153,7 +153,7 @@ TYPE
 	END MinMax;
 
 	PROCEDURE Standardize*( n: Matrix );
-	VAR y, x: LONGINT;  min, max: LONGREAL;
+	VAR y, x: SIGNED32;  min, max: LONGREAL;
 	BEGIN
 		MinMax( n, min, max );
 		IF min = max THEN Fill( n.par, 0 ) ELSE
@@ -164,7 +164,7 @@ TYPE
 	END Standardize;
 
 	PROCEDURE L0*( n: Matrix );
-	VAR y, x: LONGINT;
+	VAR y, x: SIGNED32;
 	BEGIN
 		FOR y := 0 TO n.dimy - 1 DO
 			FOR x := 0 TO n.dimx - 1 DO
@@ -174,7 +174,7 @@ TYPE
 	END L0;
 
 	PROCEDURE L1*( n: Matrix );
-	VAR y, x: LONGINT;
+	VAR y, x: SIGNED32;
 	BEGIN
 		FOR y := 0 TO n.dimy - 1 DO
 			FOR x := 0 TO n.dimx - 1 DO n.par[y, x] := ABS( y - x ) END
@@ -183,7 +183,7 @@ TYPE
 	END L1;
 
 	PROCEDURE L2*( n: Matrix );
-	VAR y, x: LONGINT;
+	VAR y, x: SIGNED32;
 	BEGIN
 		FOR y := 0 TO n.dimy - 1 DO
 			FOR x := 0 TO n.dimx - 1 DO n.par[y, x] := (y - x) * (y - x) END
@@ -199,7 +199,7 @@ TYPE
 	END New;
 
 	PROCEDURE DoWrite*( n: Matrix );
-	VAR y, x: LONGINT;
+	VAR y, x: SIGNED32;
 	BEGIN
 		aM.SISI( "dimy = ", n.dimy, "dimx= ", n.dimx );
 		FOR y := 0 TO n.dimy - 1 DO

@@ -33,7 +33,7 @@ TYPE
 
 		PROCEDURE New0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR
-			key: LONGINT;
+			key: SIGNED32;
 			f: File;
 		BEGIN
 			IF Trace THEN KernelLog.String("FileSystem.New - Name: "); KernelLog.String(name); KernelLog.Ln(); END;
@@ -59,7 +59,7 @@ TYPE
 		PROCEDURE Old0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR
 			f: File;
-			key: LONGINT;
+			key: SIGNED32;
 		BEGIN
 			IF Trace THEN KernelLog.String("FileSystem.Old - Name: "); KernelLog.String(name); KernelLog.Ln(); END;
 
@@ -80,10 +80,10 @@ TYPE
 
 		(** Delete a file. res = 0 indicates success.  End users use Files.Delete instead. *)
 
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: LONGINT; VAR res: WORD);
+		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: WORD);
 		VAR
 			check : BOOLEAN;
-			closekey : LONGINT;
+			closekey : SIGNED32;
 			nameTrimmed: Files.FileName;
 		BEGIN
 			IF Trace THEN
@@ -126,7 +126,7 @@ TYPE
 		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: WORD);
 		VAR
 			check : BOOLEAN;
-			closekey : LONGINT;
+			closekey : SIGNED32;
 			old1, new1: Files.FileName;
 		BEGIN
 			IF Trace THEN
@@ -176,11 +176,11 @@ TYPE
 			byteCount, dataOff, paraOff, eos: SIGNED16;
 			fileFlags : SET;
 			curPos: Files.Position;
-			attr, nextEntryOff, progress: LONGINT; maskLen: SIZE;
-			t: ARRAY 2 OF LONGINT;
+			attr, nextEntryOff, progress: SIGNED32; maskLen: SIZE;
+			t: ARRAY 2 OF SIGNED32;
 			ch: ARRAY 2 OF CHAR;
 			dt: Dates.DateTime;
-			date, time, size: LONGINT;
+			date, time, size: SIGNED32;
 			maskModified, dirMask, filename: Files.FileName;
 		BEGIN
 			endOfSearch := FALSE;
@@ -318,8 +318,8 @@ TYPE
 
 		(** Return the unique non-zero key of the named file, if it exists. *)
 
-		PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): LONGINT;
-		VAR key: LONGINT;
+		PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
+		VAR key: SIGNED32;
 		BEGIN
 			lock.Acquire();
 			key := OpenAndX(c, name, 40H, FALSE);
@@ -362,7 +362,7 @@ TYPE
 		(** Remove a directory. If force=TRUE, any subdirectories and files should be automatically deleted.
 			End users use Files.RemoveDirectory instead. *)
 
-		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key: LONGINT; VAR res: WORD);
+		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: WORD);
 		VAR check: BOOLEAN;
 		BEGIN
 			IF Trace THEN
@@ -476,7 +476,7 @@ TYPE
 			 	c.out.Net8(0);				(* reserved *)
 			 	c.out.RawInt(0);				(* andx offset *)
 			 	c.out.RawInt(SHORT(key));	(* fid *)
-			 	c.out.RawLInt(r.apos(LONGINT));	(* offset *)
+			 	c.out.RawLInt(r.apos(SIGNED32));	(* offset *)
 			 	c.out.RawInt(adjLen);		(* max count low *)
 			 	c.out.RawInt(adjLen);		(* min count *)
 			 	c.out.Net32(0);				(* max count 64k *)
@@ -581,7 +581,7 @@ TYPE
 			 	c.out.Net8(0);				(* reserved *)
 			 	c.out.RawInt(0);				(* andx offset *)
 			 	c.out.RawInt(SHORT(key));	(* fid *)
-			 	c.out.RawLInt(r.apos(LONGINT));	(* offset *)
+			 	c.out.RawLInt(r.apos(SIGNED32));	(* offset *)
 			 	c.out.RawLInt(0);			(* reserved *)
 			 	c.out.RawInt(0);				(* write mode *)
 			 	c.out.RawInt(0);				(* remaining *)
@@ -625,7 +625,7 @@ TYPE
 
 		PROCEDURE Length*(): Files.Size;
 		VAR
-			filesize: LONGINT;
+			filesize: SIGNED32;
 			check: BOOLEAN;
 		BEGIN
 			fs(FileSystem).lock.Acquire();
@@ -667,12 +667,12 @@ TYPE
 
 		(** Return the time (t) and date (d) when a file was last modified. *)
 
-		PROCEDURE GetDate*(VAR t, d: LONGINT);
+		PROCEDURE GetDate*(VAR t, d: SIGNED32);
 		BEGIN HALT(301) END GetDate;	(* abstract *)
 
 		(** Set the modification time (t) and date (d) of a file. *)
 
-		PROCEDURE SetDate*(t, d: LONGINT);
+		PROCEDURE SetDate*(t, d: SIGNED32);
 		BEGIN HALT(301) END SetDate;	(* abstract *)
 
 		(** Return the canonical name of a file. *)
@@ -704,7 +704,7 @@ TYPE
 	VAR
 		connection: TCP.Connection;
 
-		PROCEDURE Connect(CONST host: ARRAY OF CHAR; port: LONGINT; VAR c: Connection);
+		PROCEDURE Connect(CONST host: ARRAY OF CHAR; port: SIGNED32; VAR c: Connection);
 		VAR
 			fadr: IP.Adr;
 			res: WORD;
@@ -844,7 +844,7 @@ END CheckFFSMB;
 
 PROCEDURE ReplaceSlash(VAR name: ARRAY OF CHAR);
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 BEGIN
 	i := 0;
 	WHILE (i < Strings.Length(name)) DO
@@ -858,7 +858,7 @@ END ReplaceSlash;
 PROCEDURE NegotiateProtocol(c: Connection): BOOLEAN;
 VAR
 	check : BOOLEAN;
-	variable: LONGINT;
+	variable: SIGNED32;
 BEGIN
 	IF Trace THEN KernelLog.String("Negotiate Protocol"); KernelLog.Ln(); END;
 
@@ -1097,7 +1097,7 @@ BEGIN
 	RETURN fid;
 END OpenAndX;
 
-PROCEDURE CloseFile(c: Connection; key: LONGINT);
+PROCEDURE CloseFile(c: Connection; key: SIGNED32);
 VAR
 	check: BOOLEAN;
 BEGIN
@@ -1174,11 +1174,11 @@ BEGIN
 	END;
 END StartClient;
 
-PROCEDURE GetDateTime(t: ARRAY OF LONGINT; VAR datetime: Dates.DateTime);
+PROCEDURE GetDateTime(t: ARRAY OF SIGNED32; VAR datetime: Dates.DateTime);
 VAR
-	second, minute, hour, day, month, year, totalDays, NofDaysMnth: LONGINT;
+	second, minute, hour, day, month, year, totalDays, NofDaysMnth: SIGNED32;
 	tsh: HUGEINT;
-	ts: LONGINT;
+	ts: SIGNED32;
 	continue: BOOLEAN;
 BEGIN
 	tsh := t[1] * 100000000H + t[0];

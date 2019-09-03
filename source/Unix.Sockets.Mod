@@ -23,15 +23,15 @@ TYPE
 	END;
 
 	SocketAdrV4* = POINTER TO RECORD (SocketAdr)
-		v4Adr*		: LONGINT;
+		v4Adr*		: SIGNED32;
 		zero*		: ARRAY 8 OF CHAR
 	END;
 
 	SocketAdrV6* = POINTER TO RECORD (SocketAdr)
-		flowinfo*	: LONGINT;
+		flowinfo*	: SIGNED32;
 		v6Adr*		: ARRAY 16 OF CHAR;
-		scopeId*	: LONGINT;
-		srcId*		: LONGINT
+		scopeId*	: SIGNED32;
+		srcId*		: SIGNED32
 	END;
 
 	NameBuf = POINTER TO RECORD
@@ -42,12 +42,12 @@ TYPE
 	Length = WORD;
 
 	Linger = RECORD (SocketOption)
-		onoff	: LONGINT;
-		linger	: LONGINT;
+		onoff	: SIGNED32;
+		linger	: SIGNED32;
 	END;
 
 	Switch = RECORD (SocketOption)
-		onoff	: LONGINT
+		onoff	: SIGNED32
 	END;
 
 VAR
@@ -71,7 +71,7 @@ VAR
 	ntohl	: PROCEDURE {C} ( netlong	: UNSIGNED32 ): UNSIGNED32;
 	ntohs	: PROCEDURE {C} ( netshort	: UNSIGNED16 ): UNSIGNED16;
 
-	PROCEDURE NewSocketAdr*( ip: IP.Adr; port: LONGINT ): SocketAdr;
+	PROCEDURE NewSocketAdr*( ip: IP.Adr; port: SIGNED32 ): SocketAdr;
 	VAR sadr4: SocketAdrV4;  sadr6: SocketAdrV6; i: SIZE;
 	BEGIN
 		CASE ip.usedProtocol OF
@@ -118,8 +118,8 @@ VAR
 		RETURN ip
 	END SockAdrToIPAdr;
 
-	PROCEDURE GetPortNumber*( sadr: SocketAdr ): LONGINT;
-	VAR port: LONGINT;
+	PROCEDURE GetPortNumber*( sadr: SocketAdr ): SIGNED32;
+	VAR port: SIGNED32;
 	BEGIN
 		port := NetToInt( sadr.port );
 		IF port < 0 THEN port := port + 10000H END;
@@ -280,7 +280,7 @@ VAR
 		RETURN s
 	END Socket;
 
-	PROCEDURE Available*( s: WORD ): LONGINT;
+	PROCEDURE Available*( s: WORD ): SIGNED32;
 	VAR available, err: WORD;
 	BEGIN
 		available := 0;
@@ -309,7 +309,7 @@ VAR
 		RETURN res > 0
 	END Requested;
 
-	PROCEDURE AwaitPacket*( s: WORD; ms: LONGINT ): BOOLEAN;
+	PROCEDURE AwaitPacket*( s: WORD; ms: SIGNED32 ): BOOLEAN;
 	CONST
 		SLen = Unix.FdSetLen;
 		SetBits = SIZEOF( SET32 ) * 8;
@@ -372,14 +372,14 @@ VAR
 		RETURN SIGNED16(htons(x))
 	END IntToNet;
 
-	PROCEDURE NetToLInt* (x: LONGINT): LONGINT;
+	PROCEDURE NetToLInt* (x: SIGNED32): SIGNED32;
 	BEGIN
-		RETURN LONGINT(ntohl(x))
+		RETURN SIGNED32(ntohl(x))
 	END NetToLInt;
 
-	PROCEDURE LIntToNet* (x: LONGINT): LONGINT;
+	PROCEDURE LIntToNet* (x: SIGNED32): SIGNED32;
 	BEGIN
-		RETURN LONGINT(htonl(x))
+		RETURN SIGNED32(htonl(x))
 	END LIntToNet;
 
 	PROCEDURE Init;

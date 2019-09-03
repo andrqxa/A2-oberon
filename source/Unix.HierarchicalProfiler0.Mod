@@ -15,7 +15,7 @@ TYPE
 
 	ProcessTimeArray = POINTER TO ARRAY ProcessInfo.MaxNofProcesses OF HUGEINT;
 
-	Callback = PROCEDURE (id : LONGINT; process : Objects.Process; pc, bp, lowAdr, highAdr : ADDRESS);
+	Callback = PROCEDURE (id : SIGNED32; process : Objects.Process; pc, bp, lowAdr, highAdr : ADDRESS);
 
 	Poller = OBJECT
 	VAR
@@ -156,7 +156,7 @@ BEGIN
 					bp := context.BP;
 					sp := context.SP;
 					ASSERT(context.BP <= stackBottom);
-					callback(1, process, context.PC, context.BP, context.SP,  stackBottom(*  LONGINT(0FFFFFFFFH)*)  );
+					callback(1, process, context.PC, context.BP, context.SP,  stackBottom(*  SIGNED32(0FFFFFFFFH)*)  );
 				END;
 			END;
 			res := Kernel32.ResumeThread(handle);

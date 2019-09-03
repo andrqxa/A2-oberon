@@ -58,7 +58,7 @@ TYPE
 	END;
 
 VAR
-	NPOS, NCLUSTER, NSET, NBIT: LONGINT;
+	NPOS, NCLUSTER, NSET, NBIT: SIGNED32;
 	BUFFER:  ARRAY BUFSIZE OF CHAR;
 
 PROCEDURE exp2* (z: SIGNED16): SIGNED16;   VAR
@@ -73,9 +73,9 @@ END bit;
 
 
 
-PROCEDURE NewBitmap* (W, H, Depth, ColorDepth: LONGINT): tBitmap;
+PROCEDURE NewBitmap* (W, H, Depth, ColorDepth: SIGNED32): tBitmap;
 VAR
-	NumOfClusters, NumOfBytes, i, j: LONGINT;  Bitmap: tBitmap;
+	NumOfClusters, NumOfBytes, i, j: SIGNED32;  Bitmap: tBitmap;
 BEGIN
 	NEW(Bitmap);
 	Bitmap.W := SHORT(W);  Bitmap.H := SHORT(H);
@@ -105,7 +105,7 @@ BEGIN
 	RETURN Bitmap;
 END NewBitmap;
 
-PROCEDURE GetPosition (bmp: tBitmap;  x, y: LONGINT;  VAR pos, cluster, set, bit: LONGINT);
+PROCEDURE GetPosition (bmp: tBitmap;  x, y: SIGNED32;  VAR pos, cluster, set, bit: SIGNED32);
 BEGIN
 	pos := x * bmp.Depth + bmp.W * y * bmp.Depth;
 	cluster := pos DIV (MAX(SET) + 1) DIV (ClusterSize) ;
@@ -114,7 +114,7 @@ BEGIN
 END GetPosition;
 
 
-PROCEDURE SetNextPixel* (Bitmap: tBitmap; val: LONGINT);
+PROCEDURE SetNextPixel* (Bitmap: tBitmap; val: SIGNED32);
 	VAR i: SIGNED16;
 BEGIN
 	i := Bitmap.Depth - 1;
@@ -129,7 +129,7 @@ BEGIN
 	END;
 END SetNextPixel;
 
-PROCEDURE SetAPixel* (Bitmap: tBitmap;  X, Y: LONGINT; val: LONGINT);
+PROCEDURE SetAPixel* (Bitmap: tBitmap;  X, Y: SIGNED32; val: SIGNED32);
 	VAR i: SIGNED16;
 BEGIN
 	(*
@@ -151,9 +151,9 @@ BEGIN
 	END;
 END SetAPixel;
 
-PROCEDURE SetARect* (Bitmap: tBitmap;  RectX, RectY, W, H: LONGINT; val: LONGINT);
+PROCEDURE SetARect* (Bitmap: tBitmap;  RectX, RectY, W, H: SIGNED32; val: SIGNED32);
 	(*! Optimize. Should we have global Bresenham ? *)
-	VAR i: SIGNED16;  X, Y: LONGINT;
+	VAR i: SIGNED16;  X, Y: SIGNED32;
 BEGIN
 	ASSERT((W > 0) & (H > 0), 110);
 	X := RectX; Y := RectY;  WHILE ((Y <= RectY + H) & (X <= RectX + W)) DO
@@ -172,9 +172,9 @@ BEGIN
 	END;  (* WHILE  ((Y<=RectY+H) & (X<=RectX+W)) *)
 END SetARect;
 
-PROCEDURE SetALine* (Bitmap: tBitmap;  FromX, FromY, ToX, ToY: LONGINT; val: LONGINT);
+PROCEDURE SetALine* (Bitmap: tBitmap;  FromX, FromY, ToX, ToY: SIGNED32; val: SIGNED32);
 	(*! Optimize. Should we have global Bresenham ? *)
-	VAR  x, y: LONGINT;  d, dx, dy, dx2, dy2, inx, iny: LONGINT;
+	VAR  x, y: SIGNED32;  d, dx, dy, dx2, dy2, inx, iny: SIGNED32;
 BEGIN
 	ASSERT((FromX # ToX) OR (FromY # ToY), 110);
 	dx := ToX - FromX;  dy := ToY - FromY;  x := FromX;  y := FromY;
@@ -201,8 +201,8 @@ BEGIN
 	END;
 END SetALine;
 (*
-PROCEDURE GetNextPixel (Bitmap: tBitmap): LONGINT;
-VAR val: LONGINT; i: SIGNED16;
+PROCEDURE GetNextPixel (Bitmap: tBitmap): SIGNED32;
+VAR val: SIGNED32; i: SIGNED16;
 BEGIN
 i := Bitmap.Depth-1; val := 0;
 WHILE(i>=0) DO
@@ -216,8 +216,8 @@ END;
 RETURN val;
 END GetNextPixel;
 *)
-PROCEDURE GetAPixel* (Bitmap: tBitmap;  X, Y: LONGINT): LONGINT;
-	VAR val: LONGINT;  i: SIGNED16;
+PROCEDURE GetAPixel* (Bitmap: tBitmap;  X, Y: SIGNED32): SIGNED32;
+	VAR val: SIGNED32;  i: SIGNED16;
 
 BEGIN
 	(*
@@ -254,7 +254,7 @@ END ReadColor;
 
 PROCEDURE Write* (VAR RF: vyBase.FilesWriter;  Bitmap: tBitmap );
 VAR
-	NumOfBytes, NumOfColors, count: LONGINT;
+	NumOfBytes, NumOfColors, count: SIGNED32;
 BEGIN
 	Files.WriteInt(RF, Bitmap.W);  Files.WriteInt(RF, Bitmap.H);  Files.WriteInt(RF, Bitmap.Depth);
 	Files.WriteInt(RF, Bitmap.ColorDepth);
@@ -271,7 +271,7 @@ END Write;
 
 PROCEDURE Read* (VAR RF: vyBase.FilesReader;  VAR Bitmap: tBitmap);
 VAR
-	NumOfBytes, NumOfColors, count: LONGINT;
+	NumOfBytes, NumOfColors, count: SIGNED32;
 	W, H, Depth, ColorDepth : SIGNED16;
 BEGIN
 	Files.ReadInt(RF, W);  Files.ReadInt(RF, H);  Files.ReadInt(RF, Depth);
@@ -298,11 +298,11 @@ VAR
 	int: SIGNED16;
 	count: SIGNED16;
 
-	SW, SH: LONGINT;  (* screenwidth / height *)
+	SW, SH: SIGNED32;  (* screenwidth / height *)
 	SColors: Colors;
 	globalcolormap: BOOLEAN;
 	bitsofcolres, bitsperpixel, backgroundcolor: SIGNED16;
-	IX, IY, IW, IH: LONGINT;
+	IX, IY, IW, IH: SIGNED32;
 	localcolormap, seqentialordered: BOOLEAN;
 	bitsperpixelinimage: SIGNED16;
 
@@ -361,7 +361,7 @@ VAR
 	sttlen: SIGNED16;  (* length of code table *)
 	codesize, rootsize: SIGNED16;
 	cc, eoi, code, old: SIGNED16;
-	(*	i: LONGINT; *)
+	(*	i: SIGNED32; *)
 
 PROCEDURE output (VAR input: SIGNED16);
 
@@ -544,7 +544,7 @@ TYPE
 	codes = ARRAY 2 OF SIGNED16;
 VAR
 
-	filespos : LONGINT;
+	filespos : SIGNED32;
 	x, y: SIGNED16;
 	chars: ARRAY 32 OF CHAR;
 	char : CHAR;
@@ -574,8 +574,8 @@ VAR
 	eoi : SIGNED16;
 	new: SIGNED16;
 	code : codes;
-	i: LONGINT;
-	fp: LONGINT;
+	i: SIGNED32;
+	fp: SIGNED32;
 
 PROCEDURE resetstt;
 
@@ -782,7 +782,7 @@ BEGIN
 END CopyColors;
 
 PROCEDURE CopyBitmap* (source: tBitmap;  VAR dest: tBitmap);
-	VAR NumOfBytes, count: LONGINT;
+	VAR NumOfBytes, count: SIGNED32;
 BEGIN
 	dest := NewBitmap(source.W, source.H, source.Depth, source.ColorDepth);
 	CopyColors(source, dest);

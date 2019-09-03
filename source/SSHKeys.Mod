@@ -45,7 +45,7 @@ TYPE
 	VAR
 		f: Files.File; r: Files.Reader;
 		buf1, buf2: ARRAY 512 OF CHAR;
-		i: LONGINT;
+		i: SIGNED32;
 		names: Strings.StringArray;
 	BEGIN
 		f := Files.Old( G.HostkeysFile );
@@ -155,7 +155,7 @@ TYPE
 
 	PROCEDURE VerifyIdentity*( CONST keyblob, signature, host, hash: ARRAY OF CHAR ): BOOLEAN;
 	VAR
-		name1, name2: ARRAY 128 OF CHAR; i, j: SIZE; len: LONGINT;
+		name1, name2: ARRAY 128 OF CHAR; i, j: SIZE; len: SIGNED32;
 		dsa: DSA.Key; dsasig: DSA.Signature;
 		rsa: RSA.Key; e, n, rsasig: BigNumber;
 		p, q, g, pub, r, s: BigNumber;
@@ -201,7 +201,7 @@ TYPE
 		Size = 2048;
 
 	VAR
-		pw1, pw2: ARRAY 32 OF CHAR; ignore, res: LONGINT; ok: BOOLEAN;
+		pw1, pw2: ARRAY 32 OF CHAR; ignore, res: SIGNED32; ok: BOOLEAN;
 		p, q, e: BigNumber;
 		priv, pub: RSA.Key;
 		f: Files.File; w: Files.Writer;

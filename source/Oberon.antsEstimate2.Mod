@@ -38,7 +38,7 @@ TYPE
 
 VAR
 	gM: antsMDimDiscreteS.tModel;  gA: antsArrayObjects.tINTEGERObject;  gT: antsNeighbourhoods.NeighbourTable;
-	lasttime: LONGINT;
+	lasttime: SIGNED32;
 
 	PROCEDURE Handler*( o: Objects.Object;  VAR M: Objects.ObjMsg );
 	VAR version: SIGNED16;  objsub: Objects.Object;
@@ -102,7 +102,7 @@ VAR
 	END New;
 
 	PROCEDURE func( VAR Par: ARRAY OF LONGREAL ): LONGREAL;
-	VAR i, time: LONGINT;
+	VAR i, time: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN( Par ) - 1 DO gM.n.par[i] := Par[i] END;
 		antsNeighbourhoods.FillCache( gM.n );  time := Oberon.Time();
@@ -113,7 +113,7 @@ VAR
 (*
 PROCEDURE EstimateOld*;
 VAR A: antsArrayObjects.tINTEGERObject; m: antsMDimDiscreteS.tModel; link: vyLinks.Link;  c: tClass; region: antsRegions.tRegion;
-l: antsCommands.tScanList;   obj1,obj2: vyBase.Object; i: LONGINT;  len: LONGINT; fret: LONGREAL;
+l: antsCommands.tScanList;   obj1,obj2: vyBase.Object; i: SIGNED32;  len: SIGNED32; fret: LONGREAL;
 a: POINTER TO ARRAY OF LONGREAL;
 BEGIN
 l := antsCommands.ScanFromPar();

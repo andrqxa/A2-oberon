@@ -20,7 +20,7 @@ VAR
 PROCEDURE OpenScanner(VAR S: Texts.Scanner);
 	VAR
 		text: Texts.Text;
-		beg, end, time: LONGINT;
+		beg, end, time: SIGNED32;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(S);
@@ -32,8 +32,8 @@ BEGIN
 END OpenScanner;
 
 (** Execute commands contained in the text. Each command must be on a separate line. *)
-PROCEDURE do*(T: Texts.Text; beg, end: LONGINT);
-VAR S: Texts.Scanner; pos: LONGINT; res: SIGNED16;
+PROCEDURE do*(T: Texts.Text; beg, end: SIGNED32);
+VAR S: Texts.Scanner; pos: SIGNED32; res: SIGNED16;
 
 	PROCEDURE NextCmd;
 		VAR tR: Texts.Reader; ch: CHAR;
@@ -118,7 +118,7 @@ END do;
 PROCEDURE DoCommands*;
 	VAR
 		S: Texts.Scanner; T: Texts.Text;
-		beg, end, time: LONGINT;
+		beg, end, time: SIGNED32;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(S);

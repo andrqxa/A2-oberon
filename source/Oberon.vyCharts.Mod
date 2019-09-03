@@ -55,9 +55,9 @@ VAR
 	slink*, dlink*: Objects.Object;
 
 	PROCEDURE Recall( chart: tLayer );
-	VAR i: LONGINT;  closed: BOOLEAN;   (* fof 020624 *)
+	VAR i: SIGNED32;  closed: BOOLEAN;   (* fof 020624 *)
 
-		PROCEDURE Min( x, y: LONGINT ): LONGINT;
+		PROCEDURE Min( x, y: SIGNED32 ): SIGNED32;
 		BEGIN
 			IF (x < y) THEN RETURN x ELSE RETURN y END;
 		END Min;
@@ -101,7 +101,7 @@ VAR
 	END Respond;
 
 (*PROCEDURE Copy (src, dest: tLayer);
-(*VAR i: LONGINT;*)
+(*VAR i: SIGNED32;*)
 BEGIN ASSERT((src.x.nrData = src.y.nrData) & (src.x.nrData > 0));
 dest^ := src^;
 dest.x := vyRealVec.New (src.x.nrData); vyRealVec.CopyData(src.x, dest.x);
@@ -134,7 +134,7 @@ END Copy; *)
 	END Responsible;
 
 	PROCEDURE Consume( o: tLayer;  msg: Display.ConsumeMsg );
-	VAR v, w: vyBase.tVector;  minX, maxX, minY, maxY: REAL;  pict: vyPort.Picture;  data: Objects.Object;  nans: LONGINT;
+	VAR v, w: vyBase.tVector;  minX, maxX, minY, maxY: REAL;  pict: vyPort.Picture;  data: Objects.Object;  nans: SIGNED32;
 	BEGIN
 		pict := msg.dlink( vyPort.Picture );  data := msg.obj;  v := vyBase.GetVFromObj( data );  data := data.slink;
 		w := vyBase.GetVFromObj( data );
@@ -201,7 +201,7 @@ END Load0;
 VAR copy: tLayer;
 pict : vyPort.Picture;
 minX, maxX, minY, maxY : REAL;
-nans : LONGINT;
+nans : SIGNED32;
 uhandle: Objects.Handler; gen: PROCEDURE;
 
 CONST GenProc = "vyCharts.Alloc";  	(* Gen Procedure as String *)

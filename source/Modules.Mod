@@ -113,7 +113,7 @@ TYPE
 			internal-: POINTER TO ARRAY OF ANY;
 			body*: PROCEDURE;
 			flags*: SET;	 (* e.g. compilation flags *)
-			crc*: LONGINT;
+			crc*: SIGNED32;
 			init, published: BOOLEAN;
 
 		#IF ~COOP THEN

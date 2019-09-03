@@ -50,7 +50,7 @@ TYPE
 		ch, cbeta: LONGREAL;
 		Z: nb;
 		U, P, Cdf: pb;
-		card: LONGINT;
+		card: SIGNED32;
 		dist: vyName.tNameArray;
 		ran: RandomArray
 	END;
@@ -58,8 +58,8 @@ TYPE
 VAR  (* localCache: tConstNeighbourCache;  *)
 	localModel: tModel;
 
-	PROCEDURE U( m: tModel;  x, v1, v2, v3, v4: LONGINT ): LONGREAL;
-	VAR a: LONGINT;
+	PROCEDURE U( m: tModel;  x, v1, v2, v3, v4: SIGNED32 ): LONGREAL;
+	VAR a: SIGNED32;
 	BEGIN
 		IF m.dist = "L1" THEN a := ABS( x - v1 ) + ABS( x - v2 ) + ABS( x - v3 ) + ABS( x - v4 )
 		ELSIF m.dist = "L2" THEN a := (x - v1) * (x - v1) + (x - v2) * (x - v2) + (x - v3) * (x - v3) + (x - v4) * (x - v4)
@@ -73,8 +73,8 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 		RETURN Math.exp( m.coolingTemp * (m.ch * x - m.cbeta * a) )
 	END U;
 
-	PROCEDURE Z( m: tModel;  v1, v2, v3, v4: LONGINT ): LONGREAL;
-	VAR x: LONGINT;  z: LONGREAL;
+	PROCEDURE Z( m: tModel;  v1, v2, v3, v4: SIGNED32 ): LONGREAL;
+	VAR x: SIGNED32;  z: LONGREAL;
 	BEGIN
 		z := 0;
 		FOR x := 0 TO m.card - 1 DO z := z + U( m, x, v1, v2, v3, v4 ) END;
@@ -82,8 +82,8 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	END Z;
 
 (*
-PROCEDURE FillCache* (VAR c: tConstNeighbourCache;   beta, h: LONGREAL;   d: LONGINT;   v1, v2, v3, v4: LONGINT);
-VAR x: LONGINT;   r: LONGREAL;
+PROCEDURE FillCache* (VAR c: tConstNeighbourCache;   beta, h: LONGREAL;   d: SIGNED32;   v1, v2, v3, v4: SIGNED32);
+VAR x: SIGNED32;   r: LONGREAL;
 BEGIN
 localModel.beta := beta;   localModel.h := h;   localModel.card := d;
 IF c = NIL THEN NEW(c) END;
@@ -100,13 +100,13 @@ END;
 c.E := c.E / c.Z
 END FillCache;
 
-PROCEDURE CachedU* (c: tConstNeighbourCache;   x: LONGINT): LONGREAL;
+PROCEDURE CachedU* (c: tConstNeighbourCache;   x: SIGNED32): LONGREAL;
 BEGIN	RETURN c.U[x] END CachedU;
 
 PROCEDURE CachedZ* (c: tConstNeighbourCache): LONGREAL;
 BEGIN	RETURN c.Z END CachedZ;
 
-PROCEDURE CachedP* (c: tConstNeighbourCache;   x: LONGINT): LONGREAL;
+PROCEDURE CachedP* (c: tConstNeighbourCache;   x: SIGNED32): LONGREAL;
 BEGIN	RETURN c.U[x] / c.Z END CachedP;
 
 PROCEDURE CachedE* (c: tConstNeighbourCache): LONGREAL;
@@ -115,7 +115,7 @@ END CachedE;
 *)
 
 	PROCEDURE CalcP( M: tModel );
-	VAR x, v1, v2, v3, v4: LONGINT;  card: LONGINT;  p: LONGREAL;  t1, t2: LONGREAL;
+	VAR x, v1, v2, v3, v4: SIGNED32;  card: SIGNED32;  p: LONGREAL;  t1, t2: LONGREAL;
 	BEGIN
 		card := M.card;  DEC( card );
 		FOR v1 := 0 TO card DO
@@ -138,7 +138,7 @@ END CachedE;
 		M.cbeta := M.beta * 2;  M.ch := M.h * 2
 	END SetPars;
 
-	PROCEDURE NewDepth( M: tModel;  card: LONGINT );
+	PROCEDURE NewDepth( M: tModel;  card: SIGNED32 );
 	BEGIN
 		IF M.card # card THEN
 			M.card := card;  NEW( M.Z, card, card, card, card );  NEW( M.P, card, card, card, card, card );
@@ -158,7 +158,7 @@ END CachedE;
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR card: LONGINT;  version: SIGNED16;
+	VAR card: SIGNED32;  version: SIGNED16;
 	BEGIN
 		Files.ReadInt( R, version );  Files.ReadLReal( R, s.h );  Files.ReadLReal( R, s.beta );  Files.ReadLInt( R, card );
 		Files.ReadString( R, s.dist );  s.card := 0;  Open( s, s.beta, s.h );  NewDepth( s, s.card )
@@ -172,10 +172,10 @@ END CachedE;
 	END CheckDepth;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, w, h: LONGINT;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  p: RandomArray;  xv: SIGNED16;  v1, v2, v3, v4: LONGINT;  cdf: LONGREAL;
-		AO: antsArrayObjects.tINTEGERObject;  t1, t2, t3, t4: LONGINT;  ran: LONGREAL;  d: SIGNED16;
+	VAR x, y, w, h: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  p: RandomArray;  xv: SIGNED16;  v1, v2, v3, v4: SIGNED32;  cdf: LONGREAL;
+		AO: antsArrayObjects.tINTEGERObject;  t1, t2, t3, t4: SIGNED32;  ran: LONGREAL;  d: SIGNED16;
 
-		PROCEDURE DistriFromLocalChar( VAR x, y: LONGINT );
+		PROCEDURE DistriFromLocalChar( VAR x, y: SIGNED32 );
 		BEGIN
 			v1 := A[y, (x - 1) MOD w];  v2 := A[(y - 1) MOD h, x];  v3 := A[y, (x + 1) MOD w];  v4 := A[(y + 1) MOD h, x];
 			ran := p[x];  xv := 0;  cdf := model.Cdf[xv, v1, v2, v3, v4];

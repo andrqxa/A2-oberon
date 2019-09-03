@@ -38,7 +38,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 		log: Texts.Text;
 		line: ARRAY MaxLine OF CHAR;
 		buffer: ARRAY BufLen OF CHAR;
-		timeOut: LONGINT;
+		timeOut: SIGNED32;
 		dataPort, col: SIGNED16;
 
 	PROCEDURE Connected(C: NetSystem.Connection; mode: SIGNED16): BOOLEAN;
@@ -89,7 +89,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 
 	PROCEDURE ReadResponse(S: Session; VAR sline: ARRAY OF CHAR);
 		VAR
-			time, i, j, cpos: LONGINT;
+			time, i, j, cpos: SIGNED32;
 			code: ARRAY 8 OF CHAR;
 			line: ARRAY MaxLine OF CHAR;
 	BEGIN
@@ -147,7 +147,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 	END ReadResponse;
 
 	PROCEDURE SendString(C: NetSystem.Connection; str: ARRAY OF CHAR);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE str[i] # 0X DO
@@ -304,7 +304,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 	END ChangeDirS;
 
 	PROCEDURE SetDataPort(S: Session);
-		VAR str: ARRAY 4 OF CHAR; p0, p1: LONGINT; i, j, k: SIGNED16; done: BOOLEAN;
+		VAR str: ARRAY 4 OF CHAR; p0, p1: SIGNED32; i, j, k: SIGNED16; done: BOOLEAN;
 	BEGIN
 		SendCmd(S, "PASV"); ReadResponse(S, line);
 		IF (S.status >= 200) & (S.status < 300) THEN
@@ -366,7 +366,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 	END SetDataPort;
 
 	PROCEDURE WaitDataCon(S: Session): NetSystem.Connection;
-		VAR C1: NetSystem.Connection; time: LONGINT;
+		VAR C1: NetSystem.Connection; time: SIGNED32;
 	BEGIN
 		IF IP.AdrsEqual(S.dataIP, NetSystem.anyIP) THEN
 			time := Input.Time();
@@ -396,7 +396,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE EnumDir(S: Session; enum: EnumProc);
 		VAR
 			C: NetSystem.Connection;
-			len: LONGINT;
+			len: SIGNED32;
 	BEGIN
 		S.reply := ""; SetDataPort(S); C := NIL;
 		IF S.res = Interrupted THEN RETURN END;
@@ -503,7 +503,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 	END DeleteFile;
 
 	PROCEDURE ReadData(S: Session; C: NetSystem.Connection; VAR R: Files.Rider);
-		VAR len, rlen: LONGINT;
+		VAR len, rlen: SIGNED32;
 	BEGIN
 		len := NetSystem.Available(C);
 		WHILE (len > 0) OR Connected(C, NetSystem.in) DO
@@ -636,7 +636,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 
 	PROCEDURE ReadText(C: NetSystem.Connection; VAR W: Texts.Writer);
 		VAR
-			len, rlen, i: LONGINT;
+			len, rlen, i: SIGNED32;
 			ch: CHAR; exit: BOOLEAN;
 	BEGIN
 		len := NetSystem.Available(C); exit := FALSE;
@@ -773,7 +773,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 
 	PROCEDURE OpenScanner(VAR S: Texts.Scanner);
 		VAR
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			text: Texts.Text;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
@@ -1073,7 +1073,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE DeleteFiles*;
 		VAR
 			Sc: Texts.Scanner;
-			beg, end, time, pos: LONGINT;
+			beg, end, time, pos: SIGNED32;
 			text: Texts.Text;
 	BEGIN
 		IF Con() THEN
@@ -1170,7 +1170,7 @@ MODULE FTP IN Oberon; (** portable *)	(* ejz,  *)
 			loc, rem: ARRAY LEN(Sc.s) OF CHAR;
 			T: Texts.Text;
 			F: Files.File;
-			len: LONGINT;
+			len: SIGNED32;
 			Wr: Texts.Writer;
 	BEGIN
 		IF Con() THEN

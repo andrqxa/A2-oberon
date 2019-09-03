@@ -282,7 +282,7 @@ VAR
 	e, i: SIGNED16;
 PROCEDURE RTS (r: LONGREAL;  m1: SIGNED16;  VAR string: ARRAY OF CHAR);
 VAR
-	r1: LONGREAL;  L, L1, L2: LONGINT;  h, a: SIGNED16;  neg: BOOLEAN;
+	r1: LONGREAL;  L, L1, L2: SIGNED32;  h, a: SIGNED16;  neg: BOOLEAN;
 BEGIN
 	IF r < 0 THEN neg := TRUE;  r := - r ELSE neg := FALSE END;
 	r1 := vyHost.TenL(m1) * r;
@@ -308,7 +308,7 @@ END RTS;
 BEGIN
 	e := 0;
 	IF E = FALSE THEN
-		IF  (ABS(l) * vyHost.TenL(m) > MAX(LONGINT))  OR ((l > 0) & (ABS(l) * vyHost.TenL(m) < 1 / MAX(LONGINT)))  THEN
+		IF  (ABS(l) * vyHost.TenL(m) > MAX(SIGNED32))  OR ((l > 0) & (ABS(l) * vyHost.TenL(m) < 1 / MAX(SIGNED32)))  THEN
 			E := TRUE;  AppendRealToString(l, s, E, m);  RETURN
 		ELSE
 			RTS(l, m, s)
@@ -610,7 +610,7 @@ BEGIN
 END Automaticdr;
 
 PROCEDURE Automaticr (axe: tAxe);
-	VAR e1: LONGINT;
+	VAR e1: SIGNED32;
 BEGIN e1 := ENTIER(axe.r1 / axe.dr);  axe.r := e1 * axe.dr;
 	WHILE(axe.r > axe.r1) OR equals(axe.r, axe.r1) DO
 		axe.r := axe.r - axe.dr

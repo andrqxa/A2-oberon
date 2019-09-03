@@ -48,7 +48,7 @@ TYPE
 		changed*: vyBase.Object
 	END;
 
-	PROCEDURE Min( a, b: LONGINT ): LONGINT;
+	PROCEDURE Min( a, b: SIGNED32 ): SIGNED32;
 	BEGIN
 		IF a < b THEN RETURN a ELSE RETURN b END
 	END Min;
@@ -87,7 +87,7 @@ TYPE
 	END FrameLinks;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  w, h, depth: LONGINT;  version: SIGNED16;
+	VAR objsub: Objects.Object;  w, h, depth: SIGNED32;  version: SIGNED16;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN
@@ -215,7 +215,7 @@ TYPE
 	END Gen;
 
 	PROCEDURE FromArray*( obj: tObject;  A: antsArrayObjects.tINTEGERObject );
-	VAR r, g, b: SIGNED16;  i: LONGINT;
+	VAR r, g, b: SIGNED16;  i: SIGNED32;
 	BEGIN
 		obj.A := A;  obj.w := A.w;  obj.h := A.h;  obj.depth := A.depth;
 
@@ -239,7 +239,7 @@ TYPE
 		END
 	END New;
 
-	PROCEDURE P2A( obj: tObject;  depth: LONGINT );
+	PROCEDURE P2A( obj: tObject;  depth: SIGNED32 );
 	VAR x, y: SIGNED16;  r, g, b: SIGNED16;  ncm: vyColorPalettes.NewColMsg;  img: Pictures.Picture;
 	BEGIN
 		aM.vSI( "Pict Array Conversion, depth = ", depth );  img := obj.pict;  vyColorPalettes.InitConversion( depth, ncm.pal );
@@ -252,7 +252,7 @@ TYPE
 
 	END P2A;
 
-	PROCEDURE DoToArray*( obj: tObject;  depth: LONGINT;  name: vyName.tNameArray );
+	PROCEDURE DoToArray*( obj: tObject;  depth: SIGNED32;  name: vyName.tNameArray );
 	BEGIN
 		IF obj.A # NIL THEN aM.S( "overwriting existing ARRAY" );
 			(* Now: new Array object*)
@@ -278,7 +278,7 @@ TYPE
 	END SetPicture;
 
 	PROCEDURE ToArray*;
-	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  from: vyBase.Object;  obj: tObject;  depth: LONGINT;
+	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  from: vyBase.Object;  obj: tObject;  depth: SIGNED32;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME from=OBJ depth=INT ~# Convert Image to Array with <depth> greyvalues / colors." );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectObjectFromKeyword( l, "from", from ) &
@@ -295,7 +295,7 @@ TYPE
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectStringFromKeyword( l, "fname", fname ) THEN
 			Gen;  obj := Objects.NewObj( tObject );  antsToolbox.LoadPicture( obj.pict, fname, done );
 			IF done THEN
-				obj.w := obj.pict.width;  obj.h := obj.pict.height;  obj.depth := MAX( LONGINT );  vyName.RegisterNamed( obj, name );
+				obj.w := obj.pict.width;  obj.h := obj.pict.height;  obj.depth := MAX( SIGNED32 );  vyName.RegisterNamed( obj, name );
 				antsObjects.Register( obj );
 				IF antsCommands.FindKeyword( l, "show" ) THEN link := NIL;  vyLinks.InsertObj( link, obj );  vyBase.Show( link, 1, "antsViews" ) END
 
@@ -318,7 +318,7 @@ TYPE
 			IF obj = NIL THEN
 				Gen;  obj := Objects.NewObj( tObject );  vyName.RegisterNamed( obj, name );  antsObjects.Register( obj )
 			END;
-			obj.pict := picture;  obj.w := obj.pict.width;  obj.h := obj.pict.height;  obj.depth := MAX( LONGINT );
+			obj.pict := picture;  obj.w := obj.pict.width;  obj.h := obj.pict.height;  obj.depth := MAX( SIGNED32 );
 			IF antsCommands.Find( "show" ) & (o1 = NIL ) THEN link := NIL;  vyLinks.InsertObj( link, obj );  vyBase.Show( link, 1, "antsViews" ) END;
 			vyBase.Update( obj )
 		END

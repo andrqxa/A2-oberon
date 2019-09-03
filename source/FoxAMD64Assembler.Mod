@@ -134,7 +134,7 @@ TYPE
 	OperandType = InstructionSet.OperandType;
 
 	Size = SIGNED8;
-	Register* = LONGINT; (* index for InstructionSet.registers *)
+	Register* = SIGNED32; (* index for InstructionSet.registers *)
 	(*
 		an implementation of Operands as objects is very elegant but unfortunately also very costly in terms of number of allocations
 	*)
@@ -152,14 +152,14 @@ TYPE
 		register-: Register; (* for registers and mem *)
 		sizeInBytes-: Size; (* for mem and imm and moffset *)
 		segment-,index-: Register; (* registers for mem *)
-		scale-, displacement-: LONGINT;  (* for mem *)
+		scale-, displacement-: SIGNED32;  (* for mem *)
 		symbol- : ObjectFile.Identifier; (* for imm and mem *)
 		symbolOffset-: SIZE; (* offset in immediate code (source) for a fixup *)
 
 		val-: HUGEINT; (* for imm and moffset  *)
 		pc-: SIZE;
 
-		selector-, offset-: LONGINT; (* for pntr1616 / pntr1632 *)
+		selector-, offset-: SIGNED32; (* for pntr1616 / pntr1632 *)
 	END;
 
 	Code* = BinaryCode.Section;
@@ -169,7 +169,7 @@ TYPE
 		offset: SIZE;
 		name-: SyntaxTree.IdentifierString;
 		nextNamedLabel-: NamedLabel;
-		index-: LONGINT;
+		index-: SIGNED32;
 
 		PROCEDURE &InitNamedLabel(offset: SIZE; CONST name: ARRAY OF CHAR);
 		BEGIN
@@ -185,7 +185,7 @@ TYPE
 	END NamedLabel;
 
 	NamedLabelList*=OBJECT
-	VAR first-,last-: NamedLabel; number-: LONGINT;
+	VAR first-,last-: NamedLabel; number-: SIGNED32;
 
 		PROCEDURE & InitNamedLabelList;
 		BEGIN first := NIL; last := NIL; number := 0;
@@ -233,7 +233,7 @@ TYPE
 			dump := code.comments
 		END SetCode;
 
-		PROCEDURE SetBits* (numberBits: LONGINT): BOOLEAN;
+		PROCEDURE SetBits* (numberBits: SIGNED32): BOOLEAN;
 		BEGIN
 			CASE numberBits OF
 			16: cpuBits := bits16;
@@ -268,7 +268,7 @@ TYPE
 			Error(message);
 		END ErrorSS;
 
-		PROCEDURE ErrorSI(CONST msg1: ARRAY OF CHAR; mnemonic: LONGINT; CONST operands: ARRAY OF Operand);
+		PROCEDURE ErrorSI(CONST msg1: ARRAY OF CHAR; mnemonic: SIGNED32; CONST operands: ARRAY OF Operand);
 		VAR s: Streams.StringWriter; msg: Basic.MessageString;
 		BEGIN
 			NEW(s,LEN(msg));
@@ -279,7 +279,7 @@ TYPE
 			ErrorSS(msg1,msg);
 		END ErrorSI;
 
-		PROCEDURE AddFixup (mode: SIGNED8; size: SIGNED8; pc: SIZE; symbol: ObjectFile.Identifier; symbolOffset: SIZE; displacement: LONGINT);
+		PROCEDURE AddFixup (mode: SIGNED8; size: SIGNED8; pc: SIZE; symbol: ObjectFile.Identifier; symbolOffset: SIZE; displacement: SIGNED32);
 		VAR fixup: BinaryCode.Fixup; format: BinaryCode.FixupPatterns; id: ObjectFile.Identifier;
 		BEGIN
 			NEW(format,1);
@@ -289,29 +289,29 @@ TYPE
 			code.fixupList.AddFixup(fixup);
 		END AddFixup;
 
-		PROCEDURE EmitInstruction (mnem: LONGINT; VAR operands: ARRAY OF Operand; lastPass: BOOLEAN): BOOLEAN;
-		VAR instr, i, oppos, op: LONGINT;
-			val: LONGINT;
-			regOperand, regOperand2: LONGINT;
-			addressOperand: LONGINT;
-			regField, modField, rmField: LONGINT;
-			scaleField, indexField, baseField: LONGINT;
+		PROCEDURE EmitInstruction (mnem: SIGNED32; VAR operands: ARRAY OF Operand; lastPass: BOOLEAN): BOOLEAN;
+		VAR instr, i, oppos, op: SIGNED32;
+			val: SIGNED32;
+			regOperand, regOperand2: SIGNED32;
+			addressOperand: SIGNED32;
+			regField, modField, rmField: SIGNED32;
+			scaleField, indexField, baseField: SIGNED32;
 			free: ARRAY maxNumberOperands OF BOOLEAN;
-			byte: LONGINT;
-			offset: LONGINT;
+			byte: SIGNED32;
+			offset: SIGNED32;
 			opPrefix, adrPrefix: BOOLEAN;
-			segPrefix: LONGINT; rexPrefix: SET;
+			segPrefix: SIGNED32; rexPrefix: SET;
 
 			bitwidthOptions: SET;
 			opcode: ARRAY InstructionSet.maxCodeLength OF InstructionSet.Code;
 			pc0: SIZE;
 
-			debug,temp: LONGINT;
+			debug,temp: SIGNED32;
 
-			PROCEDURE FindInstruction(mnem: LONGINT; CONST operands: ARRAY OF Operand): LONGINT;
-			VAR instr: LONGINT;
+			PROCEDURE FindInstruction(mnem: SIGNED32; CONST operands: ARRAY OF Operand): SIGNED32;
+			VAR instr: SIGNED32;
 				PROCEDURE MatchesInstruction (): BOOLEAN;
-				VAR i: LONGINT;
+				VAR i: SIGNED32;
 				BEGIN
 					FOR i := 0 TO maxNumberOperands - 1 DO
 						IF (i>=LEN(operands)) OR (operands[i].type = none) THEN (* no operand -> check if instruction has no operand here *)
@@ -341,8 +341,8 @@ TYPE
 				RETURN instr
 			END FindInstruction;
 
-			PROCEDURE GetRegOperand (startIndex: LONGINT): LONGINT;
-			VAR i: LONGINT;
+			PROCEDURE GetRegOperand (startIndex: SIGNED32): SIGNED32;
+			VAR i: SIGNED32;
 			BEGIN
 				FOR i := startIndex TO maxNumberOperands -1 DO
 					CASE InstructionSet.instructions[instr].operands[i] OF
@@ -354,8 +354,8 @@ TYPE
 				RETURN none;
 			END GetRegOperand;
 
-			PROCEDURE GetAddressOperand (): LONGINT;
-			VAR i: LONGINT;
+			PROCEDURE GetAddressOperand (): SIGNED32;
+			VAR i: SIGNED32;
 			BEGIN
 				FOR i := 0 TO maxNumberOperands -1 DO
 					CASE InstructionSet.instructions[instr].operands[i] OF
@@ -372,8 +372,8 @@ TYPE
 				RETURN none;
 			END GetAddressOperand;
 
-			PROCEDURE GetSpecialOperand (): LONGINT;
-			VAR i: LONGINT;
+			PROCEDURE GetSpecialOperand (): SIGNED32;
+			VAR i: SIGNED32;
 			BEGIN
 				FOR i := 0 TO maxNumberOperands -1 DO
 					CASE InstructionSet.instructions[instr].operands[i] OF
@@ -385,7 +385,7 @@ TYPE
 				RETURN none;
 			END GetSpecialOperand;
 
-			PROCEDURE ModRM (mod, reg, rm: LONGINT);
+			PROCEDURE ModRM (mod, reg, rm: SIGNED32);
 			BEGIN
 				IF Trace THEN KernelLog.String("ModRM"); KernelLog.Int(mod,1); KernelLog.String(","); KernelLog.Int(reg,1);
 					KernelLog.String(","); KernelLog.Int(rm,1); KernelLog.Ln;
@@ -394,16 +394,16 @@ TYPE
 				code.PutByte (mod MOD 4 * 40H + reg MOD 8 * 8H + rm MOD 8);
 			END ModRM;
 
-			PROCEDURE SIB (scale, index, base: LONGINT);
+			PROCEDURE SIB (scale, index, base: SIGNED32);
 			BEGIN code.PutByte (scale MOD 4 * 40H + index MOD 8 * 8H + base MOD 8);
 			END SIB;
 
-			PROCEDURE FPOrSSEOperation(instr: LONGINT): BOOLEAN;
+			PROCEDURE FPOrSSEOperation(instr: SIGNED32): BOOLEAN;
 			BEGIN
 				RETURN {InstructionSet.cpuFPU, InstructionSet.cpuSSE, InstructionSet.cpuSSE2, InstructionSet.cpuSSE3} * InstructionSet.instructions[instr].cpuOptions # {}
 			END FPOrSSEOperation;
 
-			PROCEDURE FPOperation(instr: LONGINT): BOOLEAN;
+			PROCEDURE FPOperation(instr: SIGNED32): BOOLEAN;
 			BEGIN
 				RETURN {InstructionSet.cpuFPU} * InstructionSet.instructions[instr].cpuOptions # {}
 			END FPOperation;
@@ -826,7 +826,7 @@ TYPE
 						FOR i := 0 TO maxNumberOperands - 1 DO
 							IF (free[i]) & (operands[i].type = ioffset) THEN
 								IF Trace THEN KernelLog.String(" ioffset "); END;
-								offset := LONGINT(operands[i].val - code.pc  - 1);
+								offset := SIGNED32(operands[i].val - code.pc  - 1);
 								IF lastPass & ~ValueInByteRange (offset) THEN
 									Error( "value exceeds bounds");
 									RETURN FALSE;
@@ -851,7 +851,7 @@ TYPE
 						IF val # -1 THEN code.PutByte (val); val := -1 END;
 						FOR i := 0 TO maxNumberOperands - 1 DO
 							IF (free[i]) & (InstructionSet.instructions[instr].operands[i] = InstructionSet.rel16off) THEN
-								offset := LONGINT(operands[i].val - code.pc - 2);
+								offset := SIGNED32(operands[i].val - code.pc - 2);
 								IF lastPass & ~ValueInWordRange (offset) THEN
 									Error( "value exceeds bounds");
 								END;
@@ -880,7 +880,7 @@ TYPE
 									AddFixup(BinaryCode.Relative,4,code.pc,operands[i].symbol,operands[i].symbolOffset,operands[i].displacement-4);
 									code.PutDWord(SHORT(operands[i].val));
 								ELSE
-									code.PutDWord (LONGINT(operands[i].val - code.pc - 4));
+									code.PutDWord (SIGNED32(operands[i].val - code.pc - 4));
 								END;
 
 								free[i] := FALSE; i:= maxNumberOperands;
@@ -935,7 +935,7 @@ TYPE
 
 								IF lastPass & (operands[i].symbol.name # "") THEN AddFixup(BinaryCode.Relative,4,code.pc,operands[i].symbol,operands[i].symbolOffset,operands[i].displacement-4)  END;
 
-								code.PutDWord (LONGINT(operands[i].val - code.pc - 4));
+								code.PutDWord (SIGNED32(operands[i].val - code.pc - 4));
 								free[i] := FALSE; i:= maxNumberOperands;
 							ELSIF (free[i]) & InstructionSet.IsImmediate32(InstructionSet.instructions[instr].operands[i])  THEN
 								operands[i].pc := code.pc;
@@ -1035,12 +1035,12 @@ TYPE
 			RETURN TRUE;
 		END EmitInstruction;
 
-		PROCEDURE EmitPrefix* (prefix: LONGINT);
+		PROCEDURE EmitPrefix* (prefix: SIGNED32);
 		BEGIN code.PutByte (prefix);
 		END EmitPrefix;
 
-		PROCEDURE Emit*(mnem: LONGINT; VAR op1,op2,op3: Operand);
-		VAR operands: ARRAY maxNumberOperands OF Operand; res: BOOLEAN; i: LONGINT; noOperand: Operand;
+		PROCEDURE Emit*(mnem: SIGNED32; VAR op1,op2,op3: Operand);
+		VAR operands: ARRAY maxNumberOperands OF Operand; res: BOOLEAN; i: SIGNED32; noOperand: Operand;
 		BEGIN
 			operands[0] := op1;
 			operands[1] := op2;
@@ -1055,7 +1055,7 @@ TYPE
 			op3 := operands[2];
 		END Emit;
 
-		PROCEDURE EmitAt*(pc: SIZE;mnem: LONGINT; VAR op1,op2,op3: Operand);
+		PROCEDURE EmitAt*(pc: SIZE;mnem: SIGNED32; VAR op1,op2,op3: Operand);
 		VAR prevPC: SIZE; prevDump: Streams.Writer;
 		BEGIN
 			prevDump := dump;
@@ -1082,28 +1082,28 @@ TYPE
 			SELF.dump := code.comments;
 		END EndEmitAt;
 
-		PROCEDURE Emit0* (mnem: LONGINT);
+		PROCEDURE Emit0* (mnem: SIGNED32);
 		VAR noOperand: Operand;
 		BEGIN
 			noOperand.type := none;
 			Emit(mnem,noOperand,noOperand,noOperand);
 		END Emit0;
 
-		PROCEDURE Emit1* (mnem: LONGINT; VAR op1: Operand);
+		PROCEDURE Emit1* (mnem: SIGNED32; VAR op1: Operand);
 		VAR noOperand: Operand;
 		BEGIN
 			noOperand.type := none;
 			Emit(mnem,op1,noOperand,noOperand);
 		END Emit1;
 
-		PROCEDURE Emit2* (mnem: LONGINT; VAR op1, op2: Operand);
+		PROCEDURE Emit2* (mnem: SIGNED32; VAR op1, op2: Operand);
 		VAR noOperand: Operand;
 		BEGIN
 			noOperand.type := none;
 			Emit(mnem,op1,op2,noOperand);
 		END Emit2;
 
-		PROCEDURE Emit3* (mnem: LONGINT; VAR  op1, op2, op3: Operand);
+		PROCEDURE Emit3* (mnem: SIGNED32; VAR  op1, op2, op3: Operand);
 		BEGIN
 			Emit(mnem,op1,op2,op3);
 		END Emit3;
@@ -1112,7 +1112,7 @@ TYPE
 
 	RegisterMap*= OBJECT
 
-		PROCEDURE Find*(CONST name: ARRAY OF CHAR): LONGINT; (* abstract *)
+		PROCEDURE Find*(CONST name: ARRAY OF CHAR): SIGNED32; (* abstract *)
 		BEGIN HALT(100);
 		END Find;
 
@@ -1177,7 +1177,7 @@ TYPE
 		);
 		CONST maxPasses = 2;
 		VAR
-			symbol, reg: LONGINT;
+			symbol, reg: SIGNED32;
 			ident, idents: Name;
 			val, times: HUGEINT;
 
@@ -1185,7 +1185,7 @@ TYPE
 			labels: NamedLabelList;
 
 			prevPC: SIZE;
-			pass: LONGINT;
+			pass: SIGNED32;
 			absoluteMode: BOOLEAN;
 			absoluteOffset: HUGEINT;
 			orgOffset: HUGEINT;
@@ -1239,7 +1239,7 @@ TYPE
 			END GetNumber;
 
 			PROCEDURE GetIdentifier;
-			VAR i: LONGINT;
+			VAR i: SIGNED32;
 			BEGIN
 				i := 0;
 				REPEAT
@@ -1256,7 +1256,7 @@ TYPE
 			END GetIdentifier;
 
 			PROCEDURE GetString;
-			VAR i: LONGINT;
+			VAR i: SIGNED32;
 			BEGIN
 				i := 0;
 				NextChar;
@@ -1349,8 +1349,8 @@ TYPE
 				END;
 			END SkipLine;
 
-			PROCEDURE Ensure (desiredSymbol, errNumber : LONGINT) : BOOLEAN;
-			VAR temp: LONGINT;
+			PROCEDURE Ensure (desiredSymbol, errNumber : SIGNED32) : BOOLEAN;
+			VAR temp: SIGNED32;
 			BEGIN
 				temp := symbol;
 				IF symbol = desiredSymbol THEN
@@ -1363,7 +1363,7 @@ TYPE
 			END Ensure;
 
 			PROCEDURE GetCPU (cumulateOptions: BOOLEAN): BOOLEAN;
-			VAR i: LONGINT;
+			VAR i: SIGNED32;
 			BEGIN
 				SkipBlanks;
 				GetIdentifier;
@@ -1500,7 +1500,7 @@ TYPE
 				RETURN TRUE;
 			END Expression;
 
-			PROCEDURE Align(size: LONGINT);
+			PROCEDURE Align(size: SIGNED32);
 			VAR pc: SIZE;
 			BEGIN
 				IF size <= 0 THEN Error("invalid alignment size"); RETURN END;
@@ -1538,12 +1538,12 @@ TYPE
 						IF symbol = symPlus THEN
 							NextSymbol;
 							IF Expression(x, FALSE, type) THEN
-								ofs.displacement := LONGINT (x)
+								ofs.displacement := SIGNED32 (x)
 							END;
 						ELSIF symbol = symMinus THEN
 							NextSymbol;
 							IF Expression(x, FALSE, type) THEN
-								ofs.displacement := - LONGINT (x)
+								ofs.displacement := - SIGNED32 (x)
 							END;
 						END;
 						IF pass = maxPasses THEN
@@ -1675,9 +1675,9 @@ TYPE
 					Global.GetSymbolSegmentedName(scopeSymbol,name);
 					SetSymbol(operand,name,0,0,0);
 				ELSIF (scopeSymbol IS SyntaxTree.Variable) THEN (* local variable *)
-					operand.displacement := (scopeSymbol.offsetInBits DIV 8)(LONGINT);
+					operand.displacement := (scopeSymbol.offsetInBits DIV 8)(SIGNED32);
 				ELSIF (scopeSymbol IS SyntaxTree.Parameter) THEN (* local parameter *)
-					operand.displacement := (scopeSymbol.offsetInBits DIV 8)(LONGINT);
+					operand.displacement := (scopeSymbol.offsetInBits DIV 8)(SIGNED32);
 				ELSE
 					RETURN (* ? *)
 				END;
@@ -1706,7 +1706,7 @@ TYPE
 
 			(* the following procedure is used to adapt sizes for relative jumps *)
 			PROCEDURE AdaptOperandSizes(VAR operands: ARRAY OF Operand);
-			VAR i: LONGINT;
+			VAR i: SIGNED32;
 
 				PROCEDURE OffsetSize(val: HUGEINT): SIGNED8;
 				BEGIN
@@ -1717,7 +1717,7 @@ TYPE
 					(i.e. prefixing the jump instruction with the `addr16' opcode prefix),
 					since the 80386 insists upon masking `%eip' to 16 bits after the word
 					displacement is added. *)
-					ELSIF (val > MIN(LONGINT)+2) & (val < MAX(LONGINT)-2) THEN
+					ELSIF (val > MIN(SIGNED32)+2) & (val < MAX(SIGNED32)-2) THEN
 						RETURN bits32
 					ELSE
 						RETURN bits64
@@ -1743,13 +1743,13 @@ TYPE
 			PROCEDURE GetInstruction (): BOOLEAN;
 			VAR
 				position: Basic.Position;
-				mnem, opCount: LONGINT;
+				mnem, opCount: SIGNED32;
 				size: Size;
 				operands: ARRAY InstructionSet.maxNumberOperands OF Operand;
 				prevFixup: BinaryCode.Fixup;
 				mem: Operand;
 				offset: Operand;
-				i: LONGINT;
+				i: SIGNED32;
 				x: HUGEINT;
 				type: OperandType;
 			BEGIN
@@ -1838,7 +1838,7 @@ TYPE
 										IF ~Factor (x, FALSE,type) THEN
 											RETURN FALSE;
 										END;
-										mem.scale := LONGINT (x);
+										mem.scale := SIGNED32 (x);
 										mem.index := mem.register;
 										mem.register :=  InstructionSet.none;
 									END;
@@ -1855,7 +1855,7 @@ TYPE
 														IF ~Factor (x, FALSE,type) THEN
 															RETURN FALSE;
 														END;
-														mem.scale := LONGINT (x);
+														mem.scale := SIGNED32 (x);
 													END;
 												ELSE
 													mem.register := reg;
@@ -1878,7 +1878,7 @@ TYPE
 								IF ~Expression (x, FALSE ,type) THEN
 									RETURN FALSE;
 								END;
-								INC (mem.displacement, LONGINT (x));
+								INC (mem.displacement, SIGNED32 (x));
 							ELSIF (mem.register = InstructionSet.none) & (mem.index = InstructionSet.none) & (mem.symbol.name = "") THEN
 								Error("operand missing: no register provided");
 								RETURN FALSE;
@@ -1905,7 +1905,7 @@ TYPE
 								END;
 								offset.type := type;
 								IF currentFixup # "" THEN
-									offset.symbol.name := currentFixup; offset.symbolOffset := LONGINT (offset.val);
+									offset.symbol.name := currentFixup; offset.symbolOffset := SIGNED32 (offset.val);
 								ELSIF currentLabel # NIL THEN
 									IF (offset.sizeInBytes = bitsDefault ) & (offset.val > emitter.code.pc) THEN (* forward jump *)
 										offset.sizeInBytes := bits32
@@ -1922,7 +1922,7 @@ TYPE
 									IF ~Expression (x, FALSE, type) THEN
 										RETURN FALSE;
 									END;
-									InitOffset(operands[opCount],bitsDefault,LONGINT (x));
+									InitOffset(operands[opCount],bitsDefault,SIGNED32 (x));
 									INC (opCount);
 								END;
 							ELSE
@@ -1979,7 +1979,7 @@ TYPE
 							IF labels.Find(idents) # NIL THEN
 								Error("multiply declared identifier")
 							ELSE
-								NEW(label,MAX(LONGINT),idents);
+								NEW(label,MAX(SIGNED32),idents);
 								labels.Add(label);
 								IF Trace THEN	KernelLog.String("found label"); KernelLog.String(idents); KernelLog.Ln; END;
 							END
@@ -2089,7 +2089,7 @@ TYPE
 						currentLabel := labels.Find(idents);
 						ASSERT(currentLabel # NIL);
 						IF absoluteMode THEN
-							currentLabel.SetOffset(LONGINT (absoluteOffset));
+							currentLabel.SetOffset(SIGNED32 (absoluteOffset));
 						ELSE
 							currentLabel.SetOffset(emitter.code.pc)
 						END;
@@ -2099,7 +2099,7 @@ TYPE
 							symbol := symNone;
 						ELSIF ident = "BITS" THEN
 							NextSymbol;
-							IF ~Ensure (symNumber, 553) OR ~emitter.SetBits (LONGINT (val)) THEN
+							IF ~Ensure (symNumber, 553) OR ~emitter.SetBits (SIGNED32 (val)) THEN
 								SkipLine;
 							ELSE
 								NextSymbol;
@@ -2107,7 +2107,7 @@ TYPE
 						ELSIF ident = "ALIGN" THEN
 							NextSymbol;
 							IF Expression(val, TRUE, type) THEN
-								Align(LONGINT (val));
+								Align(SIGNED32 (val));
 							END;
 						ELSIF ~(scope # NIL) & (ident = "CPU") THEN
 							IF ~GetCPU (FALSE) THEN
@@ -2233,7 +2233,7 @@ TYPE
 	BEGIN RETURN op.type = imm
 	END IsImmediateOperand;
 
-	PROCEDURE DumpType*(w: Streams.Writer; type: LONGINT);
+	PROCEDURE DumpType*(w: Streams.Writer; type: SIGNED32);
 	BEGIN
 		CASE type OF
 			reg8: w.String("reg8")
@@ -2294,7 +2294,7 @@ TYPE
 				Basic.WriteSegmentedName(w, operand.symbol.name);	w.String(":"); w.Int(operand.displacement,1);
 				IF operand.symbolOffset # 0 THEN w.String("(@"); w.Int(operand.symbolOffset,1); w.String(")") END;
 			ELSE
-				IF (operand.val > MAX(LONGINT)) OR (operand.val < MIN(LONGINT)) THEN
+				IF (operand.val > MAX(SIGNED32)) OR (operand.val < MIN(SIGNED32)) THEN
 					w.Hex(operand.val,1); w.String("H");
 				ELSE
 					w.Int(SHORT(operand.val),1);
@@ -2308,8 +2308,8 @@ TYPE
 
 	END DumpOperand;
 
-	PROCEDURE DumpInstruction(w: Streams.Writer; mnemonic: LONGINT; CONST operands: ARRAY OF Operand);
-	VAR i: LONGINT;
+	PROCEDURE DumpInstruction(w: Streams.Writer; mnemonic: SIGNED32; CONST operands: ARRAY OF Operand);
+	VAR i: SIGNED32;
 	CONST DebugSize =  FALSE;
 	BEGIN
 		IF mnemonic # none THEN
@@ -2329,7 +2329,7 @@ TYPE
 	END DumpInstruction;
 
 	PROCEDURE Matches(CONST operand: Operand; type: OperandType): BOOLEAN;
-		PROCEDURE IsMemReg(regIndex: LONGINT): BOOLEAN;
+		PROCEDURE IsMemReg(regIndex: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN InstructionSet.RegisterType(regIndex) IN {reg16, reg32, reg64}
 		END IsMemReg;
@@ -2560,7 +2560,7 @@ TYPE
 	BEGIN InitRegister(operand,register); RETURN operand
 	END NewRegister;
 
-	PROCEDURE InitMem*(VAR operand: Operand; size: Size; reg: Register; displacement: LONGINT);
+	PROCEDURE InitMem*(VAR operand: Operand; size: Size; reg: Register; displacement: SIGNED32);
 	BEGIN
 		InitOperand(operand);
 		operand.type := mem;
@@ -2570,59 +2570,59 @@ TYPE
 		operand.scale := 1;
 	END InitMem;
 
-	PROCEDURE SetIndexScale*(VAR operand: Operand; index: Register;  scale: LONGINT);
+	PROCEDURE SetIndexScale*(VAR operand: Operand; index: Register;  scale: SIGNED32);
 	BEGIN
 		operand.index := index;
 		operand.scale := scale
 	END SetIndexScale;
 
-	PROCEDURE NewMem*(size: Size; reg: Register;   displacement: LONGINT): Operand;
+	PROCEDURE NewMem*(size: Size; reg: Register;   displacement: SIGNED32): Operand;
 	VAR operand: Operand;
 	BEGIN
 		InitMem(operand,size,reg,displacement); RETURN operand
 	END NewMem;
 
-	PROCEDURE InitMem8* (VAR operand: Operand; reg: Register; displacement: LONGINT);
+	PROCEDURE InitMem8* (VAR operand: Operand; reg: Register; displacement: SIGNED32);
 	BEGIN  InitMem (operand, bits8, reg, displacement);
 	END InitMem8;
 
-	PROCEDURE NewMem8* (reg: Register; displacement: LONGINT): Operand;
+	PROCEDURE NewMem8* (reg: Register; displacement: SIGNED32): Operand;
 	VAR operand: Operand;
 	BEGIN  InitMem8 (operand,reg, displacement); RETURN operand
 	END NewMem8;
 
-	PROCEDURE InitMem16* (VAR operand: Operand; reg: Register; displacement: LONGINT);
+	PROCEDURE InitMem16* (VAR operand: Operand; reg: Register; displacement: SIGNED32);
 	BEGIN  InitMem (operand,bits16, reg, displacement);
 	END InitMem16;
 
-	PROCEDURE NewMem16* (reg: Register; displacement: LONGINT): Operand;
+	PROCEDURE NewMem16* (reg: Register; displacement: SIGNED32): Operand;
 	VAR operand: Operand;
 	BEGIN  InitMem16 (operand,reg, displacement); RETURN operand
 	END NewMem16;
 
-	PROCEDURE InitMem32* (VAR operand: Operand; reg: Register; displacement: LONGINT);
+	PROCEDURE InitMem32* (VAR operand: Operand; reg: Register; displacement: SIGNED32);
 	BEGIN  InitMem (operand,bits32, reg, displacement);
 	END InitMem32;
 
-	PROCEDURE NewMem32* (reg: Register; displacement: LONGINT): Operand;
+	PROCEDURE NewMem32* (reg: Register; displacement: SIGNED32): Operand;
 	VAR operand: Operand;
 	BEGIN  InitMem32 (operand,reg, displacement); RETURN operand
 	END NewMem32;
 
-	PROCEDURE InitMem64* (VAR operand: Operand; reg: Register; displacement: LONGINT);
+	PROCEDURE InitMem64* (VAR operand: Operand; reg: Register; displacement: SIGNED32);
 	BEGIN  InitMem (operand,bits64, reg, displacement);
 	END InitMem64;
 
-	PROCEDURE NewMem64* (reg: Register; displacement: LONGINT): Operand;
+	PROCEDURE NewMem64* (reg: Register; displacement: SIGNED32): Operand;
 	VAR operand: Operand;
 	BEGIN  InitMem64 (operand,reg, displacement); RETURN operand
 	END NewMem64;
 
-	PROCEDURE InitMem128* (VAR operand: Operand; reg: Register; displacement: LONGINT);
+	PROCEDURE InitMem128* (VAR operand: Operand; reg: Register; displacement: SIGNED32);
 	BEGIN  InitMem (operand,bits128, reg, displacement);
 	END InitMem128;
 
-	PROCEDURE NewMem128* (reg: Register; displacement: LONGINT): Operand;
+	PROCEDURE NewMem128* (reg: Register; displacement: SIGNED32): Operand;
 	VAR operand: Operand;
 	BEGIN  InitMem128 (operand,reg, displacement); RETURN operand
 	END NewMem128;
@@ -2631,7 +2631,7 @@ TYPE
 	BEGIN
 		operand.symbol.name := symbol;
 		operand.symbol.fingerprint := fingerprint;
-		operand.symbolOffset := symbolOffset; operand.displacement := displacement(LONGINT);
+		operand.symbolOffset := symbolOffset; operand.displacement := displacement(SIGNED32);
 	END SetSymbol;
 
 	PROCEDURE InitImm* (VAR operand: Operand; size: SIGNED8; val: HUGEINT);
@@ -2714,11 +2714,11 @@ TYPE
 	BEGIN InitOffset64(operand,val); RETURN operand
 	END NewOffset64;
 
-	PROCEDURE InitPntr1616* (VAR operand: Operand; s, o: LONGINT);
+	PROCEDURE InitPntr1616* (VAR operand: Operand; s, o: SIGNED32);
 	BEGIN InitOperand(operand); operand.type := pntr1616; operand.selector := s; operand.offset := o;
 	END InitPntr1616;
 
-	PROCEDURE InitPntr1632* (VAR operand: Operand; s, o: LONGINT);
+	PROCEDURE InitPntr1632* (VAR operand: Operand; s, o: SIGNED32);
 	BEGIN InitOperand(operand); operand.type := pntr1632; operand.selector := s; operand.offset := o;
 	END InitPntr1632;
 
@@ -2745,7 +2745,7 @@ TYPE
 		diagnostics: Diagnostics.StreamDiagnostics;
 		code: Code;
 		pooledName: Basic.SegmentedName;
-		PROCEDURE Op(CONST name: ARRAY OF CHAR): LONGINT;
+		PROCEDURE Op(CONST name: ARRAY OF CHAR): SIGNED32;
 		BEGIN
 			RETURN InstructionSet.FindMnemonic(name)
 		END Op;

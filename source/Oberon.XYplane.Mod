@@ -19,11 +19,11 @@ TYPE
 VAR
 	F: XYframe;  V: MenuViewers.Viewer;
 	bitmap: POINTER TO ARRAY OF SET;
-	max: LONGINT;
+	max: SIGNED32;
 	W*, H*: SIGNED16;	(** size of virtual screen in pixel *)
 
 PROCEDURE Modify(F: XYframe; VAR M: Display.ModifyMsg);
-VAR i, j: LONGINT; x, y: SIGNED16;
+VAR i, j: SIGNED32; x, y: SIGNED16;
 BEGIN
 	IF M.id = Display.extend THEN
 		Display.CopyBlock(F.X, F.Y, F.W, F.H, F.X, F.Y + M.dY, Display.replace);
@@ -64,7 +64,7 @@ BEGIN
 END XYhandle;
 
 PROCEDURE Clear*;
-VAR j: LONGINT;
+VAR j: SIGNED32;
 BEGIN
 	Display.ReplConst(black, F.X, F.Y, F.W, F.H, Display.replace);
 	j := 0;  WHILE j < max DO  bitmap[j] := {}; INC(j) END
@@ -84,7 +84,7 @@ BEGIN
 END Open;
 
 PROCEDURE Dot*(x, y, mode: SIGNED16);
-VAR k, i, j: LONGINT;
+VAR k, i, j: SIGNED32;
 BEGIN
 	IF (x >= 0) & (x < W) & (y >= 0) & (y < H) THEN
 		k := LONG(y)*W + x; i := k DIV SetSize; j := k MOD SetSize;
@@ -97,7 +97,7 @@ BEGIN
 END Dot;
 
 PROCEDURE IsDot*(x, y: SIGNED16): BOOLEAN;
-VAR k, i, j: LONGINT;
+VAR k, i, j: SIGNED32;
 BEGIN
 	IF (x >= 0) & (x < W) & (y >= 0) & (y < H) THEN
 		k := LONG(y)*W + x; i := k DIV SetSize; j := k MOD SetSize;

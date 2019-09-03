@@ -76,7 +76,7 @@ CONST
 TYPE
 	User = POINTER TO RECORD
 		name: ARRAY nameLen OF CHAR;
-		password, currentlogins, maxlogins: LONGINT;
+		password, currentlogins, maxlogins: SIGNED32;
 		permissions: SET;
 		root: ARRAY dirLen OF CHAR;
 		next: User;
@@ -87,7 +87,7 @@ TYPE
 		ip: IP.Adr;
 		method: ARRAY 16 OF CHAR;
 		uri: ARRAY 1024 OF CHAR;
-		status: LONGINT;
+		status: SIGNED32;
 		result: WORD;
 		pending: BOOLEAN;
 	END;
@@ -97,7 +97,7 @@ TYPE
 			running: BOOLEAN;
 			in: Streams.Reader;
 			out: Streams.Writer;
-			dataAdr: IP.Adr; dataPort: LONGINT;
+			dataAdr: IP.Adr; dataPort: SIGNED32;
 			timeout, pasvTimeout: Objects.Timer;
 			line: ARRAY LineLen OF CHAR;
 			cmd: ARRAY CmdLen OF CHAR;
@@ -106,10 +106,10 @@ TYPE
 			type: SIGNED8;
 			workDir: ARRAY dirLen OF CHAR;
 			rnfrName: ARRAY dirLen OF CHAR;	(* RNFR parameter *)
-			state: LONGINT;	(* one of: Ok, RNFR, REST *)
-			mode: LONGINT;	(* one of: Active, Passive *)
-			consecutiveErrors: LONGINT;	(* count of consecutive invalid commands *)
-			restMarker: LONGINT;	(* position in file where next file transfer should start. *)
+			state: SIGNED32;	(* one of: Ok, RNFR, REST *)
+			mode: SIGNED32;	(* one of: Active, Passive *)
+			consecutiveErrors: SIGNED32;	(* count of consecutive invalid commands *)
+			restMarker: SIGNED32;	(* position in file where next file transfer should start. *)
 			pasvListener: TCP.Connection;
 			logEntry: LogEntry;
 
@@ -156,7 +156,7 @@ TYPE
 			out.String(str); out.Ln(); out.Update
 		END SendString;
 
-		PROCEDURE SendMessage(code: LONGINT; msg: ARRAY OF CHAR);
+		PROCEDURE SendMessage(code: SIGNED32; msg: ARRAY OF CHAR);
 		BEGIN
 			IF logEntry.pending THEN
 				logEntry.status := code;W3CLog(logEntry);
@@ -197,7 +197,7 @@ TYPE
 
 		PROCEDURE Directory(name: ARRAY OF CHAR; full: BOOLEAN);
 		VAR data: TCP.Connection; w: Streams.Writer; e: Files.Enumerator; t: Kernel.MilliTimer;
-			prefix: Files.Prefix; str: ARRAY 20 OF CHAR; date, time: LONGINT; size: Files.Size; res: WORD; flags: SET; c: CHAR;
+			prefix: Files.Prefix; str: ARRAY 20 OF CHAR; date, time: SIGNED32; size: Files.Size; res: WORD; flags: SET; c: CHAR;
 			split: BOOLEAN;
 		BEGIN
 			SendMessage(150, "Opening ASCII mode data connection for file list.");
@@ -275,7 +275,7 @@ TYPE
 			END
 		END WaitEstablished;
 
-		PROCEDURE Retrieve(name: ARRAY OF CHAR; marker: LONGINT);
+		PROCEDURE Retrieve(name: ARRAY OF CHAR; marker: SIGNED32);
 		VAR data: TCP.Connection; w: Streams.Writer; f: Files.File; r: Files.Reader;
 			filename, msg: ARRAY dirLen OF CHAR; res: WORD;
 		BEGIN
@@ -316,7 +316,7 @@ TYPE
 					IF (type = ASCII) THEN ASCIITransfer(r, w)
 					ELSE BinaryTransfer(r, w)
 					END;
-					IncreaseSent(f.Length()(LONGINT));
+					IncreaseSent(f.Length()(SIGNED32));
 					SendMessage(226, "Transfer complete.")
 				END;
 
@@ -372,7 +372,7 @@ TYPE
 					ELSE BinaryTransfer(r, w)
 					END;
 					f.Update();
-					IncreaseReceived(f.Length()(LONGINT));
+					IncreaseReceived(f.Length()(SIGNED32));
 					SendMessage(226, Msg226)
 				END;
 
@@ -383,7 +383,7 @@ TYPE
 		PROCEDURE Execute(VAR cmd, param: ARRAY OF CHAR);
 		VAR
 			tmp, filename, str: ARRAY dirLen OF CHAR;
-			i, code, lastState: LONGINT; res: WORD;
+			i, code, lastState: SIGNED32; res: WORD;
 
 		BEGIN
 			lastState := state; state := Ok;
@@ -678,10 +678,10 @@ VAR
 	w3cf: Files.File;
 	w3cw: Streams.Writer;
 	(** statistical counters. #bytes sent/received := NMebiBX * 2**20 + NbytesX *)
-	NclientsTotal*, NclientsActive*, NMebiBReceived*, NMebiBSent*, NbytesReceived*, NbytesSent*: LONGINT;
+	NclientsTotal*, NclientsActive*, NMebiBReceived*, NMebiBSent*, NbytesReceived*, NbytesSent*: SIGNED32;
 
 (* --------- statisitcal counter handling --------------*)
-PROCEDURE IncreaseSent(delta: LONGINT);
+PROCEDURE IncreaseSent(delta: SIGNED32);
 BEGIN {EXCLUSIVE}
 	(* wp: delta >= 0 *)
 	ASSERT(delta >= 0);
@@ -690,7 +690,7 @@ BEGIN {EXCLUSIVE}
 	NbytesSent := NbytesSent MOD 100000H
 END IncreaseSent;
 
-PROCEDURE IncreaseReceived(delta: LONGINT);
+PROCEDURE IncreaseReceived(delta: SIGNED32);
 BEGIN {EXCLUSIVE}
 	(* wp: delta >= 0 *)
 	ASSERT(delta >= 0);
@@ -699,7 +699,7 @@ BEGIN {EXCLUSIVE}
 	NbytesReceived := NbytesReceived MOD 100000H
 END IncreaseReceived;
 
-PROCEDURE IncreaseActive(delta: LONGINT);
+PROCEDURE IncreaseActive(delta: SIGNED32);
 BEGIN {EXCLUSIVE}
 	NclientsActive := NclientsActive + delta
 END IncreaseActive;
@@ -711,8 +711,8 @@ BEGIN
 	RETURN (ch >= "0") & (ch <= "9")
 END IsDigit;
 
-PROCEDURE StrToInt(str: ARRAY OF CHAR; VAR val: LONGINT);
-VAR i, d: LONGINT; neg: BOOLEAN;
+PROCEDURE StrToInt(str: ARRAY OF CHAR; VAR val: SIGNED32);
+VAR i, d: SIGNED32; neg: BOOLEAN;
 BEGIN
 	i := 0;
 	WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
@@ -723,15 +723,15 @@ BEGIN
 	val := 0;
 	WHILE (str[i] # 0X) & (str[i] >= "0") & (str[i] <= "9") DO
 		d := ORD(str[i])-ORD("0");
-		IF val <= ((MAX(LONGINT)-d) DIV 10) THEN val := 10*val+d ELSE HALT(99) END;
+		IF val <= ((MAX(SIGNED32)-d) DIV 10) THEN val := 10*val+d ELSE HALT(99) END;
 		INC(i)
 	END;
 	IF neg THEN val := -val END
 END StrToInt;
 
-PROCEDURE StrToIntPos(VAR str: ARRAY OF CHAR; VAR i: SIGNED16): LONGINT;
+PROCEDURE StrToIntPos(VAR str: ARRAY OF CHAR; VAR i: SIGNED16): SIGNED32;
 VAR noStr: ARRAY 16 OF CHAR;
-		j: LONGINT;
+		j: SIGNED32;
 BEGIN
 	WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
 	j := 0;
@@ -746,8 +746,8 @@ BEGIN
 	RETURN j
 END StrToIntPos;
 
-PROCEDURE SplitPort(parm: ARRAY OF CHAR;  VAR adr: IP.Adr;  VAR port: LONGINT);
-	VAR pos: SIGNED16; i, n: LONGINT;
+PROCEDURE SplitPort(parm: ARRAY OF CHAR;  VAR adr: IP.Adr;  VAR port: SIGNED32);
+	VAR pos: SIGNED16; i, n: SIGNED32;
 BEGIN
 	pos := 0;
 	FOR i := 0 TO 3 DO n := StrToIntPos(parm, pos); parm[pos] := '.'; INC(pos) END;
@@ -759,12 +759,12 @@ END SplitPort;
 
 
 (* Parses the EPRT command *)
-PROCEDURE SplitEPRT(param: ARRAY OF CHAR; VAR adr: IP.Adr; VAR port: LONGINT);
+PROCEDURE SplitEPRT(param: ARRAY OF CHAR; VAR adr: IP.Adr; VAR port: SIGNED32);
 VAR
-	i: LONGINT;
-	protocol: LONGINT;
+	i: SIGNED32;
+	protocol: SIGNED32;
 	tempString: ARRAY 128 OF CHAR;
-	j: LONGINT;
+	j: SIGNED32;
 
 BEGIN
 	(* read protocol *)
@@ -834,8 +834,8 @@ BEGIN
 	w.Update
 END ASCIITransfer;
 
-PROCEDURE Code(VAR s: ARRAY OF CHAR): LONGINT;
-VAR i: SIGNED16; a, b, c: LONGINT;
+PROCEDURE Code(VAR s: ARRAY OF CHAR): SIGNED32;
+VAR i: SIGNED16; a, b, c: SIGNED32;
 BEGIN
 	a := 0; b := 0; i := 0;
 	WHILE s[i] # 0X DO
@@ -964,7 +964,7 @@ PROCEDURE AddUser*(context : Commands.Context);
 VAR
 	username, permissions: ARRAY nameLen OF CHAR; root: ARRAY dirLen OF CHAR;
 	password: ARRAY pwdLen+1 OF CHAR;
-	user: User; i, maxlogins: LONGINT;
+	user: User; i, maxlogins: SIGNED32;
 BEGIN {EXCLUSIVE}
 	context.arg.SkipWhitespace;
 	context.arg.Token(username); context.arg.SkipWhitespace;
@@ -1017,7 +1017,7 @@ END AddUser;
 *)
 
 PROCEDURE RemoveUser*(context : Commands.Context);
-VAR prev, u: User; name: ARRAY nameLen OF CHAR; nofRemovals : LONGINT;
+VAR prev, u: User; name: ARRAY nameLen OF CHAR; nofRemovals : SIGNED32;
 BEGIN {EXCLUSIVE}
 	context.arg.SkipWhitespace; context.arg.Token(name);
 	IF (name # "") THEN

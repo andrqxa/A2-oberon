@@ -34,10 +34,10 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 		refreshOn: BOOLEAN;
 		timer : Kernel.Timer;
 		module: Modules.Module;
-		interval: LONGINT;
+		interval: SIGNED32;
 		autorefresh: WMStandardComponents.Checkbox;
 
-	PROCEDURE &New*(title : ARRAY OF CHAR; interval: LONGINT; name: Modules.Name);
+	PROCEDURE &New*(title : ARRAY OF CHAR; interval: SIGNED32; name: Modules.Name);
 	VAR  toolbar: WMStandardComponents.Panel;
 		load, clear : WMStandardComponents.Button;
 		font: WMGraphics.Font;
@@ -143,7 +143,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 
 	PROCEDURE Load(sender, data : ANY);
 	VAR
-		dr: LONGINT;
+		dr: SIGNED32;
 		name: Modules.Name;
 		temp: BOOLEAN;
 	BEGIN
@@ -259,7 +259,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 		out.text.ReleaseWrite();
 	END Refresh;
 
-	PROCEDURE SetInterval*(interval: LONGINT);
+	PROCEDURE SetInterval*(interval: SIGNED32);
 	BEGIN
 		SELF.interval := interval;
 	END SetInterval;
@@ -269,7 +269,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 	VAR
 		mode, ch: CHAR;
 		m, tmp1: SIZE;
-		type, n, lval, size, tmp3, tdadr: LONGINT;
+		type, n, lval, size, tmp3, tdadr: SIGNED32;
 		adr, tmp2: ADDRESS;
 		etc: BOOLEAN;
 		sval: SIGNED8;
@@ -346,7 +346,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 								SYSTEM.GET(adr, sval);  w.Int( sval, 1)
 							|5:	(* SIGNED16 *)
 								SYSTEM.GET(adr, ival);  w.Int( ival, 1)
-							|6:	(* LONGINT *)
+							|6:	(* SIGNED32 *)
 								SYSTEM.GET(adr, lval);  w.Int( lval, 1)
 							|7:	(* REAL *)
 								SYSTEM.GET(adr, rval);  w.RawReal(rval)
@@ -382,7 +382,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 
 	(* FindProc - Find a procedure in the reference block.  Return index of name, or -1 if not found. *)
 	PROCEDURE FindProc(refs: Bytes;  ofs: ADDRESS): SIZE;
-	VAR i, m, proc: SIZE; t: LONGINT; ch: CHAR;
+	VAR i, m, proc: SIZE; t: SIGNED32; ch: CHAR;
 	BEGIN
 		proc := -1;  i := 0;  m := LEN(refs^);
 		ch := refs[i];  INC(i);
@@ -444,8 +444,8 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 
 
 
-	PROCEDURE GetNum(refs: Bytes;  VAR i: SIZE; VAR num: LONGINT);
-	VAR n, s: LONGINT;  x: CHAR;
+	PROCEDURE GetNum(refs: Bytes;  VAR i: SIZE; VAR num: SIGNED32);
+	VAR n, s: SIGNED32;  x: CHAR;
 	BEGIN
 		s := 0;  n := 0;  x := refs[i];  INC(i);
 		WHILE ORD(x) >= 128 DO
@@ -471,7 +471,7 @@ TYPE WinCollection = POINTER TO ARRAY OF StateWindow;
 
 VAR
 	stateWins: WinCollection;
-	nrWins: LONGINT;
+	nrWins: SIGNED32;
 
 
 PROCEDURE Remove(stateWin: StateWindow);
@@ -511,7 +511,7 @@ END Remove;
 PROCEDURE Open*(context : Commands.Context);
 VAR
 	i: SIZE;
-	interval: LONGINT;
+	interval: SIGNED32;
 	name: Modules.Name;
 	wins: WinCollection;
 	stateWin: StateWindow;

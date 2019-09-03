@@ -447,7 +447,7 @@ TYPE
 		so the scanner needs to be set to the first line of interest. *)
 		PROCEDURE FindStartPos;
 		VAR
-			thisChar : LONGINT;
+			thisChar : SIGNED32;
 		BEGIN
 			thisChar := 0;
 			text.AcquireRead;

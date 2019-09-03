@@ -14,7 +14,7 @@ TYPE
 
 
 			PROCEDURE Initialize;
-			VAR n: Node;  i: LONGINT;
+			VAR n: Node;  i: SIGNED32;
 			BEGIN
 				alpha := NIL;
 				FOR i := 0 TO 255 DO
@@ -23,7 +23,7 @@ TYPE
 			END Initialize;
 
 			PROCEDURE Encode( VAR buf: ARRAY OF CHAR; len: SIZE );
-			VAR l, m: Node;  i: SIZE;  k: LONGINT; ch: CHAR;
+			VAR l, m: Node;  i: SIZE;  k: SIGNED32; ch: CHAR;
 			BEGIN
 				Initialize;
 				FOR i := 0 TO len - 1 DO
@@ -41,7 +41,7 @@ TYPE
 			END Encode;
 
 			PROCEDURE Decode( VAR buf: ARRAY OF CHAR; len: SIZE );
-			VAR l, m: Node;  i: SIZE;  c: LONGINT;  ch: CHAR;
+			VAR l, m: Node;  i: SIZE;  c: SIGNED32;  ch: CHAR;
 			BEGIN
 				Initialize;
 				FOR i := 0 TO len - 1 DO
@@ -74,7 +74,7 @@ TYPE
 
 
 			PROCEDURE Less( a, b: Index ): BOOLEAN;
-			VAR i1, i2: Index;  n, diff: LONGINT;
+			VAR i1, i2: Index;  n, diff: SIGNED32;
 			BEGIN
 				n := 0;  i1 := rotation[a];  i2 := rotation[b];
 				REPEAT
@@ -136,8 +136,8 @@ TYPE
 				END
 			END SortR;
 
-			PROCEDURE EncodeBlock*( VAR buf: ARRAY OF CHAR; len: SIZE ): LONGINT;
-			VAR  i: SIZE;  index: LONGINT;
+			PROCEDURE EncodeBlock*( VAR buf: ARRAY OF CHAR; len: SIZE ): SIGNED32;
+			VAR  i: SIZE;  index: SIGNED32;
 			BEGIN
 				ASSERT( len <= BlockSize );  length := len;
 				FOR i := 0 TO length - 1 DO  sbuf[i] := buf[i];  sbuf[i+length] := buf[i]  END;
@@ -201,7 +201,7 @@ TYPE
 
 			PROCEDURE DecodeBlock*( VAR buf: ARRAY OF CHAR; len, index: SIZE );
 			VAR
-				i, j: SIZE; n: LONGINT;  ch: CHAR;
+				i, j: SIZE; n: SIGNED32;  ch: CHAR;
 				xn: ARRAY 256 OF SIGNED16;
 			BEGIN
 				ASSERT( len <= BlockSize );

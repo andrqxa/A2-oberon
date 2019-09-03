@@ -31,7 +31,7 @@ TYPE
 		frame: Display.Frame;
 		text: Texts.Text;
 		changed: BOOLEAN;
-		lastchanged: LONGINT;
+		lastchanged: SIGNED32;
 	END;
 VAR
 	sym, level: SIGNED8;  noerr: BOOLEAN;  inFormPar: BOOLEAN;  exprdepth: SIGNED16;  sline: SIGNED16;  found: BOOLEAN;  silent, notrap: BOOLEAN;
@@ -137,7 +137,7 @@ VAR
 	END CheckMark;
 
 	PROCEDURE CheckSysFlag;
-	VAR sf: LONGINT;
+	VAR sf: SIGNED32;
 	BEGIN
 		IF sym = lbrak THEN IO.Get( sym );  ConstExpression();  IO.appSP();  CheckSym( rbrak )
 		ELSIF sym = lbrace THEN
@@ -491,7 +491,7 @@ VAR
 		END GetParams;
 
 		PROCEDURE Body;
-		VAR c: LONGINT;
+		VAR c: SIGNED32;
 		BEGIN
 			CheckSym( semicolon );  Block( FALSE );
 			IF (sym = ident) OR (sym = number) OR (sym = string) THEN IO.Get( sym ) ELSE err( ident ) END;
@@ -552,10 +552,10 @@ VAR
 	END CaseLabelList;
 
 	PROCEDURE StatSeq( bp: BreakPoint;  adj: BOOLEAN );
-	VAR cst: BOOLEAN;  line: SIGNED16;  bp1: BreakPoint;  prevbps: ssBP;  withpos: LONGINT;
+	VAR cst: BOOLEAN;  line: SIGNED16;  bp1: BreakPoint;  prevbps: ssBP;  withpos: SIGNED32;
 
 		PROCEDURE CasePart;
-		VAR n: SIGNED16;  low, high: LONGINT;  e: BOOLEAN;  bp: BreakPoint;
+		VAR n: SIGNED16;  low, high: SIGNED32;  e: BOOLEAN;  bp: BreakPoint;
 		BEGIN
 			Expression( NIL );  CheckSym( of );  IO.prepNL;
 			LOOP
@@ -700,7 +700,7 @@ VAR
 	END StatSeq;
 
 	PROCEDURE Code;
-	VAR il: LONGINT;  n: SIGNED16;  skippedspaces: BOOLEAN;  curline: SIGNED16;
+	VAR il: SIGNED32;  n: SIGNED16;  skippedspaces: BOOLEAN;  curline: SIGNED16;
 	BEGIN
 		skippedspaces := FALSE;
 		IF sym = lbrace THEN
@@ -928,7 +928,7 @@ VAR
 	*)
 
 	PROCEDURE GetOptions( VAR Sc: Texts.Scanner;  VAR print, large, color, lowercase, uppercase: BOOLEAN );
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		WHILE (Sc.class = Texts.Char) & (Sc.c = "\") DO
 			Texts.Scan( Sc );
@@ -952,7 +952,7 @@ VAR
 	END GetOptions;
 
 	PROCEDURE Format*;
-	VAR par: Oberon.ParList;  T: Texts.Text;  F: Files.File;  Sc: Texts.Scanner;  R: Texts.Reader;  res: SIGNED16;  beg, end, time: LONGINT;
+	VAR par: Oberon.ParList;  T: Texts.Text;  F: Files.File;  Sc: Texts.Scanner;  R: Texts.Reader;  res: SIGNED16;  beg, end, time: SIGNED32;
 		name: ARRAY 256 OF CHAR;
 		print: BOOLEAN;  ch: CHAR;  i: SIGNED16;  caret: Oberon.CaretMsg;  color: BOOLEAN;  large: BOOLEAN;  prefix: CHAR;  uppercase, lowercase: BOOLEAN;
 	BEGIN
@@ -1001,23 +1001,23 @@ VAR
 	PROCEDURE RemoveOldStyleWith*;
 	CONST with = 1;  case = 2;  else = 3;  end = 4;
 	TYPE Job = OBJECT
-		VAR pos: LONGINT;
-			c: LONGINT;
+		VAR pos: SIGNED32;
+			c: SIGNED32;
 			next: Job;
 		END Job;
-	VAR pos: LONGINT;  c: LONGINT;  S: Texts.Scanner;  S1: Texts.Scanner;  T: Texts.Text;  NT: Texts.Text;
+	VAR pos: SIGNED32;  c: SIGNED32;  S: Texts.Scanner;  S1: Texts.Scanner;  T: Texts.Text;  NT: Texts.Text;
 		name: ARRAY 256 OF CHAR;
-		root, job: Job;  W: Texts.Writer;  ooffset, offset: LONGINT;
+		root, job: Job;  W: Texts.Writer;  ooffset, offset: SIGNED32;
 
 		PROCEDURE StripColon( VAR n1, n2: ARRAY OF CHAR );
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			i := 0;
 			WHILE (n1[i] # 0X) & (n1[i] # ":") DO n2[i] := n1[i];  INC( i )  END;
 			ASSERT( n1[i] = ":" );  n2[i] := 0X;
 		END StripColon;
 
-		PROCEDURE InsertJob( pos: LONGINT;  c: LONGINT );
+		PROCEDURE InsertJob( pos: SIGNED32;  c: SIGNED32 );
 		VAR t, job: Job;
 		BEGIN
 			NEW( t );  t.pos := pos;  t.c := c;  job := root;

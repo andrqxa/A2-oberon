@@ -43,7 +43,7 @@ MODULE OType IN Oberon;	(** eos  **)
 		CacheObj = POINTER TO CacheObjDesc;
 		CacheObjDesc = RECORD
 			prev, next: CacheObj;
-			stamp: LONGINT;
+			stamp: SIGNED32;
 		END;
 
 		(** object cache **)
@@ -54,9 +54,9 @@ MODULE OType IN Oberon;	(** eos  **)
 
 		(* OpenType table directory entry *)
 		TableEntry = RECORD
-			tag: LONGINT;	(* table identifier *)
-			checkSum: LONGINT;	(* checksum over table *)
-			offset, length: LONGINT;	(* position and length of table within file *)
+			tag: SIGNED32;	(* table identifier *)
+			checkSum: SIGNED32;	(* checksum over table *)
+			offset, length: SIGNED32;	(* position and length of table within file *)
 		END;
 
 		(** header table **)
@@ -134,7 +134,7 @@ MODULE OType IN Oberon;	(** eos  **)
 			instr: OTInt.Instructions;
 			store: OTInt.Store;
 			cvt: OTInt.CVT;
-			cvtLen: LONGINT;
+			cvtLen: SIGNED32;
 			twilight: OTInt.Zone;
 		END;
 
@@ -197,7 +197,7 @@ MODULE OType IN Oberon;	(** eos  **)
 		FontCache*: Cache;	(** cache for font objects **)
 		CharToUnicode*: ARRAY 256 OF SIGNED16;	(** mapping from Oberon character codes to Unicodes **)
 		Identity*: Matrix;	(** matrix normally used for generating instances **)
-		CacheStamp: LONGINT;	(* next object stamp *)
+		CacheStamp: SIGNED32;	(* next object stamp *)
 		MacChar, UniChar: ARRAY 256 OF SIGNED16;	(* corresponding Mac and Unicode characters in ascending Unicode order *)
 
 
@@ -207,7 +207,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	PROCEDURE InitCache* (VAR cache: Cache);
 	BEGIN
 		NEW(cache.sent); cache.sent.next := cache.sent; cache.sent.prev := cache.sent;
-		cache.sent.stamp := MAX(LONGINT);
+		cache.sent.stamp := MAX(SIGNED32);
 		cache.entries := 0; cache.max := DefaultCacheSize
 	END InitCache;
 
@@ -248,8 +248,8 @@ MODULE OType IN Oberon;	(** eos  **)
 	(**--- Fonts ---**)
 
 	(** return location of table within font file (returns whether table was found) **)
-	PROCEDURE FindTable* (font: Font; name: ARRAY OF CHAR; VAR offset, length: LONGINT): BOOLEAN;
-		VAR tag, lo, hi, m: LONGINT;
+	PROCEDURE FindTable* (font: Font; name: ARRAY OF CHAR; VAR offset, length: SIGNED32): BOOLEAN;
+		VAR tag, lo, hi, m: SIGNED32;
 	BEGIN
 		tag := ASH(ASH(ASH(ORD(name[0]), 8) + ORD(name[1]), 8) + ORD(name[2]), 8) + ORD(name[3]);
 		lo := 0; hi := font.numTables;
@@ -272,7 +272,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	END ReadInt;
 
 	(** read big endian 4 byte integer **)
-	PROCEDURE ReadLInt* (VAR r: Files.Rider; VAR l: LONGINT);
+	PROCEDURE ReadLInt* (VAR r: Files.Rider; VAR l: SIGNED32);
 		VAR c: ARRAY 4 OF CHAR;
 	BEGIN
 		Files.ReadBytes(r, c, 4);
@@ -280,7 +280,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	END ReadLInt;
 
 	PROCEDURE LoadHeader (font: Font): BOOLEAN;
-		VAR pos, len, version, magic: LONGINT; r: Files.Rider; gformat: SIGNED16;
+		VAR pos, len, version, magic: SIGNED32; r: Files.Rider; gformat: SIGNED16;
 	BEGIN
 		IF ~FindTable(font, "head", pos, len) THEN RETURN FALSE END;
 		Files.Set(r, font.file, pos); ReadLInt(r, version);
@@ -300,7 +300,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	END LoadHeader;
 
 	PROCEDURE LoadHorHeader (font: Font): BOOLEAN;
-		VAR pos, len, version: LONGINT; r: Files.Rider; mformat: SIGNED16;
+		VAR pos, len, version: SIGNED32; r: Files.Rider; mformat: SIGNED16;
 	BEGIN
 		IF ~FindTable(font, "hhea", pos, len) THEN RETURN FALSE END;
 		Files.Set(r, font.file, pos); ReadLInt(r, version);
@@ -315,7 +315,7 @@ MODULE OType IN Oberon;	(** eos  **)
 
 	PROCEDURE LoadCharMap (font: Font): BOOLEAN;
 		VAR
-			r: Files.Rider; pos, length, offset, s, p: LONGINT;
+			r: Files.Rider; pos, length, offset, s, p: SIGNED32;
 			version, tables, t, platform, encoding, format, n, len, segCountX2, pad, off: SIGNED16;
 			found: BOOLEAN; glyph: ARRAY 256 OF CHAR; uni: ARRAY CharMapSize OF SIGNED16;
 	BEGIN
@@ -408,7 +408,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	END LoadCharMap;
 
 	PROCEDURE LoadMaxProfile (font: Font): BOOLEAN;
-		VAR pos, len, version: LONGINT; r: Files.Rider;
+		VAR pos, len, version: SIGNED32; r: Files.Rider;
 	BEGIN
 		IF ~FindTable(font, "maxp", pos, len) THEN RETURN FALSE END;
 		Files.Set(r, font.file, pos); ReadLInt(r, version);
@@ -425,7 +425,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	END LoadMaxProfile;
 
 	PROCEDURE LoadHorMetrics (font: Font): BOOLEAN;
-		VAR pos, len: LONGINT; r: Files.Rider; n, aw: SIGNED16;
+		VAR pos, len: SIGNED32; r: Files.Rider; n, aw: SIGNED16;
 	BEGIN
 		IF ~FindTable(font, "hmtx", pos, len) THEN RETURN FALSE END;
 		NEW(font.hmtx, font.maxp.numGlyphs);
@@ -444,7 +444,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	END LoadHorMetrics;
 
 	PROCEDURE LoadCVT (font: Font);
-		VAR pos, len, n: LONGINT; r: Files.Rider; val: FUnit;
+		VAR pos, len, n: SIGNED32; r: Files.Rider; val: FUnit;
 	BEGIN
 		font.cvt := NIL; font.cvtLen := 0;
 		IF FindTable(font, "cvt ", pos, len) THEN
@@ -458,7 +458,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	END LoadCVT;
 
 	PROCEDURE LoadLinearThresholds (font: Font);
-		VAR pos, len: LONGINT; r: Files.Rider; numGlyphs: SIGNED16;
+		VAR pos, len: SIGNED32; r: Files.Rider; numGlyphs: SIGNED16;
 	BEGIN
 		font.LTSH := NIL;
 		IF FindTable(font, "LTSH", pos, len) THEN
@@ -478,7 +478,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	END LoadLinearThresholds;
 
 	PROCEDURE LoadFont (font: Font): BOOLEAN;
-		VAR r: Files.Rider; n: LONGINT; ok: BOOLEAN;
+		VAR r: Files.Rider; n: SIGNED32; ok: BOOLEAN;
 	BEGIN
 		(* load table directory *)
 		Files.Set(r, font.file, 4); ReadInt(r, font.numTables);
@@ -521,7 +521,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	END LoadFont;
 
 	PROCEDURE ExecFontProg (font: Font);
-		VAR pos, len: LONGINT; r: Files.Rider; context: OTInt.Context;
+		VAR pos, len: SIGNED32; r: Files.Rider; context: OTInt.Context;
 	BEGIN
 		IF FindTable(font, "fpgm", pos, len) THEN
 			OTInt.NewCode(font.fontProg, len);
@@ -537,7 +537,7 @@ MODULE OType IN Oberon;	(** eos  **)
 
 	(** open a OpenType font file; file name extension and path may be omitted; returns NIL if not found **)
 	PROCEDURE Open* (name: ARRAY OF CHAR): Font;
-		VAR fname, ext: ARRAY 64 OF CHAR; obj: CacheObj; file: Files.File; r: Files.Rider; version: LONGINT; font: Font;
+		VAR fname, ext: ARRAY 64 OF CHAR; obj: CacheObj; file: Files.File; r: Files.Rider; version: SIGNED32; font: Font;
 	BEGIN
 		COPY(name, fname);
 		Strings.GetSuffix(name, ext);
@@ -581,7 +581,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	(** get entry from name table; whenever possible, a string in English is returned **)
 	PROCEDURE GetName* (font: Font; id: SIGNED16; VAR name: ARRAY OF CHAR);
 		VAR
-			pos, len, off: LONGINT;
+			pos, len, off: SIGNED32;
 			r: Files.Rider;
 			unicode: BOOLEAN;
 			n, offset, platform, encoding, language, nameID, l, o: SIGNED16;
@@ -618,8 +618,8 @@ MODULE OType IN Oberon;	(** eos  **)
 	END GetName;
 
 	(** map Unicode character code to glyph number **)
-	PROCEDURE UnicodeToGlyph* (font: Font; code: LONGINT): SIGNED16;
-		VAR lo, hi, m, start, end, delta, offset, idx: LONGINT;
+	PROCEDURE UnicodeToGlyph* (font: Font; code: SIGNED32): SIGNED16;
+		VAR lo, hi, m, start, end, delta, offset, idx: SIGNED32;
 	BEGIN
 		lo := 0; hi := font.cmap.segCount;
 		WHILE lo+1 < hi DO
@@ -663,7 +663,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	(** get an instance for an opened font (an instance has fixed point size and resolution) **)
 	PROCEDURE GetInstance* (font: Font; ptsize: F26D6; xdpi, ydpi: SIGNED16; mat: Matrix; VAR inst: Instance);
 		VAR
-			xppm, yppm, ppm, lo, hi, xmin, xmax, ymin, ymax: F26D6; obj: CacheObj; i, pos, len, size: LONGINT;
+			xppm, yppm, ppm, lo, hi, xmin, xmax, ymin, ymax: F26D6; obj: CacheObj; i, pos, len, size: SIGNED32;
 			context: OTInt.Context; r: Files.Rider; version, n, maxPPM, flags: SIGNED16; ch: CHAR;
 	BEGIN
 		CalcPPEm(font, ptsize, xdpi, ydpi, xppm, yppm);
@@ -897,7 +897,7 @@ MODULE OType IN Oberon;	(** eos  **)
 
 	PROCEDURE LoadOutline (glyph: Glyph; inst: Instance; num: SIGNED16; hinted, rotated, stretched: BOOLEAN);
 		VAR
-			font: Font; pos, len, beg, end: LONGINT; r: Files.Rider;
+			font: Font; pos, len, beg, end: SIGNED32; r: Files.Rider;
 			int, contours, flags, idx, arg1, arg2, firstc, firstp, i, lastc, lastp, instrLen, points: SIGNED16; comp: OTInt.Zone;
 			aw, lsb, xmin, ymin, xmax, ymax: FUnit; lppx, rppx, dx, dy: F26D6; m00, m01, m10, m11: F2D14;
 			scaled, rot: BOOLEAN; context: OTInt.Context;
@@ -1249,7 +1249,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	(*--- Initialization ---*)
 
 	PROCEDURE InitCharMaps;
-		VAR i: SIGNED16; l: LONGINT;
+		VAR i: SIGNED16; l: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 126 DO
 			UniChar[i] := i; MacChar[i] := i

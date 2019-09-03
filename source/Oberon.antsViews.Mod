@@ -44,7 +44,7 @@ TYPE
 VAR
 	tempLayer-: tLayer;
 
-	PROCEDURE CheckColors*( l: tLayer;  depth: LONGINT );
+	PROCEDURE CheckColors*( l: tLayer;  depth: SIGNED32 );
 	BEGIN
 		IF depth > 256 THEN RETURN END;
 		IF depth - 1 # l.pal.last THEN vyColorPalettes.ShiftPath( l.pal, 0, SHORT( depth - 1 ) ) END
@@ -280,14 +280,14 @@ VAR
 		Init( layer );  vyPort.OpenLayer( layer, id )
 	END Open;
 
-	PROCEDURE DoShowI*( a: antsArrayObjects.tINTEGERArray;  depth: LONGINT );
+	PROCEDURE DoShowI*( a: antsArrayObjects.tINTEGERArray;  depth: SIGNED32 );
 	VAR A: antsArrayObjects.tINTEGERObject;  a16o: antsArrayPictures16.tObject;  ao: antsArrayPictures.tObject;
 	BEGIN
 		A := antsArrayObjects.NewINTEGERObject( LEN( a[0] ), LEN( a ), depth );  antsArrayObjects.SetInt( A, a );
 		IF depth > 255 THEN antsArrayPictures16.DoShow( A, a16o ) ELSE antsArrayPictures.DoShow( A, ao ) END
 	END DoShowI;
 
-	PROCEDURE DoShowR*( a: antsArrayObjects.tLONGREALArray;  depth: LONGINT );
+	PROCEDURE DoShowR*( a: antsArrayObjects.tLONGREALArray;  depth: SIGNED32 );
 	VAR A: antsArrayObjects.tINTEGERObject;  a16o: antsArrayPictures16.tObject;  ao: antsArrayPictures.tObject;
 	BEGIN
 		A := antsArrayObjects.NewINTEGERObject( LEN( a[0] ), LEN( a ), depth );  antsArrayObjects.SetLongreal( A, a );

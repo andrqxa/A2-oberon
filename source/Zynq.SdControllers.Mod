@@ -19,11 +19,11 @@ TYPE
 	VAR
 		hc: Sd.HostController;
 		handler: InterruptHandler;
-		state, event: LONGINT;
+		state, event: SIGNED32;
 		card: Sd.Card;
 		halted: BOOLEAN;
 
-		PROCEDURE & Init (base: ADDRESS; int: LONGINT; clock: HUGEINT);
+		PROCEDURE & Init (base: ADDRESS; int: SIGNED32; clock: HUGEINT);
 		VAR
 			result: WORD;
 		BEGIN
@@ -41,7 +41,7 @@ TYPE
 			SdEnvironment.InstallHandler(handler.Handle, int);
 		END Init;
 
-		PROCEDURE HandleEvent (card: Sd.Card; event: LONGINT; param: ANY);
+		PROCEDURE HandleEvent (card: Sd.Card; event: SIGNED32; param: ANY);
 		BEGIN {EXCLUSIVE}
 			AWAIT(state # Running);
 			SELF.event := event;
@@ -89,7 +89,7 @@ TYPE
 			blocked := FALSE
 		END Init;
 
-		PROCEDURE Block (hc: Sd.HostController; mask: SET; timeout: LONGINT): BOOLEAN;
+		PROCEDURE Block (hc: Sd.HostController; mask: SET; timeout: SIGNED32): BOOLEAN;
 		VAR
 			irqs: SET;
 		BEGIN {EXCLUSIVE}
@@ -124,7 +124,7 @@ VAR
 
 	PROCEDURE Init;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		Modules.InstallTermHandler(Cleanup);
 		FOR i := 0 TO Platform.SdNb - 1 DO
@@ -149,7 +149,7 @@ VAR
 
 	PROCEDURE Cleanup;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN(hc) - 1 DO
 			IF hc[i] # NIL THEN hc[i].Stop END
@@ -158,7 +158,7 @@ VAR
 
 	PROCEDURE Statistics * (c: Commands.Context);
 	VAR
-		accesses: LONGINT;
+		accesses: SIGNED32;
 		byteRead, byteWritten, read, write: HUGEINT;
 		tread, twrite: HUGEINT;
 		speedR, speedW: LONGREAL;

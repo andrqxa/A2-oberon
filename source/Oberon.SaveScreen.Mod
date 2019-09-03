@@ -62,12 +62,12 @@ MODULE SaveScreen IN Oberon;
 
 	VAR
 		W: Texts.Writer;
-		seed: LONGINT;	(* for the random number generator *)
+		seed: SIGNED32;	(* for the random number generator *)
 
 		Start, Step, Stop: FaderProc;
 
-		waitLimit: LONGINT;	(* time at which the fader kicks in, unit: Input.TimeUnit *)
-		waitTime, waitPeriod, drawPeriod: LONGINT;	(* unit Input.TimeUnit *)
+		waitLimit: SIGNED32;	(* time at which the fader kicks in, unit: Input.TimeUnit *)
+		waitTime, waitPeriod, drawPeriod: SIGNED32;	(* unit Input.TimeUnit *)
 		oldMouseX, oldMouseY: SIGNED16;
 
 		state: SIGNED16;
@@ -92,7 +92,7 @@ MODULE SaveScreen IN Oberon;
 
 	PROCEDURE Rand*(range: SIGNED16): SIGNED16;
 		CONST a = 16807; m = 2147483647; q = m DIV a; r = m MOD a;
-		VAR g: LONGINT;
+		VAR g: SIGNED32;
 	BEGIN
 		g := a * (seed MOD q) - r * (seed DIV q);
 		IF g > 0 THEN seed := g ELSE seed := g + m END;
@@ -145,12 +145,12 @@ MODULE SaveScreen IN Oberon;
 
 
 	PROCEDURE TaskHandler(task: Oberon.Task);
-		VAR x, y: SIGNED16; keys: SET; now: LONGINT;
+		VAR x, y: SIGNED16; keys: SET; now: SIGNED32;
 	BEGIN
 		now := Input.Time();
 		CASE state OF
 		| dormant:
-			task.time := MAX(LONGINT);
+			task.time := MAX(SIGNED32);
 		| waiting:
 			Input.Mouse(keys, x, y);
 			IF (ABS(x - oldMouseX) > mouseTolerance) OR (ABS(y - oldMouseY) > mouseTolerance) THEN
@@ -186,7 +186,7 @@ MODULE SaveScreen IN Oberon;
 				Stop;
 				IF (filler.state = 1) & (Viewers.Next(filler) = filler) THEN Viewers.CloseTrack(filler.X) END;
 			END;
-			task.time := MAX(LONGINT);
+			task.time := MAX(SIGNED32);
 		| waiting: ASSERT(state IN {drawingW, dormant}, 112);
 			IF state = drawingW THEN
 				Stop;
@@ -226,7 +226,7 @@ MODULE SaveScreen IN Oberon;
 
 (* Screen saver configuration calls & Commands *)
 
-	PROCEDURE SetWaitTime* (seconds: LONGINT);
+	PROCEDURE SetWaitTime* (seconds: SIGNED32);
 		CONST day = 60 * 60 * 24;
 	BEGIN
 		IF seconds < 15 THEN seconds := 15

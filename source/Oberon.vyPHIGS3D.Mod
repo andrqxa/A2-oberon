@@ -126,7 +126,7 @@ mtPRP, B1, B2, B: tMatrix;
 View: tMatrix;
 (* represents the transformation of the RWS in the NPS
 simply the product: View = OrientationMatrix*MappingMatrix *)
-definitionTime: LONGINT
+definitionTime: SIGNED32
 END;
 
 VAR
@@ -1045,7 +1045,7 @@ PROCEDURE InitCoordinate;
 VAR error: SIGNED16;
 BEGIN NEW (theC3D);   OpenCoordinate (theC3D, error) END InitCoordinate;
 
-PROCEDURE UpToDate* (date: LONGINT): BOOLEAN;
+PROCEDURE UpToDate* (date: SIGNED32): BOOLEAN;
 BEGIN RETURN (date > theC3D.definitionTime) END UpToDate;
 
 PROCEDURE DumpSpec*;

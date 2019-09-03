@@ -1395,7 +1395,7 @@ TYPE
 	TYPE TranspilerBackend*= OBJECT (Backend.Backend)
 	VAR
 		defineMain, declarations, initLocalData: BOOLEAN;
-		addressSize: LONGINT; style: Style;
+		addressSize: SIGNED32; style: Style;
 		traceModule: Identifier;
 
 		PROCEDURE &InitTranspilerBackend;

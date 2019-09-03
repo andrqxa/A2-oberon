@@ -44,10 +44,10 @@ VAR
 	tempLayer: tLayer;
 
 	PROCEDURE Recall( layer: tLayer );
-	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;
+	VAR cells: SIGNED32;  cellsize: LONGREAL;  i, j: SIGNED32;
 		str: ARRAY 20 OF CHAR;
 
-		PROCEDURE PaintCell( x, y: LONGINT;  val: LONGREAL );
+		PROCEDURE PaintCell( x, y: SIGNED32;  val: LONGREAL );
 		BEGIN
 			vyHostStrings.RealToFixStr( val, str, 1, 2, 0 );
 			IF val < 0 THEN val := -val;  vyGraphBase.SetForeColor( layer.style.selectcol )
@@ -108,9 +108,9 @@ VAR
 	END Prompt;
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;  origx, origy: SIGNED16;
+	VAR cells: SIGNED32;  cellsize: LONGREAL;  i, j: SIGNED32;  origx, origy: SIGNED16;
 
-		PROCEDURE InCell( x, y: LONGINT;  cx, cy: SIGNED16 ): BOOLEAN;
+		PROCEDURE InCell( x, y: SIGNED32;  cx, cy: SIGNED16 ): BOOLEAN;
 		VAR rx, ry, rw, rh: SIGNED16;
 		BEGIN
 			vyGraphBase.Rect2dToRect( x * cellsize - cellsize / 2, y * cellsize - cellsize / 2, cellsize, cellsize, rx, ry, rw, rh );

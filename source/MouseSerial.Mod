@@ -70,12 +70,12 @@ TYPE
 
 	Mouse = OBJECT
 	VAR
-		type: LONGINT; (* mouse type *)
+		type: SIGNED32; (* mouse type *)
 		mbufp, numb: SIGNED8; (* buffer pointer & protocol bytes *)
 		mbuf: ARRAY 5 OF SET; (* protocol buffer *)
 		mask0, val0, mask1, val1, lastkeys: SET; (* protocol parameters *)
 
-		errors : LONGINT;
+		errors : SIGNED32;
 		res : WORD;
 
 		port : Serials.Port;
@@ -84,7 +84,7 @@ TYPE
 		dead : BOOLEAN;
 
 		(* Read a mouse event *)
-		PROCEDURE GetMouseEvent(VAR keys: SET;  VAR dx, dy: LONGINT): WORD;
+		PROCEDURE GetMouseEvent(VAR keys: SET;  VAR dx, dy: SIGNED32): WORD;
 		VAR ch : CHAR; b : SET; res : WORD;
 		BEGIN
 			b := {};
@@ -156,8 +156,8 @@ TYPE
 			"port" - V24.COM[12]
 			"bps" - V24.BPS*
 			"rate" - sample rate (not all mice support this) *)
-		PROCEDURE &Init*(port : Serials.Port; type : LONGINT);
-		VAR c: CHAR; res: WORD; n: LONGINT;
+		PROCEDURE &Init*(port : Serials.Port; type : SIGNED32);
+		VAR c: CHAR; res: WORD; n: SIGNED32;
 		BEGIN
 			(* ASSERT: Port is already open *)
 			ASSERT(port # NIL);
@@ -247,7 +247,7 @@ VAR
 	timer : Kernel.Timer;
 
 (* Set mouse speed *)
-PROCEDURE SetSpeed(port : Serials.Port; mouseType, oldBPS, newBPS: LONGINT);
+PROCEDURE SetSpeed(port : Serials.Port; mouseType, oldBPS, newBPS: SIGNED32);
 VAR word, stop, par : SIGNED16; c : CHAR;  res : WORD;
 BEGIN
 	ASSERT(port # NIL);
@@ -282,8 +282,8 @@ BEGIN
 	END;
 END SetSpeed;
 
-PROCEDURE GetMouseType(CONST s : ARRAY OF CHAR) : LONGINT;
-VAR type : LONGINT;
+PROCEDURE GetMouseType(CONST s : ARRAY OF CHAR) : SIGNED32;
+VAR type : SIGNED32;
 BEGIN
 	type := MinType-1;
 	IF (s[0] >= "0") & (s[0] <= "9") THEN (* old style config *)
@@ -321,8 +321,8 @@ BEGIN
 	RETURN type;
 END GetMouseType;
 
-PROCEDURE Detect(port : Serials.Port; VAR mouseType : LONGINT): BOOLEAN;
-VAR ch: CHAR; i : LONGINT; res : WORD; mouseIdent : ARRAY DetectMaxIdent OF CHAR;
+PROCEDURE Detect(port : Serials.Port; VAR mouseType : SIGNED32): BOOLEAN;
+VAR ch: CHAR; i : SIGNED32; res : WORD; mouseIdent : ARRAY DetectMaxIdent OF CHAR;
 BEGIN
 	ASSERT(port # NIL);
 	port.Open(BPS, 7,  Serials.ParNo, Serials.Stop1, res);
@@ -362,7 +362,7 @@ PROCEDURE Init;
 VAR
 	value: ARRAY DetectMaxIdent OF CHAR;
 	port : Serials.Port;
-	mouseType, portNbr : LONGINT;
+	mouseType, portNbr : SIGNED32;
 BEGIN
 	Machine.GetConfig("MT", value);
 	IF value[0] # 0X THEN (* manual config *)
@@ -406,7 +406,7 @@ BEGIN
 	END;
 END Init;
 
-PROCEDURE Wait(milliseconds : LONGINT);
+PROCEDURE Wait(milliseconds : SIGNED32);
 BEGIN {EXCLUSIVE}
 	ASSERT(milliseconds > 0);
 	timer.Sleep(milliseconds);
@@ -430,7 +430,7 @@ END Install;
 
 (** Manually set the mouse type *)
 PROCEDURE ToggleMouseType*(context : Commands.Context); (** PortNumber  ~ *)
-VAR portNbr, type : LONGINT; m : Mouse;
+VAR portNbr, type : SIGNED32; m : Mouse;
 BEGIN
 	IF context.arg.GetInteger(portNbr, FALSE) & (1 <= portNbr) & (portNbr <= Serials.MaxPorts) THEN
 		m := mouse[portNbr];
@@ -448,7 +448,7 @@ BEGIN
 END ToggleMouseType;
 
 PROCEDURE Cleanup;
-VAR i : LONGINT;
+VAR i : SIGNED32;
 BEGIN
 	FOR i := 0 TO LEN(mouse)-1 DO
 		IF mouse[i] # NIL THEN

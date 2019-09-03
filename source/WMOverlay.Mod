@@ -30,7 +30,7 @@ CONST
 TYPE
 	Item = RECORD
 		isEnabled : BOOLEAN;
-		bgEnabled : LONGINT;
+		bgEnabled : SIGNED32;
 		rect : WMRectangles.Rectangle;
 		image, imageHover : WMGraphics.Image;
 	END;
@@ -48,7 +48,7 @@ TYPE
 		mouseOver : SIZE; (* index of mouse over icon, -1 of no mouse over *)
 		currentPointer : WORD;
 		currentIndex : SIZE;
-		color, bgColor : LONGINT;
+		color, bgColor : SIGNED32;
 
 		dragStartX, dragStartY : SIZE;
 		dragging, noDrag : BOOLEAN;
@@ -60,7 +60,7 @@ TYPE
 		PROCEDURE &New*;
 		VAR
 			image, imageHover : Files.FileName; font : WMGraphics.Font;
-			i : LONGINT;
+			i : SIGNED32;
 		BEGIN
 			Init(viewport.width0, viewport.height0, TRUE);
 			lx := -1; ly := -1;
@@ -133,7 +133,7 @@ TYPE
 
 		PROCEDURE Draw*(canvas : WMGraphics.Canvas; width, height : SIZE; quality : WORD);
 		CONST IconBorder = 8;
-		VAR image : WMGraphics.Image; nbr : ARRAY 8 OF CHAR; color, i : LONGINT;
+		VAR image : WMGraphics.Image; nbr : ARRAY 8 OF CHAR; color, i : SIGNED32;
 		BEGIN
 			Draw^(canvas, width, height, quality);
 			FOR i := 0 TO LEN(items)-1 DO
@@ -289,7 +289,7 @@ TYPE
 			modifierFlags := {};
 		END FocusLost;
 
-		PROCEDURE Fill(color : LONGINT);
+		PROCEDURE Fill(color : SIGNED32);
 		BEGIN
 			canvas.Fill(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()), color, WMGraphics.ModeCopy);
 			Invalidate(WMRectangles.MakeRect(0, 0, GetWidth(), GetHeight()))
@@ -297,7 +297,7 @@ TYPE
 
 		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keySym : SIZE);
 		VAR
-			filename : Files.FileName; newImg : WMGraphics.Image; oldMode: LONGINT; res: WORD;
+			filename : Files.FileName; newImg : WMGraphics.Image; oldMode: SIGNED32; res: WORD;
 			string : ARRAY 2 OF CHAR; dx, dy : SIZE;
 			font : WMGraphics.Font;
 		BEGIN

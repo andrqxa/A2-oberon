@@ -76,7 +76,7 @@ TYPE
 
 	PROCEDURE Cache( m: tModel );
 	VAR cv: ARRAY 6 OF SIGNED16;
-		c: antsCaches.FullCache;  offset: LONGINT;  s: LONGREAL;  i: SIGNED16;
+		c: antsCaches.FullCache;  offset: SIGNED32;  s: LONGREAL;  i: SIGNED16;
 	BEGIN
 		m.MCache := antsCaches.Cube( 6, 2, m.maxCacheSize );  m.ccool := m.coolingTemp;  c := m.MCache;  offset := -1;
 		WHILE (c.NextPoint( offset, cv, 1 )) DO
@@ -92,8 +92,8 @@ TYPE
 	END Cache;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, w, h, maxx, maxy: LONGINT;  A, AOrig: antsArrayObjects.tINTEGERArray;  model: tModel;
-		AO: antsArrayObjects.tINTEGERObject;  Random: RandomArray;  ran: LONGREAL;  cpos: LONGINT;  u: LONGREAL;  orig: Objects.Object;
+	VAR x, y, w, h, maxx, maxy: SIGNED32;  A, AOrig: antsArrayObjects.tINTEGERArray;  model: tModel;
+		AO: antsArrayObjects.tINTEGERObject;  Random: RandomArray;  ran: LONGREAL;  cpos: SIGNED32;  u: LONGREAL;  orig: Objects.Object;
 		checkerboard: BOOLEAN;
 		a: ARRAY 6 OF SIGNED16;
 	BEGIN

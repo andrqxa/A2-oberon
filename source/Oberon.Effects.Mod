@@ -31,7 +31,7 @@ TYPE
 	Area = RECORD
 		X, Y, W, H: SIGNED16;
 		buf: POINTER TO ARRAY OF CHAR;
-		pix: LONGINT;
+		pix: SIGNED32;
 		offscreen: BOOLEAN
 	END;
 
@@ -97,7 +97,7 @@ BEGIN
 END FadeMouse;
 
 PROCEDURE GetBlock(X, Y, W, H: SIGNED16; VAR A: Area; cursor: BOOLEAN);
-VAR dX: SIGNED16;  size: LONGINT;
+VAR dX: SIGNED16;  size: SIGNED32;
 BEGIN
 		(* clip to full display *)
 	IF X < 0 THEN INC(W, X);  X := 0 END;
@@ -174,7 +174,7 @@ BEGIN RestoreBlock(block, TRUE)
 END CloseCursor;
 
 (** Returns TRUE if mx, my is within gravity pixels from X, Y. *)
-PROCEDURE Invicinity*(mx, my, X, Y: LONGINT): BOOLEAN;
+PROCEDURE Invicinity*(mx, my, X, Y: SIGNED32): BOOLEAN;
 BEGIN RETURN (mx - X) * (mx - X) + (my - Y) * (my - Y) < gravity * gravity
 END Invicinity;
 
@@ -221,7 +221,7 @@ END InBorder;
 
 (** Returns TRUE if mx, my is within gravity pixels of the line from X, Y to X1, Y1. *)
 PROCEDURE InLineVicinity*(mx, my, X, Y, X1, Y1: SIGNED16): BOOLEAN;
-VAR  w, h, pw, ph, det,len : LONGINT;
+VAR  w, h, pw, ph, det,len : SIGNED32;
 
 	PROCEDURE Between(x, a, b: SIGNED16): BOOLEAN;
 	VAR min, max: SIGNED16;
@@ -400,8 +400,8 @@ END OpenHighlight;
 (* -----bar  ------------------------------------------------ *)
 
 (** Given a bar position, calculate the relative bar position. *)
-PROCEDURE BarValue*(X, Y, W, H, B, BW: SIGNED16; min, max: LONGINT): LONGINT;
-VAR  d, r, h: LONGINT;
+PROCEDURE BarValue*(X, Y, W, H, B, BW: SIGNED16; min, max: SIGNED32): SIGNED32;
+VAR  d, r, h: SIGNED32;
 BEGIN
 	d := (max - min);
 	IF H > W THEN r := (B - Y - 1 ) * d DIV (H - 2 - BW)
@@ -413,8 +413,8 @@ BEGIN
 END BarValue;
 
 (** Given the min, max, and val values, calculate the absolute bar position. *)
-PROCEDURE BarPos*(X, Y, W, H, BW: SIGNED16; min, max, val: LONGINT): SIGNED16;
-	VAR  b,  d  : LONGINT;
+PROCEDURE BarPos*(X, Y, W, H, BW: SIGNED16; min, max, val: SIGNED32): SIGNED16;
+	VAR  b,  d  : SIGNED32;
 BEGIN
 	d := (max - min);
 	IF min < max THEN IF val < min THEN val := min ELSIF val > max THEN val := max END

@@ -22,14 +22,14 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 	TYPE
 		RasterData* = RECORD (OType.RasterData)
 			adr*: ADDRESS;							(* base address of pattern *)
-			bpr*: LONGINT;									(* number of bytes per row *)
-			len*: LONGINT;									(* pattern length *)
+			bpr*: SIGNED32;									(* number of bytes per row *)
+			len*: SIGNED32;									(* pattern length *)
 		END;
 
 		Char* = POINTER TO CharDesc;
 		CharDesc* = RECORD								(** The objects in a font library. *)	(* Note: offset used in GetCharObj *)
 			dx*, x*, y*, w*, h*: SIGNED16;					(** Character width, pattern offset (x, y), pattern size (w, h). *)
-			pat*: LONGINT									(** Character raster data. *)
+			pat*: SIGNED32									(** Character raster data. *)
 		END;
 
 	VAR
@@ -55,7 +55,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 			WHILE n > 0 DO
 				ASSERT((data.adr <= a) & (a < data.adr + data.len), 110);
 				SYSTEM.GET(a, byte);
-				SYSTEM.PUT(a, CHR(SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, LONG(ORD(byte))) + mask)));
+				SYSTEM.PUT(a, CHR(SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, LONG(ORD(byte))) + mask)));
 				DEC(n); INC(a, data.bpr)
 			END;
 			IF x0 < x1 THEN
@@ -75,7 +75,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 					WHILE n > 0 DO
 						ASSERT((data.adr <= a) & (a < data.adr + data.len), 112);
 						SYSTEM.GET(a, byte);
-						SYSTEM.PUT(a, CHR(SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, LONG(ORD(byte))) + mask)));
+						SYSTEM.PUT(a, CHR(SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, LONG(ORD(byte))) + mask)));
 						DEC(n); INC(a, data.bpr)
 					END
 				END
@@ -88,7 +88,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 			mode = {OType.Hinted, OType.Width, OType.Raster};
 		VAR
 			file: Files.File; r, m: Files.Rider; font: OType.Font; i, chars, ranges, xmin, ymin, xmax, ymax, j: SIGNED16;
-			beg, end: ARRAY 64 OF SIGNED16; data: RasterData; no, bytes, k: LONGINT;
+			beg, end: ARRAY 64 OF SIGNED16; data: RasterData; no, bytes, k: SIGNED32;
 			ras: OpenTypeScan.Rasterizer;
 	BEGIN
 		file := Files.New(name);
@@ -182,9 +182,9 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 	**)
 	PROCEDURE Make*(context : Commands.Context);
 	VAR
-		temp : ARRAY 256 OF CHAR; tempInt : LONGINT;
-		font: OType.Font; name, fname, str: ARRAY 32 OF CHAR; style: ARRAY 3 OF CHAR; sizes, i: LONGINT;
-		size: ARRAY 16 OF LONGINT; res: SIGNED16; inst: OType.Instance;
+		temp : ARRAY 256 OF CHAR; tempInt : SIGNED32;
+		font: OType.Font; name, fname, str: ARRAY 32 OF CHAR; style: ARRAY 3 OF CHAR; sizes, i: SIGNED32;
+		size: ARRAY 16 OF SIGNED32; res: SIGNED16; inst: OType.Instance;
 	BEGIN
 		context.arg.SkipWhitespace; context.arg.String(name);
 		context.out.String(name); context.out.Ln;
@@ -235,7 +235,7 @@ MODULE OpenTypeFonts; (** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType
 	END Make;
 
 	PROCEDURE IsNumber(str : ARRAY OF CHAR): BOOLEAN;
-	VAR i : LONGINT;
+	VAR i : SIGNED32;
 	BEGIN
 		Strings.StrToInt(str, i);
 		IF i # 0 THEN RETURN TRUE ELSE RETURN FALSE END

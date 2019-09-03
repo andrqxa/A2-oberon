@@ -55,7 +55,7 @@ VAR
 	END Copy;
 
 	PROCEDURE MakePattern( layer: tLayer;  w, h: SIGNED16 ): Pattern;
-	VAR p: Pattern;  y, x: LONGINT;  d: SIGNED16;
+	VAR p: Pattern;  y, x: SIGNED32;  d: SIGNED16;
 	CONST fac = 3;  div = 8;
 	BEGIN
 		d := fac * w DIV div;  NEW( p.vals, h + d + 1, w + d + 1 );  p.w := w;  p.h := h;  p.d := d;
@@ -98,7 +98,7 @@ VAR
 	END Max;
 
 	PROCEDURE Line( p: Pictures.Picture;  fx, fy, tx, ty: SIGNED16;  col: SIGNED16 );
-	VAR x, y, steps, pos: LONGINT;
+	VAR x, y, steps, pos: SIGNED32;
 	BEGIN
 		steps := Max( ty - fy, tx - fx );
 		IF steps <= 0 THEN RETURN END;

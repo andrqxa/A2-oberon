@@ -64,7 +64,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 	END Color;
 
 	PROCEDURE Tile (llx, lly, urx, ury: SIGNED16; VAR data: GfxRegions.EnumData);
-		VAR mw, mh, mx, my, y, x, len, r, g, b, a: SIGNED16; col: Gfx.Color; bit: LONGINT; adr: ADDRESS; pix: Images.Pixel;
+		VAR mw, mh, mx, my, y, x, len, r, g, b, a: SIGNED16; col: Gfx.Color; bit: SIGNED32; adr: ADDRESS; pix: Images.Pixel;
 	BEGIN
 		WITH data: RegData DO
 			mw := data.img.width; mh := data.img.height;
@@ -113,7 +113,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 		END
 	END Tile;
 
-	PROCEDURE Dot (rc: GfxRaster.Context; x, y: LONGINT);
+	PROCEDURE Dot (rc: GfxRaster.Context; x, y: SIGNED32);
 		VAR pc: Context; mode: Images.Mode; px, py: SIGNED16; pix: Images.Pixel; col: Gfx.Color;
 	BEGIN
 		IF (rc.clipState = GfxRaster.In) OR
@@ -138,7 +138,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 		END
 	END Dot;
 
-	PROCEDURE Rect (rc: GfxRaster.Context; llx, lly, urx, ury: LONGINT);
+	PROCEDURE Rect (rc: GfxRaster.Context; llx, lly, urx, ury: SIGNED32);
 		VAR pc: Context; data: RegData;
 	BEGIN
 		IF rc.clipState # GfxRaster.Out THEN
@@ -223,7 +223,7 @@ MODULE GfxPrinter IN Oberon; (** portable *)	(* eos  *)
 	PROCEDURE Image (ctxt: Gfx.Context; x, y: REAL; img: Images.Image; VAR filter: GfxImages.Filter);
 		VAR
 			pc: Context; tmp: Images.Image; m: GfxMatrix.Matrix; dx, dy, x0, y0, x1, y1, op, j, i: SIGNED16; llx, lly, urx, ury: REAL;
-			col: Gfx.Color; mode: Images.Mode; pix: Images.Pixel; p: LONGINT; data: RegData;
+			col: Gfx.Color; mode: Images.Mode; pix: Images.Pixel; p: SIGNED32; data: RegData;
 	BEGIN
 		pc := ctxt(Context); tmp := NIL;
 		GfxMatrix.Translate(pc.ctm, x, y, m);

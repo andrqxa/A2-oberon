@@ -219,7 +219,7 @@ END DoControl; *)
 		vyPort.Write( pict )
 	END Insert;
 
-	PROCEDURE ScaleToPicture( p: vyPort.Picture;  posx, posy: LONGINT );
+	PROCEDURE ScaleToPicture( p: vyPort.Picture;  posx, posy: SIGNED32 );
 	VAR p1: vyPort.Picture;  a: Objects.AttrMsg;  layer: tLayer;  minw, minh: SIGNED16;  x, y, w, h, dsr: SIGNED16;
 	BEGIN
 		New;  layer := Objects.NewObj( tLayer );  layer.digits := 2;  minw := vyAxis.MinStdWidth();

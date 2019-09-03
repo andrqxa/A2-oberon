@@ -33,7 +33,7 @@ END Explain;
 PROCEDURE OpenPanel*(D: Documents.Document; name: ARRAY OF CHAR; VAR VW, VH: SIGNED16): Gadgets.Frame;
 TYPE EmptyMsg = RECORD (Display.FrameMsg) END;
 VAR lib: Objects.Library; root: Objects.Object; J: EmptyMsg; fp: Files.File; R: Files.Rider; ch: CHAR;
-	len: LONGINT; i, x, y: SIGNED16; s: ARRAY 64 OF CHAR; old: BOOLEAN;
+	len: SIGNED32; i, x, y: SIGNED16; s: ARRAY 64 OF CHAR; old: BOOLEAN;
 	CM: Gadgets.CmdMsg;
 BEGIN
 	VW := 266; VH := 200;
@@ -105,7 +105,7 @@ END LoadPanel;
 
 (** Document method. *)
 PROCEDURE StorePanel*(D: Documents.Document);
-VAR lib: Objects.Library; f: Files.File; len: LONGINT; P: Display.Frame;
+VAR lib: Objects.Library; f: Files.File; len: SIGNED32; P: Display.Frame;
 	new, gen: ARRAY 64 OF CHAR; i: SIGNED16; B: Objects.BindMsg; R: Files.Rider;
 BEGIN
 	Texts.WriteString(W, "Store "); Texts.Append(Oberon.Log, W.buf);

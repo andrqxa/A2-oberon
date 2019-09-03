@@ -47,7 +47,7 @@ TYPE
 	WindowInfo = RECORD
 		title : Strings.String;
 		icon : Strings.String;
-		width, height : LONGINT;
+		width, height : SIGNED32;
 		alpha : BOOLEAN;
 		flags : SET;
 		alternativeMoveResize : BOOLEAN;
@@ -181,7 +181,7 @@ TYPE
 			RETURN mode;
 		END GetMode;
 
-		PROCEDURE UpdatePointerInfo(mode : LONGINT);
+		PROCEDURE UpdatePointerInfo(mode : SIGNED32);
 		VAR info : WMWindowManager.PointerInfo;
 		BEGIN
 			CASE mode OF
@@ -307,7 +307,7 @@ TYPE
 	END GadgetWindow;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 PROCEDURE Open*(context : Commands.Context);
 VAR
@@ -516,7 +516,7 @@ BEGIN
 	RETURN result;
 END GetApplication;
 
-PROCEDURE GetInteger(element : XML.Element; CONST attributeName : ARRAY OF CHAR; VAR value : LONGINT) : BOOLEAN;
+PROCEDURE GetInteger(element : XML.Element; CONST attributeName : ARRAY OF CHAR; VAR value : SIGNED32) : BOOLEAN;
 VAR string : Strings.String;
 BEGIN
 	ASSERT(element # NIL);

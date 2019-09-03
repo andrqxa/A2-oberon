@@ -30,7 +30,7 @@ TYPE
 		running, terminated: BOOLEAN;
 		ip: IP.Adr;
 		branch, command, seqNum, messageType: SIGNED16;
-		uin, receiverUin, port, receiveBufOffset: LONGINT;
+		uin, receiverUin, port, receiveBufOffset: SIGNED32;
 		len: SIZE; res: WORD;
 		user: Base.User;
 		users: Base.Users;
@@ -57,7 +57,7 @@ TYPE
 
 	PROCEDURE FinalizeClients(clients: Base.List);
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 		p: ANY;
 		client: Base.Client;
 	BEGIN
@@ -71,10 +71,10 @@ TYPE
 	END FinalizeClients;
 
 	PROCEDURE FindClient (clients: Base.List;
-		uin: LONGINT;
+		uin: SIGNED32;
 		VAR client: Base.Client): BOOLEAN;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 		p: ANY;
 	BEGIN
 		i := 0;
@@ -91,7 +91,7 @@ TYPE
 
 	PROCEDURE CheckKeepAlive (clients: Base.List);
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 		p: ANY;
 	BEGIN
 		i := 0;
@@ -108,7 +108,7 @@ TYPE
 	END CheckKeepAlive;
 
 
-	PROCEDURE Server_NewUserReply (ip: IP.Adr; port: LONGINT; uin: LONGINT;
+	PROCEDURE Server_NewUserReply (ip: IP.Adr; port: SIGNED32; uin: SIGNED32;
 		seqNum: SIGNED16; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		res: WORD;
@@ -140,13 +140,13 @@ TYPE
 		user: Base.User; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		string: String;
-		res: WORD; len: LONGINT;
+		res: WORD; len: SIGNED32;
 	BEGIN {EXCLUSIVE}
 		Base.ServerPacketInit (Base.INFO_REPLY, client.inSeqNum, sendBuf);
 
 		sendBuf.AddInt (user.uin, 4);
 
-		len := (Strings.Length (user.shortName) + 1)(LONGINT);
+		len := (Strings.Length (user.shortName) + 1)(SIGNED32);
 		sendBuf.AddInt (len, 2);
 		sendBuf.Add (user.shortName, 0, len, TRUE, res);
 
@@ -225,7 +225,7 @@ TYPE
 		client: Base.Client;
 		status: SIGNED16; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 		p: ANY;
 		receiver: Base.Client;
 	BEGIN
@@ -247,7 +247,7 @@ TYPE
 		client: Base.Client; dt: Dates.DateTime; messageType: SIGNED16; message: String;
 		sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 		p: ANY;
 		receiver: Base.Client;
 	BEGIN

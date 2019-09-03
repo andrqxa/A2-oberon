@@ -16,7 +16,7 @@ MODULE DiffGadgets IN Oberon;	(** portable *) (** PS  *)
 		Line = POINTER TO LineDesc;
 		LineDesc = RECORD
 			prev, next: Line;
-			p1, p2, nr: LONGINT
+			p1, p2, nr: SIGNED32
 		END;
 
 		Slider = POINTER TO SliderDesc;

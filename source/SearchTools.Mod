@@ -219,7 +219,7 @@ VAR
 	enum : Files.Enumerator;
 	filename : Files.FileName;
 	fileflags : SET;
-	time, date : LONGINT; nofMatches : SIZE;
+	time, date : SIGNED32; nofMatches : SIZE;
 	size : Files.Size;
 BEGIN
 	ASSERT(proc # NIL);

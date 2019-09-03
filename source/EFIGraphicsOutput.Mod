@@ -46,7 +46,7 @@ TYPE ProtocolDescription* = RECORD(EFI.ProtocolDescription)
 END;
 
 BEGIN
-	GUID.Data1 := LONGINT(9042A9DEH);
+	GUID.Data1 := SIGNED32(9042A9DEH);
 	GUID.Data2 := 23DCH;
 	GUID.Data3 := 4A38H;
 	GUID.Data4[0] := SIGNED8(96H);

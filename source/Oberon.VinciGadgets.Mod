@@ -30,7 +30,7 @@ MODULE VinciGadgets IN Oberon; (** portable *)	(* eos  *)
 
 	(**--- Parsing and Evaluation ---**)
 
-	PROCEDURE Parse* (text: Texts.Text; pos: LONGINT; VAR body: Scheme.Object);
+	PROCEDURE Parse* (text: Texts.Text; pos: SIGNED32; VAR body: Scheme.Object);
 		VAR ctxt: Vinci.Context;
 	BEGIN
 		NEW(ctxt); Vinci.MakeContext(ctxt, Scheme.NewTextInput(text, pos), NIL);
@@ -181,7 +181,7 @@ MODULE VinciGadgets IN Oberon; (** portable *)	(* eos  *)
 	(*--- Handler ---*)
 
 	PROCEDURE Handle (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR frame, copy: Frame; ver: LONGINT;
+		VAR frame, copy: Frame; ver: SIGNED32;
 	BEGIN
 		frame := obj(Frame);
 		IF msg IS Display.FrameMsg THEN
@@ -299,7 +299,7 @@ MODULE VinciGadgets IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Insert*;
 		VAR
-			s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; buf: Texts.Buffer;
+			s: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; buf: Texts.Buffer;
 			frame: Frame; cm: Display.ConsumeMsg;
 	BEGIN
 		Texts.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(s);

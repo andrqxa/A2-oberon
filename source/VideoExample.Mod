@@ -29,7 +29,7 @@ TYPE
 		PROCEDURE Open;
 		VAR str : ARRAY 16 OF CHAR;
 			name, version : ARRAY 64 OF CHAR;
-			i : LONGINT;
+			i : SIGNED32;
 			info : GDI32.BitmapInfoHeader;
 			capRec : VfW.Capturerec;
 			found : BOOLEAN;
@@ -106,7 +106,7 @@ TYPE
 		END Stop;
 
 		PROCEDURE MsgLoop;
-		VAR msg: User32.Msg;  i: LONGINT;
+		VAR msg: User32.Msg;  i: SIGNED32;
 		BEGIN
 			LOOP
 				i := User32.GetMessage( msg, 0, 0, 0 );
@@ -199,7 +199,7 @@ VAR y : SIZE;
 	t0, t1 : HUGEINT;
 	t, f : LONGREAL;
 	trap : BOOLEAN;
-	bytesperpixel:LONGINT;
+	bytesperpixel:SIGNED32;
 BEGIN
 	trap := TRUE;
 	t0 := GetTimer();
@@ -229,7 +229,7 @@ FINALLY
 END FrameReceived;
 
 PROCEDURE {WINAPI} YieldCallback(hWnd : VfW.HWND) : User32.LResult;
-VAR msg: User32.Msg;  i, j: LONGINT;
+VAR msg: User32.Msg;  i, j: SIGNED32;
 BEGIN
 	REPEAT
 		i := VfW.PeekMessage( msg, hWnd, 0, 0, 1 );
@@ -241,7 +241,7 @@ END YieldCallback;
 PROCEDURE SnapshotFirstPossible*;
 VAR str : ARRAY 16 OF CHAR;
 	name, version : ARRAY 64 OF CHAR;
-	i : LONGINT;
+	i : SIGNED32;
 	timer : Kernel.Timer;
 	info : GDI32.BitmapInfoHeader;
 BEGIN

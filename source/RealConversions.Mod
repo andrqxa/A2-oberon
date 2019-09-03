@@ -94,7 +94,7 @@ VAR
 	PROCEDURE RealToString*( x: LONGREAL;  n: WORD;  VAR buf: ARRAY OF CHAR );
 	(* BM 1993.4.22. Do not simplify rounding! *)
 	VAR
-		e, h, l, i, pos: LONGINT;  z: LONGREAL;  d: ARRAY 16 OF CHAR;
+		e, h, l, i, pos: SIGNED32;  z: LONGREAL;  d: ARRAY 16 OF CHAR;
 
 		PROCEDURE Char( c: CHAR );
 		BEGIN
@@ -102,7 +102,7 @@ VAR
 		END Char;
 
 		PROCEDURE String( CONST s: ARRAY OF CHAR );
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			i := 0;
 			WHILE s[i] # 0X DO  Char( s[i] );  INC( i )  END
@@ -154,7 +154,7 @@ VAR
 	PROCEDURE RealToStringFix*( x: LONGREAL;  n, f, D: WORD; VAR buf: ARRAY OF CHAR );
 	(* BM 1993.4.22. Do not simplify rounding! / JG formatting adjusted *)
 	VAR
-		e, h, l, i, pos: LONGINT;  r, z: LONGREAL;
+		e, h, l, i, pos: SIGNED32;  r, z: LONGREAL;
 		d: ARRAY 16 OF CHAR;
 		s: CHAR;  dot: BOOLEAN;
 
@@ -164,7 +164,7 @@ VAR
 		END Char;
 
 		PROCEDURE String( CONST s: ARRAY OF CHAR );
-		VAR i: LONGINT; ch: CHAR;
+		VAR i: SIGNED32; ch: CHAR;
 		BEGIN
 			ch := s[0]; i := 1;
 			WHILE ch # 0X DO  Char( ch );  ch := s[i];  INC( i )  END
@@ -239,8 +239,8 @@ VAR
 
 	(*** the following procedures stem from Reals.Mod *)
 
-	(** Returns the NaN code (0 <= h < 1048576, MIN(LONGINT) <= l <= MAX(LONGINT)) or (-1,-1) if not NaN/Infinite. *)
-	PROCEDURE NaNCodeL( x: LONGREAL;  VAR h, l: LONGINT );
+	(** Returns the NaN code (0 <= h < 1048576, MIN(SIGNED32) <= l <= MAX(SIGNED32)) or (-1,-1) if not NaN/Infinite. *)
+	PROCEDURE NaNCodeL( x: LONGREAL;  VAR h, l: SIGNED32 );
 	BEGIN
 		SYSTEM.GET( ADDRESSOF( x ) + H, h );  SYSTEM.GET( ADDRESSOF( x ) + L, l );
 		IF ASH( h, -20 ) MOD 2048 = 2047 THEN  (* Infinite or NaN *)
@@ -251,14 +251,14 @@ VAR
 
 
 	(** Returns the shifted binary exponent (0 <= e < 2048). *)
-	PROCEDURE ExpoL( x: LONGREAL ): LONGINT;
-	VAR i: LONGINT;
+	PROCEDURE ExpoL( x: LONGREAL ): SIGNED32;
+	VAR i: SIGNED32;
 	BEGIN
 		SYSTEM.GET( ADDRESSOF( x ) + H, i );  RETURN ASH( i, -20 ) MOD 2048
 	END ExpoL;
 
 	(** Convert hexadecimal to LONGREAL. h and l are the high and low parts.*)
-	PROCEDURE RealL( h, l: LONGINT ): LONGREAL;
+	PROCEDURE RealL( h, l: SIGNED32 ): LONGREAL;
 	VAR x: LONGREAL;
 	BEGIN
 		SYSTEM.PUT( ADDRESSOF( x ) + H, h );  SYSTEM.PUT( ADDRESSOF( x ) + L, l );  RETURN x
@@ -266,7 +266,7 @@ VAR
 
 
 	(** Returns 10^e (e <= 308, 308 < e delivers IEEE-code +INF). *)
-	PROCEDURE Ten( e: LONGINT ): LONGREAL;   (* naiive version *)
+	PROCEDURE Ten( e: SIGNED32 ): LONGREAL;   (* naiive version *)
 	VAR r: LONGREAL;
 	BEGIN
 		IF e < -307 THEN RETURN 0

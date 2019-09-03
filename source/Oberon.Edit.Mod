@@ -11,13 +11,13 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 
 	VAR
 		W: Texts.Writer;
-		time: LONGINT;
+		time: SIGNED32;
 		M: SIGNED16;
 		pat: ARRAY maxlen OF CHAR;
 		d: ARRAY 256 OF SIGNED16;
         textX, pagenoX, headerY, topY, botY: SIGNED16;
 
-	PROCEDURE Max (i, j: LONGINT): LONGINT;
+	PROCEDURE Max (i, j: SIGNED32): SIGNED32;
 	BEGIN IF i >= j THEN RETURN i ELSE RETURN j END
 	END Max;
 
@@ -27,7 +27,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 		S: Texts.Scanner;
 		V: Viewers.Viewer;
 		X, Y: SIGNED16;
-		beg, end, time: LONGINT;
+		beg, end, time: SIGNED32;
 	BEGIN
 		par := Oberon.Par;
 		Texts.OpenScanner(S, par.text, par.pos); Texts.Scan(S);
@@ -51,7 +51,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			S: Texts.Scanner;
 			V: Viewers.Viewer;
 			X, Y, n, i, j: SIGNED16;
-			pos, len, beg, end, time: LONGINT;
+			pos, len, beg, end, time: SIGNED32;
 			buf: ARRAY 32 OF CHAR;
 			name: ARRAY 35 OF CHAR;
 			M: SIGNED16;
@@ -116,7 +116,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			T: Texts.Text;
 			S: Texts.Scanner;
 			f: Files.File;
-			beg, end, time, len: LONGINT;
+			beg, end, time, len: SIGNED32;
 
 		PROCEDURE Backup (VAR name: ARRAY OF CHAR);
 			VAR res, i: SIGNED16; bak: ARRAY 32 OF CHAR;
@@ -163,7 +163,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			T: Texts.Text;
 			v: Viewers.Viewer;
 			F: Display.Frame;
-			beg, end: LONGINT;
+			beg, end: SIGNED32;
 			X, Y: SIGNED16;
 			ch: CHAR;
 	BEGIN
@@ -187,7 +187,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 	END CopyFont;
 
 	PROCEDURE ChangeFont*;
-		VAR par: Oberon.ParList; S: Texts.Scanner; T: Texts.Text; beg, end: LONGINT;
+		VAR par: Oberon.ParList; S: Texts.Scanner; T: Texts.Text; beg, end: SIGNED32;
 	BEGIN
 		Oberon.GetSelection(T, beg, end, time);
 		IF time >= 0 THEN par := Oberon.Par;
@@ -203,7 +203,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			S: Texts.Scanner;
 			T: Texts.Text;
 			col: SIGNED8;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 	BEGIN par := Oberon.Par;
 		Texts.OpenScanner(S, par.text, par.pos); Texts.Scan(S);
 		IF S.class # Texts.Int THEN col := S.col ELSE col := SHORT(SHORT(S.i)) END;
@@ -216,7 +216,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			V: Viewers.Viewer;
 			R: Texts.Reader;
 			T: Texts.Text;
-			pos, beg, end, prevTime, len: LONGINT; n, i, j: SIGNED16;
+			pos, beg, end, prevTime, len: SIGNED32; n, i, j: SIGNED16;
 			buf: ARRAY 32 OF CHAR;
 
 		PROCEDURE Forward (n: SIGNED16);
@@ -271,7 +271,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 		VAR Text: TextFrames.Frame;
 			T: Texts.Text; S: Texts.Scanner;
 			V: Viewers.Viewer;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 	BEGIN
 		V := Oberon.MarkedViewer();
 		IF (V.dsc # NIL) & (V.dsc.next IS TextFrames.Frame) THEN
@@ -295,7 +295,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
     PROCEDURE AddPrefix*;
       VAR  V: Viewers.Viewer;
         S: Texts.Scanner; R: Texts.Reader; T: TextFrames.Frame;
-        pos, beg, end, time: LONGINT; ch: CHAR;
+        pos, beg, end, time: SIGNED32; ch: CHAR;
     BEGIN
       Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
       IF (S.class = Texts.Char) & (S.c = "^") THEN
@@ -321,7 +321,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
     PROCEDURE RemovePrefix*;
       VAR  V: Viewers.Viewer;
         S: Texts.Scanner; R: Texts.Reader; T: TextFrames.Frame;
-        pos, beg, end, time: LONGINT; i: SIGNED16; ch: CHAR;
+        pos, beg, end, time: SIGNED32; i: SIGNED16; ch: CHAR;
     BEGIN
       Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
       IF (S.class = Texts.Char) & (S.c = "^") THEN
@@ -365,7 +365,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			ch: CHAR;
 			pageno: SIGNED8; listing: BOOLEAN;
 			nofcopies, lsp, Y: SIGNED16;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			server, options: ARRAY 32 OF CHAR;
 			font: Fonts.Font;
 
@@ -377,7 +377,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			Printer.String(pagenoX, headerY, pno, Fonts.Default)
 		END SendHeader;
 
-		PROCEDURE PrintUnit (source: Texts.Text; pos: LONGINT);
+		PROCEDURE PrintUnit (source: Texts.Text; pos: SIGNED32);
 			CONST BufSize = 200;
 			VAR i: SIGNED16; new: BOOLEAN;
 				buf: ARRAY BufSize OF CHAR;

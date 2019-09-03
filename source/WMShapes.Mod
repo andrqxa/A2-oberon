@@ -65,7 +65,7 @@ TYPE
 		END PropertyChanged;
 
 		(* position a line line in parent coordinates*)
-		PROCEDURE Set*(x0,y0, x1, y1: LONGINT);
+		PROCEDURE Set*(x0,y0, x1, y1: SIGNED32);
 		VAR rect:WMRectangles.Rectangle; changed:BOOLEAN;
 		BEGIN
 			rect:=bounds.Get();
@@ -102,7 +102,7 @@ TYPE
 		CONST pi=3.1516; headscale= 0.25;
 		VAR  alpha: REAL;
 			dx,dy: SIZE;
-			size:LONGINT; head: LONGREAL;
+			size:SIGNED32; head: LONGREAL;
 		BEGIN
 			DrawBackground^(canvas);
 			IF (colorI # 0) THEN

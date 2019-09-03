@@ -46,7 +46,7 @@ VAR
 
 	(** Return the named command. *)
 	PROCEDURE ThisCommand( m: Module;  CONST name: Modules.Name ): CommandProc;
-	VAR cmd: Modules.Command; i: LONGINT;  found: BOOLEAN;
+	VAR cmd: Modules.Command; i: SIGNED32;  found: BOOLEAN;
 	BEGIN
 		i := 0;  found := FALSE;
 		WHILE ~found & (i # LEN( m.command^ )) DO
@@ -101,7 +101,7 @@ VAR
 		END IsCharOrDigit;
 
 		PROCEDURE GetName( VAR name: ARRAY OF CHAR ): BOOLEAN;
-		VAR j: LONGINT;  c: CHAR;
+		VAR j: SIGNED32;  c: CHAR;
 		BEGIN
 			j := -1;
 			IF IsCharacter( cmd[ci] ) THEN

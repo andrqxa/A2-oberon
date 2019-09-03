@@ -37,7 +37,7 @@ TYPE
 		coolingTemp-: LONGREAL;
 		synced*: BOOLEAN;
 		MCache*: antsCaches.FullCache;
-		maxCacheSize-: LONGINT;
+		maxCacheSize-: SIGNED32;
 		region*: antsRegions.tRegion;
 		par*: Parameters;   (* for automatic handling of attribute messages etc. , use that in higher modules *)
 		parNames*: ParameterNames;   (* for automatic handling of attribute messages etc., names of par *)
@@ -45,7 +45,7 @@ TYPE
 	END;
 
 	PROCEDURE StoreParameters( VAR R: Files.Rider;  p: Parameters;  pn: ParameterNames );
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		IF p = NIL THEN Files.WriteLInt( R, 0 )
 		ELSE
@@ -60,7 +60,7 @@ TYPE
 	END StoreParameters;
 
 	PROCEDURE ReadParameters( VAR R: Files.Rider;  VAR p: Parameters;  VAR pn: ParameterNames );
-	VAR len, i: LONGINT;
+	VAR len, i: SIGNED32;
 	BEGIN
 		Files.ReadLInt( R, len );
 		IF len = 0 THEN p := NIL
@@ -187,7 +187,7 @@ TYPE
 		par.coolingTemp := temp;  par.synced := FALSE
 	END SetTemperature;
 
-	PROCEDURE SetMaxCache*( par: tModel;  maxCacheSize: LONGINT );
+	PROCEDURE SetMaxCache*( par: tModel;  maxCacheSize: SIGNED32 );
 	BEGIN
 		IF par.maxCacheSize = maxCacheSize THEN RETURN END;
 		par.maxCacheSize := maxCacheSize;  par.synced := FALSE

@@ -68,7 +68,7 @@ MODULE UDPExample IN Oberon;	(** portable *)
 			S: NetSystem.Socket;
 			IP, remIP: NetSystem.IPAdr;
 			buf, name, num: ARRAY 1024 OF CHAR;
-			len, ttl: LONGINT;
+			len, ttl: SIGNED32;
 			pos, res, res2, remPort, i, type, class, rLen: SIGNED16;
 	BEGIN
 		Texts.OpenScanner(Sc, Oberon.Par.text, Oberon.Par.pos);

@@ -5,7 +5,7 @@ IMPORT Files, Streams, Commands, SearchTools;
 PROCEDURE replay(r: Streams.Reader);
 VAR cmdline: Streams.StringReader; w: Streams.StringWriter; context:Commands.Context;
 	cmd, args: ARRAY 1024 OF CHAR;
-	len: LONGINT;
+	len: SIGNED32;
 	flags : SET; res : WORD; msg : ARRAY 128 OF CHAR;
 	ok:BOOLEAN;
 BEGIN

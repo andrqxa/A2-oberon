@@ -20,7 +20,7 @@ TYPE
 		routerConfigs: IPv6.RouterConfig;
 		IPForwarding: BOOLEAN;
 		EchoReply: BOOLEAN;
-		PreferredProtocol: LONGINT;
+		PreferredProtocol: SIGNED32;
 		AutoNetConfigV4: BOOLEAN;
 		AutoNetConfigV6: BOOLEAN;
 		AutoNetConfigV6DNS: ARRAY DNSMod.MaxNofServer OF IP.Adr;
@@ -30,7 +30,7 @@ TYPE
 	(* A configuraton of a interface *)
 	InterfaceConfig = POINTER TO RECORD
 		Device: Plugins.Name;
-		Protocol: LONGINT;
+		Protocol: SIGNED32;
 		Name: IP.Name;
 		Domain: Strings.String;
 		DHCP: BOOLEAN;
@@ -96,7 +96,7 @@ VAR
 	doc: XML.Document;
 	ipv4Elem: XML.Element;
 	ipv6Elem: XML.Element;
-	i: LONGINT;
+	i: SIGNED32;
 	interfaceElems: XMLObjects.ArrayCollection;
 	routerElems: XMLObjects.ArrayCollection;
 	prefixElems: XMLObjects.ArrayCollection;
@@ -104,9 +104,9 @@ VAR
 	intElem: XML.Element;
 	routerElem: XML.Element;
 	prefixElem: XML.Element;
-	interfaceNbr: LONGINT;
-	routerNbr: LONGINT;
-	prefixNbr: LONGINT;
+	interfaceNbr: SIGNED32;
+	routerNbr: SIGNED32;
+	prefixNbr: SIGNED32;
 	attribute: XML.Attribute;
 	p: ANY;
 
@@ -192,7 +192,7 @@ VAR
 
 	(** Sets a integer value from Setting of a section.
 		If error is TRUE then hasXMLErrors is set to TRUE if child does not exist. *)
-	PROCEDURE GetSettingInt(section: XML.Element; CONST settingName: ARRAY OF CHAR; error: BOOLEAN; VAR int : LONGINT);
+	PROCEDURE GetSettingInt(section: XML.Element; CONST settingName: ARRAY OF CHAR; error: BOOLEAN; VAR int : SIGNED32);
 	VAR
 		nameAttr: XML.Attribute;
 		valueAttr: XML.Attribute;
@@ -855,7 +855,7 @@ VAR
 	intv4: IPv4.Interface;
 	intv6: IPv6.Interface;
 	intName: IP.Name; (* if autoconf = true; there are two ip interfaces (v4 & v6) *)
-	i: LONGINT;
+	i: SIGNED32;
 	res: WORD;
 	linkLocalAdr: IP.Adr;
 	linkLocalPrefix: IP.Adr;

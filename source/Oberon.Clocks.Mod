@@ -16,21 +16,21 @@ TYPE
 	Alarm* = POINTER TO AlarmDesc;
 	AlarmHandler* = PROCEDURE (alarm: Alarm; VAR handled: BOOLEAN);
 	AlarmDesc* = RECORD
-		at : LONGINT;
+		at : SIGNED32;
 		handle*: AlarmHandler;
 		handled : BOOLEAN;
 		next : Alarm
 	END;
-	EnumAlarmHandler* = PROCEDURE (alarm: Alarm; t, d: LONGINT; VAR handled: BOOLEAN);
+	EnumAlarmHandler* = PROCEDURE (alarm: Alarm; t, d: SIGNED32; VAR handled: BOOLEAN);
 
 	TickMsg* = RECORD (Display.FrameMsg)
 		id* : SIGNED16;
-		date*, time* : LONGINT
+		date*, time* : SIGNED32
 	END;
 
 	Clock* = POINTER TO ClockDesc;
 	ClockDesc* = RECORD (Gadgets.FrameDesc)
-		date, time, timeDiff: LONGINT;
+		date, time, timeDiff: SIGNED32;
 		state0: SET;
 		col: SIGNED16
 	END;
@@ -38,36 +38,36 @@ TYPE
 VAR
 	alarms : BOOLEAN;
 	firstAlarm  : Alarm;
-	lastTask, lastAlarm, lastTick, zeroY: LONGINT;
+	lastTask, lastAlarm, lastTick, zeroY: SIGNED32;
 	task : Oberon.Task;
 	W : Texts.Writer;
 	font: ARRAY 3 OF Fonts.Font;
 
 (* ------------ Oberon date convertion ------------ *)
 
-PROCEDURE ToLinearForm (t, d: LONGINT): LONGINT;
+PROCEDURE ToLinearForm (t, d: SIGNED32): SIGNED32;
 	VAR h, m, s: SIGNED16;
 BEGIN
 	Dates.ToHMS(t, h, m, s);
 	RETURN (Dates.NumberOfDays(d) - zeroY)*Day + LONG(s) + LONG(m)*Minute + LONG(h)*Hour
 END ToLinearForm;
 
-PROCEDURE ToOberonForm (time: LONGINT; VAR t, d: LONGINT);
+PROCEDURE ToOberonForm (time: SIGNED32; VAR t, d: SIGNED32);
 BEGIN
 	d := Dates.NumberOfDaysToDate(time DIV Day + zeroY);
 	time := time MOD Day;
 	t := Dates.ToTime(SHORT(time DIV Hour), SHORT(time DIV Minute  MOD Minute), SHORT(time MOD Minute))
 END ToOberonForm;
 
-PROCEDURE GetClock (): LONGINT;
-	VAR d, t: LONGINT;
+PROCEDURE GetClock (): SIGNED32;
+	VAR d, t: SIGNED32;
 BEGIN Oberon.GetClock(t, d); RETURN ToLinearForm(t, d)
 END GetClock;
 
 (* ------------ alarm ------------ *)
 
 PROCEDURE AlarmTask(me : Oberon.Task);
-	VAR a, p : Alarm; now, t, d: LONGINT; M : TickMsg; hour,min,sec : SIGNED16; handled : BOOLEAN;
+	VAR a, p : Alarm; now, t, d: SIGNED32; M : TickMsg; hour,min,sec : SIGNED16; handled : BOOLEAN;
 BEGIN
 	IF alarms & (Input.Time() - lastAlarm > Input.TimeUnit) THEN
 		lastAlarm := Input.Time();
@@ -94,7 +94,7 @@ BEGIN
 	me.time := Input.Time() + Input.TimeUnit;
 END AlarmTask;
 
-PROCEDURE InstallAlarm*(alarm: Alarm; time, date: LONGINT; handle : AlarmHandler);
+PROCEDURE InstallAlarm*(alarm: Alarm; time, date: SIGNED32; handle : AlarmHandler);
 	VAR pa, a: Alarm;
 BEGIN
 	IF alarm # NIL THEN
@@ -145,7 +145,7 @@ BEGIN
 END RemoveAlarm;
 
 PROCEDURE ShowAlarms*(enum: EnumAlarmHandler);
-	VAR a : Alarm; t, d: LONGINT;
+	VAR a : Alarm; t, d: SIGNED32;
 BEGIN
 	a :=  firstAlarm;
 	WHILE a # NIL DO
@@ -189,7 +189,7 @@ END Line2;
 
 PROCEDURE RestoreClock(F: Clock; M: Display3.Mask; x, y, w, h: SIGNED16; alarm : BOOLEAN);
 	VAR
-		time, date: LONGINT;
+		time, date: SIGNED32;
 		rh, rm, i ,x0, y0, r, hour, min, sec, year, month, day, dow, col: SIGNED16;
 		s : ARRAY 32 OF CHAR;
 BEGIN
@@ -251,7 +251,7 @@ END RestoreClock;
 
 PROCEDURE PrintClock(F: Clock; VAR M: Display.DisplayMsg);
 	VAR
-		time, date: LONGINT;
+		time, date: SIGNED32;
 		r, rh, rm, x0, y0, i, hour,min,sec, year,month,day,dow,col: SIGNED16;
 		s : ARRAY 32 OF CHAR;
 		Q: Display3.Mask;
@@ -407,7 +407,7 @@ BEGIN
 END ClockHandler;
 
 PROCEDURE InsertDate*;
-	VAR date : LONGINT; s : ARRAY 32 OF CHAR; M : Oberon.ConsumeMsg;
+	VAR date : SIGNED32; s : ARRAY 32 OF CHAR; M : Oberon.ConsumeMsg;
 BEGIN
 	date := GetClock();
 	IF (Gadgets.executorObj # NIL) & (Gadgets.executorObj IS Clock) THEN
@@ -420,7 +420,7 @@ BEGIN
 END InsertDate;
 
 PROCEDURE InsertTime*;
-	VAR date, time : LONGINT; s : ARRAY 32 OF CHAR; M : Oberon.ConsumeMsg;
+	VAR date, time : SIGNED32; s : ARRAY 32 OF CHAR; M : Oberon.ConsumeMsg;
 BEGIN
 	time := GetClock();
 	IF (Gadgets.executorObj # NIL) & (Gadgets.executorObj IS Clock) THEN

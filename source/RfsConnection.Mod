@@ -18,7 +18,7 @@ TYPE
 			port: SIGNED16;
 
 		PROCEDURE &Init*(host: ARRAY OF CHAR; port: SIGNED16);
-			VAR len: LONGINT;
+			VAR len: SIGNED32;
 		BEGIN
 			len := Len(host);
 			CopyBuffer(host, len + 1, SELF.host, 0);
@@ -106,7 +106,7 @@ TYPE
 			rpcConn.Send(buf, off, len, FALSE, res);
 		END Send;
 
-		PROCEDURE AwaitState*(good, bad: SET; ms: LONGINT; VAR res: WORD);
+		PROCEDURE AwaitState*(good, bad: SET; ms: SIGNED32; VAR res: WORD);
 		BEGIN
 			rpcConn.AwaitState(good, bad, ms, res);
 		END AwaitState;
@@ -120,8 +120,8 @@ TYPE
 	END Connection;
 
 
-PROCEDURE Len(VAR x: ARRAY OF CHAR): LONGINT;
-	VAR j: LONGINT;
+PROCEDURE Len(VAR x: ARRAY OF CHAR): SIGNED32;
+	VAR j: SIGNED32;
 BEGIN
 	j := 0;
 	WHILE x[j] # 0X DO
@@ -131,7 +131,7 @@ BEGIN
 END Len;
 
 (*copy buf1 of Size len into offset of buf2 *)
-PROCEDURE CopyBuffer(VAR buf1: ARRAY OF CHAR; len: LONGINT; VAR buf2: ARRAY OF CHAR; off: LONGINT);
+PROCEDURE CopyBuffer(VAR buf1: ARRAY OF CHAR; len: SIGNED32; VAR buf2: ARRAY OF CHAR; off: SIGNED32);
 BEGIN
 	SYSTEM.MOVE(ADDRESSOF(buf1[0]), ADDRESSOF(buf2[off]), len);
 END CopyBuffer;

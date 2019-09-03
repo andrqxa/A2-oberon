@@ -22,7 +22,7 @@ TYPE
 	FileObj* = POINTER TO FileObjDesc;
 	FileObjDesc* = RECORD (Gadgets.ObjDesc)
 		F*: Files.File;	(** carrier file *)
-		beg*, len*: LONGINT;	(** file offset and length *)
+		beg*, len*: SIGNED32;	(** file offset and length *)
 	END;
 
 	Suitcase* = POINTER TO SuitcaseDesc;
@@ -34,7 +34,7 @@ TYPE
 (*  --- FileObj --- *)
 
 PROCEDURE FileObjHandler*(obj: Objects.Object; VAR M: Objects.ObjMsg);
-VAR obj0: FileObj; len: LONGINT; R: Files.Rider; ch: CHAR;
+VAR obj0: FileObj; len: SIGNED32; R: Files.Rider; ch: CHAR;
 BEGIN
 	WITH obj: FileObj DO
 		IF M IS Objects.AttrMsg THEN
@@ -103,7 +103,7 @@ END NewFileObj;
 
 (** unpack a file object into the named file *)
 PROCEDURE UnpackFileObj*(obj: FileObj; CONST filename: ARRAY OF CHAR);
-VAR F: Files.File; R, r: Files.Rider; ch: CHAR; len: LONGINT;
+VAR F: Files.File; R, r: Files.Rider; ch: CHAR; len: SIGNED32;
 BEGIN
 	F := Files.New(filename); Files.Set(r, F, 0);
 	len := obj.len;

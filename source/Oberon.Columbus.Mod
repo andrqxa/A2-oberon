@@ -117,7 +117,7 @@ MODULE Columbus IN Oberon; (** portable *)	(* PS  *)
 	(* ---------------------- string opearation ----------------------- *)
 
 (* converts a referece into a string of the form "# <i>". *)
-PROCEDURE RefToStr(i: LONGINT; VAR s: ARRAY OF CHAR);
+PROCEDURE RefToStr(i: SIGNED32; VAR s: ARRAY OF CHAR);
 	VAR k, j: SIGNED16; a: ARRAY 10 OF CHAR;
 BEGIN k:= 0;
 	REPEAT
@@ -141,7 +141,7 @@ END Append;
 
 (* Appends <this> to <to>. *)
 PROCEDURE AppendCh(this: CHAR; VAR to: ARRAY OF CHAR);
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 BEGIN
 	i := 0; WHILE to[i] # 0X DO INC(i) END;
 	IF i < LEN(to) - 1 THEN to[i] := this; to[i+1] := 0X END
@@ -158,7 +158,7 @@ PROCEDURE String(CONST str: ARRAY OF CHAR);	(*  writes a string to W *)
 BEGIN Texts.WriteString(W, str)
 END String;
 
-PROCEDURE Int(i: LONGINT);	(*  writes an integer to W *)
+PROCEDURE Int(i: SIGNED32);	(*  writes an integer to W *)
 BEGIN Texts.WriteInt(W, i, 0)
 END Int;
 
@@ -183,7 +183,7 @@ END PrintMsg;
 	(* ---------------------- document related procedures ----------------------- *)
 
 PROCEDURE LoadDoc(D: Documents.Document);
-	VAR lib: Objects.Library; i: LONGINT; view: SIGNED16; p: Panel; name: ARRAY 64 OF CHAR;
+	VAR lib: Objects.Library; i: SIGNED32; view: SIGNED16; p: Panel; name: ARRAY 64 OF CHAR;
 BEGIN
 	COPY(D.name, name);
 	p:= NIL; lib := NIL; view := NoView;
@@ -386,7 +386,7 @@ BEGIN
 	RETURN F
 END MakeString;
 
-PROCEDURE MakeInt(val: LONGINT): Display.Frame;
+PROCEDURE MakeInt(val: SIGNED32): Display.Frame;
 	VAR F: TextFields.TextField;
 BEGIN
 	TextFields.NewTextField; F:= Objects.NewObj(TextFields.TextField);
@@ -1496,7 +1496,7 @@ END RemoveAttrLink;
 
 (* Gets the object/library to inspect. The order is 1. parameter, 2. selection, 3. marker. *)
 PROCEDURE GetObjLib(VAR obj: Objects.Object; VAR lib: Objects.Library);
-	VAR f: Display.Frame; T: Texts.Text; t1, t2, beg, end: LONGINT; S: Attributes.Scanner;
+	VAR f: Display.Frame; T: Texts.Text; t1, t2, beg, end: SIGNED32; S: Attributes.Scanner;
 
 	PROCEDURE GetNamed;	(* affects local var lib, obj *)
 		VAR i: SIGNED16;
@@ -1832,7 +1832,7 @@ END GetCopyStyle;
 
 (* Returns an object from reference gadget named "value" in the current context. *)
 PROCEDURE GetObject(): Objects.Object;
-	VAR link, obj: Objects.Object; time: LONGINT; L: Objects.LinkMsg;
+	VAR link, obj: Objects.Object; time: SIGNED32; L: Objects.LinkMsg;
 BEGIN obj:= NIL;
 	link:= Gadgets.FindObj(Gadgets.context, RefObj);
 	IF link # NIL THEN
@@ -1965,7 +1965,7 @@ END ShowObjs;
 If <LibName.ObjName> is a document gadget, a (deep) copy of the document is opened on the display. Frame gadget are inserted at the caret. A copy is made depending on the value of an object named "copystyle". If this object cannot be dedected in the current context, the copy style 'deep' is assumed. If <LibName.ObjName> is a model, the "Model" link of all selected frames is set to this model (No copies are made for modelsl).
 *)
 PROCEDURE GetObj*;
-	VAR obj, sel: Objects.Object; time: LONGINT; style: SIGNED16; C: Objects.CopyMsg; L: Objects.LinkMsg;
+	VAR obj, sel: Objects.Object; time: SIGNED32; style: SIGNED16; C: Objects.CopyMsg; L: Objects.LinkMsg;
 			S: Attributes.Scanner;
 BEGIN
 	Attributes.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Attributes.Scan(S);
@@ -2128,7 +2128,7 @@ PROCEDURE StoreLib*;
 	VAR P: Panel; lib: Objects.Library; S: Attributes.Scanner;
 
 	PROCEDURE StoreThis(lib: Objects.Library);
-		VAR f: Files.File; obj: Objects.Object; len: LONGINT; ref: SIGNED16; B: Objects.BindMsg;
+		VAR f: Files.File; obj: Objects.Object; len: SIGNED32; ref: SIGNED16; B: Objects.BindMsg;
 	BEGIN
 		String("Store "); Char(22X); String(lib.name); Char(22X); Ln; ToLog;
 		B.lib := lib; Objects.Stamp(B); B.dlink := NIL;
@@ -2199,7 +2199,7 @@ PROCEDURE CleanupLib*;
 	VAR P: Panel; S: Attributes.Scanner;
 
 	PROCEDURE CleanupThis(lib: Objects.Library);
-		VAR f: Files.File; lib0: Objects.Library; obj, obj0: Objects.Object; len: LONGINT; ref, cnt, cnt0: SIGNED16;
+		VAR f: Files.File; lib0: Objects.Library; obj, obj0: Objects.Object; len: SIGNED32; ref, cnt, cnt0: SIGNED16;
 			name: Objects.Name; C: Objects.CopyMsg; B: Objects.BindMsg;
 	BEGIN
 		IF (lib # NIL) & ~(lib IS Fonts.Font) THEN

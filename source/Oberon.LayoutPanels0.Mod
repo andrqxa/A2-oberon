@@ -1318,11 +1318,11 @@ MODULE LayoutPanels0 IN Oberon;	(** portable *)
 		PROCEDURE Put (ch: CHAR); BEGIN Texts.Write(W, ch) END Put;
 		PROCEDURE PutStr (str: ARRAY OF CHAR); BEGIN Texts.WriteString(W, str) END PutStr;
 
-		PROCEDURE PutInt (x: LONGINT);
+		PROCEDURE PutInt (x: SIGNED32);
 			VAR a: ARRAY 11 OF CHAR; i: SIGNED16;
 		BEGIN
 			IF x < 0 THEN
-				IF x = MIN(LONGINT) THEN PutStr("-2147483648"); RETURN
+				IF x = MIN(SIGNED32) THEN PutStr("-2147483648"); RETURN
 				ELSE Put("-"); x := -x
 				END
 			END;

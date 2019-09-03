@@ -7,45 +7,45 @@ emits procedure calls for all invocations of the runtime.
 IMPORT SYSTEM;
 
 CONST expo = 7F800000H; bias = 3F800000H;
-	mant = 7FFFFFH; mant1 = LONGINT(0FFC00000H); mant2 = 0FFFFFFH;
-	LimE = 0C800000H; C = 800000H; S = LONGINT(80000000H); M= LONGINT(7FFFFFFFH);
+	mant = 7FFFFFH; mant1 = SIGNED32(0FFC00000H); mant2 = 0FFFFFFH;
+	LimE = 0C800000H; C = 800000H; S = SIGNED32(80000000H); M= SIGNED32(7FFFFFFFH);
 
 VAR
 	lastDataAddress-: ADDRESS;
 	emptyVariable: RECORD END; (* always linked to top of used memory *)
 
 (* for testing test with intel
-VAR high: LONGINT;
+VAR high: SIGNED32;
 
-	PROCEDURE SimulatedMul(l,r: LONGINT): LONGINT;
+	PROCEDURE SimulatedMul(l,r: SIGNED32): SIGNED32;
 	VAR h: HUGEINT;
 	BEGIN
 		h := HUGEINT(l)*r;
-		high := LONGINT(h DIV 100000000H);
-		RETURN LONGINT(h MOD 100000000H);
+		high := SIGNED32(h DIV 100000000H);
+		RETURN SIGNED32(h MOD 100000000H);
 	END SimulatedMul;
 
-	PROCEDURE H(): LONGINT;
+	PROCEDURE H(): SIGNED32;
 		RETURN high
 	END H;
 *)
-	PROCEDURE H(): LONGINT;
+	PROCEDURE H(): SIGNED32;
 	CODE
 		LDH R0
 	END H;
 
 	(* helper functions *)
-	PROCEDURE MSK(x,bits: LONGINT): LONGINT;
+	PROCEDURE MSK(x,bits: SIGNED32): SIGNED32;
 	BEGIN
-		RETURN SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET,x)*SYSTEM.VAL(SET,bits))
+		RETURN SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET,x)*SYSTEM.VAL(SET,bits))
 	END MSK;
 
-	PROCEDURE NULLF(x: LONGINT): BOOLEAN;
+	PROCEDURE NULLF(x: SIGNED32): BOOLEAN;
 	BEGIN RETURN SYSTEM.VAL(SET,x) * SYSTEM.VAL(SET,M) = {}
 	END NULLF;
 
-	PROCEDURE ConvertIR*(x: LONGINT): REAL; (* Float 32 bit *)
-	VAR xe, s: LONGINT; odd,odd1: BOOLEAN; odds: LONGINT;
+	PROCEDURE ConvertIR*(x: SIGNED32): REAL; (* Float 32 bit *)
+	VAR xe, s: SIGNED32; odd,odd1: BOOLEAN; odds: SIGNED32;
 	BEGIN s := x;
 		IF x # 0 THEN
 			x := ABS(x); xe := 4B000000H;
@@ -73,10 +73,10 @@ VAR high: LONGINT;
 	BEGIN HALT(200);
 	END ConvertHR;
 
-	PROCEDURE ConvertRI*(l: REAL): LONGINT; (* Floor 32bit *)
-	VAR x,xe, n, sign: LONGINT;
+	PROCEDURE ConvertRI*(l: REAL): SIGNED32; (* Floor 32bit *)
+	VAR x,xe, n, sign: SIGNED32;
 	BEGIN
-		x := SYSTEM.VAL(LONGINT,l);
+		x := SYSTEM.VAL(SIGNED32,l);
 		IF ~NULLF(x) THEN
 			sign := MSK(x, S);
 			xe := MSK(x, expo) - bias; x := MSK(x, mant) + C;
@@ -84,7 +84,7 @@ VAR high: LONGINT;
 			IF sign < 0 THEN x := -x END ;
 			IF xe < 24 THEN n := 23 - xe;
 				WHILE n > 0 DO x := ROT(MSK(x, -2), -1) + sign; DEC(n) END
-			ELSIF xe >= 31 THEN x := MIN(LONGINT)
+			ELSIF xe >= 31 THEN x := MIN(SIGNED32)
 			ELSE n := xe - 23;
 				WHILE n > 0 DO x := x+x; DEC(n) END
 			END
@@ -100,10 +100,10 @@ VAR high: LONGINT;
 	(* 32 bit float instructions *)
 
 	PROCEDURE AddR*(l,r: REAL): REAL;
-	VAR x,y,xe, ye, xm, ym, sign: LONGINT; odd, odd1: BOOLEAN;
+	VAR x,y,xe, ye, xm, ym, sign: SIGNED32; odd, odd1: BOOLEAN;
 	BEGIN
-		x := SYSTEM.VAL(LONGINT,l);
-		y := SYSTEM.VAL(LONGINT,r);
+		x := SYSTEM.VAL(SIGNED32,l);
+		y := SYSTEM.VAL(SIGNED32,r);
 		IF NULLF(x) THEN x := y
 		ELSIF ~NULLF(y) THEN
 			xe := MSK(x, expo) - bias; xm := MSK(x, mant) + C;
@@ -153,10 +153,10 @@ VAR high: LONGINT;
 	END SubR;
 
 	PROCEDURE MulR*(l,r: REAL): REAL; (* float 32 * float 32 => float 32 *)
-	VAR x,y,xe, ye, sign: LONGINT;
+	VAR x,y,xe, ye, sign: SIGNED32;
 	BEGIN
-		x := SYSTEM.VAL(LONGINT,l);
-		y := SYSTEM.VAL(LONGINT,r);
+		x := SYSTEM.VAL(SIGNED32,l);
+		y := SYSTEM.VAL(SIGNED32,r);
 		IF NULLF(y) THEN x := 0
 		ELSIF ~NULLF(x) THEN
 			sign := MSK(x, S) + MSK(y, S);
@@ -179,10 +179,10 @@ VAR high: LONGINT;
 	END MulR;
 
 	PROCEDURE DivR*(l,r: REAL): REAL; (* float 32 / float 32 => float 32 *)
-	VAR x,y,xe, ye, q, n, sign: LONGINT;
+	VAR x,y,xe, ye, q, n, sign: SIGNED32;
 	BEGIN
-		x := SYSTEM.VAL(LONGINT,l);
-		y := SYSTEM.VAL(LONGINT,r);
+		x := SYSTEM.VAL(SIGNED32,l);
+		y := SYSTEM.VAL(SIGNED32,r);
 		ASSERT(ABS(y) # 0,26);
 		IF ~NULLF(x) THEN
 			sign := MSK(x, S) + MSK(y, S);
@@ -210,8 +210,8 @@ VAR high: LONGINT;
 		IF x < 0 THEN RETURN -x ELSE RETURN x END
 	END AbsR;
 
-	PROCEDURE DivModL(dividend, divisor: LONGINT; VAR quotient, remainder: LONGINT);
-	VAR d: LONGINT;
+	PROCEDURE DivModL(dividend, divisor: SIGNED32; VAR quotient, remainder: SIGNED32);
+	VAR d: SIGNED32;
 	BEGIN
 		ASSERT(dividend >=0); ASSERT(divisor > 0);
 		remainder := dividend;
@@ -224,8 +224,8 @@ VAR high: LONGINT;
 	END DivModL;
 
 	(* 32 bit integer instructions *)
-	PROCEDURE DivL*(l,r: LONGINT): LONGINT;
-	VAR quotient, remainder: LONGINT;
+	PROCEDURE DivL*(l,r: SIGNED32): SIGNED32;
+	VAR quotient, remainder: SIGNED32;
 	BEGIN
 		IF l < 0 THEN
 			DivModL(-l,r,quotient,remainder);
@@ -236,8 +236,8 @@ VAR high: LONGINT;
 		END;
 	END DivL;
 
-	PROCEDURE ModL*(l,r: LONGINT): LONGINT;
-	VAR quotient, remainder: LONGINT;
+	PROCEDURE ModL*(l,r: SIGNED32): SIGNED32;
+	VAR quotient, remainder: SIGNED32;
 	BEGIN
 		IF l < 0 THEN
 			DivModL(-l,r,quotient,remainder);
@@ -288,8 +288,8 @@ VAR high: LONGINT;
 	BEGIN HALT(200);
 	END ConvertRX;
 
-	PROCEDURE ConvertIX*(x: LONGINT): LONGREAL;
-	VAR xe: LONGINT;  h: HUGEINT;
+	PROCEDURE ConvertIX*(x: SIGNED32): LONGREAL;
+	VAR xe: SIGNED32;  h: HUGEINT;
 	CONST B = 1023; C=10000000000000H;
 	BEGIN
 		IF x # 0 THEN
@@ -305,7 +305,7 @@ VAR high: LONGINT;
 		RETURN SYSTEM.VAL(LONGREAL,h)
 	END ConvertIX;
 
-	PROCEDURE ConvertXI*(x: LONGREAL): LONGINT ;
+	PROCEDURE ConvertXI*(x: LONGREAL): SIGNED32 ;
 	BEGIN HALT(200);
 	END ConvertXI;
 
@@ -347,7 +347,7 @@ VAR high: LONGINT;
 		traps if src or destination is not 0X terminated and comparison is not finished
 	*)
 	PROCEDURE CompareString*(CONST left,right: ARRAY OF CHAR): SIGNED8;
-	VAR i: LONGINT; res: SIGNED8; l,r: CHAR;
+	VAR i: SIGNED32; res: SIGNED8; l,r: CHAR;
 	BEGIN
 		i := 0; res := 0;
 		LOOP
@@ -367,7 +367,7 @@ VAR high: LONGINT;
 
 	(* copy string from src to dest, emits trap if not 0X terminated or destination too short *)
 	PROCEDURE CopyString*(VAR dest: ARRAY OF CHAR; CONST src: ARRAY OF CHAR);
-	VAR i: LONGINT; ch :CHAR; l1,l2: LONGINT;
+	VAR i: SIGNED32; ch :CHAR; l1,l2: SIGNED32;
 	BEGIN
 		(*
 		i := 0;

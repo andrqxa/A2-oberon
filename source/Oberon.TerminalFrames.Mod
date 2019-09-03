@@ -17,7 +17,7 @@ MODULE TerminalFrames IN Oberon; (** portable *) (* ww 5 Jun 92 *)
 			fnt*: Fonts.Font;
 			cursorState*, charW*, lineH*: SIGNED16;
 			hasSel*: BOOLEAN;
-			selTime*: LONGINT;
+			selTime*: SIGNED32;
 			selFrom*, selTo*: Terminals.Location;
 		END;
 
@@ -131,7 +131,7 @@ MODULE TerminalFrames IN Oberon; (** portable *) (* ww 5 Jun 92 *)
 		IF l >= col THEN RETURN len + col + i - 2 ELSE RETURN len + l + i - 1 END
 	END TextPos;
 
-	PROCEDURE GetSelection*(f: Frame; VAR text: Texts.Text; VAR beg, end, time: LONGINT);
+	PROCEDURE GetSelection*(f: Frame; VAR text: Texts.Text; VAR beg, end, time: SIGNED32);
 	BEGIN
 		IF f.hasSel THEN time := f.selTime; text := TextOf(f);
 			beg := TextPos(f, f.selFrom.line, f.selFrom.col); end := TextPos(f, f.selTo.line, f.selTo.col) + 1
@@ -307,7 +307,7 @@ MODULE TerminalFrames IN Oberon; (** portable *) (* ww 5 Jun 92 *)
 	END TrackWord;
 
 	PROCEDURE Edit*(f: Frame; keys: SET; x, y: SIGNED16);
-		VAR keySum: SET; text: Texts.Text; beg, end, time: LONGINT; cmdLine, cmdCol: SIGNED16;
+		VAR keySum: SET; text: Texts.Text; beg, end, time: SIGNED32; cmdLine, cmdCol: SIGNED16;
 			msg: Oberon.ConsumeMsg;
 	BEGIN
 		IF Left IN keys THEN keySum := keys;

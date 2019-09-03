@@ -158,7 +158,7 @@ MODULE LeoImageEditors IN Oberon; (** portable **)	(* eos  *)
 	END Revert;
 
 	PROCEDURE Apply (e: LeoPanels.Editor);
-		VAR obj: Objects.Object; img: LeoImages.Image; i: LONGINT; b: BOOLEAN;
+		VAR obj: Objects.Object; img: LeoImages.Image; i: SIGNED32; b: BOOLEAN;
 	BEGIN
 		Links.GetLink(e, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoImages.Image) THEN

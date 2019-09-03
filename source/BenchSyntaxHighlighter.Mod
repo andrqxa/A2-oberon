@@ -82,7 +82,7 @@ BEGIN
 	out.String("Region lookup"); out.Int(nofIterations, 0); out.String(" times ... "); out.Update;
 	startTime := Dates.Now();
 	FOR i := 1 TO nofIterations DO
-		position := random.Dice(length(LONGINT));
+		position := random.Dice(length(SIGNED32));
 		style := highlighter.GetRegionStyle(position, state, start, end);
 	END;
 	endTime := Dates.Now();
@@ -125,18 +125,18 @@ BEGIN
 	Strings.ShowTimeDifference(startTime, endTime, out); out.Ln;
 END Full;
 
-PROCEDURE Indent(writer : Streams.Writer; width : LONGINT);
-VAR i : LONGINT;
+PROCEDURE Indent(writer : Streams.Writer; width : SIGNED32);
+VAR i : SIGNED32;
 BEGIN
 	FOR i := 1 TO width DO writer.Char(" "); END;
 END Indent;
 
 PROCEDURE Bench*(context : Commands.Context); (** [Options] filename [benchmark] ~ *)
 VAR
-	filename : Files.FileName; highlighterName, benchmark : ARRAY 64 OF CHAR; nofIterations : LONGINT;
+	filename : Files.FileName; highlighterName, benchmark : ARRAY 64 OF CHAR; nofIterations : SIGNED32;
 	options : Options.Options;
 	text : Texts.Text; reader : Texts.TextReader;
-	format : LONGINT; res: WORD;
+	format : SIGNED32; res: WORD;
 	highlighter : SyntaxHighlighter.Highlighter;
 BEGIN
 	NEW(options);

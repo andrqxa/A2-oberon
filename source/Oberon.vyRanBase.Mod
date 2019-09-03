@@ -47,10 +47,10 @@ See also G. Marsaglia's home page on http://stat.fso.edu/~geo/
 (* jb 5.5.01 version check when storing random generators *)
 (* jb 6.3.01 SumPSqr added, GetRandomLExact added, reset mechanism changed, some constants added *)
 (* jb 10.1.01 support for loading/storing seeds added *)
-(* jb 27.3.00 return value of GetRandom, MAX and GetRandomBitV is Bits = LONGINT now *)
+(* jb 27.3.00 return value of GetRandom, MAX and GetRandomBitV is Bits = SIGNED32 now *)
 (* jb 21.2.00 major changes *)
 (* gs 23.1.98 replace naive Parks&Miller by left-adjusted version. Naive version is kept as example. *)
-(* gs 1.6.96 moved from 32 bit LONGINT to generic seed *)
+(* gs 1.6.96 moved from 32 bit SIGNED32 to generic seed *)
 
 IMPORT SYSTEM, Oberon, Objects, Gadgets, Files;
 
@@ -65,13 +65,13 @@ CONST
 CONST
 	(* system dependent constants, change when necessary *)
 	sysBitsTypeSize* = 4;
-	sysHalfBitsType* = 10000H;   (* = 2 ^ (SIZEOF(LONGINT) * 8 / 2) *)
-	sysMaskFirstHalf* = LONGINT(0FFFF0000H);  sysMaskSecondHalf* = 0FFFFH;   (* mask first/second half of a LONGINT value *)
-	sysMaxUnsigned* = LONGINT(0FFFFFFFFH);   (* = 2 ^ (SIZEOF(LONGINT) * 8) - 1 *)
-	sysSHL* = 1;  sysSHR* = -1;   (* sign for left/right shift of a LONGINT value when using LSH *)
+	sysHalfBitsType* = 10000H;   (* = 2 ^ (SIZEOF(SIGNED32) * 8 / 2) *)
+	sysMaskFirstHalf* = SIGNED32(0FFFF0000H);  sysMaskSecondHalf* = 0FFFFH;   (* mask first/second half of a SIGNED32 value *)
+	sysMaxUnsigned* = SIGNED32(0FFFFFFFFH);   (* = 2 ^ (SIZEOF(SIGNED32) * 8) - 1 *)
+	sysSHL* = 1;  sysSHR* = -1;   (* sign for left/right shift of a SIGNED32 value when using LSH *)
 
 TYPE
-	Bits* = LONGINT;
+	Bits* = SIGNED32;
 
 	(*** The general type used as seed, and for task communcation ***)
 	tMsg* = OBJECT
@@ -103,7 +103,7 @@ TYPE
 
 	(*** The general type for random number generators ***)
 	(*= a new random number generator should shield its internal structure,
-	but allow as efficient access as possible. The minimum is to supply a LONGINT variant
+	but allow as efficient access as possible. The minimum is to supply a SIGNED32 variant
 	Random with values in 0..MAX, and a LONGREAL variant normed to [0,1] *)
 
 	tRandom* = POINTER TO tRandomNumberDesc;
@@ -128,25 +128,25 @@ TYPE
 		Max*: PROCEDURE ( gen: tRandom ): Bits;   (*= maximum value returned by GetRandom *)
 
 		(*= Read out functions which can be savely kept to defaults. Replace, if this gives a speed advantage *)
-		GetRandomBitV*: PROCEDURE ( gen: tRandom;  count: LONGINT;  VAR nrs: ARRAY OF Bits;  start: LONGINT );   (*= A bit pattern *)
+		GetRandomBitV*: PROCEDURE ( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF Bits;  start: SIGNED32 );   (*= A bit pattern *)
 		(* jb28.3.00 - replaced by GetRandomBitV
-		GetRandomV*: PROCEDURE (gen: tRandom; count: LONGINT; VAR nrs: ARRAY OF LONGINT; start: LONGINT);	(*= A bit pattern, stored as LONGINT *)
+		GetRandomV*: PROCEDURE (gen: tRandom; count: SIGNED32; VAR nrs: ARRAY OF SIGNED32; start: SIGNED32);	(*= A bit pattern, stored as SIGNED32 *)
 		*)
-		GetRandomUV*: PROCEDURE ( gen: tRandom;  count: LONGINT;  VAR nrs: ARRAY OF REAL;  start: LONGINT );   (*= U[0,1] *)
-		GetRandomUVX*: PROCEDURE ( gen: tRandom;  count: LONGINT;  VAR nrs: ARRAY OF LONGREAL;  start: LONGINT );   (*= U[0,1] *)
+		GetRandomUV*: PROCEDURE ( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF REAL;  start: SIGNED32 );   (*= U[0,1] *)
+		GetRandomUVX*: PROCEDURE ( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF LONGREAL;  start: SIGNED32 );   (*= U[0,1] *)
 
-		(* the following procedures generate a random LONGINT within [0; top) *)
-		(* if top <= 0 or top > min ( MAX (LONGINT), unsigned (MAX ()) ), a non-negative random LONGINT
-		within [ 0; min ( MAX (LONGINT), unsigned (MAX ()) ) ] is returned *)
+		(* the following procedures generate a random SIGNED32 within [0; top) *)
+		(* if top <= 0 or top > min ( MAX (SIGNED32), unsigned (MAX ()) ), a non-negative random SIGNED32
+		within [ 0; min ( MAX (SIGNED32), unsigned (MAX ()) ) ] is returned *)
 		(* the results are calculated from a full range random value as "MOD top", so they normally will not be
 		uniformly distributed, but the error seems to be very small [to avoid this problem see procedure GetRandomLExact below]
 		- value of Herfindahl index as measure of concentration is returned by SumPSqr
 		theoretical value of chi square test statistic is then given by unsigned (MAX ()) * (SumPSqr () * top - 1),
 		unsigned (MAX ()) - 1 degrees of freedom *)
 		(* jb 6.3.01 *)
-		SumPSqr*: PROCEDURE ( gen: tRandom;  top: LONGINT ): LONGREAL;
-		GetRandomL*: PROCEDURE ( gen: tRandom;  top: LONGINT ): LONGINT;
-		GetRandomLV*: PROCEDURE ( gen: tRandom;  top: LONGINT;  count: LONGINT;  VAR nrs: ARRAY OF LONGINT;  start: LONGINT );
+		SumPSqr*: PROCEDURE ( gen: tRandom;  top: SIGNED32 ): LONGREAL;
+		GetRandomL*: PROCEDURE ( gen: tRandom;  top: SIGNED32 ): SIGNED32;
+		GetRandomLV*: PROCEDURE ( gen: tRandom;  top: SIGNED32;  count: SIGNED32;  VAR nrs: ARRAY OF SIGNED32;  start: SIGNED32 );
 
 		(* deprecated *)
 		GetRandomSet*: PROCEDURE ( gen: tRandom ): SET;
@@ -167,7 +167,7 @@ TYPE
 	tLongintSeed* = OBJECT (* POINTER TO tLongintSeedDesc;
 	tLongintSeedDesc* = RECORD*)   (tSeed)
 	VAR
-		val*: LONGINT;
+		val*: SIGNED32;
 
 		PROCEDURE  (*VAR seed: tLongintSeedDesc*) Store*( VAR r: Files.Rider );
 		BEGIN
@@ -195,7 +195,7 @@ TYPE
 
 	(*** The global random number generator ***)
 VAR
-	RandomGenerator-: tRandom;  initSeed1, initSeed2, initSeed3: LONGINT;
+	RandomGenerator-: tRandom;  initSeed1, initSeed2, initSeed3: SIGNED32;
 
 	(*** procedures to load/store seeds - jb 29.11.00 *** *)
 
@@ -243,9 +243,9 @@ VAR
 	END RandomBits;
 
 (* jb 28.3.00 - replaced by RandomBits
-PROCEDURE Random* (): LONGINT;
+PROCEDURE Random* (): SIGNED32;
 (*= return a random number from RandomGenerator *)
-BEGIN RETURN RandomGenerator.GetRandomL(RandomGenerator, MAX(LONGINT)) END Random;
+BEGIN RETURN RandomGenerator.GetRandomL(RandomGenerator, MAX(SIGNED32)) END Random;
 *)
 
 	PROCEDURE RandomU*( ): LONGREAL;
@@ -261,24 +261,24 @@ BEGIN RETURN RandomGenerator.GetRandomL(RandomGenerator, MAX(LONGINT)) END Rando
 	END RandomName;
 
 (** Vector access to current generator **)
-	PROCEDURE RandomBitV*( count: LONGINT;  VAR nrs: ARRAY OF Bits;  start: LONGINT );
+	PROCEDURE RandomBitV*( count: SIGNED32;  VAR nrs: ARRAY OF Bits;  start: SIGNED32 );
 	BEGIN
 		RandomGenerator.GetRandomBitV( RandomGenerator, count, nrs, start )
 	END RandomBitV;
 
 (* jb 28.3.00 - replaced by RandomBitV
-PROCEDURE RandomV* (count: LONGINT; VAR nrs: ARRAY OF LONGINT; start: LONGINT);
-(* VAR i: LONGINT; *)
+PROCEDURE RandomV* (count: SIGNED32; VAR nrs: ARRAY OF SIGNED32; start: SIGNED32);
+(* VAR i: SIGNED32; *)
 BEGIN
 (* jb 12.3.00
-FOR i := start TO start + count - 1 DO nrs[i] := RandomGenerator.GetRandomL(RandomGenerator, MAX(LONGINT)) END
+FOR i := start TO start + count - 1 DO nrs[i] := RandomGenerator.GetRandomL(RandomGenerator, MAX(SIGNED32)) END
 *)
 RandomGenerator.GetRandomV (RandomGenerator, count, nrs, start)
 END RandomV;
 *)
 
-	PROCEDURE RandomLV*( top: LONGINT;  exact: BOOLEAN;  count: LONGINT;  VAR nrs: ARRAY OF LONGINT;  start: LONGINT );
-	(* VAR i: LONGINT; *)
+	PROCEDURE RandomLV*( top: SIGNED32;  exact: BOOLEAN;  count: SIGNED32;  VAR nrs: ARRAY OF SIGNED32;  start: SIGNED32 );
+	(* VAR i: SIGNED32; *)
 	BEGIN
 		(* jb 12.3.00
 	FOR i := start TO start + count - 1 DO nrs[i] := RandomGenerator.GetRandomL(RandomGenerator, top) END
@@ -286,8 +286,8 @@ END RandomV;
 		RandomGenerator.GetRandomLV( RandomGenerator, top, count, nrs, start )
 	END RandomLV;
 
-	PROCEDURE RandomUV*( count: LONGINT;  VAR nrs: ARRAY OF REAL;  start: LONGINT );
-	(* VAR i: LONGINT; *)
+	PROCEDURE RandomUV*( count: SIGNED32;  VAR nrs: ARRAY OF REAL;  start: SIGNED32 );
+	(* VAR i: SIGNED32; *)
 	BEGIN
 		(* jb 12.3.00
 	FOR i := start TO start + count - 1 DO nrs[i] := SHORT(RandomGenerator.GetRandomU(RandomGenerator)) END
@@ -295,8 +295,8 @@ END RandomV;
 		RandomGenerator.GetRandomUV( RandomGenerator, count, nrs, start )
 	END RandomUV;
 
-	PROCEDURE RandomUVX*( count: LONGINT;  VAR nrs: ARRAY OF LONGREAL;  start: LONGINT );
-	(* VAR i: LONGINT; *)
+	PROCEDURE RandomUVX*( count: SIGNED32;  VAR nrs: ARRAY OF LONGREAL;  start: SIGNED32 );
+	(* VAR i: SIGNED32; *)
 	BEGIN
 		(* jb 12.3.00
 	FOR i := start TO start + count - 1 DO nrs[i] := RandomGenerator.GetRandomU(RandomGenerator) END
@@ -308,7 +308,7 @@ END RandomV;
 
 (* auxiliary procedures *)
 
-	PROCEDURE GetRandomLExact*( gen: tRandom;  max, top, maxtries: LONGINT ): LONGINT;
+	PROCEDURE GetRandomLExact*( gen: tRandom;  max, top, maxtries: SIGNED32 ): SIGNED32;
 	(*= get a random value which is (theoretically) uniformly distributed within [0, top)
 
 	pass the result of gen.MAX (gen) as parameter max
@@ -319,9 +319,9 @@ END RandomV;
 	interval, if not, another random number is drawn; if we were not successful within maxtries times, -1
 	is returned
 	*)
-	VAR m1, m2, m3, max1, max2, max3, c, nTry, z: LONGINT;
+	VAR m1, m2, m3, max1, max2, max3, c, nTry, z: SIGNED32;
 	BEGIN
-		IF max < 0 THEN max2 := max1 - MIN( LONGINT );  max1 := MAX( LONGINT ) ELSE max2 := -1;  max1 := max END;
+		IF max < 0 THEN max2 := max1 - MIN( SIGNED32 );  max1 := MAX( SIGNED32 ) ELSE max2 := -1;  max1 := max END;
 		c := max1 MOD top + 1;
 		IF c = top THEN m1 := max1 ELSE m1 := max1 - c END;
 		ASSERT ( -1 MOD 3 = -1, 100 );   (* if not, the cases max2 = -1 and max3 = -1
@@ -338,7 +338,7 @@ END RandomV;
 				IF z <= m1 THEN RETURN z MOD top END;
 				z := z - m1 - 1
 			ELSE
-				DEC( z, MIN( LONGINT ) );
+				DEC( z, MIN( SIGNED32 ) );
 				IF z <= m2 THEN RETURN z MOD top END;
 				z := z - m2 - 1 + max1 - m1
 			END;
@@ -358,35 +358,35 @@ END RandomV;
 
 (** These are the default routines for vector oriented usage **)
 
-	PROCEDURE DefaultRandomBitV*( gen: tRandom;  count: LONGINT;  VAR nrs: ARRAY OF Bits;  start: LONGINT );
-	VAR i: LONGINT;
+	PROCEDURE DefaultRandomBitV*( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF Bits;  start: SIGNED32 );
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := start TO start + count - 1 DO nrs[i] := gen.GetRandom( gen ) END
 	END DefaultRandomBitV;
 
 	(* jb 28.3.00 *)
 (*
-PROCEDURE DefaultRandomV* (gen: tRandom; count: LONGINT; VAR nrs: ARRAY OF LONGINT; start: LONGINT);
-VAR i: LONGINT;
+PROCEDURE DefaultRandomV* (gen: tRandom; count: SIGNED32; VAR nrs: ARRAY OF SIGNED32; start: SIGNED32);
+VAR i: SIGNED32;
 BEGIN
-FOR i := start TO start + count - 1 DO nrs[i] := gen.GetRandomL(gen, MAX(LONGINT)) END
+FOR i := start TO start + count - 1 DO nrs[i] := gen.GetRandomL(gen, MAX(SIGNED32)) END
 END DefaultRandomV;
 *)
 
-	PROCEDURE DefaultRandomLV*( gen: tRandom;  top: LONGINT;  count: LONGINT;  VAR nrs: ARRAY OF LONGINT;  start: LONGINT );
-	VAR i: LONGINT;
+	PROCEDURE DefaultRandomLV*( gen: tRandom;  top: SIGNED32;  count: SIGNED32;  VAR nrs: ARRAY OF SIGNED32;  start: SIGNED32 );
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := start TO start + count - 1 DO nrs[i] := gen.GetRandomL( gen, top ) END
 	END DefaultRandomLV;
 
-	PROCEDURE DefaultRandomUV*( gen: tRandom;  count: LONGINT;  VAR nrs: ARRAY OF REAL;  start: LONGINT );
-	VAR i: LONGINT;
+	PROCEDURE DefaultRandomUV*( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF REAL;  start: SIGNED32 );
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := start TO start + count - 1 DO nrs[i] := SHORT( gen.GetRandomU( gen ) ) END
 	END DefaultRandomUV;
 
-	PROCEDURE DefaultRandomUVX*( gen: tRandom;  count: LONGINT;  VAR nrs: ARRAY OF LONGREAL;  start: LONGINT );
-	VAR i: LONGINT;
+	PROCEDURE DefaultRandomUVX*( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF LONGREAL;  start: SIGNED32 );
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := start TO start + count - 1 DO nrs[i] := gen.GetRandomU( gen ) END
 	END DefaultRandomUVX;
@@ -414,7 +414,7 @@ END DefaultRandomV;
 	END SetSeed;
 
 	PROCEDURE DefaultName( r: tRandom;  pre: ARRAY OF CHAR;  VAR name: ARRAY OF CHAR );
-	VAR i, j: LONGINT;  x, y: LONGINT;
+	VAR i, j: SIGNED32;  x, y: SIGNED32;
 	BEGIN
 		j := 0;
 		(*	vyHostTexts.MsgSS('shortid:',r.shortid);vyHostTexts.MsgSS(' pre:',pre);vyHostTexts.MsgSS(' name:',name); *)
@@ -535,11 +535,11 @@ END Store;
 	(** Default implementations not set by SetDefaultProcs **)
 
 (* jb 2.3.01 - Reset mechanism changed *)
-	PROCEDURE Combo( VAR x, y, z: LONGINT ): LONGINT;
+	PROCEDURE Combo( VAR x, y, z: SIGNED32 ): SIGNED32;
 	(*= One step of Combo random number generator. *)
 	(*! only for DefaultLongSeed, Combo implemented in own Module vyRanCombo.Mod *)
 	CONST mwcParam = 30903;
-	VAR v: LONGINT;
+	VAR v: SIGNED32;
 	BEGIN
 		v := x * y;  x := y;  y := v;
 		z :=
@@ -555,15 +555,15 @@ END Store;
 		FOR i := 1 TO 10 DO res := Combo( initSeed1, initSeed2, initSeed3 ) END
 	END SetInitSeeds;
 
-	PROCEDURE DefaultLongSeed*( ): LONGINT;
+	PROCEDURE DefaultLongSeed*( ): SIGNED32;
 	(*= return a seed, to be used with the Init procedure of the random number generator
-	!!! use with care - this procedure gives a full LONGINT, which may be negative or zero !!! *)
+	!!! use with care - this procedure gives a full SIGNED32, which may be negative or zero !!! *)
 	BEGIN
 		RETURN Combo( initSeed1, initSeed2, initSeed3 )
 	END DefaultLongSeed;
 
 	PROCEDURE DefaultLongintReset*( gen: tRandom );   (* jb 21.2.00 *)
-	(* !!! use with care - this procedure gives a full LONGINT, which may be negative or zero !!!
+	(* !!! use with care - this procedure gives a full SIGNED32, which may be negative or zero !!!
 	if something different is needed, you have to create your one Reset procedure *)
 	VAR seed: tSeed;
 	BEGIN
@@ -572,9 +572,9 @@ END Store;
 		END
 	END DefaultLongintReset;
 
-	PROCEDURE DefaultSumPSqr*( gen: tRandom;  top: LONGINT ): LONGREAL;
+	PROCEDURE DefaultSumPSqr*( gen: tRandom;  top: SIGNED32 ): LONGREAL;
 	(* default procedure if MAX () = sysMaxUnsigned *)
-	CONST N = MAX( LONGINT );
+	CONST N = MAX( SIGNED32 );
 	VAR k, t: LONGREAL;
 	BEGIN
 		IF top <= 0 THEN RETURN 1 / top END;
@@ -671,14 +671,14 @@ END FixDefaults;
 	PROCEDURE DoAsserts;
 	VAR tmp: Bits;
 	BEGIN
-		ASSERT ( SIZEOF( LONGINT ) = sysBitsTypeSize, 100 );   (* jb 28.3.00 *)
+		ASSERT ( SIZEOF( SIGNED32 ) = sysBitsTypeSize, 100 );   (* jb 28.3.00 *)
 		ASSERT ( sysMaxUnsigned = -1, 101 );   (* jb 10.1.01 *)
 		ASSERT ( sysHalfBitsType = LSH( 80000000H, -(sysBitsTypeSize * 8) DIV 2 + 1 ), 102 );   (* jb 10.1.01 *)
 		tmp := 1;
 		ASSERT ( LSH( tmp, sysSHL ) = 2, 103 );   (* jb 2.3.01 *)
 		tmp := -1;
 		ASSERT ( LSH( tmp, sysSHR ) > 0, 104 );   (* jb 2.3.01 - assert shift is unsigned *)
-		ASSERT ( SIZEOF( SET ) = SIZEOF( LONGINT ), 105 )
+		ASSERT ( SIZEOF( SET ) = SIZEOF( SIGNED32 ), 105 )
 	END DoAsserts;
 
 BEGIN

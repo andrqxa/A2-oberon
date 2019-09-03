@@ -18,7 +18,7 @@ TYPE
 			fePrev: SVGFilters.FilterElement; (* the previous filter element *)
 
 			sizeForced: BOOLEAN; (* should the output be forced to size widthForced * heightForced? *)
-			widthForced, heightForced: LONGINT;
+			widthForced, heightForced: SIGNED32;
 
 		PROCEDURE &New*;
 		BEGIN
@@ -26,7 +26,7 @@ TYPE
 		END New;
 
 		(* Force the output to be of size width * height *)
-		PROCEDURE ForceSize(width, height: LONGINT);
+		PROCEDURE ForceSize(width, height: SIGNED32);
 		BEGIN
 			sizeForced := TRUE;
 			widthForced := width;
@@ -865,7 +865,7 @@ TYPE
 		PROCEDURE LoadViewBoxAttributes(e: XML.Element; VAR transform: SVG.Transform; width0, height0: SVG.Length);
 		VAR viewBox, preserveAR: XML.String;
 			minx, miny, width, height, ratioX, ratioY: SVG.Length;
-			xAlign, yAlign: LONGINT;
+			xAlign, yAlign: SIGNED32;
 			meet: BOOLEAN;
 		BEGIN
 			viewBox := e.GetAttributeValue("viewBox");
@@ -1016,7 +1016,7 @@ BEGIN
 END LoadSVGEmbedded;
 
 (* Load some svg file and force the resulting size to be width * height *)
-PROCEDURE LoadSizedSVG*(svgName: ARRAY OF CHAR; width, height: LONGINT): SVG.Document;
+PROCEDURE LoadSizedSVG*(svgName: ARRAY OF CHAR; width, height: SIGNED32): SVG.Document;
 VAR
 	xml: XML.Document;
 	root: XML.Element;

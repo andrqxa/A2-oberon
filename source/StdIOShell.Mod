@@ -40,7 +40,7 @@ TYPE
 	(* excute the shell and termination in separate thread with proper process data structure *)
 	Executor=OBJECT
 	VAR done := FALSE: BOOLEAN;
-	VAR code := Modules.PowerDown: LONGINT;
+	VAR code := Modules.PowerDown: SIGNED32;
 
 		PROCEDURE Wait;
 		BEGIN{EXCLUSIVE}

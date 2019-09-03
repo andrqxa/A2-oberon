@@ -6,13 +6,13 @@ IMPORT antsArrays, vyLongrealVec, vyBase, vyName, antsCommands, aM := antsMessag
 	MathL IN A2, Math IN A2, vyRandom, vyPort, antsReadWrite, Out, antsArrayObjects;
 
 TYPE
-	DistanceFunction* = PROCEDURE {DELEGATE} ( l, r: LONGINT ): LONGREAL;
-	ApproximationFunction* = PROCEDURE {DELEGATE} ( l, r, pos: LONGINT ): LONGREAL;
-	MultiresFunction* = PROCEDURE {DELEGATE} ( l, r: LONGINT ): BOOLEAN;
+	DistanceFunction* = PROCEDURE {DELEGATE} ( l, r: SIGNED32 ): LONGREAL;
+	ApproximationFunction* = PROCEDURE {DELEGATE} ( l, r, pos: SIGNED32 ): LONGREAL;
+	MultiresFunction* = PROCEDURE {DELEGATE} ( l, r: SIGNED32 ): BOOLEAN;
 	GetLine = PROCEDURE {DELEGATE} ( x: LONGREAL;  VAR a, b: LONGREAL );
 	ArrayR = POINTER TO ARRAY OF LONGREAL;
 	ArrayR2 = POINTER TO ARRAY OF ARRAY OF LONGREAL;
-	ArrayI = POINTER TO ARRAY OF LONGINT;
+	ArrayI = POINTER TO ARRAY OF SIGNED32;
 
 TYPE
 
@@ -34,7 +34,7 @@ TYPE
 	END List;
 
 	BaseObject = OBJECT (vyBase.Object)
-	VAR len: LONGINT;
+	VAR len: SIGNED32;
 		factor: LONGREAL;   (* length of data vector*)
 		data: vyLongrealVec.tVector;
 
@@ -43,17 +43,17 @@ TYPE
 			aM.eS( "Implement method Object.Preparation !! " );  HALT( 100 );
 		END Preparation;
 
-		PROCEDURE Distance( l, r: LONGINT ): LONGREAL;
+		PROCEDURE Distance( l, r: SIGNED32 ): LONGREAL;
 		BEGIN
 			aM.eS( "Implement method Object.Distance !! " );  HALT( 100 );
 		END Distance;
 
-		PROCEDURE Value( l, r, pos: LONGINT ): LONGREAL;
+		PROCEDURE Value( l, r, pos: SIGNED32 ): LONGREAL;
 		BEGIN
 			aM.eS( "Implement method Object.Value !!" );  HALT( 100 );
 		END Value;
 
-		PROCEDURE Multires( l, r: LONGINT ): BOOLEAN;
+		PROCEDURE Multires( l, r: SIGNED32 ): BOOLEAN;
 		BEGIN
 			aM.eS( "Implement method Object.Multires !!" );  HALT( 100 );
 		END Multires;
@@ -67,17 +67,17 @@ TYPE
 
 	LineFinder = OBJECT
 	VAR
-		n: LONGINT;
+		n: SIGNED32;
 		d: DistanceFunction;
-		iter, iterationlimit: LONGINT;
+		iter, iterationlimit: SIGNED32;
 
-		PROCEDURE & Init( n: LONGINT;  d: DistanceFunction );
+		PROCEDURE & Init( n: SIGNED32;  d: DistanceFunction );
 		BEGIN
 			SELF.n := n;  SELF.d := d;  iter := 0;  iterationlimit := 2 * n;   (* heuristic *)
 		END Init;
 
 		PROCEDURE GetPottsLine( gamma: LONGREAL;  VAR a, b: LONGREAL );
-		VAR p: ArrayI;  r, l: LONGINT;
+		VAR p: ArrayI;  r, l: SIGNED32;
 		BEGIN
 			INC( iter );
 			IF iter > iterationlimit THEN HALT( 100 ) END;   (* iteration limit exceeded, nr of lines cannot exceed nr of data ! *)
@@ -95,7 +95,7 @@ TYPE
 	VAR
 		M, S, approx: ArrayR;
 
-		PROCEDURE Value( l, r, pos: LONGINT ): LONGREAL;
+		PROCEDURE Value( l, r, pos: SIGNED32 ): LONGREAL;
 		(* You can calculate the sum from position l to position r simply by subtracting
 		 the value of M  (see PROCEDURE Preparation) at r from the value at l-1 and the mean of the interval [l,r] by dividing through the length of the interval*)
 		VAR m: LONGREAL;
@@ -105,7 +105,7 @@ TYPE
 			RETURN m / (r - l + 1);
 		END Value;
 
-		PROCEDURE Distance( l, r: LONGINT ): LONGREAL;
+		PROCEDURE Distance( l, r: SIGNED32 ): LONGREAL;
 		(* Returns the sum of squares in an interval [l,r].
 		You get the used formula by multiplying out the underlying formula
 		"sum[from l to r] (data[i]- mean[l,r]) ^2" :
@@ -123,14 +123,14 @@ TYPE
 
 		PROCEDURE Preparation( data: vyLongrealVec.tVector );
 		(*stores the sum of the data points from position 0 to i at position i in array M, and the sum of squares of the data points from position 0 to i at position i in array S *)
-		VAR i: LONGINT;  m, s, val: LONGREAL;
+		VAR i: SIGNED32;  m, s, val: LONGREAL;
 		BEGIN
 			SELF.data := data;  len := vyLongrealVec.Len( data );  NEW( M, len );  NEW( S, len );  m := 0;  s := 0;
 			FOR i := 0 TO len - 1 DO val := vyLongrealVec.Get( data, i );  m := m + val;  s := s + val * val;  M[i] := m;  S[i] := s;  END;
 		END Preparation;
 
-		PROCEDURE Multires( l, r: LONGINT ): BOOLEAN;
-		VAR i: LONGINT;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
+		PROCEDURE Multires( l, r: SIGNED32 ): BOOLEAN;
+		VAR i: SIGNED32;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
 		BEGIN
 			NEW( approx, r - l + 1 );  datavec := vyLongrealVec.New( r - l + 1 );
 			FOR i := 0 TO r - l DO approx[i] := Value( l, r, 0 ) END;
@@ -145,12 +145,12 @@ TYPE
 		approx: ArrayR;
 		temp: ArrayR;
 
-		PROCEDURE Value( l, r, pos: LONGINT ): LONGREAL;
+		PROCEDURE Value( l, r, pos: SIGNED32 ): LONGREAL;
 		BEGIN
 			RETURN M[l, r]
 		END Value;
 
-		PROCEDURE Distance( l, r: LONGINT ): LONGREAL;
+		PROCEDURE Distance( l, r: SIGNED32 ): LONGREAL;
 		BEGIN
 			RETURN D[l, r]
 		END Distance;
@@ -158,7 +158,7 @@ TYPE
 		PROCEDURE Preparation( data: vyLongrealVec.tVector );
 		(*stores the median of the interval i to j of the data points in Matrix M at position [i,j],
 		and the L1-distances from every data point in [i,j] to the median in [i,j] in D[i,j] *)
-		VAR i, j, t: LONGINT;  sum, m: LONGREAL;  array: ArrayR;
+		VAR i, j, t: SIGNED32;  sum, m: LONGREAL;  array: ArrayR;
 		BEGIN
 			SELF.data := data;  len := vyLongrealVec.Len( data );  NEW( M, len, len );  NEW( D, len, len );  NEW( array, len );
 			vyLongrealVec.CopyToArray( data, array^ );  NEW( temp, len );
@@ -174,8 +174,8 @@ TYPE
 			END;
 		END Preparation;
 
-		PROCEDURE Multires( l, r: LONGINT ): BOOLEAN;
-		VAR i: LONGINT;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
+		PROCEDURE Multires( l, r: SIGNED32 ): BOOLEAN;
+		VAR i: SIGNED32;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
 		BEGIN
 			NEW( approx, r - l + 1 );  datavec := vyLongrealVec.New( r - l + 1 );
 			FOR i := 0 TO r - l DO approx[i] := Value( l, r, 0 ) END;
@@ -196,12 +196,12 @@ TYPE
 			c := 1;
 		END Initialize;
 
-		PROCEDURE Value( l, r, pos: LONGINT ): LONGREAL;
+		PROCEDURE Value( l, r, pos: SIGNED32 ): LONGREAL;
 		BEGIN
 			RETURN V[l, r]
 		END Value;
 
-		PROCEDURE Distance( l, r: LONGINT ): LONGREAL;
+		PROCEDURE Distance( l, r: SIGNED32 ): LONGREAL;
 		BEGIN
 			RETURN D[l, r]
 		END Distance;
@@ -210,9 +210,9 @@ TYPE
 		(*Computes the Hampel function, which punishes deviations < |c| with the L2-Distance and deviations >=|c| with the constant value c*c; c is a constant. If you don't choose c in PROCEDURE NewHampelObject,
 		it's set to 1, see PROCEDURE & Initialize*)
 
-		VAR i, j, d, m, N, len1, len2: LONGINT;  t1, t2, fail1, fail2, tmin, failmin, prtrmean1, prtrmean2, prtrssq1, prtrssq2: LONGREAL;
+		VAR i, j, d, m, N, len1, len2: SIGNED32;  t1, t2, fail1, fail2, tmin, failmin, prtrmean1, prtrmean2, prtrssq1, prtrssq2: LONGREAL;
 			A, sortedArray, sums, ssqs: ArrayR;  ok1, ok2: BOOLEAN;
-			interval1upper, interval1lower, interval2upper, interval2lower, intervallen: LONGINT;  left, right: LONGINT;
+			interval1upper, interval1lower, interval2upper, interval2lower, intervallen: SIGNED32;  left, right: SIGNED32;
 		BEGIN
 			SELF.data := data;  len := vyLongrealVec.Len( data );  NEW( V, len, len );  NEW( D, len, len );  NEW( A, len );
 			vyLongrealVec.CopyToArray( data, A^ );  NEW( temp, len );  N := len;  NEW( sortedArray, N );  NEW( sums, N );  NEW( ssqs, N );
@@ -311,8 +311,8 @@ TYPE
 			END
 		END Preparation;
 
-		PROCEDURE Multires( l, r: LONGINT ): BOOLEAN;
-		VAR i: LONGINT;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
+		PROCEDURE Multires( l, r: SIGNED32 ): BOOLEAN;
+		VAR i: SIGNED32;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
 		BEGIN
 			NEW( approx, r - l + 1 );  datavec := vyLongrealVec.New( r - l + 1 );
 			FOR i := 0 TO r - l DO approx[i] := Value( l, r, 0 ) END;
@@ -333,12 +333,12 @@ TYPE
 			c := 1;
 		END Initialize;
 
-		PROCEDURE Value( l, r, pos: LONGINT ): LONGREAL;
+		PROCEDURE Value( l, r, pos: SIGNED32 ): LONGREAL;
 		BEGIN
 			RETURN V[l, r]
 		END Value;
 
-		PROCEDURE Distance( l, r: LONGINT ): LONGREAL;
+		PROCEDURE Distance( l, r: SIGNED32 ): LONGREAL;
 		BEGIN
 			RETURN D[l, r]
 		END Distance;
@@ -347,8 +347,8 @@ TYPE
 		(*like hampel, but the deviations < |c| are punished with the  L1-distance instead of the L2-distance. The deviations >= |c| are punished with the constant value c. The Median minimises the error.
 		If you don't choose c in PROCEDURE NewSaegezahnObject, it's set to 1, see PROCEDURE & Initialize*)
 
-		VAR i, j, k, d, m, N: LONGINT;  t1, t2, fail, tmin, failmin: LONGREAL;  A, sortedArray: ArrayR;  ok1, ok2: BOOLEAN;
-			interval1upper, interval1lower, interval2upper, interval2lower, intervallen, idist, left, right: LONGINT;
+		VAR i, j, k, d, m, N: SIGNED32;  t1, t2, fail, tmin, failmin: LONGREAL;  A, sortedArray: ArrayR;  ok1, ok2: BOOLEAN;
+			interval1upper, interval1lower, interval2upper, interval2lower, intervallen, idist, left, right: SIGNED32;
 		BEGIN
 			SELF.data := data;  len := vyLongrealVec.Len( data );  NEW( V, len, len );  NEW( D, len, len );  NEW( A, len );
 			vyLongrealVec.CopyToArray( data, A^ );  NEW( temp, len );  N := len;  NEW( sortedArray, N );
@@ -461,8 +461,8 @@ TYPE
 
 		END Preparation;
 
-		PROCEDURE Multires( l, r: LONGINT ): BOOLEAN;
-		VAR i: LONGINT;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
+		PROCEDURE Multires( l, r: SIGNED32 ): BOOLEAN;
+		VAR i: SIGNED32;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
 		BEGIN
 			NEW( approx, r - l + 1 );  datavec := vyLongrealVec.New( r - l + 1 );
 			FOR i := 0 TO r - l DO approx[i] := Value( l, r, 0 ) END;
@@ -484,12 +484,12 @@ TYPE
 		END Initialize;   (*c = intervalwidth*)
 
 
-		PROCEDURE Value( l, r, pos: LONGINT ): LONGREAL;
+		PROCEDURE Value( l, r, pos: SIGNED32 ): LONGREAL;
 		BEGIN
 			RETURN V[l, r]
 		END Value;
 
-		PROCEDURE Distance( l, r: LONGINT ): LONGREAL;
+		PROCEDURE Distance( l, r: SIGNED32 ): LONGREAL;
 		BEGIN
 			RETURN D[l, r]
 		END Distance;
@@ -498,9 +498,9 @@ TYPE
 		(*Deviations < |c| are punished with the L2-distance, deviations >= |c| only with L1-distance. If you don't choose c in PROCEDURE NewHuberObject,
 		it's set to 1, see PROCEDURE & Initialize*)
 
-		VAR i, j, d, m, N, len1, len2: LONGINT;  t1, t2, fail, tmin, failmin, prtrmeanmed1, prtrmeanmed2, prtrssqsum1, prtrssqsum2: LONGREAL;
+		VAR i, j, d, m, N, len1, len2: SIGNED32;  t1, t2, fail, tmin, failmin, prtrmeanmed1, prtrmeanmed2, prtrssqsum1, prtrssqsum2: LONGREAL;
 			A, sortedArray, sums, ssqs: ArrayR;  ok1, ok2: BOOLEAN;
-			interval1upper, interval1lower, interval2upper, interval2lower, intervallen: LONGINT;  left, right: LONGINT;
+			interval1upper, interval1lower, interval2upper, interval2lower, intervallen: SIGNED32;  left, right: SIGNED32;
 		BEGIN
 			SELF.data := data;  len := vyLongrealVec.Len( data );  NEW( V, len, len );  NEW( D, len, len );  NEW( A, len );
 			vyLongrealVec.CopyToArray( data, A^ );  NEW( temp, len );  N := len;  NEW( sortedArray, N );  NEW( sums, N );  NEW( ssqs, N );
@@ -636,8 +636,8 @@ TYPE
 
 		END Preparation;
 
-		PROCEDURE Multires( l, r: LONGINT ): BOOLEAN;
-		VAR i: LONGINT;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
+		PROCEDURE Multires( l, r: SIGNED32 ): BOOLEAN;
+		VAR i: SIGNED32;  ok: BOOLEAN;  datavec: vyLongrealVec.tVector;
 		BEGIN
 			NEW( approx, r - l + 1 );  datavec := vyLongrealVec.New( r - l + 1 );
 			FOR i := 0 TO r - l DO approx[i] := Value( l, r, 0 ) END;
@@ -649,13 +649,13 @@ TYPE
 
 VAR
 
-	PROCEDURE FindBestPartition*( n: LONGINT;  gamma: LONGREAL;  d: DistanceFunction ): ArrayI;
+	PROCEDURE FindBestPartition*( n: SIGNED32;  gamma: LONGREAL;  d: DistanceFunction ): ArrayI;
 	(*delivers the best partition by going through the data from left to right and calculating stepwise the minimum of the Bellman function.
 	It uses B(r) = min B(l-1) + gamma + (1- gamma)* d[l,r], see "Complexity Penalised M-Estimation: Fast Computation", Lemma 1, with term (1-gamma) as correction, since we use a variant of
 	the functional there.
 	In other words: at a point r you know the best partition until r-1. The best partition at r consists of the minimiser of a best partition at l-1 together with the new interval [l,r].
 	 *)
-	VAR l, r: LONGINT;  B: ArrayR;  p: ArrayI;  b: LONGREAL;
+	VAR l, r: SIGNED32;  B: ArrayR;  p: ArrayI;  b: LONGREAL;
 	BEGIN
 		NEW( B, n + 1 );  NEW( p, n + 1 );  B[0] := -gamma;   (*by defintion*)
 		p[0] := -1;   (* p[0] is redundant, needed for consistency with offset of B *)
@@ -670,8 +670,8 @@ VAR
 		RETURN p;
 	END FindBestPartition;
 
-	PROCEDURE FindBestMRPartition*( n: LONGINT;  mr: MultiresFunction ): ArrayI;   (*as FindBestPartition but the Multiresolution Criterion has to be fulfilled for every interval*)
-	VAR l, r: LONGINT;  B: ArrayR;  p: ArrayI;  b: LONGREAL;  ok: BOOLEAN;
+	PROCEDURE FindBestMRPartition*( n: SIGNED32;  mr: MultiresFunction ): ArrayI;   (*as FindBestPartition but the Multiresolution Criterion has to be fulfilled for every interval*)
+	VAR l, r: SIGNED32;  B: ArrayR;  p: ArrayI;  b: LONGREAL;  ok: BOOLEAN;
 	BEGIN
 		NEW( B, n + 1 );  NEW( p, n + 1 );  B[0] := -1;   (*by defintion*)
 		p[0] := -1;   (* p[0] is redundant, needed for consistency with offset of B *)
@@ -688,9 +688,9 @@ VAR
 
 	END FindBestMRPartition;
 
-	PROCEDURE SegmentationFromPartition*( VAR p: ARRAY OF LONGINT;  mu: ApproximationFunction ): ArrayR;
+	PROCEDURE SegmentationFromPartition*( VAR p: ARRAY OF SIGNED32;  mu: ApproximationFunction ): ArrayR;
 	(*complements the partition found with PROCEDURE FindBestPartition by the values on intervals and delivers a segmentation*)
-	VAR n: LONGINT;  y: ArrayR;  l, r, t: LONGINT;
+	VAR n: SIGNED32;  y: ArrayR;  l, r, t: SIGNED32;
 	BEGIN
 		n := LEN( p ) - 1;  NEW( y, n );  r := n;
 		l := p[r];   (*because LEN(p)=n+1*)
@@ -703,20 +703,20 @@ VAR
 		RETURN y;
 	END SegmentationFromPartition;
 
-	PROCEDURE Minimisation*( n: LONGINT;  gamma: LONGREAL;  d: DistanceFunction;  mu: ApproximationFunction ): ArrayR;
+	PROCEDURE Minimisation*( n: SIGNED32;  gamma: LONGREAL;  d: DistanceFunction;  mu: ApproximationFunction ): ArrayR;
 	VAR y: ArrayR;  p: ArrayI;
 	BEGIN
 		p := FindBestPartition( n, gamma, d );  y := SegmentationFromPartition( p^, mu );  RETURN y;
 	END Minimisation;
 
-	PROCEDURE MinimisationMR*( n: LONGINT;  mr: MultiresFunction;  mu: ApproximationFunction ): ArrayR;
+	PROCEDURE MinimisationMR*( n: SIGNED32;  mr: MultiresFunction;  mu: ApproximationFunction ): ArrayR;
 	VAR y: ArrayR;  p: ArrayI;
 	BEGIN
 		p := FindBestMRPartition( n, mr );  y := SegmentationFromPartition( p^, mu );  RETURN y;
 	END MinimisationMR;
 
-	PROCEDURE CreateSortedArray( VAR y: ARRAY OF LONGREAL;  start, ende: LONGINT;  VAR yneu: ArrayR );
-	VAR len: LONGINT;
+	PROCEDURE CreateSortedArray( VAR y: ARRAY OF LONGREAL;  start, ende: SIGNED32;  VAR yneu: ArrayR );
+	VAR len: SIGNED32;
 
 	BEGIN
 		len := ende - start + 1;
@@ -725,9 +725,9 @@ VAR
 		vyLongreal.Copy( len, y, start, yneu^, 0 );  vyLongreal.Sort( len, yneu^, 0 );
 	END CreateSortedArray;
 
-	PROCEDURE CreateSums( VAR y: ARRAY OF LONGREAL;  len: LONGINT;  VAR yneu: ArrayR );
+	PROCEDURE CreateSums( VAR y: ARRAY OF LONGREAL;  len: SIGNED32;  VAR yneu: ArrayR );
 	(*creates an array in which the sum of the data points from 0 to i is stored at position i*)
-	VAR val: LONGREAL;  i: LONGINT;
+	VAR val: LONGREAL;  i: SIGNED32;
 	BEGIN
 		IF (yneu = NIL ) OR (LEN( yneu ) < len) THEN NEW( yneu, len );  END;
 		val := 0;
@@ -735,10 +735,10 @@ VAR
 
 	END CreateSums;
 
-	PROCEDURE CreateSsqs( VAR y: ARRAY OF LONGREAL;  len: LONGINT;  VAR yneu: ArrayR );
+	PROCEDURE CreateSsqs( VAR y: ARRAY OF LONGREAL;  len: SIGNED32;  VAR yneu: ArrayR );
 	(*creates an array in which the sum of squares of the data points from 0 to i is stored at position i*)
 
-	VAR val, valsq: LONGREAL;  i: LONGINT;
+	VAR val, valsq: LONGREAL;  i: SIGNED32;
 	BEGIN
 		IF (yneu = NIL ) OR (LEN( yneu ) < len) THEN NEW( yneu, len );  END;
 
@@ -746,18 +746,18 @@ VAR
 		FOR i := 0 TO len - 1 DO val := y[i];  valsq := valsq + val * val;  yneu[i] := valsq;  END;
 	END CreateSsqs;
 
-	PROCEDURE median( VAR y: ARRAY OF LONGREAL;  VAR temp: ARRAY OF LONGREAL;  start, ende: LONGINT ): LONGREAL;
-	VAR len: LONGINT;
+	PROCEDURE median( VAR y: ARRAY OF LONGREAL;  VAR temp: ARRAY OF LONGREAL;  start, ende: SIGNED32 ): LONGREAL;
+	VAR len: SIGNED32;
 	BEGIN
 		len := ende - start + 1;  vyLongreal.Copy( len, y, start, temp, 0 );  RETURN antsArrays.Median1dX( temp, len );
 	END median;
 
-	PROCEDURE StartTiming( VAR time: LONGINT );
+	PROCEDURE StartTiming( VAR time: SIGNED32 );
 	BEGIN
 		time := Oberon.Time();
 	END StartTiming;
 
-	PROCEDURE StopTiming( s: ARRAY OF CHAR;  VAR time: LONGINT );
+	PROCEDURE StopTiming( s: ARRAY OF CHAR;  VAR time: SIGNED32 );
 	BEGIN
 		aM.vSI( s, Oberon.Time() - time );
 	END StopTiming;
@@ -765,7 +765,7 @@ VAR
 	PROCEDURE NewL2Object*;
 	VAR in: vyLongrealVec.tVector;  obj: vyBase.Object;
 		objname: ARRAY 256 OF CHAR;
-		time: LONGINT;  o: L2Object;
+		time: SIGNED32;  o: L2Object;
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT object=NAME" );
 		IF antsCommands.ExpectObject( "in", obj ) & antsCommands.ExpectName( "object", objname ) THEN
@@ -780,7 +780,7 @@ VAR
 	PROCEDURE NewL1Object*;
 	VAR in: vyLongrealVec.tVector;  obj: vyBase.Object;
 		objname: ARRAY 256 OF CHAR;
-		time: LONGINT;  o: L1Object;
+		time: SIGNED32;  o: L1Object;
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT object=NAME" );
 		IF antsCommands.ExpectObject( "in", obj ) & antsCommands.ExpectName( "object", objname ) THEN
@@ -795,7 +795,7 @@ VAR
 	PROCEDURE NewHampelObject*;
 	VAR in: vyLongrealVec.tVector;  obj: vyBase.Object;
 		objname: ARRAY 256 OF CHAR;
-		o: HampelObject;  c: LONGREAL;  time: LONGINT;
+		o: HampelObject;  c: LONGREAL;  time: SIGNED32;
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT object=NAME" );
 		IF antsCommands.ExpectObject( "in", obj ) & antsCommands.ExpectName( "object", objname ) THEN
@@ -811,7 +811,7 @@ VAR
 	PROCEDURE NewSaegezahnObject*;
 	VAR in: vyLongrealVec.tVector;  obj: vyBase.Object;
 		objname: ARRAY 256 OF CHAR;
-		o: SaegezahnObject;  c: LONGREAL;  time: LONGINT;
+		o: SaegezahnObject;  c: LONGREAL;  time: SIGNED32;
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT object=NAME" );
 		IF antsCommands.ExpectObject( "in", obj ) & antsCommands.ExpectName( "object", objname ) THEN
@@ -830,7 +830,7 @@ VAR
 	PROCEDURE NewHuberObject*;
 	VAR in: vyLongrealVec.tVector;  obj: vyBase.Object;
 		objname: ARRAY 256 OF CHAR;
-		o: HuberObject;  c: LONGREAL;  time: LONGINT;
+		o: HuberObject;  c: LONGREAL;  time: SIGNED32;
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT object=NAME" );
 		IF antsCommands.ExpectObject( "in", obj ) & antsCommands.ExpectName( "object", objname ) THEN
@@ -846,7 +846,7 @@ VAR
 	END NewHuberObject;
 
 	PROCEDURE Minimise*;
-	VAR in: BaseObject;  out: vyLongrealVec.tVector;  obj: vyBase.Object;  len: LONGINT;
+	VAR in: BaseObject;  out: vyLongrealVec.tVector;  obj: vyBase.Object;  len: SIGNED32;
 		outname: ARRAY 256 OF CHAR;
 		gamma: LONGREAL;  outarray: ArrayR;
 	BEGIN
@@ -869,7 +869,7 @@ VAR
 	END Minimise;
 
 	PROCEDURE MinimiseMR*;   (*Another possibility to get a partition according to the multiresolution criterion. The functional is not used, no gamma is needed.*)
-	VAR in: BaseObject;  out: vyLongrealVec.tVector;  obj: vyBase.Object;  len: LONGINT;
+	VAR in: BaseObject;  out: vyLongrealVec.tVector;  obj: vyBase.Object;  len: SIGNED32;
 		outname: ARRAY 256 OF CHAR;
 		factor: LONGREAL;  outarray: ArrayR;
 	BEGIN
@@ -893,7 +893,7 @@ VAR
 	END MinimiseMR;
 
 	PROCEDURE MinimiseScale*;
-	VAR in: BaseObject;  out: vyLongrealVec.tVector;  obj: vyBase.Object;  len, i: LONGINT;
+	VAR in: BaseObject;  out: vyLongrealVec.tVector;  obj: vyBase.Object;  len, i: SIGNED32;
 		outname: ARRAY 256 OF CHAR;
 		gamma: LONGREAL;  outarray: ArrayR;  a, b: LONGREAL;  line: LineFinder;
 	BEGIN
@@ -919,7 +919,7 @@ VAR
 
 (*
 	PROCEDURE Test*;
-	VAR in, out: vyLongrealVec.tVector;  obj: vyBase.Object;  len: LONGINT;
+	VAR in, out: vyLongrealVec.tVector;  obj: vyBase.Object;  len: SIGNED32;
 		outname: ARRAY 256 OF CHAR;
 		gamma: LONGREAL;  outarray: ArrayR;  o: L2Object;
 	BEGIN
@@ -950,7 +950,7 @@ VAR
 
 	PROCEDURE NewSinVector*;
 	VAR name: ARRAY 256 OF CHAR;
-		vec: vyLongrealVec.tVector;  len, period, i: LONGINT;  val: LONGREAL;  obj: vyBase.Object;
+		vec: vyLongrealVec.tVector;  len, period, i: SIGNED32;  val: LONGREAL;  obj: vyBase.Object;
 	BEGIN
 		antsCommands.InitScan( "" );
 		IF antsCommands.ExpectName( "name", name ) & antsCommands.ExpectNumber( "len", len ) &
@@ -967,7 +967,7 @@ VAR
 
 	PROCEDURE AddGaussNoise*;
 	VAR sname, dname: ARRAY 256 OF CHAR;
-		svec, dvec: vyLongrealVec.tVector;  len, period, i: LONGINT;  val, var: LONGREAL;  obj: vyBase.Object;
+		svec, dvec: vyLongrealVec.tVector;  len, period, i: SIGNED32;  val, var: LONGREAL;  obj: vyBase.Object;
 	BEGIN
 		antsCommands.InitScan( "" );
 		IF antsCommands.ExpectName( "src", sname ) & antsCommands.ExpectName( "dest", dname ) &
@@ -1020,7 +1020,7 @@ VAR
 	END GammaShooting;
 
 	PROCEDURE GammaList*;
-	VAR in: BaseObject;  out: vyLongrealVec.tVector;  obj: vyBase.Object;  len: LONGINT;
+	VAR in: BaseObject;  out: vyLongrealVec.tVector;  obj: vyBase.Object;  len: SIGNED32;
 		outname: ARRAY 256 OF CHAR;
 		gamma: LONGREAL;  outarray: ArrayR;  linefinder: LineFinder;  lst: List;  intersection: Intersection;
 	BEGIN
@@ -1054,7 +1054,7 @@ VAR
 		END;
 	END DoSetReal;
 
-	PROCEDURE DoSetInt*( name: ARRAY OF CHAR;  number: LONGINT );
+	PROCEDURE DoSetInt*( name: ARRAY OF CHAR;  number: SIGNED32 );
 	VAR obj: vyBase.Object;  numobj: vyLongintVec.tLONGINT;
 	BEGIN
 		obj := vyName.FindObj( name );
@@ -1064,7 +1064,7 @@ VAR
 		END;
 	END DoSetInt;
 
-	PROCEDURE VectToName( name: ARRAY OF CHAR;  len: LONGINT ): vyLongrealVec.tVector;
+	PROCEDURE VectToName( name: ARRAY OF CHAR;  len: SIGNED32 ): vyLongrealVec.tVector;
 	VAR vec: vyLongrealVec.tVector;  obj: vyBase.Object;
 	BEGIN
 		obj := vyName.FindObj( name );
@@ -1083,7 +1083,7 @@ VAR
 	PROCEDURE FindLongestInterval*;   (*searching for the longest gamma-interval*)
 	VAR in: vyLongrealVec.tVector;  gamma: LONGREAL;  obj: vyBase.Object;
 		gammaname: ARRAY 256 OF CHAR;
-		len, i, longesti: LONGINT;  diff, longest: LONGREAL;
+		len, i, longesti: SIGNED32;  diff, longest: LONGREAL;
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT gamma=OBJECT/NAME" );
 		IF antsCommands.ExpectObject( "in", obj ) & antsCommands.ExpectName( "gamma", gammaname ) THEN
@@ -1106,7 +1106,7 @@ VAR
 	PROCEDURE FindLastMonotone*;   (*searching for the last interval, which returns, by going through the intervals from right to left, a monotone approximation*)
 	VAR in: vyLongrealVec.tVector;  gamma: LONGREAL;  obj, ob: vyBase.Object;  myobject: BaseObject;
 		gammaname: ARRAY 256 OF CHAR;
-		len, len2, r, i: LONGINT;  lastmonotone, diff: LONGREAL;  ok: BOOLEAN;  y: ArrayR;  p: ArrayI;
+		len, len2, r, i: SIGNED32;  lastmonotone, diff: LONGREAL;  ok: BOOLEAN;  y: ArrayR;  p: ArrayI;
 	BEGIN
 		antsCommands.InitScan( "myobject=OBJECT in=OBJECT gamma=OBJECT/NAME" );
 		IF antsCommands.ExpectObject( "myobject", ob ) & antsCommands.ExpectObject( "in", obj ) &
@@ -1141,7 +1141,7 @@ VAR
 	END FindLastMonotone;
 
 	PROCEDURE ToInfScale*;
-	VAR in, out: vyLongrealVec.tVector;  obj: vyBase.Object;  len, i: LONGINT;
+	VAR in, out: vyLongrealVec.tVector;  obj: vyBase.Object;  len, i: SIGNED32;
 		outname: ARRAY 256 OF CHAR;
 		val: LONGREAL;
 	BEGIN
@@ -1169,7 +1169,7 @@ The median absolute deviation is defined as
 MAD(y) = median(ABS(y[i] - median(y)))
 *)
 	(*! hieß in antsPotts1DSurveyVS Realmad*)
-	VAR N, i: LONGINT;  val: LONGREAL;  z: vyLongrealVec.tVector;  mad: LONGREAL;  median: LONGREAL;
+	VAR N, i: SIGNED32;  val: LONGREAL;  z: vyLongrealVec.tVector;  mad: LONGREAL;  median: LONGREAL;
 	BEGIN
 		N := vyLongrealVec.Len( y( vyLongrealVec.tVector ) );
 
@@ -1232,7 +1232,7 @@ MAD(y) = median(ABS(y[i] - median(y)))
 	PROCEDURE ReadRow*;
 	VAR l: antsCommands.tScanList;
 		str: ARRAY 64 OF CHAR;
-		data: vyBase.Object;  row, col, len: LONGINT;
+		data: vyBase.Object;  row, col, len: SIGNED32;
 		dataname: ARRAY 64 OF CHAR;
 		R: antsReadWrite.Rider;  msg: vyPort.AdjustCoordMsg;
 	BEGIN
@@ -1263,9 +1263,9 @@ MAD(y) = median(ABS(y[i] - median(y)))
 
 	PROCEDURE Read*;
 	VAR str: ARRAY 64 OF CHAR;
-		rownr, colnr, i, nr: LONGINT;  min, max, rowmin, rowmax: LONGREAL;
+		rownr, colnr, i, nr: SIGNED32;  min, max, rowmin, rowmax: LONGREAL;
 		dataname: ARRAY 64 OF CHAR;
-		R: antsReadWrite.Rider;  msg: vyPort.AdjustCoordMsg;  data: antsArrayObjects.tLONGREALObject;  x, y: LONGINT;  val: LONGREAL;
+		R: antsReadWrite.Rider;  msg: vyPort.AdjustCoordMsg;  data: antsArrayObjects.tLONGREALObject;  x, y: SIGNED32;  val: LONGREAL;
 		obj: vyBase.Object;
 
 	BEGIN
@@ -1301,7 +1301,7 @@ MAD(y) = median(ABS(y[i] - median(y)))
 
 	PROCEDURE GetRow*;
 	VAR str: ARRAY 64 OF CHAR;
-		obj: vyBase.Object;  row: LONGINT;  data: antsArrayObjects.tLONGREALObject;
+		obj: vyBase.Object;  row: SIGNED32;  data: antsArrayObjects.tLONGREALObject;
 		vecname: ARRAY 256 OF CHAR;
 		vec: vyLongrealVec.tVector;
 
@@ -1324,7 +1324,7 @@ MAD(y) = median(ABS(y[i] - median(y)))
 
 (*
 PROCEDURE NormalisationMinMax*;
-	VAR in, vec, out: vyLongrealVec.tVector;  rownr, colnr, i, j: LONGINT;  obj: vyBase.Object;  min, max, val: LONGREAL;  nr: LONGINT;
+	VAR in, vec, out: vyLongrealVec.tVector;  rownr, colnr, i, j: SIGNED32;  obj: vyBase.Object;  min, max, val: LONGREAL;  nr: SIGNED32;
 		outname: ARRAY 256 OF CHAR;
 		msg: vyPort.AdjustCoordMsg;
 
@@ -1347,7 +1347,7 @@ END NormalisationMinMax;
 *)
 
 	PROCEDURE Normalisation*;
-	VAR in, sort, out: vyLongrealVec.tVector;  len, i: LONGINT;  obj: vyBase.Object;  min, max, val: LONGREAL;  nr: LONGINT;
+	VAR in, sort, out: vyLongrealVec.tVector;  len, i: SIGNED32;  obj: vyBase.Object;  min, max, val: LONGREAL;  nr: SIGNED32;
 		outname: ARRAY 256 OF CHAR;
 		msg: vyPort.AdjustCoordMsg;
 	BEGIN
@@ -1365,7 +1365,7 @@ END NormalisationMinMax;
 	END Normalisation;
 
 	PROCEDURE Append*;
-	VAR in: vyLongrealVec.tVector;  len, i: LONGINT;  obj: vyBase.Object;  val: LONGREAL;
+	VAR in: vyLongrealVec.tVector;  len, i: SIGNED32;  obj: vyBase.Object;  val: LONGREAL;
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT  val=Real" );
 		IF antsCommands.ExpectObject( "in", obj ) & (antsCommands.ExpectReal( "val", val )) THEN
@@ -1374,7 +1374,7 @@ END NormalisationMinMax;
 	END Append;
 
 	PROCEDURE AppendSprungpunkt*;
-	VAR in: vyLongrealVec.tVector;  len, i: LONGINT;  obj: vyBase.Object;  val: LONGREAL;
+	VAR in: vyLongrealVec.tVector;  len, i: SIGNED32;  obj: vyBase.Object;  val: LONGREAL;
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT  val=Real" );
 		IF antsCommands.ExpectObject( "in", obj ) & (antsCommands.ExpectReal( "val", val )) THEN
@@ -1384,7 +1384,7 @@ END NormalisationMinMax;
 	END AppendSprungpunkt;
 
 	PROCEDURE NewVector*;
-	VAR i, k, len: LONGINT;  value: LONGREAL;  vec: vyLongrealVec.tVector;  obj: vyBase.Object;
+	VAR i, k, len: SIGNED32;  value: LONGREAL;  vec: vyLongrealVec.tVector;  obj: vyBase.Object;
 		name: ARRAY 256 OF CHAR;
 	BEGIN
 		antsCommands.InitScan( "name=NAME  [>create]" );
@@ -1417,7 +1417,7 @@ END NormalisationMinMax;
 	END AddReal;
 
 	PROCEDURE SetInt*;
-	VAR int: LONGINT;
+	VAR int: SIGNED32;
 		name: ARRAY 256 OF CHAR;
 	BEGIN
 		antsCommands.InitScan( "name=NAME  int=NUMBER" );
@@ -1425,7 +1425,7 @@ END NormalisationMinMax;
 	END SetInt;
 
 	PROCEDURE AddInt*;
-	VAR i1, i2: LONGINT;
+	VAR i1, i2: SIGNED32;
 		name: ARRAY 256 OF CHAR;
 	BEGIN
 		antsCommands.InitScan( "name=NAME  i1=NUMBER i2=NUMBER" );
@@ -1435,7 +1435,7 @@ END NormalisationMinMax;
 	END AddInt;
 
 	PROCEDURE JumpFunction*;   (*creates a function with |jumps|+1 plateaus of the same length and decreasing jumps of hight 1*)
-	VAR i, k, len, jumps: LONGINT;  value: LONGREAL;  vec: vyLongrealVec.tVector;  obj: vyBase.Object;  val: LONGREAL;
+	VAR i, k, len, jumps: SIGNED32;  value: LONGREAL;  vec: vyLongrealVec.tVector;  obj: vyBase.Object;  val: LONGREAL;
 		name: ARRAY 256 OF CHAR;
 		factor: LONGREAL;
 	BEGIN
@@ -1458,16 +1458,16 @@ END NormalisationMinMax;
 
 	END JumpFunction;
 
-	PROCEDURE GetNrJumps( gamma: LONGREAL;  obj: BaseObject ): LONGINT;
-	VAR p: ArrayI;  r, l: LONGINT;  a: LONGINT;
+	PROCEDURE GetNrJumps( gamma: LONGREAL;  obj: BaseObject ): SIGNED32;
+	VAR p: ArrayI;  r, l: SIGNED32;  a: SIGNED32;
 	BEGIN
 		p := FindBestPartition( obj.len, gamma, obj.Distance );  r := obj.len;  l := p[r];  a := 0;
 		WHILE (r > 0) DO a := a + 1;  r := l;  l := p[r];  END;
 		RETURN a - 1;
 	END GetNrJumps;
 
-	PROCEDURE GetPosJump( gamma: LONGREAL;  obj: BaseObject ): LONGINT;  (*searches for the position of the first jump*)
-	VAR p: ArrayI;  y: ArrayR;  len, r, position: LONGINT;  ok: BOOLEAN;  diff: LONGREAL;
+	PROCEDURE GetPosJump( gamma: LONGREAL;  obj: BaseObject ): SIGNED32;  (*searches for the position of the first jump*)
+	VAR p: ArrayI;  y: ArrayR;  len, r, position: SIGNED32;  ok: BOOLEAN;  diff: LONGREAL;
 	BEGIN
 		p := FindBestPartition( obj.len, gamma, obj.Distance );  y := SegmentationFromPartition( p^, obj.Value );  len := LEN( y );
 		ok := TRUE;  r := 1;  position := len - 1;
@@ -1479,8 +1479,8 @@ END NormalisationMinMax;
 		RETURN position;
 	END GetPosJump;
 
-	PROCEDURE GetPos1Jump( gamma: LONGREAL;  obj: BaseObject ): LONGINT;  (*searches for the position of the jump, if there is only one jump*)
-	VAR p: ArrayI;  y: ArrayR;  len, r, position,number: LONGINT;  ok: BOOLEAN;  diff: LONGREAL;
+	PROCEDURE GetPos1Jump( gamma: LONGREAL;  obj: BaseObject ): SIGNED32;  (*searches for the position of the jump, if there is only one jump*)
+	VAR p: ArrayI;  y: ArrayR;  len, r, position,number: SIGNED32;  ok: BOOLEAN;  diff: LONGREAL;
 	BEGIN
 		p := FindBestPartition( obj.len, gamma, obj.Distance );  y := SegmentationFromPartition( p^, obj.Value );  len := LEN( y );
 		ok := TRUE;  r := 1;  position := len - 1;
@@ -1499,7 +1499,7 @@ END NormalisationMinMax;
 	PROCEDURE FindNrJumps*;
 	VAR in: BaseObject;  gamma: LONGREAL;  obj: vyBase.Object;
 		jname: ARRAY 256 OF CHAR;
-		jumps: LONGINT;  diff, longest: LONGREAL;
+		jumps: SIGNED32;  diff, longest: LONGREAL;
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT gamma=LONGREAL jumps=OBJECT|NAME" );
 		IF antsCommands.ExpectObject( "in", obj ) & antsCommands.ExpectReal( "gamma", gamma ) &
@@ -1512,7 +1512,7 @@ END NormalisationMinMax;
 	PROCEDURE FindPosJump*;   (*Find the point where approximation has FIRST jump*)
 	VAR in: BaseObject;  gamma: LONGREAL;  obj: vyBase.Object;
 		pname: ARRAY 256 OF CHAR;
-		position: LONGINT;
+		position: SIGNED32;
 
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT gamma=LONGREAL position=OBJECT|NAME" );
@@ -1525,7 +1525,7 @@ END NormalisationMinMax;
 	PROCEDURE FindPos1Jump*;   (*Find the point where approximation has jump, if it has exactly one jump*)
 	VAR in: BaseObject;  gamma: LONGREAL;  obj: vyBase.Object;
 		pname: ARRAY 256 OF CHAR;
-		position: LONGINT;
+		position: SIGNED32;
 
 	BEGIN
 		antsCommands.InitScan( "in=OBJECT gamma=LONGREAL position=OBJECT|NAME" );
@@ -1537,7 +1537,7 @@ END NormalisationMinMax;
 
 
 	PROCEDURE MultiCoefficients( y: vyLongrealVec.tVector;  approx: ArrayR ): antsArrays.X2d;   (*Computes multiresolution coefficients*)
-	VAR cumsum: antsArrays.X1d;  i, j, N: LONGINT;  Coeff: antsArrays.X2d;
+	VAR cumsum: antsArrays.X1d;  i, j, N: SIGNED32;  Coeff: antsArrays.X2d;
 	BEGIN
 		N := vyLongrealVec.Len( y );
 
@@ -1558,7 +1558,7 @@ END NormalisationMinMax;
 	END MultiCoefficients;
 
 	PROCEDURE MultiResCheck( data: vyLongrealVec.tVector;  approx: ArrayR;  factor: LONGREAL ): BOOLEAN;
-	VAR N, len: LONGINT;  i, j, k: LONGINT;  ok, toobig: BOOLEAN;  Coeff: antsArrays.X2d;  cond, val, median: LONGREAL;  z: vyLongrealVec.tVector;
+	VAR N, len: SIGNED32;  i, j, k: SIGNED32;  ok, toobig: BOOLEAN;  Coeff: antsArrays.X2d;  cond, val, median: LONGREAL;  z: vyLongrealVec.tVector;
 
 	BEGIN
 		N := LEN( approx );
@@ -1607,7 +1607,7 @@ END NormalisationMinMax;
 		y: ArrayR;  p: ArrayI;
 
 		gammaname: ARRAY 256 OF CHAR;
-		len, i, longesti: LONGINT;  diff, longest: LONGREAL;  ok: BOOLEAN;
+		len, i, longesti: SIGNED32;  diff, longest: LONGREAL;  ok: BOOLEAN;
 	BEGIN
 		antsCommands.InitScan( "data=OBJECT myobject=OBJECT in=OBJECT gamma=OBJECT/NAME [>factor])" );
 		IF antsCommands.ExpectObject( "data", obje ) & antsCommands.ExpectObject( "myobject", ob ) &
@@ -1634,7 +1634,7 @@ END NormalisationMinMax;
 	END FindMultiresolution;
 
 	PROCEDURE DiffVec*;   (*Calculates the difference of two vectors element by element. At the time it is specialised to the cDNA-Data, to use it generally delete the pink part.*)
-	VAR in1, in2, out: vyLongrealVec.tVector;  len1, len2, i: LONGINT;
+	VAR in1, in2, out: vyLongrealVec.tVector;  len1, len2, i: SIGNED32;
 		outname: ARRAY 256 OF CHAR;
 		obj, ob: vyBase.Object;  val: LONGREAL;
 	BEGIN

@@ -29,7 +29,7 @@ TYPE
 		image : Raster.Image;
 		aux_canvas : WMGraphics.BufferCanvas;
 
-		state : LONGINT;
+		state : SIGNED32;
 		timer : Kernel.Timer;
 
 		PROCEDURE &Init*;
@@ -111,7 +111,7 @@ TYPE
 			END
 		END DrawBackground;
 
-		PROCEDURE SetState(state : LONGINT);
+		PROCEDURE SetState(state : SIGNED32);
 		BEGIN {EXCLUSIVE}
 			IF (SELF.state < State_Terminating) OR (state = State_Terminated) THEN
 				SELF.state := state;
@@ -127,7 +127,7 @@ TYPE
 		END Finalize;
 
 		PROCEDURE Update;
-		VAR imageDesc, p : Codecs.ImageDescriptor; delayTime : LONGINT;
+		VAR imageDesc, p : Codecs.ImageDescriptor; delayTime : SIGNED32;
 		BEGIN
 			Acquire;
 			IF (image = NIL) THEN Release; RETURN; END;

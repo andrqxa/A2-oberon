@@ -22,13 +22,13 @@ BEGIN
 END String;
 
 (** Write the integer i in n field positions. *)
-PROCEDURE Int*(i, n: LONGINT);
+PROCEDURE Int*(i, n: SIGNED32);
 BEGIN
 	Texts.WriteInt(W, i, n); Texts.Append(T, W.buf)
 END Int;
 
 (** Write the integer i in hexadecimal with a leading space. *)
-PROCEDURE Hex*(i: LONGINT);
+PROCEDURE Hex*(i: SIGNED32);
 BEGIN
 	Texts.WriteHex(W, i); Texts.Append(T, W.buf)
 END Hex;

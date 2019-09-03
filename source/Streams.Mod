@@ -140,8 +140,8 @@ TYPE
 			Bytes( SYSTEM.VAL( Bytes2, x ), 0, 2 )
 		END RawInt;
 
-	(** Write a LONGINT. *)
-		PROCEDURE RawLInt*( x: LONGINT );
+	(** Write a SIGNED32. *)
+		PROCEDURE RawLInt*( x: SIGNED32 );
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4 )
 		END RawLInt;
@@ -155,25 +155,25 @@ TYPE
 	(** Write a 64 bit value in network byte order (most significant byte first) *)
 		PROCEDURE Net64*( x: HUGEINT );
 		BEGIN
-			Net32(LONGINT( x DIV 100000000H MOD 100000000H ));
-			Net32(LONGINT( x MOD 100000000H ));
+			Net32(SIGNED32( x DIV 100000000H MOD 100000000H ));
+			Net32(SIGNED32( x MOD 100000000H ));
 		END Net64;
 
 	(** Write a 32 bit value in network byte order (most significant byte first) *)
-		PROCEDURE Net32*( x: LONGINT );
+		PROCEDURE Net32*( x: SIGNED32 );
 		BEGIN
 			Char( CHR( x DIV 1000000H MOD 100H ) );  Char( CHR( x DIV 10000H MOD 100H ) );  Char( CHR( x DIV 100H MOD 100H ) );
 			Char( CHR( x MOD 100H ) )
 		END Net32;
 
 	(** Write a 16 bit value in network byte order (most significant byte first) *)
-		PROCEDURE Net16*( x: LONGINT );
+		PROCEDURE Net16*( x: SIGNED32 );
 		BEGIN
 			Char( CHR( x DIV 100H MOD 100H ) );  Char( CHR( x MOD 100H ) )
 		END Net16;
 
 	(** write unsigned byte *)
-		PROCEDURE Net8*( x: LONGINT );
+		PROCEDURE Net8*( x: SIGNED32 );
 		BEGIN
 			Char( CHR( x MOD 100H ) )
 		END Net8;
@@ -316,7 +316,7 @@ TYPE
 			Int(x, 0);
 		END Size;
 
-		PROCEDURE Pair( ch: CHAR;  x: LONGINT );
+		PROCEDURE Pair( ch: CHAR;  x: SIGNED32 );
 		BEGIN
 			IF ch # 0X THEN Char( ch ) END;
 			Char( CHR( ORD( "0" ) + x DIV 10 MOD 10 ) );  Char( CHR( ORD( "0" ) + x MOD 10 ) )
@@ -325,7 +325,7 @@ TYPE
 	(** Write the date and time in ISO format (yyyy-mm-dd hh:mm:ss).  The t and d parameters are in Oberon time and date format.
 			If all parameters are within range, the output string is exactly 19 characters wide.  The t or d parameter can be -1, in which
 			case the time or date respectively are left out. *)
-		PROCEDURE Date*( t, d: LONGINT );
+		PROCEDURE Date*( t, d: SIGNED32 );
 		VAR ch: CHAR;
 		BEGIN
 			IF d # -1 THEN
@@ -347,8 +347,8 @@ TYPE
 			The t and d parameters are in Oberon time and date format.  The tz parameter specifies the time zone offset in minutes
 			(from -720 to 720 in steps of 30).  If all parameters are within range, the output string is exactly 26 characters wide.
 			The t, d or tz parameter can be -1, in which case the time, date or timezone respectively are left out. *)
-		PROCEDURE Date822*( t, d, tz: LONGINT );
-		VAR i, m: LONGINT;  ch: CHAR;
+		PROCEDURE Date822*( t, d, tz: SIGNED32 );
+		VAR i, m: SIGNED32;  ch: CHAR;
 		BEGIN
 			IF d # -1 THEN
 				Int( d MOD 32, 2 );   (* day *)
@@ -578,8 +578,8 @@ TYPE
 			x := ORD( x1 ) * 100H + ORD( x0 )
 		END RawInt;
 
-	(** Read a LONGINT. *)
-		PROCEDURE RawLInt*( VAR x: LONGINT );
+	(** Read a SIGNED32. *)
+		PROCEDURE RawLInt*( VAR x: SIGNED32 );
 		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4, ignore )
@@ -599,19 +599,19 @@ TYPE
 		END Net64;
 
 	(** Read a 32 bit value in network byte order (most significant byte first) *)
-		PROCEDURE Net32*( ): LONGINT;
+		PROCEDURE Net32*( ): SIGNED32;
 		BEGIN
 			RETURN LONG( ORD( Get() ) ) * 1000000H + LONG( ORD( Get() ) ) * 10000H + LONG( ORD( Get() ) ) * 100H + LONG( ORD( Get() ) )
 		END Net32;
 
 	(** Read an unsigned 16bit value in network byte order (most significant byte first) *)
-		PROCEDURE Net16*( ): LONGINT;
+		PROCEDURE Net16*( ): SIGNED32;
 		BEGIN
 			RETURN LONG( ORD( Get() ) ) * 100H + LONG( ORD( Get() ) )
 		END Net16;
 
 	(** Read an unsigned byte *)
-		PROCEDURE Net8*( ): LONGINT;
+		PROCEDURE Net8*( ): SIGNED32;
 		BEGIN
 			RETURN LONG( ORD( Get() ) )
 		END Net8;
@@ -669,12 +669,12 @@ TYPE
 		END RawString;
 
 	(** Read a number in a compressed format. *)
-		PROCEDURE RawNum*( VAR x: LONGINT );
-		VAR ch: CHAR;  n, y: LONGINT;
+		PROCEDURE RawNum*( VAR x: SIGNED32 );
+		VAR ch: CHAR;  n, y: SIGNED32;
 		BEGIN
 			n := 0;  y := 0;  ch := Get();
-			WHILE ch >= 80X DO INC( y, LSH( LONGINT( ORD( ch ) ) - 128, n ) );  INC( n, 7 );  ch := Get() END;
-			x := ASH( LSH( LONGINT( ORD( ch ) ), 25 ), n - 25 ) + y
+			WHILE ch >= 80X DO INC( y, LSH( SIGNED32( ORD( ch ) ) - 128, n ) );  INC( n, 7 );  ch := Get() END;
+			x := ASH( LSH( SIGNED32( ORD( ch ) ), 25 ), n - 25 ) + y
 		END RawNum;
 
 	(** Read a huge number in a compressed format. *)
@@ -699,8 +699,8 @@ TYPE
 
 	 (** Read an integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
 
-		PROCEDURE Int*( VAR x: LONGINT;  hex: BOOLEAN );
-		VAR vd, vh: LONGINT; sgn, d: WORD;  ch: CHAR;  ok: BOOLEAN;
+		PROCEDURE Int*( VAR x: SIGNED32;  hex: BOOLEAN );
+		VAR vd, vh: SIGNED32; sgn, d: WORD;  ch: CHAR;  ok: BOOLEAN;
 		BEGIN
 			vd := 0;  vh := 0;  sgn := 1;  ok := FALSE;
 			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
@@ -886,7 +886,7 @@ TYPE
 		END GetString;
 
 		(** First skip whitespace, then read integer *)
-		PROCEDURE GetInteger*(VAR integer : LONGINT; isHexadecimal : BOOLEAN): BOOLEAN;
+		PROCEDURE GetInteger*(VAR integer : SIGNED32; isHexadecimal : BOOLEAN): BOOLEAN;
 		BEGIN
 			SkipWhitespace;
 			Int(integer, isHexadecimal);

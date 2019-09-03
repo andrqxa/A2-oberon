@@ -362,7 +362,7 @@ END DoSelectRegion;
 		END
 	END SelectRegion;
 
-	PROCEDURE Get*( r: tRegion;  A: antsArrayObjects.tObject;  VAR x, y, w, h: LONGINT );
+	PROCEDURE Get*( r: tRegion;  A: antsArrayObjects.tObject;  VAR x, y, w, h: SIGNED32 );
 	VAR xi, yi, wi, hi: SIGNED16;
 	BEGIN
 		xi := 0;  yi := 0;  wi := SHORT( A.w );  hi := SHORT( A.h );

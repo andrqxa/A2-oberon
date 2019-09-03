@@ -843,7 +843,7 @@ BEGIN
 	END
 END ObjAttr;
 
-PROCEDURE StandardMacros(ch: CHAR; VAR T: Attributes.Reader; VAR res: Texts.Text; VAR beg: LONGINT);
+PROCEDURE StandardMacros(ch: CHAR; VAR T: Attributes.Reader; VAR res: Texts.Text; VAR beg: SIGNED32);
 VAR name: ARRAY 64 OF CHAR; f, context0: Objects.Object;
 BEGIN
 	IF ch # 0X THEN
@@ -874,8 +874,8 @@ BEGIN
 	END
 END StandardMacros;
 
-PROCEDURE UpArrowMacro(ch: CHAR; VAR T: Attributes.Reader; VAR res: Texts.Text; VAR beg: LONGINT);
-VAR text, text0: Texts.Text; bg, end, ttime: LONGINT; obj: Objects.Object; S: Display.SelectMsg;
+PROCEDURE UpArrowMacro(ch: CHAR; VAR T: Attributes.Reader; VAR res: Texts.Text; VAR beg: SIGNED32);
+VAR text, text0: Texts.Text; bg, end, ttime: SIGNED32; obj: Objects.Object; S: Display.SelectMsg;
 	i: SIGNED16; name: ARRAY 32 OF CHAR; R: Attributes.Reader; ch0: CHAR; old: Objects.Library;
 	string: BOOLEAN;
 BEGIN
@@ -1485,7 +1485,7 @@ BEGIN
 END Insert;
 
 (** Returns the latest object selection. Time < 0 indicates no selection. *)
-PROCEDURE GetSelection*(VAR objs: Objects.Object; VAR time: LONGINT);
+PROCEDURE GetSelection*(VAR objs: Objects.Object; VAR time: SIGNED32);
 VAR SM: Display.SelectMsg;
 BEGIN time := -1; objs := NIL;
 	SM.id := Display.get; SM.F := NIL; SM.sel := NIL; SM.obj := NIL; SM.time := -1; Display.Broadcast(SM);

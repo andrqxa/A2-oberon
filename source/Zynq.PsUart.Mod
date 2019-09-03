@@ -36,7 +36,7 @@ TYPE
 		id-: UartId; (** UART controller ID *)
 		regs-: PsUartMin.UartRegisters; (** controller registers *)
 		inputClock-: ClockFrequency; (** controller input clock in Hz *)
-		bps-, data-, parity-, stop-: LONGINT; (** current parameter values *)
+		bps-, data-, parity-, stop-: SIGNED32; (** current parameter values *)
 
 		open-: BOOLEAN; (** TRUE if the controller is open *)
 
@@ -170,7 +170,7 @@ VAR
 		stop: number of stop bits
 		res: returned error code, 0 in case of success
 	*)
-	PROCEDURE Open*(uart: UartController; bps, data, parity, stop: LONGINT; VAR res: WORD);
+	PROCEDURE Open*(uart: UartController; bps, data, parity, stop: SIGNED32; VAR res: WORD);
 	VAR n: SIZE;
 	BEGIN
 		IF uart.open THEN res := PsUartMin.PortInUse; RETURN; END;

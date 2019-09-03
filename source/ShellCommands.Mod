@@ -176,7 +176,7 @@ END Delete;
 PROCEDURE Directory*(context : Commands.Context);
 VAR
 	enum: Files.Enumerator;
-	name: Files.FileName; flags: SET; time, date: LONGINT; size: Files.Size; tdrec: Dates.DateTime; str: ARRAY 32 OF CHAR;
+	name: Files.FileName; flags: SET; time, date: SIGNED32; size: Files.Size; tdrec: Dates.DateTime; str: ARRAY 32 OF CHAR;
 BEGIN
 	IF ~context.arg.GetString(str) THEN str := "*"; END;
 	NEW(enum);

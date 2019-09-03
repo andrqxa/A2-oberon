@@ -30,7 +30,7 @@ IMPORT realmath := MathL IN A2;
 CONST idversion* = ' v0r0d1';
 TYPE
 	real = LONGREAL;  (* technical convenience, to avoid duplicate code for REAL and LONGREAL *)
-	index = LONGINT;
+	index = SIGNED32;
 
 PROCEDURE PolarToC* (len: index;  VAR (*IN*)rho, phi: ARRAY OF real;
 	VAR (*OUT*)Re, Im: ARRAY OF real;  start: index);

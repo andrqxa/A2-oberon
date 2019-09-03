@@ -10,11 +10,11 @@ IMPORT Ciphers := CryptoCiphers, U := CryptoUtils, D := CryptoDES;
 TYPE
 	Cipher* = OBJECT (Ciphers.Cipher)
 			VAR
-				ske, skd: ARRAY 96 OF SET32; ski: LONGINT;
+				ske, skd: ARRAY 96 OF SET32; ski: SIGNED32;
 				ivx, ivy: SET32;
 
-				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: LONGINT );
-				VAR X, Y: SET32;  i: LONGINT;
+				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: SIGNED32 );
+				VAR X, Y: SET32;  i: SIGNED32;
 				BEGIN
 					ASSERT( keybits = 192 );
 					InitKey^( src, 64 );

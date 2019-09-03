@@ -7,8 +7,8 @@ TYPE
 	EllipsePixelsFiller* = PROCEDURE(CONST canvas : WMGraphics.Canvas; rect : WMRectangles.Rectangle; dx, dy : SIZE; lineColor, fillColor : WMGraphics.Color; mode : WORD);
 
 (* factor in 1/256, alpha remains unchanged *)
-PROCEDURE ScaleColor*(color : WMGraphics.Color; factor : LONGINT): WMGraphics.Color;
-VAR r, g, b, a : LONGINT;
+PROCEDURE ScaleColor*(color : WMGraphics.Color; factor : SIGNED32): WMGraphics.Color;
+VAR r, g, b, a : SIGNED32;
 BEGIN
 	WMGraphics.ColorToRGBA(color, r, g, b, a);
 	r := MIN(r * factor DIV 256, 255);
@@ -18,14 +18,14 @@ BEGIN
 END ScaleColor;
 
 (** linear interpolation percent in [0..256] *)
-PROCEDURE InterpolateLinear*(a, b, percent : LONGINT) : LONGINT;
+PROCEDURE InterpolateLinear*(a, b, percent : SIGNED32) : SIGNED32;
 BEGIN
 	RETURN ((a * (256 - percent)) + b * percent) DIV 256
 END InterpolateLinear;
 
 (* interpolate between two colors; percent [0..256]*)
-PROCEDURE InterpolateColorLinear*(cl0, cl1: WMGraphics.Color; percent : LONGINT) : WMGraphics.Color;
-VAR r0, g0, b0, a0, r1, g1, b1, a1: LONGINT;
+PROCEDURE InterpolateColorLinear*(cl0, cl1: WMGraphics.Color; percent : SIGNED32) : WMGraphics.Color;
+VAR r0, g0, b0, a0, r1, g1, b1, a1: SIGNED32;
 BEGIN
 	WMGraphics.ColorToRGBA(cl0, r0, g0, b0, a0);
 	WMGraphics.ColorToRGBA(cl1, r1, g1, b1, a1);
@@ -58,7 +58,7 @@ BEGIN
 END DrawBevelPanel;
 
 PROCEDURE FillGradientHorizontal*(canvas : WMGraphics.Canvas; rect : WMRectangles.Rectangle; clLeft, clRight: WMGraphics.Color; mode : WORD);
-VAR dist, i : SIZE; f : LONGINT; cl: WMGraphics.Color;
+VAR dist, i : SIZE; f : SIGNED32; cl: WMGraphics.Color;
 BEGIN
 	dist := rect.r - rect.l;
 	FOR i := 0 TO dist - 1 DO
@@ -69,7 +69,7 @@ BEGIN
 END FillGradientHorizontal;
 
 PROCEDURE FillGradientVertical*(canvas : WMGraphics.Canvas; rect : WMRectangles.Rectangle; clTop, clBottom: WMGraphics.Color; mode : WORD);
-VAR dist, i : SIZE; f : LONGINT; cl: WMGraphics.Color;
+VAR dist, i : SIZE; f : SIGNED32; cl: WMGraphics.Color;
 BEGIN
 	dist := rect.b - rect.t;
 	FOR i := 0 TO dist - 1 DO
@@ -109,12 +109,12 @@ BEGIN
 	canvas.Fill(WMRectangles.MakeRect(r.r - 1, r.t, r.r, r.b), color, mode)
 END DrawRect;
 
-PROCEDURE RectGlassShade*(canvas : WMGraphics.Canvas; rect : WMRectangles.Rectangle; borderWidth : LONGINT; down : BOOLEAN);
-VAR i, ul, dr, da, w : LONGINT;
+PROCEDURE RectGlassShade*(canvas : WMGraphics.Canvas; rect : WMRectangles.Rectangle; borderWidth : SIGNED32; down : BOOLEAN);
+VAR i, ul, dr, da, w : SIGNED32;
 BEGIN
 	IF borderWidth <= 0 THEN RETURN END;
-	IF down THEN ul := 090H; dr := LONGINT(0FFFFFF90H)
-	ELSE dr := 090H; ul := LONGINT(0FFFFFF90H)
+	IF down THEN ul := 090H; dr := SIGNED32(0FFFFFF90H)
+	ELSE dr := 090H; ul := SIGNED32(0FFFFFF90H)
 	END;
 	da := 90H DIV borderWidth;
 	FOR i := 0 TO borderWidth - 1 DO
@@ -128,17 +128,17 @@ BEGIN
 		canvas.Fill(WMRectangles.MakeRect(rect.r - 1 - i, rect.t + 1 + i, rect.r - i, rect.b - i - 1), dr, WMGraphics.ModeSrcOverDst);
 		DEC(ul, da); DEC(dr, da)
 	END;
-	i := 3; ul := LONGINT(0FFFFFF40H); w := 5;
+	i := 3; ul := SIGNED32(0FFFFFF40H); w := 5;
 	canvas.Fill(WMRectangles.MakeRect(rect.l + i , rect.t + i, rect.l + i + w, rect.t + i + 2), ul, WMGraphics.ModeSrcOverDst);
 	canvas.Fill(WMRectangles.MakeRect(rect.l + i, rect.t + i, rect.l + i + 2, rect.t + i + w), ul, WMGraphics.ModeSrcOverDst);
 END RectGlassShade;
 
-PROCEDURE ExtRectGlassShade*(canvas : WMGraphics.Canvas; rect : WMRectangles.Rectangle; openSides : SET; borderWidth : LONGINT; down : BOOLEAN);
-VAR i, ul, dr, da, w, a, b, c, d : LONGINT;
+PROCEDURE ExtRectGlassShade*(canvas : WMGraphics.Canvas; rect : WMRectangles.Rectangle; openSides : SET; borderWidth : SIGNED32; down : BOOLEAN);
+VAR i, ul, dr, da, w, a, b, c, d : SIGNED32;
 BEGIN
 	IF borderWidth <= 0 THEN RETURN END;
-	IF down THEN ul := 090H; dr := LONGINT(0FFFFFF90H)
-	ELSE dr := 090H; ul := LONGINT(0FFFFFF90H)
+	IF down THEN ul := 090H; dr := SIGNED32(0FFFFFF90H)
+	ELSE dr := 090H; ul := SIGNED32(0FFFFFF90H)
 	END;
 	da := 90H DIV borderWidth;
 	FOR i := 0 TO borderWidth - 1 DO
@@ -156,7 +156,7 @@ BEGIN
 		IF ~(3 IN openSides) THEN canvas.Fill(WMRectangles.MakeRect(rect.r - 1 - i, rect.t + a, rect.r - i, rect.b - c), dr, WMGraphics.ModeSrcOverDst) END;
 		DEC(ul, da); DEC(dr, da)
 	END;
-	i := 3; ul := LONGINT(0FFFFFF40H); w := 5;
+	i := 3; ul := SIGNED32(0FFFFFF40H); w := 5;
 (*	canvas.Fill(WMRectangles.MakeRect(rect.l + i , rect.t + i, rect.l + i + w, rect.t + i + 2), ul, WMGraphics.ModeSrcOverDst);
 	canvas.Fill(WMRectangles.MakeRect(rect.l + i, rect.t + i, rect.l + i + 2, rect.t + i + w), ul, WMGraphics.ModeSrcOverDst);
 *)

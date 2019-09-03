@@ -48,15 +48,15 @@ CONST
 	ModelWindowWidth = 320; ModelWindowHeight = 80;
 
 TYPE
-	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; position : LONGINT; VAR res : WORD);
+	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : WORD);
 
 	DropTarget = OBJECT(WMDropTarget.DropTarget)
 	VAR
 		originator : ANY;
 		setString : SetStringProcedure;
-		position : LONGINT;
+		position : SIGNED32;
 
-		PROCEDURE &Init(originator : ANY; setString : SetStringProcedure; position : LONGINT);
+		PROCEDURE &Init(originator : ANY; setString : SetStringProcedure; position : SIGNED32);
 		BEGIN
 			ASSERT(setString # NIL);
 			SELF.originator := originator;
@@ -64,7 +64,7 @@ TYPE
 			SELF.position := position;
 		END Init;
 
-		PROCEDURE GetInterface*(type : LONGINT) : WMDropTarget.DropInterface;
+		PROCEDURE GetInterface*(type : SIGNED32) : WMDropTarget.DropInterface;
 		VAR sdi : DropString;
 		BEGIN
 			IF (type = WMDropTarget.TypeString) THEN
@@ -80,9 +80,9 @@ TYPE
 	VAR
 		originator : ANY;
 		setString : SetStringProcedure;
-		position : LONGINT;
+		position : SIGNED32;
 
-		PROCEDURE &Init(originator : ANY; setString : SetStringProcedure; position : LONGINT);
+		PROCEDURE &Init(originator : ANY; setString : SetStringProcedure; position : SIGNED32);
 		BEGIN
 			ASSERT(setString # NIL);
 			SELF.originator := originator;
@@ -104,8 +104,8 @@ TYPE
 		property : WMProperties.Property;
 		name, info : Strings.String;
 		type : ARRAY 32 OF CHAR;
-		ofsName, ofsInfo : LONGINT;
-		lastTimestamp : LONGINT;
+		ofsName, ofsInfo : SIGNED32;
+		lastTimestamp : SIGNED32;
 
 		next : PropertyView;
 
@@ -166,7 +166,7 @@ TYPE
 		END UpdateAdrLabel;
 
 		PROCEDURE AdrLabelMove(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
-		VAR dx, dy, dp, d : LONGINT; f : REAL; tmax, tmin : LONGINT;
+		VAR dx, dy, dp, d : SIGNED32; f : REAL; tmax, tmin : SIGNED32;
 		BEGIN
 			IF keys = {0} THEN adrLabel.AutoStartDrag END;
 		END AdrLabelMove;
@@ -183,7 +183,7 @@ TYPE
 		END MyStartDrag;
 
 		PROCEDURE InfoLabelMove(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
-		VAR dx, dy, dp, d : LONGINT; f : REAL; tmax, tmin : LONGINT;
+		VAR dx, dy, dp, d : SIGNED32; f : REAL; tmax, tmin : SIGNED32;
 		BEGIN
 			IF keys = {0} THEN infoLabel.AutoStartDrag END;
 		END InfoLabelMove;
@@ -203,14 +203,14 @@ TYPE
 			Raster.Create(img, w,h, Raster.BGRA8888);
 			NEW(canvas,img);
 			canvas.SetFont(font);
-			canvas.SetColor(LONGINT(0FFFFFFFFH));
-			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), LONGINT(0333333FFH), WMGraphics.ModeCopy);
+			canvas.SetColor(SIGNED32(0FFFFFFFFH));
+			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), SIGNED32(0333333FFH), WMGraphics.ModeCopy);
 			WMGraphics.DrawStringInRect(canvas, WMRectangles.MakeRect(0, 0, w, h), FALSE, 1, 1, string^);
 			IF StartDrag(NIL,img,0,0,NIL,NIL) THEN END;
 		END InfoLabelStartDrag;
 
 		PROCEDURE MyDragDropped(x,y: SIZE; dragInfo: WMWindowManager.DragInfo; VAR handled: BOOLEAN);
-		VAR ref,sender: ANY; dt: DropTarget; pos: LONGINT;
+		VAR ref,sender: ANY; dt: DropTarget; pos: SIGNED32;
 		BEGIN
 			ref := dragInfo.data;
 			sender := dragInfo.sender;
@@ -230,7 +230,7 @@ TYPE
 			END;
 		END MyDragDropped;
 
-		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; position : LONGINT; VAR res : WORD);
+		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : WORD);
 		VAR object: ANY; gen: XML.GeneratorProcedure; moduleName, procedureName ,msg: Modules.Name; element: XML.Element;
 
 		BEGIN
@@ -334,7 +334,7 @@ TYPE
 	PropertyViewList = OBJECT
 	VAR
 		head, tail : PropertyView;
-		nofElements : LONGINT;
+		nofElements : SIGNED32;
 
 		PROCEDURE &Init;
 		BEGIN
@@ -377,7 +377,7 @@ TYPE
 		END Enumerate;
 
 		PROCEDURE GetAll() : PropertyViewArray;
-		VAR pva : PropertyViewArray; cur : PropertyView; i : LONGINT;
+		VAR pva : PropertyViewArray; cur : PropertyView; i : SIGNED32;
 		BEGIN
 			IF (nofElements > 0) THEN
 				NEW(pva, nofElements);
@@ -412,7 +412,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Apply(force : BOOLEAN);
-		VAR boolean : WMProperties.BooleanProperty; value : BOOLEAN; state : LONGINT;
+		VAR boolean : WMProperties.BooleanProperty; value : BOOLEAN; state : SIGNED32;
 		BEGIN
 			boolean := SELF.boolean;
 			IF (boolean # NIL) THEN
@@ -431,7 +431,7 @@ TYPE
 		END Apply;
 
 		PROCEDURE Synchronize(force : BOOLEAN);
-		VAR boolean : WMProperties.BooleanProperty; state : LONGINT;
+		VAR boolean : WMProperties.BooleanProperty; state : SIGNED32;
 		BEGIN
 			Synchronize^(force);
 			boolean := SELF.boolean;
@@ -503,7 +503,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Apply(force : BOOLEAN);
-		VAR int32 : WMProperties.Int32Property; string : ARRAY 256 OF CHAR; value : LONGINT;
+		VAR int32 : WMProperties.Int32Property; string : ARRAY 256 OF CHAR; value : SIGNED32;
 		BEGIN
 			int32 := SELF.int32;
 			IF (int32 # NIL) THEN
@@ -518,7 +518,7 @@ TYPE
 		END Apply;
 
 		PROCEDURE Synchronize(force : BOOLEAN);
-		VAR int32 : WMProperties.Int32Property; value : LONGINT; string : ARRAY 256 OF CHAR;
+		VAR int32 : WMProperties.Int32Property; value : SIGNED32; string : ARRAY 256 OF CHAR;
 		BEGIN
 			Synchronize^(force);
 			int32 := SELF.int32;
@@ -563,7 +563,7 @@ TYPE
 			IF (outOfDate # value) THEN
 				outOfDate := value;
 				IF outOfDate THEN
-					editor.fillColor.Set(LONGINT(0FFFF0099H));
+					editor.fillColor.Set(SIGNED32(0FFFF0099H));
 				ELSE
 					editor.fillColor.Set(WMGraphics.White);
 				END;
@@ -670,7 +670,7 @@ TYPE
 			IF (outOfDate # value) THEN
 				outOfDate := value;
 				IF outOfDate THEN
-					editor.fillColor.Set(LONGINT(0FFFF0099H));
+					editor.fillColor.Set(SIGNED32(0FFFF0099H));
 				ELSE
 					editor.fillColor.Set(WMGraphics.White);
 				END;
@@ -716,12 +716,12 @@ TYPE
 
 		PROCEDURE UpdateEditorStates;
 
-			PROCEDURE UpdateState(editor : WMEditors.TextField; number: LONGINT);
+			PROCEDURE UpdateState(editor : WMEditors.TextField; number: SIGNED32);
 			BEGIN
 				IF (number IN enabled) THEN
 					editor.enabled.Set(TRUE);
 					IF (number IN outOfDate) THEN
-						editor.fillColor.Set(LONGINT(0FFFF0099H));
+						editor.fillColor.Set(SIGNED32(0FFFF0099H));
 					ELSE
 						editor.fillColor.Set(WMGraphics.White);
 					END;
@@ -848,7 +848,7 @@ TYPE
 			Apply(FALSE);
 		END EnterPressed;
 
-		PROCEDURE CreateEditor(CONST caption : ARRAY OF CHAR; VAR editor : WMEditors.TextField; leftBearing : LONGINT);
+		PROCEDURE CreateEditor(CONST caption : ARRAY OF CHAR; VAR editor : WMEditors.TextField; leftBearing : SIGNED32);
 		VAR label : WMStandardComponents.Label;
 		BEGIN
 			NEW(label); label.alignment.Set(WMComponents.AlignLeft);
@@ -890,12 +890,12 @@ TYPE
 
 		PROCEDURE UpdateEditorStates;
 
-			PROCEDURE UpdateState(editor : WMEditors.TextField; number: LONGINT);
+			PROCEDURE UpdateState(editor : WMEditors.TextField; number: SIGNED32);
 			BEGIN
 				IF (number IN enabled) THEN
 					editor.enabled.Set(TRUE);
 					IF (number IN outOfDate) THEN
-						editor.fillColor.Set(LONGINT(0FFFF0099H));
+						editor.fillColor.Set(SIGNED32(0FFFF0099H));
 					ELSE
 						editor.fillColor.Set(WMGraphics.White);
 					END;
@@ -998,7 +998,7 @@ TYPE
 			Apply(FALSE);
 		END EnterPressed;
 
-		PROCEDURE CreateEditor(CONST caption : ARRAY OF CHAR; VAR editor : WMEditors.TextField; leftBearing : LONGINT);
+		PROCEDURE CreateEditor(CONST caption : ARRAY OF CHAR; VAR editor : WMEditors.TextField; leftBearing : SIGNED32);
 		VAR label : WMStandardComponents.Label;
 		BEGIN
 			NEW(label); label.alignment.Set(WMComponents.AlignLeft);
@@ -1101,7 +1101,7 @@ TYPE
 			IF (outOfDate # value) THEN
 				outOfDate := value;
 				IF outOfDate THEN
-					editor.fillColor.Set(LONGINT(0FFFF0099H));
+					editor.fillColor.Set(SIGNED32(0FFFF0099H));
 				ELSE
 					editor.fillColor.Set(WMGraphics.White);
 				END;
@@ -1150,7 +1150,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Apply(force : BOOLEAN);
-		VAR color : WMProperties.ColorProperty; string : ARRAY 16 OF CHAR; value : LONGINT;
+		VAR color : WMProperties.ColorProperty; string : ARRAY 16 OF CHAR; value : SIGNED32;
 		BEGIN
 			color := SELF.color;
 			IF (color # NIL) THEN
@@ -1213,7 +1213,7 @@ TYPE
 			IF (outOfDate # value) THEN
 				outOfDate := value;
 				IF outOfDate THEN
-					editor.fillColor.Set(LONGINT(0FFFF0099H));
+					editor.fillColor.Set(SIGNED32(0FFFF0099H));
 				ELSE
 					editor.fillColor.Set(WMGraphics.White);
 				END;
@@ -1269,10 +1269,10 @@ TYPE
 
 		PROCEDURE UpdateEditorStates;
 
-			PROCEDURE UpdateState(editor : WMEditors.TextField; number: LONGINT);
+			PROCEDURE UpdateState(editor : WMEditors.TextField; number: SIGNED32);
 			BEGIN
 				IF (number IN outOfDate) THEN
-					editor.fillColor.Set(LONGINT(0FFFF0099H));
+					editor.fillColor.Set(SIGNED32(0FFFF0099H));
 				ELSE
 					editor.fillColor.Set(WMGraphics.White);
 				END;
@@ -1285,7 +1285,7 @@ TYPE
 		END UpdateEditorStates;
 
 		PROCEDURE Apply(force : BOOLEAN);
-		VAR font : WMProperties.FontProperty; f : WMGraphics.Font; temp, name : ARRAY 32 OF CHAR; size : LONGINT; style : SET;
+		VAR font : WMProperties.FontProperty; f : WMGraphics.Font; temp, name : ARRAY 32 OF CHAR; size : SIGNED32; style : SET;
 		BEGIN
 			font := SELF.font;
 			IF (font # NIL) THEN
@@ -1368,7 +1368,7 @@ TYPE
 			Apply(FALSE);
 		END EnterPressed;
 
-		PROCEDURE CreateEditor(CONST caption : ARRAY OF CHAR; VAR editor : WMEditors.TextField; leftBearing : LONGINT);
+		PROCEDURE CreateEditor(CONST caption : ARRAY OF CHAR; VAR editor : WMEditors.TextField; leftBearing : SIGNED32);
 		VAR label : WMStandardComponents.Label;
 		BEGIN
 			NEW(label); label.alignment.Set(WMComponents.AlignLeft);
@@ -1432,7 +1432,7 @@ TYPE
 		END Init;
 
 		PROCEDURE AdrLabelMove(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
-		VAR dx, dy, dp, d : LONGINT; f : REAL; tmax, tmin : LONGINT;
+		VAR dx, dy, dp, d : SIGNED32; f : REAL; tmax, tmin : SIGNED32;
 		BEGIN
 			IF keys = {0} THEN adrLabel.AutoStartDrag END;
 		END AdrLabelMove;
@@ -1575,7 +1575,7 @@ TYPE
 			IF (outOfDate # value) THEN
 				outOfDate := value;
 				IF outOfDate THEN
-					editor.fillColor.Set(LONGINT(0FFFF0099H));
+					editor.fillColor.Set(SIGNED32(0FFFF0099H));
 				ELSE
 					editor.fillColor.Set(WMGraphics.White);
 				END;
@@ -1942,7 +1942,7 @@ TYPE
 			editModeView.SetProperty(NIL);
 		END ResetProperties;
 
-		PROCEDURE SetAlignment(alignmentMode : LONGINT);
+		PROCEDURE SetAlignment(alignmentMode : SIGNED32);
 		VAR s : SET;
 		BEGIN
 			IF (alignmentMode < WMComponents.AlignNone) OR (WMComponents.AlignClient < alignmentMode) THEN
@@ -2232,7 +2232,7 @@ TYPE
 	PropertySheetCache = OBJECT
 	VAR
 		entries : CacheEntry;
-		nofEntries : LONGINT;
+		nofEntries : SIGNED32;
 
 		PROCEDURE &Init;
 		BEGIN
@@ -2256,7 +2256,7 @@ TYPE
 		END Find;
 
 		PROCEDURE FindLRU() : CacheEntry;
-		VAR age, currentAge : LONGINT; lru, e : CacheEntry;
+		VAR age, currentAge : SIGNED32; lru, e : CacheEntry;
 		BEGIN
 			age := 0;
 			lru := NIL;
@@ -2408,7 +2408,7 @@ TYPE
 		END ClearProperties;
 
 		PROCEDURE IsCompatible(component : WMComponents.Component) : BOOLEAN;
-		VAR pa : WMProperties.PropertyArray; pva : PropertyViewArray; i, j : LONGINT; compatible : BOOLEAN;
+		VAR pa : WMProperties.PropertyArray; pva : PropertyViewArray; i, j : SIGNED32; compatible : BOOLEAN;
 		BEGIN
 			pva := list.GetAll();
 			IF (component # NIL) THEN pa := component.properties.Enumerate(); ELSE pa := NIL; END;
@@ -2439,7 +2439,7 @@ TYPE
 		END IsCompatible;
 
 		PROCEDURE UpdateProperties(component : WMComponents.Component) : BOOLEAN;
-		VAR pa : WMProperties.PropertyArray; pva : PropertyViewArray; i, j : LONGINT; ok : BOOLEAN;
+		VAR pa : WMProperties.PropertyArray; pva : PropertyViewArray; i, j : SIGNED32; ok : BOOLEAN;
 		BEGIN
 			ASSERT(component # NIL);
 			pa := component.properties.Enumerate();
@@ -2826,7 +2826,7 @@ TYPE
 			IF (outOfDate # value) THEN
 				outOfDate := value;
 				IF outOfDate THEN
-					editor.fillColor.Set(LONGINT(0FFFF0099H));
+					editor.fillColor.Set(SIGNED32(0FFFF0099H));
 				ELSE
 					editor.fillColor.Set(WMGraphics.White);
 				END;
@@ -3069,11 +3069,11 @@ TYPE
 		curTab : WMTabComponents.Tab;
 
 		(* active body *)
-		state, internalState : LONGINT;
+		state, internalState : SIGNED32;
 		timer : Kernel.Timer;
 
 		PROCEDURE &Init*;
-		VAR panel, toolbar : WMStandardComponents.Panel;  i : LONGINT;
+		VAR panel, toolbar : WMStandardComponents.Panel;  i : SIGNED32;
 		BEGIN
 			Init^;
 			SetNameAsString(Strings.NewString("PropertyPanel"));
@@ -3169,7 +3169,7 @@ TYPE
 			END;
 		END UpdateTabCaptions;
 
-		PROCEDURE SetState(state : LONGINT);
+		PROCEDURE SetState(state : SIGNED32);
 		BEGIN {EXCLUSIVE}
 			IF (SELF.state < State_Terminating) THEN
 				SELF.state := state;
@@ -3341,13 +3341,13 @@ TYPE
 	RepositoryPanel* = OBJECT(WMComponents.VisualComponent)
 	VAR
 		component : Repositories.Component;
-		lastTimestamp : LONGINT;
+		lastTimestamp : SIGNED32;
 
 		repositoryName : WMStandardComponents.Label;
 		editor : WMEditors.TextField;
 		storeBtn, unbindBtn, removeBtn, updateBtn : WMStandardComponents.Button;
 
-		state : LONGINT;
+		state : SIGNED32;
 		timer : Kernel.Timer;
 
 		PROCEDURE &Init*;
@@ -3754,7 +3754,7 @@ TYPE
 	END Window;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 	StrNotAvailable, StrNoCaption, StrType,
 	StrComponentInfo, StrStandardProperties, StrExtendedProperties, StrExtendedPropertiesView, StrEventListeners, StrEventSources,
@@ -3842,7 +3842,7 @@ BEGIN
 	RETURN panel;
 END CreateLine;
 
-PROCEDURE CreateLabel*(CONST caption : ARRAY OF CHAR; width, alignment : LONGINT) : WMStandardComponents.Label;
+PROCEDURE CreateLabel*(CONST caption : ARRAY OF CHAR; width, alignment : SIGNED32) : WMStandardComponents.Label;
 VAR label : WMStandardComponents.Label;
 BEGIN
 	NEW(label); label.alignment.Set(WMComponents.AlignLeft);
@@ -3852,7 +3852,7 @@ BEGIN
 	RETURN label;
 END CreateLabel;
 
-PROCEDURE CreateEditor*(width : LONGINT) : WMEditors.TextField;
+PROCEDURE CreateEditor*(width : SIGNED32) : WMEditors.TextField;
 VAR editor : WMEditors.TextField;
 BEGIN
 	NEW(editor); editor.alignment.Set(WMComponents.AlignLeft);

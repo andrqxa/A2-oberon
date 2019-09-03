@@ -13,8 +13,8 @@ TYPE
 
 	RasterData* = RECORD (OType.RasterData)
 		adr*: ADDRESS;							(* base address of pattern *)
-		bpr*: LONGINT;							(* number of bytes per row *)
-		len*: LONGINT;							(* pattern length *)
+		bpr*: SIGNED32;							(* number of bytes per row *)
+		len*: SIGNED32;							(* pattern length *)
 	END;
 
 
@@ -35,7 +35,7 @@ TYPE
 			WHILE n > 0 DO
 				ASSERT( (data.adr <= a) & (a < data.adr + data.len), 110 );
 				S.GET( a, byte );
-				S.PUT( a, CHR( S.VAL(LONGINT, S.VAL(SET, LONG(ORD( byte ))) + mask)) );
+				S.PUT( a, CHR( S.VAL(SIGNED32, S.VAL(SET, LONG(ORD( byte ))) + mask)) );
 				DEC( n ); INC( a, data.bpr )
 			END;
 			IF x0 < x1 THEN
@@ -55,7 +55,7 @@ TYPE
 					WHILE n > 0 DO
 						ASSERT( (data.adr <= a) & (a < data.adr + data.len), 112 );
 						S.GET( a, byte );
-						S.PUT( a, CHR( S.VAL(LONGINT, S.VAL(SET, LONG(ORD( byte ))) + mask)));
+						S.PUT( a, CHR( S.VAL(SIGNED32, S.VAL(SET, LONG(ORD( byte ))) + mask)));
 						DEC( n ); INC( a, data.bpr )
 					END
 				END
@@ -68,7 +68,7 @@ TYPE
 			mode = {OType.Hinted, OType.Width, OType.Raster};
 		VAR
 			file: Files.File;  font: OType.Font;  i, chars, ranges, xmin, ymin, xmax, ymax, j: SIGNED16;
-			beg, end: ARRAY 64 OF SIGNED16;  data: RasterData;  no, bytes, k: LONGINT;
+			beg, end: ARRAY 64 OF SIGNED16;  data: RasterData;  no, bytes, k: SIGNED32;
 			ras: OpenTypeScan.Rasterizer;
 			w: Files.Writer;  ipos, apos: Files.Position;
 			pattern: ARRAY 360*360 DIV 8 OF CHAR;				(* enough for 36 point at 720 dpi *)
@@ -164,7 +164,7 @@ TYPE
 	END IsDigit;
 
 	PROCEDURE MakeTtfName( CONST oname: ARRAY OF CHAR; VAR ttfname: Name; VAR size, res: SIGNED16 );
-	VAR i: LONGINT; c: CHAR;
+	VAR i: SIGNED32; c: CHAR;
 	BEGIN
 		IF Strings.EndsWith( ".Scn.Fnt", oname ) THEN  res := ScreenDPI
 		ELSIF Strings.EndsWith( ".Pr6.Fnt", oname ) THEN  res := 600

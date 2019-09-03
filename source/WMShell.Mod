@@ -108,7 +108,7 @@ TYPE
 			END;
 		END ExtKeyPressed;
 
-		PROCEDURE Wait(ms : LONGINT);
+		PROCEDURE Wait(ms : SIGNED32);
 		BEGIN
 			timer.Sleep(ms);
 		END Wait;

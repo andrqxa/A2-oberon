@@ -86,7 +86,7 @@ VAR
 	END RequestAuthorizeNone;
 
 
-	PROCEDURE RequestConnPW( ssh: Connection;  CONST user, host: ARRAY OF CHAR; try: LONGINT );
+	PROCEDURE RequestConnPW( ssh: Connection;  CONST user, host: ARRAY OF CHAR; try: SIGNED32 );
 	VAR p: T.Packet;  headline, pw: ARRAY 64 OF CHAR;
 	BEGIN
 		headline := "SSH: Enter Password for ";
@@ -186,7 +186,7 @@ VAR
 		signature: B.BigNumber;
 		sha1: SHA1.Hash;
 		em: ARRAY EmSize OF CHAR;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		ASSERT( privKey.size = 2048 );
 		MakePubKeyBlob( blob, blen );
@@ -239,7 +239,7 @@ VAR
 	CONST
 		headline = "enter passphrase for opening your private key";
 	VAR
-		f: Files.File; r: Files.Reader; i: LONGINT;
+		f: Files.File; r: Files.Reader; i: SIGNED32;
 		pw: ARRAY 64 OF CHAR;
 	BEGIN
 		IF privKey = NIL THEN

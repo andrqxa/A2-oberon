@@ -294,8 +294,8 @@ END Real;
 (*! add read procedures for other basic types *)
 (*! add read procedures to fill complete chunks, eg. Reals *)
 
-PROCEDURE Number* (VAR sc: Scanner;  VAR i: LONGINT): BOOLEAN; 	(*cw990927*)
-	(*= read input, and try to evaluate as LONGINT number *)
+PROCEDURE Number* (VAR sc: Scanner;  VAR i: SIGNED32): BOOLEAN; 	(*cw990927*)
+	(*= read input, and try to evaluate as SIGNED32 number *)
 	VAR done, neg: BOOLEAN;  j: SIGNED16;
 BEGIN
 	neg := FALSE;
@@ -391,7 +391,7 @@ BEGIN	temp := Real(sc, x);
 	END;  	RETURN temp
 END ExpectReal;
 
-PROCEDURE ExpectNumber* (VAR sc: Scanner;  VAR i: LONGINT): BOOLEAN;
+PROCEDURE ExpectNumber* (VAR sc: Scanner;  VAR i: SIGNED32): BOOLEAN;
 	VAR temp: BOOLEAN;
 BEGIN	temp := Number(sc, i);
 	IF ~temp THEN 	PosMsg(sc);

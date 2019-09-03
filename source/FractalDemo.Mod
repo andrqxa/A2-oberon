@@ -11,7 +11,7 @@ TYPE
 		terminate : BOOLEAN;
 		x0, y0, x1, y1: LONGREAL;
 		w, h, maxIter, ys, ye : SIZE;
-		result : POINTER TO ARRAY OF LONGINT;
+		result : POINTER TO ARRAY OF SIGNED32;
 		next : WorkUnit;
 	END;
 
@@ -35,7 +35,7 @@ TYPE
 	CalcThread = OBJECT
 		VAR
 			alive : BOOLEAN;
-			i, j : LONGINT;
+			i, j : SIGNED32;
 			dx, dy : LONGREAL;
 			wu : WorkUnit;
 			workQ, resultQ : WorkUnitQ;
@@ -62,8 +62,8 @@ TYPE
 			AWAIT(~alive)
 		END AwaitFinished;
 
-		PROCEDURE Calc(x, y : LONGREAL) : LONGINT;
-		VAR re, im, re2, im2 : LONGREAL; i : LONGINT;
+		PROCEDURE Calc(x, y : LONGREAL) : SIGNED32;
+		VAR re, im, re2, im2 : LONGREAL; i : SIGNED32;
 		BEGIN
 			re := x; im := y; i := 1;
 			WHILE i < wu.maxIter DO
@@ -104,7 +104,7 @@ TYPE
 	List = POINTER TO RECORD
 		next: List;
 		x0,x1,y0,y1: LONGREAL;
-		depth: LONGINT;
+		depth: SIGNED32;
 	END;
 
 	MandelbrotSetViewer = OBJECT (WMComponents.VisualComponent)
@@ -124,7 +124,7 @@ TYPE
 		recalcNeeded, alive, calculating : BOOLEAN;
 
 		PROCEDURE &Init*;
-		VAR i, x: LONGINT;
+		VAR i, x: SIGNED32;
 		BEGIN
 			Init^;
 			SetNameAsString(StrMandelbrotSetViewer);
@@ -146,7 +146,7 @@ TYPE
 		VAR w, h, p, i, j: SIZE;
 			str : ARRAY 32 OF CHAR;
 			t : Kernel.MilliTimer;
-			t2 : LONGINT;
+			t2 : SIGNED32;
 			processes : POINTER TO ARRAY OF CalcThread;
 			wu : WorkUnit;
 		BEGIN
@@ -275,7 +275,7 @@ TYPE
 						MAX(y1, y0)), 5, FALSE)
 			END;
 			IF recalcNeeded THEN
-				canvas.SetColor(LONGINT(0FFFF00FFH));
+				canvas.SetColor(SIGNED32(0FFFF00FFH));
 				canvas.DrawString(20, 20, "Calculating...");
 				str := "Processes : "; Strings.IntToStr( nofProcesses.Get(), t);
 				Strings.Append(str, t);

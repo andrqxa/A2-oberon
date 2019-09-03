@@ -12,7 +12,7 @@ TYPE
 		prototype : Property;
 		nonDefault : BOOLEAN;
 		list : PropertyList; (* contains the list, the property is added to *)
-		timestamp : LONGINT; (* incremented when property state is changed; *)
+		timestamp : SIGNED32; (* incremented when property state is changed; *)
 		repository: Repositories.Repository;
 
 		object : Repositories.Component;
@@ -130,7 +130,7 @@ TYPE
 			RETURN FALSE
 		END IsLink;
 
-		PROCEDURE WriteLink*(w : Streams.Writer; context: ANY;  indent : LONGINT): BOOLEAN;
+		PROCEDURE WriteLink*(w : Streams.Writer; context: ANY;  indent : SIGNED32): BOOLEAN;
 		VAR name : String; id: SIZE; res: WORD; repository: Repositories.Repository; objectName: String;
 		BEGIN
 			IF object # NIL THEN
@@ -230,7 +230,7 @@ TYPE
 			INC(timestamp)
 		END Stamp;
 
-		PROCEDURE GetTimestamp*() : LONGINT;
+		PROCEDURE GetTimestamp*() : SIGNED32;
 		BEGIN
 			RETURN timestamp;
 		END GetTimestamp;
@@ -297,7 +297,7 @@ TYPE
 			NEW(element); IF name # NIL THEN element.SetName(name^); END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		END WriteXML;
 
 		PROCEDURE Finalize*;
@@ -408,7 +408,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -432,8 +432,8 @@ TYPE
 	VAR
 		value : SET;
 
-		PROCEDURE IntToSet(h:LONGINT):SET;
-		VAR i:LONGINT; set:SET;
+		PROCEDURE IntToSet(h:SIGNED32):SET;
+		VAR i:SIGNED32; set:SET;
 		BEGIN
 			i:=0;
 			WHILE h#0 DO
@@ -445,7 +445,7 @@ TYPE
 		END IntToSet;
 
 		PROCEDURE SetToInt(set:SET):HUGEINT;
-		VAR i:LONGINT; int:HUGEINT; s: String;
+		VAR i:SIGNED32; int:HUGEINT; s: String;
 		BEGIN
 			NEW(s, 18);
 			FOR i:=31 TO 0 BY -1 DO
@@ -456,7 +456,7 @@ TYPE
 		END SetToInt;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR token : ARRAY 10 OF CHAR; v : SET; i:LONGINT; res: WORD;
+		VAR token : ARRAY 10 OF CHAR; v : SET; i:SIGNED32; res: WORD;
 		BEGIN
 			AcquireWrite;
 			NotDefault;
@@ -536,7 +536,7 @@ TYPE
 
 (*! to discuss: should a SET be written explicitely - readability at cost of overhead*)
 		PROCEDURE FromXML*(xml : XML.Element);
-		VAR en : XMLObjects.Enumerator; p : ANY; s : String; i:LONGINT;
+		VAR en : XMLObjects.Enumerator; p : ANY; s : String; i:SIGNED32;
 		BEGIN
 			en := xml.GetContents();
 			p := en.GetNext();
@@ -565,7 +565,7 @@ TYPE
 		END ToXML;
 
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; s: ARRAY 10 OF CHAR;
 		BEGIN
 			name := GetName();
@@ -588,8 +588,8 @@ TYPE
 	(** Accessor property to an integer value. The range of possible values can be restricted. *)
 	Int32Property* = OBJECT(Property)
 	VAR
-		value : LONGINT;
-		min, max : LONGINT;
+		value : SIGNED32;
+		min, max : SIGNED32;
 		bounded : BOOLEAN;
 
 		PROCEDURE UpdateProperty;
@@ -613,7 +613,7 @@ TYPE
 
 		(** Confines the possible input values between min and max. Implicitly activates the bounds check. If the current value
 			lies outside the bounds, it is truncated to the nearest and a change notification is sent after the end of the transaction. *)
-		PROCEDURE SetBounds*(min, max : LONGINT);
+		PROCEDURE SetBounds*(min, max : SIGNED32);
 		BEGIN
 			AcquireWrite;
 			SELF.min := min; SELF.max := max; bounded := TRUE;
@@ -622,7 +622,7 @@ TYPE
 			ReleaseWrite
 		END SetBounds;
 
-		PROCEDURE GetBounds*(VAR min, max : LONGINT);
+		PROCEDURE GetBounds*(VAR min, max : SIGNED32);
 		BEGIN
 			AcquireRead;
 			min := SELF.min; max := SELF.max;
@@ -649,7 +649,7 @@ TYPE
 			ReleaseRead;
 		END GetIsBounded;
 
-		PROCEDURE Validate(v : LONGINT) : LONGINT;
+		PROCEDURE Validate(v : SIGNED32) : SIGNED32;
 		BEGIN
 			IF bounded THEN RETURN MAX(min, MIN(max, v))
 			ELSE RETURN v
@@ -657,7 +657,7 @@ TYPE
 		END Validate;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR v : LONGINT;
+		VAR v : SIGNED32;
 		BEGIN
 			AcquireWrite;
 			r.Int(v, TRUE);
@@ -672,8 +672,8 @@ TYPE
 			ReleaseRead
 		END ToStream;
 
-		PROCEDURE Get*() : LONGINT;
-		VAR r : LONGINT;
+		PROCEDURE Get*() : SIGNED32;
+		VAR r : SIGNED32;
 		BEGIN
 			AcquireRead;
 			IF nonDefault OR (prototype = NIL) THEN r := value
@@ -684,8 +684,8 @@ TYPE
 		END Get;
 
 
-		PROCEDURE Set*(value : LONGINT);
-		VAR v: LONGINT;
+		PROCEDURE Set*(value : SIGNED32);
+		VAR v: SIGNED32;
 		BEGIN
 			v := Validate(value);
 			AcquireWrite;
@@ -700,8 +700,8 @@ TYPE
 			ReleaseWrite
 		END Set;
 
-		PROCEDURE SetPassive*(value : LONGINT);
-		VAR v: LONGINT;
+		PROCEDURE SetPassive*(value : SIGNED32);
+		VAR v: SIGNED32;
 		BEGIN
 			v := Validate(value);
 			AcquireWrite;
@@ -722,8 +722,8 @@ TYPE
 			AcquireWrite; NotDefault;
 			mins := xml.GetAttributeValue("min");
 			maxs := xml.GetAttributeValue("max");
-			IF mins # NIL THEN Strings.StrToInt(mins^, min) ELSE min := MIN(LONGINT) END;
-			IF maxs # NIL THEN Strings.StrToInt(maxs^, max) ELSE max := MAX(LONGINT) END;
+			IF mins # NIL THEN Strings.StrToInt(mins^, min) ELSE min := MIN(SIGNED32) END;
+			IF maxs # NIL THEN Strings.StrToInt(maxs^, max) ELSE max := MAX(SIGNED32) END;
 			bounded := (mins # NIL) OR (maxs # NIL);
 			en := xml.GetContents();
 			IF en.HasMoreElements() THEN
@@ -748,7 +748,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -929,7 +929,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -1109,7 +1109,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -1294,7 +1294,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -1508,7 +1508,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; res : WORD;
 		BEGIN
 			name := GetName();
@@ -1547,7 +1547,7 @@ TYPE
 
 		(* TODO: read hex from CCG FontConverter *)
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR v : LONGINT;
+		VAR v : SIGNED32;
 		BEGIN
 			AcquireWrite;
 			r.Int(v, TRUE); NotDefault;
@@ -1649,7 +1649,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String;
 		BEGIN
 			name := GetName();
@@ -1679,7 +1679,7 @@ TYPE
 		END New;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR font : WMGraphics.Font; name, temp : ARRAY 32 OF CHAR; size : LONGINT; style : SET;
+		VAR font : WMGraphics.Font; name, temp : ARRAY 32 OF CHAR; size : SIGNED32; style : SET;
 		BEGIN
 			AcquireWrite;
 			NotDefault;
@@ -1749,7 +1749,7 @@ TYPE
 			COPY(font.name, name); size := font.size; style := font.style;
 		END GetFont;
 
-		PROCEDURE SetFont*(CONST name : ARRAY OF CHAR; size : LONGINT; style : SET);
+		PROCEDURE SetFont*(CONST name : ARRAY OF CHAR; size : SIGNED32; style : SET);
 		VAR font : WMGraphics.Font;
 		BEGIN
 			IF size < 6 THEN size := 6 END;
@@ -1836,7 +1836,7 @@ TYPE
 		END GetSyle;
 
 		PROCEDURE FromXML*(xml : XML.Element);
-		VAR s : String; name : ARRAY 32 OF CHAR; size : LONGINT; style : SET;
+		VAR s : String; name : ARRAY 32 OF CHAR; size : SIGNED32; style : SET;
 		BEGIN
 			s := xml.GetAttributeValue("name");
 			IF (s # NIL) THEN COPY(s^, name); ELSE name := ""; END;
@@ -1861,7 +1861,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; font : WMGraphics.Font; temp : ARRAY 32 OF CHAR;
 		BEGIN
 			name := GetName();
@@ -2019,7 +2019,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; t : WMGraphics.Point2d;
 		BEGIN
 			name := GetName();
@@ -2044,7 +2044,7 @@ TYPE
 		value : WMRectangles.Rectangle;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR new : WMRectangles.Rectangle; v: LONGINT;
+		VAR new : WMRectangles.Rectangle; v: SIGNED32;
 		BEGIN
 			AcquireWrite;
 			r.SkipWhitespace; r.Int(v, FALSE); new.l := v;
@@ -2247,7 +2247,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
 		VAR name : String; t : WMRectangles.Rectangle;
 		BEGIN
 			name := GetName();
@@ -2278,7 +2278,7 @@ TYPE
 		componentID : SIZE;
 		*)
 		(* temporary used in WriteXML *)
-		level: LONGINT;
+		level: SIGNED32;
 
 		PROCEDURE &NewRef*(prototype : Property; name, info : String);
 		BEGIN
@@ -2438,7 +2438,7 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : LONGINT);
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
 		VAR name : String; id: SIZE; res: WORD; repository: Repositories.Repository; objectName: String;
 		BEGIN
 			name := GetName();
@@ -2477,11 +2477,11 @@ TYPE
 	PropertyList* = OBJECT
 	VAR
 		properties : PropertyArray;
-		nofProperties- : LONGINT;
+		nofProperties- : SIGNED32;
 		onPropertyChanged- : WMEvents.EventSource;
 		onLinkChanged-: WMEvents.EventSource;
 		lock : Locks.RWLock;
-		upNofChanges : LONGINT;
+		upNofChanges : SIGNED32;
 		upChanged : Property;
 
 		propertyChanged, linkChanged: WMEvents.EventListener;
@@ -2504,7 +2504,7 @@ TYPE
 		PROCEDURE ReleaseWrite*;
 		VAR
 			removeLock : BOOLEAN;
-			changed : Property; nofChanges : LONGINT;
+			changed : Property; nofChanges : SIGNED32;
 		BEGIN
 			removeLock := lock.GetWLockLevel() = 1;
 			IF removeLock THEN
@@ -2540,7 +2540,7 @@ TYPE
 		END Add;
 
 		PROCEDURE Remove*(x : Property);
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 		BEGIN
 			AcquireWrite;
 			i := 0; WHILE (i < nofProperties) & (properties[i] # x) DO INC(i) END;
@@ -2553,7 +2553,7 @@ TYPE
 		END Remove;
 
 		PROCEDURE Get*(CONST name : ARRAY OF CHAR) : Property;
-		VAR property : Property; n : String; i : LONGINT;
+		VAR property : Property; n : String; i : SIGNED32;
 		BEGIN
 			AcquireRead;
 			i := 0; property := NIL;
@@ -2569,7 +2569,7 @@ TYPE
 		END Get;
 
 		PROCEDURE Grow;
-		VAR new: PropertyArray; i : LONGINT;
+		VAR new: PropertyArray; i : SIGNED32;
 		BEGIN
 			NEW(new, LEN(properties) * 2);
 			FOR i := 0 TO nofProperties - 1 DO new[i] := properties[i] END;
@@ -2577,7 +2577,7 @@ TYPE
 		END Grow;
 
 		PROCEDURE Enumerate*() : PropertyArray;
-		VAR current : PropertyArray; i : LONGINT;
+		VAR current : PropertyArray; i : SIGNED32;
 		BEGIN
 			AcquireWrite;
 			NEW(current, nofProperties);
@@ -2587,7 +2587,7 @@ TYPE
 		END Enumerate;
 
 		PROCEDURE HasProperty*(CONST name : ARRAY OF CHAR) : BOOLEAN;
-		VAR n : Strings.String; found : BOOLEAN; i : LONGINT;
+		VAR n : Strings.String; found : BOOLEAN; i : SIGNED32;
 		BEGIN
 			found := FALSE;
 			AcquireRead;
@@ -2602,7 +2602,7 @@ TYPE
 		END HasProperty;
 
 		PROCEDURE GetPropertyValue*(CONST name : ARRAY OF CHAR; VAR value : ARRAY OF CHAR) : BOOLEAN;
-		VAR i : LONGINT; n : String; vs : Streams.StringWriter; len : SIZE;
+		VAR i : SIGNED32; n : String; vs : Streams.StringWriter; len : SIZE;
 		BEGIN
 			AcquireRead;
 			i := 0;
@@ -2623,7 +2623,7 @@ TYPE
 		END GetPropertyValue;
 
 		PROCEDURE SetPropertyValue*(CONST name, value: ARRAY OF CHAR) : BOOLEAN;
-		VAR i : LONGINT; n : String; vs : Streams.StringReader;
+		VAR i : SIGNED32; n : String; vs : Streams.StringReader;
 		BEGIN
 			AcquireWrite;
 			i := 0;
@@ -2642,7 +2642,7 @@ TYPE
 		PROCEDURE SetXML*(xml : XML.Element);
 		VAR
 			en : XMLObjects.Enumerator;
-			p : ANY; s, n : String; i : LONGINT;
+			p : ANY; s, n : String; i : SIGNED32;
 			repository: Repositories.Repository;
 		BEGIN
 			AcquireWrite;
@@ -2672,7 +2672,7 @@ TYPE
 			property: Property;
 			l: Strings.String;
 			en : XMLObjects.Enumerator;
-			p : ANY; s, n : String; i : LONGINT;
+			p : ANY; s, n : String; i : SIGNED32;
 			moduleName, procedureName: Modules.Name;
 			res: WORD; msg: ARRAY 32 OF CHAR;
 			found: BOOLEAN;
@@ -2719,7 +2719,7 @@ TYPE
 		END FromXML;
 
 		PROCEDURE ToXML*(VAR element: XML.Element);
-		VAR sub: XML.Element; i : LONGINT; self: ANY;
+		VAR sub: XML.Element; i : SIGNED32; self: ANY;
 		BEGIN
 			NEW(element); element.SetName("Properties");
 			FOR i := 0 TO nofProperties-1 DO
@@ -2731,8 +2731,8 @@ TYPE
 			END;
 		END ToXML;
 
-		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : LONGINT);
-		VAR i : LONGINT;
+		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
+		VAR i : SIGNED32;
 		BEGIN
 			w.Ln;
 			Indent(w, indent + 1);
@@ -2748,8 +2748,8 @@ TYPE
 		END WriteXML;
 
 		(*
-		PROCEDURE ToRepository*(CONST repository: ARRAY OF CHAR; w : Streams.Writer; indent : LONGINT);
-		VAR i : LONGINT;
+		PROCEDURE ToRepository*(CONST repository: ARRAY OF CHAR; w : Streams.Writer; indent : SIGNED32);
+		VAR i : SIGNED32;
 		BEGIN
 			w.Ln;
 			Indent(w, indent + 1);
@@ -2770,7 +2770,7 @@ TYPE
 		END Changed;
 
 		PROCEDURE Finalize*;
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			AcquireWrite;
 			FOR i := 0 TO nofProperties - 1 DO
@@ -2788,15 +2788,15 @@ VAR
 	StringPropertiesInfo, StringLinksInfo : String;
 	anonymous: String;
 
-PROCEDURE Indent(w : Streams.Writer; indent : LONGINT);
-VAR i : LONGINT;
+PROCEDURE Indent(w : Streams.Writer; indent : SIGNED32);
+VAR i : SIGNED32;
 BEGIN
 	FOR i := 0 TO indent - 1 DO w.Char(9X) END
 END Indent;
 
-PROCEDURE ReadCharDataInt(xml : XML.Element) : LONGINT;
+PROCEDURE ReadCharDataInt(xml : XML.Element) : SIGNED32;
 VAR en : XMLObjects.Enumerator;
-	p : ANY; s : String; value : LONGINT;
+	p : ANY; s : String; value : SIGNED32;
 BEGIN
 	value := 0;
 	en := xml.GetContents();

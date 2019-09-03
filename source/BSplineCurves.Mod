@@ -21,8 +21,8 @@ TYPE
 
 	Buffer = OBJECT
 	VAR x: ARRAY [*] OF LONGREAL;
-		PROCEDURE &Init(len: LONGINT); BEGIN NEW(x,len); END Init;
-		PROCEDURE Length(): LONGINT; BEGIN RETURN LEN(x,0); END Length;
+		PROCEDURE &Init(len: SIGNED32); BEGIN NEW(x,len); END Init;
+		PROCEDURE Length(): SIGNED32; BEGIN RETURN LEN(x,0); END Length;
 	END Buffer;
 
 	(*
@@ -32,7 +32,7 @@ TYPE
 	VAR
 		poles: ARRAY [*] OF LONGREAL;
 		gain: LONGREAL;
-		boundary: LONGINT;
+		boundary: SIGNED32;
 		accelBuf: ARRAY [*] OF Buffer;
 
 		(*
@@ -42,9 +42,9 @@ TYPE
 			boundary - boundary handling convention
 			tolerance - tolerance for handling the boundaries
 		*)
-		PROCEDURE &Init(degree, boundary: LONGINT; tolerance: LONGREAL);
+		PROCEDURE &Init(degree, boundary: SIGNED32; tolerance: LONGREAL);
 		VAR
-			i, j, n: LONGINT;
+			i, j, n: SIGNED32;
 			p, v, w: LONGREAL;
 			buf: Buffer;
 		BEGIN
@@ -66,10 +66,10 @@ TYPE
 			SELF.boundary := boundary;
 		END Init;
 
-		PROCEDURE InitCausal(iPole: LONGINT; CONST s: ARRAY [*] OF LONGREAL): LONGREAL;
+		PROCEDURE InitCausal(iPole: SIGNED32; CONST s: ARRAY [*] OF LONGREAL): LONGREAL;
 		VAR
 			buf: Buffer;
-			i: LONGINT;
+			i: SIGNED32;
 			ic, z, zn, z2n, iz: LONGREAL;
 		BEGIN
 
@@ -130,10 +130,10 @@ TYPE
 			RETURN ic;
 		END InitCausal;
 
-		PROCEDURE InitAnticausal(iPole: LONGINT; CONST s: ARRAY [*] OF LONGREAL): LONGREAL;
+		PROCEDURE InitAnticausal(iPole: SIGNED32; CONST s: ARRAY [*] OF LONGREAL): LONGREAL;
 		VAR
 			buf: Buffer;
-			i: LONGINT;
+			i: SIGNED32;
 			ic, z, zn: LONGREAL;
 		BEGIN
 
@@ -177,7 +177,7 @@ TYPE
 		*)
 		PROCEDURE Transform(CONST s: ARRAY [*] OF LONGREAL; VAR c: ARRAY [*] OF LONGREAL);
 		VAR
-			i, j: LONGINT;
+			i, j: SIGNED32;
 			z: LONGREAL;
 		BEGIN
 			IF LEN(c,0) # LEN(s,0) THEN NEW(c,LEN(s,0)); END;
@@ -198,11 +198,11 @@ TYPE
 	(** A parametric B-Spline curve *)
 	Curve* = OBJECT
 	VAR
-		degree-: LONGINT; (** B-Spline degree *)
+		degree-: SIGNED32; (** B-Spline degree *)
 		closed-: BOOLEAN; (** TRUE for closed curves *)
 		kx-, ky-: ARRAY [*] OF LONGREAL; (** curve knots *)
 
-		boundary: LONGINT;
+		boundary: SIGNED32;
 		direct: DirectTransform;
 		cx, cy: ARRAY [*] OF LONGREAL; (* B-Spline coefficieints for x(t) and y(t) corresponding to the knots *)
 		dt: ARRAY [*] OF LONGREAL;
@@ -213,7 +213,7 @@ TYPE
 			degree - B-Spline degree
 			closed - TRUE for closed curve
 		*)
-		PROCEDURE &Init*(degree: LONGINT; closed: BOOLEAN);
+		PROCEDURE &Init*(degree: SIGNED32; closed: BOOLEAN);
 		BEGIN
 			IF closed THEN boundary := Periodic; ELSE boundary := MirrorW; END;
 
@@ -273,7 +273,7 @@ TYPE
 		*)
 		PROCEDURE GetPoly*(maxDist: LONGREAL; VAR x, y: ARRAY [*] OF LONGREAL);
 		VAR
-			i, j, k, m, n: LONGINT;
+			i, j, k, m, n: SIGNED32;
 			d1, d2, p, t: LONGREAL;
 		BEGIN
 
@@ -378,9 +378,9 @@ TYPE
 		poles - array of the filter poles
 		gain - gain of the filter
 	*)
-	PROCEDURE GetDirectFilter(degree: LONGINT; VAR poles: ARRAY [*] OF LONGREAL; VAR gain: LONGREAL);
+	PROCEDURE GetDirectFilter(degree: SIGNED32; VAR poles: ARRAY [*] OF LONGREAL; VAR gain: LONGREAL);
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		CASE degree OF
 
@@ -463,12 +463,12 @@ TYPE
 		x - array of sample locations where to interpolate
 		v - output array of interpolated values
 	*)
-	PROCEDURE Interpolate(degree: LONGINT; x0, dx: LONGREAL; boundary: LONGINT; CONST c: ARRAY [*] OF LONGREAL; CONST x: ARRAY [*] OF LONGREAL; VAR v: ARRAY [*] OF LONGREAL);
+	PROCEDURE Interpolate(degree: SIGNED32; x0, dx: LONGREAL; boundary: SIGNED32; CONST c: ARRAY [*] OF LONGREAL; CONST x: ARRAY [*] OF LONGREAL; VAR v: ARRAY [*] OF LONGREAL);
 	VAR
-		i, j, k, n: LONGINT;
+		i, j, k, n: SIGNED32;
 		s, s2, s4, t, t0, t1, idx: LONGREAL;
 		xx: LONGREAL;
-		ind0: ARRAY 10 OF LONGINT;
+		ind0: ARRAY 10 OF SIGNED32;
 		w0: ARRAY 10 OF LONGREAL;
 	BEGIN
 
@@ -633,7 +633,7 @@ TYPE
 	(*
 		Integer power: y := x^p
 	*)
-	PROCEDURE IPower(x: LONGREAL; p: LONGINT): LONGREAL;
+	PROCEDURE IPower(x: LONGREAL; p: SIGNED32): LONGREAL;
 	BEGIN
 		IF x > 0 THEN
 			RETURN MathL.exp(p*MathL.ln(x));

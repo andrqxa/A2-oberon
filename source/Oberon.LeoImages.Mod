@@ -204,7 +204,7 @@ MODULE LeoImages IN Oberon; (** portable **)	(* eos  *)
 	END Copy;
 
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR img, copy: Image; ver: LONGINT; ch: CHAR;
+		VAR img, copy: Image; ver: SIGNED32; ch: CHAR;
 	BEGIN
 		img := obj(Image);
 		IF msg IS Leonardo.ShapeMsg THEN

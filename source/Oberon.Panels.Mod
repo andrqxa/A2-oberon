@@ -54,7 +54,7 @@ TYPE
 	PanelDesc* = RECORD (Gadgets.FrameDesc)
 		focused*: BOOLEAN;	(** Has the caret ? *)
 		focusx*, focusy*: SIGNED16;	(** Relative coordinates of caret. *)
-		time*: LONGINT;	(** Time of selection. *)
+		time*: SIGNED32;	(** Time of selection. *)
 		back*: Display3.Mask;	(** Background mask of the panel, in relative coordinates. *)
 		rx*, ry*, rr*, rt*: SIGNED16;	(** Current hull to be redrawn (damage region). *)
 		borderW*: SIGNED16;	(** Size in pixels of the border area to which children are clipped. *)
@@ -276,7 +276,7 @@ END Explain;
 
 (** Default load mechanism. *)
 PROCEDURE LoadPanel*(F: Panel; VAR M: Objects.FileMsg);
-VAR ver, x: LONGINT; u: SIGNED16; t: Display.Frame; obj: Objects.Object;
+VAR ver, x: SIGNED32; u: SIGNED16; t: Display.Frame; obj: Objects.Object;
 BEGIN
 	Files.ReadNum(M.R, ver);
 	IF (ver = 5) OR (ver = 6) OR (ver = 7) THEN
@@ -839,7 +839,7 @@ BEGIN
 END HandleChildAdjust;
 
 (** Get the latest object selection. *)
-PROCEDURE GetSelection*(VAR obj: Objects.Object; VAR parent: Display.Frame; VAR time: LONGINT);
+PROCEDURE GetSelection*(VAR obj: Objects.Object; VAR parent: Display.Frame; VAR time: SIGNED32);
 VAR S: Display.SelectMsg;
 BEGIN
 	obj := NIL; parent := NIL;
@@ -948,7 +948,7 @@ BEGIN
 	END;
 END Priority;
 
-PROCEDURE CopyOver(F: Panel; text: Texts.Text; beg, end: LONGINT);
+PROCEDURE CopyOver(F: Panel; text: Texts.Text; beg, end: SIGNED32);
 VAR T: Texts.Text; buf: Texts.Buffer;
 BEGIN
 	NEW(buf); Texts.OpenBuf(buf);
@@ -1236,7 +1236,7 @@ PROCEDURE Align0(type: ARRAY OF CHAR);
 VAR M: Display.SelectMsg; obj, n: Objects.Object; x, y, w, h, maxW, maxH, px , py, count: SIGNED16; A: Display.ModifyMsg;
 	L, p, q: Objects.Object; vertical: BOOLEAN;
 
-	PROCEDURE Score(F: Display.Frame): LONGINT;
+	PROCEDURE Score(F: Display.Frame): SIGNED32;
 	BEGIN
 		IF vertical THEN RETURN 16000 - F.Y ELSE RETURN F.X END
 	END Score;
@@ -1399,7 +1399,7 @@ END UpdateCaret;
 
 PROCEDURE TrackCaret*(F: Panel; VAR M: Oberon.InputMsg);
 VAR x, y, w, h, LX, LY: SIGNED16; keysum: SET;
-	obj, newobj: Objects.Object; parent: Display.Frame; objtime, texttime, beg, end: LONGINT; text: Texts.Text;
+	obj, newobj: Objects.Object; parent: Display.Frame; objtime, texttime, beg, end: SIGNED32; text: Texts.Text;
 	buf: Texts.Buffer; T0: Texts.Text;
 BEGIN
 	x := M.x + F.X; y := M.y + F.Y; w := F.W; h := F.H;

@@ -51,7 +51,7 @@ VAR
 	debug*: BOOLEAN;
 
 PROCEDURE ParameterHandleAttribute*(VAR M: Objects.AttrMsg;  VAR p: Parameters;  VAR pn: ParameterNames): BOOLEAN;
-	VAR cur: ARRAY 64 OF CHAR;  i: LONGINT;  len: LONGINT;
+	VAR cur: ARRAY 64 OF CHAR;  i: SIGNED32;  len: SIGNED32;
 BEGIN
 	IF p = NIL THEN RETURN FALSE END;
 	len := LEN(p);

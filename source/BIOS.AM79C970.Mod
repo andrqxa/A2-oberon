@@ -30,9 +30,9 @@ CONST
 
 
 VAR
-	installed: LONGINT; (* number of installed devices *)
+	installed: SIGNED32; (* number of installed devices *)
 	installFinished: BOOLEAN;
-	outPackets, inPackets, missedFrames: LONGINT;
+	outPackets, inPackets, missedFrames: SIGNED32;
 
 TYPE
 
@@ -55,9 +55,9 @@ TYPE
 	LinkDevice = OBJECT (Network.LinkDevice)
 		VAR
 			ctrl: Controller;
-			hw: LONGINT;
+			hw: SIGNED32;
 
-		PROCEDURE Linked*(): LONGINT;
+		PROCEDURE Linked*(): SIGNED32;
 		BEGIN
 			IF ctrl.Linked() THEN
 				RETURN Network.LinkLinked;
@@ -67,9 +67,9 @@ TYPE
 		END Linked;
 
 
-		PROCEDURE DoSend*(dst: Network.LinkAdr; type: LONGINT; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: LONGINT);
+		PROCEDURE DoSend*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32);
 		VAR
-			i, pos: LONGINT;
+			i, pos: SIGNED32;
 			tBuf: TxBuffer;
 			flags1: SET;
 
@@ -137,7 +137,7 @@ TYPE
 	Controller = OBJECT
 		VAR
 			next: Controller; (* next controller in list *)
-			base, irq: LONGINT;
+			base, irq: SIGNED32;
 			dev: LinkDevice;
 			initBlock: InitializationBlock;
 
@@ -150,11 +150,11 @@ TYPE
 			txBufRing: ARRAY TxRingSize OF TxBuffer;
 			rxBufRing: ARRAY RxRingSize OF Network.Buffer;
 			(* index to point to current descriptor entry/ current buffer *)
-			rxIndex, txIndex : LONGINT;
+			rxIndex, txIndex : SIGNED32;
 
 
 
-		PROCEDURE &Init*(dev: LinkDevice; base, irq: LONGINT);
+		PROCEDURE &Init*(dev: LinkDevice; base, irq: SIGNED32);
 		VAR
 			res: WORD;
 			s: SET;
@@ -315,7 +315,7 @@ TYPE
 
 		PROCEDURE SetupRxTxRings;
 		VAR
-			i: LONGINT;
+			i: SIGNED32;
 			adr: ADDRESS;
 			t: SET;
 			rBuf: Network.Buffer;
@@ -361,7 +361,7 @@ TYPE
 
 		PROCEDURE UpdateTxRing;
 		VAR
-			i:LONGINT;
+			i:SIGNED32;
 			flags1, flags2: SET;
 		BEGIN
 
@@ -387,7 +387,7 @@ TYPE
 		(* read all frames that are marked with OWN = 0*)
 		PROCEDURE ReceivePacket;
 		VAR
-			type, size: LONGINT;
+			type, size: SIGNED32;
 			rBuf, buf: Network.Buffer;
 			flags1, flags2:SET;
 		BEGIN
@@ -515,9 +515,9 @@ TYPE
 	installedControllers: Controller;
 
 (* Scan the PCI bus for the specified card. *)
-PROCEDURE ScanPCI(vendor, device: LONGINT);
+PROCEDURE ScanPCI(vendor, device: SIGNED32);
 VAR
-	index, bus, dev, fct, base, irq, i: LONGINT; res: WORD;
+	index, bus, dev, fct, base, irq, i: SIGNED32; res: WORD;
 	d: LinkDevice;
 	c: Controller;
 	name: Plugins.Name;

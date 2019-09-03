@@ -17,7 +17,7 @@ VAR
 	frequency: HUGEINT;
 
 	(** Start the private watchdog with the given mode and delay *)
-	PROCEDURE Start * (mode: BOOLEAN; delay: LONGINT);
+	PROCEDURE Start * (mode: BOOLEAN; delay: SIGNED32);
 	VAR
 		val: SET;
 	BEGIN
@@ -31,21 +31,21 @@ VAR
 		ELSE
 			INCL(val, ControlItEnable)
 		END;
-		Platform.mpcore.Watchdog_Control_Register := SYSTEM.VAL(LONGINT, val)
+		Platform.mpcore.Watchdog_Control_Register := SYSTEM.VAL(SIGNED32, val)
 	END Start;
 
 	(** Stop private watchdog *)
 	PROCEDURE Stop *;
 	BEGIN
 		Platform.mpcore.Watchdog_Disable_Register := Platform.PrivateWatchdogDisableKey0;
-		Platform.mpcore.Watchdog_Disable_Register := LONGINT(Platform.PrivateWatchdogDisableKey1);
+		Platform.mpcore.Watchdog_Disable_Register := SIGNED32(Platform.PrivateWatchdogDisableKey1);
 		Platform.mpcore.Watchdog_Control_Register := 0
 	END Stop;
 
 	(** Feed the watchdog: overwrites its count with the given delay *)
-	PROCEDURE Feed * (delay: LONGINT);
+	PROCEDURE Feed * (delay: SIGNED32);
 	BEGIN
-		Platform.mpcore.Watchdog_Load_Register := LONGINT(HUGEINT(delay) * frequency);
+		Platform.mpcore.Watchdog_Load_Register := SIGNED32(HUGEINT(delay) * frequency);
 	END Feed;
 
 	(** Check if the watchdog has been triggered *)

@@ -86,7 +86,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		typSize*: PROCEDURE(typ: OPT.Struct; allocDesc: BOOLEAN);
 		verify*: PROCEDURE(VAR obj: OPT.Object);
 		exp: SIGNED16;	(*side effect of log*)
-		maxExp: LONGINT;	(* max n in ASH(1, n) on this machine *)
+		maxExp: SIGNED32;	(* max n in ASH(1, n) on this machine *)
 		InitPar: OPT.Object;		(* list of parameters in the current initialiser, used by NEW, only for active compiler *)
 
 	PROCEDURE err(n: SIGNED16);
@@ -167,12 +167,12 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		last := y
 	END Link;
 
-	PROCEDURE BoolToInt(b: BOOLEAN): LONGINT;
+	PROCEDURE BoolToInt(b: BOOLEAN): SIGNED32;
 	BEGIN
 		IF b THEN RETURN 1 ELSE RETURN 0 END
 	END BoolToInt;
 
-	PROCEDURE IntToBool(i: LONGINT): BOOLEAN;
+	PROCEDURE IntToBool(i: SIGNED32): BOOLEAN;
 	BEGIN
 		IF i = 0 THEN RETURN FALSE ELSE RETURN TRUE END
 	END IntToBool;
@@ -229,7 +229,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END EmptySet;
 
 	PROCEDURE SetIntType(node: OPT.Node);
-		VAR v: LONGINT;
+		VAR v: SIGNED32;
 	BEGIN v := node^.conval^.intval;
 		IF (OPM.MinSInt <= v) & (v <= OPM.MaxSInt) THEN node^.typ := OPT.sinttyp
 		ELSIF (OPM.MinInt <= v) & (v <= OPM.MaxInt) THEN node^.typ := OPT.inttyp
@@ -239,7 +239,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		END
 	END SetIntType;
 
-	PROCEDURE NewIntConst*(intval: LONGINT): OPT.Node;
+	PROCEDURE NewIntConst*(intval: SIGNED32): OPT.Node;
 		VAR x: OPT.Node;
 	BEGIN
 		x := OPT.NewNode(Nconst); x^.conval := OPT.NewConst();
@@ -254,7 +254,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		RETURN x
 	END NewRealConst;
 
-	PROCEDURE NewString*(VAR str: OPS.String; len: LONGINT): OPT.Node;
+	PROCEDURE NewString*(VAR str: OPS.String; len: SIGNED32): OPT.Node;
 		VAR x: OPT.Node;
 	BEGIN
 		x := OPT.NewNode(Nconst); x^.conval := OPT.NewConst(); x^.typ := OPT.stringtyp;
@@ -368,7 +368,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END TypTest;
 
 	PROCEDURE In*(VAR x: OPT.Node; y: OPT.Node);
-		VAR f: SIGNED16; k: LONGINT;
+		VAR f: SIGNED16; k: SIGNED32;
 	BEGIN f := x^.typ^.form;
 		IF (x^.class = Ntype) OR (x^.class = Nproc) OR (y^.class = Ntype) OR (y^.class = Nproc) THEN err(126)
 		ELSIF (f IN intSet) & (y^.typ^.form = Set) THEN
@@ -385,7 +385,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		x^.typ := OPT.booltyp
 	END In;
 
-	PROCEDURE log(x: LONGINT): LONGINT;
+	PROCEDURE log(x: SIGNED32): SIGNED32;
 	BEGIN exp := 0;
 		IF x > 0 THEN
 			WHILE ~ODD(x) DO x := x DIV 2; INC(exp) END
@@ -436,7 +436,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 					IF f IN intSet + realSet +{Set}THEN
 						IF z^.class = Nconst THEN
 							IF f IN intSet THEN
-								IF z^.conval^.intval = MIN(LONGINT) THEN err(203)
+								IF z^.conval^.intval = MIN(SIGNED32) THEN err(203)
 								ELSE z^.conval^.intval := -z^.conval^.intval; SetIntType(z)
 								END
 							ELSIF f IN realSet THEN z^.conval^.realval := -z^.conval^.realval
@@ -451,7 +451,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 					IF f IN intSet + realSet THEN
 						IF z^.class = Nconst THEN
 							IF f IN intSet THEN
-								IF z^.conval^.intval = MIN(LONGINT) THEN err(203)
+								IF z^.conval^.intval = MIN(SIGNED32) THEN err(203)
 								ELSE z^.conval^.intval := ABS(z^.conval^.intval); SetIntType(z)
 								END
 							ELSE z^.conval^.realval := ABS(z^.conval^.realval)
@@ -587,7 +587,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END CheckProc;
 
 	PROCEDURE ConstOp(op: SIGNED16; x, y: OPT.Node);
-		VAR f, g: SIGNED16; xval, yval: OPT.Const; xv, yv: LONGINT;
+		VAR f, g: SIGNED16; xval, yval: OPT.Const; xv, yv: SIGNED32;
 				temp: BOOLEAN; (* temp avoids err 215 *)
 
 		PROCEDURE ConstCmp(): SIGNED16;
@@ -682,10 +682,10 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		  times:
 				IF f IN intSet THEN xv := xval^.intval; yv := yval^.intval;
 					IF (xv = 0) OR (yv = 0) OR	(* division with negative numbers is not defined *)
-						(xv > 0) & (yv > 0) & (yv <= MAX(LONGINT) DIV xv) OR
-						(xv > 0) & (yv < 0) & (yv >= MIN(LONGINT) DIV xv) OR
-						(xv < 0) & (yv > 0) & (xv >= MIN(LONGINT) DIV yv) OR
-						(xv < 0) & (yv < 0) & (xv # MIN(LONGINT)) & (yv # MIN(LONGINT)) & (-xv <= MAX(LONGINT) DIV (-yv)) THEN
+						(xv > 0) & (yv > 0) & (yv <= MAX(SIGNED32) DIV xv) OR
+						(xv > 0) & (yv < 0) & (yv >= MIN(SIGNED32) DIV xv) OR
+						(xv < 0) & (yv > 0) & (xv >= MIN(SIGNED32) DIV yv) OR
+						(xv < 0) & (yv < 0) & (xv # MIN(SIGNED32)) & (yv # MIN(SIGNED32)) & (-xv <= MAX(SIGNED32) DIV (-yv)) THEN
 						xval^.intval := xv * yv; SetIntType(x)
 					ELSE err(204)
 					END
@@ -739,8 +739,8 @@ MODULE OPB IN Oberon;	(** non-portable *)
 				END
 		| plus:
 				IF f IN intSet THEN
-					temp := (yval^.intval >= 0) & (xval^.intval <= MAX(LONGINT) - yval^.intval);
-					IF temp OR (yval^.intval < 0) & (xval^.intval >= MIN(LONGINT) - yval^.intval) THEN
+					temp := (yval^.intval >= 0) & (xval^.intval <= MAX(SIGNED32) - yval^.intval);
+					IF temp OR (yval^.intval < 0) & (xval^.intval >= MIN(SIGNED32) - yval^.intval) THEN
 							INC(xval^.intval, yval^.intval); SetIntType(x)
 					ELSE err(206)
 					END
@@ -756,8 +756,8 @@ MODULE OPB IN Oberon;	(** non-portable *)
 				END
 		| minus:
 				IF f IN intSet THEN
-					IF (yval^.intval >= 0) & (xval^.intval >= MIN(LONGINT) + yval^.intval) OR
-						(yval^.intval < 0) & (xval^.intval <= MAX(LONGINT) + yval^.intval) THEN
+					IF (yval^.intval >= 0) & (xval^.intval >= MIN(SIGNED32) + yval^.intval) OR
+						(yval^.intval < 0) & (xval^.intval <= MAX(SIGNED32) + yval^.intval) THEN
 							DEC(xval^.intval, yval^.intval); SetIntType(x)
 					ELSE err(207)
 					END
@@ -800,7 +800,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END ConstOp;
 
 	PROCEDURE Convert(VAR x: OPT.Node; typ: OPT.Struct);
-		VAR node: OPT.Node; f, g: SIGNED16; k: LONGINT; r: LONGREAL;
+		VAR node: OPT.Node; f, g: SIGNED16; k: SIGNED32; r: LONGREAL;
 	BEGIN f := x^.typ^.form; g := typ^.form;
 		IF x^.class = Nconst THEN
 			IF f IN intSet THEN
@@ -816,7 +816,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 				IF g IN realSet THEN CheckRealType(g, 203, x^.conval)
 				ELSE (*g = LInt*)
 					r := x^.conval^.realval;
-					IF (r < MIN(LONGINT)) OR (r > MAX(LONGINT)) THEN err(203); r := 1 END ;
+					IF (r < MIN(SIGNED32)) OR (r > MAX(SIGNED32)) THEN err(203); r := 1 END ;
 					x^.conval^.intval := ENTIER(r); SetIntType(x)
 				END
 			ELSE (* (f IN {Char, Byte}) & (g IN {Byte} + intSet) OR (f = Undef) *)
@@ -841,7 +841,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 			IF (typ.form = Real) & (f IN intSet) THEN
 				x := NewRealConst(SYSTEM.VAL (REAL, x.conval.intval), typ);
 			ELSIF (typ.form IN intSet) & (f = Real) THEN
-				r := SHORT(x.conval.realval);  x := NewIntConst(SYSTEM.VAL(LONGINT, r))
+				r := SHORT(x.conval.realval);  x := NewIntConst(SYSTEM.VAL(SIGNED32, r))
 			ELSIF (typ.form IN {SInt, Int}) & (f IN intSet) THEN	(*force sign extension*)
 				IF typ.form = SInt THEN
 					x := NewIntConst (SHORT(SHORT(x.conval.intval)))
@@ -849,7 +849,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 					x := NewIntConst (SHORT(x.conval.intval))
 				END
 			ELSIF (typ.form IN intSet) & (f = Set) THEN
-				x.conval.intval := SYSTEM.VAL(LONGINT, x.conval.setval)
+				x.conval.intval := SYSTEM.VAL(SIGNED32, x.conval.setval)
 			ELSIF (typ.form = Set) & (f IN intSet) THEN
 				x.conval.setval := SYSTEM.VAL(SET, x.conval.intval)
 			ELSE
@@ -871,7 +871,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END Val;
 
 	PROCEDURE Op*(op: SIGNED8; VAR x: OPT.Node; y: OPT.Node);
-		VAR f, g: SIGNED16; t, z: OPT.Node; typ: OPT.Struct; do: BOOLEAN; val: LONGINT;
+		VAR f, g: SIGNED16; t, z: OPT.Node; typ: OPT.Struct; do: BOOLEAN; val: SIGNED32;
 
 		PROCEDURE NewOp(op: SIGNED8; typ: OPT.Struct; VAR x: OPT.Node; y: OPT.Node);
 			VAR node: OPT.Node;
@@ -1056,7 +1056,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END Op;
 
 	PROCEDURE SetRange*(VAR x: OPT.Node; y: OPT.Node);
-		VAR k, l: LONGINT;
+		VAR k, l: SIGNED32;
 	BEGIN
 		IF (x^.class = Ntype) OR (x^.class = Nproc) OR (y^.class = Ntype) OR (y^.class = Nproc) THEN err(126)
 		ELSIF (x^.typ^.form IN intSet) & (y^.typ^.form IN intSet) THEN
@@ -1082,7 +1082,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END SetRange;
 
 	PROCEDURE SetElem*(VAR x: OPT.Node);
-		VAR k: LONGINT;
+		VAR k: SIGNED32;
 	BEGIN
 		IF (x^.class = Ntype) OR (x^.class = Nproc) THEN err(126)
 		ELSIF ~(x^.typ^.form IN intSet) THEN err(93)
@@ -1416,7 +1416,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END StPar0;
 
 	PROCEDURE StPar1*(VAR par0: OPT.Node; x: OPT.Node; fctno: SIGNED8);	(* x: second parameter of standard proc *)
-		VAR f, L: SIGNED16; typ: OPT.Struct; p, t: OPT.Node; i: LONGINT;
+		VAR f, L: SIGNED16; typ: OPT.Struct; p, t: OPT.Node; i: SIGNED32;
 
 		PROCEDURE NewOp(class, subcl: SIGNED8; left, right: OPT.Node): OPT.Node;
 			VAR node: OPT.Node;
@@ -1478,7 +1478,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 					IF (p^.class = Nconst) & (x^.class = Nconst) THEN
 						IF (-maxExp > x^.conval^.intval) OR (x^.conval^.intval > maxExp) THEN err(208); p^.conval^.intval := 1
 						ELSIF x^.conval^.intval >= 0 THEN
-							IF ABS(p^.conval^.intval) <= MAX(LONGINT) DIV ASH(1, x^.conval^.intval) THEN
+							IF ABS(p^.conval^.intval) <= MAX(SIGNED32) DIV ASH(1, x^.conval^.intval) THEN
 								p^.conval^.intval := p^.conval^.intval * ASH(1, x^.conval^.intval)
 							ELSE err(208); p^.conval^.intval := 1
 							END
@@ -1809,7 +1809,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		END
 	END Param;
 
-	PROCEDURE StaticLink*(dlev: LONGINT);
+	PROCEDURE StaticLink*(dlev: SIGNED32);
 		VAR scope: OPT.Object;
 	BEGIN
 		scope := OPT.topScope;
@@ -1820,7 +1820,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END StaticLink;
 
 	PROCEDURE Call*(VAR x: OPT.Node; apar: OPT.Node; fp: OPT.Object);
-		VAR typ: OPT.Struct; p: OPT.Node; lev: LONGINT;
+		VAR typ: OPT.Struct; p: OPT.Node; lev: SIGNED32;
 	BEGIN
 		IF x^.class = Nproc THEN typ := x^.typ;
 			lev := x^.obj^.mnolev;
@@ -1934,7 +1934,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END Inittd;
 
 BEGIN
-	maxExp := log(MAX(LONGINT) DIV 2 + 1); maxExp := exp;
+	maxExp := log(MAX(SIGNED32) DIV 2 + 1); maxExp := exp;
 	verify:=NIL
 
 END OPB.

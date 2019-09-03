@@ -21,7 +21,7 @@ TYPE
    Frame* = POINTER TO FrameDesc;
    DrawCharHook = PROCEDURE (c: CHAR; x,y,dviWidth: LONGREAL; F: Frame);
    FrameDesc* = RECORD(Gadgets.FrameDesc)
-      pageNo: LONGINT;
+      pageNo: SIGNED32;
       zoom: REAL; conv: LONGREAL;
       hOffset,vOffset: LONGREAL;
       b,l,h,w: SIGNED16;
@@ -177,7 +177,7 @@ VAR
       w,h,depth,lines: SIGNED16;
       str: ARRAY End+2 OF CHAR;
       hex: SIGNED16; (* hex=-1 means that we're waiting for the first digit *)
-      val: SIGNED16; base,bytesPerColumn,i: LONGINT;
+      val: SIGNED16; base,bytesPerColumn,i: SIGNED32;
 
       PROCEDURE EatWhiteSpace(): BOOLEAN;
       (* returns true iff eof is not readched *)
@@ -269,7 +269,7 @@ VAR
    END ReadPSPreview;
 
    PROCEDURE ParseSpecial(M: DVIFiles.File; VAR r: Files.Rider;
-      pageNo,len: LONGINT): DVIFiles.Special;
+      pageNo,len: SIGNED32): DVIFiles.Special;
    CONST
       PSMsg = "Error parsing 'PSfile' special.";
       (* tokens we expect in a general special: *)
@@ -281,7 +281,7 @@ VAR
    VAR
       tok: SIGNED16; (* current token *)
       str: POINTER TO ARRAY OF CHAR; (* string used in GetToken below *)
-      n: LONGINT; (* integer used in GetToken below *)
+      n: SIGNED32; (* integer used in GetToken below *)
       seen: SET; (* whether we have seen any of the 'PSfile' identifiers *)
       vals: ARRAY rhi+1 OF REAL; (* values of 'PSfile' identifiers *)
       s: PSFileSpecial;
@@ -412,9 +412,9 @@ VAR
    END ParseSpecial;
 
    PROCEDURE DoSpecial(F: Frame; M: DVIFiles.File; h,v: LONGREAL;
-      VAR r: Files.Rider; len: LONGINT);
+      VAR r: Files.Rider; len: SIGNED32);
    VAR
-      tmp: DVIFiles.Special; s: PSFileSpecial; pos: LONGINT;
+      tmp: DVIFiles.Special; s: PSFileSpecial; pos: SIGNED32;
       ctm: GfxMatrix.Matrix; sc,phi: REAL;
    BEGIN
       pos:= Files.Pos(r);
@@ -474,11 +474,11 @@ VAR
 
    VAR
       r: Files.Rider;
-      cmd: LONGINT;
+      cmd: SIGNED32;
       h,v,w,x,y,z: LONGREAL;
-      fontNo: LONGINT; font: DVIFiles.FontInfo;
+      fontNo: SIGNED32; font: DVIFiles.FontInfo;
       stack: StackElement;
-      a,b,c: LONGINT;
+      a,b,c: SIGNED32;
    BEGIN
       IF ~DVIFiles.GetPage(M,F.pageNo,r) THEN RETURN END;
       F.conv:= GetResolution()/2.54D8*M.mag*M.num/M.den;
@@ -797,7 +797,7 @@ VAR
    (* Message- Handler: *)
    PROCEDURE CheckModels(M: Gadgets.UpdateMsg; F: Frame);
    (* Check whether the zoom- and page-number models changed. *)
-   VAR z,p: Objects.Object; r: REAL; n: LONGINT;
+   VAR z,p: Objects.Object; r: REAL; n: SIGNED32;
    BEGIN
       Links.GetLink(F,"PageNumber",p);
       IF M.obj = p THEN
@@ -957,7 +957,7 @@ VAR
      w,h,oldZoom: REAL; oldHOff,oldVOff: LONGREAL;
      name: ARRAY 64 OF CHAR;
      oldDrawChar: DrawCharHook;
-     oldPageNo,i: LONGINT;
+     oldPageNo,i: SIGNED32;
    BEGIN
      v:= CurrentDVIViewer();
      IF v = NIL THEN RETURN END; f:= v.obj(DVIFiles.File);

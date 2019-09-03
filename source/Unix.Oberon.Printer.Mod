@@ -31,7 +31,7 @@ TYPE
 			Height*, Width*, Depth*
 				: SIGNED16;  (** Page size (in printer pixels), and available colors (bit depth) **)
 			FrameX*, FrameY*, FrameW*, FrameH*: SIGNED16;   (** Prinatble region of the page. *)
-			Unit*	: LONGINT;   (** Printer resolution in 1/36000 mm per pixel. *)
+			Unit*	: SIGNED32;   (** Printer resolution in 1/36000 mm per pixel. *)
 
 			InitMetrics*	: PROCEDURE ( P: Printer );
 			Open*	: PROCEDURE ( P: Printer;  printer, options: ARRAY OF CHAR );
@@ -67,11 +67,11 @@ TYPE
 VAR
 	Height*, Width*, Depth*: SIGNED16;   (** In printer pixels, and bit depth *)
 	FrameX*, FrameY*, FrameW*, FrameH*: SIGNED16;   (** Printable area. *)
-	Unit*: LONGINT;   (** Printer resolution in 1/36000 mm per pixel. *)
+	Unit*: SIGNED32;   (** Printer resolution in 1/36000 mm per pixel. *)
 	res*: SIGNED16;   (** result code. 0 = ok, 1 = no such printer, 2 = no link, 3 = printer not ready, 4 = no permission *)
 	current*: Printer;   (** Current active printer. (read-only) *)
-	spool: SpoolList;  W: Texts.Writer;  task: Oberon.Task;  timeslice: LONGINT;
-	spoollength, spoolpos: LONGINT;   (* view with System.State Printer *)
+	spool: SpoolList;  W: Texts.Writer;  task: Oberon.Task;  timeslice: SIGNED32;
+	spoollength, spoolpos: SIGNED32;   (* view with System.State Printer *)
 
 	PROCEDURE LoadDefaultPrinter;
 	VAR defMod, defCmd: ARRAY 64 OF CHAR;

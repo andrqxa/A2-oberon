@@ -11,7 +11,7 @@ BEGIN
 END FixpToFloat;
 
 (* converts a float into a 16.16 fixpoint integer *)
-PROCEDURE FloatToFixp*(x: REAL): LONGINT;
+PROCEDURE FloatToFixp*(x: REAL): SIGNED32;
 BEGIN
 	IF x > FIXPOINT THEN RETURN FIXPOINT;
 	ELSIF x < -FIXPOINT THEN RETURN -FIXPOINT
@@ -19,7 +19,7 @@ BEGIN
 	END;
 END FloatToFixp;
 
-PROCEDURE Int*(fp1616: LONGINT) : LONGINT;
+PROCEDURE Int*(fp1616: SIGNED32) : SIGNED32;
 BEGIN
 	RETURN fp1616 DIV FIXPOINT
 END Int;
@@ -27,13 +27,13 @@ END Int;
 (* addition / subtraction just do it *)
 
 (* mulitplicates 2 Fixpoint Numbers *)
-PROCEDURE Mult*(x, y: LONGINT): LONGINT;
+PROCEDURE Mult*(x, y: SIGNED32): SIGNED32;
 BEGIN
 	RETURN (ENTIER(FixpToFloat(x)*y));
 END Mult;
 
 (* division of 2 fixpoint NUmbers *)
-PROCEDURE Div*(x, y: LONGINT): LONGINT;
+PROCEDURE Div*(x, y: SIGNED32): SIGNED32;
 BEGIN
 	RETURN (ENTIER(x/FixpToFloat(y)));
 END Div;

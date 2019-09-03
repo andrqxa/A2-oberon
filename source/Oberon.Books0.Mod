@@ -32,7 +32,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 		END;
 			(* local to a given tutorial *)
 		LocFrameDesc* = RECORD (FrameDesc)
-			pos1*, pos2*: LONGINT
+			pos1*, pos2*: SIGNED32
 		END;
 			(* external to a given tutorial *)
 		ExtFrameDesc* = RECORD (FrameDesc)
@@ -43,7 +43,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 		ImpListDesc* = RECORD
 			name*: ARRAY nameLen OF CHAR;
 			notes*: Texts.Text;
-			ind*: LONGINT;
+			ind*: SIGNED32;
 			extLabels*: ExtLabel;
 			next*: ImpList
 		END;
@@ -54,7 +54,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 			book*: ImpList;
 			name*: ARRAY identLen OF CHAR;
 			mode*: SIGNED8;
-			pos1*, pos2*: LONGINT;
+			pos1*, pos2*: SIGNED32;
 			next*: ExtLabel
 		END;
 
@@ -67,7 +67,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 		(* contents-Gadget *)
 		ContElemDesc* = RECORD (Gadgets.FrameDesc)
 			mode*: SIGNED8;
-			beg*, end*: LONGINT;
+			beg*, end*: SIGNED32;
 			col: SIGNED16;
 		END;
 
@@ -91,7 +91,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 		VAR
 			lF: LocFrame;
 			eF: ExtFrame;
-			ind: LONGINT;
+			ind: SIGNED32;
 			name: ARRAY identLen OF CHAR;
 		(* fixup an external frame, ind = index into import-list *)
 		PROCEDURE Fixup(E: ExtFrame);
@@ -400,7 +400,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 
 (* insert or append any Gadgets.Frame to a Texts.Text *)
 
-	PROCEDURE InsertFrame*(T: Texts.Text; pos: LONGINT; obj: Gadgets.Frame);
+	PROCEDURE InsertFrame*(T: Texts.Text; pos: SIGNED32; obj: Gadgets.Frame);
 		VAR W: Texts.Writer;
 	BEGIN
 		Texts.OpenWriter(W);

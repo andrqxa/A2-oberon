@@ -31,7 +31,7 @@ TYPE
 	END;
 
 	Integer* = RECORD(Any)
-		value* : LONGINT;
+		value* : SIGNED32;
 	END;
 
 	Hugeint* = RECORD(Any)
@@ -172,16 +172,16 @@ BEGIN
 	END;
 END SetBoolean;
 
-PROCEDURE GetInteger*(CONST source : Any; VAR value : LONGINT; VAR res : WORD);
+PROCEDURE GetInteger*(CONST source : Any; VAR value : SIGNED32; VAR res : WORD);
 VAR integer : Integer;
 BEGIN
 	res := Ok;
 	IF (source IS Integer) THEN
 		value := source(Integer).value;
 	ELSIF (source IS Hugeint) THEN
-		value := source(Hugeint).value(LONGINT);
+		value := source(Hugeint).value(SIGNED32);
 	ELSIF (source IS Size) THEN
-		value := source(Size).value(LONGINT);
+		value := source(Size).value(SIGNED32);
 	ELSIF (source IS Real) THEN
 		value := ENTIER(source(Real).value);
 	ELSIF (source IS Longreal) THEN
@@ -212,7 +212,7 @@ BEGIN
 	END;
 END GetInteger;
 
-PROCEDURE SetInteger*(VAR target : Any; value : LONGINT;  VAR res : WORD);
+PROCEDURE SetInteger*(VAR target : Any; value : SIGNED32;  VAR res : WORD);
 VAR integer : Integer;
 BEGIN
 	res := Ok;
@@ -300,7 +300,7 @@ VAR hugeint : Hugeint;
 BEGIN
 	res := Ok;
 	IF (target IS Integer) THEN
-		target(Integer).value := value(LONGINT);
+		target(Integer).value := value(SIGNED32);
 	ELSIF (target IS Hugeint) THEN
 		target(Hugeint).value := value;
 	ELSIF (target IS Size) THEN
@@ -383,7 +383,7 @@ VAR size : Size;
 BEGIN
 	res := Ok;
 	IF (target IS Integer) THEN
-		target(Integer).value := value(LONGINT);
+		target(Integer).value := value(SIGNED32);
 	ELSIF (target IS Hugeint) THEN
 		target(Hugeint).value := value;
 	ELSIF (target IS Size) THEN
@@ -1245,7 +1245,7 @@ BEGIN
 	s[i] := 0X;
 END CleanString;
 
-PROCEDURE FloatToString*(r: LONGREAL; fractionalDigits: LONGINT; VAR s: ARRAY OF CHAR);
+PROCEDURE FloatToString*(r: LONGREAL; fractionalDigits: SIGNED32; VAR s: ARRAY OF CHAR);
 BEGIN
 	Strings.FloatToStr(r, 0, fractionalDigits, 0, s);
 	CleanString(s);

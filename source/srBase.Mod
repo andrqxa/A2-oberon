@@ -112,11 +112,11 @@ PROCEDURE probe*(x,y,z: SREAL):Voxel;
 BEGIN
 	RETURN(SELF);
 END probe;
-PROCEDURE stroke*( p:PT; level: LONGINT; normal:PT; color: COLOR; mirror: BOOLEAN);
+PROCEDURE stroke*( p:PT; level: SIGNED32; normal:PT; color: COLOR; mirror: BOOLEAN);
 END stroke;
-PROCEDURE strokevoxel*(p:PT; level: LONGINT; voxel:Voxel);
+PROCEDURE strokevoxel*(p:PT; level: SIGNED32; voxel:Voxel);
 END strokevoxel;
-PROCEDURE linevoxel*(a,b: PT; level: LONGINT; v: Voxel);
+PROCEDURE linevoxel*(a,b: PT; level: SIGNED32; v: Voxel);
 END linevoxel;
 PROCEDURE setcamera*(x,y,z: SREAL);
 END setcamera;
@@ -163,8 +163,8 @@ VAR
 	voxelist: ARRAY 100 OF V;
 	fog*:REAL;
 	rlimit*: SIGNED16;
-	iterlimit*: LONGINT;
-	frame*: LONGINT;
+	iterlimit*: SIGNED32;
+	frame*: SIGNED32;
 	img*: Raster.Image;
 	copy*: Raster.Mode;
 	light*: Light;
@@ -439,7 +439,7 @@ END Exit;
 
 PROCEDURE filterlinear1*(VAR img:  IMAGE);
 VAR
-	i,j:LONGINT;
+	i,j:SIGNED32;
 	lr,lg,lb,r,g,b: SREAL;
 BEGIN
 	FOR i:= 0 TO W-1 DO
@@ -454,7 +454,7 @@ END filterlinear1;
 
 PROCEDURE filterlinear2*(VAR img:  IMAGE);
 VAR
-	i,j:LONGINT;
+	i,j:SIGNED32;
 	lr,lg,lb,r,g,b: SREAL;
 BEGIN
 	FOR j:= 0 TO H-1 DO

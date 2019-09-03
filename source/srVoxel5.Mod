@@ -50,7 +50,7 @@ END SetBackColor;
 PROCEDURE Shade*(VAR ray: Ray);
 VAR
 	lx, ly, dot: SREAL;
-	i,j,nx,ny,nz: LONGINT;
+	i,j,nx,ny,nz: SIGNED32;
 	inside, swastika: BOOLEAN;
 BEGIN
 	CASE ray.face OF

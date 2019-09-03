@@ -20,12 +20,12 @@ TYPE
 
 	Connection = POINTER TO RECORD
 			error: BOOLEAN;
-			errorcode: LONGINT;
+			errorcode: SIGNED32;
 			out: Streams.Writer;
 			in: Streams.Reader;
-			msgSize: LONGINT;
-			cmd: LONGINT;
-			flags: LONGINT;
+			msgSize: SIGNED32;
+			cmd: SIGNED32;
+			flags: SIGNED32;
 			flags2: SIGNED16;
 			tid: SIGNED16;
 			pid: SIGNED16;
@@ -345,7 +345,7 @@ END HandleDeleteDir;
 
 PROCEDURE HandleEcho(c: Connection);
 VAR
-	i: LONGINT; len: SIZE;
+	i: SIGNED32; len: SIZE;
 	byteCount, echoCount: SIGNED16;
 	buffer: ARRAY 32 OF CHAR;
 BEGIN
@@ -401,7 +401,7 @@ END HandleTrans;
 PROCEDURE HandleRead(c: Connection);
 VAR
 	fidToRead, maxCount: SIGNED16;
-	offset: LONGINT; len: SIZE;
+	offset: SIGNED32; len: SIZE;
 	f: Files.File;
 	r: Files.Reader;
 	buffer: ARRAY 65536 OF CHAR;
@@ -461,7 +461,7 @@ END HandleRead;
 PROCEDURE HandleWrite(c: Connection);
 VAR
 	fidToWrite, count : SIGNED16;
-	offset: LONGINT; len: SIZE; res: WORD;
+	offset: SIGNED32; len: SIZE; res: WORD;
 	buffer: ARRAY 65536 OF CHAR;
 	filename: ARRAY 256 OF CHAR;
 	f: Files.File;
@@ -529,7 +529,7 @@ END HandleWrite;
 PROCEDURE HandleWriteAndX(c: Connection);
 VAR
 	fidToWrite, byteCount, dataOffset: SIGNED16;
-	offset: LONGINT; len: SIZE;
+	offset: SIGNED32; len: SIZE;
 	f: Files.File;
 	w: Files.Writer;
 	buffer: ARRAY 65536 OF CHAR;
@@ -596,7 +596,7 @@ VAR
 	filename: ARRAY 256 OF CHAR;
 	i: SIGNED16;
 	f: Files.File;
-	t,d: LONGINT;
+	t,d: SIGNED32;
 	dTime: Dates.DateTime;
 BEGIN
 	IF Trace THEN KernelLog.String("Handle Query Information: "); KernelLog.Int(c.cmd, 0); KernelLog.Ln(); END;
@@ -629,7 +629,7 @@ BEGIN
 			dTime := Dates.OberonToDateTime(d,t);
 			GetUnixTimeStamp(dTime, t);
 			c.out.RawLInt(t);		(* last write *)
-			c.out.RawLInt(f.Length()(LONGINT));		(* file size *)
+			c.out.RawLInt(f.Length()(SIGNED32));		(* file size *)
 		ELSE
 			c.out.RawLInt(0);		(* last write *)
 			c.out.RawLInt(0);		(* file size *)
@@ -660,7 +660,7 @@ PROCEDURE HandleOpenOld(c: Connection);
 VAR
 	filename: ARRAY 256 OF CHAR;
 	f: Files.File;
-	d,t : LONGINT;
+	d,t : SIGNED32;
 	dTime: Dates.DateTime;
 BEGIN
 	IF Trace THEN KernelLog.String("Handle Open (old) File: "); KernelLog.Int(c.cmd, 0); KernelLog.Ln(); END;
@@ -696,7 +696,7 @@ BEGIN
 		dTime := Dates.OberonToDateTime(d,t);
 		GetUnixTimeStamp(dTime, t);
 		c.out.RawLInt(t);		(* last write *)
-		c.out.RawLInt(f.Length()(LONGINT));			(* datasize *)
+		c.out.RawLInt(f.Length()(SIGNED32));			(* datasize *)
 		c.out.RawInt(0);			(* granted access *)
 		c.out.RawInt(0);			(* bytecount *)
 		c.out.Update();
@@ -717,12 +717,12 @@ END HandleOpenOld;
 
 PROCEDURE HandleNegotiate(VAR c: Connection);
 VAR
-	variable: LONGINT;
+	variable: SIGNED32;
 	name: ARRAY 64 OF CHAR;
 	support: BOOLEAN;
 	size: SIZE;
 	dialectIndex: SIGNED16;
-	t: ARRAY 2 OF LONGINT;
+	t: ARRAY 2 OF SIGNED32;
 BEGIN
 	support := FALSE;
 	size := c.msgSize;
@@ -935,7 +935,7 @@ VAR
 	byteCount, openFunc: SIGNED16;
 	filename: ARRAY 256 OF CHAR;
 	f: Files.File;
-	t,d: LONGINT;
+	t,d: SIGNED32;
 	dTime: Dates.DateTime;
 BEGIN
 	IF Trace THEN KernelLog.String("Handle Open: "); KernelLog.Int(c.cmd, 0); KernelLog.Ln(); END;
@@ -981,7 +981,7 @@ BEGIN
 			dTime := Dates.OberonToDateTime(d,t);
 			GetUnixTimeStamp(dTime, t);
 			c.out.RawLInt(t);		(* last write *)
-			c.out.RawLInt(f.Length()(LONGINT));		(* file size *)
+			c.out.RawLInt(f.Length()(SIGNED32));		(* file size *)
 		ELSE
 			c.out.RawLInt(0);		(* last write *)
 			c.out.RawLInt(0);		(* file size *)
@@ -1014,7 +1014,7 @@ BEGIN
 		c.out.RawInt(0H);
 		GetUnixTimeStamp(Dates.Now(), t);
 		c.out.RawLInt(t);		(* last write *)
-		c.out.RawLInt(f.Length()(LONGINT));		 (* filesize *)
+		c.out.RawLInt(f.Length()(SIGNED32));		 (* filesize *)
 		c.out.RawInt(0);			(* granted access *)
 		c.out.RawInt(0);			(* filetype *)
 		c.out.RawInt(0);			(* ipc state *)
@@ -1186,7 +1186,7 @@ VAR
 	filename: ARRAY 256 OF CHAR;
 	fid: SIGNED16;
 	f: Files.File;
-	t,d: LONGINT;
+	t,d: SIGNED32;
 	dTime: Dates.DateTime;
 BEGIN
 	IF Trace THEN KernelLog.String("Handle Query Information 2: "); KernelLog.Int(c.cmd, 0); KernelLog.Ln(); END;
@@ -1212,8 +1212,8 @@ BEGIN
 		dTime := Dates.OberonToDateTime(d,t);
 		GetDOSTimeStamp(dTime, t);
 		c.out.RawLInt(t);		(* last write *)
-		c.out.RawLInt(f.Length()(LONGINT));		(* file data size *)
-		c.out.RawLInt(f.Length()(LONGINT));		(* file alloc *)
+		c.out.RawLInt(f.Length()(SIGNED32));		(* file data size *)
+		c.out.RawLInt(f.Length()(SIGNED32));		(* file alloc *)
 		c.out.RawInt(0);		(* attr *)
 		c.out.RawInt(0);		(* byte count *)
 		c.out.Update();
@@ -1268,13 +1268,13 @@ VAR
 	enum: Files.Enumerator;
 	eName, fullName, pathname, prefix, pattern, resumeFn, modPat: ARRAY 256 OF CHAR;
 	eFlags, flags : SET;
-	eTime, eDate : LONGINT;
+	eTime, eDate : SIGNED32;
 	eSize : Files.Size;
 	success, eos: BOOLEAN;
 	i,j,z, searchCount, totalFileNameLen, lastlen, loi, sidnext: SIGNED16;
 	f: Files.File;
-	tarray: ARRAY 2 OF LONGINT;
-	t,d: LONGINT;
+	tarray: ARRAY 2 OF SIGNED32;
+	t,d: SIGNED32;
 	dTime: Dates.DateTime;
 BEGIN
 	IF (subcmd = 7)  THEN
@@ -1311,7 +1311,7 @@ BEGIN
 		c.out.RawInt(12 + SIGNED16(Strings.Length(FileSystem) + 1));
 		c.out.RawLInt(32);
 		c.out.RawLInt(64);
-		c.out.RawLInt(LONGINT(Strings.Length(FileSystem) + 1));
+		c.out.RawLInt(SIGNED32(Strings.Length(FileSystem) + 1));
 		c.out.RawString(FileSystem);
 		c.out.Update();
 	ELSIF (subcmd = 5)  THEN
@@ -1389,7 +1389,7 @@ BEGIN
 		END;
 
 		c.out.RawLInt(0);		(* ea list *)
-		c.out.RawLInt(LONGINT(Strings.Length(eName)));		(* filename len*)
+		c.out.RawLInt(SIGNED32(Strings.Length(eName)));		(* filename len*)
 		c.out.RawString(eName);		(* file name*)
 		c.out.Update();
 	ELSIF (subcmd = 1) THEN
@@ -1510,7 +1510,7 @@ BEGIN
 				f := Files.Old(eName);
 
 				IF loi = 260 THEN
-					c.out.RawLInt(96 + LONGINT(Strings.Length(eName)));		(* next entry offset *)
+					c.out.RawLInt(96 + SIGNED32(Strings.Length(eName)));		(* next entry offset *)
 					c.out.RawLInt(0);		(* file index*)
 					c.out.RawLInt(0);		(* created *)
 					c.out.RawLInt(0);		(* created *)
@@ -1531,7 +1531,7 @@ BEGIN
 					c.out.RawLInt(0);		(* change *)
 
 					IF (f # NIL) THEN
-						c.out.RawLInt(f.Length()(LONGINT));		(* eof *)
+						c.out.RawLInt(f.Length()(SIGNED32));		(* eof *)
 						c.out.RawLInt(0);		(* eof *)
 					ELSE
 						c.out.RawLInt(0);		(* eof *)
@@ -1539,7 +1539,7 @@ BEGIN
 					END;
 
 					IF (f # NIL) THEN
-						c.out.RawLInt(f.Length()(LONGINT));		(* alloc *)
+						c.out.RawLInt(f.Length()(SIGNED32));		(* alloc *)
 					ELSE
 						c.out.RawLInt(0);		(* alloc *)
 					END;
@@ -1548,8 +1548,8 @@ BEGIN
 					flags := {};
 					IF (Files.Directory IN eFlags) THEN INCL(flags, 4); END;
 					IF (Files.ReadOnly IN eFlags) THEN INCL(flags, 0) END;
-					c.out.RawLInt(SYSTEM.VAL(LONGINT, flags));		(* file attr *)
-					c.out.RawLInt(1 + LONGINT(Strings.Length(eName)));		(* filename len *)
+					c.out.RawLInt(SYSTEM.VAL(SIGNED32, flags));		(* file attr *)
+					c.out.RawLInt(1 + SIGNED32(Strings.Length(eName)));		(* filename len *)
 					c.out.RawLInt(0);		(* ea list *)
 					c.out.RawSInt(0);		(* short fn len *)
 					c.out.RawSInt(0);		(* reserved *)
@@ -1570,8 +1570,8 @@ BEGIN
 						dTime := Dates.OberonToDateTime(d,t);
 						GetUnixTimeStamp(dTime, t);
 						c.out.RawLInt(t);		(* last write *)
-						c.out.RawLInt(f.Length()(LONGINT));		(* data size *)
-						c.out.RawLInt(f.Length()(LONGINT));		(* alloc size *)
+						c.out.RawLInt(f.Length()(SIGNED32));		(* data size *)
+						c.out.RawLInt(f.Length()(SIGNED32));		(* alloc size *)
 					ELSE
 						c.out.RawLInt(0);		(* last write *)
 						c.out.RawLInt(0);
@@ -1701,7 +1701,7 @@ BEGIN
 				f := Files.Old(eName);
 
 				IF loi = 260 THEN
-					c.out.RawLInt(96 + LONGINT(Strings.Length(eName)));		(* next entry offset *)
+					c.out.RawLInt(96 + SIGNED32(Strings.Length(eName)));		(* next entry offset *)
 					c.out.RawLInt(0);		(* file index*)
 					c.out.RawLInt(0);		(* created *)
 					c.out.RawLInt(0);		(* created *)
@@ -1723,9 +1723,9 @@ BEGIN
 					c.out.RawLInt(0);		(* change *)
 
 					IF (f # NIL) THEN
-						c.out.RawLInt(f.Length()(LONGINT));		(* eof *)
+						c.out.RawLInt(f.Length()(SIGNED32));		(* eof *)
 						c.out.RawLInt(0);		(* eof *)
-						c.out.RawLInt(f.Length()(LONGINT));		(* alloc *)
+						c.out.RawLInt(f.Length()(SIGNED32));		(* alloc *)
 						c.out.RawLInt(0);		(* alloc *)
 					ELSE
 						c.out.RawLInt(0);		(* eof *)
@@ -1737,9 +1737,9 @@ BEGIN
 					flags := {};
 					IF (Files.Directory IN eFlags) THEN INCL(flags, 4); END;
 					IF (Files.ReadOnly IN eFlags) THEN INCL(flags, 0) END;
-					c.out.RawLInt(SYSTEM.VAL(LONGINT, flags));		(* file attr *)
+					c.out.RawLInt(SYSTEM.VAL(SIGNED32, flags));		(* file attr *)
 
-					c.out.RawLInt(1 + LONGINT(Strings.Length(eName)));		(* filename len *)
+					c.out.RawLInt(1 + SIGNED32(Strings.Length(eName)));		(* filename len *)
 					c.out.RawLInt(0);		(* ea list *)
 					c.out.RawSInt(0);		(* short fn len *)
 					c.out.RawSInt(0);		(* reserved *)
@@ -1760,14 +1760,14 @@ BEGIN
 						dTime := Dates.OberonToDateTime(d,t);
 						GetUnixTimeStamp(dTime, t);
 						c.out.RawLInt(t);		(* last write *)
-						c.out.RawLInt(f.Length()(LONGINT));		(* data size *)
+						c.out.RawLInt(f.Length()(SIGNED32));		(* data size *)
 					ELSE
 						c.out.RawLInt(0);		(* last write *)
 						c.out.RawLInt(0);
 					END;
 
 					IF (f # NIL) THEN
-						c.out.RawLInt(f.Length()(LONGINT));		(* alloc size *)
+						c.out.RawLInt(f.Length()(SIGNED32));		(* alloc size *)
 					ELSE
 						c.out.RawLInt(0);
 					END;
@@ -1826,7 +1826,7 @@ END WriteSMBHeader;
 
 PROCEDURE CheckSMBHeader(VAR c: Connection): BOOLEAN;
 VAR
-	variable: LONGINT;
+	variable: SIGNED32;
 BEGIN
 	c.in.SkipBytes(2);
 	c.msgSize := c.in.Net16();	(* NetBios length *)
@@ -1857,7 +1857,7 @@ END CheckSMBHeader;
 
 PROCEDURE ReplaceSlash(VAR name: ARRAY OF CHAR);
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 BEGIN
 	i := 0;
 	WHILE (i < Strings.Length(name)) DO
@@ -1870,7 +1870,7 @@ END ReplaceSlash;
 
 PROCEDURE RemoveQuotes(VAR name: ARRAY OF CHAR);
 VAR
-	i,j: LONGINT;
+	i,j: SIGNED32;
 	newName: ARRAY 256 OF CHAR;
 BEGIN
 	i := 0;
@@ -1889,7 +1889,7 @@ END RemoveQuotes;
 
 PROCEDURE RemoveSlash(VAR name: ARRAY OF CHAR);
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 BEGIN
 	i := 1;
 	WHILE (i <= Strings.Length(name)) DO
@@ -1998,10 +1998,10 @@ BEGIN {EXCLUSIVE}
 	END;
 END ListShares;
 
-PROCEDURE GetSMBTimeStamp(dtNow:Dates.DateTime; VAR t: ARRAY OF LONGINT);
+PROCEDURE GetSMBTimeStamp(dtNow:Dates.DateTime; VAR t: ARRAY OF SIGNED32);
 VAR
 	dtOld : Dates.DateTime;
-	diffDay, diffHour, diffMinute, diffSecond: LONGINT;
+	diffDay, diffHour, diffMinute, diffSecond: SIGNED32;
 	tsNow : HUGEINT;
 BEGIN
 	dtOld.year := 1601;
@@ -2017,10 +2017,10 @@ BEGIN
 	t[1] := SHORT(tsNow DIV 100000000H);
 END GetSMBTimeStamp;
 
-PROCEDURE GetUnixTimeStamp(dtNow: Dates.DateTime; VAR t: LONGINT);
+PROCEDURE GetUnixTimeStamp(dtNow: Dates.DateTime; VAR t: SIGNED32);
 VAR
 	dtOld : Dates.DateTime;
-	diffDay, diffHour, diffMinute, diffSecond: LONGINT;
+	diffDay, diffHour, diffMinute, diffSecond: SIGNED32;
 BEGIN
 	dtOld.year := 1970;
 	dtOld.month := 1;
@@ -2032,9 +2032,9 @@ BEGIN
 	t := diffDay * 86400 + diffHour * 3600 + diffMinute * 60 + diffSecond;
 END GetUnixTimeStamp;
 
-PROCEDURE GetDOSTimeStamp(dtNow: Dates.DateTime; VAR t: LONGINT);
+PROCEDURE GetDOSTimeStamp(dtNow: Dates.DateTime; VAR t: SIGNED32);
 VAR
-	hour, minute, second, year, month, day: LONGINT;
+	hour, minute, second, year, month, day: SIGNED32;
 BEGIN
 	hour := ASH(dtNow.hour, 27);
 	minute := ASH(dtNow.minute, 21);

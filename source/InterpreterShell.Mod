@@ -122,14 +122,14 @@ TYPE
 		next: Alias;
 	END;
 
-	NotifyProcedure* = PROCEDURE {DELEGATE} (command : LONGINT);
+	NotifyProcedure* = PROCEDURE {DELEGATE} (command : SIGNED32);
 
 TYPE
 
 	(*
 	Blocker* = OBJECT (Streams.Writer)
 	VAR
-		interpreter: Interpreter.Interpreter; i: LONGINT;
+		interpreter: Interpreter.Interpreter; i: SIGNED32;
 		parser: Interpreter.Parser;
 		reader-: Streams.Reader;
 		writer-: Streams.Writer;
@@ -178,7 +178,7 @@ TYPE
 		context: Commands.Context;
 		command: ARRAY MaxLen OF CHAR;
 		res: WORD;
-		nestingLevel : LONGINT; (* how many shells run in this shell? *)
+		nestingLevel : SIGNED32; (* how many shells run in this shell? *)
 		aliases: Alias;
 		prompt: ARRAY 32 OF CHAR;
 		seenCR: CHAR;
@@ -312,7 +312,7 @@ TYPE
 		PROCEDURE ReadCommand(w: Streams.Writer);
 		VAR
 			ch: CHAR;
-			currentIndex : LONGINT;
+			currentIndex : SIGNED32;
 
 			PROCEDURE IsAsciiCharacter(ch : CHAR) : BOOLEAN;
 			BEGIN
@@ -418,8 +418,8 @@ TYPE
 		END ReadCommand;
 		*)
 		(*
-		PROCEDURE Parse(VAR cmd: Command; VAR wait: BOOLEAN): LONGINT;
-		VAR sym: SET; pos: LONGINT; c, next: CHAR;
+		PROCEDURE Parse(VAR cmd: Command; VAR wait: BOOLEAN): SIGNED32;
+		VAR sym: SET; pos: SIGNED32; c, next: CHAR;
 
 			PROCEDURE Init;
 			BEGIN
@@ -452,7 +452,7 @@ TYPE
 			END Skip;
 
 			PROCEDURE Token(VAR s: ARRAY OF CHAR; cond: SET): BOOLEAN;
-			VAR i: LONGINT; quote: BOOLEAN;
+			VAR i: SIGNED32; quote: BOOLEAN;
 			BEGIN
 				quote := FALSE;
 				WHILE (sym * cond = {}) OR (quote & (sym # eoln)) DO
@@ -463,7 +463,7 @@ TYPE
 			END Token;
 
 			PROCEDURE Cmd(): Command;
-			VAR i: LONGINT; cmd: Command; arg : Streams.StringReader;
+			VAR i: SIGNED32; cmd: Command; arg : Streams.StringReader;
 			BEGIN Skip;
 				IF (sym = char) THEN
 					NEW(cmd);
@@ -483,7 +483,7 @@ TYPE
 				RETURN cmd
 			END Cmd;
 
-			PROCEDURE CmdLine(VAR command: Command): LONGINT;
+			PROCEDURE CmdLine(VAR command: Command): SIGNED32;
 			VAR cmd, prev: Command; fn: Files.FileName; f: Files.File; fr: Files.Reader; fw: Files.Writer;
 				r: Streams.Reader; w: Streams.Writer; append, piped: BOOLEAN; s: ARRAY 64 OF CHAR;
 			BEGIN
@@ -578,7 +578,7 @@ TYPE
 		END Parse;
 	*)
 		PROCEDURE ReadAlias(cmd : Command; verbose : BOOLEAN);
-		VAR s: ARRAY MaxLen OF CHAR; alias, p, q: Alias; i, k: LONGINT; c: CHAR;
+		VAR s: ARRAY MaxLen OF CHAR; alias, p, q: Alias; i, k: SIGNED32; c: CHAR;
 		BEGIN
 			IF (cmd.parameters # "") THEN
 				COPY(cmd.parameters, s);
@@ -627,7 +627,7 @@ TYPE
 		END ReadAlias;
 		(*
 		PROCEDURE ReplaceAlias(cmd: Command): BOOLEAN;
-		VAR a: Alias; d, i: LONGINT;
+		VAR a: Alias; d, i: SIGNED32;
 		BEGIN
 			a := aliases;
 			WHILE (a # NIL) & (a.alias < cmd.command) DO a := a.next END;
@@ -728,11 +728,11 @@ TYPE
 
 	StringType = POINTER TO ARRAY OF CHAR;
 	Reader* = OBJECT (Streams.Reader)
-	VAR length : LONGINT;
+	VAR length : SIGNED32;
 			data : StringType;
 			rofs: SIZE;
 
-		PROCEDURE &Init*(initialSize : LONGINT);
+		PROCEDURE &Init*(initialSize : SIGNED32);
 		BEGIN
 			IF initialSize < 256 THEN initialSize := 256 END;
 			NEW(data, initialSize); length := 0; rofs := 0;

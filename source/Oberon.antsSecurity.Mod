@@ -83,7 +83,7 @@ VAR
 
 	PROCEDURE Stop*; END Stop;
 
-	PROCEDURE OpenScript* (t: Texts.Text; pos, num: LONGINT; executorObj, context: Objects.Object): BOOLEAN; BEGIN RETURN FALSE END OpenScript;
+	PROCEDURE OpenScript* (t: Texts.Text; pos, num: SIGNED32; executorObj, context: Objects.Object): BOOLEAN; BEGIN RETURN FALSE END OpenScript;
 
 	PROCEDURE SetProgress* (i: SIGNED16); END SetProgress; (* for interactive visualization of progress *)
 
@@ -193,7 +193,7 @@ SYSTEM.GET(ADDRESSOF(Exceptions.displayTrap),oldtrapper); trapName := "Cause: Sy
 END Test2;
 
 PROCEDURE Test3*;
-VAR ok,keys: SET; x,y: SIGNED16;time : LONGINT;
+VAR ok,keys: SET; x,y: SIGNED16;time : SIGNED32;
 BEGIN
 HALT(99);
 END Test3;
@@ -232,14 +232,14 @@ HALT(100);
 END TestTrap;
 
 PROCEDURE Time*;
-VAR time: LONGINT; i: LONGREAL;
+VAR time: SIGNED32; i: LONGREAL;
 BEGIN
 time := Oberon.Time()+Input.TimeUnit;
 WHILE Oberon.Time() < time DO
 i := i+1;
 END;
 Out.LongReal(i,30);
-Out.Int(MAX(LONGINT) DIV 2 DIV 1000,20);
+Out.Int(MAX(SIGNED32) DIV 2 DIV 1000,20);
 END Time;
 
 PROCEDURE Test*;

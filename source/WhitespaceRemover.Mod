@@ -101,7 +101,7 @@ VAR
 	enum : Files.Enumerator;
 	filename : Files.FileName;
 	fileflags : SET;
-	time, date : LONGINT;
+	time, date : SIGNED32;
 	size : Files.Size;
 	nofRemovedTotal: SIZE; res : WORD;
 	nofFiles, nofErrors : SIZE;

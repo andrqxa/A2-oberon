@@ -509,7 +509,7 @@ TYPE
 	END HashTableInt;
 
 	HashEntrySegmentedName = RECORD
-		key: ObjectFile.SegmentedName; (* key[0]= MIN(LONGINT) <=> empty *)
+		key: ObjectFile.SegmentedName; (* key[0]= MIN(SIGNED32) <=> empty *)
 		value: ANY;
 	END;
 	HashSegmentedNameArray = POINTER TO ARRAY OF HashEntrySegmentedName;
@@ -601,7 +601,7 @@ TYPE
 			Init(size*2);
 			FOR i := 0 TO oldSize-1 DO
 				key := oldTable[i].key;
-				IF key[0] # MIN(LONGINT) THEN
+				IF key[0] # MIN(SIGNED32) THEN
 					IF oldTable[i].value # NIL THEN
 						Put(key, oldTable[i].value);
 					END;
@@ -616,7 +616,7 @@ TYPE
 
 	Writer* = OBJECT (Streams.Writer)
 	VAR
-		indent-: LONGINT;
+		indent-: SIGNED32;
 		doindent: BOOLEAN;
 		w-: Streams.Writer;
 
@@ -650,7 +650,7 @@ TYPE
 		END Pos;
 
 		PROCEDURE Indent;
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			IF doindent THEN
 				FOR i := 0 TO indent-1 DO
@@ -676,7 +676,7 @@ TYPE
 		BEGIN  w.RawInt(x)
 		END RawInt;
 
-		PROCEDURE RawLInt*( x: LONGINT );
+		PROCEDURE RawLInt*( x: SIGNED32 );
 		BEGIN  w.RawLInt(x)
 		END RawLInt;
 
@@ -684,15 +684,15 @@ TYPE
 		BEGIN  w.RawHInt(x)
 		END RawHInt;
 
-		PROCEDURE Net32*( x: LONGINT );
+		PROCEDURE Net32*( x: SIGNED32 );
 		BEGIN  w.Net32(x)
 		END Net32;
 
-		PROCEDURE Net16*( x: LONGINT );
+		PROCEDURE Net16*( x: SIGNED32 );
 		BEGIN  w.Net16(x)
 		END Net16;
 
-		PROCEDURE Net8*( x: LONGINT );
+		PROCEDURE Net8*( x: SIGNED32 );
 		BEGIN  w.Net8(x)
 		END Net8;
 
@@ -744,23 +744,23 @@ TYPE
 		BEGIN Indent; w.Address(x)
 		END Address;
 
-		PROCEDURE Date*( t, d: LONGINT );
+		PROCEDURE Date*( t, d: SIGNED32 );
 		BEGIN Indent; w.Date(t,d)
 		END Date;
 
-		PROCEDURE Date822*( t, d, tz: LONGINT );
+		PROCEDURE Date822*( t, d, tz: SIGNED32 );
 		BEGIN Indent; w.Date822(t,d,tz)
 		END Date822;
 
-		PROCEDURE Float*( x: LONGREAL;  n: LONGINT );
+		PROCEDURE Float*( x: LONGREAL;  n: SIGNED32 );
 		BEGIN Indent; w.Float(x,n)
 		END Float;
 
-		PROCEDURE FloatFix*( x: LONGREAL;  n, f, D: LONGINT );
+		PROCEDURE FloatFix*( x: LONGREAL;  n, f, D: SIGNED32 );
 		BEGIN Indent; w.FloatFix(x,n,f,D)
 		END FloatFix;
 
-		PROCEDURE SetIndent*(i: LONGINT);
+		PROCEDURE SetIndent*(i: SIGNED32);
 		BEGIN
 			indent := i
 		END SetIndent;
@@ -1213,7 +1213,7 @@ VAR
 		UNTIL ch = 0X;
 	END Uppercase;
 
-	PROCEDURE GetIntegerObj*(value: LONGINT):ANY;
+	PROCEDURE GetIntegerObj*(value: SIGNED32):ANY;
 	VAR obj: IntegerObject;
 	BEGIN
 		IF integerObjects.Has(value) THEN
@@ -1261,7 +1261,7 @@ VAR
 
 	PROCEDURE GetFileReader*(CONST filename: ARRAY OF CHAR): Streams.Reader;
 	VAR
-		file: Files.File; fileReader: Files.Reader; offset: LONGINT;
+		file: Files.File; fileReader: Files.Reader; offset: SIGNED32;
 	BEGIN
 		(* Optimisation: skip header of oberon files and return a file reader instead of default text reader*)
 		file := Files.Old (filename);
@@ -1365,7 +1365,7 @@ VAR
 		RETURN message
 	END MessageSS;
 
-	PROCEDURE MessageI*(CONST format: ARRAY OF CHAR; i0: LONGINT): MessageString;
+	PROCEDURE MessageI*(CONST format: ARRAY OF CHAR; i0: SIGNED32): MessageString;
 	VAR message: MessageString; number: ARRAY 32 OF CHAR;
 	BEGIN
 		COPY(format, message);
@@ -1373,7 +1373,7 @@ VAR
 		Replace(message,"%0",number);
 	END MessageI;
 
-	PROCEDURE MessageSI*(CONST format: ARRAY OF CHAR; CONST s0: ARRAY OF CHAR; i1: LONGINT): MessageString;
+	PROCEDURE MessageSI*(CONST format: ARRAY OF CHAR; CONST s0: ARRAY OF CHAR; i1: SIGNED32): MessageString;
 	VAR message: MessageString; number: ARRAY 32 OF CHAR;
 	BEGIN
 		COPY(format, message);

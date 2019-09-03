@@ -15,7 +15,7 @@ CONST
 	LnType* = LnCRLF;
 
 TYPE
-	Int = LONGINT;
+	Int = SIGNED32;
 
 	StringType* = ARRAY OF CHAR;
 	LongString* = ARRAY 2048 OF CHAR;

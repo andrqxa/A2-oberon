@@ -7,7 +7,7 @@ MODULE PrinterInfo IN Oberon; (** portable *)	(* ejz  *)
 	VAR
 		W: Texts.Writer;
 
-	PROCEDURE Int(name: ARRAY OF CHAR; val: LONGINT);
+	PROCEDURE Int(name: ARRAY OF CHAR; val: SIGNED32);
 		VAR obj: Objects.Object;
 	BEGIN
 		obj := Gadgets.FindObj(Gadgets.context, name);
@@ -18,7 +18,7 @@ MODULE PrinterInfo IN Oberon; (** portable *)	(* ejz  *)
 	END Int;
 
 	PROCEDURE FixedStr(val: REAL; VAR str: ARRAY OF CHAR);
-		VAR v, i: LONGINT;
+		VAR v, i: SIGNED32;
 	BEGIN
 		v := ENTIER(val*100.0+0.5); i := 1;
 		IF v >= 1000 THEN
@@ -59,7 +59,7 @@ MODULE PrinterInfo IN Oberon; (** portable *)	(* ejz  *)
 	PROCEDURE unit(VAR cm: BOOLEAN);
 		VAR
 			obj: Objects.Object;
-			i: LONGINT;
+			i: SIGNED32;
 	BEGIN
 		obj := Gadgets.FindObj(Gadgets.context, "unit");
 		IF obj # NIL THEN
@@ -140,7 +140,7 @@ MODULE PrinterInfo IN Oberon; (** portable *)	(* ejz  *)
 			str: ARRAY 256 OF CHAR;
 			printer: ARRAY 64 OF CHAR;
 			P: Printer.Printer;
-			t, d: LONGINT;
+			t, d: SIGNED32;
 			pict: Pictures.Picture;
 			cm1, cm4, left, left1, left2, FrameTop, y, dy, i, r, g, b: SIGNED16;
 			cm: BOOLEAN;

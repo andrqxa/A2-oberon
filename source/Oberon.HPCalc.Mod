@@ -85,7 +85,7 @@ MODULE HPCalc IN Oberon;	(** portable *)	(** prk  **)
 		o DROP command inserted (PS proposal)
 
 	1.1 / 04.06.96 prk
-		o changed the stack. Uses Reals and BIT instead of SYSTEM to convert to and from LONGINT
+		o changed the stack. Uses Reals and BIT instead of SYSTEM to convert to and from SIGNED32
 		o View modes (Decimal or Hex) inserted
 		o Name changed to HPCalc
 		o Output fields are now locked
@@ -123,8 +123,8 @@ TYPE
 
 	CalcModel = POINTER TO CalcModelDesc;
 	CalcModelDesc = RECORD (Gadgets.ObjDesc)
-		Stack: ARRAY StackSize OF LONGINT;
-		TOS: LONGINT;
+		Stack: ARRAY StackSize OF SIGNED32;
+		TOS: SIGNED32;
 		Mode, Base: SIGNED8;
 		Status: SIGNED8;
 		SubPanel: Objects.Object;	(* functions displayed, used to remove the functions *)
@@ -153,7 +153,7 @@ VAR
 
 (* ---------------------- Stack Handling Functions ----------------- *)
 
-PROCEDURE Push(m: CalcModel; i: LONGINT);	(* push to the stack *)
+PROCEDURE Push(m: CalcModel; i: SIGNED32);	(* push to the stack *)
 BEGIN
 	m.Stack[m.TOS] := i;
 	IF m.TOS < StackSize-1 THEN INC(m.TOS)
@@ -161,36 +161,36 @@ BEGIN
 	END
 END Push;
 
-PROCEDURE Pop(m: CalcModel; VAR i: LONGINT);	(* pop from the stack *)
+PROCEDURE Pop(m: CalcModel; VAR i: SIGNED32);	(* pop from the stack *)
 BEGIN
 	IF m.TOS > 0 THEN DEC(m.TOS); i := m.Stack[m.TOS]
 	ELSE m.Status := Error
 	END
 END Pop;
 
-PROCEDURE PushI(m: CalcModel; i: LONGINT);	(* push Longint from the stack *)
+PROCEDURE PushI(m: CalcModel; i: SIGNED32);	(* push Longint from the stack *)
 BEGIN	Push (m, i); Push (m, 0)
 END PushI;
 
-PROCEDURE PopI(m: CalcModel; VAR i: LONGINT);	(* pop Longint from the stack *)
-	VAR dummy: LONGINT;
+PROCEDURE PopI(m: CalcModel; VAR i: SIGNED32);	(* pop Longint from the stack *)
+	VAR dummy: SIGNED32;
 BEGIN	Pop (m, dummy); Pop (m, i)
 END PopI;
 
 PROCEDURE PushR(m: CalcModel; r: LONGREAL);	(* push Longreal on the stack *)
-	VAR h, l: LONGINT;
+	VAR h, l: SIGNED32;
 BEGIN
 	Reals.IntL (r, h, l); Push (m, h); Push (m, l)
 END PushR;
 
 PROCEDURE PopR(m: CalcModel; VAR r: LONGREAL);	(* pop Longreal from the stack *)
-	VAR h, l: LONGINT;
+	VAR h, l: SIGNED32;
 BEGIN
 	Pop (m, l); Pop (m, h); r := Reals.RealL (h, l)
 END PopR;
 
 PROCEDURE RotateStack (m: CalcModel);
-	VAR i, h, l: LONGINT;
+	VAR i, h, l: SIGNED32;
 BEGIN
 	IF (m.TOS <= 2) THEN RETURN END;	(* to few elements!! *)
 	h := m.Stack[0]; l := m.Stack[1];
@@ -222,9 +222,9 @@ BEGIN
 END ResetModel;
 
 PROCEDURE ChangeMode (m: CalcModel; from, to: SIGNED8);
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 
-	PROCEDURE Convert (VAR h, l: LONGINT);
+	PROCEDURE Convert (VAR h, l: SIGNED32);
 		VAR r: LONGREAL;
 	BEGIN
 		IF (from = Real) & (to = Integer) THEN
@@ -244,7 +244,7 @@ BEGIN
 END ChangeMode;
 
 PROCEDURE GetModelValue (F: CalcModel; pos: SIGNED16; VAR s: ARRAY OF CHAR): SIGNED16;	(* get textual value from stack *)
-	VAR	lr: LONGREAL; l, h: LONGINT;
+	VAR	lr: LONGREAL; l, h: SIGNED32;
 BEGIN
 	(* Check Range *)
 	IF (F.TOS <= pos*2) THEN
@@ -340,9 +340,9 @@ BEGIN
 	IF FN = "ABS" THEN
 		PopR (m, b); r := ABS (b)
 	ELSIF FN = "MAXL" THEN
-		r := MAX(LONGINT)
+		r := MAX(SIGNED32)
 	ELSIF FN = "MINL" THEN
-		r := MIN(LONGINT)
+		r := MIN(SIGNED32)
 	ELSIF FN = "SIN" THEN
 		PopR (m, b); r := MathL.sin (b)
 	ELSIF FN= "COS" THEN
@@ -397,14 +397,14 @@ BEGIN
 END DoRealFunction;
 
 PROCEDURE DoIntegerFunction (m: CalcModel; VAR FN: ARRAY OF CHAR);
-	VAR a, b, r: LONGINT;
+	VAR a, b, r: SIGNED32;
 BEGIN
 	IF FN = "+" THEN
 		PopI (m, b); PopI (m, a); r := a+b
 	ELSIF FN = "MAXL" THEN
-		r := MAX(LONGINT)
+		r := MAX(SIGNED32)
 	ELSIF FN = "MINL" THEN
-		r := MIN(LONGINT)
+		r := MIN(SIGNED32)
 	ELSIF FN = "-" THEN
 		PopI (m, b); PopI (m, a); r := a-b
 	ELSIF FN = "*" THEN
@@ -441,7 +441,7 @@ BEGIN
 END DoIntegerFunction;
 
 PROCEDURE Calc;
-	VAR r, r1: LONGREAL; tmp: ARRAY 64 OF CHAR; j, l: LONGINT; hex, number: BOOLEAN; ch: CHAR; R: Texts.Reader;
+	VAR r, r1: LONGREAL; tmp: ARRAY 64 OF CHAR; j, l: SIGNED32; hex, number: BOOLEAN; ch: CHAR; R: Texts.Reader;
 		m: CalcModel; o, dlink: Objects.Object;
 
 	PROCEDURE Read;

@@ -170,7 +170,7 @@ END ClearAvoid;
 
 (* convert from HSV to RGB.  0 < H < 360, 0 < S,V < 1, 0 < R, G, B < 256  *)
 PROCEDURE HSV2RGB(H, S, V: REAL; VAR R, G, B: SIGNED16);
-VAR f, p, q, t, r, g, b: REAL; i: LONGINT;
+VAR f, p, q, t, r, g, b: REAL; i: SIGNED32;
 BEGIN
 	IF S = 0 THEN r := V; g := V; b := V
 	ELSE
@@ -362,7 +362,7 @@ END UpdateRotor;
 
 (* rotate the figure, draw the points *)
 PROCEDURE Step;
-VAR pro, orp, a, cx, sx, cy, sy, cz, sz: REAL; p, q, g: SIGNED16; ticks: LONGINT;
+VAR pro, orp, a, cx, sx, cy, sy, cz, sz: REAL; p, q, g: SIGNED16; ticks: SIGNED32;
 BEGIN
 	IF Time THEN ticks := Oberon.Time() END;
 	(* update the rotation *)

@@ -5,7 +5,7 @@ IMPORT Gfx, GfxBuffer, GfxRaster, GfxMatrix, GfxRegions, Raster, Strings, WMGrap
 TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 	VAR
 		gfxContext-: GfxBuffer.Context;
-		fillColor: LONGINT;
+		fillColor: SIGNED32;
 		gfxStrokeColor: Gfx.Color;
 		gfxFillColor: Gfx.Color;
 		gfxLineWidth: REAL;
@@ -63,7 +63,7 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 		END SetDashLength;
 
 		(* set fill/font color*)
-		PROCEDURE SetFillColor*(fillColor:LONGINT);
+		PROCEDURE SetFillColor*(fillColor:SIGNED32);
 		BEGIN
 			IF fillColor#SELF.fillColor THEN
 				SELF.fillColor := fillColor;
@@ -84,7 +84,7 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 
 		PROCEDURE GfxColorToColor(gfxColor:Gfx.Color):WMGraphics.Color;
 		BEGIN
-			RETURN LONGINT (((HUGEINT(gfxColor.r*100H)+gfxColor.g)*100H+gfxColor.b)*100H+gfxColor.a)
+			RETURN SIGNED32 (((HUGEINT(gfxColor.r*100H)+gfxColor.g)*100H+gfxColor.b)*100H+gfxColor.a)
 		END GfxColorToColor;
 
 		(* ????
@@ -111,7 +111,7 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 		END Line;
 
 		(** draw circle in requested mode (clockwise if r > 0, counterclockwise if r < 0) **)
-		PROCEDURE Circle(x,y,r:LONGINT); (*tentative -this method will be changed*)
+		PROCEDURE Circle(x,y,r:SIGNED32); (*tentative -this method will be changed*)
 		BEGIN
 			Gfx.DrawCircle(gfxContext, x,y,r, {Gfx.Stroke});
 		END Circle;

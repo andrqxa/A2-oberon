@@ -34,13 +34,13 @@ VAR
 	sbeg, send, errorvar : SIGNED16;
 	sdfa : RXA.DFA;
 	stext : Texts.Text;
-	stextpos, slinelen : LONGINT;
+	stextpos, slinelen : SIGNED32;
 	sline : ARRAY(nofline+1) OF CHAR;
 	sreplaced, casesens, replset : BOOLEAN;
 	replstr : ARRAY(nofrepl+1) OF CHAR;
 	ch : CHAR;
 
-PROCEDURE GetCaret(VAR f: Display.Frame;  VAR t: Texts.Text; VAR pos: LONGINT);
+PROCEDURE GetCaret(VAR f: Display.Frame;  VAR t: Texts.Text; VAR pos: SIGNED32);
 VAR M: Oberon.CaretMsg;
 BEGIN
 	M.id := Oberon.get; M.text := NIL;
@@ -48,7 +48,7 @@ BEGIN
 	f := M.car; t := M.text; pos := M.pos
 END GetCaret;
 
-PROCEDURE SetSelection(f: Display.Frame; t: Texts.Text; beg, end: LONGINT);
+PROCEDURE SetSelection(f: Display.Frame; t: Texts.Text; beg, end: SIGNED32);
 VAR SM: Oberon.SelectMsg;  CM: Oberon.CaretMsg;
 BEGIN
 	SM.id := Oberon.set; SM.sel := f; SM.text := t; SM.beg := beg; SM.end := end; SM.time := -1;
@@ -274,13 +274,13 @@ BEGIN
 	IF errorvar # noerror THEN RXErrorHandler("replace pattern"); END;
 END SetReplace;
 
-PROCEDURE SearchPattern( text : Texts.Text; textpos : LONGINT );
+PROCEDURE SearchPattern( text : Texts.Text; textpos : SIGNED32 );
 	VAR
 	r : Texts.Reader;
 	beg, end, lineind : SIGNED16;
 	ch : CHAR;
 	line : ARRAY(nofline+1) OF CHAR;
-	linelen : LONGINT;
+	linelen : SIGNED32;
 	linefull : BOOLEAN;
 
 PROCEDURE Append( chr : CHAR );
@@ -325,7 +325,7 @@ PROCEDURE Search*;
 	VAR
 		frame: Display.Frame;
 		text: Texts.Text;
-		textpos : LONGINT;
+		textpos : SIGNED32;
 BEGIN
 	errorvar := noerror;
 	GetCaret(frame, text, textpos);
@@ -345,7 +345,7 @@ PROCEDURE Replace*;
 		error, pos, i : SIGNED16;
 		frame: Display.Frame;
 		text: Texts.Text;
-		textpos : LONGINT;
+		textpos : SIGNED32;
 BEGIN
 	IF ( ~sreplaced ) & replset THEN
 		GetCaret(frame, text, textpos);
@@ -377,7 +377,7 @@ END Replace;
 (* Save a text to a file. *)
 PROCEDURE storeToFile(t: Texts.Text; name: ARRAY OF CHAR);
 VAR
-	f: Files.File; R: Files.Rider; len: LONGINT;
+	f: Files.File; R: Files.Rider; len: SIGNED32;
 BEGIN
 	f := Files.New(name);
 	Files.Set(R, f, 0);
@@ -388,7 +388,7 @@ END storeToFile;
 (* Get text and optional name: * ,  ^ , 1{<filename>} ~ *)
 PROCEDURE textName(VAR text: Texts.Text; VAR name: ARRAY OF CHAR;
 									VAR first, last: BOOLEAN; VAR S: Texts.Scanner): BOOLEAN;
-VAR beg, end, time: LONGINT;
+VAR beg, end, time: SIGNED32;
 
 PROCEDURE openText(VAR textName: ARRAY OF CHAR): BOOLEAN;
 BEGIN
@@ -442,7 +442,7 @@ END textName;
 PROCEDURE ReplaceAll*;
 	VAR
 		text: Texts.Text;
-		textpos : LONGINT;
+		textpos : SIGNED32;
 		error, pos, i : SIGNED16;
 		name: ARRAY 128 OF CHAR;
 		lastArg, firstArg: BOOLEAN;

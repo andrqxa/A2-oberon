@@ -36,7 +36,7 @@ TYPE
 
 	Estimator = POINTER TO EstimatorDesc;
 	EstimatorDesc = RECORD (vyBase.ObjDesc)
-		lowdim, highdim: LONGINT;
+		lowdim, highdim: SIGNED32;
 		Isotropic: vyLinks.Link;   (*antsNeighbourhoods.Neighbours will be Inserted in this queue*)
 		NonIsotropic: vyLinks.Link;
 		nisoAIC, isoAIC: vyBase.tVector;
@@ -46,12 +46,12 @@ TYPE
 	END;
 
 VAR
-	tempO: antsArrayObjects.tINTEGERObject;  tempDim: LONGINT;  tx-, ty-, tw-, th-: LONGINT;
-	temptable: POINTER TO ARRAY OF ARRAY OF LONGINT;
+	tempO: antsArrayObjects.tINTEGERObject;  tempDim: SIGNED32;  tx-, ty-, tw-, th-: SIGNED32;
+	temptable: POINTER TO ARRAY OF ARRAY OF SIGNED32;
 	n: antsNeighbourhoods.Neighbours;
 
-	PROCEDURE tabelize( o: antsArrayObjects.tINTEGERObject;  dim: LONGINT );
-	VAR x, y, i, j, k: LONGINT;  pos: LONGINT;  px, py: LONGINT;  val: LONGINT; xx,yy: LONGINT;
+	PROCEDURE tabelize( o: antsArrayObjects.tINTEGERObject;  dim: SIGNED32 );
+	VAR x, y, i, j, k: SIGNED32;  pos: SIGNED32;  px, py: SIGNED32;  val: SIGNED32; xx,yy: SIGNED32;
 	BEGIN
 		IF (temptable = NIL ) OR (LEN( temptable^ ) # tw * th) OR (LEN( temptable[0] ) # dim + 1) THEN NEW( temptable, tw * th, dim + 1 ) END;
 		FOR x := tx TO tx + tw - 1 DO
@@ -70,16 +70,16 @@ VAR
 		END;
 	END tabelize;
 
-	PROCEDURE Calc( pos: LONGINT;  dim: LONGINT;  par: ARRAY OF LONGREAL ): LONGREAL;
-	VAR theta: LONGREAL;  k: LONGINT;
+	PROCEDURE Calc( pos: SIGNED32;  dim: SIGNED32;  par: ARRAY OF LONGREAL ): LONGREAL;
+	VAR theta: LONGREAL;  k: SIGNED32;
 	BEGIN
 		theta := 0;
 		FOR k := 1 TO dim DO theta := theta + par[k] * temptable[pos, k];  END;
 		theta := theta + par[0];  RETURN -(theta * temptable[pos, 0]) + MathL.ln( MathL.exp( theta ) + MathL.exp( -theta ) );
 	END Calc;
 
-	PROCEDURE IsingPMLE( o: antsArrayObjects.tObject;  dim: LONGINT;  par: ARRAY OF LONGREAL ): LONGREAL;
-	VAR pos: LONGINT;  ret: LONGREAL;
+	PROCEDURE IsingPMLE( o: antsArrayObjects.tObject;  dim: SIGNED32;  par: ARRAY OF LONGREAL ): LONGREAL;
+	VAR pos: SIGNED32;  ret: LONGREAL;
 	BEGIN
 		ret := 0;
 		FOR pos := 0 TO (tw * th) - 1 DO ret := ret + Calc( pos, dim, par );  END;
@@ -125,7 +125,7 @@ VAR
 
 	PROCEDURE HandleLinkMsg( l: vyLinks.Link;  name: ARRAY OF CHAR;  VAR M: Objects.LinkMsg );
 	VAR lname: ARRAY 256 OF CHAR;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		IF M.id = Objects.enum THEN
 			i := 1;
@@ -201,8 +201,8 @@ VAR
 	END Gen;
 
 	PROCEDURE NewEstimator*;
-	VAR l: antsCommands.tScanList;  lowdim, highdim: LONGINT;  name, name2: vyName.tNameArray;
-		n: antsNeighbourhoods.Neighbours;  i: LONGINT;  e: Estimator;  dim: LONGINT;
+	VAR l: antsCommands.tScanList;  lowdim, highdim: SIGNED32;  name, name2: vyName.tNameArray;
+		n: antsNeighbourhoods.Neighbours;  i: SIGNED32;  e: Estimator;  dim: SIGNED32;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME lowestdim=INT highestdim=INT " );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectNumberFromKeyword( l, "lowestdim", lowdim ) &
@@ -223,8 +223,8 @@ VAR
 	END NewEstimator;
 
 	PROCEDURE Estimate*;
-	VAR l: antsCommands.tScanList;  obj, obj1: vyBase.Object;  ni, nn, lastni, lastnn: antsNeighbourhoods.Neighbours;  j: LONGINT;
-		listi, listn: vyLinks.Link;  e: Estimator;  dim: LONGINT;  init: BOOLEAN;  fret, fret2: LONGREAL;  miniso, minniso: LONGREAL;
+	VAR l: antsCommands.tScanList;  obj, obj1: vyBase.Object;  ni, nn, lastni, lastnn: antsNeighbourhoods.Neighbours;  j: SIGNED32;
+		listi, listn: vyLinks.Link;  e: Estimator;  dim: SIGNED32;  init: BOOLEAN;  fret, fret2: LONGREAL;  miniso, minniso: LONGREAL;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME from=OBJ [>init] " );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectObjectFromKeyword( l, "from", obj1 ) THEN
@@ -265,7 +265,7 @@ VAR
 	END Estimate;
 
 	PROCEDURE DoShow( e: Estimator );
-	VAR ni, nn: antsNeighbourhoods.Neighbours;  listi, listn: vyLinks.Link;  dim: LONGINT;  mindim, maxdim: LONGINT;
+	VAR ni, nn: antsNeighbourhoods.Neighbours;  listi, listn: vyLinks.Link;  dim: SIGNED32;  mindim, maxdim: SIGNED32;
 		port1, port2: vyPort.Frame;  picture: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  w, h: SIGNED16;  fact: LONGREAL;  width: SIGNED16;
 	BEGIN
 		w := SHORT( e.highdim - e.lowdim + 1 );  h := 1;  width := vyHostTexts.GetCurWidth();

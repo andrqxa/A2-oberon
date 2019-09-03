@@ -28,7 +28,7 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT antsMessages, antsArrayObjects, antsCommands, vyBase, vyLongrealVec := vyRealVec, Math := MathL IN A2, antsDirSet, aM := antsMessages;
 
 VAR
-	v1, v2: vyBase.tVector;  t1d, t2d, ph1, ph2: LONGREAL;  wd, hd: LONGINT;
+	v1, v2: vyBase.tVector;  t1d, t2d, ph1, ph2: LONGREAL;  wd, hd: SIGNED32;
 	t1, t2: POINTER TO ARRAY OF LONGREAL;
 
 	PROCEDURE bin( x: SIGNED16 ): SIGNED16;
@@ -37,7 +37,7 @@ VAR
 	END bin;
 
 	PROCEDURE t1t2*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  x, y: LONGINT;  t1, t2: LONGREAL;  b: BOOLEAN;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  x, y: SIGNED32;  t1, t2: LONGREAL;  b: BOOLEAN;
 	BEGIN
 		l := antsCommands.ScanFromPar( "from=OBJ" );  b := antsCommands.ExpectObjectFromKeyword( l, "from", obj );
 		WITH obj: antsArrayObjects.tINTEGERObject DO
@@ -61,7 +61,7 @@ VAR
 	END Max;
 
 	PROCEDURE est( VAR A: ARRAY OF LONGREAL ): LONGREAL;
-	VAR i: LONGINT;  dd: LONGREAL;  a1, a2: LONGREAL;  max, exp, val: LONGREAL;  len: LONGINT;
+	VAR i: SIGNED32;  dd: LONGREAL;  a1, a2: LONGREAL;  max, exp, val: LONGREAL;  len: SIGNED32;
 	BEGIN
 		a1 := A[0];  a2 := A[1];  len := vyLongrealVec.Len( v1 );
 		ASSERT ( len > 0 );
@@ -80,7 +80,7 @@ VAR
 	END est;
 
 	PROCEDURE DefineValues*;
-	VAR l: antsCommands.tScanList;  obj1, obj2: vyBase.Object;  i: LONGINT;  b: BOOLEAN;
+	VAR l: antsCommands.tScanList;  obj1, obj2: vyBase.Object;  i: SIGNED32;  b: BOOLEAN;
 	BEGIN
 		l := antsCommands.ScanFromPar( "t1=OBJ t2=OBJ t1d=REAL t2d=REAL wd=INT hd=INT ph1=REAL ph2=REAL" );  b := antsCommands.ExpectObjectFromKeyword( l, "t1", obj1 );
 		v1 := obj1( vyBase.tVector );  b := antsCommands.ExpectObjectFromKeyword( l, "t2", obj2 );  v2 := obj2( vyBase.tVector );
@@ -102,7 +102,7 @@ VAR
 	END Estimate;
 
 	PROCEDURE WriteOutInter*;
-	VAR obj: vyBase.Object;  i, j,k : LONGINT;  count, count2: LONGINT;
+	VAR obj: vyBase.Object;  i, j,k : SIGNED32;  count, count2: SIGNED32;
 	BEGIN
 		antsCommands.InitScan( "name=OBJ" );
 		IF antsCommands.ExpectObject( "name", obj ) THEN

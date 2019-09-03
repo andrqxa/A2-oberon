@@ -151,7 +151,7 @@ VAR
 	END ClearBmp;
 
 	PROCEDURE Dot*( x, y: REAL;  mode: SIGNED16 );
-	VAR i, j: LONGINT;  layer: BMPLayer;  pict: vyPort.Picture;  k, k0, k1, l, l0, l1, x1, y1, w, h: SIGNED16;
+	VAR i, j: SIGNED32;  layer: BMPLayer;  pict: vyPort.Picture;  k, k0, k1, l, l0, l1, x1, y1, w, h: SIGNED16;
 	BEGIN
 		IF (x < 0) OR (x > 1) OR (y < 0) OR (y > 1) THEN HALT( 201 );  END;
 		pict := vyPort.GetFocusPicture();  vyPort.GetPictureScreenRegion( pict, x1, y1, w, h );  layer := GetBitmapLayer( pict );
@@ -182,7 +182,7 @@ VAR
 
 	PROCEDURE Line*( FromX, FromY, ToX, ToY: REAL;  mode: SIGNED16 );
 	(*! Old Line renamed to PolyLine *)
-	VAR i, j, i1, j1: LONGINT;  layer: BMPLayer;  pict: vyPort.Picture;  x1, y1, w, h: SIGNED16;
+	VAR i, j, i1, j1: SIGNED32;  layer: BMPLayer;  pict: vyPort.Picture;  x1, y1, w, h: SIGNED16;
 		x, y: REAL;   (*! Hack. remove *)
 	BEGIN
 		x := FromX;  y := FromY;
@@ -198,7 +198,7 @@ VAR
 	END Line;
 
 	PROCEDURE IsDot*( x, y: REAL ): BOOLEAN;
-	VAR mode: SIGNED16;  i, j: LONGINT;  layer: BMPLayer;  pict: vyPort.Picture;  x1, y1, w, h: SIGNED16;
+	VAR mode: SIGNED16;  i, j: SIGNED32;  layer: BMPLayer;  pict: vyPort.Picture;  x1, y1, w, h: SIGNED16;
 	BEGIN
 		pict := vyPort.GetFocusPicture();  vyPort.GetPictureScreenRegion( pict, x1, y1, w, h );  layer := GetBitmapLayer( pict );
 		i := ENTIER( w * x );  j := ENTIER( h * y );

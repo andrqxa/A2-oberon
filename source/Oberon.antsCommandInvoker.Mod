@@ -122,7 +122,7 @@ END InvokeCommand;
 
 PROCEDURE FrameHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
 VAR F2: Frame; x, y, w, h: SIGNED16;
-	keysum: SET; ver: LONGINT; f: Gadgets.Frame; R: Display3.Mask;
+	keysum: SET; ver: SIGNED32; f: Gadgets.Frame; R: Display3.Mask;
 BEGIN
 	WITH F: Frame DO
 		IF M IS Objects.AttrMsg THEN

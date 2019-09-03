@@ -87,7 +87,7 @@ PROCEDURE PrintVisible(F: Frame; obj: Objects.Object): BOOLEAN;
 BEGIN RETURN ~(obj IS Control)
 END PrintVisible;
 
-PROCEDURE FindStyle*(T: Texts.Text; beg: LONGINT): Style;
+PROCEDURE FindStyle*(T: Texts.Text; beg: SIGNED32): Style;
 VAR F: Texts.Finder; obj: Objects.Object; style: Style;
 BEGIN
 	Texts.OpenFinder(F, T, 0); style := NIL;
@@ -250,10 +250,10 @@ BEGIN
 END TabSize;
 
 (* boxes must be inserted in sequence !*)
-PROCEDURE Format(F: TextGadgets0.Frame; org: LONGINT; L: TextGadgets0.Line);
+PROCEDURE Format(F: TextGadgets0.Frame; org: SIGNED32; L: TextGadgets0.Line);
 VAR obj, Tobj: Objects.Object; R: Texts.Reader; ch: CHAR; box: TextGadgets0.Box; style: SET;
 	(* adjust format *)
-	maxW, lastw, lastasr, lastdsr, leftM: SIGNED16; lastlen: LONGINT; lastbox: TextGadgets0.Box;
+	maxW, lastw, lastasr, lastdsr, leftM: SIGNED16; lastlen: SIGNED32; lastbox: TextGadgets0.Box;
 	(* WYSIWYG *)
 	d, odx, dx, pmaxW, devw, pw: SIGNED16;
 
@@ -414,10 +414,10 @@ BEGIN
 	END
 END PrinterTabSize;
 
-PROCEDURE PrintFormat(F: TextGadgets0.Frame; org: LONGINT; L: TextGadgets0.Line; VAR break: BOOLEAN);
+PROCEDURE PrintFormat(F: TextGadgets0.Frame; org: SIGNED32; L: TextGadgets0.Line; VAR break: BOOLEAN);
 VAR obj: Objects.Object; R: Texts.Reader; ch: CHAR; box: TextGadgets0.Box; style: SET;
 	(* adjust format *)
-	pmaxW, lastw, lastasr, lastdsr, leftM: SIGNED16; lastlen: LONGINT; lastbox: TextGadgets0.Box;
+	pmaxW, lastw, lastasr, lastdsr, leftM: SIGNED16; lastlen: SIGNED32; lastbox: TextGadgets0.Box;
 	voff, minY, maxY, odx, oy, oh, dx, sw, maxW: SIGNED16;
 BEGIN
 	WITH F: Frame DO
@@ -560,15 +560,15 @@ BEGIN
 	dummyF := dF; dummydlink := dd; dummyT := dT; dx := a; dy := b; dTx := c; dTy := d; dummyM := dM (* restore *)
 END RestoreFrame;
 
-PROCEDURE DisplayLine(F: TextGadgets0.Frame; M: Display3.Mask; x, y: SIGNED16; org: LONGINT; L: TextGadgets0.Line; dlink: Objects.Object);
-VAR X, Y: SIGNED16; obj: Objects.Object; R: Texts.Reader; ch: CHAR; pos: LONGINT;
+PROCEDURE DisplayLine(F: TextGadgets0.Frame; M: Display3.Mask; x, y: SIGNED16; org: SIGNED32; L: TextGadgets0.Line; dlink: Objects.Object);
+VAR X, Y: SIGNED16; obj: Objects.Object; R: Texts.Reader; ch: CHAR; pos: SIGNED32;
 	RM: Display.ControlMsg; cx, cy, cw, cch: SIGNED16; box: TextGadgets0.Box;
 	(* formatting control *)
 	leftM, offset, width, a, b, dx, d: SIGNED16;
 	spaces: SIGNED16;
 
 	(* optimize *)
-	start: LONGINT;
+	start: SIGNED32;
 BEGIN
 	cx := M.X; cy := M.Y; cw := M.W; cch := M.H;
 	WITH F: Frame DO
@@ -664,8 +664,8 @@ BEGIN
 	M.X := cx; M.Y := cy; M.W := cw; M.H := cch
 END DisplayLine;
 
-PROCEDURE PrintLine(F: TextGadgets0.Frame; M: Display3.Mask; x, y: SIGNED16; org: LONGINT; L: TextGadgets0.Line; dlink: Objects.Object);
-VAR X, Y: SIGNED16; obj: Objects.Object; R: Texts.Reader; ch: CHAR; pos: LONGINT;
+PROCEDURE PrintLine(F: TextGadgets0.Frame; M: Display3.Mask; x, y: SIGNED16; org: SIGNED32; L: TextGadgets0.Line; dlink: Objects.Object);
+VAR X, Y: SIGNED16; obj: Objects.Object; R: Texts.Reader; ch: CHAR; pos: SIGNED32;
 	dx, odx, d: SIGNED16; box: TextGadgets0.Box;
 	(* formatting control *)
 	leftM, offset, width, a, b: SIGNED16;
@@ -756,14 +756,14 @@ BEGIN
 	Put(0X, NIL, 0, 0)
 END PrintLine;
 
-PROCEDURE FindLine(F: TextGadgets0.Frame; y, Y: SIGNED16; VAR org: LONGINT; VAR L: TextGadgets0.Line);
+PROCEDURE FindLine(F: TextGadgets0.Frame; y, Y: SIGNED16; VAR org: SIGNED32; VAR L: TextGadgets0.Line);
 BEGIN
 	L := F.trailer.next; org := F.org;
 	WHILE (L.next # F.trailer) & (Y < y + F.H - 1 + L.base - L.dsr) DO org := org + L.len; L := L.next; END;
 END FindLine;
 
 PROCEDURE LocateChar(F: TextGadgets0.Frame; x, y, X, Y: SIGNED16; VAR loc: TextGadgets0.Loc);
-VAR obj: Objects.Object; ox, dx: SIGNED16; R: Texts.Reader; ch: CHAR; org: LONGINT;
+VAR obj: Objects.Object; ox, dx: SIGNED16; R: Texts.Reader; ch: CHAR; org: SIGNED32;
 	(* format *)
 	leftM, offset, width, a, b, d: SIGNED16;
 BEGIN
@@ -809,8 +809,8 @@ BEGIN
 	END
 END LocateChar;
 
-PROCEDURE LocatePos(F: TextGadgets0.Frame; pos: LONGINT; VAR loc: TextGadgets0.Loc);
-VAR l: TextGadgets0.Line; obj: Objects.Object; dx, ox: SIGNED16; R: Texts.Reader; ch: CHAR; org: LONGINT;
+PROCEDURE LocatePos(F: TextGadgets0.Frame; pos: SIGNED32; VAR loc: TextGadgets0.Loc);
+VAR l: TextGadgets0.Line; obj: Objects.Object; dx, ox: SIGNED16; R: Texts.Reader; ch: CHAR; org: SIGNED32;
 	(* format *)
 	leftM, offset, width, a, b, d: SIGNED16;
 BEGIN
@@ -857,7 +857,7 @@ BEGIN
 END LocatePos;
 
 PROCEDURE LocateString*(F: TextGadgets0.Frame; x, y, X, Y: SIGNED16; VAR loc: TextGadgets0.Loc);
-VAR R: Texts.Reader; ch: CHAR; obj: Objects.Object; lim, bpos, pos, org: LONGINT; L: TextGadgets0.Line;
+VAR R: Texts.Reader; ch: CHAR; obj: Objects.Object; lim, bpos, pos, org: SIGNED32; L: TextGadgets0.Line;
 	bx, ox, ex, dx: SIGNED16;
 	(* format *)
 	leftM, offset, width, a, b, d: SIGNED16;
@@ -931,7 +931,7 @@ BEGIN
 	END
 END LocateString;
 
-  PROCEDURE Call (F: TextGadgets0.Frame; pos: LONGINT; keysum: SET; dlink: Objects.Object);
+  PROCEDURE Call (F: TextGadgets0.Frame; pos: SIGNED32; keysum: SET; dlink: Objects.Object);
     VAR obj: Objects.Object;
     	A: Objects.AttrMsg; R: Texts.Reader; ch: CHAR;
   BEGIN
@@ -966,7 +966,7 @@ BEGIN Gadgets.framehandle(F, M);
 END ForceString;
 
 PROCEDURE HandleStyleAdjust(F: Frame; Sobj: Style);
-VAR f: Texts.Finder; from, pos: LONGINT; obj: Objects.Object;
+VAR f: Texts.Finder; from, pos: SIGNED32; obj: Objects.Object;
 BEGIN
 	from := -1;
 	Texts.OpenFinder(f, F.text, 0);
@@ -1029,7 +1029,7 @@ BEGIN
 	END;
 END FrameAttr;
 
-PROCEDURE ConvertMsg(VAR M: Texts.UpdateMsg; VAR id: SIGNED16; VAR beg, end: LONGINT);
+PROCEDURE ConvertMsg(VAR M: Texts.UpdateMsg; VAR id: SIGNED16; VAR beg, end: SIGNED32);
 (* CONST delete = 2; insert = 1; change = 0; *)
 BEGIN
 	IF M.len = 0 THEN id := delete; beg := M.beg; end := M.end
@@ -1085,7 +1085,7 @@ BEGIN
 END AdjustStyles;
 
 PROCEDURE FrameHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR F0: Frame; style: Style; id: SIGNED16; beg, end, pos: LONGINT; L: TextGadgets0.Line; M0: Texts.UpdateMsg;
+VAR F0: Frame; style: Style; id: SIGNED16; beg, end, pos: SIGNED32; L: TextGadgets0.Line; M0: Texts.UpdateMsg;
 BEGIN
 	WITH F: Frame DO
 		IF M IS Objects.CopyMsg THEN
@@ -1237,7 +1237,7 @@ END NewNote;
 (* ------------------------------- Style code ------------------------------ *)
 
 PROCEDURE StyleAttr(F: Style; VAR M: Objects.AttrMsg);
-VAR i, j, k: SIGNED16; val: LONGINT; nr: ARRAY 6 OF CHAR;
+VAR i, j, k: SIGNED16; val: SIGNED32; nr: ARRAY 6 OF CHAR;
 BEGIN
 	IF M.id = Objects.get THEN
 		IF M.name = "Gen" THEN M.class := Objects.String; COPY("TextGadgets.NewStyleProc", M.s); M.res := 0

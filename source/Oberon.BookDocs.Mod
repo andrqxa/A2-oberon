@@ -29,7 +29,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		(* list of Books0.Frame for printing *)
 		FrameListDesc = RECORD
 			frame: Books0.Frame;
-			page, pos: LONGINT;
+			page, pos: SIGNED32;
 			next: FrameList
 		END;
 
@@ -37,7 +37,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		DocListDesc = RECORD
 			doc: Documents.Document;
 			cur: Books0.TextList;
-			pos: LONGINT;
+			pos: SIGNED32;
 			next: DocList
 		END;
 
@@ -75,14 +75,14 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		printFrames, index: FrameList;
 		(* variables used for printing *)
 		Tcont, T, Tindex, Tnotes: TextGadgets.Frame;
-		pageNr, maxWi, maxWc: LONGINT;
+		pageNr, maxWi, maxWc: SIGNED32;
 		oldW: SIGNED16;
 		prMode: SET;
 		(* global variables for searching *)
 		sPat: ARRAY MaxPatLen OF CHAR;
 		sDv: ARRAY MaxPatLen + 1 OF SIGNED16;
 		sPatLen: SIGNED16;
-		lTime: LONGINT;
+		lTime: SIGNED32;
 		lastDoc: Documents.Document;
 		lastDeep, docList: DocList;
 
@@ -380,7 +380,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END BuildInterface;
 
 	(* write a tutorial-document-file-header *)
-	PROCEDURE WriteHeader*(VAR R: Files.Rider; x, y, w, h: SIGNED16; ind, pos: LONGINT; options: SET; iconStr: ARRAY OF CHAR);
+	PROCEDURE WriteHeader*(VAR R: Files.Rider; x, y, w, h: SIGNED16; ind, pos: SIGNED32; options: SET; iconStr: ARRAY OF CHAR);
 	BEGIN
 		Files.WriteInt(R, Documents.Id);
 		Files.WriteString(R, "BookDocs.NewDoc");
@@ -409,7 +409,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	PROCEDURE SkipHeader*(VAR R: Files.Rider): BOOLEAN;
 		VAR
 			i: SIGNED16;
-			li: LONGINT;
+			li: SIGNED32;
 			name: ARRAY 2*Books0.nameLen OF CHAR;
 			s: SET;
 	BEGIN
@@ -434,7 +434,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		VAR
 			F: Files.File;
 			R: Files.Rider;
-			fix1, fix2, pos, len: LONGINT;
+			fix1, fix2, pos, len: SIGNED32;
 			mode: SIGNED8;
 			el: Books0.ExtLabel;
 			E: ExistImpMsg;
@@ -534,7 +534,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 			R: Files.Rider;
 			name: ARRAY 2*Books0.nameLen OF CHAR;
 			open: ARRAY Books0.identLen OF CHAR;
-			len, ind, pos: LONGINT;
+			len, ind, pos: SIGNED32;
 			t: Books0.TextList;
 			il, oldL: Books0.ImpList;
 			T: Books.TGFrame;
@@ -735,7 +735,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END SearchFrame;
 
 	(* print number at (X, Y) *)
-	PROCEDURE PrintInt(nr: LONGINT; X, Y: SIGNED16);
+	PROCEDURE PrintInt(nr: SIGNED32; X, Y: SIGNED16);
 		VAR
 			str: ARRAY 8 OF CHAR;
 	BEGIN
@@ -744,12 +744,12 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END PrintInt;
 
 	(* overridden PrintLine-"method" for TextGadgets.Frame; translates Books0.Frame to page numbers *)
-	PROCEDURE PrintLine(F: TextGadgets0.Frame; M: Display3.Mask; x, y: SIGNED16; org: LONGINT; L: TextGadgets0.Line; dlink: Objects.Object);
+	PROCEDURE PrintLine(F: TextGadgets0.Frame; M: Display3.Mask; x, y: SIGNED16; org: SIGNED32; L: TextGadgets0.Line; dlink: Objects.Object);
 		VAR
 			Fi: Texts.Finder;
 			obj: Objects.Object;
 			l: FrameList;
-			pos: LONGINT;
+			pos: SIGNED32;
 	BEGIN
 		Texts.OpenFinder(Fi, F.text, org);
 		pos := Fi.pos;
@@ -771,10 +771,10 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END PrintLine;
 
 	(* calculate an absolute position for the ind & pos pair; used for page number fixup *)
-	PROCEDURE AbsPos(P: Books.Panel; ind, pos: LONGINT): LONGINT;
+	PROCEDURE AbsPos(P: Books.Panel; ind, pos: SIGNED32): SIGNED32;
 		VAR
 			t: Books0.TextList;
-			apos: LONGINT;
+			apos: SIGNED32;
 	BEGIN
 		apos := pos;
 		t := P.texts.next;
@@ -787,7 +787,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END AbsPos;
 
 	(* fixup all frames with absolute position >= beg to page number pageNr *)
-	PROCEDURE Fixup(beg, pageNr: LONGINT);
+	PROCEDURE Fixup(beg, pageNr: SIGNED32);
 		VAR lF: FrameList;
 	BEGIN
 		lF := printFrames;
@@ -800,9 +800,9 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END Fixup;
 
 	(* PrintText similar to TextGadgets0.PrintText; calculates page numbers, maximal width *)
-	PROCEDURE PrintText(T: TextGadgets.Frame; print, fix: BOOLEAN; VAR pageNr, maxW: LONGINT);
+	PROCEDURE PrintText(T: TextGadgets.Frame; print, fix: BOOLEAN; VAR pageNr, maxW: SIGNED32);
 		VAR
-			org, oldOrg: LONGINT;
+			org, oldOrg: SIGNED32;
 			L: TextGadgets0.Line;
 			Y: SIGNED16;
 			output: BOOLEAN;
@@ -856,7 +856,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 			lF, lF2, lastF: FrameList;
 			Fi: Texts.Finder;
 			obj: Objects.Object;
-			pos, nr: LONGINT;
+			pos, nr: SIGNED32;
 		PROCEDURE SearchSame(f: Books0.Frame): FrameList;
 			VAR
 				lF: FrameList;
@@ -931,7 +931,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 			lF: FrameList;
 			f: Books0.Frame;
 			style: TextGadgets.Style;
-			nr: LONGINT;
+			nr: SIGNED32;
 	BEGIN
 		Texts.WriteString(Wr, "Appendix: Notes");
 		Texts.WriteLn(Wr); Texts.WriteLn(Wr);
@@ -969,7 +969,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END CopyNotes;
 
 	(* count tabs beginning at beg *)
-	PROCEDURE CountTabs(t: Texts.Text; beg: LONGINT): SIGNED16;
+	PROCEDURE CountTabs(t: Texts.Text; beg: SIGNED32): SIGNED16;
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
@@ -986,7 +986,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END CountTabs;
 
 	(* add nTabs tabs to each line beginning in the text stretch (beg, end) in t *)
-	PROCEDURE AddTabs(t: Texts.Text; beg, end: LONGINT; nTabs: SIGNED16);
+	PROCEDURE AddTabs(t: Texts.Text; beg, end: SIGNED32; nTabs: SIGNED16);
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
@@ -1066,7 +1066,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 			lF: FrameList;
 			tl: Books0.TextList;
 			obj, obj2: Objects.Object;
-			beg, end, oldPageNr, maxW: LONGINT;
+			beg, end, oldPageNr, maxW: SIGNED32;
 			wr: BOOLEAN;
 			R: Texts.Reader;
 			ch: CHAR;
@@ -1274,7 +1274,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	(* print the allready prepared tutorial D *)
 	PROCEDURE DoPrintDoc(D: Documents.Document);
 		VAR
-			p, w: LONGINT;
+			p, w: SIGNED32;
 			m: TextGadgets0.Methods;
 			P: Books.Panel;
 	BEGIN
@@ -1558,7 +1558,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		VAR
 			Fi: Texts.Finder;
 			obj: Objects.Object;
-			pos: LONGINT;
+			pos: SIGNED32;
 	BEGIN
 		Texts.OpenFinder(Fi, t, 0);
 		pos := Fi.pos;
@@ -1683,7 +1683,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END ShowDoc;
 
 	(* mark ordinary text pattern found *)
-	PROCEDURE MarkPatPos(P: Books.Panel; tF: TextGadgets.Frame; pos: LONGINT);
+	PROCEDURE MarkPatPos(P: Books.Panel; tF: TextGadgets.Frame; pos: SIGNED32);
 	BEGIN
 		ShowDoc(P.doc);
 		TextGadgets0.Locate(tF, pos);
@@ -1693,7 +1693,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END MarkPatPos;
 
 	(* mark colored text found *)
-	PROCEDURE MarkColPos(P: Books.Panel; tF: TextGadgets.Frame; VAR pos: LONGINT; col: SIGNED16);
+	PROCEDURE MarkColPos(P: Books.Panel; tF: TextGadgets.Frame; VAR pos: SIGNED32; col: SIGNED16);
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
@@ -1712,7 +1712,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END MarkColPos;
 
 	(* mark object found *)
-	PROCEDURE MarkObj(P: Books.Panel; tF: TextGadgets.Frame; pos: LONGINT; obj: Objects.Object);
+	PROCEDURE MarkObj(P: Books.Panel; tF: TextGadgets.Frame; pos: SIGNED32; obj: Objects.Object);
 	BEGIN
 		ShowDoc(P.doc);
 		TextGadgets0.Locate(tF, pos);
@@ -1725,7 +1725,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END MarkObj;
 
 	(* calculate displacement vector *)
-	PROCEDURE CalcDispVec(time: LONGINT);
+	PROCEDURE CalcDispVec(time: SIGNED32);
 		VAR i, j, d: SIGNED16;
 	BEGIN
 		lTime := time;
@@ -1754,7 +1754,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END StrLen;
 
 	(* searches the next position for the color col, begining at position pos *)
-	PROCEDURE SearchColor(text: Texts.Text; VAR pos: LONGINT; col: SIGNED16): BOOLEAN;
+	PROCEDURE SearchColor(text: Texts.Text; VAR pos: SIGNED32; col: SIGNED16): BOOLEAN;
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
@@ -1777,10 +1777,10 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END SearchColor;
 
 	(* searches the next position for the search pattern sPat (and col), begining at position pos *)
-	PROCEDURE SPatFound(text: Texts.Text; VAR pos: LONGINT; mode: SET; col: SIGNED16): BOOLEAN;
+	PROCEDURE SPatFound(text: Texts.Text; VAR pos: SIGNED32; mode: SET; col: SIGNED16): BOOLEAN;
 		VAR
 			R: Texts.Reader;
-			l: LONGINT;
+			l: SIGNED32;
 			i: SIGNED16;
 			ch: CHAR;
 	BEGIN
@@ -1815,7 +1815,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END SPatFound;
 
 	(* searches for the next object (newProc, name, col) in the text, begining at position pos *)
-	PROCEDURE SearchObj(T: Texts.Text; VAR pos: LONGINT; mode: SET; VAR newProc, name: ARRAY OF CHAR; col: SIGNED16; VAR obj: Objects.Object): BOOLEAN;
+	PROCEDURE SearchObj(T: Texts.Text; VAR pos: SIGNED32; mode: SET; VAR newProc, name: ARRAY OF CHAR; col: SIGNED16; VAR obj: Objects.Object): BOOLEAN;
 		VAR
 			Fi: Texts.Finder;
 			match: BOOLEAN;
@@ -1855,14 +1855,14 @@ MODULE BookDocs IN Oberon;	(** portable *)
 	END SearchObj;
 
 	(* initiates a normal shallow search *)
-	PROCEDURE ShallowSearch(P: Books.Panel; VAR pos: LONGINT): BOOLEAN;
+	PROCEDURE ShallowSearch(P: Books.Panel; VAR pos: SIGNED32): BOOLEAN;
 		VAR
 			S: Texts.Scanner;
 			T: Books.TGFrame;
 			tl: Books0.TextList;
 			R: Texts.Reader;
 			t: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			i: SIGNED16;
 			mode: SET;
 			Text, Object: ARRAY MaxPatLen OF CHAR;
@@ -2046,7 +2046,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 
 	(* initiates a deep search *)
 	PROCEDURE DeepSearch(P: Books.Panel);
-		VAR pos: LONGINT;
+		VAR pos: SIGNED32;
 		PROCEDURE Search(name: ARRAY OF CHAR): DocList;
 			VAR d: DocList;
 		BEGIN
@@ -2110,7 +2110,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 		VAR
 			P: Books.Panel;
 			V: VisibleMsg;
-			pos: LONGINT;
+			pos: SIGNED32;
 	BEGIN
 		Books.GetPanel(P);
 		IF (P = NIL ) & (lastDoc # NIL) THEN
@@ -2139,7 +2139,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 			P: Books.Panel;
 			fname: ARRAY Books0.nameLen OF CHAR;
 			lname1, lname2: ARRAY Books0.identLen OF CHAR;
-			pos1, pos2, ind: LONGINT;
+			pos1, pos2, ind: SIGNED32;
 			F: Files.File;
 			il: Books0.ImpList;
 			el: Books0.ExtLabel;

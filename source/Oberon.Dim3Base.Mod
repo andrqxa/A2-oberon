@@ -8,7 +8,7 @@ IMPORT S := SYSTEM, Pictures;
 CONST Black* = 15; White* = 0;	(** black and white of the windows color table **)
 VAR
 	baseAdr: ADDRESS;
-	lineW, height: LONGINT;
+	lineW, height: SIGNED32;
 
 (** correct color table for Native version **)
 PROCEDURE CheckColorTab*(VAR R, G, B: ARRAY OF SIGNED16);

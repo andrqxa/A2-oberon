@@ -44,7 +44,7 @@ CONST
 	maxHistogramLen = 1000;
 
 	PROCEDURE SetHisto( obj: tObject );
-	VAR y, x: LONGINT;  val, pos: LONGINT;  len: LONGINT;  nrNaNs: LONGINT;  min, max: LONGREAL;
+	VAR y, x: SIGNED32;  val, pos: SIGNED32;  len: SIGNED32;  nrNaNs: SIGNED32;  min, max: LONGREAL;
 	BEGIN
 		IF obj.A.depth > maxHistogramLen THEN len := maxHistogramLen ELSE len := obj.A.depth END;
 		(* len := maxHistogramLen;  *)
@@ -151,7 +151,7 @@ CONST
 	END Handler;
 
 	PROCEDURE A2P*( o: Objects.Object );
-	VAR x, y: LONGINT;  r, b, g: SIGNED16;  obj: tObject;  pix: Images.Pixel;  val: LONGINT;  valr: LONGREAL;  temp: LONGREAL;  len: LONGINT;
+	VAR x, y: SIGNED32;  r, b, g: SIGNED16;  obj: tObject;  pix: Images.Pixel;  val: SIGNED32;  valr: LONGREAL;  temp: LONGREAL;  len: SIGNED32;
 	BEGIN
 		obj := o( tObject );
 		IF obj.A.depth > maxHistogramLen THEN len := maxHistogramLen ELSE len := obj.A.depth END;
@@ -204,13 +204,13 @@ CONST
 		aM.cmd;  NEW( obj );  antsArrayImages.Init( obj );  obj.handle := Handler;  obj.trans := A2P;  Objects.NewObj := obj;
 	END Gen;
 
-	PROCEDURE Min( a, b: LONGINT ): LONGINT;
+	PROCEDURE Min( a, b: SIGNED32 ): SIGNED32;
 	BEGIN
 		IF a < b THEN RETURN a ELSE RETURN b END
 	END Min;
 
 	PROCEDURE AdjustCurve( obj: tObject );
-	VAR sum, up: LONGREAL;  i: LONGINT;  len: LONGINT;
+	VAR sum, up: LONGREAL;  i: SIGNED32;  len: SIGNED32;
 	BEGIN
 		IF obj.A.depth > maxHistogramLen THEN len := maxHistogramLen ELSE len := obj.A.depth END;
 

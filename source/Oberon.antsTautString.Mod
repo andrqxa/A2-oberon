@@ -35,14 +35,14 @@ TYPE
 	Statistic* = POINTER TO StatisticDesc;
 	StatisticDesc* = RECORD (vyBase.ObjDesc)
 		data*, reko*: aA.X1d;
-		n*: LONGINT;
+		n*: SIGNED32;
 	END;
 
 	PROCEDURE tautstring( VAR fdist: ARRAY OF LONGREAL;  VAR t: ARRAY OF LONGREAL;  VAR lower: ARRAY OF LONGREAL;  VAR upper: ARRAY OF LONGREAL;
-									   VAR y1: LONGREAL;  VAR yn: LONGREAL;  n: LONGINT;  VAR string: ARRAY OF LONGREAL;  VAR knotsind: ARRAY OF LONGINT;
-									   VAR knotst: ARRAY OF LONGREAL;  VAR knotsy: ARRAY OF LONGREAL;  VAR nknots: LONGINT );
+									   VAR y1: LONGREAL;  VAR yn: LONGREAL;  n: SIGNED32;  VAR string: ARRAY OF LONGREAL;  VAR knotsind: ARRAY OF SIGNED32;
+									   VAR knotst: ARRAY OF LONGREAL;  VAR knotsy: ARRAY OF LONGREAL;  VAR nknots: SIGNED32 );
 
-	VAR newmaxderiv, newminderiv, maxderiv, minderiv, usualvalue: LONGREAL;  actind, minind, maxind, i, j, lastbound, lastsign, nmax: LONGINT;  knotssign: aA.L1d;
+	VAR newmaxderiv, newminderiv, maxderiv, minderiv, usualvalue: LONGREAL;  actind, minind, maxind, i, j, lastbound, lastsign, nmax: SIGNED32;  knotssign: aA.L1d;
 
 	BEGIN
 		NEW( knotssign, n );  nmax := 0;  lastbound := 0;  knotssign[0] := lastbound;  knotsind[0] := 1;  knotsy[0] := y1;  knotst[0] := t[0];  nknots := 1;  actind := 2;
@@ -107,7 +107,7 @@ TYPE
 
 	END tautstring;
 
-	PROCEDURE multiwdwr( y: ARRAY OF LONGREAL;  n: LONGINT;  thresh: LONGREAL;  squeezing: ARRAY OF CHAR ): aA.L1d;
+	PROCEDURE multiwdwr( y: ARRAY OF LONGREAL;  n: SIGNED32;  thresh: LONGREAL;  squeezing: ARRAY OF CHAR ): aA.L1d;
 
 	VAR z: aA.L1d;
 
@@ -145,7 +145,7 @@ TYPE
 	PROCEDURE CreateTautString*( VAR s: Statistic;  degraded: vyBase.Object;  thr: LONGREAL;  squfac: LONGREAL;  squeezing: ARRAY OF CHAR );
 	(* Mit dieser Methode wird die Berechnung gestartet, die Felder des Objekts Statistic werden initialisiert. *)
 
-	VAR n, i: LONGINT;
+	VAR n, i: SIGNED32;
 
 	BEGIN
 		n := vyLongrealVec.Len( degraded( vyLongrealVec.tVector ) );  NEW( s.data, n );  NEW( s.reko, n );  s.n := n;
@@ -157,7 +157,7 @@ TYPE
 	(* Eigentliche Methode zur Berechnung des TautString. *)
 
 	VAR dataSum, dataSumX, eps, upper, lower, residuals, string, knotst, knotsy: aA.X1d;  ind, ind2, knotsind: aA.L1d;  dist, sigma, mean, sum, sqthr: LONGREAL;
-		i, nknots: LONGINT;
+		i, nknots: SIGNED32;
 
 	BEGIN
 		NEW( dataSum, s.n + 1 );  dataSum := cumsum( data );  NEW( dataSumX, s.n + 1 );  dataSumX := MakeXInterval( LEN( dataSum ) );
@@ -198,13 +198,13 @@ TYPE
 	END GetTautString;
 
 	PROCEDURE DoGetTautString( VAR fdistx: ARRAY OF LONGREAL;  VAR fdist: ARRAY OF LONGREAL;  VAR lower: ARRAY OF LONGREAL;  VAR upper: ARRAY OF LONGREAL;
-												   start: LONGREAL;  ende: LONGREAL;  VAR string: ARRAY OF LONGREAL;  VAR knotsind: ARRAY OF LONGINT;
-												   VAR knotst: ARRAY OF LONGREAL;  VAR knotsy: ARRAY OF LONGREAL;  VAR nknots: LONGINT;  VAR s: Statistic );
+												   start: LONGREAL;  ende: LONGREAL;  VAR string: ARRAY OF LONGREAL;  VAR knotsind: ARRAY OF SIGNED32;
+												   VAR knotst: ARRAY OF LONGREAL;  VAR knotsy: ARRAY OF LONGREAL;  VAR nknots: SIGNED32;  VAR s: Statistic );
 	(* Methode zur Neuberechnung des TautStrings. Wird in der Schleife von GetTautString aufgerufen.
 	Falls das Minimum der oberen Schranke noch zu weit von Maximum der unteren Schranke entfernt ist,
 	wird der TautString neu berechnet. *)
 
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 
 	BEGIN
 		IF (ABS( Min( upper ) - Max( lower ) ) < (1 / 100000000)) THEN
@@ -217,7 +217,7 @@ TYPE
 	PROCEDURE Mad*( y: ARRAY OF LONGREAL ): LONGREAL;
 	(* Berechnung des MAD der Zahlen in y. *)
 
-	VAR i, len: LONGINT;  med, mad: LONGREAL;  z: aA.X1d;
+	VAR i, len: SIGNED32;  med, mad: LONGREAL;  z: aA.X1d;
 
 	BEGIN
 		len := LEN( y ) - 1;  NEW( z, len );
@@ -236,7 +236,7 @@ TYPE
 	PROCEDURE Median( y: ARRAY OF LONGREAL ): LONGREAL;
 	(* Berechnung des Medians der Zahlen in y. *)
 
-	VAR len: LONGINT;
+	VAR len: SIGNED32;
 
 	BEGIN
 		len := LEN( y );  RETURN aA.Median1dX( y, len );
@@ -245,7 +245,7 @@ TYPE
 	PROCEDURE Mean( y: ARRAY OF LONGREAL ): LONGREAL;
 	(* Berechnung des Durchschnitts der Zahlen in y. *)
 
-	VAR len, i, length: LONGINT;  x, diff, mean: LONGREAL;
+	VAR len, i, length: SIGNED32;  x, diff, mean: LONGREAL;
 
 	BEGIN
 		len := LEN( y );  length := 1;  mean := 0;
@@ -259,7 +259,7 @@ TYPE
 	(* Berechnet eine kumulierte Summe.
 	In z[n] steht der Ausdruck Summe von 0 bis n-1 über y geteilt durch Länge von y. *)
 
-	VAR len, i: LONGINT;  z: aA.X1d;
+	VAR len, i: SIGNED32;  z: aA.X1d;
 
 	BEGIN
 		len := LEN( y );  NEW( z, len + 1 );  z[0] := 0;
@@ -269,10 +269,10 @@ TYPE
 		RETURN z;
 	END cumsum;
 
-	PROCEDURE MakeXInterval( len: LONGINT ): aA.X1d;
+	PROCEDURE MakeXInterval( len: SIGNED32 ): aA.X1d;
 	(* Erzeugung von äquidistanten Abständen der Anzahl len auf dem Intervall [0;1]. *)
 
-	VAR ret: aA.X1d;  i: LONGINT;
+	VAR ret: aA.X1d;  i: SIGNED32;
 
 	BEGIN
 		NEW( ret, len );
@@ -285,7 +285,7 @@ TYPE
 	PROCEDURE Min*( x: ARRAY OF LONGREAL ): LONGREAL;
 	(* Berechnet das Minimum der Einträge in x. *)
 
-	VAR min: LONGREAL;  i, len: LONGINT;
+	VAR min: LONGREAL;  i, len: SIGNED32;
 
 	BEGIN
 		min := MAX( LONGREAL );  len := LEN( x ) - 1;
@@ -300,7 +300,7 @@ TYPE
 	PROCEDURE Max*( x: ARRAY OF LONGREAL ): LONGREAL;
 	(* Berechnet das Maximum der Einträge in x. *)
 
-	VAR max: LONGREAL;  i, len: LONGINT;
+	VAR max: LONGREAL;  i, len: SIGNED32;
 
 	BEGIN
 		max := MIN( LONGREAL );  len := LEN( x ) - 1;

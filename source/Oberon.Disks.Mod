@@ -43,8 +43,8 @@ TYPE
 	Partition* = Disks.Partition;
 	PartitionTable* = Disks.PartitionTable;
 
-	TransferProc* = PROCEDURE (dev: Device; op, block, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: LONGINT; VAR res: WORD);
-	GetSizeProc* = PROCEDURE (dev: Device; VAR size, res: LONGINT);
+	TransferProc* = PROCEDURE (dev: Device; op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: WORD);
+	GetSizeProc* = PROCEDURE (dev: Device; VAR size, res: SIGNED32);
 	HandleProc* = PROCEDURE (dev: Device; VAR msg: Message; VAR res: WORD);
 
 (** The base for block devices. It provides operations on an abstract array of disk blocks of blockSize bytes,
@@ -54,13 +54,13 @@ the table field with Open or UpdatePartitionTable. *)
 	DeviceDesc* = RECORD	(** fields read-only, initialized by extender *)
 		name*: Name;	(** unique device name *)
 		desc*: Description;	(** device description for Partition.Show etc. *)
-		blockSize*: LONGINT;	(** in bytes - unit of block, num & size parameters *)
+		blockSize*: SIGNED32;	(** in bytes - unit of block, num & size parameters *)
 		flags*: SET;	(** ReadOnly, Removable *)
 		transfer*: TransferProc;	(** read or write blocks *)
 		getSize*: GetSizeProc;	(** get total size of device *)
 		handle*: HandleProc;	(** handle optional messages *)
 		table*: PartitionTable;	(** cache for partition table *)
-		openCount*: LONGINT;	(** number of times device has been opened *)
+		openCount*: SIGNED32;	(** number of times device has been opened *)
 		real: Disks.Device;	(* underlying device *)
 	END;
 
@@ -79,13 +79,13 @@ BEGIN
 	dev.table := dev.real.table; dev.openCount := dev.real.openCount
 END Update;
 
-PROCEDURE Transfer(dev: Device; op, block, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: LONGINT; VAR res: WORD);
+PROCEDURE Transfer(dev: Device; op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: WORD);
 BEGIN
 	dev.real.Transfer(op, block, num, data, ofs, res);
 	Update(dev)
 END Transfer;
 
-PROCEDURE GetSize(dev: Device; VAR size, res: LONGINT);
+PROCEDURE GetSize(dev: Device; VAR size, res: SIGNED32);
 BEGIN
 	dev.real.GetSize(size, res);
 	Update(dev)
@@ -148,7 +148,7 @@ END Disks.
 (**
 o Further Transfer op numbers may be added in future, therefore devices should check explicitly for op = Read or op = Write.
 o Positive res numbers are device-specific. Negative res numbers are reserved.
-o Block size 512 and LONGINT block number limit us to 1Tb = 1024Gb.
+o Block size 512 and SIGNED32 block number limit us to 1Tb = 1024Gb.
 o When the media is changed in a removable device, the next operation (transfer, getSize, handle) will fail
 with res = MediaChanged. After that the new media can be accessed as usual.  [RFC: Perhaps the MediaChanged flag should be sticky until the next LockMsg].
 o The ReadOnly flag and blockSize may depend on the current media and is only valid after a successful access

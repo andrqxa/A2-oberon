@@ -98,17 +98,17 @@ TYPE
 	Scanner* = OBJECT
 		VAR
 			buffer: Strings.String;
-			pos-: LONGINT;	(*pos in buffer*)
+			pos-: SIGNED32;	(*pos in buffer*)
 			ch-: CHAR;	(**look-ahead *)
 			str-: ARRAY 1024 OF CHAR;
-			sym- : LONGINT;
+			sym- : SIGNED32;
 			numtyp-: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
-			intval-: LONGINT;	(* integer value or string length *)
+			intval-: SIGNED32;	(* integer value or string length *)
 			longintval-: HUGEINT;
 			realval-: REAL;
 			lrlval-: LONGREAL;
-			numStartPos, numEndPos: LONGINT;
-			lastpos-, curpos-, errpos-: LONGINT;	(*pos in text*)
+			numStartPos, numEndPos: SIGNED32;
+			lastpos-, curpos-, errpos-: SIGNED32;	(*pos in text*)
 			isNummer: BOOLEAN;
 			commentStr- : StringMaker;
 			cw : Streams.Writer;
@@ -133,8 +133,8 @@ TYPE
 			IF newChar[ORD(ch)] THEN INC(curpos) END; (* curpos := pos; *)
 		END NextChar;
 
-		PROCEDURE Str(VAR sym: LONGINT);
-		VAR i: LONGINT; och: CHAR;
+		PROCEDURE Str(VAR sym: SIGNED32);
+		VAR i: SIGNED32; och: CHAR;
 		BEGIN i := 0; och := ch;
 			LOOP NextChar;
 				IF ch = och THEN EXIT END ;
@@ -149,8 +149,8 @@ TYPE
 			END
 		END Str;
 
-		PROCEDURE Identifier(VAR sym: LONGINT);
-			VAR i: LONGINT;
+		PROCEDURE Identifier(VAR sym: SIGNED32);
+			VAR i: SIGNED32;
 		BEGIN i := 0;
 			REPEAT
 				str[i] := ch; INC(i); NextChar
@@ -228,7 +228,7 @@ TYPE
 						END
 					ELSE (* decimal *) numtyp := integer;
 						WHILE i < n DO d := Ord(dig[i], FALSE); INC(i);
-							IF intval <= (MAX(LONGINT) - d) DIV 10 THEN intval := intval*10 + d
+							IF intval <= (MAX(SIGNED32) - d) DIV 10 THEN intval := intval*10 + d
 (* > bootstrap 2
 							ELSE err(203)
 < bootstrap 2 *)
@@ -301,7 +301,7 @@ TYPE
 			val[i] := 0X
 		END GetNumAsString;
 
-		PROCEDURE Get(VAR s: LONGINT);
+		PROCEDURE Get(VAR s: SIGNED32);
 
 			PROCEDURE Comment;	(* do not read after end of file *)
 			BEGIN NextChar; cw.Char(ch);
@@ -456,9 +456,9 @@ TYPE
 
 	END Scanner;
 
-PROCEDURE InitWithText*(t: Texts.Text; pos: LONGINT): Scanner;
+PROCEDURE InitWithText*(t: Texts.Text; pos: SIGNED32): Scanner;
 	VAR buffer: Strings.String; len, i, j: SIZE; ch: WORD; r: Texts.TextReader;
-	bytesPerChar: LONGINT;
+	bytesPerChar: SIGNED32;
 	s : Scanner;
 BEGIN
 	t.AcquireRead;
@@ -517,7 +517,7 @@ END InitReservedChars;
 
 PROCEDURE InitNewChar;
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 BEGIN
 	FOR i := 0 TO LEN(newChar)-1 DO
 		(* UTF-8 encoded characters with bits 10XXXXXX do not start a new unicode character *)
@@ -531,7 +531,7 @@ END InitNewChar;
 
 PROCEDURE InitIgnoredChar;
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 BEGIN
 	FOR i := 0 TO LEN(ignoredChar)-1 DO
 		ignoredChar[i] := (i <= ORD(" ")) & (i # ORD(LF))

@@ -48,9 +48,9 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 			col: Display.Color;
 		END;
 
-		BlendDotProc = PROCEDURE (dc: Context; img: Images.Image; mx, my: SIGNED16; x, y: LONGINT);
-		CopyRunProc = PROCEDURE (img: Images.Image; mx, my, len: SIGNED16; x, y: LONGINT);
-		BlendRunProc = PROCEDURE (dc: Context; img: Images.Image; mx, my, len: SIGNED16; x, y: LONGINT);
+		BlendDotProc = PROCEDURE (dc: Context; img: Images.Image; mx, my: SIGNED16; x, y: SIGNED32);
+		CopyRunProc = PROCEDURE (img: Images.Image; mx, my, len: SIGNED16; x, y: SIGNED32);
+		BlendRunProc = PROCEDURE (dc: Context; img: Images.Image; mx, my, len: SIGNED16; x, y: SIGNED32);
 		WarpProc = PROCEDURE (dc: Context; img: Images.Image; dx, dy, x0, y0, x1, y1: SIGNED16; VAR m: GfxMatrix.Matrix; VAR f: GfxImages.Filter);
 		CopyImageProc = PROCEDURE (dc: Context; img: Images.Image; dx, dy: SIGNED16; VAR filter: GfxImages.Filter);
 
@@ -86,7 +86,7 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Blend Dot Into Display ---*)
 
-	PROCEDURE BlendDotBlk (dc: Context; img: Images.Image; mx, my: SIGNED16; x, y: LONGINT);
+	PROCEDURE BlendDotBlk (dc: Context; img: Images.Image; mx, my: SIGNED16; x, y: SIGNED32);
 		VAR buf: ARRAY 4 OF CHAR;
 	BEGIN
 		IF Images.alpha IN img.fmt.components THEN	(* get original color from display *)
@@ -96,7 +96,7 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 		Display.TransferBlock(buf, 0, 0, x, y, 1, 1, Display.set)
 	END BlendDotBlk;
 
-	PROCEDURE BlendDotRGB (dc: Context; img: Images.Image; mx, my: SIGNED16; x, y: LONGINT);
+	PROCEDURE BlendDotRGB (dc: Context; img: Images.Image; mx, my: SIGNED16; x, y: SIGNED32);
 		VAR pix: Images.Pixel;
 	BEGIN
 		IF Images.alpha IN img.fmt.components THEN
@@ -106,7 +106,7 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 		Display.Dot(Display.RGB(ORD(pix[red]), ORD(pix[green]), ORD(pix[blue])), x, y, Display.replace)
 	END BlendDotRGB;
 
-	PROCEDURE BlendDotIdx (dc: Context; img: Images.Image; mx, my: SIGNED16; x, y: LONGINT);
+	PROCEDURE BlendDotIdx (dc: Context; img: Images.Image; mx, my: SIGNED16; x, y: SIGNED32);
 		VAR buf: ARRAY 1 OF CHAR;
 	BEGIN
 		IF Images.alpha IN img.fmt.components THEN
@@ -116,7 +116,7 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 		Display.Dot(ORD(buf[0]), x, y, Display.replace)
 	END BlendDotIdx;
 
-	PROCEDURE Dot (rc: GfxRaster.Context; x, y: LONGINT);
+	PROCEDURE Dot (rc: GfxRaster.Context; x, y: SIGNED32);
 		VAR dc: Context; img: Images.Image; mw, mh, mx, my: SIGNED16;
 	BEGIN
 		IF (rc.clipState = GfxRaster.In) OR
@@ -137,8 +137,8 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Draw Run ---*)
 
-	PROCEDURE DrawRunRGB (VAR buf: ARRAY OF CHAR; len, x, y: LONGINT);
-		VAR i, l: LONGINT; r, g, b: CHAR;
+	PROCEDURE DrawRunRGB (VAR buf: ARRAY OF CHAR; len, x, y: SIGNED32);
+		VAR i, l: SIGNED32; r, g, b: CHAR;
 	BEGIN
 		i := 0;
 		WHILE len > 0 DO
@@ -151,8 +151,8 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 		END
 	END DrawRunRGB;
 
-	PROCEDURE DrawRunIdx (VAR buf: ARRAY OF CHAR; len, x, y: LONGINT);
-		VAR i, l: LONGINT; idx: CHAR;
+	PROCEDURE DrawRunIdx (VAR buf: ARRAY OF CHAR; len, x, y: SIGNED32);
+		VAR i, l: SIGNED32; idx: CHAR;
 	BEGIN
 		i := 0;
 		WHILE len > 0 DO
@@ -166,14 +166,14 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Copy Image Run ---*)
 
-	PROCEDURE CopyRunRGB (img: Images.Image; mx, my, len: SIGNED16; x, y: LONGINT);
+	PROCEDURE CopyRunRGB (img: Images.Image; mx, my, len: SIGNED16; x, y: SIGNED32);
 		VAR buf: ARRAY 3*MaxRun OF CHAR;
 	BEGIN
 		Images.GetPixels(img, mx, my, len, Images.BGR888, buf, Images.SrcCopy);
 		DrawRunRGB(buf, len, x, y)
 	END CopyRunRGB;
 
-	PROCEDURE CopyRunIdx (img: Images.Image; mx, my, len: SIGNED16; x, y: LONGINT);
+	PROCEDURE CopyRunIdx (img: Images.Image; mx, my, len: SIGNED16; x, y: SIGNED32);
 		VAR buf: ARRAY MaxRun OF CHAR;
 	BEGIN
 		Images.GetPixels(img, mx, my, len, Images.D8, buf, Images.SrcCopy);
@@ -183,8 +183,8 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Blend Image Run ---*)
 
-	PROCEDURE BlendRunRGB (dc: Context; img: Images.Image; mx, my, len: SIGNED16; x, y: LONGINT);
-		VAR i, j, l: LONGINT; buf: ARRAY 3*MaxRun OF CHAR; alpha: ARRAY MaxRun OF CHAR; a, r, g, b: CHAR;
+	PROCEDURE BlendRunRGB (dc: Context; img: Images.Image; mx, my, len: SIGNED16; x, y: SIGNED32);
+		VAR i, j, l: SIGNED32; buf: ARRAY 3*MaxRun OF CHAR; alpha: ARRAY MaxRun OF CHAR; a, r, g, b: CHAR;
 	BEGIN
 		i := 0; j := 0;
 		WHILE i < len DO
@@ -209,8 +209,8 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 		END
 	END BlendRunRGB;
 
-	PROCEDURE BlendRunIdx (dc: Context; img: Images.Image; mx, my, len: SIGNED16; x, y: LONGINT);
-		VAR i, l: LONGINT; buf, alpha: ARRAY MaxRun OF CHAR; idx: CHAR;
+	PROCEDURE BlendRunIdx (dc: Context; img: Images.Image; mx, my, len: SIGNED16; x, y: SIGNED32);
+		VAR i, l: SIGNED32; buf, alpha: ARRAY MaxRun OF CHAR; idx: CHAR;
 	BEGIN
 		i := 0; WHILE i < len DO buf[i] := CHR(dc.bgCol); INC(i) END;
 		Images.GetPixels(img, mx, my, len, Images.D8, buf, dc.srcOverDst);
@@ -276,7 +276,7 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 		END
 	END TileRectPix;
 
-	PROCEDURE Rect (rc: GfxRaster.Context; llx, lly, urx, ury: LONGINT);
+	PROCEDURE Rect (rc: GfxRaster.Context; llx, lly, urx, ury: SIGNED32);
 		VAR data: RegData; dc: Context;
 	BEGIN
 		IF rc.clipState # GfxRaster.Out THEN
@@ -402,7 +402,7 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 	(*--- Draw/Blend Image Rectangle ---*)
 
 	PROCEDURE DrawImageRectBlk (llx, lly, urx, ury: SIGNED16; VAR data: GfxRegions.EnumData);
-		VAR off: LONGINT;
+		VAR off: SIGNED32;
 	BEGIN
 		WITH data: RegData DO
 			off := (lly - data.dy) * data.img.bpr + LONG(llx - data.dx) * (data.img.fmt.bpp DIV 8);

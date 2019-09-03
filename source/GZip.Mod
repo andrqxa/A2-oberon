@@ -39,7 +39,7 @@ TYPE
 			writer: Streams.Writer;
 			s : ZlibDeflate.Stream;
 			res : WORD;
-			crc32-: LONGINT; (*crc32 of uncompressed data*)
+			crc32-: SIGNED32; (*crc32 of uncompressed data*)
 			out : POINTER TO ARRAY BufSize OF CHAR;
 			flush: SIGNED8;
 			inputsize : SIZE;
@@ -124,7 +124,7 @@ TYPE
 				ZlibDeflate.Close(SELF.s);
 				SELF.res := SELF.s.res;
 				writer.RawLInt(crc32);
-				writer.RawLInt(inputsize(LONGINT));
+				writer.RawLInt(inputsize(SIGNED32));
 				writer.Update();
 			END;
 		END Send;
@@ -138,7 +138,7 @@ TYPE
 			reader: Streams.Reader;
 			res: WORD;
 			transparent : BOOLEAN;
-			crc32-: LONGINT; (*crc32 of uncompressed data*)
+			crc32-: SIGNED32; (*crc32 of uncompressed data*)
 			in : POINTER TO ARRAY BufSize OF CHAR;
 			s: ZlibInflate.Stream;
 
@@ -162,7 +162,7 @@ TYPE
 
 		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
 		VAR
-			intlen : LONGINT;
+			intlen : SIGNED32;
 		BEGIN
 			ASSERT((0 <= ofs) & (0 <= len) & (ofs + size <= LEN(buf)), 100);
 			IF transparent THEN
@@ -295,7 +295,7 @@ BEGIN
 END Inflate;
 
 PROCEDURE GZip*(context:Commands.Context);
-VAR filename: Files.FileName; from,to: Files.File; compression, strategy: LONGINT;
+VAR filename: Files.FileName; from,to: Files.File; compression, strategy: SIGNED32;
 BEGIN
 	IF context.arg.GetString(filename) THEN
 		from:=Files.Old(filename);

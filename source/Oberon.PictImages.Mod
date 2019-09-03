@@ -111,7 +111,7 @@ MODULE PictImages IN Oberon; (** non-portable *)	(* eos  **)
 
 	(* pack/unpack procedures for 1 and 4 bit formats *)
 
-	PROCEDURE PackP1 (VAR fmt: Images.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Images.Pixel);
+	PROCEDURE PackP1 (VAR fmt: Images.Format0; adr: ADDRESS; bit: SIGNED32; VAR pix: Images.Pixel);
 		VAR b: CHAR;
 	BEGIN
 		SYSTEM.GET(adr, b);
@@ -126,7 +126,7 @@ MODULE PictImages IN Oberon; (** non-portable *)	(* eos  **)
 		END
 	END PackP1;
 
-	PROCEDURE UnpackP1 (VAR fmt: Images.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Images.Pixel);
+	PROCEDURE UnpackP1 (VAR fmt: Images.Format0; adr: ADDRESS; bit: SIGNED32; VAR pix: Images.Pixel);
 		VAR b: CHAR;
 	BEGIN
 		SYSTEM.GET(adr, b);
@@ -135,8 +135,8 @@ MODULE PictImages IN Oberon; (** non-portable *)	(* eos  **)
 		END
 	END UnpackP1;
 
-	PROCEDURE PackP4 (VAR fmt: Images.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Images.Pixel);
-		VAR b: CHAR; i: LONGINT;
+	PROCEDURE PackP4 (VAR fmt: Images.Format0; adr: ADDRESS; bit: SIGNED32; VAR pix: Images.Pixel);
+		VAR b: CHAR; i: SIGNED32;
 	BEGIN
 		SYSTEM.GET(adr, b);
 		i := Images.PaletteIndex(fmt.pal, ORD(pix[R]), ORD(pix[G]), ORD(pix[B])) MOD 10H;
@@ -147,7 +147,7 @@ MODULE PictImages IN Oberon; (** non-portable *)	(* eos  **)
 		END
 	END PackP4;
 
-	PROCEDURE UnpackP4 (VAR fmt: Images.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Images.Pixel);
+	PROCEDURE UnpackP4 (VAR fmt: Images.Format0; adr: ADDRESS; bit: SIGNED32; VAR pix: Images.Pixel);
 		VAR b: CHAR;
 	BEGIN
 		SYSTEM.GET(adr, b); pix := fmt.pal.col[ASH(ORD(b), -bit) MOD 10H]
@@ -156,7 +156,7 @@ MODULE PictImages IN Oberon; (** non-portable *)	(* eos  **)
 	(* load Oberon picture from file *)
 	PROCEDURE LoadPict (img: Images.Image; VAR fname: ARRAY OF CHAR; VAR done: BOOLEAN);
 		VAR
-			file: Files.File; r: Files.Rider; id, w, h, depth, dr, dg, db: SIGNED16; gen: ARRAY 64 OF CHAR; i, n: LONGINT;
+			file: Files.File; r: Files.Rider; id, w, h, depth, dr, dg, db: SIGNED16; gen: ARRAY 64 OF CHAR; i, n: SIGNED32;
 			default: BOOLEAN; red, green, blue: ARRAY 256 OF CHAR; pal: Images.Palette; adr, a: ADDRESS;
 			fmt: Images.Format; byte: CHAR;
 	BEGIN
@@ -233,7 +233,7 @@ MODULE PictImages IN Oberon; (** non-portable *)	(* eos  **)
 	(* store Oberon picture *)
 	PROCEDURE StorePict (img: Images.Image; VAR fname: ARRAY OF CHAR; VAR done: BOOLEAN);
 		VAR
-			file: Files.File; r: Files.Rider; pal: Images.Palette; i: LONGINT; fmt: Images.Format; depth, y, inc, x: SIGNED16;
+			file: Files.File; r: Files.Rider; pal: Images.Palette; i: SIGNED32; fmt: Images.Format; depth, y, inc, x: SIGNED16;
 			pix: POINTER TO ARRAY OF CHAR; buf: ARRAY 129 OF SIGNED8;
 	BEGIN
 		file := Files.New(fname);
@@ -376,7 +376,7 @@ MODULE PictImages IN Oberon; (** non-portable *)	(* eos  **)
 
 	(* initialize printer patterns *)
 	PROCEDURE InitPatterns;
-		VAR pat: ARRAY 8 OF SET; i: LONGINT;
+		VAR pat: ARRAY 8 OF SET; i: SIGNED32;
 	BEGIN
 		(* adapted from Printer3 *)
 		pat[0] := {}; pat[1] := {}; pat[2] := {}; pat[3] := {0,4,8,12,16,20,24,28};

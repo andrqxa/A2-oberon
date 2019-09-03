@@ -556,7 +556,7 @@ MODULE Scramble IN Oberon;	(** portable *) (* Copyright (C) 1995 by Emil J. Zell
 			tag, x, y, w, h, ref: SIGNED16;
 			gen: ARRAY 64 OF CHAR;
 			lib: Objects.Library;
-			len: LONGINT;
+			len: SIGNED32;
 			obj: Objects.Object;
 	BEGIN
 		main := NIL;
@@ -596,7 +596,7 @@ MODULE Scramble IN Oberon;	(** portable *) (* Copyright (C) 1995 by Emil J. Zell
 			F: Files.File;
 			R: Files.Rider;
 			B: Objects.BindMsg;
-			len: LONGINT;
+			len: SIGNED32;
 	BEGIN
 		Texts.WriteString(W, "Store ");
 		Texts.Append(Oberon.Log, W.buf);
@@ -709,7 +709,7 @@ MODULE Scramble IN Oberon;	(** portable *) (* Copyright (C) 1995 by Emil J. Zell
 	PROCEDURE Env(VAR S: Texts.Scanner; VAR F: Frame);
 		VAR
 			text: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			doc: Documents.Document;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);

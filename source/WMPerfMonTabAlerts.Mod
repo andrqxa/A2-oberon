@@ -18,7 +18,7 @@ CONST
 TYPE
 
 	CellData = POINTER TO RECORD
-		id : LONGINT;
+		id : SIGNED32;
 	END;
 
 	AlertsTab* = OBJECT(WMComponents.VisualComponent)
@@ -105,8 +105,8 @@ TYPE
 			rulesGrid.Release;
 		END ResetSelectedAlerts;
 
-		PROCEDURE RemoveSelectedAlerts() : LONGINT;
-		VAR scol, srow, ecol, erow, row : SIZE; ptr : ANY; cellData : CellData; nofRemoved : LONGINT;
+		PROCEDURE RemoveSelectedAlerts() : SIGNED32;
+		VAR scol, srow, ecol, erow, row : SIZE; ptr : ANY; cellData : CellData; nofRemoved : SIGNED32;
 		BEGIN
 			rulesGrid.Acquire;
 			rulesGrid.model.Acquire;
@@ -175,7 +175,7 @@ TYPE
 			statusLabel.caption.SetAOC(caption);
 		END UpdateStatusLabel;
 
-		PROCEDURE ComputeAlertInfo(alerts : Alerts.Alerts; VAR nbrOfRules, nbrOfAlerts : LONGINT);
+		PROCEDURE ComputeAlertInfo(alerts : Alerts.Alerts; VAR nbrOfRules, nbrOfAlerts : SIGNED32);
 		VAR i : SIZE;
 		BEGIN
 			nbrOfRules := 0; nbrOfAlerts := 0;
@@ -189,8 +189,8 @@ TYPE
 			END;
 		END ComputeAlertInfo;
 
-		PROCEDURE SetRowText(grid : WMStringGrids.StringGrid; alert : Alerts.AlertInfo; row : LONGINT);
-		VAR caption : ARRAY 128 OF CHAR; col : LONGINT; cellData : CellData;
+		PROCEDURE SetRowText(grid : WMStringGrids.StringGrid; alert : Alerts.AlertInfo; row : SIGNED32);
+		VAR caption : ARRAY 128 OF CHAR; col : SIGNED32; cellData : CellData;
 		BEGIN
 			NEW(cellData); cellData.id := alert.id;
 			grid.model.SetCellData(0, row, cellData);
@@ -211,8 +211,8 @@ TYPE
 
 		PROCEDURE UpdateGrids;
 		VAR
-			gridRow, alertsGridRow : LONGINT; alerts : Alerts.Alerts;
-			nbrOfRules, nbrOfAlerts : LONGINT;
+			gridRow, alertsGridRow : SIGNED32; alerts : Alerts.Alerts;
+			nbrOfRules, nbrOfAlerts : SIGNED32;
 			i : SIZE;
 		BEGIN
 			alerts := Alerts.GetAlerts();

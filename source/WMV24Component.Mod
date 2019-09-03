@@ -184,10 +184,10 @@ TYPE
 	 * the Terminal or data transfer operation *)
 	Lock = OBJECT
 	VAR
-		lock : LONGINT;
-		locklevel : LONGINT;
+		lock : SIGNED32;
+		locklevel : SIGNED32;
 
-		PROCEDURE TryAcquire(lock : LONGINT) : BOOLEAN;
+		PROCEDURE TryAcquire(lock : SIGNED32) : BOOLEAN;
 		BEGIN {EXCLUSIVE}
 			IF (SELF.lock # Free) & (SELF.lock # lock) THEN
 				RETURN FALSE;
@@ -197,7 +197,7 @@ TYPE
 			END;
 		END TryAcquire;
 
-		PROCEDURE Acquire(lock : LONGINT);
+		PROCEDURE Acquire(lock : SIGNED32);
 		BEGIN {EXCLUSIVE}
 			IF (SELF.lock # Free) & (SELF.lock # lock) THEN
 				AWAIT(SELF.lock=Free);
@@ -212,7 +212,7 @@ TYPE
 			IF locklevel = 0 THEN lock := Free; END;
 		END Release;
 
-		PROCEDURE TakeLock(lock : LONGINT);
+		PROCEDURE TakeLock(lock : SIGNED32);
 		BEGIN (* only call from critical sections !*)
 			IF SELF.lock = lock THEN
 				INC(locklevel);
@@ -394,7 +394,7 @@ TYPE
 		out : Streams.Writer;
 
 		port : Serials.Port;
-		portNr, bps, databits, parity, stop : LONGINT;
+		portNr, bps, databits, parity, stop : SIGNED32;
 		open : BOOLEAN;
 
 		lock : Lock;
@@ -426,7 +426,7 @@ TYPE
 		clearStatusBtn : WMStandardComponents.Button;
 
 		(* Error Counters *)
-		overrunErrors, framingErrors, parityErrors, breakInterrupts, transportErrors, otherErrors : LONGINT;
+		overrunErrors, framingErrors, parityErrors, breakInterrupts, transportErrors, otherErrors : SIGNED32;
 
 		statusUpdater : StatusUpdater;
 
@@ -526,7 +526,7 @@ TYPE
 			command : Strings.String;
 			filename, msg : ARRAY 512 OF CHAR;
 			filenames : Strings.StringArray;
-			mode : LONGINT;
+			mode : SIGNED32;
 			send : BOOLEAN;
 			i : SIZE;
 		BEGIN
@@ -854,7 +854,7 @@ TYPE
 			AddContent(textView);
 		END CreateContent;
 
-		PROCEDURE Wait(ms : LONGINT);
+		PROCEDURE Wait(ms : SIGNED32);
 		BEGIN
 			timer.Sleep(ms);
 		END Wait;
@@ -891,7 +891,7 @@ TYPE
 			lock.Acquire(Terminal); out.String(string^); out.Update; lock.Release;
 		END CopyFromClipboard;
 
-		PROCEDURE GetXYCommand(send : BOOLEAN; mode : LONGINT) : Strings.String;
+		PROCEDURE GetXYCommand(send : BOOLEAN; mode : SIGNED32) : Strings.String;
 		VAR command : Strings.String;
 		BEGIN
 			IF (mode = XYModem.XModem) THEN
@@ -918,7 +918,7 @@ TYPE
 			Wait(500);
 		END SendXYCommand;
 
-		PROCEDURE SendXYModem(CONST filename : ARRAY OF CHAR; mode : LONGINT);
+		PROCEDURE SendXYModem(CONST filename : ARRAY OF CHAR; mode : SIGNED32);
 		VAR
 			f : Files.File;
 			progressWindow : ProgressWindow;
@@ -964,7 +964,7 @@ TYPE
 			END;
 		END SendXYModem;
 
-		PROCEDURE ReceiveXYModem(filename : ARRAY OF CHAR; mode : LONGINT);
+		PROCEDURE ReceiveXYModem(filename : ARRAY OF CHAR; mode : SIGNED32);
 		VAR
 			f : Files.File;
 			progressWindow : ProgressWindow;
@@ -1305,7 +1305,7 @@ TYPE
 	VAR
 		terminal : TerminalComponent;
 
-		PROCEDURE GetStartupSize(VAR width, height : LONGINT);
+		PROCEDURE GetStartupSize(VAR width, height : SIGNED32);
 		VAR strings : Strings.StringArray; value : ARRAY 64 OF CHAR; res : WORD;
 		BEGIN
 			width := DefaultWidth; height := DefaultHeight;
@@ -1322,7 +1322,7 @@ TYPE
 		END GetStartupSize;
 
 		PROCEDURE CreateForm(): WMComponents.VisualComponent;
-		VAR panel : WMStandardComponents.Panel; width, height : LONGINT;
+		VAR panel : WMStandardComponents.Panel; width, height : SIGNED32;
 		BEGIN
 			GetStartupSize(width, height);
 			NEW(panel); panel.bounds.SetExtents(width, height); panel.fillColor.Set(0FFFFFFFFH); panel.takesFocus.Set(TRUE);
@@ -1397,7 +1397,7 @@ TYPE
 	END Window;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 	timeout: BOOLEAN;
 
 	StrProgressInfo, StrCustomTextView, StrTerminalComponent : Strings.String;

@@ -65,19 +65,19 @@ TYPE
 			VAR
 				int-	: IP.Interface;	(*! Unix port: dummy, only 'int.localAdr' contains valid data *)
 
-				lport-	: LONGINT;
+				lport-	: SIGNED32;
 				fip-	: IP.Adr;  (* foreign protocol address *)
-				fport-	: LONGINT;
+				fport-	: SIGNED32;
 				state*	: SIGNED8;   (* TCP state *)
 
-				socket	: LONGINT;
+				socket	: SIGNED32;
 				sender: Sender;
 
 				(* the next variables are for interface compatibility only *)
-				irs-		: LONGINT;	(* initial receive sequence number *)
-				rcvnxt-	: LONGINT;	(* receive next *)
-				iss-		: LONGINT;	(* initial send sequence number *)
-				sndnxt-	: LONGINT;	(* send next *)
+				irs-		: SIGNED32;	(* initial receive sequence number *)
+				rcvnxt-	: SIGNED32;	(* receive next *)
+				iss-		: SIGNED32;	(* initial send sequence number *)
+				sndnxt-	: SIGNED32;	(* send next *)
 
 
 				PROCEDURE & Init*;
@@ -91,7 +91,7 @@ TYPE
 
 				(** Open a TCP connection (only use once per Connection instance).
 					Use TCP.NilPort for lport to automatically assign an unused local port.*)
-				PROCEDURE Open*( lport: LONGINT;  fip: IP.Adr;  fport: LONGINT;  VAR res: WORD );
+				PROCEDURE Open*( lport: SIGNED32;  fip: IP.Adr;  fport: SIGNED32;  VAR res: WORD );
 				VAR
 					localAdr, foreignAdr: Sockets.SocketAdr;
 				BEGIN {EXCLUSIVE}
@@ -236,8 +236,8 @@ TYPE
 
 
 				(** Return number of bytes that may be read without blocking. *)
-				PROCEDURE Available*( ): LONGINT;
-				VAR available: LONGINT;
+				PROCEDURE Available*( ): SIGNED32;
+				VAR available: SIGNED32;
 				BEGIN {EXCLUSIVE}
 					IF state IN {Established, Listen} THEN
 						IF Sockets.Requested( socket ) THEN
@@ -251,13 +251,13 @@ TYPE
 				END Available;
 
 				(** Return connection state. *)
-				PROCEDURE State*( ): LONGINT;
+				PROCEDURE State*( ): SIGNED32;
 				BEGIN
 					RETURN state
 				END State;
 
 				(** Wait until the connection state is either in the good or bad set, up to "ms" milliseconds. *)
-				PROCEDURE AwaitState*( good, bad: SET;  ms: LONGINT;  VAR res: WORD );
+				PROCEDURE AwaitState*( good, bad: SET;  ms: SIGNED32;  VAR res: WORD );
 				BEGIN
 					WHILE (ms > 0) & ~(state IN (good+bad)) DO  Objects.Sleep( 10 );  DEC( ms, 10 )  END;
 					IF state IN good THEN
@@ -284,7 +284,7 @@ TYPE
 				(** Accept a client waiting on a listening connection. Blocks until a client is available or the
 					  connection is closed. *)
 				PROCEDURE Accept*( VAR client: Connection;  VAR res: WORD );
-				VAR newsocket: LONGINT;  peerAdr: Sockets.SocketAdr;
+				VAR newsocket: SIGNED32;  peerAdr: Sockets.SocketAdr;
 				BEGIN {EXCLUSIVE}
 					IF trace THEN
 						Out.String( "Accept: socket=" ); Out.Int( socket, 0 );  Out.String( " ... " )

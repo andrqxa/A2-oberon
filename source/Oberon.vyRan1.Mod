@@ -46,9 +46,9 @@ TYPE
 	tSeed = OBJECT  (* POINTER TO tSeedDesc;
 	tSeedDesc = RECORD*)
 	(vyRanBase.tLongintSeed);
-	VAR ix1, ix2, ix3: LONGINT;
+	VAR ix1, ix2, ix3: SIGNED32;
 		r: ARRAY 98 OF LONGREAL;
-		iff: LONGINT;
+		iff: SIGNED32;
 
 		PROCEDURE  (*VAR seed: tSeedDesc*) Store*( VAR r: Files.Rider );
 		VAR i: SIGNED16;
@@ -76,7 +76,7 @@ TYPE
 	END AllocSeed;
 
 	PROCEDURE Ran1*( s: tSeed ): LONGREAL;
-	VAR temp: LONGREAL;  j: LONGINT;
+	VAR temp: LONGREAL;  j: SIGNED32;
 	BEGIN
 		IF (s.val < 0) OR (s.iff = 0) THEN
 			s.iff := 1;  s.ix1 := (IC1 - (s.val)) MOD M1;  s.ix1 := (IA1 * s.ix1 + IC1) MOD M1;  s.ix2 := s.ix1 MOD M2;
@@ -118,9 +118,9 @@ TYPE
 		temp := Ran1( r.seed( tSeed ) );  RETURN temp
 	END GetUniform;
 
-	PROCEDURE GetL( r: tRandom;  top: LONGINT ): LONGINT;
+	PROCEDURE GetL( r: tRandom;  top: SIGNED32 ): SIGNED32;
 	CONST  (*a = 16807;	m = 2147483647; 	q = m DIV a;	r = m MOD a; scalefact=1.0D0/m;*)
-	VAR seed: LONGINT;  temp: LONGREAL;
+	VAR seed: SIGNED32;  temp: LONGREAL;
 	BEGIN  (* better break if top is out of range *)
 		HALT( 102 );  temp := Ran1( r.seed( tSeed ) );  RETURN ((seed - 1) MOD top)
 		(* better use higher order bits *)

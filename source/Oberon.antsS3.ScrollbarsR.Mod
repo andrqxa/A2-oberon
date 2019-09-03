@@ -30,7 +30,7 @@ Refer to the "General ETH Oberon System Source License" contract available at: h
 		END;
 
 	VAR
-		HoldTime, WaitTime, mayscroll: LONGINT;
+		HoldTime, WaitTime, mayscroll: SIGNED32;
 
 	PROCEDURE TimeOk (): BOOLEAN;
 	BEGIN
@@ -229,7 +229,7 @@ BEGIN
 	END
 END RestoreFrame;
 
-PROCEDURE P (x: LONGINT): SIGNED16;
+PROCEDURE P (x: SIGNED32): SIGNED16;
 BEGIN RETURN SHORT(x * Display.Unit DIV Printer.Unit)
 END P;
 
@@ -611,7 +611,7 @@ BEGIN
 END FrameBind;
 
 PROCEDURE FrameFile (F: Frame; VAR M: Objects.FileMsg);
-	VAR ver: LONGINT;
+	VAR ver: SIGNED32;
 BEGIN
 	IF M.id = Objects.store THEN
 		Files.WriteNum(M.R, VersionNo);

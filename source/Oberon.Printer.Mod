@@ -21,7 +21,7 @@ TYPE
 		name*: ARRAY 64 OF CHAR; (** Command used for installing the printer. *)
 		Height*, Width*, Depth*: SIGNED16;	(** Page size (in printer pixels), and available colors (bit depth) **)
 		FrameX*, FrameY*, FrameW*, FrameH*: SIGNED16; (** Printable region of the page. *)
-		Unit*: LONGINT;	(** Printer resolution in 1/36000 mm per pixel. *)
+		Unit*: SIGNED32;	(** Printer resolution in 1/36000 mm per pixel. *)
 
 		InitMetrics*: PROCEDURE (P: Printer);
 		Open*: PROCEDURE (P: Printer; printer, options: ARRAY OF CHAR); (** Initialize printer & set result code. *)
@@ -56,18 +56,18 @@ TYPE
 VAR
 	Height*, Width*, Depth*: SIGNED16;	(** In printer pixels, and bit depth *)
 	FrameX*, FrameY*, FrameW*, FrameH*: SIGNED16;	(** Printable area. *)
-	Unit*: LONGINT;	(** Printer resolution in 1/36000 mm per pixel. *)
+	Unit*: SIGNED32;	(** Printer resolution in 1/36000 mm per pixel. *)
 	res*: SIGNED16;	(** result code. 0 = ok, 1 = no such printer, 2 = no link, 3 = printer not ready, 4 = no permission *)
 	current*: Printer;	(** Current active printer. *)
 	spool: SpoolList;
 	W: Texts.Writer;
 	task: Oberon.Task;
-	timeslice: LONGINT;
-	spoollength, spoolpos: LONGINT;	(* view with System.State Printer *)
+	timeslice: SIGNED32;
+	spoollength, spoolpos: SIGNED32;	(* view with System.State Printer *)
 	default: ARRAY 64 OF CHAR;
 
 PROCEDURE SplitName(VAR name, MName, PName: ARRAY OF CHAR);
-	VAR i, j: LONGINT;
+	VAR i, j: SIGNED32;
 BEGIN i := 0;
 	WHILE name[i] # "." DO MName[i] := name[i]; INC(i) END;
 	MName[i] := 0X; INC(i); j := 0;
@@ -213,8 +213,8 @@ END GetMetric;
 	stopbits = "1"|"2" .
 *)
 
-PROCEDURE GetConfig(port: LONGINT;  VAR bps, data, parity, stop: LONGINT);
-VAR s: Texts.Scanner;  label: ARRAY 32 OF CHAR;  i: LONGINT;
+PROCEDURE GetConfig(port: SIGNED32;  VAR bps, data, parity, stop: SIGNED32);
+VAR s: Texts.Scanner;  label: ARRAY 32 OF CHAR;  i: SIGNED32;
 BEGIN
 	bps := 9600;  data := 8;  parity := V24.ParNo;  stop := V24.Stop1;
 	label := "Printer.COM#";
@@ -253,7 +253,7 @@ END GetConfig;
 (* Spooling *)
 
 PROCEDURE StartJob(n: SpoolList);
-VAR err, bps, data, parity, stop: LONGINT;
+VAR err, bps, data, parity, stop: SIGNED32;
 BEGIN
 	spoollength := Files.Length(Files.Base(n.r));
 	IF n.v24 THEN
@@ -276,7 +276,7 @@ BEGIN
 END EndJob;
 
 PROCEDURE V24Send(port: SIGNED16;  ch: CHAR;  VAR done: BOOLEAN);
-VAR s: SET;  err: LONGINT;
+VAR s: SET;  err: SIGNED32;
 BEGIN
 	V24.GetMC(port, s);
 	IF V24.CTS IN s THEN
@@ -288,7 +288,7 @@ BEGIN
 END V24Send;
 
 PROCEDURE Spooler(me: Oberon.Task);
-VAR t: LONGINT;
+VAR t: SIGNED32;
 BEGIN
 	t := Input.Time();
 	LOOP
@@ -337,7 +337,7 @@ END Enter;
 
 (** Send file to the local printer specified by its name, or if not a known printer, register the file.  res code is set. *)
 PROCEDURE Spool*(f: Files.File);	(** non-portable *)
-VAR name: ARRAY 64 OF CHAR;  pre: ARRAY 6 OF CHAR;  p: SIGNED16;  i, j: LONGINT;
+VAR name: ARRAY 64 OF CHAR;  pre: ARRAY 6 OF CHAR;  p: SIGNED16;  i, j: SIGNED32;
 BEGIN
 	Files.GetName(f, name);
 	i := 0;  WHILE (name[i] # 0X) & (name[i] # ":") DO INC(i) END;

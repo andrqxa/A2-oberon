@@ -12,11 +12,11 @@ CONST
 TYPE
 	Histogram* = POINTER TO HistogramDesc;
 	HistogramDesc* = RECORD (Gadgets.FrameDesc)
-		count: ARRAY Bins OF LONGINT; (* Counting bins *)
+		count: ARRAY Bins OF SIGNED32; (* Counting bins *)
 		nrBins: SIGNED16; (* Visible bins *)
 		offs,width,top: LONGREAL;
-		toosmall,toolarge,nans: LONGINT; (* special counters *)
-		nrobs,maxcount: LONGINT;
+		toosmall,toolarge,nans: SIGNED32; (* special counters *)
+		nrobs,maxcount: SIGNED32;
 		prevmax: LONGREAL;
 		adapting: BOOLEAN;		(* adapt number of bins and limits *)
 		moving: BOOLEAN;		(* show mem data only *)
@@ -51,7 +51,7 @@ BEGIN
 	RETURN TRUE
 END LongReal;
 
-PROCEDURE LongInt (VAR M: Objects.AttrMsg; VAR x: LONGINT): BOOLEAN;
+PROCEDURE LongInt (VAR M: Objects.AttrMsg; VAR x: SIGNED32): BOOLEAN;
 BEGIN
 	IF M.class=Objects.Int THEN x:=M.i
 	ELSIF M.class=Objects.String THEN Strings.StrToInt(M.s,x)
@@ -102,8 +102,8 @@ BEGIN
 	H.upd:=TRUE
 END AddHistCounts;
 
-PROCEDURE GetHistCounts (H: Histogram; VAR nrcounted: LONGINT);
-VAR i: LONGINT;
+PROCEDURE GetHistCounts (H: Histogram; VAR nrcounted: SIGNED32);
+VAR i: SIGNED32;
 BEGIN
 	ClearHistCounts(H); nrcounted := 0;
 	IF H.nrobs > Mems THEN
@@ -116,7 +116,7 @@ BEGIN
 END GetHistCounts;
 
 PROCEDURE AddPoint* (H: Histogram; x: LONGREAL);
-VAR bin,i,nr: LONGINT; xorig,w,min,max: LONGREAL; tempbins: SIGNED16;
+VAR bin,i,nr: SIGNED32; xorig,w,min,max: LONGREAL; tempbins: SIGNED16;
 BEGIN
 	IF H.logtransform THEN x := MathL.ln(x) END;
 	IF H.diff THEN
@@ -165,7 +165,7 @@ BEGIN
 
 PROCEDURE RestoreFrame (H: Histogram; M: Display3.Mask; x, y, w, h: SIGNED16);
 CONST specialwidth = 2;
-VAR count: LONGINT; yfact,xfact,curmax: LONGREAL; s: ARRAY 16 OF CHAR; i, width, p, xpos, col, freew: SIGNED16;
+VAR count: SIGNED32; yfact,xfact,curmax: LONGREAL; s: ARRAY 16 OF CHAR; i, width, p, xpos, col, freew: SIGNED16;
 BEGIN
 	Oberon.RemoveMarks(x, y, w, h);
 	freew := w - 2 - 4*specialwidth;
@@ -230,7 +230,7 @@ END Dev;
 PROCEDURE PrintFrame (H: Histogram; VAR Msg: Display.DisplayMsg);
 CONST specialwidth=2;
 VAR i, mode,width,p,xpos: SIGNED16; s: ARRAY 16 OF CHAR; freew:SIGNED16;M: Display3.Mask; x, y, w, h: SIGNED16;
-	count:LONGINT;yfact,xfact,curmax:LONGREAL;col:SIGNED16;
+	count:SIGNED32;yfact,xfact,curmax:LONGREAL;col:SIGNED16;
 BEGIN
 	x := Msg.x; y := Msg.y; w := Dev(H.W); h := Dev(H.H);
 	Gadgets.MakePrinterMask(H, x, y, Msg.dlink, M);
@@ -285,7 +285,7 @@ BEGIN
 END PrintFrame;
 
 PROCEDURE FrameAttr (F: Histogram; VAR M: Objects.AttrMsg);
-VAR nr, ilong: LONGINT; x: LONGREAL;
+VAR nr, ilong: SIGNED32; x: LONGREAL;
 BEGIN
 	IF M.id = Objects.get THEN
 	(* settable attributes first *)
@@ -369,7 +369,7 @@ END FrameAttr;
 
 PROCEDURE File (F: Histogram; VAR M: Objects.FileMsg);
 CONST Version = 2;
-VAR i, version: LONGINT;
+VAR i, version: SIGNED32;
 BEGIN
 	IF M.id=Objects.load THEN
 		Files.ReadLInt(M.R, version);

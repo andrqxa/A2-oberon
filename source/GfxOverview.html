@@ -259,7 +259,7 @@ that the current path is always stored in device coordinates.
       strokePat, fillPat: Pattern;  (* current stroke and fill pattern *)
       lineWidth: REAL;  (* current line and curve width *)
       dashPatOn, dashPatOff: ARRAY MaxDashPatSize OF REAL;  (* current dash pattern *)
-      dashPatLen: LONGINT;  (* number of valid elements in dash pattern arrays *)
+      dashPatLen: SIGNED32;  (* number of valid elements in dash pattern arrays *)
       dashPhase: REAL;  (* offset into pattern at first dash *)
       capStyle: CapStyle;  (* line cap style *)
       joinStyle: JoinStyle;  (* line join style *)
@@ -279,7 +279,7 @@ that the current path is always stored in device coordinates.
   PROCEDURE SetFillColor(ctxt: Context; color: GfxColors.Color);
   PROCEDURE SetFillPattern(ctxt: Context; pat: Pattern);
   PROCEDURE SetLineWidth(ctxt: Context; width: REAL);
-  PROCEDURE SetDashPattern(ctxt: Context; VAR on, off: ARRAY OF REAL; len: LONGINT; phase: REAL);
+  PROCEDURE SetDashPattern(ctxt: Context; VAR on, off: ARRAY OF REAL; len: SIGNED32; phase: REAL);
   PROCEDURE SetCapStyle(ctxt: Context; style: CapStyle);
   PROCEDURE SetJoinStyle(ctxt: Context; style: JoinStyle);
   PROCEDURE SetStyleLimit(ctxt: Context; limit: REAL);
@@ -541,8 +541,8 @@ affect the interior of the new clip area until the clip area is reset or a previ
     ContextDesc = RECORD (GfxContexts.ContextDesc)
       clipReg: Region;  (* interior of clip path *)
       pathReg: GfxRegions.Region;  (* interior of current path *)
-      dot: PROCEDURE(rc: Context; x, y: LONGINT);  (* current dot procedure *)
-      rect: PROCEDURE(rc: Context; lx, ly, rx, uy: LONGINT);  (* current rect procedure *)
+      dot: PROCEDURE(rc: Context; x, y: SIGNED32);  (* current dot procedure *)
+      rect: PROCEDURE(rc: Context; lx, ly, rx, uy: SIGNED32);  (* current rect procedure *)
       ...
     END;
 </PRE>
@@ -571,11 +571,11 @@ PostScript operations and writes them to a file.
       width, height: REAL;  (* paper size in default coordinates *)
       left, bot, right, top: REAL;  (* borders in default coordinates *)
       level2, landscape, eps: BOOLEAN;
-      res: LONGINT;  (* device resolution *)
+      res: SIGNED32;  (* device resolution *)
     END;
     
-  PROCEDURE Init(psc: Context; level2, landscape: BOOLEAN; width, height, left, right, bot, top: REAL; res: LONGINT);
-  PROCEDURE InitEPS(psc: Context; level2: BOOLEAN; res: LONGINT);
+  PROCEDURE Init(psc: Context; level2, landscape: BOOLEAN; width, height, left, right, bot, top: REAL; res: SIGNED32);
+  PROCEDURE InitEPS(psc: Context; level2: BOOLEAN; res: SIGNED32);
   PROCEDURE Open(psc: Context; file: Files.File);
   PROCEDURE ShowPage(psc: Context);
   PROCEDURE Close(psc: Context);

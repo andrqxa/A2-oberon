@@ -69,7 +69,7 @@ TYPE
 		res*,nest,last: SIGNED16;	(** error flag *)
 	END;
 VAR
-	F,D: LONGINT;	(* fraction and decimals *)
+	F,D: SIGNED32;	(* fraction and decimals *)
 	ref: Reference;	(* List of available operators *)
 	test*: Expression;	(** FOR DEBUGGING ONLY *)
 
@@ -487,7 +487,7 @@ f must be PROCEDURE(x: LONGREAL) returning LONGREAL. For example to define a sim
 
 		PROCEDURE fac(x: LONGREAL): LONGREAL;
 		VAR
-			i: LONGINT;
+			i: SIGNED32;
 			y: LONGREAL;
 		BEGIN
 			i:= 0; y:= 1.0;

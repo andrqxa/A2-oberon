@@ -30,16 +30,16 @@ TYPE
 		rider: Files.Rider;
 		reader: Texts.Reader;
 		text: Texts.Text;	(* needed for Set *)
-		ofs: LONGINT;	(* needed for Pos - Position, where text starts in file *)
+		ofs: SIGNED32;	(* needed for Pos - Position, where text starts in file *)
 		eof: BOOLEAN;	(* str is for text parsing, eof is copied from rider.eof or reader.eot *)
 		Read: PROCEDURE(VAR R: Rider; VAR c: CHAR);	(* read a byte *)
-		Pos: PROCEDURE(VAR R: Rider): LONGINT;	(* get current file position *)
-		Set: PROCEDURE(VAR R: Rider; pos: LONGINT);	(* seek to given file position *)
+		Pos: PROCEDURE(VAR R: Rider): SIGNED32;	(* get current file position *)
+		Set: PROCEDURE(VAR R: Rider; pos: SIGNED32);	(* seek to given file position *)
 	END;
 VAR
 	map,r0,g0,b0,r1,g1,b1: ARRAY 256 OF SIGNED16;
 	mode: CHAR;
-	depth: LONGINT;
+	depth: SIGNED32;
 	delta: SIGNED16;
 	credit: BOOLEAN;
 
@@ -50,12 +50,12 @@ BEGIN
 	Files.Read(R.rider,c); R.eof:= R.rider.eof;
 END ReadFile;
 
-PROCEDURE PosFile(VAR R: Rider): LONGINT;
+PROCEDURE PosFile(VAR R: Rider): SIGNED32;
 BEGIN
 	RETURN(Files.Pos(R.rider));
 END PosFile;
 
-PROCEDURE SetFile(VAR R: Rider; pos: LONGINT);
+PROCEDURE SetFile(VAR R: Rider; pos: SIGNED32);
 BEGIN
 	Files.Set(R.rider,Files.Base(R.rider),pos); R.eof:= R.rider.eof;
 END SetFile;
@@ -65,12 +65,12 @@ BEGIN
 	Texts.Read(R.reader,c); R.eof:= R.reader.eot;
 END ReadText;
 
-PROCEDURE PosText(VAR R: Rider): LONGINT;
+PROCEDURE PosText(VAR R: Rider): SIGNED32;
 BEGIN
 	RETURN(R.ofs+Texts.Pos(R.reader));
 END PosText;
 
-PROCEDURE SetText(VAR R: Rider; pos: LONGINT);
+PROCEDURE SetText(VAR R: Rider; pos: SIGNED32);
 BEGIN
 	Texts.OpenReader(R.reader,R.text,pos);
 	Files.Set(R.rider,Files.Base(R.rider),pos); R.eof:= R.rider.eof;
@@ -78,11 +78,11 @@ END SetText;
 
 (* End of Rider Methods *)
 
-PROCEDURE OpenRider(VAR FR: Files.Rider; VAR R: Rider; pos: LONGINT);
+PROCEDURE OpenRider(VAR FR: Files.Rider; VAR R: Rider; pos: SIGNED32);
 	(* initialize a Rider. Supported are Oberon Texts and DOS/UNIX Files *)
 VAR
 	c: CHAR;
-	len: LONGINT;
+	len: SIGNED32;
 	val: SIGNED16;
 	line: Objects.Name;
 BEGIN
@@ -138,7 +138,7 @@ PROCEDURE Value(VAR R: Rider): SIGNED16;
 	(* return an integer value read from the text stream *)
 VAR
 	c: ARRAY 71 OF CHAR;
-	i: LONGINT;
+	i: SIGNED32;
 BEGIN
 	IF R.eof THEN
 		i:= -1;
@@ -152,17 +152,17 @@ BEGIN
 	RETURN(SHORT(i));
 END Value;
 
-PROCEDURE ScanGrayMap(pict: Pictures.Picture; nrColor: LONGINT; conversion: BOOLEAN);
+PROCEDURE ScanGrayMap(pict: Pictures.Picture; nrColor: SIGNED32; conversion: BOOLEAN);
 	(* build a colormap from segmented grayscale values *)
 VAR
 	Gray: CHAR;
-	min,d,x,y,z: LONGINT;
+	min,d,x,y,z: SIGNED32;
 	i,j,k,minj: SIGNED16;
 BEGIN
 	IF conversion THEN
 		i:= 0;
 		FOR k:= 0 TO SHORT(nrColor) DO
-			Gray:= CHR(i); min:= MAX(LONGINT);
+			Gray:= CHR(i); min:= MAX(SIGNED32);
 			FOR j:= 0 TO SHORT(depth) DO
 				x:= ABS(ORD(Gray)-r0[j]); y:= ABS(ORD(Gray)-g0[j]); z:= ABS(ORD(Gray)-b0[j]);
 				d:= x;
@@ -189,7 +189,7 @@ END ScanGrayMap;
 PROCEDURE ScanColor(pict: Pictures.Picture; i,red,green,blue: SIGNED16; conversion: BOOLEAN): SIGNED16;
 	(* build a colormap by using the read values of red,green and blue *)
 VAR
-	min,d,x,y,z: LONGINT;
+	min,d,x,y,z: SIGNED32;
 	j,k,minj: SIGNED16;
 BEGIN
 	IF conversion THEN
@@ -198,7 +198,7 @@ BEGIN
 			IF (r1[k] = red) & (g1[k] = green) & (b1[k] = blue) THEN RETURN map[k] END;
 			INC(k);
 		END;
-		min:= MAX(LONGINT);
+		min:= MAX(SIGNED32);
 		FOR j:= 0 TO SHORT(depth) DO
 			x:= ABS((red*delta)-r0[j]); y:= ABS((green*delta)-g0[j]); z:= ABS((blue*delta)-b0[j]);
 			d:= x;
@@ -219,7 +219,7 @@ END ScanColor;
 
 PROCEDURE LoadPPM(VAR R: Rider; transparentCol: SIGNED16; colorConversion: BOOLEAN; pict: Pictures.Picture);
 VAR
-	p,pos: LONGINT;
+	p,pos: SIGNED32;
 	i,w,h,x,y,v0,v1,v2: SIGNED16;
 	c,red,green,blue: CHAR;
 	eol: BOOLEAN;
@@ -351,7 +351,7 @@ END LoadPPM;
 PROCEDURE Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg);
 VAR
 	R: Rider;
-	pos: LONGINT;
+	pos: SIGNED32;
 BEGIN
 	WITH obj: Pictures.Picture DO
 		IF msg IS Objects.AttrMsg THEN

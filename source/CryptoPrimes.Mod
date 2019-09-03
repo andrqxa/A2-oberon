@@ -15,7 +15,7 @@ TYPE
 
 VAR
 	one: BigNumber;
-	primes: ARRAY N OF LONGINT;
+	primes: ARRAY N OF SIGNED32;
 
 
 	PROCEDURE NewPrime*( bits: SIGNED16;  safe: BOOLEAN ): BigNumber;
@@ -87,7 +87,7 @@ VAR
 
 
 	PROCEDURE ProbablePrime( bits: SIGNED16 ): BigNumber;
-	VAR t: BigNumber;  delta, i: LONGINT; p: BigNumber;
+	VAR t: BigNumber;  delta, i: SIGNED32; p: BigNumber;
 		mods: ARRAY N OF UNSIGNED32;
 	BEGIN
 		LOOP
@@ -111,7 +111,7 @@ VAR
 
 
 	PROCEDURE ProbableDHPrime( bits: SIGNED16;  add, rem: BigNumber ): BigNumber;
-	VAR d, r, p: BigNumber;  i: LONGINT;
+	VAR d, r, p: BigNumber;  i: SIGNED32;
 	BEGIN
 		p := B.NewRand( bits, 0, 1 );
 
@@ -130,7 +130,7 @@ VAR
 	END ProbableDHPrime;
 
 	PROCEDURE ProbableDHPrimeSafe( bits: SIGNED16; padd, rem: BigNumber ): BigNumber;
-	VAR d, q, r, qr, qadd, p: BigNumber;  i: LONGINT;
+	VAR d, q, r, qr, qadd, p: BigNumber;  i: SIGNED32;
 	BEGIN
 		B.Copy( padd, qadd );  qadd.Shift( -1 );
 		q := B.NewRand( bits, 0, 1 );
@@ -205,7 +205,7 @@ VAR
 	END witness;
 
 	PROCEDURE Init;
-	VAR sieve: ARRAY N OF SET32; i, j, p, n: LONGINT;
+	VAR sieve: ARRAY N OF SET32; i, j, p, n: SIGNED32;
 	BEGIN
 		(* compute the first N small primes *)
 		FOR i := 0 TO N - 1 DO sieve[i] := {0..31} END;

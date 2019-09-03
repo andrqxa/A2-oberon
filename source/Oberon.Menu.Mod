@@ -35,7 +35,7 @@ MODULE Menu IN Oberon;	(** portable *)	(* rs/uh, Wed, 7-Jul-1993 *)
 			name: ARRAY 32 OF CHAR;
 			text: Texts.Text;
 			cmd: SIGNED16;
-			count: LONGINT
+			count: SIGNED32
 		END;
 
 	VAR
@@ -55,7 +55,7 @@ MODULE Menu IN Oberon;	(** portable *)	(* rs/uh, Wed, 7-Jul-1993 *)
 	END FontOf;
 
 	PROCEDURE CopyArea(x, y, w, h: SIGNED16; save: BOOLEAN);
-		VAR cx, cy, cw, ch, x0, h0: SIGNED16; size, pix: LONGINT;
+		VAR cx, cy, cw, ch, x0, h0: SIGNED16; size, pix: SIGNED32;
 	BEGIN
 		pix := Display.TransferFormat(0) DIV 8;
 		IF pix = 0 THEN	(* TransferBlock not available, use offscreen CopyBlock *)

@@ -174,7 +174,7 @@ VAR F: ErrorGadget;
 BEGIN NEW(F); F.W := 20; F.H := 14; F.errno := 255;F.handle := ErrorGadgetHandler; Objects.NewObj := F
 END NewErrorGadget;
 
-PROCEDURE MarkErrorPos(T: Texts.Text; pos: LONGINT; err: SIGNED16; str: ARRAY OF CHAR);
+PROCEDURE MarkErrorPos(T: Texts.Text; pos: SIGNED32; err: SIGNED16; str: ARRAY OF CHAR);
 VAR obj: Objects.Object;
 BEGIN
 	NewErrorGadget; obj := Objects.NewObj; obj(ErrorGadget).errno := err; COPY(str,obj(ErrorGadget).str);
@@ -183,7 +183,7 @@ BEGIN
 END MarkErrorPos;
 
 PROCEDURE RemoveErrors*(T: Texts.Text);
-VAR first: LONGINT; F: Texts.Finder; o: Objects.Object;
+VAR first: SIGNED32; F: Texts.Finder; o: Objects.Object;
 BEGIN
 	first := -1;
 	LOOP
@@ -207,7 +207,7 @@ BEGIN
 END RemoveErrors;
 
 (*
-	PROCEDURE Locate(F: Display.Frame;  T: Texts.Text;  pos: LONGINT);
+	PROCEDURE Locate(F: Display.Frame;  T: Texts.Text;  pos: SIGNED32);
 	VAR M: Oberon.CaretMsg;  N: Oberon.ControlMsg;
 	BEGIN
 		IF pos < 0 THEN pos := 0
@@ -220,8 +220,8 @@ END RemoveErrors;
 *)
 
 PROCEDURE markErrors*(VAR S: Texts.Scanner; errtext: Texts.Text; par: Display.Frame);
-VAR c, err: SIGNED16; pos, beg, l,line, k: LONGINT; C: Oberon.CaretMsg;  warn: BOOLEAN;
-	marked: ARRAY MaxErrors OF LONGINT;str: ARRAY 64 OF CHAR; R: Texts.Reader; ch: CHAR; i,endpos: LONGINT; valid: BOOLEAN;
+VAR c, err: SIGNED16; pos, beg, l,line, k: SIGNED32; C: Oberon.CaretMsg;  warn: BOOLEAN;
+	marked: ARRAY MaxErrors OF SIGNED32;str: ARRAY 64 OF CHAR; R: Texts.Reader; ch: CHAR; i,endpos: SIGNED32; valid: BOOLEAN;
 BEGIN
 	WHILE (~S.eot) & ((S.class # Texts.Name) OR (S.s # "compiling"))  DO
 		Texts.Scan(S);
@@ -265,7 +265,7 @@ BEGIN
 END markErrors;
 
 PROCEDURE MarkErrors*;
-VAR S: Texts.Scanner; par: Display.Frame; beg, end, time: LONGINT;  T, errtext: Texts.Text;
+VAR S: Texts.Scanner; par: Display.Frame; beg, end, time: SIGNED32;  T, errtext: Texts.Text;
 BEGIN
 	errtext := GetText(par);
 	IF errtext # NIL THEN
@@ -285,8 +285,8 @@ BEGIN
 	IF T # NIL THEN RemoveErrors(T) END
 END ClearErrors;
 
-PROCEDURE ErrorAfter(T: Texts.Text; VAR pos: LONGINT);
-VAR F: Texts.Finder; o: Objects.Object; p: LONGINT;
+PROCEDURE ErrorAfter(T: Texts.Text; VAR pos: SIGNED32);
+VAR F: Texts.Finder; o: Objects.Object; p: SIGNED32;
 BEGIN
 	Texts.OpenFinder(F, T, pos);
 	p := F.pos; Texts.FindObj(F, o);
@@ -295,7 +295,7 @@ BEGIN
 END ErrorAfter;
 
 PROCEDURE NextError*;
-VAR M: Oberon.CaretMsg; pos: LONGINT;
+VAR M: Oberon.CaretMsg; pos: SIGNED32;
 BEGIN
 	M.F := NIL; M.id := Oberon.get; M.car := NIL; M.text := NIL; Display .Broadcast(M);
 	IF (M.car # NIL) & (M.text # NIL) THEN

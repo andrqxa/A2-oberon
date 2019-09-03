@@ -49,7 +49,7 @@ TYPE
 		next: Password
 	END;
 
-	Bytes = ARRAY MAX(LONGINT) OF CHAR;
+	Bytes = ARRAY MAX(SIGNED32) OF CHAR;
 
 VAR
 	int*: IP.Interface;
@@ -131,12 +131,12 @@ END OpenConnection;
 (** Like OpenConnection, but this procedure may return immediately and delay the actual opening of the connection.  In this case State() should be checked to wait for the connection status to change from waitCon. *)
 
 PROCEDURE AsyncOpenConnection*(VAR C: Connection; locPort: SIGNED16; remIP: IPAdr; remPort:SIGNED16; VAR res: SIGNED16);
-VAR err: LONGINT;
+VAR err: SIGNED32;
 BEGIN
 	NEW(C); NEW(C.pcb);
 	C.pcb.Open(LONG(locPort) MOD 10000H, remIP, LONG(remPort) MOD 10000H, err);
 	IF err = 0 THEN
-		(*Kernel.WriteString("pcb="); Kernel.WriteHex(SYSTEM.VAL(LONGINT, C.pcb), 8); Kernel.WriteLn;*)
+		(*Kernel.WriteString("pcb="); Kernel.WriteHex(SYSTEM.VAL(SIGNED32, C.pcb), 8); Kernel.WriteLn;*)
 		Kernel.RegisterObject(C, Cleanup, FALSE);
 		res := done
 	ELSE
@@ -149,7 +149,7 @@ END AsyncOpenConnection;
 (** Close the connection. Connection can not be used for send operations afterwards. *)
 
 PROCEDURE CloseConnection* (C: Connection);
-VAR err: LONGINT;
+VAR err: SIGNED32;
 BEGIN
 	IF C.pcb # NIL THEN
 		C.pcb.Close();
@@ -162,7 +162,7 @@ END CloseConnection;
 (** Discard the connection. Connection can not be used afterwards. *)
 
 PROCEDURE DiscardConnection* (C: Connection);	(** non-portable *)
-VAR err: LONGINT;
+VAR err: SIGNED32;
 BEGIN
 	IF C.pcb # NIL THEN
 		C.pcb.Discard();
@@ -198,7 +198,7 @@ END Requested;
 (** Procedure accepts a new waiting, active connection (newC) on a passive one (State(C) = listen). If no connection is 	waiting, accept blocks until there is one or an error occurs. If C is not a passive connection, Accept does nothing but res is set to Done. *)
 
 PROCEDURE Accept* (C: Connection; VAR newC: Connection; VAR res: SIGNED16);
-VAR client: TCP.Connection; err: LONGINT;
+VAR client: TCP.Connection; err: SIGNED32;
 BEGIN
 	C.pcb.Accept(client, err);
 	IF err = 0 THEN
@@ -219,7 +219,7 @@ END State;
 
 (** Returns the number of bytes which may be read without blocking. *)
 
-PROCEDURE Available* (C: Connection): LONGINT;
+PROCEDURE Available* (C: Connection): SIGNED32;
 BEGIN
 	RETURN C.pcb.Available()
 END Available;
@@ -235,7 +235,7 @@ END Read;
 
 (** Blocking read len bytes of data (beginning at pos in buf) to buf. *)
 
-PROCEDURE ReadBytes* (C: Connection; pos, len: LONGINT; VAR buf: ARRAY OF SYSTEM.BYTE);
+PROCEDURE ReadBytes* (C: Connection; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
 VAR read: SIZE; res: WORD;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));	(* index check *)
@@ -258,7 +258,7 @@ END ReadInt;
 
 (** Blocking read four bytes in network byte ordering. *)
 
-PROCEDURE ReadLInt* (C: Connection; VAR x: LONGINT);
+PROCEDURE ReadLInt* (C: Connection; VAR x: SIGNED32);
 VAR buf: ARRAY 4 OF CHAR; res: WORD; len: SIZE;
 BEGIN
 	C.pcb.Receive(buf, 0, 4, 4, len, res);
@@ -272,7 +272,7 @@ END ReadLInt;
 (** Blocking read a string terminated by ( [CR]LF | 0X ). *)
 
 PROCEDURE ReadString* (C: Connection; VAR s: ARRAY OF CHAR);
-VAR i: LONGINT; ch: CHAR;
+VAR i: SIGNED32; ch: CHAR;
 BEGIN
 	i := 0;
 	LOOP
@@ -295,7 +295,7 @@ END Write;
 
 (** Blocking write len bytes of data (beginning at pos in buf) to C. *)
 
-PROCEDURE WriteBytes* (C: Connection; pos, len: LONGINT; VAR buf: ARRAY OF SYSTEM.BYTE);
+PROCEDURE WriteBytes* (C: Connection; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
 VAR res: WORD;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));
@@ -315,7 +315,7 @@ END WriteInt;
 
 (** Blocking write four bytes in network byte ordering to C. *)
 
-PROCEDURE WriteLInt* (C: Connection; x: LONGINT);
+PROCEDURE WriteLInt* (C: Connection; x: SIGNED32);
 VAR res: WORD; buf: ARRAY 4 OF CHAR;
 BEGIN
 	buf[0] := CHR(x DIV 1000000H MOD 100H); buf[1] := CHR(x DIV 10000H MOD 100H);
@@ -327,7 +327,7 @@ END WriteLInt;
 (** Blocking write a string without "0X" and terminated by "CRLF" to C. *)
 
 PROCEDURE WriteString* (C: Connection; s: ARRAY OF CHAR);
-VAR i, res: LONGINT;
+VAR i, res: SIGNED32;
 BEGIN
 	i := 0; WHILE s[i] # 0X DO INC(i) END;
 	C.pcb.Send(s, 0, i, FALSE, res);
@@ -357,7 +357,7 @@ END GetPartner;
 (** Opens a socket which is dedicated to datagram services. locPort is registered to receive datagrams from any port and any host. *)
 
 PROCEDURE OpenSocket* (VAR S: Socket; locPort: SIGNED16; VAR res: SIGNED16);
-VAR err: LONGINT;
+VAR err: SIGNED32;
 BEGIN
 	NEW(S); NEW(S.pcb, LONG(locPort) MOD 10000H, err);
 	IF err = 0 THEN res := done ELSE S.pcb := NIL; res := error END;
@@ -374,7 +374,7 @@ END CloseSocket;
 
 (** Sends len bytes of data (beginning at pos in buf) to the host specified by remIP and remPort. *)
 
-PROCEDURE SendDG* (S: Socket; remIP: IPAdr; remPort: SIGNED16; pos, len: LONGINT; VAR buf: ARRAY OF SYSTEM.BYTE);
+PROCEDURE SendDG* (S: Socket; remIP: IPAdr; remPort: SIGNED16; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
 VAR res: WORD;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));	(* index check *)
@@ -384,19 +384,19 @@ END SendDG;
 
 (** Stores an entire datagram in buf beginning at pos. On success (S.res = done), remIP and remPort indicate the sender, 	len indicates the length of valid data. *)
 
-PROCEDURE ReceiveDG*(S: Socket; VAR remIP: IPAdr; VAR remPort: SIGNED16; pos: LONGINT; VAR len: LONGINT;
+PROCEDURE ReceiveDG*(S: Socket; VAR remIP: IPAdr; VAR remPort: SIGNED16; pos: SIGNED32; VAR len: SIGNED32;
 	VAR buf: ARRAY OF SYSTEM.BYTE);
-VAR res, fport: LONGINT; length: SIZE;
+VAR res, fport: SIGNED32; length: SIZE;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));	(* index check *)
 	S.pcb.Receive(SYSTEM.VAL(Bytes, buf), pos, len, 0, remIP, fport, length, res);
 	remPort := SHORT(fport);
-	IF res = 0 THEN S.res := done; len := length(LONGINT) ELSE S.res := error; len := -1 END
+	IF res = 0 THEN S.res := done; len := length(SIGNED32) ELSE S.res := error; len := -1 END
 END ReceiveDG;
 
 (** Returns the size of the first available datagram on the socket. *)
 
-PROCEDURE AvailableDG* (S: Socket): LONGINT;
+PROCEDURE AvailableDG* (S: Socket): SIGNED32;
 BEGIN
 	RETURN 0
 END AvailableDG;
@@ -413,7 +413,7 @@ END PutInt;
 
 (** Write 4 bytes in network byte ordering to buf[pos]. *)
 
-PROCEDURE PutLInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: SIGNED16; x: LONGINT);
+PROCEDURE PutLInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: SIGNED16; x: SIGNED32);
 BEGIN
 	buf[pos] := CHR(x DIV 1000000H MOD 100H);
 	buf[pos+1] := CHR(x DIV 10000H MOD 100H);
@@ -430,7 +430,7 @@ END GetInt;
 
 (** Read 4 bytes in network byte ordering from buf[pos]. *)
 
-PROCEDURE GetLInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: SIGNED16; VAR x: LONGINT);
+PROCEDURE GetLInt* (VAR buf: ARRAY OF SYSTEM.BYTE; pos: SIGNED16; VAR x: SIGNED32);
 BEGIN
 	x := ORD(buf[pos])*1000000H + ORD(buf[pos+1])*10000H + ORD(buf[pos+2])*100H + ORD(buf[pos+3])
 END GetLInt;
@@ -504,7 +504,7 @@ PROCEDURE SetUser*;
 		pass: Password;
 
 	PROCEDURE Next(VAR str: ARRAY OF CHAR);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		Texts.Read(R, ch);
 		WHILE ~R.eot & ((ch <= " ") OR (ch = ":") OR (ch = "@") OR (ch = "/") OR ~(R.lib IS Fonts.Font)) DO
@@ -518,7 +518,7 @@ PROCEDURE SetUser*;
 	END Next;
 
 	PROCEDURE InputStr(prompt: ARRAY OF CHAR; show: BOOLEAN; VAR str: ARRAY OF CHAR);
-		VAR i: LONGINT; ch: CHAR;
+		VAR i: SIGNED32; ch: CHAR;
 	BEGIN
 		Texts.SetColor(w, 1); Texts.WriteString(w, prompt); Texts.SetColor(w, 15);
 		Texts.Append(Oberon.Log, w.buf);
@@ -639,8 +639,8 @@ BEGIN
 	END
 END Stop;
 
-PROCEDURE WriteIPPortAdr(VAR w: Texts.Writer; adr: IP.Adr; port: LONGINT);
-VAR s: ARRAY 16 OF CHAR; i, j: LONGINT;
+PROCEDURE WriteIPPortAdr(VAR w: Texts.Writer; adr: IP.Adr; port: SIGNED32);
+VAR s: ARRAY 16 OF CHAR; i, j: SIGNED32;
 BEGIN
 	IP.AdrToStr(adr, s);
 	i := 0; WHILE s[i] # 0X DO Texts.Write(w, s[i]); INC(i) END;
@@ -662,7 +662,7 @@ BEGIN
 	state[TCP.LastAck] := closed; state[TCP.FinWait2] := inout; state[TCP.TimeWait] := closed;
 	anyIP := IP.NilAdr;
 	allIP.usedProtocol := IP.IPv4;
-	allIP.ipv4Adr := LONGINT(0FFFFFFFFH);
+	allIP.ipv4Adr := SIGNED32(0FFFFFFFFH);
 	crlf[0] := CR; crlf[1] := LF;
 	started := FALSE; hostName := "";
 	Texts.OpenWriter(w); passwords := NIL;

@@ -31,7 +31,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		ResourcePtr = POINTER TO Resource;
 		Resource = RECORD
 			name: FileDir.FileName;
-			time, date, pos: LONGINT;
+			time, date, pos: SIGNED32;
 			minor, major: SIGNED16;
 			next: ResourcePtr
 		END;
@@ -42,7 +42,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		END;
 
 		(** 0: Done, 1: NetworkErr, 2: UserBreak, 3: OtherError, -1: Transfering (see also PlugIns.Mod) *)
-		GetURLProc* = PROCEDURE (context: Objects.Object; CONST url: ARRAY OF CHAR): LONGINT;
+		GetURLProc* = PROCEDURE (context: Objects.Object; CONST url: ARRAY OF CHAR): SIGNED32;
 
 	VAR
 		W: Texts.Writer;
@@ -50,7 +50,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		useCrypt: BOOLEAN;
 
 	PROCEDURE OpenScanner(VAR T: Texts.Text; VAR S: Texts.Scanner);
-		VAR crypt, key: ARRAY 64 OF CHAR;  beg, end, time: LONGINT;
+		VAR crypt, key: ARRAY 64 OF CHAR;  beg, end, time: SIGNED32;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 		Texts.Scan(S);
@@ -82,7 +82,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 
 	PROCEDURE WriteResource(VAR R: Files.Rider; VAR res: Resource; tag: SIGNED16; dLen: SIZE);
 	BEGIN
-		Files.WriteInt(R, tag); Files.WriteString(R, res.name); Files.WriteLInt(R, dLen(LONGINT)+12);
+		Files.WriteInt(R, tag); Files.WriteString(R, res.name); Files.WriteLInt(R, dLen(SIGNED32)+12);
 		Files.WriteLInt(R, res.time); Files.WriteLInt(R, res.date);
 		Files.WriteInt(R, res.minor); Files.WriteInt(R, res.major)
 	END WriteResource;
@@ -119,7 +119,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		filecmd = ( "COMPILE" | "COPY" | "DEF" ) name . *)
 	PROCEDURE Build*;
 		VAR
-			T: Texts.Text; S: Texts.Scanner; pos: LONGINT;
+			T: Texts.Text; S: Texts.Scanner; pos: SIGNED32;
 			pack: Package; err: BOOLEAN;
 		PROCEDURE Error(CONST msg1, msg2: ARRAY OF CHAR);
 		BEGIN
@@ -153,7 +153,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 			END
 		END Name;
 		PROCEDURE String(VAR str: ARRAY OF CHAR);
-			VAR R: Texts.Reader; i: LONGINT;
+			VAR R: Texts.Reader; i: SIGNED32;
 		BEGIN
 			IF S.class IN {Texts.Name, Texts.String} THEN
 				COPY(S.s, str); Scan()
@@ -293,8 +293,8 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		Texts.Append(Oberon.Log, W.buf)
 	END Build;
 
-	PROCEDURE ReadResource(VAR R: Files.Rider; VAR res: Resource; VAR tag: SIGNED16; VAR dLen: LONGINT);
-		VAR p: LONGINT;
+	PROCEDURE ReadResource(VAR R: Files.Rider; VAR res: Resource; VAR tag: SIGNED16; VAR dLen: SIGNED32);
+		VAR p: SIGNED32;
 	BEGIN
 		p := Files.Pos(R);
 		Files.ReadInt(R, tag); Files.ReadString(R, res.name); Files.ReadLInt(R, dLen);
@@ -304,7 +304,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	END ReadResource;
 
 	PROCEDURE FindResource(CONST name: ARRAY OF CHAR; VAR res: Resource);
-		VAR R: Files.Rider; org: LONGINT; err: SIGNED16;
+		VAR R: Files.Rider; org: SIGNED32; err: SIGNED16;
 	BEGIN
 		BTrees.SearchStr(index, name, org, err);
 		IF err = BTrees.Done THEN
@@ -318,7 +318,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	END FindResource;
 
 	PROCEDURE RegisterResource(VAR res: Resource; package: ARRAY OF CHAR);
-		VAR R: Files.Rider; org: LONGINT; err: SIGNED16;
+		VAR R: Files.Rider; org: SIGNED32; err: SIGNED16;
 	BEGIN
 		BTrees.SearchStr(index, res.name, org, err);
 		IF err # BTrees.Done THEN
@@ -331,11 +331,11 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		Files.Set(R, BTrees.Base(index), org);
 		Files.WriteInt(R, res.major); Files.WriteInt(R, res.minor);
 		Files.WriteLInt(R, res.date); Files.WriteLInt(R, res.time);
-		Files.WriteBytes(R, package, LEN(package)(LONGINT));
+		Files.WriteBytes(R, package, LEN(package)(SIGNED32));
 		Files.Close(BTrees.Base(index))
 	END RegisterResource;
 
-	PROCEDURE CompareVersion(VAR old, new: Resource): LONGINT;
+	PROCEDURE CompareVersion(VAR old, new: Resource): SIGNED32;
 	BEGIN
 		IF new.major > old.major THEN
 			RETURN VerNewMajorVersion
@@ -360,8 +360,8 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		END
 	END CompareVersion;
 
-	PROCEDURE CheckVersion(VAR res: Resource; CONST options: ARRAY OF CHAR; file: BOOLEAN): LONGINT;
-		VAR ver: Resource; v: LONGINT;
+	PROCEDURE CheckVersion(VAR res: Resource; CONST options: ARRAY OF CHAR; file: BOOLEAN): SIGNED32;
+		VAR ver: Resource; v: SIGNED32;
 	BEGIN
 		FindResource(res.name, ver);
 		IF ver.name = res.name THEN
@@ -390,7 +390,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	END SystemName;
 
 	PROCEDURE ReadDocHeader(VAR R: Files.Rider; VAR ch: CHAR);
-		VAR len: LONGINT; x, y, w, h: SIGNED16; name: ARRAY 32 OF CHAR;
+		VAR len: SIGNED32; x, y, w, h: SIGNED16; name: ARRAY 32 OF CHAR;
 	BEGIN
 		Files.Read(R, ch);
 		Files.ReadString(R, name);
@@ -440,12 +440,12 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		2: F is not a valid package file.
 		3: A version conflict occurd while installing the package. See gen for the name of the conflicting resource.
 		4: Installation failed for some other reason. *)
-	PROCEDURE install*(F: Files.File; VAR gen: ARRAY OF CHAR; context: Objects.Object; getURL: GetURLProc): LONGINT;
+	PROCEDURE install*(F: Files.File; VAR gen: ARRAY OF CHAR; context: Objects.Object; getURL: GetURLProc): SIGNED32;
 		VAR
 			options: FileDir.FileName;
 			pack: Package; resl, res: ResourcePtr;
 			R: Files.Rider; regT: Texts.Text;
-			p, l, v, urls: LONGINT; i: SIGNED16;
+			p, l, v, urls: SIGNED32; i: SIGNED16;
 			ch: CHAR; restore: BOOLEAN;
 		PROCEDURE StoreState;
 		BEGIN
@@ -463,7 +463,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 			COPY(msg, gen); RestoreState();
 			Cleanup()
 		END Error;
-		PROCEDURE CopyData(VAR from: Files.Rider; to: Files.File; len: LONGINT);
+		PROCEDURE CopyData(VAR from: Files.Rider; to: Files.File; len: SIGNED32);
 			VAR R: Files.Rider; buf: ARRAY 1024 OF CHAR;
 		BEGIN
 			Files.Set(R, to, 0);
@@ -484,7 +484,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 		PROCEDURE DoCmd(VAR cmd: Resource): BOOLEAN;
 			VAR
 				key, file, value: FileDir.FileName;
-				i, j, v: LONGINT; res: ResourcePtr; cRes: Resource;
+				i, j, v: SIGNED32; res: ResourcePtr; cRes: Resource;
 				F2, F3: Files.File; R, R2: Files.Rider; ok: BOOLEAN;
 				T: Texts.Text; r: Texts.Reader; re: SIGNED16;
 		BEGIN
@@ -687,7 +687,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 	PROCEDURE CreateObject*(gen: ARRAY OF CHAR; VAR err: ARRAY OF CHAR): Objects.Object;
 		VAR
 			D: Documents.Document; obj: Objects.Object;
-			prefix: ARRAY 8 OF CHAR; i, j: LONGINT;
+			prefix: ARRAY 8 OF CHAR; i, j: SIGNED32;
 	BEGIN
 		obj := NIL; D := NIL; i := 0;
 		WHILE (i < 8) & (gen[i] # ":") DO
@@ -734,7 +734,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 
 (* Implementation of an Application installer for local package files. *)
 
-	PROCEDURE GetURL(context: Objects.Object; CONST purl: ARRAY OF CHAR): LONGINT;
+	PROCEDURE GetURL(context: Objects.Object; CONST purl: ARRAY OF CHAR): SIGNED32;
 		VAR F: Files.File; gen: FileDir.FileName; res: WORD; url: POINTER TO ARRAY OF CHAR;
 	BEGIN
 		NEW(url,LEN(purl));
@@ -823,7 +823,7 @@ MODULE Packages IN Oberon; (** portable / source: Native.Packages.Mod *)	(* ejz 
 			F: Files.File; R: Files.Rider;
 			pack: Package; res: Resource;
 			options, file, value: FileDir.FileName;
-			p, l: LONGINT; i: SIGNED16;
+			p, l: SIGNED32; i: SIGNED16;
 	BEGIN
 		OpenScanner(T, S);
 		IF S.class IN {Texts.Name, Texts.String} THEN

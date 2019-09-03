@@ -64,7 +64,7 @@ VAR
 	cgiProcs : CGIProcInfo;
 
 PROCEDURE MyMatch(VAR uri : ARRAY OF CHAR; y : ARRAY OF CHAR) : BOOLEAN;
-VAR i : LONGINT;
+VAR i : SIGNED32;
 BEGIN
 	WHILE (i < LEN(uri)) & (i < LEN(y)) & (uri[i] = y[i]) &(y[i] # 0X) DO INC(i) END;
 	RETURN(i < LEN(uri)) & (i < LEN(y)) & (y[i] = 0X)

@@ -24,7 +24,7 @@ TYPE
 	DropTarget* = OBJECT
 
 		(** return NIL if the type can not be dropped, a suitable DropInterface otherwise *)
-		PROCEDURE GetInterface*(type : LONGINT) : DropInterface;
+		PROCEDURE GetInterface*(type : SIGNED32) : DropInterface;
 		BEGIN
 			RETURN NIL
 		END GetInterface;
@@ -39,7 +39,7 @@ TYPE
 
 	DropInt32* = OBJECT(DropInterface)
 
-		PROCEDURE Set*(i : LONGINT);
+		PROCEDURE Set*(i : SIGNED32);
 		END Set;
 
 	END DropInt32;

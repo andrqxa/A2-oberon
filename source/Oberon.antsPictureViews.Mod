@@ -317,7 +317,7 @@ VAR
 
 	PROCEDURE Show*;
 	VAR l: antsCommands.tScanList;  obj, o: vyBase.Object;  la: vyPort.tLayer;  name: vyName.tNameArray;  add: BOOLEAN;
-		c: antsPictCoordinate.tCoordinate;  dx: LONGINT;  pobj: antsArrayPictures.tObject;
+		c: antsPictCoordinate.tCoordinate;  dx: SIGNED32;  pobj: antsArrayPictures.tObject;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name= NAME [>add] [>texture] [gridsize=INT]" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) THEN

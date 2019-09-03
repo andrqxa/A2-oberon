@@ -26,10 +26,10 @@ IMPORT Oberon, Texts, CRS, CRP, CRT;
 
 CONST minErrDist = 8;
 
-VAR w: Texts.Writer; lastErrPos: LONGINT;
+VAR w: Texts.Writer; lastErrPos: SIGNED32;
 
 
-PROCEDURE Error (n: SIGNED16; pos: LONGINT);
+PROCEDURE Error (n: SIGNED16; pos: SIGNED32);
 
 	PROCEDURE Msg (s: ARRAY OF CHAR);
 	BEGIN Texts.WriteString(w, s)
@@ -145,7 +145,7 @@ END Options;
 
 PROCEDURE Compile*;
 	VAR s: Texts.Scanner; src, t: Texts.Text;
-		pos, beg, end, time: LONGINT; i: SIGNED16;
+		pos, beg, end, time: SIGNED32; i: SIGNED16;
 BEGIN
 	Texts.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(s);
 	src := NIL; pos := 0;

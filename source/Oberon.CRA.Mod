@@ -850,7 +850,7 @@ VAR
 	state: State;
 	t: Texts.Text;
 	f: Files.File;
-	len: LONGINT;
+	len: SIGNED32;
 
 	PROCEDURE FillStartTab;
 		VAR action: Action; i, targetState: SIGNED16; class: CRT.Set;

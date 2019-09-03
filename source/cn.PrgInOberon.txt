@@ -83,7 +83,7 @@ Institut für Computersysteme, ETH Zürich,
 
     ABS	(10.3)			LEN(10.3)
     ASH	(10.3)			LONG (10.3)
-    BOOLEAN (6.1)		LONGINT (6.1)
+    BOOLEAN (6.1)		SIGNED32 (6.1)
     CAP	(10.3)			LONGREAL(6.1)
     CHAR (6.1)			MAX (10.3)
     CHR	(10.3)			MIN (10.3)
@@ -132,13 +132,13 @@ Institut für Computersysteme, ETH Zürich,
 2. 字符型（CHAR）：扩展ASCII码字符（OX至OFFX）
 3. 短整型（SIGNED8）：在最小短整型数和最大短整型数之间的整数
 4. 整型（SIGNED16）：在最小整型数和最大整型数之间的整数
-5. 长整型（LONGINT）：在最小长整型数和最大长整型数之间的整数
+5. 长整型（SIGNED32）：在最小长整型数和最大长整型数之间的整数
 6. 实型（REAL）：在最小实型数和最大实型数之间的实数
 7. 长实型（LONGREAL）：在最小长实型数和最大长实型数之间的实数
 8. 集合型（SET）：在0和最大集合型数之间的整数集合
 9. PTR型（PTR）：任意结构指针类型的基础类型
     类型3到5都是整数型，类型6和7都是实型，他们合起来称为数字型。他们构成了一个层次关系；大类型（值）的范围包含小类型（值）的范围：
-	LONGREAL  >=  REAL  >=  LONGINT  >=  SIGNED16  >=  SIGNED8
+	LONGREAL  >=  REAL  >=  SIGNED32  >=  SIGNED16  >=  SIGNED8
     6.2 数组类型
     数组是一列类型（称为元素类型）相同的元素构成的结构。元素的个数称为数组的长度。数组元素由下标指定，下标从0到长度－1。
     数组类型：数组[长度｛“，”长度｝]OF 类型。
@@ -564,7 +564,7 @@ END Trees.
     当模块加载到系统中后执行符号BEGIN后的语句列，这些将调用模块加载后完成。循环调用模块是非法的。特殊（无参数并被调用）过程能被系统激活，这种过程当作命令使用（见附录 D1）。
     
     附录 A：术语解说
-    整数型   SIGNED8, SIGNED16, LONGINT
+    整数型   SIGNED8, SIGNED16, SIGNED32
     实型   REAL, LONGREAL
     数字型   整数型，实型
 相同类型
@@ -579,7 +579,7 @@ END Trees.
  3) Ta和Tb是形参列表一致的过程类型。
     类型包含
     数字型的层次如下：
-    LONGREAL >= REAL >= LONGINT >= SIGNED16 >= SIGNED8
+    LONGREAL >= REAL >= SIGNED32 >= SIGNED16 >= SIGNED8
 类型扩展
     若类型声明Tb＝RECORD（Ta）...END，Tb是Ta的直接扩展，Ta是Tb的直接基础类型。类型Tb是Ta的扩展（Ta是Tb的基础类型）如果
 1) Ta与Tb是相同的类型，或
@@ -711,7 +711,7 @@ MODULE Counter;
 	IMPORT Texts, Oberon;
 
 	VAR
-		counter: LONGINT;
+		counter: SIGNED32;
 		w: Texts.Writer;
 
 	PROCEDURE Add*;   (* takes a numeric argument from the command line *)

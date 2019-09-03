@@ -54,7 +54,7 @@ BEGIN
 END Module;
 
 
-PROCEDURE InsertArray (t: Texts.Text;    at: LONGINT;    Array: ARRAY OF CHAR);
+PROCEDURE InsertArray (t: Texts.Text;    at: SIGNED32;    Array: ARRAY OF CHAR);
 	VAR w: Texts.Writer;
 BEGIN
 	Texts.OpenWriter(w);
@@ -62,8 +62,8 @@ BEGIN
 	Texts.Insert(t, at, w.buf)
 END InsertArray;
 
-PROCEDURE Find (a: ARRAY OF CHAR;    t: Texts.Text;    VAR at: LONGINT): BOOLEAN;
-	VAR b: ARRAY 32 OF CHAR;    r: Texts.Reader;     ch: CHAR;    i: LONGINT;
+PROCEDURE Find (a: ARRAY OF CHAR;    t: Texts.Text;    VAR at: SIGNED32): BOOLEAN;
+	VAR b: ARRAY 32 OF CHAR;    r: Texts.Reader;     ch: CHAR;    i: SIGNED32;
 BEGIN
 	Texts.OpenReader(r, t, at);
 	WHILE ~r.eot DO
@@ -83,7 +83,7 @@ BEGIN
 END Find;
 
 PROCEDURE Replace (t: Texts.Text;    pattern: ARRAY OF CHAR;    by: ARRAY OF CHAR);
-	VAR at: LONGINT;
+	VAR at: SIGNED32;
 BEGIN
 	at := 0;
 	WHILE Find(pattern, t, at) DO InsertArray(t, at, by) END
@@ -290,7 +290,7 @@ BEGIN
 END LoadFXd;
 
 PROCEDURE Test1d*;
-	VAR r: Texts.Reader;   ch: CHAR;    Function: ARRAY 1024 OF CHAR;    i: LONGINT;
+	VAR r: Texts.Reader;   ch: CHAR;    Function: ARRAY 1024 OF CHAR;    i: SIGNED32;
 BEGIN
 	Texts.OpenReader(r, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Read(r, ch);    i := 0;
@@ -307,7 +307,7 @@ BEGIN
 END Test1d;
 
 PROCEDURE TestXd*;
-	VAR r: Texts.Reader;   ch: CHAR;    Function: ARRAY 1024 OF CHAR;    i: LONGINT;
+	VAR r: Texts.Reader;   ch: CHAR;    Function: ARRAY 1024 OF CHAR;    i: SIGNED32;
 	X: ARRAY 2 OF LONGREAL;
 BEGIN
 	Texts.OpenReader(r, Oberon.Par.text, Oberon.Par.pos);
@@ -325,7 +325,7 @@ BEGIN
 	END
 END TestXd;
 
-PROCEDURE MarkErrorPos(T: Texts.Text; pos: LONGINT; err: SIGNED16);
+PROCEDURE MarkErrorPos(T: Texts.Text; pos: SIGNED32; err: SIGNED16);
 VAR obj: Objects.Object;
 BEGIN
 	Builder.NewErrorGadget; obj := Objects.NewObj; obj(Builder.ErrorGadget).errno := err;
@@ -334,7 +334,7 @@ BEGIN
 END MarkErrorPos;
 
 PROCEDURE RemoveErrors(T: Texts.Text);
-VAR first: LONGINT; F: Texts.Finder; o: Objects.Object;
+VAR first: SIGNED32; F: Texts.Finder; o: Objects.Object;
 BEGIN
 	first := -1;
 	LOOP
@@ -357,9 +357,9 @@ BEGIN
 	END
 END RemoveErrors;
 
-PROCEDURE markErrors(VAR S: Texts.Scanner; errtext: Texts.Text; par: Display.Frame; offset,len: LONGINT);
-VAR c, err: SIGNED16; pos, beg, l, k: LONGINT; C: Oberon.CaretMsg;  warn: BOOLEAN;
-	marked: ARRAY 100 OF LONGINT;
+PROCEDURE markErrors(VAR S: Texts.Scanner; errtext: Texts.Text; par: Display.Frame; offset,len: SIGNED32);
+VAR c, err: SIGNED16; pos, beg, l, k: SIGNED32; C: Oberon.CaretMsg;  warn: BOOLEAN;
+	marked: ARRAY 100 OF SIGNED32;
 BEGIN
 	IF (S.class = Texts.Name) & (S.s = "compiling") THEN
 		l := S.line; REPEAT Texts.Scan(S) UNTIL (S.line # l) OR S.eot
@@ -396,7 +396,7 @@ END GetModuleName;
 
 
 PROCEDURE CompileText*(t: Texts.Text; inModule,cmd: ARRAY OF CHAR; begpat,endpat: ARRAY OF CHAR): BOOLEAN;
-VAR  buf: Texts.Buffer; T: Texts.Text; pos: LONGINT; source: Texts.Reader; fbeg: LONGINT; error: BOOLEAN;
+VAR  buf: Texts.Buffer; T: Texts.Text; pos: SIGNED32; source: Texts.Reader; fbeg: SIGNED32; error: BOOLEAN;
 S1: Texts.Scanner; m: Modules.Module; p: Modules.Command;name,mn: ARRAY 256 OF CHAR; F: Files.File; res: SIGNED16;
 BEGIN
 	aM.dS("enterCompileText");
@@ -410,7 +410,7 @@ BEGIN
 	Module(T,"\s2",Oberon.Log,error);
 	(*
 	OPS.Init;
-	Compiler.Module(source, "", "\s2", MAX(LONGINT), Oberon.Log, error);
+	Compiler.Module(source, "", "\s2", MAX(SIGNED32), Oberon.Log, error);
 	*)
 	IF error THEN
 		Texts.OpenScanner(S1, Oberon.Log, fbeg); Texts.Scan(S1);

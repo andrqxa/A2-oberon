@@ -61,11 +61,11 @@ TYPE
 		fcol*, bcol*: Display.Color   ;   (*! fof: fcol read only ?*)
 		mode*: SIGNED16;     (** Display paint mode **)(*! fof: mode read only  ?*)
 		style*: SET;     (** Display styles **)(*! fof:  read only ? *)
-		pattern*: LONGINT;     (** Display Patterns **)(*! fof:  read only ? *)
+		pattern*: SIGNED32;     (** Display Patterns **)(*! fof:  read only ? *)
 		pensize* : SIGNED16;   (*! fof:  read only *)
 		fnt*: ARRAY 64 OF CHAR;
 		fillcol*, selectcol*: Display.Color;
-		fillpat*, selectpat*: LONGINT;
+		fillpat*, selectpat*: SIGNED32;
 		alpha*: SIGNED16
 	END;
 
@@ -300,7 +300,7 @@ BEGIN
 END HandleStyleAttributes;
 
 PROCEDURE WriteStyle* (VAR R: Files.Rider;    VAR (* IN *)s: Style);
-PROCEDURE PatToId (pat: LONGINT): SIGNED16;
+PROCEDURE PatToId (pat: SIGNED32): SIGNED16;
 BEGIN
 	IF pat = Display.solid THEN RETURN(1)
 	ELSIF pat = Display.grey0 THEN RETURN(2)
@@ -394,9 +394,9 @@ PROCEDURE SetDisplayStyle* (s: SET);
 BEGIN	S.style := s   ;  vyGraphBase0.SetDisplayStyle(s) 	END SetDisplayStyle;
 PROCEDURE GetDisplayStyle* (VAR s: SET);
 BEGIN	s := S.style  	END GetDisplayStyle;
-PROCEDURE SetDisplayPattern* (p: LONGINT);
+PROCEDURE SetDisplayPattern* (p: SIGNED32);
 BEGIN	S.pattern := p  ;  vyGraphBase0.SetDisplayPattern(p)	END SetDisplayPattern;
-PROCEDURE GetDisplayPattern* (VAR p: LONGINT);
+PROCEDURE GetDisplayPattern* (VAR p: SIGNED32);
 BEGIN	p := S.pattern  	END GetDisplayPattern;
 PROCEDURE SetFont* (fnt: ARRAY OF CHAR);
 BEGIN	COPY(fnt, S.fnt)  ;  vyGraphBase0.SetFont(fnt)	END SetFont;
@@ -660,7 +660,7 @@ BEGIN end := Min (numPoints, maxNumPoints);
 END PaintFillArea2d;
 
 PROCEDURE EraseFillArea* (x, y: ARRAY OF SIGNED16;     numPoints: vyHost.Index);
-	VAR col:  Display.Color;     pat: LONGINT;
+	VAR col:  Display.Color;     pat: SIGNED32;
 BEGIN
 	IF status = display THEN
 		pat := S.pattern;     S.pattern := Display.solid;

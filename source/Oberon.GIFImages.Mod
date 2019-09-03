@@ -17,7 +17,7 @@ MODULE GIFImages IN Oberon; (** non-portable *)	(* eos  **)
 
 	(*--- Image Format T8 (8 bit palette with transparent color 0) ---*)
 
-	PROCEDURE PackT8 (VAR fmt: Images.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Images.Pixel);
+	PROCEDURE PackT8 (VAR fmt: Images.Format0; adr: ADDRESS; bit: SIGNED32; VAR pix: Images.Pixel);
 		CONST r = Images.r; g = Images.g; b = Images.b;
 	BEGIN
 		IF pix[Images.a] # 0X THEN
@@ -27,7 +27,7 @@ MODULE GIFImages IN Oberon; (** non-portable *)	(* eos  **)
 		END
 	END PackT8;
 
-	PROCEDURE UnpackT8 (VAR fmt: Images.Format0; adr: ADDRESS; bit: LONGINT; VAR pix: Images.Pixel);
+	PROCEDURE UnpackT8 (VAR fmt: Images.Format0; adr: ADDRESS; bit: SIGNED32; VAR pix: Images.Pixel);
 		CONST r = Images.r; g = Images.g; b = Images.b; a = Images.a;
 		VAR idx: CHAR;
 	BEGIN
@@ -51,7 +51,7 @@ MODULE GIFImages IN Oberon; (** non-portable *)	(* eos  **)
 		VAR
 			ch: CHAR;
 			codeBits, clearCode, endCode, curBits, maxCode, nextCode, bits, x, y, lines, prevCode, curCode, seq, len: SIGNED16;
-			n, buf, blkPos, blkSize, ptr: LONGINT;
+			n, buf, blkPos, blkSize, ptr: SIGNED32;
 			pix, run: ARRAY 1000H OF CHAR;
 			prev: ARRAY 1000H OF SIGNED16;
 			block: ARRAY 255 OF CHAR;
@@ -144,7 +144,7 @@ MODULE GIFImages IN Oberon; (** non-portable *)	(* eos  **)
 	PROCEDURE Load (img: Images.Image; VAR fname: ARRAY OF CHAR; VAR done: BOOLEAN);
 		VAR
 			file: Files.File; r: Files.Rider; sig: ARRAY 7 OF CHAR; w, h, images, left, top: SIGNED16;
-			lcdFlags, backGrndIdx, ch, label, transPix, idFlags: CHAR; pal: Images.Palette; n, size: LONGINT;
+			lcdFlags, backGrndIdx, ch, label, transPix, idFlags: CHAR; pal: Images.Palette; n, size: SIGNED32;
 			backGrndCol: Images.Pixel; fmt: Images.Format; transparent, interlaced: BOOLEAN;
 	BEGIN
 		file := Files.Old(fname);

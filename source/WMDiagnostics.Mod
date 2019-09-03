@@ -11,8 +11,8 @@ CONST
 	TypeError* = Diagnostics.TypeError;
 
 	(* Error grid colors *)
-	ColorError = LONGINT(0FF3030A0H);
-	ColorWarning = LONGINT(0D0D040C0H);
+	ColorError = SIGNED32(0FF3030A0H);
+	ColorWarning = SIGNED32(0D0D040C0H);
 	ColorPCPosition = 0007F00A0H;
 
 	(* Textview position marker pictures *)
@@ -47,7 +47,7 @@ TYPE
 	Model* = OBJECT(Diagnostics.Diagnostics)
 	VAR
 		entries : EntryArray;
-		nofEntries- : LONGINT;
+		nofEntries- : SIGNED32;
 
 		nofInformations: SIZE;
 		nofWarnings : SIZE;
@@ -212,7 +212,7 @@ TYPE
 			ReleaseRead;
 		END GetSummary;
 
-		PROCEDURE Synchronize(VAR entries : ViewEntryArray; VAR nofEntries : LONGINT);
+		PROCEDURE Synchronize(VAR entries : ViewEntryArray; VAR nofEntries : SIGNED32);
 		VAR dest : SIZE;
 
 			PROCEDURE Insert(type: WORD);
@@ -279,10 +279,10 @@ TYPE
 		showMarkersI : BOOLEAN;
 
 		sortBy- : WMProperties.Int32Property;
-		sortByI : LONGINT;
+		sortByI : SIGNED32;
 
 		entries : ViewEntryArray;
-		nofEntries : LONGINT;
+		nofEntries : SIGNED32;
 
 		model : Model;
 		textViews : POINTER TO ARRAY OF WMTextView.TextView;
@@ -459,7 +459,7 @@ TYPE
 			END;
 		END RemovePositionMarkers;
 
-		PROCEDURE GetFirstPosition*(VAR positions : ARRAY OF SIZE; VAR type: LONGINT);
+		PROCEDURE GetFirstPosition*(VAR positions : ARRAY OF SIZE; VAR type: SIGNED32);
 		VAR i : SIZE;
 		BEGIN
 			Acquire;
@@ -507,16 +507,16 @@ TYPE
 		BEGIN
 			Acquire;
 			IF (0 <= number) & (number <= nofEntries) THEN
-				SetSelection(0, number(LONGINT), 2, number(LONGINT));
+				SetSelection(0, number(SIGNED32), 2, number(SIGNED32));
 				IF moveTo THEN
-					SetTopPosition(0, number(LONGINT), TRUE);
+					SetTopPosition(0, number(SIGNED32), TRUE);
 				END;
 			END;
 			Release;
 		END SelectEntry;
 
 		PROCEDURE SortEntries(compare : CompareProcedure; ascending : BOOLEAN);
-		VAR result, i, j : LONGINT; temp : ViewEntry;
+		VAR result, i, j : SIGNED32; temp : ViewEntry;
 		BEGIN
 			(* caller must hold lock *)
 			ASSERT(compare # NIL);

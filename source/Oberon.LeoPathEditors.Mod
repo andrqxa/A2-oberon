@@ -101,7 +101,7 @@ MODULE LeoPathEditors IN Oberon; (** portable **)	(* eos  *)
 	END RevertSegment;
 
 	PROCEDURE ApplySegment (editor: LeoPanels.Editor);
-		VAR obj: Objects.Object; seg: LeoPaths.Segment; b: BOOLEAN; i: LONGINT;
+		VAR obj: Objects.Object; seg: LeoPaths.Segment; b: BOOLEAN; i: SIGNED32;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoPaths.Segment) & (editor.fig # NIL) THEN
@@ -511,7 +511,7 @@ MODULE LeoPathEditors IN Oberon; (** portable **)	(* eos  *)
 	END TrackArc;
 
 	PROCEDURE RevertArcTool (e: LeoPanels.Editor);
-		VAR b: BOOLEAN; m: LONGINT;
+		VAR b: BOOLEAN; m: SIGNED32;
 	BEGIN
 		Attributes.GetBool(ClosedCurve, "Value", b); Attributes.SetBool(e, "Closed", b);
 		Attributes.GetInt(ArcMode, "Value", m); Attributes.SetInt(e, "Mode", m);
@@ -520,7 +520,7 @@ MODULE LeoPathEditors IN Oberon; (** portable **)	(* eos  *)
 	END RevertArcTool;
 
 	PROCEDURE ApplyArcTool (e: LeoPanels.Editor);
-		VAR b: BOOLEAN; m: LONGINT; obj: Objects.Object;
+		VAR b: BOOLEAN; m: SIGNED32; obj: Objects.Object;
 	BEGIN
 		Attributes.GetBool(e, "Closed", b); Attributes.SetBool(ClosedCurve, "Value", b);
 		Attributes.GetInt(e, "Mode", m); Attributes.SetInt(ArcMode, "Value", m);
@@ -591,7 +591,7 @@ MODULE LeoPathEditors IN Oberon; (** portable **)	(* eos  *)
 	END RevertArc;
 
 	PROCEDURE ApplyArc (editor: LeoPanels.Editor);
-		VAR obj: Objects.Object; arc: LeoPaths.Arc; b: BOOLEAN; i: LONGINT;
+		VAR obj: Objects.Object; arc: LeoPaths.Arc; b: BOOLEAN; i: SIGNED32;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoPaths.Arc) & (editor.fig # NIL) THEN

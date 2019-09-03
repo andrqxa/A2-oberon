@@ -16,7 +16,7 @@ TYPE ptr = POINTER TO complex;
 							r,i : REAL
 						END;
 
-VAR seed: LONGINT;									(* fuer Zufallszahlenberechnung *)
+VAR seed: SIGNED32;									(* fuer Zufallszahlenberechnung *)
 		noisetable : ARRAY 99, 99 OF SIGNED16;	(* Zufallszahlenfeld *)
 		maxnoise, px, py : SIGNED16;
 		r0, r1, g0, g1, b0, b1 : SIGNED16;	(* Farbwerte fuer Rampe *)
@@ -141,10 +141,10 @@ BEGIN
 	SetColorRamp
 END SetNoColor;
 
-PROCEDURE Random(): LONGINT;
+PROCEDURE Random(): SIGNED32;
 (* Liefert eine Zufallszahl vom Typ Longint *)
 CONST a = 16807; m = 2147483647; q = m DIV a; r = m MOD a;
-VAR i: LONGINT;
+VAR i: SIGNED32;
 BEGIN
 	seed := ABS(Oberon.Time()-seed);
 	i := a * (seed MOD q) - r * (seed DIV q);
@@ -366,7 +366,7 @@ PROCEDURE Fractal*;
 (* Generiert das Backdrop Fractal *)
 VAR
 		endr, Inc, endi, Inr, dw, w, fr0, fi0, fr1, fi1 : REAL;
-		loops , max, f, k : LONGINT;
+		loops , max, f, k : SIGNED32;
 		z, c : complex;
 		ret : ptr;		(* Rueckgabe der komplexen Zahl als Pointer *)
 		P : Pictures.Picture;
@@ -453,7 +453,7 @@ END Initnoise;
 
 PROCEDURE noise(x,y : REAL): REAL;
 (* Berechnet mittels linearer Interpolation eine Zufallswert aus dem bestehenden Feld *)
-VAR ix, iy: LONGINT;
+VAR ix, iy: SIGNED32;
 		ox, oy: REAL;
 		n : SIGNED16;
 		n00, n10 : REAL;
@@ -473,7 +473,7 @@ PROCEDURE Marble*;
 (* Generiert das Backdrop Marble *)
 VAR c, prim : SIGNED16;
 		konst, fac, scale : REAL;
-		i,j : LONGINT;
+		i,j : SIGNED32;
 		P : Pictures.Picture;
 		S: Texts.Scanner;
 
@@ -581,7 +581,7 @@ PROCEDURE Clouds*;
 (* Generiert das Backdrop Clouds *)
 CONST kor=24;
 VAR array, update : SIGNED16;
-		j, loop  : LONGINT;
+		j, loop  : SIGNED32;
 		dir, i,  k : SIGNED16;
 		P : Pictures.Picture;
 		S: Texts.Scanner;
@@ -743,7 +743,7 @@ BEGIN
 END Damage;
 
 PROCEDURE Brick(P: Pictures.Picture; col, dam, x,y,w,h: SIGNED16);
-VAR fgd, bgd : SIGNED16; n : LONGINT;
+VAR fgd, bgd : SIGNED16; n : SIGNED32;
 BEGIN
 	WraplConst(P, col,x,y,w,h);
 	fgd:= col-2; IF fgd<=0 THEN fgd:=1 END;
@@ -789,7 +789,7 @@ PROCEDURE Surface*;
 VAR P : Pictures.Picture;
 		S: Texts.Scanner;
 		rnd, t, fgd, bgd, he, dx, dy, update : SIGNED16;
-		n, loop : LONGINT;
+		n, loop : SIGNED32;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(S);
@@ -894,7 +894,7 @@ PROCEDURE Bows*;
 VAR P : Pictures.Picture;
 		S: Texts.Scanner;
 		col, i, j, nbr, loop, x, y, a, b, dick: SIGNED16;
-		ud : LONGINT;
+		ud : SIGNED32;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(S);
@@ -950,7 +950,7 @@ END Spirals;
 
 PROCEDURE Tree(P: Pictures.Picture; x,y, dir, col, count,max, len : SIGNED16);
 (* Rekursion für Tree *)
-VAR num, red : SIGNED16; i: LONGINT;
+VAR num, red : SIGNED16; i: SIGNED32;
 BEGIN
 	IF count<max THEN
 		red:=count*(len DIV (max+1));

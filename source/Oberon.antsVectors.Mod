@@ -31,7 +31,7 @@ TYPE
 	Container* = POINTER TO ContainerDesc;
 	ContainerDesc* = RECORD (vyBase.ObjDesc)
 		vectors*: vyLinks.Link;
-		num*: LONGINT
+		num*: SIGNED32
 	END;
 
 	PROCEDURE HandleAttributes( o: Container;  VAR M: Objects.AttrMsg );
@@ -90,8 +90,8 @@ TYPE
 		END
 	END Handler;
 
-	PROCEDURE GetVector*( c: Container;  num: LONGINT ): vyBase.tVector;
-	VAR i: LONGINT;  list: vyLinks.Link;
+	PROCEDURE GetVector*( c: Container;  num: SIGNED32 ): vyBase.tVector;
+	VAR i: SIGNED32;  list: vyLinks.Link;
 	BEGIN
 		i := 0;  list := c.vectors;
 		WHILE list # NIL DO

@@ -584,7 +584,7 @@ END SetGrid;
 PROCEDURE Shade*(VAR ray: Ray);
 VAR
 	lx, ly, x, y: SREAL;
-	i, j: LONGINT;
+	i, j: SIGNED32;
 BEGIN
 	CASE ray.face OF
 		 1: lx := ray.lxyz.y; ly := ray.lxyz.z;
@@ -888,7 +888,7 @@ END SetColor2;
 
 PROCEDURE Shade (VAR ray: Ray);
 VAR
-	i, j, k: LONGINT;
+	i, j, k: SIGNED32;
 	sc, d: SIGNED16;
 BEGIN
 	ray.splitme := TRUE;

@@ -27,7 +27,7 @@ MODULE LPRPrinter IN Oberon;	(** portable *)  (* ejz , LPR Version of PSPrinter,
 		host, queue: ARRAY 64 OF CHAR;
 
 	PROCEDURE SendString(C: NetSystem.Connection; str: ARRAY OF CHAR);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE str[i] # 0X DO
@@ -80,10 +80,10 @@ MODULE LPRPrinter IN Oberon;	(** portable *)  (* ejz , LPR Version of PSPrinter,
 		END
 	END ScanDest;
 
-	PROCEDURE IntToStr(val: LONGINT; VAR str: ARRAY OF CHAR);
+	PROCEDURE IntToStr(val: SIGNED32; VAR str: ARRAY OF CHAR);
 		VAR
-			i, j: LONGINT;
-			digits: ARRAY 16 OF LONGINT;
+			i, j: SIGNED32;
+			digits: ARRAY 16 OF SIGNED32;
 	BEGIN
 		IF val < 0 THEN
 			val := ABS(val);
@@ -349,7 +349,7 @@ MODULE LPRPrinter IN Oberon;	(** portable *)  (* ejz , LPR Version of PSPrinter,
 
 	PROCEDURE ReadText(C: NetSystem.Connection; VAR W: Texts.Writer);
 		VAR
-			len, rlen: LONGINT;
+			len, rlen: SIGNED32;
 			state, i: SIGNED16;
 	BEGIN
 		state := NetSystem.inout;

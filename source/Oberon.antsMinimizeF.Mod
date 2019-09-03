@@ -57,14 +57,14 @@ TYPE
 	VAR Y: 			ARRAY OF LONGREAL;
 	VAR sum: 		ARRAY OF LONGREAL;
 	ndim,
-	ihi: 		LONGINT;
+	ihi: 		SIGNED32;
 	func: 	 Function;
-	VAR nfunc: 	LONGINT;
+	VAR nfunc: 	SIGNED32;
 fac: 		LONGREAL): 	 LONGREAL;
 	(*     Extrapolates by a factor FAC through the face of the simplex across from the high point, tries it, and replaces the high point
 	if the new point is better.   *)
 VAR
-	j : LONGINT;
+	j : SIGNED32;
 	fac1, fac2, ytry: LONGREAL;
 	(* PTRY: POINTER TO ARRAY OF LONGREAL; *)
 	PTRY: ARRAY 2 OF LONGREAL;
@@ -98,7 +98,7 @@ BEGIN
 END swap;
 
 PROCEDURE swapv* (VAR y1, y2: ARRAY OF LONGREAL);
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 BEGIN
 	FOR i := 0 TO LEN(y1) - 1 DO
 		swap(y1[i], y2[i])
@@ -108,10 +108,10 @@ END swapv;
 
 PROCEDURE Amoeba* (		VAR P: 		 ARRAY OF ARRAY OF LONGREAL;
 VAR Y: 		 ARRAY OF LONGREAL;
-ndim: 	LONGINT;
+ndim: 	SIGNED32;
 ftol: 	LONGREAL;
 func: 	Function;
-VAR nfunc: LONGINT);
+VAR nfunc: SIGNED32);
 CONST
 	nfuncmax = 5000;      (* The maximum allowed
 	number of function evaluations, and three parameters
@@ -120,7 +120,7 @@ CONST
 	beta = 0.5;
 	gamma = 2.0;
 	VAR t1, t2: LONGREAL;
-	mpts, nY, j, inhi, ilo, ihi, i : LONGINT;
+	mpts, nY, j, inhi, ilo, ihi, i : SIGNED32;
 	ytry, ysave, sum, rtol: LONGREAL;
 	(*  PSUM: POINTER TO ARRAY OF LONGREAL;*)
 	PSUM: ARRAY 2 OF LONGREAL;      (* dim assumed to be 2 *)
@@ -243,7 +243,7 @@ END Amoeba;
 
 PROCEDURE Downhill* (func: Function2;   VAR beta, h: LONGREAL;   prec: LONGREAL  );
 CONST initdist = 5;    fact = 0.5;
-	VAR sbeta, sh : LONGREAL;   nb, nh : ARRAY 8 OF  LONGREAL;   val, temp, dist: LONGREAL;   sf: BOOLEAN;   fval, i, count: LONGINT;
+	VAR sbeta, sh : LONGREAL;   nb, nh : ARRAY 8 OF  LONGREAL;   val, temp, dist: LONGREAL;   sf: BOOLEAN;   fval, i, count: SIGNED32;
 BEGIN
 	exceeded := FALSE;
 	count := 0;

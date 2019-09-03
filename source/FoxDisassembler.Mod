@@ -203,10 +203,10 @@ TYPE
 			first := ParseLogFile(logFile); block := first;
 			IF block = NIL THEN
 				w.String("------ code ------"); w.Ln;
-				DisassembleBlock(0, MAX(LONGINT)-1);
+				DisassembleBlock(0, MAX(SIGNED32)-1);
 				IF code # data THEN
 					w.String("------ data ------"); w.Ln;
-					DataBlock(0, MAX(LONGINT)-1);
+					DataBlock(0, MAX(SIGNED32)-1);
 				END;
 			ELSE
 				WHILE block # NIL DO

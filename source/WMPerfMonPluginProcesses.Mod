@@ -31,7 +31,7 @@ TYPE
 		VAR
 			ds : WMPerfMonPlugins.DatasetDescriptor;
 			name, temp : WMPerfMonPlugins.Description;
-			nofProcessors, id, i : LONGINT;
+			nofProcessors, id, i : SIGNED32;
 		BEGIN
 			ASSERT((p # NIL) & (p IS ProcessStatsParameter));
 			process := p(ProcessStatsParameter).process;
@@ -107,22 +107,22 @@ TYPE
 	END ProcessStats;
 
 VAR
-	nextID, nofProcessors : LONGINT;
+	nextID, nofProcessors : SIGNED32;
 
-PROCEDURE GetID() : LONGINT;
+PROCEDURE GetID() : SIGNED32;
 BEGIN {EXCLUSIVE}
 	INC(nextID);
 	RETURN nextID;
 END GetID;
 
 (** Return the number of CPUs (stupid, but not that important) *)
-PROCEDURE GetNofProcessors() : LONGINT;
+PROCEDURE GetNofProcessors() : SIGNED32;
 BEGIN {EXCLUSIVE}
 	RETURN nofProcessors;
 END GetNofProcessors;
 
 PROCEDURE SetNofProcessors*(context : Commands.Context);
-VAR value : LONGINT;
+VAR value : SIGNED32;
 BEGIN {EXCLUSIVE}
 	IF context.arg.GetInteger(value, FALSE) & (value > 0) & (value <= Machine.MaxCPU) THEN
 		nofProcessors := value;
@@ -134,7 +134,7 @@ END SetNofProcessors;
 
 PROCEDURE Install*(context : Commands.Context);
 VAR
-	id : LONGINT;
+	id : SIGNED32;
 	stats : ProcessStats; parameter : ProcessStatsParameter;
 	process : Objects.Process;
 BEGIN

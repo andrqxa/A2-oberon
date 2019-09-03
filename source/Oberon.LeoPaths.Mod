@@ -107,7 +107,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 		END;
 
 		ArcData = RECORD (GfxPaths.EnumData)
-			n: LONGINT;
+			n: SIGNED32;
 			dx0, dy0, dx1, dy1: REAL;
 		END;
 
@@ -328,7 +328,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END CopyPoint;
 
 	PROCEDURE HandlePoint* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR p, copy: Point; ver, pos: LONGINT; mode: SIGNED8;
+		VAR p, copy: Point; ver, pos: SIGNED32; mode: SIGNED8;
 	BEGIN
 		p := obj(Point);
 		IF msg IS Leonardo.ShapeMsg THEN
@@ -591,7 +591,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END CopyPath;
 
 	PROCEDURE HandlePath* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR path, copy: Path; ver: LONGINT;
+		VAR path, copy: Path; ver: SIGNED32;
 	BEGIN
 		path := obj(Path);
 		IF msg IS Leonardo.ShapeMsg THEN
@@ -825,7 +825,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END ConnectSucc;
 
 	PROCEDURE ControlSegment* (seg: Segment; VAR msg: Leonardo.ControlMsg);
-		VAR p: Leonardo.Shape; n: LONGINT; pred, succ, bot, top: Leonardo.Shape; cm: ConnectMsg; copy: Segment;
+		VAR p: Leonardo.Shape; n: SIGNED32; pred, succ, bot, top: Leonardo.Shape; cm: ConnectMsg; copy: Segment;
 	BEGIN
 		IF msg.id = Leonardo.delete THEN
 			Leonardo.ControlContainer(seg, msg);
@@ -1286,7 +1286,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END CopySegment;
 
 	PROCEDURE HandleSegment* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR seg, copy: Segment; p: Leonardo.Shape; ver: LONGINT;
+		VAR seg, copy: Segment; p: Leonardo.Shape; ver: SIGNED32;
 	BEGIN
 		seg := obj(Segment);
 		IF msg IS Leonardo.ShapeMsg THEN
@@ -2519,7 +2519,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END CopyArc;
 
 	PROCEDURE HandleArc* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR arc, copy: Arc; ver: LONGINT;
+		VAR arc, copy: Arc; ver: SIGNED32;
 	BEGIN
 		arc := obj(Arc);
 		IF msg IS Leonardo.ShapeMsg THEN
@@ -2630,7 +2630,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	(**--- Pathification ---**)
 
 	PROCEDURE HandlePathifier* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR pen, copy: Pathifier; ver: LONGINT;
+		VAR pen, copy: Pathifier; ver: SIGNED32;
 	BEGIN
 		pen := obj(Pathifier);
 		IF msg IS Objects.AttrMsg THEN
@@ -2834,8 +2834,8 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE ReadLegacyCurves (VAR r: Files.Rider; path: Path);
 		VAR
-			n, i, succ, pred, j, m: LONGINT; key: SIGNED16; name: ARRAY 64 OF CHAR; obj: Objects.Object;
-			cv: ARRAY 64 OF Segment; last: ARRAY 64 OF LONGINT; p: Leonardo.Shape;
+			n, i, succ, pred, j, m: SIGNED32; key: SIGNED16; name: ARRAY 64 OF CHAR; obj: Objects.Object;
+			cv: ARRAY 64 OF Segment; last: ARRAY 64 OF SIGNED32; p: Leonardo.Shape;
 			curve: Segment; cm: Objects.CopyMsg;
 	BEGIN
 		Files.ReadNum(r, n);
@@ -2896,7 +2896,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END ReadLegacyCurves;
 
 	PROCEDURE HandleLegacyPath (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR path: Path; ver: LONGINT; i: SIGNED16; real: REAL; cm: Objects.CopyMsg; s: Leonardo.Shape; bool: BOOLEAN;
+		VAR path: Path; ver: SIGNED32; i: SIGNED16; real: REAL; cm: Objects.CopyMsg; s: Leonardo.Shape; bool: BOOLEAN;
 	BEGIN
 		IF msg IS Objects.FileMsg THEN
 			WITH msg: Objects.FileMsg DO

@@ -26,7 +26,7 @@ CONST
 VAR
 	f: Files.File;
 	w*: Files.Writer;
-	Ny: LONGINT;
+	Ny: SIGNED32;
 	ScaleFactor: HUGEINT;
 
 TYPE
@@ -34,15 +34,15 @@ TYPE
 	PCMBuffer* = OBJECT
 		VAR data*: ARRAY MaxBlocksize OF HUGEINT;
 
-		PROCEDURE Print*(name: ARRAY OF CHAR; len: LONGINT);
+		PROCEDURE Print*(name: ARRAY OF CHAR; len: SIGNED32);
 		BEGIN
 			ArrayHugeLen(name, data, len)
 		END Print;
 
-		PROCEDURE PrintShort(name: ARRAY OF CHAR; len: LONGINT);
+		PROCEDURE PrintShort(name: ARRAY OF CHAR; len: SIGNED32);
 		VAR
-			tmp: POINTER TO ARRAY  OF LONGINT;
-			i: LONGINT;
+			tmp: POINTER TO ARRAY  OF SIGNED32;
+			i: SIGNED32;
 		BEGIN
 			NEW(tmp,len);
 			FOR  i := 0 TO len - 1 DO
@@ -53,7 +53,7 @@ TYPE
 
 		(** set whole buffer to 0 *)
 		PROCEDURE ZeroBuffer*;
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			IF (Trace IN Debug) THEN String("@VorbisCodec::PCMBuffer::ZeroBuffer()") END;
 			FOR i := 0 TO LEN(data) - 1 DO
@@ -72,7 +72,7 @@ TYPE
 		END Init;
 
 		(** insert the HuffmanNode correspond to the codeword with the value *)
-		PROCEDURE AddNode(value, length, codeword: LONGINT);
+		PROCEDURE AddNode(value, length, codeword: SIGNED32);
 		BEGIN
 			IF (Trace IN Debug) THEN
 				String("@MyUtilities::HuffmanTree::AddNode()")
@@ -81,7 +81,7 @@ TYPE
 		END AddNode;
 
 		(** check if the length list represents a valid huffman-tree *)
-		PROCEDURE IsValidLengthList*(VAR list: IntList; unused: LONGINT): BOOLEAN;
+		PROCEDURE IsValidLengthList*(VAR list: IntList; unused: SIGNED32): BOOLEAN;
 		VAR limit, sum: HUGEINT;
 		BEGIN
 			IF (Trace IN Debug) THEN
@@ -93,7 +93,7 @@ TYPE
 		END IsValidLengthList;
 
 		(** check if the list of length represents an overspecified huffman-tree *)
-		PROCEDURE IsOverspecified*(VAR list: IntList; unused: LONGINT): BOOLEAN;
+		PROCEDURE IsOverspecified*(VAR list: IntList; unused: SIGNED32): BOOLEAN;
 		VAR limit, sum: HUGEINT;
 		BEGIN
 			GetSumAndLimit(list, sum, limit, unused);
@@ -101,7 +101,7 @@ TYPE
 		END IsOverspecified;
 
 		(** check if the list of length represents an underspecified huffman-tree *)
-		PROCEDURE IsUnderspecified*(VAR list: IntList; unused: LONGINT): BOOLEAN;
+		PROCEDURE IsUnderspecified*(VAR list: IntList; unused: SIGNED32): BOOLEAN;
 		VAR limit, sum: HUGEINT;
 		BEGIN
 			GetSumAndLimit(list, sum, limit, unused);
@@ -109,7 +109,7 @@ TYPE
 		END IsUnderspecified;
 
 		(* background: Kraft-McMillan's Theorem - sum(1,n, 1 / (2^l[i])) <= 1  <=> l[i] represents a valid HuffmanTree *)
-		PROCEDURE GetSumAndLimit(VAR list: IntList; VAR sum, limit: HUGEINT; unused: LONGINT);
+		PROCEDURE GetSumAndLimit(VAR list: IntList; VAR sum, limit: HUGEINT; unused: SIGNED32);
 		VAR
 			i: HUGEINT;
 			cur: ListElement;
@@ -126,7 +126,7 @@ TYPE
 		END GetSumAndLimit;
 
 		(* check wether the list has any used entries *)
-		PROCEDURE HasUsedEntries*(VAR list: IntList; unused: LONGINT): BOOLEAN;
+		PROCEDURE HasUsedEntries*(VAR list: IntList; unused: SIGNED32): BOOLEAN;
 		VAR
 			i: HUGEINT;
 			cur: ListElement;
@@ -139,9 +139,9 @@ TYPE
 		END HasUsedEntries;
 
 		(** build a HuffmanTree from a IntList, return FALSE if not possible, else TRUE *)
-		PROCEDURE BuildTree*(VAR lengths: IntList; VAR codes: IntList; unused: LONGINT);
+		PROCEDURE BuildTree*(VAR lengths: IntList; VAR codes: IntList; unused: SIGNED32);
 		VAR
-			value: LONGINT;
+			value: SIGNED32;
 			curLen, curCode: IntElement;
 		BEGIN
 			IF (Trace IN Debug) THEN String("@MyUtilities::HuffmanTree::BuildTree()") END;
@@ -162,7 +162,7 @@ TYPE
 
 		(** get left or rigth son (as a VAR-parameter) depending on the input (0/1) during Hufman-decode-process
 				(it's up to the clients to decide wether a codeword/leaf has been found or not *)
-		PROCEDURE GoLeftOrRight*(VAR node: HuffmanNode; bit: LONGINT);
+		PROCEDURE GoLeftOrRight*(VAR node: HuffmanNode; bit: SIGNED32);
 		BEGIN
 			IF ((bit # 0) & (bit # 1)) THEN
 				KernelLog.String("ASSERTION failed - bit is not 0 or 1"); KernelLog.Ln
@@ -187,10 +187,10 @@ TYPE
 	HuffmanNode* = OBJECT
 		VAR
 			left, right: HuffmanNode;
-			value: LONGINT;
+			value: SIGNED32;
 			isLeaf, isFull: BOOLEAN; (* isLeaf only used for Print() *)
 
-		PROCEDURE &Init*(value: LONGINT; isLeaf, isFull: BOOLEAN);
+		PROCEDURE &Init*(value: SIGNED32; isLeaf, isFull: BOOLEAN);
 		BEGIN
 			left := NIL; right := NIL;
 			SELF.value := value;
@@ -199,7 +199,7 @@ TYPE
 		END Init;
 
 		(** get the value *)
-		PROCEDURE GetValue*(): LONGINT;
+		PROCEDURE GetValue*(): SIGNED32;
 		BEGIN
 			RETURN value
 		END GetValue;
@@ -221,9 +221,9 @@ TYPE
 			IF (right # NIL) THEN right.Print() END
 		END Print;
 
-		PROCEDURE AddNode(value, length, restCodeword: LONGINT);
+		PROCEDURE AddNode(value, length, restCodeword: SIGNED32);
 		VAR
-			digit: LONGINT;
+			digit: SIGNED32;
 		BEGIN
 			IF (Trace IN Debug) THEN
 				String("@MyUtilities::HuffmanNode::AddNode()")
@@ -255,7 +255,7 @@ TYPE
 	(** data-structure for holding a number of (BaseVectorSize) longint data *)
 	Vector* = OBJECT
 		VAR
-			capacity, len: LONGINT;
+			capacity, len: SIGNED32;
 			data: ARRAY BaseVectorSize OF HUGEINT;
 
 		PROCEDURE &Init*;
@@ -282,7 +282,7 @@ TYPE
 
 		(** increase each value by inc *)
 		PROCEDURE Increase(inc: HUGEINT);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			FOR i := 0 TO len - 1 DO
 				INC(data[i], inc)
@@ -290,7 +290,7 @@ TYPE
 		END Increase;
 
 		(** get the length *)
-		PROCEDURE GetLen(): LONGINT;
+		PROCEDURE GetLen(): SIGNED32;
 		BEGIN
 			RETURN len
 		END GetLen;
@@ -302,7 +302,7 @@ TYPE
 		END GetLast;
 
 		(** get value at a certain position *)
-		PROCEDURE GetValueAt*(idx: LONGINT): HUGEINT;
+		PROCEDURE GetValueAt*(idx: SIGNED32): HUGEINT;
 		BEGIN
 			IF (idx >= len) THEN
 				KernelLog.String("ASSERTION failed - access to invalid vector element"); KernelLog.Ln
@@ -311,12 +311,12 @@ TYPE
 			RETURN data[idx]
 		END GetValueAt;
 
-		PROCEDURE IncValueAt(inc: HUGEINT; idx: LONGINT);
+		PROCEDURE IncValueAt(inc: HUGEINT; idx: SIGNED32);
 		BEGIN
 			SetValueAt(inc + GetValueAt(idx), idx)
 		END IncValueAt;
 
-		PROCEDURE SetValueAt(val: HUGEINT; idx: LONGINT);
+		PROCEDURE SetValueAt(val: HUGEINT; idx: SIGNED32);
 		BEGIN
 			IF (idx >= len) THEN
 				KernelLog.String("ASSERTION failed - access to invalid vector element"); KernelLog.Ln
@@ -327,7 +327,7 @@ TYPE
 
 		(** concetenate another vector *)
 		PROCEDURE Concatenate(VAR v: Vector);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			FOR i := 0 TO v.GetLen() - 1 DO
 				SELF.Add(v.data[i])
@@ -363,13 +363,13 @@ TYPE
 		(** print the list *)
 		PROCEDURE Print*;
 		VAR
-			i, split: LONGINT;
+			i, split: SIGNED32;
 			cur: ListElement;
 		BEGIN
 			i := 0; split := 16; (* every 'split' elements make a line break *)
 			cur := SELF.start;
 			String("-> List <-");
-			Var("list-length", SYSTEM.VAL(LONGINT,length));
+			Var("list-length", SYSTEM.VAL(SIGNED32,length));
 			WHILE (cur # NIL) DO
 				IF (~(i = 0) & (i MOD split = 0)) THEN w.Ln END;
 				cur.Print;
@@ -400,9 +400,9 @@ TYPE
 
 	IntElement* = OBJECT(ListElement)
 		VAR
-			long-: LONGINT;
+			long-: SIGNED32;
 
-		PROCEDURE &InitInt*(long: LONGINT);
+		PROCEDURE &InitInt*(long: SIGNED32);
 		BEGIN
 			SELF.long := long;
 			SELF.next := NIL
@@ -444,8 +444,8 @@ TYPE
 	(** these procedures are used in multiple places by the OGGVorbisPlayer *)
 
 	(** get the position number of the lowest set bit of x *)
-	PROCEDURE ILog*(x: LONGINT): LONGINT;
-	VAR ret: LONGINT;
+	PROCEDURE ILog*(x: SIGNED32): SIGNED32;
+	VAR ret: SIGNED32;
 	BEGIN
 		ret := 0;
 		LOOP
@@ -461,13 +461,13 @@ TYPE
 
 	(** translate the packed binary representation of a Vorbis codebook float value into the
 			representation used by the decoder for floating point numbers *)
-	PROCEDURE Float32Unpack*(val: LONGINT): HUGEINT;
+	PROCEDURE Float32Unpack*(val: SIGNED32): HUGEINT;
 	VAR
-		mantissa, sign, exponent, one: LONGINT;
+		mantissa, sign, exponent, one: SIGNED32;
 		res: REAL;
 	BEGIN
 		mantissa := BIT.LAND(val, 1FFFFFH);
-		sign := BIT.LAND(val, LONGINT(80000000H));
+		sign := BIT.LAND(val, SIGNED32(80000000H));
 		exponent := BIT.LAND(val, 7FE00000H) DIV 1FFFFFH;
 		IF (sign # 0) THEN
 			mantissa := -1 * mantissa
@@ -478,8 +478,8 @@ TYPE
 	END Float32Unpack;
 
 	(** compute the correct length of the value index for a codebook VQ lookup table of lookup type 1 *)
-	PROCEDURE Lookup1Values*(cbEntries, cbDimensions: LONGINT): LONGINT;
-	VAR res: LONGINT;
+	PROCEDURE Lookup1Values*(cbEntries, cbDimensions: SIGNED32): SIGNED32;
+	VAR res: SIGNED32;
 	BEGIN
 		res := 0;
 		WHILE (Power(res, cbDimensions) <= cbEntries) DO
@@ -490,8 +490,8 @@ TYPE
 	END Lookup1Values;
 
 	(** find the position n in vector v of the GREATEST value scalar element for which n is less than x and v[n] is less than v[x] *)
-	PROCEDURE LowNeighbor*(v: ARRAY OF LONGINT; x: LONGINT): LONGINT;
-	VAR i, n: LONGINT;
+	PROCEDURE LowNeighbor*(v: ARRAY OF SIGNED32; x: SIGNED32): SIGNED32;
+	VAR i, n: SIGNED32;
 	BEGIN
 		n := 0;
 		FOR i := 1 TO x - 1 DO (* n is less than x *)
@@ -505,8 +505,8 @@ TYPE
 	END LowNeighbor;
 
 	(** find the position n in vector v of the LOWEST value scalar element for which n is less than x and v[n] is greater than v[x] *)
-	PROCEDURE HighNeighbor*(v: ARRAY OF LONGINT; x: LONGINT): LONGINT;
-	VAR i, n: LONGINT;
+	PROCEDURE HighNeighbor*(v: ARRAY OF SIGNED32; x: SIGNED32): SIGNED32;
+	VAR i, n: SIGNED32;
 	BEGIN
 		n := 0;
 		FOR i := 0 TO x - 1 DO (* n is less than x *)
@@ -520,9 +520,9 @@ TYPE
 	END HighNeighbor;
 
 	(** find the y-coordinate at point x along the line specified by x0, x1, y0 and y1 *)
-	PROCEDURE RenderPoint*(x0,y0,x1,y1,x: LONGINT): LONGINT;
+	PROCEDURE RenderPoint*(x0,y0,x1,y1,x: SIGNED32): SIGNED32;
 	VAR
-		dy, adx, ady, err, off: LONGINT;
+		dy, adx, ady, err, off: SIGNED32;
 	BEGIN
 		dy := y1 - y0;
 		adx := x1 - x0;
@@ -537,8 +537,8 @@ TYPE
 	END RenderPoint;
 
 	(** construct an integer floor curve for contiguous piecewise line segments *)
-	PROCEDURE RenderLine*(x0, y0, x1, y1: LONGINT; VAR v: ARRAY OF HUGEINT);
-	VAR dy, adx, ady, x, y, err, base, sy: LONGINT;
+	PROCEDURE RenderLine*(x0, y0, x1, y1: SIGNED32; VAR v: ARRAY OF HUGEINT);
+	VAR dy, adx, ady, x, y, err, base, sy: SIGNED32;
 	BEGIN
 		dy := y1 - y0;
 		adx := x1 - x0;
@@ -572,8 +572,8 @@ TYPE
 	END RenderLine;
 
 	(** sort an array, storing the position changes *)
-	PROCEDURE EasySortRemember*(VAR data, sortptr: ARRAY OF LONGINT; n: LONGINT);
-	VAR tmp, j, k: LONGINT;
+	PROCEDURE EasySortRemember*(VAR data, sortptr: ARRAY OF SIGNED32; n: SIGNED32);
+	VAR tmp, j, k: SIGNED32;
 	BEGIN
 		IF ((n > LEN(data)) OR (n > LEN(sortptr))) THEN
 			KernelLog.String("ASSERTION failed - array too short to sort")
@@ -595,8 +595,8 @@ TYPE
 	(** some mathematical procedures *)
 
 	(** return x to the power of n (ASSERT(n>=0)) *)
-	PROCEDURE Power*(x,n: LONGINT): LONGINT;
-	VAR res: LONGINT;
+	PROCEDURE Power*(x,n: SIGNED32): SIGNED32;
+	VAR res: SIGNED32;
 	BEGIN
 		IF (n < 0) THEN
 			KernelLog.String("ASSERTION failed - power of negative numbers are not allowed"); KernelLog.Ln
@@ -615,7 +615,7 @@ TYPE
 	END Power;
 
 	(** return x to the power of n (ASSERT(n>=0)) *)
-	PROCEDURE PowerH(x: HUGEINT; n: LONGINT): HUGEINT;
+	PROCEDURE PowerH(x: HUGEINT; n: SIGNED32): HUGEINT;
 	VAR res: HUGEINT;
 	BEGIN
 		IF (n < 0) THEN
@@ -635,7 +635,7 @@ TYPE
 	END PowerH;
 
 	(** return x to the power of n (ASSERT(n>=0)) *)
-	PROCEDURE PowerR*(x: REAL; n: LONGINT): REAL;
+	PROCEDURE PowerR*(x: REAL; n: SIGNED32): REAL;
 	VAR res: REAL;
 	BEGIN
 		IF (n < 0) THEN
@@ -655,8 +655,8 @@ TYPE
 	END PowerR;
 
 	(** returns the logarithm to the base 2 *)
-	PROCEDURE Log2n*(n: LONGINT): LONGINT;
-	VAR res: LONGINT;
+	PROCEDURE Log2n*(n: SIGNED32): SIGNED32;
+	VAR res: SIGNED32;
 	BEGIN
 		ASSERT(n > 0);
 		res := 0;
@@ -667,13 +667,13 @@ TYPE
 		RETURN res
 	END Log2n;
 (*
-	PROCEDURE HighestBit(h: HUGEINT): LONGINT;
-	VAR res, i: LONGINT;
+	PROCEDURE HighestBit(h: HUGEINT): SIGNED32;
+	VAR res, i: SIGNED32;
 	BEGIN
 		IF h < 0 THEN h := -1 * h END;
 		res := 0;
 		FOR i := 0 TO 63 DO
-			IF LONGINT(h) MOD 2 = 1 THEN
+			IF SIGNED32(h) MOD 2 = 1 THEN
 				res := i
 			END;
 			h := LSH(h, -1)
@@ -730,7 +730,7 @@ TYPE
 
 	(** fixed-point multiplication, result same format as input with constant fraction Nx*)
 	PROCEDURE MultFP*(a, b: HUGEINT): HUGEINT;
-	VAR divident, n: LONGINT;
+	VAR divident, n: SIGNED32;
 	BEGIN
 		IF (a = 0) OR (b = 0) THEN
 			RETURN 0
@@ -744,7 +744,7 @@ TYPE
 	END MultFP;
 
 	(** fixed-point division, result same format as input with constant fraction Nx*)
-	PROCEDURE DivFP*(a, b: LONGINT): LONGINT;
+	PROCEDURE DivFP*(a, b: SIGNED32): SIGNED32;
 	BEGIN
 		RETURN ScaleUpInt(a) DIV b;
 	END DivFP;
@@ -758,8 +758,8 @@ TYPE
 	END ScaleUpHuge;
 
 	(** scales a float up for fix-point representation with fraction Ny *)
-	PROCEDURE ScaleUp*(r: LONGREAL): LONGINT;
-	VAR tmp: LONGINT;
+	PROCEDURE ScaleUp*(r: LONGREAL): SIGNED32;
+	VAR tmp: SIGNED32;
 	BEGIN
 		tmp := ENTIER(0.5 + r * ScaleFactor);
 		RETURN tmp
@@ -775,8 +775,8 @@ TYPE
 
 
 	(** scales an integer up for fix-point representation with constant fraction Ny *)
-	PROCEDURE ScaleUpInt*(i: LONGINT): LONGINT;
-	VAR tmp: LONGINT;
+	PROCEDURE ScaleUpInt*(i: SIGNED32): SIGNED32;
+	VAR tmp: SIGNED32;
 	BEGIN
 		tmp :=  i * SHORT(ScaleFactor);
 		RETURN tmp
@@ -792,7 +792,7 @@ TYPE
 
 
 	(** scales a hugeint down for fix-point representation (rounded) with constant fraction Ny*)
-	PROCEDURE ScaleDownRoundedHuge*(i: HUGEINT): LONGINT;
+	PROCEDURE ScaleDownRoundedHuge*(i: HUGEINT): SIGNED32;
 	BEGIN
 		RETURN SHORT((i + ScaleFactor DIV 2) DIV ScaleFactor)
 	END ScaleDownRoundedHuge;
@@ -811,7 +811,7 @@ TYPE
 		f.GetName(name)
 	END GetFilename;
 
-	PROCEDURE Array2D*(name: ARRAY OF CHAR; VAR a: ARRAY OF ARRAY OF LONGINT);
+	PROCEDURE Array2D*(name: ARRAY OF CHAR; VAR a: ARRAY OF ARRAY OF SIGNED32);
 	VAR i: SIZE;
 	BEGIN
 		w.String("[ "); w.String(name); w.String(" ]"); w.Ln;
@@ -843,7 +843,7 @@ TYPE
 	END ArrayBool;
 
 	(** print an array of longint *)
-	PROCEDURE Array*(name: ARRAY OF CHAR; VAR a: ARRAY OF LONGINT);
+	PROCEDURE Array*(name: ARRAY OF CHAR; VAR a: ARRAY OF SIGNED32);
 	BEGIN
 		ArrayLen(name, a, LEN(a))
 	END Array;
@@ -871,7 +871,7 @@ TYPE
 	END ArrayHugeLen;
 
 	(** print an array of longint of a given length *)
-	PROCEDURE ArrayLen*(name: ARRAY OF CHAR; VAR a: ARRAY OF LONGINT; n: SIZE);
+	PROCEDURE ArrayLen*(name: ARRAY OF CHAR; VAR a: ARRAY OF SIGNED32; n: SIZE);
 	VAR i: SIZE;
 	BEGIN
 		IF (n > LEN(a)) THEN
@@ -893,8 +893,8 @@ TYPE
 	END String;
 
 	(** write some bytes from a buffer *)
-	PROCEDURE Buffer*(VAR buf: ARRAY OF CHAR; ofs, len: LONGINT);
-	VAR i, line: LONGINT;
+	PROCEDURE Buffer*(VAR buf: ARRAY OF CHAR; ofs, len: SIGNED32);
+	VAR i, line: SIGNED32;
 		hex: ARRAY 3 OF CHAR;
 	BEGIN
 		line := 16;
@@ -907,7 +907,7 @@ TYPE
 	END Buffer;
 
 	PROCEDURE CharToHex(ch: CHAR; VAR hex: ARRAY OF CHAR);
-	VAR ord, low, high: LONGINT;
+	VAR ord, low, high: SIGNED32;
 	BEGIN
 		ord := ORD(ch);
 		low := ord MOD 16;
@@ -916,7 +916,7 @@ TYPE
 		hex[1] := GetHexDigit(low);
 	END CharToHex;
 
-	PROCEDURE GetHexDigit(val: LONGINT): CHAR;
+	PROCEDURE GetHexDigit(val: SIGNED32): CHAR;
 	BEGIN
 		IF (val <= 9) THEN
 			RETURN CHR(48 + val)
@@ -926,7 +926,7 @@ TYPE
 	END GetHexDigit;
 
 	(** print a varname with its value, type must be a longint *)
-	PROCEDURE Var*(name: ARRAY OF CHAR; value: LONGINT);
+	PROCEDURE Var*(name: ARRAY OF CHAR; value: SIGNED32);
 	BEGIN
 		w.String(name); w.String(": "); w.Int(value,5); w.Ln; w.Update
 	END Var;
@@ -941,7 +941,7 @@ TYPE
 
 	(** print a hugeint *)
 	PROCEDURE VarH2*(value: HUGEINT);
-	VAR sign: LONGINT;
+	VAR sign: SIGNED32;
 	BEGIN
 		IF (value < 0) THEN sign := -1; value := -1 * value ELSE sign := 1 END;
 		IF (sign = -1) THEN w.String("-") ELSE w.String(" ") END;
@@ -950,8 +950,8 @@ TYPE
 		w.Update
 	END VarH2;
 
-	PROCEDURE PrintHex(x: LONGINT);
-	VAR i, j: LONGINT;
+	PROCEDURE PrintHex(x: SIGNED32);
+	VAR i, j: SIGNED32;
 		buf: ARRAY 10 OF CHAR;
 	BEGIN
 		j := 8;

@@ -51,12 +51,12 @@ BEGIN
 	RETURN TRUE;
 END DisplayAvailable;
 
-PROCEDURE DisplayWidth*(): LONGINT;
+PROCEDURE DisplayWidth*(): SIGNED32;
 BEGIN
 	RETURN Display.Width;
 END DisplayWidth;
 
-PROCEDURE DisplayHeight*(): LONGINT;
+PROCEDURE DisplayHeight*(): SIGNED32;
 BEGIN
 	RETURN Display.Height;
 END DisplayHeight;
@@ -90,8 +90,8 @@ END StretchedPict; (* not implemented for native. Since images are used as doubl
 PROCEDURE TypeOf*(p: ANY): Type;
 VAR type: Type;
 BEGIN
-	SYSTEM.GET(SYSTEM.VAL(LONGINT, p)-4, type);
-	SYSTEM.GET(SYSTEM.VAL(LONGINT, type)-4, type);
+	SYSTEM.GET(SYSTEM.VAL(SIGNED32, p)-4, type);
+	SYSTEM.GET(SYSTEM.VAL(SIGNED32, type)-4, type);
 	RETURN type
 END TypeOf;
 

@@ -14,7 +14,7 @@ TYPE
 		bufferPool : SoundDevices.BufferPool;
 		buffer : SoundDevices.Buffer;
 		out : Streams.Writer;
-		channels, rate, bits : LONGINT;
+		channels, rate, bits : SIGNED32;
 		recLength: SIZE;
 		t : Kernel.Timer;
 
@@ -22,7 +22,7 @@ TYPE
 
 		(* Initialize Recorder with the given File *)
 		PROCEDURE &Init*(out : Streams.Writer);
-		VAR i: LONGINT; res: WORD;
+		VAR i: SIGNED32; res: WORD;
 		BEGIN
 			ready := FALSE; recording := FALSE; paused := FALSE; finished := FALSE;
 			SELF.out := out; recLength := 0;
@@ -122,7 +122,7 @@ TYPE
 		playChannel : SoundDevices.Channel;
 		bufferPool : SoundDevices.BufferPool;
 		buffer : SoundDevices.Buffer;
-		channels, rate, bits : LONGINT;
+		channels, rate, bits : SIGNED32;
 		t : Kernel.Timer;
 
 		ready, recording, paused, finished : BOOLEAN;

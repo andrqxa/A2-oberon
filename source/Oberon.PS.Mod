@@ -58,7 +58,7 @@ CONST
 		rle, a3, rot, eps: BOOLEAN;
 		name: ARRAY 32 OF CHAR;
 		adjust: REAL;
-		linew: LONGINT;
+		linew: SIGNED32;
 
 		PROCEDURE Int(n: SIGNED16);
 		VAR d: ARRAY 8 OF CHAR; i: SIGNED16;
@@ -149,8 +149,8 @@ CONST
 		END Out;
 
 		PROCEDURE DateTime;
-		VAR t, d: LONGINT;
-			PROCEDURE Pair(ch: CHAR; n: LONGINT);
+		VAR t, d: SIGNED32;
+			PROCEDURE Pair(ch: CHAR; n: SIGNED32);
 			BEGIN Files.Write(R, ch); Files.Write(R, CHR(n DIV 10 MOD 10+30H)); Files.Write(R, CHR(n MOD 10 +30H))
 			END Pair;
 		BEGIN Oberon.GetClock(t, d);

@@ -328,7 +328,7 @@ END TrackMiddle;
 	Allows to copy over an object to be set as new value (left, middle). If succeeded
 	executes attribute 'ConsumeCmd'. *)
 PROCEDURE TrackLeft(F: Frame; VAR M: Oberon.InputMsg);
-	VAR Q: Display3.Mask; obj: Objects.Object; time: LONGINT; x, y, w, h: SIGNED16; keysum: SET;
+	VAR Q: Display3.Mask; obj: Objects.Object; time: SIGNED32; x, y, w, h: SIGNED16; keysum: SET;
 BEGIN
 	x:= M.x+F.X; y:= M.y+F.Y; w:= F.W; h:= F.H;
 	Gadgets.MakeMask(F, x, y, M.dlink, Q);
@@ -478,7 +478,7 @@ END NewFrame;
 	Creates a new object and set the value link of the specified RefGadget. A destination
 	RefGadget is either the executor, selected or marked gadget. *)
 PROCEDURE Create*;
-VAR obj, ref: Objects.Object; time: LONGINT; L: Objects.LinkMsg; S: Attributes.Scanner;
+VAR obj, ref: Objects.Object; time: SIGNED32; L: Objects.LinkMsg; S: Attributes.Scanner;
 BEGIN
 	Attributes.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Attributes.Scan(S);
 	IF S.class IN {Attributes.Name, Attributes.String} THEN

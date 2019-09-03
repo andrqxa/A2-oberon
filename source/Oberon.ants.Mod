@@ -56,8 +56,8 @@ BEGIN
 	END
 END Show;
 
-PROCEDURE getTimeSeries (x, y: LONGINT;  o: Objects.Object;  link: Objects.Object);
-	VAR data: Objects.Object;   row: LONGINT;   msg: vyPort.AdjustCoordMsg;  pos: LONGINT;
+PROCEDURE getTimeSeries (x, y: SIGNED32;  o: Objects.Object;  link: Objects.Object);
+	VAR data: Objects.Object;   row: SIGNED32;   msg: vyPort.AdjustCoordMsg;  pos: SIGNED32;
 BEGIN
 	Links.GetLink(link, "data", data);
 	WITH o: antsArrayObjects.tObject DO

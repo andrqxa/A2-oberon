@@ -111,7 +111,7 @@ END CopyFramePart;
 
 PROCEDURE CopySourcePart (pos: CRT.Position; indent: SIGNED16);
 (*Copy sequence <position> from <src> to <syn>*)
-	VAR ch: CHAR; i: SIGNED16; nChars: LONGINT; r: Texts.Reader;
+	VAR ch: CHAR; i: SIGNED16; nChars: SIGNED32; r: Texts.Reader;
 BEGIN
 	IF (pos.beg >= 0) & (pos.len > 0) THEN
 		Texts.OpenReader(r, CRS.src, pos.beg); Texts.Read(r, ch);
@@ -395,7 +395,7 @@ PROCEDURE GenCompiler*;
 	VAR errNr, i: SIGNED16; checked: CRT.Set;
 			gn: CRT.GraphNode; sn: CRT.SymbolNode;
 			parser: ARRAY 32 OF CHAR;
-			t: Texts.Text; pos: LONGINT;	f: Files.File;
+			t: Texts.Text; pos: SIGNED32;	f: Files.File;
 BEGIN
 	CRT.GetNode(CRT.root, gn); CRT.GetSym(gn.p1, sn);
 	COPY(sn.name, parser); i := Length(parser); parser[i] := "P"; parser[i+1] := 0X;

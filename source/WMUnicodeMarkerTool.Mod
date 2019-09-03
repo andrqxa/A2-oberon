@@ -15,8 +15,8 @@ TYPE
 	END KillerMsg;
 
 	ContextMenuData = OBJECT
-	VAR val: LONGINT;
-		PROCEDURE &New*(val: LONGINT);
+	VAR val: SIGNED32;
+		PROCEDURE &New*(val: SIGNED32);
 		BEGIN
 			SELF.val := val;
 		END New;
@@ -222,7 +222,7 @@ TYPE
 
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 	ctxAlignLeft, ctxAlignCenter, ctxAlignRight, ctxAlignJustified : ContextMenuData;
 	ctxRegular, ctxBold, ctxItalic, ctxBoldItalic : ContextMenuData;
 

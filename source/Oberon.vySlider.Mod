@@ -348,7 +348,7 @@ VAR
 	END Open;
 
 	PROCEDURE Insert*;
-	VAR pict: vyPort.Picture;  from, to, value: REAL;  slider: tSlider;  ticks: LONGINT;
+	VAR pict: vyPort.Picture;  from, to, value: REAL;  slider: tSlider;  ticks: SIGNED32;
 
 		PROCEDURE GetValues;
 		VAR s: vyParser.Scanner;  x: REAL;

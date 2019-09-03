@@ -10,7 +10,7 @@ Refer to the "General ETH Oberon System Source License" contract available at: h
 2000.06.13 - 1.5 - release
 	- you can specify rgb values for live cells (lonely, normal, crowded) they are specified
 	   as long integers, following the parameter. The most readable way to specify them is
-	   as a hexadecmimal LONGINT, for example: normal 9A9B9CH where R=9AH, G=9BH,
+	   as a hexadecmimal SIGNED32, for example: normal 9A9B9CH where R=9AH, G=9BH,
 	   blue=9CH.
 *)
 
@@ -97,8 +97,8 @@ VAR
 	cols, rows: SIGNED16;	(* # cells across and down on the screen *)
 
 	(* offsets to neighbors in 6 of the  8 directions, east and west are constants *)
-	nw, nn, ne : LONGINT;	(* north-west, north, north-east *)
-	sw, ss, se: LONGINT;	(* south-west, south, south-east *)
+	nw, nn, ne : SIGNED32;	(* north-west, north, north-east *)
+	sw, ss, se: SIGNED32;	(* south-west, south, south-east *)
 
 	g0: Generation;	(* the current generation *)
 	g1: Generation;	(* a copy of the previous generation *)
@@ -113,14 +113,14 @@ VAR
 	(* simulation control *)
 	state: SIGNED16;	(* generate | drawList | makeList | update *)
 	step: SIGNED16;	(* drawing step, for fading in/out cells *)
-	generations: LONGINT;	(* nr of complete generations simulated so far *)
-	times: ARRAY 4 OF LONGINT;	(* time required for generate, draw, update. unit: Input.TimeUnit *)
-	timeStarted: LONGINT;	(* time at which Start was last called, unit Input.TimeUnit() *)
+	generations: SIGNED32;	(* nr of complete generations simulated so far *)
+	times: ARRAY 4 OF SIGNED32;	(* time required for generate, draw, update. unit: Input.TimeUnit *)
+	timeStarted: SIGNED32;	(* time at which Start was last called, unit Input.TimeUnit() *)
 
 	(* kickstart *)
-	nrCellsChanged: LONGINT;	(* number of cells changed relative to prev generation *)
-	nrGensUnchanged: LONGINT;	(* number of continuous generations seeing no change in nrCellsChanged *)
-	nrCellsChangedLimit: LONGINT;	(* randomize when nrCellsChanged < nrCellsChangedLimit*)
+	nrCellsChanged: SIGNED32;	(* number of cells changed relative to prev generation *)
+	nrGensUnchanged: SIGNED32;	(* number of continuous generations seeing no change in nrCellsChanged *)
+	nrCellsChangedLimit: SIGNED32;	(* randomize when nrCellsChanged < nrCellsChangedLimit*)
 
 	timing: BOOLEAN;	(* should timing information be printed out when fader stops? *)
 	frameRate: SIGNED16;
@@ -136,7 +136,7 @@ VAR
 	m: REAL; (* with value m [0..1], screen brightness appears at 50%, see CreateMonochromeFade *)
 
 
-	PROCEDURE SetRGB(VAR color: RGB; n: LONGINT);
+	PROCEDURE SetRGB(VAR color: RGB; n: SIGNED32);
 	BEGIN ASSERT( (0 <= n) & (n <= 0FFFFFFH), 101);
 		color[2] := SHORT(n MOD 256);
 		color[1] := SIGNED16(ASH(n, -8) MOD 256);
@@ -255,7 +255,7 @@ VAR
 
 
 	PROCEDURE MakeDisplayList(all: BOOLEAN);
-	VAR r, c: SIGNED16; oldColor, newColor: SIGNED16; i: LONGINT;
+	VAR r, c: SIGNED16; oldColor, newColor: SIGNED16; i: SIGNED32;
 	BEGIN
 		dlistEnd := dlist;
 		i := cols+2;
@@ -335,7 +335,7 @@ VAR
 	CONST range = 10000;
 	VAR
 		r,c: SIGNED16;
-		i: LONGINT;
+		i: SIGNED32;
 		limit: SIGNED16;
 	BEGIN
 		ASSERT( (0.0 <= proportion) & (proportion <= 1.0), 101);
@@ -355,7 +355,7 @@ VAR
 
 	PROCEDURE RecomputeNeighbors;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 		r, c: SIGNED16;
 		(* neighbor sum for g0[i] *)
 		sum: SIGNED8;
@@ -398,7 +398,7 @@ VAR
 		END ComputeNeighborOffsets;
 
 		PROCEDURE CreateGenerations;
-		VAR len: LONGINT;
+		VAR len: SIGNED32;
 		BEGIN
 			len := LONG(cols+2)*(rows+2);
 			NEW(g0, len);
@@ -458,9 +458,9 @@ VAR
 	VAR
 		r,c: SIGNED16;
 		a: SIGNED8;
-		i: LONGINT;
+		i: SIGNED32;
 		t: Generation;
-		nr: LONGINT;	(* number of cells changed *)
+		nr: SIGNED32;	(* number of cells changed *)
 	BEGIN
 		nr := 0;
 		CopyGeneration(n0, n1); (* n1 is our working copy of n0 *)
@@ -576,7 +576,7 @@ VAR
 
 
 	PROCEDURE Step;
-	VAR ostate: SIGNED16; t: LONGINT;
+	VAR ostate: SIGNED16; t: SIGNED32;
 	BEGIN
 		ostate := state;
 		t := Input.Time();
@@ -618,8 +618,8 @@ VAR
 
 
 	PROCEDURE Stop;
-	VAR timeTaken: LONGINT;
-		PROCEDURE PerGen(ticks: LONGINT): LONGINT;	(* milliseconds *)
+	VAR timeTaken: SIGNED32;
+		PROCEDURE PerGen(ticks: SIGNED32): SIGNED32;	(* milliseconds *)
 		BEGIN RETURN ENTIER(((ticks/generations)/Input.TimeUnit)*1000)
 		END PerGen;
 	BEGIN
@@ -649,7 +649,7 @@ VAR
 
 
 	PROCEDURE Install*;
-	VAR r: REAL; n: SIGNED16; name: ARRAY 64 OF CHAR; color: LONGINT;
+	VAR r: REAL; n: SIGNED16; name: ARRAY 64 OF CHAR; color: SIGNED32;
 	BEGIN
 		SaveScreen.InstallFader(Start, Step, Stop);
 

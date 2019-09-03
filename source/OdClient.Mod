@@ -20,7 +20,7 @@ IMPORT
 
 VAR
 	log * : OdUtil.Log;
-	traceLevel * : LONGINT;
+	traceLevel * : SIGNED32;
 
 CONST
 	Ok* = 0;
@@ -172,7 +172,7 @@ TYPE
 		(* Get filelist of client directory *)
 		PROCEDURE ClientMembers(CONST dir: ARRAY OF CHAR): OdUtil.Lines;
 		VAR
-			enum: Files.Enumerator; time, date: LONGINT;
+			enum: Files.Enumerator; time, date: SIGNED32;
 			size: Files.Size; entryFlags, flags: SET;
 			pattern: ARRAY 128 OF CHAR;
 			fileNames: OdUtil.Lines; name: OdUtil.Line;
@@ -542,7 +542,7 @@ TYPE
 		 reconnect : BOOLEAN;
 
 		 actualHost : ARRAY 256 OF CHAR;
-		 actualPort : LONGINT;
+		 actualPort : SIGNED32;
 
 		PROCEDURE &Init* ( x : OdXml.OdXml );
 		BEGIN
@@ -705,7 +705,7 @@ TYPE
 
 		(** Set client trace level to none(0), header(1), body(2) *)
 		PROCEDURE SetTraceLevel * ( context: Commands.Context );
-		VAR level: LONGINT;
+		VAR level: SIGNED32;
 		BEGIN
 			IF context.arg.GetInteger( level, FALSE ) THEN
 				CASE level OF
@@ -756,7 +756,7 @@ TYPE
 
 		PROCEDURE SvnSetRepos * ( CONST url : ARRAY OF CHAR );
 		VAR
-			port: LONGINT;
+			port: SIGNED32;
 			s : ARRAY 6 OF CHAR;
 		BEGIN
 			IF ~WebHTTP.SplitHTTPAdr (url, repos.host, repos.path, port) THEN
@@ -784,7 +784,7 @@ TYPE
 		END SetRepos;
 
 
-		PROCEDURE OpenConnection ( CONST url : ARRAY OF CHAR; VAR host, path : ARRAY OF CHAR; VAR port : LONGINT; VAR res : WORD ) : BOOLEAN;
+		PROCEDURE OpenConnection ( CONST url : ARRAY OF CHAR; VAR host, path : ARRAY OF CHAR; VAR port : SIGNED32; VAR res : WORD ) : BOOLEAN;
 		VAR
 			fadr : IP.Adr;
 		BEGIN
@@ -829,7 +829,7 @@ TYPE
 		CONST
 			StringWriterSize = 10000;
 		VAR
-			host : ARRAY 128 OF CHAR; path : ARRAY 256 OF CHAR; port : LONGINT;
+			host : ARRAY 128 OF CHAR; path : ARRAY 256 OF CHAR; port : SIGNED32;
 			w, aosioWriter : Streams.Writer; x : WebHTTP.AdditionalField;
 			buf: ARRAY StringWriterSize OF CHAR; stringWriter: Streams.StringWriter;
 			xmlSize: Streams.Position;
@@ -923,7 +923,7 @@ TYPE
 			 VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
 		VAR
 			reqBody: OdXml.BaselineControlReq;
-			host : ARRAY 128 OF CHAR; path : ARRAY 256 OF CHAR; port : LONGINT;
+			host : ARRAY 128 OF CHAR; path : ARRAY 256 OF CHAR; port : SIGNED32;
 		BEGIN
 			IF WebHTTP.SplitHTTPAdr(url, host, path, port) THEN
 				reqHeader.method := WebHTTP.BaselineControlM;
@@ -938,7 +938,7 @@ TYPE
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 			w : Streams.Writer;
 			r : Streams.Reader;
 		BEGIN
@@ -972,7 +972,7 @@ TYPE
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 			w : Streams.Writer;
 			x : WebHTTP.AdditionalField;
 		BEGIN
@@ -1006,7 +1006,7 @@ TYPE
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 			w : Streams.Writer; (* to connection *)
 			x : WebHTTP.AdditionalField;
 		BEGIN
@@ -1056,7 +1056,7 @@ TYPE
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 			w : Streams.Writer;
 			xmlDoc: XML.Document;
 			(* For bodytracing. TODO: Update should be converted to Net(). *)
@@ -1119,7 +1119,7 @@ TYPE
 			coReq: OdXml.CheckoutReq;
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 		BEGIN
 			IF WebHTTP.SplitHTTPAdr(url, host, path, port) THEN
 				reqHeader.method := WebHTTP.CheckoutM;
@@ -1156,7 +1156,7 @@ TYPE
 			mergeReq: OdXml.MergeSvnReq;
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 		BEGIN
 			IF WebHTTP.SplitHTTPAdr(url, host, path, port) THEN
 				reqHeader.method := WebHTTP.MergeM;
@@ -1178,7 +1178,7 @@ TYPE
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 			w : Streams.Writer;
 		BEGIN
 			IF OpenConnection ( url, host, path, port, res ) THEN
@@ -1203,7 +1203,7 @@ TYPE
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 			w : Streams.Writer; (* to connection *)
 			xmlDoc: XML.Document;
 			s: ARRAY 128 OF CHAR; ok: BOOLEAN;
@@ -1386,12 +1386,12 @@ TYPE
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 			w : Streams.Writer; (* to connection *)
 			xmlDoc: XML.Document;
 			(* For bodytracing. TODO: Update should be converted to Net(). *)
 			CONST StringWriterSize = 10000;
-			VAR xmlSize: LONGINT; buf: ARRAY StringWriterSize OF CHAR; stringWriter: Streams.StringWriter;
+			VAR xmlSize: SIGNED32; buf: ARRAY StringWriterSize OF CHAR; stringWriter: Streams.StringWriter;
 			aosioWriter : Streams.Writer;
 		BEGIN
 			xmlSize := 0;
@@ -1487,7 +1487,7 @@ END Terminate;
 
 (***  Some utility functions for connecting used in Vcc ***)
 
-PROCEDURE ShowMethodUrl * (method: LONGINT; CONST url: ARRAY OF CHAR);
+PROCEDURE ShowMethodUrl * (method: SIGNED32; CONST url: ARRAY OF CHAR);
 VAR line: ARRAY 256 OF CHAR;
 BEGIN
 	WebHTTP.GetMethodName(method, line); Strings.Append(line, " "); Strings.Append(line, url);
@@ -1511,11 +1511,11 @@ PROCEDURE StoreResult2File * (VAR resHeader: WebHTTP.ResponseHeader; res: WORD;
 CONST
 	BufSize = 512;
 VAR read, remain : SIZE;
-	timer: Kernel.Timer; slept: LONGINT;
+	timer: Kernel.Timer; slept: SIGNED32;
 	r: Files.Rider;
 	buf : ARRAY BufSize OF CHAR;
 	dechunk: WebHTTP.ChunkedInStream; sequential: Streams.Reader;
-	chunkSize: LONGINT; token: ARRAY 16 OF CHAR;
+	chunkSize: SIGNED32; token: ARRAY 16 OF CHAR;
 BEGIN
 	f := NIL;
 	IF res = Ok THEN

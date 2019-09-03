@@ -44,20 +44,20 @@ TYPE
 
 
 	PROCEDURE Open*( M: tModel;  a: ARRAY OF LONGREAL );
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 5 DO M.a[i] := a[i] END
 	END Open;
 
 	PROCEDURE StoreM( VAR R: Files.Rider;  s: tModel );
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		Files.WriteInt( R, 0 );
 		FOR i := 0 TO 5 DO Files.WriteLReal( R, s.a[i] ) END
 	END StoreM;
 
 	PROCEDURE LoadM( VAR R: Files.Rider;  s: tModel );
-	VAR version: SIGNED16;  i: LONGINT;
+	VAR version: SIGNED16;  i: SIGNED32;
 	BEGIN
 		Files.ReadInt( R, version );
 		FOR i := 0 TO 5 DO Files.ReadLReal( R, s.a[i] ) END
@@ -94,7 +94,7 @@ TYPE
 
 	PROCEDURE ArrayHandleAttribute( VAR M: Objects.AttrMsg;  prefix: ARRAY OF CHAR;  VAR array: ARRAY OF LONGREAL ): BOOLEAN;
 	VAR cur: ARRAY 64 OF CHAR;
-		i: LONGINT;  len: LONGINT;
+		i: SIGNED32;  len: SIGNED32;
 	BEGIN
 		len := LEN( array );
 		IF M.id = Objects.enum THEN
@@ -123,7 +123,7 @@ TYPE
 	END ArrayHandleAttribute;
 
 	PROCEDURE Handler*( o: Objects.Object;  VAR M: Objects.ObjMsg );
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		WITH o: tModel DO
 			IF M IS antsKernel.samplingMsg THEN

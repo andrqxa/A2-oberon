@@ -82,7 +82,7 @@ TYPE
 
 VAR
 	intToChar: POINTER TO ARRAY OF CHAR;
-	charToInt: POINTER TO ARRAY OF LONGINT;
+	charToInt: POINTER TO ARRAY OF SIGNED32;
 	(** The initial key assigned to a Data.Datum.  It is the only key that can be overwritten via SetKey. *)
 	Sentinel-: Key;
 

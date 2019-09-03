@@ -238,7 +238,7 @@ MODULE ColorWells IN Oberon;	(** eos  **)
 		VAR
 			mask: Display3.Mask; x, y, w, h, one, two: SIGNED16;
 
-		PROCEDURE P (x: LONGINT): SIGNED16;
+		PROCEDURE P (x: SIGNED32): SIGNED16;
 		BEGIN
 			RETURN SHORT(x * LONG(10000) DIV Printer.Unit)
 		END P;
@@ -330,7 +330,7 @@ MODULE ColorWells IN Oberon;	(** eos  **)
 	END Copy;
 
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR well, copy: ColorWell; fx, fy: SIGNED16; mask: Display3.Mask; am: Objects.AttrMsg; ver: LONGINT;
+		VAR well, copy: ColorWell; fx, fy: SIGNED16; mask: Display3.Mask; am: Objects.AttrMsg; ver: SIGNED32;
 	BEGIN
 		well := obj(ColorWell);
 		IF msg IS Display.FrameMsg THEN

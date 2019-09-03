@@ -628,7 +628,7 @@ TYPE
 			sr.AddContent(gr);
 
 			(* edit panel *)
-			NEW(ep); ep.alignment.Set(WMComponents.AlignClient); ep.fillColor.Set(LONGINT(0DDDD00EEH));
+			NEW(ep); ep.alignment.Set(WMComponents.AlignClient); ep.fillColor.Set(SIGNED32(0DDDD00EEH));
 			panel.AddContent(ep);
 
 			NEW(edit); edit.alignment.Set(WMComponents.AlignClient); edit.tv.showBorder.Set(TRUE);

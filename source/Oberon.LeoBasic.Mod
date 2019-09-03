@@ -38,7 +38,7 @@ MODULE LeoBasic IN Oberon; (** portable **)	(* eos  *)
 	END CopyLink;
 
 	PROCEDURE HandleLink* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR l, copy: Link; ver: LONGINT;
+		VAR l, copy: Link; ver: SIGNED32;
 	BEGIN
 		l := obj(Link);
 		IF msg IS Leonardo.ValidateMsg THEN
@@ -288,7 +288,7 @@ MODULE LeoBasic IN Oberon; (** portable **)	(* eos  *)
 	END CopyFrame;
 
 	PROCEDURE HandleFrame* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR f, copy: Frame; lgm: GfxMatrix.Matrix; ver, pos: LONGINT; forker: LeoPens.Forker;
+		VAR f, copy: Frame; lgm: GfxMatrix.Matrix; ver, pos: SIGNED32; forker: LeoPens.Forker;
 	BEGIN
 		f := obj(Frame);
 		IF msg IS Leonardo.ShapeMsg THEN

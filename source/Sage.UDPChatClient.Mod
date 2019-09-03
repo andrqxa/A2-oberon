@@ -45,7 +45,7 @@ TYPE
 		password, passwordConfirm: ARRAY 33 OF CHAR;
 		shortName, fullName, eMail: ARRAY 65 OF CHAR;
 
-		uin: LONGINT; res: WORD;
+		uin: SIGNED32; res: WORD;
 		dt: Dates.DateTime;
 
 		keepAliveTimer: Kernel.MilliTimer;
@@ -57,7 +57,7 @@ TYPE
 		str1, str2: ARRAY 256 OF CHAR;
 
 		branch, command, seqNum, messageType, inSeqNum, outSeqNum: SIGNED16;
-		senderUin, receiverUin, port, receiveBufOffset: LONGINT;
+		senderUin, receiverUin, port, receiveBufOffset: SIGNED32;
 		len: SIZE;
 		sendBuf-: Base.Buffer;
 
@@ -95,7 +95,7 @@ TYPE
 
 	END Finalize;
 
-	PROCEDURE Client_ACK (seqNum: SIGNED16; uin: LONGINT; sendBuf: Base.Buffer;
+	PROCEDURE Client_ACK (seqNum: SIGNED16; uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		res: WORD;
@@ -142,7 +142,7 @@ TYPE
 	END Client_NewUserReg;
 
 	PROCEDURE Client_Login (password: ARRAY OF CHAR;
-		VAR seqNum: SIGNED16; uin: LONGINT; sendBuf: Base.Buffer;
+		VAR seqNum: SIGNED16; uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		len: SIZE; res: WORD;
@@ -164,8 +164,8 @@ TYPE
 		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_Login;
 
-	PROCEDURE Client_InfoReq (userUIN: LONGINT; VAR seqNum: SIGNED16;
-		uin: LONGINT; sendBuf: Base.Buffer;
+	PROCEDURE Client_InfoReq (userUIN: SIGNED32; VAR seqNum: SIGNED16;
+		uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		res: WORD;
@@ -186,8 +186,8 @@ TYPE
 	END Client_InfoReq;
 
 	PROCEDURE Client_SendMessage (
-		userUIN: LONGINT; messageType: SIGNED16; message: String;
-		VAR seqNum: SIGNED16; uin: LONGINT; sendBuf: Base.Buffer;
+		userUIN: SIGNED32; messageType: SIGNED16; message: String;
+		VAR seqNum: SIGNED16; uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		string: String;
@@ -218,7 +218,7 @@ TYPE
 	END Client_SendMessage;
 
 	PROCEDURE Client_SendTextCode (code: String;
-		VAR seqNum: SIGNED16; uin: LONGINT; sendBuf: Base.Buffer;
+		VAR seqNum: SIGNED16; uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		string: String;
@@ -233,14 +233,14 @@ TYPE
 		INC (seqNum);
 
 		len := Strings.Length (code^) + 1;
-		sendBuf.AddInt (len(LONGINT), 2);
+		sendBuf.AddInt (len(SIGNED32), 2);
 		sendBuf.Add (code^, 0, len, TRUE, res);
 
 		string := sendBuf.GetString ();
 		s.Send (serverIP, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_SendTextCode;
 
-	PROCEDURE Client_KeepAlive (VAR seqNum: SIGNED16; uin: LONGINT; sendBuf: Base.Buffer;
+	PROCEDURE Client_KeepAlive (VAR seqNum: SIGNED16; uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		res: WORD;
@@ -258,9 +258,9 @@ TYPE
 		s.Send (ip, Base.serverPort, string^, 0, sendBuf.GetLength (), res);
 	END Client_KeepAlive;
 
-	PROCEDURE FindUserInfo (list: Base.List; uin: LONGINT): Base.UserInfo;
+	PROCEDURE FindUserInfo (list: Base.List; uin: SIGNED32): Base.UserInfo;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 		u: Base.UserInfo;
 		ptr: ANY;
 	BEGIN

@@ -56,7 +56,7 @@ TYPE
 		root: Objects.Object;
 		name, val: ARRAY 256 OF CHAR;
 		entriesvisible: BOOLEAN;
-		entriescount: LONGINT;
+		entriescount: SIGNED32;
 		repetition: BOOLEAN;
 		X, Y, W, H: SIGNED16;
 		x, y: LONGREAL;
@@ -71,7 +71,7 @@ TYPE
 		forbidden: ARRAY 128 OF vyName.tNameArray;
 		forbiddencount: SIGNED16;
 		commands: vyCommandMenus.List;
-		lastLink: LONGINT;
+		lastLink: SIGNED32;
 		lifeUpdate: BOOLEAN
 	END;
 
@@ -207,9 +207,9 @@ VAR
 		END
 	END Enqueue;
 
-	PROCEDURE Entries( node: tNode;  CONST rname, rval: ARRAY OF CHAR;  depth: LONGINT );
+	PROCEDURE Entries( node: tNode;  CONST rname, rval: ARRAY OF CHAR;  depth: SIGNED32 );
 	VAR msg: Objects.AttrMsg;  lmsg: Objects.LinkMsg;
-	VAR i: LONGINT;  ec1, ec2: LONGINT;  name: vyName.tNameArray;  Entry: tEntry;  subnode: tNode;
+	VAR i: SIGNED32;  ec1, ec2: SIGNED32;  name: vyName.tNameArray;  Entry: tEntry;  subnode: tNode;
 	BEGIN
 
 		node.selected := FALSE;  node.visible := TRUE;  node.entriesvisible := TRUE;  COPY( rname, node.name );  COPY( rval, node.val );
@@ -286,7 +286,7 @@ VAR
 	END Entries;
 
 	PROCEDURE ListFromDummy( layer: tLayer );
-	VAR obj: vyBase.Object;  node: tNode;  i: LONGINT;
+	VAR obj: vyBase.Object;  node: tNode;  i: SIGNED32;
 	BEGIN
 		NEW( obj );  obj.handle := vyBase.objecthandle;  NEW( node );  node.root := obj;  Entries( node, "", "", 0 );
 		FOR i := 0 TO enumCount - 1 DO COPY( enumChar[i], layer.forbidden[layer.forbiddencount] );  INC( layer.forbiddencount ) END;

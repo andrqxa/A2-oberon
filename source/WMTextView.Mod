@@ -41,8 +41,8 @@ CONST
 	InterclickCancelled = 99;
 
 	SelectionColor = 0000FF60H;
-	SelectionColorInterclick01 = LONGINT(0FFFF0060H);
-	SelectionColorInterclick02 = LONGINT(0FF000060H);
+	SelectionColorInterclick01 = SIGNED32(0FFFF0060H);
+	SelectionColorInterclick02 = SIGNED32(0FF000060H);
 
 TYPE
 	Char32 = Texts.Char32;
@@ -80,7 +80,7 @@ TYPE
 
 		PROCEDURE &New *(tp : TabPositions);
 		VAR
-			idx : LONGINT;
+			idx : SIGNED32;
 		BEGIN
 			idx := 0; tabDist := 150;
 			WHILE idx < LEN(tp)-1 DO ASSERT(tp[idx] <= tp[idx+1]); INC(idx) END;
@@ -375,7 +375,7 @@ TYPE
 
 		PROCEDURE &Init*;
 		BEGIN
-			color := LONGINT(0FF0000CCH); visible := TRUE
+			color := SIGNED32(0FF0000CCH); visible := TRUE
 		END Init;
 
 		PROCEDURE Draw(canvas : WMGraphics.Canvas; x, y, ascent : SIZE);
@@ -384,7 +384,7 @@ TYPE
 			IF img # NIL THEN canvas.DrawImage(x - hotX, y - hotY, img, WMGraphics.ModeSrcOverDst)
 			ELSE
 				currentArea := GetArea(x, y, ascent);
-				canvas.Fill(currentArea, LONGINT(0FF0000CCH), WMGraphics.ModeSrcOverDst)
+				canvas.Fill(currentArea, SIGNED32(0FF0000CCH), WMGraphics.ModeSrcOverDst)
 			END
 		END Draw;
 
@@ -503,7 +503,7 @@ TYPE
 	VAR
 		cursor : ANY;
 		callback : CursorBlinkerCallback;
-		interval : LONGINT;
+		interval : SIGNED32;
 		isVisible : BOOLEAN;
 
 		alive, dead : BOOLEAN;
@@ -529,13 +529,13 @@ TYPE
 			timer.Wakeup;
 		END Set;
 
-		(** Set the cursor blinking interval in milliseconds. An interval of MAX(LONGINT) means don't blink *)
-		PROCEDURE SetInterval*(ms : LONGINT);
+		(** Set the cursor blinking interval in milliseconds. An interval of MAX(SIGNED32) means don't blink *)
+		PROCEDURE SetInterval*(ms : SIGNED32);
 		BEGIN {EXCLUSIVE}
 			ASSERT(ms > 0);
 			interval := ms;
 			timer.Wakeup;
-			IF (interval = MAX(LONGINT)) & (cursor # NIL) THEN
+			IF (interval = MAX(SIGNED32)) & (cursor # NIL) THEN
 				isVisible := TRUE;
 				callback(isVisible);
 			END;
@@ -571,7 +571,7 @@ TYPE
 	BEGIN {ACTIVE}
 		WHILE alive DO
 			BEGIN {EXCLUSIVE}
-				AWAIT(~alive OR ((cursor # NIL) & (interval # MAX(LONGINT))));
+				AWAIT(~alive OR ((cursor # NIL) & (interval # MAX(SIGNED32))));
 				IF alive THEN
 					callback(isVisible);
 					isVisible := ~isVisible;
@@ -621,7 +621,7 @@ TYPE
 
 		(** Text wrapping mode: NoWrap, Wrap or WrapWord (default : WrapWord) *)
 		wrapMode- : WMProperties.Int32Property;
-		wrapModeI : LONGINT;
+		wrapModeI : SIGNED32;
 
 		firstLine- : WMProperties.SizeProperty;
 		firstLineI : SIZE;
@@ -649,7 +649,7 @@ TYPE
 
 		(** Mouse wheel scrolling speed multiplier? (default: 3, 0: disable mouse wheel scrolling) *)
 		mouseWheelScrollSpeed- : WMProperties.Int32Property;
-		mouseWheelScrollSpeedI : LONGINT;
+		mouseWheelScrollSpeedI : SIGNED32;
 
 		(** Allow middle-click command execution? (default: TRUE) *)
 		allowCommandExecution- : WMProperties.BooleanProperty;
@@ -735,9 +735,9 @@ TYPE
 		lineEnter : SIZE;
 		modifierFlags : SET;
 		oldFlags : SET;	(* old pointer flags *)
-		interclick : LONGINT;
+		interclick : SIGNED32;
 
-		lastTimeStamp : LONGINT;
+		lastTimeStamp : SIGNED32;
 
 		oldObject, focusObject : ANY;
 		oldPos, focusPos : SIZE;
@@ -1673,7 +1673,7 @@ TYPE
 			f,cf : WMGraphics.Font;
 			ch : Char32;
 			tabstring : ARRAY 256 OF CHAR; tabs : CustomTabStops; tp : TabPositions;
-			sr : Streams.StringReader; tabCounter, tabPos : LONGINT; token : ARRAY 16 OF CHAR;
+			sr : Streams.StringReader; tabCounter, tabPos : SIGNED32; token : ARRAY 16 OF CHAR;
 			pStyle : Texts.ParagraphStyle;
 			cStyle : Texts.CharacterStyle;
 
@@ -2012,9 +2012,9 @@ TYPE
 			wrapPos: SIZE;
 			eol, first : BOOLEAN;
 			ascent, descent, leading, ld, a, d, dx, x : SIZE;
-			align, firstIndent, leftIndent, rightIndent, spaceBefore, spaceAfter : LONGINT;
+			align, firstIndent, leftIndent, rightIndent, spaceBefore, spaceAfter : SIGNED32;
 			tabstring : ARRAY 256 OF CHAR; tabs : CustomTabStops; tp : TabPositions;
-			sr : Streams.StringReader; tabCounter, tabPos : LONGINT; token : ARRAY 16 OF CHAR;
+			sr : Streams.StringReader; tabCounter, tabPos : SIGNED32; token : ARRAY 16 OF CHAR;
 			pStyle : Texts.ParagraphStyle;
 			start, stop, isFirst : BOOLEAN;
 			bidiTextReader, localTextReader : Texts.TextReader;
@@ -2024,7 +2024,7 @@ TYPE
 			currentStyle, lastStyle : ANY;
 			cf:  WMGraphics.Font;
 			style : RECORD
-				voff : LONGINT;
+				voff : SIGNED32;
 				font : WMGraphics.Font;
 			END;
 
@@ -2336,7 +2336,7 @@ TYPE
 			cf: WMGraphics.Font;
 			style : RECORD
 				color, bgColor : WMGraphics.Color;
-				voff : LONGINT;
+				voff : SIGNED32;
 				font : WMGraphics.Font;
 			END;
 		BEGIN
@@ -2554,7 +2554,7 @@ TYPE
 						font.GetStringSize(localTextReader.object(Texts.LabelPiece).label^, dx, dy);
 						font.RenderString(canvas, x + sx+2, top + (l.ascent), localTextReader.object(Texts.LabelPiece).label^);
 						INC(dx, 4);
-						canvas.Fill(WMRectangles.MakeRect(x + sx, top, x + dx + sx, top + (l.height)), LONGINT(0FF880050H), WMGraphics.ModeSrcOverDst);
+						canvas.Fill(WMRectangles.MakeRect(x + sx, top, x + dx + sx, top + (l.height)), SIGNED32(0FF880050H), WMGraphics.ModeSrcOverDst);
 						WMGraphicUtilities.RectGlassShade(canvas, WMRectangles.MakeRect(x + sx, top, x + dx + sx, top + (l.height)), 1, FALSE)
 					ELSE dx := 0; END;
 				ELSE
@@ -2653,7 +2653,7 @@ TYPE
 				DrawBackground^(canvas);
 				IF showBorderI THEN
 					WMGraphicUtilities.DrawBevel(canvas, rect,
-						1, TRUE, LONGINT(0808080FFH), WMGraphics.ModeCopy)
+						1, TRUE, SIGNED32(0808080FFH), WMGraphics.ModeCopy)
 				END;
 			END;
 
@@ -2801,8 +2801,8 @@ TYPE
 			cursor.SetVisible(to - from > 0);
 		END DoubleClickSelect;
 
-		PROCEDURE SetInterclick(new : LONGINT);
-		VAR old : LONGINT;
+		PROCEDURE SetInterclick(new : SIGNED32);
+		VAR old : SIGNED32;
 		BEGIN
 			old := interclick;
 			IF (old # new) THEN
@@ -2817,7 +2817,7 @@ TYPE
 		END SetInterclick;
 
 		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
-		VAR pos, a, b, internalPos : SIZE; oldInterclick : LONGINT;
+		VAR pos, a, b, internalPos : SIZE; oldInterclick : SIGNED32;
 		BEGIN
 			ViewToTextPos(x,y,pos);
 			internalPos := GetInternalPos(pos);
@@ -2837,7 +2837,7 @@ TYPE
 				IF commandMarker = NIL THEN
 					commandMarker := CreateHighlight();
 					commandMarker.SetKind(HLUnder);
-					commandMarker.SetColor(LONGINT(0FF0000FFH));
+					commandMarker.SetColor(SIGNED32(0FF0000FFH));
 					text.AcquireRead;
 					FindCommand(internalPos, a, b);
 					commandMarker.SetFromTo(a, b);
@@ -2978,7 +2978,7 @@ TYPE
 
 		(* Returns TRUE if an Object is Hit, FALSE otherwise *)
 		PROCEDURE HitObject(x, y : SIZE; (* keys : SET;*)  VAR pos : SIZE; VAR obj : ANY): BOOLEAN;
-		VAR ch : LONGINT; tx, ty : SIZE;
+		VAR ch : SIGNED32; tx, ty : SIZE;
 		BEGIN
 			text.AcquireRead;
 			ViewToTextPos(x, y, pos);
@@ -2997,7 +2997,7 @@ TYPE
 
 		(* Returns TRUE if a Link is Hit, FALSE otherwise *)
 		PROCEDURE HitLink(x, y : SIZE;  VAR pos : SIZE; VAR link : Texts.Link): BOOLEAN;
-		VAR ch: LONGINT; tx, ty : SIZE;
+		VAR ch: SIGNED32; tx, ty : SIZE;
 		BEGIN
 			text.AcquireRead;
 			ViewToTextPos(x, y, pos);
@@ -3053,7 +3053,7 @@ TYPE
 
 		(* Returns the position of the label in text *)
 		PROCEDURE FindLabel*(CONST label : ARRAY OF CHAR; VAR pos : SIZE): BOOLEAN;
-		VAR ch : LONGINT;
+		VAR ch : SIGNED32;
 			found : BOOLEAN;
 		BEGIN
 			found := FALSE; pos := 0;
@@ -3347,7 +3347,7 @@ TYPE
 				lineStart := layout.GetLineStartPos(cl);
 				cPos := lineStart + MIN(layout.GetLineLength(cl) - 1, lineEnter);
 				cursor.SetPosition(cPos);
-				IF cl < firstLineI THEN firstLine.Set(LONGINT(cl)) END
+				IF cl < firstLineI THEN firstLine.Set(SIGNED32(cl)) END
 			END;
 			IF select THEN
 				KeyUpdateSelection(GetInternalPos(cursor.GetPosition()));
@@ -3637,12 +3637,12 @@ TYPE
 		END SetFlags;
 
 		PROCEDURE FindCommandRange*(pos: SIZE; VAR start, end, nofLastSelections : SIZE);
-		VAR ch : LONGINT; string : ARRAY 23 OF CHAR; i : SIZE; sDoCommands, lastWasTilde : BOOLEAN;
-			escapeString: ARRAY 32 OF LONGINT; escapePos: LONGINT; escape: BOOLEAN;
+		VAR ch : SIGNED32; string : ARRAY 23 OF CHAR; i : SIZE; sDoCommands, lastWasTilde : BOOLEAN;
+			escapeString: ARRAY 32 OF SIGNED32; escapePos: SIGNED32; escape: BOOLEAN;
 
 			(* note: this simple algorithm can be emplyed if  the substring to be implicitly searched for does not contain its first character *)
-			PROCEDURE String(escape: BOOLEAN; CONST escapeString: ARRAY OF LONGINT);
-			VAR done: BOOLEAN; escapePos: LONGINT;
+			PROCEDURE String(escape: BOOLEAN; CONST escapeString: ARRAY OF SIGNED32);
+			VAR done: BOOLEAN; escapePos: SIGNED32;
 			BEGIN
 				done := FALSE; escapePos := -1;
 				REPEAT
@@ -3730,7 +3730,7 @@ TYPE
 		END FindCommandRange;
 
 		PROCEDURE FindCommand*(pos: SIZE; VAR start, end : SIZE);
-		VAR ch : LONGINT;
+		VAR ch : SIGNED32;
 		BEGIN
 			text.AcquireRead;
 			utilreader.SetDirection(-1); utilreader.SetPosition(pos);

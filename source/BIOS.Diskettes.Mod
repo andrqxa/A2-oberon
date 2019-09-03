@@ -32,14 +32,14 @@ CONST
 TYPE
 	Device* = OBJECT (Disks.Device)
 		VAR
-			drive: LONGINT;
+			drive: SIGNED32;
 			locked: BOOLEAN;	(* must be locked before access is allowed *)
 			type, media: SIGNED8;	(* drive type & current media *)
 				(* current parameters *)
-			size, sectors, heads, tracks: LONGINT;
+			size, sectors, heads, tracks: SIGNED32;
 			gap, rate, spec1, spec2, fgap: CHAR;
 
-		PROCEDURE Transfer*(op, start, num: LONGINT;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD);
+		PROCEDURE Transfer*(op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD);
 		BEGIN
 			Transfer1(SELF, op, start, num, buf, ofs, res);
 			IF Disks.Stats THEN
@@ -61,7 +61,7 @@ TYPE
 			END;
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: LONGINT; VAR res: WORD);
+		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: WORD);
 		BEGIN
 			GetSize1(SELF, size, res)
 		END GetSize;
@@ -75,12 +75,12 @@ TYPE
 
 VAR
 	device: ARRAY MaxDevices OF Device;
-	curdrive: LONGINT;
-	curtrack: LONGINT;
+	curdrive: SIGNED32;
+	curtrack: SIGNED32;
 	state: SIGNED8;
 	result: ARRAY 7 OF SET;
 	errors: ARRAY 3 OF SET;
-	dmabufvirt, dmabufphys: ADDRESS; dmabufsize: LONGINT;
+	dmabufvirt, dmabufphys: ADDRESS; dmabufsize: SIGNED32;
 	motor, interrupt : BOOLEAN;
 	trace: SIGNED8;
 
@@ -107,9 +107,9 @@ BEGIN
 	KernelLog.Ln;  KernelLog.String("Diskette: ");  KernelLog.String(error);
 	KernelLog.String(". ");  KernelLog.String(reason);  KernelLog.Ln;
 	IF trace > 0 THEN
-		FOR i := 0 TO 2 DO KernelLog.Hex(SYSTEM.VAL(LONGINT, result[i]), 9) END;
+		FOR i := 0 TO 2 DO KernelLog.Hex(SYSTEM.VAL(SIGNED32, result[i]), 9) END;
 		KernelLog.Ln;
-		FOR i := 0 TO 2 DO KernelLog.Hex(SYSTEM.VAL(LONGINT, errors[i]), 9) END;
+		FOR i := 0 TO 2 DO KernelLog.Hex(SYSTEM.VAL(SIGNED32, errors[i]), 9) END;
 		KernelLog.Ln
 	END;
 	FOR i := 0 TO 6 DO result[i] := {} END;
@@ -119,8 +119,8 @@ END Error;
 
 (* SetupDMA - Start a DMA operation *)
 
-PROCEDURE SetupDMA(read: BOOLEAN; chan, len: LONGINT);
-VAR adr: ADDRESS; page, mode: LONGINT;
+PROCEDURE SetupDMA(read: BOOLEAN; chan, len: SIGNED32);
+VAR adr: ADDRESS; page, mode: SIGNED32;
 BEGIN
 	adr := dmabufphys;
 	ASSERT(len <= dmabufsize);
@@ -265,9 +265,9 @@ END CycleMedia;
 
 (* Do - Perform a floppy operation *)
 
-PROCEDURE Do(dev: Device; op, sector, head, track, num: LONGINT;  VAR buf: ARRAY OF SYSTEM.BYTE): LONGINT;
+PROCEDURE Do(dev: Device; op, sector, head, track, num: SIGNED32;  VAR buf: ARRAY OF SYSTEM.BYTE): SIGNED32;
 CONST MaxLoops = 18;  MaxTries = 3;
-VAR s: SET;  i, loops, try: LONGINT;  t: Kernel.MilliTimer;  ok: BOOLEAN;  media: SIGNED8;
+VAR s: SET;  i, loops, try: SIGNED32;  t: Kernel.MilliTimer;  ok: BOOLEAN;  media: SIGNED8;
 BEGIN
 	FOR i := 0 TO 2 DO errors[i] := {} END;
 	IF (num < 1) OR (num > 126) THEN Error("Bad number of sectors"); RETURN 1003 END;
@@ -402,8 +402,8 @@ BEGIN
 	IF dev.media = media THEN RETURN Ok ELSE RETURN Disks.MediaChanged END
 END Do;
 
-PROCEDURE Transfer0(d: Disks.Device;  op, start, num: LONGINT;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD);
-VAR dev: Device; sector, head, track, s, n, max, start0, num0: LONGINT; ofs0: SIZE;
+PROCEDURE Transfer0(d: Disks.Device;  op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD);
+VAR dev: Device; sector, head, track, s, n, max, start0, num0: SIGNED32; ofs0: SIZE;
 BEGIN
 	dev := d(Device);
 	IF dev.locked THEN
@@ -435,12 +435,12 @@ BEGIN
 	END
 END Transfer0;
 
-PROCEDURE Transfer1(d: Disks.Device;  op, start, num: LONGINT;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD);
+PROCEDURE Transfer1(d: Disks.Device;  op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD);
 BEGIN {EXCLUSIVE}
 	Transfer0(d, op, start, num, buf, ofs, res)
 END Transfer1;
 
-PROCEDURE GetSize1(d: Disks.Device;  VAR size: LONGINT; VAR res: WORD);
+PROCEDURE GetSize1(d: Disks.Device;  VAR size: SIGNED32; VAR res: WORD);
 VAR dev: Device;  buf: ARRAY BS OF CHAR;
 BEGIN {EXCLUSIVE}
 	dev := d(Device);
@@ -479,15 +479,15 @@ END Handle1;
 
 (* StopMotor - Switch off diskette motor *)
 
-PROCEDURE StopMotor(drive: LONGINT);
+PROCEDURE StopMotor(drive: SIGNED32);
 BEGIN
 	device[drive].media := T0;	(* reset media type *)
 	Machine.Portout8(3F2H, 0CX);	(* all motors off *)
 	motor := FALSE
 END StopMotor;
 
-PROCEDURE StrToInt(s: ARRAY OF CHAR): LONGINT;
-VAR i: SIGNED8;  v: LONGINT;
+PROCEDURE StrToInt(s: ARRAY OF CHAR): SIGNED32;
+VAR i: SIGNED8;  v: SIGNED32;
 BEGIN
 	v := 0;  i := 0;
 	WHILE s[i] # 0X DO v := v*10+(ORD(s[i])-48); INC(i) END;
@@ -536,7 +536,7 @@ BEGIN
 END Init;
 
 PROCEDURE Register;
-VAR i: LONGINT; res: WORD; dev: Device; name: Plugins.Name;
+VAR i: SIGNED32; res: WORD; dev: Device; name: Plugins.Name;
 BEGIN
 	FOR i := 0 TO MaxDevices-1 DO
 		dev := device[i];
@@ -551,7 +551,7 @@ BEGIN
 END Register;
 
 PROCEDURE Cleanup;
-VAR i: LONGINT;
+VAR i: SIGNED32;
 BEGIN {EXCLUSIVE}
 	IF Modules.shutdown = Modules.None THEN
 		FOR i := 0 TO MaxDevices-1 DO
@@ -570,7 +570,7 @@ PROCEDURE Install*;
 END Install;
 
 BEGIN
-	dmabufsize := SYSTEM.VAL (LONGINT, Machine.dmaSize);
+	dmabufsize := SYSTEM.VAL (SIGNED32, Machine.dmaSize);
 	IF dmabufsize > 0 THEN
 		dmabufphys := Machine.lowTop;
 		Machine.MapPhysical(dmabufphys, dmabufsize, dmabufvirt);

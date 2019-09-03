@@ -3,7 +3,7 @@ IMPORT SYSTEM;
 
 VAR
 	kernelModule-: ARRAY 32 OF ADDRESS;
-	modules-: LONGINT;
+	modules-: SIGNED32;
 
 PROCEDURE InsertModule*(a: ADDRESS): BOOLEAN;
 BEGIN {UNCOOPERATIVE}
@@ -243,12 +243,12 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF l< 0 THEN RETURN -l ELSE RETURN l END;
 END AbsH;
 
-PROCEDURE AslH*(l: HUGEINT; r: LONGINT): HUGEINT; (*! coincides with Logic Shift, remove ? *)
+PROCEDURE AslH*(l: HUGEINT; r: SIGNED32): HUGEINT; (*! coincides with Logic Shift, remove ? *)
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	RETURN LslH(l,r)
 END AslH;
 
-PROCEDURE LslH*(l: HUGEINT; r: LONGINT): HUGEINT;
+PROCEDURE LslH*(l: HUGEINT; r: SIGNED32): HUGEINT;
 CODE{SYSTEM.i386}
 	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
@@ -267,7 +267,7 @@ CODE{SYSTEM.i386}
 	POP	ECX
 END LslH;
 
-PROCEDURE AsrH*(l: HUGEINT; r: LONGINT): HUGEINT;
+PROCEDURE AsrH*(l: HUGEINT; r: SIGNED32): HUGEINT;
 CODE{SYSTEM.i386}
 	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
@@ -286,7 +286,7 @@ CODE{SYSTEM.i386}
 	POP	ECX
 END AsrH;
 
-PROCEDURE LsrH*(l: HUGEINT; r: LONGINT): HUGEINT;
+PROCEDURE LsrH*(l: HUGEINT; r: SIGNED32): HUGEINT;
 CODE{SYSTEM.i386}
 	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
@@ -305,7 +305,7 @@ CODE{SYSTEM.i386}
 	POP	ECX
 END LsrH;
 
-PROCEDURE RorH*(l: HUGEINT; r: LONGINT): HUGEINT;
+PROCEDURE RorH*(l: HUGEINT; r: SIGNED32): HUGEINT;
 CODE{SYSTEM.i386}
 	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"
@@ -325,7 +325,7 @@ rest:
 	POP	ECX
 END RorH;
 
-PROCEDURE RolH*(l: HUGEINT; r: LONGINT): HUGEINT;
+PROCEDURE RolH*(l: HUGEINT; r: SIGNED32): HUGEINT;
 CODE{SYSTEM.i386}
 	PUSH	ECX
 	; taken from "Software Optimization Guide for AMD64 Processors"

@@ -13,7 +13,7 @@ TYPE
 
 VAR
 	server*: ARRAY 4 OF IP.Adr;
-	domain*: DomainName;  currentServer*, serverCount*: LONGINT;
+	domain*: DomainName;  currentServer*, serverCount*: SIGNED32;
 	trace: BOOLEAN;
 
 

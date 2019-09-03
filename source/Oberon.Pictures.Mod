@@ -28,7 +28,7 @@ TYPE
 
 	PictureDesc* = RECORD(Objects.ObjDesc)
 		width*, height*, depth*: SIGNED16;	(** Width, height in pixels, and depth in bits per pixel (1, 4, or 8). *)
-		wth: LONGINT;
+		wth: SIGNED32;
 		bitmap: Bitmaps.Bitmap;
 		address*: ADDRESS;	(** Pointer to bitmap data. *)
 		ct: ColorTable;
@@ -39,7 +39,7 @@ VAR
 	dots*: Display.Pattern;
 	colorD*: SIGNED16;	(** Default bitmap color depth. *)
 	grey: ARRAY 4 OF Display.Pattern;
-	greyPat: ARRAY 4 OF ARRAY 5 OF LONGINT;
+	greyPat: ARRAY 4 OF ARRAY 5 OF SIGNED32;
 	handler: Objects.Handler;
 	cRes: SIGNED16; cName: ARRAY 128 OF CHAR; cP: Picture;
 	first: BOOLEAN;
@@ -109,7 +109,7 @@ BEGIN
 END ReplConst;
 
 (** Pattern fill pattern pat in the area x, y, w, h in color col using mode. *)
-PROCEDURE ReplPattern* (P:Picture;col:SIGNED16;pat:LONGINT;X,Y,W,H,mode: SIGNED16);
+PROCEDURE ReplPattern* (P:Picture;col:SIGNED16;pat:SIGNED32;X,Y,W,H,mode: SIGNED16);
 BEGIN
 	IF InBoundaries(X, Y, P.width, P.height) THEN
 		ASSERT((W >= 0) & (H >= 0));
@@ -126,7 +126,7 @@ BEGIN
 END Copy;
 (*
 PROCEDURE Copy*(sP,dP:Picture;SX,SY,SW,SH,DX,DY,DW,DH,mode:SIGNED16);
-VAR hx, hy,DW2,SW2: LONGINT;
+VAR hx, hy,DW2,SW2: SIGNED32;
 		dx, dy, SXo, DXo: SIGNED16;
 BEGIN
 	IF (SW> 0) &(SH >0) &(DW >0 ) &(DH > 0) THEN
@@ -194,7 +194,7 @@ END Update;
 (** Copy the area x, y, w, h of picture P to position dx, dy on the display. *)
 PROCEDURE DisplayBlock*(P: Picture; X, Y, W, H, DX, DY, mode: SIGNED16);
 VAR L, B, R, T, cw, ch: SIGNED16;
-	colortable: ARRAY 256 OF LONGINT; i: LONGINT; (* fof *)
+	colortable: ARRAY 256 OF SIGNED32; i: SIGNED32; (* fof *)
 BEGIN
 	FOR i := 0 TO 255 DO  (* fof *)
 		colortable[i] := ASH(ASH(P.ct[i].red, 8) + P.ct[i].green, 8) + P.ct[i].blue
@@ -212,8 +212,8 @@ BEGIN
 	END
 END DisplayBlock;
 
-PROCEDURE New(VAR P: Picture; width, height, depth: SIGNED16; addr: LONGINT);
-VAR H: LONGINT;
+PROCEDURE New(VAR P: Picture; width, height, depth: SIGNED16; addr: SIGNED32);
+VAR H: SIGNED32;
 BEGIN
 	P.handle := handler;
 	P.depth := 8; P.width := width; P.height := height; P.wth := width;
@@ -280,9 +280,9 @@ END GetLine;
 *)
 
 (** Stores picture run length encoded to file F (including tag). *)
-PROCEDURE Store* (P: Picture; F : Files.File; pos: LONGINT; VAR len: LONGINT);
+PROCEDURE Store* (P: Picture; F : Files.File; pos: SIGNED32; VAR len: SIGNED32);
 (* stores picture to run length encoded file F  (including tag *)
-	VAR j, i,a,b,d,wth: SIGNED16; adr, OldAdr: ADDRESS; size: LONGINT; h: SIGNED8;
+	VAR j, i,a,b,d,wth: SIGNED16; adr, OldAdr: ADDRESS; size: SIGNED32; h: SIGNED8;
 			buf: ARRAY 129 OF SIGNED8; R: Files.Rider;
 			help: BOOLEAN;
 BEGIN
@@ -356,10 +356,10 @@ BEGIN
 END LoadRLE;
 
 (** Load a run length encoded picture from position pos from file F. Pos should be AFTER the two byte picture identification of a picture file. *)
-PROCEDURE Load*(P: Picture; F : Files.File; pos: LONGINT; VAR len: LONGINT);
+PROCEDURE Load*(P: Picture; F : Files.File; pos: SIGNED32; VAR len: SIGNED32);
 	VAR R: Files.Rider; id: SIGNED16;
 			(* buf: ARRAY MaxWth OF CHAR; *) err: ARRAY 32 OF CHAR;
-			size: LONGINT;
+			size: SIGNED32;
 BEGIN
 	Files.Set(R,F,pos-2); Files.ReadBytes(R,id,2);
 	IF id = PictFileId THEN
@@ -448,7 +448,7 @@ END ConverterOpen;
 
 (** Open the picture file with name from disk. Any graphic file format listed in the PictureConverters section of Oberon.Text can be loaded (e.g. GIF, JPEG, XBM, BMP). *)
 PROCEDURE Open*(P: Picture; name: ARRAY OF CHAR; color: BOOLEAN);
-	VAR F :Files.File; R: Files.Rider; len: LONGINT; x,depth: SIGNED16; P2: Picture;
+	VAR F :Files.File; R: Files.Rider; len: SIGNED32; x,depth: SIGNED16; P2: Picture;
 	dname: ARRAY 64 OF CHAR; d: SIGNED16; (* << jm *)
 BEGIN
 	F := Files.Old(name);
@@ -475,7 +475,7 @@ BEGIN
 END Open;
 
 (** Returns the address of the bitmap data of a picture. *)
-PROCEDURE Address*(P: Picture): LONGINT;	(** non-portable *)
+PROCEDURE Address*(P: Picture): SIGNED32;	(** non-portable *)
 BEGIN
 	HALT(99);	(* should not be used *)
 	RETURN 0
@@ -484,7 +484,7 @@ END Address;
 (** Default picture object handler. *)
 
 PROCEDURE Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg);
-	VAR len: LONGINT; P2: Picture; ref: SIGNED16;
+	VAR len: SIGNED32; P2: Picture; ref: SIGNED16;
 BEGIN
 	WITH obj: Picture DO
 		IF msg IS Objects.AttrMsg THEN
@@ -546,9 +546,9 @@ BEGIN
 	s[6] := s[1];
 	s[7] := s[1];
 	dots := Display.NewPattern(32,8, s);
-	greyPat[0,0] := 02100000H; greyPat[0,1] :=  LONGINT(0AAAAAAAAH); greyPat[0,2] := 0;
+	greyPat[0,0] := 02100000H; greyPat[0,1] :=  SIGNED32(0AAAAAAAAH); greyPat[0,2] := 0;
 	greyPat[1,0] := 04100000H; greyPat[1,1] :=  011111111H; greyPat[1,2] := 0; greyPat[1,3] := 0; greyPat[1,4] := 0;
-	greyPat[2,0] := 02100000H; greyPat[2,1] :=  LONGINT(0AAAAAAAAH); greyPat[2,2] := LONGINT(0FFFFFFFFH);
+	greyPat[2,0] := 02100000H; greyPat[2,1] :=  SIGNED32(0AAAAAAAAH); greyPat[2,2] := SIGNED32(0FFFFFFFFH);
 	greyPat[3,0] := 04100000H; greyPat[3,1] :=  011111111H; greyPat[3,2] := 0; greyPat[3,3] := 044444444H; greyPat[3,4] := 0;
 
 	grey[0] := ADDRESSOF(greyPat[1]) +2;

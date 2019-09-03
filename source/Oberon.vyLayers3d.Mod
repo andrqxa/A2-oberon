@@ -65,7 +65,7 @@ VAR
 	END Open;
 
 	PROCEDURE OpenViewWindow( c: tCoordinate3d;  event: vyEvents.EventMsg );
-	VAR time: LONGINT;
+	VAR time: SIGNED32;
 	BEGIN
 		vyPort.onTheFly := TRUE;  time := Oberon.Time();
 		WHILE event.gesture = vyEvents.EvtCopyAttr DO
@@ -77,7 +77,7 @@ VAR
 	END OpenViewWindow;
 
 	PROCEDURE OpenViewWindow2( c: tCoordinate3d;  event: vyEvents.EventMsg );
-	VAR time: LONGINT;
+	VAR time: SIGNED32;
 	BEGIN
 		vyPort.onTheFly := TRUE;  time := Oberon.Time();
 		WHILE event.gesture = vyEvents.EvtPointCmd DO

@@ -40,23 +40,23 @@ TYPE
 				cvers, svers: ARRAY 260 OF CHAR;  (* string *)
 				sessionId-, hash: Key;
 				secret: ARRAY 1024 OF CHAR;	(* shared secret, (mpint format) *)
-				incount, outcount: LONGINT;	(* packet counters *)
+				incount, outcount: SIGNED32;	(* packet counters *)
 				(* current security state: *)
 				inhkey, outhkey: Key;
 				incipher, outcipher: Ciphers.Cipher;
 				inmac, outmac: HMAC.HMac;
-				inmaclen, outmaclen: LONGINT;
+				inmaclen, outmaclen: SIGNED32;
 				new: RECORD
 						(* pending security state: *)
 						incipher, outcipher: Ciphers.Cipher;
-						inkeybits, outkeybits: LONGINT;		(* cipher keybits *)
+						inkeybits, outkeybits: SIGNED32;		(* cipher keybits *)
 						inmode, outmode: SIGNED8;		(* cipher modes *)
 						inmac, outmac: HMAC.HMac;
-						inmaclen, outmaclen: LONGINT;
+						inmaclen, outmaclen: SIGNED32;
 					END;
 
 				cipherList, hmacList: ARRAY 1024 OF CHAR;
-				clientChannelNo: LONGINT;
+				clientChannelNo: SIGNED32;
 
 				PROCEDURE & Open*( CONST hostname: ARRAY OF CHAR );
 				VAR
@@ -120,7 +120,7 @@ TYPE
 
 				PROCEDURE SendClientVersion;
 				VAR
-					len: LONGINT; pos: SIZE; res: WORD;
+					len: SIGNED32; pos: SIZE; res: WORD;
 					nl: ARRAY 4 OF CHAR;
 				BEGIN
 					pos := 0;
@@ -136,7 +136,7 @@ TYPE
 					i, trlen, payload, pad, cbs: SIZE; res: WORD;
 					seqno: ARRAY 4 OF CHAR;
 					trbuf: ARRAY 8196 OF CHAR;
-					packType: LONGINT;
+					packType: SIGNED32;
 				BEGIN
 					IF state = Closed THEN  RETURN  END;
 					ASSERT( p.len > 0 );
@@ -144,7 +144,7 @@ TYPE
 					pad := cbs - (p.len + 5) MOD cbs;
 					IF pad < 4 THEN INC( pad, cbs ) END;
 					payload := 1 + p.len + pad;
-					Int2Chars( payload(LONGINT), trbuf );  trbuf[4] := CHR( pad );
+					Int2Chars( payload(SIGNED32), trbuf );  trbuf[4] := CHR( pad );
 					trlen := 4 + payload;
 					FOR i := 0 TO p.len - 1 DO trbuf[i+5] := p.buf[i]  END;
 					U.RandomBytes( trbuf, p.len + 5, pad  );
@@ -170,10 +170,10 @@ TYPE
 
 				(** Receive SSH Packet into buf,  return packet type *)
 				PROCEDURE ReceivePacket*( VAR buf: ARRAY OF CHAR;  VAR size: SIZE ): CHAR;
-				VAR i, l: SIZE; pos: SIZE; l2, pad, trlen, cbs: LONGINT; res: WORD;
+				VAR i, l: SIZE; pos: SIZE; l2, pad, trlen, cbs: SIGNED32; res: WORD;
 					seqno: ARRAY 4 OF CHAR; rmac, cmac: ARRAY 20 OF CHAR;
 					trbuf: ARRAY 8196 OF CHAR;
-					packType: LONGINT;
+					packType: SIGNED32;
 				BEGIN
 					IF state = Closed THEN RETURN 0X END;
 					cbs := incipher.blockSize;
@@ -256,7 +256,7 @@ TYPE
 					END
 				END Disconnect;
 
-				PROCEDURE GetChannelNo*( ): LONGINT;
+				PROCEDURE GetChannelNo*( ): SIGNED32;
 				BEGIN
 					INC( clientChannelNo );
 					RETURN clientChannelNo
@@ -273,10 +273,10 @@ TYPE
 				PROCEDURE NegotiateAlgorythms;
 				VAR
 					p, len: SIZE;
-					l, n: LONGINT;  kex: SIGNED8;
+					l, n: SIGNED32;  kex: SIGNED8;
 					buf: ARRAY 4096 OF CHAR;
 					x, m: ARRAY 512 OF CHAR;  lbuf: ARRAY 4 OF CHAR;
-					cipher: Ciphers.Cipher; keybits, maclen: LONGINT;
+					cipher: Ciphers.Cipher; keybits, maclen: SIGNED32;
 					modname: ARRAY 32 OF CHAR;
 					mode: SIGNED8;
 					mac: HMAC.HMac;
@@ -291,12 +291,12 @@ TYPE
 
 					packet := ClientAlgorythms( );
 
-					Int2Chars( packet.len(LONGINT), lbuf );
+					Int2Chars( packet.len(SIGNED32), lbuf );
 					sha1.Update( lbuf, 0, 4 );  sha1.Update( packet.buf^, 0, packet.len );	(* IC *)
 					SendPacket( packet );
 
 					IF ReceivePacket( buf, len ) = KEXInit THEN
-						Int2Chars( len(LONGINT), lbuf );
+						Int2Chars( len(SIGNED32), lbuf );
 						sha1.Update( lbuf, 0, 4 );  sha1.Update( buf, 0, len );				(* IS *)
 
 						p := 17;
@@ -400,7 +400,7 @@ TYPE
 				PROCEDURE Group1( sha1: SHA1.Hash );
 				CONST DHInit = 1EX;  DHReply = 1FX;
 				VAR
-					buf: ARRAY 1024 OF CHAR; lshkb, lf: LONGINT; len, p, pos: SIZE;
+					buf: ARRAY 1024 OF CHAR; lshkb, lf: SIGNED32; len, p, pos: SIZE;
 					pub, serverpub, sec: B.BigNumber;  dh: DH.DH;  packet: Packet;
 				BEGIN
 					IF 1 IN G.debug THEN
@@ -437,7 +437,7 @@ TYPE
 				PROCEDURE Group14( sha1: SHA1.Hash );
 				CONST DHInit = 1EX;  DHReply = 1FX;
 				VAR
-					buf: ARRAY 2048 OF CHAR; p, pos, len: SIZE; lshkb, lf: LONGINT;
+					buf: ARRAY 2048 OF CHAR; p, pos, len: SIZE; lshkb, lf: SIGNED32;
 					pub, serverpub, sec: B.BigNumber;  dh: DH.DH;  packet: Packet;
 				BEGIN
 					IF 1 IN G.debug THEN
@@ -486,7 +486,7 @@ TYPE
 				PROCEDURE GroupExchange( sha1: SHA1.Hash );
 				CONST GEXRequest = 22X;  GEXGroup = 1FX;  GEXInit = 20X;  GEXReply = 21X;
 				VAR
-					buf1,buf2: ARRAY 4096 OF CHAR; pos, b1len, b2len: SIZE; l, lshkb, lf: LONGINT;
+					buf1,buf2: ARRAY 4096 OF CHAR; pos, b1len, b2len: SIZE; l, lshkb, lf: SIGNED32;
 					pub, serverpub, sec, prim, gen: B.BigNumber;  dh: DH.DH;
 					pack1, pack2: Packet;
 				BEGIN
@@ -575,10 +575,10 @@ TYPE
 				END ActivateNewKeys;
 
 
-				PROCEDURE DeriveKey( keykind: CHAR;  keylen: LONGINT;  VAR key: ARRAY OF CHAR );
+				PROCEDURE DeriveKey( keykind: CHAR;  keylen: SIGNED32;  VAR key: ARRAY OF CHAR );
 				VAR
 					buf: ARRAY 512 OF CHAR;
-					i, top, slen: LONGINT;
+					i, top, slen: SIGNED32;
 					h: SHA1.Hash;
 					p: SIZE;
 				BEGIN
@@ -620,7 +620,7 @@ TYPE
 					buf[len] := c;  INC( len )
 				END AppChar;
 
-				PROCEDURE AppInteger* ( v: LONGINT );
+				PROCEDURE AppInteger* ( v: SIGNED32 );
 				VAR i: SIZE;
 				BEGIN
 					FOR i := 3 TO 0 BY -1 DO buf[len + i] := CHR( v MOD 256 );  v := v DIV 256 END;
@@ -632,14 +632,14 @@ TYPE
 				BEGIN
 					l := 0;  c := str[0];  p := len + 4;
 					WHILE (l < LEN( str )) & (c # 0X) DO buf[p + l] := c;  INC( l );  c := str[l]  END;
-					AppInteger( l(LONGINT) );
+					AppInteger( l(SIGNED32) );
 					INC( len, l )
 				END AppString;
 
 				PROCEDURE AppArray*( CONST arr: ARRAY OF CHAR;  pos, arrlen: SIZE );
 				VAR i: SIZE;
 				BEGIN
-					AppInteger( arrlen(LONGINT) );
+					AppInteger( arrlen(SIGNED32) );
 					FOR i := 0 TO arrlen -1 DO buf[len] := arr[pos + i];  INC( len )  END
 				END AppArray;
 
@@ -649,7 +649,7 @@ TYPE
 VAR hexd: ARRAY 17 OF CHAR;
 
 
-	PROCEDURE Int2Chars( v: LONGINT;  VAR buf: ARRAY OF CHAR );
+	PROCEDURE Int2Chars( v: SIGNED32;  VAR buf: ARRAY OF CHAR );
 	VAR i: SIZE;
 	BEGIN
 		FOR i := 3 TO 0 BY -1 DO buf[i] := CHR( v MOD 256 );  v := v DIV 256 END;

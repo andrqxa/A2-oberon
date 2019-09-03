@@ -93,7 +93,7 @@ TYPE
 		PROCEDURE RenderEnd(state: SVG.State; recordPathMode: BOOLEAN);
 		VAR pattern: Gfx.Pattern;
 			worldBBox, objectBBox: SVG.Box;
-			minx, miny, maxx, maxy: LONGINT;
+			minx, miny, maxx, maxy: SIGNED32;
 			strokeWidth: SVG.Length;
 		BEGIN
 			IF recordPathMode THEN

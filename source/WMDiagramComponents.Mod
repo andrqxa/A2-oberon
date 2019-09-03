@@ -23,7 +23,7 @@ TYPE
 	DataPointModel* = OBJECT
 	VAR
 		lockedBy : ANY;
-		lockLevel : LONGINT;
+		lockLevel : SIGNED32;
 		viewChanged : BOOLEAN;
 		onChanged- : WMEvents.EventSource; (** does not hold the lock, if called *)
 
@@ -74,12 +74,12 @@ TYPE
 	DatasetDescriptor* = POINTER TO ARRAY OF DataDescriptor;
 
 	Dataset* = POINTER TO ARRAY OF REAL;
-	LongintDataset* = POINTER TO ARRAY OF LONGINT;
+	LongintDataset* = POINTER TO ARRAY OF SIGNED32;
 
 	Statistics* = RECORD
 		valid- : BOOLEAN;
 		cur*, min*, max*, avg*, sum* : Dataset;
-		nbrOfSamples- : LONGINT;
+		nbrOfSamples- : SIGNED32;
 	END;
 
 TYPE
@@ -92,12 +92,12 @@ TYPE
 		pos, nofItems, dimensions : SIZE;
 		bufferSize : SIZE;
 
-		viewSampleCount : LONGINT;
+		viewSampleCount : SIGNED32;
 
 		(* Lifetime statistics - min, max, sum of all value ever received (not just those in buffer) *)
 		statistics : BOOLEAN;
 		valid : BOOLEAN;
-		nbrOfValues : LONGINT;
+		nbrOfValues : SIGNED32;
 		cur, min, max, sum : Dataset;
 
 		PROCEDURE &Init*(bufferSize, dimensions : SIZE);
@@ -271,7 +271,7 @@ TYPE
 
 		(* Note: Grid is not rendered when deltaXGrid/deltaXGridSmall are zero *)
 		min-, max-, deltax-, deltaXGrid-, deltaXGridSmall-, glassShade-, valueWidth- : WMProperties.Int32Property;
-		minI, maxI, deltaxI, deltaXGridI, deltaXGridSmallI, glassShadeI, valueWidthI : LONGINT;
+		minI, maxI, deltaxI, deltaXGridI, deltaXGridSmallI, glassShadeI, valueWidthI : SIGNED32;
 
 		color-, gridColor- : WMProperties.ColorProperty;
 		colorI, gridColorI : WMGraphics.Color;
@@ -282,7 +282,7 @@ TYPE
 		unit- : WMProperties.StringProperty;
 
 		style- : WMProperties.Int32Property;
-		styleI : LONGINT;
+		styleI : SIGNED32;
 
 		extUpdate : ExtUpdateHandler;
 
@@ -443,7 +443,7 @@ TYPE
 			nofPoints, nofVisible, nofStandalone, index, dim : SIZE;
 			x, y0, y1: SIZE; colorLine, color : WMGraphics.Color;
 			maxSumIdx : SIZE;
-			v0, v1 : LONGINT;
+			v0, v1 : SIGNED32;
 			factor : REAL;
 			poly : ARRAY 4 OF WMGraphics.Point2d;
 		BEGIN
@@ -553,7 +553,7 @@ TYPE
 		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR
 			w, h, yborder, t, virtp : SIZE; color: WMGraphics.Color;
-			mode : LONGINT;
+			mode : SIGNED32;
 			tmin, tmax : REAL;
 			str : ARRAY 16 OF CHAR;
 			s : Strings.String;
@@ -636,11 +636,11 @@ TYPE
 		checkAllBtn, checkNoneBtn : WMStandardComponents.Button;
 
 		(** Optimum width and height *)
-		optWidth-, optHeight- : LONGINT;
+		optWidth-, optHeight- : SIGNED32;
 
 		(** onClick handler called by each checkbox *)
 		PROCEDURE HandleClick(sender, data : ANY);
-		VAR i : SIZE; state : LONGINT;
+		VAR i : SIZE; state : SIGNED32;
 		BEGIN
 			FOR i := 0 TO LEN(checkboxes)-1 DO
 				state := checkboxes[i].state.Get();
@@ -679,7 +679,7 @@ TYPE
 			NEW(names, LEN(ds));
 			NEW(colors, LEN(ds));
 			NEW(checkboxes, LEN(ds));
-			optWidth := 200; optHeight := LEN(ds)(LONGINT) * 20;
+			optWidth := 200; optHeight := LEN(ds)(SIGNED32) * 20;
 			FOR i := 0 TO LEN(ds)-1 DO
 				NEW(panel);
 				panel.alignment.Set(WMComponents.AlignTop); panel.bounds.SetHeight(20);
@@ -741,7 +741,7 @@ TYPE
 		barColor-,lineColor- ,textColor-,backgroundColor-: WMProperties.ColorProperty;
 
 		width-,offset-: LONGREAL; (* width and offset of histogram, initialized to width=1, offset = -0.5  *)
-		numberData-: LONGINT; (* number of box plot data *)
+		numberData-: SIGNED32; (* number of box plot data *)
 		heights-: POINTER TO ARRAY OF LONGREAL; (* bin height *)
 		labels-: POINTER TO ARRAY OF Strings.String; (* bin label (if any) *)
 		colors- : POINTER TO ARRAY OF WMGraphics.Color;
@@ -758,10 +758,10 @@ TYPE
 			lineColor.Set(0FFH);
 
 			NEW(textColor, NIL, NIL, NIL); properties.Add(textColor);
-			textColor.Set(LONGINT(0FF0000FFH));
+			textColor.Set(SIGNED32(0FF0000FFH));
 
 			NEW(backgroundColor, NIL, NIL, NIL); properties.Add(backgroundColor);
-			backgroundColor.Set(LONGINT(0FFFF00FFH));
+			backgroundColor.Set(SIGNED32(0FFFF00FFH));
 
 			heights := NIL; labels := NIL; colors := NIL;
 			width := 1; offset := -0.5; numberData := 0;
@@ -779,8 +779,8 @@ TYPE
 			END;
 		END UpdateCoordinateSystem;
 
-		PROCEDURE SetData*(CONST heights: ARRAY OF LONGREAL; numberData: LONGINT);
-		VAR i: LONGINT;
+		PROCEDURE SetData*(CONST heights: ARRAY OF LONGREAL; numberData: SIGNED32);
+		VAR i: SIGNED32;
 		BEGIN
 			IF LEN(heights) < numberData THEN RETURN END;
 			Acquire();
@@ -796,7 +796,7 @@ TYPE
 		END SetData;
 
 		PROCEDURE SetLabels*(CONST labels: ARRAY OF Strings.String);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			Acquire();
 			IF LEN(labels) < numberData THEN RETURN END;
@@ -809,7 +809,7 @@ TYPE
 		END SetLabels;
 
 		PROCEDURE SetColors*(CONST colors: ARRAY OF WMGraphics.Color);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			Acquire();
 			IF LEN(colors) < numberData THEN RETURN END;
@@ -847,7 +847,7 @@ TYPE
 		END PropertyChanged;
 
 		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
-		VAR boundary,rect: WMRectangles.Rectangle; i: LONGINT;
+		VAR boundary,rect: WMRectangles.Rectangle; i: SIGNED32;
 
 			PROCEDURE Point2dToPoint(xr,yr: LONGREAL; VAR x,y: SIZE);
 			BEGIN
@@ -932,7 +932,7 @@ BEGIN
 		S("samples between small separator lines")); PrototypeDeltaXGridSmall.Set(10);
 
 	NEW(PrototypeColor, NIL, S("Color"), S("color of the graph")); PrototypeColor.Set(0CC00FFH);
-	NEW(PrototypeGridColor, NIL, S("GridColor"), S("color of the grid")); PrototypeGridColor.Set(LONGINT(0FFCC00FFH));
+	NEW(PrototypeGridColor, NIL, S("GridColor"), S("color of the grid")); PrototypeGridColor.Set(SIGNED32(0FFCC00FFH));
 
 	NEW(PrototypeGlassShade, NIL, S("GlassShade"), NIL); PrototypeGlassShade.Set(8);
 	NEW(PrototypeValueWidth, NIL, S("ValueWidth"), NIL); PrototypeValueWidth.Set(50);
@@ -942,7 +942,7 @@ BEGIN
 	NEW(PrototypeStyle, NIL, S("Style"), NIL); PrototypeStyle.Set(StyleAuto);
 END InitProtoTypes;
 
-PROCEDURE FindIndexOf*(flag : LONGINT; ds : DatasetDescriptor) : SIZE;
+PROCEDURE FindIndexOf*(flag : SIGNED32; ds : DatasetDescriptor) : SIZE;
 VAR index, length : SIZE;
 BEGIN
 	IF (ds # NIL) THEN
@@ -955,7 +955,7 @@ BEGIN
 	RETURN index;
 END FindIndexOf;
 
-PROCEDURE GetNumberOf*(flag : LONGINT; startIndex, endIndex : SIZE; ds : DatasetDescriptor) : SIZE;
+PROCEDURE GetNumberOf*(flag : SIGNED32; startIndex, endIndex : SIZE; ds : DatasetDescriptor) : SIZE;
 VAR result, i : SIZE;
 BEGIN
 	result := 0;
@@ -968,7 +968,7 @@ BEGIN
 	RETURN result;
 END GetNumberOf;
 
-PROCEDURE ClearFlag*(flag : LONGINT; ds : DatasetDescriptor);
+PROCEDURE ClearFlag*(flag : SIGNED32; ds : DatasetDescriptor);
 VAR i : SIZE;
 BEGIN
 	IF (ds # NIL) THEN

@@ -48,11 +48,11 @@ TYPE
 	Tester = OBJECT
 		VAR
 			res: WORD;
-			c: TCP.Connection; num, num0: SIZE; port: LONGINT; fip: IP.Adr;
+			c: TCP.Connection; num, num0: SIZE; port: SIGNED32; fip: IP.Adr;
 			timer: Kernel.MilliTimer; sender: Sender; server: ARRAY 64 OF CHAR;
 			total, len: SIZE; time: HUGEINT;
 
-		PROCEDURE &Init*(CONST server: ARRAY OF CHAR; num, port: LONGINT);
+		PROCEDURE &Init*(CONST server: ARRAY OF CHAR; num, port: SIGNED32);
 		BEGIN
 			COPY(server, SELF.server); SELF.num := num; SELF.port := port;
 			DNS.HostByName(server, fip, res);
@@ -113,7 +113,7 @@ BEGIN
 END Message;
 
 
-PROCEDURE Report(ms, port: LONGINT; total: SIZE; CONST msg: ARRAY OF CHAR);
+PROCEDURE Report(ms, port: SIGNED32; total: SIZE; CONST msg: ARRAY OF CHAR);
 VAR
 	realStr: ARRAY 128 OF CHAR;
 
@@ -140,7 +140,7 @@ END Report;
 
 (** server KB *)
 PROCEDURE Discard*(context : Commands.Context);
-VAR t: Tester; num: LONGINT; server: ARRAY 64 OF CHAR;
+VAR t: Tester; num: SIGNED32; server: ARRAY 64 OF CHAR;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(server);
 	context.arg.SkipWhitespace; context.arg.Int(num, FALSE);
@@ -150,7 +150,7 @@ END Discard;
 
 (** server KB *)
 PROCEDURE Echo*(context : Commands.Context);
-VAR t: Tester; num: LONGINT; server: ARRAY 64 OF CHAR;
+VAR t: Tester; num: SIGNED32; server: ARRAY 64 OF CHAR;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(server);
 	context.arg.SkipWhitespace; context.arg.Int(num, FALSE);
@@ -159,7 +159,7 @@ END Echo;
 
 (** server KB *)
 PROCEDURE Time*(context : Commands.Context);
-VAR t: Tester; num: LONGINT; server: ARRAY 64 OF CHAR;
+VAR t: Tester; num: SIGNED32; server: ARRAY 64 OF CHAR;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(server);
 	NEW(t, server, 0, TimePort);

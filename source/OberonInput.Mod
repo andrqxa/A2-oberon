@@ -41,7 +41,7 @@ TYPE
 		VAR
 			input: Inputs.OberonInput;
 
-			head, tail: LONGINT;
+			head, tail: SIGNED32;
 			keys: SET;
 			break: BOOLEAN;
 			buf: ARRAY BufSize OF CHAR;

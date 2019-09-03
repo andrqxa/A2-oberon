@@ -31,7 +31,7 @@ BEGIN
 END FindMod;
 
 PROCEDURE ThisMod*(CONST name: ARRAY OF CHAR): Module;
-VAR context: ARRAY 64 OF CHAR; m: Module;  r: LONGINT;
+VAR context: ARRAY 64 OF CHAR; m: Module;  r: SIGNED32;
 BEGIN
 	CreateContext (context, name);
 	m := Modules.ThisModule(context, r, resMsg);
@@ -55,7 +55,7 @@ BEGIN
 END ThisCommand;
 
 PROCEDURE Free*(CONST name: ARRAY OF CHAR; all: BOOLEAN);
-VAR context: ARRAY 64 OF CHAR; r: LONGINT;
+VAR context: ARRAY 64 OF CHAR; r: SIGNED32;
 BEGIN
 	ASSERT(~all);	(* not implemented *)
 	CreateContext (context, name);

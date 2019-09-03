@@ -32,12 +32,12 @@ CONST idversion* = ' v0r0a3';
 	(* strategies: pre-check array bounds *)
 	(*? limit counts at 0 or 1 ? 0 may need exception anyhow, so 1 is ok *)
 	(* Assertion models: single array
-	(len:LONGINT; VAR x: ARRAY OF LONGREAL; start: LONGINT; .....)
+	(len:SIGNED32; VAR x: ARRAY OF LONGREAL; start: SIGNED32; .....)
 	ASSERT(start>=0,100);ASSERT(len>=0,101);
 	ASSERT(start<=LEN(x)-len,102);
 
 	single array with step size
-	(len:LONGINT; VAR x: ARRAY OF LONGREAL; start, step: LONGINT; .....)
+	(len:SIGNED32; VAR x: ARRAY OF LONGREAL; start, step: SIGNED32; .....)
 	ASSERT(start>=0,100);ASSERT(len>=0,101);
 	ASSERT(start+len<=LEN(x),102);	ASSERT(step>0,103);
 
@@ -51,7 +51,7 @@ CONST idversion* = ' v0r0a3';
 
 TYPE
 	int = SIGNED16;  (* technical convenience, to avoid triplicate code for  intger types  *)
-	index = LONGINT;
+	index = SIGNED32;
 
 	(** File storage *)
 
@@ -76,11 +76,11 @@ END Read;
 (*= Formatted write, eg. packed, sparse... *)
 (*! add implementations *)
 (*= file is a series of packages of structure
-<formatkey>: LONGINT
+<formatkey>: SIGNED32
 0: terminate. No further information in this record
 1: plain
 2: repeat packing
-<start><count> : LONGINT
+<start><count> : SIGNED32
 <privat packing data>
 *)
 (*= packed format.
@@ -91,7 +91,7 @@ count: total number of entries
 *)
 (*! check add implementations *)
 
-PROCEDURE WriteFmt* (prefform: LONGINT;  VAR R: Files.Rider;  count: index;  VAR x: ARRAY OF int;  start: index);
+PROCEDURE WriteFmt* (prefform: SIGNED32;  VAR R: Files.Rider;  count: index;  VAR x: ARRAY OF int;  start: index);
 
 	(*= prefform is the preferred storage format, but the internal algorithm may choose a different one *)
 
@@ -104,9 +104,9 @@ BEGIN
 	Files.WriteLInt(R, fmtend)
 END WriteFmt;
 
-PROCEDURE ReadFmt* (VAR form: LONGINT;  VAR R: Files.Rider;  count: index;  VAR x: ARRAY OF int;  start: index);
+PROCEDURE ReadFmt* (VAR form: SIGNED32;  VAR R: Files.Rider;  count: index;  VAR x: ARRAY OF int;  start: index);
 
-	VAR stop: LONGINT;
+	VAR stop: SIGNED32;
 
 BEGIN
 	(*! add implementations for non plain. form ignored so far *)
@@ -119,7 +119,7 @@ BEGIN
 END ReadFmt;
 
 (** Basic **)
-PROCEDURE Fill* (len: LONGINT; VAR x: ARRAY OF SIGNED16;  start: LONGINT; val: SIGNED16);
+PROCEDURE Fill* (len: SIGNED32; VAR x: ARRAY OF SIGNED16;  start: SIGNED32; val: SIGNED16);
 BEGIN
 	ASSERT(start >= 0, 100); ASSERT(len >= 0, 101);
 	ASSERT(start <= LEN(x) - len, 102);
@@ -127,7 +127,7 @@ BEGIN
 	WHILE start < len DO x[start] := val;  INC(start) END
 END Fill;
 
-PROCEDURE FillPat* (count: LONGINT; VAR x: ARRAY OF SIGNED16;  start, step: LONGINT;
+PROCEDURE FillPat* (count: SIGNED32; VAR x: ARRAY OF SIGNED16;  start, step: SIGNED32;
 val: SIGNED16);
 BEGIN ASSERT(start >= 0, 100); ASSERT(count >= 0, 101);
 	ASSERT(count * step <= LEN(x) - start, 102); 	ASSERT(step > 0, 103);
@@ -135,9 +135,9 @@ BEGIN ASSERT(start >= 0, 100); ASSERT(count >= 0, 101);
 	WHILE start < count DO x[start] := val;  INC(start, step) END;
 END FillPat;
 
-PROCEDURE Copy* (len: LONGINT;
-VAR src: ARRAY OF SIGNED16; srcstart: LONGINT;
-VAR dest: ARRAY OF SIGNED16; deststart: LONGINT );
+PROCEDURE Copy* (len: SIGNED32;
+VAR src: ARRAY OF SIGNED16; srcstart: SIGNED32;
+VAR dest: ARRAY OF SIGNED16; deststart: SIGNED32 );
 	(*= The array src isn't changed *)
 BEGIN
 	ASSERT(len > 0, 100);
@@ -146,9 +146,9 @@ BEGIN
 	vyBase.COPYI(src, srcstart, len, dest, deststart);
 END Copy;
 
-PROCEDURE CopyPat* (count: LONGINT; VAR src: ARRAY OF SIGNED16; start, step: LONGINT; VAR dest: ARRAY OF SIGNED16;  deststart, deststep: LONGINT);
+PROCEDURE CopyPat* (count: SIGNED32; VAR src: ARRAY OF SIGNED16; start, step: SIGNED32; VAR dest: ARRAY OF SIGNED16;  deststart, deststep: SIGNED32);
 	(*= The array src isn't changed *)
-	VAR i, j, top: LONGINT;
+	VAR i, j, top: SIGNED32;
 BEGIN
 	ASSERT((start >= 0) & (deststart >= 0), 100); ASSERT(count >= 0, 101);
 	ASSERT((step > 0) & (deststep > 0), 103);
@@ -158,7 +158,7 @@ BEGIN
 	WHILE i < top DO dest[j] := src[i]; INC(i, step); INC(j, deststep) END;
 END CopyPat;
 
-PROCEDURE Min* (len: LONGINT; VAR x: ARRAY OF SIGNED16; start: LONGINT; VAR minpos: LONGINT): SIGNED16;
+PROCEDURE Min* (len: SIGNED32; VAR x: ARRAY OF SIGNED16; start: SIGNED32; VAR minpos: SIGNED32): SIGNED16;
 	(*= The array x isn't changed *)
 	VAR min: SIGNED16;
 BEGIN
@@ -171,7 +171,7 @@ BEGIN
 	RETURN min;
 END Min;
 
-PROCEDURE Max* (len: LONGINT; VAR x: ARRAY OF SIGNED16;  start: LONGINT;  VAR maxpos: LONGINT): SIGNED16;
+PROCEDURE Max* (len: SIGNED32; VAR x: ARRAY OF SIGNED16;  start: SIGNED32;  VAR maxpos: SIGNED32): SIGNED16;
 	(*= The array x isn't changed *)
 	VAR max: SIGNED16;
 BEGIN
@@ -184,8 +184,8 @@ BEGIN
 	RETURN max;
 END Max;
 
-PROCEDURE MinMax* (len: LONGINT; VAR x: ARRAY OF SIGNED16;  start: LONGINT;
-VAR min: SIGNED16;  VAR minpos: LONGINT;  VAR max: SIGNED16;  VAR maxpos: LONGINT; VAR nans: LONGINT);
+PROCEDURE MinMax* (len: SIGNED32; VAR x: ARRAY OF SIGNED16;  start: SIGNED32;
+VAR min: SIGNED16;  VAR minpos: SIGNED32;  VAR max: SIGNED16;  VAR maxpos: SIGNED32; VAR nans: SIGNED32);
 BEGIN
 	ASSERT(start >= 0, 100); ASSERT(len >= 0, 101);
 	ASSERT(start <= LEN(x) - len, 102);
@@ -210,23 +210,23 @@ BEGIN
 END MinMax;
 
 (* test site to look for high speed low count exchanges *)
-PROCEDURE sort5* (VAR data: ARRAY OF SIGNED16;  start: LONGINT);
+PROCEDURE sort5* (VAR data: ARRAY OF SIGNED16;  start: SIGNED32);
 	(*= Procedure only for test functions *)
 BEGIN
 	Sort(5, data, start);
 END sort5;
 
-PROCEDURE Sort5* (VAR data: ARRAY OF SIGNED16;  start: LONGINT);
+PROCEDURE Sort5* (VAR data: ARRAY OF SIGNED16;  start: SIGNED32);
 BEGIN
 	ASSERT(start >= 0, 100);
 	ASSERT(start <= LEN(data) - 5, 102);
 	sort5(data, start);
 END Sort5;
 
-PROCEDURE Sort* (count: LONGINT;  VAR x: ARRAY OF SIGNED16; start: LONGINT); (** vs 0.1d0 gs *)
+PROCEDURE Sort* (count: SIGNED32;  VAR x: ARRAY OF SIGNED16; start: SIGNED32); (** vs 0.1d0 gs *)
 	(** Quicksort ist used for normal sorting *)
-PROCEDURE LocSort (lo, hi: LONGINT); (* Quicksort *)
-	VAR i, j, m: LONGINT; temp: SIGNED16;
+PROCEDURE LocSort (lo, hi: SIGNED32); (* Quicksort *)
+	VAR i, j, m: SIGNED32; temp: SIGNED16;
 BEGIN
 	IF lo < hi THEN i := lo;  j := hi;  m := (lo + hi) DIV 2;
 		REPEAT
@@ -249,12 +249,12 @@ BEGIN
 END Sort;
 
 (*? Is it useful to have two general sorting algorithms? *)
-PROCEDURE MergeSort* (count: LONGINT;  VAR x: ARRAY OF SIGNED16; start: LONGINT); (* Natural Mergesort for normal sorting *)
+PROCEDURE MergeSort* (count: SIGNED32;  VAR x: ARRAY OF SIGNED16; start: SIGNED32); (* Natural Mergesort for normal sorting *)
 	(* 	Contact	M. Fuchs <fuchs@statlab.uni-heidelberg.de> *)
-PROCEDURE NMerge (lo, hi: LONGINT); (* Natural Mergesort *)
-PROCEDURE Merge (l, m, r: LONGINT); 	(* Mixing the preorderd Runs *)
+PROCEDURE NMerge (lo, hi: SIGNED32); (* Natural Mergesort *)
+PROCEDURE Merge (l, m, r: SIGNED32); 	(* Mixing the preorderd Runs *)
 	VAR hx : POINTER TO ARRAY OF SIGNED16; 	(* Arrays to store the datas temporary *)
-	h, i, j, k : LONGINT;
+	h, i, j, k : SIGNED32;
 BEGIN
 	NEW(hx, r - l + 1); 	(*Allocation of store *)
 	i := l;  j := m + 1;  k := 0;
@@ -282,8 +282,8 @@ BEGIN
 	END
 END Merge;
 
-PROCEDURE NMS (l, r: LONGINT); 	(* Searching of preorderd runs and merge them *)
-	VAR rr, ll, mm: LONGINT;
+PROCEDURE NMS (l, r: SIGNED32); 	(* Searching of preorderd runs and merge them *)
+	VAR rr, ll, mm: SIGNED32;
 BEGIN
 	REPEAT
 		rr := l - 1;
@@ -314,14 +314,14 @@ BEGIN
 END MergeSort;
 
 
-PROCEDURE SortIndexed* (count: LONGINT;  VAR data: ARRAY OF SIGNED16; start: LONGINT; VAR index: ARRAY OF LONGINT);
+PROCEDURE SortIndexed* (count: SIGNED32;  VAR data: ARRAY OF SIGNED16; start: SIGNED32; VAR index: ARRAY OF SIGNED32);
 	(** Natural Mergesort is used for indexed sorting *)
 	(* 	Contact	M. Fuchs <fuchs@statlab.uni-heidelberg.de> *)
-PROCEDURE NMergeIndexed (lo, hi: LONGINT); (* Natural Mergesort *)
-PROCEDURE MergeIndexed (l, m, r: LONGINT); 	(* Mixing the preorderd Runs *)
+PROCEDURE NMergeIndexed (lo, hi: SIGNED32); (* Natural Mergesort *)
+PROCEDURE MergeIndexed (l, m, r: SIGNED32); 	(* Mixing the preorderd Runs *)
 	VAR hdata : POINTER TO ARRAY OF SIGNED16;
-	hindex : POINTER TO ARRAY OF LONGINT; 	(* Arrays to store the datas temporary *)
-	h, i, j, k : LONGINT;
+	hindex : POINTER TO ARRAY OF SIGNED32; 	(* Arrays to store the datas temporary *)
+	h, i, j, k : SIGNED32;
 BEGIN
 	NEW(hdata, r - l + 1);  NEW(hindex, r - l + 1); 	(*Allocation of store *)
 	i := l;  j := m + 1;  k := 0;
@@ -349,8 +349,8 @@ BEGIN
 	END
 END MergeIndexed;
 
-PROCEDURE NMSIndexed (l, r: LONGINT); 	(* Searching of preorderd runs and merge them *)
-	VAR rr, ll, mm: LONGINT;
+PROCEDURE NMSIndexed (l, r: SIGNED32); 	(* Searching of preorderd runs and merge them *)
+	VAR rr, ll, mm: SIGNED32;
 BEGIN
 	REPEAT
 		rr := l - 1;
@@ -426,11 +426,11 @@ BEGIN
 	RETURN LocSort(start, start + count - 1, ith)
 END Order;
 
-PROCEDURE Summary* (len: LONGINT; VAR x: ARRAY OF SIGNED16;
-start: LONGINT;  VAR min, max: SIGNED16; VAR mean, ssq: LONGREAL); (** vs 0.1d0 gs *)
+PROCEDURE Summary* (len: SIGNED32; VAR x: ARRAY OF SIGNED16;
+start: SIGNED32;  VAR min, max: SIGNED16; VAR mean, ssq: LONGREAL); (** vs 0.1d0 gs *)
 	(*= The array x isn't changed *)
 	(* One pass summary *)
-	VAR i, top: LONGINT; Xdiff: LONGREAL; xx: SIGNED16;
+	VAR i, top: SIGNED32; Xdiff: LONGREAL; xx: SIGNED16;
 BEGIN
 	min := MAX(SIGNED16);  max := MIN(SIGNED16);  mean := 0;  ssq := 0;
 	i := start; top := start + len;
@@ -443,8 +443,8 @@ BEGIN
 	INC(i) END;
 END Summary;
 
-PROCEDURE MeanSSq* (len: LONGINT;  VAR x: ARRAY OF int;  start: LONGINT;  VAR mean, ssq: LONGREAL; VAR nans: LONGINT);
-	VAR i, top: LONGINT;  Xdiff: LONGREAL;  xx: int;
+PROCEDURE MeanSSq* (len: SIGNED32;  VAR x: ARRAY OF int;  start: SIGNED32;  VAR mean, ssq: LONGREAL; VAR nans: SIGNED32);
+	VAR i, top: SIGNED32;  Xdiff: LONGREAL;  xx: int;
 BEGIN
 	nans := 0;  (*! not yet supported *)
 	mean := 0;  ssq := 0;
@@ -458,8 +458,8 @@ BEGIN
 END MeanSSq;
 
 (** Predeclared functions *)
-PROCEDURE Abs* (len: LONGINT;  VAR x: ARRAY OF SIGNED16; start: LONGINT);
-	VAR i, top: LONGINT;
+PROCEDURE Abs* (len: SIGNED32;  VAR x: ARRAY OF SIGNED16; start: SIGNED32);
+	VAR i, top: SIGNED32;
 BEGIN ASSERT(start >= 0, 100); ASSERT(len >= 0, 101);
 	ASSERT(start + len <= LEN(x), 102);
 	i := start;  top := start + len;
@@ -467,8 +467,8 @@ BEGIN ASSERT(start >= 0, 100); ASSERT(len >= 0, 101);
 END Abs;
 
 (** Vector-Scalar operations *)
-PROCEDURE AddConst* (len: LONGINT;  VAR x: ARRAY OF SIGNED16; start: LONGINT; 	y: SIGNED16);
-	VAR i, top: LONGINT;
+PROCEDURE AddConst* (len: SIGNED32;  VAR x: ARRAY OF SIGNED16; start: SIGNED32; 	y: SIGNED16);
+	VAR i, top: SIGNED32;
 BEGIN ASSERT(start >= 0, 100); ASSERT(len >= 0, 101);
 	ASSERT(start + len <= LEN(x), 102);
 	i := start;  top := start + len;
@@ -490,7 +490,7 @@ BEGIN
 	WHILE i < top DO x[i] := x[i] + y;  INC(i, step) END
 END AddConstPat;
 
-PROCEDURE SubConst* (len: LONGINT;  VAR x: ARRAY OF SIGNED16; start: LONGINT; 	y: SIGNED16);
+PROCEDURE SubConst* (len: SIGNED32;  VAR x: ARRAY OF SIGNED16; start: SIGNED32; 	y: SIGNED16);
 BEGIN
 	AddConst(len, x, start, (- 1) * y)
 END SubConst;
@@ -501,8 +501,8 @@ BEGIN
 	AddConstPat(count, x, start, step, - y)
 END SubConstPat;
 
-PROCEDURE MulConst* (len: LONGINT;  VAR x: ARRAY OF SIGNED16;  start: LONGINT;  y: SIGNED16 );
-	VAR i, top: LONGINT;
+PROCEDURE MulConst* (len: SIGNED32;  VAR x: ARRAY OF SIGNED16;  start: SIGNED32;  y: SIGNED16 );
+	VAR i, top: SIGNED32;
 BEGIN ASSERT(start >= 0, 100); ASSERT(len >= 0, 101);
 	ASSERT(start + len <= LEN(x), 102);
 	i := start;  top := start + len;
@@ -524,8 +524,8 @@ BEGIN
 	WHILE i < top DO x[i] := x[i] * fact;  INC(i, step) END
 END MulConstPat;
 
-PROCEDURE DivConst* (len: LONGINT;  VAR x: ARRAY OF SIGNED16;  start: LONGINT;  y: SIGNED16 );
-	VAR i, top: LONGINT;
+PROCEDURE DivConst* (len: SIGNED32;  VAR x: ARRAY OF SIGNED16;  start: SIGNED32;  y: SIGNED16 );
+	VAR i, top: SIGNED32;
 BEGIN ASSERT(start >= 0, 100); ASSERT(len >= 0, 101);
 	ASSERT(start + len <= LEN(x), 102);
 	i := start;  top := start + len;
@@ -545,8 +545,8 @@ BEGIN
 	WHILE i < top DO x[i] := x[i] DIV y;  INC(i, step) END;
 END DivConstPat;
 
-PROCEDURE ModConst* (len: LONGINT;  VAR x: ARRAY OF SIGNED16;  start: LONGINT;  y: SIGNED16 );
-	VAR i, top: LONGINT;
+PROCEDURE ModConst* (len: SIGNED32;  VAR x: ARRAY OF SIGNED16;  start: SIGNED32;  y: SIGNED16 );
+	VAR i, top: SIGNED32;
 BEGIN ASSERT(start >= 0, 100); ASSERT(len >= 0, 101);
 	ASSERT(start + len <= LEN(x), 102);
 	i := start;  top := start + len;
@@ -567,33 +567,33 @@ BEGIN
 END ModConstPat;
 
 (** Vector-Vector operations, assuming equivalent vectors. Interface may change!!! *)
-PROCEDURE Add* (VAR x, y: ARRAY OF SIGNED16; VAR z: ARRAY OF SIGNED16;  len: LONGINT );
+PROCEDURE Add* (VAR x, y: ARRAY OF SIGNED16; VAR z: ARRAY OF SIGNED16;  len: SIGNED32 );
 	(*= The arrays x and y aren't changed *)
-	VAR i: LONGINT;  temp: SIGNED16;
+	VAR i: SIGNED32;  temp: SIGNED16;
 BEGIN
 	i := 0;  WHILE i < len DO temp := x[i] + y[i]; z[i] := temp;  INC(i) END;
 	(* 970919 fof inserted temp for windows compatibilty (~"too many registers")*)
 END Add;
 
-PROCEDURE Sub* (VAR x, y: ARRAY OF SIGNED16; VAR z: ARRAY OF SIGNED16;  len: LONGINT );
+PROCEDURE Sub* (VAR x, y: ARRAY OF SIGNED16; VAR z: ARRAY OF SIGNED16;  len: SIGNED32 );
 	(*= The arrays x and y aren't changed *)
-	VAR i: LONGINT;  temp: SIGNED16;
+	VAR i: SIGNED32;  temp: SIGNED16;
 BEGIN
 	i := 0;  WHILE i < len DO temp := x[i] - y[i]; z[i] := temp; INC(i) END;
 	(* 970919 fof inserted temp for windows compatibilty (~"too many registers")*)
 END Sub;
 
-PROCEDURE Mul* (VAR x, y: ARRAY OF SIGNED16; VAR z: ARRAY OF SIGNED16;  len: LONGINT );
+PROCEDURE Mul* (VAR x, y: ARRAY OF SIGNED16; VAR z: ARRAY OF SIGNED16;  len: SIGNED32 );
 	(*= The arrays x and y aren't changed *)
-	VAR i: LONGINT;  temp: SIGNED16;
+	VAR i: SIGNED32;  temp: SIGNED16;
 BEGIN
 	i := 0;  WHILE i < len DO temp := x[i] * y[i] ;  z[i] := temp; INC(i) END;
 	(* 970919 fof inserted temp for windows compatibilty (~"too many registers")*)
 END Mul;
 
-PROCEDURE Div* (VAR x, y: ARRAY OF SIGNED16; VAR z: ARRAY OF SIGNED16;  len: LONGINT );
+PROCEDURE Div* (VAR x, y: ARRAY OF SIGNED16; VAR z: ARRAY OF SIGNED16;  len: SIGNED32 );
 	(*= The arrays x and y aren't changed *)
-	VAR i: LONGINT;  temp: SIGNED16;
+	VAR i: SIGNED32;  temp: SIGNED16;
 BEGIN
 	i := 0;  WHILE i < len DO temp := x[i] DIV y[i];  z[i] := temp; INC(i) END;
 	(* 970919 fof inserted temp for windows compatibilty (~"too many registers")*)
@@ -601,32 +601,32 @@ END Div;
 
 PROCEDURE SSQxy* (VAR x, y: ARRAY OF SIGNED16;
 mx, my: LONGREAL;
-len: LONGINT): LONGREAL; (** vs 0.1d0 gs *)
+len: SIGNED32): LONGREAL; (** vs 0.1d0 gs *)
 	(*= The arrays x and y aren't changed *)
-	VAR i: LONGINT; s: LONGREAL;
+	VAR i: SIGNED32; s: LONGREAL;
 BEGIN
 	s := 0; i := 0;  WHILE i < len DO s := s + (x[i] - mx) * (y[i] - my);  INC(i);  END;
 	RETURN s;
 END SSQxy;
 
 (* 2D support *)
-PROCEDURE Get2d* (VAR x: ARRAY OF SIGNED16;  rows, row, column: LONGINT): SIGNED16;
+PROCEDURE Get2d* (VAR x: ARRAY OF SIGNED16;  rows, row, column: SIGNED32): SIGNED16;
 	(*= The array x isn't changed *)
 BEGIN
 	ASSERT(rows >= row);
 	RETURN x[row * rows + column]
 END Get2d;
 
-PROCEDURE Set2d* (VAR x: ARRAY OF SIGNED16;  rows, row, column: LONGINT; val: SIGNED16);
+PROCEDURE Set2d* (VAR x: ARRAY OF SIGNED16;  rows, row, column: SIGNED32; val: SIGNED16);
 BEGIN
 	ASSERT(rows >= row);
 	x[row * rows + column] := val
 END Set2d;
 
 PROCEDURE Get2dM* (VAR x: ARRAY OF SIGNED16;
-rowoffset, coloffset, nrrows, nrcolumns: LONGINT; VAR dest: ARRAY OF ARRAY OF SIGNED16);  (*vs 0.1d0 gs *)
+rowoffset, coloffset, nrrows, nrcolumns: SIGNED32; VAR dest: ARRAY OF ARRAY OF SIGNED16);  (*vs 0.1d0 gs *)
 	(*= copy a 1-dim array as nrrows,nrcolumns submatrix into dest, while the array x isn't changed *)
-	VAR i, j, k: LONGINT;
+	VAR i, j, k: SIGNED32;
 BEGIN	k := 0;
 	FOR i := rowoffset TO rowoffset + nrrows DO
 		FOR j := coloffset TO coloffset + nrcolumns DO dest[i, j] := x[k];  INC(k);
@@ -635,9 +635,9 @@ BEGIN	k := 0;
 END Get2dM;
 
 PROCEDURE Set2dM* (VAR x: ARRAY OF SIGNED16;
-rowoffset, coloffset, nrrows, nrcolumns: LONGINT; VAR src: ARRAY OF ARRAY OF SIGNED16);  (*vs 0.1d0 gs *)
+rowoffset, coloffset, nrrows, nrcolumns: SIGNED32; VAR src: ARRAY OF ARRAY OF SIGNED16);  (*vs 0.1d0 gs *)
 	(*= set a 1-dim array as nrrows,nrcolumns submatrix from src, while the array src isn't changed *)
-	VAR i, j, k: LONGINT;
+	VAR i, j, k: SIGNED32;
 BEGIN 	k := 0;
 	FOR i := rowoffset TO rowoffset + nrrows DO
 		FOR j := coloffset TO coloffset + nrcolumns DO x[k] := src[i, j];  INC(k);
@@ -646,24 +646,24 @@ BEGIN 	k := 0;
 END Set2dM;
 
 (*? 2D support - FORTRAN-like. Are these needed ?*)
-PROCEDURE Get2dF* (VAR x: ARRAY OF SIGNED16;  columns, row, column: LONGINT): SIGNED16;
+PROCEDURE Get2dF* (VAR x: ARRAY OF SIGNED16;  columns, row, column: SIGNED32): SIGNED16;
 	(*= The array x isn't changed *)
 BEGIN
 	ASSERT(columns >= column);
 	RETURN x[row + column * columns]
 END Get2dF;
 
-PROCEDURE Set2dF* (VAR x: ARRAY OF SIGNED16;  columns, row, column: LONGINT; val: SIGNED16);
+PROCEDURE Set2dF* (VAR x: ARRAY OF SIGNED16;  columns, row, column: SIGNED32; val: SIGNED16);
 BEGIN
 	ASSERT(columns >= column);
 	x[row + column * columns] := val
 END Set2dF;
 
-PROCEDURE SkalProd* (len: LONGINT;  VAR x: ARRAY OF SIGNED16;  xstart: LONGINT; VAR y: ARRAY OF SIGNED16;  ystart: LONGINT): LONGINT;
+PROCEDURE SkalProd* (len: SIGNED32;  VAR x: ARRAY OF SIGNED16;  xstart: SIGNED32; VAR y: ARRAY OF SIGNED16;  ystart: SIGNED32): SIGNED32;
 	(*! replace by BLAS1.SDOT*)
 	(*=  scalar product <x,y> *)
 	(*= The arrays x and y aren't changed*)
-	VAR prod: LONGINT;
+	VAR prod: SIGNED32;
 BEGIN
 	ASSERT(xstart >= 0, 100); ASSERT(ystart >= 0, 101); ASSERT(len >= 0, 102);
 	ASSERT(xstart + len <= LEN(x), 103); ASSERT(ystart + len <= LEN(y), 104);
@@ -695,11 +695,11 @@ BEGIN
 	RETURN prod
 END SkalProdPat;
 
-PROCEDURE Norm2Sq* (len: LONGINT;  VAR x: ARRAY OF SIGNED16;  xstart: LONGINT): LONGINT;
+PROCEDURE Norm2Sq* (len: SIGNED32;  VAR x: ARRAY OF SIGNED16;  xstart: SIGNED32): SIGNED32;
 	(*! replace by BLAS1.SNORM2*)
 	(*= Square of L2-Norm of x *)
 	(*= The arrays x isn't changed*)
-	VAR prod: LONGINT;
+	VAR prod: SIGNED32;
 BEGIN
 	ASSERT(xstart >= 0, 100); ASSERT(len >= 0, 101);
 	ASSERT(xstart + len <= LEN(x), 102);
@@ -724,11 +724,11 @@ BEGIN
 	RETURN prod
 END Norm2SqPat;
 
-PROCEDURE Dist2Sq* (len: LONGINT;  VAR x: ARRAY OF SIGNED16;  xstart: LONGINT; VAR y: ARRAY OF SIGNED16;  ystart: LONGINT): LONGINT;
+PROCEDURE Dist2Sq* (len: SIGNED32;  VAR x: ARRAY OF SIGNED16;  xstart: SIGNED32; VAR y: ARRAY OF SIGNED16;  ystart: SIGNED32): SIGNED32;
 	(*! replace by BLAS1.SNORM2 modified*)
 	(*= Square of L2-Norm of x-y *)
 	(*= The arrays x and y aren't changed*)
-	VAR prod: LONGINT; delta: LONGINT;
+	VAR prod: SIGNED32; delta: SIGNED32;
 BEGIN
 	ASSERT(xstart >= 0, 100); ASSERT(ystart >= 0, 101); ASSERT(len >= 0, 102);
 	ASSERT(xstart + len <= LEN(x), 103); ASSERT(ystart + len <= LEN(y), 104);

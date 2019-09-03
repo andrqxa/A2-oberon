@@ -38,7 +38,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 		sTab: ARRAY 256 OF SIGNED16;		(* table for Boyer Moore algorithm *)
 		sPatLen: SIGNED16;	(* number of valid characters in sPat [read only] *)
 		rBuf: Texts.Buffer;	(* replace buffer [read only] *)
-		lTime: LONGINT;	(* most recent time for sPat and/or rBuf *)
+		lTime: SIGNED32;	(* most recent time for sPat and/or rBuf *)
 		lastPno: SIGNED16;
 		printer, ext, options: ARRAY 32 OF CHAR;
 		open: BOOLEAN;	(*very ugly: printer flag*)
@@ -49,10 +49,10 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 		head, tail: Objects.Object;	(*page break position*)
 		pages: SIGNED16;
 
-	PROCEDURE MarkBrk(pos: LONGINT);
+	PROCEDURE MarkBrk(pos: SIGNED32);
 	BEGIN
 		IF tail # NIL THEN tail.stamp := pos;
-			NEW(tail.slink); tail := tail.slink; tail.stamp := MAX(LONGINT);
+			NEW(tail.slink); tail := tail.slink; tail.stamp := MAX(SIGNED32);
 			INC(pages)
 		END
 	END MarkBrk;
@@ -110,7 +110,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 		V: Display.Frame;
 		S: Texts.Scanner;
 		f: Files.File;
-		len: LONGINT;
+		len: SIGNED32;
 	BEGIN
 		Texts.WriteString(W, "Script.Store ");
 		par := Oberon.Par; S.s := "";
@@ -129,10 +129,10 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 	END Store;
 
 (*
-	PROCEDURE FindPat(F: ScriptFrames.Frame; pos: LONGINT);
+	PROCEDURE FindPat(F: ScriptFrames.Frame; pos: SIGNED32);
 	(* searches pattern sPat beginning at position pos *)
 		VAR R: Texts.Reader;	buf: ARRAY MaxPatLen OF CHAR;
-			len, lPos: LONGINT; 	n, j: SIGNED16;
+			len, lPos: SIGNED32; 	n, j: SIGNED16;
 
 		PROCEDURE Forward (n: SIGNED16);
 			VAR m: SIGNED16; j: SIGNED16;
@@ -168,7 +168,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 	PROCEDURE Search*;
 		VAR F: ScriptFrames.Frame;
 			R: Texts.Reader;	text: Texts.Text;
-			pos, beg, end, time: LONGINT; 	i: SIGNED16;
+			pos, beg, end, time: SIGNED32; 	i: SIGNED16;
 			par: Oberon.ParList;
 	BEGIN par := Oberon.Par; F := NIL;
 		IF (par.vwr # NIL) & (par.frame = par.vwr.dsc) THEN
@@ -192,7 +192,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 	PROCEDURE replace(): BOOLEAN;
 		VAR F: ScriptFrames.Frame;
 			R: Texts.Reader;	tBuf: Texts.Buffer;	text: Texts.Text;
-			pos, beg, end, time, p, len: LONGINT; 	i: SIGNED16;	ch: CHAR;
+			pos, beg, end, time, p, len: SIGNED32; 	i: SIGNED16;	ch: CHAR;
 	BEGIN
 		F := FocusFrame();
 		IF F = NIL THEN RETURN FALSE END;	(**###*)
@@ -220,13 +220,13 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 	END replace;
 *)
 
-	PROCEDURE SetCaret(F: Display.Frame; text: Texts.Text; pos: LONGINT);
+	PROCEDURE SetCaret(F: Display.Frame; text: Texts.Text; pos: SIGNED32);
 		VAR M: Oberon.CaretMsg;
 	BEGIN M.res := -1; M.dlink := NIL; Objects.Stamp(M);
 		M.id := Oberon.set; M.F := F; M.car := F; M.text := text; M.pos := pos; F.handle(F, M)
 	END SetCaret;
 
-	PROCEDURE SetSelection(F: Display.Frame; text: Texts.Text; beg, end: LONGINT; VAR time: LONGINT);
+	PROCEDURE SetSelection(F: Display.Frame; text: Texts.Text; beg, end: SIGNED32; VAR time: SIGNED32);
 		VAR M: Oberon.SelectMsg;
 	BEGIN M.res := -1; M.dlink := NIL; Objects.Stamp(M);
 		M.id := Oberon.set; M.F := F; M.sel := F; M.text := text; M.beg := beg; M.end := end;
@@ -234,17 +234,17 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 		M.id := Oberon.get; M.res := -1; M.time := -1; F.handle(F, M); time :=  M.time
 	END SetSelection;
 
-	PROCEDURE GetCaret(VAR F: Display.Frame; VAR text: Texts.Text; VAR pos: LONGINT);
+	PROCEDURE GetCaret(VAR F: Display.Frame; VAR text: Texts.Text; VAR pos: SIGNED32);
 		VAR M: Oberon.CaretMsg;
 	BEGIN text := NIL; F := NIL;
 		M.id := Oberon.get; M.F := NIL; M.car := NIL; Display.Broadcast(M);
 		IF M.car # NIL THEN F := M.car; text := M.text; pos := M.pos END
 	END GetCaret;
 
-	PROCEDURE FindPat(F: Display.Frame; text: Texts.Text; pos, time: LONGINT): BOOLEAN;
+	PROCEDURE FindPat(F: Display.Frame; text: Texts.Text; pos, time: SIGNED32): BOOLEAN;
 	(* searches pattern sPat beginning at position pos *)
 		VAR R: Texts.Reader;	buf: ARRAY MaxPatLen OF CHAR;
-			len: LONGINT; 	n, j: SIGNED16;
+			len: SIGNED32; 	n, j: SIGNED16;
 			N: Oberon.ControlMsg;
 
 		PROCEDURE Forward (n: SIGNED16);
@@ -275,7 +275,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 		END
 	END FindPat;
 
-	PROCEDURE GetFrame(VAR F: Display.Frame; VAR text: Texts.Text; VAR pos: LONGINT);
+	PROCEDURE GetFrame(VAR F: Display.Frame; VAR text: Texts.Text; VAR pos: SIGNED32);
 		VAR M: Objects.LinkMsg; par: Oberon.ParList;
 	BEGIN par := Oberon.Par;
 		GetCaret(F, text, pos);
@@ -292,7 +292,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 	PROCEDURE Search*;
 		VAR F: Display.Frame;
 			R: Texts.Reader; text, seltext: Texts.Text;
-			pos, beg, end, time: LONGINT; i: SIGNED16;
+			pos, beg, end, time: SIGNED32; i: SIGNED16;
 	BEGIN GetFrame(F, text, pos);
 		IF F # NIL THEN Oberon.GetSelection(seltext, beg, end, time);
 			IF (time >= 0) & (seltext.len > 0) & (time > lTime) THEN	(* set search pattern *)
@@ -310,7 +310,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 	PROCEDURE replace(): BOOLEAN;
 		VAR F: Display.Frame;
 			R: Texts.Reader;	tBuf: Texts.Buffer;	text, repltext: Texts.Text;
-			pos, beg, end, time, p, len: LONGINT; 	i: SIGNED16;	ch: CHAR;
+			pos, beg, end, time, p, len: SIGNED32; 	i: SIGNED16;	ch: CHAR;
 	BEGIN GetFrame(F, text, pos);
 		IF F # NIL THEN
 			Oberon.GetSelection(repltext, beg, end, time);
@@ -354,7 +354,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 
 	PROCEDURE ChangeFont*;
 	VAR S: Texts.Scanner;
-		T: Texts.Text; beg, end, time: LONGINT;
+		T: Texts.Text; beg, end, time: SIGNED32;
 		fnt: Fonts.Font;
 	BEGIN OpenScanner(S, NIL);
 		IF S.class = Texts.Name THEN
@@ -365,7 +365,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 
 	PROCEDURE ChangeColor*;
 	VAR S: Texts.Scanner;
-		T: Texts.Text; col: SIGNED8; beg, end, time: LONGINT;
+		T: Texts.Text; col: SIGNED8; beg, end, time: SIGNED32;
 	BEGIN OpenScanner(S, NIL);
 		IF S.class # Texts.Int THEN col := S.col ELSE col := SHORT(SHORT(S.i)) END;
 		Oberon.GetSelection(T, beg, end, time);
@@ -373,7 +373,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 	END ChangeColor;
 
 	PROCEDURE ChangeOffset*;
-	VAR S: Texts.Scanner; T: Texts.Text; voff: SIGNED8; beg, end, time: LONGINT;
+	VAR S: Texts.Scanner; T: Texts.Text; voff: SIGNED8; beg, end, time: SIGNED32;
 	BEGIN OpenScanner(S, NIL);
 		IF S.class # Texts.Int THEN voff := S.voff ELSE voff := SHORT(SHORT(S.i)) END;
 		Oberon.GetSelection(T, beg, end, time);
@@ -443,7 +443,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 
 		LineDesc = RECORD
 			next: Line;
-			len: LONGINT;
+			len: SIGNED32;
 			w, asr, dsr, h, nSpc: SIGNED16;
 			eot, brk: BOOLEAN
 		END;
@@ -507,7 +507,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 		END FrameDsr;
 
 		PROCEDURE ChW(fnt: Fonts.Font; ch: CHAR): SIGNED16;
-		VAR obj: Objects.Object; unit: LONGINT;
+		VAR obj: Objects.Object; unit: SIGNED32;
 		BEGIN Styles.MetricFnt(fnt, unit, fnt); fnt.GetObj(fnt, ORD(ch), obj);
 			IF fnt.type = Fonts.metric THEN RETURN obj(Fonts.Char).dx
 			ELSE RETURN SHORT(unit*obj(Fonts.Char).dx DIV Printer.Unit)
@@ -544,10 +544,10 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 			G.dlink := NIL; M.F := G; G.handle(G, M)	(*G.dlink : HACK*)
 		END PrintFrame;
 
-		PROCEDURE PrintLine(VAR R: Texts.Reader; X, Y, pno, sx, rx: SIGNED16; len: LONGINT; VAR pbrk: BOOLEAN);	(*X, Y: baseline*)
+		PROCEDURE PrintLine(VAR R: Texts.Reader; X, Y, pno, sx, rx: SIGNED16; len: SIGNED32; VAR pbrk: BOOLEAN);	(*X, Y: baseline*)
 		VAR
 			buf: ARRAY 256 OF CHAR;
-			pos, ddX, unit: LONGINT;
+			pos, ddX, unit: SIGNED32;
 			obj: Objects.Object; G: Display.Frame;
 			lib: Objects.Library;
 			mlib: Fonts.Font;
@@ -848,7 +848,7 @@ VAR
 	V: Display.Frame;
 	F: ScriptFrames.Frame;
 	title: ARRAY 32 OF CHAR;
-	T: Texts.Text; beg, end, time: LONGINT;
+	T: Texts.Text; beg, end, time: SIGNED32;
 
 	PROCEDURE PrintText(T: Texts.Text; title: ARRAY OF CHAR; VAR S: Texts.Scanner);
 	VAR opts: SET; pn0, pnb, pne, copies: SIGNED16; fnt: Fonts.Font;

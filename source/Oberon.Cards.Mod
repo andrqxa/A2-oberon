@@ -31,7 +31,7 @@ TYPE
 	Move* = POINTER TO MoveDesc;
 	MoveDesc* = RECORD
 		next: Move;
-		time: LONGINT;
+		time: SIGNED32;
 	END;
 
 	Stack* = POINTER TO StackDesc;
@@ -64,7 +64,7 @@ TYPE
 	END;
 
 	UndoMsg* = RECORD (Display.FrameMsg)
-		time: LONGINT;
+		time: SIGNED32;
 		stack: Stack;
 	END;
 
@@ -74,14 +74,14 @@ TYPE
 
 VAR
 	methods*: Methods;
-	seed: LONGINT;
+	seed: SIGNED32;
 	cardPicts: Pictures.Picture;
 
 (*	-----------------------------	auxiliary procs	-----------------------------	*)
 
-PROCEDURE Random*(range: LONGINT): LONGINT;
+PROCEDURE Random*(range: SIGNED32): SIGNED32;
 CONST a = 16807; m = 2147483647; q = m DIV a; r = m MOD a;
-VAR g: LONGINT;
+VAR g: SIGNED32;
 BEGIN
 	g:= a*(seed MOD q) - r*(seed DIV q);
 	IF g > 0 THEN seed:= g ELSE seed:= g + m END;

@@ -96,7 +96,7 @@ END SetParams;
 
 PROCEDURE Include () : Layouts.Node;
 VAR node : Layouts.Node;
-		oldpos : LONGINT;
+		oldpos : SIGNED32;
 		oldtext : Texts.Text;
 BEGIN	LayLaS.Get (sym);
 	IF (sym # LayLaS.Qualident) & (sym # LayLaS.Ident) THEN
@@ -258,7 +258,7 @@ BEGIN	node := NIL;
 	RETURN node;
 END Eval;
 
-PROCEDURE ParseText* (text : Texts.Text; pos : LONGINT) : Objects.Object;
+PROCEDURE ParseText* (text : Texts.Text; pos : SIGNED32) : Objects.Object;
 VAR node : Layouts.Node;
 BEGIN
 	curtext := text;
@@ -267,16 +267,16 @@ BEGIN
 	IF ~LayLaS.error THEN RETURN Layouts.Realize (node) ELSE RETURN NIL END
 END ParseText;
 
-PROCEDURE ParseString* (str : ARRAY OF CHAR; pos : LONGINT) : Objects.Object;
+PROCEDURE ParseString* (str : ARRAY OF CHAR; pos : SIGNED32) : Objects.Object;
 BEGIN
 	Texts.WriteString (W, str);
 	NEW (curtext); Texts.Open (curtext, ""); Texts.Append (curtext, W.buf);
 	RETURN ParseText (curtext, pos)
 END ParseString;
 
-PROCEDURE GetText (VAR T : Texts.Text; VAR beg : LONGINT);
+PROCEDURE GetText (VAR T : Texts.Text; VAR beg : SIGNED32);
 VAR s : Texts.Scanner;
-		end, time : LONGINT;
+		end, time : SIGNED32;
 		Name : ARRAY 64 OF CHAR;
 BEGIN
 	Texts.OpenScanner (s, Oberon.Par.text, Oberon.Par.pos);
@@ -315,7 +315,7 @@ PROCEDURE Insert*;
 		 Insert (NEW object)
 *)
 VAR T : Texts.Text;
-		pos : LONGINT;
+		pos : SIGNED32;
 		obj : Objects.Object;
 BEGIN
 	GetText (T, pos);
@@ -334,7 +334,7 @@ PROCEDURE OpenAsDoc*;
 		 OpenAsDoc (NEW object)
 *)
 VAR T : Texts.Text;
-		pos : LONGINT;
+		pos : SIGNED32;
 		obj : Objects.Object;
 		D: Documents.Document;
 		P: Panels.Panel;
@@ -373,7 +373,7 @@ PROCEDURE AddToLibrary*;
 		 AddToLibrary L.O (NEW object)
 *)
 VAR T : Texts.Text;
-		pos : LONGINT;
+		pos : SIGNED32;
 		old, obj : Objects.Object;
 		lib: Objects.Library;
 		libname, objname: ARRAY 64 OF CHAR;

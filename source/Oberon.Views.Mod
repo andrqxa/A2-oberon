@@ -34,7 +34,7 @@ TYPE
 	ViewDesc* = RECORD (Gadgets.ViewDesc)
 		(** Relative viewpoint of viewer object. Vector from top-left camera-view corner to top-left of contents. *)
 		vx*, vy*: SIGNED16;
-		time*: LONGINT; (** Selection time of viewed gadget. *)
+		time*: SIGNED32; (** Selection time of viewed gadget. *)
 	END;
 
 	(** Structure to "store" an area on the display *)
@@ -257,7 +257,7 @@ BEGIN
 END StoreView;
 
 PROCEDURE LoadView(F: View; VAR M: Objects.FileMsg);
-VAR x: LONGINT; dummy: SIGNED16;
+VAR x: SIGNED32; dummy: SIGNED16;
 BEGIN
 	Files.ReadNum(M.R, x);
 	IF x # VersionNo THEN
@@ -331,7 +331,7 @@ BEGIN
 	END
 END Absolute;
 
-PROCEDURE CleverAdjust(F: View; VAR M: Display.ModifyMsg; VAR stamp: LONGINT; borderW: SIGNED16);
+PROCEDURE CleverAdjust(F: View; VAR M: Display.ModifyMsg; VAR stamp: SIGNED32; borderW: SIGNED16);
 VAR x, y, w, h, x0, y0, w0, h0, x1, y1, w1, h1: SIGNED16; D: Display.DisplayMsg; abs: BOOLEAN;
 BEGIN
 	(* calculate old position *)

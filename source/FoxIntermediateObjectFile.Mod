@@ -213,7 +213,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			addressType: IntermediateCode.Type;
 
 			PROCEDURE SectionName(VAR sectionName: ObjectFile.SegmentedName);
-			VAR name: ObjectFile.SectionName; i, num: LONGINT;
+			VAR name: ObjectFile.SectionName; i, num: SIGNED32;
 			BEGIN
 				i := 0;
 				REPEAT
@@ -227,9 +227,9 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END SectionName;
 
 			PROCEDURE ReadOperand(VAR operand: IntermediateCode.Operand);
-			VAR type: IntermediateCode.Type; mode, subMode: LONGINT; register: LONGINT; registerClass: IntermediateCode.RegisterClass;
-				offset: LONGINT; int: HUGEINT; real: LONGREAL; name: ObjectFile.SegmentedName; symbolOffset: LONGINT;
-				string: Strings.String; len: LONGINT;
+			VAR type: IntermediateCode.Type; mode, subMode: SIGNED32; register: SIGNED32; registerClass: IntermediateCode.RegisterClass;
+				offset: SIGNED32; int: HUGEINT; real: LONGREAL; name: ObjectFile.SegmentedName; symbolOffset: SIGNED32;
+				string: Strings.String; len: SIGNED32;
 				symbolSection: Sections.Section;
 
 				PROCEDURE Type(VAR t: IntermediateCode.Type);
@@ -307,7 +307,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END ReadOperand;
 
 			PROCEDURE ReadInstruction(section: IntermediateCode.Section);
-			VAR opcode, subtype: LONGINT; instruction: IntermediateCode.Instruction; op1, op2, op3: IntermediateCode.Operand;
+			VAR opcode, subtype: SIGNED32; instruction: IntermediateCode.Instruction; op1, op2, op3: IntermediateCode.Operand;
 			BEGIN
 				r.RawNum(opcode);
 				IF opcode = IntermediateCode.special THEN r.RawNum(subtype) END;
@@ -326,10 +326,10 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				name: Basic.SegmentedName;
 				symbol: SyntaxTree.Symbol;
 				comment: BOOLEAN;
-				type: LONGINT;
+				type: SIGNED32;
 				fixed: BOOLEAN;
-				positionOrAlignment, fingerprint, bitsPerUnit: LONGINT;
-				pc,i: LONGINT;
+				positionOrAlignment, fingerprint, bitsPerUnit: SIGNED32;
+				pc,i: SIGNED32;
 			BEGIN
 				r.RawLInt(type);
 				SectionName(name);
@@ -358,7 +358,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END ReadSection;
 
 			PROCEDURE SectionList(list: Sections.SectionList);
-			VAR section: Sections.Section; length,i: LONGINT;
+			VAR section: Sections.Section; length,i: SIGNED32;
 			BEGIN
 				r.RawNum(length);
 				FOR i := 0 TO length - 1 DO
@@ -367,7 +367,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 			END SectionList;
 
 			PROCEDURE Imports(imports: Sections.NameList);
-			VAR name: SyntaxTree.IdentifierString; length,i: LONGINT;
+			VAR name: SyntaxTree.IdentifierString; length,i: SIGNED32;
 			BEGIN
 				r.RawNum(length);
 				FOR i := 0 TO length-1 DO
@@ -442,7 +442,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 	END Get;
 
 	PROCEDURE ReadHeader(reader: Streams.Reader; VAR binary: BOOLEAN; VAR poolMap: ObjectFile.PoolMap);
-	VAR ch: CHAR; version: LONGINT; string: ARRAY 32 OF CHAR; i,j,pos,size: LONGINT; name: ObjectFile.SectionName;
+	VAR ch: CHAR; version: SIGNED32; string: ARRAY 32 OF CHAR; i,j,pos,size: SIGNED32; name: ObjectFile.SectionName;
 	BEGIN
 		reader.String(string);
 		binary := string="FoxILB";
@@ -460,7 +460,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 	END ReadHeader;
 
 	PROCEDURE WriteHeader(writer: Streams.Writer; binary: BOOLEAN; sections: Sections.SectionList; VAR poolMap: ObjectFile.PoolMap);
-	VAR i: SIZE; section: Sections.Section; fixups: LONGINT; fixupList: ObjectFile.Fixups;
+	VAR i: SIZE; section: Sections.Section; fixups: SIGNED32; fixupList: ObjectFile.Fixups;
 
 		PROCEDURE ProcessOperand(CONST operand: IntermediateCode.Operand);
 		BEGIN

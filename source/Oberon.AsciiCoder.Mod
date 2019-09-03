@@ -21,7 +21,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 		table: ARRAY N OF CHAR;	(* hash table for compression *)
 
 	PROCEDURE Compress*(src, dest: Files.File);	(* due to Stefan Ludwig *)
-		VAR hash, byte, bit, i: LONGINT; ch: CHAR; from, to: Files.Rider;
+		VAR hash, byte, bit, i: SIGNED32; ch: CHAR; from, to: Files.Rider;
 	BEGIN
 		i := 0; REPEAT table[i] := 0X; INC(i) UNTIL i = N;
 		Files.Set(from, src, 0); Files.Set(to, dest, 0);
@@ -45,7 +45,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 	END Compress;
 
 	PROCEDURE Expand*(src, dest: Files.File);	(* due to Stefan Ludwig *)
-		VAR hash, val, byte, bit, i: LONGINT; ch: CHAR; from, to: Files.Rider;
+		VAR hash, val, byte, bit, i: SIGNED32; ch: CHAR; from, to: Files.Rider;
 	BEGIN
 		i := 0; REPEAT table[i] := 0X; INC(i) UNTIL i = N;
 		Files.Set(from, src, 0); Files.Set(to, dest, 0);
@@ -86,7 +86,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 		Texts.WriteLn(w); Texts.Append(to, w.buf)
 	END Code;
 
-	PROCEDURE Decode*(from: Texts.Text; VAR pos: LONGINT; to: Files.File; VAR ok: BOOLEAN);
+	PROCEDURE Decode*(from: Texts.Text; VAR pos: SIGNED32; to: Files.File; VAR ok: BOOLEAN);
 		VAR rest, div, factor, byte: SIGNED16; ch: CHAR; r: Texts.Reader; w: Files.Rider;
 	BEGIN Texts.OpenReader(r, from, pos); Files.Set(w, to, 0); factor := 1; div := 256; rest := 0;
 		REPEAT Texts.Read(r, ch) UNTIL (ch > " ") OR r.eot;
@@ -107,7 +107,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 		Oberon.OpenText(name, text, Display.Width DIV 8 * 3 + 20, Display.Height DIV 2)
 	END OpenViewer;
 
-	PROCEDURE ReadFileNames(t: Texts.Text; beg, end: LONGINT; VAR names: NameList; VAR pos: LONGINT);
+	PROCEDURE ReadFileNames(t: Texts.Text; beg, end: SIGNED32; VAR names: NameList; VAR pos: SIGNED32);
 		VAR last, n: NameList; s: Texts.Scanner;
 	BEGIN NEW(names); last := names; Texts.OpenScanner(s, t, beg); pos := beg; Texts.Scan(s);
 		WHILE (pos < end) & ((s.class = Texts.String) OR (s.class = Texts.Name)) DO NEW(n); last.next := n; last := n;
@@ -119,7 +119,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 	END ReadFileNames;
 
 	PROCEDURE CodeFiles*;
-		VAR pos, beg, end, time: LONGINT; compress: BOOLEAN; names, n: NameList;
+		VAR pos, beg, end, time: SIGNED32; compress: BOOLEAN; names, n: NameList;
 			f, f1: Files.File; text: Texts.Text; s: Texts.Scanner;
 	BEGIN pos := Oberon.Par.pos; compress := FALSE;
 		Texts.OpenScanner(s, Oberon.Par.text, pos); Texts.Scan(s);
@@ -160,7 +160,7 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 	END CodeFiles;
 
 	PROCEDURE DecodeFiles*;
-		VAR pos, beg, end, time: LONGINT; i, res: SIGNED16; ch: CHAR; ok, compress: BOOLEAN;
+		VAR pos, beg, end, time: SIGNED32; i, res: SIGNED16; ch: CHAR; ok, compress: BOOLEAN;
 			f, f1: Files.File; text: Texts.Text; s: Texts.Scanner; names: NameList; bakname: ARRAY 256 OF CHAR;
 	BEGIN text := Oberon.Par.text; pos := Oberon.Par.pos; compress := FALSE;
 		Texts.OpenScanner(s, text, pos); Texts.Scan(s);
@@ -186,8 +186,8 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 	END DecodeFiles;
 
 	PROCEDURE CodeText*;
-		VAR beg, end, time: LONGINT; compress: BOOLEAN;
-			f, f1: Files.File; t, text: Texts.Text; s: Texts.Scanner; len: LONGINT;
+		VAR beg, end, time: SIGNED32; compress: BOOLEAN;
+			f, f1: Files.File; t, text: Texts.Text; s: Texts.Scanner; len: SIGNED32;
 	BEGIN compress := FALSE;
 		Texts.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(s);
 		IF (s.line = 0) & (s.class = Texts.Char)  & (s.c = "%") THEN compress := TRUE; Texts.Scan(s) END;
@@ -214,8 +214,8 @@ MODULE AsciiCoder IN Oberon;	(** portable *) (* Wolfgang Weck 14 Dec 93, compres
 	END CodeText;
 
 	PROCEDURE DecodeText*;
-		VAR pos, beg, end, time: LONGINT; ok, compress: BOOLEAN;
-			f, f1: Files.File; text: Texts.Text; s: Texts.Scanner; len: LONGINT;
+		VAR pos, beg, end, time: SIGNED32; ok, compress: BOOLEAN;
+			f, f1: Files.File; text: Texts.Text; s: Texts.Scanner; len: SIGNED32;
 	BEGIN compress := FALSE; pos := Oberon.Par.pos; f := Files.New("");
 		Texts.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(s);
 		IF (s.line = 0) & (s.class = Texts.Char)  & (s.c = "%") THEN compress := TRUE; pos := Texts.Pos(s); Texts.Scan(s) END;

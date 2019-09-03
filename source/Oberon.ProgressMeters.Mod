@@ -10,7 +10,7 @@ MODULE ProgressMeters IN Oberon;	(** portable *) (* ejz,  *)
 	TYPE
 		Frame* = POINTER TO FrameDesc;
 		FrameDesc* = RECORD (Gadgets.FrameDesc)
-			min, max, val, step: LONGINT;
+			min, max, val, step: SIGNED32;
 			col: SIGNED16;
 			marks, labels: BOOLEAN
 		END;
@@ -52,7 +52,7 @@ MODULE ProgressMeters IN Oberon;	(** portable *) (* ejz,  *)
 	PROCEDURE Restore(F: Frame; Q: Display3.Mask; x, y, w, h: SIGNED16; back: BOOLEAN);
 		VAR
 			red, xm, ym, wm, hm, xma, diff, fw, fh, dsr: SIGNED16;
-			mark, range: LONGINT;
+			mark, range: SIGNED32;
 			cap: ARRAY 16 OF CHAR;
 			horz: BOOLEAN;
 	BEGIN
@@ -159,7 +159,7 @@ MODULE ProgressMeters IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			Q: Display3.Mask;
 			x, y, w, h, red, xm, ym, wm, hm, xma, diff, fw, fh, dsr: SIGNED16;
-			mark, range: LONGINT;
+			mark, range: SIGNED32;
 			cap: ARRAY 16 OF CHAR;
 			horz: BOOLEAN;
 		PROCEDURE P(x: SIGNED16): SIGNED16;

@@ -15,7 +15,7 @@ MODULE V24Gadgets IN Oberon;	(** portable *)	(* ip/mh/mg 17.3.94 / 5.7.1994 / 05
 		Terminal = POINTER TO TerminalDesc;
 		TerminalDesc = RECORD (Terminals.TerminalDesc)
 			localecho, stop: BOOLEAN;
-			port, bps, data, stopb, parity: LONGINT
+			port, bps, data, stopb, parity: SIGNED32
 		END;
 
 		TaskDesc = RECORD (Oberon.TaskDesc)
@@ -27,7 +27,7 @@ VAR
 	fixed: Fonts.Font;
 
 PROCEDURE Send0(T: Terminals.Terminal; ch: CHAR);
-	VAR t: LONGINT;
+	VAR t: SIGNED32;
 BEGIN
 	WITH T: Terminal DO
 		IF T.port # -1 THEN
@@ -57,7 +57,7 @@ BEGIN
 END WriteLn;
 
 PROCEDURE Receiver(me: Oberon.Task);
-	VAR ch: CHAR;  port, t: LONGINT; l: SIZE;
+	VAR ch: CHAR;  port, t: SIGNED32; l: SIZE;
 BEGIN
 	WITH me: Task DO
 		IF me.T.stop THEN
@@ -96,8 +96,8 @@ BEGIN
 	END
 END Cleanup;
 
-	PROCEDURE OpenConn(F: TerminalGadgets.Frame; port, bps, data, stop, parity: LONGINT);
-		VAR task: Task; t: LONGINT;
+	PROCEDURE OpenConn(F: TerminalGadgets.Frame; port, bps, data, stop, parity: SIGNED32);
+		VAR task: Task; t: SIGNED32;
 	BEGIN
 		NEW(task); task.safe := FALSE; task.handle := Receiver; task.T := F.text(Terminal);
 		V24.Start(port, bps, data, parity, stop, t);
@@ -120,7 +120,7 @@ END Cleanup;
 		VAR S: Texts.Scanner;
 			obj: Objects.Object;
 			F: TerminalGadgets.Frame;
-			port, bps, data, stop, parity: LONGINT;
+			port, bps, data, stop, parity: SIGNED32;
 			ok: BOOLEAN;
 	BEGIN
 		port := V24.COM1; data := 8;  stop := V24.Stop1;  parity := V24.ParNo;  ok := FALSE;
@@ -269,8 +269,8 @@ END Cleanup;
 
 	PROCEDURE SendS(VAR br: Files.Rider;  T: Terminals.Terminal);
 	VAR
-		adr, size, x: LONGINT;
-		buf: ARRAY 8 OF LONGINT;
+		adr, size, x: SIGNED32;
+		buf: ARRAY 8 OF SIGNED32;
 		i, sum: SIGNED16;
 
 		PROCEDURE Write(ch: CHAR);
@@ -289,7 +289,7 @@ END Cleanup;
 			sum := (sum + x) MOD 100H
 		END WriteHexByte;
 
-		PROCEDURE WriteHex(x: LONGINT);
+		PROCEDURE WriteHex(x: SIGNED32);
 		BEGIN
 			WriteHexByte(SIGNED16(ASH(x, -24) MOD 100H));
 			WriteHexByte(SIGNED16(ASH(x, -16) MOD 100H));

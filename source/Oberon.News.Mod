@@ -33,7 +33,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	TYPE
 		ArtNrs = POINTER TO ArtNrsDesc;
 		ArtNrsDesc = RECORD
-			beg, end: LONGINT;
+			beg, end: SIGNED32;
 			next: ArtNrs
 		END;
 		Group = POINTER TO GroupDesc;
@@ -52,11 +52,11 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		W, Wr: Texts.Writer;
 		groups, curGrp: Group;
 		curGrpNewOnly: BOOLEAN;
-		newgDate, newgTime: LONGINT;
+		newgDate, newgTime: SIGNED32;
 		EMail: ARRAY NetTools.ServerStrLen OF CHAR;
 		refs: Files.File;
 		indexM, indexA: BTrees.Tree;
-		availBeg, beg, end, level, thread: LONGINT;
+		availBeg, beg, end, level, thread: SIGNED32;
 		marked: POINTER TO ARRAY OF BOOLEAN;
 		line: ARRAY 2*NetTools.MaxLine OF CHAR;
 		newsFont: Fonts.Font;
@@ -71,7 +71,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		END
 	END ScanInt;
 
-	PROCEDURE ScanDate(VAR S: Texts.Scanner; VAR date: LONGINT);
+	PROCEDURE ScanDate(VAR S: Texts.Scanner; VAR date: SIGNED32);
 		VAR day, month, year: SIGNED16;
 	BEGIN
 		ScanInt(S, day); ScanInt(S, month); ScanInt(S, year);
@@ -85,7 +85,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		date := Dates.ToDate(year, month, day)
 	END ScanDate;
 
-	PROCEDURE ScanTime(VAR S: Texts.Scanner; VAR time: LONGINT);
+	PROCEDURE ScanTime(VAR S: Texts.Scanner; VAR time: SIGNED32);
 		VAR hour, min, sec: SIGNED16;
 	BEGIN
 		ScanInt(S, hour); ScanInt(S, min); ScanInt(S, sec);
@@ -99,7 +99,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		str[2] := 0X
 	END TwoDigit;
 
-	PROCEDURE ConcatDate(VAR line: ARRAY OF CHAR; VAR date: LONGINT);
+	PROCEDURE ConcatDate(VAR line: ARRAY OF CHAR; VAR date: SIGNED32);
 		VAR
 			str: ARRAY 8 OF CHAR;
 			day, month, year: SIGNED16;
@@ -117,7 +117,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		Strings.Append(line, str)
 	END ConcatDate;
 
-	PROCEDURE ConcatTime(VAR line: ARRAY OF CHAR; VAR time: LONGINT);
+	PROCEDURE ConcatTime(VAR line: ARRAY OF CHAR; VAR time: SIGNED32);
 		VAR
 			str: ARRAY 8 OF CHAR;
 			hour, min, sec: SIGNED16;
@@ -137,7 +137,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			S: Texts.Scanner;
 			group, lastg: Group;
 			art, last: ArtNrs;
-			i: LONGINT;
+			i: SIGNED32;
 			val: ARRAY 64 OF CHAR;
 	BEGIN
 		IF NetTools.QueryString("NewsFont", val) & (Fonts.This(val) # NIL) THEN
@@ -211,7 +211,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		END
 	END LoadInitText;
 
-	PROCEDURE WriteDate(VAR W: Texts.Writer; VAR date: LONGINT);
+	PROCEDURE WriteDate(VAR W: Texts.Writer; VAR date: SIGNED32);
 		VAR day, month, year: SIGNED16;
 	BEGIN
 		Dates.ToYMD(date, year, month, day);
@@ -222,7 +222,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		Texts.WriteInt(W, year, 0)
 	END WriteDate;
 
-	PROCEDURE WriteTime(VAR W: Texts.Writer; VAR time: LONGINT);
+	PROCEDURE WriteTime(VAR W: Texts.Writer; VAR time: SIGNED32);
 		VAR hour, min, sec: SIGNED16;
 	BEGIN
 		Dates.ToHMS(time, hour, min, sec);
@@ -239,7 +239,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			group: Group;
 			art: ArtNrs;
 			F: Files.File;
-			len: LONGINT;
+			len: SIGNED32;
 			name: FileDir.FileName;
 	BEGIN
 		NEW(text); Texts.Open(text, "");
@@ -299,7 +299,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		storeInitText()
 	END StoreInitText;
 
-	PROCEDURE NewArtNr(nr: LONGINT): ArtNrs;
+	PROCEDURE NewArtNr(nr: SIGNED32): ArtNrs;
 		VAR art: ArtNrs;
 	BEGIN
 		NEW(art); art.next := NIL;
@@ -307,7 +307,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		RETURN art
 	END NewArtNr;
 
-	PROCEDURE AddArtNr(group: Group; nr: LONGINT);
+	PROCEDURE AddArtNr(group: Group; nr: SIGNED32);
 		VAR prev, cur, art: ArtNrs;
 	BEGIN
 		prev := NIL; cur := group.readArtNrs;
@@ -363,7 +363,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		RETURN group
 	END GetGroup;
 
-	PROCEDURE ReadArt(group: Group; nr: LONGINT): BOOLEAN;
+	PROCEDURE ReadArt(group: Group; nr: SIGNED32): BOOLEAN;
 		VAR article: ArtNrs;
 	BEGIN
 		article := group.readArtNrs;
@@ -377,7 +377,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END ReadArt;
 
 	PROCEDURE ReadResponse(S: Session);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		NetSystem.ReadString(S.C, S.reply);
 		Strings.StrToInt(S.reply, i);
@@ -426,8 +426,8 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		RETURN S.res = Done
 	END Connect;
 
-	PROCEDURE RegisterNewsAdr(host, group: ARRAY OF CHAR): LONGINT;
-		VAR key: LONGINT;
+	PROCEDURE RegisterNewsAdr(host, group: ARRAY OF CHAR): SIGNED32;
+		VAR key: SIGNED32;
 	BEGIN
 		COPY("news:", line);
 		Strings.Append(line, group);
@@ -441,7 +441,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 
 	PROCEDURE WriteGroup(VAR group: ARRAY OF CHAR);
 		VAR
-			i, key: LONGINT;
+			i, key: SIGNED32;
 			link: Objects.Object;
 	BEGIN
 		Texts.SetColor(W, SHORT(HyperDocs.linkC));
@@ -492,7 +492,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END AllGroups;
 
 (** List all new groups since the last access. *)
-	PROCEDURE NewGroups*(S: Session; date, time: LONGINT; VAR T: Texts.Text);
+	PROCEDURE NewGroups*(S: Session; date, time: SIGNED32; VAR T: Texts.Text);
 	BEGIN
 		line := "NEWGROUPS ";
 		ConcatDate(line, date);
@@ -516,7 +516,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END NewGroups;
 
 	PROCEDURE NewGrp(S: Session; VAR T: Texts.Text);
-		VAR time, date: LONGINT;
+		VAR time, date: SIGNED32;
 	BEGIN
 		Oberon.GetClock(time, date);
 		NewGroups(S, newgDate, newgTime, T);
@@ -546,11 +546,11 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		Texts.WriteLn(Wr)
 	END WriteGrpHead;
 
-	PROCEDURE RegisterNNTPAdr(group: ARRAY OF CHAR; artnr: LONGINT): LONGINT;
+	PROCEDURE RegisterNNTPAdr(group: ARRAY OF CHAR; artnr: SIGNED32): SIGNED32;
 		VAR
 			line: ARRAY NetTools.MaxLine OF CHAR;
 			str: ARRAY 12 OF CHAR;
-			key: LONGINT;
+			key: SIGNED32;
 	BEGIN
 		COPY("nntp:", line);
 		Strings.Append(line, group);
@@ -561,10 +561,10 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		RETURN key
 	END RegisterNNTPAdr;
 
-	PROCEDURE WriteArticle(nr: LONGINT; VAR line: ARRAY OF CHAR);
+	PROCEDURE WriteArticle(nr: SIGNED32; VAR line: ARRAY OF CHAR);
 		VAR
 			link: Objects.Object;
-			i, key: LONGINT;
+			i, key: SIGNED32;
 	BEGIN
 		IF nr >= availBeg THEN
 			IF ~ReadArt(curGrp, nr) THEN
@@ -593,7 +593,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE ListArts(T: Texts.Text);
 		VAR
 			R: Files.Rider;
-			key, org: LONGINT;
+			key, org: SIGNED32;
 	BEGIN
 		Files.Set(R, refs, 0);
 		Files.ReadLInt(R, org);
@@ -607,10 +607,10 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		END
 	END ListArts;
 
-	PROCEDURE enumThread(key, org: LONGINT; VAR cont: BOOLEAN);
+	PROCEDURE enumThread(key, org: SIGNED32; VAR cont: BOOLEAN);
 		VAR
 			R: Files.Rider;
-			sorg, app, i, oldThread: LONGINT;
+			sorg, app, i, oldThread: SIGNED32;
 			inthread: BOOLEAN;
 	BEGIN
 		inthread := FALSE;
@@ -639,7 +639,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE Thread(T: Texts.Text);
 		VAR
 			R: Files.Rider;
-			a, org, sorg, porg: LONGINT;
+			a, org, sorg, porg: SIGNED32;
 			re: SIGNED16;
 	BEGIN
 		NEW(marked, MaxMessages);
@@ -675,10 +675,10 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END Thread;
 
 (** List all available articles in group in a certain range. 0-0 = all *)
-	PROCEDURE ArticleRange(S: Session; group: ARRAY OF CHAR; VAR T: Texts.Text; thread: BOOLEAN; from, to: LONGINT);
+	PROCEDURE ArticleRange(S: Session; group: ARRAY OF CHAR; VAR T: Texts.Text; thread: BOOLEAN; from, to: SIGNED32);
 		VAR
-			nr: LONGINT;
-			org, org2, org3, fixup: LONGINT;
+			nr: SIGNED32;
+			org, org2, org3, fixup: SIGNED32;
 			str: ARRAY 16 OF CHAR;
 			msgid: ARRAY 128 OF CHAR;
 			dummy: ARRAY 256 OF CHAR;
@@ -881,7 +881,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			cont: MIME.Content;
 			out: Streams.Stream;
 			val: ARRAY 256 OF CHAR;
-			pos: LONGINT;
+			pos: SIGNED32;
 			mT: Texts.Text;
 			i: SIGNED16;
 	BEGIN
@@ -907,7 +907,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			END
 		END;
 		Texts.Append(T, W.buf); (*Texts.WriteLn(W);*)
-		cont.len := MAX(LONGINT);
+		cont.len := MAX(SIGNED32);
 		IF cont.typ.typ # "multipart" THEN
 			MIME.ReadText(S.S, W, cont, TRUE)
 		ELSE
@@ -924,7 +924,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END ReadArticle;
 
 (** Retrieve article with number artnr in group. *)
-	PROCEDURE ArticleByNr*(S: Session; group: ARRAY OF CHAR; artnr: LONGINT; VAR T: Texts.Text);
+	PROCEDURE ArticleByNr*(S: Session; group: ARRAY OF CHAR; artnr: SIGNED32; VAR T: Texts.Text);
 		VAR str: ARRAY 12 OF CHAR;
 	BEGIN
 		line := "GROUP ";
@@ -977,7 +977,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE ReadGroupName(VAR name: ARRAY OF CHAR);
 		VAR
 			R: Texts.Reader;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			text: Texts.Text;
 			ch: CHAR;
 	BEGIN
@@ -1057,7 +1057,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 
 	PROCEDURE catchUp(S: Session; group: Group);
 		VAR
-			end: LONGINT;
+			end: SIGNED32;
 			art: ArtNrs;
 			i: SIGNED16;
 	BEGIN
@@ -1129,9 +1129,9 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		Close(S)
 	END CatchUpAll;
 
-	PROCEDURE SplitNewsAdr(VAR url, host, groupart: ARRAY OF CHAR): LONGINT;
+	PROCEDURE SplitNewsAdr(VAR url, host, groupart: ARRAY OF CHAR): SIGNED32;
 		VAR
-			key: LONGINT;
+			key: SIGNED32;
 			i, j, l: SIZE;
 			iskey: BOOLEAN;
 		PROCEDURE Blanks;
@@ -1206,10 +1206,10 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		RETURN key
 	END SplitNewsAdr;
 
-	PROCEDURE SplitNNTPAdr(VAR url, group: ARRAY OF CHAR; VAR artnr: LONGINT): LONGINT;
+	PROCEDURE SplitNNTPAdr(VAR url, group: ARRAY OF CHAR; VAR artnr: SIGNED32): SIGNED32;
 		VAR
 			i, j, l: SIZE;
-			key: LONGINT;
+			key: SIGNED32;
 			iskey: BOOLEAN;
 			str: ARRAY 12 OF CHAR;
 		PROCEDURE Blanks;
@@ -1288,7 +1288,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	END DocHandler;
 
 (* Find the line containing pos. *)
-	PROCEDURE FindBeg(T: Texts.Text; VAR pos: LONGINT);
+	PROCEDURE FindBeg(T: Texts.Text; VAR pos: SIGNED32);
 		VAR
 			R: Texts.Reader;
 			ch: CHAR;
@@ -1310,8 +1310,8 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			host: ARRAY NetTools.ServerStrLen OF CHAR;
 			group, msgid: ARRAY NetTools.PathStrLen OF CHAR;
 			T: Texts.Text;
-			pos, artnr, artnr1: LONGINT;
-			date, time: LONGINT;
+			pos, artnr, artnr1: SIGNED32;
+			date, time: SIGNED32;
 			S: Session;
 			obj, t: Objects.Object;
 			F: Texts.Finder;
@@ -1532,7 +1532,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 	PROCEDURE NNTPSchemeHandler(L: Objects.Object; VAR M: Objects.ObjMsg);
 		VAR
 			group: ARRAY NetTools.PathStrLen OF CHAR;
-			artnr: LONGINT;
+			artnr: SIGNED32;
 	BEGIN
 		WITH L: HyperDocs.LinkScheme DO
 			IF M IS HyperDocs.RegisterLinkMsg THEN
@@ -1572,7 +1572,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 			h: MIME.Header;
 			head: Texts.Text;
 			R: Texts.Reader;
-			end: LONGINT;
+			end: SIGNED32;
 			ch: CHAR;
 	BEGIN
 		NetSystem.WriteString(S.C, "POST");
@@ -1668,7 +1668,7 @@ MODULE News IN Oberon; (** portable *)	(* ejz,  *)
 		VAR
 			T, text: Texts.Text;
 			S: Attributes.Scanner;
-			time, beg, end: LONGINT;
+			time, beg, end: SIGNED32;
 			par, msgid, from: ARRAY 256 OF CHAR;
 			R: Texts.Reader;
 			lib: Objects.Library;

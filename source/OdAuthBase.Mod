@@ -198,9 +198,9 @@ END InitTables;
 (* Should be perhaps done with an AosIO.Reader, Writer. *)
 PROCEDURE EncodeString * (VAR in, out:  ARRAY OF CHAR);
 	VAR
-		i, j, c, c0, c1, c2, l: LONGINT;
+		i, j, c, c0, c1, c2, l: SIGNED32;
 		chars: ARRAY 3 OF CHAR;
-		inPos, outPos: LONGINT; eos: BOOLEAN;
+		inPos, outPos: SIGNED32; eos: BOOLEAN;
 
 	PROCEDURE OutCode;
 	BEGIN

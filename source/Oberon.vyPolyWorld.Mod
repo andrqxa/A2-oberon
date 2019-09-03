@@ -111,15 +111,15 @@ TYPE
 		vx, vy, vz: Real		(* the actual view direction - the vector N of the coordintes*)
 	END;
 
-	ColorMap* = ARRAY 256 OF LONGINT;
+	ColorMap* = ARRAY 256 OF SIGNED32;
 
 VAR
 	theHLHSRroutine: tPlotRoutine;
 	PHIGS3DError: SIGNED16;
 	lightDirX, lightDirY, lightDirZ: Real;      	(* light direction: this vector have to be normed to 1 *)
-	maxFaces: LONGINT;
+	maxFaces: SIGNED32;
 	faceDepths: POINTER TO ARRAY OF LONGREAL;
-	faceIndex: POINTER TO ARRAY OF LONGINT;  (* POINTER ! *)
+	faceIndex: POINTER TO ARRAY OF SIGNED32;  (* POINTER ! *)
 	triangulate: BOOLEAN;
 	lines: BOOLEAN;
 	colorTable*: ColorMap;
@@ -224,10 +224,10 @@ END ReadVertex;
 (** ------------  display surfaces during interactions (rotation) ------------ *)
 PROCEDURE ReplOnTheFly (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 14:55:52 *)
-	VAR map: tMap;      m: vyRealVec.tMatrixChunk;      row, col, r, c, i, j: LONGINT;      dx, dy, x, y, z: Real;
-	t: LONGINT;
+	VAR map: tMap;      m: vyRealVec.tMatrixChunk;      row, col, r, c, i, j: SIGNED32;      dx, dy, x, y, z: Real;
+	t: SIGNED32;
 
-PROCEDURE ReplRow (i: LONGINT);
+PROCEDURE ReplRow (i: SIGNED32);
 	(*vs 0.0d0   md  12.04.95 16:13:45 *)
 BEGIN x := map.x0;
 	y := i * dy / (row - 1) + map.y0;
@@ -240,7 +240,7 @@ BEGIN x := map.x0;
 	END
 END ReplRow;
 
-PROCEDURE ReplCol (j: LONGINT);
+PROCEDURE ReplCol (j: SIGNED32);
 	(*vs 0.0d0   md  12.04.95 16:13:09 *)
 BEGIN x := j * dx / (col - 1) + map.x0;
 	y := map.y0;
@@ -263,7 +263,7 @@ END ReplOnTheFly;
 (** ------------  wireframe plot ------------ *)
 PROCEDURE WireFrameMapH (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 14:55:52 *)
-	VAR map: tMap;      m: vyRealVec.tMatrixChunk;      row, col, i, j: LONGINT;      dx, dy, x, y, z: Real;
+	VAR map: tMap;      m: vyRealVec.tMatrixChunk;      row, col, i, j: SIGNED32;      dx, dy, x, y, z: Real;
 BEGIN ASSERT (o3d IS tMap);      map := o3d(tMap);
 	m := map.mdata.buf;      row := m.row;      col := m.col;      dx := map.x1 - map.x0;      dy := map.y1 - map.y0;
 	FOR i := 0 TO row - 1 DO
@@ -281,7 +281,7 @@ END WireFrameMapH;
 
 PROCEDURE WireFrameMapV (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 14:55:52 *)
-	VAR map: tMap;      m: vyRealVec.tMatrixChunk;      row, col, i, j: LONGINT;      dx, dy, x, y, z: Real;
+	VAR map: tMap;      m: vyRealVec.tMatrixChunk;      row, col, i, j: SIGNED32;      dx, dy, x, y, z: Real;
 BEGIN ASSERT (o3d IS tMap);      map := o3d(tMap);
 	m := map.mdata.buf;      row := m.row;      col := m.col;      dx := map.x1 - map.x0;      dy := map.y1 - map.y0;
 	FOR j := 0 TO col - 1 DO
@@ -349,7 +349,7 @@ END PrefFaceConnection;
 PROCEDURE InstallHalfEdgeDesc (map: tMap;      update: BOOLEAN);
 	(* *)
 	VAR m: vyRealVec.tMatrixChunk;      row, col, i, j: SIGNED16;      dx, dy: Real;
-	face, lastFace: tFace;      lastVertex: tVertex;     faces: LONGINT; n: LONGINT;
+	face, lastFace: tFace;      lastVertex: tVertex;     faces: SIGNED32; n: SIGNED32;
 
 PROCEDURE UpdateSurface;
 	(** vs 0.0d0 *)	(* md  28.08.95 16:29:38 *)
@@ -562,13 +562,13 @@ END BackFaceIdentification;
 
 PROCEDURE SortFaces (m: tMap);
 	(*! optimieren *)
-	VAR face: tFace;     faces: LONGINT;      count, i: LONGINT;
+	VAR face: tFace;     faces: SIGNED32;      count, i: SIGNED32;
 BEGIN
 
 	face := m.firstFace.next;  count := 0;
 	WHILE(face # NIL) DO
 		(* SYSTEM.GET((face), *)
-		faceIndex[count] := SYSTEM.VAL(LONGINT, face);
+		faceIndex[count] := SYSTEM.VAL(SIGNED32, face);
 		faceDepths[count] :=  GetFaceDepth (face);
 		face := face.next;  INC(count)
 	END;
@@ -658,7 +658,7 @@ this: tFace;
 next: faceList;
 END;
 
-VAR prevFace, face, slideFace: tFace; faceDepth: Real; faces: LONGINT;
+VAR prevFace, face, slideFace: tFace; faceDepth: Real; faces: SIGNED32;
 faceList,current: faceList;
 BEGIN
 NEW(faceList);
@@ -821,7 +821,7 @@ END ReplHiddenLine;
 
 PROCEDURE HiddenLineMap (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 15:26:48 *)
-	VAR self: tMap;     sort: BOOLEAN;     t0, t1: LONGINT;
+	VAR self: tMap;     sort: BOOLEAN;     t0, t1: SIGNED32;
 
 BEGIN IF vyPort.onTheFly THEN WireFrameMap (o3d);     RETURN END;
 	self := o3d(tMap);     sort := FALSE;
@@ -886,7 +886,7 @@ END ReplPainter;
 
 PROCEDURE PainterMap (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 15:26:48 *)
-	VAR self: tMap;     sort: BOOLEAN;     t0, t1: LONGINT; lightingMap: tPlotRoutine;
+	VAR self: tMap;     sort: BOOLEAN;     t0, t1: SIGNED32; lightingMap: tPlotRoutine;
 
 BEGIN IF vyPort.onTheFly THEN ReplOnTheFly (o3d);     RETURN END;
 	self := o3d(tMap);     sort := FALSE;
@@ -929,7 +929,7 @@ BEGIN n := Norm (x, y, z);
 END SetLightDirection;
 
 PROCEDURE SetFaceColor (nx, ny, nz: Real);
-	VAR a: Real;     col: LONGINT;     vx, vy, vz: LONGREAL;
+	VAR a: Real;     col: SIGNED32;     vx, vy, vz: LONGREAL;
 BEGIN
 	vx :=  lightDirX;     vy := lightDirY;     vz := lightDirZ;
 	a := (nx * lightDirX + ny * lightDirY + nz * lightDirZ) / (Norm (nx, ny, nz)) + 1;
@@ -986,7 +986,7 @@ END ReplLighting;
 
 PROCEDURE LightingMap (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 15:26:48 *)
-	VAR self: tMap;     sort: BOOLEAN;     t0, t1: LONGINT;
+	VAR self: tMap;     sort: BOOLEAN;     t0, t1: SIGNED32;
 
 BEGIN IF vyPort.onTheFly THEN ReplOnTheFly (o3d);     RETURN END;
 	self := o3d(tMap);     sort := FALSE;
@@ -1080,7 +1080,7 @@ END ReplSmoothLighting;
 
 PROCEDURE SmoothLightingMap (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 15:26:48 *)
-	VAR self: tMap;     sort: BOOLEAN;     t0, t1: LONGINT;
+	VAR self: tMap;     sort: BOOLEAN;     t0, t1: SIGNED32;
 
 BEGIN IF vyPort.onTheFly THEN ReplOnTheFly (o3d);     RETURN END;
 	self := o3d(tMap);     sort := FALSE;
@@ -1109,7 +1109,7 @@ END SmoothLightingMap;
 
 (** ------------  niveau coloring plot ------------ *)
 PROCEDURE SetFaceNiveauColor (face: tFace;     min, max: Real);
-	VAR r: Real;    col: LONGINT;
+	VAR r: Real;    col: SIGNED32;
 BEGIN r := (face.sz - min) / (max - min);
 	col := ENTIER(255 * r + 0.5);
 	(*vyHostTexts.MsgSRSR("r ",r,"col ",col); *)
@@ -1124,7 +1124,7 @@ END SetFaceNiveauColor;
 PROCEDURE ReplNiveauColoring (map: tMap);
 	(*vs 0.0d0   md  10.04.95 12:28:33 *)
 	VAR  face: tFace;     x, y: ARRAY 10 OF Real;     i: SIGNED16;     he: tHalfEdge;
-	m: vyRealVec.tMatrixChunk;     row, col, k, l: LONGINT;     r, min, max: Real;
+	m: vyRealVec.tMatrixChunk;     row, col, k, l: SIGNED32;     r, min, max: Real;
 BEGIN ResetDoneMarker (map);
 	face := map.lastFace;
 	m := map.mdata.buf;     row := m.row;     col := m.col;
@@ -1161,7 +1161,7 @@ END ReplNiveauColoring;
 
 PROCEDURE NiveauColoringMap (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 15:26:48 *)
-	VAR self: tMap;     sort: BOOLEAN;     t0, t1: LONGINT;
+	VAR self: tMap;     sort: BOOLEAN;     t0, t1: SIGNED32;
 
 BEGIN IF vyPort.onTheFly THEN ReplOnTheFly (o3d);     RETURN END;
 	self := o3d(tMap);     sort := FALSE;
@@ -1218,7 +1218,7 @@ END ReplBackFaceColoring;
 
 PROCEDURE BackFaceColoringMap (o3d: tObject);
 	(*vs 0.0d0   md  12.12.94 15:26:48 *)
-	VAR self: tMap;     t0, t1: LONGINT;
+	VAR self: tMap;     t0, t1: SIGNED32;
 
 BEGIN IF vyPort.onTheFly THEN WireFrameMap (o3d);     RETURN END;
 	self := o3d(tMap);
@@ -1316,7 +1316,7 @@ BEGIN
 END InitColorMap;
 
 
-PROCEDURE SetColorMap* (colors: ARRAY OF LONGINT);
+PROCEDURE SetColorMap* (colors: ARRAY OF SIGNED32);
 	VAR i: SIGNED16;
 BEGIN
 	ASSERT(LEN(colors) >= LEN(colorTable));

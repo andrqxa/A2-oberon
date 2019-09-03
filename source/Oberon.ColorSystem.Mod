@@ -83,7 +83,7 @@ END NewObj;
     VAR obj: Objects.Object; M: Objects.AttrMsg;
       T: Texts.Text; S: Texts.Scanner;
       f: Files.File; R: Files.Rider;
-      beg, end, time: LONGINT;
+      beg, end, time: SIGNED32;
       col: SIGNED16; red, green, blue: CHAR;
   BEGIN
     M.id := Objects.get; M.name := "Value";
@@ -109,7 +109,7 @@ END NewObj;
     VAR obj: Objects.Object; M: Objects.AttrMsg;
       T: Texts.Text; S: Texts.Scanner;
       f: Files.File; R: Files.Rider;
-      beg, end, time: LONGINT;
+      beg, end, time: SIGNED32;
       col: SIGNED16; red, green, blue: SIGNED16;
   BEGIN
     M.id := Objects.get; M.name := "Value";

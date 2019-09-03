@@ -18,7 +18,7 @@ TYPE
 	ShapeSym = POINTER TO ShapeSymDesc;
 	ShapeSymDesc = RECORD
 		name: ARRAY 32 OF CHAR;
-		startpos: LONGINT;
+		startpos: SIGNED32;
 		next: ShapeSym;
 	END;
 
@@ -39,14 +39,14 @@ VAR
 	src: Texts.Text;
 	sym: SIGNED16;
 	W: Texts.Writer;
-	lastErrPos: LONGINT;
+	lastErrPos: SIGNED32;
 	shapes: ShapeSym;
 	cur: Attributes;
 
 
 (* print error message *)
 PROCEDURE Error (msg: ARRAY OF CHAR);
-VAR pos: LONGINT;
+VAR pos: SIGNED32;
 BEGIN
 	pos := Texts.Pos(S);
 	IF pos - lastErrPos > 6 THEN
@@ -536,7 +536,7 @@ BEGIN
 END ShapeDef;
 
 PROCEDURE Add (shape: Dim3Engine.Shape);
-VAR s: ShapeSym; pos: LONGINT;
+VAR s: ShapeSym; pos: SIGNED32;
 BEGIN
 	pos := Texts.Pos(S);	(* remember where to continue *)
 	Get;

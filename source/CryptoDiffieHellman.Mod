@@ -52,7 +52,7 @@ TYPE
 	PROCEDURE GetDHPrime( CONST name: ARRAY OF CHAR;  VAR p, g: B.BigNumber );
 	VAR
 		buf: ARRAY 1048 OF CHAR;
-		pos: LONGINT;
+		pos: SIGNED32;
 
 		PROCEDURE Append( CONST val: ARRAY OF CHAR );
 		VAR i: SIZE;  c: CHAR;

@@ -92,11 +92,11 @@ TYPE
 VAR
 	errors*: SIGNED16;	(*number of errors detected*)
 	lasterror* : SIGNED16;
-	charcount : LONGINT;
-	getCalls : LONGINT;
+	charcount : SIGNED32;
+	getCalls : SIGNED32;
 	start: StartTable;	(*start state for every character*)
 	Pattern, Ack : ARRAY 6 OF CHAR;
-	active : LONGINT;
+	active : SIGNED32;
 
 CONST
 	maxP				= 13;
@@ -150,7 +150,7 @@ TYPE
 			finished : BOOLEAN;
 			sym: SIGNED16;	 (* current input symbol *)
 			state : SIGNED16;
-			badTokens : LONGINT;
+			badTokens : SIGNED32;
 			auxString : String;
 
 	(* Support procedures *)
@@ -301,7 +301,7 @@ TYPE
 	END AddExt;
 
 	PROCEDURE PutBareName ( name : String; VAR wr : Files.Writer );
-		VAR ix : LONGINT; ch : CHAR;
+		VAR ix : SIGNED32; ch : CHAR;
 	BEGIN
 		ix := 0;
 		WHILE (ix<LEN(name)) & (name[ix]#0X)
@@ -433,7 +433,7 @@ TYPE
 	VAR
 		msg: Files.File;
 		msgWr : Files.Writer;
-		ix, testIx : LONGINT;
+		ix, testIx : SIGNED32;
 		receiveTime, remoteIP : String;
 
 		PROCEDURE WriteIPNr( ip : IP.Adr );
@@ -850,7 +850,7 @@ TYPE
 	END Who;
 
 	PROCEDURE BackStagePass (pass : String) : BOOLEAN;
-		VAR ipStr : String; ix: LONGINT;
+		VAR ipStr : String; ix: SIGNED32;
 	BEGIN
 		IP.AdrToStr (SELF.client.fip, ipStr);
 		ix := 0;

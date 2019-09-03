@@ -11,13 +11,13 @@ MODULE BinHex IN Oberon;	(** portable *) (* ejz,  *)
 		decTable: ARRAY 128 OF SIGNED16;
 		W: Texts.Writer;
 
-	PROCEDURE DecodeText*(T: Texts.Text; beg: LONGINT; F: Files.File): BOOLEAN;
+	PROCEDURE DecodeText*(T: Texts.Text; beg: SIGNED32; F: Files.File): BOOLEAN;
 		VAR
 			Rt: Texts.Reader;
 			Rf, R: Files.Rider;
 			S: Texts.Scanner;
 			codes: ARRAY 4 OF SIGNED16;
-			dlen: LONGINT;
+			dlen: SIGNED32;
 			i: SIGNED16;
 			ok, end: BOOLEAN;
 			ch, last: CHAR;
@@ -116,7 +116,7 @@ MODULE BinHex IN Oberon;	(** portable *) (* ejz,  *)
 			S: Texts.Scanner;
 			F: Files.File;
 			T: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 		Texts.Scan(S);

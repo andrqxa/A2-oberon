@@ -27,7 +27,7 @@ CONST
 TYPE
 	Bar = RECORD
 		bg, box: SIGNED16;
-		range, size, pos: LONGINT;
+		range, size, pos: SIGNED32;
 	END;
 
 	Item* = POINTER TO ItemDesc;
@@ -42,7 +42,7 @@ TYPE
 		items*, last*: Item;	(** First and last element of list of items. *)
 		beg*: Item;	(** First item displayed in list. *)
 		pointed*: Item;	(** Item pointed at last with the middle mouse button. *)
-		time*: LONGINT;	(** Selection time. *)
+		time*: SIGNED32;	(** Selection time. *)
 		focus*: BOOLEAN;	(** Is the list focused ? *)
 		sorted*: BOOLEAN;	(** Are list entries sorted ? *)
 		noitems*: SIGNED16;	(** Number of entries in the list. *)
@@ -53,7 +53,7 @@ TYPE
 
 VAR
 	W: Texts.Writer;
-	mayscroll, waittime: LONGINT;
+	mayscroll, waittime: SIGNED32;
 	pat, ss: ARRAY 256 OF CHAR;
 	pos: SIGNED16;
 
@@ -82,7 +82,7 @@ BEGIN
 END Knob;
 
 PROCEDURE DrawSlider(M: Display3.Mask; VAR bar: Bar; x, y, w, h: SIGNED16);
-VAR barlen, min, max, pos: LONGINT; i: SIGNED16;
+VAR barlen, min, max, pos: SIGNED32; i: SIGNED16;
 BEGIN
 	(* border *)
 	Oberon.RemoveMarks(x, y, w, h);
@@ -149,7 +149,7 @@ BEGIN
 END DrawSlider;
 
 PROCEDURE TrackSlider(M: Display3.Mask; VAR bar: Bar; x, y, w, h: SIGNED16);
-VAR keys: SET; X, Y: SIGNED16; barlen, min, max, pos, npos, oldpos: LONGINT; keysum: SET;
+VAR keys: SET; X, Y: SIGNED16; barlen, min, max, pos, npos, oldpos: SIGNED32; keysum: SET;
 
 	PROCEDURE Pushed(x, y, w, h: SIGNED16): BOOLEAN;
 	VAR on, newstate: BOOLEAN;
@@ -270,7 +270,7 @@ END TrackSlider;
 (* --------------------- CHOOSER ------------------- *)
 
 PROCEDURE Updatebar(F: List; H: SIGNED16);
-VAR space: LONGINT;
+VAR space: SIGNED32;
 BEGIN
 	space := H DIV (Fonts.Default.height + 2);
 	IF F.noitems <= space THEN
@@ -335,7 +335,7 @@ BEGIN
 END InsertItem;
 
 (** Inserts the stretch [beg, end) of text T into the list as entries. *)
-PROCEDURE InsertItems*(F: List; T: Texts.Text; beg, end: LONGINT);
+PROCEDURE InsertItems*(F: List; T: Texts.Text; beg, end: SIGNED32);
 VAR S: Attributes.Scanner;
 BEGIN
 	Attributes.OpenScanner(S, T, beg);
@@ -495,7 +495,7 @@ VAR R: Display3.Mask; x, y, w, h, cx, cy, cw, ch, Y, barW: SIGNED16; item: Item;
 	END P;
 
 	PROCEDURE PrintSlider(M: Display3.Mask; VAR bar: Bar; x, y, w, h: SIGNED16);
-	VAR barlen, min, max, pos: LONGINT; i: SIGNED16;
+	VAR barlen, min, max, pos: SIGNED32; i: SIGNED16;
 
 		PROCEDURE Dot(R: Display3.Mask; x, y: SIGNED16);
 		VAR c: SIGNED16;
@@ -768,8 +768,8 @@ BEGIN
 END GetSelection;
 
 PROCEDURE TrackList(F: List; R: Display3.Mask; x, y, w, h: SIGNED16; VAR M: Oberon.InputMsg);
-VAR item, i: Item; Y, nY: SIGNED16; keysum: SET; pos: LONGINT; redraw, scroll, scrolled: BOOLEAN; C: Oberon.ConsumeMsg;
-	T: Texts.Text; beg, end, time: LONGINT;
+VAR item, i: Item; Y, nY: SIGNED16; keysum: SET; pos: SIGNED32; redraw, scroll, scrolled: BOOLEAN; C: Oberon.ConsumeMsg;
+	T: Texts.Text; beg, end, time: SIGNED32;
 BEGIN
 	keysum := M.keys;
 	IF ((M.keys = {1}) OR (Oberon.New & (keysum = {2}))) & F.scrollbar & (M.X > x + w - barw) THEN
@@ -872,7 +872,7 @@ BEGIN
 END TrackList;
 
 PROCEDURE Search(F: List; ch: CHAR);
-VAR i: Item; j: SIGNED16; pos: LONGINT;
+VAR i: Item; j: SIGNED16; pos: SIGNED32;
 BEGIN
 	IF ch = 0X THEN
 		ss[0] := 0X;
@@ -891,7 +891,7 @@ END Search;
 
 PROCEDURE ListHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
 VAR x, y, w, h: SIGNED16; F0: List; R: Display3.Mask; redraw: BOOLEAN; T: Texts.Text;
-	ver, noitems: LONGINT; l, new: Item;
+	ver, noitems: SIGNED32; l, new: Item;
 BEGIN
 	WITH F: List DO
 		IF M IS Display.FrameMsg THEN
@@ -1051,7 +1051,7 @@ END NewList;
 (* --- tools for lists --- *)
 
 (* Native-Oberon version *)
-PROCEDURE ListFiles(name: ARRAY OF CHAR; time, date, size: LONGINT; VAR cont: BOOLEAN);
+PROCEDURE ListFiles(name: ARRAY OF CHAR; time, date, size: SIGNED32; VAR cont: BOOLEAN);
 VAR i0, i1, j0, j1: SIGNED16; f: BOOLEAN;
 BEGIN i0 := pos; j0 := pos; f := TRUE;
 	LOOP
@@ -1155,7 +1155,7 @@ BEGIN pos := 0;
 	RETURN f
 END Match;
 
-PROCEDURE EntryHandler(name: ARRAY OF CHAR; date, time, size: LONGINT);
+PROCEDURE EntryHandler(name: ARRAY OF CHAR; date, time, size: SIGNED32);
 BEGIN
 	IF (name[0] > " ") & (name[0] < CHR(127)) & Match(name,pat) THEN Texts.WriteString(W,name); Texts.WriteLn(W) END
 END EntryHandler;
@@ -1272,7 +1272,7 @@ END Lists.
 
 1. Here is some code that illustrates how to insert items into a list. Note that you have to update F.beg to the start of the items you want to show. F.bar.pos says where the scroll bar must be positioned.
 
-	PROCEDURE InsertItems(F: List; T: Texts.Text; beg, end: LONGINT);
+	PROCEDURE InsertItems(F: List; T: Texts.Text; beg, end: SIGNED32);
 	VAR S: Attributes.Scanner;
 	BEGIN
 		Attributes.OpenScanner(S, T, beg);

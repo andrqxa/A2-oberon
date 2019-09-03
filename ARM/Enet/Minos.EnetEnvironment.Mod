@@ -27,14 +27,14 @@ VAR
 	GetTimeCounter-: PROCEDURE(): Time;
 	InvalidateDCacheRange-: PROCEDURE(addr: ADDRESS; length: SIZE);
 	FlushDCacheRange-: PROCEDURE(addr: ADDRESS; length: SIZE);
-	handlers: ARRAY MaxHandlers OF RECORD handle: PROCEDURE; irq: LONGINT END;
+	handlers: ARRAY MaxHandlers OF RECORD handle: PROCEDURE; irq: SIGNED32 END;
 
 	(**
 		Install an interrupt handler
 	*)
-	PROCEDURE InstallInterruptHandler*(interruptHandler: InterruptHandler; interruptNumber: LONGINT);
+	PROCEDURE InstallInterruptHandler*(interruptHandler: InterruptHandler; interruptNumber: SIGNED32);
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE (i < MaxHandlers) & (handlers[i].handle # NIL) DO INC(i) END;
@@ -88,9 +88,9 @@ VAR
 	END ToMilli;
 
 	(** Delegating interrupt handler *)
-	PROCEDURE HandleInterrupt * (irq: LONGINT);
+	PROCEDURE HandleInterrupt * (irq: SIGNED32);
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 		handle: PROCEDURE;
 	BEGIN
 		FOR i := 0 TO MaxHandlers - 1 DO

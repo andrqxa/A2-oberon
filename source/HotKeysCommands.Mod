@@ -103,7 +103,7 @@ VAR
 (** Generate mouse message *)
 PROCEDURE SimulateMouse*(context : Commands.Context); (** MouseX|MouseY|MouseButtons|MouseWheel value ~ *)
 VAR
-	string : ARRAY 32 OF CHAR; value : LONGINT;
+	string : ARRAY 32 OF CHAR; value : SIGNED32;
 	msg : Inputs.MouseMsg;
 	doHandle : BOOLEAN;
 BEGIN

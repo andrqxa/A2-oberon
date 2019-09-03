@@ -113,7 +113,7 @@ END SendPoll;
 
 (** Available - Returns number of bytes available for reading (implementation optional). *)
 
-PROCEDURE Available*(port: SIGNED16): LONGINT;
+PROCEDURE Available*(port: SIGNED16): SIGNED32;
 BEGIN
 	Halt("Not implemented");
 	RETURN 0

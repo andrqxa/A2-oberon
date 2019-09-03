@@ -47,7 +47,7 @@ M Matrix
 B BOOLEAN
 S SIGNED8
 I SIGNED16
-L LONGINT
+L SIGNED32
 R REAL
 X LONGREAL
 *)
@@ -91,8 +91,8 @@ TYPE
 	Is it possible to add a slot for data of generic base type ? For now, the base type has to be identified before accessing information like LEN etc. As a kludge, we keep a private copy of the len 	information. *)
 	(*	tChunk= POINTER TO tChunkDesc;
 	tChunkDesc = RECORD (tBufDesc)
-	len:LONGINT; (* Nr of entries allocated to a chunk. aka  LEN.  *)
-	usedentries:LONGINT; (* Nr of used entries in a chunk. >=0  *)
+	len:SIGNED32; (* Nr of entries allocated to a chunk. aka  LEN.  *)
+	usedentries:SIGNED32; (* Nr of used entries in a chunk. >=0  *)
 	next:tChunk
 	END;
 	*)
@@ -129,10 +129,10 @@ TYPE
 		END
 	END NumForm;
 
-	PROCEDURE NrNaNs*( data: vyBase.tData ): LONGINT;
+	PROCEDURE NrNaNs*( data: vyBase.tData ): SIGNED32;
 	(*= structure form from SInt=4 to LReal=8 if  data can be read as a numeric vector; undef=0 else *)
 	BEGIN
-		IF NumForm( data ) = 0 THEN RETURN MAX( LONGINT ) END;
+		IF NumForm( data ) = 0 THEN RETURN MAX( SIGNED32 ) END;
 		(*! not yet implemented*)
 	END NrNaNs;
 
@@ -211,7 +211,7 @@ END CollectReal;
 	(** Read/set from/to vector *)
 (*= Use cenversion if a save and reliable implementation is possible *)
 
-	PROCEDURE VGetR*( v: vyBase.tVector;  pos: LONGINT ): REAL;
+	PROCEDURE VGetR*( v: vyBase.tVector;  pos: SIGNED32 ): REAL;
 	BEGIN
 		ASSERT ( v # NIL , 100 );
 		IF v IS vyIntVec.tVector THEN
@@ -369,7 +369,7 @@ END CollectReal;
 	(*! set to nil if buffer cannot be allocated *)
 
 	(* Procedure not used
-PROCEDURE GrowIntegerVector (v:vyIntVec.tVector;size:LONGINT);
+PROCEDURE GrowIntegerVector (v:vyIntVec.tVector;size:SIGNED32);
 BEGIN	 vyBase.ApndChunks(NEWINTEGER(size),v);
 END GrowIntegerVector;
 *)
@@ -399,7 +399,7 @@ END GrowIntegerVector;
 
 	(** 2d support *)
 	(*
-PROCEDURE GetIndex* (m: tMatrix; r, c: LONGINT): LONGINT;
+PROCEDURE GetIndex* (m: tMatrix; r, c: SIGNED32): SIGNED32;
 BEGIN RETURN r*(m.LEN1) + c
 END GetIndex;
 (*! untested routines for new interface *)
@@ -408,8 +408,8 @@ END GetIndex;
 *)
 (** Minimum and maximum *)
 
-	PROCEDURE VGetMinMax*( v: vyBase.tVector;  VAR min, max: LONGREAL;  VAR nrNaNs: LONGINT );
-	VAR imin, imax: SIGNED16;  lmin, lmax: LONGINT;
+	PROCEDURE VGetMinMax*( v: vyBase.tVector;  VAR min, max: LONGREAL;  VAR nrNaNs: SIGNED32 );
+	VAR imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
 	BEGIN
 		IF v = NIL THEN min := MIN( LONGREAL );  max := MAX( LONGREAL );  nrNaNs := 0;  RETURN END;
 		(*! check and propagate to other types *)
@@ -428,9 +428,9 @@ END GetIndex;
 		END
 	END VGetMinMax;
 
-	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: REAL;  VAR nrNaNs: LONGINT );
+	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: REAL;  VAR nrNaNs: SIGNED32 );
 	(*! check. if ok: move this model to other variants *)
-	VAR xmin, xmax: LONGREAL;  imin, imax: SIGNED16;  lmin, lmax: LONGINT;
+	VAR xmin, xmax: LONGREAL;  imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
 	BEGIN
 		xmin := MAX( LONGREAL );  xmax := MIN( LONGREAL );  nrNaNs := 0;
 		ASSERT ( v # NIL , 100 );
@@ -451,8 +451,8 @@ END GetIndex;
 		rmin := SHORT( xmin );  rmax := SHORT( xmax )
 	END VGetMinMaxR;
 
-	PROCEDURE VGetMinMaxX*( v: vyBase.tVector;  VAR min, max: LONGREAL;  VAR nrNaNs: LONGINT );
-	VAR imin, imax: SIGNED16;  lmin, lmax: LONGINT;  rmin, rmax: LONGREAL;
+	PROCEDURE VGetMinMaxX*( v: vyBase.tVector;  VAR min, max: LONGREAL;  VAR nrNaNs: SIGNED32 );
+	VAR imin, imax: SIGNED16;  lmin, lmax: SIGNED32;  rmin, rmax: LONGREAL;
 	BEGIN
 		min := MAX( LONGREAL );  max := MIN( LONGREAL );  nrNaNs := 0;
 		IF v IS vyLongrealVec.tVector THEN
@@ -472,7 +472,7 @@ END GetIndex;
 
 (** Dyadic operators *)
 	PROCEDURE Sub*( x, y: vyBase.tVector;  diff: vyBase.tVector );
-	VAR i: LONGINT;  chx: vyBase.tBuf;
+	VAR i: SIGNED32;  chx: vyBase.tBuf;
 	BEGIN
 		IF (x.nrData) # (y.nrData) THEN diff.status := diff.status + {cBadLen} ELSE
 			IF diff = NIL THEN NEW( diff ) END;
@@ -502,7 +502,7 @@ END GetIndex;
 	(*! vectors may grow on the fly *)
 	(*! additional vector information needs update *)
 	(*PROCEDURE MCopyR* (v:tMatrix; VAR A:ARRAY OF ARRAY OF REAL);
-VAR i,j:LONGINT;
+VAR i,j:SIGNED32;
 BEGIN 	FOR i:=0 TO LEN(A,0) DO
 FOR j:=0 TO LEN(A,1) DO
 A[i,j]:=VGetR(v,GetIndex(v,i,j)); (*! use SYSTEM.COPYR to speed up *)
@@ -511,7 +511,7 @@ END;
 END MCopyR;
 
 PROCEDURE RCopyM* (VAR A:ARRAY OF ARRAY OF REAL;v:tMatrix);
-VAR i,j:LONGINT;
+VAR i,j:SIGNED32;
 BEGIN
 FOR i:=0 TO LEN(A,0) DO
 FOR j:=0 TO LEN(A,1) DO
@@ -611,7 +611,7 @@ END VectorType;
 	END Compatible;
 
 	PROCEDURE Summary*( VAR w: vyBase.TextsWriter;  v: vyBase.tData );
-	VAR i: LONGINT;  min, max: LONGREAL;  nrNaNs: LONGINT;
+	VAR i: SIGNED32;  min, max: LONGREAL;  nrNaNs: SIGNED32;
 	BEGIN
 		IF v IS vyBase.tVector THEN
 			IF v IS vyBase.tVector THEN
@@ -689,7 +689,7 @@ END VectorType;
 (** Conversion *)
 	PROCEDURE Short*( from: vyBase.tData ): vyBase.tData;
 	(*! speedup: use chunk structure *)
-	VAR fromv, v: vyBase.tVector;  i: LONGINT;  len: LONGINT;
+	VAR fromv, v: vyBase.tVector;  i: SIGNED32;  len: SIGNED32;
 	BEGIN
 		ASSERT ( from # NIL , 100 );
 		ASSERT ( (from IS vyBase.tVector), 101 );
@@ -710,7 +710,7 @@ END VectorType;
 	PROCEDURE Entier*( from: vyBase.tData;  offs, factor: LONGREAL ): vyBase.tData;
 	(*= offs and factor are included to allow some scaling *)
 	(*! speedup: use chunk structure *)
-	VAR fromv, v: vyBase.tVector;  i: LONGINT;  len: LONGINT;
+	VAR fromv, v: vyBase.tVector;  i: SIGNED32;  len: SIGNED32;
 	BEGIN
 		ASSERT ( from # NIL , 100 );
 		ASSERT ( (from IS vyBase.tVector), 101 );
@@ -730,7 +730,7 @@ END VectorType;
 
 	PROCEDURE CvtReal*( src: vyBase.tData ): vyBase.tData;
 	(*= Convert any src to REAL, if safe and reliable *)
-	VAR temp: vyBase.tData;  i: LONGINT;  len: LONGINT;  from, v: vyBase.tVector;
+	VAR temp: vyBase.tData;  i: SIGNED32;  len: SIGNED32;  from, v: vyBase.tVector;
 	BEGIN
 		ASSERT ( (src # NIL ), 100 );
 		ASSERT ( (src IS vyBase.tVector), 101 );

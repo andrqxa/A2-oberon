@@ -58,14 +58,14 @@ TYPE
 		seloutline: Element;			(* Darstellung des selektierten *)
 		selcolor: SIGNED16;		(* Selektionsfarbe *)
 		selcol: SIGNED16;				(* Farbe der Fläche *)
-		seltime: LONGINT;
+		seltime: SIGNED32;
 		selpict: Pictures.Picture;
 		car* : BOOLEAN;
 		cx*, cy*: SIGNED16;
 		string: RECORD len, x, y: SIGNED16 END;
 		zoom: SIGNED16;				(* Zoomweite: 1=normal *)
 		grid: BOOLEAN;				(* Rasterlinien *)
-		time: LONGINT;
+		time: SIGNED32;
 		col*: SIGNED16; 	(* für Version 1.6 *)
 	END;
 
@@ -237,8 +237,8 @@ BEGIN
 	F.time:= Oberon.Time();
 END SetSelection;
 
-PROCEDURE GetSelection(VAR F: Frame; VAR P: Pictures.Picture; VAR time: LONGINT; VAR x, y, w, h: SIGNED16);
-VAR M: SelectMsg; M2: Display.SelectMsg; time2: LONGINT;
+PROCEDURE GetSelection(VAR F: Frame; VAR P: Pictures.Picture; VAR time: SIGNED32; VAR x, y, w, h: SIGNED16);
+VAR M: SelectMsg; M2: Display.SelectMsg; time2: SIGNED32;
 BEGIN
 	M.id := Display.get; M.time := -1; M.pict := NIL; M.F := NIL; M.obj := NIL;
 	Display.Broadcast(M);
@@ -298,7 +298,7 @@ END CopyPalette;
 (** Gibt die letzte Selektion in Form eines Pictures zurück *)
 PROCEDURE GetSelectedPict*(VAR P: Pictures.Picture; VAR x, y, w, h: SIGNED16);
 VAR F: Frame;
-		time: LONGINT;
+		time: SIGNED32;
 		act: Element;
 BEGIN
 	GetSelection(F, P, time, x, y, w, h);
@@ -1221,7 +1221,7 @@ BEGIN
 	M.res:= 0
 END Write;
 
-PROCEDURE CopyText(F: Frame; text: Texts.Text; beg, end: LONGINT; x, y: SIGNED16);
+PROCEDURE CopyText(F: Frame; text: Texts.Text; beg, end: SIGNED32; x, y: SIGNED16);
 (* Kopiert einen selektierten Text an die Caretposition im Picture *)
 VAR R: Texts.Reader; ch: CHAR; px, py: SIGNED16;
 BEGIN
@@ -1251,7 +1251,7 @@ END CopyOver;
 PROCEDURE SizeRect*(F: Frame; x, y: SIGNED16; Q: D3.Mask; VAR keysum: SET; VAR mx, my, sx, sy, sw, sh: SIGNED16; info: BOOLEAN);
 VAR keys: SET; ox, oy, opx, opy, dz, oldsw, oldsh, cmx, cmy: SIGNED16; disptext: ARRAY 22 OF CHAR;
 
-	PROCEDURE ConvertNumberstoText(x, y: LONGINT; VAR text: ARRAY OF CHAR);
+	PROCEDURE ConvertNumberstoText(x, y: SIGNED32; VAR text: ARRAY OF CHAR);
 	BEGIN
 		text[0]:= "X"; text[1]:= ":"; text[2]:= " ";
 		IF x>999 THEN text[3]:= CHR(x DIV 1000+48) ELSE text[3]:= " " END;
@@ -1796,8 +1796,8 @@ BEGIN
 END HandleStamp;
 
 PROCEDURE TrackCaret(F: Frame; VAR M: Oberon.InputMsg; x, y: SIGNED16);
-VAR f: Frame; p: Pictures.Picture; sx, sy, sw, sh, dx, dy: SIGNED16; time, time2: LONGINT;
-		text: Texts.Text; beg, end: LONGINT; keys: SET;Q: D3.Mask; mx, my: SIGNED16;
+VAR f: Frame; p: Pictures.Picture; sx, sy, sw, sh, dx, dy: SIGNED16; time, time2: SIGNED32;
+		text: Texts.Text; beg, end: SIGNED32; keys: SET;Q: D3.Mask; mx, my: SIGNED16;
 BEGIN
 	Gadgets.MakeMask(F, x, y, M.dlink, Q);
 	keys := M.keys;
@@ -2006,7 +2006,7 @@ BEGIN
 END ClipboardDraw;
 
 PROCEDURE CutCopy(clear: BOOLEAN);
-VAR P, D: Pictures.Picture; F: Frame; px, py, pw, ph: SIGNED16; time: LONGINT; act: Element;
+VAR P, D: Pictures.Picture; F: Frame; px, py, pw, ph: SIGNED16; time: SIGNED32; act: Element;
 BEGIN
 	P:= NIL; F:= NIL;
 	GetSelection(F, P, time, px, py, pw, ph);
@@ -2116,7 +2116,7 @@ END FreehandSelect;
 (** Generiert Pattern-Code aus der letzten Block-Selektion; sollte nicht grösser als 32*32 sein *)
 PROCEDURE MakePattern*;
 VAR F: Frame; P: Pictures.Picture; sx, sy, sw, sh, x0, x1, y: SIGNED16;
-		time: LONGINT; first: BOOLEAN;
+		time: SIGNED32; first: BOOLEAN;
 BEGIN
 	GetSelection(F, P, time, sx, sy, sw, sh);
 	IF time # -1 THEN
@@ -2124,7 +2124,7 @@ BEGIN
 		ELSE
 			y:=0;
 			Out.String("VAR pattern: ARRAY "); Out.Int(P.height, 2); Out.String(" OF SET;"); Out.Ln;
-			Out.String("       pat: LONGINT;");Out.Ln;
+			Out.String("       pat: SIGNED32;");Out.Ln;
 			WHILE y<P.height DO
 				x0:=0; Out.String("pattern["); Out.Int(y, 2); Out.String("]:={"); first:= TRUE;
 				WHILE x0<P.width DO

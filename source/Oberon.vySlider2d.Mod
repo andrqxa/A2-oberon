@@ -50,7 +50,7 @@ TYPE
 
 	tLayerDesc = RECORD (vyCharts.tLayerDesc)
 		locked: BOOLEAN;
-		pos: LONGINT;
+		pos: SIGNED32;
 		slider: tCtlSlider
 	END;
 
@@ -84,8 +84,8 @@ VAR
 		END
 	END Line;
 
-	PROCEDURE MoveBallTo( slider2d: tLayer;  pos: LONGINT );
-	VAR x, y: SIGNED16;  lastPos: LONGINT;
+	PROCEDURE MoveBallTo( slider2d: tLayer;  pos: SIGNED32 );
+	VAR x, y: SIGNED16;  lastPos: SIGNED32;
 	BEGIN
 		vyHostDisplay.SetPatternJustification( vyHostDisplay.center, vyHostDisplay.center );  lastPos := slider2d.pos;
 		vyGraphBase.Point2dToPoint( vyTypes.VGetR( slider2d.x, lastPos ), vyTypes.VGetR( slider2d.y, lastPos ), x, y );
@@ -95,10 +95,10 @@ VAR
 	END MoveBallTo;
 
 	PROCEDURE Recall( slider2d: tLayer;  VAR msg: Display.DisplayMsg );
-	VAR xOld, yOld, x, y, w, h: SIGNED16;  i: LONGINT;
+	VAR xOld, yOld, x, y, w, h: SIGNED16;  i: SIGNED32;
 
 		PROCEDURE RecallBall( slider2d: tLayer );
-		VAR X, Y: SIGNED16;  p: LONGINT;
+		VAR X, Y: SIGNED16;  p: SIGNED32;
 		BEGIN
 			vyHostDisplay.SetDisplayMode( vyHostDisplay.invert );  p := slider2d.pos;
 			vyGraphBase.Point2dToPoint( vyTypes.VGetR( slider2d.x, p ), vyTypes.VGetR( slider2d.y, p ), X, Y );
@@ -179,7 +179,7 @@ VAR
 
 	PROCEDURE Handler*( o: Objects.Object;  VAR msg: Objects.ObjMsg );
 	(*s 0.0a1	md  20.07.94 *)
-	VAR slider, copy: tLayer;  done: BOOLEAN;  i: LONGINT;
+	VAR slider, copy: tLayer;  done: BOOLEAN;  i: SIGNED32;
 	BEGIN
 		slider := o( tLayer );  done := FALSE;
 

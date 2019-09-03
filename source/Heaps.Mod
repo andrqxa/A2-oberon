@@ -17,7 +17,7 @@ CONST
 									paranoid = false expects correct metadata and correct settings of untraced variables
 									moreover, it should improve GC mark speed *)
 
-	DebugValue = LONGINT(0DEADDEADH);	(* set non-0 to clear free storage to this value *)
+	DebugValue = SIGNED32(0DEADDEADH);	(* set non-0 to clear free storage to this value *)
 
 	Stats* = TRUE;					(* maintain statistical counters *)
 
@@ -108,11 +108,11 @@ TYPE
 	ProtRecBlock* = POINTER TO ProtRecBlockDesc;
 	ProtRecBlockU = POINTER {UNSAFE,UNTRACED} TO ProtRecBlockDesc;
 	ProtRecBlockDesc* = RECORD  (RecordBlockDesc)
-		count*: LONGINT;
+		count*: SIGNED32;
 		locked*: BOOLEAN;
 		awaitingLock*, awaitingCond*: ProcessQueue;
 		lockedBy*: ANY;
-		waitingPriorities*: ARRAY NumPriorities OF LONGINT;
+		waitingPriorities*: ARRAY NumPriorities OF SIGNED32;
 		lock*: ANY; (* generic implementation slot -- used by LinuxAos *)
 	END;
 

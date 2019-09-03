@@ -231,7 +231,7 @@ TYPE
 			gradient: Gradient;
 			img: Raster.Image;
 			mode: Raster.Mode;
-			x, y, minx, miny, maxx, maxy, imgWidth, imgHeight: LONGINT;
+			x, y, minx, miny, maxx, maxy, imgWidth, imgHeight: SIGNED32;
 			p, patternStart: SVG.Coordinate;
 			transform: SVG.Transform;
 		BEGIN

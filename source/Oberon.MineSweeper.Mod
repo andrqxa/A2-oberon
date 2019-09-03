@@ -71,7 +71,7 @@ TYPE
 		area* : ARRAY MaxFieldW,MaxFieldH OF Area;	(* the play field in its maximum size *)
 		W, H : SIGNED16;													(* actual number of boxes (actual size of mine field) *)
 		mines : SIGNED16;													(* total number of mines *)
-		time : LONGINT;													(* time since first action on the field *)
+		time : SIGNED32;													(* time since first action on the field *)
 		NrToGo : SIGNED16;												(* number of flags to be set *)
 		NrFound : SIGNED16;												(* number of mines marked by a flag (found) *)
 		NrCovered : SIGNED16;											(* number of boxes still covered *)
@@ -101,16 +101,16 @@ TYPE
 
 	(* message sent by the timer-task *)
 	NotifyMsg* = RECORD (Display.FrameMsg)
-		dt*: LONGINT;	(* time difference since last message *)
+		dt*: SIGNED32;	(* time difference since last message *)
 	END;
 
 
 (*	----------------------------	global variables	----------------------------	*)
 
 VAR
-	seek: LONGINT;			(* used in procedure Random *)
+	seek: SIGNED32;			(* used in procedure Random *)
 	task: Oberon.Task;		(* timer *)
-	lastTime: LONGINT;
+	lastTime: SIGNED32;
 
 	changedFields: Coords;	(* global array to improve performance *)
 	curArrayPos: SIGNED16;	(* index to changedFields (needs to be global. why? see below) *)
@@ -145,7 +145,7 @@ END Timer;
 (*	----------------------------	procedures to control the game itself	----------------------------	*)
 
 PROCEDURE InitField*(F: Field; w, h, m: SIGNED16; pause: BOOLEAN);
-VAR i,j,x,y: SIGNED16; p: LONGINT;
+VAR i,j,x,y: SIGNED16; p: SIGNED32;
 BEGIN
 	p:= ENTIER(w * h * 0.7); IF m > p THEN m:= SHORT(p) END;	(* 30% of the field should be mine(d)less *)
 	F.W:= w; F.H:= h; F.mines:= m;
@@ -203,7 +203,7 @@ BEGIN
 	SetPause(F, ~F.pause)
 END TogglePause;
 
-PROCEDURE GetTime*(F: Field; VAR t: LONGINT);
+PROCEDURE GetTime*(F: Field; VAR t: SIGNED32);
 (* hmmm... *)
 BEGIN t:= F.time
 END GetTime;
@@ -423,7 +423,7 @@ END ToggleState;
 
 PROCEDURE FieldAttr(F: Field; VAR M: Objects.AttrMsg);
 (* handles Objects.AttrMsg *)
-VAR i: LONGINT;
+VAR i: SIGNED32;
 BEGIN
 	IF M.id = Objects.get THEN
 		IF M.name = "Gen" THEN M.class:= Objects.String; COPY("MineSweeper.NewField", M.s); M.res:= 0
@@ -533,7 +533,7 @@ END FieldToDisplay;
 
 PROCEDURE DrawTime(F: Frame; M: Display3.Mask; x, y, w, h: SIGNED16);
 (* draws modles time in time area *)
-VAR t: LONGINT; oldX, oldY: SIGNED16; obj: Objects.Object;
+VAR t: SIGNED32; oldX, oldY: SIGNED16; obj: Objects.Object;
 BEGIN
 	IF (F.obj = NIL) OR ~(F.obj IS Field) THEN t:= 0
 	ELSE GetTime(F.obj(Field),t)
@@ -681,7 +681,7 @@ END RestoreFrame;
 PROCEDURE Print(F: Frame; VAR M: Display.DisplayMsg);
 (* handles aprint request. Does the same as DrawTime, DrawCounts and DrawField.
 	Display patterns have to be converted to Printer patterns by the procedure Printer3.NewPattern *)
-VAR R: Display3.Mask; X, Y, W, H, x, y, bw, bh, one, mines, state, c, i, j: SIGNED16; t: LONGINT;
+VAR R: Display3.Mask; X, Y, W, H, x, y, bw, bh, one, mines, state, c, i, j: SIGNED16; t: SIGNED32;
 	A: Objects.AttrMsg; str: ARRAY 8 OF CHAR; obj: Objects.Object;
 
 	PROCEDURE P(x: SIGNED16): SIGNED16;
@@ -1145,7 +1145,7 @@ PROCEDURE LoadDocument*(D: Documents.Document);
 	This procedure has to be implemented, when you create a new document type *)
 VAR obj, V: Objects.Object; main: Gadgets.Frame;
 	F: Files.File; R: Files.Rider; name: ARRAY 64 OF CHAR; ch: CHAR;
-	tag: SIGNED16; len: LONGINT; lib: Objects.Library;
+	tag: SIGNED16; len: SIGNED32; lib: Objects.Library;
 	C: Display.ConsumeMsg; A: Objects.AttrMsg;
 BEGIN
 	main:= NIL; D.W:= 300; D.H:= 200;
@@ -1214,7 +1214,7 @@ END LoadDocument;
 
 PROCEDURE StoreDocument(D: Documents.Document);
 (* stores a document in a file with name D.name *)
-VAR F: Files.File; len: LONGINT; R: Files.Rider; B: Objects.BindMsg; obj: Objects.Object;
+VAR F: Files.File; len: SIGNED32; R: Files.Rider; B: Objects.BindMsg; obj: Objects.Object;
 BEGIN
 	IF D.name # "" THEN
 		obj:= D.dsc;

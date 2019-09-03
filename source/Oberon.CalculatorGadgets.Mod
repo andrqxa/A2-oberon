@@ -51,7 +51,7 @@ VAR
 	setx,sety: SET;
 BEGIN
 	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(LONGINT,setx * sety));
+	RETURN(SYSTEM.VAL(SIGNED32,setx * sety));
 END and;
 
 PROCEDURE or(x,y: LONGREAL): LONGREAL;
@@ -59,7 +59,7 @@ VAR
 	setx,sety: SET;
 BEGIN
 	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(LONGINT,setx + sety));
+	RETURN(SYSTEM.VAL(SIGNED32,setx + sety));
 END or;
 
 PROCEDURE nor(x,y: LONGREAL): LONGREAL;
@@ -67,7 +67,7 @@ VAR
 	setx,sety: SET;
 BEGIN
 	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(LONGINT,(setx / {MIN(SET)..MAX(SET)}) + sety));
+	RETURN(SYSTEM.VAL(SIGNED32,(setx / {MIN(SET)..MAX(SET)}) + sety));
 END nor;
 
 PROCEDURE xor(x,y: LONGREAL): LONGREAL;
@@ -75,7 +75,7 @@ VAR
 	setx,sety: SET;
 BEGIN
 	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(LONGINT,setx / sety));
+	RETURN(SYSTEM.VAL(SIGNED32,setx / sety));
 END xor;
 
 PROCEDURE xnor(x,y: LONGREAL): LONGREAL;
@@ -83,7 +83,7 @@ VAR
 	setx,sety: SET;
 BEGIN
 	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(LONGINT,(setx / {MIN(SET)..MAX(SET)}) / sety));
+	RETURN(SYSTEM.VAL(SIGNED32,(setx / {MIN(SET)..MAX(SET)}) / sety));
 END xnor;
 
 (* ** Built-In Functions **************************************** *)
@@ -93,7 +93,7 @@ VAR
 	setx: SET;
 BEGIN
 	setx:= SYSTEM.VAL(SET,ENTIER(x));
-	RETURN(SYSTEM.VAL(LONGINT,setx / {MIN(SET)..MAX(SET)}));
+	RETURN(SYSTEM.VAL(SIGNED32,setx / {MIN(SET)..MAX(SET)}));
 END not;
 
 PROCEDURE Rad(value: LONGREAL; angle: SIGNED16): LONGREAL;
@@ -449,7 +449,7 @@ END EngineCopy;
 
 PROCEDURE EngineFile(E: Engine; VAR M: Objects.FileMsg);
 VAR
-	i,len: LONGINT;
+	i,len: SIGNED32;
 BEGIN
 	IF (M.id = Objects.store) THEN
 		Files.WriteLInt(M.R,CalcUndoOp);

@@ -19,7 +19,7 @@ MODULE PictConverters IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.12.96, af
 		LastBlock: ARRAY 4096 OF SIGNED16;
 
 	PROCEDURE WriteScrDesc(VAR R: Files.Rider; P: Pictures.Picture);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		Files.WriteInt(R, P.width); Files.WriteInt(R, P.height);
 		i := ASH(7+P.depth, 4); i := i+P.depth-1;
@@ -172,7 +172,7 @@ MODULE PictConverters IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.12.96, af
 		VAR
 			S: Texts.Scanner;
 			T: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			Fi, Fo: Files.File;
 			R: Files.Rider;
 			name: ARRAY 64 OF CHAR;
@@ -233,7 +233,7 @@ MODULE PictConverters IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.12.96, af
 		VAR
 			S: Texts.Scanner;
 			T: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			Fi, Fo: Files.File;
 			R: Files.Rider;
 			P: Pictures.Picture;
@@ -286,7 +286,7 @@ MODULE PictConverters IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.12.96, af
 		VAR
 			S: Texts.Scanner;
 			T: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			Fi, Fo: Files.File;
 			R: Files.Rider;
 			P: Pictures.Picture;
@@ -335,7 +335,7 @@ MODULE PictConverters IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.12.96, af
 		VAR
 			S: Texts.Scanner;
 			T: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			Fi, Fo: Files.File;
 			R: Files.Rider;
 			P: Pictures.Picture;
@@ -384,7 +384,7 @@ MODULE PictConverters IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.12.96, af
 		VAR
 			S: Texts.Scanner;
 			T: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			Fi, Fo: Files.File;
 			R: Files.Rider;
 			P: Pictures.Picture;
@@ -439,7 +439,7 @@ MODULE PictConverters IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.12.96, af
 		VAR
 			S: Texts.Scanner;
 			T: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			Fi, Fo: Files.File;
 			R: Files.Rider;
 			P: Pictures.Picture;

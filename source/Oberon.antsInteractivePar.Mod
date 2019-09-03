@@ -36,7 +36,7 @@ TYPE
 	tLayer* = POINTER TO tLayerDesc;
 	tLayerDesc* = RECORD (vyPort.tLayerDesc);
 		n-: antsNeighbourhoods.Neighbours;
-		maxx, maxy: LONGINT;
+		maxx, maxy: SIGNED32;
 		dim: SIGNED16;
 		isotropic: BOOLEAN;
 		commands: vyCommandMenus.List;
@@ -47,10 +47,10 @@ VAR
 	tempLayer: tLayer;
 
 	PROCEDURE Recall( layer: tLayer );
-	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;
+	VAR cells: SIGNED32;  cellsize: LONGREAL;  i, j: SIGNED32;
 		str: ARRAY 20 OF CHAR;
 
-		PROCEDURE PaintCell( x, y: LONGINT;  val: LONGREAL );
+		PROCEDURE PaintCell( x, y: SIGNED32;  val: LONGREAL );
 		BEGIN
 			vyHostStrings.RealToFixStr( val, str, 1, 2, 0 );
 			IF val = MIN( LONGREAL ) THEN val := layer.max;  str := "";  vyGraphBase.SetForeColor( layer.style.bcol )
@@ -107,9 +107,9 @@ VAR
 	END Prompt;
 
 	PROCEDURE OnLayer( layer: tLayer;  VAR event: vyEvents.EventMsg ): BOOLEAN;
-	VAR i, j: SIGNED16;  cells: LONGINT;  cellsize: LONGREAL;
+	VAR i, j: SIGNED16;  cells: SIGNED32;  cellsize: LONGREAL;
 
-		PROCEDURE InCell( x, y: LONGINT;  cx, cy: SIGNED16 ): BOOLEAN;
+		PROCEDURE InCell( x, y: SIGNED32;  cx, cy: SIGNED16 ): BOOLEAN;
 		VAR rx, ry, rw, rh: SIGNED16;
 		BEGIN
 			vyGraphBase.Rect2dToRect( x * cellsize - cellsize / 2, y * cellsize - cellsize / 2, cellsize, cellsize, rx, ry, rw, rh );
@@ -129,9 +129,9 @@ VAR
 	END OnLayer;
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;
+	VAR cells: SIGNED32;  cellsize: LONGREAL;  i, j: SIGNED32;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;
 
-		PROCEDURE InCell( x, y: LONGINT;  cx, cy: SIGNED16 ): BOOLEAN;
+		PROCEDURE InCell( x, y: SIGNED32;  cx, cy: SIGNED16 ): BOOLEAN;
 		VAR rx, ry, rw, rh: SIGNED16;
 		BEGIN
 			vyGraphBase.Rect2dToRect( x * cellsize - cellsize / 2, y * cellsize - cellsize / 2, cellsize, cellsize, rx, ry, rw, rh );
@@ -171,9 +171,9 @@ VAR
 	END Select;
 
 	PROCEDURE Wheel( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR cells: LONGINT;  cellsize: LONGREAL;  i, j: LONGINT;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;  add, val: LONGREAL;
+	VAR cells: SIGNED32;  cellsize: LONGREAL;  i, j: SIGNED32;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;  add, val: LONGREAL;
 
-		PROCEDURE InCell( x, y: LONGINT;  cx, cy: SIGNED16 ): BOOLEAN;
+		PROCEDURE InCell( x, y: SIGNED32;  cx, cy: SIGNED16 ): BOOLEAN;
 		VAR rx, ry, rw, rh: SIGNED16;
 		BEGIN
 			vyGraphBase.Rect2dToRect( x * cellsize - cellsize / 2, y * cellsize - cellsize / 2, cellsize, cellsize, rx, ry, rw, rh );
@@ -342,7 +342,7 @@ VAR
 	END Init;
 
 	PROCEDURE AdjustXY( layer: tLayer );
-	VAR i, j: LONGINT;
+	VAR i, j: SIGNED32;
 	BEGIN
 		layer.maxx := 0;  layer.maxy := 0;
 		FOR i := 0 TO layer.n.dim - 1 DO
@@ -408,7 +408,7 @@ VAR
 [functionality to make panels easier to understand,  general method would be to kick off parameter (num) beforehand!!]
 *)
 	PROCEDURE ToggleDisable*;
-	VAR layer: tLayer;  l: vyPort.tLayer;  num: LONGINT;
+	VAR layer: tLayer;  l: vyPort.tLayer;  num: SIGNED32;
 	BEGIN
 		l := vyPort.FocusLayer();
 

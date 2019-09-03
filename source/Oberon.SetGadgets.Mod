@@ -24,7 +24,7 @@ MODULE SetGadgets IN Oberon;	(** portable *)	(* ps -  *)
 (* ------ converters ------ *)
 
 (** Convert an integer into a set *)
-PROCEDURE IntToSet* (int: LONGINT; VAR set: SET);
+PROCEDURE IntToSet* (int: SIGNED32; VAR set: SET);
 VAR i: SIGNED8;
 BEGIN
 	set := {};
@@ -34,7 +34,7 @@ BEGIN
 END IntToSet;
 
 (** Convert a set into an integer *)
-PROCEDURE SetToInt* (set: SET; VAR int: LONGINT);
+PROCEDURE SetToInt* (set: SET; VAR int: SIGNED32);
 VAR i: SIGNED8;
 BEGIN
 	int := 0;
@@ -50,7 +50,7 @@ BEGIN Gadgets.CopyObject(M, from, to); to.val := from.val
 END CopySet;
 
 PROCEDURE SetHandler* (obj: Objects.Object; VAR M: Objects.ObjMsg);
-VAR obj2: Set; ver: LONGINT;
+VAR obj2: Set; ver: SIGNED32;
 BEGIN
 	WITH obj: Set DO
 		IF M IS Objects.AttrMsg THEN
@@ -201,7 +201,7 @@ BEGIN
 END Restore;
 
 PROCEDURE Print (F: Frame; VAR M: Display.DisplayMsg);
-	VAR Q: Display3.Mask; i: LONGINT; x, y, w, h, sw: SIGNED16;
+	VAR Q: Display3.Mask; i: SIGNED32; x, y, w, h, sw: SIGNED16;
 
 	PROCEDURE P(x: SIGNED16): SIGNED16;
 	BEGIN RETURN SHORT(x * Display.Unit DIV Printer.Unit)
@@ -261,7 +261,7 @@ BEGIN to.val := from.val; Gadgets.CopyFrame(M, from, to)
 END CopyFrame;
 
 PROCEDURE FrameHandle* (F: Objects.Object; VAR M: Objects.ObjMsg);
-	VAR ver: LONGINT; x, y, w, h: SIGNED16; F1: Frame; Q: Display3.Mask;
+	VAR ver: SIGNED32; x, y, w, h: SIGNED16; F1: Frame; Q: Display3.Mask;
 BEGIN
 	WITH F: Frame DO
 		IF M IS Display.FrameMsg THEN

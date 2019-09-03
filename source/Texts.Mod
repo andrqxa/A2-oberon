@@ -21,9 +21,9 @@ CONST
 	TraceHard = FALSE;
 
 TYPE
-	UCS32String* = ARRAY OF LONGINT;
+	UCS32String* = ARRAY OF SIGNED32;
 	PUCS32String* = POINTER TO UCS32String;
-	Char32* = LONGINT;
+	Char32* = SIGNED32;
 
 	FontInfo* = OBJECT
 	VAR
@@ -48,11 +48,11 @@ TYPE
 
 	Attributes* = OBJECT
 	VAR
-		color*, bgcolor* : LONGINT;
-		voff* : LONGINT;
+		color*, bgcolor* : SIGNED32;
+		voff* : SIGNED32;
 		fontInfo* : FontInfo;
 
-		PROCEDURE Set* (color, bgcolor, voff : LONGINT; CONST name : ARRAY OF CHAR; size : SIZE; style : SET);
+		PROCEDURE Set* (color, bgcolor, voff : SIGNED32; CONST name : ARRAY OF CHAR; size : SIZE; style : SET);
 		BEGIN
 			SELF.color := color;
 			SELF.bgcolor := bgcolor;
@@ -86,12 +86,12 @@ TYPE
 	ParagraphStyle* = OBJECT
 	VAR
 		name* : ARRAY 128 OF CHAR;				(* name of the paragraph style *)
-		alignment* : LONGINT;						(* 0 = left, 1 = center, 2 = right, 3 = justified *)
-		spaceBefore* : LONGINT;					(* space before paragraph [mm] *)
-		spaceAfter* : LONGINT;						(* space after paragrapg [mm] *)
-		leftIndent* : LONGINT;						(* left Indent [mm] *)
-		rightIndent* : LONGINT;						(* right Indent [mm] *)
-		firstIndent* : LONGINT;						(* first Line Indent [mm] *)
+		alignment* : SIGNED32;						(* 0 = left, 1 = center, 2 = right, 3 = justified *)
+		spaceBefore* : SIGNED32;					(* space before paragraph [mm] *)
+		spaceAfter* : SIGNED32;						(* space after paragrapg [mm] *)
+		leftIndent* : SIGNED32;						(* left Indent [mm] *)
+		rightIndent* : SIGNED32;						(* right Indent [mm] *)
+		firstIndent* : SIGNED32;						(* first Line Indent [mm] *)
 		charStyle* : CharacterStyle;					(* default character style *)
 		tabStops* : ARRAY 256 OF CHAR;			(* tabStop String *)
 
@@ -135,14 +135,14 @@ TYPE
 		family* : ARRAY 32 OF CHAR;				(* font family *)
 		style* : SET;									(* font style; 0 = bold, 1 = italic *)
 		size* : SIZE;							(* font size [pt]; 1pt == 1/72inch == 0,3527777778mm *)
-		leading* : LONGINT;							(* baseline distance [pt] - usually 120% of font size *)
-		baselineShift* : LONGINT;					(* baseline shift up/down [pt] *)
-		tracking* : LONGINT;						(* character spacing [pt] *)
+		leading* : SIGNED32;							(* baseline distance [pt] - usually 120% of font size *)
+		baselineShift* : SIGNED32;					(* baseline shift up/down [pt] *)
+		tracking* : SIGNED32;						(* character spacing [pt] *)
 
-		scaleHorizontal* : LONGINT;					(* horizontal character scale *)
-		scaleVertical* : LONGINT;					(* vertical character scale *)
-		color* : LONGINT;							(* character color *)
-		bgColor* : LONGINT;						(* character background color *)
+		scaleHorizontal* : SIGNED32;					(* horizontal character scale *)
+		scaleVertical* : SIGNED32;					(* vertical character scale *)
+		color* : SIGNED32;							(* character color *)
+		bgColor* : SIGNED32;						(* character background color *)
 
 		PROCEDURE &New*;
 		BEGIN
@@ -499,7 +499,7 @@ TYPE
 		piece : Piece;
 		backwards : BOOLEAN;
 		eot- : BOOLEAN;
-		voff-, color-, bgcolor- : LONGINT;
+		voff-, color-, bgcolor- : SIGNED32;
 		font- : FontInfo;
 		attributes- : Attributes;
 		cstyle- : CharacterStyle;
@@ -532,7 +532,7 @@ TYPE
 			Changed^(op, pos, len); piece := NIL
 		END Changed;
 
-		PROCEDURE ReadCh*(VAR ucs32 : LONGINT);
+		PROCEDURE ReadCh*(VAR ucs32 : SIGNED32);
 		VAR res : WORD; tfont: FontInfo;
 			tempObj : ObjectPiece;
 		BEGIN
@@ -602,7 +602,7 @@ TYPE
 
 	TextChangeInfo* = OBJECT
 	VAR
-		timestamp* : LONGINT;
+		timestamp* : SIGNED32;
 		op* : WORD;
 		pos*, len* : SIZE;
 	END TextChangeInfo;
@@ -650,7 +650,7 @@ TYPE
 
 		posObjects : Kernel.FinalizedCollection;
 		pop: WORD; ppos, plen : SIZE;
-		timestamp : LONGINT;
+		timestamp : SIGNED32;
 		upOp: WORD; upPos, upLen : SIZE;
 		onTextChanged* : WMEvents.EventSource;
 		lock : Locks.RWLock;
@@ -701,7 +701,7 @@ TYPE
 		(** release the write lock on the object *)
 		PROCEDURE ReleaseWrite*;
 		VAR removeLock : BOOLEAN;
-			op : WORD; pos, len : SIZE; localtimestamp : LONGINT;
+			op : WORD; pos, len : SIZE; localtimestamp : SIGNED32;
 		BEGIN
 			removeLock := lock.GetWLockLevel() = 1;
 			IF removeLock THEN op := upOp; pos := upPos; len := upLen; localtimestamp := GetTimestamp(); upOp := -1 END;
@@ -733,7 +733,7 @@ TYPE
 			RETURN lock.HasReadLock();
 		END HasReadLock;
 
-		PROCEDURE InformListeners(timestamp : LONGINT; op : WORD; pos, len : SIZE);
+		PROCEDURE InformListeners(timestamp : SIGNED32; op : WORD; pos, len : SIZE);
 		VAR updateInfo : TextChangeInfo; um : UndoManager;
 		BEGIN
 			NEW(updateInfo);
@@ -1152,7 +1152,7 @@ TYPE
 		The timestamp can be used to check if an asynchronous change notification reflects the last change. Text
 		viewers can use this knowledge to incrementally update the layout. If the notification timestamp #
 		GetTimestamp then a full update is needed *)
-		PROCEDURE GetTimestamp*() : LONGINT;
+		PROCEDURE GetTimestamp*() : SIGNED32;
 		BEGIN
 			ASSERT(lock.HasReadLock(), 3000);
 			RETURN timestamp
@@ -1400,7 +1400,7 @@ VAR
 	str: Strings.String;
 	cStyle : CharacterStyle;
 	pStyle : ParagraphStyle;
-	tempReal: LONGREAL; tempInt: LONGINT; tempRes : WORD;
+	tempReal: LONGREAL; tempInt: SIGNED32; tempRes : WORD;
 BEGIN
 	NEW(scanner, r);
 	NEW(parser, scanner);
@@ -1498,8 +1498,8 @@ CONST
 	FontBold = 0; FontItalic = 1;
 VAR
 	res : WORD;
-	textColor := 0xFF, textBackColor := 0x00: LONGINT;
-	defaultFontSize : LONGINT;
+	textColor := 0xFF, textBackColor := 0x00: SIGNED32;
+	defaultFontSize : SIGNED32;
 	defaultFontStyle := {} : SET;
 	defaultFontName : ARRAY 64 OF CHAR;
 	fontStyleName : ARRAY 16 OF CHAR;

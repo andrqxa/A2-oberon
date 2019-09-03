@@ -27,7 +27,7 @@ TYPE
 		BEGIN HALT(301)
 		END GetName;
 
-		PROCEDURE GetSize*() : LONGINT;
+		PROCEDURE GetSize*() : SIGNED32;
 		BEGIN HALT(301)
 		END GetSize;
 

@@ -11,15 +11,15 @@ CONST
 VAR
 	running: BOOLEAN; (* is an echo request (ping) currently running? *)
 	timer: Objects.Timer;
-	timeout: LONGINT;
-	pingSize: LONGINT;
+	timeout: SIGNED32;
+	pingSize: SIGNED32;
 	ms: Kernel.MilliTimer;
 
 (** Ping a host. Call: Ping.Ping host [pingSize] [timeout] ~ *)
 
 PROCEDURE Ping*(context : Commands.Context);
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 	hostname: DNS.Name;
 	fip: IP.Adr;
 	res1, res2: WORD;
@@ -90,7 +90,7 @@ BEGIN {EXCLUSIVE}
 	END;
 END TimeoutHandler;
 
-PROCEDURE GetReply(int: IP.Interface; type, code: LONGINT; fip, lip: IP.Adr; buffer: Network.Buffer);
+PROCEDURE GetReply(int: IP.Interface; type, code: SIGNED32; fip, lip: IP.Adr; buffer: Network.Buffer);
 VAR res: WORD;
 BEGIN {EXCLUSIVE}
 	IF running THEN

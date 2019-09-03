@@ -150,7 +150,7 @@ END ParseOptions;
 PROCEDURE RunTests(
 	text : Texts.Text;
 	CONST source: ARRAY OF CHAR;
-	pos: LONGINT; (* ignore *)
+	pos: SIGNED32; (* ignore *)
 	CONST pc,opt: ARRAY OF CHAR;
 	log: Streams.Writer; diagnostics : Diagnostics.Diagnostics; VAR error: BOOLEAN);
 VAR

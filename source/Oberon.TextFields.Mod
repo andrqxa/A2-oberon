@@ -49,13 +49,13 @@ TYPE
 		focused*,	(** Has the keyboard focus or not ? *)
 		underlined*: BOOLEAN;	(** Is text underlined ? *)
 		text*: Texts.Text;	(** Displayed Text. *)
-		time: LONGINT;
+		time: SIGNED32;
 	END;
 
 	TextField* = POINTER TO TextFieldDesc;
 	TextFieldDesc* = RECORD (Gadgets.FrameDesc)
 		selbeg*, selend*: SIGNED16;	(** Starting and ending position of selected characters [selbeg, selend). *)
-		time*: LONGINT;	(** Selection time. *)
+		time*: SIGNED32;	(** Selection time. *)
 		carpos*, carx*, cary*: SIGNED16;	(** Caret position and relative coordinates. *)
 		val*: ARRAY MaxLen OF CHAR;	(** Current value. *)
 		font*:Fonts.Font;
@@ -67,7 +67,7 @@ TYPE
 	END;
 
 	TextFieldUpdateMsg = RECORD (Gadgets.UpdateMsg)
-		beg: LONGINT;
+		beg: SIGNED32;
 	END;
 
 	PassFocusMsg = RECORD (Display.FrameMsg)
@@ -165,9 +165,9 @@ END GetFont;
 		REPEAT ch := suffix[j]; fn[i] := ch; INC(i); INC(j) UNTIL ch = 0X
 	END CombineFontName;
 
-PROCEDURE IncFontSize (T: Texts.Text; beg, end: LONGINT; delta: SIGNED16);
+PROCEDURE IncFontSize (T: Texts.Text; beg, end: SIGNED32; delta: SIGNED16);
 		CONST MinSize = 6; MaxSize = 96;
-		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, size: SIGNED16; ch: CHAR;
+		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: SIGNED32; i, j, size: SIGNED16; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg;
 			fnt := R.lib;
@@ -489,7 +489,7 @@ BEGIN
 END ConsumeCh;
 
 PROCEDURE LoadCaption(F: Caption; VAR M: Objects.FileMsg);
-VAR ver, len: LONGINT; chr: CHAR; name: ARRAY 256 OF CHAR; i, col: SIGNED16;
+VAR ver, len: SIGNED32; chr: CHAR; name: ARRAY 256 OF CHAR; i, col: SIGNED16;
 	fnt: Objects.Library; ch: CHAR;
 BEGIN
 	Files.ReadNum(M.R, ver);
@@ -527,8 +527,8 @@ END LoadCaption;
 
 PROCEDURE CaptionHandler* (F: Objects.Object; VAR M: Objects.ObjMsg);
 VAR x, y, w, h: SIGNED16; F1: Caption; Q: Display3.Mask; keysum: SET;
-	text: Texts.Text; tbeg, tend, time: LONGINT; R: Texts.Reader; buf: Texts.Buffer; ch: CHAR;
-	len: LONGINT;
+	text: Texts.Text; tbeg, tend, time: SIGNED32; R: Texts.Reader; buf: Texts.Buffer; ch: CHAR;
+	len: SIGNED32;
 BEGIN
 	WITH F: Caption DO
 		IF M IS Display.FrameMsg THEN
@@ -755,14 +755,14 @@ END Pass;
 
 PROCEDURE passFocusMsg(F: TextField; VAR M: PassFocusMsg);
 
-	PROCEDURE Distance(x, y: LONGINT): LONGINT;
+	PROCEDURE Distance(x, y: SIGNED32): SIGNED32;
 	BEGIN
 		IF y = M.Y THEN (* on the same line *)
-			IF x < M.X THEN RETURN MAX(LONGINT)
+			IF x < M.X THEN RETURN MAX(SIGNED32)
 			ELSE RETURN x - M.X
 			END
 		ELSE
-			IF y > M.Y THEN RETURN MAX(LONGINT)
+			IF y > M.Y THEN RETURN MAX(SIGNED32)
 			ELSE RETURN (M.Y - y) * 1000
 			END
 		END
@@ -781,7 +781,7 @@ END passFocusMsg;
 
 (* ----------- *)
 
-PROCEDURE Inval(F: TextField; VAR hint: LONGINT);
+PROCEDURE Inval(F: TextField; VAR hint: SIGNED32);
 BEGIN
 	IF F.consistent THEN
 		hint := -1;
@@ -789,14 +789,14 @@ BEGIN
 	END
 END Inval;
 
-PROCEDURE UpdateTextField(F: TextField; beg: LONGINT);
+PROCEDURE UpdateTextField(F: TextField; beg: SIGNED32);
 VAR M: TextFieldUpdateMsg;
 BEGIN
 	M.F := NIL; M.obj := F; M.beg := beg; F.slink := NIL; Display.Broadcast(M)
 END UpdateTextField;
 
 PROCEDURE ConsumeChar(F: TextField; ch: CHAR; dlink: Objects.Object);
-VAR beg: LONGINT; x, y: SIGNED16;
+VAR beg: SIGNED32; x, y: SIGNED16;
 BEGIN
 	beg := -1;
 	IF ch = 7FX THEN
@@ -911,7 +911,7 @@ BEGIN
 END RemoveCaret;
 
 PROCEDURE TrackCaret(VAR DR: Display3.Mask; F: TextField; x, y: SIGNED16);
-VAR mx, my, pos: SIGNED16; keys, keysum: SET; time, beg, end, p, hint: LONGINT; text: Texts.Text;
+VAR mx, my, pos: SIGNED16; keys, keysum: SET; time, beg, end, p, hint: SIGNED32; text: Texts.Text;
 	R: Texts.Reader; ch: CHAR;
 BEGIN
 	RemoveCaret(DR, F, x, y); keysum := {};
@@ -961,7 +961,7 @@ BEGIN
 END RemoveSelection;
 
 PROCEDURE TrackSelection(R: Display3.Mask; F: TextField; x, y: SIGNED16);
-VAR mx, my, pos, spos, epos, len: SIGNED16; keys, keysum: SET; time: LONGINT;
+VAR mx, my, pos, spos, epos, len: SIGNED16; keys, keysum: SET; time: SIGNED32;
 	C: Oberon.ConsumeMsg;
 BEGIN
 	Oberon.FadeCursor(Oberon.Mouse);
@@ -1015,7 +1015,7 @@ BEGIN
 	END
 END TrackSelection;
 
-PROCEDURE GetSelection(F: TextField; VAR text: Texts.Text; VAR beg, end, time: LONGINT);
+PROCEDURE GetSelection(F: TextField; VAR text: Texts.Text; VAR beg, end, time: SIGNED32);
 VAR p: SIGNED16; W: Texts.Writer;
 BEGIN
 	NEW(text); Texts.Open(text, "");
@@ -1063,7 +1063,7 @@ BEGIN
 END TextFieldAttr;
 
 PROCEDURE ConsumeText(F: TextField; VAR M: Oberon.ConsumeMsg);
-VAR R: Texts.Reader; ch: CHAR; pos, beg: LONGINT;
+VAR R: Texts.Reader; ch: CHAR; pos, beg: SIGNED32;
 BEGIN
 	pos := M.beg; Texts.OpenReader(R, M.text, pos); beg := F.carpos;
 	IF F.selbeg >= 0 THEN F.selbeg := -1; beg := -1 END;
@@ -1095,7 +1095,7 @@ BEGIN
 	IF F.font=NIL THEN F.font:=oldfont END;
 END AdaptFontSizeProportional;
 
-PROCEDURE ComputeColors(F:TextField; col:LONGINT);
+PROCEDURE ComputeColors(F:TextField; col:SIGNED32);
 VAR r,g,b:REAL;
 BEGIN
 	IF col=Display3.textbackC THEN F.topC:=Display3.textbackC; F.bottomC:=Display3.bottomC;
@@ -1110,7 +1110,7 @@ BEGIN
 	END;
 END ComputeColors;
 
-PROCEDURE RestoreTextField(R: Display3.Mask; F: TextField; x, y, w, h: SIGNED16; beg: LONGINT);
+PROCEDURE RestoreTextField(R: Display3.Mask; F: TextField; x, y, w, h: SIGNED16; beg: SIGNED32);
 VAR p, X, Y, cx, cy, cw, ch: SIGNED16; r: Objects.Object;
 BEGIN
 	Oberon.RemoveMarks(x, y, w, h);
@@ -1222,7 +1222,7 @@ BEGIN
 END CopyTextField;
 
 PROCEDURE Recall(F: TextField; dlink: Objects.Object);
-VAR buf: Texts.Buffer; t: Texts.Text; str: ARRAY MaxLen OF CHAR; i: LONGINT;
+VAR buf: Texts.Buffer; t: Texts.Text; str: ARRAY MaxLen OF CHAR; i: SIGNED32;
 BEGIN
 	NEW(buf); Texts.OpenBuf(buf); Texts.Recall(buf);
 	NEW(t); Texts.Open(t, ""); Texts.Append(t, buf);
@@ -1277,7 +1277,7 @@ BEGIN
 END MakeConsistent;
 
 PROCEDURE TextFieldHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR F2: TextField; x, y, w, h: SIGNED16; R: Display3.Mask; ver: LONGINT; field,fontname: ARRAY 256 OF CHAR;
+VAR F2: TextField; x, y, w, h: SIGNED16; R: Display3.Mask; ver: SIGNED32; field,fontname: ARRAY 256 OF CHAR;
 BEGIN
 	WITH F: TextField DO
 		IF M IS Objects.AttrMsg THEN

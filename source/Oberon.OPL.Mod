@@ -358,7 +358,7 @@ References:
 		Instruction* = RECORD
 			scale*, reg*: SIGNED8;
 			op*: SIGNED16;
-			dest*, src1*, src2*, inx*, pc*, hint*: LONGINT; (* pc: PC on the target machine, used for jumps *)
+			dest*, src1*, src2*, inx*, pc*, hint*: SIGNED32; (* pc: PC on the target machine, used for jumps *)
 			link*, used*: SIGNED16;
 			node*: OPT.Node;
 			abs*: BOOLEAN;	(* absolute address, should not be fixed. Def = FALSE. *)		(* GetPut *)
@@ -367,12 +367,12 @@ References:
 
 		Map* = POINTER TO MapDesc;
 		MapDesc* = ARRAY OF RECORD
-			pos*, pc* : LONGINT
+			pos*, pc* : SIGNED32
 		END;
 
 	VAR
 		Instr*:  InstructionTable; (* Pseudo Code *)
-		mapSize* : LONGINT;
+		mapSize* : SIGNED32;
 		map* : Map;
 
 (* Target Code i386 definitions *)
@@ -482,7 +482,7 @@ References:
 
 
 		(* Export/Use Section *)
-		EUEnd = 0X; EURecord = 1X; EUProcFlag = LONGINT(080000000H);
+		EUEnd = 0X; EURecord = 1X; EUProcFlag = SIGNED32(080000000H);
 
 		(* sysflag *) (* ejz *)
 		notag = 1; stdcall = 2; cdecl = 3; untraced = 4; delegate = 5;
@@ -493,7 +493,7 @@ References:
 		END;
 
 		VarConsRec = RECORD
-			mod : LONGINT;
+			mod : SIGNED32;
 			entry, noflinks, index: SIGNED16
 		END;
 		VarConsTable = POINTER TO ARRAY OF VarConsRec;
@@ -507,13 +507,13 @@ References:
 			reg, sreg, freg: ARRAY 8 OF SIGNED16
 		END;
 
-		PtrTable = POINTER TO ARRAY OF LONGINT;
+		PtrTable = POINTER TO ARRAY OF SIGNED32;
 		RecTable = POINTER TO ARRAY OF OPT.Struct;
 		EntryTable = POINTER TO ARRAY OF SIGNED16;
-		ExpTable = POINTER TO ARRAY OF LONGINT;
+		ExpTable = POINTER TO ARRAY OF SIGNED32;
 
 		ExTableEntry = POINTER TO RECORD
-			pcFrom, pcTo, pcHandler: LONGINT;
+			pcFrom, pcTo, pcHandler: SIGNED32;
 			next: ExTableEntry;
 		END;
 
@@ -526,27 +526,27 @@ References:
 	link: ARRAY LinkLength OF LinkRec;	(* link table *)
 	varConsTab: VarConsLinkTable;	(* variable / constant table *)
 	nofVarCons, noVarEntries, nofEntries, (*nofptrs,*) nofVarConsLinks, nofLinks, nofrecs: SIGNED16;
-	nofptrs: LONGINT;
+	nofptrs: SIGNED32;
 	ConstErr, RegErr, VarEntryErr, LinkErr: BOOLEAN;
 
 	(* i386 code generator *)
-	regTab, sregTab, fregTab: ARRAY 8 OF LONGINT; (* regTab: 32/16 bit; sregTab: 8 Bit; fregTab: floating points *)
+	regTab, sregTab, fregTab: ARRAY 8 OF SIGNED32; (* regTab: 32/16 bit; sregTab: 8 Bit; fregTab: floating points *)
 	savedRegs: ARRAY MaxSaveLevel OF SavedRegRec;
 	nofSavedLevel: SIGNED16;	(* number of saved register sets *)
 	ftop: SIGNED8;	(* floating point top of stack *)
-	trapFixupTab: ARRAY nofTrapFixups OF LONGINT;
+	trapFixupTab: ARRAY nofTrapFixups OF SIGNED32;
 	JmpConvert: ARRAY Jnc-Je+1 OF SIGNED8;
 	SetccConvert: ARRAY Setnc - Sete + 1 OF SIGNED8;
 	FreeRegDisp: SIGNED8;
 
-	exTableLen: LONGINT;
+	exTableLen: SIGNED32;
 	exTable: ExTableEntry;
 
 	nofStr: SIGNED16;
-	linkTable*: LONGINT;
-	gVarLink*: LONGINT;
+	linkTable*: SIGNED32;
+	gVarLink*: SIGNED32;
 
-	explist: ExpTable; exppos: LONGINT;	(*list of fp. To check for duplicates*)
+	explist: ExpTable; exppos: SIGNED32;	(*list of fp. To check for duplicates*)
 
 	PROCEDURE Init*;
 	BEGIN
@@ -671,7 +671,7 @@ References:
 	(* marks 'this' as occupied. If the register is not free it will be moved to any free one (with pReg if necessary) *)
 		VAR
 			r, reg, r0, r1: SIGNED8;
-			pReg: LONGINT;
+			pReg: SIGNED32;
 	BEGIN
 		ASSERT (this IN {EAX..DI});
 		reg := this MOD 8;
@@ -712,9 +712,9 @@ References:
 		regTab [reg] := Occupied
 	END GetThisReg;
 
-	PROCEDURE AssignNewReg (pReg: LONGINT);
+	PROCEDURE AssignNewReg (pReg: SIGNED32);
 	(* assigns pReg to any free register *)
-		VAR reg: SIGNED8; size: LONGINT;
+		VAR reg: SIGNED8; size: SIGNED32;
 	BEGIN
 		size := Instr [pReg].op MOD 8;
 		IF size = 2 THEN (* Byte *)
@@ -728,7 +728,7 @@ References:
 		Instr [pReg].reg := reg
 	END AssignNewReg;
 
-	PROCEDURE AssignThisReg (pReg: LONGINT; this: SIGNED8);
+	PROCEDURE AssignThisReg (pReg: SIGNED32; this: SIGNED8);
 	(* assigns pReg to the register 'this'. 'this' will be moved to another register if it is occupied *)
 	BEGIN
 		IF this IN {AL..BH} THEN
@@ -741,9 +741,9 @@ References:
 		Instr [pReg].reg := this
 	END AssignThisReg;
 
-	PROCEDURE AssignReg (pReg: LONGINT; VAR reg, base, inx: SIGNED8);
+	PROCEDURE AssignReg (pReg: SIGNED32; VAR reg, base, inx: SIGNED8);
 		VAR
-			hint, size, pRegBase, pRegInx, pRegReg: LONGINT;
+			hint, size, pRegBase, pRegInx, pRegReg: SIGNED32;
 	BEGIN
 		hint := Instr[pReg].hint; size:= (Instr[pReg].op MOD 8) * 8;
 		ASSERT ((reg = none) OR ((size = Bit8) & (reg >= AL)) OR
@@ -805,7 +805,7 @@ References:
 	END FreeReg;
 
 	PROCEDURE DecReg (reg: SIGNED8); (* only used by DecCheckReg, Store, GenPush, Gen0, GenFlags *)
-		VAR pReg: LONGINT;
+		VAR pReg: SIGNED32;
 	BEGIN
 		IF reg > none THEN
 			IF reg >= AL THEN pReg := sregTab [reg-AL]
@@ -818,11 +818,11 @@ References:
 		END
 	END DecReg;
 
-	PROCEDURE DecCheckReg (pReg: LONGINT; src, base, inx: SIGNED8);
+	PROCEDURE DecCheckReg (pReg: SIGNED32; src, base, inx: SIGNED8);
 		VAR reg, r: SIGNED8;
 
 		PROCEDURE ReleaseReg (reg: SIGNED8);
-			VAR pReg: LONGINT;
+			VAR pReg: SIGNED32;
 		BEGIN
 			IF reg > none THEN
 				IF reg >= AL THEN pReg := sregTab [reg-AL]
@@ -868,14 +868,14 @@ References:
 		END
 	END DecCheckReg;
 
-	PROCEDURE loaded (pReg: LONGINT): BOOLEAN;
+	PROCEDURE loaded (pReg: SIGNED32): BOOLEAN;
 	BEGIN
 		IF pReg > none THEN RETURN (Instr [pReg].reg > none)
 		ELSE RETURN ((pReg = RiscESP) OR (pReg = RiscFP))
 		END
 	END loaded;
 
-	PROCEDURE FindReg (pReg: LONGINT; VAR reg: SIGNED8);
+	PROCEDURE FindReg (pReg: SIGNED32; VAR reg: SIGNED8);
 	BEGIN
 		ASSERT (loaded (pReg));
 		IF pReg > none THEN reg := Instr [pReg].reg
@@ -884,7 +884,7 @@ References:
 		END
 	END FindReg;
 
-	PROCEDURE FindLoadReg (pReg: LONGINT; VAR reg: SIGNED8);
+	PROCEDURE FindLoadReg (pReg: SIGNED32; VAR reg: SIGNED8);
 	BEGIN
 		IF pReg > none THEN
 			IF ~loaded (pReg) THEN Load (Instr [pReg]) END;
@@ -898,7 +898,7 @@ References:
 (* general *)
 
 	PROCEDURE LastUse (reg: SIGNED8): BOOLEAN;
-		VAR pReg: LONGINT;
+		VAR pReg: SIGNED32;
 	BEGIN
 		ASSERT (reg IN {EAX..BH});
 		IF reg >= AL THEN pReg := sregTab [reg-AL]
@@ -913,7 +913,7 @@ References:
 
 (* Risc Code -> i386 Code *)
 
-	PROCEDURE FindMemReg (VAR instr: Instruction; VAR mode, scale, size, base, inx: SIGNED8; VAR disp: LONGINT);
+	PROCEDURE FindMemReg (VAR instr: Instruction; VAR mode, scale, size, base, inx: SIGNED8; VAR disp: SIGNED32);
 	BEGIN
 		size := SHORT (instr.op MOD 8) * 8; mode := SHORT((instr.op DIV 8) MOD 4); scale := instr.scale;
 		IF mode IN {MemReg, RegMem} THEN
@@ -932,11 +932,11 @@ References:
 	(* ld, lea, ldbdw, ldbw, ldwdw, ldProc, ldXProc *)
 		VAR
 			mode, scale, size, base, inx, dummy: SIGNED8;
-			disp: LONGINT;
+			disp: SIGNED32;
 
-		PROCEDURE AssignReg (pReg: LONGINT; VAR baseReg, inxReg: SIGNED8);
+		PROCEDURE AssignReg (pReg: SIGNED32; VAR baseReg, inxReg: SIGNED8);
 			VAR
-				hint, size, pRegBase, pRegInx: LONGINT;
+				hint, size, pRegBase, pRegInx: SIGNED32;
 				base, inx, op: SIGNED8;  (* NM 7.6.94; workaround for sign-extended bug *)
 		BEGIN
 			hint := Instr[pReg].hint; size:= (Instr[pReg].op MOD 8) * 8;
@@ -1008,9 +1008,9 @@ References:
 	PROCEDURE LoadProc (VAR instr: Instruction);
 		VAR dummy: SIGNED8;
 
-		PROCEDURE AssignReg (pReg: LONGINT);
+		PROCEDURE AssignReg (pReg: SIGNED32);
 			VAR
-				hint, size: LONGINT;
+				hint, size: SIGNED32;
 		BEGIN
 			hint := Instr[pReg].hint; size:= (Instr[pReg].op MOD 8) * 8;
 			IF hint >= tryEAX THEN
@@ -1052,7 +1052,7 @@ References:
 	(* store, getReg *)
 		VAR
 			mode, scale, size, reg, base, inx: SIGNED8;
-			disp, delta: LONGINT;
+			disp, delta: SIGNED32;
 	BEGIN
 		FindMemReg (instr, mode, scale, size, base, inx, disp);
 		IF instr.op DIV 32 = GETreg THEN
@@ -1142,10 +1142,10 @@ ASSERT(~loaded(instr.dest));
 		OPO.GenPOP (Regs, reg, noBase, noInx, noScale, noDisp)
 	END GenPop;
 
-	PROCEDURE Gen1 (VAR instr: Instruction; RiscPC: LONGINT);
+	PROCEDURE Gen1 (VAR instr: Instruction; RiscPC: SIGNED32);
 	(* je, jne, jl, jle, jg, jge, ja, jae, jb, jbe, jc, jnc, jmp, jmpReg *)
 		VAR
-			op, mode, scale, size, reg, base, inx: SIGNED8; disp: LONGINT;
+			op, mode, scale, size, reg, base, inx: SIGNED8; disp: SIGNED32;
 	BEGIN
 		op := SHORT (instr.op DIV 32);
 		IF op = JmpReg THEN
@@ -1202,7 +1202,7 @@ ASSERT(~loaded(instr.dest));
 	(* add, sub, or, xor, and, btr, bts, sal, sar, shl, shr, rol *)
 		VAR
 			op, mode, scale, size, base, inx, src, dummy, shiftReg: SIGNED8;
-			disp: LONGINT;
+			disp: SIGNED32;
 	BEGIN
 		op := SHORT (instr.op DIV 32); mode := SHORT ((instr.op DIV 8) MOD 4); size := SHORT (instr.op MOD 8) * 8;
 		IF mode = ImmReg THEN
@@ -1273,7 +1273,7 @@ ASSERT(~loaded(instr.dest));
 	(* cmp, bt *)
 		VAR
 			op, mode, scale, size, base, inx, reg, dummy: SIGNED8;
-			disp: LONGINT;
+			disp: SIGNED32;
 	BEGIN
 		op := SHORT (instr.op DIV 32); mode := SHORT ((instr.op DIV 8) MOD 4); size := SHORT (instr.op MOD 8) * 8;
 		IF mode # ImmReg THEN
@@ -1379,7 +1379,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE GenDivMod (VAR instr: Instruction);
 		VAR
 			size, mode, src, base, inx, scale, dummy: SIGNED8;
-			disp, pRegBase, pRegInx: LONGINT;
+			disp, pRegBase, pRegInx: SIGNED32;
 	BEGIN
 		size := SHORT (instr.op MOD 8) * 8; mode := SHORT ((instr.op DIV 8) MOD 4);
 		IF (size # Bit8) & (regTab [EDX] = free) THEN regTab [EDX] := Occupied END; (* reserve EDX *)
@@ -1502,7 +1502,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE GenMul (VAR instr: Instruction);
 		VAR
 			size, mode, src, base, inx, scale, dummy:  SIGNED8;
-			disp, pRegBase, pRegInx: LONGINT;
+			disp, pRegBase, pRegInx: SIGNED32;
 	BEGIN
 		size := SHORT ((instr.op MOD 8) * 8); mode := SHORT ((instr.op DIV 8) MOD 4);
 		IF mode # ImmReg THEN
@@ -1630,7 +1630,7 @@ ASSERT(~loaded(instr.dest));
 	(* cmpString *)
 		VAR
 			src, srcAdr, src2Adr: SIGNED8;
-			Lfix, L0, L1: LONGINT;
+			Lfix, L0, L1: SIGNED32;
 	BEGIN
 		Lfix := OPO.pc;
 		FindLoadReg (instr.src1, srcAdr); FindLoadReg (instr.src2, src2Adr);
@@ -1657,7 +1657,7 @@ ASSERT(~loaded(instr.dest));
 		OPO.GenSetcc (SetccConvert [(instr.op DIV 32) - Sete], Regs, instr.reg, noInx, noScale, noDisp)
 	END Setcc;
 
-	PROCEDURE GenTrap (trapNr: LONGINT);
+	PROCEDURE GenTrap (trapNr: SIGNED32);
 	BEGIN
 		OPO.GenPUSH(Imme, 0, noBase, noInx, noScale, noDisp, trapNr);	(* PUSH TrapNr *)
 		OPO.PutByte(0CCH);		(* INT 3 *)
@@ -1692,7 +1692,7 @@ ASSERT(~loaded(instr.dest));
 	END GenTrapCC;
 
 	PROCEDURE FixupAndGenTrap;
-		VAR i, fixuppos, pos, next: LONGINT;
+		VAR i, fixuppos, pos, next: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE i < nofTrapFixups DO
@@ -1815,7 +1815,7 @@ ASSERT(~loaded(instr.dest));
 		END
 	END ReleaseFreg;
 
-	PROCEDURE AssignFreg (pReg: LONGINT);
+	PROCEDURE AssignFreg (pReg: SIGNED32);
 		VAR freg: SIGNED8;
 	BEGIN
 		GetFreg (freg);
@@ -1823,13 +1823,13 @@ ASSERT(~loaded(instr.dest));
 		Instr [pReg].reg := freg
 	END AssignFreg;
 
-	PROCEDURE TakeFreg (pReg: LONGINT; freg: SIGNED8);
+	PROCEDURE TakeFreg (pReg: SIGNED32; freg: SIGNED8);
 	BEGIN
 		ASSERT (fregTab[freg] = free);
 		fregTab [freg] := pReg; Instr [pReg].reg := freg
 	END TakeFreg;
 
-	PROCEDURE FindFreg (pReg: LONGINT; VAR freg: SIGNED8);
+	PROCEDURE FindFreg (pReg: SIGNED32; VAR freg: SIGNED8);
 	BEGIN
 		ASSERT ((pReg >= 0) & (Instr [pReg].reg >= 0));
 		freg := Instr [pReg].reg;
@@ -1842,7 +1842,7 @@ ASSERT(~loaded(instr.dest));
 	END LastUseF;
 
 	PROCEDURE DecCheckFreg (freg: SIGNED8);
-		VAR pReg: LONGINT;
+		VAR pReg: SIGNED32;
 	BEGIN
 		IF freg > none THEN
 			pReg := fregTab [freg];
@@ -1856,7 +1856,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE Fload (VAR instr: Instruction);
 		VAR
 			mode, scale, size, base, inx: SIGNED8;
-			disp: LONGINT;
+			disp: SIGNED32;
 	BEGIN
 		FindMemReg (instr, mode, scale, size, base, inx, disp); size := ((size DIV 8)-3)*2;
 		ASSERT (mode # RegReg);
@@ -1873,7 +1873,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE Fstore (VAR instr: Instruction);
 		VAR
 			mode, scale, size, base, inx, src: SIGNED8;
-			disp: LONGINT;
+			disp: SIGNED32;
 	BEGIN
 		FindMemReg (instr, mode, scale, size, base, inx, disp); size := ((size DIV 8)-3)*2;
 		IF instr.op DIV 32 = Fist THEN size := sInt END;
@@ -1991,7 +1991,7 @@ ASSERT(~loaded(instr.dest));
 		FreeReg (EAX)
 	END FloatCmp;
 
-	PROCEDURE AddExceptionHandler(pcFrom, pcTo, pcHandler: LONGINT);
+	PROCEDURE AddExceptionHandler(pcFrom, pcTo, pcHandler: SIGNED32);
 	VAR
 		entry: ExTableEntry;
 	BEGIN
@@ -2063,7 +2063,7 @@ ASSERT(~loaded(instr.dest));
 
 
 	PROCEDURE ClearSDynArr(VAR instr: Instruction);
-		VAR L: LONGINT; reg: SIGNED8;
+		VAR L: SIGNED32; reg: SIGNED8;
 	BEGIN
 		FindReg(instr.src1, reg);
 		OPO.GenTyp1 (XOR, RegReg, EAX, EAX, noInx, noScale, noDisp, noImm);
@@ -2076,13 +2076,13 @@ ASSERT(~loaded(instr.dest));
 
 (* general *)
 
-	PROCEDURE GenEnter (locSize: LONGINT; locals: OPT.Object; sysflag: SIGNED8);
-		VAR first: BOOLEAN; enoff, ensize: LONGINT;
+	PROCEDURE GenEnter (locSize: SIGNED32; locals: OPT.Object; sysflag: SIGNED8);
+		VAR first: BOOLEAN; enoff, ensize: SIGNED32;
 
-			last: LONGINT;		(*static local for ClearStack: last offset touched*)
+			last: SIGNED32;		(*static local for ClearStack: last offset touched*)
 
-		PROCEDURE ClearStack(off, size: LONGINT);
-			VAR L: LONGINT;
+		PROCEDURE ClearStack(off, size: SIGNED32);
+			VAR L: SIGNED32;
 		BEGIN
 			IF first THEN
 				OPO.GenTyp1 (XOR, RegReg, EAX, EAX, noInx, noScale, noDisp, noImm);
@@ -2109,12 +2109,12 @@ ASSERT(~loaded(instr.dest));
 			END
 		END ClearStack;
 
-		PROCEDURE TraverseLocals(offset: LONGINT; obj: OPT.Object);
+		PROCEDURE TraverseLocals(offset: SIGNED32; obj: OPT.Object);
 			(*!!! The locals are traversed in descending order (list traversal), the recfields are traversed
 				using a recursive postfix traversal to reverse the list !!!*)
-			VAR	size, adr, oldoff, oldsize: LONGINT; t: OPT.Struct;
+			VAR	size, adr, oldoff, oldsize: SIGNED32; t: OPT.Struct;
 
-			PROCEDURE TraverseRecord(offset: LONGINT; t: OPT.Struct);
+			PROCEDURE TraverseRecord(offset: SIGNED32; t: OPT.Struct);
 			BEGIN
 				IF t.BaseTyp # NIL THEN TraverseRecord(offset, t.BaseTyp) END;
 				TraverseLocals(offset, t.link)
@@ -2159,8 +2159,8 @@ ASSERT(~loaded(instr.dest));
 			END;
 		END TraverseLocals;
 
-		PROCEDURE FullClearStack(size: LONGINT);		(*size in doublewords*)
-			VAR  i: LONGINT;
+		PROCEDURE FullClearStack(size: SIGNED32);		(*size in doublewords*)
+			VAR  i: SIGNED32;
 		BEGIN
 			ASSERT(size > 0, 100);
 			IF size < 8 THEN
@@ -2224,7 +2224,7 @@ ASSERT(~loaded(instr.dest));
 	END GenLeave;
 
 	PROCEDURE PushRegs;
-		VAR i: SIGNED8; disp: LONGINT;
+		VAR i: SIGNED8; disp: SIGNED32;
 	BEGIN
 		IF nofSavedLevel > MaxSaveLevel THEN OPM.err (251)
 		ELSE
@@ -2271,7 +2271,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE PopRegs (VAR instr: Instruction);
 		VAR
 			i, j, size, freg: SIGNED8;
-			disp: LONGINT;
+			disp: SIGNED32;
 	BEGIN
 		DEC (nofSavedLevel);
 		IF instr.hint # noHint THEN
@@ -2409,8 +2409,8 @@ ASSERT(~loaded(instr.dest));
 *)
 	END PopRegs;
 
-	PROCEDURE FixupJcc (label: LONGINT);
-		VAR pos, nextLabel: LONGINT;
+	PROCEDURE FixupJcc (label: SIGNED32);
+		VAR pos, nextLabel: SIGNED32;
 	BEGIN
 		WHILE label # Nil DO
 			IF Instr [label].op = jmp THEN pos := Instr [label].pc + 1
@@ -2423,7 +2423,7 @@ ASSERT(~loaded(instr.dest));
 	END FixupJcc;
 
 	PROCEDURE FixupCaseTab (VAR instr: Instruction);
-		VAR elseLabel, from, to, val, caseFixup: LONGINT;
+		VAR elseLabel, from, to, val, caseFixup: SIGNED32;
 	BEGIN
 		caseFixup := link [0].offset;
 		elseLabel := Instr [instr.src2].pc;
@@ -2448,9 +2448,9 @@ ASSERT(~loaded(instr.dest));
 		link [0].offset := SHORT (instr.src1)
 	END FixupCaseTab;
 
-	PROCEDURE EncodeFixup (i: LONGINT);
+	PROCEDURE EncodeFixup (i: SIGNED32);
 		VAR
-			L, L1: LONGINT;
+			L, L1: SIGNED32;
 			node: OPT.Node;
 	BEGIN
 		node := Instr [i].node;
@@ -2467,7 +2467,7 @@ ASSERT(~loaded(instr.dest));
 	END EncodeFixup;
 
 	PROCEDURE GenAsm ( instr: Instruction );
-		VAR n, code, fix: OPT.Node; pc: LONGINT;
+		VAR n, code, fix: OPT.Node; pc: SIGNED32;
 	BEGIN
 		pc := OPO.pc; n := instr.node;
 		code := n.left;
@@ -2491,12 +2491,12 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE GenCode* (pSize: SIGNED16);
 		VAR
 			obj, list: OPT.Object;
-			i, k: LONGINT;
+			i, k: SIGNED32;
 			op, reg, ret, sysflag: SIGNED8;
 			node: OPT.Node;
 
 		PROCEDURE MarkPos;
-		VAR j : LONGINT;
+		VAR j : SIGNED32;
 		BEGIN
 			IF mapSize < LEN(map^) THEN
 				map[mapSize].pos := Instr[i].src1;
@@ -2666,7 +2666,7 @@ ASSERT(~loaded(instr.dest));
 (* fixups *)
 
 	PROCEDURE FixupLocalProcCall* (proc: OPT.Object);
-		VAR L, L1, entryNr: LONGINT;
+		VAR L, L1, entryNr: SIGNED32;
 	BEGIN
 		IF (proc.linkadr < 0) & ~(proc.mode IN {TProc, Typ}) THEN
 			L := -2 - proc.linkadr - 10000H;
@@ -2690,7 +2690,7 @@ ASSERT(~loaded(instr.dest));
 
 (* object file *)
 
-	PROCEDURE NewVarCons* (mod: LONGINT; entry: SIGNED16; VAR index: LONGINT);
+	PROCEDURE NewVarCons* (mod: SIGNED32; entry: SIGNED16; VAR index: SIGNED32);
 	VAR i: SIZE;  var: VarConsTable;
 	BEGIN
 		IF nofVarCons >= LEN(varConsLink) THEN
@@ -2704,7 +2704,7 @@ ASSERT(~loaded(instr.dest));
 		INC (nofVarCons)
 	END NewVarCons;
 
-	PROCEDURE VarConsLink (index, offset: LONGINT);
+	PROCEDURE VarConsLink (index, offset: SIGNED32);
 	VAR i: SIZE;  var: VarConsLinkTable;
 	BEGIN
 		IF nofVarConsLinks >= LEN(varConsTab) THEN
@@ -2725,7 +2725,7 @@ ASSERT(~loaded(instr.dest));
 		INC (nofVarConsLinks)
 	END VarConsLink;
 
-	PROCEDURE AbsAccess (node: OPT.Node; offset: LONGINT);
+	PROCEDURE AbsAccess (node: OPT.Node; offset: SIGNED32);
 	BEGIN
 		IF OPM.noerr THEN
 			IF (node # NIL) & (node.link = NIL) & (node.obj = NIL) & (node.left = NIL) & (node.right = NIL) THEN
@@ -2742,7 +2742,7 @@ ASSERT(~loaded(instr.dest));
 		END
 	END AbsAccess;
 
-	PROCEDURE NewEntry* (VAR entryNr: LONGINT);
+	PROCEDURE NewEntry* (VAR entryNr: SIGNED32);
 		VAR table: EntryTable; i: SIZE;
 	BEGIN
 		IF nofEntries >= LEN(entry) THEN
@@ -2755,7 +2755,7 @@ ASSERT(~loaded(instr.dest));
 		INC (nofEntries)
 	END NewEntry;
 
-	PROCEDURE NewLink* (mod, entry: LONGINT; VAR index: LONGINT);
+	PROCEDURE NewLink* (mod, entry: SIGNED32; VAR index: SIGNED32);
 	BEGIN
 		IF nofLinks >= LinkLength THEN
 			IF ~LinkErr THEN
@@ -2769,8 +2769,8 @@ ASSERT(~loaded(instr.dest));
 		END
 	END NewLink;
 
-	PROCEDURE AddLink (index, offset: LONGINT);
-		VAR old: LONGINT;
+	PROCEDURE AddLink (index, offset: SIGNED32);
+		VAR old: SIGNED32;
 	BEGIN
 		IF ~LinkErr THEN
 			OPO.GetDWord (offset, old);
@@ -2787,8 +2787,8 @@ ASSERT(~loaded(instr.dest));
 		END
 	END AddLink;
 
-	PROCEDURE AllocConst* (VAR s: ARRAY OF SYSTEM.BYTE; len, align: LONGINT; VAR adr: LONGINT);
-		VAR fill: LONGINT; table: OPO.ConstArray;
+	PROCEDURE AllocConst* (VAR s: ARRAY OF SYSTEM.BYTE; len, align: SIGNED32; VAR adr: SIGNED32);
+		VAR fill: SIGNED32; table: OPO.ConstArray;
 	BEGIN
 		IF ~ConstErr THEN
 			adr := OPO.csize;
@@ -2812,8 +2812,8 @@ ASSERT(~loaded(instr.dest));
 		END
 	END AllocConst;
 
-	PROCEDURE AllocCaseTab* (low, high: LONGINT; VAR tab: LONGINT);
-		VAR len, i: LONGINT; table: OPO.ConstArray;
+	PROCEDURE AllocCaseTab* (low, high: SIGNED32; VAR tab: SIGNED32);
+		VAR len, i: SIGNED32; table: OPO.ConstArray;
 	BEGIN
 		IF ~ConstErr THEN
 			len := 4 * (high - low + 1);
@@ -2836,7 +2836,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE AllocTypDesc* (typ: OPT.Struct);
 	(* typ.tdadr = entryNr adr *)
-		VAR nil: LONGINT; table: RecTable; i: SIZE;
+		VAR nil: SIGNED32; table: RecTable; i: SIZE;
 	BEGIN
 		IF typ.comp = Record THEN
 			nil := 0; AllocConst (nil, 4, 4, typ.tdadr);
@@ -2852,7 +2852,7 @@ ASSERT(~loaded(instr.dest));
 		END (* no typ desc for arrays *)
 	END AllocTypDesc;
 
-	PROCEDURE CaseJump* (Label, tab, from, to: LONGINT);
+	PROCEDURE CaseJump* (Label, tab, from, to: SIGNED32);
 	BEGIN
 		IF ~ConstErr THEN
 			from := tab + 4 * from; to := tab + 4 * to;
@@ -2865,7 +2865,7 @@ ASSERT(~loaded(instr.dest));
 	END CaseJump;
 
 	PROCEDURE OutRefPoint* (proc: OPT.Object);
-		VAR obj: OPT.Object; n: LONGINT;
+		VAR obj: OPT.Object; n: SIGNED32;
 	BEGIN
 		IF proc = NIL THEN (* Module Body *)
 			OPM.RefW (RefTag);
@@ -2965,13 +2965,13 @@ ASSERT(~loaded(instr.dest));
 		END
 	END OutRefs;
 
-	PROCEDURE LSW (x: LONGINT): LONGINT;
+	PROCEDURE LSW (x: SIGNED32): SIGNED32;
 	BEGIN (* least significant word (unsigned) *)
-		RETURN SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, x) * SYSTEM.VAL(SET, 0FFFFH))
+		RETURN SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, x) * SYSTEM.VAL(SET, 0FFFFH))
 	END LSW;
 
 	PROCEDURE Export(obj: OPT.Object; VAR nofExp: SIGNED16);
-		VAR typ: OPT.Struct; i: LONGINT; tmp: ExpTable;
+		VAR typ: OPT.Struct; i: SIGNED32; tmp: ExpTable;
 
 		PROCEDURE ExportMeth(fld: OPT.Object; basetyp: OPT.Struct; VAR noFld: SIGNED16);
 		BEGIN
@@ -2984,7 +2984,7 @@ ASSERT(~loaded(instr.dest));
 		END ExportMeth;
 
 		PROCEDURE ExportRecord(typ: OPT.Struct);
-			VAR fld: OPT.Object; pos: LONGINT; nofld: SIGNED16;
+			VAR fld: OPT.Object; pos: SIGNED32; nofld: SIGNED16;
 		BEGIN
 			IF typ.mno=0 THEN
 				OPM.ObjW(EURecord);
@@ -3102,7 +3102,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE OutCode*(VAR modName: ARRAY OF CHAR);
 		VAR
-			i, k, pos: LONGINT;
+			i, k, pos: SIGNED32;
 			nofcmds, nofnewmth, nofinhmth, linkCorrection, nofExp, nofImp: SIGNED16;
 			obj: OPT.Object;
 			typ, btyp: OPT.Struct;
@@ -3121,14 +3121,14 @@ ASSERT(~loaded(instr.dest));
 			UNTIL ch = 0X
 		END WriteName;
 
-		PROCEDURE FindPtrs (typ: OPT.Struct; adr: LONGINT);
+		PROCEDURE FindPtrs (typ: OPT.Struct; adr: SIGNED32);
 			VAR
 				fld: OPT.Object;
-				i, n, s: LONGINT;
+				i, n, s: SIGNED32;
 				j: SIZE;
 				btyp: OPT.Struct;
 
-				PROCEDURE Add(adr: LONGINT);
+				PROCEDURE Add(adr: SIGNED32);
 				VAR  table: PtrTable;
 				BEGIN
 					IF nofptrs >= LEN(ptrTab) THEN

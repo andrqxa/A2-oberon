@@ -418,7 +418,7 @@ TYPE
 				END WriteRectangleProperty;
 
 				PROCEDURE WriteAlignmentAndBounds(CONST identifier : Identifier; vc : WMComponents.VisualComponent; forceBounds : BOOLEAN);
-				VAR alignment : LONGINT; r : WMRectangles.Rectangle;
+				VAR alignment : SIGNED32; r : WMRectangles.Rectangle;
 				BEGIN
 					alignment := vc.alignment.Get();
 					IF ~vc.alignment.GetIsDefault() THEN
@@ -538,7 +538,7 @@ TYPE
 		END Transform;
 
 		PROCEDURE GenerateCode(CONST targetName, templateName, skeletonName,  moduleName : ARRAY OF CHAR; VAR res : WORD);
-		VAR base, skeleton : Texts.Text; format : LONGINT; fileName : Files.FileName;
+		VAR base, skeleton : Texts.Text; format : SIGNED32; fileName : Files.FileName;
 		BEGIN
 			NEW(base); TextUtilities.LoadAuto(base, templateName, format, res);
 			IF (res = 0) THEN
@@ -630,7 +630,7 @@ BEGIN
 	error := nofReplacements # 1;
 END ReplaceString;
 
-PROCEDURE AlignmentToStream(alignment : LONGINT; w : Streams.Writer);
+PROCEDURE AlignmentToStream(alignment : SIGNED32; w : Streams.Writer);
 BEGIN
 	CASE alignment OF
 		|WMComponents.AlignNone: w.String("WMComponents.AlignNone");
@@ -677,7 +677,7 @@ BEGIN
 	END;
 END GetPropertyNameAsString;
 
-PROCEDURE Indent(writer : Streams.Writer; level : LONGINT);
+PROCEDURE Indent(writer : Streams.Writer; level : SIGNED32);
 BEGIN
 	WHILE (level > 0) DO writer.Char(TAB); DEC(level); END;
 END Indent;

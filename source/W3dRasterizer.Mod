@@ -10,7 +10,7 @@ TYPE
 	VAR
 		p*, pt*, n*, nt* : Vectors.TVector3d;
 		u*, v*, x*, y* : LONGREAL;
-		color* : LONGINT;
+		color* : SIGNED32;
 		behind* : BOOLEAN;
 
 		PROCEDURE SetPos*(p : Vectors.TVector3d);
@@ -23,7 +23,7 @@ TYPE
 			SELF.u := u; SELF.v := v
 		END SetUV;
 
-		PROCEDURE SetColor*(color : LONGINT);
+		PROCEDURE SetColor*(color : SIGNED32);
 		BEGIN
 			SELF.color := color
 		END SetColor;
@@ -37,8 +37,8 @@ TYPE
 	Triangle* = RECORD
 		normal* : Vectors.TVector3d;
 		vert* : ARRAY 3 OF Vertex;
-		color* : LONGINT;
-		transColor*: LONGINT;
+		color* : SIGNED32;
+		transColor*: SIGNED32;
 		tex* : Texture;
 		mask0*, culled* : BOOLEAN;
 	END;
@@ -46,12 +46,12 @@ TYPE
 	Rasterizer* = OBJECT
 	VAR img*, saveimg: Raster.Image;
 		zBuffer, savezBuffer : POINTER TO ARRAY OF REAL;
-		invBuffer : POINTER TO ARRAY OF LONGINT;
+		invBuffer : POINTER TO ARRAY OF SIGNED32;
 
 		width*, height* : SIZE;
 		(* Global to avoid stack clearing penalty, TODO: check accesstimes *)
 		x0, x1, x2, x3, dxL, dxR, xL, xR, xStart, xEnd, tr: REAL;
-		y0, y1, y2, dx, zStride, stride: SIZE; color: LONGINT; (* buffer variables *)
+		y0, y1, y2, dx, zStride, stride: SIZE; color: SIGNED32; (* buffer variables *)
 		adrBase, zBufBase: ADDRESS;
 
 		tx0, tx1, tx2, tx3, ty0, ty1, ty2, ty3, txStart, tyStart, dtxStart, dtyStart, dtx, dty: REAL; (* parameters for affine texture *)
@@ -103,18 +103,18 @@ TYPE
 			SELF.invertable := invertable
 		END SetInvertable;
 
-		PROCEDURE SetObjectIndex*(idx : LONGINT);
+		PROCEDURE SetObjectIndex*(idx : SIGNED32);
 		BEGIN
 			SELF.invIdx := idx
 		END SetObjectIndex;
 
 		(** Return 0 if no object found *)
-		PROCEDURE GetInvIdx*(x, y : SIZE) : LONGINT;
+		PROCEDURE GetInvIdx*(x, y : SIZE) : SIGNED32;
 		BEGIN
 			IF (invBuffer#NIL) & (x >= 0) & (x < width) & (y >= 0) & (y < height) THEN RETURN invBuffer[y * width + x] ELSE RETURN 0 END
 		END GetInvIdx;
 
-		PROCEDURE Clear*(color: LONGINT);
+		PROCEDURE Clear*(color: SIGNED32);
 		VAR pix : Raster.Pixel;
 			mode : Raster.Mode;
 			i : SIZE;
@@ -122,12 +122,12 @@ TYPE
 			Raster.InitMode(mode, Raster.srcCopy);
 			Raster.SetRGB(pix, color DIV 65536 MOD 256, color DIV 256 MOD 256, color MOD 256);
 			Raster.Fill(img, 0, 0, width, height, pix, mode);
-			FOR i := 0 TO width * height - 1 DO zBuffer[i] := MAX(LONGINT) END;
+			FOR i := 0 TO width * height - 1 DO zBuffer[i] := MAX(SIGNED32) END;
 			IF invertable THEN FOR i := 0 TO width * height - 1 DO invBuffer[i] := 0 END END
 		END Clear;
 
 		PROCEDURE RenderLine;
-		VAR adr, zAdr, invAdr: ADDRESS; x : LONGINT; z, ttx, tty: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x : SIGNED32; z, ttx, tty: REAL;
 		BEGIN
 			xL := xStart; xR := xEnd; z := zStart;
 			ttx := txStart; tty := tyStart;
@@ -153,7 +153,7 @@ TYPE
 				END;
 				IF z < SYSTEM.VAL(REAL, SYSTEM.GET32(zAdr)) THEN
 					SYSTEM.PUT16(adr, color);
-					SYSTEM.PUT32(zAdr, SYSTEM.VAL(LONGINT, z));
+					SYSTEM.PUT32(zAdr, SYSTEM.VAL(SIGNED32, z));
 					IF invertable THEN SYSTEM.PUT32(invAdr, invIdx) END
 				END;
 				INC(zAdr, 4); INC(invAdr, 4); INC(adr, 2); z := z + dz
@@ -165,7 +165,7 @@ TYPE
 		END RenderLine;
 
 		PROCEDURE RenderLineTex(tex : Texture);
-		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: LONGINT; tadr: SIZE; z, tx, ty: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: SIGNED32; tadr: SIZE; z, tx, ty: REAL;
 		BEGIN
 			xL := xStart;
 			xR := xEnd;
@@ -201,7 +201,7 @@ TYPE
 						color := SYSTEM.GET16(tex.img.adr + tadr);
 					END;
 					SYSTEM.PUT16(adr, color);
-					SYSTEM.PUT32(zAdr, SYSTEM.VAL(LONGINT, z));
+					SYSTEM.PUT32(zAdr, SYSTEM.VAL(SIGNED32, z));
 					IF invertable THEN SYSTEM.PUT32(invAdr, invIdx) END
 				END;
 				INC(zAdr, 4); INC(invAdr, 4); INC(adr, 2);
@@ -323,7 +323,7 @@ TYPE
 (* Expensive perspective case *)
 
 		PROCEDURE RenderPerspLineTex(tex : Texture);
-		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: LONGINT; tadr: SIZE; z, zinv, rzinv, tx, ty, txr, tyr: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: SIGNED32; tadr: SIZE; z, zinv, rzinv, tx, ty, txr, tyr: REAL;
 		BEGIN
 			xL := xStart;
 			xR := xEnd;
@@ -364,7 +364,7 @@ TYPE
 						color := SYSTEM.GET16(tex.img.adr + tadr)
 					END;
 					SYSTEM.PUT16(adr, color);
-					SYSTEM.PUT32(zAdr, SYSTEM.VAL(LONGINT, z));
+					SYSTEM.PUT32(zAdr, SYSTEM.VAL(SIGNED32, z));
 					IF invertable THEN SYSTEM.PUT32(invAdr, invIdx) END
 				END;
 				INC(zAdr, 4); INC(invAdr, 4); INC(adr, 2);
@@ -381,7 +381,7 @@ TYPE
 		END RenderPerspLineTex;
 
 		PROCEDURE RenderPerspLineFlat;
-		VAR adr, zAdr, invAdr: ADDRESS; x: LONGINT; z, zinv, rzinv: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x: SIGNED32; z, zinv, rzinv: REAL;
 		BEGIN
 			xL := xStart;
 			xR := xEnd;
@@ -413,7 +413,7 @@ TYPE
 
 				IF z < SYSTEM.VAL(REAL, SYSTEM.GET32(zAdr)) THEN
 					SYSTEM.PUT16(adr, color);
-					SYSTEM.PUT32(zAdr, SYSTEM.VAL(LONGINT, z));
+					SYSTEM.PUT32(zAdr, SYSTEM.VAL(SIGNED32, z));
 					IF invertable THEN SYSTEM.PUT32(invAdr, invIdx) END
 				END;
 				INC(zAdr, 4); INC(invAdr, 4); INC(adr, 2);
@@ -529,8 +529,8 @@ TYPE
 (* Experimental Subdivision case *)
 
 		PROCEDURE SubDivLineTex(tex : Texture);
-		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: LONGINT; tadr: SIZE; zinv, txr, tyr, zr, rzinv, tx, ty, sdtx, sdty, stx, sty, szr, ezr, dzr, subDivInv: REAL;
-				i : LONGINT;
+		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: SIGNED32; tadr: SIZE; zinv, txr, tyr, zr, rzinv, tx, ty, sdtx, sdty, stx, sty, szr, ezr, dzr, subDivInv: REAL;
+				i : SIGNED32;
 		CONST SubDiv = 16;
 		BEGIN
 			subDivInv := 1 / SubDiv;
@@ -589,7 +589,7 @@ TYPE
 						color := SYSTEM.GET16(tex.img.adr + tadr);
 					END;
 					SYSTEM.PUT16(adr, color);
-					SYSTEM.PUT32(zAdr, SYSTEM.VAL(LONGINT, zr));
+					SYSTEM.PUT32(zAdr, SYSTEM.VAL(SIGNED32, zr));
 					IF invertable THEN SYSTEM.PUT32(invAdr, invIdx) END
 				END;
 				INC(zAdr, 4); INC(invAdr, 4); INC(adr, 2);
@@ -607,8 +607,8 @@ TYPE
 		END SubDivLineTex;
 
 		PROCEDURE SubDivLineFlat;
-		VAR adr, zAdr, invAdr: ADDRESS; x: LONGINT; zinv, zr, rzinv, szr, ezr, dzr, subDivInv: REAL;
-				i : LONGINT;
+		VAR adr, zAdr, invAdr: ADDRESS; x: SIGNED32; zinv, zr, rzinv, szr, ezr, dzr, subDivInv: REAL;
+				i : SIGNED32;
 		CONST SubDiv = 16;
 		BEGIN
 			subDivInv := 1 / SubDiv;
@@ -653,7 +653,7 @@ TYPE
 
 				IF zr < SYSTEM.VAL(REAL, SYSTEM.GET32(zAdr)) THEN
 					SYSTEM.PUT16(adr, color);
-					SYSTEM.PUT32(zAdr, SYSTEM.VAL(LONGINT, zr));
+					SYSTEM.PUT32(zAdr, SYSTEM.VAL(SIGNED32, zr));
 					IF invertable THEN SYSTEM.PUT32(invAdr, invIdx) END
 				END;
 				INC(zAdr, 4); INC(invAdr, 4); INC(adr, 2);

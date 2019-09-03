@@ -51,7 +51,7 @@ VAR
 	END Copy;
 
 	PROCEDURE Recall( layer: tLayer );
-	VAR x, y, i: SIGNED16;  col: LONGINT;  w, h: SIGNED16;
+	VAR x, y, i: SIGNED16;  col: SIGNED32;  w, h: SIGNED16;
 	BEGIN
 		vyGraphBase.Rect2dToRect( 0, 0, 1, 1, x, y, w, h );
 		FOR y := 0 TO 15 DO
@@ -101,7 +101,7 @@ VAR
 	END Prompt;
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR index, index2: SIGNED16;  dx, dy: SIGNED16;  r, g, b: REAL;  dcol: LONGINT;  r1, g1, b1: REAL;  dcol1: LONGINT;
+	VAR index, index2: SIGNED16;  dx, dy: SIGNED16;  r, g, b: REAL;  dcol: SIGNED32;  r1, g1, b1: REAL;  dcol1: SIGNED32;
 	BEGIN
 		IF LGetCol( layer, event.x, event.y, index ) THEN
 			vyTracking.FramedString( event.x + 10, event.y, "Syntax10.Scn.Fnt", "exchange with ?", dx, dy );
@@ -298,7 +298,7 @@ VAR
 	END Path2;
 
 	PROCEDURE LPath*;
-	VAR r1, g1, b1, r2, g2, b2: REAL;  keys: SET;  x, y, dx, dy: SIGNED16;  from, to: LONGINT;  msg: vyColorPalettes.GetColMsg;  sc: Texts.Scanner;
+	VAR r1, g1, b1, r2, g2, b2: REAL;  keys: SET;  x, y, dx, dy: SIGNED16;  from, to: SIGNED32;  msg: vyColorPalettes.GetColMsg;  sc: Texts.Scanner;
 		obj: Objects.Object;
 	BEGIN
 

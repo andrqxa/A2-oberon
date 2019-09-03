@@ -28,7 +28,7 @@ CONST
 TYPE
 
 	ErrorMessage* = RECORD
-		code : LONGINT;
+		code : SIGNED32;
 		moduleName- : Modules.Name;
 		text- : Strings.String; (* is never NIL *)
 	END;
@@ -37,7 +37,7 @@ TYPE
 
 VAR
 	cache : ErrorMessages;
-	index : LONGINT;
+	index : SIGNED32;
 	lastModuleName : Modules.Name;
 
 PROCEDURE GetErrorString(errorCode : WORD) : Strings.String;
@@ -94,12 +94,12 @@ BEGIN
 END Add;
 
 PROCEDURE Get(number : WORD; VAR errorMessage : ErrorMessage; VAR res : WORD);
-VAR i : LONGINT;
+VAR i : SIGNED32;
 BEGIN
 	IF (cache # NIL) THEN
 		i := 0; WHILE (i < index) & (cache[i].code # number) DO INC(i); END;
 	ELSE
-		i := MAX(LONGINT);
+		i := MAX(SIGNED32);
 	END;
 	IF (i < index) THEN
 		errorMessage := cache[i]; res := Ok;
@@ -172,7 +172,7 @@ END Open;
 	show all loaded error messages. This procedure is primarly for testing purposes. *)
 PROCEDURE Show*(context : Commands.Context); (** [error number] ~ *)
 CONST Tab = 09X;
-VAR number, i : LONGINT; errorMessage : ErrorMessage;
+VAR number, i : SIGNED32; errorMessage : ErrorMessage;
 BEGIN
 	IF context.arg.GetInteger(number, FALSE) THEN
 		errorMessage := GetErrorMessage(number);

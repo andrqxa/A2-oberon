@@ -133,7 +133,7 @@ TYPE
 		PROCEDURE SetRange*(x, y, w, h : REAL; showTransition : BOOLEAN);
 		VAR
 			sx, sy, sx2, sy2, dx, dy, dx2, dy2, x2, y2  : REAL;
-			i, steps : LONGINT;
+			i, steps : SIGNED32;
 		CONST Steps = 16;
 
 			PROCEDURE Set(x, y, w, h : REAL);
@@ -206,7 +206,7 @@ TYPE
 			wr, nr : WMRectangles.Rectangle;
 
 			PROCEDURE InternalDraw(r : WMRectangles.Rectangle; cur : WMWindowManager.Window);
-			VAR nr, cb, dsr : WMRectangles.Rectangle; width, height : LONGINT;
+			VAR nr, cb, dsr : WMRectangles.Rectangle; width, height : SIGNED32;
 			BEGIN
 				ASSERT(cur.isVisible);
 				IF cur.useAlpha & (cur.prev # NIL)  THEN Draw(r, cur.prev)
@@ -401,7 +401,7 @@ TYPE
 			IF (r0.b < r1.b) THEN res.b := r0.b; ELSE res.b := r1.b; END;
 
 			rect := WMRectangles.MakeRect(ENTIER(viewPort.fx * (res.l - r1.l)), ENTIER(viewPort.fy * (res.t - r1.t)), ENTIER(viewPort.fx * (res.r - r1.l)), ENTIER(viewPort.fy * (res.b - r1.t)));
-			WMGraphicUtilities.DrawRect(canvas, rect, LONGINT(0FF0000FFH), WMGraphics.ModeCopy);
+			WMGraphicUtilities.DrawRect(canvas, rect, SIGNED32(0FF0000FFH), WMGraphics.ModeCopy);
 		END Draw;
 
 	BEGIN {ACTIVE}

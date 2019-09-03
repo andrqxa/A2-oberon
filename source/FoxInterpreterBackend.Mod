@@ -16,7 +16,7 @@ TYPE
 
 	Int1 = SIGNED8;
 	Int2 = SIGNED16;
-	Int4 = LONGINT;
+	Int4 = SIGNED32;
 	Int8 = HUGEINT;
 	Float4 = REAL;
 	Float8 = LONGREAL;
@@ -367,7 +367,7 @@ TYPE
 	InterpreterBackend = OBJECT (IntermediateBackend.IntermediateBackend)
 	VAR
 		heap: Heap;
-		addressSize, setSize: LONGINT;
+		addressSize, setSize: SIGNED32;
 
 		PROCEDURE &InitInterpreterBackend;
 		BEGIN InitBackend;

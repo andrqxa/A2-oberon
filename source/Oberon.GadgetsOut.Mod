@@ -63,7 +63,7 @@ END Clear;
 	of output to a string attribute, the string is always overwritten. *)
 
 PROCEDURE Append*;
-VAR a: Objects.AttrMsg;  r: Texts.Reader;  i, pos: LONGINT;
+VAR a: Objects.AttrMsg;  r: Texts.Reader;  i, pos: SIGNED32;
 BEGIN
 	IF text = NIL THEN
 		ASSERT(outobj # NIL);
@@ -87,27 +87,27 @@ BEGIN
 	Texts.Write(w, x)
 END Char;
 
-PROCEDURE Date*(t, d: LONGINT);
+PROCEDURE Date*(t, d: SIGNED32);
 BEGIN
 	Texts.WriteDate(w, t, d)
 END Date;
 
-PROCEDURE Int*(x, n: LONGINT);
+PROCEDURE Int*(x, n: SIGNED32);
 BEGIN
 	Texts.WriteInt(w, x, n)
 END Int;
 
-PROCEDURE IntHex*(x: LONGINT);
+PROCEDURE IntHex*(x: SIGNED32);
 BEGIN
 	Texts.WriteHex(w, x)
 END IntHex;
 
-PROCEDURE Real*(x: REAL;  n: LONGINT);
+PROCEDURE Real*(x: REAL;  n: SIGNED32);
 BEGIN
 	Texts.WriteReal(w, x, n)
 END Real;
 
-PROCEDURE RealFix*(x: REAL;  n, f, E: LONGINT);
+PROCEDURE RealFix*(x: REAL;  n, f, E: SIGNED32);
 BEGIN
 	Texts.WriteRealFix(w, x, n, f, E)
 END RealFix;
@@ -117,12 +117,12 @@ BEGIN
 	Texts.WriteRealHex(w, x)
 END RealHex;
 
-PROCEDURE LongReal*(x: LONGREAL;  n: LONGINT);
+PROCEDURE LongReal*(x: LONGREAL;  n: SIGNED32);
 BEGIN
 	Texts.WriteLongReal(w, x, n)
 END LongReal;
 
-PROCEDURE LongRealFix*(x: LONGREAL;  n, f, E: LONGINT);
+PROCEDURE LongRealFix*(x: LONGREAL;  n, f, E: SIGNED32);
 BEGIN
 	Texts.WriteLongRealFix(w, x, n, f, E)
 END LongRealFix;

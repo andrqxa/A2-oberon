@@ -27,7 +27,7 @@ TYPE
 	NamePlate* = POINTER TO NamePlateDesc;
 	NamePlateDesc* = RECORD (Gadgets.FrameDesc)
 		selbeg, selend: SIGNED16;
-		time: LONGINT;
+		time: SIGNED32;
 		carpos, carx, cary: SIGNED16;
 		val: ARRAY MaxLen OF CHAR;
 		start: SIGNED16
@@ -89,7 +89,7 @@ BEGIN
 END Delete;
 
 PROCEDURE DocToPlate(F: NamePlate);
-	VAR i, j, k: LONGINT;
+	VAR i, j, k: SIGNED32;
 BEGIN
 	IF F.carpos >= 0 THEN RETURN END;
 	COPY(F.obj(Documents.Document).name, F.val);
@@ -118,7 +118,7 @@ END DocToPlate;
 
 PROCEDURE PlateToDoc(F: NamePlate);
 	VAR
-		i, j: LONGINT;
+		i, j: SIGNED32;
 		lastChar: CHAR;
 BEGIN
 	IF F.carpos >= 0 THEN RETURN END;
@@ -305,7 +305,7 @@ BEGIN
 END RemoveCaret;
 
 PROCEDURE TrackCaret(VAR DR: Display3.Mask; F: NamePlate; x, y: SIGNED16);
-VAR mx, my, pos: SIGNED16; keys, keysum: SET; time, beg, end, p: LONGINT; text: Texts.Text;
+VAR mx, my, pos: SIGNED16; keys, keysum: SET; time, beg, end, p: SIGNED32; text: Texts.Text;
 	R: Texts.Reader; ch: CHAR;
 BEGIN
 	RemoveCaret(DR, F, x, y); keysum := {};
@@ -353,7 +353,7 @@ BEGIN
 END RemoveSelection;
 
 PROCEDURE TrackSelection(R: Display3.Mask; F: NamePlate; x, y: SIGNED16);
-VAR mx, my, pos, spos, epos, len: SIGNED16; keys, keysum: SET; time: LONGINT;
+VAR mx, my, pos, spos, epos, len: SIGNED16; keys, keysum: SET; time: SIGNED32;
 	C: Oberon.ConsumeMsg;
 BEGIN
 	Oberon.FadeCursor(Oberon.Mouse);
@@ -406,7 +406,7 @@ BEGIN
 	END
 END TrackSelection;
 
-PROCEDURE GetSelection(F: NamePlate; VAR text: Texts.Text; VAR beg, end, time: LONGINT);
+PROCEDURE GetSelection(F: NamePlate; VAR text: Texts.Text; VAR beg, end, time: SIGNED32);
 VAR p: SIGNED16; W: Texts.Writer;
 BEGIN
 	NEW(text); Texts.Open(text, "");
@@ -466,7 +466,7 @@ BEGIN
 END NamePlateAttr;
 
 PROCEDURE ConsumeText(F: NamePlate; VAR M: Oberon.ConsumeMsg);
-VAR R: Texts.Reader; ch: CHAR; pos: LONGINT;
+VAR R: Texts.Reader; ch: CHAR; pos: SIGNED32;
 BEGIN
 	F.selbeg := -1;
 	pos := M.beg; Texts.OpenReader(R, M.text, pos);
@@ -600,7 +600,7 @@ BEGIN
 END CopyNamePlate;
 
 PROCEDURE NamePlateHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR F2: NamePlate; x, y, w, h: SIGNED16; R: Display3.Mask; ver: LONGINT; obj: Objects.Object; A: Objects.AttrMsg;
+VAR F2: NamePlate; x, y, w, h: SIGNED16; R: Display3.Mask; ver: SIGNED32; obj: Objects.Object; A: Objects.AttrMsg;
 BEGIN
 	IF Oberon.New THEN XtraOffset := 15 ELSE XtraOffset := 0 END;
 	WITH F: NamePlate DO

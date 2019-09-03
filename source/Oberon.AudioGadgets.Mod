@@ -11,7 +11,7 @@ MODULE AudioGadgets IN Oberon;	(** portable *) (* EJZ,  *)
 	TYPE
 		LCDFrame* = POINTER TO LCDFrameDesc;
 		LCDFrameDesc* = RECORD (Gadgets.FrameDesc)
-			val: LONGINT;
+			val: SIGNED32;
 			backCol, digiCol, shadowCol: SIGNED16;
 			digits, width: SIGNED16;
 			border: SIGNED16
@@ -25,7 +25,7 @@ MODULE AudioGadgets IN Oberon;	(** portable *) (* EJZ,  *)
 	PROCEDURE RestoreLCD(F: LCDFrame; Q: Display3.Mask; x, y, w, h: SIGNED16; back: BOOLEAN);
 		VAR
 			ledh, ledw, i, ox, oy: SIGNED16;
-			val, digi: LONGINT;
+			val, digi: SIGNED32;
 			A: Objects.AttrMsg;
 		PROCEDURE HLed(x, y: SIGNED16; on: BOOLEAN);
 			VAR j, col: SIGNED16;

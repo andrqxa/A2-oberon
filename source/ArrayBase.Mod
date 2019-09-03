@@ -16,11 +16,11 @@ MODULE ArrayBase;   (**  AUTHOR "fof"; PURPOSE "runtime array operators";  **)
 			minus ("-A") , not ("~A");
 			abs ("ABS(A)")
 			conversion (used to cast operators. Additionally "SHORT(A)","LONG(A)","ENTIER(A)" supported)
-				SIGNED8 -> {SIGNED16,LONGINT,REAL,LONGREAL},
-				SIGNED16->{SIGNED8,LONGINT,REAL,LONGREAL},
-				LONGINT->{SIGNED16,REAL,LONGREAL},
-				REAL -> {LONGINT,LONGREAL}
-				LONGREAL->{REAL,LONGINT}
+				SIGNED8 -> {SIGNED16,SIGNED32,REAL,LONGREAL},
+				SIGNED16->{SIGNED8,SIGNED32,REAL,LONGREAL},
+				SIGNED32->{SIGNED16,REAL,LONGREAL},
+				REAL -> {SIGNED32,LONGREAL}
+				LONGREAL->{REAL,SIGNED32}
 			transpose ("A`")
 
 	2.) binary operators
@@ -83,7 +83,7 @@ MODULE ArrayBase;   (**  AUTHOR "fof"; PURPOSE "runtime array operators";  **)
 IMPORT KernelLog, SYSTEM, Heaps;
 
 TYPE
-	Address = LONGINT;
+	Address = SIGNED32;
 
 	UnaryAALoop = PROCEDURE ( ladr, dadr, linc, dinc, len: Address );
 	UnaryASLoop = PROCEDURE ( ladr, dadr, linc, len: Address );
@@ -117,37 +117,37 @@ CONST
 	Size7Flag = 9; (* size = 7 *)
 	Size8Flag = 10; (* size = 8 *)
 
-	Mat2x2 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,Size2Flag});
-	Mat3x3 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,Size3Flag});
-	Mat4x4 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,Size4Flag});
-	Mat5x5 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,Size5Flag});
-	Mat6x6 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,Size6Flag});
-	Mat7x7 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,Size7Flag});
-	Mat8x8 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,Size8Flag});
+	Mat2x2 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,Size2Flag});
+	Mat3x3 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,Size3Flag});
+	Mat4x4 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,Size4Flag});
+	Mat5x5 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,Size5Flag});
+	Mat6x6 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,Size6Flag});
+	Mat7x7 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,Size7Flag});
+	Mat8x8 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,Size8Flag});
 
-	Vec2 = SYSTEM.VAL(LONGINT,{SmallVectorFlag,Size2Flag});
-	Vec3 = SYSTEM.VAL(LONGINT,{SmallVectorFlag,Size3Flag});
-	Vec4 = SYSTEM.VAL(LONGINT,{SmallVectorFlag,Size4Flag});
-	Vec5 = SYSTEM.VAL(LONGINT,{SmallVectorFlag,Size5Flag});
-	Vec6 = SYSTEM.VAL(LONGINT,{SmallVectorFlag,Size6Flag});
-	Vec7 = SYSTEM.VAL(LONGINT,{SmallVectorFlag,Size7Flag});
-	Vec8 = SYSTEM.VAL(LONGINT,{SmallVectorFlag,Size8Flag});
+	Vec2 = SYSTEM.VAL(SIGNED32,{SmallVectorFlag,Size2Flag});
+	Vec3 = SYSTEM.VAL(SIGNED32,{SmallVectorFlag,Size3Flag});
+	Vec4 = SYSTEM.VAL(SIGNED32,{SmallVectorFlag,Size4Flag});
+	Vec5 = SYSTEM.VAL(SIGNED32,{SmallVectorFlag,Size5Flag});
+	Vec6 = SYSTEM.VAL(SIGNED32,{SmallVectorFlag,Size6Flag});
+	Vec7 = SYSTEM.VAL(SIGNED32,{SmallVectorFlag,Size7Flag});
+	Vec8 = SYSTEM.VAL(SIGNED32,{SmallVectorFlag,Size8Flag});
 
-	MatVec2x2 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,SmallVectorFlag,Size2Flag});
-	MatVec3x3 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,SmallVectorFlag,Size3Flag});
-	MatVec4x4 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,SmallVectorFlag,Size4Flag});
-	MatVec5x5 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,SmallVectorFlag,Size5Flag});
-	MatVec6x6 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,SmallVectorFlag,Size6Flag});
-	MatVec7x7 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,SmallVectorFlag,Size7Flag});
-	MatVec8x8 = SYSTEM.VAL(LONGINT,{SmallMatrixFlag,SmallVectorFlag,Size8Flag});
+	MatVec2x2 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,SmallVectorFlag,Size2Flag});
+	MatVec3x3 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,SmallVectorFlag,Size3Flag});
+	MatVec4x4 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,SmallVectorFlag,Size4Flag});
+	MatVec5x5 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,SmallVectorFlag,Size5Flag});
+	MatVec6x6 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,SmallVectorFlag,Size6Flag});
+	MatVec7x7 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,SmallVectorFlag,Size7Flag});
+	MatVec8x8 = SYSTEM.VAL(SIGNED32,{SmallMatrixFlag,SmallVectorFlag,Size8Flag});
 
 TYPE
-	FastMatMul* = PROCEDURE ( matrixA, matrixB, matrixC, IncA, StrideA, IncB, StrideB, IncC, StrideC, RowsA, ColsA, RowsB, ColsB: LONGINT ): BOOLEAN;
-	TransposeP* = PROCEDURE ( ladr, dadr, lstride, linc, dstride, dinc, rows, cols: LONGINT );
+	FastMatMul* = PROCEDURE ( matrixA, matrixB, matrixC, IncA, StrideA, IncB, StrideB, IncC, StrideC, RowsA, ColsA, RowsB, ColsB: SIGNED32 ): BOOLEAN;
+	TransposeP* = PROCEDURE ( ladr, dadr, lstride, linc, dstride, dinc, rows, cols: SIGNED32 );
 	(*
 	TensorType = RECORD
 		ptr: ANY;
-		tag: LONGINT
+		tag: SIGNED32
 	END;
 	*)
 
@@ -187,11 +187,11 @@ TYPE
 	T32 =POINTER TO  RECORD ptr: ANY;a: ARRAY lenoffs + 32 * 8 OF CHAR END;
 
 	(* used for optimizations of MatMul with small sizes (Alexey Morozov) *)
-	SmallMatMul* = PROCEDURE(dadr, ladr, radr: LONGINT);
+	SmallMatMul* = PROCEDURE(dadr, ladr, radr: SIGNED32);
 
 VAR
-	alloc*: LONGINT;   (* statistics *)
-	allocTemp*: LONGINT;   (* statistics *)
+	alloc*: SIGNED32;   (* statistics *)
+	allocTemp*: SIGNED32;   (* statistics *)
 
 	(* procedures that might be replaced by ASM methods *)
 	loopSPAXAX*, loopSPARAR*: BinaryAASLoop;
@@ -243,18 +243,18 @@ VAR
 	END Err;
 
 	(*
-	PROCEDURE NewTensorType( dim: LONGINT;  VAR t: TensorType );
-	VAR tp: ANY;  tag: LONGINT;
+	PROCEDURE NewTensorType( dim: SIGNED32;  VAR t: TensorType );
+	VAR tp: ANY;  tag: SIGNED32;
 	BEGIN
 		Heaps.NewType( tp, lenoffs + dim * 8, 1, 0, "ArrayDescriptor", NIL , {} );
-		tag := SYSTEM.VAL( LONGINT, tp );   (* type desc base adr *)
+		tag := SYSTEM.VAL( SIGNED32, tp );   (* type desc base adr *)
 		tag := SYSTEM.GET32( tag + 8 );   (* self pointer pointing to start of record descriptor *)
 		SYSTEM.PUT( tag + 4, 0 );   (* offset of pointer to array data in array descriptor is 0 *)
 		t.ptr := tp;  t.tag := tag;
 	END NewTensorType;
 	*)
 
-	PROCEDURE GetArrayDesc( dim: LONGINT ): ANY;
+	PROCEDURE GetArrayDesc( dim: SIGNED32 ): ANY;
 	VAR (* t: TensorType;  *) ptr: ANY;
 		p0: T0;
 		p1: T1; p2: T2; p3: T3; p4: T4; p5: T5; p6: T6; p7: T7; p8: T8; p9: T9;
@@ -306,13 +306,13 @@ VAR
 		|32:NEW(p32); ptr := p32;
 		END;
 
-		PutDim( SYSTEM.VAL( LONGINT, ptr ), dim );
-		PutFlags( SYSTEM.VAL( LONGINT, ptr ), {TensorFlag} );  RETURN ptr;
+		PutDim( SYSTEM.VAL( SIGNED32, ptr ), dim );
+		PutFlags( SYSTEM.VAL( SIGNED32, ptr ), {TensorFlag} );  RETURN ptr;
 	END GetArrayDesc;
 
 	(*
 	PROCEDURE CreateTypePool;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN( TensorTypePool ) - 1 DO
 			NewTensorType( i, TensorTypePool[i] );
@@ -337,7 +337,7 @@ VAR
 machine code equivalents:
 
 (* get increment of dimension dim *)
-	PROCEDURE -GetInc( base, dim: Address ): LONGINT;
+	PROCEDURE -GetInc( base, dim: Address ): SIGNED32;
 	CODE {SYSTEM.i386}
 		MOV	EBX, 4[ESP] (* base *)
 		MOV	EDX, [ESP] (* dim *)
@@ -356,7 +356,7 @@ machine code equivalents:
 	END PutInc;
 
 (* get len of dimension dim *)
-	PROCEDURE -GetLen( base, dim: Address ): LONGINT;
+	PROCEDURE -GetLen( base, dim: Address ): SIGNED32;
 	CODE {SYSTEM.i386}
 		MOV	EBX, 4[ESP] (* base *)
 		MOV	EDX, [ESP] (* dim *)
@@ -375,7 +375,7 @@ machine code equivalents:
 	END PutLen;
 
 (* get data address *)
-	PROCEDURE -GetAdr( base: Address ): LONGINT;
+	PROCEDURE -GetAdr( base: Address ): SIGNED32;
 	CODE {SYSTEM.i386}
 		MOV	EBX, [ESP] (*base *)
 		MOV	EAX, adroffs[EBX]
@@ -392,7 +392,7 @@ machine code equivalents:
 	END PutAdr;
 
 (* get data address *)
-	PROCEDURE -GetPtr( base: Address ): LONGINT;
+	PROCEDURE -GetPtr( base: Address ): SIGNED32;
 	CODE {SYSTEM.i386}
 		MOV	EBX, [ESP] (*base *)
 		MOV	EAX, ptroffs[EBX]
@@ -410,8 +410,8 @@ machine code equivalents:
 *)
 
 	(* get increment of dimension dim *)
-	PROCEDURE GetInc(base,dim: Address): LONGINT;
-	VAR result: LONGINT;
+	PROCEDURE GetInc(base,dim: Address): SIGNED32;
+	VAR result: SIGNED32;
 	BEGIN
 		SYSTEM.GET(base+incoffs+8*dim,result);
 		RETURN result
@@ -424,8 +424,8 @@ machine code equivalents:
 	END PutInc;
 
 	(* get length of dimension dim *)
-	PROCEDURE GetLen(base,dim: Address): LONGINT;
-	VAR result: LONGINT;
+	PROCEDURE GetLen(base,dim: Address): SIGNED32;
+	VAR result: SIGNED32;
 	BEGIN
 		SYSTEM.GET(base+lenoffs+8*dim,result);
 		RETURN result
@@ -439,7 +439,7 @@ machine code equivalents:
 
 	(* get data address *)
 	PROCEDURE GetAdr(base: Address): Address;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN
 		SYSTEM.GET(base+adroffs,result);
 		RETURN result
@@ -453,7 +453,7 @@ machine code equivalents:
 
 	(* get data base pointer (GC protection) *)
 	PROCEDURE GetPtr(base: Address): Address;
-	VAR result: LONGINT;
+	VAR result: SIGNED32;
 	BEGIN
 		SYSTEM.GET(base+ptroffs,result);
 		RETURN result
@@ -465,19 +465,19 @@ machine code equivalents:
 		SYSTEM.PUT(base+ptroffs,value)
 	END PutPtr;
 
-	PROCEDURE GetSize( base: Address ): LONGINT;
-	VAR dim: LONGINT;
+	PROCEDURE GetSize( base: Address ): SIGNED32;
+	VAR dim: SIGNED32;
 	BEGIN
 		IF base = 0 THEN RETURN 0 ELSE SYSTEM.GET( base + sizeoffs, dim );  RETURN dim;  END;
 	END GetSize;
 
-	PROCEDURE PutSize( base: Address;  dim: LONGINT );
+	PROCEDURE PutSize( base: Address;  dim: SIGNED32 );
 	BEGIN
 		SYSTEM.PUT( base + sizeoffs, dim );
 	END PutSize;
 
-	PROCEDURE GetDim( base: Address ): LONGINT;
-	VAR dim: LONGINT;
+	PROCEDURE GetDim( base: Address ): SIGNED32;
+	VAR dim: SIGNED32;
 	BEGIN
 		IF base = 0 THEN RETURN 0 ELSE SYSTEM.GET( base + dimoffs, dim );  RETURN dim;  END;
 	END GetDim;
@@ -488,7 +488,7 @@ machine code equivalents:
 		SYSTEM.GET( base + flagoffs, set );  RETURN set;
 	END GetFlags;
 
-	PROCEDURE PutDim( base: Address;  dim: LONGINT );
+	PROCEDURE PutDim( base: Address;  dim: SIGNED32 );
 	BEGIN
 		SYSTEM.PUT( base + dimoffs, dim );
 	END PutDim;
@@ -500,8 +500,8 @@ machine code equivalents:
 
 (*
 (* report geometry of array passed via address s *)
-	PROCEDURE Report( name: ARRAY OF CHAR;  s: LONGINT );
-	VAR i: LONGINT;  ldim, inc, len: LONGINT;  dim: LONGINT;
+	PROCEDURE Report( name: ARRAY OF CHAR;  s: SIGNED32 );
+	VAR i: SIGNED32;  ldim, inc, len: SIGNED32;  dim: SIGNED32;
 	BEGIN
 		KernelLog.String( name );  KernelLog.String( " at adr " );  KernelLog.Int( s, 1 );
 		KernelLog.String( "; ptr= " );  KernelLog.Int( GetPtr( s ), 1 );  KernelLog.String( "; adr= " );
@@ -517,7 +517,7 @@ machine code equivalents:
 	END Report;
 	*)
 
-	PROCEDURE Halt( code: LONGINT;  left, right, dest: LONGINT );
+	PROCEDURE Halt( code: SIGNED32;  left, right, dest: SIGNED32 );
 	VAR reason: ARRAY 64 OF CHAR;
 	BEGIN
 		IF left # 0 THEN Report( "Source operand ", left ) END;
@@ -539,7 +539,7 @@ machine code equivalents:
 
  (* find the largest block with a regular pattern of the form offset+{i*li: 0<=i<len}. d is dimension applying to the resulting loop *)
 
-	PROCEDURE FindPattern1( left, dim: Address;  VAR d, len, linc: LONGINT );
+	PROCEDURE FindPattern1( left, dim: Address;  VAR d, len, linc: SIGNED32 );
 	BEGIN
 		d := dim - 1;  len := GetLen( left, d );
 		WHILE (len = 1) & (d > 0) DO DEC( d );  len := GetLen( left, d );
@@ -556,8 +556,8 @@ machine code equivalents:
 	END FindPattern1;
 
 (* find the largest block with a regular pattern of the form offset+{i*linc: 0<=i<len} for two arrays simultaneously. d is dimension applying to the resulting loop *)
-	PROCEDURE FindPattern2( left, right: Address;  dim: LONGINT;
-												VAR d, len, linc, ri: LONGINT );
+	PROCEDURE FindPattern2( left, right: Address;  dim: SIGNED32;
+												VAR d, len, linc, ri: SIGNED32 );
 	(* geometric precondition: lengths must coincide *)
 	BEGIN
 		d := dim - 1;  len := GetLen( left, d );  ASSERT( len = GetLen( right, d ) );
@@ -574,8 +574,8 @@ machine code equivalents:
 	END FindPattern2;
 
 (* find the largest block with a regular pattern of the form offset+{i*linc: 0<=i<len} for three arrays simultaneously. d is dimension applying to the resulting loop *)
-	PROCEDURE FindPattern3( left, right, dest: Address;  dim: LONGINT;
-												VAR d, len, linc, ri, di: LONGINT );
+	PROCEDURE FindPattern3( left, right, dest: Address;  dim: SIGNED32;
+												VAR d, len, linc, ri, di: SIGNED32 );
 	(* geometric precondition: lengths must coincide *)
 	BEGIN
 		d := dim - 1;  len := GetLen( left, d );
@@ -595,8 +595,8 @@ machine code equivalents:
 		END;
 	END FindPattern3;
 
-	PROCEDURE Reverse( src: Address;  dim: LONGINT );
-	VAR d, sl, sr: LONGINT;
+	PROCEDURE Reverse( src: Address;  dim: SIGNED32 );
+	VAR d, sl, sr: SIGNED32;
 	BEGIN
 		d := 0;  sl := GetAdr( src );
 		WHILE (d < dim) DO
@@ -608,7 +608,7 @@ machine code equivalents:
 
 (* check if forward copy may be performed *)
 	PROCEDURE CopyUpCompatible( dest, src: Address;  VAR modes: SET );
-	VAR d, sl, sr, dl, dr: LONGINT;  dim: LONGINT;
+	VAR d, sl, sr, dl, dr: SIGNED32;  dim: SIGNED32;
 		(* precondition: len(src,i)=len(dest,i) *)
 		(* for forward src -> dest copy compatibility src must not be overwritten before src is copied.
 Sufficient (but not necessary) conditions:
@@ -640,16 +640,16 @@ Sufficient (but not necessary) conditions:
 	END CopyUpCompatible;
 
 	PROCEDURE AllocateTemp( VAR dest: Address;  src: Address;
-												Size: LONGINT ): ANY;
+												Size: SIGNED32 ): ANY;
 	(* allocate a temporary block containing both descriptor and data *)
-	VAR d, len, i: LONGINT;  p: ANY;  dim: LONGINT;
+	VAR d, len, i: SIGNED32;  p: ANY;  dim: SIGNED32;
 	BEGIN
 		IF statistics THEN INC( allocTemp ) END;
 		d := 0;  len := Size;  dim := GetDim( src );
 		WHILE (d < dim) DO len := len * GetLen( src, d );  INC( d );  END;
-		INC( len, 2 * dim * SIZEOF( LONGINT ) + lenoffs );  SYSTEM.NEW( p, len );
-		dest := SYSTEM.VAL( LONGINT, p );
-		PutAdr( dest, dest + dim * 2 * SIZEOF( LONGINT ) + lenoffs );
+		INC( len, 2 * dim * SIZEOF( SIGNED32 ) + lenoffs );  SYSTEM.NEW( p, len );
+		dest := SYSTEM.VAL( SIGNED32, p );
+		PutAdr( dest, dest + dim * 2 * SIZEOF( SIGNED32 ) + lenoffs );
 		PutPtr( dest, dest );  PutDim( dest, dim );  len := Size;
 		FOR i := 0 TO dim - 1 DO
 			PutInc( dest, i, len );  PutLen( dest, i, GetLen( src, i ) );
@@ -662,14 +662,14 @@ Sufficient (but not necessary) conditions:
 	(*** procedures to traverse arrays and apply operators *)
 
 (** apply unary operator to array:  array -> array *)
-	PROCEDURE ApplyUnaryAAOp( d, l: Address;  elementSize: LONGINT;
+	PROCEDURE ApplyUnaryAAOp( d, l: Address;  elementSize: SIGNED32;
 														Loop: UnaryAALoop );
-	VAR loopd, looplen, loopli, loopdi: LONGINT;  p: ANY;  glen: LONGINT;
-		origdest: LONGINT;  modes: SET;
-	VAR dest, left, dim: LONGINT;
+	VAR loopd, looplen, loopli, loopdi: SIGNED32;  p: ANY;  glen: SIGNED32;
+		origdest: SIGNED32;  modes: SET;
+	VAR dest, left, dim: SIGNED32;
 
-		PROCEDURE Traverse( dim: LONGINT;  ladr, dadr: Address );
-		VAR len: LONGINT;  linc, dinc: LONGINT;
+		PROCEDURE Traverse( dim: SIGNED32;  ladr, dadr: Address );
+		VAR len: SIGNED32;  linc, dinc: SIGNED32;
 		BEGIN
 			IF dim = loopd THEN
 				Loop( ladr, dadr, loopli, loopdi, looplen );
@@ -717,11 +717,11 @@ Sufficient (but not necessary) conditions:
 
 (** apply unary operator to array:  array -> scalar *)
 	PROCEDURE ApplyUnaryASOp( dest, l: Address;  Loop: UnaryASLoop );
-	VAR loopd, looplen, loopli: LONGINT;  glen: LONGINT;
-	VAR left, dim: LONGINT;
+	VAR loopd, looplen, loopli: SIGNED32;  glen: SIGNED32;
+	VAR left, dim: SIGNED32;
 
-		PROCEDURE Traverse( dim: LONGINT;  ladr: Address );
-		VAR len: LONGINT;  linc: LONGINT;
+		PROCEDURE Traverse( dim: SIGNED32;  ladr: Address );
+		VAR len: SIGNED32;  linc: SIGNED32;
 		BEGIN
 			IF dim = loopd THEN
 				Loop( ladr, dest, loopli, looplen );
@@ -749,13 +749,13 @@ Sufficient (but not necessary) conditions:
 
 (** apply binary operator : array x array -> array *)
 
-	PROCEDURE ApplyBinaryAAAOp( d, l, r: Address;  elementSize: LONGINT;
+	PROCEDURE ApplyBinaryAAAOp( d, l, r: Address;  elementSize: SIGNED32;
 														Loop: BinaryAAALoop );
-	VAR loopd, looplen, loopli, loopri, loopdi: LONGINT;  p: ANY;  glen: LONGINT;
-		origdest: LONGINT;  modes: SET;  left, right, dest: Address;  dim: LONGINT;
+	VAR loopd, looplen, loopli, loopri, loopdi: SIGNED32;  p: ANY;  glen: SIGNED32;
+		origdest: SIGNED32;  modes: SET;  left, right, dest: Address;  dim: SIGNED32;
 
-		PROCEDURE Traverse( dim: LONGINT;  ladr, radr, dadr: Address );
-		VAR len: LONGINT;  linc, rinc, dinc: LONGINT;
+		PROCEDURE Traverse( dim: SIGNED32;  ladr, radr, dadr: Address );
+		VAR len: SIGNED32;  linc, rinc, dinc: SIGNED32;
 		BEGIN
 			IF dim = loopd THEN
 				Loop( ladr, radr, dadr, loopli, loopri, loopdi, looplen );
@@ -808,13 +808,13 @@ Sufficient (but not necessary) conditions:
 (** apply binary operator: array x scalar -> array *)
 
 	PROCEDURE ApplyBinaryASAOp( d, l, right: Address;
-														elementSize: LONGINT;
+														elementSize: SIGNED32;
 														Loop: BinaryASALoop );
-	VAR loopd, looplen, loopli, loopdi: LONGINT;  p: ANY;  glen: LONGINT;
-		origdest: LONGINT;  modes: SET;  dest, left, dim: LONGINT;
+	VAR loopd, looplen, loopli, loopdi: SIGNED32;  p: ANY;  glen: SIGNED32;
+		origdest: SIGNED32;  modes: SET;  dest, left, dim: SIGNED32;
 
-		PROCEDURE Traverse( dim: LONGINT;  ladr, dadr: Address );
-		VAR len: LONGINT;  linc, dinc: LONGINT;
+		PROCEDURE Traverse( dim: SIGNED32;  ladr, dadr: Address );
+		VAR len: SIGNED32;  linc, dinc: SIGNED32;
 		BEGIN
 			IF dim = loopd THEN
 				Loop( ladr, right, dadr, loopli, loopdi, looplen );
@@ -866,11 +866,11 @@ Sufficient (but not necessary) conditions:
 (** apply binary operator: array x array -> scalar *)
 
 	PROCEDURE ApplyBinaryAASOp( dest, l, r: Address;  Loop: BinaryAASLoop );
-	VAR loopd, looplen, loopli, loopri: LONGINT;  glen: LONGINT;
-		left, right, dim: LONGINT;
+	VAR loopd, looplen, loopli, loopri: SIGNED32;  glen: SIGNED32;
+		left, right, dim: SIGNED32;
 
-		PROCEDURE Traverse( dim: LONGINT;  ladr, radr: Address );
-		VAR len: LONGINT;  linc, rinc: LONGINT;
+		PROCEDURE Traverse( dim: SIGNED32;  ladr, radr: Address );
+		VAR len: SIGNED32;  linc, rinc: SIGNED32;
 		BEGIN
 			IF dim = loopd THEN
 				Loop( ladr, radr, dest, loopli, loopri, looplen );
@@ -910,10 +910,10 @@ Sufficient (but not necessary) conditions:
 
 	PROCEDURE ApplyBinaryAABOp( l, r: Address;
 														Loop: BinaryAABLoop ): BOOLEAN;
-	VAR loopd, looplen, loopli, loopri: LONGINT;  left, right, dim: LONGINT;
+	VAR loopd, looplen, loopli, loopri: SIGNED32;  left, right, dim: SIGNED32;
 
-		PROCEDURE Traverse( dim: LONGINT;  ladr, radr: Address ): BOOLEAN;
-		VAR len: LONGINT;  linc, rinc: LONGINT;
+		PROCEDURE Traverse( dim: SIGNED32;  ladr, radr: Address ): BOOLEAN;
+		VAR len: SIGNED32;  linc, rinc: SIGNED32;
 		BEGIN
 			IF dim = loopd THEN RETURN Loop( ladr, radr, loopli, loopri, looplen );
 			ELSE
@@ -946,10 +946,10 @@ Sufficient (but not necessary) conditions:
 
 	PROCEDURE ApplyBinaryASBOp( l, right: Address;
 														Loop: BinaryASBLoop ): BOOLEAN;
-	VAR loopd, looplen, loopli: LONGINT;  left, dim: LONGINT;
+	VAR loopd, looplen, loopli: SIGNED32;  left, dim: SIGNED32;
 
-		PROCEDURE Traverse( dim: LONGINT;  ladr: Address ): BOOLEAN;
-		VAR len: LONGINT;  linc: LONGINT;
+		PROCEDURE Traverse( dim: SIGNED32;  ladr: Address ): BOOLEAN;
+		VAR len: SIGNED32;  linc: SIGNED32;
 		BEGIN
 			IF dim = loopd THEN RETURN Loop( ladr, right, loopli, looplen );
 			ELSE
@@ -974,7 +974,7 @@ Sufficient (but not necessary) conditions:
 	(**** operators *)
 
 (*** copy *)
-	PROCEDURE Copy4( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE Copy4( ladr, dadr, linc, dinc, len: SIGNED32 );
 	CODE {SYSTEM.i386}
 		MOV	ECX, [EBP+ladr]	;  ECX := ladr
 		MOV	EDX, [EBP+dadr]	;  EDX := dadr
@@ -991,7 +991,7 @@ Sufficient (but not necessary) conditions:
 		end:
 	END Copy4;
 
-	PROCEDURE Copy2( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE Copy2( ladr, dadr, linc, dinc, len: SIGNED32 );
 	CODE {SYSTEM.i386}
 		MOV	ECX, [EBP+ladr]	;  ECX := ladr
 		MOV	EDX, [EBP+dadr]	;  EDX := dadr
@@ -1008,7 +1008,7 @@ Sufficient (but not necessary) conditions:
 		end:
 	END Copy2;
 
-	PROCEDURE Copy1( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE Copy1( ladr, dadr, linc, dinc, len: SIGNED32 );
 	CODE {SYSTEM.i386}
 		MOV	ECX, [EBP+ladr]	;  ECX := ladr
 		MOV	EDX, [EBP+dadr]	;  EDX := dadr
@@ -1025,7 +1025,7 @@ Sufficient (but not necessary) conditions:
 		end:
 	END Copy1;
 
-	PROCEDURE Copy8( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE Copy8( ladr, dadr, linc, dinc, len: SIGNED32 );
 	CODE {SYSTEM.i386}
 		MOV	ECX, [EBP+ladr]	;  ECX := ladr
 		MOV	EDX, [EBP+dadr]	;  EDX := dadr
@@ -1044,7 +1044,7 @@ Sufficient (but not necessary) conditions:
 		end:
 	END Copy8;
 
-	PROCEDURE -MoveB*( srcadr, destadr, len: LONGINT );
+	PROCEDURE -MoveB*( srcadr, destadr, len: SIGNED32 );
 	(** Correct move if overlap, might be important for some array operations,
 		do not use SYSTEM.MOVE.  *)
 	CODE {SYSTEM.i386}
@@ -1079,11 +1079,11 @@ Sufficient (but not necessary) conditions:
 		ADD	ESP, 12	;  adjust stack pointer(inline procedure!)
 	END MoveB;
 
-	PROCEDURE CopyContent( dest, src, elementSize: LONGINT );   (**! optimize *)
-	VAR loopd, looplen, loopli, loopdi: LONGINT;  p: ANY;  glen: LONGINT;
-		origdest: LONGINT;  modes: SET;  dim: LONGINT;
+	PROCEDURE CopyContent( dest, src, elementSize: SIGNED32 );   (**! optimize *)
+	VAR loopd, looplen, loopli, loopdi: SIGNED32;  p: ANY;  glen: SIGNED32;
+		origdest: SIGNED32;  modes: SET;  dim: SIGNED32;
 
-		PROCEDURE Loop( ladr, dadr, linc, dinc, len: LONGINT );
+		PROCEDURE Loop( ladr, dadr, linc, dinc, len: SIGNED32 );
 		BEGIN
 			IF (dinc = elementSize) & (linc = elementSize) THEN
 				MoveB( ladr, dadr, len * elementSize );
@@ -1131,8 +1131,8 @@ Sufficient (but not necessary) conditions:
 			END;
 		END Loop;
 
-		PROCEDURE Traverse( dim: LONGINT;  ladr, dadr: Address );
-		VAR len: LONGINT;  linc, dinc: LONGINT;
+		PROCEDURE Traverse( dim: SIGNED32;  ladr, dadr: Address );
+		VAR len: SIGNED32;  linc, dinc: SIGNED32;
 		BEGIN
 			IF dim = loopd THEN
 				Loop( ladr, dadr, loopli, loopdi, looplen );
@@ -1174,20 +1174,20 @@ Sufficient (but not necessary) conditions:
 		END;
 	END CopyContent;
 
-	PROCEDURE AllocateSame( VAR dest: LONGINT;  src: LONGINT;
-												elementsize: LONGINT ): ANY;
-	VAR ptr, data: ANY;  Size: LONGINT;
+	PROCEDURE AllocateSame( VAR dest: SIGNED32;  src: SIGNED32;
+												elementsize: SIGNED32 ): ANY;
+	VAR ptr, data: ANY;  Size: SIGNED32;
 		(* allocate a structure in dest compatible with src, if necessary. returns if allocation has taken place *)
 
 		PROCEDURE UseDescriptor;
-		VAR tag: LONGINT;
+		VAR tag: SIGNED32;
 		BEGIN
 			SYSTEM.GET( src - 4, tag );  Heaps.NewRec( ptr, tag, FALSE );
-			dest := SYSTEM.VAL( LONGINT, ptr );
+			dest := SYSTEM.VAL( SIGNED32, ptr );
 		END UseDescriptor;
 
 		PROCEDURE NewData;
-		VAR dim, len, size: LONGINT;
+		VAR dim, len, size: SIGNED32;
 		BEGIN
 			dim := GetDim( src );  size := elementsize;  PutDim( dest, dim );
 			PutSize( dest, elementsize );
@@ -1195,8 +1195,8 @@ Sufficient (but not necessary) conditions:
 				DEC( dim );  len := GetLen( src, dim );  PutLen( dest, dim, len );
 				PutInc( dest, dim, size );  size := size * len;
 			END;
-			SYSTEM.NEW( data, size );  PutAdr( dest, SYSTEM.VAL( LONGINT, data ) );
-			PutPtr( dest, SYSTEM.VAL( LONGINT, data ) );
+			SYSTEM.NEW( data, size );  PutAdr( dest, SYSTEM.VAL( SIGNED32, data ) );
+			PutPtr( dest, SYSTEM.VAL( SIGNED32, data ) );
 		END NewData;
 
 	BEGIN
@@ -1204,7 +1204,7 @@ Sufficient (but not necessary) conditions:
 		IF debug THEN KernelLog.String( "Allocate same " );  Report( "allocation source", src );  Report( "allocation des", dest );  END;
 		IF dest = 0 THEN  (* NIL pointer, guaranteed to be tensor *)
 			IF TensorFlag IN GetFlags( src ) THEN UseDescriptor();
-			ELSE ptr := GetArrayDesc( GetDim( src ) );  dest := SYSTEM.VAL( LONGINT, ptr );
+			ELSE ptr := GetArrayDesc( GetDim( src ) );  dest := SYSTEM.VAL( SIGNED32, ptr );
 			END;
 			NewData();  RETURN ptr;
 		ELSIF GetDim( dest ) # GetDim( src ) THEN  (* different dimension *)
@@ -1228,22 +1228,22 @@ Sufficient (but not necessary) conditions:
 	END AllocateSame;
 
 	PROCEDURE TempDescCopy( src: Address ): ANY;
-	VAR p: ANY;  dim: LONGINT;
+	VAR p: ANY;  dim: SIGNED32;
 	BEGIN
 		dim := GetDim( src );  SYSTEM.NEW( p, dim * 8 + lenoffs );
-		SYSTEM.MOVE( src, SYSTEM.VAL( LONGINT, p ), dim * 8 + lenoffs );  PutAdr( src, 0 );
+		SYSTEM.MOVE( src, SYSTEM.VAL( SIGNED32, p ), dim * 8 + lenoffs );  PutAdr( src, 0 );
 		PutPtr( src, 0 );  PutFlags( src, {} );  RETURN p;
 	END TempDescCopy;
 
-	PROCEDURE CopyArraySelf*( dest, src: Address;  elementsize: LONGINT );
+	PROCEDURE CopyArraySelf*( dest, src: Address;  elementsize: SIGNED32 );
 	VAR p: ANY;
 	BEGIN
 		ASSERT( src = dest );  p := TempDescCopy( src );
-		CopyArray( dest, SYSTEM.VAL( LONGINT, p ), elementsize );
+		CopyArray( dest, SYSTEM.VAL( SIGNED32, p ), elementsize );
 	END CopyArraySelf;
 
 	PROCEDURE CopyArray*( dest: Address;  src: Address;
-											elementsize: LONGINT );
+											elementsize: SIGNED32 );
 	VAR p: ANY;
 	BEGIN
 		(* IF dest = 0 THEN Helper.ViewFrame END;  *)
@@ -1259,13 +1259,13 @@ Sufficient (but not necessary) conditions:
 	END CopyArray;
 
 	PROCEDURE CopyTensorSelf*( VAR dest: Address;  src: Address;
-													elementsize: LONGINT );
+													elementsize: SIGNED32 );
 	BEGIN
 		dest := 0;  CopyTensor( dest, src, elementsize );
 	END CopyTensorSelf;
 
 	PROCEDURE CopyTensor*( VAR dest: Address;  src: Address;
-												elementsize: LONGINT );
+												elementsize: SIGNED32 );
 	VAR p: ANY;
 	BEGIN
 		IF (dest = 0) OR ~(SameShape( dest, src )) OR (GetAdr( dest ) = 0) THEN
@@ -1281,10 +1281,10 @@ Sufficient (but not necessary) conditions:
 	VAR ptr: ANY;
 
 		PROCEDURE UseTypeDescriptor;
-		VAR tag: LONGINT;  ptr: ANY;
+		VAR tag: SIGNED32;  ptr: ANY;
 		BEGIN
 			SYSTEM.GET( src + Heaps.TypeDescOffset, tag );  Heaps.NewRec( ptr, tag, FALSE );
-			dest := SYSTEM.VAL( LONGINT, ptr );
+			dest := SYSTEM.VAL( SIGNED32, ptr );
 		END UseTypeDescriptor;
 
 		PROCEDURE CopyDescriptor;
@@ -1303,7 +1303,7 @@ Sufficient (but not necessary) conditions:
 		IF dest = 0 THEN  (* NIL pointer, guaranteed to be tensor *)
 			IF TensorFlag IN GetFlags( src ) THEN UseTypeDescriptor();
 			ELSE
-				ptr := GetArrayDesc( GetDim( src ) );  dest := SYSTEM.VAL( LONGINT, ptr );  (* ??? *)
+				ptr := GetArrayDesc( GetDim( src ) );  dest := SYSTEM.VAL( SIGNED32, ptr );  (* ??? *)
 			END;
 			CopyDescriptor();
 		ELSIF GetDim( dest ) # GetDim( src ) THEN  (* different dimension *)
@@ -1313,7 +1313,7 @@ Sufficient (but not necessary) conditions:
 			END;
 
 			(* create a new descriptor!!! (added by Alexey) *)
-			ptr := GetArrayDesc( GetDim( src ) );  dest := SYSTEM.VAL( LONGINT, ptr );
+			ptr := GetArrayDesc( GetDim( src ) );  dest := SYSTEM.VAL( SIGNED32, ptr );
 
 			CopyDescriptor();
 		ELSE
@@ -1326,7 +1326,7 @@ Sufficient (but not necessary) conditions:
 
 	END ShallowCopy;
 
-	PROCEDURE DescriptorCopy( src, dest: LONGINT );
+	PROCEDURE DescriptorCopy( src, dest: SIGNED32 );
 	BEGIN
 		IF debug THEN
 			KernelLog.String( "DescriptorCopy from " );  KernelLog.Int( src, 1 );  KernelLog.String( " to " );
@@ -1337,7 +1337,7 @@ Sufficient (but not necessary) conditions:
 	END DescriptorCopy;
 
 	PROCEDURE ZeroCopyArray*( dest: Address;  src: Address;
-													elementsize: LONGINT );
+													elementsize: SIGNED32 );
 	(*
 		called as ZeroCopy(A,B,Size) with enhanced arrays A,B
 		check if deep copy can be avoided and if so then do a shallow copy
@@ -1358,7 +1358,7 @@ Sufficient (but not necessary) conditions:
 	END ZeroCopyArray;
 
 	PROCEDURE ZeroCopyTensor*( VAR dest: Address;  src: Address;
-														elementsize: LONGINT );
+														elementsize: SIGNED32 );
 	(*
 		called as ZeroCopy(A,B,Size) with A,B: ARRAY [?] OF ...
 		check if deep copy can be avoided and if so then do a shallow copy
@@ -1392,8 +1392,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ZeroCopyTensor;
 
-	PROCEDURE SameShape( l, r: LONGINT ): BOOLEAN;
-	VAR dim: LONGINT;
+	PROCEDURE SameShape( l, r: SIGNED32 ): BOOLEAN;
+	VAR dim: SIGNED32;
 	BEGIN
 		dim := GetDim( l );
 		IF dim # GetDim( r ) THEN RETURN FALSE END;
@@ -1405,11 +1405,11 @@ Sufficient (but not necessary) conditions:
 	END SameShape;
 
 (* report geometry of array passed via address s *)
-	PROCEDURE Report(CONST name: ARRAY OF CHAR;  s: LONGINT );
-	VAR i: LONGINT;  dim: LONGINT;
+	PROCEDURE Report(CONST name: ARRAY OF CHAR;  s: SIGNED32 );
+	VAR i: SIGNED32;  dim: SIGNED32;
 
 		PROCEDURE Set( s: SET );
-		VAR i: LONGINT;  first: BOOLEAN;
+		VAR i: SIGNED32;  first: BOOLEAN;
 		BEGIN
 			KernelLog.String( "{" );  first := TRUE;
 			FOR i := 31 TO 0 BY -1 DO
@@ -1445,16 +1445,16 @@ Sufficient (but not necessary) conditions:
 	END Report;
 
 (*
-	PROCEDURE AddALAL*( VAR dest: ARRAY [?] OF LONGINT;  left, right: ARRAY [?] OF LONGINT );
-	VAR d: LONGINT;  i, j: LONGINT;  adrd, adrl: LONGINT;
+	PROCEDURE AddALAL*( VAR dest: ARRAY [?] OF SIGNED32;  left, right: ARRAY [?] OF SIGNED32 );
+	VAR d: SIGNED32;  i, j: SIGNED32;  adrd, adrl: SIGNED32;
 	BEGIN
-		ApplyBinaryAAAOpx( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( LONGINT ),
+		ApplyBinaryAAAOpx( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( SIGNED32 ),
 										AddALALLoop );
 	END AddALAL;
 	*)
 
-	PROCEDURE ZeroCopy*( left, elementSize, dest, dim: LONGINT );   (**! optimize *)
-	VAR i: LONGINT;
+	PROCEDURE ZeroCopy*( left, elementSize, dest, dim: SIGNED32 );   (**! optimize *)
+	VAR i: SIGNED32;
 	BEGIN
 		IF GetPtr( dest ) = -1 THEN  (* zero copy forbidden, try data copy *)
 			CopyContent( dest, left, elementSize )
@@ -1474,7 +1474,7 @@ Sufficient (but not necessary) conditions:
 
 (** SIGNED8 -> SIGNED16  *)
 
-	PROCEDURE ConvertASAILoop( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ConvertASAILoop( ladr, dadr, linc, dinc, len: SIGNED32 );
 	BEGIN
 		WHILE (len > 0) DO  (* SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval ); *)
 			SYSTEM.PUT16( dadr, SYSTEM.GET8( ladr ) );  INC( ladr, linc );  INC( dadr, dinc );
@@ -1489,8 +1489,8 @@ Sufficient (but not necessary) conditions:
 									ConvertASAILoop );
 	END ConvertASAI;
 
-(** SIGNED8 -> LONGINT *)
-	PROCEDURE ConvertLoopSL( ladr, dadr, linc, dinc, len: LONGINT );
+(** SIGNED8 -> SIGNED32 *)
+	PROCEDURE ConvertLoopSL( ladr, dadr, linc, dinc, len: SIGNED32 );
 	BEGIN
 		WHILE (len > 0) DO  (* SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval ); *)
 			SYSTEM.PUT32( dadr, SYSTEM.GET8( ladr ) );  INC( ladr, linc );  INC( dadr, dinc );
@@ -1498,15 +1498,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopSL;
 
-	PROCEDURE ConvertASAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
+	PROCEDURE ConvertASAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
 												CONST src: ARRAY [ ? ] OF SIGNED8 );
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( LONGINT ),
+		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( SIGNED32 ),
 									ConvertLoopSL );
 	END ConvertASAL;
 
 (** SIGNED8 -> REAL *)
-	PROCEDURE ConvertLoopSR( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ConvertLoopSR( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: SIGNED8;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1522,7 +1522,7 @@ Sufficient (but not necessary) conditions:
 	END ConvertASAR;
 
 (** SIGNED8 -> LONGREAL *)
-	PROCEDURE ConvertLoopSX( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ConvertLoopSX( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: SIGNED8;  dval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1539,7 +1539,7 @@ Sufficient (but not necessary) conditions:
 	END ConvertASAX;
 
 (** SIGNED16 -> SIGNED8 (SHORT) *)
-	PROCEDURE ConvertLoopIS( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ConvertLoopIS( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: SIGNED16;  dval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1555,16 +1555,16 @@ Sufficient (but not necessary) conditions:
 									ConvertLoopIS );
 	END ConvertAIAS;
 
-	(** SIGNED16 -> LONGINT *)
+	(** SIGNED16 -> SIGNED32 *)
 (*
-	PROCEDURE ItoL(s,d: LONGINT);
+	PROCEDURE ItoL(s,d: SIGNED32);
 	CODE{SYSTEM.i386, SYSTEM.FPU}
 		MOVSX   EBX,WORD ANY s[EBP]
 	MOV d[EBP],EBX
 	END ItoL;
 *)
 
-	PROCEDURE ConvertLoopIL( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ConvertLoopIL( ladr, dadr, linc, dinc, len: SIGNED32 );
 	BEGIN
 		WHILE (len > 0) DO  (* SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  *)
 			SYSTEM.PUT32( dadr, SYSTEM.GET16( ladr ) );  INC( ladr, linc );  INC( dadr, dinc );
@@ -1572,15 +1572,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopIL;
 
-	PROCEDURE ConvertAIAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
+	PROCEDURE ConvertAIAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
 												CONST src: ARRAY [ ? ] OF SIGNED16 );
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( LONGINT ),
+		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( SIGNED32 ),
 									ConvertLoopIL );
 	END ConvertAIAL;
 
 (** SIGNED16 -> REAL *)
-	PROCEDURE ConvertLoopIR( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ConvertLoopIR( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: SIGNED16;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1596,7 +1596,7 @@ Sufficient (but not necessary) conditions:
 	END ConvertAIAR;
 
 (** SIGNED16 -> LONGREAL *)
-	PROCEDURE ConvertLoopIX( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ConvertLoopIX( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: SIGNED16;  dval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1612,9 +1612,9 @@ Sufficient (but not necessary) conditions:
 									ConvertLoopIX );
 	END ConvertAIAX;
 
-(** LONGINT -> SIGNED16 (SHORT) *)
-	PROCEDURE ConvertLoopLI( ladr, dadr, linc, dinc, len: LONGINT );
-	VAR lval: LONGINT;  dval: SIGNED16;
+(** SIGNED32 -> SIGNED16 (SHORT) *)
+	PROCEDURE ConvertLoopLI( ladr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval: SIGNED32;  dval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := SHORT( lval );  SYSTEM.PUT( dadr, dval );
@@ -1623,15 +1623,15 @@ Sufficient (but not necessary) conditions:
 	END ConvertLoopLI;
 
 	PROCEDURE ConvertALAI*( VAR dest: ARRAY [ ? ] OF SIGNED16;
-												CONST src: ARRAY [ ? ] OF LONGINT );
+												CONST src: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( SIGNED16 ),
 									ConvertLoopLI );
 	END ConvertALAI;
 
-(** LONGINT -> REAL *)
-	PROCEDURE ConvertLoopLR( ladr, dadr, linc, dinc, len: LONGINT );
-	VAR lval: LONGINT;  dval: REAL;
+(** SIGNED32 -> REAL *)
+	PROCEDURE ConvertLoopLR( ladr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval: SIGNED32;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1640,14 +1640,14 @@ Sufficient (but not necessary) conditions:
 	END ConvertLoopLR;
 
 	PROCEDURE ConvertALAR*( VAR dest: ARRAY [ ? ] OF REAL;
-												CONST src: ARRAY [ ? ] OF LONGINT );
+												CONST src: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( REAL ), ConvertLoopLR );
 	END ConvertALAR;
 
-(** LONGINT -> LONGREAL *)
-	PROCEDURE ConvertLoopLX( ladr, dadr, linc, dinc, len: LONGINT );
-	VAR lval: LONGINT;  dval: LONGREAL;
+(** SIGNED32 -> LONGREAL *)
+	PROCEDURE ConvertLoopLX( ladr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval: SIGNED32;  dval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1656,15 +1656,15 @@ Sufficient (but not necessary) conditions:
 	END ConvertLoopLX;
 
 	PROCEDURE ConvertALAX*( VAR dest: ARRAY [ ? ] OF LONGREAL;
-												CONST src: ARRAY [ ? ] OF LONGINT );
+												CONST src: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( LONGREAL ),
 									ConvertLoopLX );
 	END ConvertALAX;
 
-(** REAL -> LONGINT (ENTIER) *)
-	PROCEDURE ConvertLoopRL( ladr, dadr, linc, dinc, len: LONGINT );
-	VAR lval: REAL;  dval: LONGINT;
+(** REAL -> SIGNED32 (ENTIER) *)
+	PROCEDURE ConvertLoopRL( ladr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval: REAL;  dval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := ENTIER( lval );  SYSTEM.PUT( dadr, dval );
@@ -1672,15 +1672,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopRL;
 
-	PROCEDURE ConvertARAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
+	PROCEDURE ConvertARAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
 												CONST src: ARRAY [ ? ] OF REAL );
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( LONGINT ),
+		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( SIGNED32 ),
 									ConvertLoopRL );
 	END ConvertARAL;
 
 (** REAL -> LONGREAL *)
-	PROCEDURE ConvertLoopRX( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ConvertLoopRX( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: REAL;  dval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1697,7 +1697,7 @@ Sufficient (but not necessary) conditions:
 	END ConvertARAX;
 
 (** LONGREAL -> REAL (SHORT) *)
-	PROCEDURE ConvertLoopXR( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ConvertLoopXR( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: LONGREAL;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1712,9 +1712,9 @@ Sufficient (but not necessary) conditions:
 		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( REAL ), ConvertLoopXR );
 	END ConvertAXAR;
 
-(** LONGREAL -> LONGINT (ENTIER) *)
-	PROCEDURE ConvertLoopXL( ladr, dadr, linc, dinc, len: LONGINT );
-	VAR lval: LONGREAL;  dval: LONGINT;
+(** LONGREAL -> SIGNED32 (ENTIER) *)
+	PROCEDURE ConvertLoopXL( ladr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval: LONGREAL;  dval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := ENTIER( lval );  SYSTEM.PUT( dadr, dval );
@@ -1722,17 +1722,17 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopXL;
 
-	PROCEDURE ConvertAXAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
+	PROCEDURE ConvertAXAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
 												CONST src: ARRAY [ ? ] OF LONGREAL );
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( LONGINT ),
+		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( SIGNED32 ),
 									ConvertLoopXL );
 	END ConvertAXAL;
 
 	(*** monadic not A -> ~A ********************************************************************)
 
 (** BOOLEAN *)
-	PROCEDURE NotLoopAB( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE NotLoopAB( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: BOOLEAN;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1750,7 +1750,7 @@ Sufficient (but not necessary) conditions:
 	(*** monadic minus A -> -A  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE MinusLoopS( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE MinusLoopS( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1766,7 +1766,7 @@ Sufficient (but not necessary) conditions:
 	END MinusAS;
 
 (** SIGNED16 *)
-	PROCEDURE MinusLoopI( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE MinusLoopI( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1781,9 +1781,9 @@ Sufficient (but not necessary) conditions:
 		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( SIGNED16 ), MinusLoopI );
 	END MinusAI;
 
-(** LONGINT *)
-	PROCEDURE MinusLoopL( ladr, dadr, linc, dinc, len: LONGINT );
-	VAR lval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE MinusLoopL( ladr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, -lval );  INC( ladr, linc );  INC( dadr, dinc );
@@ -1791,14 +1791,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MinusLoopL;
 
-	PROCEDURE MinusAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-											CONST src: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE MinusAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+											CONST src: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( LONGINT ), MinusLoopL );
+		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( SIGNED32 ), MinusLoopL );
 	END MinusAL;
 
 (** REAL *)
-	PROCEDURE MinusLoopR( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE MinusLoopR( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1815,7 +1815,7 @@ Sufficient (but not necessary) conditions:
 	END MinusAR;
 
 (** LONGREAL *)
-	PROCEDURE MinusLoopX( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE MinusLoopX( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1834,7 +1834,7 @@ Sufficient (but not necessary) conditions:
 	(*** add array + array -> array  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE AddASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE AddASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1851,7 +1851,7 @@ Sufficient (but not necessary) conditions:
 	END AddASAS;
 
 (** SIGNED16 *)
-	PROCEDURE AddAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE AddAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1867,9 +1867,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), AddAIAILoop );
 	END AddAIAI;
 
-(** LONGINT *)
-	PROCEDURE AddALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE AddALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval + rval );
@@ -1877,20 +1877,20 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddALALLoop;
 
-	PROCEDURE AddALAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-										CONST left, right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE AddALAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+										CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		(*
-		Report("dest",SYSTEM.VAL(LONGINT,dest)); Report("left",SYSTEM.VAL(LONGINT,left));Report("right",SYSTEM.VAL(LONGINT,right));
+		Report("dest",SYSTEM.VAL(SIGNED32,dest)); Report("left",SYSTEM.VAL(SIGNED32,left));Report("right",SYSTEM.VAL(SIGNED32,right));
 		KernelLog.Int(ADDRESSOF(dest),10); KernelLog.Int(ADDRESSOF(left),10); KernelLog.Int(ADDRESSOF(right),10); KernelLog.Ln;
 		*)
 
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), AddALALLoop );
+										SIZEOF( SIGNED32 ), AddALALLoop );
 	END AddALAL;
 
 (** REAL *)
-	PROCEDURE AddARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE AddARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1906,7 +1906,7 @@ Sufficient (but not necessary) conditions:
 										loopAddARAR );
 	END AddARAR;
 
-	PROCEDURE AddAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE AddAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -1925,7 +1925,7 @@ Sufficient (but not necessary) conditions:
 	(*** add array + scalar -> array and scalar + array -> array ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE AddASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AddASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -1951,7 +1951,7 @@ Sufficient (but not necessary) conditions:
 	END AddSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE AddAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AddAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -1975,9 +1975,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), AddAISILoop );
 	END AddSIAI;
 
-(** LONGINT *)
-	PROCEDURE AddALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE AddALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -1986,22 +1986,22 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddALSLLoop;
 
-	PROCEDURE AddALSL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-										CONST left: ARRAY [ ? ] OF LONGINT;  right: LONGINT );
+	PROCEDURE AddALSL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+										CONST left: ARRAY [ ? ] OF SIGNED32;  right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), AddALSLLoop );
+										SIZEOF( SIGNED32 ), AddALSLLoop );
 	END AddALSL;
 
-	PROCEDURE AddSLAL*( VAR dest: ARRAY [ ? ] OF LONGINT;  left: LONGINT;
-										CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE AddSLAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;  left: SIGNED32;
+										CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
-										SIZEOF( LONGINT ), AddALSLLoop );
+										SIZEOF( SIGNED32 ), AddALSLLoop );
 	END AddSLAL;
 
 (** REAL *)
-	PROCEDURE AddARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AddARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2026,7 +2026,7 @@ Sufficient (but not necessary) conditions:
 	END AddSRAR;
 
 (** LONGREAL *)
-	PROCEDURE AddAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AddAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2055,7 +2055,7 @@ Sufficient (but not necessary) conditions:
 	(*** subtraction array - array -> array  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE SubASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE SubASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2072,7 +2072,7 @@ Sufficient (but not necessary) conditions:
 	END SubASAS;
 
 (** SIGNED16 *)
-	PROCEDURE SubAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE SubAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2088,9 +2088,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), SubAIAILoop );
 	END SubAIAI;
 
-(** LONGINT *)
-	PROCEDURE SubALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE SubALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval - rval );
@@ -2098,15 +2098,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubALALLoop;
 
-	PROCEDURE SubALAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-										CONST left, right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE SubALAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+										CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), SubALALLoop );
+										SIZEOF( SIGNED32 ), SubALALLoop );
 	END SubALAL;
 
 (** REAL *)
-	PROCEDURE SubARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE SubARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2123,7 +2123,7 @@ Sufficient (but not necessary) conditions:
 	END SubARAR;
 
 (** LONGREAL *)
-	PROCEDURE SubAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE SubAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2157,10 +2157,10 @@ Sufficient (but not necessary) conditions:
 		AddAISI( dest, left, -right );
 	END SubAISI;
 
-(** LONGINT *)
-	PROCEDURE SubALSL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-										CONST left: ARRAY [ ? ] OF LONGINT;
-	right: LONGINT );   (* a: left, b: right, c: dest *)
+(** SIGNED32 *)
+	PROCEDURE SubALSL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+										CONST left: ARRAY [ ? ] OF SIGNED32;
+	right: SIGNED32 );   (* a: left, b: right, c: dest *)
 	BEGIN
 		AddALSL( dest, left, -right );
 	END SubALSL;
@@ -2184,7 +2184,7 @@ Sufficient (but not necessary) conditions:
 	(*** subtraction scalar-array -> array  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE SubSSASLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE SubSSASLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2202,7 +2202,7 @@ Sufficient (but not necessary) conditions:
 	END SubSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE SubSIAILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE SubSIAILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval, dval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2219,9 +2219,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), SubSIAILoop );
 	END SubSIAI;
 
-(** LONGINT *)
-	PROCEDURE SubSLALLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval, dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE SubSLALLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval, dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2230,15 +2230,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubSLALLoop;
 
-	PROCEDURE SubSLAL*( VAR dest: ARRAY [ ? ] OF LONGINT;  left: LONGINT;
-										CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE SubSLAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;  left: SIGNED32;
+										CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
-										SIZEOF( LONGINT ), SubSLALLoop );
+										SIZEOF( SIGNED32 ), SubSLALLoop );
 	END SubSLAL;
 
 (** REAL *)
-	PROCEDURE SubSRARLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE SubSRARLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval, dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2256,7 +2256,7 @@ Sufficient (but not necessary) conditions:
 	END SubSRAR;
 
 (** LONGREAL *)
-	PROCEDURE SubSXAXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE SubSXAXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval, dval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2277,7 +2277,7 @@ Sufficient (but not necessary) conditions:
 	(*** element-wise multiply array x array -> array  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE EMulASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EMulASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2294,7 +2294,7 @@ Sufficient (but not necessary) conditions:
 	END EMulASAS;
 
 (** SIGNED16 *)
-	PROCEDURE EMulAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EMulAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2311,9 +2311,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), EMulAIAILoop );
 	END EMulAIAI;
 
-(** LONGINT *)
-	PROCEDURE EMulALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EMulALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval * rval );
@@ -2321,15 +2321,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulALALLoop;
 
-	PROCEDURE EMulALAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE EMulALAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), EMulALALLoop );
+										SIZEOF( SIGNED32 ), EMulALALLoop );
 	END EMulALAL;
 
 (** REAL *)
-	PROCEDURE EMulARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EMulARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2346,7 +2346,7 @@ Sufficient (but not necessary) conditions:
 	END EMulARAR;
 
 (** LONGREAL *)
-	PROCEDURE EMulAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EMulAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2365,7 +2365,7 @@ Sufficient (but not necessary) conditions:
 	(*** element-wise multiply and add array x array -> array  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE EMulIncASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EMulIncASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval,dval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2382,7 +2382,7 @@ Sufficient (but not necessary) conditions:
 	END EMulIncASAS;
 
 (** SIGNED16 *)
-	PROCEDURE EMulIncAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EMulIncAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval,dval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2399,9 +2399,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), EMulIncAIAILoop );
 	END EMulIncAIAI;
 
-(** LONGINT *)
-	PROCEDURE EMulIncALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval,dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EMulIncALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval,dval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.GET(dadr,dval); SYSTEM.PUT( dadr, dval+ lval * rval );
@@ -2409,15 +2409,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulIncALALLoop;
 
-	PROCEDURE EMulIncALAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE EMulIncALAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), EMulIncALALLoop );
+										SIZEOF( SIGNED32 ), EMulIncALALLoop );
 	END EMulIncALAL;
 
 (** REAL *)
-	PROCEDURE EMulIncARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EMulIncARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval,dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2434,7 +2434,7 @@ Sufficient (but not necessary) conditions:
 	END EMulIncARAR;
 
 (** LONGREAL *)
-	PROCEDURE EMulIncAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EMulIncAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval,dval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2452,7 +2452,7 @@ Sufficient (but not necessary) conditions:
 	(*** multiply array x scalar -> array and scalar + array -> array ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE MulASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE MulASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2478,7 +2478,7 @@ Sufficient (but not necessary) conditions:
 	END MulSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE MulAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE MulAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2502,9 +2502,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), MulAISILoop );
 	END MulSIAI;
 
-(** LONGINT *)
-	PROCEDURE MulALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE MulALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2513,23 +2513,23 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MulALSLLoop;
 
-	PROCEDURE MulALSL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-										CONST left: ARRAY [ ? ] OF LONGINT;
-										right: LONGINT );
+	PROCEDURE MulALSL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+										CONST left: ARRAY [ ? ] OF SIGNED32;
+										right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), MulALSLLoop );
+										SIZEOF( SIGNED32 ), MulALSLLoop );
 	END MulALSL;
 
-	PROCEDURE MulSLAL*( VAR dest: ARRAY [ ? ] OF LONGINT;  left: LONGINT;
-										CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE MulSLAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;  left: SIGNED32;
+										CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
-										SIZEOF( LONGINT ), MulALSLLoop );
+										SIZEOF( SIGNED32 ), MulALSLLoop );
 	END MulSLAL;
 
 (** REAL *)
-	PROCEDURE MulARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE MulARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2554,7 +2554,7 @@ Sufficient (but not necessary) conditions:
 	END MulSRAR;
 
 (** LONGREAL *)
-	PROCEDURE MulAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE MulAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		IF debug THEN
@@ -2589,7 +2589,7 @@ Sufficient (but not necessary) conditions:
 	(*** multiply and add array * scalar -> array and scalar *  array -> array ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE IncMulASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE IncMulASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2636,7 +2636,7 @@ Sufficient (but not necessary) conditions:
 	END DecMulSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE IncMulAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE IncMulAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval, dval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2680,9 +2680,9 @@ Sufficient (but not necessary) conditions:
 		MinusAI(dest,dest);
 	END DecMulSIAI;
 
-(** LONGINT *)
-	PROCEDURE IncMulALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval, dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE IncMulALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval, dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2691,44 +2691,44 @@ Sufficient (but not necessary) conditions:
 		END;
 	END IncMulALSLLoop;
 
-	PROCEDURE IncMulALSL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-												CONST left: ARRAY [ ? ] OF LONGINT;
-												right: LONGINT );
+	PROCEDURE IncMulALSL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+												CONST left: ARRAY [ ? ] OF SIGNED32;
+												right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), IncMulALSLLoop );
+										SIZEOF( SIGNED32 ), IncMulALSLLoop );
 	END IncMulALSL;
 
-	PROCEDURE IncMulSLAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-												left: LONGINT;
-												CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE IncMulSLAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+												left: SIGNED32;
+												CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
-										SIZEOF( LONGINT ), IncMulALSLLoop );
+										SIZEOF( SIGNED32 ), IncMulALSLLoop );
 	END IncMulSLAL;
 
-	PROCEDURE DecMulALSL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-												CONST left: ARRAY [ ? ] OF LONGINT;
-												right: LONGINT );
+	PROCEDURE DecMulALSL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+												CONST left: ARRAY [ ? ] OF SIGNED32;
+												right: SIGNED32 );
 	BEGIN
 		MinusAL(dest,dest);
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), IncMulALSLLoop );
+										SIZEOF( SIGNED32 ), IncMulALSLLoop );
 		MinusAL(dest,dest);
 	END DecMulALSL;
 
-	PROCEDURE DecMulSLAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-												left: LONGINT;
-												CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE DecMulSLAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+												left: SIGNED32;
+												CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		MinusAL(dest,dest);
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
-										SIZEOF( LONGINT ), IncMulALSLLoop );
+										SIZEOF( SIGNED32 ), IncMulALSLLoop );
 		MinusAL(dest,dest);
 	END DecMulSLAL;
 
 (** REAL *)
-	PROCEDURE IncMulARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE IncMulARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval, dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2771,7 +2771,7 @@ Sufficient (but not necessary) conditions:
 	END DecMulSRAR;
 
 (** LONGREAL *)
-	PROCEDURE IncMulAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE IncMulAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval, dval: LONGREAL;
 	BEGIN
 		IF debug THEN
@@ -2826,7 +2826,7 @@ Sufficient (but not necessary) conditions:
 	(*** element-wise division array / array -> array  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE EDivideASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EDivideASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2844,7 +2844,7 @@ Sufficient (but not necessary) conditions:
 	END EDivideASAS;
 
 (** SIGNED16 *)
-	PROCEDURE EDivideAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EDivideAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2861,9 +2861,9 @@ Sufficient (but not necessary) conditions:
 										EDivideAIAILoop );
 	END EDivideAIAI;
 
-(** LONGINT *)
-	PROCEDURE EDivideALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: REAL;
+(** SIGNED32 *)
+	PROCEDURE EDivideALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval / rval;
@@ -2873,14 +2873,14 @@ Sufficient (but not necessary) conditions:
 	END EDivideALALLoop;
 
 	PROCEDURE EDivideALAL*( VAR dest: ARRAY [ ? ] OF REAL;
-												CONST left, right: ARRAY [ ? ] OF LONGINT );
+												CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
 										EDivideALALLoop );
 	END EDivideALAL;
 
 (** REAL *)
-	PROCEDURE EDivideARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EDivideARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2898,7 +2898,7 @@ Sufficient (but not necessary) conditions:
 	END EDivideARAR;
 
 (** LONGREAL *)
-	PROCEDURE EDivideAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EDivideAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;  dval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -2918,7 +2918,7 @@ Sufficient (but not necessary) conditions:
 	(*** division array / scalar -> array and scalar / array -> array ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE DivideASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivideASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2936,7 +2936,7 @@ Sufficient (but not necessary) conditions:
 										DivideASSSLoop );
 	END DivideASSS;
 
-	PROCEDURE DivideSSASLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivideSSASLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2954,7 +2954,7 @@ Sufficient (but not necessary) conditions:
 	END DivideSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE DivideAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivideAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2972,7 +2972,7 @@ Sufficient (but not necessary) conditions:
 										DivideAISILoop );
 	END DivideAISI;
 
-	PROCEDURE DivideSIAILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivideSIAILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -2989,9 +2989,9 @@ Sufficient (but not necessary) conditions:
 										DivideSIAILoop );
 	END DivideSIAI;
 
-(** LONGINT *)
-	PROCEDURE DivideALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: REAL;
+(** SIGNED32 *)
+	PROCEDURE DivideALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3001,15 +3001,15 @@ Sufficient (but not necessary) conditions:
 	END DivideALSLLoop;
 
 	PROCEDURE DivideALSL*( VAR dest: ARRAY [ ? ] OF REAL;
-												CONST left: ARRAY [ ? ] OF LONGINT;
-												right: LONGINT );
+												CONST left: ARRAY [ ? ] OF SIGNED32;
+												right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
 										DivideALSLLoop );
 	END DivideALSL;
 
-	PROCEDURE DivideSLALLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: REAL;
+	PROCEDURE DivideSLALLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3018,15 +3018,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideSLALLoop;
 
-	PROCEDURE DivideSLAL*( VAR dest: ARRAY [ ? ] OF REAL;  left: LONGINT;
-												CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE DivideSLAL*( VAR dest: ARRAY [ ? ] OF REAL;  left: SIGNED32;
+												CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
 										DivideSLALLoop );
 	END DivideSLAL;
 
 (** REAL *)
-	PROCEDURE DivideARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivideARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3043,7 +3043,7 @@ Sufficient (but not necessary) conditions:
 										DivideARSRLoop );
 	END DivideARSR;
 
-	PROCEDURE DivideSRARLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivideSRARLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3061,7 +3061,7 @@ Sufficient (but not necessary) conditions:
 	END DivideSRAR;
 
 (** LONGREAL *)
-	PROCEDURE DivideAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivideAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;  dval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3079,7 +3079,7 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( LONGREAL ), DivideAXSXLoop );
 	END DivideAXSX;
 
-	PROCEDURE DivideSXAXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivideSXAXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;  dval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3100,7 +3100,7 @@ Sufficient (but not necessary) conditions:
 	(*** element-wise DIV array DIV array -> array  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE EDivASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EDivASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3118,7 +3118,7 @@ Sufficient (but not necessary) conditions:
 	END EDivASAS;
 
 (** SIGNED16 *)
-	PROCEDURE EDivAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EDivAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3135,9 +3135,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), EDivAIAILoop );
 	END EDivAIAI;
 
-(** LONGINT *)
-	PROCEDURE EDivALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EDivALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval DIV rval;
@@ -3146,17 +3146,17 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivALALLoop;
 
-	PROCEDURE EDivALAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE EDivALAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), EDivALALLoop );
+										SIZEOF( SIGNED32 ), EDivALALLoop );
 	END EDivALAL;
 
 	(*** division array DIV scalar -> array and scalar DIV  array -> array ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE DivASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3174,7 +3174,7 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED8 ), DivASSSLoop );
 	END DivASSS;
 
-	PROCEDURE DivSSASLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivSSASLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3192,7 +3192,7 @@ Sufficient (but not necessary) conditions:
 	END DivSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE DivAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3209,7 +3209,7 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), DivAISILoop );
 	END DivAISI;
 
-	PROCEDURE DivSIAILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE DivSIAILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3226,9 +3226,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), DivSIAILoop );
 	END DivSIAI;
 
-(** LONGINT *)
-	PROCEDURE DivALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE DivALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3237,15 +3237,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivALSLLoop;
 
-	PROCEDURE DivALSL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-										CONST left: ARRAY [ ? ] OF LONGINT;  right: LONGINT );
+	PROCEDURE DivALSL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+										CONST left: ARRAY [ ? ] OF SIGNED32;  right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), DivALSLLoop );
+										SIZEOF( SIGNED32 ), DivALSLLoop );
 	END DivALSL;
 
-	PROCEDURE DivSLALLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: LONGINT;
+	PROCEDURE DivSLALLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3254,17 +3254,17 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivSLALLoop;
 
-	PROCEDURE DivSLAL*( VAR dest: ARRAY [ ? ] OF LONGINT;  left: LONGINT;
-										CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE DivSLAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;  left: SIGNED32;
+										CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
-										SIZEOF( LONGINT ), DivSLALLoop );
+										SIZEOF( SIGNED32 ), DivSLALLoop );
 	END DivSLAL;
 
 	(*** element-wise modulus array MOD array -> array  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE EModASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EModASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3282,7 +3282,7 @@ Sufficient (but not necessary) conditions:
 	END EModASAS;
 
 (** SIGNED16 *)
-	PROCEDURE EModAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EModAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3299,9 +3299,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), EModAIAILoop );
 	END EModAIAI;
 
-(** LONGINT *)
-	PROCEDURE EModALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EModALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval MOD rval;
@@ -3310,17 +3310,17 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EModALALLoop;
 
-	PROCEDURE EModALAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE EModALAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), EModALALLoop );
+										SIZEOF( SIGNED32 ), EModALALLoop );
 	END EModALAL;
 
 	(*** modulus array MOD scalar -> array and scalar MOD  array -> array ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE ModASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ModASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3338,7 +3338,7 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED8 ), ModASSSLoop );
 	END ModASSS;
 
-	PROCEDURE ModSSASLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ModSSASLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3356,7 +3356,7 @@ Sufficient (but not necessary) conditions:
 	END ModSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE ModAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ModAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3373,7 +3373,7 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), ModAISILoop );
 	END ModAISI;
 
-	PROCEDURE ModSIAILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ModSIAILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;  dval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3390,9 +3390,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), ModSIAILoop );
 	END ModSIAI;
 
-(** LONGINT *)
-	PROCEDURE ModALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE ModALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3401,16 +3401,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ModALSLLoop;
 
-	PROCEDURE ModALSL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-											CONST left: ARRAY [ ? ] OF LONGINT;
-											right: LONGINT );
+	PROCEDURE ModALSL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+											CONST left: ARRAY [ ? ] OF SIGNED32;
+											right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), ModALSLLoop );
+										SIZEOF( SIGNED32 ), ModALSLLoop );
 	END ModALSL;
 
-	PROCEDURE ModSLALLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: LONGINT;
+	PROCEDURE ModSLALLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3419,18 +3419,18 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ModSLALLoop;
 
-	PROCEDURE ModSLAL*( VAR dest: ARRAY [ ? ] OF LONGINT;  left: LONGINT;
-											CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE ModSLAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;  left: SIGNED32;
+											CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
-										SIZEOF( LONGINT ), ModSLALLoop );
+										SIZEOF( SIGNED32 ), ModSLALLoop );
 	END ModSLAL;
 
 	(*** scalar product <array,array> -> scalar  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE SPASASLoop( ladr, radr, dadr, linc, rinc, len: LONGINT );
-	VAR lval, rval: SIGNED8;  dval: LONGINT;
+	PROCEDURE SPASASLoop( ladr, radr, dadr, linc, rinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED8;  dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -3440,8 +3440,8 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END SPASASLoop;
 
-	PROCEDURE SPASAS*( CONST left, right: ARRAY [ ? ] OF SIGNED8 ): LONGINT;
-	VAR dest: LONGINT;
+	PROCEDURE SPASAS*( CONST left, right: ARRAY [ ? ] OF SIGNED8 ): SIGNED32;
+	VAR dest: SIGNED32;
 	BEGIN
 		dest := 0;
 		ApplyBinaryAASOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), SPASASLoop );
@@ -3449,8 +3449,8 @@ Sufficient (but not necessary) conditions:
 	END SPASAS;
 
 (** SIGNED16 *)
-	PROCEDURE SPAIAILoop( ladr, radr, dadr, linc, rinc, len: LONGINT );
-	VAR lval, rval: SIGNED16;  dval: LONGINT;
+	PROCEDURE SPAIAILoop( ladr, radr, dadr, linc, rinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED16;  dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -3460,17 +3460,17 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END SPAIAILoop;
 
-	PROCEDURE SPAIAI*( CONST left, right: ARRAY [ ? ] OF SIGNED16 ): LONGINT;
-	VAR dest: LONGINT;
+	PROCEDURE SPAIAI*( CONST left, right: ARRAY [ ? ] OF SIGNED16 ): SIGNED32;
+	VAR dest: SIGNED32;
 	BEGIN
 		dest := 0;
 		ApplyBinaryAASOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), SPAIAILoop );
 		RETURN dest;
 	END SPAIAI;
 
-(** LONGINT *)
-	PROCEDURE SPALALLoop( ladr, radr, dadr, linc, rinc, len: LONGINT );
-	VAR lval, rval: LONGINT;  dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE SPALALLoop( ladr, radr, dadr, linc, rinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;  dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -3480,8 +3480,8 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END SPALALLoop;
 
-	PROCEDURE SPALAL*( CONST left, right: ARRAY [ ? ] OF LONGINT ): LONGINT;
-	VAR dest: LONGINT;
+	PROCEDURE SPALAL*( CONST left, right: ARRAY [ ? ] OF SIGNED32 ): SIGNED32;
+	VAR dest: SIGNED32;
 	BEGIN
 		dest := 0;
 		ApplyBinaryAASOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), SPALALLoop );
@@ -3489,7 +3489,7 @@ Sufficient (but not necessary) conditions:
 	END SPALAL;
 
 (** REAL *)
-	PROCEDURE SPARARLoop( ladr, radr, dadr, linc, rinc, len: LONGINT );
+	PROCEDURE SPARARLoop( ladr, radr, dadr, linc, rinc, len: SIGNED32 );
 	VAR lval, rval: REAL;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -3508,7 +3508,7 @@ Sufficient (but not necessary) conditions:
 		RETURN dest;
 	END SPARAR;
 
-	PROCEDURE SPAXAXLoop( ladr, radr, dadr, linc, rinc, len: LONGINT );
+	PROCEDURE SPAXAXLoop( ladr, radr, dadr, linc, rinc, len: SIGNED32 );
 	VAR lval, rval, dval: LONGREAL;
 	BEGIN
 		IF debug THEN
@@ -3537,7 +3537,7 @@ Sufficient (but not necessary) conditions:
 
 (** BOOLEAN *)
 
-	PROCEDURE EEqlABABLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EEqlABABLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3555,7 +3555,7 @@ Sufficient (but not necessary) conditions:
 
 (** SIGNED8 *)
 
-	PROCEDURE EEqlASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EEqlASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3573,7 +3573,7 @@ Sufficient (but not necessary) conditions:
 
 (** SIGNED16 *)
 
-	PROCEDURE EEqlAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EEqlAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3589,10 +3589,10 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), EEqlAIAILoop );
 	END EEqlAIAI;
 
-(** LONGINT *)
+(** SIGNED32 *)
 
-	PROCEDURE EEqlALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+	PROCEDURE EEqlALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval = rval );
@@ -3601,14 +3601,14 @@ Sufficient (but not necessary) conditions:
 	END EEqlALALLoop;
 
 	PROCEDURE EEqlALAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), EEqlALALLoop );
 	END EEqlALAL;
 
 (** REAL *)
-	PROCEDURE EEqlARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EEqlARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3625,7 +3625,7 @@ Sufficient (but not necessary) conditions:
 	END EEqlARAR;
 
 (** LONGREAL *)
-	PROCEDURE EEqlAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EEqlAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3644,7 +3644,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise equal  array x scalar ->  array of boolean ********************************************************************)
 
 (** BOOLEAN *)
-	PROCEDURE EEqlABSBLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EEqlABSBLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3671,7 +3671,7 @@ Sufficient (but not necessary) conditions:
 	END EEqlSBAB;
 
 (** SIGNED8 *)
-	PROCEDURE EEqlASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EEqlASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3698,7 +3698,7 @@ Sufficient (but not necessary) conditions:
 	END EEqlSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE EEqlAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EEqlAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3722,9 +3722,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), EEqlAISILoop );
 	END EEqlSIAI;
 
-(** LONGINT *)
-	PROCEDURE EEqlALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EEqlALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3734,22 +3734,22 @@ Sufficient (but not necessary) conditions:
 	END EEqlALSLLoop;
 
 	PROCEDURE EEqlALSL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left: ARRAY [ ? ] OF LONGINT;
-											right: LONGINT );
+											CONST left: ARRAY [ ? ] OF SIGNED32;
+											right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), EEqlALSLLoop );
 	END EEqlALSL;
 
-	PROCEDURE EEqlSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: LONGINT;
-											CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE EEqlSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: SIGNED32;
+											CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), EEqlALSLLoop );
 	END EEqlSLAL;
 
 (** REAL *)
-	PROCEDURE EEqlARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EEqlARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3774,7 +3774,7 @@ Sufficient (but not necessary) conditions:
 	END EEqlSRAR;
 
 (** LONGREAL *)
-	PROCEDURE EEqlAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EEqlAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3803,7 +3803,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise nequal: array x array -> array of boolean  ********************************************************************)
 
 (** BOOLEAN *)
-	PROCEDURE ENeqABABLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ENeqABABLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3820,7 +3820,7 @@ Sufficient (but not necessary) conditions:
 	END ENeqABAB;
 
 (** SIGNED8 *)
-	PROCEDURE ENeqASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ENeqASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3837,7 +3837,7 @@ Sufficient (but not necessary) conditions:
 	END ENeqASAS;
 
 (** SIGNED16*)
-	PROCEDURE ENeqAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ENeqAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3853,9 +3853,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), ENeqAIAILoop );
 	END ENeqAIAI;
 
-(** LONGINT*)
-	PROCEDURE ENeqALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32*)
+	PROCEDURE ENeqALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval # rval );
@@ -3864,14 +3864,14 @@ Sufficient (but not necessary) conditions:
 	END ENeqALALLoop;
 
 	PROCEDURE ENeqALAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), ENeqALALLoop );
 	END ENeqALAL;
 
 (** REAL *)
-	PROCEDURE ENeqARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ENeqARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3888,7 +3888,7 @@ Sufficient (but not necessary) conditions:
 	END ENeqARAR;
 
 (** LONGREAL *)
-	PROCEDURE ENeqAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ENeqAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -3907,7 +3907,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise nequal  array x scalar ->  array of boolean ********************************************************************)
 
 (** BOOLEAN *)
-	PROCEDURE ENeqABSBLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ENeqABSBLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3934,7 +3934,7 @@ Sufficient (but not necessary) conditions:
 	END ENeqSBAB;
 
 (** SIGNED8 *)
-	PROCEDURE ENeqASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ENeqASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3961,7 +3961,7 @@ Sufficient (but not necessary) conditions:
 	END ENeqSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE ENeqAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ENeqAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -3985,9 +3985,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), ENeqAISILoop );
 	END ENeqSIAI;
 
-(** LONGINT *)
-	PROCEDURE ENeqALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE ENeqALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3997,22 +3997,22 @@ Sufficient (but not necessary) conditions:
 	END ENeqALSLLoop;
 
 	PROCEDURE ENeqALSL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left: ARRAY [ ? ] OF LONGINT;
-											right: LONGINT );
+											CONST left: ARRAY [ ? ] OF SIGNED32;
+											right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), ENeqALSLLoop );
 	END ENeqALSL;
 
-	PROCEDURE ENeqSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: LONGINT;
-											CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE ENeqSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: SIGNED32;
+											CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), ENeqALSLLoop );
 	END ENeqSLAL;
 
 (** REAL *)
-	PROCEDURE ENeqARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ENeqARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4037,7 +4037,7 @@ Sufficient (but not necessary) conditions:
 	END ENeqSRAR;
 
 (** LONGREAL *)
-	PROCEDURE ENeqAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ENeqAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4066,7 +4066,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise greater than: array x array -> array of boolean  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE EGtrASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EGtrASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4083,7 +4083,7 @@ Sufficient (but not necessary) conditions:
 	END EGtrASAS;
 
 (** SIGNED16 *)
-	PROCEDURE EGtrAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EGtrAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4099,9 +4099,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), EGtrAIAILoop );
 	END EGtrAIAI;
 
-(** LONGINT *)
-	PROCEDURE EGtrALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EGtrALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval > rval );
@@ -4110,14 +4110,14 @@ Sufficient (but not necessary) conditions:
 	END EGtrALALLoop;
 
 	PROCEDURE EGtrALAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), EGtrALALLoop );
 	END EGtrALAL;
 
 (** REAL *)
-	PROCEDURE EGtrARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EGtrARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4134,7 +4134,7 @@ Sufficient (but not necessary) conditions:
 	END EGtrARAR;
 
 (** LONGREAL *)
-	PROCEDURE EGtrAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EGtrAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4153,7 +4153,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise greater  array x scalar ->  array of boolean ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE EGtrASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EGtrASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4180,7 +4180,7 @@ Sufficient (but not necessary) conditions:
 	END ELssSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE EGtrAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EGtrAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4204,9 +4204,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), EGtrAISILoop );
 	END ELssSIAI;
 
-(** LONGINT *)
-	PROCEDURE EGtrALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EGtrALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4216,22 +4216,22 @@ Sufficient (but not necessary) conditions:
 	END EGtrALSLLoop;
 
 	PROCEDURE EGtrALSL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left: ARRAY [ ? ] OF LONGINT;
-											right: LONGINT );
+											CONST left: ARRAY [ ? ] OF SIGNED32;
+											right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), EGtrALSLLoop );
 	END EGtrALSL;
 
-	PROCEDURE ELssSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: LONGINT;
-											CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE ELssSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: SIGNED32;
+											CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), EGtrALSLLoop );
 	END ELssSLAL;
 
 (** REAL *)
-	PROCEDURE EGtrARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EGtrARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4256,7 +4256,7 @@ Sufficient (but not necessary) conditions:
 	END ELssSRAR;
 
 (** LONGREAL *)
-	PROCEDURE EGtrAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EGtrAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4285,7 +4285,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise greater or equal: array x array -> array of boolean  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE EGeqASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EGeqASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4302,7 +4302,7 @@ Sufficient (but not necessary) conditions:
 	END EGeqASAS;
 
 (** SIGNED16 *)
-	PROCEDURE EGeqAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EGeqAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4318,9 +4318,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), EGeqAIAILoop );
 	END EGeqAIAI;
 
-(** LONGINT *)
-	PROCEDURE EGeqALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EGeqALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval >= rval );
@@ -4329,14 +4329,14 @@ Sufficient (but not necessary) conditions:
 	END EGeqALALLoop;
 
 	PROCEDURE EGeqALAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), EGeqALALLoop );
 	END EGeqALAL;
 
 (** REAL *)
-	PROCEDURE EGeqARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EGeqARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4353,7 +4353,7 @@ Sufficient (but not necessary) conditions:
 	END EGeqARAR;
 
 (** LONGREAL *)
-	PROCEDURE EGeqAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE EGeqAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4372,7 +4372,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise geq  array x scalar ->  array of boolean ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE EGeqASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EGeqASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4399,7 +4399,7 @@ Sufficient (but not necessary) conditions:
 	END ELeqSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE EGeqAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EGeqAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4423,9 +4423,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), EGeqAISILoop );
 	END ELeqSIAI;
 
-(** LONGINT *)
-	PROCEDURE EGeqALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EGeqALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4435,22 +4435,22 @@ Sufficient (but not necessary) conditions:
 	END EGeqALSLLoop;
 
 	PROCEDURE EGeqALSL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left: ARRAY [ ? ] OF LONGINT;
-											right: LONGINT );
+											CONST left: ARRAY [ ? ] OF SIGNED32;
+											right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), EGeqALSLLoop );
 	END EGeqALSL;
 
-	PROCEDURE ELeqSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: LONGINT;
-											CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE ELeqSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: SIGNED32;
+											CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), EGeqALSLLoop );
 	END ELeqSLAL;
 
 (** REAL *)
-	PROCEDURE EGeqARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EGeqARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4475,7 +4475,7 @@ Sufficient (but not necessary) conditions:
 	END ELeqSRAR;
 
 (** LONGREAL *)
-	PROCEDURE EGeqAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE EGeqAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4504,7 +4504,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise less than: array x array -> array of boolean  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE ELssASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ELssASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4521,7 +4521,7 @@ Sufficient (but not necessary) conditions:
 	END ELssASAS;
 
 (** SIGNED16 *)
-	PROCEDURE ELssAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ELssAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4537,9 +4537,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), ELssAIAILoop );
 	END ELssAIAI;
 
-(** LONGINT*)
-	PROCEDURE ELssALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32*)
+	PROCEDURE ELssALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval < rval );
@@ -4548,14 +4548,14 @@ Sufficient (but not necessary) conditions:
 	END ELssALALLoop;
 
 	PROCEDURE ELssALAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), ELssALALLoop );
 	END ELssALAL;
 
 (** REAL *)
-	PROCEDURE ELssARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ELssARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4572,7 +4572,7 @@ Sufficient (but not necessary) conditions:
 	END ELssARAR;
 
 (** LONGREAL *)
-	PROCEDURE ELssAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ELssAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4591,7 +4591,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise less  array x scalar ->  array of boolean ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE ELssASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ELssASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4618,7 +4618,7 @@ Sufficient (but not necessary) conditions:
 	END EGtrSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE ELssAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ELssAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4642,9 +4642,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), ELssAISILoop );
 	END EGtrSIAI;
 
-(** LONGINT *)
-	PROCEDURE ELssALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE ELssALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4654,22 +4654,22 @@ Sufficient (but not necessary) conditions:
 	END ELssALSLLoop;
 
 	PROCEDURE ELssALSL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left: ARRAY [ ? ] OF LONGINT;
-											right: LONGINT );
+											CONST left: ARRAY [ ? ] OF SIGNED32;
+											right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), ELssALSLLoop );
 	END ELssALSL;
 
-	PROCEDURE EGtrSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: LONGINT;
-											CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE EGtrSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: SIGNED32;
+											CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), ELssALSLLoop );
 	END EGtrSLAL;
 
 (** REAL *)
-	PROCEDURE ELssARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ELssARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4694,7 +4694,7 @@ Sufficient (but not necessary) conditions:
 	END EGtrSRAR;
 
 (** LONGREAL *)
-	PROCEDURE ELssAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ELssAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4723,7 +4723,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise less or equal: array x array -> array of boolean ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE ELeqASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ELeqASASLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4740,7 +4740,7 @@ Sufficient (but not necessary) conditions:
 	END ELeqASAS;
 
 (** SIGNED16 *)
-	PROCEDURE ELeqAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ELeqAIAILoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4756,9 +4756,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), ELeqAIAILoop );
 	END ELeqAIAI;
 
-(** LONGINT *)
-	PROCEDURE ELeqALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE ELeqALALLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval <= rval );
@@ -4767,14 +4767,14 @@ Sufficient (but not necessary) conditions:
 	END ELeqALALLoop;
 
 	PROCEDURE ELeqALAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left, right: ARRAY [ ? ] OF LONGINT );
+											CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), ELeqALALLoop );
 	END ELeqALAL;
 
 (** REAL  *)
-	PROCEDURE ELeqARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ELeqARARLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4791,7 +4791,7 @@ Sufficient (but not necessary) conditions:
 	END ELeqARAR;
 
 (** LONGREAL*)
-	PROCEDURE ELeqAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ELeqAXAXLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4810,7 +4810,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise leq  array x scalar ->  array of boolean ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE ELeqASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ELeqASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4837,7 +4837,7 @@ Sufficient (but not necessary) conditions:
 	END EGeqSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE ELeqAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ELeqAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4861,9 +4861,9 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), ELeqAISILoop );
 	END EGeqSIAI;
 
-(** LONGINT *)
-	PROCEDURE ELeqALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE ELeqALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4873,22 +4873,22 @@ Sufficient (but not necessary) conditions:
 	END ELeqALSLLoop;
 
 	PROCEDURE ELeqALSL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;
-											CONST left: ARRAY [ ? ] OF LONGINT;
-											right: LONGINT );
+											CONST left: ARRAY [ ? ] OF SIGNED32;
+											right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), ELeqALSLLoop );
 	END ELeqALSL;
 
-	PROCEDURE EGeqSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: LONGINT;
-											CONST right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE EGeqSLAL*( VAR dest: ARRAY [ ? ] OF BOOLEAN;  left: SIGNED32;
+											CONST right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( right ), ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), ELeqALSLLoop );
 	END EGeqSLAL;
 
 (** REAL *)
-	PROCEDURE ELeqARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ELeqARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4913,7 +4913,7 @@ Sufficient (but not necessary) conditions:
 	END EGeqSRAR;
 
 (** LONGREAL *)
-	PROCEDURE ELeqAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ELeqAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -4942,7 +4942,7 @@ Sufficient (but not necessary) conditions:
 	(*** elementwise or, elementwise and  ********************************************************************)
 
 (** array x array *)
-	PROCEDURE ElOrABABLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ElOrABABLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4958,7 +4958,7 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), ElOrABABLoop );
 	END ElOrABAB;
 
-	PROCEDURE ElAndABABLoop( ladr, radr, dadr, linc, rinc, dinc, len: LONGINT );
+	PROCEDURE ElAndABABLoop( ladr, radr, dadr, linc, rinc, dinc, len: SIGNED32 );
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		WHILE (len > 0) DO
@@ -4975,7 +4975,7 @@ Sufficient (but not necessary) conditions:
 	END ElAndABAB;
 
 (** array x boolean *)
-	PROCEDURE ElOrABSBLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ElOrABSBLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5001,7 +5001,7 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( BOOLEAN ), ElOrABSBLoop );
 	END ElOrSBAB;
 
-	PROCEDURE ElAndABSBLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE ElAndABSBLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5030,7 +5030,7 @@ Sufficient (but not necessary) conditions:
 	(*** less than, greater or equal: array x array -> boolean  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE LssASASLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LssASASLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5046,7 +5046,7 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LssASASLoop );
 	END LssASAS;
 
-	PROCEDURE GeqASASLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GeqASASLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5063,7 +5063,7 @@ Sufficient (but not necessary) conditions:
 	END GeqASAS;
 
 (** SIGNED16 *)
-	PROCEDURE LssAIAILoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LssAIAILoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5079,7 +5079,7 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LssAIAILoop );
 	END LssAIAI;
 
-	PROCEDURE GeqAIAILoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GeqAIAILoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5095,9 +5095,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GeqAIAILoop );
 	END GeqAIAI;
 
-(** LONGINT *)
-	PROCEDURE LssALALLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE LssALALLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -5107,13 +5107,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LssALALLoop;
 
-	PROCEDURE LssALAL*( CONST left, right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE LssALAL*( CONST left, right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LssALALLoop );
 	END LssALAL;
 
-	PROCEDURE GeqALALLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+	PROCEDURE GeqALALLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -5123,13 +5123,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GeqALALLoop;
 
-	PROCEDURE GeqALAL*( CONST left, right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE GeqALAL*( CONST left, right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GeqALALLoop );
 	END GeqALAL;
 
 (** REAL *)
-	PROCEDURE LssARARLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LssARARLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5145,7 +5145,7 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LssARARLoop );
 	END LssARAR;
 
-	PROCEDURE GeqARARLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GeqARARLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5162,7 +5162,7 @@ Sufficient (but not necessary) conditions:
 	END GeqARAR;
 
 (** LONGREAL *)
-	PROCEDURE LssAXAXLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LssAXAXLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5178,7 +5178,7 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LssAXAXLoop );
 	END LssAXAX;
 
-	PROCEDURE GeqAXAXLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GeqAXAXLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5197,7 +5197,7 @@ Sufficient (but not necessary) conditions:
 	(*** less than, greater or equal: array x array -> boolean  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE GtrASASLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GtrASASLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5213,7 +5213,7 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrASASLoop );
 	END GtrASAS;
 
-	PROCEDURE LeqASASLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LeqASASLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5230,7 +5230,7 @@ Sufficient (but not necessary) conditions:
 	END LeqASAS;
 
 (** SIGNED16 *)
-	PROCEDURE GtrAIAILoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GtrAIAILoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5246,7 +5246,7 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrAIAILoop );
 	END GtrAIAI;
 
-	PROCEDURE LeqAIAILoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LeqAIAILoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5262,9 +5262,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LeqAIAILoop );
 	END LeqAIAI;
 
-(** LONGINT *)
-	PROCEDURE GtrALALLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE GtrALALLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -5274,13 +5274,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GtrALALLoop;
 
-	PROCEDURE GtrALAL*( CONST left, right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE GtrALAL*( CONST left, right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrALALLoop );
 	END GtrALAL;
 
-	PROCEDURE LeqALALLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+	PROCEDURE LeqALALLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -5290,13 +5290,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LeqALALLoop;
 
-	PROCEDURE LeqALAL*( CONST left, right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE LeqALAL*( CONST left, right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LeqALALLoop );
 	END LeqALAL;
 
 (** REAL *)
-	PROCEDURE GtrARARLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GtrARARLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5312,7 +5312,7 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrARARLoop );
 	END GtrARAR;
 
-	PROCEDURE LeqARARLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LeqARARLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5329,7 +5329,7 @@ Sufficient (but not necessary) conditions:
 	END LeqARAR;
 
 (** LONGREAL *)
-	PROCEDURE GtrAXAXLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GtrAXAXLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5345,7 +5345,7 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrAXAXLoop );
 	END GtrAXAX;
 
-	PROCEDURE LeqAXAXLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LeqAXAXLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5364,7 +5364,7 @@ Sufficient (but not necessary) conditions:
 	(*** equals: array x array -> boolean  ********************************************************************)
 
 (** BOOLEAN *)
-	PROCEDURE EqlABABLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlABABLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5386,7 +5386,7 @@ Sufficient (but not necessary) conditions:
 	END NeqABAB;
 
 (** SIGNED8 *)
-	PROCEDURE EqlASASLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlASASLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5408,7 +5408,7 @@ Sufficient (but not necessary) conditions:
 	END NeqASAS;
 
 (** SIGNED16 *)
-	PROCEDURE EqlAIAILoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlAIAILoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5429,9 +5429,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlAIAILoop );
 	END NeqAIAI;
 
-(** LONGINT *)
-	PROCEDURE EqlALALLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EqlALALLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -5441,18 +5441,18 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlALALLoop;
 
-	PROCEDURE EqlALAL*( CONST left, right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE EqlALAL*( CONST left, right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlALALLoop );
 	END EqlALAL;
 
-	PROCEDURE NeqALAL*( CONST left, right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE NeqALAL*( CONST left, right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlALALLoop );
 	END NeqALAL;
 
 (** REAL *)
-	PROCEDURE EqlARARLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlARARLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5474,7 +5474,7 @@ Sufficient (but not necessary) conditions:
 	END NeqARAR;
 
 (** LONGREAL *)
-	PROCEDURE EqlAXAXLoop( ladr, radr, linc, rinc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlAXAXLoop( ladr, radr, linc, rinc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -5498,7 +5498,7 @@ Sufficient (but not necessary) conditions:
 	(*** equals: array x scalar -> boolean  ********************************************************************)
 
 (** BOOLEAN *)
-	PROCEDURE EqlABSBLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlABSBLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: BOOLEAN;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5535,7 +5535,7 @@ Sufficient (but not necessary) conditions:
 	END NeqSBAB;
 
 (** SIGNED8 *)
-	PROCEDURE EqlASSSLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlASSSLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5572,7 +5572,7 @@ Sufficient (but not necessary) conditions:
 	END NeqSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE EqlAISILoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlAISILoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5608,9 +5608,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ~EqlSIAI( left, right );
 	END NeqSIAI;
 
-(** LONGINT *)
-	PROCEDURE EqlALSLLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE EqlALSLLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5621,32 +5621,32 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlALSLLoop;
 
-	PROCEDURE EqlALSL*( CONST left: ARRAY [ ? ] OF LONGINT;
-										right: LONGINT ): BOOLEAN;
+	PROCEDURE EqlALSL*( CONST left: ARRAY [ ? ] OF SIGNED32;
+										right: SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlALSLLoop );
 	END EqlALSL;
 
-	PROCEDURE EqlSLAL*( left: LONGINT;
-										CONST right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE EqlSLAL*( left: SIGNED32;
+										CONST right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), EqlALSLLoop );
 	END EqlSLAL;
 
-	PROCEDURE NeqALSL*( CONST left: ARRAY [ ? ] OF LONGINT;
-											right: LONGINT ): BOOLEAN;
+	PROCEDURE NeqALSL*( CONST left: ARRAY [ ? ] OF SIGNED32;
+											right: SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ~EqlALSL( left, right );
 	END NeqALSL;
 
-	PROCEDURE NeqSLAL*( left: LONGINT;
-											CONST right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE NeqSLAL*( left: SIGNED32;
+											CONST right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ~EqlSLAL( left, right );
 	END NeqSLAL;
 
 (** REAL *)
-	PROCEDURE EqlARSRLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlARSRLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5683,7 +5683,7 @@ Sufficient (but not necessary) conditions:
 	END NeqSRAR;
 
 (** LONGREAL *)
-	PROCEDURE EqlAXSXLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE EqlAXSXLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5722,7 +5722,7 @@ Sufficient (but not necessary) conditions:
 	(*** gtr : array x scalar -> boolean  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE GtrASSSLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GtrASSSLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5747,7 +5747,7 @@ Sufficient (but not necessary) conditions:
 	END LssSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE GtrAISILoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GtrAISILoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5771,9 +5771,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GtrAISILoop );
 	END LssSIAI;
 
-(** LONGINT *)
-	PROCEDURE GtrALSLLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE GtrALSLLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5784,20 +5784,20 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GtrALSLLoop;
 
-	PROCEDURE GtrALSL*( CONST left: ARRAY [ ? ] OF LONGINT;
-										right: LONGINT ): BOOLEAN;
+	PROCEDURE GtrALSL*( CONST left: ARRAY [ ? ] OF SIGNED32;
+										right: SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrALSLLoop );
 	END GtrALSL;
 
-	PROCEDURE LssSLAL*( left: LONGINT;
-										CONST right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE LssSLAL*( left: SIGNED32;
+										CONST right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GtrALSLLoop );
 	END LssSLAL;
 
 (** REAL *)
-	PROCEDURE GtrARSRLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GtrARSRLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5822,7 +5822,7 @@ Sufficient (but not necessary) conditions:
 	END LssSRAR;
 
 (** LONGREAL *)
-	PROCEDURE GtrAXSXLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GtrAXSXLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5849,7 +5849,7 @@ Sufficient (but not necessary) conditions:
 	(*** geq : array x scalar -> boolean  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE GeqASSSLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GeqASSSLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5874,7 +5874,7 @@ Sufficient (but not necessary) conditions:
 	END LeqSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE GeqAISILoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GeqAISILoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5898,9 +5898,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GeqAISILoop );
 	END LeqSIAI;
 
-(** LONGINT *)
-	PROCEDURE GeqALSLLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE GeqALSLLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5911,20 +5911,20 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GeqALSLLoop;
 
-	PROCEDURE GeqALSL*( CONST left: ARRAY [ ? ] OF LONGINT;
-										right: LONGINT ): BOOLEAN;
+	PROCEDURE GeqALSL*( CONST left: ARRAY [ ? ] OF SIGNED32;
+										right: SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), GeqALSLLoop );
 	END GeqALSL;
 
-	PROCEDURE LeqSLAL*( left: LONGINT;
-										CONST right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE LeqSLAL*( left: SIGNED32;
+										CONST right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GeqALSLLoop );
 	END LeqSLAL;
 
 (** REAL *)
-	PROCEDURE GeqARSRLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GeqARSRLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5949,7 +5949,7 @@ Sufficient (but not necessary) conditions:
 	END LeqSRAR;
 
 (** LONGREAL *)
-	PROCEDURE GeqAXSXLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE GeqAXSXLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -5976,7 +5976,7 @@ Sufficient (but not necessary) conditions:
 	(*** leq : array x scalar -> boolean  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE LeqASSSLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LeqASSSLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6001,7 +6001,7 @@ Sufficient (but not necessary) conditions:
 	END GeqSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE LeqAISILoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LeqAISILoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6025,9 +6025,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LeqAISILoop );
 	END GeqSIAI;
 
-(** LONGINT *)
-	PROCEDURE LeqALSLLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE LeqALSLLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6038,20 +6038,20 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LeqALSLLoop;
 
-	PROCEDURE LeqALSL*( CONST left: ARRAY [ ? ] OF LONGINT;
-										right: LONGINT ): BOOLEAN;
+	PROCEDURE LeqALSL*( CONST left: ARRAY [ ? ] OF SIGNED32;
+										right: SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), LeqALSLLoop );
 	END LeqALSL;
 
-	PROCEDURE GeqSLAL*( left: LONGINT;
-										CONST right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE GeqSLAL*( left: SIGNED32;
+										CONST right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LeqALSLLoop );
 	END GeqSLAL;
 
 (** REAL *)
-	PROCEDURE LeqARSRLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LeqARSRLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6076,7 +6076,7 @@ Sufficient (but not necessary) conditions:
 	END GeqSRAR;
 
 (** LONGREAL *)
-	PROCEDURE LeqAXSXLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LeqAXSXLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6103,7 +6103,7 @@ Sufficient (but not necessary) conditions:
 	(*** lss: array x scalar -> boolean  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE LssASSSLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LssASSSLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6128,7 +6128,7 @@ Sufficient (but not necessary) conditions:
 	END GtrSSAS;
 
 (** SIGNED16 *)
-	PROCEDURE LssAISILoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LssAISILoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6152,9 +6152,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LssAISILoop );
 	END GtrSIAI;
 
-(** LONGINT *)
-	PROCEDURE LssALSLLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
-	VAR lval, rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE LssALSLLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
+	VAR lval, rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6165,20 +6165,20 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LssALSLLoop;
 
-	PROCEDURE LssALSL*( CONST left: ARRAY [ ? ] OF LONGINT;
-										right: LONGINT ): BOOLEAN;
+	PROCEDURE LssALSL*( CONST left: ARRAY [ ? ] OF SIGNED32;
+										right: SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), LssALSLLoop );
 	END LssALSL;
 
-	PROCEDURE GtrSLAL*( left: LONGINT;
-										CONST right: ARRAY [ ? ] OF LONGINT ): BOOLEAN;
+	PROCEDURE GtrSLAL*( left: SIGNED32;
+										CONST right: ARRAY [ ? ] OF SIGNED32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LssALSLLoop );
 	END GtrSLAL;
 
 (** REAL *)
-	PROCEDURE LssARSRLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LssARSRLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6203,7 +6203,7 @@ Sufficient (but not necessary) conditions:
 	END GtrSRAR;
 
 (** LONGREAL *)
-	PROCEDURE LssAXSXLoop( ladr, radr, linc, len: LONGINT ): BOOLEAN;
+	PROCEDURE LssAXSXLoop( ladr, radr, linc, len: SIGNED32 ): BOOLEAN;
 	VAR lval, rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6232,7 +6232,7 @@ Sufficient (but not necessary) conditions:
 	(*** min: array -> scalar ****************************************)
 
 (** SIGNED8 *)
-	PROCEDURE MinASLoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE MinASLoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6253,7 +6253,7 @@ Sufficient (but not necessary) conditions:
 	END MinAS;
 
 (** SIGNED16 *)
-	PROCEDURE MinAILoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE MinAILoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6273,9 +6273,9 @@ Sufficient (but not necessary) conditions:
 		ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), MinAILoop );  RETURN val;
 	END MinAI;
 
-(** LONGINT *)
-	PROCEDURE MinALLoop( ladr, dadr, linc, len: LONGINT );
-	VAR lval, dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE MinALLoop( ladr, dadr, linc, len: SIGNED32 );
+	VAR lval, dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -6286,8 +6286,8 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END MinALLoop;
 
-	PROCEDURE MinAL*( CONST left: ARRAY [ ? ] OF LONGINT ): LONGINT;
-	TYPE Type = LONGINT;
+	PROCEDURE MinAL*( CONST left: ARRAY [ ? ] OF SIGNED32 ): SIGNED32;
+	TYPE Type = SIGNED32;
 	VAR val: Type;
 	BEGIN
 		val := MAX( Type );
@@ -6295,7 +6295,7 @@ Sufficient (but not necessary) conditions:
 	END MinAL;
 
 (** REAL *)
-	PROCEDURE MinARLoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE MinARLoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: REAL;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6316,7 +6316,7 @@ Sufficient (but not necessary) conditions:
 	END MinAR;
 
 (** LONGREAL *)
-	PROCEDURE MinAXLoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE MinAXLoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6339,7 +6339,7 @@ Sufficient (but not necessary) conditions:
 	(*** max: array -> scalar  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE MaxASLoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE MaxASLoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6360,7 +6360,7 @@ Sufficient (but not necessary) conditions:
 	END MaxAS;
 
 (** SIGNED16 *)
-	PROCEDURE MaxAILoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE MaxAILoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6380,9 +6380,9 @@ Sufficient (but not necessary) conditions:
 		ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), MaxAILoop );  RETURN val;
 	END MaxAI;
 
-(** LONGINT *)
-	PROCEDURE MaxALLoop( ladr, dadr, linc, len: LONGINT );
-	VAR lval, dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE MaxALLoop( ladr, dadr, linc, len: SIGNED32 );
+	VAR lval, dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -6393,8 +6393,8 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END MaxALLoop;
 
-	PROCEDURE MaxAL*( CONST left: ARRAY [ ? ] OF LONGINT ): LONGINT;
-	TYPE Type = LONGINT;
+	PROCEDURE MaxAL*( CONST left: ARRAY [ ? ] OF SIGNED32 ): SIGNED32;
+	TYPE Type = SIGNED32;
 	VAR val: Type;
 	BEGIN
 		val := MIN( Type );
@@ -6402,7 +6402,7 @@ Sufficient (but not necessary) conditions:
 	END MaxAL;
 
 (** REAL *)
-	PROCEDURE MaxARLoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE MaxARLoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: REAL;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6423,7 +6423,7 @@ Sufficient (but not necessary) conditions:
 	END MaxAR;
 
 (** LONGREAL *)
-	PROCEDURE MaxAXLoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE MaxAXLoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6446,7 +6446,7 @@ Sufficient (but not necessary) conditions:
 	(*** SUM: array -> scalar  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE SumASLoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE SumASLoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6465,7 +6465,7 @@ Sufficient (but not necessary) conditions:
 	END SumAS;
 
 (** SIGNED16 *)
-	PROCEDURE SumAILoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE SumAILoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6483,9 +6483,9 @@ Sufficient (but not necessary) conditions:
 		RETURN val;
 	END SumAI;
 
-(** LONGINT *)
-	PROCEDURE SumALLoop( ladr, dadr, linc, len: LONGINT );
-	VAR lval, dval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE SumALLoop( ladr, dadr, linc, len: SIGNED32 );
+	VAR lval, dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -6494,8 +6494,8 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END SumALLoop;
 
-	PROCEDURE SumAL*( CONST left: ARRAY [ ? ] OF LONGINT ): LONGINT;
-	TYPE Type = LONGINT;
+	PROCEDURE SumAL*( CONST left: ARRAY [ ? ] OF SIGNED32 ): SIGNED32;
+	TYPE Type = SIGNED32;
 	VAR val: Type;
 	BEGIN
 		val := 0;  ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), SumALLoop );
@@ -6503,7 +6503,7 @@ Sufficient (but not necessary) conditions:
 	END SumAL;
 
 (** REAL *)
-	PROCEDURE SumARLoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE SumARLoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: REAL;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6522,7 +6522,7 @@ Sufficient (but not necessary) conditions:
 	END SumAR;
 
 (** LONGREAL *)
-	PROCEDURE SumAXLoop( ladr, dadr, linc, len: LONGINT );
+	PROCEDURE SumAXLoop( ladr, dadr, linc, len: SIGNED32 );
 	VAR lval, dval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
@@ -6543,7 +6543,7 @@ Sufficient (but not necessary) conditions:
 	(*** monadic ABS array -> array  ********************************************************************)
 
 (** SIGNED8 *)
-	PROCEDURE AbsLoopS( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AbsLoopS( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
@@ -6559,7 +6559,7 @@ Sufficient (but not necessary) conditions:
 	END AbsAS;
 
 (** SIGNED16 *)
-	PROCEDURE AbsLoopI( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AbsLoopI( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: SIGNED16;
 	BEGIN
 		WHILE (len > 0) DO
@@ -6574,9 +6574,9 @@ Sufficient (but not necessary) conditions:
 		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( SIGNED16 ), AbsLoopI );
 	END AbsAI;
 
-(** LONGINT *)
-	PROCEDURE AbsLoopL( ladr, dadr, linc, dinc, len: LONGINT );
-	VAR lval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE AbsLoopL( ladr, dadr, linc, dinc, len: SIGNED32 );
+	VAR lval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, ABS( lval ) );  INC( ladr, linc );
@@ -6584,14 +6584,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AbsLoopL;
 
-	PROCEDURE AbsAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-									CONST src: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE AbsAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+									CONST src: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( LONGINT ), AbsLoopL );
+		ApplyUnaryAAOp( ADDRESSOF( dest ), ADDRESSOF( src ), SIZEOF( SIGNED32 ), AbsLoopL );
 	END AbsAL;
 
 (** REAL *)
-	PROCEDURE AbsLoopR( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AbsLoopR( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -6607,7 +6607,7 @@ Sufficient (but not necessary) conditions:
 	END AbsAR;
 
 (** LONGREAL *)
-	PROCEDURE AbsLoopX( ladr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AbsLoopX( ladr, dadr, linc, dinc, len: SIGNED32 );
 	VAR lval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
@@ -6625,7 +6625,7 @@ Sufficient (but not necessary) conditions:
 	(*** assign number to array  (initialisation) ********************************************************************)
 
 (** BOOLEAN *)
-	PROCEDURE AssignABSBLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AssignABSBLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR rval: BOOLEAN;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6641,7 +6641,7 @@ Sufficient (but not necessary) conditions:
 	END AssignABSB;
 
 (** SIGNED8*)
-	PROCEDURE AssignASSSLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AssignASSSLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6657,7 +6657,7 @@ Sufficient (but not necessary) conditions:
 	END AssignASSS;
 
 (**SIGNED16 *)
-	PROCEDURE AssignAISILoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AssignAISILoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR rval: SIGNED16;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6672,24 +6672,24 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), AssignAISILoop );
 	END AssignAISI;
 
-(** LONGINT *)
-	PROCEDURE AssignALSLLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
-	VAR rval: LONGINT;
+(** SIGNED32 *)
+	PROCEDURE AssignALSLLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
+	VAR rval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO SYSTEM.PUT( dadr, rval );  INC( dadr, dinc );  DEC( len );  END;
 	END AssignALSLLoop;
 
-	PROCEDURE AssignALSL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-												CONST left: ARRAY [ ? ] OF LONGINT;
-												right: LONGINT );
+	PROCEDURE AssignALSL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+												CONST left: ARRAY [ ? ] OF SIGNED32;
+												right: SIGNED32 );
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), AssignALSLLoop );
+										SIZEOF( SIGNED32 ), AssignALSLLoop );
 	END AssignALSL;
 
 (** REAL *)
-	PROCEDURE AssignARSRLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AssignARSRLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR rval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6704,7 +6704,7 @@ Sufficient (but not necessary) conditions:
 	END AssignARSR;
 
 (** LONGREAL *)
-	PROCEDURE AssignAXSXLoop( ladr, radr, dadr, linc, dinc, len: LONGINT );
+	PROCEDURE AssignAXSXLoop( ladr, radr, dadr, linc, dinc, len: SIGNED32 );
 	VAR rval: LONGREAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
@@ -6722,7 +6722,7 @@ Sufficient (but not necessary) conditions:
 (*** matrix multipliation ********************************************************************)
 
 	PROCEDURE AllocateMatrix( dest: Address;
-													rows, cols, elementsize: LONGINT ): ANY;
+													rows, cols, elementsize: SIGNED32 ): ANY;
 	VAR p: ANY;
 	BEGIN
 		(*
@@ -6730,23 +6730,23 @@ Sufficient (but not necessary) conditions:
 		*)
 		SYSTEM.NEW( p, rows * cols * elementsize );  PutLen( dest, 1, cols );
 		PutLen( dest, 0, rows );  PutInc( dest, 1, elementsize );
-		PutInc( dest, 0, elementsize * cols );  PutAdr( dest, SYSTEM.VAL( LONGINT, p ) );
-		PutPtr( dest, SYSTEM.VAL( LONGINT, p ) );  RETURN p;
+		PutInc( dest, 0, elementsize * cols );  PutAdr( dest, SYSTEM.VAL( SIGNED32, p ) );
+		PutPtr( dest, SYSTEM.VAL( SIGNED32, p ) );  RETURN p;
 	END AllocateMatrix;
 
-	PROCEDURE AllocateVector( dest: Address;  l0, elementsize: LONGINT ): ANY;
+	PROCEDURE AllocateVector( dest: Address;  l0, elementsize: SIGNED32 ): ANY;
 	VAR p: ANY;
 	BEGIN
 		SYSTEM.NEW( p, l0 * elementsize );  PutLen( dest, 0, l0 );
-		PutInc( dest, 0, elementsize );  PutAdr( dest, SYSTEM.VAL( LONGINT, p ) );
-		PutPtr( dest, SYSTEM.VAL( LONGINT, p ) );  RETURN p;
+		PutInc( dest, 0, elementsize );  PutAdr( dest, SYSTEM.VAL( SIGNED32, p ) );
+		PutPtr( dest, SYSTEM.VAL( SIGNED32, p ) );  RETURN p;
 	END AllocateVector;
 
-	PROCEDURE ApplyMatMulLoop( dest, left, right: Address;  Size: LONGINT;
+	PROCEDURE ApplyMatMulLoop( dest, left, right: Address;  Size: SIGNED32;
 														loop: BinaryAASLoop;
 	fast: FastMatMul );   (* Size= element-size *)
-	VAR ladr, radr, dadr, dadri, radri, rowsL, colsL, rowsR, colsR, incL, incR, incD, strideR, strideL, strideD, colsRi: LONGINT;
-		p: ANY;  overlap: BOOLEAN;  destOld, destNew: LONGINT;
+	VAR ladr, radr, dadr, dadri, radri, rowsL, colsL, rowsR, colsR, incL, incR, incD, strideR, strideL, strideD, colsRi: SIGNED32;
+		p: ANY;  overlap: BOOLEAN;  destOld, destNew: SIGNED32;
 	BEGIN
 	(*
 				<- 1 ->
@@ -6823,10 +6823,10 @@ Sufficient (but not necessary) conditions:
 	END ApplyMatMulLoop;
 
 	PROCEDURE ApplyMatVecMulLoop( dest, left, right: Address;
-															Size: LONGINT;  loop: BinaryAASLoop;
+															Size: SIGNED32;  loop: BinaryAASLoop;
 															fast: FastMatMul );   (* Size= element-size *)
-	VAR ladr, radr, dadr, li1, li0, ri0, di0, l1, l2: LONGINT;  p: ANY;
-		overlap: BOOLEAN;  destOld, destNew: LONGINT;
+	VAR ladr, radr, dadr, li1, li0, ri0, di0, l1, l2: SIGNED32;  p: ANY;
+		overlap: BOOLEAN;  destOld, destNew: SIGNED32;
 
 	BEGIN
 	(*
@@ -6888,10 +6888,10 @@ Sufficient (but not necessary) conditions:
 	END ApplyMatVecMulLoop;
 
 	PROCEDURE ApplyVecMatMulLoop( dest, left, right: Address;
-															Size: LONGINT;  loop: BinaryAASLoop;
+															Size: SIGNED32;  loop: BinaryAASLoop;
 															fast: FastMatMul );   (* Size= element-size *)
-	VAR ladr, radr, dadr, li0, ri1, ri0, di0, l0, l2: LONGINT;  p: ANY;
-		overlap: BOOLEAN;  destOld, destNew: LONGINT;
+	VAR ladr, radr, dadr, li0, ri1, ri0, di0, l0, l2: SIGNED32;  p: ANY;
+		overlap: BOOLEAN;  destOld, destNew: SIGNED32;
 
 	BEGIN
 	(*
@@ -7018,9 +7018,9 @@ Sufficient (but not necessary) conditions:
 											SIZEOF( SIGNED16 ), MatMulAIAILoop, NIL );
 	END VecMatMulAIAI;
 
-(** LONGINT *)
+(** SIGNED32 *)
 	PROCEDURE MatMulALALLoop( ladr, radr, dadr, linc, rinc, len: Address );
-	VAR lval, rval, dval: LONGINT;
+	VAR lval, rval, dval: SIGNED32;
 	BEGIN
 		dval := 0;
 		WHILE (len > 0) DO
@@ -7030,35 +7030,35 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END MatMulALALLoop;
 
-	PROCEDURE MatMulALAL*( VAR dest: ARRAY [ * , * ] OF LONGINT;
-												CONST left, right: ARRAY [ * , * ] OF LONGINT );
+	PROCEDURE MatMulALAL*( VAR dest: ARRAY [ * , * ] OF SIGNED32;
+												CONST left, right: ARRAY [ * , * ] OF SIGNED32 );
 	BEGIN
 		(*
 		KernelLog.String("MatMulALAL");
-		KernelLog.Int(SYSTEM.VAL(LONGINT,dest),10);
-		KernelLog.Int(SYSTEM.VAL(LONGINT,left),10);
-		KernelLog.Int(SYSTEM.VAL(LONGINT,right),10);
+		KernelLog.Int(SYSTEM.VAL(SIGNED32,dest),10);
+		KernelLog.Int(SYSTEM.VAL(SIGNED32,left),10);
+		KernelLog.Int(SYSTEM.VAL(SIGNED32,right),10);
 		KernelLog.Ln;
 		*)
 
 		ApplyMatMulLoop( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-									SIZEOF( LONGINT ), MatMulALALLoop, NIL );
+									SIZEOF( SIGNED32 ), MatMulALALLoop, NIL );
 	END MatMulALAL;
 
-	PROCEDURE MatVecMulALAL*( VAR dest: ARRAY [ * ] OF LONGINT;
-														CONST left: ARRAY [ * , * ] OF LONGINT;
-														CONST right: ARRAY [ * ] OF LONGINT );
+	PROCEDURE MatVecMulALAL*( VAR dest: ARRAY [ * ] OF SIGNED32;
+														CONST left: ARRAY [ * , * ] OF SIGNED32;
+														CONST right: ARRAY [ * ] OF SIGNED32 );
 	BEGIN
 		ApplyMatVecMulLoop( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-											SIZEOF( LONGINT ), MatMulALALLoop, NIL );
+											SIZEOF( SIGNED32 ), MatMulALALLoop, NIL );
 	END MatVecMulALAL;
 
-	PROCEDURE VecMatMulALAL*( VAR dest: ARRAY [ * ] OF LONGINT;
-														CONST left: ARRAY [ * ] OF LONGINT;
-														CONST right: ARRAY [ * , * ] OF LONGINT );
+	PROCEDURE VecMatMulALAL*( VAR dest: ARRAY [ * ] OF SIGNED32;
+														CONST left: ARRAY [ * ] OF SIGNED32;
+														CONST right: ARRAY [ * , * ] OF SIGNED32 );
 	BEGIN
 		ApplyVecMatMulLoop( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-											SIZEOF( LONGINT ), MatMulALALLoop, NIL );
+											SIZEOF( SIGNED32 ), MatMulALALLoop, NIL );
 	END VecMatMulALAL;
 
 (** REAL *)
@@ -7080,7 +7080,7 @@ Sufficient (but not necessary) conditions:
 	*)
 	PROCEDURE MatMulARAR*( VAR dest: ARRAY [ * , * ] OF REAL;
 										CONST left, right: ARRAY [ * , * ] OF REAL );
-	VAR flags: SET; dadr, ladr, radr: LONGINT;
+	VAR flags: SET; dadr, ladr, radr: SIGNED32;
 	BEGIN
 
 		dadr := SYSTEM.GET32(ADDRESSOF(dest)+adroffs);
@@ -7092,7 +7092,7 @@ Sufficient (but not necessary) conditions:
 
 			flags := SYSTEM.VAL(SET,SYSTEM.GET32(ADDRESSOF(left)+flagoffs)) * SYSTEM.VAL(SET,SYSTEM.GET32(ADDRESSOF(right)+flagoffs));
 
-			CASE SYSTEM.VAL(LONGINT,flags) OF
+			CASE SYSTEM.VAL(SIGNED32,flags) OF
 
 				Mat2x2:
 					IF SYSTEM.GET32(ADDRESSOF(dest)+flagoffs) # Mat2x2 THEN
@@ -7179,7 +7179,7 @@ Sufficient (but not necessary) conditions:
 												CONST left: ARRAY [ * , * ] OF REAL;
 												CONST right: ARRAY [ * ] OF REAL );
 	VAR
-		flags: SET; dadr, ladr, radr: LONGINT;
+		flags: SET; dadr, ladr, radr: SIGNED32;
 		v0, v1, v2: REAL;
 	BEGIN
 
@@ -7189,7 +7189,7 @@ Sufficient (but not necessary) conditions:
 
 		flags := SYSTEM.VAL(SET,SYSTEM.GET32(ADDRESSOF(left)+flagoffs)) * SYSTEM.VAL(SET,SYSTEM.GET32(ADDRESSOF(right)+flagoffs));
 
-		CASE SYSTEM.VAL(LONGINT,flags) OF
+		CASE SYSTEM.VAL(SIGNED32,flags) OF
 
 			MatVec2x2:
 				IF SYSTEM.GET32(ADDRESSOF(dest)+flagoffs) # Vec2 THEN
@@ -7274,7 +7274,7 @@ Sufficient (but not necessary) conditions:
 	PROCEDURE MatMulAXAX*( VAR dest: ARRAY [ * , * ] OF LONGREAL;
 										CONST left, right: ARRAY [ * , * ] OF LONGREAL );
 	VAR
-		flags: SET; dadr, ladr, radr: LONGINT;
+		flags: SET; dadr, ladr, radr: SIGNED32;
 	BEGIN
 
 		dadr := SYSTEM.GET32(ADDRESSOF(dest)+adroffs);
@@ -7285,7 +7285,7 @@ Sufficient (but not necessary) conditions:
 
 			flags := SYSTEM.VAL(SET,SYSTEM.GET32(ADDRESSOF(left)+flagoffs)) * SYSTEM.VAL(SET,SYSTEM.GET32(ADDRESSOF(right)+flagoffs));
 
-			CASE SYSTEM.VAL(LONGINT,flags) OF
+			CASE SYSTEM.VAL(SIGNED32,flags) OF
 				Mat2x2:
 					IF SYSTEM.GET32(ADDRESSOF(dest)+flagoffs) # Mat2x2 THEN
 						IF dadr = 0 THEN NEW(dest,2,2);
@@ -7371,7 +7371,7 @@ Sufficient (but not necessary) conditions:
 												CONST left: ARRAY [ * , * ] OF LONGREAL;
 												CONST right: ARRAY [ * ] OF LONGREAL );
 	VAR
-		flags: SET; dadr, ladr, radr: LONGINT;
+		flags: SET; dadr, ladr, radr: SIGNED32;
 		v0, v1, v2: LONGREAL;
 	BEGIN
 
@@ -7381,7 +7381,7 @@ Sufficient (but not necessary) conditions:
 
 		flags := SYSTEM.VAL(SET,SYSTEM.GET32(ADDRESSOF(left)+flagoffs)) * SYSTEM.VAL(SET,SYSTEM.GET32(ADDRESSOF(right)+flagoffs));
 
-		CASE SYSTEM.VAL(LONGINT,flags) OF
+		CASE SYSTEM.VAL(SIGNED32,flags) OF
 
 			MatVec2x2:
 				IF SYSTEM.GET32(ADDRESSOF(dest)+flagoffs) # Vec2 THEN
@@ -7574,9 +7574,9 @@ Sufficient (but not necessary) conditions:
 		MinusAI(dest,dest);
 	END VecMatMulDecAIAI;
 
-(** LONGINT *)
+(** SIGNED32 *)
 	PROCEDURE MatMulIncALALLoop( ladr, radr, dadr, linc, rinc, len: Address );
-	VAR lval, rval, dval: LONGINT;
+	VAR lval, rval, dval: SIGNED32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7586,55 +7586,55 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END MatMulIncALALLoop;
 
-	PROCEDURE MatMulIncALAL*( VAR dest: ARRAY [ * , * ] OF LONGINT;
-													CONST left, right: ARRAY [ * , * ] OF LONGINT );
+	PROCEDURE MatMulIncALAL*( VAR dest: ARRAY [ * , * ] OF SIGNED32;
+													CONST left, right: ARRAY [ * , * ] OF SIGNED32 );
 	BEGIN
 		ApplyMatMulLoop( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-									SIZEOF( LONGINT ), MatMulIncALALLoop, NIL );
+									SIZEOF( SIGNED32 ), MatMulIncALALLoop, NIL );
 	END MatMulIncALAL;
 
-	PROCEDURE MatVecMulIncALAL*( VAR dest: ARRAY [ * ] OF LONGINT;
-															CONST left: ARRAY [ * , * ] OF LONGINT;
-															CONST right: ARRAY [ * ] OF LONGINT );
+	PROCEDURE MatVecMulIncALAL*( VAR dest: ARRAY [ * ] OF SIGNED32;
+															CONST left: ARRAY [ * , * ] OF SIGNED32;
+															CONST right: ARRAY [ * ] OF SIGNED32 );
 	BEGIN
 		ApplyMatVecMulLoop( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-											SIZEOF( LONGINT ), MatMulIncALALLoop, NIL );
+											SIZEOF( SIGNED32 ), MatMulIncALALLoop, NIL );
 	END MatVecMulIncALAL;
 
-	PROCEDURE VecMatMulIncALAL*( VAR dest: ARRAY [ * ] OF LONGINT;
-															CONST left: ARRAY [ * ] OF LONGINT;
-															CONST right: ARRAY [ * , * ] OF LONGINT );
+	PROCEDURE VecMatMulIncALAL*( VAR dest: ARRAY [ * ] OF SIGNED32;
+															CONST left: ARRAY [ * ] OF SIGNED32;
+															CONST right: ARRAY [ * , * ] OF SIGNED32 );
 	BEGIN
 		ApplyVecMatMulLoop( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-											SIZEOF( LONGINT ), MatMulIncALALLoop, NIL );
+											SIZEOF( SIGNED32 ), MatMulIncALALLoop, NIL );
 	END VecMatMulIncALAL;
 
-	PROCEDURE MatMulDecALAL*( VAR dest: ARRAY [ * , * ] OF LONGINT;
-													CONST left, right: ARRAY [ * , * ] OF LONGINT );
+	PROCEDURE MatMulDecALAL*( VAR dest: ARRAY [ * , * ] OF SIGNED32;
+													CONST left, right: ARRAY [ * , * ] OF SIGNED32 );
 	BEGIN
 		MinusAL(dest,dest);
 		ApplyMatMulLoop( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-									SIZEOF( LONGINT ), MatMulIncALALLoop, NIL );
+									SIZEOF( SIGNED32 ), MatMulIncALALLoop, NIL );
 		MinusAL(dest,dest);
 	END MatMulDecALAL;
 
-	PROCEDURE MatVecMulDecALAL*( VAR dest: ARRAY [ * ] OF LONGINT;
-															CONST left: ARRAY [ * , * ] OF LONGINT;
-															CONST right: ARRAY [ * ] OF LONGINT );
+	PROCEDURE MatVecMulDecALAL*( VAR dest: ARRAY [ * ] OF SIGNED32;
+															CONST left: ARRAY [ * , * ] OF SIGNED32;
+															CONST right: ARRAY [ * ] OF SIGNED32 );
 	BEGIN
 		MinusAL(dest,dest);
 		ApplyMatVecMulLoop( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-											SIZEOF( LONGINT ), MatMulIncALALLoop, NIL );
+											SIZEOF( SIGNED32 ), MatMulIncALALLoop, NIL );
 		MinusAL(dest,dest);
 	END MatVecMulDecALAL;
 
-	PROCEDURE VecMatMulDecALAL*( VAR dest: ARRAY [ * ] OF LONGINT;
-															CONST left: ARRAY [ * ] OF LONGINT;
-															CONST right: ARRAY [ * , * ] OF LONGINT );
+	PROCEDURE VecMatMulDecALAL*( VAR dest: ARRAY [ * ] OF SIGNED32;
+															CONST left: ARRAY [ * ] OF SIGNED32;
+															CONST right: ARRAY [ * , * ] OF SIGNED32 );
 	BEGIN
 		MinusAL(dest,dest);
 		ApplyVecMatMulLoop( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-											SIZEOF( LONGINT ), MatMulIncALALLoop, NIL );
+											SIZEOF( SIGNED32 ), MatMulIncALALLoop, NIL );
 		MinusAL(dest,dest);
 	END VecMatMulDecALAL;
 
@@ -7794,9 +7794,9 @@ Sufficient (but not necessary) conditions:
 		dest[1] := vl3 * vr1 - vl1 * vr3;  dest[2] := vl1 * vr2 - vl2 * vr1;
 	END CrossProductAIAI;
 
-	PROCEDURE CrossProductALAL*( VAR dest: ARRAY [ * ] OF LONGINT;
-														CONST left, right: ARRAY [ * ] OF LONGINT );
-	VAR vl1, vl2, vl3, vr1, vr2, vr3: LONGINT;
+	PROCEDURE CrossProductALAL*( VAR dest: ARRAY [ * ] OF SIGNED32;
+														CONST left, right: ARRAY [ * ] OF SIGNED32 );
+	VAR vl1, vl2, vl3, vr1, vr2, vr3: SIGNED32;
 	BEGIN
 		IF (LEN( left,0 ) # 3) OR (LEN( right,0 ) # 3) THEN
 			Halt( GeometryMismatch, ADDRESSOF( left ), ADDRESSOF( right ),  0 )
@@ -7836,7 +7836,7 @@ Sufficient (but not necessary) conditions:
 (** Transpose  ********************************************************************)
 
 	PROCEDURE Overlap( src1, src2: Address ): BOOLEAN;
-	VAR from1, from2, to1, to2: Address;  dim: LONGINT;
+	VAR from1, from2, to1, to2: Address;  dim: SIGNED32;
 	BEGIN
 		from1 := GetAdr( src1 );  from2 := GetAdr( src2 );  to1 := from1;  to2 := from2;
 		dim := GetDim( src1 ) - 1;
@@ -7870,10 +7870,10 @@ Sufficient (but not necessary) conditions:
 	END Overlap;
 	*)
 
-	PROCEDURE Transpose*( dest, left: Address;  Size: LONGINT );
-	VAR len0, len1, linc0, linc1, dinc0, dinc1, ladr, dadr: LONGINT;  p: ANY;
+	PROCEDURE Transpose*( dest, left: Address;  Size: SIGNED32 );
+	VAR len0, len1, linc0, linc1, dinc0, dinc1, ladr, dadr: SIGNED32;  p: ANY;
 
-		PROCEDURE CopyLoop( src, dest, srcinc, destinc, len: LONGINT );
+		PROCEDURE CopyLoop( src, dest, srcinc, destinc, len: SIGNED32 );
 		BEGIN
 			WHILE (len > 0) DO
 				SYSTEM.MOVE( src, dest, Size );  INC( src, srcinc );  INC( dest, destinc );
@@ -7893,14 +7893,14 @@ Sufficient (but not necessary) conditions:
 			END;
 			IF Overlap( left, dest ) THEN  (* copy data first, then transpose *)
 				SYSTEM.NEW( p, len0 * len1 * Size );  dinc0 := Size;  dinc1 := len0 * Size;
-				dadr := SYSTEM.VAL( LONGINT, p );  linc0 := GetInc( left, 0 );
+				dadr := SYSTEM.VAL( SIGNED32, p );  linc0 := GetInc( left, 0 );
 				linc1 := GetInc( left, 1 );  ladr := GetAdr( left );
 				WHILE (len0 > 0) DO
 					CopyLoop( ladr, dadr, linc1, dinc1, len1 );  INC( ladr, linc0 );
 					INC( dadr, dinc0 );  DEC( len0 );
 				END;
 				len0 := GetLen( left, 0 );  linc0 := Size;  linc1 := len0 * Size;
-				ladr := SYSTEM.VAL( LONGINT, p );
+				ladr := SYSTEM.VAL( SIGNED32, p );
 			ELSE
 				linc0 := GetInc( left, 0 );  linc1 := GetInc( left, 1 );  ladr := GetAdr( left );
 			END;
@@ -7931,10 +7931,10 @@ Sufficient (but not necessary) conditions:
 		Transpose( ADDRESSOF( dest ), ADDRESSOF( left ), SIZEOF( SIGNED16 ) );
 	END TransposeAI;
 
-	PROCEDURE TransposeAL*( VAR dest: ARRAY [ * , * ] OF LONGINT;
-												CONST left: ARRAY [ * , * ] OF LONGINT );
+	PROCEDURE TransposeAL*( VAR dest: ARRAY [ * , * ] OF SIGNED32;
+												CONST left: ARRAY [ * , * ] OF SIGNED32 );
 	BEGIN
-		Transpose( ADDRESSOF( dest ), ADDRESSOF( left ), SIZEOF( LONGINT ) );
+		Transpose( ADDRESSOF( dest ), ADDRESSOF( left ), SIZEOF( SIGNED32 ) );
 	END TransposeAL;
 
 	PROCEDURE TransposeAR*( VAR dest: ARRAY [ * , * ] OF REAL;
@@ -7950,8 +7950,8 @@ Sufficient (but not necessary) conditions:
 	END TransposeAX;
 
 	PROCEDURE CheckTensorGeometry( left, right, dest: Address;
-															ldim, rdim: LONGINT ): BOOLEAN;
-	VAR i: LONGINT;
+															ldim, rdim: SIGNED32 ): BOOLEAN;
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO rdim - 1 DO
 			IF GetLen( right, i ) # GetLen( dest, i ) THEN RETURN FALSE END;
@@ -7963,24 +7963,24 @@ Sufficient (but not necessary) conditions:
 	END CheckTensorGeometry;
 
 (*
-	PROCEDURE Zero(p: ANY; size: LONGINT);
-	VAR adr: LONGINT;
+	PROCEDURE Zero(p: ANY; size: SIGNED32);
+	VAR adr: SIGNED32;
 	BEGIN
-		adr := SYSTEM.VAL(LONGINT,p);
+		adr := SYSTEM.VAL(SIGNED32,p);
 		WHILE(size>0) DO
 			SYSTEM.PUT8(adr,0); DEC(size);INC(adr);
 		END;
 	END Zero;
 *)
-	PROCEDURE Reshape*( VAR dest: LONGINT;  src: LONGINT;
-											CONST shape: ARRAY [ * ] OF LONGINT );
-	VAR i, Size: LONGINT;  ptr, data: ANY;  new: LONGINT;
+	PROCEDURE Reshape*( VAR dest: SIGNED32;  src: SIGNED32;
+											CONST shape: ARRAY [ * ] OF SIGNED32 );
+	VAR i, Size: SIGNED32;  ptr, data: ANY;  new: SIGNED32;
 
-		oldSize, newSize: LONGINT;  oldDim, newDim: LONGINT;
+		oldSize, newSize: SIGNED32;  oldDim, newDim: SIGNED32;
 
 		PROCEDURE NewDescriptor;
 		BEGIN
-			ptr := GetArrayDesc( newDim );  new := SYSTEM.VAL( LONGINT, ptr );
+			ptr := GetArrayDesc( newDim );  new := SYSTEM.VAL( SIGNED32, ptr );
 		END NewDescriptor;
 
 		(*	Added by Alexey
@@ -7988,7 +7988,7 @@ Sufficient (but not necessary) conditions:
 		*)
 		PROCEDURE SqueezingReshape(): BOOLEAN;
 		VAR
-			i, j, n: LONGINT;
+			i, j, n: SIGNED32;
 		BEGIN
 			IF oldDim > newDim THEN
 				i := 0; j := 0;
@@ -8007,9 +8007,9 @@ Sufficient (but not necessary) conditions:
 
 		(* Added by Alexey *)
 		PROCEDURE NewDescriptorForSameData;
-		VAR len, size, i, j: LONGINT;
+		VAR len, size, i, j: SIGNED32;
 		BEGIN
-			ptr := GetArrayDesc( newDim );  new := SYSTEM.VAL( LONGINT, ptr );
+			ptr := GetArrayDesc( newDim );  new := SYSTEM.VAL( SIGNED32, ptr );
 
 			IF ~(RangeFlag IN GetFlags(src)) THEN
 				size := Size;
@@ -8034,7 +8034,7 @@ Sufficient (but not necessary) conditions:
 		END NewDescriptorForSameData;
 
 		PROCEDURE NewData;
-		VAR len, size, i: LONGINT;
+		VAR len, size, i: SIGNED32;
 		BEGIN
 			size := Size;
 			FOR i := newDim - 1 TO 0 BY -1 DO
@@ -8042,16 +8042,16 @@ Sufficient (but not necessary) conditions:
 				size := size * len;
 			END;
 			SYSTEM.NEW( data, size );   (* Zero(data,size*Size); *)
-			PutAdr( new, SYSTEM.VAL( LONGINT, data ) );
-			PutPtr( new, SYSTEM.VAL( LONGINT, data ) );  PutDim( new, newDim );
+			PutAdr( new, SYSTEM.VAL( SIGNED32, data ) );
+			PutPtr( new, SYSTEM.VAL( SIGNED32, data ) );  PutDim( new, newDim );
 			PutSize( new, Size );
 		END NewData;
 
 		PROCEDURE CopyData;
-		VAR d, s, dadr: LONGINT;
+		VAR d, s, dadr: SIGNED32;
 
-			PROCEDURE Loop( dim: LONGINT;  sadr: LONGINT );
-			VAR inc, len, i: LONGINT;
+			PROCEDURE Loop( dim: SIGNED32;  sadr: SIGNED32 );
+			VAR inc, len, i: SIGNED32;
 			BEGIN
 				IF dim = d THEN
 					inc := GetInc( src, dim );  len := GetLen( src, dim );
@@ -8076,10 +8076,10 @@ Sufficient (but not necessary) conditions:
 		END CopyData;
 
 		PROCEDURE CopyDataBack;
-		VAR d, s: LONGINT;  sadr: LONGINT;
+		VAR d, s: SIGNED32;  sadr: SIGNED32;
 
-			PROCEDURE Loop( dim: LONGINT;  dadr: LONGINT );
-			VAR inc, len, i: LONGINT;
+			PROCEDURE Loop( dim: SIGNED32;  dadr: SIGNED32 );
+			VAR inc, len, i: SIGNED32;
 			BEGIN
 				IF dim = d THEN
 					inc := GetInc( dest, dim );  len := GetLen( dest, dim );
@@ -8103,14 +8103,14 @@ Sufficient (but not necessary) conditions:
 			END;
 		END CopyDataBack;
 
-		PROCEDURE CopyDescriptor( src, dest: LONGINT );
+		PROCEDURE CopyDescriptor( src, dest: SIGNED32 );
 		BEGIN
 			ASSERT( GetDim( src ) = GetDim( dest ) );
 			SYSTEM.MOVE( src, dest, lenoffs + GetDim( src ) * 8 );
 		END CopyDescriptor;
 
 		PROCEDURE ShapeDiffers( ): BOOLEAN;
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			ASSERT( oldDim = newDim );
 			FOR i := 0 TO oldDim - 1 DO
@@ -8150,7 +8150,7 @@ Sufficient (but not necessary) conditions:
 				dest := new;
 			ELSIF ((newDim = oldDim) & ~ShapeDiffers()) THEN
 				(* create a copy of the original descriptor *)
-				ptr := GetArrayDesc(newDim);  dest := SYSTEM.VAL(LONGINT,ptr); CopyDescriptor(src,dest);
+				ptr := GetArrayDesc(newDim);  dest := SYSTEM.VAL(SIGNED32,ptr); CopyDescriptor(src,dest);
 			ELSE
 				Err( "RESHAPE: given RANGE array can not be reshaped!" );
 			END;
@@ -8171,13 +8171,13 @@ Sufficient (but not necessary) conditions:
 		END;
 	END Reshape;
 
-	PROCEDURE AllocateTensorX*( VAR dest: LONGINT;
-														CONST a: ARRAY [ * ] OF LONGINT;
-														Size: LONGINT );
-	VAR descr, data: ANY;  same: BOOLEAN;  i: LONGINT;  dim: LONGINT;
+	PROCEDURE AllocateTensorX*( VAR dest: SIGNED32;
+														CONST a: ARRAY [ * ] OF SIGNED32;
+														Size: SIGNED32 );
+	VAR descr, data: ANY;  same: BOOLEAN;  i: SIGNED32;  dim: SIGNED32;
 
 		PROCEDURE NewData;
-		VAR len, size, i: LONGINT;
+		VAR len, size, i: SIGNED32;
 		BEGIN
 			size := Size;
 			FOR i := dim - 1 TO 0 BY -1 DO
@@ -8188,8 +8188,8 @@ Sufficient (but not necessary) conditions:
 				PutInc( dest, i, size );  PutLen( dest, i, len );  size := size * len;
 			END;
 			SYSTEM.NEW( data, size );   (* Zero(data,size*Size); *)
-			PutAdr( dest, SYSTEM.VAL( LONGINT, data ) );
-			PutPtr( dest, SYSTEM.VAL( LONGINT, data ) );  PutSize( dest, Size );
+			PutAdr( dest, SYSTEM.VAL( SIGNED32, data ) );
+			PutPtr( dest, SYSTEM.VAL( SIGNED32, data ) );  PutSize( dest, Size );
 		END NewData;
 
 		PROCEDURE ClearData;
@@ -8205,7 +8205,7 @@ Sufficient (but not necessary) conditions:
 			IF dest # 0 THEN
 				IF (~(TensorFlag IN GetFlags( dest ))) THEN Err( "Array's number of dimension must not be modified (no TENSOR !)" );  END;
 			END;
-			descr := GetArrayDesc( LEN( a,0 ) );  dest := SYSTEM.VAL( LONGINT, descr );
+			descr := GetArrayDesc( LEN( a,0 ) );  dest := SYSTEM.VAL( SIGNED32, descr );
 			NewData;
 		ELSE
 			i := 0;
@@ -8221,24 +8221,24 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AllocateTensorX;
 
-	PROCEDURE LenA*( VAR dest: ARRAY [ * ] OF LONGINT;  src: Address );
-	VAR dim, i: LONGINT;
+	PROCEDURE LenA*( VAR dest: ARRAY [ * ] OF SIGNED32;  src: Address );
+	VAR dim, i: SIGNED32;
 	BEGIN
 		dim := GetDim( src );
 		IF LEN( dest, 0 ) # dim THEN NEW( dest, dim );  END;
 		FOR i := 0 TO dim - 1 DO dest[i] := GetLen( src, i );  END;
 	END LenA;
 
-	PROCEDURE IncrA*( VAR dest: ARRAY [ * ] OF LONGINT;  src: Address );
-	VAR dim, i, len: LONGINT;
+	PROCEDURE IncrA*( VAR dest: ARRAY [ * ] OF SIGNED32;  src: Address );
+	VAR dim, i, len: SIGNED32;
 	BEGIN
 		dim := GetDim( src );  len := LEN( dest, 0 );
 		IF len # dim THEN NEW( dest, dim );  END;
 		FOR i := 0 TO dim - 1 DO dest[i] := GetInc( src, i );  END;
 	END IncrA;
 
-		PROCEDURE Len*(src: Address; d: LONGINT): LONGINT;
-	VAR dim: LONGINT;
+		PROCEDURE Len*(src: Address; d: SIGNED32): SIGNED32;
+	VAR dim: SIGNED32;
 	BEGIN
 		dim := GetDim(src);
 		IF (d<0) OR (d>=dim) THEN HALT(100)
@@ -8247,8 +8247,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END Len;
 
-	PROCEDURE Incr*(src: Address; d: LONGINT): LONGINT;
-	VAR dim: LONGINT;
+	PROCEDURE Incr*(src: Address; d: SIGNED32): SIGNED32;
+	VAR dim: SIGNED32;
 	BEGIN
 		dim := GetDim(src);
 		IF (d<0) OR (d>=dim) THEN HALT(100)
@@ -8257,12 +8257,12 @@ Sufficient (but not necessary) conditions:
 		END;
 	END Incr;
 
-	PROCEDURE AllocateTensor( VAR dest: LONGINT;  left, right: Address;
-												Size: LONGINT ): ANY;
-	VAR ldim, rdim: LONGINT;  ptr, data: ANY;
+	PROCEDURE AllocateTensor( VAR dest: SIGNED32;  left, right: Address;
+												Size: SIGNED32 ): ANY;
+	VAR ldim, rdim: SIGNED32;  ptr, data: ANY;
 
 		PROCEDURE NewData;
-		VAR len, size, i: LONGINT;
+		VAR len, size, i: SIGNED32;
 		BEGIN
 			size := 1;
 			FOR i := 0 TO ldim - 1 DO
@@ -8273,28 +8273,28 @@ Sufficient (but not necessary) conditions:
 			END;
 			SYSTEM.NEW( data, size * Size );   (* Zero(data,size*Size); *)
 			(*
-			KernelLog.String("adr data="); KernelLog.Int(SYSTEM.VAL(LONGINT,data),10); KernelLog.Ln;
+			KernelLog.String("adr data="); KernelLog.Int(SYSTEM.VAL(SIGNED32,data),10); KernelLog.Ln;
 			KernelLog.String("adr dest="); KernelLog.Int(dest,10); KernelLog.Ln;
 			*)
 			size := Size;
 			FOR i := ldim + rdim - 1 TO 0 BY -1 DO
 				PutInc( dest, i, size );  size := size * GetLen( dest, i );
 			END;
-			PutAdr( dest, SYSTEM.VAL( LONGINT, data ) );
-			PutPtr( dest, SYSTEM.VAL( LONGINT, data ) );
+			PutAdr( dest, SYSTEM.VAL( SIGNED32, data ) );
+			PutPtr( dest, SYSTEM.VAL( SIGNED32, data ) );
 		END NewData;
 
 	BEGIN
 		ldim := GetDim( left );  rdim := GetDim( right );
 		IF dest = 0 THEN  (* NIL pointer, guaranteed to be tensor *)
-			ptr := GetArrayDesc( ldim + rdim );  dest := SYSTEM.VAL( LONGINT, ptr );
+			ptr := GetArrayDesc( ldim + rdim );  dest := SYSTEM.VAL( SIGNED32, ptr );
 			NewData();  RETURN ptr;
 		ELSIF (ldim + rdim # GetDim( dest )) THEN
 			IF ~(TensorFlag IN GetFlags( dest )) &
 				~(TemporaryFlag IN GetFlags( dest )) THEN  (* no, not allowed*)
 				HALT( 100 );
 			END;
-			ptr := GetArrayDesc( ldim + rdim );  dest := SYSTEM.VAL( LONGINT, ptr );
+			ptr := GetArrayDesc( ldim + rdim );  dest := SYSTEM.VAL( SIGNED32, ptr );
 			NewData();  RETURN ptr;
 		ELSIF ~CheckTensorGeometry( left, right, dest, ldim, rdim ) THEN  (* dimension matches but not geometry *)
 			IF RangeFlag IN GetFlags( dest ) THEN  (* no! not allowed *)
@@ -8307,9 +8307,9 @@ Sufficient (but not necessary) conditions:
 
 (* find the largest block with a regular pattern of the form offset+{i*linc: 0<=i<len} for two arrays simultaneously. d is dimension applying to the resulting loop *)
 	PROCEDURE FindPatternTensor( left, right: Address;
-														VAR rdim, len, linc, ri: LONGINT );
+														VAR rdim, len, linc, ri: SIGNED32 );
 	(* geometric precondition: lengths must coincide *)
-	VAR ldim: LONGINT;
+	VAR ldim: SIGNED32;
 	BEGIN
 		ldim := GetDim( left ) - 1;  rdim := GetDim( right ) - 1;
 		len := GetLen( left, ldim );  ASSERT( len = GetLen( right, rdim ) );
@@ -8331,13 +8331,13 @@ Sufficient (but not necessary) conditions:
 		END;
 	END FindPatternTensor;
 
-	PROCEDURE ApplyTensorAAAOp( d, l, r: Address;  elementSize: LONGINT;
+	PROCEDURE ApplyTensorAAAOp( d, l, r: Address;  elementSize: SIGNED32;
 														Loop: BinaryASALoop );
-	VAR loopd, looplen, loopri, loopdi, lDim, rDim: LONGINT;  p: ANY;
-		origdest: LONGINT;  left, right, dest: Address;
+	VAR loopd, looplen, loopri, loopdi, lDim, rDim: SIGNED32;  p: ANY;
+		origdest: SIGNED32;  left, right, dest: Address;
 
-		PROCEDURE Traverse( ladr, radr, dadr: Address;  ldim, rdim: LONGINT );
-		VAR len: LONGINT;  linc, rinc, dinc: LONGINT;
+		PROCEDURE Traverse( ladr, radr, dadr: Address;  ldim, rdim: SIGNED32 );
+		VAR len: SIGNED32;  linc, rinc, dinc: SIGNED32;
 		BEGIN
 			IF (ldim < lDim) THEN
 				len := GetLen( left, ldim );  linc := GetInc( left, ldim );
@@ -8407,11 +8407,11 @@ Sufficient (but not necessary) conditions:
 										SIZEOF( SIGNED16 ), MulAISILoop );
 	END TensorProdAIAI;
 
-	PROCEDURE TensorProdALAL*( VAR dest: ARRAY [ ? ] OF LONGINT;
-														CONST left, right: ARRAY [ ? ] OF LONGINT );
+	PROCEDURE TensorProdALAL*( VAR dest: ARRAY [ ? ] OF SIGNED32;
+														CONST left, right: ARRAY [ ? ] OF SIGNED32 );
 	BEGIN
 		ApplyTensorAAAOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ),
-										SIZEOF( LONGINT ), MulALSLLoop );
+										SIZEOF( SIGNED32 ), MulALSLLoop );
 	END TensorProdALAL;
 
 	PROCEDURE TensorProdARAR*( VAR dest: ARRAY [ ? ] OF REAL;
@@ -8469,15 +8469,15 @@ END ArrayBase.
 (*
 	without loop idea:
 
-	PROCEDURE AddALAL*( left, right, dest, dim: LONGINT );   (* a: left, b: right, c: dest *)
-	TYPE Type = LONGINT;
+	PROCEDURE AddALAL*( left, right, dest, dim: SIGNED32 );   (* a: left, b: right, c: dest *)
+	TYPE Type = SIGNED32;
 	VAR lval, rval, dval: Type;
 	CONST Size = SIZEOF( Type );
 
-	VAR x, i: LONGINT;  p: ANY;  len: LONGINT;
+	VAR x, i: SIGNED32;  p: ANY;  len: SIGNED32;
 
-		PROCEDURE Traverse( dim, ladr, radr, dadr: LONGINT );
-		VAR len: LONGINT;  linc, rinc, dinc: LONGINT;
+		PROCEDURE Traverse( dim, ladr, radr, dadr: SIGNED32 );
+		VAR len: SIGNED32;  linc, rinc, dinc: SIGNED32;
 		BEGIN
 			DEC( dim );
 			IF dim < 0 THEN SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval + rval );  ELSE len := GetLen( left, dim );
@@ -8495,15 +8495,15 @@ END ArrayBase.
 	END AddALAL;
 *)
 
-(*PROCEDURE ConvertALAX*( left, dest, dim: LONGINT );
-	TYPE sType = LONGINT;  dType = LONGREAL;
+(*PROCEDURE ConvertALAX*( left, dest, dim: SIGNED32 );
+	TYPE sType = SIGNED32;  dType = LONGREAL;
 	VAR lval: sType;  dval: dType;
 	CONST sSize = SIZEOF( sType );  dSize = SIZEOF( dType );
 
-	VAR p: ANY;  len, inc, i: LONGINT;  dadr: LONGINT;
+	VAR p: ANY;  len, inc, i: SIGNED32;  dadr: SIGNED32;
 
-		PROCEDURE Traverse( dim, adr: LONGINT );
-		VAR len, inc: LONGINT;
+		PROCEDURE Traverse( dim, adr: SIGNED32 );
+		VAR len, inc: SIGNED32;
 		BEGIN
 			DEC( dim );
 			IF dim < 0 THEN SYSTEM.GET( adr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( dadr, dSize );
@@ -8518,17 +8518,17 @@ END ArrayBase.
 
 		len := 1;
 		FOR i := 0 TO dim - 1 DO len := len * GetLen( left, i );  END;
-		SYSTEM.NEW( p, len * dSize );  dadr := SYSTEM.VAL( LONGINT, p );
+		SYSTEM.NEW( p, len * dSize );  dadr := SYSTEM.VAL( SIGNED32, p );
 
 		Traverse( dim, GetAdr( left ) );
 
-		PutAdr( dest, SYSTEM.VAL( LONGINT, p ) );  inc := dSize;
+		PutAdr( dest, SYSTEM.VAL( SIGNED32, p ) );  inc := dSize;
 		FOR i := 0 TO dim - 1 DO len := GetLen( left, i );  PutInc( dest, i, inc );  PutLen( dest, i, len );  inc := inc * len;  END;
 		Report( "conv: dest", dest, dim );
 	END ConvertALAX;
 	*)
 	(*
-supported base types: SIGNED8, SIGNED16, LONGINT, REAL, LONGREAL -> 16 (10 commutative) Functions per operator
+supported base types: SIGNED8, SIGNED16, SIGNED32, REAL, LONGREAL -> 16 (10 commutative) Functions per operator
 type commutative AAA operators: +(10),.*(10),*(10), .= (elementwise equal)
 non type commuatative AAA operators: -(16),/(16), MOD(4),DIV(4)
 type commutative ASA operators: +(10),*(10)

@@ -58,7 +58,7 @@ MODULE GfxBuffer; (** portable *)	(* eos  *)
 		END
 	END Tile;
 
-	PROCEDURE Dot (rc: GfxRaster.Context; x, y: LONGINT);
+	PROCEDURE Dot (rc: GfxRaster.Context; x, y: SIGNED32);
 		VAR bc: Context; px, py: SIZE; mode: Images.Mode;
 	BEGIN
 		IF (rc.clipState = GfxRaster.In) OR
@@ -77,7 +77,7 @@ MODULE GfxBuffer; (** portable *)	(* eos  *)
 		END
 	END Dot;
 
-	PROCEDURE Rect (rc: GfxRaster.Context; llx, lly, urx, ury: LONGINT);
+	PROCEDURE Rect (rc: GfxRaster.Context; llx, lly, urx, ury: SIGNED32);
 		VAR bc: Context; data: RegData; mode: Images.Mode;
 	BEGIN
 		IF (rc.clipState # GfxRaster.Out) & (llx < urx) & (lly < ury) THEN

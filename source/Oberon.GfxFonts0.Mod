@@ -11,7 +11,7 @@ MODULE GfxFonts0 IN Oberon; (** non-portable *)	(* eos  *)
 	**)
 
 	(*
-		16.2.99 - made unknown font types have ppm=MIN(LONGINT) (to avoid .Md?)
+		16.2.99 - made unknown font types have ppm=MIN(SIGNED32) (to avoid .Md?)
 		20.4.99 - merged Native and Windows version (using Builder preprocessor)
 		22.02.2000 - made name matching more robust to be compatible with device specifiers in Native
 		30.03.2000 - fixed dimensionless fonts not being recognized (Elektra)
@@ -27,7 +27,7 @@ MODULE GfxFonts0 IN Oberon; (** non-portable *)	(* eos  *)
 
 
 
-	PROCEDURE EnumFile (name: ARRAY OF CHAR; time, date, size: LONGINT; VAR continue: BOOLEAN);
+	PROCEDURE EnumFile (name: ARRAY OF CHAR; time, date, size: SIGNED32; VAR continue: BOOLEAN);
 		CONST isdir = FALSE;
 		VAR i, ppm: SIGNED16; s: ARRAY 4 OF CHAR;
 

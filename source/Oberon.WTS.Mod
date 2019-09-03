@@ -24,7 +24,7 @@ VAR
 		Texts.Append(Oberon.Log, X.buf)
 	END Msg;
 
-	PROCEDURE WriteText(VAR R: Files.Rider; lib: Objects.Library; col, voff: SIGNED8; len: LONGINT);
+	PROCEDURE WriteText(VAR R: Files.Rider; lib: Objects.Library; col, voff: SIGNED8; len: SIGNED32);
 	VAR ch: CHAR;
 	BEGIN Texts.SetFont(W, lib); Texts.SetColor(W, col); Texts.SetOffset(W, voff);
 		WHILE len > 0 DO Files.Read(R, ch); Texts.Write(W, ch); DEC(len) END
@@ -34,9 +34,9 @@ VAR
 	VAR
 		style: TextGadgets.Style;
 		ref: SIGNED16;
-		i, tabs: LONGINT;
-		opts: LONGINT;
-		x: LONGINT;
+		i, tabs: SIGNED32;
+		opts: SIGNED32;
+		x: SIGNED32;
 	BEGIN
 		IF L = NIL THEN NEW(L); Objects.OpenLibrary(L) END;
 		style := TextGadgets.newStyle();
@@ -85,8 +85,8 @@ VAR
 		Texts.SetFont(W, L); Texts.Write(W, CHR(ref))
 	END PutObj;
 
-	PROCEDURE Elem(VAR R, S: Files.Rider; n: LONGINT);
-	VAR w, h, pos: LONGINT;
+	PROCEDURE Elem(VAR R, S: Files.Rider; n: SIGNED32);
+	VAR w, h, pos: SIGNED32;
 		ch: CHAR;
 		proc, cmd: ARRAY 32 OF CHAR; res: SIGNED16;
 	BEGIN Files.ReadLInt(R, w); Files.ReadLInt(R, h); Files.Read(R, ch);
@@ -129,7 +129,7 @@ VAR
 
 	PROCEDURE Conv(VAR R: Files.Rider; VAR T: Texts.Text);
 	VAR
-		hlen, len: LONGINT;
+		hlen, len: SIGNED32;
 		N, lib, col, voff: SIGNED8;
 		LName: ARRAY 32, 32 OF CHAR;
 		S: Files.Rider;
@@ -158,7 +158,7 @@ VAR
 
 	PROCEDURE Convert*;
 	VAR
-		F: Files.File; len: LONGINT;
+		F: Files.File; len: SIGNED32;
 		S: Texts.Scanner; T: Texts.Text;
 		name: ARRAY 32 OF CHAR; x, y: CHAR;
 		bak: BOOLEAN;

@@ -41,7 +41,7 @@ TYPE
 	BackRdr = RECORD
 		text: Texts.Text;
 		buf: ARRAY BufLen OF CHAR;
-		begPos: LONGINT;
+		begPos: SIGNED32;
 		last, next: SIGNED16;
 		beg: BOOLEAN
 	END;
@@ -58,7 +58,7 @@ VAR
 	sDv: ARRAY MaxPatLen + 1 OF SIGNED16;	(* displacement vector for search pattern *)
 	sPatLen: SIGNED16;	(* number of valid characters in sPat [read only] *)
 	rBuf: Texts.Buffer;	(* replace buffer [read only] *)
-	lTime: LONGINT;	(* most recent time for sPat and/or rBuf *)
+	lTime: SIGNED32;	(* most recent time for sPat and/or rBuf *)
 	inFnt: Fonts.Font;	(* input font *)
 	inColor: SIGNED8;	(* input color *)
 	menuAvail: BOOLEAN;	(* true if modul Menu is available *)
@@ -67,17 +67,17 @@ VAR
 	sX, sY: SIGNED16;	(* saved coordinates for new viewer [used in Marker and ExchangeMenu] *)
 	ii: SIGNED16;
 
-	PROCEDURE Min(i, j: LONGINT): LONGINT;
+	PROCEDURE Min(i, j: SIGNED32): SIGNED32;
 	BEGIN
 		IF i < j THEN RETURN i ELSE RETURN j END
 	END Min;
 
-	PROCEDURE Max(i, j: LONGINT): LONGINT;
+	PROCEDURE Max(i, j: SIGNED32): SIGNED32;
 	BEGIN
 		IF i > j THEN RETURN i ELSE RETURN j END
 	END Max;
 
-	PROCEDURE OpenScanner(VAR S: Texts.Scanner; text: Texts.Text; pos: LONGINT);
+	PROCEDURE OpenScanner(VAR S: Texts.Scanner; text: Texts.Text; pos: SIGNED32);
 	BEGIN
 		S.line := 0;
 		IF text = NIL THEN S.class := Err
@@ -86,7 +86,7 @@ VAR
 	END OpenScanner;
 
 	PROCEDURE ScanName(DX: SIGNED16; VAR X, Y: SIGNED16; VAR S: Texts.Scanner);
-		VAR text: Texts.Text;	beg, end, time: LONGINT;
+		VAR text: Texts.Text;	beg, end, time: SIGNED32;
 	BEGIN
 		IF DX = Oberon.SystemTrack(DX) THEN Oberon.AllocateSystemViewer(DX, X, Y)
 		ELSE Oberon.AllocateUserViewer(DX, X, Y)
@@ -114,7 +114,7 @@ VAR
 	END ViewerName;
 
 	PROCEDURE ScanPara(VAR S: Texts.Scanner);
-		VAR text: Texts.Text;	beg, end, time: LONGINT;
+		VAR text: Texts.Text;	beg, end, time: SIGNED32;
 	BEGIN
 		OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); IF S.class = Err THEN RETURN END;	(* ### *)
 		Texts.Scan(S);
@@ -157,7 +157,7 @@ VAR
 	BEGIN Oberon.Defocus
 	END Defocus;
 
-	PROCEDURE GetSelData(tF: TextFrames.Frame; VAR text: Texts.Text; VAR beg, end, time: LONGINT);
+	PROCEDURE GetSelData(tF: TextFrames.Frame; VAR text: Texts.Text; VAR beg, end, time: SIGNED32);
 	VAR M: SelectMsg; (* gets correct selection data of textframe tF *)
 	BEGIN
 		M.time := -1; M.id := Display.get; TextFrames.GetSelection(tF, M);
@@ -195,7 +195,7 @@ VAR
 		RETURN (tF.H - tF.top - tF.bot) DIV tF.lsp
 	END LinesOf;
 
-	PROCEDURE OpenBackRdr(VAR bR: BackRdr; text: Texts.Text; pos: LONGINT);
+	PROCEDURE OpenBackRdr(VAR bR: BackRdr; text: Texts.Text; pos: SIGNED32);
 		VAR R: Texts.Reader;	i: SIGNED16;	ch: CHAR;
 	BEGIN
 		bR.text := text; bR.beg := FALSE; bR.next := BufLen - 1;
@@ -219,14 +219,14 @@ VAR
 		END
 	END BackRead;
 
-	PROCEDURE RPos(VAR bR: BackRdr): LONGINT;
+	PROCEDURE RPos(VAR bR: BackRdr): SIGNED32;
 	BEGIN
 		IF bR.next >= 0 THEN RETURN bR.begPos + bR.next + 1
 		ELSE RETURN bR.begPos
 		END
 	END RPos;
 
-	PROCEDURE LinesUp(text: Texts.Text; pos: LONGINT; nbr: SIGNED16): LONGINT;
+	PROCEDURE LinesUp(text: Texts.Text; pos: SIGNED32; nbr: SIGNED16): SIGNED32;
 	(* returns the start position of nbr lines above line containing pos *)
 		VAR bR: BackRdr;	l: SIGNED16;	ch: CHAR;
 	BEGIN
@@ -245,8 +245,8 @@ VAR
 		Oberon.RemoveMarks(tF.X, tF.Y, tF.W, tF.H)
 	END RemoveMarks;
 
-	PROCEDURE ShowPos(tF: TextFrames.Frame; pos: LONGINT);
-		VAR org, lines: LONGINT;
+	PROCEDURE ShowPos(tF: TextFrames.Frame; pos: SIGNED32);
+		VAR org, lines: SIGNED32;
 	BEGIN
 		IF (pos < TextFrames.Pos(tF, tF.X , tF.Y + tF.H)) OR (TextFrames.Pos(tF, tF.X + tF.W, tF.Y) < pos) THEN
 			lines := LinesOf(tF);
@@ -258,7 +258,7 @@ VAR
 	END ShowPos;
 
 	PROCEDURE SendTabs(tF: TextFrames.Frame; VAR M: Oberon.InputMsg);
-		VAR tR: Texts.Reader;	ch: CHAR;	pos: LONGINT;	T: Texts.Text;
+		VAR tR: Texts.Reader;	ch: CHAR;	pos: SIGNED32;	T: Texts.Text;
 	BEGIN
 		T := tF.text;
 		pos := LinesUp(T, tF.carloc.pos, 1);
@@ -269,7 +269,7 @@ VAR
 	END SendTabs;
 
 	PROCEDURE ScrollFrame(tF: TextFrames.Frame; X, Y: SIGNED16; keys: SET);
-		VAR mm, mr, ml: BOOLEAN;	pos: LONGINT;	lPos: SIGNED16;
+		VAR mm, mr, ml: BOOLEAN;	pos: SIGNED32;	lPos: SIGNED16;
 	BEGIN
 		ml := FALSE; mm := FALSE; mr := FALSE;
 		IF keys = {ML} THEN
@@ -307,7 +307,7 @@ VAR
 		END
 	END ScrollFrame;
 
-	PROCEDURE DisplayMenu(tF: TextFrames.Frame; X, Y: SIGNED16; text: Texts.Text; pos: LONGINT);
+	PROCEDURE DisplayMenu(tF: TextFrames.Frame; X, Y: SIGNED16; text: Texts.Text; pos: SIGNED32);
 		VAR cmd: ARRAY 32 OF CHAR;	res: SIGNED16;
 	BEGIN
 		IF menuAvail THEN
@@ -340,7 +340,7 @@ VAR
 
 	PROCEDURE right(F: Frame; nbr: SIGNED8);
 		VAR tF: TextFrames.Frame;	text: Texts.Text;	R: Texts.Reader;	ch, dh: CHAR;
-			beg, end, time, fLine, lLine: LONGINT;	nr: SIGNED8;
+			beg, end, time, fLine, lLine: SIGNED32;	nr: SIGNED8;
 	BEGIN
 		IF F = NIL THEN GetSelFrame(tF) ELSIF F IS TextFrames.Frame THEN tF := F(TextFrames.Frame) ELSE tF := NIL END;
 		IF (tF # NIL) & (tF.sel > 0) THEN
@@ -370,7 +370,7 @@ VAR
 		END
 	END Right;
 
-	PROCEDURE IsCh(T: Texts.Text; pos: LONGINT): BOOLEAN;
+	PROCEDURE IsCh(T: Texts.Text; pos: SIGNED32): BOOLEAN;
 	(* tests if character in text T at position pos is a tabulator or space *)
 		VAR R: Texts.Reader;	ch: CHAR;
 	BEGIN
@@ -380,7 +380,7 @@ VAR
 
 	PROCEDURE left(F: Frame; nbr: SIGNED8);
 		VAR tF: TextFrames.Frame;	text: Texts.Text;
-			beg, end, time, fLine, lLine: LONGINT;	nr: SIGNED8;
+			beg, end, time, fLine, lLine: SIGNED32;	nr: SIGNED8;
 	BEGIN
 		IF F = NIL THEN GetSelFrame(tF) ELSIF F IS TextFrames.Frame THEN tF := F(TextFrames.Frame) ELSE tF := NIL END;
 		IF (tF # NIL) & (tF.sel > 0) THEN
@@ -432,7 +432,7 @@ VAR
 	END PredSelFrame;
 
 	PROCEDURE PreHandleMR(tF: TextFrames.Frame; VAR X, Y: SIGNED16; keys: SET);
-		VAR pF: TextFrames.Frame;	newPos, endPos: LONGINT;
+		VAR pF: TextFrames.Frame;	newPos, endPos: SIGNED32;
 	BEGIN
 		IF (X >= tF.X  + Min(tF.left, TextFrames.barW)) THEN	(* not in scrollbar *)
 			pF := PredSelFrame(tF);
@@ -491,7 +491,7 @@ VAR
 	END IsWarning;
 
 	PROCEDURE TextProcessor(tF: TextFrames.Frame; VAR M: UpdateMsg);
-		VAR scroll: BOOLEAN;	lUp, pos: LONGINT;
+		VAR scroll: BOOLEAN;	lUp, pos: SIGNED32;
 	BEGIN
 		scroll := FALSE;
 		IF tF.text = Oberon.Log THEN
@@ -599,7 +599,7 @@ VAR
 		RETURN F
 	END NewMF;
 
-	PROCEDURE NewETF(text: Texts.Text; org: LONGINT): TextFrames.Frame;
+	PROCEDURE NewETF(text: Texts.Text; org: SIGNED32): TextFrames.Frame;
 		VAR F: TextFrames.Frame;
 	BEGIN
 		F := TextFrames.NewText(text, org);
@@ -607,7 +607,7 @@ VAR
 		RETURN F
 	END NewETF;
 
-	PROCEDURE OpenViewer(text: Texts.Text; title: ARRAY OF CHAR; pos: LONGINT;
+	PROCEDURE OpenViewer(text: Texts.Text; title: ARRAY OF CHAR; pos: SIGNED32;
 												X, Y: SIGNED16; kind: SIGNED8): Viewers.Viewer;
 		VAR mF: TextFrames.Frame;	menuH: SIGNED16;
 	BEGIN
@@ -666,7 +666,7 @@ VAR
 		END
 	END OpenSysAscii;
 
-	PROCEDURE CalcDispVec(time: LONGINT);
+	PROCEDURE CalcDispVec(time: SIGNED32);
 		VAR i, j, d: SIGNED16;
 	BEGIN
 		lTime := time;
@@ -678,10 +678,10 @@ VAR
 		END
 	END CalcDispVec;
 
-	PROCEDURE SPatFound(tF: TextFrames.Frame; text: Texts.Text; VAR pos:LONGINT): BOOLEAN;
+	PROCEDURE SPatFound(tF: TextFrames.Frame; text: Texts.Text; VAR pos:SIGNED32): BOOLEAN;
 	(* searches the next position for the search pattern sPat begining at position pos *)
 	(* in the text text; resturns result accordingly *)
-		VAR R: Texts.Reader;	l: LONGINT;	i: SIGNED16;	ch: CHAR;
+		VAR R: Texts.Reader;	l: SIGNED32;	i: SIGNED16;	ch: CHAR;
 	BEGIN
 		IF sPatLen > 0 THEN
 			IF tF # NIL THEN TextFrames.Mark(tF, -1) END;
@@ -704,7 +704,7 @@ VAR
 	(** specification needed: "text.pattern"; loads the text text, searches the pattern *)
 	(** pattern and shows it in a viewer *)
 		VAR text: Texts.Text;	S: Texts.Scanner;	V: Viewers.Viewer;
-			X, Y, i, j, M: SIGNED16;	pos: LONGINT;	name: ARRAY 35 OF CHAR;
+			X, Y, i, j, M: SIGNED16;	pos: SIGNED32;	name: ARRAY 35 OF CHAR;
 	BEGIN
 		ScanName(Oberon.UserTrack(Oberon.Par.vwr.X), X, Y, S);
 		IF S.class # Texts.Name THEN RETURN END;	(* ### *)
@@ -728,9 +728,9 @@ VAR
 		END
 	END Show;
 
-	PROCEDURE WriteDate(VAR r: Files.Rider; t, d: LONGINT);
+	PROCEDURE WriteDate(VAR r: Files.Rider; t, d: SIGNED32);
 
-		PROCEDURE WritePair(ch: CHAR; x: LONGINT);
+		PROCEDURE WritePair(ch: CHAR; x: SIGNED32);
 		BEGIN
 			Files.Write(r, ch);
 			Files.Write(r, CHR(x DIV 10 + 30H)); Files.Write(r, CHR(x MOD 10 + 30H))
@@ -743,7 +743,7 @@ VAR
 	END WriteDate;
 
 	PROCEDURE UpdateNameLog(name: ARRAY OF CHAR; typ: CHAR);
-		VAR t, d: LONGINT;	i: SIGNED16;
+		VAR t, d: SIGNED32;	i: SIGNED16;
 	BEGIN
 		IF log.f # NIL THEN
 			Oberon.GetClock (t, d); WriteDate(log.r, t, d);
@@ -766,7 +766,7 @@ VAR
 	PROCEDURE store(typ: CHAR);
 	(* typ specifies the type to store the text: "t": text / "a": ascii / "c": chars *)
 		VAR par : Oberon.ParList;	V: Viewers.Viewer;	tF: TextFrames.Frame;
-			f: Files.File;	r: Files.Rider; 	S: Texts.Scanner;	R: Texts.Reader;	len: LONGINT;	ch: CHAR;
+			f: Files.File;	r: Files.Rider; 	S: Texts.Scanner;	R: Texts.Reader;	len: SIGNED32;	ch: CHAR;
 	BEGIN
 		par := Oberon.Par; tF := NIL; S.class := Texts.Inval;
 		IF par.frame = par.vwr.dsc THEN	(* command in menu frame *)
@@ -881,8 +881,8 @@ VAR
 		END
 	END Marker;
 
-	PROCEDURE MarkPatPos(tF: TextFrames.Frame; pos: LONGINT);
-		VAR l: LONGINT;
+	PROCEDURE MarkPatPos(tF: TextFrames.Frame; pos: SIGNED32);
+		VAR l: SIGNED32;
 	BEGIN
 		RemoveMarks(tF);
 		IF (pos < TextFrames.Pos(tF, tF.X, tF.Y + tF.H)) OR (TextFrames.Pos(tF, tF.X + tF.W, tF.Y) < pos) THEN
@@ -898,7 +898,7 @@ VAR
 	PROCEDURE Search*;
 		VAR tF: TextFrames.Frame;	V: Viewers.Viewer;
 			R: Texts.Reader;	text: Texts.Text;
-			pos, beg, end, time: LONGINT; 	i: SIGNED16;
+			pos, beg, end, time: SIGNED32; 	i: SIGNED16;
 	BEGIN
 		IF (Oberon.Par.vwr # NIL) & (Oberon.Par.frame = Oberon.Par.vwr.dsc) THEN V := Oberon.Par.vwr
 		ELSE V := FocusViewer()
@@ -919,7 +919,7 @@ VAR
 	END Search;
 
 	PROCEDURE SearchDiff*;
-		VAR F1, F2: TextFrames.Frame; pos1, pos2: LONGINT; R1, R2: Texts.Reader; ch1, ch2: CHAR;
+		VAR F1, F2: TextFrames.Frame; pos1, pos2: SIGNED32; R1, R2: Texts.Reader; ch1, ch2: CHAR;
 	BEGIN
 		GetSelFrame(F1);
 		IF F1 # NIL THEN pos1 := F1.selbeg.pos; RemoveMarks(F1) END;
@@ -946,7 +946,7 @@ VAR
 	PROCEDURE replace(): BOOLEAN;
 		VAR tF: TextFrames.Frame;	V: Viewers.Viewer;
 			R: Texts.Reader;	tBuf: Texts.Buffer;	text: Texts.Text;
-			pos, beg, end, time, p, len: LONGINT; 	i: SIGNED16;	ch: CHAR;	T: Texts.Text;
+			pos, beg, end, time, p, len: SIGNED32; 	i: SIGNED16;	ch: CHAR;	T: Texts.Text;
 	BEGIN
 		V := FocusViewer();
 		IF (V.dsc = NIL) OR ~ (V.dsc.next IS TextFrames.Frame) THEN RETURN FALSE END;	(* ### *)
@@ -984,7 +984,7 @@ VAR
 
 	PROCEDURE Locate*;
 		VAR tF: TextFrames.Frame;	V: Viewers.Viewer;
-			text: Texts.Text;	S: Texts.Scanner;	beg, end, time: LONGINT;
+			text: Texts.Text;	S: Texts.Scanner;	beg, end, time: SIGNED32;
 	BEGIN
 		V := Oberon.MarkedViewer();
 		IF (V.dsc # NIL) & (V.dsc.next IS TextFrames.Frame) THEN
@@ -1005,7 +1005,7 @@ VAR
 
 	PROCEDURE Error*;
 		VAR text: Texts.Text;	S: Texts.Scanner;	V: Viewers.Viewer;
-			X, Y, i: SIGNED16;	pos, beg, end, time: LONGINT;
+			X, Y, i: SIGNED16;	pos, beg, end, time: SIGNED32;
 	BEGIN
 		text := NIL; Oberon.GetSelection(text, beg, end, time);
 		IF (text # NIL) & (time # -1) THEN
@@ -1088,7 +1088,7 @@ VAR
 	END ExchangeMenu;
 
 	PROCEDURE Delete*;
-		VAR tF: TextFrames.Frame;	text: Texts.Text;	beg,end, time: LONGINT;
+		VAR tF: TextFrames.Frame;	text: Texts.Text;	beg,end, time: SIGNED32;
 	BEGIN
 		GetSelFrame(tF);
 		IF tF # NIL THEN
@@ -1102,7 +1102,7 @@ VAR
 
 	PROCEDURE Move*;
 		VAR T: Texts.Text; tF: TextFrames.Frame;	V: Viewers.Viewer;
-			beg, end, time, carloc : LONGINT; 	B: Texts.Buffer;
+			beg, end, time, carloc : SIGNED32; 	B: Texts.Buffer;
 	BEGIN
 		Oberon.GetSelection(T, beg, end, time);
 		IF time # -1 THEN
@@ -1151,7 +1151,7 @@ VAR
 
 	PROCEDURE Recall*;
 		VAR tF: TextFrames.Frame;	V: Viewers.Viewer;
-			buf: Texts.Buffer;	pos: LONGINT;
+			buf: Texts.Buffer;	pos: SIGNED32;
 	BEGIN
 		V := FocusViewer();
 		IF (V.dsc # NIL) & (V.dsc.next IS TextFrames.Frame) THEN
@@ -1167,7 +1167,7 @@ VAR
 
 	PROCEDURE Font*;
 		VAR S: Texts.Scanner;	text: Texts.Text;	ext: ARRAY 12 OF CHAR;
-			beg, end, time: LONGINT;	i, j: SIGNED16;
+			beg, end, time: SIGNED32;	i, j: SIGNED16;
 	BEGIN
 		ScanPara(S); IF S.class # Texts.Name THEN RETURN END;	(* ### *)
 		i := 0; WHILE (S.s[i] # 0X) & (S.s[i] # ".") DO INC(i) END;
@@ -1184,7 +1184,7 @@ VAR
 
 	PROCEDURE Color*;
 		VAR S: Texts.Scanner;	text: Texts.Text;
-			beg, end, time: LONGINT;	col: SIGNED8;
+			beg, end, time: SIGNED32;	col: SIGNED8;
 	BEGIN
 		ScanPara(S); IF S.class # Texts.Int THEN RETURN END;	(* ### *)
 		col := SHORT(SHORT(S.i));
@@ -1197,9 +1197,9 @@ VAR
     END Color;
 
 	PROCEDURE Do*;
-		VAR S: Texts.Scanner;	text: Texts.Text;	pos: LONGINT;	res: SIGNED16;
+		VAR S: Texts.Scanner;	text: Texts.Text;	pos: SIGNED32;	res: SIGNED16;
 
-		PROCEDURE NextLine(text: Texts.Text; pos: LONGINT): LONGINT;
+		PROCEDURE NextLine(text: Texts.Text; pos: SIGNED32): SIGNED32;
 			VAR tR: Texts.Reader;	ch: CHAR;
 		BEGIN
 			IF pos < text.len THEN
@@ -1225,8 +1225,8 @@ VAR
 		END
 	END Do;
 
-	PROCEDURE Process(text: Texts.Text; beg, end: LONGINT; s: ARRAY OF CHAR);
-		VAR S: Texts.Scanner;	pos: LONGINT;	i: SIGNED16;
+	PROCEDURE Process(text: Texts.Text; beg, end: SIGNED32; s: ARRAY OF CHAR);
+		VAR S: Texts.Scanner;	pos: SIGNED32;	i: SIGNED16;
 	BEGIN
 		i := 0; WHILE (s[i] # 0X) & (s[i] # "*") DO INC(i) END;
 		IF s[i] = 0X THEN
@@ -1256,7 +1256,7 @@ VAR
 	PROCEDURE Call*;
 	(* expected parameters: M.P  {Processor} *)
 	(* Processor: specified as string; "*" -> specifies name of list *)
-		VAR S: Texts.Scanner;	text: Texts.Text;	beg, end, time: LONGINT;
+		VAR S: Texts.Scanner;	text: Texts.Text;	beg, end, time: SIGNED32;
 			cmd: ARRAY 32 OF CHAR;	res: SIGNED16;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
@@ -1387,8 +1387,8 @@ VAR
 		END
 	END SetMenu;
 
-	PROCEDURE StrSearch(pat: ARRAY OF CHAR;  VAR str: ARRAY OF CHAR;  VAR pos: LONGINT);
-		VAR i: LONGINT; found: BOOLEAN;
+	PROCEDURE StrSearch(pat: ARRAY OF CHAR;  VAR str: ARRAY OF CHAR;  VAR pos: SIGNED32);
+		VAR i: SIGNED32; found: BOOLEAN;
 	BEGIN
 		found := FALSE;
 		WHILE (str[pos] # 0X) & ~found DO
@@ -1401,8 +1401,8 @@ VAR
 		IF ~found THEN pos := -1 END
 	END StrSearch;
 
-	PROCEDURE StrDelete(VAR str: ARRAY OF CHAR;  pos, len: LONGINT);
-	VAR i, n: LONGINT;
+	PROCEDURE StrDelete(VAR str: ARRAY OF CHAR;  pos, len: SIGNED32);
+	VAR i, n: SIGNED32;
 	BEGIN
 		i := pos+len;  n := 0;  WHILE str[n] # 0X DO INC(n) END;
 		IF i < n THEN
@@ -1412,7 +1412,7 @@ VAR
 	END StrDelete;
 
 	PROCEDURE ShowText(title: ARRAY OF CHAR; T: Texts.Text; W, H: SIGNED16);
-		VAR X, Y: SIGNED16; V: Viewers.Viewer; pos: LONGINT;
+		VAR X, Y: SIGNED16; V: Viewers.Viewer; pos: SIGNED32;
 	BEGIN
 		IF T = Oberon.Log THEN
 			Oberon.AllocateSystemViewer(Oberon.SystemTrack(Oberon.Par.vwr.X), X, Y);

@@ -80,9 +80,9 @@ CONST
 TYPE
 
 	DEV_BROADCAST_HDR  = RECORD
-		dbch_size: LONGINT;
-		dbch_devicetype: LONGINT ;
-		dbch_reserved: LONGINT;
+		dbch_size: SIGNED32;
+		dbch_devicetype: SIGNED32 ;
+		dbch_reserved: SIGNED32;
 	END;
 	DEV_BROADCAST_HDRP  = POINTER  TO DEV_BROADCAST_HDR;
 
@@ -95,7 +95,7 @@ TYPE
 
 	Inputs = RECORD
 		keys: SET;
-		X, Y, Z, dx, dy: LONGINT;
+		X, Y, Z, dx, dy: SIGNED32;
 		flags: SET;
 	END;
 	(** The BITMAPINFO structure defines the dimensions and color information for a Win32 DIB. *)
@@ -103,7 +103,7 @@ TYPE
 
 	BitmapInfo* = RECORD
 		bmiHeader*: GDI32.BitmapInfoHeader;
-		colors: ARRAY 3 OF LONGINT;
+		colors: ARRAY 3 OF SIGNED32;
 		(* old: colors: ANY;  *)
 	END;
 
@@ -112,7 +112,7 @@ TYPE
 		hWndParent: User32.HWND;   (** handle of the parent window, = hWnd for document windows *)
 		hDC: User32.HDC;
 
-		width, height: LONGINT;   (** current size *)
+		width, height: SIGNED32;   (** current size *)
 
 		defWindowProc: User32.WndProc;   (** default window procedure for all messages not handled here *)
 		windowRect: User32.Rect;
@@ -120,30 +120,30 @@ TYPE
 		link: Window;
 
 		bmp: GDI32.HBitmap;
-		bmadr: LONGINT;
+		bmadr: SIGNED32;
 
 		bmphdc: User32.HDC;
 		track: Inputs;
 		pal: POINTER TO ARRAY OF GDI32.PaletteEntry;
-		dx, dy: LONGINT;
+		dx, dy: SIGNED32;
 		hBrush: GDI32.HBrush;
 		frame: BOOLEAN;
 	END;
 
 	DisplayProc* = PROCEDURE ( disp: Window );
-	PaintProc* = PROCEDURE ( disp: Window;  x, y, w, h: LONGINT );
+	PaintProc* = PROCEDURE ( disp: Window;  x, y, w, h: SIGNED32 );
 
 	CreateStruct = POINTER TO RECORD
 		win: Window;
 		finished: BOOLEAN;
 		className: ARRAY 32 OF CHAR;
 		style: WORDSET;
-		x, y, w, h: LONGINT;
+		x, y, w, h: SIGNED32;
 		hMenu: User32.HMenu
 	END;
 
 	(** handler called for registered window messages *)
-	WindowHandlerProc* = PROCEDURE {WINAPI} ( win: Window;  uMsg: LONGINT;  wParam: User32.WParam;
+	WindowHandlerProc* = PROCEDURE {WINAPI} ( win: Window;  uMsg: SIGNED32;  wParam: User32.WParam;
 																					  lParam: User32.LParam ): User32.LResult;
 
 	WinMain = OBJECT
@@ -155,7 +155,7 @@ TYPE
 		END Init;
 
 		PROCEDURE MsgLoop;
-		VAR msg: User32.Msg;  i: LONGINT; mode: LONGINT;
+		VAR msg: User32.Msg;  i: SIGNED32; mode: SIGNED32;
 		BEGIN
 			LOOP
 				mode := process.mode;
@@ -190,7 +190,7 @@ TYPE
 
 	Display = OBJECT (Displays.Display) (* only one instance of this object allowed ! *)
 
-		PROCEDURE Transfer*( VAR buf: ARRAY OF CHAR;  ofs, stride, x, y, w, h: SIZE; op: LONGINT );
+		PROCEDURE Transfer*( VAR buf: ARRAY OF CHAR;  ofs, stride, x, y, w, h: SIZE; op: SIGNED32 );
 		BEGIN
 
 			IF letWindowsHandleTheBuffer THEN
@@ -215,7 +215,7 @@ TYPE
 VAR
 	dummyClass, windowClass: User32.WndClassEx;
 	dummyClassName, windowClassName, controlClassName, windowTitle : ARRAY 32 OF CHAR;
-	nWindows: LONGINT;  aControlWinClass: LONGINT;  fixedFrameX, fixedFrameY, frameX, frameY, captionY, menuY: LONGINT;
+	nWindows: SIGNED32;  aControlWinClass: SIGNED32;  fixedFrameX, fixedFrameY, frameX, frameY, captionY, menuY: SIGNED32;
 	hCurrentCursor, hAlternativeCursor: User32.HCursor;  capture, hook, mouse: Window;  kioskmode*: BOOLEAN;
 	dummyWin*: Window;
 	ISOToOberon: ARRAY 256 OF CHAR;
@@ -231,7 +231,7 @@ VAR
 
 	fullscreen: BOOLEAN;   (*ALEX 2005.11.30*)
 
-	closeRequests: LONGINT;
+	closeRequests: SIGNED32;
 
 	PROCEDURE CreateHWND( create: CreateStruct );
 	VAR str: ARRAY 32 OF CHAR;
@@ -252,8 +252,8 @@ VAR
 	(* wParam contains the virtual key code
 	 	lParam: {0..15}: Key repeat count, {16..23}: Scan code, {24}: Extended-key flag, {25..28}: Reserved,
 	 	{29}: Context code (1 if ALT was down, 0 otherwise), {30}: Previous key-state flag, {31}: Transition-state flag *)
-	PROCEDURE DecomposeKeyEvent( wParam, lParam: LONGINT;  VAR ch: CHAR;  VAR key: LONGINT;  char: BOOLEAN );
-	VAR scancode: LONGINT;  previous: LONGINT;  repeat: LONGINT;  extended: BOOLEAN;
+	PROCEDURE DecomposeKeyEvent( wParam, lParam: SIGNED32;  VAR ch: CHAR;  VAR key: SIGNED32;  char: BOOLEAN );
+	VAR scancode: SIGNED32;  previous: SIGNED32;  repeat: SIGNED32;  extended: BOOLEAN;
 	BEGIN
 		repeat := lParam MOD ASH( 1, 16 );  scancode := ASH( lParam, -16 ) MOD ASH( 1, 8 );  extended := ODD( ASH( lParam, -24 ) );
 		previous := ASH( lParam, -30 ) MOD 2;
@@ -332,19 +332,19 @@ VAR
 		END;
 	END DecomposeKeyEvent;
 
-	PROCEDURE GetChar( wParam, lParam: LONGINT;  VAR ch: CHAR;  VAR key: LONGINT );
+	PROCEDURE GetChar( wParam, lParam: SIGNED32;  VAR ch: CHAR;  VAR key: SIGNED32 );
 	BEGIN
 		ch := ISOToOberon[wParam]; key := ORD( ch );
 	END GetChar;
 
-	PROCEDURE GetKeyState( key: LONGINT;  what: SIGNED16 ): BOOLEAN;
+	PROCEDURE GetKeyState( key: SIGNED32;  what: SIGNED16 ): BOOLEAN;
 	VAR state: SIGNED16;
 	BEGIN
 		state := User32.GetKeyState( key );  RETURN what IN SYSTEM.VAL( SET, state );
 	END GetKeyState;
 
 (* Common base handler for all variants of windows provided by this module. *)
-	PROCEDURE DummyHandler( win: Window;  uMsg: LONGINT;  wParam: User32.WParam;  lParam: User32.LParam ): User32.LResult;
+	PROCEDURE DummyHandler( win: Window;  uMsg: SIGNED32;  wParam: User32.WParam;  lParam: User32.LParam ): User32.LResult;
 	VAR res: User32.LResult; proc: User32.WndProc; hhWnd: ADDRESS;  ret: Kernel32.BOOL;
 	BEGIN
 		IF (uMsg = User32.WMDestroy) & ~(external IN win.state) THEN
@@ -374,7 +374,7 @@ VAR
 		RETURN 0
 	END DummyHandler;
 
-	PROCEDURE HandleFocus( win: Window;  uMsg: LONGINT;  wParam: User32.WParam );
+	PROCEDURE HandleFocus( win: Window;  uMsg: SIGNED32;  wParam: User32.WParam );
 	BEGIN
 		IF (uMsg = User32.WMSetFocus) & (hook # win) THEN
 			Kernel32.Sleep( 0 );   (* ????????????????????? *)
@@ -400,7 +400,7 @@ VAR
 		IF User32.GetFocus() = win.hWnd THEN HandleFocus( win, User32.WMSetFocus, 0 ) END;
 	END SetupWin;
 
-	PROCEDURE {WINAPI} DummyProc( hwnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
+	PROCEDURE {WINAPI} DummyProc( hwnd: User32.HWND;  uMsg: SIGNED32;  wParam: User32.WParam;
 															  lParam: User32.LParam ): User32.LResult;
 	VAR win: Window;  create: CreateStruct;  ret: Kernel32.BOOL;
 	BEGIN
@@ -412,7 +412,7 @@ VAR
 			lParam := SYSTEM.VAL( User32.LParam, create.win );
 			ret := User32.PostMessage( hwnd, WMSetup, wParam, lParam )
 		ELSIF uMsg = WMSetup THEN
-			win := SYSTEM.VAL( Window, lParam );  ret := User32.SetWindowLong( hwnd, GWLWindow, LONGINT(lParam) );
+			win := SYSTEM.VAL( Window, lParam );  ret := User32.SetWindowLong( hwnd, GWLWindow, SIGNED32(lParam) );
 			create := SYSTEM.VAL( CreateStruct, wParam );
 			IF ~(dummy IN win.state) THEN SetupWin( win ) ELSE Add( win, TRUE ) END;
 			IF ~(external IN win.state) THEN INC( nWindows ) END;
@@ -441,13 +441,13 @@ VAR
 		IF hCurrentCursor # hCursor THEN hCurrentCursor := hCursor;  ChangeCursor() END
 	END SetCursor;
 
-	PROCEDURE HandleMouse( win: Window;  uMsg: LONGINT;  wParam: User32.WParam;  lParam: User32.LParam );
-	VAR m: AosInputs.AbsMouseMsg;  oldx, oldy: LONGINT;  keys: SET; ret: Kernel32.HANDLE;
+	PROCEDURE HandleMouse( win: Window;  uMsg: SIGNED32;  wParam: User32.WParam;  lParam: User32.LParam );
+	VAR m: AosInputs.AbsMouseMsg;  oldx, oldy: SIGNED32;  keys: SET; ret: Kernel32.HANDLE;
 	BEGIN
 		(* User32.SetCursor(hCurrentCursor);*)
 		oldx := win.track.X;  oldy := win.track.Y;
-		win.track.X := LONGINT( lParam MOD ASH( 1, 16 ) ) - win.dx;
-		win.track.Y := LONGINT( (* win.height-*) ASH( lParam, -16 ) - 1 ) - win.dy;
+		win.track.X := SIGNED32( lParam MOD ASH( 1, 16 ) ) - win.dx;
+		win.track.Y := SIGNED32( (* win.height-*) ASH( lParam, -16 ) - 1 ) - win.dy;
 		m.x := win.track.X;  m.y := win.track.Y;  m.z := win.track.Z;
 
 		m.dx := 0;  m.dy := 0;  m.dz := 0;
@@ -485,7 +485,7 @@ VAR
 		| User32.WMXButtonUp:
 				EXCL( keys, MX )
 		| User32.WMMouseWheel:
-				IF LONGINT(wParam) DIV 10000H  > 0 THEN m.dz := -1 ELSE m.dz := 1 END;
+				IF SIGNED32(wParam) DIV 10000H  > 0 THEN m.dz := -1 ELSE m.dz := 1 END;
 				m.x := oldx;  m.y := oldy;  win.track.X := oldx;  win.track.Y := oldy;
 				(* strange: if wheel used, then coordinates are not realtive to windows -> use coordinates of last event, fof *)
 		ELSE
@@ -515,9 +515,9 @@ VAR
 
 (* default handler for WMChar messages *)
 	PROCEDURE HandleChar( win: Window;  wParam: User32.WParam;  lParam: User32.LParam );
-	VAR ch: CHAR;  msg: AosInputs.KeyboardMsg;  key: LONGINT;
+	VAR ch: CHAR;  msg: AosInputs.KeyboardMsg;  key: SIGNED32;
 	BEGIN
-		GetChar( LONGINT(wParam), LONGINT(lParam), ch, key );
+		GetChar( SIGNED32(wParam), SIGNED32(lParam), ch, key );
 		GetKeyFlags(msg.flags);
 		msg.ch := ch;  msg.keysym := key;
 		(*
@@ -535,15 +535,15 @@ VAR
 
 (* default handler for WMKeyDown or WMKeyUp messages *)
 	PROCEDURE HandleKey( win: Window;  wParam: User32.WParam;  lParam: User32.LParam );
-	VAR ch: CHAR;  msg: AosInputs.KeyboardMsg;  key : LONGINT; rect: User32.Rect;  ret: Kernel32.BOOL;
+	VAR ch: CHAR;  msg: AosInputs.KeyboardMsg;  key : SIGNED32; rect: User32.Rect;  ret: Kernel32.BOOL;
 	BEGIN
-		DecomposeKeyEvent( LONGINT(wParam), LONGINT(lParam), ch, key, FALSE );
+		DecomposeKeyEvent( SIGNED32(wParam), SIGNED32(lParam), ch, key, FALSE );
 
 		IF  (key = AosInputs.KsF8) & (maximized IN win.state) & ~fullscreen (*ALEX 2005.11.30*) THEN
 			IF win.frame THEN
 				ret :=
 					User32.SetWindowLong( win.hWnd, User32.GWLStyle,
-															 SYSTEM.VAL( LONGINT, SYSTEM.VAL( SET, User32.GetWindowLong( win.hWnd, User32.GWLStyle ) ) + SYSTEM.VAL( SET, 12582912 (* WScaption *) ) ) );
+															 SYSTEM.VAL( SIGNED32, SYSTEM.VAL( SET, User32.GetWindowLong( win.hWnd, User32.GWLStyle ) ) + SYSTEM.VAL( SET, 12582912 (* WScaption *) ) ) );
 				ret := User32.GetWindowRect( win.hWnd, rect );
 				ret :=
 					User32.SetWindowRgn( win.hWnd,
@@ -553,7 +553,7 @@ VAR
 			ELSE
 				ret :=
 					User32.SetWindowLong( win.hWnd, User32.GWLStyle,
-															 SYSTEM.VAL( LONGINT, SYSTEM.VAL( SET, User32.GetWindowLong( win.hWnd, User32.GWLStyle ) ) - SYSTEM.VAL( SET, 12582912 (* WScaption *) ) ) );
+															 SYSTEM.VAL( SIGNED32, SYSTEM.VAL( SET, User32.GetWindowLong( win.hWnd, User32.GWLStyle ) ) - SYSTEM.VAL( SET, 12582912 (* WScaption *) ) ) );
 
 				ret := User32.GetWindowRect( win.hWnd, rect );
 				ret :=
@@ -568,7 +568,7 @@ VAR
 		GetKeyFlags(msg.flags);
 		IF (msg.flags * AosInputs.Ctrl # {}) & (msg.flags * AosInputs.Alt = {}) & (VK0 <= wParam) & (wParam <= VK9) THEN
 			(* Same behaviour as AOS *)
-			ch := CHR(wParam); key := LONGINT(wParam);
+			ch := CHR(wParam); key := SIGNED32(wParam);
 		END;
 
 		IF (AosInputs.LeftAlt IN msg.flags) & (AosInputs.LeftShift IN msg.flags) THEN
@@ -605,9 +605,9 @@ VAR
 
 	(* default handler for WMKeyDown or WMKeyUp messages *)
 	PROCEDURE HandleKeyUp( win: Window;  wParam: User32.WParam;  lParam: User32.LParam );
-	VAR ch: CHAR;  msg: AosInputs.KeyboardMsg; key : LONGINT;
+	VAR ch: CHAR;  msg: AosInputs.KeyboardMsg; key : SIGNED32;
 	BEGIN
-		DecomposeKeyEvent( LONGINT(wParam), LONGINT(lParam), ch, key, TRUE );
+		DecomposeKeyEvent( SIGNED32(wParam), SIGNED32(lParam), ch, key, TRUE );
 		GetKeyFlags(msg.flags);
 
 		IF ~((AosInputs.LeftAlt IN msg.flags) & (AosInputs.LeftShift IN msg.flags)) THEN
@@ -645,11 +645,11 @@ VAR
 		END;
 	END SetDocRect;
 
-	PROCEDURE UpdateDisplay( win: Window;  id: LONGINT;  lParam: User32.LParam;  wParam: User32.WParam );
-	VAR x, y, w, h, dx, dy, bw, bh: LONGINT;  hOldBr: GDI32.HBrush;  ret: Kernel32.BOOL;
+	PROCEDURE UpdateDisplay( win: Window;  id: SIGNED32;  lParam: User32.LParam;  wParam: User32.WParam );
+	VAR x, y, w, h, dx, dy, bw, bh: SIGNED32;  hOldBr: GDI32.HBrush;  ret: Kernel32.BOOL;
 	BEGIN
 		IF ~(minimized IN win.state) THEN
-			IF id = resize THEN win.width := LONGINT(lParam) MOD ASH( 1, 16 );  win.height := LONGINT(lParam) DIV ASH( 1, 16 );  SetDocRect( win, TRUE ) END;
+			IF id = resize THEN win.width := SIGNED32(lParam) MOD ASH( 1, 16 );  win.height := SIGNED32(lParam) DIV ASH( 1, 16 );  SetDocRect( win, TRUE ) END;
 			ret := User32.ValidateRect( win.hWnd, NIL );
 			IF win.hDC = 0 THEN GetDC( win );  END;
 
@@ -687,11 +687,11 @@ VAR
 	VAR adr: ADDRESS;  hDC: User32.HDC;  ret: Kernel32.BOOL;
 	BEGIN
 		hDC := win.bmphdc;   (*  hDC := win.hDC; (* writes to screen*) *)
-		bmi.info.bmiHeader.biWidth := LONGINT(stride) DIV format (* w *) ;  bmi.info.bmiHeader.biHeight := -LONGINT(h);   (* top-down *)
+		bmi.info.bmiHeader.biWidth := SIGNED32(stride) DIV format (* w *) ;  bmi.info.bmiHeader.biHeight := -SIGNED32(h);   (* top-down *)
 		adr := ADDRESSOF( buf[ofs] );
 
 		ret :=
-			GDI32.SetDIBitsToDevice( hDC, LONGINT(x), LONGINT(y), LONGINT(w), LONGINT(h), 0, 0, 0, LONGINT(h), adr, SYSTEM.VAL( GDI32.BitmapInfo, bmi.info ),
+			GDI32.SetDIBitsToDevice( hDC, SIGNED32(x), SIGNED32(y), SIGNED32(w), SIGNED32(h), 0, 0, 0, SIGNED32(h), adr, SYSTEM.VAL( GDI32.BitmapInfo, bmi.info ),
 													   GDI32.DIBPalColors )
 		(*	ELSE
 			bmi.info.bmiHeader.biHeight := 1;
@@ -707,14 +707,14 @@ VAR
 		*)
 	END ToMemory;
 
-	PROCEDURE ToWindow*( win: Window;  x, y, w, h: SIZE;  dx, dy: LONGINT );
+	PROCEDURE ToWindow*( win: Window;  x, y, w, h: SIZE;  dx, dy: SIGNED32 );
 	VAR ret: Kernel32.BOOL;
 	BEGIN
 		IF traceDisplay THEN
-			ret := GDI32.BitBlt( win.hDC (* = destination *) , LONGINT(x) + dx, LONGINT(y) + dy, LONGINT(w), LONGINT(h), win.bmphdc (* source *) , LONGINT(x), LONGINT(y), GDI32.NotSrcCopy );
+			ret := GDI32.BitBlt( win.hDC (* = destination *) , SIGNED32(x) + dx, SIGNED32(y) + dy, SIGNED32(w), SIGNED32(h), win.bmphdc (* source *) , SIGNED32(x), SIGNED32(y), GDI32.NotSrcCopy );
 			Kernel32.Sleep(50);
 		END;
-		ret := GDI32.BitBlt( win.hDC (* = destination *) , LONGINT(x) + dx, LONGINT(y) + dy, LONGINT(w), LONGINT(h), win.bmphdc (* source *) , LONGINT(x), LONGINT(y), GDI32.SrcCopy );
+		ret := GDI32.BitBlt( win.hDC (* = destination *) , SIGNED32(x) + dx, SIGNED32(y) + dy, SIGNED32(w), SIGNED32(h), win.bmphdc (* source *) , SIGNED32(x), SIGNED32(y), GDI32.SrcCopy );
 	END ToWindow;
 
 	PROCEDURE GetMinMaxInfo( win: Window;  lParam: User32.LParam ): BOOLEAN;
@@ -752,7 +752,7 @@ VAR
 	END PosChanging;
 
 (** Common base handler for all visual windows (document or control) provided by this module. *)
-	PROCEDURE WindowHandler( win: Window;  uMsg: LONGINT;  wParam: User32.WParam;
+	PROCEDURE WindowHandler( win: Window;  uMsg: SIGNED32;  wParam: User32.WParam;
 													  lParam: User32.LParam ): User32.LResult;
 
 	VAR handled: BOOLEAN; ret: Kernel32.HANDLE;
@@ -817,9 +817,9 @@ VAR
 		IF ~handled THEN RETURN DummyHandler( win, uMsg, wParam, lParam ) ELSE RETURN 0 END
 	END WindowHandler;
 
-	PROCEDURE {WINAPI} WindowProc( hwnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
+	PROCEDURE {WINAPI} WindowProc( hwnd: User32.HWND;  uMsg: SIGNED32;  wParam: User32.WParam;
 															    lParam: User32.LParam ): User32.LResult;
-	VAR win {UNTRACED}: Window;  dbh {UNTRACED}: DEV_BROADCAST_HDRP; dbv  {UNTRACED}: DEV_BROADCAST_VOLUMEP; i: LONGINT;
+	VAR win {UNTRACED}: Window;  dbh {UNTRACED}: DEV_BROADCAST_HDRP; dbv  {UNTRACED}: DEV_BROADCAST_VOLUMEP; i: SIGNED32;
 	BEGIN
 
 		IF uMsg = WM_DEVICECHANGE THEN
@@ -827,13 +827,13 @@ VAR
 				dbh := SYSTEM.VAL(DEV_BROADCAST_HDRP,lParam);
 				IF dbh.dbch_devicetype = DBT_DEVTYP_VOLUME THEN
 					dbv := SYSTEM.VAL(DEV_BROADCAST_VOLUMEP,lParam);
-					WinFS.DeviceNotification(LONGINT(wParam),dbv.dbcv_unitmask);
+					WinFS.DeviceNotification(SIGNED32(wParam),dbv.dbcv_unitmask);
 				END;
 			ELSIF wParam = DBT_DEVICEREMOVECOMPLETE THEN
 				dbh := SYSTEM.VAL(DEV_BROADCAST_HDRP,lParam);
 				IF dbh.dbch_devicetype = DBT_DEVTYP_VOLUME THEN
 					dbv := SYSTEM.VAL(DEV_BROADCAST_VOLUMEP,lParam);
-					WinFS.DeviceNotification(LONGINT(wParam),dbv.dbcv_unitmask);
+					WinFS.DeviceNotification(SIGNED32(wParam),dbv.dbcv_unitmask);
 				END;
 			END;
 		END;
@@ -845,7 +845,7 @@ VAR
 	END WindowProc;
 (** Implementation of GetDC for all visual windows (document or control) provided by this module. *)
 	PROCEDURE GetDC( win: Window );
-	VAR oldhbm: GDI32.HBitmap;  ret: LONGINT;
+	VAR oldhbm: GDI32.HBitmap;  ret: SIGNED32;
 	BEGIN
 		IF win.hWnd # Kernel32.NULL THEN
 			win.hDC := User32.GetDC( win.hWnd );
@@ -967,7 +967,7 @@ VAR
 		END;
 	END CreateWin;
 
-	PROCEDURE {WINAPI} ControlWindowProc( hwnd: User32.HWND;  uMsg: LONGINT;  wParam: User32.WParam;
+	PROCEDURE {WINAPI} ControlWindowProc( hwnd: User32.HWND;  uMsg: SIGNED32;  wParam: User32.WParam;
 																		    lParam: User32.LParam ): User32.LResult;
 	VAR win: Window;  ret: Kernel32.BOOL;
 	BEGIN
@@ -975,7 +975,7 @@ VAR
 		IF win # NIL THEN RETURN WindowHandler( win, uMsg, wParam, lParam )
 		ELSIF uMsg = User32.WMCreate THEN
 			SYSTEM.GET( lParam, win );  win.hWnd := hwnd;
-			ret := User32.SetWindowLong( hwnd, GWLWindow, SYSTEM.VAL( LONGINT, win ) );  InstallW( win, TRUE );  RETURN 0
+			ret := User32.SetWindowLong( hwnd, GWLWindow, SYSTEM.VAL( SIGNED32, win ) );  InstallW( win, TRUE );  RETURN 0
 		ELSE RETURN DummyProc(hwnd,uMsg,wParam,lParam);
 		END
 	END ControlWindowProc;
@@ -989,7 +989,7 @@ VAR
 	END UnregisterControlWinClass;
 
 	PROCEDURE InitMod;
-	VAR  (*  path: FileDir.FileName;*) i: LONGINT;
+	VAR  (*  path: FileDir.FileName;*) i: SIGNED32;
 		str: ARRAY 32 OF CHAR;
 	BEGIN
 		fixedFrameX := User32.GetSystemMetrics( User32.SMCXFixedFrame );
@@ -1081,10 +1081,10 @@ VAR
 		UnregisterControlWinClass()
 	END Shutdown;
 
-	PROCEDURE DoInstall( w, h, left, top: LONGINT );
+	PROCEDURE DoInstall( w, h, left, top: SIGNED32 );
 	VAR ts: ARRAY 16 OF CHAR;
-		res: WORD;  create: CreateStruct;  win: Window;  hMenu: User32.HMenu;  x, y: LONGINT;
-	VAR border: LONGINT;  rect: User32.Rect;   (*ALEX 2005.11.30*)
+		res: WORD;  create: CreateStruct;  win: Window;  hMenu: User32.HMenu;  x, y: SIGNED32;
+	VAR border: SIGNED32;  rect: User32.Rect;   (*ALEX 2005.11.30*)
 
 		hDC: User32.HDC;
 
@@ -1136,7 +1136,7 @@ VAR
 			IF fullscreen THEN
 				res :=
 					User32.SetWindowLong( win.hWnd, User32.GWLStyle,
-															 SYSTEM.VAL( LONGINT, SYSTEM.VAL( SET, User32.GetWindowLong( win.hWnd, User32.GWLStyle ) ) - SYSTEM.VAL( SET, 12582912 (* WScaption *) ) ) );
+															 SYSTEM.VAL( SIGNED32, SYSTEM.VAL( SET, User32.GetWindowLong( win.hWnd, User32.GWLStyle ) ) - SYSTEM.VAL( SET, 12582912 (* WScaption *) ) ) );
 
 				res := User32.GetWindowRect( win.hWnd, rect );
 				res := User32.SetWindowRgn( win.hWnd, GDI32.CreateRectRgn( rect.left, rect.bottom, rect.right, rect.top ), 1 );
@@ -1170,7 +1170,7 @@ VAR
 	END DoInstall;
 
 	PROCEDURE Install*(context : Commands.Context); (** ["H"] [ width [height] ] ["FULLSCREEN"] [ x [y] ] *)
-	VAR x,y,w,h : LONGINT; options: Options.Options;
+	VAR x,y,w,h : SIGNED32; options: Options.Options;
 	BEGIN
 		NEW(options);
 		options.Add("b","bits16",Options.Flag);

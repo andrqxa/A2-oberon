@@ -30,7 +30,7 @@ IMPORT vyPort, Objects, vyBase, vyLinks, Files, Gadgets, vyName, antsCommands, a
 	antsToolbox, aM := antsMessages, Strings, Types, vyCommandMenus, vyEvents;
 
 TYPE
-	Index* = LONGINT;
+	Index* = SIGNED32;
 
 	tObject* = POINTER TO tObjectDesc;
 	tObjectDesc* = RECORD (vyBase.ObjDesc)
@@ -50,9 +50,9 @@ TYPE
 
 	UpdateTask = POINTER TO UpdateTaskDesc;
 	UpdateTaskDesc = RECORD (Oberon.TaskDesc)
-		nexttime: LONGINT;
+		nexttime: SIGNED32;
 		t: Texts.Text;
-		pos: LONGINT;
+		pos: SIGNED32;
 		D: Documents.Document;
 		l: vyLinks.Link
 	END;
@@ -61,7 +61,7 @@ CONST
 	classBoolean* = "Boolean";  classInteger* = "Integer";  classReal* = "Real";  classString* = "String";  classUnknown* = "Unknown";
 
 VAR
-	obj-: tObject;  antsObjects: vyLinks.Link;  currobj: Objects.Object;  currcount: LONGINT;
+	obj-: tObject;  antsObjects: vyLinks.Link;  currobj: Objects.Object;  currcount: SIGNED32;
 	currName: ARRAY 64 OF ARRAY 32 OF CHAR;
 	(* gen-: vyRanBase.tRandom; *)
 	linklist*, curlinklist: tlinkList;  found: BOOLEAN;
@@ -121,7 +121,7 @@ VAR
 
 	PROCEDURE HandleLinkMsg( l: vyLinks.Link;  name: ARRAY OF CHAR;  VAR M: Objects.LinkMsg );
 	VAR lname: ARRAY 256 OF CHAR;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		IF M.id = Objects.enum THEN
 			i := 1;
@@ -249,7 +249,7 @@ VAR
 	PROCEDURE SetAttribute*;
 	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  obj1: Objects.Object;
 		attribute, name, class: ARRAY 32 OF CHAR;
-		model: Objects.Object;  num: LONGINT;  real: LONGREAL;
+		model: Objects.Object;  num: SIGNED32;  real: LONGREAL;
 		string: ARRAY 256 OF CHAR;
 	BEGIN
 		l := antsCommands.ScanFromPar( "[obj=OBJ | obj=NAME] attr=NAME val=(INT|REAL|STR) ~#use obj=LAYER or obj=PICTURE for last opened graphics" );
@@ -297,7 +297,7 @@ VAR
 
 	PROCEDURE EnumInsertGadget( CONST A: ARRAY OF CHAR );
 	VAR class: ARRAY 32 OF CHAR;
-		model: Objects.Object;  i: LONGINT;
+		model: Objects.Object;  i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO currcount - 1 DO
 			IF A = currName[i] THEN RETURN END
@@ -461,7 +461,7 @@ END SetGen;
 	PROCEDURE WriteObject( VAR w: Texts.Writer;  o: Objects.Object );
 	VAR obj, TF, model: Objects.Object;
 		name, gen, timestamp: ARRAY 64 OF CHAR;
-		id: LONGINT;
+		id: SIGNED32;
 		class: ARRAY 64 OF CHAR;
 		t: Types.Type;
 	BEGIN
@@ -490,7 +490,7 @@ END SetGen;
 	END WriteObject;
 
 	PROCEDURE UpdateT( t: Oberon.Task );
-	VAR time: LONGINT;  f: Display.Frame;  orighandle: Objects.Handler;  msg: Display.FrameMsg;  l: vyLinks.Link;  w: Texts.Writer;
+	VAR time: SIGNED32;  f: Display.Frame;  orighandle: Objects.Handler;  msg: Display.FrameMsg;  l: vyLinks.Link;  w: Texts.Writer;
 
 	BEGIN
 		WITH t: UpdateTask DO

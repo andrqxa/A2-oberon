@@ -17,8 +17,8 @@ CONST
 
 TYPE
 	ContextMenuData = OBJECT
-	VAR val: LONGINT;
-		PROCEDURE &New*(val: LONGINT);
+	VAR val: SIGNED32;
+		PROCEDURE &New*(val: SIGNED32);
 		BEGIN
 			SELF.val := val;
 		END New;
@@ -36,7 +36,7 @@ TYPE
 		BEGIN
 			(* default values *)
 			lineColor := 0000000FFH;
-			rectColor := LONGINT(0FFFFFFFFH);
+			rectColor := SIGNED32(0FFFFFFFFH);
 			rectColor2 := 000FFFFH;
 			lineWidth := 0.0;
 			gradientHorizontal := TRUE;
@@ -104,7 +104,7 @@ TYPE
 		VAR name : Strings.String;
 			cont: XMLObjects.Enumerator;
 			ptr: ANY;
-			tempInt : LONGINT; res: WORD;
+			tempInt : SIGNED32; res: WORD;
 			tempReal : LONGREAL;
 		BEGIN
 			cont := elem.GetContents(); cont.Reset();
@@ -432,7 +432,7 @@ TYPE
 		PROCEDURE SetValueHandler(sender, data: ANY);
 		VAR
 			colorString, origString : ARRAY 128 OF CHAR;
-			color : LONGINT; res: WORD;
+			color : SIGNED32; res: WORD;
 			width: LONGREAL;
 			bool: BOOLEAN;
 

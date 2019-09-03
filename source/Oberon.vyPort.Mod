@@ -195,7 +195,7 @@ VAR
 		IF w <= 0 THEN w := 1 END;
 		IF h <= 0 THEN h := 1 END;
 
-		IF (w > 1 / MAX( LONGINT )) & (h > 1 / MAX( LONGINT )) THEN
+		IF (w > 1 / MAX( SIGNED32 )) & (h > 1 / MAX( SIGNED32 )) THEN
 			cont := vyDisplay2d.NewC2d( x, y, w, h );
 			IF (p.gcontext = NIL ) OR (vyPortability.TypeOf( p.gcontext ) = vyPortability.TypeOf( cont )) THEN
 				IF (p.gcontext # NIL ) THEN vyBase.UnSubscribe( p.gcontext, p ) END;
@@ -336,7 +336,7 @@ END AdjustPict;
 	END FrameHandleAttributes;
 
 	PROCEDURE FrameHandler*( obj: Objects.Object;  VAR msg: Objects.ObjMsg );
-	VAR f: Display.Frame;  count: SIGNED16;  rows, cols: LONGINT;  tr, tc: SIGNED16;  x, y, w, h: SIGNED16;
+	VAR f: Display.Frame;  count: SIGNED16;  rows, cols: SIGNED32;  tr, tc: SIGNED16;  x, y, w, h: SIGNED16;
 
 		PROCEDURE FrameDrawRect( PRINT: BOOLEAN );   (*! move to HostDisplay *)
 		(*! implement and call in a reliable way
@@ -1791,7 +1791,7 @@ END LayerHandleAttributes;*)
 	END Bind;
 
 	PROCEDURE LayerHandler*( o: Objects.Object;  VAR M: Objects.ObjMsg );
-	VAR obj0: tLayer;  obsub: Objects.Object;  minX, minY, maxX, maxY, dy: Real;  nansX, nansY: LONGINT;  vx, vy: vyBase.tVector;
+	VAR obj0: tLayer;  obsub: Objects.Object;  minX, minY, maxX, maxY, dy: Real;  nansX, nansY: SIGNED32;  vx, vy: vyBase.tVector;
 		pmsg: Gadgets.PriorityMsg;  p: Picture;
 
 	BEGIN  (*vyHostTexts.Msg(' Enter LayerHandler');*)
@@ -1947,7 +1947,7 @@ END LayerHandleAttributes;*)
 	END NewP;
 
 	PROCEDURE InsertNewVecPicture*( vx, vy: vyBase.tVector ): Picture;
-	VAR minX, minY, maxX, maxY: Real;  nansX, nansY: LONGINT;
+	VAR minX, minY, maxX, maxY: Real;  nansX, nansY: SIGNED32;
 	BEGIN
 		IF vx = NIL THEN minX := 0;  maxX := 1;  nansX := 0 ELSE vyTypes.VGetMinMax( vx, minX, maxX, nansX ) END;
 		IF vy = NIL THEN minY := 0;  maxY := 1;  nansY := 0 ELSE vyTypes.VGetMinMax( vy, minY, maxY, nansY ) END;

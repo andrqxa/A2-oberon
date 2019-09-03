@@ -52,10 +52,10 @@ PROCEDURE Decode*(R: Streams.Reader; W:Streams.Writer);
 
 	PROCEDURE Encode*(R:Streams.Reader; W:Streams.Writer);
 		VAR
-			i, j, c, c0, c1, c2, l: LONGINT;
+			i, j, c, c0, c1, c2, l: SIGNED32;
 			chars: ARRAY 3 OF CHAR;
 
-		PROCEDURE OutCode(k:LONGINT);
+		PROCEDURE OutCode(k:SIGNED32);
 		BEGIN
 			IF l > 80 THEN	W.Ln; l := 0	END;
 

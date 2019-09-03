@@ -320,7 +320,7 @@ CONST
 	tiny = 1.0E-20;
 VAR
 	ulim, u, r, q, fu, dum: LONGREAL;
-	count: LONGINT;
+	count: SIGNED32;
 BEGIN
 	fa := func(ax);  IF rcheck THEN RETURN END;
 	fb := func(bx);  IF rcheck THEN RETURN END;
@@ -403,17 +403,17 @@ BEGIN
 END MnBrak;
 
 
-(* PROCEDURE GetVectorAttr (P: Vector;VAR n: LONGINT; VAR p: PtrToReals);
+(* PROCEDURE GetVectorAttr (P: Vector;VAR n: SIGNED32; VAR p: PtrToReals);
 BEGIN
 p := P; n := LEN(P^);
 END GetVectorAttr;
 
-PROCEDURE GetMatrixAttr (P: Matrix; VAR n,m: LONGINT; VAR p:PtrToLines );
+PROCEDURE GetMatrixAttr (P: Matrix; VAR n,m: SIGNED32; VAR p:PtrToLines );
 BEGIN
 p := P; n := LEN(P^); m:= LEN(P[0]);
 END GetMatrixAttr;
 
-PROCEDURE CreateVector ( n: LONGINT; VAR P: Vector; VAR p: PtrToReals);
+PROCEDURE CreateVector ( n: SIGNED32; VAR P: Vector; VAR p: PtrToReals);
 BEGIN
 NEW(P,n); p := P;
 END CreateVector; *)(* for n dimension *)
@@ -421,7 +421,7 @@ END CreateVector; *)(* for n dimension *)
 PROCEDURE F1Dim* (x: LONGREAL;   VAR  LinMinPCom,
 LinMinXCom: ARRAY OF LONGREAL ;   fnc: VectorFunction): LONGREAL;
 VAR
-	j, linMinNCom: LONGINT;
+	j, linMinNCom: SIGNED32;
 	(* Define the global variables. *)
 	f1dim: LONGREAL;
 BEGIN
@@ -457,7 +457,7 @@ PROCEDURE LinMin* (VAR P, XI: ARRAY OF LONGREAL;   VAR fret: LONGREAL;   vf: Vec
 CONST
 	tol = 1.0E-4;   (* tol is passed to Brent. *)
 VAR
-	j, n, nXI: LONGINT;
+	j, n, nXI: SIGNED32;
 	xx, xmin, fx, fb, fa, bx, ax: LONGREAL;   t1, t2: LONGREAL;
 	(* p, xi: PtrToReals;*)
 BEGIN
@@ -502,13 +502,13 @@ END LinMin;
 PROCEDURE Powell* (	VAR	P: 		ARRAY OF LONGREAL;
 VAR  XI: 	ARRAY OF ARRAY OF LONGREAL ;
 ftol: LONGREAL;
-VAR iter: LONGINT;
+VAR iter: SIGNED32;
 VAR fret: LONGREAL;
 fncP: VectorFunction;  range: LONGREAL);
 CONST
 	itmax = 200;   (* Maximum allowed iterations. *)
 VAR
-	j, ibig, i, n : LONGINT;
+	j, ibig, i, n : SIGNED32;
 	t, fptt, fp, del: LONGREAL;
 	(* p, pt, ptt, xit: PtrToReals;  *)
 	(* xi: PtrToLines; *)
@@ -569,7 +569,7 @@ END Powell;
 
 PROCEDURE EasyMinimize* (VAR P: ARRAY OF LONGREAL;  VAR fret: LONGREAL;  ftol: LONGREAL;   fncP: VectorFunction;  init: BOOLEAN);
 CONST range = 100000;
-	VAR n: LONGINT;  iter: LONGINT;  i, j: LONGINT;   tol: LONGREAL;
+	VAR n: SIGNED32;  iter: SIGNED32;  i, j: SIGNED32;   tol: LONGREAL;
 BEGIN
 	n := LEN(P);
 	IF (tempXI = NIL) OR (LEN(tempXI^) # n)
@@ -597,7 +597,7 @@ END EasyMinimize;
 
 
 PROCEDURE mfncP ( VAR P: ARRAY OF LONGREAL): LONGREAL;
-	VAR ret: LONGREAL; i: LONGINT;
+	VAR ret: LONGREAL; i: SIGNED32;
 BEGIN
 	ret := 1;
 	FOR i := 0 TO LEN(P) - 1 DO
@@ -608,7 +608,7 @@ END mfncP;
 
 (*
 PROCEDURE Test*;
-	VAR P: ARRAY 10 OF LONGREAL;  f: LONGREAL;  i: LONGINT;
+	VAR P: ARRAY 10 OF LONGREAL;  f: LONGREAL;  i: SIGNED32;
 BEGIN
 	EasyMinimize(P, f, 0.00001, mfncP, TRUE);
 	vyOut.LongReal(f, 10);

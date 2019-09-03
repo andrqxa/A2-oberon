@@ -38,7 +38,7 @@ TYPE
 		name*: ARRAY 128 OF CHAR;	(** Document name. *)
 		Load*: PROCEDURE (D: Document);	(** Load document contents from disk. *)
 		Store*: PROCEDURE (D: Document);	(** Store document contents to disk. *)
-		time: LONGINT
+		time: SIGNED32
 	END;
 
 	(** Find out what document is located at X, Y on the display. *)
@@ -67,7 +67,7 @@ VAR
 *)
 
 PROCEDURE LoadAttachments*(VAR R: Files.Rider; VAR attr: Attributes.Attr; VAR link: Links.Link);
-VAR len: LONGINT; F: Files.File; ch: CHAR; lib: Objects.Library;
+VAR len: SIGNED32; F: Files.File; ch: CHAR; lib: Objects.Library;
 BEGIN
 	F := Files.Base(R);
 	Files.Read(R, ch); ASSERT(ch = 08X);
@@ -81,7 +81,7 @@ BEGIN
 END LoadAttachments;
 
 PROCEDURE StoreAttachments*(VAR R: Files.Rider; attr: Attributes.Attr; link: Links.Link);
-VAR r: Files.Rider; F: Files.File; patch, len: LONGINT; lib: Objects.Library; M: Objects.BindMsg;
+VAR r: Files.Rider; F: Files.File; patch, len: SIGNED32; lib: Objects.Library; M: Objects.BindMsg;
 BEGIN
 	F := Files.Base(R);
 
@@ -102,7 +102,7 @@ END StoreAttachments;
 (* How to skip attachments:
 
 	PROCEDURE SkipAttachments(VAR R: Files.Rider);
-	VAR F: Files.File; len: LONGINT;
+	VAR F: Files.File; len: SIGNED32;
 	BEGIN
 		F := Files.Base(R);
 		Files.Read(R, ch); ASSERT(ch = 08X);

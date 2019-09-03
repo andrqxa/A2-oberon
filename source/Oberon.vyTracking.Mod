@@ -297,7 +297,7 @@ BEGIN
 END Deselecte;
 
 PROCEDURE Select (VAR ls: List);
-	VAR xm, ym: SIGNED16;  orgkeys, keys: SET;  stoptime: LONGINT;
+	VAR xm, ym: SIGNED16;  orgkeys, keys: SET;  stoptime: SIGNED32;
 BEGIN
 	stoptime := Oberon.Time() + listMaxIdleTime * Input.TimeUnit;   (* stop track mouse after idle *)
 
@@ -490,7 +490,7 @@ END helpEnd;
 
 PROCEDURE trackMouseCont (VAR keys: SET;  VAR x, y:  SIGNED16;  marker: Oberon.Marker);
 	(* for consistency with ANTS functionality, should be safe procedure for mouse handling*)
-	VAR k: SET;   stoptime: LONGINT;
+	VAR k: SET;   stoptime: SIGNED32;
 BEGIN
 	stoptime := Oberon.Time() + maxIdleTime * Input.TimeUnit;   (* stop track mouse after idle *)
 	Input.Mouse(k, x, y);

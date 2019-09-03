@@ -406,7 +406,7 @@ END NewColumn;
 
 PROCEDURE LoadDocument(D: Documents.Document);
 VAR obj: Objects.Object; main: Gadgets.Frame; talon, stack: Cards.Stack; c: Cards.Card;
-	F: Files.File; R: Files.Rider; name: ARRAY 64 OF CHAR; ch: CHAR; len: LONGINT;
+	F: Files.File; R: Files.Rider; name: ARRAY 64 OF CHAR; ch: CHAR; len: SIGNED32;
 	lib: Objects.Library; tag, i, k, Y: SIGNED16; A: Objects.AttrMsg; C: Display.ConsumeMsg;
 BEGIN
 	main:= NIL;
@@ -467,7 +467,7 @@ BEGIN
 END LoadDocument;
 
 PROCEDURE StoreDocument(D: Documents.Document);
-VAR F: Files.File; len: LONGINT; R: Files.Rider; B: Objects.BindMsg; obj: Objects.Object;
+VAR F: Files.File; len: SIGNED32; R: Files.Rider; B: Objects.BindMsg; obj: Objects.Object;
 BEGIN
 	IF D.name # "" THEN
 		obj:= D.dsc;

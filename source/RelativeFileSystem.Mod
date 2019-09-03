@@ -58,7 +58,7 @@ TYPE PathName=ARRAY 272 OF CHAR;
 			MakeRel(name,new); fs.CreateDirectory0(new,res);
 		END CreateDirectory0;
 
-		PROCEDURE Delete0* (CONST name: ARRAY OF CHAR;     VAR key: LONGINT; VAR res: WORD);
+		PROCEDURE Delete0* (CONST name: ARRAY OF CHAR;     VAR key: SIGNED32; VAR res: WORD);
 		VAR new: PathName;
 		BEGIN
 			MakeRel(name,new); fs.Delete0(new,key,res);
@@ -71,7 +71,7 @@ TYPE PathName=ARRAY 272 OF CHAR;
 			fs.Enumerate0(new,flags,enum);
 		END Enumerate0;
 
-		PROCEDURE FileKey* (CONST name: ARRAY OF CHAR): LONGINT;
+		PROCEDURE FileKey* (CONST name: ARRAY OF CHAR): SIGNED32;
 		VAR new: PathName;
 		BEGIN
 			(*Out.String("FileKey, called with:"); Out.String(name); Out.Ln; *)
@@ -80,7 +80,7 @@ TYPE PathName=ARRAY 272 OF CHAR;
 			RETURN fs.FileKey(new);
 		END FileKey;
 
-		PROCEDURE RemoveDirectory0* (CONST name: ARRAY OF CHAR;     force: BOOLEAN;     VAR key: LONGINT; VAR res: WORD);
+		PROCEDURE RemoveDirectory0* (CONST name: ARRAY OF CHAR;     force: BOOLEAN;     VAR key: SIGNED32; VAR res: WORD);
 		VAR new: PathName;
 		BEGIN
 			MakeRel(name,new);  fs.RemoveDirectory0(new,force,key,res);

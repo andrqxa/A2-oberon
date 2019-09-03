@@ -40,12 +40,12 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Unix.exit (status);
 END Exit;
 
-PROCEDURE Clock- (): LONGINT;
+PROCEDURE Clock- (): SIGNED32;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
-	RETURN LONGINT ((Timer.GetCounter () - clock) / milliseconds);
+	RETURN SIGNED32 ((Timer.GetCounter () - clock) / milliseconds);
 END Clock;
 
-PROCEDURE Sleep- (milliseconds: LONGINT);
+PROCEDURE Sleep- (milliseconds: SIGNED32);
 VAR nextActivity: Activities.Activity;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	INC (milliseconds, Clock ());
@@ -102,7 +102,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Unix.free (address);
 END Deallocate;
 
-PROCEDURE GetInit- (n: SIZE; VAR val: LONGINT);
+PROCEDURE GetInit- (n: SIZE; VAR val: SIGNED32);
 BEGIN val := 0;
 END GetInit;
 
@@ -121,7 +121,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	SYSTEM.SetActivity(SYSTEM.VAL(Activities.Activity,Unix.ReadKey (activity)));
 END RestoreActivity;
 
-PROCEDURE TrapHandler ( sig: LONGINT; mc: Unix.Mcontext );
+PROCEDURE TrapHandler ( sig: SIGNED32; mc: Unix.Mcontext );
 PROCEDURE Trap EXTERN "Runtime.Trap" (number: SIZE);
 BEGIN
 	RestoreActivity;

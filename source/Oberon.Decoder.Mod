@@ -74,21 +74,21 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	TYPE
 		ProcEntry* = RECORD
 			name*: ARRAY 64 OF CHAR;
-			point*: LONGINT
+			point*: SIGNED32
 		END;
 		ProcArray* = POINTER TO ARRAY OF ProcEntry;
-		EntryArray = POINTER TO ARRAY OF LONGINT;
-		DecodeHandler* = PROCEDURE(VAR pc: LONGINT; VAR r: Files.Rider; VAR w: Texts.Writer);
-		HeaderCallback* = PROCEDURE(VAR dataSize, constSize, codeSize: LONGINT);
+		EntryArray = POINTER TO ARRAY OF SIGNED32;
+		DecodeHandler* = PROCEDURE(VAR pc: SIGNED32; VAR r: Files.Rider; VAR w: Texts.Writer);
+		HeaderCallback* = PROCEDURE(VAR dataSize, constSize, codeSize: SIGNED32);
 
 	VAR
 		R: Files.Rider; (* Rider for Object file *)
 		W: Texts.Writer; (* Writer for output on screen *)
-		pc, breakpos: LONGINT; column: SIGNED16; (* cursor position in the current line *)
+		pc, breakpos: SIGNED32; column: SIGNED16; (* cursor position in the current line *)
 		prefix, w: SIGNED16; adrPrefix, opPrefix: BOOLEAN;
 		defaultFont, titleFont: Fonts.Font;
 		PE*: ProcArray;
-		nofPE*: LONGINT;
+		nofPE*: SIGNED32;
 		memory, compilable, raw, suppressOut, suppressH, noOutput: BOOLEAN;
 		ReadAdr: ADDRESS;
 		target: SET;
@@ -96,7 +96,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		OpPos, RMPos: SIGNED8;
 		decoder: DecodeHandler;
 		headerCallback: HeaderCallback;
-		addressFactor: LONGINT;
+		addressFactor: SIGNED32;
 
 (* general Procedures *)
 
@@ -123,14 +123,14 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		b:= ORD(ch)
 	END GetByte;
 
-	PROCEDURE GetWord (VAR w: LONGINT);
+	PROCEDURE GetWord (VAR w: SIGNED32);
 		VAR ch: CHAR;
 	BEGIN
 		Next(ch); w:= ORD(ch);
 		Next(ch);  w:= LONG(ORD(ch)) * 100H + w
 	END GetWord;
 
-	PROCEDURE GetDWord (VAR dw: LONGINT);
+	PROCEDURE GetDWord (VAR dw: SIGNED32);
 		VAR ch: CHAR; byte: SIGNED16;
 	BEGIN
 		Next(ch); dw:= LONG(ORD(ch));
@@ -141,8 +141,8 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		dw:= LONG(byte) * 1000000H + dw
 	END GetDWord;
 
-	PROCEDURE GetNum (VAR x: LONGINT);
-		VAR ch: CHAR; n: SIGNED16; y: LONGINT;
+	PROCEDURE GetNum (VAR x: SIGNED32);
+		VAR ch: CHAR; n: SIGNED16; y: SIGNED32;
 	BEGIN n := 0; y := 0; Next (ch);
 		WHILE ch >= 80X DO INC(y, LSH(LONG(ORD(ch)) - 128, n)); INC(n, 7); Next (ch) END;
 		x := ASH(LSH(LONG(ORD(ch)), 25), n-25) + y
@@ -164,7 +164,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		IF ~suppressOut THEN	Texts.Write(W, ch); INC(column)	END
 	END Write;
 
-	PROCEDURE WriteInt (x: LONGINT);
+	PROCEDURE WriteInt (x: SIGNED32);
 	BEGIN
 		IF ~suppressOut THEN	Texts.WriteInt(W, x, 10); INC(column, 10)	END
 	END WriteInt;
@@ -184,21 +184,21 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		IF (~suppressH) & (column >= OpPos) THEN Write("H") END
 	END WriteByte;
 
-	PROCEDURE WriteWord (word: LONGINT);
+	PROCEDURE WriteWord (word: SIGNED32);
 	(* write word in byte form, little endian notation *)
 	BEGIN
 		WriteByte(SHORT(word MOD 100H)); Write(" ");
 		WriteByte(SHORT(word DIV 100H) MOD 100H)
 	END WriteWord;
 
-	PROCEDURE WriteDWord (dword: LONGINT);
+	PROCEDURE WriteDWord (dword: SIGNED32);
 	(* write dword in byte form, little endian notation *)
 	BEGIN
 		WriteWord(dword MOD 10000H); Write(" ");
 		WriteWord((dword DIV 10000H) MOD 10000H)
 	END WriteDWord;
 
-	PROCEDURE WriteWHex (word: LONGINT);
+	PROCEDURE WriteWHex (word: SIGNED32);
 	(* write word hexadecimal *)
 		VAR b: BOOLEAN;
 	BEGIN
@@ -208,7 +208,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		suppressH := b;
 	END WriteWHex;
 
-	PROCEDURE WriteDWHex (dword: LONGINT);
+	PROCEDURE WriteDWHex (dword: SIGNED32);
 		VAR b: BOOLEAN;
 	BEGIN
 		b := suppressH; suppressH := TRUE;
@@ -217,11 +217,11 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		suppressH := b;
 	END WriteDWHex;
 
-	PROCEDURE WriteDisp (disp: LONGINT);
+	PROCEDURE WriteDisp (disp: SIGNED32);
 	BEGIN
 		IF ~suppressOut THEN
 			Texts.WriteInt(W, disp, 1);
-			IF disp = MIN(LONGINT) THEN INC(column, 12)	(* " -2147483648" *)
+			IF disp = MIN(SIGNED32) THEN INC(column, 12)	(* " -2147483648" *)
 			ELSE
 				IF disp <= 0 THEN INC(column) END;
 				disp:= ABS(disp);
@@ -354,7 +354,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		END
 	END WriteRegReg;
 
-	PROCEDURE WriteMem (base, inx, scale: SIGNED16; disp: LONGINT);
+	PROCEDURE WriteMem (base, inx, scale: SIGNED16; disp: SIGNED32);
 	BEGIN
 		WritePrefix(prefix);
 		IF base # none THEN(* register relative *)
@@ -374,7 +374,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		Write("]")
 	END WriteMem;
 
-	PROCEDURE WriteMem1 (d, reg, base: SIGNED16; disp: LONGINT);
+	PROCEDURE WriteMem1 (d, reg, base: SIGNED16; disp: SIGNED32);
 	(* d = TRUE: reg, mem ; d = FALSE: mem, reg *)
 	BEGIN
 		IF d = 1 THEN
@@ -386,7 +386,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		END
 	END WriteMem1;
 
-	PROCEDURE WriteMem2 (d, reg, base, inx: SIGNED16; scale: SIGNED8; disp: LONGINT);
+	PROCEDURE WriteMem2 (d, reg, base, inx: SIGNED16; scale: SIGNED8; disp: SIGNED32);
 	(* d = TRUE: reg, mem; d= FALSE: mem, reg *)
 	BEGIN
 		IF d = 1 THEN
@@ -398,13 +398,13 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		END
 	END WriteMem2;
 
-	PROCEDURE WriteRegImm (reg: SIGNED16; imm: LONGINT; hex: BOOLEAN);
+	PROCEDURE WriteRegImm (reg: SIGNED16; imm: SIGNED32; hex: BOOLEAN);
 	BEGIN
 		WriteReg(reg); Write(",");
 		IF hex THEN WriteDWHex(imm) ELSE WriteDisp(imm) END
 	END WriteRegImm;
 
-	PROCEDURE WriteMemImm (reg, base, inx: SIGNED16; scale: SIGNED8; disp, imm: LONGINT; hex: BOOLEAN);
+	PROCEDURE WriteMemImm (reg, base, inx: SIGNED16; scale: SIGNED8; disp, imm: SIGNED32; hex: BOOLEAN);
 	BEGIN
 		WritePrefix(prefix);
 		WriteMem(base, inx, scale, disp);
@@ -412,7 +412,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		IF hex THEN WriteDWHex(imm) ELSE WriteDisp(imm) END
 	END WriteMemImm;
 
-	PROCEDURE WriteRM (mode: SIGNED8; d, reg, base, inx, scale: SIGNED16; disp, imm: LONGINT; hex: BOOLEAN);
+	PROCEDURE WriteRM (mode: SIGNED8; d, reg, base, inx, scale: SIGNED16; disp, imm: SIGNED32; hex: BOOLEAN);
 	BEGIN
 		CASE mode OF
 			RegImm:
@@ -439,7 +439,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 (* Decode part *)
 
-	PROCEDURE GetImm (w: SIGNED16; VAR imm: LONGINT);
+	PROCEDURE GetImm (w: SIGNED16; VAR imm: SIGNED32);
 		VAR byte: SIGNED16;
 	BEGIN
 		IF w = 0 THEN (* 8 bit *)
@@ -454,7 +454,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		END
 	END GetImm;
 
-	PROCEDURE ModRm (VAR mode: SIGNED8; VAR reg, base, inx: SIGNED16; VAR scale: SIGNED8; VAR disp: LONGINT);
+	PROCEDURE ModRm (VAR mode: SIGNED8; VAR reg, base, inx: SIGNED16; VAR scale: SIGNED8; VAR disp: SIGNED32);
 		VAR mod, byte: SIGNED16;
 	BEGIN
 		GetByte(byte); WriteByte(byte); Write(" ");
@@ -491,7 +491,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END ModRm;
 
 	PROCEDURE Type1 (op: SIGNED16; VAR mode: SIGNED8; VAR d, reg, base, inx: SIGNED16;
-								VAR scale: SIGNED8; VAR disp, imm: LONGINT);
+								VAR scale: SIGNED8; VAR disp, imm: SIGNED32);
 	(* type 1: add, or, adc, sbb, and, sub, xor, cmp *)
 	BEGIN
 		IF op = 4 THEN
@@ -511,7 +511,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Type1;
 
 	PROCEDURE Add (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		Type1(op, mode, d, reg, base, inx, scale, disp, imm);
 		WriteOp("ADD");
@@ -519,7 +519,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Add;
 
 	PROCEDURE Push (op: SIGNED16);
-		VAR imm: LONGINT;
+		VAR imm: SIGNED32;
 	BEGIN
 		w:= 1;
 		IF op = 60H THEN
@@ -553,7 +553,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Push2;
 
 	PROCEDURE Pop(op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		IF op = 61H THEN
 			IF opPrefix THEN WriteOp("POPA") ELSE WriteOp("POPAD") END;
@@ -583,7 +583,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Pop2;
 
 	PROCEDURE Or (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		Type1(op - 08H, mode, d, reg, base, inx, scale, disp, imm);
 		WriteOp("OR");
@@ -591,7 +591,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Or;
 
 	PROCEDURE Adc (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		Type1(op -10H, mode, d, reg, base, inx, scale, disp, imm);
 		WriteOp("ADC");
@@ -599,7 +599,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Adc;
 
 	PROCEDURE Sbb (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		Type1(op - 18H, mode, d, reg, base, inx, scale, disp, imm);
 		WriteOp("SBB");
@@ -607,7 +607,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Sbb;
 
 	PROCEDURE  And (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		Type1(op - 20H, mode, d, reg, base, inx, scale, disp, imm);
 		WriteOp("AND");
@@ -615,7 +615,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END And;
 
 	PROCEDURE Sub (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		Type1(op - 28H, mode, d, reg, base, inx, scale, disp, imm);
 		WriteOp("SUB");
@@ -623,7 +623,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Sub;
 
 	PROCEDURE Xor (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		Type1(op - 30H, mode, d, reg, base, inx, scale, disp, imm);
 		WriteOp("XOR");
@@ -631,7 +631,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Xor;
 
 	PROCEDURE Cmp (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		Type1(op - 38H, mode, d, reg, base, inx, scale, disp, imm);
 		WriteOp("CMP");
@@ -651,7 +651,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Dec;
 
 	PROCEDURE Bound (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		w:= 1;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -660,7 +660,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Bound;
 
 	PROCEDURE Imul (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		w:= 1;
@@ -673,7 +673,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Imul;
 
 	PROCEDURE Imul2 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		w:= 1;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -725,7 +725,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Jcc;
 
 	PROCEDURE Jcc2 (op: SIGNED16);
-		VAR disp: LONGINT;
+		VAR disp: SIGNED32;
 	BEGIN
 		IF adrPrefix THEN
 			GetWord(disp); WriteWord(disp)
@@ -755,7 +755,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Jcc2;
 
 	PROCEDURE Test (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		IF (op = 0A8H) OR (op = 0A9H) THEN
 			IF op = 0A8H THEN
@@ -776,7 +776,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Test;
 
 	PROCEDURE Xchg (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		IF (op >= 91H) & (op <= 97H) THEN (* xchg .ax, reg *)
 			w:= 1; reg:= AX; base:= op MOD 8;
@@ -792,7 +792,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Xchg;
 
 	PROCEDURE Mov (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		IF (op >= 88H) & (op <= 8BH) THEN
 			Type1(op - 88H, mode, d, reg, base, inx, scale, disp, imm)
@@ -838,7 +838,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Mov;
 
 	PROCEDURE Mov2 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN (* reg, base only used, because Mov2 op codes contains special registers (debug/test/controll) *)
 		ModRm(mode, reg, base, inx, scale, disp);
 		WriteOp("MOV"); w := 1;
@@ -854,7 +854,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Mov2;
 
 	PROCEDURE Movx(op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT; byte: BOOLEAN;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32; byte: BOOLEAN;
 	BEGIN
 		byte := (op = 0B6H) OR (op = 0BEH);
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -880,7 +880,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Movx;
 
 	PROCEDURE Lea (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		w:= 1;
@@ -889,7 +889,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Lea;
 
 	PROCEDURE Call (op: SIGNED16);
-		VAR imm, sel: LONGINT;
+		VAR imm, sel: SIGNED32;
 	BEGIN
 		IF op = 0E8H THEN
 			IF adrPrefix THEN
@@ -958,7 +958,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Scas;
 
 	PROCEDURE Ret (op: SIGNED16);
-		VAR imm: LONGINT;
+		VAR imm: SIGNED32;
 	BEGIN
 		IF (op = 0C2H) OR (op = 0CAH) THEN
 			GetWord(imm); WriteWord(imm)
@@ -970,7 +970,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Ret;
 
 	PROCEDURE Enter (op: SIGNED16);
-		VAR l: LONGINT; b: SIGNED16;
+		VAR l: SIGNED32; b: SIGNED16;
 	BEGIN
 		GetWord(l); WriteWord(l); Write(" ");
 		GetByte(b); WriteByte(b); Write(" ");
@@ -979,7 +979,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Enter;
 
 	PROCEDURE Les (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		WriteOp("LES");
@@ -987,7 +987,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Les;
 
 	PROCEDURE Lds (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		WriteOp("LDS");
@@ -995,7 +995,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Lds;
 
 	PROCEDURE Ldseg (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		IF op = 0B2H THEN WriteOp("LSS")
@@ -1017,7 +1017,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Int;
 
 	PROCEDURE Loop (op: SIGNED16);
-		VAR imm: LONGINT;
+		VAR imm: SIGNED32;
 	BEGIN
 		GetImm(0, imm);
 		CASE op OF
@@ -1048,7 +1048,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END InOut;
 
 	PROCEDURE Jmp (op: SIGNED16);
-		VAR imm: LONGINT; byte: SIGNED16;
+		VAR imm: SIGNED32; byte: SIGNED16;
 	BEGIN
 		IF (op = 0E9H) OR (op = 0EAH) THEN
 			GetDWord(imm); WriteDWord(imm)
@@ -1066,7 +1066,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Jmp;
 
 	PROCEDURE Lar (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		WriteOp("LAR");
@@ -1074,7 +1074,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Lar;
 
 	PROCEDURE Lsl (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		WriteOp("LSL");
@@ -1082,7 +1082,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Lsl;
 
 	PROCEDURE Setcc (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		w:= 0; (* always 8 bit wide *)
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1111,7 +1111,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Setcc;
 
 	PROCEDURE Bit (op: SIGNED16);
-		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx, d: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		w:= 1;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1134,7 +1134,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Bit;
 
 	PROCEDURE Shift (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		IF (op = 0A4H) OR (op = 0ACH) THEN (* immediate byte *)
@@ -1161,7 +1161,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Bswap;
 
 	PROCEDURE Xadd (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		INCL(target, i486);
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1174,7 +1174,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Xadd;
 
 	PROCEDURE Cmpxchg (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		INCL(target, i486);
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1187,7 +1187,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Cmpxchg;
 
 	PROCEDURE Cmov (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		INCL(target, PPro);  w := 1;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1214,7 +1214,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Cmov;
 
 	PROCEDURE Grp1 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		IF op = 80H THEN (* byte *)
@@ -1245,7 +1245,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Grp1;
 
 	PROCEDURE Grp2 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		IF (op >= 0D0H) & (op <= 0D3H) THEN
@@ -1279,7 +1279,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Grp2;
 
 	PROCEDURE Grp3 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		ModRm(mode, reg, base, inx, scale, disp);
 		IF op = 0F6H THEN w:= 0
@@ -1305,7 +1305,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Grp3;
 
 	PROCEDURE Grp4 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		w:= 0;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1319,7 +1319,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Grp4;
 
 	PROCEDURE Grp5 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		w:= 1;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1338,7 +1338,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Grp5;
 
 	PROCEDURE Grp6 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		w := 1;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1357,7 +1357,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Grp6;
 
 	PROCEDURE Grp7 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		w := 1;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1377,7 +1377,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Grp7;
 
 	PROCEDURE Grp8 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp, imm: SIGNED32;
 	BEGIN
 		w:= 1;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1396,7 +1396,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END Grp8;
 
 	PROCEDURE Grp9 (op: SIGNED16);
-		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR reg, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		w:= 1;
 		ModRm(mode, reg, base, inx, scale, disp);
@@ -1488,7 +1488,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		END
 	END WriteFReg;
 
-	PROCEDURE WriteFloat (form: SIGNED8; base, inx: SIGNED16; scale: SIGNED8; disp: LONGINT);
+	PROCEDURE WriteFloat (form: SIGNED8; base, inx: SIGNED16; scale: SIGNED8; disp: SIGNED32);
 	BEGIN
 		(* not nice but necessary -> no more constant memory for case table *)
 		IF form = SReal THEN WriteString("SINGLE ")
@@ -1506,7 +1506,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 	PROCEDURE Float0 (op: SIGNED16);
 	(* op is 0D8H *)
-		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, stat, base, inx, scale, disp);
 		IF mode # Reg THEN (* memory *)
@@ -1540,7 +1540,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 	PROCEDURE Float1 (op: SIGNED16);
 	(* op is 0D9H *)
-		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, stat, base, inx, scale, disp);
 		IF mode # Reg THEN
@@ -1605,7 +1605,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 	PROCEDURE Float2 (op: SIGNED16);
 	(* op is 0DAH *)
-		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, stat, base, inx, scale, disp);
 		IF mode # Reg THEN
@@ -1628,7 +1628,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 	PROCEDURE Float3 (op: SIGNED16);
 	(* op is 0DBH *)
-		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, stat, base, inx, scale, disp);
 		IF mode # Reg THEN
@@ -1651,7 +1651,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 	PROCEDURE Float4 (op: SIGNED16);
 	(* op is 0DCH *)
-		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, stat, base, inx, scale, disp);
 		IF mode # Reg THEN
@@ -1683,7 +1683,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 	PROCEDURE Float5 (op: SIGNED16);
 	(* op is 0DDH *)
-		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, stat, base, inx, scale, disp);
 		IF mode # Reg THEN (* memory *)
@@ -1718,7 +1718,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 	PROCEDURE Float6(op: SIGNED16);
 	(* op is 0DEH *)
-		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, stat, base, inx, scale, disp);
 		IF mode # Reg THEN (* memory *)
@@ -1753,7 +1753,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 	PROCEDURE Float7(op: SIGNED16);
 	(* op is 0DFH *)
-		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: LONGINT;
+		VAR stat, base, inx: SIGNED16; scale, mode: SIGNED8; disp: SIGNED32;
 	BEGIN
 		ModRm(mode, stat, base, inx, scale, disp);
 		IF mode # Reg THEN (* memory *)
@@ -1794,7 +1794,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		END
 	END Prefix;
 
-	PROCEDURE IA32Decoder(VAR PC: LONGINT; VAR r: Files.Rider; VAR w: Texts.Writer); (* ignore params *)
+	PROCEDURE IA32Decoder(VAR PC: SIGNED32; VAR r: Files.Rider; VAR w: Texts.Writer); (* ignore params *)
 	VAR op: SIGNED16;
 	BEGIN
 			GetByte(op);
@@ -2025,16 +2025,16 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		END;
 	END Dump;
 
-	PROCEDURE Reference (size: LONGINT);
+	PROCEDURE Reference (size: SIGNED32);
 		VAR
-			offs, dim: LONGINT;
+			offs, dim: SIGNED32;
 			name: ARRAY 64 OF CHAR;
 			b, par, sl, lev: CHAR;
 			old: ProcArray;
 			i: SIZE;
 
 			PROCEDURE GetName(VAR name: ARRAY OF CHAR);
-				VAR i: LONGINT;
+				VAR i: SIGNED32;
 			BEGIN
 				i:= 0;
 				REPEAT
@@ -2058,7 +2058,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 				  | 3X: WriteString("CHAR  ")
 				  | 4X: WriteString("SIGNED8  ")
 				  | 5X: WriteString("SIGNED16  ")
-				  | 6X: WriteString("LONGINT  ")
+				  | 6X: WriteString("SIGNED32  ")
 				  | 7X: WriteString("REAL  ")
 				  | 8X: WriteString("LONGREAL  ")
 				  | 9X: WriteString("SET  ")
@@ -2126,12 +2126,12 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		VAR b: CHAR;
 	BEGIN
 		Next(b); Texts.SetFont(W, titleFont); WriteString(str);
-		IF memory THEN WriteDWHex(LONGINT(ReadAdr)-1) ELSE WriteDWHex(Files.Pos(R)-1) END;
+		IF memory THEN WriteDWHex(SIGNED32(ReadAdr)-1) ELSE WriteDWHex(Files.Pos(R)-1) END;
 		IF b = ch THEN WriteLn ELSE WriteString(" wrong sign! "); WriteByte(ORD(b)); WriteLn END;
 		Texts.SetFont(W, defaultFont)
 	END Check;
 
-	PROCEDURE DumpData(VAR a: ARRAY OF CHAR; len: LONGINT);
+	PROCEDURE DumpData(VAR a: ARRAY OF CHAR; len: SIGNED32);
 		VAR i: SIGNED16;
 	BEGIN
 		i := 0;
@@ -2142,9 +2142,9 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	END DumpData;
 
 	PROCEDURE ReadExport;
-		VAR count: LONGINT; name: ARRAY 64 OF CHAR;
-		PROCEDURE LoadScope (level: LONGINT);
-			VAR	adr, fp, off, i, len: LONGINT; exp: LONGINT; check: POINTER TO ARRAY OF LONGINT;
+		VAR count: SIGNED32; name: ARRAY 64 OF CHAR;
+		PROCEDURE LoadScope (level: SIGNED32);
+			VAR	adr, fp, off, i, len: SIGNED32; exp: SIGNED32; check: POINTER TO ARRAY OF SIGNED32;
 		BEGIN
 			GetDWord ( exp ); (*fof*)  WriteString(" cnt = ");  WriteDisp(exp);
 			GetNum ( fp);
@@ -2196,7 +2196,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		VAR  name: ARRAY 32 OF CHAR;
 
 		PROCEDURE GetString (VAR str: ARRAY OF CHAR);
-			VAR i: LONGINT;
+			VAR i: SIGNED32;
 		BEGIN
 		(*
 			i := 0;
@@ -2211,8 +2211,8 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		UNTIL str[i-1] = 0X;
 		END GetString;
 
-		PROCEDURE CheckUse (level: LONGINT);
-			VAR fp, link: LONGINT; tmpErr: BOOLEAN; name: ARRAY 32 OF CHAR;
+		PROCEDURE CheckUse (level: SIGNED32);
+			VAR fp, link: SIGNED32; tmpErr: BOOLEAN; name: ARRAY 32 OF CHAR;
 		BEGIN tmpErr := (level = -1);
 			Files.ReadNum (R, fp);
 			WHILE fp # 0 DO
@@ -2248,8 +2248,8 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		END
 	END ReadUse;
 
-	PROCEDURE WriteProc(pc: LONGINT);
-	VAR i: LONGINT;
+	PROCEDURE WriteProc(pc: SIGNED32);
+	VAR i: SIGNED32;
 	BEGIN
 		i := 0;  WHILE (i < nofPE) & (pc # PE[i].point) DO INC(i) END;
 		IF i # nofPE THEN WriteString(PE[i].name) END
@@ -2260,14 +2260,14 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 			f: Files.File;
 			byte, version, tag: SIGNED16;
 			word, dword, nofEntries, nofCmds, nofPtrs, nofImports,
-			nofVarConsLinks, nofLinks, conssize, codesize, exTableLen, nofTypes, refSize, i, j, ptrs, newMths: LONGINT;
-			symSize: LONGINT;
+			nofVarConsLinks, nofLinks, conssize, codesize, exTableLen, nofTypes, refSize, i, j, ptrs, newMths: SIGNED32;
+			symSize: SIGNED32;
 			name: ARRAY 32 OF CHAR;
 			ch: CHAR;
-			pos, filepos: LONGINT;
+			pos, filepos: SIGNED32;
 			data: ARRAY 16 OF CHAR;
 			entry: EntryArray;
-			noProcs,tmp,codeoffset,beginOffset,endOffset,nofptrs,p: LONGINT;   (* fof *)
+			noProcs,tmp,codeoffset,beginOffset,endOffset,nofptrs,p: SIGNED32;   (* fof *)
 	BEGIN
 		T := NIL; f := Files.Old(objName);
 		IF f # NIL THEN
@@ -2510,11 +2510,11 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	(* ------------------------------------------------------------------------------------ *)
 	(* Memory Module Dump *)
 (*
-	PROCEDURE DumpType (tdadr, codebase: LONGINT);
-		VAR tdbase, i, j: LONGINT; m: Modules.Module;
+	PROCEDURE DumpType (tdadr, codebase: SIGNED32);
+		VAR tdbase, i, j: SIGNED32; m: Modules.Module;
 
-		PROCEDURE DumpTypeName (tdadr: LONGINT);
-			VAR tdbase, i: LONGINT; ch: CHAR;
+		PROCEDURE DumpTypeName (tdadr: SIGNED32);
+			VAR tdbase, i: SIGNED32; ch: CHAR;
 		BEGIN
 			IF tdadr # 0 THEN
 				SYSTEM.GET (tdadr-4, tdbase);
@@ -2580,8 +2580,8 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 
 (*
 	PROCEDURE DecodeModule* (objName : ARRAY OF CHAR; VAR T : Texts.Text);
-		VAR i, j, pos: LONGINT; mod: Modules.Module;
-			codesize, refsize, datasize, constsize: LONGINT;
+		VAR i, j, pos: SIGNED32; mod: Modules.Module;
+			codesize, refsize, datasize, constsize: SIGNED32;
 			data: ARRAY 16 OF CHAR;
 	BEGIN
 		mod := Modules.ThisMod (objName);
@@ -2589,7 +2589,7 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 		NEW(T); Texts.Open(T, "");
 		Texts.SetFont(W, titleFont); WriteString ("Module Dump"); WriteLn; Texts.SetFont(W, defaultFont);
 		suppressH := TRUE;
-		WriteString ("  mdesc:           "); WriteDWHex (SYSTEM.VAL (LONGINT, mod)); WriteLn;
+		WriteString ("  mdesc:           "); WriteDWHex (SYSTEM.VAL (SIGNED32, mod)); WriteLn;
 		WriteString ("  name:            "); WriteString (mod.name); WriteLn;
 		WriteString ("  refcnt:          "); WriteDWHex (mod.refcnt); WriteLn;
 		WriteString ("  sb:              "); WriteDWHex (mod.sb); WriteLn;
@@ -2681,11 +2681,11 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 	(** Decoder.Decode Module	Decodes the object file of Module *)
 	PROCEDURE Decode*;
 		VAR
-			i, j: LONGINT;
+			i, j: SIGNED32;
 			name, suf: ARRAY 32 OF CHAR;
 			ch: CHAR;
 			S: Texts.Scanner;
-			beg, end, start, time: LONGINT;
+			beg, end, start, time: SIGNED32;
 			T: Texts.Text;
 			res: SIGNED16; arm, big: BOOLEAN;
 	BEGIN
@@ -2733,10 +2733,10 @@ MODULE Decoder IN Oberon;	(** non-portable *) (* NM 2.3.93 / 26.10.93 *)
 			ELSE Texts.OpenScanner(S, T, beg); start := Texts.Pos(S); Texts.Scan(S)
 			END
 		ELSE
-			end := MAX(LONGINT)
+			end := MAX(SIGNED32)
 		END;
 		WHILE (S.class = Texts.Name) & (start <= end) DO
-			i := 0; ch := S.s[0];  j := MAX(LONGINT);
+			i := 0; ch := S.s[0];  j := MAX(SIGNED32);
 			WHILE ("A" <= CAP(ch)) & (CAP(ch) <= "Z") OR ("0" <= ch) & (ch <= "9") OR (ch = ".") DO
 				IF ch = "." THEN j := i END;
 				name[i] := ch; INC(i); ch := S.s[i]
@@ -2801,7 +2801,7 @@ BEGIN
 	RETURN t
 END GetText;
 
-PROCEDURE Locate(F: Display.Frame;  T: Texts.Text;  pos: LONGINT);
+PROCEDURE Locate(F: Display.Frame;  T: Texts.Text;  pos: SIGNED32);
 VAR M: Oberon.CaretMsg;  N: Oberon.ControlMsg;
 BEGIN
 	IF pos < 0 THEN pos := 0
@@ -2812,8 +2812,8 @@ BEGIN
 	M.id := Oberon.set; M.F := F; M.car := F; M.text := T; M.pos := pos; Display.Broadcast(M)
 END Locate;
 
-PROCEDURE Scan(s: ARRAY OF CHAR): LONGINT;
-VAR x, i: LONGINT;
+PROCEDURE Scan(s: ARRAY OF CHAR): SIGNED32;
+VAR x, i: SIGNED32;
 BEGIN
 	x := 0;  i := 0;
 	WHILE ((s[i] >= "0") & (s[i] <= "9")) OR ((s[i] >= "A") & (s[i] <= "F")) & (i # LEN(s)) DO
@@ -2826,7 +2826,7 @@ BEGIN
 END Scan;
 
 PROCEDURE GetLine(VAR r: Texts.Reader;  VAR buf: ARRAY OF CHAR);
-VAR i: LONGINT;  ch: CHAR;
+VAR i: SIGNED32;  ch: CHAR;
 BEGIN
 	i := 0;
 	Texts.Read(r, ch);
@@ -2840,7 +2840,7 @@ END GetLine;
 (** Decoder.Find	Finds the selected pc in the marked window *)
 PROCEDURE Find*;
 VAR
-	fbeg, fend, ftime, breakpc, breakpos: LONGINT;  ftext: Texts.Text;  S1: Texts.Scanner;
+	fbeg, fend, ftime, breakpc, breakpos: SIGNED32;  ftext: Texts.Text;  S1: Texts.Scanner;
 	line: SIGNED16;  fpar: Display.Frame;  scan: BOOLEAN;  buf: ARRAY 6 OF CHAR;
 	r: Texts.Reader;
 BEGIN
@@ -2895,7 +2895,7 @@ BEGIN
 	Out.Ln
 END SetSuffix;
 
-PROCEDURE InstallDecoder*(decodeHandler: DecodeHandler; suffix: ARRAY OF CHAR; adrFactor: LONGINT);
+PROCEDURE InstallDecoder*(decodeHandler: DecodeHandler; suffix: ARRAY OF CHAR; adrFactor: SIGNED32);
 BEGIN
 	IF (decodeHandler = NIL) THEN InstallIA32Decoder
 	ELSE decoder := decodeHandler; SetObjSuffix(suffix); addressFactor := adrFactor

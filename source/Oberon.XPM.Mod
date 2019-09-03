@@ -24,11 +24,11 @@ TYPE
 		rider: Files.Rider;
 		reader: Texts.Reader;
 		text: Texts.Text;	(* needed for Set *)
-		ofs: LONGINT;	(* needed for Pos - Position, where text starts in file *)
+		ofs: SIGNED32;	(* needed for Pos - Position, where text starts in file *)
 		str,eof: BOOLEAN;	(* str is for text parsing, eof is copied from rider.eof or reader.eot *)
 		Read: PROCEDURE(VAR R: Rider; VAR c: CHAR);	(* read a byte *)
-		Pos: PROCEDURE(VAR R: Rider): LONGINT;	(* get current file position *)
-		Set: PROCEDURE(VAR R: Rider; pos: LONGINT);	(* seek to given file position *)
+		Pos: PROCEDURE(VAR R: Rider): SIGNED32;	(* get current file position *)
+		Set: PROCEDURE(VAR R: Rider; pos: SIGNED32);	(* seek to given file position *)
 	END;
 
 	(* User-defined color entry *)
@@ -53,12 +53,12 @@ BEGIN
 	Files.Read(R.rider,c); R.eof:= R.rider.eof;
 END ReadFile;
 
-PROCEDURE PosFile(VAR R: Rider): LONGINT;
+PROCEDURE PosFile(VAR R: Rider): SIGNED32;
 BEGIN
 	RETURN(Files.Pos(R.rider));
 END PosFile;
 
-PROCEDURE SetFile(VAR R: Rider; pos: LONGINT);
+PROCEDURE SetFile(VAR R: Rider; pos: SIGNED32);
 BEGIN
 	Files.Set(R.rider,Files.Base(R.rider),pos); R.eof:= R.rider.eof;
 END SetFile;
@@ -68,12 +68,12 @@ BEGIN
 	Texts.Read(R.reader,c); R.eof:= R.reader.eot;
 END ReadText;
 
-PROCEDURE PosText(VAR R: Rider): LONGINT;
+PROCEDURE PosText(VAR R: Rider): SIGNED32;
 BEGIN
 	RETURN(R.ofs+Texts.Pos(R.reader));
 END PosText;
 
-PROCEDURE SetText(VAR R: Rider; pos: LONGINT);
+PROCEDURE SetText(VAR R: Rider; pos: SIGNED32);
 BEGIN
 	Texts.OpenReader(R.reader,R.text,pos);
 	Files.Set(R.rider,Files.Base(R.rider),pos); R.eof:= R.rider.eof;
@@ -104,11 +104,11 @@ BEGIN
 	END;
 END GetColorEntry;
 
-PROCEDURE OpenRider(VAR FR: Files.Rider; VAR R: Rider; pos: LONGINT);
+PROCEDURE OpenRider(VAR FR: Files.Rider; VAR R: Rider; pos: SIGNED32);
 	(* initialize a Rider. Supported are Oberon Texts and DOS/UNIX Files *)
 VAR
 	c: CHAR;
-	len: LONGINT;
+	len: SIGNED32;
 BEGIN
 	Files.Read(FR,c);
 	IF (c = Texts.TextBlockId) THEN
@@ -186,7 +186,7 @@ VAR
 
 	PROCEDURE ReadNum(): SIGNED16;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 		s: ARRAY 64 OF CHAR;
 	BEGIN
 		i:= 0; ch:= ScanChar(R);
@@ -212,7 +212,7 @@ PROCEDURE XpmColor(VAR R: Rider; pict: Pictures.Picture; nrColor,pixChr,traCol: 
 VAR
 	r,g,b,i,j,k: SIGNED16;
 	x0,x1,x2: REAL;
-	C: LONGINT;
+	C: SIGNED32;
 	ok: BOOLEAN;
 	ch,key,spec: CHAR;
 	cval: ARRAY 60 OF CHAR;
@@ -220,7 +220,7 @@ VAR
 	PROCEDURE Value(col: ARRAY OF CHAR; pos,len: SIGNED16): REAL;
 	VAR
 		i: SIGNED16;
-		v,w: LONGINT;
+		v,w: SIGNED32;
 	BEGIN
 		v:= 0; w:= 0;
 		FOR i:= 0 TO len-1 DO
@@ -312,7 +312,7 @@ END XpmLine;
 
 PROCEDURE LoadXPM(VAR R: Rider; transparentCol: SIGNED16; colorConversion: BOOLEAN; pict: Pictures.Picture);
 VAR
-	pos: LONGINT;
+	pos: SIGNED32;
 	w,h,col,cpp,y: SIGNED16;
 	name: ARRAY 60 OF CHAR;
 BEGIN
@@ -342,7 +342,7 @@ END LoadXPM;
 PROCEDURE Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg);
 VAR
 	R: Rider;
-	pos: LONGINT;
+	pos: SIGNED32;
 BEGIN
 	WITH obj: Pictures.Picture DO
 		IF msg IS Objects.AttrMsg THEN

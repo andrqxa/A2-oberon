@@ -66,15 +66,15 @@ MODULE TextPopups IN Oberon;	(** portable *)	(* tk 6.12.95 *)
 
 		(* procedure name marker *)
 		PMarkerMenuItem = POINTER TO PMarkerMenuItemDesc;
-		PMarkerMenuItemDesc = RECORD	(MenuItemDesc) pos: LONGINT	END;
+		PMarkerMenuItemDesc = RECORD	(MenuItemDesc) pos: SIGNED32	END;
 
 		(* type name marker *)
 		TMarkerMenuItem = POINTER TO TMarkerMenuItemDesc;
-		TMarkerMenuItemDesc = RECORD	(MenuItemDesc) pos: LONGINT	END;
+		TMarkerMenuItemDesc = RECORD	(MenuItemDesc) pos: SIGNED32	END;
 
 		(* LaTeX section marker *)
 		LMarkerMenuItem = POINTER TO LMarkerMenuItemDesc;
-		LMarkerMenuItemDesc = RECORD	(MenuItemDesc) pos: LONGINT	END;
+		LMarkerMenuItemDesc = RECORD	(MenuItemDesc) pos: SIGNED32	END;
 
 		(* file name marker *)
 		FileMenuItem = POINTER TO FileMenuItemDesc;
@@ -146,7 +146,7 @@ MODULE TextPopups IN Oberon;	(** portable *)	(* tk 6.12.95 *)
 		ELSE doItem:=NIL END
 	END Do;
 
-	PROCEDURE AppendToTypeList(VAR list, last: MenuItem; CONST context, name: ARRAY OF CHAR; pos: LONGINT);
+	PROCEDURE AppendToTypeList(VAR list, last: MenuItem; CONST context, name: ARRAY OF CHAR; pos: SIGNED32);
 		VAR t: TMarkerMenuItem; q: MenuItem;
 	BEGIN
 		NEW(t); COPY(context, t.val); Strings.Append(t.val, name); t.pos := pos;
@@ -158,7 +158,7 @@ MODULE TextPopups IN Oberon;	(** portable *)	(* tk 6.12.95 *)
 	PROCEDURE ExtractProcTypeNames(T: Texts.Text; VAR lastProc, lastType: MenuItem);
 		CONST	rec = 0; proc = 1; mod = 2;
 		VAR R: Texts.Reader; isType, init: BOOLEAN; sym, prevsym: SIGNED8;
-			Stack: ARRAY 16 OF SIGNED8; ST, i: LONGINT; j: SIZE;
+			Stack: ARRAY 16 OF SIGNED8; ST, i: SIGNED32; j: SIZE;
 			Context, name: ARRAY 128 OF CHAR;startP, startT, q: MenuItem; p: PMarkerMenuItem;
 	BEGIN
 		Texts.OpenReader(R, T, 0);
@@ -248,7 +248,7 @@ MODULE TextPopups IN Oberon;	(** portable *)	(* tk 6.12.95 *)
 	(* Extract LaTeX sections *)
 
 	PROCEDURE ExtractSections(t: Texts.Text);
-	VAR r: Texts.Reader; i, j: LONGINT; q: LMarkerMenuItem; s: ARRAY 1024 OF CHAR; ch: CHAR;
+	VAR r: Texts.Reader; i, j: SIGNED32; q: LMarkerMenuItem; s: ARRAY 1024 OF CHAR; ch: CHAR;
 	BEGIN
 		Texts.OpenReader(r, t, 0); Texts.Read(r, ch);
 		WHILE ~r.eot DO
@@ -292,7 +292,7 @@ MODULE TextPopups IN Oberon;	(** portable *)	(* tk 6.12.95 *)
 	(* Extract BibTeX entries *)
 
 	PROCEDURE ExtractBibtex(t: Texts.Text);
-	VAR r: Texts.Reader; i, j: LONGINT; first, p: MenuItem; q: LMarkerMenuItem; s, e: ARRAY 64 OF CHAR; ch: CHAR;
+	VAR r: Texts.Reader; i, j: SIGNED32; first, p: MenuItem; q: LMarkerMenuItem; s, e: ARRAY 64 OF CHAR; ch: CHAR;
 	BEGIN
 		first := lastItem;
 		Texts.OpenReader(r, t, 0); Texts.Read(r, ch);

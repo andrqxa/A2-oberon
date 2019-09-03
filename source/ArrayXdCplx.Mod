@@ -21,7 +21,7 @@ CONST
 	AntisymmetricOffBoundaryC* = 6;   (* like SymmetricOffBoundaryC but with additional change of sign if out of bounds *)
 
 TYPE
-	Value* = Array1d.Value;  Index* = LONGINT;  Array1* = Array1d.Array;  IntValue* = Array1dInt.Value;
+	Value* = Array1d.Value;  Index* = SIGNED32;  Array1* = Array1d.Array;  IntValue* = Array1dInt.Value;
 	Array2* = POINTER TO ARRAY OF ARRAY OF Value;
 	Array3* = POINTER TO ARRAY OF ARRAY OF ARRAY OF Value;
 	Array4* = POINTER TO ARRAY OF ARRAY OF ARRAY OF ARRAY OF Value;
@@ -33,7 +33,7 @@ TYPE
 	VAR data-: Array1;   (*! will probably be removed, do not use ! *)
 
 		(** override *)
-		PROCEDURE Allocate*( size: LONGINT;  VAR adr: Index;  VAR ptr: ANY );
+		PROCEDURE Allocate*( size: SIGNED32;  VAR adr: Index;  VAR ptr: ANY );
 		BEGIN
 			NEW( data, size );  adr := ADDRESSOF( data[0] );  ptr := data;
 		END Allocate;
@@ -467,7 +467,7 @@ TYPE
 		END Divide;
 
 		PROCEDURE dbgWrite*;
-		VAR x, y, z: LONGINT;
+		VAR x, y, z: SIGNED32;
 			str: ARRAY 256 OF CHAR;
 		BEGIN
 			IF Type() = vector THEN
@@ -777,7 +777,7 @@ VAR
 																srcpos, srclen, destpos, destlen: ArrayXdBytes.IndexArray );
 
 	VAR temp: ArrayXdBytes.ArrayMemoryStructure;
-		spos, dpos, last, borigin, blen, srcposcut, srclencut, destoffset: ArrayXdBytes.IndexArray;  i, dim: LONGINT;
+		spos, dpos, last, borigin, blen, srcposcut, srclencut, destoffset: ArrayXdBytes.IndexArray;  i, dim: SIGNED32;
 		val: Value;  temp2: Array;  enumB: ArrayXdBytes.BoundaryEnum;
 		Get: PROCEDURE {DELEGATE} ( x: ARRAY OF Index;
 																																													dim: Index ): Value;
@@ -785,7 +785,7 @@ VAR
 
 		(* for debugging
 			PROCEDURE OutIndex( idx: ArrayXdBytes.IndexArray;  name: ARRAY OF CHAR );
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			dbgOut.String( name );
 			FOR i := 0 TO LEN( idx ) - 1 DO dbgOut.Int( idx[i], 1 );  dbgOut.String( "," );  END;

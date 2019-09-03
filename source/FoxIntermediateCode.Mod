@@ -73,7 +73,7 @@ TYPE
 	Type*=RECORD
 		form-: SIGNED8; (* SignedInteger, UnsignedInteger or Float *)
 		sizeInBits-: SIGNED16; (* size in bits *)
-		length-: LONGINT; (* vector length, if any. If zero then type is scalar *)
+		length-: SIGNED32; (* vector length, if any. If zero then type is scalar *)
 	END;
 
 	RegisterClass*=RECORD
@@ -135,7 +135,7 @@ TYPE
 		aliasOffset-: SIZE; (* for aliases *)
 
 		comments-: Sections.CommentWriter;
-		sizeInUnits: LONGINT;
+		sizeInUnits: SIGNED32;
 		exported-: BOOLEAN;
 
 		PROCEDURE GetPC(): SIZE;
@@ -180,7 +180,7 @@ TYPE
 		BEGIN finally := atPc
 		END SetFinally;
 
-		PROCEDURE GetSize*(): LONGINT;
+		PROCEDURE GetSize*(): SIGNED32;
 		VAR
 			i: SIZE;
 			instruction: Instruction;
@@ -203,7 +203,7 @@ TYPE
 
 							| reserve:
 								ASSERT(instruction.op1.mode = ModeNumber);
-								INC(sizeInUnits, LONGINT(instruction.op1.intValue))
+								INC(sizeInUnits, SIGNED32(instruction.op1.intValue))
 
 							ELSE
 								HALT(100); (* a var/const section may not contain any other type of instruction *)
@@ -225,7 +225,7 @@ TYPE
 
 		PROCEDURE Emit*(instruction: Instruction);
 		VAR new: Instructions;
-			op1size,op2size,op3size,op1form,op2form,op3form: LONGINT;
+			op1size,op2size,op3size,op1form,op2form,op3form: SIGNED32;
 			i: SIZE;
 		BEGIN
 			op1size := instruction.op1.type.sizeInBits;
@@ -440,7 +440,7 @@ TYPE
 	END NewSection;
 
 	PROCEDURE SameOperand*(CONST left, right: Operand): BOOLEAN;
-	VAR mode: LONGINT;
+	VAR mode: SIGNED32;
 	BEGIN
 		mode := left.mode;
 		IF (left.type.form =right.type.form) & (left.type.sizeInBits=right.type.sizeInBits) & (left.type.length = right.type.length) & (mode = right.mode) THEN
@@ -464,7 +464,7 @@ TYPE
 	END SameOperand;
 
 	(** check if an operand is valid at a certain location for a given instruction opcode **)
-	PROCEDURE CheckOperand*(operand: Operand; opCode, location: LONGINT; VAR message: ARRAY OF CHAR): BOOLEAN;
+	PROCEDURE CheckOperand*(operand: Operand; opCode, location: SIGNED32; VAR message: ARRAY OF CHAR): BOOLEAN;
 	VAR
 		validOperandModes: SET;
 	BEGIN
@@ -568,7 +568,7 @@ TYPE
 
 		PROCEDURE DumpString(CONST str: ARRAY OF CHAR);
 		VAR
-			i: LONGINT;
+			i: SIGNED32;
 			ch: CHAR;
 			newln: BOOLEAN;
 		BEGIN
@@ -635,7 +635,7 @@ TYPE
 				END
 			ELSE
 				IF operand.type.form IN Integer THEN
-					IF (operand.intValue > MAX(LONGINT)) OR (operand.intValue < MIN(LONGINT)) THEN
+					IF (operand.intValue > MAX(SIGNED32)) OR (operand.intValue < MIN(SIGNED32)) THEN
 						w.String("0");
 						w.Hex(operand.intValue,0);
 						w.String("H");
@@ -665,28 +665,28 @@ TYPE
 			Undefined:
 		|ModeMemory:
 			IF operand.register # None THEN
-				w.RawLInt(operand.register(LONGINT));
+				w.RawLInt(operand.register(SIGNED32));
 				w.RawSInt(operand.registerClass.class);
 				w.RawInt(operand.registerClass.number);
-				w.RawLInt(operand.offset(LONGINT));
+				w.RawLInt(operand.offset(SIGNED32));
 			ELSIF operand.symbol.name # "" THEN
 				Basic.WriteSegmentedName(w,operand.symbol.name);
 				IF operand.symbol.fingerprint # 0 THEN w.RawHInt(operand.symbol.fingerprint);END;
-				w.RawLInt(operand.symbolOffset(LONGINT));
-				w.RawLInt(operand.offset(LONGINT));
+				w.RawLInt(operand.symbolOffset(SIGNED32));
+				w.RawLInt(operand.offset(SIGNED32));
 			ELSE w.RawLInt(SHORT(operand.intValue));
 			END;
 		|ModeRegister:
-			w.RawLInt(operand.register(LONGINT));
+			w.RawLInt(operand.register(SIGNED32));
 			w.RawSInt(operand.registerClass.class);
 			w.RawInt(operand.registerClass.number);
-			w.RawLInt(operand.offset(LONGINT));
+			w.RawLInt(operand.offset(SIGNED32));
 		|ModeImmediate:
 			IF operand.symbol.name # "" THEN
 				Basic.WriteSegmentedName(w,operand.symbol.name);
 				IF operand.symbol.fingerprint # 0 THEN w.RawHInt(operand.symbol.fingerprint);END;
-				w.RawLInt(operand.symbolOffset(LONGINT));
-				w.RawLInt(operand.offset(LONGINT));
+				w.RawLInt(operand.symbolOffset(SIGNED32));
+				w.RawLInt(operand.offset(SIGNED32));
 			ELSE
 				IF operand.type.form IN Integer THEN
 						w.RawLInt(SHORT(operand.intValue));
@@ -835,7 +835,7 @@ TYPE
 	END InitInstructions;
 
 	PROCEDURE InitInstruction*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SIGNED8; CONST op1,op2,op3: Operand);
-	VAR format: InstructionFormat; mode1, mode2, mode3: LONGINT; (* debugging *)
+	VAR format: InstructionFormat; mode1, mode2, mode3: SIGNED32; (* debugging *)
 	BEGIN
 		IF instr = NIL THEN NEW(instr) END;
 		format := instructionFormat[opcode];
@@ -906,7 +906,7 @@ TYPE
 	BEGIN InitRegister(op,type,registerClass, register); RETURN op
 	END Register;
 
-	PROCEDURE RegisterOffset*(type: Type; registerClass: RegisterClass; register: SIZE; offset: LONGINT): Operand;
+	PROCEDURE RegisterOffset*(type: Type; registerClass: RegisterClass; register: SIZE; offset: SIGNED32): Operand;
 	VAR op: Operand;
 	BEGIN InitRegister(op,type,registerClass, register); SetOffset (op, offset); RETURN op
 	END RegisterOffset;
@@ -921,7 +921,7 @@ TYPE
 		END
 	END AddOffset;
 
-	PROCEDURE SetOffset*(VAR op: Operand; offset: LONGINT);
+	PROCEDURE SetOffset*(VAR op: Operand; offset: SIGNED32);
 	BEGIN
 		Assert((op.mode = ModeRegister) OR (op.mode = ModeImmediate) & (op.type.form IN {SignedInteger, UnsignedInteger}),"offset not on register or integer immediate");
 		op.offset := offset
@@ -1044,7 +1044,7 @@ TYPE
 	BEGIN type.form := form; type.sizeInBits := sizeInBits; type.length := 1;
 	END InitType;
 
-	PROCEDURE ToVectorType*(VAR type: Type; length: LONGINT);
+	PROCEDURE ToVectorType*(VAR type: Type; length: SIGNED32);
 	BEGIN type.length := length
 	END ToVectorType;
 
@@ -1057,7 +1057,7 @@ TYPE
 	BEGIN registerClass.class := class; registerClass.number := SIGNED16(number)
 	END InitRegisterClass;
 
-	PROCEDURE InitParameterRegisterClass*(VAR registerClass: RegisterClass; number: LONGINT);
+	PROCEDURE InitParameterRegisterClass*(VAR registerClass: RegisterClass; number: SIGNED32);
 	BEGIN registerClass.class := Parameter; registerClass.number := SIGNED16(number)
 	END InitParameterRegisterClass;
 
@@ -1088,7 +1088,7 @@ TYPE
 		op.register := reg; ASSERT(reg # 0);
 	END SetRegister;
 
-	PROCEDURE DecimalNumber(ch: CHAR; VAR nr: LONGINT): BOOLEAN;
+	PROCEDURE DecimalNumber(ch: CHAR; VAR nr: SIGNED32): BOOLEAN;
 	BEGIN
 		IF (ch < "0") OR (ch > "9") THEN RETURN FALSE
 		ELSE
@@ -1098,7 +1098,7 @@ TYPE
 		END;
 	END DecimalNumber;
 
-	PROCEDURE Numbers(CONST name: ARRAY OF CHAR; VAR pos: SIZE; VAR number: LONGINT): BOOLEAN;
+	PROCEDURE Numbers(CONST name: ARRAY OF CHAR; VAR pos: SIZE; VAR number: SIGNED32): BOOLEAN;
 	BEGIN
 		number := 0;
 		IF DecimalNumber(name[pos], number) THEN
@@ -1115,8 +1115,8 @@ TYPE
 		IF name[pos] = char THEN INC(pos); RETURN TRUE ELSE RETURN FALSE END;
 	END Character;
 
-	PROCEDURE DenotesRegister*(CONST name: ARRAY OF CHAR; VAR registerClass: RegisterClass; VAR register: LONGINT): BOOLEAN;
-	VAR pos: SIZE; registerNumber: LONGINT;
+	PROCEDURE DenotesRegister*(CONST name: ARRAY OF CHAR; VAR registerClass: RegisterClass; VAR register: SIGNED32): BOOLEAN;
+	VAR pos: SIZE; registerNumber: SIGNED32;
 	BEGIN
 		pos := 0;
 		IF Character(name,pos,'r') THEN
@@ -1181,7 +1181,7 @@ TYPE
 
 	PROCEDURE DenotesType*(CONST name: ARRAY OF CHAR; VAR type: Type): BOOLEAN;
 	VAR
-		sizeInBits: LONGINT; pos: SIZE;
+		sizeInBits: SIGNED32; pos: SIZE;
 	BEGIN
 		pos := 0;
 		IF Character(name,pos,'s') THEN

@@ -12,16 +12,16 @@ CONST
 TYPE
 	(*LimitedInStream* = OBJECT
 	VAR inR: Streams.Reader;
-		remain: LONGINT;
+		remain: SIGNED32;
 
-		PROCEDURE &Init*(VAR inR, outR: Streams.Reader; size : LONGINT);
+		PROCEDURE &Init*(VAR inR, outR: Streams.Reader; size : SIGNED32);
 		BEGIN
 			SELF.inR := inR;	remain := size;
 			Streams.OpenReader(outR, Receiver);
 		END Init;
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: LONGINT; VAR len, res: LONGINT);
-		VAR l: LONGINT;
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIGNED32; VAR len, res: SIGNED32);
+		VAR l: SIGNED32;
 		BEGIN
 			IF remain > 0 THEN
 				ASSERT((size > 0) & (min <= size) & (min >= 0));
@@ -38,7 +38,7 @@ TYPE
 
 	HTTPConnection* = OBJECT
 	VAR host, referer, useragent, accept : ARRAY 128 OF CHAR;
-		port : LONGINT;
+		port : SIGNED32;
 		http11 : BOOLEAN;
 		con : TCP.Connection;
 		requestHeader*: WebHTTP.RequestHeader;
@@ -74,7 +74,7 @@ TYPE
 			x : WebHTTP.AdditionalField;
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 2048 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 			dechunk: WebHTTP.ChunkedInStream;
 			lin : WebHTTP.LimitedInStream;
 		BEGIN
@@ -133,7 +133,7 @@ TYPE
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 2048 OF CHAR;
 			buf: ARRAY 1024 OF CHAR;
-			port : LONGINT;
+			port : SIGNED32;
 			dechunk: WebHTTP.ChunkedInStream;
 			lin : WebHTTP.LimitedInStream;
 			len: ARRAY 16 OF CHAR;

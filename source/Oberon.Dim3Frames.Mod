@@ -50,7 +50,7 @@ BEGIN
 END DrawRect;
 
 PROCEDURE RestoreFrame (F: Frame; R: Display3.Mask; x, y: SIGNED16);
-VAR start: LONGINT;
+VAR start: SIGNED32;
 BEGIN
 	start := Oberon.Time();
 	Dim3Engine.DrawDirect(F.obj(Dim3Engine.World), F.camera, F.P);
@@ -599,7 +599,7 @@ END SetViewAngle;
 PROCEDURE AlignSelection*;
 VAR
 	F: Frame; s: Dim3Engine.Shape; R: Display3.Mask; N, M: Dim3Engine.Matrix; angle: REAL;
-	axis, scale, trans: Dim3Engine.Vector; steps: LONGINT;
+	axis, scale, trans: Dim3Engine.Vector; steps: SIGNED32;
 BEGIN
 	Texts.WriteString(W, "Dim3Frames.AlignSelection"); Texts.WriteLn(W); Texts.Append(Oberon.Log, W.buf);
 	GetFrame(F);
@@ -654,7 +654,7 @@ END Poll;
 (** make benchmark test **)
 PROCEDURE Benchmark*;
 CONST nFrames = 160;
-VAR F: Frame; X, Y, i: SIGNED16; start, time: LONGINT; R: Display3.Mask;
+VAR F: Frame; X, Y, i: SIGNED16; start, time: SIGNED32; R: Display3.Mask;
 BEGIN
 	Texts.WriteString(W, "Dim3Frames.Benchmark: ");
 	GetFrame(F);

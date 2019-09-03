@@ -29,7 +29,7 @@ CONST
 	max= 256;
 
 VAR
-	Z: LONGINT;
+	Z: SIGNED32;
 	color*: Color;							(** Aktuelle Farbe für Rembrandt-Editor *)
 	noc*, maxnoc* : SIGNED16;		(** Anzahl Farben für Backdrops / Maximale Anzahl Farben auf Bildschirm verfügbar *)
 	coltable*: ARRAY max OF RECORD r*, g*, b*: SIGNED16 END;	(** Farbpalette für Backdrops *)
@@ -37,21 +37,21 @@ VAR
 	(* floyd *)
 	r, g, b, rpal, gpal, bpal: ARRAY 256 OF SIGNED16;
 	floyd: POINTER TO RECORD
-		errr, errg, errb,clamp: ARRAY 1024 OF LONGINT;
+		errr, errg, errb,clamp: ARRAY 1024 OF SIGNED32;
 		hash: ARRAY 16, 16, 16 OF CHAR
 	END;
 
 (** Zufallszahl **)
 PROCEDURE Uniform*(): REAL;
 CONST a = 16807; m = 2147483647; q = m DIV a; r = m MOD a;
-VAR g: LONGINT;
+VAR g: SIGNED32;
 BEGIN
 	g := a*(Z MOD q) - r*(Z DIV q);
 	IF g > 0 THEN Z := g ELSE Z := g + m END;
 	RETURN Z*(1.0/m)
 END Uniform;
 
-PROCEDURE InitSeed*(seed: LONGINT);
+PROCEDURE InitSeed*(seed: SIGNED32);
 BEGIN
 	Z := seed
 END InitSeed;
@@ -59,12 +59,12 @@ END InitSeed;
 (** Dither **)
 
 PROCEDURE InitFloyd;
-VAR i, j, k, col: SIGNED16; r, g, b: LONGINT;
+VAR i, j, k, col: SIGNED16; r, g, b: SIGNED32;
 
-	PROCEDURE CApprox(r, g, b: LONGINT; VAR col: SIGNED16; VAR nr, ng, nb: LONGINT);
-	VAR d, t, min: LONGINT; i: SIGNED16;
+	PROCEDURE CApprox(r, g, b: SIGNED32; VAR col: SIGNED16; VAR nr, ng, nb: SIGNED32);
+	VAR d, t, min: SIGNED32; i: SIGNED16;
 	BEGIN
-		min := MAX(LONGINT);
+		min := MAX(SIGNED32);
 		i := 0;
 		WHILE i < ASH(1,Pictures.colorD) DO
 			t := (r - rpal[i]); d := t * t;
@@ -108,8 +108,8 @@ END InitFloyd;
 
 PROCEDURE Floyd*(S, D: Pictures.Picture);
 VAR  i, i2,  j,  dcol, col: SIGNED16;
-	rcol, gcol, bcol, restim, gestim, bestim: LONGINT;
-	err, er0, er1, er4, eg0, eg1, eg4, eb0, eb1, eb4: LONGINT;
+	rcol, gcol, bcol, restim, gestim, bestim: SIGNED32;
+	err, er0, er1, er4, eg0, eg1, eg4, eb0, eb1, eb4: SIGNED32;
 BEGIN
 
 	IF floyd = NIL THEN InitFloyd END;
@@ -207,7 +207,7 @@ END RGBtoHSV;
 PROCEDURE HSVtoRGB(H, S, V: REAL; VAR R, G, B: REAL);
 (* Wandelt HSV-Wrte in RGB-Wrte um *)
 VAR f, p, q, t: REAL;
-		i: LONGINT;
+		i: SIGNED32;
 BEGIN
 	IF S = 0 THEN R := V; G := V; B := V
 	ELSE
@@ -417,10 +417,10 @@ BEGIN
 END AllocatePictureMem;
 
 (** Best Match für gesuchten Farbwert in der aktuellen Farbpalette **)
-PROCEDURE NearestColor*(r, g, b: LONGINT): SIGNED16;
-VAR d, t, min: LONGINT; col, i: SIGNED16;
+PROCEDURE NearestColor*(r, g, b: SIGNED32): SIGNED16;
+VAR d, t, min: SIGNED32; col, i: SIGNED16;
 BEGIN
-	min := MAX(LONGINT);
+	min := MAX(SIGNED32);
 	i := 0;
 	WHILE i # noc DO
 		t := (r - coltable[i].r); d := t * t;

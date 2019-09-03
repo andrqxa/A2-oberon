@@ -240,7 +240,7 @@ TYPE
 	(* generic message to be handled by the sequencer *)
 	Message* = OBJECT
 	VAR
-		next: Message; time: LONGINT;
+		next: Message; time: SIGNED32;
 
 		PROCEDURE &InitMessage*;
 		BEGIN SELF.next := NIL; time := NoDelay;
@@ -495,7 +495,7 @@ TYPE
 			END;
 		END HandleMessages;
 
-		PROCEDURE Add*(message: Message; time: LONGINT);
+		PROCEDURE Add*(message: Message; time: SIGNED32);
 		VAR prev, next: Message;
 		BEGIN
 			BEGIN {EXCLUSIVE}
@@ -630,7 +630,7 @@ TYPE
 	RealProcedureInteger = PROCEDURE {DELEGATE} (value: REAL): WORD;
 
 (* helper function for delayed execution *)
-PROCEDURE Delay* (delay: LONGINT): LONGINT;
+PROCEDURE Delay* (delay: SIGNED32): SIGNED32;
 BEGIN RETURN delay + Kernel.GetTicks ();
 END Delay;
 

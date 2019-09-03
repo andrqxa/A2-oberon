@@ -30,7 +30,7 @@ of the Oberon system. Each track of the Oberon system consists of a number of vi
       minH*: SIGNED16;	(** Minimum viewer height. *)
       DH: SIGNED16;
       FillerTrack: Track; FillerViewer, buf: Viewer; (*for closed viewers*)
-      bcF: Display.Frame;  bcLev: LONGINT;
+      bcF: Display.Frame;  bcLev: SIGNED32;
 
 	(** Open a new viewer V with top at Y in track X. *)
     PROCEDURE Open* (V: Viewer; X, Y: SIGNED16);

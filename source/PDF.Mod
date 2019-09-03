@@ -38,7 +38,7 @@ TYPE
 
 	PDFObjArray = POINTER TO ARRAY OF PDFObject;
 	PDFObjList = OBJECT
-	VAR nof : LONGINT;
+	VAR nof : SIGNED32;
 		data : PDFObjArray;
 
 		PROCEDURE &Init*;
@@ -47,7 +47,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Add(o : PDFObject);
-		VAR n : PDFObjArray; i : LONGINT;
+		VAR n : PDFObjArray; i : SIGNED32;
 		BEGIN
 			IF nof = LEN(data) THEN
 				NEW(n, LEN(data) * 2);
@@ -60,7 +60,7 @@ TYPE
 	END PDFObjList;
 
 	Int = OBJECT(PDFObject)
-	VAR val : LONGINT;
+	VAR val : SIGNED32;
 		PROCEDURE Write(w : Streams.Writer);
 		BEGIN
 			w.Int(val, 0)
@@ -86,7 +86,7 @@ TYPE
 	END String;
 
 	Stream = OBJECT(PDFObject)
-	VAR length : LONGINT;
+	VAR length : SIGNED32;
 		data : Strings.String;
 
 		PROCEDURE &Init*(context : Document);
@@ -116,7 +116,7 @@ TYPE
 
 
 		PROCEDURE Write(w : Streams.Writer);
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 		BEGIN
 			w.String("<< /Length "); w.Int(length, 0); w.String(" >>"); w.Ln;
 			w.String("stream"); w.Ln;
@@ -146,7 +146,7 @@ TYPE
 	DictionaryList = POINTER TO ARRAY OF DictionaryEntry;
 	Dictionary = OBJECT (PDFObject)
 	VAR data : DictionaryList;
-		nofData : LONGINT;
+		nofData : SIGNED32;
 
 		PROCEDURE &Init*(context : Document);
 		BEGIN
@@ -155,7 +155,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Add(key : Name; obj : PDFObject);
-		VAR n : DictionaryList; i : LONGINT;
+		VAR n : DictionaryList; i : SIGNED32;
 		BEGIN
 			i := 0; WHILE (i < nofData) & (data[i].key # key) DO INC(i) END;
 			IF i = nofData THEN (* key not found *)
@@ -172,7 +172,7 @@ TYPE
 		END Add;
 
 		PROCEDURE GetObject(key : Name) : PDFObject;
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 		BEGIN
 			i := 0; WHILE (i < nofData) & (data[i].key # key) DO INC(i) END;
 			IF i = nofData THEN RETURN NIL
@@ -181,7 +181,7 @@ TYPE
 		END GetObject;
 
 		PROCEDURE Write(w : Streams.Writer);
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 		BEGIN
 			w.String("<<"); w.Ln;
 			FOR i := 0 TO nofData - 1 DO
@@ -207,7 +207,7 @@ TYPE
 		END Add;
 
 		PROCEDURE Write(w : Streams.Writer);
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 		BEGIN
 			w.Char("[");
 			FOR i := 0 TO content.nof - 1 DO
@@ -216,7 +216,7 @@ TYPE
 			w.Char("]");
 		END Write;
 
-		PROCEDURE Get(i : LONGINT): PDFObject;
+		PROCEDURE Get(i : SIGNED32): PDFObject;
 		BEGIN
 			RETURN content.data[i]
 		END Get;
@@ -225,8 +225,8 @@ TYPE
 	END Array;
 
 	Object = OBJECT(PDFObject)
-	VAR id, generation : LONGINT;
-		filepos : LONGINT;
+	VAR id, generation : SIGNED32;
+		filepos : SIGNED32;
 		content : PDFObjList;
 		next : Object;
 
@@ -243,9 +243,9 @@ TYPE
 		END AddContent;
 
 		PROCEDURE WriteContent(w : Streams.Writer);
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 		BEGIN
-			filepos := w.Pos()(LONGINT);
+			filepos := w.Pos()(SIGNED32);
 			w.Int(id, 0); w.String(" "); w.Int(generation, 0); w.String(" obj"); w.Ln;
 			FOR i := 0 TO content.nof - 1 DO
 				content.data[i].Write(w); w.Ln;
@@ -290,11 +290,11 @@ TYPE
 	Font = OBJECT(Object)
 	VAR dict : Dictionary;
 		name : Name;
-		type : LONGINT;
+		type : SIGNED32;
 		style : SET;
 		next : Font;
 
-		PROCEDURE &New*(context : Document; type : LONGINT; style : SET);
+		PROCEDURE &New*(context : Document; type : SIGNED32; style : SET);
 		BEGIN
 			Init(context);
 			dict := context.NewDictionary();
@@ -315,9 +315,9 @@ TYPE
 		END SetName;
 
 
-		PROCEDURE SetStandard(type : LONGINT; style : SET);
+		PROCEDURE SetStandard(type : SIGNED32; style : SET);
 		VAR fontName : ARRAY 64 OF CHAR;
-			s : LONGINT;
+			s : SIGNED32;
 		BEGIN
 			s := 0;
 			IF WMGraphics.FontBold IN style THEN s := 1;
@@ -391,7 +391,7 @@ TYPE
 			dict.Add(context.NewName("/MediaBox"), mediaBox);
 		END Init;
 
-		PROCEDURE SetPaper(paper : LONGINT; landscape : BOOLEAN);
+		PROCEDURE SetPaper(paper : SIGNED32; landscape : BOOLEAN);
 		VAR t, w, h : REAL;
 		BEGIN
 			CASE paper OF
@@ -427,7 +427,7 @@ TYPE
 			r := mediaBox.Get(3); h := r(Real).val;
 		END GetExtents;
 
-		PROCEDURE GetFont(type : LONGINT; style : SET) : Font;
+		PROCEDURE GetFont(type : SIGNED32; style : SET) : Font;
 		VAR f : Font;
 		BEGIN
 			f := context.GetFont(type, style);
@@ -445,7 +445,7 @@ TYPE
 
 	Document = OBJECT
 	VAR version : ARRAY 64 OF CHAR;
-		nofObjects : LONGINT;
+		nofObjects : SIGNED32;
 		firstObj, lastObj : Object;
 
 		catalog, infoObj : Object;
@@ -457,10 +457,10 @@ TYPE
 		defaultProcSet : Object;
 
 		names : NameList;
-		nofNames : LONGINT;
+		nofNames : SIGNED32;
 
 		fonts : Font;
-		nofFonts : LONGINT;
+		nofFonts : SIGNED32;
 
 		PROCEDURE &Init*;
 		VAR cDict : Dictionary;
@@ -533,7 +533,7 @@ TYPE
 			RETURN d
 		END NewDictionary;
 
-		PROCEDURE NewInt(val : LONGINT) : Int;
+		PROCEDURE NewInt(val : SIGNED32) : Int;
 		VAR i : Int;
 		BEGIN
 			NEW(i, SELF); i.val := val;
@@ -561,7 +561,7 @@ TYPE
 			RETURN p
 		END NewPage;
 
-		PROCEDURE GetFont(type : LONGINT; style : SET) : Font;
+		PROCEDURE GetFont(type : SIGNED32; style : SET) : Font;
 		VAR cur : Font; name, s : ARRAY 10 OF CHAR;
 		BEGIN
 			cur := fonts;
@@ -580,7 +580,7 @@ TYPE
 		END GetFont;
 
 		PROCEDURE NewName(name : ARRAY OF CHAR) : Name;
-		VAR i, j : LONGINT; nn : NameList;
+		VAR i, j : SIGNED32; nn : NameList;
 		BEGIN
 			i := 0; WHILE (i < nofNames) & (names[i].s^ # name) DO INC(i) END;
 			IF i = nofNames THEN
@@ -597,7 +597,7 @@ TYPE
 		END NewName;
 
 
-		PROCEDURE WriteLZInt(w : Streams.Writer; val, digits : LONGINT);
+		PROCEDURE WriteLZInt(w : Streams.Writer; val, digits : SIGNED32);
 		VAR s : ARRAY 16 OF CHAR; i : SIZE;
 		BEGIN
 			Strings.IntToStr(val, s);
@@ -667,7 +667,7 @@ TYPE
 		fSize : REAL;
 		xfont : Font;
 
-		PROCEDURE &Init*(pc : PDFCreator; pageFormat : LONGINT; landscape : BOOLEAN; unit : LONGINT);
+		PROCEDURE &Init*(pc : PDFCreator; pageFormat : SIGNED32; landscape : BOOLEAN; unit : SIGNED32);
 		BEGIN
 			SELF.pc := pc; d := pc.d;
 			p := d.NewPage();
@@ -732,7 +732,7 @@ TYPE
 			END
 		END SetColRG;
 
-		PROCEDURE Fill*(r : WMRectangles.Rectangle; col : WMGraphics.Color; mode : LONGINT);
+		PROCEDURE Fill*(r : WMRectangles.Rectangle; col : WMGraphics.Color; mode : SIGNED32);
 		VAR ax, ay, bx ,by : REAL;
 		BEGIN
 			SetColrg(col);
@@ -743,7 +743,7 @@ TYPE
 		END Fill;
 
 		PROCEDURE GetPDFFont(f : WMGraphics.Font) : Font;
-		VAR (* font : Font; *) t : LONGINT;
+		VAR (* font : Font; *) t : SIGNED32;
 		BEGIN
 (*			IF f.name = "Oberon" THEN t := FontHelvetica
 			ELSIF f.name = "Courier" THEN t := FontCourier
@@ -756,8 +756,8 @@ TYPE
 		END GetPDFFont;
 
 		(*ALEX 2005.10.26 changed signature*)
-		PROCEDURE PDFSetFont*(name : ARRAY OF CHAR; size : LONGINT(*REAL*); style : SET);
-		VAR t : LONGINT;
+		PROCEDURE PDFSetFont*(name : ARRAY OF CHAR; size : SIGNED32(*REAL*); style : SET);
+		VAR t : SIGNED32;
 		BEGIN
 			IF name = "Oberon" THEN t := FontHelvetica
 			ELSIF name = "Courier" THEN t := FontCourier
@@ -784,11 +784,11 @@ TYPE
 		END DrawString;
 
 		(*ALEX 2005.10.26*)
-		PROCEDURE DrawStringMultiLine*(x, y, width,height: LONGINT; resizeHeight: BOOLEAN; CONST stext : ARRAY OF CHAR; VAR actualHeight: SIZE);
-		VAR i: LONGINT;
+		PROCEDURE DrawStringMultiLine*(x, y, width,height: SIGNED32; resizeHeight: BOOLEAN; CONST stext : ARRAY OF CHAR; VAR actualHeight: SIZE);
+		VAR i: SIGNED32;
 			buf: ARRAY 2 OF CHAR;
 			sumW, sumH, strW, strH, lineH: SIZE;
-			beginLine: LONGINT;
+			beginLine: SIGNED32;
 			f : WMGraphics.Font;
 			overflowH: BOOLEAN;
 
@@ -853,7 +853,7 @@ TYPE
 		END DrawStringMultiLine;
 
 		(*ALEX 2005.10.25*)
-		PROCEDURE DrawStringSingleLine*(x, y, width, align: LONGINT; stext : ARRAY OF CHAR);
+		PROCEDURE DrawStringSingleLine*(x, y, width, align: SIGNED32; stext : ARRAY OF CHAR);
 		VAR f : WMGraphics.Font;
 			sz, i, j: SIZE;
 			overflow: BOOLEAN;
@@ -969,8 +969,8 @@ TYPE
 			w.Char("S"); w.Ln
 		END PolyLine;
 
-		PROCEDURE FillPoly*(CONST points : ARRAY OF WMGraphics.Point2d; nofPoints : LONGINT; color : WMGraphics.Color; mode : LONGINT);
-		VAR i : LONGINT;
+		PROCEDURE FillPoly*(CONST points : ARRAY OF WMGraphics.Point2d; nofPoints : SIGNED32; color : WMGraphics.Color; mode : SIGNED32);
+		VAR i : SIGNED32;
 		BEGIN
 			IF nofPoints < 2 THEN RETURN END;
 			ASSERT(nofPoints <= LEN(points));
@@ -982,7 +982,7 @@ TYPE
 			w.String("f*"); w.Ln
 		END FillPoly;
 
-		PROCEDURE Line*(x0, y0, x1, y1 : SIZE; color : WMGraphics.Color; mode : LONGINT);
+		PROCEDURE Line*(x0, y0, x1, y1 : SIZE; color : WMGraphics.Color; mode : SIGNED32);
 		BEGIN
 			SetColRG(color);
 			WriteTrafoCoord(x0, y0); w.String(" m ");
@@ -1010,7 +1010,7 @@ TYPE
 			closed := FALSE;
 		END Init;
 
-		PROCEDURE NewPage*(pageFormat : LONGINT; landscape : BOOLEAN; unit : LONGINT) : PDFCanvas;
+		PROCEDURE NewPage*(pageFormat : SIGNED32; landscape : BOOLEAN; unit : SIGNED32) : PDFCanvas;
 		VAR c : PDFCanvas;
 		BEGIN
 			NEW(c, SELF, pageFormat, landscape, unit);
@@ -1051,7 +1051,7 @@ BEGIN
 END WriteReal;
 
 PROCEDURE WritePDFString(w : Streams.Writer; CONST  data : ARRAY OF CHAR);
-VAR i : LONGINT;
+VAR i : SIGNED32;
 BEGIN
 	w.Char("(");
 	i := 0; WHILE data[i] # 0X DO
@@ -1093,7 +1093,7 @@ END WritePDFStringPos;
 
 (*ALEX 2005.10.31*)
 PROCEDURE GetCharSpacings(f: WMGraphics.Font; VAR text: ARRAY OF CHAR; i: SIZE; VAR g : WMGraphics.GlyphSpacings): BOOLEAN;
-VAR code: LONGINT;
+VAR code: SIGNED32;
 BEGIN
 	IF UTF8Strings.DecodeChar(text, i, code) THEN
 		IF f.HasChar(code) THEN f.GetGlyphSpacings(code, g);

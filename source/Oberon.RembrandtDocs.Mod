@@ -85,7 +85,7 @@ BEGIN
 END Load;
 
 PROCEDURE Store(D: Documents.Document);
-VAR obj:Rembrandt .Frame; F: Files.File; R: Files.Rider; len: LONGINT;
+VAR obj:Rembrandt .Frame; F: Files.File; R: Files.Rider; len: SIGNED32;
 BEGIN
 	obj := D.dsc(Rembrandt.Frame);
 	IF D.name # "" THEN

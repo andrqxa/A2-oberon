@@ -136,7 +136,7 @@ VAR
 		RETURN Math.exp( cooling * UP( a ) );
 	END EP;
 
-	PROCEDURE DistriFromLocalChar( F: antsPEV.tField;  y, x: LONGINT );
+	PROCEDURE DistriFromLocalChar( F: antsPEV.tField;  y, x: SIGNED32 );
 	VAR po, p, p1, p2, p3, p4, e1, e2, e3, e4: SIGNED16;  nges, prob, rand: LONGREAL;
 	BEGIN
 		(* insert penalization to AOrig here *)
@@ -154,7 +154,7 @@ VAR
 	END DistriFromLocalChar;
 
 	PROCEDURE FastestC( F: antsPEV.tField );
-	VAR y, x, w, h, offset: LONGINT;  p: SIGNED16;
+	VAR y, x, w, h, offset: SIGNED32;  p: SIGNED16;
 		a: ARRAY 11 OF SIGNED16;
 		rand: LONGREAL;  c: antsCaches.FullCache;  A, H, V, O: antsArrayObjects.tINTEGERArray;
 	BEGIN
@@ -182,7 +182,7 @@ VAR
 		RETURN Math.exp( cooling * UE( a ) );
 	END EE;
 
-	PROCEDURE DistriFromLocalCharE( F: antsPEV.tField;  y, x: LONGINT );
+	PROCEDURE DistriFromLocalCharE( F: antsPEV.tField;  y, x: SIGNED32 );
 	VAR e, p1, p2, e1, e2, e3, e4, e5, e6, e7, e8: SIGNED16;  nges, ges, prob: LONGREAL;
 	BEGIN
 		antsPEV.EGetENeighboursH( F, y, x, e, p1, p2 );
@@ -201,7 +201,7 @@ VAR
 	END DistriFromLocalCharE;
 
 	PROCEDURE FastestEC( F: antsPEV.tField );
-	VAR y, x, w, h, offset: LONGINT;
+	VAR y, x, w, h, offset: SIGNED32;
 		a: ARRAY 11 OF SIGNED16;
 		c: antsCaches.FullCache;  A, H, V: antsArrayObjects.tINTEGERArray;
 	BEGIN
@@ -222,7 +222,7 @@ VAR
 
 	PROCEDURE CreateCaches( m: tModel;  d: SIGNED16 );
 	VAR A: ARRAY 11 OF SIGNED16;
-		i: SIGNED16;  offset: LONGINT;  c: antsCaches.FullCache;  s: LONGREAL;
+		i: SIGNED16;  offset: SIGNED32;  c: antsCaches.FullCache;  s: LONGREAL;
 	BEGIN
 		FOR i := 0 TO 4 DO A[i] := d;  END;
 		FOR i := 5 TO 8 DO A[i] := 2 END;
@@ -290,14 +290,14 @@ VAR
 	END Uniform;
 
 	PROCEDURE WriteArray( VAR R: Files.Rider;  VAR A: ARRAY OF LONGREAL );
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		Files.WriteLInt( R, LEN( A ) );  aM.dSISI( "Writing len at pos", LEN( A ), "  ", Files.Pos( R ) );
 		FOR i := 0 TO LEN( A ) - 1 DO Files.WriteLReal( R, A[i] );  END;
 	END WriteArray;
 
 	PROCEDURE ReadArray( VAR R: Files.Rider;  VAR A: ARRAY OF LONGREAL );
-	VAR i, len: LONGINT;
+	VAR i, len: SIGNED32;
 	BEGIN
 		Files.ReadLInt( R, len );  aM.dSISI( "Reading len at pos", len, "   ", Files.Pos( R ) );
 		FOR i := 0 TO len - 1 DO Files.ReadLReal( R, A[i] );  END;
@@ -316,7 +316,7 @@ VAR
 
 	PROCEDURE ArrayHandleAttribute( VAR M: Objects.AttrMsg;  prefix: ARRAY OF CHAR;  VAR array: ARRAY OF LONGREAL ): BOOLEAN;
 	VAR cur: ARRAY 64 OF CHAR;
-		i: LONGINT;  len: LONGINT;
+		i: SIGNED32;  len: SIGNED32;
 	BEGIN
 		len := LEN( array );
 		IF M.id = Objects.enum THEN
@@ -394,7 +394,7 @@ VAR
 	PROCEDURE NewModel*;
 	VAR l: antsCommands.tScanList;  name: vyCG.tNameArray;  M: tModel;
 		a: ARRAY 14 OF LONGREAL;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name= NAME a0=REAL a1=REAL a2=REAL a3=REAL a4=REAL a5=REAL b2=REAL b4=REAL b5=REAL g1=REAL g2=REAL d=REAL e=REAL pen=REAL" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectRealFromKeyword( l, "a0", a[0] ) &

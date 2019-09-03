@@ -36,7 +36,7 @@ CONST
 	cMedian* = 0;  cMean* = 1;  cAbs* = 0;  cLog* = 1;  cIncr* = 0;  cDecr* = 1;
 TYPE
 
-	ArrayFunction = PROCEDURE ( VAR f: ARRAY OF LONGREAL;  i: LONGINT ): LONGREAL;
+	ArrayFunction = PROCEDURE ( VAR f: ARRAY OF LONGREAL;  i: SIGNED32 ): LONGREAL;
 
 	PROCEDURE MakeMonotoneRec*;
 	VAR name: ARRAY 64 OF CHAR;
@@ -59,8 +59,8 @@ TYPE
 	END MakeMonotoneRec;
 
 	PROCEDURE DoMonotone( degraded: vyBase.Object;  type: SIGNED16;  VAR vec: vyLongrealVec.tVector );
-	VAR N, i, j: LONGINT;  data: antsArrays.X1d;  pos: LONGINT;  multi: antsArrays.L1d;  start, end: LONGINT;  mean, ssq: LONGREAL;  nrNaNs: LONGINT;
-		len: LONGINT;  interval: vyLongrealVec.tVector;
+	VAR N, i, j: SIGNED32;  data: antsArrays.X1d;  pos: SIGNED32;  multi: antsArrays.L1d;  start, end: SIGNED32;  mean, ssq: LONGREAL;  nrNaNs: SIGNED32;
+		len: SIGNED32;  interval: vyLongrealVec.tVector;
 	BEGIN
 		ASSERT ( (degraded # NIL ) & (degraded IS vyLongrealVec.tVector), 109 );
 		N := vyLongrealVec.Len( degraded( vyLongrealVec.tVector ) );
@@ -109,8 +109,8 @@ TYPE
 (*
 this generates a new vector where the value at position is dropped out
 *)
-	PROCEDURE DropX1d*( vec: antsArrays.X1d;  position: LONGINT;  VAR new: antsArrays.X1d );
-	VAR N, k: LONGINT;
+	PROCEDURE DropX1d*( vec: antsArrays.X1d;  position: SIGNED32;  VAR new: antsArrays.X1d );
+	VAR N, k: SIGNED32;
 	BEGIN
 		(* N := vyLongrealVec.Len(vec); *)
 		N := LEN( vec^ );  NEW( new, N - 1 );
@@ -123,8 +123,8 @@ this generates a new vector where the value at position is dropped out
 		END
 	END DropX1d;
 
-	PROCEDURE DropL1d*( vec: antsArrays.L1d;  position: LONGINT;  VAR new: antsArrays.L1d );
-	VAR N, k: LONGINT;
+	PROCEDURE DropL1d*( vec: antsArrays.L1d;  position: SIGNED32;  VAR new: antsArrays.L1d );
+	VAR N, k: SIGNED32;
 	BEGIN
 		(* N := vyLongrealVec.Len(vec); *)
 		N := LEN( vec^ );  NEW( new, N - 1 );
@@ -138,7 +138,7 @@ this generates a new vector where the value at position is dropped out
 	END DropL1d;
 
 	PROCEDURE TestMonotone( VAR vector: ARRAY OF LONGREAL;  montype: SIGNED16 ): BOOLEAN;
-	VAR i, N: LONGINT;  flag: BOOLEAN;
+	VAR i, N: SIGNED32;  flag: BOOLEAN;
 	BEGIN
 		N := LEN( vector );  i := 0;  flag := TRUE;
 		WHILE (i < N - 1) & (flag = TRUE ) DO
@@ -150,7 +150,7 @@ this generates a new vector where the value at position is dropped out
 	END TestMonotone;
 
 	PROCEDURE MakeMatrix*( VAR Xstern: antsArrays.X2d;  VAR jumps: antsArrays.I1d;  VAR gamma: antsArrays.X1d;  VAR matrix: antsArrays.X2d );
-	VAR N, jumpN, i: LONGINT;
+	VAR N, jumpN, i: SIGNED32;
 	BEGIN
 		N := LEN( Xstern^ );
 		jumpN := antsArrays.FindFirstX( gamma^, 0 ) + 1;   (*! changed 031027 *)
@@ -168,7 +168,7 @@ this generates a new vector where the value at position is dropped out
 	END MakeMatrix;
 
 	PROCEDURE LastMonotone*( VAR matrix: antsArrays.X2d;  montype: SIGNED16;  VAR lastmon: antsArrays.X1d );
-	VAR N, i, jumpN: LONGINT;
+	VAR N, i, jumpN: SIGNED32;
 		(* flag : BOOLEAN;*)
 	BEGIN
 		N := LEN( matrix[0] );  jumpN := LEN( matrix );  NEW( lastmon, N );
@@ -192,7 +192,7 @@ this generates a new vector where the value at position is dropped out
 	PROCEDURE FindLastMonotonePotts*;
 	VAR statistic: antsPotts1DSurvey.StatisticObj;  degraded, vec: vyBase.Object;  matrix: antsArrays.X2d;  lastmon: antsArrays.X1d;
 		name: ARRAY 64 OF CHAR;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		antsCommands.InitScan( "data=OBJ" );
 
@@ -273,7 +273,7 @@ this generates a new vector where the value at position is dropped out
 	END ApproxMonotone;
 
 	PROCEDURE DoApproxMonotonePotts( VAR Matrix: antsArrays.X2d;  type: SIGNED16;  VAR MatrixOut: antsArrays.X2d );
-	VAR i, j, rows, columns: LONGINT;  spotdata: vyLongrealVec.tVector;  statistic: antsPotts1DSurvey.StatisticObj;  ScanningMatrix: antsArrays.X2d;
+	VAR i, j, rows, columns: SIGNED32;  spotdata: vyLongrealVec.tVector;  statistic: antsPotts1DSurvey.StatisticObj;  ScanningMatrix: antsArrays.X2d;
 		lastmon: antsArrays.X1d;
 	BEGIN
 		rows := LEN( Matrix );  columns := LEN( Matrix[0] );  NEW( MatrixOut, rows, columns );

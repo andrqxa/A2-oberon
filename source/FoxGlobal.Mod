@@ -209,7 +209,7 @@ TYPE
 	Position = SyntaxTree.Position;
 
 	Alignment* = RECORD
-		min, max: LONGINT; (* alignments in bits *)
+		min, max: SIGNED32; (* alignments in bits *)
 	END;
 
 	PassInRegisterProc = PROCEDURE {DELEGATE} (type: SyntaxTree.Type): BOOLEAN;
@@ -222,19 +222,19 @@ TYPE
 		activeCellsCapabilities-: SyntaxTree.Symbol; (* list of supported capabilities, filled by ActiveCells specification *)
 
 		(* addressing granularity in code and data memory *)
-		codeUnit-: LONGINT;
-		dataUnit-: LONGINT;
+		codeUnit-: SIGNED32;
+		dataUnit-: SIGNED32;
 		(* alignment (variables, record entries) *)
 		(* alignment (parameters & stack frames) *)
 		variableAlignment-, parameterAlignment-: Alignment;
 		(* offset of first parameter *)
-		offsetFirstParameter-: LONGINT;
-		offsetFirstVariable-: LONGINT;
+		offsetFirstParameter-: SIGNED32;
+		offsetFirstVariable-: SIGNED32;
 		(* to determine if a builtin-procedure can be operator-overloaded *)
 		operatorDefined-: ARRAY end OF BOOLEAN;
 
 		(* type sizes defined by backend *)
-		addressSize-: LONGINT;
+		addressSize-: SIGNED32;
 
 		(* system type mapping, in a later version only the global (unisgned) types should be used
 			the following two types are only there for compatibility with the system as is
@@ -252,8 +252,8 @@ TYPE
 		(* MAX values of commonly-used types *)
 		maxSize-, maxSet-: Basic.Integer;
 
-		PROCEDURE &InitSystem*(codeUnit, dataUnit: LONGINT; addressSize, minVarAlign, maxVarAlign, minParAlign, maxParAlign, offsetFirstPar, offsetFirstVar: LONGINT; cooperative: BOOLEAN);
-		VAR i: LONGINT;
+		PROCEDURE &InitSystem*(codeUnit, dataUnit: SIGNED32; addressSize, minVarAlign, maxVarAlign, minParAlign, maxParAlign, offsetFirstPar, offsetFirstVar: SIGNED32; cooperative: BOOLEAN);
+		VAR i: SIGNED32;
 		BEGIN
 			ASSERT(dataUnit > 0);
 			ASSERT(minVarAlign > 0);
@@ -775,7 +775,7 @@ TYPE
 	END System;
 
 	PROCEDURE BuildScopes(system: System);
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO end-1 DO
 			system.operatorDefined[i] := FALSE
@@ -1018,13 +1018,13 @@ TYPE
 
 	END SetDefaultDeclarations;
 
-	PROCEDURE OperatorDefined*(system: System; op: LONGINT; defined: BOOLEAN);
+	PROCEDURE OperatorDefined*(system: System; op: SIGNED32; defined: BOOLEAN);
 	BEGIN
 		system.operatorDefined[op] := defined;
 	END OperatorDefined;
 
 	PROCEDURE SetDefaultOperators*(system: System);
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := Scanner.Equal TO Scanner.Not DO
 			OperatorDefined(system,i,TRUE);
@@ -1131,7 +1131,7 @@ TYPE
     END DeclareLynxType;
     (* -LYNX *)
 
-	PROCEDURE NewConstant0(CONST name: ARRAY OF CHAR; int: LONGINT; type: SyntaxTree.Type; in: SyntaxTree.Scope);
+	PROCEDURE NewConstant0(CONST name: ARRAY OF CHAR; int: SIGNED32; type: SyntaxTree.Type; in: SyntaxTree.Scope);
 	VAR constant: SyntaxTree.Constant; value: SyntaxTree.IntegerValue;duplicate: BOOLEAN;
 	BEGIN
 		value := SyntaxTree.NewIntegerValue(SyntaxTree.invalidPosition,int);
@@ -1146,7 +1146,7 @@ TYPE
 		ASSERT(~duplicate);
 	END NewConstant0;
 
-	PROCEDURE NewConstant*(CONST name: ARRAY OF CHAR; int: LONGINT; type: SyntaxTree.Type; CONST scope: ARRAY OF SyntaxTree.ModuleScope);
+	PROCEDURE NewConstant*(CONST name: ARRAY OF CHAR; int: SIGNED32; type: SyntaxTree.Type; CONST scope: ARRAY OF SyntaxTree.ModuleScope);
 	VAR nameL,nameU: Scanner.IdentifierString;
 	BEGIN
 		Basic.Lowercase(name,nameL);
@@ -1185,7 +1185,7 @@ TYPE
 		NewStringConstant0(name,string,type,scope[Scanner.Lowercase]);
 	END NewStringConstantCamelCase;
 
-	PROCEDURE NewBuiltin0( id: LONGINT; CONST name: ARRAY OF CHAR; in:  SyntaxTree.ModuleScope; realtime: BOOLEAN);
+	PROCEDURE NewBuiltin0( id: SIGNED32; CONST name: ARRAY OF CHAR; in:  SyntaxTree.ModuleScope; realtime: BOOLEAN);
 	VAR basic: SyntaxTree.Builtin; duplicate: BOOLEAN; type: SyntaxTree.ProcedureType;
 	BEGIN
 		basic := SyntaxTree.NewBuiltin(SyntaxTree.invalidPosition,SyntaxTree.NewIdentifier(name),id);
@@ -1200,7 +1200,7 @@ TYPE
 		ASSERT(~duplicate);
 	END NewBuiltin0;
 
-	PROCEDURE NewBuiltin*(id: LONGINT; CONST name: ARRAY OF CHAR; CONST scope: ARRAY OF SyntaxTree.ModuleScope; realtime: BOOLEAN);
+	PROCEDURE NewBuiltin*(id: SIGNED32; CONST name: ARRAY OF CHAR; CONST scope: ARRAY OF SyntaxTree.ModuleScope; realtime: BOOLEAN);
 	VAR nameL,nameU: Scanner.IdentifierString;
 	BEGIN
 		Basic.Lowercase(name,nameL);
@@ -1209,7 +1209,7 @@ TYPE
 		NewBuiltin0(id,nameL,scope[Scanner.Lowercase],realtime);
 	END NewBuiltin;
 
-	PROCEDURE NewBuiltinCamelCase*(id: LONGINT; CONST name: ARRAY OF CHAR; CONST scope: ARRAY OF SyntaxTree.ModuleScope; realtime: BOOLEAN);
+	PROCEDURE NewBuiltinCamelCase*(id: SIGNED32; CONST name: ARRAY OF CHAR; CONST scope: ARRAY OF SyntaxTree.ModuleScope; realtime: BOOLEAN);
 	BEGIN
 		NewBuiltin0(id,name,scope[Scanner.Uppercase],realtime);
 		NewBuiltin0(id,name,scope[Scanner.Lowercase],realtime);
@@ -1277,7 +1277,7 @@ TYPE
 	END ModuleSectionIdentifier;
 
 	PROCEDURE ContextFromName*(CONST fileName: ARRAY OF CHAR; VAR module,context: SyntaxTree.Identifier);
-	VAR moduleName, contextName: Scanner.IdentifierString; i,j: LONGINT;
+	VAR moduleName, contextName: Scanner.IdentifierString; i,j: SIGNED32;
 	BEGIN
 		i := 0; j := 0;
 		WHILE (fileName[i] # 0X) & (fileName[i] # ".") DO
@@ -1312,7 +1312,7 @@ TYPE
 	END GetModuleSegmentedName;
 
 	PROCEDURE FindSymbol*(CONST name: Basic.SegmentedName; scope: SyntaxTree.Scope): SyntaxTree.Symbol;
-	VAR s: LONGINT;  symbol : SyntaxTree.Symbol;
+	VAR s: SIGNED32;  symbol : SyntaxTree.Symbol;
 
 		PROCEDURE GetSymbolScope;
 		VAR type: SyntaxTree.Type;
@@ -1410,7 +1410,7 @@ TYPE
 	END GetSymbolName;
 
 	PROCEDURE GetSymbolSegmentedNameInScope*(symbol: SyntaxTree.Symbol; inScope: SyntaxTree.Scope; VAR pooledName: Basic.SegmentedName);
-	VAR td: SyntaxTree.TypeDeclaration; i: LONGINT;
+	VAR td: SyntaxTree.TypeDeclaration; i: SIGNED32;
 
 		PROCEDURE Scope(scope: SyntaxTree.Scope);
 		BEGIN
@@ -1449,8 +1449,8 @@ TYPE
 		GetSymbolSegmentedNameInScope(symbol,NIL,pooledName);
 	END GetSymbolSegmentedName;
 
-	PROCEDURE Level*(t: SyntaxTree.Type): LONGINT;
-	VAR level: LONGINT;
+	PROCEDURE Level*(t: SyntaxTree.Type): SIGNED32;
+	VAR level: SIGNED32;
 	BEGIN
 		IF t IS SyntaxTree.IntegerType THEN
 			CASE t.sizeInBits OF
@@ -1677,7 +1677,7 @@ TYPE
 		RETURN distance
 	END BasicTypeDistance;
 
-	PROCEDURE GetIdentifier*(symbol: LONGINT; case: LONGINT): SyntaxTree.Identifier;
+	PROCEDURE GetIdentifier*(symbol: SIGNED32; case: SIGNED32): SyntaxTree.Identifier;
 	BEGIN
 		IF (symbol >= 0) & (symbol < LEN(identifiers,1)) THEN
 			RETURN identifiers[case,symbol]
@@ -1686,8 +1686,8 @@ TYPE
 		END;
 	END GetIdentifier;
 
-	PROCEDURE GetSymbol*(case: LONGINT; id: SyntaxTree.Identifier): LONGINT;
-	VAR i: LONGINT;
+	PROCEDURE GetSymbol*(case: SIGNED32; id: SyntaxTree.Identifier): SIGNED32;
+	VAR i: SIGNED32;
 	BEGIN
 		(*! quick and dirty implementation, optimize ! *)
 		FOR i := 0 TO LEN(identifiers,1)-1 DO
@@ -1697,9 +1697,9 @@ TYPE
 	END GetSymbol;
 
 	PROCEDURE InitIdentifiers;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 
-		PROCEDURE NewKeywordIdentifier(op: LONGINT);
+		PROCEDURE NewKeywordIdentifier(op: SIGNED32);
 		VAR id: Scanner.IdentifierType;
 		BEGIN
 			Scanner.GetKeyword(Scanner.Uppercase,op,id);
@@ -1708,7 +1708,7 @@ TYPE
 			identifiers[Scanner.Lowercase,op] := id;
 		END NewKeywordIdentifier;
 
-		PROCEDURE NewBuiltinIdentifier(op: LONGINT; CONST name: ARRAY OF CHAR);
+		PROCEDURE NewBuiltinIdentifier(op: SIGNED32; CONST name: ARRAY OF CHAR);
 		VAR nameL,nameU: Scanner.IdentifierString;
 		BEGIN
 			ASSERT(op < LEN(identifiers[0]));

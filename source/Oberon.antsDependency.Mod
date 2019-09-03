@@ -188,7 +188,7 @@ VAR
 	END ThereIsEdge;
 
 	PROCEDURE InstallGraph*( level: tLayer;  debug: BOOLEAN );
-	VAR graph: vyGraph.tGraph;  i: SIGNED16;  ref2: tNode;  vtroot: tNode;  e: vyGraph.tEdge;  name: vyName.tNameArray;  count: LONGINT;
+	VAR graph: vyGraph.tGraph;  i: SIGNED16;  ref2: tNode;  vtroot: tNode;  e: vyGraph.tEdge;  name: vyName.tNameArray;  count: SIGNED32;
 
 		PROCEDURE AlreadyInstalled( rt: Objects.Object ): BOOLEAN;
 		BEGIN

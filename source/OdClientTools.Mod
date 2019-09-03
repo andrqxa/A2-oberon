@@ -51,7 +51,7 @@ BEGIN
 END GetCbGames;
 
 (* Get Clusterball games. *)
-PROCEDURE GetCbGame * (num: LONGINT);
+PROCEDURE GetCbGame * (num: SIGNED32);
 VAR reqHeader: WebHTTP.RequestHeader; resHeader: WebHTTP.ResponseHeader; res: WORD; con : AosTCP.Connection;
 	out : AosIO.Reader; numStr, url, target: ARRAY 128 OF CHAR;
 	f: AosFS.File;
@@ -78,7 +78,7 @@ END Get;
 
 PROCEDURE Put*;
 VAR reqHeader: WebHTTP.RequestHeader; resHeader: WebHTTP.ResponseHeader; res: WORD; con : AosTCP.Connection;
-	out : AosIO.Reader; in: AosFS.Reader; i, avail: LONGINT; url, name: ARRAY 128 OF CHAR;
+	out : AosIO.Reader; in: AosFS.Reader; i, avail: SIGNED32; url, name: ARRAY 128 OF CHAR;
 	f: AosFS.File; doc: XML.Document;	lenStr: ARRAY 16 OF CHAR;
 	root: XML.Element; info: ARRAY 128 OF CHAR; s: XML.String;
 BEGIN { EXCLUSIVE }

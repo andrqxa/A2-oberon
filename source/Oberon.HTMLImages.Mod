@@ -11,7 +11,7 @@ MODULE HTMLImages IN Oberon;	(** portable *)
 	TYPE
 		Area = POINTER TO AreaDesc;
 		AreaDesc = RECORD
-			key: LONGINT;
+			key: SIGNED32;
 			x, y: SIGNED16;
 			next: Area
 		END;
@@ -129,7 +129,7 @@ Gadgets.objecthandle(obj, M);
 			attr: ARRAY 64 OF CHAR;
 			area: Area;
 			rarea: RectArea;
-			val: LONGINT;
+			val: SIGNED32;
 			obj: Objects.Object;
 			curMap: Map;
 			pos: SIGNED16;
@@ -184,10 +184,10 @@ Gadgets.objecthandle(obj, M);
 		Load the image linked to the icon. *)
 	PROCEDURE LoadIMG*;
 		VAR
-			pos: LONGINT;
+			pos: SIGNED32;
 			F: Texts.Finder;
 			obj, icon: Objects.Object;
-			key: LONGINT;
+			key: SIGNED32;
 			text: Texts.Text;
 			node: HyperDocs.Node;
 			doc: Documents.Document;
@@ -225,9 +225,9 @@ HALT(99)
 		VAR
 			T: Texts.Text;
 			F: Texts.Finder;
-			pos: LONGINT;
+			pos: SIGNED32;
 			obj: Objects.Object;
-			key: LONGINT;
+			key: SIGNED32;
 			doc: Documents.Document;
 			node: HyperDocs.Node;
 	BEGIN
@@ -343,7 +343,7 @@ HALT(99)
 	PROCEDURE IconHandler(F: Objects.Object; VAR M: Objects.ObjMsg);
 		VAR
 			F1: Icon;
-			key: LONGINT;
+			key: SIGNED32;
 	BEGIN
 		WITH F: Icon DO
 			IF M IS Objects.AttrMsg THEN
@@ -405,7 +405,7 @@ HALT(99)
 	END NewIcon;
 
 	PROCEDURE LocalName(VAR url, name: ARRAY OF CHAR);
-		VAR i, j: LONGINT;
+		VAR i, j: SIGNED32;
 	BEGIN
 		i := 0; j := 0;
 		WHILE url[i] # 0X DO
@@ -422,7 +422,7 @@ HALT(99)
 		VAR
 			objname, libname: ARRAY 64 OF CHAR;
 			s: HyperDocs.LinkScheme;
-			key: LONGINT;
+			key: SIGNED32;
 			obj: Objects.Object;
 			C: Objects.CopyMsg;
 			lib: Objects.Library;
@@ -467,7 +467,7 @@ HALT(99)
 			P: HTMLDocs.Page;
 			attr, mapname: ARRAY 64 OF CHAR;
 			alt: ARRAY 512 OF CHAR;
-			okey, ikey, l: LONGINT;
+			okey, ikey, l: SIGNED32;
 			doc: Documents.Document;
 			ismap: BOOLEAN;
 			obj: Objects.Object;
@@ -481,7 +481,7 @@ HALT(99)
 			iCon: Icon;
 			C: Objects.CopyMsg;
 			locked: BOOLEAN;
-		PROCEDURE ImgIcon(keyAttr: ARRAY OF CHAR; key: LONGINT);
+		PROCEDURE ImgIcon(keyAttr: ARRAY OF CHAR; key: SIGNED32);
 		BEGIN
 			doc := NIL;
 			obj := Gadgets.FindPublicObj("Icons.Picture");

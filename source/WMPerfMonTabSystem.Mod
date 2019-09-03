@@ -9,7 +9,7 @@ TYPE
 
 	SystemTab* = OBJECT(WMComponents.VisualComponent)
 	VAR
-		clockrate : LONGINT; (* MHz, -1 if invalid *)
+		clockrate : SIGNED32; (* MHz, -1 if invalid *)
 
 		(* GC Statistics *)
 		gcCurrentRun : Perf.Indicator;
@@ -38,10 +38,10 @@ TYPE
 		timer : Kernel.Timer;
 		alive, dead : BOOLEAN;
 
-		PROCEDURE EstimateClockRate() : LONGINT;
+		PROCEDURE EstimateClockRate() : SIGNED32;
 		CONST Tries = 10;
 		VAR
-			try : LONGINT; done : BOOLEAN; clockrate : LONGINT;
+			try : SIGNED32; done : BOOLEAN; clockrate : SIGNED32;
 			string, nbr : ARRAY 128 OF CHAR;
 		BEGIN
 			cpuClockrate.SetCaption("   CPU clock rate estimation...");
@@ -117,7 +117,7 @@ TYPE
 		END HandleDetectButton;
 
 		PROCEDURE HandleTimerButton(sender, data : ANY);
-		VAR string, nbr : ARRAY 128 OF CHAR; msTicks, msTimestamp, msGc, msDiff : LONGINT;
+		VAR string, nbr : ARRAY 128 OF CHAR; msTicks, msTimestamp, msGc, msDiff : SIGNED32;
 		BEGIN
 			IF clockrate = -1 THEN clockrate := EstimateClockRate(); END;
 			IF started THEN

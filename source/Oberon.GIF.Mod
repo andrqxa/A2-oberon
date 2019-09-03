@@ -52,7 +52,7 @@ MODULE GIF IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.11.96 *)
 
 	PROCEDURE ComputeColors(VAR CT: ColorTable; colorConversion: BOOLEAN);
 		VAR
-			x, y, z, min, d, red, green, blue: LONGINT;
+			x, y, z, min, d, red, green, blue: SIGNED32;
 			r, g, b: ARRAY 256 OF SIGNED16;
 			i, j, minj, size: SIGNED16;
 	BEGIN
@@ -63,7 +63,7 @@ MODULE GIF IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.11.96 *)
 		IF colorConversion THEN
 			FOR i := 0 TO size-1 DO
 				red := ORD(CT.rgb[i].r); green := ORD(CT.rgb[i].g); blue := ORD(CT.rgb[i].b);
-				j := 0; minj := 0; min := MAX(LONGINT);
+				j := 0; minj := 0; min := MAX(SIGNED32);
 				WHILE (j < size) & (min > 0) DO
 					x := ABS(red-r[j]); y := ABS(green-g[j]); z := ABS(blue-b[j]);
 					d := x; IF y > d THEN d := y END; IF z > d THEN d := z END;
@@ -80,7 +80,7 @@ MODULE GIF IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.11.96 *)
 
 	PROCEDURE GetLogicalScrDesc(VAR R: Files.Rider; VAR LSD: LogicalScrDesc);
 		VAR
-			i: LONGINT;
+			i: SIGNED32;
 			ch: CHAR;
 	BEGIN
 		Files.ReadInt(R, LSD.width); Files.ReadInt(R, LSD.height);
@@ -93,8 +93,8 @@ MODULE GIF IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.11.96 *)
 		LSD.GCTFlag := i > 0
 	END GetLogicalScrDesc;
 
-	PROCEDURE GetCMap(VAR R: Files.Rider; VAR map: ColorTable; size: LONGINT);
-		VAR i: LONGINT;
+	PROCEDURE GetCMap(VAR R: Files.Rider; VAR map: ColorTable; size: SIGNED32);
+		VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO size-1 DO
 			Files.ReadBytes(R, map.rgb[i], 3)
@@ -126,7 +126,7 @@ MODULE GIF IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.11.96 *)
 
 	PROCEDURE GetImageDesc(VAR R: Files.Rider; VAR IDesc: ImageDesc);
 		VAR
-			i: LONGINT;
+			i: SIGNED32;
 			ch: CHAR;
 	BEGIN
 		Files.ReadInt(R, IDesc.left); Files.ReadInt(R, IDesc.top);
@@ -138,8 +138,8 @@ MODULE GIF IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.11.96 *)
 		IDesc.LCTFlag := i > 0
 	END GetImageDesc;
 
-	PROCEDURE InitCodeBook(codeLen: LONGINT);
-		VAR i, to: LONGINT;
+	PROCEDURE InitCodeBook(codeLen: SIGNED32);
+		VAR i, to: SIGNED32;
 	BEGIN
 		to := ASH(1, codeLen)-1;
 		FOR i := 0 TO to DO
@@ -151,8 +151,8 @@ MODULE GIF IN Oberon;	(** portable *) (* rm 1.9.1996, ejz 8.11.96 *)
 
 PROCEDURE GetData(VAR r: Files.Rider; VAR Image: Gif; P: Pictures.Picture);
 	CONST byteLen=8;
-	VAR bufferSize, bufpos, buf, bitsleft: LONGINT;
-		code, codept, maxCode, clearCode, endCode, oldcode, codeLen, startSize, stackpt: LONGINT;
+	VAR bufferSize, bufpos, buf, bitsleft: SIGNED32;
+		code, codept, maxCode, clearCode, endCode, oldcode, codeLen, startSize, stackpt: SIGNED32;
 		page: CodePages;
 		dots: POINTER TO ARRAY OF SIGNED16;
 		buffer: ARRAY 256 OF CHAR;
@@ -160,7 +160,7 @@ PROCEDURE GetData(VAR r: Files.Rider; VAR Image: Gif; P: Pictures.Picture);
 		x, y, w, n: SIGNED16;
 		ch: CHAR;
 
-	PROCEDURE Dot(col: LONGINT);
+	PROCEDURE Dot(col: SIGNED32);
 	BEGIN
 		dots[x]:=Image.IDesc.LCT.colTrans[col]; INC(x);
 		IF x=w THEN x:=0;
@@ -173,8 +173,8 @@ PROCEDURE GetData(VAR r: Files.Rider; VAR Image: Gif; P: Pictures.Picture);
 		END
 	END Dot;
 
-	PROCEDURE ReadCode(VAR code: LONGINT);
-		VAR bitsneed, b, val: LONGINT;
+	PROCEDURE ReadCode(VAR code: SIGNED32);
+		VAR bitsneed, b, val: SIGNED32;
 	BEGIN
 		IF bitsleft<codeLen THEN
 			bitsneed:=codeLen-bitsleft; b:=0;

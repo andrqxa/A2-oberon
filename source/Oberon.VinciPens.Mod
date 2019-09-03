@@ -94,7 +94,7 @@ MODULE VinciPens IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Dasher (ctxt: Scheme.Context; args: Object; VAR res: Object);
 		VAR
-			c: Context; base: LeoPens.Pen; len: LONGINT; on, off: ARRAY Gfx.MaxDashPatSize OF REAL; cont: BOOLEAN;
+			c: Context; base: LeoPens.Pen; len: SIGNED32; on, off: ARRAY Gfx.MaxDashPatSize OF REAL; cont: BOOLEAN;
 			str: Object; s: ARRAY 30 OF CHAR; ref: Objects.Object; pen: LeoPens.Dasher;
 	BEGIN
 		c := ctxt(Context); base := LeoPens.Default; len := 1; on[0] := 5; off[0] := 5; cont := FALSE;

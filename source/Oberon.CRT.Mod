@@ -29,8 +29,8 @@ CONST
 TYPE
 	Name* = ARRAY 32 OF CHAR;  (*symbol name*)
 	Position*   = RECORD     (*position of stretch of source text*)
-		beg*: LONGINT;  (*start relative to beginning of file*)
-		len*: LONGINT;  (*length*)
+		beg*: SIGNED32;  (*start relative to beginning of file*)
+		len*: SIGNED32;  (*length*)
 		col*: SIGNED16;  (*column number of start position*)
 	END ;
 

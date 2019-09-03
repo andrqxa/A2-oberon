@@ -92,7 +92,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END RestoreRuns;
 
 	PROCEDURE RestoreBlock (x, y, w, h: SIGNED16);
-		VAR offset: LONGINT;
+		VAR offset: SIGNED32;
 	BEGIN
 		offset := (y - Enum.y) * Enum.img.bpr + (x - Enum.x) * Enum.img.fmt.bpp DIV 8;
 		Display.TransferBlock(Enum.img.mem^, offset, Enum.img.bpr, x, y, w, h, Display.set)
@@ -228,7 +228,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE PrintWell (well: Well; VAR msg: Display.DisplayMsg);
 		VAR mask: Display3.Mask; x, y, w, h, one, two: SIGNED16;
 
-		PROCEDURE pc (x: LONGINT): SIGNED16;
+		PROCEDURE pc (x: SIGNED32): SIGNED16;
 		BEGIN
 			RETURN SHORT(x * Display.Unit DIV Printer.Unit)
 		END pc;
@@ -324,7 +324,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END CopyWell;
 
 	PROCEDURE HandleWell* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR well, copy: Well; fx, fy: SIGNED16; mask: Display3.Mask; ver: LONGINT;
+		VAR well, copy: Well; fx, fy: SIGNED16; mask: Display3.Mask; ver: SIGNED32;
 	BEGIN
 		well := obj(Well);
 		IF msg IS Display.FrameMsg THEN
@@ -635,7 +635,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END CopyDisc;
 
 	PROCEDURE HandleDisc* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR disc, copy: Disc; fx, fy: SIGNED16; mask: Display3.Mask; ver: LONGINT;
+		VAR disc, copy: Disc; fx, fy: SIGNED16; mask: Display3.Mask; ver: SIGNED32;
 	BEGIN
 		disc := obj(Disc);
 		IF msg IS Display.FrameMsg THEN
@@ -972,7 +972,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END CopyWedge;
 
 	PROCEDURE HandleWedge* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR wedge, copy: Wedge; fx, fy: SIGNED16; mask: Display3.Mask; ver: LONGINT;
+		VAR wedge, copy: Wedge; fx, fy: SIGNED16; mask: Display3.Mask; ver: SIGNED32;
 	BEGIN
 		wedge := obj(Wedge);
 		IF msg IS Display.FrameMsg THEN
@@ -1071,7 +1071,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(** set selected text color **)
 	PROCEDURE SetText*;
-		VAR text: Texts.Text; beg, end, time: LONGINT; s: Attributes.Scanner; r, g, b, col: SIGNED16;
+		VAR text: Texts.Text; beg, end, time: SIGNED32; s: Attributes.Scanner; r, g, b, col: SIGNED16;
 	BEGIN
 		Oberon.GetSelection(text, beg, end, time);
 		IF time # -1 THEN
@@ -1091,7 +1091,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	(** get color of selected text and store it in attribute (2.) of named (1.) object **)
 	PROCEDURE GetText*;
 		VAR
-			text: Texts.Text; beg, end, time: LONGINT; r: Texts.Reader; ch: CHAR; s: Attributes.Scanner;
+			text: Texts.Text; beg, end, time: SIGNED32; r: Texts.Reader; ch: CHAR; s: Attributes.Scanner;
 			obj: Objects.Object; am: Objects.AttrMsg;
 	BEGIN
 		Oberon.GetSelection(text, beg, end, time);
@@ -1116,7 +1116,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(** set attribute (1.) of selected objects to color value (2.) **)
 	PROCEDURE SetAttr*;
-		VAR sel: Objects.Object; time: LONGINT; s: Attributes.Scanner; am: Objects.AttrMsg; r, g, b: SIGNED16;
+		VAR sel: Objects.Object; time: SIGNED32; s: Attributes.Scanner; am: Objects.AttrMsg; r, g, b: SIGNED16;
 	BEGIN
 		Gadgets.GetSelection(sel, time);
 		IF (time # -1) & (sel # NIL) THEN
@@ -1144,7 +1144,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(** get attribute (1.) of selected objects and set attribute (3.) of named (2.) object **)
 	PROCEDURE GetAttr*;
-		VAR sel, obj: Objects.Object; time, col: LONGINT; s: Attributes.Scanner; am: Objects.AttrMsg;
+		VAR sel, obj: Objects.Object; time, col: SIGNED32; s: Attributes.Scanner; am: Objects.AttrMsg;
 	BEGIN
 		Gadgets.GetSelection(sel, time);
 		IF (time # -1) & (sel # NIL) THEN

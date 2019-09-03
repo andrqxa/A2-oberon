@@ -74,7 +74,7 @@ VAR
 	u, v: ARRAY 2048 OF SIGNED16; (* used for spline to polygon conversion + scratch area for drawing polygons *)
 
 PROCEDURE Distance(x, y, x0, y0: SIGNED16): SIGNED16;
-VAR dx, dy: LONGINT;
+VAR dx, dy: SIGNED32;
 BEGIN dx := x - x0; dy := y - y0;
 	RETURN SHORT(ENTIER(Math.sqrt(dx * dx + dy * dy)))
 END Distance;
@@ -98,7 +98,7 @@ BEGIN
 END GetPat;
 
 (* Is X, Y somewhere inside the polygon defined by p ? *)
-PROCEDURE Inside(p: Point; x, y: SIGNED16; X, Y: LONGINT): BOOLEAN;
+PROCEDURE Inside(p: Point; x, y: SIGNED16; X, Y: SIGNED32): BOOLEAN;
 VAR c: SIGNED16; q: Point;
 
 	PROCEDURE Intersect(x0,y0,x1,y1 : SIGNED16) : BOOLEAN;

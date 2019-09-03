@@ -227,7 +227,7 @@ TYPE
 			PROCEDURE ExportModule (module: Sections.Module): BOOLEAN;
 			VAR result: BOOLEAN;
 				offers, requires: ObjectFile.NameList;
-				numImports: LONGINT;
+				numImports: SIGNED32;
 				name: ObjectFile.SectionName;
 				import: SyntaxTree.Import;
 				i: SIZE;

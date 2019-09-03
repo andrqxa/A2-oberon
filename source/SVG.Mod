@@ -331,7 +331,7 @@ BEGIN
 END ParseViewBox;
 
 (* Parse the contents of the preserveAspectRatio attribute *)
-PROCEDURE ParsePreserveAspect*(value: String; VAR xAlign, yAlign: LONGINT; VAR meet: BOOLEAN);
+PROCEDURE ParsePreserveAspect*(value: String; VAR xAlign, yAlign: SIGNED32; VAR meet: BOOLEAN);
 VAR i: SIZE;
 BEGIN
 	i := 0;

@@ -14,7 +14,7 @@ CONST
 TYPE
 	FontInfo = RECORD	(* Version 2.0 *)
 		version: SIGNED16;
-		size: LONGINT;
+		size: SIGNED32;
 		copyright: ARRAY 60 OF CHAR;
 		type: SIGNED16;
 		points: SIGNED16;
@@ -29,10 +29,10 @@ TYPE
 		avgWidth, maxWidth: SIGNED16;
 		firstChar, lastChar, defaultChar, breakChar: CHAR;
 		widthBytes: SIGNED16;
-		device: LONGINT;
-		face: LONGINT;
-		bitsPointer: LONGINT;
-		bitsOffset: LONGINT;
+		device: SIGNED32;
+		face: SIGNED32;
+		bitsPointer: SIGNED32;
+		bitsOffset: SIGNED32;
 		res: CHAR;
 	END;
 
@@ -46,7 +46,7 @@ VAR
 	Info: FontInfo;
 	CharTab: ARRAY 257 OF CharEntry; (* one dummy entry at the end *)
 	PowTwo: ARRAY 9 OF SIGNED16; (* 2^0 .. 2^8 *)
-	C: ARRAY 50 OF LONGINT;	(* DOS Stub and New Executable Header *)
+	C: ARRAY 50 OF SIGNED32;	(* DOS Stub and New Executable Header *)
 
 PROCEDURE Append (VAR s: ARRAY OF CHAR; suff: ARRAY OF CHAR);
 	VAR i, j, max: SIZE;
@@ -86,10 +86,10 @@ PROCEDURE Do (VAR R, out: Files.Rider; face: ARRAY OF CHAR; size: SIGNED16; styl
 		charW: SIGNED16;
 		bitY, bitX: SIGNED16;
 		fix: Files.Rider;
-		FaceFixup1, FaceFixup2, FONTSizeFixup1, FONTSizeFixup2, BitsFixup, mapPos: LONGINT;
-		FontDirStartFix, FontStartFixup: LONGINT;
-		FontDirStart, FontDirEnd: LONGINT; (* start and end of FONTDIR resource *)
-		FontStart, FontEnd: LONGINT; (* start and end of FONT resource *)
+		FaceFixup1, FaceFixup2, FONTSizeFixup1, FONTSizeFixup2, BitsFixup, mapPos: SIGNED32;
+		FontDirStartFix, FontStartFixup: SIGNED32;
+		FontDirStart, FontDirEnd: SIGNED32; (* start and end of FONTDIR resource *)
+		FontStart, FontEnd: SIGNED32; (* start and end of FONT resource *)
 		s: ARRAY 128 OF CHAR;
 BEGIN
 	Info.version := 200H;	(* Version 2.0 *)
@@ -368,7 +368,7 @@ PROCEDURE Convert*;	(** { OberonFontFile => [Path]WindowsFontFile } ~ **)
 	VAR F, f: Files.File; R, r: Files.Rider;
 		size, res, style: SIGNED16; ch: CHAR;
 		face, wname: ARRAY 64 OF CHAR;
-		S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT;
+		S: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 	IF (S.class = Texts.Char) & (S.c = "^") THEN
@@ -407,7 +407,7 @@ BEGIN
 	END
 END Convert;
 
-PROCEDURE SetUnsigned(VAR dest: LONGINT; src: HUGEINT);
+PROCEDURE SetUnsigned(VAR dest: SIGNED32; src: HUGEINT);
 BEGIN
 	dest := SHORT(src);
 END SetUnsigned;

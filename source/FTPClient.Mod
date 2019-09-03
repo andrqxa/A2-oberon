@@ -40,11 +40,11 @@ TYPE
 		connection : TCP.Connection; (* control connection to the server *)
 		dataCon : TCP.Connection;
 		dataIP : IP.Adr;
-		dataPort : LONGINT;
+		dataPort : SIGNED32;
 		w : Streams.Writer; (* writer oo the control connection *)
 		r : Streams.Reader; (* reader on the control connection *)
 		msg- : ARRAY 4096 OF CHAR;
-		code : LONGINT;
+		code : SIGNED32;
 		passiveTransfer : BOOLEAN;
 		actvListener : TCP.Connection;
 		actvTimeout : Objects.Timer;
@@ -58,7 +58,7 @@ TYPE
 		END Init;
 
 
-		PROCEDURE Open*(CONST host, user, password : ARRAY OF CHAR; port : LONGINT; VAR res : WORD);
+		PROCEDURE Open*(CONST host, user, password : ARRAY OF CHAR; port : SIGNED32; VAR res : WORD);
 		VAR fadr : IP.Adr;
 		BEGIN {EXCLUSIVE}
 			res := 0;
@@ -106,8 +106,8 @@ TYPE
 			END
 		END Login;
 
-		PROCEDURE ReadResponse(VAR code : LONGINT; VAR reply : ARRAY OF CHAR);
-		VAR temp : ARRAY 1024 OF CHAR; tcode: ARRAY 4 OF CHAR; t : LONGINT;
+		PROCEDURE ReadResponse(VAR code : SIGNED32; VAR reply : ARRAY OF CHAR);
+		VAR temp : ARRAY 1024 OF CHAR; tcode: ARRAY 4 OF CHAR; t : SIGNED32;
 			stop : BOOLEAN;
 		BEGIN
 			r.Int(code, FALSE); COPY("", reply);
@@ -135,7 +135,7 @@ TYPE
 		END Close;
 
 		PROCEDURE IsAlive*() : BOOLEAN;
-		VAR state: LONGINT;
+		VAR state: SIGNED32;
 		BEGIN
 			state := connection.state;
 			IF (state IN TCP.ClosedStates) OR (state = 5) THEN RETURN FALSE
@@ -148,7 +148,7 @@ TYPE
 		END IsNum;
 
 		PROCEDURE GetDataConnection( VAR res : WORD);
-		VAR ch : CHAR; i, j : SIZE; ipstr : ARRAY 16 OF CHAR; p0, p1, port : LONGINT;
+		VAR ch : CHAR; i, j : SIZE; ipstr : ARRAY 16 OF CHAR; p0, p1, port : SIGNED32;
 			str : ARRAY 32 OF CHAR;
 
 			PROCEDURE Fail;

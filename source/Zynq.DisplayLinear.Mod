@@ -52,7 +52,7 @@ CONST
 	VertSyncPolarity* = TRUE;
 *)
 
-	DefaultColor* = LONGINT(0FFFFFFFFH); (** the color of the booting screen  *)
+	DefaultColor* = SIGNED32(0FFFFFFFFH); (** the color of the booting screen  *)
 
 TYPE
 
@@ -148,7 +148,7 @@ VAR
 		polarity: reset signal polarity, TRUE for active high and FALSE for active low
 	*)
 	PROCEDURE ResetPl(polarity: BOOLEAN);
-	VAR res, t: LONGINT;
+	VAR res, t: SIGNED32;
 	BEGIN
 		IF polarity THEN (* active high *)
 			ASSERT(PsConfig.SetPlResets({},res));
@@ -168,7 +168,7 @@ VAR
 	*)
 	PROCEDURE SetupClocks;
 	VAR
-		res: LONGINT;
+		res: SIGNED32;
 		freq: HUGEINT;
 	BEGIN
 		(*
@@ -201,7 +201,7 @@ VAR
 	PROCEDURE Init;
 	VAR
 		res: WORD;
-		d: LONGINT;
+		d: SIGNED32;
 	BEGIN
 		SetupClocks;
 
@@ -298,7 +298,7 @@ VAR
 		END;
 	END Install;
 
-	PROCEDURE -Copy32(sadr: ADDRESS; dadr: ADDRESS; len: LONGINT);
+	PROCEDURE -Copy32(sadr: ADDRESS; dadr: ADDRESS; len: SIGNED32);
 	CODE
 		LDR	R0, [SP, #dadr]
 		LDR	R1, [SP, #len]

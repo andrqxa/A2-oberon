@@ -46,7 +46,7 @@ TYPE
 	END LoadM;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, maxx, maxy: LONGINT;  A: antsArrayObjects.tINTEGERArray;  ym, yp, xm, xp, config: LONGINT;  model: tModel;
+	VAR x, y, maxx, maxy: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  ym, yp, xm, xp, config: SIGNED32;  model: tModel;
 		AO: antsArrayObjects.tINTEGERObject;  tempA: antsArrayObjects.tINTEGERObject;  orig: Objects.Object;
 
 		PROCEDURE DistriFromLocalChar;
@@ -246,8 +246,8 @@ END;
 
 
 PROCEDURE OneSweep* (s: antsGibbs.tSampler);
-VAR  x,y,maxx,maxy: LONGINT ;    A: antsPictArray.tArray;  model: tModel;
-xm,xp,ym,yp: LONGINT;  config: LONGINT;  AO: antsPictArray.tObject;
+VAR  x,y,maxx,maxy: SIGNED32 ;    A: antsPictArray.tArray;  model: tModel;
+xm,xp,ym,yp: SIGNED32;  config: SIGNED32;  AO: antsPictArray.tObject;
 
 PROCEDURE DistriFromLocalChar ();
 BEGIN

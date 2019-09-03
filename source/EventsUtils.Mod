@@ -173,9 +173,9 @@ BEGIN
 END ToStream;
 
 PROCEDURE FromStream*(r : Streams.Reader; VAR event : Events.Event; VAR msg : ARRAY OF CHAR; VAR res : WORD);
-VAR dt : Dates.DateTime; str : Events.Message; ch : CHAR; class, subclass, code : LONGINT;
+VAR dt : Dates.DateTime; str : Events.Message; ch : CHAR; class, subclass, code : SIGNED32;
 
-	PROCEDURE IsValid(value : LONGINT) : BOOLEAN;
+	PROCEDURE IsValid(value : SIGNED32) : BOOLEAN;
 	BEGIN
 		RETURN (0 <= value) & (value <= MAX(SIGNED8));
 	END IsValid;
@@ -241,7 +241,7 @@ BEGIN
 	RETURN Dates.ValidDateTime(dt);
 END DateTimeFromStream;
 
-PROCEDURE GetTypeString*(type : LONGINT; VAR string: ARRAY OF CHAR);
+PROCEDURE GetTypeString*(type : SIGNED32; VAR string: ARRAY OF CHAR);
 VAR nbr : ARRAY 16 OF CHAR;
 BEGIN
 	CASE type OF
@@ -276,7 +276,7 @@ BEGIN
 END GetType;
 
 PROCEDURE GenerateEvent*(context : Commands.Context); (** originator type class subclass code message ~ *)
-VAR event : Events.Event; value : LONGINT;
+VAR event : Events.Event; value : SIGNED32;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(event.originator);
 	context.arg.SkipWhitespace; context.arg.Int(value, FALSE); event.type := SHORT(SHORT(value));

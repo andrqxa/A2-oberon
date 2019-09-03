@@ -8,10 +8,10 @@ MODULE Magnifier IN Oberon; (** portable *)	(* ejz  *)
 		W, H, W2, H2, Z: SIGNED16;
 		Marker, eArrow, oArrow: Oberon.Marker;
 		buf, buf1, buf2: POINTER TO ARRAY OF CHAR;
-		vX, vY, pix: LONGINT;
+		vX, vY, pix: SIGNED32;
 		installed: BOOLEAN;
 
-	PROCEDURE FlipArrow(X, Y: LONGINT);
+	PROCEDURE FlipArrow(X, Y: SIGNED32);
 		VAR cx, cy, cw, ch: SIGNED16;
 	BEGIN
 		Display.GetClip(cx, cy, cw, ch);
@@ -53,7 +53,7 @@ MODULE Magnifier IN Oberon; (** portable *)	(* ejz  *)
 	END ShowView;
 
 	PROCEDURE Draw(X, Y: SIGNED16);
-		VAR i, j, m, n: LONGINT; p: LONGINT;
+		VAR i, j, m, n: SIGNED32; p: SIGNED32;
 	BEGIN
 		IF (X >= vX) & (X < (vX+Z*W)) & (Y >= vY) & (Y < (vY+Z*H)) THEN
 			FadeView();

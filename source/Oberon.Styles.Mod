@@ -42,12 +42,12 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 		Style* = POINTER TO StyleDesc;
 		StyleDesc* = RECORD(Objects.ObjDesc)
 			opts*: SET;	(* opts: {0} = left, {1} = right, {0,1} = adjust, {} = center *)
-			paraW*: LONGINT;	(* width of area *)
-			left*: LONGINT;	(* left offset *)
-			lsp*, dsr*: LONGINT;	(* line spacing *)
-			gap*: LONGINT;	(* gap before style *)
+			paraW*: SIGNED32;	(* width of area *)
+			left*: SIGNED32;	(* left offset *)
+			lsp*, dsr*: SIGNED32;	(* line spacing *)
+			gap*: SIGNED32;	(* gap before style *)
 			nTabs*: SIGNED8;
-			tab*: ARRAY MaxTabs OF LONGINT
+			tab*: ARRAY MaxTabs OF SIGNED32
 		END;
 		Frame* = POINTER TO FrameDesc;
 		FrameDesc* = RECORD(Display.FrameDesc)
@@ -73,7 +73,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 			next: FontList;
 			name: Objects.Name;
 			mfnt: Fonts.Font;
-			unit: LONGINT
+			unit: SIGNED32
 		END;
 
 
@@ -88,12 +88,12 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 (* document coordinate stuff *)
 
 
-	PROCEDURE Screen(x: LONGINT): SIGNED16;
+	PROCEDURE Screen(x: SIGNED32): SIGNED16;
 	BEGIN
 		RETURN SHORT(x DIV ScnUnit)
 	END Screen;
 
-	PROCEDURE Doc(x: SIGNED16): LONGINT;
+	PROCEDURE Doc(x: SIGNED16): SIGNED32;
 	BEGIN
 		RETURN LONG(x)*ScnUnit;
 	END Doc;
@@ -112,7 +112,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 *)
 	END Uncache;
 
-	PROCEDURE OpenMetricFont(fnt: Fonts.Font; VAR unit: LONGINT; VAR mfnt: Fonts.Font);
+	PROCEDURE OpenMetricFont(fnt: Fonts.Font; VAR unit: SIGNED32; VAR mfnt: Fonts.Font);
 	BEGIN
 		mfnt := Printer.GetMetric(fnt);
 		IF mfnt = NIL THEN unit := ScnUnit; mfnt := fnt
@@ -120,7 +120,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 		END
 	END OpenMetricFont;
 
-	PROCEDURE MetricFnt*(fnt: Fonts.Font; VAR unit: LONGINT; VAR mfnt: Fonts.Font);
+	PROCEDURE MetricFnt*(fnt: Fonts.Font; VAR unit: SIGNED32; VAR mfnt: Fonts.Font);
 	VAR p, q: FontList;
 	BEGIN
 		q := font.next;
@@ -134,11 +134,11 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 		mfnt := q.mfnt; unit := q.unit
 	END MetricFnt;
 
-	PROCEDURE Tab*(style: Style; fnt: Fonts.Font; x, X: LONGINT; VAR dx: SIGNED16; VAR dX: LONGINT);
+	PROCEDURE Tab*(style: Style; fnt: Fonts.Font; x, X: SIGNED32; VAR dx: SIGNED16; VAR dX: SIGNED32);
 	VAR
 		t: SIGNED16;
 		obj: Objects.Object;
-		X0, unit: LONGINT;
+		X0, unit: SIGNED32;
 	BEGIN
 		t := 0;
 		x := x*ScnUnit;	(* to doc *)
@@ -154,8 +154,8 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 		MetricFnt(fnt, unit, fnt); fnt.GetObj(fnt, ORD(TAB), obj); dX := unit*obj(Fonts.Char).dx
 	END Tab;
 
-	PROCEDURE Height*(fnt: Fonts.Font; VAR asr, dsr: LONGINT);
-	VAR unit: LONGINT;
+	PROCEDURE Height*(fnt: Fonts.Font; VAR asr, dsr: SIGNED32);
+	VAR unit: SIGNED32;
 	BEGIN MetricFnt(fnt, unit, fnt); asr := unit*fnt.maxY; dsr := -unit*fnt.minY
 	END Height;
 
@@ -181,7 +181,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 
 	(*old*)
 
-	PROCEDURE ReadLong (VAR R: Files.Rider; VAR x: LONGINT);
+	PROCEDURE ReadLong (VAR R: Files.Rider; VAR x: SIGNED32);
 	VAR c0, c1, c2: CHAR; s1: SIGNED8;
 	BEGIN Files.Read(R, c0); Files.Read(R, c1); Files.Read(R, c2); Files.Read(R, s1);
 		x := s1; x := ((x * 100H + LONG(ORD(c2))) * 100H + LONG(ORD(c1))) * 100H + LONG(ORD(c0))
@@ -189,7 +189,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 
 	(*new*)
 
-	PROCEDURE IntToSet(n: LONGINT): SET;	(*[0..255]->[{}..{0..7}]*)
+	PROCEDURE IntToSet(n: SIGNED32): SET;	(*[0..255]->[{}..{0..7}]*)
 	VAR i: SIGNED16; s: SET;
 	BEGIN i := 0; s := {};
 		REPEAT
@@ -198,8 +198,8 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 		RETURN s
 	END IntToSet;
 
-	PROCEDURE SetToInt(s: SET): LONGINT;	(*[{}..{0..7}]->[0..255]*)
-	VAR i: SIGNED16; n: LONGINT;
+	PROCEDURE SetToInt(s: SET): SIGNED32;	(*[{}..{0..7}]->[0..255]*)
+	VAR i: SIGNED16; n: SIGNED32;
 	BEGIN i := 8; n := 0;
 		REPEAT DEC(i); n := n*2;
 			IF i IN s THEN INC(n) END
@@ -222,7 +222,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 	END WriteData;
 
 	PROCEDURE ReadData (VAR R: Files.Rider; style: Style);
-		VAR i: SIGNED16; n: LONGINT; x, y: CHAR;
+		VAR i: SIGNED16; n: SIGNED32; x, y: CHAR;
 	BEGIN
 		Files.Read(R, y); Files.Read(R, x);
 		IF x = 0X THEN	(*old*)	(*opts=[y|0|0|0]*)
@@ -323,7 +323,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 
 	PROCEDURE CheckTab(style: Style; i: SIGNED16);
 	VAR
-		tab: LONGINT;
+		tab: SIGNED32;
 		j: SIGNED16;
 	BEGIN
 		tab := style.tab[i]; j := i;
@@ -492,7 +492,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 	PROCEDURE SelStyle*(VAR style: Style);
 	VAR
 		T: Texts.Text;
-		beg, end, time: LONGINT;
+		beg, end, time: SIGNED32;
 		R: Texts.Reader;
 		obj: Objects.Object;
 		x: CHAR;
@@ -660,11 +660,11 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 		d.nTabs := s.nTabs; d.tab := s.tab
 	END Copy;
 
-	PROCEDURE WTenth(n: LONGINT);
+	PROCEDURE WTenth(n: SIGNED32);
 	BEGIN Texts.WriteInt(W, n DIV tenth, 8)
 	END WTenth;
 
-	PROCEDURE Tenth(VAR M: ParamMsg; max: LONGINT; VAR n: LONGINT);
+	PROCEDURE Tenth(VAR M: ParamMsg; max: SIGNED32; VAR n: SIGNED32);
 	BEGIN
 		IF M.id = get THEN Texts.WriteInt(W, n DIV tenth, 8)
 		ELSE Texts.Scan(M.S);
@@ -674,7 +674,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 		END
 	END Tenth;
 
-	PROCEDURE LibMetrics(VAR M: ParamMsg; VAR height, dsr: LONGINT);
+	PROCEDURE LibMetrics(VAR M: ParamMsg; VAR height, dsr: SIGNED32);
 	VAR fnt: Fonts.Font;
 	BEGIN
 		IF M.id = get THEN Texts.WriteInt(W, height DIV tenth, 8)
@@ -716,7 +716,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 	PROCEDURE Params(s: Style; VAR M: ParamMsg);
 	VAR
 		hint, i, dX: SIGNED16;
-		old, dmy, right: LONGINT;
+		old, dmy, right: SIGNED32;
 	BEGIN
 		(*WHILE M.S.class = Texts.Name DO*)
 		IF M.S.class = Texts.Name THEN
@@ -825,7 +825,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 	PROCEDURE Init;
 		VAR obj: Objects.Object;
 		img: ARRAY 32 OF SET;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		obj := NewStyle(); defStyle := obj(Style);
 		img[0] := {0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30}; (*055555555H*)

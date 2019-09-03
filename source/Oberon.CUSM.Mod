@@ -42,7 +42,7 @@ TYPE
 	Addr=RECORD
 		family: SIGNED16;
 		port: SIGNED16;
-		addr: LONGINT;
+		addr: SIGNED32;
 	END;
 
 	Routing=RECORD
@@ -53,7 +53,7 @@ TYPE
 	VideoPacketHeader = POINTER TO VideoPacketHeaderDesc;
 	VideoPacketHeaderDesc=RECORD
 		routing: Routing;
-		seqNum: LONGINT;
+		seqNum: SIGNED32;
 		message: SIGNED16;
 		dataType: SIGNED16;
 		len: SIGNED16;
@@ -62,7 +62,7 @@ TYPE
 	OpenContinueData = POINTER TO OpenContinueDataDesc;
 	OpenContinueDataDesc=RECORD
 		clientCount: SIGNED16;
-		seqNum: LONGINT;
+		seqNum: SIGNED32;
 		name: ARRAY 20 OF CHAR;
 		sendMode: CHAR;
 		recvMode: CHAR;
@@ -80,10 +80,10 @@ TYPE
 	Client = POINTER TO ClientDesc;
 	ClientDesc = RECORD
 	next: Client;
-		clAdr: LONGINT;
+		clAdr: SIGNED32;
 		clAdrStr: ARRAY 16 OF CHAR;
 		name: ARRAY 256 OF CHAR;
-		lastSeqNum: LONGINT;
+		lastSeqNum: SIGNED32;
 		sndBufOffset: SIGNED16;
 		sender: BOOLEAN;
 		timeOut: SIGNED8;
@@ -93,7 +93,7 @@ TYPE
 
 	Connection = POINTER TO ConnectionDesc;
 	ConnectionDesc = RECORD
-		reflAdr: LONGINT;
+		reflAdr: SIGNED32;
 		reflAdrStr: ARRAY 16 OF CHAR;
 		confID: SIGNED16;
 		connected:BOOLEAN;
@@ -102,7 +102,7 @@ TYPE
 		sndBufLen: SIGNED16;
 		vphSeqNum:SIGNED16;
 		ocdSeqNum:SIGNED16;
-		timeToSend,timeToUpdate: LONGINT;
+		timeToSend,timeToUpdate: SIGNED32;
 		clientsList: Client;
 		next: Connection;
 	END;
@@ -110,7 +110,7 @@ TYPE
 VAR
 	connectionsList:Connection;
 	currentConnection: Connection;
-	hostAdr, reflAdr: LONGINT;
+	hostAdr, reflAdr: SIGNED32;
 	rcvBuf: ARRAY MAXRCVBUFLEN OF CHAR; (* buffers to receive *)
 	sndTask, rcvTask: Oberon.Task;
 	rcvScktStarted, sndScktStarted:BOOLEAN;
@@ -123,11 +123,11 @@ VAR
 	connectionsLog, videosLog*: Texts.Text;
 	(* IMAGE DECODE*)
 		intraRowBytes: ARRAY 16 OF SIGNED16;
-		interRowDiff: ARRAY 16 OF LONGINT;
+		interRowDiff: ARRAY 16 OF SIGNED32;
 		wordDiff: ARRAY 256 OF  SIGNED16;
-		longDiff: ARRAY 256 OF LONGINT;
+		longDiff: ARRAY 256 OF SIGNED32;
 		conv4To8Bit: ARRAY 256 OF SIGNED16;
-(*		imAdr,imSize: LONGINT;*)
+(*		imAdr,imSize: SIGNED32;*)
 		lumin,contr: SIGNED16; (* luminosity and  contrast *)
 		gamma: REAL;
 
@@ -294,8 +294,8 @@ END SetPalette;
 
 PROCEDURE InitVideo;
 VAR i,j,c,d,m,u:SIGNED16;
-			a,b:LONGINT;
-			digit: ARRAY 8 OF LONGINT;
+			a,b:SIGNED32;
+			digit: ARRAY 8 OF SIGNED32;
 BEGIN
 	(* init intraRowBytes *)
 	intraRowBytes[0]:=-1;
@@ -307,7 +307,7 @@ BEGIN
 
 	(* init interRowDiff *)
 	interRowDiff[0]:=0;
-	a:=LONGINT(0DDDDDDDEH);
+	a:=SIGNED32(0DDDDDDDEH);
 	FOR  i:= 0 TO 4 DO
 		b:=a;
 		FOR j:=1 TO 3 DO
@@ -358,14 +358,14 @@ VAR
 		dataLim: SIGNED16;
 		width,height: SIGNED16;
 		ok: BOOLEAN;
-		rowData: LONGINT;
-(*		imPos: LONGINT;*)
+		rowData: SIGNED32;
+(*		imPos: SIGNED32;*)
 x, y, minx, miny, maxx, maxy: SIGNED16;
 
 	PROCEDURE DecodeRow(code:SIGNED16);
 	VAR
 			i,col,intra: SIGNED16;
-			temp:LONGINT;
+			temp:SIGNED32;
 			cols:SIGNED16;
 	BEGIN
 		IF code=0 THEN
@@ -396,7 +396,7 @@ DEC(y);
 			FOR i:=0 TO 3 DO
 				col:=SHORT(temp MOD 256);
 				IF temp < 0 THEN
-					temp := MAX(LONGINT)+temp+1;	(* put away sign bit *)
+					temp := MAX(SIGNED32)+temp+1;	(* put away sign bit *)
 					temp := temp DIV 256 + 800000H;  (* shift,    800000H = sign bit shifted of 8 bit  *)
 				ELSE
 					temp:=temp DIV 256
@@ -439,7 +439,7 @@ IF y > maxy THEN
 END;
 		codePos:=pos;
 		INC(pos,4);
-		rowData:=LONGINT(88888888H);
+		rowData:=SIGNED32(88888888H);
 		FOR i:=1 TO 4 DO
 			code:=ORD(data[codePos]); INC(codePos);
 			DecodeRow(code DIV 16);
@@ -589,11 +589,11 @@ BEGIN
 	END
 END StopRcvTask;
 
-PROCEDURE ConvIpAdrLtoS(adr: LONGINT; VAR ip: ARRAY OF CHAR);
+PROCEDURE ConvIpAdrLtoS(adr: SIGNED32; VAR ip: ARRAY OF CHAR);
 	VAR k: SIGNED16;
-	PROCEDURE Write(i: LONGINT);
+	PROCEDURE Write(i: SIGNED32);
 	VAR
-			p, n: LONGINT;
+			p, n: SIGNED32;
 			notFirstZero: BOOLEAN;
 	BEGIN
 		notFirstZero:=FALSE;
@@ -680,7 +680,7 @@ BEGIN
 	Texts.Append(videosLog,w2.buf)
 END UpdateVideoStreamsLog;
 
-PROCEDURE SearchConnection(rAddr: LONGINT): Connection;
+PROCEDURE SearchConnection(rAddr: SIGNED32): Connection;
 VAR cur: Connection;
 BEGIN
 	IF connectionsList # NIL THEN
@@ -720,7 +720,7 @@ BEGIN
 	END
 END RemoveConnection;
 
-PROCEDURE SearchClientByAdr(con:Connection; ipAdr: LONGINT): Client;
+PROCEDURE SearchClientByAdr(con:Connection; ipAdr: SIGNED32): Client;
 VAR cur: Client;
 BEGIN
 	cur:=con.clientsList;
@@ -768,7 +768,7 @@ BEGIN
 	END;
 END RemoveClient;
 
-PROCEDURE Turn(ipAdr:LONGINT):LONGINT;
+PROCEDURE Turn(ipAdr:SIGNED32):SIGNED32;
 VAR
 		buf:ARRAY 4 OF CHAR;
 		pos:SIGNED16;
@@ -815,9 +815,9 @@ BEGIN
 	con.sndBufLen:=VPHLEN+OCDLEN
 END FullSndBuf;
 
-PROCEDURE InsertClientInfo(con:Connection; ipAdr: LONGINT ;recv: BOOLEAN);
+PROCEDURE InsertClientInfo(con:Connection; ipAdr: SIGNED32 ;recv: BOOLEAN);
 VAR
-		ccl: LONGINT;
+		ccl: SIGNED32;
 		pos,p,cci:SIGNED16;
 		src: Client;
 BEGIN
@@ -899,7 +899,7 @@ END UpdateClientsList;
 
 PROCEDURE Sender(me: Oberon.Task);
 VAR
-		t:LONGINT;
+		t:SIGNED32;
 		pos:SIGNED16;
 		curCon: Connection;
 		adr: NetSystem.IPAdr;
@@ -943,7 +943,7 @@ END OutMsg;
 
 PROCEDURE Receiver(me: Oberon.Task);
 	VAR
-		rAddr,len,t: LONGINT;
+		rAddr,len,t: SIGNED32;
 		i, msgLen, pos, rPort: SIGNED16;
 		src: Client;
 		curCon:Connection;
@@ -1108,7 +1108,7 @@ END SetReflAdr;
 PROCEDURE SetReflAdrFromList*;
 	VAR
 		s: Texts.Scanner;
-		oldRA: LONGINT;
+		oldRA: SIGNED32;
 		ipAdrS: ARRAY 16 OF CHAR;
 		adr: NetSystem.IPAdr;
 BEGIN
@@ -1140,7 +1140,7 @@ PROCEDURE HandleReflectorLogClick*;
 		pos: SIGNED16;
 		s:Texts.Scanner;
 		con: Connection;
-		reflAdr: LONGINT;
+		reflAdr: SIGNED32;
 		adr,temp: NetSystem.IPAdr;
 BEGIN
 	Texts.OpenScanner(s,Oberon.Par.text, Oberon.Par.pos);

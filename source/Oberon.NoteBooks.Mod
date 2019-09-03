@@ -19,7 +19,7 @@ TYPE
 	NoteBook* = POINTER TO NoteBookDesc;
 	NoteBookDesc* = RECORD (Gadgets.FrameDesc)
 		pages*: Display.Frame;	(* list of pages belonging to the notebook *)
-		time*: LONGINT	(* time of selection *)
+		time*: SIGNED32	(* time of selection *)
 	END;
 
 	(* Message to change the current page *)
@@ -375,7 +375,7 @@ END Attr;
 
 PROCEDURE Handler*(F: Objects.Object; VAR M: Objects.ObjMsg);
 VAR x, y, w, h: SIGNED16; F0: NoteBook; R: Display3.Mask;
-	f: Display.Frame; ver: LONGINT; obj: Objects.Object;
+	f: Display.Frame; ver: SIGNED32; obj: Objects.Object;
 BEGIN
 	WITH F: NoteBook DO
 		IF M IS Display.FrameMsg THEN

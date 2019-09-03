@@ -20,7 +20,7 @@ TYPE
 			ASSERT(uart # NIL);
 		END Init;
 
-		PROCEDURE Open (bps, data, parity, stop : LONGINT; VAR res: WORD);
+		PROCEDURE Open (bps, data, parity, stop : SIGNED32; VAR res: WORD);
 		BEGIN{EXCLUSIVE}
 			PsUart.Open(uart, bps, data, parity, stop, res);
 		END Open;
@@ -88,7 +88,7 @@ TYPE
 			RETURN PsUart.Available(uart);
 		END Available;
 
-		PROCEDURE GetPortState(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : LONGINT);
+		PROCEDURE GetPortState(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : SIGNED32);
 		BEGIN{EXCLUSIVE}
 			openstat := uart.open;
 			bps := uart.bps;

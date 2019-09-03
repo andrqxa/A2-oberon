@@ -35,7 +35,7 @@ CONST
 	(*invalNrNans = -1;  	(* nan count to flag invalid min/max/nans for a buffer *)
 	invalSsq = -1.0;    (* ssq value to flag mean/ssq as invalid *)*)
 TYPE
-	index* = LONGINT;
+	index* = SIGNED32;
 
 	(* REAL *)  (* preferred chunk sizes: 128, 1024, 8192 *)
 	nameptr* = vyName.tName;   (* technical convenience, to avoid duplicate code for REAL and LONGREAL *)
@@ -105,7 +105,7 @@ END NewBufs;
 	PROCEDURE NewBufs( size: index ): tBuf;
 	VAR first, last: vyBase.tBuf;  chunk: tBuf;
 
-		PROCEDURE generic( ch: tBuf;  len: LONGINT );
+		PROCEDURE generic( ch: tBuf;  len: SIGNED32 );
 		VAR i: index;
 		BEGIN
 			NEW( ch.data, len );
@@ -156,7 +156,7 @@ END
 END FillBufMinCache;
 
 PROCEDURE FillBufMeanCache (buf: vyBase.tBuf);
-VAR nans: LONGINT;
+VAR nans: SIGNED32;
 BEGIN (* propagate nan handling *)
 IF buf # NIL THEN WITH buf: tBuf DO
 vynameptr.MeanSSq(buf.usedentries, buf(tBuf).data^, 0, buf.mean, buf.ssq, nans)
@@ -184,7 +184,7 @@ END SetNrData; *)
 	(*=  allocate memory for a vector. Do not change information.
 	To reduce size, use SetLen first to trim length
 	*)
-	VAR l, freetrail: LONGINT;
+	VAR l, freetrail: SIGNED32;
 	VAR firstfree: vyBase.tBuf;
 	BEGIN
 		ASSERT ( size >= vec.nrData );
@@ -199,7 +199,7 @@ END SetNrData; *)
 		vyBase.MarkUsed( size, vec );  FlushVecCaches( vec )
 	END SetLen;
 
-	PROCEDURE Len*( vec: vyBase.tVector ): LONGINT;
+	PROCEDURE Len*( vec: vyBase.tVector ): SIGNED32;
 	(*= get total vector length *)
 	BEGIN
 		IF vec = NIL THEN RETURN 0 ELSE RETURN vec.nrData END
@@ -382,7 +382,7 @@ END SetNrData; *)
 		FOR i := offs TO offs + count - 1 DO Set( val, v, i ) END
 	END Fill;
 
-	PROCEDURE NewFilledNamed*( count: LONGINT;  val: nameptr;  name: ARRAY OF CHAR ): tVector;
+	PROCEDURE NewFilledNamed*( count: SIGNED32;  val: nameptr;  name: ARRAY OF CHAR ): tVector;
 	VAR v: tVector;
 	BEGIN
 		v := New( count );  Fill( v, val, 0, count );  vyName.Register( vyName.NameBase, v, name );  RETURN v

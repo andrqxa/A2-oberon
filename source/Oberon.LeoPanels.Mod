@@ -429,7 +429,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	(**--- Color Panel ---**)
 
 	PROCEDURE RevertColor (e: Editor);
-		VAR obj, ref: Objects.Object; fld: ARRAY 32 OF CHAR; col: LONGINT;
+		VAR obj, ref: Objects.Object; fld: ARRAY 32 OF CHAR; col: SIGNED32;
 	BEGIN
 		Links.GetLink(e, "Model", obj);
 		IF obj # NIL THEN
@@ -439,7 +439,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END RevertColor;
 
 	PROCEDURE ApplyColor (e: Editor);
-		VAR obj, ref: Objects.Object; col: LONGINT; fld: ARRAY 32 OF CHAR;
+		VAR obj, ref: Objects.Object; col: SIGNED32; fld: ARRAY 32 OF CHAR;
 	BEGIN
 		Links.GetLink(e, "Model", obj); Attributes.GetInt(obj, "Color", col);
 		Links.GetLink(e, "Referer", ref); Attributes.GetString(e, "Field", fld);
@@ -447,7 +447,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END ApplyColor;
 
 	PROCEDURE EditColor*;
-		VAR p: Gadgets.Frame; obj: Objects.Object; e: Editor; fld: ARRAY 32 OF CHAR; col: LONGINT;
+		VAR p: Gadgets.Frame; obj: Objects.Object; e: Editor; fld: ARRAY 32 OF CHAR; col: SIGNED32;
 	BEGIN
 		p := CopyObj("ColorPanel", TRUE);
 		IF p # NIL THEN
@@ -527,7 +527,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END EditTransform;
 
 	PROCEDURE MakeTransform (e: Editor; VAR m: GfxMatrix.Matrix);
-		VAR x0, y0, dx, dy, d, cos, sin, phi, tx, ty, sx, sy, rho, f: REAL; dir, kind: LONGINT;
+		VAR x0, y0, dx, dy, d, cos, sin, phi, tx, ty, sx, sy, rho, f: REAL; dir, kind: SIGNED32;
 	BEGIN
 		m := GfxMatrix.Identity;
 		Attributes.GetReal(e, "X0", x0); Attributes.GetReal(e, "Y0", y0);
@@ -683,7 +683,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE Print*;
 		VAR
 			frame: Gadgets.Frame; obj: Objects.Object; tool: LeoTools.Tool; name: ARRAY 64 OF CHAR;
-			ls, printps, level2: BOOLEAN; dpi: LONGINT; ps: GfxPS.Context; file: Files.File; pc: GfxPrinter.Context;
+			ls, printps, level2: BOOLEAN; dpi: SIGNED32; ps: GfxPS.Context; file: Files.File; pc: GfxPrinter.Context;
 	BEGIN
 		frame := FindFrame(Gadgets.context);
 		IF (frame # NIL) & (frame.obj # NIL) & (frame.obj IS Leonardo.Figure) THEN
@@ -777,7 +777,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END ExportImage;
 
 	PROCEDURE ExportEPS (fig: Leonardo.Figure; x0, y0, x1, y1: SIGNED16);
-		VAR level2: BOOLEAN; dpi: LONGINT; name: ARRAY 64 OF CHAR; file: Files.File; eps: GfxPS.Context;
+		VAR level2: BOOLEAN; dpi: SIGNED32; name: ARRAY 64 OF CHAR; file: Files.File; eps: GfxPS.Context;
 	BEGIN
 		Attributes.GetBool(PSLevel2, "Value", level2);
 		Attributes.GetInt(PSDPI, "Value", dpi);
@@ -798,7 +798,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END ExportEPS;
 
 	PROCEDURE Export*;
-		VAR fig: Leonardo.Figure; mode: LONGINT; border, llx, lly, urx, ury, bw: REAL; x0, y0, x1, y1: SIGNED16;
+		VAR fig: Leonardo.Figure; mode: SIGNED32; border, llx, lly, urx, ury, bw: REAL; x0, y0, x1, y1: SIGNED16;
 	BEGIN
 		fig := FindFigure(Gadgets.context);
 		IF fig # NIL THEN
@@ -847,7 +847,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END RevertFrame;
 
 	PROCEDURE ApplyFrame (editor: Editor);
-		VAR obj: Objects.Object; frame: LeoFrames.Frame; col, ticks: LONGINT; tool: LeoTools.Tool; t: BOOLEAN;
+		VAR obj: Objects.Object; frame: LeoFrames.Frame; col, ticks: SIGNED32; tool: LeoTools.Tool; t: BOOLEAN;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoFrames.Frame) THEN
@@ -985,7 +985,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	(**--- Figures ---**)
 
 	PROCEDURE RevertFigure (editor: Editor);
-		VAR obj: Objects.Object; fig: Leonardo.Figure; limit: LONGINT;
+		VAR obj: Objects.Object; fig: Leonardo.Figure; limit: SIGNED32;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS Leonardo.Figure) THEN
@@ -996,7 +996,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END RevertFigure;
 
 	PROCEDURE ApplyFigure (editor: Editor);
-		VAR obj: Objects.Object; fig: Leonardo.Figure; limit: LONGINT;
+		VAR obj: Objects.Object; fig: Leonardo.Figure; limit: SIGNED32;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS Leonardo.Figure) THEN
@@ -1248,7 +1248,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			END;
 
 		VAR
-			fig: Leonardo.Figure; sel: Leonardo.Shape; first, last, ref: Reference; xy, val, n: LONGINT;
+			fig: Leonardo.Figure; sel: Leonardo.Shape; first, last, ref: Reference; xy, val, n: SIGNED32;
 			obj: Objects.Object; mat: GfxMatrix.Matrix;
 
 		PROCEDURE const (obj: Objects.Object): REAL;
@@ -1265,7 +1265,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			RETURN val
 		END const;
 
-		PROCEDURE findMax (xy, lo, hi: LONGINT): REAL;
+		PROCEDURE findMax (xy, lo, hi: SIGNED32): REAL;
 			VAR ref: Reference; max, m: REAL;
 		BEGIN
 			ref := first; max := ref.c[xy, hi] - ref.c[xy, lo]; ref := ref.next;
@@ -1277,7 +1277,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			RETURN max
 		END findMax;
 
-		PROCEDURE setDim (xy: LONGINT; dim: REAL);
+		PROCEDURE setDim (xy: SIGNED32; dim: REAL);
 			VAR ref: Reference; d: REAL;
 		BEGIN
 			ref := first;
@@ -1288,7 +1288,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			END
 		END setDim;
 
-		PROCEDURE align (xy, m: LONGINT; step: REAL);
+		PROCEDURE align (xy, m: SIGNED32; step: REAL);
 			VAR ref: Reference; to, d: REAL;
 		BEGIN
 			ref := first; to := ref.c[xy, m] + ref.d[xy, m]; ref := ref.next;
@@ -1301,7 +1301,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			END
 		END align;
 
-		PROCEDURE sort (xy, m: LONGINT);
+		PROCEDURE sort (xy, m: SIGNED32);
 			VAR sent, cand, ref: Reference; max, t: REAL;
 		BEGIN
 			NEW(sent); sent.next := first; first := NIL;
@@ -1320,8 +1320,8 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			WHILE last.next # NIL DO last := last.next END
 		END sort;
 
-		PROCEDURE distribute (xy, m: LONGINT);
-			VAR s: LONGINT; p, q: Reference; step, t: REAL;
+		PROCEDURE distribute (xy, m: SIGNED32);
+			VAR s: SIGNED32; p, q: Reference; step, t: REAL;
 		BEGIN
 			sort(xy, m);
 			Attributes.GetInt(SpaceType[xy], "Value", s);
@@ -1347,8 +1347,8 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			align(xy, m, step)
 		END distribute;
 
-		PROCEDURE distributeSpace (xy: LONGINT);
-			VAR s: LONGINT; p, q, ref: Reference; step, d, sum, to: REAL;
+		PROCEDURE distributeSpace (xy: SIGNED32);
+			VAR s: SIGNED32; p, q, ref: Reference; step, d, sum, to: REAL;
 		BEGIN
 			sort(xy, mid);
 			Attributes.GetInt(SpaceType[xy], "Value", s);
@@ -1513,7 +1513,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END RevertFocus;
 
 	PROCEDURE ApplyFocus (e: Editor);
-		VAR frame: LeoFrames.Frame; kind, dir: LONGINT; pts: SIGNED16; tool: LeoTools.Tool; x, y, phi, dx, dy: REAL;
+		VAR frame: LeoFrames.Frame; kind, dir: SIGNED32; pts: SIGNED16; tool: LeoTools.Tool; x, y, phi, dx, dy: REAL;
 	BEGIN
 		IF e # NIL THEN
 			IF (e.frame # LeoTools.Focus.frame) OR LeoTools.Focus.visible THEN

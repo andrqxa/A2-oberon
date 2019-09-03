@@ -90,7 +90,7 @@ MODULE ImageDocs IN Oberon; (** portable **)	(* eos  *)
 	END NewDoc;
 
 	PROCEDURE Open*;
-		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; doc: Documents.Document;
+		VAR s: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; doc: Documents.Document;
 	BEGIN
 		Texts.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(s);
 		IF (s.class = Texts.Char) & (s.c = "^") THEN

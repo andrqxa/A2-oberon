@@ -61,7 +61,7 @@ VAR
 		END;
 	VAR lenv: vyBase.tVector;  xp, yp: REAL;  lenMin: REAL;  dataSpan: REAL;
 		penVec: ARRAY cPens + 1 OF tPoint;
-		yFac: REAL;  delta: SIGNED16;  I, J, rightLim, leftLim, dataPoint, count: LONGINT;
+		yFac: REAL;  delta: SIGNED16;  I, J, rightLim, leftLim, dataPoint, count: SIGNED32;
 	BEGIN
 		IF shorth.x # NIL THEN
 			count := shorth.x.nrData;
@@ -127,7 +127,7 @@ VAR
 	END Consume;
 
 	PROCEDURE AdjustCoord( pict: vyPort.Picture;  obj: tLayer );
-	VAR minX, maxX: REAL;  nans: LONGINT;
+	VAR minX, maxX: REAL;  nans: SIGNED32;
 	BEGIN
 		IF pict # NIL THEN
 			IF obj.x # NIL THEN vyTypes.VGetMinMaxR( obj.x, minX, maxX, nans ) ELSE minX := 0;  maxX := 1 END;
@@ -189,7 +189,7 @@ VAR
 	END New;
 
 	PROCEDURE Handler*( obj: Objects.Object;  VAR msg: Objects.ObjMsg );   (*vs 0.0a1	md  20.07.94 *)
-	VAR minX, maxX: REAL;  pict: vyPort.Picture;  nans: LONGINT;
+	VAR minX, maxX: REAL;  pict: vyPort.Picture;  nans: SIGNED32;
 	BEGIN
 		WITH obj: tLayer DO
 			IF msg IS Display.DisplayMsg THEN
@@ -267,7 +267,7 @@ END Init;*)
 VAR F: tLayer;
 pict: vyPort.Picture;
 minX, maxX: REAL;
-nans: LONGINT;
+nans: SIGNED32;
 BEGIN
 WHILE list # NIL DO
 NEW (F); Init (F, list.obj);
@@ -290,7 +290,7 @@ END ShowL;*)
 VAR F: tLayer;
 pict: vyPort.Picture;
 minX, maxX: REAL;
-nans: LONGINT;
+nans: SIGNED32;
 BEGIN
 NEW (F); Init (F, obj);
 pict := vyPort.InsertNewCPicture (0, 0, 1, 1, vyDisplay2d.NewC2d (0, -1, F.x(vyBase.tVector).nrData, 1));

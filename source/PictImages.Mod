@@ -60,7 +60,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 	END UnpackP1;
 
 	PROCEDURE PackP4 (VAR fmt: Raster.Format0; adr: ADDRESS; bit: SIZE; VAR pix: Raster.Pixel);
-		VAR b: CHAR; i: LONGINT;
+		VAR b: CHAR; i: SIGNED32;
 	BEGIN
 		SYSTEM.GET(adr, b);
 		i := Raster.PaletteIndex(fmt.pal, ORD(pix[R]), ORD(pix[G]), ORD(pix[B])) MOD 10H;
@@ -78,7 +78,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 	(* load Oberon picture from file *)
 	PROCEDURE LoadPict (img: Raster.Image; VAR fname: ARRAY OF CHAR; VAR done: BOOLEAN);
 		VAR
-			file: Files.File; r: Files.Reader; id, w, h, depth: SIGNED16; gen: ARRAY 64 OF CHAR; i, n: LONGINT;
+			file: Files.File; r: Files.Reader; id, w, h, depth: SIGNED16; gen: ARRAY 64 OF CHAR; i, n: SIGNED32;
 			adr, a: ADDRESS; pal: Raster.Palette; red, green, blue, byte: CHAR; fmt: Raster.Format;
 	BEGIN
 		file := Files.Old(fname);
@@ -269,8 +269,8 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 	END PatternToImage;
 
 	(** initialize pattern from sets **)
-	PROCEDURE NewPattern* (w, h: LONGINT; VAR image: ARRAY OF SET): Raster.Image;
-		VAR bpr, y: LONGINT; sa, da: ADDRESS; img: Raster.Image;
+	PROCEDURE NewPattern* (w, h: SIGNED32; VAR image: ARRAY OF SET): Raster.Image;
+		VAR bpr, y: SIGNED32; sa, da: ADDRESS; img: Raster.Image;
 	BEGIN
 		bpr := (w+7) DIV 8;
 		NEW(img); Raster.Create(img, w, h, Raster.A1);
@@ -282,7 +282,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 	END NewPattern;
 
 	PROCEDURE InitPatterns;
-		VAR pat: ARRAY 8 OF SET; i: LONGINT;
+		VAR pat: ARRAY 8 OF SET; i: SIGNED32;
 	BEGIN
 		(* adapted from Printer3 *)
 		pat[0] := {}; pat[1] := {}; pat[2] := {}; pat[3] := {0,4,8,12,16,20,24,28};

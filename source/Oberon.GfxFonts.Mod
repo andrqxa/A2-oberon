@@ -115,7 +115,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 		Default*: Font;	(** corresponds to Fonts.Default **)
 		RClass, ORClass, FClass, OFClass, WRClass, OWRClass, WFClass, OWFClass, OClass: Methods;	(* builtin font classes *)
 		Cache: Font;	(* sentinel for list of cached fonts *)
-		Chars: LONGINT;	(* current number of cached characters *)
+		Chars: SIGNED32;	(* current number of cached characters *)
 		TmpPath: GfxPaths.Path;
 		TmpRegion: GfxRegions.Region;
 		Inv: ARRAY 256 OF CHAR;	(* reverses bit order *)
@@ -167,7 +167,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 	END AddSplineElem;
 
 	(* convert natural spline to Bezier control points *)
-	PROCEDURE SplineToBezier (VAR x, y: ARRAY OF REAL; VAR n: LONGINT; closed: BOOLEAN);
+	PROCEDURE SplineToBezier (VAR x, y: ARRAY OF REAL; VAR n: SIGNED32; closed: BOOLEAN);
 		VAR data: PathEnumData;
 	BEGIN
 		data.n := 1; data.x := x[0]; data.y := y[0];
@@ -179,8 +179,8 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 	END SplineToBezier;
 
 	(* convert Bezier2 to Bezier *)
-	PROCEDURE Bezier2ToBezier (VAR x, y: ARRAY OF REAL; VAR n: LONGINT);
-		VAR nout, m: LONGINT;
+	PROCEDURE Bezier2ToBezier (VAR x, y: ARRAY OF REAL; VAR n: SIGNED32);
+		VAR nout, m: SIGNED32;
 	BEGIN
 		IF ODD(n) THEN
 			nout := (n - 1) DIV 2 * 3 + 1;
@@ -208,18 +208,18 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 			maxNofContours = 128;
 
 		VAR
-			minY, maxY, base, i, y, ntypes, nchars, x, left, ncontours, n, m, cont, k: LONGINT; scale: REAL; ch: CHAR;
-			type, pred, succ, last: ARRAY maxNofContours OF LONGINT; str: ARRAY 32 OF CHAR; kind: ARRAY 5 OF SIGNED16;
+			minY, maxY, base, i, y, ntypes, nchars, x, left, ncontours, n, m, cont, k: SIGNED32; scale: REAL; ch: CHAR;
+			type, pred, succ, last: ARRAY maxNofContours OF SIGNED32; str: ARRAY 32 OF CHAR; kind: ARRAY 5 OF SIGNED16;
 			closed: BOOLEAN; px, py: POINTER TO ARRAY maxNofContours, MaxBezierPoints OF REAL;
 			done: ARRAY maxNofContours OF BOOLEAN;
 
-		PROCEDURE coincident (px, py, qx, qy: REAL; dist: LONGINT): BOOLEAN;
+		PROCEDURE coincident (px, py, qx, qy: REAL; dist: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN (ABS(px - qx) <= dist) & (ABS(py - qy) <= dist)
 		END coincident;
 
 	BEGIN
-		minY := MAX(LONGINT); maxY := MIN(LONGINT); base := minY;
+		minY := MAX(SIGNED32); maxY := MIN(SIGNED32); base := minY;
 		FOR i := 1 TO 5 DO
 			Files.ReadNum(r, y);
 			IF y > maxY THEN maxY := y END;
@@ -383,7 +383,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 
 	(* put character into cache *)
 	PROCEDURE CacheChar (font: Font; ch: CHAR; x, y, dx, dy: REAL; map: Images.Image);
-		VAR char: Char; n, m: LONGINT;
+		VAR char: Char; n, m: SIGNED32;
 	BEGIN
 		NEW(char); font.char[ORD(ch)] := char;
 		char.x := x; char.y := y; char.dx := dx; char.dy := dy; char.map := map;
@@ -426,7 +426,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 
 	(* extract family and style from font name *)
 	PROCEDURE SplitName (name: ARRAY OF CHAR; VAR fam, style: ARRAY OF CHAR);
-		VAR i, j: LONGINT;
+		VAR i, j: SIGNED32;
 	BEGIN
 		fam[0] := name[0];
 		i := 1;
@@ -485,7 +485,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 	PROCEDURE LoadRaster (VAR name: ARRAY OF CHAR): RasterFile;
 		VAR
 			rfile: RasterFile; file: Files.File; r: Files.Rider; id, ch: CHAR; type: SIGNED8; height, runs, i, j: SIGNED16;
-			beg, end: ARRAY 32 OF SIGNED16; size: LONGINT; adr: ADDRESS;
+			beg, end: ARRAY 32 OF SIGNED16; size: SIGNED32; adr: ADDRESS;
 	BEGIN
 		rfile := NIL;
 		file := Files.Old(name);	(* guaranteed to exist *)
@@ -736,7 +736,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 
 	(** compute advance vector for complete string **)
 	PROCEDURE GetStringWidth* (font: Font; str: ARRAY OF CHAR; VAR dx, dy: REAL);
-		VAR i: LONGINT; ddx, ddy: REAL;
+		VAR i: SIGNED32; ddx, ddy: REAL;
 	BEGIN
 		i := 0; dx := 0; dy := 0;
 		WHILE str[i] # 0X DO
@@ -1023,7 +1023,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 
 	(* ... from outline structure *)
 	PROCEDURE OGetOutline (font: Font; ch: CHAR; x, y: REAL; path: GfxPaths.Path);
-		VAR outline: Outline; len: LONGINT; mat: GfxMatrix.Matrix; s: GfxPaths.Scanner; scale, dx, dy, x0, y0, x1, y1, x2, y2: REAL;
+		VAR outline: Outline; len: SIGNED32; mat: GfxMatrix.Matrix; s: GfxPaths.Scanner; scale, dx, dy, x0, y0, x1, y1, x2, y2: REAL;
 	BEGIN
 		GfxPaths.Clear(path);
 		outline := font.outline; len := outline.len[ORD(ch)];
@@ -1081,7 +1081,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 	END InitClasses;
 
 	PROCEDURE InitDefault;
-		VAR family, style: FontName; i: LONGINT;
+		VAR family, style: FontName; i: SIGNED32;
 	BEGIN
 		NEW(Default); Default.class := RClass; Default.rfont := Fonts.Default; Default.niceMaps := TRUE;
 		Default.xmin := Default.rfont.minX; Default.ymin := Default.rfont.minY;
@@ -1096,7 +1096,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 	END InitDefault;
 
 	PROCEDURE InitInv;
-		VAR ch, inv, bit: LONGINT;
+		VAR ch, inv, bit: SIGNED32;
 	BEGIN
 		FOR ch := 0 TO 0FFH DO
 			inv := 0;

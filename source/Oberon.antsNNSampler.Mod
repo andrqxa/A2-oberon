@@ -66,8 +66,8 @@ VAR
 	A: antsArrayObjects.tArray
 	*)
 		A: antsArrayObjects.tINTEGERObject;  Ao: antsArrayObjects.tINTEGERObject;
-		AA, AAo: antsArrayObjects.tINTEGERArray;  y, W, H: LONGINT;  ran: LONGREAL;  depth: LONGINT;  n1, n2, n3, n4, nd, nh: SIGNED16;  h, h1, h2, cooling: LONGREAL;
-		gen: vyRanBase.tRandom;  zvax, zvay, zva: LONGINT;  orig: Objects.Object;
+		AA, AAo: antsArrayObjects.tINTEGERArray;  y, W, H: SIGNED32;  ran: LONGREAL;  depth: SIGNED32;  n1, n2, n3, n4, nd, nh: SIGNED16;  h, h1, h2, cooling: LONGREAL;
+		gen: vyRanBase.tRandom;  zvax, zvay, zva: SIGNED32;  orig: Objects.Object;
 
 	BEGIN
 
@@ -101,7 +101,7 @@ VAR
 	A: antsArrayObjects.tArray
 	*)
 		A: antsArrayObjects.tINTEGERObject;  Ao: antsArrayObjects.tINTEGERObject;
-		AA, AAo: antsArrayObjects.tINTEGERArray;  y, x, W, H: LONGINT;  ran, this, z: LONGREAL;  depth, i: LONGINT;  n1, n2, n3, n4, nd: SIGNED16;
+		AA, AAo: antsArrayObjects.tINTEGERArray;  y, x, W, H: SIGNED32;  ran, this, z: LONGREAL;  depth, i: SIGNED32;  n1, n2, n3, n4, nd: SIGNED16;
 		orig: Objects.Object;
 	BEGIN
 		o := s.par( tModel );  A := s.A( antsArrayObjects.tINTEGERObject );  Links.GetLink( A, "orig", orig );
@@ -132,8 +132,8 @@ VAR
 
 	END OneSweep;
 
-	PROCEDURE Sync( m: tModel;  depth: LONGINT );
-	VAR y, x: LONGINT;
+	PROCEDURE Sync( m: tModel;  depth: SIGNED32 );
+	VAR y, x: SIGNED32;
 	BEGIN
 		IF (m.u = NIL ) OR (LEN( m.u ) # depth) THEN NEW( m.u, depth, depth );  NEW( m.ud, depth, depth );  END;
 		FOR y := 0 TO depth - 1 DO

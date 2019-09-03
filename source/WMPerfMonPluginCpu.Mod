@@ -21,13 +21,13 @@ TYPE
 	CpuLoadHelper = OBJECT(WMPerfMonPlugins.Helper);
 	VAR
 		cpuLoad : ARRAY Machine.MaxCPU OF REAL; (* in % *)
-		nbrOfCpus : LONGINT;
+		nbrOfCpus : SIGNED32;
 
 		lastTimeStamp, timestamp : HUGEINT;
 		lastCycles : ARRAY Machine.MaxCPU OF HUGEINT;
 
 		PROCEDURE Update;
-		VAR cpuNbr : LONGINT; dCycles, total : LONGREAL;
+		VAR cpuNbr : SIGNED32; dCycles, total : LONGREAL;
 		BEGIN
 			timestamp := Machine.GetTimer();
 
@@ -46,8 +46,8 @@ TYPE
 		END Update;
 
 		(** Return the number of CPUs *)
-		PROCEDURE GetNbrOfCpus() : LONGINT;
-		VAR nbrOfCpus, cpuNbr : LONGINT;
+		PROCEDURE GetNbrOfCpus() : SIGNED32;
+		VAR nbrOfCpus, cpuNbr : SIGNED32;
 		BEGIN
 			(* Determine number of CPUs *)
 			nbrOfCpus := 0;
@@ -98,7 +98,7 @@ TYPE
 		END Init;
 
 		PROCEDURE UpdateDataset*;
-		VAR cpu : LONGINT; sum : REAL;
+		VAR cpu : SIGNED32; sum : REAL;
 		BEGIN
 			IF processorID = CpuLoadAll THEN
 				FOR cpu := 0 TO Machine.MaxCPU-1 DO
@@ -132,13 +132,13 @@ TYPE
 
 VAR
 	(* Facilitates integration into Performance Monitor application *)
-	nbrOfCpus- : LONGINT;
+	nbrOfCpus- : SIGNED32;
 	cpuLoadHelper : CpuLoadHelper;
 
 PROCEDURE InitPlugins;
 VAR
 	readyCounter : ReadyCounter; par : WMPerfMonPlugins.Parameter;
-	c : CpuLoad; cpar : CpuParameter; proc : LONGINT;
+	c : CpuLoad; cpar : CpuParameter; proc : SIGNED32;
 BEGIN
 	NEW(par); NEW(readyCounter, par);
 	NEW(cpar); cpar.processorID := 0; NEW(c, cpar);

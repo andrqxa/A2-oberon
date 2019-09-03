@@ -66,7 +66,7 @@ MODULE Terminals IN Oberon;	(** portable *) (* gri/ww 5 Jun 92 *)
 			oldRelative: BOOLEAN;
 			cache*: Texts.Writer;
 			text*: Texts.Text;
-			pin*: LONGINT;
+			pin*: SIGNED32;
 		END;
 
 
@@ -567,7 +567,7 @@ MODULE Terminals IN Oberon;	(** portable *) (* gri/ww 5 Jun 92 *)
 		WHILE s[i] # 0X DO Send(T, s[i]); INC(i) END
 	END SendString;
 
-	PROCEDURE SendText* (T: Terminal; text: Texts.Text; beg, end: LONGINT);
+	PROCEDURE SendText* (T: Terminal; text: Texts.Text; beg, end: SIGNED32);
 		VAR R: Texts.Reader; ch: CHAR;
 	BEGIN Texts.OpenReader(R, text, beg);
 		WHILE Texts.Pos(R) < end DO Texts.Read(R, ch); Send(T, ch) END

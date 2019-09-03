@@ -3,7 +3,7 @@ MODULE CryptoIDEA;   (* g.f.	2002.07.19 *)
 IMPORT S := SYSTEM, Ciphers := CryptoCiphers;
 
 TYPE
-	CARD16 = LONGINT;  LI = LONGINT;
+	CARD16 = SIGNED32;  LI = SIGNED32;
 	Block = ARRAY 4 OF CARD16;
 	KeyBlock = ARRAY 9, 6 OF CARD16;
 
@@ -12,7 +12,7 @@ TYPE
 				ekeys, dkeys: KeyBlock;
 				iv: Block;
 
-				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: LONGINT );
+				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: SIGNED32 );
 				BEGIN
 					ASSERT( keybits = 128 );
 					InitKey^( src, keybits );
@@ -95,7 +95,7 @@ TYPE
 
 
 	PROCEDURE Inverse( x: CARD16 ): CARD16;
-	VAR n1, n2, q, r, b1, b2, t: LONGINT;
+	VAR n1, n2, q, r, b1, b2, t: SIGNED32;
 	BEGIN
 		IF x = 0 THEN  b2 := 0
 		ELSE
@@ -184,11 +184,11 @@ TYPE
 
 	PROCEDURE Xor( a, b: CARD16 ): CARD16;
 	BEGIN
-		RETURN S.VAL( LONGINT, S.VAL( SET32, a )/S.VAL( SET32, b ) )
+		RETURN S.VAL( SIGNED32, S.VAL( SET32, a )/S.VAL( SET32, b ) )
 	END Xor;
 
 	PROCEDURE Mul( a, b: CARD16 ): CARD16;
-	VAR p, q: LONGINT;
+	VAR p, q: SIGNED32;
 	BEGIN
 		IF a = 0 THEN  p := 10001H - b
 		ELSIF b = 0 THEN  p := 10001H - a

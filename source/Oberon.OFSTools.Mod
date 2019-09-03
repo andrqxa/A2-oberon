@@ -8,7 +8,7 @@ VAR
 	W: Texts.Writer;
 
 PROCEDURE ExpandAlias(VAR alias, genvol, genfs: ARRAY OF CHAR);
-VAR t: ARRAY 64 OF CHAR; s: Texts.Scanner; i, j: LONGINT;
+VAR t: ARRAY 64 OF CHAR; s: Texts.Scanner; i, j: SIGNED32;
 BEGIN
 	genvol[0] := 0X; genfs[0] := 0X;
 	t := "AosFS.Alias.";
@@ -25,7 +25,7 @@ BEGIN
 END ExpandAlias;
 
 PROCEDURE GetSelection(VAR par: ARRAY OF CHAR);
-VAR t: Texts.Text; r: Texts.Reader; beg, end, time, i: LONGINT; ch: CHAR;
+VAR t: Texts.Text; r: Texts.Reader; beg, end, time, i: SIGNED32; ch: CHAR;
 BEGIN
 	Oberon.GetSelection(t, beg, end, time);
 	IF (time # -1) & (t # NIL) THEN
@@ -56,7 +56,7 @@ END GetFileSystemFactory;
 PROCEDURE Mount*;	(** prefix alias ([volpar] ["|" fspar] ~ | ^ ) *)
 VAR
 	factory : AosFS.FileSystemFactory;
-	parvol, parfs: AosFS.Parameters; s: Texts.Scanner; i, k : LONGINT;
+	parvol, parfs: AosFS.Parameters; s: Texts.Scanner; i, k : SIGNED32;
 	temp, par, alias, genvol, genfs: ARRAY 64 OF CHAR; prefix: AosFS.Prefix;
 	r : Streams.StringReader; w : Streams.StringWriter; string : ARRAY 1024 OF CHAR; res : WORD;
 BEGIN
@@ -128,7 +128,7 @@ BEGIN
 END Mount;
 
 PROCEDURE Unmount*;	(** prefix *)
-VAR prefix: AosFS.Prefix; fs: AosFS.FileSystem; i: LONGINT;
+VAR prefix: AosFS.Prefix; fs: AosFS.FileSystem; i: SIGNED32;
 BEGIN
 	In.Open;  In.Name(prefix);
 	IF In.Done THEN
@@ -175,7 +175,7 @@ BEGIN
 END SetDefault;
 
 PROCEDURE ModifyName(in, prefix: ARRAY OF CHAR;  add: BOOLEAN;  VAR out: ARRAY OF CHAR);
-VAR i, j: LONGINT;
+VAR i, j: SIGNED32;
 BEGIN
 	IF add THEN
 		i := 0; WHILE prefix[i] # 0X DO out[i] := prefix[i]; INC(i) END;
@@ -191,7 +191,7 @@ END ModifyName;
 
 PROCEDURE GenCopyFiles*;	(** remprefix addprefix ( "mask" | &file | { file [=> file] } ) ~ *)
 VAR
-	s: Texts.Scanner; t: Texts.Text; time, date: LONGINT; size: AosFS.Size; enum: AosFS.Enumerator;
+	s: Texts.Scanner; t: Texts.Text; time, date: SIGNED32; size: AosFS.Size; enum: AosFS.Enumerator;
 	prefix1, prefix2: AosFS.Prefix; name: AosFS.FileName; flags: SET;
 BEGIN
 	StartScan(s);
@@ -244,7 +244,7 @@ BEGIN
 END GenCopyFiles;
 
 PROCEDURE StartScan(VAR S: Texts.Scanner);
-VAR beg, end, time: LONGINT;  T: Texts.Text;
+VAR beg, end, time: SIGNED32;  T: Texts.Text;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(S);
@@ -331,7 +331,7 @@ BEGIN
 	Texts.Append(Oberon.Log, W.buf)
 END CopyTo;
 
-PROCEDURE WriteK(VAR W: Texts.Writer;  k: LONGINT);
+PROCEDURE WriteK(VAR W: Texts.Writer;  k: SIGNED32);
 VAR suffix: CHAR;
 BEGIN
 	IF k < 10*1024 THEN suffix := "K"
@@ -342,7 +342,7 @@ BEGIN
 END WriteK;
 
 PROCEDURE Watch*;
-VAR free, total: LONGINT; i: SIZE; fs: AosFS.FileSystem; ft: AosFS.FileSystemTable;
+VAR free, total: SIGNED32; i: SIZE; fs: AosFS.FileSystem; ft: AosFS.FileSystemTable;
 BEGIN
 	Texts.WriteString(W, "OFSTools.Watch");  Texts.WriteLn(W);
 	AosFS.GetList(ft);

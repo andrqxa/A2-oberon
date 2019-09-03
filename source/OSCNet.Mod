@@ -83,7 +83,7 @@ TYPE
 	OSCUDPData = OBJECT
 		VAR
 			fip*: IP.Adr;
-			fport*: LONGINT;
+			fport*: SIGNED32;
 	END OSCUDPData;
 
 	(* UDP Client *)
@@ -91,13 +91,13 @@ TYPE
 		VAR
 			s: UDP.Socket;
 			fip: IP.Adr;
-			fport: LONGINT;
+			fport: SIGNED32;
 
 		(* Creates a new UDPClient which sends packets to fip:fport.
 			Supply UDP.NilPort for lport, if you don't want to specify a fixed local port for communication.
 			In res the returnvalue of the UDP.Socket's creations is returned. If res doesn't equal to UDP.Ok, the
 			client shouldn't be used *)
-		PROCEDURE &InitUDP*(fip: IP.Adr; fport, lport: LONGINT; VAR res: WORD);
+		PROCEDURE &InitUDP*(fip: IP.Adr; fport, lport: SIGNED32; VAR res: WORD);
 		BEGIN
 			SELF.fip := fip;
 			SELF.fport := fport;
@@ -113,14 +113,14 @@ TYPE
 		(* receives a packet from the network. Only UDP packets from our partner are considered.
 			You can also supply a timeout in miliseconds. Use -1 for a infinite wait.
 			Returns Ok, ParseError or an UDP returncode (eg:. UDP.Timeout) *)
-		PROCEDURE Recieve*(VAR p: OSC.OSCPacket; timeout (* in ms *): LONGINT): WORD;
+		PROCEDURE Recieve*(VAR p: OSC.OSCPacket; timeout (* in ms *): SIGNED32): WORD;
 		VAR
-			fip2: IP.Adr; fport2: LONGINT;
+			fip2: IP.Adr; fport2: SIGNED32;
 			size: SIZE;
 			buffer: Strings.String;
 			got: SIZE;
 			res: WORD;
-			endticks: LONGINT;
+			endticks: SIGNED32;
 			istimeout: BOOLEAN;
 		BEGIN
 			IF timeout # -1 THEN
@@ -162,7 +162,7 @@ TYPE
 			newPacket: OSC.OSCPacket;
 			newUDPData: OSCUDPData;
 			buffer: OSC.String; (* ARRAY MaxUDPPacketLength OF CHAR; *)
-			receivefip: IP.Adr; receivefport: LONGINT;
+			receivefip: IP.Adr; receivefport: SIGNED32;
 			got: SIZE;
 			res: WORD;
 
@@ -174,7 +174,7 @@ TYPE
 
 		(* Creates a new UDPServer listening on UDP port lport.. Sends received packets to service.
 			If res is not UDP.Ok, then the server will immediately quit *)
-		PROCEDURE &InitUDPServer*(service: OSCService.OSCService; lport: LONGINT; VAR res: WORD);
+		PROCEDURE &InitUDPServer*(service: OSCService.OSCService; lport: SIGNED32; VAR res: WORD);
 		BEGIN
 			ASSERT(service # NIL);
 			oscservice := service;
@@ -244,7 +244,7 @@ TYPE
 		(* creates a new OSCTCPClient and connects to fip:fport. The user can also specify a local port to use for the outgoing
 			connection. If TCP.NilPort is used, the operating system assigns a free local port number. If res doesn't euqal to
 			TCP.Ok then this client shouldn't be used. *)
-		PROCEDURE &InitTCP*(fip: IP.Adr; fport, lport: LONGINT; VAR res: WORD);
+		PROCEDURE &InitTCP*(fip: IP.Adr; fport, lport: SIGNED32; VAR res: WORD);
 		BEGIN
 			NEW(connection);
 			connection.Open(lport, fip, fport, res);
@@ -316,7 +316,7 @@ TYPE
 			service: OSCService.OSCService;
 
 		(* starts the server: registers the OSCService s and creates the TCPServices.Service, which listens for connections *)
-		PROCEDURE &InitTCPServer*(s: OSCService.OSCService; lport: LONGINT; VAR res: WORD);
+		PROCEDURE &InitTCPServer*(s: OSCService.OSCService; lport: SIGNED32; VAR res: WORD);
 		BEGIN
 			ASSERT(s # NIL);
 			service := s;
@@ -351,7 +351,7 @@ TYPE
 		buffer := p.GetBytes();
 		ASSERT(buffer # NIL);
 		(* TCP: <size || packet> *)
-		Network.PutNet4(size, 0, p.GetSize()(LONGINT));
+		Network.PutNet4(size, 0, p.GetSize()(SIGNED32));
 		client.Send(size, 0, 4, FALSE, res);
 		IF(res # TCP.Ok) THEN RETURN res; END;
 		client.Send(buffer^, 0, LEN(buffer^), FALSE, res);
@@ -363,7 +363,7 @@ TYPE
 		res: WORD; len: SIZE;
 		buffer: POINTER TO ARRAY OF CHAR;
 		sizebuf: ARRAY 4 OF CHAR;
-		packetsize: LONGINT;
+		packetsize: SIGNED32;
 	BEGIN
 		client.Receive(sizebuf, 0, LEN(sizebuf), 4, len, res);
 		IF res # TCP.Ok THEN RETURN res END;
@@ -383,7 +383,7 @@ TYPE
 		RETURN Ok;
 	END ReceiveTCP;
 
-	PROCEDURE SendUDP(s: UDP.Socket; fip: IP.Adr; fport: LONGINT; p: OSC.OSCPacket): WORD;
+	PROCEDURE SendUDP(s: UDP.Socket; fip: IP.Adr; fport: SIGNED32; p: OSC.OSCPacket): WORD;
 	VAR
 		buffer: OSC.String;
 		res: WORD;
@@ -397,13 +397,13 @@ TYPE
 		RETURN res;
 	END SendUDP;
 	(*
-	PROCEDURE RecieveUDP(s: UDP.Socket; timeout (* in ms *): LONGINT;
-								VAR fip: IP.Adr; VAR fport: LONGINT; VAR p: OSC.OSCPacket): LONGINT;
+	PROCEDURE RecieveUDP(s: UDP.Socket; timeout (* in ms *): SIGNED32;
+								VAR fip: IP.Adr; VAR fport: SIGNED32; VAR p: OSC.OSCPacket): SIGNED32;
 		VAR
-			fip2: IP.Adr; fport2: LONGINT;
-			size: LONGINT;
+			fip2: IP.Adr; fport2: SIGNED32;
+			size: SIGNED32;
 			buffer: Strings.String;
-			got, res: LONGINT;
+			got, res: SIGNED32;
 		BEGIN
 			NEW(buffer, MaxUDPPacketLength);
 			ASSERT(buffer # NIL);

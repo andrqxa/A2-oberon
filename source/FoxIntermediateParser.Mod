@@ -81,16 +81,16 @@ TYPE
 			END;
 		END ExpectAnyIdentifier;
 
-		PROCEDURE ExpectIntegerWithSign(VAR integer: LONGINT): BOOLEAN;
+		PROCEDURE ExpectIntegerWithSign(VAR integer: SIGNED32): BOOLEAN;
 		VAR
 			result, isNegated: BOOLEAN;
 		BEGIN
 			isNegated := ThisSymbol(Scanner.Minus);
 			IF ExpectSymbol(Scanner.Number) & (token.numberType = Scanner.Integer) THEN
 				IF isNegated THEN
-					integer := -token.integer(LONGINT)
+					integer := -token.integer(SIGNED32)
 				ELSE
-					integer := token.integer(LONGINT)
+					integer := token.integer(SIGNED32)
 				END;
 				result := TRUE
 			ELSE
@@ -99,12 +99,12 @@ TYPE
 			RETURN result
 		END ExpectIntegerWithSign;
 
-		PROCEDURE ExpectIntegerWithoutSign(VAR integer: LONGINT): BOOLEAN;
+		PROCEDURE ExpectIntegerWithoutSign(VAR integer: SIGNED32): BOOLEAN;
 		VAR
 			result: BOOLEAN;
 		BEGIN
 			IF ExpectSymbol(Scanner.Number) & (token.numberType = Scanner.Integer) THEN
-				integer := token.integer(LONGINT);
+				integer := token.integer(SIGNED32);
 				result := TRUE
 			ELSE
 				result := FALSE
@@ -157,7 +157,7 @@ TYPE
 		(** parse an intermediate code operand **)
 		PROCEDURE ParseOperand(VAR operand: IntermediateCode.Operand; sectionList: Sections.SectionList);
 		VAR
-			positionOfOperand, pos: Position; registerNumber, symbolOffset, integer: LONGINT;
+			positionOfOperand, pos: Position; registerNumber, symbolOffset, integer: SIGNED32;
 			someHugeint: HUGEINT;
 			hasTypeDescriptor, isMemoryOperand, lastWasIdentifier, isNegated: BOOLEAN;
 			someLongreal: LONGREAL;
@@ -283,7 +283,7 @@ TYPE
 		VAR
 			opCode: SIGNED8;
 			positionOfInstruction, positionOfOperand: Position;
-			operandNumber: LONGINT;
+			operandNumber: SIGNED32;
 			operand: IntermediateCode.Operand;
 			operands: ARRAY 3 OF IntermediateCode.Operand;
 			operandType: IntermediateCode.Type;
@@ -368,7 +368,7 @@ TYPE
 		(** parse a list of section properties **)
 		PROCEDURE ParseSectionProperties(VAR section: IntermediateCode.Section);
 		VAR
-			positionOfProperty: Position;  integer: LONGINT;
+			positionOfProperty: Position;  integer: SIGNED32;
 		BEGIN
 			IF Trace THEN D.Ln; D.String(">>> ParseSectionProperties"); D.Ln END;
 

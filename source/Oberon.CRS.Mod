@@ -13,23 +13,23 @@ CONST
   noSym = 38;
 
 TYPE
-	ErrorProc* = PROCEDURE (n: SIGNED16; pos: LONGINT);
+	ErrorProc* = PROCEDURE (n: SIGNED16; pos: SIGNED32);
 	StartTable = ARRAY 128 OF SIGNED16;
 
 VAR
 	src*: Texts.Text;  (*source text. To be set by the main pgm*)
-	pos*: LONGINT;  (*position of current symbol*)
+	pos*: SIGNED32;  (*position of current symbol*)
 	line*, col*, len*: SIGNED16;  (*line, column, length of current symbol*)
-	nextPos*: LONGINT;  (*position of lookahead symbol*)
+	nextPos*: SIGNED32;  (*position of lookahead symbol*)
 	nextLine*, nextCol*, nextLen*: SIGNED16;  (*line, column, length of lookahead symbol*)
 	errors*: SIGNED16;  (*number of errors detected*)
 	Error*: ErrorProc;
 
 	ch: CHAR;        (*current input character*)
 	r: Texts.Reader;	(*global reader*)
-	chPos: LONGINT;	(*position of current character*)
+	chPos: SIGNED32;	(*position of current character*)
 	chLine: SIGNED16;  (*current line number*)
-	lineStart: LONGINT;  (*start position of current line*)
+	lineStart: SIGNED32;  (*start position of current line*)
 	oldEols: SIGNED16;     (*nr. of EOLs in a comment*)
 
 	start: StartTable;  (*start state for every character*)
@@ -46,7 +46,7 @@ END NextCh;
 
 
 PROCEDURE Comment(): BOOLEAN;
-	VAR level, startLine: SIGNED16; oldLineStart: LONGINT;
+	VAR level, startLine: SIGNED16; oldLineStart: SIGNED32;
 BEGIN (*Comment*)
 	level := 1; startLine := chLine; oldLineStart := lineStart;
   IF (ch ="(") THEN
@@ -179,7 +179,7 @@ BEGIN
 END Get;
 
 
-PROCEDURE GetName*(pos: LONGINT; len: SIGNED16; VAR s: ARRAY OF CHAR);
+PROCEDURE GetName*(pos: SIGNED32; len: SIGNED16; VAR s: ARRAY OF CHAR);
 	VAR i: SIGNED16; r: Texts.Reader;
 BEGIN
 	Texts.OpenReader(r, src, pos);
@@ -188,10 +188,10 @@ BEGIN
 	s[i] := 0X
 END GetName;
 
-PROCEDURE StdErrorProc* (n: SIGNED16; pos: LONGINT);
+PROCEDURE StdErrorProc* (n: SIGNED16; pos: SIGNED32);
 BEGIN INC(errors) END StdErrorProc;
 
-PROCEDURE Reset* (t: Texts.Text; pos: LONGINT; errProc: ErrorProc);
+PROCEDURE Reset* (t: Texts.Text; pos: SIGNED32; errProc: ErrorProc);
 BEGIN
 	src := t; Error := errProc;
 	Texts.OpenReader(r, src, pos);

@@ -15,13 +15,13 @@ TYPE
 	Cipher* = OBJECT
 			VAR
 				name-: ARRAY 64 OF CHAR;
-				blockSize-: LONGINT;   (** cipher block size (bytes) *)
+				blockSize-: SIGNED32;   (** cipher block size (bytes) *)
 				isKeyInitialized*: BOOLEAN;
 				mode-: SIGNED8;   (** ECB, CBC *)
 				len1, len2: SIGNED16;
 
-				PROCEDURE appsize( size: LONGINT );
-				VAR i, t, d: LONGINT;
+				PROCEDURE appsize( size: SIGNED32 );
+				VAR i, t, d: SIGNED32;
 				BEGIN
 					IF (size = 64) OR (size = 128) THEN  RETURN   END;
 					len2 := len1;  i := 0;  t := 10000;
@@ -40,7 +40,7 @@ TYPE
 				END appmode;
 
 				(** initialize key for de/encryption *)
-				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: LONGINT );
+				PROCEDURE InitKey*( CONST src: ARRAY OF CHAR; keybits: SIGNED32 );
 				BEGIN
 					appsize( keybits );  isKeyInitialized := TRUE
 				END InitKey;
@@ -65,7 +65,7 @@ TYPE
 				END Decrypt;
 
 				(** this method is invoked by subclasses; blocksize in bytes *)
-				PROCEDURE SetNameAndBlocksize*( CONST name: ARRAY OF CHAR;  size: LONGINT );
+				PROCEDURE SetNameAndBlocksize*( CONST name: ARRAY OF CHAR;  size: SIGNED32 );
 				BEGIN
 					COPY( name, SELF.name );  len1 := 0;
 					WHILE name[len1] # 0X DO  INC( len1 )  END;

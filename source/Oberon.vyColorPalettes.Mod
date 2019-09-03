@@ -31,7 +31,7 @@ TYPE
 	Palette* = POINTER TO PaletteDesc;
 	PaletteDesc* = RECORD (vyBase.ObjDesc)
 		col-: ARRAY 256 OF Colors.Color;
-		dcol-: ARRAY 256 OF LONGINT;   (* Cache for Display *)
+		dcol-: ARRAY 256 OF SIGNED32;   (* Cache for Display *)
 		icol-: ARRAY 256 OF Images.Pixel;   (* Cache for Images *)
 		used*: SIGNED16;
 		first*, last*: SIGNED16
@@ -124,7 +124,7 @@ VAR
 		NEW( p );  p.handle := PHandler;  Objects.NewObj := p;
 	END PNew;
 
-	PROCEDURE SetCol*( p: Palette;  index: SIGNED16;  col: LONGINT );
+	PROCEDURE SetCol*( p: Palette;  index: SIGNED16;  col: SIGNED32 );
 	VAR r, g, b: REAL;
 	BEGIN
 		IF index < p.used THEN
@@ -164,7 +164,7 @@ VAR
 	END ShiftPath;
 
 	PROCEDURE PathFromTo*( from, to: Palette );
-	VAR this, i: SIGNED16;  r, g, b: REAL;  dcol: LONGINT;
+	VAR this, i: SIGNED16;  r, g, b: REAL;  dcol: SIGNED32;
 	BEGIN
 		FOR i := to.first TO to.last DO
 			this := SHORT( ENTIER( from.first + (i - to.first) / (to.last - to.first) * (from.last - from.first) + 0.5 ) );
@@ -190,7 +190,7 @@ VAR
 		to.last := from.last;
 	END CopyPalette;
 
-	PROCEDURE InitConversion*( depth: LONGINT;  VAR p: Palette );
+	PROCEDURE InitConversion*( depth: SIGNED32;  VAR p: Palette );
 	VAR i: SIGNED16;
 		r, g, b: ARRAY 256 OF SIGNED16;
 	BEGIN
@@ -199,7 +199,7 @@ VAR
 		Colors.MakeIndex( index, 8, p.last + 1, r, g, b );   (* fof, changed Bits from 4 to 8 *)
 	END InitConversion;
 
-	PROCEDURE Convert*( r, g, b: SIGNED16 ): LONGINT;
+	PROCEDURE Convert*( r, g, b: SIGNED16 ): SIGNED32;
 	BEGIN
 		RETURN Colors.Match( index, 8, r, g, b );
 	END Convert;

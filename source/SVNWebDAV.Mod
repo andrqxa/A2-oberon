@@ -11,7 +11,7 @@ IMPORT
 	VAR
 		name, err, vcc, repoUUID, bln, bc, version, workUrl : ARRAY 256 OF CHAR;
 		props: WebHTTP.AdditionalField;
-		ver : LONGINT; pos : SIZE;
+		ver : SIGNED32; pos : SIZE;
 	BEGIN
 		svn.checkout := TRUE;
 		res := SVNOutput.ResOK;
@@ -59,11 +59,11 @@ IMPORT
 
 
 	(* SVN update using .svn directories *)
-	PROCEDURE Update* (svn : OdSvn.OdSvn; CONST pathName : ARRAY OF CHAR; pathNameVersion : LONGINT;  CONST workName : ARRAY OF CHAR; VAR res : WORD );
+	PROCEDURE Update* (svn : OdSvn.OdSvn; CONST pathName : ARRAY OF CHAR; pathNameVersion : SIGNED32;  CONST workName : ARRAY OF CHAR; VAR res : WORD );
 	VAR
 		name, err, vcc, repoUUID, bln, bc, version, workUrl : ARRAY 256 OF CHAR;
 		props: WebHTTP.AdditionalField;
-		ver : LONGINT; pos : SIZE;
+		ver : SIGNED32; pos : SIZE;
 	BEGIN
 		res := SVNOutput.ResOK;
 		Files.SplitPath ( pathName, workUrl, name );
@@ -179,7 +179,7 @@ IMPORT
 		vcc, vurl, ver, tmp, tmp2, path, name, date : ARRAY 256 OF CHAR;
 		creationdate, creator, status : ARRAY 33 OF CHAR;
 		version : ARRAY 10 OF CHAR;
-		ft,fd : LONGINT; res: WORD;
+		ft,fd : SIGNED32; res: WORD;
 		adminDir : SVNAdmin.Entry;
 		f : Files.File;
 		len: SIZE;
@@ -430,7 +430,7 @@ IMPORT
 		RETURN TRUE;
 	END CommitHandler;
 
-	PROCEDURE ExpectedResult ( status : LONGINT; svn : OdSvn.OdSvn; CONST wrk, lcl, message : ARRAY OF CHAR );
+	PROCEDURE ExpectedResult ( status : SIGNED32; svn : OdSvn.OdSvn; CONST wrk, lcl, message : ARRAY OF CHAR );
 	BEGIN
 		IF svn.pfStatus # status THEN
 			svn.context.out.String ( "ERROR: failed to " );

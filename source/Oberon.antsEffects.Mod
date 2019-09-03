@@ -65,8 +65,8 @@ BEGIN
 	Display.TransferBlock(buf.buf.mem^, 0, buf.buf.bpr, buf.X, buf.Y, buf.W, buf.H, Display.get)
 END OpenBuffer;
 
-PROCEDURE Ants* (x, y, w, h: SIGNED16;  num: SIGNED16;  dur: LONGINT);
-	VAR xp, yp: POINTER TO ARRAY OF SIGNED16;  timee, time, i: LONGINT;  r : LONGREAL;
+PROCEDURE Ants* (x, y, w, h: SIGNED16;  num: SIGNED16;  dur: SIGNED32);
+	VAR xp, yp: POINTER TO ARRAY OF SIGNED16;  timee, time, i: SIGNED32;  r : LONGREAL;
 	dir: POINTER TO ARRAY  OF SIGNED16;
 BEGIN
 	vyGraphBase.SetDisplayMode(vyGraphBase.invert);
@@ -140,8 +140,8 @@ BEGIN
 	END;
 END FadeImage;
 
-PROCEDURE FadeIn*(pict: Images.Image;  time: LONGINT; x,y,w,h: SIGNED16);
-VAR   t, time0: LONGINT;
+PROCEDURE FadeIn*(pict: Images.Image;  time: SIGNED32; x,y,w,h: SIGNED16);
+VAR   t, time0: SIGNED32;
 	fact: REAL;
 	cur: antsPortability.display;
 BEGIN
@@ -171,7 +171,7 @@ BEGIN
 END FadeIn;
 
 PROCEDURE Launch*(pict: Images.Image; x,y,w,h: SIGNED16);
-VAR   t, time0,time: LONGINT;
+VAR   t, time0,time: SIGNED32;
 	fact: REAL;
 	cur: antsPortability.display;
 

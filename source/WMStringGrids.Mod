@@ -499,13 +499,13 @@ BEGIN
 	plStringGrid.Add(PrototypeTclTextSelected);
 	NEW(PrototypeTfontHeight, NIL, Strings.NewString("FontHeight"), Strings.NewString("height of the tree item text"));
 	plStringGrid.Add(PrototypeTfontHeight);
-	PrototypeTclCell.Set(LONGINT(0FFFFFFFFH));
-	PrototypeTclFixed.Set(LONGINT(0CCCCCCFFH));
-	PrototypeTclHover.Set(LONGINT(0FFFF00FFH));
+	PrototypeTclCell.Set(SIGNED32(0FFFFFFFFH));
+	PrototypeTclFixed.Set(SIGNED32(0CCCCCCFFH));
+	PrototypeTclHover.Set(SIGNED32(0FFFF00FFH));
 	PrototypeTclSelected.Set(00000FFFFH);
 	PrototypeTclTextDefault.Set(0000000FFH);
 	PrototypeTclTextHover.Set(00000FFFFH);
-	PrototypeTclTextSelected.Set(LONGINT(0FFFFFFFFH));
+	PrototypeTclTextSelected.Set(SIGNED32(0FFFFFFFFH));
 
 	PrototypeTfontHeight.Set(12);
 	WMComponents.propertyListList.Add("StringGrid", plStringGrid);

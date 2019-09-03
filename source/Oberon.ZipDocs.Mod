@@ -28,10 +28,10 @@ MODULE ZipDocs IN Oberon; (** portable *)	(* ejz  *)
 
 	PROCEDURE doExtract(action: SIGNED16);
 	VAR
-		S: Texts.Scanner; T, T2: Texts.Text; beg, end, time: LONGINT;
+		S: Texts.Scanner; T, T2: Texts.Text; beg, end, time: SIGNED32;
 		D: Documents.Document;
 		arc: Zip.Archive; ent: Zip.Entry; arcname, name, tempname: ARRAY 256 OF CHAR;
-		line, res: LONGINT;
+		line, res: SIGNED32;
 		tempfile: Files.File;
 		res2 : SIGNED16;
 	BEGIN
@@ -122,7 +122,7 @@ MODULE ZipDocs IN Oberon; (** portable *)	(* ejz  *)
 		arc: Zip.Archive;
 		ent: Zip.Entry;
 		res: WORD;
-		n, m: LONGINT;	(* number of extracted files *)
+		n, m: SIGNED32;	(* number of extracted files *)
 	BEGIN
 		GetArcName(name);
 		arc := Zip.OpenArchive(name, res);
@@ -149,7 +149,7 @@ MODULE ZipDocs IN Oberon; (** portable *)	(* ejz  *)
 
 	PROCEDURE Add*;
 	VAR
-		S: Texts.Scanner; T: Texts.Text; beg, end, time, res: LONGINT;
+		S: Texts.Scanner; T: Texts.Text; beg, end, time, res: SIGNED32;
 		arc: Zip.Archive;
 		strategy, level: SIGNED8;
 		arcname, oldname, newname: ARRAY 256 OF CHAR;
@@ -222,11 +222,11 @@ MODULE ZipDocs IN Oberon; (** portable *)	(* ejz  *)
 	PROCEDURE Delete*;
 	VAR
 		name: ARRAY 256 OF CHAR;
-		S: Texts.Scanner; T, T2: Texts.Text; beg, end, time: LONGINT;
+		S: Texts.Scanner; T, T2: Texts.Text; beg, end, time: SIGNED32;
 		D: Documents.Document;
 		arc: Zip.Archive;
 		ent: Zip.Entry;
-		line, res: LONGINT;
+		line, res: SIGNED32;
 	BEGIN
 		Oberon.GetSelection(T, beg, end, time);
 		GetArcName(name);

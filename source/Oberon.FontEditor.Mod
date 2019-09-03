@@ -39,10 +39,10 @@ TYPE
 	FontDesc = RECORD
 		type, family, variant: CHAR;
 		height, minX, maxX, minY, maxY, nofRuns: SIGNED16;
-		pos: LONGINT;
+		pos: SIGNED32;
 		run: ARRAY 256 OF RunRec;
 		box: ARRAY 256 OF BoxRec;
-		p: ARRAY 256 OF LONGINT;
+		p: ARRAY 256 OF SIGNED32;
 		raster: POINTER TO ARRAY OF CHAR
 	END;
 
@@ -81,7 +81,7 @@ PROCEDURE Min(a, b: SIGNED16): SIGNED16; BEGIN IF a<b THEN RETURN a ELSE RETURN 
 
 PROCEDURE Max(a, b: SIGNED16): SIGNED16; BEGIN IF a>b THEN RETURN a ELSE RETURN b END END Max;
 
-PROCEDURE Get(F: Font; beg, w, x, y: LONGINT): BOOLEAN;
+PROCEDURE Get(F: Font; beg, w, x, y: SIGNED32): BOOLEAN;
 (* Gibt zurück, ob Punkt im Fontraster gesetzt ist *)
 VAR ch: SIGNED16; s: SET;
 BEGIN
@@ -90,7 +90,7 @@ BEGIN
 	RETURN x MOD 8 IN s
 END Get;
 
-PROCEDURE Put(F: Font; beg, w, x, y: LONGINT; b: BOOLEAN);
+PROCEDURE Put(F: Font; beg, w, x, y: SIGNED32; b: BOOLEAN);
 (* Setzt/löscht einen Punkt im Fontraster *)
 VAR ch: SIGNED16; s: SET;
 BEGIN
@@ -301,7 +301,7 @@ END NewDoc;
 PROCEDURE DisplayChar(Q: D3.Mask; x, y: SIGNED16; F: Font; pos: SIGNED16);
 (* Stellt einen Fonttable-Eintrag auf dem Bildschirm dar *)
 CONST dt= 1;
-VAR beg: LONGINT; i, j, h, w, dx, dy, wb: SIGNED16; s: ARRAY 3 OF CHAR;
+VAR beg: SIGNED32; i, j, h, w, dx, dy, wb: SIGNED16; s: ARRAY 3 OF CHAR;
 BEGIN
 	IF (pos>=dbeg) & (pos<dend) & (F.p[pos]#undef) THEN	(* Sichtbares Zeichen ausgeben *)
 		w:= F.box[pos].w; h:= F.box[pos].h; beg:= F.p[pos];
@@ -340,7 +340,7 @@ BEGIN
 END DisplayBoxBorder;
 
 PROCEDURE CreateCharPict(F: Font; pos: SIGNED16): Pictures.Picture;
-VAR beg: LONGINT; i, j, dx, dy, pw, ph, h, w, wb: SIGNED16; P: Pictures.Picture;
+VAR beg: SIGNED32; i, j, dx, dy, pw, ph, h, w, wb: SIGNED16; P: Pictures.Picture;
 BEGIN
 	NEW(P);
 	IF F.p[pos]#undef THEN
@@ -453,7 +453,7 @@ BEGIN
 END CopyTable;
 
 PROCEDURE StoreChar(F: Fonttable; M: StoreMsg; fx, fy, fw, fh: SIGNED16);
-VAR i, j: LONGINT; x, y, x0, x1, y0, y1, w, h, d, nob, actnob, sel, nminx, nminy, nmaxx, nmaxy: SIGNED16;
+VAR i, j: SIGNED32; x, y, x0, x1, y0, y1, w, h, d, nob, actnob, sel, nminx, nminy, nmaxx, nmaxy: SIGNED16;
 		P: Pictures.Picture; f: Font;
 BEGIN
 	f:= F.f;
@@ -920,7 +920,7 @@ END HandlePreview;
 
 PROCEDURE ShowTeststring*;
 VAR obj: Objects.Object; len: SIGNED16; f: Font; teststring: ARRAY 64 OF CHAR;
-		beg: LONGINT;
+		beg: SIGNED32;
 		pw, ph, i, j, k, sel, w, h, dx, dy, wb, x, y: SIGNED16;
 		P: Pictures.Picture;
 		doc: Documents.Document;
@@ -1092,7 +1092,7 @@ END NewPreview;
 (* Load/Store Font *)
 
 PROCEDURE LoadFont(VAR F: Font; VAR R: Files.Rider);
-VAR bitW, bitH: LONGINT; k, l, i: SIGNED16; type: CHAR;
+VAR bitW, bitH: SIGNED32; k, l, i: SIGNED16; type: CHAR;
 BEGIN F := NIL;
 	Files.Read(R, type);
 	IF type = 0DBX THEN NEW(F);
@@ -1181,7 +1181,7 @@ BEGIN
 END Load;
 
 PROCEDURE StoreFont(VAR F: Font; VAR R: Files.Rider);
-VAR pos: LONGINT; nofRuns, k, l, i: SIGNED16;
+VAR pos: SIGNED32; nofRuns, k, l, i: SIGNED16;
 BEGIN
 	Files.Write(R, 0DBX);
 	Files.Write(R, F.type);

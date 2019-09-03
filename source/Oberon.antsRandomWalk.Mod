@@ -223,10 +223,10 @@ VAR
 	END NewModel;
 
 	PROCEDURE Many1d*;
-	VAR linePlot: vyLinePlot.tLayer;  pict: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  nans: LONGINT;  r, ran: LONGREAL;
-		v: vyLongrealVec.tVector;  i: LONGINT;  j: LONGINT;  hist0, hist1, hist2: vyLongrealVec.tVector;  link: vyLinks.Link;  obj: vyBase.Object;
+	VAR linePlot: vyLinePlot.tLayer;  pict: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  nans: SIGNED32;  r, ran: LONGREAL;
+		v: vyLongrealVec.tVector;  i: SIGNED32;  j: SIGNED32;  hist0, hist1, hist2: vyLongrealVec.tVector;  link: vyLinks.Link;  obj: vyBase.Object;
 		vname: ARRAY 256 OF CHAR;
-		append: BOOLEAN;  len: LONGINT;
+		append: BOOLEAN;  len: SIGNED32;
 	BEGIN
 		antsCommands.InitScan( "[len= INT] [>new]" );
 		IF antsCommands.GetNumber( "len", len ) THEN ELSE len := 500 END;

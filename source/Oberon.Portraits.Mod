@@ -9,7 +9,7 @@ CONST border = 4;
 TYPE
   Portrait = POINTER TO PortraitDesc;
   PortraitDesc = RECORD (Gadgets.FrameDesc)
-    time*: LONGINT	(* time of selection *)
+    time*: SIGNED32	(* time of selection *)
   END;
 
 PROCEDURE SetMask (F: Display.Frame; Q: Display3.Mask);

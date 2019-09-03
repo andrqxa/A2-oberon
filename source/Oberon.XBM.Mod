@@ -21,7 +21,7 @@ MODULE XBM IN Oberon; (** portable *)	(* ejz  *)
 			id = 11;
 			unsigned = 12;
 		VAR
-			num: LONGINT;
+			num: SIGNED32;
 			ident: ARRAY 64 OF CHAR;
 			x, y, bits, i, sym: SIGNED16;
 			error: BOOLEAN;

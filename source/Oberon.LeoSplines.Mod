@@ -362,7 +362,7 @@ MODULE LeoSplines IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE HandleSpline (obj: Objects.Object; VAR msg: Objects.ObjMsg);
 		VAR
-			c: Spline; ver: LONGINT; i: SIGNED16; real, x0, y0, x1, y1, bw: REAL; cm: Objects.CopyMsg;
+			c: Spline; ver: SIGNED32; i: SIGNED16; real, x0, y0, x1, y1, bw: REAL; cm: Objects.CopyMsg;
 			s: Leonardo.Shape; bool: BOOLEAN;
 	BEGIN
 		IF msg IS Objects.FileMsg THEN

@@ -36,7 +36,7 @@ MODULE LeoLists IN Oberon; (** portable **)	(* eos  *)
 
 	VAR
 		Font: Fonts.Font;
-		Time, Wait: LONGINT;
+		Time, Wait: SIGNED32;
 
 
 	PROCEDURE DrawFold (mask: Display3.Mask; col, x, y, dim, mode: SIGNED16; open: BOOLEAN);
@@ -154,7 +154,7 @@ MODULE LeoLists IN Oberon; (** portable **)	(* eos  *)
 	END UpdateModel;
 
 	PROCEDURE SetPos (list: List; update: BOOLEAN);
-		VAR l: Line; pos: LONGINT;
+		VAR l: Line; pos: SIGNED32;
 	BEGIN
 		IF list.pos # NIL THEN
 			l := list.lines.next; pos := 0;
@@ -167,7 +167,7 @@ MODULE LeoLists IN Oberon; (** portable **)	(* eos  *)
 	END SetPos;
 
 	PROCEDURE SetMax (list: List);
-		VAR l: Line; max: LONGINT;
+		VAR l: Line; max: SIGNED32;
 	BEGIN
 		IF list.max # NIL THEN
 			l := list.lines.next; max := 0;
@@ -188,7 +188,7 @@ MODULE LeoLists IN Oberon; (** portable **)	(* eos  *)
 	END SetCont;
 
 	PROCEDURE Update (list: List; VAR msg: Gadgets.UpdateMsg);
-		VAR dm: Display.DisplayMsg; pos, first: LONGINT; l: Line;
+		VAR dm: Display.DisplayMsg; pos, first: SIGNED32; l: Line;
 	BEGIN
 		IF list.pos # NIL THEN list.pos.handle(list.pos, msg) END;
 		IF list.max # NIL THEN list.max.handle(list.max, msg) END;
@@ -572,7 +572,7 @@ MODULE LeoLists IN Oberon; (** portable **)	(* eos  *)
 	END Copy;
 
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR list, copy: List; keys: SET; lx, ly: SIGNED16; mask: Display3.Mask; fig: Leonardo.Figure; ver: LONGINT;
+		VAR list, copy: List; keys: SET; lx, ly: SIGNED16; mask: Display3.Mask; fig: Leonardo.Figure; ver: SIGNED32;
 	BEGIN
 		list := obj(List);
 		IF msg IS Display.FrameMsg THEN

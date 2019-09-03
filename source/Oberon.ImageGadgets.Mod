@@ -135,7 +135,7 @@ MODULE ImageGadgets IN Oberon; (** portable **)	(* eos  *)
 	END RestoreLines;
 
 	PROCEDURE RestoreBlock (x, y, w, h: SIGNED16);
-		VAR offset: LONGINT;
+		VAR offset: SIGNED32;
 	BEGIN
 		offset := (y - Enum.y) * Enum.img.bpr + (x - Enum.x) * Enum.img.fmt.bpp DIV 8;
 		Display.TransferBlock(Enum.img.mem^, offset, Enum.img.bpr, x, y, w, h, Display.set)
@@ -187,7 +187,7 @@ MODULE ImageGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE PrintRect (dx, dy, dw, dh: SIGNED16);
 		CONST red = Images.r; green = Images.g; blue = Images.b; alpha = Images.a;
-		VAR du, pu, hpu, fy, fx: LONGINT; sy, y, h, sx, x, w, rw: SIGNED16; col, pix: Images.Pixel;
+		VAR du, pu, hpu, fy, fx: SIGNED32; sy, y, h, sx, x, w, rw: SIGNED16; col, pix: Images.Pixel;
 	BEGIN
 		DEC(dx, Enum.x); DEC(dy, Enum.y);
 		du := Display.Unit; pu := Printer.Unit; hpu := pu DIV 2;
@@ -295,7 +295,7 @@ MODULE ImageGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(** frame handler **)
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR frame, copy: Frame; fx, fy: SIGNED16; mask: Display3.Mask; img: Images.Image; ver: LONGINT;
+		VAR frame, copy: Frame; fx, fy: SIGNED16; mask: Display3.Mask; img: Images.Image; ver: SIGNED32;
 	BEGIN
 		frame := obj(Frame);
 		IF msg IS Display.FrameMsg THEN

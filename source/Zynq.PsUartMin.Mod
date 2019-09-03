@@ -168,19 +168,19 @@ TYPE
 	*)
 	UartRegisters* = POINTER {UNSAFE, UNTRACED}  TO RECORD
 		cr*, mr*, ier*, idr*, imr*, isr*: SET32;
-		baudgen*, rxtout*, rxwm*: LONGINT;
+		baudgen*, rxtout*, rxwm*: SIGNED32;
 		modemcr*, modemsr*: SET32;
 		sr*: SET32;
-		fifo*: LONGINT;
-		bauddiv*, flowdel*: LONGINT;
-		padding2: ARRAY 2 OF LONGINT;
-		txwm*: LONGINT;
+		fifo*: SIGNED32;
+		bauddiv*, flowdel*: SIGNED32;
+		padding2: ARRAY 2 OF SIGNED32;
+		txwm*: SIGNED32;
 	END;
 
 	BusyLoopCallback* = PROCEDURE{DELEGATE}(VAR res: WORD): BOOLEAN;
 
 	UartId* = SIZE;
-	ClockFrequency* = LONGINT;
+	ClockFrequency* = SIGNED32;
 
 VAR
 	uarts: ARRAY NumUarts OF UartRegisters;
@@ -262,12 +262,12 @@ VAR
 	(*
 		Setup baudrate in bps
 	*)
-	PROCEDURE SetBps*(uart: UartRegisters; baudrate: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE SetBps*(uart: UartRegisters; baudrate: SIGNED32; VAR res: WORD): BOOLEAN;
 	VAR
 		i: SIZE;
 		clock: ClockFrequency;
-		valBAUDDIV, valBRGR, calcBaudrate, baudError: LONGINT;
-		bestError, bestBRGR, bestBAUDDIV: LONGINT;
+		valBAUDDIV, valBRGR, calcBaudrate, baudError: SIGNED32;
+		bestError, bestBRGR, bestBAUDDIV: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE (i < LEN(uarts)) & (uarts[i] # uart) DO INC(i); END;
@@ -289,7 +289,7 @@ VAR
 
 		(* Determine the Baud divider. It can be 4 to 254.
 			Loop through all possible combinations *)
-		bestError := MAX(LONGINT);
+		bestError := MAX(SIGNED32);
 		FOR valBAUDDIV := 4 TO 255 DO
 
 			(* Calculate the value for BRGR register *)
@@ -337,7 +337,7 @@ VAR
 	(**
 		Set number of data bits
 	*)
-	PROCEDURE SetDataBits*(uart: UartRegisters; dataBits: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE SetDataBits*(uart: UartRegisters; dataBits: SIGNED32; VAR res: WORD): BOOLEAN;
 	VAR reg: SET32;
 	BEGIN
 		CASE dataBits OF
@@ -357,7 +357,7 @@ VAR
 	(**
 		Setup parity check type
 	*)
-	PROCEDURE SetParity*(uart: UartRegisters; parityType: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE SetParity*(uart: UartRegisters; parityType: SIGNED32; VAR res: WORD): BOOLEAN;
 	VAR reg: SET32;
 	BEGIN
 		CASE parityType OF
@@ -379,7 +379,7 @@ VAR
 	(**
 		Setup number of stop bits
 	*)
-	PROCEDURE SetStopBits*(uart: UartRegisters; stopBits: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE SetStopBits*(uart: UartRegisters; stopBits: SIGNED32; VAR res: WORD): BOOLEAN;
 	VAR reg: SET32;
 	BEGIN
 		CASE stopBits OF

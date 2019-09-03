@@ -3,7 +3,7 @@ IMPORT SYSTEM;
 
 VAR
 	kernelModule-: ARRAY 32 OF ADDRESS;
-	modules-: LONGINT;
+	modules-: SIGNED32;
 
 PROCEDURE InsertModule*(a: ADDRESS): BOOLEAN;
 BEGIN {UNCOOPERATIVE}

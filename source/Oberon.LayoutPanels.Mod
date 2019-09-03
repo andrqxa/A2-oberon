@@ -35,14 +35,14 @@ END ClipAgainst;
 
 (* --- load and store procedures --- *)
 PROCEDURE StoreText (T: Texts.Text; VAR R: Files.Rider);
-	VAR len: LONGINT;
+	VAR len: SIGNED32;
 BEGIN
 	Texts.Store(T, Files.Base(R), Files.Pos(R), len);
 	Files.Set(R, Files.Base(R), Files.Pos(R) + len)
 END StoreText;
 
 PROCEDURE LoadText (T: Texts.Text; VAR R: Files.Rider);
-	VAR len: LONGINT; ch: CHAR;
+	VAR len: SIGNED32; ch: CHAR;
 BEGIN
 	Files.Read(R, ch);
 	Texts.Load(T, Files.Base(R), Files.Pos(R), len);
@@ -65,7 +65,7 @@ END StorePanel;
 
 (** Default load mechanism. *)
 PROCEDURE LoadPanel*(F: Panel; VAR M: Objects.FileMsg);
-VAR ver: LONGINT; e: LP0.Element;
+VAR ver: SIGNED32; e: LP0.Element;
 BEGIN
 	Files.ReadNum(M.R, ver);
 	IF (ver = 1) THEN LoadText(F.layout, M.R)
@@ -640,7 +640,7 @@ END NewPanel;
 
 PROCEDURE TrackCaret*(F: Panels.Panel; VAR M: Oberon.InputMsg);
 VAR x, y, w, h, LX, LY: SIGNED16; keysum: SET;
-	obj, newobj: Objects.Object; parent: Display.Frame; objtime, texttime, beg, end: LONGINT; text: Texts.Text;
+	obj, newobj: Objects.Object; parent: Display.Frame; objtime, texttime, beg, end: SIGNED32; text: Texts.Text;
 	buf: Texts.Buffer; T0: Texts.Text;
 BEGIN
 	x := M.x + F.X; y := M.y + F.Y; w := F.W; h := F.H;
@@ -868,7 +868,7 @@ END NewDoc;
 	AddCol "@" "left"|"right"
 *)
 PROCEDURE AddCol*;
-VAR obj: Objects.Object; time: LONGINT; e: LP0.Element; tab: LP0.Table; pos: SIGNED16; S: Texts.Scanner;
+VAR obj: Objects.Object; time: SIGNED32; e: LP0.Element; tab: LP0.Table; pos: SIGNED16; S: Texts.Scanner;
 BEGIN
 	Gadgets.GetSelection(obj, time);
 	IF (time # -1) & (obj # NIL) & (obj IS LP0.Element) THEN
@@ -899,7 +899,7 @@ END AddCol;
 	AddRow "@" "lower"|"upper"
 *)
 PROCEDURE AddRow*;
-VAR obj: Objects.Object; time: LONGINT; e: LP0.Element; tab: LP0.Table; pos: SIGNED16; S: Texts.Scanner;
+VAR obj: Objects.Object; time: SIGNED32; e: LP0.Element; tab: LP0.Table; pos: SIGNED16; S: Texts.Scanner;
 BEGIN
 	Gadgets.GetSelection(obj, time);
 	IF (time # -1) & (obj # NIL) & (obj IS LP0.Element) THEN
@@ -930,7 +930,7 @@ END AddRow;
 	DelCol "@"
 *)
 PROCEDURE DelCol*;
-VAR obj: Objects.Object; time: LONGINT; e: LP0.Element; tab: LP0.Table; pos: SIGNED16; S: Texts.Scanner;
+VAR obj: Objects.Object; time: SIGNED32; e: LP0.Element; tab: LP0.Table; pos: SIGNED16; S: Texts.Scanner;
 BEGIN
 	Gadgets.GetSelection(obj, time);
 	IF (time # -1) & (obj # NIL) & (obj IS LP0.Element) THEN
@@ -960,7 +960,7 @@ END DelCol;
 	DelRow "@"
 *)
 PROCEDURE DelRow*;
-VAR obj: Objects.Object; time: LONGINT; e: LP0.Element; tab: LP0.Table; pos: SIGNED16; S: Texts.Scanner;
+VAR obj: Objects.Object; time: SIGNED32; e: LP0.Element; tab: LP0.Table; pos: SIGNED16; S: Texts.Scanner;
 BEGIN
 	Gadgets.GetSelection(obj, time);
 	IF (time # -1) & (obj # NIL) & (obj IS LP0.Element) THEN
@@ -989,7 +989,7 @@ END DelRow;
 	InsertTable ^ <rows> <cols>
 *)
 PROCEDURE InsertTable*;
-VAR obj: Objects.Object; time: LONGINT; c: LP0.Container; cols, rows: SIGNED16; S: Texts.Scanner;
+VAR obj: Objects.Object; time: SIGNED32; c: LP0.Container; cols, rows: SIGNED16; S: Texts.Scanner;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 	IF (S.class = Texts.Char) & (S.c = "^") THEN
@@ -1010,7 +1010,7 @@ END InsertTable;
 	Syntax: InsertPlace ^
 *)
 PROCEDURE InsertPlace*;
-VAR obj: Objects.Object; time: LONGINT; c: LP0.Container; new: LP0.Element; S: Texts.Scanner;
+VAR obj: Objects.Object; time: SIGNED32; c: LP0.Container; new: LP0.Element; S: Texts.Scanner;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 	IF (S.class = Texts.Char) & (S.c = "^") THEN
@@ -1027,7 +1027,7 @@ END InsertPlace;
 
 (**  Minimize "^" *)
 PROCEDURE Minimize*;
-VAR F: Objects.Object; time: LONGINT; e: LP0.Element; M: Display.ModifyMsg;
+VAR F: Objects.Object; time: SIGNED32; e: LP0.Element; M: Display.ModifyMsg;
 BEGIN
 	Gadgets.GetSelection(F, time);
 	IF (time # -1) & (F # NIL) & (F IS Panel) THEN

@@ -27,14 +27,14 @@ positive: math array types of basic types
 		TAIOS= ARRAY [*,*,2,3] OF SIGNED16;
 		TAIT= ARRAY [?] OF SIGNED16;
 
-		TALS1= ARRAY [2] OF LONGINT;
-		TALO1= ARRAY [*] OF LONGINT;
-		TALS2= ARRAY [2,3] OF LONGINT;
-		TALO2= ARRAY [*,*] OF LONGINT;
-		TALS3= ARRAY [2,3,4] OF LONGINT;
-		TALO3= ARRAY [*,*,*] OF LONGINT;
-		TALOS= ARRAY [*,*,2,3] OF LONGINT;
-		TALT= ARRAY [?] OF LONGINT;
+		TALS1= ARRAY [2] OF SIGNED32;
+		TALO1= ARRAY [*] OF SIGNED32;
+		TALS2= ARRAY [2,3] OF SIGNED32;
+		TALO2= ARRAY [*,*] OF SIGNED32;
+		TALS3= ARRAY [2,3,4] OF SIGNED32;
+		TALO3= ARRAY [*,*,*] OF SIGNED32;
+		TALOS= ARRAY [*,*,2,3] OF SIGNED32;
+		TALT= ARRAY [?] OF SIGNED32;
 
 		TARS1= ARRAY [2] OF REAL;
 		TARO1= ARRAY [*] OF REAL;
@@ -204,7 +204,7 @@ positive: variables and parameters of math array type
 negative: comparison of incompatible array types
 
 	MODULE Test;
-	VAR a: ARRAY [*] OF LONGINT;	b: ARRAY [*,*] OF LONGINT;
+	VAR a: ARRAY [*] OF SIGNED32;	b: ARRAY [*,*] OF SIGNED32;
 
 	BEGIN 
 		ASSERT(a=b);
@@ -250,7 +250,7 @@ MODULE Test;
 TYPE
 	Object = OBJECT
 	VAR yn1, ct: LONGCOMPLEX;
-	VAR i: LONGINT; xn: ARRAY [*] OF LONGCOMPLEX;
+	VAR i: SIGNED32; xn: ARRAY [*] OF LONGCOMPLEX;
 	BEGIN
 		yn1 := yn1
 	END Object;

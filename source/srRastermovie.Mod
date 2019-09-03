@@ -6,7 +6,7 @@ TYPE Screen = OBJECT(WMWindowManager.BufferWindow)
 VAR
 	alive: BOOLEAN;
 	timer: Kernel.Timer;
-	frame: LONGINT;
+	frame: SIGNED32;
 	playing: BOOLEAN;
 
 PROCEDURE & New*;
@@ -51,7 +51,7 @@ END playframe;
 END Screen;
 VAR
 	title: ARRAY 24 OF CHAR;
-	frame: LONGINT;
+	frame: SIGNED32;
 	screen: Screen;
 
 PROCEDURE snap*(img: Raster.Image);

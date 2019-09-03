@@ -150,14 +150,14 @@ TYPE
 		END AddContent;
 
 		(** Write current data value of model to stream <w> at indention level <level>. Caller must hold read lock *)
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT);
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32);
 		BEGIN
 			ASSERT(w # NIL);
 			ASSERT(HasReadLock());
 		END WriteValue;
 
 		(** Externalize model to stream <w> at indention level <level> *)
-		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : LONGINT); (** overwrite *)
+		PROCEDURE Write*(w: Streams.Writer; context: ANY; level : SIGNED32); (** overwrite *)
 		VAR name : Strings.String; enum: XMLObjects.Enumerator; c: ANY;
 		BEGIN
 			IF (SELF IS Container) THEN
@@ -232,7 +232,7 @@ TYPE
 			Types.SetBoolean(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			IF value THEN w.String("TRUE"); ELSE w.String("FALSE"); END;
@@ -244,7 +244,7 @@ TYPE
 
 	Integer* = OBJECT(Model)
 	VAR
-		value : LONGINT;
+		value : SIGNED32;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -254,7 +254,7 @@ TYPE
 			SetGenerator("Models.GenInteger");
 		END Init;
 
-		PROCEDURE Set*(value : LONGINT);
+		PROCEDURE Set*(value : SIGNED32);
 		BEGIN
 			AcquireWrite;
 			IF (SELF.value # value) THEN
@@ -264,8 +264,8 @@ TYPE
 			ReleaseWrite;
 		END Set;
 
-		PROCEDURE Get*() : LONGINT;
-		VAR value : LONGINT;
+		PROCEDURE Get*() : SIGNED32;
+		VAR value : SIGNED32;
 		BEGIN
 			AcquireRead;
 			value := SELF.value;
@@ -273,7 +273,7 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE Add*(value : LONGINT);
+		PROCEDURE Add*(value : SIGNED32);
 		BEGIN
 			IF (value # 0) THEN
 				AcquireWrite;
@@ -284,20 +284,20 @@ TYPE
 		END Add;
 
 		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
-		VAR newValue : LONGINT;
+		VAR newValue : SIGNED32;
 		BEGIN
 			Types.GetInteger(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
 		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
-		VAR currentValue : LONGINT;
+		VAR currentValue : SIGNED32;
 		BEGIN
 			currentValue := Get();
 			Types.SetInteger(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Int(value, 0);
@@ -360,7 +360,7 @@ TYPE
 			Types.SetHugeint(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Int(value, 0);
@@ -423,7 +423,7 @@ TYPE
 			Types.SetSize(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Int(value, 0);
@@ -478,7 +478,7 @@ TYPE
 			Types.SetReal(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Float(value, 15); (*8 decimal, 'E-', 2 expo, decimal point, leading space*)
@@ -533,7 +533,7 @@ TYPE
 			Types.SetLongreal(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Float(value, 24); (* leading space, decimal point, 16 digits, 5 expo *)
@@ -588,7 +588,7 @@ TYPE
 			Types.SetChar(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			IF IsPrintableCharacter(value) THEN
@@ -637,7 +637,7 @@ TYPE
 		END Get;
 
 		PROCEDURE SetAOC*(CONST value : ARRAY OF CHAR);
-		VAR length : LONGINT;
+		VAR length : SIGNED32;
 		BEGIN
 			length := 0;
 			WHILE (length < LEN(value)) & (value[length] # 0X) DO INC(length); END;
@@ -674,7 +674,7 @@ TYPE
 			Types.SetString(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		VAR res : WORD;
 		BEGIN
 			WriteValue^(w, level);
@@ -716,7 +716,7 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE Include*(element : LONGINT);
+		PROCEDURE Include*(element : SIGNED32);
 		BEGIN
 			AcquireWrite;
 			IF ~(element IN SELF.value) THEN
@@ -726,7 +726,7 @@ TYPE
 			ReleaseWrite;
 		END Include;
 
-		PROCEDURE Exclude*(element : LONGINT);
+		PROCEDURE Exclude*(element : SIGNED32);
 		BEGIN
 			AcquireWrite;
 			IF (element IN SELF.value) THEN
@@ -736,7 +736,7 @@ TYPE
 			ReleaseWrite;
 		END Exclude;
 
-		PROCEDURE Contains*(element : LONGINT) : BOOLEAN;
+		PROCEDURE Contains*(element : SIGNED32) : BOOLEAN;
 		VAR result : BOOLEAN;
 		BEGIN
 			AcquireRead;
@@ -759,7 +759,7 @@ TYPE
 			Types.SetSet(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			w.Set(value);
@@ -878,7 +878,7 @@ TYPE
 			Types.SetText(value, currentValue, res);
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
 		BEGIN
 			WriteValue^(w, level);
 			(* TBD *)
@@ -914,7 +914,7 @@ TYPE
 		END FindModel;
 
 		PROCEDURE FindModelByName(CONST fullname : ARRAY OF CHAR) : Model;
-		VAR curModel : Model; name : ARRAY 32 OF CHAR; i, j : LONGINT; done : BOOLEAN;
+		VAR curModel : Model; name : ARRAY 32 OF CHAR; i, j : SIGNED32; done : BOOLEAN;
 		BEGIN
 			curModel := SELF;
 			done := FALSE;
@@ -966,7 +966,7 @@ TYPE
 VAR
 	StrBoolean, StrInteger, StrHugeint, StrSize, StrReal, StrLongreal, StrChar, StrString, StrSet, StrText, StrContainer : Strings.String;
 
-PROCEDURE NewLine*(w : Streams.Writer; level : LONGINT);
+PROCEDURE NewLine*(w : Streams.Writer; level : SIGNED32);
 BEGIN
 	ASSERT(w # NIL);
 	w.Ln; WHILE level > 0 DO w.Char(09X); DEC(level) END
@@ -994,7 +994,7 @@ BEGIN
 	END;
 END GetReal;
 
-PROCEDURE GetInteger*(m: Model; VAR i: LONGINT): BOOLEAN;
+PROCEDURE GetInteger*(m: Model; VAR i: SIGNED32): BOOLEAN;
 VAR int: Types.Integer; res: WORD;
 BEGIN
 	IF m = NIL THEN RETURN FALSE END;

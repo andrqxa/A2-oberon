@@ -399,7 +399,7 @@ PROCEDURE RenameExtension*(context : Commands.Context);
 VAR
 	enumerator : Files.Enumerator;
 	oe, ne, temp: ARRAY 16 OF CHAR;
-	name, file, ext : Files.FileName; flags : SET; time, date: LONGINT; size: Files.Size; res : WORD;
+	name, file, ext : Files.FileName; flags : SET; time, date: SIGNED32; size: Files.Size; res : WORD;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(oe);
 	context.arg.SkipWhitespace; context.arg.String(ne);
@@ -745,7 +745,7 @@ END Ln;
 
 (** Block for ms milliseconds *)
 PROCEDURE Wait*(context : Commands.Context); (** ms ~ *)
-VAR timer : Kernel.Timer; milliseconds : LONGINT;
+VAR timer : Kernel.Timer; milliseconds : SIGNED32;
 BEGIN
 	IF context.arg.GetInteger(milliseconds, FALSE) & (milliseconds > 0) THEN
 		NEW(timer);

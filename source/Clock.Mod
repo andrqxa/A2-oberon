@@ -37,20 +37,20 @@ VAR
 	getRtcTime: GetRtcTimeFunc;
 	setRtcTime: SetRtcTimeFunc;
 
-	tz*: LONGINT;	(** system time zone offset in minutes (from -720 to 720) *)
-	starttime*, startdate*: LONGINT;	(** time this module was loaded (usually boot time) *)
+	tz*: SIGNED32;	(** system time zone offset in minutes (from -720 to 720) *)
+	starttime*, startdate*: SIGNED32;	(** time this module was loaded (usually boot time) *)
 
 (** Return the current time and date in Oberon format. *)
 
-PROCEDURE Get*(VAR time, date: LONGINT);
+PROCEDURE Get*(VAR time, date: SIGNED32);
 VAR
 	second, minute, hour, day, month: SIGNED8;
 	year: SIGNED16;
 BEGIN{EXCLUSIVE}
 	IF getRtcTime # NIL THEN
 		IF getRtcTime(second, minute, hour, day, month, year) THEN
-			time := LONGINT(hour)*4096 + LONGINT(minute)*64 + second;
-			date := LONGINT(year)*512 + LONGINT(month)*32 + day;
+			time := SIGNED32(hour)*4096 + SIGNED32(minute)*64 + second;
+			date := SIGNED32(year)*512 + SIGNED32(month)*32 + day;
 			RETURN;
 		END;
 	END;
@@ -60,7 +60,7 @@ END Get;
 
 (** Set the current time and date in Oberon format. *)
 
-PROCEDURE Set*(time, date: LONGINT);
+PROCEDURE Set*(time, date: SIGNED32);
 VAR
 	second, minute, hour, day, month: SIGNED8;
 	year: SIGNED16;
@@ -101,7 +101,7 @@ The time and date are that of the real-time clock of the system, which may be se
 
 The tz variable indicates the system time zone offset from universal time in minutes.  It may be updated at any time due to daylight savings time.  E.g. MET DST is 2 * 60 = 120.
 
-The time and date are each represented in an encoded LONGINT.
+The time and date are each represented in an encoded SIGNED32.
 
 Converting from year, month, day, hour, minute, second to time, date:
 	time := hour*4096 + minute*64 + second;

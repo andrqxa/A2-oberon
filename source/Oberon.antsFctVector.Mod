@@ -72,7 +72,7 @@ TYPE
 	END HandleFileMsg;
 
 	PROCEDURE Sync*( obj: Object );
-	VAR i: LONGINT;  get, at: LONGREAL;
+	VAR i: SIGNED32;  get, at: LONGREAL;
 	BEGIN
 		IF obj.f # NIL THEN
 			FOR i := 0 TO obj.x.nrData - 1 DO
@@ -143,8 +143,8 @@ END
 END New;
 
 PROCEDURE NewVec*;
-VAR l: antsCommands.tScanList;   vec: vyLongrealVec.tVector;   len: LONGINT;   name: vyName.tNameArray ;   from: vyBase.Object;
-val: LONGREAL;    i: LONGINT;
+VAR l: antsCommands.tScanList;   vec: vyLongrealVec.tVector;   len: SIGNED32;   name: vyName.tNameArray ;   from: vyBase.Object;
+val: LONGREAL;    i: SIGNED32;
 BEGIN
 l := antsCommands.ScanFromPar("name=NAME ( len=INT| from=OBJ )");
 IF antsCommands.ExpectNameFromKeyword(l, "name",  name) THEN
@@ -235,7 +235,7 @@ END New;
 	END DoSetObject;
 
 	PROCEDURE NewVec*;
-	VAR l: antsCommands.tScanList;  vec: vyLongrealVec.tVector;  len: LONGINT;  name: vyName.tNameArray;  from: vyBase.Object;
+	VAR l: antsCommands.tScanList;  vec: vyLongrealVec.tVector;  len: SIGNED32;  name: vyName.tNameArray;  from: vyBase.Object;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME ( len=INT| from=OBJ )" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) THEN
@@ -246,7 +246,7 @@ END New;
 		END
 	END NewVec;
 
-	PROCEDURE DoNewVec1*( len: LONGINT;  VAR vec: vyLongrealVec.tVector );
+	PROCEDURE DoNewVec1*( len: SIGNED32;  VAR vec: vyLongrealVec.tVector );
 	BEGIN
 		vec := vyLongrealVec.New( len );  vyLongrealVec.Fill( vec, 0, 0, len );
 		IF len > 0 THEN
@@ -255,7 +255,7 @@ END New;
 	END DoNewVec1;
 
 	PROCEDURE DoNewVec2*( from: vyBase.Object;  VAR vec: vyLongrealVec.tVector );
-	VAR i: LONGINT;  val: LONGREAL;
+	VAR i: SIGNED32;  val: LONGREAL;
 	BEGIN
 		IF from IS vyLongrealVec.tVector THEN
 			WITH from: vyLongrealVec.tVector DO

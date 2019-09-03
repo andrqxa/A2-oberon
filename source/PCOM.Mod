@@ -38,7 +38,7 @@ MODULE PCOM; (** AUTHOR "prk"; PURPOSE "Parallel Compiler: symbol file plug-in";
 	           record bodies @Body
 
 	 records   invisible fields and methods are exported with name ""
-	           prio: any LONGINT
+	           prio: any SIGNED32
 	           flags: SET
 	           	bit 0   	Protectable
 	           	bit 2       Active
@@ -161,17 +161,17 @@ TYPE
 
 	Symbol* = OBJECT (PCM.Attribute)		(*attributes for PCT.Symbol*)
 	VAR
-			fp*: LONGINT;		(*fingerprint*)
+			fp*: SIGNED32;		(*fingerprint*)
 			sibling: PCT.Symbol;
 	END Symbol;
 
 	Struct* = OBJECT (PCM.Attribute)		(*attributes for PCT.Struct*)
 		VAR
-			fp*, pbfp*, pvfp*: LONGINT;		(*fingerprint*)
+			fp*, pbfp*, pvfp*: SIGNED32;		(*fingerprint*)
 			fpdone* {UNTRACED} : PCT.Module;	(*module relative to which the fp has been computed*)
-			strref*: LONGINT;	(*import: index for struct array*)
-			tag: LONGINT;	 (*tag->export/import number*)
-			uref*: LONGINT;
+			strref*: SIGNED32;	(*import: index for struct array*)
+			tag: SIGNED32;	 (*tag->export/import number*)
+			uref*: SIGNED32;
 			mod*: PCT.Module;		(*defining module*)
 
 		PROCEDURE & Init*(mod: PCT.Module);
@@ -184,10 +184,10 @@ TYPE
 
 	Module* = OBJECT  (PCM.Attribute)		(*attributes for PCT.Module*)
 		VAR
-			nofimp: LONGINT;	import: PCT.ModuleArray;		(*import: list of all modules imported by SELF, [0..nofimp[*)
-			nofstr: LONGINT;	struct: StructArray;			(*import: list of own structures, [0..nofstr[ *)
-			nofreimp: LONGINT;	reimp: StructArray;		(*import of main: list of structs used by main, [0..nofreimp[*)
-			expnumber: LONGINT;										(*export of main: this module reference [1..oo[ ; OM uses mode for this*)
+			nofimp: SIGNED32;	import: PCT.ModuleArray;		(*import: list of all modules imported by SELF, [0..nofimp[*)
+			nofstr: SIGNED32;	struct: StructArray;			(*import: list of own structures, [0..nofstr[ *)
+			nofreimp: SIGNED32;	reimp: StructArray;		(*import of main: list of structs used by main, [0..nofreimp[*)
+			expnumber: SIGNED32;										(*export of main: this module reference [1..oo[ ; OM uses mode for this*)
 			changed: BOOLEAN;										(*self-import: imported obj doesn't exist anymore*)
 
 		PROCEDURE & Init*;
@@ -208,51 +208,51 @@ VAR
 
 		altSelf: PCS.Name;	(*predefined strings*)
 
-		Ninterfaces, NpatchPointer0: LONGINT;
+		Ninterfaces, NpatchPointer0: SIGNED32;
 
 (** ========== Symbol Table Checker ============== *)
 (** ---------- Fingerprinting -------------- *)
-PROCEDURE FPrint(VAR fp: LONGINT; val: LONGINT);
-BEGIN fp:=SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, ROT(fp, 7)) / SYSTEM.VAL(SET, val))
+PROCEDURE FPrint(VAR fp: SIGNED32; val: SIGNED32);
+BEGIN fp:=SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, ROT(fp, 7)) / SYSTEM.VAL(SET, val))
 END FPrint;
 
-PROCEDURE FPrintSet(VAR fp: LONGINT; set: SET);
-BEGIN FPrint(fp, SYSTEM.VAL(LONGINT, set))
+PROCEDURE FPrintSet(VAR fp: SIGNED32; set: SET);
+BEGIN FPrint(fp, SYSTEM.VAL(SIGNED32, set))
 END FPrintSet;
 
-PROCEDURE FPrintReal(VAR fp: LONGINT; real: REAL);
-BEGIN FPrint(fp, SYSTEM.VAL(LONGINT, real))
+PROCEDURE FPrintReal(VAR fp: SIGNED32; real: REAL);
+BEGIN FPrint(fp, SYSTEM.VAL(SIGNED32, real))
 END FPrintReal;
 
-PROCEDURE FPrintLReal(VAR fp: LONGINT; lr: LONGREAL);
-	VAR l, h: LONGINT;
+PROCEDURE FPrintLReal(VAR fp: SIGNED32; lr: LONGREAL);
+	VAR l, h: SIGNED32;
 BEGIN
 	SYSTEM.GET(ADDRESSOF(lr)+4, l); SYSTEM.GET(ADDRESSOF(lr), h);
 	FPrint(fp, l); FPrint(fp, h);
 END FPrintLReal;
 
-PROCEDURE FPrintName*(VAR fp: LONGINT; name: ARRAY OF CHAR);
+PROCEDURE FPrintName*(VAR fp: SIGNED32; name: ARRAY OF CHAR);
 	VAR i: SIGNED16; ch: CHAR;
 BEGIN i:=0; REPEAT ch:=name[i]; FPrint(fp, ORD(ch)); INC(i) UNTIL ch=0X
 END FPrintName;
 
-PROCEDURE FPrintVis(VAR fp: LONGINT; vis: SET);
+PROCEDURE FPrintVis(VAR fp: SIGNED32; vis: SET);
 BEGIN
 	IF vis = PCT.Public THEN  FPrint(fp, FPextern)
 	ELSIF vis = readonly THEN  FPrint(fp, FPexternR)
 	ELSIF vis = PCT.Internal THEN  FPrint(fp, FPintern)
 	ELSE
-		FPrint(fp, FPothervis + SYSTEM.VAL(LONGINT, vis))
+		FPrint(fp, FPothervis + SYSTEM.VAL(SIGNED32, vis))
 (*
 		HALT(99)
 *)
 	END
 END FPrintVis;
 
-PROCEDURE FPrintSign(VAR fp: LONGINT;  par: PCT.Parameter;  self: PCT.Parameter;  ret: PCT.Struct;  current: PCT.Module;
+PROCEDURE FPrintSign(VAR fp: SIGNED32;  par: PCT.Parameter;  self: PCT.Parameter;  ret: PCT.Struct;  current: PCT.Module;
 										isOperator: BOOLEAN);
 
-	PROCEDURE FPrintPar(VAR fp: LONGINT;  par: PCT.Parameter;  current: PCT.Module);
+	PROCEDURE FPrintPar(VAR fp: SIGNED32;  par: PCT.Parameter;  current: PCT.Module);
 	VAR str: StringBuf;
 	BEGIN
 		IF par.ref THEN  FPrint(fp, FPMvarpar)  ELSE  FPrint(fp, FPMpar)  END;
@@ -272,8 +272,8 @@ BEGIN
 	END;
 END FPrintSign;
 
-PROCEDURE FPrintMeth(VAR pbfp, pvfp: LONGINT; mth, init, body: PCT.Method;  current: PCT.Module);
-	VAR fp: LONGINT; oAttr: Symbol; str: StringBuf;
+PROCEDURE FPrintMeth(VAR pbfp, pvfp: SIGNED32; mth, init, body: PCT.Method;  current: PCT.Module);
+	VAR fp: SIGNED32; oAttr: Symbol; str: StringBuf;
 BEGIN
 	IF (mth.vis # PCT.Internal) THEN
 		IF mth.sym=NIL  THEN  NEW(oAttr); mth.sym:=oAttr  ELSE  oAttr := mth.sym(Symbol)  END;
@@ -293,7 +293,7 @@ BEGIN
 END FPrintMeth;
 
 PROCEDURE FPrintRecord(typ: PCT.Record;  current: PCT.Module);
-	VAR p: PCT.Symbol; fld: PCT.Variable; adr, flags, fp, pbfp, pvfp: LONGINT; tAttr: Struct;  oAttr: Symbol;
+	VAR p: PCT.Symbol; fld: PCT.Variable; adr, flags, fp, pbfp, pvfp: SIGNED32; tAttr: Struct;  oAttr: Symbol;
 			scope: PCT.RecScope; intf: PCT.Interface;
 			name: ARRAY 32 OF CHAR; dump: BOOLEAN;
 			str: StringBuf; i: SIZE;
@@ -386,7 +386,7 @@ END FPrintRecord;
 
 PROCEDURE FPrintTyp0(typ: PCT.Struct;  current: PCT.Module);
 (* calculate fingerprint without looking at record fields, private and public fingerprints *)
-	VAR fp: LONGINT; mode: SIGNED8; rec: PCT.Record; intf: PCT.Interface; tAttr: Struct;  base: PCT.Struct;
+	VAR fp: SIGNED32; mode: SIGNED8; rec: PCT.Record; intf: PCT.Interface; tAttr: Struct;  base: PCT.Struct;
 		name: ARRAY 32 OF CHAR; dump: BOOLEAN; str: StringBuf; i: SIZE;
 
 	PROCEDURE Name;	(*has side effects on the local variables!!!*)
@@ -544,7 +544,7 @@ BEGIN
 END FPrintTyp;
 
 (** fof >> *)
-	PROCEDURE FPrintConstEnhArray( VAR fp: LONGINT;  val: PCT.Value );
+	PROCEDURE FPrintConstEnhArray( VAR fp: SIGNED32;  val: PCT.Value );
 	BEGIN
 		IF val.vis # PCT.Internal THEN PCM.Error( -1, -1, "const arrays not fingerprinted yet" )
 		END;   (* otherwise a change does not change the module *)
@@ -552,7 +552,7 @@ END FPrintTyp;
 (** << fof  *)
 
 PROCEDURE FPrintObj*(obj: PCT.Symbol;  current: PCT.Module);
-	VAR fp, len, pos: LONGINT; con: PCT.Const; oAttr: Symbol;  c: PCLIR.AsmBlock; str: StringBuf;
+	VAR fp, len, pos: SIGNED32; con: PCT.Const; oAttr: Symbol;  c: PCLIR.AsmBlock; str: StringBuf;
 BEGIN
 	current := current.scope.owner;	(* canonical representation *)
 (*PCM.LogWLn; PCM.LogWStr("FPrintObj "); PCM.LogWStr(obj.name);*)
@@ -622,7 +622,7 @@ END FPrintObj;
 
 PROCEDURE Export*(VAR r: PCM.Rider; M: PCT.Module; new, extend, skipImport: BOOLEAN; VAR msg: ARRAY OF CHAR);
 	VAR name: StringBuf;
-		oldM: PCT.Module; nofstruct: LONGINT;
+		oldM: PCT.Module; nofstruct: SIGNED32;
 		newsym, changed, extended: BOOLEAN; MAttr: Module;
 		impList: ImportList;
 
@@ -698,7 +698,7 @@ PROCEDURE Export*(VAR r: PCM.Rider; M: PCT.Module; new, extend, skipImport: BOOL
 		ELSIF type = PCT.Float64 THEN  PCM.SymWLReal(r, c.real)
 		ELSIF type = PCT.String THEN  PCM.SymWString(r, c.str^)
 		ELSIF type = PCT.Bool THEN  PCM.SymWNum(r, SYSTEM.VAL(SIGNED8, c.bool))
-		ELSIF type = PCT.Set THEN  PCM.SymWNum(r, SYSTEM.VAL(LONGINT, c.set))
+		ELSIF type = PCT.Set THEN  PCM.SymWNum(r, SYSTEM.VAL(SIGNED32, c.set))
 (** fof >> *)
 		ELSIF type IS PCT.EnhArray THEN
 			PCM.Error( 200, -1, "const arrays cannot be exported yet" );
@@ -880,7 +880,7 @@ PROCEDURE Export*(VAR r: PCM.Rider; M: PCT.Module; new, extend, skipImport: BOOL
 	END OutObj;
 
 	PROCEDURE OutInline(i: PCM.Attribute);
-	VAR p: PCLIR.AsmBlock; len, pos, cnt: LONGINT;
+	VAR p: PCLIR.AsmBlock; len, pos, cnt: SIGNED32;
 	BEGIN
 		WITH i: PCLIR.AsmInline DO
 			ASSERT(i.fixup = NIL);
@@ -937,7 +937,7 @@ PROCEDURE Export*(VAR r: PCM.Rider; M: PCT.Module; new, extend, skipImport: BOOL
 		IF PCM.error THEN RETURN END;		(*symfile is changed*)
 
 		IF {PCT.Overloading} * m.flags # {} THEN
-			PCM.SymWNum(r, SFsysflag); PCM.SymWNum(r, SYSTEM.VAL(LONGINT, m.flags * {PCT.Overloading}))
+			PCM.SymWNum(r, SFsysflag); PCM.SymWNum(r, SYSTEM.VAL(SIGNED32, m.flags * {PCT.Overloading}))
 		END;
 		p1 := NIL; p2 := NIL; t1 := NIL;
 		c := m.scope.firstValue; first := TRUE;
@@ -1169,7 +1169,7 @@ BEGIN
 END ReadStrIndex;
 
 PROCEDURE ImportComplete(m: PCT.Module);
-VAR attr: Module; i: LONGINT;
+VAR attr: Module; i: SIGNED32;
 
 	PROCEDURE RecordComplete(r: PCT.Record);
 	BEGIN
@@ -1191,7 +1191,7 @@ END ImportComplete;
 
 PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index);
 	VAR
-			res: WORD; tag, i: LONGINT;  name: PCS.Name;  str: PCT.Struct;  vis: SET; R: PCM.SymReader;
+			res: WORD; tag, i: SIGNED32;  name: PCS.Name;  str: PCT.Struct;  vis: SET; R: PCM.SymReader;
 			proc: PCT.Proc;
 			scope: PCT.ModScope;
 			pscope: PCT.ProcScope;
@@ -1237,7 +1237,7 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 			VAR	old: PCT.Symbol;  OAttr: Symbol;
 				p: PCT.Symbol;
 				paramProc, paramObj: PCT.Parameter;
-				j: LONGINT;
+				j: SIGNED32;
 		BEGIN
 			ASSERT(selfimport);
 			old:=PCT.Find(scope, scope, obj.name, PCT.procdeclared, FALSE);
@@ -1303,7 +1303,7 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 		END GetImports;
 
 		PROCEDURE InConst(): PCT.Const;
-			VAR i: LONGINT;  r: REAL;  lr: LONGREAL;  str: PCS.String;  set: SET;  c: PCT.Const;
+			VAR i: SIGNED32;  r: REAL;  lr: LONGREAL;  str: PCS.String;  set: SET;  c: PCT.Const;
 		BEGIN
 			CASE	tag	OF
 			| SFtypBool:	R.RawNum(i);
@@ -1324,8 +1324,8 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 			| SFtypInt64:	R.RawLReal(lr);
 									IF TraceImport THEN PCM.LogWLn; PCM.LogWStr("InConst / HInt / ") END;
 									c := PCT.NewInt64Const(SYSTEM.VAL(HUGEINT, lr))
-			| SFtypSet:	R.RawNum(SYSTEM.VAL(LONGINT, set));
-									IF TraceImport THEN PCM.LogWLn; PCM.LogWStr("InConst / Set / "); PCM.LogWHex(SYSTEM.VAL(LONGINT, set)) END;
+			| SFtypSet:	R.RawNum(SYSTEM.VAL(SIGNED32, set));
+									IF TraceImport THEN PCM.LogWLn; PCM.LogWStr("InConst / Set / "); PCM.LogWHex(SYSTEM.VAL(SIGNED32, set)) END;
 									c := PCT.NewSetConst(set)
 			| SFtypFloat32:	R.RawReal(r);
 									IF TraceImport THEN PCM.LogWLn; PCM.LogWStr("InConst / Real / ") END;
@@ -1342,7 +1342,7 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 		END InConst;
 
 		PROCEDURE InParList(upper: PCT.Scope): PCT.ProcScope;
-			VAR	s: PCT.ProcScope;  svar, var: BOOLEAN;  name: PCS.Name; styp, str: PCT.Struct; f: LONGINT; flags: SET; (* ejz *)
+			VAR	s: PCT.ProcScope;  svar, var: BOOLEAN;  name: PCS.Name; styp, str: PCT.Struct; f: SIGNED32; flags: SET; (* ejz *)
 		BEGIN
 			styp := NIL;
 			NEW(s); PCT.InitScope(s, upper, {}, TRUE); PCT.SetOwner(s);
@@ -1390,13 +1390,13 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 			NEW(s);
 			PCT.SetOwner(s);
 			PCT.InitScope(s, scope, {}, TRUE);
-			R.RawNum(SYSTEM.VAL(LONGINT, mode));
+			R.RawNum(SYSTEM.VAL(SIGNED32, mode));
 			PCT.InitRecord(rec, btyp, intf, s, PCT.interface IN mode, TRUE, TRUE, res); (* ASSERT(res = PCT.Ok); *)
 			Assert(res = PCT.Ok);
 			rec.mode := mode;
 			R.Char(ch);  rec.prio := ORD(ch);
 			IF TraceImport THEN
-				PCM.LogWLn; PCM.LogWStr("Rec / Mode / "); PCM.LogWHex(SYSTEM.VAL(LONGINT, rec.mode));
+				PCM.LogWLn; PCM.LogWStr("Rec / Mode / "); PCM.LogWHex(SYSTEM.VAL(SIGNED32, rec.mode));
 				PCM.LogWLn; PCM.LogWStr("Rec / Prio / "); PCM.LogWNum(rec.prio)
 			END;
 			R.RawNum(tag);
@@ -1434,14 +1434,14 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 		END InRecord;
 
 		PROCEDURE InStruct(VAR typ: PCT.Struct);
-			VAR i, len, strref, typtag, typadr: LONGINT; vis: SET; name: PCS.Name; btyp: PCT.Struct;
+			VAR i, len, strref, typtag, typadr: SIGNED32; vis: SET; name: PCS.Name; btyp: PCT.Struct;
 				arr: PCT.Array; type: PCT.Type; mod: PCT.Module;  typname: PCS.Name; proc: PCT.Delegate; r, rec: PCT.Record;
 				ptr: PCT.Pointer;
 				modAttr: Module; tAttr: Struct;
-				sysflag: LONGINT; sf: SET;
+				sysflag: SIGNED32; sf: SET;
 				intf: ARRAY 32 OF PCT.Interface; c: CHAR;
-			earr: PCT.EnhArray; tensor: PCT.Tensor; readonly: LONGINT;  (*fof*)
-			flags: LONGINT;
+			earr: PCT.EnhArray; tensor: PCT.Tensor; readonly: SIGNED32;  (*fof*)
+			flags: SIGNED32;
 			(*!!! when loading the user structures, no fix is used, but dummy elements !!!*)
 		BEGIN
 			IF tag <= 0 THEN	(*oldstruct*)
@@ -1601,7 +1601,7 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 				| SFtypProcTyp:
 
 						ReadStrIndex(R, readString, name);
-						R.RawNum(SYSTEM.VAL(LONGINT, sf));
+						R.RawNum(SYSTEM.VAL(SIGNED32, sf));
 						IF sysflag # SFdelegate THEN INCL (sf, PCT.StaticMethodsOnly) END;
 						PCT.InitDelegate(proc, btyp, InParList(scope), sf, res); (* ASSERT(res = PCT.Ok); *)
 						Assert(res = PCT.Ok);
@@ -1623,7 +1623,7 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 		END InStruct;
 
 		PROCEDURE InCProc(): PCLIR.AsmInline;
-		VAR  inline: PCLIR.AsmInline;  p: PCLIR.AsmBlock;  ch: CHAR;  pos, len: LONGINT;
+		VAR  inline: PCLIR.AsmInline;  p: PCLIR.AsmBlock;  ch: CHAR;  pos, len: SIGNED32;
 		BEGIN
 			NEW(inline); R.Char(ch);
 			REPEAT
@@ -1636,7 +1636,7 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 		END InCProc;
 
 		PROCEDURE InObj(VAR idx: PCS.Name;  VAR vis: SET;  VAR flag: SET;  VAR typ: PCT.Struct);
-		VAR  f: LONGINT; name: ARRAY 32 OF CHAR;
+		VAR  f: SIGNED32; name: ARRAY 32 OF CHAR;
 		BEGIN
 			flag := {}; vis:=PCT.Public;
 			IF tag=SFobjflag THEN
@@ -1706,7 +1706,7 @@ BEGIN
 	R.RawNum(tag);
 	flag := {};
 	IF tag = SFsysflag THEN
-		R.RawNum(SYSTEM.VAL(LONGINT, flag)); R.RawNum(tag);
+		R.RawNum(SYSTEM.VAL(SIGNED32, flag)); R.RawNum(tag);
 	END;
 	IF ~selfimport THEN PCT.InitScope(scope, NIL, flag, TRUE) END;
 	IF	tag=SFconst	THEN R.RawNum(tag);
@@ -1825,7 +1825,7 @@ PROCEDURE Cleanup;
 BEGIN PCT.RemoveImporter(Import)
 END Cleanup;
 
-PROCEDURE InitBasic(t: PCT.Struct; tag, fp: LONGINT);
+PROCEDURE InitBasic(t: PCT.Struct; tag, fp: SIGNED32);
 	VAR sAttr: Struct;
 BEGIN
 	NEW(sAttr, NIL);  sAttr.tag := tag;  t.sym := sAttr;  sAttr.fp:=fp;  sAttr.pbfp := fp;

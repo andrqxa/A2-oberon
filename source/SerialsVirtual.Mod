@@ -47,16 +47,16 @@ TYPE
 	VirtualPort = OBJECT (Serials.Port);
 	VAR
 		buffer : ARRAY BufferSize OF CHAR;
-		head, tail : LONGINT;
+		head, tail : SIGNED32;
 
 		open : BOOLEAN;
-		bps, data, parity, stop : LONGINT;
+		bps, data, parity, stop : SIGNED32;
 		mc : SET;
 
 		sender : SendProcedure;
 
 		(* Send speed emulation fields *)
-		eachNCharacters, waitForMs : LONGINT;
+		eachNCharacters, waitForMs : SIGNED32;
 		timer : Kernel.Timer;
 
 		(** Virtual Port Interface *)
@@ -79,7 +79,7 @@ TYPE
 
 		(** Serial Port Interface *)
 
-		PROCEDURE Open*(bps, data, parity, stop : LONGINT; VAR res: WORD);
+		PROCEDURE Open*(bps, data, parity, stop : SIGNED32; VAR res: WORD);
 		BEGIN {EXCLUSIVE}
 			IF open THEN
 				IF Verbose THEN ShowModule; KernelLog.String(name); KernelLog.String(" already open"); KernelLog.Ln; END;
@@ -140,7 +140,7 @@ TYPE
 		END Available;
 
 		(* Set the port state: speed in bps, no. of data bits, parity, stop bit length. *)
-		PROCEDURE SetPortState(bps, data, parity, stop : LONGINT; VAR res: WORD);
+		PROCEDURE SetPortState(bps, data, parity, stop : SIGNED32; VAR res: WORD);
 		BEGIN
 			SELF.bps := bps; SELF.data := data; SELF.parity := parity; SELF.stop := stop;
 			res := Serials.Ok;
@@ -150,7 +150,7 @@ TYPE
 		END SetPortState;
 
 		(** Get the port state: state (open, closed), speed in bps, no. of data bits, parity, stop bit length. *)
-		PROCEDURE GetPortState*(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : LONGINT);
+		PROCEDURE GetPortState*(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : SIGNED32);
 		BEGIN {EXCLUSIVE}
 			openstat := open;
 			bps := SELF.bps; data := SELF.data; parity := SELF.parity; stop := SELF.stop;
@@ -190,7 +190,7 @@ TYPE
 		port : Serials.Port;
 		in, out : Streams.Writer;
 
-		PROCEDURE Open*(bps, data, parity, stop : LONGINT; VAR res: WORD);
+		PROCEDURE Open*(bps, data, parity, stop : SIGNED32; VAR res: WORD);
 		BEGIN {EXCLUSIVE}
 			port.Open(bps, data, parity, stop, res);
 			IF res = Serials.Ok THEN
@@ -243,7 +243,7 @@ TYPE
 		END Available;
 
 		(** Get the port state: state (open, closed), speed in bps, no. of data bits, parity, stop bit length. *)
-		PROCEDURE GetPortState*(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : LONGINT);
+		PROCEDURE GetPortState*(VAR openstat : BOOLEAN; VAR bps, data, parity, stop : SIGNED32);
 		BEGIN {EXCLUSIVE}
 			port.GetPortState(openstat, bps, data, parity, stop);
 		END GetPortState;
@@ -284,7 +284,7 @@ BEGIN
 	KernelLog.String(ModuleName); KernelLog.String(": ");
 END ShowModule;
 
-PROCEDURE GetSlowdownValues(bps : LONGINT; VAR eachNCharacters, waitForMs: LONGINT; VAR res : WORD);
+PROCEDURE GetSlowdownValues(bps : SIGNED32; VAR eachNCharacters, waitForMs: SIGNED32; VAR res : WORD);
 BEGIN
 	res := Serials.Ok;
 	waitForMs := 1;
@@ -306,12 +306,12 @@ BEGIN
 	END;
 END GetSlowdownValues;
 
-PROCEDURE IsValidPortNumber(portNbr : LONGINT) : BOOLEAN;
+PROCEDURE IsValidPortNumber(portNbr : SIGNED32) : BOOLEAN;
 BEGIN
 	RETURN (1 <= portNbr) & (portNbr <= Serials.MaxPorts);
 END IsValidPortNumber;
 
-PROCEDURE SendFileIntern(portNbr : LONGINT; CONST filename : ARRAY OF CHAR; loop : BOOLEAN; context : Commands.Context);
+PROCEDURE SendFileIntern(portNbr : SIGNED32; CONST filename : ARRAY OF CHAR; loop : BOOLEAN; context : Commands.Context);
 VAR
 	port : Serials.Port;
 	file : Files.File;
@@ -357,7 +357,7 @@ END SendFileIntern;
 (** Send the content of the specified file to the specified serial port. If the Loop parameter is used, the file is sent
 	in a endless loop. Sending can be stopped using the StopSendFile commands *)
 PROCEDURE SendFile*(context : Commands.Context); (** portNbr filename [Loop] ~ *)
-VAR portNbr : LONGINT; filename, parString : ARRAY Files.NameLength OF CHAR; loop : BOOLEAN;
+VAR portNbr : SIGNED32; filename, parString : ARRAY Files.NameLength OF CHAR; loop : BOOLEAN;
 BEGIN
 	IF context.arg.GetInteger(portNbr, FALSE) & IsValidPortNumber(portNbr) THEN
 		IF context.arg.GetString(filename) THEN
@@ -375,7 +375,7 @@ END SendFile;
 
 (** Stop sending a file for the specified port *)
 PROCEDURE StopSendFile*(context : Commands.Context); (** portNbr ~ *)
-VAR portNbr : LONGINT;
+VAR portNbr : SIGNED32;
 BEGIN
 	IF context.arg.GetInteger(portNbr, FALSE) & IsValidPortNumber(portNbr) THEN
 		BEGIN {EXCLUSIVE}
@@ -410,7 +410,7 @@ END Install;
 PROCEDURE InstallSniffer*(context : Commands.Context); (** [portNbr] ~ *)
 VAR
 	portSniffer : PortSniffer; port : Serials.Port;
-	portNbr : LONGINT;
+	portNbr : SIGNED32;
 	description : ARRAY 128 OF CHAR;
 BEGIN
 	IF context.arg.GetInteger(portNbr, FALSE) & IsValidPortNumber(portNbr) THEN
@@ -430,7 +430,7 @@ BEGIN
 END InstallSniffer;
 
 PROCEDURE Cleanup;
-VAR portNbr : LONGINT;
+VAR portNbr : SIGNED32;
 BEGIN
 	FOR portNbr := 1 TO Serials.MaxPorts DO
 		active[portNbr] := FALSE;
@@ -438,7 +438,7 @@ BEGIN
 END Cleanup;
 
 PROCEDURE SetErrorRate*(context: Commands.Context);
-VAR rate, divisor: LONGINT;
+VAR rate, divisor: SIGNED32;
 BEGIN
 	IF context.arg.GetInteger(rate,FALSE) & context.arg.GetInteger(divisor,FALSE) THEN
 		errorRate := rate  / divisor;

@@ -11,12 +11,12 @@ TYPE
 	Time* = HUGEINT; (* Time type *)
 
 VAR
-	InstallHandler *: PROCEDURE (handler: Objects.EventHandler; irq: LONGINT);
+	InstallHandler *: PROCEDURE (handler: Objects.EventHandler; irq: SIGNED32);
 
 	Char *: PROCEDURE (c: CHAR);
 	String *: PROCEDURE (CONST str: ARRAY OF CHAR);
-	Int *: PROCEDURE (i: HUGEINT; w: LONGINT);
-	Hex *: PROCEDURE (i: HUGEINT; w: LONGINT);
+	Int *: PROCEDURE (i: HUGEINT; w: SIGNED32);
+	Hex *: PROCEDURE (i: HUGEINT; w: SIGNED32);
 	Address *: PROCEDURE (a: ADDRESS);
 	Set *: PROCEDURE (s: SET);
 	Boolean *: PROCEDURE (b: BOOLEAN);
@@ -26,9 +26,9 @@ VAR
 
 	GetTimeCounter-: PROCEDURE(): Time;
 
-	cpuClockHz: LONGINT;
+	cpuClockHz: SIGNED32;
 
-	PROCEDURE Enable * (sd: LONGINT): BOOLEAN;
+	PROCEDURE Enable * (sd: SIGNED32): BOOLEAN;
 	VAR
 		key, value: ARRAY 32 OF CHAR;
 	BEGIN
@@ -39,11 +39,11 @@ VAR
 		RETURN value = "1"
 	END Enable;
 
-	PROCEDURE HcClock * (sd: LONGINT): LONGINT;
+	PROCEDURE HcClock * (sd: SIGNED32): SIGNED32;
 	VAR
-		clock, res: LONGINT;
+		clock, res: SIGNED32;
 	BEGIN
-		clock := LONGINT(PsConfig.GetIoClockFrequency(PsConfig.IoSdio, res));
+		clock := SIGNED32(PsConfig.GetIoClockFrequency(PsConfig.IoSdio, res));
 		ASSERT(res = 0);
 		RETURN clock
 	END HcClock;

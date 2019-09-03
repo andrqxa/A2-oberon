@@ -52,7 +52,7 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 
 
 	PROCEDURE InitContext (VAR ctxt: Context);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		ctxt.class[1] := "Graphics.NewLine";
 		ctxt.class[2] := "Graphics.NewCaption";
@@ -172,7 +172,7 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 	END CreateRectangle;
 
 	PROCEDURE CreateSpline (closed: BOOLEAN; CONST u, v: ARRAY OF SIGNED16; n, col, width: SIGNED16): Leonardo.Shape;
-		VAR p, bot, top: LeoPaths.Point; i: LONGINT; spline: LeoSplines.Spline;
+		VAR p, bot, top: LeoPaths.Point; i: SIGNED32; spline: LeoSplines.Spline;
 	BEGIN
 		NEW(p); LeoPaths.InitPoint(p, u[0] + 0.5, v[0] + 0.5); bot := p; top := p;
 		i := 1;
@@ -186,7 +186,7 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 	END CreateSpline;
 
 	PROCEDURE LoadCaption (VAR ctxt: Context; VAR r: Files.Rider; x, y, col: SIGNED16): Leonardo.Shape;
-		VAR fno: SIGNED8; i: LONGINT; ch: CHAR; s: ARRAY 64 OF CHAR; color: Gfx.Color; cap: LeoCaptions.Caption;
+		VAR fno: SIGNED8; i: SIGNED32; ch: CHAR; s: ARRAY 64 OF CHAR; color: Gfx.Color; cap: LeoCaptions.Caption;
 	BEGIN
 		Files.Read(r, fno); Files.Read(r, ch); i := 0;
 		WHILE ch > 0DX DO
@@ -286,7 +286,7 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 	PROCEDURE LoadElems (VAR r: Files.Rider; VAR ctxt: Context): Leonardo.Shape;
 		VAR
 			shapes, last, new: Leonardo.Shape; cno, k: SIGNED8; name, font, cmd: ARRAY 32 OF CHAR;
-			i, j: LONGINT; size, len: SIGNED16;
+			i, j: SIGNED32; size, len: SIGNED16;
 	BEGIN
 		shapes := NIL; last := NIL;
 		Files.Read(r, cno);

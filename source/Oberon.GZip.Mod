@@ -28,7 +28,7 @@ MODULE GZip IN Oberon;	(** eos  **)
 	(** uncompress (".gz"-) file in to file out **)
 	PROCEDURE UnzipFile*(in, out: Files.File; VAR res: WORD);
 	VAR
-		gzr: GZReaders.Reader; r: Files.Rider; buf: ARRAY BufSize OF CHAR; read: LONGINT;
+		gzr: GZReaders.Reader; r: Files.Rider; buf: ARRAY BufSize OF CHAR; read: SIGNED32;
 	BEGIN
 		IF (in = NIL) OR (out = NIL) THEN
 			res := FileError
@@ -59,7 +59,7 @@ MODULE GZip IN Oberon;	(** eos  **)
 		\o: If set, files with the same name are overwritten, otherwise they are renamed to filename.Bak **)
 	PROCEDURE Unzip*;
 		VAR
-			S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT; overwrite, oldfilefound: BOOLEAN;
+			S: Texts.Scanner; T: Texts.Text; beg, end, time: SIGNED32; overwrite, oldfilefound: BOOLEAN;
 			suffix, infile, outfile, newname: ARRAY 256 OF CHAR; in, out: Files.File; res: WORD; res2: SIGNED16;
 	BEGIN
 		T := Oberon.Par.text;
@@ -130,7 +130,7 @@ MODULE GZip IN Oberon;	(** eos  **)
 	(** compress file in into file out **)
 	PROCEDURE ZipFile*(in, out: Files.File; level, strategy: SIGNED8; VAR res: WORD);
 	VAR
-		gzw: GZWriters.Writer; r: Files.Rider; buf: ARRAY BufSize OF CHAR; len, written, totWritten: LONGINT;
+		gzw: GZWriters.Writer; r: Files.Rider; buf: ARRAY BufSize OF CHAR; len, written, totWritten: SIGNED32;
 	BEGIN
 		IF (in = NIL) OR (out = NIL) THEN
 				res := FileError
@@ -166,7 +166,7 @@ MODULE GZip IN Oberon;	(** eos  **)
 		\strategy: specifies the compression strategy (from 0 - 2) **)
 	PROCEDURE Zip*;
 	VAR
-		S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT;
+		S: Texts.Scanner; T: Texts.Text; beg, end, time: SIGNED32;
 		level, strategy: SIGNED8; res: WORD;
 		suffix, outfile: ARRAY 256 OF CHAR; in, out: Files.File;
 	BEGIN

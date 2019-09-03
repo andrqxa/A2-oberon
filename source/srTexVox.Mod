@@ -276,7 +276,7 @@ NOT WORKING NOW.
 TYPE mirVox *= OBJECT(Voxel);
 VAR
 	fmt: Raster.Format;
-	w,h, bpr,adr: LONGINT;
+	w,h, bpr,adr: SIGNED32;
 	done: BOOLEAN;
 
 PROCEDURE & init;
@@ -287,7 +287,7 @@ END init;
 PROCEDURE Shade (VAR ray: Ray);
 VAR
 	p: Raster.Pixel;
-	x,y: LONGINT;
+	x,y: SIGNED32;
 	red,green,blue, alpha: SREAL;
 	a,b,c,lx,ly: SREAL;
 BEGIN

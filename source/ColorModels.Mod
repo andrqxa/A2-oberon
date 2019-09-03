@@ -1,10 +1,10 @@
 MODULE ColorModels; (** AUTHOR ""; PURPOSE ""; *)
 (* ported from Oberon.ColorModels.Mod and Oberon.Colors.Mod
- - use LONGINT [0,255] instead of REAL [0,1] (compatible with WMGraphics.Mod)
+ - use SIGNED32 [0,255] instead of REAL [0,1] (compatible with WMGraphics.Mod)
 *)
 
 (** convert a RedGreenBlue color specification to HueSaturationValue *)
-PROCEDURE RGBToHSV*(r,g,b : LONGINT; VAR h,s,v: REAL);
+PROCEDURE RGBToHSV*(r,g,b : SIGNED32; VAR h,s,v: REAL);
 VAR
 	m,rl,gl,bl, rr, gg, bb: REAL;
 BEGIN
@@ -40,9 +40,9 @@ BEGIN
 END RGBToHSV;
 
 (** convert a HueSaturationValue color specification to RedGreenBlue *)
-PROCEDURE HSVToRGB*(h,s,v: REAL; VAR rl,gl,bl: LONGINT);
+PROCEDURE HSVToRGB*(h,s,v: REAL; VAR rl,gl,bl: SIGNED32);
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 	f,p1,p2,p3, r, g, b: REAL;
 BEGIN
 	IF h = 360.0 THEN h:= 0.0; ELSE h:= h / 60.0; END;	(* convert h to be in [0,6] *)
@@ -66,13 +66,13 @@ BEGIN
 END RGBToCMY;
 
 (** convert a CyanMagentaYellow color specification to RedGreenBlue *)
-PROCEDURE CMYToRGB*(c,m,y: REAL; VAR r,g,b: LONGINT);
+PROCEDURE CMYToRGB*(c,m,y: REAL; VAR r,g,b: SIGNED32);
 BEGIN
 	r:= ENTIER ( (1.0 - c)*255 ); g:= ENTIER ( (1.0 - m)*255 ); b:= ENTIER ( (1.0 - y)*255 );
 END CMYToRGB;
 
 (** CMYK (Cyan Magenta Yellow blacK) model **)
-PROCEDURE RGBToCMYK* (rl, gl, bl: LONGINT; VAR c, m, y, k: REAL);
+PROCEDURE RGBToCMYK* (rl, gl, bl: SIGNED32; VAR c, m, y, k: REAL);
 VAR r, g, b : REAL;
 BEGIN
 	r := rl / 255; g := gl / 255; b := bl / 255;

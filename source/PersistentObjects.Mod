@@ -11,11 +11,11 @@ TYPE
 	(** the translation object is used to translate enumeration values to integers (and reverse) *)
 	Translation* = OBJECT
 	TYPE
-		Entry = RECORD name: ARRAY 32 OF CHAR; key: LONGINT END;
+		Entry = RECORD name: ARRAY 32 OF CHAR; key: SIGNED32 END;
 		Table= POINTER TO ARRAY OF Entry;
 	VAR
 		table: Table;
-		len: LONGINT;
+		len: SIGNED32;
 
 		PROCEDURE & Init*;
 		BEGIN len := 0; NEW(table,4);
@@ -29,16 +29,16 @@ TYPE
 			table := new
 		END Grow;
 
-		PROCEDURE Add*(CONST name: ARRAY OF CHAR; key: LONGINT);
-		VAR i: LONGINT;
+		PROCEDURE Add*(CONST name: ARRAY OF CHAR; key: SIGNED32);
+		VAR i: SIGNED32;
 		BEGIN
 			IF len = LEN(table) THEN Grow END;
 			COPY(name, table[len].name); table[len].key := key;
 			INC(len);
 		END Add;
 
-		PROCEDURE Key*(CONST name: ARRAY OF CHAR; VAR key: LONGINT): BOOLEAN;
-		VAR i: LONGINT;
+		PROCEDURE Key*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32): BOOLEAN;
+		VAR i: SIGNED32;
 		BEGIN
 			FOR i := 0 TO len-1 DO
 				IF table[i].name = name THEN key := table[i].key; RETURN TRUE END;
@@ -47,7 +47,7 @@ TYPE
 		END Key;
 
 		PROCEDURE Name*(index: SIZE; VAR name: ARRAY OF CHAR): BOOLEAN;
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			FOR i := 0 TO len-1 DO
 				IF table[i].key = index THEN COPY(table[i].name,name); RETURN TRUE END;
@@ -107,7 +107,7 @@ TYPE
 		END SetString;
 
 		PROCEDURE SetAsString*(CONST s: ARRAY OF CHAR);
-		VAR split: Strings.StringArray; first, last, step: LONGINT; int: LONGINT;
+		VAR split: Strings.StringArray; first, last, step: SIGNED32; int: SIGNED32;
 		BEGIN
 			CASE class OF
 				Class.String: string := Strings.NewString(s)
@@ -122,7 +122,7 @@ TYPE
 					IF (LEN(split) > 1) & (split[1]^ # "") THEN
 						Strings.StrToInt(split[1]^, last)
 					ELSE
-						last := MAX(LONGINT)
+						last := MAX(SIGNED32)
 					END;
 					IF (LEN(split) >2) & (split[2]^ # "") THEN
 						Strings.StrToInt(split[2]^, step)
@@ -137,7 +137,7 @@ TYPE
 		END SetAsString;
 
 		PROCEDURE Equals*(CONST s: ARRAY OF CHAR): BOOLEAN;
-		VAR int: LONGINT; flt: LONGREAL; st: SET; split: Strings.StringArray; first, last, step: LONGINT;
+		VAR int: SIGNED32; flt: LONGREAL; st: SET; split: Strings.StringArray; first, last, step: SIGNED32;
 		BEGIN
 			CASE class OF
 				Class.String: RETURN (string # NIL) & (string^ = s)
@@ -152,7 +152,7 @@ TYPE
 					IF (LEN(split) > 1) & (split[1]^ # "") THEN
 						Strings.StrToInt(split[1]^, last)
 					ELSE
-						last := MAX(LONGINT)
+						last := MAX(SIGNED32)
 					END;
 					IF (LEN(split) >2) & (split[2]^ # "") THEN
 						Strings.StrToInt(split[2]^, step)
@@ -290,7 +290,7 @@ TYPE
 		*)
 
 		PROCEDURE ActionEnumerator(CONST name: ARRAY OF CHAR; array: BOOLEAN);
-		VAR index: LONGINT;
+		VAR index: SIGNED32;
 		BEGIN
 			index := 0;
 			REPEAT
@@ -375,7 +375,7 @@ TYPE
 		END RemoveTranslation;
 
 		PROCEDURE ReadContent*(CONST name: ARRAY OF CHAR; array: BOOLEAN);
-		VAR index: LONGINT; str: Strings.String;
+		VAR index: SIGNED32; str: Strings.String;
 		BEGIN
 			index := 0;
 			REPEAT
@@ -404,7 +404,7 @@ TYPE
 		END ReadContent;
 
 		PROCEDURE WriteContent*(CONST name: ARRAY OF CHAR; array: BOOLEAN);
-		VAR index: LONGINT; translation: Interpretation;
+		VAR index: SIGNED32; translation: Interpretation;
 		BEGIN
 			index := 0;
 			REPEAT
@@ -581,7 +581,7 @@ TYPE
 		PROCEDURE StringAttribute*(CONST name: ARRAY OF CHAR; VAR str: Strings.String): BOOLEAN;
 		END StringAttribute;
 
-		PROCEDURE ReadObject*(CONST name, optionalType: ARRAY OF CHAR; index: LONGINT; VAR o: Object): BOOLEAN ;
+		PROCEDURE ReadObject*(CONST name, optionalType: ARRAY OF CHAR; index: SIGNED32; VAR o: Object): BOOLEAN ;
 		BEGIN
 		END ReadObject;
 
@@ -619,7 +619,7 @@ TYPE
 		END BooleanAttribute;
 
 		PROCEDURE IntegerAttribute*(CONST name: ARRAY OF CHAR; VAR value: HUGEINT): BOOLEAN;
-		VAR s: ARRAY 64 OF CHAR; v: LONGINT;
+		VAR s: ARRAY 64 OF CHAR; v: SIGNED32;
 		BEGIN
 			IF NameAttribute(name, s) THEN Strings.StrToInt(s, v); value := v; RETURN TRUE ELSE RETURN FALSE END;
 		END IntegerAttribute;
@@ -636,13 +636,13 @@ TYPE
 		END FloatAttribute;
 
 		PROCEDURE EnumAttribute*(CONST name: ARRAY OF CHAR; translation: Translation; VAR value:HUGEINT): BOOLEAN;
-		VAR str: ARRAY 32 OF CHAR; v: LONGINT;
+		VAR str: ARRAY 32 OF CHAR; v: SIGNED32;
 		BEGIN
 			IF NameAttribute(name, str) & translation.Key(str, v) THEN value := v; RETURN TRUE ELSE RETURN FALSE END;
 		END EnumAttribute;
 
 		PROCEDURE RangeAttribute*(CONST name: ARRAY OF CHAR; VAR value: RANGE): BOOLEAN;
-		VAR str: ARRAY 64 OF CHAR; first, last , step: LONGINT;  split:Strings.StringArray;
+		VAR str: ARRAY 64 OF CHAR; first, last , step: SIGNED32;  split:Strings.StringArray;
 		BEGIN
 			IF NameAttribute(name, str) THEN
 				split := Strings.Split(str, ":");
@@ -650,7 +650,7 @@ TYPE
 				IF (LEN(split) > 1) & (split[1]^ # "") THEN
 					Strings.StrToInt(split[1]^, last)
 				ELSE
-					last := MAX(LONGINT)
+					last := MAX(SIGNED32)
 				END;
 				IF (LEN(split) >2) & (split[2]^ # "") THEN
 					Strings.StrToInt(split[2]^, step)
@@ -690,7 +690,7 @@ TYPE
 		PROCEDURE NameAttribute*(CONST name, str: ARRAY OF CHAR);
 		END NameAttribute;
 
-		PROCEDURE WriteObject*(CONST name: ARRAY OF CHAR; index: LONGINT; o: Object);
+		PROCEDURE WriteObject*(CONST name: ARRAY OF CHAR; index: SIGNED32; o: Object);
 		END WriteObject;
 
 		PROCEDURE StartObjectArray*(CONST name: ARRAY OF CHAR);
@@ -708,7 +708,7 @@ TYPE
 		PROCEDURE IntegerAttribute*(CONST name: ARRAY OF CHAR; value: HUGEINT);
 		VAR str: ARRAY 64 OF CHAR;
 		BEGIN
-			Strings.IntToStr(LONGINT(value), str);
+			Strings.IntToStr(SIGNED32(value), str);
 			NameAttribute(name, str);
 		END IntegerAttribute;
 
@@ -727,7 +727,7 @@ TYPE
 		PROCEDURE EnumAttribute*(CONST name: ARRAY OF CHAR; translation: Translation; value: HUGEINT);
 		VAR str: ARRAY 32 OF CHAR;
 		BEGIN
-			IF translation.Name(LONGINT(value), str) THEN NameAttribute(name, str) ELSE NameAttribute(name, "unknown") END;
+			IF translation.Name(SIGNED32(value), str) THEN NameAttribute(name, str) ELSE NameAttribute(name, "unknown") END;
 		END EnumAttribute;
 
 		PROCEDURE RangeAttribute*(CONST name: ARRAY OF CHAR; value: RANGE);
@@ -735,7 +735,7 @@ TYPE
 		BEGIN
 			Strings.IntToStr(FIRST(value), str);
 			Strings.Append(str, ":");
-			IF LAST(value) # MAX(LONGINT) THEN
+			IF LAST(value) # MAX(SIGNED32) THEN
 				Strings.AppendInt(str, LAST(value));
 			END;
 			IF STEP(value) # 1 THEN
@@ -756,10 +756,10 @@ TYPE
 
 	WrittenTable = OBJECT (Basic.HashTable)
 	TYPE
-		ObjectId = POINTER TO RECORD num: LONGINT END;
-	VAR length: LONGINT;
+		ObjectId = POINTER TO RECORD num: SIGNED32 END;
+	VAR length: SIGNED32;
 
-		PROCEDURE Enter(o: Object; VAR entry: LONGINT): BOOLEAN;
+		PROCEDURE Enter(o: Object; VAR entry: SIGNED32): BOOLEAN;
 		VAR any: ANY; id: ObjectId;
 		BEGIN
 			any := Get(o);
@@ -807,8 +807,8 @@ TYPE
 			IF (current IS XML.Element) THEN element := current(XML.Element) ELSE element := NIL END;
 		END Exit;
 
-		PROCEDURE WriteObject*(CONST name: ARRAY OF CHAR; index: LONGINT; o: Object);
-		VAR guid: LONGINT;
+		PROCEDURE WriteObject*(CONST name: ARRAY OF CHAR; index: SIGNED32; o: Object);
+		VAR guid: SIGNED32;
 		BEGIN
 			IF o # NIL THEN
 				Enter(name,o);
@@ -831,13 +831,13 @@ TYPE
 		END Enter;
 
 		PROCEDURE GetObject(index: HUGEINT): Object;
-		BEGIN RETURN Get(LONGINT(index))(Object)
+		BEGIN RETURN Get(SIGNED32(index))(Object)
 		END GetObject;
 
 	END ReadTable;
 
 	Element=POINTER TO RECORD
-		index: LONGINT;
+		index: SIGNED32;
 		e: XML.Element;
 		next: Element;
 	END;
@@ -845,7 +845,7 @@ TYPE
 	Symbol = POINTER TO RECORD
 		name: StringPool.Index;
 		first, last: Element;
-		numberElements: LONGINT;
+		numberElements: SIGNED32;
 		next: Symbol;
 	END;
 
@@ -923,7 +923,7 @@ TYPE
 			RETURN symbol
 		END AddSymbol;
 
-		PROCEDURE FindElement(CONST name: ARRAY OF CHAR; index: LONGINT): XML.Element;
+		PROCEDURE FindElement(CONST name: ARRAY OF CHAR; index: SIGNED32): XML.Element;
 		VAR id: StringPool.Index; any: ANY; symbol: Symbol; element: Element;
 		BEGIN
 			IF name = "" THEN
@@ -1040,7 +1040,7 @@ TYPE
 			RETURN str # NIL;
 		END StringAttribute;
 
-		PROCEDURE Enter(CONST name: ARRAY OF CHAR; index: LONGINT; VAR o: Object): BOOLEAN;
+		PROCEDURE Enter(CONST name: ARRAY OF CHAR; index: SIGNED32; VAR o: Object): BOOLEAN;
 		VAR e: XML.Element;
 		BEGIN
 			e := scope.FindElement(name, index);
@@ -1097,7 +1097,7 @@ TYPE
 			END;
 		END CheckUse;
 
-		PROCEDURE ReadObject*(CONST name, optionalType: ARRAY OF CHAR; index: LONGINT; VAR o: Object): BOOLEAN;
+		PROCEDURE ReadObject*(CONST name, optionalType: ARRAY OF CHAR; index: SIGNED32; VAR o: Object): BOOLEAN;
 		VAR type: ARRAY 32 OF CHAR; id: HUGEINT;
 		BEGIN
 			(*IF err THEN RETURN FALSE END;*)

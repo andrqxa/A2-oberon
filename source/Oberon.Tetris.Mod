@@ -118,7 +118,7 @@ TYPE
 	(* High Score Identifier *)
 	Score = RECORD
 		name: Objects.Name;
-		points: LONGINT;
+		points: SIGNED32;
 		level,rows: SIGNED16;
 	END;
 
@@ -128,7 +128,7 @@ TYPE
 		curr,next,angle,line,row,rank,mult: SIGNED8;
 		delay,figures: SIGNED16;
 		focus,match,preview,paused: BOOLEAN;
-		lap1,lap2: LONGINT;
+		lap1,lap2: SIGNED32;
 		timer: Timer;
 		pot: Pot;
 	END;
@@ -170,7 +170,7 @@ VAR
 	timers: Timer;
 	delay: ARRAY Levels OF SIGNED16;
 	backdrop: ARRAY Levels OF Objects.Name;
-	fudge: LONGINT;
+	fudge: SIGNED32;
 
 PROCEDURE OtherFrame(me: Object; VAR M: Objects.ObjMsg): BOOLEAN;
 (* Determine, if an object is affected by a message *)
@@ -218,7 +218,7 @@ END NextFigure;
 PROCEDURE IncScore(F: Field; score,bonus: SIGNED16);
 (* Increment the score and resort the highscore list if neccessary *)
 VAR
-	sum: LONGINT;
+	sum: SIGNED32;
 	level,rows: SIGNED16;
 	rank: SIGNED8;
 BEGIN
@@ -533,7 +533,7 @@ PROCEDURE Drop(F: Field);
 (* Drop Figure by incrementing the line index *)
 VAR
 	full: SIGNED16;
-	lap: LONGINT;
+	lap: SIGNED32;
 	M: FigureMsg;
 BEGIN
 	M.F:= NIL; M.model:= F; M.id:= -1;
@@ -574,7 +574,7 @@ END Drop;
 PROCEDURE TimerHandler(me: Oberon.Task);
 (* send the drop messages to target frame, delayed per level *)
 VAR
-	time: LONGINT;
+	time: SIGNED32;
 BEGIN
 	WITH me: Timer DO
 		IF ~me.model.paused THEN
@@ -1312,7 +1312,7 @@ PROCEDURE OldDocument(F: Files.File; D: Document; VAR f: Gadgets.Frame);
 VAR
 	obj: Objects.Object;
 	tag: SIGNED16;
-	len: LONGINT;
+	len: SIGNED32;
 	id: CHAR;
 	str: Objects.Name;
 	lib: Objects.Library;
@@ -1414,7 +1414,7 @@ VAR
 	R: Files.Rider;
 	B: BindMsg;
 	A: AttrMsg;
-	len: LONGINT;
+	len: SIGNED32;
 BEGIN
 	IF (D.name # "") & (D.dsc # NIL) THEN
 		Out.String("Store ");

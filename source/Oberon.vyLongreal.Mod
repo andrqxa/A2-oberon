@@ -33,7 +33,7 @@ Report any problems as soon as possible to voyager@statlab.uni-heidelberg.de
 (*! all procedures should include gentle support for NaNs, eg. report nr of NaNs *)
 
 (*base model.  Including  BLAS machar.
-Generate SIGNED16, LONGINT, LONGREAL, BOOLEAN from this module
+Generate SIGNED16, SIGNED32, LONGREAL, BOOLEAN from this module
 Automatic.Do
 Edit.Open 	:vy:vyBoolean.v0r0a2.Mod
 Edit.Open 	:vy:vyBits.v0r0a2.Mod
@@ -83,7 +83,7 @@ TYPE
 	real = LONGREAL;  	(* Or use these for REAL: TYPE real=REAL; *)
 
 
-	index = LONGINT;
+	index = SIGNED32;
 	tOp1* = PROCEDURE (VAR arg: real);
 	tOp2* = PROCEDURE (VAR arg1: real;  arg2: real);
 	tOp3* = PROCEDURE (VAR arg1: real;  arg2, arg3: real);
@@ -421,11 +421,11 @@ BEGIN
 		(*= Formatted write, eg. packed, sparse... *)
 		(*! add implementations *)
 		(*= file is a series of packages of structure
-		<formatkey>: LONGINT
+		<formatkey>: SIGNED32
 		0: terminate. No further information in this record
 		1: plain
 		2: repeat packing
-		<start><count> : LONGINT
+		<start><count> : SIGNED32
 		<privat packing data>
 		*)
 		(*= packed format.
@@ -435,7 +435,7 @@ BEGIN
 		[<packcount>   <packstart>	<packval> ] terminates on packcount 0
 		*)
 		(*! check add implementations *)
-	PROCEDURE WriteFmt* (prefform: LONGINT; VAR R: Files.Rider;  count: index;  VAR x: ARRAY OF real;  start: index);
+	PROCEDURE WriteFmt* (prefform: SIGNED32; VAR R: Files.Rider;  count: index;  VAR x: ARRAY OF real;  start: index);
 		(*= prefform is the preferred storage format, but the internal algorithm may choose a different one *)
 	BEGIN
 		(*! add implementations for non plain. form ignored so far *)
@@ -446,8 +446,8 @@ BEGIN
 		Files.WriteLInt(R, fmtend)
 	END WriteFmt;
 
-PROCEDURE ReadFmt* (VAR form: LONGINT; VAR R: Files.Rider;  count: index;  VAR x: ARRAY OF real;  start: index);
-	VAR stop: LONGINT;
+PROCEDURE ReadFmt* (VAR form: SIGNED32; VAR R: Files.Rider;  count: index;  VAR x: ARRAY OF real;  start: index);
+	VAR stop: SIGNED32;
 BEGIN
 	(*! add implementations for non plain. form ignored so far *)
 	Files.ReadLInt(R, form);

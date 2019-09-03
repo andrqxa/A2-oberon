@@ -15,7 +15,7 @@ TYPE
 	BitReader = OBJECT
 		VAR
 			in: Streams.Reader;
-			curByte, curBit: LONGINT;
+			curByte, curBit: SIGNED32;
 
 			PROCEDURE &New( r: Streams.Reader );
 			BEGIN
@@ -27,9 +27,9 @@ TYPE
 				curBit := -1;  curByte := 0
 			END Initialize;
 
-			PROCEDURE Bit( ): LONGINT;
+			PROCEDURE Bit( ): SIGNED32;
 			VAR
-				bit: LONGINT;  ch: CHAR;
+				bit: SIGNED32;  ch: CHAR;
 			BEGIN
 				IF curBit < 0 THEN
 					in.Char( ch );  curByte := ORD( ch );  curBit := 7
@@ -46,14 +46,14 @@ TYPE
 	BitWriter = OBJECT
 		VAR
 			out: Streams.Writer;
-			curByte, curBit: LONGINT;
+			curByte, curBit: SIGNED32;
 
 			PROCEDURE &New( w: Streams.Writer );
 			BEGIN
 				out := w;  curBit := 0;  curByte := 0
 			END New;
 
-			PROCEDURE Bit( bit: LONGINT );
+			PROCEDURE Bit( bit: SIGNED32 );
 			BEGIN
 				curByte := 2*curByte + bit;
 				INC( curBit );
@@ -133,7 +133,7 @@ TYPE
 		END GetPattern;
 
 		PROCEDURE PutPattern( patt: Pattern );
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			FOR i := 0 TO 7 DO
 				out.Bit( patt MOD 2 );  patt := patt DIV 2;
@@ -166,7 +166,7 @@ TYPE
 		PROCEDURE GroupLeader( node: Index ): Index;
 		VAR
 			leader: Index;
-			weight: LONGINT;
+			weight: SIGNED32;
 			patt, prev:  Pattern;
 		BEGIN
 			weight := table[node].weight;  leader := node;
@@ -282,7 +282,7 @@ TYPE
 
 		PROCEDURE EncodeByte( ch: CHAR );
 		VAR
-			code, bits: LONGINT;
+			code, bits: SIGNED32;
 			cur, node: Index;  patt: Pattern;
 		BEGIN
 			patt := ORD( ch );  node := map[patt];
@@ -368,8 +368,8 @@ TYPE
 				NEW( huff, Decode, archive, NIL );
 			END New;
 
-			PROCEDURE ExtractBlock*( VAR buf: ARRAY OF CHAR; len: LONGINT );
-			VAR  i: LONGINT;
+			PROCEDURE ExtractBlock*( VAR buf: ARRAY OF CHAR; len: SIGNED32 );
+			VAR  i: SIGNED32;
 			BEGIN
 				huff.Initialize;
 				i := 0;

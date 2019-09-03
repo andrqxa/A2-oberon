@@ -37,7 +37,7 @@ CONST
           cscalepar*="scale parameter";
 
 PROCEDURE DoAddConst* (data, result: vyBase.tVector;  const: LONGREAL);
-	VAR i: LONGINT;             val: LONGREAL;
+	VAR i: SIGNED32;             val: LONGREAL;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH result: vyLongrealVec.tVector DO
@@ -50,7 +50,7 @@ BEGIN
 END DoAddConst;
 
 PROCEDURE DoAddGaussNoise* (data, degraded: vyBase.tVector;  mu, sigmasq: LONGREAL);
-	VAR i: LONGINT;             val: LONGREAL;
+	VAR i: SIGNED32;             val: LONGREAL;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -63,7 +63,7 @@ BEGIN
 END DoAddGaussNoise;
 
 PROCEDURE DoAddCauchyNoise* (data, degraded: vyBase.tVector);
-	VAR i: LONGINT;             val: LONGREAL;
+	VAR i: SIGNED32;             val: LONGREAL;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -76,7 +76,7 @@ BEGIN
 END DoAddCauchyNoise;
 
 PROCEDURE DoAddLaplaceNoise* (data, degraded: vyBase.tVector;             mu: LONGREAL ); (*! exchange mu by lambda ! *)
-	VAR i: LONGINT;             val: LONGREAL;
+	VAR i: SIGNED32;             val: LONGREAL;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -90,7 +90,7 @@ BEGIN
 END DoAddLaplaceNoise;
 
 PROCEDURE DoAddExpNoise* (data, degraded: vyBase.tVector;             mu: LONGREAL ); (*! exchange mu by lambda ! *)
-	VAR i: LONGINT;             val: LONGREAL;
+	VAR i: SIGNED32;             val: LONGREAL;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -104,7 +104,7 @@ BEGIN
 END DoAddExpNoise;
 
 PROCEDURE DoAddUniformNoise* (data, degraded: vyBase.tVector;             len: LONGREAL );
-	VAR i: LONGINT;             val: LONGREAL;
+	VAR i: SIGNED32;             val: LONGREAL;
 BEGIN
 	WITH data: vyLongrealVec.tVector DO
 		WITH degraded: vyLongrealVec.tVector DO
@@ -199,8 +199,8 @@ BEGIN
 	END
 END AddConst;
 
-PROCEDURE Mean (VAR a: ARRAY OF LONGREAL;   n: LONGINT): LONGREAL;
-	VAR sum: LONGREAL;  i: LONGINT;
+PROCEDURE Mean (VAR a: ARRAY OF LONGREAL;   n: SIGNED32): LONGREAL;
+	VAR sum: LONGREAL;  i: SIGNED32;
 BEGIN
 	sum := 0;
 	FOR i := 0 TO n - 1 DO
@@ -209,8 +209,8 @@ BEGIN
 	RETURN sum / n
 END Mean;
 
-PROCEDURE DoUMA (len: LONGINT;   v: vyLongrealVec.tVector);
-	VAR a, to: POINTER TO ARRAY OF LONGREAL;  i, j, mlen, vlen: LONGINT;
+PROCEDURE DoUMA (len: SIGNED32;   v: vyLongrealVec.tVector);
+	VAR a, to: POINTER TO ARRAY OF LONGREAL;  i, j, mlen, vlen: SIGNED32;
 BEGIN
 	NEW(a, 2 * len + 1);   vlen := vyLongrealVec.Len(v);
 	NEW(to, vlen);
@@ -228,7 +228,7 @@ BEGIN
 END DoUMA;
 
 PROCEDURE UniformMovingAverage*;
-	VAR v1, v2: vyBase.Object;  i, iter, len: LONGINT;
+	VAR v1, v2: vyBase.Object;  i, iter, len: SIGNED32;
 BEGIN
 	antsCommands.InitScan("src=OBJ dest=OBJ len=INT iter=INT");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2)  & antsCommands.ExpectNumber("len", len) &
@@ -245,8 +245,8 @@ END UniformMovingAverage;
 
 
 (* Median Filter with cut data *)
-PROCEDURE DoCutMedian* (len: LONGINT;  v: vyLongrealVec.tVector);
-	VAR a, to: POINTER TO ARRAY OF LONGREAL;  i, j, mlen, vlen: LONGINT;
+PROCEDURE DoCutMedian* (len: SIGNED32;  v: vyLongrealVec.tVector);
+	VAR a, to: POINTER TO ARRAY OF LONGREAL;  i, j, mlen, vlen: SIGNED32;
 BEGIN
 	NEW(a, 2 * len + 1);   vlen := vyLongrealVec.Len(v);
 	NEW(to, vlen);
@@ -265,9 +265,9 @@ END DoCutMedian;
 
 (**************************************************************************************)
 (*realization of median filter of length len, data are tapered (mirrored) at the boundaries *)
-PROCEDURE DoTaperedMedian* ( len: LONGINT;  v: vyLongrealVec.tVector );
+PROCEDURE DoTaperedMedian* ( len: SIGNED32;  v: vyLongrealVec.tVector );
 	VAR x: POINTER TO ARRAY OF LONGREAL;
-	i, j, N: LONGINT;
+	i, j, N: SIGNED32;
 BEGIN
 	NEW( x, len );             N := vyLongrealVec.Len( v( vyLongrealVec.tVector ) );
 	FOR i := 0 TO len DIV 2 - 1 DO
@@ -285,7 +285,7 @@ BEGIN
 END DoTaperedMedian;
 
 PROCEDURE MedianFilter*;
-	VAR v1, v2: vyBase.Object;  i, iter, len: LONGINT;
+	VAR v1, v2: vyBase.Object;  i, iter, len: SIGNED32;
 BEGIN
 	antsCommands.InitScan("src=OBJ dest=OBJ len=INT iter=INT");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2) & antsCommands.ExpectNumber("len", len) &
@@ -301,7 +301,7 @@ BEGIN
 END MedianFilter;
 
 PROCEDURE TaperedMedianFilter*;
-	VAR v1, v2: vyBase.Object;  i, iter, len: LONGINT;
+	VAR v1, v2: vyBase.Object;  i, iter, len: SIGNED32;
 BEGIN
 	antsCommands.InitScan("src=OBJ dest=OBJ len=INT iter=INT");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2) & antsCommands.ExpectNumber("len", len) & antsCommands.ExpectNumber("iter", iter) THEN
@@ -344,7 +344,7 @@ BEGIN
 END AppendValue;
 (******************************integrated process******************************************************************)
 PROCEDURE PartialSums* ( y: vyBase.tVector;             yint: vyBase.tVector );
-	VAR N, i: LONGINT;             sum: LONGREAL;
+	VAR N, i: SIGNED32;             sum: LONGREAL;
 BEGIN
 	WITH y: vyLongrealVec.tVector DO
 		WITH yint: vyLongrealVec.tVector DO
@@ -359,7 +359,7 @@ BEGIN
 END PartialSums;
 (**************************cumulative sum************************************************************************************)
 PROCEDURE CumSum* ( y: vyBase.tVector;             ysum: vyBase.tVector );
-	VAR N, l: LONGINT;             sum: LONGREAL;
+	VAR N, l: SIGNED32;             sum: LONGREAL;
 BEGIN
 	WITH y: vyLongrealVec.tVector DO
 		WITH ysum: vyLongrealVec.tVector DO

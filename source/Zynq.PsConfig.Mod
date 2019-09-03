@@ -46,7 +46,7 @@ VAR
 
 		Returns the frequency in Hz
 	*)
-	PROCEDURE GetPllClockFrequency*(srcSel: LONGINT; VAR res: WORD): HUGEINT;
+	PROCEDURE GetPllClockFrequency*(srcSel: SIGNED32; VAR res: WORD): HUGEINT;
 	BEGIN
 		CASE srcSel OF
 			|IoPll: RETURN HUGEINT(LSH(SYSTEM.MSK(Platform.slcr.IO_PLL_CTRL,0x7F000),-12)) * psRefClockHz;
@@ -88,7 +88,7 @@ VAR
 
 		Returns TRUE in case of success
 	*)
-	PROCEDURE SetPlClock*(channel: LONGINT; srcSel: LONGINT; divisor0, divisor1: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE SetPlClock*(channel: SIGNED32; srcSel: SIGNED32; divisor0, divisor1: SIGNED32; VAR res: WORD): BOOLEAN;
 	BEGIN
 		IF (srcSel > 0) OR (srcSel > 3) THEN res := InvalidClockSource; RETURN FALSE; END;
 		IF (divisor0 < 1) OR (divisor0 > 63) OR (divisor1 < 0) OR (divisor1 > 63) THEN res := InvalidDivisor; RETURN FALSE; END;
@@ -119,9 +119,9 @@ VAR
 
 		Returns the frequency in Hz
 	*)
-	PROCEDURE GetPlClockFrequency*(channel: LONGINT; VAR res: WORD): HUGEINT;
+	PROCEDURE GetPlClockFrequency*(channel: SIGNED32; VAR res: WORD): HUGEINT;
 	VAR
-		d, srcSel, divisor0, divisor1: LONGINT;
+		d, srcSel, divisor0, divisor1: SIGNED32;
 	BEGIN
 		CASE channel OF
 			|0: d := Platform.slcr.FPGA0_CLK_CTRL;
@@ -148,7 +148,7 @@ VAR
 
 		Returns TRUE in case of success
 	*)
-	PROCEDURE StopPlClock*(channel: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE StopPlClock*(channel: SIGNED32; VAR res: WORD): BOOLEAN;
 	BEGIN
 
 		Platform.slcr.SLCR_UNLOCK := Platform.SlcrUnlockKey; (* enable writing to SLCR registers *)
@@ -178,7 +178,7 @@ VAR
 
 		Returns TRUE in case of success
 	*)
-	PROCEDURE StartPlClock*(channel: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE StartPlClock*(channel: SIGNED32; VAR res: WORD): BOOLEAN;
 	BEGIN
 		Platform.slcr.SLCR_UNLOCK := Platform.SlcrUnlockKey; (* enable writing to SLCR registers *)
 
@@ -249,10 +249,10 @@ VAR
 		RETURN TRUE;
 	END StartPlClocks;
 
-	PROCEDURE GetIoClockFrequency*(module: LONGINT; VAR res: WORD): HUGEINT;
+	PROCEDURE GetIoClockFrequency*(module: SIGNED32; VAR res: WORD): HUGEINT;
 	VAR
 		baseFreq: HUGEINT;
-		val: LONGINT;
+		val: SIGNED32;
 	BEGIN
 		CASE module OF
 			 IoUsb: (*!TODO*)
@@ -283,9 +283,9 @@ VAR
 		RETURN baseFreq DIV val
 	END GetIoClockFrequency;
 
-	PROCEDURE GetIoClockSource*(module: LONGINT; VAR res: WORD): LONGINT;
+	PROCEDURE GetIoClockSource*(module: SIGNED32; VAR res: WORD): SIGNED32;
 	VAR
-		pll, val: LONGINT;
+		pll, val: SIGNED32;
 	BEGIN
 		res := Ok;
 		CASE module OF
@@ -316,10 +316,10 @@ VAR
 		RETURN pll
 	END GetIoClockSource;
 
-	PROCEDURE SetIoClockFrequency*(module: LONGINT; freq: HUGEINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE SetIoClockFrequency*(module: SIGNED32; freq: HUGEINT; VAR res: WORD): BOOLEAN;
 	VAR
 		baseFreq: HUGEINT;
-		val, div: LONGINT;
+		val, div: SIGNED32;
 	BEGIN
 		res := Ok;
 		CASE module OF
@@ -345,8 +345,8 @@ VAR
 			 IoUsb: (*!TODO*)
 			|IoGem: (*!TODO*)
 			|IoSdio, IoSmc, IoSpi, IoQuadSpi, IoUart:
-				div := LONGINT(baseFreq DIV freq);
-				val := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, val) - {8 .. 13} + SYSTEM.VAL(SET, LSH(div, 8)) * {8 .. 13});
+				div := SIGNED32(baseFreq DIV freq);
+				val := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, val) - {8 .. 13} + SYSTEM.VAL(SET, LSH(div, 8)) * {8 .. 13});
 				Platform.slcr.SDIO_CLK_CTRL := val
 			|IoCan:(*!TODO*)
 			|IoGpio:(*!TODO*)
@@ -356,17 +356,17 @@ VAR
 		RETURN TRUE
 	END SetIoClockFrequency;
 
-	PROCEDURE SetIoClockSource*(module, source: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE SetIoClockSource*(module, source: SIGNED32; VAR res: WORD): BOOLEAN;
 	BEGIN
 
 	END SetIoClockSource;
 
-	PROCEDURE StartIoClock*(module, device: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE StartIoClock*(module, device: SIGNED32; VAR res: WORD): BOOLEAN;
 	BEGIN
 
 	END StartIoClock;
 
-	PROCEDURE StopIoClock*(module, device: LONGINT; VAR res: WORD): BOOLEAN;
+	PROCEDURE StopIoClock*(module, device: SIGNED32; VAR res: WORD): BOOLEAN;
 	BEGIN
 
 	END StopIoClock;

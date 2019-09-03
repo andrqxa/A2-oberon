@@ -18,7 +18,7 @@ TYPE
 		gen*: ARRAY 64 OF CHAR; (** Command used for installing the printer. *)
 		Height*, Width*, Depth*: SIGNED16;	(** Page size (in printer pixels), and available colors (bit depth) **)
 		FrameX*, FrameY*, FrameW*, FrameH*: SIGNED16; (** Printable region of the page. *)
-		Unit*: LONGINT;	(** Printer resolution in 1/36000 mm per pixel. *)
+		Unit*: SIGNED32;	(** Printer resolution in 1/36000 mm per pixel. *)
 
 		InitMetrics*: PROCEDURE (P: Printer);
 		Open*: PROCEDURE (P: Printer; printer, options: ARRAY OF CHAR); (** Initialize printer & set result code. *)
@@ -41,12 +41,12 @@ TYPE
 VAR
 	Height*, Width*, Depth*: SIGNED16;	(** In printer pixels, and bit depth *)
 	FrameX*, FrameY*, FrameW*, FrameH*: SIGNED16;	(** Printable area. *)
-	Unit*: LONGINT;	(** Printer resolution in 1/36000 mm per pixel. *)
+	Unit*: SIGNED32;	(** Printer resolution in 1/36000 mm per pixel. *)
 	res*: SIGNED16;	(** result code. 0 = ok, 1 = no such printer, 2 = no link, 3 = printer not ready, 4 = no permission *)
 	current*: Printer;	(** Current active printer. *)
 
 PROCEDURE SplitName(VAR name, MName, PName: ARRAY OF CHAR);
-	VAR i, j: LONGINT;
+	VAR i, j: SIGNED32;
 BEGIN i := 0;
 	WHILE name[i] # "." DO MName[i] := name[i]; INC(i) END;
 	MName[i] := 0X; INC(i); j := 0;

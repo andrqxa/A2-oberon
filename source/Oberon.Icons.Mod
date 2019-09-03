@@ -507,7 +507,7 @@ END HasCmdAttr;
 
 PROCEDURE IconHandler*(F: Objects.Object; VAR M: Objects.ObjMsg);
 VAR x, y, w, h, u, v, capw: SIGNED16; F0: Icon; f: Display.Frame; B: Objects.BindMsg;
-	CM: Display.ControlMsg; C: Objects.CopyMsg; R: Display3.Mask;  ver: LONGINT;
+	CM: Display.ControlMsg; C: Objects.CopyMsg; R: Display3.Mask;  ver: SIGNED32;
 BEGIN
 	WITH F: Icon DO
 		IF M IS Objects.AttrMsg THEN
@@ -1210,7 +1210,7 @@ BEGIN
 END StoreIconizer;
 
 PROCEDURE LoadIconizer (F: Iconizer; VAR M: Objects.FileMsg);
-VAR ver, i: LONGINT; obj: Objects.Object;
+VAR ver, i: SIGNED32; obj: Objects.Object;
 BEGIN
 	Files.ReadNum(M.R, ver);
 	IF (ver = 2) OR (ver = 3) THEN

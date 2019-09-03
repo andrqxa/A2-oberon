@@ -13,7 +13,7 @@ MODULE Sort IN Oberon;	(** portable *)	(*SHML 13.11.91 / mf 13.10.94 / tk adapte
 
 	VAR W: Texts.Writer;
 
-	PROCEDURE WriteMsg(n: LONGINT; str: ARRAY OF CHAR);
+	PROCEDURE WriteMsg(n: SIGNED32; str: ARRAY OF CHAR);
 		(*Write number n followed by str followed by a newline to the Log*)
 	BEGIN
 		Texts.WriteInt(W, n, 0);
@@ -47,7 +47,7 @@ MODULE Sort IN Oberon;	(** portable *)	(*SHML 13.11.91 / mf 13.10.94 / tk adapte
 
 	PROCEDURE FillArray(array: Array; VAR n: SIGNED16; text: Texts.Text; emptyLines: BOOLEAN);
 		(*Fill array with lines from text (including empty lines if requested); return number of lines in n*)
-		VAR j: SIGNED16; len, pos: LONGINT; R: Texts.Reader; ch: CHAR; white: BOOLEAN;
+		VAR j: SIGNED16; len, pos: SIGNED32; R: Texts.Reader; ch: CHAR; white: BOOLEAN;
 	BEGIN	len:=text.len; IF len=0 THEN RETURN END;
 		Texts.OpenReader(R, text, len-1); Texts.Read(R, ch);
 		IF ch # 0DX THEN Texts.Write(W, 0DX); Texts.Append(text, W.buf) END;	(*terminate text with a CR*)
@@ -95,7 +95,7 @@ MODULE Sort IN Oberon;	(** portable *)	(*SHML 13.11.91 / mf 13.10.94 / tk adapte
 
 	PROCEDURE Sort*;	(**("^" | "*" | <name>) ["/" {c}]	where c IN {"r", "e", "u"}**)
 		(**Sort a marked viewer, a selection, or a file. Option /r means in reverse order; /e keep empty lines**)
-		VAR S: Texts.Scanner; n: SIGNED16; text, sel: Texts.Text; beg, end, time: LONGINT;
+		VAR S: Texts.Scanner; n: SIGNED16; text, sel: Texts.Text; beg, end, time: SIGNED32;
 			buf: Texts.Buffer; array: Array; reverse, empty, unique: BOOLEAN; TF: TextGadgets.Frame; D: Objects.Object;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);

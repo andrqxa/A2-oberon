@@ -36,14 +36,14 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 		TCPStream* = POINTER TO TCPStreamDesc;
 		TCPStreamDesc* = RECORD (Streams.StreamDesc)
 			C*: NetSystem.Connection;
-			avail: LONGINT
+			avail: SIGNED32
 		END;
 
 	VAR
 		W: Texts.Writer;
-		curLen*: LONGINT; (** maximum length of the current blocking transfer *)
-		prevPos, curPos*: LONGINT; (** state of the current blocking transfer *)
-		TimeOut*: LONGINT; (** typical time-out for blocking transfer *)
+		curLen*: SIGNED32; (** maximum length of the current blocking transfer *)
+		prevPos, curPos*: SIGNED32; (** state of the current blocking transfer *)
+		TimeOut*: SIGNED32; (** typical time-out for blocking transfer *)
 		progM: Objects.Object;
 		buffer: ARRAY BufLen OF CHAR;
 		proxyDomain: ARRAY 64 OF CHAR;
@@ -143,7 +143,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 
 (** Send the string str on connection C without any termination characters. *)
 	PROCEDURE SendString*(C: NetSystem.Connection; str: ARRAY OF CHAR);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE str[i] # 0X DO
@@ -152,8 +152,8 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 		NetSystem.WriteBytes(C, 0, i, str)
 	END SendString;
 
-	PROCEDURE ReadTCPBytes(S: Streams.Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: LONGINT);
-		VAR len, pos, time: LONGINT;
+	PROCEDURE ReadTCPBytes(S: Streams.Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32);
+		VAR len, pos, time: SIGNED32;
 	BEGIN
 		WITH S: TCPStream DO
 			IF n > 0 THEN
@@ -183,7 +183,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END ReadTCPBytes;
 
-	PROCEDURE WriteTCPBytes(S: Streams.Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: LONGINT);
+	PROCEDURE WriteTCPBytes(S: Streams.Stream; VAR x: ARRAY OF SYSTEM.BYTE; n: SIGNED32);
 	BEGIN
 		WITH S: TCPStream DO
 			NetSystem.WriteBytes(S.C, 0, n, x); S.res := 0;
@@ -194,7 +194,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 		END
 	END WriteTCPBytes;
 
-	PROCEDURE TCPAvailable*(S: Streams.Stream): LONGINT;
+	PROCEDURE TCPAvailable*(S: Streams.Stream): SIGNED32;
 		VAR state: SIGNED16;
 	BEGIN
 		WITH S: TCPStream DO
@@ -225,7 +225,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 	END TCPState;
 
 	PROCEDURE TCPFlush(S: Streams.Stream);
-		VAR len: LONGINT;
+		VAR len: SIGNED32;
 	BEGIN
 		WITH S: TCPStream DO
 			len := S.Available(S)
@@ -256,8 +256,8 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 
 (** Write all incoming data on connection C to R, until the connection is closed. notify is called after each
 		packet received. *)
-	PROCEDURE ReadData*(C: NetSystem.Connection; VAR R: Files.Rider; maxLen: LONGINT);
-		VAR len, rlen, try: LONGINT;
+	PROCEDURE ReadData*(C: NetSystem.Connection; VAR R: Files.Rider; maxLen: SIGNED32);
+		VAR len, rlen, try: SIGNED32;
 	BEGIN
 		curPos := 0; ProgMNotify(); try := Input.Time() + TimeOut;
 		len := NetSystem.Available(C);
@@ -319,7 +319,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 (** Get host and port of the Registry entry key in section NetSystem. *)
 	PROCEDURE GetHostPort*(key: ARRAY OF CHAR; VAR host: ARRAY OF CHAR; VAR port: SIGNED16; defPort: SIGNED16);
 		VAR
-			val: LONGINT;
+			val: SIGNED32;
 			i: SIGNED16;
 	BEGIN
 		IF QueryString(key, host) & (host[0] # "<") THEN
@@ -360,7 +360,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 	PROCEDURE SplitHostPort*(VAR url, host: ARRAY OF CHAR; VAR port: SIGNED16);
 		VAR
 			i, j: SIGNED16;
-			val: LONGINT;
+			val: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE (url[i] # 0X) & (url[i] # "/") DO
@@ -391,7 +391,7 @@ MODULE NetTools IN Oberon;	(** portable *) (* ejz,  *)
 
 (** Checks if a proxy should be used for host. *)
 	PROCEDURE UseProxy*(VAR host: ARRAY OF CHAR): BOOLEAN;
-		VAR i, j: LONGINT;
+		VAR i, j: SIGNED32;
 	BEGIN
 		IF proxyDomain # "" THEN
 			i := 0; j := -1;

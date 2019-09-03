@@ -187,7 +187,7 @@ TYPE
 	VAR
 		originator- : Component; (** {originator # NIL} *)
 		command- : Strings.String; (** {command # NIL}, immutable *)
-		timestamp- : LONGINT;
+		timestamp- : SIGNED32;
 
 		PROCEDURE &New*(originator : Component; command : Strings.String; in, arg : Streams.Reader; out, error : Streams.Writer; caller : OBJECT);
 		BEGIN
@@ -253,8 +253,8 @@ TYPE
 		END Init;
 
 
-		PROCEDURE Write*(w : Streams.Writer;context: ANY; level : LONGINT);
-		VAR enum: XMLObjects.Enumerator; c: ANY; name : Strings.String; nextLevel : LONGINT;
+		PROCEDURE Write*(w : Streams.Writer;context: ANY; level : SIGNED32);
+		VAR enum: XMLObjects.Enumerator; c: ANY; name : Strings.String; nextLevel : SIGNED32;
 		BEGIN
 			IF IsLocked() THEN (* D.String("Component.Write: islocked"); D.Ln; *) RETURN; END;
 			IF ~internal THEN
@@ -284,8 +284,8 @@ TYPE
 		END Write;
 
 		(*
-		PROCEDURE ToRepository*(CONST repository: ARRAY OF CHAR; w: Streams.Writer; level: LONGINT);
-		VAR enum: XMLObjects.Enumerator; c: ANY; name : Strings.String; nextLevel : LONGINT;
+		PROCEDURE ToRepository*(CONST repository: ARRAY OF CHAR; w: Streams.Writer; level: SIGNED32);
+		VAR enum: XMLObjects.Enumerator; c: ANY; name : Strings.String; nextLevel : SIGNED32;
 		BEGIN
 			IF IsLocked() THEN RETURN; END;
 			IF ~internal THEN
@@ -507,7 +507,7 @@ TYPE
 		END FindByUID;
 
 		(** find a component by relative path *)
-		PROCEDURE FindByPath*(CONST path : ARRAY OF CHAR; pos : LONGINT) : Component;
+		PROCEDURE FindByPath*(CONST path : ARRAY OF CHAR; pos : SIGNED32) : Component;
 		VAR component : Component;
 		BEGIN
 			Acquire;
@@ -764,7 +764,7 @@ TYPE
 		layoutManager : LayoutManager;
 		aligning* : BOOLEAN;
 		pointerInfo : WM.PointerInfo;
-		editRegion: LONGINT;
+		editRegion: SIGNED32;
 		editX, editY: SIZE;
 		keyFlags: SET; (*! remove *)
 		oldPointerInfo : WM.PointerInfo;
@@ -1115,7 +1115,7 @@ TYPE
 		END DragDropped;
 
 		(*
-		PROCEDURE EditDragOver(x,y: LONGINT; dragInfo: WMWindowManager.DragInfo);
+		PROCEDURE EditDragOver(x,y: SIGNED32; dragInfo: WMWindowManager.DragInfo);
 		BEGIN
 		END EditDragOver;
 		*)
@@ -1164,7 +1164,7 @@ TYPE
 		END AddVisualComponent;
 
 		PROCEDURE EditDragDropped(x,y: SIZE; dragInfo: WM.DragInfo): BOOLEAN;
-		VAR data: ANY; e: ComponentListEntry; parent: XML.Element; dt: DropTarget; pos: LONGINT;
+		VAR data: ANY; e: ComponentListEntry; parent: XML.Element; dt: DropTarget; pos: SIGNED32;
 		BEGIN
 			data := dragInfo.data;
 			IF (data # NIL) & (data IS VisualComponent)  THEN
@@ -1303,7 +1303,7 @@ TYPE
 
 		(** Is called before any sub-components are drawn *)
 		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
-		VAR color: WMGraphics.Color; i : LONGINT; name:Strings.String;
+		VAR color: WMGraphics.Color; i : SIGNED32; name:Strings.String;
 		(* DebugUpdates can be used in order to visualize updates via some color cycling
 			Moreover, it slows down display extremely such that updates can be seen
 		*)
@@ -1341,7 +1341,7 @@ TYPE
 		PROCEDURE DrawSelection(canvas : WMGraphics.Canvas);
 		VAR r,r0: Rectangles.Rectangle; x,y,x0,y0: SIZE; color: WMGraphics.Color;
 
-			PROCEDURE MarkSelected(r: Rectangles.Rectangle; w: LONGINT; color: WMGraphics.Color);
+			PROCEDURE MarkSelected(r: Rectangles.Rectangle; w: SIGNED32; color: WMGraphics.Color);
 			VAR r0: Rectangles.Rectangle;
 			BEGIN
 				r0 :=r; r0.r := r.l+w; r0.b := r.t+w;
@@ -1712,7 +1712,7 @@ TYPE
 		END KeyEvent;
 
 		PROCEDURE EditKeyEvents(ucs : SIZE; flags: SET; VAR keySym: SIZE): BOOLEAN; (** FINAL *)
-		VAR event : KeyPressedEvent; command : Strings.String; scale: LONGINT;
+		VAR event : KeyPressedEvent; command : Strings.String; scale: SIGNED32;
 			clone: Repositories.Component; parent: XML.Content; parentEditMode: BOOLEAN;
 			enum: XMLObjects.Enumerator; obj: ANY;
 			po: VisualComponent;
@@ -1780,7 +1780,7 @@ TYPE
 
 
 		PROCEDURE CheckKeyEvents(ucs : SIZE; flags: SET; VAR keySym: SIZE); (** FINAL *)
-		VAR event : KeyPressedEvent; command : Strings.String; scale: LONGINT; clone: Repositories.Component; parent: XML.Content;
+		VAR event : KeyPressedEvent; command : Strings.String; scale: SIGNED32; clone: Repositories.Component; parent: XML.Content;
 		BEGIN
 			ASSERT(IsCallFromSequencer());
 			event.ucs := ucs; event.flags := flags; event.keysym := keySym;
@@ -1870,8 +1870,8 @@ TYPE
 		END InEditBounds;
 
 		PROCEDURE Edit(VAR msg: Messages.Message);
-		VAR region: LONGINT; dx,dy: SIZE; b: Rectangles.Rectangle; manager: WM.WindowManager;
-			w,h: LONGINT; img: WMGraphics.Image; canvas: WMGraphics.BufferCanvas; e: ComponentListEntry;
+		VAR region: SIGNED32; dx,dy: SIZE; b: Rectangles.Rectangle; manager: WM.WindowManager;
+			w,h: SIGNED32; img: WMGraphics.Image; canvas: WMGraphics.BufferCanvas; e: ComponentListEntry;
 			tr,or : Rectangles.Rectangle; enum: XMLObjects.Enumerator; obj: ANY;
 			alignRelative : BOOLEAN;
 		BEGIN
@@ -1981,7 +1981,7 @@ TYPE
 			r, v : VisualComponent;
 			p : XML.Element;
 			keyFlags: SET; manager : WM.WindowManager;
-			currentEditRegion: LONGINT;
+			currentEditRegion: SIGNED32;
 			parent: XML.Element;
 			parentEditMode: BOOLEAN;
 
@@ -2201,7 +2201,7 @@ TYPE
 	VAR
 		form- : Form;
 		cs : WMGraphics.CanvasState;
-		disableUpdate : LONGINT;
+		disableUpdate : SIGNED32;
 		content : VisualComponent;
 		scaling* : BOOLEAN;
 
@@ -2513,7 +2513,7 @@ TYPE
 		END Add;
 
 		PROCEDURE Enumerate*() : ListArray;
-		VAR array : ListArray; current : PropertyListEntry; i : LONGINT;
+		VAR array : ListArray; current : PropertyListEntry; i : SIGNED32;
 		BEGIN {EXCLUSIVE}
 			i := 0;
 			current := first;
@@ -2558,7 +2558,7 @@ TYPE
 	SelectionArray* = POINTER TO ARRAY OF VisualComponent;
 
 	SelectionList*= OBJECT
-	VAR first, last: ComponentListEntry; number: LONGINT; state: LONGINT; timer: Kernel.Timer;
+	VAR first, last: ComponentListEntry; number: SIGNED32; state: SIGNED32; timer: Kernel.Timer;
 		onChanged-: WMEvents.EventSource;
 		lock: Locks.RecursiveLock;
 		rectOwner: ANY;
@@ -2632,7 +2632,7 @@ TYPE
 
 
 		PROCEDURE GetSelection*(): SelectionArray;
-		VAR array: SelectionArray; i: LONGINT; e: ComponentListEntry;
+		VAR array: SelectionArray; i: SIGNED32; e: ComponentListEntry;
 		BEGIN
 			lock.Acquire;
 			NEW(array, number);
@@ -2661,7 +2661,7 @@ TYPE
 			END;
 		END Update;
 
-		PROCEDURE Shift(dx, dy: LONGINT);
+		PROCEDURE Shift(dx, dy: SIGNED32);
 		VAR e: ComponentListEntry; rect: Rectangles.Rectangle;
 		BEGIN
 			e := first;
@@ -2745,7 +2745,7 @@ VAR
 	currentStyle- : XML.Element;
 	componentStyleMsg- : ComponentStyleChanged;
 
-	timestamp : LONGINT;
+	timestamp : SIGNED32;
 
 	macroHandlers : MacroHandler; (* the head of the list is always the DefaultMacroHandler *)
 	selection-: SelectionList;
@@ -2783,7 +2783,7 @@ END ReadWord;
 
 (* Split <string> into two strings separated by <separator> *)
 PROCEDURE SplitMacroString(CONST string : ARRAY OF CHAR; VAR namespace, name : ARRAY OF CHAR; separator : CHAR);
-VAR i, j : LONGINT;
+VAR i, j : SIGNED32;
 BEGIN
 	ASSERT((LEN(namespace) >= LEN(string)) & (LEN(name) >= LEN(string)));
 	i := 0;
@@ -2812,7 +2812,7 @@ VAR
 	secondArgument : BOOLEAN;
 
 	PROCEDURE Append(VAR message : ARRAY OF CHAR; CONST argument : ARRAY OF CHAR; VAR index : SIZE);
-	VAR i : LONGINT;
+	VAR i : SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE (i < LEN(argument)) & (argument[i] # 0X) & (index < LEN(message) - 1) DO
@@ -3328,10 +3328,10 @@ BEGIN
 	m.Broadcast(msg)
 END SetStyleInternal;
 
-PROCEDURE FindRelativePath(x : Component; CONST path : ARRAY OF CHAR; pos : LONGINT) : Component;
+PROCEDURE FindRelativePath(x : Component; CONST path : ARRAY OF CHAR; pos : SIGNED32) : Component;
 VAR c : XML.Content;
 	sn : ARRAY MaxComponentNameSize OF CHAR;
-	i : LONGINT; id : Strings.String;
+	i : SIGNED32; id : Strings.String;
 BEGIN
 	IF x = NIL THEN RETURN NIL
 	ELSIF path[pos] = 0X THEN RETURN x
@@ -3397,7 +3397,7 @@ VAR winx: XML.Element; formx: XML.Content; window: FormWindow; name, string:Stri
 	moduleName, procedureName : Modules.Name;
 	msg : ARRAY 128 OF CHAR;
 	res: WORD;
-	l,t,r,b: LONGINT;
+	l,t,r,b: SIGNED32;
 BEGIN
 	IF xml IS XML.Element THEN
 		winx:=xml(XML.Element);
@@ -3594,7 +3594,7 @@ BEGIN
 	END;
 END ShowComponent;
 
-PROCEDURE NewLine(w : Streams.Writer; level : LONGINT);
+PROCEDURE NewLine(w : Streams.Writer; level : SIGNED32);
 BEGIN
 	w.Ln; WHILE level > 0 DO w.Char(09X); DEC(level) END
 END NewLine;

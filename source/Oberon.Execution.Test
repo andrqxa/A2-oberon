@@ -128,7 +128,7 @@ positive: Longint stored in PAF
 	MODULE Test;
 
 	PROCEDURE Longint;
-	VAR a,b: LONGINT;
+	VAR a,b: SIGNED32;
 	BEGIN
 		a := 70800;
 		b := a;
@@ -586,21 +586,21 @@ positive: procedure array with return type
 positive: constant positive real to integer conversion
 
 	MODULE Test;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN i := ENTIER (3.5); ASSERT (i = 3);
 	END Test.
 
 positive: constant negative real to integer conversion
 
 	MODULE Test;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN i := ENTIER (-3.5); ASSERT (i = -4);
 	END Test.
 
 positive: positive real to integer conversion
 
 	MODULE Test;
-	VAR r: REAL; i: LONGINT;
+	VAR r: REAL; i: SIGNED32;
 	BEGIN r := 3.5; i := ENTIER (r); ASSERT (i = 3);
 	END Test.
 
@@ -608,7 +608,7 @@ positive: positive real to integer conversion
 positive: negative real to integer conversion
 
 	MODULE Test;
-	VAR r: REAL; i: LONGINT;
+	VAR r: REAL; i: SIGNED32;
 	BEGIN r := -3.5; i := ENTIER (r); ASSERT (i = -4);
 	END Test.
 
@@ -761,7 +761,7 @@ positive: relational operations on integers
 positive: relational operations on long integers
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN
 		value := 5;
 		ASSERT (value = 5); ASSERT (~(value = 6)); ASSERT (value = value);
@@ -863,7 +863,7 @@ positive: negation on integers
 positive: negation on long integers
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN value := 5; ASSERT (-value = -5); ASSERT (-(-value) = 5); ASSERT (-(-value) = value)
 	END Test.
 
@@ -919,7 +919,7 @@ positive: absolute value of integer
 positive: absolute value of long integer
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN
 		value := 5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = value); ASSERT (ABS (-value) = value);
 		value := -5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = -value); ASSERT (ABS (-value) = -value);
@@ -1073,7 +1073,7 @@ positive: character value of integer
 positive: character value of long integer
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN
 		value := ORD ('0'); ASSERT (CHR (value) = '0');
 		value := ORD ('9'); ASSERT (CHR (value) = '9');
@@ -1278,7 +1278,7 @@ positive: integers as set elements
 positive: long integer as set element
 
 	MODULE Test;
-	VAR element: LONGINT; set: SET;
+	VAR element: SIGNED32; set: SET;
 	BEGIN
 		element := MIN (SET); set := {element}; ASSERT (element IN set); ASSERT (set - {element} = {});
 		element := MAX (SET); set := {element}; ASSERT (element IN set); ASSERT (set - {element} = {});
@@ -1287,21 +1287,21 @@ positive: long integer as set element
 negative: long integer as too small set element
 
 	MODULE Test;
-	VAR element: LONGINT; set: SET;
+	VAR element: SIGNED32; set: SET;
 	BEGIN element := MIN (SET) - 1; set := {element};
 	END Test.
 
 negative: long integer as too large set element
 
 	MODULE Test;
-	VAR element: LONGINT; set: SET;
+	VAR element: SIGNED32; set: SET;
 	BEGIN element := MAX (SET) + 1; set := {element};
 	END Test.
 
 positive: long integer as first set element
 
 	MODULE Test;
-	VAR element: LONGINT; set: SET;
+	VAR element: SIGNED32; set: SET;
 	BEGIN
 		element := MIN (SET); set := {element .. MAX (SET)}; ASSERT (element IN set); ASSERT (set = {MIN (SET) .. MAX (SET)}); ASSERT (-set = {});
 		element := MIN (SET); set := {element .. MIN (SET)}; ASSERT (element IN set); ASSERT (set = {MIN (SET) .. MIN (SET)}); ASSERT (set = {element}); ASSERT (set = {MIN (SET)});
@@ -1312,21 +1312,21 @@ positive: long integer as first set element
 negative: long integer as too small first set element
 
 	MODULE Test;
-	VAR element: LONGINT; set: SET;
+	VAR element: SIGNED32; set: SET;
 	BEGIN element := MIN (SET) - 1;set := {element .. MAX (SET)};
 	END Test.
 
 negative: long integer as too large first set element
 
 	MODULE Test;
-	VAR element: LONGINT; set: SET;
+	VAR element: SIGNED32; set: SET;
 	BEGIN element := MAX (SET) + 1;set := {element .. MAX (SET)};
 	END Test.
 
 positive: long integer as last set element
 
 	MODULE Test;
-	VAR element: LONGINT; set: SET;
+	VAR element: SIGNED32; set: SET;
 	BEGIN
 		element := MAX (SET); set := {MIN (SET) .. element}; ASSERT (element IN set); ASSERT (set = {MIN (SET) .. MAX (SET)}); ASSERT (-set = {});
 		element := MAX (SET); set := {MAX (SET) .. element}; ASSERT (element IN set); ASSERT (set = {MAX (SET) .. MAX (SET)}); ASSERT (set = {MAX (SET)});
@@ -1337,21 +1337,21 @@ positive: long integer as last set element
 negative: long integer as too small last set element
 
 	MODULE Test;
-	VAR element: LONGINT; set: SET;
+	VAR element: SIGNED32; set: SET;
 	BEGIN element := MIN (SET) - 1;set := {MIN (SET) .. element};
 	END Test.
 
 negative: long integer as too large last set element
 
 	MODULE Test;
-	VAR element: LONGINT; set: SET;
+	VAR element: SIGNED32; set: SET;
 	BEGIN element := MAX (SET) + 1;set := {MIN (SET) .. element};
 	END Test.
 
 positive: long integers as set elements
 
 	MODULE Test;
-	VAR first, last: LONGINT; set: SET;
+	VAR first, last: SIGNED32; set: SET;
 	BEGIN
 		first := MIN (SET); last := MAX (SET); set := {first .. last}; ASSERT (set = {MIN (SET) .. MAX (SET)});
 		ASSERT (first IN set); ASSERT (last IN set); ASSERT (-set = {});
@@ -1475,7 +1475,7 @@ positive: odd test on integer
 positive: odd test on long integer
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN
 		value := 0; ASSERT (~ODD (value)); ASSERT (ODD (value + 1));
 		value := 5; ASSERT (ODD (value)); ASSERT (~ODD (value + 1));
@@ -1512,7 +1512,7 @@ positive: long on integer
 positive: long on long integer
 
 	MODULE Test;
-	VAR value: LONGINT;
+	VAR value: SIGNED32;
 	BEGIN value := 11223344H; ASSERT (LONG (value) = 11223344H); ASSERT (LONG (value) = LONG (11223344H));
 	END Test.
 
@@ -1526,8 +1526,8 @@ positive: short on integer
 positive: short on long integer
 
 	MODULE Test;
-	VAR value: LONGINT;
-	BEGIN value := 11223344H;ASSERT (SHORT (value) = SHORT (LONGINT(11223344H)));
+	VAR value: SIGNED32;
+	BEGIN value := 11223344H;ASSERT (SHORT (value) = SHORT (SIGNED32(11223344H)));
 	END Test.
 
 positive: short on huge integer
@@ -1591,13 +1591,13 @@ positive: addition on integers
 positive: addition on long integers
 
 	MODULE Test;
-	VAR a, b: LONGINT;
+	VAR a, b: SIGNED32;
 	BEGIN
 		a := 3; b := 2; ASSERT (a + b = +5); ASSERT (a + b = 3 + 2);
 		a := -3; b := 2; ASSERT (a + b = -1); ASSERT (a + b = (-3) + 2);
 		a := 3; b := -2; ASSERT (a + b = +1); ASSERT (a + b = 3 + (-2));
 		a := -3; b := -2; ASSERT (a + b = -5); ASSERT (a + b = (-3) + (-2));
-		a := MAX (LONGINT); b := MIN (LONGINT) + 1; ASSERT (a + b = 0); ASSERT (a + b = MAX (LONGINT) + MIN (LONGINT) + 1);
+		a := MAX (SIGNED32); b := MIN (SIGNED32) + 1; ASSERT (a + b = 0); ASSERT (a + b = MAX (SIGNED32) + MIN (SIGNED32) + 1);
 	END Test.
 
 positive: addition on huge integers
@@ -1655,20 +1655,20 @@ positive: subtraction on integers
 		a := -3; b := 2; ASSERT (a - b = -5); ASSERT (a - b = (-3) - 2);
 		a := 3; b := -2; ASSERT (a - b = +5); ASSERT (a - b = 3 - (-2));
 		a := -3; b := -2; ASSERT (a - b = -1); ASSERT (a - b = (-3) - (-2));
-		a := MIN (SIGNED16) + 1; b := MAX (SIGNED16); ASSERT (a - b = 2); ASSERT (a - b = SHORT (LONGINT(MIN (SIGNED16) + 1 - MAX (SIGNED16))));
+		a := MIN (SIGNED16) + 1; b := MAX (SIGNED16); ASSERT (a - b = 2); ASSERT (a - b = SHORT (SIGNED32(MIN (SIGNED16) + 1 - MAX (SIGNED16))));
 	END Test.
 
 positive: subtraction on long integers
 
 	MODULE Test;
-	VAR a, b: LONGINT;
+	VAR a, b: SIGNED32;
 	BEGIN
 		a := 3; b := 2; ASSERT (a - b = +1); ASSERT (a - b = 3 - 2);
 		a := -3; b := 2; ASSERT (a - b = -5); ASSERT (a - b = (-3) - 2);
 		a := 3; b := -2; ASSERT (a - b = +5); ASSERT (a - b = 3 - (-2));
 		a := -3; b := -2; ASSERT (a - b = -1); ASSERT (a - b = (-3) - (-2));
-		a := MIN (LONGINT) + 1; b := MAX (LONGINT); ASSERT (a - b = 2);
-		(* ASSERT (a - b = SHORT (MIN (LONGINT) + 1 - MAX (LONGINT))); *)
+		a := MIN (SIGNED32) + 1; b := MAX (SIGNED32); ASSERT (a - b = 2);
+		(* ASSERT (a - b = SHORT (MIN (SIGNED32) + 1 - MAX (SIGNED32))); *)
 	END Test.
 
 positive: subtraction on huge integers
@@ -1726,20 +1726,20 @@ positive: multiplication on integers
 		a := -3; b := 2; ASSERT (a * b = -6); ASSERT (a * b = (-3) * 2);
 		a := 3; b := -2; ASSERT (a * b = -6); ASSERT (a * b = 3 * (-2));
 		a := -3; b := -2; ASSERT (a * b = +6); ASSERT (a * b = (-3) * (-2));
-		a := MAX (SIGNED16); b := MAX (SIGNED16); ASSERT (a * b = 1); ASSERT (a * b = SHORT (LONGINT(MAX (SIGNED16) * MAX (SIGNED16))));
+		a := MAX (SIGNED16); b := MAX (SIGNED16); ASSERT (a * b = 1); ASSERT (a * b = SHORT (SIGNED32(MAX (SIGNED16) * MAX (SIGNED16))));
 	END Test.
 
 positive: multiplication on long integers
 
 	MODULE Test;
-	VAR a, b: LONGINT;
+	VAR a, b: SIGNED32;
 	BEGIN
 		a := 3; b := 2; ASSERT (a * b = +6); ASSERT (a * b = 3 * 2);
 		a := -3; b := 2; ASSERT (a * b = -6); ASSERT (a * b = (-3) * 2);
 		a := 3; b := -2; ASSERT (a * b = -6); ASSERT (a * b = 3 * (-2));
 		a := -3; b := -2; ASSERT (a * b = +6); ASSERT (a * b = (-3) * (-2));
-		a := MAX (LONGINT); b := MAX (LONGINT); ASSERT (a * b = 1);
-		(*ASSERT (a * b = SHORT (HUGEINT(MAX (LONGINT) * MAX (LONGINT))));*)
+		a := MAX (SIGNED32); b := MAX (SIGNED32); ASSERT (a * b = 1);
+		(*ASSERT (a * b = SHORT (HUGEINT(MAX (SIGNED32) * MAX (SIGNED32))));*)
 	END Test.
 
 positive: multiplication on huge integers
@@ -1834,19 +1834,19 @@ negative: integer division by zero on integer
 positive: integer division on long integers with positive divisor
 
 	MODULE Test;
-	VAR a, b: LONGINT;
+	VAR a, b: SIGNED32;
 	BEGIN
 		a := 3; b := 2; ASSERT (a DIV b = +1); ASSERT (a DIV b = 3 DIV 2);
 		a := -3; b := 2; ASSERT (a DIV b = -2); ASSERT (a DIV b = (-3) DIV 2);
 		a := 2; b := 3; ASSERT (a DIV b = +0); ASSERT (a DIV b = 2 DIV 3);
 		a := -2; b := 3; ASSERT (a DIV b = -1); ASSERT (a DIV b = (-2) DIV 3);
-		a := MAX (LONGINT); b := MAX (LONGINT); ASSERT (a DIV b = 1); ASSERT (a DIV b = MAX (LONGINT) DIV MAX (LONGINT));
+		a := MAX (SIGNED32); b := MAX (SIGNED32); ASSERT (a DIV b = 1); ASSERT (a DIV b = MAX (SIGNED32) DIV MAX (SIGNED32));
 	END Test.
 
 negative: integer division on long integers with negative divisor
 
 	MODULE Test;
-	VAR a, b, c: LONGINT;
+	VAR a, b, c: SIGNED32;
 	BEGIN
 		a := 3; b := -2; c := a DIV b;
 	END Test.
@@ -1854,7 +1854,7 @@ negative: integer division on long integers with negative divisor
 negative: integer division by zero on long integer
 
 	MODULE Test;
-	VAR a, b, r: LONGINT;
+	VAR a, b, r: SIGNED32;
 	BEGIN a := 3; b := 0; r := a DIV b;
 	END Test.
 
@@ -1902,7 +1902,7 @@ positive: real division on integers
 positive: real division on long integers
 
 	MODULE Test;
-	VAR a, b: LONGINT;
+	VAR a, b: SIGNED32;
 	BEGIN a := 3; b := 2; ASSERT (a / b = 1.5); ASSERT (a / b = 3 / 2);
 	END Test.
 
@@ -1969,19 +1969,19 @@ negative: modulo by zero on integer
 positive: modulo on long integers
 
 	MODULE Test;
-	VAR a, b: LONGINT;
+	VAR a, b: SIGNED32;
 	BEGIN
 		a := 3; b := 2; ASSERT (a MOD b = +1); ASSERT (3 MOD b = +1); ASSERT (a MOD 2 = +1); ASSERT (a MOD b = 3 MOD 2);
 		a := -3; b := 2; ASSERT (a MOD b = +1); ASSERT ((-3) MOD b = +1); ASSERT (a MOD 2 = +1); ASSERT (a MOD b = (-3) MOD 2);
 		a := 2; b := 3; ASSERT (a MOD b = +2); ASSERT (2 MOD b = +2); ASSERT (a MOD 3 = +2); ASSERT (a MOD b = 2 MOD 3);
 		a := -2; b := 3; ASSERT (a MOD b = 1); ASSERT ((-2) MOD b = 1); ASSERT (a MOD 3 = 1); ASSERT (a MOD b = (-2) MOD 3);
-		a := MAX (LONGINT); b := MAX (LONGINT); ASSERT (a MOD b = 0); ASSERT (a MOD b = MAX (LONGINT) MOD MAX (LONGINT));
+		a := MAX (SIGNED32); b := MAX (SIGNED32); ASSERT (a MOD b = 0); ASSERT (a MOD b = MAX (SIGNED32) MOD MAX (SIGNED32));
 	END Test.
 
 negative: modulo by zero on long integer
 
 	MODULE Test;
-	VAR a, b, r: LONGINT;
+	VAR a, b, r: SIGNED32;
 	BEGIN a := 3; b := 0; r := a MOD b;
 	END Test.
 
@@ -2027,7 +2027,7 @@ positive: arithmetic shift on integer
 positive: arithmetic shift on long integer
 
 	MODULE Test;
-	VAR a, b: LONGINT;
+	VAR a, b: SIGNED32;
 	BEGIN
 		a := 6; b := 2; ASSERT (ASH (a, b) = 24); ASSERT (ASH (a, b) = ASH (a, 2)); ASSERT (ASH (a, b) = ASH (6, 2));
 		a := 6; b := 0; ASSERT (ASH (a, b) = 6); ASSERT (ASH (a, b) = ASH (a, 0)); ASSERT (ASH (a, b) = ASH (6, 0));
@@ -4425,7 +4425,7 @@ positive: new statement on pointer to record
 positive: new statement on pointer to too large record
 
 	MODULE Test;
-	VAR p: POINTER TO RECORD data*: ARRAY MAX (LONGINT) DIV 16 - 1000 OF SIGNED16 END;
+	VAR p: POINTER TO RECORD data*: ARRAY MAX (SIGNED32) DIV 16 - 1000 OF SIGNED16 END;
 	BEGIN (*! NEW (p); ASSERT (p = NIL); *)
 	END Test.
 
@@ -4439,7 +4439,7 @@ positive: new statement on pointer to array
 positive: new statement on pointer to too large array
 
 	MODULE Test;
-	VAR r: POINTER TO ARRAY MAX (LONGINT) DIV 16 - 1000 OF SIGNED16;
+	VAR r: POINTER TO ARRAY MAX (SIGNED32) DIV 16 - 1000 OF SIGNED16;
 	BEGIN (*! NEW (r); ASSERT (r = NIL); *)
 	END Test.
 
@@ -4461,7 +4461,7 @@ positive: new statement on pointer to too large open array
 
 	MODULE Test;
 	VAR r: POINTER TO ARRAY OF SIGNED16;
-	BEGIN (*! NEW (r, MAX (LONGINT) DIV 2 - 1000); ASSERT (r = NIL); *)
+	BEGIN (*! NEW (r, MAX (SIGNED32) DIV 2 - 1000); ASSERT (r = NIL); *)
 	END Test.
 
 positive: new statement on object
@@ -4474,7 +4474,7 @@ positive: new statement on object
 positive: new statement on too large object
 
 	MODULE Test;
-	VAR o: OBJECT VAR data*: ARRAY MAX (LONGINT) DIV 16 - 1000 OF SIGNED16 END;
+	VAR o: OBJECT VAR data*: ARRAY MAX (SIGNED32) DIV 16 - 1000 OF SIGNED16 END;
 	BEGIN (*! NEW (o); ASSERT (o = NIL); *)
 	END Test.
 
@@ -5395,7 +5395,7 @@ positive: increment statement with integers
 positive: increment statement with long integers
 
 	MODULE Test;
-	VAR a, b: LONGINT; c: SIGNED16; d: SIGNED8;
+	VAR a, b: SIGNED32; c: SIGNED16; d: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5;
 		INC (a); ASSERT (a = 1); DEC (a); ASSERT (a = 0);
 		INC (a, 2); ASSERT (a = 2); INC (a, -2); ASSERT (a = 0);
@@ -5407,7 +5407,7 @@ positive: increment statement with long integers
 positive: increment statement with huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT; c: LONGINT; d: SIGNED16; e: SIGNED8;
+	VAR a, b: HUGEINT; c: SIGNED32; d: SIGNED16; e: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5; e := -6;
 		INC (a); ASSERT (a = 1); DEC (a); ASSERT (a = 0);
 		INC (a, 2); ASSERT (a = 2); INC (a, -2); ASSERT (a = 0);
@@ -5445,7 +5445,7 @@ positive: decrement statement with integers
 positive: decrement statement with long integers
 
 	MODULE Test;
-	VAR a, b: LONGINT; c: SIGNED16; d: SIGNED8;
+	VAR a, b: SIGNED32; c: SIGNED16; d: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5;
 		DEC (a); ASSERT (a = -1); INC (a); ASSERT (a = 0);
 		DEC (a, 2); ASSERT (a = -2); DEC (a, -2); ASSERT (a = 0);
@@ -5457,7 +5457,7 @@ positive: decrement statement with long integers
 positive: decrement statement with huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT; c: LONGINT; d: SIGNED16; e: SIGNED8;
+	VAR a, b: HUGEINT; c: SIGNED32; d: SIGNED16; e: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5; e := -6;
 		DEC (a); ASSERT (a = -1); INC (a); ASSERT (a = 0);
 		DEC (a, 2); ASSERT (a = -2); DEC (a, -2); ASSERT (a = 0);
@@ -5523,7 +5523,7 @@ negative: include statement with too large integer as set element
 positive: include statement with long integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: LONGINT;
+	VAR set: SET; element: SIGNED32;
 	BEGIN
 		set := {}; element := MIN (SET); INCL (set, element); ASSERT (set = {element}); ASSERT (set = {MIN (SET)}); ASSERT (element IN set);
 		set := {}; element := MAX (SET); INCL (set, element); ASSERT (set = {element}); ASSERT (set = {MAX (SET)}); ASSERT (element IN set);
@@ -5534,14 +5534,14 @@ positive: include statement with long integer as set element
 negative: include statement with too small long integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: LONGINT;
+	VAR set: SET; element: SIGNED32;
 	BEGIN set := {}; element := MIN (SET) - 1; INCL (set, element);
 	END Test.
 
 negative: include statement with too large long integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: LONGINT;
+	VAR set: SET; element: SIGNED32;
 	BEGIN set := {}; element := MAX (SET) + 1; INCL (set, element);
 	END Test.
 
@@ -5626,7 +5626,7 @@ negative: exclude statement with too large integer as set element
 positive: exclude statement with long integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: LONGINT;
+	VAR set: SET; element: SIGNED32;
 	BEGIN
 		set := {}; element := MIN (SET); EXCL (set, element); ASSERT (set = {}); ASSERT (~(element IN set));
 		set := {}; element := MAX (SET); EXCL (set, element); ASSERT (set = {}); ASSERT (~(element IN set));
@@ -5637,14 +5637,14 @@ positive: exclude statement with long integer as set element
 negative: exclude statement with too small long integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: LONGINT;
+	VAR set: SET; element: SIGNED32;
 	BEGIN set := {}; element := MIN (SET) - 1; EXCL (set, element);
 	END Test.
 
 negative: exclude statement with too large long integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: LONGINT;
+	VAR set: SET; element: SIGNED32;
 	BEGIN set := {}; element := MAX (SET) + 1; EXCL (set, element);
 	END Test.
 
@@ -5904,7 +5904,7 @@ positive: positive await statement in procedure in module scope
 negative: active body
 	MODULE Test;
 	VAR start,called: BOOLEAN;
-	VAR o:OBJECT VAR i: LONGINT; BEGIN{ACTIVE} WHILE ~start DO END; called := TRUE  END;
+	VAR o:OBJECT VAR i: SIGNED32; BEGIN{ACTIVE} WHILE ~start DO END; called := TRUE  END;
 	BEGIN
 		start := FALSE; called := FALSE;
 		NEW(o);
@@ -5916,7 +5916,7 @@ negative: active body
 positive: negative await statement in procedure in module scope
 	MODULE Test;
 	VAR done: BOOLEAN;
-	VAR o:OBJECT VAR i: LONGINT; BEGIN{ACTIVE} FOR i := 0 TO 10000 DO END; Done END;
+	VAR o:OBJECT VAR i: SIGNED32; BEGIN{ACTIVE} FOR i := 0 TO 10000 DO END; Done END;
 	PROCEDURE Done;
 	BEGIN{EXCLUSIVE}
 		done := TRUE
@@ -5942,7 +5942,7 @@ positive: positive await statement in procedure in object scope
 positive: negative await statement in procedure in object scope
 	MODULE Test;
 	VAR o:OBJECT
-	VAR done: BOOLEAN; i: LONGINT;
+	VAR done: BOOLEAN; i: SIGNED32;
 	PROCEDURE & Init; BEGIN done := FALSE END Init;
 	PROCEDURE P;
 	BEGIN{EXCLUSIVE}
@@ -5964,7 +5964,7 @@ positive: Gaussian natural sum using arrays
 
 	MODULE Test;
 	CONST Count = 100;
-	VAR i, sum: LONGINT; a: ARRAY Count OF LONGINT;
+	VAR i, sum: SIGNED32; a: ARRAY Count OF SIGNED32;
 	BEGIN
 		FOR i := 0 TO Count - 1 DO
 			a[i] := i;
@@ -6093,8 +6093,8 @@ positive: SYSTEM.VAL on designator and non-designator expression
 		c2 := 0FFX;
 		c3 := 0FFX;
 		c4 := 0FFX;
-		ASSERT(SYSTEM.VAL(LONGINT,c4) = -1);
-		ASSERT(SYSTEM.VAL(LONGINT,ORD(c4)) = 255);
+		ASSERT(SYSTEM.VAL(SIGNED32,c4) = -1);
+		ASSERT(SYSTEM.VAL(SIGNED32,ORD(c4)) = 255);
 	END P;
 
 	BEGIN P;
@@ -6129,7 +6129,7 @@ positive: reimporting objects and execute bodies
 
 	MODULE A;
 	TYPE O*= OBJECT
-		VAR initZ-: LONGINT;
+		VAR initZ-: SIGNED32;
 		BEGIN initZ := 999;
 		END O;
 	END A.
@@ -6137,7 +6137,7 @@ positive: reimporting objects and execute bodies
 	MODULE B;
 	IMPORT A;
 	TYPE O*= OBJECT (A.O)
-		VAR initY-: LONGINT;
+		VAR initY-: SIGNED32;
 		BEGIN initY := 998;
 		END O;
 	END B.
@@ -6145,7 +6145,7 @@ positive: reimporting objects and execute bodies
 	MODULE Test;
 	IMPORT B;
 	TYPE O*=OBJECT (B.O)
-		VAR initO: LONGINT;
+		VAR initO: SIGNED32;
 		BEGIN initO := 997
 		END O;
 	VAR o: O;
@@ -6231,9 +6231,9 @@ positive: nested procedure calls itself with parameter
 	MODULE Test;
 
 		PROCEDURE Test;
-		VAR k: LONGINT;
+		VAR k: SIGNED32;
 
-			PROCEDURE Test0(l: LONGINT);
+			PROCEDURE Test0(l: SIGNED32);
 			BEGIN
 				ASSERT(l = 999);
 				INC(k);
@@ -6254,7 +6254,7 @@ positive: object type declared in procedure scope
 		PROCEDURE Test;
 		TYPE
 			O=OBJECT
-			VAR i:LONGINT;
+			VAR i:SIGNED32;
 
 				PROCEDURE &Init;
 				BEGIN
@@ -6279,9 +6279,9 @@ positive: expression involving multiple register savings on stack
 	MODULE Test;
 
 	PROCEDURE Test;
-	VAR a: POINTER TO ARRAY OF LONGINT; i : LONGINT;
+	VAR a: POINTER TO ARRAY OF SIGNED32; i : SIGNED32;
 
-		PROCEDURE Add(i: LONGINT): LONGINT;
+		PROCEDURE Add(i: SIGNED32): SIGNED32;
 		BEGIN
 			RETURN i+10
 		END Add;
@@ -6300,7 +6300,7 @@ positive: expression involving multiple register savings on stack
 positive:  GETPROCEDURE with procedure returning an object
 
 	MODULE A;
-	TYPE Object*=OBJECT VAR a-: LONGINT; END Object;
+	TYPE Object*=OBJECT VAR a-: SIGNED32; END Object;
 		PROCEDURE TheProcedure*(): Object;
 		VAR o: Object;
 		BEGIN
@@ -6325,7 +6325,7 @@ positive: import object and use initializer on alias
 	MODULE A;
 	TYPE
 	O*= OBJECT
-	VAR a*: LONGINT;
+	VAR a*: SIGNED32;
 
 	PROCEDURE &Init*;
 	BEGIN
@@ -6347,9 +6347,9 @@ positive: import object and use initializer on alias
 positive: procedure returning record
 
 	MODULE Test;
-	TYPE R= RECORD a,b: LONGINT END;
+	TYPE R= RECORD a,b: SIGNED32 END;
 	VAR r: R;
-	PROCEDURE P(b,a: LONGINT): R;
+	PROCEDURE P(b,a: SIGNED32): R;
 	VAR r: R;
 	BEGIN
 		r.a := a; r.b := b;
@@ -6383,7 +6383,7 @@ positive: assign static array of char to static VAR parameter arrray of char
 	TYPE String = ARRAY 1024 OF CHAR;
 	VAR o:OBJECT
 		VAR
-			x,y,z: LONGINT;
+			x,y,z: SIGNED32;
 			string:String;
 		END;
 		name: String;
@@ -6399,9 +6399,9 @@ positive: assign static array of char to static VAR parameter arrray of char
 
 positive: procedure returning record containing pointer
 	MODULE Test;
-	TYPE R= RECORD any: POINTER TO R; a,b: LONGINT END;
+	TYPE R= RECORD any: POINTER TO R; a,b: SIGNED32 END;
 	VAR r: R;
-	PROCEDURE P(b,a: LONGINT): R;
+	PROCEDURE P(b,a: SIGNED32): R;
 	VAR r: R;
 	BEGIN
 		r.a := a; r.b := b;
@@ -6414,7 +6414,7 @@ positive: procedure returning record containing pointer
 
 positive: pass record by value, variable and as a constant
 	MODULE Test;
-	TYPE Record= RECORD min,max: LONGINT END;
+	TYPE Record= RECORD min,max: SIGNED32 END;
 
 	PROCEDURE P(x: Record);
 	BEGIN
@@ -6446,8 +6446,8 @@ positive: procedure returning record called as parameter
 	MODULE Test;
 
 	TYPE
-	Rectangle=RECORD l,t,r,b: LONGINT END;
-	Object = OBJECT VAR w: LONGINT END Object;
+	Rectangle=RECORD l,t,r,b: SIGNED32 END;
+	Object = OBJECT VAR w: SIGNED32 END Object;
 
 	PROCEDURE Check(y: Object; r1: Rectangle; x: Object; CONST  r2: Rectangle);
 	BEGIN
@@ -6459,7 +6459,7 @@ positive: procedure returning record called as parameter
 
 
 
-	PROCEDURE Q(l,t,r,b: LONGINT): Rectangle;
+	PROCEDURE Q(l,t,r,b: SIGNED32): Rectangle;
 	VAR R: Rectangle;
 	BEGIN
 		R.l := l; R.t := t; R.r := r; R.b := b;
@@ -6484,11 +6484,11 @@ positive: pass delegate as parameter
 	MODULE Test;
 
 	TYPE
-	Procedure = PROCEDURE {DELEGATE}(): LONGINT;
+	Procedure = PROCEDURE {DELEGATE}(): SIGNED32;
 
 	TYPE
 	O= OBJECT
-	VAR g: LONGINT;
+	VAR g: SIGNED32;
 
 		PROCEDURE Test;
 		BEGIN
@@ -6496,7 +6496,7 @@ positive: pass delegate as parameter
 			CallProc(GProc);
 		END Test;
 
-		PROCEDURE OProc(): LONGINT;
+		PROCEDURE OProc(): SIGNED32;
 		BEGIN
 			RETURN g
 		END OProc;
@@ -6509,7 +6509,7 @@ positive: pass delegate as parameter
 		ASSERT(p() = 10);
 	END CallProc;
 
-	PROCEDURE GProc(): LONGINT;
+	PROCEDURE GProc(): SIGNED32;
 	BEGIN
 		RETURN 10
 	END GProc;
@@ -6574,7 +6574,7 @@ positive: reimport indirectly published procedure
 
 positive: pass static array by value, reference and as constant
 	MODULE Test;
-	TYPE Array= ARRAY 10 OF LONGINT;
+	TYPE Array= ARRAY 10 OF SIGNED32;
 
 	PROCEDURE P(x: Array);
 	BEGIN
@@ -6606,8 +6606,8 @@ positive: procedure returning static array called as parameter
 	MODULE Test;
 
 	TYPE
-	Rectangle=ARRAY 10 OF LONGINT;
-	Object = OBJECT VAR w: LONGINT END Object;
+	Rectangle=ARRAY 10 OF SIGNED32;
+	Object = OBJECT VAR w: SIGNED32 END Object;
 
 	PROCEDURE Check(y: Object; r1: Rectangle; x: Object; CONST  r2: Rectangle);
 	BEGIN
@@ -6617,7 +6617,7 @@ positive: procedure returning static array called as parameter
 		ASSERT(x.w = 10);
 	END Check;
 
-	PROCEDURE Q(l,t,r,b: LONGINT): Rectangle;
+	PROCEDURE Q(l,t,r,b: SIGNED32): Rectangle;
 	VAR R: Rectangle;
 	BEGIN
 		R[3] := l; R[5] := t; R[6] := r; R[7] := b;
@@ -6643,7 +6643,7 @@ positive: new on var parameter object
 	MODULE Test;
 
 	TYPE O = OBJECT
-		VAR x: LONGINT;
+		VAR x: SIGNED32;
 		PROCEDURE &init;
 		BEGIN x := 10;
 		END init;
@@ -6689,8 +6689,8 @@ positive: call procedure returning a basic type within an exclusive section
 
 	TYPE
 		O= OBJECT
-			PROCEDURE P(): LONGINT;
-			VAR a: LONGINT;
+			PROCEDURE P(): SIGNED32;
+			VAR a: SIGNED32;
 			BEGIN{EXCLUSIVE}
 				a := 4;
 				RETURN a*a
@@ -6729,11 +6729,11 @@ positive: type tests and guards on records and pointers on direct and indirect p
 
 	TYPE
 		R0=RECORD END;
-		R1=RECORD(R0) v: LONGINT END;
+		R1=RECORD(R0) v: SIGNED32 END;
 		R2=RECORD(R0) END;
 
 		P0=POINTER TO RECORD END;
-		P1=POINTER TO RECORD(P0) v: LONGINT; END;
+		P1=POINTER TO RECORD(P0) v: SIGNED32; END;
 		P2=POINTER TO RECORD(P1) END;
 
 	PROCEDURE R(VAR r: R0);
@@ -6752,7 +6752,7 @@ positive: type tests and guards on records and pointers on direct and indirect p
 	END S;
 
 	PROCEDURE RC(CONST r: R0);
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		ASSERT(r IS R1);
 		ASSERT(~(r IS R2));
@@ -6834,7 +6834,7 @@ positive: call a winapi procedure with an array of system byte
 positive: unlock with or without return statements
 	MODULE Test;
 
-	VAR q: LONGINT;
+	VAR q: SIGNED32;
 
 	PROCEDURE P;
 	BEGIN{EXCLUSIVE}
@@ -6845,7 +6845,7 @@ positive: unlock with or without return statements
 		RETURN
 	END P2;
 
-	PROCEDURE Q(): LONGINT;
+	PROCEDURE Q(): SIGNED32;
 	BEGIN{EXCLUSIVE}
 		RETURN 0
 	END Q;
@@ -6858,7 +6858,7 @@ positive: conversion to 32 bit in ash
 	MODULE Test;
 
 	PROCEDURE P;
-	VAR l: LONGINT; ch: CHAR;
+	VAR l: SIGNED32; ch: CHAR;
 	BEGIN
 		ch := CHR(237); l := 8;
 		l := ASH(ORD(ch),l); ASSERT(l=60672);
@@ -6938,7 +6938,7 @@ positive: procedures returning a record (checks correct return parameter size)
 	MODULE Test;
 
 	TYPE
-		Rectangle=RECORD t,l,r,b: LONGINT END;
+		Rectangle=RECORD t,l,r,b: SIGNED32 END;
 		Container= POINTER TO RECORD r: Rectangle END;
 
 	PROCEDURE GetWMCoordinates(VAR r : Rectangle) : Rectangle;
@@ -7003,14 +7003,14 @@ positive: conversion on return types
 
 	MODULE Test;
 
-		PROCEDURE GetInt () : LONGINT;
+		PROCEDURE GetInt () : SIGNED32;
 		VAR integer: SIGNED16;
 		BEGIN
 			integer := -56;
 			RETURN integer
 		END GetInt;
 
-		PROCEDURE GetShortint () : LONGINT;
+		PROCEDURE GetShortint () : SIGNED32;
 		VAR integer: SIGNED16;
 		BEGIN
 			integer := -56;
@@ -7018,7 +7018,7 @@ positive: conversion on return types
 		END GetShortint;
 
 		PROCEDURE P;
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			i := GetInt();
 			ASSERT(i=-56);
@@ -7033,7 +7033,7 @@ positive: allocate imported variable
 
 	MODULE A;
 
-	TYPE Record*= RECORD a*: LONGINT; p*: POINTER TO ARRAY OF CHAR; c*: LONGINT; END;
+	TYPE Record*= RECORD a*: SIGNED32; p*: POINTER TO ARRAY OF CHAR; c*: SIGNED32; END;
 	VAR a*: Record;
 	END A.
 
@@ -7058,19 +7058,19 @@ positive: bitwise rotate
 
 
 	PROCEDURE P;
-	VAR val,rot: SET; by: LONGINT;
+	VAR val,rot: SET; by: SIGNED32;
 	BEGIN
 		val := {1,2,3,30,31};
-		rot := SYSTEM.VAL(SET,ROT(SYSTEM.VAL(LONGINT,val),7));
+		rot := SYSTEM.VAL(SET,ROT(SYSTEM.VAL(SIGNED32,val),7));
 		ASSERT(rot ={5..6,8..10});
-		rot :=  SYSTEM.VAL(SET,ROT(SYSTEM.VAL(LONGINT,val),-7));
+		rot :=  SYSTEM.VAL(SET,ROT(SYSTEM.VAL(SIGNED32,val),-7));
 		ASSERT(rot={23..24,26..28});
 		val := {1,2,3,30,31};
 		by := 7;
-		rot := SYSTEM.VAL(SET,ROT(SYSTEM.VAL(LONGINT,val),by));
+		rot := SYSTEM.VAL(SET,ROT(SYSTEM.VAL(SIGNED32,val),by));
 		ASSERT(rot ={5..6,8..10});
 		by := -7;
-		rot := SYSTEM.VAL(SET,ROT(SYSTEM.VAL(LONGINT,val),by));
+		rot := SYSTEM.VAL(SET,ROT(SYSTEM.VAL(SIGNED32,val),by));
 		ASSERT(rot={23..24,26..28});
 
 	END P;
@@ -7083,7 +7083,7 @@ positive: huge stack frames to check for ensured stack allocation
 
 	MODULE Test;
 
-	PROCEDURE P(count: LONGINT);
+	PROCEDURE P(count: SIGNED32);
 	VAR x: ARRAY 16000 OF CHAR;
 	BEGIN
 		IF count > 5 THEN RETURN END;
@@ -7155,7 +7155,7 @@ positive: allocation of a partially exported record type
 
 	TYPE
 	P*=POINTER TO Desc;
-	Desc=RECORD a*,b: LONGINT END;
+	Desc=RECORD a*,b: SIGNED32 END;
 
 	END A.
 
@@ -7179,7 +7179,7 @@ positive: allocation of a partially exported record type in a multiply imported 
 
 	TYPE
 	P*=POINTER TO Desc;
-	Desc=RECORD a*,b: LONGINT END;
+	Desc=RECORD a*,b: SIGNED32 END;
 
 	END A.
 
@@ -7230,9 +7230,9 @@ positive: array length operator for static and dynamic arrays with static and dy
 	MODULE Test;
 
 	PROCEDURE Test;
-	VAR a: ARRAY 1,2,3,4 OF LONGINT;
-		b: POINTER TO ARRAY OF ARRAY OF ARRAY 3,4 OF LONGINT;
-		c: POINTER TO ARRAY OF ARRAY OF ARRAY OF ARRAY OF LONGINT;
+	VAR a: ARRAY 1,2,3,4 OF SIGNED32;
+		b: POINTER TO ARRAY OF ARRAY OF ARRAY 3,4 OF SIGNED32;
+		c: POINTER TO ARRAY OF ARRAY OF ARRAY OF ARRAY OF SIGNED32;
 		l0,l1,l2,l3,lv,v: SIZE;
 	BEGIN
 		v := 2;
@@ -7288,29 +7288,29 @@ positive: assignment of extended record type to base type (check destination siz
 	MODULE Test;
 
 	TYPE
-		R= RECORD a,b,c: LONGINT END;
-		S= RECORD (R) d,e: LONGINT END;
+		R= RECORD a,b,c: SIGNED32 END;
+		S= RECORD (R) d,e: SIGNED32 END;
 
 	PROCEDURE Test;
-	VAR a0,a1,a2: LONGINT; b: R; c: LONGINT; d: S;
+	VAR a0,a1,a2: SIGNED32; b: R; c: SIGNED32; d: S;
 	BEGIN
 		a0 := 0;
 		a1 := 0;
 		a2 := 0;
 		c := 0;
-		d.a := MAX(LONGINT);
-		d.b := MAX(LONGINT);
-		d.c := MAX(LONGINT);
-		d.d := MAX(LONGINT);
-		d.e := MAX(LONGINT);
+		d.a := MAX(SIGNED32);
+		d.b := MAX(SIGNED32);
+		d.c := MAX(SIGNED32);
+		d.d := MAX(SIGNED32);
+		d.e := MAX(SIGNED32);
 		b := d;
 		ASSERT(c=0);
 		ASSERT(a0=0);
 		ASSERT(a1=0);
 		ASSERT(a2=0);
-		ASSERT(b.a = MAX(LONGINT));
-		ASSERT(b.b = MAX(LONGINT));
-		ASSERT(b.c = MAX(LONGINT));
+		ASSERT(b.a = MAX(SIGNED32));
+		ASSERT(b.b = MAX(SIGNED32));
+		ASSERT(b.c = MAX(SIGNED32));
 
 	END Test;
 
@@ -7340,8 +7340,8 @@ positive: return of real number (was: problem in AMD float stack)
 positive: multiplication with 8-bit number (was: problem in AMD backend register reuse)
 
 	MODULE Test;
-	VAR longint: LONGINT;
-		PROCEDURE Mul16(ch1,ch2: CHAR; VAR long:LONGINT);
+	VAR longint: SIGNED32;
+		PROCEDURE Mul16(ch1,ch2: CHAR; VAR long:SIGNED32);
 		VAR
 			int1,int0: SIGNED16;
 		BEGIN
@@ -7360,10 +7360,10 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 
 	IMPORT SYSTEM;
 
-	VAR r: REAL; x: LONGREAL;  l: LONGINT; h: HUGEINT;
+	VAR r: REAL; x: LONGREAL;  l: SIGNED32; h: HUGEINT;
 
-	PROCEDURE Real(): LONGINT;
-	VAR r: REAL; l: LONGINT;
+	PROCEDURE Real(): SIGNED32;
+	VAR r: REAL; l: SIGNED32;
 	BEGIN
 		r := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
@@ -7381,7 +7381,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 	END Longreal;
 
 	PROCEDURE Longint(): REAL;
-	VAR r: REAL; l: LONGINT;
+	VAR r: REAL; l: SIGNED32;
 	BEGIN
 		l := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
@@ -7404,7 +7404,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 		ASSERT(r = 10);
 		x := SYSTEM.VAL(LONGREAL,Longreal());
 		ASSERT(x = 10);
-		l := SYSTEM.VAL(LONGINT, Longint());
+		l := SYSTEM.VAL(SIGNED32, Longint());
 		ASSERT(l=10);
 		h := SYSTEM.VAL(HUGEINT, Hugeint());
 		ASSERT(h=10);
@@ -7412,10 +7412,10 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 
 positive: correct use of indexers for (static) array of array
 	MODULE Test;
-	TYPE Elem = ARRAY 4 OF LONGINT;
+	TYPE Elem = ARRAY 4 OF SIGNED32;
 	PROCEDURE P;
 	VAR a: ARRAY 8 OF Elem;
-		x: Elem; i: LONGINT;
+		x: Elem; i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN(a)-1 DO
 			a[i,0] := i*1;
@@ -7640,9 +7640,9 @@ positive: simple calling convention test (c and winapi returning pointer)
 
 	TYPE
 
-		Pointer = POINTER TO RECORD x,y: LONGINT END;
+		Pointer = POINTER TO RECORD x,y: SIGNED32 END;
 
-		PROCEDURE {C} P(x,y: LONGINT): Pointer;
+		PROCEDURE {C} P(x,y: SIGNED32): Pointer;
 		VAR p: Pointer;
 		BEGIN
 			NEW(p);
@@ -7651,7 +7651,7 @@ positive: simple calling convention test (c and winapi returning pointer)
 			RETURN p
 		END P;
 
-		PROCEDURE {WINAPI} Q(x,y: LONGINT): Pointer;
+		PROCEDURE {WINAPI} Q(x,y: SIGNED32): Pointer;
 		VAR p: Pointer;
 		BEGIN
 			NEW(p);
@@ -7660,7 +7660,7 @@ positive: simple calling convention test (c and winapi returning pointer)
 			RETURN p
 		END Q;
 
-		PROCEDURE R(x,y: LONGINT): Pointer;
+		PROCEDURE R(x,y: SIGNED32): Pointer;
 		VAR p: Pointer;
 		BEGIN
 			NEW(p);
@@ -7689,13 +7689,13 @@ positive: use local variable as value and as reference (optimizer test)
 
 	MODULE Test;
 
-	PROCEDURE P(VAR x: LONGINT);
+	PROCEDURE P(VAR x: SIGNED32);
 	BEGIN
 		x := 20;
 	END P;
 
 	PROCEDURE T;
-	VAR x: LONGINT;
+	VAR x: SIGNED32;
 	BEGIN
 		x := 10;
 		P(x);
@@ -7713,7 +7713,7 @@ positive: pass record size to array of system.byte with dynamic dize for varpars
 	IMPORT SYSTEM;
 
 	TYPE Base = RECORD END;
-	TYPE Record = RECORD(Base) a,b,c: LONGINT END
+	TYPE Record = RECORD(Base) a,b,c: SIGNED32 END
 
 	PROCEDURE TestS(VAR a: ARRAY OF SYSTEM.BYTE);
 	BEGIN
@@ -7739,14 +7739,14 @@ positive: pass variables and values to array of byte
 
 	IMPORT SYSTEM;
 
-	PROCEDURE Pass(CONST a: ARRAY OF SYSTEM.BYTE; len: LONGINT);
-	VAR i: LONGINT;
+	PROCEDURE Pass(CONST a: ARRAY OF SYSTEM.BYTE; len: SIGNED32);
+	VAR i: SIGNED32;
 	BEGIN
 		ASSERT(LEN(a) = len);
 	END Pass;
 
 	PROCEDURE Test;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		Pass(3,1);
 		Pass(i,4);
@@ -7765,7 +7765,7 @@ positive: pass three-dimensional arrays A[x,y,z] with missing dimensions, e.g. A
 	IMPORT SYSTEM;
 
 	PROCEDURE Pass(CONST a: ARRAY OF SYSTEM.BYTE; adr, len: ADDRESS);
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		ASSERT(ADDRESS OF a[0] = adr);
 		ASSERT(LEN(a) = len);
@@ -7773,18 +7773,18 @@ positive: pass three-dimensional arrays A[x,y,z] with missing dimensions, e.g. A
 
 	PROCEDURE Test;
 	TYPE
-		R= RECORD a,b,c: LONGINT END;
-		S= ARRAY 3 OF LONGINT;
+		R= RECORD a,b,c: SIGNED32 END;
+		S= ARRAY 3 OF SIGNED32;
 	VAR
-		b: POINTER TO ARRAY OF ARRAY OF ARRAY OF LONGINT;
+		b: POINTER TO ARRAY OF ARRAY OF ARRAY OF SIGNED32;
 		c: POINTER TO ARRAY OF ARRAY OF ARRAY OF R;
 		d: POINTER TO ARRAY OF ARRAY OF ARRAY OF S;
 	BEGIN
 		NEW(b,7,8,9);
-		Pass(b^, ADDRESS OF b[0,0,0], LEN(b,0)*LEN(b,1)*LEN(b,2)*SIZEOF(LONGINT));
-		Pass(b[1], ADDRESS OF b[1,0,0], LEN(b,1)*LEN(b,2)*SIZEOF(LONGINT));
-		Pass(b[1,2], ADDRESS OF b[1,2,0], LEN(b,2)*SIZEOF(LONGINT));
-		Pass(b[1,2,3], ADDRESS OF b[1,2,3], SIZEOF(LONGINT));
+		Pass(b^, ADDRESS OF b[0,0,0], LEN(b,0)*LEN(b,1)*LEN(b,2)*SIZEOF(SIGNED32));
+		Pass(b[1], ADDRESS OF b[1,0,0], LEN(b,1)*LEN(b,2)*SIZEOF(SIGNED32));
+		Pass(b[1,2], ADDRESS OF b[1,2,0], LEN(b,2)*SIZEOF(SIGNED32));
+		Pass(b[1,2,3], ADDRESS OF b[1,2,3], SIZEOF(SIGNED32));
 		NEW(c,7,8,9);
 		Pass(c^, ADDRESS OF c[0,0,0], LEN(c,0)*LEN(c,1)*LEN(c,2)*SIZEOF(R));
 		Pass(c[1], ADDRESS OF c[1,0,0], LEN(c,1)*LEN(c,2)*SIZEOF(R));
@@ -7818,14 +7818,14 @@ positive: index operators on objects
 	MODULE Test; (** AUTHOR ""; PURPOSE ""; *)
 
 	TYPE O* = OBJECT
-	VAR a: ARRAY 100 OF LONGINT;
+	VAR a: ARRAY 100 OF SIGNED32;
 
-		OPERATOR "[]"* (index: SIZE): LONGINT;
+		OPERATOR "[]"* (index: SIZE): SIGNED32;
 		BEGIN
 			RETURN a[index]
 		END "[]";
 
-		OPERATOR "[]"* (index: SIZE; value: LONGINT);
+		OPERATOR "[]"* (index: SIZE; value: SIGNED32);
 		BEGIN
 			a[index] := value;
 		END "[]";
@@ -7833,21 +7833,21 @@ positive: index operators on objects
 	END O;
 
 	TYPE Q = OBJECT
-	VAR a: ARRAY 100 OF LONGINT;
+	VAR a: ARRAY 100 OF SIGNED32;
 
-		OPERATOR "[]" (index: SIZE): LONGINT;
+		OPERATOR "[]" (index: SIZE): SIGNED32;
 		BEGIN
 			RETURN a[index]
 		END "[]";
 
-		OPERATOR "[]" (index: SIZE; value: LONGINT);
+		OPERATOR "[]" (index: SIZE; value: SIGNED32);
 		BEGIN
 			a[index] := value;
 		END "[]";
 
 	END Q;
 
-	PROCEDURE VarTest(VAR a: LONGINT): LONGINT;
+	PROCEDURE VarTest(VAR a: SIGNED32): SIGNED32;
 	BEGIN
 		a := 1000;
 		RETURN 123;

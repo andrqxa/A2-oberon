@@ -55,14 +55,14 @@ TYPE
 	(** Viewer for displaying documents in a desktop. *)
 	DocGadget* = POINTER TO DocGadgetDesc;
 	DocGadgetDesc* = RECORD (Gadgets.FrameDesc)
-		time: LONGINT
+		time: SIGNED32
 	END;
 
 	(** Viewers.Viewer for displaying documents in the tiled viewer system. *)
 	DocViewer* = POINTER TO DocViewerDesc;
 	DocViewerDesc* = RECORD (Viewers.ViewerDesc)
 		menuH*: SIGNED16;	(** Menubar height. *)
-		time: LONGINT
+		time: SIGNED32
 	END;
 
 	Dummy = POINTER TO RECORD (Display.FrameDesc) END;
@@ -988,7 +988,7 @@ of a menu button can be set by following the name by the caption text in square 
 	PROCEDURE NewMenu*(menubar: ARRAY OF CHAR): Display.Frame;
 		VAR
 			obj, list: Objects.Object; P, f: Gadgets.Frame; X, p: SIGNED16; cmd, title: ARRAY 64 OF CHAR;
-			C: Display.ConsumeMsg; i: LONGINT; havecopy: BOOLEAN;
+			C: Display.ConsumeMsg; i: SIGNED32; havecopy: BOOLEAN;
 
 		PROCEDURE Button(caption, command: ARRAY OF CHAR);
 		BEGIN
@@ -1005,7 +1005,7 @@ of a menu button can be set by following the name by the caption text in square 
 		END Button;
 
 		PROCEDURE GetString(VAR s: ARRAY OF CHAR);
-			VAR term: CHAR; j: LONGINT;
+			VAR term: CHAR; j: SIGNED32;
 		BEGIN
 			WHILE menubar[i] = " " DO INC(i) END;
 			IF menubar[i] = "'" THEN
@@ -1035,7 +1035,7 @@ of a menu button can be set by following the name by the caption text in square 
 		END GetString;
 
 		PROCEDURE GenTitle(VAR cmd, title: ARRAY OF CHAR);
-			VAR j, k: LONGINT;
+			VAR j, k: SIGNED32;
 		BEGIN
 			j := 0; WHILE (cmd[j] # ".") & (cmd[j] # 0X) & (cmd[j] # " ") DO INC(j) END;
 			IF cmd[j] = "." THEN

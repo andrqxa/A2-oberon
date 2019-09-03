@@ -71,7 +71,7 @@ PROCEDURE Ln;
 BEGIN Texts.WriteLn(w); Texts.Append(Oberon.Log, w.buf)
 END Ln;
 
-PROCEDURE Int(x: LONGINT; n: SIGNED16);
+PROCEDURE Int(x: SIGNED32; n: SIGNED16);
 BEGIN Texts.WriteInt(w, x, n); Texts.Append(Oberon.Log, w.buf)
 END Int;
 
@@ -384,7 +384,7 @@ END Spiral;
 PROCEDURE Milky;
 CONST Size = 0.6; Height = 0.1; Twist = 4 * M.pi; Var = 0.05;
 	Centre = 0.15; CentreSize = 0.07 * Size; Earth = 0.06; EarthDist = 0.8 * Size; EarthSize = 0.08 * Size;
-VAR k, m: LONGINT; a, e: REAL; p: Point;
+VAR k, m: SIGNED32; a, e: REAL; p: Point;
 BEGIN
 	m := (ENTIER(MaxPoint * Centre));
 	FOR k := 0 TO m - 1 DO
@@ -795,7 +795,7 @@ END Mars;
 PROCEDURE Text(CONST font, text: ARRAY OF CHAR);
 CONST width = 1.8; maxheight = 1.6;
 VAR m, n, p, dx, x, y, w, h, x0, count, totalw, totalh, pixels, max, min, dot, times: SIGNED16;
-	pattern: Display.Pattern; pat: Pat; s: SET; adr: ADDRESS; len: LONGINT; f: Fonts.Font;
+	pattern: Display.Pattern; pat: Pat; s: SET; adr: ADDRESS; len: SIGNED32; f: Fonts.Font;
 	pixelw, pixeld, woff, hoff: REAL;
 
 	PROCEDURE Pixel(x, y: SIGNED16);

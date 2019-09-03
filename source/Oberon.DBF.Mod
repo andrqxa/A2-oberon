@@ -14,37 +14,37 @@ MODULE DBF IN Oberon; (* ejz  *)
 		Field* = POINTER TO FieldDesc;
 		FieldDesc* = RECORD
 			name*: ARRAY 12 OF CHAR;
-			type*: LONGINT; (** Character, Date, Logical, Numeric *)
-			address: LONGINT;
-			width: LONGINT;
-			digits*: LONGINT;
+			type*: SIGNED32; (** Character, Date, Logical, Numeric *)
+			address: SIGNED32;
+			width: SIGNED32;
+			digits*: SIGNED32;
 			next*: Field
 		END;
 
 		FieldValue* = RECORD
 			character*: ARRAY 256 OF CHAR;
-			date*: LONGINT;
+			date*: SIGNED32;
 			logical*: BOOLEAN;
 			numeric*: LONGREAL
 		END;
 
 		Reader* = RECORD
 			R: Files.Rider;
-			firstRecord, thisRecord: LONGINT;
-			nRecords*: LONGINT;
-			sizeRecord: LONGINT;
+			firstRecord, thisRecord: SIGNED32;
+			nRecords*: SIGNED32;
+			sizeRecord: SIGNED32;
 			fields*: Field;
 			res*: SIGNED16 (** Done, CorruptedFile, OutOfRange, RecordDeleted *)
 		END;
 
-	PROCEDURE ReadDate(VAR R: Reader; VAR date: LONGINT);
+	PROCEDURE ReadDate(VAR R: Reader; VAR date: SIGNED32);
 		VAR y, m, d: CHAR;
 	BEGIN
 		Files.Read(R.R, y); Files.Read(R.R, m); Files.Read(R.R, d);
 		date := Dates.ToDate(ORD(y)+1900, ORD(m), ORD(d))
 	END ReadDate;
 
-	PROCEDURE ReadLInt(VAR R: Reader; VAR i: LONGINT);
+	PROCEDURE ReadLInt(VAR R: Reader; VAR i: SIGNED32);
 		VAR ch: CHAR;
 	BEGIN
 		Files.Read(R.R, ch); i := ORD(ch);
@@ -60,10 +60,10 @@ MODULE DBF IN Oberon; (* ejz  *)
 		Files.Read(R.R, ch); i := 256*ORD(ch) + i
 	END ReadInt;
 
-	PROCEDURE Open*(VAR R: Reader; F: Files.File; pos: LONGINT);
+	PROCEDURE Open*(VAR R: Reader; F: Files.File; pos: SIGNED32);
 		VAR
 			field: Field;
-			i, nFields, address, width: LONGINT;
+			i, nFields, address, width: SIGNED32;
 			sizeHead, sizeRecord: SIGNED16;
 			ch: CHAR;
 		PROCEDURE Error;
@@ -111,7 +111,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 		R.firstRecord := sizeHead; R.thisRecord := -1
 	END Open;
 
-	PROCEDURE Set*(VAR R: Reader; record: LONGINT);
+	PROCEDURE Set*(VAR R: Reader; record: SIGNED32);
 		VAR ch: CHAR;
 	BEGIN
 		R.thisRecord := -1;
@@ -155,7 +155,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 	END ToLogical;
 
 	PROCEDURE Read*(VAR R: Reader; field: Field; VAR value: FieldValue);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		Files.Set(R.R, Files.Base(R.R), R.thisRecord+field.address);
 		Files.ReadBytes(R.R, value.character, field.width); value.character[field.width] := 0X;

@@ -38,13 +38,13 @@ CONST
 PROCEDURE Uniform* (): LONGREAL;
 BEGIN RETURN (vyRanBase.RandomU()) END Uniform;
 
-PROCEDURE UniformV* (count: LONGINT; VAR x: ARRAY OF LONGREAL;  start: LONGINT);
+PROCEDURE UniformV* (count: SIGNED32; VAR x: ARRAY OF LONGREAL;  start: SIGNED32);
 BEGIN vyRanBase.RandomUVX(count, x, start)  END UniformV;
 
 PROCEDURE Exp* (mu: LONGREAL): LONGREAL;
 BEGIN RETURN (- MathL.ln(Uniform()) / mu) END Exp;
 
-PROCEDURE ExpV* (mu: LONGREAL; count: LONGINT; VAR  x: ARRAY OF LONGREAL;  start: LONGINT);
+PROCEDURE ExpV* (mu: LONGREAL; count: SIGNED32; VAR  x: ARRAY OF LONGREAL;  start: SIGNED32);
 BEGIN
 	vyRanBase.RandomUVX(count, x, start);
 	count := count + start;
@@ -64,7 +64,7 @@ BEGIN
 	RETURN (MathL.sin(x) / MathL.cos(x))
 END Cauchy;
 
-PROCEDURE CauchyV* (count: LONGINT; VAR x: ARRAY OF LONGREAL;  start: LONGINT);
+PROCEDURE CauchyV* (count: SIGNED32; VAR x: ARRAY OF LONGREAL;  start: SIGNED32);
 	VAR temp: LONGREAL;
 BEGIN
 	vyRanBase.RandomUVX(count, x, start);
@@ -89,7 +89,7 @@ BEGIN
 	RETURN ((MathL.sqrt(  - 2 * MathL.ln(u1)) * MathL.cos(twopi * u2))) * MathL.sqrt(sigmasq) + mu
 END Gauss;
 
-PROCEDURE GaussV* (mu, sigmasq: LONGREAL; count: LONGINT; VAR x: ARRAY OF LONGREAL;  start: LONGINT);
+PROCEDURE GaussV* (mu, sigmasq: LONGREAL; count: SIGNED32; VAR x: ARRAY OF LONGREAL;  start: SIGNED32);
 	(*= Gaussian random variates, mean mu, Var sigmasq *)
 	VAR u1, u2: LONGREAL; stddev: LONGREAL;
 BEGIN stddev := MathL.sqrt(sigmasq);
@@ -125,7 +125,7 @@ BEGIN
 	(*       {another independent variate} *)
 END GaussM;
 
-PROCEDURE GaussMV* (mu, sigmasq: LONGREAL; count: LONGINT; VAR gauss: ARRAY OF LONGREAL;  start: LONGINT);
+PROCEDURE GaussMV* (mu, sigmasq: LONGREAL; count: SIGNED32; VAR gauss: ARRAY OF LONGREAL;  start: SIGNED32);
 VAR
 	v1, v2, w, c: LONGREAL; stddev: LONGREAL;
 BEGIN stddev := MathL.sqrt(sigmasq);
@@ -150,7 +150,7 @@ BEGIN
 	RETURN (MathL.exp(MathL.ln(  - MathL.ln(Uniform()) / beta)));
 END Weibull;
 
-PROCEDURE WeibullV* (beta : LONGREAL; count: LONGINT; VAR x: ARRAY OF LONGREAL;  start: LONGINT);
+PROCEDURE WeibullV* (beta : LONGREAL; count: SIGNED32; VAR x: ARRAY OF LONGREAL;  start: SIGNED32);
 BEGIN
 	vyRanBase.RandomUVX(count, x, start);
 	count := count + start;
@@ -166,7 +166,7 @@ BEGIN
 	RETURN  (- MathL.ln(  - MathL.ln(Uniform())));
 END Gumbel;
 
-PROCEDURE GumbelV* (count: LONGINT; VAR x: ARRAY OF LONGREAL;  start: LONGINT);
+PROCEDURE GumbelV* (count: SIGNED32; VAR x: ARRAY OF LONGREAL;  start: SIGNED32);
 BEGIN
 	vyRanBase.RandomUVX(count, x, start);
 	count := count + start;
@@ -184,7 +184,7 @@ BEGIN
 	RETURN (y);
 END VonMises;
 
-PROCEDURE VonMisesV* (Kappa : LONGREAL; count: LONGINT; VAR x: ARRAY OF LONGREAL;  start: LONGINT);
+PROCEDURE VonMisesV* (Kappa : LONGREAL; count: SIGNED32; VAR x: ARRAY OF LONGREAL;  start: SIGNED32);
 	VAR        y: LONGREAL;
 BEGIN
 	count := count + start;

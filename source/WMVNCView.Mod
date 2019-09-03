@@ -23,7 +23,7 @@ TYPE
 			fx, fy, inffx, inffy, factor, intfactor : REAL;
 			active : BOOLEAN;
 
-		PROCEDURE &New*(manager:WMWindowManager.WindowManager; port, dx, dy, w, h:LONGINT; name, password:ARRAY OF CHAR);
+		PROCEDURE &New*(manager:WMWindowManager.WindowManager; port, dx, dy, w, h:SIGNED32; name, password:ARRAY OF CHAR);
 		VAR str : ARRAY 16 OF CHAR;
 		BEGIN
 			NEW(backbuffer);
@@ -49,7 +49,7 @@ TYPE
 			Texts.clipboard.onTextChanged.Add(ClipboardChanged)
 		END New;
 
-		PROCEDURE CheckActive(nof : LONGINT);
+		PROCEDURE CheckActive(nof : SIGNED32);
 		BEGIN
 			IF ~active & (nof > 0) THEN
 				active := TRUE;
@@ -129,7 +129,7 @@ TYPE
 			END
 		END Draw;
 
-		PROCEDURE SetExtents(w, h : LONGINT);
+		PROCEDURE SetExtents(w, h : SIGNED32);
 		BEGIN
 			range.r := range.l + w; range.b := range.t + h;
 		END SetExtents;
@@ -146,7 +146,7 @@ TYPE
 			range.b := centerY + inffy * 0.5 * backbuffer.height
 		END SetScaleFactor;
 
-		PROCEDURE KeyEvent(ucs: LONGINT; flags : SET; keysym : LONGINT);
+		PROCEDURE KeyEvent(ucs: SIGNED32; flags : SET; keysym : SIGNED32);
 		VAR msg : Messages.Message;
 		BEGIN
 			manager.lock.AcquireWrite;
@@ -160,7 +160,7 @@ TYPE
 			manager.lock.ReleaseWrite
 		END KeyEvent;
 
-		PROCEDURE MouseEvent(x, y, dz: LONGINT; keys : SET);
+		PROCEDURE MouseEvent(x, y, dz: SIGNED32; keys : SET);
 		VAR msg : Messages.Message;
 		BEGIN
 			manager.lock.AcquireWrite;
@@ -229,7 +229,7 @@ PROCEDURE Install*(context : Commands.Context); (** name password [port [x [ y [
 VAR
 	name:ARRAY 100 OF CHAR;
 	password: ARRAY 32 OF CHAR;
-	port, dx, dy, w, h:LONGINT;
+	port, dx, dy, w, h:SIGNED32;
 	nv:VNCView;
 	vl:VVList;
 BEGIN

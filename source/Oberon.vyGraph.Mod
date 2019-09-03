@@ -347,7 +347,7 @@ VAR
 
 (** drawing routines *)
 	PROCEDURE RecallNode( graph: tGraph;  v: tNode );
-	VAR x, y, w, h, dsr: SIGNED16;  oldCol, oldBkCol: LONGINT;  dsrr, temp: Real;
+	VAR x, y, w, h, dsr: SIGNED16;  oldCol, oldBkCol: SIGNED32;  dsrr, temp: Real;
 		name: ARRAY 32 OF CHAR;
 
 		PROCEDURE DrawNode( v: tNode );
@@ -428,7 +428,7 @@ define=0;
 invert=1;
 remove=3;
 *)
-	VAR v: tNode;  i: LONGINT;  inNew, inOld, chg: BOOLEAN;
+	VAR v: tNode;  i: SIGNED32;  inNew, inOld, chg: BOOLEAN;
 
 		PROCEDURE PointInRect( px, py, x0, y0, x1, y1: Real ): BOOLEAN;
 		BEGIN

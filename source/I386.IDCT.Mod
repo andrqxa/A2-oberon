@@ -601,7 +601,7 @@ END TransformINT;
 
 PROCEDURE Row( src: ADDRESS);
 VAR
-	x0, x1, x2, x3, x4, x5, x6, x7, x8: LONGINT;
+	x0, x1, x2, x3, x4, x5, x6, x7, x8: SIGNED32;
 	adr, tempAdr: ADDRESS;
 BEGIN
 	adr := src;
@@ -693,7 +693,7 @@ END Row;
 *)
 PROCEDURE Col( src: ADDRESS);
 VAR
-	x0, x1, x2, x3, x4, x5, x6, x7, x8: LONGINT;
+	x0, x1, x2, x3, x4, x5, x6, x7, x8: SIGNED32;
 	adr, tempAdr, sourceAdr: ADDRESS;
 BEGIN
 	adr := src;

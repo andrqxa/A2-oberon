@@ -26,7 +26,7 @@ PROCEDURE LoadCursors(el : XML.Element; manager : WM.WindowManager);
 VAR en: Objects.Enumerator; p : ANY; x : XML.Element; s : String;
 
 	PROCEDURE LoadPointerInfo(x : XML.Element; pi : WM.PointerInfo);
-	VAR hotX, hotY : LONGINT; s, bitmap : String;
+	VAR hotX, hotY : SIGNED32; s, bitmap : String;
 		en : Objects.Enumerator; a : ANY; y : XML.Element;
 	BEGIN
 		en := x.GetContents(); en.Reset();
@@ -316,7 +316,7 @@ END LoadWindow;
 
 (* reset skin-engine i.e. install zero-skin *)
 PROCEDURE SetZeroSkin(broadcast: BOOLEAN);
-VAR i, j : LONGINT; lists : WMComponents.ListArray;
+VAR i, j : SIGNED32; lists : WMComponents.ListArray;
 	 properties : WMProperties.PropertyArray; msg : Messages.Message;
 BEGIN
 	(* components *)

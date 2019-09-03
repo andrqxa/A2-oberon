@@ -54,7 +54,7 @@ TYPE
 	END LoadM;
 
 	PROCEDURE U( m: tModel;  a: ARRAY OF SIGNED16 ): LONGREAL;
-	VAR theta: LONGREAL;  sum: LONGREAL;  i: LONGINT;
+	VAR theta: LONGREAL;  sum: LONGREAL;  i: SIGNED32;
 	BEGIN
 		sum := 0;
 		FOR i := 0 TO 7 DO
@@ -74,7 +74,7 @@ TYPE
 
 	PROCEDURE Cache( m: tModel );
 	VAR cv: ARRAY 8 OF SIGNED16;
-		c: antsCaches.FullCache;  offset: LONGINT;  s: LONGREAL;  i: SIGNED16;
+		c: antsCaches.FullCache;  offset: SIGNED32;  s: LONGREAL;  i: SIGNED16;
 	BEGIN
 		m.MCache := antsCaches.Cube( 8, 2, m.maxCacheSize );  m.ccool := m.coolingTemp;  c := m.MCache;  offset := -1;
 		WHILE (c.NextPoint( offset, cv, 1 )) DO
@@ -97,8 +97,8 @@ TYPE
 	END CheckCaches;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, w, h, maxx, maxy: LONGINT;  A, AOrig: ants3dArrayObjects.tArray;  model: tModel;  AO: ants3dArrayObjects.tObject;
-		Random: RandomArray;  ran: LONGREAL;  cpos: LONGINT;  u: LONGREAL;  orig: Objects.Object;  l, maxl, ll: LONGINT;
+	VAR x, y, w, h, maxx, maxy: SIGNED32;  A, AOrig: ants3dArrayObjects.tArray;  model: tModel;  AO: ants3dArrayObjects.tObject;
+		Random: RandomArray;  ran: LONGREAL;  cpos: SIGNED32;  u: LONGREAL;  orig: Objects.Object;  l, maxl, ll: SIGNED32;
 		a: ARRAY 8 OF SIGNED16;
 		scaletemp: BOOLEAN;
 	BEGIN

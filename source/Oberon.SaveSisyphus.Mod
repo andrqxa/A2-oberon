@@ -40,7 +40,7 @@ MODULE SaveSisyphus IN Oberon;	(** portable *)
 		END;
 
 	VAR
-		N: LONGINT; (* no. of figurs *)
+		N: SIGNED32; (* no. of figurs *)
 		Fig: POINTER TO ARRAY MaxN OF Icon;	(* stored on heap *)
 		State: SIGNED16;	(* frame number *)
 		x0, y0: SIGNED16;	(* sisiphus' location *)
@@ -65,15 +65,15 @@ MODULE SaveSisyphus IN Oberon;	(** portable *)
 		PROCEDURE LoadFig; (* read portable file format *)	(*Sisiphus*)
 			VAR F: Files.File; R: Files.Rider; i, j: SIGNED16;
 
-			PROCEDURE ReadInt (VAR x: LONGINT);
-				VAR n: LONGINT; i: SIGNED8; ch: CHAR;
+			PROCEDURE ReadInt (VAR x: SIGNED32);
+				VAR n: SIGNED32; i: SIGNED8; ch: CHAR;
 			BEGIN i := 0; n := 0; Files.Read(R, ch);
 				WHILE ORD(ch) >= 128 DO INC(n, ASH(ORD(ch) - 128, i)); INC(i, 7); Files.Read(R, ch) END;
 				x := n + ASH(ORD(ch) MOD 64 - ORD(ch) DIV 64 * 64, i)
 			END ReadInt;
 
 			PROCEDURE ReadSet (VAR s: SET);
-				VAR x: LONGINT; i: SIGNED16;
+				VAR x: SIGNED32; i: SIGNED16;
 			BEGIN ReadInt(x); s := {}; i := 0;
 				WHILE i < 32 DO
 					IF ODD(x) THEN INCL(s, i) END;
@@ -105,7 +105,7 @@ MODULE SaveSisyphus IN Oberon;	(** portable *)
 
 		PROCEDURE HotSpot (X, Y, W, H, X0, Y0: SIGNED16);	(*Sisiphus*)
 			CONST d = 6;
-			VAR dx, dy: LONGINT; r: SIGNED16;
+			VAR dx, dy: SIGNED32; r: SIGNED16;
 
 			PROCEDURE Block (x, y, w, h, col, mode: SIGNED16);
 			BEGIN

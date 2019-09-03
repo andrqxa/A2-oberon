@@ -87,7 +87,7 @@ TYPE
 	Timer* =  OBJECT
 	VAR
 		next: Timer;
-		trigger: LONGINT;
+		trigger: SIGNED32;
 		handler: EventHandler
 	END Timer;
 
@@ -216,7 +216,7 @@ TYPE
 		condFP-		: ADDRESS;			(* awaited process' condition's context *)
 		continue		: Unix.Condition_t;	(* gets signaled when condition yields true *)
 		waitingOn-	: ProtectedObject;
-		procID-		: LONGINT;				(*! processor ID where running, not used in UnixAos *)
+		procID-		: SIGNED32;				(*! processor ID where running, not used in UnixAos *)
 		state-			: Machine.State;
 		state0	: ARRAY 2048 OF CHAR;		(* thread state at body start, used for restart after trap *)
 		context: ANY; (* commands context *)
@@ -571,7 +571,7 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 		me.SetPriority( pri )
 	END SetPriority;
 
-	PROCEDURE Sleep*( ms: LONGINT );
+	PROCEDURE Sleep*( ms: SIGNED32 );
 	BEGIN
 		Unix.ThrSleep( ms );
 	END Sleep;
@@ -777,7 +777,7 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 		Unix.MtxUnlock( timerListMutex )
 	END Insert;
 
-	PROCEDURE SetTimeout*( t: Timer;  h: EventHandler;  ms: LONGINT );
+	PROCEDURE SetTimeout*( t: Timer;  h: EventHandler;  ms: SIGNED32 );
 	BEGIN
 		ASSERT( ( t # NIL) & ( h # NIL) );
 		Remove( t );
@@ -787,7 +787,7 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 		timerActivity.Restart
 	END SetTimeout;
 
-	PROCEDURE SetTimeoutAt*( t: Timer;  h: EventHandler;  ms: LONGINT );
+	PROCEDURE SetTimeoutAt*( t: Timer;  h: EventHandler;  ms: SIGNED32 );
 	BEGIN
 		ASSERT( (t # NIL) & (h # NIL) );
 		Remove( t );

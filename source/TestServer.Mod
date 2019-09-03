@@ -72,7 +72,7 @@ TYPE
 
 TYPE
 	DayTimeAgent = OBJECT (TCPServices.Agent)
-		VAR time, date: LONGINT; w: Streams.Writer;
+		VAR time, date: SIGNED32; w: Streams.Writer;
 
 	BEGIN {ACTIVE}
 		Streams.OpenWriter(w, client.Send);
@@ -88,7 +88,7 @@ VAR
 	chargenbuf: POINTER TO ARRAY CharGenBufSize OF CHAR;
 
 PROCEDURE InitChargenBuf;
-VAR i, j, k: LONGINT;
+VAR i, j, k: SIGNED32;
 BEGIN
 	k := 0; NEW(chargenbuf);
 	FOR i := 1 TO ChargenNumChars DO

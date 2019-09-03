@@ -115,7 +115,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 		OpenProc*: PROCEDURE (VAR family, style: ARRAY OF CHAR; ptsize: SIGNED16; VAR mat: GfxMatrix.Matrix): Font;
 		FClass, OFClass, WFClass, OWFClass, OClass: Methods;	(* builtin font classes *)
 		Cache: Font;	(* sentinel for list of cached fonts *) (* RACE ?*)
-		Chars: LONGINT;	(* current number of cached characters *)
+		Chars: SIGNED32;	(* current number of cached characters *)
 	(*	TmpPath: GfxPaths.Path;
 		TmpRegion: GfxRegions.Region; *)
 
@@ -136,7 +136,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 	END Append;
 
 	PROCEDURE AppendCh(VAR to(** in/out *): ARRAY OF CHAR; this: CHAR);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE to[i] # 0X DO
@@ -147,12 +147,12 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 		END
 	END AppendCh;
 
-	PROCEDURE IntToStr(val: LONGINT; VAR str: ARRAY OF CHAR);
+	PROCEDURE IntToStr(val: SIGNED32; VAR str: ARRAY OF CHAR);
 		VAR
-			i, j: LONGINT;
-			digits: ARRAY 16 OF LONGINT;
+			i, j: SIGNED32;
+			digits: ARRAY 16 OF SIGNED32;
 	BEGIN
-		IF val = MIN(LONGINT) THEN
+		IF val = MIN(SIGNED32) THEN
 			COPY("-2147483648", str);
 			RETURN
 		END;
@@ -174,7 +174,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 
 	PROCEDURE Find (VAR family, style: ARRAY OF CHAR; sppm: SIGNED16; VAR fname: ARRAY OF CHAR; VAR fppm: SIGNED16);
 		VAR
-			enum: Files.Enumerator; i, time, date: LONGINT; size: Files.Size; error, ppm: SIGNED16;
+			enum: Files.Enumerator; i, time, date: SIGNED32; size: Files.Size; error, ppm: SIGNED16;
 			s: ARRAY 4 OF CHAR; pattern: ARRAY 64 OF CHAR; name: Files.FileName; flags: SET;
 	BEGIN
 		fname[0] := 0X; fppm := 0;
@@ -251,7 +251,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 	END AddSplineElem;
 
 	(* convert natural spline to Bezier control points *)
-	PROCEDURE SplineToBezier (VAR x, y: ARRAY OF REAL; VAR n: LONGINT; closed: BOOLEAN);
+	PROCEDURE SplineToBezier (VAR x, y: ARRAY OF REAL; VAR n: SIGNED32; closed: BOOLEAN);
 		VAR data: PathEnumData;
 	BEGIN
 		data.n := 1; data.x := x[0]; data.y := y[0];
@@ -263,8 +263,8 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 	END SplineToBezier;
 
 	(* convert Bezier2 to Bezier *)
-	PROCEDURE Bezier2ToBezier (VAR x, y: ARRAY OF REAL; VAR n: LONGINT);
-		VAR nout, m: LONGINT;
+	PROCEDURE Bezier2ToBezier (VAR x, y: ARRAY OF REAL; VAR n: SIGNED32);
+		VAR nout, m: SIGNED32;
 	BEGIN
 		IF ODD(n) THEN
 			nout := (n - 1) DIV 2 * 3 + 1;
@@ -292,18 +292,18 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 			maxNofContours = 128;
 
 		VAR
-			minY, maxY, base, i, y, ntypes, nchars, x, left, ncontours, n, m, cont, k: LONGINT; scale: REAL; ch: CHAR;
-			type, pred, succ, last: ARRAY maxNofContours OF LONGINT; str: ARRAY 32 OF CHAR; kind: ARRAY 5 OF SIGNED16;
+			minY, maxY, base, i, y, ntypes, nchars, x, left, ncontours, n, m, cont, k: SIGNED32; scale: REAL; ch: CHAR;
+			type, pred, succ, last: ARRAY maxNofContours OF SIGNED32; str: ARRAY 32 OF CHAR; kind: ARRAY 5 OF SIGNED16;
 			closed: BOOLEAN; px, py: POINTER TO ARRAY maxNofContours, MaxBezierPoints OF REAL;
 			done: ARRAY maxNofContours OF BOOLEAN;
 
-		PROCEDURE coincident (px, py, qx, qy: REAL; dist: LONGINT): BOOLEAN;
+		PROCEDURE coincident (px, py, qx, qy: REAL; dist: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN (ABS(px - qx) <= dist) & (ABS(py - qy) <= dist)
 		END coincident;
 
 	BEGIN
-		minY := MAX(LONGINT); maxY := MIN(LONGINT); base := minY;
+		minY := MAX(SIGNED32); maxY := MIN(SIGNED32); base := minY;
 		FOR i := 1 TO 5 DO
 			r.RawNum(y);
 			IF y > maxY THEN maxY := y END;
@@ -467,7 +467,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 
 	(* put character into cache *)
 	PROCEDURE CacheChar (font: Font; ch: CHAR; x, y, dx, dy: REAL; map: Raster.Image);
-		VAR char: Char; n, m: LONGINT;
+		VAR char: Char; n, m: SIGNED32;
 	BEGIN {EXCLUSIVE}
 		NEW(char); font.char[ORD(ch)] := char;
 		char.x := x; char.y := y; char.dx := dx; char.dy := dy; char.map := map;
@@ -510,7 +510,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 
 	(* extract family and style from font name *)
 	PROCEDURE SplitName (name: ARRAY OF CHAR; VAR fam, style: ARRAY OF CHAR);
-		VAR i, j: LONGINT;
+		VAR i, j: SIGNED32;
 	BEGIN
 		fam[0] := name[0];
 		i := 1;
@@ -569,7 +569,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 	PROCEDURE LoadRaster (VAR name: ARRAY OF CHAR): RasterFile;
 		VAR
 			rfile: RasterFile; file: Files.File; r: Files.Reader; id, ch: CHAR; type: SIGNED8; height, runs, i, j: SIGNED16;
-			beg, end: ARRAY 32 OF SIGNED16; size: LONGINT; adr: ADDRESS;
+			beg, end: ARRAY 32 OF SIGNED16; size: SIGNED32; adr: ADDRESS;
 	BEGIN
 		rfile := NIL;
 		file := Files.Old(name);
@@ -684,8 +684,8 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 
 	PROCEDURE OpenExtension (VAR family, style: ARRAY OF CHAR; ptsize: SIGNED16; VAR m: GfxMatrix.Matrix): Font;
 		VAR
-			i, j, n: LONGINT; res: WORD;
-			enum: Files.Enumerator; time, date: LONGINT; size: Files.Size; continue: BOOLEAN;
+			i, j, n: SIGNED32; res: WORD;
+			enum: Files.Enumerator; time, date: SIGNED32; size: Files.Size; continue: BOOLEAN;
 			name: Files.FileName; msg, cmd: ARRAY 64 OF CHAR; flags: SET;
 	BEGIN
 		cmd := "";
@@ -812,7 +812,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 
 	(** compute advance vector for complete string **)
 	PROCEDURE GetStringWidth* (font: Font; str: ARRAY OF CHAR; VAR dx, dy: REAL);
-		VAR i: LONGINT; ddx, ddy: REAL;
+		VAR i: SIGNED32; ddx, ddy: REAL;
 	BEGIN
 		i := 0; dx := 0; dy := 0;
 		WHILE str[i] # 0X DO
@@ -870,7 +870,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 	(*--- GetMap Methods ---*)
 
 	PROCEDURE WarpMap (src: Raster.Image; mat: GfxMatrix.Matrix; VAR x, y: REAL; VAR dst: Raster.Image);
-		VAR x0, y0, x1, y1: REAL; w, h: LONGINT; filter: GfxImages.Filter;
+		VAR x0, y0, x1, y1: REAL; w, h: SIGNED32; filter: GfxImages.Filter;
 	BEGIN
 		GfxImages.InitLinearFilter(filter);
 		GfxMatrix.Apply(mat, x, y, x, y);
@@ -892,7 +892,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 
 	(* ... from raster font *)
 	PROCEDURE FGetMap (font: Font; ch: CHAR; VAR x, y, dx, dy: REAL; VAR map: Raster.Image);
-		VAR char: RasterChar; stride: LONGINT;
+		VAR char: RasterChar; stride: SIGNED32;
 	BEGIN
 		char := font.rfile.char[ORD(ch)];
 		IF char = NIL THEN
@@ -1031,7 +1031,7 @@ MODULE GfxFonts; (** non-portable *)	(* eos  *)
 
 	(* ... from outline structure *)
 	PROCEDURE OGetOutline (font: Font; ch: CHAR; x, y: REAL; path: GfxPaths.Path);
-		VAR outline: Outline; len: LONGINT; mat: GfxMatrix.Matrix; s: GfxPaths.Scanner; scale, dx, dy, x0, y0, x1, y1, x2, y2: REAL;
+		VAR outline: Outline; len: SIGNED32; mat: GfxMatrix.Matrix; s: GfxPaths.Scanner; scale, dx, dy, x0, y0, x1, y1, x2, y2: REAL;
 	BEGIN
 		GfxPaths.Clear(path);
 		outline := font.outline; len := outline.len[ORD(ch)];

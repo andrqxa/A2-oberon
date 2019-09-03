@@ -24,14 +24,14 @@ MODULE TestMathLong;
 			calc: CalcHandler;
 			compare: CompareHandler;
 			show: ShowHandler;
-			n, ok: LONGINT;
+			n, ok: SIGNED32;
 			next: Command;
 		END;
 		
 		ResultDesc = RECORD
 			single: REAL;
 			boolean: BOOLEAN;
-			int: LONGINT;
+			int: SIGNED32;
 			double: LONGREAL;
 		END;
 	
@@ -40,7 +40,7 @@ MODULE TestMathLong;
 		rd: OFS.Rider;
 		cmds: Command;
 		singlepar: ARRAY 2 OF REAL;
-		intpar: LONGINT;
+		intpar: SIGNED32;
 		doublepar: ARRAY 2 OF LONGREAL;
 		trueres: ResultDesc;
 		calcres: ResultDesc;
@@ -198,7 +198,7 @@ MODULE TestMathLong;
 	END ShowLogDate;
 	
 	PROCEDURE GetCommandName(VAR s: ARRAY OF CHAR);
-		VAR ch: CHAR; i: LONGINT;
+		VAR ch: CHAR; i: SIGNED32;
 	BEGIN
 		i := 0;
 		REPEAT
@@ -210,7 +210,7 @@ MODULE TestMathLong;
 	END GetCommandName;
 	
 	PROCEDURE ReadParameters(VAR s: ARRAY OF CHAR);
-		VAR i, ir, ilr: LONGINT;
+		VAR i, ir, ilr: SIGNED32;
 	BEGIN
 		ir := 0;
 		ilr := 0;
@@ -251,9 +251,9 @@ MODULE TestMathLong;
 		VAR
 			f: OFS.File;
 			name: ARRAY 12 OF CHAR;
-			n, ok, i: LONGINT;
+			n, ok, i: SIGNED32;
 			cmd: Command;
-			t, dt: LONGINT;
+			t, dt: SIGNED32;
 	BEGIN
 		dt := 0;
 		FOR i := 0 TO LEN(filenames, 0)-1 DO

@@ -68,7 +68,7 @@ MODULE GfxMatrix; (** portable *)	(* eos  *)
 
 	(** calculate matrix that maps p0 to p1, q0 to q1, and r0 to r1 **)
 	PROCEDURE Get3PointTransform* (px0, py0, px1, py1, qx0, qy0, qx1, qy1, rx0, ry0, rx1, ry1: REAL; VAR res: Matrix);
-		VAR m: ARRAY 6, 7 OF REAL; i, j, k: LONGINT; max, t: REAL; v: ARRAY 6 OF REAL;
+		VAR m: ARRAY 6, 7 OF REAL; i, j, k: SIGNED32; max, t: REAL; v: ARRAY 6 OF REAL;
 	BEGIN
 		(* initialize set of linear equations for matrix coefficients *)
 		m[0, 0] := px0; m[0, 1] := py0; m[0, 2] := 1.0; m[0, 3] := 0.0; m[0, 4] := 0.0; m[0, 5] := 0.0; m[0, 6] := px1;
@@ -324,7 +324,7 @@ MODULE GfxMatrix; (** portable *)	(* eos  *)
 	(**--- Matrix I/O ---**)
 
 	PROCEDURE Write* (VAR w: Streams.Writer; VAR m: Matrix);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 2 DO
 			w.RawReal(m[i, 0]); w.RawReal(m[i, 1])
@@ -332,7 +332,7 @@ MODULE GfxMatrix; (** portable *)	(* eos  *)
 	END Write;
 
 	PROCEDURE Read* (VAR r: Streams.Reader; VAR m: Matrix);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 2 DO
 			r.RawReal(m[i, 0]); r.RawReal(m[i, 1])

@@ -34,7 +34,7 @@ TYPE
 		PROCEDURE Receive * (VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD);
 		VAR
 			token: ARRAY 16 OF CHAR;
-			i, total: LONGINT; r: WORD;
+			i, total: SIGNED32; r: WORD;
 			ch: CHAR;
 		BEGIN
 			IF (encoding # "") & Strings.Match("chunked", encoding) THEN
@@ -70,7 +70,7 @@ PROCEDURE Head*(CONST url : ARRAY OF CHAR; VAR con : TCP.Connection; VAR header:
 VAR
 	host : ARRAY 128 OF CHAR;
 	path : ARRAY 256 OF CHAR;
-	port : LONGINT;
+	port : SIGNED32;
 	fadr : IP.Adr;
 	w : Streams.Writer;
 	r : Streams.Reader;
@@ -102,7 +102,7 @@ PROCEDURE Get*(CONST url : ARRAY OF CHAR; VAR rHeader : WebHTTP.RequestHeader;
 VAR
 	host : ARRAY 128 OF CHAR;
 	path : ARRAY 256 OF CHAR;
-	port : LONGINT;
+	port : SIGNED32;
 	fadr : IP.Adr;
 	w : Streams.Writer;
 	x : WebHTTP.AdditionalField;

@@ -5,41 +5,41 @@ IMPORT
 
 TYPE
 	CharInfo = RECORD
-		w : LONGINT;
+		w : SIGNED32;
 	END;
 
 	FontMetrics* = OBJECT
 	VAR chars : ARRAY 256 OF CharInfo;
 		fontName : ARRAY 64 OF CHAR;
 
-		PROCEDURE AddCharInfo(ucs : LONGINT; ci : CharInfo);
+		PROCEDURE AddCharInfo(ucs : SIGNED32; ci : CharInfo);
 		BEGIN
 			IF (ucs >= 0) & (ucs < 256) THEN
 				chars[ucs] := ci
 			END
 		END AddCharInfo;
 
-		PROCEDURE InternalGetWidth(ucs : LONGINT) : LONGINT;
+		PROCEDURE InternalGetWidth(ucs : SIGNED32) : SIGNED32;
 		BEGIN
 			IF (ucs >= 0) & (ucs < 256) THEN RETURN chars[ucs].w
 			ELSE RETURN 0
 			END
 		END InternalGetWidth;
 
-		PROCEDURE GetWidth*(size : REAL; ucs : LONGINT) : REAL;
+		PROCEDURE GetWidth*(size : REAL; ucs : SIGNED32) : REAL;
 		BEGIN
 			IF (ucs >= 0) & (ucs < 256) THEN RETURN chars[ucs].w * size / 1000
 			ELSE RETURN 0
 			END
 		END GetWidth;
 
-		PROCEDURE Kerning(ucs0, ucs1 : LONGINT) : LONGINT;
+		PROCEDURE Kerning(ucs0, ucs1 : SIGNED32) : SIGNED32;
 		BEGIN
 			RETURN 0
 		END Kerning;
 
 		PROCEDURE GetStringWidth*(size : REAL; str : ARRAY OF CHAR) : REAL;
-		VAR i, w : LONGINT;
+		VAR i, w : SIGNED32;
 		BEGIN
 			IF str[0] = 0X THEN RETURN 0.0 END;
 			w := InternalGetWidth(ORD(str[0])); i := 1;
@@ -54,7 +54,7 @@ TYPE
 		VAR f : Files.File; r : Files.Reader;
 			t  : ARRAY 32 OF CHAR;
 			hasName, hasCharMetrics, isC : BOOLEAN;
-			char : LONGINT;
+			char : SIGNED32;
 			ci : CharInfo;
 		BEGIN
 			f := Files.Old(filename);

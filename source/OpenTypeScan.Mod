@@ -161,7 +161,7 @@ VAR
 	END Insert;
 
 	PROCEDURE IntersectLine (x0, y0, x1, y1: F26D6; VAR scans: Scanline; hint: Intersection; t, dt: Fixed);
-		VAR y, yend, ystep, dy, dy0, dy2, dx, xstep, q, r, x, xr: F26D6; up: LONGINT; qt, rt, tr: Fixed; times: LONGINT;
+		VAR y, yend, ystep, dy, dy0, dy2, dx, xstep, q, r, x, xr: F26D6; up: SIGNED32; qt, rt, tr: Fixed; times: SIGNED32;
 	BEGIN
 		IF y0 # y1 THEN
 			y := y0+20H; yend := y1+20H;

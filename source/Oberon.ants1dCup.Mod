@@ -57,7 +57,7 @@ VAR
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel;  metropolis: BOOLEAN );
 	VAR o: tModel;  O: vyBase.Object;  v, ov: vyLongrealVec.tVector;  orig: Objects.Object;  last, this, next, thiso, new: LONGREAL;
-		i, j, len: LONGINT;  alpha, lambda: LONGREAL;  gen: vyRanBase.tRandom;
+		i, j, len: SIGNED32;  alpha, lambda: LONGREAL;  gen: vyRanBase.tRandom;
 
 		(*
 	AO: antsArrayObjects.tObject;

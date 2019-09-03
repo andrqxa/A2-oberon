@@ -26,12 +26,12 @@ VAR
 	GetTimeCounter-: PROCEDURE(): Time;
 	InvalidateDCacheRange-: PROCEDURE(addr: ADDRESS; length: SIZE);
 	FlushDCacheRange-: PROCEDURE(addr: ADDRESS; length: SIZE);
-	cpuClockHz: LONGINT;
+	cpuClockHz: SIGNED32;
 
 	(**
 		Install an interrupt handler
 	*)
-	PROCEDURE InstallInterruptHandler*(interruptHandler: InterruptHandler; interruptNumber: LONGINT);
+	PROCEDURE InstallInterruptHandler*(interruptHandler: InterruptHandler; interruptNumber: SIGNED32);
 	BEGIN
 		Objects.InstallHandler(interruptHandler,interruptNumber);
 	END InstallInterruptHandler;

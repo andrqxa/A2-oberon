@@ -148,7 +148,7 @@ TYPE
 		END NewData;
 
 		PROCEDURE Update(w,h: SIZE);
-		VAR col: WMGraphics.Color; x,y:SIZE; val:LONGREAL; valI:LONGINT;
+		VAR col: WMGraphics.Color; x,y:SIZE; val:LONGREAL; valI:SIGNED32;
 		BEGIN
 			FOR y:=0 TO LEN(data,0)-1 DO
 				FOR x:=0 TO LEN(data,1)-1 DO
@@ -215,7 +215,7 @@ TYPE
 		END NewData;
 (*
 		PROCEDURE Update(w,h: SIZE);
-		VAR i:SIZE; mn,mx,x0,y0,x1,y1:LONGINT;
+		VAR i:SIZE; mn,mx,x0,y0,x1,y1:SIGNED32;
 		BEGIN
 			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), WMGraphics.White, WMGraphics.ModeCopy);
 			mn:=-border+ENTIER(0.5+min*h / height);
@@ -346,7 +346,7 @@ GraphXY* = OBJECT (Window);
 
 
 		PROCEDURE GetTicks ; (*ticks along X, along Y, at decimal units*)
-		VAR maxx,maxy,stepx,stepy: LONGREAL; log:LONGREAL; steps,i:LONGINT;
+		VAR maxx,maxy,stepx,stepy: LONGREAL; log:LONGREAL; steps,i:SIGNED32;
 		BEGIN
 			maxx:=MAX(ABS(data[0,*]));
 			log:=Log10(maxx);
@@ -515,7 +515,7 @@ BEGIN
 END StoreLR;
 
 PROCEDURE GenerateName(prefix: Strings.String; VAR str: ARRAY OF CHAR);
-VAR  i,j:LONGINT; title: Files.FileName; c:CHAR;
+VAR  i,j:SIGNED32; title: Files.FileName; c:CHAR;
 BEGIN
 	i:=0; j:=0;
 	IF prefix#NIL THEN
@@ -557,7 +557,7 @@ BEGIN {EXCLUSIVE}
 END Demo;
 
 (*PROCEDURE Demo1*; (*associate new dataset with existing graph*)
-VAR h:Histogram; g:Graph; k: Graphs; gx:GraphXY; m:Matrix; s:Scatter; r:Regression; i:LONGINT;
+VAR h:Histogram; g:Graph; k: Graphs; gx:GraphXY; m:Matrix; s:Scatter; r:Regression; i:SIGNED32;
 BEGIN {EXCLUSIVE}
 	NEW(k, [[-2,7,8,4,5,9,6,4,7,8,4,5,9,6],
 			[5,3,2,12,21,3,0,5,3,-2,12,17,4,1]], "MultiGraph");
@@ -573,7 +573,7 @@ END Demo1;*)
 
 (* from MatrixUtilities.Mod*)
 PROCEDURE LoadData(R:Streams.Reader): ARRAY [?] OF LONGREAL;
-VAR s: ARRAY 16 OF CHAR; i, k:LONGINT; len: ARRAY [*] OF SIZE; n: LONGINT;
+VAR s: ARRAY 16 OF CHAR; i, k:SIGNED32; len: ARRAY [*] OF SIZE; n: SIGNED32;
 BEGIN
 	R.Ln(s);
 	ASSERT((s="TENSOR 1.0 LR ") OR (s="TENSOR 2.0 LR "));

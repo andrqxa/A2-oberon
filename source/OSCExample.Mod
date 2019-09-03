@@ -43,7 +43,7 @@ END EchoPacket;
 (* client procedure, which dumps the received packet *)
 PROCEDURE DumpPacket(p: OSC.OSCMessage);
 VAR
-	i: LONGINT;
+	i: SIGNED32;
 	param: OSC.OSCParamObject;
 BEGIN
 	KernelLog.String('Dumping whole packet: '); KernelLog.Ln;
@@ -92,7 +92,7 @@ VAR
 	f: OSC.OSCParamFloat;
 	udp: OSCNet.OSCUDPClient;
 	fip: IP.Adr;
-	fport: LONGINT;
+	fport: SIGNED32;
 	res: WORD;
 	b: OSC.OSCBundle;
 	tt: OSC.OSCTimeTag;

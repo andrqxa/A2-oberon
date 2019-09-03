@@ -83,11 +83,11 @@ TYPE
 		importCache-: SyntaxTree.ModuleScope; (* contains global imports, did not take ImportList as it was much slower, for whatever reasons *)
 		arrayBaseImported: BOOLEAN;
 		complexNumbersImported: BOOLEAN;
-		phase: LONGINT;
+		phase: SIGNED32;
 		system-: Global.System;
 		symbolFileFormat-: Formats.SymbolFileFormat;
 		backendName-: ARRAY 32 OF CHAR;
-		inConversion: LONGINT;
+		inConversion: SIGNED32;
 
 		(* temporary variables for the visitors
 			they replace variables on a stack during use of the visitor pattern and may only be
@@ -970,7 +970,7 @@ TYPE
 		**)
 		PROCEDURE ResolveCellType(x: SyntaxTree.CellType);
 		VAR
-			symbol: SyntaxTree.Symbol; isRealtime: BOOLEAN; parameter: SyntaxTree.Parameter; type: SyntaxTree.Type; len: LONGINT;
+			symbol: SyntaxTree.Symbol; isRealtime: BOOLEAN; parameter: SyntaxTree.Parameter; type: SyntaxTree.Type; len: SIGNED32;
 			modifier: SyntaxTree.Modifier; position: Position; value: Basic.Integer; isEngine: BOOLEAN; property: SyntaxTree.Property;
 			qualifiedIdentifier: SyntaxTree.QualifiedIdentifier;
 			recordBase: SyntaxTree.RecordType;
@@ -1461,7 +1461,7 @@ TYPE
 		old variant: quite generic but needs better conversion handling, do this?
 
 		PROCEDURE VisitMathArrayExpression(x: SyntaxTree.MathArrayExpression);
-		VAR type: SyntaxTree.Type; position,numberElements,i: LONGINT; expression: SyntaxTree.Expression; isValue: BOOLEAN;
+		VAR type: SyntaxTree.Type; position,numberElements,i: SIGNED32; expression: SyntaxTree.Expression; isValue: BOOLEAN;
 			value: SyntaxTree.MathArrayValue; arrayType: SyntaxTree.MathArrayType;
 		BEGIN
 			type := NIL;
@@ -1595,7 +1595,7 @@ TYPE
 		PROCEDURE ResolveUnaryExpression(unaryExpression: SyntaxTree.UnaryExpression): SyntaxTree.Expression;
 		VAR
 			left: SyntaxTree.Expression;
-			int: Basic.Integer; real, imaginary: LONGREAL; set: Basic.Set; operator: LONGINT;
+			int: Basic.Integer; real, imaginary: LONGREAL; set: Basic.Set; operator: SIGNED32;
 			bool: BOOLEAN;
 			result: SyntaxTree.Expression; type: SyntaxTree.Type; operatorCall: SyntaxTree.Expression;
 			value: SyntaxTree.Value;
@@ -2096,7 +2096,7 @@ TYPE
 			- search current module scope and all (directly or indirectly) imported modules for matching operator
 			- take operator with smalles distance, where signature distance is computed in procedure Distance
 		**)
-		PROCEDURE FindOperator(system: Global.System; operator: LONGINT; actualParameters: SyntaxTree.ExpressionList; returnType: SyntaxTree.Type): SyntaxTree.Operator;
+		PROCEDURE FindOperator(system: Global.System; operator: SIGNED32; actualParameters: SyntaxTree.ExpressionList; returnType: SyntaxTree.Type): SyntaxTree.Operator;
 		VAR bestOperator: SyntaxTree.Operator; bestDistance: SIZE; import: SyntaxTree.Import; numberParameters: SIZE; procedureType: SyntaxTree.ProcedureType;
 			identifier: SyntaxTree.Identifier;
 
@@ -2168,7 +2168,7 @@ TYPE
 				- create symbol designator for operator
 			- if error then return invalidExpression, if no operator then return NIL
 		**)
-		PROCEDURE NewOperatorCall*(position: Position; original: SyntaxTree.Expression; op: LONGINT; leftExpression, rightExpression: SyntaxTree.Expression; resultType: SyntaxTree.Type): SyntaxTree.Expression;
+		PROCEDURE NewOperatorCall*(position: Position; original: SyntaxTree.Expression; op: SIGNED32; leftExpression, rightExpression: SyntaxTree.Expression; resultType: SyntaxTree.Type): SyntaxTree.Expression;
 		VAR
 			operator: SyntaxTree.Operator;
 			import: SyntaxTree.Import;
@@ -2250,7 +2250,7 @@ TYPE
 			leftType, rightType: SyntaxTree.Type;
 			il,ir: Basic.Integer; rl,rr,a,b,c,d,divisor: LONGREAL; hl,hr: Basic.Integer;bl,br: BOOLEAN; sl,sr: Basic.Set;  strl,strr: Scanner.StringType;
 			cl,cr: CHAR;
-			operator: LONGINT; operatorCall: SyntaxTree.Expression;
+			operator: SIGNED32; operatorCall: SyntaxTree.Expression;
 			type: SyntaxTree.Type;
 			value: SyntaxTree.Value;
 			leftFirst, leftLast, leftStep, rightFirst, rightLast, rightStep: Basic.Integer;
@@ -3374,7 +3374,7 @@ TYPE
 			END;
 		END AppendIndex;
 
-		PROCEDURE NewObjectOperatorCall*(position: Position; left: SyntaxTree.Expression; oper: LONGINT; parameters: SyntaxTree.ExpressionList; rhs: SyntaxTree.Expression): SyntaxTree.Designator;
+		PROCEDURE NewObjectOperatorCall*(position: Position; left: SyntaxTree.Expression; oper: SIGNED32; parameters: SyntaxTree.ExpressionList; rhs: SyntaxTree.Expression): SyntaxTree.Designator;
 		VAR type: SyntaxTree.Type; expression: SyntaxTree.Expression; op: SyntaxTree.Operator; recordType: SyntaxTree.RecordType;
 			actualParameters: SyntaxTree.ExpressionList; i: SIZE; result: SyntaxTree.Designator;
 			pointer: BOOLEAN; designator: SyntaxTree.Designator;
@@ -4435,9 +4435,9 @@ TYPE
 			i: SIZE; i0, i1, value: Basic.Integer;
 			r,r0,r1,im: LONGREAL;
 			c: CHAR;
-			id: LONGINT;
+			id: SIGNED32;
 			b: BOOLEAN;
-			first: LONGINT;
+			first: SIGNED32;
 
 			mathArrayType: SyntaxTree.MathArrayType;
 			customBuiltin: SyntaxTree.CustomBuiltin;
@@ -5496,7 +5496,7 @@ TYPE
 								REPEAT value := 2 * value; DEC(i1) UNTIL value >= 800000H;
 							END;
 							value := (i1 + 127)*800000H - 800000H + value;
-							IF i0 < 0 THEN value := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, value) + {31}); END;
+							IF i0 < 0 THEN value := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, value) + {31}); END;
 						END;
 						result.SetResolved(SyntaxTree.NewRealValue(position, SYSTEM.VAL(REAL, value), Scanner.None));
 					END;
@@ -5831,7 +5831,7 @@ TYPE
 			- return result
 		**)
 		PROCEDURE ResolveExpression*(x: SyntaxTree.Expression): SyntaxTree.Expression;
-		VAR result: SyntaxTree.Expression; subtype: LONGINT; type: SyntaxTree.Type; pos: Streams.Position;
+		VAR result: SyntaxTree.Expression; subtype: SIGNED32; type: SyntaxTree.Type; pos: Streams.Position;
 		BEGIN
 			IF (x = NIL) OR (x = SyntaxTree.invalidExpression) OR (x.type # NIL) THEN RETURN x END;
 			pos := x.position.start;
@@ -6513,7 +6513,7 @@ TYPE
 		VAR
 			procedureType: SyntaxTree.ProcedureType;
 			leftType, rightType: SyntaxTree.Type;
-			identifierNumber: LONGINT;  position: Position;
+			identifierNumber: SIGNED32;  position: Position;
 			hasReturnType, mustBeUnary, mustBeBinary, mustReturnBoolean, mustReturnInteger, mustHaveEquitypedOperands: BOOLEAN;
 			modifiers: SyntaxTree.Modifier;
 
@@ -7623,7 +7623,7 @@ TYPE
 		**)
 		PROCEDURE BlockFlags(block: SyntaxTree.StatementBlock);
 		VAR blockModifier: SyntaxTree.Modifier; expression: SyntaxTree.Expression; name: SyntaxTree.Identifier; flags: SET; position: Position;
-			flag: LONGINT; recordBody: SyntaxTree.Body;
+			flag: SIGNED32; recordBody: SyntaxTree.Body;
 
 			PROCEDURE SetProtectedRecord;
 			VAR scope: SyntaxTree.Scope;
@@ -7841,7 +7841,7 @@ TYPE
 			check and resolve all scopes (implementation phase) that have been entered into a list during the declaration phase
 		**)
 		PROCEDURE Implementations(x: SyntaxTree.Module);
-		VAR  scope: SyntaxTree.Scope; prevPhase: LONGINT;
+		VAR  scope: SyntaxTree.Scope; prevPhase: SIGNED32;
 		BEGIN
 			prevPhase := phase;
 			phase := ImplementationPhase;
@@ -7884,7 +7884,7 @@ TYPE
 			parameter: SyntaxTree.Parameter;
 			import: SyntaxTree.Import;
 			symbol: SyntaxTree.Symbol;
-			prevPhase: LONGINT;
+			prevPhase: SIGNED32;
 			prevError : BOOLEAN;
 			i: SIZE;
 
@@ -8117,7 +8117,7 @@ TYPE
 			thisProcedureType, thatProcedureType: SyntaxTree.ProcedureType;
 			thisParameter, thatParameter: SyntaxTree.Parameter;
 			operandsAreEqual, operandsAreCompatible, hasError: BOOLEAN;
-			i: LONGINT;
+			i: SIGNED32;
 		BEGIN
 			currentScope := thisModuleScope;
 			hasError := FALSE;
@@ -8333,7 +8333,7 @@ TYPE
 	END Resolved;
 
 	PROCEDURE PowerOf2(x: Basic.Integer): BOOLEAN;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		i := 1;
 		WHILE i < x DO
@@ -8372,7 +8372,7 @@ TYPE
 
 	(* Returns TRUE if the built-in function GETPROCEDURE can be used with this procedure type *)
 	PROCEDURE GetProcedureAllowed*(type: SyntaxTree.Type) : BOOLEAN;
-	VAR procedureType: SyntaxTree.ProcedureType; numberParameters: LONGINT;
+	VAR procedureType: SyntaxTree.ProcedureType; numberParameters: SIGNED32;
 
 		PROCEDURE TypeAllowed(t : SyntaxTree.Type) : BOOLEAN;
 		BEGIN
@@ -8913,7 +8913,7 @@ TYPE
 		RETURN (type # NIL) & ((type IS SyntaxTree.IntegerType) OR (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.SizeType))
 	END IsIntegerType;
 
-	PROCEDURE IsAddressType*(type: SyntaxTree.Type; addressWidth: LONGINT): BOOLEAN;
+	PROCEDURE IsAddressType*(type: SyntaxTree.Type; addressWidth: SIGNED32): BOOLEAN;
 	BEGIN
 		RETURN (type # NIL) & ((type IS SyntaxTree.IntegerType) & (type(SyntaxTree.IntegerType).sizeInBits <= addressWidth)
 					OR (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.SizeType)
@@ -8921,7 +8921,7 @@ TYPE
 					)
 	END IsAddressType;
 
-	PROCEDURE IsSizeType(type: SyntaxTree.Type; addressWidth: LONGINT): BOOLEAN;
+	PROCEDURE IsSizeType(type: SyntaxTree.Type; addressWidth: SIGNED32): BOOLEAN;
 	BEGIN
 		RETURN (type # NIL) & ((type.resolved IS SyntaxTree.IntegerType) & (type.resolved(SyntaxTree.IntegerType).sizeInBits <= addressWidth) OR (type.resolved IS SyntaxTree.SizeType))
 	END IsSizeType;
@@ -9071,7 +9071,7 @@ TYPE
 		RETURN FALSE;
 	END IsOpenArray;
 
-	PROCEDURE IsStaticArray*(type: SyntaxTree.Type; VAR base: SyntaxTree.Type; VAR dim :LONGINT): BOOLEAN;
+	PROCEDURE IsStaticArray*(type: SyntaxTree.Type; VAR base: SyntaxTree.Type; VAR dim :SIGNED32): BOOLEAN;
 	BEGIN
 		type := type.resolved;
 		IF (type IS SyntaxTree.ArrayType) & (type(SyntaxTree.ArrayType).form = SyntaxTree.Static) THEN
@@ -9094,8 +9094,8 @@ TYPE
 		END;
 	END IsDynamicArray;
 
-	PROCEDURE Dimension*(t: SyntaxTree.Type; form: SET): LONGINT;
-	VAR i: LONGINT;
+	PROCEDURE Dimension*(t: SyntaxTree.Type; form: SET): SIGNED32;
+	VAR i: SIGNED32;
 	BEGIN
 		i := 0;
 		t := t.resolved;
@@ -9116,7 +9116,7 @@ TYPE
 		RETURN expression.assignable;
 	END IsVariable;
 
-	PROCEDURE IsReferenceType*(kind: LONGINT; type: SyntaxTree.Type): BOOLEAN;
+	PROCEDURE IsReferenceType*(kind: SIGNED32; type: SyntaxTree.Type): BOOLEAN;
 	BEGIN
 		type := type.resolved;
 		RETURN (kind = SyntaxTree.VarParameter) OR (kind = SyntaxTree.ConstParameter) & ((type IS SyntaxTree.RecordType) OR (type IS SyntaxTree.ArrayType));
@@ -9571,7 +9571,7 @@ TYPE
 	BEGIN RETURN (type.resolved IS SyntaxTree.MathArrayType) & (type.resolved(SyntaxTree.MathArrayType).form = SyntaxTree.Tensor)
 	END IsTensor;
 
-	PROCEDURE IsStaticMathArray*(type: SyntaxTree.Type; VAR length: LONGINT; VAR baseType: SyntaxTree.Type): BOOLEAN;
+	PROCEDURE IsStaticMathArray*(type: SyntaxTree.Type; VAR length: SIGNED32; VAR baseType: SyntaxTree.Type): BOOLEAN;
 	BEGIN
 		IF (type IS SyntaxTree.MathArrayType) & (type(SyntaxTree.MathArrayType).form = SyntaxTree.Static) THEN
 			length := type(SyntaxTree.MathArrayType).staticLength;

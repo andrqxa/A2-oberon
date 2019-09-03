@@ -58,14 +58,14 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 		file, spoolFile: Files.File;
 		pictList: PictList;
 		readR, spoolr: Files.Rider;
-		actPos, actPict, lastActPict: LONGINT;
+		actPos, actPict, lastActPict: SIGNED32;
 		color: BOOLEAN;
 	END;
 
 	VAR
 		Width*, Height*, Depth*, planes, Planes: SIGNED16;
 		FrameX*, FrameY*, FrameW*, FrameH*: SIGNED16;
-		Unit*: LONGINT;
+		Unit*: SIGNED32;
 		nofonts, nopage: SIGNED16;
 		font: ARRAY maxfonts OF ARRAY 32 OF CHAR;
 		printerfile: Files.Rider;
@@ -409,8 +409,8 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 
 	(* ---------- Raster Operations ---------- *)
 
-	PROCEDURE Block(x,  y, w, h : LONGINT);
-		VAR lx, rx, t, b  : LONGINT; lm, rm, s, p, help, m: SET;
+	PROCEDURE Block(x,  y, w, h : SIGNED32);
+		VAR lx, rx, t, b  : SIGNED32; lm, rm, s, p, help, m: SET;
 	BEGIN
 		IF x < 0 THEN w := w + x; x := 0 END; IF x + w > PW THEN w := PW - x END;
 		t := y + h; IF y < cY THEN y := cY  END; IF t >= cT THEN t := cT  END; h := t - y;
@@ -451,8 +451,8 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 		END
 	END Block;
 
-	PROCEDURE PatternBlock(x,  y, w, h : LONGINT; pat : SIGNED16);
-		VAR lx, rx, t, b   : LONGINT; lm, rm, s, p, help, m : SET;
+	PROCEDURE PatternBlock(x,  y, w, h : SIGNED32; pat : SIGNED16);
+		VAR lx, rx, t, b   : SIGNED32; lm, rm, s, p, help, m : SET;
 	BEGIN
 		IF x < 0 THEN w := w + x; x := 0 END; IF x + w > PW THEN w := PW - x END;
 		t := y + h; IF y < cY THEN y := cY  END; IF t >= cT THEN t := cT  END; h := t - y;
@@ -554,8 +554,8 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 		END
 	END Character;
 
-	PROCEDURE Dot(x, y: LONGINT);
-		VAR p : SET; b : LONGINT;
+	PROCEDURE Dot(x, y: SIGNED32);
+		VAR p : SET; b : SIGNED32;
 	BEGIN
 		IF (x >= 0) & (x < PW) & (y >= cY) & (y < cT) THEN
 			y := (CH-1) - (y - cY);
@@ -578,12 +578,12 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END Dot;
 
 	PROCEDURE GetLine(y: SIGNED16; map: Bitmap; VAR line: ARRAY OF CHAR);
-		VAR i, j: SIGNED16; x: LONGINT;
+		VAR i, j: SIGNED16; x: SIGNED32;
 	BEGIN
 		IF map # NIL THEN
 			i := 0; j := 0;
 			WHILE j < PL DO
-				x := SYSTEM.VAL(LONGINT, map[y, j]);
+				x := SYSTEM.VAL(SIGNED32, map[y, j]);
 				line[i] := CHR(x); x := x DIV 256; INC(i);
 				line[i] := CHR(x); x := x DIV 256; INC(i);
 				line[i] := CHR(x); x := x DIV 256; INC(i);
@@ -704,7 +704,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END PrinterCircle;
 
 	PROCEDURE PrinterEllipse(x0, y0, a, b: SIGNED16);
-		VAR a2, b2, ex, ey, q: LONGINT; x, y: SIGNED16;
+		VAR a2, b2, ex, ey, q: SIGNED32; x, y: SIGNED16;
 	BEGIN
 		IF (a <= 800) & (b <= 800) THEN (* longint range guard *)
 			a2 := LONG(a) * a; b2 := LONG(b) * b;
@@ -868,11 +868,11 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 
 	(* DOS/Native-Oberon *)
 	PROCEDURE PrinterPicture(P: Pictures.Picture; px, py, pw, ph, (* picture *) X, Y, W, H: SIGNED16(* printer *));
-		CONST Shift = 100000;	(* max device distance: MAX(LONGINT) DIV Shift *)
-		VAR scaleX, scaleY: LONGINT;
+		CONST Shift = 100000;	(* max device distance: MAX(SIGNED32) DIV Shift *)
+		VAR scaleX, scaleY: SIGNED32;
 			trailer, run: RunP;	x0, x, y, col: SIGNED16;	colored: BOOLEAN;
 
-		PROCEDURE Scale(pixel, scale: LONGINT): SIGNED16;
+		PROCEDURE Scale(pixel, scale: SIGNED32): SIGNED16;
 		BEGIN
 			RETURN SHORT(pixel * scale DIV Shift)
 		END Scale;
@@ -1073,7 +1073,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END Shift;
 
 	PROCEDURE Spool(me: Oberon.Task);
-		VAR x, y, w, h, px, py, pw, ph, i, n, r, g, b, y0: SIGNED16;  T, ip: LONGINT; pl: PictList;
+		VAR x, y, w, h, px, py, pw, ph, i, n, r, g, b, y0: SIGNED16;  T, ip: SIGNED32; pl: PictList;
 		string : ARRAY 400 OF CHAR; ch : CHAR; col, open, fno, mode : SIGNED8; X, Y : ARRAY 200 OF SIGNED16;
 
 	PROCEDURE Clip(VAR  y, h : SIGNED16) : BOOLEAN;

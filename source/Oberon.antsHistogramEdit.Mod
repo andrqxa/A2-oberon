@@ -49,8 +49,8 @@ TYPE
 VAR
 	tempLayer: tView;
 
-	PROCEDURE GetPosition*( o: tObject;  x, y, epsx, epsy: LONGREAL ): LONGINT;
-	VAR i, len: LONGINT;
+	PROCEDURE GetPosition*( o: tObject;  x, y, epsx, epsy: LONGREAL ): SIGNED32;
+	VAR i, len: SIGNED32;
 	BEGIN
 		len := vyLongrealVec.Len( o.x );
 		FOR i := 0 TO len - 1 DO
@@ -59,7 +59,7 @@ VAR
 		RETURN -1
 	END GetPosition;
 
-	PROCEDURE SetXY*( o: tObject;  x, y: LONGREAL;  pos: LONGINT ): BOOLEAN;
+	PROCEDURE SetXY*( o: tObject;  x, y: LONGREAL;  pos: SIGNED32 ): BOOLEAN;
 	VAR lx, rx, ly, ry, tx, ty: LONGREAL;
 	BEGIN
 		IF pos = 0 THEN RETURN FALSE END;
@@ -79,7 +79,7 @@ VAR
 	END SetXY;
 
 	PROCEDURE GetValue*( o: tObject;  x: LONGREAL ): LONGREAL;
-	VAR cur: LONGREAL;  last: LONGREAL;  pos: LONGINT;  y, yl: LONGREAL;
+	VAR cur: LONGREAL;  last: LONGREAL;  pos: SIGNED32;  y, yl: LONGREAL;
 	BEGIN
 		IF x <= o.x0 THEN RETURN o.y0
 		ELSIF x >= o.x0 + o.w THEN RETURN o.y0 + o.h
@@ -90,7 +90,7 @@ VAR
 	END GetValue;
 
 	PROCEDURE AddPoint*( o: tObject;  x: LONGREAL ): BOOLEAN;
-	VAR x0, cval: LONGREAL;  pos, len, cur: LONGINT;  y: LONGREAL;
+	VAR x0, cval: LONGREAL;  pos, len, cur: SIGNED32;  y: LONGREAL;
 	BEGIN
 		IF (x < o.x0) OR (x >= o.x0 + o.w) THEN RETURN FALSE END;
 		len := vyLongrealVec.Len( o.x );
@@ -124,7 +124,7 @@ VAR
 	END AddPoint;
 
 	PROCEDURE AddGenericPoint*( o: tObject );
-	VAR max, mean: LONGREAL;  len, i: LONGINT;
+	VAR max, mean: LONGREAL;  len, i: SIGNED32;
 	BEGIN
 		max := MIN( LONGREAL );  len := vyLongrealVec.Len( o.x );
 		FOR i := 0 TO len - 2 DO
@@ -175,7 +175,7 @@ VAR
 	(*vs 0.0a1   md  14.02.95 *)
 	VAR
 
-		xr, yr, epsx, epsy: LONGREAL;  pos: LONGINT;  gesture: SIGNED16;
+		xr, yr, epsx, epsy: LONGREAL;  pos: SIGNED32;  gesture: SIGNED16;
 	BEGIN
 		(*
 	Out.Ln; Out.String("edit");
@@ -218,7 +218,7 @@ VAR
 	END Responsible;
 
 	PROCEDURE Recall( layer: tView );
-	VAR i: LONGINT;  len: LONGINT;  x0, y0, x1, y1: SIGNED16;
+	VAR i: SIGNED32;  len: SIGNED32;  x0, y0, x1, y1: SIGNED16;
 	BEGIN
 		IF layer.o = NIL THEN RETURN END;
 		len := vyLongrealVec.Len( layer.o.x );

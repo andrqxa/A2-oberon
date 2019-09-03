@@ -17,7 +17,7 @@ CONST
 	Trace = FALSE;
 
 VAR
-	minX, minY, maxX, maxY: LONGINT;
+	minX, minY, maxX, maxY: SIGNED32;
 	input: Inputs.OberonInput;
 
 (** Returns the number of keystrokes in the keyboard input buffer. *)
@@ -59,7 +59,7 @@ BEGIN
 END Read;
 
 (** Returns the elapsed number of ticks since Oberon startup. *)
-PROCEDURE Time*(): LONGINT;
+PROCEDURE Time*(): SIGNED32;
 BEGIN
 	RETURN Kernel.GetTicks()
 END  Time;
@@ -73,7 +73,7 @@ END KeyState;
 
 (** Await - Wait delay TimeUnits or until next input event. *)
 
-PROCEDURE Await*(delay: LONGINT);
+PROCEDURE Await*(delay: SIGNED32);
 BEGIN
 	IF Trace THEN KernelLog.String("Await") END;
 	input.timer.Sleep(delay);
@@ -87,7 +87,7 @@ BEGIN
 	minX := x; minY := y; maxX := x+w; maxY := y+h
 END SetMouseLimits;
 
-PROCEDURE Init*(x: LONGINT);
+PROCEDURE Init*(x: SIGNED32);
 VAR p: Plugins.Plugin;
 BEGIN
 	IF x = 0BEH THEN	(* magic re-initialization *)

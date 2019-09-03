@@ -44,7 +44,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		CacheObj = POINTER TO CacheObjDesc;
 		CacheObjDesc = RECORD
 			prev, next: CacheObj;
-			stamp: LONGINT;
+			stamp: SIGNED32;
 		END;
 
 		(** object cache **)
@@ -55,9 +55,9 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 		(* OpenType table directory entry *)
 		TableEntry = RECORD
-			tag: LONGINT;										(* table identifier *)
-			checkSum: LONGINT;								(* checksum over table *)
-			offset, length: LONGINT;								(* position and length of table within file *)
+			tag: SIGNED32;										(* table identifier *)
+			checkSum: SIGNED32;								(* checksum over table *)
+			offset, length: SIGNED32;								(* position and length of table within file *)
 		END;
 
 		(** header table **)
@@ -73,7 +73,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		HorHeader* = RECORD
 			ascender*, descender*, lineGap*: FUnit;				(** typographic ascent, descent and line gap **)
 			advanceWidthMax*, minLeftSideBearing*, minRightSideBearing*, xMaxExtent*: FUnit;	(** calculated over all glyphs **)
-			numberOfHMetrics: LONGINT;						(* number of horizontal metrics entries *)
+			numberOfHMetrics: SIGNED32;						(* number of horizontal metrics entries *)
 		END;
 
 		(* character map table *)
@@ -92,7 +92,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 		(** maximum profile table **)
 		MaxProfile* = RECORD
-			numGlyphs*: LONGINT;								(** number of glyphs in font **)
+			numGlyphs*: SIGNED32;								(** number of glyphs in font **)
 			maxPoints, maxContours: SIGNED16;
 			maxCompositePoints, maxCompositeContours: SIGNED16;
 			maxZones, maxTwilightPoints: SIGNED16;
@@ -133,7 +133,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 			instr: OpenTypeInt.Instructions;
 			store: OpenTypeInt.Store;
 			cvt: OpenTypeInt.CVT;
-			cvtLen: LONGINT;
+			cvtLen: SIGNED32;
 			twilight: OpenTypeInt.Zone;
 		END;
 
@@ -195,7 +195,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	DebugLogArray = POINTER TO ARRAY OF Strings.String;
 	DebugLog = OBJECT
 	VAR log : DebugLogArray;
-		logEntries : LONGINT;
+		logEntries : SIGNED32;
 
 		PROCEDURE &New*;
 		BEGIN
@@ -204,7 +204,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		END New;
 
 		PROCEDURE Add(logEntry : ARRAY OF CHAR);
-		VAR newLog : DebugLogArray; i : LONGINT;
+		VAR newLog : DebugLogArray; i : SIGNED32;
 		BEGIN
 			INC(logEntries);
 			IF logEntries >= LEN(log) THEN
@@ -226,7 +226,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 			Add(entry)
 		END AddB;
 
-		PROCEDURE AddI(logEntry : ARRAY OF CHAR; logVal : LONGINT);
+		PROCEDURE AddI(logEntry : ARRAY OF CHAR; logVal : SIGNED32);
 		VAR tString : ARRAY 32 OF CHAR; entry : ARRAY 256 OF CHAR;
 		BEGIN
 			COPY(logEntry, entry);
@@ -236,7 +236,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		END AddI;
 
 		PROCEDURE Flush;
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 		BEGIN
 			i := 0;
 			WHILE i < logEntries DO
@@ -252,7 +252,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		FontCache*: Cache;										(** cache for font objects **)
 		CharToUnicode*: ARRAY 256 OF SIGNED16;				(** mapping from Oberon character codes to Unicodes **)
 		Identity*: Matrix;										(** matrix normally used for generating instances **)
-		CacheStamp: LONGINT;									(* next object stamp *)
+		CacheStamp: SIGNED32;									(* next object stamp *)
 		MacChar, UniChar: ARRAY 256 OF SIGNED16;				(* corresponding Mac and Unicode characters in ascending Unicode order *)
 		Log : DebugLog;
 		SharpenContours: BOOLEAN;
@@ -263,7 +263,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	PROCEDURE InitCache* (VAR cache: Cache);
 	BEGIN
 		NEW(cache.sent); cache.sent.next := cache.sent; cache.sent.prev := cache.sent;
-		cache.sent.stamp := MAX(LONGINT);
+		cache.sent.stamp := MAX(SIGNED32);
 		cache.entries := 0; cache.max := DefaultCacheSize
 	END InitCache;
 
@@ -304,8 +304,8 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	(**--- Fonts ---**)
 
 	(** return location of table within font file (returns whether table was found) **)
-	PROCEDURE FindTable* (font: Font; name: ARRAY OF CHAR; VAR offset, length: LONGINT): BOOLEAN;
-		VAR tag, lo, hi, m: LONGINT;
+	PROCEDURE FindTable* (font: Font; name: ARRAY OF CHAR; VAR offset, length: SIGNED32): BOOLEAN;
+		VAR tag, lo, hi, m: SIGNED32;
 	BEGIN
 		tag := ASH(ASH(ASH(ORD(name[0]), 8) + ORD(name[1]), 8) + ORD(name[2]), 8) + ORD(name[3]);
 		lo := 0; hi := font.numTables;
@@ -328,7 +328,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END ReadInt;
 
 	(** read big endian 4 byte integer **)
-	PROCEDURE ReadLInt* (VAR r: Files.Rider; VAR l: LONGINT);
+	PROCEDURE ReadLInt* (VAR r: Files.Rider; VAR l: SIGNED32);
 		VAR c: ARRAY 4 OF CHAR;
 	BEGIN
 		r.file.ReadBytes(r, c, 0, 4);
@@ -336,7 +336,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END ReadLInt;
 
 	(** read big endian 2 byte integer **)
-	PROCEDURE Read16U* (VAR r: Files.Rider; VAR i: LONGINT);
+	PROCEDURE Read16U* (VAR r: Files.Rider; VAR i: SIGNED32);
 		VAR c: ARRAY 2 OF CHAR;
 	BEGIN
 		r.file.ReadBytes(r, c, 0, 2);
@@ -344,7 +344,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END Read16U;
 
 	PROCEDURE LoadHeader (font: Font): BOOLEAN;
-		VAR pos, len, version, magic: LONGINT; r: Files.Rider; gformat: SIGNED16;
+		VAR pos, len, version, magic: SIGNED32; r: Files.Rider; gformat: SIGNED16;
 	BEGIN
 		IF ~FindTable(font, "head", pos, len) THEN RETURN FALSE END;
 		font.file.Set(r, pos); ReadLInt(r, version);
@@ -364,7 +364,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadHeader;
 
 	PROCEDURE LoadHorHeader (font: Font): BOOLEAN;
-		VAR pos, len, version: LONGINT; r: Files.Rider; mformat: SIGNED16;
+		VAR pos, len, version: SIGNED32; r: Files.Rider; mformat: SIGNED16;
 	BEGIN
 		IF ~FindTable(font, "hhea", pos, len) THEN RETURN FALSE END;
 		font.file.Set(r, pos); ReadLInt(r, version);
@@ -387,7 +387,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 	PROCEDURE LoadCharMap (font: Font): BOOLEAN;
 		VAR
-			r: Files.Rider; pos, length, offset, s, p: LONGINT;
+			r: Files.Rider; pos, length, offset, s, p: SIGNED32;
 			version, tables, t, platform, encoding, format, n, len, segCountX2, pad, off: SIGNED16;
 			found: BOOLEAN; glyph: ARRAY 256 OF CHAR; uni: ARRAY CharMapSize OF SIGNED16;
 	BEGIN
@@ -430,7 +430,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 						END;
 						INC(n)
 					END;
-					len := SHORT(offset + len - r.file.Pos(r)(LONGINT)) DIV 2;
+					len := SHORT(offset + len - r.file.Pos(r)(SIGNED32)) DIV 2;
 					IF len > 0 THEN
 						NEW(font.cmap.glyph, len);
 						n := 0; WHILE n < len DO ReadInt(r, font.cmap.glyph[n]); INC(n) END;
@@ -502,7 +502,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadCharMap;
 
 	PROCEDURE LoadMaxProfile (font: Font): BOOLEAN;
-		VAR pos, len, version: LONGINT; r: Files.Rider;
+		VAR pos, len, version: SIGNED32; r: Files.Rider;
 	BEGIN
 		IF ~FindTable(font, "maxp", pos, len) THEN RETURN FALSE END;
 		font.file.Set(r, pos); ReadLInt(r, version);
@@ -531,7 +531,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadMaxProfile;
 
 	PROCEDURE LoadHorMetrics (font: Font): BOOLEAN;
-		VAR pos, len: LONGINT; r: Files.Rider; aw: SIGNED16; n: LONGINT;
+		VAR pos, len: SIGNED32; r: Files.Rider; aw: SIGNED16; n: SIGNED32;
 	BEGIN
 		IF ~FindTable(font, "hmtx", pos, len) THEN RETURN FALSE END;
 		NEW(font.hmtx, font.maxp.numGlyphs);
@@ -550,7 +550,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadHorMetrics;
 
 	PROCEDURE LoadCVT (font: Font);
-		VAR pos, len, n: LONGINT; r: Files.Rider; val: FUnit;
+		VAR pos, len, n: SIGNED32; r: Files.Rider; val: FUnit;
 	BEGIN
 		font.cvt := NIL; font.cvtLen := 0;
 		IF FindTable(font, "cvt ", pos, len) THEN
@@ -564,7 +564,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadCVT;
 
 	PROCEDURE LoadLinearThresholds (font: Font);
-		VAR pos, len: LONGINT; r: Files.Rider; numGlyphs: LONGINT;
+		VAR pos, len: SIGNED32; r: Files.Rider; numGlyphs: SIGNED32;
 	BEGIN
 		font.LTSH := NIL;
 		IF FindTable(font, "LTSH", pos, len) THEN
@@ -584,7 +584,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadLinearThresholds;
 
 	PROCEDURE LoadFont (font: Font): BOOLEAN;
-		VAR r: Files.Rider; n: LONGINT; ok: BOOLEAN;
+		VAR r: Files.Rider; n: SIGNED32; ok: BOOLEAN;
 		lh, lhh, lcm, lmp, lhm : BOOLEAN;
 	BEGIN
 		(* load table directory *)
@@ -646,7 +646,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadFont;
 
 	PROCEDURE ExecFontProg (font: Font);
-		VAR pos, len: LONGINT; r: Files.Rider; context: OpenTypeInt.Context;
+		VAR pos, len: SIGNED32; r: Files.Rider; context: OpenTypeInt.Context;
 	BEGIN
 		IF FindTable(font, "fpgm", pos, len) THEN
 			IF Debug THEN KernelLog.String("fpgm execution started"); KernelLog.Ln END;
@@ -663,7 +663,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 	(** open a OpenType font file; file name extension and path may be omitted; returns NIL if not found **)
 	PROCEDURE Open* (name: ARRAY OF CHAR): Font;
-		VAR fname, temp, ext: Files.FileName; obj: CacheObj; file: Files.File; r: Files.Rider; version: LONGINT; font: Font;
+		VAR fname, temp, ext: Files.FileName; obj: CacheObj; file: Files.File; r: Files.Rider; version: SIGNED32; font: Font;
 	BEGIN
 		NEW(Log);
 		COPY(name, fname);
@@ -712,7 +712,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	(** get entry from name table; whenever possible, a string in English is returned **)
 	PROCEDURE GetName* (font: Font; id: SIGNED16; VAR name: ARRAY OF CHAR);
 		VAR
-			pos, len, off: LONGINT;
+			pos, len, off: SIGNED32;
 			r: Files.Rider;
 			unicode: BOOLEAN;
 			n, offset, platform, encoding, language, nameID, l, o: SIGNED16;
@@ -750,8 +750,8 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END GetName;
 
 	(** map Unicode character code to glyph number **)
-	PROCEDURE UnicodeToGlyph* (font: Font; code: LONGINT): LONGINT;
-		VAR lo, hi, m, start, end, delta, offset, idx: LONGINT;
+	PROCEDURE UnicodeToGlyph* (font: Font; code: SIGNED32): SIGNED32;
+		VAR lo, hi, m, start, end, delta, offset, idx: SIGNED32;
 	BEGIN
 		lo := 0; hi := font.cmap.segCount;
 		WHILE lo+1 < hi DO
@@ -795,7 +795,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	(** get an instance for an opened font (an instance has fixed point size and resolution) **)
 	PROCEDURE GetInstance* (font: Font; ptsize: F26D6; xdpi, ydpi: SIGNED16; mat: Matrix; VAR inst: Instance);
 		VAR
-			xppm, yppm, ppm, lo, hi, xmin, xmax, ymin, ymax: F26D6; obj: CacheObj; i, pos, len, size: LONGINT;
+			xppm, yppm, ppm, lo, hi, xmin, xmax, ymin, ymax: F26D6; obj: CacheObj; i, pos, len, size: SIGNED32;
 			context: OpenTypeInt.Context; r: Files.Rider; version, n, maxPPM, flags: SIGNED16; ch: CHAR;
 	BEGIN
 		CalcPPEm(font, ptsize, xdpi, ydpi, xppm, yppm);
@@ -918,7 +918,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		OpenTypeInt.NewCVT(glyph.cvt, font.cvtLen)
 	END InitGlyph;
 
-	PROCEDURE LoadSimpleOutline (VAR r: Files.Rider; glyph: Glyph; inst: Instance; num: LONGINT; contours: SIGNED16; hinted, rotated, stretched: BOOLEAN);
+	PROCEDURE LoadSimpleOutline (VAR r: Files.Rider; glyph: Glyph; inst: Instance; num: SIGNED32; contours: SIGNED16; hinted, rotated, stretched: BOOLEAN);
 		VAR
 			font: Font; zone: OpenTypeInt.Zone; pt: OpenTypeInt.Points; points, instrLen, xmin, ymin, xmax, ymax, i, j, val: SIGNED16;
 			flag: SIGNED8; byte: CHAR; x, y, aw, lsb: FUnit; dx: F26D6; context: OpenTypeInt.Context;
@@ -1046,9 +1046,9 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 		glyph.lppx := pt[points].cur[X]; glyph.rppx := pt[points+1].cur[X]
 	END LoadSimpleOutline;
 
-	PROCEDURE LoadOutline (glyph: Glyph; inst: Instance; num: LONGINT; hinted, rotated, stretched: BOOLEAN);
+	PROCEDURE LoadOutline (glyph: Glyph; inst: Instance; num: SIGNED32; hinted, rotated, stretched: BOOLEAN);
 		VAR
-			font: Font; pos, len, beg, end, idx: LONGINT; r: Files.Rider;
+			font: Font; pos, len, beg, end, idx: SIGNED32; r: Files.Rider;
 			int, contours, flags, arg1, arg2, firstc, firstp, i, lastc, lastp, instrLen, points: SIGNED16; comp: OpenTypeInt.Zone;
 			aw, lsb, xmin, ymin, xmax, ymax: FUnit; lppx, rppx, dx, dy: F26D6; m00, m01, m10, m11: F2D14;
 			scaled, rot: BOOLEAN; context: OpenTypeInt.Context;
@@ -1215,7 +1215,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	END LoadOutline;
 
 	(** load glyph structure with appropriately scaled outline **)
-	PROCEDURE LoadGlyph* (inst: Instance; glyph: Glyph; VAR ras: OpenTypeScan.Rasterizer; num: LONGINT; mode: SET);
+	PROCEDURE LoadGlyph* (inst: Instance; glyph: Glyph; VAR ras: OpenTypeScan.Rasterizer; num: SIGNED32; mode: SET);
 		VAR
 			font: Font; aw, xmin, ymin, xmax, ymax: F26D6; n: SIGNED16;
 			cur: OpenTypeInt.Coord; rules: SET;
@@ -1426,7 +1426,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	(*--- Initialization ---*)
 
 	PROCEDURE InitCharMaps;
-		VAR i: SIGNED16; l: LONGINT;
+		VAR i: SIGNED16; l: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 126 DO
 			UniChar[i] := i; MacChar[i] := i

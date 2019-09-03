@@ -133,9 +133,9 @@ TYPE
 		fp-: Basic.Fingerprint; (* temporary fingerprint for values etc. *)
 		fingerprint: SyntaxTree.Fingerprint;
 		deep: BOOLEAN; (* public / private field of FP needed ? *)
-		traceLevel: LONGINT;
+		traceLevel: SIGNED32;
 
-		level: LONGINT;
+		level: SIGNED32;
 
 		PROCEDURE & InitFingerprinter*();
 		BEGIN fp:= 0; deep := FALSE; traceLevel := 0;
@@ -1242,7 +1242,7 @@ TYPE
 		END VisitSymbol;
 
 		PROCEDURE TraceIndent;
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			FOR i := 1 TO traceLevel DO D.Str(" "); END;
 		END TraceIndent;

@@ -67,12 +67,12 @@ TYPE
 		header: ARRAY 36 OF CHAR;
 		curByte : SIGNED16;
 		curBit: SIGNED16;
-		tempVal: LONGINT;
+		tempVal: SIGNED32;
 
 		scalefactors : ARRAY 2 OF Scalefactors;
 	END Frame;
 
-	HuffDecoded = ARRAY 32+1,18 OF LONGINT;
+	HuffDecoded = ARRAY 32+1,18 OF SIGNED32;
 	Granule = ARRAY 32,18 OF REAL;
 	Stereo = ARRAY 2 OF Granule;
 
@@ -97,7 +97,7 @@ TYPE
 		bsspace: ARRAY 2,2304 OF CHAR;
 		hybridblock: ARRAY 2,2,576 OF REAL;
 		hybridblc: ARRAY 2 OF SIGNED16;
-		header: LONGINT;
+		header: SIGNED32;
 		bsnum: SIGNED16;
 		synthbuffs: ARRAY 2,2, 272OF REAL;
 		synthbo: SIGNED16;
@@ -165,14 +165,14 @@ TYPE
 		(* Variables used for buffer control*)
 		data : ARRAY MAXBUF OF CHAR;
 		curBit, curByte, tempVal, offset : SIGNED16;
-		totBits : LONGINT;
+		totBits : SIGNED32;
 		mainDataEnd, frameStart: SIGNED16;
 
 		vVec : ARRAY 2, 1024 OF REAL;
-		vectIdx0, vectIdx1 : LONGINT;
+		vectIdx0, vectIdx1 : SIGNED32;
 
 		(* Number of Frames decoded *)
-		frameNum: LONGINT;
+		frameNum: SIGNED32;
 
 		(* First Time status: for initialising some values *)
 		first: BOOLEAN;
@@ -180,19 +180,19 @@ TYPE
 
 		s: Streams.Reader;
 
-		channels: LONGINT;
-		bitsPerSample: LONGINT;
-		samplesPerSec: LONGINT;
-		bitRate: LONGINT;
+		channels: SIGNED32;
+		bitsPerSample: SIGNED32;
+		samplesPerSec: SIGNED32;
+		bitRate: SIGNED32;
 
-		totSamples : LONGINT;
+		totSamples : SIGNED32;
 
 		hasMoreBytes: BOOLEAN;
 
 		(* Variables for internal buffercontrol *)
 		out : ARRAY 2 OF PcmStereo;		(* The actual buffer *)
 		gr: SIGNED16;						(* needed for changing buffer *)
-		outBufferPos: LONGINT;				(* Current Position in buffer *)
+		outBufferPos: SIGNED32;				(* Current Position in buffer *)
 
 
 		(*                                                                  *)
@@ -206,9 +206,9 @@ TYPE
 		(* @returns: nothing															*)
 		PROCEDURE Next*;
 		VAR c:CHAR;
-			i: LONGINT;
+			i: SIGNED32;
 			found: BOOLEAN;
-			n: LONGINT;
+			n: SIGNED32;
 		BEGIN
 			(* One method: read single Bytes and decide on them. Not sure whats better
 			REPEAT
@@ -321,7 +321,7 @@ TYPE
 		(* Get general mpeg header info of a frame *)
 		PROCEDURE GetHeaderInfo;
 		VAR
-			i : LONGINT;
+			i : SIGNED32;
 
 		BEGIN
 			encFrame.bitrate := GetBits(4);
@@ -427,7 +427,7 @@ TYPE
 
 		(* Get the scalefactors *)
 		PROCEDURE GetScaleFactors(ch, gr: SIGNED16);
-		VAR i, j, k: LONGINT;
+		VAR i, j, k: SIGNED32;
 		BEGIN
 			IF (encFrame.ch[ch].gr[gr].windowswitchingflag) & (encFrame.ch[ch].gr[gr].blocktype = 2) THEN
 				IF encFrame.ch[ch].gr[gr].mixedblockflag THEN
@@ -555,7 +555,7 @@ TYPE
 		END HuffDec;
 
 		(* Layer 3 specific Huffman decoding of the different regions*)
-		PROCEDURE L3HuffDec (VAR is : HuffDecoded; ch, gr: SIGNED16; part2Start :LONGINT);
+		PROCEDURE L3HuffDec (VAR is : HuffDecoded; ch, gr: SIGNED16; part2Start :SIGNED32);
 		VAR i, j, x, y, v, w, r1Start, r2Start, ht : SIGNED16;
 				bt : BOOLEAN;
 		BEGIN
@@ -614,7 +614,7 @@ TYPE
 
 		(* Dequantizes the huffman decoded samples (samples quantized to make bitrate constant) *)
 		PROCEDURE Dequantize(is: HuffDecoded; VAR xr: Granule; ch, gr : SIGNED16);
-		VAR ss, sb, cb, sr, nextCbBoundary, cbBegin, cbWidth, tmp, tmp2 : LONGINT;
+		VAR ss, sb, cb, sr, nextCbBoundary, cbBegin, cbWidth, tmp, tmp2 : SIGNED32;
 				sign : BOOLEAN;
 		BEGIN
 			cb := 0; sr := encFrame.samplerate;
@@ -687,8 +687,8 @@ TYPE
 
 		(* Does the joint stereo processing by decoding ms-stereo and i-stereo *)
 		PROCEDURE JointStereo(ro : Stereo; VAR lr: Stereo; gr: SIGNED16);
-		VAR	 i, j, sb, ss, sfb, sfbCnt, c, maxSfb,  lines : LONGINT;
-					isPos: ARRAY 576 OF LONGINT;
+		VAR	 i, j, sb, ss, sfb, sfbCnt, c, maxSfb,  lines : SIGNED32;
+					isPos: ARRAY 576 OF SIGNED32;
 					isRatio: ARRAY 576 OF REAL;
 					msStereo, iStereo : BOOLEAN;
 		BEGIN
@@ -895,7 +895,7 @@ TYPE
 
 		(* Reorders the samples (samples reordered for better compression 123 123 123 -> 111 222 333) *)
 		PROCEDURE Reorder(xr : Granule; VAR re : Granule; ch, gr : SIGNED16);
-		VAR sfb, sfbStart, sfbLines, sb, ss, window, freq, srcLine, dstLine : LONGINT;
+		VAR sfb, sfbStart, sfbLines, sb, ss, window, freq, srcLine, dstLine : SIGNED32;
 		BEGIN
 			FOR sb := 0 TO 31 DO
 				FOR ss := 0 TO 17 DO
@@ -990,7 +990,7 @@ TYPE
 
 		(* Do the IMDCT and the overlapping *)
 		PROCEDURE HybridSynthesis(hybridIn : Granule; VAR hybridOut: Granule; ch, gr: SIGNED16);
-		VAR sb, i, j : LONGINT;
+		VAR sb, i, j : SIGNED32;
 				bt: SIGNED16;
 				rawout : Raw36;
 				rawin : Raw18;
@@ -1031,7 +1031,7 @@ TYPE
 		(* The optimized inverse discrete consine transform *)
 		PROCEDURE IMDCT(in: Raw18; VAR out: Raw36; bt: SIGNED16);
 		VAR
-			i, m : LONGINT;
+			i, m : SIGNED32;
 			tin, hl : ARRAY 18 OF REAL;
 			tmp : ARRAY 12 OF REAL;
 			hs : ARRAY 6 OF REAL;
@@ -1211,7 +1211,7 @@ TYPE
 
 		(* 9 point inverse discrete consine transform *)
 		PROCEDURE IMDCT9pt(in: Raw9; VAR out: Raw9);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 				even, evenidct : Raw5;
 				odd, oddidct: Raw4;
 		BEGIN
@@ -1251,8 +1251,8 @@ TYPE
 
 		(* does the conversion from the frequency domain into the time domain *)
 		PROCEDURE SubbandSynthesis(in : Granule; VAR out :  PcmStereo; ch, gr : SIGNED16);
-		VAR i, j, ss, tmp1, tmp2 : LONGINT;
-			samp : LONGINT;
+		VAR i, j, ss, tmp1, tmp2 : SIGNED32;
+			samp : SIGNED32;
 			sVec, tmp : Raw32;
 			sum : REAL;
 		BEGIN
@@ -1371,7 +1371,7 @@ TYPE
 
 		(* used in the subband synthesis *)
 		PROCEDURE DCT(in : Raw32; VAR out : Raw32; n : SIGNED16);
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 				evenin, evenout, oddin, oddout : Raw32;
 		BEGIN
 			IF n = 2 THEN
@@ -1460,18 +1460,18 @@ TYPE
 		END Open;
 
 		(* Returns the current sample position *)
-		PROCEDURE GetCurrentSample*() : LONGINT;
+		PROCEDURE GetCurrentSample*() : SIGNED32;
 		BEGIN
 			RETURN ENTIER(8 * s.Pos() / bitRate / 1000 * samplesPerSec)
 		END GetCurrentSample;
 
 		(* Returns the current time in 1/10 sec *)
-		PROCEDURE GetCurrentTime*() : LONGINT;
+		PROCEDURE GetCurrentTime*() : SIGNED32;
 		BEGIN
 			RETURN ENTIER(10 * GetCurrentSample() / samplesPerSec)
 		END GetCurrentTime;
 
-		PROCEDURE GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample: LONGINT);
+		PROCEDURE GetAudioInfo*(VAR nofChannels, samplesPerSecond, bitsPerSample: SIGNED32);
 		BEGIN
 			nofChannels := channels;
 			bitsPerSample := SELF.bitsPerSample;
@@ -1479,13 +1479,13 @@ TYPE
 		END GetAudioInfo;
 
 		(* Returns the total number of Samples in this file or -1 if streaming or VBR *)
-		PROCEDURE GetTotalSamples*() : LONGINT;
+		PROCEDURE GetTotalSamples*() : SIGNED32;
 		BEGIN
 			RETURN totSamples
 		END GetTotalSamples;
 
 		(* Sets the size of the Stream in Bytes. Only works for CBR *)
-		PROCEDURE SetStreamLength*(length : LONGINT);
+		PROCEDURE SetStreamLength*(length : SIGNED32);
 		BEGIN
 			totSamples := ENTIER(8 * length / bitRate / 1000 * samplesPerSec)
 		END SetStreamLength;
@@ -1502,7 +1502,7 @@ TYPE
 		(* @params: sample: the sample to seek, goKeySample: if we have a containerformat which 	*)
 		(*		        specifies keysamples, this flag can be set, res: the result of the seekoperation		*)
 		(* @returns: nothing																		*)
-		PROCEDURE SeekSample*(sample : LONGINT; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekSample*(sample : SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
 		BEGIN
 			IF ~CanSeek() THEN res := Codecs.ResFailed; RETURN; END;
 			COPY("0000", cHeader);
@@ -1513,7 +1513,7 @@ TYPE
 		END SeekSample;
 
 		(* Seeks the Sample at the position given in ms *)
-		PROCEDURE SeekMillisecond*(millisecond : LONGINT; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
 		BEGIN
 			SeekSample(ENTIER(millisecond*samplesPerSec/1000), goKeySample, res);
 		END SeekMillisecond;
@@ -1598,7 +1598,7 @@ TYPE
 		PROCEDURE DoLayer3;
 		VAR
 			j, ch, grt, dummy, flushMain, bytesToDiscard, sb, ss : SIGNED16;
-			part2Start : LONGINT;
+			part2Start : SIGNED32;
 			is : HuffDecoded;
 			ro, lr : Stereo;
 			re, hybridIn, hybridOut : Granule;

@@ -101,7 +101,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 			setFillColor*: PROCEDURE (ctxt: Context; color: Color);
 			setFillPattern*: PROCEDURE (ctxt: Context; pat: Pattern);
 			setLineWidth*: PROCEDURE (ctxt: Context; width: REAL);
-			setDashPattern*: PROCEDURE (ctxt: Context; VAR on, off: ARRAY OF REAL; len: LONGINT; phase: REAL);
+			setDashPattern*: PROCEDURE (ctxt: Context; VAR on, off: ARRAY OF REAL; len: SIGNED32; phase: REAL);
 			setCapStyle*: PROCEDURE (ctxt: Context; style: CapStyle);
 			setJoinStyle*: PROCEDURE (ctxt: Context; style: JoinStyle);
 			setStyleLimit*: PROCEDURE (ctxt: Context; limit: REAL);
@@ -144,7 +144,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 			strokePat*, fillPat*: Pattern;	(** current stroke and fill pattern **)
 			lineWidth*: REAL;	(** current line width **)
 			dashPatOn*, dashPatOff*: ARRAY MaxDashPatSize OF REAL;	(** line dash array **)
-			dashPatLen*: LONGINT;	(** number of valid elements in dash arrays **)
+			dashPatLen*: SIGNED32;	(** number of valid elements in dash arrays **)
 			dashPhase*: REAL;	(** offset for first dash **)
 			dashPeriod*: REAL;	(** sum of dash element lengths **)
 			capStyle*: CapStyle;	(** line cap style **)
@@ -162,7 +162,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 			strokeCol, fillCol: Color; strokePat, fillPat: Pattern;
 			lineWidth: REAL;
 			dashPatOn, dashPatOff: ARRAY MaxDashPatSize OF REAL;
-			dashPatLen: LONGINT; dashPhase: REAL;
+			dashPatLen: SIGNED32; dashPhase: REAL;
 			capStyle: CapStyle; joinStyle: JoinStyle; styleLimit: REAL;
 			flatness: REAL;
 			font: GfxFonts.Font;
@@ -215,7 +215,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 
 	(** save and restore graphics state **)
 	PROCEDURE Save* (ctxt: Context; elems: SET; VAR state: State);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		state.saved := elems;
 		state.strokeCol := ctxt.strokeCol; state.strokePat := ctxt.strokePat;
@@ -403,7 +403,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 	END SetLineWidth;
 
 	(** set dash pattern **)
-	PROCEDURE SetDashPattern* (ctxt: Context; VAR on, off: ARRAY OF REAL; len: LONGINT; phase: REAL);
+	PROCEDURE SetDashPattern* (ctxt: Context; VAR on, off: ARRAY OF REAL; len: SIGNED32; phase: REAL);
 	BEGIN
 		ASSERT(~(InPath IN ctxt.mode), 100);
 		ASSERT((len <= LEN(on)) & (len <= LEN(off)), 101);
@@ -411,7 +411,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 	END SetDashPattern;
 
 	(** copy values from parameter, and calculate dash period **)
-	PROCEDURE SetDashArray* (ctxt: Context; VAR on, off: ARRAY OF REAL; len: LONGINT);
+	PROCEDURE SetDashArray* (ctxt: Context; VAR on, off: ARRAY OF REAL; len: SIGNED32);
 	BEGIN
 		ctxt.dashPatLen := len;
 		ctxt.dashPeriod := 0;
@@ -782,8 +782,8 @@ MODULE Gfx; (** portable *)	(* eos  *)
 		GfxPaths.AddLine(path, x - hx, y - hy)
 	END AddExitJoinStyle;
 
-	PROCEDURE GetPolyOutline (ctxt: Context; VAR x, y: ARRAY OF REAL; n: LONGINT; dxi, dyi, dxo, dyo: REAL; dst: GfxPaths.Path);
-		VAR closed: BOOLEAN; width, odx, ody, idx, idy, hx, hy: REAL; i, j: LONGINT;
+	PROCEDURE GetPolyOutline (ctxt: Context; VAR x, y: ARRAY OF REAL; n: SIGNED32; dxi, dyi, dxo, dyo: REAL; dst: GfxPaths.Path);
+		VAR closed: BOOLEAN; width, odx, ody, idx, idy, hx, hy: REAL; i, j: SIGNED32;
 	BEGIN
 		closed := (x[n] = x[0]) & (y[n] = y[0]);
 		GfxMatrix.ApplyToDist(ctxt.cam, 0.5*ctxt.lineWidth, width);
@@ -917,7 +917,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 
 	PROCEDURE GetStrokeOutline (ctxt: Context; VAR scan: GfxPaths.Scanner; dst: GfxPaths.Path);
 		CONST last = 127;
-		VAR x, y: ARRAY last+1 OF REAL; dxi, dyi, dxo, dyo: REAL; n: LONGINT;
+		VAR x, y: ARRAY last+1 OF REAL; dxi, dyi, dxo, dyo: REAL; n: SIGNED32;
 	BEGIN
 		ASSERT(scan.elem = GfxPaths.Enter);
 		x[0] := scan.x; y[0] := scan.y; dxi := scan.dx; dyi := scan.dy;
@@ -942,7 +942,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 	END GetStrokeOutline;
 
 	(** get offset values and pattern index of visible and invisible dash part at start of subpath (in device space) **)
-	PROCEDURE GetDashOffsets* (ctxt: Context; offset: REAL; VAR beg, end, next: REAL; VAR idx: LONGINT);
+	PROCEDURE GetDashOffsets* (ctxt: Context; offset: REAL; VAR beg, end, next: REAL; VAR idx: SIGNED32);
 		VAR phase, period, len: REAL;
 	BEGIN
 		idx := 0;
@@ -963,7 +963,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 	PROCEDURE GetDashOutline (ctxt: Context; VAR scan: GfxPaths.Scanner; dst: GfxPaths.Path);
 		VAR
 			width, cx, cy, dx, dy, beg, end, next, offset, len, cos, sin, wdx, wdy, endOff, dash, nx, ny: REAL;
-			index: LONGINT; dscan: GfxPaths.Scanner;
+			index: SIGNED32; dscan: GfxPaths.Scanner;
 	BEGIN
 		GfxMatrix.ApplyToDist(ctxt.cam, 0.5*ctxt.lineWidth, width);
 		ASSERT(scan.elem = GfxPaths.Enter);
@@ -1260,7 +1260,7 @@ MODULE Gfx; (** portable *)	(* eos  *)
 		ctxt.lineWidth := width
 	END DefSetLineWidth;
 
-	PROCEDURE DefSetDashPattern* (ctxt: Context; VAR on, off: ARRAY OF REAL; len: LONGINT; phase: REAL);
+	PROCEDURE DefSetDashPattern* (ctxt: Context; VAR on, off: ARRAY OF REAL; len: SIGNED32; phase: REAL);
 	BEGIN
 		SetDashArray(ctxt, on, off, len);
 		ctxt.dashPhase := phase

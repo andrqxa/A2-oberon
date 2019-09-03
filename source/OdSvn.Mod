@@ -34,7 +34,7 @@ TYPE
 
 TYPE
 	StringReader = OBJECT
-		VAR res, pos: LONGINT; s: U.String;
+		VAR res, pos: SIGNED32; s: U.String;
 		PROCEDURE &Init(s: U.String);
 		BEGIN SELF.s := s; res := Streams.Ok; pos := 0; END Init;
 		PROCEDURE Char(VAR ch: CHAR);
@@ -58,7 +58,7 @@ TYPE
 TYPE
 	Activity* = OBJECT
 	VAR url: U.String;
-		statuscode*: LONGINT;
+		statuscode*: SIGNED32;
 		log: Log.Log;
 		client : OdClient.OdClient;
 
@@ -111,7 +111,7 @@ TYPE
 
 TYPE
 UpdateReq* = OBJECT(XML.Document);
-	PROCEDURE &InitUpdateReq*( client : OdClient.OdClient; svn : OdSvn; CONST pathName: ARRAY OF CHAR; headVersion, version: LONGINT ); (* Revision numbers: e.g. 18 *)
+	PROCEDURE &InitUpdateReq*( client : OdClient.OdClient; svn : OdSvn; CONST pathName: ARRAY OF CHAR; headVersion, version: SIGNED32 ); (* Revision numbers: e.g. 18 *)
 	VAR el1, el2: XML.Element; ac: XML.ArrayChars;
 		path,name: ARRAY 256 OF CHAR;
 		versionStr: ARRAY 32 OF CHAR;
@@ -162,7 +162,7 @@ LogReq = OBJECT(XML.Document);
 		<S:discover-changed-paths/>
 		<S:path></S:path>
 	</S:log-report>  *)
-	PROCEDURE &InitLogReq(start, end: LONGINT); (* Revision numbers: e.g. 18, 1 *)
+	PROCEDURE &InitLogReq(start, end: SIGNED32); (* Revision numbers: e.g. 18, 1 *)
 	VAR el1, el2: XML.Element; ac: XML.ArrayChars;
 		startStr, endStr: ARRAY 32 OF CHAR;
 	BEGIN Init();
@@ -184,7 +184,7 @@ TYPE
 	OdSvn* = OBJECT
 	VAR
 		useSvn : BOOLEAN;
-		globalVersion : LONGINT;
+		globalVersion : SIGNED32;
 		svnFileUpdate : BOOLEAN;
 		traverseDummy*, useUpdateTarget*, checkout* : BOOLEAN;
 
@@ -192,8 +192,8 @@ TYPE
 		xml : OdXml.OdXml;
 
 		wrk*, ver*, errorMsg, repositoryURL* : ARRAY 256 OF CHAR; (* wrk URL of PROPFIND/PATCH *)
-		pfStatus* : LONGINT;
-		countChanges* : LONGINT;
+		pfStatus* : SIGNED32;
+		countChanges* : SIGNED32;
 		repositoryPathLength* : SIZE;
 		removeDir*, svnUpdated* : BOOLEAN;
 		resultDoc* : XML.Document;
@@ -339,7 +339,7 @@ TYPE
 		dl,   (* Data length.           *)
 		(* Support variables. *)
 		co, cl, (* Copy offset, length. *)
-		n: LONGINT;
+		n: SIGNED32;
 		tvo, (* Target view offset. *)
 		istart: Files.Position;
 		read: SIZE;
@@ -483,7 +483,7 @@ TYPE
 	PROCEDURE Versions* ( context: Commands.Context );
 	VAR url, err, vcc, ci, bc, pathName, path, name: ARRAY 256 OF CHAR;
 		props: WebHTTP.AdditionalField;
-		start, end: LONGINT;
+		start, end: SIGNED32;
 	BEGIN
 		log.Enter; log.String( "" );  log.Exit;
 		log.Enter; log.String( "" );  log.Exit;
@@ -545,7 +545,7 @@ TYPE
 
 	(* There must be already a version (e.g. the newest which can be checked out) to make a delta on it for an older. *)
 	PROCEDURE UpdateReport*(pathName, vcc: ARRAY OF CHAR; CONST workUrl: ARRAY OF CHAR;
-		headVersion, version: LONGINT; CONST workName: ARRAY OF CHAR; VAR res : WORD );
+		headVersion, version: SIGNED32; CONST workName: ARRAY OF CHAR; VAR res : WORD );
 	VAR resBody: XML.Document;
 		reqBody: UpdateReq;
 		resHeader: WebHTTP.ResponseHeader;
@@ -594,7 +594,7 @@ TYPE
 	VAR
 		pathName, path, collUrl, name, workName, workUrl, vcc, ver, err: ARRAY 256 OF CHAR;
 		resHeader: WebHTTP.ResponseHeader;
-		version,headVersion: LONGINT; pos: SIZE; res: WORD;
+		version,headVersion: SIGNED32; pos: SIZE; res: WORD;
 		props: WebHTTP.AdditionalField;
 		act: Activity;
 	BEGIN
@@ -740,7 +740,7 @@ TYPE
 	<S:log-item>
 
 	*)
-	PROCEDURE LogReport(CONST url:ARRAY OF CHAR; bc: ARRAY OF CHAR; start, end: LONGINT);
+	PROCEDURE LogReport(CONST url:ARRAY OF CHAR; bc: ARRAY OF CHAR; start, end: SIGNED32);
 	VAR resBody: XML.Document;
 		reqBody: LogReq;
 		resHeader: WebHTTP.ResponseHeader;
@@ -1419,7 +1419,7 @@ TYPE
 	PROCEDURE SvnWritePROPS ( CONST path, filename : ARRAY OF CHAR; props : SvnProps );
 	VAR
 		tmp,fstr,fstr2 : ARRAY 256 OF CHAR;
-		i: LONGINT; res: WORD;
+		i: SIGNED32; res: WORD;
 		len: SIZE;
 		fr, fw : Files.File;
 		r : Files.Reader;
@@ -1631,7 +1631,7 @@ END OdSvn;
 
 
 
-PROCEDURE RawNum(VAR delta: Files.Reader; VAR li: LONGINT);
+PROCEDURE RawNum(VAR delta: Files.Reader; VAR li: SIGNED32);
 VAR ch: CHAR;
 BEGIN
 	li := 0;

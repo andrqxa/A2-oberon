@@ -50,7 +50,7 @@ BEGIN
 	to[i] := 0X
 END Append;
 
-PROCEDURE NewStyle(width: LONGINT; tabs: ARRAY OF CHAR): Objects.Object;
+PROCEDURE NewStyle(width: SIGNED32; tabs: ARRAY OF CHAR): Objects.Object;
 VAR obj: Objects.Object; res: SIGNED16; a: Objects.AttrMsg;
 BEGIN
 	Objects.NewObj := NIL;
@@ -72,7 +72,7 @@ VAR
 	arc: Zip.Archive;
 	ent: Zip.Entry;
 	width: SIGNED16;
-	ratio: LONGINT;
+	ratio: SIGNED32;
 BEGIN
 	arc := Zip.OpenArchive(archive, res);
 	CASE res OF
@@ -121,7 +121,7 @@ END WriteDirectory;
 	\D: same as \d, but without style element for tabbing **)
 PROCEDURE Directory*;
 VAR
-	S: Texts.Scanner; T1, T2: Texts.Text; beg, end, time: LONGINT;
+	S: Texts.Scanner; T1, T2: Texts.Text; beg, end, time: SIGNED32;
 	details, tabs: BOOLEAN;	(* show details of Entries *)
 	res: WORD; width: SIGNED16;
 BEGIN
@@ -237,7 +237,7 @@ END OpenFile;
 
 PROCEDURE cmdOpenExtract (action: SIGNED16);
 VAR
-	S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT;
+	S: Texts.Scanner; T: Texts.Text; beg, end, time: SIGNED32;
 	arc: Zip.Archive; ent: Zip.Entry; name: ARRAY 256 OF CHAR;
 	res: WORD;
 	path, overwrite: BOOLEAN;
@@ -312,7 +312,7 @@ BEGIN
 					ELSE	(* should not happen *)
 					END;
 					Texts.Append(Oberon.Log, W.buf);
-					IF ErrorStop & (res # Zip.Ok) THEN end := MIN(LONGINT) END
+					IF ErrorStop & (res # Zip.Ok) THEN end := MIN(SIGNED32) END
 				END
 			END
 		| Zip.FileError: Texts.WriteString(W, " not found"); Texts.WriteLn(W)
@@ -342,12 +342,12 @@ END Extract;
 	\p: If set, DstPrefix is prefixed to all file names of the entries in the zip-archives **)
 PROCEDURE ExtractAll*;
 VAR
-	S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT;
+	S: Texts.Scanner; T: Texts.Text; beg, end, time: SIGNED32;
 	path, overwrite: BOOLEAN; prefix: ARRAY 64 OF CHAR; name: ARRAY 256 OF CHAR;
 	arc: Zip.Archive;
 	ent: Zip.Entry;
 	res: WORD;
-	n, m: LONGINT;	(* number of extracted files *)
+	n, m: SIGNED32;	(* number of extracted files *)
 BEGIN
 	path := FALSE; overwrite := FALSE; prefix := "";
 	T := Oberon.Par.text;
@@ -399,7 +399,7 @@ BEGIN
 			Texts.WriteInt(W, n, 0); Texts.WriteString(W, " files extracted");
 			IF m # 0 THEN
 				Texts.WriteString(W, ", "); Texts.WriteInt(W, m, 0); Texts.WriteString(W, " errors");
-				IF ErrorStop THEN end := MIN(LONGINT) END
+				IF ErrorStop THEN end := MIN(SIGNED32) END
 			END
 		| Zip.FileError: Texts.WriteString(W, " not found")
 		| Zip.NotZipArchiveError: Texts.WriteString(W, " is not a valid zip-archive")
@@ -446,8 +446,8 @@ END AddFile;
 	\p: remove prefix from filename **)
 PROCEDURE Add*;
 VAR
-	S: Texts.Scanner; T: Texts.Text; beg, end, time, res: LONGINT;
-	arc: Zip.Archive; i, j: LONGINT;
+	S: Texts.Scanner; T: Texts.Text; beg, end, time, res: SIGNED32;
+	arc: Zip.Archive; i, j: SIGNED32;
 	strategy, level: SIGNED8; prefix: BOOLEAN;
 	oldname, newname: ARRAY 256 OF CHAR;
 BEGIN
@@ -531,7 +531,7 @@ BEGIN
 					| Zip.DataError: Texts.WriteString(W, " error during compression")
 					END;
 					Texts.WriteLn(W); Texts.Append(Oberon.Log, W.buf);
-					IF ErrorStop & (res # Zip.Ok) THEN end := MIN(LONGINT) END
+					IF ErrorStop & (res # Zip.Ok) THEN end := MIN(SIGNED32) END
 				END
 			END
 		| Zip.FileError: Texts.WriteString(W, " not found"); Texts.WriteLn(W)
@@ -545,7 +545,7 @@ END Add;
 	ZipTool.Delete (^ | ZipFile (^ | {Entry})) **)
 PROCEDURE Delete*;
 VAR
-	S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT;
+	S: Texts.Scanner; T: Texts.Text; beg, end, time: SIGNED32;
 	arc: Zip.Archive;
 	ent: Zip.Entry;
 	res: WORD;
@@ -585,7 +585,7 @@ BEGIN
 				END;
 				Texts.WriteLn(W); Texts.Append(Oberon.Log, W.buf);
 				Texts.Scan(S);
-				IF ErrorStop & (res # Zip.Ok) THEN end := MIN(LONGINT) END
+				IF ErrorStop & (res # Zip.Ok) THEN end := MIN(SIGNED32) END
 			END
 		| Zip.FileError: Texts.WriteString(W, " not found"); Texts.WriteLn(W)
 		| Zip.NotZipArchiveError: Texts.WriteString(W, " is not a valid zip-archive"); Texts.WriteLn(W)

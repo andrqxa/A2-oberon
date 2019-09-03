@@ -78,7 +78,7 @@ VAR left, right: SIZE; elem: SelectorRuleSet;
 	VAR i, j: SIZE; elem: SelectorRuleSet;
 
 		PROCEDURE Less(VAR elem1, elem2: SelectorRuleSet): BOOLEAN;
-		VAR a1, a2, b1, b2, c1, c2: LONGINT;
+		VAR a1, a2, b1, b2, c1, c2: SIGNED32;
 		BEGIN
 			elem1.selector.GetSpecifity(a1, b1, c1); elem2.selector.GetSpecifity(a2, b2, c2);
 			RETURN (a1 < a2) OR ((a1 = a2) & (b1 < b2)) OR ((a1 = a2) & (b1 = b2) & (c1 < c2))

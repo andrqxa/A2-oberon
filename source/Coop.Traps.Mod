@@ -10,7 +10,7 @@ CONST
 	TestTrap = TRUE;
 
 VAR
-	trapState: ARRAY Machine.MaxCPU OF LONGINT;	(* indexed by Machine.ID() *)
+	trapState: ARRAY Machine.MaxCPU OF SIGNED32;	(* indexed by Machine.ID() *)
 
 PROCEDURE HandleTrap (number: SIZE);
 VAR frame {UNTRACED}: POINTER {UNSAFE} TO RECORD descriptor, previous, caller, parameters: ADDRESS END; w: Streams.Writer; id: SIZE;

@@ -14,11 +14,11 @@ TYPE
 	Device = OBJECT (Disks.Device)
 		VAR
 			f: Files.File;
-			size, cyls, hds, spt: LONGINT;
+			size, cyls, hds, spt: SIGNED32;
 			new: BOOLEAN;
 
-		PROCEDURE Transfer*(op, lba, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
-		VAR pos, n: LONGINT; r: Files.Rider;
+		PROCEDURE Transfer*(op, lba, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		VAR pos, n: SIGNED32; r: Files.Rider;
 		BEGIN
 			ASSERT(ofs = 0);	(* implementation restriction *)
 			IF (op = Disks.Read) OR (op = Disks.Write) THEN
@@ -34,7 +34,7 @@ TYPE
 								r.res := num*SELF.blockSize
 							END;
 							IF r.res # 0 THEN	(* fill rest of block with 0 *)
-								pos := num*SELF.blockSize - r.res + LONGINT(ofs); n := r.res;
+								pos := num*SELF.blockSize - r.res + SIGNED32(ofs); n := r.res;
 								WHILE n # 0 DO data[pos] := 0X; INC(pos); DEC(n) END
 							END;
 							res := Disks.Ok
@@ -56,7 +56,7 @@ TYPE
 			END
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size, res: LONGINT);
+		PROCEDURE GetSize*(VAR size, res: SIGNED32);
 		BEGIN
 			size := SELF.size; res := Disks.Ok
 		END GetSize;
@@ -111,7 +111,7 @@ BEGIN
 END Open;
 
 PROCEDURE Unregister(dev: Device);
-VAR n: LONGINT; r: Files.Rider;
+VAR n: SIGNED32; r: Files.Rider;
 BEGIN
 	Disks.registry.Remove(dev);
 	Out.String("Closing "); Out.String(dev.name); Out.Char(" ");

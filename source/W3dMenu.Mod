@@ -28,7 +28,7 @@ TYPE
 		obj : AbstractWorld.Object;
 		world : AbstractWorld.World;
 		tex : AbstractWorld.Texture;
-		index : LONGINT;
+		index : SIGNED32;
 
 		PROCEDURE &Init*(world : AbstractWorld.World; pos : Vectors.TVector3d; command : ARRAY OF CHAR);
 		BEGIN
@@ -44,7 +44,7 @@ TYPE
 			alive : BOOLEAN;
 			obj, o2 : AbstractWorld.Object;
 			update : UpdateProc;
-			i, direct : LONGINT;
+			i, direct : SIGNED32;
 			dead, run, anirun : BOOLEAN;
 			pos : Vectors.TVector3d;
 			tex : AbstractWorld.Texture;
@@ -115,7 +115,7 @@ TYPE
 		mx, my, mz : LONGREAL;
 
 		infoList : Classes.List;
-		index : LONGINT;
+		index : SIGNED32;
 		aniObj, aniObj2 : AbstractWorld.Object;
 
 		selectionMethod : SET;
@@ -242,7 +242,7 @@ TYPE
 		END Load;
 
 		PROCEDURE &New*(fileName: ARRAY OF CHAR);
-		VAR w, h : LONGINT;
+		VAR w, h : SIGNED32;
 		BEGIN
 			IF winstance = NIL THEN  winstance := SELF  END;  (* fld, adapt to new semantics of NEW *)
 			manager := WM.GetDefaultManager();
@@ -296,7 +296,7 @@ TYPE
 		END PointerDown;
 
 		PROCEDURE PointerMove*(x, y: SIZE; keys: SET);
-		VAR idx : LONGINT;
+		VAR idx : SIGNED32;
 			info : Symbol; dummy : ANY;
 		BEGIN
 			IF mouseKeys = {} THEN
@@ -448,7 +448,7 @@ BEGIN
 END TextureByName;
 
 (*	PROCEDURE MatchI(VAR buf: ARRAY OF CHAR; with: ARRAY OF CHAR): BOOLEAN;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		i := 0; WHILE (with[i] # 0X) & (CAP(buf[i]) = CAP(with[i])) DO INC(i) END;
 		RETURN with[i] = 0X

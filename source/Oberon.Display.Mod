@@ -34,7 +34,7 @@ CONST
 	unknown* = 0; index8* = 8; color555* = 16; color565* = 17; color664* = 18; color888* = 24; color8888* = 32;
 
 TYPE
-	Color* = LONGINT;
+	Color* = SIGNED32;
 
 	Pattern* = ADDRESS;
 	PatternPtr = POINTER TO RECORD
@@ -83,7 +83,7 @@ TYPE
 
 	SelectMsg* = RECORD (FrameMsg)	(** Selection control. *)
 		id*: SIGNED16;	(** get, set, reset. *)
-		time*: LONGINT;	(** Time of selection. *)
+		time*: SIGNED32;	(** Time of selection. *)
 		sel*: Frame;	(** Parent of selection. *)
 		obj*: Objects.Object	(** List of objects involved, linked with slink. *)
 	END;
@@ -97,7 +97,7 @@ TYPE
 	MsgProc* = PROCEDURE (VAR M: FrameMsg);
 
 VAR
-	Unit*: LONGINT; (** RasterUnit = Unit/36000 mm *)
+	Unit*: SIGNED32; (** RasterUnit = Unit/36000 mm *)
 
 	Left*, (** Left margin of black-and-white screen. *)
 	ColLeft*, (** Left margin of secondary display, often same as Left. *)
@@ -114,17 +114,17 @@ VAR
 	grey0*, grey1*, grey2*, ticks*, solid*: Pattern;	(** Simulated grey levels. *)
 	Broadcast*: MsgProc;	(** Message broadcast to all frames in the display space. *)
 
-	palette: ARRAY 256 OF LONGINT;
-	clipX1, clipY1, clipX2, clipY2: LONGINT;	(* bottom left corner & top right corner, in Oberon coordinates *)
+	palette: ARRAY 256 OF SIGNED32;
+	clipX1, clipY1, clipX2, clipY2: SIGNED32;	(* bottom left corner & top right corner, in Oberon coordinates *)
 	pattern: List;
 
 	buf: POINTER TO ARRAY OF CHAR;	(* for DisplayBlock *)
 
 	disp: Displays.Display;
-	height: LONGINT;
+	height: SIGNED32;
 
 (** Change color palette entry. 0 <= col, red, green, blue < 256. *)
-PROCEDURE SetColor*(col: Color; red, green, blue: LONGINT);
+PROCEDURE SetColor*(col: Color; red, green, blue: SIGNED32);
 BEGIN
 	palette[col] := ASH(ASH(red, 8) + green, 8) + blue
 END SetColor;
@@ -139,19 +139,19 @@ BEGIN
 END GetColor;
 
 (** Return color with specified components. 0 <= red, green, blue < 256. *)
-PROCEDURE RGB*(red, green, blue: LONGINT): Color;
+PROCEDURE RGB*(red, green, blue: SIGNED32): Color;
 BEGIN
-	RETURN MIN(LONGINT) + ASH(red, 16) + ASH(green, 8) + blue
+	RETURN MIN(SIGNED32) + ASH(red, 16) + ASH(green, 8) + blue
 END RGB;
 
 (** Returns the number of bits per pixel for the given x coordinate. Typical values are 1, 4, 8 (maximum 8). *)
-PROCEDURE Depth*(x: LONGINT): SIGNED16;
+PROCEDURE Depth*(x: SIGNED32): SIGNED16;
 BEGIN
 	RETURN 8
 END Depth;
 
 (** Returns if truecolor is supported. *)
-PROCEDURE TrueColor*(x: LONGINT): BOOLEAN;
+PROCEDURE TrueColor*(x: SIGNED32): BOOLEAN;
 BEGIN
 	RETURN TRUE
 END TrueColor;
@@ -164,14 +164,14 @@ BEGIN
 END GetClip;
 
 (** Set the new clipping rectangle. *)
-PROCEDURE SetClip*(x, y, w, h: LONGINT);
+PROCEDURE SetClip*(x, y, w, h: SIGNED32);
 BEGIN
 	clipX1 := x; clipY1 := y; clipX2 := clipX1+w-1;  clipY2 := clipY1+h-1
 END SetClip;
 
 (** Intersect with current clip rectangle resulting in a new clip rectangle. *)
-PROCEDURE AdjustClip*(x, y, w, h: LONGINT);
-VAR x2, y2: LONGINT;
+PROCEDURE AdjustClip*(x, y, w, h: SIGNED32);
+VAR x2, y2: SIGNED32;
 BEGIN
 	x2 := x + w - 1; y2 := y + h - 1;
 	IF x > clipX1 THEN clipX1 := x END;
@@ -187,14 +187,14 @@ BEGIN
 END ResetClip;
 
 (** Copy source block SX, SY, W, H to destination DX, DY using operation mode. A block is given by its lower left corner X, Y and its dimension W, H. *)
-PROCEDURE CopyBlock*(sx, sy, w, h, dx, dy, mode: LONGINT);
+PROCEDURE CopyBlock*(sx, sy, w, h, dx, dy, mode: SIGNED32);
 BEGIN
 	disp.Copy(sx, height-sy-h, w, h, dx, height-dy-h)
 END CopyBlock;
 
 (** Copy pattern pat in color col to x, y using operation mode. *)
-PROCEDURE CopyPattern*(col: Color;  pat: Pattern;  x, y, mode: LONGINT);
-VAR pw, ph, stride: LONGINT; p {UNTRACED}: PatternPtr;
+PROCEDURE CopyPattern*(col: Color;  pat: Pattern;  x, y, mode: SIGNED32);
+VAR pw, ph, stride: SIGNED32; p {UNTRACED}: PatternPtr;
 BEGIN
 	p := SYSTEM.VAL(PatternPtr, pat); pw := ORD(p.buf[0]); ph := ORD(p.buf[1]);
 	IF (x >= clipX1) & (y >= clipY1) & (x+pw-1 <= clipX2) & (y+ph-1 <= clipY2) THEN	(* completely visible *)
@@ -219,8 +219,8 @@ BEGIN
 END CopyPattern;
 
 (** Replicate pattern pat in color col into block x, y, w, h using operation mode, proceeding from left to right and from bottom to top, starting at lower left corner. The pattern origin is placed at px, py. *)
-PROCEDURE FillPattern*(col: Color; pat: Pattern; px, py, x, y, w, h, mode: LONGINT);
-VAR pw, ph, rdx, lpx, ldw, lsx, rdw, tdy, bpy, cdy, csy, cdh, cdx, csx, stride, fg, bg: LONGINT; p {UNTRACED}: PatternPtr;
+PROCEDURE FillPattern*(col: Color; pat: Pattern; px, py, x, y, w, h, mode: SIGNED32);
+VAR pw, ph, rdx, lpx, ldw, lsx, rdw, tdy, bpy, cdy, csy, cdh, cdx, csx, stride, fg, bg: SIGNED32; p {UNTRACED}: PatternPtr;
 BEGIN
 	rdx := x+w-1;  tdy := y+h-1;	(* (x,y) bottom left & (rdx,tdy) top right *)
 	IF (x <= clipX2) & (y <= clipY2) & (rdx >= clipX1) & (tdy >= clipY1) THEN
@@ -301,14 +301,14 @@ END FillPattern;
 *)
 
 (** Like FillPattern, but the pattern origin is placed at 0, 0. *)
-PROCEDURE ReplPattern*(col: Color; pat: Pattern; x, y, w, h, mode: LONGINT);
+PROCEDURE ReplPattern*(col: Color; pat: Pattern; x, y, w, h, mode: SIGNED32);
 BEGIN
 	FillPattern(col, pat, 0, 0, x, y, w, h, mode)
 END ReplPattern;
 
 (** Block fill in color col and operation mode. **)
-PROCEDURE ReplConst*(col: Color; x, y, w, h, mode: LONGINT);
-VAR rx, ty: LONGINT;
+PROCEDURE ReplConst*(col: Color; x, y, w, h, mode: SIGNED32);
+VAR rx, ty: SIGNED32;
 BEGIN
 	rx := x+w-1;  ty := y+h-1;	(* (x,y) bottom left & (rx,ty) top right *)
 	IF (x <= clipX2) & (y <= clipY2) & (rx >= clipX1) & (ty >= clipY1) THEN
@@ -328,7 +328,7 @@ BEGIN
 END ReplConst;
 
 (** Place a dot of color col in operation mode at x, y. Effect equivalent to ReplConst with a block of size 1, 1. *)
-PROCEDURE Dot*(col: Color; x, y, mode: LONGINT);
+PROCEDURE Dot*(col: Color; x, y, mode: SIGNED32);
 BEGIN
 	IF (x <= clipX2) & (y <= clipY2) & (x >= clipX1) & (y >= clipY1) THEN
 		IF col >= 0 THEN col := palette[col] END;
@@ -347,8 +347,8 @@ BEGIN
 END GetDim;
 
 (** Define a new pattern. *)
-PROCEDURE NewPattern*(w, h: LONGINT; VAR image: ARRAY OF SET): Pattern;
-VAR len, i: LONGINT; src, dest: ADDRESS; p: PatternPtr; pl: List;
+PROCEDURE NewPattern*(w, h: SIGNED32; VAR image: ARRAY OF SET): Pattern;
+VAR len, i: SIGNED32; src, dest: ADDRESS; p: PatternPtr; pl: List;
 BEGIN
 	len := (w+7) DIV 8;
 	SYSTEM.NEW(p, SIZEOF (ADDRESS) + len*h); p.buf[0] := CHR(w); p.buf[1] := CHR(h);
@@ -526,7 +526,7 @@ BEGIN
 END CreatePatterns;
 
 (** Return the format of a display region, for TransferBlock. *)
-PROCEDURE TransferFormat*(x: LONGINT): LONGINT;
+PROCEDURE TransferFormat*(x: SIGNED32): SIGNED32;
 BEGIN
 	CASE disp.format OF
 		Displays.index8: RETURN index8
@@ -538,8 +538,8 @@ BEGIN
 END TransferFormat;
 
 (** Transfer a block of pixels in display format to (mode = set) or from (mode = get)  the display.  Pixels in the rectangular area are transferred from bottom to top and left to right.  The pixels are transferred to or from buf, starting at ofs, and with line increment stride, which may be < 0. *)
-PROCEDURE TransferBlock*(VAR buf: ARRAY OF CHAR;  ofs, stride, x, y, w, h, mode: LONGINT);
-VAR rdx, tdy: LONGINT;
+PROCEDURE TransferBlock*(VAR buf: ARRAY OF CHAR;  ofs, stride, x, y, w, h, mode: SIGNED32);
+VAR rdx, tdy: SIGNED32;
 BEGIN
 	rdx := x+w-1;  tdy := y+h-1;	(* (x,y) bottom left & (rdx,tdy) top right *)
 	IF (x <= clipX2) & (y <= clipY2) & (rdx >= clipX1) & (tdy >= clipY1) THEN
@@ -554,7 +554,7 @@ BEGIN
 END TransferBlock;
 
 (** Change screen mode. *)
-PROCEDURE SetMode*(x: LONGINT; s: SET);
+PROCEDURE SetMode*(x: SIGNED32; s: SET);
 VAR p: Plugins.Plugin; t : Kernel.Timer;
 	res : WORD; msg : ARRAY 64 OF CHAR;
 	name : ARRAY 64 OF CHAR; context: Commands.Context;
@@ -591,8 +591,8 @@ BEGIN
 END SetMode;
 
 (** Display a picture.  Used internally by Pictures module only. *)
-PROCEDURE DisplayBlock*(adr: ADDRESS; dx, dy, w, h, sx, sy, mode: LONGINT; VAR palette: ARRAY OF LONGINT (* fof *));
-VAR pw, pd, rdx, tdy, col: LONGINT; src, dst: ADDRESS; ch, prev, prevmap: CHAR;
+PROCEDURE DisplayBlock*(adr: ADDRESS; dx, dy, w, h, sx, sy, mode: SIGNED32; VAR palette: ARRAY OF SIGNED32 (* fof *));
+VAR pw, pd, rdx, tdy, col: SIGNED32; src, dst: ADDRESS; ch, prev, prevmap: CHAR;
 BEGIN
 	rdx := sx+w-1;  tdy := sy+h-1;	(* (sx,sy) bottom left & (rdx,tdy) top right *)
 	IF (sx <= clipX2) & (sy <= clipY2) & (rdx >= clipX1) & (tdy >= clipY1) THEN
@@ -624,7 +624,7 @@ BEGIN
 						FOR tdy := 0 TO h-1 DO
 							FOR rdx := 0 TO w-1 DO
 								SYSTEM.GET(src, ch); INC(src); col := palette[ORD(ch)];
-								SYSTEM.PUT(dst, SHORT(SYSTEM.VAL(LONGINT,
+								SYSTEM.PUT(dst, SHORT(SYSTEM.VAL(SIGNED32,
 										SYSTEM.VAL(SET, ASH(col, 15-23)) * {11..15} +
 										SYSTEM.VAL(SET, ASH(col, 10-15)) * {5..10} +
 										SYSTEM.VAL(SET, ASH(col, 4-7)) * {0..4})));
@@ -652,7 +652,7 @@ BEGIN
 END DisplayBlock;
 
 (** Return address of display located at x, or 0 if not supported. *)
-PROCEDURE Map*(x: LONGINT): LONGINT;
+PROCEDURE Map*(x: SIGNED32): SIGNED32;
 BEGIN
 	RETURN 0
 END Map;

@@ -36,14 +36,14 @@ TYPE
 	AttributesBuf*=RECORD
 	 	attributes: POINTER TO ARRAY OF Texts.Attributes;
 		positions: POINTER TO ARRAY OF SIZE;
-		length: LONGINT;
+		length: SIGNED32;
 	END;
 
 	TextWriter* = OBJECT (Streams.Writer);
 	VAR text : Texts.Text;
-		ucs32buf : POINTER TO ARRAY OF LONGINT;
+		ucs32buf : POINTER TO ARRAY OF SIGNED32;
 		fontName : ARRAY 32 OF CHAR;
-		fontSize: SIZE; x, fontVOff : LONGINT; fontColor, fontBgColor: WMGraphics.Color;
+		fontSize: SIZE; x, fontVOff : SIGNED32; fontColor, fontBgColor: WMGraphics.Color;
 		fontStyle : SET;
 		currentAttributes- : Texts.Attributes;
 		oldBytes : ARRAY 7 OF CHAR;
@@ -122,7 +122,7 @@ TYPE
 		END Ln;
 
 		PROCEDURE SetAttributes*(attributes: Texts.Attributes);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 		BEGIN
 			IF attributesBuf.length = LEN(attributesBuf.attributes) THEN Update(); END;
 			i := attributesBuf.length;
@@ -145,7 +145,7 @@ TYPE
 			SetAttributes(NewAttributes());
 		END SetFontName;
 
-		PROCEDURE SetFontSize* (size : LONGINT);
+		PROCEDURE SetFontSize* (size : SIGNED32);
 		BEGIN
 			fontSize := size;
 			SetAttributes(NewAttributes());
@@ -163,13 +163,13 @@ TYPE
 			SetAttributes(NewAttributes());
 		END SetFontColor;
 
-		PROCEDURE SetBgColor* (bgColor : LONGINT);
+		PROCEDURE SetBgColor* (bgColor : SIGNED32);
 		BEGIN
 			fontBgColor := bgColor;
 			SetAttributes(NewAttributes());
 		END SetBgColor;
 
-		PROCEDURE SetVerticalOffset* (voff : LONGINT);
+		PROCEDURE SetVerticalOffset* (voff : SIGNED32);
 		BEGIN
 			fontVOff := voff;
 			SetAttributes(NewAttributes());
@@ -190,7 +190,7 @@ TYPE
 	TextReader* = OBJECT (Streams.Reader)
 	VAR
 		reader: Texts.TextReader;
-		remainder: LONGINT;
+		remainder: SIGNED32;
 
 		PROCEDURE &Init*(text : Texts.Text);
 		BEGIN
@@ -200,7 +200,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Receive (VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD);
-		VAR ucs32: LONGINT; prevofs, offs: SIZE;
+		VAR ucs32: SIGNED32; prevofs, offs: SIZE;
 		BEGIN
 			reader.text.AcquireRead;
 			len := 0; res := Streams.Ok;
@@ -375,15 +375,15 @@ TYPE
 			errors := TRUE
 		END Error;
 
-		PROCEDURE LoadLibrary(buf: Strings.Buffer; pos: SIZE; VARflen:LONGINT);
+		PROCEDURE LoadLibrary(buf: Strings.Buffer; pos: SIZE; VARflen:SIGNED32);
 		END LoadLibrary;
 
-		PROCEDURE IndexToColor(index: LONGINT): LONGINT;
+		PROCEDURE IndexToColor(index: SIGNED32): SIGNED32;
 		BEGIN
 			RETURN
-					ASH(SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, index) * {5..7}), 23-7) +
-					ASH(SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, index) * {2..4}), 15-4) +
-					ASH(SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, index) * {0..1}), 7-1)
+					ASH(SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, index) * {5..7}), 23-7) +
+					ASH(SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, index) * {2..4}), 15-4) +
+					ASH(SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, index) * {0..1}), 7-1)
 		END IndexToColor;
 
 		PROCEDURE InsertPiece(ofs, len : SIZE; attr : Texts.Attributes);
@@ -421,13 +421,13 @@ TYPE
 			voff: SIGNED8;
 			lib :SIGNED8;
 			type, tag: CHAR;
-			len, hlen, tlen, flen: LONGINT;
+			len, hlen, tlen, flen: SIGNED32;
 			n, off: SIZE;
 			tempInt, pos: Streams.Position;
 			x, y, w, h: SIGNED16;
 			temp: ARRAY 4096 OF CHAR;
 			name, lName: ARRAY 32 OF CHAR;
-			oberonColors : ARRAY 16 OF LONGINT;
+			oberonColors : ARRAY 16 OF SIGNED32;
 		BEGIN
 			errors := FALSE;
 			res := -1;
@@ -442,10 +442,10 @@ TYPE
 			UNTIL (in.res # Streams.Ok);
 
 			(* define Oberon Colors *)
-			oberonColors[0] := LONGINT(0FFFFFFFFH); oberonColors[1] := LONGINT(0FF0000FFH); oberonColors[2] := 000FF00FFH; oberonColors[3] := 00000FFFFH;
-			oberonColors[4] := LONGINT(0FF00FFFFH); oberonColors[5] := LONGINT(0FFFF00FFH); oberonColors[6] := 000FFFFFFH; oberonColors[7] := LONGINT(0AA0000FFH);
-			oberonColors[8] := 000AA00FFH; oberonColors[9] := 00000AAFFH; oberonColors[10] := LONGINT(0A6BCF3FFH); oberonColors[11] := 0008282FFH;
-			oberonColors[12] := LONGINT(08A8A8AFFH); oberonColors[13] := LONGINT(0BEBEBEFFH); oberonColors[14] := 07B7B7BFFH; oberonColors[15] := 0000000FFH;
+			oberonColors[0] := SIGNED32(0FFFFFFFFH); oberonColors[1] := SIGNED32(0FF0000FFH); oberonColors[2] := 000FF00FFH; oberonColors[3] := 00000FFFFH;
+			oberonColors[4] := SIGNED32(0FF00FFFFH); oberonColors[5] := SIGNED32(0FFFF00FFH); oberonColors[6] := 000FFFFFFH; oberonColors[7] := SIGNED32(0AA0000FFH);
+			oberonColors[8] := 000AA00FFH; oberonColors[9] := 00000AAFFH; oberonColors[10] := SIGNED32(0A6BCF3FFH); oberonColors[11] := 0008282FFH;
+			oberonColors[12] := SIGNED32(08A8A8AFFH); oberonColors[13] := SIGNED32(0BEBEBEFFH); oberonColors[14] := 07B7B7BFFH; oberonColors[15] := 0000000FFH;
 
 			NEW(text);
 			text.AcquireWrite;
@@ -532,8 +532,8 @@ TYPE
 		END GetText;
 
 		(* map oberon to unicode *)
-		PROCEDURE OberonToUni(ch : LONGINT) : LONGINT;
-		VAR ret : LONGINT;
+		PROCEDURE OberonToUni(ch : SIGNED32) : SIGNED32;
+		VAR ret : SIGNED32;
 		BEGIN
 			CASE ch OF
 				128 :	ret := 0C4H;
@@ -578,13 +578,13 @@ TYPE
 		w2: Streams.StringWriter;
 		string: Strings.String;
 		buffer : Strings.Buffer;
-		oberonColors : ARRAY 16 OF LONGINT;
+		oberonColors : ARRAY 16 OF SIGNED32;
 		fonts : ARRAY 256 OF Texts.FontInfo;
 		font : Texts.FontInfo;
-		nofFonts, hLen : LONGINT;
+		nofFonts, hLen : SIGNED32;
 		firstPiece : BOOLEAN;
-		voff: LONGINT;
-		color : LONGINT;
+		voff: SIGNED32;
+		color : SIGNED32;
 
 		PROCEDURE Open*(out : Streams.Writer);
 		BEGIN
@@ -593,16 +593,16 @@ TYPE
 			END;
 		END Open;
 
-		PROCEDURE ColorToIndex(col: LONGINT): LONGINT;
+		PROCEDURE ColorToIndex(col: SIGNED32): SIGNED32;
 		BEGIN
-			RETURN SYSTEM.VAL(LONGINT,
+			RETURN SYSTEM.VAL(SIGNED32,
 					SYSTEM.VAL(SET, ASH(col, 7-23)) * {5..7} +
 					SYSTEM.VAL(SET, ASH(col, 4-15)) * {2..4} +
 					SYSTEM.VAL(SET, ASH(col, 1-7)) * {0..1})
 		END ColorToIndex;
 
-		PROCEDURE GetOberonColor(color : LONGINT):LONGINT;
-		VAR i: LONGINT;
+		PROCEDURE GetOberonColor(color : SIGNED32):SIGNED32;
+		VAR i: SIGNED32;
 		BEGIN
 			i := 0; WHILE i < LEN(oberonColors) DO IF oberonColors[i] = color THEN RETURN i END; INC(i) END;
 			RETURN ColorToIndex(color DIV 100H)
@@ -640,7 +640,7 @@ TYPE
 			firstPiece := FALSE;
 			w.RawSInt(SHORT(SHORT(GetOberonColor(color))));
 			w.RawSInt(SHORT(SHORT(-voff)));
-			w.RawLInt(len(LONGINT));
+			w.RawLInt(len(SIGNED32));
 		END WritePiece;
 
 		PROCEDURE WriteText*(text : Texts.Text; VAR res : WORD);
@@ -651,10 +651,10 @@ TYPE
 			tempInt: Streams.Position;
 		BEGIN
 			(* define Oberon colors *)
-			oberonColors[0] := LONGINT(0FFFFFFFFH); oberonColors[1] := LONGINT(0FF0000FFH); oberonColors[2] := 000FF00FFH; oberonColors[3] := 00000FFFFH;
-			oberonColors[4] := LONGINT(0FF00FFFFH); oberonColors[5] := LONGINT(0FFFF00FFH); oberonColors[6] := 000FFFFFFH; oberonColors[7] := LONGINT(0AA0000FFH);
-			oberonColors[8] := 000AA00FFH; oberonColors[9] := 00000AAFFH; oberonColors[10] := LONGINT(0A6BCF3FFH); oberonColors[11] := 0008282FFH;
-			oberonColors[12] := LONGINT(08A8A8AFFH); oberonColors[13] := LONGINT(0BEBEBEFFH); oberonColors[14] := 07B7B7BFFH; oberonColors[15] := 0000000FFH;
+			oberonColors[0] := SIGNED32(0FFFFFFFFH); oberonColors[1] := SIGNED32(0FF0000FFH); oberonColors[2] := 000FF00FFH; oberonColors[3] := 00000FFFFH;
+			oberonColors[4] := SIGNED32(0FF00FFFFH); oberonColors[5] := SIGNED32(0FFFF00FFH); oberonColors[6] := 000FFFFFFH; oberonColors[7] := SIGNED32(0AA0000FFH);
+			oberonColors[8] := 000AA00FFH; oberonColors[9] := 00000AAFFH; oberonColors[10] := SIGNED32(0A6BCF3FFH); oberonColors[11] := 0008282FFH;
+			oberonColors[12] := SIGNED32(08A8A8AFFH); oberonColors[13] := SIGNED32(0BEBEBEFFH); oberonColors[14] := 07B7B7BFFH; oberonColors[15] := 0000000FFH;
 
 			res := -1;
 			text.AcquireRead;
@@ -682,9 +682,9 @@ TYPE
 			UNTIL r.eot;
 			WritePiece(len + 1 - startPos);
 			w.Char(0X); (* ??? *)
-			w.RawLInt(len(LONGINT)); (* tLen ? *)
+			w.RawLInt(len(SIGNED32)); (* tLen ? *)
 			w.Update;
-			hLen := w.Pos()(LONGINT);
+			hLen := w.Pos()(SIGNED32);
 
 			(* pure text ... *)
 			r.SetPosition(0);
@@ -712,8 +712,8 @@ TYPE
 		END WriteText;
 
 		(* map unicode to oberon *)
-		PROCEDURE UniToOberon(ch : LONGINT) : LONGINT;
-		VAR ret : LONGINT;
+		PROCEDURE UniToOberon(ch : SIGNED32) : SIGNED32;
+		VAR ret : SIGNED32;
 		BEGIN
 			CASE ch OF
 				0C4H :	 ret := 128;
@@ -783,7 +783,7 @@ TYPE
 		VAR i, m: SIZE; tpos: SIZE; res : WORD; ch, last : Texts.Char32; tempUCS32 : ARRAY 1024 OF Texts.Char32;
 			oldpos, len : SIZE;
 			r, sr : Streams.StringReader; token : ARRAY 256 OF CHAR;
-			tempInt: LONGINT;
+			tempInt: SIGNED32;
 			buffer : Strings.String;
 			char : CHAR;
 			cStyle : Texts.CharacterStyle;
@@ -824,10 +824,10 @@ TYPE
 			ELSIF (stylename = "Highlight") THEN attr.fontInfo.style := {1};
 			ELSIF (stylename = "Assertion") THEN attr.fontInfo.style := {0}; attr.color := 00000FFFFH;
 			ELSIF (stylename = "Debug") THEN attr.color := 00000FFFFH;
-			ELSIF (stylename = "Lock") THEN attr.color := LONGINT(0FF00FFFFH);
-			ELSIF (stylename = "Stupid") THEN attr.color := LONGINT(0FF0000FFH);
-			ELSIF (stylename = "Comment") THEN attr.color := LONGINT(0808080FFH);
-			ELSIF (stylename = "Preferred") THEN attr.fontInfo.style := {0}; attr.color := LONGINT(0800080FFH);
+			ELSIF (stylename = "Lock") THEN attr.color := SIGNED32(0FF00FFFFH);
+			ELSIF (stylename = "Stupid") THEN attr.color := SIGNED32(0FF0000FFH);
+			ELSIF (stylename = "Comment") THEN attr.color := SIGNED32(0808080FFH);
+			ELSIF (stylename = "Preferred") THEN attr.fontInfo.style := {0}; attr.color := SIGNED32(0800080FFH);
 			ELSIF Strings.Match("AdHoc*", stylename) THEN
 				NEW(sr, LEN(stylename)); sr.Set(stylename);
 				sr.SkipWhitespace; sr.Token(token);												(* AdHoc *)
@@ -1020,10 +1020,10 @@ TYPE
 		(* Attributes attributes *)
 		family, dfFamily : ARRAY 64 OF CHAR;
 		size, dfSize : SIZE;
-		style, dfStyle : LONGINT;							(* 0 = regular; 1 = bold; 2 = italic; 3 = bold-italic *)
-		voff, dfVoff : LONGINT;
-		color, dfColor : LONGINT;
-		bgcolor, dfBgcolor : LONGINT;
+		style, dfStyle : SIGNED32;							(* 0 = regular; 1 = bold; 2 = italic; 3 = bold-italic *)
+		voff, dfVoff : SIGNED32;
+		color, dfColor : SIGNED32;
+		bgcolor, dfBgcolor : SIGNED32;
 
 		(* Set the default  attribute values *)
 		PROCEDURE Init;
@@ -1116,7 +1116,7 @@ TYPE
 
 		(* Return TRUE if current textreader attributes don't match the chached one *)
 		PROCEDURE CompareAttributes():BOOLEAN;
-		VAR tempstyle: LONGINT;
+		VAR tempstyle: SIGNED32;
 			isEqual : BOOLEAN;
 		BEGIN
 			IF (link = r.link) THEN
@@ -1326,7 +1326,7 @@ TYPE
 		END Error;
 
 		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
-		VAR i, m: LONGINT;
+		VAR i, m: SIGNED32;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ch, last : Texts.Char32;
 		BEGIN
@@ -1408,7 +1408,7 @@ TYPE
 		END Error;
 
 		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
-		VAR i, m: LONGINT;
+		VAR i, m: SIGNED32;
 			tempUCS32 : ARRAY 1024 OF Char32;
 			ch, last : CHAR;
 		BEGIN
@@ -1695,8 +1695,8 @@ BEGIN
 END CountWhitespace;
 
 (** Procedure to load File without explicit given Format - appropriate Format will be chosen automaticaly *)
-PROCEDURE LoadAuto*(text: Text; CONST fileName: ARRAY OF CHAR; VAR format: LONGINT; VAR res: WORD);
-VAR f : Files.File; re : Files.Reader; ri: Files.Rider; ch: CHAR; fstring: ARRAY 64 OF CHAR; i: LONGINT;
+PROCEDURE LoadAuto*(text: Text; CONST fileName: ARRAY OF CHAR; VAR format: SIGNED32; VAR res: WORD);
+VAR f : Files.File; re : Files.Reader; ri: Files.Rider; ch: CHAR; fstring: ARRAY 64 OF CHAR; i: SIGNED32;
 BEGIN
 	(* KernelLog.String("Auto Format.... "); KernelLog.Ln; *)
 	text.AcquireWrite;
@@ -1739,7 +1739,7 @@ END LoadAuto;
 
 (** Procedure to get decoder for the given file - appropriate Format will be chosen automaticaly *)
 PROCEDURE DecodeAuto*( CONST fileName: ARRAY OF CHAR; VAR format: ARRAY OF CHAR): Codecs.TextDecoder;
-VAR reader : Streams.Reader; decoder : Codecs.TextDecoder; fstring : ARRAY 64 OF CHAR; i : LONGINT;
+VAR reader : Streams.Reader; decoder : Codecs.TextDecoder; fstring : ARRAY 64 OF CHAR; i : SIGNED32;
 BEGIN
 	reader := Codecs.OpenInputStream(fileName);
 	IF (reader # NIL) THEN
@@ -1810,7 +1810,7 @@ END LoadUTF8;
 (** import text in UCS16 format *)
 PROCEDURE LoadUCS16*(text : Text; CONST filename : ARRAY OF CHAR; VAR res : WORD);
 VAR f : Files.File; r : Files.Reader;
-	 i, m  : LONGINT;
+	 i, m  : SIGNED32;
 	tempUCS32 : ARRAY 1024 OF Char32;
 	ch, last : Char32; tc1, tc2 : CHAR;
 BEGIN
@@ -1992,7 +1992,7 @@ END SubTextToStr;
 (** insert utf8 string into text *)
 PROCEDURE StrToText*(text : Text; pos : SIZE; CONST string : ARRAY OF CHAR);
 VAR r : Streams.StringReader;
-	i, m: LONGINT;
+	i, m: SIGNED32;
 	tempUCS32 : ARRAY 1024 OF Char32;
 	ch, last : Texts.Char32;
 BEGIN
@@ -2126,7 +2126,7 @@ END Convert;
 
 PROCEDURE ConvertAll*(context : Commands.Context);
 VAR enumerator : Files.Enumerator;
-	filename : Files.FileName; flags : SET; time, date : LONGINT; size: Files.Size;
+	filename : Files.FileName; flags : SET; time, date : SIGNED32; size: Files.Size;
 BEGIN
 	NEW(enumerator);
 	enumerator.Open("", {});
@@ -2227,9 +2227,9 @@ END UCS32StrLength;
 (* efficiency could be improved by not seeking so much *)
 PROCEDURE Pos*(CONST pattern: ARRAY OF Char32; from : SIZE; text : Text): SIZE;
 CONST
-	q = 8204957;	(* prime number, {(d+1) * q <= MAX(LONGINT)} *)
+	q = 8204957;	(* prime number, {(d+1) * q <= MAX(SIGNED32)} *)
 	d = 256;			(* number of different characters *)
-VAR h1, h2, dM: LONGINT; i, j, m, n: SIZE; ch : Char32; found : BOOLEAN; r : Texts.TextReader;
+VAR h1, h2, dM: SIGNED32; i, j, m, n: SIZE; ch : Char32; found : BOOLEAN; r : Texts.TextReader;
 BEGIN (* caller must hold read lock on text *)
 	m := UCS32StrLength(pattern); n := text.GetLength();
 	IF (from + m > n) THEN RETURN -1 END;
@@ -2272,7 +2272,7 @@ END Pos;
 
 PROCEDURE UpperCaseChar32*(VAR ch : Texts.Char32);
 BEGIN
-	(* LONGINT version of IF (ch >= "a") & (ch <= "z") THEN CAP(ch); END; *)
+	(* SIGNED32 version of IF (ch >= "a") & (ch <= "z") THEN CAP(ch); END; *)
 	IF (ch >= 61H) & (ch <= 7AH) THEN ch := ch - 32; END;
 END UpperCaseChar32;
 
@@ -2296,9 +2296,9 @@ END Equals;
  *)
 PROCEDURE GenericPos*(CONST pattern: ARRAY OF Char32; from : SIZE; text : Text; ignoreCase, backwards : BOOLEAN): SIZE;
 CONST
-	q = 8204957;	(* prime number, {(d+1) * q <= MAX(LONGINT)} *)
+	q = 8204957;	(* prime number, {(d+1) * q <= MAX(SIGNED32)} *)
 	d = 256;			(* number of different characters *)
-VAR h1, h2, dM: LONGINT; i, patternLength, stringLength: SIZE; ch : Char32; found : BOOLEAN; r : Texts.TextReader;
+VAR h1, h2, dM: SIGNED32; i, patternLength, stringLength: SIZE; ch : Char32; found : BOOLEAN; r : Texts.TextReader;
 BEGIN (* caller must hold read lock on text *)
 	patternLength := UCS32StrLength(pattern); stringLength := text.GetLength();
 
@@ -2546,8 +2546,8 @@ END SetClipboard;
 
 PROCEDURE GetTextReader* (CONST filename: ARRAY OF CHAR): Streams.Reader;
 VAR
-	file: Files.File; fileReader: Files.Reader; offset: LONGINT;
-	text: Text; format: LONGINT; res: WORD; textReader: TextReader;
+	file: Files.File; fileReader: Files.Reader; offset: SIGNED32;
+	text: Text; format: SIGNED32; res: WORD; textReader: TextReader;
 BEGIN
 	(* Optimisation: skip header of oberon files and return a file reader instead of default text reader*)
 	file := Files.Old (filename);

@@ -19,7 +19,7 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
 	PROCEDURE OpenScanner(VAR S: Texts.Scanner);
 		VAR
 			text: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 	BEGIN
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 		Texts.Scan(S);
@@ -30,7 +30,7 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
 		END
 	END OpenScanner;
 
-	PROCEDURE Count(name: ARRAY OF CHAR; VAR nofLines: LONGINT; what: CHAR);
+	PROCEDURE Count(name: ARRAY OF CHAR; VAR nofLines: SIGNED32; what: CHAR);
 		VAR T: Texts.Text; R: Texts.Reader; ch: CHAR;
   BEGIN
 		Texts.WriteString(W, name); Texts.Write(W, Strings.Tab);
@@ -54,7 +54,7 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
 	PROCEDURE CountLines*;	(** non-portable *)
 		VAR
 			S: Texts.Scanner; T: Texts.Text;
-			nofLines, totalLines, beg, end, time: LONGINT;
+			nofLines, totalLines, beg, end, time: SIGNED32;
 			what: CHAR;
 	BEGIN
 		totalLines := 0; what := Strings.CR;
@@ -90,9 +90,9 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
 		END
 	END CountLines;
 
-	PROCEDURE GetSize (VAR name: ARRAY OF CHAR; VAR varSize: LONGINT;
-		VAR constSize: LONGINT; VAR codeSize: LONGINT; T: Texts.Text);
-		VAR f: Files.File; R: Files.Rider; x: SIGNED16; ch1, ch2: CHAR;  size: LONGINT;
+	PROCEDURE GetSize (VAR name: ARRAY OF CHAR; VAR varSize: SIGNED32;
+		VAR constSize: SIGNED32; VAR codeSize: SIGNED32; T: Texts.Text);
+		VAR f: Files.File; R: Files.Rider; x: SIGNED16; ch1, ch2: CHAR;  size: SIGNED32;
 	BEGIN
 		Texts.WriteString(W, name);  Texts.Append(T, W.buf);
 		varSize := 0;  constSize := 0;  codeSize := 0;
@@ -123,8 +123,8 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
       S: Texts.Scanner;
       T: Texts.Text;
       constSize, codeSize,
-      varSize, totalConstSize, totalVarSize, totalCodeSize: LONGINT;
-      beg, end, time: LONGINT;
+      varSize, totalConstSize, totalVarSize, totalCodeSize: SIGNED32;
+      beg, end, time: SIGNED32;
   BEGIN
     NEW(T); Texts.Open(T, "");
     Oberon.OpenText("ObjSize", T, 380, 300);
@@ -377,7 +377,7 @@ MODULE Miscellaneous IN Oberon;	(** portable, except where noted *) (*JG 20.5.94
 
 (** Copy the specified file "File" into subfiles named "File0", "File1" etc., maximally 700k each *)
   PROCEDURE SplitFile*;
-    VAR S: Texts.Scanner; f, g: Files.File; Rf, Rg: Files.Rider; i: SIGNED16; n: LONGINT; ch: CHAR;
+    VAR S: Texts.Scanner; f, g: Files.File; Rf, Rg: Files.Rider; i: SIGNED16; n: SIGNED32; ch: CHAR;
       name: ARRAY 32 OF CHAR;
   BEGIN
     OpenScanner(S);
@@ -418,7 +418,7 @@ PROCEDURE ShowMod*;
 		S: Texts.Scanner;
 		T: Texts.Text;
 		file, name, prefixes, prefix: FileName;
-		i, j: LONGINT;
+		i, j: SIGNED32;
 	PROCEDURE Try;
 	BEGIN
 		COPY(prefix, file); Strings.Append(file, name);
@@ -469,7 +469,7 @@ END ShowMod;
 
 PROCEDURE EqualFiles(f1, f2: Files.File): BOOLEAN;
 CONST BufSize = 16384;
-VAR r1, r2: Files.Rider; i, len: LONGINT; buf1, buf2: ARRAY BufSize OF CHAR;
+VAR r1, r2: Files.Rider; i, len: SIGNED32; buf1, buf2: ARRAY BufSize OF CHAR;
 BEGIN
 	IF Files.Length(f1) = Files.Length(f2) THEN
 		Files.Set(r1, f1, 0); Files.Set(r2, f2, 0);

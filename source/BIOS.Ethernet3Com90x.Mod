@@ -34,7 +34,7 @@ CONST
 	MaxPkt = 1514;
 	MTU = MaxPkt-14;
 
-	EarlyThresh = MAX(LONGINT);
+	EarlyThresh = MAX(SIGNED32);
 
 	ReceiveBuffers = 128;
 
@@ -59,49 +59,49 @@ TYPE
 	DPD = POINTER TO RECORD	(* p. 6-1 *)
 		(* dummy : CHAR; may be used for padding, next field must be aligned at multiplee of 8 bytes  *)
 			(* start fixed-layout *)
-		nextPhysAdr: LONGINT;	(* 00H *)
+		nextPhysAdr: SIGNED32;	(* 00H *)
 		status: SET;	(* 04 *)
 		frag: ARRAY 5 OF RECORD
-			dataPhysAdr: LONGINT;	(* 08H, 10H, 18H, 20H, 28H *)
-			dataLen: LONGINT	(* 0CH, 14H, 1CH, 24H, 2CH *)
+			dataPhysAdr: SIGNED32;	(* 08H, 10H, 18H, 20H, 28H *)
+			dataLen: SIGNED32	(* 0CH, 14H, 1CH, 24H, 2CH *)
 		END;
 		dst, src: ARRAY 6 OF CHAR;
 		type: SIGNED16;
 			(* end fixed-layout *)
-		physAdr: LONGINT;	(* assume physical address of dpd^ will not change *)
+		physAdr: SIGNED32;	(* assume physical address of dpd^ will not change *)
 	END;
 
 	UPD = POINTER TO RECORD	(* p. 7-1 *)
 		 (* dummy : CHAR; may be used for padding, next field must be aligned at multiplee of 8 bytes  *)
 			(* start fixed-layout *)
-		nextPhysAdr: LONGINT;	(* 00H *)
+		nextPhysAdr: SIGNED32;	(* 00H *)
 		status: SET;	(* 04 *)
 		frag: ARRAY 3 OF RECORD
-			dataPhysAdr: LONGINT;	(* 08H, 10H, 18H *)
-			dataLen: LONGINT	(* 0CH, 14H, 1CH *)
+			dataPhysAdr: SIGNED32;	(* 08H, 10H, 18H *)
+			dataLen: SIGNED32	(* 0CH, 14H, 1CH *)
 		END;
 		dst, src: ARRAY 6 OF CHAR;
 		type: SIGNED16;
 			(* end fixed-layout *)
-		physAdr: LONGINT;	(* assume physical address of upd^ will not change *)
+		physAdr: SIGNED32;	(* assume physical address of upd^ will not change *)
 		buffer: Network.Buffer;
 		next: UPD;
 	END;
 
 VAR
-	installed: LONGINT;	(* number of installed devices *)
+	installed: SIGNED32;	(* number of installed devices *)
 	NdnTxReclaimError, NdnTxStatusOverflow, NdnMaxCollisions, NdnTxUnderrun, NdnTxJabber, NnewRetry,
 		NspuriousComplete, NupOverrun, NupRuntFrame, NupAlignmentError, NupCrcError, NupOversizedFrame,
 		NupOverflow, NbadSize, Ninterrupt, NintHostError, NintTxComplete, NintRxEarly, NintRequested,
 		NintUpdateStats, NintLinkEvent, NintDnComplete, NintUpComplete, NstatCarrierLost,
 		NstatSqeErrors, NstatMultipleCollisions, NstatSingleCollisions, NstatLateCollisions, NstatRxOverruns,
 		NstatFramesXmittedOk, NstatFramesRcvdOk, NstatFramesDeferred, NstatBytesRcvdOk,
-		NstatBytesXmittedOk, NstatBadSSD, NupCompleteLoops, NsendTimeouts: LONGINT;
+		NstatBytesXmittedOk, NstatBadSSD, NupCompleteLoops, NsendTimeouts: SIGNED32;
 
 TYPE
 	Timer = OBJECT (Kernel.Timer)
 		VAR
-			ms: LONGINT;
+			ms: SIGNED32;
 			c: Controller;
 			quit: BOOLEAN;
 
@@ -120,20 +120,20 @@ TYPE
 
 	Controller* = OBJECT
 		VAR
-			base, irq*: LONGINT;
+			base, irq*: SIGNED32;
 			dev: LinkDevice;
 			flags: SET;
-			model: LONGINT;
+			model: SIGNED32;
 			media: SET;
 			dpd: DPD;
 			upd: UPD;
 
-			bus, pdev, fct: LONGINT;
+			bus, pdev, fct: SIGNED32;
 			interrupted: BOOLEAN;
 			timer: Timer;
 
 		PROCEDURE HandleInterrupt;
-		VAR type, len: LONGINT; status: SET; int: SIGNED16; ch: CHAR; buf: Network.Buffer;
+		VAR type, len: SIGNED32; status: SET; int: SIGNED16; ch: CHAR; buf: Network.Buffer;
 		BEGIN
 			interrupted := TRUE;
 			Machine.AtomicInc(Ninterrupt);
@@ -189,7 +189,7 @@ TYPE
 					REPEAT
 						Machine.AtomicInc(NupCompleteLoops);
 						IF upd.status * {14,16..20,24} = {} THEN	(* no error *)
-							len := SYSTEM.VAL(LONGINT, upd.status * {0..12}) - 14;
+							len := SYSTEM.VAL(SIGNED32, upd.status * {0..12}) - 14;
 							IF (len >= 60-14) & (len <= MTU) THEN
 								buf := upd.buffer;
 								IF buf # NIL THEN
@@ -227,14 +227,14 @@ TYPE
 			END;
 			IF status * {0, 5, 6, 9, 10} # {} THEN
 				Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, SHORT(6800H +
-						SYSTEM.VAL(LONGINT, status * {0, 5, 6, 9, 10}))))	(* AcknowledgeInterrupt 10 (p. 10-9) *)
+						SYSTEM.VAL(SIGNED32, status * {0, 5, 6, 9, 10}))))	(* AcknowledgeInterrupt 10 (p. 10-9) *)
 			END
 		END HandleInterrupt;
 
 		(* Initialize the controller. *)
 
-		PROCEDURE &Init*(dev: LinkDevice; base, irq, model: LONGINT; flags, media: SET);
-		VAR res: WORD; i: LONGINT;
+		PROCEDURE &Init*(dev: LinkDevice; base, irq, model: SIGNED32; flags, media: SET);
+		VAR res: WORD; i: SIGNED32;
 		BEGIN
 			SELF.interrupted := FALSE;
 			SELF.base := base; SELF.irq := irq;  SELF.dev := dev; SELF.model := model; SELF.media := media;
@@ -296,19 +296,19 @@ TYPE
 			hdr: ARRAY Network.MaxPacketSize OF CHAR; (* internal buffer for eventual header copy in DoSend *)
 			ctrl*: Controller;
 
-		PROCEDURE DoSend(dst: Network.LinkAdr; type: LONGINT; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: LONGINT);
+		PROCEDURE DoSend(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR; h3len, h4len, dofs, dlen: SIGNED32);
 		VAR
 			dpd: DPD;
 			t: Kernel.MilliTimer;
-			h3n, h4n, dn, hn, hlen, len, base, i: LONGINT;
+			h3n, h4n, dn, hn, hlen, len, base, i: SIGNED32;
 			h3phys, h4phys, dphys, hphys: MemRangeArray;
 
-			PROCEDURE PutToDPD(n: LONGINT; VAR phys: MemRangeArray);
-			VAR j: LONGINT;
+			PROCEDURE PutToDPD(n: SIGNED32; VAR phys: MemRangeArray);
+			VAR j: SIGNED32;
 			BEGIN
 				FOR j := 0 TO n-1 DO
 					dpd.frag[i].dataPhysAdr := phys[j].adr(Machine.Address32);
-					dpd.frag[i].dataLen := phys[j].size(LONGINT);
+					dpd.frag[i].dataLen := phys[j].size(SIGNED32);
 					INC(i);
 				END;
 			END PutToDPD;
@@ -351,7 +351,7 @@ TYPE
 			(* put data *)
 			PutToDPD(dn, dphys);
 			(* set "end" marker *)
-			INC(dpd.frag[i-1].dataLen, LONGINT(80000000H));
+			INC(dpd.frag[i-1].dataLen, SIGNED32(80000000H));
 
 			len := h3len + h4len + len +14;	(* now len is total packet length including headers *)
 			ASSERT((len >= 14) & (len <= MaxPkt));	(* packet size *)
@@ -378,7 +378,7 @@ TYPE
 
 (* Change to the specified register window. *)
 
-PROCEDURE SetWindow(base, window: LONGINT);
+PROCEDURE SetWindow(base, window: SIGNED32);
 BEGIN
 	ASSERT((0 <= window) & (window <= 7));
 	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, SHORT(800H + window)))
@@ -386,7 +386,7 @@ END SetWindow;
 
 (* Read a 16-bit value from the EEPROM (chapter 5). *)
 
-PROCEDURE ReadConfig(base, reg: LONGINT; flags: SET; VAR word: SIGNED16);
+PROCEDURE ReadConfig(base, reg: SIGNED32; flags: SET; VAR word: SIGNED16);
 VAR x: SIGNED16;
 BEGIN
 	ASSERT((0 <= reg) & (reg < 64));
@@ -402,7 +402,7 @@ END ReadConfig;
 (* Initialize the local address. *)
 
 PROCEDURE InitAddress(d: LinkDevice);
-VAR base, i: LONGINT; flags: SET; word: ARRAY 3 OF SIGNED16;
+VAR base, i: SIGNED32; flags: SET; word: ARRAY 3 OF SIGNED16;
 BEGIN
 	base := d.ctrl.base;
 	flags := d.ctrl.flags;
@@ -422,7 +422,7 @@ END InitAddress;
 
 (* Get the specified setting for the NIC currently being initialized (indexed by "installed"). *)
 
-PROCEDURE GetSetting(s: ARRAY OF CHAR): LONGINT;
+PROCEDURE GetSetting(s: ARRAY OF CHAR): SIGNED32;
 VAR i: SIZE; name, val: ARRAY 32 OF CHAR;
 BEGIN
 	i := 0; WHILE s[i] # 0X DO name[i] := s[i]; INC(i) END;
@@ -438,21 +438,21 @@ END GetSetting;
 (* Initialize the communication interface. *)
 
 PROCEDURE InitInterface(ctrl: Controller);
-VAR config: SET; base, media: LONGINT;
+VAR config: SET; base, media: SIGNED32;
 BEGIN
 	base := ctrl.base;
 	SetWindow(base, 3);
-	Machine.Portin32(base, SYSTEM.VAL (LONGINT, config));	(* InternalConfig (p. 4-9) *)
+	Machine.Portin32(base, SYSTEM.VAL (SIGNED32, config));	(* InternalConfig (p. 4-9) *)
 	media := GetSetting("3C90xMedia");
 	IF media # 0 THEN
 		ASSERT((media >= 1) & (media <= 9));
 		ctrl.media := SYSTEM.VAL(SET, LSH(media-1, 20)) * MediaMask;
-		Machine.Portout32(base, SYSTEM.VAL (LONGINT, config - MediaMask + ctrl.media))
+		Machine.Portout32(base, SYSTEM.VAL (SIGNED32, config - MediaMask + ctrl.media))
 	ELSIF ~(24 IN config) THEN
 		ctrl.media := config * MediaMask	(* autoselect off, no changes needed *)
 	ELSE
-		media := SYSTEM.VAL(LONGINT, ctrl.media);
-		Machine.Portout32(base, SYSTEM.VAL (LONGINT, config - MediaMask + ctrl.media));
+		media := SYSTEM.VAL(SIGNED32, ctrl.media);
+		Machine.Portout32(base, SYSTEM.VAL (SIGNED32, config - MediaMask + ctrl.media));
 		KernelLog.Enter; KernelLog.String(ctrl.dev.name); KernelLog.String(" auto-selection not supported"); KernelLog.Exit;
 		(*HALT(3801)*)	(* auto-selection not yet supported *)
 	END
@@ -461,7 +461,7 @@ END InitInterface;
 
 (* Issue a command and wait for completion. *)
 
-PROCEDURE IssueCommand(base, cmd: LONGINT);
+PROCEDURE IssueCommand(base, cmd: SIGNED32);
 VAR word: SIGNED16;
 BEGIN
 	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, SHORT(cmd)));
@@ -470,24 +470,24 @@ BEGIN
 	UNTIL ~(12 IN SYSTEM.VAL(SET, LONG(word)))
 END IssueCommand;
 
-PROCEDURE ResetTx(base: LONGINT);
+PROCEDURE ResetTx(base: SIGNED32);
 BEGIN
 	IssueCommand(base, 5800H);	(* TxReset (p. 10-4) *)
-	Machine.Portout32(base+24H, SYSTEM.VAL(LONGINT, 0))	(* DnListPtr (p. 6-17) *)
+	Machine.Portout32(base+24H, SYSTEM.VAL(SIGNED32, 0))	(* DnListPtr (p. 6-17) *)
 END ResetTx;
 
 PROCEDURE ResetRx(ctrl: Controller; setThresh: BOOLEAN);
-VAR base: LONGINT;
+VAR base: SIGNED32;
 BEGIN
 	base := ctrl.base;
 	IssueCommand(base, 2800H);	(* RxReset (p. 10-3) *)
 	IF setThresh THEN
 		IF EarlyThresh DIV 4 > 7FFH THEN
 			Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 8FFFH));	(* SetRxEarlyThresh (p. 10-7) *)
-			Machine.Portout32(base+20H, SYSTEM.VAL(LONGINT, 0H))	(* DmaCtrl (p. 6-14) *)
+			Machine.Portout32(base+20H, SYSTEM.VAL(SIGNED32, 0H))	(* DmaCtrl (p. 6-14) *)
 		ELSE
 			Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 8800H + EarlyThresh DIV 4));
-			Machine.Portout32(base+20H, SYSTEM.VAL(LONGINT, 20H))	(* DmaCtrl (p. 6-14) - upRxEarlyEnable *)
+			Machine.Portout32(base+20H, SYSTEM.VAL(SIGNED32, 20H))	(* DmaCtrl (p. 6-14) - upRxEarlyEnable *)
 		END
 	END;
 	Machine.Portout32(base+38H, ctrl.upd.physAdr);	(* UpListPtr (p. 7-14) *)
@@ -496,7 +496,7 @@ END ResetRx;
 
 (* Check the transmitter and reset it if required. *)
 
-PROCEDURE CheckTransmission(base: LONGINT);
+PROCEDURE CheckTransmission(base: SIGNED32);
 VAR status: SET; enable, reset: BOOLEAN; ch: CHAR;
 BEGIN
 	enable := FALSE; reset := FALSE;
@@ -518,7 +518,7 @@ END CheckTransmission;
 (* Allocate a DPD.  Assume the physical address of the record will not change (beware copying GC). *)
 
 PROCEDURE InitDPD(VAR dpd: DPD);
-VAR i, n: LONGINT; phys: MemRangeArray;
+VAR i, n: SIGNED32; phys: MemRangeArray;
 BEGIN
 	i := 0;
 	LOOP
@@ -540,7 +540,7 @@ END InitDPD;
 (* Allocate the UPD ring. *)
 
 PROCEDURE InitUPD(VAR upd: UPD);
-VAR i, j, n: LONGINT; head, tail: UPD; phys: MemRangeArray;
+VAR i, j, n: SIGNED32; head, tail: UPD; phys: MemRangeArray;
 BEGIN
 	head := NIL; tail := NIL;
 	FOR j := 1 TO ReceiveBuffers DO
@@ -578,7 +578,7 @@ END InitUPD;
 
 PROCEDURE BufferToUPD(buffer: Network.Buffer; upd: UPD);
 VAR
-	n, i: LONGINT;
+	n, i: SIGNED32;
 	phys: MemRangeArray;
 BEGIN
 	ASSERT(upd # NIL);
@@ -587,13 +587,13 @@ BEGIN
 		Machine.TranslateVirtual(ADDRESSOF(buffer.data[0]), LEN(buffer.data), n, phys);
 		ASSERT(n <= 2);
 		FOR i := 1 TO n DO
-			upd.frag[i].dataPhysAdr := phys[i-1].adr(Machine.Address32); upd.frag[i].dataLen := phys[i-1].size(LONGINT);
+			upd.frag[i].dataPhysAdr := phys[i-1].adr(Machine.Address32); upd.frag[i].dataLen := phys[i-1].size(SIGNED32);
 		END;
-		INC(upd.frag[n].dataLen, LONGINT(80000000H)); (* end of buffer marker *)
+		INC(upd.frag[n].dataLen, SIGNED32(80000000H)); (* end of buffer marker *)
 	ELSE
 		(* no buffer available at the moment. only header can be received. *)
 		upd.frag[0].dataLen := 14; (* ethernet header *)
-		INC(upd.frag[0].dataLen, LONGINT(80000000H)); (* end of buffer marker *)
+		INC(upd.frag[0].dataLen, SIGNED32(80000000H)); (* end of buffer marker *)
 	END;
 	upd.buffer := buffer; (* attach buffer reference *)
 END BufferToUPD;
@@ -601,14 +601,14 @@ END BufferToUPD;
 (* Initialize the registers. *)
 
 PROCEDURE InitRegisters(ctrl: Controller);
-VAR base, duplex, i: LONGINT; word: SIGNED16; full: BOOLEAN; ch: CHAR; flags: SET;
+VAR base, duplex, i: SIGNED32; word: SIGNED16; full: BOOLEAN; ch: CHAR; flags: SET;
 BEGIN
 	base := ctrl.base;
 	flags := ctrl.flags;
 	IF InvertMIIPower IN flags THEN
 		SetWindow(base, 2);
 		Machine.Portin16(base+0CH, word);
-		word := SHORT(SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, LONG(word)) + {14}));
+		word := SHORT(SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, LONG(word)) + {14}));
 		Machine.Portout16(base+0CH, word);
 		KernelLog.Enter; KernelLog.String("Invert MII Power "); KernelLog.Hex(word, 0); KernelLog.Exit;
 	END;
@@ -640,7 +640,7 @@ BEGIN
 	END;
 		(* clear all interrupts & indications *)
 	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 7FF6H));	(* SetIndicationEnable (p. 10-9) - all *)
-	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, SYSTEM.VAL(LONGINT, {1, 6, 7, 10}) + 7000H));	(* SetInterruptEnable (p. 10-10, 8-4) *)
+	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SIGNED32, {1, 6, 7, 10}) + 7000H));	(* SetInterruptEnable (p. 10-10, 8-4) *)
 	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 6F69H));	(* AcknowledgeInterrupt (p. 10-9) - all *)
 		(* clear all statistics *)
 	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 0B000H));	(* StatisticsDisable (p. 10-11) *)
@@ -654,13 +654,13 @@ BEGIN
 	SetWindow(base, 4);
 (*
 	Machine.Portin8(base+0AH, word);
-	Machine.Portout8(base+0AH, SYSTEM.VAL(SIGNED16, SHORT(SYSTEM.VAL(LONGINT,
+	Machine.Portout8(base+0AH, SYSTEM.VAL(SIGNED16, SHORT(SYSTEM.VAL(SIGNED32,
 			SYSTEM.VAL(SET, LONG(word)) - {7}))));	(* MediaStatus: disable linkBeatEnable *)
 *)
 	Machine.Portin8(base+0CH, ch);
 	Machine.Portin8(base+0DH, ch);
 	Machine.Portin16(base+6, word);	(* NetworkDiagnostic (p. 9-8) *)
-	Machine.Portout16(base+6, SYSTEM.VAL(SIGNED16, SHORT(SYSTEM.VAL(LONGINT,
+	Machine.Portout16(base+6, SYSTEM.VAL(SIGNED16, SHORT(SYSTEM.VAL(SIGNED32,
 			SYSTEM.VAL(SET, LONG(word)) + {6}))));	(* upperBytesEnable *)
 	Machine.Portout16(base+0EH, SYSTEM.VAL(SIGNED16, 0A800H));	(* StatisticsEnable (p. 10-11) *)
 		(* start the NIC *)
@@ -671,8 +671,8 @@ END InitRegisters;
 
 (* Scan the PCI bus for the specified card. *)
 
-PROCEDURE ScanPCI(vendor, device, model: LONGINT; flags, media: SET);
-VAR index, bus, dev, fct, base, irq, i: LONGINT; res: WORD; d: LinkDevice; c: Controller; name: Plugins.Name;
+PROCEDURE ScanPCI(vendor, device, model: SIGNED32; flags, media: SET);
+VAR index, bus, dev, fct, base, irq, i: SIGNED32; res: WORD; d: LinkDevice; c: Controller; name: Plugins.Name;
 BEGIN
 	index := 0;
 	WHILE (PCI.FindPCIDevice(device, vendor, index, bus, dev, fct) = PCI.Done) & (installed < 10) DO
@@ -732,7 +732,7 @@ END Remove;
 (* Request an interrupt from every controller. *)
 
 PROCEDURE Kick*;
-VAR i: SIZE; base: LONGINT; table: Plugins.Table;
+VAR i: SIZE; base: SIGNED32; table: Plugins.Table;
 BEGIN
 	Network.registry.GetAll(table);
 	IF table # NIL THEN
@@ -749,9 +749,9 @@ END Kick;
 (* Dump all registers - may have side effects that influence the device's normal operation *)
 
 PROCEDURE Dump*;
-VAR i: SIZE; base, win: LONGINT; int: SIGNED16; table: Plugins.Table;
+VAR i: SIZE; base, win: SIGNED32; int: SIGNED16; table: Plugins.Table;
 
-	PROCEDURE Byte(reg: ARRAY OF CHAR; ofs: LONGINT);
+	PROCEDURE Byte(reg: ARRAY OF CHAR; ofs: SIGNED32);
 	VAR x: CHAR;
 	BEGIN
 		KernelLog.String(reg); KernelLog.Char("=");
@@ -759,7 +759,7 @@ VAR i: SIZE; base, win: LONGINT; int: SIGNED16; table: Plugins.Table;
 		KernelLog.Hex(ORD(x), -2); KernelLog.Char(" ")
 	END Byte;
 
-	PROCEDURE Word(reg: ARRAY OF CHAR; ofs: LONGINT);
+	PROCEDURE Word(reg: ARRAY OF CHAR; ofs: SIGNED32);
 	VAR x: SIGNED16;
 	BEGIN
 		KernelLog.String(reg); KernelLog.Char("=");
@@ -767,16 +767,16 @@ VAR i: SIZE; base, win: LONGINT; int: SIGNED16; table: Plugins.Table;
 		KernelLog.Hex(LONG(x) MOD 10000H, 8); KernelLog.Char(" ")
 	END Word;
 
-	PROCEDURE DWord(reg: ARRAY OF CHAR; ofs: LONGINT);
-	VAR x: LONGINT;
+	PROCEDURE DWord(reg: ARRAY OF CHAR; ofs: SIGNED32);
+	VAR x: SIGNED32;
 	BEGIN
 		KernelLog.String(reg); KernelLog.Char("=");
 		Machine.Portin32(base+ofs, x);
 		KernelLog.Hex(x, 8); KernelLog.Char(" ")
 	END DWord;
 
-	PROCEDURE PCIWord(reg: ARRAY OF CHAR; ofs: LONGINT);
-	VAR x: LONGINT; res: WORD; ctrl: Controller;
+	PROCEDURE PCIWord(reg: ARRAY OF CHAR; ofs: SIGNED32);
+	VAR x: SIGNED32; res: WORD; ctrl: Controller;
 	BEGIN
 		ctrl := table[i](LinkDevice).ctrl;
 		KernelLog.String(reg); KernelLog.Char("=");

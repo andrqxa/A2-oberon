@@ -85,7 +85,7 @@ OSCBundle b:
 	VAR
 		MonthToDays : ARRAY 13 OF SIGNED16; (* copied from Dates.Mod *)
 
-		SysStartSeconds-: LONGINT; (* stores the current bootuptimestamp (secs sincs 1st Jan 1900), when an overflow of Objects.ticks is detected,
+		SysStartSeconds-: SIGNED32; (* stores the current bootuptimestamp (secs sincs 1st Jan 1900), when an overflow of Objects.ticks is detected,
 										the timestamp will be adjusted *)
 		TicksArePositive-: BOOLEAN;
 
@@ -112,7 +112,7 @@ OSCBundle b:
 			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE); BEGIN HALT(WrngClassUsedOrFunNotOverl); END export;
 
 			(* Dumps the current parameter (with stored values) to the kernel log. *)
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamObject { }'); KernelLog.Ln;
 			END dump;
@@ -123,7 +123,7 @@ OSCBundle b:
 		(* This 'abstract' class stored the shared functionality of OSCParamInteger and OSCParamRGBAColor *)
 		OSCParamAbsInteger = OBJECT(OSCParamObject)
 			VAR (* 32bit on IA32 *)
-				integer-: LONGINT;
+				integer-: SIGNED32;
 			PROCEDURE GetSize*(): SIZE;
 			BEGIN
 				RETURN 4;
@@ -133,7 +133,7 @@ OSCBundle b:
 				Network.PutNet4(packet, pos, integer);
 				INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamAbsInteger{ }'); KernelLog.Ln;
 			END dump;
@@ -141,12 +141,12 @@ OSCBundle b:
 
 		(* int32: OSC Type Tag 'i' *)
 		OSCParamInteger* = OBJECT(OSCParamAbsInteger)
-			PROCEDURE &InitInteger*(i: LONGINT);
+			PROCEDURE &InitInteger*(i: SIGNED32);
 			BEGIN
 				integer := i;
 				tag := 'i';
 			END InitInteger;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamInt { ');
 				KernelLog.Int(integer, 1); KernelLog.String(' ('); KernelLog.Hex(integer, 1); KernelLog.String(') }'); KernelLog.Ln;
@@ -171,9 +171,9 @@ OSCBundle b:
 				Network.PutNet4(packet, pos, Reals.Int(float));
 				INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			VAR
-				l, hi, lo: LONGINT;
+				l, hi, lo: SIGNED32;
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamFloat { ');
 				l := Reals.RoundL(float*1000);
@@ -197,7 +197,7 @@ OSCBundle b:
 				ASSERT(string # NIL);
 				exportString(string, packet, pos);
 			END export;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamAbsString { '); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -211,7 +211,7 @@ OSCBundle b:
 				string := s;
 				tag := 's';
 			END InitString;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamString{ ');
 				KernelLog.String(string^); KernelLog.String(' }'); KernelLog.Ln;
@@ -238,7 +238,7 @@ OSCBundle b:
 			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR i: SIZE;
 			BEGIN
-				Network.PutNet4(packet, pos, size(LONGINT)); INC(pos, 4);
+				Network.PutNet4(packet, pos, size(SIGNED32)); INC(pos, 4);
 				FOR i:=0 TO size-1 DO
 					packet[pos+i] := blob[i];
 				END;
@@ -247,7 +247,7 @@ OSCBundle b:
 					packet[pos] := 0X; INC(pos);
 				END;
 			END export;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamBlob { '); KernelLog.Buffer(blob^, 0, size); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -282,14 +282,14 @@ OSCBundle b:
 			END GetSize;
 			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR
-				l, h: LONGINT;
+				l, h: SIGNED32;
 			BEGIN
 				SYSTEM.GET(ADDRESSOF(integer)+H, h);
 				Network.PutNet4(packet, pos, h); INC(pos, 4);
 				SYSTEM.GET(ADDRESSOF(integer)+L, l);
 				Network.PutNet4(packet, pos, l); INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamInteger64 { '); KernelLog.HIntHex(integer, 16); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -312,7 +312,7 @@ OSCBundle b:
 			BEGIN
 				tt.export(packet, pos);
 			END export;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamTT { '); KernelLog.Ln;
 				tt.dump(indent+1);
@@ -335,13 +335,13 @@ OSCBundle b:
 			END GetSize;
 			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR
-				l, h: LONGINT;
+				l, h: SIGNED32;
 			BEGIN
 				Reals.IntL(float, h, l);
 				Network.PutNet4(packet, pos, h); INC(pos, 4);
 				Network.PutNet4(packet, pos, l); INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamFloat64 { '); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -355,7 +355,7 @@ OSCBundle b:
 				string := s;
 				tag := 'S';
 			END InitAltString;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamAltString { '); KernelLog.String(string^); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -378,7 +378,7 @@ OSCBundle b:
 			BEGIN
 				Network.PutNet4(packet, pos, ORD(char)); INC(pos, 4);
 			END export;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamChar { '); KernelLog.Char(char); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -391,7 +391,7 @@ OSCBundle b:
 				tag := 'r';
 				integer := c;
 			END InitRGBAColor;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamRGBAColor { '); KernelLog.Int(integer, 4); KernelLog.String(' }'); KernelLog.Ln;
 			END dump;
@@ -405,7 +405,7 @@ OSCBundle b:
 			END GetSize;
 			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			END export;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamEmpty { }'); KernelLog.Ln;
 			END dump;
@@ -417,7 +417,7 @@ OSCBundle b:
 			BEGIN
 				tag := 'T';
 			END InitTrue;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamTrue { }'); KernelLog.Ln;
 			END dump;
@@ -429,7 +429,7 @@ OSCBundle b:
 			BEGIN
 				tag := 'F';
 			END InitFalse;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamFalse { }'); KernelLog.Ln;
 			END dump;
@@ -441,7 +441,7 @@ OSCBundle b:
 			BEGIN
 				tag := 'N';
 			END InitNil;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamNil { }'); KernelLog.Ln;
 			END dump;
@@ -453,7 +453,7 @@ OSCBundle b:
 			BEGIN
 				tag := 'I';
 			END InitInf;
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCParamNil { }'); KernelLog.Ln;
 			END dump;
@@ -473,8 +473,8 @@ OSCBundle b:
 			*)
 		OSCTimeTag* = OBJECT
 			VAR
-				seconds-: LONGINT; (* seconds from 1st Jan 1900 *)
-				miliseconds-: LONGINT; (* 0...999 *)
+				seconds-: SIGNED32; (* seconds from 1st Jan 1900 *)
+				miliseconds-: SIGNED32; (* 0...999 *)
 				imm-: BOOLEAN; (* immediate-flag *)
 			PROCEDURE &Init*;
 			BEGIN
@@ -486,7 +486,7 @@ OSCBundle b:
 			PROCEDURE SetImmediately*; BEGIN imm := TRUE; END SetImmediately;
 
 			(* Sets the OSCTimeTag to the time described by seconds since January 1, 1900 and the miliseconds offset *)
-			PROCEDURE Set*(sec, msec: LONGINT);
+			PROCEDURE Set*(sec, msec: SIGNED32);
 			BEGIN
 				seconds := sec; miliseconds := msec MOD 1000; imm := FALSE;
 			END Set;
@@ -501,7 +501,7 @@ OSCBundle b:
 			END SetLow;
 
 			(* Outputs the stored timetag *)
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				IF imm THEN
 					indentDump(indent); KernelLog.String('TT { imm: TRUE } '); KernelLog.Ln;
@@ -514,8 +514,8 @@ OSCBundle b:
 
 			PROCEDURE export(VAR packet: ARRAY OF CHAR; VAR pos: SIZE);
 			VAR
-				i: LONGINT;
-				fraction: LONGINT;
+				i: SIGNED32;
+				fraction: SIGNED32;
 			BEGIN
 				IF imm THEN
 					FOR i := 0 TO 6 DO
@@ -585,7 +585,7 @@ OSCBundle b:
 				returnerdata := data;
 			END SetReturner;
 
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCPacket { bytearray: ');
 				KernelLog.Buffer(bytearray^, 0, LEN(bytearray^)); KernelLog.String(' }'); KernelLog.Ln;
@@ -705,8 +705,8 @@ OSCBundle b:
 				END;
 			END export;
 
-			PROCEDURE dump*(indent: LONGINT);
-				VAR i: LONGINT;
+			PROCEDURE dump*(indent: SIGNED32);
+				VAR i: SIGNED32;
 			BEGIN
 				indentDump(indent); KernelLog.String('OSCMessage { address: '); KernelLog.String(address^); KernelLog.String(' noTypeTagString: ');
 				KernelLog.Boolean(noTypeTagString); KernelLog.Ln;
@@ -766,15 +766,15 @@ OSCBundle b:
 
 			(* Note: This function uses Objects.ticks to get a 'exact' systemtime.
 				It calculates the seconds since midnight Jan 1, 1900 with SysStartSeconds plus the offset with Objects.ticks.
-				If the Timeout of a packet in miliseconds is greather then it can be expressed in an positive LONGINT, a
-				maximal timeout of MAX(LONGINT) DIV 1000 is used. *)
-			PROCEDURE GetTimeout*(): LONGINT; (* timeout in ms from now *)
+				If the Timeout of a packet in miliseconds is greather then it can be expressed in an positive SIGNED32, a
+				maximal timeout of MAX(SIGNED32) DIV 1000 is used. *)
+			PROCEDURE GetTimeout*(): SIGNED32; (* timeout in ms from now *)
 			VAR
-				nowseconds, nowms: LONGINT;
-				ticks: LONGINT;
-				diff, diffms: LONGINT;
-				overflowdiff: LONGINT;
-				timeout: LONGINT;
+				nowseconds, nowms: SIGNED32;
+				ticks: SIGNED32;
+				diff, diffms: SIGNED32;
+				overflowdiff: SIGNED32;
+				timeout: SIGNED32;
 			BEGIN
 				IF timetag.imm THEN RETURN 0 END;
 				ticks := Kernel.GetTicks ();
@@ -783,7 +783,7 @@ OSCBundle b:
 				IF Trace THEN KernelLog.String('GetTimeout.nowseconds '); KernelLog.Hex(nowseconds, 4); KernelLog.Ln; END;
 				nowms := ((ticks MOD Kernel.Second) * 1000) DIV Kernel.Second;
 				IF Trace THEN KernelLog.String('GetTimeout.nowms '); KernelLog.Int(nowms, 4); KernelLog.Ln;END;
-				overflowdiff := MAX(LONGINT) DIV 1000;
+				overflowdiff := MAX(SIGNED32) DIV 1000;
 				diff := timetag.seconds - nowseconds;
 				diffms := timetag.miliseconds - nowms;
 				IF diff < 0 THEN RETURN 0; END;
@@ -811,7 +811,7 @@ OSCBundle b:
 				END;
 			END SetReturner;
 
-			PROCEDURE dump*(indent: LONGINT);
+			PROCEDURE dump*(indent: SIGNED32);
 			VAR
 				i: SIZE;
 			BEGIN
@@ -830,7 +830,7 @@ OSCBundle b:
 				exportString(OSCBundleIdent, packet, pos);
 				timetag.export(packet, pos);
 				FOR i := 0 TO messagescount-1 DO
-					Network.PutNet4(packet, pos, messages[i].GetSize()(LONGINT)); INC(pos, 4);
+					Network.PutNet4(packet, pos, messages[i].GetSize()(SIGNED32)); INC(pos, 4);
 					messages[i].export(packet, pos);
 				END;
 			END export;
@@ -850,9 +850,9 @@ OSCBundle b:
 		END OSCBundle;
 
 	(* helper for indentation of the dump()-function *)
-	PROCEDURE indentDump(i: LONGINT);
+	PROCEDURE indentDump(i: SIGNED32);
 	VAR
-		a: LONGINT;
+		a: SIGNED32;
 	BEGIN
 		FOR a:=1 TO i DO KernelLog.String('  '); END;
 	END indentDump;
@@ -862,9 +862,9 @@ OSCBundle b:
 	(* Returns the number of seconds since midnight January 1, 1900 until now
 		Note: This function doesn't honor the users current timezone.
 		Note: The timezone of a timetag isn't specified in the OSC specification v 1.0 by Matt Wright*)
-	PROCEDURE TTGetSecondsNow*(): LONGINT;
+	PROCEDURE TTGetSecondsNow*(): SIGNED32;
 		VAR year, month, day, hour,minute, second: SIGNED16;
-		date, time: LONGINT;
+		date, time: SIGNED32;
 	BEGIN
 		Clock.Get(time, date);
 		hour := SHORT((time DIV 4096) MOD 32);
@@ -880,9 +880,9 @@ OSCBundle b:
 
 	(* Returns the number of seconds from midnight January 1, 1900 to the specified date and time *)
 	PROCEDURE TTGetSecondsLow*(year (* >=1900 *), month (* 1..12 *), day (* 1..31 *),
-		hour (* 0..23 *), min (* 0..59 *), sec (* 0..59 *): SIGNED16): LONGINT;
+		hour (* 0..23 *), min (* 0..59 *), sec (* 0..59 *): SIGNED16): SIGNED32;
 	VAR
-		days, seconds: LONGINT;
+		days, seconds: SIGNED32;
 		i: SIGNED16;
 	BEGIN
 		days := 0;
@@ -1007,7 +1007,7 @@ OSCBundle b:
 	PROCEDURE parseOSCTT(VAR data: ARRAY OF CHAR; VAR ofs: SIZE): OSCTimeTag;
 	VAR
 		tt: OSCTimeTag;
-		sec, fraction, msec: LONGINT;
+		sec, fraction, msec: SIGNED32;
 	BEGIN
 		IF Trace THEN KernelLog.String('parseOSCTT: '); KernelLog.Int(ofs, 4); KernelLog.Ln; END;
 		NEW(tt);
@@ -1043,7 +1043,7 @@ OSCBundle b:
 	PROCEDURE parseOSCParamFloat(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamFloat;
 	VAR
 		p: OSCParamFloat;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		IF (ofs+4) > endofs THEN RETURN NIL END;
 		i := Network.GetNet4(data, ofs); INC(ofs, 4);
@@ -1067,7 +1067,7 @@ OSCBundle b:
 	VAR
 		p: OSCParamBlob;
 		b: Blob;
-		size, i: LONGINT;
+		size, i: SIGNED32;
 	BEGIN
 		IF Trace THEN KernelLog.String('parseOSCParamBlob: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;
 		IF (ofs+4) > endofs THEN RETURN NIL END;
@@ -1082,7 +1082,7 @@ OSCBundle b:
 	PROCEDURE parseOSCParamInteger64(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamInteger64;
 	VAR
 		p: OSCParamInteger64;
-		h, l: LONGINT;
+		h, l: SIGNED32;
 		bigint: HUGEINT;
 	BEGIN
 		IF Trace THEN KernelLog.String('parseOSCParamInteger64: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;
@@ -1111,7 +1111,7 @@ OSCBundle b:
 	PROCEDURE parseOSCParamFloat64(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamFloat64;
 	VAR
 		p: OSCParamFloat64;
-		h,l: LONGINT;
+		h,l: SIGNED32;
 		f: LONGREAL;
 	BEGIN
 		IF Trace THEN KernelLog.String('parseOSCParamFloat64: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;
@@ -1138,7 +1138,7 @@ OSCBundle b:
 	PROCEDURE parseOSCParamChar(VAR data: ARRAY OF CHAR; VAR ofs: SIZE; endofs: SIZE): OSCParamChar;
 	VAR
 		p: OSCParamChar;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		IF Trace THEN KernelLog.String('parseOSCParamChar: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;
 		IF (ofs+4) > endofs THEN RETURN NIL END;
@@ -1244,7 +1244,7 @@ OSCBundle b:
 	(* helpers *)
 	PROCEDURE CheckOSCAdr*(adr: String): BOOLEAN;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		ASSERT(adr # NIL);
 		i := 0;
@@ -1265,7 +1265,7 @@ OSCBundle b:
 
 	PROCEDURE CheckOSCAdrPattern*(adr: String): BOOLEAN;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		ASSERT(adr # NIL);
 		i := 0;
@@ -1522,8 +1522,8 @@ OSCBundle b:
 		This function is called from the module initializer. *)
 	PROCEDURE calculateBootup;
 		VAR
-			nowseconds: LONGINT;
-			ticks: LONGINT;
+			nowseconds: SIGNED32;
+			ticks: SIGNED32;
 	BEGIN
 		ticks := Kernel.GetTicks ();
 		nowseconds := TTGetSecondsNow();
@@ -1534,7 +1534,7 @@ OSCBundle b:
 	(* This function will be called from GetTimeout() to detect overflows of Objects.ticks *)
 	PROCEDURE updateBootup;
 		VAR
-			ticks: LONGINT;
+			ticks: SIGNED32;
 	BEGIN
 		ticks := Kernel.GetTicks ();
 		IF ticks > 0 THEN

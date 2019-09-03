@@ -98,7 +98,7 @@ PROCEDURE tick*;
 (*
 VAR
 	v: Voxel;
-	a, b, c, d, e, f: LONGINT;
+	a, b, c, d, e, f: SIGNED32;
 BEGIN
 	a := rand.Dice(3);
 	b := rand.Dice(3);
@@ -372,7 +372,7 @@ END Fill;
 PROCEDURE tick;
 VAR
 	v: Voxel;
-	a, b, c, d, e, f: LONGINT;
+	a, b, c, d, e, f: SIGNED32;
 BEGIN
 	a := rand.Dice(3);
 	b := rand.Dice(3);
@@ -504,7 +504,7 @@ END Shade;
 PROCEDURE probe(x,y,z: SREAL):Voxel;
 VAR
 	X,Y,Z: SREAL;
-	i,j,k: LONGINT;
+	i,j,k: SIGNED32;
 BEGIN
  RETURN(core);
 END probe;

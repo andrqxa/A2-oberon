@@ -329,7 +329,7 @@ TYPE
 
 	(* Returns true iff back or refresh button was pressed and increases the state counter if back button was not pressed *)
 	PROCEDURE BackRefreshButtonWasPressed(request: HTTPSupport.HTTPRequest; session: HTTPSession.Session) : BOOLEAN;
-	VAR httpVar: HTTPSupport.HTTPVariable; httpCounter, sessionCounter: LONGINT; p: ANY;
+	VAR httpVar: HTTPSupport.HTTPVariable; httpCounter, sessionCounter: SIGNED32; p: ANY;
 		dynStr: DynamicStrings.DynamicString; str: Strings.String; numberStr: ARRAY 14 OF CHAR;
 	BEGIN (* request # NIL & session # NIL *)
 		httpVar := request.GetVariableByName(DynamicWebpage.StateCounterVariable);

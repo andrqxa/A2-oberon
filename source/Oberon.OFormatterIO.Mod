@@ -41,7 +41,7 @@ VAR
 	T: Texts.Text;  R: Texts.Reader;   (* input text *)
 	ch: CHAR;   (*current input character*)
 	str: ARRAY 1024 OF CHAR;
-	tokenlen: SIGNED16;  MaxLineLength*: LONGINT;  reservedCols: SET;
+	tokenlen: SIGNED16;  MaxLineLength*: SIGNED32;  reservedCols: SET;
 	defaultFont: ARRAY 9 OF ARRAY 32 OF CHAR;
 	defaultColor: ARRAY 9 OF SIGNED8;
 	lcase, ucase: BOOLEAN;   (* true: recognize lowercase keywords *)
@@ -71,7 +71,7 @@ CONST
 TYPE
 	BreakPoint* = POINTER TO RECORD
 		line-: SIGNED16;
-		textpos-: LONGINT;
+		textpos-: SIGNED32;
 		width-: SIGNED16;
 		indent-: SIGNED16;   (* in pixel *)
 		pred: BreakPoint
@@ -96,7 +96,7 @@ VAR
 	forceNL*: BOOLEAN;
 	curbp*: ssBP;   (* breakpoints in current statement sequence  *)
 	curLine-, width-, curInd-: SIGNED16;   (* in output file *)
-	inpLine-: LONGINT;  inCode: BOOLEAN;
+	inpLine-: SIGNED32;  inCode: BOOLEAN;
 
 	N: Texts.Text;  W: Texts.Writer;   (* output text *)
 	newFile: ARRAY 256 OF CHAR;
@@ -106,7 +106,7 @@ VAR
 	tabw: SIGNED16;   (* width of indentation TAB (in pixel) *)
 	spw: SIGNED16;   (* width of pace char (in pixel) *)
 	indentl1, indentl2: SIGNED16;   (* marked indentation for level1 and level2 expr. *)
-	il1pos, il2pos: LONGINT;  gotEmptyLine, emptyLine*: BOOLEAN;
+	il1pos, il2pos: SIGNED32;  gotEmptyLine, emptyLine*: BOOLEAN;
 	emptyLines: SIGNED16;   (* no of empty lines done (output) *)
 	nlines: SIGNED16;   (* CR's between last token or comment and comment  (input) *)
 	needSp, instring, linestart, adjusted: BOOLEAN;  haveToken: BOOLEAN;
@@ -120,7 +120,7 @@ VAR
 	lowercase, uppercase, usecolors: BOOLEAN;   (* print keywords in lower case *)
 	curFont, tokCol: SIGNED8;  lastbp: BreakPoint;
 	lastNL: BreakPoint;   (* at this point occured the last NL in source file *)
-	expMark: BOOLEAN;  important: BOOLEAN;  isstring: BOOLEAN;  isextra: BOOLEAN;  inBreakLine, inPutComment, inAssComment: BOOLEAN;  lastLineStart: LONGINT;  noerr*: BOOLEAN;
+	expMark: BOOLEAN;  important: BOOLEAN;  isstring: BOOLEAN;  isextra: BOOLEAN;  inBreakLine, inPutComment, inAssComment: BOOLEAN;  lastLineStart: SIGNED32;  noerr*: BOOLEAN;
 
 	fonts: ARRAY 9 OF RECORD
 		f: Fonts.Font;
@@ -450,7 +450,7 @@ VAR
 	END fixBPs;
 
 	PROCEDURE breakLine*( VAR bp: BreakPoint );
-	VAR i, j, nbc, r, wdiff: SIGNED16;  nl: Texts.Writer;  del: SIGNED16;  p: LONGINT;
+	VAR i, j, nbc, r, wdiff: SIGNED16;  nl: Texts.Writer;  del: SIGNED16;  p: SIGNED32;
 	BEGIN
 		IF (bp # NIL ) & (bp.textpos > lastLineStart) THEN
 			inBreakLine := TRUE;  p := bp.textpos;
@@ -525,7 +525,7 @@ VAR
 	END getCharWidths;
 
 	PROCEDURE Terminate*;
-	VAR beg, end: LONGINT;  F: Texts.Finder;  obj: Objects.Object;  C: Objects.CopyMsg;
+	VAR beg, end: SIGNED32;  F: Texts.Finder;  obj: Objects.Object;  C: Objects.CopyMsg;
 	BEGIN
 		putToken;  beg := Texts.Pos( R ) - 1;  end := T.len;  Texts.OpenFinder( F, T, beg );
 		WHILE F.pos < end DO
@@ -546,7 +546,7 @@ VAR
 
 (* ------------ Scanner part ------------- *)
 
-	PROCEDURE Pos*( ): LONGINT;
+	PROCEDURE Pos*( ): SIGNED32;
 	BEGIN
 		RETURN Texts.Pos( R );
 	END Pos;
@@ -584,7 +584,7 @@ VAR
 	PROCEDURE Number;
 	VAR i, m, n, d, e: SIGNED16;
 		dig: ARRAY 24 OF CHAR;
-		f: LONGREAL;  expCh: CHAR;  neg: BOOLEAN;  intval: LONGINT;
+		f: LONGREAL;  expCh: CHAR;  neg: BOOLEAN;  intval: SIGNED32;
 
 		PROCEDURE Ord( ch: CHAR;  hex: BOOLEAN ): SIGNED16;
 		BEGIN
@@ -702,7 +702,7 @@ VAR
 		PROCEDURE Comment;   (* do not read after end of file *)
 		VAR specialcolor: SIGNED8;
 			fnt, number: ARRAY 64 OF CHAR;
-			size, cnt: LONGINT;
+			size, cnt: SIGNED32;
 
 			PROCEDURE next;
 			VAR F: Texts.Finder;  obj: Objects.Object;  C: Objects.CopyMsg;

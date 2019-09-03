@@ -30,21 +30,21 @@ VAR  reader : Texts.Reader;
 
 		error* : BOOLEAN;
 		eot* : BOOLEAN;
-		errpos : LONGINT;
+		errpos : SIGNED32;
 
 		s* : ARRAY strlen OF CHAR;
 		ident* : ARRAY idlen OF CHAR;
-		int* : LONGINT;
+		int* : SIGNED32;
 		real* : REAL;
 		char* : CHAR;
 		bool* : BOOLEAN;
 
-PROCEDURE Pos* () : LONGINT;		(**	Position of scanner in text	*)
+PROCEDURE Pos* () : SIGNED32;		(**	Position of scanner in text	*)
 BEGIN	RETURN Texts.Pos(reader)
 END Pos;
 
-PROCEDURE Mark* (pos : LONGINT; t : ARRAY OF CHAR);		(**	Write error message t to Log	*)
-VAR p : LONGINT;
+PROCEDURE Mark* (pos : SIGNED32; t : ARRAY OF CHAR);		(**	Write error message t to Log	*)
+VAR p : SIGNED32;
 BEGIN	p := Pos ();
 	IF p > errpos THEN
 		Texts.WriteString (W, "  pos "); Texts.WriteInt(W, pos, 1);
@@ -60,7 +60,7 @@ BEGIN	IF ~reader.eot THEN Texts.Read (reader, ch) ELSE ch := ')'; eot := TRUE EN
 END ReadChar;
 
 PROCEDURE Comment;
-VAR p : LONGINT;
+VAR p : SIGNED32;
 BEGIN	p := Pos ();
 	REPEAT ReadChar;
 		IF ch = '{' THEN Comment END;
@@ -72,7 +72,7 @@ END Comment;
 PROCEDURE ReadString (VAR sym : SIGNED16);
 VAR i : SIGNED16;
 		quot : CHAR;
-		pos : LONGINT;
+		pos : SIGNED32;
 BEGIN	quot := ch;
 	ReadChar; sym := String; pos := Pos ();
 	i := 0;
@@ -95,7 +95,7 @@ BEGIN	sym := Int;
 	int := 0;	real := 0;	intE := FALSE;	realE := FALSE;
 	WHILE (ch >= '0') & (ch <= '9') DO
 		n := ORD(ch)-ORD('0');
-		IF (MAX(LONGINT)-n) DIV 10 >= int THEN
+		IF (MAX(SIGNED32)-n) DIV 10 >= int THEN
 			int := int*10 + n;	real := int
 		ELSIF (MAX(REAL)-n)/10 >= real THEN
 			intE := TRUE;
@@ -187,7 +187,7 @@ BEGIN
 	END;
 END Get;
 
-PROCEDURE OpenText* (text : Texts.Text; pos : LONGINT);
+PROCEDURE OpenText* (text : Texts.Text; pos : SIGNED32);
 BEGIN
 	Texts.OpenReader (reader, text, pos);
 	ch := ' ';

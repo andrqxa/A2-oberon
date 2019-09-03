@@ -20,7 +20,7 @@ TYPE
 	END;
 
 PROCEDURE OpenScanner(VAR S: Texts.Scanner);
-VAR beg, end, time: LONGINT; T: Texts.Text; BEGIN
+VAR beg, end, time: SIGNED32; T: Texts.Text; BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 	IF (S.class = Texts.Char) & (S.c = "^") THEN
 		Oberon.GetSelection(T, beg, end, time);
@@ -37,7 +37,7 @@ BEGIN
 	END
 END GetString;
 
-PROCEDURE GetInteger(VAR S: Texts.Scanner; VAR v: LONGINT): BOOLEAN;
+PROCEDURE GetInteger(VAR S: Texts.Scanner; VAR v: SIGNED32): BOOLEAN;
 BEGIN
 	IF (S.class = Texts.Int) THEN v := S.i; Texts.Scan(S); RETURN TRUE
 	ELSE v := 0; RETURN FALSE
@@ -202,7 +202,7 @@ END RemoveDirectory;
 
 PROCEDURE SetCache*; (** prefix cacheSize *)
 VAR W: Texts.Writer; S: Texts.Scanner; path: Path; fs: Files.FileSystem; p: ARRAY 1024 OF CHAR;
-	cacheSize: LONGINT; writeback: BOOLEAN;
+	cacheSize: SIGNED32; writeback: BOOLEAN;
 BEGIN
 	Texts.OpenWriter(W); OpenScanner(S);
 	IF GetString(S, p) & GetInteger(S, cacheSize) THEN

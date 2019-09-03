@@ -12,7 +12,7 @@ TYPE
 		PROCEDURE Init*(w, h : SIZE);
 		END Init;
 
-		PROCEDURE CalcImage*(a, b, result : Raster.Image; per255 : LONGINT);
+		PROCEDURE CalcImage*(a, b, result : Raster.Image; per255 : SIGNED32);
 		END CalcImage;
 
 	END Transition;
@@ -29,7 +29,7 @@ TYPE
 		END Init;
 
 		PROCEDURE SetMask*(mi : Raster.Image);
-		VAR x, y, col, i : SIZE; tr, tg, tb, ta : LONGINT;
+		VAR x, y, col, i : SIZE; tr, tg, tb, ta : SIGNED32;
 			adr: ADDRESS;
 			ti : Raster.Image;
 			mode : Raster.Mode;
@@ -91,8 +91,8 @@ TYPE
 			WMWindowManager.DefaultAddWindow(w);
 		END DumpMask;
 
-		PROCEDURE CalcImage*(a, b, result : Raster.Image; per255 : LONGINT);
-		VAR i, x, y : SIZE; col : LONGINT;
+		PROCEDURE CalcImage*(a, b, result : Raster.Image; per255 : SIGNED32);
+		VAR i, x, y : SIZE; col : SIGNED32;
 			adra, adrb, adrr: ADDRESS;
 			mode : Raster.Mode;
 			pix : Raster.Pixel;
@@ -158,7 +158,7 @@ TYPE
 			Raster.InitMode(mode, Raster.srcCopy);
 		END Init;
 
-		PROCEDURE CalcImage*(a, b, result : Raster.Image; per255 : LONGINT);
+		PROCEDURE CalcImage*(a, b, result : Raster.Image; per255 : SIGNED32);
 		BEGIN
 			(* correct outofbound alpha values *)
 			IF (per255 < 0) THEN per255 := 0; END;
@@ -215,15 +215,15 @@ TYPE
  * Calculate a frame of the fade in 565-Mode (optimized version, 2 pixels at once)
  *
  *** *)
-PROCEDURE Calc565Opt(a, b : Raster.Image; VAR result : Raster.Image; per255 : LONGINT);
+PROCEDURE Calc565Opt(a, b : Raster.Image; VAR result : Raster.Image; per255 : SIGNED32);
 VAR
 	x, y : SIZE;
 	adra, adrb, adrr : ADDRESS;
-	ar,ag,ab,   br,bg,bb,   cr,cg,cb : LONGINT;
+	ar,ag,ab,   br,bg,bb,   cr,cg,cb : SIGNED32;
 	height, width : SIZE;
 	oddWidth : BOOLEAN; blocksOf4Bytes : SIZE;
-	add64, alphaOver2 : LONGINT;
-	tmpA, tmpB : LONGINT;
+	add64, alphaOver2 : SIGNED32;
+	tmpA, tmpB : SIGNED32;
 BEGIN
 	IF (DEBUG) THEN KernelLog.String("Fade in 565-Format"); KernelLog.Ln; END;
 	height := a.height; width := a.width;
@@ -297,7 +297,7 @@ END Calc565Opt;
  * Calculate a frame of the fade in 565-Mode (MMX optimized version, 4 pixels at once)
  *
  *** *)
-PROCEDURE Calc565MMX(a, b : Raster.Image; VAR result : Raster.Image; per255 : LONGINT);
+PROCEDURE Calc565MMX(a, b : Raster.Image; VAR result : Raster.Image; per255 : SIGNED32);
 VAR
 	x, y : SIZE; (* current image coordinates *)
 	height, width : SIZE;
@@ -305,9 +305,9 @@ VAR
 	blocksOf8Bytes : SIZE;
 	adra, adrb, adrr : ADDRESS;
 	alpha64, maskRed64, maskGreen64, maskBlue64 : HUGEINT;
-	alpha32 : LONGINT;
-	tmpA, tmpB : LONGINT;
-	ar, ag, ab, br, bg, bb, cr, cg, cb : LONGINT;
+	alpha32 : SIGNED32;
+	tmpA, tmpB : SIGNED32;
+	ar, ag, ab, br, bg, bb, cr, cg, cb : SIGNED32;
 BEGIN
 	IF (DEBUG) THEN KernelLog.String("Fade in 565-Format (MMX)"); KernelLog.Ln; END;
 	height := a.height; width := a.width;
@@ -366,7 +366,7 @@ END Calc565MMX;
  * Helper Function for Calc565MMX: :Calculate fade for just one line using assembler code (MMX technology)
  *
  *** *)
-PROCEDURE Calc565MMXLine (adra, adrb, adrr: ADDRESS; i : SIZE; alpha : LONGINT; a64, mr64, mg64, mb64 : HUGEINT);
+PROCEDURE Calc565MMXLine (adra, adrb, adrr: ADDRESS; i : SIZE; alpha : SIGNED32; a64, mr64, mg64, mb64 : HUGEINT);
 CODE
 #IF I386 THEN
 	;
@@ -628,13 +628,13 @@ END Calc565MMXLine;
  * Calculate a frame of the fade in 888-Mode (optimized version, 1 by 1 pixel = 3 Bytes)
  *
  *** *)
-PROCEDURE Calc888Opt(a, b : Raster.Image; VAR result : Raster.Image; per255 : LONGINT);
+PROCEDURE Calc888Opt(a, b : Raster.Image; VAR result : Raster.Image; per255 : SIGNED32);
 VAR
 	x, y : SIZE;  (* current image coordinates *)
 	height, width : SIZE;
 	adra, adrb, adrr : ADDRESS;  (* image start addresses *)
-	ar,ag,ab,   br,bg,bb,   cr,cg,cb : LONGINT; (* red, green, blue part of the images *)
-	tmpA, tmpB, tmpR : LONGINT; (* the two source pixels *)
+	ar,ag,ab,   br,bg,bb,   cr,cg,cb : SIGNED32; (* red, green, blue part of the images *)
+	tmpA, tmpB, tmpR : SIGNED32; (* the two source pixels *)
 BEGIN
 	IF (DEBUG) THEN KernelLog.String("Fade in 888-Format"); KernelLog.Ln; END;
 	height := a.height;  width := a.width;
@@ -686,7 +686,7 @@ END Calc888Opt;
  * Calculate a frame of the fade in 888-Mode (MMX optimized version)
  *
  *** *)
-PROCEDURE Calc888MMX(a, b : Raster.Image; VAR result : Raster.Image; per255 : LONGINT);
+PROCEDURE Calc888MMX(a, b : Raster.Image; VAR result : Raster.Image; per255 : SIGNED32);
 VAR
 	y : SIZE; (* current image coordinates *)
 	height, width : SIZE;
@@ -952,14 +952,14 @@ END Calc888MMXLine;
  * Calculate a frame of the fade in a Generic-Mode (Packs the result image in a generic buffered canvas object. Very slow!!!)
  *
  *** *)
-PROCEDURE CalcGenUnknown(a, b : Raster.Image; VAR result : Raster.Image; perc : LONGINT);
+PROCEDURE CalcGenUnknown(a, b : Raster.Image; VAR result : Raster.Image; perc : SIGNED32);
 VAR
 	x, y : SIZE; (* current image coordinates *)
 	mode : Raster.Mode;
 	canvas : WMGraphics.BufferCanvas;
 	pix : Raster.Pixel; (* pixel read from a or b *)
 	ca, cb : WMGraphics.Color; (* color of pixel in a and b *)
-	red, green, blue, alpha : LONGINT;
+	red, green, blue, alpha : SIGNED32;
 BEGIN
 	IF (DEBUG) THEN
 		KernelLog.String("Fade in other Format ["); KernelLog.String("a.fmt.code= "); KernelLog.Int(a.fmt.code, 0); KernelLog.String("b.fmt.code= "); KernelLog.Int(b.fmt.code, 0);  KernelLog.String("]");  KernelLog.Ln;
@@ -999,7 +999,7 @@ PROCEDURE Test*;
 VAR w : WMWindowManager.BufferWindow;
 	t : TransitionMask;
 	a, b, m : Raster.Image;
-	i : LONGINT;
+	i : SIGNED32;
 BEGIN
 	NEW(t);
 	a := LoadImage("Reto01.png");
@@ -1019,7 +1019,7 @@ PROCEDURE Test2*;
 VAR w : WMWindowManager.BufferWindow;
 	t : TransitionFade;
 	a, b : Raster.Image;
-	i : LONGINT;
+	i : SIGNED32;
 BEGIN
 	NEW(t);
 	a := LoadImage("Reto01.png");

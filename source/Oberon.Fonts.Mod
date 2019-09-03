@@ -44,7 +44,7 @@ of characters, each character being a pattern and and metric data.
 	BEGIN y := SHORT(x); SYSTEM.PUT(a, y); INC(a)
 	END Put1;
 
-	PROCEDURE Put2 (VAR a: ADDRESS; x: LONGINT);
+	PROCEDURE Put2 (VAR a: ADDRESS; x: SIGNED32);
 	VAR y: SIGNED16;
 	BEGIN y := SHORT(x); SYSTEM.PUT(a, y); a := a + 2
 	END Put2;
@@ -108,7 +108,7 @@ of characters, each character being a pattern and and metric data.
 	PROCEDURE Internalize (F: Font; VAR R: Files.Rider; type: SIGNED8);
 	VAR ch: CHAR;
 			NofRuns, NofBoxes, i, k, l, m: SIGNED16;
-			NofBytes: LONGINT; RasterBase, A, a: ADDRESS;
+			NofBytes: SIGNED32; RasterBase, A, a: ADDRESS;
 			run: ARRAY MaxRuns OF RunRec;
 			box: ARRAY 256 OF BoxRec;
 	BEGIN F.type := type;
@@ -190,7 +190,7 @@ of characters, each character being a pattern and and metric data.
 	END Substitute;
 
 	PROCEDURE Load (L: Objects.Library);
-	VAR f: Files.File; R: Files.Rider; id: CHAR; i, j: LONGINT;
+	VAR f: Files.File; R: Files.Rider; id: CHAR; i, j: SIGNED32;
 			name: Objects.Name;
 	BEGIN
 		WITH L: Font DO

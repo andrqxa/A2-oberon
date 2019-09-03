@@ -8,8 +8,8 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 
 	TYPE
 		Entry* = POINTER TO RECORD
-			method, pos: LONGINT;
-			crc*, csize*, size*: LONGINT;
+			method, pos: SIGNED32;
+			crc*, csize*, size*: SIGNED32;
 			td*: Dates.DateTime;
 			name*: Strings.String;
 			next: Entry
@@ -38,10 +38,10 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 		ZipFile* = OBJECT
 			VAR
 				F: Files.File;
-				root: Entry; entries: LONGINT;
+				root: Entry; entries: SIGNED32;
 
 			PROCEDURE FindEntry*(CONST name: ARRAY OF CHAR): Entry;
-				VAR e: Entry; i: LONGINT;
+				VAR e: Entry; i: SIGNED32;
 			BEGIN
 				e := root; i := 0;
 				WHILE (e # NIL) & (e.name^ # name) DO
@@ -60,13 +60,13 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 				RETURN e.next
 			END GetNext;
 
-			PROCEDURE NoOfEntries*(): LONGINT;
+			PROCEDURE NoOfEntries*(): SIGNED32;
 			BEGIN
 				RETURN entries
 			END NoOfEntries;
 
 			PROCEDURE OpenReceiver*(VAR R: Streams.Receiver; entry: Entry; VAR res: WORD);
-				VAR fR: Files.Reader; sig: LONGINT; e: Entry; I: Inflate.Reader; S: SizeReader;
+				VAR fR: Files.Reader; sig: SIGNED32; e: Entry; I: Inflate.Reader; S: SizeReader;
 			BEGIN
 				R := NIL; res := Streams.FormatError;
 				Files.OpenReader(fR, F, entry.pos); fR.RawLInt(sig);
@@ -104,7 +104,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 			END Extract;
 
 			PROCEDURE &New*(F: Files.File; VAR res: WORD);
-				VAR R: Files.Reader; r, e: Entry; pos: Files.Position; sig, l, j: LONGINT; i: SIGNED16;
+				VAR R: Files.Reader; r, e: Entry; pos: Files.Position; sig, l, j: SIGNED32; i: SIGNED16;
 			BEGIN
 				res := Streams.Ok; SELF.F := NIL; root := NIL; entries := 0;
 				pos := F.Length()-20; sig := 0;
@@ -144,18 +144,18 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 
 		END ZipFile;
 
-	PROCEDURE DosToOberonTime(t: LONGINT): LONGINT;
+	PROCEDURE DosToOberonTime(t: SIGNED32): SIGNED32;
 	BEGIN
 		RETURN t DIV 800H MOD 20H * 1000H + t DIV 20H MOD 40H * 40H + t MOD 20H * 2
 	END DosToOberonTime;
 
-	PROCEDURE DosToOberonDate(d: LONGINT): LONGINT;
+	PROCEDURE DosToOberonDate(d: SIGNED32): SIGNED32;
 	BEGIN
 		RETURN (d DIV 200H MOD 80H + 1980 - 1900) * 200H + d MOD 200H
 	END DosToOberonDate;
 
 	PROCEDURE ReadEntry(R: Streams.Reader; entry: Entry; local: BOOLEAN);
-		VAR l, nl, xl, t, d: LONGINT; i: SIGNED16;
+		VAR l, nl, xl, t, d: SIGNED32; i: SIGNED16;
 	BEGIN
 		IF local THEN
 			R.RawInt(i);
@@ -200,7 +200,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 	END ReadEntry;
 
 	PROCEDURE StripPrefix(CONST long: ARRAY OF CHAR; VAR short: ARRAY OF CHAR);
-		VAR i, j: LONGINT; ch: CHAR;
+		VAR i, j: SIGNED32; ch: CHAR;
 	BEGIN
 		i := 0; j := 0; ch := long[0];
 		WHILE ch # 0X DO
@@ -338,7 +338,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 	(* Directory [ \d ] zip ~ *)
 	PROCEDURE Directory*(context : Commands.Context);
 	VAR
-		F: Files.File; zip: ZipFile; name: Files.FileName; res: WORD; i: LONGINT;
+		F: Files.File; zip: ZipFile; name: Files.FileName; res: WORD; i: SIGNED32;
 		e: Entry; opt: ARRAY 32 OF CHAR; ch: CHAR; detail: BOOLEAN;
 	BEGIN
 		context.arg.SkipWhitespace();

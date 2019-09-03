@@ -7,22 +7,22 @@ IMPORT
 
 CONST
 	(** Colors *)
-	Aqua* = LONGINT(0FF00FFFFH);
-	Black* =LONGINT( 0FF000000H);
-	Blue* = LONGINT(0FF0000FFH);
-	Fuchsia* = LONGINT(0FFFF00FFH);
-	Gray* = LONGINT(0FF808080H);
-	Green* =LONGINT( 0FF008000H);
-	Lime* = LONGINT(0FF00FF00H);
-	Maroon* = LONGINT(0FF800000H);
-	Navy* = LONGINT(0FF000080H);
-	Olive* =LONGINT( 0FF808000H);
-	Purple* = LONGINT(0FF800080H);
-	Red* = LONGINT(0FFFF0000H);
-	Silver* = LONGINT(0FFC0C0C0H);
-	Teal* = LONGINT(0FF008080H);
-	White* = LONGINT(0FFFFFFFFH);
-	Yellow* = LONGINT(0FFFFFF00H);
+	Aqua* = SIGNED32(0FF00FFFFH);
+	Black* =SIGNED32( 0FF000000H);
+	Blue* = SIGNED32(0FF0000FFH);
+	Fuchsia* = SIGNED32(0FFFF00FFH);
+	Gray* = SIGNED32(0FF808080H);
+	Green* =SIGNED32( 0FF008000H);
+	Lime* = SIGNED32(0FF00FF00H);
+	Maroon* = SIGNED32(0FF800000H);
+	Navy* = SIGNED32(0FF000080H);
+	Olive* =SIGNED32( 0FF808000H);
+	Purple* = SIGNED32(0FF800080H);
+	Red* = SIGNED32(0FFFF0000H);
+	Silver* = SIGNED32(0FFC0C0C0H);
+	Teal* = SIGNED32(0FF008080H);
+	White* = SIGNED32(0FFFFFFFFH);
+	Yellow* = SIGNED32(0FFFFFF00H);
 	Transparent* = 00000000H;
 
 	(** font-size: <absolute-size> *)
@@ -137,7 +137,7 @@ CONST
 
 VAR
 	AbsoluteFontSizes: ARRAY 7 OF SIGNED8;
-	defaultColor*: LONGINT;
+	defaultColor*: SIGNED32;
 	defaultCursor*, crosshairCursor*, pointerCursor*, moveCursor*, eResizeCursor*, neResizeCursor*, nwResizeCursor*,
 	nResizeCursor*, seResizeCursor*, swResizeCursor*, sResizeCursor*, wResizeCursor*, textCursor*, waitCursor*,
 	helpCursor* : WMWindowManager.PointerInfo;
@@ -319,7 +319,7 @@ TYPE
 			verticalAlign*: RECORD (Value) computedLength*: LONGREAL; computed*: SIGNED8 END;
 			visibility*: Ident;
 			whiteSpace*: Ident;
-			zIndex*: RECORD (Value) computed*: LONGINT END;	(* Auto = -1 *)
+			zIndex*: RECORD (Value) computed*: SIGNED32 END;	(* Auto = -1 *)
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -580,7 +580,7 @@ TYPE
 
 		PROCEDURE SetValue*(declaration: CSS2.Declaration);
 		VAR s: String; terms: XMLObjects.Enumerator; c: ANY;
-			term1, term2, term3, term4, term5, term6: CSS2.Term; i: LONGINT; imgTerm: ImgTerm;
+			term1, term2, term3, term4, term5, term6: CSS2.Term; i: SIGNED32; imgTerm: ImgTerm;
 		BEGIN
 			s := declaration.GetProperty();
 			terms := declaration.GetTerms();
@@ -2122,7 +2122,7 @@ VAR m : WMWindowManager.WindowManager;
 	END BoxOffset;
 
 (*
-	PROCEDURE GetSmallerFont(fontSize: LONGINT): LONGINT;
+	PROCEDURE GetSmallerFont(fontSize: SIGNED32): SIGNED32;
 	VAR i: SIGNED8;
 	BEGIN
 		i := XXSmall;
@@ -2131,7 +2131,7 @@ VAR m : WMWindowManager.WindowManager;
 		RETURN AbsoluteFontSizes[i - 1]
 	END GetSmallerFont;
 
-	PROCEDURE GetLargerFont(fontSize: LONGINT): LONGINT;
+	PROCEDURE GetLargerFont(fontSize: SIGNED32): SIGNED32;
 	VAR i: SIGNED8;
 	BEGIN
 		i := XXLarge;
@@ -2220,7 +2220,7 @@ VAR m : WMWindowManager.WindowManager;
 		END
 	END PaddingWidth;
 
-	PROCEDURE ComputeBool(VAR property: Bool; parentProperty: Bool; trueIdent: LONGINT);
+	PROCEDURE ComputeBool(VAR property: Bool; parentProperty: Bool; trueIdent: SIGNED32);
 	BEGIN
 		IF property.specified # NIL THEN
 			IF property.specified.IsIdent(Inherit) THEN property.computed := parentProperty.computed
@@ -2350,7 +2350,7 @@ VAR m : WMWindowManager.WindowManager;
 		RETURN c
 	END ToGfxColor;
 
-	PROCEDURE IntToColor(color: LONGINT): Color;
+	PROCEDURE IntToColor(color: SIGNED32): Color;
 	VAR c1: CSS2.Term; c2: Color;
 	BEGIN
 		NEW(c1); c1.SetType(CSS2.Color); c1.SetIntVal(color);

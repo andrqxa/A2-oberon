@@ -17,8 +17,8 @@ VAR
 	stdInDecoupler: Pipes.ReadDecoupler;
 
 PROCEDURE Args(): String;
-VAR size, pos: SIZE; i,j: LONGINT; str: String;
-	argc: LONGINT;
+VAR size, pos: SIZE; i,j: SIGNED32; str: String;
+	argc: SIGNED32;
 	argv {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF POINTER {UNSAFE,UNTRACED} TO ARRAY OF CHAR;
 BEGIN
 	argc := Unix.argc;

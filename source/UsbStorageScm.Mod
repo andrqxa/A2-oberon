@@ -37,8 +37,8 @@ TYPE
 			RETURN SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, ORD(p2)*256) + SYSTEM.VAL(SET, ORD(p1)));
 		END ScmShortPack;
 
-		PROCEDURE ScmSendControl(dir : SET; req, reqtyp, value, index : LONGINT; VAR buffer : Usbdi.Buffer;
-			ofs, bufferlen, timeout : LONGINT) : WORD;
+		PROCEDURE ScmSendControl(dir : SET; req, reqtyp, value, index : SIGNED32; VAR buffer : Usbdi.Buffer;
+			ofs, bufferlen, timeout : SIGNED32) : WORD;
 		VAR status : Usbdi.Status; ignore : SIZE;
 		BEGIN
 			IF Debug.Trace & Debug.traceScTransfers THEN
@@ -79,7 +79,7 @@ TYPE
 		END ScmSendControl;
 
 		PROCEDURE ScmBulkTransport(dir : SET; VAR buffer : Usbdi.Buffer; ofs, bufferlen : SIZE;
-			VAR tlen : SIZE; timeout : LONGINT) : LONGINT;
+			VAR tlen : SIZE; timeout : SIGNED32) : SIGNED32;
 		VAR status : Usbdi.Status;
 		BEGIN
 			IF Debug.Trace & Debug.traceScTransfers THEN
@@ -144,7 +144,7 @@ TYPE
 			RETURN Base.ResOk;
 			END ScmBulkTransport;
 
-		PROCEDURE ScmWaitNotBusy(timeout : LONGINT) : WORD;
+		PROCEDURE ScmWaitNotBusy(timeout : SIGNED32) : WORD;
 		VAR status : CHAR; res : WORD;
 		BEGIN
 			LOOP
@@ -170,7 +170,7 @@ TYPE
 			RETURN Base.ResTimeout;
 		END ScmWaitNotBusy;
 
-		PROCEDURE ScmReadUserIO(VAR dataflags: CHAR; timeout : LONGINT) : WORD;
+		PROCEDURE ScmReadUserIO(VAR dataflags: CHAR; timeout : SIGNED32) : WORD;
 		VAR res : WORD;
 		BEGIN
 			res := ScmSendControl(Base.DataIn, 82H, 0C0H, 0, 0, buffer^, 0, 1, timeout);
@@ -178,12 +178,12 @@ TYPE
 			RETURN res;
 		END ScmReadUserIO;
 
-		PROCEDURE ScmWriteUserIO(enableflags, dataflags: CHAR; timeout : LONGINT) : WORD;
+		PROCEDURE ScmWriteUserIO(enableflags, dataflags: CHAR; timeout : SIGNED32) : WORD;
 		BEGIN
 			RETURN ScmSendControl(Base.DataOut, 82H, 40H, ScmShortPack(enableflags, dataflags), 0, Usbdi.NoData, 0, 0, timeout);
 		END ScmWriteUserIO;
 
-		PROCEDURE ScmRead(access, reg : CHAR; VAR content: CHAR; timeout : LONGINT) : WORD;
+		PROCEDURE ScmRead(access, reg : CHAR; VAR content: CHAR; timeout : SIGNED32) : WORD;
 		VAR res : WORD;
 		BEGIN
 			res := ScmSendControl(Base.DataIn, ORD(access), 0C0H, ORD(reg), 0, buffer^, 0, 1, timeout);
@@ -191,13 +191,13 @@ TYPE
 			RETURN res;
 		END ScmRead;
 
-		PROCEDURE ScmWrite(access, reg, content : CHAR; timeout : LONGINT) : WORD;
+		PROCEDURE ScmWrite(access, reg, content : CHAR; timeout : SIGNED32) : WORD;
 		BEGIN
 			access := SYSTEM.VAL(CHAR, SYSTEM.VAL(SET, access) + {0});
 			RETURN ScmSendControl(Base.DataOut, ORD(access), 040H, ScmShortPack(reg, content), 0, Usbdi.NoData, 0, 0, timeout);
 		END ScmWrite;
 
-		PROCEDURE ScmMultipleWrite(access : CHAR; VAR registers, dataout: ARRAY OF CHAR; numregs,  timeout : LONGINT) : WORD;
+		PROCEDURE ScmMultipleWrite(access : CHAR; VAR registers, dataout: ARRAY OF CHAR; numregs,  timeout : SIGNED32) : WORD;
 		VAR res: WORD; i, tlen : SIZE;
 		BEGIN
 			IF numregs > 7 THEN
@@ -227,7 +227,7 @@ TYPE
 			RETURN ScmWaitNotBusy(timeout);
 		END ScmMultipleWrite;
 
-		PROCEDURE ScmReadBlock(access, reg : CHAR; VAR content : Usbdi.Buffer; ofs, len: SIZE; VAR tlen : SIZE; timeout : LONGINT): WORD;
+		PROCEDURE ScmReadBlock(access, reg : CHAR; VAR content : Usbdi.Buffer; ofs, len: SIZE; VAR tlen : SIZE; timeout : SIGNED32): WORD;
 		VAR res : WORD;
 		BEGIN
 			command[0] := 0C0X;
@@ -246,7 +246,7 @@ TYPE
 			RETURN res;
 		END ScmReadBlock;
 
-		PROCEDURE ScmWriteBlock(access, reg : CHAR; VAR content : Usbdi.Buffer; ofs, len : SIZE; VAR tlen : SIZE; timeout : LONGINT): WORD;
+		PROCEDURE ScmWriteBlock(access, reg : CHAR; VAR content : Usbdi.Buffer; ofs, len : SIZE; VAR tlen : SIZE; timeout : SIGNED32): WORD;
 		VAR res : WORD;
 		BEGIN
 			command[0] := 40X;
@@ -269,7 +269,7 @@ TYPE
 
 		PROCEDURE ScmRWBlockTest(access : CHAR; VAR registers, dataout : ARRAY OF CHAR;
 			numregs :SIGNED16; datareg, statusreg, atapitimeout, qualifier : CHAR; dir : SET; VAR content : Usbdi.Buffer;
-			ofs, contentlen: SIZE; VAR tlen : SIZE; timeout : LONGINT): WORD;
+			ofs, contentlen: SIZE; VAR tlen : SIZE; timeout : SIGNED32): WORD;
 		VAR
 			tmpreg : CHAR;
 			status : CHAR;
@@ -492,10 +492,10 @@ TYPE
 		END Initialization;
 
 		PROCEDURE Transport*(cmd : ARRAY OF CHAR; cmdlen : SIZE; dir : SET;
-			VAR buffer : ARRAY OF CHAR; ofs, bufferlen : SIZE; VAR tlen : SIZE; timeout : LONGINT) : WORD;
+			VAR buffer : ARRAY OF CHAR; ofs, bufferlen : SIZE; VAR tlen : SIZE; timeout : SIGNED32) : WORD;
 		VAR
 			registers, data : ARRAY 32 OF CHAR;
-			i : LONGINT; res : WORD;
+			i : SIGNED32; res : WORD;
 			status : CHAR;
 			atapilen, tmplen, sector, transfered : SIZE;
 			j : SIZE;
@@ -652,7 +652,7 @@ TYPE
 			RETURN Base.ResOk;
 		END Transport;
 
-		PROCEDURE Wait(ms : LONGINT);
+		PROCEDURE Wait(ms : SIGNED32);
 		BEGIN
 			timer.Sleep(ms);
 		END Wait;

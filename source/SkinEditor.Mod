@@ -41,10 +41,10 @@ TYPE
 
 	ErrorList= OBJECT
 	VAR errors : ARRAY MaxErrors OF ErrorInfo;
-		size : LONGINT;
+		size : SIGNED32;
 
 		PROCEDURE & Init*;
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 		BEGIN
 			size := 0;
 			FOR i := 0 TO MaxErrors-1 DO NEW(errors[i]) END
@@ -112,7 +112,7 @@ TYPE
 		archiveTree : WMArchives.ArchiveTree;
 		history : FNHistories.History;
 		modified, splitted : BOOLEAN;
-		focus : LONGINT;
+		focus : SIGNED32;
 		originalSkin : SkinEngine.Skin;
 		skinFile : Archives.Archive;
 
@@ -232,7 +232,7 @@ TYPE
 		END CreateForm;
 
 		PROCEDURE &New*(c : WMRestorable.Context);
-		VAR fl, cp : LONGINT;
+		VAR fl, cp : SIGNED32;
 			 vc : WMComponents.VisualComponent;
 			 xml : XML.Element;
 			 s : Strings.String;
@@ -327,7 +327,7 @@ TYPE
 		PROCEDURE ErrorClick(sender, data : ANY);
 		VAR scol, srow, ecol, erow, y : SIZE;
 			focusEditor : WMEditors.Editor;
-			index : LONGINT;
+			index : SIGNED32;
 		BEGIN
 			errorLog.GetSelection(scol, srow, ecol, erow);
 			y := srow;
@@ -614,8 +614,8 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE ReportError(pos, line, col : LONGINT; msg : String);
-		VAR i : LONGINT;
+		PROCEDURE ReportError(pos, line, col : SIGNED32; msg : String);
+		VAR i : SIGNED32;
 		BEGIN
 			i := 	compileErrors.size; IF i = MaxErrors THEN RETURN END; (* too many errors *)
 			(* main editor *)
@@ -634,7 +634,7 @@ TYPE
 		END ReportError;
 
 		PROCEDURE RemovePositionMarkers;
-		VAR i : LONGINT;
+		VAR i : SIGNED32;
 		BEGIN
 			IF compileErrors = NIL THEN RETURN END;
 			FOR i := 0 TO compileErrors.size - 1 DO
@@ -663,7 +663,7 @@ TYPE
 	END Window;
 
 VAR
-	nofWindows : LONGINT;
+	nofWindows : SIGNED32;
 
 	StrPreviewPanel : String;
 

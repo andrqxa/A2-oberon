@@ -101,8 +101,8 @@ VAR
 	error, done, good: BOOLEAN;
 	color, hold: Color;
 	colora: ARRAY 3 OF CHAR;
-	len: LONGINT; f: Files.File;
-	pos: LONGINT;
+	len: SIGNED32; f: Files.File;
+	pos: SIGNED32;
 BEGIN
 	pos := Files.Pos(R);
 	IF GetTgaHeader( R, H) THEN
@@ -313,7 +313,7 @@ END LoadTga;
 
 PROCEDURE Handle*(obj: Objects.Object; VAR msg: Objects.ObjMsg);
 VAR
-	pos: LONGINT;
+	pos: SIGNED32;
 BEGIN
 	WITH obj: Pictures.Picture DO
 		IF msg IS Objects.AttrMsg THEN

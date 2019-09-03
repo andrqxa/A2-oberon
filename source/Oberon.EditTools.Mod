@@ -21,7 +21,7 @@ CONST
 VAR
 	W, WR: Texts.Writer;
 
-	PROCEDURE Plural (n: LONGINT; CONST s: ARRAY OF CHAR);
+	PROCEDURE Plural (n: SIGNED32; CONST s: ARRAY OF CHAR);
 	BEGIN Texts.WriteInt(W, n, 0); Texts.Write(W, " "); Texts.WriteString(W, s);
 		IF n # 1 THEN Texts.Write(W, "s") END;
 		Texts.Append(Oberon.Log, W.buf);
@@ -71,9 +71,9 @@ VAR
 
 	(** text manipulation **)
 
-	PROCEDURE IncFontSize* (T: Texts.Text; beg, end: LONGINT; delta: SIGNED16);
+	PROCEDURE IncFontSize* (T: Texts.Text; beg, end: SIGNED32; delta: SIGNED16);
 		CONST MinSize = 6; MaxSize = 96;
-		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, size: SIGNED16; ch: CHAR;
+		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: SIGNED32; i, j, size: SIGNED16; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg;
 			fnt := R.lib;
@@ -87,8 +87,8 @@ VAR
 		END
 	END IncFontSize;
 
-	PROCEDURE ChangeFontSize* (T: Texts.Text; beg, end: LONGINT; old, new: SIGNED16);
-		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, size: SIGNED16; ch: CHAR;
+	PROCEDURE ChangeFontSize* (T: Texts.Text; beg, end: SIGNED32; old, new: SIGNED16);
+		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: SIGNED32; i, j, size: SIGNED16; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg; fnt := R.lib;
 			WHILE ~R.eot & (beg < end) & (R.lib = fnt) DO INC(beg); Texts.Read(R, ch) END;
@@ -102,8 +102,8 @@ VAR
 		END
 	END ChangeFontSize;
 
-	PROCEDURE ChangeFontFamily* (T: Texts.Text; beg, end: LONGINT; CONST old, new: ARRAY OF CHAR);
-		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, i1, j, j1, size, size1: SIGNED16; ch: CHAR;
+	PROCEDURE ChangeFontFamily* (T: Texts.Text; beg, end: SIGNED32; CONST old, new: ARRAY OF CHAR);
+		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: SIGNED32; i, i1, j, j1, size, size1: SIGNED16; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg; fnt := R.lib;
 			WHILE ~R.eot & (beg < end) & (R.lib = fnt) DO INC(beg); Texts.Read(R, ch) END;
@@ -116,8 +116,8 @@ VAR
 		END
 	END ChangeFontFamily;
 
-	PROCEDURE ChangeFontStyle* (T: Texts.Text; beg, end: LONGINT; old, new: CHAR);
-		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: LONGINT; i, j, k, size: SIGNED16; ch: CHAR;
+	PROCEDURE ChangeFontStyle* (T: Texts.Text; beg, end: SIGNED32; old, new: CHAR);
+		VAR R: Texts.Reader; fnt: Objects.Library; fn: Objects.Name; org: SIGNED32; i, j, k, size: SIGNED16; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg; fnt := R.lib;
 			WHILE ~R.eot & (beg < end) & (R.lib = fnt) DO INC(beg); Texts.Read(R, ch) END;
@@ -137,8 +137,8 @@ VAR
 		END
 	END ChangeFontStyle;
 
-	PROCEDURE ChangeFont* (T: Texts.Text; beg, end: LONGINT; CONST old, new: ARRAY OF CHAR);
-		VAR R: Texts.Reader; fnt: Objects.Library; org: LONGINT; ch: CHAR;
+	PROCEDURE ChangeFont* (T: Texts.Text; beg, end: SIGNED32; CONST old, new: ARRAY OF CHAR);
+		VAR R: Texts.Reader; fnt: Objects.Library; org: SIGNED32; ch: CHAR;
 	BEGIN Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO org := beg; fnt := R.lib;
 			WHILE ~R.eot & (beg < end) & (R.lib = fnt) DO INC(beg); Texts.Read(R, ch) END;
@@ -153,7 +153,7 @@ VAR
 	(** increment or decrement font size of selected text *)
 	PROCEDURE IncSize*;	(** size; selection **)
 		CONST MinSize = -6; MaxSize = 6;
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.class = Texts.Int) & (S.line = 0) & (MinSize <= S.i) & (S.i <= MaxSize) THEN
@@ -164,7 +164,7 @@ VAR
 	(** change font size of selected text (from => to) *)
 	PROCEDURE ChangeSize*;	(** {old "=>" new}, selection **)
 		CONST MinSize = 6; MaxSize = 96;
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: SIGNED16;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; old: SIGNED16;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.line = 0) THEN
@@ -180,7 +180,7 @@ VAR
 
 	(** change style of selected text (from => to) *)
 	PROCEDURE ChangeStyle*;	(** {old "=>" new}, selection **)
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old, new: CHAR;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; old, new: CHAR;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.line = 0) THEN
@@ -197,7 +197,7 @@ VAR
 
 	(** change font family of selected text (from => to) *)
 	PROCEDURE ChangeFamily*;	(** {old "=>" new}, selection **)
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: Objects.Name;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; old: Objects.Name;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.line = 0) THEN
@@ -213,7 +213,7 @@ VAR
 
 	(** change font of selected text *)
 	PROCEDURE Change*;	(** {old "=>" new}, selection **)
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: Objects.Name;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; old: Objects.Name;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.line = 0) THEN
@@ -227,8 +227,8 @@ VAR
 		END
 	END Change;
 
-	PROCEDURE ChangeCol* (T: Texts.Text; beg, end: LONGINT; old, new: SIGNED16);
-		VAR R: Texts.Reader; org: LONGINT; color: SIGNED16; ch: CHAR;
+	PROCEDURE ChangeCol* (T: Texts.Text; beg, end: SIGNED32; old, new: SIGNED16);
+		VAR R: Texts.Reader; org: SIGNED32; color: SIGNED16; ch: CHAR;
 	BEGIN
 		Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO
@@ -243,7 +243,7 @@ VAR
 	(** change color of selected text *)
 	PROCEDURE ChangeColor*;	(** {old "=>" new}, selection / old may be "?" / Color = 0 .. 255 **)
 		CONST Range=256;
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: SIGNED16;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; old: SIGNED16;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.line = 0) THEN
@@ -257,8 +257,8 @@ VAR
 		END
 	END ChangeColor;
 
-	PROCEDURE Changevoff* (T: Texts.Text; beg, end: LONGINT; old, new: SIGNED16);
-		VAR R: Texts.Reader; org: LONGINT; voff: SIGNED16; ch: CHAR;
+	PROCEDURE Changevoff* (T: Texts.Text; beg, end: SIGNED32; old, new: SIGNED16);
+		VAR R: Texts.Reader; org: SIGNED32; voff: SIGNED16; ch: CHAR;
 	BEGIN
 		Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO
@@ -274,7 +274,7 @@ VAR
 	PROCEDURE ChangeVoff*;	(** {old "=>" new}, selection / old may be "?" / Voff = -32 .. 32 **)
 		CONST Range=32;
 
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT; old: SIGNED16;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32; old: SIGNED16;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.line = 0) THEN
@@ -288,8 +288,8 @@ VAR
 		END
 	END ChangeVoff;
 
-	PROCEDURE Incvoff* (T: Texts.Text; beg, end: LONGINT; delta: SIGNED16);
-		VAR R: Texts.Reader; org: LONGINT; voff: SIGNED16; ch: CHAR;
+	PROCEDURE Incvoff* (T: Texts.Text; beg, end: SIGNED32; delta: SIGNED16);
+		VAR R: Texts.Reader; org: SIGNED32; voff: SIGNED16; ch: CHAR;
 	BEGIN
 		Texts.OpenReader(R, T, beg); Texts.Read(R, ch);
 		WHILE ~R.eot & (beg < end) DO
@@ -301,7 +301,7 @@ VAR
 
 	PROCEDURE IncVoff*;	(** Voff increment; selection / size = -32 .. 32 **)
 		CONST Range=32;
-		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: LONGINT;
+		VAR S: Texts.Scanner; text: Texts.Text; beg, end, time: SIGNED32;
 	BEGIN Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		Oberon.GetSelection(text, beg, end, time);
 		IF (time # -1) & (S.class = Texts.Int) & (S.line = 0) & (-Range <= S.i) & (S.i <= Range) THEN
@@ -309,10 +309,10 @@ VAR
 		END
 	END IncVoff;
 
-	PROCEDURE upper*(T: Texts.Text; beg, end: LONGINT);
+	PROCEDURE upper*(T: Texts.Text; beg, end: SIGNED32);
 		VAR
 			R: Texts.Reader;
-			pos: LONGINT;
+			pos: SIGNED32;
 			ch: CHAR;
 	BEGIN
 		pos := beg;
@@ -334,7 +334,7 @@ VAR
 	PROCEDURE Upper*;
 		VAR
 			text: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 	BEGIN
 		Oberon.GetSelection(text, beg, end, time);
 		IF time # -1 THEN
@@ -342,10 +342,10 @@ VAR
 		END
 	END Upper;
 
-	PROCEDURE lower*(T: Texts.Text; beg, end: LONGINT);
+	PROCEDURE lower*(T: Texts.Text; beg, end: SIGNED32);
 		VAR
 			R: Texts.Reader;
-			pos: LONGINT;
+			pos: SIGNED32;
 			ch: CHAR;
 	BEGIN
 		pos := beg;
@@ -367,7 +367,7 @@ VAR
 	PROCEDURE Lower*;
 		VAR
 			text: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 	BEGIN
 		Oberon.GetSelection(text, beg, end, time);
 		IF time # -1 THEN
@@ -375,10 +375,10 @@ VAR
 		END
 	END Lower;
 
-	PROCEDURE flipCase*(T: Texts.Text; beg, end: LONGINT);
+	PROCEDURE flipCase*(T: Texts.Text; beg, end: SIGNED32);
 		VAR
 			R: Texts.Reader;
-			pos: LONGINT;
+			pos: SIGNED32;
 			flip, ch: CHAR;
 	BEGIN
 		pos := beg;
@@ -404,7 +404,7 @@ VAR
 	PROCEDURE FlipCase*;
 		VAR
 			text: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 	BEGIN
 		Oberon.GetSelection(text, beg, end, time);
 		IF time # -1 THEN
@@ -593,7 +593,7 @@ VAR
 
 	(** Strip objects from text *)
 	PROCEDURE RemoveObjects*;
-	VAR D: Documents.Document; L: Objects.LinkMsg; R: Texts.Reader; ch: CHAR; pos: LONGINT;
+	VAR D: Documents.Document; L: Objects.LinkMsg; R: Texts.Reader; ch: CHAR; pos: SIGNED32;
 	BEGIN
 		D := Documents.MarkedDoc();
 		IF (D # NIL) & (D.dsc # NIL) THEN
@@ -613,7 +613,7 @@ VAR
 		END
 	END RemoveObjects;
 
-	PROCEDURE Count* (T: Texts.Text; beg, end: LONGINT; VAR wc, pc, ec: LONGINT);
+	PROCEDURE Count* (T: Texts.Text; beg, end: SIGNED32; VAR wc, pc, ec: SIGNED32);
 		VAR R: Texts.Reader; ch: CHAR;
 	BEGIN wc:=0; pc:=0; ec:=0;
 		Texts.OpenReader(R, T, beg); Texts.Read(R, ch); INC(beg);
@@ -630,8 +630,8 @@ VAR
 		END
 	END Count;
 
-	PROCEDURE GetMainArg (VAR S: Texts.Scanner; VAR beg, end: LONGINT);
-		VAR text: Texts.Text; sbeg, send, time: LONGINT;
+	PROCEDURE GetMainArg (VAR S: Texts.Scanner; VAR beg, end: SIGNED32);
+		VAR text: Texts.Text; sbeg, send, time: SIGNED32;
 	BEGIN beg:=Oberon.Par.pos; end:=Oberon.Par.text.len;
 		Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos); Texts.Scan(S);
 		IF (S.class=Texts.Char) & (S.line=0) & (S.c="^") THEN Oberon.GetSelection(text, sbeg, send, time);
@@ -642,7 +642,7 @@ VAR
 	(** Calculates # words, chars, and objects *)
 	PROCEDURE Words*;	(** "@" | "^" | "*" *)
 		VAR S: Texts.Scanner; D: Documents.Document; text: Texts.Text; L: Objects.LinkMsg;
-			cc, wc, pc, ec, beg1, end1, beg, end, time: LONGINT;  done: BOOLEAN;
+			cc, wc, pc, ec, beg1, end1, beg, end, time: SIGNED32;  done: BOOLEAN;
 	BEGIN GetMainArg(S, beg1, end1); D:=Documents.MarkedDoc(); Oberon.GetSelection(text, beg, end, time);
 		done := FALSE;
 		IF (S.class=Texts.Char) & (S.c="*") & (D # NIL) THEN
@@ -664,7 +664,7 @@ VAR
 	PROCEDURE ShowAttrs*;	(** "^" **)
 		VAR
 			T: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			R: Texts.Reader;
 			gen: ARRAY 64 OF CHAR;
 			obj: Objects.Object;
@@ -722,7 +722,7 @@ VAR
 
 	(** Show position of selected text *)
 	PROCEDURE ShowPos*;	(** "^" **)
-		VAR T: Texts.Text; beg, end, time: LONGINT;
+		VAR T: Texts.Text; beg, end, time: SIGNED32;
 	BEGIN
 		Oberon.GetSelection(T, beg, end, time);
 		IF (time # -1) & (T # NIL) THEN
@@ -737,9 +737,9 @@ VAR
 		VAR
 			S: Attributes.Scanner;
 			C: Oberon.CaretMsg;
-			line: LONGINT;
+			line: SIGNED32;
 			T: Texts.Text;
-			beg, end, time: LONGINT;
+			beg, end, time: SIGNED32;
 			R: Texts.Reader;
 			ch: CHAR;
 	BEGIN

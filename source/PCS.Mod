@@ -114,17 +114,17 @@ TYPE
 	Scanner* = OBJECT
 		VAR
 			buffer: Buffer;
-			pos: LONGINT;	(*pos in buffer*)
+			pos: SIGNED32;	(*pos in buffer*)
 			ch-: CHAR;	(**look-ahead *)
 			name-: Name;
 			str*: String;
 			numtyp-: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
-			intval-: LONGINT;	(* integer value or string length *)
+			intval-: SIGNED32;	(* integer value or string length *)
 			longintval-: HUGEINT;
 			realval-: REAL;
 			lrlval-: LONGREAL;
-			numStartPos, numEndPos: LONGINT;
-			curpos-, errpos-: LONGINT;	(*pos in text*)
+			numStartPos, numEndPos: SIGNED32;
+			curpos-, errpos-: SIGNED32;	(*pos in text*)
 			isNummer: BOOLEAN;
 
 			(* fof 070731 *)
@@ -176,7 +176,7 @@ TYPE
 		END Str;
 
 		PROCEDURE Identifier(VAR sym: SIGNED8; check: BOOLEAN);
-			VAR i: LONGINT;
+			VAR i: SIGNED32;
 		BEGIN i := 0;
 			REPEAT
 				str[i] := ch; INC(i); NextChar
@@ -618,7 +618,7 @@ TYPE
 		Files.Register(f);
 	END SaveBuffer;
 *)
-	PROCEDURE NewScanner(b: Buffer;  pos, curpos: LONGINT): Scanner;
+	PROCEDURE NewScanner(b: Buffer;  pos, curpos: SIGNED32): Scanner;
 	VAR s: Scanner;
 	BEGIN
 (*
@@ -633,9 +633,9 @@ TYPE
 		RETURN s
 	END NewScanner;
 
-	PROCEDURE InitWithText*(t: Texts.Text; pos: LONGINT): Scanner;
-		VAR buffer: Buffer; len, i, j: SIZE; ch: LONGINT; r: Texts.TextReader;
-		bytesPerChar: LONGINT;
+	PROCEDURE InitWithText*(t: Texts.Text; pos: SIGNED32): Scanner;
+		VAR buffer: Buffer; len, i, j: SIZE; ch: SIGNED32; r: Texts.TextReader;
+		bytesPerChar: SIGNED32;
 	BEGIN
 		t.AcquireRead;
 		len := t.GetLength();
@@ -672,12 +672,12 @@ TYPE
 	BEGIN
 		NEW(buffer, size);
 		r.Bytes(buffer^, 0, size, read);
-		RETURN NewScanner(buffer, 0, pos(LONGINT))
+		RETURN NewScanner(buffer, 0, pos(SIGNED32))
 	END InitWithReader;
 
 (*
 	PROCEDURE InitReservedCharsOld;
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN(reservedChar)-1 DO
 			IF (CHR(i) < "0") OR ("9" < CHR(i)) & (CHR(i) < "A") OR ("Z"< CHR(i)) & (CHR(i) < "a") OR ("z" < CHR(i)) THEN
@@ -691,7 +691,7 @@ TYPE
 
 	PROCEDURE InitReservedChars;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN(reservedChar)-1 DO
 			reservedChar[i] := ((CHR(i) < '0') OR ('9' < CHR(i))) & (CAP(CHR(i)) < "A") OR ("Z" < CAP(CHR(i))) & (CHR(i) # '_')
@@ -700,7 +700,7 @@ TYPE
 
 	PROCEDURE InitNewChar;
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN(newChar)-1 DO
 			(* UTF-8 encoded characters with bits 10XXXXXX do not start a new unicode character *)

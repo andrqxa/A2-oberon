@@ -360,7 +360,7 @@ TYPE
 
 		PROCEDURE &Init*;
 		BEGIN
-			color := LONGINT(0FF0000CCH); visible := TRUE
+			color := SIGNED32(0FF0000CCH); visible := TRUE
 		END Init;
 
 		PROCEDURE Draw(canvas : WMGraphics.Canvas; x, y, ascent : SIZE);
@@ -369,7 +369,7 @@ TYPE
 			IF img # NIL THEN canvas.DrawImage(x - hotX, y - hotY, img, WMGraphics.ModeSrcOverDst)
 			ELSE
 				currentArea := GetArea(x, y, ascent);
-				canvas.Fill(currentArea, LONGINT(0FF0000CCH), WMGraphics.ModeSrcOverDst)
+				canvas.Fill(currentArea, SIGNED32(0FF0000CCH), WMGraphics.ModeSrcOverDst)
 			END
 		END Draw;
 
@@ -467,7 +467,7 @@ TYPE
 		chainPrev* : TextObject;
 		chainNextN* : ARRAY 128 OF CHAR;
 		chainPrevN* : ARRAY 128 OF CHAR;
-		vAlign* : LONGINT;
+		vAlign* : SIGNED32;
 
 		showBorders : BOOLEAN;
 		bordersI, borderClip : WMRectangles.Rectangle;
@@ -479,7 +479,7 @@ TYPE
 		firstInParagraph: BOOLEAN;
 		jSpaceSize : REAL;
 
-		defaultTextColor*, defaultTextBgColor* : LONGINT;
+		defaultTextColor*, defaultTextBgColor* : SIGNED32;
 		defaultAttr : Texts.Attributes;
 		(* default style ?? *)
 		defaultFont : WMGraphics.Font;
@@ -544,7 +544,7 @@ TYPE
 			(* firstLineI := 0; *)
 			firstPos := 0;
 			defaultTextColor := 0000000FFH;
-			defaultTextBgColor := LONGINT(0FFFFFF00H);
+			defaultTextBgColor := SIGNED32(0FFFFFF00H);
 			quality := TRUE;
 			preview := FALSE;
 			firstInParagraph := FALSE;
@@ -1475,7 +1475,7 @@ TYPE
 
 		(* llen = -1 to render until the end of line > 0 to render llen elements in the line *)
 		PROCEDURE RenderLine*(canvas : WMGraphics.Canvas; VAR l : LineInfo; linenr: SIZE; top : SIZE; llen : SIZE);
-		VAR sx, x, i, j, k, w, voff : SIZE; color, bgcolor: LONGINT; sp, linelength, p: SIZE; char : Char32; gs: WMGraphics.GlyphSpacings;
+		VAR sx, x, i, j, k, w, voff : SIZE; color, bgcolor: SIGNED32; sp, linelength, p: SIZE; char : Char32; gs: WMGraphics.GlyphSpacings;
 	 		curAttr : Texts.Attributes; font : WMGraphics.Font; vc : WMComponents.VisualComponent;
 	 		hc : BOOLEAN;
 	 		realX, dx: REAL;
@@ -1611,7 +1611,7 @@ TYPE
 				ELSE
 					(* default values *)
 					color := 0000000FFH;
-					bgcolor := LONGINT(0FFFFFF00H);
+					bgcolor := SIGNED32(0FFFFFF00H);
 					font := WMGraphics.GetFont("Oberon", 12, {});
 					voff := 0;
 					curStyle := NIL
@@ -1693,7 +1693,7 @@ TYPE
 			UNTIL (i >= linelength) OR utilreader.eot OR (x + sx > w)
 		END RenderLine;
 
-		PROCEDURE RenderChar(canvas : WMGraphics.Canvas; x, y: REAL; char: Char32; font: WMGraphics.Font; color: LONGINT);
+		PROCEDURE RenderChar(canvas : WMGraphics.Canvas; x, y: REAL; char: Char32; font: WMGraphics.Font; color: SIGNED32);
 		VAR g: WMGraphics.GlyphSpacings; img: WMGraphics.Image;
 			glyphCanvas: WMGraphics.BufferCanvas;
 			glyphImg: WMGraphics.Image;
@@ -1887,7 +1887,7 @@ TYPE
 			ELSIF (keysym = 0FF63H) & (flags * Inputs.Shift # {}) THEN  (* Shift Insert *) Paste
 			(* ELSIF (keysym = 0FF1BH) THEN onEscape.Call(NIL); FocusNext (* Escape *) *)
 			ELSE
-				InsertChar(ucs(LONGINT));
+				InsertChar(ucs(SIGNED32));
 				IF text.GetLength() = 1 THEN
 					text.SetCharacterStyle(0,1, Texts.GetCharacterStyleByName("defaultCharacterStyle"));
 					text.SetParagraphStyle(0,1, Texts.GetParagraphStyleByName("defaultParagrahStyle"));
@@ -2261,7 +2261,7 @@ TYPE
 		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE;  zoomF: REAL; quality, preview: BOOLEAN);
 		VAR la, lb, i, top : SIZE; cliprect : WMRectangles.Rectangle; cstate : WMGraphics.CanvasState;
 			t: SIZE;
-			color: LONGINT;
+			color: SIGNED32;
 			realTop: REAL;
 			overflow: BOOLEAN;
 			chained: BOOLEAN;
@@ -2287,7 +2287,7 @@ TYPE
 *)
 			IF showBorders THEN
 				WMGraphicUtilities.DrawBevel(canvas, WMRectangles.ResizeRect(bounds.Get(), -1),
-					1, TRUE, LONGINT(0808080FFH), WMGraphics.ModeCopy)
+					1, TRUE, SIGNED32(0808080FFH), WMGraphics.ModeCopy)
 			END;
 			text.AcquireRead;
 			la := FindLineByY(firstLineI, MAX(cliprect.t, bordersI.t));
@@ -2351,7 +2351,7 @@ TYPE
 (*				KernelLog.String("lines: "); KernelLog.Int(layout.GetNofLines(), 0); KernelLog.Ln;
 				KernelLog.String("lb: "); KernelLog.Int(lb, 0); KernelLog.Ln;
 *)				IF chained THEN color := 000FF00FFH;
-				ELSE color := LONGINT(0FF0000FFH); END;
+				ELSE color := SIGNED32(0FF0000FFH); END;
 				canvas.Line(w-6, h-6, w, h-6, color, WMGraphics.ModeCopy);
 				canvas.Line(w-6, h-6, w-6, h, color, WMGraphics.ModeCopy);
 				canvas.Line(w-6, h, w, h, color, WMGraphics.ModeCopy);
@@ -3141,7 +3141,7 @@ TYPE
 			currentPStyle : DTPData.ParagraphStyleObject;
 			pStyle : Texts.ParagraphStyle;
 			cStyle : Texts.CharacterStyle;
-			a, b: SIZE; ch : LONGINT;
+			a, b: SIZE; ch : SIGNED32;
 		BEGIN
 			IF (data # NIL ) THEN
 				currentPStyle := data(DTPData.ParagraphStyleObject);
@@ -3205,7 +3205,7 @@ TYPE
 			attr : Texts.Attributes;
 			currentCStyle : DTPData.CharacterStyleObject;
 			cStyle : Texts.CharacterStyle;
-			a, b: SIZE; ch : LONGINT;
+			a, b: SIZE; ch : SIGNED32;
 		BEGIN
 			IF (data # NIL ) THEN
 				currentCStyle := data(DTPData.CharacterStyleObject);

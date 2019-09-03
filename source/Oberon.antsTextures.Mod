@@ -101,7 +101,7 @@ TYPE
 
 	PROCEDURE New*;
 	VAR l: antsCommands.tScanList;     name: vyName.tNameArray;
-	isotropic: BOOLEAN;      size: LONGINT; r: tClass;
+	isotropic: BOOLEAN;      size: SIGNED32; r: tClass;
 	BEGIN
 	l := antsCommands.ScanFromPar();
 	IF antsCommands.ExpectNameFromKeyword(l, "name", 1, name) THEN
@@ -113,7 +113,7 @@ TYPE
 
 	PROCEDURE Add*;
 	VAR l: antsCommands.tScanList;     name: vyName.tNameArray;
-	isotropic: BOOLEAN;      size: LONGINT; r: tClass;  obj1,obj2: vyBase.Object; c: tClass;
+	isotropic: BOOLEAN;      size: SIGNED32; r: tClass;  obj1,obj2: vyBase.Object; c: tClass;
 	BEGIN
 	l := antsCommands.ScanFromPar();
 	IF antsCommands.ExpectObjectFromKeyword(l, "name", 1, obj1)
@@ -130,7 +130,7 @@ TYPE
 
 PROCEDURE Try*;
 	VAR A: antsArrayObjects.tINTEGERObject;   m: antsMDimDiscreteIsingS.tModel;   link: vyLinks.Link;    (* c: tClass; *)region: antsRegions.tRegion;
-	l: antsCommands.tScanList;     obj1: vyBase.Object;   i: LONGINT;   T: antsNeighbourhoods.NeighbourTable;
+	l: antsCommands.tScanList;     obj1: vyBase.Object;   i: SIGNED32;   T: antsNeighbourhoods.NeighbourTable;
 	c: antsKernel.Kernel;
 BEGIN
 	l := antsCommands.ScanFromPar("name=OBJ");
@@ -200,8 +200,8 @@ END GoThrough;
 
 PROCEDURE GoThroughSel*;
 	VAR A: antsArrayObjects.tINTEGERObject;   m: antsMDimDiscreteIsingS.tModel;   link: vyLinks.Link;    (* c: tClass; *)region: antsRegions.tRegion;
-	l: antsCommands.tScanList;     obj1: vyBase.Object;   i: SIGNED16;   min, val: LONGREAL;   mini: SIGNED16;   size, to, curs: LONGINT;
-	y, x: SIGNED16;   ty, tx: LONGINT;
+	l: antsCommands.tScanList;     obj1: vyBase.Object;   i: SIGNED16;   min, val: LONGREAL;   mini: SIGNED16;   size, to, curs: SIGNED32;
+	y, x: SIGNED16;   ty, tx: SIGNED32;
 	B : antsArrayObjects.tINTEGERObject;   tac, taccur: tArrayChain;
 	c: antsKernel.Kernel;
 BEGIN

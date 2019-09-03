@@ -143,7 +143,7 @@ TYPE
 		status*, result*: SIGNED8;
 		target*, chan*, lun*: SIGNED8;	(**destination*)
 		cmd*: ARRAY 12 OF CHAR;  clen*: SIGNED8;	(**command*)
-		dataAddr*: ADDRESS; dlen*: LONGINT;	(**data*)
+		dataAddr*: ADDRESS; dlen*: SIGNED32;	(**data*)
 		tag*: CHAR;	(*SCSI-II queued command tag*)
 	END;
 
@@ -170,7 +170,7 @@ TYPE
 			started: BOOLEAN;
 			next*: Disk;
 
-		PROCEDURE Transfer*(op, start, num: LONGINT; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE Transfer*(op, start, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
 		VAR  requ: Command;  str: ARRAY 32 OF CHAR;
 		BEGIN
 			IF (op = Disks.Read) OR (op = Disks.Write) THEN
@@ -194,8 +194,8 @@ TYPE
 			END
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: LONGINT; VAR res: WORD);
-		VAR  blkSize: LONGINT;
+		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: WORD);
+		VAR  blkSize: SIGNED32;
 		BEGIN
 			DoReadCapacity(bus, target, 0, size, blkSize, res);
 			IF size # 0 THEN
@@ -222,10 +222,10 @@ TYPE
 
 VAR
 	busList: Bus;
-	busCount: LONGINT;
+	busCount: SIGNED32;
 
 	diskList: Disk;
-	diskCount: LONGINT;
+	diskCount: SIGNED32;
 
 	deviceClassName: ARRAY 32, 20 OF CHAR;
 	trace: SET;
@@ -273,13 +273,13 @@ PROCEDURE WriteDisk(disk: Disk);
 BEGIN  KernelLog.String(disk.name); KernelLog.String(": ")
 END WriteDisk;
 
-PROCEDURE WriteDisk2(bus: Bus;  target: LONGINT);
+PROCEDURE WriteDisk2(bus: Bus;  target: SIGNED32);
 BEGIN  KernelLog.String(bus.name); KernelLog.Char("."); KernelLog.Int(target, 0); KernelLog.String(": ")
 END WriteDisk2;
 
 (** Useful SCSI Commands *)
 
-PROCEDURE MakeCmd6(VAR c: ARRAY OF CHAR;  op: CHAR;  lun, lba, len, ctrl: LONGINT);
+PROCEDURE MakeCmd6(VAR c: ARRAY OF CHAR;  op: CHAR;  lun, lba, len, ctrl: SIGNED32);
 BEGIN
 	ASSERT((0 <= lun) & (lun < 8), 100);
 	ASSERT((0 <= lba) & (lba < 200000H), 101);
@@ -292,7 +292,7 @@ BEGIN
 	c[5] := CHR(ctrl)
 END MakeCmd6;
 
-PROCEDURE MakeCmd10(VAR c: ARRAY OF CHAR;  op: CHAR;  lun: LONGINT; lba: ADDRESS; len, ctrl: LONGINT);
+PROCEDURE MakeCmd10(VAR c: ARRAY OF CHAR;  op: CHAR;  lun: SIGNED32; lba: ADDRESS; len, ctrl: SIGNED32);
 BEGIN
 	ASSERT((0 <= len) & (len < 10000H), 100);
 	c[0] := op;
@@ -308,7 +308,7 @@ BEGIN
 END MakeCmd10;
 
 (*
-PROCEDURE MakeCmd12(VAR c: ARRAY OF CHAR;  op: CHAR;  lun, lba, len, ctrl: LONGINT);
+PROCEDURE MakeCmd12(VAR c: ARRAY OF CHAR;  op: CHAR;  lun, lba, len, ctrl: SIGNED32);
 BEGIN
 	c[0] := op;
 	c[1] := CHR(LSH(lun, 5));
@@ -325,13 +325,13 @@ BEGIN
 END MakeCmd12;
 *)
 
-PROCEDURE NewCmd(VAR c: Command; t, l: SIGNED8; cl: LONGINT; da: ADDRESS; dl: LONGINT);
+PROCEDURE NewCmd(VAR c: Command; t, l: SIGNED8; cl: SIGNED32; da: ADDRESS; dl: SIGNED32);
 BEGIN
 	c.clen := SHORT(SHORT(cl));  c.dataAddr := da;  c.dlen := dl;
 	c.target := t;  c.lun := l;  c.chan := 0;
 END NewCmd;
 
-PROCEDURE DoSense*(b: Bus;  target,  lun: SIGNED8;  VAR key, code: LONGINT; VAR res: WORD);
+PROCEDURE DoSense*(b: Bus;  target,  lun: SIGNED8;  VAR key, code: SIGNED32; VAR res: WORD);
 VAR requ: Command; data: ARRAY 36 OF CHAR;
 BEGIN
 	MakeCmd6(requ.cmd, RequestSense, lun, 0, 36, 0);
@@ -346,8 +346,8 @@ BEGIN
 	res := requ.status
 END DoSense;
 
-PROCEDURE SubmitAndSense*(d: Bus;  VAR requ: Command;  maxtry: LONGINT;  msg: ARRAY OF CHAR;  VAR res: WORD);
-VAR key, code, kind: LONGINT; first: BOOLEAN;
+PROCEDURE SubmitAndSense*(d: Bus;  VAR requ: Command;  maxtry: SIGNED32;  msg: ARRAY OF CHAR;  VAR res: WORD);
+VAR key, code, kind: SIGNED32; first: BOOLEAN;
 BEGIN
 	first := TRUE;
 	REPEAT
@@ -395,7 +395,7 @@ BEGIN
 END DoTestUnitReady;
 
 PROCEDURE DoInquiry*(b: Bus;  target, lun: SIGNED8; VAR inq: InquiryData; VAR res: WORD);
-VAR requ: Command; data: ARRAY 36 OF CHAR; i: LONGINT;
+VAR requ: Command; data: ARRAY 36 OF CHAR; i: SIGNED32;
 BEGIN
 	MakeCmd6(requ.cmd, Inquiry, lun, 0, 36, 0);
 	NewCmd(requ, target, 0, 6, ADDRESSOF(data), 36);
@@ -450,8 +450,8 @@ BEGIN
 	END
 END PreventAllowRemoval;
 
-PROCEDURE DoReadCapacity*(b: Bus;  target, lun: SIGNED8;  VAR capacity, blockSize: LONGINT;  VAR res: WORD);
-VAR  requ: Command;  data: ARRAY 128 OF CHAR;  i: LONGINT;
+PROCEDURE DoReadCapacity*(b: Bus;  target, lun: SIGNED8;  VAR capacity, blockSize: SIGNED32;  VAR res: WORD);
+VAR  requ: Command;  data: ARRAY 128 OF CHAR;  i: SIGNED32;
 BEGIN
 	capacity := 0;  blockSize := 0;
 	IF (b # NIL) THEN
@@ -497,7 +497,7 @@ BEGIN
 	IF d.inquiry.deviceClass IN DiskDevices THEN  Disks.registry.Remove(d)  END;
 END TerminateDisk;
 
-PROCEDURE NumToChar(i: LONGINT): CHAR;
+PROCEDURE NumToChar(i: SIGNED32): CHAR;
 VAR  ch: CHAR;
 BEGIN
 	ASSERT(i >= 0);
@@ -512,7 +512,7 @@ END NumToChar;
 (** SCSI Bus Handling *)
 
 PROCEDURE InitBus(bus: Bus);
-VAR  i: SIGNED8;  d: Disk; data: InquiryData;  max, j, k: LONGINT; res: WORD; name: Plugins.Name;
+VAR  i: SIGNED8;  d: Disk; data: InquiryData;  max, j, k: SIGNED32; res: WORD; name: Plugins.Name;
 BEGIN
 	i := 0;
 	IF bus.wide THEN  max := 16  ELSE  max := 8  END;
@@ -617,7 +617,7 @@ BEGIN
 	i := 0;
 	trace := SYSTEM.VAL(SET, Machine.StrToInt(i, str));
 	IF trace # {} THEN
-		KernelLog.String("SCSIDebug = "); KernelLog.Hex(SYSTEM.VAL(LONGINT, trace),0); KernelLog.Ln
+		KernelLog.String("SCSIDebug = "); KernelLog.Hex(SYSTEM.VAL(SIGNED32, trace),0); KernelLog.Ln
 	END;
 END Init;
 

@@ -27,7 +27,7 @@ CONST
 
 TYPE
 	HashEntrySegmentedName = RECORD
-		key: ObjectFile.SegmentedName; (* key[0]= MIN(LONGINT) <=> empty *)
+		key: ObjectFile.SegmentedName; (* key[0]= MIN(SIGNED32) <=> empty *)
 		value: Block;
 	END;
 	HashSegmentedNameArray = POINTER TO ARRAY OF HashEntrySegmentedName;
@@ -115,7 +115,7 @@ TYPE
 			Init(size*2);
 			FOR i := 0 TO oldSize-1 DO
 				key := oldTable[i].key;
-				IF key[0] # MIN(LONGINT) THEN
+				IF key[0] # MIN(SIGNED32) THEN
 					IF oldTable[i].value # NIL THEN
 						Put(key, oldTable[i].value);
 					END;

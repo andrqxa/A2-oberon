@@ -88,10 +88,10 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 			width*, height*: REAL;	(** paper size in default coordinates **)
 			left*, bot*, right*, top*: REAL;	(** borders in default coordinates **)
 			level2*, landscape*, eps*: BOOLEAN;	(** flags affecting generated code **)
-			res*: LONGINT;	(** device resolution **)
+			res*: SIGNED32;	(** device resolution **)
 			cp: GfxPaths.Path;	(* current path if Record flag isn't set *)
 			llx, lly, urx, ury: REAL;	(* document bounding box *)
-			fileLen: LONGINT;	(* number of bytes relevant for output pages *)
+			fileLen: SIGNED32;	(* number of bytes relevant for output pages *)
 			pages: SIGNED16;	(* number of pages written *)
 			defMatrix: GfxMatrix.Matrix;	(* default matrix *)
 			clip: ClipPath;	(* current list of clip paths *)
@@ -134,7 +134,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		Files.Write(r, CR); Files.Write(r, LF)
 	END Ln;
 
-	PROCEDURE Hex (VAR r: Files.Rider; n: LONGINT);
+	PROCEDURE Hex (VAR r: Files.Rider; n: SIGNED32);
 	BEGIN
 		IF n >= 10 THEN
 			Ch(r, CHR(n - 10 + ORD("a")))
@@ -152,10 +152,10 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Str (VAR r: Files.Rider; s: ARRAY OF CHAR);
 	BEGIN
-		Files.WriteBytes(r, s, Strings.Length(s)(LONGINT))
+		Files.WriteBytes(r, s, Strings.Length(s)(SIGNED32))
 	END Str;
 
-	PROCEDURE Int (VAR r: Files.Rider; l: LONGINT);
+	PROCEDURE Int (VAR r: Files.Rider; l: SIGNED32);
 		VAR s: ARRAY 12 OF CHAR;
 	BEGIN
 		Strings.IntToStr(l, s);
@@ -163,7 +163,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END Int;
 
 	PROCEDURE Real (VAR r: Files.Rider; x: REAL);
-		VAR l: LONGINT;
+		VAR l: SIGNED32;
 	BEGIN
 		IF x < 0 THEN Ch(r, "-"); x := -x END;
 		x := x + 0.00005;
@@ -195,8 +195,8 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		Ch(r, "]");
 	END Matrix;
 
-	PROCEDURE Array (VAR r: Files.Rider; VAR a: ARRAY OF REAL; len: LONGINT);
-		VAR i: LONGINT;
+	PROCEDURE Array (VAR r: Files.Rider; VAR a: ARRAY OF REAL; len: SIGNED32);
+		VAR i: SIGNED32;
 	BEGIN
 		Ch(r, "[");
 		IF len > 0 THEN
@@ -210,7 +210,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END Array;
 
 	PROCEDURE Literal (VAR r: Files.Rider; VAR str: ARRAY OF CHAR);
-		VAR i: LONGINT; ch: CHAR;
+		VAR i: SIGNED32; ch: CHAR;
 	BEGIN
 		Ch(r, "(");
 		i := 0; ch := str[0];
@@ -340,7 +340,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END RLEStart;
 
 	PROCEDURE RLECh (VAR r: Files.Rider; x: CHAR; VAR d: RLEData);
-		VAR len, i: LONGINT;
+		VAR len, i: SIGNED32;
 	BEGIN
 		IF d.len = 0 THEN
 			d.buf[0] := x; d.len := 1
@@ -385,7 +385,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END RLECh;
 
 	PROCEDURE RLEStop (VAR r: Files.Rider; VAR d: RLEData);
-		VAR len, i: LONGINT;
+		VAR len, i: SIGNED32;
 	BEGIN
 		IF d.len > 0 THEN
 			len := d.len-1;
@@ -447,8 +447,8 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		END
 	END ImageMask;
 
-	PROCEDURE Palette (VAR r: Files.Rider; VAR col: ARRAY OF Images.Pixel; size: LONGINT);
-		VAR i, j: LONGINT;
+	PROCEDURE Palette (VAR r: Files.Rider; VAR col: ARRAY OF Images.Pixel; size: SIGNED32);
+		VAR i, j: SIGNED32;
 	BEGIN
 		Ln(r); Str(r, " <"); i := 0; j := 0;
 		WHILE i < size DO
@@ -462,7 +462,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END Palette;
 
 	PROCEDURE DPalette (VAR r: Files.Rider);
-		VAR i, j: LONGINT; col: Images.Pixel;
+		VAR i, j: SIGNED32; col: Images.Pixel;
 	BEGIN
 		Ln(r); Str(r, " <"); i := 0; j := 0;
 		WHILE i < 256 DO
@@ -673,7 +673,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Fonts ---*)
 
-	PROCEDURE ECh (VAR r: Files.Rider; x: CHAR; VAR ekey, epos: LONGINT);
+	PROCEDURE ECh (VAR r: Files.Rider; x: CHAR; VAR ekey, epos: SIGNED32);
 		CONST c1 = 52845; c2 = 22719;
 		VAR c: CHAR;
 	BEGIN
@@ -686,13 +686,13 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		END
 	END ECh;
 
-	PROCEDURE ELn (VAR r: Files.Rider; VAR ekey, epos: LONGINT);
+	PROCEDURE ELn (VAR r: Files.Rider; VAR ekey, epos: SIGNED32);
 	BEGIN
 		ECh(r, LF, ekey, epos)
 	END ELn;
 
-	PROCEDURE EStr (VAR r: Files.Rider; s: ARRAY OF CHAR; VAR ekey, epos: LONGINT);
-		VAR i: LONGINT;
+	PROCEDURE EStr (VAR r: Files.Rider; s: ARRAY OF CHAR; VAR ekey, epos: SIGNED32);
+		VAR i: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE s[i] # 0X DO
@@ -701,7 +701,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		END
 	END EStr;
 
-	PROCEDURE EECh (VAR r: Files.Rider; x: CHAR; VAR eekey, ekey, epos: LONGINT);
+	PROCEDURE EECh (VAR r: Files.Rider; x: CHAR; VAR eekey, ekey, epos: SIGNED32);
 		CONST c1 = 52845; c2 = 22719;
 		VAR c: CHAR;
 	BEGIN
@@ -710,7 +710,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		ECh(r, c, ekey, epos)
 	END EECh;
 
-	PROCEDURE GetName (ch: LONGINT; VAR s: ARRAY OF CHAR);
+	PROCEDURE GetName (ch: SIGNED32; VAR s: ARRAY OF CHAR);
 	BEGIN
 		CASE ch OF
 		| 32: COPY("space", s)	| 33: COPY("exclam", s)	| 34: COPY("quotedbl", s)	| 35: COPY("numbersign", s)
@@ -737,7 +737,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		END
 	END GetName;
 
-	PROCEDURE Private (VAR r: Files.Rider; VAR ekey, epos: LONGINT);
+	PROCEDURE Private (VAR r: Files.Rider; VAR ekey, epos: SIGNED32);
 	BEGIN
 		EStr(r, "dup /Private 8 dict dup begin", ekey, epos); ELn(r, ekey, epos);
 		EStr(r, "/RD {string currentfile exch readstring pop} executeonly def", ekey, epos); ELn(r, ekey, epos);
@@ -750,20 +750,20 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		EStr(r, "[ {} {} {} ] ND", ekey, epos); ELn(r, ekey, epos)
 	END Private;
 
-	PROCEDURE Char (VAR r: Files.Rider; font: GfxFonts.Font; ch: LONGINT; VAR ekey, epos: LONGINT);
+	PROCEDURE Char (VAR r: Files.Rider; font: GfxFonts.Font; ch: SIGNED32; VAR ekey, epos: SIGNED32);
 		CONST
 			sqrt2 = 1.41421356;
 
 		VAR
-			len, cx, cy, ix, iy, sx, sy, i, eekey: LONGINT; dx, dy, cr, sr, rad, cos, sin, cdx, sdx, cdy, sdy: REAL;
+			len, cx, cy, ix, iy, sx, sy, i, eekey: SIGNED32; dx, dy, cr, sr, rad, cos, sin, cdx, sdx, cdy, sdy: REAL;
 			s: GfxPaths.Scanner; closed: BOOLEAN; name: ARRAY 32 OF CHAR; cmd: ARRAY 2048 OF CHAR;
 
-		PROCEDURE put (x: LONGINT);
+		PROCEDURE put (x: SIGNED32);
 		BEGIN
 			cmd[len] := CHR(x); INC(len)
 		END put;
 
-		PROCEDURE num (x: LONGINT);
+		PROCEDURE num (x: SIGNED32);
 		BEGIN
 			IF (x >= -107) & (x <= 107) THEN
 				put(x + 139)
@@ -859,8 +859,8 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		EStr(r, " ND", ekey, epos); ELn(r, ekey, epos)
 	END Char;
 
-	PROCEDURE CharStrings (VAR r: Files.Rider; font: GfxFonts.Font; VAR ekey, epos: LONGINT);
-		VAR ch, n: LONGINT; s: ARRAY 32 OF CHAR; dx, dy: REAL;
+	PROCEDURE CharStrings (VAR r: Files.Rider; font: GfxFonts.Font; VAR ekey, epos: SIGNED32);
+		VAR ch, n: SIGNED32; s: ARRAY 32 OF CHAR; dx, dy: REAL;
 	BEGIN
 		ch := 0; n := 1;
 		WHILE ch < 256 DO
@@ -895,7 +895,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 
 	(** write type-1 font to rider **)
 	PROCEDURE Type1* (VAR r: Files.Rider; VAR name: ARRAY OF CHAR);
-		VAR scale: REAL; m: GfxMatrix.Matrix; font: GfxFonts.Font; fam, style: ARRAY 32 OF CHAR; i, j, ekey, epos: LONGINT;
+		VAR scale: REAL; m: GfxMatrix.Matrix; font: GfxFonts.Font; fam, style: ARRAY 32 OF CHAR; i, j, ekey, epos: SIGNED32;
 	BEGIN
 		scale := 1000 * PSDPI/ScreenDPI;	(* 1000 Postscript points *)
 		GfxMatrix.Init(m, scale, 0, 0, scale, 0, 0);
@@ -956,7 +956,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END Type1;
 
 	PROCEDURE Type3 (VAR r: Files.Rider; VAR t3: T3Font; scale: REAL);
-		VAR font: GfxFonts.Font; used, i, j: LONGINT; bx, by, dx, dy: REAL; img: Images.Image; name: GfxFonts.FontName;
+		VAR font: GfxFonts.Font; used, i, j: SIGNED32; bx, by, dx, dy: REAL; img: Images.Image; name: GfxFonts.FontName;
 	BEGIN
 		font := t3.font;
 		Str(r, "8 dict dup begin"); Ln(r);
@@ -1077,7 +1077,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END Prolog;
 
 	PROCEDURE Setup (psc: Context);
-		VAR il: Image; pat: Pattern; n: LONGINT; img: Images.Image; t1: T1Font; t3: T3Font;
+		VAR il: Image; pat: Pattern; n: SIGNED32; img: Images.Image; t1: T1Font; t3: T3Font;
 	BEGIN
 		Str(psc.out, "%%BeginSetup"); Ln(psc.out);
 		il := psc.images;
@@ -1251,7 +1251,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	(*--- Clipping ---*)
 
 	PROCEDURE ResetClip (ctxt: Gfx.Context);
-		VAR psc: Context; col: Gfx.Color; pat: Gfx.Pattern; i: LONGINT; fname: GfxFonts.FontName; fmat: GfxMatrix.Matrix;
+		VAR psc: Context; col: Gfx.Color; pat: Gfx.Pattern; i: SIGNED32; fname: GfxFonts.FontName; fmat: GfxMatrix.Matrix;
 	BEGIN
 		psc := ctxt(Context);
 		InitClip(psc);
@@ -1339,8 +1339,8 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 		END
 	END SetLineWidth;
 
-	PROCEDURE SetDashPattern (ctxt: Gfx.Context; VAR on, off: ARRAY OF REAL; len: LONGINT; phase: REAL);
-		VAR psc: Context; i: LONGINT; pat: ARRAY 2*Gfx.MaxDashPatSize OF REAL;
+	PROCEDURE SetDashPattern (ctxt: Gfx.Context; VAR on, off: ARRAY OF REAL; len: SIGNED32; phase: REAL);
+		VAR psc: Context; i: SIGNED32; pat: ARRAY 2*Gfx.MaxDashPatSize OF REAL;
 	BEGIN
 		psc := ctxt(Context);
 		IF (len = psc.dashPatLen) & (phase = psc.dashPhase) THEN
@@ -1461,7 +1461,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END SetColor;
 
 	PROCEDURE FillPattern (psc: Context; llx, lly, urx, ury: REAL; pat: Pattern);
-		VAR m: GfxMatrix.Matrix; px, py: REAL; vcnt, hcnt: LONGINT;
+		VAR m: GfxMatrix.Matrix; px, py: REAL; vcnt, hcnt: SIGNED32;
 	BEGIN
 		Str(psc.out, "gs clip"); Ln(psc.out);
 		GfxMatrix.Invert(psc.defMatrix, m);
@@ -1721,7 +1721,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END BezierTo;
 
 	PROCEDURE ShowOutline (psc: Context; x, y: REAL; VAR str: ARRAY OF CHAR);
-		VAR m: GfxMatrix.Matrix; font: GfxFonts.Font; bw, llx, lly, urx, ury, dx, dy: REAL; i: LONGINT; path: GfxPaths.Path;
+		VAR m: GfxMatrix.Matrix; font: GfxFonts.Font; bw, llx, lly, urx, ury, dx, dy: REAL; i: SIGNED32; path: GfxPaths.Path;
 	BEGIN
 		GfxMatrix.Concat(psc.font.mat, psc.ctm, m);
 		font := GfxFonts.Open(psc.font.name, psc.font.ptsize, m);
@@ -1775,7 +1775,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END ShowOutline;
 
 	PROCEDURE ShowRaster (psc: Context; x, y: REAL; VAR str: ARRAY OF CHAR; font: GfxFonts.Font; VAR m: GfxMatrix.Matrix);
-		VAR name, s: GfxFonts.FontName; i, n: LONGINT; t3: T3Font; dx, dy, llx, lly, urx, ury: REAL;
+		VAR name, s: GfxFonts.FontName; i, n: SIGNED32; t3: T3Font; dx, dy, llx, lly, urx, ury: REAL;
 	BEGIN
 		IF font.rfont # NIL THEN
 			COPY(font.rfont.name, name)
@@ -1993,7 +1993,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	(** terminate output for current document **)
 	PROCEDURE Close* (psc: Context);
 		CONST bufSize = 4096;
-		VAR src: Files.Rider; date, time: LONGINT; str: ARRAY 32 OF CHAR; buf: ARRAY bufSize OF CHAR;
+		VAR src: Files.Rider; date, time: SIGNED32; str: ARRAY 32 OF CHAR; buf: ARRAY bufSize OF CHAR;
 	BEGIN
 		Files.Set(src, Files.Base(psc.out), 0);
 		Files.Set(psc.out, psc.psfile, 0);

@@ -15,7 +15,7 @@ TYPE
 
 	ProcessTimeArray = POINTER TO ARRAY ProcessInfo.MaxNofProcesses OF HUGEINT;
 
-	Callback = PROCEDURE (id : LONGINT; process : Objects.Process; pc, bp, lowAdr, highAdr : ADDRESS);
+	Callback = PROCEDURE (id : SIGNED32; process : Objects.Process; pc, bp, lowAdr, highAdr : ADDRESS);
 
 	Poller = OBJECT
 	VAR

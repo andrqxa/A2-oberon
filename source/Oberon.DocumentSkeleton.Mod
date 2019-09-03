@@ -9,7 +9,7 @@ CONST Menu = "Desktops.StoreDoc[Store] DocumentSkeleton.Cycle[Cycle]";
 VAR W: Texts.Writer;
 
 PROCEDURE Cycle*;
-	VAR doc: Documents.Document; F: Gadgets.Frame; col: LONGINT;
+	VAR doc: Documents.Document; F: Gadgets.Frame; col: SIGNED32;
 BEGIN
 	doc := Desktops.CurDoc(Gadgets.context);
 	IF (doc # NIL) & (doc.dsc IS Gadgets.Frame) THEN
@@ -68,7 +68,7 @@ BEGIN
 END Load;
 
 PROCEDURE Store (D: Documents.Document);
-	VAR obj: Gadgets.Frame; F: Files.File; R: Files.Rider; col: LONGINT;
+	VAR obj: Gadgets.Frame; F: Files.File; R: Files.Rider; col: SIGNED32;
 BEGIN
 	obj := D.dsc(Gadgets.Frame);
 	Texts.WriteString(W, "Store "); Texts.Append(Oberon.Log, W.buf);

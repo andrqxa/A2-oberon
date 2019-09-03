@@ -45,7 +45,7 @@ TYPE
 		ValNodeDesc = RECORD (NodeDesc)
 			str : POINTER TO ARRAY OF CHAR;
 			char : CHAR;
-			int, fills : LONGINT;
+			int, fills : SIGNED32;
 			real : REAL;
 			bool : BOOLEAN;
 			format : SIGNED16;
@@ -221,7 +221,7 @@ BEGIN
 	RETURN node;
 END NewChar;
 
-PROCEDURE NewInt* (int : LONGINT) : Node;
+PROCEDURE NewInt* (int : SIGNED32) : Node;
 VAR node : ValNode;
 BEGIN
 	node := NewValNode (Int); node.int := int; node.fills := 0;
@@ -659,7 +659,7 @@ END CountRows;
 
 PROCEDURE CalcSize (node : ObjNode; VAR minSize : SIGNED16; VAR break : BOOLEAN);		(* node # NIL *)
 TYPE WideCell = POINTER TO RECORD
-			key : LONGINT;
+			key : SIGNED32;
 			col, span : SIGNED16;
 			size, fills : SIGNED16;
 			next : WideCell
@@ -670,7 +670,7 @@ VAR dsc, obj : Node;
 
 		PROCEDURE Adjust (w, fill, col, span : SIGNED16; max, expand : IntLine; anchor : WideCell);		(* max, expand # NIL *)
 		VAR cur, new : WideCell;
-				key : LONGINT;
+				key : SIGNED32;
 		BEGIN
 			IF span = 1 THEN
 				IF fill = 0 THEN expand[col] := MAX(SIGNED16)
@@ -730,8 +730,8 @@ VAR dsc, obj : Node;
 
 BEGIN
 	dsc := node.dsc;	minSize := 0;	break := FALSE;
-	NEW (wanchor); wanchor.key := MAX(LONGINT); wanchor.next := wanchor;
-	NEW (hanchor); hanchor.key := MAX(LONGINT); hanchor.next := hanchor;
+	NEW (wanchor); wanchor.key := MAX(SIGNED32); wanchor.next := wanchor;
+	NEW (hanchor); hanchor.key := MAX(SIGNED32); hanchor.next := hanchor;
 	node.minw := 2*node.hborder + (node.cols-1)*node.hdist;
 	node.minh := 2*node.vborder + (node.rows-1)*node.vdist;
 	WHILE dsc # NIL DO

@@ -23,7 +23,7 @@ MODULE HTMLDocs IN Oberon; (** portable *) (* ejz, Greek & Math support by afi *
 	TYPE
 		DocURL* = POINTER TO DocURLDesc;
 		DocURLDesc* = RECORD (HyperDocs.DefURLDesc)
-			dockey*: LONGINT
+			dockey*: SIGNED32
 		END;
 		TextAttrs = POINTER TO TextAttrsDesc;
 		TextAttrsDesc = RECORD
@@ -40,7 +40,7 @@ MODULE HTMLDocs IN Oberon; (** portable *) (* ejz, Greek & Math support by afi *
 			value*: ARRAY 1024 OF CHAR;
 			pre*, end*: BOOLEAN;
 			ch*, next*, char*: CHAR;
-			avail: LONGINT
+			avail: SIGNED32
 		END;
 		List = POINTER TO ListDesc;
 		ListDesc = RECORD
@@ -63,7 +63,7 @@ MODULE HTMLDocs IN Oberon; (** portable *) (* ejz, Greek & Math support by afi *
 			base*: DocURL;
 			orgLabel: ARRAY 64 OF CHAR;
 			lists: List;
-			orgPos, linkkey*, headerLen, docKey*: LONGINT;
+			orgPos, linkkey*, headerLen, docKey*: SIGNED32;
 			next*: Page;
 			task: Oberon.Task;
 			textC*, linkC*, oldLinkC*, textbackC*, lines*: SIGNED16;
@@ -139,7 +139,7 @@ MODULE HTMLDocs IN Oberon; (** portable *) (* ejz, Greek & Math support by afi *
 	END WriteObj;
 
 	PROCEDURE InitTabs(style: TextGadgets.Style);
-		VAR i: LONGINT;
+		VAR i: SIGNED32;
 	BEGIN
 		style.W := ((dispW DIV 8) * 5)-24; style.width := style.W;
 		style.noTabs := 32;
@@ -221,7 +221,7 @@ MODULE HTMLDocs IN Oberon; (** portable *) (* ejz, Greek & Math support by afi *
 
 	PROCEDURE SplitFontName(f: Fonts.Font; VAR family: ARRAY OF CHAR; VAR size: SIGNED16; VAR attr: CHAR);
 		VAR
-			val: LONGINT;
+			val: SIGNED32;
 			i: SIGNED16;
 	BEGIN
 		i := 0;
@@ -537,7 +537,7 @@ MODULE HTMLDocs IN Oberon; (** portable *) (* ejz, Greek & Math support by afi *
 		VAR
 			S: Attributes.Scanner;
 			F: Texts.Finder;
-			pos: LONGINT;
+			pos: SIGNED32;
 			obj: Objects.Object;
 			name: ARRAY 32 OF CHAR;
 			curDoc: Documents.Document;
@@ -643,7 +643,7 @@ to.elems := from.elems
 		VAR
 			ol: HTTPDocs0.ObjList;
 			obj, action: Objects.Object;
-			key: LONGINT;
+			key: SIGNED32;
 			F1: Form;
 	BEGIN
 		WITH F: Form DO
@@ -776,7 +776,7 @@ to.elems := from.elems
 				Texts.Write(Wr, ch)
 			END
 		END WriteEscCh;
-		PROCEDURE IntAttr(i: LONGINT);
+		PROCEDURE IntAttr(i: SIGNED32);
 		BEGIN
 			Texts.WriteString(Wr, name);
 			Texts.Write(Wr, "=");
@@ -916,7 +916,7 @@ to.elems := from.elems
 		VAR
 			exec, obj: Objects.Object;
 			attr, qury: ARRAY 32 OF CHAR;
-			key, mkey: LONGINT;
+			key, mkey: SIGNED32;
 			docname: ARRAY 1024 OF CHAR;
 			query: Texts.Text;
 			form: Form;
@@ -1019,8 +1019,8 @@ to.elems := from.elems
 		END
 	END SubmitQuery;
 
-	PROCEDURE HREF(P: Page; VAR href, cmd: ARRAY OF CHAR; VAR key: LONGINT);
-		VAR i, j: LONGINT;
+	PROCEDURE HREF(P: Page; VAR href, cmd: ARRAY OF CHAR; VAR key: SIGNED32);
+		VAR i, j: SIGNED32;
 	BEGIN
 		key := -1; COPY("", cmd); i := 0;
 		WHILE (href[i] # 0X) & (href[i] <= " ") DO
@@ -1113,7 +1113,7 @@ to.elems := from.elems
 
 	PROCEDURE WriteCharRef*(P: Page; VAR S: Scanner);
 		VAR
-			i, j, k: LONGINT;
+			i, j, k: SIGNED32;
 			entity: ARRAY 64 OF CHAR; istr: ARRAY 4 OF CHAR;
 			lib: Objects.Library;
 			obj: Objects.Object;
@@ -1326,7 +1326,7 @@ to.elems := from.elems
 
 	PROCEDURE CharRefStr*(P: Page; VAR S: Scanner; VAR str: ARRAY OF CHAR);
 		VAR
-			i, j: LONGINT;
+			i, j: SIGNED32;
 			entity: ARRAY 64 OF CHAR;
 	BEGIN
 		COPY("", str);
@@ -1394,7 +1394,7 @@ to.elems := from.elems
 	END CharRefStr;
 
 	PROCEDURE Next*(VAR S: Scanner);
-		VAR i, l: LONGINT;
+		VAR i, l: SIGNED32;
 	BEGIN
 		CASE S.state OF
 			TextHtml: IF S.ch = "<" THEN
@@ -1644,7 +1644,7 @@ END
 	PROCEDURE SplitHostPort*(VAR url, host: ARRAY OF CHAR; VAR port: SIGNED16);
 		VAR
 			i, j: SIGNED16;
-			val: LONGINT;
+			val: SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE (url[i] # 0X) & (url[i] # "/") DO
@@ -1678,7 +1678,7 @@ END
 			P: Page;
 			attr, label: ARRAY 64 OF CHAR;
 			s: HyperDocs.LinkScheme;
-			key: LONGINT;
+			key: SIGNED32;
 			port: SIGNED16;
 	BEGIN
 		IF on THEN
@@ -1765,7 +1765,7 @@ END
 		VAR
 			P: Page;
 			attr: ARRAY 64 OF CHAR;
-			val: LONGINT;
+			val: SIGNED32;
 			size, i: SIGNED16;
 			col: BOOLEAN;
 	BEGIN
@@ -1856,7 +1856,7 @@ END
 		VAR
 			P: Page;
 			attr: ARRAY 64 OF CHAR;
-			key: LONGINT;
+			key: SIGNED32;
 			doc: Documents.Document;
 			BackE: HTTPDocs0.Entry;
 			col: SIGNED16;
@@ -1905,7 +1905,7 @@ END
 		VAR
 			exec, cont: Objects.Object;
 			name, nr: ARRAY 32 OF CHAR;
-			i: LONGINT;
+			i: SIGNED32;
 	BEGIN
 		cont := Gadgets.context; exec := Gadgets.executorObj;
 		IF exec # NIL THEN
@@ -1926,7 +1926,7 @@ END
 		VAR
 			P: Page;
 			name, attr: ARRAY 32 OF CHAR;
-			i: LONGINT;
+			i: SIGNED32;
 	BEGIN
 		P := S.page; CloseA(P);
 		IF on THEN
@@ -2138,7 +2138,7 @@ END
 		VAR
 			P: Page;
 			attr: ARRAY 64 OF CHAR;
-			val: LONGINT;
+			val: SIGNED32;
 			size, i, textC: SIGNED16;
 			col: BOOLEAN;
 	BEGIN
@@ -2239,7 +2239,7 @@ END
 		VAR
 			attr: ARRAY 64 OF CHAR;
 			P: Page;
-			l: LONGINT;
+			l: SIGNED32;
 			w, h, pos: SIGNED16;
 	BEGIN
 		IF on THEN
@@ -2339,7 +2339,7 @@ END
 (*		VAR
 			P: Page;
 			attr, cmd, caption: ARRAY 64 OF CHAR;
-			key: LONGINT;
+			key: SIGNED32;
 			obj: Objects.Object;
 	BEGIN
 		IF on THEN
@@ -2394,7 +2394,7 @@ END
 			form: Form;
 			attr: ARRAY 64 OF CHAR;
 			prompt: ARRAY 512 OF CHAR;
-			key: LONGINT;
+			key: SIGNED32;
 	BEGIN
 		IF on THEN
 			P := S.page;
@@ -3088,7 +3088,7 @@ ELSIF ~on THEN
 		VAR
 			P: Page;
 			St: Streams.Stream;
-			i, minSize, timeOut: LONGINT;
+			i, minSize, timeOut: SIGNED32;
 			app: BOOLEAN;
 	BEGIN
 		WITH me: Task DO
@@ -3179,12 +3179,12 @@ ELSIF ~on THEN
 		END
 	END QueryBool;
 
-	PROCEDURE Parse*(D: Documents.Document; basekey: LONGINT; S: Streams.Stream; head, cache, blocking: BOOLEAN);
+	PROCEDURE Parse*(D: Documents.Document; basekey: SIGNED32; S: Streams.Stream; head, cache, blocking: BOOLEAN);
 		VAR
 			me: Task;
 			s: HyperDocs.LinkScheme;
 			e: ExtTag;
-			i, j: LONGINT;
+			i, j: SIGNED32;
 	BEGIN
 		imgs := QueryBool("HTMLImages");
 		NEW(me);
@@ -3337,7 +3337,7 @@ ELSIF ~on THEN
 
 	PROCEDURE LoadDoc(D: Documents.Document);
 		VAR
-			key: LONGINT;
+			key: SIGNED32;
 			s, so: HyperDocs.LinkScheme;
 			T: Texts.Text;
 			path, label: ARRAY 64 OF CHAR;
@@ -3474,7 +3474,7 @@ PROCEDURE ShowHTML*;
 		D: Documents.Document;
 		node: HyperDocs.Node;
 		P: Page;
-		key, pos: LONGINT;
+		key, pos: SIGNED32;
 		T: Texts.Text;
 		R: Texts.Reader;
 		ch: CHAR;

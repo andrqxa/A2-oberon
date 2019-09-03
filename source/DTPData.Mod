@@ -19,7 +19,7 @@ TYPE
 	END StyleObject;
 
 	ParagraphStyleObject* = OBJECT(StyleObject)
-	VAR alignment* : LONGINT;						(* 0 = left, 1 = center, 2 = right, 3 = justified *)
+	VAR alignment* : SIGNED32;						(* 0 = left, 1 = center, 2 = right, 3 = justified *)
 		spaceBefore* : REAL;						(* space before paragraph [mm] *)
 		spaceAfter* : REAL;							(* space after paragrapg [mm] *)
 		leftIndent* : REAL;							(* left Indent [mm] *)
@@ -54,8 +54,8 @@ TYPE
 		kerning* : REAL;								(* NOT USED - needs appropriate Fonts *)
 		scaleHorizontal* : REAL;						(* horizontal character scale *)
 		scaleVertical* : REAL;						(* vertical character scale *)
-		color* : LONGINT;							(* character color *)
-		bgColor* : LONGINT;						(* character background color *)
+		color* : SIGNED32;							(* character color *)
+		bgColor* : SIGNED32;						(* character background color *)
 
 		PROCEDURE Clone*(): CharacterStyleObject;
 		VAR newCSO: CharacterStyleObject;
@@ -100,16 +100,16 @@ TYPE
 		marginTop, marginBottom, marginLeft, marginRight : REAL;
 		facingPages : BOOLEAN;
 		meta : MetaInformation;
-		objectCounter*: LONGINT;
-		copyCounter*: LONGINT;
+		objectCounter*: SIGNED32;
+		copyCounter*: SIGNED32;
 
-		nofPStyles*: LONGINT;
+		nofPStyles*: SIGNED32;
 		pStyles* : PStyles;
-		nofCStyles*: LONGINT;
+		nofCStyles*: SIGNED32;
 		cStyles* : CStyles;
-		nofGStyles*: LONGINT;
+		nofGStyles*: SIGNED32;
 		gStyles* : GStyles;
-		nofCustomStyles*: LONGINT;
+		nofCustomStyles*: SIGNED32;
 		customStyles* : CustomStyles;
 		defaultParagraphStyle* : ParagraphStyleObject;
 		defaultCharacterStyle* : CharacterStyleObject;
@@ -118,17 +118,17 @@ TYPE
 
 		pages* : ContentPages;
 		mpages* : MasterPages;
-		contents* : Contents; nofContents* : LONGINT;
+		contents* : Contents; nofContents* : SIGNED32;
 		frames* : Frames;
 
 		(* dollyFrame* : FrameObject; *)
 		dollyGuide* : GuideObject;
 
 		currentPage*, firstPage*, lastPage* : PageObject;
-		pageNumber*, nofPages* : LONGINT;
+		pageNumber*, nofPages* : SIGNED32;
 
 		currentMPage*, firstMPage*, lastMPage* : MasterPageObject;
-		mpageNumber*, nofMPages* : LONGINT;
+		mpageNumber*, nofMPages* : SIGNED32;
 
 		PROCEDURE &New*(width, height, margintop,marginbottom, marginleft, marginright : REAL; facingpages : BOOLEAN);
 		VAR
@@ -182,7 +182,7 @@ TYPE
 			newCStyle.scaleHorizontal := 100;
 			newCStyle.scaleVertical := 100;
 			newCStyle.color := 0000000FFH;
-			newCStyle.bgColor := LONGINT(0FFFFFF00H);
+			newCStyle.bgColor := SIGNED32(0FFFFFF00H);
 
 			NEW(newPStyle);
 			newPStyle.name := "defaultParagraphStyle";
@@ -726,12 +726,12 @@ TYPE
 			RETURN result;
 		END GetMasterByName;
 
-		PROCEDURE GetCurrentPageNumber*(): LONGINT;
+		PROCEDURE GetCurrentPageNumber*(): SIGNED32;
 		BEGIN
 			RETURN pageNumber;
 		END GetCurrentPageNumber;
 
-		PROCEDURE GetCurrentMasterPageNumber*(): LONGINT;
+		PROCEDURE GetCurrentMasterPageNumber*(): SIGNED32;
 		BEGIN
 			RETURN mpageNumber;
 		END GetCurrentMasterPageNumber;
@@ -1335,9 +1335,9 @@ TYPE
 		END Clone;
 
 		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: REAL; quality, preview: BOOLEAN);
-		VAR color: LONGINT;
+		VAR color: SIGNED32;
 		BEGIN
-			color := LONGINT(0FF0000FFH);
+			color := SIGNED32(0FF0000FFH);
 			canvas.Line(x, y, x+w, y+h, color, WMGraphics.ModeCopy);
 			canvas.Line(x+w, y, x, y+h, color, WMGraphics.ModeCopy);
 		END Draw;
@@ -1409,7 +1409,7 @@ TYPE
 		PROCEDURE PointerLeave*;
 		END PointerLeave;
 
-		PROCEDURE IsHit*(x, y: LONGINT): BOOLEAN;
+		PROCEDURE IsHit*(x, y: SIGNED32): BOOLEAN;
 		BEGIN
 			RETURN TRUE;
 		END IsHit;

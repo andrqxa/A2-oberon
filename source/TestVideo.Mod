@@ -14,8 +14,8 @@ CONST
 
 TYPE
 	LabelInfo* = RECORD
-		firstPos : LONGINT;
-		nofPixels : LONGINT;
+		firstPos : SIGNED32;
+		nofPixels : SIGNED32;
 		label : SIGNED16;
 	END;
 
@@ -24,18 +24,18 @@ TYPE
 	END;
 
 VAR
-	threshold, pixThreshold : LONGINT;
+	threshold, pixThreshold : SIGNED32;
 	labelBuffer : POINTER TO ARRAY OF SIGNED16;
 	equivalence : ARRAY 32*1024 OF SIGNED16;
 	labelInfo : ARRAY 32*1024 OF LabelInfo;
-	labelColor : ARRAY 32*1024 OF LONGINT;
+	labelColor : ARRAY 32*1024 OF SIGNED32;
 	g : WMGraphics.BufferCanvas;
-	dirX, dirY : ARRAY 8 OF LONGINT;
+	dirX, dirY : ARRAY 8 OF SIGNED32;
 	rectified : VideoExample.PreviewWindow;
 
 	intensityBuffer, thresholdBuffer : POINTER TO ARRAY OF CHAR;
 
-	PROCEDURE RGBToYUVReal(r, g, b : LONGINT; VAR y, u, v : LONGINT);
+	PROCEDURE RGBToYUVReal(r, g, b : SIGNED32; VAR y, u, v : SIGNED32);
 	BEGIN
 		y := ENTIER(0.299 * r + 0.587 * g + 0.114 * b);
 		u := ENTIER(128  - 0.16874 * r - 0.33126 * g + 0.5 * b);
@@ -115,9 +115,9 @@ BEGIN
 END Transform;
 
 PROCEDURE SearchHVLines(buffer : Raster.Image);
-VAR x, y : SIZE; tr, tg, tb, ta : LONGINT;
-	sum : LONGINT;
-	hArray, vArray : ARRAY 2048 OF LONGINT;
+VAR x, y : SIZE; tr, tg, tb, ta : SIGNED32;
+	sum : SIGNED32;
+	hArray, vArray : ARRAY 2048 OF SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 BEGIN
@@ -143,10 +143,10 @@ BEGIN
 END SearchHVLines;
 
 PROCEDURE IsEmptyField(buffer : Raster.Image; x, y , w, h : SIZE) : BOOLEAN;
-VAR i, j : SIZE; tr, tg, tb, ta : LONGINT;
+VAR i, j : SIZE; tr, tg, tb, ta : SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
-	nonEmpty : LONGINT;
+	nonEmpty : SIGNED32;
 BEGIN
 	Raster.InitMode(mode, Raster.srcCopy);
 	nonEmpty := 0;
@@ -162,11 +162,11 @@ BEGIN
 	RETURN nonEmpty < 8*w*h DIV 100;
 END IsEmptyField;
 
-PROCEDURE Dist(buffer : Raster.Image; x0, y0, x1, y1, w, h : SIZE) : LONGINT;
-VAR i, j : SIZE; tr, tg, tb, ta, s0, s1 : LONGINT;
+PROCEDURE Dist(buffer : Raster.Image; x0, y0, x1, y1, w, h : SIZE) : SIGNED32;
+VAR i, j : SIZE; tr, tg, tb, ta, s0, s1 : SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
-	sum : LONGINT;
+	sum : SIGNED32;
 BEGIN
 	Raster.InitMode(mode, Raster.srcCopy);
 	sum := 0;
@@ -190,16 +190,16 @@ VAR i, j, x, y, w, h : SIZE;
 		nofFields : SIGNED8;
 		fields : ARRAY 81 OF SIGNED8;
 	END;
-	distance, dist : ARRAY 81, 81 OF LONGINT;
+	distance, dist : ARRAY 81, 81 OF SIGNED32;
 
-	PROCEDURE SetDist(a, b : SIZE; d : LONGINT);
+	PROCEDURE SetDist(a, b : SIZE; d : SIGNED32);
 	BEGIN
 		IF a < b THEN dist[a, b] := d
 		ELSE dist[b, a] := d
 		END
 	END SetDist;
 
-	PROCEDURE GetDist(a, b : SIZE) : LONGINT;
+	PROCEDURE GetDist(a, b : SIZE) : SIGNED32;
 	BEGIN
 		IF a < b THEN RETURN dist[a, b]
 		ELSE RETURN dist[b, a]
@@ -207,7 +207,7 @@ VAR i, j, x, y, w, h : SIZE;
 	END GetDist;
 
 	PROCEDURE GetSmallest(VAR maxi, maxj : SIZE);
-	VAR max : LONGINT;
+	VAR max : SIGNED32;
 		first : BOOLEAN;
 	BEGIN
 		first := TRUE;
@@ -274,25 +274,25 @@ END CheckFields;
 	equivalenceBuffer : storage space for maxLabels label;
 	colorThreshold : ...
 	*)
-PROCEDURE BinaryLabler*(buffer : Raster.Image; VAR labelBuffer, equivalence : ARRAY OF SIGNED16; colorThreshold, pixelThreshold, maxLabels : LONGINT;
+PROCEDURE BinaryLabler*(buffer : Raster.Image; VAR labelBuffer, equivalence : ARRAY OF SIGNED16; colorThreshold, pixelThreshold, maxLabels : SIGNED32;
 	VAR labelInfo : ARRAY OF LabelInfo;
-	unifyLabels : BOOLEAN; VAR nofFLabels : LONGINT; VAR res : WORD);
-VAR i, x, y, w, h: SIZE; color: LONGINT;
-	tr, tg, tb, ta  : LONGINT;
+	unifyLabels : BOOLEAN; VAR nofFLabels : SIGNED32; VAR res : WORD);
+VAR i, x, y, w, h: SIZE; color: SIGNED32;
+	tr, tg, tb, ta  : SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 	nofLabels : SIGNED16;
-	lbufpos, lastLineLbufPos, minClass : LONGINT;
+	lbufpos, lastLineLbufPos, minClass : SIGNED32;
 	lastsum, sum, cl, ctl, ct, ctr, tlabel : SIGNED16;
 	adr : ADDRESS;
 	ch : CHAR;
 
-	PROCEDURE Equivalence(x, y : LONGINT);
+	PROCEDURE Equivalence(x, y : SIGNED32);
 	BEGIN
 		IF x > y THEN equivalence[x] := SHORT(y) ELSE equivalence[y] := SHORT(x) END
 	END Equivalence;
 
-	PROCEDURE NewLabel(lbufPos : LONGINT);
+	PROCEDURE NewLabel(lbufPos : SIGNED32);
 	BEGIN
 		IF nofLabels < maxLabels THEN
 			INC(nofLabels);
@@ -399,7 +399,7 @@ BEGIN
 			FOR x := 0 TO w - 1 DO
 				tlabel := equivalence[labelBuffer[lbufpos]];
 				IF (tlabel>0)&(labelInfo[tlabel].nofPixels >= pixelThreshold) THEN color := labelColor[tlabel]
-				ELSE color := LONGINT(0FFFFFFFFH);
+				ELSE color := SIGNED32(0FFFFFFFFH);
 					Raster.SetRGBA(pix, ((color DIV 65536) DIV 256) MOD 256, (color DIV 65536) MOD 256,
 						(color DIV 256) MOD 256, 255);
 					Raster.Put(buffer, x, y, pix, mode);
@@ -421,7 +421,7 @@ END BinaryLabler;
 
 (* trace a region in the label buffer. The image buffer is used for the width and height and debug output.*)
 PROCEDURE Trace(buffer : Raster.Image; CONST labelBuffer : ARRAY OF SIGNED16; VAR labelInfo :  LabelInfo;
-			VAR length : LONGINT; VAR path : ARRAY OF Point;
+			VAR length : SIGNED32; VAR path : ARRAY OF Point;
 			VAR res : WORD);
 VAR x, y, tx, ty : SIZE;
 	w, h, i, j: SIZE;
@@ -479,8 +479,8 @@ BEGIN
 
 END Trace;
 
-PROCEDURE SimplifyPoly(VAR path : ARRAY OF Point; nofPoints, tolerance: LONGINT; VAR resultPoint: LONGINT);
-VAR i, j : LONGINT;
+PROCEDURE SimplifyPoly(VAR path : ARRAY OF Point; nofPoints, tolerance: SIGNED32; VAR resultPoint: SIGNED32);
+VAR i, j : SIGNED32;
 	dir0, dir1 : Vectors.TVector2d;
 BEGIN
 	IF nofPoints > 2 THEN
@@ -496,11 +496,11 @@ BEGIN
 	resultPoint := j+ 1;
 END SimplifyPoly;
 
-PROCEDURE ExtractLines(buffer : Raster.Image; CONST path : ARRAY OF Point; pathLength : LONGINT; VAR poly : ARRAY OF Point; VAR nofPoints : LONGINT );
-VAR i, p, nofLines, straight, nonStraight : LONGINT;
-	l: LONGINT;
+PROCEDURE ExtractLines(buffer : Raster.Image; CONST path : ARRAY OF Point; pathLength : SIGNED32; VAR poly : ARRAY OF Point; VAR nofPoints : SIGNED32 );
+VAR i, p, nofLines, straight, nonStraight : SIGNED32;
+	l: SIGNED32;
 
-	PROCEDURE IsLine(from, to, l : LONGINT) : BOOLEAN;
+	PROCEDURE IsLine(from, to, l : SIGNED32) : BOOLEAN;
 	VAR i, d : SIZE;
 		x0, x1, y0, y1, px, py : SIZE;
 	BEGIN
@@ -533,7 +533,7 @@ BEGIN
 			IF DebugLiner THEN
 				IF g = NIL THEN NEW(g, buffer) END;
 				g.Fill(WMRectangles.MakeRect(path[p].x-2, path[p].y-2, path[p].x+2, path[p].y+2), 00FFH, WMGraphics.ModeCopy);
-				g.Fill(WMRectangles.MakeRect(path[p].x-1, path[p].y-1, path[p].x+1, path[p].y+1), LONGINT(0FFFF00FFH), WMGraphics.ModeCopy);
+				g.Fill(WMRectangles.MakeRect(path[p].x-1, path[p].y-1, path[p].x+1, path[p].y+1), SIGNED32(0FFFF00FFH), WMGraphics.ModeCopy);
 			END;
 			IF nofLines >= LEN(poly) THEN RETURN END;
 			IF nofLines = 0 THEN	poly[0] := path[i]; INC(nofLines) END;
@@ -554,7 +554,7 @@ BEGIN
 	IF DebugLiner THEN
 		FOR i := 0 TO nofLines - 1 DO
 			g.Fill(WMRectangles.MakeRect(poly[i].x-2, poly[i].y-2, poly[i].x+2, poly[i].y+2), 00FFH, WMGraphics.ModeCopy);
-			g.Fill(WMRectangles.MakeRect(poly[i].x-1, poly[i].y-1, poly[i].x+1, poly[i].y+1), LONGINT(0FF0000FFH), WMGraphics.ModeCopy);
+			g.Fill(WMRectangles.MakeRect(poly[i].x-1, poly[i].y-1, poly[i].x+1, poly[i].y+1), SIGNED32(0FF0000FFH), WMGraphics.ModeCopy);
 		END
 	 END;
 	 nofPoints := nofLines;
@@ -577,10 +577,10 @@ BEGIN
 END GetFreq;
 
 PROCEDURE Label2(buffer : Raster.Image);
-VAR nof, length, i, j : LONGINT; w, h: SIZE; res: WORD;
+VAR nof, length, i, j : SIGNED32; w, h: SIZE; res: WORD;
 	path : ARRAY 1024*4 OF Point;
 	poly : ARRAY 40 OF Point;
-	nofPoints : LONGINT;
+	nofPoints : SIGNED32;
 	t0, t1, labeltime,  tracetime, linetime : HUGEINT;
 	f  : LONGREAL;
 	gp : ARRAY 50 OF WMGraphics.Point2d;
@@ -623,16 +623,16 @@ BEGIN
 						Transform(buffer, rectified.img, poly);
 						CheckFields(rectified.img);
 						rectified.Invalidate(WMRectangles.MakeRect(0, 0, rectified.GetWidth(), rectified.GetHeight()));
-						g.Line((poly[0].x + poly[1].x) DIV 2, (poly[0].y + poly[1].y) DIV 2 , (poly[2].x + poly[3].x) DIV 2, (poly[2].y + poly[3].y) DIV 2, LONGINT(0FF0000FFH), WMGraphics.ModeSrcOverDst);
+						g.Line((poly[0].x + poly[1].x) DIV 2, (poly[0].y + poly[1].y) DIV 2 , (poly[2].x + poly[3].x) DIV 2, (poly[2].y + poly[3].y) DIV 2, SIGNED32(0FF0000FFH), WMGraphics.ModeSrcOverDst);
 
 						g.FillPolygonFlat(gp, nofPoints, 000FF0080H, WMGraphics.ModeSrcOverDst);
 						g.Line(poly[0].x, poly[0].y, poly[2].x, poly[2].y, 000FFFFFFH, WMGraphics.ModeSrcOverDst);
 						g.Line(poly[1].x, poly[1].y, poly[3].x, poly[3].y, 000FFFFFFH, WMGraphics.ModeSrcOverDst);
 					END;
 
-(*					g.FillPolygonFlat(gp, nofPoints, LONGINT(0FF00FF80H), WMGraphics.ModeSrcOverDst)	*)
+(*					g.FillPolygonFlat(gp, nofPoints, SIGNED32(0FF00FF80H), WMGraphics.ModeSrcOverDst)	*)
 				ELSIF nofPoints = 6 THEN
-					g.FillPolygonFlat(gp, nofPoints, LONGINT(0FF000020H), WMGraphics.ModeSrcOverDst);
+					g.FillPolygonFlat(gp, nofPoints, SIGNED32(0FF000020H), WMGraphics.ModeSrcOverDst);
 				END;
 				t1 := GetTimer(); linetime := linetime + (t1 - t0);
 			END
@@ -649,7 +649,7 @@ END Label2;
 
 PROCEDURE YUVFilter(buffer : Raster.Image);
 VAR x, y, w , h : SIZE;
-	tr, tg, tb, ta, cy, cu, cv : LONGINT;
+	tr, tg, tb, ta, cy, cu, cv : SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 BEGIN
@@ -674,7 +674,7 @@ END SetYUVFilter;
 
 PROCEDURE BWFilter(buffer : Raster.Image);
 VAR x, y, w , h : SIZE;
-	tr, tg, tb, ta, cy, cu, cv : LONGINT;
+	tr, tg, tb, ta, cy, cu, cv : SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 BEGIN
@@ -698,7 +698,7 @@ END SetBWFilter;
 
 PROCEDURE RedDotFilter(buffer : Raster.Image);
 VAR x, y, w , h : SIZE;
-	tr, tg, tb, ta : LONGINT;
+	tr, tg, tb, ta : SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 BEGIN
@@ -722,10 +722,10 @@ END SetRedDotFilter;
 
 PROCEDURE ThresholdFilter(buffer : Raster.Image);
 VAR x, y, w , h : SIZE;
-	sum, lastsum, tr, tg, tb, ta : LONGINT;
+	sum, lastsum, tr, tg, tb, ta : SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
-	tresh : LONGINT;
+	tresh : SIGNED32;
 	darkMode : BOOLEAN;
 BEGIN
 	Raster.InitMode(mode, Raster.srcCopy);
@@ -770,12 +770,12 @@ END SetThresholdFilter;
 
 PROCEDURE AdaptiveThresholdFilter(buffer : Raster.Image);
 VAR x, y, w, h, p, t : SIZE;
-	sum : LONGINT;
+	sum : SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 	ch : CHAR;
 	adr : ADDRESS;
-	total : LONGINT;
+	total : SIGNED32;
 BEGIN
 	Raster.InitMode(mode, Raster.srcCopy);
 	w := buffer.width; h := buffer.height;
@@ -817,12 +817,12 @@ END SetAdaptiveThresholdFilter;
 PROCEDURE FineAdaptiveThresholdFilter(buffer : Raster.Image);
 CONST WindowX = 32;
 VAR x, y, w, h, p, t : SIZE;
-	sum : LONGINT;
+	sum : SIGNED32;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 	ch : CHAR;
 	adr : ADDRESS;
-	total : LONGINT;
+	total : SIGNED32;
 
 BEGIN
 	Raster.InitMode(mode, Raster.srcCopy);
@@ -922,12 +922,12 @@ BEGIN
 END Uninstall;
 
 PROCEDURE Init;
-VAR i : LONGINT;
+VAR i : SIGNED32;
 	gen : Random.Generator;
 BEGIN
 	NEW(gen);
 	FOR i := 1 TO LEN(labelColor) - 1 DO labelColor[i] := gen.Integer();  END;
-	labelColor[0] := LONGINT(0FFFFFFFFH);
+	labelColor[0] := SIGNED32(0FFFFFFFFH);
 
 	dirX[DirN] := 0; dirY[DirN] := -1; (* N *)
 	dirX[DirNE] := 1; dirY[DirNE] := -1; (* NE *)

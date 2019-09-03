@@ -23,7 +23,7 @@ CONST
 
 TYPE
 	Bar = RECORD
-		min, max, val: LONGINT;
+		min, max, val: SIGNED32;
 		backC, knoblen: SIGNED16;
 		vertical: BOOLEAN
 	END;
@@ -57,15 +57,15 @@ BEGIN
 	w := r - x; h := t - y
 END ClipAgainst;
 
-PROCEDURE P (X: LONGINT): SIGNED16;
+PROCEDURE P (X: SIGNED32): SIGNED16;
 BEGIN RETURN SHORT(X * Display.Unit DIV Printer.Unit)
 END P;
 
-PROCEDURE Value (VAR bar: Bar; x, y, w, h, X, Y: SIGNED16; min, max: LONGINT): LONGINT;
+PROCEDURE Value (VAR bar: Bar; x, y, w, h, X, Y: SIGNED16; min, max: SIGNED32): SIGNED32;
 VAR res: WORD;
 
-	PROCEDURE CalcVal (x, w, bx, bw: SIGNED16; min, max: LONGINT): LONGINT;
-	VAR r, d: LONGINT;
+	PROCEDURE CalcVal (x, w, bx, bw: SIGNED16; min, max: SIGNED32): SIGNED32;
+	VAR r, d: SIGNED32;
 	BEGIN
 		d := max - min;
 		IF (d = 0) OR (w = bw) THEN r := 0
@@ -85,11 +85,11 @@ BEGIN
 	RETURN res
 END Value;
 
-PROCEDURE Pos (VAR bar: Bar; x, y, w, h, bw: SIGNED16; min, max, val: LONGINT): SIGNED16;
+PROCEDURE Pos (VAR bar: Bar; x, y, w, h, bw: SIGNED16; min, max, val: SIGNED32): SIGNED16;
 VAR res: SIGNED16;
 
-	PROCEDURE CalcPos (x, w, bw: SIGNED16; min, max, val: LONGINT): SIGNED16;
-	VAR d: LONGINT;
+	PROCEDURE CalcPos (x, w, bw: SIGNED16; min, max, val: SIGNED32): SIGNED16;
+	VAR d: SIGNED32;
 	BEGIN
 		d := ABS(max - min);
 		IF d > 0 THEN
@@ -115,7 +115,7 @@ END Pos;
 (* --------------------- SLIDER - VIEW ------------------- *)
 
 PROCEDURE UpdateBars (F: View);
-VAR min, max, len: LONGINT; vx, vy, w, h, W, H, VH: SIGNED16;
+VAR min, max, len: SIGNED32; vx, vy, w, h, W, H, VH: SIGNED16;
 BEGIN
 	IF F.hasVBar THEN	(* vertical *)
 		H:= F.H - 2*F.border;
@@ -330,7 +330,7 @@ BEGIN
 END MoveContent;
 
 PROCEDURE TrackBar (F: View; VAR M: Oberon.InputMsg; VAR bar: Bar; x, y, w, h: SIGNED16);
-	VAR keysum: SET; Q: Display3.Mask; pos, npos, oldpos: LONGINT;
+	VAR keysum: SET; Q: Display3.Mask; pos, npos, oldpos: SIGNED32;
 BEGIN
 		Gadgets.MakeMask(F, M.x + F.X, M.y + F.Y, M.dlink, Q); Display3.Copy(Q, Q);
 		keysum:= M.keys; oldpos := bar.val; pos := oldpos;
@@ -350,7 +350,7 @@ BEGIN
 		M.res:= 0
 END TrackBar;
 
-PROCEDURE InitBar (VAR b: Bar; min, max, val: LONGINT; backC: SIGNED16; vertical: BOOLEAN; width: SIGNED16);
+PROCEDURE InitBar (VAR b: Bar; min, max, val: SIGNED32; backC: SIGNED16; vertical: BOOLEAN; width: SIGNED16);
 BEGIN
 	b.min:= min; b.max:= max; b.val:= val; b.backC:= backC; b.vertical:= vertical;
 	b.knoblen := SHORT(width - ABS(max - min));
@@ -961,7 +961,7 @@ BEGIN
 END ViewLinks;
 
 PROCEDURE ViewHandler* (F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR F0: View; f: Gadgets.Frame; vNo: LONGINT; x, y, w, h, u, v: SIGNED16;
+VAR F0: View; f: Gadgets.Frame; vNo: SIGNED32; x, y, w, h, u, v: SIGNED16;
 		D: Display.DisplayMsg; S: Display.SelectMsg;
 BEGIN
 	WITH F: View DO

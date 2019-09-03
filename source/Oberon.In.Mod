@@ -14,7 +14,7 @@ VAR
 (** Initializes the parameter scanner. The parameter stream is assumed to be the selection when ^ is scanned,
 the marked text viewer when * is scanned; otherwise the text that follows the command itself. *)
 PROCEDURE Open*;
-VAR beg, end, time: LONGINT; T: Texts.Text;
+VAR beg, end, time: SIGNED32; T: Texts.Text;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);  Texts.Scan(S);
 	IF (S.class = Texts.Char) & (S.c = "^") THEN
@@ -52,7 +52,7 @@ BEGIN
 END Int;
 
 (** Scan a long integer. *)
-PROCEDURE LongInt* (VAR i: LONGINT);
+PROCEDURE LongInt* (VAR i: SIGNED32);
 BEGIN
 	IF Done THEN
 		Texts.Scan(S);

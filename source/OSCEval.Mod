@@ -26,7 +26,7 @@ TYPE
 			s: UDP.Socket;
 			buffer: POINTER TO ARRAY OF CHAR;
 			receivefip: IP.Adr;
-			receivefport: LONGINT;
+			receivefport: SIGNED32;
 			got: SIZE;
 			res: WORD;
 			fip: IP.Adr;
@@ -62,7 +62,7 @@ TYPE
 			len: SIZE;
 			buffer: POINTER TO ARRAY OF CHAR;
 			sizebuf: ARRAY 4 OF CHAR;
-			packetsize: LONGINT;
+			packetsize: SIGNED32;
 
 		PROCEDURE &StartOSCAgent*(c: TCP.Connection; s: TCPServices.Service);
 		BEGIN
@@ -239,7 +239,7 @@ PROCEDURE MessageTest4(m: OSC.OSCMessage);
 VAR
 	res: WORD;
 	param: OSC.OSCParamObject;
-	ok: BOOLEAN; i: LONGINT;
+	ok: BOOLEAN; i: SIGNED32;
 BEGIN
 	(* This Test should receive an OSC message with one Blob (01 02 03 ... 20) *)
 	IF (m.argumentcount = 1) & (~ m.noTypeTagString) THEN
@@ -268,7 +268,7 @@ PROCEDURE SendMsg4*;
 VAR
 	m: OSC.OSCMessage;
 	p: OSC.OSCParamBlob;
-	data: OSC.Blob; i: LONGINT;
+	data: OSC.Blob; i: SIGNED32;
 	res: WORD;
 BEGIN
 	NEW(data, 32);

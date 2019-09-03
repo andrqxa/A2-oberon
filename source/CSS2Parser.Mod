@@ -9,7 +9,7 @@ TYPE
 
 	Parser* = OBJECT
 		VAR
-			reportError*: PROCEDURE(pos, line, row: LONGINT; msg: ARRAY OF CHAR);
+			reportError*: PROCEDURE(pos, line, row: SIGNED32; msg: ARRAY OF CHAR);
 			scanner: Scanner.Scanner;
 
 		PROCEDURE & Init*(scanner: Scanner.Scanner);
@@ -418,8 +418,8 @@ TYPE
 			RETURN term
 		END ParseTerm;
 
-		PROCEDURE ParseRGB(hasAlpha: BOOLEAN): LONGINT;
-		VAR term: CSS2.Term; r, g, b, a: LONGINT;
+		PROCEDURE ParseRGB(hasAlpha: BOOLEAN): SIGNED32;
+		VAR term: CSS2.Term; r, g, b, a: SIGNED32;
 		BEGIN
 			term := ParseTerm();
 			IF (term # NIL) & (term.GetOperator() = CSS2.Undefined) & (term.GetUnaryOperator() = CSS2.Plus) THEN
@@ -549,8 +549,8 @@ TYPE
 		END
 	END GetTermUnit;
 
-	PROCEDURE ComputeRGB(VAR s: ARRAY OF CHAR): LONGINT;
-	VAR col: LONGINT; r, g, b, a: LONGINT;
+	PROCEDURE ComputeRGB(VAR s: ARRAY OF CHAR): SIGNED32;
+	VAR col: SIGNED32; r, g, b, a: SIGNED32;
 	BEGIN
 		HexStrToInt(s, col);
 		IF (Strings.Length(s) = 6) OR (Strings.Length(s) = 8) THEN
@@ -563,8 +563,8 @@ TYPE
 		END
 	END ComputeRGB;
 
-	PROCEDURE HexStrToInt(VAR str: ARRAY OF CHAR; VAR val: LONGINT);
-	VAR i, d: LONGINT; ch: CHAR;
+	PROCEDURE HexStrToInt(VAR str: ARRAY OF CHAR; VAR val: SIGNED32);
+	VAR i, d: SIGNED32; ch: CHAR;
 	BEGIN
 		i := 0; ch := str[0];
 		WHILE (ch # 0X) & (ch <= " ") DO
@@ -594,7 +594,7 @@ TYPE
 		END
 	END SetKeyword; *)
 
-	PROCEDURE DefaultReportError(pos, line, row: LONGINT; msg: ARRAY OF CHAR);
+	PROCEDURE DefaultReportError(pos, line, row: SIGNED32; msg: ARRAY OF CHAR);
 	BEGIN
 		KernelLog.Enter; KernelLog.Char(CHR(9H)); KernelLog.Char(CHR(9H)); KernelLog.String("pos "); KernelLog.Int(pos, 6);
 		KernelLog.String(", line "); KernelLog.Int(line, 0); KernelLog.String(", row "); KernelLog.Int(row, 0);

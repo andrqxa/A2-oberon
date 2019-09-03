@@ -84,7 +84,7 @@ BEGIN
 	blox[1,1,1] := h;
 END split;
 
-PROCEDURE bounds* (i, j, k: LONGINT; VAR out: BOOLEAN);
+PROCEDURE bounds* (i, j, k: SIGNED32; VAR out: BOOLEAN);
 BEGIN
 	IF (i < 0) OR (i > 1) OR (j < 0) OR (j > 1) OR (k < 0) OR (k > 1) THEN
 		out := TRUE
@@ -208,7 +208,7 @@ TYPE Bloc3* = OBJECT(Voxel);
 VAR
 	blox*: AR3;
 
-PROCEDURE bounds* (i, j, k: LONGINT; VAR out: BOOLEAN);
+PROCEDURE bounds* (i, j, k: SIGNED32; VAR out: BOOLEAN);
 BEGIN
 	IF (i < 0) OR (i > 2) OR (j < 0) OR (j > 2) OR (k < 0) OR (k > 2) THEN
 		out := TRUE
@@ -279,7 +279,7 @@ END fillSerp;
 
 PROCEDURE tick*;
 VAR
-	i, j, k, ii, jj, kk, n: LONGINT;
+	i, j, k, ii, jj, kk, n: SIGNED32;
 	v: Voxel;
 BEGIN
 	n := rand.Dice(3);
@@ -467,7 +467,7 @@ BEGIN
 	airblack :=  BL/5;
 END SetColor;
 
-PROCEDURE bounds* (i, j, k: LONGINT; VAR out: BOOLEAN);
+PROCEDURE bounds* (i, j, k: SIGNED32; VAR out: BOOLEAN);
 BEGIN
 	IF (i < 0) OR (i > 4) OR (j < 0) OR (j > 4) OR (k < 0) OR (k > 4) THEN
 		out := TRUE
@@ -644,7 +644,7 @@ END Shade;
 PROCEDURE probe*(x,y,z: SREAL):Voxel;
 VAR
 	X,Y,Z: SREAL;
-	i,j,k: LONGINT;
+	i,j,k: SIGNED32;
 BEGIN
 	srBase.clamp3(x,y,z);
 	X := x*5; Y := y*5; Z := z*5;
@@ -817,7 +817,7 @@ END tick;
 PROCEDURE tickit;
 VAR
 	v: Voxel;
-	a, b, c, d, e, f: LONGINT;
+	a, b, c, d, e, f: SIGNED32;
 BEGIN
 	a := rand.Dice(10);
 	b := rand.Dice(10);
@@ -830,7 +830,7 @@ BEGIN
 	blox[d, e, f] := v;
 END tickit;*)
 
-PROCEDURE bounds* (i, j, k: LONGINT; VAR out: BOOLEAN);
+PROCEDURE bounds* (i, j, k: SIGNED32; VAR out: BOOLEAN);
 BEGIN
 	IF (i < 0) OR (i > 9) OR (j < 0) OR (j > 9) OR (k < 0) OR (k > 9) THEN
 		out := TRUE
@@ -842,7 +842,7 @@ END bounds;
 PROCEDURE probe*(x,y,z: SREAL):Voxel;
 VAR
 	X,Y,Z: SREAL;
-	i,j,k: LONGINT;
+	i,j,k: SIGNED32;
 BEGIN
 	srBase.clamp3(x,y,z);
 	X := x*10; Y := y*10; Z := z*10;

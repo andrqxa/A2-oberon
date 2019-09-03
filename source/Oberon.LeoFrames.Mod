@@ -169,7 +169,7 @@ MODULE LeoFrames IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE Print (frame: Frame; VAR msg: Display.DisplayMsg);
 		VAR mask: Display3.Mask; w, h: SIGNED16; ctxt: Gfx.Context;
 
-		PROCEDURE pc (x: LONGINT): SIGNED16;
+		PROCEDURE pc (x: SIGNED32): SIGNED16;
 		BEGIN
 			RETURN SHORT((x * Display.Unit + Printer.Unit DIV 2) DIV Printer.Unit)
 		END pc;
@@ -309,7 +309,7 @@ MODULE LeoFrames IN Oberon; (** portable **)	(* eos  *)
 
 	(** frame handler **)
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR frame, copy: Frame; fx, fy: SIGNED16; mask: Display3.Mask; ver: LONGINT;
+		VAR frame, copy: Frame; fx, fy: SIGNED16; mask: Display3.Mask; ver: SIGNED32;
 	BEGIN
 		frame := obj(Frame);
 		IF msg IS Display.FrameMsg THEN
@@ -406,7 +406,7 @@ MODULE LeoFrames IN Oberon; (** portable **)	(* eos  *)
 	END NewFrame;
 
 	PROCEDURE ReadContainer (VAR r: Files.Rider; cont: Leonardo.Container);
-		VAR ver: LONGINT; i: SIGNED16; real: REAL; obj: Objects.Object; cm: Objects.CopyMsg; s: Leonardo.Shape; bool: BOOLEAN;
+		VAR ver: SIGNED32; i: SIGNED16; real: REAL; obj: Objects.Object; cm: Objects.CopyMsg; s: Leonardo.Shape; bool: BOOLEAN;
 	BEGIN
 		(* shape part *)
 		Files.ReadNum(r, ver);

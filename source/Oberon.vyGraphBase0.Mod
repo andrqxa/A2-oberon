@@ -77,7 +77,7 @@ TYPE
 	END;
 
 VAR
-	du, pu, hpu: LONGINT;  (* Display.Unit, Printer.Unit, Printer.Unit DIV 2 *)(* fof 020624 *)
+	du, pu, hpu: SIGNED32;  (* Display.Unit, Printer.Unit, Printer.Unit DIV 2 *)(* fof 020624 *)
 	clipMask*: Display3.Mask;
 	db-: doubleBuffer;
 	xPrnOrg, yPrnOrg, xPortOrg, yPortOrg: SIGNED16;
@@ -87,7 +87,7 @@ VAR
 	contextfcol-, contextbcol-: Display.Color;
 	contextmode: SIGNED16;
 	contextstyle: SET;
-	contextpattern: LONGINT;
+	contextpattern: SIGNED32;
 	contextpensize: SIGNED16;
 	contextfnt: ARRAY 64 OF CHAR;
 	tmpr, tmpg, tmpb: SIGNED16;
@@ -160,7 +160,7 @@ PROCEDURE SetDisplayMode* (m: SIGNED16);
 BEGIN	contextmode := m 	END SetDisplayMode;
 PROCEDURE SetDisplayStyle* (s: SET);
 BEGIN	contextstyle := s 	END SetDisplayStyle;
-PROCEDURE SetDisplayPattern* (p: LONGINT);
+PROCEDURE SetDisplayPattern* (p: SIGNED32);
 BEGIN contextpattern := p 	END SetDisplayPattern;
 PROCEDURE SetFont* (f: ARRAY OF CHAR);
 BEGIN COPY(f, contextfnt) 	END SetFont;
@@ -309,7 +309,7 @@ BEGIN
 END RestoreLines;
 
 PROCEDURE RestoreBlock (x, y, w, h: SIGNED16);
-	VAR offset: LONGINT;
+	VAR offset: SIGNED32;
 BEGIN
 	offset := (y - Enum.y ) * Enum.img.bpr + (x - Enum.x ) * Enum.img.fmt.bpp DIV 8;
 	Display.TransferBlock(Enum.img.mem^, offset, Enum.img.bpr, x, y, w, h, Display.set)
@@ -869,7 +869,7 @@ BEGIN
 END Polyi;
 
 PROCEDURE Ellipsei ( X, Y, a, b: SIGNED16);
-	VAR x1, y1: SIGNED16;  d, dx, dy, x2, y2, a1, a2, a8, b1, b2, b8: LONGINT;
+	VAR x1, y1: SIGNED16;  d, dx, dy, x2, y2, a1, a2, a8, b1, b2, b8: SIGNED32;
 
 PROCEDURE Dot4 (x1, x2, y1, y2: SIGNED16);
 BEGIN
@@ -1294,7 +1294,7 @@ END StretchedImagei;
 (** printing primitives *)
 
 PROCEDURE PointToPrnPoint (VAR x, y: SIGNED16);
-	VAR xL, yL : LONGINT;
+	VAR xL, yL : SIGNED32;
 BEGIN
 	xL := x - xPortOrg;  xL := xL * du;
 	x := xPrnOrg + SHORT ((xL + hpu) DIV pu);
@@ -1447,7 +1447,7 @@ PROCEDURE LoadPattern* (VAR R: Files.Rider): tSign;
 VAR
 	sgn: tSign;
 	w: SIGNED16;
-	adr: LONGINT;
+	adr: SIGNED32;
 BEGIN
 	Files.ReadInt(R, w);
 	IF w = - 1 THEN RETURN NIL END;

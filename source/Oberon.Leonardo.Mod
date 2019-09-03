@@ -58,7 +58,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		FigureDesc* = RECORD (Objects.ObjDesc)
 			bottom*, top*: Shape;	(** layers containing shapes **)
 			active*: Layer;	(** currently editable layer **)
-			seltime*: LONGINT;	(** time of current selection, negative for empty selection **)
+			seltime*: SIGNED32;	(** time of current selection, negative for empty selection **)
 			damage: GfxRegions.Region;	(* accumulated area that should be updated *)
 			bw: REAL;	(* maximal border width around damage area *)
 			lockLevel: SIGNED16;	(* number of times updates have been disabled *)
@@ -96,7 +96,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 
 		IntAction = POINTER TO IntActionDesc;
 		IntActionDesc = RECORD (AttrActionDesc)
-			int: LONGINT;
+			int: SIGNED32;
 		END;
 
 		RealAction = POINTER TO RealActionDesc;
@@ -501,7 +501,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END SetBool;
 
 	PROCEDURE DoIntAction (fig: Figure; act: Action);
-		VAR ia: IntAction; am: Objects.AttrMsg; val: LONGINT;
+		VAR ia: IntAction; am: Objects.AttrMsg; val: SIGNED32;
 	BEGIN
 		ia := act(IntAction);
 		am.id := Objects.get; COPY(ia.name, am.name); am.res := -1; ia.shape.handle(ia.shape, am);
@@ -511,7 +511,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END DoIntAction;
 
 	(** set integer attribute value with undoable action **)
-	PROCEDURE SetInt* (fig: Figure; shape: Shape; name: ARRAY OF CHAR; val: LONGINT);
+	PROCEDURE SetInt* (fig: Figure; shape: Shape; name: ARRAY OF CHAR; val: SIGNED32);
 		VAR am: Objects.AttrMsg; ia: IntAction;
 	BEGIN
 		am.id := Objects.get; COPY(name, am.name); am.res := -1; shape.handle(shape, am);
@@ -589,7 +589,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	(**--- Transformations ---**)
 
 	PROCEDURE Exchange (a: AttrAction);
-		VAR am: Objects.AttrMsg; i: LONGINT; r: REAL; s: ARRAY 64 OF CHAR;
+		VAR am: Objects.AttrMsg; i: SIGNED32; r: REAL; s: ARRAY 64 OF CHAR;
 	BEGIN
 		am.id := Objects.get; COPY(a.name, am.name); am.res := -1; a.shape.handle(a.shape, am);
 		CASE am.class OF
@@ -934,7 +934,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END CopyShape;
 
 	PROCEDURE HandleShape* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR shape, copy: Shape; cm: Objects.CopyMsg; am: Objects.AttrMsg; ver: LONGINT; int: SIGNED16; real: REAL;
+		VAR shape, copy: Shape; cm: Objects.CopyMsg; am: Objects.AttrMsg; ver: SIGNED32; int: SIGNED16; real: REAL;
 	BEGIN
 		shape := obj(Shape);
 		IF msg IS UnmarkMsg THEN
@@ -1359,7 +1359,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END CopyContainer;
 
 	PROCEDURE HandleContainer* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR cont: Container; ver: LONGINT; cur: Shape;
+		VAR cont: Container; ver: SIGNED32; cur: Shape;
 	BEGIN
 		cont := obj(Container);
 		IF msg IS ShapeMsg THEN
@@ -1472,7 +1472,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END CopyLayer;
 
 	PROCEDURE HandleLayer* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR layer, copy: Layer; cur: Shape; ver: LONGINT; dummy: BOOLEAN;
+		VAR layer, copy: Layer; cur: Shape; ver: SIGNED32; dummy: BOOLEAN;
 	BEGIN
 		layer := obj(Layer);
 		IF msg IS ShapeMsg THEN
@@ -1744,14 +1744,14 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		CopyComponents(msg, from.bottom, to.bottom, to.top);
 		cur := to.bottom; WHILE cur # NIL DO cur(Layer).fig := to; cur := cur.up END;
 		to.active := from.active.dlink(Layer);
-		to.seltime := MIN(LONGINT);
+		to.seltime := MIN(SIGNED32);
 		to.lockLevel := 0; NEW(to.damage); GfxRegions.Init(to.damage, GfxRegions.Winding);
 		to.cmdLevel := 0; to.maxCmds := from.maxCmds; to.nofCmds := 0;
 		NEW(to.undoCmd); to.firstCmd := to.undoCmd; to.curCmd := NIL
 	END CopyFigure;
 
 	PROCEDURE HandleFigure* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR fig, copy: Figure; bm: Objects.BindMsg; len, ver: LONGINT; id: CHAR; lib: Objects.Library; s: Shape;
+		VAR fig, copy: Figure; bm: Objects.BindMsg; len, ver: SIGNED32; id: CHAR; lib: Objects.Library; s: Shape;
 	BEGIN
 		fig := obj(Figure);
 		IF msg IS ShapeMsg THEN
@@ -1823,7 +1823,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		fig.handle := HandleFigure;
 		NEW(layer); InitLayer(layer, "Main", TRUE, TRUE, TRUE); layer.fig := fig;
 		fig.bottom := layer; fig.top := layer; fig.active := layer;
-		fig.seltime := MIN(LONGINT);
+		fig.seltime := MIN(SIGNED32);
 		fig.lockLevel := 0; NEW(fig.damage); GfxRegions.Init(fig.damage, GfxRegions.Winding);
 		fig.cmdLevel := 0; fig.maxCmds := 200; fig.nofCmds := 0;
 		NEW(fig.undoCmd); fig.firstCmd := fig.undoCmd; fig.curCmd := NIL
@@ -1846,7 +1846,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END NewDoc;
 
 	PROCEDURE HandleRuler (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR frame: Gadgets.Frame; ver: LONGINT;
+		VAR frame: Gadgets.Frame; ver: SIGNED32;
 	BEGIN
 		frame := obj(Gadgets.Frame);
 		IF msg IS Objects.FileMsg THEN

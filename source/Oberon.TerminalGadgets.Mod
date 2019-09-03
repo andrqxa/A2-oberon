@@ -18,7 +18,7 @@ TYPE
 		fnt*: Fonts.Font;
 		cursorState*, charW*, lineH*, textcol*, profile*: SIGNED16;
 		hasSel*: BOOLEAN;
-		selTime*: LONGINT;
+		selTime*: SIGNED32;
 		selFrom*, selTo*: Terminals.Location;
 		col: SIGNED16
 	END;
@@ -246,7 +246,7 @@ END TextPos;
 
 
 
-PROCEDURE GetSelection*(f: Frame; VAR text: Texts.Text; VAR beg, end, time: LONGINT);
+PROCEDURE GetSelection*(f: Frame; VAR text: Texts.Text; VAR beg, end, time: SIGNED32);
 BEGIN
 	IF f.hasSel THEN
 		time := f.selTime;
@@ -626,7 +626,7 @@ PROCEDURE Edit*(f: Frame; frameX, frameY: SIGNED16; R: Display3.Mask; keys: SET;
 VAR
 	keySum: SET;
 	text: Texts.Text;
-	beg, end, time: LONGINT;
+	beg, end, time: SIGNED32;
 	cmdLine, cmdCol: SIGNED16;
 	msg: Oberon.ConsumeMsg;
 BEGIN
@@ -792,7 +792,7 @@ END RestoreFrame;
 			R: Display3.Mask;
 			b, t, i, j: SIGNED16;
 			print: ARRAY 2 OF CHAR;
-		PROCEDURE P(x: LONGINT): SIGNED16;
+		PROCEDURE P(x: SIGNED32): SIGNED16;
 		BEGIN
 			RETURN SHORT((x * Display.Unit + Printer.Unit DIV 2) DIV Printer.Unit)
 		END P;

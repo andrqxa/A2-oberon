@@ -25,7 +25,7 @@ VAR
 	revCode: ARRAY 256 OF SIGNED8;
 	table: ARRAY N OF SIGNED8;
 
-	PROCEDURE ShowError( n: LONGINT );
+	PROCEDURE ShowError( n: SIGNED32 );
 	BEGIN
 		Log.String( "### StdCoder.Decode: " );
 		CASE n OF
@@ -44,8 +44,8 @@ VAR
 	END ShowError;
 
 
-	PROCEDURE read( r: Streams.Reader; VAR res: WORD ): LONGINT;
-	VAR ch: CHAR; x: LONGINT;
+	PROCEDURE read( r: Streams.Reader; VAR res: WORD ): SIGNED32;
+	VAR ch: CHAR; x: SIGNED32;
 	BEGIN
 		IF res = 0 THEN
 			REPEAT  r.Char( ch );  x := revCode[ORD( ch )]  UNTIL (x >= 0) OR (r.res # Ok);
@@ -64,9 +64,9 @@ VAR
 
 
 	PROCEDURE ReadHeader(		r: Streams.Reader;
-									VAR res: WORD;  VAR name: ARRAY OF CHAR;  VAR type: LONGINT );
+									VAR res: WORD;  VAR name: ARRAY OF CHAR;  VAR type: SIGNED32 );
 	VAR
-		x, bits, i: LONGINT; ch: CHAR; tag: ARRAY 16 OF CHAR;
+		x, bits, i: SIGNED32; ch: CHAR; tag: ARRAY 16 OF CHAR;
 	BEGIN
 		tag := Tag; i := 0;  res := 0;
 		r.SkipWhitespace;  ch := r.Peek( );
@@ -98,7 +98,7 @@ VAR
 
 
 	PROCEDURE SkipFileType(r: Streams.Reader; VAR res: WORD ): BOOLEAN;
-	VAR x, bits, i: LONGINT; ch: CHAR;  ftype: FileType;
+	VAR x, bits, i: SIGNED32; ch: CHAR;  ftype: FileType;
 	BEGIN
 		res := 0;  i := 0; bits := 0;  x := 0;
 		REPEAT
@@ -111,8 +111,8 @@ VAR
 	END SkipFileType;
 
 
-	PROCEDURE ReadInteger( r: Streams.Reader; VAR res: WORD ): LONGINT;
-	VAR bits, val: LONGINT;
+	PROCEDURE ReadInteger( r: Streams.Reader; VAR res: WORD ): SIGNED32;
+	VAR bits, val: SIGNED32;
 	BEGIN
 		bits := 0;  val := 0;
 		REPEAT  val := val + ASH( read( r, res ), bits ); INC( bits, 6 )  UNTIL (res # 0) OR (bits >= 32);
@@ -122,7 +122,7 @@ VAR
 
 	PROCEDURE ReadFile( r: Streams.Reader; VAR res: WORD ): Files.File;
 	VAR
-		hash, x, bits, i, len, sum, s: LONGINT; byte: SIGNED8;  f: Files.File;  w: Files.Writer;
+		hash, x, bits, i, len, sum, s: SIGNED32; byte: SIGNED8;  f: Files.File;  w: Files.Writer;
 	BEGIN
 		f := Files.New( "" );  Files.OpenWriter( w, f, 0 );
 		FOR i := 0 TO N - 1 DO  table[i] := 0  END;
@@ -167,7 +167,7 @@ VAR
 
 
 	PROCEDURE CutSuffixODC( VAR n: Files.FileName );
-	VAR i: LONGINT
+	VAR i: SIGNED32
 	BEGIN
 		i := 0;  WHILE n[i] # 0X DO  INC(i)  END;
 		IF (i > 4) & (n[i -4] = ".") & (CAP(n[i-3]) = "O") & (CAP(n[i-2]) = "D") & (CAP(n[i-1]) = "C") THEN
@@ -177,7 +177,7 @@ VAR
 
 
 	PROCEDURE PositionReader( VAR r: Files.Reader; str: ARRAY OF CHAR );
-	VAR pos, i: LONGINT; c: CHAR;
+	VAR pos, i: SIGNED32; c: CHAR;
 	BEGIN
 		pos := 0;
 		LOOP
@@ -227,7 +227,7 @@ VAR
 
 	PROCEDURE DecodeFileList ( r: Streams.Reader; VAR res: WORD );
 	VAR
-		i: LONGINT; p, files: FileList; ch: CHAR;
+		i: SIGNED32; p, files: FileList; ch: CHAR;
 		f: Files.File; fr: Files.Reader; path: Files.FileName;
 		sa: Strings.StringArray; suffix: ARRAY 16 OF CHAR;
 	BEGIN
@@ -278,7 +278,7 @@ VAR
 	PROCEDURE Decode* ( c: Commands.Context );
 	VAR
 		name: Files.FileName;
-		res, type: LONGINT;
+		res, type: SIGNED32;
 		r: Streams.Reader;
 	BEGIN
 		r := c.arg;
@@ -297,7 +297,7 @@ VAR
 
 
 	PROCEDURE InitCodes;
-	VAR i: SIGNED8;  j: LONGINT;
+	VAR i: SIGNED8;  j: SIGNED32;
 	BEGIN
 		FOR j := 0 TO 255 DO  revCode[j] := -1  END;
 		code[0] := ".";  revCode[ORD(".")] := 0;

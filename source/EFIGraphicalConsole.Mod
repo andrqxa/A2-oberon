@@ -26,12 +26,12 @@ TYPE
 	(* copies of types in EFIGraphicsOutput -- to be independent of EFI *)
 	GraphicsModeInfo = POINTER TO GraphicsModeInfoDescription;
 	GraphicsModeInfoDescription = RECORD
-		Version-: LONGINT; (* = 0 for the structure specified here. If > 0, structure extended backwards compatibly *)
-		HorizontalResolution-: LONGINT;
-		VerticalResolution-: LONGINT;
-		PixelFormat-: LONGINT; (* enum *)
-		PixelBitmask-: RECORD RedMask-,GreenMask-,BlueMask-,ReservedMask-:LONGINT; END;
-		PixelsPerScanline-: LONGINT;
+		Version-: SIGNED32; (* = 0 for the structure specified here. If > 0, structure extended backwards compatibly *)
+		HorizontalResolution-: SIGNED32;
+		VerticalResolution-: SIGNED32;
+		PixelFormat-: SIGNED32; (* enum *)
+		PixelBitmask-: RECORD RedMask-,GreenMask-,BlueMask-,ReservedMask-:SIGNED32; END;
+		PixelsPerScanline-: SIGNED32;
 	END;
 
 	VAR
@@ -45,7 +45,7 @@ TYPE
 		traceChar: PROCEDURE {DELEGATE} (c: CHAR);
 
 	PROCEDURE MakeFont*(VAR font: Font);
-	VAR buf: Buffer; pos: LONGINT;
+	VAR buf: Buffer; pos: SIGNED32;
 		PROCEDURE SetBuf(VAR p: Buffer); BEGIN p := ADDRESSOF(buffer[pos]) END SetBuf;
 		PROCEDURE Put1(ch: CHAR); BEGIN buffer[pos] := ch; INC(pos) END Put1;
 		PROCEDURE Dimensions(VAR char: Char; dx,x,y,w,h: SIGNED16); BEGIN char.dx := dx; char.x := x; char.y := y; char.w := w; char.h := h END Dimensions;
@@ -317,7 +317,7 @@ TYPE
 
 	PROCEDURE Mask(buf: ADDRESS; bitof, stride, x, y, w, h, adr, dstride, depth: SIZE);
 	CONST SetSize = MAX (SET) + 1;
-	VAR p, i, dadr: ADDRESS; s: SET; space: LONGINT; d, bitofs: SIZE;
+	VAR p, i, dadr: ADDRESS; s: SET; space: SIGNED32; d, bitofs: SIZE;
 	BEGIN
 		IF (w > 0) & (h > 0) THEN
 			i := buf MOD SIZEOF (SET);
@@ -349,7 +349,7 @@ TYPE
 
 
 	PROCEDURE RenderChar0(c: CHAR; adr: ADDRESS; VAR x,y: SIZE; w,h,depth: SIZE );
-	VAR char: Char; stride,pw,ph: LONGINT;
+	VAR char: Char; stride,pw,ph: SIGNED32;
 
 		PROCEDURE Scroll;
 		VAR x0,y0: ADDRESS; val: CHAR; sadr,dadr: ADDRESS;
@@ -401,8 +401,8 @@ TYPE
 		RenderChar0(c, adr,x,y,w,h,depth);
 	END RenderChar;
 
-	PROCEDURE GetDepth(info: GraphicsModeInfo): LONGINT; (* depth in bits *)
-	VAR mask, depth: LONGINT;
+	PROCEDURE GetDepth(info: GraphicsModeInfo): SIGNED32; (* depth in bits *)
+	VAR mask, depth: SIGNED32;
 	BEGIN
 		CASE info.PixelFormat OF
 		PFRGBX8Bit, PFBGRX8Bit :
@@ -495,13 +495,13 @@ TYPE
 
 PROCEDURE Do*(context: Commands.Context);
 VAR
-	name: ARRAY 64 OF CHAR; l,i: LONGINT; file: Files.File; r: Files.Reader; font: Fonts.Font; p: PatternPtr;
-	pw, ph,stride: LONGINT;
+	name: ARRAY 64 OF CHAR; l,i: SIGNED32; file: Files.File; r: Files.Reader; font: Fonts.Font; p: PatternPtr;
+	pw, ph,stride: SIGNED32;
 	dx,dy,x,y,w,h: SIGNED16;
 	dx2,dy2,x2,y2,w2,h2: SIGNED16;
-	pat,pat2: Display.Pattern; j: LONGINT; done: BOOLEAN; len: LONGINT;
+	pat,pat2: Display.Pattern; j: SIGNED32; done: BOOLEAN; len: SIGNED32;
 
-	PROCEDURE Mask(VAR buf: ARRAY OF CHAR; bitof, stride, x, y, w, h: LONGINT);
+	PROCEDURE Mask(VAR buf: ARRAY OF CHAR; bitof, stride, x, y, w, h: SIGNED32);
 	CONST SetSize = MAX (SET) + 1;
 	VAR p, i, bitofs: ADDRESS; s: SET;
 	BEGIN
@@ -530,7 +530,7 @@ VAR
 		END
 	END Mask;
 
-	PROCEDURE WriteChar(i: LONGINT);
+	PROCEDURE WriteChar(i: SIGNED32);
 	BEGIN
 		context.out.String("font.char["); context.out.Int(i,1); context.out.String("]");
 		out.Update;
@@ -543,7 +543,7 @@ BEGIN
 		font := Fonts.This(name);
 		(*
 		out.String("PROCEDURE MakeFont(VAR font: Font);"); out.Ln;
-		out.String("VAR buf: Buffer; pos: LONGINT;");out.Ln;
+		out.String("VAR buf: Buffer; pos: SIGNED32;");out.Ln;
 		out.String("PROCEDURE SetBuf(VAR p: Buffer); BEGIN p := ADDRESSOF(buffer[pos]) END SetBuf;"); out.Ln;
 		out.String("PROCEDURE Put1(ch: CHAR); BEGIN buffer[pos] := ch; INC(pos) END Put1;"); out.Ln;
 		out.String("PROCEDURE Dimensions(VAR char: Char; dx,x,y,w,h: SIGNED16); BEGIN char.dx := dx; char.x := x; char.y := y; char.w := w; char.h := h END Dimensions;"); out.Ln;

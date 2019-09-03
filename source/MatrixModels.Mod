@@ -56,8 +56,8 @@ TYPE
 			ReleaseRead;
 		END GetGeneric;
 
-		PROCEDURE WriteValue*(w : Streams.Writer; level : LONGINT); (** protected *)
-		VAR column, row, nofColumns, nofRows : LONGINT;
+		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
+		VAR column, row, nofColumns, nofRows : SIGNED32;
 		BEGIN
 			WriteValue^(w, level);
 			nofColumns := LEN(matrix, 0);
@@ -94,8 +94,8 @@ TYPE
 VAR
 	StrMatrix : Strings.String;
 
-PROCEDURE GetStringLength(CONST matrix : Matrix) : LONGINT;
-VAR length, nofColumns, nofRows : LONGINT;
+PROCEDURE GetStringLength(CONST matrix : Matrix) : SIGNED32;
+VAR length, nofColumns, nofRows : SIGNED32;
 BEGIN
 	length := 0;
 	nofColumns := LEN(matrix, 0);
@@ -109,10 +109,10 @@ BEGIN
 END GetStringLength;
 
 PROCEDURE MatrixToString(CONST matrix : Matrix; VAR string : ARRAY OF CHAR; VAR res : WORD);
-VAR length, nofColumns, nofRows, column, row,  i : LONGINT; error : BOOLEAN;
+VAR length, nofColumns, nofRows, column, row,  i : SIGNED32; error : BOOLEAN;
 
-	PROCEDURE Append(VAR string : ARRAY OF CHAR; VAR index : LONGINT; CONST suffix : ARRAY OF CHAR) : BOOLEAN;
-	VAR result : BOOLEAN; length, i : LONGINT;
+	PROCEDURE Append(VAR string : ARRAY OF CHAR; VAR index : SIGNED32; CONST suffix : ARRAY OF CHAR) : BOOLEAN;
+	VAR result : BOOLEAN; length, i : SIGNED32;
 	BEGIN
 		length := Strings.Length(suffix);
 		ASSERT(length > 0);
@@ -128,7 +128,7 @@ VAR length, nofColumns, nofRows, column, row,  i : LONGINT; error : BOOLEAN;
 		RETURN result;
 	END Append;
 
-	PROCEDURE AppendFloat(VAR string : ARRAY OF CHAR; VAR index : LONGINT; float : LONGREAL) : BOOLEAN;
+	PROCEDURE AppendFloat(VAR string : ARRAY OF CHAR; VAR index : SIGNED32; float : LONGREAL) : BOOLEAN;
 	VAR floatStr : ARRAY 128 OF CHAR;
 	BEGIN
 		Strings.FloatToStr(float, 0, 10, 4, floatStr);
@@ -170,22 +170,22 @@ END MatrixToString;
 
 PROCEDURE StringToMatrix(CONST string : ARRAY OF CHAR; VAR matrix : Matrix; VAR res : WORD);
 VAR
-	nofColumns, nofRows, column, row, length, index : LONGINT;
+	nofColumns, nofRows, column, row, length, index : SIGNED32;
 
 	PROCEDURE IsWhitespace(character : CHAR) : BOOLEAN;
 	BEGIN
 		RETURN (character <= " ") & (character # 0X);
 	END IsWhitespace;
 
-	PROCEDURE SkipWhitespace(CONST string : ARRAY OF CHAR; length : LONGINT; VAR index : LONGINT);
+	PROCEDURE SkipWhitespace(CONST string : ARRAY OF CHAR; length : SIGNED32; VAR index : SIGNED32);
 	BEGIN
 		ASSERT(length < LEN(string));
 		WHILE (index < length) & (string[index] # 0X) & IsWhitespace(string[index]) DO INC(index); END;
 		ASSERT(index <= length);
 	END SkipWhitespace;
 
-	PROCEDURE CountFloats(CONST string : ARRAY OF CHAR; length : LONGINT; VAR index : LONGINT) : LONGINT;
-	VAR nofFloats : LONGINT;
+	PROCEDURE CountFloats(CONST string : ARRAY OF CHAR; length : SIGNED32; VAR index : SIGNED32) : SIGNED32;
+	VAR nofFloats : SIGNED32;
 	BEGIN
 		nofFloats := 1;
 		WHILE (index < length) & (string[index] # "]") DO
@@ -197,7 +197,7 @@ VAR
 		RETURN nofFloats;
 	END CountFloats;
 
-	PROCEDURE Consume(CONST string : ARRAY OF CHAR; character : CHAR; VAR index : LONGINT) : BOOLEAN;
+	PROCEDURE Consume(CONST string : ARRAY OF CHAR; character : CHAR; VAR index : SIGNED32) : BOOLEAN;
 	VAR result : BOOLEAN;
 	BEGIN
 		result := (index < LEN(string)) & (string[index] = character);
@@ -205,9 +205,9 @@ VAR
 		RETURN result;
 	END Consume;
 
-	PROCEDURE GetDimensions(CONST string : ARRAY OF CHAR; length : LONGINT; VAR nofColumns, nofRows : LONGINT; VAR res : WORD);
+	PROCEDURE GetDimensions(CONST string : ARRAY OF CHAR; length : SIGNED32; VAR nofColumns, nofRows : SIGNED32; VAR res : WORD);
 	CONST Start = 0; ExpectRow = 1; ReadingRow = 2; Error = 9; Done = 10;
-	VAR oldIndex, index : LONGINT; state, nofFloats : LONGINT;
+	VAR oldIndex, index : SIGNED32; state, nofFloats : SIGNED32;
 	BEGIN
 		res := Types.CannotConvert;
 		index := 0;
@@ -270,8 +270,8 @@ VAR
 		END;
 	END GetDimensions;
 
-	PROCEDURE ReadFloat(CONST string : ARRAY OF CHAR; VAR index : LONGINT) : LONGREAL;
-	VAR floatStr : ARRAY 128 OF CHAR; float : LONGREAL; i : LONGINT;
+	PROCEDURE ReadFloat(CONST string : ARRAY OF CHAR; VAR index : SIGNED32) : LONGREAL;
+	VAR floatStr : ARRAY 128 OF CHAR; float : LONGREAL; i : SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE (string[index] # ",") & (string[index] # "]") DO

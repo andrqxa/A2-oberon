@@ -42,7 +42,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		SOSndBuf* = 01001H; (** send buffer size *)
 		SORcvBuf* = 01002H; (** receive buffer size *)
 		SOSndTimeo* = 01005H; SORcvTimeo* = 01006H;
-		SIORcvAll* = LONGINT(98000001H);
+		SIORcvAll* = SIGNED32(98000001H);
 
 		SDReceive*=0; SDSend*=1; SDboth* = 2; (* graceful shutdown modes *)
 
@@ -53,7 +53,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		TimeVal* = POINTER TO TimeValDesc;
 		TimeValDesc* = RECORD
-			sec*,musec*: LONGINT; (* seconds and microseconds *)
+			sec*,musec*: SIGNED32; (* seconds and microseconds *)
 		END;
 
 		WSAData* = RECORD
@@ -64,7 +64,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 			lpVendorInfo*: ADDRESS
 		END;
 
-		inAddr* = LONGINT;
+		inAddr* = SIGNED32;
 
 		PsockaddrIn* = POINTER TO sockaddrIn;
 		sockaddrIn* = RECORD
@@ -76,8 +76,8 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		Paddrinfo* = POINTER TO addrinfo;
 		addrinfo* = RECORD
 			aiFlags*: SET;
-			aiFamily*, aiSocktype*, aiProtocol*: LONGINT;
-			aiAddrlen*: LONGINT;
+			aiFamily*, aiSocktype*, aiProtocol*: SIGNED32;
+			aiAddrlen*: SIGNED32;
 			aiCanonname*: ADDRESS;
 			aiAddr*{UNTRACED}: PsockaddrIn;
 			aiNext*{UNTRACED}: Paddrinfo
@@ -85,11 +85,11 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		Socket* = Kernel32.HANDLE;
 
-		Group* = LONGINT;
+		Group* = SIGNED32;
 
 		FDSet*=RECORD
-			fdcount*: LONGINT;
-			socket*: ARRAY 64 OF Socket (*LONGINT*);
+			fdcount*: SIGNED32;
+			socket*: ARRAY 64 OF Socket (*SIGNED32*);
 		END;
 
 		(** The Windows Sockets WSAPROTOCOL_INFO structure is used to store or retrieve complete information for
@@ -111,7 +111,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		Error = OBJECT
 		VAR
-		nr: LONGINT;
+		nr: SIGNED32;
 		name: ARRAY 64 OF CHAR;
 		msg: ARRAY 256 OF CHAR;
 		left, right: Error;
@@ -128,15 +128,15 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		(** The Windows Sockets WSAAsyncGetHostByAddr function asynchronously retrieves host information that
 			corresponds to an address. *)
-		WSAAsyncGetHostByAddr-: PROCEDURE {WINAPI} (hWnd: User32.HWND; wMsg: LONGINT; VAR addr: ARRAY   OF SYSTEM.BYTE; len: WORD; type: WORD; VAR buf: ARRAY   OF SYSTEM.BYTE; buflen: WORD): Kernel32.HANDLE;
+		WSAAsyncGetHostByAddr-: PROCEDURE {WINAPI} (hWnd: User32.HWND; wMsg: SIGNED32; VAR addr: ARRAY   OF SYSTEM.BYTE; len: WORD; type: WORD; VAR buf: ARRAY   OF SYSTEM.BYTE; buflen: WORD): Kernel32.HANDLE;
 
 		(** The Windows Sockets WSAAsyncGetHostByName function asynchronously retrieves host information corresponding
 			to a host name. *)
-		WSAAsyncGetHostByName-: PROCEDURE {WINAPI} (hWnd: User32.HWND; wMsg: LONGINT; name: ARRAY   OF CHAR; VAR buf: ARRAY   OF SYSTEM.BYTE; buflen: WORD): Kernel32.HANDLE;
+		WSAAsyncGetHostByName-: PROCEDURE {WINAPI} (hWnd: User32.HWND; wMsg: SIGNED32; name: ARRAY   OF CHAR; VAR buf: ARRAY   OF SYSTEM.BYTE; buflen: WORD): Kernel32.HANDLE;
 
 		(** The Windows Sockets WSAAsyncSelect function requests Windows message-based notification of network events
 			for a socket. *)
-		WSAAsyncSelect-: PROCEDURE {WINAPI} (s: Socket; hWnd: User32.HWND; wMsg: LONGINT; lEvent: WORD): WORD;
+		WSAAsyncSelect-: PROCEDURE {WINAPI} (s: Socket; hWnd: User32.HWND; wMsg: SIGNED32; lEvent: WORD): WORD;
 
 		(** The Windows Sockets WSAGetLastError function gets the error status for the last operation that failed. *)
 		WSAGetLastError-: PROCEDURE {WINAPI} (): WORD;
@@ -180,21 +180,21 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 		(** The Windows Sockets htonl function converts a u_long from host to TCP/IP network byte order
 			(which is big-endian). *)
-		htonl-: PROCEDURE {WINAPI} (x: LONGINT): LONGINT;
+		htonl-: PROCEDURE {WINAPI} (x: SIGNED32): SIGNED32;
 
 		(** The Windows Sockets htons function converts a u_short from host to TCP/IP network byte order
 			(which is big-endian). *)
 		htons-: PROCEDURE {WINAPI} (x: SIGNED16): SIGNED16;
 
 		(** The Windows Sockets ioctlsocket function controls the I/O mode of a socket. *)
-		ioctlsocket-: PROCEDURE {WINAPI} (s: Socket; cmd: LONGWORD; VAR argp: LONGINT): WORD;
+		ioctlsocket-: PROCEDURE {WINAPI} (s: Socket; cmd: LONGWORD; VAR argp: SIGNED32): WORD;
 
 		(** The Windows Sockets listen function places a socket a state where it is listening for an incoming connection. *)
 		listen-: PROCEDURE {WINAPI} (s: Socket; backlog: WORD): WORD;
 
 		(** The Windows Sockets ntohl function converts a u_long from TCP/IP network order to host byte order
 			(which is little-endian on Intel processors). *)
-		ntohl-: PROCEDURE {WINAPI} (x: LONGINT): LONGINT;
+		ntohl-: PROCEDURE {WINAPI} (x: SIGNED32): SIGNED32;
 
 		(** The Windows Sockets ntohs function converts a u_short from TCP/IP network byte order to host byte order
 			(which is little-endian on Intel processors). *)
@@ -320,7 +320,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 (*** debugging *)
 
 	PROCEDURE DispError*;
-	VAR err: Error;  nr: LONGINT;
+	VAR err: Error;  nr: SIGNED32;
 	BEGIN
 		nr := WSAGetLastError();
 		IF  (nr=0) THEN RETURN END;
@@ -341,7 +341,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 
 	END DispError;
 
-	PROCEDURE Enter( nr: LONGINT;  short, desc: ARRAY OF CHAR );
+	PROCEDURE Enter( nr: SIGNED32;  short, desc: ARRAY OF CHAR );
 	VAR this: Error;
 
 		PROCEDURE InsertErr( VAR err: Error;  this: Error );

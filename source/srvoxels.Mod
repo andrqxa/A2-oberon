@@ -74,7 +74,7 @@ VAR
 	tree: srTree.tree;
 	azure,crimson,yellow: srBase.COLOR;cp: srBase.PT;
 	avatar: ARRAY 10 OF srBase.Voxel;
-	av: LONGINT;
+	av: SIGNED32;
 	rota: srRotaVox.RVox;
 	mrmkitty: ARRAY 77 OF srTexVox.TexVox;
 	title: srBase.Name;
@@ -417,7 +417,7 @@ END tick;
 
 PROCEDURE fill5cosm;
 VAR
-	i, j: LONGINT;
+	i, j: SIGNED32;
 	theta, phi: SREAL;
 	a: srBase.PT;
 	sky:srBase.COLOR;
@@ -441,7 +441,7 @@ END fill5cosm;
 
 PROCEDURE fillcell;
 VAR
-	i, j: LONGINT;
+	i, j: SIGNED32;
 	theta, phi: SREAL;
 	a,normal: srBase.PT;
 	reddishgray:srBase.COLOR;
@@ -469,7 +469,7 @@ BEGIN
 END fillcell;
 PROCEDURE fillX;
 VAR
-	i, j,k: LONGINT;
+	i, j,k: SIGNED32;
 	a,b: SREAL;
 	v: ARRAY 8 OF srBase.PT;
 BEGIN

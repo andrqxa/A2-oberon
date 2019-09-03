@@ -14,7 +14,7 @@ MODULE TimeStamps IN Oberon;	(** portable *) (* ejz *)
 		END;
 		RevFrame* = POINTER TO RevFrameDesc;
 		RevFrameDesc* = RECORD (FrameDesc)
-			revision: LONGINT
+			revision: SIGNED32
 		END;
 
 	PROCEDURE Restore(F: Frame; Q: Display3.Mask; x, y, w, h: SIGNED16);
@@ -28,11 +28,11 @@ MODULE TimeStamps IN Oberon;	(** portable *) (* ejz *)
 		END
 	END Restore;
 
-	PROCEDURE P(x: LONGINT): SIGNED16;
+	PROCEDURE P(x: SIGNED32): SIGNED16;
 	BEGIN RETURN SHORT((x * Display.Unit + (Printer.Unit-1)) DIV Printer.Unit)
 	END P;
 
-	PROCEDURE DR(x: LONGINT): REAL;
+	PROCEDURE DR(x: SIGNED32): REAL;
 	BEGIN RETURN (x * Printer.Unit) / Display.Unit
 	END DR;
 
@@ -53,7 +53,7 @@ MODULE TimeStamps IN Oberon;	(** portable *) (* ejz *)
 
 	PROCEDURE Caption(F: Frame; VAR w, h: SIGNED16; newtime: BOOLEAN);
 		VAR
-			date, time: LONGINT;
+			date, time: SIGNED32;
 			wr, hr: REAL;
 			tmp: ARRAY 64 OF CHAR;
 			pw, ph, dsr: SIGNED16;

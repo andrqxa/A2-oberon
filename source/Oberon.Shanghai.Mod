@@ -35,7 +35,7 @@ TYPE
 
 	Frame = POINTER TO FrameDesc;
 	FrameDesc = RECORD (Gadgets.FrameDesc)
-		time: LONGINT;
+		time: SIGNED32;
 		nofTiles: SIGNED16;
 		sel1, sel2: SIGNED16;
 		over: BOOLEAN;
@@ -47,14 +47,14 @@ TYPE
 	END;
 
 VAR
-	DoubleClick: LONGINT;
-	seed: LONGINT;
+	DoubleClick: SIGNED32;
+	seed: SIGNED32;
 	faceFnt, textFnt: Fonts.Font;
 	W: Texts.Writer;
 
 PROCEDURE Random ( z : SIGNED16) : SIGNED16;
 CONST a = 16807; m = 2147483647; q = m DIV a; r = m MOD a;
-VAR g: LONGINT;
+VAR g: SIGNED32;
 BEGIN
 	g := a*(seed MOD q) - r*(seed DIV q);
 	IF g > 0 THEN seed := g ELSE seed := g + m END;
@@ -247,7 +247,7 @@ BEGIN
 END DrawGameOver;
 
 PROCEDURE FlashTiles (F: Frame; Q: Display3.Mask; x, y: SIGNED16; tiles: ARRAY OF SIGNED16; cnt: SIGNED16);
-VAR i, time: LONGINT;
+VAR i, time: SIGNED32;
 BEGIN
 	FOR i := 0 TO cnt DO DrawTile(Q, 12, x, y, F.board[tiles[i]]) END;
 	time := Oberon.Time() + Input.TimeUnit;
@@ -418,7 +418,7 @@ BEGIN
 END Attributes;
 
 PROCEDURE Copy* (VAR M: Objects.CopyMsg; from, to: Frame);
-VAR i: LONGINT;
+VAR i: SIGNED32;
 BEGIN
 	Gadgets.CopyFrame(M, from, to);
 	to.nofTiles := from.nofTiles;

@@ -346,7 +346,7 @@ CONST
 	VAR
 		b: BOOLEAN;
 		c: CHAR;
-		s: SIGNED8; i: SIGNED16; l: LONGINT; h: HUGEINT;
+		s: SIGNED8; i: SIGNED16; l: SIGNED32; h: HUGEINT;
 		sz: SIZE; a, pc: ADDRESS;
 		word: WORD; lword: LONGWORD;
 		s8: SIGNED8; s16: SIGNED16; s32: SIGNED32; s64: SIGNED64;
@@ -385,7 +385,7 @@ CONST
 			size := SIZEOF(SIGNED16);
 			SYSTEM.GET(adr, i); Signed(i);
 		| sfTypeLONGINT:
-			size := SIZEOF(LONGINT);
+			size := SIZEOF(SIGNED32);
 			SYSTEM.GET(adr, l); Signed(l);
 		| sfTypeHUGEINT:
 			size := SIZEOF(HUGEINT);
@@ -1075,7 +1075,7 @@ TYPE
 		RETURN TRUE;
 	END FindVar;
 
-	PROCEDURE WriteVar*(w: Streams.Writer; v: Variable; VAR col: LONGINT);
+	PROCEDURE WriteVar*(w: Streams.Writer; v: Variable; VAR col: SIGNED32);
 	BEGIN
 	END WriteVar;
 
@@ -1104,7 +1104,7 @@ TYPE
 		| sfTypeCHAR: w.String("CHAR");
 		| sfTypeSHORTINT: w.String("SIGNED8");
 		| sfTypeINTEGER: w.String("SIGNED16");
-		| sfTypeLONGINT: w.String("LONGINT");
+		| sfTypeLONGINT: w.String("SIGNED32");
 		| sfTypeHUGEINT: w.String("HUGEINT");
 		| sfTypeWORD: w.String("WORD");
 		| sfTypeLONGWORD: w.String("LONGWORD");
@@ -1244,7 +1244,7 @@ TYPE
 
 VAR trace: Streams.Writer;
 
-	PROCEDURE WriteMode*(mode : LONGINT; out : Streams.Writer);
+	PROCEDURE WriteMode*(mode : SIGNED32; out : Streams.Writer);
 	BEGIN
 		CASE mode OF
 			|Objects.Ready : out.String("rdy");

@@ -392,7 +392,7 @@ END BindIt;
 
 (** drawing routines *)
 	PROCEDURE RecallNode( graph: tGraph;  v: tNode );
-	VAR x, y, w, h, dsr: SIGNED16;  oldCol, oldBkCol: LONGINT;  dsrr, temp: Real;
+	VAR x, y, w, h, dsr: SIGNED16;  oldCol, oldBkCol: SIGNED32;  dsrr, temp: Real;
 		name: ARRAY 32 OF CHAR;
 
 		PROCEDURE DrawNode( v: tNode );
@@ -433,7 +433,7 @@ END BindIt;
 	END RecallNode;
 
 	PROCEDURE RecallEdge( g: tGraph;  e: tEdge );
-	VAR  (*x, y, w, h, X, Y, W, H: SIGNED16;*) x, y: SIGNED16;  oldCol, oldBkCol: LONGINT;
+	VAR  (*x, y, w, h, X, Y, W, H: SIGNED16;*) x, y: SIGNED16;  oldCol, oldBkCol: SIGNED32;
 	BEGIN
 		(*GetNodeRect (g, e.from, x, y, w, h); GetNodeRect (g, e.to, X, Y, W, H);
 	vyGraphBase.Line (x+w DIV 2, y+h, X+W DIV 2, Y)*)
@@ -475,7 +475,7 @@ END BindIt;
 	invert=1;
 	remove=3;
 	*)
-	VAR v: tNode;  i: LONGINT;  inNew, inOld, chg: BOOLEAN;
+	VAR v: tNode;  i: SIGNED32;  inNew, inOld, chg: BOOLEAN;
 
 		PROCEDURE PointInRect( px, py, x0, y0, x1, y1: Real ): BOOLEAN;
 		BEGIN

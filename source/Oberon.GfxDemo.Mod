@@ -37,7 +37,7 @@ MODULE GfxDemo IN Oberon; (** portable *)	(* eos  *)
 
 
 	(* append a Koch curve to the current path *)
-	PROCEDURE DrawKoch (ctxt: Gfx.Context; iter: LONGINT);
+	PROCEDURE DrawKoch (ctxt: Gfx.Context; iter: SIGNED32);
 		VAR ctm: GfxMatrix.Matrix;
 	BEGIN
 		IF iter = 0 THEN
@@ -73,7 +73,7 @@ MODULE GfxDemo IN Oberon; (** portable *)	(* eos  *)
 
 	(* render Koch curve on context *)
 	PROCEDURE Render (frame: Frame; ctxt: Gfx.Context);
-		VAR border, i: LONGINT;
+		VAR border, i: SIGNED32;
 	BEGIN
 		(* set stroke parameters *)
 		Gfx.SetStrokeColor(ctxt, frame.fgCol);
@@ -181,7 +181,7 @@ MODULE GfxDemo IN Oberon; (** portable *)	(* eos  *)
 	END PrintFrame;
 
 	PROCEDURE HandleFrame* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR frame, copy: Frame; fx, fy: SIGNED16; mask: Display3.Mask; ver: LONGINT; ch: CHAR;
+		VAR frame, copy: Frame; fx, fy: SIGNED16; mask: Display3.Mask; ver: SIGNED32; ch: CHAR;
 	BEGIN
 		frame := obj(Frame);
 		IF msg IS Display.FrameMsg THEN

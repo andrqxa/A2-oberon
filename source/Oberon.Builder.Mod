@@ -87,7 +87,7 @@ VAR
 	Flags: List;
 	lib: Objects.Library;	(* Library of last character/object read. *)
 	col: SIGNED8;		(* Color index of last character read. *)
-	ifdepth: LONGINT;		(* number of $if levels *)
+	ifdepth: SIGNED32;		(* number of $if levels *)
 	OPSGet: OPS.GetProc;
 	skipping: BOOLEAN;
 	first: BOOLEAN;	(* first attempt to read Oberon.Text/OP2.Errors *)
@@ -275,7 +275,7 @@ VAR F: ErrorGadget;
 BEGIN NEW(F); F.W := 20; F.H := 14; F.errno := 255;F.handle := ErrorGadgetHandler; Objects.NewObj := F
 END NewErrorGadget;
 
-PROCEDURE MarkErrorPos(T: Texts.Text; pos: LONGINT; err: SIGNED16);
+PROCEDURE MarkErrorPos(T: Texts.Text; pos: SIGNED32; err: SIGNED16);
 VAR obj: Objects.Object;
 BEGIN
 	NewErrorGadget; obj := Objects.NewObj; obj(ErrorGadget).errno := err;
@@ -284,7 +284,7 @@ BEGIN
 END MarkErrorPos;
 
 PROCEDURE RemoveErrors(T: Texts.Text);
-VAR first: LONGINT; F: Texts.Finder; o: Objects.Object;
+VAR first: SIGNED32; F: Texts.Finder; o: Objects.Object;
 BEGIN
 	first := -1;
 	LOOP
@@ -308,8 +308,8 @@ BEGIN
 END RemoveErrors;
 
 PROCEDURE markErrors(VAR S: Texts.Scanner; errtext: Texts.Text; par: Display.Frame);
-VAR c, err: SIGNED16; pos, beg, l, k: LONGINT; C: Oberon.CaretMsg;  warn: BOOLEAN;
-	marked: ARRAY MaxErrors OF LONGINT;
+VAR c, err: SIGNED16; pos, beg, l, k: SIGNED32; C: Oberon.CaretMsg;  warn: BOOLEAN;
+	marked: ARRAY MaxErrors OF SIGNED32;
 BEGIN
 	IF (S.class = Texts.Name) & (S.s = "compiling") THEN
 		l := S.line; REPEAT Texts.Scan(S) UNTIL (S.line # l) OR S.eot
@@ -336,7 +336,7 @@ BEGIN
 END markErrors;
 
 PROCEDURE MarkErrors*;
-VAR S: Texts.Scanner; par: Display.Frame; beg, end, time: LONGINT;  T, errtext: Texts.Text;
+VAR S: Texts.Scanner; par: Display.Frame; beg, end, time: SIGNED32;  T, errtext: Texts.Text;
 BEGIN
 	errtext := GetText(par);
 	IF errtext # NIL THEN
@@ -356,8 +356,8 @@ BEGIN
 	IF T # NIL THEN RemoveErrors(T) END
 END ClearErrors;
 
-PROCEDURE ErrorAfter(T: Texts.Text; VAR pos: LONGINT);
-VAR F: Texts.Finder; o: Objects.Object; p: LONGINT;
+PROCEDURE ErrorAfter(T: Texts.Text; VAR pos: SIGNED32);
+VAR F: Texts.Finder; o: Objects.Object; p: SIGNED32;
 BEGIN
 	Texts.OpenFinder(F, T, pos);
 	p := F.pos; Texts.FindObj(F, o);
@@ -366,7 +366,7 @@ BEGIN
 END ErrorAfter;
 
 PROCEDURE NextError*;
-VAR M: Oberon.CaretMsg; pos: LONGINT;
+VAR M: Oberon.CaretMsg; pos: SIGNED32;
 BEGIN
 	M.F := NIL; M.id := Oberon.get; M.car := NIL; M.text := NIL; Display.Broadcast(M);
 	IF (M.car # NIL) & (M.text # NIL) THEN
@@ -385,7 +385,7 @@ END NextError;
 
 (* ---------------- preprocessor --------------------- *)
 
-PROCEDURE err (pos: LONGINT; msg: ARRAY OF CHAR);
+PROCEDURE err (pos: SIGNED32; msg: ARRAY OF CHAR);
 BEGIN
 	Texts.WriteString (W, "  pos  "); Texts.WriteInt (W, pos, 1);
 	Texts.WriteString (W, "  "); Texts.WriteString (W, msg);
@@ -691,7 +691,7 @@ BEGIN
 END MatchSym;
 
 PROCEDURE GetOptions(VAR S: Attributes.Scanner; VAR opts: ARRAY OF CHAR);
-	VAR i: LONGINT;
+	VAR i: SIGNED32;
 BEGIN
 	i := 0;
 	IF (S.class = Attributes.Char) & (S.c = Oberon.OptionChar) THEN
@@ -891,9 +891,9 @@ END InsertHierarchy;
 
 PROCEDURE Compile*;
 VAR S: Attributes.Scanner; T: Tree; m: Mod; s: FileDir.FileName; opts, options: ARRAY 64 OF CHAR; i, line: SIGNED16; S1: Texts.Scanner;
-	fbeg, fend, ftime: LONGINT; text, ftext: Texts.Text; par: Display.Frame; R: Texts.Reader;
+	fbeg, fend, ftime: SIGNED32; text, ftext: Texts.Text; par: Display.Frame; R: Texts.Reader;
 
-	PROCEDURE Locate(F: Display.Frame;  T: Texts.Text;  pos: LONGINT);
+	PROCEDURE Locate(F: Display.Frame;  T: Texts.Text;  pos: SIGNED32);
 	VAR M: Oberon.CaretMsg;  N: Oberon.ControlMsg;
 	BEGIN
 		IF pos < 0 THEN pos := 0
@@ -946,7 +946,7 @@ BEGIN
 				RETURN
 			ELSE
 				fbeg := Oberon.Log.len;
-				Compiler.Module(R, "", options, MAX(LONGINT), Oberon.Log, error);
+				Compiler.Module(R, "", options, MAX(SIGNED32), Oberon.Log, error);
 				IF error & autoMark THEN
 					Texts.OpenScanner(S1, Oberon.Log, fbeg); Texts.Scan(S1);
 					markErrors(S1, text, par)
@@ -969,7 +969,7 @@ BEGIN
 					Texts.OpenReader(R, text, 0);
 					InitPreprocessor;
 					COPY(options, opts); Strings.Append(opts, m.opts);
-					Compiler.Module(R, m.fname, opts, MAX(LONGINT), Oberon.Log, error);
+					Compiler.Module(R, m.fname, opts, MAX(SIGNED32), Oberon.Log, error);
 				END;
 				m := m.next
 			END

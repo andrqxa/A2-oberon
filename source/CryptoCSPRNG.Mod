@@ -31,7 +31,7 @@ IMPORT  Machine, Clock, Heaps, SHA3 := CryptoSHA3(*, Out := KernelLog*);
 	END CSRand;
 
 	PROCEDURE Noise( ): HUGEINT;
-	VAR tm, dt: HUGEINT; t, d: LONGINT;  total, free, largest: SIZE;
+	VAR tm, dt: HUGEINT; t, d: SIGNED32;  total, free, largest: SIZE;
 	BEGIN
 		tm := Machine.GetTimer( );
 		Clock.Get( t, d );

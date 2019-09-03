@@ -55,7 +55,7 @@ MODULE Watson0 IN Oberon;	(** portable *)	(** PS	/		/	OP2-Version *)
 
 	(* vars used by symbol file reader *)
 		curObj: OPT.Object;	(* current object in process *)
-		syspos: LONGINT;	(* text pos where to write imported modules *)
+		syspos: SIGNED32;	(* text pos where to write imported modules *)
 		sysImported,	(* indicates whether SYSTEM is imported or not *)
 		first,	(* FALSE: keyword ['CONST' | 'TYPE' | 'VAR'] has already been written to text *)
 		showObj: BOOLEAN;	(* TRUE: only one object is showen *)
@@ -89,11 +89,11 @@ MODULE Watson0 IN Oberon;	(** portable *)	(** PS	/		/	OP2-Version *)
 	BEGIN Texts.Write(W, ch)
 	END Ch;
 
-	PROCEDURE Num (i: LONGINT);	(* writes number i to W *)
+	PROCEDURE Num (i: SIGNED32);	(* writes number i to W *)
 	BEGIN Texts.WriteInt(W, i, 0);
 	END Num;
 
-	PROCEDURE Hexa(i: LONGINT; short: BOOLEAN);	(* writes number i to W as a hex. number *)
+	PROCEDURE Hexa(i: SIGNED32; short: BOOLEAN);	(* writes number i to W as a hex. number *)
 	BEGIN
 		IF ~short THEN	(* fully 32 bit number *)
 			Ch(Hex[i DIV 10000000H]); i:= i MOD 10000000H;
@@ -150,7 +150,7 @@ MODULE Watson0 IN Oberon;	(** portable *)	(** PS	/		/	OP2-Version *)
 	(* ---------------------- write sybol file info ----------------------- *)
 
 	PROCEDURE WriteConstValue (obj: OPT.Object);	(* writes the value of a constant object *)
-		VAR i: SIGNED16; y: LONGINT; s: SET;
+		VAR i: SIGNED16; y: SIGNED32; s: SET;
 	BEGIN
 		y:= obj.conval.intval;
 		CASE obj.typ^.form OF
@@ -193,7 +193,7 @@ MODULE Watson0 IN Oberon;	(** portable *)	(** PS	/		/	OP2-Version *)
 
 	PROCEDURE WriteFields (VAR obj: OPT.Object; i: SIGNED16; recField: BOOLEAN);
 	(* writes field list of a proc. or record: all variables of same type *)
-		VAR typ: OPT.Struct; mode: LONGINT;
+		VAR typ: OPT.Struct; mode: SIGNED32;
 	BEGIN
 		(* obj.vis # internal *)
 		typ := obj.typ; mode := obj.mode;
@@ -267,7 +267,7 @@ MODULE Watson0 IN Oberon;	(** portable *)	(** PS	/		/	OP2-Version *)
 		END
 	END WriteFieldList;
 
-	PROCEDURE WriteInstVars (typ: OPT.Struct; i: SIGNED16; extlev: LONGINT);	(* writes a record definition *)
+	PROCEDURE WriteInstVars (typ: OPT.Struct; i: SIGNED16; extlev: SIGNED32);	(* writes a record definition *)
 	BEGIN
 		IF typ # NIL THEN
 			IF expandTypes & (extlev > 0) THEN
@@ -350,7 +350,7 @@ MODULE Watson0 IN Oberon;	(** portable *)	(** PS	/		/	OP2-Version *)
 		END
 	END WriteType;
 
-	PROCEDURE WriteObject(obj: OPT.Object; mode: LONGINT);	(* writes any object as given mode *)
+	PROCEDURE WriteObject(obj: OPT.Object; mode: SIGNED32);	(* writes any object as given mode *)
 		VAR h: OPT.Object; name: ARRAY 64 OF CHAR;
 	BEGIN
 		curObj:= obj;	(* set cur. object in process *)
@@ -541,7 +541,7 @@ MODULE Watson0 IN Oberon;	(** portable *)	(** PS	/		/	OP2-Version *)
 	(* ---------------------- write object info ----------------------- *)
 
 	PROCEDURE Commands(F: Files.File; VAR modName: ARRAY OF CHAR);	(* writes all commands of this module  *)
-	VAR R: Files.Rider; name: ARRAY 64 OF CHAR; key, ref, symSize: LONGINT;
+	VAR R: Files.Rider; name: ARRAY 64 OF CHAR; key, ref, symSize: SIGNED32;
 			i, c, e, nofentry, nofcmds: SIGNED16; ch: CHAR;
 	BEGIN Files.Set(R, F, 0);
 		(* check if it is an object file *)

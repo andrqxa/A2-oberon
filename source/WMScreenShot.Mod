@@ -15,7 +15,7 @@ TYPE
 
 			fx, fy, inffx, inffy, factor, intfactor : REAL;
 
-		PROCEDURE &New*(manager : WM.WindowManager; w, h : LONGINT);
+		PROCEDURE &New*(manager : WM.WindowManager; w, h : SIGNED32);
 		BEGIN
 			SELF.manager := manager;
 			NEW(backbuffer);
@@ -129,7 +129,7 @@ VAR manager : WM.WindowManager;
 	viewport : WM.ViewPort;
 	sv : View;
 	p : Plugins.Plugin;
-	w, h: LONGINT; res: WORD;
+	w, h: SIGNED32; res: WORD;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(fn);
 	IF ~((context.arg.Peek() >= '0') & (context.arg.Peek() <= '9')) THEN
@@ -166,7 +166,7 @@ PROCEDURE SnapShotRange*(context : Commands.Context);
 VAR manager : WM.WindowManager;
 	fn : ARRAY 100 OF CHAR;
 	sv : View;
-	w, h, rl, rt, rw, rh: LONGINT; res: WORD;
+	w, h, rl, rt, rw, rh: SIGNED32; res: WORD;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(fn);
 	context.arg.SkipWhitespace; context.arg.Int(w, FALSE);

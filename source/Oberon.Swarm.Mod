@@ -95,8 +95,8 @@ MODULE Swarm IN Oberon;  (** BES, Oct 16 96 - Oct 25 96 *)
 		Task = POINTER TO TaskDesc;
 		TaskDesc = RECORD (Oberon.TaskDesc)
 			x, y: SIGNED16; keys: SET;  (* mouse state *)
-			timeout: LONGINT;  (* timeout of state *)
-			ticks: LONGINT;  (* ticks for swarm gadgets *)
+			timeout: SIGNED32;  (* timeout of state *)
+			ticks: SIGNED32;  (* ticks for swarm gadgets *)
 		END;
 
 		SwarmMsg = RECORD (Display.FrameMsg) END;
@@ -104,7 +104,7 @@ MODULE Swarm IN Oberon;  (** BES, Oct 16 96 - Oct 25 96 *)
 	VAR
 		W: Texts.Writer;  (* everybody needs a writer now and then *)
 		task: Task;  (* singleton screensaver task *)
-		Second, Tick: LONGINT;
+		Second, Tick: SIGNED32;
 		warn: BOOLEAN;
 
 	(* Swarm *)
@@ -510,7 +510,7 @@ MODULE Swarm IN Oberon;  (** BES, Oct 16 96 - Oct 25 96 *)
 		Warning(name); RETURN default  (* some error occured, return default *)
 	END GetBool;
 
-	PROCEDURE GetInt (name: ARRAY OF CHAR; default: LONGINT): LONGINT;
+	PROCEDURE GetInt (name: ARRAY OF CHAR; default: SIGNED32): SIGNED32;
 		(* return longint model of public object name, or default if failure *)
 		VAR L: Objects.LinkMsg; A: Objects.AttrMsg; obj: Objects.Object;
 	BEGIN
@@ -529,8 +529,8 @@ MODULE Swarm IN Oberon;  (** BES, Oct 16 96 - Oct 25 96 *)
 		Warning(name); RETURN default  (* some error occured, return default *)
 	END GetInt;
 
-	PROCEDURE GetSleepTime (): LONGINT;
-		VAR sleep: LONGINT;
+	PROCEDURE GetSleepTime (): SIGNED32;
+		VAR sleep: SIGNED32;
 	BEGIN
 		sleep := GetInt(SleepObj, SleepDef);
 		IF sleep < 1 THEN sleep := 1 END;  (* can't prevent user from setting stupid sleep time *)
@@ -543,9 +543,9 @@ MODULE Swarm IN Oberon;  (** BES, Oct 16 96 - Oct 25 96 *)
 	PROCEDURE FadeAway (): BOOLEAN;  (* dummy procedure to blank screen *)
 		VAR minx, miny, maxx, maxy: SIGNED16; keys: SET;
 
-		PROCEDURE Fade (pat: Display.Pattern; delay: LONGINT): BOOLEAN;
+		PROCEDURE Fade (pat: Display.Pattern; delay: SIGNED32): BOOLEAN;
 			CONST steps = 32;
-			VAR i, x, y: SIGNED16; time: LONGINT;
+			VAR i, x, y: SIGNED16; time: SIGNED32;
 		BEGIN
 			FOR i := 0 TO steps-1 DO
 				y := Display.Height-i;
@@ -583,7 +583,7 @@ MODULE Swarm IN Oberon;  (** BES, Oct 16 96 - Oct 25 96 *)
     END RestoreDisplay;
 
 	PROCEDURE SwarmOut (speed, size, border, mincol, maxcol, bacc, bvel, wacc, wvel: SIGNED16);
-		VAR s: Swarm; m: Display3.Mask; minx, miny, maxx, maxy, x, y: SIGNED16; keys: SET; tdiff, timeout: LONGINT;
+		VAR s: Swarm; m: Display3.Mask; minx, miny, maxx, maxy, x, y: SIGNED16; keys: SET; tdiff, timeout: SIGNED32;
 	BEGIN
 		Oberon.RemoveMarks(0, 0, Display.Width, Display.Height);
 		IF FadeAway() THEN
@@ -615,7 +615,7 @@ MODULE Swarm IN Oberon;  (** BES, Oct 16 96 - Oct 25 96 *)
 	(* Screensaver Task *)
 
 	PROCEDURE TaskHandler (task: Oberon.Task);
-		VAR x, y: SIGNED16; keys: SET; time: LONGINT; msg: SwarmMsg;
+		VAR x, y: SIGNED16; keys: SET; time: SIGNED32; msg: SwarmMsg;
 	BEGIN
 		WITH task: Task DO
 			time := Input.Time();

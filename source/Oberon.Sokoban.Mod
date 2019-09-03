@@ -51,7 +51,7 @@ MODULE Sokoban IN Oberon; (** portable *)	(* ejz  *)
 			backPictName, wallPictName, parkPictName, userName: ARRAY 32 OF CHAR;
 			backPict, wallPict, parkPict: Pictures.Picture;
 			focus, nameFocus, done, movedCan: BOOLEAN;
-			startTime, time: LONGINT;
+			startTime, time: SIGNED32;
 			task: Task
 		END;
 		UpdateMsg = RECORD (Display.FrameMsg)
@@ -193,7 +193,7 @@ MODULE Sokoban IN Oberon; (** portable *)	(* ejz  *)
 	PROCEDURE LoadLevel(F: Frame);
 		VAR
 			i, j, levels: SIGNED16;
-			offs: LONGINT;
+			offs: SIGNED32;
 			file: Files.File;
 			R: Files.Rider;
 	BEGIN
@@ -252,7 +252,7 @@ MODULE Sokoban IN Oberon; (** portable *)	(* ejz  *)
 			file: Files.File;
 			R: Files.Rider;
 			level, moves: SIGNED16;
-			time: LONGINT;
+			time: SIGNED32;
 			name: ARRAY 32 OF CHAR;
 	BEGIN
 		file := Files.Old(HighScores);
@@ -299,7 +299,7 @@ MODULE Sokoban IN Oberon; (** portable *)	(* ejz  *)
 			new: BOOLEAN;
 			R: Files.Rider;
 			level, moves: SIGNED16;
-			time, pos: LONGINT;
+			time, pos: SIGNED32;
 			name: ARRAY 32 OF CHAR;
 	BEGIN
 		file := Files.Old(HighScores);
@@ -906,7 +906,7 @@ MODULE Sokoban IN Oberon; (** portable *)	(* ejz  *)
 			tag, x, y, w, h, ref: SIGNED16;
 			gen: ARRAY 64 OF CHAR;
 			lib: Objects.Library;
-			len: LONGINT;
+			len: SIGNED32;
 			obj: Objects.Object;
 	BEGIN
 		main := NIL;
@@ -946,7 +946,7 @@ MODULE Sokoban IN Oberon; (** portable *)	(* ejz  *)
 			F: Files.File;
 			R: Files.Rider;
 			B: Objects.BindMsg;
-			len: LONGINT;
+			len: SIGNED32;
 	BEGIN
 		F := Files.New(D.name);
 		IF F # NIL THEN

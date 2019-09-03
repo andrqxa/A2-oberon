@@ -4,7 +4,7 @@ Refer to the "General ETH Oberon System Source License" contract available at: h
 MODULE Simulator IN Oberon; (*JG 10.10.93*)
   IMPORT Display, Gadgets, Attributes, Diagrams;
 
-  VAR seed: LONGINT;
+  VAR seed: SIGNED32;
 
   PROCEDURE Random (): REAL;
     CONST a = 16807; m = 2147483647; q = m DIV a; r = m MOD a;
@@ -14,7 +14,7 @@ MODULE Simulator IN Oberon; (*JG 10.10.93*)
   END Random;
 
   PROCEDURE Start*;
-    VAR a, b, r, x: LONGREAL; t, T: LONGINT; limited: BOOLEAN;
+    VAR a, b, r, x: LONGREAL; t, T: SIGNED32; limited: BOOLEAN;
       N: Diagrams.UpdateMsg;
   BEGIN
     Attributes.GetBool(Gadgets.FindObj(Gadgets.context, "Loss"), "Value", limited);

@@ -176,7 +176,7 @@ TYPE
 				length := Strings.Length(draggedString^) * 7;
 				IF length > 400 THEN w := 400 ELSE w := length END;
 				NEW(img); Raster.Create(img, w, 25, Raster.BGRA8888);
-				NEW(c, img); c.SetColor(LONGINT(0FFFF00FFH));
+				NEW(c, img); c.SetColor(SIGNED32(0FFFF00FFH));
 				c.Fill(WMRectangles.MakeRect(0, 0, w, 25), 0FF80H, WMGraphics.ModeCopy);
 				c.DrawString(3, 20, draggedString^);
 				IF treeView.StartDrag(a, img, 0,0, DragArrived, NIL) THEN KernelLog.String("DraggingStarted"); KernelLog.Ln
@@ -966,7 +966,7 @@ TYPE
 			(* render to bitmap *)
 			NEW(img);	Raster.Create(img, 100, 200, Raster.BGRA8888);
 			NEW(c, img);
-			c.SetColor(LONGINT(0FFFF00FFH));
+			c.SetColor(SIGNED32(0FFFF00FFH));
 			top := 0;
 			FOR i := 0 TO LEN(selection) - 1 DO
 				IF selection[i] # NIL THEN

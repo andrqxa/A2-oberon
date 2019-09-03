@@ -50,7 +50,7 @@ TYPE
 	END;
 
 (** Upcall for macro substitution. Ch is the character to be substituted, res is the substitution text and beg is the starting position inside of the text.*)
-	MacroHandler* = PROCEDURE (ch: CHAR; VAR T: Reader; VAR res: Texts.Text; VAR beg: LONGINT);
+	MacroHandler* = PROCEDURE (ch: CHAR; VAR T: Reader; VAR res: Texts.Text; VAR beg: SIGNED32);
 
 	Macro = POINTER TO MacroDesc;
 	MacroDesc = RECORD
@@ -64,7 +64,7 @@ TYPE
 		eot*: BOOLEAN;	(** End of text reached? *)
 		nextCh*: CHAR;	(** Character located immediately after scanned token. *)
 		class*: SIGNED16;		(** Scanner classes. Scanned tokens are returned in the record fields below. *)
-		i*: LONGINT;
+		i*: SIGNED32;
 		x*: REAL;
 		y*: LONGREAL;
 		c*: CHAR;
@@ -87,7 +87,7 @@ TYPE
 	CharDesc* = RECORD (AttrDesc) c*: CHAR END;
 
 	IntAttr* = POINTER TO IntDesc;
-	IntDesc* = RECORD (AttrDesc) i*: LONGINT END;
+	IntDesc* = RECORD (AttrDesc) i*: SIGNED32 END;
 
 	RealAttr* = POINTER TO RealDesc;
 	RealDesc* = RECORD (AttrDesc) r*: LONGREAL END;
@@ -126,7 +126,7 @@ END TxtToStr;
 
 (* --- Scanning routines --- *)
 
-PROCEDURE OpenR(VAR R: Reader; text: Texts.Text; pos: LONGINT);
+PROCEDURE OpenR(VAR R: Reader; text: Texts.Text; pos: SIGNED32);
 VAR nR: Reader;
 BEGIN
 	NEW(nR); nR.next := R; R := nR; R.substitute := TRUE;
@@ -135,7 +135,7 @@ END OpenR;
 
 (** Read character ch from the Reader. Registered character macros are automatically substituted by making upcalls to the installed macro handlers. *)
 PROCEDURE Read*(VAR R: Reader; VAR ch: CHAR);
-VAR m: Macro; nT: Texts.Text; beg: LONGINT;
+VAR m: Macro; nT: Texts.Text; beg: SIGNED32;
 BEGIN
 	IF R.eot THEN ch := 0X; RETURN END;
 	Texts.Read(R.R, ch);
@@ -180,8 +180,8 @@ BEGIN
 END Read;
 
 (** Open reader R at position pos in text. *)
-PROCEDURE OpenReader*(VAR R: Reader; text: Texts.Text; pos: LONGINT);
-VAR m: Macro; nT: Texts.Text; beg: LONGINT;
+PROCEDURE OpenReader*(VAR R: Reader; text: Texts.Text; pos: SIGNED32);
+VAR m: Macro; nT: Texts.Text; beg: SIGNED32;
 BEGIN
 	NEW(R); R.substitute := TRUE;
 	Texts.OpenReader(R.R, text, pos); R.text := text; R.eot := R.R.eot;
@@ -194,7 +194,7 @@ BEGIN
 END OpenReader;
 
 (** Return current position of Reader R in text R.text. Note that R.text may change as macro characters are being substituted. *)
-PROCEDURE Pos*(VAR R: Reader): LONGINT;
+PROCEDURE Pos*(VAR R: Reader): SIGNED32;
 BEGIN RETURN Texts.Pos(R.R);
 END Pos;
 
@@ -206,7 +206,7 @@ BEGIN
 END IsAscii;
 
 (** Open Scanner S at position pos in text T. *)
-PROCEDURE OpenScanner*(VAR S: Scanner; T: Texts.Text; pos: LONGINT);
+PROCEDURE OpenScanner*(VAR S: Scanner; T: Texts.Text; pos: SIGNED32);
 BEGIN
 	S.R := NIL;
 	OpenReader(S.R, T, pos); Read(S.R, S.nextCh)
@@ -218,10 +218,10 @@ END OpenScanner;
     VAR ch, E: CHAR;
       neg, negE, hex, old: BOOLEAN;
       i, j, h: SIGNED8;
-      e: SIGNED16; k: LONGINT;
+      e: SIGNED16; k: SIGNED32;
       y: LONGREAL;
       d: ARRAY maxD OF CHAR;
-	  k1, k2, k3: LONGINT;
+	  k1, k2, k3: SIGNED32;
 
   BEGIN ch := S.nextCh; i := 0;
     LOOP
@@ -347,8 +347,8 @@ BEGIN
 	NEW(M); M.ch := ch; M.handle := handler; M.next := macros; macros := M;
 END AddMacro;
 
-PROCEDURE StandardMacros(ch: CHAR; VAR T: Reader; VAR res: Texts.Text; VAR beg: LONGINT);
-VAR text: Texts.Text; bg, end, time: LONGINT;
+PROCEDURE StandardMacros(ch: CHAR; VAR T: Reader; VAR res: Texts.Text; VAR beg: SIGNED32);
+VAR text: Texts.Text; bg, end, time: SIGNED32;
 BEGIN
 	IF ch = 0X THEN (* Reset *)
 		uparrowdone := FALSE;
@@ -514,7 +514,7 @@ END WriteAttr;
 	Type	T	Attribute classes converted
 
 	Bool	BOOLEAN	Bool, String, Char
-	Int	LONGINT	Int, String, Real, LongReal
+	Int	SIGNED32	Int, String, Real, LongReal
 	Real	REAL	Real, String, LongReal, Int
 	LongReal	LONGREAL	LongReal, String, Real, Int
 	String	ARRAY OF CHAR	String, Int, Bool, Real, LongReal, Bool
@@ -539,7 +539,7 @@ END WriteAttr;
 		END
 	END GetBool;
 
-	PROCEDURE GetInt*(obj: Objects.Object; name: ARRAY OF CHAR; VAR i: LONGINT);
+	PROCEDURE GetInt*(obj: Objects.Object; name: ARRAY OF CHAR; VAR i: SIGNED32);
 		VAR A: Objects.AttrMsg;
 	BEGIN
 		i := 0;
@@ -627,7 +627,7 @@ END WriteAttr;
 	Type	T	Attribute classes converted
 
 	Bool	BOOLEAN	Bool, String, Char
-	Int	LONGINT	Int, String, Real, LongReal
+	Int	SIGNED32	Int, String, Real, LongReal
 	Real	REAL	Real, String, LongReal, Int
 	LongReal	LONGREAL	LongReal, String, Real, Int
 	String	ARRAY OF CHAR	String, Int, Bool, Real, LongReal, Bool
@@ -653,7 +653,7 @@ END WriteAttr;
 		END
 	END SetBool;
 
-	PROCEDURE SetInt*(obj: Objects.Object; name: ARRAY OF CHAR; i: LONGINT);
+	PROCEDURE SetInt*(obj: Objects.Object; name: ARRAY OF CHAR; i: SIGNED32);
 		VAR A: Objects.AttrMsg;
 	BEGIN
 		IF obj # NIL THEN

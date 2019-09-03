@@ -32,7 +32,7 @@ MODULE LeoDocs IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE Load (doc: Documents.Document);
 		VAR
 			main: LeoFrames.Frame; file: Files.File; r: Files.Rider; tag, ref: SIGNED16; name: ARRAY 64 OF CHAR; ch: CHAR;
-			lib: Objects.Library; len: LONGINT; obj: Objects.Object; ff: Gadgets.Frame; fig: Leonardo.Figure;
+			lib: Objects.Library; len: SIGNED32; obj: Objects.Object; ff: Gadgets.Frame; fig: Leonardo.Figure;
 	BEGIN
 		main := NIL;
 		file := Files.Old(doc.name);
@@ -70,7 +70,7 @@ MODULE LeoDocs IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE Store (doc: Documents.Document);
 		VAR
 			bak, gen: ARRAY 64 OF CHAR; res: SIGNED16; frame: Display.Frame; main: LeoFrames.Frame;
-			bm: Objects.BindMsg; file: Files.File; r: Files.Rider; len: LONGINT; sm: StoreMsg;
+			bm: Objects.BindMsg; file: Files.File; r: Files.Rider; len: SIGNED32; sm: StoreMsg;
 	BEGIN
 		Texts.WriteString(W, "Store ");
 		Texts.Write(W, 22X); Texts.WriteString(W, doc.name); Texts.Write(W, 22X);
@@ -260,7 +260,7 @@ MODULE LeoDocs IN Oberon; (** portable **)	(* eos  *)
 	(** print document to PostScript file **)
 	PROCEDURE PrintPS*;
 		VAR
-			s: Attributes.Scanner; name: ARRAY 64 OF CHAR; landscape, level2: BOOLEAN; dpi: LONGINT;
+			s: Attributes.Scanner; name: ARRAY 64 OF CHAR; landscape, level2: BOOLEAN; dpi: SIGNED32;
 			doc: Documents.Document; frame: LeoFrames.Frame; w, h: REAL; ps: GfxPS.Context; file: Files.File;
 	BEGIN
 		Attributes.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Attributes.Scan(s);

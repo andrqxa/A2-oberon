@@ -402,7 +402,7 @@ CONST
 
 TYPE
 	(** Interface for data command execute method of host controller *)
-	CommandExecuter * = PROCEDURE (CONST command: Command; VAR data: ARRAY OF CHAR; ofs, len: LONGINT; VAR result: LONGINT): BOOLEAN;
+	CommandExecuter * = PROCEDURE (CONST command: Command; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR result: SIGNED32): BOOLEAN;
 
 	(**
 		SD Host controller descriptor.
@@ -413,10 +413,10 @@ TYPE
 		frequency -,						(** Bus frequency *)
 		timeoutFreq,						(** Timeout clock frequency *)
 		state -,								(** HC state *)
-		version -: LONGINT;				(** Specifications version *)
+		version -: SIGNED32;				(** Specifications version *)
 		execute -: CommandExecuter;	(** Method to execute command with data transmission *)
 		opmode,							(** Host controller operation mode for data transfers *)
-		lastRca: LONGINT;					(** Last RCA selected by the controller. *)
+		lastRca: SIGNED32;					(** Last RCA selected by the controller. *)
 		acquire *, release *: PROCEDURE {DELEGATE};
 		handle: EventHandler;				(** Card event handler *)
 		handlerParam: ANY;				(** Parameter of the eventHandler *)
@@ -426,7 +426,7 @@ TYPE
 		dmaBuf: POINTER TO ARRAY OF CHAR;
 		dmaBufAdr: ADDRESS;
 		desc: ARRAY 5 OF HUGEINT;					(** DMA descriptor *)
-		descOfs: LONGINT;
+		descOfs: SIGNED32;
 	END;
 
 	(**
@@ -443,9 +443,9 @@ TYPE
 		rca *,									(** Optional RCA parameter. Required only for ACMDs *)
 		command *,							(** Command number *)
 		argument *,							(** Command argument *)
-		responseType *: LONGINT;			(** Response type *)
+		responseType *: SIGNED32;			(** Response type *)
 		flags *: SET;							(** Command flags *)
-		response *: ARRAY 4 OF LONGINT;	(** Response *)
+		response *: ARRAY 4 OF SIGNED32;	(** Response *)
 	END;
 
 	(** Card descriptor *)
@@ -453,8 +453,8 @@ TYPE
 	CardDesc * = RECORD
 		state -,									(** Card state. Currently not used *)
 		(*type -,									(** Type of card. One of 'Type*' constants *)*)
-		rca -: LONGINT;						(** Card RCA *)
-		cid: ARRAY 4 OF LONGINT;			(** Raw CID *)
+		rca -: SIGNED32;						(** Card RCA *)
+		cid: ARRAY 4 OF SIGNED32;			(** Raw CID *)
 		csd -: Csd;								(** CSD *)
 		scr -: Scr;								(** SCR *)
 		ocr: SET;								(** Raw OCR *)
@@ -467,43 +467,43 @@ TYPE
 	Csd * = RECORD
 		(* Card properties *)
 		capacity *: HUGEINT;							(** Card capacity in bytes *)
-		sectorSize *: LONGINT;						(** Size of a sector in bytes *)
+		sectorSize *: SIGNED32;						(** Size of a sector in bytes *)
 		commandClasses *: SET;						(** Command classes supported by the card *)
 
 		(* Timing info *)
-		r2w *: LONGINT;								(** Read to write time factor = read time / write time *)
+		r2w *: SIGNED32;								(** Read to write time factor = read time / write time *)
 		taac *: REAL;									(** Asynchronous access time, in s *)
-		nsac *: LONGINT;								(** Worst-case clock dependent access time, in clock cycles *)
-		txSpeed *: LONGINT;							(** Max transfer speed in bit/s *)
+		nsac *: SIGNED32;								(** Worst-case clock dependent access time, in clock cycles *)
+		txSpeed *: SIGNED32;							(** Max transfer speed in bit/s *)
 	END;
 
 	(** SCR register *)
 	Scr * = RECORD
 		version *,										(** Card physical spec. version: one of Version* *)
-		security *: LONGINT;							(** Card security type: one of Type* *)
+		security *: SIGNED32;							(** Card security type: one of Type* *)
 		busWidth *: SET;								(** Bus widths supported by the card *)
 	END;
 
 	(** SWITCH_FUNC returned status *)
 	SwitchFuncStatus * = RECORD
-		current *: LONGINT;							(** Current for specified config *)
+		current *: SIGNED32;							(** Current for specified config *)
 		functionGroups *: ARRAY 6 OF SET;			(** Supported function in each group *)
-		functionStatus *: ARRAY 6 OF LONGINT;	(** Function status *)
+		functionStatus *: ARRAY 6 OF SIGNED32;	(** Function status *)
 	END;
 
 	(** Card event handler. 'card' is the card for which an event is reported (can be a new card object) and 'event' is one of 'On*' constants *)
-	EventHandler * = PROCEDURE {DELEGATE} (card: Card; event: LONGINT; param: ANY);
+	EventHandler * = PROCEDURE {DELEGATE} (card: Card; event: SIGNED32; param: ANY);
 
 	(** Host controller registers *)
 	HcRegisters = POINTER {UNSAFE,UNTRACED} TO RECORD
-		SDMASystemAddress {ALIGNED(1)}: LONGINT;				(** offset = 0H *)
+		SDMASystemAddress {ALIGNED(1)}: SIGNED32;				(** offset = 0H *)
 		BlockSize {ALIGNED(1)},										(** offset = 4H *)
 		BlockCount {ALIGNED(1)}: SIGNED16;							(** offset = 6H *)
-		Argument1 {ALIGNED(1)}: LONGINT;							(** offset = 8H *)
+		Argument1 {ALIGNED(1)}: SIGNED32;							(** offset = 8H *)
 		TransferMode {ALIGNED(1)},									(** offset = 0CH *)
 		Command {ALIGNED(1)}: SIGNED16;							(** offset = 0EH *)
-		Response {ALIGNED(1)}: ARRAY 4 OF LONGINT;			(** offset = 10H *)
-		BufferData {ALIGNED(1)}: LONGINT;
+		Response {ALIGNED(1)}: ARRAY 4 OF SIGNED32;			(** offset = 10H *)
+		BufferData {ALIGNED(1)}: SIGNED32;
 		PresentState {ALIGNED(1)}: SET;
 		HostControl1 {ALIGNED(1)},
 		PowerControl {ALIGNED(1)},
@@ -525,9 +525,9 @@ TYPE
 		padding0 {ALIGNED(1)}: ARRAY 3 OF SIGNED8;
 		AdmaSystemAddress {ALIGNED(1)}: HUGEINT;
 		PresetValues {ALIGNED(1)}: ARRAY 8 OF SIGNED16;
-		padding1 {ALIGNED(1)}: ARRAY 28 OF LONGINT;
-		SharedBusControl {ALIGNED(1)}: LONGINT;
-		padding2 {ALIGNED(1)}: ARRAY 6 OF LONGINT;
+		padding1 {ALIGNED(1)}: ARRAY 28 OF SIGNED32;
+		SharedBusControl {ALIGNED(1)}: SIGNED32;
+		padding2 {ALIGNED(1)}: ARRAY 6 OF SIGNED32;
 		SlotInterruptStatus {ALIGNED(1)},
 		HostControllerVersion {ALIGNED(1)}: SIGNED16;
 	END;
@@ -543,20 +543,20 @@ VAR
 		'extClockFreq' is an optional external clock frequency. It is used iff the host controller has no information about its clock frequency.
 		'handler' is the event handler and 'param' is user parameter.
 	*)
-	PROCEDURE New * (baseAddress: ADDRESS; extClockFreq: LONGINT; handler: EventHandler; param: ANY): HostController;
+	PROCEDURE New * (baseAddress: ADDRESS; extClockFreq: SIGNED32; handler: EventHandler; param: ANY): HostController;
 	VAR
 		hc: HostController;
-		val, result: LONGINT;
+		val, result: SIGNED32;
 	BEGIN
 		NEW(hc);
 		hc.regs := baseAddress;
 		hc.handle := handler;
 		IF ~Reset(hc, TRUE, TRUE) THEN RETURN NIL END;
-		hc.baseFrequency := LSH(SYSTEM.VAL(LONGINT, hc.regs.Capabilities[0] * Capabilities_BaseClockFreqSdMask), -Capabilities_BaseClockFreqSdOfs);
+		hc.baseFrequency := LSH(SYSTEM.VAL(SIGNED32, hc.regs.Capabilities[0] * Capabilities_BaseClockFreqSdMask), -Capabilities_BaseClockFreqSdOfs);
 		IF hc.baseFrequency = 0 THEN
 			hc.baseFrequency := extClockFreq
 		END;
-		hc.timeoutFreq := LSH(SYSTEM.VAL(LONGINT, hc.regs.Capabilities[0] * Capabilities_TimeoutClockFrequencyMask), -Capabilities_TimeoutClockFrequencyOfs) * 1000;
+		hc.timeoutFreq := LSH(SYSTEM.VAL(SIGNED32, hc.regs.Capabilities[0] * Capabilities_TimeoutClockFrequencyMask), -Capabilities_TimeoutClockFrequencyOfs) * 1000;
 		IF Capabilities_TimeoutClockUnit IN hc.regs.Capabilities[0] THEN hc.timeoutFreq := hc.timeoutFreq * 1000 END;
 		IF hc.timeoutFreq = 0 THEN hc.timeoutFreq := extClockFreq END;
 		SetBusClock(hc, InitialClockFrequency);
@@ -570,8 +570,8 @@ VAR
 		hc.regs.InterruptSignalEnable := {Interrupt_Normal_CardInsertion, Interrupt_Normal_CardRemoval};
 		hc.regs.BlockGapControl := 0;
 
-		val := LONGINT(hc.regs.HostControllerVersion);
-		hc.version := SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, val) * HostControllerVersion_SpecificationMask) + 1;
+		val := SIGNED32(hc.regs.HostControllerVersion);
+		hc.version := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, val) * HostControllerVersion_SpecificationMask) + 1;
 
 		IF Trace THEN
 			SdEnvironment.String("[SD] New Host Controller v");
@@ -632,7 +632,7 @@ VAR
 			o Execute the command
 			o Wait for response
 	*)
-	PROCEDURE ExecuteCommand * (VAR command: Command; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE ExecuteCommand * (VAR command: Command; VAR result: SIGNED32): BOOLEAN;
 	VAR
 		status, r1: SET;
 	BEGIN
@@ -685,12 +685,12 @@ VAR
 		Execute command with data transfer using CPU.
 		Data is read from/written to [data[ofs], data[ofs + len]).
 	*)
-	PROCEDURE ExecuteDataCommand (CONST command: Command; VAR data: ARRAY OF CHAR; ofs, len: LONGINT; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE ExecuteDataCommand (CONST command: Command; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR result: SIGNED32): BOOLEAN;
 	TYPE
 		DataBytes = ARRAY 4 OF CHAR;
 	VAR
 		tmp: DataBytes;
-		i, stepLen: LONGINT;
+		i, stepLen: SIGNED32;
 		hc: HostController;
 		r1, status: SET;
 	BEGIN
@@ -795,13 +795,13 @@ VAR
 			IF FlagRead IN command.flags THEN
 				FOR i := 0 TO stepLen - 1 BY 4 DO
 					SYSTEM.PUT32(ADDRESSOF(data[ofs + i]), hc.regs.BufferData);
-					(*SYSTEM.VAL(LONGINT, tmp) := hc.regs.BufferData;
+					(*SYSTEM.VAL(SIGNED32, tmp) := hc.regs.BufferData;
 					SYSTEM.VAL(DataBytes, data[ofs + i]) := tmp*)
 				END
 			ELSE
 				FOR i := 0 TO stepLen - 1 BY 4 DO
 					tmp := SYSTEM.VAL(DataBytes, data[ofs + i]);
-					hc.regs.BufferData := SYSTEM.VAL(LONGINT, tmp);
+					hc.regs.BufferData := SYSTEM.VAL(SIGNED32, tmp);
 				END
 			END;
 			(* 17 *)
@@ -826,7 +826,7 @@ VAR
 	(**
 		Execute Command with data transfers using ADMA
 	*)
-	PROCEDURE ExecuteAdmaCommand (CONST command: Command; VAR data: ARRAY OF CHAR; ofs, len: LONGINT; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE ExecuteAdmaCommand (CONST command: Command; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR result: SIGNED32): BOOLEAN;
 	TYPE
 		QWord = ARRAY 2 OF ADDRESS;
 	VAR
@@ -941,7 +941,7 @@ VAR
 	(** Read response R1 or R1b from command record *)
 	PROCEDURE GetR1 * (CONST command: Command): SET;
 	VAR
-		idx: LONGINT;
+		idx: SIGNED32;
 	BEGIN
 		idx := 0;
 		(*IF (FlagAutoCmd12 IN command.flags) OR (FlagAutoCmd23 IN command.flags) THEN
@@ -951,9 +951,9 @@ VAR
 	END GetR1;
 
 	(** Read response R2 from command record *)
-	PROCEDURE GetR2 * (CONST command: Command; VAR response: ARRAY OF LONGINT);
+	PROCEDURE GetR2 * (CONST command: Command; VAR response: ARRAY OF SIGNED32);
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 3 DO
 			response[i] := command.response[i]
@@ -961,31 +961,31 @@ VAR
 	END GetR2;
 
 	(** Read response R3 from command record *)
-	PROCEDURE GetR3 * (CONST command: Command): LONGINT;
+	PROCEDURE GetR3 * (CONST command: Command): SIGNED32;
 	BEGIN
 		RETURN command.response[0]
 	END GetR3;
 
 	(** Read response R4 from command record *)
-	PROCEDURE GetR4 * (CONST command: Command): LONGINT;
+	PROCEDURE GetR4 * (CONST command: Command): SIGNED32;
 	BEGIN
 		RETURN command.response[0]
 	END GetR4;
 
 	(** Read response R5 from command record *)
-	PROCEDURE GetR5 * (CONST command: Command): LONGINT;
+	PROCEDURE GetR5 * (CONST command: Command): SIGNED32;
 	BEGIN
 		RETURN command.response[0]
 	END GetR5;
 
 	(** Read response R6 from command record *)
-	PROCEDURE GetR6 * (CONST command: Command): LONGINT;
+	PROCEDURE GetR6 * (CONST command: Command): SIGNED32;
 	BEGIN
 		RETURN command.response[0]
 	END GetR6;
 
 	(** Read response R7 from command record *)
-	PROCEDURE GetR7 * (CONST command: Command): LONGINT;
+	PROCEDURE GetR7 * (CONST command: Command): SIGNED32;
 	BEGIN
 		RETURN command.response[0]
 	END GetR7;
@@ -998,7 +998,7 @@ VAR
 
 	(* ==================== Card (High-Level) Interface ==================== *)
 	(** Write 'data[ofs, ofs + len)' to 'card', starting at block 'firstBlock'. *)
-	PROCEDURE Write * (card: Card; firstBlock, len: LONGINT; VAR data: ARRAY OF CHAR; ofs: LONGINT; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE Write * (card: Card; firstBlock, len: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR result: SIGNED32): BOOLEAN;
 	VAR
 		command: Command;
 		ret: BOOLEAN;
@@ -1043,7 +1043,7 @@ VAR
 	END Write;
 
 	(** Read 'len' bytes starting from 'firstBlock' of 'card' to 'data[ofs, ofs + len)' *)
-	PROCEDURE Read * (card: Card; firstBlock, len: LONGINT; VAR data: ARRAY OF CHAR; ofs: LONGINT; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE Read * (card: Card; firstBlock, len: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR result: SIGNED32): BOOLEAN;
 	VAR
 		command: Command;
 		ret: BOOLEAN;
@@ -1072,7 +1072,7 @@ VAR
 		RETURN ret
 	END Read;
 
-	PROCEDURE Erase * (card: Card; block, num: LONGINT; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE Erase * (card: Card; block, num: SIGNED32; VAR result: SIGNED32): BOOLEAN;
 	VAR
 		command: Command;
 		r1: SET;
@@ -1125,9 +1125,9 @@ VAR
 		RETURN TRUE
 	END Reset;
 
-	PROCEDURE SetBusClock (hc: HostController; freq: LONGINT);
+	PROCEDURE SetBusClock (hc: HostController; freq: SIGNED32);
 	VAR
-		divisor, d, val: LONGINT;
+		divisor, d, val: SIGNED32;
 	BEGIN
 		hc.regs.ClockControl := 0;
 		divisor := hc.baseFrequency DIV freq;
@@ -1146,8 +1146,8 @@ VAR
 		IF val >= 8 THEN val := 7 END;
 		ASSERT(val < 8);
 		(*val := divisor * 2;*)
-		hc.regs.ClockControl := SIGNED16(LSH(LSH(LONGINT(1), val), 8) + SYSTEM.VAL(SIGNED16, {ClockControl_InternalClockEnable}));
-		hc.frequency := hc.baseFrequency DIV (LSH(LONGINT(1), val));
+		hc.regs.ClockControl := SIGNED16(LSH(LSH(SIGNED32(1), val), 8) + SYSTEM.VAL(SIGNED16, {ClockControl_InternalClockEnable}));
+		hc.frequency := hc.baseFrequency DIV (LSH(SIGNED32(1), val));
 		REPEAT val := hc.regs.ClockControl UNTIL ClockControl_InternalClockState IN SYSTEM.VAL(SET, val);
 		val := hc.regs.ClockControl;
 		hc.regs.ClockControl := SYSTEM.VAL(SIGNED16, SYSTEM.VAL(SET, val) + {ClockControl_SdClockEnable});
@@ -1159,9 +1159,9 @@ VAR
 		(*SetTimeout(hc, 10); (* 100ms *)*)
 	END SetBusClock;
 
-	PROCEDURE SetTimeout (hc: HostController; timeoutFreq: LONGINT);
+	PROCEDURE SetTimeout (hc: HostController; timeoutFreq: SIGNED32);
 	VAR
-		ratio, val: LONGINT;
+		ratio, val: SIGNED32;
 	BEGIN
 		ratio := hc.frequency DIV timeoutFreq DIV 8192;
 		val := 0;
@@ -1172,10 +1172,10 @@ VAR
 		hc.regs.TimeoutControl := SYSTEM.VAL(SIGNED8, val);
 	END SetTimeout;
 
-	PROCEDURE SetBusWidth (hc: HostController; rca, width: LONGINT; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE SetBusWidth (hc: HostController; rca, width: SIGNED32; VAR result: SIGNED32): BOOLEAN;
 	VAR
 		command: Command;
-		val: LONGINT;
+		val: SIGNED32;
 	BEGIN
 		(* 1 *)
 		(*EXCL(hc.regs.InterruptStatusEnable, Interrupt_Normal_CardInterrupt);*)
@@ -1213,7 +1213,7 @@ VAR
 	PROCEDURE HandleInterrupt * (hc: HostController);
 	VAR
 		card: Card;
-		result: LONGINT;
+		result: SIGNED32;
 	BEGIN
 		IF Trace THEN SdEnvironment.String("[SD] Interrupt: "); SdEnvironment.Set(hc.regs.InterruptStatus); SdEnvironment.Ln END;
 		IF Interrupt_Normal_CardInsertion IN hc.regs.InterruptStatus THEN
@@ -1234,14 +1234,14 @@ VAR
 		hc.regs.InterruptStatus := hc.regs.InterruptStatus
 	END HandleInterrupt;
 
-	PROCEDURE InitCard * (hc: HostController; card: Card; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE InitCard * (hc: HostController; card: Card; VAR result: SIGNED32): BOOLEAN;
 	VAR
-		csd: ARRAY 4 OF LONGINT;
-		response: LONGINT;
+		csd: ARRAY 4 OF SIGNED32;
+		response: SIGNED32;
 		status: SET;
 		f8, sdio: BOOLEAN;
 		command: Command;
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		SetBusClock(hc, 400000);
 
@@ -1329,7 +1329,7 @@ VAR
 		END;
 
 		command.command := ACMD_SD_SEND_OP_COND;
-		command.argument := SYSTEM.VAL(LONGINT, status);
+		command.argument := SYSTEM.VAL(SIGNED32, status);
 		command.responseType := ResponseR3;
 		command.flags := {FlagApplicationCmd, FlagIgnoreIllegalCmd};
 		REPEAT
@@ -1441,7 +1441,7 @@ VAR
 		RETURN TRUE
 	END InitCard;
 
-	PROCEDURE ReadScr (card: Card; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE ReadScr (card: Card; VAR result: SIGNED32): BOOLEAN;
 	VAR
 		command: Command;
 		scr: ARRAY 8 OF CHAR;
@@ -1461,18 +1461,18 @@ VAR
 		RETURN TRUE
 	END ReadScr;
 
-	PROCEDURE SwitchFunc (card: Card; switch: BOOLEAN; funcs: ARRAY 6 OF LONGINT; VAR sts: SwitchFuncStatus; VAR res: LONGINT): BOOLEAN;
+	PROCEDURE SwitchFunc (card: Card; switch: BOOLEAN; funcs: ARRAY 6 OF SIGNED32; VAR sts: SwitchFuncStatus; VAR res: SIGNED32): BOOLEAN;
 	VAR
 		status: ARRAY 64 OF CHAR;
 		command: Command;
 
 		PROCEDURE GetStatus (CONST status: ARRAY OF CHAR; VAR sts: SwitchFuncStatus);
 		VAR
-			i: LONGINT;
+			i: SIGNED32;
 		BEGIN
-			sts.current := LONGINT(ORD(status[0])) * 100H + LONGINT(ORD(status[1]));
+			sts.current := SIGNED32(ORD(status[0])) * 100H + SIGNED32(ORD(status[1]));
 			FOR i := 0 TO 5 DO
-				sts.functionGroups[i] := SYSTEM.VAL(SET, LONGINT(ORD(status[2 + 2 * (5 - i)])) * 100H + LONGINT(ORD(status[1 + 2 + 2 * (5 - i)])))
+				sts.functionGroups[i] := SYSTEM.VAL(SET, SIGNED32(ORD(status[2 + 2 * (5 - i)])) * 100H + SIGNED32(ORD(status[1 + 2 + 2 * (5 - i)])))
 			END;
 			FOR i := 0 TO 5 BY 2 DO
 				sts.functionStatus[i] := ORD(status[14 + 2 - i DIV 2]) MOD 10H;
@@ -1495,7 +1495,7 @@ VAR
 
 	PROCEDURE PrintSwitchFuncStatus(CONST status: SwitchFuncStatus);
 	VAR
-		i: LONGINT;
+		i: SIGNED32;
 	BEGIN
 		IF Trace THEN
 			SdEnvironment.String("Switch Func Status");
@@ -1524,9 +1524,9 @@ VAR
 		END
 	END PrintSwitchFuncStatus;
 
-	PROCEDURE SelectSpeedMode(card: Card; high: BOOLEAN; VAR res: LONGINT): BOOLEAN;
+	PROCEDURE SelectSpeedMode(card: Card; high: BOOLEAN; VAR res: SIGNED32): BOOLEAN;
 	VAR
-		funcs: ARRAY 6 OF LONGINT;
+		funcs: ARRAY 6 OF SIGNED32;
 		status: SwitchFuncStatus;
 	BEGIN
 		funcs[0] := 1;
@@ -1543,7 +1543,7 @@ VAR
 	END SelectSpeedMode;
 
 	(** Sends CMD7 if necessary to select the given card *)
-	PROCEDURE SelectCard (card: Card; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE SelectCard (card: Card; VAR result: SIGNED32): BOOLEAN;
 	VAR
 		command: Command;
 		status: SET;
@@ -1568,15 +1568,15 @@ VAR
 	END SelectCard;
 
 	(** Get the response registers in 'response' *)
-	PROCEDURE GetResponse (hc: HostController; responseType: LONGINT; VAR response: ARRAY 4 OF LONGINT);
+	PROCEDURE GetResponse (hc: HostController; responseType: SIGNED32; VAR response: ARRAY 4 OF SIGNED32);
 	BEGIN
 		response := hc.regs.Response
 	END GetResponse;
 
 	(** Issue an SD Card Transaction. [Simplified specs. 3.7.1.1 pp. 106-108] *)
-	PROCEDURE StartCommand (hc: HostController; cmd, argument, responseType: LONGINT; read, dma, busy, abort: BOOLEAN; VAR status: SET; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE StartCommand (hc: HostController; cmd, argument, responseType: SIGNED32; read, dma, busy, abort: BOOLEAN; VAR status: SET; VAR result: SIGNED32): BOOLEAN;
 	VAR
-		reg: LONGINT;
+		reg: SIGNED32;
 		flags, txFlags: SET;
 	BEGIN
 		IF TraceCmd THEN
@@ -1664,7 +1664,7 @@ VAR
 		(* Steps 7, 8 and 9 of WaitForCompletion have to be done by caller *)
 	END StartCommand;
 
-	PROCEDURE ErrorRecovery (hc: HostController; VAR result: LONGINT; VAR status: SET): BOOLEAN;
+	PROCEDURE ErrorRecovery (hc: HostController; VAR result: SIGNED32; VAR status: SET): BOOLEAN;
 	BEGIN
 		(* 1 is done *)
 		status := hc.regs.InterruptStatus;
@@ -1724,7 +1724,7 @@ VAR
 	END ErrorRecovery;
 
 	(** Wait for completion of an SD command [Simplified specs. 3.7.1.2 pp. 109-110 *)
-	PROCEDURE WaitForCompletion (hc: HostController; tryRecover: BOOLEAN; 	VAR status: SET; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE WaitForCompletion (hc: HostController; tryRecover: BOOLEAN; 	VAR status: SET; VAR result: SIGNED32): BOOLEAN;
 	BEGIN
 		result := ErrorNone;
 		(* 1 *)
@@ -1759,7 +1759,7 @@ VAR
 		RETURN TRUE
 	END WaitForCompletion;
 
-	PROCEDURE WaitForTransfer (hc: HostController; VAR result: LONGINT): BOOLEAN;
+	PROCEDURE WaitForTransfer (hc: HostController; VAR result: SIGNED32): BOOLEAN;
 	VAR
 		status: SET;
 	BEGIN
@@ -1777,15 +1777,15 @@ VAR
 	END WaitForTransfer;
 
 	(** Fills a Csd record from the raw csd bytes *)
-	PROCEDURE GetCsd (CONST raw: ARRAY OF LONGINT; VAR csd: Csd);
+	PROCEDURE GetCsd (CONST raw: ARRAY OF SIGNED32; VAR csd: Csd);
 	VAR
-		sizeMult, val, version: LONGINT;
+		sizeMult, val, version: SIGNED32;
 		real: REAL;
 	BEGIN
 		version := ReadBitfield(raw, CardCsd_CsdStructureOfs, CardCsd_CsdStructureWidth) + 1;
 		
 		IF version = 1 THEN
-			sizeMult := LSH(LONGINT(2), ReadBitfield(raw, CardCsd_CSizeMultOfs1, CardCsd_CSizeMultWidth1));
+			sizeMult := LSH(SIGNED32(2), ReadBitfield(raw, CardCsd_CSizeMultOfs1, CardCsd_CSizeMultWidth1));
 			csd.capacity := sizeMult * (1 + ReadBitfield(raw, CardCsd_CSizeOfs1, CardCsd_CSizeWidth1)) * 512;
 		ELSE
 			csd.capacity := 1024 * (HUGEINT(ReadBitfield(raw, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
@@ -1798,7 +1798,7 @@ VAR
 		IF val >= 6 THEN
 			csd.r2w := 0
 		ELSE
-			csd.r2w := LSH(LONGINT(1), val);
+			csd.r2w := LSH(SIGNED32(1), val);
 		END;
 
 		val := ReadBitfield(raw, CardCsd_TranSpeedOfs, CardCsd_TranSpeedWidth);
@@ -1866,8 +1866,8 @@ VAR
 	TYPE
 		Array = ARRAY 8 OF CHAR;
 	VAR
-		bfield: ARRAY 2 OF LONGINT;
-		i: LONGINT;
+		bfield: ARRAY 2 OF SIGNED32;
+		i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 7 DO SYSTEM.VAL(Array, bfield)[7-i] := raw[i] END;
 		IF ReadBitfield(bfield, CardScr_StructureOfs, CardScr_StructureWidth) # 0 THEN RETURN END;
@@ -1898,7 +1898,7 @@ VAR
 			IF c0 * Capabilities_TimeoutClockFrequencyMask = {} THEN
 				SdEnvironment.String("Unknown")
 			ELSE
-				SdEnvironment.Int(SYSTEM.VAL(LONGINT, c0 * Capabilities_TimeoutClockFrequencyMask), 0);
+				SdEnvironment.Int(SYSTEM.VAL(SIGNED32, c0 * Capabilities_TimeoutClockFrequencyMask), 0);
 				IF Capabilities_TimeoutClockUnit IN c0 THEN
 					SdEnvironment.String(" MHz")
 				ELSE
@@ -1911,12 +1911,12 @@ VAR
 			IF c0 * Capabilities_BaseClockFreqSdMask = {} THEN
 				SdEnvironment.String("Unknown")
 			ELSE
-				SdEnvironment.Int(LSH(SYSTEM.VAL(LONGINT, c0 * Capabilities_BaseClockFreqSdMask), -Capabilities_BaseClockFreqSdOfs), 0)
+				SdEnvironment.Int(LSH(SYSTEM.VAL(SIGNED32, c0 * Capabilities_BaseClockFreqSdMask), -Capabilities_BaseClockFreqSdOfs), 0)
 			END;
 			SdEnvironment.Ln;
 
 			SdEnvironment.String("[SD] "); SdEnvironment.String("	Max Block Length: ");
-			SdEnvironment.Int(512 * (1 + LSH(SYSTEM.VAL(LONGINT, c0 * Capabilities_MaxBlockLenMask), -Capabilities_MaxBlockLenOfs)), 0);
+			SdEnvironment.Int(512 * (1 + LSH(SYSTEM.VAL(SIGNED32, c0 * Capabilities_MaxBlockLenMask), -Capabilities_MaxBlockLenOfs)), 0);
 			SdEnvironment.String(" B");
 			SdEnvironment.Ln;
 
@@ -2001,7 +2001,7 @@ VAR
 				ELSIF c1 * Capabilities_TimerCountRetuningMask = {} THEN
 					SdEnvironment.String("Disabled")
 				ELSE
-					SdEnvironment.Int(LSH(LONGINT(1), LSH(SYSTEM.VAL(LONGINT, c1 * Capabilities_TimerCountRetuningMask), -Capabilities_TimerCountRetuningOfs)), 0);
+					SdEnvironment.Int(LSH(SIGNED32(1), LSH(SYSTEM.VAL(SIGNED32, c1 * Capabilities_TimerCountRetuningMask), -Capabilities_TimerCountRetuningOfs)), 0);
 					SdEnvironment.String(" s")
 				END;
 				SdEnvironment.Ln;
@@ -2011,14 +2011,14 @@ VAR
 				SdEnvironment.Ln;
 
 				SdEnvironment.String("[SD] "); SdEnvironment.String("	Retuning Mode: ");
-				SdEnvironment.Int(LSH(SYSTEM.VAL(LONGINT, c1 * Capabilities_RetuningModesMask), -Capabilities_RetuningModesOfs), 0);
+				SdEnvironment.Int(LSH(SYSTEM.VAL(SIGNED32, c1 * Capabilities_RetuningModesMask), -Capabilities_RetuningModesOfs), 0);
 				SdEnvironment.Ln;
 
 				SdEnvironment.String("[SD] "); SdEnvironment.String("	Clock Multiplier: ");
 				IF c1 * Capabilities_ClockMultiplierMask = {} THEN
 					SdEnvironment.String("Not Supported")
 				ELSE
-					SdEnvironment.Int(LSH(SYSTEM.VAL(LONGINT, c1 * Capabilities_ClockMultiplierMask), -Capabilities_ClockMultiplierOfs) + 1, 0)
+					SdEnvironment.Int(LSH(SYSTEM.VAL(SIGNED32, c1 * Capabilities_ClockMultiplierMask), -Capabilities_ClockMultiplierOfs) + 1, 0)
 				END;
 				SdEnvironment.Ln
 			END
@@ -2033,7 +2033,7 @@ VAR
 			SdEnvironment.String("[SD]	App Command: "); SdEnvironment.Boolean(CardStatus_AppCmd IN status); SdEnvironment.Ln;
 			SdEnvironment.String("[SD]	Ready For Data: "); SdEnvironment.Boolean(CardStatus_ReadyForData IN status); SdEnvironment.Ln;
 			SdEnvironment.String("[SD]	Card State: ");
-			CASE LSH(SYSTEM.VAL(LONGINT, status * CardStatus_CurrentStateMask), -CardStatus_CurrentStateOffset) OF
+			CASE LSH(SYSTEM.VAL(SIGNED32, status * CardStatus_CurrentStateMask), -CardStatus_CurrentStateOffset) OF
 				 CardIdle: SdEnvironment.String("Idle")
 				|CardReady: SdEnvironment.String("Ready")
 				|CardIdentification: SdEnvironment.String("Identification")
@@ -2065,10 +2065,10 @@ VAR
 		END
 	END PrintCardStatus;
 
-	PROCEDURE PrintCardCsd * (CONST csd: ARRAY OF LONGINT);
+	PROCEDURE PrintCardCsd * (CONST csd: ARRAY OF SIGNED32);
 	VAR
 		cap: HUGEINT;
-		val, version, sizeMult: LONGINT;
+		val, version, sizeMult: SIGNED32;
 	BEGIN
 		IF Trace THEN
 			version := ReadBitfield(csd, CardCsd_CsdStructureOfs, CardCsd_CsdStructureWidth) + 1;
@@ -2104,7 +2104,7 @@ VAR
 				SdEnvironment.Int(val, 0);
 				SdEnvironment.String(")")
 			ELSE
-				SdEnvironment.Int(LSH(LONGINT(1), val), 0);
+				SdEnvironment.Int(LSH(SIGNED32(1), val), 0);
 			END;
 			SdEnvironment.Ln;
 			SdEnvironment.String("[SD] "); SdEnvironment.String("	Block Program Time / Block Read Time: ");
@@ -2114,7 +2114,7 @@ VAR
 				SdEnvironment.Int(val, 0);
 				SdEnvironment.String(")")
 			ELSE
-				SdEnvironment.Int(LSH(LONGINT(1), val), 0);
+				SdEnvironment.Int(LSH(SIGNED32(1), val), 0);
 			END;
 			SdEnvironment.Ln;
 			SdEnvironment.String("[SD] "); SdEnvironment.String("	Group Write Protection: "); SdEnvironment.Boolean(ReadBitfield(csd, CardCsd_WpGrpEnable, 1) = 1); SdEnvironment.Ln;
@@ -2123,7 +2123,7 @@ VAR
 			SdEnvironment.String("[SD] "); SdEnvironment.String("	Erase Block Enable: "); SdEnvironment.Boolean(ReadBitfield(csd, CardCsd_EraseBlkEn, 1) = 1); SdEnvironment.Ln;
 
 			IF version = 1 THEN
-				sizeMult := LSH(LONGINT(2), ReadBitfield(csd, CardCsd_CSizeMultOfs1, CardCsd_CSizeMultWidth1));
+				sizeMult := LSH(SIGNED32(2), ReadBitfield(csd, CardCsd_CSizeMultOfs1, CardCsd_CSizeMultWidth1));
 				cap := sizeMult * (1 + ReadBitfield(csd, CardCsd_CSizeOfs1, CardCsd_CSizeWidth1)) * 512;
 			ELSE
 				cap := 1024 * (HUGEINT(ReadBitfield(csd, CardCsd_CSizeOfs2, CardCsd_CSizeWidth2)) + 1);
@@ -2141,7 +2141,7 @@ VAR
 				SdEnvironment.Int(val, 0);
 				SdEnvironment.String(")")
 			ELSE
-				SdEnvironment.Int(LSH(LONGINT(1), val), 0); SdEnvironment.String(" B")
+				SdEnvironment.Int(LSH(SIGNED32(1), val), 0); SdEnvironment.String(" B")
 			END;
 			SdEnvironment.Ln;
 			SdEnvironment.String("[SD] "); SdEnvironment.String("	Supported Command Classes: "); SdEnvironment.Set(SYSTEM.VAL(SET, ReadBitfield(csd, CardCsd_CccOfs, CardCsd_CccWidth))); SdEnvironment.Ln;
@@ -2217,7 +2217,7 @@ VAR
 		END
 	END PrintCardCsd;
 
-	PROCEDURE ReadBitfield (CONST field: ARRAY OF LONGINT; ofs, width: LONGINT): LONGINT;
+	PROCEDURE ReadBitfield (CONST field: ARRAY OF SIGNED32; ofs, width: SIGNED32): SIGNED32;
 	VAR
 		bits: ADDRESS;
 	BEGIN
@@ -2232,6 +2232,6 @@ VAR
 		IF ofs MOD 8 + width > 24 THEN
 			bits := bits + SYSTEM.GET8(ADDRESSOF(field[0]) + ofs DIV 8 + 3) * 1000000H
 		END;
-		RETURN SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, LSH(bits, -(ofs MOD 8))) * {0 .. width - 1})
+		RETURN SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, LSH(bits, -(ofs MOD 8))) * {0 .. width - 1})
 	END ReadBitfield;
 END Sd.
