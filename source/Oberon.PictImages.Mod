@@ -234,7 +234,7 @@ MODULE PictImages IN Oberon; (** non-portable *)	(* eos  **)
 	PROCEDURE StorePict (img: Images.Image; VAR fname: ARRAY OF CHAR; VAR done: BOOLEAN);
 		VAR
 			file: Files.File; r: Files.Rider; pal: Images.Palette; i: LONGINT; fmt: Images.Format; depth, y, inc, x: INTEGER;
-			pix: POINTER TO ARRAY OF CHAR; buf: ARRAY 129 OF SHORTINT;
+			pix: POINTER TO ARRAY OF CHAR; buf: ARRAY 129 OF SIGNED8;
 	BEGIN
 		file := Files.New(fname);
 		IF file # NIL THEN

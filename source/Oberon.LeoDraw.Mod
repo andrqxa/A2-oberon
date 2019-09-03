@@ -186,7 +186,7 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 	END CreateSpline;
 
 	PROCEDURE LoadCaption (VAR ctxt: Context; VAR r: Files.Rider; x, y, col: INTEGER): Leonardo.Shape;
-		VAR fno: SHORTINT; i: LONGINT; ch: CHAR; s: ARRAY 64 OF CHAR; color: Gfx.Color; cap: LeoCaptions.Caption;
+		VAR fno: SIGNED8; i: LONGINT; ch: CHAR; s: ARRAY 64 OF CHAR; color: Gfx.Color; cap: LeoCaptions.Caption;
 	BEGIN
 		Files.Read(r, fno); Files.Read(r, ch); i := 0;
 		WHILE ch > 0DX DO
@@ -200,7 +200,7 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 	END LoadCaption;
 
 	PROCEDURE LoadMacro (VAR ctxt: Context; VAR r: Files.Rider; x, y, col: INTEGER): Leonardo.Shape;
-		VAR lno: SHORTINT; name: Name; mh: MacroHead; shape: Leonardo.Shape; mat: GfxMatrix.Matrix;
+		VAR lno: SIGNED8; name: Name; mh: MacroHead; shape: Leonardo.Shape; mat: GfxMatrix.Matrix;
 	BEGIN
 		Files.Read(r, lno); Files.ReadString(r, name);
 		IF ctxt.lib[lno] # NIL THEN
@@ -238,14 +238,14 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 	END LoadCurve;
 
 	PROCEDURE LoadRectangle (VAR r: Files.Rider; x, y, w, h, col: INTEGER): Leonardo.Shape;
-		VAR len: INTEGER; width, vers: SHORTINT;
+		VAR len: INTEGER; width, vers: SIGNED8;
 	BEGIN
 		Files.ReadInt(r, len); Files.Read(r, width); Files.Read(r, vers);
 		RETURN CreateRectangle(x + 0.5, y + 0.5, x + w - 0.5, y + h - 0.5, col, width, ThisFiller(col, vers))
 	END LoadRectangle;
 
 	PROCEDURE LoadSpline (VAR r: Files.Rider; x, y, col: INTEGER): Leonardo.Shape;
-		VAR len, n, i: INTEGER; open: SHORTINT; u, v: ARRAY 21 OF INTEGER;
+		VAR len, n, i: INTEGER; open: SIGNED8; u, v: ARRAY 21 OF INTEGER;
 	BEGIN
 		Files.ReadInt(r, len);
 		n := (len - 1) DIV 4;
@@ -285,7 +285,7 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 
 	PROCEDURE LoadElems (VAR r: Files.Rider; VAR ctxt: Context): Leonardo.Shape;
 		VAR
-			shapes, last, new: Leonardo.Shape; cno, k: SHORTINT; name, font, cmd: ARRAY 32 OF CHAR;
+			shapes, last, new: Leonardo.Shape; cno, k: SIGNED8; name, font, cmd: ARRAY 32 OF CHAR;
 			i, j: LONGINT; size, len: INTEGER;
 	BEGIN
 		shapes := NIL; last := NIL;

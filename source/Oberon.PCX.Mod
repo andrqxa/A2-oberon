@@ -92,7 +92,7 @@ VAR
 	pcxh: PCXHeader;
 	line: POINTER TO ARRAY OF CHAR;
 	x,y,z,w,h,rep: INTEGER;
-	k,p: SHORTINT;
+	k,p: SIGNED8;
 	c: CHAR;
 BEGIN
 	IF ReadPCXHeader(R,pcxh) THEN

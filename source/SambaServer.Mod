@@ -1582,7 +1582,7 @@ BEGIN
 					IF (Files.Directory IN eFlags) THEN INCL(flags, 4); END;
 					IF (Files.ReadOnly IN eFlags) THEN INCL(flags, 0) END;
 					c.out.RawInt(SYSTEM.VAL(INTEGER, flags));			(* file attri *)
-					c.out.RawSInt(SHORTINT(Strings.Length(eName)));	(* filename len *)
+					c.out.RawSInt(SIGNED8(Strings.Length(eName)));	(* filename len *)
 					c.out.RawString(eName);		(* file name*)
 				END;
 			END;
@@ -1776,7 +1776,7 @@ BEGIN
 					IF (Files.Directory IN eFlags) THEN INCL(flags, 4); END;
 					IF (Files.ReadOnly IN eFlags) THEN INCL(flags, 0) END;
 					c.out.RawInt(SYSTEM.VAL(INTEGER, flags));			(* file attri *)
-					c.out.RawSInt(SHORTINT(Strings.Length(eName)));	(* filename len *)
+					c.out.RawSInt(SIGNED8(Strings.Length(eName)));	(* filename len *)
 					c.out.RawString(eName);		(* file name*)
 				END;
 			END;

@@ -131,7 +131,7 @@ TYPE
 			sym, savedsym: PCS.Token;
 			scanner, savedscanner: PCS.Scanner;
 			scope, codescope: PCT.Scope;		(*codescope is the scope where the code is defined, where a WITH is used*)
-			looplevel, scopelevel: SHORTINT;	(*copy of scope(ProcScope).level or 0 (rec/mod)*)
+			looplevel, scopelevel: SIGNED8;	(*copy of scope(ProcScope).level or 0 (rec/mod)*)
 			forexitcount, forretcount, retcount, fincount: LONGINT;	(*nested for-loops inside a LOOP-statement, used to remove the temp for-counters*)
 			curloop: PCB.LoopInfo;
 			code: PCC.Code;
@@ -765,7 +765,7 @@ TYPE
 		END ConstDecl;
 
 		PROCEDURE FixForwards;
-		VAR obj: PCT.Symbol; state: SHORTINT; res: WORD;
+		VAR obj: PCT.Symbol; state: SIGNED8; res: WORD;
 		BEGIN
 			state := PCT.structallocated;
 			IF isRecord THEN state := PCT.structdeclared END;
@@ -1181,7 +1181,7 @@ TYPE
 			END Convert;
 
 			PROCEDURE FillConst( a: PCB.ArrayQ );
-			VAR s: SHORTINT;  i: INTEGER;  l: LONGINT;  r: REAL;  x: LONGREAL;  con: PCT.Const;
+			VAR s: SIGNED8;  i: INTEGER;  l: LONGINT;  r: REAL;  x: LONGREAL;  con: PCT.Const;
 			BEGIN
 				WHILE (a # NIL ) DO
 					IF a.e IS PCB.ArrayExpression  THEN FillConst( a.e(PCB.ArrayExpression).array )
@@ -1698,7 +1698,7 @@ TYPE
 			Check(end)
 		END StatementBlock;
 
-		PROCEDURE CallNewOnObject (code: PCC.Code;  suppress: BOOLEAN;  proc: PCB.Designator;  params: PCB.ExprList;  curlevel: SHORTINT);
+		PROCEDURE CallNewOnObject (code: PCC.Code;  suppress: BOOLEAN;  proc: PCB.Designator;  params: PCB.ExprList;  curlevel: SIGNED8);
 		VAR varName: StringPool.Index; symbol: PCT.Variable; res: WORD; parameters: PCB.ExprList; item: PCB.Expression; tempVar: PCB.Designator;
 		BEGIN
 			symbol := codescope.FindHiddenVar (-PCB.newfn, codescope);
@@ -2077,7 +2077,7 @@ TYPE
 		VAR
 			procparser: ProcedureParser; procscope: PCT.ProcScope; pos: LONGINT; res: WORD;
 			i: IdentDefDesc; flags: SET; rtype: PCT.Struct; forward, suppress : BOOLEAN;
-			opName: PCS.Name; pflags: SET; right: SHORTINT; (* ejz *)
+			opName: PCS.Name; pflags: SET; right: SIGNED8; (* ejz *)
 			opStr: ARRAY PCS.MaxStrLen OF CHAR;
 		BEGIN
 			flags := {}; forward := FALSE; pflags := {}; (* ejz *)

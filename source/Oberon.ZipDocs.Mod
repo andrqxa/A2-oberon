@@ -151,7 +151,7 @@ MODULE ZipDocs IN Oberon; (** portable *)	(* ejz  *)
 	VAR
 		S: Texts.Scanner; T: Texts.Text; beg, end, time, res: LONGINT;
 		arc: Zip.Archive;
-		strategy, level: SHORTINT;
+		strategy, level: SIGNED8;
 		arcname, oldname, newname: ARRAY 256 OF CHAR;
 		D: Documents.Document;
 	BEGIN

@@ -83,7 +83,7 @@ MODULE WTSDraw IN Oberon;	(** portable *)
 	END Caption;
 
 	PROCEDURE Rect(VAR R: Files.Rider; col, x, y, w, h: INTEGER): Display.Frame;
-		VAR state: SET; len: INTEGER; lw, vers: SHORTINT; L: BasicFigures.Figure;
+		VAR state: SET; len: INTEGER; lw, vers: SIGNED8; L: BasicFigures.Figure;
 	BEGIN
 		Files.ReadInt(R, len); Files.Read(R, lw); Files.Read(R, vers);
 		state := {}; IF vers > 0 THEN INCL(state, BasicFigures.filled); col := -BasicFigures.filled + vers END;
@@ -119,10 +119,10 @@ MODULE WTSDraw IN Oberon;	(** portable *)
 		IF name = "TTL0" THEN RETURN Objects.ThisLibrary("TTL.Lib") END
 	END ThisLib;
 
-	PROCEDURE Item(VAR R: Files.Rider; type: SHORTINT): Display.Frame;
+	PROCEDURE Item(VAR R: Files.Rider; type: SIGNED8): Display.Frame;
 		VAR s, t: ARRAY 64 OF CHAR;
 			x, y, w, h, col: INTEGER;
-			no: SHORTINT;
+			no: SIGNED8;
 	BEGIN
 		IF type = 0 THEN Files.Read(R, no);
 			IF no = 0 THEN Files.Read(R, no); ReadString(R, fontname[no])
@@ -146,7 +146,7 @@ MODULE WTSDraw IN Oberon;	(** portable *)
 	END Item;
 
 	PROCEDURE Load(VAR R: Files.Rider; VAR link: Objects.Object);
-		VAR p: Display.Frame; tag, type: SHORTINT;
+		VAR p: Display.Frame; tag, type: SIGNED8;
 	BEGIN
 		Files.Read(R, tag); Files.Read(R, type);
 		WHILE type # -1 DO p := Item(R, type);

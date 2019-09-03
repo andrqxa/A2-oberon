@@ -47,7 +47,7 @@ CONST
 	floatCC = -6;
 
 TYPE
-	XOpcode = SHORTINT;	(* extended opcode type *)
+	XOpcode = SIGNED8;	(* extended opcode type *)
 	XRegister = RECORD
 		Low, High: LONGINT;	(* low & high register of value *)
 	END;
@@ -86,7 +86,7 @@ VAR HexTab: ARRAY 16 OF CHAR;
 
 (* ----------- Helper Functions -----------------*)
 PROCEDURE InitHexTab;
-VAR i: SHORTINT;
+VAR i: SIGNED8;
 BEGIN
 	FOR i := 0 TO 9 DO HexTab[i] := CHR(ORD("0") + i) END;
 	FOR i := 0 TO 5 DO HexTab[i+10] := CHR(ORD("A") + i) END
@@ -2803,7 +2803,7 @@ END Optimize;
 (** DumpCode (Debug) - TraverseProc, dumps whole code to global writer W *)
 
 PROCEDURE DumpCode*(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT;  context: ANY);
-VAR  op: PCLIR.Opcode;  info: Info; format: SHORTINT; flags: SET;
+VAR  op: PCLIR.Opcode;  info: Info; format: SIGNED8; flags: SET;
 
 	PROCEDURE Reg(r: LONGINT);
 	BEGIN

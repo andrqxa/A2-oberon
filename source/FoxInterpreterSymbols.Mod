@@ -224,7 +224,7 @@ TYPE
 			PushL(i);
 		END PushI;
 
-		PROCEDURE PushS(i: SHORTINT);
+		PROCEDURE PushS(i: SIGNED8);
 		BEGIN
 			PushL(i);
 		END PushS;
@@ -419,7 +419,7 @@ TYPE
 
 		PROCEDURE PushTyped*(o: Result; mode: CHAR; refs: Modules.Bytes; VAR offset: SIZE): BOOLEAN;
 		VAR ofs: SIZE;
-			s: SHORTINT; i: INTEGER; l: LONGINT; h: HUGEINT;
+			s: SIGNED8; i: INTEGER; l: LONGINT; h: HUGEINT;
 			r: REAL; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
@@ -459,7 +459,7 @@ TYPE
 						CASE type OF
 						Reflection.sfTypeSHORTINT,Reflection.sfTypeSIGNED8 :
 							IF v.GetInt(h) THEN
-								s:= SHORTINT(h); stack.PushS(s);
+								s:= SIGNED8(h); stack.PushS(s);
 								RETURN TRUE;
 							END;
 						| Reflection.sfTypeINTEGER,Reflection.sfTypeSIGNED16 :
@@ -519,7 +519,7 @@ TYPE
 
 		PROCEDURE Push*(o: Result): BOOLEAN;
 		VAR
-			s: SHORTINT; i: INTEGER; l: LONGINT; h: HUGEINT;
+			s: SIGNED8; i: INTEGER; l: LONGINT; h: HUGEINT;
 			r: REAL; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
@@ -553,7 +553,7 @@ TYPE
 			type := ReturnType();
 			CASE Reflection.GetChar(type.refs, type.offset) OF
 				Reflection.sfTypeSHORTINT,Reflection.sfTypeSIGNED8 :
-					NEW(int, SHORTINT(stack.CallH(address)));
+					NEW(int, SIGNED8(stack.CallH(address)));
 					RETURN int;
 			| Reflection.sfTypeINTEGER,Reflection.sfTypeSIGNED16 :
 					NEW(int,  INTEGER(stack.CallH(address)));
@@ -607,7 +607,7 @@ TYPE
 
 		PROCEDURE Evaluate*(): Value;
 		VAR
-			s: SHORTINT;
+			s: SIGNED8;
 			i: INTEGER;
 			l: LONGINT;
 			h: HUGEINT;
@@ -647,7 +647,7 @@ TYPE
 
 		PROCEDURE SetV*(v: Value): BOOLEAN;
 		VAR
-			s: SHORTINT; i: INTEGER; l: LONGINT; h: HUGEINT;
+			s: SIGNED8; i: INTEGER; l: LONGINT; h: HUGEINT;
 			r: REAL; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
@@ -659,7 +659,7 @@ TYPE
 			CASE c OF
 				Reflection.sfTypeSHORTINT, Reflection.sfTypeSIGNED8:
 				IF v.GetInt(h) THEN
-					s:= SHORTINT(h); SYSTEM.PUT(address, s);
+					s:= SIGNED8(h); SYSTEM.PUT(address, s);
 					RETURN TRUE;
 				END;
 			|Reflection.sfTypeINTEGER, Reflection.sfTypeSIGNED16:

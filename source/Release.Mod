@@ -809,7 +809,7 @@ TYPE
 				ELSE
 					f.Set(r, 0);
 					Files.SplitPath(dstname, pathName, fileName);
-					Zip.AddEntry(archive, fileName, r, f.Length()(LONGINT), SHORTINT(level), SHORTINT(strategy), res);
+					Zip.AddEntry(archive, fileName, r, f.Length()(LONGINT), SIGNED8(level), SIGNED8(strategy), res);
 				END;
 			END AddFile;
 

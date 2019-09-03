@@ -318,7 +318,7 @@ BEGIN
 END DisplayBlock;
 
 PROCEDURE GetPix*(VAR addr: ADDRESS; VAR buf: SYSTEM.BYTE; depth: INTEGER);
-VAR s1, s2, s3: SHORTINT;
+VAR s1, s2, s3: SIGNED8;
 BEGIN
 	IF depth = 8 THEN SYSTEM.GET(addr, buf); INC(addr)
 	ELSIF depth = 4 THEN
@@ -330,19 +330,19 @@ BEGIN
 END GetPix;
 
 PROCEDURE PutPix*(VAR addr: ADDRESS; border: ADDRESS; buf: SYSTEM.BYTE; depth: INTEGER);
-VAR s1: SHORTINT;
+VAR s1: SIGNED8;
 BEGIN
 	IF (depth = 8) & (addr < border) THEN SYSTEM.PUT(addr, buf); INC(addr)
 	ELSIF depth = 4 THEN
-		IF addr < border THEN SYSTEM.PUT(addr, SYSTEM.VAL(SHORTINT, buf) MOD 16); INC(addr) END;
-		IF addr < border THEN SYSTEM.PUT(addr, SYSTEM.VAL(SHORTINT, buf) DIV 16 MOD 16); INC(addr) END;
+		IF addr < border THEN SYSTEM.PUT(addr, SYSTEM.VAL(SIGNED8, buf) MOD 16); INC(addr) END;
+		IF addr < border THEN SYSTEM.PUT(addr, SYSTEM.VAL(SIGNED8, buf) DIV 16 MOD 16); INC(addr) END;
 	ELSE (* depth = 1 *)
 		s1 := 0;
 		WHILE s1 < 8 DO
 			IF addr < border THEN
-				IF ODD(SYSTEM.VAL(SHORTINT, buf)) THEN SYSTEM.PUT(addr, 15) ELSE SYSTEM.PUT(addr, 0) END
+				IF ODD(SYSTEM.VAL(SIGNED8, buf)) THEN SYSTEM.PUT(addr, 15) ELSE SYSTEM.PUT(addr, 0) END
 			END;
-			INC(s1); INC(addr); buf := SYSTEM.VAL(SHORTINT, buf) DIV 2;
+			INC(s1); INC(addr); buf := SYSTEM.VAL(SIGNED8, buf) DIV 2;
 		END
 	END;
 END PutPix;

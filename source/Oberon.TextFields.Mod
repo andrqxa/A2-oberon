@@ -472,7 +472,7 @@ BEGIN
 	caption.W:=newW; caption.H:=newH;
 END ResizeCaptionToFit;
 
-PROCEDURE ConsumeCh(F: Caption; ch: CHAR; fnt: Objects.Library; col, voff: SHORTINT);
+PROCEDURE ConsumeCh(F: Caption; ch: CHAR; fnt: Objects.Library; col, voff: SIGNED8);
 VAR R: Texts.Reader; chr: CHAR;
 BEGIN
 	IF ch = 7FX THEN	(* DEL *)

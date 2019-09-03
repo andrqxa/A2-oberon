@@ -63,7 +63,7 @@ TYPE
 	LogFont* = RECORD
 		lfHeight*, lfWidth*, lfEscapement*, lfOrientation*, lfWeight*: LONGINT;
 		lfItalic*, lfUnderline*, lfStrikeOut*: BOOLEAN;
-		lfCharSet*, lfOutPrecision*, lfClipPrecision*, lfQuality*, lfPitchAndFamily*: SHORTINT;
+		lfCharSet*, lfOutPrecision*, lfClipPrecision*, lfQuality*, lfPitchAndFamily*: SIGNED8;
 		lfFaceName*: ARRAY LFFaceSize OF CHAR
 	END;
 
@@ -81,7 +81,7 @@ TYPE
 		tmDigitizedAspectX*, tmDigitizedAspectY*: LONGINT;
 		tmFirstChar*, tmLastChar*, tmDefaultChar*, tmBreakChar*: CHAR;
 		tmItalic*, tmUnderlined*, tmStruckOut*: BOOLEAN;
-		tmPitchAndFamily*, tmCharSet*: SHORTINT
+		tmPitchAndFamily*, tmCharSet*: SIGNED8
 	END;
 
 	(** The EnumFontFamProc function is an application definedßcallback function used with the EnumFontFamilies

@@ -38,7 +38,7 @@ TYPE
 						IF 4 IN buf[0] THEN DEC(m.dx, 256) END;
 						m.dy := SYSTEM.VAL(LONGINT, buf[2]);
 						IF 5 IN buf[0] THEN DEC(m.dy, 256) END;
-						m.dz := SYSTEM.VAL(SHORTINT, buf[3]);
+						m.dz := SYSTEM.VAL(SIGNED8, buf[3]);
 						IF 6 IN buf[0] THEN DEC(m.dz, 256) END;
 						p := 0; m.dy := -m.dy;
 						Inputs.mouse.Handle(m)
@@ -106,7 +106,7 @@ BEGIN
 END PollAux;
 
 PROCEDURE InAux(): CHAR;
-VAR s: SET; t: Kernel.MilliTimer;ch: CHAR; i: SHORTINT;
+VAR s: SET; t: Kernel.MilliTimer;ch: CHAR; i: SIGNED8;
 BEGIN
 	i := 10;	(* up to 0.2s! *)
 	REPEAT

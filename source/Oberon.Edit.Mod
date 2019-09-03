@@ -202,7 +202,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 		VAR par: Oberon.ParList;
 			S: Texts.Scanner;
 			T: Texts.Text;
-			col: SHORTINT;
+			col: SIGNED8;
 			beg, end, time: LONGINT;
 	BEGIN par := Oberon.Par;
 		Texts.OpenScanner(S, par.text, par.pos); Texts.Scan(S);
@@ -363,7 +363,7 @@ MODULE Edit IN Oberon;	(** portable *) (*JG 4.4.95 / NW 24.1.91*)
 			lib: Objects.Library;
 			V: Viewers.Viewer;
 			ch: CHAR;
-			pageno: SHORTINT; listing: BOOLEAN;
+			pageno: SIGNED8; listing: BOOLEAN;
 			nofcopies, lsp, Y: INTEGER;
 			beg, end, time: LONGINT;
 			server, options: ARRAY 32 OF CHAR;

@@ -62,12 +62,12 @@ CONST
 	HighLevelTPL* = 31;
 
 (* various type definitions *)
-TYPE Char8* = SHORTINT;
+TYPE Char8* = SIGNED8;
 TYPE Char16* = INTEGER;
 TYPE Boolean* = BOOLEAN;
 
 TYPE Int* = SIZE; (* size of Int architecture dependant (e.g. 32bit on i386, 64bit on ia64) *)
-TYPE Int8* = SHORTINT; (* Int8, Int16, Int32, Int64 NOT architecture dependant *)
+TYPE Int8* = SIGNED8; (* Int8, Int16, Int32, Int64 NOT architecture dependant *)
 TYPE Int16* = INTEGER;
 TYPE Int32* = LONGINT;
 TYPE Int64* = HUGEINT;

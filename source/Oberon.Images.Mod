@@ -69,9 +69,9 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 
 		(** image format **)
 		Format0* = RECORD
-			code*: SHORTINT;	(** format code for quick format checks **)
-			bpp*: SHORTINT;	(** number of bits per pixel **)
-			align*: SHORTINT;	(** bytes per row must be multiple of this **)
+			code*: SIGNED8;	(** format code for quick format checks **)
+			bpp*: SIGNED8;	(** number of bits per pixel **)
+			align*: SIGNED8;	(** bytes per row must be multiple of this **)
 			components*: SET;	(** components that are stored in a pixel **)
 			pal*: Palette;	(** optional palette for indexed formats **)
 		END;
@@ -482,7 +482,7 @@ MODULE Images IN Oberon; (** non-portable *)	(* eos  **)
 	END UnpackBGRA8888;
 
 	(** initialize format **)
-	PROCEDURE InitFormat* (VAR fmt: Format; code, bpp, align: SHORTINT; comps: SET; pal: Palette; pack, unpack: PackProc);
+	PROCEDURE InitFormat* (VAR fmt: Format; code, bpp, align: SIGNED8; comps: SET; pal: Palette; pack, unpack: PackProc);
 	BEGIN
 		fmt.code := code; fmt.bpp := bpp; fmt.align := align; fmt.components := comps; fmt.pal := pal;
 		fmt.pack := pack; fmt.unpack := unpack

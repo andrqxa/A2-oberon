@@ -89,7 +89,7 @@ MODULE PSD IN Oberon; (** portable *)	(* ejz  *)
 	END CopyPal;
 
 	PROCEDURE LoadRLEInd8(VAR R: Files.Rider; VAR h: Header; P: Pictures.Picture);
-		VAR F: Files.File; pos: LONGINT; n, nb, x, y, py: INTEGER; rle: SHORTINT; ch: CHAR;
+		VAR F: Files.File; pos: LONGINT; n, nb, x, y, py: INTEGER; rle: SIGNED8; ch: CHAR;
 	BEGIN
 		Pictures.Create(P, SHORT(h.width), SHORT(h.height), 8);
 		CopyPal(h, P); F := Files.Base(R);

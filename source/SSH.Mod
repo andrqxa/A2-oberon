@@ -197,7 +197,7 @@ VAR
 TYPE
 	Channel* = OBJECT (Streams.Connection)
 			VAR
-				state-: SHORTINT;
+				state-: SIGNED8;
 				conn-: T.Connection;
 				rchan: LONGINT;
 				wsize-: SIZE;

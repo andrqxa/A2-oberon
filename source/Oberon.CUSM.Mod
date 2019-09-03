@@ -86,7 +86,7 @@ TYPE
 		lastSeqNum: LONGINT;
 		sndBufOffset: INTEGER;
 		sender: BOOLEAN;
-		timeOut: SHORTINT;
+		timeOut: SIGNED8;
 		wantVideo:BOOLEAN;
 		image: Image;
 	END;

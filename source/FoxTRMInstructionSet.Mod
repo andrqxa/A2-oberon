@@ -246,7 +246,7 @@ TYPE
 		VAR imm: LONGINT;
 
 			PROCEDURE Fixup(from, to: LONGINT);
-			VAR patterns: ObjectFile.FixupPatterns; displacement: LONGINT; mode: SHORTINT;
+			VAR patterns: ObjectFile.FixupPatterns; displacement: LONGINT; mode: SIGNED8;
 			BEGIN
 				NEW(patterns, 1);
 				patterns[0].offset := from; patterns[0].bits := to-from+1;
@@ -417,7 +417,7 @@ TYPE
 		RETURN None;
 	END FindMnemonic;
 
-	PROCEDURE FindRegister*(CONST name: ARRAY OF CHAR): SHORTINT;
+	PROCEDURE FindRegister*(CONST name: ARRAY OF CHAR): SIGNED8;
 	BEGIN
 		IF name[0] = "R" THEN
 			IF name[2] = 0X THEN
@@ -847,7 +847,7 @@ TYPE
 	END InitMemory;
 
 	(* generate immediate operand with fixup *)
-	PROCEDURE InitFixup*(VAR operand: Operand; bits: SHORTINT; fixup: BinaryCode.Fixup (*symbol: Sections.Section; offset, displacement: LONGINT *));
+	PROCEDURE InitFixup*(VAR operand: Operand; bits: SIGNED8; fixup: BinaryCode.Fixup (*symbol: Sections.Section; offset, displacement: LONGINT *));
 	BEGIN
 		operand.type := Immediate;
 		operand.imm := 0;

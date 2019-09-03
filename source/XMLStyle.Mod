@@ -172,7 +172,7 @@ END MatchSimpleSelector;
 
 PROCEDURE MatchSubSelector(elem: XML.Element; subSelector: CSS2.SubSelector;
 		propChanger: XMLComponents.PropertyChanger; VAR hasDynamic: BOOLEAN): BOOLEAN;
-VAR s1, s2: String; rel: SHORTINT; attribute: XML.Attribute;
+VAR s1, s2: String; rel: SIGNED8; attribute: XML.Attribute;
 BEGIN
 	IF subSelector IS CSS2.Id THEN
 		s1 := elem.GetId(); s2 := subSelector(CSS2.Id).GetValue();

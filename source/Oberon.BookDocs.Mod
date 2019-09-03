@@ -435,7 +435,7 @@ MODULE BookDocs IN Oberon;	(** portable *)
 			F: Files.File;
 			R: Files.Rider;
 			fix1, fix2, pos, len: LONGINT;
-			mode: SHORTINT;
+			mode: SIGNED8;
 			el: Books0.ExtLabel;
 			E: ExistImpMsg;
 	BEGIN

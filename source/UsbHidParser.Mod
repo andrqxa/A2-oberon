@@ -264,7 +264,7 @@ TYPE
 		* 	param: i	the i th globalState, f.e. 0 means UsagePage
 		* 	return: globalState [i]
 		*)
-		PROCEDURE State(i:SHORTINT):LONGINT;
+		PROCEDURE State(i:SIGNED8):LONGINT;
 		BEGIN
 			IF ((i>=0) & (i < LengthGlobalState)) THEN
 				RETURN globalState.state[i];

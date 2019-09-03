@@ -364,8 +364,8 @@ TYPE
 	Dirent* = POINTER TO RECORD
 				ino-		: LONGINT;
 				reclen-	: INTEGER;
-				typ-		: SHORTINT;
-				namlen-	: SHORTINT;
+				typ-		: SIGNED8;
+				namlen-	: SIGNED8;
 				name-	:  (*array of*) CHAR;
 			END;
 

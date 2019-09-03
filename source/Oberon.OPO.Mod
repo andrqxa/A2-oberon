@@ -92,7 +92,7 @@ MODULE OPO IN Oberon;
 	VAR
 	pc*, dsize*: LONGINT; 		(* code size, data size *)
 	csize*: LONGINT;		(* constant size *)
-	lastImmSize*: SHORTINT;		(* last immediate Size *)
+	lastImmSize*: SIGNED8;		(* last immediate Size *)
 	constant*: ConstArray;	(* constant area *)
 	code*: ARRAY CodeLength OF CHAR;	(* i386/i387 code area *)
 	CodeErr*: BOOLEAN;
@@ -191,7 +191,7 @@ MODULE OPO IN Oberon;
 		PutByte (3 * 40H + reg1 * 8+ reg2)
 	END PutReg;
 
-	PROCEDURE PutRMInx (mode: SHORTINT; reg, base, inx, scale: INTEGER; disp: LONGINT);
+	PROCEDURE PutRMInx (mode: SIGNED8; reg, base, inx, scale: INTEGER; disp: LONGINT);
 	(* put register memory with index *)
 	BEGIN
 		reg:= reg MOD 8; inx:= inx MOD 8;
@@ -216,7 +216,7 @@ MODULE OPO IN Oberon;
 		END
 	END PutRMInx;
 
-	PROCEDURE PutRegMem (mode: SHORTINT; reg, base: INTEGER; disp: LONGINT);
+	PROCEDURE PutRegMem (mode: SIGNED8; reg, base: INTEGER; disp: LONGINT);
 	(* put register memory *)
 	BEGIN
 		reg:= reg MOD 8;
@@ -239,7 +239,7 @@ MODULE OPO IN Oberon;
 		END
 	END PutRegMem;
 
-	PROCEDURE PutMem (reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE PutMem (reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	(* put memory *)
 	BEGIN
 		IF base = noBase THEN (* Abs *)
@@ -260,7 +260,7 @@ MODULE OPO IN Oberon;
 		END
 	END PutDisp;
 
-	PROCEDURE Prefix* (reg: INTEGER; VAR w: SHORTINT);
+	PROCEDURE Prefix* (reg: INTEGER; VAR w: SIGNED8);
 	(* put out the Operand Size Prefix if necessary
 		w = 0 : 8 bit data w= 1: 16/32 bit data *)
 	BEGIN
@@ -271,8 +271,8 @@ MODULE OPO IN Oberon;
 		END
 	END Prefix;
 
-	PROCEDURE GenMOV* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT; r: INTEGER;
+	PROCEDURE GenMOV* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8; r: INTEGER;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -300,8 +300,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenMOV;
 
-	PROCEDURE GenMOVSX* (mode, s: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT; (* s = 0: 8 bit; s = 1: 16/32 bit *)
+	PROCEDURE GenMOVSX* (mode, s: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8; (* s = 0: 8 bit; s = 1: 16/32 bit *)
 	BEGIN
 		Prefix (reg, w);
 		PutByte (0FH); PutByte (0BEH + s);
@@ -315,8 +315,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenMOVSX;
 
-	PROCEDURE GenMOVZX* (mode, s: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT; (* s = 0: 8 bit; s = 1: 16/32 bit *)
+	PROCEDURE GenMOVZX* (mode, s: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8; (* s = 0: 8 bit; s = 1: 16/32 bit *)
 	BEGIN
 		Prefix (reg, w);
 		PutByte (0FH); PutByte (0B6H+s);
@@ -347,8 +347,8 @@ MODULE OPO IN Oberon;
 		 END
 	END GenOUT;
 
-	PROCEDURE GenPUSH* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenPUSH* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -367,8 +367,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenPUSH;
 
-	PROCEDURE GenPOP* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenPOP* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -380,8 +380,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenPOP;
 
-	PROCEDURE GenXCHG* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenXCHG* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -398,7 +398,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenXCHG;
 
-	PROCEDURE GenLEA* (reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenLEA* (reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		(* no prefix necessary, addressing mode is always 32 bit *)
 		IF (reg = base) & (inx = noInx) & (disp = 0) THEN
@@ -408,9 +408,9 @@ MODULE OPO IN Oberon;
 		END
 	END GenLEA;
 
-	PROCEDURE GenTyp1* (op, mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
+	PROCEDURE GenTyp1* (op, mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
 	(* general code generator procedure for ADD, ADC, AND, XOR, OR, SBB, SUB, CMP *)
-		VAR w, wImm: SHORTINT;
+		VAR w, wImm: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -448,8 +448,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenTyp1;
 
-	PROCEDURE GenINC* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenINC* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		IF mode = ImmReg THEN
@@ -463,8 +463,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenINC;
 
-	PROCEDURE GenDEC* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenDEC* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		IF mode = ImmReg THEN
@@ -478,8 +478,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenDEC;
 
-	PROCEDURE GenNEG* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenNEG* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		PutByte (0F6H + w);
@@ -488,9 +488,9 @@ MODULE OPO IN Oberon;
 		END
 	END GenNEG;
 
-	PROCEDURE GenIMUL* (mode: SHORTINT; shortform: BOOLEAN; reg, base, inx: INTEGER; scale: SHORTINT;
+	PROCEDURE GenIMUL* (mode: SIGNED8; shortform: BOOLEAN; reg, base, inx: INTEGER; scale: SIGNED8;
 									disp, imm: LONGINT);
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -522,8 +522,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenIMUL;
 
-	PROCEDURE GenIDIV* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenIDIV* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w); PutByte (0F6H + w);
 		IF mode = RegReg THEN PutReg (7, reg)
@@ -531,9 +531,9 @@ MODULE OPO IN Oberon;
 		END
 	END GenIDIV;
 
-	PROCEDURE GenShiftRot* (op, mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
+	PROCEDURE GenShiftRot* (op, mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
 	(* Generates code for ROL, ROR, SAL, SAR, SHL and SHR *)
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -557,8 +557,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenShiftRot;
 
-	PROCEDURE GenNOT* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenNOT* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w); PutByte (0F6H + w);
 		IF mode = Regs THEN PutReg (2, reg)
@@ -567,14 +567,14 @@ MODULE OPO IN Oberon;
 	END GenNOT;
 
 	PROCEDURE GenString* (op, size: INTEGER);
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (size, w);
 		PutByte (op * 2 + w)
 	END GenString;
 
 	PROCEDURE GenRepString* (op, size: INTEGER); (* without REPE CMPS, REPE SCAS *)
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (size, w);
 		PutByte (0F3H); PutByte (op * 2 + w)
@@ -582,14 +582,14 @@ MODULE OPO IN Oberon;
 
 	PROCEDURE GenRepCmpsScas* (op, size: INTEGER);
 	(* REPE CMPS, REPE SCAS *)
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (size, w);
 		PutByte (0F3H); PutByte (op * 2 + w)
 	END GenRepCmpsScas;
 
-	PROCEDURE GenTEST* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenTEST* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix(reg, w);
 		CASE mode OF
@@ -614,8 +614,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenTEST;
 
-	PROCEDURE GenBT* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenBT* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w); PutByte (0FH);
 		CASE mode OF
@@ -631,8 +631,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenBT;
 
-	PROCEDURE GenBTR* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenBTR* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w); PutByte (0FH);
 		CASE mode OF
@@ -648,8 +648,8 @@ MODULE OPO IN Oberon;
 		END
 	END GenBTR;
 
-	PROCEDURE GenBTS* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenBTS* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w); PutByte (0FH);
 		CASE mode OF
@@ -665,7 +665,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenBTS;
 
-	PROCEDURE GenCALL* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenCALL* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	(* no intersegment call implemented yet *)
 	BEGIN
 		IF mode = Imme THEN  (* direct call within segment *)
@@ -678,7 +678,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenCALL;
 
-	PROCEDURE GenJMP* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenJMP* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	(* no intersegment jmp implemented yet *)
 	BEGIN
 		IF mode =  Imme THEN (* direct jmp whithin segment *)
@@ -712,7 +712,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenRET;
 
-	PROCEDURE GenJcc* (op: SHORTINT; disp: LONGINT);
+	PROCEDURE GenJcc* (op: SIGNED8; disp: LONGINT);
 	(*
 		jo, jno, jb/jnae, jnb/jae, je/jz, jne/jnz, jbe/jna, jnbe/ja, js, jns, jp/jpe, jnp/jpo, jl/jnge, jnl/jge, jnle/jg
 		disp must lie within the segment!
@@ -725,7 +725,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenJcc;
 
-	PROCEDURE GenSetcc* (op, mode: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenSetcc* (op, mode: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	(*
 		seto, setno, setb/setna, setnb, sete/setz, setne/setnz, setnbe/seta, sets, setns, setp/setpe, setnp/setpo,
 		setl/setnge, setnl/setge, setle/setng, setnle/setg
@@ -753,7 +753,7 @@ MODULE OPO IN Oberon;
 
 (* floating point encoding *)
 
-	PROCEDURE GenFLD* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFLD* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fload st(0), st (i) ; st(i) = base *)
@@ -768,7 +768,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenFLD;
 
-	PROCEDURE GenFST* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFST* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fstore st(0), st(i); st(i) = base *)
@@ -779,7 +779,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenFST;
 
-	PROCEDURE GenFSTP* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFSTP* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fstore st(0), st(i); st(i) = base *)
@@ -794,7 +794,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenFSTP;
 
-	PROCEDURE GenFCOM* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFCOM* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fcom st(0), st(i) *)
@@ -805,7 +805,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenFCOM;
 
-	PROCEDURE GenFCOMP* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFCOMP* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fcomp st(0), st(i) *)
@@ -816,7 +816,7 @@ MODULE OPO IN Oberon;
 		END
 	END GenFCOMP;
 
-	PROCEDURE GenFtyp1* (op, mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFtyp1* (op, mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			RegSt: (* op st, base and pop not possible*)
@@ -831,38 +831,38 @@ MODULE OPO IN Oberon;
 		END
 	END GenFtyp1;
 
-	PROCEDURE GenFADD* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFADD* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		GenFtyp1 (0, mode, size, base, inx, scale, disp)
 	END GenFADD;
 
-	PROCEDURE GenFSUB* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFSUB* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		IF (mode = StReg) OR (mode = StRegP) THEN GenFtyp1 (5, mode, size, base, inx, scale, disp)
 		ELSE GenFtyp1 (4, mode, size, base, inx, scale, disp)
 		END
 	END GenFSUB;
 
-	PROCEDURE GenFSUBR* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFSUBR* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		IF (mode = StReg) OR (mode = StRegP) THEN GenFtyp1 (4, mode, size, base, inx, scale, disp)
 		ELSE GenFtyp1 (5, mode, size, base, inx, scale, disp)
 		END
 	END GenFSUBR;
 
-	PROCEDURE GenFMUL* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFMUL* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		GenFtyp1 (1, mode, size, base, inx, scale, disp)
 	END GenFMUL;
 
-	PROCEDURE GenFDIV* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFDIV* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		IF (mode = StReg) OR (mode = StRegP) THEN GenFtyp1 (7, mode, size, base, inx, scale, disp)
 		ELSE GenFtyp1 (6, mode, size, base, inx, scale, disp)
 		END
 	END GenFDIV;
 
-	PROCEDURE GenFDIVR* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFDIVR* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		IF (mode = StReg) OR (mode = StRegP) THEN GenFtyp1 (6, mode, size, base, inx, scale, disp)
 		ELSE GenFtyp1 (7, mode, size, base, inx, scale, disp)
@@ -899,12 +899,12 @@ MODULE OPO IN Oberon;
 		END
 	END GenFop1;
 
-	PROCEDURE GenFSTCW* (base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFSTCW* (base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		PutByte (0D9H); PutMem (7, base, inx, scale, disp)
 	END GenFSTCW;
 
-	PROCEDURE GenFLDCW* (base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFLDCW* (base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		PutByte (0D9H); PutMem (5, base, inx, scale, disp)
 	END GenFLDCW;

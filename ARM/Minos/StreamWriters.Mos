@@ -107,8 +107,8 @@ VAR
 		END
 	END Bytes;
 
-	(** Write a SHORTINT. *)
-	PROCEDURE RawSInt*(VAR wr: Writer; x: SHORTINT );
+	(** Write a SIGNED8. *)
+	PROCEDURE RawSInt*(VAR wr: Writer; x: SIGNED8 );
 	BEGIN
 		Char(wr, SYSTEM.VAL( CHAR, x ) )
 	END RawSInt;

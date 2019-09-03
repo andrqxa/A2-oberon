@@ -91,10 +91,10 @@ MODULE OPP IN Oberon;	(** non-portable *)
 	TYPE
 		FixPtr = POINTER TO FixDesc;		(* late parsing *)
 		FixDesc = RECORD
-			mode: LONGINT; scope: OPT.Object; level: SHORTINT; node: OPT.Node; stream: OPS.TokenStream; next: FixPtr
+			mode: LONGINT; scope: OPT.Object; level: SIGNED8; node: OPT.Node; stream: OPS.TokenStream; next: FixPtr
 		END;
 		TypeFix = RECORD
-			pos: LONGINT; name: OPS.Name; scope: OPT.Object; level: SHORTINT;
+			pos: LONGINT; name: OPS.Name; scope: OPT.Object; level: SIGNED8;
 		END;
 		ObjFixDesc = RECORD (TypeFix)  obj: OPT.Object  END;
 		StructFixDesc = RECORD (TypeFix)  typ: OPT.Struct  END;
@@ -102,12 +102,12 @@ MODULE OPP IN Oberon;	(** non-portable *)
 
 	VAR
 		SignOnMessage*: ARRAY 80 OF CHAR;
-		sym, level: SHORTINT;
+		sym, level: SIGNED8;
 		LoopLevel: INTEGER;
 		TDinit, lastTDinit: OPT.Node;	(*global list of TDInit nodes*)
 		RecInit, lastRecInit: OPT.Node;	(*global list of Record Nodes (method code)*)
 		CondNodes: OPT.Node;
-		CondCount: SHORTINT;
+		CondCount: SIGNED8;
 		UndefFlag, FixPhase: BOOLEAN;
 		UndefObj: OPT.Object;
 		scopeLock: BOOLEAN;	(*current or any parent statement block locked *)
@@ -119,7 +119,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 		ptrToRec: OPT.Struct;
 
 		ObjFix:  ARRAY 128 OF ObjFixDesc;
-		ObjCheck:  ARRAY 256 OF RECORD  obj: OPT.Object;  level: SHORTINT  END;
+		ObjCheck:  ARRAY 256 OF RECORD  obj: OPT.Object;  level: SIGNED8  END;
 		TypFix:  ARRAY 128 OF StructFixDesc;
 		nofCheck, nofObjFix, nofTypFix: LONGINT;
 
@@ -196,7 +196,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 	END NewCheck;
 
 	PROCEDURE NewType(obj: OPT.Object);	(*a new type is declared, do an early fix*)
-	VAR  i: LONGINT; old: SHORTINT;
+	VAR  i: LONGINT; old: SIGNED8;
 	BEGIN
 		i := 0;
 		WHILE i < nofTypFix DO
@@ -426,7 +426,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 		FixPhase := tmp
 	END ConstExpression;
 
-	PROCEDURE CheckMark(VAR vis: SHORTINT; rdonlyAllowed: BOOLEAN);
+	PROCEDURE CheckMark(VAR vis: SIGNED8; rdonlyAllowed: BOOLEAN);
 	BEGIN OPS.Get(sym);
 		IF (sym = times) OR (sym = minus) THEN
 			IF level > 0 THEN err(47) END ;
@@ -439,7 +439,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 		END
 	END CheckMark;
 
-	PROCEDURE CheckSysFlag(VAR sysflag: SHORTINT; default: SHORTINT; allowed: SET);	(* ejz *)
+	PROCEDURE CheckSysFlag(VAR sysflag: SIGNED8; default: SIGNED8; allowed: SET);	(* ejz *)
 		VAR sf: LONGINT;
 	BEGIN
 		sf := default;
@@ -545,9 +545,9 @@ MODULE OPP IN Oberon;	(** non-portable *)
 
 	PROCEDURE RecordType(VAR typ, banned: OPT.Struct; owner: OPT.Object);
 		VAR base: OPT.Object;
-			sysflag: SHORTINT;
+			sysflag: SIGNED8;
 			c: LONGINT;
-			procdec, statseq, p: OPT.Node; lev: SHORTINT;
+			procdec, statseq, p: OPT.Node; lev: SIGNED8;
 	BEGIN
 		typ := OPT.NewStr(Comp, Record); typ^.BaseTyp := NIL;
 		IF ptrToRec # NIL THEN	(*POINTER TO RECORD, ptr already declared*)
@@ -621,7 +621,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 	END OwnScope;
 
 	PROCEDURE ArrayType(VAR typ, banned: OPT.Struct);
-	VAR	x: OPT.Node; n: LONGINT;  sysflag: SHORTINT;
+	VAR	x: OPT.Node; n: LONGINT;  sysflag: SIGNED8;
 
 		PROCEDURE HiddenVar (name: ARRAY OF CHAR; exp: OPT.Node): OPT.Object;
 			VAR dim, owner: OPT.Object; y: OPT.Node;
@@ -716,8 +716,8 @@ MODULE OPP IN Oberon;	(** non-portable *)
 		END;
 	END PointerType;
 
-	PROCEDURE FormalParameters(VAR firstPar: OPT.Object; VAR resTyp: OPT.Struct;  sysflag: SHORTINT);
-		VAR mode: SHORTINT;
+	PROCEDURE FormalParameters(VAR firstPar: OPT.Object; VAR resTyp: OPT.Struct;  sysflag: SIGNED8);
+		VAR mode: SIGNED8;
 				par, first, last, res: OPT.Object; typ, btyp: OPT.Struct;
 	BEGIN first := NIL; last := firstPar;
 		IF (sym = ident) OR (sym = var) THEN
@@ -1040,7 +1040,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 	END Await;
 
 	PROCEDURE StandProcCall(VAR x: OPT.Node);
-		VAR y: OPT.Node; m: SHORTINT; n: INTEGER;
+		VAR y: OPT.Node; m: SIGNED8; n: INTEGER;
 			flag, flag1: BOOLEAN;
 	BEGIN m := SHORT(SHORT(x^.obj^.adr)); n := 0;
 		IF ((m = sizefn) OR (m = lenfn)) & (OPB.verify # NIL) THEN
@@ -1269,7 +1269,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 
 	PROCEDURE Term(VAR x: OPT.Node);
 		VAR
-			y: OPT.Node; mulop: SHORTINT; name: OPS.Name; op: OPT.Object;
+			y: OPT.Node; mulop: SIGNED8; name: OPS.Name; op: OPT.Object;
 			b: BOOLEAN;
 	BEGIN
 		b := UndefFlag; UndefFlag := FALSE;
@@ -1288,7 +1288,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 
 	PROCEDURE SimpleExpression(VAR x: OPT.Node);
 		VAR
-			y: OPT.Node; addop : SHORTINT; name: OPS.Name; op: OPT.Object;
+			y: OPT.Node; addop : SIGNED8; name: OPS.Name; op: OPT.Object;
 			b: BOOLEAN;
 	BEGIN
 		b := UndefFlag; UndefFlag := FALSE;
@@ -1315,7 +1315,7 @@ MODULE OPP IN Oberon;	(** non-portable *)
 	END SimpleExpression;
 
 	PROCEDURE Expression(VAR x: OPT.Node);
-		VAR y: OPT.Node; obj: OPT.Object; relation: SHORTINT; name: OPS.Name;
+		VAR y: OPT.Node; obj: OPT.Object; relation: SIGNED8; name: OPS.Name;
 	BEGIN SimpleExpression(x);
 		IF (eql <= sym) & (sym <= geq) THEN
 			obj:=NIL; relation := sym; name:=OPS.name;
@@ -1356,11 +1356,11 @@ MODULE OPP IN Oberon;	(** non-portable *)
 
 		VAR proc, fwd: OPT.Object;
 			name: OPS.Name;
-			sysflag, mode, vis, prio: SHORTINT;
+			sysflag, mode, vis, prio: SIGNED8;
 			forward, init: BOOLEAN;
 			flags: SET;
 			scope: OPT.Object; redef: BOOLEAN;
-			selfname: OPS.Name; selftype, selfrec: OPT.Struct; selfmode: SHORTINT;
+			selfname: OPS.Name; selftype, selfrec: OPT.Struct; selfmode: SIGNED8;
 
 		PROCEDURE GetParam;	(* set link and typ *)
 		BEGIN
@@ -2086,7 +2086,7 @@ OPM.LogWStr("  failed");*)
 	END StatBlock;
 
 	PROCEDURE AddTraceCode(owner: OPT.Object;  VAR statseq: OPT.Node);
-	VAR  curScope, obj, last: OPT.Object;  x: OPT.Node;  name: OPS.Name;  i, m: SHORTINT;
+	VAR  curScope, obj, last: OPT.Object;  x: OPT.Node;  name: OPS.Name;  i, m: SIGNED8;
 	BEGIN
 		curScope := OPT.topScope;  OPT.topScope := OPT.modules[0];	(*switch to module scope*)
 		name := "trace";  i := 0;

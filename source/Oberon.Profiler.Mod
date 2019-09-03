@@ -141,7 +141,7 @@ PROCEDURE FindProcedure(pc: LONGINT; VAR low, hi: LONGINT; VAR name: ARRAY OF CH
 	VAR i, dummy, refstart, refpos, limit, oldprocstart, procstart: LONGINT; ch: CHAR; mod: Modules.Module;
 
 	PROCEDURE ReadNum (VAR pos: LONGINT; VAR i: LONGINT);
-		VAR n: LONGINT; s: SHORTINT; x: CHAR;
+		VAR n: LONGINT; s: SIGNED8; x: CHAR;
 	BEGIN
 		s := 0; n := 0; SYSTEM.GET(pos, x); INC(pos);
 		WHILE ORD(x) >= 128 DO INC(n, ASH(ORD(x) - 128, s)); INC(s, 7); SYSTEM.GET(pos, x); INC(pos) END;

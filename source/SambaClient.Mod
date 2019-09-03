@@ -824,7 +824,7 @@ END RecieveResponse;
 
 PROCEDURE CheckFFSMB(c: Connection): BOOLEAN;
 VAR
-	variable: SHORTINT;
+	variable: SIGNED8;
 BEGIN
 	c.in.RawSInt(variable);
 	IF variable = -1 THEN

@@ -99,12 +99,12 @@ TYPE
 			RETURN media
 		END GetMedia;
 
-		PROCEDURE IsMediumSupported*(medium: SHORTINT): BOOLEAN;
+		PROCEDURE IsMediumSupported*(medium: SIGNED8): BOOLEAN;
 		BEGIN
 			RETURN medium IN media
 		END IsMediumSupported;
 
-		PROCEDURE AddMedium*(medium: SHORTINT);
+		PROCEDURE AddMedium*(medium: SIGNED8);
 		BEGIN
 			IF medium IN {All, Aural, Braille, Embossed, Handheld, Print, Projection, Screen, TTY, TV} THEN
 				IF medium # All THEN EXCL(media, All) END;
@@ -208,7 +208,7 @@ TYPE
 	SimpleSelector* = OBJECT
 		VAR
 			next: SimpleSelector;
-			combinator: SHORTINT;
+			combinator: SIGNED8;
 			elementName: String;
 			subSelectors: Objects.Collection;
 
@@ -224,12 +224,12 @@ TYPE
 			RETURN next
 		END GetNext;
 
-		PROCEDURE GetCombinator*(): SHORTINT;
+		PROCEDURE GetCombinator*(): SIGNED8;
 		BEGIN
 			RETURN combinator
 		END GetCombinator;
 
-		PROCEDURE SetCombinator*(combinator: SHORTINT);
+		PROCEDURE SetCombinator*(combinator: SIGNED8);
 		BEGIN
 			IF combinator IN {Descendant, Child, Sibling} THEN
 				SELF.combinator := combinator
@@ -301,7 +301,7 @@ TYPE
 	Attribute* = OBJECT (SubSelector)
 		VAR
 			name, value: String;
-			relation: SHORTINT;
+			relation: SIGNED8;
 
 		PROCEDURE & Init*;
 		BEGIN
@@ -318,12 +318,12 @@ TYPE
 			SELF.name := NewString(name)
 		END SetName;
 
-		PROCEDURE GetRelation*(): SHORTINT;
+		PROCEDURE GetRelation*(): SIGNED8;
 		BEGIN
 			RETURN relation
 		END GetRelation;
 
-		PROCEDURE SetRelation*(relation: SHORTINT);
+		PROCEDURE SetRelation*(relation: SIGNED8);
 		BEGIN
 			IF relation IN {Equal, Includes, Dashmatch} THEN
 				SELF.relation := relation
@@ -477,12 +477,12 @@ CONST
 TYPE
 	Term* = OBJECT
 		VAR
-			operator, unaryOperator: SHORTINT;
-			type: SHORTINT;
+			operator, unaryOperator: SIGNED8;
+			type: SIGNED8;
 			intVal: LONGINT;
 			realVal: LONGREAL;
 			stringVal: String;
-			unit: SHORTINT;
+			unit: SIGNED8;
 			expr: Objects.Collection;	(* if term is a function *)
 
 		PROCEDURE & Init*;
@@ -513,36 +513,36 @@ TYPE
 			END
 		END Copy;*)
 
-		PROCEDURE GetOperator*(): SHORTINT;
+		PROCEDURE GetOperator*(): SIGNED8;
 		BEGIN
 			RETURN operator
 		END GetOperator;
 
-		PROCEDURE SetOperator*(operator: SHORTINT);
+		PROCEDURE SetOperator*(operator: SIGNED8);
 		BEGIN
 			IF (operator = Slash) OR (operator = Comma) THEN
 				SELF.operator := operator
 			END
 		END SetOperator;
 
-		PROCEDURE GetUnaryOperator*(): SHORTINT;
+		PROCEDURE GetUnaryOperator*(): SIGNED8;
 		BEGIN
 			RETURN unaryOperator
 		END GetUnaryOperator;
 
-		PROCEDURE SetUnaryOperator*(unaryOperator: SHORTINT);
+		PROCEDURE SetUnaryOperator*(unaryOperator: SIGNED8);
 		BEGIN
 			IF (unaryOperator = Minus) OR (unaryOperator = Plus) THEN
 				SELF.unaryOperator := unaryOperator
 			END
 		END SetUnaryOperator;
 
-		PROCEDURE GetType*(): SHORTINT;
+		PROCEDURE GetType*(): SIGNED8;
 		BEGIN
 			RETURN type
 		END GetType;
 
-		PROCEDURE SetType*(type: SHORTINT);
+		PROCEDURE SetType*(type: SIGNED8);
 		BEGIN
 			CASE type OF
 			| IntNumber, Color, Ident: realVal := 0.0; stringVal := NIL; unit := Undefined; expr := NIL
@@ -598,12 +598,12 @@ TYPE
 			RETURN (type = Ident) & (intVal = ident)
 		END IsIdent;
 
-		PROCEDURE GetUnit*(): SHORTINT;
+		PROCEDURE GetUnit*(): SIGNED8;
 		BEGIN
 			RETURN unit
 		END GetUnit;
 
-		PROCEDURE SetUnit*(unit: SHORTINT);
+		PROCEDURE SetUnit*(unit: SIGNED8);
 		BEGIN
 			IF unit IN {em, ex, px, in, cm, mm, pt, pc, deg, grad, rad, ms, s, Hz, kHz} THEN
 				SELF.unit := unit
@@ -664,7 +664,7 @@ TYPE
 	Page* = OBJECT
 	VAR
 		selector: String;
-		pseudoPage: SHORTINT;
+		pseudoPage: SIGNED8;
 		declarations: Objects.Collection;
 
 		PROCEDURE & Init*;
@@ -684,12 +684,12 @@ TYPE
 			SELF.selector := NewString(selector)
 		END SetSelector;
 
-		PROCEDURE GetPseudoPage*(): SHORTINT;
+		PROCEDURE GetPseudoPage*(): SIGNED8;
 		BEGIN
 			RETURN pseudoPage
 		END GetPseudoPage;
 
-		PROCEDURE SetPseudoPage*(pseudoPage: SHORTINT);
+		PROCEDURE SetPseudoPage*(pseudoPage: SIGNED8);
 		BEGIN
 			IF pseudoPage IN {Left, Right, First} THEN
 				SELF.pseudoPage := pseudoPage

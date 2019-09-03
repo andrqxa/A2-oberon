@@ -43,7 +43,7 @@ VAR
 	str: ARRAY 1024 OF CHAR;
 	tokenlen: INTEGER;  MaxLineLength*: LONGINT;  reservedCols: SET;
 	defaultFont: ARRAY 9 OF ARRAY 32 OF CHAR;
-	defaultColor: ARRAY 9 OF SHORTINT;
+	defaultColor: ARRAY 9 OF SIGNED8;
 	lcase, ucase: BOOLEAN;   (* true: recognize lowercase keywords *)
 	firstId: BOOLEAN;  n1: CHAR;
 CONST
@@ -101,7 +101,7 @@ VAR
 	N: Texts.Text;  W: Texts.Writer;   (* output text *)
 	newFile: ARRAY 256 OF CHAR;
 	lastch: CHAR;   (* last outpuct char *)
-	outsym: SHORTINT;   (* symbol for output *)
+	outsym: SIGNED8;   (* symbol for output *)
 	kw: BOOLEAN;  nossbp: ssBP;
 	tabw: INTEGER;   (* width of indentation TAB (in pixel) *)
 	spw: INTEGER;   (* width of pace char (in pixel) *)
@@ -118,28 +118,28 @@ VAR
 	END;
 	pc: BOOLEAN;   (* TRUE: a comment preceeding a statement/declaration *)
 	lowercase, uppercase, usecolors: BOOLEAN;   (* print keywords in lower case *)
-	curFont, tokCol: SHORTINT;  lastbp: BreakPoint;
+	curFont, tokCol: SIGNED8;  lastbp: BreakPoint;
 	lastNL: BreakPoint;   (* at this point occured the last NL in source file *)
 	expMark: BOOLEAN;  important: BOOLEAN;  isstring: BOOLEAN;  isextra: BOOLEAN;  inBreakLine, inPutComment, inAssComment: BOOLEAN;  lastLineStart: LONGINT;  noerr*: BOOLEAN;
 
 	fonts: ARRAY 9 OF RECORD
 		f: Fonts.Font;
-		cw: ARRAY 256 OF SHORTINT;
-		col: SHORTINT;
+		cw: ARRAY 256 OF SIGNED8;
+		col: SIGNED8;
 	END;
 
-	PROCEDURE strSym( s: SHORTINT ): BOOLEAN;
+	PROCEDURE strSym( s: SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN (s = number) OR (s = string) OR (s = ident)
 	END strSym;
 
-	PROCEDURE sSs( s: SHORTINT ): BOOLEAN;
+	PROCEDURE sSs( s: SIGNED8 ): BOOLEAN;
 	BEGIN
 		(* RETURN (s IN {and, eql..geq}) OR (s = becomes)	fails! bug in OOP2 Compiler for PowerPC! *)
 		RETURN ((s < 32) & (s IN {and, eql..geq})) OR (s = becomes)
 	END sSs;
 
-	PROCEDURE Ss( s: SHORTINT ): BOOLEAN;
+	PROCEDURE Ss( s: SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN (s = comma) OR (s = colon) OR (s = semicolon) OR (s = bar)
 	END Ss;
@@ -167,7 +167,7 @@ VAR
 		inCode := FALSE;
 	END LeaveCode;
 
-	PROCEDURE setFont( fn: SHORTINT );
+	PROCEDURE setFont( fn: SIGNED8 );
 	BEGIN
 		IF ~inAssComment & ~inCode THEN Texts.SetFont( W, fonts[fn].f );  curFont := fn END;
 	END setFont;
@@ -560,7 +560,7 @@ VAR
 		END;
 	END nextChar;
 
-	PROCEDURE Str( VAR sym: SHORTINT );
+	PROCEDURE Str( VAR sym: SIGNED8 );
 	VAR i: INTEGER;  och: CHAR;
 	BEGIN
 		instring := TRUE;  i := 0;  och := ch;
@@ -574,7 +574,7 @@ VAR
 		IF i = 1 THEN sym := number;  ELSE sym := string END;
 	END Str;
 
-	PROCEDURE Identifier( VAR sym: SHORTINT );
+	PROCEDURE Identifier( VAR sym: SIGNED8 );
 	BEGIN
 		REPEAT nextChar UNTIL ((ch < "0") OR ("9" < ch) & (CAP( ch ) < "A") OR ("Z" < CAP( ch ))) & (ch # "_");
 
@@ -696,11 +696,11 @@ VAR
 		END
 	END putc;
 
-	PROCEDURE Get*( VAR sym: SHORTINT );
-	VAR s: SHORTINT;  k: INTEGER;  read: BOOLEAN;
+	PROCEDURE Get*( VAR sym: SIGNED8 );
+	VAR s: SIGNED8;  k: INTEGER;  read: BOOLEAN;
 
 		PROCEDURE Comment;   (* do not read after end of file *)
-		VAR specialcolor: SHORTINT;
+		VAR specialcolor: SIGNED8;
 			fnt, number: ARRAY 64 OF CHAR;
 			size, cnt: LONGINT;
 
@@ -989,7 +989,7 @@ VAR
 		haveToken := TRUE;
 	END Get;
 
-	PROCEDURE LoadFont( n: INTEGER;  prefix: CHAR;  VAR col: SHORTINT ): Fonts.Font;
+	PROCEDURE LoadFont( n: INTEGER;  prefix: CHAR;  VAR col: SIGNED8 ): Fonts.Font;
 	VAR S: Texts.Scanner;
 		rname, fname: ARRAY 64 OF CHAR;
 		na: ARRAY 2 OF CHAR;

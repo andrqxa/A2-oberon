@@ -170,7 +170,7 @@ VAR
 		OpTabLen: LONGINT;		(* nof opcodes in the table *)
 		InstrTab: POINTER TO ARRAY OF InstrDesc;	(* Table with the instructions !!Hash *)
 		InstrTabLen: LONGINT;
-		SizeTab: ARRAY 17 OF SHORTINT;		(* size of the oberon types *)
+		SizeTab: ARRAY 17 OF SIGNED8;		(* size of the oberon types *)
 		TargetTab: ARRAY 32 OF RECORD  name: Name;  flag: SET  END;
 		TargetCount: LONGINT;
 
@@ -224,7 +224,7 @@ VAR
 
 	PROCEDURE ConstSize(i: LONGINT; signed: BOOLEAN):INTEGER;
 	BEGIN
-		IF (MIN(SHORTINT) <= i) & (MAX(SHORTINT) >= i) OR (~signed & (AND(i,LONGINT(0FFFFFF00H))=0)) THEN
+		IF (MIN(SIGNED8) <= i) & (MAX(SIGNED8) >= i) OR (~signed & (AND(i,LONGINT(0FFFFFF00H))=0)) THEN
 			RETURN(1)
 		ELSIF (MIN(INTEGER) <= i) & (MAX(INTEGER) >= i) OR (~signed & (AND(i,LONGINT(0FFFF0000H))=0))THEN
 			RETURN(2)
@@ -1084,7 +1084,7 @@ BEGIN
 	END
 END ModRM;
 
-PROCEDURE SIB(op: Operand): SHORTINT;
+PROCEDURE SIB(op: Operand): SIGNED8;
 	VAR val: LONGINT;
 BEGIN
 	IF op.index = 4 THEN 	(* ESP not allowed *)

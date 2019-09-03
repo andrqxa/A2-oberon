@@ -53,7 +53,7 @@ BEGIN
 END MatchFont;
 
 (* Delimit a paragraph: begins at lastnl and ends at end *)
-PROCEDURE GetPara(T: Texts.Text; VAR R: Texts.Reader; VAR beg, end: LONGINT; VAR typ: SHORTINT);
+PROCEDURE GetPara(T: Texts.Text; VAR R: Texts.Reader; VAR beg, end: LONGINT; VAR typ: SIGNED8);
 VAR ch, firstch: CHAR; firstfnt: Objects.Library; firstcol: INTEGER; lastnl: LONGINT;
 BEGIN
 	beg := Texts.Pos(R); end := beg; lastnl := beg;
@@ -178,7 +178,7 @@ BEGIN
 END GetPrefix;
 
 PROCEDURE ConvertText(T: Texts.Text; start: LONGINT; VAR filename: ARRAY OF CHAR);
-VAR R: Texts.Reader; beg, end, nbeg, nend: LONGINT; typ, ntyp: SHORTINT; body: BOOLEAN;
+VAR R: Texts.Reader; beg, end, nbeg, nend: LONGINT; typ, ntyp: SIGNED8; body: BOOLEAN;
 
 	PROCEDURE StartBody;
 	BEGIN
@@ -299,7 +299,7 @@ PROCEDURE Compile*;
 	VAR S: Texts.Scanner; T: Texts.Text; filename: ARRAY 64 OF CHAR; f: Files.File; beg, end, time: LONGINT;
 
 	PROCEDURE CompileT;
-		VAR R: Texts.Reader; beg, end: LONGINT; typ: SHORTINT;
+		VAR R: Texts.Reader; beg, end: LONGINT; typ: SIGNED8;
 				res, i: INTEGER; bak: ARRAY 64 OF CHAR;
 	BEGIN
 		IF T.len > 0 THEN

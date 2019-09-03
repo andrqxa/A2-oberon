@@ -29,7 +29,7 @@ TYPE
 	(** structure for writing deflated data in a file **)
 	Writer* = RECORD
 		res-: LONGINT;	(** current stream state **)
-		flush-: SHORTINT;	(** flush strategy **)
+		flush-: SIGNED8;	(** flush strategy **)
 		wrapper-: BOOLEAN;	(** if set, zlib header and checksum are generated **)
 		r: Files.Rider;	(* file rider *)
 		pos: LONGINT;	(* logical position in uncompressed input stream *)
@@ -40,7 +40,7 @@ TYPE
 
 
 (** change deflate parameters within the writer **)
-PROCEDURE SetParams*(VAR w: Writer; level, strategy, flush: SHORTINT);
+PROCEDURE SetParams*(VAR w: Writer; level, strategy, flush: SIGNED8);
 BEGIN
 	IF flush IN {NoFlush, SyncFlush, FullFlush} THEN
 		ZlibDeflate.SetParams(w.s, level, strategy);
@@ -52,7 +52,7 @@ BEGIN
 END SetParams;
 
 (** open writer on a Files.Rider **)
-PROCEDURE Open*(VAR w: Writer; level, strategy, flush: SHORTINT; wrapper: BOOLEAN; r: Files.Rider);
+PROCEDURE Open*(VAR w: Writer; level, strategy, flush: SIGNED8; wrapper: BOOLEAN; r: Files.Rider);
 BEGIN
 	IF flush IN {NoFlush, SyncFlush, FullFlush} THEN
 		w.flush := flush;
@@ -135,7 +135,7 @@ BEGIN
 END Close;
 
 (** compress srclen bytes from src to dst with specified level and strategy. dstlen returns how many bytes have been written. **)
-PROCEDURE Compress*(VAR src, dst: Files.Rider; srclen: LONGINT; VAR dstlen: LONGINT; level, strategy: SHORTINT; VAR crc32: LONGINT; VAR res: WORD);
+PROCEDURE Compress*(VAR src, dst: Files.Rider; srclen: LONGINT; VAR dstlen: LONGINT; level, strategy: SIGNED8; VAR crc32: LONGINT; VAR res: WORD);
 VAR
 	w: Writer; buf: ARRAY BufSize OF CHAR; totWritten, written, read: SIZE;
 BEGIN

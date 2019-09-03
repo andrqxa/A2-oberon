@@ -28,7 +28,7 @@ TYPE
 	Model* = OBJECT(Repositories.Component)
 	VAR
 		changed : BOOLEAN;
-		notificationMode : SHORTINT;
+		notificationMode : SIGNED8;
 		lock : Locks.RWLock;
 
 		PROCEDURE &Init*; (** protected *)
@@ -106,7 +106,7 @@ TYPE
 	(** Change notification *)
 
 		(** Set how the model notifies listeners upon value changes *)
-		PROCEDURE SetNotificationMode*(mode : SHORTINT);
+		PROCEDURE SetNotificationMode*(mode : SIGNED8);
 		BEGIN
 			ASSERT((mode = NoNotifications) OR (mode = OnChanged));
 			lock.AcquireWrite;

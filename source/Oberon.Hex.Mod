@@ -1086,7 +1086,7 @@ BEGIN
 			i := BIT.LOR(0, ORD(ch)); Texts.Read(R, ch);
 			i := ASH(ASH(BIT.LOR(i, ASH(ORD(ch), 8)), 16), -16);
 			Texts.WriteInt(W, i, 0)
-		ELSIF S.s = "SHORTINT" THEN
+		ELSIF S.s = "SIGNED8" THEN
 			Texts.WriteInt(W, ASH(ASH(ORD(ch), 24), -24), 0)
 		ELSIF S.s = "LONGINT (MSB)" THEN
 			i := BIT.LOR(0, ASH(ORD(ch),24)); Texts.Read(R, ch);
@@ -1244,7 +1244,7 @@ BEGIN
 		IF M.R # NIL THEN
 			AddItem(M.R, "LONGINT (LSB)");
 			AddItem(M.R, "INTEGER (LSB)");
-			AddItem(M.R, "SHORTINT");
+			AddItem(M.R, "SIGNED8");
 			AddItem(M.R, "NUM");
 			AddItem(M.R, "REAL");
 			AddItem(M.R, "LONGREAL");

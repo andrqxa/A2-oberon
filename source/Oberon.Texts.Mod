@@ -38,8 +38,8 @@ TYPE
       obj: Objects.Object;
       lib: Objects.Library;
       ref: INTEGER; (* ref no in obs lib *)
-      col: SHORTINT;
-      voff: SHORTINT;
+      col: SIGNED8;
+      voff: SIGNED8;
       prev, next: Piece
     END;
 
@@ -75,8 +75,8 @@ TYPE
       buf: ARRAY BufSize OF CHAR;
       bufpos, buflen: LONGINT;
       lib*: Objects.Library;	(** Library of last character/object read. *)
-      col*: SHORTINT;	(** Color index of last character read. *)
-      voff*: SHORTINT;	(** vertical offset of last character read. *)
+      col*: SIGNED8;	(** Color index of last character read. *)
+      voff*: SIGNED8;	(** vertical offset of last character read. *)
       eot*: BOOLEAN	(** Reader has reached end of the text stream. *)
     END;
 
@@ -88,7 +88,7 @@ TYPE
       x*: REAL;
       y*: LONGREAL;
       c*: CHAR;
-      len*: SHORTINT;	(** Length of name or string scanned. *)
+      len*: SIGNED8;	(** Length of name or string scanned. *)
       s*: ARRAY 256 OF CHAR;
       obj*: Objects.Object
     END;
@@ -104,8 +104,8 @@ TYPE
       R: Files.Rider;
       buf*: Buffer;	(** Associated buffer. *)
       lib*: Objects.Library;	(** Current font/library of characters written. *)
-      col*: SHORTINT;	(** Current color of text being written. *)
-      voff*: SHORTINT	(** Current vertical offset of text being written. *)
+      col*: SIGNED8;	(** Current color of text being written. *)
+      voff*: SIGNED8	(** Current vertical offset of text being written. *)
     END;
 
   VAR TextBlockId* (** First character of a text block. *), DocBlockId, NoSpex, NoSpex2, TextSpex: CHAR;
@@ -148,7 +148,7 @@ TYPE
       R, S: Files.Rider;
       Q, q, p: Piece;
       hlen, tlen, flen, off: LONGINT;
-      N, lib: SHORTINT;
+      N, lib: SIGNED8;
       type, ref, tag: CHAR;
       LName: ARRAY 256 OF CHAR;
       Dict: ARRAY 64 OF Objects.Library;
@@ -250,7 +250,7 @@ TYPE
       R, W: Files.Rider;
       hlen, flen, rlen, m: LONGINT;
       id, i: INTEGER;
-      N, n: SHORTINT;
+      N, n: SIGNED8;
       type, ch: CHAR;
       obj: Objects.Object;
       M: Objects.BindMsg;
@@ -491,7 +491,7 @@ TYPE
   END Replace;
 
 (** Change character attributes within stretch [beg, end[ of text T. sel selects the attributes to be changed: 0, 1, 2 IN sel = fnt, col, voff selected. *)
-  PROCEDURE ChangeLooks* (T: Text; beg, end: LONGINT; sel: SET; lib: Objects.Library; col, voff: SHORTINT);
+  PROCEDURE ChangeLooks* (T: Text; beg, end: LONGINT; sel: SET; lib: Objects.Library; col, voff: SIGNED8);
     VAR pb, pe, p: Piece; org: LONGINT; M: UpdateMsg; A: Objects.AttrMsg;
   BEGIN
     IF beg < end THEN
@@ -839,12 +839,12 @@ information about the last character read. *)
   END SetFont;
 
 (** Set writer W to color col. *)
-  PROCEDURE SetColor* (VAR W: Writer; col: SHORTINT);
+  PROCEDURE SetColor* (VAR W: Writer; col: SIGNED8);
   BEGIN W.col := col
   END SetColor;
 
 (** Set writer W to vertical offset voff. Vertical offset controls the writing of super- and sub-scripts. *)
-  PROCEDURE SetOffset* (VAR W: Writer; voff: SHORTINT);
+  PROCEDURE SetOffset* (VAR W: Writer; voff: SIGNED8);
   BEGIN W.voff := voff
   END SetOffset;
 

@@ -155,7 +155,7 @@ TYPE
 		(* Constructor *)
 		PROCEDURE &Init*;
 		VAR
-			i: SHORTINT;
+			i: SIGNED8;
 
 		BEGIN
 			NEW(idct);
@@ -1634,7 +1634,7 @@ TYPE
 
 		(* MPEG-1 only !! *)
 		PROCEDURE DecodeBlock(
-			nr: SHORTINT;
+			nr: SIGNED8;
 			coeffs: Util.PointerToArrayOfLONGINT;
 			intra: BOOLEAN;
 			VAR qScale: LONGINT;
@@ -1758,7 +1758,7 @@ TYPE
 		END DecodeBlock;
 
 		PROCEDURE DecodeBlock2(
-			nr: SHORTINT;
+			nr: SIGNED8;
 			coeffs:Util.PointerToArrayOfLONGINT;
 			intra: BOOLEAN;
 			VAR qScale: LONGINT;

@@ -573,10 +573,10 @@ TYPE
 		HostControl1 * {ALIGNED(1)},
 		PowerControl * {ALIGNED(1)},
 		BlockGapControl * {ALIGNED(1)},
-		WakeupControl * {ALIGNED(1)}: SHORTINT;
+		WakeupControl * {ALIGNED(1)}: SIGNED8;
 		ClockControl * {ALIGNED(1)}: INTEGER;
 		TimeoutControl * {ALIGNED(1)},
-		SoftwareReset * {ALIGNED(1)}: SHORTINT;
+		SoftwareReset * {ALIGNED(1)}: SIGNED8;
 		InterruptStatus * {ALIGNED(1)},
 		InterruptStatusEnable * {ALIGNED(1)},
 		InterruptSignalEnable * {ALIGNED(1)}: SET;
@@ -586,8 +586,8 @@ TYPE
 		MaximumCurrentCapabilities * {ALIGNED(1)}: HUGEINT;
 		ForceEventAutoCmdErrorStatus * {ALIGNED(1)},
 		ForceEventErrorInterruptStatus * {ALIGNED(1)}: INTEGER;
-		AdmaErrorStatus * {ALIGNED(1)}: SHORTINT;
-		padding0 * {ALIGNED(1)}: ARRAY 3 OF SHORTINT;
+		AdmaErrorStatus * {ALIGNED(1)}: SIGNED8;
+		padding0 * {ALIGNED(1)}: ARRAY 3 OF SIGNED8;
 		AdmaSystemAddress * {ALIGNED(1)}: HUGEINT;
 		PresetValues * {ALIGNED(1)}: ARRAY 8 OF INTEGER;
 		padding1 * {ALIGNED(1)}: ARRAY 28 OF LONGINT;
@@ -630,7 +630,7 @@ VAR
 		SetTimeout(hc, 100);*)
 
 		(* Power select 3.3V bus voltage *)
-		hc.regs.PowerControl :=  SYSTEM.VAL(SHORTINT, PowerControl_SDBusVoltage_33 + {PowerControl_SDBusPower});
+		hc.regs.PowerControl :=  SYSTEM.VAL(SIGNED8, PowerControl_SDBusVoltage_33 + {PowerControl_SDBusPower});
 
 		(* Enable All Interrupts *)
 		hc.regs.InterruptStatusEnable := Interrupt_All;
@@ -655,7 +655,7 @@ VAR
 		IF TxDma THEN
 			IF (Capabilities_ADMA2 IN hc.regs.Capabilities[0]) THEN
 				hc.transfer := ExecuteAdmaCommand;
-				hc.regs.HostControl1 := SYSTEM.VAL(SHORTINT, SYSTEM.VAL(SET, LONGINT(hc.regs.HostControl1)) + HostControl1_DmaSelect_32Adma);
+				hc.regs.HostControl1 := SYSTEM.VAL(SIGNED8, SYSTEM.VAL(SET, LONGINT(hc.regs.HostControl1)) + HostControl1_DmaSelect_32Adma);
 			ELSE
 				(*! ADMA1 and SDMA are not implemented yet *)
 				hc.transfer := ExecuteDataCommand
@@ -739,7 +739,7 @@ VAR
 		ELSE
 			EXCL(reg, HostControl1_LedControl)
 		END;
-		hc.regs.HostControl1 := SYSTEM.VAL(SHORTINT, reg)
+		hc.regs.HostControl1 := SYSTEM.VAL(SIGNED8, reg)
 	END SetLedState;
 
 	(** Get the state of the busy LED *)
@@ -942,7 +942,7 @@ VAR
 		hc.regs.InterruptStatus := {Interrupt_Normal_TransferComplete};
 
 		(*DEC(hc.regs.ClockControl, LSH(1, ClockControl_SdClockEnable));
-		hc.regs.SoftwareReset := SYSTEM.VAL(SHORTINT, {SoftwareResetCmd, SoftwareResetDat});
+		hc.regs.SoftwareReset := SYSTEM.VAL(SIGNED8, {SoftwareResetCmd, SoftwareResetDat});
 		REPEAT UNTIL hc.regs.SoftwareReset = 0;
 		INC(hc.regs.ClockControl, LSH(1, ClockControl_SdClockEnable));*)
 
@@ -1482,7 +1482,7 @@ VAR
 	(** Reset command and/or data lines of a host controller *)
 	PROCEDURE Reset (hc: HostController; cmd, dat: BOOLEAN): BOOLEAN;
 	VAR
-		val: SHORTINT;
+		val: SIGNED8;
 	BEGIN
 		IF cmd & dat THEN
 			val := SoftwareResetAll
@@ -1548,7 +1548,7 @@ VAR
 		val := 0;
 		WHILE (val < 15) & (LSH(LONGINT(1), val) < ratio) DO INC(val) END;
 		ASSERT(LSH(LONGINT(1), val) >= ratio);
-		hc.regs.TimeoutControl := SYSTEM.VAL(SHORTINT, val);
+		hc.regs.TimeoutControl := SYSTEM.VAL(SIGNED8, val);
 		INCL(hc.regs.InterruptStatusEnable, Interrupt_Error_DataTimeout)
 	END SetTimeout;
 
@@ -1592,7 +1592,7 @@ VAR
 			 1: EXCL(SYSTEM.VAL(SET, val), HostControl1_DataTransferWidth)
 			|4: INCL(SYSTEM.VAL(SET, val), HostControl1_DataTransferWidth)
 		END;
-		hc.regs.HostControl1 := SHORTINT(val);
+		hc.regs.HostControl1 := SIGNED8(val);
 
 		(* 6: SD card only *)
 		(* 8 *)
@@ -2295,7 +2295,7 @@ TYPE
 		ELSE
 			EXCL(val, HostControl1_HighSpeedEnable)
 		END;
-		card.hc.regs.HostControl1 := SYSTEM.VAL(SHORTINT, val);
+		card.hc.regs.HostControl1 := SYSTEM.VAL(SIGNED8, val);
 		RETURN TRUE
 	END SelectSpeedMode;
 
@@ -2523,13 +2523,13 @@ TYPE
 
 			Log.String("[SD] 	BufferData: 0x"); Log.Hex(regs.BufferData,-SIZEOF(LONGINT)*2); Log.Ln;
 			Log.String("[SD] 	PresentState: "); Log.Set(regs.PresentState); Log.Ln;
-			Log.String("[SD] 	HostControl1: 0x"); Log.Hex(regs.HostControl1,-SIZEOF(SHORTINT)*2); Log.Ln;
-			Log.String("[SD] 	PowerControl: 0x"); Log.Hex(regs.PowerControl,-SIZEOF(SHORTINT)*2); Log.Ln;
-			Log.String("[SD] 	BlockGapControl: 0x"); Log.Hex(regs.BlockGapControl,-SIZEOF(SHORTINT)*2); Log.Ln;
-			Log.String("[SD] 	WakeupControl: 0x"); Log.Hex(regs.WakeupControl,-SIZEOF(SHORTINT)*2); Log.Ln;
+			Log.String("[SD] 	HostControl1: 0x"); Log.Hex(regs.HostControl1,-SIZEOF(SIGNED8)*2); Log.Ln;
+			Log.String("[SD] 	PowerControl: 0x"); Log.Hex(regs.PowerControl,-SIZEOF(SIGNED8)*2); Log.Ln;
+			Log.String("[SD] 	BlockGapControl: 0x"); Log.Hex(regs.BlockGapControl,-SIZEOF(SIGNED8)*2); Log.Ln;
+			Log.String("[SD] 	WakeupControl: 0x"); Log.Hex(regs.WakeupControl,-SIZEOF(SIGNED8)*2); Log.Ln;
 			Log.String("[SD] 	ClockControl: 0x"); Log.Hex(regs.ClockControl,-SIZEOF(INTEGER)*2); Log.Ln;
-			Log.String("[SD] 	TimeoutControl: 0x"); Log.Hex(regs.TimeoutControl,-SIZEOF(SHORTINT)*2); Log.Ln;
-			Log.String("[SD] 	SoftwareReset: 0x"); Log.Hex(regs.SoftwareReset,-SIZEOF(SHORTINT)*2); Log.Ln;
+			Log.String("[SD] 	TimeoutControl: 0x"); Log.Hex(regs.TimeoutControl,-SIZEOF(SIGNED8)*2); Log.Ln;
+			Log.String("[SD] 	SoftwareReset: 0x"); Log.Hex(regs.SoftwareReset,-SIZEOF(SIGNED8)*2); Log.Ln;
 			Log.String("[SD] 	InterruptStatus: "); Log.Set(regs.InterruptStatus); Log.Ln;
 			Log.String("[SD] 	InterruptStatusEnable: "); Log.Set(regs.InterruptStatusEnable); Log.Ln;
 			Log.String("[SD] 	InterruptSignalEnable: "); Log.Set(regs.InterruptSignalEnable); Log.Ln;
@@ -2543,7 +2543,7 @@ TYPE
 			(*Log.String("[SD] 	MaximumCurrentCapabilities: 0x"); Log.Hex(regs.MaximumCurrentCapabilities,-SIZEOF(HUGEINT)*2); Log.Ln;
 			Log.String("[SD] 	ForceEventAutoCmdErrorStatus: 0x"); Log.Hex(regs.ForceEventAutoCmdErrorStatus,-SIZEOF(INTEGER)*2); Log.Ln;
 			Log.String("[SD] 	ForceEventErrorInterruptStatus: 0x"); Log.Hex(regs.ForceEventErrorInterruptStatus,-SIZEOF(INTEGER)*2); Log.Ln;
-			Log.String("[SD] 	AdmaErrorStatus: 0x"); Log.Hex(regs.AdmaErrorStatus,-SIZEOF(SHORTINT)*2); Log.Ln;
+			Log.String("[SD] 	AdmaErrorStatus: 0x"); Log.Hex(regs.AdmaErrorStatus,-SIZEOF(SIGNED8)*2); Log.Ln;
 			Log.String("[SD] 	AdmaSystemAddress: 0x"); Log.Hex(regs.AdmaSystemAddress,-SIZEOF(HUGEINT)*2); Log.Ln;*)
 
 			Log.String("[SD] 	PresetValues: 0x");

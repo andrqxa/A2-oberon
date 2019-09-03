@@ -27,7 +27,7 @@ VAR
 
 		(* Write flag values. *)
 		PROCEDURE Flags( w: Streams.Writer;  s: SET );
-		VAR i: SHORTINT;  ch: CHAR;
+		VAR i: SIGNED8;  ch: CHAR;
 		BEGIN
 			FOR i := 0 TO 11 DO
 				ch := flags[i];

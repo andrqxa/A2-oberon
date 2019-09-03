@@ -259,7 +259,7 @@ TYPE
 				1H : w.String("BYTE")
 				| 2H : w.String("BOOLEAN")
 				| 3H : w.String("CHAR")
-				| 4H : w.String("SHORTINT")
+				| 4H : w.String("SIGNED8")
 				| 5H : w.String("INTEGER")
 				| 6H : w.String("LONGINT")
 				| 7H : w.String("REAL")

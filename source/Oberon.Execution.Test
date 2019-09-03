@@ -96,7 +96,7 @@ positive: Shortint stored in PAF
 	MODULE Test;
 
 	PROCEDURE Shortint;
-	VAR a,b: SHORTINT;
+	VAR a,b: SIGNED8;
 	BEGIN
 		a := 13;
 		b := a;
@@ -733,7 +733,7 @@ positive: relational operations on characters
 positive: relational operations on short integers
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN
 		value := 5;
 		ASSERT (value = 5); ASSERT (~(value = 6)); ASSERT (value = value);
@@ -849,7 +849,7 @@ positive: relational operations on character arrays
 positive: negation on short integers
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN value := 5; ASSERT (-value = -5); ASSERT (-(-value) = 5); ASSERT (-(-value) = value)
 	END Test.
 
@@ -901,7 +901,7 @@ positive: negation on sets
 positive: absolute value of short integer
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN
 		value := 5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = value); ASSERT (ABS (-value) = value);
 		value := -5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = -value); ASSERT (ABS (-value) = -value);
@@ -1047,7 +1047,7 @@ positive: ordinal value of character
 positive: character value of short integer
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN
 		value := ORD ('0'); ASSERT (CHR (value) = '0');
 		value := ORD ('9'); ASSERT (CHR (value) = '9');
@@ -1102,7 +1102,7 @@ positive: character value of huge integer
 positive: short integer as set element
 
 	MODULE Test;
-	VAR element: SHORTINT; set: SET;
+	VAR element: SIGNED8; set: SET;
 	BEGIN
 		element := MIN (SET); set := {element}; ASSERT (element IN set); ASSERT (set - {element} = {});
 		element := MIN (SET) + 2; set := {element}; ASSERT (element IN set); ASSERT (set - {element} = {});
@@ -1113,21 +1113,21 @@ positive: short integer as set element
 negative: short integer as too small set element
 
 	MODULE Test;
-	VAR element: SHORTINT; set: SET;
+	VAR element: SIGNED8; set: SET;
 	BEGIN element := MIN (SET) - 1; set := {element};
 	END Test.
 
 negative: short integer as too large set element
 
 	MODULE Test;
-	VAR element: SHORTINT; set: SET;
+	VAR element: SIGNED8; set: SET;
 	BEGIN element := MAX (SET) + 1; set := {element};
 	END Test.
 
 positive: short integer as first set element
 
 	MODULE Test;
-	VAR element: SHORTINT; set: SET;
+	VAR element: SIGNED8; set: SET;
 	BEGIN
 		element := MIN (SET); set := {element .. MAX (SET)}; ASSERT (element IN set); ASSERT (set = {MIN (SET) .. MAX (SET)}); ASSERT (-set = {});
 		element := MIN (SET); set := {element .. MIN (SET)}; ASSERT (element IN set); ASSERT (set = {MIN (SET) .. MIN (SET)}); ASSERT (set = {element}); ASSERT (set = {MIN (SET)});
@@ -1138,21 +1138,21 @@ positive: short integer as first set element
 negative: short integer as too small first set element
 
 	MODULE Test;
-	VAR element: SHORTINT; set: SET;
+	VAR element: SIGNED8; set: SET;
 	BEGIN element := MIN (SET) - 1;set := {element .. MAX (SET)};
 	END Test.
 
 negative: short integer as too large first set element
 
 	MODULE Test;
-	VAR element: SHORTINT; set: SET;
+	VAR element: SIGNED8; set: SET;
 	BEGIN element := MAX (SET) + 1;set := {element .. MAX (SET)};
 	END Test.
 
 positive: short integer as last set element
 
 	MODULE Test;
-	VAR element: SHORTINT; set: SET;
+	VAR element: SIGNED8; set: SET;
 	BEGIN
 		element := MAX (SET); set := {MIN (SET) .. element}; ASSERT (element IN set); ASSERT (set = {MIN (SET) .. MAX (SET)}); ASSERT (-set = {});
 		element := MAX (SET); set := {MAX (SET) .. element}; ASSERT (element IN set); ASSERT (set = {MAX (SET) .. MAX (SET)}); ASSERT (set = {MAX (SET)});
@@ -1163,21 +1163,21 @@ positive: short integer as last set element
 negative: short integer as too small last set element
 
 	MODULE Test;
-	VAR element: SHORTINT; set: SET;
+	VAR element: SIGNED8; set: SET;
 	BEGIN element := MIN (SET) - 1;set := {MIN (SET) .. element};
 	END Test.
 
 negative: short integer as too large last set element
 
 	MODULE Test;
-	VAR element: SHORTINT; set: SET;
+	VAR element: SIGNED8; set: SET;
 	BEGIN element := MAX (SET) + 1;set := {MIN (SET) .. element};
 	END Test.
 
 positive: short integers as set elements
 
 	MODULE Test;
-	VAR first, last: SHORTINT; set: SET;
+	VAR first, last: SIGNED8; set: SET;
 	BEGIN
 		first := MIN (SET); last := MAX (SET); set := {first .. last}; ASSERT (set = {MIN (SET) .. MAX (SET)});
 		ASSERT (first IN set); ASSERT (last IN set); ASSERT (-set = {});
@@ -1455,7 +1455,7 @@ positive: huge integers as set elements
 positive: odd test on short integer
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN
 		value := 0; ASSERT (~ODD (value)); ASSERT (ODD (value + 1));
 		value := 5; ASSERT (ODD (value)); ASSERT (~ODD (value + 1));
@@ -1498,7 +1498,7 @@ positive: odd test on huge integer
 positive: long on short integer
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN value := 11H; ASSERT (LONG (value) = 11H); ASSERT (LONG (value) = LONG (11H));
 	END Test.
 
@@ -1567,13 +1567,13 @@ positive: entier on long reals
 positive: addition on short integers
 
 	MODULE Test;
-	VAR a, b: SHORTINT;
+	VAR a, b: SIGNED8;
 	BEGIN
 		a := 3; b := 2; ASSERT (a + b = +5); ASSERT (a + b = 3 + 2);
 		a := -3; b := 2; ASSERT (a + b = -1); ASSERT (a + b = (-3) + 2);
 		a := 3; b := -2; ASSERT (a + b = +1); ASSERT (a + b = 3 + (-2));
 		a := -3; b := -2; ASSERT (a + b = -5); ASSERT (a + b = (-3) + (-2));
-		a := MAX (SHORTINT); b := MIN (SHORTINT) + 1; ASSERT (a + b = 0); ASSERT (a + b = MAX (SHORTINT) + MIN (SHORTINT) + 1);
+		a := MAX (SIGNED8); b := MIN (SIGNED8) + 1; ASSERT (a + b = 0); ASSERT (a + b = MAX (SIGNED8) + MIN (SIGNED8) + 1);
 	END Test.
 
 positive: addition on integers
@@ -1637,13 +1637,13 @@ positive: addition on long reals
 positive: subtraction on short integers
 
 	MODULE Test;
-	VAR a, b: SHORTINT;
+	VAR a, b: SIGNED8;
 	BEGIN
 		a := 3; b := 2; ASSERT (a - b = +1); ASSERT (a - b = 3 - 2);
 		a := -3; b := 2; ASSERT (a - b = -5); ASSERT (a - b = (-3) - 2);
 		a := 3; b := -2; ASSERT (a - b = +5); ASSERT (a - b = 3 - (-2));
 		a := -3; b := -2; ASSERT (a - b = -1); ASSERT (a - b = (-3) - (-2));
-		a := MIN (SHORTINT) + 1; b := MAX (SHORTINT); ASSERT (a - b = 2); ASSERT (a - b = SHORT (INTEGER(MIN (SHORTINT) + 1 - MAX (SHORTINT))));
+		a := MIN (SIGNED8) + 1; b := MAX (SIGNED8); ASSERT (a - b = 2); ASSERT (a - b = SHORT (INTEGER(MIN (SIGNED8) + 1 - MAX (SIGNED8))));
 	END Test.
 
 positive: subtraction on integers
@@ -1708,13 +1708,13 @@ positive: subtraction on long reals
 positive: multiplication on short integers
 
 	MODULE Test;
-	VAR a, b: SHORTINT;
+	VAR a, b: SIGNED8;
 	BEGIN
 		a := 3; b := 2; ASSERT (a * b = +6); ASSERT (a * b = 3 * 2);
 		a := -3; b := 2; ASSERT (a * b = -6); ASSERT (a * b = (-3) * 2);
 		a := 3; b := -2; ASSERT (a * b = -6); ASSERT (a * b = 3 * (-2));
 		a := -3; b := -2; ASSERT (a * b = +6); ASSERT (a * b = (-3) * (-2));
-		a := MAX (SHORTINT); b := MAX (SHORTINT); ASSERT (a * b = 1); ASSERT (a * b = SHORT (INTEGER(MAX (SHORTINT) * MAX (SHORTINT))));
+		a := MAX (SIGNED8); b := MAX (SIGNED8); ASSERT (a * b = 1); ASSERT (a * b = SHORT (INTEGER(MAX (SIGNED8) * MAX (SIGNED8))));
 	END Test.
 
 positive: multiplication on integers
@@ -1779,19 +1779,19 @@ positive: multiplication on long reals
 positive: integer division on short integers with positive divisor
 
 	MODULE Test;
-	VAR a, b: SHORTINT;
+	VAR a, b: SIGNED8;
 	BEGIN
 		a := 3; b := 2; ASSERT (a DIV b = +1); ASSERT (a DIV b = 3 DIV 2);
 		a := -3; b := 2; ASSERT (a DIV b = -2); ASSERT (a DIV b = (-3) DIV 2);
 		a := 2; b := 3; ASSERT (a DIV b = +0); ASSERT (a DIV b = 2 DIV 3);
 		a := -2; b := 3; ASSERT (a DIV b = -1); ASSERT (a DIV b = (-2) DIV 3);
-		a := MAX (SHORTINT); b := MAX (SHORTINT); ASSERT (a DIV b = 1); ASSERT (a DIV b = MAX (SHORTINT) DIV MAX (SHORTINT));
+		a := MAX (SIGNED8); b := MAX (SIGNED8); ASSERT (a DIV b = 1); ASSERT (a DIV b = MAX (SIGNED8) DIV MAX (SIGNED8));
 	END Test.
 
 negative: integer division on short integers with negative divisor
 
 	MODULE Test;
-	VAR a, b, c: SHORTINT;
+	VAR a, b, c: SIGNED8;
 	BEGIN
 		a := 3; b := -2; c := a DIV b;
 	END Test.
@@ -1799,7 +1799,7 @@ negative: integer division on short integers with negative divisor
 negative: integer division by zero on short integer
 
 	MODULE Test;
-	VAR a, b, r: SHORTINT;
+	VAR a, b, r: SIGNED8;
 	BEGIN a := 3; b := 0; r := a DIV b;
 	END Test.
 
@@ -1888,7 +1888,7 @@ negative: integer division by zero on huge integer
 positive: real division on short integers
 
 	MODULE Test;
-	VAR a, b: SHORTINT;
+	VAR a, b: SIGNED8;
 	BEGIN a := 3; b := 2; ASSERT (a / b = 1.5); ASSERT (a / b = 3 / 2);
 	END Test.
 
@@ -1930,19 +1930,19 @@ positive: real division on long reals
 positive: modulo on short integers
 
 	MODULE Test;
-	VAR a, b: SHORTINT;
+	VAR a, b: SIGNED8;
 	BEGIN
 		a := 3; b := 2; ASSERT (a MOD b = +1); ASSERT (3 MOD b = +1); ASSERT (a MOD 2 = +1); ASSERT (a MOD b = 3 MOD 2);
 		a := -3; b := 2; ASSERT (a MOD b = +1); ASSERT ((-3) MOD b = +1); ASSERT (a MOD 2 = +1); ASSERT (a MOD b = (-3) MOD 2);
 		a := 2; b := 3; ASSERT (a MOD b = +2); ASSERT (2 MOD b = +2); ASSERT (a MOD 3 = +2); ASSERT (a MOD b = 2 MOD 3);
 		a := -2; b := 3; ASSERT (a MOD b = 1); ASSERT ((-2) MOD b = 1); ASSERT (a MOD 3 = 1); ASSERT (a MOD b = (-2) MOD 3);
-		a := MAX (SHORTINT); b := MAX (SHORTINT); ASSERT (a MOD b = 0); ASSERT (a MOD b = MAX (SHORTINT) MOD MAX (SHORTINT));
+		a := MAX (SIGNED8); b := MAX (SIGNED8); ASSERT (a MOD b = 0); ASSERT (a MOD b = MAX (SIGNED8) MOD MAX (SIGNED8));
 	END Test.
 
 negative: modulo by zero on short integer
 
 	MODULE Test;
-	VAR a, b, r: SHORTINT;
+	VAR a, b, r: SIGNED8;
 	BEGIN a := 3; b := 0; r := a MOD b;
 	END Test.
 
@@ -2007,7 +2007,7 @@ negative: modulo by zero on huge integer
 positive: arithmetic shift on short integer
 
 	MODULE Test;
-	VAR a, b: SHORTINT;
+	VAR a, b: SIGNED8;
 	BEGIN
 		a := 6; b := 2; ASSERT (ASH (a, b) = 24); ASSERT (ASH (a, b) = ASH (a, 2)); ASSERT (ASH (a, b) = ASH (6, 2));
 		a := 6; b := 0; ASSERT (ASH (a, b) = 6); ASSERT (ASH (a, b) = ASH (a, 0)); ASSERT (ASH (a, b) = ASH (6, 0));
@@ -5373,7 +5373,7 @@ positive: string assignment on too short open variable array of character parame
 positive: increment statement with short integers
 
 	MODULE Test;
-	VAR a, b, c: SHORTINT;
+	VAR a, b, c: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4;
 		INC (a); ASSERT (a = 1); DEC (a); ASSERT (a = 0);
 		INC (a, 2); ASSERT (a = 2); INC (a, -2); ASSERT (a = 0);
@@ -5384,7 +5384,7 @@ positive: increment statement with short integers
 positive: increment statement with integers
 
 	MODULE Test;
-	VAR a, b: INTEGER; c: SHORTINT;
+	VAR a, b: INTEGER; c: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4;
 		INC (a); ASSERT (a = 1); DEC (a); ASSERT (a = 0);
 		INC (a, 2); ASSERT (a = 2); INC (a, -2); ASSERT (a = 0);
@@ -5395,7 +5395,7 @@ positive: increment statement with integers
 positive: increment statement with long integers
 
 	MODULE Test;
-	VAR a, b: LONGINT; c: INTEGER; d: SHORTINT;
+	VAR a, b: LONGINT; c: INTEGER; d: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5;
 		INC (a); ASSERT (a = 1); DEC (a); ASSERT (a = 0);
 		INC (a, 2); ASSERT (a = 2); INC (a, -2); ASSERT (a = 0);
@@ -5407,7 +5407,7 @@ positive: increment statement with long integers
 positive: increment statement with huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT; c: LONGINT; d: INTEGER; e: SHORTINT;
+	VAR a, b: HUGEINT; c: LONGINT; d: INTEGER; e: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5; e := -6;
 		INC (a); ASSERT (a = 1); DEC (a); ASSERT (a = 0);
 		INC (a, 2); ASSERT (a = 2); INC (a, -2); ASSERT (a = 0);
@@ -5423,7 +5423,7 @@ positive: increment statement with huge integers
 positive: decrement statement with short integers
 
 	MODULE Test;
-	VAR a, b, c: SHORTINT;
+	VAR a, b, c: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4;
 		DEC (a); ASSERT (a = -1); INC (a); ASSERT (a = 0);
 		DEC (a, 2); ASSERT (a = -2); DEC (a, -2); ASSERT (a = 0);
@@ -5434,7 +5434,7 @@ positive: decrement statement with short integers
 positive: decrement statement with integers
 
 	MODULE Test;
-	VAR a, b: INTEGER; c: SHORTINT;
+	VAR a, b: INTEGER; c: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4;
 		DEC (a); ASSERT (a = -1); INC (a); ASSERT (a = 0);
 		DEC (a, 2); ASSERT (a = -2); DEC (a, -2); ASSERT (a = 0);
@@ -5445,7 +5445,7 @@ positive: decrement statement with integers
 positive: decrement statement with long integers
 
 	MODULE Test;
-	VAR a, b: LONGINT; c: INTEGER; d: SHORTINT;
+	VAR a, b: LONGINT; c: INTEGER; d: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5;
 		DEC (a); ASSERT (a = -1); INC (a); ASSERT (a = 0);
 		DEC (a, 2); ASSERT (a = -2); DEC (a, -2); ASSERT (a = 0);
@@ -5457,7 +5457,7 @@ positive: decrement statement with long integers
 positive: decrement statement with huge integers
 
 	MODULE Test;
-	VAR a, b: HUGEINT; c: LONGINT; d: INTEGER; e: SHORTINT;
+	VAR a, b: HUGEINT; c: LONGINT; d: INTEGER; e: SIGNED8;
 	BEGIN a := 0; b := 3; c := -4; d := 5; e := -6;
 		DEC (a); ASSERT (a = -1); INC (a); ASSERT (a = 0);
 		DEC (a, 2); ASSERT (a = -2); DEC (a, -2); ASSERT (a = 0);
@@ -5473,7 +5473,7 @@ positive: decrement statement with huge integers
 positive: include statement with short integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: SHORTINT;
+	VAR set: SET; element: SIGNED8;
 	BEGIN
 		set := {}; element := MIN (SET); INCL (set, element); ASSERT (set = {element}); ASSERT (set = {MIN (SET)}); ASSERT (element IN set);
 		set := {}; element := MAX (SET); INCL (set, element); ASSERT (set = {element}); ASSERT (set = {MAX (SET)}); ASSERT (element IN set);
@@ -5484,14 +5484,14 @@ positive: include statement with short integer as set element
 negative: include statement with too small short integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: SHORTINT;
+	VAR set: SET; element: SIGNED8;
 	BEGIN set := {}; element := MIN (SET) - 1; INCL (set, element);
 	END Test.
 
 negative: include statement with too large short integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: SHORTINT;
+	VAR set: SET; element: SIGNED8;
 	BEGIN set := {}; element := MAX (SET) + 1; INCL (set, element);
 	END Test.
 
@@ -5576,7 +5576,7 @@ negative: include statement with too large huge integer as set element
 positive: exclude statement with short integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: SHORTINT;
+	VAR set: SET; element: SIGNED8;
 	BEGIN
 		set := {}; element := MIN (SET); EXCL (set, element); ASSERT (set = {}); ASSERT (~(element IN set));
 		set := {}; element := MAX (SET); EXCL (set, element); ASSERT (set = {}); ASSERT (~(element IN set));
@@ -5587,14 +5587,14 @@ positive: exclude statement with short integer as set element
 negative: exclude statement with too small short integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: SHORTINT;
+	VAR set: SET; element: SIGNED8;
 	BEGIN set := {}; element := MIN (SET) - 1; EXCL (set, element);
 	END Test.
 
 negative: exclude statement with too large short integer as set element
 
 	MODULE Test;
-	VAR set: SET; element: SHORTINT;
+	VAR set: SET; element: SIGNED8;
 	BEGIN set := {}; element := MAX (SET) + 1; EXCL (set, element);
 	END Test.
 
@@ -6067,7 +6067,7 @@ positive: sudoku solver
 	VAR cell: Cell; BEGIN FOR cell := 0 TO Cells - 1 DO IF ~IsValidCell (game, cell) THEN RETURN FALSE END END; RETURN TRUE;
 	END IsValid;
 	PROCEDURE Solve (VAR game: Game): BOOLEAN;
-	VAR cell: Cell; value: SHORTINT;
+	VAR cell: Cell; value: SIGNED8;
 	BEGIN FOR cell := 0 TO Cells - 1 DO IF game[cell] = Empty THEN FOR value := ORD (Empty) + 1 TO ORD (Empty) + Columns DO game[cell] := CHR (value);
 		IF IsValidCell (game, cell) & Solve (game) THEN RETURN TRUE END; END; game[cell] := Empty; RETURN FALSE; END END; RETURN IsValid (game);
 	END Solve;

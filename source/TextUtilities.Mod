@@ -417,9 +417,9 @@ TYPE
 			attr : Texts.Attributes;
 			tattr : Texts.FontInfo;
 			fonts : ARRAY 256 OF Texts.FontInfo;
-			col: SHORTINT;
-			voff: SHORTINT;
-			lib :SHORTINT;
+			col: SIGNED8;
+			voff: SIGNED8;
+			lib :SIGNED8;
 			type, tag: CHAR;
 			len, hlen, tlen, flen: LONGINT;
 			n, off: SIZE;
@@ -615,7 +615,7 @@ TYPE
 				i := 0; WHILE (i < nofFonts)  &  (~fonts[i].IsEqual(font)) DO INC(i) END;
 				IF (i = nofFonts) THEN
 					IF ToOberonFont(font.name, font.size, font.style, oname) THEN
-						w.RawSInt(SHORTINT(i+1));
+						w.RawSInt(SIGNED8(i+1));
 						IF i = nofFonts THEN w.RawString(oname); fonts[nofFonts] := font; INC(nofFonts) END
 					ELSE
 						w.RawSInt(1);
@@ -626,7 +626,7 @@ TYPE
 							INC(nofFonts)
 						END;
 					END
-				ELSE w.RawSInt(SHORTINT(i+1));
+				ELSE w.RawSInt(SIGNED8(i+1));
 				END
 			ELSE
 				w.RawSInt(1);

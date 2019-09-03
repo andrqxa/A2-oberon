@@ -1124,7 +1124,7 @@ MODULE LayoutPanels0 IN Oberon;	(** portable *)
 		VAR
 			key, val: INTEGER; t: Objects.Object;
 
-			PROCEDURE Ident (): SHORTINT;
+			PROCEDURE Ident (): SIGNED8;
 				VAR ch1: CHAR;
 			BEGIN ch1 := ch; Get(ch);
 				CASE ch1 OF

@@ -201,9 +201,9 @@ TYPE
 VAR
 		predefStruct: ARRAY SFlastStruct+1 OF PCT.Struct;
 (*
-		FPvis: ARRAY 5 OF SHORTINT;
+		FPvis: ARRAY 5 OF SIGNED8;
 *)
-		FParray: ARRAY 6 OF SHORTINT;
+		FParray: ARRAY 6 OF SIGNED8;
 
 
 		altSelf: PCS.Name;	(*predefined strings*)
@@ -386,7 +386,7 @@ END FPrintRecord;
 
 PROCEDURE FPrintTyp0(typ: PCT.Struct;  current: PCT.Module);
 (* calculate fingerprint without looking at record fields, private and public fingerprints *)
-	VAR fp: LONGINT; mode: SHORTINT; rec: PCT.Record; intf: PCT.Interface; tAttr: Struct;  base: PCT.Struct;
+	VAR fp: LONGINT; mode: SIGNED8; rec: PCT.Record; intf: PCT.Interface; tAttr: Struct;  base: PCT.Struct;
 		name: ARRAY 32 OF CHAR; dump: BOOLEAN; str: StringBuf; i: SIZE;
 
 	PROCEDURE Name;	(*has side effects on the local variables!!!*)
@@ -697,7 +697,7 @@ PROCEDURE Export*(VAR r: PCM.Rider; M: PCT.Module; new, extend, skipImport: BOOL
 		ELSIF type = PCT.Float32 THEN  PCM.SymWReal(r, SHORT(c.real))
 		ELSIF type = PCT.Float64 THEN  PCM.SymWLReal(r, c.real)
 		ELSIF type = PCT.String THEN  PCM.SymWString(r, c.str^)
-		ELSIF type = PCT.Bool THEN  PCM.SymWNum(r, SYSTEM.VAL(SHORTINT, c.bool))
+		ELSIF type = PCT.Bool THEN  PCM.SymWNum(r, SYSTEM.VAL(SIGNED8, c.bool))
 		ELSIF type = PCT.Set THEN  PCM.SymWNum(r, SYSTEM.VAL(LONGINT, c.set))
 (** fof >> *)
 		ELSIF type IS PCT.EnhArray THEN

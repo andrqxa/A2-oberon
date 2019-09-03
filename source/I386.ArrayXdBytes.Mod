@@ -97,9 +97,9 @@ TYPE
 	VAR  (**)
 		protector: ANY;   (* temporary pointer to protect data from being garbage collected *)
 		permutation-: IndexArray;   (* permutation used for INTERNALLY accessing the data. *)
-		bc-: SHORTINT;   (* boundary condition, abstract *)
+		bc-: SIGNED8;   (* boundary condition, abstract *)
 		(** public values *)
-		(* boundaryCondition-: SHORTINT;   *)
+		(* boundaryCondition-: SIGNED8;   *)
 		(* used-: IndexArray;   (*  in preparation *)*)
 
 		(** cache variables for faster access *)
@@ -119,7 +119,7 @@ TYPE
 			HALT( 1001 );   (* abstract *)
 		END GetInfo;
 
-		PROCEDURE SetBoundaryCondition*( c: SHORTINT );   (* to be overridden in higher level modules to determine access methods*)
+		PROCEDURE SetBoundaryCondition*( c: SIGNED8 );   (* to be overridden in higher level modules to determine access methods*)
 		BEGIN
 			bc := c;
 		END SetBoundaryCondition;

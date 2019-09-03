@@ -24,7 +24,7 @@ VAR
 		Texts.Append(Oberon.Log, X.buf)
 	END Msg;
 
-	PROCEDURE WriteText(VAR R: Files.Rider; lib: Objects.Library; col, voff: SHORTINT; len: LONGINT);
+	PROCEDURE WriteText(VAR R: Files.Rider; lib: Objects.Library; col, voff: SIGNED8; len: LONGINT);
 	VAR ch: CHAR;
 	BEGIN Texts.SetFont(W, lib); Texts.SetColor(W, col); Texts.SetOffset(W, voff);
 		WHILE len > 0 DO Files.Read(R, ch); Texts.Write(W, ch); DEC(len) END
@@ -130,7 +130,7 @@ VAR
 	PROCEDURE Conv(VAR R: Files.Rider; VAR T: Texts.Text);
 	VAR
 		hlen, len: LONGINT;
-		N, lib, col, voff: SHORTINT;
+		N, lib, col, voff: SIGNED8;
 		LName: ARRAY 32, 32 OF CHAR;
 		S: Files.Rider;
 	BEGIN	(*type read 01 F0*)

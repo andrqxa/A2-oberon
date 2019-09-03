@@ -141,7 +141,7 @@ BEGIN
 END Detected;
 
 PROCEDURE Init;
-VAR i: SHORTINT;  p: INTEGER;
+VAR i: SIGNED8;  p: INTEGER;
 BEGIN
 	num := 0;
 	FOR i := 0 TO 2 DO

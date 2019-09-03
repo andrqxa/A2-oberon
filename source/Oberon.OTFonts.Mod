@@ -193,7 +193,7 @@ MODULE OTFonts IN Oberon;	(** eos  **)
 	END GetChar;
 
 	PROCEDURE GetCharObj (lib: Objects.Library; ref: INTEGER; VAR obj: Objects.Object);
-		VAR font: Font; adr: ADDRESS; pat: Display.Pattern; no: INTEGER; ch: CHAR; s: SHORTINT;
+		VAR font: Font; adr: ADDRESS; pat: Display.Pattern; no: INTEGER; ch: CHAR; s: SIGNED8;
 	BEGIN
 		font := lib(Font);
 		adr := ADDRESSOF(font.mem[0]);

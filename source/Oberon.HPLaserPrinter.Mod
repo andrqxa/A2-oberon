@@ -43,33 +43,33 @@ TYPE
 
 	Font = RECORD
 		name: ARRAY 32 OF CHAR;
-		pitch: SHORTINT;
+		pitch: SIGNED8;
 		chartab: Set;	(* ARRAY 256 OF BIT *)
 	END;
 
 	HPFontDesc = RECORD	(* the HP font descriptor *)
 		size: INTEGER;
-		res0: SHORTINT;
-		type: SHORTINT;
+		res0: SIGNED8;
+		type: SIGNED8;
 		res1,
 		base,
 		cellwidth,
 		cellheight: INTEGER;
-		orient: SHORTINT;
-		space: SHORTINT;
+		orient: SIGNED8;
+		space: SIGNED8;
 		symbol,
 		pitch,
 		height,
 		xheight: INTEGER;
 		widthtype,style*,
 		strokeweight,typeface,
-		res2, serifstyle: SHORTINT;
+		res2, serifstyle: SIGNED8;
 		res3: INTEGER;
-		underdist,underheight: SHORTINT;
+		underdist,underheight: SIGNED8;
 		textheight,
 		textwidth,
 		res4,res5: INTEGER;
-		pitchext,heightext :SHORTINT;
+		pitchext,heightext :SIGNED8;
 		res6,res7,res8 :INTEGER;
 		name: ARRAY 16 OF CHAR;
 	END;
@@ -94,7 +94,7 @@ VAR
 	r, u: Files.Rider;
 	Unit: LONGINT;
 	Depth, Width, Height: INTEGER;
-	CurFont, PrevFont: SHORTINT;
+	CurFont, PrevFont: SIGNED8;
 	M: POINTER TO ARRAY HPPageHeight OF Set;
 	maxX, maxY, minX, minY: INTEGER;
 	nofonts: INTEGER;
@@ -103,7 +103,7 @@ VAR
 
 (* Font table procedures *)
 
-PROCEDURE LookupFont(name: ARRAY OF CHAR;  VAR i: SHORTINT;  VAR inserted: BOOLEAN);
+PROCEDURE LookupFont(name: ARRAY OF CHAR;  VAR i: SIGNED8;  VAR inserted: BOOLEAN);
 BEGIN
 	inserted := FALSE;
 	i := 0;  WHILE (i < nofonts) & (font[i].name # name) DO INC(i) END;
@@ -322,7 +322,7 @@ CONST maxpat = 256;
 TYPE
 	Pattern = POINTER TO PatternDesc;
 	PatternDesc = RECORD
-		w, h: SHORTINT;
+		w, h: SIGNED8;
 		raster: ARRAY (maxpat+7) DIV 8 * maxpat OF CHAR;
 	END;
 VAR
@@ -370,7 +370,7 @@ BEGIN
 	END
 END DownloadChar;
 
-PROCEDURE SwitchOn(fntno: SHORTINT);
+PROCEDURE SwitchOn(fntno: SIGNED8);
 BEGIN
 	Files.Write(r, ESC);  Files.Write(r, "(");  WriteInt(BaseFont+fntno);  Files.Write(r, "X")
 END SwitchOn;
@@ -389,9 +389,9 @@ BEGIN
 END CreateFont;
 
 PROCEDURE SetFont(name: ARRAY OF CHAR;  VAR s : ARRAY OF CHAR);
-VAR i: INTEGER;  fntno,pitch: SHORTINT;  inserted: BOOLEAN;
+VAR i: INTEGER;  fntno,pitch: SIGNED8;  inserted: BOOLEAN;
 
-	PROCEDURE ToPr3Font(VAR fn: ARRAY OF CHAR;  VAR pi: SHORTINT);
+	PROCEDURE ToPr3Font(VAR fn: ARRAY OF CHAR;  VAR pi: SIGNED8);
 	VAR i: INTEGER;  ch, ch2, ch3: CHAR;
 	BEGIN
 		i := 0;  ch := fn[i];
@@ -443,7 +443,7 @@ BEGIN
 	END
 END SetFont;
 
-PROCEDURE LoadFont(f: SHORTINT);	(* load used font with used chars *)
+PROCEDURE LoadFont(f: SIGNED8);	(* load used font with used chars *)
 VAR i: INTEGER;
 BEGIN
 	CreateFont(Fonts.This(font[f].name), BaseFont+f, font[f].pitch, PORTRAIT, PROPOR);
@@ -852,7 +852,7 @@ BEGIN
 END Page;
 
 PROCEDURE Close*(P: Printer.Printer);
-VAR tmp: Files.Rider;  ch: CHAR;  i: SHORTINT;
+VAR tmp: Files.Rider;  ch: CHAR;  i: SIGNED8;
 BEGIN
 	Files.Set(tmp, Files.Base(r), 0);
 	Files.Set(r, Files.Base(u), 0);

@@ -46,14 +46,14 @@ TYPE
 
 	SwapMove = POINTER TO SwapMoveDesc;
 	SwapMoveDesc = RECORD (Cards.MoveDesc)
-		nrVis: ARRAY CARDS OF SHORTINT;
+		nrVis: ARRAY CARDS OF SIGNED8;
 		curSwap: INTEGER;
 	END;
 
 	Talon = POINTER TO TalonDesc;
 	TalonDesc = RECORD (Cards.StackDesc)
 		visTail: Cards.Card;	(* cards that are visible *)
-		nrVis: ARRAY CARDS OF SHORTINT;	(* nr. of cards that are visible on top *)
+		nrVis: ARRAY CARDS OF SIGNED8;	(* nr. of cards that are visible on top *)
 		curSwap: INTEGER;	(* index into nr.Vis-array *)
 		nrDraw: INTEGER;	(* nr. of cards to move from tail to visTail when clicked *)
 	END;

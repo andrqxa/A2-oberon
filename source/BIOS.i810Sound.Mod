@@ -116,12 +116,12 @@ MODULE i810Sound; (** AUTHOR "krijo210@student.liu.se"; PURPOSE "Intel 810 Sound
 			END Constr;
 
 			(* Read from I/O register *)
-			PROCEDURE RegRead8(offset : LONGINT) : SHORTINT;
+			PROCEDURE RegRead8(offset : LONGINT) : SIGNED8;
 			VAR
 				res : CHAR;
 			BEGIN
 				Machine.Portin8(base + offset, res);
-				RETURN SYSTEM.VAL(SHORTINT, res)
+				RETURN SYSTEM.VAL(SIGNED8, res)
 			END RegRead8;
 
 			PROCEDURE RegRead16(offset : LONGINT) : INTEGER;
@@ -1326,7 +1326,7 @@ TYPE
 			VAR
 				bufferPos : LONGINT;
 				sample : Sample;
-				sampleSize : SHORTINT;
+				sampleSize : SIGNED8;
 				srate : LONGINT;
 			BEGIN
 				srate := 0;

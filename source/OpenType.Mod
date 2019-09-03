@@ -921,8 +921,8 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 	PROCEDURE LoadSimpleOutline (VAR r: Files.Rider; glyph: Glyph; inst: Instance; num: LONGINT; contours: INTEGER; hinted, rotated, stretched: BOOLEAN);
 		VAR
 			font: Font; zone: OpenTypeInt.Zone; pt: OpenTypeInt.Points; points, instrLen, xmin, ymin, xmax, ymax, i, j, val: INTEGER;
-			flag: SHORTINT; byte: CHAR; x, y, aw, lsb: FUnit; dx: F26D6; context: OpenTypeInt.Context;
-			flags: ARRAY 512 OF SHORTINT;
+			flag: SIGNED8; byte: CHAR; x, y, aw, lsb: FUnit; dx: F26D6; context: OpenTypeInt.Context;
+			flags: ARRAY 512 OF SIGNED8;
 	BEGIN
 		font := glyph.font; zone := glyph.simple; pt := zone.pt;
 		zone.contours := 0; points := 0; instrLen := 0;

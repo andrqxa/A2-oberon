@@ -3508,7 +3508,7 @@ TYPE
 				parameter.SetType(Global.Float32); procedureType.AddParameter(parameter)
 			END RealVarPar;
 
-			PROCEDURE Finish(CONST name: ARRAY OF CHAR; number: SHORTINT);
+			PROCEDURE Finish(CONST name: ARRAY OF CHAR; number: SIGNED8);
 			BEGIN Global.NewCustomBuiltin(name, system.systemScope, number, procedureType);
 			END Finish;
 

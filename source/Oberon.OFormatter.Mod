@@ -34,7 +34,7 @@ TYPE
 		lastchanged: LONGINT;
 	END;
 VAR
-	sym, level: SHORTINT;  noerr: BOOLEAN;  inFormPar: BOOLEAN;  exprdepth: INTEGER;  sline: INTEGER;  found: BOOLEAN;  silent, notrap: BOOLEAN;
+	sym, level: SIGNED8;  noerr: BOOLEAN;  inFormPar: BOOLEAN;  exprdepth: INTEGER;  sline: INTEGER;  found: BOOLEAN;  silent, notrap: BOOLEAN;
 	forceNL: BOOLEAN;  nobp: BreakPoint;
 
 	PROCEDURE debug( s: ARRAY OF CHAR );
@@ -56,7 +56,7 @@ VAR
 		IF exprdepth = 1 THEN clearBPS( bps, 6 ) END
 	END DecExprdepth;
 
-	PROCEDURE getBP( bps: ssBP;  k: SHORTINT );
+	PROCEDURE getBP( bps: ssBP;  k: SIGNED8 );
 	VAR i: INTEGER;
 	BEGIN
 		IF bps = NIL THEN RETURN END;
@@ -116,7 +116,7 @@ VAR
 	END CheckSym;
 
 	PROCEDURE qualident;
-	VAR lev: SHORTINT;
+	VAR lev: SIGNED8;
 	BEGIN
 		IO.Get( sym );
 		IF (sym = period) THEN
@@ -565,7 +565,7 @@ VAR
 			IF sym = else THEN IO.prepNL;  IO.Get( sym );  IO.getBPind( bp1 );  StatSeq( nobp, FALSE )  END;
 		END CasePart;
 
-		PROCEDURE ExpressionAndSym( sym: SHORTINT );
+		PROCEDURE ExpressionAndSym( sym: SIGNED8 );
 		VAR line: INTEGER;
 		BEGIN
 			line := IO.curLine;  exprdepth := 1;  markIndent;  Expression( IO.curbp );  checkLine( IO.curbp );  clearBPS( IO.curbp, 2 );

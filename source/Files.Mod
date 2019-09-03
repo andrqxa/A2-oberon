@@ -1211,7 +1211,7 @@ END FindOpenFile;
 
 (** Portable routines to read the standard Oberon types.  DEPRECATED, use Streams instead. *)
 
-PROCEDURE ReadSInt*(VAR r: Rider; VAR x: SHORTINT);
+PROCEDURE ReadSInt*(VAR r: Rider; VAR x: SIGNED8);
 BEGIN
 	r.file.Read(r, SYSTEM.VAL(CHAR, x))
 END ReadSInt;
@@ -1297,7 +1297,7 @@ END ReadSize;
 
 (** Portable routines to write the standard Oberon types. DEPRECATED, used Streams instead. *)
 
-PROCEDURE WriteSInt*(VAR r: Rider; x: SHORTINT);
+PROCEDURE WriteSInt*(VAR r: Rider; x: SIGNED8);
 BEGIN
 	r.file.Write(r, SYSTEM.VAL(CHAR, x))
 END WriteSInt;

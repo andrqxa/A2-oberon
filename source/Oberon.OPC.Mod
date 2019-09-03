@@ -116,7 +116,7 @@ MODULE OPC IN Oberon;	(** non-portable *)
 
 	TYPE
 		Item* = RECORD
-			mode*, scale*: SHORTINT;
+			mode*, scale*: SIGNED8;
 			mnolev* : LONGINT; (* mnolev < 0 -> mno (module number) = -mnolev *)
 			typ*: OPT.Struct; node*: OPT.Node;
 			adr*, offs*, inx*, descReg*, descOffs*: LONGINT
@@ -165,11 +165,11 @@ Intel i386 :
 		BUG = 40;      (* Trap code for Bugs in OP2 *)
 
 	VAR
-	level*: SHORTINT; 	(* nesting level *)
+	level*: SIGNED8; 	(* nesting level *)
 	pc*: INTEGER; 	(* pc of pseudo RISC machine *)
 	True, False, Stack: Item; 	(* constant items True, False and Stack *)
 	ebp: Item; 	(* base pointer item *)
-	formTab: ARRAY 16 OF SHORTINT;
+	formTab: ARRAY 16 OF SIGNED8;
 	CCtab: ARRAY 2, (geq-eql+1) OF INTEGER;	(* condition code table, CCtab[0] = integer; CCtab[1] = char *)
 	InvCCtab: ARRAY (CC-EQ) DIV 32 + 1 OF INTEGER; (* inverted conditon code table*)
 	lastTD: Item;	(*optimizing the method call: TD of the self parameter. Set by Parameter ParRecord, used by call. only set whe a AVR Record is pushed*)
@@ -200,7 +200,7 @@ Intel i386 :
 		IF pReg >= 0 THEN INC (OPL.Instr[pReg].used) END (* pReg < 0: special registers  *)
 	END IncReg;
 
-	PROCEDURE InitInstr (op: INTEGER; mode, form: SHORTINT; node: OPT.Node);
+	PROCEDURE InitInstr (op: INTEGER; mode, form: SIGNED8; node: OPT.Node);
 	(* initialize the pseudo instruction at position pc *)
 	VAR i: SIZE;  instr: OPL.InstructionTable;
 	BEGIN
@@ -317,7 +317,7 @@ Intel i386 :
 		INC (pc)
 	END GenStore;
 
-	PROCEDURE GenPopReg (hint, form: SHORTINT);
+	PROCEDURE GenPopReg (hint, form: SIGNED8);
 	(* popReg *)
 	BEGIN
 		IF hint = OPL.noHint THEN InitInstr (popReg, 0, 0, NIL)
@@ -413,7 +413,7 @@ Intel i386 :
 		INC (pc)
 	END GenSetC;
 
-	PROCEDURE GenRepMovs (VAR z, x, nofElem: Item; moveSize: SHORTINT;  reverse: BOOLEAN); (* z := x; block copy *)
+	PROCEDURE GenRepMovs (VAR z, x, nofElem: Item; moveSize: SIGNED8;  reverse: BOOLEAN); (* z := x; block copy *)
 	(* used for: repMovs *)
 	BEGIN
 		InitInstr (repMovs, 0, 0, NIL);
@@ -734,10 +734,10 @@ Intel i386 :
 		IF (OPM.ovflchk IN OPM.codeOptions) THEN Gen1 (to, OPL.OverflowTrap, NIL) END
 	END CheckOverflow;
 
-	PROCEDURE CheckIntRange (VAR x: Item; form: SHORTINT);
+	PROCEDURE CheckIntRange (VAR x: Item; form: SIGNED8);
 	END CheckIntRange;
 
-	PROCEDURE CheckRealRange (VAR x: Item; form: SHORTINT);
+	PROCEDURE CheckRealRange (VAR x: Item; form: SIGNED8);
 	END CheckRealRange;
 
 	PROCEDURE CheckIndex (VAR index, len: Item);
@@ -754,7 +754,7 @@ Intel i386 :
 		END;
 	END CheckIndex;
 
-	PROCEDURE ChangeType (VAR item: Item; form: SHORTINT);
+	PROCEDURE ChangeType (VAR item: Item; form: SIGNED8);
 	BEGIN
 		CASE form OF
 			Byte: item.typ:= OPT.bytetyp
@@ -782,12 +782,12 @@ Intel i386 :
 		Gen3 (bts, z, z, x)
 	END SetElem;
 
-	PROCEDURE Convert* (VAR x: Item; form: SHORTINT);
+	PROCEDURE Convert* (VAR x: Item; form: SIGNED8);
 		VAR
 			t: Item;
-			xform: SHORTINT;
+			xform: SIGNED8;
 
-		PROCEDURE IntToInt (VAR z, x: Item; xform, zform: SHORTINT);
+		PROCEDURE IntToInt (VAR z, x: Item; xform, zform: SIGNED8);
 		(* integer to integer convertion *)
 		BEGIN
 			ASSERT ((xform IN intSet) & (zform IN intSet) & (x.typ.form IN intSet) & (z.typ.form IN intSet));
@@ -814,7 +814,7 @@ Intel i386 :
 			(* z.typ will be changed by Convert *)
 		END IntToInt;
 
-		PROCEDURE IntToReal (VAR z, x: Item; xform, zform: SHORTINT);
+		PROCEDURE IntToReal (VAR z, x: Item; xform, zform: SIGNED8);
 		(* integer to real convertion *)
 			VAR  temp, cons: Item;
 		BEGIN
@@ -838,7 +838,7 @@ Intel i386 :
 			(* z.typ will be changed by Convert *)
 		END IntToReal;
 
-		PROCEDURE IntToCharByte (VAR z, x: Item; form: SHORTINT);
+		PROCEDURE IntToCharByte (VAR z, x: Item; form: SIGNED8);
 		BEGIN
 			IF (x.typ.form # SInt) & (x.mode = Reg) THEN
 				ChangeType (x, form);
@@ -848,7 +848,7 @@ Intel i386 :
 			(* z.typ will be changed by Convert *)
 		END IntToCharByte;
 
-		PROCEDURE RealToReal (VAR z, x: Item; xform, zform: SHORTINT);
+		PROCEDURE RealToReal (VAR z, x: Item; xform, zform: SIGNED8);
 		(* real to real convertion *)
 		BEGIN
 			IF xform < zform THEN (* smaller to bigger *)
@@ -860,7 +860,7 @@ Intel i386 :
 			(* z.typ will be changed by Convert *)
 		END RealToReal;
 
-		PROCEDURE RealToInt (VAR z, x: Item; xform, zform: SHORTINT);
+		PROCEDURE RealToInt (VAR z, x: Item; xform, zform: SIGNED8);
 		(* real to integer convertion *)
 		BEGIN
 			loadf (x); ChangeType (x, LInt);
@@ -868,7 +868,7 @@ Intel i386 :
 			(* z.typ will be changed by Convert *)
 		END RealToInt;
 
-		PROCEDURE CharToInt (VAR z, x: Item; zform: SHORTINT);
+		PROCEDURE CharToInt (VAR z, x: Item; zform: SIGNED8);
 		(* character to integer convertion *)
 		BEGIN
 			IF x.mode = VarPar THEN
@@ -883,7 +883,7 @@ Intel i386 :
 			(* z.typ will be changed by Convert *)
 		END CharToInt;
 
-		PROCEDURE ByteToInt (VAR z, x: Item; zform: SHORTINT);
+		PROCEDURE ByteToInt (VAR z, x: Item; zform: SIGNED8);
 		(* byte to integer convertion *)
 		BEGIN
 			IF x.mode = VarPar THEN
@@ -1416,10 +1416,10 @@ Intel i386 :
 		z.adr := y.adr; z.inx := y.inx (* Fjmp *)
 	END Or;
 
-	PROCEDURE SYSmop* (VAR z, x: Item; subcl: SHORTINT; typ: OPT.Struct);
+	PROCEDURE SYSmop* (VAR z, x: Item; subcl: SIGNED8; typ: OPT.Struct);
 	(* implementation of ADDRESSOF, CC, VAL *)
 		VAR
-			xform, typform: SHORTINT;
+			xform, typform: SIGNED8;
 			t, const: Item;
 	BEGIN
 		CASE subcl OF
@@ -1464,7 +1464,7 @@ Intel i386 :
 		END
 	END Mem;
 
-	PROCEDURE SYSdop* (VAR z, x, y: Item; subcl: SHORTINT);	(* implementation of BIT, LSH, ROT *)
+	PROCEDURE SYSdop* (VAR z, x, y: Item; subcl: SIGNED8);	(* implementation of BIT, LSH, ROT *)
 		VAR t, phiItem: Item; L, Lc: Label; absAccess: BOOLEAN;
 	BEGIN
 		CASE subcl OF
@@ -1505,7 +1505,7 @@ Intel i386 :
 						MakeCon (z, x.typ, 0);
 						CASE x.typ.form OF
 							Byte, Char, SInt:
-								z.adr := ROT (SYSTEM.VAL (SHORTINT, x.adr), SHORT (y.adr))
+								z.adr := ROT (SYSTEM.VAL (SIGNED8, x.adr), SHORT (y.adr))
 						  | Int:
 								z.adr := ROT (SYSTEM.VAL (INTEGER, x.adr), SHORT (y.adr))
 						  | LInt:
@@ -1522,7 +1522,7 @@ Intel i386 :
 	END SYSdop;
 
 	PROCEDURE SYSgetput* (VAR z, x: Item; getfn: BOOLEAN);	(* SYSTEM.GET, SYSTEM.PUT *)
-		VAR form: SHORTINT; constAddr: BOOLEAN;					(* GetPut *)
+		VAR form: SIGNED8; constAddr: BOOLEAN;					(* GetPut *)
 	BEGIN
 		IF getfn THEN
 			constAddr := x.mode = Con;					(* GetPut *)
@@ -1587,7 +1587,7 @@ Intel i386 :
 	0	EAX/AX/AL	1	ECX/CX/CL	2	EDX/DX/DL	3	EBX/BX/BL
 	4	ESP/SP/AH	5	EBP/BP/CH	6	ESI/SI/DH	7	EDI/DI/DL
 	registers size is depending on the type of the variable (2nd argument in PUTREG/GETREG).
-	SHORTINT 	= 8 bit values 	(AL, CL, DL, BL, AH, CH, DH, DL)
+	SIGNED8 	= 8 bit values 	(AL, CL, DL, BL, AH, CH, DH, DL)
 	INTEGER  	= 16 bit values 	(AX, CX, DX, BX, SP, BP, SI, DI)
 	LONGINT 	= 32 bit values 	(EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI)
 	SYTEM.PUTREG (const, const) always access 32 bit register. 	*)
@@ -1721,7 +1721,7 @@ Intel i386 :
 		IF (t.mode=Con)&(len.mode=Con) THEN  len.adr:=len.adr*t.adr  ELSE  tt := len;  Mul(len, t, tt, LInt)  END;
 	END ArrayBaseSize;
 
-	PROCEDURE TypeSize(x: Item; VAR size: Item; VAR step, scale: SHORTINT);	(*used for moves, returns the scale*)
+	PROCEDURE TypeSize(x: Item; VAR size: Item; VAR step, scale: SIGNED8);	(*used for moves, returns the scale*)
 	VAR  typ: OPT.Struct; dim, rest: LONGINT; t, tt: Item;
 	BEGIN
 		typ := x.typ; dim := 0;
@@ -1829,7 +1829,7 @@ Intel i386 :
 		z.typ := typ.BaseTyp; DEC(z.descOffs, OPM.LIntSize);
 	END Index;
 
-	PROCEDURE MoveBlock (VAR z, x, size: Item; moveSize: SHORTINT);
+	PROCEDURE MoveBlock (VAR z, x, size: Item; moveSize: SIGNED8);
 	(* move 'size' element from x to z, where 'element' has the size 'moveSize' (byte, word, dword *)
 	VAR type: OPT.Struct;  src: Item; oldSize: LONGINT;
 	BEGIN
@@ -1899,9 +1899,9 @@ Intel i386 :
 		END
 	END MoveBlock;
 
-	PROCEDURE MoveBlockReversed (VAR z, x, size: Item; moveSize: SHORTINT);
+	PROCEDURE MoveBlockReversed (VAR z, x, size: Item; moveSize: SIGNED8);
 	(* same as MoveBlock, but reversed! *)
-	VAR	scale: SHORTINT; t: LONGINT;
+	VAR	scale: SIGNED8; t: LONGINT;
 	BEGIN
 		ASSERT (moveSize IN {OPO.Bit8, OPO.Bit16, OPO.Bit32});
 		IF (size.mode = Con) & (moveSize IN {OPO.Bit16, OPO.Bit8})  THEN (* try to optimize *)
@@ -2067,7 +2067,7 @@ Intel i386 :
 
 	PROCEDURE Assign* (VAR z, x: Item);	(* z  := x *)
 		VAR
-			zform, xform, step, scale : SHORTINT;
+			zform, xform, step, scale : SIGNED8;
 			temp, zero, sizeItem: Item;
 			proc: OPT.Object;
 	BEGIN
@@ -2431,7 +2431,7 @@ Intel i386 :
 	END ParRecord;
 
 	PROCEDURE Parameter* (VAR ap: Item; fp: OPT.Object; apIsDeref, alwaysRef: BOOLEAN);
-		VAR form, apMode: SHORTINT; temp, cons, stack, tag: Item;
+		VAR form, apMode: SIGNED8; temp, cons, stack, tag: Item;
 			proc: OPT.Object; apTyp, fpTyp: OPT.Struct;  pushtag: BOOLEAN;
 	BEGIN
 		fpTyp := fp.typ; apTyp := ap.typ;
@@ -2618,7 +2618,7 @@ Intel i386 :
 	END RemoveStatic;
 
 	PROCEDURE CopyDynArr(VAR x, y: Item);
-	VAR	dim: LONGINT; yy, xx, size, t: Item; typ: OPT.Struct; step, scale: SHORTINT;
+	VAR	dim: LONGINT; yy, xx, size, t: Item; typ: OPT.Struct; step, scale: SIGNED8;
 	BEGIN
 			(*dimensions of y*)
 		IF ~(y.mode IN {Var, VarPar, Abs}) THEN  load(y); GenPush(y)  END;
@@ -2831,7 +2831,7 @@ Intel i386 :
 	END AllocSDynArr;
 
 	PROCEDURE Enter* (proc: OPT.Object; dataSize: LONGINT; node: OPT.Node);
-		VAR par: OPT.Object; x, z, t0, t1, size: Item; step, scale: SHORTINT;  useRef: BOOLEAN;
+		VAR par: OPT.Object; x, z, t0, t1, size: Item; step, scale: SIGNED8;  useRef: BOOLEAN;
 	BEGIN (* !!later due to a bug this procedure looks no longer very nice *)
 		useRef := (proc # NIL) & (proc.sysflag # 0);
 		IF proc # NIL THEN
@@ -2877,8 +2877,8 @@ Intel i386 :
 	END Enter;
 
 	PROCEDURE Return* (VAR res: Item; proc: OPT.Object); (* RETURN res *)
-		VAR res1, t, size, negsize: Item; pReg: LONGINT; procform: SHORTINT; typ: OPT.Struct;
-			sp, ref, t1: Item; step, scale: SHORTINT;
+		VAR res1, t, size, negsize: Item; pReg: LONGINT; procform: SIGNED8; typ: OPT.Struct;
+			sp, ref, t1: Item; step, scale: SIGNED8;
 			savedPC, savedFP, callerTOS: Item;
 	BEGIN
 		typ := proc.typ;  procform:=typ.form;

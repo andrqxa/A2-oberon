@@ -508,10 +508,10 @@ TYPE
 		HostControl1 {ALIGNED(1)},
 		PowerControl {ALIGNED(1)},
 		BlockGapControl {ALIGNED(1)},
-		WakeupControl {ALIGNED(1)}: SHORTINT;
+		WakeupControl {ALIGNED(1)}: SIGNED8;
 		ClockControl {ALIGNED(1)}: INTEGER;
 		TimeoutControl {ALIGNED(1)},
-		SoftwareReset {ALIGNED(1)}: SHORTINT;
+		SoftwareReset {ALIGNED(1)}: SIGNED8;
 		InterruptStatus {ALIGNED(1)},
 		InterruptStatusEnable {ALIGNED(1)},
 		InterruptSignalEnable {ALIGNED(1)}: SET;
@@ -521,8 +521,8 @@ TYPE
 		MaximumCurrentCapabilities {ALIGNED(1)}: HUGEINT;
 		ForceEventAutoCmdErrorStatus {ALIGNED(1)},
 		ForceEventErrorInterruptStatus {ALIGNED(1)}: INTEGER;
-		AdmaErrorStatus {ALIGNED(1)}: SHORTINT;
-		padding0 {ALIGNED(1)}: ARRAY 3 OF SHORTINT;
+		AdmaErrorStatus {ALIGNED(1)}: SIGNED8;
+		padding0 {ALIGNED(1)}: ARRAY 3 OF SIGNED8;
 		AdmaSystemAddress {ALIGNED(1)}: HUGEINT;
 		PresetValues {ALIGNED(1)}: ARRAY 8 OF INTEGER;
 		padding1 {ALIGNED(1)}: ARRAY 28 OF LONGINT;
@@ -563,7 +563,7 @@ VAR
 		SetTimeout(hc, 10);
 
 		(* Power select 3.3V bus voltage *)
-		hc.regs.PowerControl :=  SYSTEM.VAL(SHORTINT, PowerControl_SDBusVoltage_33 + {PowerControl_SDBusPower});
+		hc.regs.PowerControl :=  SYSTEM.VAL(SIGNED8, PowerControl_SDBusVoltage_33 + {PowerControl_SDBusPower});
 
 		(* Enable All Interrupts *)
 		hc.regs.InterruptStatusEnable := Interrupt_All;
@@ -815,7 +815,7 @@ VAR
 		INCL(hc.regs.InterruptStatus, Interrupt_Normal_TransferComplete);
 
 		(*DEC(hc.regs.ClockControl, LSH(1, ClockControl_SdClockEnable));
-		hc.regs.SoftwareReset := SYSTEM.VAL(SHORTINT, {SoftwareResetCmd, SoftwareResetDat});
+		hc.regs.SoftwareReset := SYSTEM.VAL(SIGNED8, {SoftwareResetCmd, SoftwareResetDat});
 		REPEAT UNTIL hc.regs.SoftwareReset = 0;
 		INC(hc.regs.ClockControl, LSH(1, ClockControl_SdClockEnable));*)
 
@@ -1108,7 +1108,7 @@ VAR
 
 	PROCEDURE Reset (hc: HostController; cmd, dat: BOOLEAN): BOOLEAN;
 	VAR
-		val: SHORTINT;
+		val: SIGNED8;
 	BEGIN
 		IF cmd & dat THEN
 			val := SoftwareResetAll
@@ -1169,7 +1169,7 @@ VAR
 			INC(val);
 			ratio := ratio DIV 2
 		UNTIL ratio = 0;
-		hc.regs.TimeoutControl := SYSTEM.VAL(SHORTINT, val);
+		hc.regs.TimeoutControl := SYSTEM.VAL(SIGNED8, val);
 	END SetTimeout;
 
 	PROCEDURE SetBusWidth (hc: HostController; rca, width: LONGINT; VAR result: LONGINT): BOOLEAN;
@@ -1201,7 +1201,7 @@ VAR
 			 1: EXCL(SYSTEM.VAL(SET, val), HostControl1_DataWidthTransfer)
 			|4: INCL(SYSTEM.VAL(SET, val), HostControl1_DataWidthTransfer)
 		END;
-		hc.regs.HostControl1 := SHORTINT(val);
+		hc.regs.HostControl1 := SIGNED8(val);
 
 		(* 6: SD card only *)
 

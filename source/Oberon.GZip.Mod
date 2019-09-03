@@ -128,7 +128,7 @@ MODULE GZip IN Oberon;	(** eos  **)
 	END Unzip;
 
 	(** compress file in into file out **)
-	PROCEDURE ZipFile*(in, out: Files.File; level, strategy: SHORTINT; VAR res: WORD);
+	PROCEDURE ZipFile*(in, out: Files.File; level, strategy: SIGNED8; VAR res: WORD);
 	VAR
 		gzw: GZWriters.Writer; r: Files.Rider; buf: ARRAY BufSize OF CHAR; len, written, totWritten: LONGINT;
 	BEGIN
@@ -167,7 +167,7 @@ MODULE GZip IN Oberon;	(** eos  **)
 	PROCEDURE Zip*;
 	VAR
 		S: Texts.Scanner; T: Texts.Text; beg, end, time: LONGINT;
-		level, strategy: SHORTINT; res: WORD;
+		level, strategy: SIGNED8; res: WORD;
 		suffix, outfile: ARRAY 256 OF CHAR; in, out: Files.File;
 	BEGIN
 		T := Oberon.Par.text;

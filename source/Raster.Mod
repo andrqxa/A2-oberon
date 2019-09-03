@@ -74,9 +74,9 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 
 		(** image format **)
 		Format0* = RECORD
-			code*: SHORTINT;	(** format code for quick format checks **)
-			bpp*: SHORTINT;	(** number of bits per pixel **)
-			align*: SHORTINT;	(** bytes per row must be multiple of this **)
+			code*: SIGNED8;	(** format code for quick format checks **)
+			bpp*: SIGNED8;	(** number of bits per pixel **)
+			align*: SIGNED8;	(** bytes per row must be multiple of this **)
 			components*: SET;	(** components that are stored in a pixel **)
 			pal*: Palette;	(** optional palette for indexed formats **)
 		END;
@@ -614,7 +614,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END DisplayFormat;
 
 	(** initialize format **)
-	PROCEDURE InitFormat* (VAR fmt: Format; code, bpp, align: SHORTINT; comps: SET; pal: Palette; pack, unpack: PackProc);
+	PROCEDURE InitFormat* (VAR fmt: Format; code, bpp, align: SIGNED8; comps: SET; pal: Palette; pack, unpack: PackProc);
 	BEGIN
 		fmt.code := code; fmt.bpp := bpp; fmt.align := align; fmt.components := comps; fmt.pal := pal;
 		fmt.pack := pack; fmt.unpack := unpack
@@ -719,7 +719,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	(**--- Transfer Modes ---**)
 
 	(** initialize transfer mode **)
-	PROCEDURE InitMode* (VAR mode: Mode; op: SHORTINT);
+	PROCEDURE InitMode* (VAR mode: Mode; op: SIGNED8);
 	BEGIN
 		mode.op := op;
 		IF (mode.src.pal # NIL) & ((mode.map = NIL) OR (LEN(mode.map^) # mode.src.pal.used)) THEN
@@ -733,7 +733,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END InitMode;
 
 	(** initialize transfer mode with color components for pure alpha sources **)
-	PROCEDURE InitModeColor* (VAR mode: Mode; op: SHORTINT; red, green, blue: WORD);
+	PROCEDURE InitModeColor* (VAR mode: Mode; op: SIGNED8; red, green, blue: WORD);
 	BEGIN
 		mode.op := op;
 		IF (mode.src.pal # NIL) & ((mode.map = NIL) OR (LEN(mode.map^) # mode.src.pal.used)) THEN

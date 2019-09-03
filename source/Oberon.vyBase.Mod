@@ -2086,9 +2086,9 @@ BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYCHAR;
 
-PROCEDURE COPYSHORT* (VAR src: ARRAY OF SHORTINT;      srcoffs, len: LONGINT;
-VAR dest: ARRAY OF SHORTINT;     destoffs: LONGINT);
-CONST sz = SIZEOF(SHORTINT);
+PROCEDURE COPYSHORT* (VAR src: ARRAY OF SIGNED8;      srcoffs, len: LONGINT;
+VAR dest: ARRAY OF SIGNED8;     destoffs: LONGINT);
+CONST sz = SIZEOF(SIGNED8);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
 	ASSERT((len >= 0) & (len < (MAX(LONGINT) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)

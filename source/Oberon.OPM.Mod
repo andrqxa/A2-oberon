@@ -17,7 +17,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 		CharSize* = 1;	(* CHAR *)
 		BoolSize* = 1;	(* BOOLEAN *)
 		SetSize* = 4;	(* SET *)
-		SIntSize* = 1;	(* SHORTINT *)
+		SIntSize* = 1;	(* SIGNED8 *)
 		IntSize* = 2;	(* INTEGER *)
 		LIntSize* = 4;	(* LONGINT *)
 		HIntSize* = 8;	(* HUGEINT *)
@@ -163,7 +163,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 		RefFile, ObjFile, ModFile, oldSymFile, newSymFile: Files.File;
 
 	PROCEDURE Init*(codeOpt, parserOpt: SET; source: Texts.Reader; log: Texts.Text);
-		VAR i: SHORTINT;
+		VAR i: SIGNED8;
 	BEGIN inR := source; Log := log; codeOptions := codeOpt; parserOptions := parserOpt;
 		noerr := TRUE; curpos := Texts.Pos(inR); errpos := curpos; lastpos := curpos-10;
 		FOR i := 0 TO NumErrors DIV SetLen - 1 DO errors[i] := {} END;
@@ -260,7 +260,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	END LogWLn;
 
 	PROCEDURE ErrorMsg(n: INTEGER);
-	VAR s: Texts.Scanner; ch: CHAR;  e: ARRAY 127 OF CHAR;  i: SHORTINT;
+	VAR s: Texts.Scanner; ch: CHAR;  e: ARRAY 127 OF CHAR;  i: SIGNED8;
 	BEGIN
 		IF (n >= NumErrors) OR ~((n MOD SetLen) IN errors[n DIV SetLen]) THEN
 			IF (n < NumErrors) THEN INCL(errors[n DIV SetLen], n MOD SetLen) END;

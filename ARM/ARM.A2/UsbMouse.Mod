@@ -44,8 +44,8 @@ TYPE
 		VAR (*mm : Inputs.MouseMsg;*) dx, dy : LONGINT;
 		BEGIN
 			IF (status = Usbdi.Ok) OR ((status = Usbdi.ShortPacket) & (actLen >= 3))  THEN
-				dx := SYSTEM.VAL(SHORTINT, buffer[1]);
-				dy := SYSTEM.VAL(SHORTINT, buffer[2]);
+				dx := SYSTEM.VAL(SIGNED8, buffer[1]);
+				dy := SYSTEM.VAL(SIGNED8, buffer[2]);
 
 				accelX := 1.0 + ABS(dx - lastDx) / 128 * MouseAcceleration;
 				accelY := 1.0 + ABS(dy - lastDy) / 128 * MouseAcceleration;

@@ -55,7 +55,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 			pos, caret: LONGINT;
 			frame: TextGadgets.Frame;
 			def, fnt: Fonts.Font;
-			voff: SHORTINT
+			voff: SIGNED8
 		END;
 
 	PROCEDURE OpenText(title: ARRAY OF CHAR; T: Texts.Text; systemtrack: BOOLEAN);
@@ -303,7 +303,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 	BEGIN INC(errs); Gap; Str(s); Str(" in "); FlipStr(def.trig); Ln; WLog
 	END Err;
 
-	PROCEDURE PopArg (def: Definition; class: SHORTINT; VAR S: Texts.Scanner; VAR stack: Sequence);
+	PROCEDURE PopArg (def: Definition; class: SIGNED8; VAR S: Texts.Scanner; VAR stack: Sequence);
 		VAR B: Texts.Buffer;
 	BEGIN
 		IF stack # NIL THEN NEW(T); Texts.Open(T, "");
@@ -459,7 +459,7 @@ MODULE EditKeys IN Oberon;	(** portable *)	(* CAS/MH 27 Jan 93 / jm 2.5.95 *)
 
 	PROCEDURE Key (frame: TextGadgets.Frame; ch: CHAR; VAR handled: BOOLEAN);
 		CONST TAB = 9X; LF = 0AX; CR = 0DX; DEL = 7FX;
-		VAR del, pos, beg: LONGINT; voff: SHORTINT; fnt: Fonts.Font; ch1: CHAR;
+		VAR del, pos, beg: LONGINT; voff: SIGNED8; fnt: Fonts.Font; ch1: CHAR;
 	BEGIN handled := TRUE; pos := frame.carpos.pos;
 		IF frame.text.len > 0 THEN
 			IF pos < frame.text.len THEN Texts.OpenReader(R, frame.text, pos); Texts.Read(R, ch1) END;

@@ -577,7 +577,7 @@ TYPE
 TYPE
 
 	Token* = RECORD
-		type-, subtype- : SHORTINT;
+		type-, subtype- : SIGNED8;
 		startPosition-, endPosition- : SIZE;
 		value- : ARRAY MaxTokenLength OF CHAR;
 		length : SIZE; (* if type = Type_Identifier: of string value *)

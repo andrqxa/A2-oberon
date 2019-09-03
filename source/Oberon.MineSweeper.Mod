@@ -61,8 +61,8 @@ CONST
 TYPE
 	(* data type to control a single mine box *)
 	Area = RECORD
-		state*: SHORTINT;	(* see mine box state ids *)
-		mines*: SHORTINT;	(* number of mines in the neighbothood or 'Bombe' if it's a bombe*)
+		state*: SIGNED8;	(* see mine box state ids *)
+		mines*: SIGNED8;	(* number of mines in the neighbothood or 'Bombe' if it's a bombe*)
 	END;
 
 	(* abstract gadget (model), which holds the game's state *)
@@ -90,7 +90,7 @@ TYPE
 
 	(* data structure to hold the coords of the modified boxes during last action on the field *)
 	Coords = POINTER TO CoordsDesc;
-	CoordsDesc = ARRAY (MaxFieldW*MaxFieldH + 1) * 2 OF SHORTINT;
+	CoordsDesc = ARRAY (MaxFieldW*MaxFieldH + 1) * 2 OF SIGNED8;
 
 	(* message sent by the model to inform its views *)
 	UpdateMsg* = RECORD (Display.FrameMsg)
@@ -234,7 +234,7 @@ END InsertXY;
 
 PROCEDURE GameOver(F: Field);
 (* sets F.over to TRUE, covers up remaining boxes and marks flags, which were set wrong *)
-VAR x,y: INTEGER; state: SHORTINT; U: UpdateMsg;
+VAR x,y: INTEGER; state: SIGNED8; U: UpdateMsg;
 BEGIN
 	F.over:= TRUE;
 	curArrayPos:= 0;
@@ -376,7 +376,7 @@ END CoverUp;
 
 PROCEDURE ToggleState*(F: Field; x,y: INTEGER);
 (* preforms action due to a right mouse click *)
-VAR state: SHORTINT; U: UpdateMsg;
+VAR state: SIGNED8; U: UpdateMsg;
 BEGIN
 	(* return if performing the action is not allowed *)
 	IF (x >= F.W) OR (y >= F.H) OR F.over OR F.pause THEN RETURN END;

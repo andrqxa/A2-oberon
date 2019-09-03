@@ -125,8 +125,8 @@ TYPE
 	CalcModelDesc = RECORD (Gadgets.ObjDesc)
 		Stack: ARRAY StackSize OF LONGINT;
 		TOS: LONGINT;
-		Mode, Base: SHORTINT;
-		Status: SHORTINT;
+		Mode, Base: SIGNED8;
+		Status: SIGNED8;
 		SubPanel: Objects.Object;	(* functions displayed, used to remove the functions *)
 	END;
 
@@ -221,7 +221,7 @@ BEGIN
 	RemoveSub (m);
 END ResetModel;
 
-PROCEDURE ChangeMode (m: CalcModel; from, to: SHORTINT);
+PROCEDURE ChangeMode (m: CalcModel; from, to: SIGNED8);
 	VAR i: LONGINT;
 
 	PROCEDURE Convert (VAR h, l: LONGINT);

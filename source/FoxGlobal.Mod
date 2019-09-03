@@ -1215,7 +1215,7 @@ TYPE
 		NewBuiltin0(id,name,scope[Scanner.Lowercase],realtime);
 	END NewBuiltinCamelCase;
 
-	PROCEDURE NewCustomBuiltin0(CONST name: ARRAY OF CHAR; scope: SyntaxTree.ModuleScope; subType: SHORTINT; procedureType: SyntaxTree.ProcedureType);
+	PROCEDURE NewCustomBuiltin0(CONST name: ARRAY OF CHAR; scope: SyntaxTree.ModuleScope; subType: SIGNED8; procedureType: SyntaxTree.ProcedureType);
 	VAR
 		isDuplicate: BOOLEAN;
 		customBuiltin: SyntaxTree.CustomBuiltin;
@@ -1230,7 +1230,7 @@ TYPE
 		ASSERT(~isDuplicate)
 	END NewCustomBuiltin0;
 
-	PROCEDURE NewCustomBuiltin*(CONST name: ARRAY OF CHAR; CONST scope: ARRAY OF SyntaxTree.ModuleScope; subType: SHORTINT; procedureType: SyntaxTree.ProcedureType);
+	PROCEDURE NewCustomBuiltin*(CONST name: ARRAY OF CHAR; CONST scope: ARRAY OF SyntaxTree.ModuleScope; subType: SIGNED8; procedureType: SyntaxTree.ProcedureType);
 	VAR
 		nameL, nameU: Scanner.IdentifierString;
 	BEGIN

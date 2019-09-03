@@ -2653,7 +2653,7 @@ negative: redefining short
 negative: redefining shortint
 
 	MODULE Test;
-	CONST SHORTINT = 0;
+	CONST SIGNED8 = 0;
 	END Test.
 
 negative: redefining then
@@ -4332,13 +4332,13 @@ negative: capital letter of constant integer
 positive: minimal value of integer
 
 	MODULE Test;
-	CONST A = MIN (SHORTINT); B = MIN (INTEGER); C = MIN (LONGINT); D = MIN (HUGEINT)
+	CONST A = MIN (SIGNED8); B = MIN (INTEGER); C = MIN (LONGINT); D = MIN (HUGEINT)
 	END Test.
 
 positive: maximal value of integer
 
 	MODULE Test;
-	CONST A = MAX (SHORTINT); B = MAX (INTEGER); C = MAX (LONGINT); D = MAX (HUGEINT)
+	CONST A = MAX (SIGNED8); B = MAX (INTEGER); C = MAX (LONGINT); D = MAX (HUGEINT)
 	END Test.
 
 positive: arithmetic left shift of constant integers
@@ -6875,7 +6875,7 @@ positive: predefined basic boolean type
 positive: predefined basic short integer type
 
 	MODULE Test;
-	TYPE BasicType = SHORTINT;
+	TYPE BasicType = SIGNED8;
 	END Test.
 
 positive: predefined basic integer type
@@ -7037,7 +7037,7 @@ positive: array of basic boolean type
 positive: array of basic short integer type
 
 	MODULE Test;
-	TYPE Array = ARRAY 10 OF SHORTINT;
+	TYPE Array = ARRAY 10 OF SIGNED8;
 	END Test.
 
 positive: array of basic integer type
@@ -7605,7 +7605,7 @@ negative: pointer to basic boolean type
 negative: pointer to basic short integer type
 
 	MODULE Test;
-	TYPE Pointer = POINTER TO SHORTINT;
+	TYPE Pointer = POINTER TO SIGNED8;
 	END Test.
 
 negative: pointer to basic integer type
@@ -7769,7 +7769,7 @@ positive: procedure type returning basic boolean type
 positive: procedure type returning basic short integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (): SHORTINT;
+	TYPE Procedure = PROCEDURE (): SIGNED8;
 	END Test.
 
 positive: procedure type returning basic integer type
@@ -8045,43 +8045,43 @@ positive: procedure type with intermixed parameters of boolean type
 positive: procedure type with a parameter of basic short integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (parameter: SHORTINT);
+	TYPE Procedure = PROCEDURE (parameter: SIGNED8);
 	END Test.
 
 positive: procedure type with parameters of basic short integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (a, b, c: SHORTINT);
+	TYPE Procedure = PROCEDURE (a, b, c: SIGNED8);
 	END Test.
 
 positive: procedure type with a parameter of variable short integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (VAR parameter: SHORTINT);
+	TYPE Procedure = PROCEDURE (VAR parameter: SIGNED8);
 	END Test.
 
 positive: procedure type with parameters of variable short integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (VAR a, b, c: SHORTINT);
+	TYPE Procedure = PROCEDURE (VAR a, b, c: SIGNED8);
 	END Test.
 
 positive: procedure type with a parameter of constant short integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (CONST parameter: SHORTINT);
+	TYPE Procedure = PROCEDURE (CONST parameter: SIGNED8);
 	END Test.
 
 positive: procedure type with parameters of constant short integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (CONST a, b, c: SHORTINT);
+	TYPE Procedure = PROCEDURE (CONST a, b, c: SIGNED8);
 	END Test.
 
 positive: procedure type with intermixed parameters of short integer type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (a: SHORTINT; VAR b: SHORTINT; CONST c: SHORTINT);
+	TYPE Procedure = PROCEDURE (a: SIGNED8; VAR b: SIGNED8; CONST c: SIGNED8);
 	END Test.
 
 positive: procedure type with a parameter of basic integer type
@@ -9558,7 +9558,7 @@ positive: variable of basic boolean type
 positive: variable of basic short integer type
 
 	MODULE Test;
-	VAR variable: SHORTINT;
+	VAR variable: SIGNED8;
 	END Test.
 
 positive: variable of basic integer type
@@ -10675,7 +10675,7 @@ positive: procedure returning basic boolean type
 positive: procedure returning basic short integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (): SHORTINT;
+	PROCEDURE Procedure (): SIGNED8;
 	END Procedure;
 	END Test.
 
@@ -11015,49 +11015,49 @@ positive: procedure with intermixed parameters of boolean type
 positive: procedure with a parameter of basic short integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter: SHORTINT);
+	PROCEDURE Procedure (parameter: SIGNED8);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of basic short integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (a, b, c: SHORTINT);
+	PROCEDURE Procedure (a, b, c: SIGNED8);
 	END Procedure;
 	END Test.
 
 positive: procedure with a parameter of variable short integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR parameter: SHORTINT);
+	PROCEDURE Procedure (VAR parameter: SIGNED8);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of variable short integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR a, b, c: SHORTINT);
+	PROCEDURE Procedure (VAR a, b, c: SIGNED8);
 	END Procedure;
 	END Test.
 
 positive: procedure with a parameter of constant short integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST parameter: SHORTINT);
+	PROCEDURE Procedure (CONST parameter: SIGNED8);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of constant short integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST a, b, c: SHORTINT);
+	PROCEDURE Procedure (CONST a, b, c: SIGNED8);
 	END Procedure;
 	END Test.
 
 positive: procedure with intermixed parameters of short integer type
 
 	MODULE Test;
-	PROCEDURE Procedure (a: SHORTINT; VAR b: SHORTINT; CONST c: SHORTINT);
+	PROCEDURE Procedure (a: SIGNED8; VAR b: SIGNED8; CONST c: SIGNED8);
 	END Procedure;
 	END Test.
 
@@ -12071,7 +12071,7 @@ positive: char parameter assignment
 positive: short integer parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SHORTINT); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); BEGIN value := value; END Procedure;
 	END Test.
 
 positive: integer parameter assignment
@@ -12221,7 +12221,7 @@ positive: variable char parameter assignment
 positive: variable short integer parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR value: SHORTINT); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); BEGIN value := value; END Procedure;
 	END Test.
 
 positive: variable integer parameter assignment
@@ -12371,7 +12371,7 @@ negative: constant char parameter assignment
 negative: constant short integer parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST value: SHORTINT); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (CONST value: SIGNED8); BEGIN value := value; END Procedure;
 	END Test.
 
 negative: constant integer parameter assignment
@@ -12525,7 +12525,7 @@ negative: calling procedure with boolean parameter with character argument
 negative: calling procedure with boolean parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: BOOLEAN); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12653,7 +12653,7 @@ positive: calling procedure with character parameter with character argument
 negative: calling procedure with character parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12766,7 +12766,7 @@ negative: calling procedure with short integer parameter with boolean argument
 
 	MODULE Test;
 	VAR argument: BOOLEAN;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12774,15 +12774,15 @@ negative: calling procedure with short integer parameter with character argument
 
 	MODULE Test;
 	VAR argument: CHAR;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
 positive: calling procedure with short integer parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	VAR argument: SIGNED8;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12790,7 +12790,7 @@ negative: calling procedure with short integer parameter with integer argument
 
 	MODULE Test;
 	VAR argument: INTEGER;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12798,7 +12798,7 @@ negative: calling procedure with short integer parameter with long integer argum
 
 	MODULE Test;
 	VAR argument: LONGINT;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12806,7 +12806,7 @@ negative: calling procedure with short integer parameter with huge integer argum
 
 	MODULE Test;
 	VAR argument: HUGEINT;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12814,7 +12814,7 @@ negative: calling procedure with short integer parameter with real argument
 
 	MODULE Test;
 	VAR argument: REAL;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12822,7 +12822,7 @@ negative: calling procedure with short integer parameter with long real argument
 
 	MODULE Test;
 	VAR argument: LONGREAL;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12830,7 +12830,7 @@ negative: calling procedure with short integer parameter with set argument
 
 	MODULE Test;
 	VAR argument: SET;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12838,7 +12838,7 @@ negative: calling procedure with short integer parameter with array argument
 
 	MODULE Test;
 	VAR argument: ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12846,7 +12846,7 @@ negative: calling procedure with short integer parameter with record argument
 
 	MODULE Test;
 	VAR argument: RECORD END;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12854,7 +12854,7 @@ negative: calling procedure with short integer parameter with object argument
 
 	MODULE Test;
 	VAR argument: OBJECT END;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12862,7 +12862,7 @@ negative: calling procedure with short integer parameter with base object argume
 
 	MODULE Test;
 	VAR argument: OBJECT;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12870,7 +12870,7 @@ negative: calling procedure with short integer parameter with pointer to array a
 
 	MODULE Test;
 	VAR argument: POINTER TO ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12878,7 +12878,7 @@ negative: calling procedure with short integer parameter with pointer to record 
 
 	MODULE Test;
 	VAR argument: POINTER TO RECORD END;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12886,7 +12886,7 @@ negative: calling procedure with short integer parameter with procedure argument
 
 	MODULE Test;
 	VAR argument: PROCEDURE;
-	PROCEDURE Procedure (value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -12909,7 +12909,7 @@ negative: calling procedure with integer parameter with character argument
 positive: calling procedure with integer parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: INTEGER); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13037,7 +13037,7 @@ negative: calling procedure with long integer parameter with character argument
 positive: calling procedure with long integer parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: LONGINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13165,7 +13165,7 @@ negative: calling procedure with huge integer parameter with character argument
 positive: calling procedure with huge integer parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: HUGEINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13293,7 +13293,7 @@ negative: calling procedure with real parameter with character argument
 positive: calling procedure with real parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: REAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13421,7 +13421,7 @@ negative: calling procedure with long real parameter with character argument
 positive: calling procedure with long real parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: LONGREAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13549,7 +13549,7 @@ negative: calling procedure with set parameter with character argument
 negative: calling procedure with set parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: SET); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13677,7 +13677,7 @@ negative: calling procedure with array parameter with character argument
 negative: calling procedure with array parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13828,7 +13828,7 @@ negative: calling procedure with open array parameter with character argument
 negative: calling procedure with open array parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: ARRAY OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13963,7 +13963,7 @@ negative: calling procedure with record parameter with character argument
 negative: calling procedure with record parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14110,7 +14110,7 @@ negative: calling procedure with object parameter with character argument
 negative: calling procedure with object parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: OBJECT END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14257,7 +14257,7 @@ negative: calling procedure with base object parameter with character argument
 negative: calling procedure with base object parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: OBJECT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14385,7 +14385,7 @@ negative: calling procedure with pointer to array parameter with character argum
 negative: calling procedure with pointer to array parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14513,7 +14513,7 @@ negative: calling procedure with pointer to record parameter with character argu
 negative: calling procedure with pointer to record parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: POINTER TO RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14660,7 +14660,7 @@ negative: calling procedure with procedure parameter with character argument
 negative: calling procedure with procedure parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (value: PROCEDURE); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14788,7 +14788,7 @@ negative: calling procedure with boolean variable parameter with character argum
 negative: calling procedure with boolean variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: BOOLEAN); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14916,7 +14916,7 @@ positive: calling procedure with character variable parameter with character arg
 negative: calling procedure with character variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15029,7 +15029,7 @@ negative: calling procedure with short integer variable parameter with boolean a
 
 	MODULE Test;
 	VAR argument: BOOLEAN;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15037,15 +15037,15 @@ negative: calling procedure with short integer variable parameter with character
 
 	MODULE Test;
 	VAR argument: CHAR;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
 positive: calling procedure with short integer variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	VAR argument: SIGNED8;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15053,7 +15053,7 @@ negative: calling procedure with short integer variable parameter with integer a
 
 	MODULE Test;
 	VAR argument: INTEGER;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15061,7 +15061,7 @@ negative: calling procedure with short integer variable parameter with long inte
 
 	MODULE Test;
 	VAR argument: LONGINT;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15069,7 +15069,7 @@ negative: calling procedure with short integer variable parameter with huge inte
 
 	MODULE Test;
 	VAR argument: HUGEINT;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15077,7 +15077,7 @@ negative: calling procedure with short integer variable parameter with real argu
 
 	MODULE Test;
 	VAR argument: REAL;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15085,7 +15085,7 @@ negative: calling procedure with short integer variable parameter with long real
 
 	MODULE Test;
 	VAR argument: LONGREAL;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15093,7 +15093,7 @@ negative: calling procedure with short integer variable parameter with set argum
 
 	MODULE Test;
 	VAR argument: SET;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15101,7 +15101,7 @@ negative: calling procedure with short integer variable parameter with array arg
 
 	MODULE Test;
 	VAR argument: ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15109,7 +15109,7 @@ negative: calling procedure with short integer variable parameter with record ar
 
 	MODULE Test;
 	VAR argument: RECORD END;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15117,7 +15117,7 @@ negative: calling procedure with short integer variable parameter with object ar
 
 	MODULE Test;
 	VAR argument: OBJECT END;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15125,7 +15125,7 @@ negative: calling procedure with short integer variable parameter with base obje
 
 	MODULE Test;
 	VAR argument: OBJECT;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15133,7 +15133,7 @@ negative: calling procedure with short integer variable parameter with pointer t
 
 	MODULE Test;
 	VAR argument: POINTER TO ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15141,7 +15141,7 @@ negative: calling procedure with short integer variable parameter with pointer t
 
 	MODULE Test;
 	VAR argument: POINTER TO RECORD END;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15149,7 +15149,7 @@ negative: calling procedure with short integer variable parameter with procedure
 
 	MODULE Test;
 	VAR argument: PROCEDURE;
-	PROCEDURE Procedure (VAR value: SHORTINT); END Procedure;
+	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15172,7 +15172,7 @@ negative: calling procedure with integer variable parameter with character argum
 negative: calling procedure with integer variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: INTEGER); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15300,7 +15300,7 @@ negative: calling procedure with long integer variable parameter with character 
 negative: calling procedure with long integer variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: LONGINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15428,7 +15428,7 @@ negative: calling procedure with huge integer variable parameter with character 
 negative: calling procedure with huge integer variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: HUGEINT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15556,7 +15556,7 @@ negative: calling procedure with real variable parameter with character argument
 negative: calling procedure with real variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: REAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15684,7 +15684,7 @@ negative: calling procedure with long real variable parameter with character arg
 negative: calling procedure with long real variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15812,7 +15812,7 @@ negative: calling procedure with set variable parameter with character argument
 negative: calling procedure with set variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: SET); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15940,7 +15940,7 @@ negative: calling procedure with array variable parameter with character argumen
 negative: calling procedure with array variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16076,7 +16076,7 @@ negative: calling procedure with open array variable parameter with character ar
 negative: calling procedure with open array variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: ARRAY OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16204,7 +16204,7 @@ negative: calling procedure with record variable parameter with character argume
 negative: calling procedure with record variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16351,7 +16351,7 @@ negative: calling procedure with object variable parameter with character argume
 negative: calling procedure with object variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: OBJECT END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16498,7 +16498,7 @@ negative: calling procedure with base object variable parameter with character a
 negative: calling procedure with base object variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: OBJECT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16626,7 +16626,7 @@ negative: calling procedure with pointer to array variable parameter with charac
 negative: calling procedure with pointer to array variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: POINTER TO ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16754,7 +16754,7 @@ negative: calling procedure with pointer to record variable parameter with chara
 negative: calling procedure with pointer to record variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: POINTER TO RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16901,7 +16901,7 @@ negative: calling procedure with procedure variable parameter with character arg
 negative: calling procedure with procedure variable parameter with short integer argument
 
 	MODULE Test;
-	VAR argument: SHORTINT;
+	VAR argument: SIGNED8;
 	PROCEDURE Procedure (VAR value: PROCEDURE); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -17758,7 +17758,7 @@ negative: while statement with condition of type character
 negative: while statement with condition of type short integer
 
 	MODULE Test;
-	VAR condition: SHORTINT;
+	VAR condition: SIGNED8;
 	BEGIN WHILE condition DO END;
 	END Test.
 
@@ -17921,7 +17921,7 @@ negative: repeat statement with condition of type character
 negative: repeat statement with condition of type short integer
 
 	MODULE Test;
-	VAR condition: SHORTINT;
+	VAR condition: SIGNED8;
 	BEGIN REPEAT UNTIL condition;
 	END Test.
 
@@ -18119,7 +18119,7 @@ negative: await statement with condition of type character
 negative: await statement with condition of type short integer
 
 	MODULE Test;
-	VAR condition: SHORTINT;
+	VAR condition: SIGNED8;
 	BEGIN {EXCLUSIVE} AWAIT (condition);
 	END Test.
 
@@ -18404,91 +18404,91 @@ negative: procedure to variable character assignment
 negative: constant boolean to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := TRUE;
 	END Test.
 
 negative: constant character to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := 'f';
 	END Test.
 
 positive: constant short integer to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := 10H;
 	END Test.
 
 negative: constant short integer to temporary short integer assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): SHORTINT;
+	VAR result: PROCEDURE (): SIGNED8;
 	BEGIN result () := 10H;
 	END Test.
 
 negative: constant integer to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := 1000H;
 	END Test.
 
 negative: constant long integer to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := 100000H;
 	END Test.
 
 negative: constant huge integer to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := 10000000000H;
 	END Test.
 
 negative: constant real to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := 5.4;
 	END Test.
 
 negative: constant long real to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := 5.4D100;
 	END Test.
 
 negative: constant set to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := {5};
 	END Test.
 
 negative: string to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := "string";
 	END Test.
 
 negative: nil pointer to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	BEGIN result := NIL;
 	END Test.
 
 negative: procedure to variable short integer assignment
 
 	MODULE Test;
-	VAR result: SHORTINT;
+	VAR result: SIGNED8;
 	PROCEDURE Procedure; END Procedure;
 	BEGIN result := Procedure;
 	END Test.
@@ -19259,7 +19259,7 @@ negative: string to shorter variable array of character assignment
 negative: string to variable array of short integer assignment
 
 	MODULE Test;
-	VAR result: ARRAY 10 OF SHORTINT;
+	VAR result: ARRAY 10 OF SIGNED8;
 	BEGIN result := "string";
 	END Test.
 
@@ -19957,7 +19957,7 @@ negative: variable character to variable boolean assignment
 negative: variable short integer to variable boolean assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: BOOLEAN;
+	VAR variable: SIGNED8; result: BOOLEAN;
 	BEGIN result := variable;
 	END Test.
 
@@ -20076,7 +20076,7 @@ negative: variable character to temporary character assignment
 negative: variable short integer to variable character assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: CHAR;
+	VAR variable: SIGNED8; result: CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -20174,119 +20174,119 @@ negative: type to variable character assignment
 negative: variable boolean to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: BOOLEAN; result: SHORTINT;
+	VAR variable: BOOLEAN; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable character to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: CHAR; result: SHORTINT;
+	VAR variable: CHAR; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 positive: variable short integer to variable short integer assignment
 
 	MODULE Test;
-	VAR variable, result: SHORTINT;
+	VAR variable, result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable short integer to temporary short integer assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: PROCEDURE (): SHORTINT;
+	VAR variable: SIGNED8; result: PROCEDURE (): SIGNED8;
 	BEGIN result () := variable;
 	END Test.
 
 negative: variable integer to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: INTEGER; result: SHORTINT;
+	VAR variable: INTEGER; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long integer to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: LONGINT; result: SHORTINT;
+	VAR variable: LONGINT; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable huge integer to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: HUGEINT; result: SHORTINT;
+	VAR variable: HUGEINT; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable real to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: REAL; result: SHORTINT;
+	VAR variable: REAL; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long real to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: SHORTINT;
+	VAR variable: LONGREAL; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable set to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: SET; result: SHORTINT;
+	VAR variable: SET; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF CHAR; result: SHORTINT;
+	VAR variable: ARRAY 10 OF CHAR; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: record to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: RECORD END; result: SHORTINT;
+	VAR variable: RECORD END; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: object to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: OBJECT; result: SHORTINT;
+	VAR variable: OBJECT; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: pointer to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: POINTER TO RECORD END; result: SHORTINT;
+	VAR variable: POINTER TO RECORD END; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable procedure to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: PROCEDURE; result: SHORTINT;
+	VAR variable: PROCEDURE; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: import to variable short integer assignment
 
 	MODULE Test;
-	IMPORT variable := Dummy; VAR result: SHORTINT;
+	IMPORT variable := Dummy; VAR result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: type to variable short integer assignment
 
 	MODULE Test;
-	TYPE Type = SHORTINT; VAR result: Type;
+	TYPE Type = SIGNED8; VAR result: Type;
 	BEGIN result := Type;
 	END Test.
 
@@ -20307,14 +20307,14 @@ negative: variable character to variable integer assignment
 positive: variable short integer to variable integer assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: INTEGER;
+	VAR variable: SIGNED8; result: INTEGER;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable short integer to temporary integer assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: PROCEDURE (): INTEGER;
+	VAR variable: SIGNED8; result: PROCEDURE (): INTEGER;
 	BEGIN result () := variable;
 	END Test.
 
@@ -20433,14 +20433,14 @@ negative: variable character to variable long integer assignment
 positive: variable short integer to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: LONGINT;
+	VAR variable: SIGNED8; result: LONGINT;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable short integer to temporary long integer assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: PROCEDURE (): LONGINT;
+	VAR variable: SIGNED8; result: PROCEDURE (): LONGINT;
 	BEGIN result () := variable;
 	END Test.
 
@@ -20566,14 +20566,14 @@ negative: variable character to variable huge integer assignment
 positive: variable short integer to variable huge integer assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: HUGEINT;
+	VAR variable: SIGNED8; result: HUGEINT;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable short integer to temporary huge integer assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: PROCEDURE (): HUGEINT;
+	VAR variable: SIGNED8; result: PROCEDURE (): HUGEINT;
 	BEGIN result () := variable;
 	END Test.
 
@@ -20706,14 +20706,14 @@ negative: variable character to variable real assignment
 positive: variable short integer to variable real assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: REAL;
+	VAR variable: SIGNED8; result: REAL;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable short integer to temporary real assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: PROCEDURE (): REAL;
+	VAR variable: SIGNED8; result: PROCEDURE (): REAL;
 	BEGIN result () := variable;
 	END Test.
 
@@ -20853,14 +20853,14 @@ negative: variable character to variable long real assignment
 positive: variable short integer to variable long real assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: LONGREAL;
+	VAR variable: SIGNED8; result: LONGREAL;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable short integer to temporary long real assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: PROCEDURE (): LONGREAL;
+	VAR variable: SIGNED8; result: PROCEDURE (): LONGREAL;
 	BEGIN result () := variable;
 	END Test.
 
@@ -21007,7 +21007,7 @@ negative: variable character to variable set assignment
 negative: variable short integer to variable set assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: SET;
+	VAR variable: SIGNED8; result: SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -21126,7 +21126,7 @@ negative: variable character to array assignment
 negative: variable short integer to array assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: ARRAY 10 OF CHAR;
+	VAR variable: SIGNED8; result: ARRAY 10 OF CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -21235,7 +21235,7 @@ negative: array of character to array of boolean assignment
 negative: array of short integer to array of boolean assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF BOOLEAN;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF BOOLEAN;
 	BEGIN result := variable;
 	END Test.
 
@@ -21394,7 +21394,7 @@ positive: string to dereferenced open array of character assignment
 negative: array of short integer to array of character assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF CHAR;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -21478,50 +21478,50 @@ negative: array of procedure to array of character assignment
 negative: array of boolean to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF BOOLEAN; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF BOOLEAN; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of character to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF CHAR; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF CHAR; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 positive: array of short integer to array of short integer assignment
 
 	MODULE Test;
-	VAR variable, result: ARRAY 10 OF SHORTINT;
+	VAR variable, result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of short integer to temporary array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: PROCEDURE (): ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF SIGNED8; result: PROCEDURE (): ARRAY 10 OF SIGNED8;
 	BEGIN result () := variable;
 	END Test.
 
 negative: array of short integer to longer array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 20 OF SHORTINT;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 20 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of short integer to shorter array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 5 OF SHORTINT;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 5 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of short integer to open array of short integer assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR result: ARRAY OF SHORTINT);
-	VAR variable: ARRAY 10 OF SHORTINT;
+	PROCEDURE Procedure (VAR result: ARRAY OF SIGNED8);
+	VAR variable: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Procedure;
 	END Test.
@@ -21529,8 +21529,8 @@ negative: array of short integer to open array of short integer assignment
 negative: open array of short integer to array of short integer assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR variable: ARRAY OF SHORTINT);
-	VAR result: ARRAY 10 OF SHORTINT;
+	PROCEDURE Procedure (VAR variable: ARRAY OF SIGNED8);
+	VAR result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Procedure;
 	END Test.
@@ -21538,84 +21538,84 @@ negative: open array of short integer to array of short integer assignment
 negative: array of short integer to dereferenced open array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: POINTER TO ARRAY OF SHORTINT;
+	VAR variable: ARRAY 10 OF SIGNED8; result: POINTER TO ARRAY OF SIGNED8;
 	BEGIN result^ := variable;
 	END Test.
 
 negative: array of integer to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF INTEGER; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long integer to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF LONGINT; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of huge integer to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF HUGEINT; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF HUGEINT; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of real to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF REAL; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF REAL; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long real to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of set to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SET; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF SET; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of array to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF ARRAY 10 OF SET; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF ARRAY 10 OF SET; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of record to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF RECORD END; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF RECORD END; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of object to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF OBJECT; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF OBJECT; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of pointer to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF POINTER TO RECORD END; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF POINTER TO RECORD END; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of procedure to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF PROCEDURE; result: ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF PROCEDURE; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
@@ -21636,7 +21636,7 @@ negative: array of character to array of integer assignment
 negative: array of short integer to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF INTEGER;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF INTEGER;
 	BEGIN result := variable;
 	END Test.
 
@@ -21780,7 +21780,7 @@ negative: array of character to array of long integer assignment
 negative: array of short integer to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF LONGINT;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF LONGINT;
 	BEGIN result := variable;
 	END Test.
 
@@ -21924,7 +21924,7 @@ negative: array of character to array of huge integer assignment
 negative: array of short integer to array of huge integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF HUGEINT;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF HUGEINT;
 	BEGIN result := variable;
 	END Test.
 
@@ -22068,7 +22068,7 @@ negative: array of character to array of real assignment
 negative: array of short integer to array of real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF REAL;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF REAL;
 	BEGIN result := variable;
 	END Test.
 
@@ -22103,7 +22103,7 @@ positive: array of real to array of real assignment
 negative: array of real to temporary array of real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: PROCEDURE (): ARRAY 10 OF SHORTINT;
+	VAR variable: ARRAY 10 OF SIGNED8; result: PROCEDURE (): ARRAY 10 OF SIGNED8;
 	BEGIN result () := variable;
 	END Test.
 
@@ -22212,7 +22212,7 @@ negative: array of character to array of long real assignment
 negative: array of short integer to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF LONGREAL;
 	BEGIN result := variable;
 	END Test.
 
@@ -22356,7 +22356,7 @@ negative: array of character to array of set assignment
 negative: array of short integer to array of set assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF SET;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -22493,7 +22493,7 @@ negative: array of character to array of array assignment
 negative: array of short integer to array of array assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF ARRAY 10 OF SET;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF ARRAY 10 OF SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -22637,7 +22637,7 @@ negative: array of character to array of record assignment
 negative: array of short integer to array of record assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF RECORD END;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -22787,7 +22787,7 @@ negative: array of character to array of object assignment
 negative: array of short integer to array of object assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF OBJECT END;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF OBJECT END;
 	BEGIN result := variable;
 	END Test.
 
@@ -22937,7 +22937,7 @@ negative: array of character to array of pointer assignment
 negative: array of short integer to array of pointer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF POINTER TO RECORD END;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF POINTER TO RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23087,7 +23087,7 @@ negative: array of character to array of procedure assignment
 negative: array of short integer to array of procedure assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SHORTINT; result: ARRAY 10 OF PROCEDURE;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF PROCEDURE;
 	BEGIN result := variable;
 	END Test.
 
@@ -23273,7 +23273,7 @@ negative: variable character to record assignment
 negative: variable short integer to record assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: RECORD END;
+	VAR variable: SIGNED8; result: RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23451,7 +23451,7 @@ negative: variable character to object assignment
 negative: variable short integer to object assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: OBJECT END;
+	VAR variable: SIGNED8; result: OBJECT END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23601,7 +23601,7 @@ negative: variable character to pointer assignment
 negative: variable short integer to pointer assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: POINTER TO RECORD END;
+	VAR variable: SIGNED8; result: POINTER TO RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23826,7 +23826,7 @@ negative: variable character to procedure assignment
 negative: variable short integer to procedure assignment
 
 	MODULE Test;
-	VAR variable: SHORTINT; result: PROCEDURE;
+	VAR variable: SIGNED8; result: PROCEDURE;
 	BEGIN result := variable;
 	END Test.
 
@@ -24208,7 +24208,7 @@ negative: variable short integer to import assignment
 
 	MODULE Test;
 	IMPORT result := Dummy;
-	VAR variable: SHORTINT;
+	VAR variable: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
@@ -24331,7 +24331,7 @@ negative: variable character to type assignment
 negative: variable short integer to type assignment
 
 	MODULE Test;
-	TYPE result = SHORTINT; VAR variable: result;
+	TYPE result = SIGNED8; VAR variable: result;
 	BEGIN result := variable;
 	END Test.
 
@@ -25207,7 +25207,7 @@ positive: arithmetic shift of variable integers
 negative: short on variable short integer
 
 	MODULE Test;
-	VAR shortint, result: SHORTINT;
+	VAR shortint, result: SIGNED8;
 	BEGIN result := SHORT (shortint)
 	END Test.
 
@@ -25235,7 +25235,7 @@ positive: short on variable huge integer
 positive: long on variable short integer
 
 	MODULE Test;
-	VAR shortint, result: SHORTINT;
+	VAR shortint, result: SIGNED8;
 	BEGIN result := SHORT (LONG (shortint))
 	END Test.
 
@@ -29782,21 +29782,21 @@ positive: ignoring procedure variable returning procedure
 positive: implicit variable short to integer conversion
 
 	MODULE Test;
-	VAR shortint: SHORTINT; integer, result: INTEGER;
+	VAR shortint: SIGNED8; integer, result: INTEGER;
 	BEGIN result := shortint + integer
 	END Test.
 
 positive: implicit variable short to long integer conversion
 
 	MODULE Test;
-	VAR shortint: SHORTINT; longint, result: LONGINT;
+	VAR shortint: SIGNED8; longint, result: LONGINT;
 	BEGIN result := shortint * longint
 	END Test.
 
 positive: implicit variable short to huge integer conversion
 
 	MODULE Test;
-	VAR shortint: SHORTINT; hugeint, result: HUGEINT;
+	VAR shortint: SIGNED8; hugeint, result: HUGEINT;
 	BEGIN result := hugeint DIV shortint
 	END Test.
 
@@ -29918,14 +29918,14 @@ negative: implicit conversion between variable real and set
 negative: explicit long conversion on variable short integer
 
 	MODULE Test;
-	VAR shortint: SHORTINT;
+	VAR shortint: SIGNED8;
 	BEGIN shortint := LONG (shortint);
 	END Test.
 
 negative: explicit short conversion on variable short integer
 
 	MODULE Test;
-	VAR shortint: SHORTINT;
+	VAR shortint: SIGNED8;
 	BEGIN shortint := SHORT (shortint);
 	END Test.
 
@@ -29974,28 +29974,28 @@ positive: explicit short conversion on variable huge integer
 positive: explicit variable short integer to integer conversion
 
 	MODULE Test;
-	VAR shortint: SHORTINT; integer: INTEGER;
+	VAR shortint: SIGNED8; integer: INTEGER;
 	BEGIN integer := LONG (shortint);
 	END Test.
 
 positive: explicit variable short to long integer conversion
 
 	MODULE Test;
-	VAR shortint: SHORTINT; longint: LONGINT;
+	VAR shortint: SIGNED8; longint: LONGINT;
 	BEGIN longint := LONG (LONG (shortint));
 	END Test.
 
 positive: explicit variable short to huge integer conversion
 
 	MODULE Test;
-	VAR shortint: SHORTINT; hugeint: HUGEINT;
+	VAR shortint: SIGNED8; hugeint: HUGEINT;
 	BEGIN hugeint := LONG (LONG (LONG (shortint)));
 	END Test.
 
 positive: explicit variable integer to short integer conversion
 
 	MODULE Test;
-	VAR integer: INTEGER; shortint: SHORTINT;
+	VAR integer: INTEGER; shortint: SIGNED8;
 	BEGIN integer := SHORT (integer);
 	END Test.
 
@@ -30016,7 +30016,7 @@ positive: explicit variable integer to huge integer conversion
 positive: explicit variable long to short integer conversion
 
 	MODULE Test;
-	VAR longint: LONGINT; shortint: SHORTINT;
+	VAR longint: LONGINT; shortint: SIGNED8;
 	BEGIN shortint := SHORT (SHORT (longint));
 	END Test.
 
@@ -30037,7 +30037,7 @@ positive: explicit variable long to huge integer conversion
 positive: explicit variable huge to short integer conversion
 
 	MODULE Test;
-	VAR hugeint: HUGEINT; shortint: SHORTINT;
+	VAR hugeint: HUGEINT; shortint: SIGNED8;
 	BEGIN shortint := SHORT (SHORT (SHORT (hugeint)));
 	END Test.
 
@@ -30058,7 +30058,7 @@ positive: explicit variable huge to long integer conversion
 negative: explicit variable real to short integer conversion
 
 	MODULE Test;
-	VAR real: REAL; shortint: SHORTINT;
+	VAR real: REAL; shortint: SIGNED8;
 	BEGIN shortint := ENTIER (real);
 	END Test.
 
@@ -30086,7 +30086,7 @@ positive: explicit variable real to huge integer conversion
 negative: explicit variable long real to short integer conversion
 
 	MODULE Test;
-	VAR longreal: LONGREAL; shortint: SHORTINT;
+	VAR longreal: LONGREAL; shortint: SIGNED8;
 	BEGIN shortint := ENTIER (longreal);
 	END Test.
 
@@ -30348,7 +30348,7 @@ negative: for statement with counter of type character
 positive: for statement with counter of type short integer
 
 	MODULE Test;
-	VAR i, s, e: SHORTINT;
+	VAR i, s, e: SIGNED8;
 	BEGIN FOR i := s TO e DO END
 	END Test.
 
@@ -30432,35 +30432,35 @@ negative: for statement with counter of type procedure
 positive: for statement with short integer counter and short integer start counter
 
 	MODULE Test;
-	VAR i, s: SHORTINT;
+	VAR i, s: SIGNED8;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 negative: for statement with short integer counter and integer start counter
 
 	MODULE Test;
-	VAR i: SHORTINT; s: INTEGER;
+	VAR i: SIGNED8; s: INTEGER;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 negative: for statement with short integer counter and long integer start counter
 
 	MODULE Test;
-	VAR i: SHORTINT; s: LONGINT;
+	VAR i: SIGNED8; s: LONGINT;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 negative: for statement with short integer counter and huge integer start counter
 
 	MODULE Test;
-	VAR i: SHORTINT; s: HUGEINT;
+	VAR i: SIGNED8; s: HUGEINT;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
 positive: for statement with integer counter and short integer start counter
 
 	MODULE Test;
-	VAR i: INTEGER; s: SHORTINT;
+	VAR i: INTEGER; s: SIGNED8;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30488,7 +30488,7 @@ negative: for statement with integer counter and huge integer start counter
 positive: for statement with long integer counter and short integer start counter
 
 	MODULE Test;
-	VAR i: LONGINT; s: SHORTINT;
+	VAR i: LONGINT; s: SIGNED8;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30516,7 +30516,7 @@ negative: for statement with long integer counter and huge integer start counter
 positive: for statement with huge integer counter and short integer start counter
 
 	MODULE Test;
-	VAR i: HUGEINT; s: SHORTINT;
+	VAR i: HUGEINT; s: SIGNED8;
 	BEGIN FOR i := s TO 10 DO END
 	END Test.
 
@@ -30544,35 +30544,35 @@ positive: for statement with huge integer counter and huge integer start counter
 positive: for statement with short integer counter and short integer end counter
 
 	MODULE Test;
-	VAR i, e: SHORTINT;
+	VAR i, e: SIGNED8;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 negative: for statement with short integer counter and integer end counter
 
 	MODULE Test;
-	VAR i: SHORTINT; e: INTEGER;
+	VAR i: SIGNED8; e: INTEGER;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 negative: for statement with short integer counter and long integer end counter
 
 	MODULE Test;
-	VAR i: SHORTINT; e: LONGINT;
+	VAR i: SIGNED8; e: LONGINT;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 negative: for statement with short integer counter and huge integer end counter
 
 	MODULE Test;
-	VAR i: SHORTINT; e: HUGEINT;
+	VAR i: SIGNED8; e: HUGEINT;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
 positive: for statement with integer counter and short integer end counter
 
 	MODULE Test;
-	VAR i: INTEGER; e: SHORTINT;
+	VAR i: INTEGER; e: SIGNED8;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30600,7 +30600,7 @@ negative: for statement with integer counter and huge integer end counter
 positive: for statement with long integer counter and short integer end counter
 
 	MODULE Test;
-	VAR i: LONGINT; e: SHORTINT;
+	VAR i: LONGINT; e: SIGNED8;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30628,7 +30628,7 @@ negative: for statement with long integer counter and huge integer end counter
 positive: for statement with huge integer counter and short integer end counter
 
 	MODULE Test;
-	VAR i: HUGEINT; e: SHORTINT;
+	VAR i: HUGEINT; e: SIGNED8;
 	BEGIN FOR i := 0 TO e DO END
 	END Test.
 
@@ -30863,91 +30863,91 @@ negative: procedure with character as return type returning procedure
 negative: procedure with short integer as return type returning boolean
 
 	MODULE Test;
-	PROCEDURE Procedure (value: BOOLEAN): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: BOOLEAN): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning character
 
 	MODULE Test;
-	PROCEDURE Procedure (value: CHAR): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: CHAR): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with short integer as return type returning short integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SHORTINT): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED8): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: INTEGER): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: INTEGER): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning long integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGINT): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: LONGINT): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning huge integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: HUGEINT): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: HUGEINT): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning real
 
 	MODULE Test;
-	PROCEDURE Procedure (value: REAL): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: REAL): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning set
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SET): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SET): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning array
 
 	MODULE Test;
-	PROCEDURE Procedure (value: ARRAY 10 OF CHAR): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: ARRAY 10 OF CHAR): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning record
 
 	MODULE Test;
-	PROCEDURE Procedure (value: RECORD END): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: RECORD END): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning object
 
 	MODULE Test;
-	PROCEDURE Procedure (value: OBJECT END): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: OBJECT END): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning base object
 
 	MODULE Test;
-	PROCEDURE Procedure (value: OBJECT): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: OBJECT): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning pointer to array
 
 	MODULE Test;
-	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning pointer to record
 
 	MODULE Test;
-	PROCEDURE Procedure (value: POINTER TO RECORD END): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: POINTER TO RECORD END): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with short integer as return type returning procedure
 
 	MODULE Test;
-	PROCEDURE Procedure (value: PROCEDURE): SHORTINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: PROCEDURE): SIGNED8; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with integer as return type returning boolean
@@ -30965,7 +30965,7 @@ negative: procedure with integer as return type returning character
 positive: procedure with integer as return type returning short integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SHORTINT): INTEGER; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED8): INTEGER; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with integer as return type returning integer
@@ -31055,7 +31055,7 @@ negative: procedure with long integer as return type returning character
 positive: procedure with long integer as return type returning short integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SHORTINT): LONGINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED8): LONGINT; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long integer as return type returning integer
@@ -31145,7 +31145,7 @@ negative: procedure with huge integer as return type returning character
 positive: procedure with huge integer as return type returning short integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SHORTINT): HUGEINT; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED8): HUGEINT; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with huge integer as return type returning integer
@@ -31235,7 +31235,7 @@ negative: procedure with real as return type returning character
 positive: procedure with real as return type returning short integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SHORTINT): REAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED8): REAL; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with real as return type returning integer
@@ -31331,7 +31331,7 @@ negative: procedure with long real as return type returning character
 positive: procedure with long real as return type returning short integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SHORTINT): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED8): LONGREAL; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long real as return type returning integer
@@ -32231,7 +32231,7 @@ negative: assert statement with condition of type character
 negative: assert statement with condition of type short integer
 
 	MODULE Test;
-	VAR condition: SHORTINT;
+	VAR condition: SIGNED8;
 	BEGIN ASSERT (condition);
 	END Test.
 
@@ -32379,7 +32379,7 @@ negative: assert statement with number of type character
 negative: assert statement with number of type short integer
 
 	MODULE Test;
-	VAR number: SHORTINT;
+	VAR number: SIGNED8;
 	BEGIN ASSERT (TRUE, number);
 	END Test.
 
@@ -32542,7 +32542,7 @@ negative: if statement with condition of type character
 negative: if statement with condition of type short integer
 
 	MODULE Test;
-	VAR condition: SHORTINT;
+	VAR condition: SIGNED8;
 	BEGIN IF condition THEN END;
 	END Test.
 
@@ -32702,7 +32702,7 @@ negative: else if statement with condition of type character
 negative: else if statement with condition of type short integer
 
 	MODULE Test;
-	VAR condition: SHORTINT;
+	VAR condition: SIGNED8;
 	BEGIN IF TRUE THEN ELSIF condition THEN END;
 	END Test.
 
@@ -32853,7 +32853,7 @@ negative: halt statement with number of type character
 negative: halt statement with number of type short integer
 
 	MODULE Test;
-	VAR number: SHORTINT;
+	VAR number: SIGNED8;
 	BEGIN HALT (number);
 	END Test.
 
@@ -33064,7 +33064,7 @@ positive: case statement with variable character value
 positive: case statement with variable short integer value
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF 5: END
 	END Test.
 
@@ -33267,7 +33267,7 @@ negative: character case statement with variable character case
 negative: character case statement with variable short integer case
 
 	MODULE Test;
-	VAR value: CHAR; case: SHORTINT;
+	VAR value: CHAR; case: SIGNED8;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33381,196 +33381,196 @@ negative: character case statement with type as case
 negative: short integer case statement with constant boolean case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF TRUE: END
 	END Test.
 
 negative: short integer case statement with constant character case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF 'a': END
 	END Test.
 
 positive: short integer case statement with constant short integer case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF 10H: END
 	END Test.
 
 negative: short integer case statement with constant integer case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF 1000H: END
 	END Test.
 
 negative: short integer case statement with constant long integer case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF 100000H: END
 	END Test.
 
 negative: short integer case statement with constant huge integer case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF 100000000H: END
 	END Test.
 
 negative: short integer case statement with constant real case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF 1.0: END
 	END Test.
 
 negative: short integer case statement with constant long real case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF 1.D0: END
 	END Test.
 
 negative: short integer case statement with constant set case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF {}: END
 	END Test.
 
 negative: short integer case statement with constant string case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF "value": END
 	END Test.
 
 negative: short integer case statement with nil pointer case
 
 	MODULE Test;
-	VAR value: SHORTINT;
+	VAR value: SIGNED8;
 	BEGIN CASE value OF NIL: END
 	END Test.
 
 negative: short integer case statement variable boolean case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: BOOLEAN;
+	VAR value: SIGNED8; case: BOOLEAN;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable character case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: CHAR;
+	VAR value: SIGNED8; case: CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable short integer case
 
 	MODULE Test;
-	VAR value, case: SHORTINT;
+	VAR value, case: SIGNED8;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable integer case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: INTEGER;
+	VAR value: SIGNED8; case: INTEGER;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable long integer case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: LONGINT;
+	VAR value: SIGNED8; case: LONGINT;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable huge integer case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: HUGEINT;
+	VAR value: SIGNED8; case: HUGEINT;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable real case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: REAL;
+	VAR value: SIGNED8; case: REAL;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable long real case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: LONGREAL;
+	VAR value: SIGNED8; case: LONGREAL;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable set case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: SET;
+	VAR value: SIGNED8; case: SET;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable array case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: ARRAY 10 OF CHAR;
+	VAR value: SIGNED8; case: ARRAY 10 OF CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable record case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: RECORD END;
+	VAR value: SIGNED8; case: RECORD END;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable object case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: OBJECT END;
+	VAR value: SIGNED8; case: OBJECT END;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable base object case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: OBJECT;
+	VAR value: SIGNED8; case: OBJECT;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable pointer to record case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: POINTER TO RECORD END;
+	VAR value: SIGNED8; case: POINTER TO RECORD END;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable pointer to array case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: POINTER TO ARRAY OF CHAR;
+	VAR value: SIGNED8; case: POINTER TO ARRAY OF CHAR;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with variable procedure case
 
 	MODULE Test;
-	VAR value: SHORTINT; case: PROCEDURE;
+	VAR value: SIGNED8; case: PROCEDURE;
 	BEGIN CASE value OF case: END
 	END Test.
 
 negative: short integer case statement with import case
 
 	MODULE Test;
-	IMPORT case := Dummy; VAR value: SHORTINT;
+	IMPORT case := Dummy; VAR value: SIGNED8;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33675,7 +33675,7 @@ negative: integer case statement with variable character case
 negative: integer case statement with variable short integer case
 
 	MODULE Test;
-	VAR value: INTEGER; case: SHORTINT;
+	VAR value: INTEGER; case: SIGNED8;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33878,7 +33878,7 @@ negative: long integer case statement with variable character case
 negative: long integer case statement with variable short integer case
 
 	MODULE Test;
-	VAR value: LONGINT; case: SHORTINT;
+	VAR value: LONGINT; case: SIGNED8;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -34081,7 +34081,7 @@ negative: huge integer case statement with variable character case
 negative: huge integer case statement with variable short integer case
 
 	MODULE Test;
-	VAR value: HUGEINT; case: SHORTINT;
+	VAR value: HUGEINT; case: SIGNED8;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -34584,14 +34584,14 @@ negative: with statement with variable character value type
 negative: with statement with variable short integer value
 
 	MODULE Test;
-	VAR value: SHORTINT;
-	BEGIN WITH value : SHORTINT DO END;
+	VAR value: SIGNED8;
+	BEGIN WITH value : SIGNED8 DO END;
 	END Test.
 
 negative: with statement with variable short integer value type
 
 	MODULE Test;
-	TYPE Type = SHORTINT;
+	TYPE Type = SIGNED8;
 	VAR value: Type;
 	BEGIN WITH value : Type DO END;
 	END Test.
@@ -35594,7 +35594,7 @@ negative: increment statement on character
 positive: increment statement on short integer
 
 	MODULE Test;
-	VAR integer: SHORTINT;
+	VAR integer: SIGNED8;
 	BEGIN INC (integer);
 	END Test.
 
@@ -35793,35 +35793,35 @@ negative: increment statement with character as increment
 positive: increment statement on short integer with short integer as increment
 
 	MODULE Test;
-	VAR integer, increment: SHORTINT;
+	VAR integer, increment: SIGNED8;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement on short integer with integer as increment
 
 	MODULE Test;
-	VAR integer: SHORTINT; increment: INTEGER;
+	VAR integer: SIGNED8; increment: INTEGER;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement on short integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: SHORTINT; increment: LONGINT;
+	VAR integer: SIGNED8; increment: LONGINT;
 	BEGIN INC (integer, increment);
 	END Test.
 
 negative: increment statement on short integer with huge integer as increment
 
 	MODULE Test;
-	VAR integer: SHORTINT; increment: HUGEINT;
+	VAR integer: SIGNED8; increment: HUGEINT;
 	BEGIN INC (integer, increment);
 	END Test.
 
 positive: increment statement on integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: SHORTINT;
+	VAR integer: INTEGER; increment: SIGNED8;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35849,7 +35849,7 @@ negative: increment statement on integer with huge integer as increment
 positive: increment statement on long integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: SHORTINT;
+	VAR integer: LONGINT; increment: SIGNED8;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -35877,7 +35877,7 @@ negative: increment statement on long integer with huge integer as increment
 positive: increment statement on huge integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: HUGEINT; increment: SHORTINT;
+	VAR integer: HUGEINT; increment: SIGNED8;
 	BEGIN INC (integer, increment);
 	END Test.
 
@@ -36054,7 +36054,7 @@ negative: decrement statement on character
 positive: decrement statement on short integer
 
 	MODULE Test;
-	VAR integer: SHORTINT;
+	VAR integer: SIGNED8;
 	BEGIN DEC (integer);
 	END Test.
 
@@ -36253,35 +36253,35 @@ negative: decrement statement with character as increment
 positive: decrement statement on short integer with short integer as increment
 
 	MODULE Test;
-	VAR integer, increment: SHORTINT;
+	VAR integer, increment: SIGNED8;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement on short integer with integer as increment
 
 	MODULE Test;
-	VAR integer: SHORTINT; increment: INTEGER;
+	VAR integer: SIGNED8; increment: INTEGER;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement on short integer with long integer as increment
 
 	MODULE Test;
-	VAR integer: SHORTINT; increment: LONGINT;
+	VAR integer: SIGNED8; increment: LONGINT;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 negative: decrement statement on short integer with huge integer as increment
 
 	MODULE Test;
-	VAR integer: SHORTINT; increment: HUGEINT;
+	VAR integer: SIGNED8; increment: HUGEINT;
 	BEGIN DEC (integer, increment);
 	END Test.
 
 positive: decrement statement on integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: INTEGER; increment: SHORTINT;
+	VAR integer: INTEGER; increment: SIGNED8;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36309,7 +36309,7 @@ negative: decrement statement on integer with huge integer as increment
 positive: decrement statement on long integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: LONGINT; increment: SHORTINT;
+	VAR integer: LONGINT; increment: SIGNED8;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36337,7 +36337,7 @@ negative: decrement statement on long integer with huge integer as increment
 positive: decrement statement on huge integer with short integer as increment
 
 	MODULE Test;
-	VAR integer: HUGEINT; increment: SHORTINT;
+	VAR integer: HUGEINT; increment: SIGNED8;
 	BEGIN DEC (integer, increment);
 	END Test.
 
@@ -36663,7 +36663,7 @@ negative: include statement on set with character
 positive: include statement on set with short integer
 
 	MODULE Test;
-	VAR set: SET; integer: SHORTINT;
+	VAR set: SET; integer: SIGNED8;
 	BEGIN INCL (set, integer);
 	END Test.
 
@@ -36955,7 +36955,7 @@ negative: exclude statement on set with character
 positive: exclude statement on set with short integer
 
 	MODULE Test;
-	VAR set: SET; integer: SHORTINT;
+	VAR set: SET; integer: SIGNED8;
 	BEGIN EXCL (set, integer);
 	END Test.
 
@@ -37999,7 +37999,7 @@ positive: realtime object containing basic type fields
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE A = OBJECT {REALTIME}
-		VAR a0: CHAR; a1: SHORTINT; a2: INTEGER; a3: LONGINT; a4: HUGEINT; a5: REAL;
+		VAR a0: CHAR; a1: SIGNED8; a2: INTEGER; a3: LONGINT; a4: HUGEINT; a5: REAL;
 			a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END A;
 	END Test.
@@ -38009,7 +38009,7 @@ positive: realtime pointer to record that contains basic type fields
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE A = POINTER {REALTIME} TO RECORD
-		a0: CHAR; a1: SHORTINT; a2: INTEGER; a3: LONGINT; a4: HUGEINT; a5: REAL;
+		a0: CHAR; a1: SIGNED8; a2: INTEGER; a3: LONGINT; a4: HUGEINT; a5: REAL;
 		a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END;
 	END Test.
@@ -38019,7 +38019,7 @@ positive: realtime pointer to array where the elements contain basic type fields
 	MODULE Test;
 	IMPORT SYSTEM;
 	TYPE A0 = POINTER {REALTIME} TO ARRAY OF RECORD
-		a0: CHAR; a1: SHORTINT; a2: INTEGER; a3: LONGINT; a4: HUGEINT; a5: REAL;
+		a0: CHAR; a1: SIGNED8; a2: INTEGER; a3: LONGINT; a4: HUGEINT; a5: REAL;
 		a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END;
 	END Test.
@@ -38080,7 +38080,7 @@ negative: realtime object containing non-realtime object reference
 positive: realtime object containing record variable with realtime fields
 
 	MODULE Test;
-	TYPE A = OBJECT {REALTIME} VAR a: RECORD k: SHORTINT; l: INTEGER; m: A END END A;
+	TYPE A = OBJECT {REALTIME} VAR a: RECORD k: SIGNED8; l: INTEGER; m: A END END A;
 	END Test.
 
 positive: realtime object containing record variable with realtime pointers
@@ -38664,7 +38664,7 @@ negative: system address function on size-incompatible type
 
 	MODULE Test;
 	IMPORT SYSTEM;
-	VAR a: SHORTINT;
+	VAR a: SIGNED8;
 	BEGIN a := SYSTEM.ADR(a)
 	END Test.
 
@@ -39208,7 +39208,7 @@ positive: shortint variable multiplied by shortint value (8bit multiply)
 	MODULE Test;
 
 	PROCEDURE P;
-	VAR a: SHORTINT;
+	VAR a: SIGNED8;
 	BEGIN
 		IF a = a*3 THEN END;
 	END P;
@@ -39291,7 +39291,7 @@ positive: write a SYSTEM.BYTE varpar without conversion
 	IMPORT SYSTEM;
 
 	PROCEDURE P(VAR buf: SYSTEM.BYTE);
-	VAR s1,s2: SHORTINT;
+	VAR s1,s2: SIGNED8;
 	BEGIN
 		buf := s2*16 + (s1 MOD 16)
 	END P;
@@ -39533,7 +39533,7 @@ positive: tests of MIN and MAX
 
 	PROCEDURE TestMinMax*();
 	BEGIN
-	    ASSERT(-128 = MIN(SHORTINT)); ASSERT(127 = MAX(SHORTINT));
+	    ASSERT(-128 = MIN(SIGNED8)); ASSERT(127 = MAX(SIGNED8));
 	    ASSERT(-32768 = MIN(INTEGER)); ASSERT(32767 = MAX(INTEGER));
 	    ASSERT(-2147483648 = MIN(LONGINT)); ASSERT(2147483647 = MAX(LONGINT));
 	    ASSERT(-9223372036854775807-1 = MIN(HUGEINT)); ASSERT(9223372036854775807 = MAX(HUGEINT));

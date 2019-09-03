@@ -36,7 +36,7 @@ CONST
 
 	(** SQL data types **)
 	SqlBitType* = -7;	(** single bit binary data **)
-	SqlTinyIntType* = -6;	(** SHORTINT **)
+	SqlTinyIntType* = -6;	(** SIGNED8 **)
 	SqlBigIntType* = -5;	(** 64 bit integer data **)
 	SqlLongVarBinaryType* = -4;	(** variable length binary data, maximum length is data source dependant **)
 	SqlVarBinaryType* = -3;	(** variable length binary data of maximum length n (1 <= n <= 255) **)

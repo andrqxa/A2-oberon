@@ -900,7 +900,7 @@ TYPE
 
 	END NumberType;
 
-	(** <<SHORTINT, INTEGER, LONGINT, HUGEINT>>
+	(** <<SIGNED8, INTEGER, LONGINT, HUGEINT>>
 		integer types
 	**)
 	IntegerType*= OBJECT (NumberType)
@@ -2097,7 +2097,7 @@ TYPE
 	VAR
 		first-, last-, step-: Expression;
 		missingFirst-, missingLast-, missingStep-: BOOLEAN; (* only for printout*)
-		context-: SHORTINT; (* one of ArrayIndex, SetElement or CaseGuard *)
+		context-: SIGNED8; (* one of ArrayIndex, SetElement or CaseGuard *)
 
 		PROCEDURE &InitRangeExpression(position: Position; first, last, step: Expression);
 		BEGIN
@@ -2124,7 +2124,7 @@ TYPE
 		BEGIN SELF.step := step
 		END SetStep;
 
-		PROCEDURE SetContext*(context: SHORTINT);
+		PROCEDURE SetContext*(context: SIGNED8);
 		BEGIN
 			SELF.context := context
 		END SetContext;
@@ -5227,7 +5227,7 @@ VAR
 		NEW(builtin,position,name,id); RETURN builtin
 	END NewBuiltin;
 
-	PROCEDURE NewCustomBuiltin*(position: Position; name: Identifier; id: LONGINT; subType: SHORTINT): CustomBuiltin;
+	PROCEDURE NewCustomBuiltin*(position: Position; name: Identifier; id: LONGINT; subType: SIGNED8): CustomBuiltin;
 	VAR builtin:CustomBuiltin;
 	BEGIN
 		NEW(builtin,position,name,id,subType); RETURN builtin

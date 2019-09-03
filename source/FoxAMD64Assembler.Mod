@@ -133,7 +133,7 @@ TYPE
 
 	OperandType = InstructionSet.OperandType;
 
-	Size = SHORTINT;
+	Size = SIGNED8;
 	Register* = LONGINT; (* index for InstructionSet.registers *)
 	(*
 		an implementation of Operands as objects is very elegant but unfortunately also very costly in terms of number of allocations
@@ -279,7 +279,7 @@ TYPE
 			ErrorSS(msg1,msg);
 		END ErrorSI;
 
-		PROCEDURE AddFixup (mode: SHORTINT; size: SHORTINT; pc: SIZE; symbol: ObjectFile.Identifier; symbolOffset: SIZE; displacement: LONGINT);
+		PROCEDURE AddFixup (mode: SIGNED8; size: SIGNED8; pc: SIZE; symbol: ObjectFile.Identifier; symbolOffset: SIZE; displacement: LONGINT);
 		VAR fixup: BinaryCode.Fixup; format: BinaryCode.FixupPatterns; id: ObjectFile.Identifier;
 		BEGIN
 			NEW(format,1);
@@ -1022,7 +1022,7 @@ TYPE
 						IF (operands[4].val > 3) OR (operands[4].val < 0) THEN
 							Error("operand exceeds bounds");
 						END;
-						code.PutByte(InstructionSet.RegisterIndex(operands[3].register)*0x10 + SHORTINT(operands[4].val));
+						code.PutByte(InstructionSet.RegisterIndex(operands[3].register)*0x10 + SIGNED8(operands[4].val));
 					ELSE HALT(100) (* decoding error *)
 					END;
 				END;
@@ -1708,10 +1708,10 @@ TYPE
 			PROCEDURE AdaptOperandSizes(VAR operands: ARRAY OF Operand);
 			VAR i: LONGINT;
 
-				PROCEDURE OffsetSize(val: HUGEINT): SHORTINT;
+				PROCEDURE OffsetSize(val: HUGEINT): SIGNED8;
 				BEGIN
 					DEC(val,emitter.code.pc);
-					IF (val > MIN(SHORTINT)+2) & (val < MAX(SHORTINT)) THEN
+					IF (val > MIN(SIGNED8)+2) & (val < MAX(SIGNED8)) THEN
 						RETURN bits8
 					(* We do not support word (16-bit) displacement jumps
 					(i.e. prefixing the jump instruction with the `addr16' opcode prefix),
@@ -2517,7 +2517,7 @@ TYPE
 	END Matches;
 
 	PROCEDURE ValueInByteRange (value: HUGEINT): BOOLEAN;
-	BEGIN RETURN SYSTEM.VAL (SHORTINT, value) = value
+	BEGIN RETURN SYSTEM.VAL (SIGNED8, value) = value
 	END ValueInByteRange;
 
 	PROCEDURE ValueInWordRange (value: HUGEINT): BOOLEAN;
@@ -2634,7 +2634,7 @@ TYPE
 		operand.symbolOffset := symbolOffset; operand.displacement := displacement(LONGINT);
 	END SetSymbol;
 
-	PROCEDURE InitImm* (VAR operand: Operand; size: SHORTINT; val: HUGEINT);
+	PROCEDURE InitImm* (VAR operand: Operand; size: SIGNED8; val: HUGEINT);
 	BEGIN InitOperand(operand); operand.type := imm; operand.sizeInBytes := size; operand.val := val;
 	END InitImm;
 
@@ -2674,7 +2674,7 @@ TYPE
 	BEGIN InitImm64(operand,val); RETURN operand
 	END NewImm64;
 
-	PROCEDURE InitOffset* (VAR operand: Operand; size: SHORTINT; val: HUGEINT);
+	PROCEDURE InitOffset* (VAR operand: Operand; size: SIGNED8; val: HUGEINT);
 	BEGIN InitOperand(operand); operand.type := ioffset; operand.sizeInBytes := size; operand.val := val;
 	END InitOffset;
 

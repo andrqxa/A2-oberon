@@ -460,18 +460,18 @@ BEGIN
 	RETURN LSH(SYSTEM.VAL(LONGINT, SYSTEM.VAL(SET, byte) * mask), -ofs);
 END GetField;
 
-PROCEDURE SetBit*(VAR byte: CHAR; bit: SHORTINT);
+PROCEDURE SetBit*(VAR byte: CHAR; bit: SIGNED8);
 BEGIN
 	ASSERT(bit < 8);
 	byte := SYSTEM.VAL(CHAR, SYSTEM.VAL(SET, byte) + {bit});
 END SetBit;
 
-PROCEDURE CheckBit*(byte: CHAR; bit: SHORTINT): BOOLEAN;
+PROCEDURE CheckBit*(byte: CHAR; bit: SIGNED8): BOOLEAN;
 BEGIN
 	RETURN bit IN SYSTEM.VAL(SET, byte);
 END CheckBit;
 
-PROCEDURE ClearBit*(VAR byte: CHAR; bit: SHORTINT);
+PROCEDURE ClearBit*(VAR byte: CHAR; bit: SIGNED8);
 BEGIN
 	ASSERT(bit < 8);
 	byte := SYSTEM.VAL(CHAR, SYSTEM.VAL(SET, byte) *(-{bit}));

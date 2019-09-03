@@ -20,7 +20,7 @@ TYPE
 					CalcDecryptionKeys( ekeys, dkeys )
 				END InitKey;
 
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SHORTINT );
+				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
 				VAR i: INTEGER;
 				BEGIN
 					SetIV^( src, mode );   (* set mode *)

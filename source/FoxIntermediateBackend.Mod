@@ -117,7 +117,7 @@ TYPE
 	END;
 
 	Operand = RECORD
-		mode: SHORTINT;
+		mode: SIGNED8;
 		op: IntermediateCode.Operand;
 		tag: IntermediateCode.Operand;
 		extra: IntermediateCode.Operand; (* stores the step size of an array range *)
@@ -1380,7 +1380,7 @@ TYPE
 			temporaries := context.temporaries;
 		END ReturnToContext;
 
-		PROCEDURE NewSection(list: Sections.SectionList; type: SHORTINT; CONST name: Basic.SegmentedName; syntaxTreeSymbol: SyntaxTree.Symbol; dump: BOOLEAN): IntermediateCode.Section;
+		PROCEDURE NewSection(list: Sections.SectionList; type: SIGNED8; CONST name: Basic.SegmentedName; syntaxTreeSymbol: SyntaxTree.Symbol; dump: BOOLEAN): IntermediateCode.Section;
 		VAR fp: SyntaxTree.Fingerprint; section: IntermediateCode.Section;
 		BEGIN
 			IF (syntaxTreeSymbol # NIL) & ~((syntaxTreeSymbol IS SyntaxTree.Procedure) & (syntaxTreeSymbol(SyntaxTree.Procedure).isInline)) THEN
@@ -10128,7 +10128,7 @@ TYPE
 		END DynamicCallOperand;
 
 		PROCEDURE StaticCallOperand(x: SyntaxTree.Procedure; VAR operand: Operand);
-		VAR source: IntermediateCode.Section; tag,reg: IntermediateCode.Operand; name:Basic.SegmentedName; sectionType: SHORTINT;
+		VAR source: IntermediateCode.Section; tag,reg: IntermediateCode.Operand; name:Basic.SegmentedName; sectionType: SIGNED8;
 			binary: BinaryCode.Section; bits: SyntaxTree.BinaryCode;
 		BEGIN
 			IF Trace THEN TraceEnter("StaticCallOperand") END;
@@ -12606,7 +12606,7 @@ TYPE
 						| SyntaxTree.IntegerType DO
 							IF type(SyntaxTree.IntegerType).signed THEN
 								IF (type = module.system.shortintType) THEN
-									IF RefInfo THEN Info(section,"SHORTINT") END;
+									IF RefInfo THEN Info(section,"SIGNED8") END;
 									Char(section, sfTypeSHORTINT)
 								ELSIF (type = module.system.integerType) THEN
 									IF RefInfo THEN Info(section,"INTEGER") END;
@@ -14237,7 +14237,7 @@ TYPE
 		RETURN module.moduleScope.FindSymbol(SyntaxTree.NewIdentifier(symbolName));
 	END GetSymbol;
 
-	PROCEDURE InitOperand(VAR op: Operand; mode: SHORTINT);
+	PROCEDURE InitOperand(VAR op: Operand; mode: SIGNED8);
 	BEGIN
 		op.mode := mode;
 		IntermediateCode.InitOperand(op.op);
@@ -14853,7 +14853,7 @@ TYPE
 		RETURN instruction
 	END Data;
 
-	PROCEDURE SpecialInstruction(position: Basic.Position;subtype: SHORTINT; op1,op2,op3: IntermediateCode.Operand): IntermediateCode.Instruction;
+	PROCEDURE SpecialInstruction(position: Basic.Position;subtype: SIGNED8; op1,op2,op3: IntermediateCode.Operand): IntermediateCode.Instruction;
 	VAR instruction: IntermediateCode.Instruction;
 	BEGIN
 		IntermediateCode.InitInstruction(instruction,position,IntermediateCode.special,op1,op2,op3);

@@ -622,7 +622,7 @@ TYPE
 			AWAIT(state = s);
 		END AwaitStateEqual;
 
-		PROCEDURE SetState*(s : SHORTINT);
+		PROCEDURE SetState*(s : SIGNED8);
 		BEGIN { EXCLUSIVE}
 			state := s;
 		END SetState;

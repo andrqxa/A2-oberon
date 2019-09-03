@@ -226,7 +226,7 @@ the indicated sections:
   EXCL      (10.2)   REAL      (6.1)
   FALSE     (6.1)    SET       (6.1)
   HALT      (10.2)   SHORT     (10.2)
-  INC       (10.2)   SHORTINT  (6.1)
+  INC       (10.2)   SIGNED8  (6.1)
   INCL      (10.2)   SIZE      (10.2)
   INTEGER   (6.1)    TRUE      (6.1)
 </PRE>
@@ -291,7 +291,7 @@ The values of a given basic type are the following:
 <OL>
 <LI>BOOLEAN the truth values TRUE and FALSE.
 <LI>CHAR the characters of the extended ASCII set  (0X ... 0FFX).
-<LI>SHORTINT the integers between MIN(SHORTINT) and MAX(SHORTINT).
+<LI>SIGNED8 the integers between MIN(SIGNED8) and MAX(SIGNED8).
 <LI>INTEGER the integers between MIN(INTEGER) and MAX(INTEGER).
 <LI>LONGINT the integers between MIN(LONGINT) and MAX(LONGINT).
 <LI>REAL real numbers between MIN(REAL) and MAX(REAL).
@@ -302,7 +302,7 @@ Types 3 to 5 are <EM>integer</EM> types, 6 and 7 are <EM>real</EM> types,
 and together they are called <EM>numeric</EM> types. They form a hierarchy;
 the larger type <EM>includes</EM> (the values of) the smaller type:
 <P>
-&nbsp; &nbsp; LONGREAL  &gt;=  REAL  &gt;=  LONGINT  &gt;=  INTEGER  &gt;=  SHORTINT
+&nbsp; &nbsp; LONGREAL  &gt;=  REAL  &gt;=  LONGINT  &gt;=  INTEGER  &gt;=  SIGNED8
 <P>Note: &gt;= stands here for "is superset of or equal to".
 
 <H3>6.2. Array types</H3>
@@ -1033,9 +1033,9 @@ x</TD></TR>
 ordinal
 number x</TD></TR>
 <TR><TD>SHORT(x)</TD><TD>LONGINT<BR>INTEGER<BR>LONGREAL</TD>
-<TD>INTEGER<BR>SHORTINT<BR>REAL</TD><TD>identity (truncation
+<TD>INTEGER<BR>SIGNED8<BR>REAL</TD><TD>identity (truncation
 possible)</TD></TR>
-<TR><TD>LONG(x)</TD><TD>SHORTINT<BR>INTEGER<BR>REAL</TD>
+<TR><TD>LONG(x)</TD><TD>SIGNED8<BR>INTEGER<BR>REAL</TD>
 <TD>INTEGER<BR>LONGINT<BR>LONGREAL</TD><TD>identity</TD></TR>
 <TR><TD>ENTIER(x)</TD><TD>real type</TD><TD>LONGINT</TD><TD>largest integer
 not greater than x.<BR>Note that  ENTIER(i/j)  =  i DIV j</TD></TR></TABLE>
@@ -1136,7 +1136,7 @@ are particular to the specific, underlying computer.
 <P>Module SYSTEM exports the data type BYTE. No representation of values is
 specified. Instead, certain compatibility rules with other types are given:
 <OL>
-<LI>The type BYTE is compatible with CHAR and SHORTINT.
+<LI>The type BYTE is compatible with CHAR and SIGNED8.
 <LI>If a formal parameter is of type ARRAY OF BYTE, then the corresponding
 actual parameter may be
 of any type.

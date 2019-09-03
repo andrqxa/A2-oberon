@@ -8,7 +8,7 @@ TYPE
 	LI = LONGINT;
 	Key =	RECORD
 				val: LONGINT;
-				rot: SHORTINT
+				rot: SIGNED8
 			END;
 	Keys =	RECORD
 				short: BOOLEAN;
@@ -33,7 +33,7 @@ TYPE
 					InitKeys( keys, src, keybits DIV 8 )
 				END InitKey;
 
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR;  mode: SHORTINT );
+				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR;  mode: SIGNED8 );
 				BEGIN
 					SetIV^( src, mode );   (* set mode *)
 					iv[0] := U.SetFromBufferBE( src, 0 );  iv[1] := U.SetFromBufferBE( src, 4 );

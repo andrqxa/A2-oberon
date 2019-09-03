@@ -4,7 +4,7 @@ IMPORT
 	S := SYSTEM;
 
 TYPE
-	Int8 = SHORTINT;
+	Int8 = SIGNED8;
 	Int16 = INTEGER;
 	Int32 = LONGINT;
 

@@ -1445,7 +1445,7 @@ MODULE Mail IN Oberon; (** portable *)	(* ejz,  *)
 		VAR
 			R: Texts.Reader;
 			lib: Objects.Library;
-			col, voff: SHORTINT;
+			col, voff: SIGNED8;
 			ch: CHAR;
 	BEGIN
 		lib := W.lib; col := W.col; voff := W.voff;

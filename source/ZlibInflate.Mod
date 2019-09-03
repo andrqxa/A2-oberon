@@ -64,21 +64,21 @@ MODULE ZlibInflate;	(** eos  **)
 		END;
 
 		(* code parameters *)
-		Lengths = ARRAY OF SHORTINT;
+		Lengths = ARRAY OF SIGNED8;
 		Code = RECORD
 			bits: INTEGER;	(* number of lookup bits *)
 			offset: INTEGER;	(* offset in length array *)
 			size: INTEGER;	(* number of codes *)
 			simple: INTEGER;	(* number of simple codes *)
-			extra: ARRAY MaxNonSimpleCodes OF SHORTINT;	(* number of extra bits for non-simple codes *)
+			extra: ARRAY MaxNonSimpleCodes OF SIGNED8;	(* number of extra bits for non-simple codes *)
 			base: ARRAY MaxNonSimpleCodes OF INTEGER;	(* base length/distance for non-simple codes *)
 		END;
 
 		(* tree nodes for decoding Huffman trees *)
 		Node = RECORD
 			base: INTEGER;	(* literal, length base, distance base, or table offset *)
-			exop: SHORTINT;	(* number of extra bits or operation *)
-			bits: SHORTINT;	(* number of bits in this code or subcode *)
+			exop: SIGNED8;	(* number of extra bits or operation *)
+			bits: SIGNED8;	(* number of bits in this code or subcode *)
 		END;
 		Nodes = POINTER TO ARRAY OF Node;
 
@@ -128,13 +128,13 @@ MODULE ZlibInflate;	(** eos  **)
 
 			(* block state machine *)
 			block: RECORD
-				state: SHORTINT;	(* current block state *)
+				state: SIGNED8;	(* current block state *)
 				last: BOOLEAN;	(* set for last block *)
 				left: SIZE;	(* bytes left to copy for non-compressed blocks *)
 				nlit: INTEGER;	(* number of literal/length codes *)
-				ndist: SHORTINT;	(* number of distance codes *)
-				nclen: SHORTINT;	(* number of code lengths *)
-				clen: ARRAY MaxLitLenCodes + MaxDistCodes OF SHORTINT;	(* code lengths of bit, lit/len, or distance code *)
+				ndist: SIGNED8;	(* number of distance codes *)
+				nclen: SIGNED8;	(* number of code lengths *)
+				clen: ARRAY MaxLitLenCodes + MaxDistCodes OF SIGNED8;	(* code lengths of bit, lit/len, or distance code *)
 				index: INTEGER;	(* index of next code length *)
 				nodes: Nodes;	(* memory for Huffman trees *)
 				btree: Tree;	(* bit decoding tree *)
@@ -142,7 +142,7 @@ MODULE ZlibInflate;	(** eos  **)
 
 			(* code state machine *)
 			decode: RECORD
-				state: SHORTINT;	(* current decode state *)
+				state: SIGNED8;	(* current decode state *)
 				lltree, dtree: Tree;	(* literal/length and distance tree *)
 				tree: Tree;	(* current decoding table *)
 				lit: INTEGER;	(* decoded literal *)
@@ -156,7 +156,7 @@ MODULE ZlibInflate;	(** eos  **)
 	VAR
 		FixedBuilt: BOOLEAN;	(* set if fixed Huffman tables have been built *)
 		FixedLitLenTree, FixedDistTree: Tree;	(* nodes for fixed literal/length and distance tree *)
-		Order: ARRAY 19 OF SHORTINT;	(* order of code bit lengths *)
+		Order: ARRAY 19 OF SIGNED8;	(* order of code bit lengths *)
 
 
 	(*--- Results ---*)
@@ -746,7 +746,7 @@ MODULE ZlibInflate;	(** eos  **)
 
 	PROCEDURE InflateBlocks (VAR s: Stream);
 		VAR
-			wavail, t: SIZE; cnt, len: LONGINT; tn: TreeNodes; clen: ARRAY MaxLitLenCodes OF SHORTINT; code: Code; res: WORD;
+			wavail, t: SIZE; cnt, len: LONGINT; tn: TreeNodes; clen: ARRAY MaxLitLenCodes OF SIGNED8; code: Code; res: WORD;
 			node: Node; lltree, dtree: Tree;
 	BEGIN
 		IF s.write < s.read THEN wavail := s.read - s.write - 1
@@ -827,8 +827,8 @@ MODULE ZlibInflate;	(** eos  **)
 				IF ~Need(s, 14) THEN EXIT END;	(* 5 (#lit/len-257) + 5 (#dist-1) + 4 (#codelen-4) *)
 				t := s.buf MOD 4000H;
 				s.block.nlit := INTEGER(257 + t MOD 20H); t := t DIV 20H;
-				s.block.ndist := SHORTINT(1 + t MOD 20H); t := t DIV 20H;
-				s.block.nclen := SHORTINT(4 + t);
+				s.block.ndist := SIGNED8(1 + t MOD 20H); t := t DIV 20H;
+				s.block.nclen := SIGNED8(4 + t);
 				IF (s.block.nlit > 286) OR (s.block.ndist > 30) THEN
 					SetMsg(s.res, "too many length or distance symbols");
 					s.block.state := BlkBad; s.res.code := DataError;
@@ -1031,7 +1031,7 @@ MODULE ZlibInflate;	(** eos  **)
 	END Close;
 
 	(** inflate until either input or output buffer runs out; if op is 'Finish', Inflate returns with either 'StreamEnd' or an error **)
-	PROCEDURE Inflate* (VAR stream: Stream; flush: SHORTINT);
+	PROCEDURE Inflate* (VAR stream: Stream; flush: SIGNED8);
 		VAR res: WORD; byte: CHAR; (* inxt, onxt: LONGINT; *)
 	BEGIN
 		IF ~stream.open THEN

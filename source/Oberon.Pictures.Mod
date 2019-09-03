@@ -282,8 +282,8 @@ END GetLine;
 (** Stores picture run length encoded to file F (including tag). *)
 PROCEDURE Store* (P: Picture; F : Files.File; pos: LONGINT; VAR len: LONGINT);
 (* stores picture to run length encoded file F  (including tag *)
-	VAR j, i,a,b,d,wth: INTEGER; adr, OldAdr: ADDRESS; size: LONGINT; h: SHORTINT;
-			buf: ARRAY 129 OF SHORTINT; R: Files.Rider;
+	VAR j, i,a,b,d,wth: INTEGER; adr, OldAdr: ADDRESS; size: LONGINT; h: SIGNED8;
+			buf: ARRAY 129 OF SIGNED8; R: Files.Rider;
 			help: BOOLEAN;
 BEGIN
 	Files.Set(R, F, pos);

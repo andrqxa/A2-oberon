@@ -412,7 +412,7 @@ VAR
 		END
 	END FlipCase;
 
-	PROCEDURE open(os: SHORTINT);
+	PROCEDURE open(os: SIGNED8);
 	VAR S: Attributes.Scanner; F: Files.File; R: Files.Rider; T: Texts.Text; ch, ch2: CHAR;
 		D: Documents.Document; f: TextGadgets.Frame;
 	BEGIN
@@ -486,7 +486,7 @@ VAR
 		open(Unicode)
 	END OpenUnicode;
 
-	PROCEDURE StoreDoc(D: Documents.Document; os: SHORTINT);
+	PROCEDURE StoreDoc(D: Documents.Document; os: SIGNED8);
 	VAR L: Objects.LinkMsg;
 		R: Texts.Reader; F: Files.File; r: Files.Rider; bak: ARRAY 64 OF CHAR; ch: CHAR;
 		i, res: INTEGER;
@@ -560,7 +560,7 @@ VAR
 		StoreDoc(D, Ascii)
 	END StoreAsciiDoc;
 
-	PROCEDURE store(os: SHORTINT);
+	PROCEDURE store(os: SIGNED8);
 	VAR S: Attributes.Scanner; D: Documents.Document;
 	BEGIN
 		Attributes.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
@@ -669,7 +669,7 @@ VAR
 			gen: ARRAY 64 OF CHAR;
 			obj: Objects.Object;
 			lib: Objects.Library;
-			col, voff: SHORTINT;
+			col, voff: SIGNED8;
 			ch: CHAR;
 
 		PROCEDURE Voff (obj: Objects.Object): INTEGER;
@@ -685,7 +685,7 @@ VAR
 	BEGIN
 		Oberon.GetSelection(T, beg, end, time);
 		IF (time # -1) & (T # NIL) THEN
-			lib := NIL; col := MIN(SHORTINT); voff := MIN(SHORTINT);
+			lib := NIL; col := MIN(SIGNED8); voff := MIN(SIGNED8);
 			Texts.OpenReader(R, T, beg);
 			Texts.Read(R, ch);
 			WHILE ~R.eot & (beg <= end) DO

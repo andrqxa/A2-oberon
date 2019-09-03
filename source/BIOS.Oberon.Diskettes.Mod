@@ -22,7 +22,7 @@ TYPE
 		VAR
 			drive: LONGINT;
 			locked: BOOLEAN;	(* must be locked before access is allowed *)
-			type, media: SHORTINT;	(* drive type & current media *)
+			type, media: SIGNED8;	(* drive type & current media *)
 				(* current parameters *)
 			size, sectors, heads, tracks: LONGINT;
 			gap, rate, spec1, spec2, fgap: CHAR;
@@ -48,19 +48,19 @@ VAR
 	device: ARRAY MaxDevices OF Device;
 	curdrive: LONGINT;
 	curtrack: LONGINT;
-	state: SHORTINT;
+	state: SIGNED8;
 	result: ARRAY 7 OF SET;
 	errors: ARRAY 3 OF SET;
 	dmabufvirt, dmabufphys: ADDRESS; dmabufsize: LONGINT;
 	motor, interrupt, installed: BOOLEAN;
-	trace: SHORTINT;
+	trace: SIGNED8;
 
 (* Device driver *)
 
 (* Error - Report an error *)
 
 PROCEDURE Error(msg: ARRAY OF CHAR);
-VAR error, reason: ARRAY 32 OF CHAR;  i: SHORTINT;  r0, r1, r2: SET;
+VAR error, reason: ARRAY 32 OF CHAR;  i: SIGNED8;  r0, r1, r2: SET;
 BEGIN
 	COPY(msg, error);  r0 := errors[0];  r1 := errors[1];  r2 := errors[2];
 	IF (0 IN r1) OR (0 IN r2) THEN reason := "Missing address mark"
@@ -141,7 +141,7 @@ END PutByte;
 (* GetResults - Get results from controller, returns length of result *)
 
 PROCEDURE GetResults(): INTEGER;
-VAR t: AosKernel.MilliTimer;  s: SET;  i: SHORTINT;
+VAR t: AosKernel.MilliTimer;  s: SET;  i: SIGNED8;
 BEGIN
 	IF state # Reset THEN
 		i := 0;  s := {};
@@ -238,7 +238,7 @@ END CycleMedia;
 
 PROCEDURE Do(dev: Device; op, sector, head, track, num: LONGINT;  VAR buf: ARRAY OF SYSTEM.BYTE): LONGINT;
 CONST MaxLoops = 18;  MaxTries = 3;
-VAR s: SET;  i, loops, try: LONGINT;  t: AosKernel.MilliTimer;  ok: BOOLEAN;  media: SHORTINT;
+VAR s: SET;  i, loops, try: LONGINT;  t: AosKernel.MilliTimer;  ok: BOOLEAN;  media: SIGNED8;
 BEGIN
 	FOR i := 0 TO 2 DO errors[i] := {} END;
 	IF (num < 1) OR (num > 126) THEN Error("Bad number of sectors"); RETURN 1003 END;
@@ -504,7 +504,7 @@ BEGIN
 END StopMotor;
 
 PROCEDURE StrToInt(s: ARRAY OF CHAR): LONGINT;
-VAR i: SHORTINT;  v: LONGINT;
+VAR i: SIGNED8;  v: LONGINT;
 BEGIN
 	v := 0;  i := 0;
 	WHILE s[i] # 0X DO v := v*10+(ORD(s[i])-48); INC(i) END;

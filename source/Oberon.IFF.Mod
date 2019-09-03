@@ -95,7 +95,7 @@ VAR
 	hd: ChunkHeader;
 	ilbmhd: ILBMHD;
 	type: ChunkId;
-	c,k,z: SHORTINT;
+	c,k,z: SIGNED8;
 	line: POINTER TO ARRAY OF CHAR;
 	start,bpos,cpos,hpos,size: LONGINT;
 	p,w,h,x,y,cols,rep,cnt: INTEGER;

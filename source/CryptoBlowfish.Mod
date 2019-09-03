@@ -57,7 +57,7 @@ TYPE
 					END
 				END InitKey;
 
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SHORTINT );
+				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
 				BEGIN
 					SetIV^( src, mode );
 					ivl := U.SetFromBufferBE( src, 0 );  ivr := U.SetFromBufferBE( src, 4 );

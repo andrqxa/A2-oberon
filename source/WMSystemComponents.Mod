@@ -1082,7 +1082,7 @@ END Open;
 			i, j, m, L, R : SIZE;
 			x : DirEntry;
 			dirName, xName: Strings.String;
-			dirFlag, xFlag: SHORTINT;
+			dirFlag, xFlag: SIGNED8;
 		BEGIN
 			FOR i := 1 TO LEN(dir) - 1 DO
 				x := dir[i]; L := 0; R := i; xName := Strings.NewString(x.name^); Strings.UpperCase(xName^);
@@ -1107,7 +1107,7 @@ END Open;
 			i, j, m, L, R : SIZE;
 			x : DirEntry;
 			dirTime,dirDate:LONGINT;
-			dirFlag, xFlag: SHORTINT;
+			dirFlag, xFlag: SIGNED8;
 		BEGIN
 			FOR i := 1 TO LEN(dir) - 1 DO
 				x := dir[i]; L := 0; R := i;

@@ -487,7 +487,7 @@ TYPE
 
 	END Parser;
 
-	PROCEDURE GetMedium(mediumStr: ARRAY OF CHAR): SHORTINT;
+	PROCEDURE GetMedium(mediumStr: ARRAY OF CHAR): SIGNED8;
 	BEGIN
 		IF mediumStr = 'all' THEN RETURN CSS2.All
 		ELSIF mediumStr = 'aural' THEN RETURN CSS2.Aural
@@ -503,7 +503,7 @@ TYPE
 		END
 	END GetMedium;
 
-	PROCEDURE GetPseudoPage(pseudoPageStr: ARRAY OF CHAR): SHORTINT;
+	PROCEDURE GetPseudoPage(pseudoPageStr: ARRAY OF CHAR): SIGNED8;
 	BEGIN
 		IF pseudoPageStr = 'left' THEN RETURN CSS2.Left
 		ELSIF pseudoPageStr = 'right' THEN RETURN CSS2.Right
@@ -512,7 +512,7 @@ TYPE
 	END
 	END GetPseudoPage;
 
-(*	PROCEDURE GetPseudoType(typeStr: ARRAY OF CHAR): SHORTINT;
+(*	PROCEDURE GetPseudoType(typeStr: ARRAY OF CHAR): SIGNED8;
 	BEGIN
 		IF typeStr = 'first-child' THEN RETURN CSS2.FirstChild
 		ELSIF typeStr = 'link' THEN RETURN CSS2.Link
@@ -528,7 +528,7 @@ TYPE
 		END
 	END GetPseudoType;*)
 
-	PROCEDURE GetTermUnit(unitStr: ARRAY OF CHAR): SHORTINT;
+	PROCEDURE GetTermUnit(unitStr: ARRAY OF CHAR): SIGNED8;
 	BEGIN
 		IF unitStr = 'em' THEN RETURN CSS2.em
 		ELSIF unitStr = 'ex' THEN RETURN CSS2.ex

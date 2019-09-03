@@ -96,14 +96,14 @@ TYPE
 	Stream* = RECORD
 		in*, out*: ZlibBuffers.Buffer;
 		res-: LONGINT;		(** result of last operation **)
-		level-: SHORTINT;	(** compression level **)
-		strategy-: SHORTINT;	(**compression strategy **)
-		dataType-: SHORTINT;	(** Unknown, Binary or Ascii **)
+		level-: SIGNED8;	(** compression level **)
+		strategy-: SIGNED8;	(**compression strategy **)
+		dataType-: SIGNED8;	(** Unknown, Binary or Ascii **)
 		wrapper-: BOOLEAN;	(** if set, zlib header and checksum are generated **)
 		open-: BOOLEAN;		(** if set, stream is initialized **)
 		trailerDone: BOOLEAN;	(* if set, the zlib trailer has already been generated *)
-		lastFlush: SHORTINT;	(* flush operation of the previous deflate call *)
-		status: SHORTINT;		(* current stream state *)
+		lastFlush: SIGNED8;	(* flush operation of the previous deflate call *)
+		status: SIGNED8;		(* current stream state *)
 		adler: LONGINT;		(* Adler32 checksum *)
 
 		window: POINTER TO Window;	(* memory for sliding window *)
@@ -138,7 +138,7 @@ TYPE
 		staticLen: LONGINT;	(* bit length of current block with static trees *)
 	END;
 
-	Compressor = PROCEDURE (VAR s: Stream; flush: SHORTINT): SHORTINT;
+	Compressor = PROCEDURE (VAR s: Stream; flush: SIGNED8): SIGNED8;
 
 VAR
 	ExtraLenBits, ExtraDistBits, ExtraBitBits: Bits;
@@ -147,7 +147,7 @@ VAR
 	BaseDist: ARRAY DistCodes OF INTEGER;
 	LengthCode: ARRAY MaxMatch - MinMatch + 1 OF CHAR;
 	DistCode: ARRAY DistCodeLen OF CHAR;
-	BitOrder: ARRAY BitCodes OF SHORTINT;
+	BitOrder: ARRAY BitCodes OF SIGNED8;
 	ConfigTable: ARRAY 10 OF RECORD
 		GoodLen: INTEGER;	(* reduce lazy search above this match length *)
 		MaxLazy: INTEGER;	(* do not perform lazy search above this match length *)
@@ -999,7 +999,7 @@ END FillWindow;
 
 (* store without compression as much as possible from the input stream, return the current block state.
 	This function does not insert new strings in the dictionary since uncompressible data is probably not useful. *)
-PROCEDURE CompressStored(VAR stream: Stream; flush: SHORTINT): SHORTINT;
+PROCEDURE CompressStored(VAR stream: Stream; flush: SIGNED8): SIGNED8;
 CONST
 	MaxBlockSize = PendingBufSize - 5; (* header for stored block takes 5 bytes *)
 BEGIN
@@ -1046,7 +1046,7 @@ END CompressStored;
 
 (* Compress without lazy matches.
 	This function inserts new strings in the dictionary only for unmatched strings or for short matches. *)
-PROCEDURE CompressFast(VAR stream: Stream; flush: SHORTINT): SHORTINT;
+PROCEDURE CompressFast(VAR stream: Stream; flush: SIGNED8): SIGNED8;
 VAR
 	head: SIZE; (* head of the hash chain *)
 	mustFlush: BOOLEAN; (* set if current block must be flushed *)
@@ -1120,7 +1120,7 @@ END CompressFast;
 
 (* Same as above, but achieves a better compression. We use lazy evaluation for matches:
 	a match is finally adopted only if there is no better match at the next window position *)
-PROCEDURE CompressSlow(VAR stream: Stream; flush: SHORTINT): SHORTINT;
+PROCEDURE CompressSlow(VAR stream: Stream; flush: SIGNED8): SIGNED8;
 VAR
 	head: SIZE; (* head of the hash chain *)
 	maxIns: SIZE;
@@ -1258,7 +1258,7 @@ BEGIN
 END Close;
 
 (** initialize deflate stream with compression level and strategy; if wrapper is not set, no header and checksum are generated **)
-PROCEDURE Open*(VAR stream: Stream; level, strategy: SHORTINT; wrapper: BOOLEAN);
+PROCEDURE Open*(VAR stream: Stream; level, strategy: SIGNED8; wrapper: BOOLEAN);
 BEGIN
 	IF level = DefaultCompression THEN level := 6 END;
 	IF (0 <= level) & (level <= 9) & (DefaultStrategy <= strategy) & (strategy <= HuffmanOnly) THEN
@@ -1315,9 +1315,9 @@ END SetDictionary;
 
 (** Deflate compresses as much data as possible, and stops when the input buffer becomes empty or the output buffer becomes full;
 	the flush parameter decides if and how blocks are terminated **)
-PROCEDURE Deflate*(VAR stream: Stream; flush: SHORTINT);
+PROCEDURE Deflate*(VAR stream: Stream; flush: SIGNED8);
 VAR
-	lastFlush, bstate: SHORTINT;
+	lastFlush, bstate: SIGNED8;
 	header: LONGINT;
 	buf: ARRAY 1 OF CHAR;
 BEGIN
@@ -1429,7 +1429,7 @@ END Deflate;
 
 (** change deflate parameters within the stream. If the compression level is changed, the input available so far
 	is compressed with the old level (and may be flushed); the new level will take effect only at the next call of Deflate **)
-PROCEDURE SetParams*(VAR stream: Stream; level, strategy: SHORTINT);
+PROCEDURE SetParams*(VAR stream: Stream; level, strategy: SIGNED8);
 BEGIN
 	IF level = DefaultCompression THEN
 		level := 6
@@ -1446,7 +1446,7 @@ BEGIN
 END SetParams;
 
 (** compress complete stream and return output length in len **)
-PROCEDURE Compress* (VAR src, dst: ARRAY OF CHAR; srcoffset, srclen, dstoffset, dstlen: LONGINT; level, strategy: SHORTINT; VAR len: SIZE; VAR res: WORD);
+PROCEDURE Compress* (VAR src, dst: ARRAY OF CHAR; srcoffset, srclen, dstoffset, dstlen: LONGINT; level, strategy: SIGNED8; VAR len: SIZE; VAR res: WORD);
 	VAR s: Stream;
 BEGIN
 	ZlibBuffers.Init(s.in, src, srcoffset, srclen, srclen);

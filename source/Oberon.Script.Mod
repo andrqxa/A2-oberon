@@ -365,7 +365,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 
 	PROCEDURE ChangeColor*;
 	VAR S: Texts.Scanner;
-		T: Texts.Text; col: SHORTINT; beg, end, time: LONGINT;
+		T: Texts.Text; col: SIGNED8; beg, end, time: LONGINT;
 	BEGIN OpenScanner(S, NIL);
 		IF S.class # Texts.Int THEN col := S.col ELSE col := SHORT(SHORT(S.i)) END;
 		Oberon.GetSelection(T, beg, end, time);
@@ -373,7 +373,7 @@ MODULE Script IN Oberon;	(** portable *)	(* RS, Wed, 9-Jun-1993*)
 	END ChangeColor;
 
 	PROCEDURE ChangeOffset*;
-	VAR S: Texts.Scanner; T: Texts.Text; voff: SHORTINT; beg, end, time: LONGINT;
+	VAR S: Texts.Scanner; T: Texts.Text; voff: SIGNED8; beg, end, time: LONGINT;
 	BEGIN OpenScanner(S, NIL);
 		IF S.class # Texts.Int THEN voff := S.voff ELSE voff := SHORT(SHORT(S.i)) END;
 		Oberon.GetSelection(T, beg, end, time);

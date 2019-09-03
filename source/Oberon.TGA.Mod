@@ -15,11 +15,11 @@ TYPE
 	Color = ARRAY 3 OF INTEGER;
 	Header = RECORD
 		IDlength: CHAR;
-		cmap, type: SHORTINT;
+		cmap, type: SIGNED8;
 		cmaporigin, cmaplength: INTEGER;
-		csize: SHORTINT;
+		csize: SIGNED8;
 		xorigin, yorigin, width, height: INTEGER;
-		depth, descriptor: SHORTINT;
+		depth, descriptor: SIGNED8;
 	END;
 
 PROCEDURE GetTgaHeader( VAR R: Files.Rider; VAR H: Header): BOOLEAN;

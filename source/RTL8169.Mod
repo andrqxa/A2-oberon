@@ -287,7 +287,7 @@ TYPE
 			chksums := {};
 			IF type = 0800H THEN
 				INCL(chksums, 18); (* offload IP checksum *)
-				type4 := SYSTEM.VAL(SHORTINT, l3hdr[9]); (* get type if IP data *)
+				type4 := SYSTEM.VAL(SIGNED8, l3hdr[9]); (* get type if IP data *)
 				IF type4 = 6 THEN (* TCP/IP *)
 					INCL(chksums, 16); (* offload TCP checksum *)
 				ELSIF type4 = 17 THEN
@@ -420,7 +420,7 @@ TYPE
 			dev.adrSize := 6;
 		END ReadMACAddress;
 
-		PROCEDURE Read8(reg: LONGINT): SHORTINT;
+		PROCEDURE Read8(reg: LONGINT): SIGNED8;
 		BEGIN
 			RETURN SYSTEM.GET8(base + reg);
 		END Read8;
@@ -910,10 +910,10 @@ TYPE
 
 			(* disable Tx and Rx *)
 			s := SYSTEM.VAL(SET, Read8(37H));
-			Write8(37H, SYSTEM.VAL(SHORTINT, s - {2, 3}));
+			Write8(37H, SYSTEM.VAL(SIGNED8, s - {2, 3}));
 
 			(* soft reset *)
-			Write8(37H, SYSTEM.VAL(SHORTINT, {4}));
+			Write8(37H, SYSTEM.VAL(SIGNED8, {4}));
 
 			(* disable all interrupts *)
 			Write16(3CH, 0);

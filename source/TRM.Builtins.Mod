@@ -346,8 +346,8 @@ VAR high: LONGINT;
 		returns -1 if left is lexicographics smaller than right
 		traps if src or destination is not 0X terminated and comparison is not finished
 	*)
-	PROCEDURE CompareString*(CONST left,right: ARRAY OF CHAR): SHORTINT;
-	VAR i: LONGINT; res: SHORTINT; l,r: CHAR;
+	PROCEDURE CompareString*(CONST left,right: ARRAY OF CHAR): SIGNED8;
+	VAR i: LONGINT; res: SIGNED8; l,r: CHAR;
 	BEGIN
 		i := 0; res := 0;
 		LOOP

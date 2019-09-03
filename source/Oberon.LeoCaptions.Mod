@@ -31,13 +31,13 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 			color*: Gfx.Color;	(** caption color **)
 			width: REAL;	(* advance width in figure space along baseline *)
 			caret: LONGINT;	(* logical caret position, negative if not holding focus *)
-			update: SHORTINT;	(* kind of update *)
+			update: SIGNED8;	(* kind of update *)
 			from, to: LONGINT;	(* update stretch *)
 		END;
 
 		(** message for managing the focus shape **)
 		FocusMsg* = RECORD (Leonardo.LocalizedMsg)
-			id*: SHORTINT;	(** consume/accept/release **)
+			id*: SIGNED8;	(** consume/accept/release **)
 			char*: CHAR;	(** character to consume **)
 			res*: INTEGER;	(** result for consume **)
 			fx*, fy*: REAL;	(** focus coordinates (in figure space) **)
@@ -49,7 +49,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		EditActionDesc = RECORD (Leonardo.ActionDesc)
 			cap: Caption;
 			pos: LONGINT;
-			update: SHORTINT;
+			update: SIGNED8;
 			char: CHAR;
 		END;
 
@@ -308,7 +308,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		cap.marked := TRUE; cap.sel := TRUE
 	END DoEditAction;
 
-	PROCEDURE AddCommand (fig: Leonardo.Figure; cap: Caption; update: SHORTINT; pos: LONGINT; char: CHAR);
+	PROCEDURE AddCommand (fig: Leonardo.Figure; cap: Caption; update: SIGNED8; pos: LONGINT; char: CHAR);
 		VAR act: EditAction;
 	BEGIN
 		Leonardo.BeginCommand(fig);

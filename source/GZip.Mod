@@ -41,7 +41,7 @@ TYPE
 			res : WORD;
 			crc32-: LONGINT; (*crc32 of uncompressed data*)
 			out : POINTER TO ARRAY BufSize OF CHAR;
-			flush: SHORTINT;
+			flush: SIGNED8;
 			inputsize : SIZE;
 
 		PROCEDURE WriteHeader(w: Streams.Writer);
@@ -55,7 +55,7 @@ TYPE
 		END WriteHeader;
 
 
-		PROCEDURE &Init*(writer: Streams.Writer; level, strategy, flush: SHORTINT);
+		PROCEDURE &Init*(writer: Streams.Writer; level, strategy, flush: SIGNED8);
 		BEGIN
 			IF writer = NIL THEN
 				res := Zlib.StreamError; RETURN;
@@ -243,7 +243,7 @@ TYPE
 	END Inflator;
 
 
-PROCEDURE Deflate*(in,out :Files.File; level, strategy, flush: SHORTINT);
+PROCEDURE Deflate*(in,out :Files.File; level, strategy, flush: SIGNED8);
 VAR
 	d : Deflator;
 	R: Files.Reader;
@@ -308,7 +308,7 @@ BEGIN
 			ELSIF ~context.arg.GetInteger(strategy,FALSE) THEN
 				strategy:=DefaultStrategy;
 			END;
-			Deflate(from,to,SHORTINT(compression), SHORTINT(strategy), FullFlush(*?*));
+			Deflate(from,to,SIGNED8(compression), SIGNED8(strategy), FullFlush(*?*));
 			Files.Register(to);
 			context.out.String("gzipped "); context.out.String(filename);context.out.Ln; context.out.Update;
 		ELSE

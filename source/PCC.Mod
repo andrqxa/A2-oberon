@@ -68,7 +68,7 @@ Procedure/Delegates handling:
 
 *)
 	Item* = RECORD
-		mode, level: SHORTINT;
+		mode, level: SIGNED8;
 		deref: BOOLEAN;	(* has been dereferenced. For getting the actual type descriptor *)
 		adr, offs, value: LONGINT;
 		breg, boffs: LONGINT;	(* pointer to the array bound. Valid only if mode = {RegRel} *)
@@ -134,7 +134,7 @@ VAR
 	topscope*: PCT.ModScope;
 
 	CCTab, InvCCTab, SetCCTab: ARRAY 15 OF PCLIR.Opcode;
-	InvCC: ARRAY 15 OF SHORTINT;
+	InvCC: ARRAY 15 OF SIGNED8;
 
 	MethodType: PCT.Delegate;
 
@@ -176,7 +176,7 @@ END IsString;
 
 (* GetActivationFrame - return a pointer to the procedure activation frame *)
 
-PROCEDURE GetActivationFrame(code: Code;  level: SHORTINT;  VAR reg: LONGINT);
+PROCEDURE GetActivationFrame(code: Code;  level: SIGNED8;  VAR reg: LONGINT);
 BEGIN
 	ASSERT(level >= 0);
 	reg := PCLIR.FP;
@@ -373,7 +373,7 @@ END NilCheck;
 
 (**-----------Item Creation----------------*)
 
-PROCEDURE MakeItem*(VAR x: Item; o: PCT.Symbol;  deltaLevel:  SHORTINT);
+PROCEDURE MakeItem*(VAR x: Item; o: PCT.Symbol;  deltaLevel:  SIGNED8);
 BEGIN
 	ASSERT(deltaLevel >= 0, 200);
 	x.level := deltaLevel;
@@ -508,7 +508,7 @@ BEGIN  RETURN  t.size(PCBT.Size).size
 END GetStaticSize;
 
 PROCEDURE GetArrayBaseSize(code: Code; VAR size: Item; arr: Item);
-VAR t: PCT.Struct; len: Item; mode: SHORTINT;  name: ARRAY 32 OF CHAR;
+VAR t: PCT.Struct; len: Item; mode: SIGNED8;  name: ARRAY 32 OF CHAR;
 BEGIN
 	ASSERT(arr.type IS PCT.Array);
 	(** fof >> *)
@@ -1770,13 +1770,13 @@ BEGIN
 *)
 END MoveString;
 
-PROCEDURE GetHWReg*(code: Code;  VAR x: Item;  reg: SHORTINT);
+PROCEDURE GetHWReg*(code: Code;  VAR x: Item;  reg: SIGNED8);
 BEGIN
 	LoadAdr(code,x);
 	PCLIR.EmitStoreRelative(code, 0, x.adr, PCLIR.HwReg-reg);
 END GetHWReg;
 
-PROCEDURE SetHWReg*(code: Code;  VAR x: Item;  reg: SHORTINT);
+PROCEDURE SetHWReg*(code: Code;  VAR x: Item;  reg: SIGNED8);
 BEGIN
 	Load(code, x);
 	PCLIR.EmitStoreReg(code, PCLIR.HwReg-reg, x.adr);
@@ -1977,7 +1977,7 @@ END MOp;
 (** fof >> *)
 (*
 	PROCEDURE MinMax*( code: Code;  f: LONGINT;  VAR a, b: Item );
-	VAR fc: SHORTINT;  temp: PCLIR.Register;  label: LONGINT;  size: PCBT.Size;  cc: Item;
+	VAR fc: SIGNED8;  temp: PCLIR.Register;  label: LONGINT;  size: PCBT.Size;  cc: Item;
 	BEGIN
 		IF f = PCS.lss THEN fc := PCLIR.jlt
 		ELSIF f = PCS.gtr THEN fc := PCLIR.jgt
@@ -1999,7 +1999,7 @@ END MOp;
 *)
 
 	PROCEDURE MinMax*( code: Code;  fcc: LONGINT;  VAR a, b: Item );
-	VAR fc: SHORTINT; label,end: LONGINT; size: PCBT.Size;reg: LONGINT;
+	VAR fc: SIGNED8; label,end: LONGINT; size: PCBT.Size;reg: LONGINT;
 	BEGIN
 		IF fcc = PCS.lss THEN fc := PCLIR.jlt
 		ELSIF fcc = PCS.gtr THEN fc := PCLIR.jgt
@@ -2176,8 +2176,8 @@ BEGIN
 	PCLIR.Emit12(code, op, a.adr, a.adr, b.adr)
 END DOp;
 
-PROCEDURE StringCmp(code: Code; cc: SHORTINT;  VAR cond: Item;  a, b: Item);
-VAR  aval, bval, abase, bbase, abase2, bbase2, zero, one, loop, pc: LONGINT;  cctrue, ccfalse: SHORTINT;
+PROCEDURE StringCmp(code: Code; cc: SIGNED8;  VAR cond: Item;  a, b: Item);
+VAR  aval, bval, abase, bbase, abase2, bbase2, zero, one, loop, pc: LONGINT;  cctrue, ccfalse: SIGNED8;
 BEGIN
 	ASSERT(a.mode # Reg, 200);
 	ASSERT(b.mode # Reg, 201);
@@ -2235,7 +2235,7 @@ BEGIN
 END StringCmp;
 
 PROCEDURE RelOp*(code: Code; operand: LONGINT; VAR a, b: Item);
-VAR  cc: SHORTINT;  string: BOOLEAN;  list: Label;
+VAR  cc: SIGNED8;  string: BOOLEAN;  list: Label;
 BEGIN
 	IF operand = bitfn THEN
 		Convert(code, a, PCT.Int32, FALSE);
@@ -2386,10 +2386,10 @@ END Deref;
 
 (** fof >> *)
 	PROCEDURE Range*( code: Code;  rangeover: PCT.EnhArray;   VAR descr, x, from, to, by: Item;  dim: LONGINT );   (* called by PCB.Range.Emit *)
-	VAR type: PCT.EnhArray;  mode: SHORTINT;  one, inc: Item;  oldby: Item;
+	VAR type: PCT.EnhArray;  mode: SIGNED8;  one, inc: Item;  oldby: Item;
 
 		PROCEDURE CheckUpper( code: Code;  VAR x, index: Item );
-		VAR bound: Item;  type: PCT.EnhArray;  mode: SHORTINT;  label: Label;
+		VAR bound: Item;  type: PCT.EnhArray;  mode: SIGNED8;  label: Label;
 		BEGIN
 			type := x.type( PCT.EnhArray );  mode := type.mode;
 
@@ -2508,10 +2508,10 @@ END Deref;
 
 	PROCEDURE EIndex*( code: Code;  VAR descr, x, index: Item;  dim: LONGINT (*useInc: BOOLEAN*) );   (* called by PCB.Index.Emit *)
 	(* here an additional switch (useInc) can help to optimize w.r.t. fixed increments *)
-	VAR type: PCT.EnhArray;  mode: SHORTINT;  inc: Item;
+	VAR type: PCT.EnhArray;  mode: SIGNED8;  inc: Item;
 
 		PROCEDURE IndexCheck( code: Code; VAR index: Item );
-		VAR bound: Item;  type: PCT.EnhArray;  mode: SHORTINT;
+		VAR bound: Item;  type: PCT.EnhArray;  mode: SIGNED8;
 		BEGIN
 			type := x.type( PCT.EnhArray );  mode := type.mode;
 
@@ -2674,7 +2674,7 @@ END Deref;
 
 
 PROCEDURE Index*(code: Code; VAR x, index: Item);
-VAR size: Item; type: PCT.Array; mode: SHORTINT;
+VAR size: Item; type: PCT.Array; mode: SIGNED8;
 
 	PROCEDURE IndexCheck(code: Code; VAR x, index: Item);
 	VAR bound: Item;
@@ -3772,7 +3772,7 @@ END Await;
 
 (** PushSL - push the static link (SL), for local procedures only *)
 
-PROCEDURE PushSL*(code: Code;  deltaLevel: SHORTINT);
+PROCEDURE PushSL*(code: Code;  deltaLevel: SIGNED8);
 VAR  reg: LONGINT;
 BEGIN
 	ASSERT(deltaLevel >= -1);

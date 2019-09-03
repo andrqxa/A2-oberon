@@ -7,7 +7,7 @@ IMPORT SYSTEM, KernelLog, Heaps, MathL;
 
 TYPE
 
-	GenericUnaryAALoopS = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: SHORTINT): SHORTINT );
+	GenericUnaryAALoopS = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: SIGNED8): SIGNED8 );
 	GenericUnaryAALoopI = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: INTEGER): INTEGER );
 	GenericUnaryAALoopL = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: LONGINT): LONGINT );
 	GenericUnaryAALoopH = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE} (x: HUGEINT): HUGEINT );
@@ -514,8 +514,8 @@ Sufficient (but not necessary) conditions:
 
 	(*** procedures to traverse arrays and apply operators *)
 
-	(** apply unary operator to array:  array SHORTINT -> array SHORTINT *)
-	PROCEDURE ApplyGenericUnaryAAOpS(VAR dest: UnsafeArrayT; CONST left: UnsafeArrayT;  elementSize: SIZE; Loop: GenericUnaryAALoopS; op: PROCEDURE {DELEGATE} (x: SHORTINT): SHORTINT );
+	(** apply unary operator to array:  array SIGNED8 -> array SIGNED8 *)
+	PROCEDURE ApplyGenericUnaryAAOpS(VAR dest: UnsafeArrayT; CONST left: UnsafeArrayT;  elementSize: SIZE; Loop: GenericUnaryAALoopS; op: PROCEDURE {DELEGATE} (x: SIGNED8): SIGNED8 );
 		VAR loopd, looplen, loopli, loopdi: SIZE;  p: ANY;  glen: SIZE;
 			origdest: ADDRESS;  modes: SET;
 			dim: SIZE;
@@ -1651,7 +1651,7 @@ Sufficient (but not necessary) conditions:
 	*)
 	(*** conversions ****)
 
-(** SHORTINT -> INTEGER *)
+(** SIGNED8 -> INTEGER *)
 	PROCEDURE ConvertASAILoop( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
 	BEGIN
 		WHILE (len > 0) DO  (* SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval ); *)
@@ -1660,19 +1660,19 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertASAILoop;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [?] OF INTEGER;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [?] OF INTEGER;
 	BEGIN
 		ApplyUnaryAAOp( RESULT, src, SIZEOF( INTEGER ),ConvertASAILoop );
 		RETURN RESULT
 	END "@Convert";
 
-	OPERATOR "LONG"*(CONST src: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [?] OF INTEGER;
+	OPERATOR "LONG"*(CONST src: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [?] OF INTEGER;
 	BEGIN
 		ApplyUnaryAAOp( RESULT, src, SIZEOF( INTEGER ),ConvertASAILoop );
 		RETURN RESULT
 	END "LONG";
 
-(** SHORTINT -> LONGINT *)
+(** SIGNED8 -> LONGINT *)
 	PROCEDURE ConvertLoopSL( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
 	BEGIN
 		WHILE (len > 0) DO  (* SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval ); *)
@@ -1681,15 +1681,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopSL;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [?] OF LONGINT;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [?] OF LONGINT;
 	BEGIN
 		ApplyUnaryAAOp(RESULT, src,SIZEOF( LONGINT ),ConvertLoopSL );
 		RETURN RESULT
 	END "@Convert";
 
-(** SHORTINT -> REAL *)
+(** SIGNED8 -> REAL *)
 	PROCEDURE ConvertLoopSR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SHORTINT;  dval: REAL;
+	VAR lval: SIGNED8;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1697,15 +1697,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopSR;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [?] OF REAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [?] OF REAL;
 	BEGIN
 		ApplyUnaryAAOp(RESULT, src,SIZEOF( REAL ), ConvertLoopSR );
 		RETURN RESULT
 	END "@Convert";
 
-(** SHORTINT -> LONGREAL *)
+(** SIGNED8 -> LONGREAL *)
 	PROCEDURE ConvertLoopSX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SHORTINT;  dval: LONGREAL;
+	VAR lval: SIGNED8;  dval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1713,15 +1713,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopSX;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SHORTINT ):  ARRAY {UNSAFE} [ ? ] OF LONGREAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED8 ):  ARRAY {UNSAFE} [ ? ] OF LONGREAL;
 	BEGIN
 		ApplyUnaryAAOp(RESULT, src,SIZEOF( LONGREAL ), ConvertLoopSX );
 		RETURN RESULT
 	END "@Convert";
 
-(** INTEGER -> SHORTINT (SHORT) *)
+(** INTEGER -> SIGNED8 (SHORT) *)
 	PROCEDURE ConvertLoopIS( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: INTEGER;  dval: SHORTINT;
+	VAR lval: INTEGER;  dval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := SHORT( lval );  SYSTEM.PUT( dadr, dval );
@@ -1729,15 +1729,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopIS;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF INTEGER ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF INTEGER ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
-		ApplyUnaryAAOp(RESULT, src,SIZEOF( SHORTINT ), ConvertLoopIS );
+		ApplyUnaryAAOp(RESULT, src,SIZEOF( SIGNED8 ), ConvertLoopIS );
 		RETURN RESULT
 	END "@Convert";
 
-	OPERATOR "SHORT"*(CONST src: ARRAY [ ? ] OF INTEGER ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "SHORT"*(CONST src: ARRAY [ ? ] OF INTEGER ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
-		ApplyUnaryAAOp(RESULT, src,SIZEOF( SHORTINT ), ConvertLoopIS );
+		ApplyUnaryAAOp(RESULT, src,SIZEOF( SIGNED8 ), ConvertLoopIS );
 		RETURN RESULT
 	END "SHORT";
 
@@ -2004,9 +2004,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** monadic generic (A) -> -A  ********************************************************************)
 
-(** SHORTINT *)
-	PROCEDURE GenericLoopS( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE}(x: SHORTINT): SHORTINT );
-	VAR lval: SHORTINT;
+(** SIGNED8 *)
+	PROCEDURE GenericLoopS( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE {DELEGATE}(x: SIGNED8): SIGNED8 );
+	VAR lval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, op(lval) );  INC( ladr, linc );  INC( dadr, dinc );
@@ -2092,9 +2092,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** monadic minus A -> -A  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE MinusLoopS( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SHORTINT;
+	VAR lval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, -lval );  INC( ladr, linc );  INC( dadr, dinc );
@@ -2102,9 +2102,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MinusLoopS;
 
-	OPERATOR "-"*(CONST src: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "-"*(CONST src: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
-		ApplyUnaryAAOp(RESULT, src,SIZEOF( SHORTINT ), MinusLoopS );
+		ApplyUnaryAAOp(RESULT, src,SIZEOF( SIGNED8 ), MinusLoopS );
 		RETURN RESULT
 	END "-";
 
@@ -2192,9 +2192,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** add array + array -> array  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE AddASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval + rval );
@@ -2202,10 +2202,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddASASLoop;
 
-	OPERATOR "+"*(CONST left,right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR "+"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
-										SIZEOF( SHORTINT ), AddASASLoop );
+										SIZEOF( SIGNED8 ), AddASASLoop );
 		RETURN RESULT
 	END "+";
 
@@ -2350,9 +2350,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** add array + scalar -> array and scalar + array -> array ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE AddASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2361,17 +2361,17 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddASSSLoop;
 
-	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
-										SIZEOF( SHORTINT ), AddASSSLoop );
+										SIZEOF( SIGNED8 ), AddASSSLoop );
 		RETURN RESULT
 	END "+";
 
-	OPERATOR "+"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "+"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
-										SIZEOF( SHORTINT ), AddASSSLoop );
+										SIZEOF( SIGNED8 ), AddASSSLoop );
 		RETURN RESULT
 	END "+";
 
@@ -2579,9 +2579,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** subtraction array - array -> array  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE SubASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval - rval );
@@ -2589,10 +2589,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubASASLoop;
 
-	OPERATOR "-"*(CONST left,right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR "-"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
-										SIZEOF( SHORTINT ), SubASASLoop );
+										SIZEOF( SIGNED8 ), SubASASLoop );
 		RETURN RESULT
 	END "-";
 
@@ -2720,8 +2720,8 @@ Sufficient (but not necessary) conditions:
 
 	(*** subtraction array-scalar -> array  ********************************************************************)
 
-(** SHORTINT *)
-	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;   (* a: left, b: right, c: dest *)
+(** SIGNED8 *)
+	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;   (* a: left, b: right, c: dest *)
 	BEGIN
 		RESULT := left + (-right);
 		RETURN RESULT
@@ -2778,9 +2778,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** subtraction scalar-array -> array  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE SubSSASLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval, dval: SHORTINT;
+	VAR lval, rval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2789,10 +2789,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubSSASLoop;
 
-	OPERATOR "-"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "-"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
-										SIZEOF( SHORTINT ), SubSSASLoop );
+										SIZEOF( SIGNED8 ), SubSSASLoop );
 		RETURN RESULT
 	END "-";
 
@@ -2925,9 +2925,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** element-wise multiply array x array -> array  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EMulASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval * rval );
@@ -2935,10 +2935,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulASASLoop;
 
-	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
-										SIZEOF( SHORTINT ), EMulASASLoop );
+										SIZEOF( SIGNED8 ), EMulASASLoop );
 		RETURN RESULT
 	END ".*";
 
@@ -3050,9 +3050,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** element-wise multiply and add array x array -> array  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EMulIncASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval,dval: SHORTINT;
+	VAR lval, rval,dval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.GET(dadr,dval); SYSTEM.PUT( dadr, dval + lval * rval );
@@ -3060,10 +3060,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulIncASASLoop;
 
-	OPERATOR ".*+"*(CONST left,right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR ".*+"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
-										SIZEOF( SHORTINT ), EMulIncASASLoop );
+										SIZEOF( SIGNED8 ), EMulIncASASLoop );
 	END  ".*+";
 
 (** INTEGER *)
@@ -3132,9 +3132,9 @@ Sufficient (but not necessary) conditions:
 	END  ".*+";
 	(*** multiply array x scalar -> array and scalar + array -> array ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE MulASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3143,17 +3143,17 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MulASSSLoop;
 
-	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
-										SIZEOF( SHORTINT ), MulASSSLoop );
+										SIZEOF( SIGNED8 ), MulASSSLoop );
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "*"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
-										SIZEOF( SHORTINT ), MulASSSLoop );
+										SIZEOF( SIGNED8 ), MulASSSLoop );
 		RETURN RESULT
 	END "*";
 
@@ -3342,9 +3342,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** multiply and add array * scalar -> array and scalar *  array -> array ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE IncMulASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval, dval: SHORTINT;
+	VAR lval, rval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3353,33 +3353,33 @@ Sufficient (but not necessary) conditions:
 		END;
 	END IncMulASSSLoop;
 
-	OPERATOR "INCMUL"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "INCMUL"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
-										SIZEOF( SHORTINT ), IncMulASSSLoop );
+										SIZEOF( SIGNED8 ), IncMulASSSLoop );
 	END "INCMUL";
 
-	OPERATOR "INCMUL"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "INCMUL"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
-										SIZEOF( SHORTINT ), IncMulASSSLoop );
+										SIZEOF( SIGNED8 ), IncMulASSSLoop );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "DECMUL"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "DECMUL"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
-										SIZEOF( SHORTINT ), IncMulASSSLoop );
+										SIZEOF( SIGNED8 ), IncMulASSSLoop );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
 
-	OPERATOR "DECMUL"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "DECMUL"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
-										SIZEOF( SHORTINT ), IncMulASSSLoop );
+										SIZEOF( SIGNED8 ), IncMulASSSLoop );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
@@ -3564,9 +3564,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** element-wise division array / array -> array  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EDivideASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: REAL;
+	VAR lval, rval: SIGNED8;  dval: REAL;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval / rval;
@@ -3575,7 +3575,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivideASASLoop;
 
-	OPERATOR "./"*(CONST left,right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF REAL;
+	OPERATOR "./"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF REAL;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right, SIZEOF( REAL ),
 										EDivideASASLoop );
@@ -3702,9 +3702,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** division array / scalar -> array and scalar / array -> array ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE DivideASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: REAL;
+	VAR lval, rval: SIGNED8;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3713,7 +3713,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideASSSLoop;
 
-	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF REAL;
+	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF REAL;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ), SIZEOF( REAL ),
 										DivideASSSLoop );
@@ -3721,7 +3721,7 @@ Sufficient (but not necessary) conditions:
 	END "/";
 
 	PROCEDURE DivideSSASLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: REAL;
+	VAR lval, rval: SIGNED8;  dval: REAL;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3730,7 +3730,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideSSASLoop;
 
-	OPERATOR "/"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF REAL;
+	OPERATOR "/"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF REAL;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ), SIZEOF( REAL ),
 										DivideSSASLoop );
@@ -3970,9 +3970,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** element-wise DIV array DIV array -> array  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EDivASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: SHORTINT;
+	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval DIV rval;
@@ -3981,10 +3981,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivASASLoop;
 
-	OPERATOR "DIV"*(CONST left,right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR "DIV"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
-										SIZEOF( SHORTINT ), EDivASASLoop );
+										SIZEOF( SIGNED8 ), EDivASASLoop );
 		RETURN RESULT
 	END "DIV";
 
@@ -4043,9 +4043,9 @@ Sufficient (but not necessary) conditions:
 	END "DIV";
 	(*** division array DIV scalar -> array and scalar DIV  array -> array ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE DivASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: SHORTINT;
+	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4054,15 +4054,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivASSSLoop;
 
-	OPERATOR "DIV"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "DIV"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
-										SIZEOF( SHORTINT ), DivASSSLoop );
+										SIZEOF( SIGNED8 ), DivASSSLoop );
 		RETURN RESULT
 	END "DIV";
 
 	PROCEDURE DivSSASLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: SHORTINT;
+	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4071,10 +4071,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivSSASLoop;
 
-	OPERATOR "DIV"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "DIV"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
-										SIZEOF( SHORTINT ), DivSSASLoop );
+										SIZEOF( SIGNED8 ), DivSSASLoop );
 		RETURN RESULT
 	END "DIV";
 
@@ -4185,9 +4185,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** element-wise modulus array MOD array -> array  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EModASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: SHORTINT;
+	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval MOD rval;
@@ -4196,10 +4196,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EModASASLoop;
 
-	OPERATOR "MOD"*(CONST left,right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR "MOD"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
-										SIZEOF( SHORTINT ), EModASASLoop );
+										SIZEOF( SIGNED8 ), EModASASLoop );
 		RETURN RESULT
 	END "MOD";
 
@@ -4259,9 +4259,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** modulus array MOD scalar -> array and scalar MOD  array -> array ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE ModASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: SHORTINT;
+	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4270,15 +4270,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ModASSSLoop;
 
-	OPERATOR "MOD"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "MOD"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
-										SIZEOF( SHORTINT ), ModASSSLoop );
+										SIZEOF( SIGNED8 ), ModASSSLoop );
 		RETURN RESULT
 	END "MOD";
 
 	PROCEDURE ModSSASLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: SHORTINT;
+	VAR lval, rval: SIGNED8;  dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4287,10 +4287,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ModSSASLoop;
 
-	OPERATOR "MOD"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "MOD"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
-										SIZEOF( SHORTINT ), ModSSASLoop );
+										SIZEOF( SIGNED8 ), ModSSASLoop );
 		RETURN RESULT
 	END "MOD";
 
@@ -4401,9 +4401,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** scalar product <array,array> -> scalar  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE SPASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval: SHORTINT;  dval: LONGINT;
+	VAR lval, rval: SIGNED8;  dval: LONGINT;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -4413,7 +4413,7 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END SPASASLoop;
 
-	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF SHORTINT ): LONGINT;
+	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF SIGNED8 ): LONGINT;
 	VAR dest: LONGINT;
 	BEGIN
 		dest := 0;
@@ -4571,10 +4571,10 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".=";
 
-(** SHORTINT *)
+(** SIGNED8 *)
 
 	PROCEDURE EEqlASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval = rval );
@@ -4582,7 +4582,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EEqlASASLoop;
 
-	OPERATOR ".="*(CONST left, right: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".="*(CONST left, right: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
 										SIZEOF( BOOLEAN ), EEqlASASLoop );
@@ -4686,9 +4686,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".=";
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EEqlASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4697,14 +4697,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EEqlASSSLoop;
 
-	OPERATOR ".="*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".="*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), EEqlASSSLoop );
 		RETURN RESULT
 	END ".=";
 
-	OPERATOR ".="*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".="*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), EEqlASSSLoop );
@@ -4830,9 +4830,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".#";
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE ENeqASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval # rval );
@@ -4840,7 +4840,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ENeqASASLoop;
 
-	OPERATOR ".#"*(CONST left, right: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".#"*(CONST left, right: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
 										SIZEOF( BOOLEAN ), ENeqASASLoop );
@@ -4942,9 +4942,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".#";
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE ENeqASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4953,14 +4953,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ENeqASSSLoop;
 
-	OPERATOR ".#"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".#"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), ENeqASSSLoop );
 		RETURN RESULT
 	END ".#";
 
-	OPERATOR ".#"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".#"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), ENeqASSSLoop );
@@ -5069,9 +5069,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** elementwise greater than: array x array -> array of boolean  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EGtrASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval > rval );
@@ -5079,7 +5079,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGtrASASLoop;
 
-	OPERATOR ".>"*(CONST left, right: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".>"*(CONST left, right: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
 										SIZEOF( BOOLEAN ), EGtrASASLoop );
@@ -5156,9 +5156,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** elementwise greater  array x scalar ->  array of boolean ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EGtrASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5167,14 +5167,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGtrASSSLoop;
 
-	OPERATOR ".>"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".>"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), EGtrASSSLoop );
 		RETURN RESULT
 	END ".>";
 
-	OPERATOR ".<"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".<"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), EGtrASSSLoop );
@@ -5283,9 +5283,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** elementwise greater or equal: array x array -> array of boolean  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EGeqASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval >= rval );
@@ -5293,7 +5293,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGeqASASLoop;
 
-	OPERATOR ".>="*(CONST left, right: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".>="*(CONST left, right: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
 										SIZEOF( BOOLEAN ), EGeqASASLoop );
@@ -5370,9 +5370,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** elementwise geq  array x scalar ->  array of boolean ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EGeqASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5381,14 +5381,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGeqASSSLoop;
 
-	OPERATOR ".>="*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".>="*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), EGeqASSSLoop );
 		RETURN RESULT
 	END ".>=";
 
-	OPERATOR ".<="*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".<="*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), EGeqASSSLoop );
@@ -5497,9 +5497,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** elementwise less than: array x array -> array of boolean  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE ELssASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval < rval );
@@ -5507,7 +5507,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELssASASLoop;
 
-	OPERATOR ".<"*(CONST left, right: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".<"*(CONST left, right: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
 										SIZEOF( BOOLEAN ), ELssASASLoop );
@@ -5584,9 +5584,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** elementwise less  array x scalar ->  array of boolean ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE ELssASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5595,14 +5595,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELssASSSLoop;
 
-	OPERATOR ".<"*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".<"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), ELssASSSLoop );
 		RETURN RESULT
 	END ".<";
 
-	OPERATOR ".>"*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".>"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), ELssASSSLoop );
@@ -5711,9 +5711,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** elementwise less or equal: array x array -> array of boolean ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE ELeqASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval <= rval );
@@ -5721,7 +5721,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELeqASASLoop;
 
-	OPERATOR ".<="*(CONST left, right: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".<="*(CONST left, right: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( RESULT, left, right,
 										SIZEOF( BOOLEAN ), ELeqASASLoop );
@@ -5798,9 +5798,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** elementwise leq  array x scalar ->  array of boolean ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE ELeqASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5809,14 +5809,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELeqASSSLoop;
 
-	OPERATOR ".<="*(CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".<="*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ),
 										SIZEOF( BOOLEAN ), ELeqASSSLoop );
 		RETURN RESULT
 	END ".<=";
 
-	OPERATOR ".>="*(left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
+	OPERATOR ".>="*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , right, ADDRESSOF( left ),
 										SIZEOF( BOOLEAN ), ELeqASSSLoop );
@@ -6009,9 +6009,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** less than, greater or equal: array x array -> boolean  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE LssASASLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6021,13 +6021,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LssASASLoop;
 
-	OPERATOR "<"*( CONST left, right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR "<"*( CONST left, right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( left, right, LssASASLoop , FALSE);
 	END "<";
 
 	PROCEDURE GeqASASLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6037,7 +6037,7 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GeqASASLoop;
 
-	OPERATOR ">="*( CONST left, right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR ">="*( CONST left, right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( left, right, GeqASASLoop , FALSE);
 	END ">=";
@@ -6209,9 +6209,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** less than, greater or equal: array x array -> boolean  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE GtrASASLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6221,13 +6221,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GtrASASLoop;
 
-	OPERATOR ">"*( CONST left, right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR ">"*( CONST left, right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( left, right, GtrASASLoop , FALSE);
 	END ">";
 
 	PROCEDURE LeqASASLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6237,7 +6237,7 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LeqASASLoop;
 
-	OPERATOR "<="*( CONST left, right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR "<="*( CONST left, right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( left, right, LeqASASLoop , FALSE);
 	END "<=";
@@ -6431,9 +6431,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ~ApplyBinaryAABOp( left, right, EqlABABLoop, FALSE);
 	END "#";
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EqlASASLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6443,12 +6443,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlASASLoop;
 
-	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( left, right, EqlASASLoop , FALSE);
 	END "=";
 
-	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ~ApplyBinaryAABOp( left, right, EqlASASLoop, FALSE );
 	END "#";
@@ -6647,9 +6647,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ~( left = right );
 	END "#";
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE EqlASSSLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6660,22 +6660,22 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlASSSLoop;
 
-	OPERATOR "="*( CONST left: ARRAY [ ? ] OF SHORTINT;right: SHORTINT ): BOOLEAN;
+	OPERATOR "="*( CONST left: ARRAY [ ? ] OF SIGNED8;right: SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( left, ADDRESSOF( right ), EqlASSSLoop );
 	END "=";
 
-	OPERATOR "="*( left: SHORTINT;CONST right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR "="*( left: SIGNED8;CONST right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( right , ADDRESSOF( left ), EqlASSSLoop );
 	END "=";
 
-	OPERATOR "#"*( CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): BOOLEAN;
+	OPERATOR "#"*( CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ~( left= right );
 	END "#";
 
-	OPERATOR "#"*( left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR "#"*( left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ~( left= right );
 	END "#";
@@ -6862,9 +6862,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** gtr : array x scalar -> boolean  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE GtrASSSLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6875,12 +6875,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GtrASSSLoop;
 
-	OPERATOR ">"*( CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): BOOLEAN;
+	OPERATOR ">"*( CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( left, ADDRESSOF( right ), GtrASSSLoop );
 	END ">";
 
-	OPERATOR "<"*( left: SHORTINT;CONST right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR "<"*( left: SIGNED8;CONST right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( right , ADDRESSOF( left ), GtrASSSLoop );
 	END "<";
@@ -7006,9 +7006,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** geq : array x scalar -> boolean  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE GeqASSSLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -7019,14 +7019,14 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GeqASSSLoop;
 
-	OPERATOR ">="*( CONST left: ARRAY [ ? ] OF SHORTINT;
-											right: SHORTINT ): BOOLEAN;
+	OPERATOR ">="*( CONST left: ARRAY [ ? ] OF SIGNED8;
+											right: SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( left, ADDRESSOF( right ), GeqASSSLoop );
 	END ">=";
 
-	OPERATOR "<="*( left: SHORTINT;
-										CONST right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR "<="*( left: SIGNED8;
+										CONST right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( right , ADDRESSOF( left ), GeqASSSLoop );
 	END "<=";
@@ -7154,9 +7154,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** leq : array x scalar -> boolean  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE LeqASSSLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -7167,12 +7167,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LeqASSSLoop;
 
-	OPERATOR "<="*( CONST left: ARRAY [ ? ] OF SHORTINT;right: SHORTINT ): BOOLEAN;
+	OPERATOR "<="*( CONST left: ARRAY [ ? ] OF SIGNED8;right: SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( left, ADDRESSOF( right ), LeqASSSLoop );
 	END "<=";
 
-	OPERATOR ">="*( left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR ">="*( left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( right , ADDRESSOF( left ), LeqASSSLoop );
 	END ">=";
@@ -7294,9 +7294,9 @@ Sufficient (but not necessary) conditions:
 
 	(*** lss: array x scalar -> boolean  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE LssASSSLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -7307,12 +7307,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LssASSSLoop;
 
-	OPERATOR "<"*( CONST left: ARRAY [ ? ] OF SHORTINT; right: SHORTINT ): BOOLEAN;
+	OPERATOR "<"*( CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( left, ADDRESSOF( right ), LssASSSLoop );
 	END "<";
 
-	OPERATOR ">"*( left: SHORTINT; CONST right: ARRAY [ ? ] OF SHORTINT ): BOOLEAN;
+	OPERATOR ">"*( left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( right , ADDRESSOF( left ), LssASSSLoop );
 	END ">";
@@ -7515,7 +7515,7 @@ Sufficient (but not necessary) conditions:
 	END "MAX";
 
 	PROCEDURE MaxASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, val: SHORTINT;
+	VAR lval, val: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, val );
 		WHILE (len > 0) DO
@@ -7526,8 +7526,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MaxASSSLoop;
 
-	OPERATOR "MAX"*(CONST left: ARRAY [?] OF SHORTINT; right: SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
-	TYPE Type = SHORTINT;
+	OPERATOR "MAX"*(CONST left: ARRAY [?] OF SIGNED8; right: SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
+	TYPE Type = SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ), SIZEOF( Type ), MaxASSSLoop );
 		RETURN RESULT
@@ -7610,7 +7610,7 @@ Sufficient (but not necessary) conditions:
 	END "MIN";
 
 	PROCEDURE MinASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, val: SHORTINT;
+	VAR lval, val: SIGNED8;
 	BEGIN
 		SYSTEM.GET( radr, val );
 		WHILE (len > 0) DO
@@ -7621,8 +7621,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MinASSSLoop;
 
-	OPERATOR "MIN"*(CONST left: ARRAY [?] OF SHORTINT; right: SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
-	TYPE Type = SHORTINT;
+	OPERATOR "MIN"*(CONST left: ARRAY [?] OF SIGNED8; right: SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
+	TYPE Type = SIGNED8;
 	BEGIN
 		ApplyBinaryASAOp( RESULT , left, ADDRESSOF( right ), SIZEOF( Type ), MinASSSLoop );
 		RETURN RESULT
@@ -7699,7 +7699,7 @@ Sufficient (but not necessary) conditions:
 	END "MAX";
 
 	PROCEDURE MaxASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval ); SYSTEM.GET( radr, rval );
@@ -7709,9 +7709,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MaxASASLoop;
 
-	OPERATOR "MAX"*(CONST left, right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR "MAX"*(CONST left, right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
-		ApplyBinaryAAAOp( RESULT, left, right, SIZEOF( SHORTINT ), MaxASASLoop );
+		ApplyBinaryAAAOp( RESULT, left, right, SIZEOF( SIGNED8 ), MaxASASLoop );
 		RETURN RESULT
 	END "MAX";
 
@@ -7818,7 +7818,7 @@ TYPE
 	END "MIN";
 
 	PROCEDURE MinASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SHORTINT;
+	VAR lval, rval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval ); SYSTEM.GET( radr, rval );
@@ -7828,9 +7828,9 @@ TYPE
 		END;
 	END MinASASLoop;
 
-	OPERATOR "MIN"*(CONST left, right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR "MIN"*(CONST left, right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
-		ApplyBinaryAAAOp( RESULT, left, right, SIZEOF( SHORTINT ), MinASASLoop );
+		ApplyBinaryAAAOp( RESULT, left, right, SIZEOF( SIGNED8 ), MinASASLoop );
 		RETURN RESULT
 	END "MIN";
 
@@ -7838,9 +7838,9 @@ TYPE
 
 	(*** min: array -> scalar ****************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE MinASLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: SHORTINT;
+	VAR lval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7851,8 +7851,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MinASLoop;
 
-	OPERATOR "MIN"*( CONST left: ARRAY [ ? ] OF SHORTINT ): SHORTINT;
-	TYPE Type = SHORTINT;
+	OPERATOR "MIN"*( CONST left: ARRAY [ ? ] OF SIGNED8 ): SIGNED8;
+	TYPE Type = SIGNED8;
 	VAR val: Type;
 	BEGIN
 		val := MAX( Type );
@@ -7966,9 +7966,9 @@ TYPE
 
 	(*** max: array -> scalar  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE MaxASLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: SHORTINT;
+	VAR lval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7979,8 +7979,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MaxASLoop;
 
-	OPERATOR "MAX"*( CONST left: ARRAY [ ? ] OF SHORTINT ): SHORTINT;
-	TYPE Type = SHORTINT;
+	OPERATOR "MAX"*( CONST left: ARRAY [ ? ] OF SIGNED8 ): SIGNED8;
+	TYPE Type = SIGNED8;
 	VAR val: Type;
 	BEGIN
 		val := MIN( Type );
@@ -8084,9 +8084,9 @@ TYPE
 
 	(*** SUM: array -> scalar  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE SumASLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: SHORTINT;
+	VAR lval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -8095,8 +8095,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END SumASLoop;
 
-	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF SHORTINT ): SHORTINT;
-	TYPE Type = SHORTINT;
+	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF SIGNED8 ): SIGNED8;
+	TYPE Type = SIGNED8;
 	VAR val: Type;
 	BEGIN
 		val := 0;  ApplyUnaryASOp( ADDRESSOF( val ), left , SumASLoop );
@@ -8239,9 +8239,9 @@ TYPE
 
 	(*** monadic ABS array -> array  ********************************************************************)
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE AbsLoopS( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SHORTINT;
+	VAR lval: SIGNED8;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, ABS( lval ) );  INC( ladr, linc );
@@ -8249,9 +8249,9 @@ TYPE
 		END;
 	END AbsLoopS;
 
-	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF SHORTINT): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF SIGNED8): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
-		ApplyUnaryAAOp(RESULT, src,SIZEOF( SHORTINT ), AbsLoopS );
+		ApplyUnaryAAOp(RESULT, src,SIZEOF( SIGNED8 ), AbsLoopS );
 		RETURN RESULT
 	END "ABS";
 
@@ -8368,15 +8368,15 @@ TYPE
 		ApplyUnarySAOp( dest, ADDRESSOF( right ), AssignSBABLoop );
 	END ":=";
 
-(** SHORTINT*)
+(** SIGNED8*)
 	PROCEDURE AssignSSASLoop( ladr, dadr: ADDRESS; dinc, len: SIZE );
-	VAR lval: SHORTINT;
+	VAR lval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( ladr, lval );
 		WHILE (len > 0) DO SYSTEM.PUT( dadr, lval );  INC( dadr, dinc );  DEC( len );  END;
 	END AssignSSASLoop;
 
-	OPERATOR ":="*(VAR dest: ARRAY {UNSAFE} [?] OF SHORTINT; right: SHORTINT);
+	OPERATOR ":="*(VAR dest: ARRAY {UNSAFE} [?] OF SIGNED8; right: SIGNED8);
 	BEGIN
 		ApplyUnarySAOp( dest, ADDRESSOF( right ), AssignSSASLoop );
 	END ":=";
@@ -8720,9 +8720,9 @@ TYPE
 		END;
 	END ApplyVecMatMulLoop;
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE MatMulASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval, dval: SHORTINT;
+	VAR lval, rval, dval: SIGNED8;
 	BEGIN
 		dval := 0;
 		WHILE (len > 0) DO
@@ -8733,24 +8733,24 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MatMulASASLoop;
 
-	OPERATOR "*"*(CONST left, right: ARRAY [ * , * ] OF SHORTINT ): ARRAY [ * , * ] OF SHORTINT;
+	OPERATOR "*"*(CONST left, right: ARRAY [ * , * ] OF SIGNED8 ): ARRAY [ * , * ] OF SIGNED8;
 	BEGIN
 		ApplyMatMulLoop( ADDRESS OF RESULT, ADDRESS OF left, ADDRESS OF right,
-									SIZEOF( SHORTINT ), MatMulASASLoop, NIL );
+									SIZEOF( SIGNED8 ), MatMulASASLoop, NIL );
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(CONST left: ARRAY [ * , * ] OF SHORTINT; CONST right: ARRAY [ * ] OF SHORTINT): ARRAY [ * ] OF SHORTINT;
+	OPERATOR "*"*(CONST left: ARRAY [ * , * ] OF SIGNED8; CONST right: ARRAY [ * ] OF SIGNED8): ARRAY [ * ] OF SIGNED8;
 	BEGIN
 		ApplyMatVecMulLoop( ADDRESS OF RESULT, ADDRESS OF left, ADDRESS OF right,
-											SIZEOF( SHORTINT ), MatMulASASLoop, NIL );
+											SIZEOF( SIGNED8 ), MatMulASASLoop, NIL );
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*( CONST left: ARRAY [ * ] OF SHORTINT; CONST right: ARRAY [ * , * ] OF SHORTINT  ): ARRAY [ * ] OF SHORTINT;
+	OPERATOR "*"*( CONST left: ARRAY [ * ] OF SIGNED8; CONST right: ARRAY [ * , * ] OF SIGNED8  ): ARRAY [ * ] OF SIGNED8;
 	BEGIN
 		ApplyVecMatMulLoop( ADDRESS OF RESULT, ADDRESS OF left, ADDRESS OF right,
-											SIZEOF( SHORTINT ), MatMulASASLoop, NIL );
+											SIZEOF( SIGNED8 ), MatMulASASLoop, NIL );
 		RETURN RESULT
 	END "*";
 
@@ -9214,9 +9214,9 @@ TYPE
 		RETURN RESULT
 	END "*";
 
-(** SHORTINT *)
+(** SIGNED8 *)
 	PROCEDURE MatMulIncASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval, dval: SHORTINT;
+	VAR lval, rval, dval: SIGNED8;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -9227,54 +9227,54 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MatMulIncASASLoop;
 
-	OPERATOR "INCMUL"*(CONST left, right: ARRAY [ * , * ] OF SHORTINT ): ARRAY [ * , * ] OF SHORTINT;
+	OPERATOR "INCMUL"*(CONST left, right: ARRAY [ * , * ] OF SIGNED8 ): ARRAY [ * , * ] OF SIGNED8;
 	BEGIN
 		ApplyMatMulLoop( ADDRESS OF RESULT, ADDRESS OF left, ADDRESS OF right,
-									SIZEOF( SHORTINT ), MatMulIncASASLoop, NIL );
+									SIZEOF( SIGNED8 ), MatMulIncASASLoop, NIL );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "INCMUL"*(CONST left: ARRAY [ * , * ] OF SHORTINT;
-															CONST right: ARRAY [ * ] OF SHORTINT  ): ARRAY [ * ] OF SHORTINT;
+	OPERATOR "INCMUL"*(CONST left: ARRAY [ * , * ] OF SIGNED8;
+															CONST right: ARRAY [ * ] OF SIGNED8  ): ARRAY [ * ] OF SIGNED8;
 	BEGIN
 		ApplyMatVecMulLoop( ADDRESS OF RESULT, ADDRESS OF left, ADDRESS OF right,
-											SIZEOF( SHORTINT ), MatMulIncASASLoop, NIL );
+											SIZEOF( SIGNED8 ), MatMulIncASASLoop, NIL );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "INCMUL"*( CONST left: ARRAY [ * ] OF SHORTINT;
-															CONST right: ARRAY [ * , * ] OF SHORTINT  ): ARRAY [ * ] OF SHORTINT;
+	OPERATOR "INCMUL"*( CONST left: ARRAY [ * ] OF SIGNED8;
+															CONST right: ARRAY [ * , * ] OF SIGNED8  ): ARRAY [ * ] OF SIGNED8;
 		BEGIN
 		ApplyVecMatMulLoop( ADDRESS OF RESULT, ADDRESS OF left, ADDRESS OF right,
-											SIZEOF( SHORTINT ), MatMulIncASASLoop, NIL );
+											SIZEOF( SIGNED8 ), MatMulIncASASLoop, NIL );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "DECMUL"*(CONST left, right: ARRAY [ * , * ] OF SHORTINT  ): ARRAY [ * , * ] OF SHORTINT;
+	OPERATOR "DECMUL"*(CONST left, right: ARRAY [ * , * ] OF SIGNED8  ): ARRAY [ * , * ] OF SIGNED8;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyMatMulLoop( ADDRESS OF RESULT, ADDRESS OF left, ADDRESS OF right,
-									SIZEOF( SHORTINT ), MatMulIncASASLoop, NIL );
+									SIZEOF( SIGNED8 ), MatMulIncASASLoop, NIL );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
 
-	OPERATOR "DECMUL"*(CONST left: ARRAY [ * , * ] OF SHORTINT;
-															CONST right: ARRAY [ * ] OF SHORTINT  ): ARRAY [ * ] OF SHORTINT;
+	OPERATOR "DECMUL"*(CONST left: ARRAY [ * , * ] OF SIGNED8;
+															CONST right: ARRAY [ * ] OF SIGNED8  ): ARRAY [ * ] OF SIGNED8;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyMatVecMulLoop( ADDRESS OF RESULT, ADDRESS OF left, ADDRESS OF right,
-											SIZEOF( SHORTINT ), MatMulIncASASLoop, NIL );
+											SIZEOF( SIGNED8 ), MatMulIncASASLoop, NIL );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
 
-	OPERATOR "DECMUL"*( CONST left: ARRAY [ * ] OF SHORTINT;
-															CONST right: ARRAY [ * , * ] OF SHORTINT ): ARRAY [ * ] OF SHORTINT;
+	OPERATOR "DECMUL"*( CONST left: ARRAY [ * ] OF SIGNED8;
+															CONST right: ARRAY [ * , * ] OF SIGNED8 ): ARRAY [ * ] OF SIGNED8;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyVecMatMulLoop( ADDRESS OF RESULT, ADDRESS OF left, ADDRESS OF right,
-											SIZEOF( SHORTINT ), MatMulIncASASLoop, NIL );
+											SIZEOF( SIGNED8 ), MatMulIncASASLoop, NIL );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
@@ -9521,8 +9521,8 @@ TYPE
 
 (*** Cross product ********************************************************************)
 
-	OPERATOR "*"*(CONST left, right: ARRAY [ * ] OF SHORTINT  ): ARRAY [ * ] OF SHORTINT;
-	VAR vl1, vl2, vl3, vr1, vr2, vr3: SHORTINT;
+	OPERATOR "*"*(CONST left, right: ARRAY [ * ] OF SIGNED8  ): ARRAY [ * ] OF SIGNED8;
+	VAR vl1, vl2, vl3, vr1, vr2, vr3: SIGNED8;
 	BEGIN
 		IF (LEN( left,0 ) # 3) OR (LEN( right,0 ) # 3) THEN
 			Halt( GeometryMismatch, ADDRESSOF( left ), ADDRESSOF( right ),  0 )
@@ -9640,7 +9640,7 @@ TYPE
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(CONST left, right: ARRAY [ ? ] OF SHORTINT ): ARRAY {UNSAFE} [ ? ] OF SHORTINT;
+	OPERATOR "*"*(CONST left, right: ARRAY [ ? ] OF SIGNED8 ): ARRAY {UNSAFE} [ ? ] OF SIGNED8;
 	BEGIN
 		IF (DIM(left) = 2) & (DIM(right)=2) THEN
 			EnsureArrayDesc(2, SYSTEM.VAL(Tensor, RESULT));
@@ -9648,7 +9648,7 @@ TYPE
 			EnsureArrayDesc(1, SYSTEM.VAL(Tensor, RESULT));
 		ELSE HALT(200);
 		END;
-		ApplyMatMulLoop(SYSTEM.VAL(Tensor, RESULT), SYSTEM.VAL(Tensor, left), SYSTEM.VAL(Tensor, right), SIZEOF( SHORTINT ),
+		ApplyMatMulLoop(SYSTEM.VAL(Tensor, RESULT), SYSTEM.VAL(Tensor, left), SYSTEM.VAL(Tensor, right), SIZEOF( SIGNED8 ),
 									MatMulASASLoop, NIL );
 		RETURN RESULT
 	END "*";
@@ -9799,9 +9799,9 @@ TYPE
 		END;
 	END Transpose;
 
-	OPERATOR "`"*(CONST left: ARRAY [ * , * ] OF SHORTINT): ARRAY [ * , * ] OF SHORTINT;
+	OPERATOR "`"*(CONST left: ARRAY [ * , * ] OF SIGNED8): ARRAY [ * , * ] OF SIGNED8;
 	BEGIN
-		Transpose( ADDRESSOF( RESULT ), ADDRESSOF( left ), SIZEOF( SHORTINT ) );
+		Transpose( ADDRESSOF( RESULT ), ADDRESSOF( left ), SIZEOF( SIGNED8 ) );
 		RETURN RESULT
 	END "`";
 
@@ -10375,10 +10375,10 @@ TYPE
 		Traverse( GetAdr( left ), GetAdr( right ), GetAdr( dest ), 0, 0 );
 	END ApplyTensorAAAOp;
 
-	OPERATOR "**"*(CONST left,right: ARRAY [?] OF SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR "**"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
 		ApplyTensorAAAOp( RESULT, left, right,
-										SIZEOF( SHORTINT ), MulASSSLoop );
+										SIZEOF( SIGNED8 ), MulASSSLoop );
 		RETURN RESULT
 	END "**";
 
@@ -10568,9 +10568,9 @@ TYPE
 		RETURN result
 	END "LEN";
 
-	OPERATOR "ALL"*(CONST x: ARRAY {UNSAFE} [?] OF SHORTINT; op: PROCEDURE {DELEGATE}(x: SHORTINT): SHORTINT): ARRAY {UNSAFE} [?] OF SHORTINT;
+	OPERATOR "ALL"*(CONST x: ARRAY {UNSAFE} [?] OF SIGNED8; op: PROCEDURE {DELEGATE}(x: SIGNED8): SIGNED8): ARRAY {UNSAFE} [?] OF SIGNED8;
 	BEGIN
-		ApplyGenericUnaryAAOpS(RESULT, x, SIZEOF(SHORTINT),GenericLoopS,op);
+		ApplyGenericUnaryAAOpS(RESULT, x, SIZEOF(SIGNED8),GenericLoopS,op);
 		RETURN RESULT;
 	END "ALL";
 
@@ -10616,7 +10616,7 @@ TYPE
 		RETURN RESULT;
 	END "ALL";
 
-	OPERATOR "ALL"*(CONST x: ARRAY [?] OF SHORTINT; map: PROCEDURE( ladr, dadr: ADDRESS; linc, dinc, len: SIZE)): ARRAY {UNSAFE}[?]  OF SHORTINT;
+	OPERATOR "ALL"*(CONST x: ARRAY [?] OF SIGNED8; map: PROCEDURE( ladr, dadr: ADDRESS; linc, dinc, len: SIZE)): ARRAY {UNSAFE}[?]  OF SIGNED8;
 	VAR elementSize: SIZE;
 	BEGIN
 		ApplyUnaryAAOp(RESULT,x,GetSize(x),map);

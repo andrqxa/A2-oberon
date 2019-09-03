@@ -926,7 +926,7 @@ TYPE
 		END FocusLost;
 
 		PROCEDURE ProcessMessage*(m: ANY);
-		VAR newPointerOwner: VisualComponent; kd, kdp: SHORTINT;
+		VAR newPointerOwner: VisualComponent; kd, kdp: SIGNED8;
 		BEGIN
 			IF m IS MouseMessage THEN
 				WITH m: MouseMessage DO

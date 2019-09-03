@@ -1530,7 +1530,7 @@ TYPE
 				REPEAT
 					IF (scanner.symbol = sNumber) THEN
 						WriteLn("   number");
-						IF (MIN(SHORTINT) > scanner.number) OR (scanner.number > 2*MAX(SHORTINT)+1) THEN
+						IF (MIN(SIGNED8) > scanner.number) OR (scanner.number > 2*MAX(SIGNED8)+1) THEN
 							Error(499) (* number too small/big *)
 						ELSE
 							PutData(scanner.number, 1)

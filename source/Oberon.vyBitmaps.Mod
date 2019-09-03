@@ -66,7 +66,7 @@ BEGIN
 	RETURN INTEGER(ASH(1, z))
 END exp2;
 
-PROCEDURE bit* (VAR pos: SHORTINT;  VAR number: INTEGER): INTEGER;
+PROCEDURE bit* (VAR pos: SIGNED8;  VAR number: INTEGER): INTEGER;
 BEGIN (* returns 1 if bit is set, else 0 *)
 	RETURN number MOD (exp2(pos + 1)) DIV (exp2(pos))
 END bit;
@@ -310,7 +310,7 @@ VAR
 	byte: INTEGER;
 	blocksize: INTEGER;
 	bytecount: INTEGER;
-	bytepos: SHORTINT;
+	bytepos: SIGNED8;
 	msgcount : INTEGER;
 	fpos : INTEGER;
 
@@ -323,7 +323,7 @@ END LoadBuffer;
 PROCEDURE getnextint (numberofbits: INTEGER): INTEGER;
 VAR
 	val: INTEGER;
-	intpos: SHORTINT;
+	intpos: SIGNED8;
 BEGIN
 	val := 0;
 	intpos := 0;
@@ -558,7 +558,7 @@ VAR
 	byte: INTEGER;
 	blocksize: INTEGER;
 	bytecount: INTEGER;
-	bytepos: SHORTINT;
+	bytepos: SIGNED8;
 
 
 
@@ -633,7 +633,7 @@ END storeinstt;
 PROCEDURE output (val, numberofbits: INTEGER);
 
 VAR
-	intpos: SHORTINT;
+	intpos: SIGNED8;
 BEGIN
 	intpos := 0;
 	REPEAT

@@ -414,7 +414,7 @@ TYPE
 			END
 		END GetNotationDecl;
 
-		PROCEDURE GetEntityDecl*(CONST name: ARRAY OF CHAR; type: SHORTINT): EntityDecl;
+		PROCEDURE GetEntityDecl*(CONST name: ARRAY OF CHAR; type: SIGNED8): EntityDecl;
 		VAR p: ANY;
 		BEGIN
 			p := NIL;
@@ -516,7 +516,7 @@ TYPE
 	EntityDecl* = OBJECT (NotationDecl)
 	VAR
 		value, notationName: String;
-		type: SHORTINT;
+		type: SIGNED8;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -525,12 +525,12 @@ TYPE
 			type := GeneralEntity;
 		END Init;
 
-		PROCEDURE GetType*(): SHORTINT;
+		PROCEDURE GetType*(): SIGNED8;
 		BEGIN
 			RETURN type
 		END GetType;
 
-		PROCEDURE SetType*(type: SHORTINT);
+		PROCEDURE SetType*(type: SIGNED8);
 		BEGIN
 			SELF.type := type
 		END SetType;
@@ -588,7 +588,7 @@ CONST
 TYPE
 	ElementDecl* = OBJECT (NameContent)
 	VAR
-		contentType: SHORTINT;
+		contentType: SIGNED8;
 		content: CollectionCP;	(* for contentType = Mixed or contentType = Element *)
 		attributeDecls: Objects.Dictionary;
 
@@ -601,12 +601,12 @@ TYPE
 			NEW(arrDict); attributeDecls := arrDict
 		END Init;
 
-		PROCEDURE GetContentType*(): SHORTINT;
+		PROCEDURE GetContentType*(): SIGNED8;
 		BEGIN
 			RETURN contentType
 		END GetContentType;
 
-		PROCEDURE SetContentType*(contentType: SHORTINT);
+		PROCEDURE SetContentType*(contentType: SIGNED8);
 		BEGIN
 			SELF.contentType := contentType
 		END SetContentType;
@@ -672,7 +672,7 @@ CONST
 TYPE
 	ContentParticle* = OBJECT (Content)
 	VAR
-		occurence: SHORTINT;
+		occurence: SIGNED8;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -680,12 +680,12 @@ TYPE
 			occurence := ZeroOrOnce;
 		END Init;
 
-		PROCEDURE GetOccurence*(): SHORTINT;
+		PROCEDURE GetOccurence*(): SIGNED8;
 		BEGIN
 			RETURN occurence
 		END GetOccurence;
 
-		PROCEDURE SetOccurence*(occ: SHORTINT);
+		PROCEDURE SetOccurence*(occ: SIGNED8);
 		BEGIN
 			occurence := occ
 		END SetOccurence;
@@ -745,7 +745,7 @@ TYPE
 	CollectionCP* = OBJECT (ContentParticle)
 	VAR
 		children: Objects.Collection;
-		type: SHORTINT;
+		type: SIGNED8;
 
 		PROCEDURE & Init*;
 		VAR arrColl: Objects.ArrayCollection;
@@ -755,12 +755,12 @@ TYPE
 			type := 0;
 		END Init;
 
-		PROCEDURE GetType*(): SHORTINT;
+		PROCEDURE GetType*(): SIGNED8;
 		BEGIN
 			RETURN type
 		END GetType;
 
-		PROCEDURE SetType*(type: SHORTINT);
+		PROCEDURE SetType*(type: SIGNED8);
 		BEGIN
 			SELF.type := type
 		END SetType;
@@ -812,7 +812,7 @@ TYPE
 	AttributeDecl* = OBJECT (NameContent)
 	VAR
 		defaultValue: String;
-		type: SHORTINT;
+		type: SIGNED8;
 		allowedValues: Objects.Dictionary;
 		required: BOOLEAN;
 
@@ -836,12 +836,12 @@ TYPE
 			SELF.defaultValue := NewString(defaultValue)
 		END SetDefaultValue;
 
-		PROCEDURE GetType*(): SHORTINT;
+		PROCEDURE GetType*(): SIGNED8;
 		BEGIN
 			RETURN type
 		END GetType;
 
-		PROCEDURE SetType*(type: SHORTINT);
+		PROCEDURE SetType*(type: SIGNED8);
 		BEGIN
 			SELF.type := type
 		END SetType;

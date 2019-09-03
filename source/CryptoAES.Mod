@@ -26,7 +26,7 @@ TYPE
 				Block = ARRAY 4 OF SET32;
 				Ind4 = RECORD a, b, c, d: LONGINT END;
 			VAR
-				rounds: SHORTINT;
+				rounds: SIGNED8;
 				key, dkey: RKeys;
 				iv: Block;
 
@@ -40,7 +40,7 @@ TYPE
 					InvertKeys
 				END InitKey;
 
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SHORTINT );
+				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
 				BEGIN
 					SetIV^( src, mode );   (* set mode *)
 					U.BufferToBlockBE( src, 0, iv );
@@ -167,7 +167,7 @@ TYPE
 				END split;
 
 
-				PROCEDURE Init128( CONST src: ARRAY OF CHAR ): SHORTINT;
+				PROCEDURE Init128( CONST src: ARRAY OF CHAR ): SIGNED8;
 				VAR i, p: LONGINT;  ib: Ind4;
 				BEGIN
 					FOR i := 0 TO 3 DO  key[i] := U.SetFromBufferBE( src, 4*i )  END;
@@ -185,7 +185,7 @@ TYPE
 					RETURN 10
 				END Init128;
 
-				PROCEDURE Init192( CONST src: ARRAY OF CHAR ): SHORTINT;
+				PROCEDURE Init192( CONST src: ARRAY OF CHAR ): SIGNED8;
 				VAR i, p: LONGINT;  ib: Ind4;
 				BEGIN
 					FOR i := 0 TO 5 DO  key[i] := U.SetFromBufferBE( src, 4*i )  END;
@@ -205,7 +205,7 @@ TYPE
 					RETURN 12
 				END Init192;
 
-				PROCEDURE Init256( CONST src: ARRAY OF CHAR ): SHORTINT;
+				PROCEDURE Init256( CONST src: ARRAY OF CHAR ): SIGNED8;
 				VAR i, p: LONGINT;  ib: Ind4;
 				BEGIN
 					FOR i := 0 TO 7 DO  key[i] := U.SetFromBufferBE( src, 4*i )  END;

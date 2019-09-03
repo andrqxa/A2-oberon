@@ -17,7 +17,7 @@ MODULE PCS; (** AUTHOR "prk"; PURPOSE "Parallel Compiler: scanner"; *)
 
 		Buffer = POINTER TO ARRAY OF CHAR;
 
-		Token* = SHORTINT;
+		Token* = SIGNED8;
 
 	CONST
 		Eot* = 0X;
@@ -148,7 +148,7 @@ TYPE
 			IF newChar[ORD(ch)] THEN INC(curpos) END; (* curpos := pos; *)
 		END NextChar;
 
-		PROCEDURE SkipUntilNextEnd*(VAR sym: SHORTINT);
+		PROCEDURE SkipUntilNextEnd*(VAR sym: SIGNED8);
 		BEGIN
 			WHILE (sym # eof) & (sym # end) DO
 				IF ch = Eot THEN sym := eof
@@ -159,7 +159,7 @@ TYPE
 			END;
 		END SkipUntilNextEnd;
 
-		PROCEDURE Str(VAR sym: SHORTINT);
+		PROCEDURE Str(VAR sym: SIGNED8);
 			VAR i: INTEGER; och: CHAR;
 		BEGIN i := 0; och := ch;
 			LOOP NextChar;
@@ -175,7 +175,7 @@ TYPE
 			END
 		END Str;
 
-		PROCEDURE Identifier(VAR sym: SHORTINT; check: BOOLEAN);
+		PROCEDURE Identifier(VAR sym: SIGNED8; check: BOOLEAN);
 			VAR i: LONGINT;
 		BEGIN i := 0;
 			REPEAT
@@ -303,7 +303,7 @@ TYPE
 			val[i] := 0X
 		END GetNumAsString;
 
-		PROCEDURE Get*(VAR s: SHORTINT);
+		PROCEDURE Get*(VAR s: SIGNED8);
 
 			PROCEDURE Comment;	(* do not read after end of file *)
 				VAR dump: BOOLEAN;
@@ -595,7 +595,7 @@ TYPE
 
 	END Scanner;
 
-	PROCEDURE GetOpName*(op: SHORTINT; VAR name: Name);
+	PROCEDURE GetOpName*(op: SIGNED8; VAR name: Name);
 	BEGIN
 		name := opTable[op];
 	END GetOpName;

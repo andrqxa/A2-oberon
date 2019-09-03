@@ -45,7 +45,7 @@ types for input and output are
 V vector
 M Matrix
 B BOOLEAN
-S SHORTINT
+S SIGNED8
 I INTEGER
 L LONGINT
 R REAL
@@ -108,7 +108,7 @@ TYPE
 
 	(** Enquiry routines.  *)
 
-	PROCEDURE NumForm*( data: vyBase.tData ): SHORTINT;
+	PROCEDURE NumForm*( data: vyBase.tData ): SIGNED8;
 	(*= structure form from SInt=4 to LReal=8 if  data can be read as a numeric vector; undef=0 else *)
 	BEGIN
 		(*! adapt to struct based identification *)
@@ -702,7 +702,7 @@ END VectorType;
 			v := vyIntVec.New( len );
 			FOR i := 0 TO len - 1 DO vyIntVec.Set( SHORT( vyLongintVec.Get( fromv, i ) ), v, i ) END;
 			RETURN v
-			(*	ELSIF from.type.basetype=inttyp THEN *)  (*! SHORTINT not yet supported *)
+			(*	ELSIF from.type.basetype=inttyp THEN *)  (*! SIGNED8 not yet supported *)
 		ELSE RETURN NIL
 		END
 	END Short;
@@ -723,7 +723,7 @@ END VectorType;
 			v := vyLongintVec.New( len );
 			FOR i := 0 TO len - 1 DO vyLongintVec.Set( ENTIER( vyRealVec.Get( fromv, i ) * factor + offs ), v, i ) END;
 			RETURN v
-			(*	ELSIF from.type.basetype=inttyp THEN *)  (*! SHORTINT not yet supported *)
+			(*	ELSIF from.type.basetype=inttyp THEN *)  (*! SIGNED8 not yet supported *)
 		ELSE RETURN NIL
 		END
 	END Entier;

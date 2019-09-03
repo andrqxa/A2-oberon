@@ -46,7 +46,7 @@ MODULE Sokoban IN Oberon; (** portable *)	(* ejz  *)
 		END;
 		FrameDesc* = RECORD (Gadgets.FrameDesc)
 			level: INTEGER;
-			world: ARRAY MaxN+2, MaxM+2 OF SHORTINT;
+			world: ARRAY MaxN+2, MaxM+2 OF SIGNED8;
 			mani, manj, oldmani, oldmanj, n, m, moves: INTEGER;
 			backPictName, wallPictName, parkPictName, userName: ARRAY 32 OF CHAR;
 			backPict, wallPict, parkPict: Pictures.Picture;
@@ -64,7 +64,7 @@ MODULE Sokoban IN Oberon; (** portable *)	(* ejz  *)
 		statusBarH: INTEGER;
 		W: Texts.Writer;
 
-	PROCEDURE RestoreField(F: Frame; field: SHORTINT; Q: Display3.Mask; x, y, w, h: INTEGER);
+	PROCEDURE RestoreField(F: Frame; field: SIGNED8; Q: Display3.Mask; x, y, w, h: INTEGER);
 	BEGIN
 		Oberon.RemoveMarks(x, y, w, h);
 		CASE field OF

@@ -177,7 +177,7 @@ VAR dt : Dates.DateTime; str : Events.Message; ch : CHAR; class, subclass, code 
 
 	PROCEDURE IsValid(value : LONGINT) : BOOLEAN;
 	BEGIN
-		RETURN (0 <= value) & (value <= MAX(SHORTINT));
+		RETURN (0 <= value) & (value <= MAX(SIGNED8));
 	END IsValid;
 
 BEGIN
@@ -258,8 +258,8 @@ BEGIN
 	END;
 END GetTypeString;
 
-PROCEDURE GetType*(CONST string : ARRAY OF CHAR) : SHORTINT;
-VAR type : SHORTINT;
+PROCEDURE GetType*(CONST string : ARRAY OF CHAR) : SIGNED8;
+VAR type : SIGNED8;
 BEGIN
 	IF string = "Unknown" THEN type := Events.Unknown;
 	ELSIF string = "Undefined" THEN type := Events.Undefined;

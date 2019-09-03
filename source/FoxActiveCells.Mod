@@ -413,7 +413,7 @@ TYPE
 		Boolean=0;Integer=1;String=2;
 	VAR
 		index-: SIZE;
-		parameterType-: SHORTINT; (* Integer or Boolean, for the time being *)
+		parameterType-: SIGNED8; (* Integer or Boolean, for the time being *)
 		integer-: LONGINT;
 		boolean-: BOOLEAN;
 		string-: Strings.String;

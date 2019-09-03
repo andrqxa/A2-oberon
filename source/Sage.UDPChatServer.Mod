@@ -515,7 +515,7 @@ TYPE
 VAR
 	instance: Instance;
 
-PROCEDURE Log (type, code : SHORTINT; msg: ARRAY OF CHAR; showOnKernelLog : BOOLEAN);
+PROCEDURE Log (type, code : SIGNED8; msg: ARRAY OF CHAR; showOnKernelLog : BOOLEAN);
 VAR message : Events.Message;
 BEGIN
 	COPY(msg, message);

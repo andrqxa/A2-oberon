@@ -8,7 +8,7 @@ TYPE
 	CharProc*= PROCEDURE (c:CHAR);
 VAR
 	Char*: CharProc;
-	Color*: PROCEDURE (c: SHORTINT);
+	Color*: PROCEDURE (c: SIGNED8);
 
 (** Send the specified characters to the trace output (cf. Streams.Sender). *)
 PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: LONGINT; propagate: BOOLEAN; VAR res: LONGINT);
@@ -294,7 +294,7 @@ PROCEDURE NullChar(c: CHAR);
 BEGIN
 END NullChar;
 
-PROCEDURE NullColor(c: SHORTINT);
+PROCEDURE NullColor(c: SIGNED8);
 BEGIN
 END NullColor;
 

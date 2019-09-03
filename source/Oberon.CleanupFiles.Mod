@@ -22,7 +22,7 @@ VAR
 	w: Texts.Writer;
 
 PROCEDURE Insert(VAR name: FileName; time, date, size: LONGINT; t: Texts.Text);
-VAR prefix: FileName;  n, p: Node;  col: SHORTINT;
+VAR prefix: FileName;  n, p: Node;  col: SIGNED8;
 BEGIN
 	NEW(n);
 	COPY(name, n.full);

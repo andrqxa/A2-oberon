@@ -17,7 +17,7 @@ TYPE
 				name-: ARRAY 64 OF CHAR;
 				blockSize-: LONGINT;   (** cipher block size (bytes) *)
 				isKeyInitialized*: BOOLEAN;
-				mode-: SHORTINT;   (** ECB, CBC *)
+				mode-: SIGNED8;   (** ECB, CBC *)
 				len1, len2: INTEGER;
 
 				PROCEDURE appsize( size: LONGINT );
@@ -46,7 +46,7 @@ TYPE
 				END InitKey;
 
 				(** set initialization vector, change mode to CBC;  MUST be invoked AFTER Initkey *)
-				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SHORTINT );
+				PROCEDURE SetIV*( CONST src: ARRAY OF CHAR; mode: SIGNED8 );
 				BEGIN
 					ASSERT( isKeyInitialized );   (* initKey must have been called before *)
 					ASSERT( mode IN {CBC, CTR} );

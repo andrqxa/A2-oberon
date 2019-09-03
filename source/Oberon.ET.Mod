@@ -60,7 +60,7 @@ VAR
 	rBuf: Texts.Buffer;	(* replace buffer [read only] *)
 	lTime: LONGINT;	(* most recent time for sPat and/or rBuf *)
 	inFnt: Fonts.Font;	(* input font *)
-	inColor: SHORTINT;	(* input color *)
+	inColor: SIGNED8;	(* input color *)
 	menuAvail: BOOLEAN;	(* true if modul Menu is available *)
 	filter: BOOLEAN;	(* filter compiler warnings *)
 	mStr: ARRAY 6 OF MenuStr;	(* menu strings: 0=user / 1=system / 2=log / 3=userascii / 4=systemascii *)
@@ -338,9 +338,9 @@ VAR
 		END
 	END TrackedMM;
 
-	PROCEDURE right(F: Frame; nbr: SHORTINT);
+	PROCEDURE right(F: Frame; nbr: SIGNED8);
 		VAR tF: TextFrames.Frame;	text: Texts.Text;	R: Texts.Reader;	ch, dh: CHAR;
-			beg, end, time, fLine, lLine: LONGINT;	nr: SHORTINT;
+			beg, end, time, fLine, lLine: LONGINT;	nr: SIGNED8;
 	BEGIN
 		IF F = NIL THEN GetSelFrame(tF) ELSIF F IS TextFrames.Frame THEN tF := F(TextFrames.Frame) ELSE tF := NIL END;
 		IF (tF # NIL) & (tF.sel > 0) THEN
@@ -378,9 +378,9 @@ VAR
 		RETURN (ch = SPACE) OR (ch = TAB)
 	END IsCh;
 
-	PROCEDURE left(F: Frame; nbr: SHORTINT);
+	PROCEDURE left(F: Frame; nbr: SIGNED8);
 		VAR tF: TextFrames.Frame;	text: Texts.Text;
-			beg, end, time, fLine, lLine: LONGINT;	nr: SHORTINT;
+			beg, end, time, fLine, lLine: LONGINT;	nr: SIGNED8;
 	BEGIN
 		IF F = NIL THEN GetSelFrame(tF) ELSIF F IS TextFrames.Frame THEN tF := F(TextFrames.Frame) ELSE tF := NIL END;
 		IF (tF # NIL) & (tF.sel > 0) THEN
@@ -406,7 +406,7 @@ VAR
 		END
 	END Left;
 
-	PROCEDURE SetInFnt(tF: TextFrames.Frame; VAR inFnt: Fonts.Font; VAR inCol: SHORTINT);
+	PROCEDURE SetInFnt(tF: TextFrames.Frame; VAR inFnt: Fonts.Font; VAR inCol: SIGNED8);
 		VAR R: Texts.Reader;	ch: CHAR;
 	BEGIN
 		IF (tF.car > 0) & (tF.text.len > 0) THEN
@@ -608,7 +608,7 @@ VAR
 	END NewETF;
 
 	PROCEDURE OpenViewer(text: Texts.Text; title: ARRAY OF CHAR; pos: LONGINT;
-												X, Y: INTEGER; kind: SHORTINT): Viewers.Viewer;
+												X, Y: INTEGER; kind: SIGNED8): Viewers.Viewer;
 		VAR mF: TextFrames.Frame;	menuH: INTEGER;
 	BEGIN
 		IF text = NIL THEN text := TextFrames.Text("") END;
@@ -1184,7 +1184,7 @@ VAR
 
 	PROCEDURE Color*;
 		VAR S: Texts.Scanner;	text: Texts.Text;
-			beg, end, time: LONGINT;	col: SHORTINT;
+			beg, end, time: LONGINT;	col: SIGNED8;
 	BEGIN
 		ScanPara(S); IF S.class # Texts.Int THEN RETURN END;	(* ### *)
 		col := SHORT(SHORT(S.i));

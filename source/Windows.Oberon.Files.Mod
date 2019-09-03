@@ -284,7 +284,7 @@ Portable routines to read the standard Oberon types.
 *)
 
 PROCEDURE ReadInt*(VAR r: Rider; VAR x: INTEGER);
-VAR x0, x1: SHORTINT;
+VAR x0, x1: SIGNED8;
 BEGIN
 	Read(r, x0); Read(r, x1);
 	x := LONG(x1) * 100H + LONG(x0) MOD 100H
@@ -301,7 +301,7 @@ BEGIN
 END ReadSet;
 
 PROCEDURE ReadBool*(VAR r: Rider; VAR x: BOOLEAN);
-VAR s: SHORTINT;
+VAR s: SIGNED8;
 BEGIN
 	Read(r, s); x := s # 0
 END ReadBool;

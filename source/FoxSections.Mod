@@ -27,7 +27,7 @@ TYPE
 	Section*=OBJECT
 	VAR
 		name-: SectionName; (* name of this section (globally unique-name derived from symbol name) *)
-		type-: SHORTINT; (* CodeSection, InlineCodeSection, ...  *)
+		type-: SIGNED8; (* CodeSection, InlineCodeSection, ...  *)
 
 		fixed-: BOOLEAN; (* whether the position of the section is fixed, as opposed to being restricted by an alignment *)
 		positionOrAlignment-: SIZE; (* the alignment OR the position *)
@@ -40,7 +40,7 @@ TYPE
 		(* for linking *)
 		isReachable-: BOOLEAN;
 
-		PROCEDURE & InitSection*(type: SHORTINT; CONST n: ObjectFile.SegmentedName; symbol: SyntaxTree.Symbol);
+		PROCEDURE & InitSection*(type: SIGNED8; CONST n: ObjectFile.SegmentedName; symbol: SyntaxTree.Symbol);
 		BEGIN
 			name := n;
 			SELF.symbol := symbol;
@@ -88,7 +88,7 @@ TYPE
 		END SetFingerprint;
 
 		(** change the type of a section **)
-		PROCEDURE SetType*(type: SHORTINT);
+		PROCEDURE SetType*(type: SIGNED8);
 		BEGIN SELF.type := type
 		END SetType;
 

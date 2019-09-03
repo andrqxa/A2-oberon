@@ -69,8 +69,8 @@ MODULE Gfx IN Oberon; (** portable *)	(* eos  *)
 		END;
 
 		(** line join and cap styles **)
-		JoinStyle* = SHORTINT;
-		CapStyle* = SHORTINT;
+		JoinStyle* = SIGNED8;
+		CapStyle* = SIGNED8;
 
 		(** abstract clip areas **)
 		ClipArea* = POINTER TO ClipAreaDesc;

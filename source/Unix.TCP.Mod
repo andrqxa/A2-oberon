@@ -68,7 +68,7 @@ TYPE
 				lport-	: LONGINT;
 				fip-	: IP.Adr;  (* foreign protocol address *)
 				fport-	: LONGINT;
-				state*	: SHORTINT;   (* TCP state *)
+				state*	: SIGNED8;   (* TCP state *)
 
 				socket	: LONGINT;
 				sender: Sender;

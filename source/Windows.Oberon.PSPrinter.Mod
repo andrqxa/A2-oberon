@@ -30,7 +30,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 
 			l, t, r, b: LONGINT;
 			sx, sy: INTEGER; (* current string pos *)
-			mode, location: SHORTINT;
+			mode, location: SIGNED8;
 			duplex: BOOLEAN; (* Print duplex pages *)
 			anonymous: BOOLEAN
 		END;

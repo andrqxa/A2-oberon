@@ -157,7 +157,7 @@ TYPE
 
 	Scope* = OBJECT
 		VAR
-			state-: SHORTINT;
+			state-: SIGNED8;
 			flags-: SET;
 			ownerID-: ADDRESS;	(** process owning this scope*)
 			module-: Module;	(** module owning this scope *)
@@ -174,13 +174,13 @@ TYPE
 			tmpCount: LONGINT; (* ug *)
 
 
-		PROCEDURE Await*(state: SHORTINT);
+		PROCEDURE Await*(state: SIGNED8);
 		BEGIN {EXCLUSIVE}
 			IF SELF.state >= state THEN INC(ANoWait) ELSE INC(AWait) END;
 			AWAIT(SELF.state >= state)	(** remove EXCLUSIVE, not needed*)
 		END Await;
 
-		PROCEDURE ChangeState(state: SHORTINT);
+		PROCEDURE ChangeState(state: SIGNED8);
 		BEGIN {EXCLUSIVE}
 			ASSERT((ownerID = 0) OR (ownerID = PCM.GetProcessID()), 500);(* global scope has no process id (=0) since different processes may insert elements here, cf. procedure Init *)
 			ASSERT(SELF.state < state, 501);
@@ -515,7 +515,7 @@ TYPE
 	END;
 
 	Array* = POINTER TO RECORD (Struct)
-		mode-: SHORTINT;	(** array size: static, open *)
+		mode-: SIGNED8;	(** array size: static, open *)
 		base-: Struct;			(** element type *)
 		len-: LONGINT;		(** array size (iff mode=static) *)
 
@@ -525,7 +525,7 @@ TYPE
 
 	(** fof >> *)
 	EnhArray* = POINTER TO RECORD (Struct)
-		mode-: SHORTINT;  	(** array size: static, open *)
+		mode-: SIGNED8;  	(** array size: static, open *)
 		base-: Struct;   			(** element type, if more dimensional array then of type EnhArray *)
 		len-: LONGINT;  		  (** array size (iff mode=static) *)
 		inc-: LONGINT;   		  (** increment of this dimension  (iff mode = static) *)
@@ -604,7 +604,7 @@ TYPE
 
 	Variable* = OBJECT (Symbol)
 	VAR
-		level-: SHORTINT;	(**LocalVar and Parameter only*)
+		level-: SIGNED8;	(**LocalVar and Parameter only*)
 		nextVar-: Variable;	(** next variable in scope (by insertion order) *)
 	END Variable;
 
@@ -637,7 +637,7 @@ TYPE
 	VAR
 		scope-: ProcScope;
 		nextProc-: Proc;
-		level-: SHORTINT;
+		level-: SIGNED8;
 	END Proc;
 
 	Method* = OBJECT (Proc)
@@ -1252,7 +1252,7 @@ VAR
 		mark -> mark the object as used
 	*)
 
-	PROCEDURE Find*(current, search: Scope;  name: StringIndex;  mode: SHORTINT; mark: BOOLEAN): Symbol;
+	PROCEDURE Find*(current, search: Scope;  name: StringIndex;  mode: SIGNED8; mark: BOOLEAN): Symbol;
 		VAR p: Symbol; rec: Record; backtrack: Scope; localsearch, restrict: BOOLEAN;
 	BEGIN
 		restrict := FALSE;
@@ -1533,7 +1533,7 @@ VAR
 	END StateStructShallowAllocated;
 
 
-	PROCEDURE ChangeState*(scope: Scope;  state: SHORTINT;  pos: LONGINT);
+	PROCEDURE ChangeState*(scope: Scope;  state: SIGNED8;  pos: LONGINT);
 	VAR  rec, r, int: Record; rscope: RecScope; mth: Method; i: SIZE; res: WORD;
 	BEGIN
 		WHILE scope.state < state DO
@@ -1684,7 +1684,7 @@ VAR
 		INC(mod.nofRecs);
 	END AddRecord;
 
-	PROCEDURE CommitParList(scope: ProcScope;  level: SHORTINT);
+	PROCEDURE CommitParList(scope: ProcScope;  level: SIGNED8);
 		VAR p: Parameter;
 	BEGIN
 		p := scope.firstPar;
@@ -1697,7 +1697,7 @@ VAR
 	PROCEDURE GetIntType*(i: LONGINT): Struct;
 		VAR type: Struct;
 	BEGIN
-		IF (MIN(SHORTINT) <= i) & (i <= MAX(SHORTINT)) THEN  type := Int8
+		IF (MIN(SIGNED8) <= i) & (i <= MAX(SIGNED8)) THEN  type := Int8
 		ELSIF (MIN(INTEGER) <= i) & (i <= MAX(INTEGER)) THEN  type := Int16
 		ELSE  type := Int32
 		END;
@@ -2504,7 +2504,7 @@ VAR
 			CharType[1] := NewBasic(Universe, "CHAR16"); Char16 := CharType[1];
 			CharType[2] := NewBasic(Universe, "CHAR32"); Char32 := CharType[2]
 		END;
-		NumericType[0] := NewBasic(Universe, "SHORTINT"); Int8 := NumericType[0];
+		NumericType[0] := NewBasic(Universe, "SIGNED8"); Int8 := NumericType[0];
 		NumericType[1] := NewBasic(Universe, "INTEGER"); Int16 := NumericType[1];
 		NumericType[2] := NewBasic(Universe, "LONGINT"); Int32 := NumericType[2];
 		NumericType[3] := NewBasic(Universe, "HUGEINT"); Int64 := NumericType[3];

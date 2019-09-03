@@ -32,7 +32,7 @@ TYPE
 	Transform*=SVGMatrix.Matrix;
 
 	Paint*=RECORD
-		type*: SHORTINT;
+		type*: SIGNED8;
 		color*: Color;
 		uri*: String;
 	END;
@@ -111,7 +111,7 @@ END ParseNumber;
 PROCEDURE ParseLength2(value:String; ppi: LONGREAL;  percent100: Length; VAR length: Length; VAR i: SIZE);
 VAR
 	term: CSS2.Term;
-	unit: SHORTINT;
+	unit: SIGNED8;
 	unitStr: String;
 BEGIN
 	ParseNumber2(value, length, AllowPercentages, percent100, i, unitStr);
@@ -207,7 +207,7 @@ BEGIN
 END ParseURI;
 
 (* Parse the contents of the gradientUnits attribute *)
-PROCEDURE ParseUnits*(value: String; VAR units: SHORTINT);
+PROCEDURE ParseUnits*(value: String; VAR units: SIGNED8);
 BEGIN
 	IF value^ = "userSpaceOnUse" THEN units := UnitsUserSpaceOnUse
 	ELSIF value^ = "objectBoundingBox" THEN units := UnitsObjectBoundingBox
@@ -425,7 +425,7 @@ BEGIN
 	NEW(term); term.SetType(CSS2.RealDimension); term.SetRealVal(pixelVal); term.SetUnit(CSS2.px); RETURN term
 END ChangeToPixel;
 
-PROCEDURE GetTermUnit(CONST unitStr: ARRAY OF CHAR): SHORTINT;
+PROCEDURE GetTermUnit(CONST unitStr: ARRAY OF CHAR): SIGNED8;
 BEGIN
 	IF unitStr = 'em' THEN RETURN CSS2.em
 	ELSIF unitStr = 'ex' THEN RETURN CSS2.ex

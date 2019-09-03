@@ -60,7 +60,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 			setColPat*: PROCEDURE (rc: Context; col: Gfx.Color; pat: Gfx.Pattern);
 			col*: Gfx.Color;	(** current color **)
 			pat*: Gfx.Pattern;	(** current pattern **)
-			clipState*: SHORTINT;	(* current clip state (In, Out, InOut) *)
+			clipState*: SIGNED8;	(* current clip state (In, Out, InOut) *)
 			useRegion, lateStroke: BOOLEAN;	(* flags for path operations *)
 			cp: GfxPaths.Path;	(* current path if lateStroke is set *)
 			pathReg: GfxRegions.Region;	(* region surrounded by current path *)

@@ -18,8 +18,8 @@ TYPE
 
 	Gradient*=OBJECT
 		VAR first, last: GradientStop;
-			gradientUnits*: SHORTINT;
-			spreadMethod*: SHORTINT;
+			gradientUnits*: SIGNED8;
+			spreadMethod*: SIGNED8;
 			transform*: SVG.Transform;
 
 		PROCEDURE &New*;
@@ -296,7 +296,7 @@ TYPE
 	END GradientDict;
 
 (* Parse some spreadMethod attribute *)
-PROCEDURE ParseSpreadMethod*(value: SVG.String; VAR spreadMethod: SHORTINT);
+PROCEDURE ParseSpreadMethod*(value: SVG.String; VAR spreadMethod: SIGNED8);
 BEGIN
 	IF value^ = "pad" THEN spreadMethod := SpreadMethodPad
 	ELSIF value^ = "reflect" THEN spreadMethod := SpreadMethodReflect

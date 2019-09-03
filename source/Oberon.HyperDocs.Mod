@@ -610,7 +610,7 @@ MODULE HyperDocs IN Oberon;	(** portable *) (* ejz,  *)
 		VAR
 			obj: Objects.Object;
 			ocol: LONGINT;
-			col: SHORTINT;
+			col: SIGNED8;
 	BEGIN
 		IF (doc # NIL) & (doc.dsc = linkF) THEN
 			Links.GetLink(linkF, "Model", obj);

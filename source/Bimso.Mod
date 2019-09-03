@@ -21,7 +21,7 @@ TYPE
 		start, alive : BOOLEAN;
 		c, cflash : ARRAY 4 OF WMGraphics.Color;
 		random : Random.Generator;
-		game : ARRAY MaxLevel OF SHORTINT;
+		game : ARRAY MaxLevel OF SIGNED8;
 		level : LONGINT;
 		step : LONGINT;
 		error : BOOLEAN;

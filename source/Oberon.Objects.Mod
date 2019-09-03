@@ -428,7 +428,7 @@ Most entities in Oberon are derived from this base type.
 (* Load a standard object library (old format) from position pos in file f. *)
 	PROCEDURE OldLoadLibrary (L: Library; f: Files.File; pos: LONGINT; VAR len: LONGINT);
 		VAR R, S: Files.Rider; Mod: Modules.Module; Cmd: Modules.Command; NofRuns, key, N, i, k, m: INTEGER;
-				clen, dlen: LONGINT; type, n: SHORTINT; ch: CHAR; entry: Entry;
+				clen, dlen: LONGINT; type, n: SIGNED8; ch: CHAR; entry: Entry;
 				obj: Object; M: FileMsg; MName, PName: Name; GName: ARRAY MaxNews OF Name;
 				run: ARRAY MaxRuns OF RunRec; ind: ArrayIndex; dict: ListDict;
 	BEGIN

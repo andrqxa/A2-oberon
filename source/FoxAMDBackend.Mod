@@ -835,9 +835,9 @@ TYPE
 		PROCEDURE GetSpillOperand(ticket: Ticket; VAR op: Assembler.Operand);
 		BEGIN
 			IF FrameSpillStack THEN
-				op := Assembler.NewMem(SHORTINT(ticket.type.sizeInBits*ticket.type.length DIV 8), BP , -(spillStackStart + cpuBits DIV 8 + ticket.offset*cpuBits DIV 8));
+				op := Assembler.NewMem(SIGNED8(ticket.type.sizeInBits*ticket.type.length DIV 8), BP , -(spillStackStart + cpuBits DIV 8 + ticket.offset*cpuBits DIV 8));
 			ELSE
-				op := Assembler.NewMem(SHORTINT(ticket.type.sizeInBits*ticket.type.length DIV 8),SP , (spillStack.Size()-ticket.offset)*cpuBits DIV 8);
+				op := Assembler.NewMem(SIGNED8(ticket.type.sizeInBits*ticket.type.length DIV 8),SP , (spillStack.Size()-ticket.offset)*cpuBits DIV 8);
 			END;
 		END GetSpillOperand;
 
@@ -882,7 +882,7 @@ TYPE
 		END GetImmediateMem;
 
 		PROCEDURE GetImmediate(CONST virtual: IntermediateCode.Operand; part: LONGINT; VAR physical: Assembler.Operand; forbidden16Bit,push: BOOLEAN);
-		VAR type: IntermediateCode.Type; temp: Assembler.Operand; size: SHORTINT; value: HUGEINT;
+		VAR type: IntermediateCode.Type; temp: Assembler.Operand; size: SIGNED8; value: HUGEINT;
 
 			PROCEDURE IsImm8(value: HUGEINT): BOOLEAN;
 			BEGIN
@@ -987,7 +987,7 @@ TYPE
 				offset := virtual.offset;
 				ASSERT(virtual.intValue = 0);
 			END;
-			Assembler.InitMem(physical, SHORTINT(type.length * type.sizeInBits DIV 8) , physicalRegister, (offset + (cpuBits DIV 8) * part)(LONGINT));
+			Assembler.InitMem(physical, SIGNED8(type.length * type.sizeInBits DIV 8) , physicalRegister, (offset + (cpuBits DIV 8) * part)(LONGINT));
 			IF (virtual.symbol.name # "") & (cpuBits # 64) THEN
 				Assembler.SetSymbol(physical,virtual.symbol.name,virtual.symbol.fingerprint,virtual.symbolOffset,virtual.offset+ (cpuBits DIV 8) *part);
 			END;
@@ -1026,7 +1026,7 @@ TYPE
 					ticket := NIL;
 				END;
 				IF Assembler.IsRegisterOperand(physical) & (type.sizeInBits > 8) THEN
-					Assembler.InitMem(physical,SHORTINT(type.length * type.sizeInBits DIV 8) , physical.register, virtual.offset(LONGINT));
+					Assembler.InitMem(physical,SIGNED8(type.length * type.sizeInBits DIV 8) , physical.register, virtual.offset(LONGINT));
 					emitter.Emit2(InstructionSet.opLEA, tmp,physical);
 				ELSE
 					emitter.Emit2(InstructionSet.opMOV,tmp,physical);
@@ -1119,7 +1119,7 @@ TYPE
 		END IsComplex;
 
 		PROCEDURE Generate*(VAR instruction: IntermediateCode.Instruction);
-		VAR opcode: SHORTINT; ticket: Ticket; hwreg, lastUse, i, part: LONGINT;
+		VAR opcode: SIGNED8; ticket: Ticket; hwreg, lastUse, i, part: LONGINT;
 		BEGIN
 			ReserveOperandRegisters(instruction.op1,TRUE); ReserveOperandRegisters(instruction.op2,TRUE);ReserveOperandRegisters(instruction.op3,TRUE);
 			(*TryAllocate(instruction.op1,Low);
@@ -1429,9 +1429,9 @@ TYPE
 		END EmitReturn;
 
 		PROCEDURE EmitMovFloat(CONST vdest,vsrc:IntermediateCode.Operand);
-		VAR dest,src, espm: Assembler.Operand; sizeInBytes: SHORTINT; stackSize: SIZE; vcopy: IntermediateCode.Operand;
+		VAR dest,src, espm: Assembler.Operand; sizeInBytes: SIGNED8; stackSize: SIZE; vcopy: IntermediateCode.Operand;
 		BEGIN
-			sizeInBytes := SHORTINT(vdest.type.sizeInBits DIV 8);
+			sizeInBytes := SIGNED8(vdest.type.sizeInBits DIV 8);
 			stackSize := sizeInBytes;
 			Basic.Align(stackSize, cpuBits DIV 8);
 			IF vdest.type.form IN IntermediateCode.Integer THEN
@@ -1632,7 +1632,7 @@ TYPE
 					ELSE
 						IF backend.forceFPU THEN (* via stack *)
 							EmitPush(vsrc,Low);
-							sizeInBytes := SHORTINT(cpuBits DIV 8);
+							sizeInBytes := SIGNED8(cpuBits DIV 8);
 						ELSE (* via memory or register *)
 							sizeInBytes := 0;
 							MakeOperand(vsrc,Low,src,NIL);
@@ -1651,7 +1651,7 @@ TYPE
 						END
 					END;
 					IF sizeInBytes > 0 THEN
-						Assembler.InitMem(espm, SHORTINT(sizeInBytes),SP,0);
+						Assembler.InitMem(espm, SIGNED8(sizeInBytes),SP,0);
 					END;
 					IF backend.forceFPU THEN
 						emitter.Emit1(InstructionSet.opFILD,espm);
@@ -2454,7 +2454,7 @@ TYPE
 			op: LONGINT;
 			op1,op2,op3,dest,temporary,op1High,op2High: Assembler.Operand;
 
-			index: SHORTINT; temp: Assembler.Operand;
+			index: SIGNED8; temp: Assembler.Operand;
 
 			left: BOOLEAN;
 			ecx,ticket: Ticket;
@@ -2595,11 +2595,11 @@ TYPE
 		BEGIN
 			IF IntermediateCode.IsConstantInteger(instruction.op3, size) & ((size=8)  OR (size = 4) OR (size = 2) OR (size=1)) & (size * 8 <= cpuBits) THEN
 				MakeRegister(instruction.op1,Low,op1);
-				Assembler.InitMem(op1,SHORTINT(size),op1.register,0);
+				Assembler.InitMem(op1,SIGNED8(size),op1.register,0);
 				MakeRegister(instruction.op2,Low,op2);
-				Assembler.InitMem(op2,SHORTINT(size),op2.register,0);
+				Assembler.InitMem(op2,SIGNED8(size),op2.register,0);
 
-				type := IntermediateCode.NewType(IntermediateCode.SignedInteger, SHORTINT(size*8));
+				type := IntermediateCode.NewType(IntermediateCode.SignedInteger, SIGNED8(size*8));
 				rd := TemporaryTicket(IntermediateCode.GeneralPurposeRegister, type);
 				TicketToOperand(rd,op3);
 
@@ -3029,7 +3029,7 @@ TYPE
 				ELSE
 					ModifyStackPointer(sizeInBytes*length);
 				END;
-				Assembler.InitMem(memop, SHORTINT(sizeInBytes*length),SP,0);
+				Assembler.InitMem(memop, SIGNED8(sizeInBytes*length),SP,0);
 				IF backend.forceFPU THEN
 					emitter.Emit1(InstructionSet.opFLD,op); INC(fpStackPointer);
 					emitter.Emit1(InstructionSet.opFSTP,memop); DEC(fpStackPointer);
@@ -3048,7 +3048,7 @@ TYPE
 				MakeOperand(vop,Low,op,NIL);
 				emitter.Emit1(InstructionSet.opPOP,op);
 			ELSE
-				Assembler.InitMem(memop, SHORTINT(sizeInBytes*length),SP,0);
+				Assembler.InitMem(memop, SIGNED8(sizeInBytes*length),SP,0);
 				IF backend.forceFPU THEN
 					emitter.Emit1(InstructionSet.opFLD,memop);
 					INC(fpStackPointer);

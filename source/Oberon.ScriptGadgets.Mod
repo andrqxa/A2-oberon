@@ -1580,7 +1580,7 @@ MODULE ScriptGadgets IN Oberon; (** portable *)	(* RS, Wed, 9-Jun-1993 / KR, Mon
 
 	(*---message handling---*)
 
-	PROCEDURE Write* (F: Frame; ch: CHAR; lib: Objects.Library; col, voff: SHORTINT);
+	PROCEDURE Write* (F: Frame; ch: CHAR; lib: Objects.Library; col, voff: SIGNED8);
 	VAR
 		pos, i: LONGINT;
 		s: ARRAY 64 OF CHAR;

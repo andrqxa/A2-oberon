@@ -35,7 +35,7 @@ TYPE
 	VAR
 		size*: LONGINT;	(** size in bytes, used for allocation*)
 		align*: LONGINT;	(** on which boundary should this type be aligned *)
-		type*: SHORTINT;	(** Back-End Type *)
+		type*: SIGNED8;	(** Back-End Type *)
 		signed*: BOOLEAN;
 		containPtrs*: BOOLEAN;
 		needsrecursion*: BOOLEAN;

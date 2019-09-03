@@ -194,7 +194,7 @@ VAR
 	version: CHAR; res: WORD;
 	str: StringBuf;
 	msg: ARRAY 32 OF CHAR;
-	finished: BOOLEAN; copyscanner: PCS.Scanner; sym: SHORTINT;
+	finished: BOOLEAN; copyscanner: PCS.Scanner; sym: SIGNED8;
 BEGIN {EXCLUSIVE}
 	PCM.Init (source, log, diagnostics); (* also resets PCM.count!! *)
 	ParseOptions(options, PCM.prefix, PCM.suffix, dest, PCM.dump, objF, PCM.codeOptions, PCM.parserOptions);

@@ -30,7 +30,7 @@ Numeric computations deal with numbers. These numbers belong to one of four basi
 	If you need to change from 32- to 64-bit reals, then the following modules will require some minor changes to be made to them (e.g., algorithmic constants): NbrRe.Mod, NbrStrings.Mod, MathCbrt.Mod, MathErf.Mod, MathGamma.Mod, MathExpInt and CalcGauss. Code fragments that will need to be changed are highlighted in red.
 
 1.1 NbrInt8.Mod
-This module exports a low-level integer type with 8-bit length, i.e., a SHORTINT.   
+This module exports a low-level integer type with 8-bit length, i.e., a SIGNED8.   
 
 1.2 NbrInt16.Mod
 This module exports a low-level integer type with 16-bit length, i.e., an INTEGER.  It has the same structure as that of NbrInt8.

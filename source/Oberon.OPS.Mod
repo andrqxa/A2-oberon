@@ -15,9 +15,9 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		Name* = ARRAY MaxIdLen OF CHAR;
 		String* = ARRAY MaxStrLen OF CHAR;
 
-		GetProc* = PROCEDURE (VAR sym: SHORTINT);
+		GetProc* = PROCEDURE (VAR sym: SIGNED8);
 
-		Token = POINTER TO RECORD	pos: LONGINT; sym: SHORTINT; next: Token	END;
+		Token = POINTER TO RECORD	pos: LONGINT; sym: SIGNED8; next: Token	END;
 		IntToken = POINTER TO RECORD (Token)	intval: LONGINT; typ: INTEGER	END;
 		RealToken = POINTER TO RECORD (Token)	realval: REAL	END;
 		LRealToken = POINTER TO RECORD (Token)	lrlval: LONGREAL	END;
@@ -81,7 +81,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 	BEGIN OPM.err(n)
 	END err;
 
-	PROCEDURE StreamGet (VAR sym: SHORTINT);
+	PROCEDURE StreamGet (VAR sym: SIGNED8);
 	BEGIN
 		IF (stream # NIL) & (stream.next # NIL) THEN
 			stream := stream.next;
@@ -98,7 +98,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		END
 	END StreamGet;
 
-	PROCEDURE RecToken (sym: SHORTINT);
+	PROCEDURE RecToken (sym: SIGNED8);
 		VAR s: Token; r: RealToken; lr: LRealToken; i: IntToken; st: StrToken; nam: NameToken;
 	BEGIN
 		IF sym = number THEN
@@ -115,7 +115,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		s.pos := OPM.errpos; s.sym := sym; s.next := last.next; last.next := s; last := s
 	END RecToken;
 
-	PROCEDURE StartRecording* (sym: SHORTINT);
+	PROCEDURE StartRecording* (sym: SIGNED8);
 	BEGIN NEW (stream); last := stream; RecToken (sym)
 	END StartRecording;
 
@@ -127,7 +127,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 	BEGIN stream := s; Get := StreamGet
 	END StartPlaying;
 
-	PROCEDURE Str(VAR sym: SHORTINT);
+	PROCEDURE Str(VAR sym: SIGNED8);
 		VAR i: INTEGER; och: CHAR;
 	BEGIN i := 0; och := ch;
 		LOOP OPM.Get(ch);
@@ -143,7 +143,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		END
 	END Str;
 
-	PROCEDURE Identifier(VAR sym: SHORTINT);
+	PROCEDURE Identifier(VAR sym: SIGNED8);
 		VAR i: INTEGER;
 	BEGIN i := 0;
 		REPEAT
@@ -153,7 +153,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		name[i] := 0X; sym := ident
 	END Identifier;
 
-	PROCEDURE CheckCardinality*(VAR name: Name; nofp: SHORTINT): BOOLEAN;
+	PROCEDURE CheckCardinality*(VAR name: Name; nofp: SIGNED8): BOOLEAN;
 	BEGIN
 		CASE name[0] OF
 		| "+", "-": RETURN (nofp=1) OR (nofp=2)
@@ -162,7 +162,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		END
 	END CheckCardinality;
 
-	PROCEDURE CheckOperator*(VAR id: SHORTINT);
+	PROCEDURE CheckOperator*(VAR id: SIGNED8);
 		VAR ch0, ch1, ch2: CHAR;
 	BEGIN id:=126; COPY(str, name);
 		ch0:=str[0]; ch1:=str[1]; ch2:=str[2];
@@ -278,8 +278,8 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		END
 	END Number;
 
-	PROCEDURE DefaultGet(VAR sym: SHORTINT);
-		VAR s: SHORTINT;
+	PROCEDURE DefaultGet(VAR sym: SIGNED8);
+		VAR s: SIGNED8;
 
 		PROCEDURE Comment;	(* do not read after end of file *)
 			VAR dump: BOOLEAN;

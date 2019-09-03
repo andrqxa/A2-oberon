@@ -2572,7 +2572,7 @@ TYPE
 			chksums := {};
 			IF type = 0800H THEN
 				INCL(chksums, 29(*18*)); (* offload IP checksum *)
-				type4 := S.VAL(SHORTINT, l3hdr[9]); (* get type if IP data *)
+				type4 := S.VAL(SIGNED8, l3hdr[9]); (* get type if IP data *)
 				IF type4 = 6 THEN (* TCP/IP *)
 					INCL(chksums, 30(*16*)); (* offload TCP checksum *)
 				ELSIF type4 = 17 THEN
@@ -2609,7 +2609,7 @@ TYPE
 
 		PROCEDURE Write8(reg: LONGINT; val: SET);
 		BEGIN
-			S.PUT8(base+reg,SHORTINT(S.VAL(LONGINT,val)));
+			S.PUT8(base+reg,SIGNED8(S.VAL(LONGINT,val)));
 			(*KernelLog.String("W8 0x"); KernelLog.Hex(reg,-2);
 			KernelLog.String(" 0x"); KernelLog.Hex(S.VAL(LONGINT,val),-2);
 			KernelLog.Ln;*)

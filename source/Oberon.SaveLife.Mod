@@ -79,7 +79,7 @@ CONST
 TYPE
 	RGB = ARRAY 3 OF INTEGER;
 	Fader = ARRAY maxFadeSteps OF INTEGER;
-	Generation = POINTER TO ARRAY OF SHORTINT;
+	Generation = POINTER TO ARRAY OF SIGNED8;
 	DisplayList = POINTER TO DisplayListDesc;
 	DisplayListDesc = RECORD
 		next: DisplayList;
@@ -127,8 +127,8 @@ VAR
 	offscreenMode: INTEGER;	(* 0=never; 1=auto; 2=always *)
 
 	(* lookup tables for liveness and color: [ liveness (0 or 1),  nr neighbors (0..8) ] *)
-	alive: ARRAY 2, 9 OF SHORTINT;
-	toPseudo: ARRAY 2, 9 OF SHORTINT;	(* map [liveness,neighborCount] to pseudo *)
+	alive: ARRAY 2, 9 OF SIGNED8;
+	toPseudo: ARRAY 2, 9 OF SIGNED8;	(* map [liveness,neighborCount] to pseudo *)
 
 	pseudoToRGBColor: ARRAY numPseudos OF RGB;	(* map pseudo-color to RGB Color *)
 	faderTable: ARRAY numPseudos, numPseudos OF Fader;
@@ -358,7 +358,7 @@ VAR
 		i: LONGINT;
 		r, c: INTEGER;
 		(* neighbor sum for g0[i] *)
-		sum: SHORTINT;
+		sum: SIGNED8;
 	BEGIN
 		i := cols + 2;
 		FOR r := 1 TO rows  DO
@@ -457,7 +457,7 @@ VAR
 	PROCEDURE Generate;
 	VAR
 		r,c: INTEGER;
-		a: SHORTINT;
+		a: SIGNED8;
 		i: LONGINT;
 		t: Generation;
 		nr: LONGINT;	(* number of cells changed *)

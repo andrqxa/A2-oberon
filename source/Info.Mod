@@ -29,7 +29,7 @@ TYPE
 		ptag : ADDRESS;
 		count : LONGINT;
 		size : SIZE;
-		type : SHORTINT;
+		type : SIGNED8;
 		pc: ADDRESS;
 	END;
 
@@ -110,10 +110,10 @@ TYPE
 		END SortBy;
 
 		PROCEDURE Add(CONST block : Heaps.HeapBlock; byPC: BOOLEAN);
-		VAR type: SHORTINT;
+		VAR type: SIGNED8;
 
 
-			PROCEDURE AddByType(type: SHORTINT);
+			PROCEDURE AddByType(type: SIGNED8);
 			VAR tag: ADDRESS; i: LONGINT;
 			BEGIN
 				SYSTEM.GET(block.dataAdr + Heaps.TypeDescOffset, tag);
@@ -131,7 +131,7 @@ TYPE
 				END;
 			END AddByType;
 
-			PROCEDURE AddByPC(type: SHORTINT);
+			PROCEDURE AddByPC(type: SIGNED8);
 			VAR pc: ADDRESS; i: LONGINT;
 			BEGIN
 				SYSTEM.GET(block.dataAdr + Heaps.HeapBlockOffset, pc);

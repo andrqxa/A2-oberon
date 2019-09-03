@@ -15,9 +15,9 @@ CONST
 	(** ============= Instruction Set Definitions ======================== *)
 
 TYPE
-	Opcode* = SHORTINT;
+	Opcode* = SIGNED8;
 	Register* = LONGINT;
-	Size* = SHORTINT;
+	Size* = SIGNED8;
 
 CONST
 		(**Register sizes*)
@@ -40,7 +40,7 @@ TYPE
 
 		suppress*: BOOLEAN;		(* suppress this instruction*)
 
-		dstCount*: SHORTINT;			(* counts use of this register *)
+		dstCount*: SIGNED8;			(* counts use of this register *)
 		dstSize-: Size;						  (* size of this register *)
 		dstSigned-: BOOLEAN; 		  (* TRUE if the value in dst is signed *)
 
@@ -219,7 +219,7 @@ Remarks:
 
 TYPE
 	InstructionSetDescription* = ARRAY NofOpcodes OF RECORD
-		format-: SHORTINT;
+		format-: SIGNED8;
 		flags-: SET;
 		name-: ARRAY 9 OF CHAR;	(* Debug *)
 
@@ -408,7 +408,7 @@ VAR
 
 (** NofBytes - Return the number of Bytes taken by a Size *)
 
-	PROCEDURE NofBytes*(size: Size): SHORTINT;
+	PROCEDURE NofBytes*(size: Size): SIGNED8;
 	BEGIN
 		CASE size OF
 		|  Int8:  RETURN 1
@@ -687,7 +687,7 @@ VAR
 (** DumpCode (Debug) - TraverseProc, dumps whole code to global writer W *)
 
 	PROCEDURE DumpCode*(code: Code;  VAR instr: Instruction;  pc: LONGINT;  context: ANY);
-	VAR  op: Opcode;  format: SHORTINT;
+	VAR  op: Opcode;  format: SIGNED8;
 
 		PROCEDURE Reg(r: LONGINT);
 		BEGIN
@@ -901,7 +901,7 @@ VAR
 
 PROCEDURE InitModule;
 
-	PROCEDURE NewInstr(op: Opcode;  format: SHORTINT;  name: ARRAY OF CHAR);
+	PROCEDURE NewInstr(op: Opcode;  format: SIGNED8;  name: ARRAY OF CHAR);
 	VAR  i: LONGINT;
 	BEGIN
 		InstructionSet[op].format := format;

@@ -209,7 +209,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END
 END TraceChar;
 
-PROCEDURE TraceColor (c: SHORTINT);
+PROCEDURE TraceColor (c: SIGNED8);
 BEGIN {UNCOOPERATIVE, UNCHECKED} traceColor := c;
 END TraceColor;
 
@@ -295,7 +295,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	END;
 END CheckMemory;
 
-PROCEDURE SetupTimer (channel, mode: SHORTINT; frequency: LONGINT);
+PROCEDURE SetupTimer (channel, mode: SIGNED8; frequency: LONGINT);
 CONST CommandPort = 043H; AccessLoHiByte = 030H; Binary = 000H; Channel0Port = 040H;
 CONST OscillatorFrequency = 1193180;
 VAR divisor: SIZE;

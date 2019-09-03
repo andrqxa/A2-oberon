@@ -35,7 +35,7 @@ VAR
 TYPE DES* = OBJECT
 			VAR encryptKeys, decryptKeys : ARRAY 32 OF LONGINT;
 
-			PROCEDURE RotateRight*(L : LONGINT;n : SHORTINT) : LONGINT;
+			PROCEDURE RotateRight*(L : LONGINT;n : SIGNED8) : LONGINT;
 			(*This rotates L right by n places, corresponding to the J++ >>>
 				operator, but doesn't move any set bits in at the high end of
 				the word

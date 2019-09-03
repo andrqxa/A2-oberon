@@ -475,7 +475,7 @@ VAR
 	nCollisions: SIZE;
 	ucs32Min, ucs32Max: Char32;
 
-	PROCEDURE hashSearch(encoding: SHORTINT; bAddAllowed: BOOLEAN; ucs32: Char32; VAR ch: CHAR): BOOLEAN;
+	PROCEDURE hashSearch(encoding: SIGNED8; bAddAllowed: BOOLEAN; ucs32: Char32; VAR ch: CHAR): BOOLEAN;
 	VAR
 		d: INTEGER;
 		h: SIZE;

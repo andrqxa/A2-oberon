@@ -45,7 +45,7 @@ MODULE Find IN Oberon;	(** portable *)	(* tk 12.12.95 / pr 12.12.95 *)
 	PROCEDURE BrowseFile(filename: ARRAY OF CHAR);
 		CONST bufSize = 31744; (*2**15 - 1024*)
 		VAR	F: Files.File; R: Files.Rider; n, pos: LONGINT; m, i, j, i0, b, e: INTEGER;
-				ch, patj: CHAR; found: BOOLEAN; tab: ARRAY 265 OF SHORTINT; buffer: ARRAY bufSize OF CHAR;
+				ch, patj: CHAR; found: BOOLEAN; tab: ARRAY 265 OF SIGNED8; buffer: ARRAY bufSize OF CHAR;
 	BEGIN
 		Oberon.Collect;
 		F:=Files.Old(filename);

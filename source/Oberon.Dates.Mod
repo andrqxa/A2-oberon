@@ -13,7 +13,7 @@ CONST
 VAR
 	TimeDiff*: LONGINT;	(** local difference to universal time in minutes *)
 	A : ARRAY 13 OF INTEGER;
-	T : ARRAY 365 OF SHORTINT;
+	T : ARRAY 365 OF SIGNED8;
 
 (** Returns TRUE if year is a leap year *)
 PROCEDURE IsLeapYear* (year: INTEGER): BOOLEAN;

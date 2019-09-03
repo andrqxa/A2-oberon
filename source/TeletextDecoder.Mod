@@ -173,7 +173,7 @@ TYPE
 		nextSub-, prevSub- : TeletextPage;
 		pageNumber, subPageNo- : LONGINT;
 		text- : Texts.Text;
-		attributes-: ARRAY FormattedPageSize OF SHORTINT;
+		attributes-: ARRAY FormattedPageSize OF SIGNED8;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -266,17 +266,17 @@ TYPE
 		PROCEDURE MarkupPage;
 		VAR
 			text: ARRAY FormattedPageSize OF Texts.Char32;
-			fgColor, bgColor: ARRAY FormattedPageSize OF SHORTINT;
+			fgColor, bgColor: ARRAY FormattedPageSize OF SIGNED8;
 			flashing, boxed: ARRAY FormattedPageSize OF BOOLEAN;
 			forceAlpha, isGraphics, holdGraphics, isDouble, hasDouble, conceal, isFlashing, separatedGraphics : BOOLEAN;
 			teletextPage: TeletextPage;
 			i, j, k, begin : LONGINT;
 			ch : LONGINT;
-			fg, bg, isBoxed : SHORTINT;
+			fg, bg, isBoxed : SIGNED8;
 
-		PROCEDURE CreateAttribute(fg, bg: SHORTINT; flashing, boxed: BOOLEAN) : SHORTINT;
+		PROCEDURE CreateAttribute(fg, bg: SIGNED8; flashing, boxed: BOOLEAN) : SIGNED8;
 		VAR
-			attr: SHORTINT;
+			attr: SIGNED8;
 		BEGIN
 			(* Teletext is very memory-intensive (approx. 1000 pages per TV channel) => Compress attributes *)
 			(* 'fg' is coded into bits 0-2, 'bg' is coded into 3-5, 'flashing' is coded in bit no. 6 and 'boxed' modifies the sign *)

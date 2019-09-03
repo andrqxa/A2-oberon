@@ -255,7 +255,7 @@ VAR
 
 
 	(** random number with len 'bits' *)
-	PROCEDURE NewRand*( bits: SIZE;  top, bottom: SHORTINT ): BigNumber;
+	PROCEDURE NewRand*( bits: SIZE;  top, bottom: SIGNED8 ): BigNumber;
 	VAR n, len, i, topbit: SIZE;  topword: SET32;  b: BigNumber;
 	BEGIN
 		len := bits;  INC( len, (-len) MOD 32 );
@@ -347,7 +347,7 @@ VAR
 		IF val # 0 THEN  b.len := 1;  b.d[0] := val  ELSE  b.len := 0   END
 	END AssignInt;
 
-	PROCEDURE cmpd( VAR a, b: digits;  len: SIZE ): SHORTINT;
+	PROCEDURE cmpd( VAR a, b: digits;  len: SIZE ): SIGNED8;
 	VAR i: SIZE;
 	BEGIN
 		i := len - 1;
@@ -358,7 +358,7 @@ VAR
 		END
 	END cmpd;
 
-	PROCEDURE ucmp( VAR a, b: BigNumber ): SHORTINT;   (* 1: |a| > |b|;  0: a = b;  -1:  |a| < |b| *)
+	PROCEDURE ucmp( VAR a, b: BigNumber ): SIGNED8;   (* 1: |a| > |b|;  0: a = b;  -1:  |a| < |b| *)
 	BEGIN
 		IF a.len > b.len THEN  RETURN 1
 		ELSIF a.len < b.len THEN  RETURN -1
@@ -366,7 +366,7 @@ VAR
 		END
 	END ucmp;
 
-	PROCEDURE Cmp*( a, b: BigNumber ): SHORTINT;   (** 1: a > b;  0: a = b;  -1:  a < b *)
+	PROCEDURE Cmp*( a, b: BigNumber ): SIGNED8;   (** 1: a > b;  0: a = b;  -1:  a < b *)
 	BEGIN
 		IF a.neg # b.neg THEN
 			IF a.neg THEN  RETURN -1  ELSE  RETURN 1  END

@@ -45,7 +45,7 @@ TYPE
 		(* foreign protocol address *)
 		fip-: IP.Adr;
 		fport-: LONGINT;
-		state*: SHORTINT;   (* TCP state *)
+		state*: SIGNED8;   (* TCP state *)
 		(* send sequence *)
 		sndnxt-: LONGINT;   (* send next *)
 		iss-: LONGINT;   (* initial send sequence number *)

@@ -125,7 +125,7 @@ TYPE
 	(* The game model *)
 	FieldDesc = RECORD(Gadgets.ObjDesc)
 		score: ARRAY Ranks OF Score;
-		curr,next,angle,line,row,rank,mult: SHORTINT;
+		curr,next,angle,line,row,rank,mult: SIGNED8;
 		delay,figures: INTEGER;
 		focus,match,preview,paused: BOOLEAN;
 		lap1,lap2: LONGINT;
@@ -161,11 +161,11 @@ TYPE
 	FigureMsg = RECORD(Display.FrameMsg)
 		model: Object;
 		id: INTEGER;	(* 0 create, 1 move, 2 drop, 3 whole pot *)
-		ndx,angle0,line0,row0,angle1,line1,row1: SHORTINT;
+		ndx,angle0,line0,row0,angle1,line1,row1: SIGNED8;
 	END;
 VAR
 	figure: ARRAY Figures, 4 OF Figure;
-	color,xofs,yofs: ARRAY Figures OF SHORTINT;
+	color,xofs,yofs: ARRAY Figures OF SIGNED8;
 	clrpot: Pot;
 	timers: Timer;
 	delay: ARRAY Levels OF INTEGER;
@@ -220,7 +220,7 @@ PROCEDURE IncScore(F: Field; score,bonus: INTEGER);
 VAR
 	sum: LONGINT;
 	level,rows: INTEGER;
-	rank: SHORTINT;
+	rank: SIGNED8;
 BEGIN
 	rank:= F.rank;
 	level:= F.score[rank].level; rows:= F.score[rank].rows;
@@ -314,7 +314,7 @@ END DrawLine;
 PROCEDURE DrawFigure(R: Frame; fig: Figure; dX,dY,c,r,l: INTEGER);
 (* Draw or remove figure fig. c is color, r row and l line *)
 VAR
-	i,j: SHORTINT;
+	i,j: SIGNED8;
 BEGIN
 	j:= 0;
 	Oberon.RemoveMarks(R.mask.X,R.mask.Y,R.mask.W,R.mask.H);
@@ -331,7 +331,7 @@ END DrawFigure;
 PROCEDURE DrawDrop(R: Frame; fig: Figure; dX,dY,c,r,l: INTEGER);
 (* Do not remove and redraw to avoid flickering at fast droppping *)
 VAR
-	i,j,k: SHORTINT;
+	i,j,k: SIGNED8;
 BEGIN
 	j:= 0; k:= FigLines - 1;
 	Oberon.RemoveMarks(R.mask.X,R.mask.Y,R.mask.W,R.mask.H);
@@ -357,7 +357,7 @@ END DrawDrop;
 PROCEDURE DrawPot(R: Frame; dX,dY: INTEGER; pot: Pot);
 (* Draw the whole pot *)
 VAR
-	i: SHORTINT;
+	i: SIGNED8;
 BEGIN
 	i:= FigLines;
 	Oberon.RemoveMarks(R.mask.X,R.mask.Y,R.mask.W,R.mask.H);
@@ -367,7 +367,7 @@ END DrawPot;
 PROCEDURE DrawPreview(R: Frame; fig: Figure; xofs,yofs,c: INTEGER);
 (* Draw or remove the figure in the preview panel *)
 VAR
-	i,j: SHORTINT;
+	i,j: SIGNED8;
 	ox,oy: INTEGER;
 BEGIN
 	ox:= R.mask.X + 5;
@@ -388,7 +388,7 @@ BEGIN
 	END;
 END DrawPreview;
 
-PROCEDURE MatchFigure(F: Field; fig: Figure; r,l: SHORTINT): BOOLEAN;
+PROCEDURE MatchFigure(F: Field; fig: Figure; r,l: SIGNED8): BOOLEAN;
 (* Check, if there is space in the pot to put figure fig at position r,l *)
 VAR
 	i,j: INTEGER;
@@ -406,7 +406,7 @@ BEGIN
 	RETURN(~b);
 END MatchFigure;
 
-PROCEDURE SetFigure(F: Field; fig: Figure; r,l: SHORTINT; c: CHAR);
+PROCEDURE SetFigure(F: Field; fig: Figure; r,l: SIGNED8; c: CHAR);
 (* Place Figure fig into the pot at position r,l - color c *)
 VAR
 	i,j: INTEGER;
@@ -434,7 +434,7 @@ END FieldFigure;
 PROCEDURE InitPot(VAR pot: Pot);
 (* Initialize a pot including frames (avoid overflows when checking) *)
 VAR
-	i,j: SHORTINT;
+	i,j: SIGNED8;
 BEGIN
 	i:= 0;
 	WHILE (i < FigLines) DO
@@ -457,7 +457,7 @@ END InitPot;
 PROCEDURE CheckPot(VAR pot: Pot): INTEGER;
 (* Search for filled lines in the pot, drop upper part if found *)
 VAR
-	i,j,k: SHORTINT;
+	i,j,k: SIGNED8;
 	full: INTEGER;
 	b: BOOLEAN;
 BEGIN
@@ -504,19 +504,19 @@ PROCEDURE Move(F: Field; c: CHAR): BOOLEAN;
 VAR
 	M: FigureMsg;
 BEGIN
-	M.row1:= MIN(SHORTINT); M.line1:= F.line;
+	M.row1:= MIN(SIGNED8); M.line1:= F.line;
 	IF ~F.paused THEN
 		CASE c OF
 		| LeftArrow:     M.row1:= F.row - 1; M.angle1:= F.angle;
 		| RightArrow:  M.row1:= F.row + 1; M.angle1:= F.angle;
 		| DownArrow: M.row1:= F.row; M.angle1:= (F.angle+1) MOD 4;
 		| UpArrow: 	 M.row1:= F.row; M.angle1:= (F.angle-1) MOD 4;
-		| " ":				M.row1:= MAX(SHORTINT);
+		| " ":				M.row1:= MAX(SIGNED8);
 		ELSE END;
 	END;
-	IF (M.row1 = MAX(SHORTINT)) THEN
+	IF (M.row1 = MAX(SIGNED8)) THEN
 		IF (F.delay # -1) THEN IncScore(F,F.line,DropBonus); F.delay:= -1; END;
-	ELSIF (M.row1 > MIN(SHORTINT)) THEN
+	ELSIF (M.row1 > MIN(SIGNED8)) THEN
 		FieldFigure(F,FALSE);
 		IF MatchFigure(F,figure[F.curr,M.angle1],M.row1,F.line) THEN
 			M.F:= NIL; M.model:= F; M.id:= 1; M.ndx:= F.curr;
@@ -526,7 +526,7 @@ BEGIN
 		END;
 		FieldFigure(F,TRUE);
 	END;
-	RETURN(M.row1 # MIN(SHORTINT));
+	RETURN(M.row1 # MIN(SIGNED8));
 END Move;
 
 PROCEDURE Drop(F: Field);
@@ -648,7 +648,7 @@ END FieldAttr;
 
 PROCEDURE FieldFile(F: Field; VAR M: FileMsg);
 VAR
-	i: SHORTINT;
+	i: SIGNED8;
 BEGIN
 	IF (M.id = Objects.store) THEN
 		i:= 0;
@@ -881,7 +881,7 @@ VAR
 	F: Object;
 	mx,my: INTEGER;
 	show: BOOLEAN;
-	next: SHORTINT;
+	next: SIGNED8;
 	mask: Display3.Mask;	(* needed for MakeMask *)
 BEGIN
 	Panels.PanelHandler(P,M);
@@ -902,7 +902,7 @@ PROCEDURE PreviewUpdate(P: Frame; VAR M: UpdateMsg);
 VAR
 	F: Object;
 	show: BOOLEAN;
-	curr,next: SHORTINT;
+	curr,next: SIGNED8;
 	mask: Display3.Mask;	(* needed for MakeMask *)
 BEGIN
 	Panels.PanelHandler(P,M);
@@ -1263,7 +1263,7 @@ PROCEDURE ScoreArray(model: Object): Object;
 VAR
 	first,this,obj: Object;
 	ofs: INTEGER;
-	i: SHORTINT;
+	i: SIGNED8;
 BEGIN
 	i:= 0;
 	first:= NewTop("Name",NameW,0);

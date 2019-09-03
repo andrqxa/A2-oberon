@@ -43,7 +43,7 @@ Institut für Computersysteme, ETH Zürich,
     数字： “0” | “1” | “2” | “3” | “4” | “5” | “6” | “7” | “8” | “9”
 例如:
 	1991	INTEGER	1991
-	0DH 	SHORTINT	13
+	0DH 	SIGNED8	13
 	12.3	REAL	12.3
 	4.567E8 	REAL	456700000
 	0.57712566D-6 	LONGREAL		0.00000057712566
@@ -93,7 +93,7 @@ Institut für Computersysteme, ETH Zürich,
     EXCL (10.3)			REAL (6.1)
     FALSE (6.1)			SET (6.1)
     HALT (10.3)			SHORT	(10.3)
-    INC	(10.3)			SHORTINT (6.1)
+    INC	(10.3)			SIGNED8 (6.1)
     INCL (10.3)			SIZE (10.3)
     INTEGER (6.1)		TRUE (6.1)
     
@@ -130,7 +130,7 @@ Institut für Computersysteme, ETH Zürich,
     基本类型由预声明标识符表示。相应的算子在8.2中定义，预声明函数过程见10.3。基本类型值的范围如下：
 1. 布尔型（BOOLEAN）：逻辑值TURE和FALSE
 2. 字符型（CHAR）：扩展ASCII码字符（OX至OFFX）
-3. 短整型（SHORTINT）：在最小短整型数和最大短整型数之间的整数
+3. 短整型（SIGNED8）：在最小短整型数和最大短整型数之间的整数
 4. 整型（INTEGER）：在最小整型数和最大整型数之间的整数
 5. 长整型（LONGINT）：在最小长整型数和最大长整型数之间的整数
 6. 实型（REAL）：在最小实型数和最大实型数之间的实数
@@ -138,7 +138,7 @@ Institut für Computersysteme, ETH Zürich,
 8. 集合型（SET）：在0和最大集合型数之间的整数集合
 9. PTR型（PTR）：任意结构指针类型的基础类型
     类型3到5都是整数型，类型6和7都是实型，他们合起来称为数字型。他们构成了一个层次关系；大类型（值）的范围包含小类型（值）的范围：
-	LONGREAL  >=  REAL  >=  LONGINT  >=  INTEGER  >=  SHORTINT
+	LONGREAL  >=  REAL  >=  LONGINT  >=  INTEGER  >=  SIGNED8
     6.2 数组类型
     数组是一列类型（称为元素类型）相同的元素构成的结构。元素的个数称为数组的长度。数组元素由下标指定，下标从0到长度－1。
     数组类型：数组[长度｛“，”长度｝]OF 类型。
@@ -473,7 +473,7 @@ CHR(x)			整型					字符型			整型x变为字符型
 ENTIER(x)		实型					长整型			不大于x的最大整数
 LEN(v, n)		v:数组; n: 整常量	长整型			v的第 n 维长度(第一维 = 0)
 LEN(v)			v: 数组					长整型			与 LEN(v, 0)相同
-LONG(x)		SHORTINT					整型				扩展
+LONG(x)		SIGNED8					整型				扩展
 				INTEGER					长整型
 				REAL						长实型
 				
@@ -564,7 +564,7 @@ END Trees.
     当模块加载到系统中后执行符号BEGIN后的语句列，这些将调用模块加载后完成。循环调用模块是非法的。特殊（无参数并被调用）过程能被系统激活，这种过程当作命令使用（见附录 D1）。
     
     附录 A：术语解说
-    整数型   SHORTINT, INTEGER, LONGINT
+    整数型   SIGNED8, INTEGER, LONGINT
     实型   REAL, LONGREAL
     数字型   整数型，实型
 相同类型
@@ -579,7 +579,7 @@ END Trees.
  3) Ta和Tb是形参列表一致的过程类型。
     类型包含
     数字型的层次如下：
-    LONGREAL >= REAL >= LONGINT >= INTEGER >= SHORTINT
+    LONGREAL >= REAL >= LONGINT >= INTEGER >= SIGNED8
 类型扩展
     若类型声明Tb＝RECORD（Ta）...END，Tb是Ta的直接扩展，Ta是Tb的直接基础类型。类型Tb是Ta的扩展（Ta是Tb的基础类型）如果
 1) Ta与Tb是相同的类型，或

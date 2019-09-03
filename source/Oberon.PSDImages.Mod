@@ -84,7 +84,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 	END SkipSection;
 
 	PROCEDURE LoadRLEInd8(VAR R: Files.Rider; VAR h: Header; img: Images.Image);
-		VAR F: Files.File; pos, pix: LONGINT; i, n, nb, x, y: INTEGER; rle: SHORTINT; ch: CHAR;
+		VAR F: Files.File; pos, pix: LONGINT; i, n, nb, x, y: INTEGER; rle: SIGNED8; ch: CHAR;
 	BEGIN
 		F := Files.Base(R);
 		pos := h.data + h.channels*h.height*2;
@@ -120,7 +120,7 @@ MODULE PSDImages IN Oberon; (** portable *)	(* ejz  *)
 	END LoadRLEInd8;
 
 	PROCEDURE LoadRLERGB888(VAR R: Files.Rider; VAR h: Header; img: Images.Image);
-		VAR F: Files.File; pos, pix, c: LONGINT; i, n, nb, x, y: INTEGER; rle: SHORTINT; ch: CHAR;
+		VAR F: Files.File; pos, pix, c: LONGINT; i, n, nb, x, y: INTEGER; rle: SIGNED8; ch: CHAR;
 	BEGIN
 		F := Files.Base(R);
 		pos := h.data + h.channels*h.height*2;

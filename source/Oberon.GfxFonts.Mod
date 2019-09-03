@@ -46,7 +46,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 		Outline = POINTER TO OutlineDesc;
 		OutlineDesc = RECORD
 			width: ARRAY 256 OF REAL;	(* width including left and right side bearings (0 if character undefined) *)
-			len: ARRAY 256 OF SHORTINT;	(* number of subpaths of each character *)
+			len: ARRAY 256 OF SIGNED8;	(* number of subpaths of each character *)
 			path: GfxPaths.Path;	(* path containing character outlines *)
 			pos: ARRAY 256 OF INTEGER;	(* positions of characters within path *)
 			xmin, ymin, xmax, ymax: REAL;	(* union of character bounding boxes *)
@@ -484,7 +484,7 @@ MODULE GfxFonts IN Oberon; (** non-portable *)	(* eos  *)
 
 	PROCEDURE LoadRaster (VAR name: ARRAY OF CHAR): RasterFile;
 		VAR
-			rfile: RasterFile; file: Files.File; r: Files.Rider; id, ch: CHAR; type: SHORTINT; height, runs, i, j: INTEGER;
+			rfile: RasterFile; file: Files.File; r: Files.Rider; id, ch: CHAR; type: SIGNED8; height, runs, i, j: INTEGER;
 			beg, end: ARRAY 32 OF INTEGER; size: LONGINT; adr: ADDRESS;
 	BEGIN
 		rfile := NIL;

@@ -53,7 +53,7 @@ TYPE
 
 	Event* = RECORD
 		originator* : Name;	(** name of module that generated event *)
-		type*, class*, subclass*, code* : SHORTINT;
+		type*, class*, subclass*, code* : SIGNED8;
 		message* : Message;
 		date*, time* : LONGINT; (* when enqueued in event queue *)
 	END;
@@ -290,13 +290,13 @@ END Add;
 (** Generate an new event record and add it to the event queue. If showOnKernenLog is TRUE, a simplified representation
 	of the event (originator + ": " + message) is displayed on the kernel log.
 	This operation is non-blocking if showOnKernelLog is FALSE, blocking otherwise *)
-PROCEDURE AddEvent*(CONST originator : Name; type, class, subclass, code : SHORTINT; CONST message : Message; showOnKernelLog : BOOLEAN);
+PROCEDURE AddEvent*(CONST originator : Name; type, class, subclass, code : SIGNED8; CONST message : Message; showOnKernelLog : BOOLEAN);
 BEGIN
 	Add(NewEvent(originator, type, class, subclass, code, message), showOnKernelLog)
 END AddEvent;
 
 (** Generate an new event record *)
-PROCEDURE NewEvent*(CONST originator : Name; type, class, subclass, code : SHORTINT; CONST message : Message) : Event;
+PROCEDURE NewEvent*(CONST originator : Name; type, class, subclass, code : SIGNED8; CONST message : Message) : Event;
 VAR event : Event;
 BEGIN
 	event.originator := originator;

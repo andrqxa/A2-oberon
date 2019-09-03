@@ -110,15 +110,15 @@ TYPE
 
 	Character = RECORD
 		ch : CHAR;
-		color : SHORTINT;
+		color : SIGNED8;
 	END;
 
 	Line = ARRAY LineWidth OF Character;
 
 	TextBuffer = OBJECT
 	VAR
-		defaultColor : SHORTINT;
-		currentColor : SHORTINT;
+		defaultColor : SIGNED8;
+		currentColor : SIGNED8;
 
 		(* ring buffer of lines *)
 		lines : ARRAY BufferHeight OF Line;
@@ -164,7 +164,7 @@ TYPE
 			Invalidate(SELF);
 		END Clear;
 
-		PROCEDURE SetColor(foreground, background : SHORTINT);
+		PROCEDURE SetColor(foreground, background : SIGNED8);
 		BEGIN
 			currentColor := foreground + 10H * background;
 		END SetColor;
@@ -637,7 +637,7 @@ BEGIN
 	RETURN result;
 END Difference;
 
-PROCEDURE ClearLine(VAR line : Line; from, to : LONGINT; color : SHORTINT);
+PROCEDURE ClearLine(VAR line : Line; from, to : LONGINT; color : SIGNED8);
 VAR i : LONGINT;
 BEGIN
 	ASSERT((0 <= from) & (from < LineWidth));

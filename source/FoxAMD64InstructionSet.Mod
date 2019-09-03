@@ -1395,8 +1395,8 @@ TYPE
 		name-: Name; (* name for debug output and for an assembler *)
 		type-: OperandType; (* can be one of reg8, reg16, reg32, reg64, CRn, DRn, segReg, mmx, xmm, sti
 								the particular value of reg8 ... sti does not have a meaning *)
-		index-: SHORTINT; (* this index has a meaning for instruction encoding, it is the register index used in the instruction *)
-		sizeInBytes-: SHORTINT; (* size in bytes *)
+		index-: SIGNED8; (* this index has a meaning for instruction encoding, it is the register index used in the instruction *)
+		sizeInBytes-: SIGNED8; (* size in bytes *)
 	END;
 
 VAR
@@ -1443,7 +1443,7 @@ VAR
 	BEGIN IF regNumber = none THEN RETURN none ELSE RETURN registers[regNumber].type END
 	END RegisterType;
 
-	PROCEDURE RegisterIndex*(regNumber: LONGINT): SHORTINT;
+	PROCEDURE RegisterIndex*(regNumber: LONGINT): SIGNED8;
 	BEGIN IF regNumber = none THEN RETURN none ELSE RETURN registers[regNumber].index END
 	END RegisterIndex;
 
@@ -1457,7 +1457,7 @@ VAR
 		RETURN none;
 	END FindCPU;
 
-				PROCEDURE StringToOperand(CONST name: ARRAY OF CHAR): SHORTINT;
+				PROCEDURE StringToOperand(CONST name: ARRAY OF CHAR): SIGNED8;
 				BEGIN
 					IF name = "" THEN RETURN none
 					ELSIF name = "1" THEN RETURN one;
@@ -1599,7 +1599,7 @@ VAR
 					END;
 				END StringToOperand;
 
-			PROCEDURE ParseOperand(CONST op: ARRAY OF CHAR; VAR at: LONGINT): SHORTINT;
+			PROCEDURE ParseOperand(CONST op: ARRAY OF CHAR; VAR at: LONGINT): SIGNED8;
 			VAR name: ARRAY 32 OF CHAR; i: LONGINT;
 			BEGIN
 				i := 0;
@@ -1652,7 +1652,7 @@ VAR
 
 			all symbols 8 bit wide, numbers also 8 bits wide
 		*)
-		VAR i,k,length: SHORTINT; ch1,ch2: CHAR;
+		VAR i,k,length: SIGNED8; ch1,ch2: CHAR;
 		BEGIN
 			i := 0; k := 0;
 			WHILE(charcode[2*i] # 0X) DO
@@ -1753,7 +1753,7 @@ VAR
 				RETURN TRUE;
 			END GetCode;
 
-		VAR i,k,length: SHORTINT; ch1,ch2: CHAR; cdc: ARRAY 32 OF CHAR; at,mul,val: LONGINT;
+		VAR i,k,length: SIGNED8; ch1,ch2: CHAR; cdc: ARRAY 32 OF CHAR; at,mul,val: LONGINT;
 		BEGIN
 			i := 0; k := 0; at := 0;
 			WHILE(GetCode(charcode,at,cdc)) DO
@@ -1919,7 +1919,7 @@ VAR
 		END AddInstructionV;
 
 		PROCEDURE AddInstruction(mnemonic: LONGINT; CONST op,code: ARRAY OF CHAR; bitwidthOptions, cpuOptions: SET);
-		VAR i: SHORTINT; at: LONGINT;
+		VAR i: SIGNED8; at: LONGINT;
 
 		BEGIN
 			i := 0; at := 0;
@@ -5156,7 +5156,7 @@ VAR
 	(** setup register tables **)
 	PROCEDURE InitRegisters;
 		(* insert an new register *)
-		PROCEDURE AddRegister (number: LONGINT; CONST name: ARRAY OF CHAR; type: OperandType; sizeInBytes: SHORTINT; index: SHORTINT);
+		PROCEDURE AddRegister (number: LONGINT; CONST name: ARRAY OF CHAR; type: OperandType; sizeInBytes: SIGNED8; index: SIGNED8);
 		BEGIN
 			COPY (name, registers[number].name);
 			registers[number].type := type;
@@ -5446,21 +5446,21 @@ System.FreeDownTo FoxAMD64InstructionSet ~
 		cpuoptions-: CnUOptions; (* necessary CPU options for the instruction to be available *)
 
 		prefixFlags-: SET;
-		numerLegacyPrefixes-: SHORTINT;
+		numerLegacyPrefixes-: SIGNED8;
 		legacyPrefixes-: ARRAY MaxLegacyPrefixes OF CHAR; (* legacy prefixes *)
 
 		usedREXPrefix-:BOOLEAN;
 		REXPrefix-:CHAR; (* REX prefix *)
 
 		opcodeFlags-: SET;
-		numberOpcodes-: SHORTINT; (* 1..MaxOpCodes *)
+		numberOpcodes-: SIGNED8; (* 1..MaxOpCodes *)
 		opcode-: ARRAY MaxOpCodes OF CHAR;
 		usedModRM-: BOOLEAN;
 		ModRM: CHAR; (* mode-register-memory *)
 		usedSIB_: BOOLEAN;
 		SIB-: CHAR; (* scale-index-base *)
 
-		numberOperands-: SHORTINT; (* 0.. MaxOperands *)
+		numberOperands-: SIGNED8; (* 0.. MaxOperands *)
 		operand-: ARRAY MaxOperands OF Operand;
 	END;
 

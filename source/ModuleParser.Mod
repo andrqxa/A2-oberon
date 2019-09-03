@@ -335,7 +335,7 @@ TYPE
 	IdentDef* = OBJECT
 	VAR
 		ident*: InfoItem;
-		vis*: SHORTINT;
+		vis*: SIGNED8;
 		initializer*: InfoItem;
 		external*: Strings.String;
 	END IdentDef;

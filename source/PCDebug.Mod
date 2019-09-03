@@ -23,7 +23,7 @@ MODULE PCDebug; (** AUTHOR "prk"; PURPOSE "Parallel Compiler: low-level trace fu
 	(* Read a compressed integer from memory *)
 
 	PROCEDURE ReadNum (VAR pos: ADDRESS; VAR i: LONGINT);
-		VAR n: LONGINT; s: SHORTINT; x: CHAR;
+		VAR n: LONGINT; s: SIGNED8; x: CHAR;
 	BEGIN
 		s := 0; n := 0; SYSTEM.GET(pos, x); INC(pos);
 		WHILE ORD(x) >= 128 DO INC(n, ASH(ORD(x) - 128, s)); INC(s, 7); SYSTEM.GET(pos, x); INC(pos) END;

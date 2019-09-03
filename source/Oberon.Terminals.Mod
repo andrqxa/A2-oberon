@@ -23,7 +23,7 @@ MODULE Terminals IN Oberon;	(** portable *) (* gri/ww 5 Jun 92 *)
 		ansi* = 0; applic* = 1; lineFeed* = 2; insert* = 3; relative* = 4; cursorKeys* = 5; autowrap* = 6;
 
 	TYPE
-		Char* = RECORD ch*: CHAR; attr*: SHORTINT END;
+		Char* = RECORD ch*: CHAR; attr*: SIGNED8 END;
 
 		Line* = POINTER TO RECORD
 			len*: INTEGER;
@@ -44,7 +44,7 @@ MODULE Terminals IN Oberon;	(** portable *) (* gri/ww 5 Jun 92 *)
 
 		TerminalDesc* = RECORD
 		(* text *)
-			attr*: SHORTINT;
+			attr*: SIGNED8;
 			width*, height* : INTEGER;
 			top, bottom: INTEGER;
 			cursor*: Location;
@@ -61,7 +61,7 @@ MODULE Terminals IN Oberon;	(** portable *) (* gri/ww 5 Jun 92 *)
 			strBuf: ARRAY 256 OF CHAR;
 			tabs: ARRAY MaxWidth+1 OF BOOLEAN;
 			answerback*: ARRAY 32 OF CHAR;
-			oldAttr: SHORTINT;
+			oldAttr: SIGNED8;
 			oldCursor: Location;
 			oldRelative: BOOLEAN;
 			cache*: Texts.Writer;
@@ -185,7 +185,7 @@ MODULE Terminals IN Oberon;	(** portable *) (* gri/ww 5 Jun 92 *)
 		t.notify(t, update, 1, 1, t.height, t.width, t.cursor)
 	END SetWidth;
 
-	PROCEDURE SetAttribute (t: Terminal; attr: SHORTINT);
+	PROCEDURE SetAttribute (t: Terminal; attr: SIGNED8);
 	BEGIN
 		IF attr = none THEN t.attr := attr ELSE t.attr := t.attr + attr END
 	END SetAttribute;

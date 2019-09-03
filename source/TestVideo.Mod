@@ -187,8 +187,8 @@ VAR i, j, x, y, w, h : SIZE;
 	numbers : ARRAY 81 OF SIZE;
 
 	cluster: ARRAY 81 OF RECORD
-		nofFields : SHORTINT;
-		fields : ARRAY 81 OF SHORTINT;
+		nofFields : SIGNED8;
+		fields : ARRAY 81 OF SIGNED8;
 	END;
 	distance, dist : ARRAY 81, 81 OF LONGINT;
 
@@ -230,7 +230,7 @@ VAR i, j, x, y, w, h : SIZE;
 	PROCEDURE Cluster;
 	VAR i : SIZE;
 	BEGIN
-		FOR i := 0 TO 81 - 1 DO cluster[i].nofFields := 0; cluster[i].fields[0] := SHORTINT(i) END;
+		FOR i := 0 TO 81 - 1 DO cluster[i].nofFields := 0; cluster[i].fields[0] := SIGNED8(i) END;
 		FOR i := 0 TO nofNumbers - 1 DO cluster[i].nofFields := 1 END;
 		FOR i := 0 TO nofNumbers - 1 DO
 

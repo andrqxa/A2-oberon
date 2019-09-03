@@ -153,7 +153,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		RETURN node
 	END NewLeaf;
 
-	PROCEDURE Construct*(class: SHORTINT; VAR x: OPT.Node;  y: OPT.Node);
+	PROCEDURE Construct*(class: SIGNED8; VAR x: OPT.Node;  y: OPT.Node);
 		VAR node: OPT.Node;
 	BEGIN
 		node := OPT.NewNode(class); node^.typ := OPT.notyp;
@@ -273,7 +273,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		n^.conval^.intval := OPM.ConstNotAlloc; n^.obj := NIL
 	END CharToString;
 
-	PROCEDURE BindNodes(class: SHORTINT; typ: OPT.Struct; VAR x: OPT.Node; y: OPT.Node);
+	PROCEDURE BindNodes(class: SIGNED8; typ: OPT.Struct; VAR x: OPT.Node; y: OPT.Node);
 		VAR node: OPT.Node;
 	BEGIN
 		node := OPT.NewNode(class); node^.typ := typ;
@@ -407,10 +407,10 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		x^.intval := OPM.ConstNotAlloc
 	END CheckRealType;
 
-	PROCEDURE MOp*(op: SHORTINT; VAR x: OPT.Node);
+	PROCEDURE MOp*(op: SIGNED8; VAR x: OPT.Node);
 		VAR f: INTEGER; typ: OPT.Struct; z: OPT.Node;
 
-		PROCEDURE NewOp(op: SHORTINT; typ: OPT.Struct; z: OPT.Node): OPT.Node;
+		PROCEDURE NewOp(op: SIGNED8; typ: OPT.Struct; z: OPT.Node): OPT.Node;
 			VAR node: OPT.Node;
 		BEGIN
 			node := OPT.NewNode(Nmop); node^.subcl := op; node^.typ := typ;
@@ -870,10 +870,10 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		x.typ := typ
 	END Val;
 
-	PROCEDURE Op*(op: SHORTINT; VAR x: OPT.Node; y: OPT.Node);
+	PROCEDURE Op*(op: SIGNED8; VAR x: OPT.Node; y: OPT.Node);
 		VAR f, g: INTEGER; t, z: OPT.Node; typ: OPT.Struct; do: BOOLEAN; val: LONGINT;
 
-		PROCEDURE NewOp(op: SHORTINT; typ: OPT.Struct; VAR x: OPT.Node; y: OPT.Node);
+		PROCEDURE NewOp(op: SIGNED8; typ: OPT.Struct; VAR x: OPT.Node; y: OPT.Node);
 			VAR node: OPT.Node;
 		BEGIN
 			node := OPT.NewNode(Ndop); node^.subcl := op; node^.typ := typ;
@@ -1415,10 +1415,10 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		par0 := x
 	END StPar0;
 
-	PROCEDURE StPar1*(VAR par0: OPT.Node; x: OPT.Node; fctno: SHORTINT);	(* x: second parameter of standard proc *)
+	PROCEDURE StPar1*(VAR par0: OPT.Node; x: OPT.Node; fctno: SIGNED8);	(* x: second parameter of standard proc *)
 		VAR f, L: INTEGER; typ: OPT.Struct; p, t: OPT.Node; i: LONGINT;
 
-		PROCEDURE NewOp(class, subcl: SHORTINT; left, right: OPT.Node): OPT.Node;
+		PROCEDURE NewOp(class, subcl: SIGNED8; left, right: OPT.Node): OPT.Node;
 			VAR node: OPT.Node;
 		BEGIN
 			node := OPT.NewNode(class); node^.subcl := subcl;
@@ -1633,7 +1633,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		par0 := p
 	END StParN;
 
-	PROCEDURE StFct*(VAR par0: OPT.Node; fctno: SHORTINT; parno: INTEGER);
+	PROCEDURE StFct*(VAR par0: OPT.Node; fctno: SIGNED8; parno: INTEGER);
 		VAR dim: INTEGER; x, p, r: OPT.Node;
 				obj: OPT.Object; typ: OPT.Struct;
 	BEGIN p := par0;

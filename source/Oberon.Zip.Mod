@@ -59,7 +59,7 @@ TYPE
 		extFileAttr: LONGINT;	(* external file attributes, not used in this implementation *)
 		extraField (* for future expansions *), comment-: POINTER TO ARRAY OF CHAR;	(** comment for this file **)
 		genPurpBitFlag: INTEGER;
-		support: SHORTINT;
+		support: SIGNED8;
 		dataDescriptor: BOOLEAN;	(* if set, data descriptor after (compressed) file data *)
 		offsetLocal: LONGINT;	(* offset of file header in central directory *)
 		offsetFileData: LONGINT;	(* offset of (compressed) file data *)
@@ -498,7 +498,7 @@ END ExtractEntry;
 	- EntryAlreadyExists: there is already an Entry in arc with the same name
 	- DataError: error during compression
 	- BadName: src is not based on a valid file **)
-PROCEDURE AddEntry*(arc: Archive; VAR name: ARRAY OF CHAR; VAR src: Files.Rider; len: LONGINT; level, strategy: SHORTINT; VAR res: WORD);
+PROCEDURE AddEntry*(arc: Archive; VAR name: ARRAY OF CHAR; VAR src: Files.Rider; len: LONGINT; level, strategy: SIGNED8; VAR res: WORD);
 VAR
 	dst: Files.Rider; ent: Entry; start: LONGINT;
 BEGIN

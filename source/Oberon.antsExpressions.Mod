@@ -58,7 +58,7 @@ TYPE
 	Value* = RECORD
 		name*: OPS.String;
 
-		class*: SHORTINT;
+		class*: SIGNED8;
 		b*: BOOLEAN;   (* bool var *)
 		c*: CHAR;   (* char var *)
 		i*: LONGINT;   (* Sint,Int,LInt var *)
@@ -112,7 +112,7 @@ TYPE
 		code: ARRAY 128 OF CHAR;
 		i, pc: LONGINT;
 		resadr, npar: LONGINT;
-		class: SHORTINT;
+		class: SIGNED8;
 		obj: OPT.Object
 	END;
 
@@ -131,7 +131,7 @@ TYPE
 VAR
 	oldHook, thisHook: Objects.Handler;
 	map: ARRAY 17 OF CHAR;
-	sym: SHORTINT;  W: Texts.Writer;
+	sym: SIGNED8;  W: Texts.Writer;
 	ptrTab: PtrTable;   (* pointer table *)
 	nofptrs: INTEGER;  foundSTRING: BOOLEAN;
 	strings: StringStack;   (* need this chain to keep objects consistent while evaluating *)
@@ -436,7 +436,7 @@ VAR
 
 (** parser, create stack **)
 
-	PROCEDURE GetSym( VAR sym: SHORTINT );
+	PROCEDURE GetSym( VAR sym: SIGNED8 );
 	BEGIN
 		OPS.Get( sym )
 	END GetSym;
@@ -465,7 +465,7 @@ VAR
 		val := NewV( stack );  val.val.class := String;  val.val.s := str
 	END PushString;
 
-	PROCEDURE PushSInt*( VAR stack: Stack;  i: SHORTINT );
+	PROCEDURE PushSInt*( VAR stack: Stack;  i: SIGNED8 );
 	VAR val: ValueItem;
 	BEGIN
 		val := NewV( stack );  val.val.class := SInt;  val.val.i := i
@@ -1101,7 +1101,7 @@ VAR
 		RETURN IsTypeOf( Types.TypeOf( p ), ref )
 	END PointerIs;
 
-	PROCEDURE GetObjClass( obj: OPT.Object ): SHORTINT;
+	PROCEDURE GetObjClass( obj: OPT.Object ): SIGNED8;
 	BEGIN
 		WObj( obj );
 		IF obj.typ.form IN {Bool, Char, SInt, Int, LInt, Real, LReal, NoTyp, Pointer, String, Comp, ProcTyp} THEN
@@ -1241,7 +1241,7 @@ VAR
 
 	PROCEDURE ShortInt( VAR val: Value );
 	BEGIN
-		IF (val.i >= MIN( SHORTINT )) & (val.i <= MAX( SHORTINT )) THEN val.class := SInt
+		IF (val.i >= MIN( SIGNED8 )) & (val.i <= MAX( SIGNED8 )) THEN val.class := SInt
 		ELSIF (val.i >= MIN( INTEGER )) & (val.i <= MAX( INTEGER )) THEN val.class := Int
 		ELSE val.class := LInt
 		END
@@ -1322,7 +1322,7 @@ VAR
 	END OutFile;
 
 	PROCEDURE InFile( VAR stack: Stack;  VAR res: Value );
-	VAR class: SHORTINT;  adr: LONGINT;  ch: CHAR;  global: BOOLEAN;  ptr1: ANY;  f: Files.File;  R: Files.Rider;  file: Value;  obj: Objects.Object;
+	VAR class: SIGNED8;  adr: LONGINT;  ch: CHAR;  global: BOOLEAN;  ptr1: ANY;  f: Files.File;  R: Files.Rider;  file: Value;  obj: Objects.Object;
 		l: Objects.Library;  len: LONGINT;
 		gen: ARRAY 64 OF CHAR;
 		obj1: OPT.Object;  n: vyName.tNameArray;  fM: Objects.FileMsg;  nil: BOOLEAN;  isfirstitem: BOOLEAN;  pos: LONGINT;
@@ -1397,7 +1397,7 @@ VAR
 	END InFile;
 
 	PROCEDURE Assign( VAR stack: Stack;  VAR res: Value );
-	VAR obj: OPT.Object;  class: SHORTINT;  i, adr: LONGINT;  ch: CHAR;  global: BOOLEAN;  ptr1, ptr2: ANY;  nil: BOOLEAN;  varadr: LONGINT;
+	VAR obj: OPT.Object;  class: SIGNED8;  i, adr: LONGINT;  ch: CHAR;  global: BOOLEAN;  ptr1, ptr2: ANY;  nil: BOOLEAN;  varadr: LONGINT;
 	BEGIN
 		Eval( stack, res );  global := TRUE;  obj := PopWrVar( stack, global, nil );  Ln;  Str( "Trying to assign: " );  OutVal( res );
 		IF obj # NIL THEN
@@ -1562,7 +1562,7 @@ VAR
 	END PushLRealPar;
 
 	PROCEDURE PopCallPar( VAR stack: Stack;  VAR call: CallStack;  fpar: OPT.Object ): BOOLEAN;
-	VAR apar: Value;  obj: OPT.Object;  class: SHORTINT;
+	VAR apar: Value;  obj: OPT.Object;  class: SIGNED8;
 		s: ARRAY 256 OF CHAR;
 		adr: LONGINT;  global: BOOLEAN;  nil: BOOLEAN;
 

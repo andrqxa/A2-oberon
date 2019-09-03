@@ -136,7 +136,7 @@ MODULE Compiler IN Oberon;	(** portable, except where noted *)
 	END ParseOptions;
 
 	PROCEDURE WriteMsg(source: Texts.Reader;  log: Texts.Text);
-	VAR sym: SHORTINT;
+	VAR sym: SIGNED8;
 	BEGIN
 		Texts.WriteString(W, " compiling ");
 		OPM.Init({}, {}, source, log); OPS.Get(sym);

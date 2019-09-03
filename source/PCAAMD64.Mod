@@ -2017,7 +2017,7 @@ BEGIN
 END HexOrd;
 
 PROCEDURE ValueInByteRange (value: HUGEINT): BOOLEAN;
-BEGIN RETURN SYSTEM.VAL (SHORTINT, value) = value
+BEGIN RETURN SYSTEM.VAL (SIGNED8, value) = value
 END ValueInByteRange;
 
 PROCEDURE ValueInWordRange (value: HUGEINT): BOOLEAN;

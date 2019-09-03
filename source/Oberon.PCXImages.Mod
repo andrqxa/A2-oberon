@@ -81,7 +81,7 @@ VAR
 (*	pcxh: PCXHeader;	*)
 	line: ARRAY 4 OF POINTER TO ARRAY OF CHAR;
 	x, y, z, w, h, rep, pcount: INTEGER;
-	k, p: SHORTINT;
+	k, p: SIGNED8;
 	c: CHAR; fmt: Images.Format; pix, thispix: Images.Pixel; col: INTEGER; colors: LONGINT;
 BEGIN
 	IF ReadPCXHeader(R,pcxh) THEN

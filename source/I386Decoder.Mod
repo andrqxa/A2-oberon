@@ -1518,7 +1518,7 @@ TYPE
 		END Type1;
 
 (*		PROCEDURE Add(opcode : IA32Opcode);
-			VAR reg, base, inx, d: INTEGER; scale, mode: SHORTINT; disp, imm: LONGINT;
+			VAR reg, base, inx, d: INTEGER; scale, mode: SIGNED8; disp, imm: LONGINT;
 		BEGIN
 			Type1(opcode,  mode, d, reg, base, inx, scale, disp, imm);
 			opcode.instr := opADD

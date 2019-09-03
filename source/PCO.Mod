@@ -109,7 +109,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 
 	VAR
 	pc*, dsize*: LONGINT; 		(* code size, data size *)
-	lastImmSize*: SHORTINT;		(* last immediate Size *)
+	lastImmSize*: SIGNED8;		(* last immediate Size *)
 	code*: PCLIR.CodeArray;	(* i386/i387 code area *)
 	codeLength : LONGINT;
 	errpos*: LONGINT;
@@ -223,7 +223,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END PutRMInx;
 
-	PROCEDURE PutRegMem ((*mode: SHORTINT;*) reg, base: INTEGER; disp: LONGINT;  disp32: BOOLEAN);
+	PROCEDURE PutRegMem ((*mode: SIGNED8;*) reg, base: INTEGER; disp: LONGINT;  disp32: BOOLEAN);
 	(* put register memory *)
 	BEGIN
 		reg:= reg MOD 8;
@@ -246,7 +246,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END PutRegMem;
 
-	PROCEDURE PutMem (reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT;  disp32: BOOLEAN);
+	PROCEDURE PutMem (reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT;  disp32: BOOLEAN);
 	(* put memory *)
 	BEGIN
 		IF inx = noInx THEN PutRegMem (reg, base, disp, disp32)
@@ -263,7 +263,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END PutDisp;
 
-	PROCEDURE Prefix* (reg: INTEGER; VAR w: SHORTINT);
+	PROCEDURE Prefix* (reg: INTEGER; VAR w: SIGNED8);
 	(* put out the Operand Size Prefix if necessary
 		w = 0 : 8 bit data w= 1: 16/32 bit data *)
 	BEGIN
@@ -274,8 +274,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END Prefix;
 
-	PROCEDURE GenMOV* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT; r: INTEGER;
+	PROCEDURE GenMOV* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8; r: INTEGER;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -310,8 +310,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenMOV;
 
-	PROCEDURE GenMOVSX* (mode, s: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT; (* s = 0: 8 bit; s = 1: 16/32 bit *)
+	PROCEDURE GenMOVSX* (mode, s: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8; (* s = 0: 8 bit; s = 1: 16/32 bit *)
 	BEGIN
 		Prefix (reg, w);
 		PutByte (0FH); PutByte (0BEH + s);
@@ -325,8 +325,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenMOVSX;
 
-	PROCEDURE GenMOVZX* (mode, s: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT; (* s = 0: 8 bit; s = 1: 16/32 bit *)
+	PROCEDURE GenMOVZX* (mode, s: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8; (* s = 0: 8 bit; s = 1: 16/32 bit *)
 	BEGIN
 		Prefix (reg, w);
 		PutByte (0FH); PutByte (0B6H+s);
@@ -357,8 +357,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		 END
 	END GenOUT;
 
-	PROCEDURE GenPUSH* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenPUSH* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		IF (mode = Imme) & (reg = AX) THEN  reg := EAX  END;	(*16bit immediate -> push 32 bit *)
 		Prefix (reg, w);
@@ -380,8 +380,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenPUSH;
 
-	PROCEDURE GenPOP* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenPOP* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -393,8 +393,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenPOP;
 
-	PROCEDURE GenXCHG* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenXCHG* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -411,7 +411,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenXCHG;
 
-	PROCEDURE GenLEA* (disp32: BOOLEAN; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenLEA* (disp32: BOOLEAN; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		(* no prefix necessary, addressing mode is always 32 bit *)
 		IF (reg = base) & (inx = noInx) & (disp = 0) THEN
@@ -421,9 +421,9 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenLEA;
 
-	PROCEDURE GenTyp1* (op, mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
+	PROCEDURE GenTyp1* (op, mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
 	(* general code generator procedure for ADD, ADC, AND, XOR, OR, SBB, SUB, CMP *)
-		VAR w, wImm: SHORTINT;
+		VAR w, wImm: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -461,9 +461,9 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenTyp1;
 
-	PROCEDURE GenGroup3* (op, mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenGroup3* (op, mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	(* generic code generator for NEG, NOT *)
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w); PutByte (0F6H + w);
 		IF mode = Regs THEN PutReg (op, reg)
@@ -471,8 +471,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenGroup3;
 
-	PROCEDURE GenINC* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenINC* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		IF mode = ImmReg THEN
@@ -486,8 +486,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenINC;
 
-	PROCEDURE GenDEC* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenDEC* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		IF mode = ImmReg THEN
@@ -501,17 +501,17 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenDEC;
 
-	PROCEDURE GenMUL* (disp32: BOOLEAN; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenMUL* (disp32: BOOLEAN; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		ASSERT(reg MOD 8 = EAX);	(*EAX or AX or AL *)
 		Prefix(reg, w);
 		PutByte(0F6H + w); PutMem (4, base, inx, scale, disp, disp32)
 	END GenMUL;
 
-	PROCEDURE GenIMUL* (mode: SHORTINT; shortform: BOOLEAN; reg, base, inx: INTEGER; scale: SHORTINT;
+	PROCEDURE GenIMUL* (mode: SIGNED8; shortform: BOOLEAN; reg, base, inx: INTEGER; scale: SIGNED8;
 									disp, imm: LONGINT);
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -543,8 +543,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenIMUL;
 
-	PROCEDURE GenIDIV* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenIDIV* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w); PutByte (0F6H + w);
 		IF mode = RegReg THEN PutReg (7, reg)
@@ -552,9 +552,9 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenIDIV;
 
-	PROCEDURE GenShiftRot* (op, mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
+	PROCEDURE GenShiftRot* (op, mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
 	(* Generates code for ROL, ROR, SAL, SAR, SHL and SHR *)
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w);
 		CASE mode OF
@@ -578,8 +578,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenShiftRot;
 
-	PROCEDURE GenSHDouble* (op, mode: SHORTINT; shortform: BOOLEAN; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-	VAR w : SHORTINT;
+	PROCEDURE GenSHDouble* (op, mode: SIGNED8; shortform: BOOLEAN; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+	VAR w : SIGNED8;
 	BEGIN
 		ASSERT((op = Left) OR (op = Right), 200);
 		Prefix (reg, w);
@@ -601,14 +601,14 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 	END GenSHDouble;
 
 	PROCEDURE GenString* (op, size: INTEGER);
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (size, w);
 		PutByte (op * 2 + w)
 	END GenString;
 
 	PROCEDURE GenRepString* (op, size: INTEGER); (* without REPE CMPS, REPE SCAS *)
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (size, w);
 		PutByte (0F3H); PutByte (op * 2 + w)
@@ -616,14 +616,14 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 
 	PROCEDURE GenRepCmpsScas* (op, size: INTEGER);
 	(* REPE CMPS, REPE SCAS *)
-		VAR w: SHORTINT;
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (size, w);
 		PutByte (0F3H); PutByte (op * 2 + w)
 	END GenRepCmpsScas;
 
-	PROCEDURE GenTEST* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenTEST* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix(reg, w);
 		CASE mode OF
@@ -644,8 +644,8 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenTEST;
 
-	PROCEDURE GenB* (op: SHORTINT; mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp, imm: LONGINT);
-		VAR w: SHORTINT;
+	PROCEDURE GenB* (op: SIGNED8; mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp, imm: LONGINT);
+		VAR w: SIGNED8;
 	BEGIN
 		Prefix (reg, w); PutByte (0FH);
 		CASE mode OF
@@ -661,7 +661,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenB;
 
-	PROCEDURE GenCALL* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenCALL* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	(* no intersegment call implemented yet *)
 	BEGIN
 		IF (mode = Imme) OR (mode = ImmeA) THEN  (* direct call within segment *)
@@ -674,7 +674,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenCALL;
 
-	PROCEDURE GenJMP* (mode: SHORTINT; reg, base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenJMP* (mode: SIGNED8; reg, base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	(* no intersegment jmp implemented yet *)
 	BEGIN
 		IF mode =  Imme THEN (* direct jmp whithin segment *)
@@ -710,7 +710,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenRET;
 
-	PROCEDURE GenJcc* (op: SHORTINT; disp: LONGINT);
+	PROCEDURE GenJcc* (op: SIGNED8; disp: LONGINT);
 	(*
 		jo, jno, jb/jnae, jnb/jae, je/jz, jne/jnz, jbe/jna, jnbe/ja, js, jns, jp/jpe, jnp/jpo, jl/jnge, jnl/jge, jnle/jg
 		disp must lie within the segment!
@@ -723,7 +723,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenJcc;
 
-	PROCEDURE GenSetcc* (op, mode: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenSetcc* (op, mode: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	(*
 		seto, setno, setb/setna, setnb, sete/setz, setne/setnz, setnbe/seta, sets, setns, setp/setpe, setnp/setpo,
 		setl/setnge, setnl/setge, setle/setng, setnle/setg
@@ -751,7 +751,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 
 (* floating point encoding *)
 
-	PROCEDURE GenFLD* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFLD* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fload st(0), st (i) ; st(i) = base *)
@@ -768,7 +768,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenFLD;
 
-	PROCEDURE GenFST* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFST* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fstore st(0), st(i); st(i) = base *)
@@ -779,7 +779,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenFST;
 
-	PROCEDURE GenFSTP* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFSTP* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fstore st(0), st(i); st(i) = base *)
@@ -796,7 +796,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenFSTP;
 
-	PROCEDURE GenFCOM* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFCOM* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fcom st(0), st(i) *)
@@ -807,7 +807,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenFCOM;
 
-	PROCEDURE GenFCOMP* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFCOMP* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			Regs: (* fcomp st(0), st(i) *)
@@ -818,7 +818,7 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenFCOMP;
 
-	PROCEDURE GenFtyp1* (op, mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFtyp1* (op, mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		CASE mode OF
 			RegSt: (* op st, base and pop not possible*)
@@ -833,38 +833,38 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenFtyp1;
 
-	PROCEDURE GenFADD* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFADD* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		GenFtyp1 (0, mode, size, base, inx, scale, disp)
 	END GenFADD;
 
-	PROCEDURE GenFSUB* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFSUB* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		IF (mode = StReg) OR (mode = StRegP) THEN GenFtyp1 (5, mode, size, base, inx, scale, disp)
 		ELSE GenFtyp1 (4, mode, size, base, inx, scale, disp)
 		END
 	END GenFSUB;
 
-	PROCEDURE GenFSUBR* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFSUBR* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		IF (mode = StReg) OR (mode = StRegP) THEN GenFtyp1 (4, mode, size, base, inx, scale, disp)
 		ELSE GenFtyp1 (5, mode, size, base, inx, scale, disp)
 		END
 	END GenFSUBR;
 
-	PROCEDURE GenFMUL* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFMUL* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		GenFtyp1 (1, mode, size, base, inx, scale, disp)
 	END GenFMUL;
 
-	PROCEDURE GenFDIV* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFDIV* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		IF (mode = StReg) OR (mode = StRegP) THEN GenFtyp1 (7, mode, size, base, inx, scale, disp)
 		ELSE GenFtyp1 (6, mode, size, base, inx, scale, disp)
 		END
 	END GenFDIV;
 
-	PROCEDURE GenFDIVR* (mode, size: SHORTINT; base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFDIVR* (mode, size: SIGNED8; base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		IF (mode = StReg) OR (mode = StRegP) THEN GenFtyp1 (6, mode, size, base, inx, scale, disp)
 		ELSE GenFtyp1 (7, mode, size, base, inx, scale, disp)
@@ -901,12 +901,12 @@ MODULE PCO; (** AUTHOR "prk / be"; PURPOSE "Parallel Compiler: Intel 386 code pa
 		END
 	END GenFop1;
 
-	PROCEDURE GenFSTCW* (base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFSTCW* (base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		PutByte (0D9H); PutMem (7, base, inx, scale, disp, FALSE)
 	END GenFSTCW;
 
-	PROCEDURE GenFLDCW* (base, inx: INTEGER; scale: SHORTINT; disp: LONGINT);
+	PROCEDURE GenFLDCW* (base, inx: INTEGER; scale: SIGNED8; disp: LONGINT);
 	BEGIN
 		PutByte (0D9H); PutMem (5, base, inx, scale, disp, FALSE)
 	END GenFLDCW;

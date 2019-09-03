@@ -71,19 +71,19 @@ CONST
 
 TYPE
 	Type*=RECORD
-		form-: SHORTINT; (* SignedInteger, UnsignedInteger or Float *)
+		form-: SIGNED8; (* SignedInteger, UnsignedInteger or Float *)
 		sizeInBits-: INTEGER; (* size in bits *)
 		length-: LONGINT; (* vector length, if any. If zero then type is scalar *)
 	END;
 
 	RegisterClass*=RECORD
-		class-: SHORTINT;
+		class-: SIGNED8;
 		number-: INTEGER;
 	END;
 
 
 	Operand* = RECORD
-		mode-: SHORTINT; (* Undefined, ModeRegister, ModeImmediate, ModeMemory, ModeNumber or ModeString *)
+		mode-: SIGNED8; (* Undefined, ModeRegister, ModeImmediate, ModeMemory, ModeNumber or ModeString *)
 		type-: Type; (* size and form *)
 		register-: SIZE; (* (virtual) register number, equals None if no register *)
 		registerClass-: RegisterClass; (* normal register vs. special registers such as parameter registers *)
@@ -109,8 +109,8 @@ TYPE
 	*)
 
 	Instruction* = POINTER TO RECORD
-		opcode-: SHORTINT; (* instruction opcode *)
-		subtype-: SHORTINT; (* for special backend instruction *)
+		opcode-: SIGNED8; (* instruction opcode *)
+		subtype-: SIGNED8; (* for special backend instruction *)
 		textPosition-: Basic.Position; (* for error handling and tracking (findPC) *)
 		pc-: SIZE; (* backend program counter (in bits) for debugging and for label fixups in backend *)
 		scope-: SyntaxTree.Scope; (* will replace rules *)
@@ -142,7 +142,7 @@ TYPE
 		BEGIN RETURN pc
 		END GetPC;
 
-		PROCEDURE & InitIntermediateSection*(type: SHORTINT; CONST n: Basic.SegmentedName; symbol: SyntaxTree.Symbol; comment: BOOLEAN);
+		PROCEDURE & InitIntermediateSection*(type: SIGNED8; CONST n: Basic.SegmentedName; symbol: SyntaxTree.Symbol; comment: BOOLEAN);
 		BEGIN
 			InitSection(type,n,symbol); (*InitArray;*) pc := 0; resolved := NIL;
 			IF comment THEN NEW(comments,GetPC) ELSE comments := NIL END;
@@ -398,7 +398,7 @@ TYPE
 		- if the section already exists, reuse the existing section
 		note: for compatibility with the old binary object file format, const sections can also be referred to as var sections
 	**)
-	PROCEDURE NewSection*(list: Sections.SectionList; type: SHORTINT; CONST name: Basic.SegmentedName; syntaxTreeSymbol: SyntaxTree.Symbol; dump: BOOLEAN): Section;
+	PROCEDURE NewSection*(list: Sections.SectionList; type: SIGNED8; CONST name: Basic.SegmentedName; syntaxTreeSymbol: SyntaxTree.Symbol; dump: BOOLEAN): Section;
 	VAR
 		result: Sections.Section;
 		section: Section;
@@ -741,7 +741,7 @@ TYPE
 
 	PROCEDURE InitInstructions;
 
-		PROCEDURE AddFormat(opcode: SHORTINT; CONST name: ARRAY OF CHAR; op1,op2,op3: SET; flags: SET);
+		PROCEDURE AddFormat(opcode: SIGNED8; CONST name: ARRAY OF CHAR; op1,op2,op3: SET; flags: SET);
 		BEGIN
 			COPY(name,instructionFormat[opcode].name);
 			instructionFormat[opcode].op1 := op1;
@@ -834,7 +834,7 @@ TYPE
 		AddFormat(special,"special",Any, Any, Any, {} );
 	END InitInstructions;
 
-	PROCEDURE InitInstruction*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SHORTINT; CONST op1,op2,op3: Operand);
+	PROCEDURE InitInstruction*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SIGNED8; CONST op1,op2,op3: Operand);
 	VAR format: InstructionFormat; mode1, mode2, mode3: LONGINT; (* debugging *)
 	BEGIN
 		IF instr = NIL THEN NEW(instr) END;
@@ -859,22 +859,22 @@ TYPE
 		instr.textPosition := textPosition;
 	END InitInstruction;
 
-	PROCEDURE InitInstruction2*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SHORTINT; op1,op2: Operand);
+	PROCEDURE InitInstruction2*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SIGNED8; op1,op2: Operand);
 	BEGIN
 		InitInstruction(instr, textPosition, opcode, op1, op2, empty);
 	END InitInstruction2;
 
-	PROCEDURE InitInstruction1*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SHORTINT; op1: Operand);
+	PROCEDURE InitInstruction1*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SIGNED8; op1: Operand);
 	BEGIN
 		InitInstruction(instr, textPosition, opcode, op1, empty, empty);
 	END InitInstruction1;
 
-	PROCEDURE InitInstruction0*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SHORTINT);
+	PROCEDURE InitInstruction0*(VAR instr: Instruction; textPosition: Basic.Position; opcode: SIGNED8);
 	BEGIN
 		InitInstruction(instr, textPosition, opcode, empty, empty, empty);
 	END InitInstruction0;
 
-	PROCEDURE SetSubType*(VAR instr: Instruction; subType: SHORTINT);
+	PROCEDURE SetSubType*(VAR instr: Instruction; subType: SIGNED8);
 	BEGIN
 		instr.subtype := subType
 	END SetSubType;
@@ -1040,7 +1040,7 @@ TYPE
 	BEGIN InitString(op,string); RETURN op
 	END String;
 
-	PROCEDURE InitType*(VAR type: Type; form: SHORTINT; sizeInBits: INTEGER);
+	PROCEDURE InitType*(VAR type: Type; form: SIGNED8; sizeInBits: INTEGER);
 	BEGIN type.form := form; type.sizeInBits := sizeInBits; type.length := 1;
 	END InitType;
 
@@ -1053,7 +1053,7 @@ TYPE
 		RETURN (op.mode = ModeRegister) & (op.type.length > 1);
 	END IsVectorRegister;
 
-	PROCEDURE InitRegisterClass*(VAR registerClass: RegisterClass; class: SHORTINT; number: SIZE);
+	PROCEDURE InitRegisterClass*(VAR registerClass: RegisterClass; class: SIGNED8; number: SIZE);
 	BEGIN registerClass.class := class; registerClass.number := INTEGER(number)
 	END InitRegisterClass;
 
@@ -1061,7 +1061,7 @@ TYPE
 	BEGIN registerClass.class := Parameter; registerClass.number := INTEGER(number)
 	END InitParameterRegisterClass;
 
-	PROCEDURE NewType*(form: SHORTINT; sizeInBits: INTEGER): Type;
+	PROCEDURE NewType*(form: SIGNED8; sizeInBits: INTEGER): Type;
 	VAR type: Type;
 	BEGIN InitType(type, form, sizeInBits); RETURN type
 	END NewType;
@@ -1072,8 +1072,8 @@ TYPE
 
 	(** assembler related part *)
 
-	PROCEDURE FindMnemonic*(CONST name: ARRAY OF CHAR): SHORTINT;
-	VAR i: SHORTINT;
+	PROCEDURE FindMnemonic*(CONST name: ARRAY OF CHAR): SIGNED8;
+	VAR i: SIGNED8;
 	BEGIN
 		FOR i := 0 TO NofOpcodes-1 DO
 			IF name = instructionFormat[i].name THEN
@@ -1145,7 +1145,7 @@ TYPE
 		ELSIF bits=16 THEN RETURN uint16
 		ELSIF bits=32 THEN RETURN uint32
 		ELSIF bits=64 THEN RETURN uint64
-		ELSE RETURN NewType(UnsignedInteger, SHORTINT(bits))
+		ELSE RETURN NewType(UnsignedInteger, SIGNED8(bits))
 		END;
 	END UnsignedIntegerType;
 
@@ -1155,7 +1155,7 @@ TYPE
 		ELSIF bits=16 THEN RETURN int16
 		ELSIF bits=32 THEN RETURN int32
 		ELSIF bits=64 THEN RETURN int64
-		ELSE RETURN NewType(SignedInteger, SHORTINT(bits))
+		ELSE RETURN NewType(SignedInteger, SIGNED8(bits))
 		END;
 	END SignedIntegerType;
 
@@ -1163,7 +1163,7 @@ TYPE
 	BEGIN
 		IF bits=32 THEN RETURN float32
 		ELSIF bits=64 THEN RETURN float64
-		ELSE  RETURN NewType(Float, SHORTINT(bits))
+		ELSE  RETURN NewType(Float, SIGNED8(bits))
 		END;
 	END FloatType;
 

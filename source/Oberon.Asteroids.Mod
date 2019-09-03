@@ -157,7 +157,7 @@ TYPE
 	Ship = POINTER TO ShipDesc;
 	ShipDesc = RECORD(FlyingObjDesc)
 		thrust0,thrust: BOOLEAN;
-		shield0,shield: SHORTINT;
+		shield0,shield: SIGNED8;
 		shieldval,warpval: INTEGER;
 		shape0: Shape;
 		px2,py2: Vertices;

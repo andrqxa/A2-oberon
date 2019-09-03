@@ -1412,7 +1412,7 @@ TYPE
 
 		PROCEDURE ProcessShortEntry(shortEntry: ShortEntry);
 		VAR
-			counter : SHORTINT;
+			counter : SIGNED8;
 			clusterCount : LONGINT;
 			link, oldlink : LONGINT;
 			fragments : LONGINT;

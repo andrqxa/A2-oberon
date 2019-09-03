@@ -746,7 +746,7 @@ BEGIN
 END WatchARP;
 
 PROCEDURE WriteTCP(p: TCP.Connection);
-VAR name: ARRAY 64 OF CHAR; i: SHORTINT;
+VAR name: ARRAY 64 OF CHAR; i: SIGNED8;
 BEGIN
 	WriteIPPortAdr(w, p.int.localAdr, p.lport); WriteIPPortAdr(w, p.fip, p.fport);
 	CASE p.state OF

@@ -14,7 +14,7 @@ TYPE
 		index: SIZE;
 	END;
 
-	Int1 = SHORTINT;
+	Int1 = SIGNED8;
 	Int2 = INTEGER;
 	Int4 = LONGINT;
 	Int8 = HUGEINT;
@@ -133,7 +133,7 @@ TYPE
 		trace: Streams.Writer;
 		module: Sections.Module;
 
-		PROCEDURE &InitInterpreter (backend: InterpreterBackend; addressSize: SHORTINT; m: Sections.Module);
+		PROCEDURE &InitInterpreter (backend: InterpreterBackend; addressSize: SIGNED8; m: Sections.Module);
 		BEGIN SELF.backend := backend; pc.section := NIL; pc.index := 0; sp := backend.heap.Allocate (StackSize) + StackSize; fp := sp;
 			addressType := Intermediate.NewType (Intermediate.UnsignedInteger, addressSize);
 			NEW (trace, Trace.Send, 1);

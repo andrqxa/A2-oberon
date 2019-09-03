@@ -68,7 +68,7 @@ TYPE
 		x*: REAL;
 		y*: LONGREAL;
 		c*: CHAR;
-		len*: SHORTINT;
+		len*: SIGNED8;
 		s*: ARRAY MaxLen OF CHAR;
 		o*: Objects.Object;
 	END ;
@@ -217,7 +217,7 @@ END OpenScanner;
     CONST maxD = 32;
     VAR ch, E: CHAR;
       neg, negE, hex, old: BOOLEAN;
-      i, j, h: SHORTINT;
+      i, j, h: SIGNED8;
       e: INTEGER; k: LONGINT;
       y: LONGREAL;
       d: ARRAY maxD OF CHAR;

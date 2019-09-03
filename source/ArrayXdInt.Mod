@@ -66,7 +66,7 @@ TYPE
 			StoreXd( W, TRUE )
 		END Write;
 
-		PROCEDURE Type*( ): SHORTINT;
+		PROCEDURE Type*( ): SIGNED8;
 		(* generic, vector, matrix, cube, hcube *)
 		BEGIN
 			IF dim < 5 THEN RETURN SHORT( SHORT( dim ) ) ELSE RETURN 0 END;
@@ -783,7 +783,7 @@ TYPE
 																		ArrayXdBytes.Index4( lenx, leny, lenz, lent ) );
 	END CopyHCubeToArray;
 
-	PROCEDURE CopyArrayToArrayPartB*( src: Array;  dest: ArrayXdBytes.ArrayMemoryStructure;  boundaryCondition: SHORTINT;
+	PROCEDURE CopyArrayToArrayPartB*( src: Array;  dest: ArrayXdBytes.ArrayMemoryStructure;  boundaryCondition: SIGNED8;
 																srcpos, srclen, destpos, destlen: ArrayXdBytes.IndexArray );
 
 	VAR temp: ArrayXdBytes.ArrayMemoryStructure;
@@ -1125,7 +1125,7 @@ TYPE
 
 (* The procedures needed to register an arbitrary Array so that its instances can be made persistent. *)
 	PROCEDURE LoadArray( R: DataIO.Reader;  VAR obj: OBJECT );
-	VAR a: Array;  version: SHORTINT;  ver: NbrInt.Integer;
+	VAR a: Array;  version: SIGNED8;  ver: NbrInt.Integer;
 	BEGIN
 		R.RawSInt( version );
 		IF version = -1 THEN

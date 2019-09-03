@@ -20,12 +20,12 @@ MODULE LeoOutliners IN Oberon; (** portable **)	(* eos  *)
 		Outliner* = POINTER TO OutlinerDesc;
 		OutlinerDesc* = RECORD (LeoPens.WidePenDesc)
 			base*: LeoPens.Pen;	(** pen for rendering outline **)
-			mode*: SHORTINT;	(** outline mode **)
+			mode*: SIGNED8;	(** outline mode **)
 		END;
 
 		Arrow* = POINTER TO ArrowDesc;
 		ArrowDesc* = RECORD (OutlinerDesc)
-			dir*: SHORTINT;	(** arrow direction **)
+			dir*: SIGNED8;	(** arrow direction **)
 			len*: REAL;	(** arrow length **)
 			coff*, cdist*: REAL;	(** corner offset and distance **)
 			bdist, edist, length: LeoPens.DistArray;
@@ -284,7 +284,7 @@ MODULE LeoOutliners IN Oberon; (** portable **)	(* eos  *)
 		END
 	END HandleOutliner;
 
-	PROCEDURE InitOutliner* (pen: Outliner; base: LeoPens.Pen; width: REAL; mode: SHORTINT);
+	PROCEDURE InitOutliner* (pen: Outliner; base: LeoPens.Pen; width: REAL; mode: SIGNED8);
 	BEGIN
 		ASSERT(base # NIL, 100);
 		ASSERT((outlined <= mode) & (mode <= right), 101);
@@ -466,7 +466,7 @@ MODULE LeoOutliners IN Oberon; (** portable **)	(* eos  *)
 		END
 	END HandleArrow;
 
-	PROCEDURE InitArrow* (pen: Arrow; base: LeoPens.Pen; dir, mode: SHORTINT; len, coff, cdist, w: REAL);
+	PROCEDURE InitArrow* (pen: Arrow; base: LeoPens.Pen; dir, mode: SIGNED8; len, coff, cdist, w: REAL);
 	BEGIN
 		ASSERT(base # NIL, 100);
 		InitOutliner(pen, base, w, mode);

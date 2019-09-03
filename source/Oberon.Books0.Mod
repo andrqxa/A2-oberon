@@ -28,7 +28,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 		(* invisible Gadgets for links, notes & calls *)
 			(* abstract base type *)
 		FrameDesc* = RECORD (Gadgets.FrameDesc)
-			mode*: SHORTINT
+			mode*: SIGNED8
 		END;
 			(* local to a given tutorial *)
 		LocFrameDesc* = RECORD (FrameDesc)
@@ -53,7 +53,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 			frame*: Frame;
 			book*: ImpList;
 			name*: ARRAY identLen OF CHAR;
-			mode*: SHORTINT;
+			mode*: SIGNED8;
 			pos1*, pos2*: LONGINT;
 			next*: ExtLabel
 		END;
@@ -66,7 +66,7 @@ MODULE Books0 IN Oberon; (** portable *)	(* ejz  *)
 
 		(* contents-Gadget *)
 		ContElemDesc* = RECORD (Gadgets.FrameDesc)
-			mode*: SHORTINT;
+			mode*: SIGNED8;
 			beg*, end*: LONGINT;
 			col: INTEGER;
 		END;

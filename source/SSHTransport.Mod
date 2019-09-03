@@ -34,7 +34,7 @@ TYPE
 
 	Connection* = OBJECT
 			VAR
-				state-: SHORTINT;
+				state-: SIGNED8;
 				tcp: TCP.Connection;
 				servername: ARRAY 128 OF CHAR;
 				cvers, svers: ARRAY 260 OF CHAR;  (* string *)
@@ -50,7 +50,7 @@ TYPE
 						(* pending security state: *)
 						incipher, outcipher: Ciphers.Cipher;
 						inkeybits, outkeybits: LONGINT;		(* cipher keybits *)
-						inmode, outmode: SHORTINT;		(* cipher modes *)
+						inmode, outmode: SIGNED8;		(* cipher modes *)
 						inmac, outmac: HMAC.HMac;
 						inmaclen, outmaclen: LONGINT;
 					END;
@@ -240,7 +240,7 @@ TYPE
 				END SendDebug;
 
 
-				PROCEDURE Disconnect*( reason: SHORTINT;  CONST msg: ARRAY  OF CHAR );
+				PROCEDURE Disconnect*( reason: SIGNED8;  CONST msg: ARRAY  OF CHAR );
 				VAR packet: Packet;
 				BEGIN
 					IF state > Closed THEN
@@ -273,12 +273,12 @@ TYPE
 				PROCEDURE NegotiateAlgorythms;
 				VAR
 					p, len: SIZE;
-					l, n: LONGINT;  kex: SHORTINT;
+					l, n: LONGINT;  kex: SIGNED8;
 					buf: ARRAY 4096 OF CHAR;
 					x, m: ARRAY 512 OF CHAR;  lbuf: ARRAY 4 OF CHAR;
 					cipher: Ciphers.Cipher; keybits, maclen: LONGINT;
 					modname: ARRAY 32 OF CHAR;
-					mode: SHORTINT;
+					mode: SIGNED8;
 					mac: HMAC.HMac;
 					sha1: SHA1.Hash;
 					packet: Packet;

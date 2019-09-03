@@ -709,7 +709,7 @@ END WriteProc;
 PROCEDURE Variables(refs: Bytes;  i: SIZE; base: LONGINT);
 VAR
 	mode, ch: CHAR;  m, tmp1: SIZE; adr, type, n, lval, size, tmp2, tdadr: LONGINT;  etc: BOOLEAN;
-	sval: SHORTINT;  ival: INTEGER;  tmp: Bytes;  set: SET;
+	sval: SIGNED8;  ival: INTEGER;  tmp: Bytes;  set: SET;
 	rval: REAL;  lrval: LONGREAL;
 BEGIN
 	m := LEN(refs^);  mode := refs[i];  INC(i);
@@ -772,7 +772,7 @@ BEGIN
 							ELSIF ch = 1X THEN Texts.WriteString(W, "TRUE")
 							ELSE Texts.WriteInt(W, ORD(ch), 1)
 							END
-						|4:	(* SHORTINT *)
+						|4:	(* SIGNED8 *)
 							SYSTEM.GET(adr, sval);  Texts.WriteInt(W, sval, 1)
 						|5:	(* INTEGER *)
 							SYSTEM.GET(adr, ival);  Texts.WriteInt(W, ival, 1)

@@ -495,7 +495,7 @@ CONST
 	END InitInstruction;
 
 	(* generate immediate operand with fixup *)
-	PROCEDURE InitFixup*(VAR operand: Operand; bits: SHORTINT; fixup: BinaryCode.Fixup (*symbol: Sections.Section; offset, displacement: LONGINT *));
+	PROCEDURE InitFixup*(VAR operand: Operand; bits: SIGNED8; fixup: BinaryCode.Fixup (*symbol: Sections.Section; offset, displacement: LONGINT *));
 	BEGIN
 		operand.mode := modeImmediate;
 		operand.immediate := 0;
@@ -966,7 +966,7 @@ CONST
 			NEONRegisterPos: ARRAY 5 OF INTEGER;
 
 			PROCEDURE Fixup(from, to: LONGINT);
-			VAR patterns: ObjectFile.FixupPatterns; displacement: LONGINT; mode: SHORTINT;
+			VAR patterns: ObjectFile.FixupPatterns; displacement: LONGINT; mode: SIGNED8;
 			BEGIN
 				NEW(patterns, 1);
 				patterns[0].offset := from; patterns[0].bits := to-from+1;

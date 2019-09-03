@@ -245,7 +245,7 @@ MODULE GfxImages; (** non-portable *)	(* eos  **)
 	END LinearVScale;
 
 	(** initialize filter with compositing operation and transformation procedures **)
-	PROCEDURE InitFilter* (VAR filter: Filter; op: SHORTINT; hshift, vshift: ShiftProc; hscale, vscale: ScaleProc);
+	PROCEDURE InitFilter* (VAR filter: Filter; op: SIGNED8; hshift, vshift: ShiftProc; hscale, vscale: ScaleProc);
 	BEGIN
 		Raster.InitMode(filter, op);
 		filter.hshift := hshift; filter.vshift := vshift;

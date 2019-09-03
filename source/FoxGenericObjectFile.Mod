@@ -174,17 +174,17 @@ TYPE
 
 					IF codeSection # NIL THEN
 						UpdateAliases (codeSection, fingerprinter);
-						irSection := IntermediateCode.NewSection(sections, SHORTINT(codeSection.os.type), codeSection.os.identifier.name, NIL, FALSE);
+						irSection := IntermediateCode.NewSection(sections, SIGNED8(codeSection.os.type), codeSection.os.identifier.name, NIL, FALSE);
 						irSection.SetResolved(codeSection);
 					END;
 					IF dataSection # NIL THEN
 						UpdateAliases (dataSection, fingerprinter);
-						irSection := IntermediateCode.NewSection(sections, SHORTINT(dataSection.os.type), dataSection.os.identifier.name, NIL, FALSE);
+						irSection := IntermediateCode.NewSection(sections, SIGNED8(dataSection.os.type), dataSection.os.identifier.name, NIL, FALSE);
 						irSection.SetResolved(dataSection);
 					END;
 					IF constSection # NIL THEN
 						UpdateAliases (constSection, fingerprinter);
-						irSection := IntermediateCode.NewSection(sections, SHORTINT(constSection.os.type), constSection.os.identifier.name, NIL, FALSE);
+						irSection := IntermediateCode.NewSection(sections, SIGNED8(constSection.os.type), constSection.os.identifier.name, NIL, FALSE);
 						irSection.SetResolved(constSection);
 					END;
 
@@ -613,9 +613,9 @@ TYPE
 					WHILE reader.Peek () # 0X DO
 						ObjectFile.InitSection(section);
 						ObjectFile.ReadSection (reader, section, binary, poolMap);
-						NEW(bs, SHORTINT(section.type) ,section.unit,name, FALSE, FALSE);
+						NEW(bs, SIGNED8(section.type) ,section.unit,name, FALSE, FALSE);
 						bs.os := section;
-						NEW(is, SHORTINT(bs.os.type),  bs.os.identifier.name,NIL, FALSE);
+						NEW(is, SIGNED8(bs.os.type),  bs.os.identifier.name,NIL, FALSE);
 						is.SetResolved(bs);
 						sectionList.AddSection(is);
 						reader.SkipWhitespace;

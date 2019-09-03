@@ -1489,10 +1489,10 @@ g) Static array as return type of a function
 	END BuiltInEl;
 
 	FunCall* = OBJECT (Expression)
-		VAR	proc*: Designator;  params*: ExprList;  curLevel: SHORTINT;
+		VAR	proc*: Designator;  params*: ExprList;  curLevel: SIGNED8;
 
 		PROCEDURE Emit*(code: PCC.Code; VAR i: PCC.Item);
-		VAR  lev: SHORTINT;  pos: LONGINT;  p: AnyProc;  scope: PCT.Scope;
+		VAR  lev: SIGNED8;  pos: LONGINT;  p: AnyProc;  scope: PCT.Scope;
 		cparams: PCT.Parameter; cpsize, gap: LONGINT;	(* fld *)
 		BEGIN
 			pos := SELF.pos;
@@ -1524,7 +1524,7 @@ g) Static array as return type of a function
 			IF TraceEmit THEN DebugLeave(aFunCall) END
 		END Emit;
 
-		PROCEDURE & InitF*(pos: LONGINT; proc: Designator;  params: ExprList;  curLevel: SHORTINT);
+		PROCEDURE & InitF*(pos: LONGINT; proc: Designator;  params: ExprList;  curLevel: SIGNED8);
 		VAR p: PCT.Parameter;  ret: PCT.Struct;
 		BEGIN
 			IF GetProcedureInfo(proc, p, ret) THEN
@@ -1658,7 +1658,7 @@ g) Static array as return type of a function
 
 	(**basic designators*)
 	Var* = OBJECT (Designator)
-		VAR obj*: PCT.Variable;  deltaLevel: SHORTINT;
+		VAR obj*: PCT.Variable;  deltaLevel: SIGNED8;
 
 		(** fof 070731  >> *)
 		PROCEDURE Written;
@@ -1681,7 +1681,7 @@ g) Static array as return type of a function
 			IF TraceEmit THEN DebugLeave(aVar) END
 		END Emit;
 
-		PROCEDURE & InitD*(pos: LONGINT; obj: PCT.Variable;  curLevel: SHORTINT;  readonly: BOOLEAN);
+		PROCEDURE & InitD*(pos: LONGINT; obj: PCT.Variable;  curLevel: SIGNED8;  readonly: BOOLEAN);
 		BEGIN
 			SELF.obj := obj; SELF.readonly := readonly;
 			Init(pos, obj.type);
@@ -3188,11 +3188,11 @@ END RealtimeCompatible;
 			END;
 
 			(* create *)
-			IF type = PCT.Int8 THEN	exp := NewIntValue(pos, SYSTEM.VAL(SHORTINT, buf), type)
+			IF type = PCT.Int8 THEN	exp := NewIntValue(pos, SYSTEM.VAL(SIGNED8, buf), type)
 			ELSIF type = PCT.Int16  THEN	 exp := NewIntValue(pos, SYSTEM.VAL(INTEGER, buf), type)
 			ELSIF type = PCT.Int32  THEN	exp := NewIntValue(pos, buf, type)
 			ELSIF type = PCT.Int64  THEN	exp := NewIntValue(pos, buf, type)
-			ELSIF type = PCT.Char8  THEN	exp := NewIntValue(pos, SYSTEM.VAL(SHORTINT, buf), PCT.Char8)
+			ELSIF type = PCT.Char8  THEN	exp := NewIntValue(pos, SYSTEM.VAL(SIGNED8, buf), PCT.Char8)
 			ELSIF type = PCT.Float32  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(REAL, buf), PCT.Float32)
 			ELSIF type = PCT.Float64  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(LONGREAL, buf), PCT.Float64)
 			ELSIF type = PCT.Set  THEN	exp := NewSetValue(pos, SYSTEM.VAL(SET, buf))
@@ -3218,7 +3218,7 @@ END RealtimeCompatible;
 		END
 	END RevertExprList;
 
-	PROCEDURE NewFuncCall*(pos: LONGINT; proc: Designator;  params: ExprList;  curlevel: SHORTINT): Expression;
+	PROCEDURE NewFuncCall*(pos: LONGINT; proc: Designator;  params: ExprList;  curlevel: SIGNED8): Expression;
 		VAR fc: FunCall; type: PCT.Struct; fnr: LONGINT; first,r (* fof *): Expression;
 	BEGIN
 		IF IsInvalid(proc) OR IsInvalid(params) THEN RETURN InvalidExpr END;
@@ -3236,7 +3236,7 @@ END RealtimeCompatible;
 						IF type=PCT.Char8 THEN RETURN NewIntValue(pos, ORD(MAX(CHAR)), PCT.Char8)
 						ELSIF type=PCT.Char16 THEN RETURN NewIntValue(pos, 0FFFFH, PCT.Char16)
 						ELSIF type=PCT.Char32 THEN RETURN NewIntValue(pos, LONGINT(0FFFFFFFFH), PCT.Char32)
-						ELSIF type=PCT.Int8 THEN RETURN NewIntValue(pos, MAX(SHORTINT), type)
+						ELSIF type=PCT.Int8 THEN RETURN NewIntValue(pos, MAX(SIGNED8), type)
 						ELSIF type=PCT.Int16 THEN RETURN NewIntValue(pos, MAX(INTEGER), type)
 						ELSIF type=PCT.Int32 THEN RETURN NewIntValue(pos, MAX(LONGINT), type)
 (* > bootstrap 1 *)
@@ -3257,7 +3257,7 @@ END RealtimeCompatible;
 						IF type=PCT.Char8 THEN RETURN NewIntValue(pos, ORD(MIN(CHAR)), PCT.Char8)
 						ELSIF type=PCT.Char16 THEN RETURN NewIntValue(pos, 0H, PCT.Char16)
 						ELSIF type=PCT.Char32 THEN RETURN NewIntValue(pos, 0H, PCT.Char32)
-						ELSIF type=PCT.Int8 THEN RETURN NewIntValue(pos, MIN(SHORTINT), type)
+						ELSIF type=PCT.Int8 THEN RETURN NewIntValue(pos, MIN(SIGNED8), type)
 						ELSIF type=PCT.Int16 THEN RETURN NewIntValue(pos, MIN(INTEGER), type)
 						ELSIF type=PCT.Int32 THEN RETURN NewIntValue(pos, MIN(LONGINT), type)
 (* > bootstrap 1 *)
@@ -3993,7 +3993,7 @@ END RealtimeCompatible;
 
 
 	PROCEDURE MakeNode*(pos: LONGINT; scope: PCT.Scope; obj: PCT.Symbol): Designator;
-	VAR	v: Var; s: SProc; t: Type; self: Designator; selfo: PCT.Symbol;  level: SHORTINT; d: Designator; ss: PCT.Scope;
+	VAR	v: Var; s: SProc; t: Type; self: Designator; selfo: PCT.Symbol;  level: SIGNED8; d: Designator; ss: PCT.Scope;
 		ap: AnyProc;
 		c: ConstDesignator;   (** fof  *)
 	BEGIN
@@ -4339,7 +4339,7 @@ END RealtimeCompatible;
 	PROCEDURE CallSProc(code: PCC.Code;  suppress: BOOLEAN;  pos, fnr: LONGINT;  params: BuiltInEl);
 		VAR tmp: Const;
 			i, j, k: PCC.Item; l: PCC.Label; type: PCT.Struct;  c, size, openDims: LONGINT;  par0, par1: Expression;
-			rec: PCT.Record;  init: PCT.Method; reg: SHORTINT;
+			rec: PCT.Record;  init: PCT.Method; reg: SIGNED8;
 (** fof >> *)
 			left, right, dest: Expression;  lbase, rbase, dbase: PCT.Struct; t: PCT.Struct;  temp1: Expression;
 (** << fof  *)
@@ -4714,7 +4714,7 @@ END RealtimeCompatible;
 	END CheckForCParams;
 
 
-	PROCEDURE MakeCall(code: PCC.Code;  proc: Designator;  p: PCT.Proc;  pars: ExprList;  curlevel: SHORTINT; extC: BOOLEAN);	(* fld *)
+	PROCEDURE MakeCall(code: PCC.Code;  proc: Designator;  p: PCT.Proc;  pars: ExprList;  curlevel: SIGNED8; extC: BOOLEAN);	(* fld *)
 		VAR scope: PCT.ProcScope;  i: PCC.Item;cparams: PCT.Parameter; cpsize, gap: LONGINT;	(* fld *)
 	BEGIN
 		CheckForCParams( proc, cparams, cpsize );	(* fld *)
@@ -4743,7 +4743,7 @@ END RealtimeCompatible;
 		PCC.RestoreRegisters(code);
 	END MakeCall;
 
-	PROCEDURE CallProc*(code: PCC.Code;  suppress: BOOLEAN;  proc: Designator;  params: ExprList;  curlevel: SHORTINT);
+	PROCEDURE CallProc*(code: PCC.Code;  suppress: BOOLEAN;  proc: Designator;  params: ExprList;  curlevel: SIGNED8);
 	VAR p: PCT.Proc;  ret: PCT.Struct; winapi: BOOLEAN;
 	BEGIN
 		IF IsInvalid(proc) OR  IsInvalid(params.first) THEN RETURN END;

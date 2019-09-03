@@ -22,7 +22,7 @@ TYPE
 	StringType* = Strings.String;
 	IdentifierType* = StringPool.Index;
 	IdentifierString*= ARRAY MaxIdentifierLength+1 OF CHAR;
-	SubType*= SHORTINT;
+	SubType*= SIGNED8;
 
 CONST
 

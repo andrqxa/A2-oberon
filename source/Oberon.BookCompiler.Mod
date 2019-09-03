@@ -360,7 +360,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 	END DefCallGadgets;
 
 (* mark the given text-stretch with the correct (mode) color and font (if ft) *)
-	PROCEDURE MarkText(T: Texts.Text; beg, end: LONGINT; mode: SHORTINT; ft: BOOLEAN);
+	PROCEDURE MarkText(T: Texts.Text; beg, end: LONGINT; mode: SIGNED8; ft: BOOLEAN);
 	BEGIN
 		IF ft THEN
 			CASE mode OF
@@ -564,7 +564,7 @@ MODULE BookCompiler IN Oberon;	(** portable *)
 		END
 	END Compare;
 
-	PROCEDURE DefIndex(pos: LONGINT; mode: SHORTINT);
+	PROCEDURE DefIndex(pos: LONGINT; mode: SIGNED8);
 		VAR
 			n, cur, prev: Node;
 			res: INTEGER;

@@ -17,9 +17,9 @@ TYPE
 		low*: UNSIGNED32; high*: SIGNED32;
 	END;
 
-	PROCEDURE DivS8*(left, right: SHORTINT): SHORTINT;
+	PROCEDURE DivS8*(left, right: SIGNED8): SIGNED8;
 	VAR result, dummy: LONGINT;
-	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, result, dummy); RETURN SHORTINT(result)
+	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, result, dummy); RETURN SIGNED8(result)
 	END DivS8;
 
 	PROCEDURE DivS16*(left, right: INTEGER): INTEGER;
@@ -42,9 +42,9 @@ TYPE
 	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS64(left, right, result, dummy); RETURN result
 	END DivS64;
 
-	PROCEDURE ModS8*(left, right: SHORTINT): SHORTINT;
+	PROCEDURE ModS8*(left, right: SIGNED8): SIGNED8;
 	VAR result, dummy: LONGINT;
-	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, dummy, result); RETURN SHORTINT(result)
+	BEGIN {UNCOOPERATIVE, UNCHECKED} DivModS32(left, right, dummy, result); RETURN SIGNED8(result)
 	END ModS8;
 
 	PROCEDURE ModS16*(left, right: INTEGER): INTEGER;
@@ -421,13 +421,13 @@ TYPE
 	END ConvF32S16;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE ConvF32S8*(x: SHORTINT): FLOAT32;
+	PROCEDURE ConvF32S8*(x: SIGNED8): FLOAT32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		RETURN ConvF32S16(INTEGER(x))
 	END ConvF32S8;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE ConvF64S8*(x: SHORTINT): FLOAT64;
+	PROCEDURE ConvF64S8*(x: SIGNED8): FLOAT64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		RETURN ConvF64S16(INTEGER(x))
 	END ConvF64S8;
@@ -578,9 +578,9 @@ TYPE
 	- returns +1 if 'left' is lexicographically greater than 'right'
 	- returns -1 if 'left' is lexicographically less than 'right'
 	**)
-	PROCEDURE CompareString*(CONST left, right: ARRAY OF CHAR): SHORTINT;
+	PROCEDURE CompareString*(CONST left, right: ARRAY OF CHAR): SIGNED8;
 	VAR
-		result: SHORTINT;
+		result: SIGNED8;
 		i: LONGINT;
 		leftChar, rightChar: CHAR;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}

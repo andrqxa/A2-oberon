@@ -837,7 +837,7 @@ END GetSelection;
 PROCEDURE CopyStretch(text: Texts.Text; beg, end: LONGINT; VAR W: Texts.Writer; F: Frame);
 	VAR
 		R: Texts.Finder; obj, new: Objects.Object; M: Objects.CopyMsg;
-		r: Texts.Reader; ch: CHAR; col, voff: SHORTINT;
+		r: Texts.Reader; ch: CHAR; col, voff: SIGNED8;
 BEGIN
 	col := W.col; voff := W.voff;
 	IF end > text.len THEN end := text.len END;
@@ -1296,8 +1296,8 @@ BEGIN
 	END
 END Edit;
 
-PROCEDURE Right*(F: Frame; nbr: SHORTINT);
-VAR text: Texts.Text; beg, end, fLine, lLine: LONGINT; nr: SHORTINT; R: Texts.Reader; ch, dh: CHAR;
+PROCEDURE Right*(F: Frame; nbr: SIGNED8);
+VAR text: Texts.Text; beg, end, fLine, lLine: LONGINT; nr: SIGNED8; R: Texts.Reader; ch, dh: CHAR;
 	tW: Texts.Writer;
 
 	PROCEDURE AdjustFont(VAR W: Texts.Writer; VAR R: Texts.Reader);
@@ -1324,8 +1324,8 @@ BEGIN
 	END
 END Right;
 
-PROCEDURE Left*(F: Frame; nbr: SHORTINT);
-VAR text: Texts.Text; beg, end, fLine, lLine: LONGINT; nr: SHORTINT;
+PROCEDURE Left*(F: Frame; nbr: SIGNED8);
+VAR text: Texts.Text; beg, end, fLine, lLine: LONGINT; nr: SIGNED8;
 
 	PROCEDURE IsCh(T: Texts.Text; pos: LONGINT): BOOLEAN;
 	(* tests if character in text T at position pos is a tabulator or space *)

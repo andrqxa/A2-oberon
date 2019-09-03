@@ -46,7 +46,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 		ElemBlock = POINTER TO ElemBlockDesc;
 		ElemBlockDesc = RECORD
 			next: ElemBlock;
-			elem: ARRAY ElemBlockSize OF SHORTINT;
+			elem: ARRAY ElemBlockSize OF SIGNED8;
 			coords: INTEGER;
 		END;
 
@@ -148,12 +148,12 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 
 
 	VAR
-		Coords: ARRAY Exit+1 OF SHORTINT;	(* number of coordinate pairs for each element type *)
+		Coords: ARRAY Exit+1 OF SIGNED8;	(* number of coordinate pairs for each element type *)
 
 
 	(**--- Path Construction ---**)
 
-	PROCEDURE AddElem (path: Path; elem: SHORTINT);
+	PROCEDURE AddElem (path: Path; elem: SIGNED8);
 		VAR elems: INTEGER; eb: ElemBlock;
 	BEGIN
 		elems := path.elems MOD ElemBlockSize;
@@ -237,7 +237,7 @@ MODULE GfxPaths IN Oberon; (** portable *)	(* eos  *)
 
 	(** append one path to another **)
 	PROCEDURE Append* (to, from: Path);
-		VAR pos, epos, cpos, n: INTEGER; eb: ElemBlock; cb: CoordBlock; elem: SHORTINT;
+		VAR pos, epos, cpos, n: INTEGER; eb: ElemBlock; cb: CoordBlock; elem: SIGNED8;
 	BEGIN
 		pos := 0; epos := 0; cpos := 0; eb := from.firstEB; cb := from.firstCB;
 		WHILE pos < from.elems DO

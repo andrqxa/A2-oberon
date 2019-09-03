@@ -668,7 +668,7 @@ TYPE
 		BEGIN  w.Bytes(x,ofs,len);
 		END Bytes;
 
-		PROCEDURE RawSInt*( x: SHORTINT );
+		PROCEDURE RawSInt*( x: SIGNED8 );
 		BEGIN  w.RawSInt(x)
 		END RawSInt;
 

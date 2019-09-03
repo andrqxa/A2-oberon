@@ -606,7 +606,7 @@ BEGIN res := GetLInt(text, pos, len, xl);
 	ELSE RETURN FALSE END
 END GetInt;
 
-PROCEDURE GetSInt* (VAR text: Texts.Text;  pos: LONGINT;   len: INTEGER;  VAR x: SHORTINT): BOOLEAN;
+PROCEDURE GetSInt* (VAR text: Texts.Text;  pos: LONGINT;   len: INTEGER;  VAR x: SIGNED8): BOOLEAN;
 	VAR res: BOOLEAN;  xl: LONGINT;
 BEGIN res := GetLInt(text, pos, len, xl);
 	IF res THEN 	(*! Add range check *)

@@ -54,8 +54,8 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 		(** abstract scheme objects (pointer-based implementation not to be relied on) **)
 		Object* = POINTER TO ObjDesc;
 		ObjDesc = RECORD
-			type: SHORTINT;	(* object type *)
-			sub: SHORTINT;	(* subtype *)
+			type: SIGNED8;	(* object type *)
+			sub: SIGNED8;	(* subtype *)
 			dsc, next: Object;	(* optimization for pairs *)
 		END;
 

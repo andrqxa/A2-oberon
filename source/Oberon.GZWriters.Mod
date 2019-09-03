@@ -42,14 +42,14 @@ BEGIN
 END WriteHeader;
 
 (** change deflate parameters within the writer **)
-PROCEDURE SetParams*(VAR w: Writer; level, strategy: SHORTINT);
+PROCEDURE SetParams*(VAR w: Writer; level, strategy: SIGNED8);
 BEGIN
 	ZlibWriters.SetParams(w.zw, level, strategy, ZlibWriters.NoFlush);
 	w.res := w.zw.res;
 END SetParams;
 
 (** open writer on .gz-file **)
-PROCEDURE Open*(VAR w: Writer; level, strategy: SHORTINT; file: Files.File);
+PROCEDURE Open*(VAR w: Writer; level, strategy: SIGNED8; file: Files.File);
 VAR
 	r: Files.Rider;
 BEGIN

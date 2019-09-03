@@ -374,7 +374,7 @@ TYPE
 *)
 	Message = RECORD
 		buf: ARRAY 6 OF CHAR;
-		pos, len, dir: SHORTINT;
+		pos, len, dir: SIGNED8;
 	END;
 
 
@@ -382,12 +382,12 @@ TYPE
 		VAR
 				(* card configuration *)
 			flags, features:  SET;
-			chip: SHORTINT;
+			chip: SIGNED8;
 			interruptable: BOOLEAN;
-			irq: SHORTINT;	(* interrupt line *)
-			scsiId: SHORTINT;
+			irq: SIGNED8;	(* interrupt line *)
+			scsiId: SIGNED8;
 
-			sync: ARRAY 16 OF SHORTINT;	(* bus synchronization: only one cmd per device *)
+			sync: ARRAY 16 OF SIGNED8;	(* bus synchronization: only one cmd per device *)
 
 				(* card IO information *)
 			busNo, devNo, slotNo: LONGINT;	(* PCI Address *)
@@ -400,16 +400,16 @@ TYPE
 			Get1: PROCEDURE (d: Bus; offset: LONGINT): CHAR;
 
 				(* cached values *)
-			width: SHORTINT; 	(* 8 or 16, iff FeatWide *)
+			width: SIGNED8; 	(* 8 or 16, iff FeatWide *)
 			negotiateWidth: SET;	(*handle transmission width whenever possible*)
 			negotiateSync: SET;	(*handle transmission sync whenever possible*)
 			msg: Message;	(*message from/to device. Only one buffer: the message phase is not prehempted*)
 
-			result, status: ARRAY 16 OF SHORTINT;
+			result, status: ARRAY 16 OF SIGNED8;
 
 			next: Bus;	(*list of all Ada7 busses *)
 
-		PROCEDURE Synchronize(dev: LONGINT;  await, set: SHORTINT);
+		PROCEDURE Synchronize(dev: LONGINT;  await, set: SIGNED8);
 			PROCEDURE Data;
 			BEGIN
 				KernelLog.String("Sync ["); KernelLog.Int(dev, 0); KernelLog.String("] ");
@@ -444,7 +444,7 @@ TYPE
 	END Bus;
 
 	RateTableDesc = RECORD
-		period: SHORTINT;	(* 1/4 of nsec, same as sync negotiation message *)
+		period: SIGNED8;	(* 1/4 of nsec, same as sync negotiation message *)
 		rate: CHAR;	(* rate for normal/fast/ultra cards *)
 		u2rate: CHAR;	(* rate ultra2 cards *)
 		speed: LONGINT;	(* speed in 100 KB/s for 8-bit bus *)
@@ -453,7 +453,7 @@ TYPE
 	(* Description of the cards we're know about *)
 	CardTable = RECORD
 		signature: LONGINT;
-		chip: SHORTINT;
+		chip: SIGNED8;
 		flags, features: SET;
 		name: ARRAY 32 OF CHAR;
 	END;
@@ -597,7 +597,7 @@ BEGIN
 	d.Put1(d, TARGSCSIRATE + index, SYSTEM.VAL(CHAR, rate));
 	d.Put1(d, SCSIRATE, SYSTEM.VAL(CHAR, rate));
 	BusNameMsg(d, "Device["); KernelLog.Int(index, 0); KernelLog.String("].width=");
-	KernelLog.Int(SYSTEM.VAL(SHORTINT, wide), 0); KernelLog.Ln
+	KernelLog.Int(SYSTEM.VAL(SIGNED8, wide), 0); KernelLog.Ln
 END SetWidth;
 
 PROCEDURE SetSyncRate(d: Bus;  period, offset: LONGINT);
@@ -1494,7 +1494,7 @@ BEGIN
 END BusDetectWidth;
 
 PROCEDURE BusConfigureChannels(d: Bus);	(*special setups for multichannel boards*)
-VAR  chip: SHORTINT; set: SET;
+VAR  chip: SIGNED8; set: SET;
 BEGIN
 	chip := d.chip;
 	IF  FlagMultiChannel IN d.flags THEN
@@ -1660,7 +1660,7 @@ CONST
 	ultraFlags = {FlagPageSCB, FlagNewEepromFMT, FlagBiosEnabled};
 	ultra2Features = {FeatMoreSRAM, FeatUltra2, FeatCmdChan, FeatQueueRegs, FeatSGPreload};
 
-	PROCEDURE Card(i: LONGINT; sig: HUGEINT;  chip: SHORTINT;  flags, features: SET;  name: ARRAY OF CHAR);
+	PROCEDURE Card(i: LONGINT; sig: HUGEINT;  chip: SIGNED8;  flags, features: SET;  name: ARRAY OF CHAR);
 	BEGIN
 		card[i].signature := SHORT(sig);
 		card[i].chip := chip;
@@ -1668,7 +1668,7 @@ CONST
 		COPY(name, card[i].name)
 	END Card;
 
-	PROCEDURE Table(i: LONGINT;  period: SHORTINT;  rate, u2rate: CHAR;  speed: LONGINT);
+	PROCEDURE Table(i: LONGINT;  period: SIGNED8;  rate, u2rate: CHAR;  speed: LONGINT);
 	BEGIN
 		rateTable[i].period := period;
 		rateTable[i].rate := rate;
@@ -1830,7 +1830,7 @@ BEGIN
 END Test;
 
 PROCEDURE Scan*;
-VAR  d: Bus;  res: WORD;  i: SHORTINT;  inq: SCSI.InquiryData;
+VAR  d: Bus;  res: WORD;  i: SIGNED8;  inq: SCSI.InquiryData;
 BEGIN
 	d := firstBus;
 	KernelLog.String("Adaptec7.Scan"); KernelLog.Int(aCount, 0); KernelLog.Ln;

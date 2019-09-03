@@ -34,7 +34,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 
 		(** message for getting and setting positional shape links **)
 		LinkMsg* = RECORD (Leonardo.LocalizedMsg)
-			id*: SHORTINT;	(** get/set **)
+			id*: SIGNED8;	(** get/set **)
 			done*: BOOLEAN;	(** to be set by receiver **)
 			x*, y*: REAL;	(** coordinates in global space (in/out) **)
 		END;
@@ -66,16 +66,16 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 		SegmentDesc* = RECORD (Leonardo.ContainerDesc)
 			pen*: LeoPens.Pen;	(** pen for rendering **)
 			closed*: BOOLEAN;	(** set if segment returns to first point after last one **)
-			pred*, succ*: SHORTINT;	(** continuity mode **)
+			pred*, succ*: SIGNED8;	(** continuity mode **)
 			boff*, eoff*: REAL;	(** offsets from begin and to end of connected contour **)
 			len*: REAL;	(** segment length **)
 		END;
 
 		(** message for exchanging information between neighboring contours **)
 		ConnectMsg* = RECORD (Leonardo.ShapeMsg)
-			id*: SHORTINT;	(** get/set **)
-			pos*: SHORTINT;	(** start/end **)
-			mode*: SHORTINT;	(** term/coincident/collinear/symmetric **)
+			id*: SIGNED8;	(** get/set **)
+			pos*: SIGNED8;	(** start/end **)
+			mode*: SIGNED8;	(** term/coincident/collinear/symmetric **)
 			done*: BOOLEAN;	(** to be set by receiver **)
 			x*, y*: REAL;	(** position in local space **)
 			dx*, dy*: REAL;	(** direction vector in local space **)
@@ -83,7 +83,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 
 		(** message for updating segment offsets **)
 		ValidateMsg* = RECORD (Leonardo.ShapeMsg)
-			pos*: SHORTINT;	(** start/end **)
+			pos*: SIGNED8;	(** start/end **)
 			off*: REAL;	(** start: boff, end: eoff **)
 		END;
 
@@ -95,13 +95,13 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 		ModeAction = POINTER TO ModeActionDesc;
 		ModeActionDesc = RECORD (Leonardo.ActionDesc)
 			seg: Segment;
-			mode: SHORTINT;
+			mode: SIGNED8;
 		END;
 
 		(** arc segments **)
 		Arc* = POINTER TO ArcDesc;
 		ArcDesc* = RECORD (SegmentDesc)
-			mode*: SHORTINT;	(** close mode: wedge/segment **)
+			mode*: SIGNED8;	(** close mode: wedge/segment **)
 			mat*: GfxMatrix.Matrix;	(** ellipse specification **)
 			dx0, dy0, dx1, dy1: REAL;
 		END;
@@ -116,7 +116,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 		PathifierDesc* = RECORD (LeoPens.PenDesc)
 			bot*, top*: Segment;
 			enter: Segment;
-			elem: SHORTINT;
+			elem: SIGNED8;
 			x0, y0, x, y: REAL;
 		END;
 
@@ -328,7 +328,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END CopyPoint;
 
 	PROCEDURE HandlePoint* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR p, copy: Point; ver, pos: LONGINT; mode: SHORTINT;
+		VAR p, copy: Point; ver, pos: LONGINT; mode: SIGNED8;
 	BEGIN
 		p := obj(Point);
 		IF msg IS Leonardo.ShapeMsg THEN
@@ -761,14 +761,14 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END GetSucc;
 
 	PROCEDURE SwapPred (fig: Leonardo.Figure; a: Leonardo.Action);
-		VAR act: ModeAction; seg: Segment; mode: SHORTINT;
+		VAR act: ModeAction; seg: Segment; mode: SIGNED8;
 	BEGIN
 		act := a(ModeAction); seg := act.seg;
 		mode := seg.pred; seg.pred := act.mode; act.mode := mode;
 		seg.marked := TRUE; seg.sel := TRUE
 	END SwapPred;
 
-	PROCEDURE ChangePred* (fig: Leonardo.Figure; seg: Segment; mode: SHORTINT);
+	PROCEDURE ChangePred* (fig: Leonardo.Figure; seg: Segment; mode: SIGNED8);
 		VAR act: ModeAction;
 	BEGIN
 		NEW(act); act.do := SwapPred; act.undo := SwapPred; act.seg := seg; act.mode := mode;
@@ -776,14 +776,14 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 	END ChangePred;
 
 	PROCEDURE SwapSucc (fig: Leonardo.Figure; a: Leonardo.Action);
-		VAR act: ModeAction; seg: Segment; mode: SHORTINT;
+		VAR act: ModeAction; seg: Segment; mode: SIGNED8;
 	BEGIN
 		act := a(ModeAction); seg := act.seg;
 		mode := seg.succ; seg.succ := act.mode; act.mode := mode;
 		seg.marked := TRUE; seg.sel := TRUE
 	END SwapSucc;
 
-	PROCEDURE ChangeSucc* (fig: Leonardo.Figure; seg: Segment; mode: SHORTINT);
+	PROCEDURE ChangeSucc* (fig: Leonardo.Figure; seg: Segment; mode: SIGNED8);
 		VAR act: ModeAction;
 	BEGIN
 		NEW(act); act.do := SwapSucc; act.undo := SwapSucc; act.seg := seg; act.mode := mode;
@@ -1422,7 +1422,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 		CalcSegmentBox(seg, GfxMatrix.Identity)
 	END InitSegment;
 
-	PROCEDURE SplitSegment* (fig: Leonardo.Figure; seg, new: Segment; at: Point; mode: SHORTINT);
+	PROCEDURE SplitSegment* (fig: Leonardo.Figure; seg, new: Segment; at: Point; mode: SIGNED8);
 		VAR p: Point;
 	BEGIN
 		InitSegment(new, seg.handle, NIL, NIL, FALSE, seg.pen);
@@ -1436,7 +1436,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 		ChangeSucc(fig, seg, mode)
 	END SplitSegment;
 
-	PROCEDURE SetPred* (fig: Leonardo.Figure; seg: Segment; mode: SHORTINT);
+	PROCEDURE SetPred* (fig: Leonardo.Figure; seg: Segment; mode: SIGNED8);
 		VAR pred: Leonardo.Shape; cm: ConnectMsg;
 	BEGIN
 		pred := Pred(seg);
@@ -1451,7 +1451,7 @@ MODULE LeoPaths IN Oberon; (** portable **)	(* eos  *)
 		END
 	END SetPred;
 
-	PROCEDURE SetSucc* (fig: Leonardo.Figure; seg: Segment; mode: SHORTINT);
+	PROCEDURE SetSucc* (fig: Leonardo.Figure; seg: Segment; mode: SIGNED8);
 		VAR succ: Leonardo.Shape; cm: ConnectMsg;
 	BEGIN
 		succ := Succ(seg);

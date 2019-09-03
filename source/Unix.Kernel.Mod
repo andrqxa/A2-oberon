@@ -25,7 +25,7 @@ TYPE
 TYPE
 	(** Delay timer. *)
 	Timer* = OBJECT
-		VAR timer: Objects.Timer; state: SHORTINT;
+		VAR timer: Objects.Timer; state: SIGNED8;
 
 		PROCEDURE HandleTimeout;
 		BEGIN {EXCLUSIVE}

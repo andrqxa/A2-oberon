@@ -52,7 +52,7 @@ VAR
 (* not portable
 	PROCEDURE NewPattern*(pat: Display.Pattern): Display.Pattern;
 		VAR x, y, b, l, r, t, w, h, i, W, H : INTEGER; s : SET; d : ARRAY 256, 4 OF SET; p, s0 : LONGINT; D, P : LONGINT;
-			k : SHORTINT;
+			k : SIGNED8;
 			ptr : POINTER TO RECORD END;
 	BEGIN
 		y := 0;

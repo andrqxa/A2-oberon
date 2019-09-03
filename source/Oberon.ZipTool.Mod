@@ -424,7 +424,7 @@ END Open;
 	level: specifies the compression level (0: no compression, 9: best compression)
 	strategy: specifies the compression strategy (from 0 - 2)
 	res = Zip.Ok, Zip.BadName, Zip.EntryAlreadyExists, Zip.DataError **)
-PROCEDURE AddFile*(arc: Zip.Archive; srcname, dstname: ARRAY OF CHAR; level, strategy: SHORTINT; VAR res: WORD);
+PROCEDURE AddFile*(arc: Zip.Archive; srcname, dstname: ARRAY OF CHAR; level, strategy: SIGNED8; VAR res: WORD);
 VAR
 	f: Files.File; r: Files.Rider;
 BEGIN
@@ -448,7 +448,7 @@ PROCEDURE Add*;
 VAR
 	S: Texts.Scanner; T: Texts.Text; beg, end, time, res: LONGINT;
 	arc: Zip.Archive; i, j: LONGINT;
-	strategy, level: SHORTINT; prefix: BOOLEAN;
+	strategy, level: SIGNED8; prefix: BOOLEAN;
 	oldname, newname: ARRAY 256 OF CHAR;
 BEGIN
 	Texts.WriteString(W, "ZipTool.Add ");

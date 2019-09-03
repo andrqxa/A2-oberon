@@ -51,7 +51,7 @@ TYPE
 		(** Create an Texts.Text instance with colored text *)
 		PROCEDURE LoadPage() : TeletextBrowser.TeletextPage;
 		VAR
-			attr, fg, bg : SHORTINT;
+			attr, fg, bg : SIGNED8;
 			boxed : BOOLEAN;
 			i, begin, pos : SIZE;
 			nl: ARRAY 3 OF LONGINT;

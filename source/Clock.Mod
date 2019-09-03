@@ -19,7 +19,7 @@ TYPE
 		month: months \in [1,12]
 		year: the actual year minus 1900
 	*)
-	GetRtcTimeFunc = PROCEDURE{DELEGATE}(VAR second, minute, hour, day, month: SHORTINT; VAR year: INTEGER): BOOLEAN;
+	GetRtcTimeFunc = PROCEDURE{DELEGATE}(VAR second, minute, hour, day, month: SIGNED8; VAR year: INTEGER): BOOLEAN;
 
 	(*
 		Function for setting up time on an RTC device
@@ -31,7 +31,7 @@ TYPE
 		month: months \in [1,12]
 		year: the actual year minus 1900
 	*)
-	SetRtcTimeFunc =PROCEDURE{DELEGATE}(second, minute, hour, day, month: SHORTINT; year: INTEGER): BOOLEAN;
+	SetRtcTimeFunc =PROCEDURE{DELEGATE}(second, minute, hour, day, month: SIGNED8; year: INTEGER): BOOLEAN;
 
 VAR
 	getRtcTime: GetRtcTimeFunc;
@@ -44,7 +44,7 @@ VAR
 
 PROCEDURE Get*(VAR time, date: LONGINT);
 VAR
-	second, minute, hour, day, month: SHORTINT;
+	second, minute, hour, day, month: SIGNED8;
 	year: INTEGER;
 BEGIN{EXCLUSIVE}
 	IF getRtcTime # NIL THEN
@@ -62,15 +62,15 @@ END Get;
 
 PROCEDURE Set*(time, date: LONGINT);
 VAR
-	second, minute, hour, day, month: SHORTINT;
+	second, minute, hour, day, month: SIGNED8;
 	year: INTEGER;
 BEGIN{EXCLUSIVE}
 	IF setRtcTime # NIL THEN
-		second := SHORTINT(time MOD 64);
-		minute := SHORTINT(time DIV 64 MOD 64);
-		hour := SHORTINT(time DIV 4096 MOD 32);
-		day := SHORTINT(date MOD 32);
-		month := SHORTINT(date DIV 32 MOD 16);
+		second := SIGNED8(time MOD 64);
+		minute := SIGNED8(time DIV 64 MOD 64);
+		hour := SIGNED8(time DIV 4096 MOD 32);
+		day := SIGNED8(date MOD 32);
+		month := SIGNED8(date DIV 32 MOD 16);
 		year := INTEGER(date DIV 512);
 		IF setRtcTime(second, minute, hour, day, month, year) THEN
 		END;

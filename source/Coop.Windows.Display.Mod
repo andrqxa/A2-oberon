@@ -184,7 +184,7 @@ VAR
 		pal: ARRAY 256 OF GDI32.ColorRef
 	END;
 	disp: Display;
-	format* : SHORTINT;
+	format* : SIGNED8;
 
 	KeyHandled: BOOLEAN;
 

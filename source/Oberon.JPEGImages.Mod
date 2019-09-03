@@ -183,11 +183,11 @@ TYPE
 	JPEGCompInfoDesc = RECORD
 			componentID: INTEGER;			(* ID fuer diesen Komponenten 0..255 *)
 			componentIndex: INTEGER;        (* Index in SOF-Marker *)
-			hSampFactor: SHORTINT;		    (* Horizontaler Sampling Faktor 1..4 *)
-			vSampFactor: SHORTINT;			(* Vertikaler Sampling Faktor 1..4 *)
+			hSampFactor: SIGNED8;		    (* Horizontaler Sampling Faktor 1..4 *)
+			vSampFactor: SIGNED8;			(* Vertikaler Sampling Faktor 1..4 *)
 			quantTblNo: INTEGER;			   (* Nummer der Quantisierungstabelle 0..3 *)
-			dcTblNo: SHORTINT;				  (* Nummer der DC Entropy Tabelle 0..3 *)
-			acTblNo: SHORTINT;				  (* Nummer der AC Entropy Tabelle 0..3 *)
+			dcTblNo: SIGNED8;				  (* Nummer der DC Entropy Tabelle 0..3 *)
+			acTblNo: SIGNED8;				  (* Nummer der AC Entropy Tabelle 0..3 *)
 			widthInBlocks: LONGINT;		   (* Breite in Blocks *)
 			heightInBlocks: LONGINT;		  (* Hoehe in Blocks *)
 			DCTScaledSize: INTEGER;			 (* Groesse eines DCT Blocks in Samples *)
@@ -224,7 +224,7 @@ TYPE
 	MasterPtr = POINTER TO MasterDesc;
 	MasterDesc = RECORD
 			usingMergedUpsample: BOOLEAN;	(* im Moment nur FALSE implementiert *)
-			passType: SHORTINT;					 (* in welchem Pass sind wir? *)
+			passType: SIGNED8;					 (* in welchem Pass sind wir? *)
 			passNumber: INTEGER;				  (* der wievielte Pass ist es ? *)
 			totalPasses: INTEGER;					 (* Totale Anzahl Passe *)
 			needPostPass: BOOLEAN;				(* Braucht es eine Nachbearbeitung: nur FALSE *)
@@ -356,8 +356,8 @@ TYPE
 			globalState: INTEGER; 		  		(* Globaler Status der Dekomprimierung *)
 			imageWidth: LONGINT;				(* nominale Bildbreite, aus SOF Marker *)
 			imageHeight: LONGINT;				(* nominale Bildhoehe, aus SOF Marker *)
-			numComponents: SHORTINT;	 	(* Anzahl Farbkomponenten des Bildes *)
-			selectIDCT: SHORTINT;			  	(* gewuenschte IDCT Routine *)
+			numComponents: SIGNED8;	 	(* Anzahl Farbkomponenten des Bildes *)
+			selectIDCT: SIGNED8;			  	(* gewuenschte IDCT Routine *)
 			jpegColorSpace: INTEGER;		 	 (* Farbformat des JPEG Bildes *)
 			outColorSpace: INTEGER;		   	(* gewuenschtes Farbformat des Output *)
 			scaleNum, scaleDenom: INTEGER;   (* im Moment nicht implementiert *)
@@ -377,8 +377,8 @@ TYPE
 			CCIR601Sampling: BOOLEAN;	 	(* TRUE=first samples are cosited, nicht implementiert *)
 			densityUnit: INTEGER;				   (* JFIF Code fuer die Pixeleinheiten *)
 			XDensity, YDensity: LONGINT;	 	(* Horizontale, Vertikale Aufloesung *)
-			dataPrecision: SHORTINT;			   (* Bildgenauigkeit *)
-			compsInScan: SHORTINT;			   (* Anzahl Farbkomponenten im JPEG File *)
+			dataPrecision: SIGNED8;			   (* Bildgenauigkeit *)
+			compsInScan: SIGNED8;			   (* Anzahl Farbkomponenten im JPEG File *)
 			curCompInfo: ARRAY MAXCOMPSINSCAN OF JPEGCompInfoPtr;	(*Farbkomponente an i.ter Stelle in SOS*)
 			dcHuffTbl: ARRAY NUMHUFFTBLS OF JHuffTblPtr;    	(* Zeiger auf Huffman Tabellen *)
 			acHuffTbl: ARRAY NUMHUFFTBLS OF JHuffTblPtr;    	(* Zeiger auf Huffman Tabellen *)
@@ -397,7 +397,7 @@ TYPE
 			blocksInMCU: INTEGER;				 (* # DCT Bloecke in einer MCU *)
 			MCUMembership: ARRAY MAXBLOCKSINMCU OF INTEGER; (* Farbkomponentenzugehoerigkeit *)
 			twoPassQuantize: BOOLEAN;           (* nur FALSE implementiert *)
-			ditherMode: SHORTINT;				  (* gewuenschtes Dithering Verfahrens *)
+			ditherMode: SIGNED8;				  (* gewuenschtes Dithering Verfahrens *)
 			desiredNumberOfColors: INTEGER;	(* gewuenschte Anzahl Farben im Output *)
 			actualNumberOfColors: INTEGER;	 (* berechnete Anzahl Farben im Output *)
 			minDCTScaledSize: INTEGER;			(* kleinste DCTScaledSize fuer jeden Farbkomponenten *)
@@ -417,8 +417,8 @@ TYPE
 
 VAR
 	W: T.Writer;
-	ZAG: ARRAY (DCTSIZE2 + 16) OF SHORTINT;
-	ZIG : ARRAY DCTSIZE2 OF SHORTINT;
+	ZAG: ARRAY (DCTSIZE2 + 16) OF SIGNED8;
+	ZIG : ARRAY DCTSIZE2 OF SIGNED8;
 	RL: ARRAY 1024 OF INTEGER;
 	i,x: INTEGER;
 	crRTab,cbBTab: ARRAY 257 OF INTEGER;
@@ -499,8 +499,8 @@ VAR
 		END;
 	END ReadChar;
 
-	(* Lesen eines SHORTINT vom InputFile, 1 Byte *)
-	PROCEDURE ReadShort(cInfo: CInfoPtr; VAR short:SHORTINT):BOOLEAN;
+	(* Lesen eines SIGNED8 vom InputFile, 1 Byte *)
+	PROCEDURE ReadShort(cInfo: CInfoPtr; VAR short:SIGNED8):BOOLEAN;
 	BEGIN
 		F.Read(cInfo.src.rider,short);
 		IF ~cInfo.src.rider.eof THEN
@@ -564,7 +564,7 @@ VAR
 	END ReadUINT16;
 
 	(* Aufteilen eines Bytes in obere und untere 4 Bit *)
-	PROCEDURE ByteSplit(int:INTEGER; VAR byte03,byte47:SHORTINT);
+	PROCEDURE ByteSplit(int:INTEGER; VAR byte03,byte47:SIGNED8);
 	BEGIN
 		byte03 := SHORT(int MOD 10H);
 		byte47 := SHORT((int DIV 10H) MOD 10H);
@@ -659,7 +659,7 @@ VAR
 	PROCEDURE getSOS(cInfo: CInfoPtr):BOOLEAN;
 	VAR
 		c,ci,cc,ccc:INTEGER;
-		i,n:SHORTINT;
+		i,n:SIGNED8;
 		length:INTEGER;
 		fehler: BOOLEAN;
 		compptr: JPEGCompInfoPtr;
@@ -771,7 +771,7 @@ VAR
 	(* Lesen eines DAC-Markers vom InputFile: Block fuer Arithmetik Kodierung *)
 	PROCEDURE getDAC(cInfo: CInfoPtr):BOOLEAN;
 	VAR
-		index,help1,help2: SHORTINT;
+		index,help1,help2: SIGNED8;
 		length,val :INTEGER;
 	BEGIN
 		IF ~ReadInt(cInfo,length) THEN RETURN FALSE END;
@@ -856,7 +856,7 @@ VAR
 	VAR
 		quantptr: JQuantTblPtr;
 		length,i,n,tmp :INTEGER;
-		prec,index :SHORTINT;
+		prec,index :SIGNED8;
 	BEGIN
 		IF ~ReadInt(cInfo,length) THEN RETURN FALSE END;
 		DEC(length,2);
@@ -2220,7 +2220,7 @@ Out.String("  MCUColNum"); Out.Int(lastMCUCol - cInfo.coef.MCUColNum, 5); Out.Ln
 		RETURN TRUE;
 	END decompressData;
 
-	PROCEDURE startPassCoef(cInfo: CInfoPtr; passMode:SHORTINT);
+	PROCEDURE startPassCoef(cInfo: CInfoPtr; passMode:SIGNED8);
 	BEGIN
 		cInfo.coef.MCUColNum := 0;
 		cInfo.coef.MCURowNum := 0;
@@ -2696,7 +2696,7 @@ Out.String("  MCUColNum"); Out.Int(lastMCUCol - cInfo.coef.MCUColNum, 5); Out.Ln
 	VAR
 		nc,maxColors,totalColors,iroot,i,j : LONGINT;
 		temp: LONGINT;
-		RGBOrder: ARRAY 3 OF SHORTINT;
+		RGBOrder: ARRAY 3 OF SIGNED8;
 	BEGIN
 		RGBOrder[0] := RGBGREEN;
 		RGBOrder[1] := RGBRED;
@@ -2967,7 +2967,7 @@ Out.String("  MCUColNum"); Out.Int(lastMCUCol - cInfo.coef.MCUColNum, 5); Out.Ln
 	END postProcess1Pass;
 
 	(* Initialisierung fuer einen Pass des Post-Kontrollers *)
-	PROCEDURE startPassPost(cInfo: CInfoPtr; passMode:SHORTINT);
+	PROCEDURE startPassPost(cInfo: CInfoPtr; passMode:SIGNED8);
 	BEGIN
 		IF passMode = JBUFPASSTHRU THEN
 			cInfo.post.postProcessData := postProcess1Pass;
@@ -3023,7 +3023,7 @@ Out.String("  MCUColNum"); Out.Int(lastMCUCol - cInfo.coef.MCUColNum, 5); Out.Ln
 	END processDataSimpleMain;
 
 	(* Intitialisierung des Main-Contollers fuer einen Pass *)
-	PROCEDURE startPassMain(cInfo: CInfoPtr; passMode:SHORTINT);
+	PROCEDURE startPassMain(cInfo: CInfoPtr; passMode:SIGNED8);
 	BEGIN
 		cInfo.main.numChunks := cInfo.outputHeight;
 

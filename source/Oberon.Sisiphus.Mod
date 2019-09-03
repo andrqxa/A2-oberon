@@ -48,7 +48,7 @@ MODULE Sisiphus IN Oberon;	(** portable *) (* gri 18.3.91 / 30.1.92 / 27.4.92 / 
 		VAR F: Files.File; R: Files.Rider; i, j: INTEGER;
 
 		PROCEDURE ReadInt (VAR x: LONGINT);
-			VAR n: LONGINT; i: SHORTINT; ch: CHAR;
+			VAR n: LONGINT; i: SIGNED8; ch: CHAR;
 		BEGIN i := 0; n := 0; Files.Read(R, ch);
 			WHILE ORD(ch) >= 128 DO INC(n, ASH(ORD(ch) - 128, i)); INC(i, 7); Files.Read(R, ch) END;
 			x := n + ASH(ORD(ch) MOD 64 - ORD(ch) DIV 64 * 64, i)

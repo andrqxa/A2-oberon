@@ -50,7 +50,7 @@ TYPE
 
    (** Read a signed byte from rider r. **)
    PROCEDURE ReadSignedByte*(VAR r: Files.Rider): LONGINT;
-   VAR s: SHORTINT;
+   VAR s: SIGNED8;
    BEGIN
       Files.Read(r,s);
       RETURN s

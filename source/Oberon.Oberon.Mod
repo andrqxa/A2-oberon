@@ -56,7 +56,7 @@ scheduling of tasks, cursor handling and command execution.
       X*, Y*: INTEGER;	(** Mouse position. *)
       ch*: CHAR;	(** Character typed. *)
       fnt*: Fonts.Font;	(** Font of typed character. *)
-      col*, voff*: SHORTINT	(** Color and vertical offset of typed character. *)
+      col*, voff*: SIGNED8	(** Color and vertical offset of typed character. *)
     END;
 
     CaretMsg* = RECORD (Display.FrameMsg)	(** Text caret handling. *)
@@ -101,7 +101,7 @@ scheduling of tasks, cursor handling and command execution.
     Par*: ParList;	(** Actual parameters of executed command. *)
 
     CurFnt*: Fonts.Font;	(** Current input font when typing. *)
-    CurCol*, CurOff*: SHORTINT;	(** Current color and offset when typing. *)
+    CurCol*, CurOff*: SIGNED8;	(** Current color and offset when typing. *)
 
 	OptionChar*: CHAR;	(** Option character "/" or "\" *)
 	OpenText*: PROCEDURE (title: ARRAY OF CHAR; T: Texts.Text; W, H: INTEGER);
@@ -116,7 +116,7 @@ scheduling of tasks, cursor handling and command execution.
     GCTask: Task; (* garbage collection task *)
 
     ScreenOn: BOOLEAN;
-	FillerColor: SHORTINT;
+	FillerColor: SIGNED8;
 
 	conftext: Texts.Text;
 	conftime, confdate: LONGINT;
@@ -471,12 +471,12 @@ by calling its handler when the system has nothing else to do. *)
     END SetFont;
 
 (** Set the color of typed characters. *)
-    PROCEDURE SetColor* (col: SHORTINT);
+    PROCEDURE SetColor* (col: SIGNED8);
     BEGIN CurCol := col
     END SetColor;
 
 (** Set the vertical offset of typed characters. *)
-    PROCEDURE SetOffset* (voff: SHORTINT);
+    PROCEDURE SetOffset* (voff: SIGNED8);
     BEGIN CurOff := voff
     END SetOffset;
 

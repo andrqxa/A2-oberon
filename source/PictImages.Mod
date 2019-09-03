@@ -149,7 +149,7 @@ MODULE PictImages; (** non-portable *)	(* eos  **)
 		TYPE Bytes129 = ARRAY 129 OF CHAR;
 		VAR
 			file: Files.File; w: Files.Writer; pal: Raster.Palette; i, y, inc, x: SIZE; fmt: Raster.Format; depth: INTEGER;
-			pix: POINTER TO ARRAY OF CHAR; buf: ARRAY 129 OF SHORTINT;
+			pix: POINTER TO ARRAY OF CHAR; buf: ARRAY 129 OF SIGNED8;
 			SrcCopy: Raster.Mode;
 	BEGIN
 		file := Files.New(fname);

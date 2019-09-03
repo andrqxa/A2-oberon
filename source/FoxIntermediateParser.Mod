@@ -281,7 +281,7 @@ TYPE
 		(** parse an intermediate code instruction **)
 		PROCEDURE ParseInstruction(VAR instruction: IntermediateCode.Instruction; sectionList: Sections.SectionList);
 		VAR
-			opCode: SHORTINT;
+			opCode: SIGNED8;
 			positionOfInstruction, positionOfOperand: Position;
 			operandNumber: LONGINT;
 			operand: IntermediateCode.Operand;
@@ -431,7 +431,7 @@ TYPE
 			pos, positionOfDirective:Position;
 			identifier: Scanner.IdentifierString;
 			afterModuleDirective, afterImportsDirective, afterFirstSection, isExternalSection: BOOLEAN;
-			sectionType: SHORTINT;
+			sectionType: SIGNED8;
 			section: IntermediateCode.Section;
 			name: Basic.SegmentedName;
 			moduleName: SyntaxTree.IdentifierString;

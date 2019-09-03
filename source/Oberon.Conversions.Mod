@@ -26,7 +26,7 @@ VAR
 
 
 PROCEDURE BitPatternToStr (val: LONGINT; VAR str: ARRAY OF CHAR; base: LONGINT);
-	VAR i, j,shift, size: SHORTINT;
+	VAR i, j,shift, size: SIGNED8;
 BEGIN
 	ASSERT ((base=2) OR (base=8) OR (base=16));
 	IF	base = 2	THEN shift := 1; size := 32

@@ -46,7 +46,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 			left*: LONGINT;	(* left offset *)
 			lsp*, dsr*: LONGINT;	(* line spacing *)
 			gap*: LONGINT;	(* gap before style *)
-			nTabs*: SHORTINT;
+			nTabs*: SIGNED8;
 			tab*: ARRAY MaxTabs OF LONGINT
 		END;
 		Frame* = POINTER TO FrameDesc;
@@ -182,7 +182,7 @@ MODULE Styles IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993 *)
 	(*old*)
 
 	PROCEDURE ReadLong (VAR R: Files.Rider; VAR x: LONGINT);
-	VAR c0, c1, c2: CHAR; s1: SHORTINT;
+	VAR c0, c1, c2: CHAR; s1: SIGNED8;
 	BEGIN Files.Read(R, c0); Files.Read(R, c1); Files.Read(R, c2); Files.Read(R, s1);
 		x := s1; x := ((x * 100H + LONG(ORD(c2))) * 100H + LONG(ORD(c1))) * 100H + LONG(ORD(c0))
 	END ReadLong;

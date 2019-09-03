@@ -18,8 +18,8 @@ END InsertModule;
 	returns -1 if left is lexicographics smaller than right
 	traps if src or destination is not 0X terminated and comparison is not finished
 *)
-PROCEDURE CompareString*(CONST left,right: ARRAY OF CHAR): SHORTINT;
-VAR i: SIZE; res: SHORTINT; l, r: CHAR;
+PROCEDURE CompareString*(CONST left,right: ARRAY OF CHAR): SIGNED8;
+VAR i: SIZE; res: SIGNED8; l, r: CHAR;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	i := 0; res := 0;
 	LOOP

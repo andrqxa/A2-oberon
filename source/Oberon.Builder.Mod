@@ -78,7 +78,7 @@ TYPE
 
 VAR
 	W: Texts.Writer;
-	sym: SHORTINT; (* << win *)
+	sym: SIGNED8; (* << win *)
 	error, autoMark: BOOLEAN;
 
 	(*Preprocessor*)
@@ -86,7 +86,7 @@ VAR
 	targetW: Texts.Writer;
 	Flags: List;
 	lib: Objects.Library;	(* Library of last character/object read. *)
-	col: SHORTINT;		(* Color index of last character read. *)
+	col: SIGNED8;		(* Color index of last character read. *)
 	ifdepth: LONGINT;		(* number of $if levels *)
 	OPSGet: OPS.GetProc;
 	skipping: BOOLEAN;
@@ -579,7 +579,7 @@ BEGIN
 END Preprocess;
 
 
-PROCEDURE get(VAR sym: SHORTINT);
+PROCEDURE get(VAR sym: SIGNED8);
 	VAR body: BOOLEAN;
 
 	PROCEDURE Skip;

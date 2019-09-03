@@ -29,7 +29,7 @@ MODULE HTMLDocs IN Oberon; (** portable *) (* ejz, Greek & Math support by afi *
 		TextAttrsDesc = RECORD
 			lib: Objects.Library;
 			style: TextGadgets.Style;
-			col, voff: SHORTINT;
+			col, voff: SIGNED8;
 			next: TextAttrs
 		END;
 		Page* = POINTER TO PageDesc;
@@ -1837,7 +1837,7 @@ END
 		(*S.skipWS := TRUE*)
 	END BLOCKQUOTE;
 
-	PROCEDURE ChangeColors(P: Page; from, to: SHORTINT);
+	PROCEDURE ChangeColors(P: Page; from, to: SIGNED8);
 		VAR tattr: TextAttrs;
 	BEGIN
 		IF P.W.col = from THEN
@@ -3028,7 +3028,7 @@ ELSIF ~on THEN
 		END
 	END DocHandler;
 
-	PROCEDURE TextColor(col: INTEGER): SHORTINT;
+	PROCEDURE TextColor(col: INTEGER): SIGNED8;
 		VAR r, g, b: INTEGER;
 	BEGIN
 		Display.GetColor(col, r, g, b);

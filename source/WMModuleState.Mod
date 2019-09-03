@@ -272,7 +272,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 		type, n, lval, size, tmp3, tdadr: LONGINT;
 		adr, tmp2: ADDRESS;
 		etc: BOOLEAN;
-		sval: SHORTINT;
+		sval: SIGNED8;
 		ival: INTEGER;
 		tmp: Bytes;
 		set: SET;
@@ -342,7 +342,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 								ELSIF ch = 1X THEN w.String("TRUE")
 								ELSE w.Int(ORD(ch), 1)
 								END
-							|4:	(* SHORTINT *)
+							|4:	(* SIGNED8 *)
 								SYSTEM.GET(adr, sval);  w.Int( sval, 1)
 							|5:	(* INTEGER *)
 								SYSTEM.GET(adr, ival);  w.Int( ival, 1)

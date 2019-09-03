@@ -157,8 +157,8 @@ MODULE TextPopups IN Oberon;	(** portable *)	(* tk 6.12.95 *)
 (* build item list *)
 	PROCEDURE ExtractProcTypeNames(T: Texts.Text; VAR lastProc, lastType: MenuItem);
 		CONST	rec = 0; proc = 1; mod = 2;
-		VAR R: Texts.Reader; isType, init: BOOLEAN; sym, prevsym: SHORTINT;
-			Stack: ARRAY 16 OF SHORTINT; ST, i: LONGINT; j: SIZE;
+		VAR R: Texts.Reader; isType, init: BOOLEAN; sym, prevsym: SIGNED8;
+			Stack: ARRAY 16 OF SIGNED8; ST, i: LONGINT; j: SIZE;
 			Context, name: ARRAY 128 OF CHAR;startP, startT, q: MenuItem; p: PMarkerMenuItem;
 	BEGIN
 		Texts.OpenReader(R, T, 0);

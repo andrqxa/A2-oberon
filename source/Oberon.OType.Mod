@@ -778,7 +778,7 @@ MODULE OType IN Oberon;	(** eos  **)
 	PROCEDURE LoadSimpleOutline (VAR r: Files.Rider; glyph: Glyph; inst: Instance; num, contours: INTEGER; hinted, rotated, stretched: BOOLEAN);
 		VAR
 			font: Font; zone: OTInt.Zone; pt: OTInt.Points; points, instrLen, xmin, ymin, xmax, ymax, i, j, val: INTEGER;
-			flag: SHORTINT; byte: CHAR; x, y, aw, lsb: FUnit; dx: F26D6; context: OTInt.Context;
+			flag: SIGNED8; byte: CHAR; x, y, aw, lsb: FUnit; dx: F26D6; context: OTInt.Context;
 	BEGIN
 		font := glyph.font; zone := glyph.simple; pt := zone.pt;
 		zone.contours := 0; points := 0; instrLen := 0;

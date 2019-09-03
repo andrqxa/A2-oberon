@@ -136,7 +136,7 @@ CONST
 	DummyAuto = 0;
 
 VAR
-	AbsoluteFontSizes: ARRAY 7 OF SHORTINT;
+	AbsoluteFontSizes: ARRAY 7 OF SIGNED8;
 	defaultColor*: LONGINT;
 	defaultCursor*, crosshairCursor*, pointerCursor*, moveCursor*, eResizeCursor*, neResizeCursor*, nwResizeCursor*,
 	nResizeCursor*, seResizeCursor*, swResizeCursor*, sResizeCursor*, wResizeCursor*, textCursor*, waitCursor*,
@@ -153,7 +153,7 @@ TYPE
 	TRBLColor* = RECORD
 		top*, right*, bottom*, left*: Color
 	END;
-	Ident* = RECORD (Value) computed*: SHORTINT END;
+	Ident* = RECORD (Value) computed*: SIGNED8 END;
 	TRBLIdent* = RECORD
 		top*, right*, bottom*, left*: Ident
 	END;
@@ -316,7 +316,7 @@ TYPE
 			textShadow*: RECORD (Value) END;
 			textTransform*: Ident;
 			unicodeBidi*: Ident;
-			verticalAlign*: RECORD (Value) computedLength*: LONGREAL; computed*: SHORTINT END;
+			verticalAlign*: RECORD (Value) computedLength*: LONGREAL; computed*: SIGNED8 END;
 			visibility*: Ident;
 			whiteSpace*: Ident;
 			zIndex*: RECORD (Value) computed*: LONGINT END;	(* Auto = -1 *)
@@ -1933,7 +1933,7 @@ VAR m : WMWindowManager.WindowManager;
 		RETURN (margin.specified # NIL) & (margin.specified.IsIdent(Auto) OR margin.specified.IsStringIdent("auto"))
 	END IsAutoMargin;
 
-	PROCEDURE ChangeToIdent(identValue: SHORTINT): CSS2.Term;
+	PROCEDURE ChangeToIdent(identValue: SIGNED8): CSS2.Term;
 	VAR term: CSS2.Term;
 	BEGIN
 		NEW(term); term.SetType(CSS2.Ident); term.SetIntVal(identValue); RETURN term
@@ -1975,7 +1975,7 @@ VAR m : WMWindowManager.WindowManager;
 		END
 	END SetNone;
 
-	PROCEDURE ChangeToIdentCollection(VAR collection: XMLObjects.Collection; identValue: SHORTINT);
+	PROCEDURE ChangeToIdentCollection(VAR collection: XMLObjects.Collection; identValue: SIGNED8);
 	VAR arrColl: XMLObjects.ArrayCollection; term: CSS2.Term;
 	BEGIN
 		IF collection = NIL THEN NEW(arrColl); collection := arrColl END;
@@ -2123,7 +2123,7 @@ VAR m : WMWindowManager.WindowManager;
 
 (*
 	PROCEDURE GetSmallerFont(fontSize: LONGINT): LONGINT;
-	VAR i: SHORTINT;
+	VAR i: SIGNED8;
 	BEGIN
 		i := XXSmall;
 		WHILE (i <= XXLarge) & (AbsoluteFontSizes[i] < fontSize) DO INC(i) END;
@@ -2132,7 +2132,7 @@ VAR m : WMWindowManager.WindowManager;
 	END GetSmallerFont;
 
 	PROCEDURE GetLargerFont(fontSize: LONGINT): LONGINT;
-	VAR i: SHORTINT;
+	VAR i: SIGNED8;
 	BEGIN
 		i := XXLarge;
 		WHILE (XXSmall <= i) & (fontSize < AbsoluteFontSizes[i]) DO DEC(i) END;

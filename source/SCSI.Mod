@@ -133,16 +133,16 @@ CONST
 TYPE
 (** SCSI Structures for the common commands *)
 	InquiryData* = RECORD
-		deviceClass*, ISO*, ECMA*, ANSI*: SHORTINT;
+		deviceClass*, ISO*, ECMA*, ANSI*: SIGNED8;
 		w32*, w16*, sync*, link*, que*, rmb*: BOOLEAN;
 		manufacturer*, product*, rev*: ARRAY 32 OF CHAR;
 	END;
 
 (** SCSI Command, all driver must accept this structure *)
 	Command* = RECORD
-		status*, result*: SHORTINT;
-		target*, chan*, lun*: SHORTINT;	(**destination*)
-		cmd*: ARRAY 12 OF CHAR;  clen*: SHORTINT;	(**command*)
+		status*, result*: SIGNED8;
+		target*, chan*, lun*: SIGNED8;	(**destination*)
+		cmd*: ARRAY 12 OF CHAR;  clen*: SIGNED8;	(**command*)
 		dataAddr*: ADDRESS; dlen*: LONGINT;	(**data*)
 		tag*: CHAR;	(*SCSI-II queued command tag*)
 	END;
@@ -165,7 +165,7 @@ TYPE
 	Disk* = OBJECT  (Disks.Device)
 		VAR
 			bus*: Bus;
-			target*: SHORTINT;
+			target*: SIGNED8;
 			inquiry*: InquiryData;
 			started: BOOLEAN;
 			next*: Disk;
@@ -233,7 +233,7 @@ VAR
 
 (* Debug *)
 
-PROCEDURE DumpCmdStatus(stat, res: SHORTINT);
+PROCEDURE DumpCmdStatus(stat, res: SIGNED8);
 BEGIN
 	CASE stat OF
 	|  Good: KernelLog.String("Good ")
@@ -325,13 +325,13 @@ BEGIN
 END MakeCmd12;
 *)
 
-PROCEDURE NewCmd(VAR c: Command; t, l: SHORTINT; cl: LONGINT; da: ADDRESS; dl: LONGINT);
+PROCEDURE NewCmd(VAR c: Command; t, l: SIGNED8; cl: LONGINT; da: ADDRESS; dl: LONGINT);
 BEGIN
 	c.clen := SHORT(SHORT(cl));  c.dataAddr := da;  c.dlen := dl;
 	c.target := t;  c.lun := l;  c.chan := 0;
 END NewCmd;
 
-PROCEDURE DoSense*(b: Bus;  target,  lun: SHORTINT;  VAR key, code: LONGINT; VAR res: WORD);
+PROCEDURE DoSense*(b: Bus;  target,  lun: SIGNED8;  VAR key, code: LONGINT; VAR res: WORD);
 VAR requ: Command; data: ARRAY 36 OF CHAR;
 BEGIN
 	MakeCmd6(requ.cmd, RequestSense, lun, 0, 36, 0);
@@ -385,7 +385,7 @@ BEGIN
 	res := requ.status
 END SubmitAndSense;
 
-PROCEDURE DoTestUnitReady*(b: Bus;  target, lun: SHORTINT;  VAR res: WORD);
+PROCEDURE DoTestUnitReady*(b: Bus;  target, lun: SIGNED8;  VAR res: WORD);
 VAR requ: Command;
 BEGIN
 	MakeCmd6(requ.cmd, TestUnitReady, lun, 0, 0, 0);
@@ -394,7 +394,7 @@ BEGIN
 	res := requ.status
 END DoTestUnitReady;
 
-PROCEDURE DoInquiry*(b: Bus;  target, lun: SHORTINT; VAR inq: InquiryData; VAR res: WORD);
+PROCEDURE DoInquiry*(b: Bus;  target, lun: SIGNED8; VAR inq: InquiryData; VAR res: WORD);
 VAR requ: Command; data: ARRAY 36 OF CHAR; i: LONGINT;
 BEGIN
 	MakeCmd6(requ.cmd, Inquiry, lun, 0, 36, 0);
@@ -427,7 +427,7 @@ BEGIN
 	END
 END DoInquiry;
 
-PROCEDURE DoStartStopUnit*(b: Bus;  target, lun: SHORTINT; start: BOOLEAN;  VAR res: WORD);
+PROCEDURE DoStartStopUnit*(b: Bus;  target, lun: SIGNED8; start: BOOLEAN;  VAR res: WORD);
 VAR	requ: Command;
 BEGIN
 	MakeCmd6(requ.cmd, StartStop, 0, 0, 0, 0);
@@ -450,7 +450,7 @@ BEGIN
 	END
 END PreventAllowRemoval;
 
-PROCEDURE DoReadCapacity*(b: Bus;  target, lun: SHORTINT;  VAR capacity, blockSize: LONGINT;  VAR res: WORD);
+PROCEDURE DoReadCapacity*(b: Bus;  target, lun: SIGNED8;  VAR capacity, blockSize: LONGINT;  VAR res: WORD);
 VAR  requ: Command;  data: ARRAY 128 OF CHAR;  i: LONGINT;
 BEGIN
 	capacity := 0;  blockSize := 0;
@@ -512,7 +512,7 @@ END NumToChar;
 (** SCSI Bus Handling *)
 
 PROCEDURE InitBus(bus: Bus);
-VAR  i: SHORTINT;  d: Disk; data: InquiryData;  max, j, k: LONGINT; res: WORD; name: Plugins.Name;
+VAR  i: SIGNED8;  d: Disk; data: InquiryData;  max, j, k: LONGINT; res: WORD; name: Plugins.Name;
 BEGIN
 	i := 0;
 	IF bus.wide THEN  max := 16  ELSE  max := 8  END;

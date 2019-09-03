@@ -1349,7 +1349,7 @@ TYPE
 		(* bounds and state of logical subcomponents *)
 		areas : ARRAY 5 OF Area;
 
-		down, pressed, hover : SHORTINT;
+		down, pressed, hover : SIGNED8;
 
 		timer : InternalTimer;
 
@@ -1501,7 +1501,7 @@ TYPE
 			END;
 		END CheckRepeating;
 
-		PROCEDURE Down(area : SHORTINT);
+		PROCEDURE Down(area : SIGNED8);
 		BEGIN
 			IF (area = MinusButton) THEN DecPos(NIL, NIL);
 			ELSIF (area = MinusPage) THEN PageUp(NIL, NIL);
@@ -1531,7 +1531,7 @@ TYPE
 		END PointerDown;
 
 		PROCEDURE PointerMove*(x, y : SIZE; keys : SET);
-		VAR oldHover, oldPressed, area : SHORTINT;
+		VAR oldHover, oldPressed, area : SIGNED8;
 		BEGIN
 			PointerMove^(x, y, keys);
 			area := FindArea(x, y);
@@ -1557,7 +1557,7 @@ TYPE
 		END PointerMove;
 
 		PROCEDURE PointerUp*(x, y : SIZE; keys : SET);
-		VAR oldPressed : SHORTINT;
+		VAR oldPressed : SIGNED8;
 		BEGIN
 			PointerUp^(x, y, keys);
 			IF ~(0 IN keys) THEN
@@ -1572,7 +1572,7 @@ TYPE
 		END PointerUp;
 
 		PROCEDURE PointerLeave*;
-		VAR oldHover : SHORTINT;
+		VAR oldHover : SIGNED8;
 		BEGIN
 			PointerLeave^;
 			IF (hover # None) THEN
@@ -1582,8 +1582,8 @@ TYPE
 			END;
 		END PointerLeave;
 
-		PROCEDURE FindArea(x, y : SIZE) : SHORTINT;
-		VAR result : SHORTINT;
+		PROCEDURE FindArea(x, y : SIZE) : SIGNED8;
+		VAR result : SIGNED8;
 		BEGIN
 			result := 0;
 			WHILE (result < LEN(areas)) & ~WMRectangles.PointInRect(x, y, areas[result].rect) DO INC(result); END;
@@ -1779,7 +1779,7 @@ TYPE
 			END;
 		END UpdateLayout;
 
-		PROCEDURE GetButtonColor(area : SHORTINT) : WMGraphics.Color;
+		PROCEDURE GetButtonColor(area : SIGNED8) : WMGraphics.Color;
 		VAR color : WMGraphics.Color;
 		BEGIN
 			IF (area = pressed) THEN color := clBtnPressed.Get();
@@ -1789,7 +1789,7 @@ TYPE
 			RETURN color;
 		END GetButtonColor;
 
-		PROCEDURE GetPageColor(area : SHORTINT) : WMGraphics.Color;
+		PROCEDURE GetPageColor(area : SIGNED8) : WMGraphics.Color;
 		VAR color : WMGraphics.Color;
 		BEGIN
 			IF (area = pressed) THEN color := clPressed.Get();
@@ -1799,7 +1799,7 @@ TYPE
 			RETURN color;
 		END GetPageColor;
 
-		PROCEDURE GetMinusButtonImage(vertical : BOOLEAN; area : SHORTINT; VAR image : WMGraphics.Image);
+		PROCEDURE GetMinusButtonImage(vertical : BOOLEAN; area : SIGNED8; VAR image : WMGraphics.Image);
 		BEGIN
 			IF vertical THEN
 				IF (area = pressed) THEN image := arrowUpPressed;
@@ -1814,7 +1814,7 @@ TYPE
 			END;
 		END GetMinusButtonImage;
 
-		PROCEDURE GetPlusButtonImage(vertical : BOOLEAN; area : SHORTINT; VAR image : WMGraphics.Image);
+		PROCEDURE GetPlusButtonImage(vertical : BOOLEAN; area : SIGNED8; VAR image : WMGraphics.Image);
 		BEGIN
 			IF vertical THEN
 				IF (area = pressed) THEN image := arrowDownPressed;
@@ -1829,7 +1829,7 @@ TYPE
 			END;
 		END GetPlusButtonImage;
 
-		PROCEDURE GetTrackerImages( vertical : BOOLEAN; area : SHORTINT; VAR a, b, c : WMGraphics.Image);
+		PROCEDURE GetTrackerImages( vertical : BOOLEAN; area : SIGNED8; VAR a, b, c : WMGraphics.Image);
 		BEGIN
 			IF vertical THEN
 				IF (area = pressed) THEN a := vTrackerPressedTop; b := vTrackerPressedMiddle; c := vTrackerPressedBottom;
@@ -1844,7 +1844,7 @@ TYPE
 			END;
 		END GetTrackerImages;
 
-		PROCEDURE GetBgImage(vertical : BOOLEAN; area : SHORTINT;  VAR image : WMGraphics.Image);
+		PROCEDURE GetBgImage(vertical : BOOLEAN; area : SIGNED8;  VAR image : WMGraphics.Image);
 		BEGIN
 			IF vertical THEN
 				IF (area = pressed) THEN image := vBgPressed;

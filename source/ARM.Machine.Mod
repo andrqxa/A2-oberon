@@ -208,7 +208,7 @@ TYPE
 		adr*: ADDRESS; size*: SIZE;
 	END;
 
-	CacheRefs = POINTER {UNSAFE,UNTRACED} TO ARRAY MaxCacheRefSize OF SHORTINT;
+	CacheRefs = POINTER {UNSAFE,UNTRACED} TO ARRAY MaxCacheRefSize OF SIGNED8;
 VAR
 	version -: ARRAY 64 OF CHAR;
 

@@ -133,10 +133,10 @@ TYPE
 		WHILE n > 0 DO ch := Get(r);  DEC( n ) END
 	END SkipBytes;
 
-	(** Read a SHORTINT. *)
-	PROCEDURE RawSInt*(VAR r: Reader; VAR x: SHORTINT );
+	(** Read a SIGNED8. *)
+	PROCEDURE RawSInt*(VAR r: Reader; VAR x: SIGNED8 );
 	BEGIN
-		x := SYSTEM.VAL( SHORTINT, Get(r) )
+		x := SYSTEM.VAL( SIGNED8, Get(r) )
 	END RawSInt;
 
 	(** Read an INTEGER. *)

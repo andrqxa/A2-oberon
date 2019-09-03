@@ -103,7 +103,7 @@ TYPE
 			cmd: ARRAY CmdLen OF CHAR;
 			logged, quit: BOOLEAN;
 			user: User;
-			type: SHORTINT;
+			type: SIGNED8;
 			workDir: ARRAY dirLen OF CHAR;
 			rnfrName: ARRAY dirLen OF CHAR;	(* RNFR parameter *)
 			state: LONGINT;	(* one of: Ok, RNFR, REST *)

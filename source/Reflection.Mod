@@ -346,7 +346,7 @@ CONST
 	VAR
 		b: BOOLEAN;
 		c: CHAR;
-		s: SHORTINT; i: INTEGER; l: LONGINT; h: HUGEINT;
+		s: SIGNED8; i: INTEGER; l: LONGINT; h: HUGEINT;
 		sz: SIZE; a, pc: ADDRESS;
 		word: WORD; lword: LONGWORD;
 		s8: SIGNED8; s16: SIGNED16; s32: SIGNED32; s64: SIGNED64;
@@ -379,7 +379,7 @@ CONST
 			size := SIZEOF(CHAR);
 			SYSTEM.GET(adr, c); IF (c > " ") & (c <= "~") THEN w.Char( c ); ELSE w.Hex( ORD( c ), -2 );  w.Char( "X" ) END;
 		| sfTypeSHORTINT:
-			size := SIZEOF(SHORTINT);
+			size := SIZEOF(SIGNED8);
 			SYSTEM.GET(adr, s); Signed(s);
 		| sfTypeINTEGER:
 			size := SIZEOF(INTEGER);
@@ -1102,7 +1102,7 @@ TYPE
 			w.String("):"); ReportType(w, refs, offset);
 		| sfTypeBOOLEAN: w.String("BOOLEAN");
 		| sfTypeCHAR: w.String("CHAR");
-		| sfTypeSHORTINT: w.String("SHORTINT");
+		| sfTypeSHORTINT: w.String("SIGNED8");
 		| sfTypeINTEGER: w.String("INTEGER");
 		| sfTypeLONGINT: w.String("LONGINT");
 		| sfTypeHUGEINT: w.String("HUGEINT");

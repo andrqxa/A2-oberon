@@ -25,7 +25,7 @@ MODULE GfxBuffer; (** portable *)	(* eos  *)
 			bgCol*: Gfx.Color;	(** background color for erasing **)
 			img*: Images.Image;	(** target buffer **)
 			pix: Images.Pixel;
-			compOp:SHORTINT; (* composition operation for raster device *)
+			compOp:SIGNED8; (* composition operation for raster device *)
 		END;
 
 		RegData = RECORD (GfxRegions.EnumData)
@@ -201,7 +201,7 @@ MODULE GfxBuffer; (** portable *)	(* eos  *)
 	END SetBGColor;
 
 	(** set composition operation as defined in Raster **)
-	PROCEDURE SetCompOp* (bc: Context; op:SHORTINT);
+	PROCEDURE SetCompOp* (bc: Context; op:SIGNED8);
 	BEGIN
 		bc.compOp := op
 	END SetCompOp;

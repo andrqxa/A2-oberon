@@ -115,7 +115,7 @@ VAR
 	PROCEDURE GetCipherParams*(	CONST name: ARRAY OF CHAR;
 											VAR modname: ARRAY OF CHAR;
 											VAR bits: LONGINT;
-											VAR mode: SHORTINT );
+											VAR mode: SIGNED8 );
 	VAR x: ARRAY 128 OF CHAR;
 	BEGIN
 		IF buf = NIL THEN  buf := GetConfigBuffer()  END;

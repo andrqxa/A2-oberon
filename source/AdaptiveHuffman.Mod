@@ -85,7 +85,7 @@ TYPE
 				down: Index			(* pair of down nodes (if weight is odd, internal node)	*)
 			END;
 		VAR
-			mode: SHORTINT;	(* Encode, Decode *)
+			mode: SIGNED8;	(* Encode, Decode *)
 			in: BitReader;		(* input from archive *)
 			out: BitWriter;	(* output to archive *)
 
@@ -96,7 +96,7 @@ TYPE
 
 
 
-		PROCEDURE &New( m: SHORTINT;  input: Streams.Reader;  output: Streams.Writer );
+		PROCEDURE &New( m: SIGNED8;  input: Streams.Reader;  output: Streams.Writer );
 		BEGIN
 			ASSERT( m IN {Encode, Decode} );
 			mode := m;

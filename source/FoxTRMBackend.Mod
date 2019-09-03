@@ -603,7 +603,7 @@ TYPE
 		END IsFloat;
 
 		PROCEDURE Generate*(VAR instruction: IntermediateCode.Instruction);
-		VAR opcode: SHORTINT; ticket: Ticket; hwreg, lastUse: LONGINT;
+		VAR opcode: SIGNED8; ticket: Ticket; hwreg, lastUse: LONGINT;
 		BEGIN
 			CheckFixups;
 

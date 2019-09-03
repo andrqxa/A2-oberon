@@ -1294,7 +1294,7 @@ BEGIN
 	AddBasicType(Universe, "BOOLEAN", TS.BasicBoolean);
 	AddBasicType(Universe, "ANY", TS.BasicInt32);
 	AddBasicType(Universe, "PTR", TS.BasicInt32);
-	AddBasicType(Universe, "SHORTINT", TS.BasicInt8);
+	AddBasicType(Universe, "SIGNED8", TS.BasicInt8);
 	AddBasicType(Universe, "INTEGER", TS.BasicInt16);
 	AddBasicType(Universe, "LONGINT", TS.BasicInt32);
 	AddBasicType(Universe, "SET", TS.BasicInt32);

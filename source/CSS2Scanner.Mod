@@ -50,7 +50,7 @@ TYPE
 		Scanner* = OBJECT
 		VAR
 			sym-: LONGINT;
-			numberType-: SHORTINT;
+			numberType-: SIGNED8;
 			intVal-: LONGINT;
 			realVal-: LONGREAL;
 			line-, row-, pos: LONGINT;
@@ -118,7 +118,7 @@ TYPE
 		END ScanComment;
 
 		PROCEDURE ScanEscape(isString: BOOLEAN; VAR i: LONGINT);
-		VAR val: LONGINT; n: SHORTINT; hexstr: ARRAY 7 OF CHAR; newline: BOOLEAN;
+		VAR val: LONGINT; n: SIGNED8; hexstr: ARRAY 7 OF CHAR; newline: BOOLEAN;
 		BEGIN
 			newline := FALSE;
 			NextCh();

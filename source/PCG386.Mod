@@ -54,7 +54,7 @@ CONST
 	intMode = 0;  floatMode = 1;	(*index for JccTable*)
 
 TYPE
-	Register = SHORTINT;		(* i386 Register*)
+	Register = SIGNED8;		(* i386 Register*)
 
 	(*
 		Address describes the value used by the instruction in terms of a complex addressing mode.
@@ -105,7 +105,7 @@ TYPE
 	*)
 	Address = OBJECT (PCLIR.InstructionAttribute)
 	VAR
-		mode, scale: SHORTINT;
+		mode, scale: SIGNED8;
 		base, index: PCLIR.Register;
 		imm, imm2, disp: LONGINT;
 		addr: PCM.Attribute;
@@ -122,9 +122,9 @@ TYPE
 	(* RealAddress - Similar to address, used to represent a real addressing mode during code emission *)
 
 	RealAddress = RECORD
-		mode: SHORTINT;		(* PCO.Regs / Mem / Imme / MemA *)
+		mode: SIGNED8;		(* PCO.Regs / Mem / Imme / MemA *)
 		base, index: Register;
-		scale: SHORTINT;
+		scale: SIGNED8;
 		imm, imm2, disp: LONGINT;
 		addr: PCM.Attribute;
 		size: PCLIR.Size;
@@ -135,18 +135,18 @@ VAR
 	SavedRegisters: SavedRegistersType; (* ARRAY 800 OF SavedRegistersDesc; *)
 	SaveLevel: LONGINT;
 
-	CCTableSwitch: SHORTINT;	(*0=Int/1=Float; remind last cmp operation, used for jcc/jncc/setcc because flags are different*)
+	CCTableSwitch: SIGNED8;	(*0=Int/1=Float; remind last cmp operation, used for jcc/jncc/setcc because flags are different*)
 
 	(* Conversion Tables *)
-	FPSize: ARRAY 7 OF SHORTINT;
-	TccOpcode: ARRAY 2 OF SHORTINT;	(*maps Tcc to a Jcc jump that skips the trap*)
-	JccOpcode: ARRAY 16, 2 OF SHORTINT;	(* maps PCLIR.jcc to i386 jcc *)
-	Jcc2Opcode: ARRAY 16, 3 OF SHORTINT;	(* maps PCLIR.jcc to i386 jcc for HUGEINTS comparisons*)
-	Typ1Opcode: ARRAY 5 OF SHORTINT;
-	Typ1Opcode2: ARRAY 5 OF SHORTINT;	(*opcodes for the msb of Typ1Operations (Huge) *)
-	Group3Opcode: ARRAY 2 OF SHORTINT;	(*maps to neg/not*)
-	BitOpcode: ARRAY 2 OF SHORTINT;		(*maps to bts/btc*)
-	ShiftOpcode: ARRAY 6, 2 OF SHORTINT;	(*maps to ash/bsh/rot*)
+	FPSize: ARRAY 7 OF SIGNED8;
+	TccOpcode: ARRAY 2 OF SIGNED8;	(*maps Tcc to a Jcc jump that skips the trap*)
+	JccOpcode: ARRAY 16, 2 OF SIGNED8;	(* maps PCLIR.jcc to i386 jcc *)
+	Jcc2Opcode: ARRAY 16, 3 OF SIGNED8;	(* maps PCLIR.jcc to i386 jcc for HUGEINTS comparisons*)
+	Typ1Opcode: ARRAY 5 OF SIGNED8;
+	Typ1Opcode2: ARRAY 5 OF SIGNED8;	(*opcodes for the msb of Typ1Operations (Huge) *)
+	Group3Opcode: ARRAY 2 OF SIGNED8;	(*maps to neg/not*)
+	BitOpcode: ARRAY 2 OF SIGNED8;		(*maps to bts/btc*)
+	ShiftOpcode: ARRAY 6, 2 OF SIGNED8;	(*maps to ash/bsh/rot*)
 
 	(* Debug *)
 	RegName: ARRAY 8 OF CHAR;
@@ -158,7 +158,7 @@ TYPE
 		VAR
 			reg32, reg8: RegSet;
 			regFP: RegSet;
-			FSP: SHORTINT;	(*F-Stack Top Pointer *)
+			FSP: SIGNED8;	(*F-Stack Top Pointer *)
 			(*
 				reg8:
 					Free: register not used
@@ -235,7 +235,7 @@ TYPE
 
 		(* GetReg - Reserve a reg of given size for use by virtual register pc *)
 
-		PROCEDURE GetReg(VAR reg: Register;  size: SHORTINT;  pc: LONGINT;  mask: SET);
+		PROCEDURE GetReg(VAR reg: Register;  size: SIGNED8;  pc: LONGINT;  mask: SET);
 
 			PROCEDURE GetReg8;
 			VAR  p: Register;
@@ -304,7 +304,7 @@ TYPE
 		(* FreeReg - Free a register *)
 
 		PROCEDURE FreeReg(reg: Register);
-		VAR off8, off32: SHORTINT;
+		VAR off8, off32: SIGNED8;
 		BEGIN
 			Assert(reg IN Regs, 1017);
 			IF  reg IN {ESP, EBP} THEN	(*skip, never allocated*)
@@ -365,7 +365,7 @@ BEGIN
 	RETURN reg1 = reg2
 END RegisterOverlaps;
 
-PROCEDURE RegisterSize(reg: Register): SHORTINT;
+PROCEDURE RegisterSize(reg: Register): SIGNED8;
 BEGIN
 	IF reg IN Reg32 THEN  RETURN 4
 	ELSIF reg IN Reg16 THEN  RETURN 2
@@ -409,9 +409,9 @@ BEGIN
 	END
 END RegisterD;
 
-PROCEDURE ConstSize(c: LONGINT; allow16: BOOLEAN): SHORTINT;
+PROCEDURE ConstSize(c: LONGINT; allow16: BOOLEAN): SIGNED8;
 BEGIN
-	IF (c >= MIN(SHORTINT)) & (c <= MAX(SHORTINT)) THEN
+	IF (c >= MIN(SIGNED8)) & (c <= MAX(SIGNED8)) THEN
 		RETURN 1
 	ELSIF allow16 & (c >= MIN(INTEGER)) & (c <= MAX(INTEGER)) THEN
 		RETURN 2
@@ -706,12 +706,12 @@ END SetRegisterHint2;
 (** Optimize - Perform some code optimizations; must be a reverse traversal *)
 PROCEDURE Optimize(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT;  context: ANY);
 CONST	Full = 1;  Const = 2;  NoConst = 3;	(*Optimization Mode*)
-VAR	p: PCLIR.Piece;  copy, pos: LONGINT; op: PCLIR.Opcode; debSrc1, debSrc2: PCLIR.Register; mode: SHORTINT;
+VAR	p: PCLIR.Piece;  copy, pos: LONGINT; op: PCLIR.Opcode; debSrc1, debSrc2: PCLIR.Register; mode: SIGNED8;
 	info: Address;  format: LONGINT; size1: PCLIR.Size;
 	alive: AliveSetPtr; hint1, hint2: Register;
 
-	PROCEDURE Compact(reg: PCLIR.Register;  mode:  SHORTINT): SHORTINT;
-	VAR  p: PCLIR.Piece; pos: LONGINT;  info: Address;  op: PCLIR.Opcode;  mode0: SHORTINT;
+	PROCEDURE Compact(reg: PCLIR.Register;  mode:  SIGNED8): SIGNED8;
+	VAR  p: PCLIR.Piece; pos: LONGINT;  info: Address;  op: PCLIR.Opcode;  mode0: SIGNED8;
 	BEGIN
 		IF reg >= instr.barrier THEN
 			pos := reg; code.GetPiece(pos, p);
@@ -1000,7 +1000,7 @@ END UseRegister2;
 
 PROCEDURE UseComplexI(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  VAR addr: RealAddress);
 VAR  info: Address;  adr: PCBT.Procedure;
-	PROCEDURE IntelScale(scale: LONGINT): SHORTINT;
+	PROCEDURE IntelScale(scale: LONGINT): SIGNED8;
 	BEGIN
 		CASE scale OF
 		| 1:  RETURN PCO.Scale1  | 2:  RETURN PCO.Scale2  | 4:  RETURN PCO.Scale4  | 8:  RETURN PCO.Scale8
@@ -1741,7 +1741,7 @@ BEGIN
 
 END GenLabel;
 
-PROCEDURE EmitJcc(op: SHORTINT;  dest: LONGINT;  VAR chain: LONGINT);
+PROCEDURE EmitJcc(op: SIGNED8;  dest: LONGINT;  VAR chain: LONGINT);
 BEGIN
 	IF dest = 0 THEN	(*fwd jmp*)
 		PCO.GenJcc(op, chain+10000H);
@@ -1754,7 +1754,7 @@ BEGIN
 END EmitJcc;
 
 PROCEDURE GenJcc(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT);
-VAR  info: Address;  pos, fix: LONGINT;  p: PCLIR.Piece;  jcc: SHORTINT; src1, src2: RealAddress;
+VAR  info: Address;  pos, fix: LONGINT;  p: PCLIR.Piece;  jcc: SIGNED8; src1, src2: RealAddress;
 BEGIN
 	UseComplex(code, instr.src1, src1);  UseComplex(code, instr.src2, src2);
 	pos := instr.val; code.GetPiece(pos, p);
@@ -1820,7 +1820,7 @@ BEGIN
 END GenCall;
 
 PROCEDURE GenCallReg(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT);
-VAR  src: RealAddress;  mode: SHORTINT;
+VAR  src: RealAddress;  mode: SIGNED8;
 BEGIN
 	UseComplex(code, instr.src1, src);
 	mode := src.mode;
@@ -1836,7 +1836,7 @@ BEGIN
 END GenSysCall;
 
 PROCEDURE GenSetcc(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT);
-VAR  reg: Register;  jcc, op: SHORTINT; src1, src2: RealAddress; true1, true2, false: LONGINT;
+VAR  reg: Register;  jcc, op: SIGNED8; src1, src2: RealAddress; true1, true2, false: LONGINT;
 BEGIN
 	UseComplex(code, instr.src1, src1);  UseComplex(code, instr.src2, src2);
 	IF src1.size = PCLIR.Int64 THEN
@@ -1941,7 +1941,7 @@ BEGIN
 END GenPush;
 
 PROCEDURE IntExpansion(op: PCLIR.Opcode;  src: RealAddress;  dst: Register);
-VAR t: SHORTINT;  size: LONGINT;
+VAR t: SIGNED8;  size: LONGINT;
 BEGIN
 	size := PCLIR.NofBytes(src.size);
 	IF size = 1 THEN  t := 0  ELSE  t := 1  END;
@@ -2137,7 +2137,7 @@ BEGIN
 END GenAbs;
 
 PROCEDURE GenBitOp(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT);
-VAR  reg: Register;  src2: RealAddress;  op: SHORTINT;
+VAR  reg: Register;  src2: RealAddress;  op: SIGNED8;
 BEGIN
 	UseRegister(code, instr.src1, reg);  AllocateThisRegI(instr, pc, reg);
 	UseComplex(code, instr.src2, src2);
@@ -2227,7 +2227,7 @@ BEGIN
 END GenCmp2;
 
 PROCEDURE GenFtyp1(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT);
-VAR src1, src2: RealAddress;  reverse: BOOLEAN;  op: SHORTINT;  reg: Register;
+VAR src1, src2: RealAddress;  reverse: BOOLEAN;  op: SIGNED8;  reg: Register;
 BEGIN
 	ASSERT(instr.dstSize IN PCLIR.FloatSize);
 	UseComplex(code, instr.src2, src2);  ASSERT(src2.mode IN {PCO.Regs, PCO.Mem, PCO.MemA});		(* higher on FP Stack, first used *)
@@ -2786,7 +2786,7 @@ END GenCaseElse;
 
 (* Debug Procedures *)
 PROCEDURE DumpCode(code: PCLIR.Code;  VAR instr: PCLIR.Instruction;  pc: LONGINT;  context: ANY);
-	VAR op: PCLIR.Opcode;   format: SHORTINT;  info: Address;
+	VAR op: PCLIR.Opcode;   format: SIGNED8;  info: Address;
 
 	PROCEDURE Reg(r: PCLIR.Register;  expand: BOOLEAN);
 	VAR p: PCLIR.Piece; reg: LONGINT;
@@ -3069,7 +3069,7 @@ END Done;
 	END Install;
 
 	PROCEDURE Configure;
-	VAR i: SHORTINT;
+	VAR i: SIGNED8;
 	BEGIN
 		TccOpcode[PCLIR.tae-PCLIR.tae] := PCO.JNAE;
 		TccOpcode[PCLIR.tne-PCLIR.tae] := PCO.JE;

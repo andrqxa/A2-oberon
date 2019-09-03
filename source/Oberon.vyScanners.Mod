@@ -92,7 +92,7 @@ CONST	(*cDebug=FALSE;*)	idversion* = "vyScanner 0.0a2-1";
 	csBackslash = 76;
 TYPE
 	tName = ARRAY maxNameLen OF CHAR;
-	tChTable = ARRAY 256 OF SHORTINT;
+	tChTable = ARRAY 256 OF SIGNED8;
 	tReserved = POINTER TO tReservedTable;
 	tReservedTable = ARRAY maxReserved OF tName;
 

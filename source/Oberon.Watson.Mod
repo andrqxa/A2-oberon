@@ -153,14 +153,14 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 		wasRecord: BOOLEAN;	(* last type read was a record *)
 		newLine: BOOLEAN;	(* TRUE when read a line feed while scanning one symbol *)
 		ch: CHAR;     (* current character *)
-		sym: SHORTINT;	(* current symbol *)
+		sym: SIGNED8;	(* current symbol *)
 
 		(* variables needed to write definition text *)
 		OutT: Texts.Text;	(* text for definition output *)
 		italic: Fonts.Font;	(* pointer to Oberon10i font *)
 		lastPos, importPos: LONGINT;	(* position of last error *)
 		noerr: BOOLEAN;
-		curErr: SHORTINT;	(* current error code *)
+		curErr: SIGNED8;	(* current error code *)
 		doItalic: BOOLEAN;	(* forces output of comments in italic *)
 
 	(* ---------------------- string operations ----------------------- *)
@@ -192,7 +192,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 
 	(* ---------------------- output procedure ----------------------- *)
 
-	PROCEDURE SetColor(col: SHORTINT);	(*  sets W color to col *)
+	PROCEDURE SetColor(col: SIGNED8);	(*  sets W color to col *)
 	BEGIN Texts.SetColor(W, col)
 	END SetColor;
 
@@ -414,7 +414,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 	BEGIN RETURN Texts.Pos(R)-1
 	END Pos;
 
-	PROCEDURE err(n: SHORTINT);	(* writes an error msg to the Oberon log *)
+	PROCEDURE err(n: SIGNED8);	(* writes an error msg to the Oberon log *)
 		VAR pos: LONGINT;
 	BEGIN noerr:= FALSE; pos:= Pos();
 		Texts.OpenBuf(W.buf); Texts.SetFont(W, Fonts.Default);
@@ -566,7 +566,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 		ELSE
 			(* check if ident is a keyword, if so write it and return *)
 			IF (name = "CHAR") OR (name = "BOOLEAN") OR (name = "INTEGER") THEN Str(name); RETURN
-			ELSIF (name = "LONGINT") OR (name = "SHORTINT") OR (name = "SET")THEN Str(name); RETURN
+			ELSIF (name = "LONGINT") OR (name = "SIGNED8") OR (name = "SET")THEN Str(name); RETURN
 			ELSIF (name = "REAL") OR (name = "LONGREAL") THEN Str(name); RETURN
 			ELSIF (name = "TRUE") OR (name = "FALSE") THEN Str(name); RETURN
 			ELSIF (name = "MOD") OR (name = "DIV") THEN Str(name); RETURN
@@ -713,7 +713,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 		wPos: after last symbol or start of line
 		begPos: beginnig of current symbol
 	*)
-		VAR oLine: INTEGER; s: SHORTINT; ch0: CHAR;
+		VAR oLine: INTEGER; s: SIGNED8; ch0: CHAR;
 	BEGIN
 		IF sym = eot THEN RETURN END;	(* nothing more to scan *)
 		s:= none; oLine:= lines;
@@ -811,7 +811,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 	BEGIN IF sym = s THEN Sym ELSE err(errSym) END
 	END CheckSym;
 
-	PROCEDURE CheckMark(VAR vis: SHORTINT);
+	PROCEDURE CheckMark(VAR vis: SIGNED8);
 	BEGIN
 		IF (sym = times) OR (sym = minus) THEN
 			IF level > 0 THEN vis:= internal
@@ -860,7 +860,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 	END ConstExpression;
 
 	PROCEDURE ConstDef;	(* parses and writes constant declarations *)
-		VAR cmnt: Cmnt; obj: LocalIdent; vis: SHORTINT; first, newL, needsLn: BOOLEAN;
+		VAR cmnt: Cmnt; obj: LocalIdent; vis: SIGNED8; first, newL, needsLn: BOOLEAN;
 	BEGIN first:= TRUE; needsLn:= NeedsLn(); cmnt:= cmnts.next; Sym;
 		WHILE sym = ident DO newL:= newL OR newLine;
 			Sym; CheckMark(vis);
@@ -1052,7 +1052,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 	END SkipType;
 
 	PROCEDURE TypeDef;	(* parses and writes a type declaration block *)
-		VAR cmnt: Cmnt; obj: LocalIdent; vis: SHORTINT; first, newL, needsLn: BOOLEAN;
+		VAR cmnt: Cmnt; obj: LocalIdent; vis: SIGNED8; first, newL, needsLn: BOOLEAN;
 	BEGIN wasRecord:= FALSE; recLevel:= 0; first:= TRUE; needsLn:= NeedsLn(); cmnt:= cmnts.next; Sym;
 		WHILE sym = ident DO newL:= newL OR newLine;
 			Sym; CheckMark(vis);
@@ -1072,7 +1072,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 	(* ---------------- parse variable declaration block ----------------- *)
 
 	PROCEDURE VarDef;	(* parses and writes a variable declaration block *)
-		VAR cmnt: Cmnt; vis: SHORTINT; first, isVis, newL, needsLn, writeVar: BOOLEAN; flag: Name;
+		VAR cmnt: Cmnt; vis: SIGNED8; first, isVis, newL, needsLn, writeVar: BOOLEAN; flag: Name;
 	BEGIN  first:= TRUE; needsLn:= NeedsLn(); cmnt:= cmnts.next;
 		writeVar := sym = var;
 		IF writeVar THEN Sym END;
@@ -1109,7 +1109,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 	PROCEDURE ProcedureDeclaration(blockvis: BOOLEAN);
 		(* parses and writes/skips one procedure declaration. *)
 		CONST LProc = 0; XProc = 1; IProc = 2; CProc = 3;
-		VAR procId, self, typId, sysflag: Name; vis, mode: SHORTINT; fwd, init, varPar, constPar: BOOLEAN;
+		VAR procId, self, typId, sysflag: Name; vis, mode: SIGNED8; fwd, init, varPar, constPar: BOOLEAN;
 	BEGIN fwd:= FALSE; init:= FALSE; mode:= LProc;
 		IF sym = arrow THEN fwd:= TRUE; Sym END;
 		IF sym = lbrace THEN  Sym; COPY(id, sysflag); CheckSym(ident); CheckSym(rbrace)  END;
@@ -1561,7 +1561,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 	(* *************** WATSON MAIN PART *************** *)
 
 	PROCEDURE GetArgs (VAR S: Texts.Scanner; VAR name: ARRAY OF CHAR);	(* reads in the given params *)
-		VAR text: Texts.Text; beg, end, time: LONGINT; optS: SET; k: SHORTINT; A: Objects.AttrMsg;
+		VAR text: Texts.Text; beg, end, time: LONGINT; optS: SET; k: SIGNED8; A: Objects.AttrMsg;
 
 		PROCEDURE SetOrder(str: ARRAY OF CHAR);
 			VAR i: INTEGER; ch: CHAR;

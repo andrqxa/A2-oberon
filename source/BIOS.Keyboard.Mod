@@ -70,7 +70,7 @@ VAR
 	flags: SET;
 	keytable: POINTER TO ARRAY OF CHAR;
 	keyboard: Keyboard;
-	mapflag: ARRAY RShift+1 OF SHORTINT;
+	mapflag: ARRAY RShift+1 OF SIGNED8;
 
 (* ---- Keyboard Driver ---- *)
 
@@ -350,7 +350,7 @@ END ShiftKey;
 
 (* LedKey - Handle "lock" keys. *)
 
-PROCEDURE LedKey(VAR flags: SET; lock: SHORTINT; c: CHAR;
+PROCEDURE LedKey(VAR flags: SET; lock: SIGNED8; c: CHAR;
 		VAR k: WORD);
 BEGIN
 	IF flags * {LAlt, RAlt, LCtrl, RCtrl, LShift, RShift} = {} THEN
@@ -488,7 +488,7 @@ END KeySym;
 (* InitKeyboard - Initialise the keyboard. *)
 
 PROCEDURE InitKeyboard;
-VAR s: SET; c: CHAR; i: SHORTINT; k: ARRAY 32 OF CHAR;
+VAR s: SET; c: CHAR; i: SIGNED8; k: ARRAY 32 OF CHAR;
 BEGIN
 	keyval := -1; dkey := 0;
 	mapflag[LAlt] := Inputs.LeftAlt; mapflag[RAlt] := Inputs.RightAlt;

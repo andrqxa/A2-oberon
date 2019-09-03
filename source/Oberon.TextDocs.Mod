@@ -707,7 +707,7 @@ END ChangeFont;
 	Changes the color of the selection. *)
 PROCEDURE ChangeColor*;
 VAR par: Oberon.ParList; S: Attributes.Scanner; T: Texts.Text;
-	col: SHORTINT; beg, end, time: LONGINT;
+	col: SIGNED8; beg, end, time: LONGINT;
 BEGIN par := Oberon.Par;
 	Attributes.OpenScanner(S, par.text, par.pos); Attributes.Scan(S);
 	IF S.class # Texts.Int THEN col := Display.FG ELSE col := SHORT(SHORT(S.i)) END;
@@ -719,7 +719,7 @@ END ChangeColor;
 	Changes the offset of the selection. Offset is measured in pixels, and may be negative. *)
 PROCEDURE ChangeOffset*;
 VAR par: Oberon.ParList; S: Attributes.Scanner; T: Texts.Text;
-	off: SHORTINT; beg, end, time: LONGINT;
+	off: SIGNED8; beg, end, time: LONGINT;
 BEGIN par := Oberon.Par;
 	Attributes.OpenScanner(S, par.text, par.pos); Attributes.Scan(S);
 	IF S.class # Texts.Int THEN off := 0 ELSE off := SHORT(SHORT(S.i)) END;
@@ -861,7 +861,7 @@ END SearchColor;
 (** fof >> *)
 PROCEDURE ReplaceColor*;
 	VAR R: Texts.Reader;S: Attributes.Scanner;  text: Texts.Text;
-		beg, end,time: LONGINT; ch: CHAR; srccol,destcol: SHORTINT;
+		beg, end,time: LONGINT; ch: CHAR; srccol,destcol: SIGNED8;
  par: Oberon.ParList; f: Display.Frame; F: TextGadgets.Frame; doc: Documents.Document;
 
 BEGIN

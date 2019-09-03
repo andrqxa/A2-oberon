@@ -40,7 +40,7 @@ TYPE
 			lenx := len[0];  leny := len[1];  lenz := len[2];  ox := origin[0];  oy := origin[1];  oz := origin[2];
 		END ValidateCache;
 
-		PROCEDURE SetBoundaryCondition*( c: SHORTINT );   (* called by new, load and directly *)
+		PROCEDURE SetBoundaryCondition*( c: SIGNED8 );   (* called by new, load and directly *)
 		BEGIN
 			SetBoundaryCondition^( c );
 			CASE c OF
@@ -435,7 +435,7 @@ TYPE
 
 (* The procedures needed to register type Cube so that its instances can be made persistent. *)
 	PROCEDURE LoadCube( R: DataIO.Reader;  VAR obj: OBJECT );
-	VAR a: Cube;  version: SHORTINT;  ver: NbrInt.Integer;
+	VAR a: Cube;  version: SIGNED8;  ver: NbrInt.Integer;
 	BEGIN
 		R.RawSInt( version );
 		IF version = -1 THEN

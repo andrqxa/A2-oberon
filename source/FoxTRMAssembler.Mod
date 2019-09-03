@@ -28,7 +28,7 @@ TYPE
 			(* stub, must be overwritten by implementation *)
 			VAR operand: InstructionSet.Operand;
 				result: FoxAssembler.Result;
-				register1,register2: SHORTINT;
+				register1,register2: SIGNED8;
 				stop,memory: BOOLEAN;
 			BEGIN
 				stop := FALSE;
@@ -104,7 +104,7 @@ TYPE
 			END
 		END Instruction;
 
-		PROCEDURE GetRegister(CONST ident: ARRAY OF CHAR; VAR register: SHORTINT): BOOLEAN;
+		PROCEDURE GetRegister(CONST ident: ARRAY OF CHAR; VAR register: SIGNED8): BOOLEAN;
 		BEGIN
 			register := instructionSet.FindRegister(ident);
 			RETURN register # InstructionSet.None

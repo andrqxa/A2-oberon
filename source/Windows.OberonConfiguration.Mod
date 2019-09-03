@@ -38,9 +38,9 @@ TYPE
 
 	tWriter = OBJECT
 			VAR PutCh: WriterProc;
-				EndOfLine: SHORTINT;
+				EndOfLine: SIGNED8;
 
-				PROCEDURE & Init*( w: WriterProc;  eol: SHORTINT );
+				PROCEDURE & Init*( w: WriterProc;  eol: SIGNED8 );
 				BEGIN
 					PutCh := w;  EndOfLine := eol;
 				END Init;
@@ -174,8 +174,8 @@ TYPE
 					IF buflen > 0 THEN Getchb( ch ) ELSE GetCh( ch );  INC( pos );  END;
 				END Getch;
 
-				PROCEDURE Get( VAR sym: SHORTINT );
-				VAR s: SHORTINT;
+				PROCEDURE Get( VAR sym: SIGNED8 );
+				VAR s: SIGNED8;
 				BEGIN
 					IF och # 0X THEN  (* ignore controls in string *)
 						IF ch = och THEN och := 0X;  s := char;  Getch( ch ) ELSE
@@ -217,19 +217,19 @@ TYPE
 
 			(** parser *)
 
-				PROCEDURE White( VAR sym: SHORTINT );
+				PROCEDURE White( VAR sym: SIGNED8 );
 				BEGIN
 					WHILE (sym = whitespace) OR (sym = eol) DO Get( sym ) END;
 				END White;
 
-				PROCEDURE SkipNL( VAR sym: SHORTINT );
+				PROCEDURE SkipNL( VAR sym: SIGNED8 );
 				BEGIN
 					WHILE (sym = whitespace) DO Get( sym );  END;
 					IF sym = eol THEN Get( sym ) END;
 					WHILE (sym = whitespace) DO Get( sym );  END;
 				END SkipNL;
 
-				PROCEDURE Entry( VAR sym: SHORTINT;  name: ARRAY OF CHAR;  segment: tSegment );
+				PROCEDURE Entry( VAR sym: SIGNED8;  name: ARRAY OF CHAR;  segment: tSegment );
 				VAR value: tString;  i: LONGINT;
 				BEGIN
 					i := 0;
@@ -240,7 +240,7 @@ TYPE
 					value[i] := 0X;  AddValue( segment, name, value );  SkipNL( sym );
 				END Entry;
 
-				PROCEDURE Subsection( VAR sym: SHORTINT;  name: ARRAY OF CHAR;  segment: tSegment ): BOOLEAN;
+				PROCEDURE Subsection( VAR sym: SIGNED8;  name: ARRAY OF CHAR;  segment: tSegment ): BOOLEAN;
 				VAR seg: tSegment;
 				BEGIN
 					IF sym # lbrace THEN RETURN FALSE END;
@@ -249,8 +249,8 @@ TYPE
 					RETURN TRUE
 				END Subsection;
 
-				PROCEDURE AssignHead( VAR sym: SHORTINT;  VAR name: ARRAY OF CHAR ): BOOLEAN;
-				VAR lastsym: SHORTINT;  buflastch: CHAR;
+				PROCEDURE AssignHead( VAR sym: SIGNED8;  VAR name: ARRAY OF CHAR ): BOOLEAN;
+				VAR lastsym: SIGNED8;  buflastch: CHAR;
 				BEGIN
 					ASSERT( buflen = 0 );
 					IF sym # char THEN RETURN FALSE END;
@@ -271,7 +271,7 @@ TYPE
 					END;
 				END AssignHead;
 
-				PROCEDURE Segment( VAR sym: SHORTINT;  segment: tSegment );
+				PROCEDURE Segment( VAR sym: SIGNED8;  segment: tSegment );
 				VAR name: tName;
 				BEGIN
 					WHILE (sym # eot) & (sym # rbrace) DO
@@ -285,7 +285,7 @@ TYPE
 				END Segment;
 
 				PROCEDURE Configuration( ): tSegment;
-				VAR s: SHORTINT;  segment: tSegment;
+				VAR s: SIGNED8;  segment: tSegment;
 				BEGIN
 					buflen := 0;  bufpos := 0;  noerr := TRUE;  Getch( ch );  Get( s );  White( s );
 					segment := AddSegment( NIL , "" );  Segment( s, segment );
@@ -294,7 +294,7 @@ TYPE
 
 			END tParser;
 VAR
-	EndOfLine*: SHORTINT;  PathSeparator-: CHAR;
+	EndOfLine*: SIGNED8;  PathSeparator-: CHAR;
 
 	(** output *)
 

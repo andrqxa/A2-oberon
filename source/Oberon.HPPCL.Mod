@@ -210,7 +210,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 		WriteInt(x); WriteInt(y); WriteInt(w); WriteInt(h)
 	END ReplConst;
 
-	PROCEDURE fontno(name: ARRAY OF CHAR): SHORTINT;
+	PROCEDURE fontno(name: ARRAY OF CHAR): SIGNED8;
 		VAR i, j: INTEGER;
 	BEGIN i := 0;
 		WHILE (i < nofonts) & (font[i] # name) DO INC(i) END ;
@@ -252,12 +252,12 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END GetMetric;
 
 	PROCEDURE String*(P: Printer.Printer; x, y: INTEGER; s: ARRAY OF CHAR; fnt: Fonts.Font);
-		VAR fno: SHORTINT;
+		VAR fno: SIGNED8;
 	BEGIN fno := fontno(fnt.name); Write(1); Write(fno); WriteInt(x); WriteInt(y); WriteString(s)
 	END String;
 
 	PROCEDURE ContString*(P: Printer.Printer; s: ARRAY OF CHAR; fnt: Fonts.Font);
-		VAR fno: SHORTINT;
+		VAR fno: SIGNED8;
 	BEGIN fno := fontno(fnt.name); Write(0); Write(fno); WriteString(s)
 	END ContString;
 
@@ -1074,7 +1074,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 
 	PROCEDURE Spool(me: Oberon.Task);
 		VAR x, y, w, h, px, py, pw, ph, i, n, r, g, b, y0: INTEGER;  T, ip: LONGINT; pl: PictList;
-		string : ARRAY 400 OF CHAR; ch : CHAR; col, open, fno, mode : SHORTINT; X, Y : ARRAY 200 OF INTEGER;
+		string : ARRAY 400 OF CHAR; ch : CHAR; col, open, fno, mode : SIGNED8; X, Y : ARRAY 200 OF INTEGER;
 
 	PROCEDURE Clip(VAR  y, h : INTEGER) : BOOLEAN;
 		VAR  t : INTEGER;

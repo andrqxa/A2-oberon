@@ -120,7 +120,7 @@ MODULE VinciPens IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Outliner (ctxt: Scheme.Context; args: Object; VAR res: Object);
 		VAR
-			c: Context; w, limit: REAL; cap: Gfx.CapStyle; join: Gfx.JoinStyle; base: LeoPens.Pen; mode: SHORTINT;
+			c: Context; w, limit: REAL; cap: Gfx.CapStyle; join: Gfx.JoinStyle; base: LeoPens.Pen; mode: SIGNED8;
 			str: Object; s: ARRAY 30 OF CHAR; ref: Objects.Object; pen: LeoOutliners.Outliner;
 	BEGIN
 		c := ctxt(Context); w := 1; limit := 5; cap := Gfx.DefaultCap; join := Gfx.DefaultJoin;
@@ -151,7 +151,7 @@ MODULE VinciPens IN Oberon; (** portable *)	(* eos  *)
 	PROCEDURE Arrow (ctxt: Scheme.Context; args: Object; VAR res: Object);
 		VAR
 			c: Context; w, limit, len, coff, cdist: REAL; cap: Gfx.CapStyle; join: Gfx.JoinStyle; base: LeoPens.Pen;
-			mode, dir: SHORTINT; str: Object; s: ARRAY 30 OF CHAR; ref: Objects.Object; pen: LeoOutliners.Arrow;
+			mode, dir: SIGNED8; str: Object; s: ARRAY 30 OF CHAR; ref: Objects.Object; pen: LeoOutliners.Arrow;
 	BEGIN
 		c := ctxt(Context); w := 1; limit := 5; cap := Gfx.DefaultCap; join := Gfx.DefaultJoin;
 		base := LeoPens.Default; mode := LeoOutliners.outlined; dir := LeoOutliners.forwards;

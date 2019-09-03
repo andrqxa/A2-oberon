@@ -117,7 +117,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (Kernel32.WriteFile (stdout, char ,1, written, NIL) # 0);
 END WriteChar;
 
-PROCEDURE SetConsoleColor (color: SHORTINT);
+PROCEDURE SetConsoleColor (color: SIGNED8);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (Kernel32.SetConsoleTextAttribute (stdout, color) # 0);
 END SetConsoleColor;

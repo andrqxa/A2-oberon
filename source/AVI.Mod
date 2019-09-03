@@ -312,7 +312,7 @@ IMPORT
 			headerBeginPos: Streams.Position;
 
 			tempHeader: AVIStreamHeader;
-			streamNumber: SHORTINT;
+			streamNumber: SIGNED8;
 
 		BEGIN
 			done := FALSE;

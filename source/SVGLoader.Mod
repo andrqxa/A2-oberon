@@ -202,7 +202,7 @@ TYPE
 		(* Load the <linearGradient> element e *)
 		PROCEDURE LoadLinearGradient(e: XML.Element; id: XML.String);
 		VAR gradient: SVGGradients.LinearGradient;
-			onOmitted: SHORTINT;
+			onOmitted: SIGNED8;
 		BEGIN
 			SVG.Log("<linearGradient>");
 
@@ -226,7 +226,7 @@ TYPE
 		(* Load the <radialGradient> element e *)
 		PROCEDURE LoadRadialGradient(e: XML.Element; id: XML.String);
 		VAR gradient: SVGGradients.RadialGradient;
-			onOmitted: SHORTINT;
+			onOmitted: SIGNED8;
 		BEGIN
 			SVG.Log("<radialGradient>");
 
@@ -892,7 +892,7 @@ TYPE
 
 		(* Load some numeric attribute of element e *)
 		PROCEDURE LoadAttrNumber(e: XML.Element; name: ARRAY OF CHAR; VAR number: SVG.Number;
-			percentageAllowed: BOOLEAN; percent100: SVG.Number; onOmitted: SHORTINT; default: ARRAY OF CHAR);
+			percentageAllowed: BOOLEAN; percent100: SVG.Number; onOmitted: SIGNED8; default: ARRAY OF CHAR);
 		VAR value: XML.String;
 		BEGIN
 			value := LoadAttribute(e,name);
@@ -912,7 +912,7 @@ TYPE
 
 		(* Load some attribute of element e of type length *)
 		PROCEDURE LoadAttrLength(e: XML.Element; name: ARRAY OF CHAR; VAR length: SVG.Length;
-			percent100: SVG.Number; onOmitted: SHORTINT; default: ARRAY OF CHAR);
+			percent100: SVG.Number; onOmitted: SIGNED8; default: ARRAY OF CHAR);
 		VAR value: XML.String;
 		BEGIN
 			value := LoadAttribute(e,name);
@@ -941,9 +941,9 @@ TYPE
 		END LoadAttrTransform;
 
 		(* Load some attribute of element e using a custom parse procedure*)
-		PROCEDURE LoadAttrParsed(e: XML.Element; name: ARRAY OF CHAR; VAR parsed: SHORTINT;
-			onOmitted: SHORTINT; default: ARRAY OF CHAR;
-			parser: PROCEDURE(value: XML.String; VAR parsed: SHORTINT));
+		PROCEDURE LoadAttrParsed(e: XML.Element; name: ARRAY OF CHAR; VAR parsed: SIGNED8;
+			onOmitted: SIGNED8; default: ARRAY OF CHAR;
+			parser: PROCEDURE(value: XML.String; VAR parsed: SIGNED8));
 		VAR value: XML.String;
 		BEGIN
 			value := LoadAttribute(e,name);
@@ -975,7 +975,7 @@ TYPE
 		END LoadAttribute;
 
 		(* Load some opacity attribute of element e *)
-		PROCEDURE LoadOpacity(e: XML.Element; name: ARRAY OF CHAR; VAR color: SVG.Color; onOmitted: SHORTINT; default: ARRAY OF CHAR);
+		PROCEDURE LoadOpacity(e: XML.Element; name: ARRAY OF CHAR; VAR color: SVG.Color; onOmitted: SIGNED8; default: ARRAY OF CHAR);
 		VAR opacity: SVG.Length;
 			r,g,b,a: INTEGER;
 		BEGIN

@@ -128,8 +128,8 @@ TYPE
 			END
 		END Bytes;
 
-	(** Write a SHORTINT. *)
-		PROCEDURE RawSInt*( x: SHORTINT );
+	(** Write a SIGNED8. *)
+		PROCEDURE RawSInt*( x: SIGNED8 );
 		BEGIN
 			Char( SYSTEM.VAL( CHAR, x ) )
 		END RawSInt;
@@ -564,10 +564,10 @@ TYPE
 			WHILE n > 0 DO ch := Get();  DEC( n ) END
 		END SkipBytes;
 
-	(** Read a SHORTINT. *)
-		PROCEDURE RawSInt*( VAR x: SHORTINT );
+	(** Read a SIGNED8. *)
+		PROCEDURE RawSInt*( VAR x: SIGNED8 );
 		BEGIN
-			x := SYSTEM.VAL( SHORTINT, Get() )
+			x := SYSTEM.VAL( SIGNED8, Get() )
 		END RawSInt;
 
 	(** Read an INTEGER. *)

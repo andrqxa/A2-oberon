@@ -26,10 +26,10 @@ IMPORT IP,UDP, Streams, Commands, Configuration, DNS, Machine, Dates;
 CONST NTPPort*=123;
 
 TYPE Packet=RECORD
-	Header*:SHORTINT; (* LeapIndicator: 2 MSB bits; Version: 3 bits; mode: 3 LSB bits *)
-	Stratum*: SHORTINT;
-	Poll*:SHORTINT;
-	Precision*:SHORTINT;
+	Header*:SIGNED8; (* LeapIndicator: 2 MSB bits; Version: 3 bits; mode: 3 LSB bits *)
+	Stratum*: SIGNED8;
+	Poll*:SIGNED8;
+	Precision*:SIGNED8;
 	RootDelay*:LONGINT;
 	RootDispersion*:LONGINT;
 	ReferenceIdentifier*:LONGINT;

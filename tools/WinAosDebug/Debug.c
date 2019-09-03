@@ -502,7 +502,7 @@ void Variables(HWND hWnd, LPVOID mod, LPVOID refs, LONGINT reflen, LONGINT i, LO
 								wsprintf(msg, "%i", ch);
 							}
 							break;
-						case 4: // SHORTINT
+						case 4: // SIGNED8
 							ch = Get((LPVOID)adr, &k);
 							wsprintf(msg, "%i", ch);
 							break;

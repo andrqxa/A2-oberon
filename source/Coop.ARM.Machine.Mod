@@ -32,7 +32,7 @@ CONST
 
 TYPE
 	Vendor* = ARRAY 13 OF CHAR;
-	IDMap* = ARRAY 16 OF SHORTINT;
+	IDMap* = ARRAY 16 OF SIGNED8;
 
 	Range* = RECORD
 		adr*, size*: LONGINT

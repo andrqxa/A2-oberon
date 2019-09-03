@@ -70,7 +70,7 @@ MODULE Diskette IN Oberon;	(** non-portable *) (*JG 11.8.94/pjm *)
 
 VAR
 	res*: INTEGER;
-	drive*: SHORTINT;
+	drive*: SIGNED8;
 	open: BOOLEAN;
 	vol: Volume;
 	device: Disks.Device;

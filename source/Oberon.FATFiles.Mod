@@ -63,8 +63,8 @@ TYPE	(* svr *)
 	Drive = POINTER TO DriveDesc;
 	DriveDesc = RECORD
 		next: Drive;
-		num: SHORTINT;	(* logical drive number *)
-		part: SHORTINT;	(* partition number *)
+		num: SIGNED8;	(* logical drive number *)
+		part: SIGNED8;	(* partition number *)
 		dev: Disks.Device;	(* device *)
 		fat16: BOOLEAN;	(* 16-bit fat *)
 		spc, bpc: LONGINT;	(* sectors/bytes per cluster *)
@@ -309,9 +309,9 @@ BEGIN
 	END
 END ReadFAT12;
 
-PROCEDURE FindDrive(num: SHORTINT;  VAR d: Disks.Device;  VAR part: SHORTINT);
+PROCEDURE FindDrive(num: SIGNED8;  VAR d: Disks.Device;  VAR part: SIGNED8);
 VAR
-	dev: Disks.DeviceTable;  i, j: SIZE; res: LONGINT;  dnum: SHORTINT;  name: Disks.Name;
+	dev: Disks.DeviceTable;  i, j: SIZE; res: LONGINT;  dnum: SIGNED8;  name: Disks.Name;
 	m: Modules.Module; c: Modules.Command;
 BEGIN
 	IF num < NumFlop THEN	(* floppy *)
@@ -346,7 +346,7 @@ BEGIN
 						IF IsDOS(dev[i].table[j].type) THEN
 							IF dnum = num THEN
 								IF ~(Disks.Mounted IN dev[i].table[j].flags) THEN
-									d := dev[i];  part := SHORTINT(j);
+									d := dev[i];  part := SIGNED8(j);
 									INCL(d.table[j].flags, Disks.Mounted);
 									RETURN	(* leave device open *)
 								END
@@ -365,7 +365,7 @@ END FindDrive;
 (* OpenDrive - Open a drive, get all partition information, FAT & root dir. *)
 
 PROCEDURE OpenDrive(letter: CHAR; VAR d: Drive; VAR res: WORD);
-VAR b: ARRAY SS OF CHAR;  i: SHORTINT; n: LONGINT; num: SHORTINT;
+VAR b: ARRAY SS OF CHAR;  i: SIGNED8; n: LONGINT; num: SIGNED8;
 BEGIN (* Pre: num is a valid drive number *)
 	res := 0;
 	num := SHORT(ORD(letter)-ORD("A"));
@@ -1448,7 +1448,7 @@ Portable routines to read the standard Oberon types.
 *)
 
 	PROCEDURE ReadInt*(VAR R: Rider; VAR x: INTEGER; VAR res: WORD);
-		VAR x0, x1: SHORTINT;
+		VAR x0, x1: SIGNED8;
 	BEGIN Read(R, x0, res); IF res = 0 THEN Read(R, x1, res) END;
 		x := LONG(x1) * 100H + LONG(x0) MOD 100H
 	END ReadInt;
@@ -1462,7 +1462,7 @@ Portable routines to read the standard Oberon types.
 	END ReadSet;
 
 	PROCEDURE ReadBool*(VAR R: Rider; VAR x: BOOLEAN; VAR res: WORD);
-		VAR s: SHORTINT;
+		VAR s: SIGNED8;
 	BEGIN Read(R, s, res); x := s # 0
 	END ReadBool;
 
@@ -1665,7 +1665,7 @@ BEGIN
 	END
 END Rename;
 
-PROCEDURE Unmount(dev: Disks.Device;  part: SHORTINT);
+PROCEDURE Unmount(dev: Disks.Device;  part: SIGNED8);
 VAR res: WORD;
 BEGIN
 	EXCL(dev.table[part].flags, Disks.Mounted);

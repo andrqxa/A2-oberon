@@ -65,7 +65,7 @@ TYPE
 
 	Scanner* = OBJECT
 		VAR
-			sym-: SHORTINT;	(** current token *)
+			sym-: SIGNED8;	(** current token *)
 			line-, col-, oldpos, pos: LONGINT;
 			reportError*: PROCEDURE {DELEGATE} (pos, line, row: Streams.Position; CONST msg: ARRAY OF CHAR);
 			nextCh: CHAR;	(* look-ahead *)

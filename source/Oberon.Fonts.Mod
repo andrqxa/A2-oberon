@@ -24,7 +24,7 @@ of characters, each character being a pattern and and metric data.
 		END;
 
 		FontDesc* = RECORD (Objects.LibDesc)
-			type*: SHORTINT;	(** Substitute, font, or metric. *)
+			type*: SIGNED8;	(** Substitute, font, or metric. *)
 			height*, minX*, maxX*, minY*, maxY*: INTEGER	(** Font height, extremal values of characters in font. *)
 		END;
 
@@ -40,7 +40,7 @@ of characters, each character being a pattern and and metric data.
 			conv: BOOLEAN;
 
 	PROCEDURE Put1 (VAR a: ADDRESS; x: INTEGER);
-	VAR y: SHORTINT;
+	VAR y: SIGNED8;
 	BEGIN y := SHORT(x); SYSTEM.PUT(a, y); INC(a)
 	END Put1;
 
@@ -54,7 +54,7 @@ of characters, each character being a pattern and and metric data.
 	END PutAdr;
 
 	PROCEDURE ReadInt (VAR R: Files.Rider; VAR x: INTEGER);
-	VAR c0: CHAR; s1: SHORTINT;
+	VAR c0: CHAR; s1: SIGNED8;
 	BEGIN Files.Read(R, c0); Files.Read(R, s1); x := s1; x := x * 100H + ORD(c0)
 	END ReadInt;
 
@@ -83,7 +83,7 @@ of characters, each character being a pattern and and metric data.
 *)
 	(* portable version *)
 	PROCEDURE GetCharObj (L: Objects.Library; ref: INTEGER; VAR obj: Objects.Object);
-	VAR m: ADDRESS; h1: SHORTINT; h2: ADDRESS; ch: CHAR;
+	VAR m: ADDRESS; h1: SIGNED8; h2: ADDRESS; ch: CHAR;
 	BEGIN
 		m := L.ind;
 		SYSTEM.GET(m + ref * SIZEOF(ADDRESS), h2); (* pat adr*)
@@ -105,7 +105,7 @@ of characters, each character being a pattern and and metric data.
 		END
 	END GetChar;
 
-	PROCEDURE Internalize (F: Font; VAR R: Files.Rider; type: SHORTINT);
+	PROCEDURE Internalize (F: Font; VAR R: Files.Rider; type: SIGNED8);
 	VAR ch: CHAR;
 			NofRuns, NofBoxes, i, k, l, m: INTEGER;
 			NofBytes: LONGINT; RasterBase, A, a: ADDRESS;

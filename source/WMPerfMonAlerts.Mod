@@ -634,7 +634,7 @@ BEGIN
 	END;
 END GetFullTriggerString;
 
-PROCEDURE GetEvent(CONST message : Events.Message; code : SHORTINT) : Events.Event;
+PROCEDURE GetEvent(CONST message : Events.Message; code : SIGNED8) : Events.Event;
 VAR event : Events.Event;
 BEGIN
 	event.originator := EventOriginator;

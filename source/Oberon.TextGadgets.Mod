@@ -45,7 +45,7 @@ TYPE
 		text*: Texts.Text;
 		mode*: SET;
 		leftM*, width*: INTEGER;
-		noTabs*: SHORTINT;
+		noTabs*: SIGNED8;
 		tab*: ARRAY MaxTabs OF INTEGER;
 	END;
 
@@ -1328,7 +1328,7 @@ BEGIN
 END StyleAttr;
 
 PROCEDURE RestoreStyle(F: Style; M: Display3.Mask; x, y, w, h: INTEGER);
-VAR i, j: SHORTINT; name: ARRAY 128 OF CHAR; s: ARRAY 64 OF CHAR;
+VAR i, j: SIGNED8; name: ARRAY 128 OF CHAR; s: ARRAY 64 OF CHAR;
 
 	PROCEDURE WriteTag(VAR s: ARRAY OF CHAR);
 	VAR W, H, dsr: INTEGER;

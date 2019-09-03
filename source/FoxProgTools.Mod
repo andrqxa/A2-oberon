@@ -62,7 +62,7 @@ TYPE
 	(** string comparator function that is used to sort strings alphabetically **)
 	PROCEDURE NameComparator(left, right: ANY): BOOLEAN;
 	VAR
-		result: SHORTINT;
+		result: SIGNED8;
 		i: SIZE;
 		leftChar, rightChar: CHAR;
 	BEGIN

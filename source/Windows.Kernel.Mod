@@ -33,7 +33,7 @@ TYPE
 	Timer* = OBJECT
 	VAR
 		timer: Objects.Timer;
-		state-: SHORTINT;
+		state-: SIGNED8;
 		nofHandleTimeout-, nofHandleTimeout2- : LONGINT;
 		nofSleeps-, nofSleepsLeft- : LONGINT;
 		nofAwaits-, nofAwaitsLeft- : LONGINT;

@@ -153,73 +153,73 @@ positive: test driver
 	IMPORT Random,Debugging;
 	VAR gen: Random.Generator;
 
-		PROCEDURE FillS0(VAR a: ARRAY [?] OF SHORTINT; base: SHORTINT);
-		VAR i: SHORTINT;
+		PROCEDURE FillS0(VAR a: ARRAY [?] OF SIGNED8; base: SIGNED8);
+		VAR i: SIGNED8;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO SHORTINT(LEN(a,0)-1) DO a[i] := 10*base+i END;
+				FOR i := 0 TO SIGNED8(LEN(a,0)-1) DO a[i] := 10*base+i END;
 			ELSE
-				FOR i := 0 TO SHORTINT(LEN(a,0)-1) DO FillS0(a[i,?],10*base+i) END;
+				FOR i := 0 TO SIGNED8(LEN(a,0)-1) DO FillS0(a[i,?],10*base+i) END;
 			END;
 		END FillS0;
 
-		PROCEDURE FillS*(VAR a: ARRAY [?] OF SHORTINT);
+		PROCEDURE FillS*(VAR a: ARRAY [?] OF SIGNED8);
 		BEGIN FillS0(a,0);
 		END FillS;
 
-		PROCEDURE TestFillS0*(CONST a: ARRAY [?] OF SHORTINT; base: SHORTINT);
-		VAR i: SHORTINT;
+		PROCEDURE TestFillS0*(CONST a: ARRAY [?] OF SIGNED8; base: SIGNED8);
+		VAR i: SIGNED8;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO SHORTINT(LEN(a,0)-1) DO ASSERT(a[i] = 10*base+i) END;
+				FOR i := 0 TO SIGNED8(LEN(a,0)-1) DO ASSERT(a[i] = 10*base+i) END;
 			ELSE
-				FOR i := 0 TO SHORTINT(LEN(a,0)-1) DO TestFillS0(a[i,?],10*base+i) END;
+				FOR i := 0 TO SIGNED8(LEN(a,0)-1) DO TestFillS0(a[i,?],10*base+i) END;
 			END;
 		END TestFillS0;
 
-		PROCEDURE TestS1*(CONST a: ARRAY [*] OF SHORTINT; r: RANGE);
+		PROCEDURE TestS1*(CONST a: ARRAY [*] OF SIGNED8; r: RANGE);
 		VAR i: LONGINT;
 		BEGIN
 		 	i := FIRST(r); WHILE i <= LAST(r) DO
-		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=SHORTINT(i));
+		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=SIGNED8(i));
 		 		INC(i,STEP(r));
 		 	END;
 		END TestS1;
 
-		PROCEDURE TestS2*(CONST a: ARRAY [*,*] OF SHORTINT; r1, r2: RANGE);
+		PROCEDURE TestS2*(CONST a: ARRAY [*,*] OF SIGNED8; r1, r2: RANGE);
 		VAR i,j: LONGINT;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
-		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2)]=SHORTINT(10*i+j));
+		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2)]=SIGNED8(10*i+j));
 		 	INC(j,STEP(r2)) END;
 		 	INC(i,STEP(r1)) END;
 		END TestS2;
 
-		PROCEDURE TestS3*(CONST a: ARRAY [*,*,*] OF SHORTINT; r1, r2, r3: RANGE);
+		PROCEDURE TestS3*(CONST a: ARRAY [*,*,*] OF SIGNED8; r1, r2, r3: RANGE);
 		VAR i,j,k: LONGINT;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
 		 	k := FIRST(r3); WHILE k <= LAST(r3) DO
-		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2),(k-FIRST(r3)) DIV STEP(r3)]=SHORTINT(100*i+10*j+k));
+		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2),(k-FIRST(r3)) DIV STEP(r3)]=SIGNED8(100*i+10*j+k));
 		 	INC(k,STEP(r3)) END;
 		 	INC(j,STEP(r2)) END;
 		 	INC(i,STEP(r1)) END;
 		END TestS3;
 
-		PROCEDURE TestFillS*(CONST a: ARRAY [?] OF SHORTINT);
+		PROCEDURE TestFillS*(CONST a: ARRAY [?] OF SIGNED8);
 		BEGIN
 			TestFillS0(a,0)
 		END TestFillS;
 
-		PROCEDURE RandomS*(VAR a: ARRAY [?] OF SHORTINT);
-		VAR i: SHORTINT;
+		PROCEDURE RandomS*(VAR a: ARRAY [?] OF SIGNED8);
+		VAR i: SIGNED8;
 		BEGIN
 			IF DIM(a) = 1 THEN
-				FOR i := 0 TO SHORTINT(LEN(a,0)-1) DO a[i] := SHORTINT(gen.Dice(1000)) END;
+				FOR i := 0 TO SIGNED8(LEN(a,0)-1) DO a[i] := SIGNED8(gen.Dice(1000)) END;
 			ELSE
-				FOR i := 0 TO SHORTINT(LEN(a,0)-1) DO RandomS(a[i,?]) END;
+				FOR i := 0 TO SIGNED8(LEN(a,0)-1) DO RandomS(a[i,?]) END;
 			END;
 		END RandomS;
 
@@ -524,7 +524,7 @@ positive: driver tests (fill and compare arrays)
 	IMPORT Driver;
 
 		PROCEDURE TestS;
-		VAR a: ARRAY [*,*] OF SHORTINT; b: ARRAY [?] OF SHORTINT; c: ARRAY [2,3] OF SHORTINT;
+		VAR a: ARRAY [*,*] OF SIGNED8; b: ARRAY [?] OF SIGNED8; c: ARRAY [2,3] OF SIGNED8;
 		BEGIN
 			NEW(a,2,3); NEW(b,2,3);
 			Driver.FillS(a); Driver.FillS(b); Driver.FillS(c);
@@ -586,7 +586,7 @@ positive: driver tests (fill and compare arrays)
 positive: use ranges in procedure with static global array (was: register allocation problem)
 
 	MODULE Test;
-	VAR a: ARRAY [3,3] OF SHORTINT;
+	VAR a: ARRAY [3,3] OF SIGNED8;
 
 	PROCEDURE Test(r1,r2: RANGE);
 	BEGIN
@@ -601,7 +601,7 @@ positive: use ranges in procedure with static global array (was: register alloca
 positive: test for unequality with unallocated arrays 
 
 	MODULE Test;
-	VAR array: ARRAY [*] OF SHORTINT; tensor: ARRAY [?] OF SHORTINT;
+	VAR array: ARRAY [*] OF SIGNED8; tensor: ARRAY [?] OF SIGNED8;
 	BEGIN 
 		ASSERT(array # [1,2]);
 		ASSERT(~(array = [1,2]));
@@ -625,7 +625,7 @@ positive: simple tests for ranges
 	IMPORT Driver;
 
 	PROCEDURE TestS;
-	VAR s1: ARRAY [*] OF SHORTINT; s2: ARRAY [*,*] OF SHORTINT; s3: ARRAY [*,*,*] OF SHORTINT;
+	VAR s1: ARRAY [*] OF SIGNED8; s2: ARRAY [*,*] OF SIGNED8; s3: ARRAY [*,*,*] OF SIGNED8;
 	BEGIN
 		NEW(s1,3); NEW(s2,3,4); NEW(s3,3,4,5);
 		Driver.FillS(s1); Driver.FillS(s2); Driver.FillS(s3);
@@ -687,7 +687,7 @@ positive: conversion tests
 
 	MODULE Test;
 	IMPORT Driver;
-	VAR s: ARRAY [?] OF SHORTINT; i: ARRAY [?] OF INTEGER; l: ARRAY [?] OF LONGINT; r: ARRAY [?] OF REAL; x: ARRAY [?] OF LONGREAL;
+	VAR s: ARRAY [?] OF SIGNED8; i: ARRAY [?] OF INTEGER; l: ARRAY [?] OF LONGINT; r: ARRAY [?] OF REAL; x: ARRAY [?] OF LONGREAL;
 	BEGIN
 		NEW(s,2,3,5);
 		Driver.FillS(s); Driver.TestFillS(s);

@@ -118,7 +118,7 @@ VAR
 	dir: IconDirEntry;
 	bmih: BitmapInfoHeader;
 	c: CHAR;
-	k: SHORTINT;
+	k: SIGNED8;
 	i,length: LONGINT;
 
 	PROCEDURE PosX(ndx: LONGINT): INTEGER;

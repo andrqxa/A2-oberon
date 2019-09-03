@@ -186,7 +186,7 @@ CONST
 TYPE
 	Vendor* = ARRAY 13 OF CHAR;
 
-	IDMap* = ARRAY 16 OF SHORTINT;
+	IDMap* = ARRAY 16 OF SIGNED8;
 
 TYPE
 	Stack* = RECORD	(** values are read-only *)
@@ -402,7 +402,7 @@ VAR
 	timerRate: LONGINT;	(* Hz - rate at which CPU timers run - for timeslicing and profiling *)
 	stopped: BOOLEAN;	(* StopAll was called *)
 	idMap: IDMap;
-	revIDmap: ARRAY MaxCPU OF SHORTINT;
+	revIDmap: ARRAY MaxCPU OF SIGNED8;
 	time: TimeArray;
 	eventCount, eventMax: LONGINT;
 	event: Handler;
@@ -424,7 +424,7 @@ VAR
 	traceBase: ADDRESS;	(* screen buffer base address *)
 	tracePos: SIZE;	(* current screen cursor *)
 	tracePort: LONGINT;	(* serial base port *)
-	traceColor: SHORTINT;	(* current screen tracing color *)
+	traceColor: SIGNED8;	(* current screen tracing color *)
 
 (** -- Processor identification -- *)
 
@@ -3208,7 +3208,7 @@ BEGIN
 		x := idMap[i];
 		IF x # -1 THEN
 			ASSERT(revIDmap[x] = -1);	(* no duplicate APIC ids *)
-			revIDmap[x] := SHORTINT(i)
+			revIDmap[x] := SIGNED8(i)
 		END
 	END;
 	(* timer configuration *)
@@ -3465,7 +3465,7 @@ VAR scrollLines: LONGINT;
 
 (* Send and print character *)
 PROCEDURE TraceChar (c: CHAR);
-VAR status: SHORTINT;
+VAR status: SIGNED8;
 
 	(* Scroll the screen by one line. *)
 	PROCEDURE Scroll;
@@ -3512,7 +3512,7 @@ BEGIN
 END TraceChar;
 
 (* Change color *)
-PROCEDURE TraceColor (c: SHORTINT);
+PROCEDURE TraceColor (c: SIGNED8);
 BEGIN traceColor := c;
 END TraceColor;
 

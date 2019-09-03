@@ -16,7 +16,7 @@ TYPE
 	Monitor = OBJECT
 		VAR
 			period: LONGINT; rand: Random.Generator; timer: Kernel.Timer;
-			loops: LONGINT; state: SHORTINT;
+			loops: LONGINT; state: SIGNED8;
 
 		PROCEDURE &Init*(period: LONGINT; randomized: BOOLEAN);
 		BEGIN

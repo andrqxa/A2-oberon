@@ -91,7 +91,7 @@ TYPE
 VAR
 	trackMM*: TrackMMProc;		(** Handler für Operationen *)
 	trackSelMM*: RECORD			(** Handler für Selektionsoperationen *)
-								id*: SHORTINT;
+								id*: SIGNED8;
 								track*: TrackMMProc
 						END;
 	undo (*, redo *): Region;	(* Picture für letzte Änderung rückgängig machbar *)
@@ -105,7 +105,7 @@ VAR
 						sw, sh: INTEGER;
 						Paste: PROCEDURE(D: Pictures.Picture; dx, dy: INTEGER);
 					END;
-	seldir: ARRAY 4 OF RECORD dx, dy, ind: SHORTINT END;	(* Hilfsarray für Outlinebestimmung von bel. Selektion *)
+	seldir: ARRAY 4 OF RECORD dx, dy, ind: SIGNED8 END;	(* Hilfsarray für Outlinebestimmung von bel. Selektion *)
 
 PROCEDURE Min(a, b: INTEGER): INTEGER;
 BEGIN

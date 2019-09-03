@@ -305,7 +305,7 @@ TYPE
 			(* foreign protocol address *)
 			fip-: IP.Adr;
 			fport-: LONGINT;
-			state*: SHORTINT;	(* TCP state *)
+			state*: SIGNED8;	(* TCP state *)
 			timer: ARRAY NumTimers OF LONGINT;
 			rxtshift-: LONGINT;	(* log(2) of rexmt exponential backoff *)
 			rxtcur-: LONGINT;	(* current retransmission timeout (ticks) *)

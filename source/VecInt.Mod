@@ -39,7 +39,7 @@ TYPE
 			lenx := len[0];  ox := origin[0];
 		END ValidateCache;
 
-		PROCEDURE SetBoundaryCondition*( c: SHORTINT );   (* called by new, load and directly *)
+		PROCEDURE SetBoundaryCondition*( c: SIGNED8 );   (* called by new, load and directly *)
 		BEGIN
 			SetBoundaryCondition^( c );
 			CASE c OF
@@ -385,7 +385,7 @@ TYPE
 
 (* The procedures needed to register type Vector so that its instances can be made persistent. *)
 	PROCEDURE LoadVector( R: DataIO.Reader;  VAR obj: OBJECT );
-	VAR a: Vector;  version: SHORTINT;  ver: NbrInt.Integer;
+	VAR a: Vector;  version: SIGNED8;  ver: NbrInt.Integer;
 	BEGIN
 		R.RawSInt( version );
 		IF version = -1 THEN

@@ -337,7 +337,7 @@ END Max;
 
 	(* ---------------------- frame generators ----------------------- *)
 
-PROCEDURE MakeCaption(CONST s: ARRAY OF CHAR; col: SHORTINT; bold: BOOLEAN): Display.Frame;
+PROCEDURE MakeCaption(CONST s: ARRAY OF CHAR; col: SIGNED8; bold: BOOLEAN): Display.Frame;
 	VAR F: TextFields.Caption; nolines: INTEGER;
 BEGIN
 	TextFields.NewCaption; F:= Objects.NewObj(TextFields.Caption);
@@ -509,7 +509,7 @@ BEGIN
 	F.slink:= L.frames; L.frames:= F
 END WriteLine;
 
-PROCEDURE WriteCaption(VAR L: Layout; CONST s: ARRAY OF CHAR; col: SHORTINT; bold: BOOLEAN);
+PROCEDURE WriteCaption(VAR L: Layout; CONST s: ARRAY OF CHAR; col: SIGNED8; bold: BOOLEAN);
 	VAR F: Display.Frame;
 BEGIN
 	F:= MakeCaption(s, col, bold);
@@ -1211,7 +1211,7 @@ END LibViewButton;
 
 PROCEDURE MakeLibView(obj: Objects.Object; lib: Objects.Library; VAR L: Layout);
 	VAR o: Objects.Object; v: ScrollViews.View; p: Panels.Panel; name: Objects.Name; ref, cnt: INTEGER;
-			col: SHORTINT; public: BOOLEAN; A: Objects.AttrMsg; subLay: Layout; M: Display.ModifyMsg;
+			col: SIGNED8; public: BOOLEAN; A: Objects.AttrMsg; subLay: Layout; M: Display.ModifyMsg;
 BEGIN
 	public:= lib.name # "";
 	(* write objects in library *)

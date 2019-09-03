@@ -377,7 +377,7 @@ Statements
 
 	PROCEDURE ArgSize (par: OPT.Object): LONGINT;
 		VAR
-			size: LONGINT; comp: SHORTINT; typ: OPT.Struct;
+			size: LONGINT; comp: SIGNED8; typ: OPT.Struct;
 	BEGIN
 		size:= 0;
 		WHILE par # NIL DO

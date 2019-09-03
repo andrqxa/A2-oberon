@@ -46,7 +46,7 @@ TYPE
 			RETURN CHR(SHORT(SHORT(num)))
 		END ExpandCharacterRef;
 
-		PROCEDURE ExpandEntityRef(CONST name: ARRAY OF CHAR; type: SHORTINT): String;
+		PROCEDURE ExpandEntityRef(CONST name: ARRAY OF CHAR; type: SIGNED8): String;
 		VAR generalEntity: XML.EntityDecl;
 		BEGIN
 			IF dtd # NIL THEN
@@ -305,7 +305,7 @@ TYPE
 		*)
 		PROCEDURE ParseElementDecl(dtd: XML.DocTypeDecl);
 		VAR ed: XML.ElementDecl; ccp: XML.CollectionCP; s: String;
-			contentType: SHORTINT;
+			contentType: SIGNED8;
 		BEGIN
 			scanner.ScanMarkup();
 			IF ~CheckSymbol({Scanner.Name}, "Element name expected") THEN RETURN END;
@@ -430,7 +430,7 @@ TYPE
 			choice		::=	'(' S? cp (S? '|' S? cp)+ S? ')'
 			seq			::=	'(' S? cp (S? ',' S? cp)* S? ')'
 		*)
-		PROCEDURE ParseContentParticle(VAR contentType: SHORTINT): XML.CollectionCP;
+		PROCEDURE ParseContentParticle(VAR contentType: SIGNED8): XML.CollectionCP;
 		VAR cp: XML.ContentParticle; ncp: XML.NameContentParticle; ccp: XML.CollectionCP; s: String;
 		BEGIN
 			IF ~CheckSymbol({Scanner.ParenOpen}, "'(' expected") THEN RETURN ccp END;

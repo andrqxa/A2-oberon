@@ -25,7 +25,7 @@ MODULE SetGadgets IN Oberon;	(** portable *)	(* ps -  *)
 
 (** Convert an integer into a set *)
 PROCEDURE IntToSet* (int: LONGINT; VAR set: SET);
-VAR i: SHORTINT;
+VAR i: SIGNED8;
 BEGIN
 	set := {};
 	FOR i:= 0 TO 31 DO
@@ -35,7 +35,7 @@ END IntToSet;
 
 (** Convert a set into an integer *)
 PROCEDURE SetToInt* (set: SET; VAR int: LONGINT);
-VAR i: SHORTINT;
+VAR i: SIGNED8;
 BEGIN
 	int := 0;
 	FOR i := 0 TO 31 DO

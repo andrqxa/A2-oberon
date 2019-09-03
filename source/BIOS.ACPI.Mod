@@ -13,8 +13,8 @@ END;
 TYPE Header* = RECORD
 	signature-: LONGINT;
 	length-: LONGINT;
-	revision-: SHORTINT;
-	checksum-: SHORTINT;
+	revision-: SIGNED8;
+	checksum-: SIGNED8;
 	oemID-: ARRAY 6 OF CHAR;
 	oemTableID-: ARRAY 8 OF CHAR;
 	oemRevision-: LONGINT;
@@ -25,23 +25,23 @@ END;
 TYPE HPET* = RECORD (Header)
 	eventTimerBlockID-: LONGINT;
 	baseAddress-: RECORD
-		addressSpaceID-: SHORTINT;
-		registerBitWidth-: SHORTINT;
-		registerBitOffset-: SHORTINT;
-		reserved-: SHORTINT;
+		addressSpaceID-: SIGNED8;
+		registerBitWidth-: SIGNED8;
+		registerBitOffset-: SIGNED8;
+		reserved-: SIGNED8;
 		addressLow-: Address;
 		addressHigh-: Address;
 	END;
-	hpetNumber-: SHORTINT;
+	hpetNumber-: SIGNED8;
 	mainCounterMinimum-: INTEGER;
-	oemAttribute-: SHORTINT;
+	oemAttribute-: SIGNED8;
 END;
 
 TYPE RDSP* = RECORD
 	signature-: HUGEINT;
-	checksum-: SHORTINT;
+	checksum-: SIGNED8;
 	oemID-: ARRAY 6 OF CHAR;
-	revision-: SHORTINT;
+	revision-: SIGNED8;
 	rsdtAddress-: Address;
 END;
 
@@ -51,8 +51,8 @@ END;
 
 VAR rdsp- {UNTRACED} := NIL: POINTER {UNSAFE} TO RDSP;
 
-PROCEDURE Checksum (address: ADDRESS; size: SIZE): SHORTINT;
-VAR checksum := 0: SHORTINT; block {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF SHORTINT;
+PROCEDURE Checksum (address: ADDRESS; size: SIZE): SIGNED8;
+VAR checksum := 0: SIGNED8; block {UNTRACED}: POINTER {UNSAFE} TO ARRAY OF SIGNED8;
 BEGIN {UNCOOPERATIVE, UNCHECKED} block := address; WHILE size # 0 DO DEC (size); INC (checksum, block[size]) END; RETURN checksum;
 END Checksum;
 

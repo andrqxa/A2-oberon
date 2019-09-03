@@ -599,7 +599,7 @@ VAR
 	s1: CHAR;
 	s : SET;
 	k: INTEGER;
-	dkn: SHORTINT;
+	dkn: SIGNED8;
 BEGIN
 	IF (c = 46X) & (flags * Inputs.Ctrl # {}) THEN RETURN -2 END;  (* Ctrl-Break - break *)
 	IF (c = 44X) & (flags * Inputs.Ctrl # {}) THEN RETURN 0FFH END;	(* Ctrl-F10 - exit *)

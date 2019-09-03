@@ -233,7 +233,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				symbolSection: Sections.Section;
 
 				PROCEDURE Type(VAR t: IntermediateCode.Type);
-				VAR form: SHORTINT; sizeInBits: INTEGER;
+				VAR form: SIGNED8; sizeInBits: INTEGER;
 				BEGIN
 					r.RawSInt(form);
 					r.RawInt(sizeInBits);
@@ -241,7 +241,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				END Type;
 
 				PROCEDURE RegisterClass(VAR c: IntermediateCode.RegisterClass);
-				VAR class: SHORTINT; number: INTEGER;
+				VAR class: SIGNED8; number: INTEGER;
 				BEGIN
 					r.RawSInt(class);
 					r.RawInt(number);
@@ -315,8 +315,8 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				ReadOperand(op1);
 				ReadOperand(op2);
 				ReadOperand(op3);
-				IntermediateCode.InitInstruction(instruction, Basic.invalidPosition, SHORTINT(opcode), op1, op2, op3);
-				IntermediateCode.SetSubType(instruction, SHORTINT(subtype));
+				IntermediateCode.InitInstruction(instruction, Basic.invalidPosition, SIGNED8(opcode), op1, op2, op3);
+				IntermediateCode.SetSubType(instruction, SIGNED8(subtype));
 				section.Emit(instruction);
 			END ReadInstruction;
 
@@ -338,7 +338,7 @@ TYPE ObjectFileFormat* = OBJECT (Formats.ObjectFileFormat)
 				r.RawNum(fingerprint);
 				r.RawNum(bitsPerUnit);
 
-				section := IntermediateCode.NewSection(sectionList, SHORTINT(type), name, NIL, FALSE); (* keeps section if already present *)
+				section := IntermediateCode.NewSection(sectionList, SIGNED8(type), name, NIL, FALSE); (* keeps section if already present *)
 				IF bitsPerUnit < 0 THEN (* unknown *)
 					IF (type = Sections.VarSection) OR (type = Sections.ConstSection) THEN
 						bitsPerUnit := system.dataUnit

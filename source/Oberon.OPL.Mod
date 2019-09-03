@@ -356,7 +356,7 @@ References:
 
 	TYPE
 		Instruction* = RECORD
-			scale*, reg*: SHORTINT;
+			scale*, reg*: SIGNED8;
 			op*: INTEGER;
 			dest*, src1*, src2*, inx*, pc*, hint*: LONGINT; (* pc: PC on the target machine, used for jumps *)
 			link*, used*: INTEGER;
@@ -533,11 +533,11 @@ References:
 	regTab, sregTab, fregTab: ARRAY 8 OF LONGINT; (* regTab: 32/16 bit; sregTab: 8 Bit; fregTab: floating points *)
 	savedRegs: ARRAY MaxSaveLevel OF SavedRegRec;
 	nofSavedLevel: INTEGER;	(* number of saved register sets *)
-	ftop: SHORTINT;	(* floating point top of stack *)
+	ftop: SIGNED8;	(* floating point top of stack *)
 	trapFixupTab: ARRAY nofTrapFixups OF LONGINT;
-	JmpConvert: ARRAY Jnc-Je+1 OF SHORTINT;
-	SetccConvert: ARRAY Setnc - Sete + 1 OF SHORTINT;
-	FreeRegDisp: SHORTINT;
+	JmpConvert: ARRAY Jnc-Je+1 OF SIGNED8;
+	SetccConvert: ARRAY Setnc - Sete + 1 OF SIGNED8;
+	FreeRegDisp: SIGNED8;
 
 	exTableLen: LONGINT;
 	exTable: ExTableEntry;
@@ -576,8 +576,8 @@ References:
 
 (* i386 Register *)
 
-	PROCEDURE GetReg8 (VAR reg: SHORTINT);
-		VAR i: SHORTINT;
+	PROCEDURE GetReg8 (VAR reg: SIGNED8);
+		VAR i: SIGNED8;
 	BEGIN
 		i := EBX;
 		WHILE (i >= EAX) & ~((regTab[i] = Splitted) & ((sregTab[i] = free) OR (sregTab[i+4] = free))) DO DEC (i) END;
@@ -601,9 +601,9 @@ References:
 		reg := i+AL
 	END GetReg8;
 
-	PROCEDURE GetThisReg8 (this: SHORTINT);
+	PROCEDURE GetThisReg8 (this: SIGNED8);
 	(* this IN {AL..BH} *)
-		VAR i, reg: SHORTINT;
+		VAR i, reg: SIGNED8;
 	BEGIN
 		ASSERT (this IN {AL..BH});
 		reg := this MOD 4; (* = splitted 32/16 bit register *)
@@ -627,9 +627,9 @@ References:
 		END
 	END GetThisReg8;
 
-	PROCEDURE GetSplittableReg (VAR reg: SHORTINT);
+	PROCEDURE GetSplittableReg (VAR reg: SIGNED8);
 	(* returns any splittable register -> EBX, EDX, ECX, EAX *)
-		VAR r: SHORTINT;
+		VAR r: SIGNED8;
 	BEGIN
 		r := EBX;
 		WHILE (r >= EAX) & (regTab [r] # free) DO DEC (r) END;
@@ -647,9 +647,9 @@ References:
 		reg := r
 	END GetSplittableReg;
 
-	PROCEDURE GetReg (VAR reg: SHORTINT);
+	PROCEDURE GetReg (VAR reg: SIGNED8);
 	(* returns any free 32 bit register and marks it as occupied *)
-		VAR r: SHORTINT;
+		VAR r: SIGNED8;
 	BEGIN
 		r := EBX;
 		WHILE (r >= EAX) & (regTab [r] # free) DO DEC (r) END;
@@ -667,10 +667,10 @@ References:
 		reg := r
 	END GetReg;
 
-	PROCEDURE GetThisReg (this: SHORTINT);
+	PROCEDURE GetThisReg (this: SIGNED8);
 	(* marks 'this' as occupied. If the register is not free it will be moved to any free one (with pReg if necessary) *)
 		VAR
-			r, reg, r0, r1: SHORTINT;
+			r, reg, r0, r1: SIGNED8;
 			pReg: LONGINT;
 	BEGIN
 		ASSERT (this IN {EAX..DI});
@@ -714,7 +714,7 @@ References:
 
 	PROCEDURE AssignNewReg (pReg: LONGINT);
 	(* assigns pReg to any free register *)
-		VAR reg: SHORTINT; size: LONGINT;
+		VAR reg: SIGNED8; size: LONGINT;
 	BEGIN
 		size := Instr [pReg].op MOD 8;
 		IF size = 2 THEN (* Byte *)
@@ -728,7 +728,7 @@ References:
 		Instr [pReg].reg := reg
 	END AssignNewReg;
 
-	PROCEDURE AssignThisReg (pReg: LONGINT; this: SHORTINT);
+	PROCEDURE AssignThisReg (pReg: LONGINT; this: SIGNED8);
 	(* assigns pReg to the register 'this'. 'this' will be moved to another register if it is occupied *)
 	BEGIN
 		IF this IN {AL..BH} THEN
@@ -741,7 +741,7 @@ References:
 		Instr [pReg].reg := this
 	END AssignThisReg;
 
-	PROCEDURE AssignReg (pReg: LONGINT; VAR reg, base, inx: SHORTINT);
+	PROCEDURE AssignReg (pReg: LONGINT; VAR reg, base, inx: SIGNED8);
 		VAR
 			hint, size, pRegBase, pRegInx, pRegReg: LONGINT;
 	BEGIN
@@ -781,9 +781,9 @@ References:
 		END
 	END AssignReg;
 
-	PROCEDURE FreeReg (reg: SHORTINT);
+	PROCEDURE FreeReg (reg: SIGNED8);
 	(* releases register reg *)
-		VAR i: SHORTINT;
+		VAR i: SIGNED8;
 	BEGIN
 		IF (reg > none) & ~(reg IN {ESP, SP, EBP, BP}) THEN
 			IF reg IN {AL..BH} THEN
@@ -804,7 +804,7 @@ References:
 		END
 	END FreeReg;
 
-	PROCEDURE DecReg (reg: SHORTINT); (* only used by DecCheckReg, Store, GenPush, Gen0, GenFlags *)
+	PROCEDURE DecReg (reg: SIGNED8); (* only used by DecCheckReg, Store, GenPush, Gen0, GenFlags *)
 		VAR pReg: LONGINT;
 	BEGIN
 		IF reg > none THEN
@@ -818,10 +818,10 @@ References:
 		END
 	END DecReg;
 
-	PROCEDURE DecCheckReg (pReg: LONGINT; src, base, inx: SHORTINT);
-		VAR reg, r: SHORTINT;
+	PROCEDURE DecCheckReg (pReg: LONGINT; src, base, inx: SIGNED8);
+		VAR reg, r: SIGNED8;
 
-		PROCEDURE ReleaseReg (reg: SHORTINT);
+		PROCEDURE ReleaseReg (reg: SIGNED8);
 			VAR pReg: LONGINT;
 		BEGIN
 			IF reg > none THEN
@@ -832,8 +832,8 @@ References:
 			END
 		END ReleaseReg;
 
-		PROCEDURE CheckRegister (reg, src: SHORTINT);
-			VAR s: SHORTINT;
+		PROCEDURE CheckRegister (reg, src: SIGNED8);
+			VAR s: SIGNED8;
 		BEGIN
 			IF src IN {AL..BH} THEN s := src MOD 4
 			ELSE s := src MOD 8
@@ -875,7 +875,7 @@ References:
 		END
 	END loaded;
 
-	PROCEDURE FindReg (pReg: LONGINT; VAR reg: SHORTINT);
+	PROCEDURE FindReg (pReg: LONGINT; VAR reg: SIGNED8);
 	BEGIN
 		ASSERT (loaded (pReg));
 		IF pReg > none THEN reg := Instr [pReg].reg
@@ -884,7 +884,7 @@ References:
 		END
 	END FindReg;
 
-	PROCEDURE FindLoadReg (pReg: LONGINT; VAR reg: SHORTINT);
+	PROCEDURE FindLoadReg (pReg: LONGINT; VAR reg: SIGNED8);
 	BEGIN
 		IF pReg > none THEN
 			IF ~loaded (pReg) THEN Load (Instr [pReg]) END;
@@ -897,7 +897,7 @@ References:
 
 (* general *)
 
-	PROCEDURE LastUse (reg: SHORTINT): BOOLEAN;
+	PROCEDURE LastUse (reg: SIGNED8): BOOLEAN;
 		VAR pReg: LONGINT;
 	BEGIN
 		ASSERT (reg IN {EAX..BH});
@@ -913,7 +913,7 @@ References:
 
 (* Risc Code -> i386 Code *)
 
-	PROCEDURE FindMemReg (VAR instr: Instruction; VAR mode, scale, size, base, inx: SHORTINT; VAR disp: LONGINT);
+	PROCEDURE FindMemReg (VAR instr: Instruction; VAR mode, scale, size, base, inx: SIGNED8; VAR disp: LONGINT);
 	BEGIN
 		size := SHORT (instr.op MOD 8) * 8; mode := SHORT((instr.op DIV 8) MOD 4); scale := instr.scale;
 		IF mode IN {MemReg, RegMem} THEN
@@ -931,13 +931,13 @@ References:
 	PROCEDURE Load (VAR instr: Instruction);
 	(* ld, lea, ldbdw, ldbw, ldwdw, ldProc, ldXProc *)
 		VAR
-			mode, scale, size, base, inx, dummy: SHORTINT;
+			mode, scale, size, base, inx, dummy: SIGNED8;
 			disp: LONGINT;
 
-		PROCEDURE AssignReg (pReg: LONGINT; VAR baseReg, inxReg: SHORTINT);
+		PROCEDURE AssignReg (pReg: LONGINT; VAR baseReg, inxReg: SIGNED8);
 			VAR
 				hint, size, pRegBase, pRegInx: LONGINT;
-				base, inx, op: SHORTINT;  (* NM 7.6.94; workaround for sign-extended bug *)
+				base, inx, op: SIGNED8;  (* NM 7.6.94; workaround for sign-extended bug *)
 		BEGIN
 			hint := Instr[pReg].hint; size:= (Instr[pReg].op MOD 8) * 8;
 			IF hint >= tryEAX THEN
@@ -1006,7 +1006,7 @@ References:
 	END Load;
 
 	PROCEDURE LoadProc (VAR instr: Instruction);
-		VAR dummy: SHORTINT;
+		VAR dummy: SIGNED8;
 
 		PROCEDURE AssignReg (pReg: LONGINT);
 			VAR
@@ -1051,7 +1051,7 @@ References:
 	PROCEDURE Store (VAR instr: Instruction);
 	(* store, getReg *)
 		VAR
-			mode, scale, size, reg, base, inx: SHORTINT;
+			mode, scale, size, reg, base, inx: SIGNED8;
 			disp, delta: LONGINT;
 	BEGIN
 		FindMemReg (instr, mode, scale, size, base, inx, disp);
@@ -1099,7 +1099,7 @@ ASSERT(~loaded(instr.dest));
 	END GenPortIO;
 
 	PROCEDURE GenPush (VAR instr: Instruction);
-		VAR reg, i: SHORTINT;
+		VAR reg, i: SIGNED8;
 	BEGIN
 		ASSERT ((instr.op DIV 8) MOD 4 IN {Imme, Regs});
 		IF (instr.op DIV 8) MOD 4 = Imme THEN OPO.GenPUSH (Imme, Bit32, noBase, noInx, noScale, noDisp, instr.src2)
@@ -1133,7 +1133,7 @@ ASSERT(~loaded(instr.dest));
 	END GenPush;
 
 	PROCEDURE GenPop (VAR instr: Instruction);
-		VAR reg, dummy: SHORTINT;
+		VAR reg, dummy: SIGNED8;
 	BEGIN
 		dummy := noBase; (* = noInx *)
 		AssignReg (instr.dest, dummy, dummy, dummy); reg := instr.reg;
@@ -1145,7 +1145,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE Gen1 (VAR instr: Instruction; RiscPC: LONGINT);
 	(* je, jne, jl, jle, jg, jge, ja, jae, jb, jbe, jc, jnc, jmp, jmpReg *)
 		VAR
-			op, mode, scale, size, reg, base, inx: SHORTINT; disp: LONGINT;
+			op, mode, scale, size, reg, base, inx: SIGNED8; disp: LONGINT;
 	BEGIN
 		op := SHORT (instr.op DIV 32);
 		IF op = JmpReg THEN
@@ -1185,7 +1185,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE Gen2 (VAR instr: Instruction);
 	(* neg, not *)
-		VAR src, dummy: SHORTINT;
+		VAR src, dummy: SIGNED8;
 	BEGIN
 		ASSERT ((instr.op DIV 32 = Neg) OR (instr.op DIV 32 = Not));
 		dummy := noInx;
@@ -1201,7 +1201,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE Gen3 (VAR instr: Instruction);
 	(* add, sub, or, xor, and, btr, bts, sal, sar, shl, shr, rol *)
 		VAR
-			op, mode, scale, size, base, inx, src, dummy, shiftReg: SHORTINT;
+			op, mode, scale, size, base, inx, src, dummy, shiftReg: SIGNED8;
 			disp: LONGINT;
 	BEGIN
 		op := SHORT (instr.op DIV 32); mode := SHORT ((instr.op DIV 8) MOD 4); size := SHORT (instr.op MOD 8) * 8;
@@ -1272,7 +1272,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE Flags (VAR instr: Instruction);
 	(* cmp, bt *)
 		VAR
-			op, mode, scale, size, base, inx, reg, dummy: SHORTINT;
+			op, mode, scale, size, base, inx, reg, dummy: SIGNED8;
 			disp: LONGINT;
 	BEGIN
 		op := SHORT (instr.op DIV 32); mode := SHORT ((instr.op DIV 8) MOD 4); size := SHORT (instr.op MOD 8) * 8;
@@ -1311,7 +1311,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE GenAbs (VAR instr: Instruction);
 	(* abs *)
-		VAR size, src, reg, dummy: SHORTINT;
+		VAR size, src, reg, dummy: SIGNED8;
 	BEGIN
 		size := SHORT ((instr.op MOD 8) * 8);
 		FindLoadReg (instr.src1, src);
@@ -1378,7 +1378,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE GenDivMod (VAR instr: Instruction);
 		VAR
-			size, mode, src, base, inx, scale, dummy: SHORTINT;
+			size, mode, src, base, inx, scale, dummy: SIGNED8;
 			disp, pRegBase, pRegInx: LONGINT;
 	BEGIN
 		size := SHORT (instr.op MOD 8) * 8; mode := SHORT ((instr.op DIV 8) MOD 4);
@@ -1501,7 +1501,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE GenMul (VAR instr: Instruction);
 		VAR
-			size, mode, src, base, inx, scale, dummy:  SHORTINT;
+			size, mode, src, base, inx, scale, dummy:  SIGNED8;
 			disp, pRegBase, pRegInx: LONGINT;
 	BEGIN
 		size := SHORT ((instr.op MOD 8) * 8); mode := SHORT ((instr.op DIV 8) MOD 4);
@@ -1574,7 +1574,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE GenRepMovs (VAR instr: Instruction);
 	(* repMovs *)
 		VAR
-			src, dest, nofElem, tmp: SHORTINT;
+			src, dest, nofElem, tmp: SIGNED8;
 	BEGIN
 		FindLoadReg (instr.dest, dest);
 		ASSERT (dest IN {EAX..EDI});
@@ -1629,7 +1629,7 @@ ASSERT(~loaded(instr.dest));
 	PROCEDURE GenCmpString (VAR instr: Instruction);
 	(* cmpString *)
 		VAR
-			src, srcAdr, src2Adr: SHORTINT;
+			src, srcAdr, src2Adr: SIGNED8;
 			Lfix, L0, L1: LONGINT;
 	BEGIN
 		Lfix := OPO.pc;
@@ -1650,7 +1650,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE Setcc (VAR instr: Instruction);
 	(* sete, setne, setl, setle, setg, setge, setc, setnc *)
-		VAR dummy: SHORTINT;
+		VAR dummy: SIGNED8;
 	BEGIN
 		dummy := none;
 		AssignReg (instr.dest, dummy, dummy, dummy);
@@ -1672,7 +1672,7 @@ ASSERT(~loaded(instr.dest));
 *)
 
 	PROCEDURE GenTrapCC (VAR instr: Instruction);
-		VAR op: SHORTINT;
+		VAR op: SIGNED8;
 	BEGIN
 		IF instr.op DIV 32 = To THEN
 			OPO.PutByte (0CEH)
@@ -1711,7 +1711,7 @@ ASSERT(~loaded(instr.dest));
 	END FixupAndGenTrap;
 
 	PROCEDURE GenShort (VAR instr: Instruction);
-		VAR src, reg, hint: SHORTINT;
+		VAR src, reg, hint: SIGNED8;
 	BEGIN
 		FindReg (instr.src1, src);
 		hint := SHORT (SHORT (instr.hint));
@@ -1751,7 +1751,7 @@ ASSERT(~loaded(instr.dest));
 	END GenShort;
 
 	PROCEDURE GenPhi (VAR instr: Instruction);
-		VAR src1, src2: SHORTINT;
+		VAR src1, src2: SIGNED8;
 	BEGIN
 		ASSERT ((Instr [instr.src2].reg >= 0) & (Instr [instr.src1].reg # none));
 		IF Instr [instr.src1].reg < 0 THEN src1 := -2 - Instr [instr.src1].reg
@@ -1777,7 +1777,7 @@ ASSERT(~loaded(instr.dest));
 
 (* i387 Register *)
 
-	PROCEDURE GetFreg (VAR freg: SHORTINT);
+	PROCEDURE GetFreg (VAR freg: SIGNED8);
 	(* returns any free floating point register *)
 	BEGIN
 		ftop := (ftop -1) MOD 8;
@@ -1790,7 +1790,7 @@ ASSERT(~loaded(instr.dest));
 		freg := ftop
 	END GetFreg;
 
-	PROCEDURE FreeFreg (freg: SHORTINT);
+	PROCEDURE FreeFreg (freg: SIGNED8);
 	BEGIN
 		IF freg > none THEN
 			IF fregTab [freg] > free THEN Instr [fregTab [freg]].reg := -2-freg END;
@@ -1806,7 +1806,7 @@ ASSERT(~loaded(instr.dest));
 		END
 	END FreeFreg;
 
-	PROCEDURE ReleaseFreg (freg: SHORTINT);
+	PROCEDURE ReleaseFreg (freg: SIGNED8);
 	BEGIN
 		IF freg > none THEN
 			IF fregTab [freg] > free THEN Instr [fregTab [freg]].reg := -2-freg END;
@@ -1816,32 +1816,32 @@ ASSERT(~loaded(instr.dest));
 	END ReleaseFreg;
 
 	PROCEDURE AssignFreg (pReg: LONGINT);
-		VAR freg: SHORTINT;
+		VAR freg: SIGNED8;
 	BEGIN
 		GetFreg (freg);
 		fregTab [freg] := pReg;
 		Instr [pReg].reg := freg
 	END AssignFreg;
 
-	PROCEDURE TakeFreg (pReg: LONGINT; freg: SHORTINT);
+	PROCEDURE TakeFreg (pReg: LONGINT; freg: SIGNED8);
 	BEGIN
 		ASSERT (fregTab[freg] = free);
 		fregTab [freg] := pReg; Instr [pReg].reg := freg
 	END TakeFreg;
 
-	PROCEDURE FindFreg (pReg: LONGINT; VAR freg: SHORTINT);
+	PROCEDURE FindFreg (pReg: LONGINT; VAR freg: SIGNED8);
 	BEGIN
 		ASSERT ((pReg >= 0) & (Instr [pReg].reg >= 0));
 		freg := Instr [pReg].reg;
 	END FindFreg;
 
-	PROCEDURE LastUseF (freg: SHORTINT): BOOLEAN;
+	PROCEDURE LastUseF (freg: SIGNED8): BOOLEAN;
 	BEGIN
 		ASSERT ((freg IN {0..7}) & (fregTab [freg] >= 0));
 		RETURN Instr[fregTab [freg]].used = 1
 	END LastUseF;
 
-	PROCEDURE DecCheckFreg (freg: SHORTINT);
+	PROCEDURE DecCheckFreg (freg: SIGNED8);
 		VAR pReg: LONGINT;
 	BEGIN
 		IF freg > none THEN
@@ -1855,7 +1855,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE Fload (VAR instr: Instruction);
 		VAR
-			mode, scale, size, base, inx: SHORTINT;
+			mode, scale, size, base, inx: SIGNED8;
 			disp: LONGINT;
 	BEGIN
 		FindMemReg (instr, mode, scale, size, base, inx, disp); size := ((size DIV 8)-3)*2;
@@ -1872,7 +1872,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE Fstore (VAR instr: Instruction);
 		VAR
-			mode, scale, size, base, inx, src: SHORTINT;
+			mode, scale, size, base, inx, src: SIGNED8;
 			disp: LONGINT;
 	BEGIN
 		FindMemReg (instr, mode, scale, size, base, inx, disp); size := ((size DIV 8)-3)*2;
@@ -1888,7 +1888,7 @@ ASSERT(~loaded(instr.dest));
 	END Fstore;
 
 	PROCEDURE FloatGen1 (VAR instr: Instruction);
-		VAR src: SHORTINT;
+		VAR src: SIGNED8;
 	BEGIN
 		FindFreg (instr.src1, src);
 		ASSERT (LastUseF (src) & (src = ftop));
@@ -1902,7 +1902,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE FloatGen3 (VAR instr: Instruction);
 		VAR
-			mode, size, src, src1, src2: SHORTINT;
+			mode, size, src, src1, src2: SIGNED8;
 			reverse, r2: BOOLEAN;
 	BEGIN
 		size := SHORT (((instr.op MOD 8) -3) *2);
@@ -1960,7 +1960,7 @@ ASSERT(~loaded(instr.dest));
 	END FloatGen3;
 
 	PROCEDURE FloatCmp (VAR instr: Instruction);
-		VAR size, src1, src2, reg: SHORTINT; stackOK: BOOLEAN;
+		VAR size, src1, src2, reg: SIGNED8; stackOK: BOOLEAN;
 	BEGIN
 		size := SHORT (((instr.op MOD 8) -3)*2);
 		FindFreg (instr.src1, src1); FindFreg (instr.src2, src2);
@@ -2012,7 +2012,7 @@ ASSERT(~loaded(instr.dest));
 
 
 	PROCEDURE GenEntier (VAR instr: Instruction);
-		VAR dest, src, reg, dummy: SHORTINT;
+		VAR dest, src, reg, dummy: SIGNED8;
 	(*
 		sub esp, 8
 		fstcw 0[esp]
@@ -2063,7 +2063,7 @@ ASSERT(~loaded(instr.dest));
 
 
 	PROCEDURE ClearSDynArr(VAR instr: Instruction);
-		VAR L: LONGINT; reg: SHORTINT;
+		VAR L: LONGINT; reg: SIGNED8;
 	BEGIN
 		FindReg(instr.src1, reg);
 		OPO.GenTyp1 (XOR, RegReg, EAX, EAX, noInx, noScale, noDisp, noImm);
@@ -2076,7 +2076,7 @@ ASSERT(~loaded(instr.dest));
 
 (* general *)
 
-	PROCEDURE GenEnter (locSize: LONGINT; locals: OPT.Object; sysflag: SHORTINT);
+	PROCEDURE GenEnter (locSize: LONGINT; locals: OPT.Object; sysflag: SIGNED8);
 		VAR first: BOOLEAN; enoff, ensize: LONGINT;
 
 			last: LONGINT;		(*static local for ClearStack: last offset touched*)
@@ -2212,7 +2212,7 @@ ASSERT(~loaded(instr.dest));
 		END
 	END GenEnter;
 
-	PROCEDURE GenLeave (sysflag: SHORTINT); (* ejz *)
+	PROCEDURE GenLeave (sysflag: SIGNED8); (* ejz *)
 	BEGIN
 		IF (sysflag = stdcall) OR (sysflag = cdecl) THEN
 			OPO.GenPOP (Regs, EDI, noBase, noInx, noScale, noDisp);
@@ -2224,7 +2224,7 @@ ASSERT(~loaded(instr.dest));
 	END GenLeave;
 
 	PROCEDURE PushRegs;
-		VAR i: SHORTINT; disp: LONGINT;
+		VAR i: SIGNED8; disp: LONGINT;
 	BEGIN
 		IF nofSavedLevel > MaxSaveLevel THEN OPM.err (251)
 		ELSE
@@ -2270,7 +2270,7 @@ ASSERT(~loaded(instr.dest));
 
 	PROCEDURE PopRegs (VAR instr: Instruction);
 		VAR
-			i, j, size, freg: SHORTINT;
+			i, j, size, freg: SIGNED8;
 			disp: LONGINT;
 	BEGIN
 		DEC (nofSavedLevel);
@@ -2479,7 +2479,7 @@ ASSERT(~loaded(instr.dest));
 			IF (fix.obj.mode = Var) & (fix.obj.mnolev <=0) THEN
 				OPO.PutDWordAt(pc + fix.conval.intval, fix.obj.linkadr);
 				AbsAccess (fix, pc + fix.conval.intval)
-			ELSIF (fix.obj.linkadr <= MAX(SHORTINT)) & (fix.obj.linkadr >= MIN(SHORTINT)) THEN
+			ELSIF (fix.obj.linkadr <= MAX(SIGNED8)) & (fix.obj.linkadr >= MIN(SIGNED8)) THEN
 				OPO.PutByteAt(pc + fix.conval.intval, SHORT(SHORT(fix.obj.linkadr)))
 			ELSE
 				OPM.Mark(600,SHORT(fix.conval.intval2))
@@ -2492,7 +2492,7 @@ ASSERT(~loaded(instr.dest));
 		VAR
 			obj, list: OPT.Object;
 			i, k: LONGINT;
-			op, reg, ret, sysflag: SHORTINT;
+			op, reg, ret, sysflag: SIGNED8;
 			node: OPT.Node;
 
 		PROCEDURE MarkPos;
@@ -3108,7 +3108,7 @@ ASSERT(~loaded(instr.dest));
 			typ, btyp: OPT.Struct;
 			commandTab: ARRAY MaxCommands OF OPT.Object;
 			newMthTab: ARRAY MaxEntry OF OPT.Object;
-			modMap: ARRAY 4096 OF SHORTINT;
+			modMap: ARRAY 4096 OF SIGNED8;
 
 		PROCEDURE WriteName (VAR name: ARRAY OF CHAR);
 			VAR i: INTEGER; ch: CHAR;

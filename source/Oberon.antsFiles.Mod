@@ -59,7 +59,7 @@ TYPE
 		x: REAL;
 		y: LONGREAL;
 		c: CHAR;
-		len: SHORTINT;   (** Length of name or string scanned. *)
+		len: SIGNED8;   (** Length of name or string scanned. *)
 		s: ARRAY 64 OF CHAR;
 		scanneropen: BOOLEAN;
 		check: LONGINT;

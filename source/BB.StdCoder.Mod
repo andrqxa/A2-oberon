@@ -22,8 +22,8 @@ TYPE
 
 VAR
 	code: ARRAY 64 OF CHAR;
-	revCode: ARRAY 256 OF SHORTINT;
-	table: ARRAY N OF SHORTINT;
+	revCode: ARRAY 256 OF SIGNED8;
+	table: ARRAY N OF SIGNED8;
 
 	PROCEDURE ShowError( n: LONGINT );
 	BEGIN
@@ -122,7 +122,7 @@ VAR
 
 	PROCEDURE ReadFile( r: Streams.Reader; VAR res: WORD ): Files.File;
 	VAR
-		hash, x, bits, i, len, sum, s: LONGINT; byte: SHORTINT;  f: Files.File;  w: Files.Writer;
+		hash, x, bits, i, len, sum, s: LONGINT; byte: SIGNED8;  f: Files.File;  w: Files.Writer;
 	BEGIN
 		f := Files.New( "" );  Files.OpenWriter( w, f, 0 );
 		FOR i := 0 TO N - 1 DO  table[i] := 0  END;
@@ -133,8 +133,8 @@ VAR
 				x := x DIV 2;  DEC( bits );
 				WHILE (res = 0) & (bits < 8) DO  INC( x, ASH( read( r, res ), bits ) ); INC( bits, 6 )  END;
 				i := x MOD 256;
-				IF i > MAX(SHORTINT) THEN  i := i - 256  END;
-				byte := SHORTINT( i );  x := x DIV 256;  DEC( bits, 8 );
+				IF i > MAX(SIGNED8) THEN  i := i - 256  END;
+				byte := SIGNED8( i );  x := x DIV 256;  DEC( bits, 8 );
 				table[hash] := byte
 			ELSE  (* correct prediction *)
 				byte := table[hash];  x := x DIV 2;  DEC( bits )
@@ -297,7 +297,7 @@ VAR
 
 
 	PROCEDURE InitCodes;
-	VAR i: SHORTINT;  j: LONGINT;
+	VAR i: SIGNED8;  j: LONGINT;
 	BEGIN
 		FOR j := 0 TO 255 DO  revCode[j] := -1  END;
 		code[0] := ".";  revCode[ORD(".")] := 0;

@@ -1239,7 +1239,7 @@ MODULE ScriptFrames IN Oberon;	(** portable *) (* RS, Wed, 9-Jun-1993*)
 		IF new THEN SetCaret(F, pos+len) END
 	END Integrate;
 
-	PROCEDURE Write* (F: Frame; ch: CHAR; lib: Objects.Library; col, voff: SHORTINT);
+	PROCEDURE Write* (F: Frame; ch: CHAR; lib: Objects.Library; col, voff: SIGNED8);
 	VAR
 		M: Objects.CopyMsg; obj: Objects.Object;
 		pos, i: LONGINT;

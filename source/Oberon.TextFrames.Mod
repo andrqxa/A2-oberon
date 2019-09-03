@@ -591,7 +591,7 @@ MODULE TextFrames IN Oberon;	(** portable *) (* JG / pjm *)
     END
   END Call;
 
-  PROCEDURE Write* (F: Frame; ch: CHAR; lib: Objects.Library; col, voff: SHORTINT);
+  PROCEDURE Write* (F: Frame; ch: CHAR; lib: Objects.Library; col, voff: SIGNED8);
   BEGIN (*F.car # 0*)
     IF ch = 7FX THEN
       IF F.carloc.pos > F.org THEN
