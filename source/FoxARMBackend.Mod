@@ -3481,13 +3481,13 @@ TYPE
 			END BoolRet;
 
 			PROCEDURE IntRet;
-			BEGIN procedureType.SetReturnType(Global.Integer32)
+			BEGIN procedureType.SetReturnType(Global.Signed32)
 			END IntRet;
 
 			PROCEDURE IntPar;
 			BEGIN
 				parameter := SyntaxTree.NewParameter(Basic.invalidPosition, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.ValueParameter);
-				parameter.SetType(Global.Integer32); procedureType.AddParameter(parameter)
+				parameter.SetType(Global.Signed32); procedureType.AddParameter(parameter)
 			END IntPar;
 
 			PROCEDURE AddressPar;
@@ -3499,7 +3499,7 @@ TYPE
 			PROCEDURE IntVarPar;
 			BEGIN
 				parameter := SyntaxTree.NewParameter(Basic.invalidPosition, procedureType, SyntaxTree.NewIdentifier(""), SyntaxTree.VarParameter);
-				parameter.SetType(Global.Integer32); procedureType.AddParameter(parameter)
+				parameter.SetType(Global.Signed32); procedureType.AddParameter(parameter)
 			END IntVarPar;
 
 			PROCEDURE RealVarPar;

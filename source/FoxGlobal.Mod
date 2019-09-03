@@ -199,7 +199,7 @@ VAR
 	identifiers: ARRAY 2 OF ARRAY end OF SyntaxTree.Identifier;
 
 	(* some handy type variables for backend / checker implementers *)
-	Integer8-, Integer16-, Integer32-, Integer64-: SyntaxTree.IntegerType;
+	Signed8-, Signed16-, Signed32-, Signed64-: SyntaxTree.IntegerType;
 	Unsigned8-, Unsigned16-, Unsigned32-, Unsigned64-: SyntaxTree.IntegerType;
 	Set8-, Set16-, Set32-, Set64-: SyntaxTree.SetType;
 	Float32-, Float64-: SyntaxTree.FloatType;
@@ -802,8 +802,8 @@ TYPE
 		system.realType := SyntaxTree.NewFloatType(32);
 		system.longrealType := SyntaxTree.NewFloatType(64);
 		(*
-		system.longintType := Integer32;
-		system.hugeintType := Integer64;
+		system.longintType := Signed32;
+		system.hugeintType := Signed64;
 		system.realType := Float32;
 		system.longrealType := Float64;
 		*)
@@ -892,10 +892,10 @@ TYPE
 		DeclareType(system.longWordType,"LONGWORD",system.globalScope);
 		DeclareType(system.wordSetType,"WORDSET",system.globalScope);
 
-		DeclareType(Integer8, "SIGNED8", system.globalScope);
-		DeclareType(Integer16, "SIGNED16", system.globalScope);
-		DeclareType(Integer32, "SIGNED32", system.globalScope);
-		DeclareType(Integer64, "SIGNED64", system.globalScope);
+		DeclareType(Signed8, "SIGNED8", system.globalScope);
+		DeclareType(Signed16, "SIGNED16", system.globalScope);
+		DeclareType(Signed32, "SIGNED32", system.globalScope);
+		DeclareType(Signed64, "SIGNED64", system.globalScope);
 
 		DeclareType(Unsigned8, "UNSIGNED8", system.globalScope);
 		DeclareType(Unsigned16, "UNSIGNED16", system.globalScope);
@@ -1553,23 +1553,23 @@ TYPE
 		*)
 
 	BEGIN
-		IF IsSignedInteger(this,8) THEN RETURN Integer8
-		ELSIF IsSignedInteger(this, 16) THEN RETURN Integer16
-		ELSIF IsSignedInteger(this, 32) THEN RETURN Integer32
-		ELSE RETURN Integer64
+		IF IsSignedInteger(this,8) THEN RETURN Signed8
+		ELSIF IsSignedInteger(this, 16) THEN RETURN Signed16
+		ELSIF IsSignedInteger(this, 32) THEN RETURN Signed32
+		ELSE RETURN Signed64
 		END;
 	END GetSignedIntegerType;
 
 	PROCEDURE GetIntegerType*(system: System; this: HUGEINT): SyntaxTree.IntegerType;
 	BEGIN
-		IF IsSignedInteger(this,8) THEN RETURN Integer8
+		IF IsSignedInteger(this,8) THEN RETURN Signed8
 				(* system.SizeOf(...) = 8 : detect special backends with no sizes smaller than 32 *)
 		ELSIF (system.SizeOf(Unsigned8) =  8) & IsUnsignedInteger(this,8) THEN RETURN Unsigned8
-		ELSIF IsSignedInteger(this, 16) THEN RETURN Integer16
+		ELSIF IsSignedInteger(this, 16) THEN RETURN Signed16
 		ELSIF (system.SizeOf(Unsigned16) = 16) & IsUnsignedInteger(this,16) THEN RETURN Unsigned16
-		ELSIF IsSignedInteger(this, 32) THEN RETURN Integer32
+		ELSIF IsSignedInteger(this, 32) THEN RETURN Signed32
 		ELSIF IsUnsignedInteger(this,32) THEN RETURN Unsigned32
-		ELSE RETURN Integer64
+		ELSE RETURN Signed64
 		END;
 	END GetIntegerType;
 
@@ -1845,10 +1845,10 @@ TYPE
 
 
 		(* types *)
-		Integer8 := SyntaxTree.NewIntegerType(8, TRUE);
-		Integer16 := SyntaxTree.NewIntegerType(16, TRUE);
-		Integer32 := SyntaxTree.NewIntegerType(32, TRUE);
-		Integer64 := SyntaxTree.NewIntegerType(64, TRUE);
+		Signed8 := SyntaxTree.NewIntegerType(8, TRUE);
+		Signed16 := SyntaxTree.NewIntegerType(16, TRUE);
+		Signed32 := SyntaxTree.NewIntegerType(32, TRUE);
+		Signed64 := SyntaxTree.NewIntegerType(64, TRUE);
 		Unsigned8 := SyntaxTree.NewIntegerType(8, FALSE);
 		Unsigned16 := SyntaxTree.NewIntegerType(16, FALSE);
 		Unsigned32 := SyntaxTree.NewIntegerType(32, FALSE);

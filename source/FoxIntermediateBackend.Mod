@@ -12623,16 +12623,16 @@ TYPE
 								ELSIF (type = module.system.longWordType) THEN
 									IF RefInfo THEN Info(section,"LONGWORD") END;
 									Char(section, sfTypeLONGWORD);
-								ELSIF (type = Global.Integer8) OR (type.sizeInBits = 8 ) THEN
+								ELSIF (type = Global.Signed8) OR (type.sizeInBits = 8 ) THEN
 									IF RefInfo THEN Info(section,"SIGNED8") END;
 									Char(section, sfTypeSIGNED8)
-								ELSIF (type = Global.Integer16) OR (type.sizeInBits = 16 ) THEN
+								ELSIF (type = Global.Signed16) OR (type.sizeInBits = 16 ) THEN
 									IF RefInfo THEN Info(section,"SIGNED16") END;
 									Char(section, sfTypeSIGNED16)
-								ELSIF (type = Global.Integer32) OR (type.sizeInBits = 32 ) THEN
+								ELSIF (type = Global.Signed32) OR (type.sizeInBits = 32 ) THEN
 									IF RefInfo THEN Info(section,"SIGNED32") END;
 									Char(section, sfTypeSIGNED32)
-								ELSIF (type = Global.Integer64) OR (type.sizeInBits = 64 ) THEN
+								ELSIF (type = Global.Signed64) OR (type.sizeInBits = 64 ) THEN
 									IF RefInfo THEN Info(section,"SIGNED64") END;
 									Char(section, sfTypeSIGNED64)
 								ELSE

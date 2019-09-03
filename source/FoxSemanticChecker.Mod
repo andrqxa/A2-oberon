@@ -5092,9 +5092,9 @@ TYPE
 						ELSIF type = system.hugeintType THEN type:= system.longintType
 						ELSE
 							CASE type.sizeInBits OF
-								16: type := Global.Integer8
-								|32: type := Global.Integer16
-								|64: type := Global.Integer32
+								16: type := Global.Signed8
+								|32: type := Global.Signed16
+								|64: type := Global.Signed32
 							END;
 						END;
 					ELSIF IsUnsignedIntegerType(type) THEN
@@ -5135,9 +5135,9 @@ TYPE
 						ELSIF type = system.shortintType THEN type := system.integerType
 						ELSE
 							CASE type.sizeInBits OF
-							8: type := Global.Integer16
-							|16: type := Global.Integer32
-							|32: type := Global.Integer64
+							8: type := Global.Signed16
+							|16: type := Global.Signed32
+							|32: type := Global.Signed64
 							END;
 						END;
 					ELSIF IsUnsignedIntegerType(type) THEN
