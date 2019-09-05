@@ -905,6 +905,9 @@ TYPE
 		DeclareType(Float32, "FLOAT32", system.globalScope);
 		DeclareType(Float64, "FLOAT64", system.globalScope);
 
+		DeclareType(Complex32, "COMPLEX32", system.globalScope);
+		DeclareType(Complex64, "COMPLEX64", system.globalScope);
+
 		DeclareType(system.realType,"REAL",system.globalScope);
 		DeclareType(system.longrealType,"LONGREAL",system.globalScope);
 		DeclareType(system.complexType,"COMPLEX",system.globalScope);
