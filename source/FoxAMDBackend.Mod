@@ -3273,7 +3273,7 @@ TYPE
 
 			PROCEDURE AddRegister(CONST name: Scanner.IdentifierString; val: SIGNED32);
 			BEGIN
-				Global.NewConstant(name,val,system.shortintType,system.systemScope)
+				Global.NewConstant(name,val,Global.Signed8,system.systemScope)
 			END AddRegister;
 
 			PROCEDURE AddRegisters;

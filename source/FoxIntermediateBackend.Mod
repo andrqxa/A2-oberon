@@ -984,7 +984,7 @@ TYPE
 				EnsureBodyProcedure(x.moduleScope);
 				Global.GetModuleSegmentedName(module.module,name); Basic.SuffixSegmentedName(name, Basic.MakeString("@ModuleId"));
 				implementationEmitter.profileId := implementationEmitter.NewSection(module.allSections, Sections.VarSection, name,NIL,dump);
-				implementationEmitter.profileId.Emit(Reserve(Basic.invalidPosition,ToMemoryUnits(system,system.SizeOf(system.longintType))));
+				implementationEmitter.profileId.Emit(Reserve(Basic.invalidPosition,ToMemoryUnits(system,system.SizeOf(Global.Signed32))));
 				Global.GetModuleSegmentedName(module.module,name); Basic.SuffixSegmentedName(name, Basic.MakeString("@InitProfiler"));
 				implementationEmitter.profileInit := implementationEmitter.NewSection(module.allSections, Sections.CodeSection, name,NIL,dump);
 				implementationEmitter.EmitEnter(implementationEmitter.profileInit,Basic.invalidPosition,NIL,0,0);
@@ -1316,8 +1316,8 @@ TYPE
 			sizeType := IntermediateCode.GetType(system, system.sizeType);
 			byteType := IntermediateCode.GetType(system, system.byteType);
 			characterType := IntermediateCode.GetType(system, system.characterType);
-			longintType := IntermediateCode.GetType(system, system.longintType);
-			hugeintType := IntermediateCode.GetType(system, system.hugeintType);
+			longintType := IntermediateCode.GetType(system, Global.Signed32);
+			hugeintType := IntermediateCode.GetType(system, Global.Signed64);
 
 			fp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.FP);
 			sp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.SP);
@@ -1685,7 +1685,7 @@ TYPE
 					operand.extra := stepOp;
 				ELSIF type IS SyntaxTree.ComplexType THEN
 					componentType := type(SyntaxTree.ComplexType).componentType;
-					ASSERT((componentType.SameType(system.realType)) OR (componentType.SameType(system.longrealType)));
+					ASSERT((componentType.SameType(Global.Float32)) OR (componentType.SameType(Global.Float64)));
 					MakeMemory(firstOp, operand.op, IntermediateCode.GetType(system, componentType), 0);
 					MakeMemory(lastOp, operand.op, IntermediateCode.GetType(system, componentType), ToMemoryUnits(system, system.SizeOf(componentType)));
 					ReleaseOperand(operand);
@@ -2938,7 +2938,7 @@ TYPE
 			index := SyntaxTree.NewIndexDesignator(x.position,NIL,designator, SyntaxTree.NewExpressionList());
 			FOR i := 0 TO dim-1 DO
 				element := SyntaxTree.NewIntegerValue(x.position,0);
-				element.SetType(system.longintType);
+				element.SetType(Global.Signed32);
 				index.parameters.AddExpression(element);
 			END;
 			index.SetType(SemanticChecker.ArrayBase(x.type,dim));
@@ -7110,7 +7110,7 @@ TYPE
 		VAR value: SyntaxTree.Value; op: Operand;
 		BEGIN
 			value := SyntaxTree.NewIntegerValue(Basic.invalidPosition, v);
-			value.SetType(system.longintType);
+			value.SetType(Global.Signed32);
 			Evaluate(value, op);
 			Emit(Push(Basic.invalidPosition, op.op));
 			ReleaseOperand(op);
@@ -8673,7 +8673,7 @@ TYPE
 					ReuseCopy(result.op, result.op);
 					ReleaseIntermediateOperand(tmp);
 					(* add offset to result.op *)
-					IntermediateCode.AddOffset(result.op, ToMemoryUnits(system, system.SizeOf(system.longintType)))
+					IntermediateCode.AddOffset(result.op, ToMemoryUnits(system, system.SizeOf(Global.Signed32)))
 				END
 
 			(* ---- STEP ---- *)
@@ -8689,7 +8689,7 @@ TYPE
 					ReleaseIntermediateOperand(tmp);
 
 					(* add offset to result.op *)
-					IntermediateCode.AddOffset(result.op, 2 * ToMemoryUnits(system, system.SizeOf(system.longintType)))
+					IntermediateCode.AddOffset(result.op, 2 * ToMemoryUnits(system, system.SizeOf(Global.Signed32)))
 				END
 
 			(* ---- RE ---- *)
@@ -11792,14 +11792,14 @@ TYPE
 		PROCEDURE Longint(section: IntermediateCode.Section; value: SIGNED32);
 		VAR op: IntermediateCode.Operand;
 		BEGIN
-			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, module.system.longintType),value);
+			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, Global.Signed32),value);
 			section.Emit(Data(Basic.invalidPosition,op));
 		END Longint;
 
 		PROCEDURE Hugeint(section: IntermediateCode.Section; value: SIGNED64);
 		VAR op: IntermediateCode.Operand;
 		BEGIN
-			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, module.system.hugeintType),value);
+			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, Global.Signed64),value);
 			section.Emit(Data(Basic.invalidPosition,op));
 		END Hugeint;
 
@@ -11815,7 +11815,7 @@ TYPE
 		VAR op,noOperand: IntermediateCode.Operand;
 		BEGIN
 			IntermediateCode.InitOperand(noOperand);
-			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, module.system.longintType),value);
+			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, Global.Signed32),value);
 			section.PatchOperands(pc,op,noOperand,noOperand);
 		END PatchLongint;
 
@@ -12605,16 +12605,16 @@ TYPE
 							Char(section, sfTypeCHAR);
 						| SyntaxTree.IntegerType DO
 							IF type(SyntaxTree.IntegerType).signed THEN
-								IF (type = module.system.shortintType) THEN
+								IF (type = Global.Signed8) THEN
 									IF RefInfo THEN Info(section,"SIGNED8") END;
 									Char(section, sfTypeSHORTINT)
-								ELSIF (type = module.system.integerType) THEN
+								ELSIF (type = Global.Signed16) THEN
 									IF RefInfo THEN Info(section,"SIGNED16") END;
 									Char(section, sfTypeINTEGER)
-								ELSIF (type = module.system.longintType) THEN
+								ELSIF (type = Global.Signed32) THEN
 									IF RefInfo THEN Info(section,"SIGNED32") END;
 									Char(section, sfTypeLONGINT)
-								ELSIF (type = module.system.hugeintType) THEN
+								ELSIF (type = Global.Signed64) THEN
 									IF RefInfo THEN Info(section,"SIGNED64") END;
 									Char(section, sfTypeHUGEINT)
 								ELSIF (type = module.system.wordType) THEN
@@ -12656,20 +12656,20 @@ TYPE
 								END
 							END;
 						| SyntaxTree.FloatType DO
-							IF (type = module.system.realType) OR (type.sizeInBits = 32) THEN
+							IF (type = Global.Float32) OR (type.sizeInBits = 32) THEN
 								IF RefInfo THEN Info(section,"FLOAT32") END;
 								Char(section, sfTypeREAL);
-							ELSIF (type = module.system.longrealType) OR (type.sizeInBits = 64) THEN
+							ELSIF (type = Global.Float64) OR (type.sizeInBits = 64) THEN
 								IF RefInfo THEN Info(section,"FLOAT64") END;
 								Char(section, sfTypeLONGREAL);
 							ELSE
 								HALT(100);
 							END;
 						| SyntaxTree.ComplexType DO
-							IF (type = module.system.complexType) OR (type.sizeInBits = 64) THEN
+							IF (type = Global.Complex32) OR (type.sizeInBits = 64) THEN
 								IF RefInfo THEN Info(section,"COMPLEX32") END;
 								Char(section, sfTypeCOMPLEX);
-							ELSIF (type = module.system.longcomplexType) OR (type.sizeInBits = 12) THEN
+							ELSIF (type = Global.Complex64) OR (type.sizeInBits = 12) THEN
 								IF RefInfo THEN Info(section,"COMPLEX64") END;
 								Char(section, sfTypeLONGCOMPLEX);
 							ELSE

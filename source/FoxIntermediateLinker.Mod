@@ -790,7 +790,7 @@ TYPE
 				IF parameter.parameterType = 0 THEN (* Boolean *)
 					value := SyntaxTree.NewBooleanValue(-1, parameter.boolean); value.SetType(system.booleanType);
 				ELSE
-					value := SyntaxTree.NewIntegerValue(-1, parameter.integer); value.SetType(system.integerType);
+					value := SyntaxTree.NewIntegerValue(-1, parameter.integer); value.SetType(Global.Signed16);
 				END;
 				Basic.ToSegmentedName(parameter.name, pooledName);
 				irLinker.PatchValueInSection(pooledName,value);
@@ -1062,7 +1062,7 @@ TYPE
 					IF parameter.parameterType = 0 THEN (* Boolean *)
 						value := SyntaxTree.NewBooleanValue(-1, parameter.boolean); value.SetType(system.booleanType);
 					ELSE
-						value := SyntaxTree.NewIntegerValue(-1, parameter.integer); value.SetType(system.integerType);
+						value := SyntaxTree.NewIntegerValue(-1, parameter.integer); value.SetType(Global.Signed16);
 					END;
 					Basic.ToSegmentedName(parameter.name, pooledName);
 					irLinker.PatchValueInSection(pooledName,value);
