@@ -55,7 +55,7 @@ IMPORT Math, MathL;
 	END "*";
 
 	OPERATOR "/"*(CONST left, right: COMPLEX): COMPLEX;
-	VAR result: COMPLEX; iDivisor: REAL;
+	VAR result: COMPLEX; iDivisor: FLOAT32;
 	BEGIN
 		iDivisor := 1.0 / (RE(right) * RE(right) + IM(right) * IM(right));
 		RE(result) := (RE(left) * RE(right) + IM(left) * IM(right)) * iDivisor;
@@ -72,7 +72,7 @@ IMPORT Math, MathL;
 		RETURN result
 	END "/";
 
-	OPERATOR "ABS"*(CONST arg: COMPLEX): REAL;
+	OPERATOR "ABS"*(CONST arg: COMPLEX): FLOAT32;
 	BEGIN RETURN Math.sqrt(RE(arg) * RE(arg) + IM(arg) * IM(arg))
 	END "ABS";
 

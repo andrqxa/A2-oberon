@@ -38,7 +38,7 @@ TYPE
 		pipe : Usbdi.Pipe;
 
 		lastDx, lastDy : SIGNED32;
-		accelX, accelY : REAL;
+		accelX, accelY : FLOAT32;
 
 		PROCEDURE HandleEvent(status : Usbdi.Status; actLen : SIZE);
 		VAR mm : Inputs.MouseMsg; dx, dy : SIGNED32;

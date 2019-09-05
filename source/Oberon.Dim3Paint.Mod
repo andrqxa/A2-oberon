@@ -32,7 +32,7 @@ TYPE
 	TSEntryDesc = RECORD	(* Scanline entry for transparent textures *)
 		texture: TextureMap;
 		X, Y, W: SIGNED16;
-		u, v, uStep, vStep: REAL;
+		u, v, uStep, vStep: FLOAT32;
 		next: TSEntry;
 	END;
 
@@ -41,7 +41,7 @@ TYPE
 	END;
 
 	Point = RECORD	(* help structure for points *)
-		x, y, u, v, w: REAL;
+		x, y, u, v, w: FLOAT32;
 	END;
 
 VAR
@@ -58,7 +58,7 @@ VAR
 
 
 (* Random procedure for dithering *)
- PROCEDURE Random (): REAL;
+ PROCEDURE Random (): FLOAT32;
     CONST a = 16807; m = 2147483647; q = m DIV a; r = m MOD a; (*invm = 0.025 / m;*)
  BEGIN
 	seed := a*(seed MOD q) - r*(seed DIV q);
@@ -170,7 +170,7 @@ BEGIN
 END InitColors;
 
 (** get color index for colormap that matches best **)
-PROCEDURE GetColor* (col: ARRAY OF REAL; light: REAL; grayscale: BOOLEAN):SIGNED16;
+PROCEDURE GetColor* (col: ARRAY OF FLOAT32; light: FLOAT32; grayscale: BOOLEAN):SIGNED16;
 VAR R, G, B: SIGNED32;
 BEGIN
 	IF light <=  0.0 THEN
@@ -192,8 +192,8 @@ BEGIN
 END GetColor;
 
 (* get color indexes for colormap and dithering that matches best *)
-PROCEDURE GetColorDither (col: ARRAY OF REAL; light: REAL; grayscale: BOOLEAN; VAR baseCol, patCol: SIGNED16;
-												VAR pat: SIGNED32; rand: REAL);
+PROCEDURE GetColorDither (col: ARRAY OF FLOAT32; light: FLOAT32; grayscale: BOOLEAN; VAR baseCol, patCol: SIGNED16;
+												VAR pat: SIGNED32; rand: FLOAT32);
 VAR R, G, B, R1, G1, B1, RMod, GMod, BMod: SIGNED32; color: Color;
 BEGIN
 	light := light + rand;
@@ -229,8 +229,8 @@ BEGIN
 END GetColorDither;
 
 (* get color indexes for colormap and dithering that matches best, for specular reflection*)
-PROCEDURE GetColorSpecular (col: ARRAY OF REAL; light, spec: REAL; grayscale: BOOLEAN; VAR baseCol, patCol: SIGNED16;
-													VAR pat: SIGNED32; rand: REAL);
+PROCEDURE GetColorSpecular (col: ARRAY OF FLOAT32; light, spec: FLOAT32; grayscale: BOOLEAN; VAR baseCol, patCol: SIGNED16;
+													VAR pat: SIGNED32; rand: FLOAT32);
 VAR R, G, B, R1, G1, B1, RMod, GMod, BMod: SIGNED32; color: Color;
 BEGIN
 	light := light + rand; spec := spec + 0.001;
@@ -392,12 +392,12 @@ BEGIN
 END SplitSegment;
 
 (* draw a gouraud shaded polygon scanline, with dithering and specular reflection *)
-PROCEDURE DrawSpecularSegment(sel: BOOLEAN; col: ARRAY OF REAL; planeCol: SIGNED16; grayscale: BOOLEAN; entry: DSEntry;
-												  			xL, xR: REAL; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF REAL);
-VAR XL, XR, W: SIGNED16; t1, t3, iL, iR, dInten, dSpec, sL, sR: REAL;
+PROCEDURE DrawSpecularSegment(sel: BOOLEAN; col: ARRAY OF FLOAT32; planeCol: SIGNED16; grayscale: BOOLEAN; entry: DSEntry;
+												  			xL, xR: FLOAT32; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF FLOAT32);
+VAR XL, XR, W: SIGNED16; t1, t3, iL, iR, dInten, dSpec, sL, sR: FLOAT32;
 
-	PROCEDURE Display(X, W: SIGNED16; iLeft, sLeft: REAL);
-	VAR  x, color, oddY, oddX, patCol: SIGNED16; inten, spec: REAL; pat: SIGNED32; pictAdr: ADDRESS; rand: REAL;
+	PROCEDURE Display(X, W: SIGNED16; iLeft, sLeft: FLOAT32);
+	VAR  x, color, oddY, oddX, patCol: SIGNED16; inten, spec: FLOAT32; pat: SIGNED32; pictAdr: ADDRESS; rand: FLOAT32;
 	BEGIN
 		IF W > 2 THEN rand := Random() ELSE rand := 0 END;
 		IF ODD(Y) THEN oddY := 0 ELSE oddY := 2 END;
@@ -506,12 +506,12 @@ BEGIN
 END DrawSpecularSegment;
 
 (* draw a gouraud shaded polygon scanline, with dithering *)
-PROCEDURE DrawDitherSegment(sel: BOOLEAN; col: ARRAY OF REAL; planeCol: SIGNED16; grayscale: BOOLEAN; entry: DSEntry;
-												  			xL, xR: REAL; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF REAL);
-VAR XL, XR, W: SIGNED16; t1, t2, t3, iL, iR, dInten: REAL;
+PROCEDURE DrawDitherSegment(sel: BOOLEAN; col: ARRAY OF FLOAT32; planeCol: SIGNED16; grayscale: BOOLEAN; entry: DSEntry;
+												  			xL, xR: FLOAT32; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF FLOAT32);
+VAR XL, XR, W: SIGNED16; t1, t2, t3, iL, iR, dInten: FLOAT32;
 
-	PROCEDURE Display(X, W: SIGNED16; iLeft: REAL);
-	VAR  x, color, oddY, oddX, patCol: SIGNED16; inten: REAL; pat: SIGNED32; pictAdr: ADDRESS; rand: REAL;
+	PROCEDURE Display(X, W: SIGNED16; iLeft: FLOAT32);
+	VAR  x, color, oddY, oddX, patCol: SIGNED16; inten: FLOAT32; pat: SIGNED32; pictAdr: ADDRESS; rand: FLOAT32;
 	BEGIN
 		IF W > 2 THEN rand := Random() ELSE rand := 0 END;
 		IF ODD(Y) THEN oddY := 0 ELSE oddY := 2 END;
@@ -613,12 +613,12 @@ BEGIN
 END DrawDitherSegment;
 
 (* draw a gouraud shaded polygon scanline, no dithering *)
-PROCEDURE DrawGouraudSegment(sel: BOOLEAN; col: ARRAY OF REAL; planeCol: SIGNED16; grayscale: BOOLEAN; entry: DSEntry;
-												  			xL, xR: REAL; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF REAL);
-VAR XL, XR, W: SIGNED16; t1, t2, t3, iL, iR, dInten: REAL;
+PROCEDURE DrawGouraudSegment(sel: BOOLEAN; col: ARRAY OF FLOAT32; planeCol: SIGNED16; grayscale: BOOLEAN; entry: DSEntry;
+												  			xL, xR: FLOAT32; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF FLOAT32);
+VAR XL, XR, W: SIGNED16; t1, t2, t3, iL, iR, dInten: FLOAT32;
 
-	PROCEDURE Display(X, W: SIGNED16; iLeft: REAL);
-	VAR  x, color: SIGNED16; inten, dInt: REAL; pictAdr: ADDRESS;
+	PROCEDURE Display(X, W: SIGNED16; iLeft: FLOAT32);
+	VAR  x, color: SIGNED16; inten, dInt: FLOAT32; pictAdr: ADDRESS;
 	BEGIN
 		DEC(W);
 		inten := iLeft;
@@ -700,8 +700,8 @@ BEGIN
 END DrawGouraudSegment;
 
 (* draw a constant shaded polygon scanline *)
-PROCEDURE DrawUniSegment(sel: BOOLEAN; col: ARRAY OF REAL; planeCol: SIGNED16; grayscale: BOOLEAN;
-												  	entry: DSEntry; xL, xR: REAL; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF REAL);
+PROCEDURE DrawUniSegment(sel: BOOLEAN; col: ARRAY OF FLOAT32; planeCol: SIGNED16; grayscale: BOOLEAN;
+												  	entry: DSEntry; xL, xR: FLOAT32; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF FLOAT32);
 VAR XL, XR, W: SIGNED16;
 
 	PROCEDURE Display(X, W: SIGNED16);
@@ -775,14 +775,14 @@ END DrawUniSegment;
 		uni = FALSE & dither = FALSE & specular = TRUE : not allowed;
 		uni = FALSE & dither = TRUE & specular = FALSE : draw a gouraud shaded polygon with 2*2 dithering and without specular reflection;
 		uni = FALSE & dither = TRUE & specular = TRUE : draw a gouraud shaded polygon with 2*2 dithering and with specular reflection; **)
-PROCEDURE DrawShadePoly* (P: Pictures.Picture; VAR ds: ARRAY OF DSEntry; col: ARRAY OF REAL; planeCol: SIGNED16;
-										grayscale, uni, sel, dither, specular: BOOLEAN; VAR x, y, i, s: ARRAY OF REAL; n: SIGNED16);
+PROCEDURE DrawShadePoly* (P: Pictures.Picture; VAR ds: ARRAY OF DSEntry; col: ARRAY OF FLOAT32; planeCol: SIGNED16;
+										grayscale, uni, sel, dither, specular: BOOLEAN; VAR x, y, i, s: ARRAY OF FLOAT32; n: SIGNED16);
 VAR
-	xL, xR, mL, mR, dxL, dxR, dyL, dyR, yt, pw, ph: REAL;
+	xL, xR, mL, mR, dxL, dxR, dyL, dyR, yt, pw, ph: FLOAT32;
 	sy, topY, stopL, stopR: SIGNED32;
 	topL, topR, botL, botR, t, Y: SIGNED16;
-	drawScanline: PROCEDURE(sel: BOOLEAN; col: ARRAY OF REAL; planeCol: SIGNED16; grayscale: BOOLEAN;
-												  entry: DSEntry; xL, xR: REAL; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF REAL);
+	drawScanline: PROCEDURE(sel: BOOLEAN; col: ARRAY OF FLOAT32; planeCol: SIGNED16; grayscale: BOOLEAN;
+												  entry: DSEntry; xL, xR: FLOAT32; Y, botL, botR, topL, topR: SIGNED16; y, i, s: ARRAY OF FLOAT32);
 BEGIN
 	seed := 1235; DEC(n);
 	Dim3Base.SetPicture(P);
@@ -883,9 +883,9 @@ BEGIN
 END DrawShadePoly;
 
 (** Draw constant shaded polygon without the dynamic screen method **)
-PROCEDURE DrawPolygon* (P: Pictures.Picture; col: SIGNED16; sel: BOOLEAN; VAR x, y: ARRAY OF REAL; n: SIGNED16);
+PROCEDURE DrawPolygon* (P: Pictures.Picture; col: SIGNED16; sel: BOOLEAN; VAR x, y: ARRAY OF FLOAT32; n: SIGNED16);
 VAR
-	xL, xR, mL, mR, dxL, dxR, dyL, dyR, yt, pw, ph: REAL;
+	xL, xR, mL, mR, dxL, dxR, dyL, dyR, yt, pw, ph: FLOAT32;
 	sy, topY, stopL, stopR: SIGNED32;
 	topL, topR, botL, botR, t, X, W: SIGNED16;
 BEGIN
@@ -988,7 +988,7 @@ END DrawPolygon;
 
 (** draw the transparent texture polygons back to front, free TSList **)
 PROCEDURE DrawTSList* (P: Pictures.Picture; ts: TSEntry);
-VAR entry, last: TSEntry; x, width, height: SIGNED16; baseAdr, adr, pictAdr: ADDRESS; U, V, Vmult: SIGNED32; c, bg: CHAR; u, v, us, vs: REAL;
+VAR entry, last: TSEntry; x, width, height: SIGNED16; baseAdr, adr, pictAdr: ADDRESS; U, V, Vmult: SIGNED32; c, bg: CHAR; u, v, us, vs: FLOAT32;
 		oldText: TextureMap;
 BEGIN
 	Dim3Base.SetPicture(P); V := -1000;
@@ -1034,13 +1034,13 @@ END DrawTSList;
 (* draw transparent texture within polygon using the given mipmap, because a transparent texture has to be drawn
       from back to front, the scanlines are stored in a TSEntry list. Use DrawTSList to display TSList after drawing the BSPTree *)
 PROCEDURE DrawTransparent (P: Pictures.Picture; VAR ds: ARRAY OF DSEntry; texture: TextureMap;
-												VAR tsList: TSEntry; VAR x, y, u, v: ARRAY OF REAL; n: SIGNED16);
+												VAR tsList: TSEntry; VAR x, y, u, v: ARRAY OF FLOAT32; n: SIGNED16);
 VAR
-	xL, xR, mL, mR, dxL, dxR, dyL, dyR, t1, t3, uR, uL, vR, vL, uStep, vStep, invW: REAL;
+	xL, xR, mL, mR, dxL, dxR, dyL, dyR, t1, t3, uR, uL, vR, vL, uStep, vStep, invW: FLOAT32;
 	sy, topY, stopL, stopR: SIGNED32; baseAdr: ADDRESS; test: BOOLEAN;
 	topL, topR, botL, botR, t, W, Y, XL, XR, width, height, w2, h2: SIGNED16; entry: DSEntry;
 
-	PROCEDURE display(P: Pictures.Picture; texture: TextureMap; X, Y, W: SIGNED16; u, v: REAL);
+	PROCEDURE display(P: Pictures.Picture; texture: TextureMap; X, Y, W: SIGNED16; u, v: FLOAT32);
 	VAR entry: TSEntry;
 	BEGIN
 		AllocTSEntry(entry);
@@ -1206,13 +1206,13 @@ END DrawTransparent;
 
 (* draw texture within polygon using the given mipmap, no transparent textures *)
 PROCEDURE DrawTexture (P: Pictures.Picture; VAR ds: ARRAY OF DSEntry; texture: TextureMap;
-												VAR x, y, u, v: ARRAY OF REAL; n: SIGNED16);
+												VAR x, y, u, v: ARRAY OF FLOAT32; n: SIGNED16);
 VAR
-	xL, xR, mL, mR, dxL, dxR, dyL, dyR, t1, t3, uR, uL, vR, vL, uStep, vStep, invW: REAL;
+	xL, xR, mL, mR, dxL, dxR, dyL, dyR, t1, t3, uR, uL, vR, vL, uStep, vStep, invW: FLOAT32;
 	sy, topY, stopL, stopR: SIGNED32; baseAdr: ADDRESS; test: BOOLEAN;
 	topL, topR, botL, botR, t, W, Y, XL, XR, height, width, width2, height2: SIGNED16; entry: DSEntry;
 
-	PROCEDURE display (P: Pictures.Picture; texture: TextureMap;  X, Y, W: SIGNED16; u, v: REAL);
+	PROCEDURE display (P: Pictures.Picture; texture: TextureMap;  X, Y, W: SIGNED16; u, v: FLOAT32);
 	VAR x: SIGNED16; U, V, Vmult: SIGNED32; adr, pictAdr: ADDRESS;
 	BEGIN
 		pictAdr := Dim3Base.GetAddress(X, Y); V := -1000;
@@ -1393,12 +1393,12 @@ END DrawTexture;
 
 (** draw perspective correct texture polygon, if transparent = FALSE then use DrawTexture else use DrawTransparent **)
 PROCEDURE DrawPersTexture* (P: Pictures.Picture; VAR ds: ARRAY OF DSEntry; texture: ARRAY OF TextureMap; numPict: SIGNED16;
-									sel, transparent: BOOLEAN; VAR tsList: TSEntry; VAR x, y, w, u, v: ARRAY OF REAL; col, n: SIGNED16);
-VAR  h, width, height: SIGNED16; point1, point2, point3: Point; dummy: ARRAY 50 OF REAL; pw, ph: REAL;
+									sel, transparent: BOOLEAN; VAR tsList: TSEntry; VAR x, y, w, u, v: ARRAY OF FLOAT32; col, n: SIGNED16);
+VAR  h, width, height: SIGNED16; point1, point2, point3: Point; dummy: ARRAY 50 OF FLOAT32; pw, ph: FLOAT32;
 		adr: ADDRESS; width2, height2 : SIGNED32;
 
 	PROCEDURE Test(p1, p2: Point; VAR p12: Point): BOOLEAN;
-	VAR wsum, dx, dy: REAL;
+	VAR wsum, dx, dy: FLOAT32;
 	BEGIN
 		wsum := p1.w + p2.w;
 		p12.w := 0.5 * wsum;
@@ -1413,7 +1413,7 @@ VAR  h, width, height: SIGNED16; point1, point2, point3: Point; dummy: ARRAY 50 
 
 	PROCEDURE Divide(p1, p2, p3: Point);
 	VAR p12, p13, p23: Point; test12, test13, test23: BOOLEAN; mipmap: SIGNED32;
-			x, y, u, v: ARRAY 3 OF REAL; deltaX, deltaY, deltaU, deltaV: REAL;
+			x, y, u, v: ARRAY 3 OF FLOAT32; deltaX, deltaY, deltaU, deltaV: FLOAT32;
 	BEGIN
 		test12 := Test(p1, p2, p12);
 		test13 := Test(p1, p3, p13);
@@ -1480,7 +1480,7 @@ BEGIN
 END DrawPersTexture;
 
 (** calculate and shade the mipmaps: P is the origin picture for texture **)
-PROCEDURE ShadeTexture* (P: Pictures.Picture;VAR texture: ARRAY OF TextureMap; VAR numPict: SIGNED16; trans: BOOLEAN; light: REAL);
+PROCEDURE ShadeTexture* (P: Pictures.Picture;VAR texture: ARRAY OF TextureMap; VAR numPict: SIGNED16; trans: BOOLEAN; light: FLOAT32);
 VAR   x, y, color, i, r, g, b, w, h, maxlevel, delay, c11, c12, c21, c22, w2, h2, m, n, anz, anz2, baseX, baseY: SIGNED16;
 		R, G, B, w1, h1: SIGNED32; adr, baseAdr, textAdr: ADDRESS; sumR, sumG, sumB, wAlt, anz3: SIGNED16;
 		pictColorTab: ARRAY 3, 256 OF SIGNED16; bgColor, col: CHAR;

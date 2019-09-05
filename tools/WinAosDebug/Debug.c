@@ -514,7 +514,7 @@ void Variables(HWND hWnd, LPVOID mod, LPVOID refs, SIGNED32 reflen, SIGNED32 i, 
 							j = GetLInt((LPVOID)adr, &k);
 							wsprintf(msg, "%i", j);
 							break;
-						case 7: // REAL
+						case 7: // FLOAT32
 							ReadProcessMemory(proc.hProcess, (LPVOID)adr, &x, 4, &read);
 							sprintf(msg, "%E", x);
 							break;

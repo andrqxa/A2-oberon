@@ -101,7 +101,7 @@ END MatrixFromArray;
 PROCEDURE ScaleMatrix*;
 	VAR  obj: vyBase.Object;  par: LONGREAL;  y, x: SIGNED32;
 BEGIN
-	antsCommands.InitScan("name=NAME scale=REAL");
+	antsCommands.InitScan("name=NAME scale=FLOAT32");
 	IF antsCommands.ExpectObject("name", obj) &
 		antsCommands.ExpectReal("scale", par) THEN
 		WITH obj: vyRealVec.tChunkedMatrix DO

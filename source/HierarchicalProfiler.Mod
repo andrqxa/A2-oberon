@@ -57,7 +57,7 @@ TYPE
 		child- : Node;
 		sibling- : Node;
 		count- : SIGNED32;
-		percent- : REAL;
+		percent- : FLOAT32;
 		nofChildren- : SIGNED32; (* number of direct descendants *)
 		name- : Name;
 

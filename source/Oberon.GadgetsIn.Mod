@@ -136,7 +136,7 @@ END Int;
 
 (** Real - Input a real number. *)
 
-PROCEDURE Real*(VAR x: REAL);
+PROCEDURE Real*(VAR x: FLOAT32);
 BEGIN
 	IF done THEN
 		Texts.Scan(s);

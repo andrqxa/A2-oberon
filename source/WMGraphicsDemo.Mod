@@ -27,7 +27,7 @@ TYPE
 		(* Calculate a polygon in form of a circle *)
 		PROCEDURE MakeCircle(x, y, r, nofPoints: SIGNED32; VAR p : ARRAY OF WMGraphics.Point2d);
 		VAR i : SIGNED32;
-			inv : REAL;
+			inv : FLOAT32;
 		BEGIN
 			inv := 2 * Math.pi / nofPoints;
 			FOR i := 0 TO nofPoints - 1 DO

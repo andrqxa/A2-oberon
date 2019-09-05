@@ -128,7 +128,7 @@ BEGIN
 	gen.seed(vyRanBase.tLongintSeed).val := s
 END RandomUVX;
 
-PROCEDURE RandomUV (gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF REAL;  start: SIGNED32);
+PROCEDURE RandomUV (gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF FLOAT32;  start: SIGNED32);
 CONST
 	scalefact = 1.0D0 / m;
 VAR

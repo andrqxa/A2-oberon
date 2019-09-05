@@ -41,8 +41,8 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 			next: PictList;
 		END;
 
-		RealVector = ARRAY N OF REAL;
-		Poly = RECORD a, b, c, d, t: REAL END ;
+		RealVector = ARRAY N OF FLOAT32;
+		Poly = RECORD a, b, c, d, t: FLOAT32 END ;
 		PolyVector = ARRAY N OF Poly;
 
 	(* used for printing pictures *)
@@ -132,7 +132,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END WriteString;
 
 	PROCEDURE GetDim(label: ARRAY OF CHAR;  def: SIGNED16;  VAR val: SIGNED16);
-	VAR v: REAL; S: Texts.Scanner;
+	VAR v: FLOAT32; S: Texts.Scanner;
 	BEGIN
 		Oberon.OpenScanner(S, label);
 		IF (S.class = Texts.Int) OR (S.class = Texts.Real) THEN
@@ -728,7 +728,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 
 	(*
 	PROCEDURE Bezier(col, x0, y0, xd0, yd0, x1, y1, xd1, yd1: SIGNED16);
-		VAR t, dt, dx, dy, ax, bx, ay, by: REAL;
+		VAR t, dt, dx, dy, ax, bx, ay, by: FLOAT32;
 	BEGIN
 		dx := x1 - x0; ax := xd0 + xd1 - 2.0*dx; bx := 3.0*dx - 2.0*xd0 - xd1;
 		dy := y1 - y0; ay := yd0 + yd1 - 2.0*dy; by := 3.0*dy - 2.0*yd0 - yd1;
@@ -741,8 +741,8 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END Bezier;
 	*)
 
-	PROCEDURE PrintPoly(x0, y0: SIGNED16; VAR p, q: Poly; lim: REAL);
-		VAR t: REAL;
+	PROCEDURE PrintPoly(x0, y0: SIGNED16; VAR p, q: Poly; lim: FLOAT32);
+		VAR t: FLOAT32;
 	BEGIN t := 0;
 		REPEAT
 			Dot(SHORT(ENTIER(((p.a * t + p.b) * t + p.c) * t + p.d) + x0),SHORT(ENTIER(((q.a * t + q.b) * t + q.c) * t + q.d) + y0));
@@ -751,7 +751,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END PrintPoly;
 
 	PROCEDURE SolveTriDiag(VAR a, b, c, y: RealVector; n: SIGNED16);
-		VAR i: SIGNED16;  t: REAL;
+		VAR i: SIGNED16;  t: FLOAT32;
 	BEGIN (*a, b, c of tri-diag matrix T; solve Ty' = y for y', assign y' to y*)
 		i := 1;
 		WHILE i < n DO
@@ -764,7 +764,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END SolveTriDiag;
 
 	PROCEDURE OpenSpline(VAR x, y, d: RealVector; n: SIGNED16);
-		VAR i: SIGNED16; d1, d2: REAL;
+		VAR i: SIGNED16; d1, d2: FLOAT32;
 			a, b, c: RealVector;
 	BEGIN (*from x, y compute d = y'*)
 		b[0] := 1.0/(x[1] - x[0]); a[0] := 2.0*b[0]; c[0] := b[0];
@@ -782,7 +782,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END OpenSpline;
 
 	PROCEDURE ClosedSpline(VAR x, y, d: RealVector; n: SIGNED16);
-		VAR i: SIGNED16; d1, d2, hn, dn: REAL;
+		VAR i: SIGNED16; d1, d2, hn, dn: FLOAT32;
 			a, b, c, w: RealVector;
 	BEGIN (*from x, y compute d = y'*)
 		hn := 1.0/(x[n-1] - x[n-2]);
@@ -809,7 +809,7 @@ MODULE HPPCL IN Oberon;  (*bh, ard 27.11.92  /  kr 23.12. 92 / 03.08.93 - js 4.8
 	END ClosedSpline;
 
 	PROCEDURE PrinterSpline(x0, y0, n, open : SIGNED16; u,v : ARRAY OF SIGNED16);
-		VAR i : SIGNED16; dx, dy, ds: REAL;
+		VAR i : SIGNED16; dx, dy, ds: FLOAT32;
 			x, xd, y, yd, s: RealVector;
 			p, q: PolyVector;
 	BEGIN (*from u, v compute x, y, s*)

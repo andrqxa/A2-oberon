@@ -19,7 +19,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 			frame: LeoFrames.Frame;	(* frame displaying caret *)
 			fig: Leonardo.Figure;	(* figure containing focus shape *)
 			shape: Leonardo.Shape;	(* focus shape *)
-			px, py: REAL;	(* figure coordinates of caret *)
+			px, py: FLOAT32;	(* figure coordinates of caret *)
 			x, y: SIGNED16;	(* screen position of caret *)
 			visible: BOOLEAN;
 		END;
@@ -190,7 +190,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 		END
 	END ConsumeText;
 
-	PROCEDURE SetFocus (frame: LeoFrames.Frame; x, y: REAL): BOOLEAN;
+	PROCEDURE SetFocus (frame: LeoFrames.Frame; x, y: FLOAT32): BOOLEAN;
 		VAR fig: Leonardo.Figure; dmat: GfxMatrix.Matrix; shape: Leonardo.Shape;
 	BEGIN
 		fig := frame.obj(Leonardo.Figure);
@@ -223,7 +223,7 @@ MODULE LeoCaptionEditors IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE Track (frame: LeoFrames.Frame; VAR msg: Oberon.InputMsg);
 		VAR
-			fx, fy, mx, my, x, y, len: SIGNED16; px, py: REAL; keysum, keys, state: SET; done: BOOLEAN; text: Texts.Text;
+			fx, fy, mx, my, x, y, len: SIGNED16; px, py: FLOAT32; keysum, keys, state: SET; done: BOOLEAN; text: Texts.Text;
 			beg, end, time: SIGNED32; tool: LeoTools.Tool; mask: Display3.Mask; s: ARRAY 128 OF CHAR;
 	BEGIN
 		IF msg.keys = {} THEN

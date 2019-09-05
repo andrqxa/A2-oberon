@@ -73,7 +73,7 @@ TYPE
 
 		PROCEDURE AddTriangle*(a, b, c : AbstractWorld.Vertex; color : SIGNED32; tex : AbstractWorld.Texture; mask0, culled: BOOLEAN);
 		VAR n : TriangleArray; i : SIGNED32;
-				f : REAL;
+				f : FLOAT32;
 		BEGIN
 			IF nofTriangles = LEN(triangles) THEN
 				NEW(n, LEN(triangles) * 2);

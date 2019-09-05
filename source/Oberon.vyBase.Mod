@@ -2110,9 +2110,9 @@ BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYL;
 
-PROCEDURE COPYR* (VAR src: ARRAY OF REAL;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF REAL;     destoffs: SIGNED32);
-CONST sz = SIZEOF(REAL);
+PROCEDURE COPYR* (VAR src: ARRAY OF FLOAT32;      srcoffs, len: SIGNED32;
+VAR dest: ARRAY OF FLOAT32;     destoffs: SIGNED32);
+CONST sz = SIZEOF(FLOAT32);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
 	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)

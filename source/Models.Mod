@@ -435,7 +435,7 @@ TYPE
 
 	Real* = OBJECT(Model)
 	VAR
-		value : REAL;
+		value : FLOAT32;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -445,7 +445,7 @@ TYPE
 			SetGenerator("Models.GenReal");
 		END Init;
 
-		PROCEDURE Set*(value : REAL);
+		PROCEDURE Set*(value : FLOAT32);
 		BEGIN
 			AcquireWrite;
 			IF (SELF.value # value) THEN
@@ -455,8 +455,8 @@ TYPE
 			ReleaseWrite;
 		END Set;
 
-		PROCEDURE Get*() : REAL;
-		VAR value : REAL;
+		PROCEDURE Get*() : FLOAT32;
+		VAR value : FLOAT32;
 		BEGIN
 			AcquireRead;
 			value := SELF.value;
@@ -465,14 +465,14 @@ TYPE
 		END Get;
 
 		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
-		VAR newValue : REAL;
+		VAR newValue : FLOAT32;
 		BEGIN
 			Types.GetReal(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
 		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
-		VAR currentValue : REAL;
+		VAR currentValue : FLOAT32;
 		BEGIN
 			currentValue := Get();
 			Types.SetReal(value, currentValue, res);

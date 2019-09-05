@@ -335,9 +335,9 @@ TYPE
 		PROCEDURE GetCursorPosition(x: SIZE) : SIGNED32;
 		VAR
 			cursorPosition, code, i : SIGNED32;
-			found : BOOLEAN; lastDistance : REAL;
+			found : BOOLEAN; lastDistance : FLOAT32;
 			font : WMGraphics.Font;
-			g : WMGraphics.GlyphSpacings; gx : REAL;
+			g : WMGraphics.GlyphSpacings; gx : FLOAT32;
 		BEGIN
 			font := GetFont();
 			cursorPosition := 0;
@@ -365,7 +365,7 @@ TYPE
 
 		(* Determine the cursor's x-coordinate of the current cursor position relative to the first characer *)
 		PROCEDURE GetCursorCoordinateX() : SIGNED32;
-		VAR font : WMGraphics.Font; g : WMGraphics.GlyphSpacings; x : REAL; i, code : SIGNED32;
+		VAR font : WMGraphics.Font; g : WMGraphics.GlyphSpacings; x : FLOAT32; i, code : SIGNED32;
 		BEGIN
 			font := GetFont();
 			x := 0.0;

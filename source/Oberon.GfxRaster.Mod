@@ -66,16 +66,16 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 			pathReg: GfxRegions.Region;	(* region surrounded by current path *)
 			plx, ply, prx, puy: SIGNED16;	(* rectangle around last point *)
 			border: SIGNED16;	(* safety border in proportion to style limit around points *)
-			devWidth: REAL;	(* half the line width in device space *)
-			u, v: REAL;	(* current position in device space *)
-			su, sv: REAL;	(* position of first point for thick lines *)
-			du, dv: REAL;	(* current direction for thick lines *)
-			tu, tv: REAL;	(* point on thick line perpendicular to current inner join vertex *)
+			devWidth: FLOAT32;	(* half the line width in device space *)
+			u, v: FLOAT32;	(* current position in device space *)
+			su, sv: FLOAT32;	(* position of first point for thick lines *)
+			du, dv: FLOAT32;	(* current direction for thick lines *)
+			tu, tv: FLOAT32;	(* point on thick line perpendicular to current inner join vertex *)
 			px, py: SIGNED32;	(* current pixel position *)
-			fu, fv: REAL;	(* current outline position for filled areas *)
-			offset: REAL;	(* current offset *)
+			fu, fv: FLOAT32;	(* current outline position for filled areas *)
+			offset: FLOAT32;	(* current offset *)
 			deferred: BOOLEAN;	(* indicates that no cap/join has been drawn for start of thick line yet *)
-			u0, v0, u1, v1: REAL;	(* endpoints of first thick line of current subpath *)
+			u0, v0, u1, v1: FLOAT32;	(* endpoints of first thick line of current subpath *)
 		END;
 
 		(* path data for filling paths *)
@@ -95,9 +95,9 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 	(**--- Ellipse Test ---**)
 
 	(** return if arc parameter describe axis-aligned ellipse and, if so, the radii in x and y direction **)
-	PROCEDURE IsEllipse* (x0, y0, x1, y1, x2, y2, sx, sy, ex, ey, flatness: REAL; VAR rx, ry: REAL): BOOLEAN;
+	PROCEDURE IsEllipse* (x0, y0, x1, y1, x2, y2, sx, sy, ex, ey, flatness: FLOAT32; VAR rx, ry: FLOAT32): BOOLEAN;
 		CONST eps = 0.01;
-		VAR x, y: REAL;
+		VAR x, y: FLOAT32;
 	BEGIN
 		IF (ABS(x1 - x0) < eps) & (ABS(y2 - y0) < eps) THEN
 			rx := x0 - x2; ry := y0 - y1
@@ -126,7 +126,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		GfxRegions.Clear(ctxt(Context).clipReg)
 	END ResetClip;
 
-	PROCEDURE GetClipRect* (ctxt: Gfx.Context; VAR llx, lly, urx, ury: REAL);
+	PROCEDURE GetClipRect* (ctxt: Gfx.Context; VAR llx, lly, urx, ury: FLOAT32);
 		VAR inv: GfxMatrix.Matrix; reg: GfxRegions.Region;
 	BEGIN
 		GfxMatrix.Invert(ctxt.ctm, inv);
@@ -179,7 +179,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Hairlines ---*)
 
-	PROCEDURE HairLineEnter (rc: Context; u, v: REAL);
+	PROCEDURE HairLineEnter (rc: Context; u, v: FLOAT32);
 	BEGIN
 		rc.u := u; rc.v := v;
 		rc.px := ENTIER(u); rc.py := ENTIER(v);
@@ -187,8 +187,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		rc.dot(rc, rc.px, rc.py)
 	END HairLineEnter;
 
-	PROCEDURE HairLineTo (rc: Context; u, v: REAL);
-		VAR px, py, xstep, ystep, steps: SIGNED32; du, dv, eu, ev, e: REAL;
+	PROCEDURE HairLineTo (rc: Context; u, v: FLOAT32);
+		VAR px, py, xstep, ystep, steps: SIGNED32; du, dv, eu, ev, e: FLOAT32;
 	BEGIN
 		px := ENTIER(u); py := ENTIER(v);
 		UpdateClipState(rc, SHORT(px), SHORT(py));
@@ -301,14 +301,14 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Filled Areas ---*)
 
-	PROCEDURE EnterLine (rc: Context; u, v: REAL);
+	PROCEDURE EnterLine (rc: Context; u, v: FLOAT32);
 	BEGIN
 		rc.fu := u; rc.fv := v;
 		rc.px := ENTIER(u + 0.5); rc.py := ENTIER(v + 0.5);
 	END EnterLine;
 
-	PROCEDURE AddLine (rc: Context; u, v: REAL);
-		VAR px, py, x, y, xstep, ystep, steps: SIGNED32; du, dv, eu, ev, e: REAL;
+	PROCEDURE AddLine (rc: Context; u, v: FLOAT32);
+		VAR px, py, x, y, xstep, ystep, steps: SIGNED32; du, dv, eu, ev, e: FLOAT32;
 	BEGIN
 		px := ENTIER(u + 0.5); py := ENTIER(v + 0.5);
 		x := rc.px; y := rc.py;
@@ -421,7 +421,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 	END FillRegion;
 
 	PROCEDURE AddPathElem (VAR data: GfxPaths.EnumData);
-		VAR rc: Context; x, y: REAL;
+		VAR rc: Context; x, y: FLOAT32;
 	BEGIN
 		rc := data(PathData).context;
 		CASE data.elem OF
@@ -456,8 +456,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Thick Lines ---*)
 
-	PROCEDURE StrokeHalfJoin (rc: Context; cu, cv, u, v, du, dv, hu, hv: REAL; part: SIGNED32);
-		VAR limit, bu, bv, t: REAL; data: PathData;
+	PROCEDURE StrokeHalfJoin (rc: Context; cu, cv, u, v, du, dv, hu, hv: FLOAT32; part: SIGNED32);
+		VAR limit, bu, bv, t: FLOAT32; data: PathData;
 	BEGIN
 		IF (hu # 0) OR (hv # 0) THEN
 			IF du * hv > dv * hu THEN
@@ -497,8 +497,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END StrokeHalfJoin;
 
-	PROCEDURE StrokeFullJoin (rc: Context; su, sv, cu, cv, eu, ev, idu, idv, odu, odv, hu, hv: REAL);
-		VAR t, limit: REAL; data: PathData;
+	PROCEDURE StrokeFullJoin (rc: Context; su, sv, cu, cv, eu, ev, idu, idv, odu, odv, hu, hv: FLOAT32);
+		VAR t, limit: FLOAT32; data: PathData;
 	BEGIN
 		IF (hu # 0) OR (hv # 0) THEN
 			IF idu * odv < idv * odu THEN	(* turn right turns into left turns *)
@@ -523,7 +523,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END StrokeFullJoin;
 
-	PROCEDURE StrokeCap (rc: Context; u, v, du, dv: REAL);
+	PROCEDURE StrokeCap (rc: Context; u, v, du, dv: FLOAT32);
 		VAR data: PathData;
 	BEGIN
 		IF rc.capStyle = Gfx.RoundCap THEN
@@ -538,7 +538,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END StrokeCap;
 
-	PROCEDURE ThickVerticalLine (rc: Context; lu, v0, v1: REAL);
+	PROCEDURE ThickVerticalLine (rc: Context; lu, v0, v1: FLOAT32);
 		VAR left, right, bot, top: SIGNED32;
 	BEGIN
 		IF v0 < v1 THEN
@@ -551,7 +551,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		rc.rect(rc, SHORT(left), SHORT(bot), SHORT(right), SHORT(top))
 	END ThickVerticalLine;
 
-	PROCEDURE ThickHorizontalLine (rc: Context; rv, u0, u1: REAL);
+	PROCEDURE ThickHorizontalLine (rc: Context; rv, u0, u1: FLOAT32);
 		VAR left, right, bot, top: SIGNED32;
 	BEGIN
 		IF u0 < u1 THEN
@@ -564,7 +564,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		rc.rect(rc, SHORT(left), SHORT(bot), SHORT(right), SHORT(top))
 	END ThickHorizontalLine;
 
-	PROCEDURE ThickLine (rc: Context; su, sv, eu, ev, du, dv: REAL);
+	PROCEDURE ThickLine (rc: Context; su, sv, eu, ev, du, dv: FLOAT32);
 	BEGIN
 		IF ABS(eu - su) < 0.5 THEN
 			ThickVerticalLine(rc, su - dv, sv, ev)
@@ -577,7 +577,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END ThickLine;
 
-	PROCEDURE TrimJoinLength (cu, cv, u, v, du, dv, hu, hv: REAL; VAR tu, tv: REAL);
+	PROCEDURE TrimJoinLength (cu, cv, u, v, du, dv, hu, hv: FLOAT32; VAR tu, tv: FLOAT32);
 	BEGIN
 		IF (u - cu + hu) * du + (v - cv + hv) * dv < 0 THEN	(* joint is longer than allowed *)
 			tu := u; tv := v
@@ -588,7 +588,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END TrimJoinLength;
 
-	PROCEDURE ThickEnter (rc: Context; u, v, idu, idv: REAL);
+	PROCEDURE ThickEnter (rc: Context; u, v, idu, idv: FLOAT32);
 	BEGIN
 		rc.su := u; rc.sv := v;
 		rc.u := u; rc.v := v;
@@ -596,8 +596,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		InitClipState(rc, SHORT(ENTIER(u)), SHORT(ENTIER(v)))
 	END ThickEnter;
 
-	PROCEDURE ThickLineTo (rc: Context; u, v: REAL);
-		VAR cu, cv, idu, idv, odu, odv, hu, hv, tu, tv: REAL;
+	PROCEDURE ThickLineTo (rc: Context; u, v: FLOAT32);
+		VAR cu, cv, idu, idv, odu, odv, hu, hv, tu, tv: FLOAT32;
 	BEGIN
 		cu := rc.u; cv := rc.v;
 		idu := rc.du; idv := rc.dv;
@@ -639,8 +639,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		rc.du := odu; rc.dv := odv
 	END ThickLineTo;
 
-	PROCEDURE ThickExit (rc: Context; odu, odv: REAL);
-		VAR cu, cv, idu, idv, hu, hv, tu, tv: REAL;
+	PROCEDURE ThickExit (rc: Context; odu, odv: FLOAT32);
+		VAR cu, cv, idu, idv, hu, hv, tu, tv: FLOAT32;
 	BEGIN
 		cu := rc.u; cv := rc.v;
 		IF (cu # rc.su) OR (cv # rc.sv) THEN	(* at least one thick line was rendered *)
@@ -673,7 +673,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 	END ThickExit;
 
 	PROCEDURE ThickClose (rc: Context);
-		VAR cu, cv, idu, idv, odu, odv, hu, hv, tu, tv, eu, ev: REAL;
+		VAR cu, cv, idu, idv, odu, odv, hu, hv, tu, tv, eu, ev: FLOAT32;
 	BEGIN
 		cu := rc.u; cv := rc.v; idu := rc.du; idv := rc.dv;
 		UpdateClipState(rc, SHORT(ENTIER(cu)), SHORT(ENTIER(cv)));
@@ -696,8 +696,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Dashed Lines ---*)
 
-	PROCEDURE DashEnter (rc: Context; su, sv, idu, idv: REAL);
-		VAR beg, end, next: REAL; index: SIGNED32;
+	PROCEDURE DashEnter (rc: Context; su, sv, idu, idv: FLOAT32);
+		VAR beg, end, next: FLOAT32; index: SIGNED32;
 	BEGIN
 		rc.offset := 0;
 		Gfx.GetDashOffsets(rc, 0, beg, end, next, index);
@@ -710,9 +710,9 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END DashEnter;
 
-	PROCEDURE DashLineTo (rc: Context; u, v: REAL);
+	PROCEDURE DashLineTo (rc: Context; u, v: FLOAT32);
 		VAR
-			cu, cv, du, dv, len, cos, sin, wdu, wdv, offset, beg, end, next, dash, tu, tv, u1, v1: REAL;
+			cu, cv, du, dv, len, cos, sin, wdu, wdv, offset, beg, end, next, dash, tu, tv, u1, v1: FLOAT32;
 			index: SIGNED32; deferred: BOOLEAN;
 	BEGIN
 		cu := rc.u; cv := rc.v;
@@ -779,8 +779,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END DashLineTo;
 
-	PROCEDURE DashExit (rc: Context; odu, odv: REAL);
-		VAR beg, end, next: REAL; index: SIGNED32;
+	PROCEDURE DashExit (rc: Context; odu, odv: FLOAT32);
+		VAR beg, end, next: FLOAT32; index: SIGNED32;
 	BEGIN
 		IF rc.devWidth > 0.75 THEN
 			Gfx.GetDashOffsets(rc, rc.offset, beg, end, next, index);
@@ -791,7 +791,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 	END DashExit;
 
 	PROCEDURE DashClose (rc: Context);
-		VAR beg, end, next: REAL; index: SIGNED32;
+		VAR beg, end, next: FLOAT32; index: SIGNED32;
 	BEGIN
 		IF rc.deferred & (rc.devWidth > 0.75) THEN
 			Gfx.GetDashOffsets(rc, rc.offset, beg, end, next, index);
@@ -815,7 +815,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		rc.setColPat(rc, rc.strokeCol, rc.strokePat)
 	END StrokePrepare;
 
-	PROCEDURE StrokeEnter (rc: Context; u, v, du, dv: REAL);
+	PROCEDURE StrokeEnter (rc: Context; u, v, du, dv: FLOAT32);
 	BEGIN
 		IF rc.devWidth > 0.75 THEN
 			GfxRegions.Clear(rc.pathReg)
@@ -829,7 +829,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END StrokeEnter;
 
-	PROCEDURE StrokeLineTo (rc: Context; u, v: REAL);
+	PROCEDURE StrokeLineTo (rc: Context; u, v: FLOAT32);
 	BEGIN
 		IF rc.dashPatLen > 0 THEN
 			DashLineTo(rc, u, v)
@@ -840,7 +840,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END StrokeLineTo;
 
-	PROCEDURE StrokeExit (rc: Context; du, dv: REAL);
+	PROCEDURE StrokeExit (rc: Context; du, dv: FLOAT32);
 	BEGIN
 		IF rc.dashPatLen > 0 THEN
 			DashExit(rc, du, dv)
@@ -873,7 +873,7 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 	END StrokeClose;
 
 	PROCEDURE StrokePathElem (VAR data: GfxPaths.EnumData);
-		VAR rc: Context; x, y: REAL;
+		VAR rc: Context; x, y: FLOAT32;
 	BEGIN
 		rc := data(PathData).context;
 		CASE data.elem OF
@@ -965,8 +965,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END End;
 
-	PROCEDURE Enter* (ctxt: Gfx.Context; x, y, dx, dy: REAL);
-		VAR rc: Context; u, v, du, dv: REAL;
+	PROCEDURE Enter* (ctxt: Gfx.Context; x, y, dx, dy: FLOAT32);
+		VAR rc: Context; u, v, du, dv: FLOAT32;
 	BEGIN
 		rc := ctxt(Context);
 		GfxMatrix.Apply(rc.ctm, x, y, u, v);
@@ -992,8 +992,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		rc.cpx := x; rc.cpy := y
 	END Enter;
 
-	PROCEDURE Exit* (ctxt: Gfx.Context; dx, dy: REAL);
-		VAR rc: Context; du, dv: REAL;
+	PROCEDURE Exit* (ctxt: Gfx.Context; dx, dy: FLOAT32);
+		VAR rc: Context; du, dv: FLOAT32;
 	BEGIN
 		rc := ctxt(Context);
 		GfxMatrix.ApplyToVector(rc.ctm, dx, dy, du, dv);
@@ -1045,8 +1045,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END Close;
 
-	PROCEDURE Line* (ctxt: Gfx.Context; x, y: REAL);
-		VAR rc: Context; u, v: REAL;
+	PROCEDURE Line* (ctxt: Gfx.Context; x, y: FLOAT32);
+		VAR rc: Context; u, v: FLOAT32;
 	BEGIN
 		rc := ctxt(Context);
 		GfxMatrix.Apply(ctxt.ctm, x, y, u, v);
@@ -1069,8 +1069,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END Line;
 
-	PROCEDURE Arc* (ctxt: Gfx.Context; x, y, x0, y0, x1, y1, x2, y2: REAL);
-		VAR rc: Context; u, v, u0, v0, u1, v1, u2, v2, ru, rv: REAL; data: PathData;
+	PROCEDURE Arc* (ctxt: Gfx.Context; x, y, x0, y0, x1, y1, x2, y2: FLOAT32);
+		VAR rc: Context; u, v, u0, v0, u1, v1, u2, v2, ru, rv: FLOAT32; data: PathData;
 	BEGIN
 		rc := ctxt(Context);
 		GfxMatrix.Apply(rc.ctm, x, y, u, v);
@@ -1122,8 +1122,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		rc.cpx := x; rc.cpy := y
 	END Arc;
 
-	PROCEDURE Bezier* (ctxt: Gfx.Context; x, y, x1, y1, x2, y2: REAL);
-		VAR rc: Context; u, v, u1, v1, u2, v2: REAL; data: PathData;
+	PROCEDURE Bezier* (ctxt: Gfx.Context; x, y, x1, y1, x2, y2: FLOAT32);
+		VAR rc: Context; u, v, u1, v1, u2, v2: FLOAT32; data: PathData;
 	BEGIN
 		rc := ctxt(Context);
 		GfxMatrix.Apply(rc.ctm, x, y, u, v);
@@ -1146,9 +1146,9 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		rc.cpx := x; rc.cpy := y
 	END Bezier;
 
-	PROCEDURE Show* (ctxt: Gfx.Context; x, y: REAL; VAR str: ARRAY OF CHAR);
+	PROCEDURE Show* (ctxt: Gfx.Context; x, y: FLOAT32; VAR str: ARRAY OF CHAR);
 		VAR
-			rc: Context; mat: GfxMatrix.Matrix; font: GfxFonts.Font; u, v, bu, bv, du, dv: REAL;
+			rc: Context; mat: GfxMatrix.Matrix; font: GfxFonts.Font; u, v, bu, bv, du, dv: FLOAT32;
 			i: SIGNED32; img: GfxImages.Image; data: PathData;
 	BEGIN
 		rc := ctxt(Context);
@@ -1233,8 +1233,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END Render;
 
-	PROCEDURE Rect* (ctxt: Gfx.Context; x0, y0, x1, y1: REAL);
-		VAR rc: Context; u0, v0, u1, v1, t: REAL; enter, exit, llx, lly, urx, ury: SIGNED16;
+	PROCEDURE Rect* (ctxt: Gfx.Context; x0, y0, x1, y1: FLOAT32);
+		VAR rc: Context; u0, v0, u1, v1, t: FLOAT32; enter, exit, llx, lly, urx, ury: SIGNED16;
 	BEGIN
 		IF ~(Gfx.Record IN ctxt.mode) & ~GfxMatrix.Rotated(ctxt.ctm) THEN
 			rc := ctxt(Context);
@@ -1284,8 +1284,8 @@ MODULE GfxRaster IN Oberon; (** portable *)	(* eos  *)
 		END
 	END Rect;
 
-	PROCEDURE Ellipse* (ctxt: Gfx.Context; x, y, rx, ry: REAL);
-		VAR rc: Context; u, v, ru, rv: REAL; data: PathData;
+	PROCEDURE Ellipse* (ctxt: Gfx.Context; x, y, rx, ry: FLOAT32);
+		VAR rc: Context; u, v, ru, rv: FLOAT32; data: PathData;
 	BEGIN
 		IF ~(Gfx.Record IN ctxt.mode) & ~GfxMatrix.Rotated(ctxt.ctm) THEN
 			rc := ctxt(Context);

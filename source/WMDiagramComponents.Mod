@@ -73,7 +73,7 @@ TYPE
 
 	DatasetDescriptor* = POINTER TO ARRAY OF DataDescriptor;
 
-	Dataset* = POINTER TO ARRAY OF REAL;
+	Dataset* = POINTER TO ARRAY OF FLOAT32;
 	LongintDataset* = POINTER TO ARRAY OF SIGNED32;
 
 	Statistics* = RECORD
@@ -127,7 +127,7 @@ TYPE
 			IF statistics THEN
 				nbrOfValues := 0; valid := FALSE;
 				FOR i := 0 TO dimensions-1 DO
-					min[i] := MAX(REAL); max[i] := MIN(REAL);
+					min[i] := MAX(FLOAT32); max[i] := MIN(FLOAT32);
 					sum[i] := 0; cur[i] := 0;
 				END;
 			END;
@@ -156,12 +156,12 @@ TYPE
 		END GetStatistics;
 
 		(* Find the max and min value in the model dataset. Model lock must be held *)
-		PROCEDURE FindMinMax*(from, len : SIZE; VAR min, max : REAL);
-		VAR bufferIndex, dim : SIZE; v : REAL; points : Dataset;
+		PROCEDURE FindMinMax*(from, len : SIZE; VAR min, max : FLOAT32);
+		VAR bufferIndex, dim : SIZE; v : FLOAT32; points : Dataset;
 		BEGIN
 			ASSERT(Objects.ActiveObject() = lockedBy, 3000);
 			ASSERT((from >= 0) & (len > 0) & (from + len < nofItems));
-			min := MAX(REAL); max := MIN(REAL);
+			min := MAX(FLOAT32); max := MIN(FLOAT32);
 
 			bufferIndex := (pos + bufferSize - nofItems + from) MOD bufferSize;
 
@@ -179,12 +179,12 @@ TYPE
 		END FindMinMax;
 
 		(* Find the max and min value in the model dataset for each dimension. Model lock must be held *)
-		PROCEDURE FindAllMinMax*(from, len : SIZE; VAR min, max : REAL);
-		VAR bufferIndex, dim : SIZE; sum : REAL; points : Dataset;
+		PROCEDURE FindAllMinMax*(from, len : SIZE; VAR min, max : FLOAT32);
+		VAR bufferIndex, dim : SIZE; sum : FLOAT32; points : Dataset;
 		BEGIN
 			ASSERT(Objects.ActiveObject() = lockedBy, 3000);
 			ASSERT((from >= 0) & (len > 0) & (from + len < nofItems));
-			min := MAX(REAL); max := MIN(REAL);
+			min := MAX(FLOAT32); max := MIN(FLOAT32);
 
 			bufferIndex := (pos + bufferSize - nofItems + from) MOD bufferSize;
 
@@ -211,7 +211,7 @@ TYPE
 		END SetDescriptor;
 
 		PROCEDURE PutValues*(values : Dataset);
-		VAR i : SIZE; value : REAL;
+		VAR i : SIZE; value : FLOAT32;
 		BEGIN
 			ASSERT(Objects.ActiveObject() = lockedBy, 3000);
 			ASSERT(LEN(values) = dimensions);
@@ -386,7 +386,7 @@ TYPE
 			END;
 		END Update;
 
-		PROCEDURE Scale(factor, min : REAL; srcPoints : Dataset; tarPoints : LongintDataset; height, border : SIZE);
+		PROCEDURE Scale(factor, min : FLOAT32; srcPoints : Dataset; tarPoints : LongintDataset; height, border : SIZE);
 		VAR dim : SIZE;
 		BEGIN
 			FOR dim := 0 TO dimensions-1 DO
@@ -394,11 +394,11 @@ TYPE
 			END;
 		END Scale;
 
-		PROCEDURE DrawLines(canvas : WMGraphics.Canvas; w, h, border : SIZE; VAR tmin, tmax : REAL);
+		PROCEDURE DrawLines(canvas : WMGraphics.Canvas; w, h, border : SIZE; VAR tmin, tmax : FLOAT32);
 		VAR
 			nofPoints, nofVisible, index, dim : SIZE;
 			x, v0, v1 : SIZE;
-			factor : REAL;
+			factor : FLOAT32;
 		BEGIN
 			model.Acquire;
 			nofPoints := model.GetNofPoints();
@@ -438,13 +438,13 @@ TYPE
 			model.Release;
 		END DrawLines;
 
-		PROCEDURE DrawAreas(canvas : WMGraphics.Canvas; w, h, border : SIZE; VAR tmin, tmax : REAL);
+		PROCEDURE DrawAreas(canvas : WMGraphics.Canvas; w, h, border : SIZE; VAR tmin, tmax : FLOAT32);
 		VAR
 			nofPoints, nofVisible, nofStandalone, index, dim : SIZE;
 			x, y0, y1: SIZE; colorLine, color : WMGraphics.Color;
 			maxSumIdx : SIZE;
 			v0, v1 : SIGNED32;
-			factor : REAL;
+			factor : FLOAT32;
 			poly : ARRAY 4 OF WMGraphics.Point2d;
 		BEGIN
 			model.Acquire;
@@ -554,7 +554,7 @@ TYPE
 		VAR
 			w, h, yborder, t, virtp : SIZE; color: WMGraphics.Color;
 			mode : SIGNED32;
-			tmin, tmax : REAL;
+			tmin, tmax : FLOAT32;
 			str : ARRAY 16 OF CHAR;
 			s : Strings.String;
 		BEGIN
@@ -978,12 +978,12 @@ BEGIN
 	END;
 END ClearFlag;
 
-PROCEDURE RMin(a, b : REAL) : REAL;
+PROCEDURE RMin(a, b : FLOAT32) : FLOAT32;
 BEGIN
 	IF a < b THEN RETURN a; ELSE RETURN b; END;
 END RMin;
 
-PROCEDURE RMax(a, b : REAL) : REAL;
+PROCEDURE RMax(a, b : FLOAT32) : FLOAT32;
 BEGIN
 	IF a> b THEN RETURN a; ELSE RETURN b; END;
 END RMax;

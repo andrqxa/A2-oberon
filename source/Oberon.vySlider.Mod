@@ -70,7 +70,7 @@ TYPE
 		X, Y, W, H: SIGNED16;
 		barBegin, barEnd, pos: SIGNED16;   (* location of the bar & slide relative to the rect (X, Y, W, H) *)
 		rlx, lx, rx, rrx, by, sx, sy: SIGNED16;   (* caching the buttoms location relative to the rect (X, Y, W, H)*)
-		min, max, value-: REAL;
+		min, max, value-: FLOAT32;
 		ticks: SIGNED16;
 		cmd: ARRAY 64 OF CHAR
 	END;
@@ -83,13 +83,13 @@ VAR
 		dest^ := src^;  COPY( src.cmd, dest.cmd )
 	END Copy;
 
-	PROCEDURE P2dToP( slider: tSlider;  x: REAL ): SIGNED16;
+	PROCEDURE P2dToP( slider: tSlider;  x: FLOAT32 ): SIGNED16;
 	(*= returns the pixel representing x, relative to the slider rect (X, Y, W, H) *)
 	BEGIN
 		RETURN slider.barBegin + SHORT( ENTIER( (x - slider.min) * ((slider.barEnd - slider.barBegin) / (slider.max - slider.min)) + 0.5 ) )
 	END P2dToP;
 
-	PROCEDURE PToP2d( slider: tSlider;  x: SIGNED16 ): REAL;
+	PROCEDURE PToP2d( slider: tSlider;  x: SIGNED16 ): FLOAT32;
 	(*= returns the the value, represented by the pixel x
 	(relative to the slider rect (X, Y, W, H) ) *)
 	BEGIN
@@ -106,10 +106,10 @@ VAR
 		slider.sy := slider.by + 1
 	END TrimLocation;
 
-	PROCEDURE IncValue( slider: tSlider;  direction: SIGNED16 ): REAL;
+	PROCEDURE IncValue( slider: tSlider;  direction: SIGNED16 ): FLOAT32;
 	(*= calculates the next lower or upper step on the grid, depending of direction
 	the identification if the slide is on a grid point is exact only to the resolution of the screen! *)
-	VAR dx, ticks, x: REAL;
+	VAR dx, ticks, x: FLOAT32;
 	BEGIN
 		dx := (slider.max - slider.min) / slider.ticks;  ticks := (slider.value - slider.min) / dx;
 		IF P2dToP( slider, slider.value ) # P2dToP( slider, slider.min + dx * ticks ) THEN
@@ -164,9 +164,9 @@ VAR
 	END Recall;
 
 	PROCEDURE Respond( slider: tSlider;  VAR event: vyEvents.EventMsg );
-	VAR x0, y0, w0, h0, x, y, w, h, Dx, Dy: SIGNED16;  dx: REAL;
+	VAR x0, y0, w0, h0, x, y, w, h, Dx, Dy: SIGNED16;  dx: FLOAT32;
 
-		PROCEDURE MoveSlider( slider: tSlider;  x: REAL );
+		PROCEDURE MoveSlider( slider: tSlider;  x: FLOAT32 );
 		VAR x0, y0, w0, h0: SIGNED16;  res: SIGNED16;
 			par: ARRAY 32 OF CHAR;
 		BEGIN
@@ -338,7 +338,7 @@ VAR
 		F.handle := Handler
 	END Init;
 
-	PROCEDURE Open*( F: tSlider;  picture: vyPort.Picture;  min, max, value: REAL;  ticks: SIGNED16 );
+	PROCEDURE Open*( F: tSlider;  picture: vyPort.Picture;  min, max, value: FLOAT32;  ticks: SIGNED16 );
 	VAR x, y, w, h: SIGNED16;
 	BEGIN
 		Init( F );  vyPort.OpenLayer( F, "slider" );  F.style.fcol := grey1;  F.min := min;  F.max := max;  F.ticks := ticks;  F.value := value;
@@ -348,10 +348,10 @@ VAR
 	END Open;
 
 	PROCEDURE Insert*;
-	VAR pict: vyPort.Picture;  from, to, value: REAL;  slider: tSlider;  ticks: SIGNED32;
+	VAR pict: vyPort.Picture;  from, to, value: FLOAT32;  slider: tSlider;  ticks: SIGNED32;
 
 		PROCEDURE GetValues;
-		VAR s: vyParser.Scanner;  x: REAL;
+		VAR s: vyParser.Scanner;  x: FLOAT32;
 		BEGIN
 			vyParser.OpenParScanner( s );
 			IF vyParser.Real( s, from ) & vyParser.Real( s, to ) & vyParser.Real( s, value ) & vyParser.Number( s, ticks ) THEN
@@ -408,7 +408,7 @@ VAR
 	END help;
 
 	PROCEDURE Set*;
-	VAR s: vyParser.Scanner;  code: vyName.tNameArray;  val: REAL;
+	VAR s: vyParser.Scanner;  code: vyName.tNameArray;  val: FLOAT32;
 	BEGIN
 		vyParser.OpenParScanner( s );
 		IF ~(vyParser.Name( s, code ) & vyParser.Real( s, val )) THEN help;  RETURN END;

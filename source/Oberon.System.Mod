@@ -710,7 +710,7 @@ PROCEDURE Variables(refs: Bytes;  i: SIZE; base: SIGNED32);
 VAR
 	mode, ch: CHAR;  m, tmp1: SIZE; adr, type, n, lval, size, tmp2, tdadr: SIGNED32;  etc: BOOLEAN;
 	sval: SIGNED8;  ival: SIGNED16;  tmp: Bytes;  set: SET;
-	rval: REAL;  lrval: LONGREAL;
+	rval: FLOAT32;  lrval: LONGREAL;
 BEGIN
 	m := LEN(refs^);  mode := refs[i];  INC(i);
 	WHILE (i < m) & (mode >= 1X) & (mode <= 3X) DO	(* var *)
@@ -778,7 +778,7 @@ BEGIN
 							SYSTEM.GET(adr, ival);  Texts.WriteInt(W, ival, 1)
 						|6:	(* SIGNED32 *)
 							SYSTEM.GET(adr, lval);  Texts.WriteInt(W, lval, 1)
-						|7:	(* REAL *)
+						|7:	(* FLOAT32 *)
 							SYSTEM.GET(adr, rval);  Texts.WriteReal(W, rval, 15)
 						|8:	(* LONGREAL *)
 							SYSTEM.GET(adr, lrval);  Texts.WriteLongReal(W, lrval, 24)

@@ -20,8 +20,8 @@ MODULE GfxBuffer; (** portable *)	(* eos  *)
 	TYPE
 		Context* = POINTER TO ContextDesc;
 		ContextDesc* = RECORD (GfxRaster.ContextDesc)
-			orgX*, orgY*: REAL;	(** origin of default coordinate system **)
-			scale*: REAL;	(** default scale factor **)
+			orgX*, orgY*: FLOAT32;	(** origin of default coordinate system **)
+			scale*: FLOAT32;	(** default scale factor **)
 			bgCol*: Gfx.Color;	(** background color for erasing **)
 			img*: Images.Image;	(** target buffer **)
 			pix: Images.Pixel;
@@ -127,7 +127,7 @@ MODULE GfxBuffer; (** portable *)	(* eos  *)
 		GfxRegions.SetToRect(bc.clipReg, 0, 0, SIGNED16(bc.img.width), SIGNED16(bc.img.height))
 	END ResetClip;
 
-	PROCEDURE Image (ctxt: Gfx.Context; x, y: REAL; img: Images.Image; VAR filter: GfxImages.Filter);
+	PROCEDURE Image (ctxt: Gfx.Context; x, y: FLOAT32; img: Images.Image; VAR filter: GfxImages.Filter);
 		VAR bc: Context; m: GfxMatrix.Matrix; dx, dy, llx, lly, urx, ury: SIGNED16; col: Images.Pixel;
 	BEGIN
 		bc := ctxt(Context);
@@ -189,7 +189,7 @@ MODULE GfxBuffer; (** portable *)	(* eos  *)
 	(*--- Exported Interface ---*)
 
 	(** set default coordinate origin and scale factor **)
-	PROCEDURE SetCoordinates* (bc: Context; x, y, scale: REAL);
+	PROCEDURE SetCoordinates* (bc: Context; x, y, scale: FLOAT32);
 	BEGIN
 		bc.orgX := x; bc.orgY := y; bc.scale := scale
 	END SetCoordinates;

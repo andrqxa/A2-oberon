@@ -85,7 +85,7 @@ TYPE
       line*: SIGNED16;	(** # carriage returns scanned so far. *)
       class*: SIGNED16;	(** Scan result: Int, Real, String etc. *)
       i*: SIGNED32;
-      x*: REAL;
+      x*: FLOAT32;
       y*: LONGREAL;
       c*: CHAR;
       len*: SIGNED8;	(** Length of name or string scanned. *)
@@ -690,7 +690,7 @@ information about the last character read. *)
   (*IEEE floating-point formats  (BM 1992.1.1): (-1)^s * 1.m * 2^(e-e0), where
 
                               s                 e                 e0              m
-      REAL             1-bit     8-bit biased      127    1+23-bit explicit
+      FLOAT32             1-bit     8-bit biased      127    1+23-bit explicit
       LONGREAL   1-bit   11-bit biased     1023   1+52-bit explicit*)
 
 (** Read the next symbol. Whitespace is ignored. CR increments the line counter. *)
@@ -798,7 +798,7 @@ information about the last character read. *)
               IF neg THEN S.y := - y ELSE S.y := y END;
               IF Reals.ExpoL(S.y) = 0 THEN S.y := 0 END
             END
-          ELSIF MAX(REAL) < y THEN S.class:= Inval (* NaN *)
+          ELSIF MAX(FLOAT32) < y THEN S.class:= Inval (* NaN *)
           ELSE S.class := Real;
             IF neg THEN S.x := SHORT(- y) ELSE S.x := SHORT(y) END;
             IF Reals.Expo(S.x) = 0 THEN S.x := 0 END
@@ -908,7 +908,7 @@ PROCEDURE WriteHex* (VAR W: Writer; x: SIGNED32);
   END WriteHex;
 
 (** Write the hexadecimal representation of x to W's buffer. *)
-PROCEDURE WriteRealHex* (VAR W: Writer; x: REAL);
+PROCEDURE WriteRealHex* (VAR W: Writer; x: FLOAT32);
 BEGIN (* BM 1991.12.25 *) WriteHex(W, Reals.Int(x))
 END WriteRealHex;
 
@@ -919,9 +919,9 @@ BEGIN Reals.IntL(x, h, l); WriteHex(W, h); WriteHex(W, l)
 END WriteLongRealHex;
 
 (** Write real x to W's buffer using n character positions. *)
-PROCEDURE WriteReal* (VAR W: Writer; x: REAL; n: SIGNED32);
+PROCEDURE WriteReal* (VAR W: Writer; x: FLOAT32; n: SIGNED32);
   (* BM 1993.4.22. Do not simplify rounding! *)
-  VAR e, h, i: SIGNED32; y: LONGREAL; z: REAL; d: ARRAY 8 OF CHAR;
+  VAR e, h, i: SIGNED32; y: LONGREAL; z: FLOAT32; d: ARRAY 8 OF CHAR;
 BEGIN
   e:= Reals.Expo(x);
   IF e = 255 THEN
@@ -958,9 +958,9 @@ END WriteReal;
 (** Write real x in a fixed point notation. n is the overall minimal length for the output field,
 f the number of fraction digits following the decimal point, E the fixed exponent (printed only
 when E # 0). *)
-PROCEDURE WriteRealFix* (VAR W: Writer; x: REAL; n, f, E: SIGNED32);
+PROCEDURE WriteRealFix* (VAR W: Writer; x: FLOAT32; n, f, E: SIGNED32);
   (* BM 1993.4.22. Do not simplify rounding ! / JG formatting adjusted *)
-  VAR e, h, i: SIGNED32; r, y: LONGREAL; z: REAL; s: CHAR; d: ARRAY 8 OF CHAR;
+  VAR e, h, i: SIGNED32; r, y: LONGREAL; z: FLOAT32; s: CHAR; d: ARRAY 8 OF CHAR;
 BEGIN
   e := Reals.Expo(x);
   IF (e = 255) OR (ABS(E) > 38) THEN
@@ -1247,7 +1247,7 @@ the following token types:
 	String	Any character sequence surrounded by double quotes, i.e. "string".
 		The quotes are not returned in the s field of the scanner descriptor.
 	Int	Any valid integer number.
-	Real	Any valid REAL number, including exponent E.
+	Real	Any valid FLOAT32 number, including exponent E.
 	LongReal	Any valid LONGREAL number, including exponent D.
 	Char	A character (single) not classified as one of the above.
 

@@ -144,7 +144,7 @@ END LifeVox;
 
 TYPE RDVox*= OBJECT(Voxel);
 VAR
-		m1,m2,n1,n2 : ARRAY M,N OF REAL;
+		m1,m2,n1,n2 : ARRAY M,N OF FLOAT32;
 		gen: SIGNED16;
 		i:SIGNED32;
 		BLUE, RED: Voxel;
@@ -233,7 +233,7 @@ END RDMirror;
 
 TYPE RDVolVox*=OBJECT(Voxel);
 VAR
-	m1*,m2,n1,n2: ARRAY V,V,V OF REAL;
+	m1*,m2,n1,n2: ARRAY V,V,V OF FLOAT32;
 	gen: SIGNED16;
 	i:SIGNED32;
 	tock*: SIGNED16;
@@ -297,7 +297,7 @@ END bounds;
 PROCEDURE tick*;
 VAR
 		i, j,k: SIGNED32;
-		A1, B1, C1, D1: REAL;
+		A1, B1, C1, D1: FLOAT32;
 BEGIN
 	INC(frame);
 	IF TRUE OR (frame MOD tock = 0) THEN
@@ -487,7 +487,7 @@ TYPE RDCloud*=OBJECT(RDVolVox);
 PROCEDURE tick*;
 VAR
 		i, j,k: SIGNED32;
-		A1, B1, C1, D1: REAL;
+		A1, B1, C1, D1: FLOAT32;
 BEGIN
 	FOR i := 1 TO V - 2 DO
 		FOR j := 1 TO V - 2 DO

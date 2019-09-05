@@ -129,7 +129,7 @@ VAR
 		conv4To8Bit: ARRAY 256 OF SIGNED16;
 (*		imAdr,imSize: SIGNED32;*)
 		lumin,contr: SIGNED16; (* luminosity and  contrast *)
-		gamma: REAL;
+		gamma: FLOAT32;
 
 
 (******* GADGETS ************)

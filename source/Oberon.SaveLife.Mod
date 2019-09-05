@@ -133,7 +133,7 @@ VAR
 	pseudoToRGBColor: ARRAY numPseudos OF RGB;	(* map pseudo-color to RGB Color *)
 	faderTable: ARRAY numPseudos, numPseudos OF Fader;
 	curFadeSteps: SIGNED16;
-	m: REAL; (* with value m [0..1], screen brightness appears at 50%, see CreateMonochromeFade *)
+	m: FLOAT32; (* with value m [0..1], screen brightness appears at 50%, see CreateMonochromeFade *)
 
 
 	PROCEDURE SetRGB(VAR color: RGB; n: SIGNED32);
@@ -169,21 +169,21 @@ VAR
 
 		PROCEDURE MakeFader(from, to: (* pseudo *) SIGNED16);
 		TYPE
-			MonochromeFade = ARRAY maxFadeSteps OF REAL;
+			MonochromeFade = ARRAY maxFadeSteps OF FLOAT32;
 		VAR
 			F, T: RGB;
 			fade: ARRAY 3 OF MonochromeFade;
 			i: SIGNED16;
 			r, g, b: SIGNED16;
 
-			PROCEDURE CreateMonochromeFade(fromValue, toValue: REAL; VAR f: MonochromeFade);
+			PROCEDURE CreateMonochromeFade(fromValue, toValue: FLOAT32; VAR f: MonochromeFade);
 			VAR
 				i: SIGNED16;
-				fromBrite, toBrite: REAL;
-				dBrite: REAL;
+				fromBrite, toBrite: FLOAT32;
+				dBrite: FLOAT32;
 
 				PROCEDURE Reverse(VAR f: MonochromeFade);
-				VAR i: SIGNED16; t: REAL;
+				VAR i: SIGNED16; t: FLOAT32;
 				BEGIN
 					FOR i := 0 TO curFadeSteps DIV 2 - 1 DO
 						t := f[i]; f[i] := f[curFadeSteps-1-i]; f[curFadeSteps-1-i] := t;
@@ -199,12 +199,12 @@ VAR
 				default value, that of the author's display, m=0.78.
 				*)
 
-				PROCEDURE BrightnessToValue(b: REAL): REAL;	(* polynomial v(b) *)
+				PROCEDURE BrightnessToValue(b: FLOAT32): FLOAT32;	(* polynomial v(b) *)
 				BEGIN
 					RETURN (2 - m*4) * b * b + (m*4 - 1) * b;
 				END BrightnessToValue;
 
-				PROCEDURE ValueToBrightness(v: REAL): REAL; 	(* function b(v) *)
+				PROCEDURE ValueToBrightness(v: FLOAT32): FLOAT32; 	(* function b(v) *)
 				CONST eps = 0.00001;
 				BEGIN
 					IF (ABS(m-0.5)<eps) (* special case to avoid divide by zero *)
@@ -331,7 +331,7 @@ VAR
 	END ClearGeneration;
 
 
-	PROCEDURE Randomize(proportion: REAL);
+	PROCEDURE Randomize(proportion: FLOAT32);
 	CONST range = 10000;
 	VAR
 		r,c: SIGNED16;
@@ -649,7 +649,7 @@ VAR
 
 
 	PROCEDURE Install*;
-	VAR r: REAL; n: SIGNED16; name: ARRAY 64 OF CHAR; color: SIGNED32;
+	VAR r: FLOAT32; n: SIGNED16; name: ARRAY 64 OF CHAR; color: SIGNED32;
 	BEGIN
 		SaveScreen.InstallFader(Start, Step, Stop);
 

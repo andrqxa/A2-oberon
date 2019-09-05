@@ -511,8 +511,8 @@ END NoNumberNaN;
 
 *)
 
-PROCEDURE XpwrI* (x: REAL;   i: SIGNED16): REAL;
-	VAR z: REAL;
+PROCEDURE XpwrI* (x: FLOAT32;   i: SIGNED16): FLOAT32;
+	VAR z: FLOAT32;
 BEGIN IF i < 0 THEN  x := 1 / x;  i := - i END;
 	z := 1;
 	WHILE i > 0 DO
@@ -535,9 +535,9 @@ BEGIN IF i < 0 THEN  x := 1 / x;  i := - i END;
 	RETURN z
 END XLpwrIL;
 
-PROCEDURE Ten* (i: SIGNED16): REAL;
+PROCEDURE Ten* (i: SIGNED16): FLOAT32;
 	(* special case of XpwrI(10.0,i) -- optimize ! Use Reals.Ten*)
-	VAR x, z: REAL;
+	VAR x, z: FLOAT32;
 BEGIN
 	IF i < 0 THEN x := 0.1  ELSE x := 10.0  END;
 	z := 1;
@@ -672,7 +672,7 @@ BEGIN IF (text = NIL) OR ((pos < 0) OR (len <= 0)) THEN x := 0;   RETURN FALSE E
 	END GetLReal;
 
 	PROCEDURE GetReal* (VAR text: Texts.Text;  pos: SIGNED32;   len: SIGNED16;
-VAR x: REAL): BOOLEAN;
+VAR x: FLOAT32): BOOLEAN;
 	VAR xl: LONGREAL;   res: BOOLEAN;
 BEGIN res := GetLReal(text, pos, len, xl);
 	IF res THEN	(*! Add range check *)

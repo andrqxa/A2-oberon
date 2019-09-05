@@ -692,7 +692,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Snap(x, y : SIZE; VAR snapX, snapY : SIZE);
-		VAR r : REAL; f : SIGNED32;
+		VAR r : FLOAT32; f : SIGNED32;
 		BEGIN
 			x := x - offsetX;
 			y := y - offsetY;
@@ -873,7 +873,7 @@ TYPE
 
 TYPE
 	RectangleReal = RECORD
-		l, t, b, r : REAL;
+		l, t, b, r : FLOAT32;
 	END;
 
 	BoundsArray = POINTER TO ARRAY OF RectangleReal;
@@ -3218,7 +3218,7 @@ BEGIN
 	RETURN i;
 END CreateIndicator;
 
-PROCEDURE Distance(x0, y0, x1, y1 : SIZE) : REAL;
+PROCEDURE Distance(x0, y0, x1, y1 : SIZE) : FLOAT32;
 BEGIN
 	RETURN Math.sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
 END Distance;

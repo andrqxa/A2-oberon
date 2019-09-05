@@ -2,7 +2,7 @@
 Refer to the "General ETH Oberon System Source License" contract available at: http://www.oberon.ethz.ch/ *)
 
 MODULE Math;	(** portable *)
-(** AUTHOR "?"; PURPOSE "Math utility module (REAL)"; *)
+(** AUTHOR "?"; PURPOSE "Math utility module (FLOAT32)"; *)
 
 (* Aos version - requires floating-point instruction support. *)
 
@@ -15,7 +15,7 @@ CONST
 	eps = 1.2E-7;
 
 TYPE
-	Value = REAL;
+	Value = FLOAT32;
 
 PROCEDURE Expo (x: Value): UNSIGNED32;
 BEGIN

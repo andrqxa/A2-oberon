@@ -27,7 +27,7 @@ TYPE
 	IntDesc* = RECORD (DataDesc) i*: SIGNED32 END;
 
 	Real* = POINTER TO RealDesc;
-	RealDesc* = RECORD (DataDesc) x*: REAL END;
+	RealDesc* = RECORD (DataDesc) x*: FLOAT32 END;
 
 	LReal* = POINTER TO LRealDesc;
 	LRealDesc* = RECORD (DataDesc) x*: LONGREAL END;

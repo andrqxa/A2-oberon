@@ -16,11 +16,11 @@ IMPORT
 TYPE
 	Complex* = POINTER TO ComplexDesc;
 	ComplexDesc* = RECORD (Gadgets.ObjDesc)
-		real*, imag*: REAL
+		real*, imag*: FLOAT32
 	END;
 
-PROCEDURE Phi(obj: Complex): REAL;
-VAR x: REAL;
+PROCEDURE Phi(obj: Complex): FLOAT32;
+VAR x: FLOAT32;
 BEGIN
 	IF obj.real = 0.0 THEN
 		IF obj.imag < 0.0 THEN x := (Math.pi / 2)*3

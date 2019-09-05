@@ -76,7 +76,7 @@ TYPE
 	END ModVar;
 
 PROCEDURE GetValueOf(v: Reflection.Variable; VAR value : LONGREAL) : BOOLEAN;
-VAR short : SIGNED8; int : SIGNED16; long : SIGNED32; ch : CHAR; real : REAL;
+VAR short : SIGNED8; int : SIGNED16; long : SIGNED32; ch : CHAR; real : FLOAT32;
 BEGIN
 	IF (v.n = 1) THEN (* arrays not supported *)
 		CASE v.type OF

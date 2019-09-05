@@ -59,7 +59,7 @@ TYPE
 		maindatabegin : SIGNED16;
 
 		hsynth: BOOLEAN;
-		store: ARRAY 2, 32, 18 OF REAL;
+		store: ARRAY 2, 32, 18 OF FLOAT32;
 
 		ssynth: BOOLEAN;
 		ch: ARRAY 2 OF Channel;
@@ -73,18 +73,18 @@ TYPE
 	END Frame;
 
 	HuffDecoded = ARRAY 32+1,18 OF SIGNED32;
-	Granule = ARRAY 32,18 OF REAL;
+	Granule = ARRAY 32,18 OF FLOAT32;
 	Stereo = ARRAY 2 OF Granule;
 
 	PcmStereo = ARRAY 2304 OF CHAR;
 
-	Raw3 = ARRAY 3 OF REAL;
-	Raw4 = ARRAY 4 OF REAL;
-	Raw5 = ARRAY 5 OF REAL;
-	Raw9 = ARRAY 9 OF REAL;
-	Raw18 = ARRAY 18 OF REAL;
-	Raw32 = ARRAY 32 OF REAL;
-	Raw36 = ARRAY 36 OF REAL;
+	Raw3 = ARRAY 3 OF FLOAT32;
+	Raw4 = ARRAY 4 OF FLOAT32;
+	Raw5 = ARRAY 5 OF FLOAT32;
+	Raw9 = ARRAY 9 OF FLOAT32;
+	Raw18 = ARRAY 18 OF FLOAT32;
+	Raw32 = ARRAY 32 OF FLOAT32;
+	Raw36 = ARRAY 36 OF FLOAT32;
 
 	MpstrPtr* = POINTER TO Mpstr;
 	Mpstr* = RECORD
@@ -95,11 +95,11 @@ TYPE
 		fsizeold: SIGNED16;
 		fr: Frame;
 		bsspace: ARRAY 2,2304 OF CHAR;
-		hybridblock: ARRAY 2,2,576 OF REAL;
+		hybridblock: ARRAY 2,2,576 OF FLOAT32;
 		hybridblc: ARRAY 2 OF SIGNED16;
 		header: SIGNED32;
 		bsnum: SIGNED16;
-		synthbuffs: ARRAY 2,2, 272OF REAL;
+		synthbuffs: ARRAY 2,2, 272OF FLOAT32;
 		synthbo: SIGNED16;
 	END;
 
@@ -107,7 +107,7 @@ VAR
 	(* Tables, initialized once the Module loads*)
 	JSBTABLE : ARRAY 4 OF SIGNED16;
 	BITRATE : ARRAY 15 OF SIGNED16;
-	FREQUENCY : ARRAY 4 OF REAL;
+	FREQUENCY : ARRAY 4 OF FLOAT32;
 	SFBTABLE: RECORD
 				l: ARRAY 5 OF SIGNED16;
 				s: ARRAY 3 OF SIGNED16;
@@ -125,31 +125,31 @@ VAR
 				v: POINTER TO ARRAY OF POINTER TO ARRAY OF SIGNED16;
 			END;
 
-	ISPOW: ARRAY 8207 OF REAL;
-	GGPOW : ARRAY 256 OF REAL;
-	SGPOW : ARRAY 8 OF REAL;
-	SFSPOW : ARRAY 2,16 OF REAL;
-	SFLPOW: ARRAY 2,16,2,22 OF REAL;
+	ISPOW: ARRAY 8207 OF FLOAT32;
+	GGPOW : ARRAY 256 OF FLOAT32;
+	SGPOW : ARRAY 8 OF FLOAT32;
+	SFSPOW : ARRAY 2,16 OF FLOAT32;
+	SFLPOW: ARRAY 2,16,2,22 OF FLOAT32;
 
-	STEREOTAN : ARRAY 8 OF REAL;
+	STEREOTAN : ARRAY 8 OF FLOAT32;
 
-	CI, CA, CS : ARRAY 8 OF REAL;
+	CI, CA, CS : ARRAY 8 OF FLOAT32;
 
-	IMDCTWIN : ARRAY 4, 36 OF REAL;
-	IMDCTCOS : ARRAY 5 OF REAL;
-	IMDCTSIN : ARRAY 4 OF REAL;
-	IMDCTSQRT : REAL;
+	IMDCTWIN : ARRAY 4, 36 OF FLOAT32;
+	IMDCTCOS : ARRAY 5 OF FLOAT32;
+	IMDCTSIN : ARRAY 4 OF FLOAT32;
+	IMDCTSQRT : FLOAT32;
 
-	POSTTWIDDLE6: ARRAY 3 OF REAL;
-	POSTTWIDDLE9: ARRAY 4 OF REAL;
-	POSTTWIDDLE12: ARRAY 6 OF REAL;
-	POSTTWIDDLE18: ARRAY 9 OF REAL;
-	POSTTWIDDLE36: ARRAY 18 OF REAL;
+	POSTTWIDDLE6: ARRAY 3 OF FLOAT32;
+	POSTTWIDDLE9: ARRAY 4 OF FLOAT32;
+	POSTTWIDDLE12: ARRAY 6 OF FLOAT32;
+	POSTTWIDDLE18: ARRAY 9 OF FLOAT32;
+	POSTTWIDDLE36: ARRAY 18 OF FLOAT32;
 
-	GS: ARRAY 512 OF REAL;
+	GS: ARRAY 512 OF FLOAT32;
 
-	DCTCOS: ARRAY 2,2 OF REAL;
-	DCTTWIDDLE: ARRAY 16, 33 OF REAL;
+	DCTCOS: ARRAY 2,2 OF FLOAT32;
+	DCTTWIDDLE: ARRAY 16, 33 OF FLOAT32;
 
 TYPE
 	(** The Player object can be used to play a MP3 file or to decode it into a PCM file *)
@@ -168,7 +168,7 @@ TYPE
 		totBits : SIGNED32;
 		mainDataEnd, frameStart: SIGNED16;
 
-		vVec : ARRAY 2, 1024 OF REAL;
+		vVec : ARRAY 2, 1024 OF FLOAT32;
 		vectIdx0, vectIdx1 : SIGNED32;
 
 		(* Number of Frames decoded *)
@@ -689,7 +689,7 @@ TYPE
 		PROCEDURE JointStereo(ro : Stereo; VAR lr: Stereo; gr: SIGNED16);
 		VAR	 i, j, sb, ss, sfb, sfbCnt, c, maxSfb,  lines : SIGNED32;
 					isPos: ARRAY 576 OF SIGNED32;
-					isRatio: ARRAY 576 OF REAL;
+					isRatio: ARRAY 576 OF FLOAT32;
 					msStereo, iStereo : BOOLEAN;
 		BEGIN
 			msStereo := ((encFrame.channelmode =  1) & ((encFrame.modeextension DIV 2) MOD 2 = 1));
@@ -956,7 +956,7 @@ TYPE
 		(* Compensates the alias effects that wereproduced by the polyphase filterbank of the encoder *)
 		PROCEDURE Antialias(xr: Granule; VAR hybridIn: Granule; ch, gr : SIGNED16);
 		VAR ss, sb, sblim : SIGNED16;
-				bu, bd : REAL;
+				bu, bd : FLOAT32;
 		BEGIN
 			FOR sb := 0 TO 31 DO
 				FOR ss := 0 TO 17 DO
@@ -1032,9 +1032,9 @@ TYPE
 		PROCEDURE IMDCT(in: Raw18; VAR out: Raw36; bt: SIGNED16);
 		VAR
 			i, m : SIGNED32;
-			tin, hl : ARRAY 18 OF REAL;
-			tmp : ARRAY 12 OF REAL;
-			hs : ARRAY 6 OF REAL;
+			tin, hl : ARRAY 18 OF FLOAT32;
+			tmp : ARRAY 12 OF FLOAT32;
+			hs : ARRAY 6 OF FLOAT32;
 			evens, odds, evenidcts, oddidcts : Raw3;
 			evenl, oddl, evenidctl, oddidctl : Raw9;
 
@@ -1167,7 +1167,7 @@ TYPE
 
 		(* 3 point inverse discrete consine transform *)
 		PROCEDURE IMDCT3pt(in: Raw3; VAR out: Raw3);
-		VAR t0, t1 : REAL;
+		VAR t0, t1 : FLOAT32;
 		BEGIN
 			t0 := in[2] / 2 + in[0];
 			t1 := in[1] * IMDCTSQRT;
@@ -1180,7 +1180,7 @@ TYPE
 
 		(* 4 point inverse discrete consine transform *)
 		PROCEDURE IMDCT4pt(in: Raw4; VAR out: Raw4);
-		VAR t0, t1 : REAL;
+		VAR t0, t1 : FLOAT32;
 		BEGIN
 			t0 := in[3] / 2 + in[0];
 			t1 := in[1] - in[2];
@@ -1194,7 +1194,7 @@ TYPE
 
 		(* 5 point inverse discrete consine transform *)
 		PROCEDURE IMDCT5pt(in: Raw5; VAR out: Raw5);
-		VAR t0, t1, t2 : REAL;
+		VAR t0, t1, t2 : FLOAT32;
 		BEGIN
 			t0 := in[3] /2 + in[0];
 			t1 := in[0] - in[3];
@@ -1254,7 +1254,7 @@ TYPE
 		VAR i, j, ss, tmp1, tmp2 : SIGNED32;
 			samp : SIGNED32;
 			sVec, tmp : Raw32;
-			sum : REAL;
+			sum : FLOAT32;
 		BEGIN
 			(* Initialisation *)
 			IF encFrame.ssynth THEN
@@ -1788,7 +1788,7 @@ END LoadHuffmanTables;
 (* Initialize certain tables *)
 PROCEDURE InitTables;
 VAR i, j, k, l: SIGNED16;
-		LN2, sq: REAL;
+		LN2, sq: FLOAT32;
 BEGIN
 	JSBTABLE[0] := 0; JSBTABLE[1] := 4; JSBTABLE[2] := 8;  JSBTABLE[3] := 16;
 

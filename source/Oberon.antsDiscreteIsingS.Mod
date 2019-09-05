@@ -287,7 +287,7 @@ END CachedE;
 	PROCEDURE NewModel*;
 	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  beta, h: LONGREAL;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name=NAME beta=REAL h=REAL" );
+		l := antsCommands.ScanFromPar( "name=NAME beta=FLOAT32 h=FLOAT32" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectRealFromKeyword( l, "beta", beta ) &
 		    antsCommands.ExpectRealFromKeyword( l, "h", h ) THEN
 			Gen;  M := Objects.NewObj( tModel );  antsModels.Open( M );  OpenModel( M, name, beta, h )

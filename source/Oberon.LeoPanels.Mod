@@ -489,7 +489,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END ResetTransform;
 
 	PROCEDURE ApplyTransform (e: Editor);
-		VAR m, inv, mat: GfxMatrix.Matrix; tool: LeoTools.Tool; u: REAL; ref, obj: Objects.Object; list: Leonardo.Shape;
+		VAR m, inv, mat: GfxMatrix.Matrix; tool: LeoTools.Tool; u: FLOAT32; ref, obj: Objects.Object; list: Leonardo.Shape;
 	BEGIN
 		IF e.fig # NIL THEN
 			GetTransform(e, m);
@@ -527,7 +527,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END EditTransform;
 
 	PROCEDURE MakeTransform (e: Editor; VAR m: GfxMatrix.Matrix);
-		VAR x0, y0, dx, dy, d, cos, sin, phi, tx, ty, sx, sy, rho, f: REAL; dir, kind: SIGNED32;
+		VAR x0, y0, dx, dy, d, cos, sin, phi, tx, ty, sx, sy, rho, f: FLOAT32; dir, kind: SIGNED32;
 	BEGIN
 		m := GfxMatrix.Identity;
 		Attributes.GetReal(e, "X0", x0); Attributes.GetReal(e, "Y0", y0);
@@ -798,7 +798,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END ExportEPS;
 
 	PROCEDURE Export*;
-		VAR fig: Leonardo.Figure; mode: SIGNED32; border, llx, lly, urx, ury, bw: REAL; x0, y0, x1, y1: SIGNED16;
+		VAR fig: Leonardo.Figure; mode: SIGNED32; border, llx, lly, urx, ury, bw: FLOAT32; x0, y0, x1, y1: SIGNED16;
 	BEGIN
 		fig := FindFigure(Gadgets.context);
 		IF fig # NIL THEN
@@ -897,7 +897,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END EditFrame;
 
 	PROCEDURE SetFrameUnit*;
-		VAR editor: Editor; s: Attributes.Scanner; unit, w, h: REAL;
+		VAR editor: Editor; s: Attributes.Scanner; unit, w, h: FLOAT32;
 	BEGIN
 		editor := FindEditor(Gadgets.context);
 		IF editor # NIL THEN
@@ -914,7 +914,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END SetFrameUnit;
 
 	PROCEDURE SetFrameSize*;
-		VAR editor: Editor; landscape: BOOLEAN; unit: REAL; s: Attributes.Scanner;
+		VAR editor: Editor; landscape: BOOLEAN; unit: FLOAT32; s: Attributes.Scanner;
 	BEGIN
 		editor := FindEditor(Gadgets.context);
 		IF editor # NIL THEN
@@ -939,7 +939,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END SetFrameSize;
 
 	PROCEDURE SetFrameOrientation*;
-		VAR editor: Editor; w, h: REAL;
+		VAR editor: Editor; w, h: FLOAT32;
 	BEGIN
 		editor := FindEditor(Gadgets.context);
 		IF editor # NIL THEN
@@ -1244,15 +1244,15 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			Reference = POINTER TO RECORD
 				shape: Leonardo.Shape;
 				next: Reference;
-				c, d: ARRAY 2, 3 OF REAL;	(* coordinate and displacement for x/y, min/max/mid *)
+				c, d: ARRAY 2, 3 OF FLOAT32;	(* coordinate and displacement for x/y, min/max/mid *)
 			END;
 
 		VAR
 			fig: Leonardo.Figure; sel: Leonardo.Shape; first, last, ref: Reference; xy, val, n: SIGNED32;
 			obj: Objects.Object; mat: GfxMatrix.Matrix;
 
-		PROCEDURE const (obj: Objects.Object): REAL;
-			VAR val: REAL; frame: Gadgets.Frame; tool: LeoTools.Tool;
+		PROCEDURE const (obj: Objects.Object): FLOAT32;
+			VAR val: FLOAT32; frame: Gadgets.Frame; tool: LeoTools.Tool;
 		BEGIN
 			Attributes.GetReal(obj, "Value", val);
 			frame := FindFrame(Gadgets.context);
@@ -1265,8 +1265,8 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			RETURN val
 		END const;
 
-		PROCEDURE findMax (xy, lo, hi: SIGNED32): REAL;
-			VAR ref: Reference; max, m: REAL;
+		PROCEDURE findMax (xy, lo, hi: SIGNED32): FLOAT32;
+			VAR ref: Reference; max, m: FLOAT32;
 		BEGIN
 			ref := first; max := ref.c[xy, hi] - ref.c[xy, lo]; ref := ref.next;
 			WHILE ref # NIL DO
@@ -1277,8 +1277,8 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			RETURN max
 		END findMax;
 
-		PROCEDURE setDim (xy: SIGNED32; dim: REAL);
-			VAR ref: Reference; d: REAL;
+		PROCEDURE setDim (xy: SIGNED32; dim: FLOAT32);
+			VAR ref: Reference; d: FLOAT32;
 		BEGIN
 			ref := first;
 			WHILE ref # NIL DO
@@ -1288,8 +1288,8 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 			END
 		END setDim;
 
-		PROCEDURE align (xy, m: SIGNED32; step: REAL);
-			VAR ref: Reference; to, d: REAL;
+		PROCEDURE align (xy, m: SIGNED32; step: FLOAT32);
+			VAR ref: Reference; to, d: FLOAT32;
 		BEGIN
 			ref := first; to := ref.c[xy, m] + ref.d[xy, m]; ref := ref.next;
 			WHILE ref # NIL DO
@@ -1302,7 +1302,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 		END align;
 
 		PROCEDURE sort (xy, m: SIGNED32);
-			VAR sent, cand, ref: Reference; max, t: REAL;
+			VAR sent, cand, ref: Reference; max, t: FLOAT32;
 		BEGIN
 			NEW(sent); sent.next := first; first := NIL;
 			WHILE sent.next # NIL DO
@@ -1321,12 +1321,12 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 		END sort;
 
 		PROCEDURE distribute (xy, m: SIGNED32);
-			VAR s: SIGNED32; p, q: Reference; step, t: REAL;
+			VAR s: SIGNED32; p, q: Reference; step, t: FLOAT32;
 		BEGIN
 			sort(xy, m);
 			Attributes.GetInt(SpaceType[xy], "Value", s);
 			IF s = spaceMin THEN
-				p := first; q := p.next; step := MAX(REAL);
+				p := first; q := p.next; step := MAX(FLOAT32);
 				REPEAT
 					t := (q.c[xy, m] + q.d[xy, m]) - (p.c[xy, m] + p.d[xy, m]);
 					IF t < step THEN step := t END;
@@ -1348,12 +1348,12 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 		END distribute;
 
 		PROCEDURE distributeSpace (xy: SIGNED32);
-			VAR s: SIGNED32; p, q, ref: Reference; step, d, sum, to: REAL;
+			VAR s: SIGNED32; p, q, ref: Reference; step, d, sum, to: FLOAT32;
 		BEGIN
 			sort(xy, mid);
 			Attributes.GetInt(SpaceType[xy], "Value", s);
 			IF s = spaceMin THEN
-				p := first; q := p.next; step := MAX(REAL);
+				p := first; q := p.next; step := MAX(FLOAT32);
 				REPEAT
 					d := (q.c[xy, min] + q.d[xy, min]) - (p.c[xy, max] + p.d[xy, max]);
 					IF d < step THEN step := d END;
@@ -1468,10 +1468,10 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 
 	(**--- Focus Tool ---**)
 
-	PROCEDURE atan2 (x, y: REAL): REAL;
-		VAR phi: REAL;
+	PROCEDURE atan2 (x, y: FLOAT32): FLOAT32;
+		VAR phi: FLOAT32;
 	BEGIN
-		IF (ABS(x) < 1.0) & (ABS(y) >= ABS(x * MAX(REAL))) THEN	(* y/x would result in overflow/divide by zero trap *)
+		IF (ABS(x) < 1.0) & (ABS(y) >= ABS(x * MAX(FLOAT32))) THEN	(* y/x would result in overflow/divide by zero trap *)
 			IF y >= 0 THEN phi := Math.pi/2
 			ELSE phi := 3*Math.pi/2
 			END
@@ -1486,7 +1486,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END atan2;
 
 	PROCEDURE RevertFocus (e: Editor);
-		VAR frame: LeoFrames.Frame; tool: LeoTools.Tool; x, y, dx, dy, d: REAL;
+		VAR frame: LeoFrames.Frame; tool: LeoTools.Tool; x, y, dx, dy, d: FLOAT32;
 	BEGIN
 		IF e # NIL THEN
 			Attributes.SetInt(e, "Kind", 0); Attributes.SetInt(e, "Direction", 0);
@@ -1513,7 +1513,7 @@ MODULE LeoPanels IN Oberon; (** portable **)	(* eos  *)
 	END RevertFocus;
 
 	PROCEDURE ApplyFocus (e: Editor);
-		VAR frame: LeoFrames.Frame; kind, dir: SIGNED32; pts: SIGNED16; tool: LeoTools.Tool; x, y, phi, dx, dy: REAL;
+		VAR frame: LeoFrames.Frame; kind, dir: SIGNED32; pts: SIGNED16; tool: LeoTools.Tool; x, y, phi, dx, dy: FLOAT32;
 	BEGIN
 		IF e # NIL THEN
 			IF (e.frame # LeoTools.Focus.frame) OR LeoTools.Focus.visible THEN

@@ -276,7 +276,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 		ival: SIGNED16;
 		tmp: Bytes;
 		set: SET;
-		rval: REAL;
+		rval: FLOAT32;
 		lrval: LONGREAL;
 	BEGIN
 		m := LEN(refs^);  mode := refs[i];  INC(i);
@@ -348,7 +348,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 								SYSTEM.GET(adr, ival);  w.Int( ival, 1)
 							|6:	(* SIGNED32 *)
 								SYSTEM.GET(adr, lval);  w.Int( lval, 1)
-							|7:	(* REAL *)
+							|7:	(* FLOAT32 *)
 								SYSTEM.GET(adr, rval);  w.RawReal(rval)
 							|8:	(* LONGREAL *)
 								SYSTEM.GET(adr, lrval);  w.RawLReal(lrval)

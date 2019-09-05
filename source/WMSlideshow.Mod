@@ -510,7 +510,7 @@ TYPE  SlideshowNavigation = OBJECT(WMComponents.FormWindow);
 		nextSlide : Slide;
 		nextIndex : SIGNED32;
 		image : Image;
-		fact : REAL;
+		fact : FLOAT32;
 		c : WMGraphics.BufferCanvas;
 		w, h : SIZE;
 	BEGIN

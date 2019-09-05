@@ -118,7 +118,7 @@ TYPE
 PROCEDURE New*;
 VAR l: antsCommands.tScanList;    name: vyName.tNameArray;    fct, vect:  vyBase.Object;   obj: Object; 	from, to: LONGREAL;
 BEGIN
-l := antsCommands.ScanFromPar("name = NAME fct = OBJ  vect= OBJ [from=REAL to=REAL]");
+l := antsCommands.ScanFromPar("name = NAME fct = OBJ  vect= OBJ [from=FLOAT32 to=FLOAT32]");
 IF antsCommands.ExpectNameFromKeyword(l, "name",  name) &
 antsCommands.ExpectObjectFromKeyword(l, "fct",  fct) &
 antsCommands.ExpectObjectFromKeyword(l, "vect", vect)
@@ -176,7 +176,7 @@ END NewVec;
 	PROCEDURE New*;
 	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  fct, vect: vyBase.Object;  obj: Object;  from, to: LONGREAL;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name = NAME fct = OBJ  vect= OBJ[from=REAL to=REAL]" );
+		l := antsCommands.ScanFromPar( "name = NAME fct = OBJ  vect= OBJ[from=FLOAT32 to=FLOAT32]" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectObjectFromKeyword( l, "fct", fct ) &
 		    antsCommands.ExpectObjectFromKeyword( l, "vect", vect ) THEN
 			WITH fct: antsFunctions.Function DO
@@ -197,7 +197,7 @@ VAR l: antsCommands.tScanList;
 	fct, vect:  vyBase.Object;
 	from, to: LONGREAL;
 BEGIN
-	l := antsCommands.ScanFromPar("name = NAME fct = OBJ  vect= OBJ [from=REAL to=REAL]");
+	l := antsCommands.ScanFromPar("name = NAME fct = OBJ  vect= OBJ [from=FLOAT32 to=FLOAT32]");
 	IF antsCommands.ExpectNameFromKeyword(l, "name",  name) &
 		antsCommands.ExpectObjectFromKeyword(l, "fct",  fct) &
 		antsCommands.ExpectObjectFromKeyword(l, "vect", vect) THEN

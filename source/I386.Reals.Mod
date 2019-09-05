@@ -4,7 +4,7 @@ Refer to the "General ETH Oberon System Source License" contract available at: h
 MODULE Reals;	(** portable, except where noted *)
 (** AUTHOR "bmoesli"; PURPOSE "Real number manipulation"; *)
 
-(** Implementation of the non-portable components of IEEE REAL and
+(** Implementation of the non-portable components of IEEE FLOAT32 and
 LONGREAL manipulation. The routines here are required to do conversion
 of reals to strings and back.
 Implemented by Bernd Moesli, Seminar for Applied Mathematics,
@@ -44,7 +44,7 @@ VAR
 	H, L: SIGNED16;
 
 (** Returns the shifted binary exponent (0 <= e < 256). *)
-PROCEDURE Expo* (x: REAL): SIGNED32;
+PROCEDURE Expo* (x: FLOAT32): SIGNED32;
 BEGIN
 	RETURN ASH(SYSTEM.VAL(SIGNED32, x), -23) MOD 256
 END Expo;
@@ -57,7 +57,7 @@ BEGIN
 END ExpoL;
 
 (** Sets the shifted binary exponent. *)
-PROCEDURE SetExpo* (e: SIGNED32; VAR x: REAL);
+PROCEDURE SetExpo* (e: SIGNED32; VAR x: FLOAT32);
 	VAR i: SIGNED32;
 BEGIN
 	SYSTEM.GET(ADDRESSOF(x), i);
@@ -74,9 +74,9 @@ BEGIN
 	SYSTEM.PUT(ADDRESSOF(x) + H, i)
 END SetExpoL;
 
-(** Convert hexadecimal to REAL. *)
-PROCEDURE Real* (h: SIGNED32): REAL;
-	VAR x: REAL;
+(** Convert hexadecimal to FLOAT32. *)
+PROCEDURE Real* (h: SIGNED32): FLOAT32;
+	VAR x: FLOAT32;
 BEGIN SYSTEM.PUT(ADDRESSOF(x), h); RETURN x
 END Real;
 
@@ -86,8 +86,8 @@ PROCEDURE RealL* (h, l: SIGNED32): LONGREAL;
 BEGIN SYSTEM.PUT(ADDRESSOF(x) + H, h); SYSTEM.PUT(ADDRESSOF(x) + L, l); RETURN x
 END RealL;
 
-(** Convert REAL to hexadecimal. *)
-PROCEDURE Int* (x: REAL): SIGNED32;
+(** Convert FLOAT32 to hexadecimal. *)
+PROCEDURE Int* (x: FLOAT32): SIGNED32;
 	VAR i: SIGNED32;
 BEGIN SYSTEM.PUT(ADDRESSOF(i), x); RETURN i
 END Int;
@@ -112,7 +112,7 @@ BEGIN
 END Ten;
 
 (** Returns the NaN code (0 <= c < 8399608) or -1 if not NaN/Infinite. *)
-PROCEDURE NaNCode* (x: REAL): SIGNED32;
+PROCEDURE NaNCode* (x: FLOAT32): SIGNED32;
 BEGIN
 	IF ASH(SYSTEM.VAL(SIGNED32, x), -23) MOD 256 = 255 THEN	(* Infinite or NaN *)
 		RETURN SYSTEM.VAL(SIGNED32, x) MOD 800000H	(* lowest 23 bits *)
@@ -133,7 +133,7 @@ BEGIN
 END NaNCodeL;
 
 (** Returns TRUE iff x is NaN/Infinite. *)
-PROCEDURE IsNaN* (x: REAL): BOOLEAN;
+PROCEDURE IsNaN* (x: FLOAT32): BOOLEAN;
 BEGIN
 	RETURN ASH(SYSTEM.VAL(SIGNED32, x), -23) MOD 256 = 255
 END IsNaN;
@@ -147,8 +147,8 @@ BEGIN
 END IsNaNL;
 
 (** Returns NaN with specified code (0 <= l < 8399608). *)
-PROCEDURE NaN* (l: SIGNED32): REAL;
-VAR x: REAL;
+PROCEDURE NaN* (l: SIGNED32): FLOAT32;
+VAR x: FLOAT32;
 BEGIN
 	SYSTEM.PUT(ADDRESSOF(x), (l MOD 800000H) + 7F800000H);
 	RETURN x
@@ -192,7 +192,7 @@ END SetFCR;
 
 (** Round x to an integer using the current rounding mode. *)
 
-PROCEDURE -Round*(x: REAL): SIGNED32;	(** non-portable *)
+PROCEDURE -Round*(x: FLOAT32): SIGNED32;	(** non-portable *)
 CODE {SYSTEM.i386, SYSTEM.FPU}
 	FLD DWORD [ESP]
 	FISTP DWORD [ESP]	; store integer using current rounding mode

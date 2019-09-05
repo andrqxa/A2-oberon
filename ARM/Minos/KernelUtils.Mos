@@ -7,7 +7,7 @@ MODULE KernelUtils;
 IMPORT SYSTEM, Bit, Clocks;
 
 VAR
-	tickDivisor : REAL;
+	tickDivisor : FLOAT32;
 
 
 PROCEDURE IsValidSetParameter*( CONST value : SIGNED32 ) : BOOLEAN;
@@ -107,9 +107,9 @@ BEGIN
 	SYSTEM.PUT( adr, mem );
 END PutMem32;
 
-PROCEDURE GetIntAsReal*( CONST i : SIGNED32 ): REAL;
+PROCEDURE GetIntAsReal*( CONST i : SIGNED32 ): FLOAT32;
 BEGIN
-	RETURN SYSTEM.VAL(REAL,i)
+	RETURN SYSTEM.VAL(FLOAT32,i)
 END GetIntAsReal;
 
 PROCEDURE GetIntLittleEndian*( CONST input : SIGNED32; VAR output : ARRAY OF CHAR; VAR result : SIGNED32 );

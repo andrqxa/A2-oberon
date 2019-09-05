@@ -859,15 +859,15 @@ END NewRect3D;
 
 (* start of Rege code *)
 
-		PROCEDURE MakePoly(VAR RX, RY, RXstrich, RYstrich, RS: ARRAY OF REAL; n: SIGNED16;
+		PROCEDURE MakePoly(VAR RX, RY, RXstrich, RYstrich, RS: ARRAY OF FLOAT32; n: SIGNED16;
 									VAR X, Y: ARRAY OF SIGNED16; VAR k: SIGNED16);
 
-			 TYPE Polynom = RECORD A, B, C, D: REAL END;
+			 TYPE Polynom = RECORD A, B, C, D: FLOAT32 END;
 			 VAR i, cs, smax, k1: SIGNED16; px, py: Polynom;
-					 x, dx1, dx2, dx3, y, dy1, dy2, dy3: REAL; L, B, R, T,dW  : SIGNED16;
+					 x, dx1, dx2, dx3, y, dy1, dy2, dy3: FLOAT32; L, B, R, T,dW  : SIGNED16;
 
-				PROCEDURE GetPolynom((* VAR *) y1, y2, y1s, y2s: REAL; VAR p: Polynom);
-					VAR dx1, dyx: REAL;
+				PROCEDURE GetPolynom((* VAR *) y1, y2, y1s, y2s: FLOAT32; VAR p: Polynom);
+					VAR dx1, dyx: FLOAT32;
 				BEGIN
 					IF RS[i] # RS[i+1] THEN dx1 := 1.0/(RS[i + 1] - RS[i]) ELSE dx1 := 1.0 END;
 					dyx := (y2 - y1)*dx1;
@@ -916,15 +916,15 @@ END NewRect3D;
 		END MakePoly;
 
 	PROCEDURE SplineToPoly(c: Point; closed: BOOLEAN; VAR X, Y: ARRAY OF SIGNED16; VAR k: SIGNED16);
-		TYPE RealVect = ARRAY 256 OF REAL;
-		VAR   n, i: SIGNED16; RS, RX, RY ,RXstrich, RYstrich : RealVect; dx, dy: REAL;
-			helpR: REAL;
+		TYPE RealVect = ARRAY 256 OF FLOAT32;
+		VAR   n, i: SIGNED16; RS, RX, RY ,RXstrich, RYstrich : RealVect; dx, dy: FLOAT32;
+			helpR: FLOAT32;
 
-		PROCEDURE NatSplineDerivates(VAR x, y, d: ARRAY OF REAL; n: SIGNED16);
-			VAR i: SIGNED16; d1, d2: REAL; a, b, c: RealVect;
+		PROCEDURE NatSplineDerivates(VAR x, y, d: ARRAY OF FLOAT32; n: SIGNED16);
+			VAR i: SIGNED16; d1, d2: FLOAT32; a, b, c: RealVect;
 
-			PROCEDURE SolveTriDiag(VAR a, b, c: ARRAY OF REAL; n: SIGNED16; VAR y: ARRAY OF REAL);
-				VAR i: SIGNED16; t: REAL;
+			PROCEDURE SolveTriDiag(VAR a, b, c: ARRAY OF FLOAT32; n: SIGNED16; VAR y: ARRAY OF FLOAT32);
+				VAR i: SIGNED16; t: FLOAT32;
 			BEGIN i := 1;
 				WHILE i < n DO t := a[i]; c[i] := c[i]/t; helpR := c[i]*b[i]; a[i+1] := a[i+1] -  helpR; INC(i); END;
 				i := 2;
@@ -950,11 +950,11 @@ END NewRect3D;
 				SolveTriDiag(a, b, c, n, d)
 			END NatSplineDerivates;
 
-		PROCEDURE ClSplineDerivates(VAR x, y, d: ARRAY OF REAL; n: SIGNED16);
-			VAR i: SIGNED16; hn1, dn1, d1, d2: REAL; a, b, c, u: RealVect;
+		PROCEDURE ClSplineDerivates(VAR x, y, d: ARRAY OF FLOAT32; n: SIGNED16);
+			VAR i: SIGNED16; hn1, dn1, d1, d2: FLOAT32; a, b, c, u: RealVect;
 
-			PROCEDURE SolveTriDiag2(VAR a, b, c: ARRAY OF REAL; n:SIGNED16; VAR y1, y2: ARRAY OF REAL);
-			VAR i: SIGNED16; t: REAL;
+			PROCEDURE SolveTriDiag2(VAR a, b, c: ARRAY OF FLOAT32; n:SIGNED16; VAR y1, y2: ARRAY OF FLOAT32);
+			VAR i: SIGNED16; t: FLOAT32;
 			BEGIN
 				i := 1;
 				WHILE i < n DO

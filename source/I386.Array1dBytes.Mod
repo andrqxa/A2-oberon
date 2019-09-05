@@ -443,7 +443,7 @@ Array1dBytes.Test ~
 (* Operator procedures *)
 
 	PROCEDURE NegateR;
-	VAR x: REAL;
+	VAR x: FLOAT32;
 	BEGIN
 		x := -x;
 	END NegateR;

@@ -35,8 +35,8 @@ CONST
 	ColSubDiv = 6;	(* subdivision of color range in black and white printing *)
 
 TYPE
-	RealVector = ARRAY N OF REAL;
-	Poly = RECORD a, b, c, d, t: REAL END ;
+	RealVector = ARRAY N OF FLOAT32;
+	Poly = RECORD a, b, c, d, t: FLOAT32 END ;
 	PolyVector = ARRAY N OF Poly;
 
 	Set = POINTER TO ARRAY OF SET;
@@ -532,8 +532,8 @@ BEGIN
 	END
 END ellipse;
 
-PROCEDURE PrintPoly(x0, y0: SIGNED16; VAR p, q: Poly; lim: REAL);
-VAR t: REAL;
+PROCEDURE PrintPoly(x0, y0: SIGNED16; VAR p, q: Poly; lim: FLOAT32);
+VAR t: FLOAT32;
 BEGIN t := 0;
 	REPEAT
 		Dot(SHORT(ENTIER(((p.a * t + p.b) * t + p.c) * t + p.d) + x0),SHORT(ENTIER(((q.a * t + q.b) * t + q.c) * t + q.d) + y0));
@@ -543,7 +543,7 @@ END PrintPoly;
 
 PROCEDURE SolveTriDiag(VAR a, b, c, y: RealVector; n: SIGNED16);
 VAR i: SIGNED16;
-		r: REAL;
+		r: FLOAT32;
 BEGIN (*a, b, c of tri-diag matrix T; solve Ty' = y for y', assign y' to y*)
 	i := 1;
 	WHILE i < n DO
@@ -561,7 +561,7 @@ BEGIN (*a, b, c of tri-diag matrix T; solve Ty' = y for y', assign y' to y*)
 END SolveTriDiag;
 
 PROCEDURE OpenSpline(VAR x, y, d: RealVector; n: SIGNED16);
-VAR i: SIGNED16; d1, d2: REAL;
+VAR i: SIGNED16; d1, d2: FLOAT32;
 		a, b, c: RealVector;
 BEGIN (*from x, y compute d = y'*)
 	b[0] := 1.0/(x[1] - x[0]); a[0] := 2.0*b[0]; c[0] := b[0];
@@ -579,7 +579,7 @@ BEGIN (*from x, y compute d = y'*)
 END OpenSpline;
 
 PROCEDURE ClosedSpline(VAR x, y, d: RealVector; n: SIGNED16);
-VAR i: SIGNED16; d1, d2, hn, dn,r: REAL;
+VAR i: SIGNED16; d1, d2, hn, dn,r: FLOAT32;
 		a, b, c, w: RealVector;
 BEGIN (*from x, y compute d = y'*)
 	hn := 1.0/(x[n-1] - x[n-2]);
@@ -609,7 +609,7 @@ BEGIN (*from x, y compute d = y'*)
 END ClosedSpline;
 
 PROCEDURE spline (x0, y0, n, open: SIGNED16; VAR u,v: ARRAY OF SIGNED16);
-VAR i: SIGNED16; dx, dy, ds: REAL;
+VAR i: SIGNED16; dx, dy, ds: FLOAT32;
 		x, xd, y, yd, s: RealVector;
 		p, q: PolyVector;
 BEGIN (*from u, v compute x, y, s*)
@@ -644,7 +644,7 @@ BEGIN (*from u, v compute x, y, s*)
 END spline;
 
 PROCEDURE GetDim(label: ARRAY OF CHAR;  def: SIGNED16;  VAR val: SIGNED16);
-VAR v: REAL; S: Texts.Scanner;
+VAR v: FLOAT32; S: Texts.Scanner;
 BEGIN
 	Oberon.OpenScanner(S, label);
 	IF (S.class = Texts.Int) OR (S.class = Texts.Real) THEN

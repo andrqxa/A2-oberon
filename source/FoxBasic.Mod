@@ -255,7 +255,7 @@ TYPE
 		table: HashAnyArray;
 		size: SIZE;
 		used-: SIZE;
-		maxLoadFactor: REAL;
+		maxLoadFactor: FLOAT32;
 
 		(* Interface *)
 
@@ -395,7 +395,7 @@ TYPE
 		table: HashIntArray;
 		size: SIZE;
 		used-: SIZE;
-		maxLoadFactor: REAL;
+		maxLoadFactor: FLOAT32;
 
 		(* Interface *)
 
@@ -519,7 +519,7 @@ TYPE
 		table: HashSegmentedNameArray;
 		size: SIZE;
 		used-: SIZE;
-		maxLoadFactor: REAL;
+		maxLoadFactor: FLOAT32;
 
 		(* Interface *)
 
@@ -704,7 +704,7 @@ TYPE
 		BEGIN  w.RawBool(x)
 		END RawBool;
 
-		PROCEDURE RawReal*( x: REAL );
+		PROCEDURE RawReal*( x: FLOAT32 );
 		BEGIN  w.RawReal(x)
 		END RawReal;
 

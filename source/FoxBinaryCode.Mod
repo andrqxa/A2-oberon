@@ -366,7 +366,7 @@ TYPE
 			INC(pc,(8*Byte) DIV os.unit);
 		END PutQWord;
 
-		PROCEDURE PutReal*(f: REAL);
+		PROCEDURE PutReal*(f: FLOAT32);
 		BEGIN
 			PutDWord(ConvertReal(f))
 		END PutReal;
@@ -471,7 +471,7 @@ TYPE
 			RETURN h
 		END GetQWord;
 
-		PROCEDURE GetReal*(pc: Unit): REAL;
+		PROCEDURE GetReal*(pc: Unit): FLOAT32;
 		BEGIN
 			RETURN ConvertToReal(GetDWord(pc))
 		END GetReal;
@@ -619,7 +619,7 @@ TYPE
 
 	END Section;
 
-	PROCEDURE ConvertReal* (value: REAL): SIGNED32;
+	PROCEDURE ConvertReal* (value: FLOAT32): SIGNED32;
 	CONST Exponent = 8; Significant = 23;
 	VAR result: SIGNED32; VAR exponent, i: WORD;
 	BEGIN
@@ -655,8 +655,8 @@ TYPE
 		RETURN result;
 	END ConvertLongreal;
 
-	PROCEDURE ConvertToReal*(x: SIGNED32): REAL;
-	VAR result: REAL; e,i: SIGNED32;
+	PROCEDURE ConvertToReal*(x: SIGNED32): FLOAT32;
+	VAR result: FLOAT32; e,i: SIGNED32;
 
 		PROCEDURE Bit(bit: SIGNED32): BOOLEAN;
 		BEGIN

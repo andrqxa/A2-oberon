@@ -220,7 +220,7 @@ PROCEDURE FPrintSet(VAR fp: SIGNED32; set: SET);
 BEGIN FPrint(fp, SYSTEM.VAL(SIGNED32, set))
 END FPrintSet;
 
-PROCEDURE FPrintReal(VAR fp: SIGNED32; real: REAL);
+PROCEDURE FPrintReal(VAR fp: SIGNED32; real: FLOAT32);
 BEGIN FPrint(fp, SYSTEM.VAL(SIGNED32, real))
 END FPrintReal;
 
@@ -1303,7 +1303,7 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 		END GetImports;
 
 		PROCEDURE InConst(): PCT.Const;
-			VAR i: SIGNED32;  r: REAL;  lr: LONGREAL;  str: PCS.String;  set: SET;  c: PCT.Const;
+			VAR i: SIGNED32;  r: FLOAT32;  lr: LONGREAL;  str: PCS.String;  set: SET;  c: PCT.Const;
 		BEGIN
 			CASE	tag	OF
 			| SFtypBool:	R.RawNum(i);

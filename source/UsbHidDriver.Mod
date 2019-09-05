@@ -703,7 +703,7 @@ TYPE
 		VAR
 			mm : 			Inputs.MouseMsg;
 			dx, dy,i :		SIGNED32;
-			accelX, accelY : 	REAL;
+			accelX, accelY : 	FLOAT32;
 		BEGIN
 			dx := TwosComplement(mouseState.x.usageValue, mouseState.axisReport.reportSize);
 			dy := TwosComplement(mouseState.y.usageValue, mouseState.axisReport.reportSize);

@@ -127,7 +127,7 @@ BEGIN
 	vyGraphBase.SetDisplayMode(vyGraphBase.replace)
 END Ants;
 
-PROCEDURE FadeImage*(fimg,timg: Images.Image; factor: REAL);
+PROCEDURE FadeImage*(fimg,timg: Images.Image; factor: FLOAT32);
 VAR pix:  Images.Pixel; y,x: SIGNED16; r,g,b,a: SIGNED16;
 BEGIN
 	FOR y := 0 TO fimg.height-1 DO
@@ -142,7 +142,7 @@ END FadeImage;
 
 PROCEDURE FadeIn*(pict: Images.Image;  time: SIGNED32; x,y,w,h: SIGNED16);
 VAR   t, time0: SIGNED32;
-	fact: REAL;
+	fact: FLOAT32;
 	cur: antsPortability.display;
 BEGIN
 	NEW(copy);
@@ -172,7 +172,7 @@ END FadeIn;
 
 PROCEDURE Launch*(pict: Images.Image; x,y,w,h: SIGNED16);
 VAR   t, time0,time: SIGNED32;
-	fact: REAL;
+	fact: FLOAT32;
 	cur: antsPortability.display;
 
 BEGIN

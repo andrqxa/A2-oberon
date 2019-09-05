@@ -772,7 +772,7 @@ TYPE
 					token.numberType := Real;
 					IF (1 - MaxRealExponent < e) & (e <= MaxRealExponent) THEN
 						IF e < 0 THEN token.real :=  f / Ten( -e ) ELSE token.real := f * Ten( e )  END;
-						token.real := REAL (token.real);
+						token.real := FLOAT32 (token.real);
 					ELSE Error( Basic.NumberTooLarge )
 					END
 				ELSE

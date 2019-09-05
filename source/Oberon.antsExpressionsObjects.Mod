@@ -441,7 +441,7 @@ IMPORT vyBase, vyLongrealVec, vyRealVec, Objects, vyIntVec, vyLongintVec, vyType
 		RETURN -x
 	END NegLR;
 
-	PROCEDURE NegR( x: REAL ): REAL;
+	PROCEDURE NegR( x: FLOAT32 ): FLOAT32;
 	BEGIN
 		RETURN -x
 	END NegR;
@@ -551,7 +551,7 @@ IMPORT vyBase, vyLongrealVec, vyRealVec, Objects, vyIntVec, vyLongintVec, vyType
 		RETURN FALSE
 	END AssignLReal;
 
-	PROCEDURE AssignReal*( x: REAL;  adr: SIGNED32;  name: ARRAY OF CHAR ): BOOLEAN;
+	PROCEDURE AssignReal*( x: FLOAT32;  adr: SIGNED32;  name: ARRAY OF CHAR ): BOOLEAN;
 	VAR xx: vyRealVec.tREAL;  p: ANY;
 	BEGIN
 		IF adr = 0 THEN xx := vyRealVec.NewRealObject( x );  vyName.RegisterNamed( xx, name );  RETURN TRUE

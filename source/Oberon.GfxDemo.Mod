@@ -110,7 +110,7 @@ MODULE GfxDemo IN Oberon; (** portable *)	(* eos  *)
 
 	(* restore frame within given region *)
 	PROCEDURE RestoreFrame (frame: Frame; x, y, w, h, fx, fy: SIGNED16; mask: Display3.Mask);
-		VAR llx, lly, urx, ury: REAL;
+		VAR llx, lly, urx, ury: FLOAT32;
 	BEGIN
 		(* remove marks from area where we will draw *)
 		INC(x, fx); INC(y, fy);

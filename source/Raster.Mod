@@ -4332,7 +4332,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END FillPattern;
 
 	(** darken image while maintaining coverage **)
-	PROCEDURE Darken* (img: Image; factor: REAL);
+	PROCEDURE Darken* (img: Image; factor: FLOAT32);
 		VAR s, i, j, k, y, x, bit: SIGNED32; adr: ADDRESS; clamp: ARRAY 256 OF CHAR; pix: Pixel;
 	BEGIN
 		s := ABS(ENTIER(255*factor + 0.5));
@@ -4358,7 +4358,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END Darken;
 
 	(** fade image **)
-	PROCEDURE Fade* (img: Image; factor: REAL);
+	PROCEDURE Fade* (img: Image; factor: FLOAT32);
 		VAR s, i, j, k, y, x, bit: SIGNED32; adr: ADDRESS; clamp: ARRAY 256 OF CHAR; pix: Pixel;
 	BEGIN
 		s := ABS(ENTIER(255*factor + 0.5));
@@ -4387,7 +4387,7 @@ MODULE Raster; (** non-portable *)	(* eos, TF  **)
 	END Fade;
 
 	(** make image brighter and more transparent; Opaque(I, f) = Darken(Fade(I, f), 1/f) **)
-	PROCEDURE Opaque* (img: Image; factor: REAL);
+	PROCEDURE Opaque* (img: Image; factor: FLOAT32);
 		VAR s, i, j, k, y, x, bit: SIGNED32; adr: ADDRESS; clamp: ARRAY 256 OF CHAR; pix: Pixel;
 	BEGIN
 		s := ABS(ENTIER(255*factor + 0.5));

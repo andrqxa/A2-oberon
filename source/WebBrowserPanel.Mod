@@ -838,7 +838,7 @@ VAR
 	prevSlot : FrameslotNode;
 	percents : SIGNED32;
 	parts : SIGNED32;
-	factor : REAL;
+	factor : FLOAT32;
 	onePart : SIGNED32;
 BEGIN
 	percents := 0;

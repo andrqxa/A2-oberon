@@ -367,7 +367,7 @@ TYPE
 		END Setup;
 
 		PROCEDURE Update;
-		VAR pos: SIGNED32; fact: REAL; c: WMGraphics.BufferCanvas;
+		VAR pos: SIGNED32; fact: FLOAT32; c: WMGraphics.BufferCanvas;
 			rect : WMRectangles.Rectangle;
 			i: SIZE;
 			data:ANY;

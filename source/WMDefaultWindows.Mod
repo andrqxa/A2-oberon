@@ -217,7 +217,7 @@ TYPE
 				RETURN r;
 			END Pow2;
 
-			PROCEDURE FindNearestPow2 (value: REAL): SIGNED32;
+			PROCEDURE FindNearestPow2 (value: FLOAT32): SIGNED32;
 			VAR result: SIGNED32;
 			BEGIN
 				result := 1;
@@ -383,7 +383,7 @@ TYPE
 		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : SIGNED32);
 		CONST IconBorder  = 5;
 		VAR
-			color, tc, sw : SIGNED32; tx, ty, dx, dy : SIZE; fw, fh : REAL; a, b, c, img : Graphics.Image; title : String;
+			color, tc, sw : SIGNED32; tx, ty, dx, dy : SIZE; fw, fh : FLOAT32; a, b, c, img : Graphics.Image; title : String;
 			f : Graphics.Font;
 			iconSize, closeImageWidth : SIZE;
 		BEGIN
@@ -669,7 +669,7 @@ TYPE
 (** GRAPHIC TOOLS *)
 (** Fill a rectangle vertically with images, repeating the middle if needed *)
 PROCEDURE RepeatMiddleVertical*(canvas : Graphics.Canvas; csw, csh, w, h : SIZE; q : WORD; top, middle, bottom : Graphics.Image);
-VAR fh : REAL; y, t : SIZE;
+VAR fh : FLOAT32; y, t : SIZE;
 BEGIN
 	IF (csw = 0) OR (csh = 0) OR (w = 0) OR (h = 0) THEN RETURN END;
 	fh := h / csh;
@@ -701,7 +701,7 @@ END RepeatMiddleVertical;
 
 (** Fill a rectangle vertically with images, repeating the middle if needed *)
 PROCEDURE RepeatMiddleHorizontal*(canvas : Graphics.Canvas; csw, csh, w, h : SIZE; q : WORD; left, middle, right : Graphics.Image);
-VAR fw : REAL; x, t : SIZE;
+VAR fw : FLOAT32; x, t : SIZE;
 BEGIN
 	IF (csw = 0) OR (csh = 0) OR (w = 0) OR (h = 0) THEN RETURN END;
 	fw := w / csw;

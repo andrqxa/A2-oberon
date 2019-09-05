@@ -98,7 +98,7 @@ VAR
 		END;
 	END Int;
 
-	PROCEDURE Real( a: REAL );
+	PROCEDURE Real( a: FLOAT32 );
 	BEGIN
 		IF Await ( 9 ) THEN
 			Cmd ( FLOAT ); Device.WriteReal( dev, a );
@@ -108,7 +108,7 @@ VAR
 		END;
 	END Real;
 
-	PROCEDURE RealHex( a: REAL );
+	PROCEDURE RealHex( a: FLOAT32 );
 	BEGIN
 		IF Await ( 15 )  THEN
 			Cmd ( HEX ); Device.WriteReal( dev, a );

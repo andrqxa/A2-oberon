@@ -26,7 +26,7 @@ TYPE
 		VAR
 			sessionId*: SessionId;
 			sessionVariables*: TFClasses.List; (** List of SessionVariable *)
-			leaseTime*: REAL;
+			leaseTime*: FLOAT32;
 
 		PROCEDURE &Init*(sessionId: SessionId);
 		BEGIN

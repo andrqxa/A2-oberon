@@ -39,8 +39,8 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 			name: Name;
 			used: ARRAY 8 OF SET;
 		END;
-		RealVector = ARRAY N OF REAL;
-		Poly = RECORD a, b, c, d, t: REAL END ;
+		RealVector = ARRAY N OF FLOAT32;
+		Poly = RECORD a, b, c, d, t: FLOAT32 END ;
 		PolyVector = ARRAY N OF Poly;
 
 		FontDef = POINTER TO FontDefDesc;
@@ -98,7 +98,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		Ch(hexArray[ORD(ch) MOD 16]);
 	END Hex2;
 
-	PROCEDURE Real(x: REAL);
+	PROCEDURE Real(x: FLOAT32);
 	VAR
 		n, i, xi: SIGNED16;
 		d: ARRAY 4 OF CHAR;
@@ -420,7 +420,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	(* -- Exported Procedures -- *)
 
 	PROCEDURE GetDim(P: Printer.Printer;  label: ARRAY OF CHAR;  def: SIGNED16;  VAR val: SIGNED16);
-	VAR v: REAL; S: Texts.Scanner;
+	VAR v: FLOAT32; S: Texts.Scanner;
 	BEGIN
 		Oberon.OpenScanner(S, label);
 		IF S.class IN {Texts.Int, Texts.Real} THEN
@@ -803,7 +803,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	(* -- Spline computation -- *)
 
 	PROCEDURE SolveTriDiag(VAR a, b, c, y: RealVector; n: SIGNED16);
-		VAR i: SIGNED16; t, tt: REAL;
+		VAR i: SIGNED16; t, tt: FLOAT32;
 	BEGIN (*a, b, c of tri-diag matrix T; solve Ty' = y for y', assign y' to y*)
 		i := 1;
 		WHILE i < n DO t := y[i-1]; y[i] := y[i] - c[i-1]*t; INC(i) END ;
@@ -812,7 +812,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END SolveTriDiag;
 
 	PROCEDURE OpenSpline(VAR x, y, d: RealVector; n: SIGNED16);
-		VAR i: SIGNED16; d1, d2: REAL;
+		VAR i: SIGNED16; d1, d2: FLOAT32;
 			a, b, c: RealVector;
 	BEGIN (*from x, y compute d = y'*)
 		b[0] := 1.0/(x[1] - x[0]); a[0] := 2.0*b[0]; c[0] := b[0];
@@ -830,7 +830,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END OpenSpline;
 
 	PROCEDURE ClosedSpline(VAR x, y, d: RealVector; n: SIGNED16);
-		VAR i: SIGNED16; d1, d2, hn, dn: REAL;
+		VAR i: SIGNED16; d1, d2, hn, dn: FLOAT32;
 			a, b, c, w: RealVector;
 	BEGIN (*from x, y compute d = y'*)
 		hn := 1.0/(x[n-1] - x[n-2]);
@@ -856,8 +856,8 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 		d[i] := d[0]
 	END ClosedSpline;
 
-	PROCEDURE PrintPoly(P: PSPrinter; VAR p, q: Poly; lim: REAL);
-		VAR x0, y0, x1, y1, x2, y2, x3, y3: REAL;
+	PROCEDURE PrintPoly(P: PSPrinter; VAR p, q: Poly; lim: FLOAT32);
+		VAR x0, y0, x1, y1, x2, y2, x3, y3: FLOAT32;
 			xx0, yy0, xx1, yy1, xx2, yy2, xx3, yy3: SIGNED32;
 
 	BEGIN
@@ -891,7 +891,7 @@ MODULE PSPrinter IN Oberon; (** portable *)	(*UNIX version: JT 11.5.90, RC 2.7.9
 	END PrintPoly;
 
 	PROCEDURE Spline*(P: Printer.Printer; x0, y0, n, open: SIGNED16; VAR X, Y: ARRAY OF SIGNED16);
-		VAR i: SIGNED16; dx, dy, ds: REAL;
+		VAR i: SIGNED16; dx, dy, ds: FLOAT32;
 			x, xd, y, yd, s: RealVector;
 			p, q: PolyVector;
 	BEGIN

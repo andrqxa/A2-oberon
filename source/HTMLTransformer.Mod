@@ -1775,7 +1775,7 @@ TYPE
 			tableWidth, tableHeight : SIZE;
 			targetWidth : SIZE;
 			cellWidths, cellHeights : CellSizes;
-			fac : REAL;
+			fac : FLOAT32;
 			leftIndent, topIndent : SIZE;
 		BEGIN
 

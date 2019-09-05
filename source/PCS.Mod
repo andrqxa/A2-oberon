@@ -121,7 +121,7 @@ TYPE
 			numtyp-: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
 			intval-: SIGNED32;	(* integer value or string length *)
 			longintval-: SIGNED64;
-			realval-: REAL;
+			realval-: FLOAT32;
 			lrlval-: LONGREAL;
 			numStartPos, numEndPos: SIGNED32;
 			curpos-, errpos-: SIGNED32;	(*pos in text*)

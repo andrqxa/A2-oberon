@@ -50,7 +50,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 		SetRealActionDesc = RECORD (Leonardo.ActionDesc)
 			pen: LeoPens.Pen;
 			name: Objects.Name;
-			val: REAL;
+			val: FLOAT32;
 		END;
 
 		SetBoolAction = POINTER TO SetBoolActionDesc;
@@ -165,8 +165,8 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE Make*;
 		VAR
 			e: LeoPanels.Editor; mode, am, col, dm, dlen: SIGNED32; c: Gfx.Color; fill: LeoPens.Filler; pen: LeoPens.Pen;
-			w, dp: REAL; arr: LeoOutliners.Arrow; stroke: LeoPens.Stroker; fork: LeoPens.Forker; ol: LeoOutliners.Outliner;
-			on, off: ARRAY 2 OF REAL; dash: LeoPens.Dasher;
+			w, dp: FLOAT32; arr: LeoOutliners.Arrow; stroke: LeoPens.Stroker; fork: LeoPens.Forker; ol: LeoOutliners.Outliner;
+			on, off: ARRAY 2 OF FLOAT32; dash: LeoPens.Dasher;
 	BEGIN
 		e := LeoPanels.FindEditor(Gadgets.context);
 		IF e # NIL THEN
@@ -366,7 +366,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END SetInt;
 
 	PROCEDURE DoSetRealAction (fig: Leonardo.Figure; act: Leonardo.Action);
-		VAR a: SetRealAction; am: Objects.AttrMsg; val: REAL;
+		VAR a: SetRealAction; am: Objects.AttrMsg; val: FLOAT32;
 	BEGIN
 		a := act(SetRealAction);
 		am.id := Objects.get; COPY(a.name, am.name); am.res := -1; a.pen.handle(a.pen, am);
@@ -376,7 +376,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END DoSetRealAction;
 
 	(** set real attribute value with undoable action **)
-	PROCEDURE SetReal* (fig: Leonardo.Figure; pen: LeoPens.Pen; CONST name: ARRAY OF CHAR; val: REAL);
+	PROCEDURE SetReal* (fig: Leonardo.Figure; pen: LeoPens.Pen; CONST name: ARRAY OF CHAR; val: FLOAT32);
 		VAR am: Objects.AttrMsg; a: SetRealAction;
 	BEGIN
 		am.id := Objects.get; COPY(name, am.name); am.res := -1; pen.handle(pen, am);
@@ -711,7 +711,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 		msg.res := 0
 	END TrackPreview;
 
-	PROCEDURE RenderPreview (ctxt: Gfx.Context; pen: LeoPens.Pen; w, h: REAL);
+	PROCEDURE RenderPreview (ctxt: Gfx.Context; pen: LeoPens.Pen; w, h: FLOAT32);
 	BEGIN
 		pen.do.begin(pen, ctxt);
 		pen.do.enter(pen, -w, h, 0, 0, 0);
@@ -721,7 +721,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END RenderPreview;
 
 	PROCEDURE RestorePreview (prev: Preview; px, py: SIGNED16; mask: Display3.Mask);
-		VAR obj: Objects.Object; pen: LeoPens.Pen; bw, d, w, h: REAL; scale: SIGNED32; s, t: ARRAY 16 OF CHAR;
+		VAR obj: Objects.Object; pen: LeoPens.Pen; bw, d, w, h: FLOAT32; scale: SIGNED32; s, t: ARRAY 16 OF CHAR;
 	BEGIN
 		Display3.FilledRect3D(mask, Display3.bottomC, Display3.topC, Display3.textbackC, px, py, prev.W, prev.H, 1, Display.replace);
 		Links.GetLink(prev.obj, "Pen", obj);
@@ -751,7 +751,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE PrintPreview (prev: Preview; VAR msg: Display.DisplayMsg);
 		VAR
 			pw, ph, pix: SIGNED16; mask: Display3.Mask; obj: Objects.Object; pen: LeoPens.Pen;
-			bw, d, w, h: REAL; scale: SIGNED32; ctxt: GfxPrinter.Context; s, t: ARRAY 16 OF CHAR;
+			bw, d, w, h: FLOAT32; scale: SIGNED32; ctxt: GfxPrinter.Context; s, t: ARRAY 16 OF CHAR;
 	BEGIN
 		pw := SHORT(LONG(prev.W) * Display.Unit DIV Printer.Unit);
 		ph := SHORT(LONG(prev.H) * Display.Unit DIV Printer.Unit);
@@ -917,7 +917,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END RevertStroker;
 
 	PROCEDURE ApplyStroker (editor: LeoPanels.Editor);
-		VAR obj: Objects.Object; pen: LeoPens.Stroker; x: REAL; i: SIGNED32;
+		VAR obj: Objects.Object; pen: LeoPens.Stroker; x: FLOAT32; i: SIGNED32;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoPens.Stroker) THEN
@@ -972,7 +972,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END RevertFiller;
 
 	PROCEDURE ApplyFiller (editor: LeoPanels.Editor);
-		VAR obj: Objects.Object; pen: LeoPens.Filler; i: SIGNED32; x: REAL;
+		VAR obj: Objects.Object; pen: LeoPens.Filler; i: SIGNED32; x: FLOAT32;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoPens.Filler) THEN
@@ -1034,7 +1034,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END RevertDasher;
 
 	PROCEDURE ApplyDasher (editor: LeoPanels.Editor);
-		VAR obj: Objects.Object; pen: LeoPens.Dasher; len, n: SIGNED32; name: ARRAY 5 OF CHAR; x: REAL; b: BOOLEAN;
+		VAR obj: Objects.Object; pen: LeoPens.Dasher; len, n: SIGNED32; name: ARRAY 5 OF CHAR; x: FLOAT32; b: BOOLEAN;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoPens.Dasher) THEN
@@ -1179,7 +1179,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END RevertOutliner;
 
 	PROCEDURE ApplyOutliner (editor: LeoPanels.Editor);
-		VAR obj: Objects.Object; pen: LeoOutliners.Outliner; x: REAL; i: SIGNED32;
+		VAR obj: Objects.Object; pen: LeoOutliners.Outliner; x: FLOAT32; i: SIGNED32;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoOutliners.Outliner) THEN
@@ -1233,7 +1233,7 @@ MODULE LeoPenEditors IN Oberon; (** portable **)	(* eos  *)
 	END RevertArrow;
 
 	PROCEDURE ApplyArrow (editor: LeoPanels.Editor);
-		VAR obj: Objects.Object; pen: LeoOutliners.Arrow; i: SIGNED32; x: REAL;
+		VAR obj: Objects.Object; pen: LeoOutliners.Arrow; i: SIGNED32; x: FLOAT32;
 	BEGIN
 		Links.GetLink(editor, "Model", obj);
 		IF (obj # NIL) & (obj IS LeoOutliners.Arrow) THEN

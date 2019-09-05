@@ -30,8 +30,8 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 	TYPE
 		Context* = POINTER TO ContextDesc;
 		ContextDesc* = RECORD (GfxRaster.ContextDesc)
-			orgX*, orgY*: REAL;	(** origin of default coordinate system **)
-			scale*: REAL;	(** scale factor of default coordinate system **)
+			orgX*, orgY*: FLOAT32;	(** origin of default coordinate system **)
+			scale*: FLOAT32;	(** scale factor of default coordinate system **)
 			defClip*: GfxRegions.Region;	(** default clipping region **)
 			bg*: Gfx.Color;	(** background color for erasing **)
 			bgCol: Display.Color;	(* display color corresponding to background color *)
@@ -328,9 +328,9 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 		END
 	END CopyPattern;
 
-	PROCEDURE Show (ctxt: Gfx.Context; x, y: REAL; VAR str: ARRAY OF CHAR);
+	PROCEDURE Show (ctxt: Gfx.Context; x, y: FLOAT32; VAR str: ARRAY OF CHAR);
 		VAR
-			mat: GfxMatrix.Matrix; font: GfxFonts.Font; dc: Context; u, v: REAL;
+			mat: GfxMatrix.Matrix; font: GfxFonts.Font; dc: Context; u, v: FLOAT32;
 			px, py, i, aw, dx, bx, by, w, h: SIGNED16; pat: Display.Pattern; data: RegData;
 	BEGIN
 		GfxMatrix.Concat(ctxt.font.mat, ctxt.ctm, mat);
@@ -509,8 +509,8 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 
 	(*--- Draw Bitmap ---*)
 
-	PROCEDURE Image (ctxt: Gfx.Context; x, y: REAL; img: Images.Image; VAR filter: GfxImages.Filter);
-		VAR dc: Context; m: GfxMatrix.Matrix; dx, dy, llx, lly, urx, ury: SIGNED16; x0, y0, x1, y1: REAL; data: RegData;
+	PROCEDURE Image (ctxt: Gfx.Context; x, y: FLOAT32; img: Images.Image; VAR filter: GfxImages.Filter);
+		VAR dc: Context; m: GfxMatrix.Matrix; dx, dy, llx, lly, urx, ury: SIGNED16; x0, y0, x1, y1: FLOAT32; data: RegData;
 	BEGIN
 		dc := ctxt(Context);
 		GfxMatrix.Translate(dc.ctm, x, y, m);
@@ -610,7 +610,7 @@ MODULE GfxDisplay IN Oberon; (** portable *)	(* eos  *)
 	END SetClipRegion;
 
 	(** set default coordinate origin and scale factor **)
-	PROCEDURE SetCoordinates* (dc: Context; x, y, scale: REAL);
+	PROCEDURE SetCoordinates* (dc: Context; x, y, scale: FLOAT32);
 	BEGIN
 		dc.orgX := x; dc.orgY := y; dc.scale := scale
 	END SetCoordinates;

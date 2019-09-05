@@ -904,10 +904,10 @@ TYPE
 
 		Based on the "0x5f3759df" algorithm described in Wikipedia ( https://en.wikipedia.org/wiki/Fast_inverse_square_root )
 	*)
-	PROCEDURE InvSqrt(x: REAL): REAL;
+	PROCEDURE InvSqrt(x: FLOAT32): FLOAT32;
 	VAR y: Real;
 	BEGIN
-		y := SYSTEM.VAL(REAL,0x5f3759df - SYSTEM.VAL(SIGNED32,x) DIV 2); (* ~4% of error *)
+		y := SYSTEM.VAL(FLOAT32,0x5f3759df - SYSTEM.VAL(SIGNED32,x) DIV 2); (* ~4% of error *)
 		RETURN y * ( 1.5E0 - y * y * (x * 0.5E0) ); (* ~0.15% of error *)
 	END InvSqrt;
 

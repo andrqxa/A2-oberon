@@ -49,7 +49,7 @@ TYPE
 
 TYPE
 	LoadMonitor = OBJECT (Monitor)	(* singleton *)
-		VAR exp: ARRAY 3 OF REAL;
+		VAR exp: ARRAY 3 OF FLOAT32;
 
 		PROCEDURE &Init*(period: SIGNED32; randomized: BOOLEAN);
 		BEGIN
@@ -112,17 +112,17 @@ TYPE
 	END IdleMonitor;
 
 VAR
-	load*: ARRAY 3 OF REAL;	(** load estimates *)
+	load*: ARRAY 3 OF FLOAT32;	(** load estimates *)
 	idle*: ARRAY Machine.MaxCPU OF SIGNED32;	(** idle percentage estimates *)
 	loadmon: LoadMonitor;
 	idlemon: IdleMonitor;
 
-PROCEDURE UpdateLoad(VAR load: REAL; exp: REAL; n: SIGNED32);
+PROCEDURE UpdateLoad(VAR load: FLOAT32; exp: FLOAT32; n: SIGNED32);
 BEGIN
-	load := load*exp + (1-exp)*n	(* REAL assigments are atomic *)
+	load := load*exp + (1-exp)*n	(* FLOAT32 assigments are atomic *)
 END UpdateLoad;
 
-PROCEDURE WriteLoad(load: REAL);
+PROCEDURE WriteLoad(load: FLOAT32);
 VAR x: SIGNED32;
 BEGIN
 	IF Trace THEN

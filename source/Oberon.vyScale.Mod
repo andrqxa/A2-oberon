@@ -58,7 +58,7 @@ TYPE
 		dx, dy: Coordinate;
 		xregion, yregion: Coordinate;
 		ToReal: BOOLEAN;
-		trx, try: REAL
+		trx, try: FLOAT32
 	END;
 
 VAR
@@ -319,7 +319,7 @@ VAR
 	END New;
 
 	PROCEDURE Insert*;
-	VAR pict: vyPort.Picture;  sc: vyParser.Scanner;  x, y: REAL;
+	VAR pict: vyPort.Picture;  sc: vyParser.Scanner;  x, y: FLOAT32;
 	BEGIN
 		vyParser.OpenParScanner( sc );  pict := vyPort.GetFocusPicture();
 		(*! teste auf 2d Koordinaten *)

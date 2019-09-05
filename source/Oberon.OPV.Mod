@@ -874,7 +874,7 @@ Statements
 	END Call;
 
 	PROCEDURE Expression (n: OPT.Node; VAR z: OPC.Item; selfForUnlock: OPT.Node);
-		VAR x, y: OPC.Item; f: SIGNED16; real: REAL; con: OPT.Const; typ: OPT.Struct;
+		VAR x, y: OPC.Item; f: SIGNED16; real: FLOAT32; con: OPT.Const; typ: OPT.Struct;
 
 		PROCEDURE AllocConst (VAR bytes: ARRAY OF SYSTEM.BYTE; len, align: SIGNED32);
 			VAR con1, con2: OPT.Const;

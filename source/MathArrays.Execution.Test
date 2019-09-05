@@ -445,7 +445,7 @@ positive: test driver
 		END TestX3;
 
 
-		PROCEDURE FillR0(VAR a: ARRAY [?] OF REAL; base: SIGNED32);
+		PROCEDURE FillR0(VAR a: ARRAY [?] OF FLOAT32; base: SIGNED32);
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
@@ -455,11 +455,11 @@ positive: test driver
 			END;
 		END FillR0;
 
-		PROCEDURE FillR*(VAR a: ARRAY [?] OF REAL);
+		PROCEDURE FillR*(VAR a: ARRAY [?] OF FLOAT32);
 		BEGIN FillR0(a,0);
 		END FillR;
 
-		PROCEDURE TestFillR0*(CONST a: ARRAY [?] OF REAL; base: SIGNED32);
+		PROCEDURE TestFillR0*(CONST a: ARRAY [?] OF FLOAT32; base: SIGNED32);
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
@@ -474,7 +474,7 @@ positive: test driver
 			TestFillX0(a,0);
 		END TestFillR;
 
-		PROCEDURE RandomR*(VAR a: ARRAY [?] OF REAL);
+		PROCEDURE RandomR*(VAR a: ARRAY [?] OF FLOAT32);
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
@@ -484,32 +484,32 @@ positive: test driver
 			END;
 		END RandomR;
 
-		PROCEDURE TestR1*(CONST a: ARRAY [*] OF REAL; r: RANGE);
+		PROCEDURE TestR1*(CONST a: ARRAY [*] OF FLOAT32; r: RANGE);
 		VAR i: SIGNED32;
 		BEGIN
 		 	i := FIRST(r); WHILE i <= LAST(r) DO
-		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=REAL(i));
+		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=FLOAT32(i));
 		 		INC(i,STEP(r));
 		 	END;
 		END TestR1;
 
-		PROCEDURE TestR2*(CONST a: ARRAY [*,*] OF REAL; r1, r2: RANGE);
+		PROCEDURE TestR2*(CONST a: ARRAY [*,*] OF FLOAT32; r1, r2: RANGE);
 		VAR i,j: SIGNED32;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
-		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2)]=REAL(10*i+j));
+		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2)]=FLOAT32(10*i+j));
 		 	INC(j,STEP(r2)) END;
 		 	INC(i,STEP(r1)) END;
 		END TestR2;
 
-		PROCEDURE TestR3*(CONST a: ARRAY [*,*,*] OF REAL; r1, r2, r3: RANGE);
+		PROCEDURE TestR3*(CONST a: ARRAY [*,*,*] OF FLOAT32; r1, r2, r3: RANGE);
 		VAR i,j,k: SIGNED32;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
 		 	k := FIRST(r3); WHILE k <= LAST(r3) DO
-		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2),(k-FIRST(r3)) DIV STEP(r3)]=REAL(100*i+10*j+k));
+		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2),(k-FIRST(r3)) DIV STEP(r3)]=FLOAT32(100*i+10*j+k));
 		 	INC(k,STEP(r3)) END;
 		 	INC(j,STEP(r2)) END;
 		 	INC(i,STEP(r1)) END;
@@ -558,7 +558,7 @@ positive: driver tests (fill and compare arrays)
 		END TestL;
 
 		PROCEDURE TestR;
-		VAR a: ARRAY [*,*] OF REAL; b: ARRAY [?] OF REAL; c: ARRAY [2,3] OF REAL;
+		VAR a: ARRAY [*,*] OF FLOAT32; b: ARRAY [?] OF FLOAT32; c: ARRAY [2,3] OF FLOAT32;
 		BEGIN
 			NEW(a,2,3); NEW(b,2,3);
 			Driver.FillR(a); Driver.FillR(b); Driver.FillR(c);
@@ -658,7 +658,7 @@ positive: simple tests for ranges
 	END TestL;
 
 	PROCEDURE TestR;
-	VAR s1: ARRAY [*] OF REAL; s2: ARRAY [*,*] OF REAL; s3: ARRAY [*,*,*] OF REAL;
+	VAR s1: ARRAY [*] OF FLOAT32; s2: ARRAY [*,*] OF FLOAT32; s3: ARRAY [*,*,*] OF FLOAT32;
 	BEGIN
 		NEW(s1,3); NEW(s2,3,4); NEW(s3,3,4,5);
 		Driver.FillR(s1); Driver.FillR(s2); Driver.FillR(s3);
@@ -687,7 +687,7 @@ positive: conversion tests
 
 	MODULE Test;
 	IMPORT Driver;
-	VAR s: ARRAY [?] OF SIGNED8; i: ARRAY [?] OF SIGNED16; l: ARRAY [?] OF SIGNED32; r: ARRAY [?] OF REAL; x: ARRAY [?] OF LONGREAL;
+	VAR s: ARRAY [?] OF SIGNED8; i: ARRAY [?] OF SIGNED16; l: ARRAY [?] OF SIGNED32; r: ARRAY [?] OF FLOAT32; x: ARRAY [?] OF LONGREAL;
 	BEGIN
 		NEW(s,2,3,5);
 		Driver.FillS(s); Driver.TestFillS(s);
@@ -706,7 +706,7 @@ positive: correct use of ADDRESS OF and SYSTEM.VAL for tensors and open math arr
 	MODULE Test;
 	IMPORT SYSTEM;
 
-	VAR a: ARRAY [*,*,*] OF REAL;
+	VAR a: ARRAY [*,*,*] OF FLOAT32;
 
 	PROCEDURE GetDim(adr: ADDRESS): SIGNED32;
 	CONST
@@ -716,7 +716,7 @@ positive: correct use of ADDRESS OF and SYSTEM.VAL for tensors and open math arr
 		SYSTEM.GET(adr+MathDimOffset,adr); RETURN adr;
 	END GetDim;
 
-	PROCEDURE P(CONST a: ARRAY [?] OF REAL);
+	PROCEDURE P(CONST a: ARRAY [?] OF FLOAT32);
 	VAR adr,val,val2: SIGNED32;
 	BEGIN
 		adr := SYSTEM.ADR(a);
@@ -726,7 +726,7 @@ positive: correct use of ADDRESS OF and SYSTEM.VAL for tensors and open math arr
 		ASSERT(GetDim(val) = 3);
 	END P;
 
-	PROCEDURE Q(CONST a: ARRAY [*,*,*] OF REAL);
+	PROCEDURE Q(CONST a: ARRAY [*,*,*] OF FLOAT32);
 	VAR adr: SIGNED32;
 	BEGIN
 		adr := SYSTEM.ADR(a);
@@ -742,7 +742,7 @@ positive: Test of Min and Max
 
 	MODULE Test;
 
-	TYPE B= ARRAY [*,*] OF REAL;
+	TYPE B= ARRAY [*,*] OF FLOAT32;
 	CONST a = [[1,2,3],
 				[4,5,6],
 				[7,8,9]];
@@ -795,8 +795,8 @@ positive: Temporary allocation of small arrays (failed before 2016.10.07)
 	MODULE Test;
 
 	PROCEDURE Do;
-	VAR LT1,LT2: ARRAY [4,4] OF REAL;
-	    L: ARRAY [4] OF REAL;
+	VAR LT1,LT2: ARRAY [4,4] OF FLOAT32;
+	    L: ARRAY [4] OF FLOAT32;
 	BEGIN
 	    L := LT1 * LT2 * [0.3, 0, 0, 1];
 	END Do;

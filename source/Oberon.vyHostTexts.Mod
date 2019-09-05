@@ -136,12 +136,12 @@ VAR
 
 PROCEDURE InRealRange (x: LONGREAL): BOOLEAN;
 BEGIN
-	RETURN (x >= MIN(REAL)) & (x <= MAX(REAL))
+	RETURN (x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32))
 END InRealRange;
 
 PROCEDURE WReal* (VAR w: Texts.Writer;   x: LONGREAL;   prec: SIGNED16);
 BEGIN
-	IF (x >= MIN(REAL)) & (x <= MAX(REAL)) THEN	Texts.WriteReal(w, SHORT(x), prec) ELSE Texts.WriteLongReal(w, x, prec) END
+	IF (x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)) THEN	Texts.WriteReal(w, SHORT(x), prec) ELSE Texts.WriteLongReal(w, x, prec) END
 END WReal;
 
 PROCEDURE DebugNote (s: ARRAY OF CHAR);
@@ -156,7 +156,7 @@ BEGIN
 	Texts.WriteRealFix(W,x, n, f);
 	*)
 	(*S3 *)
-	IF (x >= MIN(REAL)) & (x <= MAX(REAL)) THEN
+	IF (x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)) THEN
 		Texts.WriteRealFix(W, SHORT(x), n, f, E)
 	ELSE Texts.WriteLongRealFix(W, SHORT(x), n, f, E)
 	END
@@ -440,7 +440,7 @@ BEGIN
 	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteLongRealFix(W, x[start], n, f, E);   INC(start) END
 END WriteLongRealFixTab;
 
-PROCEDURE WriteRealTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF REAL;   start: SIGNED32;   n: SIGNED32);
+PROCEDURE WriteRealTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF FLOAT32;   start: SIGNED32;   n: SIGNED32);
 BEGIN
 	IF len <= 0 THEN RETURN END;
 	Texts.WriteReal(W, x[start], n);
@@ -448,7 +448,7 @@ BEGIN
 	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteReal(W, x[start], n);   INC(start) END
 END WriteRealTab;
 
-PROCEDURE WriteRealFixTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF REAL;   start: SIGNED32;   n, f, E: SIGNED32);
+PROCEDURE WriteRealFixTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF FLOAT32;   start: SIGNED32;   n, f, E: SIGNED32);
 BEGIN
 	IF len <= 0 THEN RETURN END;
 	Texts.WriteRealFix(W, x[start], n, f, E);
@@ -460,7 +460,7 @@ END WriteRealFixTab;
 PROCEDURE WriteReal* (VAR W: Texts.Writer;   x: LONGREAL);
 	(*! replace by smatrt choice *)
 BEGIN
-	IF (x >= MIN(REAL)) & (x <= MAX(REAL)) THEN
+	IF (x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)) THEN
 		Texts.WriteRealFix(W, SHORT(x), 12, 3, 3)
 	ELSE
 		Texts.WriteLongRealFix(W, SHORT(x), 12, 3, 3)
@@ -777,7 +777,7 @@ BEGIN
 	Texts.WriteLn(w); WritePrevStyle(w)
 END DumpBool;
 
-PROCEDURE DumpReal* (VAR w: Texts.Writer;    VAR a: ARRAY OF REAL;   prec: SIGNED16);
+PROCEDURE DumpReal* (VAR w: Texts.Writer;    VAR a: ARRAY OF FLOAT32;   prec: SIGNED16);
 	VAR i, count: SIZE;
 BEGIN   WriteTableStyle(w);
 	count := LEN(a); i := 0;
@@ -829,7 +829,7 @@ BEGIN Texts.WriteString(w, "Summary for boolean array");   Texts.WriteLn(w);   i
 	Texts.WriteLn(w)
 END SummaryBool;
 
-PROCEDURE SummaryReal* (VAR w: Texts.Writer;   count: SIGNED32;   VAR a: ARRAY OF REAL;   prec: SIGNED16);
+PROCEDURE SummaryReal* (VAR w: Texts.Writer;   count: SIGNED32;   VAR a: ARRAY OF FLOAT32;   prec: SIGNED16);
 	VAR i: SIGNED32;
 BEGIN Texts.WriteString(w, "Summary for real array ");
 	Texts.WriteString(w, " count=");   Texts.WriteInt(w, count, 0);

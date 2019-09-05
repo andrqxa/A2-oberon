@@ -324,7 +324,7 @@ VAR
 	VAR
 		i: SIGNED32;
 		w: Writer;
-		speed: REAL;
+		speed: FLOAT32;
 	BEGIN
 		i := 0;
 		WHILE (i < writers.Length()) & (writers.Get(i)(Writer).id # id) DO
@@ -333,7 +333,7 @@ VAR
 
 		IF i < writers.Length() THEN
 			w := writers.Get(i)(Writer);
-			speed := 1000.0 * REAL(w.byteCount-w.startByteCount) / Kernel.Elapsed(w.tStart);
+			speed := 1000.0 * FLOAT32(w.byteCount-w.startByteCount) / Kernel.Elapsed(w.tStart);
 			ctx.out.String("byte count="); ctx.out.Int(w.byteCount,0); ctx.out.Ln;
 			ctx.out.String("speed="); ctx.out.FloatFix(speed,0,5,0); ctx.out.String(" bytes/s"); ctx.out.Ln;
 			ctx.out.String("status: ");

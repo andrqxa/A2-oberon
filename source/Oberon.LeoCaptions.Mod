@@ -29,7 +29,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 			font*: GfxFonts.Font;	(** caption font (instanced at 300 dpi for calculating metrics) **)
 			mat*: GfxMatrix.Matrix;	(** transform from font to local coordinates **)
 			color*: Gfx.Color;	(** caption color **)
-			width: REAL;	(* advance width in figure space along baseline *)
+			width: FLOAT32;	(* advance width in figure space along baseline *)
 			caret: SIGNED32;	(* logical caret position, negative if not holding focus *)
 			update: SIGNED8;	(* kind of update *)
 			from, to: SIGNED32;	(* update stretch *)
@@ -40,7 +40,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 			id*: SIGNED8;	(** consume/accept/release **)
 			char*: CHAR;	(** character to consume **)
 			res*: SIGNED16;	(** result for consume **)
-			fx*, fy*: REAL;	(** focus coordinates (in figure space) **)
+			fx*, fy*: FLOAT32;	(** focus coordinates (in figure space) **)
 			gdm*: GfxMatrix.Matrix;	(** transforms global to device coordinates **)
 			shape*: Leonardo.Shape;	(** shape accepting the focus **)
 		END;
@@ -60,7 +60,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 
 	(**--- Focus Handling ---**)
 
-	PROCEDURE Accept* (fig: Leonardo.Figure; x, y: REAL; gdm: GfxMatrix.Matrix): Leonardo.Shape;
+	PROCEDURE Accept* (fig: Leonardo.Figure; x, y: FLOAT32; gdm: GfxMatrix.Matrix): Leonardo.Shape;
 		VAR fm: FocusMsg;
 	BEGIN
 		fm.id := accept; fm.fx := x; fm.fy := y; fm.gdm := gdm; fm.shape := NIL; fig.handle(fig, fm);
@@ -89,7 +89,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 
 	(**--- Captions ---**)
 
-	PROCEDURE GetOffset (cap: Caption; len: SIGNED32; font: GfxFonts.Font; VAR x, y: REAL);
+	PROCEDURE GetOffset (cap: Caption; len: SIGNED32; font: GfxFonts.Font; VAR x, y: FLOAT32);
 		VAR ch: CHAR;
 	BEGIN
 		IF len > 0 THEN
@@ -112,7 +112,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Set;
 
 	PROCEDURE CalcBox (cap: Caption; VAR mat: GfxMatrix.Matrix);
-		VAR h: REAL; m: GfxMatrix.Matrix;
+		VAR h: FLOAT32; m: GfxMatrix.Matrix;
 	BEGIN
 		GfxFonts.GetStringWidth(cap.font, cap.text^, cap.width, h);
 		GfxMatrix.Concat(cap.mat, mat, m);
@@ -126,7 +126,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		VAR lgm: GfxMatrix.Matrix;
 
 		PROCEDURE update (from, to: SIGNED32);
-			VAR fx, y, tx, llx, lly, urx, ury: REAL;
+			VAR fx, y, tx, llx, lly, urx, ury: FLOAT32;
 		BEGIN
 			GetOffset(cap, from, cap.font, fx, y);
 			IF to = from THEN tx := fx
@@ -172,7 +172,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Validate;
 
 	PROCEDURE Outline (cap: Caption; VAR msg: LeoPaths.RenderMsg);
-		VAR pen: LeoPens.Pen; path: GfxPaths.Path; i: SIGNED32; x, y, dx, dy: REAL; scan: GfxPaths.Scanner;
+		VAR pen: LeoPens.Pen; path: GfxPaths.Path; i: SIGNED32; x, y, dx, dy: FLOAT32; scan: GfxPaths.Scanner;
 	BEGIN
 		pen := msg.pen; NEW(path);
 		i := 0; x := 0; y := 0;
@@ -198,7 +198,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Outline;
 
 	PROCEDURE Render (cap: Caption; VAR msg: Leonardo.RenderMsg);
-		VAR llx, lly, urx, ury, cx, cy, lw: REAL; ctm, lgm, m: GfxMatrix.Matrix; font: GfxFonts.Font; col: Gfx.Color;
+		VAR llx, lly, urx, ury, cx, cy, lw: FLOAT32; ctm, lgm, m: GfxMatrix.Matrix; font: GfxFonts.Font; col: Gfx.Color;
 	BEGIN
 		IF (msg.id IN {Leonardo.active, Leonardo.passive, Leonardo.marksonly}) OR (msg.id = Leonardo.marked) & cap.marked THEN
 			llx := cap.llx - cap.bw; lly := cap.lly - cap.bw; urx := cap.urx + cap.bw; ury := cap.ury + cap.bw;
@@ -242,7 +242,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Render;
 
 	PROCEDURE Locate (cap: Caption; VAR msg: Leonardo.LocateMsg);
-		VAR mat, inv, lgm: GfxMatrix.Matrix; llx, lly, urx, ury: REAL;
+		VAR mat, inv, lgm: GfxMatrix.Matrix; llx, lly, urx, ury: FLOAT32;
 	BEGIN
 		IF (msg.id = Leonardo.inside) & (msg.llx <= cap.llx) & (cap.urx <= msg.urx) & (msg.lly <= cap.lly) & (cap.ury <= msg.ury) THEN
 			cap.slink := msg.res; msg.res := cap
@@ -350,7 +350,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 	END Edit;
 
 	PROCEDURE Focus (cap: Caption; VAR msg: FocusMsg);
-		VAR fx, fy, x0, x1, y, xm: REAL; car, p0, p1, pm: SIGNED32; m, mm, inv: GfxMatrix.Matrix; font: GfxFonts.Font;
+		VAR fx, fy, x0, x1, y, xm: FLOAT32; car, p0, p1, pm: SIGNED32; m, mm, inv: GfxMatrix.Matrix; font: GfxFonts.Font;
 	BEGIN
 		IF (msg.id = consume) & (cap.caret >= 0) THEN
 			Edit(msg.fig, cap, msg.char); msg.res := 0
@@ -548,7 +548,7 @@ MODULE LeoCaptions IN Oberon; (** portable **)	(* eos  *)
 		END
 	END Handle;
 
-	PROCEDURE Init* (cap: Caption; x, y: REAL; text: ARRAY OF CHAR; font: GfxFonts.Font; col: Gfx.Color);
+	PROCEDURE Init* (cap: Caption; x, y: FLOAT32; text: ARRAY OF CHAR; font: GfxFonts.Font; col: Gfx.Color);
 		VAR len: SIGNED32;
 	BEGIN
 		cap.handle := Handle;

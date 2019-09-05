@@ -19,7 +19,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		(** color objects **)
 		Color* = POINTER TO ColorDesc;
 		ColorDesc* = RECORD (Objects.ObjDesc)
-			r, g, b: REAL;	(* internal representation is RGB *)
+			r, g, b: FLOAT32;	(* internal representation is RGB *)
 		END;
 
 		(** inverse color lookup table **)
@@ -213,7 +213,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 	(**--- Conversion Routines ---**)
 
 	(** Oberon display model **)
-	PROCEDURE DisplayToRGB* (dcol: Display.Color; VAR r, g, b: REAL);
+	PROCEDURE DisplayToRGB* (dcol: Display.Color; VAR r, g, b: FLOAT32);
 		VAR dr, dg, db: SIGNED16;
 	BEGIN
 		IF dcol < 0 THEN Display.GetColor(dcol, dr, dg, db)
@@ -222,7 +222,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		r := (1/255)*dr; g := (1/255)*dg; b := (1/255)*db
 	END DisplayToRGB;
 
-	PROCEDURE RGBToDisplay* (r, g, b: REAL; VAR dcol: Display.Color);
+	PROCEDURE RGBToDisplay* (r, g, b: FLOAT32; VAR dcol: Display.Color);
 		VAR dr, dg, db: SIGNED32;
 	BEGIN
 		dr := ENTIER(255*r); dg := ENTIER(255*g); db := ENTIER(255*b);
@@ -235,8 +235,8 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 
 
 	(** HSV (Hue Saturation Value) model **)
-	PROCEDURE RGBToHSV* (r, g, b: REAL; VAR h, s, v: REAL);
-		VAR min, d: REAL;
+	PROCEDURE RGBToHSV* (r, g, b: FLOAT32; VAR h, s, v: FLOAT32);
+		VAR min, d: FLOAT32;
 	BEGIN
 		(* conversion algorithm: Foley et al. fig 13.33 *)
 		IF r < g THEN
@@ -268,8 +268,8 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		END
 	END RGBToHSV;
 
-	PROCEDURE HSVToRGB* (h, s, v: REAL; VAR r, g, b: REAL);
-		VAR i: SIGNED32; f, p, q, t: REAL;
+	PROCEDURE HSVToRGB* (h, s, v: FLOAT32; VAR r, g, b: FLOAT32);
+		VAR i: SIGNED32; f, p, q, t: FLOAT32;
 	BEGIN
 		(* conversion algorithm: Foley et al. fig 13.34 *)
 		IF s = 0 THEN	(* achromatic case  *)
@@ -290,19 +290,19 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 
 
 	(** CMY (Cyan Magenta Yellow) model **)
-	PROCEDURE RGBToCMY* (r, g, b: REAL; VAR c, m, y: REAL);
+	PROCEDURE RGBToCMY* (r, g, b: FLOAT32; VAR c, m, y: FLOAT32);
 	BEGIN
 		c := 1 - r; m := 1 - g; y := 1 - b
 	END RGBToCMY;
 
-	PROCEDURE CMYToRGB* (c, m, y: REAL; VAR r, g, b: REAL);
+	PROCEDURE CMYToRGB* (c, m, y: FLOAT32; VAR r, g, b: FLOAT32);
 	BEGIN
 		r := 1 - c; g := 1 - m; b := 1 - y
 	END CMYToRGB;
 
 
 	(** CMYK (Cyan Magenta Yellow blacK) model **)
-	PROCEDURE RGBToCMYK* (r, g, b: REAL; VAR c, m, y, k: REAL);
+	PROCEDURE RGBToCMYK* (r, g, b: FLOAT32; VAR c, m, y, k: FLOAT32);
 	BEGIN
 		c := 1 - r; m := 1 - g; y := 1 - b;
 		IF r < g THEN
@@ -317,7 +317,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		c := c - k; m := m - k; y := y - k
 	END RGBToCMYK;
 
-	PROCEDURE CMYKToRGB* (c, m, y, k: REAL; VAR r, g, b: REAL);
+	PROCEDURE CMYKToRGB* (c, m, y, k: FLOAT32; VAR r, g, b: FLOAT32);
 	BEGIN
 		r := 1 - (k + c); g := 1 - (k + m); b := 1 - (k + y)
 	END CMYKToRGB;
@@ -334,7 +334,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 
 	(** message handler **)
 	PROCEDURE Handle* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR col, copy: Color; x, y, z, w: REAL; lib: Objects.Library; ref: SIGNED16; ver: SIGNED32;
+		VAR col, copy: Color; x, y, z, w: FLOAT32; lib: Objects.Library; ref: SIGNED16; ver: SIGNED32;
 	BEGIN
 		col := obj(Color);
 		IF msg IS Objects.AttrMsg THEN
@@ -489,7 +489,7 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 	END New;
 
 	(** initialization **)
-	PROCEDURE InitRGB* (col: Color; r, g, b: REAL);
+	PROCEDURE InitRGB* (col: Color; r, g, b: FLOAT32);
 	BEGIN
 		col.handle := Handle; col.r := r; col.g := g; col.b := b
 	END InitRGB;
@@ -500,26 +500,26 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		DisplayToRGB(dcol, col.r, col.g, col.b)
 	END InitDisplay;
 
-	PROCEDURE InitHSV* (col: Color; h, s, v: REAL);
+	PROCEDURE InitHSV* (col: Color; h, s, v: FLOAT32);
 	BEGIN
 		col.handle := Handle;
 		HSVToRGB(h, s, v, col.r, col.g, col.b)
 	END InitHSV;
 
-	PROCEDURE InitCMY* (col: Color; c, m, y: REAL);
+	PROCEDURE InitCMY* (col: Color; c, m, y: FLOAT32);
 	BEGIN
 		col.handle := Handle;
 		CMYToRGB(c, m, y, col.r, col.g, col.b)
 	END InitCMY;
 
-	PROCEDURE InitCMYK* (col: Color; c, m, y, k: REAL);
+	PROCEDURE InitCMYK* (col: Color; c, m, y, k: FLOAT32);
 	BEGIN
 		col.handle := Handle;
 		CMYKToRGB(c, m, y, k, col.r, col.g, col.b)
 	END InitCMYK;
 
 	(** get color values **)
-	PROCEDURE GetRGB* (col: Color; VAR r, g, b: REAL);
+	PROCEDURE GetRGB* (col: Color; VAR r, g, b: FLOAT32);
 	BEGIN
 		r := col.r; g := col.g; b := col.b
 	END GetRGB;
@@ -529,23 +529,23 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		RGBToDisplay(col.r, col.g, col.b, dcol)
 	END GetDisplay;
 
-	PROCEDURE GetHSV* (col: Color; VAR h, s, v: REAL);
+	PROCEDURE GetHSV* (col: Color; VAR h, s, v: FLOAT32);
 	BEGIN
 		RGBToHSV(col.r, col.g, col.b, h, s, v)
 	END GetHSV;
 
-	PROCEDURE GetCMY* (col: Color; VAR c, m, y: REAL);
+	PROCEDURE GetCMY* (col: Color; VAR c, m, y: FLOAT32);
 	BEGIN
 		RGBToCMY(col.r, col.b, col.b, c, m, y)
 	END GetCMY;
 
-	PROCEDURE GetCMYK* (col: Color; VAR c, m, y, k: REAL);
+	PROCEDURE GetCMYK* (col: Color; VAR c, m, y, k: FLOAT32);
 	BEGIN
 		RGBToCMYK(col.r, col.g, col.b, c, m, y, k)
 	END GetCMYK;
 
 	(** set color values **)
-	PROCEDURE SetRGB* (col: Color; r, g, b: REAL);
+	PROCEDURE SetRGB* (col: Color; r, g, b: FLOAT32);
 	BEGIN
 		col.r := r; col.g := g; col.b := b
 	END SetRGB;
@@ -555,17 +555,17 @@ MODULE Colors IN Oberon; (** portable **)	(* eos  *)
 		DisplayToRGB(dcol, col.r, col.g, col.b)
 	END SetDisplay;
 
-	PROCEDURE SetHSV* (col: Color; h, s, v: REAL);
+	PROCEDURE SetHSV* (col: Color; h, s, v: FLOAT32);
 	BEGIN
 		HSVToRGB(h, s, v, col.r, col.g, col.b)
 	END SetHSV;
 
-	PROCEDURE SetCMY* (col: Color; c, m, y: REAL);
+	PROCEDURE SetCMY* (col: Color; c, m, y: FLOAT32);
 	BEGIN
 		CMYToRGB(c, m, y, col.r, col.b, col.b)
 	END SetCMY;
 
-	PROCEDURE SetCMYK* (col: Color; c, m, y, k: REAL);
+	PROCEDURE SetCMYK* (col: Color; c, m, y, k: FLOAT32);
 	BEGIN
 		CMYKToRGB(c, m, y, k, col.r, col.b, col.b)
 	END SetCMYK;

@@ -17,7 +17,7 @@ CONST
 	XYZ* = 3;   (** col=x, row=y, value=z *)
 
 TYPE
-	Datatype = REAL;
+	Datatype = FLOAT32;
 	Matrix = ARRAY [*,*] OF Datatype;
 	Point = ARRAY [*] OF Datatype;
 	IntPoint = ARRAY [*] OF SIGNED32;
@@ -131,9 +131,9 @@ TYPE
 		PROCEDURE DrawBackground(canvas : WMGraphics.Canvas);
 		VAR
 			depth, x, y, col : SIGNED32;
-			x0, y0, z0 : REAL;
+			x0, y0, z0 : FLOAT32;
 			p : Point; p0, p1 : IntPoint;
-			scale : REAL; zscale, zrange, minz: REAL;
+			scale : FLOAT32; zscale, zrange, minz: FLOAT32;
 		BEGIN
 			DrawBackground^(canvas);
 			IF (modelI = NIL) THEN RETURN; END;

@@ -42,7 +42,7 @@ VAR
 	END;
 
 (** Zufallszahl **)
-PROCEDURE Uniform*(): REAL;
+PROCEDURE Uniform*(): FLOAT32;
 CONST a = 16807; m = 2147483647; q = m DIV a; r = m MOD a;
 VAR g: SIGNED32;
 BEGIN
@@ -164,21 +164,21 @@ BEGIN
 	END;
 END Floyd;
 
-PROCEDURE RGBtoHSV(R, G, B: REAL; VAR H, S, V: REAL);
+PROCEDURE RGBtoHSV(R, G, B: FLOAT32; VAR H, S, V: FLOAT32);
 (* Wandelt RGB-Werte in HSV-Werte um *)
 CONST	undef = 361;
 VAR
-	maxVal, minVal, diff, Rdist, Gdist, Bdist: REAL;
+	maxVal, minVal, diff, Rdist, Gdist, Bdist: FLOAT32;
 
-	PROCEDURE maxOf(R, G, B: REAL): REAL;
-	VAR	max: REAL;
+	PROCEDURE maxOf(R, G, B: FLOAT32): FLOAT32;
+	VAR	max: FLOAT32;
 	BEGIN
 		IF R > G THEN max := R ELSE max := G END;
 		IF B > max THEN RETURN B ELSE RETURN max END;
 	END maxOf;
 
-	PROCEDURE minOf(R, G, B: REAL): REAL;
-	VAR	min: REAL;
+	PROCEDURE minOf(R, G, B: FLOAT32): FLOAT32;
+	VAR	min: FLOAT32;
 	BEGIN
 		IF R < G THEN min := R ELSE min := G END;
 		IF B < min THEN RETURN B ELSE RETURN min END
@@ -204,9 +204,9 @@ BEGIN
 	END
 END RGBtoHSV;
 
-PROCEDURE HSVtoRGB(H, S, V: REAL; VAR R, G, B: REAL);
+PROCEDURE HSVtoRGB(H, S, V: FLOAT32; VAR R, G, B: FLOAT32);
 (* Wandelt HSV-Wrte in RGB-Wrte um *)
-VAR f, p, q, t: REAL;
+VAR f, p, q, t: FLOAT32;
 		i: SIGNED32;
 BEGIN
 	IF S = 0 THEN R := V; G := V; B := V
@@ -230,8 +230,8 @@ BEGIN
 END HSVtoRGB;
 
 (** Verändert die Farben eines Pictures mit den gegebenen Parameter *)
-PROCEDURE Reduce*(S, D: Pictures.Picture; ds, dv: REAL);
-VAR rr, gr, br, hr, sr, vr  : REAL;
+PROCEDURE Reduce*(S, D: Pictures.Picture; ds, dv: FLOAT32);
+VAR rr, gr, br, hr, sr, vr  : FLOAT32;
 		i, r, g, b, maxc, h : SIGNED16;
 		P: Pictures.Picture;
 BEGIN
@@ -432,8 +432,8 @@ BEGIN
 	RETURN col
 END NearestColor;
 
-PROCEDURE Gamma( val: SIGNED16; gamma: REAL): SIGNED16;
-VAR gval: REAL;
+PROCEDURE Gamma( val: SIGNED16; gamma: FLOAT32): SIGNED16;
+VAR gval: FLOAT32;
   BEGIN
 	IF val = 0 THEN gval := 0 ELSE gval := Math.exp(Math.ln(val/256.0)*gamma) END;
 	RETURN SHORT(ENTIER(256*gval))
@@ -441,7 +441,7 @@ END Gamma;
 
 (** Farbpalette ändern **)
 PROCEDURE Darken*;
-VAR i, r, g, b: SIGNED16; gamma: REAL;
+VAR i, r, g, b: SIGNED16; gamma: FLOAT32;
 BEGIN
 	gamma:= 1.25;
 	FOR i:= 0 TO maxnoc-1 DO
@@ -451,7 +451,7 @@ BEGIN
 END Darken;
 
 PROCEDURE Lighten*;
-VAR i, r, g, b: SIGNED16; gamma: REAL;
+VAR i, r, g, b: SIGNED16; gamma: FLOAT32;
 BEGIN
 	gamma:= 0.8;
 	FOR i:= 0 TO maxnoc-1 DO

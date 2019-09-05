@@ -1460,8 +1460,8 @@ BEGIN (* TODO simplify *)
 				regs.FreeReg(srcDef.info(Info).dst.High) (* overflow check: srcDef.info.dst.High = 0 ? *)
 			END
 		ELSE (* instr.dstSize IN PCLIR.FloatSize *)
-			IF (srcDef.dstSize = PCLIR.Int64) THEN Error(pc, "Conversion Int64 -> [LONG]REAL not supported")
-			ELSE (* 32bit Integer -> [LONG]REAL *)
+			IF (srcDef.dstSize = PCLIR.Int64) THEN Error(pc, "Conversion Int64 -> [LONG]FLOAT32 not supported")
+			ELSE (* 32bit Integer -> [LONG]FLOAT32 *)
 				(* free source register *)
 				regs.FreeReg(srcDef.info(Info).dst.Low);
 
@@ -1512,8 +1512,8 @@ BEGIN (* TODO simplify *)
 		END
 
 	ELSE (* srcDef.dstSize IN PCLIR.FloatSize *)
-		IF (instr.dstSize = PCLIR.Int64) THEN Error(pc, "Conversion [LONG]REAL -> Int64 not supported")
-		ELSIF (instr.dstSize IN PCLIR.IntSize) THEN (* [LONG]REAL -> IntX *)
+		IF (instr.dstSize = PCLIR.Int64) THEN Error(pc, "Conversion [LONG]FLOAT32 -> Int64 not supported")
+		ELSIF (instr.dstSize IN PCLIR.IntSize) THEN (* [LONG]FLOAT32 -> IntX *)
 			(* free source register(s) *)
 			regs.FreeReg(srcDef.info(Info).dst.Low);
 			IF (srcDef.dstSize = PCLIR.Float64) THEN regs.FreeReg(srcDef.info(Info).dst.High) END;
@@ -1551,7 +1551,7 @@ BEGIN (* TODO simplify *)
 			(* restore saved registers *)
 			IF (rs # {}) THEN PCO.LDM(AL, PCO.A4IA, SP, rs, PCO.A4W) END
 
-		ELSE (* [LONG]REAL -> [LONG]REAL *)
+		ELSE (* [LONG]FLOAT32 -> [LONG]FLOAT32 *)
 			(* free source register(s) *)
 			regs.FreeReg(srcDef.info(Info).dst.Low);
 			IF (srcDef.dstSize = PCLIR.Float64) THEN regs.FreeReg(srcDef.info(Info).dst.High) END;
@@ -2989,7 +2989,7 @@ BEGIN
 	PCLIR.CG.SysCallMap[Int64LSH] := CHR(190);
 	PCLIR.CG.SysCallMap[Int64ASH] := CHR(191);
 
-	(* REAL syscalls *)
+	(* FLOAT32 syscalls *)
 	PCLIR.CG.SysCallMap[FAdd] := CHR(200);
 	PCLIR.CG.SysCallMap[FSub] := CHR(201);
 	PCLIR.CG.SysCallMap[FMul] := CHR(202);

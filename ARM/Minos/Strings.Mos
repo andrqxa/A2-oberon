@@ -195,7 +195,7 @@ MODULE Strings;
 	END StrToBool;
 
 	(* Returns the shifted binary exponent of a real (0 <= e < 256 *)
-	PROCEDURE Expo*(x: REAL): SIGNED32; 
+	PROCEDURE Expo*(x: FLOAT32): SIGNED32; 
 		VAR e: SIGNED32;
 	BEGIN 
 		(* Replaced the following code with safe variant *)
@@ -205,14 +205,14 @@ MODULE Strings;
 	END Expo; 
 
 	(* Returns 10^e (e <= 308, 308 < e delivers IEEE-code +INF). *)
-	PROCEDURE Ten(e: SIGNED32): REAL; 
-		VAR res: REAL; 
+	PROCEDURE Ten(e: SIGNED32): FLOAT32; 
+		VAR res: FLOAT32; 
 	BEGIN 
 		(* hack! *)
 		IF e < -38 THEN 
 			res := 0.0; 
 		ELSIF e > 38 THEN 
-			res := MAX(REAL); 
+			res := MAX(FLOAT32); 
 		ELSE 
 			res := 1.0; 
 			WHILE (e > 0) DO res := res * 10.0; DEC(e); END; 
@@ -222,7 +222,7 @@ MODULE Strings;
 	END Ten; 
 
 	(* Returns the NaN code (0 <= c < 8399608) or -1 if not NaN/Infinite. *)
-	PROCEDURE NaNCode(x: REAL): SIGNED32; 
+	PROCEDURE NaNCode(x: FLOAT32): SIGNED32; 
 		VAR l: SIGNED32; 
 	BEGIN 
  		IF Expo(x) = 255 THEN (* Infinite or NaN *)
@@ -311,10 +311,10 @@ MODULE Strings;
 	END AppendChar; 
 
 	(** Write real x to buffer str as ascii text *)
-	PROCEDURE AppendReal*(VAR str: ARRAY OF CHAR; x: REAL); 
+	PROCEDURE AppendReal*(VAR str: ARRAY OF CHAR; x: FLOAT32); 
 		VAR 
 			e, h, i, n: SIGNED32; 
-			y, z, temp05: REAL;
+			y, z, temp05: FLOAT32;
 			d: ARRAY 8 OF CHAR;  
 	BEGIN 
 		n := 14;  (* larger number of n do not really make sense *)
@@ -387,7 +387,7 @@ MODULE Strings;
 	END AppendBool; 
 
 	(* Convert a real to a string *)
-	PROCEDURE RealToStr*(r: REAL; VAR str: ARRAY OF CHAR); 
+	PROCEDURE RealToStr*(r: FLOAT32; VAR str: ARRAY OF CHAR); 
 	BEGIN 
 		str[0] := 0X; AppendReal(str, r); 
 	END RealToStr; 

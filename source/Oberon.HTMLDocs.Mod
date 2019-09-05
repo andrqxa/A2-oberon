@@ -1722,7 +1722,7 @@ END
 	PROCEDURE Color(CONST val: ARRAY OF CHAR; VAR col: SIGNED16);
 		VAR
 			r, g, b, rr, gg, bb, i, bestC: SIGNED16;
-			diff, mdiff: REAL;
+			diff, mdiff: FLOAT32;
 	BEGIN
 		IF val = "white" THEN
 			col := 0; RETURN
@@ -1746,7 +1746,7 @@ END
 		IF (r > 255) OR (g > 255) OR (b > 255) THEN
 			RETURN
 		END;
-		mdiff := MAX(REAL); bestC := 0;
+		mdiff := MAX(FLOAT32); bestC := 0;
 		i := 0;
 		WHILE (i < 256) & (mdiff > 0.0) DO
 			Display.GetColor(i, rr, gg, bb);

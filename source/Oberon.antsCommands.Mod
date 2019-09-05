@@ -103,7 +103,7 @@ VAR
 	usage  keywords
 
 	OBJ = vyBase.Object
-	REAL = LONGREAL
+	FLOAT32 = LONGREAL
 	INT = SIGNED32
 	STR = ARRAY OF CHAR
 	NAME = Voyager.Name (ARRAY OF CHAR with restrictions)
@@ -188,7 +188,7 @@ VAR
 
 	PROCEDURE Scan*( VAR sc: vyScanners.Scanner ): tScanList;
 	VAR anchor, this: tScanList;  Real: tReal;  Number: tNumber;  Name: tName;  sstring: tString;  Symbol: tSymbol;
-		name: vyName.tNameArray;  pos, num: SIGNED32;  real: REAL;  object: vyBase.Object;  Object: tObject;  negative: BOOLEAN;  count: SIGNED32;  start: SIGNED32;
+		name: vyName.tNameArray;  pos, num: SIGNED32;  real: FLOAT32;  object: vyBase.Object;  Object: tObject;  negative: BOOLEAN;  count: SIGNED32;  start: SIGNED32;
 		eot: BOOLEAN;  strpos: SIGNED32;  tok: SIGNED16;  s: CHAR;
 		string: ARRAY 1024 OF CHAR;
 		temppos: SIGNED32;  text: Texts.Text;  noscanonce: BOOLEAN;  objsc: Texts.Scanner;  objpos: SIGNED32;  s3obj, vyobj: Objects.Object;

@@ -83,7 +83,7 @@ CONST idversion* = ' v0r0a3x';
 	(*> BLAS machar interface >*)
 TYPE
 
-	real = REAL; (* technical convenience, to avoid duplicate code for REAL and LONGREAL *)
+	real = FLOAT32; (* technical convenience, to avoid duplicate code for FLOAT32 and LONGREAL *)
 
 
 	index = SIGNED32;
@@ -186,7 +186,7 @@ TYPE
 	VAR IBETA-, IEXP-, IRND-, IT-
 	, MACHEP-, MAXEXP-,
 	MINEXP-, NEGEP-, NGRD-: SIGNED16;
-	(*S    REAL D    DOUBLE PRECISION*)
+	(*S    FLOAT32 D    DOUBLE PRECISION*)
 	(*CONV,*)EPS-,
 	EPSNEG-, XMAX-, XMIN-: real;
 
@@ -194,14 +194,14 @@ TYPE
 PROCEDURE Machar;
 	VAR I, J, K, ITEMP, IZ,
 	MX, NXRES: SIGNED16;
-	(*S    REAL D    DOUBLE PRECISION*)
+	(*S    FLOAT32 D    DOUBLE PRECISION*)
 	A, B, BETA, BETAIN, BETAH, ONE, T, TEMP, TEMPA,
 	TEMP1, TWO, Y, Z, ZERO: real;
 	(*-----------------------------------------------------------------------
-	S    CONV(I) = REAL(I)
+	S    CONV(I) = FLOAT32(I)
 	D    CONV(I) = DBLE(I)*)
 	(*-----------------------------------------------------------------------
-	S    CONV(I) = REAL(I)
+	S    CONV(I) = FLOAT32(I)
 	D    CONV(I) = DBLE(I)*)
 
 PROCEDURE CONV (i: SIGNED16): real;
@@ -1479,7 +1479,7 @@ END Entier;
 
 
 
-PROCEDURE Short* (len: index;  VAR x: ARRAY OF real;  start: index;  VAR result: ARRAY OF REAL);
+PROCEDURE Short* (len: index;  VAR x: ARRAY OF real;  start: index;  VAR result: ARRAY OF FLOAT32);
 	(*=  result[ ]:=SHORT(x[ ]) , or x[ ]*)
 	VAR end: index;
 BEGIN
@@ -1491,7 +1491,7 @@ END Short;
 
 
 
-PROCEDURE Long* (len: index;  VAR x: ARRAY OF REAL;  start: index;  VAR result: ARRAY OF real);
+PROCEDURE Long* (len: index;  VAR x: ARRAY OF FLOAT32;  start: index;  VAR result: ARRAY OF real);
 	(*=  result[ ]:=LONG(x[ ]) *)
 	VAR end: index;
 BEGIN

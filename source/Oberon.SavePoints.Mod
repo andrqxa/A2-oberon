@@ -36,10 +36,10 @@ CONST
 
 TYPE
 	IntPoint = RECORD x, y, z: SIGNED16 END;
-	Point = RECORD x, y, z: REAL END;
+	Point = RECORD x, y, z: FLOAT32 END;
 	Figure = POINTER TO ARRAY OF Point;
 	Control = ARRAY 3 OF Point;
-	Rotor = RECORD from, to, curr, peak: REAL END;
+	Rotor = RECORD from, to, curr, peak: FLOAT32 END;
 	Colour = RECORD r, g, b: SIGNED16 END;
 
 VAR
@@ -48,9 +48,9 @@ VAR
 	numpoint: SIGNED16;	(* number of points *)
 	figure: POINTER TO ARRAY OF ARRAY OF IntPoint;	(* figures known to the system *)
 	move: POINTER TO ARRAY OF ARRAY OF SIGNED16;	(* movement between figures *)
-	timefactor: POINTER TO ARRAY OF REAL;	(* fraction of time each figure uses *)
+	timefactor: POINTER TO ARRAY OF FLOAT32;	(* fraction of time each figure uses *)
 	attributes: POINTER TO ARRAY OF SET;	(* figure attributes *)
-	maxint, minint, max, min, factor: REAL;	(* details about figure data file needed for figure conversion *)
+	maxint, minint, max, min, factor: FLOAT32;	(* details about figure data file needed for figure conversion *)
 
 	(* active info: *)
 	curfig: SIGNED16;	(* nr of current figure *)
@@ -58,9 +58,9 @@ VAR
 	control: Control;	(* control points *)
 	rx, ry, rz: Rotor;	(* rotation controls *)
 	morphoff: BOOLEAN;	(* do we morph from the current figure to the next *)
-	timefac: REAL;	(* time factor for current figure *)
-	time: REAL;	(* phase timer *)
-	step: REAL;	(* phase timer increment *)
+	timefac: FLOAT32;	(* time factor for current figure *)
+	time: FLOAT32;	(* phase timer *)
+	step: FLOAT32;	(* phase timer increment *)
 
 	(* active colour info: *)
 	coltime: SIGNED16;	(* colour timer *)
@@ -137,7 +137,7 @@ BEGIN
 END ReadData;
 
 (* initialise a rotor *)
-PROCEDURE InitRotor(VAR r: Rotor; f, t, p: REAL);
+PROCEDURE InitRotor(VAR r: Rotor; f, t, p: FLOAT32);
 BEGIN
 	r.from := f; r.to := t; r.curr := r.from; r.peak := p
 END InitRotor;
@@ -169,8 +169,8 @@ BEGIN
 END ClearAvoid;
 
 (* convert from HSV to RGB.  0 < H < 360, 0 < S,V < 1, 0 < R, G, B < 256  *)
-PROCEDURE HSV2RGB(H, S, V: REAL; VAR R, G, B: SIGNED16);
-VAR f, p, q, t, r, g, b: REAL; i: SIGNED32;
+PROCEDURE HSV2RGB(H, S, V: FLOAT32; VAR R, G, B: SIGNED16);
+VAR f, p, q, t, r, g, b: FLOAT32; i: SIGNED32;
 BEGIN
 	IF S = 0 THEN r := V; g := V; b := V
 	ELSE
@@ -243,8 +243,8 @@ BEGIN
 END InitVars;
 
 (* rotate the two coordinates x, y with the given factors c, s *)
-PROCEDURE Rotate(c, s: REAL; VAR x, y: REAL);
-VAR t: REAL;
+PROCEDURE Rotate(c, s: FLOAT32; VAR x, y: FLOAT32);
+VAR t: FLOAT32;
 BEGIN
 	t := x * s + y * c;
 	x := x * c - y * s;
@@ -253,7 +253,7 @@ END Rotate;
 
 (* draw the point in the given colour *)
 PROCEDURE Draw(VAR p: Point; c: SIGNED16);
-VAR d: REAL; x0, y0, x1, y1: SIGNED16;
+VAR d: FLOAT32; x0, y0, x1, y1: SIGNED16;
 BEGIN
 	d := Dist / (p.z + Dist);
 	x0 := SHORT(ENTIER(W + ScaleX * W * d * p.x));
@@ -269,7 +269,7 @@ END Draw;
 	in short, there are three control points that rotate with the figure.  this procedure uses those
 	points to figure out the current orientation and rotates the figure accordingly. *)
 PROCEDURE Position(VAR F: Figure);
-VAR lortnoc: Control; cos, sin: REAL; k, p: SIGNED16; a: ARRAY 4 OF REAL;
+VAR lortnoc: Control; cos, sin: FLOAT32; k, p: SIGNED16; a: ARRAY 4 OF FLOAT32;
 	todo: ARRAY 7 OF BOOLEAN;
 BEGIN
 	(* assume we have to do nothing *)
@@ -341,8 +341,8 @@ BEGIN
 END Start;
 
 (* update the rotation controller r *)
-PROCEDURE UpdateRotor(VAR r: Rotor; VAR a: REAL);
-VAR v, w, maxpeak: REAL;
+PROCEDURE UpdateRotor(VAR r: Rotor; VAR a: FLOAT32);
+VAR v, w, maxpeak: FLOAT32;
 BEGIN
 	IF ((r.from > r.to) & (r.curr < r.to)) OR (r.curr > r.to) THEN
 		r.from := r.to;
@@ -362,7 +362,7 @@ END UpdateRotor;
 
 (* rotate the figure, draw the points *)
 PROCEDURE Step;
-VAR pro, orp, a, cx, sx, cy, sy, cz, sz: REAL; p, q, g: SIGNED16; ticks: SIGNED32;
+VAR pro, orp, a, cx, sx, cy, sy, cz, sz: FLOAT32; p, q, g: SIGNED16; ticks: SIGNED32;
 BEGIN
 	IF Time THEN ticks := Oberon.Time() END;
 	(* update the rotation *)

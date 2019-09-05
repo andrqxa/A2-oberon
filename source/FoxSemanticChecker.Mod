@@ -5498,7 +5498,7 @@ TYPE
 							value := (i1 + 127)*800000H - 800000H + value;
 							IF i0 < 0 THEN value := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, value) + {31}); END;
 						END;
-						result.SetResolved(SyntaxTree.NewRealValue(position, SYSTEM.VAL(REAL, value), Scanner.None));
+						result.SetResolved(SyntaxTree.NewRealValue(position, SYSTEM.VAL(FLOAT32, value), Scanner.None));
 					END;
 				(* ------- CONNECT -------*)
 				ELSIF (id = Global.Connect) & (CheckArity(2,3)) THEN

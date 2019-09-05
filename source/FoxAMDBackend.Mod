@@ -1481,7 +1481,7 @@ TYPE
 					END;
 				END;
 			ELSIF vsrc.type.form IN IntermediateCode.Integer THEN
-				(* e.g. in SYSTEM.VAL(REAL, i) *)
+				(* e.g. in SYSTEM.VAL(FLOAT32, i) *)
 				IF vdest.mode = IntermediateCode.ModeMemory THEN
 					vcopy := vdest; IntermediateCode.SetType(vcopy,vsrc.type);
 					EmitMov(vcopy, vsrc,Low);

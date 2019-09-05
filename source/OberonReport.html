@@ -98,7 +98,7 @@ representation.
 <P>A real number always contains a decimal point. Optionally it may also
 contain
 a decimal scale factor. The letter E (or D) is pronounced as  "times ten to
-the power of". A real number is of type REAL, unless it has a scale factor
+the power of". A real number is of type FLOAT32, unless it has a scale factor
 containing the letter D; in this case it is of type LONGREAL.
 <PRE><STRONG>
 $  number  =  integer | real.
@@ -223,7 +223,7 @@ the indicated sections:
   COPY      (10.2)   NEW       (6.4)
   DEC       (10.2)   ODD       (10.2)
   ENTIER    (10.2)   ORD       (10.2)
-  EXCL      (10.2)   REAL      (6.1)
+  EXCL      (10.2)   FLOAT32      (6.1)
   FALSE     (6.1)    SET       (6.1)
   HALT      (10.2)   SHORT     (10.2)
   INC       (10.2)   SIGNED8  (6.1)
@@ -268,7 +268,7 @@ ProcedureType.
 </STRONG></PRE>
 <P><STRONG>Examples:</STRONG>
 <PRE>
-  Table  =  ARRAY N OF REAL
+  Table  =  ARRAY N OF FLOAT32
   Tree  =  POINTER TO Node
   Node  =  RECORD key: SIGNED16;
       left, right: Tree
@@ -294,7 +294,7 @@ The values of a given basic type are the following:
 <LI>SIGNED8 the integers between MIN(SIGNED8) and MAX(SIGNED8).
 <LI>SIGNED16 the integers between MIN(SIGNED16) and MAX(SIGNED16).
 <LI>SIGNED32 the integers between MIN(SIGNED32) and MAX(SIGNED32).
-<LI>REAL real numbers between MIN(REAL) and MAX(REAL).
+<LI>FLOAT32 real numbers between MIN(FLOAT32) and MAX(FLOAT32).
 <LI>LONGREAL real numbers between MIN(LONGREAL) and MAX(LONGREAL).
 <LI>SET the sets of integers between 0 and MAX(SET).
 </OL>
@@ -302,7 +302,7 @@ Types 3 to 5 are <EM>integer</EM> types, 6 and 7 are <EM>real</EM> types,
 and together they are called <EM>numeric</EM> types. They form a hierarchy;
 the larger type <EM>includes</EM> (the values of) the smaller type:
 <P>
-&nbsp; &nbsp; LONGREAL  &gt;=  REAL  &gt;=  SIGNED32  &gt;=  SIGNED16  &gt;=  SIGNED8
+&nbsp; &nbsp; LONGREAL  &gt;=  FLOAT32  &gt;=  SIGNED32  &gt;=  SIGNED16  &gt;=  SIGNED8
 <P>Note: &gt;= stands here for "is superset of or equal to".
 
 <H3>6.2. Array types</H3>
@@ -325,7 +325,7 @@ is understood as an abbreviation of the declaration
 <P><STRONG>Examples of array types:</STRONG>
 <PRE>
 ARRAY N OF SIGNED16
-ARRAY 10, 20 OF REAL
+ARRAY 10, 20 OF FLOAT32
 </PRE>
 
 <H3>6.3. Record types</H3>
@@ -365,7 +365,7 @@ type of a base type of T0.
   RECORD
     name, firstname: ARRAY 32 OF CHAR;
     age: SIGNED16;
-    salary: REAL
+    salary: FLOAT32
   END
 </PRE>
 
@@ -418,11 +418,11 @@ type.
 Section 6):
 <PRE>
   i, j, k:  SIGNED16
-  x, y:     REAL
+  x, y:     FLOAT32
   p, q:     BOOLEAN
   s:        SET
   f:        Function
-  a:        ARRAY 100 OF REAL
+  a:        ARRAY 100 OF FLOAT32
   w:        ARRAY 16 OF
               RECORD ch: CHAR;
                 count: SIGNED16
@@ -493,7 +493,7 @@ Section 10).
 <P><STRONG>Examples of designators</STRONG> (see examples in Section 7):
 <PRE>
   i                      (SIGNED16)
-  a[i]                   (REAL)
+  a[i]                   (FLOAT32)
   w[3].ch                (CHAR)
   t.key                  (SIGNED16)
   t.left.right           (Tree)
@@ -616,8 +616,8 @@ of NIL IS T is undefined.
   ~p OR q            (BOOLEAN)
   (i+j) * (i-j)      (SIGNED16)
   s - {8, 9, 13}     (SET)
-  i + x              (REAL)
-  a[i+j] * a[i-j]    (REAL)
+  i + x              (FLOAT32)
+  a[i+j] * a[i-j]    (FLOAT32)
   (0&lt;=i) & (i&lt;100)   (BOOLEAN)
   t.key = 0          (BOOLEAN)
   k IN {i .. j-1}    (BOOLEAN)
@@ -1033,9 +1033,9 @@ x</TD></TR>
 ordinal
 number x</TD></TR>
 <TR><TD>SHORT(x)</TD><TD>SIGNED32<BR>SIGNED16<BR>LONGREAL</TD>
-<TD>SIGNED16<BR>SIGNED8<BR>REAL</TD><TD>identity (truncation
+<TD>SIGNED16<BR>SIGNED8<BR>FLOAT32</TD><TD>identity (truncation
 possible)</TD></TR>
-<TR><TD>LONG(x)</TD><TD>SIGNED8<BR>SIGNED16<BR>REAL</TD>
+<TR><TD>LONG(x)</TD><TD>SIGNED8<BR>SIGNED16<BR>FLOAT32</TD>
 <TD>SIGNED16<BR>SIGNED32<BR>LONGREAL</TD><TD>identity</TD></TR>
 <TR><TD>ENTIER(x)</TD><TD>real type</TD><TD>SIGNED32</TD><TD>largest integer
 not greater than x.<BR>Note that  ENTIER(i/j)  =  i DIV j</TD></TR></TABLE>

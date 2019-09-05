@@ -212,9 +212,9 @@ TYPE
 		END RenderGlyph; *)
 
 		(* floating point version *)
-		PROCEDURE RenderGlyphReal(canvas : WMGraphics.Canvas; glyph : Glyph; x, y, w, h : REAL; level : SIGNED32; trace : BOOLEAN);
-		VAR i : SIGNED32;  tx, ty, cx, cy, dx, dy : REAL; ctrl : BOOLEAN; g : Glyph; r, bb : WMRectangles.Rectangle;
-			dtx, dty, dtw, dth : REAL;
+		PROCEDURE RenderGlyphReal(canvas : WMGraphics.Canvas; glyph : Glyph; x, y, w, h : FLOAT32; level : SIGNED32; trace : BOOLEAN);
+		VAR i : SIGNED32;  tx, ty, cx, cy, dx, dy : FLOAT32; ctrl : BOOLEAN; g : Glyph; r, bb : WMRectangles.Rectangle;
+			dtx, dty, dtw, dth : FLOAT32;
 		BEGIN
 			IF level > 0 THEN (* then we must fit the bounding box in x, y, w, h *)
 				bb := CalcBB(glyph);
@@ -877,7 +877,7 @@ END GetUTF8Char;
 (*
 PROCEDURE Spline(canvas : WMGraphics.Canvas; x0, y0, x1, y1, x2, y2, x, y, w, h, color, mode : SIGNED32);
 VAR i, tx, ty, nx, ny : SIGNED32;
-	t, onet, dt : REAL; (* CHECK : possible fixed-point implementation*)
+	t, onet, dt : FLOAT32; (* CHECK : possible fixed-point implementation*)
 BEGIN
 	tx := x0; ty := y0;
 	dt := 1 / MaxSplineSeg; t := 0; onet := 1;
@@ -890,9 +890,9 @@ BEGIN
 END Spline;
 *)
 
-PROCEDURE SplineReal(canvas : WMGraphics.Canvas; x0, y0, x1, y1, x2, y2, x, y, w, h : REAL; color, mode : SIGNED32);
-VAR i: SIGNED32;  tx, ty, nx, ny : REAL;
-	t, onet, dt : REAL;
+PROCEDURE SplineReal(canvas : WMGraphics.Canvas; x0, y0, x1, y1, x2, y2, x, y, w, h : FLOAT32; color, mode : SIGNED32);
+VAR i: SIGNED32;  tx, ty, nx, ny : FLOAT32;
+	t, onet, dt : FLOAT32;
 BEGIN
 	tx := x0; ty := y0;
 	dt := 1 / MaxSplineSeg; t := 0; onet := 1;

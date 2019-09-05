@@ -134,7 +134,7 @@ END Copy; *)
 	END Responsible;
 
 	PROCEDURE Consume( o: tLayer;  msg: Display.ConsumeMsg );
-	VAR v, w: vyBase.tVector;  minX, maxX, minY, maxY: REAL;  pict: vyPort.Picture;  data: Objects.Object;  nans: SIGNED32;
+	VAR v, w: vyBase.tVector;  minX, maxX, minY, maxY: FLOAT32;  pict: vyPort.Picture;  data: Objects.Object;  nans: SIGNED32;
 	BEGIN
 		pict := msg.dlink( vyPort.Picture );  data := msg.obj;  v := vyBase.GetVFromObj( data );  data := data.slink;
 		w := vyBase.GetVFromObj( data );
@@ -200,7 +200,7 @@ END Load0;
 (*PROCEDURE Handler* (obj: Objects.Object;  VAR msg: Objects.ObjMsg);
 VAR copy: tLayer;
 pict : vyPort.Picture;
-minX, maxX, minY, maxY : REAL;
+minX, maxX, minY, maxY : FLOAT32;
 nans : SIGNED32;
 uhandle: Objects.Handler; gen: PROCEDURE;
 

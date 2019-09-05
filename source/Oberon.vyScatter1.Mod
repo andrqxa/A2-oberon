@@ -171,7 +171,7 @@ VAR
 	END Responsible;
 
 	PROCEDURE AdjustCoord( pict: vyPort.Picture;  obj: tLayer );
-	VAR minX, maxX: REAL;  nans: SIGNED32;
+	VAR minX, maxX: FLOAT32;  nans: SIGNED32;
 	BEGIN
 		(*Out.String('vyScatter1.AdjustCoord'); OutHex(pict);Out.Ln;*)
 		IF pict # NIL THEN  (*Out.String('vyScatter1.AdjustCoord pict#NIL'); Out.Ln;*)
@@ -217,7 +217,7 @@ VAR
 	END Init;
 
 	PROCEDURE Consume( o: tLayer;  msg: Display.ConsumeMsg );
-	VAR v: vyBase.tVector;  minX, maxX: REAL;  pict: vyPort.Picture;  nans: SIGNED32;
+	VAR v: vyBase.tVector;  minX, maxX: FLOAT32;  pict: vyPort.Picture;  nans: SIGNED32;
 	BEGIN
 		pict := msg.dlink( vyPort.Picture );  v := vyBase.GetVFromObj( msg.obj );
 		IF v # NIL THEN
@@ -263,7 +263,7 @@ VAR
 (*
 PROCEDURE HandleFileMsg (obj: tLayer;        VAR msg: Objects.FileMsg);
 VAR pict: vyPort.Picture;
-VAR   minX, maxX: REAL;    	nans: SIGNED32;
+VAR   minX, maxX: FLOAT32;    	nans: SIGNED32;
 VAR     objsub: Objects.Object;
 
 BEGIN
@@ -384,7 +384,7 @@ END HandleFileMsg;
 	END NewFrame;
 
 	PROCEDURE ShowO*( obj: Objects.Object );
-	VAR minX, maxX: REAL;  nans: SIGNED32;  pict: vyPort.Picture;
+	VAR minX, maxX: FLOAT32;  nans: SIGNED32;  pict: vyPort.Picture;
 	BEGIN
 		New;  Init( newlayer, obj );  vyTypes.VGetMinMaxR( newlayer.x, minX, maxX, nans );
 		pict := vyPort.InsertNewCPicture( 0, 0, 1, 1, vyDisplay2d.NewC2d( minX, cMin, maxX - minX, cMax - cMin ) );

@@ -18,7 +18,7 @@ MODULE VinciGadgets IN Oberon; (** portable *)	(* eos  *)
 			(* obj is Texts.Text containing the current description *)
 			body*: Scheme.Object;	(** parsed description **)
 			ox*, oy*: SIGNED16;	(** vector from upper left corner of frame to origin in screen space **)
-			scale*: REAL;	(** viewport scale factor **)
+			scale*: FLOAT32;	(** viewport scale factor **)
 		END;
 
 
@@ -82,7 +82,7 @@ MODULE VinciGadgets IN Oberon; (** portable *)	(* eos  *)
 	END RestoreFrame;
 
 	PROCEDURE DisplayFrame (frame: Frame; VAR msg: Display.DisplayMsg);
-		VAR fx, fy: SIGNED16; mask: Display3.Mask; pc: GfxPrinter.Context; scale: REAL;
+		VAR fx, fy: SIGNED16; mask: Display3.Mask; pc: GfxPrinter.Context; scale: FLOAT32;
 	BEGIN
 		IF msg.device = Display.screen THEN
 			fx := msg.x + frame.X; fy := msg.y + frame.Y;
@@ -134,7 +134,7 @@ MODULE VinciGadgets IN Oberon; (** portable *)	(* eos  *)
 	END TrackRect;
 
 	PROCEDURE TrackZoomIn (frame: Frame; VAR msg: Oberon.InputMsg);
-		VAR x, y, w, h: SIGNED16; keysum: SET; scale: REAL;
+		VAR x, y, w, h: SIGNED16; keysum: SET; scale: FLOAT32;
 	BEGIN
 		TrackRect(frame, msg.X, msg.Y, msg.keys, x, y, w, h, keysum);
 		IF keysum = msg.keys THEN
@@ -149,7 +149,7 @@ MODULE VinciGadgets IN Oberon; (** portable *)	(* eos  *)
 	END TrackZoomIn;
 
 	PROCEDURE TrackZoomOut (frame: Frame; VAR msg: Oberon.InputMsg);
-		VAR x, y, w, h: SIGNED16; keysum: SET; scale: REAL;
+		VAR x, y, w, h: SIGNED16; keysum: SET; scale: FLOAT32;
 	BEGIN
 		TrackRect(frame, msg.X, msg.Y, msg.keys, x, y, w, h, keysum);
 		IF keysum = msg.keys THEN

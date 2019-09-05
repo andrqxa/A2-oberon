@@ -48,7 +48,7 @@ TYPE
 		END Init;
 
 		PROCEDURE UpdateDataset*;
-		VAR read, written, nofReads, nofWrites, nofTot, nofErrors : SIGNED64; total : REAL;
+		VAR read, written, nofReads, nofWrites, nofTot, nofErrors : SIGNED64; total : FLOAT32;
 		BEGIN
 			read := dev.NbytesRead; nofReads := dev.NnofReads;
 			written := dev.NbytesWritten; nofWrites := dev.NnofWrites;

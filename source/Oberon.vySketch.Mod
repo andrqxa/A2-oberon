@@ -48,7 +48,7 @@ TYPE
 	END;
 
 	PROCEDURE Recall( sketch: tLayer );
-	VAR x1, y1, x0, y0: REAL;  break: SIGNED16;  i, from, to: SIGNED32;
+	VAR x1, y1, x0, y0: FLOAT32;  break: SIGNED16;  i, from, to: SIGNED32;
 	BEGIN
 		FOR break := 1 TO sketch.nrOfBreaks DO
 			from := sketch.breaks[break - 1];  to := sketch.breaks[break] - 1;  x0 := vyTypes.VGetR( sketch.x, from );

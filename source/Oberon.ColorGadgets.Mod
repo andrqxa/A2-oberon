@@ -28,7 +28,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 		Disc* = POINTER TO DiscDesc;
 		DiscDesc* = RECORD (Gadgets.FrameDesc)
 			bg: Display.Color;	(* background color *)
-			hue, sat: REAL;	(* current hue and saturation *)
+			hue, sat: FLOAT32;	(* current hue and saturation *)
 			img: Images.Image;	(* background image with color circle *)
 		END;
 
@@ -36,7 +36,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 		Wedge* = POINTER TO WedgeDesc;
 		WedgeDesc* = RECORD (Gadgets.FrameDesc)
 			bg: Display.Color;	(* background color *)
-			hue, sat, val: REAL;	(* current hue, saturation and value *)
+			hue, sat, val: FLOAT32;	(* current hue, saturation and value *)
 			img: Images.Image;	(* background image with colored wedge *)
 		END;
 
@@ -52,10 +52,10 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 
 	(*--- Support Procedures ---*)
 
-	PROCEDURE atan2 (x, y: REAL): REAL;
-		VAR phi: REAL;
+	PROCEDURE atan2 (x, y: FLOAT32): FLOAT32;
+		VAR phi: FLOAT32;
 	BEGIN
-		IF (ABS(x) < 1.0) & (ABS(y) >= ABS(x * MAX(REAL))) THEN	(* y/x would result in overflow/divide by zero trap *)
+		IF (ABS(x) < 1.0) & (ABS(y) >= ABS(x * MAX(FLOAT32))) THEN	(* y/x would result in overflow/divide by zero trap *)
 			IF y >= 0 THEN phi := Math.pi/2
 			ELSE phi := 3*Math.pi/2
 			END
@@ -451,7 +451,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END UpdateDiscModel;
 
 	PROCEDURE TrackDisc (disc: Disc; VAR msg: Oberon.InputMsg);
-		VAR fx, fy, px, py, mx, my, x, y: SIGNED16; mask: Display3.Mask; hue, sat, dx, dy: REAL; keysum, keys: SET;
+		VAR fx, fy, px, py, mx, my, x, y: SIGNED16; mask: Display3.Mask; hue, sat, dx, dy: FLOAT32; keysum, keys: SET;
 	BEGIN
 		fx := msg.x + disc.X; fy := msg.y + disc.Y;
 		Gadgets.MakeMask(disc, fx, fy, msg.dlink, mask);
@@ -487,7 +487,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END TrackDisc;
 
 	PROCEDURE RestoreDiscImage (disc: Disc);
-		VAR r, g, b, j, i: SIGNED16; pix: Images.Pixel; dx, dy, y, x, sat, hue, rr, gg, bb: REAL;
+		VAR r, g, b, j, i: SIGNED16; pix: Images.Pixel; dx, dy, y, x, sat, hue, rr, gg, bb: FLOAT32;
 	BEGIN
 		IF disc.img = NIL THEN
 			NEW(disc.img)
@@ -529,7 +529,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END RestoreDisc;
 
 	PROCEDURE PrintDisc (disc: Disc; VAR msg: Display.DisplayMsg);
-		VAR mask: Display3.Mask; w, h, j, i: SIGNED16; dx, dy, y, x, sat, hue, r, g, b: REAL;
+		VAR mask: Display3.Mask; w, h, j, i: SIGNED16; dx, dy, y, x, sat, hue, r, g, b: FLOAT32;
 	BEGIN
 		Gadgets.MakePrinterMask(disc, msg.x, msg.y, msg.dlink, mask);
 		w := SHORT(disc.W * Display.Unit DIV Printer.Unit);
@@ -559,7 +559,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END PrintDisc;
 
 	PROCEDURE UpdateDisc (disc: Disc; VAR msg: Display.FrameMsg);
-		VAR hue, sat: REAL; fld: ARRAY 32 OF CHAR; fx, fy: SIGNED16; mask: Display3.Mask;
+		VAR hue, sat: FLOAT32; fld: ARRAY 32 OF CHAR; fx, fy: SIGNED16; mask: Display3.Mask;
 	BEGIN
 		IF disc.obj # NIL THEN
 			hue := disc.hue; sat := disc.sat;
@@ -758,7 +758,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END UpdateWedgeModel;
 
 	PROCEDURE TrackWedge (wedge: Wedge; VAR msg: Oberon.InputMsg);
-		VAR fx, fy, px, py, mx, my, x, y: SIGNED16; mask: Display3.Mask; sat, val: REAL; keysum, keys: SET;
+		VAR fx, fy, px, py, mx, my, x, y: SIGNED16; mask: Display3.Mask; sat, val: FLOAT32; keysum, keys: SET;
 	BEGIN
 		fx := msg.x + wedge.X; fy := msg.y + wedge.Y;
 		Gadgets.MakeMask(wedge, fx, fy, msg.dlink, mask);
@@ -800,7 +800,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END TrackWedge;
 
 	PROCEDURE RestoreWedgeImage (wedge: Wedge);
-		VAR r, g, b, j, i: SIGNED16; bg, pix: Images.Pixel; val, dval, sat, dsat, rr, gg, bb: REAL;
+		VAR r, g, b, j, i: SIGNED16; bg, pix: Images.Pixel; val, dval, sat, dsat, rr, gg, bb: FLOAT32;
 	BEGIN
 		IF wedge.img = NIL THEN
 			NEW(wedge.img)
@@ -847,7 +847,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END RestoreWedge;
 
 	PROCEDURE PrintWedge (wedge: Wedge; VAR msg: Display.DisplayMsg);
-		VAR mask: Display3.Mask; w, h, j, i, x0, x1: SIGNED16; val, dval, sat, dsat, r, g, b: REAL;
+		VAR mask: Display3.Mask; w, h, j, i, x0, x1: SIGNED16; val, dval, sat, dsat, r, g, b: FLOAT32;
 	BEGIN
 		Gadgets.MakePrinterMask(wedge, msg.x, msg.y, msg.dlink, mask);
 		w := SHORT(wedge.W * Display.Unit DIV Printer.Unit);
@@ -891,7 +891,7 @@ MODULE ColorGadgets IN Oberon; (** portable **)	(* eos  *)
 	END PrintWedge;
 
 	PROCEDURE UpdateWedge (wedge: Wedge; VAR msg: Display.FrameMsg);
-		VAR hue, sat, val: REAL; fld: ARRAY 32 OF CHAR; fx, fy: SIGNED16; mask: Display3.Mask;
+		VAR hue, sat, val: FLOAT32; fld: ARRAY 32 OF CHAR; fx, fy: SIGNED16; mask: Display3.Mask;
 	BEGIN
 		IF wedge.obj # NIL THEN
 			hue := wedge.hue; sat := wedge.sat; val := wedge.val;

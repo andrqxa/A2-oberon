@@ -27,7 +27,7 @@ TYPE
 		next: Attributes;
 		T: Dim3Engine.Matrix;	(* current transformation matrix *)
 		color, fontColor: Dim3Engine.Color;
-		diffuse, speccoef: REAL;
+		diffuse, speccoef: FLOAT32;
 		specexpo: SIGNED16;
 		smooth, dither, gouraud, specular: BOOLEAN;
 		font: ARRAY 64 OF CHAR;
@@ -160,7 +160,7 @@ BEGIN
 	IF sym = s THEN Get ELSE Error(msg) END
 END Expect;
 
-PROCEDURE Number (VAR x: REAL);
+PROCEDURE Number (VAR x: FLOAT32);
 BEGIN
 	IF sym = number THEN
 		x := S.x;
@@ -171,7 +171,7 @@ BEGIN
 	END
 END Number;
 
-PROCEDURE Vector (VAR vec: ARRAY OF REAL);
+PROCEDURE Vector (VAR vec: ARRAY OF FLOAT32);
 BEGIN
 	Expect(lpar, "'(' expected");
 	Number(vec[0]);
@@ -197,7 +197,7 @@ BEGIN
 END Points;
 
 PROCEDURE Texture (shape: Dim3Engine.Shape; poly: Dim3Engine.Polygon; N: SIGNED16);
-VAR n, cnt: SIGNED16; x, u, v: REAL; trans: BOOLEAN;
+VAR n, cnt: SIGNED16; x, u, v: FLOAT32; trans: BOOLEAN;
      textName: ARRAY 32 OF CHAR; p: Dim3Engine.Point;
 BEGIN
 	Get;
@@ -243,7 +243,7 @@ BEGIN
 END Texture;
 
 PROCEDURE Text (shape: Dim3Engine.Shape; poly: Dim3Engine.Polygon; N: SIGNED16);
-VAR n, cnt: SIGNED16; x, u, v: REAL; trans: BOOLEAN;
+VAR n, cnt: SIGNED16; x, u, v: FLOAT32; trans: BOOLEAN;
      textName: ARRAY 32 OF CHAR; p: Dim3Engine.Point;
 BEGIN
 	Get;
@@ -289,7 +289,7 @@ BEGIN
 END Text;
 
 PROCEDURE Polygon (shape: Dim3Engine.Shape; N: SIGNED16);
-VAR poly: Dim3Engine.Polygon; p: Dim3Engine.Point; x: REAL; n, cnt: SIGNED16;
+VAR poly: Dim3Engine.Polygon; p: Dim3Engine.Point; x: FLOAT32; n, cnt: SIGNED16;
 BEGIN
 	Get;
 	Dim3Engine.NewPolygon(poly);
@@ -325,7 +325,7 @@ BEGIN
 END Polygon;
 
 PROCEDURE Transformation;
-VAR angle: REAL; v: Dim3Engine.Vector; j: SIGNED16;
+VAR angle: FLOAT32; v: Dim3Engine.Vector; j: SIGNED16;
 BEGIN
 	CASE sym OF
 	| translate:
@@ -354,7 +354,7 @@ BEGIN
 END Transformation;
 
 PROCEDURE Attribute;
-VAR r, g, b: REAL;
+VAR r, g, b: FLOAT32;
 BEGIN
 	CASE sym OF
 	| color:
@@ -463,7 +463,7 @@ BEGIN
 END Font;
 
 PROCEDURE Light (shape: Dim3Engine.Shape);
-VAR l: Dim3Engine.Light; v, dir: Dim3Engine.Vector; inten: REAL; type: SIGNED16;
+VAR l: Dim3Engine.Light; v, dir: Dim3Engine.Vector; inten: FLOAT32; type: SIGNED16;
 BEGIN
 	type := Dim3Engine.DirectLight;
 	Get;

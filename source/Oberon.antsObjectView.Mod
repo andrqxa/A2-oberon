@@ -985,7 +985,7 @@ VAR
 	END Gen;
 
 	PROCEDURE AllObjects*;
-	VAR obj: vyBase.Object;  c: vyDisplay2d.tCoordinate2d;  pict: vyPort.Picture;  x, y, w, h: REAL;  L: tLayer;
+	VAR obj: vyBase.Object;  c: vyDisplay2d.tCoordinate2d;  pict: vyPort.Picture;  x, y, w, h: FLOAT32;  L: tLayer;
 		name: ARRAY 256 OF CHAR;
 	BEGIN
 		aM.vS( "antsObejctView.AllObjects, view all current Objects" );  aM.vS( "Warning; antsObjectViews decrease system speed" );  obj := antsObjects.obj;  NEW( L );  L.forbiddencount := 0;  vyPort.OpenLayer( L, "OV" );
@@ -998,7 +998,7 @@ VAR
 	END AllObjects;
 
 	PROCEDURE ShowP*;
-	VAR data: Objects.Object;  c: vyDisplay2d.tCoordinate2d;  pict: vyPort.Picture;  x, y, w, h: REAL;  L: tLayer;
+	VAR data: Objects.Object;  c: vyDisplay2d.tCoordinate2d;  pict: vyPort.Picture;  x, y, w, h: FLOAT32;  L: tLayer;
 		name: ARRAY 256 OF CHAR;
 	BEGIN
 		aM.vS( "antsObjectView.ShowP" );  data := vyBase.NextParObj();

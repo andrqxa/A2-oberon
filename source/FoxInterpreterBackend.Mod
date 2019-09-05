@@ -18,7 +18,7 @@ TYPE
 	Int2 = SIGNED16;
 	Int4 = SIGNED32;
 	Int8 = SIGNED64;
-	Float4 = REAL;
+	Float4 = FLOAT32;
 	Float8 = LONGREAL;
 
 	Value = RECORD

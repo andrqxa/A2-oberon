@@ -12,7 +12,7 @@ TYPE
 	GenericUnaryAALoopI = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED16): SIGNED16 );
 	GenericUnaryAALoopL = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED32): SIGNED32 );
 	GenericUnaryAALoopH = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED64): SIGNED64 );
-	GenericUnaryAALoopR = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: REAL): REAL );
+	GenericUnaryAALoopR = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: FLOAT32): FLOAT32 );
 	GenericUnaryAALoopX = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: LONGREAL): LONGREAL );
 	GenericUnaryAALoopZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX): COMPLEX );
 	GenericUnaryAALoopLZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: LONGCOMPLEX): LONGCOMPLEX );
@@ -724,8 +724,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ApplyGenericUnaryAAOpH;
 
-	(** apply unary operator to array:  array REAL -> array REAL *)
-	PROCEDURE ApplyGenericUnaryAAOpR( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopR; op: PROCEDURE(x: REAL): REAL );
+	(** apply unary operator to array:  array FLOAT32 -> array FLOAT32 *)
+	PROCEDURE ApplyGenericUnaryAAOpR( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopR; op: PROCEDURE(x: FLOAT32): FLOAT32 );
 		VAR loopd, looplen, loopli, loopdi: SIZE;  p: ANY;  glen: SIZE;
 			origdest: SIZE;  modes: SET;
 			dest, left: ADDRESS;  dim: SIZE;
@@ -1824,9 +1824,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "@Convert";
 
-(** SIGNED8 -> REAL *)
+(** SIGNED8 -> FLOAT32 *)
 	PROCEDURE ConvertLoopSR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SIGNED8;  dval: REAL;
+	VAR lval: SIGNED8;  dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1834,9 +1834,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopSR;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED8 ): ARRAY [?] OF REAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED8 ): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( REAL ), ConvertLoopSR );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), ConvertLoopSR );
 		RETURN RESULT
 	END "@Convert";
 
@@ -1900,9 +1900,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "LONG";
 
-(** SIGNED16 -> REAL *)
+(** SIGNED16 -> FLOAT32 *)
 	PROCEDURE ConvertLoopIR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SIGNED16;  dval: REAL;
+	VAR lval: SIGNED16;  dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1910,9 +1910,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopIR;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED16 ):  ARRAY [ ? ] OF REAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED16 ):  ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( REAL ), ConvertLoopIR );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), ConvertLoopIR );
 		RETURN RESULT
 	END "@Convert";
 
@@ -1954,9 +1954,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "SHORT";
 
-(** SIGNED32 -> REAL *)
+(** SIGNED32 -> FLOAT32 *)
 	PROCEDURE ConvertLoopLR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SIGNED32;  dval: REAL;
+	VAR lval: SIGNED32;  dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1964,9 +1964,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopLR;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED32 ): ARRAY [ ? ] OF REAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED32 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( REAL ), ConvertLoopLR );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), ConvertLoopLR );
 		RETURN RESULT
 	END "@Convert";
 
@@ -1986,9 +1986,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "@Convert";
 
-(** REAL -> SIGNED32 (ENTIER) *)
+(** FLOAT32 -> SIGNED32 (ENTIER) *)
 	PROCEDURE ConvertLoopRL( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: REAL;  dval: SIGNED32;
+	VAR lval: FLOAT32;  dval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := ENTIER( lval );  SYSTEM.PUT( dadr, dval );
@@ -1996,21 +1996,21 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopRL;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF REAL ):  ARRAY [ ? ] OF SIGNED32;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF FLOAT32 ):  ARRAY [ ? ] OF SIGNED32;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( SIGNED32 ), ConvertLoopRL );
 		RETURN RESULT
 	END "@Convert";
 
-	OPERATOR "ENTIER"*(CONST src: ARRAY [ ? ] OF REAL ):  ARRAY [ ? ] OF SIGNED32;
+	OPERATOR "ENTIER"*(CONST src: ARRAY [ ? ] OF FLOAT32 ):  ARRAY [ ? ] OF SIGNED32;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( SIGNED32 ), ConvertLoopRL );
 		RETURN RESULT
 	END "ENTIER";
 
-(** REAL -> LONGREAL *)
+(** FLOAT32 -> LONGREAL *)
 	PROCEDURE ConvertLoopRX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: REAL;  dval: LONGREAL;
+	VAR lval: FLOAT32;  dval: LONGREAL;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -2018,21 +2018,21 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopRX;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF REAL ):  ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF FLOAT32 ):  ARRAY [ ? ] OF LONGREAL;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ), ConvertLoopRX );
 		RETURN RESULT
 	END "@Convert";
 
-	OPERATOR "LONG"*(CONST src: ARRAY [ ? ] OF REAL ):  ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "LONG"*(CONST src: ARRAY [ ? ] OF FLOAT32 ):  ARRAY [ ? ] OF LONGREAL;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ), ConvertLoopRX );
 		RETURN RESULT
 	END "LONG";
 
-(** LONGREAL -> REAL (SHORT) *)
+(** LONGREAL -> FLOAT32 (SHORT) *)
 	PROCEDURE ConvertLoopXR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: LONGREAL;  dval: REAL;
+	VAR lval: LONGREAL;  dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := SHORT( lval );  SYSTEM.PUT( dadr, dval );
@@ -2040,15 +2040,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopXR;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF LONGREAL ):  ARRAY [ ? ] OF REAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF LONGREAL ):  ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( REAL ), ConvertLoopXR );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), ConvertLoopXR );
 		RETURN RESULT
 	END "@Convert";
 
-	OPERATOR "SHORT"*(CONST src: ARRAY [ ? ] OF LONGREAL ):  ARRAY [ ? ] OF REAL;
+	OPERATOR "SHORT"*(CONST src: ARRAY [ ? ] OF LONGREAL ):  ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( REAL ), ConvertLoopXR );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), ConvertLoopXR );
 		RETURN RESULT
 	END "SHORT";
 
@@ -2134,9 +2134,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END GenericLoopH;
 
-(** REAL *)
-	PROCEDURE GenericLoopR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: REAL): REAL );
-	VAR lval: REAL;
+(** FLOAT32 *)
+	PROCEDURE GenericLoopR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: FLOAT32): FLOAT32 );
+	VAR lval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, op(lval) );  INC( ladr, linc );  INC( dadr, dinc );
@@ -2230,9 +2230,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE MinusLoopR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: REAL;
+	VAR lval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, -lval );  INC( ladr, linc );  INC( dadr, dinc );
@@ -2240,10 +2240,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MinusLoopR;
 
-	OPERATOR "-"*(CONST src: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF REAL;
+	OPERATOR "-"*(CONST src: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
 		IF debug THEN KernelLog.String( "MinusAR" );  KernelLog.Ln;  END;
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( REAL ), MinusLoopR );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), MinusLoopR );
 		RETURN RESULT
 	END "-";
 
@@ -2317,9 +2317,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "+";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE AddARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval + rval );
@@ -2327,9 +2327,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddARARLoop;
 
-	OPERATOR "+"*(CONST left,right: ARRAY [?] OF REAL): ARRAY [?] OF REAL;
+	OPERATOR "+"*(CONST left,right: ARRAY [?] OF FLOAT32): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  loopAddARAR );
 		RETURN RESULT
 	END "+";
@@ -2466,9 +2466,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "+";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE AddARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2477,16 +2477,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddARSRLoop;
 
-	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF REAL;
+	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  AddARSRLoop );
 		RETURN RESULT
 	END "+";
 
-	OPERATOR "+"*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF REAL;
+	OPERATOR "+"*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( FLOAT32 ),
 										  AddARSRLoop );
 		RETURN RESULT
 	END "+";
@@ -2622,9 +2622,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE SubARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval - rval );
@@ -2632,9 +2632,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubARARLoop;
 
-	OPERATOR "-"*(CONST left,right: ARRAY [?] OF REAL): ARRAY [?] OF REAL;
+	OPERATOR "-"*(CONST left,right: ARRAY [?] OF FLOAT32): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  SubARARLoop );
 		RETURN RESULT
 	END "-";
@@ -2716,8 +2716,8 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** REAL *)
-	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF REAL;
+(** FLOAT32 *)
+	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
 		RESULT := left + (-right);
 		RETURN RESULT
@@ -2800,9 +2800,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE SubSRARLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval, dval: REAL;
+	VAR lval, rval, dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2811,9 +2811,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubSRARLoop;
 
-	OPERATOR "-"*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF REAL;
+	OPERATOR "-"*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( FLOAT32 ),
 										  SubSRARLoop );
 		RETURN RESULT
 	END "-";
@@ -2929,9 +2929,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".*";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EMulARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval * rval );
@@ -2939,9 +2939,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulARARLoop;
 
-	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF REAL): ARRAY [?] OF REAL;
+	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF FLOAT32): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  EMulARARLoop );
 		RETURN RESULT
 	END ".*";
@@ -3052,9 +3052,9 @@ Sufficient (but not necessary) conditions:
 										  SIZEOF( SIGNED32 ), EMulIncALALLoop );
 	END  ".*+";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EMulIncARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval,dval: REAL;
+	VAR lval, rval,dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.GET(dadr,dval);  SYSTEM.PUT( dadr, dval+  lval * rval );
@@ -3062,9 +3062,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulIncARARLoop;
 
-	OPERATOR ".*+"*(CONST left,right: ARRAY [?] OF REAL): ARRAY [?] OF REAL;
+	OPERATOR ".*+"*(CONST left,right: ARRAY [?] OF FLOAT32): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  EMulIncARARLoop );
 	END  ".*+";
 
@@ -3160,9 +3160,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "*";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE MulARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3171,16 +3171,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MulARSRLoop;
 
-	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF REAL;
+	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  loopMulARSR );
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF REAL;
+	OPERATOR "*"*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( FLOAT32 ),
 										  loopMulARSR );
 		RETURN RESULT
 	END "*";
@@ -3403,9 +3403,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "DECMUL";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE IncMulARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval, dval: REAL;
+	VAR lval, rval, dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3414,33 +3414,33 @@ Sufficient (but not necessary) conditions:
 		END;
 	END IncMulARSRLoop;
 
-	OPERATOR "INCMUL"*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF REAL;
+	OPERATOR "INCMUL"*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  loopIncMulARSR );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "INCMUL"*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF REAL;
+	OPERATOR "INCMUL"*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( FLOAT32 ),
 										  loopIncMulARSR );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "DECMUL"*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF REAL;
+	OPERATOR "DECMUL"*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
 		RESULT := -RESULT;
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  loopIncMulARSR );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
 
-	OPERATOR "DECMUL"*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF REAL;
+	OPERATOR "DECMUL"*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
 		RESULT := -RESULT;
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( FLOAT32 ),
 										  loopIncMulARSR );
 		RESULT := -RESULT;
 		RETURN RESULT
@@ -3499,7 +3499,7 @@ Sufficient (but not necessary) conditions:
 
 (** SIGNED8 *)
 	PROCEDURE EDivideASASLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SIGNED8;  dval: REAL;
+	VAR lval, rval: SIGNED8;  dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval / rval;
@@ -3508,16 +3508,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivideASASLoop;
 
-	OPERATOR "./"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY [?] OF REAL;
+	OPERATOR "./"*(CONST left,right: ARRAY [?] OF SIGNED8): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  EDivideASASLoop );
 		RETURN RESULT
 	END "./";
 
 (** SIGNED16 *)
 	PROCEDURE EDivideAIAILoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SIGNED16;  dval: REAL;
+	VAR lval, rval: SIGNED16;  dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval / rval;
@@ -3526,16 +3526,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivideAIAILoop;
 
-	OPERATOR "./"*(CONST left,right: ARRAY [?] OF SIGNED16): ARRAY [?] OF REAL;
+	OPERATOR "./"*(CONST left,right: ARRAY [?] OF SIGNED16): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  EDivideAIAILoop );
 		RETURN RESULT
 	END "./";
 
 (** SIGNED32 *)
 	PROCEDURE EDivideALALLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: SIGNED32;  dval: REAL;
+	VAR lval, rval: SIGNED32;  dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval / rval;
@@ -3544,16 +3544,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivideALALLoop;
 
-	OPERATOR "./"*(CONST left,right: ARRAY [?] OF SIGNED32): ARRAY [?] OF REAL;
+	OPERATOR "./"*(CONST left,right: ARRAY [?] OF SIGNED32): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  EDivideALALLoop );
 		RETURN RESULT
 	END "./";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EDivideARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;  dval: REAL;
+	VAR lval, rval: FLOAT32;  dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval / rval;
@@ -3562,9 +3562,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivideARARLoop;
 
-	OPERATOR "./"*(CONST left,right: ARRAY [?] OF REAL): ARRAY [?] OF REAL;
+	OPERATOR "./"*(CONST left,right: ARRAY [?] OF FLOAT32): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  EDivideARARLoop );
 		RETURN RESULT
 	END "./";
@@ -3639,7 +3639,7 @@ Sufficient (but not necessary) conditions:
 
 (** SIGNED8 *)
 	PROCEDURE DivideASSSLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SIGNED8;  dval: REAL;
+	VAR lval, rval: SIGNED8;  dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3648,15 +3648,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideASSSLoop;
 
-	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY [ ? ] OF REAL;
+	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF SIGNED8; right: SIGNED8 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  DivideASSSLoop );
 		RETURN RESULT
 	END "/";
 
 	PROCEDURE DivideSSASLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SIGNED8;  dval: REAL;
+	VAR lval, rval: SIGNED8;  dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3665,16 +3665,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideSSASLoop;
 
-	OPERATOR "/"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY [ ? ] OF REAL;
+	OPERATOR "/"*(left: SIGNED8; CONST right: ARRAY [ ? ] OF SIGNED8): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( FLOAT32 ),
 										  DivideSSASLoop );
 		RETURN RESULT
 	END "/";
 
 (** SIGNED16 *)
 	PROCEDURE DivideAISILoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SIGNED16;  dval: REAL;
+	VAR lval, rval: SIGNED16;  dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3683,15 +3683,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideAISILoop;
 
-	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF SIGNED16; right: SIGNED16 ): ARRAY [ ? ] OF REAL;
+	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF SIGNED16; right: SIGNED16 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  DivideAISILoop );
 		RETURN RESULT
 	END "/";
 
 	PROCEDURE DivideSIAILoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SIGNED16;  dval: REAL;
+	VAR lval, rval: SIGNED16;  dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3700,16 +3700,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideSIAILoop;
 
-	OPERATOR "/"*(left: SIGNED16; CONST right: ARRAY [ ? ] OF SIGNED16): ARRAY [ ? ] OF REAL;
+	OPERATOR "/"*(left: SIGNED16; CONST right: ARRAY [ ? ] OF SIGNED16): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( FLOAT32 ),
 										  DivideSIAILoop );
 		RETURN RESULT
 	END "/";
 
 (** SIGNED32 *)
 	PROCEDURE DivideALSLLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SIGNED32;  dval: REAL;
+	VAR lval, rval: SIGNED32;  dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3718,15 +3718,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideALSLLoop;
 
-	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF SIGNED32; right: SIGNED32 ): ARRAY [ ? ] OF REAL;
+	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF SIGNED32; right: SIGNED32 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  DivideALSLLoop );
 		RETURN RESULT
 	END "/";
 
 	PROCEDURE DivideSLALLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: SIGNED32;  dval: REAL;
+	VAR lval, rval: SIGNED32;  dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3735,16 +3735,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideSLALLoop;
 
-	OPERATOR "/"*(left: SIGNED32; CONST right: ARRAY [ ? ] OF SIGNED32): ARRAY [ ? ] OF REAL;
+	OPERATOR "/"*(left: SIGNED32; CONST right: ARRAY [ ? ] OF SIGNED32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( FLOAT32 ),
 										  DivideSLALLoop );
 		RETURN RESULT
 	END "/";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE DivideARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;  dval: REAL;
+	VAR lval, rval: FLOAT32;  dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3753,15 +3753,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideARSRLoop;
 
-	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF REAL;
+	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  DivideARSRLoop );
 		RETURN RESULT
 	END "/";
 
 	PROCEDURE DivideSRARLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;  dval: REAL;
+	VAR lval, rval: FLOAT32;  dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3770,9 +3770,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideSRARLoop;
 
-	OPERATOR "/"*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF REAL;
+	OPERATOR "/"*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( REAL ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( FLOAT32 ),
 										  DivideSRARLoop );
 		RETURN RESULT
 	END "/";
@@ -4295,9 +4295,9 @@ Sufficient (but not necessary) conditions:
 		RETURN dest;
 	END "+*";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE SPARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval: REAL;  dval: REAL;
+	VAR lval, rval: FLOAT32;  dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -4307,8 +4307,8 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END SPARARLoop;
 
-	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF REAL ): REAL;
-	VAR dest: REAL;
+	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF FLOAT32 ): FLOAT32;
+	VAR dest: FLOAT32;
 	BEGIN
 		dest := 0;
 		ApplyBinaryAASOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), loopSPARAR );
@@ -4459,9 +4459,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".=";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EEqlARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval = rval );
@@ -4469,7 +4469,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EEqlARARLoop;
 
-	OPERATOR ".="*(CONST left, right: ARRAY [ ? ] OF REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".="*(CONST left, right: ARRAY [ ? ] OF FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EEqlARARLoop );
@@ -4595,9 +4595,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".=";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EEqlARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4606,14 +4606,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EEqlARSRLoop;
 
-	OPERATOR ".="*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".="*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EEqlARSRLoop );
 		RETURN RESULT
 	END ".=";
 
-	OPERATOR ".="*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".="*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), EEqlARSRLoop );
@@ -4715,9 +4715,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".#";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE ENeqARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval # rval );
@@ -4725,7 +4725,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ENeqARARLoop;
 
-	OPERATOR ".#"*(CONST left, right: ARRAY [ ? ] OF REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".#"*(CONST left, right: ARRAY [ ? ] OF FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ENeqARARLoop );
@@ -4851,9 +4851,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".#";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE ENeqARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4862,14 +4862,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ENeqARSRLoop;
 
-	OPERATOR ".#"*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".#"*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ENeqARSRLoop );
 		RETURN RESULT
 	END ".#";
 
-	OPERATOR ".#"*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".#"*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), ENeqARSRLoop );
@@ -4955,9 +4955,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".>";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EGtrARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval > rval );
@@ -4965,7 +4965,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGtrARARLoop;
 
-	OPERATOR ".>"*(CONST left, right: ARRAY [ ? ] OF REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>"*(CONST left, right: ARRAY [ ? ] OF FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EGtrARARLoop );
@@ -5066,9 +5066,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".<";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EGtrARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5077,14 +5077,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGtrARSRLoop;
 
-	OPERATOR ".>"*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>"*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EGtrARSRLoop );
 		RETURN RESULT
 	END ".>";
 
-	OPERATOR ".<"*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<"*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), EGtrARSRLoop );
@@ -5170,9 +5170,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".>=";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EGeqARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval >= rval );
@@ -5180,7 +5180,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGeqARARLoop;
 
-	OPERATOR ".>="*(CONST left, right: ARRAY [ ? ] OF REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>="*(CONST left, right: ARRAY [ ? ] OF FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EGeqARARLoop );
@@ -5281,9 +5281,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".<=";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EGeqARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5292,14 +5292,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGeqARSRLoop;
 
-	OPERATOR ".>="*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>="*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EGeqARSRLoop );
 		RETURN RESULT
 	END ".>=";
 
-	OPERATOR ".<="*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<="*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), EGeqARSRLoop );
@@ -5384,9 +5384,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".<";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE ELssARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval < rval );
@@ -5394,7 +5394,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELssARARLoop;
 
-	OPERATOR ".<"*(CONST left, right: ARRAY [ ? ] OF REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<"*(CONST left, right: ARRAY [ ? ] OF FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ELssARARLoop );
@@ -5495,9 +5495,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".>";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE ELssARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5506,14 +5506,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELssARSRLoop;
 
-	OPERATOR ".<"*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<"*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ELssARSRLoop );
 		RETURN RESULT
 	END ".<";
 
-	OPERATOR ".>"*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>"*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), ELssARSRLoop );
@@ -5599,9 +5599,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".<=";
 
-(** REAL  *)
+(** FLOAT32  *)
 	PROCEDURE ELeqARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval <= rval );
@@ -5609,7 +5609,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELeqARARLoop;
 
-	OPERATOR ".<="*(CONST left, right: ARRAY [ ? ] OF REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<="*(CONST left, right: ARRAY [ ? ] OF FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ELeqARARLoop );
@@ -5710,9 +5710,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".>=";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE ELeqARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5721,14 +5721,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELeqARSRLoop;
 
-	OPERATOR ".<="*(CONST left: ARRAY [ ? ] OF REAL; right: REAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<="*(CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ELeqARSRLoop );
 		RETURN RESULT
 	END ".<=";
 
-	OPERATOR ".>="*(left: REAL; CONST right: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>="*(left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), ELeqARSRLoop );
@@ -5947,9 +5947,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GeqALALLoop , FALSE);
 	END ">=";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE LssARARLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -5959,13 +5959,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LssARARLoop;
 
-	OPERATOR "<"*( CONST left, right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR "<"*( CONST left, right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LssARARLoop , FALSE);
 	END "<";
 
 	PROCEDURE GeqARARLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -5975,7 +5975,7 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GeqARARLoop;
 
-	OPERATOR ">="*( CONST left, right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR ">="*( CONST left, right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GeqARARLoop , FALSE);
 	END ">=";
@@ -6114,9 +6114,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LeqALALLoop , FALSE);
 	END "<=";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE GtrARARLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6126,13 +6126,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GtrARARLoop;
 
-	OPERATOR ">"*( CONST left, right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR ">"*( CONST left, right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrARARLoop , FALSE);
 	END ">";
 
 	PROCEDURE LeqARARLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6142,7 +6142,7 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LeqARARLoop;
 
-	OPERATOR "<="*( CONST left, right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR "<="*( CONST left, right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LeqARARLoop , FALSE);
 	END "<=";
@@ -6271,9 +6271,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlALALLoop, FALSE );
 	END "#";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EqlARARLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6283,12 +6283,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlARARLoop;
 
-	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlARARLoop, FALSE );
 	END "=";
 
-	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlARARLoop, FALSE );
 	END "#";
@@ -6502,9 +6502,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ~(left = right);
 	END "#";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE EqlARSRLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6515,26 +6515,26 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlARSRLoop;
 
-	OPERATOR "="*( CONST left: ARRAY [ ? ] OF REAL;
-											right: REAL ): BOOLEAN;
+	OPERATOR "="*( CONST left: ARRAY [ ? ] OF FLOAT32;
+											right: FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlARSRLoop );
 	END "=";
 
-	OPERATOR "="*( left: REAL;
-											CONST right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR "="*( left: FLOAT32;
+											CONST right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), EqlARSRLoop );
 	END "=";
 
-	OPERATOR "#"*( CONST left: ARRAY [ ? ] OF REAL;
-											  right: REAL ): BOOLEAN;
+	OPERATOR "#"*( CONST left: ARRAY [ ? ] OF FLOAT32;
+											  right: FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ~( left = right );
 	END "#";
 
-	OPERATOR "#"*( left: REAL;
-											  CONST right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR "#"*( left: FLOAT32;
+											  CONST right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ~( left = right );
 	END "#";
@@ -6648,9 +6648,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GtrALSLLoop );
 	END "<";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE GtrARSRLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6661,14 +6661,14 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GtrARSRLoop;
 
-	OPERATOR ">"*( CONST left: ARRAY [ ? ] OF REAL;
-										    right: REAL ): BOOLEAN;
+	OPERATOR ">"*( CONST left: ARRAY [ ? ] OF FLOAT32;
+										    right: FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrARSRLoop );
 	END ">";
 
-	OPERATOR "<"*( left: REAL;
-											 CONST right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR "<"*( left: FLOAT32;
+											 CONST right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GtrARSRLoop );
 	END "<";
@@ -6775,9 +6775,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GeqALSLLoop );
 	END "<=";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE GeqARSRLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6788,13 +6788,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GeqARSRLoop;
 
-	OPERATOR ">="*( CONST left: ARRAY [ ? ] OF REAL;
-											 right: REAL ): BOOLEAN;
+	OPERATOR ">="*( CONST left: ARRAY [ ? ] OF FLOAT32;
+											 right: FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), GeqARSRLoop );
 	END ">=";
 
-	OPERATOR "<="*( left: REAL; CONST right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR "<="*( left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GeqARSRLoop );
 	END "<=";
@@ -6894,9 +6894,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LeqALSLLoop );
 	END ">=";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE LeqARSRLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6907,12 +6907,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LeqARSRLoop;
 
-	OPERATOR "<="*( CONST left: ARRAY [ ? ] OF REAL; right: REAL ): BOOLEAN;
+	OPERATOR "<="*( CONST left: ARRAY [ ? ] OF FLOAT32; right: FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), LeqARSRLoop );
 	END "<=";
 
-	OPERATOR ">="*( left: REAL; CONST right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR ">="*( left: FLOAT32; CONST right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LeqARSRLoop );
 	END ">=";
@@ -7014,9 +7014,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LssALSLLoop );
 	END ">";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE LssARSRLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: REAL;
+	VAR lval, rval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -7027,14 +7027,14 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LssARSRLoop;
 
-	OPERATOR "<"*( CONST left: ARRAY [ ? ] OF REAL;
-											 right: REAL ): BOOLEAN;
+	OPERATOR "<"*( CONST left: ARRAY [ ? ] OF FLOAT32;
+											 right: FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), LssARSRLoop );
 	END "<";
 
-	OPERATOR ">"*( left: REAL;
-										    CONST right: ARRAY [ ? ] OF REAL ): BOOLEAN;
+	OPERATOR ">"*( left: FLOAT32;
+										    CONST right: ARRAY [ ? ] OF FLOAT32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LssARSRLoop );
 	END ">";
@@ -7086,7 +7086,7 @@ Sufficient (but not necessary) conditions:
 	END "MAX";
 
 	PROCEDURE MaxARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE ); 
-	VAR lval, val: REAL;
+	VAR lval, val: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, val );
 		WHILE (len > 0) DO
@@ -7097,8 +7097,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MaxARSRLoop;
 	
-	OPERATOR "MAX"*(CONST left: ARRAY [?] OF REAL; right: REAL): ARRAY [?] OF REAL;
-	TYPE Type = REAL;
+	OPERATOR "MAX"*(CONST left: ARRAY [?] OF FLOAT32; right: FLOAT32): ARRAY [?] OF FLOAT32;
+	TYPE Type = FLOAT32;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( Type ), MaxARSRLoop );
 		RETURN RESULT
@@ -7185,7 +7185,7 @@ Sufficient (but not necessary) conditions:
 	
 
 	PROCEDURE MinARSRLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE ); 
-	VAR lval, val: REAL;
+	VAR lval, val: FLOAT32;
 	BEGIN
 		SYSTEM.GET( radr, val );
 		WHILE (len > 0) DO
@@ -7196,8 +7196,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MinARSRLoop;
 	
-	OPERATOR "MIN"*(CONST left: ARRAY [?] OF REAL; right: REAL): ARRAY [?] OF REAL;
-	TYPE Type = REAL;
+	OPERATOR "MIN"*(CONST left: ARRAY [?] OF FLOAT32; right: FLOAT32): ARRAY [?] OF FLOAT32;
+	TYPE Type = FLOAT32;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( Type ), MinARSRLoop );
 		RETURN RESULT
@@ -7281,7 +7281,7 @@ Sufficient (but not necessary) conditions:
 	
 
 	PROCEDURE MaxARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE ); 
-	VAR lval, rval: REAL ;
+	VAR lval, rval: FLOAT32 ;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval ); SYSTEM.GET( radr, rval ); 
@@ -7291,9 +7291,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MaxARARLoop;
 
-	OPERATOR "MAX"*(CONST left, right: ARRAY [?] OF REAL): ARRAY [?] OF REAL;
+	OPERATOR "MAX"*(CONST left, right: ARRAY [?] OF FLOAT32): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ), MaxARARLoop );
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ), MaxARARLoop );
 		RETURN RESULT
 	END "MAX";
 
@@ -7367,7 +7367,7 @@ Sufficient (but not necessary) conditions:
 		
 
 	PROCEDURE MinARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE ); 
-	VAR lval, rval: REAL ;
+	VAR lval, rval: FLOAT32 ;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval ); SYSTEM.GET( radr, rval ); 
@@ -7377,9 +7377,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MinARARLoop;
 
-	OPERATOR "MIN"*(CONST left, right: ARRAY [?] OF REAL): ARRAY [?] OF REAL;
+	OPERATOR "MIN"*(CONST left, right: ARRAY [?] OF FLOAT32): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ), MinARARLoop );
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ), MinARARLoop );
 		RETURN RESULT
 	END "MIN";
 
@@ -7518,9 +7518,9 @@ TYPE
 		ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), MinALLoop );  RETURN val;
 	END "MIN";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE MinARLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: REAL;
+	VAR lval, dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7531,8 +7531,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MinARLoop;
 
-	OPERATOR "MIN"*( CONST left: ARRAY [ ? ] OF REAL ): REAL;
-	TYPE Type = REAL;
+	OPERATOR "MIN"*( CONST left: ARRAY [ ? ] OF FLOAT32 ): FLOAT32;
+	TYPE Type = FLOAT32;
 	VAR val: Type;
 	BEGIN
 		val := MAX( Type );
@@ -7625,9 +7625,9 @@ TYPE
 		ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), MaxALLoop );  RETURN val;
 	END "MAX";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE MaxARLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: REAL;
+	VAR lval, dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7638,8 +7638,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MaxARLoop;
 
-	OPERATOR "MAX"*( CONST left: ARRAY [ ? ] OF REAL ): REAL;
-	TYPE Type = REAL;
+	OPERATOR "MAX"*( CONST left: ARRAY [ ? ] OF FLOAT32 ): FLOAT32;
+	TYPE Type = FLOAT32;
 	VAR val: Type;
 	BEGIN
 		val := MIN( Type );
@@ -7739,9 +7739,9 @@ TYPE
 		RETURN val;
 	END "SUM";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE SumARLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: REAL;
+	VAR lval, dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7750,8 +7750,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END SumARLoop;
 
-	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF REAL ): REAL;
-	TYPE Type = REAL;
+	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF FLOAT32 ): FLOAT32;
+	TYPE Type = FLOAT32;
 	VAR val: Type;
 	BEGIN
 		val := 0;  ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), SumARLoop );
@@ -7868,9 +7868,9 @@ TYPE
 		RETURN RESULT
 	END "ABS";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE AbsLoopR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: REAL;
+	VAR lval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, ABS( lval ) );  INC( ladr, linc );
@@ -7878,9 +7878,9 @@ TYPE
 		END;
 	END AbsLoopR;
 
-	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF REAL): ARRAY [ ? ] OF REAL;
+	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF FLOAT32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( REAL ), AbsLoopR );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), AbsLoopR );
 		RETURN RESULT
 	END "ABS";
 
@@ -7910,9 +7910,9 @@ TYPE
 		END;
 	END AbsLoopZ;
 
-	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF COMPLEX): ARRAY [ ? ] OF REAL;
+	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF COMPLEX): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( REAL ), AbsLoopZ );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), AbsLoopZ );
 		RETURN RESULT
 	END "ABS";
 
@@ -7990,15 +7990,15 @@ TYPE
 	END ":=";
 
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE AssignSRARLoop( ladr, dadr: ADDRESS; dinc, len: SIZE );
-	VAR lval: REAL;
+	VAR lval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( ladr, lval );
 		WHILE (len > 0) DO SYSTEM.PUT( dadr, lval );  INC( dadr, dinc );  DEC( len );  END;
 	END AssignSRARLoop;
 
-	OPERATOR ":="*(VAR dest: ARRAY [?] OF REAL; right: REAL);
+	OPERATOR ":="*(VAR dest: ARRAY [?] OF FLOAT32; right: FLOAT32);
 	BEGIN
 		ApplyUnarySAOp( ADDRESSOF( dest ), ADDRESSOF( right ), AssignSRARLoop );
 	END ":=";
@@ -8388,9 +8388,9 @@ TYPE
 		RETURN RESULT
 	END "*";
 
-(** REAL *)
+(** FLOAT32 *)
 	PROCEDURE MatMulARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval, dval: REAL;
+	VAR lval, rval, dval: FLOAT32;
 	BEGIN
 		dval := 0;
 		WHILE (len > 0) DO
@@ -8405,7 +8405,7 @@ TYPE
 
 		use of CONST for left, right makes execution slower, it seems that a new descriptor is created in this case
 	*)
-	OPERATOR "*"*(CONST left, right: ARRAY [ * , * ] OF REAL ): ARRAY [ * , * ] OF REAL;
+	OPERATOR "*"*(CONST left, right: ARRAY [ * , * ] OF FLOAT32 ): ARRAY [ * , * ] OF FLOAT32;
 	VAR flags: SET; dadr, ladr, radr: ADDRESS;
 	BEGIN
 
@@ -8488,11 +8488,11 @@ TYPE
 						RESULT[3,3] := left[3,0]*right[0,3] + left[3,1]*right[1,3] + left[3,2]*right[2,3] + left[3,3]*right[3,3];
 					END;
 			ELSE
-				ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+				ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 									    loopMatMulARAR, matMulR );
 			END;
 		ELSE
-			ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+			ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 									    loopMatMulARAR, matMulR );
 		END;
 		RETURN RESULT
@@ -8503,10 +8503,10 @@ TYPE
 
 		use of CONST for left, right makes execution slower, it seems that a new descriptor is created in this case
 	*)
-	OPERATOR "*"*(CONST left: ARRAY [ * , * ] OF REAL; CONST right: ARRAY [ * ] OF REAL ): ARRAY [ * ] OF REAL;
+	OPERATOR "*"*(CONST left: ARRAY [ * , * ] OF FLOAT32; CONST right: ARRAY [ * ] OF FLOAT32 ): ARRAY [ * ] OF FLOAT32;
 	VAR
 		flags: SET; dadr, ladr, radr: ADDRESS;
-		v0, v1, v2: REAL;
+		v0, v1, v2: FLOAT32;
 	BEGIN
 
 		dadr := GetAdr(ADDRESSOF(RESULT));
@@ -8567,16 +8567,16 @@ TYPE
 
 		ELSE
 			ApplyMatVecMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( REAL ), loopMatMulARAR, matMulR );
+											 SIZEOF( FLOAT32 ), loopMatMulARAR, matMulR );
 		END;
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(  CONST left: ARRAY [ * ] OF REAL;
-														  CONST right: ARRAY [ * , * ] OF REAL  ): ARRAY [ * ] OF REAL;
+	OPERATOR "*"*(  CONST left: ARRAY [ * ] OF FLOAT32;
+														  CONST right: ARRAY [ * , * ] OF FLOAT32  ): ARRAY [ * ] OF FLOAT32;
 	BEGIN
 		ApplyVecMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( REAL ), loopMatMulARAR, matMulR );
+											 SIZEOF( FLOAT32 ), loopMatMulARAR, matMulR );
 		RETURN RESULT
 	END "*";
 
@@ -8961,9 +8961,9 @@ TYPE
 		RETURN RESULT
 	END "DECMUL";
 
-	(** REAL *)
+	(** FLOAT32 *)
 	PROCEDURE MatMulIncARARLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval, dval: REAL;
+	VAR lval, rval, dval: FLOAT32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -8973,50 +8973,50 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MatMulIncARARLoop;
 
-	OPERATOR "INCMUL"*(CONST left, right: ARRAY [ * , * ] OF REAL ): ARRAY [ * , * ] OF REAL;
+	OPERATOR "INCMUL"*(CONST left, right: ARRAY [ * , * ] OF FLOAT32 ): ARRAY [ * , * ] OF FLOAT32;
 	BEGIN
-		ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 									    loopMatMulIncARAR, matMulIncR );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "INCMUL"*(CONST left: ARRAY [ * , * ] OF REAL;CONST right: ARRAY [ * ] OF REAL ): ARRAY [ * ] OF REAL;
+	OPERATOR "INCMUL"*(CONST left: ARRAY [ * , * ] OF FLOAT32;CONST right: ARRAY [ * ] OF FLOAT32 ): ARRAY [ * ] OF FLOAT32;
 	BEGIN
 		ApplyMatVecMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( REAL ), loopMatMulIncARAR, matMulIncR );
+											 SIZEOF( FLOAT32 ), loopMatMulIncARAR, matMulIncR );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "INCMUL"*( CONST left: ARRAY [ * ] OF REAL; CONST right: ARRAY [ * , * ] OF REAL ): ARRAY [ * ] OF REAL;
+	OPERATOR "INCMUL"*( CONST left: ARRAY [ * ] OF FLOAT32; CONST right: ARRAY [ * , * ] OF FLOAT32 ): ARRAY [ * ] OF FLOAT32;
 	BEGIN
 		ApplyVecMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( REAL ), loopMatMulIncARAR, matMulIncR );
+											 SIZEOF( FLOAT32 ), loopMatMulIncARAR, matMulIncR );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "DECMUL"*(CONST left, right: ARRAY [ * , * ] OF REAL ): ARRAY [ * , * ] OF REAL;
+	OPERATOR "DECMUL"*(CONST left, right: ARRAY [ * , * ] OF FLOAT32 ): ARRAY [ * , * ] OF FLOAT32;
 	BEGIN
 		RESULT := -RESULT;
-		ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 									    loopMatMulIncARAR, matMulIncR );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
 
-	OPERATOR "DECMUL"*( CONST left: ARRAY [ * , * ] OF REAL; CONST right: ARRAY [ * ] OF REAL ): ARRAY [ * ] OF REAL;
+	OPERATOR "DECMUL"*( CONST left: ARRAY [ * , * ] OF FLOAT32; CONST right: ARRAY [ * ] OF FLOAT32 ): ARRAY [ * ] OF FLOAT32;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyMatVecMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( REAL ), loopMatMulIncARAR, matMulIncR );
+											 SIZEOF( FLOAT32 ), loopMatMulIncARAR, matMulIncR );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
 
-	OPERATOR "DECMUL"*(CONST left: ARRAY [ * ] OF REAL; CONST right: ARRAY [ * , * ] OF REAL ): ARRAY [ * ] OF REAL;
+	OPERATOR "DECMUL"*(CONST left: ARRAY [ * ] OF FLOAT32; CONST right: ARRAY [ * , * ] OF FLOAT32 ): ARRAY [ * ] OF FLOAT32;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyVecMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( REAL ), loopMatMulIncARAR, matMulIncR );
+											 SIZEOF( FLOAT32 ), loopMatMulIncARAR, matMulIncR );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
@@ -9123,8 +9123,8 @@ TYPE
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(CONST left, right: ARRAY [ * ] OF REAL ): ARRAY [ * ] OF REAL;
-	VAR vl1, vl2, vl3, vr1, vr2, vr3: REAL;
+	OPERATOR "*"*(CONST left, right: ARRAY [ * ] OF FLOAT32 ): ARRAY [ * ] OF FLOAT32;
+	VAR vl1, vl2, vl3, vr1, vr2, vr3: FLOAT32;
 	BEGIN
 		IF (LEN( left,0 ) # 3) OR (LEN( right,0 ) # 3) THEN
 			Halt( GeometryMismatch, ADDRESSOF( left ), ADDRESSOF( right ), 0 )
@@ -9164,7 +9164,7 @@ TYPE
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(CONST left, right: ARRAY [ ? ] OF REAL ): ARRAY [ ? ] OF REAL;
+	OPERATOR "*"*(CONST left, right: ARRAY [ ? ] OF FLOAT32 ): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
 		IF (DIM(left) = 2) & (DIM(right)=2) THEN
 			EnsureArrayDesc(2, SYSTEM.VAL(Tensor, RESULT));
@@ -9173,7 +9173,7 @@ TYPE
 		ELSE HALT(200);
 		END;
 
-		ApplyMatMulLoop(SYSTEM.VAL(Tensor, RESULT), SYSTEM.VAL(Tensor, left), SYSTEM.VAL(Tensor, right), SIZEOF( REAL ),
+		ApplyMatMulLoop(SYSTEM.VAL(Tensor, RESULT), SYSTEM.VAL(Tensor, left), SYSTEM.VAL(Tensor, right), SIZEOF( FLOAT32 ),
 									    loopMatMulARAR, matMulR );
 		RETURN RESULT
 	END "*";
@@ -9394,9 +9394,9 @@ TYPE
 		RETURN RESULT
 	END "`";
 
-	OPERATOR "`"*( CONST left: ARRAY [ * , * ] OF REAL ): ARRAY [ * , * ] OF REAL;
+	OPERATOR "`"*( CONST left: ARRAY [ * , * ] OF FLOAT32 ): ARRAY [ * , * ] OF FLOAT32;
 	BEGIN
-		Transpose( ADDRESSOF( RESULT ), ADDRESSOF( left ), SIZEOF( REAL ) );
+		Transpose( ADDRESSOF( RESULT ), ADDRESSOF( left ), SIZEOF( FLOAT32 ) );
 		RETURN RESULT
 	END "`";
 
@@ -10027,9 +10027,9 @@ TYPE
 		RETURN RESULT
 	END "**";
 
-	OPERATOR "**"*(CONST left,right: ARRAY [?] OF REAL): ARRAY [?] OF REAL;
+	OPERATOR "**"*(CONST left,right: ARRAY [?] OF FLOAT32): ARRAY [?] OF FLOAT32;
 	BEGIN
-		ApplyTensorAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( REAL ),
+		ApplyTensorAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT32 ),
 										  loopMulARSR );
 		RETURN RESULT
 	END "**";
@@ -10137,7 +10137,7 @@ TYPE
 		e.g.:
 			ExpandDimensions(array, [FALSE, TRUE, FALSE, FALSE, TRUE])
 			performs the following type transformation:
-			ARRAY [10, 20] OF REAL -> ARRAY [1, 10, 1, 1, 20] OF REAL
+			ARRAY [10, 20] OF FLOAT32 -> ARRAY [1, 10, 1, 1, 20] OF FLOAT32
 
 	**)
 	PROCEDURE ExpandDimensions*(CONST sourceArray: ARRAY [?]; CONST keptDimensions: ARRAY [*] OF BOOLEAN): ARRAY [?];
@@ -10225,9 +10225,9 @@ TYPE
 		RETURN RESULT;
 	END "ALL";
 
-	OPERATOR "ALL"*(CONST x: ARRAY [?] OF REAL; op: PROCEDURE(x: REAL): REAL): ARRAY[?] OF REAL; (*should also accept operator ?*)
+	OPERATOR "ALL"*(CONST x: ARRAY [?] OF FLOAT32; op: PROCEDURE(x: FLOAT32): FLOAT32): ARRAY[?] OF FLOAT32; (*should also accept operator ?*)
 	BEGIN
-		ApplyGenericUnaryAAOpR(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(REAL),GenericLoopR,op);
+		ApplyGenericUnaryAAOpR(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(FLOAT32),GenericLoopR,op);
 		RETURN RESULT;
 	END "ALL";
 

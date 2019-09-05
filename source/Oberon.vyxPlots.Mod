@@ -96,10 +96,10 @@ BEGIN
 	NewPlot(scatter2, Register(vx, vy, namex, namey))
 END Points;
 
-PROCEDURE AddData* (x, y: REAL;  vx, vy: vyBase.tVector);
+PROCEDURE AddData* (x, y: FLOAT32;  vx, vy: vyBase.tVector);
 BEGIN	vyRealVec.Append(x, vx);  vyRealVec.Append(y, vy) END AddData;
 
-PROCEDURE AddDataArray* (x, y: ARRAY OF REAL;  len: SIGNED16;  vx, vy: vyBase.tVector);
+PROCEDURE AddDataArray* (x, y: ARRAY OF FLOAT32;  len: SIGNED16;  vx, vy: vyBase.tVector);
 	VAR i : SIGNED16;
 BEGIN	FOR i := 1 TO len DO vyRealVec.Append(x[i - 1], vx);  vyRealVec.Append(y[i - 1], vy)	END  END AddDataArray;
 

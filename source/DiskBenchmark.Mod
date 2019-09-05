@@ -146,7 +146,7 @@ TYPE
 			string :Lib.String;
 			block, sectors : SIGNED32;
 			nbrOfBytes : SIGNED64;
-			avgDuration : REAL;
+			avgDuration : FLOAT32;
 			milliTimer : Kernel.MilliTimer;
 			time : SIGNED32;
 			i : SIGNED32; res : WORD;

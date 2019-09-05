@@ -6,7 +6,7 @@ MODULE Simulator IN Oberon; (*JG 10.10.93*)
 
   VAR seed: SIGNED32;
 
-  PROCEDURE Random (): REAL;
+  PROCEDURE Random (): FLOAT32;
     CONST a = 16807; m = 2147483647; q = m DIV a; r = m MOD a;
   BEGIN seed := a*(seed MOD q) - r*(seed DIV q);
     IF seed <= 0 THEN seed := seed + m END;

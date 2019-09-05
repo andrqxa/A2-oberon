@@ -2508,7 +2508,7 @@ VAR
 		NumericType[1] := NewBasic(Universe, "SIGNED16"); Int16 := NumericType[1];
 		NumericType[2] := NewBasic(Universe, "SIGNED32"); Int32 := NumericType[2];
 		NumericType[3] := NewBasic(Universe, "SIGNED64"); Int64 := NumericType[3];
-		NumericType[4] := NewBasic(Universe, "REAL"); Float32 := NumericType[4];
+		NumericType[4] := NewBasic(Universe, "FLOAT32"); Float32 := NumericType[4];
 		NumericType[5]:= NewBasic(Universe, "LONGREAL"); Float64 := NumericType[5];
 		Set := NewBasic(Universe, "SET");
 		Ptr := NewBasic(Universe, "ANY");

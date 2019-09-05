@@ -447,7 +447,7 @@ BEGIN
 	RETURN a;
 END GetByIdX;
 
-PROCEDURE HandleEvents(events : SET; perf : REAL);
+PROCEDURE HandleEvents(events : SET; perf : FLOAT32);
 BEGIN
 	IF WMPerfMonPlugins.EventSampleLoopDone IN events THEN
 		CheckAlerts;

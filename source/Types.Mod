@@ -43,7 +43,7 @@ TYPE
 	END;
 
 	Real* = RECORD(Any)
-		value* : REAL;
+		value* : FLOAT32;
 	END;
 
 	Longreal* = RECORD(Any)
@@ -421,7 +421,7 @@ BEGIN
 	END;
 END SetSize;
 
-PROCEDURE GetReal*(CONST source : Any; VAR value : REAL; VAR res : WORD);
+PROCEDURE GetReal*(CONST source : Any; VAR value : FLOAT32; VAR res : WORD);
 VAR longreal : LONGREAL; real : Real;
 BEGIN
 	res := Ok;
@@ -465,7 +465,7 @@ BEGIN
 	END;
 END GetReal;
 
-PROCEDURE SetReal*(VAR target : Any; value : REAL; VAR res : WORD);
+PROCEDURE SetReal*(VAR target : Any; value : FLOAT32; VAR res : WORD);
 VAR real : Real; w:Streams.StringWriter;
 BEGIN
 	res := Ok;

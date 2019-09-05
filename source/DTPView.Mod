@@ -33,16 +33,16 @@ TYPE
 
 		vScrollbar- : WMStandardComponents.Scrollbar;
 		hScrollbar- : WMStandardComponents.Scrollbar;
-		zoomFactor : REAL; quality : BOOLEAN;
-		zoomUser : REAL;
+		zoomFactor : FLOAT32; quality : BOOLEAN;
+		zoomUser : FLOAT32;
 		zoomMode- : SIGNED32;									(* 0 : ZoomFitDoc *)
 																(* 1 : ZoomFitWidth *)
 																(* 2 : ZoomFitHeight *)
 																(* 3 : ZoomFitFrame *)
 																(* 4 : ZoomFitOriginal *)
 																(* 5 : ZoomFitUser *)
-		docOriginX, docOriginY : SIGNED32; snapDistance: REAL;
-		showGrid, snapToGrid : BOOLEAN; gridDistance : REAL; gridDivision : SIGNED32;
+		docOriginX, docOriginY : SIGNED32; snapDistance: FLOAT32;
+		showGrid, snapToGrid : BOOLEAN; gridDistance : FLOAT32; gridDivision : SIGNED32;
 		wheelMode- : SIGNED32;
 		previewMode* : BOOLEAN;
 		mpageMode* : BOOLEAN;
@@ -51,14 +51,14 @@ TYPE
 		snapOnCreate: BOOLEAN;
 		activeTool*: Strings.String;
 		x0, y0, x1, y1, dx, dy, gx, gy, vx0, vy0, vx1, vy1: SIZE;
-		fx0, fy0, fx1, fy1, tx0, ty0, tx1, ty1: REAL;
+		fx0, fy0, fx1, fy1, tx0, ty0, tx1, ty1: FLOAT32;
 		res, res2: SIGNED32;
 		down, move, resize, addobject, addguide, moveguide, oldpointer: BOOLEAN;
 		prevPointerInfo: WMWindowManager.PointerInfo;
 		oldPointerInfo: SIGNED32;
 		plugPointer: BOOLEAN;
 		manager : WMWindowManager.WindowManager;
-		oldfx0, oldfy0, oldfx1, oldfy1: REAL;
+		oldfx0, oldfy0, oldfx1, oldfy1: FLOAT32;
 
 		props*: PropertyWindow;
 		propertyOpen*: BOOLEAN;
@@ -282,8 +282,8 @@ TYPE
 		END SetRenderZoomMode;
 
 		PROCEDURE ZoomFitHeight*;
-		VAR drawPanelW, drawPanelH : REAL;
-			docW, docH : REAL;
+		VAR drawPanelW, drawPanelH : FLOAT32;
+			docW, docH : FLOAT32;
 		BEGIN
 			docW := document.GetPageWidth();
 			docH := document.GetPageHeight();
@@ -294,8 +294,8 @@ TYPE
 		END ZoomFitHeight;
 
 		PROCEDURE ZoomFitWidth*;
-		VAR drawPanelW, drawPanelH : REAL;
-			docW, docH : REAL;
+		VAR drawPanelW, drawPanelH : FLOAT32;
+			docW, docH : FLOAT32;
 		BEGIN
 			docW := document.GetPageWidth();
 			docH := document.GetPageHeight();
@@ -306,9 +306,9 @@ TYPE
 		END ZoomFitWidth;
 
 		PROCEDURE ZoomFitDoc*;
-		VAR drawPanelW, drawPanelH : REAL;
-			docW, docH : REAL;
-			ratioPanel, ratioDoc : REAL;
+		VAR drawPanelW, drawPanelH : FLOAT32;
+			docW, docH : FLOAT32;
+			ratioPanel, ratioDoc : FLOAT32;
 		BEGIN
 			docW := document.GetPageWidth();
 			docH := document.GetPageHeight();
@@ -326,8 +326,8 @@ TYPE
 		END ZoomFitDoc;
 
 		PROCEDURE ZoomFitFrame*;
-		VAR drawPanelW, drawPanelH : REAL;
-			frameW, frameH : REAL;
+		VAR drawPanelW, drawPanelH : FLOAT32;
+			frameW, frameH : FLOAT32;
 			cpage : DTPData.PageObject;
 		BEGIN
 			IF (document # NIL) THEN
@@ -382,17 +382,17 @@ TYPE
 			(* ZoomFitUser; *)
 		END ZoomDecrease;
 
-		PROCEDURE SetZoomUser*(factor: REAL);
+		PROCEDURE SetZoomUser*(factor: FLOAT32);
 		BEGIN
 			zoomUser := factor;
 		END SetZoomUser;
 
-		PROCEDURE SetZoomFactor*(factor : REAL);
+		PROCEDURE SetZoomFactor*(factor : FLOAT32);
 		BEGIN
 			zoomFactor := factor;
 		END SetZoomFactor;
 
-		PROCEDURE GetZoomFactor*() : REAL;
+		PROCEDURE GetZoomFactor*() : FLOAT32;
 		BEGIN
 			RETURN zoomFactor
 		END GetZoomFactor;
@@ -413,12 +413,12 @@ TYPE
 			RETURN docOriginY
 		END GetOriginY;
 
-		PROCEDURE SetSnapDistance*(distance: REAL);
+		PROCEDURE SetSnapDistance*(distance: FLOAT32);
 		BEGIN
 			snapDistance := distance;
 		END SetSnapDistance;
 
-		PROCEDURE GetSnapDistance*(): REAL;
+		PROCEDURE GetSnapDistance*(): FLOAT32;
 		BEGIN
 			RETURN snapDistance;
 		END GetSnapDistance;
@@ -458,7 +458,7 @@ TYPE
 			showGrid := sGrid;
 		END ShowGrid;
 
-		PROCEDURE SetGrid*(gDist : REAL; gDiv : SIGNED32);
+		PROCEDURE SetGrid*(gDist : FLOAT32; gDiv : SIGNED32);
 		BEGIN
 			gridDistance := gDist;
 			gridDivision := gDiv;
@@ -488,7 +488,7 @@ TYPE
 			cframe: DTPData.FrameObject;
 			cguide: DTPData.GuideObject;
 *)
-			fx, fy: REAL;
+			fx, fy: FLOAT32;
 			px, py, pw, ph: SIGNED32;
 			horizontal: BOOLEAN;
 			snapLeft, snapTop, snapRight, snapBottom : BOOLEAN;
@@ -591,7 +591,7 @@ TYPE
 (*			cpage: DTPData.PageObject;
 			cframe: DTPData.FrameObject;
 			cguide: DTPData.GuideObject;
-*)			fx, fy, tx, ty: REAL;
+*)			fx, fy, tx, ty: FLOAT32;
 			xs, ys, xe, ye, w, h: SIGNED32;
 			oldx1, oldy1 : SIZE;
 			pointerres: SIGNED32;
@@ -801,7 +801,7 @@ TYPE
 			resguide: DTPData.GuideObject;
 			resframe: DTPData.FrameObject;
 			horizontal : BOOLEAN;
-			fx, fy, fw, fh: REAL;
+			fx, fy, fw, fh: FLOAT32;
 			px, py, pw, ph: SIGNED32;
 			snapL, snapT, snapR, snapB: BOOLEAN;
 		BEGIN
@@ -1155,13 +1155,13 @@ TYPE
 			END;
 		END KeyEvent;
 
-		PROCEDURE WillSnap*(sx,sy, ex, ey: REAL; VAR leftSnap, topSnap, rightSnap, bottomSnap: BOOLEAN; VAR resX, resY: REAL): BOOLEAN;
+		PROCEDURE WillSnap*(sx,sy, ex, ey: FLOAT32; VAR leftSnap, topSnap, rightSnap, bottomSnap: BOOLEAN; VAR resX, resY: FLOAT32): BOOLEAN;
 		VAR
 			result, point, rect: BOOLEAN;
 			cpage, cmpage: DTPData.PageObject;
 			cguide: DTPData.GuideObject;
-			mTop, mBottom, mLeft, mRight, tempmLeft, tempmRight,  mWidth, mHeight, nx, ny, mx, my: REAL;
-			gridInc : REAL;
+			mTop, mBottom, mLeft, mRight, tempmLeft, tempmRight,  mWidth, mHeight, nx, ny, mx, my: FLOAT32;
+			gridInc : FLOAT32;
 			pageNumber : SIGNED32;
 		BEGIN
 			result:= FALSE; leftSnap := FALSE; topSnap := FALSE; rightSnap := FALSE; bottomSnap := FALSE;
@@ -1477,7 +1477,7 @@ TYPE
 		PROCEDURE DrawGrid(canvas: WMGraphics.Canvas);
 		VAR
 			w, h, mt, mb, ml, mr, subGridCounter : SIGNED32;
-			gridSubSize, i : REAL;
+			gridSubSize, i : FLOAT32;
 		BEGIN
 			(* calc pixels *)
 			w := ENTIER(document.GetPageWidth()*zoomFactor);
@@ -1521,7 +1521,7 @@ TYPE
 			w, h, mt, mb, ml, mr, tempml, tempmr, pageNumber : SIGNED32;
 (*			cpage: DTPData.PageObject;
 			cguide: DTPData.GuideObject;
-*)			guidePos: REAL; guideOrientation: BOOLEAN;
+*)			guidePos: FLOAT32; guideOrientation: BOOLEAN;
 		BEGIN
 			(* calc pixels *)
 			w := ENTIER(document.GetPageWidth()*zoomFactor);
@@ -1601,7 +1601,7 @@ TYPE
 (*			cpage: DTPData.PageObject;
 			cframe: DTPData.FrameObject;
 *)			content: DTPData.ContentObject;
-			x, y, w, h: REAL;
+			x, y, w, h: FLOAT32;
 			color: SIGNED32;
 		BEGIN
 			(* Draw current Page with (content)Frames, selected Frame *)
@@ -1684,7 +1684,7 @@ TYPE
 (*			cpage: DTPData.PageObject;
 			cframe: DTPData.FrameObject;
 			cguide: DTPData.GuideObject;
-*)			x, y, w, h, pos: REAL;
+*)			x, y, w, h, pos: FLOAT32;
 			color: SIGNED32;
 			horizontal: BOOLEAN;
 		BEGIN
@@ -1745,7 +1745,7 @@ TYPE
 
 		PROCEDURE DrawUserAction(canvas: WMGraphics.Canvas);
 		VAR color: SIGNED32;
-			rx, ry: REAL;
+			rx, ry: FLOAT32;
 			snapL, snapT, snapR, snapB: BOOLEAN;
 		BEGIN
 			color := FRAMECOLOR;
@@ -1925,10 +1925,10 @@ TYPE
 
 	PropertyWindow* = OBJECT(WMComponents.FormWindow);
 	VAR frameName : Strings.String;
-		frameX,frameY, frameW, frameH : REAL;
+		frameX,frameY, frameW, frameH : FLOAT32;
 		frameStyle : DTPData.StyleObject;
 		textwrapON : BOOLEAN;
-		twrapTop, twrapBottom, twrapLeft, twrapRight : REAL;
+		twrapTop, twrapBottom, twrapLeft, twrapRight : FLOAT32;
 		theCaller : DrawPanel;
 		tempLabel* : WMStandardComponents.Label;
 
@@ -2162,7 +2162,7 @@ TYPE
 			END;
 		END SetInactive;
 
-		PROCEDURE SetProperties*(x, y, w, h: REAL; name: Strings.String; style: DTPData.StyleObject; tw: BOOLEAN; twt, twb, twl, twr: REAL);
+		PROCEDURE SetProperties*(x, y, w, h: FLOAT32; name: Strings.String; style: DTPData.StyleObject; tw: BOOLEAN; twt, twb, twl, twr: FLOAT32);
 		VAR propString: ARRAY 32 OF CHAR;
 		BEGIN
 			frameX := x; frameY := y; frameW := w; frameH := h;
@@ -2198,7 +2198,7 @@ TYPE
 
 		END SetProperties;
 
-		PROCEDURE SetCoordinates*(x, y, w, h: REAL);
+		PROCEDURE SetCoordinates*(x, y, w, h: FLOAT32);
 		VAR propString: ARRAY 32 OF CHAR;
 		BEGIN
 			frameX := x; frameY := y; frameW := w; frameH := h;
@@ -2333,7 +2333,7 @@ TYPE
 
 		END New;
 
-		PROCEDURE Show*(VAR w, h: REAL): BOOLEAN;
+		PROCEDURE Show*(VAR w, h: FLOAT32): BOOLEAN;
 		VAR resultString: ARRAY 8 OF CHAR;
 			resW, resH: LONGREAL;
 		BEGIN

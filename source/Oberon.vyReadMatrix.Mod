@@ -122,7 +122,7 @@ PROCEDURE readMatrix (VAR List: ListItem;     pos : SIGNED32;  selend: SIGNED32;
 VAR
 	s : vyScanners.Scanner;
 	cr, cc: SIGNED16;      		(*cr=checkrow; cc=checkcolumn; variables in use to detect deviations from the structure of the table; i.e. wrong nr of rows or columns*)
-	l : SIGNED32;       r: REAL;       lr : LONGREAL;
+	l : SIGNED32;       r: FLOAT32;       lr : LONGREAL;
 	temp : ListItem;
 	neg, negold, check : BOOLEAN;      				(*check is set to TRUE after reading a newlinesymbol(vyScanners.ctNL) - if check is TRUE and anything is being read, cr is being increased*)
 	string : String;
@@ -204,7 +204,7 @@ PROCEDURE readMatrixwrownames (VAR List: ListItem;     pos : SIGNED32;  selend: 
 VAR
 	s : vyScanners.Scanner;
 	cr, cc, i, j : SIGNED16;
-	l : SIGNED32;       r: REAL;       lr : LONGREAL;
+	l : SIGNED32;       r: FLOAT32;       lr : LONGREAL;
 	temp : ListItem;
 	neg, negold, check, check2 : BOOLEAN;      					(*check2 is set to FALSE after reading a rowname*)
 	string, string2: String;

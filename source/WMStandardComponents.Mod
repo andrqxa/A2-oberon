@@ -1592,7 +1592,7 @@ TYPE
 		END FindArea;
 
 		PROCEDURE TrackerMove(x, y : SIZE; keys : SET);
-		VAR newPosition, value, d, dy, dp, dx : SIZE; f : REAL; tmax, tmin, a, b : SIZE;
+		VAR newPosition, value, d, dy, dp, dx : SIZE; f : FLOAT32; tmax, tmin, a, b : SIZE;
 		BEGIN
 			tmin := min.Get(); tmax := max.Get();
 			IF 1 IN keys  THEN
@@ -1743,7 +1743,7 @@ TYPE
 		END PageDown;
 
 		PROCEDURE UpdateLayout;
-		VAR h, w, ps, tmin, tmax : SIZE; f : REAL; width, height : SIZE;
+		VAR h, w, ps, tmin, tmax : SIZE; f : FLOAT32; width, height : SIZE;
 		BEGIN
 			width := bounds.GetWidth(); height := bounds.GetHeight();
 			tmin := min.Get(); tmax := max.Get();
@@ -2157,7 +2157,7 @@ TYPE
 		END ChangeModel;
 
 		PROCEDURE TrackerPointerMove(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
-		VAR dx, dy, dp, d : SIZE; f : REAL; tmax, tmin : SIZE;
+		VAR dx, dy, dp, d : SIZE; f : FLOAT32; tmax, tmin : SIZE;
 		BEGIN
 			tmax := max.Get();
 			tmin := min.Get();

@@ -19,7 +19,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 
 		Token = POINTER TO RECORD	pos: SIGNED32; sym: SIGNED8; next: Token	END;
 		IntToken = POINTER TO RECORD (Token)	intval: SIGNED32; typ: SIGNED16	END;
-		RealToken = POINTER TO RECORD (Token)	realval: REAL	END;
+		RealToken = POINTER TO RECORD (Token)	realval: FLOAT32	END;
 		LRealToken = POINTER TO RECORD (Token)	lrlval: LONGREAL	END;
 		StrToken = POINTER TO RECORD (Token)	str: String; len: SIGNED32	END;
 		NameToken = POINTER TO RECORD (Token)	name: Name	END;
@@ -33,7 +33,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		str*: String;
 		numtyp*: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
 		intval*: SIGNED32;	(* integer value or string length *)
-		realval*: REAL;
+		realval*: FLOAT32;
 		lrlval*: LONGREAL;
 		Get*: GetProc;
 		ch*: CHAR;     (*current character*)

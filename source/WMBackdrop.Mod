@@ -52,7 +52,7 @@ TYPE
 
 		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
 		VAR view : WMWindowManager.ViewPort;
-			w, h : REAL; originator : ANY;
+			w, h : FLOAT32; originator : ANY;
 			contextMenu : WMPopups.Popup;
 		BEGIN
 			originator := sequencer.GetOriginator();
@@ -109,7 +109,7 @@ TYPE
 		END HandleChangeable;
 
 		PROCEDURE HandleFullScreen(sender, par: ANY);
-		VAR view : WMWindowManager.ViewPort; w, h : REAL; originator : ANY;
+		VAR view : WMWindowManager.ViewPort; w, h : FLOAT32; originator : ANY;
 		BEGIN
 			manager.SetFocus(SELF);
 			originator := sender(WMComponents.Component).sequencer.GetOriginator();

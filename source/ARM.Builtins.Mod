@@ -367,11 +367,11 @@ TYPE
 	END ConvF32F64;
 
 	(* if an FPU32 is available, the result must be made available via FPU register *)
-	PROCEDURE ConvF32F64F*(x: Double): REAL;
+	PROCEDURE ConvF32F64F*(x: Double): FLOAT32;
 	VAR r: Single;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		r := FPE64.Single(SYSTEM.VAL(FPE64.Float64,x));
-		RETURN SYSTEM.VAL(REAL, r);
+		RETURN SYSTEM.VAL(FLOAT32, r);
 	END ConvF32F64F;
 
 	(* only called when no FPU64 is available *)
@@ -526,7 +526,7 @@ TYPE
 	END ConvS32F32;
 
 	(** converts an integer into a float, ignores the non-integer part
-	- corresponds to REAL(int)
+	- corresponds to FLOAT32(int)
 	- note that no rounding occurs
 	only called when no FPU32 is available
 	**)
@@ -563,8 +563,8 @@ TYPE
 	END ConvF32U32;
 
 	(* if an FPU32 is available, the result must be made available via FPU register *)
-	PROCEDURE ConvF32S64F*(x: DoubleWord): REAL;
-	VAR l,h:REAL;
+	PROCEDURE ConvF32S64F*(x: DoubleWord): FLOAT32;
+	VAR l,h:FLOAT32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		l := x.low;
 		h := x.high;

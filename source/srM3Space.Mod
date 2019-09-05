@@ -10,7 +10,7 @@ TYPE Voxel = srBase.Voxel;
 TYPE NCUBE=RECORD
 	filled: BOOLEAN;
 	mirror:BOOLEAN;
-	reflectivity:REAL;
+	reflectivity:FLOAT32;
 	normal: PT;
 	color:COLOR;
 END;

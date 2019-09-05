@@ -528,7 +528,7 @@ VAR
 	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: LONGREAL;  y, x, ll, k: SIGNED32;
 		ra: POINTER TO ARRAY OF LONGREAL;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name=OBJ p=REAL # noise <name> with channel noise, prob = <p>" );
+		l := antsCommands.ScanFromPar( "name=OBJ p=FLOAT32 # noise <name> with channel noise, prob = <p>" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "p", p ) THEN
 			IF obj IS tObject THEN
 				WITH obj: tObject DO

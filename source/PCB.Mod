@@ -3097,7 +3097,7 @@ END RealtimeCompatible;
 
 
 	PROCEDURE NewConversion*(pos: SIGNED32; exp: Expression; type: PCT.Struct): Expression;	(*not exported, parser should not check types*)
-		VAR  conv: Conversion;  str: PCS.String;  con: PCT.Const; l: SIGNED32; ch: CHAR; r: REAL;  lr: LONGREAL;
+		VAR  conv: Conversion;  str: PCS.String;  con: PCT.Const; l: SIGNED32; ch: CHAR; r: FLOAT32;  lr: LONGREAL;
 	BEGIN
 		IF IsInvalid(exp) THEN  exp := InvalidExpr
 		ELSIF type IS PCT.Delegate THEN
@@ -3193,7 +3193,7 @@ END RealtimeCompatible;
 			ELSIF type = PCT.Int32  THEN	exp := NewIntValue(pos, buf, type)
 			ELSIF type = PCT.Int64  THEN	exp := NewIntValue(pos, buf, type)
 			ELSIF type = PCT.Char8  THEN	exp := NewIntValue(pos, SYSTEM.VAL(SIGNED8, buf), PCT.Char8)
-			ELSIF type = PCT.Float32  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(REAL, buf), PCT.Float32)
+			ELSIF type = PCT.Float32  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(FLOAT32, buf), PCT.Float32)
 			ELSIF type = PCT.Float64  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(LONGREAL, buf), PCT.Float64)
 			ELSIF type = PCT.Set  THEN	exp := NewSetValue(pos, SYSTEM.VAL(SET, buf))
 			ELSIF ptr THEN  exp := NewIntValue(pos, buf, type)
@@ -3242,7 +3242,7 @@ END RealtimeCompatible;
 (* > bootstrap 1 *)
 						ELSIF type=PCT.Int64 THEN RETURN NewLongIntValue(pos, 7FFFFFFFFFFFFFFFH)
 (* < bootstrap 1 *)
-						ELSIF type=PCT.Float32 THEN RETURN NewFloatValue(pos, MAX(REAL), PCT.Float32)
+						ELSIF type=PCT.Float32 THEN RETURN NewFloatValue(pos, MAX(FLOAT32), PCT.Float32)
 						ELSIF type=PCT.Float64 THEN RETURN NewFloatValue(pos, MAX(LONGREAL), PCT.Float64)
 						ELSIF type=PCT.Set THEN RETURN NewIntValue(pos, PCT.SetSize * 8 - 1, PCT.Int8)
 						ELSIF type IS PCT.EnhArray THEN RETURN NewArrayOperator( pos, fnr, NIL ,  params.first, NIL ,  FALSE ) (* fof *)
@@ -3263,7 +3263,7 @@ END RealtimeCompatible;
 (* > bootstrap 1 *)
 						ELSIF type=PCT.Int64 THEN RETURN NewLongIntValue(pos, 8000000000000000H)
 (* < bootstrap 1 *)
-						ELSIF type=PCT.Float32 THEN RETURN NewFloatValue(pos, MIN(REAL), PCT.Float32)
+						ELSIF type=PCT.Float32 THEN RETURN NewFloatValue(pos, MIN(FLOAT32), PCT.Float32)
 						ELSIF type=PCT.Float64 THEN RETURN NewFloatValue(pos, MIN(LONGREAL), PCT.Float64)
 						ELSIF type=PCT.Set THEN RETURN NewIntValue(pos, 0, PCT.Int8)
 						ELSIF type IS PCT.EnhArray THEN RETURN NewArrayOperator( pos, fnr, NIL , params.first, NIL , FALSE ) (* fof *)
@@ -5726,10 +5726,10 @@ END PCB.
 
 	Impossible errors:
 
-	1500	Conversion: const LONGREAL to other than REAL
-	1501	Conversion of const which is not Cardinal, CHAR, REAL, LONGREAL
-	1502	Projection of const which is not Cardinal, CHAR, REAL, SET, NIL
-	1503	Projection to const which is not Cardinal, CHAR, REAL, LONGREAL, SET
+	1500	Conversion: const LONGREAL to other than FLOAT32
+	1501	Conversion of const which is not Cardinal, CHAR, FLOAT32, LONGREAL
+	1502	Projection of const which is not Cardinal, CHAR, FLOAT32, SET, NIL
+	1503	Projection to const which is not Cardinal, CHAR, FLOAT32, LONGREAL, SET
 	1504	MakeNode: field/method cannot be referenced through SELF (SELF not found)
 
 *)

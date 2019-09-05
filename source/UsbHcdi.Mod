@@ -1103,12 +1103,12 @@ TYPE
 		 * a transfer or pipe creation can be supported in a given USB configuration.
 		 * @return: Time in nanoseconds the transactions will take, -1: Error
 		 *)
-(*		PROCEDURE GetBusTime*() : REAL;
-		VAR time : REAL;
+(*		PROCEDURE GetBusTime*() : FLOAT32;
+		VAR time : FLOAT32;
 
 			(* Bitstuffing inserts 1 Bit for 6 Bits in worst case, so in a worst case scenario, the amount of data
 			 * to be sent over the bus would increase by a factor of 7/6 *)
-			PROCEDURE BitStuffTime(lenData : SIGNED32) : REAL;
+			PROCEDURE BitStuffTime(lenData : SIGNED32) : FLOAT32;
 			BEGIN
 				RETURN 8.0 * 7.0 * lenData / 6.0;
 			END BitStuffTime;

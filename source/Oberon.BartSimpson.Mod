@@ -105,7 +105,7 @@ BEGIN
 END FrameAttr;
 
 PROCEDURE DrawEyes(F: Frame; M: Display3.Mask; x, y: SIGNED16);
-VAR A: Objects.AttrMsg; mx, my, py, px: SIGNED32; r, dx, dy, rp: REAL;
+VAR A: Objects.AttrMsg; mx, my, py, px: SIGNED32; r, dx, dy, rp: FLOAT32;
 BEGIN
 	IF F.oldLX > 0 THEN
 		Display3.ReplConst(M, Display3.BG, F.oldLX, F.oldLY, 2, 2, Display.replace);

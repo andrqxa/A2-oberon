@@ -26,14 +26,14 @@ MODULE LeoFrames IN Oberon; (** portable **)	(* eos  *)
 		Frame* = POINTER TO FrameDesc;
 		FrameDesc* = RECORD (Gadgets.FrameDesc)
 			ox*, oy*: SIGNED16;	(** vector from upper left corner of frame to figure origin in screen space **)
-			scale*: REAL;	(** viewport scale factor **)
+			scale*: FLOAT32;	(** viewport scale factor **)
 			col*: Display.Color;	(** background color (unless transparent) **)
 			framed*: BOOLEAN;	(** if true then a pseudo-3D border is drawn around the frame **)
 		END;
 
 		RegData = RECORD (GfxRegions.EnumData)
 			reg: GfxRegions.Region;
-			scale: REAL;
+			scale: FLOAT32;
 			border: SIGNED16;
 			dx, dy: SIGNED16;
 		END;
@@ -76,7 +76,7 @@ MODULE LeoFrames IN Oberon; (** portable **)	(* eos  *)
 	END AddScaledRect;
 
 	(** convert region from figure space to frame space and clip to frame **)
-	PROCEDURE ScaledRegion* (src: GfxRegions.Region; scale, border: REAL; dx, dy: SIGNED16): GfxRegions.Region;
+	PROCEDURE ScaledRegion* (src: GfxRegions.Region; scale, border: FLOAT32; dx, dy: SIGNED16): GfxRegions.Region;
 		VAR rdata: RegData;
 	BEGIN
 		rdata.border := -SHORT(ENTIER(-scale * border));
@@ -406,7 +406,7 @@ MODULE LeoFrames IN Oberon; (** portable **)	(* eos  *)
 	END NewFrame;
 
 	PROCEDURE ReadContainer (VAR r: Files.Rider; cont: Leonardo.Container);
-		VAR ver: SIGNED32; i: SIGNED16; real: REAL; obj: Objects.Object; cm: Objects.CopyMsg; s: Leonardo.Shape; bool: BOOLEAN;
+		VAR ver: SIGNED32; i: SIGNED16; real: FLOAT32; obj: Objects.Object; cm: Objects.CopyMsg; s: Leonardo.Shape; bool: BOOLEAN;
 	BEGIN
 		(* shape part *)
 		Files.ReadNum(r, ver);

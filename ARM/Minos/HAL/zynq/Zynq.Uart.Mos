@@ -521,7 +521,7 @@ VAR
 		uart : Uart;
 		reg : SET;
 		cd, bdiv : SIGNED32;
-		sampleClk, baudClk : REAL;
+		sampleClk, baudClk : FLOAT32;
 	BEGIN
 		IF ( GetUartByIndex( no, uart )) THEN
 			

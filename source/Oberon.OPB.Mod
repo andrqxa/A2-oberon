@@ -831,7 +831,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END Convert;
 
 	PROCEDURE Val(VAR x: OPT.Node;  typ: OPT.Struct);	(*SYSTEM.VAL, change type, no convertion only projection*)
-	VAR  t: OPT.Node;  f: SIGNED16;  r: REAL;
+	VAR  t: OPT.Node;  f: SIGNED16;  r: FLOAT32;
 	BEGIN
 		f := x.typ.form;
 		IF (x^.class = Ntype) OR (x^.class = Nproc) OR
@@ -839,7 +839,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		END ;
 		IF (x^.class = Nconst) & (typ.comp = Basic) THEN
 			IF (typ.form = Real) & (f IN intSet) THEN
-				x := NewRealConst(SYSTEM.VAL (REAL, x.conval.intval), typ);
+				x := NewRealConst(SYSTEM.VAL (FLOAT32, x.conval.intval), typ);
 			ELSIF (typ.form IN intSet) & (f = Real) THEN
 				r := SHORT(x.conval.realval);  x := NewIntConst(SYSTEM.VAL(SIGNED32, r))
 			ELSIF (typ.form IN {SInt, Int}) & (f IN intSet) THEN	(*force sign extension*)

@@ -17,7 +17,7 @@ MODULE PrinterInfo IN Oberon; (** portable *)	(* ejz  *)
 		END
 	END Int;
 
-	PROCEDURE FixedStr(val: REAL; VAR str: ARRAY OF CHAR);
+	PROCEDURE FixedStr(val: FLOAT32; VAR str: ARRAY OF CHAR);
 		VAR v, i: SIGNED32;
 	BEGIN
 		v := ENTIER(val*100.0+0.5); i := 1;
@@ -33,7 +33,7 @@ MODULE PrinterInfo IN Oberon; (** portable *)	(* ejz  *)
 		str[i] := 0X
 	END FixedStr;
 
-	PROCEDURE Fixed(name: ARRAY OF CHAR; val: REAL);
+	PROCEDURE Fixed(name: ARRAY OF CHAR; val: FLOAT32);
 		VAR
 			obj: Objects.Object;
 			str: ARRAY 8 OF CHAR;

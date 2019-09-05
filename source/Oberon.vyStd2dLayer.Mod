@@ -97,7 +97,7 @@ VAR
 	END Open;
 
 	PROCEDURE Show*;
-	VAR data: Objects.Object;  layer: tLayer;  minX, maxX: REAL;
+	VAR data: Objects.Object;  layer: tLayer;  minX, maxX: FLOAT32;
 		recallProc: ARRAY 32 OF CHAR;
 		s: vyParser.Scanner;  nans: SIGNED32;
 	BEGIN

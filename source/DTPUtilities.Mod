@@ -44,7 +44,7 @@ TYPE
 
 	RealPropertyEntry* = OBJECT(PropertyEntry)
 	VAR name: ARRAY 16 OF CHAR;
-		value: REAL;
+		value: FLOAT32;
 		onClick: WMEvents.EventSource;
 
 	END RealPropertyEntry;
@@ -2082,38 +2082,38 @@ VAR
 	ctxRegular, ctxBold, ctxItalic, ctxBoldItalic: ContextMenuData;
 
 
-PROCEDURE Inc*(VAR a, b: REAL);
+PROCEDURE Inc*(VAR a, b: FLOAT32);
 BEGIN
 	a := a + b;
 END Inc;
 
-PROCEDURE Dec*(VAR a, b: REAL);
+PROCEDURE Dec*(VAR a, b: FLOAT32);
 BEGIN
 	a := a - b;
 END Dec;
 
 (* converts a 16.16 fixpoint integer to float *)
-PROCEDURE FixpToFloat*(x: SIZE): REAL;
+PROCEDURE FixpToFloat*(x: SIZE): FLOAT32;
 BEGIN
 	RETURN (x / 65536);
 END FixpToFloat;
 
 (* converts a float into a 16.16 fixpoint integer *)
-PROCEDURE FloatToFixp*(x: REAL): SIGNED32;
+PROCEDURE FloatToFixp*(x: FLOAT32): SIGNED32;
 BEGIN
 	IF x > 65536 THEN x := 65536; RETURN ENTIER(x);
 	ELSE RETURN ENTIER(x * (65536));
 	END;
 END FloatToFixp;
 
-PROCEDURE OutReal*(input: REAL; digits: SIGNED32);
+PROCEDURE OutReal*(input: FLOAT32; digits: SIGNED32);
 VAR tempString: ARRAY 64 OF CHAR;
 BEGIN
 	Strings.FloatToStr(input, 0, digits, 0, tempString);
 	KernelLog.String(tempString);
 END OutReal;
 
-PROCEDURE ROUND*(input: REAL): SIGNED32;
+PROCEDURE ROUND*(input: FLOAT32): SIGNED32;
 VAR output: SIGNED32;
 BEGIN
 	output := ENTIER(input+0.5);

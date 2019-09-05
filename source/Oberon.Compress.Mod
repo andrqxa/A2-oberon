@@ -57,7 +57,7 @@ MODULE Compress IN Oberon; (** portable *)	(* ejz  *)
 			name*: Name;
 			length*, check: SIGNED32;
 			date*, time*: SIGNED32;
-			ratio*: REAL;
+			ratio*: FLOAT32;
 			extensions*: SET (* encryption *)
 		END;
 		List = POINTER TO ListDesc;

@@ -132,7 +132,7 @@ TYPE
 		(* jb28.3.00 - replaced by GetRandomBitV
 		GetRandomV*: PROCEDURE (gen: tRandom; count: SIGNED32; VAR nrs: ARRAY OF SIGNED32; start: SIGNED32);	(*= A bit pattern, stored as SIGNED32 *)
 		*)
-		GetRandomUV*: PROCEDURE ( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF REAL;  start: SIGNED32 );   (*= U[0,1] *)
+		GetRandomUV*: PROCEDURE ( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF FLOAT32;  start: SIGNED32 );   (*= U[0,1] *)
 		GetRandomUVX*: PROCEDURE ( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF LONGREAL;  start: SIGNED32 );   (*= U[0,1] *)
 
 		(* the following procedures generate a random SIGNED32 within [0; top) *)
@@ -286,7 +286,7 @@ END RandomV;
 		RandomGenerator.GetRandomLV( RandomGenerator, top, count, nrs, start )
 	END RandomLV;
 
-	PROCEDURE RandomUV*( count: SIGNED32;  VAR nrs: ARRAY OF REAL;  start: SIGNED32 );
+	PROCEDURE RandomUV*( count: SIGNED32;  VAR nrs: ARRAY OF FLOAT32;  start: SIGNED32 );
 	(* VAR i: SIGNED32; *)
 	BEGIN
 		(* jb 12.3.00
@@ -379,7 +379,7 @@ END DefaultRandomV;
 		FOR i := start TO start + count - 1 DO nrs[i] := gen.GetRandomL( gen, top ) END
 	END DefaultRandomLV;
 
-	PROCEDURE DefaultRandomUV*( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF REAL;  start: SIGNED32 );
+	PROCEDURE DefaultRandomUV*( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF FLOAT32;  start: SIGNED32 );
 	VAR i: SIGNED32;
 	BEGIN
 		FOR i := start TO start + count - 1 DO nrs[i] := SHORT( gen.GetRandomU( gen ) ) END

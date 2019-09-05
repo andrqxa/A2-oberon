@@ -59,7 +59,7 @@ VAR   		A: antsArrayObjects.tObject;            		r: antsRegions.tRegion;       
 	Aorig, Aorigtr, APott1, Apotttr, APott2: antsArrayObjects.tLONGREALArray;
 	lengths: BOOLEAN;
 BEGIN
-	antsCommands.InitScan("gamma=REAL minwidth=INT maxwidth=INT");
+	antsCommands.InitScan("gamma=FLOAT32 minwidth=INT maxwidth=INT");
 	IF  antsCommands.ExpectReal( "gamma", gamma) &
 		antsCommands.ExpectNumber( "minwidth",  minweit) &
 		antsCommands.ExpectNumber( "maxwidth",  maxweit)
@@ -206,7 +206,7 @@ END FileEnum;
 PROCEDURE OnDirectory*;
 VAR       done: BOOLEAN;               path: ARRAY 256 OF CHAR;
 BEGIN
-	antsCommands.InitScan("inDirectory=STR outDirectory=STR gamma=REAL minWidth=INT maxWidth=INT");
+	antsCommands.InitScan("inDirectory=STR outDirectory=STR gamma=FLOAT32 minWidth=INT maxWidth=INT");
 	IF antsCommands.ExpectString("inDirectory", inDirectory) &
 		antsCommands.ExpectString("outDirectory",  outDirectory) &
 		antsCommands.ExpectReal( "gamma", globalGamma) &
@@ -381,7 +381,7 @@ PROCEDURE PottsToVec*;
 VAR          		obj1, obj2, obj3: vyBase.Object;                  		vec1, vec2, vec3: vyLongrealVec.tVector;
 	i, N, this, last: SIGNED32;                  		rstern: antsArrays.I1d;                  		bellman, maxima, maxima2, data: antsArrays.X1d;                  		gamma: LONGREAL;
 BEGIN
-	antsCommands.InitScan("data=OBJ rek=OBJ gamma=REAL");
+	antsCommands.InitScan("data=OBJ rek=OBJ gamma=FLOAT32");
 	IF antsCommands.ExpectObject( "data",  obj1) &
 		antsCommands.ExpectObject( "rek",  obj2) &
 		antsCommands.ExpectReal( "gamma",  gamma)

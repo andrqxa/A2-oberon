@@ -49,7 +49,7 @@ TYPE
 	END TabStops;
 
 	LineInfo = RECORD
-		height, ascent, spaceSize : REAL;
+		height, ascent, spaceSize : FLOAT32;
 		width : SIZE;
 		pos : SIZE; (* the position in the text, where this line starts *)
 		align : SIZE;
@@ -57,7 +57,7 @@ TYPE
 		tabStops : TabStops;
 		firstInParagraph, lastInParagraph, lastInText: BOOLEAN;
 		eotSize: SIZE;
-		leading, firstIndent, leftIndent, rightIndent, spaceBefore, spaceAfter: REAL;
+		leading, firstIndent, leftIndent, rightIndent, spaceBefore, spaceAfter: FLOAT32;
 	END;
 
 	LineInfoArray = POINTER TO ARRAY OF LineInfo;
@@ -70,7 +70,7 @@ TYPE
 		paperWidth: SIZE;
 		textWidth : SIZE; (* maximal width of the text <= textWidth *)
 		textHeight : SIZE;
-		realHeight, realWidth: REAL;
+		realHeight, realWidth: FLOAT32;
 		layoutLineProc : PROCEDURE {DELEGATE} (VAR pos : SIZE; VAR lineInfo : LineInfo; lineNr: SIZE; wrapWidth: SIZE; stopPos: SIZE; stopXPos : SIZE; fcur: BOOLEAN);
 
 		PROCEDURE &New*;
@@ -166,7 +166,7 @@ TYPE
 		(** Fix the layouting of the text starting at pos where delta characters have been inserted (delta negativ if deleted) *)
 		PROCEDURE FixLayoutFrom(pos, delta : SIZE; VAR first, last : SIZE; VAR linesChanged : BOOLEAN; firstpos, firstline: SIZE);
 		VAR l, dl : SIZE;
-			oldh, tempHeight: REAL;
+			oldh, tempHeight: FLOAT32;
 		BEGIN
 			ASSERT(text#NIL);
 			text.AcquireRead;
@@ -477,14 +477,14 @@ TYPE
 		layout : Layout;
 		utilreader : Texts.TextReader; (* single process ! *)
 		firstInParagraph: BOOLEAN;
-		jSpaceSize : REAL;
+		jSpaceSize : FLOAT32;
 
 		defaultTextColor*, defaultTextBgColor* : SIGNED32;
 		defaultAttr : Texts.Attributes;
 		(* default style ?? *)
 		defaultFont : WMGraphics.Font;
 		fStyle : Texts.CharacterStyle;
-		fZoom : REAL;
+		fZoom : FLOAT32;
 
 		(* wrapping *)
 		wrap : SET;
@@ -636,7 +636,7 @@ TYPE
 			END;
 		END SetSize;
 
-		PROCEDURE Resize*(zoom : REAL);
+		PROCEDURE Resize*(zoom : FLOAT32);
 		BEGIN
 			Resize^(zoom);
 			(* layout.FullLayout; CheckNumberOfLines; *)
@@ -865,7 +865,7 @@ TYPE
 		END CheckNumberOfLines;
 
 		PROCEDURE CheckCursor;
-		VAR cp, l, i : SIZE; ty : REAL;
+		VAR cp, l, i : SIZE; ty : FLOAT32;
 		BEGIN
 			(* Scroll up, down to make cursor visible *)
 			text.AcquireRead;
@@ -899,7 +899,7 @@ TYPE
 		PROCEDURE TextChanged(sender, data : ANY);
 		VAR f, l, i: SIZE; t, b, h: SIZE; linesChanged : BOOLEAN;
 			info : Texts.TextChangeInfo;
-			realT, realB: REAL;
+			realT, realB: FLOAT32;
 		BEGIN
 				IF (data # NIL) & (data IS Texts.TextChangeInfo) & (data(Texts.TextChangeInfo).op # Texts.OpMulti) THEN
 					text.AcquireRead;
@@ -955,7 +955,7 @@ TYPE
 		(** Return the left indent of a line - depending on alignment *)
 		(* returns left border, in case of errors *)
 		PROCEDURE GetLineLeftIndent(linenr : SIZE): SIZE;
-		VAR result, boundsWidth: REAL;
+		VAR result, boundsWidth: FLOAT32;
 		BEGIN
 			IF (linenr < 0) OR (linenr >= layout.nofLines) THEN RETURN 0 END;
 			(* KernelLog.Int(layout.lines[linenr].align, 0); *)
@@ -999,7 +999,7 @@ TYPE
 
 		(** Find the line number that currently contains the y value (y relative to 0 in component)*)
 		PROCEDURE FindLineByY*(firstLine, y : SIZE) : SIZE;
-		VAR i : SIZE; ypos : REAL;
+		VAR i : SIZE; ypos : FLOAT32;
 		BEGIN
 			ypos := bordersI.t; i := firstLine;
 			IF y < 0 THEN RETURN 0 END;
@@ -1013,7 +1013,7 @@ TYPE
 
 		PROCEDURE ViewToTextPos*(x, y: SIZE; VAR pos : SIZE);
 		VAR l : SIZE; dummy : LineInfo;
-			boundsWidth : REAL;
+			boundsWidth : FLOAT32;
 		BEGIN
 			text.AcquireRead;
 			pos := -1;
@@ -1097,12 +1097,12 @@ TYPE
 			f : WMGraphics.Font;
 			eol, first, wrapped : BOOLEAN;
 			voff, x, wrapX, align, nofSpaces: SIZE;
-			ascent, descent, realX, dx, realWX, a, d, spaceSize, spaceRSize: REAL;
+			ascent, descent, realX, dx, realWX, a, d, spaceSize, spaceRSize: FLOAT32;
 			pStyle: Texts.ParagraphStyle;
 			curStyle, cStyle: Texts.CharacterStyle;
-			firstIndent, leftIndent, rightIndent, spaceBefore, spaceAfter, leading, leadi: REAL;
+			firstIndent, leftIndent, rightIndent, spaceBefore, spaceAfter, leading, leadi: FLOAT32;
 
-			PROCEDURE GetExtents(ch : Char32; VAR dx, ascentE, descentE: REAL);
+			PROCEDURE GetExtents(ch : Char32; VAR dx, ascentE, descentE: FLOAT32);
 			VAR gs : WMGraphics.GlyphSpacings; vc : WMComponents.VisualComponent;
 				img : Image;
 			BEGIN
@@ -1377,7 +1377,7 @@ TYPE
 
 		PROCEDURE LineYPos(lineNr : SIZE; VAR y0, y1 : SIZE);
 		VAR i : SIZE;
-			realY0, realY1: REAL;
+			realY0, realY1: FLOAT32;
 		BEGIN
 			IF (lineNr >= firstLineI) & (lineNr < layout.GetNofLines()) THEN
 				y0 := bordersI.t; realY0:= y0; i := firstLineI;
@@ -1395,7 +1395,7 @@ TYPE
 		PROCEDURE FindScreenPos*(pos : SIZE; VAR x, y : SIZE) : BOOLEAN;
 		VAR l, i, startPos: SIZE; ty : SIZE; li : LineInfo; ch : Char32; lastLine : BOOLEAN;
 			f : WMGraphics.Font;
-			realTY: REAL;
+			realTY: FLOAT32;
 		BEGIN
 			text.AcquireRead;
 			lastLine := FALSE;
@@ -1478,7 +1478,7 @@ TYPE
 		VAR sx, x, i, j, k, w, voff : SIZE; color, bgcolor: SIGNED32; sp, linelength, p: SIZE; char : Char32; gs: WMGraphics.GlyphSpacings;
 	 		curAttr : Texts.Attributes; font : WMGraphics.Font; vc : WMComponents.VisualComponent;
 	 		hc : BOOLEAN;
-	 		realX, dx: REAL;
+	 		realX, dx: FLOAT32;
 	 		curStyle, cStyle: Texts.CharacterStyle;
 	 		imh, imw: SIZE;
 		BEGIN
@@ -1693,7 +1693,7 @@ TYPE
 			UNTIL (i >= linelength) OR utilreader.eot OR (x + sx > w)
 		END RenderLine;
 
-		PROCEDURE RenderChar(canvas : WMGraphics.Canvas; x, y: REAL; char: Char32; font: WMGraphics.Font; color: SIGNED32);
+		PROCEDURE RenderChar(canvas : WMGraphics.Canvas; x, y: FLOAT32; char: Char32; font: WMGraphics.Font; color: SIGNED32);
 		VAR g: WMGraphics.GlyphSpacings; img: WMGraphics.Image;
 			glyphCanvas: WMGraphics.BufferCanvas;
 			glyphImg: WMGraphics.Image;
@@ -1903,7 +1903,7 @@ TYPE
 			i, la, lb: SIZE;
 			w, h, top : SIZE;
 			l : LineInfo;
-			realH, realTop: REAL;
+			realH, realTop: FLOAT32;
 		BEGIN
 			text.AcquireRead;
 			selection.Sort;
@@ -2258,11 +2258,11 @@ TYPE
 			text.ReleaseRead
 		END End;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE;  zoomF: REAL; quality, preview: BOOLEAN);
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE;  zoomF: FLOAT32; quality, preview: BOOLEAN);
 		VAR la, lb, i, top : SIZE; cliprect : WMRectangles.Rectangle; cstate : WMGraphics.CanvasState;
 			t: SIZE;
 			color: SIGNED32;
-			realTop: REAL;
+			realTop: FLOAT32;
 			overflow: BOOLEAN;
 			chained: BOOLEAN;
 			newText: Texts.Text;

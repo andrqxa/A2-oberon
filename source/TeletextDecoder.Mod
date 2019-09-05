@@ -583,7 +583,7 @@ TYPE
 		off, thresh : SIGNED32;
 		line, spos : SIGNED32;
 		buffers: ARRAY 8 OF PageBuffer;
-		freq : REAL;
+		freq : FLOAT32;
 		vtstep, vcstep, vpsstep : SIGNED32;
 		norm : SIGNED32;
 		currentSuite : TeletextSuite;
@@ -986,11 +986,11 @@ TYPE
 			END
 		END DecodeVt;
 
-		PROCEDURE SetFreq(f : REAL; n : SIGNED32);
+		PROCEDURE SetFreq(f : FLOAT32; n : SIGNED32);
 		VAR
-			vtfreq : REAL;
-			vpsfreq : REAL;
-			vcfreq : REAL;
+			vtfreq : FLOAT32;
+			vpsfreq : FLOAT32;
+			vcfreq : FLOAT32;
 		BEGIN
 			IF norm # 0 THEN
 				vtfreq := 5.72725

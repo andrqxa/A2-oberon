@@ -248,10 +248,10 @@ TYPE
 			p.s := set;
 		END PushSet;
 
-		PROCEDURE PushR(r: REAL);
-		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD r: REAL END;
+		PROCEDURE PushR(r: FLOAT32);
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD r: FLOAT32 END;
 		BEGIN
-			p := Next(SIZEOF(REAL));
+			p := Next(SIZEOF(FLOAT32));
 			p.r := r;
 		END PushR;
 
@@ -311,11 +311,11 @@ TYPE
 			RETURN res;
 		END CallH;
 
-		PROCEDURE CallR(adr: ADDRESS): REAL;
+		PROCEDURE CallR(adr: ADDRESS): FLOAT32;
 		TYPE
-			P = PROCEDURE(): REAL;
+			P = PROCEDURE(): FLOAT32;
 		VAR
-			res: REAL; esp: ADDRESS;
+			res: FLOAT32; esp: ADDRESS;
 			p: P;
 		BEGIN
 			p := SYSTEM.VAL(P, adr);
@@ -420,7 +420,7 @@ TYPE
 		PROCEDURE PushTyped*(o: Result; mode: CHAR; refs: Modules.Bytes; VAR offset: SIZE): BOOLEAN;
 		VAR ofs: SIZE;
 			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
-			r: REAL; x: LONGREAL;
+			r: FLOAT32; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
 			v:Value;
@@ -479,7 +479,7 @@ TYPE
 							END;
 						|Reflection.sfTypeREAL:
 							IF v.GetReal(x) THEN
-								r := REAL(x);stack.PushR(r);
+								r := FLOAT32(x);stack.PushR(r);
 								RETURN TRUE;
 							END;
 						|Reflection.sfTypeLONGREAL:
@@ -520,7 +520,7 @@ TYPE
 		PROCEDURE Push*(o: Result): BOOLEAN;
 		VAR
 			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
-			r: REAL; x: LONGREAL;
+			r: FLOAT32; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
 			v:Value;
@@ -648,7 +648,7 @@ TYPE
 		PROCEDURE SetV*(v: Value): BOOLEAN;
 		VAR
 			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
-			r: REAL; x: LONGREAL;
+			r: FLOAT32; x: LONGREAL;
 			b: BOOLEAN;
 			set: SET;
 			type: Meta;
@@ -679,7 +679,7 @@ TYPE
 				END;
 			|Reflection.sfTypeREAL:
 				IF v.GetReal(x) THEN
-					r := REAL(x); SYSTEM.PUT(address, r);
+					r := FLOAT32(x); SYSTEM.PUT(address, r);
 					RETURN TRUE
 				END;
 			|Reflection.sfTypeLONGREAL:

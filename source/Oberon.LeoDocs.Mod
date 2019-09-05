@@ -261,7 +261,7 @@ MODULE LeoDocs IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE PrintPS*;
 		VAR
 			s: Attributes.Scanner; name: ARRAY 64 OF CHAR; landscape, level2: BOOLEAN; dpi: SIGNED32;
-			doc: Documents.Document; frame: LeoFrames.Frame; w, h: REAL; ps: GfxPS.Context; file: Files.File;
+			doc: Documents.Document; frame: LeoFrames.Frame; w, h: FLOAT32; ps: GfxPS.Context; file: Files.File;
 	BEGIN
 		Attributes.OpenScanner(s, Oberon.Par.text, Oberon.Par.pos); Attributes.Scan(s);
 		IF s.class IN {Attributes.Name, Attributes.String} THEN

@@ -20,7 +20,7 @@ TYPE
 			navig : BOOLEAN;
 			scrollLock : BOOLEAN;
 
-			fx, fy, inffx, inffy, factor, intfactor : REAL;
+			fx, fy, inffx, inffy, factor, intfactor : FLOAT32;
 			active : BOOLEAN;
 
 		PROCEDURE &New*(manager:WMWindowManager.WindowManager; port, dx, dy, w, h:SIGNED32; name, password:ARRAY OF CHAR);
@@ -134,8 +134,8 @@ TYPE
 			range.r := range.l + w; range.b := range.t + h;
 		END SetExtents;
 
-		PROCEDURE SetScaleFactor(factor : REAL);
-		VAR centerX, centerY : REAL;
+		PROCEDURE SetScaleFactor(factor : FLOAT32);
+		VAR centerX, centerY : FLOAT32;
 		BEGIN
 			centerX := (range.l + range.r) / 2; centerY := (range.t + range.b) /2;
 			fx := factor; fy := factor; inffx := 1 / factor; inffy := inffx;

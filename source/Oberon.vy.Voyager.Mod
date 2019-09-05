@@ -83,7 +83,7 @@ VAR
 	PROCEDURE ReadData*;   (*vs 0.1d3 gs *)
 	(*= Syntax: ReadData <Name> <data>. Line breaks are ignored *)
 	(*! support mixed type input *)
-	VAR x: REAL;  name: vyName.tNameArray;  o: vyBase.tVector;  sc: vyParser.Scanner;
+	VAR x: FLOAT32;  name: vyName.tNameArray;  o: vyBase.tVector;  sc: vyParser.Scanner;
 	BEGIN
 		o := vyRealVec.New( 0 );  vyParser.OpenParScanner( sc );
 		IF ~vyParser.Name( sc, name ) THEN name := "no name" END;
@@ -99,7 +99,7 @@ VAR
 	PROCEDURE ReadTable*;   (*vs 0.1d1 gs *)
 	(*= Syntax: ReadData <Name> <data>. Cases are separated by line breaks. Vars must be same as nuber of names. *)
 	(*! support mixed type input *)
-	VAR x: REAL;  name: vyName.tNameArray;  o: vyBase.tVector;  first, q: vyLinks.Link;  sc: vyParser.Scanner;
+	VAR x: FLOAT32;  name: vyName.tNameArray;  o: vyBase.tVector;  first, q: vyLinks.Link;  sc: vyParser.Scanner;
 	BEGIN
 		NEW( first );  first.link := NIL;  q := first;  vyParser.OpenParScanner( sc );
 		WHILE vyParser.Name( sc, name ) DO

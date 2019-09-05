@@ -73,7 +73,7 @@ TYPE
 	Picture* = POINTER TO PictureDesc;
 	PictureDesc* = RECORD (vyBase.FrameDesc)
 	(*	defunctx * , defuncty * : SIGNED16;*)
-		Pictx, Picty, Pictw, Picth: REAL;   (* pictures location factors relative to the frame.
+		Pictx, Picty, Pictw, Picth: FLOAT32;   (* pictures location factors relative to the frame.
 		See AdjustPict for semantics *)
 		(*= pictures absolute location, is updated by host frame's handler *)
 		needsRedraw*: BOOLEAN;   (*= set to force redraw if doublebuffering *)
@@ -143,7 +143,7 @@ VAR
 	stdFrameCol: SIGNED16;  setfrontmostcalled: BOOLEAN;
 
 	(** Port Variables **)
-	DfltFramesPLine- (*=Default number of frames per line *) , defFramehwRelation (*? *) : REAL;  screenRatio*: REAL;
+	DfltFramesPLine- (*=Default number of frames per line *) , defFramehwRelation (*? *) : FLOAT32;  screenRatio*: FLOAT32;
 	updatesuspend: BOOLEAN;  BGPicture: Pictures.Picture;
 	(*	ftemp : Display.Frame;*)
 
@@ -443,7 +443,7 @@ END AdjustPict;
 	END FrameHandler;
 
 (** picture managment **)
-	PROCEDURE AddPicture*( frame: Frame;  picture: Picture;  x, y, w, h: REAL );
+	PROCEDURE AddPicture*( frame: Frame;  picture: Picture;  x, y, w, h: FLOAT32 );
 	BEGIN
 		picture.Pictx := x;  picture.Picty := y;  picture.Pictw := w;  picture.Picth := h;  picture.X := 0;  picture.Y := -picture.H;
 		Panels.InsertChild( frame, picture, 0, 0 );   (*! adjust w,h *)
@@ -456,7 +456,7 @@ END AdjustPict;
 	END RemovePicture;
 
 (** Frame generation **)
-	PROCEDURE SetDefaultFrameRatio*( framesPerLine, whRelation: REAL );
+	PROCEDURE SetDefaultFrameRatio*( framesPerLine, whRelation: FLOAT32 );
 	(*? should also work on the focus frame? *)
 	(*! Layla support *)
 	BEGIN
@@ -1929,13 +1929,13 @@ END LayerHandleAttributes;*)
 		IF gc # NIL THEN vyBase.Subscribe( (*for messages from source*) gc, picture ) END
 	END PictureSetgcontext;
 
-	PROCEDURE InsertNewCPicture*( x, y, w, h: REAL;  gc: vyBase.Object ): Picture;
+	PROCEDURE InsertNewCPicture*( x, y, w, h: FLOAT32;  gc: vyBase.Object ): Picture;
 	BEGIN
 		NewPicture;  PictureSetgcontext( newpicture, gc );  AddPicture( InsertNewFrame( 0, 0 ), newpicture, x, y, w, h );
 		RETURN newpicture
 	END InsertNewCPicture;
 
-	PROCEDURE XNewCPicture*( x, y, w, h: REAL;  gc: vyBase.Object ): Picture;
+	PROCEDURE XNewCPicture*( x, y, w, h: FLOAT32;  gc: vyBase.Object ): Picture;
 	BEGIN
 		NewPicture;  PictureSetgcontext( newpicture, gc );  AddPicture( XNewFrame( 0, 0 ), newpicture, x, y, w, h );
 		RETURN newpicture

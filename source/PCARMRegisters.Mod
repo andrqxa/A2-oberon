@@ -138,9 +138,9 @@ TYPE
 
 	RealConstant* = OBJECT(ConstantContent)
 		VAR
-			v-: REAL;
+			v-: FLOAT32;
 
-		PROCEDURE &Init*(value: REAL);
+		PROCEDURE &Init*(value: FLOAT32);
 		BEGIN v := value
 		END Init;
 
@@ -470,7 +470,7 @@ VAR c: IntConstant;
 BEGIN NEW(c, v); RETURN c
 END NewIntConst;
 
-PROCEDURE NewRealConst*(v: REAL): RealConstant;
+PROCEDURE NewRealConst*(v: FLOAT32): RealConstant;
 VAR c: RealConstant;
 BEGIN NEW(c, v); RETURN c
 END NewRealConst;

@@ -350,7 +350,7 @@ VAR
 	PROCEDURE Channel*;
 	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: LONGREAL;  x: SIGNED32;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name=OBJ p=REAL ~# Add channel noise to data <name> with prob. p " );
+		l := antsCommands.ScanFromPar( "name=OBJ p=FLOAT32 ~# Add channel noise to data <name> with prob. p " );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "p", p ) THEN
 			IF obj IS tObject THEN
 				WITH obj: tObject DO
@@ -368,7 +368,7 @@ VAR
 	PROCEDURE AddNoise*;
 	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: LONGREAL;  x: SIGNED32;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name=OBJECT p=REAL # Add (rounded) gaussian noise with var. <p> to data <name>" );
+		l := antsCommands.ScanFromPar( "name=OBJECT p=FLOAT32 # Add (rounded) gaussian noise with var. <p> to data <name>" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "p", p ) THEN
 			IF obj IS tObject THEN
 				WITH obj: tObject DO

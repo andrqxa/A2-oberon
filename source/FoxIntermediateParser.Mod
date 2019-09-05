@@ -230,7 +230,7 @@ TYPE
 							IntermediateCode.InitNumber(operand, someHugeint);
 						ELSIF type.form = IntermediateCode.Float THEN
 							ASSERT(hasTypeDescriptor);
-							IntermediateCode.InitFloatImmediate(operand, type, REAL(someHugeint))
+							IntermediateCode.InitFloatImmediate(operand, type, FLOAT32(someHugeint))
 						ELSE
 							ASSERT(hasTypeDescriptor & (type.form IN IntermediateCode.Integer));
 							IntermediateCode.InitImmediate(operand, type, someHugeint)

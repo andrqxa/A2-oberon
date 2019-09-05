@@ -94,7 +94,7 @@ BEGIN
 END SetColor;
 
 PROCEDURE SetC2d*;
-	VAR s: vyParser.Scanner;   focus: vyPort.Picture;  x2d, y2d, w2d, h2d: REAL;
+	VAR s: vyParser.Scanner;   focus: vyPort.Picture;  x2d, y2d, w2d, h2d: FLOAT32;
 BEGIN
 	focus := vyPort.GetFocusPicture ();
 	IF focus = NIL THEN vyHostTexts.Note (vyHostTexts.cNotify, "no picture focused");  RETURN  END;
@@ -155,7 +155,7 @@ END SetFont;
 
 
 PROCEDURE SetPortRatio*;
-	VAR ppl, whr: REAL;  sc: vyParser.Scanner;
+	VAR ppl, whr: FLOAT32;  sc: vyParser.Scanner;
 BEGIN vyParser.OpenParScanner(sc);
 	IF vyParser.Real (sc, ppl) & vyParser.Real (sc, whr)  THEN vyPort.SetDefaultFrameRatio (ppl, whr)
 	ELSE vyParser.MsgSyntax (" vyGraphicCtl.SetPortRatio", "portsPerWidth;whRelation")

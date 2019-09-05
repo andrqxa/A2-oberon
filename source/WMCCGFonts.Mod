@@ -60,7 +60,7 @@ TYPE
 
 
 		(** Render character char to canvas at x, y (baseline) *)
-		PROCEDURE RenderChar*(canvas : WMGraphics. Canvas ; x, y : REAL; char : SIGNED32);
+		PROCEDURE RenderChar*(canvas : WMGraphics. Canvas ; x, y : FLOAT32; char : SIGNED32);
 		VAR glyph : Glyph;
 			points : ARRAY 2560 OF WMGraphics.Point2d;
 		BEGIN
@@ -227,9 +227,9 @@ TYPE
 
 		(* floating point version *)
 		PROCEDURE RenderGlyphReal*(canvas : WMGraphics.Canvas; glyph : Glyph;
-					x, y, w, h : REAL; level : SIGNED32;  filled : BOOLEAN; color: WMGraphics.Color; mode : SIGNED32; VAR points : ARRAY OF WMGraphics.Point2d);
-		VAR i : SIGNED32;  tx, ty, cx, cy, dx, dy : REAL; ctrl : BOOLEAN; g : Glyph; r, bb : WMRectangles.Rectangle;
-			dtx, dty, dtw, dth : REAL;
+					x, y, w, h : FLOAT32; level : SIGNED32;  filled : BOOLEAN; color: WMGraphics.Color; mode : SIGNED32; VAR points : ARRAY OF WMGraphics.Point2d);
+		VAR i : SIGNED32;  tx, ty, cx, cy, dx, dy : FLOAT32; ctrl : BOOLEAN; g : Glyph; r, bb : WMRectangles.Rectangle;
+			dtx, dty, dtw, dth : FLOAT32;
 			nofPoints : SIGNED32;
 
 		BEGIN
@@ -309,9 +309,9 @@ BEGIN
 	INC(nofPoints)
 END AddPoint;
 
-PROCEDURE SplineReal(canvas : WMGraphics.Canvas; x0, y0, x1, y1, x2, y2, x, y, w, h : REAL; color: WMGraphics.Color; mode : SIGNED32);
-VAR i: SIGNED32;  tx, ty, nx, ny : REAL;
-	t, onet, dt : REAL;
+PROCEDURE SplineReal(canvas : WMGraphics.Canvas; x0, y0, x1, y1, x2, y2, x, y, w, h : FLOAT32; color: WMGraphics.Color; mode : SIGNED32);
+VAR i: SIGNED32;  tx, ty, nx, ny : FLOAT32;
+	t, onet, dt : FLOAT32;
 BEGIN
 	tx := x0; ty := y0;
 	dt := 1 / MaxSplineSeg; t := 0; onet := 1;
@@ -324,9 +324,9 @@ BEGIN
 	END
 END SplineReal;
 
-PROCEDURE AddSplinePoints(VAR points : ARRAY OF WMGraphics.Point2d; VAR nofPoints : SIGNED32;  x0, y0, x1, y1, x2, y2, x, y, w, h : REAL);
-VAR i: SIGNED32;  tx, ty, nx, ny : REAL;
-	t, onet, dt : REAL;
+PROCEDURE AddSplinePoints(VAR points : ARRAY OF WMGraphics.Point2d; VAR nofPoints : SIGNED32;  x0, y0, x1, y1, x2, y2, x, y, w, h : FLOAT32);
+VAR i: SIGNED32;  tx, ty, nx, ny : FLOAT32;
+	t, onet, dt : FLOAT32;
 BEGIN
 	tx := x0; ty := y0;
 	dt := 1 / MaxSplineSeg; t := 0; onet := 1;

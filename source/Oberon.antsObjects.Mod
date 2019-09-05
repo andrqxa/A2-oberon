@@ -252,7 +252,7 @@ VAR
 		model: Objects.Object;  num: SIGNED32;  real: LONGREAL;
 		string: ARRAY 256 OF CHAR;
 	BEGIN
-		l := antsCommands.ScanFromPar( "[obj=OBJ | obj=NAME] attr=NAME val=(INT|REAL|STR) ~#use obj=LAYER or obj=PICTURE for last opened graphics" );
+		l := antsCommands.ScanFromPar( "[obj=OBJ | obj=NAME] attr=NAME val=(INT|FLOAT32|STR) ~#use obj=LAYER or obj=PICTURE for last opened graphics" );
 		IF ~antsCommands.GetObjectFromKeyword( l, "obj", obj ) THEN
 			l.spos := 1;  aM.vS( "antsObjects: no object" );
 			IF antsCommands.ExpectNameFromKeyword( l, "obj", name ) THEN
@@ -271,7 +271,7 @@ VAR
 				aM.vS( "antsObjects: Attribute IS SIGNED16" );  l.spos := 3;
 				IF antsCommands.ExpectNumberFromKeyword( l, "val", num ) THEN Attributes.SetInt( obj1, attribute, num ) END
 			ELSIF class = classReal THEN
-				aM.vS( "antsObjects: Attribute IS REAL" );  l.spos := 3;
+				aM.vS( "antsObjects: Attribute IS FLOAT32" );  l.spos := 3;
 				IF antsCommands.ExpectRealFromKeyword( l, "val", real ) THEN Attributes.SetLongReal( obj1, attribute, real ) END
 			ELSIF class = classString THEN
 				aM.vS( "antsObjects: Attribute IS String" );  l.spos := 3;

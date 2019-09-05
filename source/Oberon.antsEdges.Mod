@@ -32,7 +32,7 @@ PROCEDURE MakeEdges*;
 	A, hor, ver: antsArrayObjects.tINTEGERObject;  x, y: SIGNED32;
 	pyx, pyxm, pymx : SIGNED16;
 BEGIN
-	l := antsCommands.ScanFromPar("from=OBJ ver=OBJ hor=OBJ threshold=REAL # make edge Arrays from Array ");
+	l := antsCommands.ScanFromPar("from=OBJ ver=OBJ hor=OBJ threshold=FLOAT32 # make edge Arrays from Array ");
 	IF antsCommands.ExpectObjectFromKeyword(l, "from", obj) &
 		antsCommands.ExpectObjectFromKeyword(l, "ver", objh) &
 		antsCommands.ExpectObjectFromKeyword(l, "hor", objv) &

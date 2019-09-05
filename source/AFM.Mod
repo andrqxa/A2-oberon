@@ -26,7 +26,7 @@ TYPE
 			END
 		END InternalGetWidth;
 
-		PROCEDURE GetWidth*(size : REAL; ucs : SIGNED32) : REAL;
+		PROCEDURE GetWidth*(size : FLOAT32; ucs : SIGNED32) : FLOAT32;
 		BEGIN
 			IF (ucs >= 0) & (ucs < 256) THEN RETURN chars[ucs].w * size / 1000
 			ELSE RETURN 0
@@ -38,7 +38,7 @@ TYPE
 			RETURN 0
 		END Kerning;
 
-		PROCEDURE GetStringWidth*(size : REAL; str : ARRAY OF CHAR) : REAL;
+		PROCEDURE GetStringWidth*(size : FLOAT32; str : ARRAY OF CHAR) : FLOAT32;
 		VAR i, w : SIGNED32;
 		BEGIN
 			IF str[0] = 0X THEN RETURN 0.0 END;

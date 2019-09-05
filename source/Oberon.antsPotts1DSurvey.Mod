@@ -1338,7 +1338,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		varname, gammaname: ARRAY 64 OF CHAR;
 		type, type2: SIGNED16;
 	BEGIN
-		antsCommands.InitScan( "data=OBJ var=REAL samples=INT varvec=NAME gammavec=NAME (>median|>mean) [>abs|>log]" );
+		antsCommands.InitScan( "data=OBJ var=FLOAT32 samples=INT varvec=NAME gammavec=NAME (>median|>mean) [>abs|>log]" );
 		IF antsCommands.ExpectObject( "data", obj1 ) & antsCommands.ExpectReal( "var", variance ) &
 		    antsCommands.ExpectNumber( "samples", n ) & antsCommands.ExpectName( "varvec", varname ) &
 		    antsCommands.ExpectName( "gammavec", gammaname ) THEN
@@ -1462,7 +1462,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		heightname, positionname: ARRAY 64 OF CHAR;
 		gamma: LONGREAL;
 	BEGIN
-		antsCommands.InitScan( "data=OBJ var=REAL gamma=REAL samples=INT heightvec=NAME positionvec=NAME" );
+		antsCommands.InitScan( "data=OBJ var=FLOAT32 gamma=FLOAT32 samples=INT heightvec=NAME positionvec=NAME" );
 		IF antsCommands.ExpectObject( "data", obj1 ) & antsCommands.ExpectReal( "var", variance ) &
 		    antsCommands.ExpectReal( "gamma", gamma ) & antsCommands.ExpectNumber( "samples", n ) &
 		    antsCommands.ExpectName( "heightvec", heightname ) & antsCommands.ExpectName( "positionvec", positionname ) THEN
@@ -1479,7 +1479,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		gammavecname, numbervecname, partivecname: ARRAY 64 OF CHAR;
 		this, old: Texts.Text;
 	BEGIN
-		antsCommands.InitScan( "signal=OBJ var=REAL samples=INT gammavec=NAME [numbervec=NAME] [lengthvec=NAME] (>median|>mean) (>abs|>log) [>silent]" );
+		antsCommands.InitScan( "signal=OBJ var=FLOAT32 samples=INT gammavec=NAME [numbervec=NAME] [lengthvec=NAME] (>median|>mean) (>abs|>log) [>silent]" );
 		IF antsCommands.ExpectObject( "signal", obj1 ) & antsCommands.ExpectReal( "var", variance ) &
 		    antsCommands.ExpectNumber( "samples", n ) & antsCommands.ExpectName( "gammavec", gammavecname ) THEN
 			IF antsCommands.GetName( "numbervec", numbervecname ) THEN
@@ -1748,7 +1748,7 @@ Survey of different properties of the gamma values in the scanning
 	PROCEDURE GammaStatistics*;
 	VAR n: SIGNED32;  variance: LONGREAL;  jumps1: SIGNED32;  from, to, step: SIGNED32;  type: SIGNED16;
 	BEGIN
-		antsCommands.InitScan( "samples=INT var=REAL jumps=INT (>median|>mean) [from=INT to=INT step=INT]" );
+		antsCommands.InitScan( "samples=INT var=FLOAT32 jumps=INT (>median|>mean) [from=INT to=INT step=INT]" );
 		IF antsCommands.ExpectNumber( "samples", n ) & antsCommands.ExpectReal( "var", variance ) &
 		    antsCommands.ExpectNumber( "jumps", jumps1 ) THEN
 		ELSE RETURN

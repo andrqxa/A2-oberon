@@ -47,7 +47,7 @@ VAR
 	END Copy;
 
 	PROCEDURE Recall( scatter: tLayer );
-	VAR xx, yy: SIGNED16;  temp: SIGNED16;  xr, yr: REAL;
+	VAR xx, yy: SIGNED16;  temp: SIGNED16;  xr, yr: FLOAT32;
 	BEGIN
 		IF scatter.xr # NIL THEN xr := vyTypes.GetValueR( scatter.xr );  vyGraphBase.Point2dToPoint( xr, 0, xx, temp )
 		ELSE xx := MIN( SIGNED16 )

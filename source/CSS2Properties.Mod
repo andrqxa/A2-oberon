@@ -2003,7 +2003,7 @@ VAR m : WMWindowManager.WindowManager;
 
 	(* ppi: pixel per inch *)
 	PROCEDURE GetPixels(term: CSS2.Term; ppi: LONGREAL; font: GfxFonts.Font): LONGREAL;
-	VAR fact, pixels: LONGREAL; x, y, dx, dy: REAL; map: Raster.Image;
+	VAR fact, pixels: LONGREAL; x, y, dx, dy: FLOAT32; map: Raster.Image;
 	BEGIN
 		IF (term # NIL) & term.IsLength() THEN
 			CASE term.GetUnit() OF

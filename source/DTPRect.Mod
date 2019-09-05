@@ -27,7 +27,7 @@ TYPE
 	RectObject* = OBJECT(DTPData.ContentObject);
 	VAR
 		lineColor, rectColor, rectColor2: WMGraphics.Color;
-		lineWidth : REAL;
+		lineWidth : FLOAT32;
 		fillMode : WORD;
 		gradientHorizontal: BOOLEAN;
 		properties : RectPropWindow;
@@ -45,8 +45,8 @@ TYPE
 			NEW(properties, SELF);
 		END New;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: REAL; quality, preview: BOOLEAN);
-		VAR rw, rh: REAL; linePixel: SIZE;
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: FLOAT32; quality, preview: BOOLEAN);
+		VAR rw, rh: FLOAT32; linePixel: SIZE;
 		BEGIN
 
 			rw := w/zoomFactor; rh := h/zoomFactor; linePixel := ENTIER(lineWidth * zoomFactor);

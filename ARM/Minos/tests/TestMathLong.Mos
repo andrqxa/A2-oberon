@@ -29,7 +29,7 @@ MODULE TestMathLong;
 		END;
 		
 		ResultDesc = RECORD
-			single: REAL;
+			single: FLOAT32;
 			boolean: BOOLEAN;
 			int: SIGNED32;
 			double: LONGREAL;
@@ -39,7 +39,7 @@ MODULE TestMathLong;
 		filenames: ARRAY 2, 20 OF CHAR;
 		rd: OFS.Rider;
 		cmds: Command;
-		singlepar: ARRAY 2 OF REAL;
+		singlepar: ARRAY 2 OF FLOAT32;
 		intpar: SIGNED32;
 		doublepar: ARRAY 2 OF LONGREAL;
 		trueres: ResultDesc;
@@ -53,7 +53,7 @@ MODULE TestMathLong;
 	PROCEDURE CalcMUL(); BEGIN calcres.single := singlepar[0]*singlepar[1] END CalcMUL;
 	PROCEDURE CalcDIV(); BEGIN calcres.single := singlepar[0]/singlepar[1] END CalcDIV;
 	PROCEDURE CalcENTIER(); BEGIN calcres.int := ENTIER(singlepar[0]) END CalcENTIER;
-	PROCEDURE CalcREAL(); BEGIN calcres.single := REAL(intpar) END CalcREAL;
+	PROCEDURE CalcREAL(); BEGIN calcres.single := FLOAT32(intpar) END CalcREAL;
 	PROCEDURE CalcGREATER(); BEGIN calcres.boolean := (singlepar[0]>singlepar[1]) END CalcGREATER;
 	PROCEDURE CalcLOWER(); BEGIN calcres.boolean := (singlepar[0]<singlepar[1]) END CalcLOWER;
 	PROCEDURE CalcSIN(); BEGIN calcres.single := Math.Sin(singlepar[0]) END CalcSIN;
@@ -74,10 +74,10 @@ MODULE TestMathLong;
 	PROCEDURE CalcLOWERD(); BEGIN calcres.boolean := doublepar[0] < doublepar[1] END CalcLOWERD;
 	PROCEDURE CalcFLOATD(); BEGIN calcres.double := intpar END CalcFLOATD;
 	PROCEDURE CalcFIXD(); BEGIN calcres.int := ENTIER(doublepar[0]) END CalcFIXD;
-	PROCEDURE CalcSINGLED(); BEGIN calcres.single := REAL(doublepar[0]) END CalcSINGLED;
+	PROCEDURE CalcSINGLED(); BEGIN calcres.single := FLOAT32(doublepar[0]) END CalcSINGLED;
 	PROCEDURE CalcDOUBLED(); BEGIN calcres.double := singlepar[0] END CalcDOUBLED;
 
-	PROCEDURE GetRelativeError(a, b: REAL): REAL;
+	PROCEDURE GetRelativeError(a, b: FLOAT32): FLOAT32;
 	BEGIN
 		IF b # 0.0 THEN
 			a := ABS(a/b) - 1.0;
@@ -314,7 +314,7 @@ MODULE TestMathLong;
 		Log.S("Successful: "); Log.IL(ok);
 		Log.S("Unsuccessful: "); Log.IL(n-ok); Log.L;
 		Log.S("Calculation time [ms]: ");
-		Log.RL(REAL(dt)/REAL(Platform.CLOCKDIVISOR)*10.0);
+		Log.RL(FLOAT32(dt)/FLOAT32(Platform.CLOCKDIVISOR)*10.0);
 		Kernel.MilliWait(1000);
 		Minos.Reset;
 	END Run;
@@ -346,7 +346,7 @@ BEGIN
 	InitCmd("MUL", "rr", "r", CalcMUL, CompareRelative1eps, ShowRRR);
 	InitCmd("DIV", "rr", "r", CalcDIV, CompareRelative1eps, ShowRRR);
 	InitCmd("ENTIER", "r", "i", CalcENTIER, CompareI, NIL);
-	InitCmd("REAL", "i", "r", CalcREAL, CompareRelative1eps, ShowIR);
+	InitCmd("FLOAT32", "i", "r", CalcREAL, CompareRelative1eps, ShowIR);
 	InitCmd("GREATER", "rr", "b", CalcGREATER, CompareB, NIL);
 	InitCmd("LOWER", "rr", "b", CalcLOWER, CompareB, NIL);
 	InitCmd("SIN", "r", "r", CalcSIN, CompareAbsolute4eps, ShowRR);

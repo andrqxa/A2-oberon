@@ -27,7 +27,7 @@ TYPE
 		lastKeys : SET;
 		modifierKeys : SET;
 		meta : BOOLEAN;
-		fx, fy, inffx, inffy, factor, intfactor : REAL;
+		fx, fy, inffx, inffy, factor, intfactor : FLOAT32;
 
 		PROCEDURE &New*(disp : Displays.Display);
 		BEGIN
@@ -57,7 +57,7 @@ TYPE
 		END GetKeyState;
 
 		PROCEDURE KeyEvent(ucs : SIGNED32; flags : SET; keysym : SIGNED32);
-		VAR msg : Messages.Message; done : BOOLEAN; r : Rectangle; originX, originY : SIGNED32; w, h : REAL;
+		VAR msg : Messages.Message; done : BOOLEAN; r : Rectangle; originX, originY : SIGNED32; w, h : FLOAT32;
 		BEGIN
 			manager.lock.AcquireWrite;
 			modifierKeys := flags;
@@ -101,8 +101,8 @@ TYPE
 
 		PROCEDURE PointerEvent(x, y, z, dx, dy, dz : SIZE; keys : SET);
 		VAR
-			msg : Messages.Message; of : REAL; i : SIZE; ignore : BOOLEAN;
-			centerX, centerY : REAL; w : Window;
+			msg : Messages.Message; of : FLOAT32; i : SIZE; ignore : BOOLEAN;
+			centerX, centerY : FLOAT32; w : Window;
 		BEGIN
 			ignore := FALSE;
 			msg.originator := SELF;
@@ -204,14 +204,14 @@ TYPE
 		END SetInitialWindowBounds;
 
 		(** Set the observed range. *)
-		PROCEDURE SetRange*(x, y, w, h : REAL; showTransition : BOOLEAN);
+		PROCEDURE SetRange*(x, y, w, h : FLOAT32; showTransition : BOOLEAN);
 		VAR
-			sx, sy, sx2, sy2, dx, dy, dx2, dy2, x2, y2  : REAL;
+			sx, sy, sx2, sy2, dx, dy, dx2, dy2, x2, y2  : FLOAT32;
 			i, steps : SIGNED32;
 		CONST Steps = 16;
 
-			PROCEDURE Set(x, y, w, h : REAL);
-			VAR tf : REAL;
+			PROCEDURE Set(x, y, w, h : FLOAT32);
+			VAR tf : FLOAT32;
 			BEGIN
 				range.l := x;
 				range.t := y;

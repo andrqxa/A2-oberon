@@ -25,7 +25,7 @@ VAR
 	mask: Display3.Mask;
 
 PROCEDURE Proportion(a, b: SIGNED16): SIGNED16;
-VAR t: REAL;
+VAR t: FLOAT32;
 BEGIN
 	t := ENTIER(1.5 + RandomNumbers.Uniform() * (prop - 2.0)) / (1.0 * prop);
 	RETURN SHORT(ENTIER(a * t + b * (1 - t)))

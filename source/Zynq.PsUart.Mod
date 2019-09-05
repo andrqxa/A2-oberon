@@ -192,7 +192,7 @@ VAR
 		uart.rxBufRdPos := 0;
 
 		(* configure receive timeout to be as close as possible to ReceiveTimeoutInUs *)
-		n := ENTIER((ReceiveTimeoutInUs*REAL(bps)+1000000) / 4000000 + 0.5);
+		n := ENTIER((ReceiveTimeoutInUs*FLOAT32(bps)+1000000) / 4000000 + 0.5);
 		n := MAX(1,MIN(255,n-1));
 		uart.regs.rxtout := n;
 

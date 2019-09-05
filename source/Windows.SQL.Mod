@@ -48,7 +48,7 @@ CONST
 	SqlLongIntType* = 4;	(** SIGNED32 **)
 	SqlIntType* = 5;	(** SIGNED16 **)
 	SqlFloatType* = 6;	(** LONGREAL **)
-	SqlRealType* = 7;	(** REAL **)
+	SqlRealType* = 7;	(** FLOAT32 **)
 	SqlLongRealType* = 8;	(** LONGREAL **)
 	SqlDateType* = 9;	(** date data (yyyy-mm-dd) **)
 	SqlTimeType* = 10;	(** time data (hh:mm:ss) **)

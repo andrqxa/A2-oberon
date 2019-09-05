@@ -51,7 +51,7 @@ Most entities in Oberon are derived from this base type.
 		res*: SIGNED16;	(** Return result: < 0 = no response, >= 0 action completed. *)
 		class*: SIGNED16;	(** Attribute class (Inval, String, Int, Real, LongReal, Char or Bool). *)
 		i*: SIGNED32;
-        x*: REAL;
+        x*: FLOAT32;
         y*: LONGREAL;
 		c*: CHAR;
 		b*: BOOLEAN;

@@ -50,7 +50,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		ELSE RETURN 1 END
 	END sign;
 
-	PROCEDURE short (n: LONGREAL): REAL;
+	PROCEDURE short (n: LONGREAL): FLOAT32;
 	BEGIN RETURN SHORT(n + Eps0)
 	END short;
 
@@ -143,7 +143,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		IF (MIN(SIGNED32) <= n) & (n <= MAX(SIGNED32)) THEN x := ABS(n - ENTIER(SHORT(n)));
 			IF x < Eps THEN WrInt(n); RETURN END
 		END;
-		IF (MIN(REAL) <= n) & (n <= MAX(REAL)) THEN x := ABS(n - SHORT(n));
+		IF (MIN(FLOAT32) <= n) & (n <= MAX(FLOAT32)) THEN x := ABS(n - SHORT(n));
 			IF x < Eps THEN
 				IF (-10000 < n) & (n < 10000) THEN Texts.WriteLongRealFix(W, n, 30, 15, 0)
 				ELSE Texts.WriteReal(W, short(n), 14)

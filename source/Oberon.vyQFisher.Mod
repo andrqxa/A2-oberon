@@ -101,7 +101,7 @@ BEGIN (*PFFISHER*)
 	ELSE
 		(*extreme value*)
 		IF (X = 0.0) THEN RETURN 0.0
-		ELSIF X >= MAX(REAL) THEN RETURN 1.0
+		ELSIF X >= MAX(FLOAT32) THEN RETURN 1.0
 		ELSE
 			(*real approximation*)
 
@@ -230,7 +230,7 @@ BEGIN (*Function QFISHER*)
 
 END Qfisher;  (*Function Qfisher*)
 
-PROCEDURE QF*;  VAR N, M: SIGNED16; RP: REAL; X, P: LONGREAL; Err: SIGNED16;
+PROCEDURE QF*;  VAR N, M: SIGNED16; RP: FLOAT32; X, P: LONGREAL; Err: SIGNED16;
 BEGIN
 	In.Open; In.Int(N); In.Int(M); In.Real(RP); P := RP;
 	X := Qfisher(N, M, P, Err);

@@ -61,7 +61,7 @@ BEGIN
 END LongInt;
 
 (** Scan a real number. *)
-PROCEDURE Real* (VAR x: REAL);
+PROCEDURE Real* (VAR x: FLOAT32);
 BEGIN
 	IF Done THEN Texts.Scan(S);
 		IF S.class = Texts.Real THEN x := S.x

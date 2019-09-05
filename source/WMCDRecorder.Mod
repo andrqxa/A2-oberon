@@ -208,7 +208,7 @@ TYPE
 		PROCEDURE Resized(width, height: SIZE);
 		VAR
 			oldWidth: SIZE;
-			factor: REAL;
+			factor: FLOAT32;
 		BEGIN
 			oldWidth := leftPanel.bounds.GetWidth() + filePanel.bounds.GetWidth();
 			factor := width / oldWidth;

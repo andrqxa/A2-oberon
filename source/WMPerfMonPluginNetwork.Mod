@@ -35,7 +35,7 @@ TYPE
 		END Init;
 
 		PROCEDURE UpdateDataset*;
-		VAR sentKB, receivedKB : REAL;
+		VAR sentKB, receivedKB : FLOAT32;
 		BEGIN
 			sentKB := l.sendCount / 1024;
 			receivedKB := l.recvCount / 1024;

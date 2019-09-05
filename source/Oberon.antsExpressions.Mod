@@ -62,7 +62,7 @@ TYPE
 		b*: BOOLEAN;   (* bool var *)
 		c*: CHAR;   (* char var *)
 		i*: SIGNED32;   (* Sint,Int,LInt var *)
-		x*: REAL;   (* real var *)
+		x*: FLOAT32;   (* real var *)
 		y*: LONGREAL;   (* longreal var *)
 		s*: OPS.String;   (* string var *)
 		ptr*: SIGNED32;   (* Pointer var , if Pointer then referenced object, if basic type class then ptr to Basic type Object *)
@@ -205,7 +205,7 @@ VAR
 		IF debug OR Note THEN Str( "  " ) END
 	END Gap;
 
-	PROCEDURE WReal( x: REAL;  n: SIGNED16 );
+	PROCEDURE WReal( x: FLOAT32;  n: SIGNED16 );
 	BEGIN
 		IF debug OR Note THEN Texts.WriteReal( W, x, n ) END
 	END WReal;
@@ -483,7 +483,7 @@ VAR
 		val := NewV( stack );  val.val.class := LInt;  val.val.i := i
 	END PushLInt;
 
-	PROCEDURE PushReal*( VAR stack: Stack;  x: REAL );
+	PROCEDURE PushReal*( VAR stack: Stack;  x: FLOAT32 );
 	VAR val: ValueItem;
 	BEGIN
 		val := NewV( stack );  val.val.class := Real;  val.val.x := x
@@ -1550,7 +1550,7 @@ VAR
 		END
 	END PushStringPar;
 
-	PROCEDURE PushRealPar( VAR call: CallStack;  val: REAL );
+	PROCEDURE PushRealPar( VAR call: CallStack;  val: FLOAT32 );
 	BEGIN
 		PushLIntPar( call, Reals.Int( val ) )
 	END PushRealPar;
@@ -1930,7 +1930,7 @@ END EvalProcObj;
 				END;
 			ELSIF obj IS vyRealVec.tREAL THEN
 				WITH obj: vyRealVec.tREAL DO
-					Str( "REAL" );  val.class := Real;  COPY( name, val.name );  val.x := obj.x;  val.ptr := ADDRESSOF( obj.x );
+					Str( "FLOAT32" );  val.class := Real;  COPY( name, val.name );  val.x := obj.x;  val.ptr := ADDRESSOF( obj.x );
 					val.p := SYSTEM.VAL( ANY, val.ptr );  val.adr := SYSTEM.GET32( ADDRESSOF( obj ) );  RETURN TRUE
 				END;
 			ELSIF obj IS vyLongintVec.tLONGINT THEN

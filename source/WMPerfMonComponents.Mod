@@ -103,7 +103,7 @@ TYPE
 
 	UpdateInfo = RECORD
 		events : SET;
-		perf : REAL;
+		perf : FLOAT32;
 		sampleInterval, sampleBufferSize, screenInterval : SIGNED32;
 	END;
 
@@ -327,7 +327,7 @@ TYPE
 			Plugins.updater.AddListener({Plugins.EventPerfUpdate} + {Plugins.EventParametersChanged} + {Plugins.EventPluginsChanged}, EventHandler);
 		END Init;
 
-		PROCEDURE EventHandler(events : SET; perf : REAL);
+		PROCEDURE EventHandler(events : SET; perf : FLOAT32);
 		BEGIN {EXCLUSIVE}
 			updateInfo.events := events;
 			updateInfo.perf := perf;
@@ -460,7 +460,7 @@ TYPE
 			plugin.DecNbrOfClients;
 		END Finalize;
 
-		PROCEDURE ScaleDataset(scale : REAL; VAR dataset : WMDiagramComponents.Dataset);
+		PROCEDURE ScaleDataset(scale : FLOAT32; VAR dataset : WMDiagramComponents.Dataset);
 		VAR i : SIZE;
 		BEGIN
 			FOR i := 0 TO LEN(dataset)-1 DO
@@ -533,7 +533,7 @@ TYPE
 		END InitView;
 
 		PROCEDURE ShowStats;
-		VAR string : ARRAY 256 OF CHAR; statsMax0 : REAL;
+		VAR string : ARRAY 256 OF CHAR; statsMax0 : FLOAT32;
 
 			PROCEDURE ShowUnit;
 			BEGIN
@@ -543,14 +543,14 @@ TYPE
 				END;
 			END ShowUnit;
 
-			PROCEDURE ShowPercent(value : REAL);
+			PROCEDURE ShowPercent(value : FLOAT32);
 			BEGIN
 				IF plugin.p.showPercent & (plugin.p.max > 0) THEN
 					stats.String(" ("); stats.FloatFix(100.0 * value / statsMax0, 5, 1, 0); stats.String("%)")
 				END;
 			END ShowPercent;
 
-			PROCEDURE ShowValue(CONST name : ARRAY OF CHAR; value : REAL);
+			PROCEDURE ShowValue(CONST name : ARRAY OF CHAR; value : FLOAT32);
 			BEGIN
 				stats.String(name); stats.FloatFix(value, plugin.p.minDigits, plugin.p.fraction, 0); ShowUnit; ShowPercent(value);
 			END ShowValue;
@@ -755,10 +755,10 @@ TYPE
 		END InitView;
 
 		PROCEDURE UpdateChart(sender, data : ANY);
-		VAR max : REAL;  i : SIZE;
+		VAR max : FLOAT32;  i : SIZE;
 
-			PROCEDURE FindMax() : REAL;
-			VAR i : SIZE; max : REAL;
+			PROCEDURE FindMax() : FLOAT32;
+			VAR i : SIZE; max : FLOAT32;
 			BEGIN
 				max := 0.0;
 				FOR i := 0 TO LEN(statistics.cur)-1 DO

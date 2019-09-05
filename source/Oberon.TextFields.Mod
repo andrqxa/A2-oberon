@@ -1096,7 +1096,7 @@ BEGIN
 END AdaptFontSizeProportional;
 
 PROCEDURE ComputeColors(F:TextField; col:SIGNED32);
-VAR r,g,b:REAL;
+VAR r,g,b:FLOAT32;
 BEGIN
 	IF col=Display3.textbackC THEN F.topC:=Display3.textbackC; F.bottomC:=Display3.bottomC;
 	ELSE

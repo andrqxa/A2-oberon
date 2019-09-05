@@ -256,7 +256,7 @@ TYPE
 	VAR l: antsCommands.tScanList;  dim: SIGNED32;  thisp, p: antsCommands.tParameter;  name: vyName.tNameArray;  par: pars;
 	VAR isotropic: BOOLEAN;  n: Neighbours;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name=NAME >par {REAL} [>nonisotropic] " );
+		l := antsCommands.ScanFromPar( "name=NAME >par {FLOAT32} [>nonisotropic] " );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) THEN
 			p := antsCommands.ParsFromKeyword( l, "par" );  thisp := p;  dim := 0;
 			WHILE thisp # NIL DO INC( dim );  thisp := thisp.next END;

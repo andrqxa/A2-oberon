@@ -12,7 +12,7 @@ CONST
 
 	PROCEDURE FadeUp(P: Pictures.Picture; max: SIGNED16);	(*fade picture colors to maximum*)
 	VAR i, r, g, b, mr, mg, mb, n: SIGNED16;
-		f: REAL;
+		f: FLOAT32;
 	BEGIN
 		n := SIGNED16(ASH(1, P.depth));
 		i := 0; mr := 0; mg := 0; mb := 0;
@@ -53,11 +53,11 @@ CONST
 		R: Files.Rider;
 		ch: CHAR;
 		x, y, k, i, h0, h1, n: SIGNED16;
-		tx, ty, dw: REAL;
+		tx, ty, dw: FLOAT32;
 		h: ARRAY 128 OF SIGNED16;
 		rle, a3, rot, eps: BOOLEAN;
 		name: ARRAY 32 OF CHAR;
-		adjust: REAL;
+		adjust: FLOAT32;
 		linew: SIGNED32;
 
 		PROCEDURE Int(n: SIGNED16);
@@ -88,7 +88,7 @@ CONST
 			i := 0; WHILE s[i] # 0X DO Files.Write(R, s[i]); INC(i) END;
 		END Str;
 
-		PROCEDURE Real(x: REAL);
+		PROCEDURE Real(x: FLOAT32);
 		VAR
 			n, i, xi: SIGNED16;
 			d: ARRAY 4 OF CHAR;
@@ -105,9 +105,9 @@ CONST
 			WHILE i > 0 DO DEC(i); Files.Write(R, d[i]) END
 		END Real;
 
-		PROCEDURE ScaleTo(w, h, W, H: SIGNED16; adjust: REAL; VAR tx, ty, dw: REAL; rot: BOOLEAN);
+		PROCEDURE ScaleTo(w, h, W, H: SIGNED16; adjust: FLOAT32; VAR tx, ty, dw: FLOAT32; rot: BOOLEAN);
 		(*compute translation vector (tx, ty) scaling factor dx in order to fit [w, h] optimally into [W, H]*)
-		VAR d0, d1: REAL;
+		VAR d0, d1: FLOAT32;
 		BEGIN
 			IF rot THEN d0 := H/w; d1 := W/h ELSE d0 := W/w; d1 := H/h END;
 			IF d0 < d1 THEN dw := d0*adjust ELSE dw := d1*adjust END;
@@ -116,7 +116,7 @@ CONST
 			END
 		END ScaleTo;
 
-		PROCEDURE Transform(tx, ty, dw: REAL; rot: BOOLEAN);
+		PROCEDURE Transform(tx, ty, dw: FLOAT32; rot: BOOLEAN);
 		BEGIN
 			Real(tx); Real(ty); Str(" translate");
 			Real(dw); Real(dw); Str(" scale");
@@ -158,14 +158,14 @@ CONST
 			Pair(" ", (t DIV (64*64)) MOD 32); Pair(":", (t DIV 64) MOD 64); Pair(":", t MOD 64);	(*time*)
 		END DateTime;
 
-		PROCEDURE BoundingBox(w, h: SIGNED16; tx, ty, dw: REAL; rot: BOOLEAN);
+		PROCEDURE BoundingBox(w, h: SIGNED16; tx, ty, dw: FLOAT32; rot: BOOLEAN);
 		BEGIN Str("%%BoundingBox: ");
 			IF rot THEN Real(tx-h*dw); Real(ty); Real(tx); Real(ty+w*dw)
 			ELSE Real(tx); Real(ty); Real(tx+w*dw); Real(ty+h*dw)
 			END
 		END BoundingBox;
 
-		PROCEDURE EPSHeader(P: Pictures.Picture; tx, ty, dw: REAL; rot: BOOLEAN);
+		PROCEDURE EPSHeader(P: Pictures.Picture; tx, ty, dw: FLOAT32; rot: BOOLEAN);
 		BEGIN
 			Str("%!PS-Adobe-1.0"); Files.Write(R, EOL);
 			BoundingBox(P.width, P.height, tx, ty, dw, rot); Files.Write(R, EOL);

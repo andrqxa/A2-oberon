@@ -37,7 +37,7 @@ TYPE
 		table: HashSegmentedNameArray;
 		size: SIZE;
 		used-: SIZE;
-		maxLoadFactor: REAL;
+		maxLoadFactor: FLOAT32;
 
 		(* Interface *)
 

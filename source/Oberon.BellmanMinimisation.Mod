@@ -850,7 +850,7 @@ VAR
 		outname: ARRAY 256 OF CHAR;
 		gamma: LONGREAL;  outarray: ArrayR;
 	BEGIN
-		antsCommands.InitScan( "in=OBJECT gamma=REAL out=OBJECT|NAME" );
+		antsCommands.InitScan( "in=OBJECT gamma=FLOAT32 out=OBJECT|NAME" );
 		IF antsCommands.ExpectObject( "in", obj ) & antsCommands.ExpectReal( "gamma", gamma ) &
 		    antsCommands.ExpectName( "out", outname ) THEN
 			IF (gamma < 0) OR (gamma > 1) THEN aM.S( "Gamma muss im Intervall [0,1] liegen, aber ich mach trotzdem weiter." );  END;
@@ -923,7 +923,7 @@ VAR
 		outname: ARRAY 256 OF CHAR;
 		gamma: LONGREAL;  outarray: ArrayR;  o: L2Object;
 	BEGIN
-		antsCommands.InitScan( "in=OBJECT gamma=REAL out=OBJECT|NAME" );
+		antsCommands.InitScan( "in=OBJECT gamma=FLOAT32 out=OBJECT|NAME" );
 		IF antsCommands.ExpectObject( "in", obj ) & antsCommands.ExpectReal( "gamma", gamma ) &
 		    antsCommands.ExpectName( "out", outname ) THEN
 			IF (gamma < 0) OR (gamma > 1) THEN aM.S( "Gamma muss im Intervall [0,1] liegen." );  RETURN END;
@@ -1157,7 +1157,7 @@ VAR
 	VAR in: LONGREAL;
 		out: ARRAY 256 OF CHAR;
 	BEGIN
-		antsCommands.InitScan( "in=REAL  out=NAME" );
+		antsCommands.InitScan( "in=FLOAT32  out=NAME" );
 		IF antsCommands.ExpectReal( "in", in ) & antsCommands.ExpectName( "out", out ) THEN
 			DoSetReal( out, in / (1 + in) );  aM.SR( "out=", in / (1 + in) );
 		END;
@@ -1402,7 +1402,7 @@ END NormalisationMinMax;
 	VAR real: LONGREAL;
 		name: ARRAY 256 OF CHAR;
 	BEGIN
-		antsCommands.InitScan( "name=NAME  real=REAL" );
+		antsCommands.InitScan( "name=NAME  real=FLOAT32" );
 		IF antsCommands.ExpectName( "name", name ) & antsCommands.ExpectReal( "real", real ) THEN DoSetReal( name, real );  END;
 	END SetReal;
 
@@ -1410,7 +1410,7 @@ END NormalisationMinMax;
 	VAR r1, r2: LONGREAL;
 		name: ARRAY 256 OF CHAR;
 	BEGIN
-		antsCommands.InitScan( "name=NAME  r1=REAL r2=REAL" );
+		antsCommands.InitScan( "name=NAME  r1=FLOAT32 r2=FLOAT32" );
 		IF antsCommands.ExpectName( "name", name ) & antsCommands.ExpectReal( "r1", r1 ) & antsCommands.ExpectReal( "r2", r2 ) THEN
 			DoSetReal( name, r1 + r2 );
 		END;

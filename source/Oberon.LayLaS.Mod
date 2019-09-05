@@ -35,7 +35,7 @@ VAR  reader : Texts.Reader;
 		s* : ARRAY strlen OF CHAR;
 		ident* : ARRAY idlen OF CHAR;
 		int* : SIGNED32;
-		real* : REAL;
+		real* : FLOAT32;
 		char* : CHAR;
 		bool* : BOOLEAN;
 
@@ -90,14 +90,14 @@ END ReadString;
 PROCEDURE ReadNumber (VAR sym : SIGNED16);
 VAR  intE, realE : BOOLEAN;
 		n : SIGNED16;
-		quotient : REAL;
+		quotient : FLOAT32;
 BEGIN	sym := Int;
 	int := 0;	real := 0;	intE := FALSE;	realE := FALSE;
 	WHILE (ch >= '0') & (ch <= '9') DO
 		n := ORD(ch)-ORD('0');
 		IF (MAX(SIGNED32)-n) DIV 10 >= int THEN
 			int := int*10 + n;	real := int
-		ELSIF (MAX(REAL)-n)/10 >= real THEN
+		ELSIF (MAX(FLOAT32)-n)/10 >= real THEN
 			intE := TRUE;
 			real := real*10 + ORD(ch)-ORD('0')
 		ELSE realE := TRUE

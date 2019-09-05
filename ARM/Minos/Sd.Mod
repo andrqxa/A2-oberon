@@ -472,7 +472,7 @@ TYPE
 
 		(* Timing info *)
 		r2w *: SIGNED32;								(** Read to write time factor = read time / write time *)
-		taac *: REAL;									(** Asynchronous access time, in s *)
+		taac *: FLOAT32;									(** Asynchronous access time, in s *)
 		nsac *: SIGNED32;								(** Worst-case clock dependent access time, in clock cycles *)
 		txSpeed *: SIGNED32;							(** Max transfer speed in bit/s *)
 	END;
@@ -1780,7 +1780,7 @@ VAR
 	PROCEDURE GetCsd (CONST raw: ARRAY OF SIGNED32; VAR csd: Csd);
 	VAR
 		sizeMult, val, version: SIGNED32;
-		real: REAL;
+		real: FLOAT32;
 	BEGIN
 		version := ReadBitfield(raw, CardCsd_CsdStructureOfs, CardCsd_CsdStructureWidth) + 1;
 		

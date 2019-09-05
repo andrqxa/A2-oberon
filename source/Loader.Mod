@@ -30,7 +30,7 @@ TYPE
 		table: HashIntArray;
 		size: SIZE;
 		used-: SIZE;
-		maxLoadFactor: REAL;
+		maxLoadFactor: FLOAT32;
 
 		(* Interface *)
 
@@ -112,7 +112,7 @@ TYPE
 		table: HashIntAnyArray;
 		size: SIZE;
 		used-: SIZE;
-		maxLoadFactor: REAL;
+		maxLoadFactor: FLOAT32;
 
 		(* Interface *)
 

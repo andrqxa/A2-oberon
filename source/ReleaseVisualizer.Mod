@@ -892,7 +892,7 @@ TYPE
 		END ScrollbarsChanged;
 
 		PROCEDURE WritePDF(sender, data : ANY);
-		VAR pdfPage : WMGraphics.Canvas; pdfCreator : PDF.PDFCreator; minf : REAL;
+		VAR pdfPage : WMGraphics.Canvas; pdfCreator : PDF.PDFCreator; minf : FLOAT32;
 		BEGIN
 			NEW(pdfCreator);
 			pdfPage := pdfCreator.NewPage(PDF.PageA0, TRUE, PDF.Unitmm100);

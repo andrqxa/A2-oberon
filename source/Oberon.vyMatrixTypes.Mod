@@ -72,8 +72,8 @@ TYPE
 		Set: tIntSetProc
 	END;
 
-	tRealGetProc = PROCEDURE ( me: tMatrix;  row, col: SIGNED32 ): REAL;
-	tRealSetProc = PROCEDURE ( val: REAL;  me: tMatrix;  row, col: SIGNED32 );
+	tRealGetProc = PROCEDURE ( me: tMatrix;  row, col: SIGNED32 ): FLOAT32;
+	tRealSetProc = PROCEDURE ( val: FLOAT32;  me: tMatrix;  row, col: SIGNED32 );
 	tRealMatrix = POINTER TO tRealMatrixDesc;
 	tRealMatrixDesc = RECORD (tMatrixDesc)
 		Get: tRealGetProc;
@@ -234,14 +234,14 @@ TYPE
 	END SetICol;
 
 (** Real **)
-	PROCEDURE GetReal*( me: tMatrix;  row, col: SIGNED32 ): REAL;
+	PROCEDURE GetReal*( me: tMatrix;  row, col: SIGNED32 ): FLOAT32;
 	BEGIN
 		ASSERT ( me IS tRealMatrix, 100 );
 		WITH me: tRealMatrix DO RETURN me.Get( me, row, col )
 		END
 	END GetReal;
 
-	PROCEDURE SetReal*( val: REAL;  me: tMatrix;  row, col: SIGNED32 );
+	PROCEDURE SetReal*( val: FLOAT32;  me: tMatrix;  row, col: SIGNED32 );
 	BEGIN
 		ASSERT ( me IS tRealMatrix, 100 );
 		WITH me: tRealMatrix DO me.Set( val, me, row, col )
@@ -307,7 +307,7 @@ TYPE
 	BEGIN
 		NEW( M.rParsCache, M.rows );
 		FOR row := 0 TO M.rows - 1 DO
-			min := MAX( REAL );  max := MIN( REAL );  mean := 0;  l := M.columns;
+			min := MAX( FLOAT32 );  max := MIN( FLOAT32 );  mean := 0;  l := M.columns;
 			FOR i := 0 TO M.columns - 1 DO
 				r := GetReal( M, row, i );
 				IF ~Reals.IsNaNL( r ) THEN
@@ -333,7 +333,7 @@ TYPE
 	BEGIN
 		NEW( M.cParsCache, M.columns );
 		FOR col := 0 TO M.columns - 1 DO
-			min := MAX( REAL );  max := MIN( REAL );  mean := 0;  l := M.rows;
+			min := MAX( FLOAT32 );  max := MIN( FLOAT32 );  mean := 0;  l := M.rows;
 			FOR i := 0 TO M.rows - 1 DO
 				r := GetReal( M, i, col );
 				IF ~Reals.IsNaNL( r ) THEN
@@ -356,7 +356,7 @@ TYPE
 	PROCEDURE GetPars*( M: tMatrix;  VAR min, max, mean: LONGREAL );
 	VAR i, j: SIGNED32;  r: LONGREAL;  l: SIGNED32;
 	BEGIN
-		min := MAX( REAL );  max := MIN( REAL );  mean := 0;  l := M.rows;
+		min := MAX( FLOAT32 );  max := MIN( FLOAT32 );  mean := 0;  l := M.rows;
 		FOR j := 0 TO M.columns - 1 DO
 			FOR i := 0 TO M.rows - 1 DO
 				r := GetReal( M, i, j );
@@ -371,7 +371,7 @@ TYPE
 		mean := mean / l
 	END GetPars;
 
-	PROCEDURE DoGetReal( M: tMatrix;  row, col: SIGNED32 ): REAL;
+	PROCEDURE DoGetReal( M: tMatrix;  row, col: SIGNED32 ): FLOAT32;
 	VAR trow: tRow;  i, ilow: SIGNED32;
 	BEGIN
 		IF row >= M.cachedrow THEN ilow := M.cachedrow;  trow := M.rowcache ELSE ilow := 0;  trow := M.firstrow END;
@@ -379,12 +379,12 @@ TYPE
 		M.cachedrow := row;  M.rowcache := trow;  RETURN vyRealVec.Get( trow.v, col )
 	END DoGetReal;
 
-	PROCEDURE DoGetRealTransposed( me: tMatrix;  row, col: SIGNED32 ): REAL;
+	PROCEDURE DoGetRealTransposed( me: tMatrix;  row, col: SIGNED32 ): FLOAT32;
 	BEGIN
 		RETURN DoGetReal( me, col, row )
 	END DoGetRealTransposed;
 
-	PROCEDURE DoSetReal( val: REAL;  M: tMatrix;  row, col: SIGNED32 );
+	PROCEDURE DoSetReal( val: FLOAT32;  M: tMatrix;  row, col: SIGNED32 );
 	VAR trow: tRow;  i, ilow: SIGNED32;
 	BEGIN
 		IF row >= M.cachedrow THEN ilow := M.cachedrow;  trow := M.rowcache ELSE ilow := 0;  trow := M.firstrow END;
@@ -393,7 +393,7 @@ TYPE
 		M.cachedrow := row;  M.rowcache := trow;  vyRealVec.Set( val, trow.v, col );  M.rParsCache := NIL;  M.cParsCache := NIL
 	END DoSetReal;
 
-	PROCEDURE DoSetRealTransposed( val: REAL;  me: tMatrix;  row, col: SIGNED32 );
+	PROCEDURE DoSetRealTransposed( val: FLOAT32;  me: tMatrix;  row, col: SIGNED32 );
 	BEGIN
 		DoSetReal( val, me, col, row )
 	END DoSetRealTransposed;
@@ -558,7 +558,7 @@ TYPE
 	PROCEDURE WriteMatrix*( M: tMatrix );
 	VAR cols, rows: SIGNED32;
 		s: ARRAY 32 OF CHAR;
-		i, j: SIGNED32;  row, col: SIGNED32;  r: REAL;
+		i, j: SIGNED32;  row, col: SIGNED32;  r: FLOAT32;
 	BEGIN
 		vyHostTexts.WriteTableStyle( vyHostTexts.w );  cols := M.columns - 1;  rows := M.rows - 1;
 		FOR i := 0 TO cols DO

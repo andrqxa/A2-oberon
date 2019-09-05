@@ -50,9 +50,9 @@ TYPE
 		m: vyRealVec.tChunkedMatrix;
 		pal: antsColors.Palette;
 		sp: vyPolyWorld.tObject;
-		axisx0, axisx1, axisxstep: REAL;
-		axisy0, axisy1, axisystep: REAL;
-		axisz0, axisz1, axiszstep: REAL;
+		axisx0, axisx1, axisxstep: FLOAT32;
+		axisy0, axisy1, axisystep: FLOAT32;
+		axisz0, axisz1, axiszstep: FLOAT32;
 		commands*: antsCommandList.List;
 		lines: BOOLEAN;
 	END;

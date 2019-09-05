@@ -175,7 +175,7 @@ TYPE
 
 	JBlock = POINTER TO ARRAY DCTSIZE2 OF SIGNED16;
 
-	DCTTablePtr = POINTER TO ARRAY DCTSIZE2 OF REAL;
+	DCTTablePtr = POINTER TO ARRAY DCTSIZE2 OF FLOAT32;
 	DCTITablePtr = POINTER TO ARRAY DCTSIZE2 OF SIGNED32;
 	DCTSTablePtr = POINTER TO ARRAY DCTSIZE2 OF SIGNED32;
 
@@ -1560,7 +1560,7 @@ VAR
 		ci,qtblno,i,row,col : SIGNED16;
 		compptr: JPEGCompInfoPtr;
 		qtbl: JQuantTblPtr;
-		sf: ARRAY DCTSIZE OF REAL;
+		sf: ARRAY DCTSIZE OF FLOAT32;
 		si: ARRAY DCTSIZE2 OF SIGNED16;
 	BEGIN
 		sf[0] := 1.0;
@@ -1999,8 +1999,8 @@ VAR
 											coefBlock: JBlock; outputBuf: JSampArray;
 											outputRow, outputCol: SIGNED32);
 	VAR
-		tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,tmp6,tmp7,tmp10,tmp11,tmp12,tmp13: REAL;
-		z5,z10,z11,z12,z13,dcval: REAL;
+		tmp0,tmp1,tmp2,tmp3,tmp4,tmp5,tmp6,tmp7,tmp10,tmp11,tmp12,tmp13: FLOAT32;
+		z5,z10,z11,z12,z13,dcval: FLOAT32;
 		inptr: JBlock;
 		quantptr,wsptr: DCTTablePtr;
 		inws,ctr: SIGNED16;

@@ -20,7 +20,7 @@ TYPE
 
 	CpuLoadHelper = OBJECT(WMPerfMonPlugins.Helper);
 	VAR
-		cpuLoad : ARRAY Machine.MaxCPU OF REAL; (* in % *)
+		cpuLoad : ARRAY Machine.MaxCPU OF FLOAT32; (* in % *)
 		nbrOfCpus : SIGNED32;
 
 		lastTimeStamp, timestamp : SIGNED64;
@@ -98,7 +98,7 @@ TYPE
 		END Init;
 
 		PROCEDURE UpdateDataset*;
-		VAR cpu : SIGNED32; sum : REAL;
+		VAR cpu : SIGNED32; sum : FLOAT32;
 		BEGIN
 			IF processorID = CpuLoadAll THEN
 				FOR cpu := 0 TO Machine.MaxCPU-1 DO

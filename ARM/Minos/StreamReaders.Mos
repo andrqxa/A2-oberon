@@ -16,7 +16,7 @@ CONST
 
 TYPE
 
-	Float = REAL;
+	Float = FLOAT32;
 	
 	Bytes2 = ARRAY 2 OF CHAR;
 	Bytes4 = ARRAY 4 OF CHAR;
@@ -192,8 +192,8 @@ TYPE
 		x := (Get(r) # 0X)
 	END RawBool;
 
-	(** Read a REAL. *)
-	PROCEDURE RawReal*(VAR r: Reader; VAR x: REAL );
+	(** Read a FLOAT32. *)
+	PROCEDURE RawReal*(VAR r: Reader; VAR x: FLOAT32 );
 	VAR ignore: SIZE;
 	BEGIN
 		Bytes(r,SYSTEM.VAL( Bytes4, x ), 0, 4, ignore )

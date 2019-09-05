@@ -34,7 +34,7 @@ TYPE
 	Rectangle = Rectangles.Rectangle;
 	String = Strings.String;
 	Message = Messages.Message;
-	RealRect* = RECORD l*, t*, r*, b* : REAL END;
+	RealRect* = RECORD l*, t*, r*, b* : FLOAT32 END;
 
 	PointerInfo* = OBJECT
 	VAR hotX*, hotY* : SIGNED32; img* : Graphics.Image;
@@ -519,7 +519,7 @@ TYPE
 		END SetCanvasGenerator;
 
 		PROCEDURE IsHit*(x, y  : SIZE) : BOOLEAN;
-		VAR w, h : SIZE; fx, fy : REAL;
+		VAR w, h : SIZE; fx, fy : FLOAT32;
 		BEGIN
 			w := GetWidth(); h := GetHeight();
 			IF (w > 0) & (h > 0) & ((w # img.width) OR (h # img.height)) THEN
@@ -553,7 +553,7 @@ TYPE
 		END Draw;
 
 		PROCEDURE Invalidate*(rect : Rectangle);
-		VAR w, h : SIZE; fx, fy : REAL;
+		VAR w, h : SIZE; fx, fy : FLOAT32;
 		BEGIN
 			w := GetWidth(); h := GetHeight();
 			IF (w > 0) & (h > 0) & ((w # img.width) OR (h # img.height))  THEN
@@ -565,7 +565,7 @@ TYPE
 		END Invalidate;
 
 		PROCEDURE Handle*(VAR m : Message);
-		VAR w, h : SIZE; fx, fy : REAL;
+		VAR w, h : SIZE; fx, fy : FLOAT32;
 		BEGIN
 			w := GetWidth(); h := GetHeight();
 			IF (w > 0) & (h > 0) & ((w # img.width) OR (h # img.height)) & (m.msgType = Messages.MsgPointer) THEN
@@ -683,7 +683,7 @@ TYPE
 		END Refresh;
 
 		(** Set the observed range *)
-		PROCEDURE SetRange*(x, y, w, h : REAL; showTransition : BOOLEAN);
+		PROCEDURE SetRange*(x, y, w, h : FLOAT32; showTransition : BOOLEAN);
 		END SetRange;
 
 		(**  Return the modifier keys that are pressed in the view *)

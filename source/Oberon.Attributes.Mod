@@ -65,7 +65,7 @@ TYPE
 		nextCh*: CHAR;	(** Character located immediately after scanned token. *)
 		class*: SIGNED16;		(** Scanner classes. Scanned tokens are returned in the record fields below. *)
 		i*: SIGNED32;
-		x*: REAL;
+		x*: FLOAT32;
 		y*: LONGREAL;
 		c*: CHAR;
 		len*: SIGNED8;
@@ -321,7 +321,7 @@ END OpenScanner;
             END;
             IF Reals.ExpoL(S.y) = 0 THEN S.y:= 0 END
           ELSE S.class := Real;
-            IF MAX(REAL) < y THEN S.x:= Reals.Real(-1)
+            IF MAX(FLOAT32) < y THEN S.x:= Reals.Real(-1)
             ELSIF neg THEN S.x := SHORT(- y)
             ELSE S.x := SHORT(y)
             END;
@@ -515,7 +515,7 @@ END WriteAttr;
 
 	Bool	BOOLEAN	Bool, String, Char
 	Int	SIGNED32	Int, String, Real, LongReal
-	Real	REAL	Real, String, LongReal, Int
+	Real	FLOAT32	Real, String, LongReal, Int
 	LongReal	LONGREAL	LongReal, String, Real, Int
 	String	ARRAY OF CHAR	String, Int, Bool, Real, LongReal, Bool
 *)
@@ -559,7 +559,7 @@ END WriteAttr;
 		END
 	END GetInt;
 
-	PROCEDURE GetReal*(obj: Objects.Object; name: ARRAY OF CHAR; VAR x: REAL);
+	PROCEDURE GetReal*(obj: Objects.Object; name: ARRAY OF CHAR; VAR x: FLOAT32);
 		VAR A: Objects.AttrMsg;
 	BEGIN
 		x := 0.0;
@@ -628,7 +628,7 @@ END WriteAttr;
 
 	Bool	BOOLEAN	Bool, String, Char
 	Int	SIGNED32	Int, String, Real, LongReal
-	Real	REAL	Real, String, LongReal, Int
+	Real	FLOAT32	Real, String, LongReal, Int
 	LongReal	LONGREAL	LongReal, String, Real, Int
 	String	ARRAY OF CHAR	String, Int, Bool, Real, LongReal, Bool
 *)
@@ -674,7 +674,7 @@ END WriteAttr;
 		END
 	END SetInt;
 
-	PROCEDURE SetReal*(obj: Objects.Object; name: ARRAY OF CHAR; x: REAL);
+	PROCEDURE SetReal*(obj: Objects.Object; name: ARRAY OF CHAR; x: FLOAT32);
 		VAR A: Objects.AttrMsg;
 	BEGIN
 		IF obj # NIL THEN

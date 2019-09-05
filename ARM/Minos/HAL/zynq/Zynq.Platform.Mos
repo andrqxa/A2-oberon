@@ -144,7 +144,7 @@ IMPORT SYSTEM;
 
 		TimerPeriod*						= 1;
 		TimerRatePerSecond*				= SIGNED32( 1000 / TimerPeriod );
-		TickRate*							= REAL( 3000000.0 );
+		TickRate*							= FLOAT32( 3000000.0 );
 
 		ConfigFileName*					= "";
 

@@ -171,8 +171,8 @@ VAR
 		IF x THEN Char(wr, 1X ) ELSE Char(wr, 0X ) END
 	END RawBool;
 
-	(** Write a REAL. *)
-	PROCEDURE RawReal*(VAR wr: Writer; x: REAL );
+	(** Write a FLOAT32. *)
+	PROCEDURE RawReal*(VAR wr: Writer; x: FLOAT32 );
 	BEGIN
 		RawLInt(wr, SYSTEM.VAL( SIGNED32, x ) )
 	END RawReal;
@@ -393,14 +393,14 @@ VAR
 	END Date822;
 
 	(** Write a floating point number x using n character positions *)
-	PROCEDURE Float*(VAR writer: Writer; x: REAL; n: SIGNED32);
+	PROCEDURE Float*(VAR writer: Writer; x: FLOAT32; n: SIGNED32);
 	BEGIN
 		(*! current implementation does not support 'n' parameter *)
 		FloatFix(writer,x,0,6,0);
 	END Float;
 
 	(** Write a floating point number x in a fixed point notation. n is the overall minimal length for the output field, f the number of fraction digits following the decimal point, D the fixed exponent (printed only when D # 0). *)
-	PROCEDURE FloatFix*(VAR writer: Writer; x: REAL; n, f, D: WORD);
+	PROCEDURE FloatFix*(VAR writer: Writer; x: FLOAT32; n, f, D: WORD);
 	VAR
 		d: SIGNED32;
 	BEGIN

@@ -413,7 +413,7 @@ BEGIN
 END MakeStackItem;
 
 PROCEDURE MakeConst*(VAR x: Item;  o: PCT.Const;  type: PCT.Struct);
-VAR	t: PCT.Struct;  adr: PCBT.GlobalVariable; r: REAL;  lr: LONGREAL; h: SIGNED64;
+VAR	t: PCT.Struct;  adr: PCBT.GlobalVariable; r: FLOAT32;  lr: LONGREAL; h: SIGNED64;
 BEGIN
 	x.mode := Const; t := o.type;
 	IF (t = PCT.Int8) OR (t = PCT.Int16) OR (t = PCT.Int32)  THEN

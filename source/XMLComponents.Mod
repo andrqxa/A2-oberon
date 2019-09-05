@@ -1054,7 +1054,7 @@ TYPE
 		END Invalidate;
 
 		PROCEDURE Draw*(ctxt: Gfx.Context);
-		VAR enum: XMLObjects.Enumerator; p: ANY; state1, state2: Gfx.State; llx, lly, urx, ury: REAL;
+		VAR enum: XMLObjects.Enumerator; p: ANY; state1, state2: Gfx.State; llx, lly, urx, ury: FLOAT32;
 		BEGIN
 			IF properties(CSS2Properties.VisualProperties).overflow.computed = CSS2Properties.Hidden THEN
 				Gfx.Save(ctxt, {Gfx.clip}, state1);

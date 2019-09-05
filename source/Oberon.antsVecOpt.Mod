@@ -134,7 +134,7 @@ END Copy;
 PROCEDURE AddGaussNoise*;
 	VAR v1, v2: vyBase.Object;  var,mean: LONGREAL;
 BEGIN
-	antsCommands.InitScan("src=OBJ dest=OBJ var=REAL [mean=REAL] [>attributes]");
+	antsCommands.InitScan("src=OBJ dest=OBJ var=FLOAT32 [mean=FLOAT32] [>attributes]");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2) & antsCommands.ExpectReal("var", var) THEN
 		mean := 0; IF antsCommands.GetReal("mean",mean) THEN END;
 		DoAddGaussNoise(v1(vyBase.tVector), v2(vyBase.tVector), mean, var);
@@ -150,7 +150,7 @@ END AddGaussNoise;
 PROCEDURE AddExpNoise*;
 	VAR v1, v2: vyBase.Object;  par: LONGREAL;
 BEGIN
-	antsCommands.InitScan("src=OBJ dest=OBJ lambda=REAL [>attributes]");
+	antsCommands.InitScan("src=OBJ dest=OBJ lambda=FLOAT32 [>attributes]");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2) & antsCommands.ExpectReal("mu", par) THEN
 		DoAddExpNoise(v1(vyBase.tVector), v2(vyBase.tVector), par);
 		IF antsCommands.Find("attributes") THEN
@@ -164,7 +164,7 @@ END AddExpNoise;
 PROCEDURE AddLaplaceNoise*;
 	VAR v1, v2: vyBase.Object;  par: LONGREAL;
 BEGIN
-	antsCommands.InitScan("src=OBJ dest=OBJ mu=REAL [>attributes]");
+	antsCommands.InitScan("src=OBJ dest=OBJ mu=FLOAT32 [>attributes]");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2) & antsCommands.ExpectReal("mu", par) THEN
 		DoAddLaplaceNoise(v1(vyBase.tVector), v2(vyBase.tVector), par);
 		IF antsCommands.Find("attributes") THEN
@@ -178,7 +178,7 @@ END AddLaplaceNoise;
 PROCEDURE AddUniformNoise*;
 	VAR v1, v2: vyBase.Object;  par: LONGREAL;
 BEGIN
-	antsCommands.InitScan("src=OBJ dest=OBJ len=REAL [>attributes]");
+	antsCommands.InitScan("src=OBJ dest=OBJ len=FLOAT32 [>attributes]");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2) & antsCommands.ExpectReal("len", par) THEN
 		DoAddUniformNoise(v1(vyBase.tVector), v2(vyBase.tVector), par);
 		IF antsCommands.Find("attributes") THEN
@@ -192,7 +192,7 @@ END AddUniformNoise;
 PROCEDURE AddConst*;
 	VAR v1, v2: vyBase.Object;  var: LONGREAL;
 BEGIN
-	antsCommands.InitScan("src=OBJ dest=OBJ const=REAL");
+	antsCommands.InitScan("src=OBJ dest=OBJ const=FLOAT32");
 	IF antsCommands.ExpectObject("src", v1) & antsCommands.ExpectObject("dest", v2) & antsCommands.ExpectReal("const", var) THEN
 		DoAddConst(v1(vyBase.tVector), v2(vyBase.tVector), var);
 		vyBase.Update(v2)

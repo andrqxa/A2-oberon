@@ -82,7 +82,7 @@ VAR
 	PROCEDURE DefineValues*;
 	VAR l: antsCommands.tScanList;  obj1, obj2: vyBase.Object;  i: SIGNED32;  b: BOOLEAN;
 	BEGIN
-		l := antsCommands.ScanFromPar( "t1=OBJ t2=OBJ t1d=REAL t2d=REAL wd=INT hd=INT ph1=REAL ph2=REAL" );  b := antsCommands.ExpectObjectFromKeyword( l, "t1", obj1 );
+		l := antsCommands.ScanFromPar( "t1=OBJ t2=OBJ t1d=FLOAT32 t2d=FLOAT32 wd=INT hd=INT ph1=FLOAT32 ph2=FLOAT32" );  b := antsCommands.ExpectObjectFromKeyword( l, "t1", obj1 );
 		v1 := obj1( vyBase.tVector );  b := antsCommands.ExpectObjectFromKeyword( l, "t2", obj2 );  v2 := obj2( vyBase.tVector );
 		b := antsCommands.ExpectRealFromKeyword( l, "t1d", t1d );  b := antsCommands.ExpectRealFromKeyword( l, "t2d", t2d );
 		b := antsCommands.ExpectNumberFromKeyword( l, "wd", wd );  b := antsCommands.ExpectNumberFromKeyword( l, "hd", hd );

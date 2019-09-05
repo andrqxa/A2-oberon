@@ -175,7 +175,7 @@ BEGIN
 END ClockAttr;
 
 PROCEDURE Line2(M: Display3.Mask; ang: SIGNED16; x0, y0, r1, r2, color: SIGNED16);
-	VAR x1, y1, x2, y2: SIGNED16; s,c,a : REAL;
+	VAR x1, y1, x2, y2: SIGNED16; s,c,a : FLOAT32;
 BEGIN
 	ang := (15-ang) MOD 60;
 	a := 2 * Math.pi / 60 * ang;
@@ -261,7 +261,7 @@ PROCEDURE PrintClock(F: Clock; VAR M: Display.DisplayMsg);
 	END P;
 
 	PROCEDURE PLine(ang: SIGNED16; x0, y0, r1, r2, color: SIGNED16);
-		VAR x1, y1, x2, y2: SIGNED16; s,c,a : REAL;
+		VAR x1, y1, x2, y2: SIGNED16; s,c,a : FLOAT32;
 	BEGIN
 		ang := (15-ang) MOD 60;
 		a := 2 * Math.pi / 60 * ang;

@@ -105,7 +105,7 @@ TYPE
 	(* the asteroid field *)
 	Starfield = POINTER TO StarfieldDesc;
 	StarfieldDesc = RECORD(Panels.PanelDesc)
-		scaleX,scaleY: REAL;
+		scaleX,scaleY: FLOAT32;
 		fdx: SIGNED16;
 	END;
 
@@ -119,7 +119,7 @@ TYPE
 	(* object in the starfield space *)
 	SpaceObj = POINTER TO SpaceObjDesc;
 	SpaceObjDesc = RECORD
-		x,y,x0,y0: REAL;
+		x,y,x0,y0: FLOAT32;
 		alive: BOOLEAN;
 		next: SpaceObj;
 	END;
@@ -134,7 +134,7 @@ TYPE
 	Mass = POINTER TO MassDesc;
 	MassDesc = RECORD(SpaceObjDesc)
 		mass: LONGREAL;
-		rot,xvel,yvel,rotvel: REAL;
+		rot,xvel,yvel,rotvel: FLOAT32;
 		shape: Shape;
 		n0,u,v,w,h: SIGNED16;
 		px0,py0,px1,py1: Vertices;
@@ -224,7 +224,7 @@ END FontGeometry;
 PROCEDURE Intersect(x11,y11,x12,y12,x21,y21,x22,y22: SIGNED16; VAR x3,y3: SIGNED16): BOOLEAN;
 	(* calculate intersection between two lines, point is in (x3,y3) *)
 VAR
-	k1,k2,d1,d2: REAL;
+	k1,k2,d1,d2: FLOAT32;
 	h1,h2: BOOLEAN;
 
 	PROCEDURE Within(c,a,b: SIGNED16): BOOLEAN;
@@ -256,19 +256,19 @@ BEGIN
 				   Within(y3,y11,y12) & Within(y3,y21,y22));
 END Intersect;
 
-PROCEDURE Sign(v: REAL): SIGNED16;
+PROCEDURE Sign(v: FLOAT32): SIGNED16;
 	(* get the sign of a real (+1|-1) *)
 BEGIN
 	IF (v < 0.0) THEN RETURN(-1); ELSE RETURN(1); END;
 END Sign;
 
-PROCEDURE TransX(x,y: SIGNED16; p,v: REAL): REAL;
+PROCEDURE TransX(x,y: SIGNED16; p,v: FLOAT32): FLOAT32;
 	(* Transform x-coord - shift and rotate *)
 BEGIN
 	RETURN((x*Math.cos(p)+y*Math.sin(p))+v);
 END TransX;
 
-PROCEDURE TransY(x,y: SIGNED16; p,v: REAL): REAL;
+PROCEDURE TransY(x,y: SIGNED16; p,v: FLOAT32): FLOAT32;
 	(* Transform y-coord - shift and rotate *)
 BEGIN
 	RETURN((-x*Math.sin(p)+y*Math.cos(p))+v);
@@ -430,7 +430,7 @@ BEGIN
 	InitMass(obj,shape); obj.ship:= ship; obj.time:= grant; obj.rpos:= -1;
 END InitBullet;
 
-PROCEDURE InitShip(obj: Ship; x,y: REAL);
+PROCEDURE InitShip(obj: Ship; x,y: FLOAT32);
 BEGIN
 	InitFlyingObj(obj,shThrShip); obj.shape:= shShip; obj.shape0:= shThrShip;
 	IF (obj.px2 = NIL) THEN NEW(obj.px2,shThrShip.n); END;
@@ -462,7 +462,7 @@ END InitEnemy;
 
 PROCEDURE InitEBullet(obj: EBullet; ufo: Enemy; ship: Ship);
 VAR
-	dw,dx,dy,dz: REAL;
+	dw,dx,dy,dz: FLOAT32;
 BEGIN
 	InitBullet(obj,shEBullet,ufo,EBulletGrant);
 	obj.x:= ufo.px1[0]; obj.y:= ufo.py1[0];
@@ -886,7 +886,7 @@ BEGIN
 	END;
 END EFire;
 
-PROCEDURE Hit(F: Field; x,y: REAL);
+PROCEDURE Hit(F: Field; x,y: FLOAT32);
 	(* produce a nice detonation *)
 VAR
 	det: Detonation;
@@ -927,7 +927,7 @@ BEGIN
 	RETURN(size);
 END SplitAsteroid;
 
-PROCEDURE NewShip(F: Field; x,y: REAL);
+PROCEDURE NewShip(F: Field; x,y: FLOAT32);
 	(* initialize a new ship and place it somewhere into the field *)
 BEGIN
 	IF (F.ships > 0) THEN
@@ -1164,7 +1164,7 @@ VAR
 	time: SIGNED32;
 	model: Field;
 	amt: SIGNED16;
-	r1: REAL;
+	r1: FLOAT32;
 	obj0,obj: SpaceObj;
 BEGIN
 	WITH me: Timer DO

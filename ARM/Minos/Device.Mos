@@ -233,12 +233,12 @@ VAR
 		WriteBytes( dev, int, 0, 4 );  
 	END WriteInt;  
 
-	PROCEDURE ReadReal*( dev: Device;  VAR real: REAL );  
+	PROCEDURE ReadReal*( dev: Device;  VAR real: FLOAT32 );  
 	BEGIN 
 		ReadBytes( dev, real, 0, 4 );  
 	END ReadReal;  
 
-	PROCEDURE WriteReal*( dev: Device;  real: REAL );  
+	PROCEDURE WriteReal*( dev: Device;  real: FLOAT32 );  
 	BEGIN 
 		WriteBytes( dev, real, 0, 4 );  
 	END WriteReal;  

@@ -394,7 +394,7 @@ END Error;
 
 (* The following procedures are defined in, but not exported from the Modules CSS2Properties and CSS2Parser *)
 PROCEDURE GetPixels(term: CSS2.Term; ppi: LONGREAL; font: GfxFonts.Font): LONGREAL;
-VAR fact, pixels: LONGREAL; x, y, dx, dy: REAL; map: Raster.Image;
+VAR fact, pixels: LONGREAL; x, y, dx, dy: FLOAT32; map: Raster.Image;
 BEGIN
 	IF (term # NIL) & term.IsLength() THEN
 		CASE term.GetUnit() OF

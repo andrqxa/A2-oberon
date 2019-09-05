@@ -251,7 +251,7 @@ VAR
 	END HandleAttributes;
 
 	PROCEDURE AdjustCoord( pict: vyPort.Picture;  obj: tLayer );
-	VAR minX, maxX, minY, maxY: REAL;  nans: SIGNED32;
+	VAR minX, maxX, minY, maxY: FLOAT32;  nans: SIGNED32;
 	BEGIN
 		IF pict # NIL THEN
 			IF (obj.x # NIL ) & (obj.y # NIL ) THEN

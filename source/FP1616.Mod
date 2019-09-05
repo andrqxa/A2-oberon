@@ -5,13 +5,13 @@ CONST
 
 TYPE
 (* converts a 16.16 fixpoint integer to float *)
-PROCEDURE FixpToFloat*(x: SIZE): REAL;
+PROCEDURE FixpToFloat*(x: SIZE): FLOAT32;
 BEGIN
 	RETURN (x / FIXPOINT);
 END FixpToFloat;
 
 (* converts a float into a 16.16 fixpoint integer *)
-PROCEDURE FloatToFixp*(x: REAL): SIGNED32;
+PROCEDURE FloatToFixp*(x: FLOAT32): SIGNED32;
 BEGIN
 	IF x > FIXPOINT THEN RETURN FIXPOINT;
 	ELSIF x < -FIXPOINT THEN RETURN -FIXPOINT

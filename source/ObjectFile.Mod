@@ -108,7 +108,7 @@ TYPE
 		table: Table;
 		size: SIZE;
 		used: SIZE;
-		maxLoadFactor: REAL;
+		maxLoadFactor: FLOAT32;
 		writer: Streams.Writer;
 		(* Interface *)
 

@@ -43,7 +43,7 @@ CONST
 
 TYPE
 	(* LONGREAL *)
-	real* = LONGREAL;   (* technical convenience, to avoid duplicate code for REAL and LONGREAL *)
+	real* = LONGREAL;   (* technical convenience, to avoid duplicate code for FLOAT32 and LONGREAL *)
 	index* = SIGNED32;
 
 	tVector* = POINTER TO tVectorDesc;

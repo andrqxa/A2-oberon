@@ -46,14 +46,14 @@ TYPE
 	tLayer* = POINTER TO tLayerDesc;
 	tLayerDesc = RECORD (vyPort.tLayerDesc)
 		lBounded, rBounded: BOOLEAN;
-		lBound, rBound: REAL;
-		a, b: REAL
+		lBound, rBound: FLOAT32;
+		a, b: FLOAT32
 	END;
 
 	PROCEDURE New*;
 	VAR line: tLayer;
 	BEGIN
-		NEW( line );  line.lBounded := FALSE;  line.rBounded := FALSE;  line.lBound := MIN( REAL );  line.rBound := MAX( REAL );  line.a := 0;  line.b := 0;
+		NEW( line );  line.lBounded := FALSE;  line.rBounded := FALSE;  line.lBound := MIN( FLOAT32 );  line.rBound := MAX( FLOAT32 );  line.a := 0;  line.b := 0;
 		line.handle := Handler;  Objects.NewObj := line
 	END New;
 
@@ -172,7 +172,7 @@ TYPE
 		F.handle := Handler
 	END Init;
 
-	PROCEDURE Open*( F: tLayer;  lBounded, rBounded: BOOLEAN;  lBound, rBound, a, b: REAL );
+	PROCEDURE Open*( F: tLayer;  lBounded, rBounded: BOOLEAN;  lBound, rBound, a, b: FLOAT32 );
 	VAR id: vyName.tNameArray;
 	BEGIN
 		Init( F );  id := "line";  vyPort.OpenLayer( F, id );  F.lBounded := lBounded;  F.rBounded := rBounded;  F.lBound := lBound;
@@ -182,7 +182,7 @@ TYPE
 (*PROCEDURE Show*;
 VAR data: Objects.Object;  F: tLayer;  count: SIGNED16;
 pict: vyPort.Picture;
-a, b : REAL;
+a, b : FLOAT32;
 inconsistentConditions : BOOLEAN;
 BEGIN
 data:=vyBase.NextParObj();
@@ -206,7 +206,7 @@ Objects.NewObj := pict
 END Show;*)
 
 	PROCEDURE Insert*;
-	VAR line: tLayer;  a, b: REAL;  sc: vyParser.Scanner;
+	VAR line: tLayer;  a, b: FLOAT32;  sc: vyParser.Scanner;
 	BEGIN
 		vyParser.OpenParScanner( sc );
 		IF ~(vyParser.Real( sc, a ) & vyParser.Real( sc, b )) THEN vyParser.MsgSyntax( "Insert", "??/2;??/2" );  RETURN END;

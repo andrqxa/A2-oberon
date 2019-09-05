@@ -150,7 +150,7 @@ VAR
 		layer.Bitmap := vyBitmaps.NewBitmap( w, h, 1, 1 );  vyPort.RedrawFocusPict;
 	END ClearBmp;
 
-	PROCEDURE Dot*( x, y: REAL;  mode: SIGNED16 );
+	PROCEDURE Dot*( x, y: FLOAT32;  mode: SIGNED16 );
 	VAR i, j: SIGNED32;  layer: BMPLayer;  pict: vyPort.Picture;  k, k0, k1, l, l0, l1, x1, y1, w, h: SIGNED16;
 	BEGIN
 		IF (x < 0) OR (x > 1) OR (y < 0) OR (y > 1) THEN HALT( 201 );  END;
@@ -180,10 +180,10 @@ VAR
 		vyPort.RedrawFocusPict;
 	END Dot;
 
-	PROCEDURE Line*( FromX, FromY, ToX, ToY: REAL;  mode: SIGNED16 );
+	PROCEDURE Line*( FromX, FromY, ToX, ToY: FLOAT32;  mode: SIGNED16 );
 	(*! Old Line renamed to PolyLine *)
 	VAR i, j, i1, j1: SIGNED32;  layer: BMPLayer;  pict: vyPort.Picture;  x1, y1, w, h: SIGNED16;
-		x, y: REAL;   (*! Hack. remove *)
+		x, y: FLOAT32;   (*! Hack. remove *)
 	BEGIN
 		x := FromX;  y := FromY;
 		IF (x < 0) OR (x > 1) OR (y < 0) OR (y > 1) THEN HALT( 201 );  END;
@@ -197,7 +197,7 @@ VAR
 		vyPort.RedrawFocusPict;
 	END Line;
 
-	PROCEDURE IsDot*( x, y: REAL ): BOOLEAN;
+	PROCEDURE IsDot*( x, y: FLOAT32 ): BOOLEAN;
 	VAR mode: SIGNED16;  i, j: SIGNED32;  layer: BMPLayer;  pict: vyPort.Picture;  x1, y1, w, h: SIGNED16;
 	BEGIN
 		pict := vyPort.GetFocusPicture();  vyPort.GetPictureScreenRegion( pict, x1, y1, w, h );  layer := GetBitmapLayer( pict );
@@ -210,7 +210,7 @@ VAR
 		END;
 	END IsDot;
 
-	PROCEDURE Scatter*( VAR x, y: ARRAY OF REAL );
+	PROCEDURE Scatter*( VAR x, y: ARRAY OF FLOAT32 );
 	VAR data: Objects.Object;  scatter: vyScatter2.tLayer;  xv, yv: vyBase.tVector;
 	BEGIN
 		IF LEN( x ) # LEN( y ) THEN HALT( 203 ) END;
@@ -219,7 +219,7 @@ VAR
 		vyScatter2.Init( scatter, data );  vyPort.AddLayer( vyPort.GetFocusPicture(), scatter );
 	END Scatter;
 
-	PROCEDURE PolyLine*( VAR x, y: ARRAY OF REAL );
+	PROCEDURE PolyLine*( VAR x, y: ARRAY OF FLOAT32 );
 	VAR line: vyCharts.tLayer;
 	BEGIN
 		IF LEN( x ) # LEN( y ) THEN HALT( 203 ) END;

@@ -45,19 +45,19 @@ TYPE
 
 	Rasterizer* = OBJECT
 	VAR img*, saveimg: Raster.Image;
-		zBuffer, savezBuffer : POINTER TO ARRAY OF REAL;
+		zBuffer, savezBuffer : POINTER TO ARRAY OF FLOAT32;
 		invBuffer : POINTER TO ARRAY OF SIGNED32;
 
 		width*, height* : SIZE;
 		(* Global to avoid stack clearing penalty, TODO: check accesstimes *)
-		x0, x1, x2, x3, dxL, dxR, xL, xR, xStart, xEnd, tr: REAL;
+		x0, x1, x2, x3, dxL, dxR, xL, xR, xStart, xEnd, tr: FLOAT32;
 		y0, y1, y2, dx, zStride, stride: SIZE; color: SIGNED32; (* buffer variables *)
 		adrBase, zBufBase: ADDRESS;
 
-		tx0, tx1, tx2, tx3, ty0, ty1, ty2, ty3, txStart, tyStart, dtxStart, dtyStart, dtx, dty: REAL; (* parameters for affine texture *)
+		tx0, tx1, tx2, tx3, ty0, ty1, ty2, ty3, txStart, tyStart, dtxStart, dtyStart, dtx, dty: FLOAT32; (* parameters for affine texture *)
 
-		z0, z1, z2, z3, zStart, dzStart, dz : REAL; (* z values used for affine mapping *)
-		 zinv0, zinv1, zinv2, zinv3, zinvStart, dzinvStart, dzinv : REAL; (* used for perspective mapping *)
+		z0, z1, z2, z3, zStart, dzStart, dz : FLOAT32; (* z values used for affine mapping *)
+		 zinv0, zinv1, zinv2, zinv3, zinvStart, dzinvStart, dzinv : FLOAT32; (* used for perspective mapping *)
 
 		 invertable : BOOLEAN;
 		 invAdrStride, invIdx : SIZE;
@@ -87,7 +87,7 @@ TYPE
 		BEGIN
 			Raster.InitMode(mode, Raster.srcCopy);
 			Raster.Copy(img, saveimg, 0, 0, width, height, 0, 0, mode);
-			SYSTEM.MOVE(ADDRESSOF(zBuffer[0]), ADDRESSOF(savezBuffer[0]), width * height * SIZEOF(REAL))
+			SYSTEM.MOVE(ADDRESSOF(zBuffer[0]), ADDRESSOF(savezBuffer[0]), width * height * SIZEOF(FLOAT32))
 		END Keep;
 
 		PROCEDURE Restore*;
@@ -95,7 +95,7 @@ TYPE
 		BEGIN
 			Raster.InitMode(mode, Raster.srcCopy);
 			Raster.Copy(saveimg, img, 0, 0, width, height, 0, 0, mode);
-			SYSTEM.MOVE(ADDRESSOF(savezBuffer[0]), ADDRESSOF(zBuffer[0]), width * height * SIZEOF(REAL))
+			SYSTEM.MOVE(ADDRESSOF(savezBuffer[0]), ADDRESSOF(zBuffer[0]), width * height * SIZEOF(FLOAT32))
 		END Restore;
 
 		PROCEDURE SetInvertable*(invertable : BOOLEAN);
@@ -127,7 +127,7 @@ TYPE
 		END Clear;
 
 		PROCEDURE RenderLine;
-		VAR adr, zAdr, invAdr: ADDRESS; x : SIGNED32; z, ttx, tty: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x : SIGNED32; z, ttx, tty: FLOAT32;
 		BEGIN
 			xL := xStart; xR := xEnd; z := zStart;
 			ttx := txStart; tty := tyStart;
@@ -151,7 +151,7 @@ TYPE
 						RETURN
 					END
 				END;
-				IF z < SYSTEM.VAL(REAL, SYSTEM.GET32(zAdr)) THEN
+				IF z < SYSTEM.VAL(FLOAT32, SYSTEM.GET32(zAdr)) THEN
 					SYSTEM.PUT16(adr, color);
 					SYSTEM.PUT32(zAdr, SYSTEM.VAL(SIGNED32, z));
 					IF invertable THEN SYSTEM.PUT32(invAdr, invIdx) END
@@ -165,7 +165,7 @@ TYPE
 		END RenderLine;
 
 		PROCEDURE RenderLineTex(tex : Texture);
-		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: SIGNED32; tadr: SIZE; z, tx, ty: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: SIGNED32; tadr: SIZE; z, tx, ty: FLOAT32;
 		BEGIN
 			xL := xStart;
 			xR := xEnd;
@@ -195,7 +195,7 @@ TYPE
 						RETURN
 					END
 				END;
-				IF z < SYSTEM.VAL(REAL, SYSTEM.GET32(zAdr)) THEN
+				IF z < SYSTEM.VAL(FLOAT32, SYSTEM.GET32(zAdr)) THEN
 					txi := ENTIER(tx); tyi := ENTIER(ty); tadr := 2* txi +  tyi * tex.img.bpr;
 					IF  tadr < 0  THEN color := 0 ELSIF tadr  >= tex.img.height * tex.img.bpr THEN color := 0 ELSE
 						color := SYSTEM.GET16(tex.img.adr + tadr);
@@ -218,7 +218,7 @@ TYPE
 		END RenderLineTex;
 
 		PROCEDURE RenderTriangle*(VAR tri : Triangle);
-		VAR p0, p1, p2, t : Vertex; y, dy : SIZE; f, dxinv, dyinv:REAL;
+		VAR p0, p1, p2, t : Vertex; y, dy : SIZE; f, dxinv, dyinv:FLOAT32;
 		BEGIN
 			IF tri.culled & ~CCW(tri) THEN RETURN END;
 			color := tri.transColor;
@@ -323,7 +323,7 @@ TYPE
 (* Expensive perspective case *)
 
 		PROCEDURE RenderPerspLineTex(tex : Texture);
-		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: SIGNED32; tadr: SIZE; z, zinv, rzinv, tx, ty, txr, tyr: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: SIGNED32; tadr: SIZE; z, zinv, rzinv, tx, ty, txr, tyr: FLOAT32;
 		BEGIN
 			xL := xStart;
 			xR := xEnd;
@@ -358,7 +358,7 @@ TYPE
 					END
 				END;
 
-				IF z < SYSTEM.VAL(REAL, SYSTEM.GET32(zAdr)) THEN
+				IF z < SYSTEM.VAL(FLOAT32, SYSTEM.GET32(zAdr)) THEN
 					txi := ENTIER(txr); tyi := ENTIER(tyr); tadr := 2* txi +  tyi * tex.img.bpr;
 					IF  tadr < 0  THEN color := 0 ELSIF tadr  >= tex.img.height * tex.img.bpr THEN color := 0 ELSE
 						color := SYSTEM.GET16(tex.img.adr + tadr)
@@ -381,7 +381,7 @@ TYPE
 		END RenderPerspLineTex;
 
 		PROCEDURE RenderPerspLineFlat;
-		VAR adr, zAdr, invAdr: ADDRESS; x: SIGNED32; z, zinv, rzinv: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x: SIGNED32; z, zinv, rzinv: FLOAT32;
 		BEGIN
 			xL := xStart;
 			xR := xEnd;
@@ -411,7 +411,7 @@ TYPE
 					END
 				END;
 
-				IF z < SYSTEM.VAL(REAL, SYSTEM.GET32(zAdr)) THEN
+				IF z < SYSTEM.VAL(FLOAT32, SYSTEM.GET32(zAdr)) THEN
 					SYSTEM.PUT16(adr, color);
 					SYSTEM.PUT32(zAdr, SYSTEM.VAL(SIGNED32, z));
 					IF invertable THEN SYSTEM.PUT32(invAdr, invIdx) END
@@ -428,7 +428,7 @@ TYPE
 		END RenderPerspLineFlat;
 
 		PROCEDURE RenderPerspTriangle*(VAR tri : Triangle);
-		VAR p0, p1, p2, t : Vertex; y, dy : SIZE; f, dyinv, dxinv : REAL;
+		VAR p0, p1, p2, t : Vertex; y, dy : SIZE; f, dyinv, dxinv : FLOAT32;
 		BEGIN
 			IF tri.culled & ~CCW(tri) THEN RETURN END;
 			color := tri.transColor;
@@ -529,7 +529,7 @@ TYPE
 (* Experimental Subdivision case *)
 
 		PROCEDURE SubDivLineTex(tex : Texture);
-		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: SIGNED32; tadr: SIZE; zinv, txr, tyr, zr, rzinv, tx, ty, sdtx, sdty, stx, sty, szr, ezr, dzr, subDivInv: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x, txi, tyi: SIGNED32; tadr: SIZE; zinv, txr, tyr, zr, rzinv, tx, ty, sdtx, sdty, stx, sty, szr, ezr, dzr, subDivInv: FLOAT32;
 				i : SIGNED32;
 		CONST SubDiv = 16;
 		BEGIN
@@ -583,7 +583,7 @@ TYPE
 					END
 				END;
 
-				IF zr < SYSTEM.VAL(REAL, SYSTEM.GET32(zAdr)) THEN
+				IF zr < SYSTEM.VAL(FLOAT32, SYSTEM.GET32(zAdr)) THEN
 					txi := ENTIER(txr); tyi := ENTIER(tyr); tadr := 2* txi +  tyi * tex.img.bpr;
 					IF  tadr < 0  THEN color := 0 ELSIF tadr  >= tex.img.height * tex.img.bpr THEN color := 0 ELSE
 						color := SYSTEM.GET16(tex.img.adr + tadr);
@@ -607,7 +607,7 @@ TYPE
 		END SubDivLineTex;
 
 		PROCEDURE SubDivLineFlat;
-		VAR adr, zAdr, invAdr: ADDRESS; x: SIGNED32; zinv, zr, rzinv, szr, ezr, dzr, subDivInv: REAL;
+		VAR adr, zAdr, invAdr: ADDRESS; x: SIGNED32; zinv, zr, rzinv, szr, ezr, dzr, subDivInv: FLOAT32;
 				i : SIGNED32;
 		CONST SubDiv = 16;
 		BEGIN
@@ -651,7 +651,7 @@ TYPE
 					END
 				END;
 
-				IF zr < SYSTEM.VAL(REAL, SYSTEM.GET32(zAdr)) THEN
+				IF zr < SYSTEM.VAL(FLOAT32, SYSTEM.GET32(zAdr)) THEN
 					SYSTEM.PUT16(adr, color);
 					SYSTEM.PUT32(zAdr, SYSTEM.VAL(SIGNED32, zr));
 					IF invertable THEN SYSTEM.PUT32(invAdr, invIdx) END
@@ -670,7 +670,7 @@ TYPE
 		END SubDivLineFlat;
 
 		PROCEDURE SubDivTriangle*(VAR tri : Triangle);
-		VAR p0, p1, p2, t : Vertex; y, dy : SIZE; f, dyinv, dxinv : REAL;
+		VAR p0, p1, p2, t : Vertex; y, dy : SIZE; f, dyinv, dxinv : FLOAT32;
 		BEGIN
 			IF tri.culled & ~CCW(tri) THEN RETURN END;
 			color := tri.transColor;

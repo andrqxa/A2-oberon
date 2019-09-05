@@ -35,7 +35,7 @@ TYPE
 	ColorEntry = POINTER TO ColorEntryDesc;
 	ColorEntryDesc = RECORD
 		name: Objects.Name;
-		r,g,b: REAL;
+		r,g,b: FLOAT32;
 		next: ColorEntry;
 	END;
 
@@ -91,7 +91,7 @@ BEGIN
 	RETURN(entry);
 END FindUserColor;
 
-PROCEDURE GetColorEntry(s: ARRAY OF CHAR; VAR r,g,b: REAL; VAR ok: BOOLEAN);
+PROCEDURE GetColorEntry(s: ARRAY OF CHAR; VAR r,g,b: FLOAT32; VAR ok: BOOLEAN);
 	(* find a color specification in the list of user-defined colors/ColorModels list *)
 VAR
 	entry: ColorEntry;
@@ -211,13 +211,13 @@ PROCEDURE XpmColor(VAR R: Rider; pict: Pictures.Picture; nrColor,pixChr,traCol: 
 	all others are treated as symbolic colors. The color conversion part is copied from BMP.Mod *)
 VAR
 	r,g,b,i,j,k: SIGNED16;
-	x0,x1,x2: REAL;
+	x0,x1,x2: FLOAT32;
 	C: SIGNED32;
 	ok: BOOLEAN;
 	ch,key,spec: CHAR;
 	cval: ARRAY 60 OF CHAR;
 
-	PROCEDURE Value(col: ARRAY OF CHAR; pos,len: SIGNED16): REAL;
+	PROCEDURE Value(col: ARRAY OF CHAR; pos,len: SIGNED16): FLOAT32;
 	VAR
 		i: SIGNED16;
 		v,w: SIGNED32;
@@ -384,14 +384,14 @@ END NewPicture;
 
 (** Define a new color. Use this, if a certain color name is undefined when loading a XPM picture.
 Syntax is: XPM.DefineColor color red green blue~
-color is a colorname, red, green and blue are REAL values between 0.0 and 1.0 *)
+color is a colorname, red, green and blue are FLOAT32 values between 0.0 and 1.0 *)
 PROCEDURE DefineColors*;
 VAR
 	entry: ColorEntry;
 	col: Objects.Name;
-	r,g,b: REAL;
+	r,g,b: FLOAT32;
 
-	PROCEDURE Valid(x: REAL): BOOLEAN;
+	PROCEDURE Valid(x: FLOAT32): BOOLEAN;
 	BEGIN
 		RETURN((x >= 0.0) & (x <= 1.0));
 	END Valid;
@@ -422,7 +422,7 @@ PROCEDURE CopyColors*;
 VAR
 	entry: ColorEntry;
 	col0,col1: Objects.Name;
-	r,g,b: REAL;
+	r,g,b: FLOAT32;
 	sep: CHAR;
 	ok: BOOLEAN;
 BEGIN

@@ -15,7 +15,7 @@ TYPE
   ALshort   * =  SIGNED16;  (* 2-byte signed *)
   ALint     * =  SIGNED32;  (* 4-byte signed *)
 
-  ALfloat   * =  REAL;
+  ALfloat   * =  FLOAT32;
   ALdouble  * =  LONGREAL;
   ALboolean * =  BOOLEAN;
 
@@ -268,7 +268,7 @@ TYPE
   ALCshort   * =  SIGNED16;  (* 2-byte signed *)
   ALCint     * =  SIGNED32;  (* 4-byte signed *)
 
-  ALCfloat   * =  REAL;
+  ALCfloat   * =  FLOAT32;
   ALCdouble  * =  LONGREAL;
   ALCboolean * =  BOOLEAN;
 

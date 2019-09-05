@@ -33,9 +33,9 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		Tool* = POINTER TO ToolDesc;
 		ToolDesc* = RECORD (Gadgets.ObjDesc)
 			frame*: LeoFrames.Frame;	(** frame that the tool objects is linked to **)
-			unit*: REAL;	(** current unit of measurement (in figure coordinates) **)
-			zx*, zy*: REAL;	(** vector from figure origin to ruler zero point (in figure coordinates) **)
-			pageW*, pageH*: REAL;	(** page size in figure coordinates **)
+			unit*: FLOAT32;	(** current unit of measurement (in figure coordinates) **)
+			zx*, zy*: FLOAT32;	(** vector from figure origin to ruler zero point (in figure coordinates) **)
+			pageW*, pageH*: FLOAT32;	(** page size in figure coordinates **)
 			buffered*: BOOLEAN;	(** true if rendering goes into bitmap first **)
 			grid*: RECORD
 				ticks*: SIGNED16;	(** number of ticks per unit **)
@@ -57,10 +57,10 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		(* special context for simplified rendering in invert mode *)
 		Context* = POINTER TO ContextDesc;
 		ContextDesc* = RECORD (Gfx.ContextDesc)
-			orgX, orgY: REAL;	(* origin of default coordinate system *)
-			scale: REAL;	(* default coordinate system scale factor *)
+			orgX, orgY: FLOAT32;	(* origin of default coordinate system *)
+			scale: FLOAT32;	(* default coordinate system scale factor *)
 			cx, cy, cw, ch: SIGNED16;	(* clip rectangle *)
-			u, v, u0, v0: REAL;
+			u, v, u0, v0: FLOAT32;
 			px, py: SIGNED16;
 			deferred: BOOLEAN;
 		END;
@@ -84,7 +84,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 			frame*: LeoFrames.Frame;	(* frame displaying focus *)
 			style*: SIGNED16;	(* one of translate, scale, rotate, shear, mirror *)
 			points*: SIGNED16;	(* number of focus points *)
-			x*, y*: ARRAY 2 OF REAL;	(* focus point coordinates *)
+			x*, y*: ARRAY 2 OF FLOAT32;	(* focus point coordinates *)
 			visible*: BOOLEAN;	(* true if focus is displayed *)
 		END;
 		Pat: ARRAY 6 OF Display.Pattern;
@@ -107,7 +107,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE ResetClip (ctxt: Gfx.Context);
 	END ResetClip;
 
-	PROCEDURE GetClipRect (ctxt: Gfx.Context; VAR llx, lly, urx, ury: REAL);
+	PROCEDURE GetClipRect (ctxt: Gfx.Context; VAR llx, lly, urx, ury: FLOAT32);
 		VAR dc: Context; inv: GfxMatrix.Matrix;
 	BEGIN
 		dc := ctxt(Context);
@@ -125,7 +125,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		ASSERT(clip = NIL, 100)
 	END SetClip;
 
-	PROCEDURE EnterLine (dc: Context; u, v: REAL; draw: BOOLEAN);
+	PROCEDURE EnterLine (dc: Context; u, v: FLOAT32; draw: BOOLEAN);
 	BEGIN
 		dc.px := SHORT(ENTIER(u)); dc.py := SHORT(ENTIER(v));
 		IF draw & (dc.cx <= dc.px) & (dc.px < dc.cx + dc.cw) & (dc.cy <= dc.py) & (dc.py < dc.cy + dc.ch) THEN
@@ -134,8 +134,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		dc.u := u; dc.v := v
 	END EnterLine;
 
-	PROCEDURE DrawLine (dc: Context; u, v: REAL);
-		VAR cx, cy, cw, ch, px, py, xstep, ystep, steps: SIGNED16; du, dv, eu, ev, e: REAL;
+	PROCEDURE DrawLine (dc: Context; u, v: FLOAT32);
+		VAR cx, cy, cw, ch, px, py, xstep, ystep, steps: SIGNED16; du, dv, eu, ev, e: FLOAT32;
 	BEGIN
 		Display.GetClip(cx, cy, cw, ch);
 		Display.SetClip(dc.cx, dc.cy, dc.cw, dc.ch);
@@ -223,8 +223,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE End (ctxt: Gfx.Context);
 	END End;
 
-	PROCEDURE Enter (ctxt: Gfx.Context; x, y, dx, dy: REAL);
-		VAR dc: Context; du, dv: REAL;
+	PROCEDURE Enter (ctxt: Gfx.Context; x, y, dx, dy: FLOAT32);
+		VAR dc: Context; du, dv: FLOAT32;
 	BEGIN
 		dc := ctxt(Context);
 		GfxMatrix.Apply(dc.ctm, x, y, dc.u, dc.v);
@@ -242,8 +242,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		dc.cpx := x; dc.cpy := y
 	END Enter;
 
-	PROCEDURE Exit (ctxt: Gfx.Context; dx, dy: REAL);
-		VAR du, dv: REAL;
+	PROCEDURE Exit (ctxt: Gfx.Context; dx, dy: FLOAT32);
+		VAR du, dv: FLOAT32;
 	BEGIN
 		IF Gfx.Record IN ctxt.mode THEN
 			GfxMatrix.ApplyToVector(ctxt.ctm, dx, dy, du, dv);
@@ -271,8 +271,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		END
 	END Close;
 
-	PROCEDURE LineTo (ctxt: Gfx.Context; x, y: REAL);
-		VAR dc: Context; u, v: REAL;
+	PROCEDURE LineTo (ctxt: Gfx.Context; x, y: FLOAT32);
+		VAR dc: Context; u, v: FLOAT32;
 	BEGIN
 		dc := ctxt(Context);
 		GfxMatrix.Apply(dc.ctm, x, y, u, v);
@@ -285,8 +285,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		dc.cpx := x; dc.cpy := y
 	END LineTo;
 
-	PROCEDURE ArcTo (ctxt: Gfx.Context; x, y, x0, y0, x1, y1, x2, y2: REAL);
-		VAR dc: Context; u, v, u0, v0, u1, v1, u2, v2: REAL; data: PathData;
+	PROCEDURE ArcTo (ctxt: Gfx.Context; x, y, x0, y0, x1, y1, x2, y2: FLOAT32);
+		VAR dc: Context; u, v, u0, v0, u1, v1, u2, v2: FLOAT32; data: PathData;
 	BEGIN
 		dc := ctxt(Context);
 		GfxMatrix.Apply(dc.ctm, x, y, u, v);
@@ -303,8 +303,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		dc.cpx := x; dc.cpy := y
 	END ArcTo;
 
-	PROCEDURE BezierTo (ctxt: Gfx.Context; x, y, x1, y1, x2, y2: REAL);
-		VAR dc: Context; u, v, u1, v1, u2, v2: REAL; data: PathData;
+	PROCEDURE BezierTo (ctxt: Gfx.Context; x, y, x1, y1, x2, y2: FLOAT32);
+		VAR dc: Context; u, v, u1, v1, u2, v2: FLOAT32; data: PathData;
 	BEGIN
 		dc := ctxt(Context);
 		GfxMatrix.Apply(dc.ctm, x, y, u, v);
@@ -320,8 +320,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		dc.cpx := x; dc.cpy := y
 	END BezierTo;
 
-	PROCEDURE Show (ctxt: Gfx.Context; x, y: REAL; VAR str: ARRAY OF CHAR);
-		VAR font: GfxFonts.Font; dx, dy: REAL;
+	PROCEDURE Show (ctxt: Gfx.Context; x, y: FLOAT32; VAR str: ARRAY OF CHAR);
+		VAR font: GfxFonts.Font; dx, dy: FLOAT32;
 	BEGIN
 		font := ctxt.font;
 		GfxFonts.GetStringWidth(font, str, dx, dy);
@@ -341,7 +341,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		END
 	END Render;
 
-	PROCEDURE Image (ctxt: Gfx.Context; x, y: REAL; img: GfxImages.Image; VAR filter: GfxImages.Filter);
+	PROCEDURE Image (ctxt: Gfx.Context; x, y: FLOAT32; img: GfxImages.Image; VAR filter: GfxImages.Filter);
 	BEGIN
 		Gfx.DrawRect(ctxt, x, y, x + img.width, y + img.height, {Gfx.Stroke})
 	END Image;
@@ -537,28 +537,28 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	(**--- Coordinate Conversions ---**)
 
 	(** map pixel relative to frame origin to point in figure space **)
-	PROCEDURE FrameToPoint* (frame: LeoFrames.Frame; fx, fy: SIGNED16; VAR px, py: REAL);
+	PROCEDURE FrameToPoint* (frame: LeoFrames.Frame; fx, fy: SIGNED16; VAR px, py: FLOAT32);
 	BEGIN
 		px := (fx - RulerW - frame.ox)/frame.scale;
 		py := (fy - (frame.H - RulerH) - frame.oy)/frame.scale
 	END FrameToPoint;
 
 	(** map point in figure space to pixel relative to frame origin **)
-	PROCEDURE PointToFrame* (frame: LeoFrames.Frame; px, py: REAL; VAR fx, fy: SIGNED16);
+	PROCEDURE PointToFrame* (frame: LeoFrames.Frame; px, py: FLOAT32; VAR fx, fy: SIGNED16);
 	BEGIN
 		fx := SHORT(ENTIER(frame.ox + px * frame.scale)) + RulerW;
 		fy := SHORT(ENTIER(frame.oy + py * frame.scale)) + frame.H - RulerH
 	END PointToFrame;
 
 	(** map point in figure space to ruler coordinates **)
-	PROCEDURE PointToRuler* (tool: Tool; px, py: REAL; VAR rx, ry: REAL);
+	PROCEDURE PointToRuler* (tool: Tool; px, py: FLOAT32; VAR rx, ry: FLOAT32);
 	BEGIN
 		rx := (px - tool.zx)/tool.unit;
 		ry := -(py - tool.zy)/tool.unit
 	END PointToRuler;
 
 	(** map point in ruler space to point in figure space **)
-	PROCEDURE RulerToPoint* (tool: Tool; rx, ry: REAL; VAR px, py: REAL);
+	PROCEDURE RulerToPoint* (tool: Tool; rx, ry: FLOAT32; VAR px, py: FLOAT32);
 	BEGIN
 		px := tool.zx + rx * tool.unit;
 		py := tool.zy - ry * tool.unit
@@ -568,10 +568,10 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	(**--- Auto-Alignment ---**)
 
 	(** return angle of normalized direction vector **)
-	PROCEDURE Angle* (dx, dy: REAL): REAL;
-		VAR phi: REAL;
+	PROCEDURE Angle* (dx, dy: FLOAT32): FLOAT32;
+		VAR phi: FLOAT32;
 	BEGIN
-		IF (ABS(dx) < 1.0) & (ABS(dy) >= ABS(dx * MAX(REAL))) THEN	(* dy/dx would result in overflow/divide by zero trap *)
+		IF (ABS(dx) < 1.0) & (ABS(dy) >= ABS(dx * MAX(FLOAT32))) THEN	(* dy/dx would result in overflow/divide by zero trap *)
 			IF dy >= 0 THEN phi := Math.pi/2
 			ELSE phi := -Math.pi/2
 			END
@@ -587,8 +587,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END Angle;
 
 	(** align point to grid **)
-	PROCEDURE AlignToGrid* (tool: Tool; VAR px, py: REAL);
-		VAR dist: REAL;
+	PROCEDURE AlignToGrid* (tool: Tool; VAR px, py: FLOAT32);
+		VAR dist: FLOAT32;
 	BEGIN
 		IF tool.grid.active THEN
 			dist := tool.unit/tool.grid.ticks;
@@ -598,8 +598,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END AlignToGrid;
 
 	(** align point to axis through (sx, sy) **)
-	PROCEDURE AlignToAxis* (tool: Tool; sx, sy: REAL; VAR x, y: REAL);
-		VAR axes: SIGNED32; phi, dx, dy, len, tol, atan: REAL;
+	PROCEDURE AlignToAxis* (tool: Tool; sx, sy: FLOAT32; VAR x, y: FLOAT32);
+		VAR axes: SIGNED32; phi, dx, dy, len, tol, atan: FLOAT32;
 	BEGIN
 		Attributes.GetInt(AlignAxes, "Value", axes);
 		IF axes > 0 THEN
@@ -617,8 +617,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END AlignToAxis;
 
 	(** align point to shape (by projection) **)
-	PROCEDURE AlignToShape* (tool: Tool; x, y: REAL; VAR px, py: REAL);
-		VAR frame: LeoFrames.Frame; fig: Leonardo.Figure; tol, s, d, tx, ty: REAL; res: Leonardo.Shape;
+	PROCEDURE AlignToShape* (tool: Tool; x, y: FLOAT32; VAR px, py: FLOAT32);
+		VAR frame: LeoFrames.Frame; fig: Leonardo.Figure; tol, s, d, tx, ty: FLOAT32; res: Leonardo.Shape;
 	BEGIN
 		frame := tool.frame; fig := frame.obj(Leonardo.Figure);
 		Attributes.GetReal(Tolerance, "Value", tol); s := 1/frame.scale; d := tol * s;
@@ -630,7 +630,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END AlignToShape;
 
 	(** align point with respect to currently pressed modifier keys **)
-	PROCEDURE Align* (tool: Tool; ox, oy: REAL; VAR px, py: REAL);
+	PROCEDURE Align* (tool: Tool; ox, oy: FLOAT32; VAR px, py: FLOAT32);
 		VAR state: SET;
 	BEGIN
 		Input.KeyState(state);
@@ -763,7 +763,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END Append;
 
 	(** append number to string and update len **)
-	PROCEDURE AppendReal* (x: REAL; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
+	PROCEDURE AppendReal* (x: FLOAT32; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
 		VAR t: ARRAY 12 OF CHAR; i, j: SIGNED32; ch: CHAR;
 	BEGIN
 		Strings.RealToFixStr(x, t, 0, 2, 0);
@@ -775,8 +775,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END AppendReal;
 
 	(** convert pair of coordinates to ruler, append to string, and update len **)
-	PROCEDURE AppendPoint* (tool: Tool; px, py: REAL; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
-		VAR rx, ry: REAL;
+	PROCEDURE AppendPoint* (tool: Tool; px, py: FLOAT32; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
+		VAR rx, ry: FLOAT32;
 	BEGIN
 		Append("(", s, len);
 		PointToRuler(tool, px, py, rx, ry);
@@ -785,8 +785,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END AppendPoint;
 
 	(** append direction vector and angle **)
-	PROCEDURE AppendDir* (tool: Tool; dx, dy: REAL; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
-		VAR d: REAL;
+	PROCEDURE AppendDir* (tool: Tool; dx, dy: FLOAT32; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
+		VAR d: FLOAT32;
 	BEGIN
 		d := Math.sqrt(dx * dx + dy * dy);
 		IF d = 0 THEN
@@ -824,7 +824,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END AppendFocus;
 
 	(** build status line for tool overriding ML only **)
-	PROCEDURE AppendTool* (tool: Tool; x, y: REAL; str: ARRAY OF CHAR; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
+	PROCEDURE AppendTool* (tool: Tool; x, y: FLOAT32; str: ARRAY OF CHAR; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
 	BEGIN
 		AppendPoint(tool, x, y, s, len);
 		Append("  ML: ", s, len);
@@ -856,7 +856,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		Display3.CopyPattern(mask, Display3.black, pat, x + cx, y + cy, Display.paint)
 	END Number;
 
-	PROCEDURE CalcTicks (unit: REAL; ticks: SIGNED16; VAR ticks0, ticks1: SIGNED32);
+	PROCEDURE CalcTicks (unit: FLOAT32; ticks: SIGNED16; VAR ticks0, ticks1: SIGNED32);
 	BEGIN
 		ticks0 := ticks;
 		WHILE (ticks0 > 1) & ((ticks MOD ticks0 # 0) OR (unit/ticks0 < 10)) DO
@@ -874,7 +874,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END CalcTicks;
 
 	PROCEDURE RestoreVRuler (tool: Tool; fx, fy: SIGNED16; mask: Display3.Mask);
-		VAR frame: LeoFrames.Frame; unit, th, zy, ty: REAL; ticks0, ticks1, t: SIGNED32; x, y: SIGNED16;
+		VAR frame: LeoFrames.Frame; unit, th, zy, ty: FLOAT32; ticks0, ticks1, t: SIGNED32; x, y: SIGNED16;
 	BEGIN
 		frame := tool.frame;
 		Display3.FilledRect3D(mask, Display3.topC, Display3.bottomC, LeoFrames.Color(frame),
@@ -901,7 +901,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END RestoreVRuler;
 
 	PROCEDURE RestoreHRuler (tool: Tool; fx, fy: SIGNED16; mask: Display3.Mask);
-		VAR frame: LeoFrames.Frame; unit, tw, zx, tx: REAL; ticks0, ticks1, t: SIGNED32; y, x: SIGNED16;
+		VAR frame: LeoFrames.Frame; unit, tw, zx, tx: FLOAT32; ticks0, ticks1, t: SIGNED32; y, x: SIGNED16;
 	BEGIN
 		frame := tool.frame;
 		Display3.FilledRect3D(mask, Display3.topC, Display3.bottomC, LeoFrames.Color(frame),
@@ -988,7 +988,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END RestorePage;
 
 	PROCEDURE RestoreGrid (tool: Tool; llx, lly, urx, ury: SIGNED16; mask: Display3.Mask);
-		VAR frame: LeoFrames.Frame; unit, td, zx, zy, tx, ty, y: REAL; ticks0, ticks1: SIGNED32; x: SIGNED16;
+		VAR frame: LeoFrames.Frame; unit, td, zx, zy, tx, ty, y: FLOAT32; ticks0, ticks1: SIGNED32; x: SIGNED16;
 	BEGIN
 		frame := tool.frame;
 		unit := tool.unit * frame.scale;	(* unit in frame space *)
@@ -1007,7 +1007,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END RestoreGrid;
 
 	PROCEDURE RestoreFigure (tool: Tool; llx, lly, urx, ury: SIGNED16; clip: GfxRegions.Region);
-		VAR frame: LeoFrames.Frame; ctxt: Gfx.Context; col: Gfx.Color; pix: Images.Pixel; x0, y0, x1, y1: REAL;
+		VAR frame: LeoFrames.Frame; ctxt: Gfx.Context; col: Gfx.Color; pix: Images.Pixel; x0, y0, x1, y1: FLOAT32;
 	BEGIN
 		frame := tool.frame;
 		ctxt := LeoFrames.DisplayContext(frame, llx, lly, urx, ury, clip);
@@ -1099,7 +1099,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END PNumber;
 
 	PROCEDURE PrintVRuler (tool: Tool; x, y, w, h, p: SIGNED16; mask: Display3.Mask);
-		VAR frame: LeoFrames.Frame; unit, th, zy, ty, s: REAL; ticks0, ticks1, t: SIGNED32; y0: SIGNED16;
+		VAR frame: LeoFrames.Frame; unit, th, zy, ty, s: FLOAT32; ticks0, ticks1, t: SIGNED32; y0: SIGNED16;
 	BEGIN
 		frame := tool.frame;
 		Printer3.FilledRect3D(mask, Display3.topC, Display3.bottomC, frame.col, x, y, w, h, p, Display.replace);
@@ -1127,7 +1127,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END PrintVRuler;
 
 	PROCEDURE PrintHRuler (tool: Tool; x, y, w, h, p: SIGNED16; mask: Display3.Mask);
-		VAR frame: LeoFrames.Frame; unit, tw, zx, tx, s: REAL; ticks0, ticks1, t: SIGNED32; x0: SIGNED16;
+		VAR frame: LeoFrames.Frame; unit, tw, zx, tx, s: FLOAT32; ticks0, ticks1, t: SIGNED32; x0: SIGNED16;
 	BEGIN
 		frame := tool.frame;
 		Printer3.FilledRect3D(mask, Display3.topC, Display3.bottomC, frame.col, x, y, w, h, p, Display.replace);
@@ -1203,7 +1203,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END PrintPage;
 
 	PROCEDURE PrintGrid (tool: Tool; llx, lly, urx, ury, p: SIGNED16; mask: Display3.Mask);
-		VAR frame: LeoFrames.Frame; unit, td, zx, zy, tx, ty, s, y: REAL; ticks0, ticks1: SIGNED32; x: SIGNED16;
+		VAR frame: LeoFrames.Frame; unit, td, zx, zy, tx, ty, s, y: FLOAT32; ticks0, ticks1: SIGNED32; x: SIGNED16;
 	BEGIN
 		frame := tool.frame;
 		unit := tool.unit * frame.scale;	(* unit in frame space *)
@@ -1375,7 +1375,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		END
 	END CycleFocus;
 
-	PROCEDURE GetDragStyle (frame: LeoFrames.Frame; VAR style, points: SIGNED16; VAR fx0, fy0, fx1, fy1: REAL);
+	PROCEDURE GetDragStyle (frame: LeoFrames.Frame; VAR style, points: SIGNED16; VAR fx0, fy0, fx1, fy1: FLOAT32);
 	BEGIN
 		IF (Focus.frame # frame) OR ~Focus.visible THEN
 			style := translate; points := 0
@@ -1391,13 +1391,13 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	END GetDragStyle;
 
 	PROCEDURE CalcMatrix (
-		tool: Tool; style, points: SIGNED16; fx0, fy0, fx1, fy1, x0, y0, x1, y1: REAL; VAR mat: GfxMatrix.Matrix;
+		tool: Tool; style, points: SIGNED16; fx0, fy0, fx1, fy1, x0, y0, x1, y1: FLOAT32; VAR mat: GfxMatrix.Matrix;
 		VAR s: ARRAY OF CHAR; VAR len: SIGNED16
 	);
 		CONST
 			eps = 1.0E-4;
 		VAR
-			dx, dy, dx0, dy0, d0, dx1, dy1, d1, t, d, cos, sin, u, v, cp: REAL;
+			dx, dy, dx0, dy0, d0, dx1, dy1, d1, t, d, cos, sin, u, v, cp: FLOAT32;
 	BEGIN
 		CASE style OF
 		| translate:
@@ -1462,8 +1462,8 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 		END
 	END CalcMatrix;
 
-	PROCEDURE CalcDrag (tool: Tool; x0, y0, x1, y1: REAL; VAR mat: GfxMatrix.Matrix; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
-		VAR points, style: SIGNED16; fx0, fy0, fx1, fy1: REAL;
+	PROCEDURE CalcDrag (tool: Tool; x0, y0, x1, y1: FLOAT32; VAR mat: GfxMatrix.Matrix; VAR s: ARRAY OF CHAR; VAR len: SIGNED16);
+		VAR points, style: SIGNED16; fx0, fy0, fx1, fy1: FLOAT32;
 	BEGIN
 		GetDragStyle(tool.frame, points, style, fx0, fy0, fx1, fy1);
 		CalcMatrix(tool, points, style, fx0, fy0, fx1, fy1, x0, y0, x1, y1, mat, s, len)
@@ -1540,7 +1540,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE TrackOrigin (tool: Tool; fx, fy: SIGNED16; VAR msg: Oberon.InputMsg);
 		VAR
-			frame: LeoFrames.Frame; mask: Display3.Mask; zx, zy, px, py: REAL; ox, oy, hx, hy, len, mx, my, l, x, y: SIGNED16;
+			frame: LeoFrames.Frame; mask: Display3.Mask; zx, zy, px, py: FLOAT32; ox, oy, hx, hy, len, mx, my, l, x, y: SIGNED16;
 			keysum, keystate, keys, kstate: SET; s: ARRAY 64 OF CHAR; dm: Display.DisplayMsg;
 	BEGIN
 		frame := tool.frame;
@@ -1608,7 +1608,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE TrackZoom (frame: LeoFrames.Frame; fx, fy: SIGNED16; VAR msg: Oberon.InputMsg);
 		VAR
-			mask: Display3.Mask; scale: REAL; len, x, y: SIGNED16; s: ARRAY 64 OF CHAR; keysum, keys: SET;
+			mask: Display3.Mask; scale: FLOAT32; len, x, y: SIGNED16; s: ARRAY 64 OF CHAR; keysum, keys: SET;
 			dm: Display.DisplayMsg;
 	BEGIN
 		Gadgets.MakeMask(frame, fx, fy, msg.dlink, mask);
@@ -1667,7 +1667,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE TrackFocus (tool: Tool; VAR msg: Oberon.InputMsg);
 		VAR
-			frame: LeoFrames.Frame; fx, fy, len, mx, my, x, y, hx, hy: SIGNED16; mask: Display3.Mask; x0, y0, tol, x1, y1: REAL;
+			frame: LeoFrames.Frame; fx, fy, len, mx, my, x, y, hx, hy: SIGNED16; mask: Display3.Mask; x0, y0, tol, x1, y1: FLOAT32;
 			s: ARRAY 128 OF CHAR; keys, keystate, kstate: SET;
 	BEGIN
 		frame := tool.frame;
@@ -1741,7 +1741,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE TrackMove (tool: Tool; VAR msg: Oberon.InputMsg);
 		VAR
-			frame: LeoFrames.Frame; fx, fy, len, mx, my, l, x, y, hx, hy: SIGNED16; x0, y0, tol, x1, y1, px, py: REAL;
+			frame: LeoFrames.Frame; fx, fy, len, mx, my, l, x, y, hx, hy: SIGNED16; x0, y0, tol, x1, y1, px, py: FLOAT32;
 			fig: Leonardo.Figure; loc, shapes, recv: Leonardo.Shape; mask: Display3.Mask; s: ARRAY 128 OF CHAR;
 			keysum, keystate, keys, kstate: SET; mat: GfxMatrix.Matrix; mm: Leonardo.MatrixMsg;
 			cm: Display.ConsumeMsg;
@@ -1834,7 +1834,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	PROCEDURE TrackSelection (tool: Tool; VAR msg: Oberon.InputMsg);
 		VAR
 			frame: LeoFrames.Frame; fx, fy, mx, my, rx, ry, rw, rh, x, y: SIGNED16; mask: Display3.Mask;
-			px, py, d, llx, lly, urx, ury: REAL; fig: Leonardo.Figure; shape, sh: Leonardo.Shape; keys, keysum: SET;
+			px, py, d, llx, lly, urx, ury: FLOAT32; fig: Leonardo.Figure; shape, sh: Leonardo.Shape; keys, keysum: SET;
 			obj: Objects.Object;
 	BEGIN
 		frame := tool.frame;
@@ -1918,7 +1918,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	(** default mouse handling if no button is pressed **)
 	PROCEDURE TrackTool* (tool: Tool; str: ARRAY OF CHAR; marker: Oberon.Marker; VAR msg: Oberon.InputMsg);
 		VAR
-			frame: LeoFrames.Frame; fx, fy, len, hx, hy: SIGNED16; x, y: REAL; state: SET; mask: Display3.Mask;
+			frame: LeoFrames.Frame; fx, fy, len, hx, hy: SIGNED16; x, y: FLOAT32; state: SET; mask: Display3.Mask;
 			s: ARRAY 128 OF CHAR;
 	BEGIN
 		frame := tool.frame;
@@ -1938,7 +1938,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	(** default mouse tracker **)
 	PROCEDURE Track* (tool: Tool; VAR msg: Oberon.InputMsg);
 		VAR
-			frame: LeoFrames.Frame; fx, fy, mx, my, len, hx, hy: SIGNED16; mask: Display3.Mask; keys: SET; px, py: REAL;
+			frame: LeoFrames.Frame; fx, fy, mx, my, len, hx, hy: SIGNED16; mask: Display3.Mask; keys: SET; px, py: FLOAT32;
 			s: ARRAY 128 OF CHAR;
 	BEGIN
 		ASSERT(~(Gadgets.selected IN tool.frame.state), 100);
@@ -1987,7 +1987,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 	(**--- Default Tool ---**)
 
 	PROCEDURE Consume (frame: LeoFrames.Frame; VAR msg: Display.ConsumeMsg);
-		VAR fig: Leonardo.Figure; shapes: Leonardo.Shape; x, y: REAL; mat: GfxMatrix.Matrix;
+		VAR fig: Leonardo.Figure; shapes: Leonardo.Shape; x, y: FLOAT32; mat: GfxMatrix.Matrix;
 	BEGIN
 		IF (msg.id = Display.drop) & (msg.F = frame) & (msg.obj IS Leonardo.Shape) THEN
 			fig := frame.obj(Leonardo.Figure); shapes := msg.obj(Leonardo.Shape);
@@ -2129,7 +2129,7 @@ MODULE LeoTools IN Oberon; (** portable **)	(* eos  *)
 
 	PROCEDURE HandleLegacyFrame (obj: Objects.Object; VAR msg: Objects.ObjMsg);
 		VAR
-			frame: LeoFrames.Frame; ver, l: SIGNED32; set: SET; real: REAL; int, red, green, blue, dr, dg, db: SIGNED16;
+			frame: LeoFrames.Frame; ver, l: SIGNED32; set: SET; real: FLOAT32; int, red, green, blue, dr, dg, db: SIGNED16;
 			bool: BOOLEAN; tool: Tool;
 	BEGIN
 		IF msg IS Objects.FileMsg THEN

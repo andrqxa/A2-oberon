@@ -26,7 +26,7 @@ TYPE
 	setP* = PROCEDURE ( s: SET );  
 	intP* = PROCEDURE ( i: SIGNED32 );  
 	hexP* = PROCEDURE ( i: SIGNED32 );  
-	realP* = PROCEDURE ( real: REAL );  
+	realP* = PROCEDURE ( real: FLOAT32 );  
 	boolP* = PROCEDURE ( b: BOOLEAN );  
 	trapModeP* = PROCEDURE ( b: BOOLEAN );  
 	chP* = PROCEDURE ( c: CHAR );  
@@ -76,7 +76,7 @@ VAR
 		IF gMode >= mode THEN hex( i ) END;  
 	END Hex;  
 
-	PROCEDURE Real*( mode: SIGNED32;  r: REAL );  
+	PROCEDURE Real*( mode: SIGNED32;  r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= mode THEN real( r ) END;  
 	END Real;  
@@ -167,7 +167,7 @@ VAR
 		IF gMode >= normal THEN int( i );  ln();  END;  
 	END IL;  
 
-	PROCEDURE RL*( r: REAL );  
+	PROCEDURE RL*( r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= normal THEN real( r );  ln();  END;  
 	END RL;  
@@ -182,7 +182,7 @@ VAR
 		IF gMode >= normal THEN hex( i );  END;  
 	END H;  
 
-	PROCEDURE R*( r: REAL );  
+	PROCEDURE R*( r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= normal THEN real( r ) END;  
 	END R;  
@@ -221,11 +221,11 @@ VAR
 		END;  
 	END SI;  
 
-	PROCEDURE SR*( CONST s: ARRAY OF CHAR;  r: REAL );  
+	PROCEDURE SR*( CONST s: ARRAY OF CHAR;  r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= normal THEN 
 			str( s );  ch( ':' );  
-			IF r = MAX(REAL) THEN str( "--" ) ELSE real( r );  END;  
+			IF r = MAX(FLOAT32) THEN str( "--" ) ELSE real( r );  END;  
 			ln;  
 		END;  
 	END SR;  
@@ -256,7 +256,7 @@ VAR
 		IF gMode >= error THEN int( i );  ln();  END;  
 	END eIL;  
 
-	PROCEDURE eRL*( r: REAL );  
+	PROCEDURE eRL*( r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= error THEN real( r );  ln();  END;  
 	END eRL;  
@@ -271,7 +271,7 @@ VAR
 		IF gMode >= error THEN hex( i );  END;  
 	END eH;  
 
-	PROCEDURE eR*( r: REAL );  
+	PROCEDURE eR*( r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= error THEN real( r ) END;  
 	END eR;  
@@ -310,11 +310,11 @@ VAR
 		END;  
 	END eSI;  
 
-	PROCEDURE eSR*( CONST s: ARRAY OF CHAR;  r: REAL );  
+	PROCEDURE eSR*( CONST s: ARRAY OF CHAR;  r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= error THEN 
 			str( s );  ch( '=' );  
-			IF r = MAX(REAL) THEN str( "--" ) ELSE real( r );  END;  
+			IF r = MAX(FLOAT32) THEN str( "--" ) ELSE real( r );  END;  
 			ln;  
 		END;  
 	END eSR;  
@@ -351,7 +351,7 @@ VAR
 		IF gMode >= verbose THEN int( i );  ln();  END;  
 	END vIL;  
 
-	PROCEDURE vRL*( r: REAL );  
+	PROCEDURE vRL*( r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= verbose THEN real( r );  ln();  END;  
 	END vRL;  
@@ -361,7 +361,7 @@ VAR
 		IF gMode >= verbose THEN hex( i );  END;  
 	END vH;  
 
-	PROCEDURE vR*( r: REAL );  
+	PROCEDURE vR*( r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= verbose THEN real( r ) END;  
 	END vR;  
@@ -400,11 +400,11 @@ VAR
 		END;  
 	END vSI;  
 
-	PROCEDURE vSR*( CONST s: ARRAY OF CHAR;  r: REAL );  
+	PROCEDURE vSR*( CONST s: ARRAY OF CHAR;  r: FLOAT32 );  
 	BEGIN 
 		IF gMode >= verbose THEN 
 			str( s );  ch( '=' );  
-			IF r = MAX(REAL) THEN str( "--" ) ELSE real( r );  END;  
+			IF r = MAX(FLOAT32) THEN str( "--" ) ELSE real( r );  END;  
 			ln;  
 		END;  
 	END vSR;  
@@ -485,7 +485,7 @@ VAR
 	BEGIN 
 	END NullHex;  
 
-	PROCEDURE NullReal*( real: REAL );  
+	PROCEDURE NullReal*( real: FLOAT32 );  
 	BEGIN 
 	END NullReal;  
 

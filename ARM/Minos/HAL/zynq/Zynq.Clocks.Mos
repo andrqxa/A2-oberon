@@ -13,10 +13,10 @@ TYPE
 		fdiv : SIGNED32;
 		divisor : SIGNED32;
 		pllclk : SIGNED32;
-		cpu6x4x : REAL;
-		cpu3x2x : REAL;
-		cpu2x : REAL;
-		cpu1x : REAL;
+		cpu6x4x : FLOAT32;
+		cpu3x2x : FLOAT32;
+		cpu2x : FLOAT32;
+		cpu1x : FLOAT32;
 	END;
 
 VAR

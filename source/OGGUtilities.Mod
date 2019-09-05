@@ -464,7 +464,7 @@ TYPE
 	PROCEDURE Float32Unpack*(val: SIGNED32): SIGNED64;
 	VAR
 		mantissa, sign, exponent, one: SIGNED32;
-		res: REAL;
+		res: FLOAT32;
 	BEGIN
 		mantissa := BIT.LAND(val, 1FFFFFH);
 		sign := BIT.LAND(val, SIGNED32(80000000H));
@@ -635,8 +635,8 @@ TYPE
 	END PowerH;
 
 	(** return x to the power of n (ASSERT(n>=0)) *)
-	PROCEDURE PowerR*(x: REAL; n: SIGNED32): REAL;
-	VAR res: REAL;
+	PROCEDURE PowerR*(x: FLOAT32; n: SIGNED32): FLOAT32;
+	VAR res: FLOAT32;
 	BEGIN
 		IF (n < 0) THEN
 			KernelLog.String("ASSERTION failed - power of negative numbers are not allowed"); KernelLog.Ln
@@ -750,7 +750,7 @@ TYPE
 	END DivFP;
 
 	(** scales a float up for fix-point representation with fraction Ny *)
-	PROCEDURE ScaleUpHuge*(r: REAL): SIGNED64;
+	PROCEDURE ScaleUpHuge*(r: FLOAT32): SIGNED64;
 	VAR tmp: SIGNED64;
 	BEGIN
 		tmp := ENTIERH(0.5 + r * ScaleFactor);
@@ -966,7 +966,7 @@ TYPE
 		w.String(buf)
 	END PrintHex;
 
-	(** print a varname with its value, type must be a REAL *)
+	(** print a varname with its value, type must be a FLOAT32 *)
 	PROCEDURE VarReal*(name: ARRAY OF CHAR; value: LONGREAL);
 	VAR tmpStr: ARRAY 32 OF CHAR;
 	BEGIN

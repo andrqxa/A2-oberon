@@ -48,7 +48,7 @@ B BOOLEAN
 S SIGNED8
 I SIGNED16
 L SIGNED32
-R REAL
+R FLOAT32
 X LONGREAL
 *)
 (*! move merge routines to type specific bases *)
@@ -211,7 +211,7 @@ END CollectReal;
 	(** Read/set from/to vector *)
 (*= Use cenversion if a save and reliable implementation is possible *)
 
-	PROCEDURE VGetR*( v: vyBase.tVector;  pos: SIGNED32 ): REAL;
+	PROCEDURE VGetR*( v: vyBase.tVector;  pos: SIGNED32 ): FLOAT32;
 	BEGIN
 		ASSERT ( v # NIL , 100 );
 		IF v IS vyIntVec.tVector THEN
@@ -230,7 +230,7 @@ END CollectReal;
 		END  (* WITH *)
 	END VGetR;
 
-	PROCEDURE GetValueR*( v: vyBase.tData ): REAL;   (* fof 0202 *)
+	PROCEDURE GetValueR*( v: vyBase.tData ): FLOAT32;   (* fof 0202 *)
 	BEGIN
 		IF v IS vyIntVec.tINTEGER THEN
 			WITH v: vyIntVec.tINTEGER DO RETURN v.i
@@ -428,7 +428,7 @@ END GetIndex;
 		END
 	END VGetMinMax;
 
-	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: REAL;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: FLOAT32;  VAR nrNaNs: SIGNED32 );
 	(*! check. if ok: move this model to other variants *)
 	VAR xmin, xmax: LONGREAL;  imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
 	BEGIN
@@ -447,7 +447,7 @@ END GetIndex;
 			WITH v: vyRealVec.tVector DO vyRealVec.GetMinMax( v, xmin, xmax, nrNaNs )
 			END;
 		END;
-		ASSERT ( (xmin >= MIN( REAL )) & (xmax <= MAX( REAL )), 101 );
+		ASSERT ( (xmin >= MIN( FLOAT32 )) & (xmax <= MAX( FLOAT32 )), 101 );
 		rmin := SHORT( xmin );  rmax := SHORT( xmax )
 	END VGetMinMaxR;
 
@@ -501,7 +501,7 @@ END GetIndex;
 	(*! interfaces may change to allow for sub matrices/vector parts *)
 	(*! vectors may grow on the fly *)
 	(*! additional vector information needs update *)
-	(*PROCEDURE MCopyR* (v:tMatrix; VAR A:ARRAY OF ARRAY OF REAL);
+	(*PROCEDURE MCopyR* (v:tMatrix; VAR A:ARRAY OF ARRAY OF FLOAT32);
 VAR i,j:SIGNED32;
 BEGIN 	FOR i:=0 TO LEN(A,0) DO
 FOR j:=0 TO LEN(A,1) DO
@@ -510,7 +510,7 @@ END;
 END;
 END MCopyR;
 
-PROCEDURE RCopyM* (VAR A:ARRAY OF ARRAY OF REAL;v:tMatrix);
+PROCEDURE RCopyM* (VAR A:ARRAY OF ARRAY OF FLOAT32;v:tMatrix);
 VAR i,j:SIGNED32;
 BEGIN
 FOR i:=0 TO LEN(A,0) DO
@@ -523,7 +523,7 @@ END RCopyM;
 (** Monadic operators and assignment *)
 
 	PROCEDURE Copy*( src: vyBase.tData;  VAR dest: vyBase.tData );
-	(*! only REAL vector so far -make full copy for any data type *)
+	(*! only FLOAT32 vector so far -make full copy for any data type *)
 	(*! dest must exist so far *)
 	(*! speed up *)
 	BEGIN
@@ -729,7 +729,7 @@ END VectorType;
 	END Entier;
 
 	PROCEDURE CvtReal*( src: vyBase.tData ): vyBase.tData;
-	(*= Convert any src to REAL, if safe and reliable *)
+	(*= Convert any src to FLOAT32, if safe and reliable *)
 	VAR temp: vyBase.tData;  i: SIGNED32;  len: SIGNED32;  from, v: vyBase.tVector;
 	BEGIN
 		ASSERT ( (src # NIL ), 100 );

@@ -118,7 +118,7 @@ CONST
 				SYSTEM.GET( adr, lval );
 				W.Int( lval, 1 );  INC( col, 5 );
 				IF ABS( lval ) >= 10000H THEN W.String( " (" );  W.Hex( lval, 8 );  W.String( "H)" );  INC( col, 12 ) END
-		| 7, 8, 13, 16, 29:  (* REAL, LONGREAL, POINTER *)
+		| 7, 8, 13, 16, 29:  (* FLOAT32, LONGREAL, POINTER *)
 				INC( col, 9 );
 				IF (type = 8) OR (type = 16) THEN SYSTEM.GET( adr + 4, lval );  W.Hex( lval, 8 );  INC( col, 8 ) END;
 				SYSTEM.GET( adr, lval );  W.Hex( lval, 8 );  W.Char( "H" )

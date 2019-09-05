@@ -1763,7 +1763,7 @@ TYPE
 
 		(* Timing info *)
 		r2w -: SIGNED32; (** Read to write time factor = read time / write time *)
-		taac -: REAL; (** Asynchronous access time, in s *)
+		taac -: FLOAT32; (** Asynchronous access time, in s *)
 		nsac -: SIGNED32; (** Worst-case clock dependent access time, in clock cycles *)
 		txSpeed -: SIGNED32; (** Max transfer speed in bit/s *)
 
@@ -2251,7 +2251,7 @@ TYPE
 			card.readTimeout := TimeoutReadFix;
 			card.writeTimeout := TimeoutWriteFix
 		ELSE
-			readTime := 100 * SIGNED32((card.csd.taac + REAL(card.csd.nsac * 100) / REAL(card.hc.frequency)) * 1000.0);
+			readTime := 100 * SIGNED32((card.csd.taac + FLOAT32(card.csd.nsac * 100) / FLOAT32(card.hc.frequency)) * 1000.0);
 			card.readTimeout := MIN(readTime, TimeoutReadFix);
 			card.writeTimeout := MIN(readTime * card.csd.r2w, TimeoutWriteFix);
 		END;
@@ -2368,7 +2368,7 @@ TYPE
 	PROCEDURE DecodeCsd (CONST raw: ARRAY OF SIGNED32; VAR csd: Csd);
 	VAR
 		sizeMult, val, version: SIGNED32;
-		real: REAL;
+		real: FLOAT32;
 	BEGIN
 		version := ReadBitfield(raw, CardCsd_CsdStructureOfs, CardCsd_CsdStructureWidth) + 1;
 

@@ -38,7 +38,7 @@ BEGIN Texts.WriteString(w, str);   vyHostTexts.InsertLog(w.buf) END String;
 PROCEDURE Int* (i, n: SIGNED32);
 BEGIN Texts.WriteInt(w, i, n);   vyHostTexts.InsertLog(w.buf) END Int;
 
-PROCEDURE Real* (x: REAL;   n: SIGNED16);
+PROCEDURE Real* (x: FLOAT32;   n: SIGNED16);
 BEGIN Texts.WriteReal(w, x, n);   vyHostTexts.InsertLog(w.buf) END Real;
 
 PROCEDURE LongReal* (x: LONGREAL;   n: SIGNED16);

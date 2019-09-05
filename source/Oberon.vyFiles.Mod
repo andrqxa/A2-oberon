@@ -57,7 +57,7 @@ PROCEDURE ReadBool* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF BOOLEAN;  start
 BEGIN	FOR i := start TO count DO Files.ReadBool(R, x[i]) END
 END ReadBool;
 
-PROCEDURE ReadReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF REAL;  start, count: SIGNED32);
+PROCEDURE ReadReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF FLOAT32;  start, count: SIGNED32);
 	VAR i: SIGNED32;
 BEGIN	FOR i := start TO count DO Files.ReadReal(R, x[i]) END
 END ReadReal;
@@ -108,7 +108,7 @@ PROCEDURE WriteBool* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF BOOLEAN;  star
 BEGIN	FOR i := start TO count DO Files.WriteBool(R, x[i]) END
 END WriteBool;
 
-PROCEDURE WriteReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF REAL;  start, count: SIGNED32);
+PROCEDURE WriteReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF FLOAT32;  start, count: SIGNED32);
 	VAR i: SIGNED32;
 BEGIN	FOR i := start TO count DO Files.WriteReal(R, x[i]) END
 END WriteReal;

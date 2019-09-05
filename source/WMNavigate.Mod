@@ -158,7 +158,7 @@ TYPE
 
 		(* width, height of remaining area, nofEntries that still need to be placed *)
 		PROCEDURE ComputeAspect;
-		VAR entryRatio, areaRatio : REAL; eWidth, eHeight : SIZE; doesFit : BOOLEAN;
+		VAR entryRatio, areaRatio : FLOAT32; eWidth, eHeight : SIZE; doesFit : BOOLEAN;
 		BEGIN
 			entryRatio := entryWidth / entryHeight;
 			areaRatio := width / height;
@@ -491,7 +491,7 @@ TYPE
 			sizeX, sizeY : SIZE;
 			imgX, imgY, imgWidth, imgHeight, winWidth, winHeight : SIZE;
 			t_width, t_height : SIZE;
-			scaleX, scaleY : REAL;
+			scaleX, scaleY : FLOAT32;
 			canvasState : WMGraphics.CanvasState;
 		BEGIN
 			DrawInternal^(canvas, x, y, width, height, window, hasFocus, mouseOver, extImage);
@@ -1378,7 +1378,7 @@ VAR
 	StrOverview: Strings.String;
 
 	width, height : SIGNED32;
-	windowShotScale*:REAL;
+	windowShotScale*:FLOAT32;
 
 	windowsAreHidden : BOOLEAN;
 	navigationIsHidden : BOOLEAN;
@@ -1425,7 +1425,7 @@ BEGIN
 	COPY(title, str);
 END GenerateName;
 
-PROCEDURE WindowShot(window: WMWindowManager.Window; scale:REAL);
+PROCEDURE WindowShot(window: WMWindowManager.Window; scale:FLOAT32);
 VAR str,fn: Files.FileName;  w,h: SIGNED32; res: WORD; startTime: Dates.DateTime;
 	img:WMGraphics.Image;
 BEGIN
@@ -1492,7 +1492,7 @@ BEGIN
 END StoreWindow;
 
 PROCEDURE DrawIntoCanvas(window : WMWindowManager.Window; canvas : WMGraphics.BufferCanvas; width, height : SIZE; VAR offsetX, offsetY : SIZE);
-VAR image : Raster.Image; winWidth, winHeight, imgWidth, imgHeight : SIZE; scaleX, scaleY : REAL;
+VAR image : Raster.Image; winWidth, winHeight, imgWidth, imgHeight : SIZE; scaleX, scaleY : FLOAT32;
 BEGIN (* must hold window manager lock *)
 	ASSERT((window # NIL) & (canvas # NIL));
 	image := canvas.GetImage();

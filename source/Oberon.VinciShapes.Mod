@@ -30,7 +30,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 			sym*: Scheme.Object;	(* parameter symbol *)
 			kind*: SIGNED16;	(* parameter kind *)
 			imin*, imax*: SIGNED32;	(* integer range *)
-			rmin*, rmax*: REAL;	(* real range *)
+			rmin*, rmax*: FLOAT32;	(* real range *)
 		END;
 
 		Shape* = POINTER TO ShapeDesc;
@@ -44,7 +44,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 		(** rectangular frame shapes for anchoring Vinci descriptions **)
 		Frame* = POINTER TO FrameDesc;
 		FrameDesc* = RECORD (Leonardo.ShapeDesc)
-			w*, h*: REAL;	(** frame dimensions **)
+			w*, h*: FLOAT32;	(** frame dimensions **)
 			mat*: GfxMatrix.Matrix;	(** accumulated transformations **)
 		END;
 
@@ -119,10 +119,10 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 		END
 	END GetMatrix;
 
-	PROCEDURE GetBox (s: Shape; VAR m: GfxMatrix.Matrix; VAR llx, lly, urx, ury, bw: REAL);
+	PROCEDURE GetBox (s: Shape; VAR m: GfxMatrix.Matrix; VAR llx, lly, urx, ury, bw: FLOAT32);
 		VAR
-			val, res, obj: Scheme.Object; ctxt: Vinci.Context; len, i: SIGNED32; x: LONGREAL; b: ARRAY 5 OF REAL;
-			x0, y0, x1, y1: REAL;
+			val, res, obj: Scheme.Object; ctxt: Vinci.Context; len, i: SIGNED32; x: LONGREAL; b: ARRAY 5 OF FLOAT32;
+			x0, y0, x1, y1: FLOAT32;
 	BEGIN
 		Leonardo.GetComponentsBox(s.bottom, llx, lly, urx, ury, bw);
 		IF Scheme.LookupVariable(bbox, s.env, val) THEN
@@ -196,8 +196,8 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Render (s: Shape; VAR msg: Leonardo.RenderMsg);
 		VAR
-			llx, lly, urx, ury, bw: REAL; marked: BOOLEAN; cur: Leonardo.Shape; ctm, mat, m: GfxMatrix.Matrix;
-			vc: Vinci.Context; val, res: Scheme.Object; state: Gfx.State; clip: Gfx.ClipArea; onoff: ARRAY 1 OF REAL;
+			llx, lly, urx, ury, bw: FLOAT32; marked: BOOLEAN; cur: Leonardo.Shape; ctm, mat, m: GfxMatrix.Matrix;
+			vc: Vinci.Context; val, res: Scheme.Object; state: Gfx.State; clip: Gfx.ClipArea; onoff: ARRAY 1 OF FLOAT32;
 	BEGIN
 		llx := s.llx - s.bw; lly := s.lly - s.bw; urx := s.urx + s.bw; ury := s.ury + s.bw;
 		IF (llx < msg.urx) & (msg.llx < urx) & (lly < msg.ury) & (msg.lly < ury) THEN
@@ -271,7 +271,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE Locate (s: Shape; VAR msg: Leonardo.LocateMsg);
 		VAR
-			mres: Leonardo.Shape; val, args: Scheme.Object; mat, inv: GfxMatrix.Matrix; llx, lly, urx, ury: REAL;
+			mres: Leonardo.Shape; val, args: Scheme.Object; mat, inv: GfxMatrix.Matrix; llx, lly, urx, ury: FLOAT32;
 			vc: Vinci.Context;
 	BEGIN
 		IF msg.id IN {Leonardo.inside, Leonardo.project} THEN
@@ -495,7 +495,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE ReadParams (s: Shape; VAR r: Files.Rider);
 		VAR
-			par: Parameter; b: BOOLEAN; val: Scheme.Object; l: SIGNED32; x: REAL; str: ARRAY 64 OF CHAR;
+			par: Parameter; b: BOOLEAN; val: Scheme.Object; l: SIGNED32; x: FLOAT32; str: ARRAY 64 OF CHAR;
 			obj: Objects.Object;
 	BEGIN
 		par := s.par;
@@ -640,7 +640,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END CopyFrame;
 
 	PROCEDURE HandleFrame* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR frame, copy: Frame; mat, lgm, inv: GfxMatrix.Matrix; llx, lly, urx, ury: REAL; ver: SIGNED32;
+		VAR frame, copy: Frame; mat, lgm, inv: GfxMatrix.Matrix; llx, lly, urx, ury: FLOAT32; ver: SIGNED32;
 	BEGIN
 		frame := obj(Frame);
 		IF msg IS Leonardo.ShapeMsg THEN
@@ -778,7 +778,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 		END
 	END HandleFrame;
 
-	PROCEDURE InitFrame* (frame: Frame; w, h: REAL);
+	PROCEDURE InitFrame* (frame: Frame; w, h: FLOAT32);
 	BEGIN
 		Leonardo.InitShape(frame, HandleFrame);
 		frame.w := w; frame.h := h; frame.mat := GfxMatrix.Identity;
@@ -805,7 +805,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 		END
 	END Append;
 
-	PROCEDURE NumVal (ctxt: Scheme.Context; VAR args: Scheme.Object): REAL;
+	PROCEDURE NumVal (ctxt: Scheme.Context; VAR args: Scheme.Object): FLOAT32;
 	BEGIN
 		RETURN SHORT(Ops.NumVal(ctxt, args))
 	END NumVal;
@@ -828,7 +828,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END ShapeArg;
 
 	PROCEDURE EvalFrame (ctxt: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
-		VAR c: Vinci.Context; w, h: REAL; frame: Frame;
+		VAR c: Vinci.Context; w, h: FLOAT32; frame: Frame;
 	BEGIN
 		c := ctxt(Vinci.Context); w := NumVal(c, args); h := NumVal(c, args); Ops.CheckNull(c, args);
 		NEW(frame); InitFrame(frame, w, h);
@@ -836,7 +836,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END EvalFrame;
 
 	PROCEDURE EvalPoint (ctxt: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
-		VAR c: Vinci.Context; x, y: REAL; p: LeoPaths.Point;
+		VAR c: Vinci.Context; x, y: FLOAT32; p: LeoPaths.Point;
 	BEGIN
 		c := ctxt(Vinci.Context); x := NumVal(c, args); y := NumVal(c, args); Ops.CheckNull(c, args);
 		NEW(p); LeoPaths.InitPoint(p, x, y);
@@ -897,7 +897,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	PROCEDURE EvalReal (ctxt: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
 		VAR par: Parameter; obj: Scheme.Object; vs: Shape;
 	BEGIN
-		NEW(par); par.kind := real; par.rmin := MIN(REAL); par.rmax := MAX(REAL);
+		NEW(par); par.kind := real; par.rmin := MIN(FLOAT32); par.rmax := MAX(FLOAT32);
 		par.sym := Scheme.StringToSymbol(Ops.StringArg(ctxt, args));
 		obj := Ops.StringArg(ctxt, args); Scheme.GetString(obj, 0, Scheme.StringLen(obj), par.name);
 		IF Scheme.IsPair(args) THEN par.rmin := NumVal(ctxt, args) END;
@@ -983,7 +983,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 		Ops.CheckNull(ctxt, args)
 	END EvalRectInit;
 
-	PROCEDURE GetRectArg (ctxt: Scheme.Context; VAR args: Scheme.Object; VAR llx, lly, urx, ury: REAL);
+	PROCEDURE GetRectArg (ctxt: Scheme.Context; VAR args: Scheme.Object; VAR llx, lly, urx, ury: FLOAT32);
 		VAR obj, elem: Scheme.Object; x: LONGREAL;
 	BEGIN
 		obj := Ops.Arg(ctxt, args);
@@ -1009,7 +1009,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END GetRectArg;
 
 	PROCEDURE EvalRectApply (ctxt: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
-		VAR llx, lly, urx, ury: REAL; m: GfxMatrix.Matrix;
+		VAR llx, lly, urx, ury: FLOAT32; m: GfxMatrix.Matrix;
 	BEGIN
 		GetRectArg(ctxt, args, llx, lly, urx, ury); Vinci.GetMatrixVal(ctxt, args, m); Ops.CheckNull(ctxt, args);
 		GfxMatrix.ApplyToRect(m, llx, lly, urx, ury, llx, lly, urx, ury);
@@ -1021,7 +1021,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END EvalRectApply;
 
 	PROCEDURE EvalRectOverlap (ctxt: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
-		VAR llx0, lly0, urx0, ury0, llx1, lly1, urx1, ury1: REAL;
+		VAR llx0, lly0, urx0, ury0, llx1, lly1, urx1, ury1: FLOAT32;
 	BEGIN
 		GetRectArg(ctxt, args, llx0, lly0, urx0, ury0); GetRectArg(ctxt, args, llx1, lly1, urx1, ury1);
 		Ops.CheckNull(ctxt, args);
@@ -1031,7 +1031,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END EvalRectOverlap;
 
 	PROCEDURE EvalRectInside (ctxt: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
-		VAR llx0, lly0, urx0, ury0, llx1, lly1, urx1, ury1: REAL;
+		VAR llx0, lly0, urx0, ury0, llx1, lly1, urx1, ury1: FLOAT32;
 	BEGIN
 		GetRectArg(ctxt, args, llx0, lly0, urx0, ury0); GetRectArg(ctxt, args, llx1, lly1, urx1, ury1);
 		Ops.CheckNull(ctxt, args);
@@ -1041,7 +1041,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END EvalRectInside;
 
 	PROCEDURE EvalRectContains (c: Scheme.Context; args: Scheme.Object; VAR res: Scheme.Object);
-		VAR llx, lly, urx, ury, x, y: REAL;
+		VAR llx, lly, urx, ury, x, y: FLOAT32;
 	BEGIN
 		GetRectArg(c, args, llx, lly, urx, ury); x := SHORT(Ops.NumVal(c, args)); y := SHORT(Ops.NumVal(c, args));
 		Ops.CheckNull(c, args);

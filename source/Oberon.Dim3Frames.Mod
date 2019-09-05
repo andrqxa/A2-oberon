@@ -25,7 +25,7 @@ TYPE
 
 
 VAR
-	frameRate: REAL;	(* current number of frames per second *)
+	frameRate: FLOAT32;	(* current number of frames per second *)
 	W: Texts.Writer;
 	drawF: Frame;	(* temporary globals when rendering picture to display *)
 	drawM: Display3.Mask;
@@ -68,14 +68,14 @@ END RestoreFrame;
 (**--- Flight Model Navigation ---**)
 
 (* run flight model on current camera view *)
-PROCEDURE RunFlightModel (F: Frame; X, Y: SIGNED16; speed: REAL);
+PROCEDURE RunFlightModel (F: Frame; X, Y: SIGNED16; speed: FLOAT32);
 CONST
 	minMove = 5; maxMove = 55; minAngle = 0.01;
 VAR
-	azi, pitch, roll, maxAngle, sinPitch, cosPitch, sinRoll, cosRoll, xAngle, yAngle: REAL;
+	azi, pitch, roll, maxAngle, sinPitch, cosPitch, sinRoll, cosRoll, xAngle, yAngle: FLOAT32;
 
-	PROCEDURE MapToAngle (x: SIGNED16): REAL;
-	VAR dx: REAL;
+	PROCEDURE MapToAngle (x: SIGNED16): FLOAT32;
+	VAR dx: FLOAT32;
 	BEGIN
 		IF ABS(x) < minMove THEN
 			RETURN 0.0
@@ -144,7 +144,7 @@ END RunFlightModel;
 PROCEDURE FlightNavigator* (F: Frame; R: Display3.Mask; VAR M: Oberon.InputMsg);
 CONST
 	minSpeed = 0.0; maxSpeed = 50.0;
-VAR keys: SET; X, Y: SIGNED16; ch: CHAR; speed: REAL;
+VAR keys: SET; X, Y: SIGNED16; ch: CHAR; speed: FLOAT32;
 BEGIN
 	speed := minSpeed;
 	Input.Mouse(keys, X, Y);
@@ -227,7 +227,7 @@ END SimpleNavigator;
 PROCEDURE TrackMouse (F: Frame; VAR M: Oberon.InputMsg);
 VAR
 	keys, keySum: SET; X, Y, oldX, oldY: SIGNED16; R: Display3.Mask; poly: Dim3Engine.Polygon;
-	shape, parent: Dim3Engine.Shape; x, y: REAL; w: Dim3Engine.World; sel: BOOLEAN; ch: CHAR;
+	shape, parent: Dim3Engine.Shape; x, y: FLOAT32; w: Dim3Engine.World; sel: BOOLEAN; ch: CHAR;
 BEGIN
 	Gadgets.MakeMask(F, F.absX, F.absY, M.dlink, R);
 
@@ -598,7 +598,7 @@ END SetViewAngle;
 
 PROCEDURE AlignSelection*;
 VAR
-	F: Frame; s: Dim3Engine.Shape; R: Display3.Mask; N, M: Dim3Engine.Matrix; angle: REAL;
+	F: Frame; s: Dim3Engine.Shape; R: Display3.Mask; N, M: Dim3Engine.Matrix; angle: FLOAT32;
 	axis, scale, trans: Dim3Engine.Vector; steps: SIGNED32;
 BEGIN
 	Texts.WriteString(W, "Dim3Frames.AlignSelection"); Texts.WriteLn(W); Texts.Append(Oberon.Log, W.buf);

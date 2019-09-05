@@ -548,7 +548,7 @@ END RestorePict;
 
 PROCEDURE Restore (F: Frame; Q: D3.Mask; x, y, w, h, picx, picy, picw, pich: SIGNED16);
 (* Zeichnet ein bestimmtes Gebiet neu inkl Background *)
-VAR sx, sy: SIGNED16; M: D3.Mask; pw, ph: REAL; L: Lockrec;
+VAR sx, sy: SIGNED16; M: D3.Mask; pw, ph: FLOAT32; L: Lockrec;
 BEGIN
 	NEW(M);
 	D3.Open(M);

@@ -47,7 +47,7 @@ VAR
 	standard1*, standard2*, current*: Palette;  index: Colors.Index;   (* current needed for Plot Routines to be called by Oberon.Call *)
 
 	PROCEDURE PHandleFileMsg( obj: Palette;  VAR msg: Objects.FileMsg );
-	VAR objsub: Objects.Object;  i: SIGNED16;  r, g, b: REAL;  version: SIGNED16;
+	VAR objsub: Objects.Object;  i: SIGNED16;  r, g, b: FLOAT32;  version: SIGNED16;
 	BEGIN
 		IF msg.id = Objects.store THEN
 			Files.WriteInt( msg.R, 0 );   (* version id *)
@@ -125,7 +125,7 @@ VAR
 	END PNew;
 
 	PROCEDURE SetCol*( p: Palette;  index: SIGNED16;  col: SIGNED32 );
-	VAR r, g, b: REAL;
+	VAR r, g, b: FLOAT32;
 	BEGIN
 		IF index < p.used THEN
 			p.dcol[index] := col;  Colors.SetDisplay( p.col[index], col );  Colors.GetRGB( p.col[index], r, g, b );
@@ -134,13 +134,13 @@ VAR
 	END SetCol;
 
 	PROCEDURE GetRGBI( c: Colors.Color;  VAR r, g, b: SIGNED16 );
-	VAR rr, gr, br: REAL;
+	VAR rr, gr, br: FLOAT32;
 	BEGIN
 		Colors.GetRGB( c, rr, gr, br );  r := SHORT( ENTIER( rr * 255 + 0.5 ) );  g := SHORT( ENTIER( gr * 255 + 0.5 ) );  b := SHORT( ENTIER( br * 255 + 0.5 ) );
 	END GetRGBI;
 
-	PROCEDURE RGBPath*( p: Palette;  first, last: SIGNED16;  r1, g1, b1, r2, g2, b2: REAL );
-	VAR r, g, b: REAL;  i: SIGNED16;
+	PROCEDURE RGBPath*( p: Palette;  first, last: SIGNED16;  r1, g1, b1, r2, g2, b2: FLOAT32 );
+	VAR r, g, b: FLOAT32;  i: SIGNED16;
 	BEGIN
 		FOR i := first TO last DO
 			r := r1 + (r2 - r1) * (i - first) / (last - first);  g := g1 + (g2 - g1) * (i - first) / (last - first);
@@ -152,7 +152,7 @@ VAR
 	END RGBPath;
 
 	PROCEDURE ShiftPath*( p: Palette;  tofirst, tolast: SIGNED16 );
-	VAR r, g, b: REAL;  i: SIGNED16;  r1, r2, g1, g2, b1, b2: REAL;
+	VAR r, g, b: FLOAT32;  i: SIGNED16;  r1, r2, g1, g2, b1, b2: FLOAT32;
 	BEGIN
 		Colors.GetRGB( p.col[p.first], r1, g1, b1 );  Colors.GetRGB( p.col[p.last], r2, g2, b2 );  p.first := tofirst;  p.last := tolast;
 		FOR i := p.first TO p.last DO
@@ -164,7 +164,7 @@ VAR
 	END ShiftPath;
 
 	PROCEDURE PathFromTo*( from, to: Palette );
-	VAR this, i: SIGNED16;  r, g, b: REAL;  dcol: SIGNED32;
+	VAR this, i: SIGNED16;  r, g, b: FLOAT32;  dcol: SIGNED32;
 	BEGIN
 		FOR i := to.first TO to.last DO
 			this := SHORT( ENTIER( from.first + (i - to.first) / (to.last - to.first) * (from.last - from.first) + 0.5 ) );
@@ -205,7 +205,7 @@ VAR
 	END Convert;
 
 	PROCEDURE InitPalette*( p: Palette );
-	VAR i: SIGNED16;  r, g, b: REAL;
+	VAR i: SIGNED16;  r, g, b: FLOAT32;
 	BEGIN
 		p.handle := PHandler;
 		FOR i := 0 TO 255 DO

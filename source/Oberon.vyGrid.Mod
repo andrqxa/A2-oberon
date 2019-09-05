@@ -194,7 +194,7 @@ VAR
 BEGIN 	F.handle := Handler
 END Init;*)
 
-	PROCEDURE Init( F: tLayer;  x0, y0, dx, dy: REAL );
+	PROCEDURE Init( F: tLayer;  x0, y0, dx, dy: FLOAT32 );
 	VAR id: vyName.tNameArray;
 	BEGIN
 		F.handle := Handler;  COPY( "Grid: ", id );  vyPort.OpenLayer( F, id );  F.style.fcol := 12;
@@ -208,7 +208,7 @@ END Init;*)
 (*PROCEDURE Show*;
 VAR data: Objects.Object;  F: tLayer;  count: SIGNED16;
 pict: vyPort.Picture;
-x0, y0, dx, dy : REAL;
+x0, y0, dx, dy : FLOAT32;
 inconsistentConditions : BOOLEAN;
 BEGIN
 data := vyBase.showParameter; count := vyBase.parameterCount;
@@ -232,7 +232,7 @@ Objects.NewObj := pict
 END Show;*)
 
 	PROCEDURE Insert*;
-	VAR x0, y0, dx, dy: REAL;  sc: vyParser.Scanner;
+	VAR x0, y0, dx, dy: FLOAT32;  sc: vyParser.Scanner;
 	BEGIN
 		vyParser.OpenParScanner( sc );  x0 := 0;  y0 := 0;  dx := 1;  dy := 10;
 		IF ~(vyParser.Real( sc, x0 ) & vyParser.Real( sc, y0 ) & vyParser.Real( sc, dx ) & vyParser.Real( sc, dy )) THEN

@@ -743,7 +743,7 @@ TYPE
 
 		PROCEDURE &Init*(length: SIGNED32; slope: SlopeFunction);
 		VAR i: SIGNED32;
-			tmp: REAL;
+			tmp: FLOAT32;
 		BEGIN
 			SELF.length := length;
 			FOR i := 0 TO length - 1 DO
@@ -916,9 +916,9 @@ TYPE
 		END ComputeCurve;
 
 		(* calculate a bark value *)
-		PROCEDURE Bark(x: REAL): SIGNED32;
+		PROCEDURE Bark(x: FLOAT32): SIGNED32;
 			(*
-		VAR res: REAL;
+		VAR res: FLOAT32;
 		BEGIN
 			res := 13.1 * Math.arctan(0.00074 * x);
 			res := res + 2.24 * Math.arctan(0.0000000158 * x * x);
@@ -3018,14 +3018,14 @@ TYPE
 	ResiduePartitionProc = PROCEDURE {DELEGATE} (VAR bufReader: BufferReader; VAR buf: ARRAY OF CHAR;
 													VAR decSate: DecoderState);
 	(* slope-function vorbis window-type 0 *)
-	SlopeFunction = PROCEDURE {DELEGATE} (x, n: SIGNED32): REAL;
+	SlopeFunction = PROCEDURE {DELEGATE} (x, n: SIGNED32): FLOAT32;
 	(** decodes len bytes from the buffer starting at pos to a valid soundOutput *)
 	Decoder* = PROCEDURE {DELEGATE} (VAR buf: ARRAY OF CHAR; pos, len: SIGNED32; continuedPage: BOOLEAN;
 										VAR soundOutput: SoundOutput): SIGNED32;
 
 	(* descending part of the window *)
-	PROCEDURE SlopeRight(x, n: SIGNED32): REAL;
-		VAR res: REAL;
+	PROCEDURE SlopeRight(x, n: SIGNED32): FLOAT32;
+		VAR res: FLOAT32;
 	BEGIN
 		res := Math.sin( ((n - x - 0.5) / n) * (Math.pi / 2) );
 		res := Math.sin( res * res * Math.pi / 2);
@@ -3033,8 +3033,8 @@ TYPE
 	END SlopeRight;
 
 	(* ascending part of the window *)
-	PROCEDURE SlopeLeft(x, n: SIGNED32): REAL;
-		VAR res: REAL;
+	PROCEDURE SlopeLeft(x, n: SIGNED32): FLOAT32;
+		VAR res: FLOAT32;
 	BEGIN
 		res := Math.sin( ((x + 0.5) / n) * (Math.pi / 2) );
 		res := Math.sin( res * res * Math.pi / 2);
@@ -3130,7 +3130,7 @@ TYPE
 
 	(* lookup table for calculated floor values *)
 	PROCEDURE InitInverseDBLookup;
-	VAR InverseDBLookupReal: ARRAY 256 OF REAL;
+	VAR InverseDBLookupReal: ARRAY 256 OF FLOAT32;
 		i: SIGNED32;
 	BEGIN
 InverseDBLookupReal[0] := 0.00000010649863;

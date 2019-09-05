@@ -13,7 +13,7 @@ CONST
 	halfrange = 20000000H;
 	step      = 7;
 
-	allbitsInv = 1 / REAL(allbits);
+	allbitsInv = 1 / FLOAT32(allbits);
 
 TYPE
 		(** A pseudo-random number generator.  This object is not reentrant. *)
@@ -86,21 +86,21 @@ TYPE
 
 		(** Return a pseudo-random real number, uniformly distributed. *)
 
-		PROCEDURE Uniform*(): REAL;
+		PROCEDURE Uniform*(): FLOAT32;
 		BEGIN
 			RETURN Integer() * allbitsInv;
 		END Uniform;
 
 		(** Return a pseudo-random real number, exponentially distributed. *)
 
-		PROCEDURE Exp*(mu: REAL): REAL;
+		PROCEDURE Exp*(mu: FLOAT32): FLOAT32;
 		BEGIN
 			RETURN -Math.ln(Uniform())/mu
 		END Exp;
 
-		PROCEDURE Gaussian*(): REAL; (*generates a normal distribution with mean 0, variance 1 using the Box-Muller Transform*)
+		PROCEDURE Gaussian*(): FLOAT32; (*generates a normal distribution with mean 0, variance 1 using the Box-Muller Transform*)
 		VAR
-			x1,x2,w,y1: REAL;
+			x1,x2,w,y1: FLOAT32;
 		BEGIN
 			REPEAT
 				x1:=2.0*Uniform()-1;
@@ -140,17 +140,17 @@ TYPE
 			RETURN r.Dice(sides)
 		END Dice;
 
-		PROCEDURE Uniform*(): REAL;
+		PROCEDURE Uniform*(): FLOAT32;
 		BEGIN {EXCLUSIVE}
 			RETURN r.Uniform()
 		END Uniform;
 
-		PROCEDURE Exp*(mu: REAL): REAL;
+		PROCEDURE Exp*(mu: FLOAT32): FLOAT32;
 		BEGIN {EXCLUSIVE}
 			RETURN r.Exp(mu)
 		END Exp;
 
-		PROCEDURE Gaussian*(): REAL; (*generates a normal distribution with mean 0, variance 1 using the Box-Muller Transform*)
+		PROCEDURE Gaussian*(): FLOAT32; (*generates a normal distribution with mean 0, variance 1 using the Box-Muller Transform*)
 		BEGIN{EXCLUSIVE}
 			RETURN r.Gaussian();
 		END Gaussian;

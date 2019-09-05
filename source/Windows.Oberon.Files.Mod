@@ -306,7 +306,7 @@ BEGIN
 	Read(r, s); x := s # 0
 END ReadBool;
 
-PROCEDURE ReadReal*(VAR r: Rider; VAR x: REAL);
+PROCEDURE ReadReal*(VAR r: Rider; VAR x: FLOAT32);
 BEGIN
 	ReadBytes(r, SYSTEM.VAL(Bytes4, x), 4)
 END ReadReal;
@@ -435,7 +435,7 @@ BEGIN
 	IF x THEN Write(r, 1) ELSE Write(r, 0) END
 END WriteBool;
 
-PROCEDURE WriteReal*(VAR r: Rider; x: REAL);
+PROCEDURE WriteReal*(VAR r: Rider; x: FLOAT32);
 BEGIN
 	WriteBytes(r, SYSTEM.VAL(Bytes4, x), 4)
 END WriteReal;

@@ -31,8 +31,8 @@ CONST
 TYPE
 	index* = SIGNED32;
 
-	(* REAL *)  (* preferred chunk sizes: 128, 1024, 8192 *)
-	real* = REAL;   (* technical convenience, to avoid duplicate code for REAL and LONGREAL *)
+	(* FLOAT32 *)  (* preferred chunk sizes: 128, 1024, 8192 *)
+	real* = FLOAT32;   (* technical convenience, to avoid duplicate code for FLOAT32 and LONGREAL *)
 
 	Real = vyBase.Real;
 
@@ -493,7 +493,7 @@ END FillBufMeanCache;
 	PROCEDURE Append*( xx: LONGREAL;  v: vyBase.tVector );
 	(*= Add a data point to a chunk. Append new chunk if necessary *)
 	(*! defensive programming *)
-	VAR l: index;  chunk: tBuf;  x: REAL;
+	VAR l: index;  chunk: tBuf;  x: FLOAT32;
 	BEGIN  (* find entry which is not full *)
 		ASSERT ( (xx >= MIN( real )) & (xx <= MAX( real )), 100 );
 		x := SHORT( xx );
@@ -691,7 +691,7 @@ END FillBufMeanCache;
 
 	PROCEDURE DoArrayOp1*( v: vyBase.tVector;  op1: ArrayOp1Function );
 	VAR v1: tVector;
-		a: POINTER TO ARRAY OF REAL;
+		a: POINTER TO ARRAY OF FLOAT32;
 	BEGIN
 		ASSERT ( v IS tVector, 100 );
 		IF v.buf.next = NIL THEN v1 := v( tVector );  op1( v1.buf( tBuf ).data^ )
@@ -702,7 +702,7 @@ END FillBufMeanCache;
 
 	PROCEDURE DoArrayOp2*( v1, v2: vyBase.tVector;  op2: ArrayOp2Function );
 	(*!Hack*)
-	VAR a, b: POINTER TO ARRAY OF REAL;
+	VAR a, b: POINTER TO ARRAY OF FLOAT32;
 	BEGIN
 		ASSERT ( v1 IS tVector, 100 );
 		ASSERT ( v2 IS tVector, 101 );

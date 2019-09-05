@@ -66,7 +66,7 @@ CONST
 	VAR TenM1, Ten7, Ten8: LONGREAL;
 	HexDig: ARRAY 17 OF CHAR;
 	(*
-	PROCEDURE Expo (x: REAL): SIGNED16;
+	PROCEDURE Expo (x: FLOAT32): SIGNED16;
 	(* Fix for Oberon f. Windows *)
 	VAR
 	L : SIGNED32;
@@ -454,7 +454,7 @@ END RealToFixStr;
 
 PROCEDURE AppendRealFix* ( x: LONGREAL;   n, k, D: SIGNED32;   VAR dest: ARRAY OF CHAR);
 	VAR s: ARRAY 64 OF CHAR;
-BEGIN 	(*ASSERT((x >= MIN(REAL)) & (x <= MAX(REAL)), 100);
+BEGIN 	(*ASSERT((x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)), 100);
 	Texts.OpenWriter(W);
 	Texts.WriteRealFix(W, SHORT(x), n, k, 5); (*! support free E parameter *)
 	AppendBuffer(W.buf, dest)*)
@@ -469,7 +469,7 @@ BEGIN
 	RealToStr(x, n, s);  Append(dest, s)
 END AppendLongReal;
 
-PROCEDURE AppendReal* (x: REAL;   n: SIGNED32;   VAR  dest: ARRAY OF CHAR);
+PROCEDURE AppendReal* (x: FLOAT32;   n: SIGNED32;   VAR  dest: ARRAY OF CHAR);
 	VAR s: ARRAY maxreallen OF CHAR;
 BEGIN 	 RealToStr(x, n, s);  Append(dest, s)
 END AppendReal;
@@ -490,8 +490,8 @@ END AppendRealHex;
 
 (*
 
-PROCEDURE AppendReal* (x: REAL; n: SIGNED32;VAR  dest: ARRAY OF CHAR);
-VAR e: SIGNED32; x0: REAL;
+PROCEDURE AppendReal* (x: FLOAT32; n: SIGNED32;VAR  dest: ARRAY OF CHAR);
+VAR e: SIGNED32; x0: FLOAT32;
 d: ARRAY maxD OF CHAR;pos:SIGNED32;
 BEGIN pos:=Length(dest);
 e := Expo(x);
@@ -521,8 +521,8 @@ END;
 dest[pos]:=0X;
 END AppendReal;
 
-PROCEDURE AppendRealFix* ( x: REAL; n, k: SIGNED32;VAR dest:ARRAY OF CHAR);
-VAR e, i: SIGNED32; sign: CHAR; x0: REAL;
+PROCEDURE AppendRealFix* ( x: FLOAT32; n, k: SIGNED32;VAR dest:ARRAY OF CHAR);
+VAR e, i: SIGNED32; sign: CHAR; x0: FLOAT32;
 d: ARRAY maxD OF CHAR;pos:SIGNED32;
 
 PROCEDURE seq (ch: CHAR; n: SIGNED32);
@@ -568,7 +568,7 @@ END;
 dest[pos]:=0X
 END AppendRealFix;
 
-PROCEDURE AppendRealHex* (x: REAL;VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendRealHex* (x: FLOAT32;VAR dest: ARRAY OF CHAR);
 VAR i: SIGNED32;
 d: ARRAY 8 OF CHAR;pos:SIGNED32;
 BEGIN Reals.ConvertH(x, d); i := 0; pos:=Length(dest);

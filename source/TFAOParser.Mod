@@ -1300,7 +1300,7 @@ BEGIN
 	AddBasicType(Universe, "SET", TS.BasicInt32);
 	AddBasicType(Universe, "SIGNED64", TS.BasicInt64);
 	AddBasicType(Universe, "CHAR", TS.BasicChar8);
-	AddBasicType(Universe, "REAL", TS.BasicReal32);
+	AddBasicType(Universe, "FLOAT32", TS.BasicReal32);
 	AddBasicType(Universe, "LONGREAL", TS.BasicReal64);
 	AddBasicType(Universe, "STRING", TS.BasicString);
 END TFAOParser.

@@ -374,10 +374,10 @@ BEGIN
 	srBase.world:=cage;
 END init;
 
-PROCEDURE cylinder(target: MSpace.cell; start, end: PT;  radius: REAL; t:SIGNED16; color:COLOR);
+PROCEDURE cylinder(target: MSpace.cell; start, end: PT;  radius: FLOAT32; t:SIGNED16; color:COLOR);
 VAR
 	i: SIGNED16;
-	sin,cos: REAL;
+	sin,cos: FLOAT32;
 	p,q,normal: PT;
 BEGIN
 	FOR i:= 0 TO t DO

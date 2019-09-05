@@ -166,7 +166,7 @@ TYPE
 		END UpdateAdrLabel;
 
 		PROCEDURE AdrLabelMove(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
-		VAR dx, dy, dp, d : SIGNED32; f : REAL; tmax, tmin : SIGNED32;
+		VAR dx, dy, dp, d : SIGNED32; f : FLOAT32; tmax, tmin : SIGNED32;
 		BEGIN
 			IF keys = {0} THEN adrLabel.AutoStartDrag END;
 		END AdrLabelMove;
@@ -183,7 +183,7 @@ TYPE
 		END MyStartDrag;
 
 		PROCEDURE InfoLabelMove(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
-		VAR dx, dy, dp, d : SIGNED32; f : REAL; tmax, tmin : SIGNED32;
+		VAR dx, dy, dp, d : SIGNED32; f : FLOAT32; tmax, tmin : SIGNED32;
 		BEGIN
 			IF keys = {0} THEN infoLabel.AutoStartDrag END;
 		END InfoLabelMove;
@@ -1432,7 +1432,7 @@ TYPE
 		END Init;
 
 		PROCEDURE AdrLabelMove(x, y : SIZE; keys : SET; VAR handled : BOOLEAN);
-		VAR dx, dy, dp, d : SIGNED32; f : REAL; tmax, tmin : SIGNED32;
+		VAR dx, dy, dp, d : SIGNED32; f : FLOAT32; tmax, tmin : SIGNED32;
 		BEGIN
 			IF keys = {0} THEN adrLabel.AutoStartDrag END;
 		END AdrLabelMove;

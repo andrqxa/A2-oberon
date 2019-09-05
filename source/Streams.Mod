@@ -200,8 +200,8 @@ TYPE
 			IF x THEN Char( 1X ) ELSE Char( 0X ) END
 		END RawBool;
 
-	(** Write a REAL. *)
-		PROCEDURE RawReal*( x: REAL );
+	(** Write a FLOAT32. *)
+		PROCEDURE RawReal*( x: FLOAT32 );
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4 )
 		END RawReal;
@@ -641,8 +641,8 @@ TYPE
 			x := (Get() # 0X)
 		END RawBool;
 
-	(** Read a REAL. *)
-		PROCEDURE RawReal*( VAR x: REAL );
+	(** Read a FLOAT32. *)
+		PROCEDURE RawReal*( VAR x: FLOAT32 );
 		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4, ignore )

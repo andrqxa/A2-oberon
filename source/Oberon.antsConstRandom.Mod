@@ -66,7 +66,7 @@ TYPE
 		END
 	END RandomUVX;
 
-	PROCEDURE RandomUV( r: vyRanBase.tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF REAL;  start: SIGNED32 );
+	PROCEDURE RandomUV( r: vyRanBase.tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF FLOAT32;  start: SIGNED32 );
 	VAR i: SIGNED32;
 	BEGIN
 		WITH r: tRandom DO

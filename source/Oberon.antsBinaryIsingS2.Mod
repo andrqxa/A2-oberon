@@ -204,7 +204,7 @@ END Uniform;
 	PROCEDURE NewModel*;
 	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  beta, h, pen: LONGREAL;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name=NAME beta=REAL h=REAL penalty=REAL" );
+		l := antsCommands.ScanFromPar( "name=NAME beta=FLOAT32 h=FLOAT32 penalty=FLOAT32" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectRealFromKeyword( l, "beta", beta ) &
 		    antsCommands.ExpectRealFromKeyword( l, "h", h ) & antsCommands.ExpectRealFromKeyword( l, "penalty", pen ) THEN
 			Gen;  M := Objects.NewObj( tModel );  antsModels.Open( M );  OpenModel( M, name, beta, h, pen )

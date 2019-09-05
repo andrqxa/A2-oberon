@@ -927,8 +927,8 @@ TYPE
 
 	END IntegerType;
 
-	(** <<REAL,LONGREAL>>
-		real types: REAL, LONGREAL
+	(** <<FLOAT32,LONGREAL>>
+		real types: FLOAT32, LONGREAL
 	**)
 	FloatType*= OBJECT (NumberType)
 
@@ -953,7 +953,7 @@ TYPE
 		complex types: COMPLEX, LONGCOMPLEX
 	**)
 	ComplexType*= OBJECT (NumberType)
-		VAR componentType-: Type; (* REAL or LONGREAL*)
+		VAR componentType-: Type; (* FLOAT32 or LONGREAL*)
 
 		PROCEDURE & InitComplexType(componentType: Type);
 		BEGIN
@@ -2547,7 +2547,7 @@ TYPE
 	RealValue* = OBJECT (Value)
 		VAR
 			value-: LONGREAL;
-			subtype-: SubType; (* accuracy information: REAL vs. LONGREAL *)
+			subtype-: SubType; (* accuracy information: FLOAT32 vs. LONGREAL *)
 
 		PROCEDURE & InitRealValue(position: Position; value: LONGREAL; subType: SubType);
 		BEGIN
@@ -2570,7 +2570,7 @@ TYPE
 	ComplexValue* = OBJECT (Value)
 		VAR
 			realValue-, imagValue-: LONGREAL;
-			subtype-: SubType; (* accuracy information of components: REAL vs. LONGREAL *)
+			subtype-: SubType; (* accuracy information of components: FLOAT32 vs. LONGREAL *)
 
 		PROCEDURE & InitComplexValue(position: Position; realValue, imagValue: LONGREAL; subType: SubType);
 		BEGIN

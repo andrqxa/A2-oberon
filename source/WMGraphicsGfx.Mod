@@ -8,8 +8,8 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 		fillColor: SIGNED32;
 		gfxStrokeColor: Gfx.Color;
 		gfxFillColor: Gfx.Color;
-		gfxLineWidth: REAL;
-		dashLength: REAL;
+		gfxLineWidth: FLOAT32;
+		dashLength: FLOAT32;
 
 		PROCEDURE &New*(img : Raster.Image);
 		BEGIN
@@ -36,7 +36,7 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 			SetFillColor(WMGraphics.Red);
 		END SetupDrawing;
 
-		PROCEDURE SetLineWidth*(w:REAL);
+		PROCEDURE SetLineWidth*(w:FLOAT32);
 		BEGIN
 			gfxLineWidth:=w;
 			Gfx.SetLineWidth(gfxContext,w);
@@ -53,8 +53,8 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 		END SetColor;
 
 		(* set line color*)
-		PROCEDURE SetDashLength*(dl:REAL);
-		VAR on,off: ARRAY 1 OF REAL;
+		PROCEDURE SetDashLength*(dl:FLOAT32);
+		VAR on,off: ARRAY 1 OF FLOAT32;
 		BEGIN
 			dashLength:=dl;
 			IF dashLength > 0 THEN
@@ -107,7 +107,7 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 				SetColor(lineColor);
 			END;
 			Gfx.DrawLine(gfxContext, dx+x0, dy+y0, dx+x1, dy+y1, {Gfx.Stroke}); (*may be refined by plotting to upper/lower boundary*)
-			(* Performance issue: Gfx.DrawLine expects REAL coordinates;	inside of Gfx a  coordinate transformation and conversion from REAL to Integer pixel position will happen again *)
+			(* Performance issue: Gfx.DrawLine expects FLOAT32 coordinates;	inside of Gfx a  coordinate transformation and conversion from FLOAT32 to Integer pixel position will happen again *)
 		END Line;
 
 		(** draw circle in requested mode (clockwise if r > 0, counterclockwise if r < 0) **)

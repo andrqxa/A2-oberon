@@ -364,7 +364,7 @@ GraphXY* = OBJECT (Window);
 			END;
 		END GetTicks;
 
-		PROCEDURE Axes(canvas: WMGraphics.Canvas; w,h,mnw,mnh:SIZE; scalex,scaley:REAL);
+		PROCEDURE Axes(canvas: WMGraphics.Canvas; w,h,mnw,mnh:SIZE; scalex,scaley:FLOAT32);
 		VAR i:SIZE;
 		BEGIN
 			IF mnh#0 THEN canvas.Line(0, h+mnh, w, h+mnh, WMGraphics.Black, WMGraphics.ModeCopy)	END;
@@ -376,7 +376,7 @@ GraphXY* = OBJECT (Window);
 		END Axes;
 
 		PROCEDURE Update(w,h: SIZE);
-		VAR i:SIZE; mnw,mnh,mxw,mxh,x0,x1,y0,y1:SIZE; scalex,scaley:REAL;
+		VAR i:SIZE; mnw,mnh,mxw,mxh,x0,x1,y0,y1:SIZE; scalex,scaley:FLOAT32;
 		BEGIN
 			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), WMGraphics.White, WMGraphics.ModeCopy);
 			scalex:=scaleRatio*w/width; scaley:=scaleRatio*h/height;
@@ -404,7 +404,7 @@ END GraphXY;
 TYPE Scatter* = OBJECT (GraphXY);
 
 		PROCEDURE Update(w,h: SIZE);
-		VAR i:SIZE; mnw,mnh,mxw,mxh, x,y, ex,ey:SIZE; scalex,scaley:REAL; rect:WMRectangles.Rectangle;
+		VAR i:SIZE; mnw,mnh,mxw,mxh, x,y, ex,ey:SIZE; scalex,scaley:FLOAT32; rect:WMRectangles.Rectangle;
 		BEGIN
 			canvas.Fill(WMRectangles.MakeRect(0, 0, w, h), WMGraphics.White, WMGraphics.ModeCopy);
 			scalex:=scaleRatio*w/width;

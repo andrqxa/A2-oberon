@@ -201,7 +201,7 @@ END getNumber;
 
 
 PROCEDURE getReal (VAR sc: Scanner; pos: SIGNED32;  len: SIGNED16;
-neg: BOOLEAN; VAR x: REAL): BOOLEAN;
+neg: BOOLEAN; VAR x: FLOAT32): BOOLEAN;
 	VAR i: SIGNED16;  r: Texts.Reader;  more, okSoFar, negex: BOOLEAN; c: CHAR; pre, post, exp, pow: SIGNED32;
 	(*	xx:ARRAY 2 OF CHAR; *)
 BEGIN	Texts.OpenReader(r, sc.text, pos);
@@ -263,7 +263,7 @@ PROCEDURE GetNumber* (VAR sc: Scanner; neg: BOOLEAN; VAR x: SIGNED32): BOOLEAN;
 BEGIN	RETURN getNumber(sc, sc.curTokPos, SHORT(sc.curTokLen), neg, x)
 END GetNumber;
 
-PROCEDURE GetReal* (VAR sc: Scanner; neg: BOOLEAN; VAR x: REAL): BOOLEAN;
+PROCEDURE GetReal* (VAR sc: Scanner; neg: BOOLEAN; VAR x: FLOAT32): BOOLEAN;
 BEGIN	RETURN getReal(sc, sc.curTokPos, SHORT(sc.curTokLen), neg, x)
 END GetReal;
 
@@ -283,7 +283,7 @@ BEGIN 	c := sc.GetNext(sc);
 	ELSE RETURN FALSE END
 END ExpectNumber;
 
-PROCEDURE ExpectReal* (VAR sc: Scanner; VAR x: REAL): BOOLEAN;
+PROCEDURE ExpectReal* (VAR sc: Scanner; VAR x: FLOAT32): BOOLEAN;
 	VAR c: SIGNED16; sign, b: BOOLEAN;  i: SIGNED32;
 BEGIN 	c := sc.GetNext(sc);
 	IF (c = ctSym) & (sc.v = csMinus) & ('0' <= sc.ch) & ('9' >= sc.ch)
@@ -658,7 +658,7 @@ UNTIL sc.class=ctEOT; (* or some other stop condition *)
 
 A typical usage is:
 VAR sc:vyScanners.Scanner;class:SIGNED16;
-name:tName;x:REAL; l:SIGNED32; neg.negold,ok:BOOLEAN;
+name:tName;x:FLOAT32; l:SIGNED32; neg.negold,ok:BOOLEAN;
 ...
 vyScanners.NewScanner(sc);	(* create a new scanner variable, and initialize it *)
 vyScanners.OpenScanner(sc,t,beg,end);	(* open on Text t for range [beg,end[ *)

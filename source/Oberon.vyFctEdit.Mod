@@ -311,7 +311,7 @@ VAR
 		END
 	END Handler;
 
-	PROCEDURE Embed*( editor: tLayer;  obj: vyBase.tVector;  x, y, w, h: REAL;  vScale, hScale, hot: BOOLEAN ): vyPort.Picture;
+	PROCEDURE Embed*( editor: tLayer;  obj: vyBase.tVector;  x, y, w, h: FLOAT32;  vScale, hScale, hot: BOOLEAN ): vyPort.Picture;
 	(*vs 0.0a1   md  23.06.95 *)
 	VAR N, i: SIGNED32;  X: vyBase.tVector;  pict: vyPort.Picture;  id: vyName.tNameArray;
 	BEGIN

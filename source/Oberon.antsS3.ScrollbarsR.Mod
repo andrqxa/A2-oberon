@@ -1,7 +1,7 @@
 (* ETH Oberon, Copyright 2000 ETH Zuerich Institut fuer Computersysteme, ETH Zentrum, CH-8092 Zuerich.
 Refer to the "General ETH Oberon System Source License" contract available at: http://www.oberon.ethz.ch/ *)
 
-(* fof: modification of Scrollbars to handle REAL and LONGREAL numbers, needed by ants *)
+(* fof: modification of Scrollbars to handle FLOAT32 and LONGREAL numbers, needed by ants *)
 (* this file is part of the ants distribution by Felix Friedrich, (c) 2002, above Copyright of the ETH applies. *)
 
 

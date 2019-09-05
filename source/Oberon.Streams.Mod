@@ -78,7 +78,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		x := n + ASH(ORD(ch) MOD 64 - ORD(ch) DIV 64 * 64, s)
 	END ReadNum;
 
-	PROCEDURE ReadReal*(S: Stream; VAR x: REAL);
+	PROCEDURE ReadReal*(S: Stream; VAR x: FLOAT32);
 	BEGIN
 		S.ReadBytes(S, x, 4)
 	END ReadReal;
@@ -127,7 +127,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		Write(S, CHR(x MOD 128))
 	END WriteNum;
 
-	PROCEDURE WriteReal*(S: Stream; x: REAL);
+	PROCEDURE WriteReal*(S: Stream; x: FLOAT32);
 	BEGIN
 		S.WriteBytes(S, x, 4)
 	END WriteReal;

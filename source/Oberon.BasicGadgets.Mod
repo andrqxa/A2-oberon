@@ -740,7 +740,7 @@ BEGIN
 END Constrain;
 
 PROCEDURE ComputeColors(F:Button; col:SIGNED32);	(*adapt shade of button border to button color *)
-VAR r,g,b:REAL; f:SIGNED16;
+VAR r,g,b:FLOAT32; f:SIGNED16;
 BEGIN
 	F.upC:=SHORT(col);
 	IF F.upC=Display3.upC THEN F.topC:=Display3.topC; F.downC:=Display3.downC; F.bottomC:=Display3.bottomC; (*default*)

@@ -63,12 +63,12 @@ VAR
 		M.cp := NIL;  M.ce := NIL;  M.synced := FALSE
 	END Open;
 
-	PROCEDURE dist( e1, e2: SIGNED16 ): REAL;
+	PROCEDURE dist( e1, e2: SIGNED16 ): FLOAT32;
 	BEGIN
 		RETURN -((e1 - e2) * (e1 - e2) / depth / depth)
 	END dist;
 
-	PROCEDURE dist2( e1, e2: SIGNED16 ): REAL;
+	PROCEDURE dist2( e1, e2: SIGNED16 ): FLOAT32;
 	BEGIN
 		IF e1 = e2 THEN RETURN 1 ELSE RETURN -1 END;
 	END dist2;
@@ -457,7 +457,7 @@ VAR
 		a: ARRAY 15 OF LONGREAL;
 		i: SIGNED32;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name= NAME a0=REAL a1=REAL a2=REAL a3=REAL a4=REAL a5=REAL a6=REAL a7=REAL a8=REAL a9=REAL a10=REAL a11=REAL a12=REAL a13=REAL a14=REAL" );
+		l := antsCommands.ScanFromPar( "name= NAME a0=FLOAT32 a1=FLOAT32 a2=FLOAT32 a3=FLOAT32 a4=FLOAT32 a5=FLOAT32 a6=FLOAT32 a7=FLOAT32 a8=FLOAT32 a9=FLOAT32 a10=FLOAT32 a11=FLOAT32 a12=FLOAT32 a13=FLOAT32 a14=FLOAT32" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectRealFromKeyword( l, "a0", a[0] ) &
 		    antsCommands.ExpectRealFromKeyword( l, "a1", a[1] ) & antsCommands.ExpectRealFromKeyword( l, "a2", a[2] ) &
 		    antsCommands.ExpectRealFromKeyword( l, "a3", a[3] ) & antsCommands.ExpectRealFromKeyword( l, "a4", a[4] ) &

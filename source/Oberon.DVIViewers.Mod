@@ -22,7 +22,7 @@ TYPE
    DrawCharHook = PROCEDURE (c: CHAR; x,y,dviWidth: LONGREAL; F: Frame);
    FrameDesc* = RECORD(Gadgets.FrameDesc)
       pageNo: SIGNED32;
-      zoom: REAL; conv: LONGREAL;
+      zoom: FLOAT32; conv: LONGREAL;
       hOffset,vOffset: LONGREAL;
       b,l,h,w: SIGNED16;
       M: Display3.Mask; clipReg: GfxRegions.Region;
@@ -42,7 +42,7 @@ TYPE
       name: POINTER TO ARRAY OF CHAR; (* file's name *)
       llx,lly,urx,ury: LONGREAL; (* bounding box in dvi-coords
          relative to the current dvi-point *)
-      angle: REAL; (* angle in degrees counterclockwise *)
+      angle: FLOAT32; (* angle in degrees counterclockwise *)
       image: Images.Image;
    END;
 
@@ -97,7 +97,7 @@ VAR
    END GetResolution;
 
    PROCEDURE DrawCharImage(c: CHAR; x,y,dviWidth: LONGREAL; F: Frame);
-   VAR cx, cy, dx, dy, llx, lly, urx, ury: REAL; img: GfxImages.Image;
+   VAR cx, cy, dx, dy, llx, lly, urx, ury: FLOAT32; img: GfxImages.Image;
    BEGIN
       GfxFonts.GetMap(F.context.font,c,cx,cy,dx,dy,img);
       cx:= SHORT(DVIToScreenX(F,x)+cx); cy:= SHORT(DVIToScreenY(F,y)+cy);
@@ -117,7 +117,7 @@ VAR
    END DrawChar;
 
    PROCEDURE DrawRule(x,y,h,w: LONGREAL; F: Frame);
-   VAR llx, lly, urx, ury, lw, tmp: REAL;
+   VAR llx, lly, urx, ury, lw, tmp: FLOAT32;
    BEGIN
       llx := SHORT(DVIToScreenX(F,x)); lly := SHORT(DVIToScreenY(F,y-h));
       urx := SHORT(DVIToScreenX(F,x+w)); ury := SHORT(DVIToScreenY(F,y));
@@ -283,7 +283,7 @@ VAR
       str: POINTER TO ARRAY OF CHAR; (* string used in GetToken below *)
       n: SIGNED32; (* integer used in GetToken below *)
       seen: SET; (* whether we have seen any of the 'PSfile' identifiers *)
-      vals: ARRAY rhi+1 OF REAL; (* values of 'PSfile' identifiers *)
+      vals: ARRAY rhi+1 OF FLOAT32; (* values of 'PSfile' identifiers *)
       s: PSFileSpecial;
       i: SIGNED16;
       c: LONGREAL; (* one 1/72 inch represents c dvi-units *)
@@ -415,7 +415,7 @@ VAR
       VAR r: Files.Rider; len: SIGNED32);
    VAR
       tmp: DVIFiles.Special; s: PSFileSpecial; pos: SIGNED32;
-      ctm: GfxMatrix.Matrix; sc,phi: REAL;
+      ctm: GfxMatrix.Matrix; sc,phi: FLOAT32;
    BEGIN
       pos:= Files.Pos(r);
       IF ~DVIFiles.IsSpecialCacheComplete(M,F.pageNo) THEN
@@ -797,7 +797,7 @@ VAR
    (* Message- Handler: *)
    PROCEDURE CheckModels(M: Gadgets.UpdateMsg; F: Frame);
    (* Check whether the zoom- and page-number models changed. *)
-   VAR z,p: Objects.Object; r: REAL; n: SIGNED32;
+   VAR z,p: Objects.Object; r: FLOAT32; n: SIGNED32;
    BEGIN
       Links.GetLink(F,"PageNumber",p);
       IF M.obj = p THEN
@@ -954,7 +954,7 @@ VAR
    VAR
      v: Frame; f: DVIFiles.File;
      c: GfxPS.Context; oldc: Gfx.Context;
-     w,h,oldZoom: REAL; oldHOff,oldVOff: LONGREAL;
+     w,h,oldZoom: FLOAT32; oldHOff,oldVOff: LONGREAL;
      name: ARRAY 64 OF CHAR;
      oldDrawChar: DrawCharHook;
      oldPageNo,i: SIGNED32;

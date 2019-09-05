@@ -160,7 +160,7 @@ positive: Real stored in PAF
 	MODULE Test;
 
 	PROCEDURE Real;
-	VAR a,b: REAL;
+	VAR a,b: FLOAT32;
 	BEGIN
 		a := 888;
 		b := a;
@@ -320,21 +320,21 @@ positive: variable integer assignment
 positive: constant real assignment
 
 	MODULE Test;
-	VAR r: REAL;
+	VAR r: FLOAT32;
 	BEGIN r := 2; ASSERT (r = 2);
 	END Test.
 
 positive: variable real assignment
 
 	MODULE Test;
-	VAR r1, r2: REAL;
+	VAR r1, r2: FLOAT32;
 	BEGIN r1 := 2.25; r2 := 3.75; r2 := r1; ASSERT (r1 = 2.25);
 	END Test.
 
 positive: real value assignment to real variable
 
 	MODULE Test;
-	VAR r: REAL;
+	VAR r: FLOAT32;
 	BEGIN r := 1.25; ASSERT (r = 1.25);
 	END Test.
 
@@ -467,17 +467,17 @@ positive: procedure type with value parameter SIGNED16
 	BEGIN FOR i := 0 TO 4 DO a[i] := i END; r := 0; Iterate (a, Accummulate); ASSERT (r = 10);
 	END Test.
 
-positive: procedure type with value parameter REAL
+positive: procedure type with value parameter FLOAT32
 
 	MODULE Test;
-	VAR a: ARRAY 5 OF REAL; i: SIGNED16; r: REAL;
+	VAR a: ARRAY 5 OF FLOAT32; i: SIGNED16; r: FLOAT32;
 
-	PROCEDURE Iterate (VAR a: ARRAY OF REAL; p : PROCEDURE (r: REAL));
+	PROCEDURE Iterate (VAR a: ARRAY OF FLOAT32; p : PROCEDURE (r: FLOAT32));
 	VAR i: SIZE;
 	BEGIN FOR i := 0 TO LEN (a) - 1 DO p (a[i]) END;
 	END Iterate;
 
-	PROCEDURE Accummulate (v: REAL);
+	PROCEDURE Accummulate (v: FLOAT32);
 	BEGIN r := r + v;
 	END Accummulate;
 
@@ -496,12 +496,12 @@ positive: procedure type with var parameter SIGNED16
 	BEGIN k := 0; p := Accummulate; FOR i := 0 TO 4 DO p (k, i) END; ASSERT (k = 10);
 	END Test.
 
-positive: procedure type with var parameter REAL
+positive: procedure type with var parameter FLOAT32
 
 	MODULE Test;
-	VAR i: SIGNED16; k: REAL; p: PROCEDURE (VAR r: REAL; b: REAL);
+	VAR i: SIGNED16; k: FLOAT32; p: PROCEDURE (VAR r: FLOAT32; b: FLOAT32);
 
-	PROCEDURE Accummulate (VAR r: REAL; v: REAL);
+	PROCEDURE Accummulate (VAR r: FLOAT32; v: FLOAT32);
 	BEGIN r := r + v;
 	END Accummulate;
 
@@ -520,12 +520,12 @@ positive: procedure type with result type SIGNED16
 	BEGIN p := Add; r := p (3, 4); ASSERT (r = 7);
 	END Test.
 
-positive: procedure type with result type REAL
+positive: procedure type with result type FLOAT32
 
 	MODULE Test;
-	VAR r: REAL; p: PROCEDURE (a, b: REAL): REAL;
+	VAR r: FLOAT32; p: PROCEDURE (a, b: FLOAT32): FLOAT32;
 
-	PROCEDURE Add (a, b: REAL): REAL;
+	PROCEDURE Add (a, b: FLOAT32): FLOAT32;
 	BEGIN RETURN a + b;
 	END Add;
 
@@ -544,12 +544,12 @@ positive: procedure type with result type in record SIGNED16
 	BEGIN p.p := Add; r := p.p (3, 4); ASSERT (r = 7);
 	END Test.
 
-positive: procedure type with result type in record REAL
+positive: procedure type with result type in record FLOAT32
 
 	MODULE Test;
-	VAR r: REAL; p: RECORD p: PROCEDURE (a, b: REAL): REAL END;
+	VAR r: FLOAT32; p: RECORD p: PROCEDURE (a, b: FLOAT32): FLOAT32 END;
 
-	PROCEDURE Add (a, b: REAL): REAL;
+	PROCEDURE Add (a, b: FLOAT32): FLOAT32;
 	BEGIN RETURN a + b;
 	END Add;
 
@@ -600,7 +600,7 @@ positive: constant negative real to integer conversion
 positive: positive real to integer conversion
 
 	MODULE Test;
-	VAR r: REAL; i: SIGNED32;
+	VAR r: FLOAT32; i: SIGNED32;
 	BEGIN r := 3.5; i := ENTIER (r); ASSERT (i = 3);
 	END Test.
 
@@ -608,7 +608,7 @@ positive: positive real to integer conversion
 positive: negative real to integer conversion
 
 	MODULE Test;
-	VAR r: REAL; i: SIGNED32;
+	VAR r: FLOAT32; i: SIGNED32;
 	BEGIN r := -3.5; i := ENTIER (r); ASSERT (i = -4);
 	END Test.
 
@@ -681,7 +681,7 @@ positive: set operations
 positive: relations
 
 	MODULE Test;
-	VAR ai, bi: SIGNED16; as, bs: SET; ar, br: REAL;
+	VAR ai, bi: SIGNED16; as, bs: SET; ar, br: FLOAT32;
 	BEGIN
 		ai := 0; bi := 1; ASSERT (~(ai = bi)); ASSERT (ai # bi); ASSERT (ai < bi); ASSERT (ai <= bi); ASSERT (~(ai > bi)); ASSERT (~(ai >= bi));
 		as := {1}; bs := {1, 2}; ASSERT (~(as = bs)); ASSERT (as # bs); ASSERT (as < bs); ASSERT (as <= bs); ASSERT (~(as > bs)); ASSERT (~(as >= bs));
@@ -789,7 +789,7 @@ positive: relational operations on huge integers
 positive: relational operations on reals
 
 	MODULE Test;
-	VAR value: REAL;
+	VAR value: FLOAT32;
 	BEGIN
 		value := 5;
 		ASSERT (value = 5); ASSERT (~(value = 6)); ASSERT (value = value);
@@ -877,7 +877,7 @@ positive: negation on huge integers
 positive: negation on reals
 
 	MODULE Test;
-	VAR value: REAL;
+	VAR value: FLOAT32;
 	BEGIN value := 5; ASSERT (-value = -5); ASSERT (-(-value) = 5); ASSERT (-(-value) = value)
 	END Test.
 
@@ -937,7 +937,7 @@ positive: absolute value of huge integer
 positive: absolute value of real
 
 	MODULE Test;
-	VAR value: REAL;
+	VAR value: FLOAT32;
 	BEGIN
 		value := 5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = value); ASSERT (ABS (-value) = value);
 		value := -5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = -value); ASSERT (ABS (-value) = -value);
@@ -1540,7 +1540,7 @@ positive: short on huge integer
 positive: entier on reals
 
 	MODULE Test;
-	VAR value: REAL;
+	VAR value: FLOAT32;
 	BEGIN
 		value := 0; ASSERT (ENTIER (value) = 0);
 		value := 1; ASSERT (ENTIER (value) = 1);
@@ -1615,7 +1615,7 @@ positive: addition on huge integers
 positive: addition on reals
 
 	MODULE Test;
-	VAR a, b: REAL;
+	VAR a, b: FLOAT32;
 	BEGIN
 		a := 3.5; b := 2.5; ASSERT (a + b = +6); ASSERT (a + b = 3.5 + 2.5);
 		a := -3.5; b := 2.5; ASSERT (a + b = -1); ASSERT (a + b = (-3.5) + 2.5);
@@ -1686,7 +1686,7 @@ positive: subtraction on huge integers
 positive: subtraction on reals
 
 	MODULE Test;
-	VAR a, b: REAL;
+	VAR a, b: FLOAT32;
 	BEGIN
 		a := 3.5; b := 2.5; ASSERT (a - b = +1); ASSERT (a - b = 3.5 - 2.5);
 		a := -3.5; b := 2.5; ASSERT (a - b = -6); ASSERT (a - b = (-3.5) - 2.5);
@@ -1757,7 +1757,7 @@ positive: multiplication on huge integers
 positive: multiplication on reals
 
 	MODULE Test;
-	VAR a, b: REAL;
+	VAR a, b: FLOAT32;
 	BEGIN
 		a := 3.5; b := 2.5; ASSERT (a * b = +8.75); ASSERT (a * b = 3.5 * 2.5);
 		a := -3.5; b := 2.5; ASSERT (a * b = -8.75); ASSERT (a * b = (-3.5) * 2.5);
@@ -1916,7 +1916,7 @@ positive: real division on huge integers
 positive: real division on reals
 
 	MODULE Test;
-	VAR a, b: REAL;
+	VAR a, b: FLOAT32;
 	BEGIN a := 3; b := 2; ASSERT (a / b = 1.5); ASSERT (a / b = 3 / 2);
 	END Test.
 
@@ -3864,8 +3864,8 @@ positive: modifying integer parameter
 positive: modifying real parameter
 
 	MODULE Test;
-	VAR g: REAL;
-	PROCEDURE Procedure (p: REAL);
+	VAR g: FLOAT32;
+	PROCEDURE Procedure (p: FLOAT32);
 	BEGIN ASSERT (p = 2.5); p := p * 2; ASSERT (p = 5); ASSERT (g = 2.5);
 	END Procedure;
 	BEGIN g := 2.5; Procedure (g); ASSERT (g = 2.5);
@@ -4070,8 +4070,8 @@ positive: modifying variable integer parameter
 positive: modifying variable real parameter
 
 	MODULE Test;
-	VAR g: REAL;
-	PROCEDURE Procedure (VAR p: REAL);
+	VAR g: FLOAT32;
+	PROCEDURE Procedure (VAR p: FLOAT32);
 	BEGIN ASSERT (p = 2.5); p := p * 2; ASSERT (p = 5); ASSERT (g = 5);
 	END Procedure;
 	BEGIN g := 2.5; Procedure (g); ASSERT (g = 5);
@@ -7360,14 +7360,14 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 
 	IMPORT SYSTEM;
 
-	VAR r: REAL; x: LONGREAL;  l: SIGNED32; h: SIGNED64;
+	VAR r: FLOAT32; x: LONGREAL;  l: SIGNED32; h: SIGNED64;
 
 	PROCEDURE Real(): SIGNED32;
-	VAR r: REAL; l: SIGNED32;
+	VAR r: FLOAT32; l: SIGNED32;
 	BEGIN
 		r := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
-		SYSTEM.MOVE(SYSTEM.ADR(r),SYSTEM.ADR(l),SIZEOF(REAL));
+		SYSTEM.MOVE(SYSTEM.ADR(r),SYSTEM.ADR(l),SIZEOF(FLOAT32));
 		RETURN l;
 	END Real;
 
@@ -7380,12 +7380,12 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 		RETURN l;
 	END Longreal;
 
-	PROCEDURE Longint(): REAL;
-	VAR r: REAL; l: SIGNED32;
+	PROCEDURE Longint(): FLOAT32;
+	VAR r: FLOAT32; l: SIGNED32;
 	BEGIN
 		l := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
-		SYSTEM.MOVE(SYSTEM.ADR(l),SYSTEM.ADR(r),SIZEOF(REAL));
+		SYSTEM.MOVE(SYSTEM.ADR(l),SYSTEM.ADR(r),SIZEOF(FLOAT32));
 		RETURN r;
 	END Longint;
 
@@ -7400,7 +7400,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 
 
 	BEGIN
-		r := SYSTEM.VAL(REAL,Real());
+		r := SYSTEM.VAL(FLOAT32,Real());
 		ASSERT(r = 10);
 		x := SYSTEM.VAL(LONGREAL,Longreal());
 		ASSERT(x = 10);

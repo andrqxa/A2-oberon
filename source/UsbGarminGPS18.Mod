@@ -197,14 +197,14 @@ TYPE
 	END;
 
 	D800PVT* = RECORD;
-		alt- : REAL; 				(* altitude above WGS 84 ellipsoid (meters) *)
-		epe- : REAL; 				(* estimated position error, 2 sigma (meters) *)
-		eph-, epv- : REAL; 		(* epe, but horizontal rsp. vertical only (meters) *)
+		alt- : FLOAT32; 				(* altitude above WGS 84 ellipsoid (meters) *)
+		epe- : FLOAT32; 				(* estimated position error, 2 sigma (meters) *)
+		eph-, epv- : FLOAT32; 		(* epe, but horizontal rsp. vertical only (meters) *)
 		fix- : SIGNED16; 			(* type of position fix: 0 = no fix; 1 = no fix; 2 = 2D; 3 = 3D; 4 = 2D differential, 5 = 3D differential *)
 		tow- : LONGREAL; 		(* time of week (seconds) *)
 		posn- : RadianType;  		(* latitude and longitude (radians) *)
-		east-, north-, up- : REAL; 	(* velocity east, north & up (meters per second) *)
-		mslHeight- : REAL; 		(* height of WGS 84 ellipsoid above MSL (meters) *)
+		east-, north-, up- : FLOAT32; 	(* velocity east, north & up (meters per second) *)
+		mslHeight- : FLOAT32; 		(* height of WGS 84 ellipsoid above MSL (meters) *)
 		leapSeconds- : SIGNED16; 	(* difference between GPS and UTC *)
 		wnDays- : SIGNED32; 		(* week number days *)
 	END;
@@ -241,7 +241,7 @@ TYPE
 		END GetPVTdata;
 
 		PROCEDURE Show(details : BOOLEAN);
-		VAR string : ARRAY 32 OF CHAR; temp : REAL;
+		VAR string : ARRAY 32 OF CHAR; temp : FLOAT32;
 		BEGIN {EXCLUSIVE}
 			KernelLog.String("GPS18: Position Info: "); KernelLog.Ln;
 			IF valid THEN

@@ -706,7 +706,7 @@ VAR
 	END FPrintTyp;
 
 	PROCEDURE FPrintObj*( obj: Object );
-	VAR fp, fp1: SIGNED32;  rval: REAL;  f, m: SIGNED16;  ext: ConstExt;  n: Node;
+	VAR fp, fp1: SIGNED32;  rval: FLOAT32;  f, m: SIGNED16;  ext: ConstExt;  n: Node;
 	BEGIN
 		fp := 0;  OPM.FPrint( fp, obj.mode );  FPrintName( fp, obj.name );  OPM.FPrint( fp, obj.vis );
 		IF TraceFP THEN fp1 := fp END;
@@ -1055,7 +1055,7 @@ VAR
 		END InCProc;
 
 		PROCEDURE InConst;
-		VAR conval: Const;  s: SIGNED16;  r: REAL;
+		VAR conval: Const;  s: SIGNED16;  r: FLOAT32;
 		BEGIN
 			NEW( conval );  obj.conval := conval;
 			CASE tag OF
@@ -1478,7 +1478,7 @@ BEGIN
 	syslink := topScope.right;  universe := topScope;  topScope.right := NIL;
 
 	EnterTyp( "CHAR", Char, OPM.CharSize, chartyp, SFtypChar );  EnterTyp( "SET", Set, OPM.SetSize, settyp, SFtypSet );
-	EnterTyp( "REAL", Real, OPM.RealSize, realtyp, SFtypReal );  EnterTyp( "SIGNED16", Int, OPM.IntSize, inttyp, SFtypInt );
+	EnterTyp( "FLOAT32", Real, OPM.RealSize, realtyp, SFtypReal );  EnterTyp( "SIGNED16", Int, OPM.IntSize, inttyp, SFtypInt );
 	EnterTyp( "SIGNED32", LInt, OPM.LIntSize, linttyp, SFtypLInt );  EnterTyp( "SIGNED64", HInt, OPM.HIntSize, hinttyp, SFtypHInt );
 	EnterTyp( "LONGREAL", LReal, OPM.LRealSize, lrltyp, SFtypLReal );  EnterTyp( "SIGNED8", SInt, OPM.SIntSize, sinttyp, SFtypSInt );
 	EnterTyp( "BOOLEAN", Bool, OPM.BoolSize, booltyp, SFtypBool );

@@ -202,7 +202,7 @@ IMPORT
 	PROCEDURE SymWMod*(VAR R: Rider; CONST str: ARRAY OF CHAR);
 	BEGIN  WriteString(R.symmod, str) END SymWMod;
 
-	PROCEDURE SymWReal*(VAR R: Rider; r: REAL);
+	PROCEDURE SymWReal*(VAR R: Rider; r: FLOAT32);
 	BEGIN  R.sym.RawReal(r)  END SymWReal;
 
 	PROCEDURE SymWLReal*(VAR R: Rider; r: LONGREAL);

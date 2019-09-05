@@ -389,17 +389,17 @@ VAR
 	(**
 		Convert raw ADC value to temperature in centigrades
 	*)
-	PROCEDURE RawToTemperature*(raw: SIGNED32): REAL;
+	PROCEDURE RawToTemperature*(raw: SIGNED32): FLOAT32;
 	BEGIN
-		RETURN REAL(raw)*(1.0/(65536.0*0.00198421639)) - 273.15;
+		RETURN FLOAT32(raw)*(1.0/(65536.0*0.00198421639)) - 273.15;
 	END RawToTemperature;
 
 	(**
 		Convert raw ADC value to voltage in volts
 	*)
-	PROCEDURE RawToVoltage*(raw: SIGNED32): REAL;
+	PROCEDURE RawToVoltage*(raw: SIGNED32): FLOAT32;
 	BEGIN
-		RETURN REAL(raw) * (3.0/65536.0);
+		RETURN FLOAT32(raw) * (3.0/65536.0);
 	END RawToVoltage;
 
 BEGIN

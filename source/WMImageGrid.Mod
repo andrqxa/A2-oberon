@@ -68,7 +68,7 @@ TYPE GridWindow* = OBJECT(WMWindowManager.Window)
 		END SetCanvasGenerator;
 
 		PROCEDURE IsHit(x, y  : SIZE) : BOOLEAN;
-		VAR w, h : SIZE; fx, fy : REAL;
+		VAR w, h : SIZE; fx, fy : FLOAT32;
 		BEGIN
 			w := GetWidth(); h := GetHeight();
 			IF (w > 0) & (h > 0) & ((w # totalW) OR (h # totalH)) THEN
@@ -140,7 +140,7 @@ TYPE GridWindow* = OBJECT(WMWindowManager.Window)
 		END Invalidate;
 
 		PROCEDURE Handle*(VAR m : Message);
-		VAR w, h : SIZE; fx, fy : REAL;
+		VAR w, h : SIZE; fx, fy : FLOAT32;
 		BEGIN
 			w := GetWidth(); h := GetHeight();
 			IF (w > 0) & (h > 0) & ((w # totalW) OR (h # totalH)) & (m.msgType = Messages.MsgPointer) THEN

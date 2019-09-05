@@ -9,8 +9,8 @@ CONST
 	(* parameters for blocking matrix multiplication *)
 	L1BlockN = 5;   (* L1 block size -> nr of columns in a block that can be processed using L1 chache *)
 	L2BARatio = 1;
-	L0BlockKR = 4;   (* L0 block size -> nr of elements that can be processed at once for type REAL *)
-	L1MaxBlockKR = 336;   (* L1CacheSize/SIZEOF(REAL)/2/6*)
+	L0BlockKR = 4;   (* L0 block size -> nr of elements that can be processed at once for type FLOAT32 *)
+	L1MaxBlockKR = 336;   (* L1CacheSize/SIZEOF(FLOAT32)/2/6*)
 	L2BlockSize = 81920;
 	L0BlockKX = 2;   (* L0 block size -> nr of elements that can be processed at once for type LONGREAL *)
 	L1MaxBlockKX = 256;   (* > L1CacheSize/SIZEOF(LONGREAL)/2/6*)
@@ -18,7 +18,7 @@ CONST
 
 	(*
 	DefaultL2CacheSize = 81920;
-	L2SizeR = L2CacheSize DIV 8;  MaxBlockKR = 336; (* ca L1CacheSize/SIZEOF(REAL)/2/6*)   (* nr of elements that can be processed using L2 cache *)
+	L2SizeR = L2CacheSize DIV 8;  MaxBlockKR = 336; (* ca L1CacheSize/SIZEOF(FLOAT32)/2/6*)   (* nr of elements that can be processed using L2 cache *)
 	L2SizeX = L2CacheSize DIV 8;  MaxBlockKX = 256;  (* bit more than L1CacheSize/SIZEL(LONGREAL)/2/6*) (* nr of elements that can be processed using L2 cache *)
 *)
 
@@ -3790,14 +3790,14 @@ VAR
 		L2BlockK := L2BlockK + (-L2BlockK) MOD 16;
 
 		L2BlockN :=
-			L2BlockSize DIV SIZEOF( REAL ) DIV
+			L2BlockSize DIV SIZEOF( FLOAT32 ) DIV
 			(L2BlockK * (L2BARatio + 1));
 		IF L2BlockN > N THEN L2BlockN := N
 		ELSIF L2BlockN < 1 THEN L2BlockN := 1;
 		END;
 
 		L2BlockM :=
-			(L2BlockSize DIV SIZEOF( REAL ) - L2BlockN * L2BlockK) DIV
+			(L2BlockSize DIV SIZEOF( FLOAT32 ) - L2BlockN * L2BlockK) DIV
 						    L2BlockK;
 		(* Round up to next multiple of 5 *)
 		IF L2BlockM > M THEN L2BlockM := M
@@ -3956,7 +3956,7 @@ VAR
 	END L1Block5X;
 
 	PROCEDURE L1Block1R( adrA, adrB, adrC, K: SIGNED32 );   (* condition: K MOD 4 = 0 *)
-	VAR reg: ARRAY 8 OF ARRAY 4 OF REAL;
+	VAR reg: ARRAY 8 OF ARRAY 4 OF FLOAT32;
 
 		PROCEDURE null( i: SIGNED32 );
 		BEGIN
@@ -4015,7 +4015,7 @@ VAR
 	END L1Block1R;
 
 	PROCEDURE L1Block5R( adrA, adrB, adrC, IncC, K: SIGNED32 );   (* condition: K MOD 4 = 0 *)
-	VAR reg: ARRAY 8 OF ARRAY 4 OF REAL;
+	VAR reg: ARRAY 8 OF ARRAY 4 OF FLOAT32;
 
 		PROCEDURE null( i: SIGNED32 );
 		BEGIN
@@ -4083,7 +4083,7 @@ VAR
 
 	PROCEDURE DispCR( adrM: SIGNED32;
 									   inc, stride, M, N: SIGNED32 );
-	VAR i, j, adr: SIGNED32;  val: REAL;
+	VAR i, j, adr: SIGNED32;  val: FLOAT32;
 	BEGIN
 		FOR i := 0 TO M - 1 DO
 			adr := adrM + i * stride;
@@ -4282,7 +4282,7 @@ VAR
 	*)
 	VAR m, n, k, a1, b1, adrA, adrB, adrC: SIGNED32;
 		KAligned: SIGNED32;
-	CONST Size = SIZEOF( REAL );
+	CONST Size = SIZEOF( FLOAT32 );
 
 		PROCEDURE L2Block( matrixA, matrixB, matrixC, M, N, K: SIGNED32 );
 		(* M,N and K arbitrary ! *)
@@ -4677,7 +4677,7 @@ VAR
 	END CopyBR;
 
 (*
-	PROCEDURE FillMR( VAR A: ARRAY [ .. , .. ] OF REAL );
+	PROCEDURE FillMR( VAR A: ARRAY [ .. , .. ] OF FLOAT32 );
 	VAR i, j: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN( A, 0 ) - 1 DO
@@ -4688,7 +4688,7 @@ VAR
 		END;
 	END FillMR;
 
-	PROCEDURE DispMR( VAR A: ARRAY [ .. , .. ] OF REAL );
+	PROCEDURE DispMR( VAR A: ARRAY [ .. , .. ] OF FLOAT32 );
 	VAR i, j: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN( A, 0 ) - 1 DO
@@ -4796,7 +4796,7 @@ VAR
 										  IncA, StrideA, IncB, StrideB, IncC, StrideC: SIGNED32;
 										  add: BOOLEAN );
 	VAR lenA, lenB, adrA, adrB, adrC, m: SIGNED32;
-		M1, M2, i: SIGNED32;  val: REAL;  inc: SIGNED32;
+		M1, M2, i: SIGNED32;  val: FLOAT32;  inc: SIGNED32;
 		obj: POINTER TO ARRAY OF MultiplyObjectR;
 		t: SIGNED64;  cache: Cache;
 	BEGIN
@@ -4852,7 +4852,7 @@ VAR
 
 
 	PROCEDURE DoTestX( M, N, K, L2BlockM, L2BlockN, L2BlockK: SIGNED32;  check: BOOLEAN;  iter: SIGNED32 );
-	VAR  (* A, B, C, D: ARRAY [ .. , .. ] OF REAL;  *)
+	VAR  (* A, B, C, D: ARRAY [ .. , .. ] OF FLOAT32;  *)
 		A, B, C, D: ARRAY [ .. , .. ] OF LONGREAL;
 		p, q: ANY;  l1, l2: SIGNED32;  adrA, adrB, len, lenA, lenB: SIGNED32;
 		matrixA, matrixB, matrixC: SIGNED32;  i: SIGNED32;  val: LONGREAL;  atime, time: SIGNED32;
@@ -4903,12 +4903,12 @@ VAR
 	END DoTestX;
 
 	PROCEDURE DoTestR( M, N, K, L2BlockM, L2BlockN, L2BlockK: SIGNED32;  check: BOOLEAN;  iter: SIGNED32 );
-	VAR  (* A, B, C, D: ARRAY [ .. , .. ] OF REAL;  *)
-		A, B, C, D: ARRAY [ .. , .. ] OF REAL;
+	VAR  (* A, B, C, D: ARRAY [ .. , .. ] OF FLOAT32;  *)
+		A, B, C, D: ARRAY [ .. , .. ] OF FLOAT32;
 		p, q: ANY;  l1, l2: SIGNED32;  adrA, adrB, len, lenA, lenB: SIGNED32;
-		matrixA, matrixB, matrixC: SIGNED32;  i: SIGNED32;  val: REAL;  atime, time: SIGNED32;
+		matrixA, matrixB, matrixC: SIGNED32;  i: SIGNED32;  val: FLOAT32;  atime, time: SIGNED32;
 	BEGIN
-		KernelLog.String( "REAL" );  KernelLog.Ln;  KernelLog.String( "M=" );  KernelLog.Int( M, 0 );  KernelLog.Ln;
+		KernelLog.String( "FLOAT32" );  KernelLog.Ln;  KernelLog.String( "M=" );  KernelLog.Int( M, 0 );  KernelLog.Ln;
 		KernelLog.String( "N=" );  KernelLog.Int( N, 0 );  KernelLog.Ln;  KernelLog.String( "K=" );  KernelLog.Int( K, 0 );
 		KernelLog.Ln;  KernelLog.String( "L2BlockM=" );  KernelLog.Int( L2BlockM, 0 );  KernelLog.Ln;  KernelLog.String( "L2BlockN=" );
 		KernelLog.Int( L2BlockN, 0 );  KernelLog.Ln;  KernelLog.String( "L2BlockK=" );  KernelLog.Int( L2BlockK, 0 );
@@ -5234,22 +5234,22 @@ VAR
 		ASSERT( ColsA = RowsB );
 
 		(* allocate 128 bit = 16 byte aligned matrix *)
-		stride := Align( ColsA * SIZEOF( REAL ), 16 );
+		stride := Align( ColsA * SIZEOF( FLOAT32 ), 16 );
 
-		IF (IncA # SIZEOF( REAL )) OR (StrideA # stride) OR
+		IF (IncA # SIZEOF( FLOAT32 )) OR (StrideA # stride) OR
 			(matrixA MOD 16 # 0) THEN
 			cacheA := cachePool.Acquire( stride * RowsA );
 			CopyDataR( matrixA, cacheA.adr, IncA, StrideA,
-							   SIZEOF( REAL ), stride, RowsA, ColsA );   (* copy to array *)
+							   SIZEOF( FLOAT32 ), stride, RowsA, ColsA );   (* copy to array *)
 			matrixA := cacheA.adr;
 		ELSE cacheA := NIL;
 		END;
 
-		IF (StrideB # SIZEOF( REAL )) OR (IncB # stride) OR
+		IF (StrideB # SIZEOF( FLOAT32 )) OR (IncB # stride) OR
 			(matrixB MOD 16 # 0) THEN
 			cacheB := cachePool.Acquire( stride * ColsB );
 			CopyDataR( matrixB, cacheB.adr, StrideB, IncB,
-							   SIZEOF( REAL ), stride, ColsB, RowsB );   (* copy to transposed array *)
+							   SIZEOF( FLOAT32 ), stride, ColsB, RowsB );   (* copy to transposed array *)
 			matrixB := cacheB.adr;
 		ELSE cacheB := NIL;
 		END;
@@ -5337,39 +5337,39 @@ VAR
 
 	PROCEDURE MatMulARARSSEStride( matrixA, matrixB, matrixC, IncA, StrideA, IncB, StrideB, IncC, StrideC, RowsA, ColsA, RowsB, ColsB: SIGNED32;
 															    add: BOOLEAN ): BOOLEAN;
-	VAR sum: REAL;  CbFrom, i, j, k: SIGNED32;  valA, valB: REAL;
+	VAR sum: FLOAT32;  CbFrom, i, j, k: SIGNED32;  valA, valB: FLOAT32;
 		adrA, adrB, adrC: SIGNED32;
 		cacheA, cacheB, cacheC: Cache;
 		matrixCO, StrideCO, IncCO: SIGNED32;  t: SIGNED64;
 		(*VAR fromA, toA: SIGNED32;  *)
 	BEGIN
-		IF (IncA # SIZEOF( REAL )) THEN
+		IF (IncA # SIZEOF( FLOAT32 )) THEN
 			cacheA :=
-				cachePool.Acquire( RowsA * ColsA * SIZEOF( REAL ) );
+				cachePool.Acquire( RowsA * ColsA * SIZEOF( FLOAT32 ) );
 			CopyDataR( matrixA, cacheA.adr, IncA, StrideA,
-							   SIZEOF( REAL ), SIZEOF( REAL ) * ColsA, RowsA,
+							   SIZEOF( FLOAT32 ), SIZEOF( FLOAT32 ) * ColsA, RowsA,
 							   ColsA );
-			matrixA := cacheA.adr;  IncA := SIZEOF( REAL );
-			StrideA := SIZEOF( REAL ) * ColsA;
+			matrixA := cacheA.adr;  IncA := SIZEOF( FLOAT32 );
+			StrideA := SIZEOF( FLOAT32 ) * ColsA;
 		END;
-		IF (IncB # SIZEOF( REAL )) THEN
+		IF (IncB # SIZEOF( FLOAT32 )) THEN
 			cacheB :=
-				cachePool.Acquire( RowsB * ColsB * SIZEOF( REAL ) );
+				cachePool.Acquire( RowsB * ColsB * SIZEOF( FLOAT32 ) );
 			CopyDataR( matrixB, cacheB.adr, IncB, StrideB,
-							   SIZEOF( REAL ), SIZEOF( REAL ) * ColsB, RowsB,
+							   SIZEOF( FLOAT32 ), SIZEOF( FLOAT32 ) * ColsB, RowsB,
 							   ColsB );
-			matrixB := cacheB.adr;  IncB := SIZEOF( REAL );
-			StrideB := SIZEOF( REAL ) * ColsB;
+			matrixB := cacheB.adr;  IncB := SIZEOF( FLOAT32 );
+			StrideB := SIZEOF( FLOAT32 ) * ColsB;
 		END;
-		IF (IncC # SIZEOF( REAL )) THEN
+		IF (IncC # SIZEOF( FLOAT32 )) THEN
 			cacheC :=
-				cachePool.Acquire( RowsA * ColsB * SIZEOF( REAL ) );
+				cachePool.Acquire( RowsA * ColsB * SIZEOF( FLOAT32 ) );
 			CopyDataR( matrixC, cacheC.adr, IncC, StrideC,
-							   SIZEOF( REAL ), SIZEOF( REAL ) * ColsB, RowsA,
+							   SIZEOF( FLOAT32 ), SIZEOF( FLOAT32 ) * ColsB, RowsA,
 							   ColsB );
 			matrixCO := matrixC;  StrideCO := StrideC;
 			IncCO := IncC;  matrixC := cacheC.adr;
-			IncC := SIZEOF( REAL );  StrideC := SIZEOF( REAL ) * ColsB;
+			IncC := SIZEOF( FLOAT32 );  StrideC := SIZEOF( FLOAT32 ) * ColsB;
 		END;
 
 		Tic( t );
@@ -5542,7 +5542,7 @@ VAR
 		C is M x N matrix; M=rows(C); N=cols(C);
 	*)
 	VAR adrA, adrB, innerB, adrC, i, j, k: SIGNED32;
-		val1, val2, sum: REAL;  t: SIGNED64;
+		val1, val2, sum: FLOAT32;  t: SIGNED64;
 	BEGIN
 		Tic( t );
 		FOR i := 1 TO M DO

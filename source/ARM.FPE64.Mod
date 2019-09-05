@@ -530,7 +530,7 @@ MODULE FPE64;
 		RETURN i;
 	END Single;
 
-	PROCEDURE Double*(x: REAL; VAR z: Float64);
+	PROCEDURE Double*(x: FLOAT32; VAR z: Float64);
 		VAR i, m, xe: SIGNED32;
 	BEGIN
 		SYSTEM.GET(ADDRESSOF(x), i);

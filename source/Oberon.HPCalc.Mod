@@ -70,7 +70,7 @@ MODULE HPCalc IN Oberon;	(** portable *)	(** prk  **)
 		o A Swap operation which swaps the TOS and TOS-1 (proposed by pjm)
 		o When clicking on Integer it displays "switch to base mode".  This should be "switched to integer mode". (found by PM)
 		o Execute Reset and then any operation which takes a parameter.  Garbage is displayed at the top of the stack. (found by PM)
-		o use LONGREAL instead of REAL, everywhere. (PM proposal)
+		o use LONGREAL instead of FLOAT32, everywhere. (PM proposal)
 		o small improvement in the OutS/OutR/OutI procedures
 		o improved parsing: in hex view mode, the input is interpreted as hex input.
 		o copy of partial results now supported

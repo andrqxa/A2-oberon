@@ -50,7 +50,7 @@ TYPE
 		END CreateForm;
 
 		PROCEDURE CreateContent;
-		VAR framerate : REAL; hours, minutes, seconds : SIGNED32;
+		VAR framerate : FLOAT32; hours, minutes, seconds : SIGNED32;
 		BEGIN
 			NEW(text); NEW(tw, text);
 			tw.SetFontStyle(StyleBold); tw.String("Content"); tw.Char(Tab); tw.SetFontStyle(StyleRegular);

@@ -467,7 +467,7 @@ VAR
 	PROCEDURE Show*;
 	VAR l: antsCommands.tScanList;  from, to, by: LONGREAL;  f: antsFunctions.Function;  obj: vyBase.Object;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name=OBJ from=REAL to=REAL by=REAL" );
+		l := antsCommands.ScanFromPar( "name=OBJ from=FLOAT32 to=FLOAT32 by=FLOAT32" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "from", from ) &
 		    antsCommands.ExpectRealFromKeyword( l, "to", to ) & antsCommands.ExpectRealFromKeyword( l, "by", by ) THEN
 			f := obj( antsFunctions.Function );  DoShow( f, from, 0, to, 1, by )

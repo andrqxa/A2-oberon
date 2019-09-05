@@ -1104,7 +1104,7 @@ BEGIN
 			Texts.WriteInt(W, i + ASH(ORD(ch) MOD 64 - ORD(ch) DIV 64 * 64, s), 0);
 			Texts.WriteString(W, " ("); Texts.WriteInt(W, j, 0);
 			IF j > 1 THEN Texts.WriteString(W, " Bytes)") ELSE Texts.WriteString(W, " Byte)") END
-		ELSIF S.s = "REAL" THEN
+		ELSIF S.s = "FLOAT32" THEN
 			Texts.WriteReal(W, Reals.Real(ReadLInt()), 16)
 		ELSIF S.s = "LONGREAL" THEN
 			i := ReadLInt();
@@ -1246,7 +1246,7 @@ BEGIN
 			AddItem(M.R, "SIGNED16 (LSB)");
 			AddItem(M.R, "SIGNED8");
 			AddItem(M.R, "NUM");
-			AddItem(M.R, "REAL");
+			AddItem(M.R, "FLOAT32");
 			AddItem(M.R, "LONGREAL");
 			AddItem(M.R, "SET");
 			AddItem(M.R, "-------------");

@@ -39,7 +39,7 @@ MODULE JPEG2000DecoderUtil;
 		LongInt4DArrayPtr* = POINTER TO ARRAY OF LongInt3DArrayPtr;
 
 		ByteArrayPtr* = POINTER TO ARRAY OF CHAR;
-		RealArrayPtr* = POINTER TO ARRAY OF REAL;
+		RealArrayPtr* = POINTER TO ARRAY OF FLOAT32;
 		SetArrayPtr* = POINTER TO ARRAY OF SET;
 
 		ByteArrayReader* = OBJECT

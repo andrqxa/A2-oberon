@@ -68,7 +68,7 @@ TYPE
 	END Int;
 
 	Real = OBJECT(PDFObject)
-	VAR val : REAL;
+	VAR val : FLOAT32;
 		PROCEDURE Write(w : Streams.Writer);
 		BEGIN
 			WriteReal(w, val);
@@ -392,7 +392,7 @@ TYPE
 		END Init;
 
 		PROCEDURE SetPaper(paper : SIGNED32; landscape : BOOLEAN);
-		VAR t, w, h : REAL;
+		VAR t, w, h : FLOAT32;
 		BEGIN
 			CASE paper OF
 				|PageA0 : w := 841; h := 1189;
@@ -409,7 +409,7 @@ TYPE
 			SetExtents(0, 0, w * 72 / 25.4, h * 72 / 25.4)
 		END SetPaper;
 
-		PROCEDURE SetExtents(x, y, w, h : REAL);
+		PROCEDURE SetExtents(x, y, w, h : FLOAT32);
 		VAR r : PDFObject;
 		BEGIN
 			r := mediaBox.Get(0); r(Real).val := x;
@@ -418,7 +418,7 @@ TYPE
 			r := mediaBox.Get(3); r(Real).val := h;
 		END SetExtents;
 
-		PROCEDURE GetExtents(VAR x, y, w, h : REAL);
+		PROCEDURE GetExtents(VAR x, y, w, h : FLOAT32);
 		VAR r : PDFObject;
 		BEGIN
 			r := mediaBox.Get(0); x := r(Real).val;
@@ -540,7 +540,7 @@ TYPE
 			RETURN i
 		END NewInt;
 
-		PROCEDURE NewReal(val : REAL) : Real;
+		PROCEDURE NewReal(val : FLOAT32) : Real;
 		VAR i : Real;
 		BEGIN
 			NEW(i, SELF); i.val := val;
@@ -662,9 +662,9 @@ TYPE
 		w : Streams.Writer;
 		font : Font;
 		next : PDFCanvas;
-		prl, prt, prr, prb, scale : REAL;
+		prl, prt, prr, prb, scale : FLOAT32;
 		colrg, colRG: WMGraphics.Color;
-		fSize : REAL;
+		fSize : FLOAT32;
 		xfont : Font;
 
 		PROCEDURE &Init*(pc : PDFCreator; pageFormat : SIGNED32; landscape : BOOLEAN; unit : SIGNED32);
@@ -691,14 +691,14 @@ TYPE
 			WriteReal(w, 1/72); w.String(" w"); w.Ln;
 		END Init;
 
-		PROCEDURE Transform(x, y : SIZE; VAR rx, ry : REAL);
+		PROCEDURE Transform(x, y : SIZE; VAR rx, ry : FLOAT32);
 		BEGIN
 			rx := x * scale;
 			ry := prb - y * scale
 		END Transform;
 
 		PROCEDURE WriteTrafoCoord(x, y : SIZE);
-		VAR rx, ry : REAL;
+		VAR rx, ry : FLOAT32;
 		BEGIN
 			Transform(x, y, rx, ry);
 			WriteReal(w, rx); w.Char(" "); WriteReal(w, ry)
@@ -733,7 +733,7 @@ TYPE
 		END SetColRG;
 
 		PROCEDURE Fill*(r : WMRectangles.Rectangle; col : WMGraphics.Color; mode : SIGNED32);
-		VAR ax, ay, bx ,by : REAL;
+		VAR ax, ay, bx ,by : FLOAT32;
 		BEGIN
 			SetColrg(col);
 			WriteTrafoCoord(r.l, r.t); w.Char(" ");
@@ -756,7 +756,7 @@ TYPE
 		END GetPDFFont;
 
 		(*ALEX 2005.10.26 changed signature*)
-		PROCEDURE PDFSetFont*(name : ARRAY OF CHAR; size : SIGNED32(*REAL*); style : SET);
+		PROCEDURE PDFSetFont*(name : ARRAY OF CHAR; size : SIGNED32(*FLOAT32*); style : SET);
 		VAR t : SIGNED32;
 		BEGIN
 			IF name = "Oberon" THEN t := FontHelvetica
@@ -940,7 +940,7 @@ TYPE
 			END;
 		END DrawStringSingleLine;
 
-		PROCEDURE PDFSetLineWidth*(width : REAL);
+		PROCEDURE PDFSetLineWidth*(width : FLOAT32);
 		BEGIN
 			WriteReal(w, width * scale);
 			w.String(" w"); w.Ln;
@@ -1043,7 +1043,7 @@ TYPE
 
 	END PDFCreator;
 
-PROCEDURE WriteReal(w : Streams.Writer; val : REAL);
+PROCEDURE WriteReal(w : Streams.Writer; val : FLOAT32);
 VAR s : ARRAY 10 OF CHAR;
 BEGIN
 	Strings.FloatToStr(val, 0, 5, 0, s);

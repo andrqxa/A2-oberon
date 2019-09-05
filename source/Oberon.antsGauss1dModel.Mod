@@ -173,7 +173,7 @@ TYPE
 	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;
 		a: ARRAY 6 OF LONGREAL;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name=NAME f1=REAL f2=REAL v1=REAL v2=REAL add1=REAL add2=REAL" );
+		l := antsCommands.ScanFromPar( "name=NAME f1=FLOAT32 f2=FLOAT32 v1=FLOAT32 v2=FLOAT32 add1=FLOAT32 add2=FLOAT32" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectRealFromKeyword( l, "f1", a[0] ) &
 		    antsCommands.ExpectRealFromKeyword( l, "f2", a[1] ) & antsCommands.ExpectRealFromKeyword( l, "v1", a[2] ) &
 		    antsCommands.ExpectRealFromKeyword( l, "v2", a[3] ) & antsCommands.ExpectRealFromKeyword( l, "add1", a[4] ) &

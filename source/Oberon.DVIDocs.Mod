@@ -83,7 +83,7 @@ CONST
       M: Objects.CopyMsg; (* message to create new viewer *)
       nv: DVIViewers.Frame; (* the new doc's dvi-viewer *)
       num: Objects.Object;
-      i: SIGNED32; r: REAL;
+      i: SIGNED32; r: FLOAT32;
    BEGIN
       curr:= Desktops.CurDoc(Gadgets.context);
       v:= curr.dsc(DVIViewers.Frame);

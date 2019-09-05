@@ -81,7 +81,7 @@ VAR
 	END LGetCol;
 
 	PROCEDURE rgbp( p: Palette;  first, last: SIGNED16 );
-	VAR r1, r2, g1, g2, b1, b2: REAL;
+	VAR r1, r2, g1, g2, b1, b2: FLOAT32;
 	BEGIN
 		Colors.GetRGB( p.col[first], r1, g1, b1 );  Colors.GetRGB( p.col[last], r2, g2, b2 );
 		vyColorPalettes.RGBPath( p, first, last, r1, g1, b1, r2, g2, b2 )
@@ -101,7 +101,7 @@ VAR
 	END Prompt;
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR index, index2: SIGNED16;  dx, dy: SIGNED16;  r, g, b: REAL;  dcol: SIGNED32;  r1, g1, b1: REAL;  dcol1: SIGNED32;
+	VAR index, index2: SIGNED16;  dx, dy: SIGNED16;  r, g, b: FLOAT32;  dcol: SIGNED32;  r1, g1, b1: FLOAT32;  dcol1: SIGNED32;
 	BEGIN
 		IF LGetCol( layer, event.x, event.y, index ) THEN
 			vyTracking.FramedString( event.x + 10, event.y, "Syntax10.Scn.Fnt", "exchange with ?", dx, dy );
@@ -298,7 +298,7 @@ VAR
 	END Path2;
 
 	PROCEDURE LPath*;
-	VAR r1, g1, b1, r2, g2, b2: REAL;  keys: SET;  x, y, dx, dy: SIGNED16;  from, to: SIGNED32;  msg: vyColorPalettes.GetColMsg;  sc: Texts.Scanner;
+	VAR r1, g1, b1, r2, g2, b2: FLOAT32;  keys: SET;  x, y, dx, dy: SIGNED16;  from, to: SIGNED32;  msg: vyColorPalettes.GetColMsg;  sc: Texts.Scanner;
 		obj: Objects.Object;
 	BEGIN
 

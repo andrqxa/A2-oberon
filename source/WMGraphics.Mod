@@ -28,7 +28,7 @@ CONST
 	Gold* = SIGNED32(0FFD700FFH);
 
 TYPE
-	Real* = REAL;
+	Real* = FLOAT32;
 	Char32 = SIGNED32;
 	Point2d* = RECORD x*, y* : SIZE END;
 	Image* = OBJECT(Raster.Image)

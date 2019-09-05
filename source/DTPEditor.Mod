@@ -837,7 +837,7 @@ TYPE
 			page : DTPData.PageObject; mpage: DTPData.MasterPageObject;
 			frame : DTPData.FrameObject;
 			tempReal: LONGREAL; tempInt: SIGNED32; res: WORD; tempBool: BOOLEAN;
-			mt, mb, ml, mr: REAL;
+			mt, mb, ml, mr: FLOAT32;
 		BEGIN
 			NEW(built, 0, 0, 0, 0, 0, 0, FALSE);
 			(* build styleArray *)
@@ -1270,12 +1270,12 @@ TYPE
 
 		PROCEDURE ExportHandler(sender, data: ANY);
 		VAR expFileName: ARRAY 256 OF CHAR;
-			pixelPerMM : REAL;
+			pixelPerMM : FLOAT32;
 			renderCanvas: WMGraphics.BufferCanvas;
 			renderImg: Raster.Image;
 			res: WORD;
 			oldDocOriginX, oldDocOriginY : SIGNED32;
-			oldZoomFactor: REAL;
+			oldZoomFactor: FLOAT32;
 			oldZoomMode: SIGNED32;
 			tempString: ARRAY 256 OF CHAR;
 			tempReal: LONGREAL;
@@ -1344,7 +1344,7 @@ TYPE
 			END;
 		END CreateNew;
 
-		PROCEDURE CreateDoc(w, h, mt, mb, ml, mr : REAL; fp : BOOLEAN);
+		PROCEDURE CreateDoc(w, h, mt, mb, ml, mr : FLOAT32; fp : BOOLEAN);
 		VAR document : DTPData.Document;
 		BEGIN
 
@@ -2425,7 +2425,7 @@ END OpenEmptyA5landscape;
 
 PROCEDURE OpenEmpty*(context : Commands.Context);
 VAR instance : Window;
-	w, h, mt, mb, ml, mr : REAL; f : SIGNED32; fp : BOOLEAN;
+	w, h, mt, mb, ml, mr : FLOAT32; f : SIGNED32; fp : BOOLEAN;
 	dstring : ARRAY 16 OF CHAR;
 	lreal : LONGREAL;
 BEGIN

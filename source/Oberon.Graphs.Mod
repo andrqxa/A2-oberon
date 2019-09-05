@@ -14,8 +14,8 @@ TYPE
 	GraphDesc* = RECORD (Gadgets.FrameDesc)
 		col*: SIGNED16;
 		beg*, end*: SIGNED16;
-		x*: ARRAY BufSize OF REAL;
-		y*: ARRAY  BufSize OF REAL
+		x*: ARRAY BufSize OF FLOAT32;
+		y*: ARRAY  BufSize OF FLOAT32
 	END;
 
 PROCEDURE GraphAttr(F: Graph; VAR M: Objects.AttrMsg);

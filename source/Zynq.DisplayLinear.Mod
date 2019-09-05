@@ -132,7 +132,7 @@ VAR
 	display: Display;
 	vout: Video.Controller;
 
-	pixelClock: REAL; (* pixel clock in Hz *)
+	pixelClock: FLOAT32; (* pixel clock in Hz *)
 
 	buf: POINTER TO ARRAY OF CHAR;
 	bufAddr: ADDRESS;
@@ -186,7 +186,7 @@ VAR
 			Setup display clocks
 		*)
 		(* pixel clock *)
-		pixelClock := REAL(freq)/PlClkDiv1;
+		pixelClock := FLOAT32(freq)/PlClkDiv1;
 		IF PsConfig.SetPlClock(1,PsConfig.IoPll,PlClkDiv1,1,res) THEN
 			Trace.String("FPGA clock 1 frequency has been changed to "); Trace.Int(PsConfig.GetPlClockFrequency(1,res),0); Trace.String(" Hz"); Trace.Ln;
 		ELSE Trace.String("Error while setting FPGA clock 1 frequency, res="); Trace.Int(res,0); Trace.Ln;

@@ -13,7 +13,7 @@ TYPE
 			c : WMGraphics.BufferCanvas;
 			state : WMGraphics.CanvasState;
 
-			fx, fy, inffx, inffy, factor, intfactor : REAL;
+			fx, fy, inffx, inffy, factor, intfactor : FLOAT32;
 
 		PROCEDURE &New*(manager : WM.WindowManager; w, h : SIGNED32);
 		BEGIN
@@ -40,10 +40,10 @@ TYPE
 			Update(WMRectangles.MakeRect(ENTIER(range.l)-1, ENTIER(range.t)-1, ENTIER(range.r) + 1, ENTIER(range.b) + 1), top)
 		END Refresh;
 
-		PROCEDURE SetRange*(x, y, w, h : REAL; showTransition : BOOLEAN);
+		PROCEDURE SetRange*(x, y, w, h : FLOAT32; showTransition : BOOLEAN);
 
-			PROCEDURE Set(x, y, w, h : REAL);
-			VAR tf : REAL;
+			PROCEDURE Set(x, y, w, h : FLOAT32);
+			VAR tf : FLOAT32;
 			BEGIN
 				range.l := x;
 				range.t := y;

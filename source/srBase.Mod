@@ -19,7 +19,7 @@ CONST
 	LLRAYY*=H DIV 2;
 
 TYPE Name* = ARRAY 32 OF CHAR;
-TYPE SREAL*=REAL;
+TYPE SREAL*=FLOAT32;
 TYPE PT*= RECORD
 	x*,y*,z*: SREAL
 END;
@@ -33,7 +33,7 @@ TYPE BOX*=RECORD
 END;
 
 TYPE Aperture* = RECORD
-	width*, height*: REAL
+	width*, height*: FLOAT32
 END;
 
 TYPE COLOR*=RECORD
@@ -161,7 +161,7 @@ END Voxel;
 
 VAR
 	voxelist: ARRAY 100 OF V;
-	fog*:REAL;
+	fog*:FLOAT32;
 	rlimit*: SIGNED16;
 	iterlimit*: SIGNED32;
 	frame*: SIGNED32;

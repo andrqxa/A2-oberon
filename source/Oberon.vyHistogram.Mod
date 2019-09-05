@@ -372,7 +372,7 @@ VAR
 	END HandleAttributes;
 
 	PROCEDURE AdjustCoord( pict: vyPort.Picture;  obj: tLayer );
-	VAR minX, maxX: REAL;  nans: SIGNED32;
+	VAR minX, maxX: FLOAT32;  nans: SIGNED32;
 	BEGIN
 		IF pict # NIL THEN
 			IF obj.x # NIL THEN
@@ -618,7 +618,7 @@ NEW (newlayer); Init (newlayer, data);  Objects.NewObj := newlayer END New;*)
 	END DoSet;
 
 	PROCEDURE SetBounds*;
-	VAR sc: vyParser.Scanner;  left, right: REAL;  h: vyPort.tLayer;  hist: tLayer;
+	VAR sc: vyParser.Scanner;  left, right: FLOAT32;  h: vyPort.tLayer;  hist: tLayer;
 	BEGIN
 		NEW( sc );  vyParser.OpenParScanner( sc );
 		IF vyParser.ExpectReal( sc, left ) & vyParser.ExpectReal( sc, right ) THEN
@@ -628,7 +628,7 @@ NEW (newlayer); Init (newlayer, data);  Objects.NewObj := newlayer END New;*)
 	END SetBounds;
 
 	PROCEDURE SetOffsetWidth*;
-	VAR sc: vyParser.Scanner;  offset, width: REAL;  h: vyPort.tLayer;  hist: tLayer;
+	VAR sc: vyParser.Scanner;  offset, width: FLOAT32;  h: vyPort.tLayer;  hist: tLayer;
 	BEGIN
 		NEW( sc );  vyParser.OpenParScanner( sc );
 		IF vyParser.ExpectReal( sc, offset ) & vyParser.ExpectReal( sc, width ) THEN
@@ -639,7 +639,7 @@ NEW (newlayer); Init (newlayer, data);  Objects.NewObj := newlayer END New;*)
 	END SetOffsetWidth;
 
 	PROCEDURE SetBoundsAndCells*;
-	VAR sc: vyParser.Scanner;  left, right: REAL;  cells: SIGNED32;  h: vyPort.tLayer;  hist: tLayer;
+	VAR sc: vyParser.Scanner;  left, right: FLOAT32;  cells: SIGNED32;  h: vyPort.tLayer;  hist: tLayer;
 	BEGIN
 		NEW( sc );  vyParser.OpenParScanner( sc );
 		IF vyParser.ExpectReal( sc, left ) & vyParser.ExpectReal( sc, right ) & vyParser.ExpectNumber( sc, cells ) THEN

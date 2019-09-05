@@ -141,7 +141,7 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 		END
 	END ThisFiller;
 
-	PROCEDURE CreateLine (x0, y0, x1, y1: REAL; col, width: SIGNED16): Leonardo.Shape;
+	PROCEDURE CreateLine (x0, y0, x1, y1: FLOAT32; col, width: SIGNED16): Leonardo.Shape;
 		VAR p, q: LeoPaths.Point; line: LeoPaths.Segment;
 	BEGIN
 		NEW(p); LeoPaths.InitPoint(p, x0, y0);
@@ -151,14 +151,14 @@ MODULE LeoDraw IN Oberon;	(** eos  **)
 		RETURN line
 	END CreateLine;
 
-	PROCEDURE CreateEllipse (xc, yc, xr, yr: REAL; col, width: SIGNED16): Leonardo.Shape;
+	PROCEDURE CreateEllipse (xc, yc, xr, yr: FLOAT32; col, width: SIGNED16): Leonardo.Shape;
 		VAR e: LeoBasic.Ellipse;
 	BEGIN
 		NEW(e); LeoBasic.InitEllipse(e, xc, yc, xr, yr, ThisStroker(col, width));
 		RETURN e
 	END CreateEllipse;
 
-	PROCEDURE CreateRectangle (x0, y0, x1, y1: REAL; col, width: SIGNED16; fill: LeoPens.Pen): Leonardo.Shape;
+	PROCEDURE CreateRectangle (x0, y0, x1, y1: FLOAT32; col, width: SIGNED16; fill: LeoPens.Pen): Leonardo.Shape;
 		VAR pen: LeoPens.Pen; forker: LeoPens.Forker; rect: LeoBasic.Rectangle;
 	BEGIN
 		IF fill = NIL THEN

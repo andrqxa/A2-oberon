@@ -43,7 +43,7 @@ This module exports a low-level integer type with 64-bit length, i.e., a SIGNED6
 	The PACO compiler has a built-in type SIGNED64, but in its current state, PACO does not have predefined operators or an arithmetic that goes along with it. For this reason, we ignore the built-in compiler type SIGNED64 and instead, define our own (viz., NbrInt64.Integer) along with the necessary procedures needed to handle arithmetic, comparison operations, etc.   
 
 1.5 NbrRe32.Mod
-This module exports a low-level real type with 32-bit length, i.e., a REAL. 
+This module exports a low-level real type with 32-bit length, i.e., a FLOAT32. 
 
 1.6 NbrRe64.Mod
 This module exports a low-level real type with 64-bit length, i.e., a LONGREAL.  Notice the similarity in its structure to that of NbrRe32. 

@@ -109,7 +109,7 @@ TYPE
 
 		(** The stats value will be computed as UpdateCounter() * scale								*)
 		(** Default: 0.0 (is interpreted as 1.0 -> don't scale) 											*)
-		scale* : REAL;
+		scale* : FLOAT32;
 
 		(** Minimum number of digits, number of fraction digits										*)
 		(** Defaults: minDigits = 0; fraction = 0;														*)
@@ -243,7 +243,7 @@ TYPE
 		END Finalize;
 
 		PROCEDURE Update;
-		VAR i, dim: SIZE; dTime : SIGNED32; sum: REAL;
+		VAR i, dim: SIZE; dTime : SIGNED32; sum: FLOAT32;
 		BEGIN
 			dTime := Kernel.Elapsed(milliTimer);
 			Kernel.SetTimer(milliTimer, 0);
@@ -370,7 +370,7 @@ TYPE
 TYPE
 
 	(* Notifies listener about current CPU time usage of updater thread and changes of the plugin list *)
-	Notifier = PROCEDURE {DELEGATE} (events : SET; perf : REAL);
+	Notifier = PROCEDURE {DELEGATE} (events : SET; perf : FLOAT32);
 
 	Notifiers = POINTER TO RECORD
 		events : SET;
@@ -396,7 +396,7 @@ TYPE
 
 	 	(* Fields related to CPU time consumption calculation of the Updater obj *)
 	 	lastCycles, lastTimestamp : SIGNED64;
-	 	sample : SIGNED32; sampleBuffer : POINTER TO ARRAY OF REAL;
+	 	sample : SIGNED32; sampleBuffer : POINTER TO ARRAY OF FLOAT32;
 	 	me : Objects.Process; (* Process associated to this active object *)
 
 	 	milliTimer : Kernel.MilliTimer;
@@ -426,7 +426,7 @@ TYPE
 			END;
 		END RemoveListener;
 
-		PROCEDURE NotifyListeners*(events : SET; perf : REAL);
+		PROCEDURE NotifyListeners*(events : SET; perf : FLOAT32);
 		VAR n : Notifiers;
 		BEGIN
 			n := notifiers.next;
@@ -672,7 +672,7 @@ TYPE
 
 		(* Calculates % CPU time consumed by this process. Updates field perf *)
 		PROCEDURE UpdatePerf;
-		VAR timestamp, cycles : SIGNED64; cpuCycles : Objects.CpuCyclesArray; i : SIGNED32; value, sum : REAL;
+		VAR timestamp, cycles : SIGNED64; cpuCycles : Objects.CpuCyclesArray; i : SIGNED32; value, sum : FLOAT32;
 		BEGIN {EXCLUSIVE}
 			timestamp := Machine.GetTimer();
 			IF lastTimestamp # 0 THEN

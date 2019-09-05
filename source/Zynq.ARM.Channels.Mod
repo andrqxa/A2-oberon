@@ -553,14 +553,14 @@ VAR
 	OPERATOR ">>?"*(port: Input; VAR x: SET32): BOOLEAN; BEGIN RETURN ReceiveNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END ">>?";
 	OPERATOR "<<?"*(VAR x: SET32; port: Input): BOOLEAN; BEGIN RETURN ReceiveNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END "<<?";
 
-	OPERATOR "<<"*(port: Output; x: REAL); BEGIN Send(port,SYSTEM.VAL(SIGNED32,x)); END "<<";
-	OPERATOR ">>"*(x: REAL; port: Output); BEGIN Send(port,SYSTEM.VAL(SIGNED32,x)); END ">>";
-	OPERATOR "<<?"*(port: Output; x: REAL): BOOLEAN; BEGIN RETURN SendNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END "<<?";
-	OPERATOR ">>?"*(x: REAL; port: Output): BOOLEAN; BEGIN RETURN SendNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END ">>?";
-	OPERATOR ">>"*(port: Input; VAR x: REAL); BEGIN Receive(port,SYSTEM.VAL(SIGNED32,x)); END ">>";
-	OPERATOR "<<"*(VAR x: REAL; port: Input); BEGIN Receive(port,SYSTEM.VAL(SIGNED32,x)); END "<<";
-	OPERATOR ">>?"*(port: Input; VAR x: REAL): BOOLEAN; BEGIN RETURN ReceiveNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END ">>?";
-	OPERATOR "<<?"*(VAR x: REAL; port: Input): BOOLEAN; BEGIN RETURN ReceiveNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END "<<?";
+	OPERATOR "<<"*(port: Output; x: FLOAT32); BEGIN Send(port,SYSTEM.VAL(SIGNED32,x)); END "<<";
+	OPERATOR ">>"*(x: FLOAT32; port: Output); BEGIN Send(port,SYSTEM.VAL(SIGNED32,x)); END ">>";
+	OPERATOR "<<?"*(port: Output; x: FLOAT32): BOOLEAN; BEGIN RETURN SendNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END "<<?";
+	OPERATOR ">>?"*(x: FLOAT32; port: Output): BOOLEAN; BEGIN RETURN SendNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END ">>?";
+	OPERATOR ">>"*(port: Input; VAR x: FLOAT32); BEGIN Receive(port,SYSTEM.VAL(SIGNED32,x)); END ">>";
+	OPERATOR "<<"*(VAR x: FLOAT32; port: Input); BEGIN Receive(port,SYSTEM.VAL(SIGNED32,x)); END "<<";
+	OPERATOR ">>?"*(port: Input; VAR x: FLOAT32): BOOLEAN; BEGIN RETURN ReceiveNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END ">>?";
+	OPERATOR "<<?"*(VAR x: FLOAT32; port: Input): BOOLEAN; BEGIN RETURN ReceiveNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END "<<?";
 
 END Channels.
 

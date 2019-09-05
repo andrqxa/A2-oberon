@@ -102,17 +102,17 @@ BEGIN
 	Texts.WriteHex(w, x)
 END IntHex;
 
-PROCEDURE Real*(x: REAL;  n: SIGNED32);
+PROCEDURE Real*(x: FLOAT32;  n: SIGNED32);
 BEGIN
 	Texts.WriteReal(w, x, n)
 END Real;
 
-PROCEDURE RealFix*(x: REAL;  n, f, E: SIGNED32);
+PROCEDURE RealFix*(x: FLOAT32;  n, f, E: SIGNED32);
 BEGIN
 	Texts.WriteRealFix(w, x, n, f, E)
 END RealFix;
 
-PROCEDURE RealHex*(x: REAL);
+PROCEDURE RealHex*(x: FLOAT32);
 BEGIN
 	Texts.WriteRealHex(w, x)
 END RealHex;

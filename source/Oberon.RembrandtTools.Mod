@@ -26,7 +26,7 @@ CONST
 VAR
 	width, sprayspeed, smearspeed, smx, smy, cdx, cdy: SIGNED16; symmetric: SET;
 	filled, double: BOOLEAN;
-	sintable: ARRAY 91 OF REAL;
+	sintable: ARRAY 91 OF FLOAT32;
 	oldtrackMM: Rembrandt.TrackMMProc;
 	oldcursor: Oberon.Marker;
 	oldval: SIGNED16; oldobj: Objects.Object;
@@ -564,7 +564,7 @@ VAR keysum: SET; ox, oy, px, py, dphi, phi: SIGNED16; Q: D3.Mask;
 
 	PROCEDURE Rotation(S: Pictures.Picture; phi: SIGNED16): Pictures.Picture;
 	VAR D: Pictures.Picture; px, py: SIGNED16;
-			dx, dy, tan, sin, maxx, maxy, h1, h2: REAL;
+			dx, dy, tan, sin, maxx, maxy, h1, h2: FLOAT32;
 	BEGIN
 	IF (phi>0) & (phi<91) THEN
 		sin:= sintable[phi];
@@ -1150,7 +1150,7 @@ END FlipV;
 PROCEDURE MakeIcon*;
 VAR P, S, D: Pictures.Picture; px, py, pw, ph, iconw, iconh, bw, bh, bwr, bhr, i, j, k, l, col, r, g, b, weight: SIGNED16;
 		T: Texts.Scanner;  F: Rembrandt.Frame;
-		wr, wg, wb: REAL; maxw, maxh, incbwr, incbhr: SIGNED16;
+		wr, wg, wb: FLOAT32; maxw, maxh, incbwr, incbhr: SIGNED16;
 BEGIN
 	Texts.OpenScanner(T, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(T);

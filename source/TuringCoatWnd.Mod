@@ -17,7 +17,7 @@ TYPE
 
 	TCW* =  OBJECT(WM.BufferWindow)
 	VAR
-		mesh1, mesh2, n1 : ARRAY m, m OF REAL;
+		mesh1, mesh2, n1 : ARRAY m, m OF FLOAT32;
 		random : Random.Generator;
 		alive, dead, alpha, delay : BOOLEAN;
 		t0 : SIGNED32;

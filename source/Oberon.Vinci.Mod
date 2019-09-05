@@ -85,7 +85,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 			pen: LeoPens.Pen;
 			mode: SET;
 			evenodd: BOOLEAN;
-			x, y: REAL;
+			x, y: FLOAT32;
 		END;
 
 		Package = POINTER TO RECORD
@@ -855,7 +855,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 
 	(**--- Argument Checks ---**)
 
-	PROCEDURE NumVal (ctxt: Scheme.Context; VAR args: Object): REAL;
+	PROCEDURE NumVal (ctxt: Scheme.Context; VAR args: Object): FLOAT32;
 	BEGIN
 		RETURN SHORT(Ops.NumVal(ctxt, args))
 	END NumVal;
@@ -882,7 +882,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 		END
 	END GetColorVal;
 
-	PROCEDURE GetPatternVal* (ctxt: Scheme.Context; VAR args: Object; VAR img: Images.Image; VAR px, py: REAL);
+	PROCEDURE GetPatternVal* (ctxt: Scheme.Context; VAR args: Object; VAR img: Images.Image; VAR px, py: FLOAT32);
 		VAR val, vec: Object; ref: Objects.Object; x, y: LONGREAL;
 	BEGIN
 		img := NIL; val := Ops.Arg(ctxt, args);
@@ -896,7 +896,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 		END
 	END GetPatternVal;
 
-	PROCEDURE GetDashVal* (ctxt: Scheme.Context; VAR args: Object; VAR on, off: ARRAY OF REAL; VAR n: SIGNED32);
+	PROCEDURE GetDashVal* (ctxt: Scheme.Context; VAR args: Object; VAR on, off: ARRAY OF FLOAT32; VAR n: SIGNED32);
 		VAR val, obj: Object; i, size: SIGNED32; r: LONGREAL;
 	BEGIN
 		val := Ops.VectorArg(ctxt, args);
@@ -1048,7 +1048,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalRecord;
 
 	PROCEDURE EvalEnter (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; dx, dy: REAL;
+		VAR c: Context; dx, dy: FLOAT32;
 	BEGIN
 		c := ctxt(Context); c.x := NumVal(c, args); c.y := NumVal(c, args);
 		dx := NumVal(c, args); dy := NumVal(c, args); Ops.CheckNull(c, args);
@@ -1060,7 +1060,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalEnter;
 
 	PROCEDURE EvalExit (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; dx, dy: REAL;
+		VAR c: Context; dx, dy: FLOAT32;
 	BEGIN
 		c := ctxt(Context); dx := NumVal(c, args); dy := NumVal(c, args); Ops.CheckNull(c, args);
 		IF c.gc = NIL THEN FailGC(c)
@@ -1106,7 +1106,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalClose;
 
 	PROCEDURE EvalArc (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; x0, y0, x, y, x1, y1, x2, y2: REAL;
+		VAR c: Context; x0, y0, x, y, x1, y1, x2, y2: FLOAT32;
 	BEGIN
 		c := ctxt(Context); x0 := NumVal(c, args); y0 := NumVal(c, args); x := NumVal(c, args); y := NumVal(c, args);
 		IF args = Scheme.nil THEN
@@ -1127,7 +1127,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalArc;
 
 	PROCEDURE EvalCurve (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; x1, y1, x, y, x2, y2: REAL;
+		VAR c: Context; x1, y1, x, y, x2, y2: FLOAT32;
 	BEGIN
 		c := ctxt(Context); x1 := NumVal(c, args); y1 := NumVal(c, args); x := NumVal(c, args); y := NumVal(c, args);
 		IF args = Scheme.nil THEN
@@ -1144,7 +1144,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalCurve;
 
 	PROCEDURE EvalCorner (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; cx, cy, r, x, y, dx, dy, d, x1, y1, x2, y2: REAL;
+		VAR c: Context; cx, cy, r, x, y, dx, dy, d, x1, y1, x2, y2: FLOAT32;
 	BEGIN
 		c := ctxt(Context); cx := NumVal(c, args); cy := NumVal(c, args); r := NumVal(c, args);
 		x := NumVal(c, args); y := NumVal(c, args); Ops.CheckNull(c, args);
@@ -1172,7 +1172,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE EvalText (ctxt: Scheme.Context; args: Object; VAR res: Object);
 		VAR
-			c: Context; str: Object; x, y, dx, dy: REAL; s: ARRAY 256 OF CHAR; i, n: SIGNED32; dist: ARRAY 16 OF REAL;
+			c: Context; str: Object; x, y, dx, dy: FLOAT32; s: ARRAY 256 OF CHAR; i, n: SIGNED32; dist: ARRAY 16 OF FLOAT32;
 			path: GfxPaths.Path; psc: GfxPaths.Scanner;
 	BEGIN
 		c := ctxt(Context); str := Ops.StringArg(c, args); x := NumVal(c, args); y := NumVal(c, args); Ops.CheckNull(c, args);
@@ -1202,7 +1202,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalText;
 
 	PROCEDURE EvalLabel (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; str: Object; mode: SIGNED32; x, y, phi, dx, dy: REAL; ctm: GfxMatrix.Matrix; s: ARRAY 300 OF CHAR;
+		VAR c: Context; str: Object; mode: SIGNED32; x, y, phi, dx, dy: FLOAT32; ctm: GfxMatrix.Matrix; s: ARRAY 300 OF CHAR;
 	BEGIN
 		c := ctxt(Context); str := Ops.StringArg(c, args); mode := Ops.IntVal(c, args); x := NumVal(c, args); y := NumVal(c, args);
 		IF Scheme.IsNull(args) THEN phi := 0
@@ -1259,7 +1259,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	PROCEDURE EvalWith (ctxt: Scheme.Context; args: Object; VAR res: Object);
 		VAR
 			c: Context; state: Gfx.State; eo: BOOLEAN; p: LeoPens.Pen; obj: Object; col: Gfx.Color; img: Images.Image;
-			px, py: REAL; on, off: ARRAY Gfx.MaxDashPatSize OF REAL; n: SIGNED32; name: ARRAY 64 OF CHAR;
+			px, py: FLOAT32; on, off: ARRAY Gfx.MaxDashPatSize OF FLOAT32; n: SIGNED32; name: ARRAY 64 OF CHAR;
 	BEGIN
 		c := ctxt(Context);
 		IF c.gc = NIL THEN FailGC(c)
@@ -1368,7 +1368,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalCTM;
 
 	PROCEDURE EvalTranslate (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; dx, dy: REAL;
+		VAR c: Context; dx, dy: FLOAT32;
 	BEGIN
 		c := ctxt(Context); dx := NumVal(c, args);
 		IF ~Scheme.IsNull(args) THEN dy := NumVal(c, args) ELSE dy := 0 END;
@@ -1379,7 +1379,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalTranslate;
 
 	PROCEDURE EvalScale (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; sx, sy, x, y: REAL;
+		VAR c: Context; sx, sy, x, y: FLOAT32;
 	BEGIN
 		c := ctxt(Context); sx := NumVal(c, args);
 		IF ~Scheme.IsNull(args) THEN sy := NumVal(c, args) ELSE sy := sx END;
@@ -1395,7 +1395,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalScale;
 
 	PROCEDURE EvalRotate (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; phi, x, y: REAL;
+		VAR c: Context; phi, x, y: FLOAT32;
 	BEGIN
 		c := ctxt(Context); phi := NumVal(c, args);
 		IF c.gc = NIL THEN FailGC(c)
@@ -1408,7 +1408,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalRotate;
 
 	PROCEDURE EvalRad (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; deg: REAL;
+		VAR c: Context; deg: FLOAT32;
 	BEGIN
 		c := ctxt(Context); deg := NumVal(c, args); res := Scheme.NewReal(deg * MathL.pi/180.0D0)
 	END EvalRad;
@@ -1433,7 +1433,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 
 
 	PROCEDURE EvalClipRect (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; xy: ARRAY 4 OF REAL; i: SIGNED32;
+		VAR c: Context; xy: ARRAY 4 OF FLOAT32; i: SIGNED32;
 	BEGIN
 		c := ctxt(Context); Ops.CheckNull(c, args);
 		IF c.gc = NIL THEN FailGC(c)
@@ -1613,7 +1613,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalImagesNewpattern;
 
 	PROCEDURE EvalImagesDraw (ctxt: Scheme.Context; args: Object; VAR res: Object);
-		VAR c: Context; ref: Objects.Object; x, y: REAL;
+		VAR c: Context; ref: Objects.Object; x, y: FLOAT32;
 	BEGIN
 		c := ctxt(Context); ref := Ops.RefVal(c, args); x := NumVal(c, args); y := NumVal(c, args); Ops.CheckNull(c, args);
 		IF c.gc = NIL THEN FailGC(c)

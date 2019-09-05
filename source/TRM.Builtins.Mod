@@ -44,7 +44,7 @@ VAR high: SIGNED32;
 	BEGIN RETURN SYSTEM.VAL(SET,x) * SYSTEM.VAL(SET,M) = {}
 	END NULLF;
 
-	PROCEDURE ConvertIR*(x: SIGNED32): REAL; (* Float 32 bit *)
+	PROCEDURE ConvertIR*(x: SIGNED32): FLOAT32; (* Float 32 bit *)
 	VAR xe, s: SIGNED32; odd,odd1: BOOLEAN; odds: SIGNED32;
 	BEGIN s := x;
 		IF x # 0 THEN
@@ -66,14 +66,14 @@ VAR high: SIGNED32;
 			x := xe - C + x;
 			IF s < 0 THEN x := x+S END
 		END ;
-		RETURN SYSTEM.VAL(REAL,x)
+		RETURN SYSTEM.VAL(FLOAT32,x)
 	END ConvertIR;
 
-	PROCEDURE ConvertHR*(x: SIGNED64): REAL;
+	PROCEDURE ConvertHR*(x: SIGNED64): FLOAT32;
 	BEGIN HALT(200);
 	END ConvertHR;
 
-	PROCEDURE ConvertRI*(l: REAL): SIGNED32; (* Floor 32bit *)
+	PROCEDURE ConvertRI*(l: FLOAT32): SIGNED32; (* Floor 32bit *)
 	VAR x,xe, n, sign: SIGNED32;
 	BEGIN
 		x := SYSTEM.VAL(SIGNED32,l);
@@ -93,13 +93,13 @@ VAR high: SIGNED32;
 		RETURN x
 	END ConvertRI;
 
-	PROCEDURE ConvertRH*(x: REAL): SIGNED64 ;
+	PROCEDURE ConvertRH*(x: FLOAT32): SIGNED64 ;
 	BEGIN HALT(200);
 	END ConvertRH;
 
 	(* 32 bit float instructions *)
 
-	PROCEDURE AddR*(l,r: REAL): REAL;
+	PROCEDURE AddR*(l,r: FLOAT32): FLOAT32;
 	VAR x,y,xe, ye, xm, ym, sign: SIGNED32; odd, odd1: BOOLEAN;
 	BEGIN
 		x := SYSTEM.VAL(SIGNED32,l);
@@ -145,14 +145,14 @@ VAR high: SIGNED32;
 				END
 			END
 		END ;
-		RETURN SYSTEM.VAL(REAL,x)
+		RETURN SYSTEM.VAL(FLOAT32,x)
 	END AddR;
 
-	PROCEDURE SubR*(l,r: REAL): REAL;
+	PROCEDURE SubR*(l,r: FLOAT32): FLOAT32;
 	BEGIN RETURN AddR(l,-r)
 	END SubR;
 
-	PROCEDURE MulR*(l,r: REAL): REAL; (* float 32 * float 32 => float 32 *)
+	PROCEDURE MulR*(l,r: FLOAT32): FLOAT32; (* float 32 * float 32 => float 32 *)
 	VAR x,y,xe, ye, sign: SIGNED32;
 	BEGIN
 		x := SYSTEM.VAL(SIGNED32,l);
@@ -175,10 +175,10 @@ VAR high: SIGNED32;
 			END
 		ELSE x := 0;
 		END ;
-		RETURN SYSTEM.VAL(REAL,x)
+		RETURN SYSTEM.VAL(FLOAT32,x)
 	END MulR;
 
-	PROCEDURE DivR*(l,r: REAL): REAL; (* float 32 / float 32 => float 32 *)
+	PROCEDURE DivR*(l,r: FLOAT32): FLOAT32; (* float 32 / float 32 => float 32 *)
 	VAR x,y,xe, ye, q, n, sign: SIGNED32;
 	BEGIN
 		x := SYSTEM.VAL(SIGNED32,l);
@@ -202,10 +202,10 @@ VAR high: SIGNED32;
 			END
 		ELSE x := 0
 		END ;
-		RETURN SYSTEM.VAL(REAL,x)
+		RETURN SYSTEM.VAL(FLOAT32,x)
 	END DivR;
 
-	PROCEDURE AbsR*(x: REAL): REAL;
+	PROCEDURE AbsR*(x: FLOAT32): FLOAT32;
 	BEGIN
 		IF x < 0 THEN RETURN -x ELSE RETURN x END
 	END AbsR;
@@ -280,11 +280,11 @@ VAR high: SIGNED32;
 	(* currently unused 64 bit float support
 
 	(* conversions such as ENTIER, SHORT or implicit *)
-	PROCEDURE ConvertXR*(x: LONGREAL): REAL;
+	PROCEDURE ConvertXR*(x: LONGREAL): FLOAT32;
 	BEGIN HALT(200);
 	END ConvertXR;
 
-	PROCEDURE ConvertRX*(x: REAL): LONGREAL ;
+	PROCEDURE ConvertRX*(x: FLOAT32): LONGREAL ;
 	BEGIN HALT(200);
 	END ConvertRX;
 

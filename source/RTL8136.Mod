@@ -3274,7 +3274,7 @@ TYPE
 		i, diff, bytes, times: SIGNED32;
 		milliTimer : Kernel.MilliTimer;
 		data: ARRAY 1024 OF CHAR;
-		bw: REAL;
+		bw: FLOAT32;
 		dst: Network.LinkAdr;
 	BEGIN
 		dst[0] := 000X;

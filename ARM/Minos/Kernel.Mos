@@ -320,7 +320,7 @@ MODULE Kernel;
 		VAR startTime, stopTime: SIGNED32;
 	BEGIN
 		delayCompensation := 0;
-		DelayDivisor := ENTIER(REAL(Platform.CLOCKDIVISOR) / 2.44140625);
+		DelayDivisor := ENTIER(FLOAT32(Platform.CLOCKDIVISOR) / 2.44140625);
 
 		DisableIRQs; SYSTEM.GET(Platform.OSCR, startTime); MicroWait(0);
 		SYSTEM.GET(Platform.OSCR, stopTime); (*EnableIRQs; *)

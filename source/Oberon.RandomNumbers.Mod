@@ -9,7 +9,7 @@ VAR Z, t, d: SIGNED32;
 
 (** Return a uniform random number r, with 0 < r < 1. *)
 
-PROCEDURE Uniform*(): REAL;
+PROCEDURE Uniform*(): FLOAT32;
 CONST
 a = 16807;	m = 2147483647;
 q = m DIV a;	r = m MOD a;
@@ -22,7 +22,7 @@ END Uniform;
 
 (** Return an exponentially distributed random number r. *)
 
-PROCEDURE Exp*(mu: REAL): REAL;
+PROCEDURE Exp*(mu: FLOAT32): FLOAT32;
 BEGIN
 	RETURN -Math.ln(Uniform())/mu
 END Exp;

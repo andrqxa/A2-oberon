@@ -246,7 +246,7 @@ MODULE JPEG2000Decoder;
 				data : J2KU.LongIntArrayPtr;
 		END DataBlkInt;
 
-		(** A data block containing data of type REAL *)
+		(** A data block containing data of type FLOAT32 *)
 		DataBlkReal = OBJECT(DataBlk)
 			VAR
 				data : J2KU.RealArrayPtr;
@@ -2801,7 +2801,7 @@ MODULE JPEG2000Decoder;
 					NOTE: We always allocate memory that won't be used, e.g. always values for 3 subbands,
 					or space for components for which no quantization is performed
 				*)
-				preStep : POINTER TO ARRAY OF POINTER TO ARRAY OF POINTER TO ARRAY OF ARRAY 3 OF REAL;
+				preStep : POINTER TO ARRAY OF POINTER TO ARRAY OF POINTER TO ARRAY OF ARRAY 3 OF FLOAT32;
 
 				cblkBuf : ARRAY CBLK_BUFSIZE OF DataBlk;
 
@@ -2908,7 +2908,7 @@ MODULE JPEG2000Decoder;
 				VAR
 					ntiles, ncomp, i, ndec, r: SIGNED32;
 					qStyle, exp : SIGNED32;
-					mant : REAL;
+					mant : FLOAT32;
 					imgInfo : J2KCS.ImageInfo;
 				BEGIN
 					imgInfo := decSpec.GetImageInfo();
@@ -3092,7 +3092,7 @@ MODULE JPEG2000Decoder;
 					cblkIdx, ncblksRet : SIGNED32;
 					qStyle, cblkSize, width, height, shift, i, j, tmp, gainLog : SIGNED32;
 					curTile, comp, ndec : SIGNED32;
-					step : REAL;
+					step : FLOAT32;
 					realData : J2KU.RealArrayPtr;
 					srcData : J2KU.LongIntArrayPtr;
 					cblkReal : DataBlkReal;
@@ -3131,7 +3131,7 @@ MODULE JPEG2000Decoder;
 
 								|	DATA_REAL :
 										(* We cannot do in-place modification *)
-										(* Allocate new code-block for REAL data *)
+										(* Allocate new code-block for FLOAT32 data *)
 										NEW(cblkReal);
 										NEW(realData, cblkSize);
 										(* Set fields *)
@@ -3759,7 +3759,7 @@ MODULE JPEG2000Decoder;
 								dataReal := reconstructedComps[curTile][c](DataBlkReal).data;
 
 								FOR h := 0 TO subbInfo.height - 1 DO
-									Machine.Fill32(ADDRESSOF(dataReal[offset]), width*SIZEOF(REAL), 0);
+									Machine.Fill32(ADDRESSOF(dataReal[offset]), width*SIZEOF(FLOAT32), 0);
 									INC(offset, scanw);
 								END;
 							END;
@@ -3812,7 +3812,7 @@ MODULE JPEG2000Decoder;
 									dataReal := recComp(DataBlkReal).data;
 
 									FOR i := 0 TO dataCblkInfoArr[j].height - 1 DO
-										SYSTEM.MOVE(ADDRESSOF(dataCblk.data[rowStartCblk]), ADDRESSOF(dataReal[rowStartComp]), dataCblkInfoArr[j].width * SIZEOF(REAL));
+										SYSTEM.MOVE(ADDRESSOF(dataCblk.data[rowStartCblk]), ADDRESSOF(dataReal[rowStartComp]), dataCblkInfoArr[j].width * SIZEOF(FLOAT32));
 										INC(rowStartComp, recComp.scanw);
 										INC(rowStartCblk, dataCblk.scanw);
 									END;
@@ -4108,7 +4108,7 @@ MODULE JPEG2000Decoder;
 								NEW(compReal.data, compSize);
 								deq.SetDataType(curTile, i, DATA_REAL);
 								reconstructedComps[curTile][i] := compReal;
-								(*Machine.Fill32(ADDRESSOF(compReal.data[0]), compSize*SIZEOF(REAL), 0);*)
+								(*Machine.Fill32(ADDRESSOF(compReal.data[0]), compSize*SIZEOF(FLOAT32), 0);*)
 							END;
 
 							reconstructedComps[curTile][i].offset := 0;
@@ -4264,7 +4264,7 @@ MODULE JPEG2000Decoder;
 								IF ~ODD(ulcx) THEN
 									(* The first coefficient is a low-pass coefficient *)
 									FOR i := 0 TO height - 1 DO
-										SYSTEM.MOVE(ADDRESSOF(dataReal[tmpOffset]), ADDRESSOF(bufReal[0]), width*SIZEOF(REAL));
+										SYSTEM.MOVE(ADDRESSOF(dataReal[tmpOffset]), ADDRESSOF(bufReal[0]), width*SIZEOF(FLOAT32));
 										(* If the width is odd then #(low-pass coefficients) = #(high-pass coefficients) + 1 *)
 										filterIrrev.SynthesizeLPF(bufReal, 0, 1, bufReal, (width+1) DIV 2, 1, dataReal, tmpOffset, 1, width);
 										INC(tmpOffset, recComp.scanw);
@@ -4272,7 +4272,7 @@ MODULE JPEG2000Decoder;
 								ELSE
 									(* The first coefficient is a high-pass coefficient *)
 									FOR i := 0 TO height - 1 DO
-										SYSTEM.MOVE(ADDRESSOF(dataReal[tmpOffset]), ADDRESSOF(bufReal[0]), width*SIZEOF(REAL));
+										SYSTEM.MOVE(ADDRESSOF(dataReal[tmpOffset]), ADDRESSOF(bufReal[0]), width*SIZEOF(FLOAT32));
 										(* If the width is odd then #(high-pass coefficients) = #(low-pass coefficients) + 1 *)
 										filterIrrev.SynthesizeHPF(bufReal, 0, 1, bufReal, width DIV 2, 1, dataReal, tmpOffset, 1, width);
 										INC(tmpOffset, recComp.scanw);
@@ -4492,7 +4492,7 @@ MODULE JPEG2000Decoder;
 					endDecLvl := SELF.endDecLvl;
 			END GetDecLevelRange;
 
-			(* Adapts a component when no component transformation is done (e.g. converting REAL to SIGNED32) *)
+			(* Adapts a component when no component transformation is done (e.g. converting FLOAT32 to SIGNED32) *)
 			PROCEDURE GetAdaptedComponent (component : SIGNED32; VAR comp : DataBlk; VAR compInfo : J2KU.BlkInfo);
 				VAR
 					tmpComp : DataBlk;

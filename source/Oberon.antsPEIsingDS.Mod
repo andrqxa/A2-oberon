@@ -396,7 +396,7 @@ VAR
 		a: ARRAY 14 OF LONGREAL;
 		i: SIGNED32;
 	BEGIN
-		l := antsCommands.ScanFromPar( "name= NAME a0=REAL a1=REAL a2=REAL a3=REAL a4=REAL a5=REAL b2=REAL b4=REAL b5=REAL g1=REAL g2=REAL d=REAL e=REAL pen=REAL" );
+		l := antsCommands.ScanFromPar( "name= NAME a0=FLOAT32 a1=FLOAT32 a2=FLOAT32 a3=FLOAT32 a4=FLOAT32 a5=FLOAT32 b2=FLOAT32 b4=FLOAT32 b5=FLOAT32 g1=FLOAT32 g2=FLOAT32 d=FLOAT32 e=FLOAT32 pen=FLOAT32" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectRealFromKeyword( l, "a0", a[0] ) &
 		    antsCommands.ExpectRealFromKeyword( l, "a1", a[1] ) & antsCommands.ExpectRealFromKeyword( l, "a2", a[2] ) &
 		    antsCommands.ExpectRealFromKeyword( l, "a3", a[3] ) & antsCommands.ExpectRealFromKeyword( l, "a4", a[4] ) &

@@ -108,7 +108,7 @@ VAR
 
 PROCEDURE randpos*(VAR pt:srBase.PT);
 VAR
-	r: REAL;
+	r: FLOAT32;
 BEGIN
 	r:= 6.2834*rand.Uniform();
 	pt.x := 1/2 + srMath.cos(r)/23;

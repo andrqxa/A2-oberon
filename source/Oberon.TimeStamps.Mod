@@ -32,7 +32,7 @@ MODULE TimeStamps IN Oberon;	(** portable *) (* ejz *)
 	BEGIN RETURN SHORT((x * Display.Unit + (Printer.Unit-1)) DIV Printer.Unit)
 	END P;
 
-	PROCEDURE DR(x: SIGNED32): REAL;
+	PROCEDURE DR(x: SIGNED32): FLOAT32;
 	BEGIN RETURN (x * Printer.Unit) / Display.Unit
 	END DR;
 
@@ -54,7 +54,7 @@ MODULE TimeStamps IN Oberon;	(** portable *) (* ejz *)
 	PROCEDURE Caption(F: Frame; VAR w, h: SIGNED16; newtime: BOOLEAN);
 		VAR
 			date, time: SIGNED32;
-			wr, hr: REAL;
+			wr, hr: FLOAT32;
 			tmp: ARRAY 64 OF CHAR;
 			pw, ph, dsr: SIGNED16;
 	BEGIN

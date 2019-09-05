@@ -46,7 +46,7 @@ TYPE
 			str : POINTER TO ARRAY OF CHAR;
 			char : CHAR;
 			int, fills : SIGNED32;
-			real : REAL;
+			real : FLOAT32;
 			bool : BOOLEAN;
 			format : SIGNED16;
 			node : Node;
@@ -235,7 +235,7 @@ BEGIN
 	RETURN node
 END NewSize;
 
-PROCEDURE NewReal* (real : REAL) : Node;
+PROCEDURE NewReal* (real : FLOAT32) : Node;
 VAR node : ValNode;
 BEGIN
 	node := NewValNode (Real); node.real := real;

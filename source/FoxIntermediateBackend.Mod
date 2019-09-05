@@ -12657,7 +12657,7 @@ TYPE
 							END;
 						| SyntaxTree.FloatType DO
 							IF (type = module.system.realType) OR (type.sizeInBits = 32) THEN
-								IF RefInfo THEN Info(section,"REAL") END;
+								IF RefInfo THEN Info(section,"FLOAT32") END;
 								Char(section, sfTypeREAL);
 							ELSIF (type = module.system.longrealType) OR (type.sizeInBits = 64) THEN
 								IF RefInfo THEN Info(section,"LONGREAL") END;

@@ -8,7 +8,7 @@ VAR
 	context: srGL.Context;
 	cell*: srM2Space.cell;
 	a,b,c, z: PT;
-	angle: REAL;
+	angle: FLOAT32;
 
 PROCEDURE & new*;
 BEGIN

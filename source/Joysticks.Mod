@@ -166,10 +166,10 @@ TYPE
 		(* values determined by joystick calibration *)
 		calMinValue, calMaxValue, calCenterValue : SIGNED32;
 		calCenterOffset : SIGNED32;
-		scaleFactorLow, scaleFactorHigh : REAL;
+		scaleFactorLow, scaleFactorHigh : FLOAT32;
 
 		(* user configuration *)
-		deadzone : REAL; (* in percent *)
+		deadzone : FLOAT32; (* in percent *)
 	END;
 
 TYPE
@@ -226,7 +226,7 @@ TYPE
 		END Poll;
 
 		(** Set the deadzone for all axis *)
-		PROCEDURE SetGlobalDeadzone*(deadzone : REAL; VAR errorMessage : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE SetGlobalDeadzone*(deadzone : FLOAT32; VAR errorMessage : ARRAY OF CHAR; VAR res : WORD);
 		VAR i : SIGNED32;
 		BEGIN
 			FOR i := 0 TO MaxNbrOfAxis - 1 DO
@@ -238,7 +238,7 @@ TYPE
 		END SetGlobalDeadzone;
 
 		(** Set the deadzone for the specified axis *)
-		PROCEDURE SetDeadzone*(axisNbr : SIGNED32; deadzone : REAL; VAR errorMessage : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE SetDeadzone*(axisNbr : SIGNED32; deadzone : FLOAT32; VAR errorMessage : ARRAY OF CHAR; VAR res : WORD);
 		BEGIN
 			IF (axisNbr < 0) OR (axisNbr >= MaxNbrOfAxis) OR (~(axisNbr IN implementedAxis)) THEN
 				errorMessage := ErrorAxisNotImplemented;
@@ -483,7 +483,7 @@ BEGIN {EXCLUSIVE}
 	RETURN nextId;
 END GetId;
 
-PROCEDURE Round(value : REAL) : SIGNED32;
+PROCEDURE Round(value : FLOAT32) : SIGNED32;
 VAR result : SIGNED32;
 BEGIN
 	result := ENTIER(value);

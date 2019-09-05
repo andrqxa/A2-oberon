@@ -163,7 +163,7 @@ MODULE User32; (** non-portable / source: Windows.User32.Mod *)	(* ejz  *)
 		END;
 		PointL* = Point;
 		PointF* = RECORD
-			x*, y*: REAL
+			x*, y*: FLOAT32
 		END;
 
 		(** The RECT structure defines the coordinates of the upper-left and lower-right corners of a rectangle. *)

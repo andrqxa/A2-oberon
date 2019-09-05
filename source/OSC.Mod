@@ -156,8 +156,8 @@ OSCBundle b:
 		(* float32: OSC Type Tag 'f' *)
 		OSCParamFloat* = OBJECT(OSCParamObject)
 			VAR (* 32bit on IA32 *)
-				float-: REAL;
-			PROCEDURE &InitFloat*(f: REAL);
+				float-: FLOAT32;
+			PROCEDURE &InitFloat*(f: FLOAT32);
 			BEGIN
 				float := f;
 				tag := 'f';

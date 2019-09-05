@@ -37,8 +37,8 @@ CONST
 TYPE
 	index* = SIGNED32;
 
-	(* REAL *)  (* preferred chunk sizes: 128, 1024, 8192 *)
-	nameptr* = vyName.tName;   (* technical convenience, to avoid duplicate code for REAL and LONGREAL *)
+	(* FLOAT32 *)  (* preferred chunk sizes: 128, 1024, 8192 *)
+	nameptr* = vyName.tName;   (* technical convenience, to avoid duplicate code for FLOAT32 and LONGREAL *)
 
 	tVector* = POINTER TO tVectorDesc;
 	tVectorDesc* = RECORD (vyBase.tVectorDesc) END;

@@ -351,8 +351,8 @@ CONST
 		word: WORD; lword: LONGWORD;
 		s8: SIGNED8; s16: SIGNED16; s32: SIGNED32; s64: SIGNED64;
 		u8: UNSIGNED8; u16: UNSIGNED16; u32: UNSIGNED32;
-		r: REAL; x: LONGREAL;
-		cplx {UNTRACED}: POINTER {UNSAFE} TO RECORD re,im: REAL END;
+		r: FLOAT32; x: LONGREAL;
+		cplx {UNTRACED}: POINTER {UNSAFE} TO RECORD re,im: FLOAT32 END;
 		lcplx {UNTRACED}: POINTER {UNSAFE} TO RECORD re,im: LONGREAL END;
 		set: SET;
 		procedure: ARRAY 256 OF CHAR;
@@ -421,7 +421,7 @@ CONST
 			size := SIZEOF(UNSIGNED64);
 			SYSTEM.GET(adr, s64); Unsigned(s64, SIZEOF(UNSIGNED64));
 		| sfTypeREAL:
-			size := SIZEOF(REAL);
+			size := SIZEOF(FLOAT32);
 			SYSTEM.GET(adr, r); w.Float(r,12);
 			w.String(" (");
 			SYSTEM.GET(adr, u32); Unsigned(u32, SIZEOF(UNSIGNED32));
@@ -1116,7 +1116,7 @@ TYPE
 		| sfTypeUNSIGNED16: w.String("UNSIGNED16");
 		| sfTypeUNSIGNED32: w.String("UNSIGNED32");
 		| sfTypeUNSIGNED64: w.String("UNSIGNED64");
-		| sfTypeREAL: w.String("REAL");
+		| sfTypeREAL: w.String("FLOAT32");
 		| sfTypeLONGREAL: w.String("LONGREAL");
 		| sfTypeCOMPLEX: w.String("COMPLEX");
 		| sfTypeLONGCOMPLEX: w.String("LONGCOMPLEX");

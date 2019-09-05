@@ -273,7 +273,7 @@ BEGIN
 	ELSE RETURN TRUE END
 END QNamedObject;
 
-PROCEDURE Real* (VAR sc: Scanner;  VAR x: REAL): BOOLEAN; 	(*cw990927*)
+PROCEDURE Real* (VAR sc: Scanner;  VAR x: FLOAT32): BOOLEAN; 	(*cw990927*)
 	(*=read input, and try to evaluate as real number *)
 	VAR done: BOOLEAN;  neg: BOOLEAN;  j: SIGNED16;
 BEGIN neg := FALSE;
@@ -382,11 +382,11 @@ BEGIN
 	ELSE RETURN TRUE END
 END ExpectQNamedObject;
 
-PROCEDURE ExpectReal* (VAR sc: Scanner;  VAR x: REAL): BOOLEAN;
+PROCEDURE ExpectReal* (VAR sc: Scanner;  VAR x: FLOAT32): BOOLEAN;
 	VAR temp: BOOLEAN;
 BEGIN	temp := Real(sc, x);
 	IF ~temp THEN 	PosMsg(sc);
-		Texts.WriteString(w, 'a REAL number was expected');  Texts.WriteLn(w);
+		Texts.WriteString(w, 'a FLOAT32 number was expected');  Texts.WriteLn(w);
 		vyHostTexts.InsertErrW(vyHostTexts.cNotify, w)
 	END;  	RETURN temp
 END ExpectReal;

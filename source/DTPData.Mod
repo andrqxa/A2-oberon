@@ -20,11 +20,11 @@ TYPE
 
 	ParagraphStyleObject* = OBJECT(StyleObject)
 	VAR alignment* : SIGNED32;						(* 0 = left, 1 = center, 2 = right, 3 = justified *)
-		spaceBefore* : REAL;						(* space before paragraph [mm] *)
-		spaceAfter* : REAL;							(* space after paragrapg [mm] *)
-		leftIndent* : REAL;							(* left Indent [mm] *)
-		rightIndent* : REAL;							(* right Indent [mm] *)
-		firstIndent* : REAL;							(* first Line Indent [mm] *)
+		spaceBefore* : FLOAT32;						(* space before paragraph [mm] *)
+		spaceAfter* : FLOAT32;							(* space after paragrapg [mm] *)
+		leftIndent* : FLOAT32;							(* left Indent [mm] *)
+		rightIndent* : FLOAT32;							(* right Indent [mm] *)
+		firstIndent* : FLOAT32;							(* first Line Indent [mm] *)
 		charStyle* : CharacterStyleObject;
 
 		PROCEDURE Clone*(): ParagraphStyleObject;
@@ -47,13 +47,13 @@ TYPE
 	CharacterStyleObject* = OBJECT(StyleObject)
 	VAR family* : ARRAY 32 OF CHAR;				(* font family *)
 		style* : SET;									(* font style; 0 = bold, 1 = italic *)
-		size* : REAL;								(* font size [pt]; 1pt == 1/72inch == 0,3527777778mm *)
-		leading* : REAL;								(* baseline distance [pt] - usually 120% of font size *)
-		baselineShift* : REAL;						(* baseline shift up/down [pt] *)
-		tracking* : REAL;							(* character spacing [pt] *)
-		kerning* : REAL;								(* NOT USED - needs appropriate Fonts *)
-		scaleHorizontal* : REAL;						(* horizontal character scale *)
-		scaleVertical* : REAL;						(* vertical character scale *)
+		size* : FLOAT32;								(* font size [pt]; 1pt == 1/72inch == 0,3527777778mm *)
+		leading* : FLOAT32;								(* baseline distance [pt] - usually 120% of font size *)
+		baselineShift* : FLOAT32;						(* baseline shift up/down [pt] *)
+		tracking* : FLOAT32;							(* character spacing [pt] *)
+		kerning* : FLOAT32;								(* NOT USED - needs appropriate Fonts *)
+		scaleHorizontal* : FLOAT32;						(* horizontal character scale *)
+		scaleVertical* : FLOAT32;						(* vertical character scale *)
 		color* : SIGNED32;							(* character color *)
 		bgColor* : SIGNED32;						(* character background color *)
 
@@ -96,8 +96,8 @@ TYPE
 	(* root for the data - all units in [mm] *)
 	Document* = OBJECT
 	VAR
-		pageWidth, pageHeight : REAL;
-		marginTop, marginBottom, marginLeft, marginRight : REAL;
+		pageWidth, pageHeight : FLOAT32;
+		marginTop, marginBottom, marginLeft, marginRight : FLOAT32;
 		facingPages : BOOLEAN;
 		meta : MetaInformation;
 		objectCounter*: SIGNED32;
@@ -130,7 +130,7 @@ TYPE
 		currentMPage*, firstMPage*, lastMPage* : MasterPageObject;
 		mpageNumber*, nofMPages* : SIGNED32;
 
-		PROCEDURE &New*(width, height, margintop,marginbottom, marginleft, marginright : REAL; facingpages : BOOLEAN);
+		PROCEDURE &New*(width, height, margintop,marginbottom, marginleft, marginright : FLOAT32; facingpages : BOOLEAN);
 		VAR
 		BEGIN
 			pageWidth := width;
@@ -618,27 +618,27 @@ TYPE
 
 		END LastMasterPage;
 
-		PROCEDURE SetPageWidth*(pagewidth : REAL);
+		PROCEDURE SetPageWidth*(pagewidth : FLOAT32);
 		BEGIN
 			pageWidth := pagewidth;
 		END SetPageWidth;
 
-		PROCEDURE GetPageWidth*(): REAL;
+		PROCEDURE GetPageWidth*(): FLOAT32;
 		BEGIN
 			RETURN pageWidth
 		END GetPageWidth;
 
-		PROCEDURE SetPageHeight*(pageheight : REAL);
+		PROCEDURE SetPageHeight*(pageheight : FLOAT32);
 		BEGIN
 			pageHeight := pageheight;
 		END SetPageHeight;
 
-		PROCEDURE GetPageHeight*(): REAL;
+		PROCEDURE GetPageHeight*(): FLOAT32;
 		BEGIN
 			RETURN pageHeight
 		END GetPageHeight;
 
-		PROCEDURE SetMargins*(top, bottom, left, right : REAL);
+		PROCEDURE SetMargins*(top, bottom, left, right : FLOAT32);
 		BEGIN
 			marginTop := top;
 			marginBottom := bottom;
@@ -647,22 +647,22 @@ TYPE
 
 		END SetMargins;
 
-		PROCEDURE GetMarginTop*(): REAL;
+		PROCEDURE GetMarginTop*(): FLOAT32;
 		BEGIN
 			RETURN marginTop
 		END GetMarginTop;
 
-		PROCEDURE GetMarginBottom*() : REAL;
+		PROCEDURE GetMarginBottom*() : FLOAT32;
 		BEGIN
 			RETURN marginBottom
 		END GetMarginBottom;
 
-		PROCEDURE GetMarginLeft*(): REAL;
+		PROCEDURE GetMarginLeft*(): FLOAT32;
 		BEGIN
 			RETURN marginLeft
 		END GetMarginLeft;
 
-		PROCEDURE GetMarginRight*(): REAL;
+		PROCEDURE GetMarginRight*(): FLOAT32;
 		BEGIN
 			RETURN marginRight
 		END GetMarginRight;
@@ -770,7 +770,7 @@ TYPE
 			RETURN masterpage;
 		END GetMasterPage;
 
-		PROCEDURE AddFrame*(x, y, w, h : REAL);
+		PROCEDURE AddFrame*(x, y, w, h : FLOAT32);
 		VAR newframe : FrameObject;
 		BEGIN
 			(* new Frames are added at last position (top) *)
@@ -862,7 +862,7 @@ TYPE
 			END
 		END PrevFrame;
 
-		PROCEDURE AddGuide*(position : REAL; horizontal : BOOLEAN);
+		PROCEDURE AddGuide*(position : FLOAT32; horizontal : BOOLEAN);
 		VAR newguide : GuideObject;
 		BEGIN
 			NEW(newguide, position, horizontal);
@@ -1100,10 +1100,10 @@ TYPE
 	GuideObject* = OBJECT
 	VAR
 		horizontal : BOOLEAN;
-		position : REAL;
+		position : FLOAT32;
 		prev*, next* : GuideObject;
 
-		PROCEDURE &New*(posi : REAL; horiz : BOOLEAN);
+		PROCEDURE &New*(posi : FLOAT32; horiz : BOOLEAN);
 		BEGIN
 			position := posi; horizontal := horiz;
 			prev := NIL; next := NIL;
@@ -1119,12 +1119,12 @@ TYPE
 			RETURN horizontal;
 		END GetHorizontal;
 
-		PROCEDURE SetPosition*(posi : REAL);
+		PROCEDURE SetPosition*(posi : FLOAT32);
 		BEGIN
 			position := posi;
 		END SetPosition;
 
-		PROCEDURE GetPosition*() : REAL;
+		PROCEDURE GetPosition*() : FLOAT32;
 		BEGIN
 			RETURN position;
 		END GetPosition;
@@ -1142,11 +1142,11 @@ TYPE
 	VAR
 		frameName : Strings.String;
 		frameType : Strings.String;
-		x, y, w, h : REAL;
+		x, y, w, h : FLOAT32;
 		style : StyleObject;
 		content : ContentObject; (* DTPFrame.ContentObject; *)
 		textwrapON : BOOLEAN;
-		twrapTop, twrapBottom, twrapLeft, twrapRight : REAL;
+		twrapTop, twrapBottom, twrapLeft, twrapRight : FLOAT32;
 
 		next*, prev* : FrameObject;
 
@@ -1184,7 +1184,7 @@ TYPE
 		END GetType;
 
 		PROCEDURE FixExtent*;
-		VAR cx, cy, cw, ch: REAL;
+		VAR cx, cy, cw, ch: FLOAT32;
 		BEGIN
 			cx := x; cy := y; cw := w; ch := h;
 			x := MIN(cx, cx+cw); y := MIN(cy, cy+ch);
@@ -1192,41 +1192,41 @@ TYPE
 
 		END FixExtent;
 
-		PROCEDURE SetExtent*(x, y, w, h: REAL);
+		PROCEDURE SetExtent*(x, y, w, h: FLOAT32);
 		BEGIN
 			SELF.x := x; SELF.y := y; SELF.w := w; SELF.h := h;
 		END SetExtent;
 
-		PROCEDURE SetSize*( w, h : REAL);
+		PROCEDURE SetSize*( w, h : FLOAT32);
 		VAR
 		BEGIN
 			SELF.w := w; SELF.h := h;
 		END SetSize;
 
-		PROCEDURE SetPosition*(x, y: REAL);
+		PROCEDURE SetPosition*(x, y: FLOAT32);
 		BEGIN
 			SELF.x := x; SELF.y := y;
 		END SetPosition;
 
-		PROCEDURE GetX*(): REAL;
+		PROCEDURE GetX*(): FLOAT32;
 		VAR
 		BEGIN
 			RETURN x;
 		END GetX;
 
-		PROCEDURE GetY*(): REAL;
+		PROCEDURE GetY*(): FLOAT32;
 		VAR
 		BEGIN
 			RETURN y;
 		END GetY;
 
-		PROCEDURE GetWidth*(): REAL;
+		PROCEDURE GetWidth*(): FLOAT32;
 		VAR
 		BEGIN
 			RETURN w;
 		END GetWidth;
 
-		PROCEDURE GetHeight*(): REAL;
+		PROCEDURE GetHeight*(): FLOAT32;
 		VAR
 		BEGIN
 			RETURN h;
@@ -1262,28 +1262,28 @@ TYPE
 			RETURN textwrapON;
 		END GetWrap;
 
-		PROCEDURE SetWrapSize*(t, b, l, r : REAL);
+		PROCEDURE SetWrapSize*(t, b, l, r : FLOAT32);
 		BEGIN
 			twrapTop := t; twrapBottom := b;
 			twrapLeft := l; twrapRight := r;
 		END SetWrapSize;
 
-		PROCEDURE GetWrapTop*(): REAL;
+		PROCEDURE GetWrapTop*(): FLOAT32;
 		BEGIN
 			RETURN twrapTop
 		END GetWrapTop;
 
-		PROCEDURE GetWrapBottom*(): REAL;
+		PROCEDURE GetWrapBottom*(): FLOAT32;
 		BEGIN
 			RETURN twrapBottom
 		END GetWrapBottom;
 
-		PROCEDURE GetWrapLeft*(): REAL;
+		PROCEDURE GetWrapLeft*(): FLOAT32;
 		BEGIN
 			RETURN twrapLeft
 		END GetWrapLeft;
 
-		PROCEDURE GetWrapRight*(): REAL;
+		PROCEDURE GetWrapRight*(): FLOAT32;
 		BEGIN
 			RETURN twrapRight
 		END GetWrapRight;
@@ -1313,7 +1313,7 @@ TYPE
 		redrawProc* : PROCEDURE {DELEGATE};
 		updatePropsPosition*: PROCEDURE {DELEGATE} (x, y: SIZE);
 		contentWidth*, contentHeight*: SIZE;
-		zoomFactor* : REAL;
+		zoomFactor* : FLOAT32;
 		ownerDoc*: Document;
 		hasFocus- : BOOLEAN;
 		running- : BOOLEAN;
@@ -1334,7 +1334,7 @@ TYPE
 			RETURN newObj;
 		END Clone;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: REAL; quality, preview: BOOLEAN);
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: FLOAT32; quality, preview: BOOLEAN);
 		VAR color: SIGNED32;
 		BEGIN
 			color := SIGNED32(0FF0000FFH);
@@ -1361,7 +1361,7 @@ TYPE
 			contentWidth := w; contentHeight := h;
 		END SetSize;
 
-		PROCEDURE Resize*(zoomF: REAL);
+		PROCEDURE Resize*(zoomF: FLOAT32);
 		BEGIN
 			zoomFactor := zoomF;
 		END Resize;

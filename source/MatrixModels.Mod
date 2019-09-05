@@ -8,7 +8,7 @@ CONST
 
 TYPE
 
-	Datatype* = REAL;
+	Datatype* = FLOAT32;
 	Matrix* = ARRAY [*,*] OF Datatype;
 
 	MatrixValue* = RECORD(Types.Generic)

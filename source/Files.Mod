@@ -1244,7 +1244,7 @@ BEGIN
 	r.file.Read(r, ch); x := ch # 0X
 END ReadBool;
 
-PROCEDURE ReadReal*(VAR r: Rider; VAR x: REAL);
+PROCEDURE ReadReal*(VAR r: Rider; VAR x: FLOAT32);
 BEGIN
 	r.file.ReadBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
 END ReadReal;
@@ -1329,7 +1329,7 @@ BEGIN
 	IF x THEN r.file.Write(r, 1X) ELSE r.file.Write(r, 0X) END
 END WriteBool;
 
-PROCEDURE WriteReal*(VAR r: Rider; x: REAL);
+PROCEDURE WriteReal*(VAR r: Rider; x: FLOAT32);
 BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
 END WriteReal;

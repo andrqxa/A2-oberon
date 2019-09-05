@@ -137,24 +137,24 @@ TYPE
 
 	Real* = OBJECT (Property)
 	VAR
-		value: REAL;
+		value: FLOAT32;
 		handlers: ARRAY MaxHandlers OF RealHandler;
 
-		PROCEDURE &InitReal* (value: REAL);
+		PROCEDURE &InitReal* (value: FLOAT32);
 		BEGIN InitProperty; SELF.value := value;
 		END InitReal;
 
-		PROCEDURE Get* (): REAL;
-		VAR value: REAL;
+		PROCEDURE Get* (): FLOAT32;
+		VAR value: FLOAT32;
 		BEGIN AcquireRead; value := SELF.value; ReleaseRead; RETURN value;
 		END Get;
 
-		PROCEDURE Set* (value: REAL);
+		PROCEDURE Set* (value: FLOAT32);
 		VAR changed: BOOLEAN;
 		BEGIN AcquireWrite; changed := SELF.value # value; SELF.value := value; ReleaseWrite; IF changed THEN Changed (value) END;
 		END Set;
 
-		PROCEDURE Changed (value: REAL);
+		PROCEDURE Changed (value: FLOAT32);
 		VAR i: SIZE;
 		BEGIN i := 0; WHILE handlers[i] # NIL DO handlers[i] (SELF, value); INC (i) END;
 		END Changed;
@@ -312,10 +312,10 @@ TYPE
 
 	TYPE RealMessage*  = OBJECT (Message)
 	VAR
-		value: REAL;
+		value: FLOAT32;
 		procedure: RealProcedure;
 
-		PROCEDURE &InitRealMessage* (value: REAL; procedure: RealProcedure);
+		PROCEDURE &InitRealMessage* (value: FLOAT32; procedure: RealProcedure);
 		BEGIN InitMessage; SELF.value := value; SELF.procedure := procedure;
 		END InitRealMessage;
 
@@ -428,7 +428,7 @@ TYPE
 	RequestReal* = OBJECT (Request)
 	VAR
 		procedure: ProcedureReal;
-		result-: REAL;
+		result-: FLOAT32;
 
 		PROCEDURE &InitRequestReal* (procedure: ProcedureReal);
 		BEGIN InitRequest; SELF.procedure := procedure;
@@ -458,11 +458,11 @@ TYPE
 
 	RealRequestInteger* = OBJECT (Request)
 	VAR
-		value: REAL;
+		value: FLOAT32;
 		procedure: RealProcedureInteger;
 		result-: WORD;
 
-		PROCEDURE &InitRealRequestInteger* (value: REAL; procedure: RealProcedureInteger);
+		PROCEDURE &InitRealRequestInteger* (value: FLOAT32; procedure: RealProcedureInteger);
 		BEGIN InitRequest; SELF.value := value; SELF.procedure := procedure;
 		END InitRealRequestInteger;
 
@@ -524,7 +524,7 @@ TYPE
 		BEGIN NEW (message, value, procedure); Add (message, NoDelay);
 		END AddIntegerMessage;
 
-		PROCEDURE AddRealMessage* (value: REAL; procedure: RealProcedure);
+		PROCEDURE AddRealMessage* (value: FLOAT32; procedure: RealProcedure);
 		VAR message: RealMessage;
 		BEGIN NEW (message, value, procedure); Add (message, NoDelay);
 		END AddRealMessage;
@@ -559,7 +559,7 @@ TYPE
 		BEGIN NEW (request, procedure); Add (request, NoDelay); RETURN request.result;
 		END AddRequestInteger;
 
-		PROCEDURE AddRequestReal* (procedure: ProcedureReal): REAL;
+		PROCEDURE AddRequestReal* (procedure: ProcedureReal): FLOAT32;
 		VAR request: RequestReal;
 		BEGIN NEW (request, procedure); Add (request, NoDelay); RETURN request.result;
 		END AddRequestReal;
@@ -569,7 +569,7 @@ TYPE
 		BEGIN NEW (request, value, procedure); Add (request, NoDelay); RETURN request.result;
 		END AddIntegerRequestBoolean;
 
-		PROCEDURE AddRealRequestInteger* (value: REAL; procedure: RealProcedureInteger): WORD;
+		PROCEDURE AddRealRequestInteger* (value: FLOAT32; procedure: RealProcedureInteger): WORD;
 		VAR request: RealRequestInteger;
 		BEGIN NEW (request, value, procedure); Add (request, NoDelay); RETURN request.result;
 		END AddRealRequestInteger;
@@ -610,7 +610,7 @@ TYPE
 (* helper types *)
 	BooleanHandler = PROCEDURE {DELEGATE} (property: Boolean; value: BOOLEAN);
 	IntegerHandler = PROCEDURE {DELEGATE} (property: Integer; value: WORD);
-	RealHandler = PROCEDURE {DELEGATE} (property: Real; value: REAL);
+	RealHandler = PROCEDURE {DELEGATE} (property: Real; value: FLOAT32);
 	SetHandler = PROCEDURE {DELEGATE} (property: Set; value: SET);
 	StringHandler = PROCEDURE {DELEGATE} (property: String; CONST value: ARRAY OF CHAR);
 
@@ -618,16 +618,16 @@ TYPE
 	BooleanProcedure = PROCEDURE {DELEGATE} (value: BOOLEAN);
 	IntegerProcedure = PROCEDURE {DELEGATE} (value: WORD);
 	IntegerIntegerProcedure = PROCEDURE {DELEGATE} (value0, value1: WORD);
-	RealProcedure = PROCEDURE {DELEGATE} (value: REAL);
+	RealProcedure = PROCEDURE {DELEGATE} (value: FLOAT32);
 	SetProcedure = PROCEDURE {DELEGATE} (value: SET);
 	StringProcedure = PROCEDURE {DELEGATE} (CONST value: ARRAY OF CHAR);
 
 	ProcedureBoolean = PROCEDURE {DELEGATE} (): BOOLEAN;
 	ProcedureInteger = PROCEDURE {DELEGATE} (): WORD;
-	ProcedureReal = PROCEDURE {DELEGATE} (): REAL;
+	ProcedureReal = PROCEDURE {DELEGATE} (): FLOAT32;
 
 	IntegerProcedureBoolean = PROCEDURE {DELEGATE} (value: WORD): BOOLEAN;
-	RealProcedureInteger = PROCEDURE {DELEGATE} (value: REAL): WORD;
+	RealProcedureInteger = PROCEDURE {DELEGATE} (value: FLOAT32): WORD;
 
 (* helper function for delayed execution *)
 PROCEDURE Delay* (delay: SIGNED32): SIGNED32;

@@ -34,13 +34,13 @@ BEGIN
 END Hex;
 
 (** Write the real x in n field positions. *)
-PROCEDURE Real*(x: REAL; n: SIGNED16);
+PROCEDURE Real*(x: FLOAT32; n: SIGNED16);
 BEGIN
 	Texts.WriteReal(W, x, n); Texts.Append(T, W.buf)
 END Real;
 
 (** Write the real x in n field positions in fixed point notation with f fraction digits. *)
-PROCEDURE RealFix*(x: REAL; n, f: SIGNED16);
+PROCEDURE RealFix*(x: FLOAT32; n, f: SIGNED16);
 BEGIN
 	Texts.WriteRealFix(W, x, n, f, 0); Texts.Append(T, W.buf)
 END RealFix;

@@ -29,8 +29,8 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		ShapeDesc* = RECORD (Objects.ObjDesc)
 			cont*: Shape;	(** shape containing this shape **)
 			up*, down*: Shape;	(** predecessor and successor in doubly linked list **)
-			llx*, lly*, urx*, ury*: REAL;	(** bounding box in global coordinates **)
-			bw*: REAL;	(** border width (additional space around box affected by rendering) **)
+			llx*, lly*, urx*, ury*: FLOAT32;	(** bounding box in global coordinates **)
+			bw*: FLOAT32;	(** border width (additional space around box affected by rendering) **)
 			sel*: BOOLEAN;	(** true if shape or one of its components is selected **)
 			marked*: BOOLEAN;	(** true if shape is temporarily marked **)
 		END;
@@ -60,7 +60,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 			active*: Layer;	(** currently editable layer **)
 			seltime*: SIGNED32;	(** time of current selection, negative for empty selection **)
 			damage: GfxRegions.Region;	(* accumulated area that should be updated *)
-			bw: REAL;	(* maximal border width around damage area *)
+			bw: FLOAT32;	(* maximal border width around damage area *)
 			lockLevel: SIGNED16;	(* number of times updates have been disabled *)
 			cmdLevel: SIGNED16;	(* number of nested commands that are currently open *)
 			maxCmds, nofCmds: SIGNED16;	(* maximal and current number of undoable commands retained *)
@@ -101,7 +101,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 
 		RealAction = POINTER TO RealActionDesc;
 		RealActionDesc = RECORD (AttrActionDesc)
-			real: REAL;
+			real: FLOAT32;
 		END;
 
 		StringAction = POINTER TO StringActionDesc;
@@ -113,7 +113,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		UpdateMsg* = RECORD (Display.FrameMsg)
 			fig*: Figure;	(** affected figure **)
 			reg*: GfxRegions.Region;	(** affected area **)
-			bw*: REAL;	(** border around affected area **)
+			bw*: FLOAT32;	(** border around affected area **)
 		END;
 
 		(** shape messages **)
@@ -154,7 +154,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		END;
 
 		ConsumeMsg* = RECORD (LocalizedMsg)
-			llx*, lly*, urx*, ury*: REAL;	(** target location (in global coordinates) **)
+			llx*, lly*, urx*, ury*: FLOAT32;	(** target location (in global coordinates) **)
 			bottom*, top*: Shape;	(** shapes to consume **)
 			slgm*: GfxMatrix.Matrix;	(** source shape's coordinate space **)
 			recv*: Shape;	(** consuming target shape **)
@@ -164,15 +164,15 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 			id*: SIGNED16;	(** active/passive/marksonly/marked **)
 			ctxt*: Gfx.Context;	(** associated context **)
 			gsm*: GfxMatrix.Matrix;	(** conversion from global to standard coordinates **)
-			llx*, lly*, urx*, ury*: REAL;	(** clip rectangle (in global coordinates) **)
+			llx*, lly*, urx*, ury*: FLOAT32;	(** clip rectangle (in global coordinates) **)
 		END;
 
 		LocateMsg* = RECORD (LocalizedMsg)
 			id*: SIGNED16;	(** inside/overlap/project **)
-			llx*, lly*, urx*, ury*: REAL;	(** rectangle within which to locate (in global coordinates) **)
+			llx*, lly*, urx*, ury*: FLOAT32;	(** rectangle within which to locate (in global coordinates) **)
 			res*: Shape;	(** linked list of shapes which handled message (in top-down order) **)
-			x*, y*: REAL;	(** point to project **)
-			px*, py*: REAL;	(** projected coordinates **)
+			x*, y*: FLOAT32;	(** point to project **)
+			px*, py*: FLOAT32;	(** projected coordinates **)
 		END;
 
 		TransformMsg* = RECORD (LocalizedMsg)
@@ -183,7 +183,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 
 		MatrixMsg* = RECORD (LocalizedMsg)
 			dest*: Shape;	(** destination shape **)
-			x0*, y0*, x1*, y1*, tol*: REAL;	(** drag vector and locate tolerance (in global coordinates) **)
+			x0*, y0*, x1*, y1*, tol*: FLOAT32;	(** drag vector and locate tolerance (in global coordinates) **)
 			done*: BOOLEAN;	(** set by destination shape **)
 			mat*: GfxMatrix.Matrix;	(** resulting global transformation matrix **)
 		END;
@@ -227,7 +227,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END EnableUpdate;
 
 	(** update rectangle **)
-	PROCEDURE UpdateRect* (fig: Figure; llx, lly, urx, ury, bw: REAL);
+	PROCEDURE UpdateRect* (fig: Figure; llx, lly, urx, ury, bw: FLOAT32);
 		VAR llu, llv, uru, urv: SIGNED16;
 	BEGIN
 		IF (llx < urx) & (lly < ury) THEN
@@ -522,7 +522,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END SetInt;
 
 	PROCEDURE DoRealAction (fig: Figure; act: Action);
-		VAR ra: RealAction; am: Objects.AttrMsg; val: REAL;
+		VAR ra: RealAction; am: Objects.AttrMsg; val: FLOAT32;
 	BEGIN
 		ra := act(RealAction);
 		am.id := Objects.get; COPY(ra.name, am.name); am.res := -1; ra.shape.handle(ra.shape, am);
@@ -532,7 +532,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END DoRealAction;
 
 	(** set real attribute value with undoable action **)
-	PROCEDURE SetReal* (fig: Figure; shape: Shape; name: ARRAY OF CHAR; val: REAL);
+	PROCEDURE SetReal* (fig: Figure; shape: Shape; name: ARRAY OF CHAR; val: FLOAT32);
 		VAR am: Objects.AttrMsg; ra: RealAction;
 	BEGIN
 		am.id := Objects.get; COPY(name, am.name); am.res := -1; shape.handle(shape, am);
@@ -589,7 +589,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	(**--- Transformations ---**)
 
 	PROCEDURE Exchange (a: AttrAction);
-		VAR am: Objects.AttrMsg; i: SIGNED32; r: REAL; s: ARRAY 64 OF CHAR;
+		VAR am: Objects.AttrMsg; i: SIGNED32; r: FLOAT32; s: ARRAY 64 OF CHAR;
 	BEGIN
 		am.id := Objects.get; COPY(a.name, am.name); am.res := -1; a.shape.handle(a.shape, am);
 		CASE am.class OF
@@ -641,7 +641,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	BEGIN
 		cmd := fig.curCmd;
 		IF cmd.done # NIL THEN cur := cmd.done.link ELSE cur := cmd.actions END;
-		WHILE cur # NIL DO	(* undo REAL actions *)
+		WHILE cur # NIL DO	(* undo FLOAT32 actions *)
 			IF cur IS RealAction THEN Exchange(cur(RealAction)) END;
 			cur := cur.link
 		END;
@@ -705,7 +705,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END Clone;
 
 	(** consume list of shapes in target shape located at (x, y) **)
-	PROCEDURE Consume* (fig: Figure; llx, lly, urx, ury: REAL; shapes: Shape; VAR recv: Shape);
+	PROCEDURE Consume* (fig: Figure; llx, lly, urx, ury: FLOAT32; shapes: Shape; VAR recv: Shape);
 		VAR obj, link: Objects.Object; crd: CoordMsg; cm: ConsumeMsg;
 	BEGIN
 		obj := shapes; shapes := NIL;
@@ -747,7 +747,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	(**--- Locate ---**)
 
 	(** locate shapes in figure **)
-	PROCEDURE Locate* (fig: Figure; id: SIGNED16; llx, lly, urx, ury: REAL): Shape;
+	PROCEDURE Locate* (fig: Figure; id: SIGNED16; llx, lly, urx, ury: FLOAT32): Shape;
 		VAR lm: LocateMsg;
 	BEGIN
 		Objects.Stamp(lm); lm.id := id; lm.llx := llx; lm.lly := lly; lm.urx := urx; lm.ury := ury; lm.res := NIL;
@@ -756,7 +756,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END Locate;
 
 	(** project point (x, y) to nearest shape within rectangle (llx, lly, urx, ury) **)
-	PROCEDURE Project* (fig: Figure; x, y, llx, lly, urx, ury: REAL; VAR px, py: REAL; VAR res: Shape);
+	PROCEDURE Project* (fig: Figure; x, y, llx, lly, urx, ury: FLOAT32; VAR px, py: FLOAT32; VAR res: Shape);
 		VAR lm: LocateMsg;
 	BEGIN
 		Objects.Stamp(lm); lm.id := project; lm.res := NIL; lm.x := x; lm.y := y; lm.px := x; lm.py := y;
@@ -769,10 +769,10 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	(**--- Standard Handles ---**)
 
 	(** draw default shape handles (in local coordinates) **)
-	PROCEDURE DrawHandles* (llx, lly, urx, ury: REAL; VAR rm: RenderMsg);
-		VAR ctm, lsmat: GfxMatrix.Matrix; col: Gfx.Color; mx, my: REAL;
+	PROCEDURE DrawHandles* (llx, lly, urx, ury: FLOAT32; VAR rm: RenderMsg);
+		VAR ctm, lsmat: GfxMatrix.Matrix; col: Gfx.Color; mx, my: FLOAT32;
 
-		PROCEDURE draw (x, y: REAL);
+		PROCEDURE draw (x, y: FLOAT32);
 		BEGIN
 			GfxMatrix.Apply(lsmat, x, y, x, y);	(* map local to standard coordinates *)
 			Gfx.DrawRect(rm.ctxt, x-2, y-2, x+2, y+2, {Gfx.Fill})
@@ -790,11 +790,11 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END DrawHandles;
 
 	(** project point to default shape handles (in local coordinates) **)
-	PROCEDURE ProjectToHandles* (shape: Shape; llx, lly, urx, ury: REAL; VAR lm: LocateMsg);
-		VAR dmin, mx, my: REAL;
+	PROCEDURE ProjectToHandles* (shape: Shape; llx, lly, urx, ury: FLOAT32; VAR lm: LocateMsg);
+		VAR dmin, mx, my: FLOAT32;
 
-		PROCEDURE project (x, y: REAL);
-			VAR dx, dy, d: REAL;
+		PROCEDURE project (x, y: FLOAT32);
+			VAR dx, dy, d: FLOAT32;
 		BEGIN
 			GfxMatrix.Apply(lm.lgm, x, y, x, y);	(* convert point to global coordinates *)
 			IF (lm.llx <= x) & (x <= lm.urx) & (lm.lly <= y) & (y <= lm.ury) THEN
@@ -806,7 +806,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		END project;
 
 	BEGIN
-		dmin := MAX(REAL);
+		dmin := MAX(FLOAT32);
 		mx := 0.5*(llx + urx); my := 0.5*(lly + ury);
 		project(mx, my);
 		project(llx, lly); project(llx, ury); project(urx, ury); project(urx, lly);
@@ -814,8 +814,8 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END ProjectToHandles;
 
 	(** get transformation bound to clicked handle point **)
-	PROCEDURE GetHandleMatrix* (llx, lly, urx, ury: REAL; VAR msg: MatrixMsg);
-		VAR glmat: GfxMatrix.Matrix; mx, my, llu, llv, uru, urv: REAL;
+	PROCEDURE GetHandleMatrix* (llx, lly, urx, ury: FLOAT32; VAR msg: MatrixMsg);
+		VAR glmat: GfxMatrix.Matrix; mx, my, llu, llv, uru, urv: FLOAT32;
 
 		PROCEDURE translate;
 		BEGIN
@@ -825,7 +825,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 
 		(*
 		PROCEDURE rotate;
-			VAR x, y, dx0, dy0, dx1, dy1, t: REAL;
+			VAR x, y, dx0, dy0, dx1, dy1, t: FLOAT32;
 		BEGIN
 			GfxMatrix.Apply(msg.lgm, mx, my, x, y);
 			dx0 := msg.x0 - x; dy0 := msg.y0 - y;
@@ -836,8 +836,8 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 		END rotate;
 		*)
 
-		PROCEDURE scale (ox, oy: REAL);
-			VAR x0, y0, x1, y1: REAL; m: GfxMatrix.Matrix;
+		PROCEDURE scale (ox, oy: FLOAT32);
+			VAR x0, y0, x1, y1: FLOAT32; m: GfxMatrix.Matrix;
 		BEGIN
 			GfxMatrix.Apply(glmat, msg.x0, msg.y0, x0, y0); GfxMatrix.Apply(glmat, msg.x1, msg.y1, x1, y1);
 			GfxMatrix.ScaleAt(msg.lgm, ox, oy, (x1 - ox)/(x0 - ox), (y1 - oy)/(y0 - oy), m);
@@ -845,8 +845,8 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 			msg.done := TRUE
 		END scale;
 
-		PROCEDURE hscale (ox, oy: REAL);
-			VAR x0, y0, x1, y1: REAL; m: GfxMatrix.Matrix;
+		PROCEDURE hscale (ox, oy: FLOAT32);
+			VAR x0, y0, x1, y1: FLOAT32; m: GfxMatrix.Matrix;
 		BEGIN
 			GfxMatrix.Apply(glmat, msg.x0, msg.y0, x0, y0); GfxMatrix.Apply(glmat, msg.x1, msg.y1, x1, y1);
 			GfxMatrix.ScaleAt(msg.lgm, ox, oy, (x1 - ox)/(x0 - ox), 1, m);
@@ -854,8 +854,8 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 			msg.done := TRUE
 		END hscale;
 
-		PROCEDURE vscale (ox, oy: REAL);
-			VAR x0, y0, x1, y1: REAL; m: GfxMatrix.Matrix;
+		PROCEDURE vscale (ox, oy: FLOAT32);
+			VAR x0, y0, x1, y1: FLOAT32; m: GfxMatrix.Matrix;
 		BEGIN
 			GfxMatrix.Apply(glmat, msg.x0, msg.y0, x0, y0); GfxMatrix.Apply(glmat, msg.x1, msg.y1, x1, y1);
 			GfxMatrix.ScaleAt(msg.lgm, ox, oy, 1, (y1 - oy)/(y0 - oy), m);
@@ -934,7 +934,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END CopyShape;
 
 	PROCEDURE HandleShape* (obj: Objects.Object; VAR msg: Objects.ObjMsg);
-		VAR shape, copy: Shape; cm: Objects.CopyMsg; am: Objects.AttrMsg; ver: SIGNED32; int: SIGNED16; real: REAL;
+		VAR shape, copy: Shape; cm: Objects.CopyMsg; am: Objects.AttrMsg; ver: SIGNED32; int: SIGNED16; real: FLOAT32;
 	BEGIN
 		shape := obj(Shape);
 		IF msg IS UnmarkMsg THEN
@@ -1011,7 +1011,7 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	BEGIN
 		shape.handle := handle;
 		shape.cont := NIL; shape.up := NIL; shape.down := NIL;
-		shape.llx := MAX(REAL); shape.lly := MAX(REAL); shape.urx := MIN(REAL); shape.ury := MIN(REAL); shape.bw := 0;
+		shape.llx := MAX(FLOAT32); shape.lly := MAX(FLOAT32); shape.urx := MIN(FLOAT32); shape.ury := MIN(FLOAT32); shape.bw := 0;
 		shape.sel := FALSE; shape.marked := FALSE
 	END InitShape;
 
@@ -1074,9 +1074,9 @@ MODULE Leonardo IN Oberon; (** portable **)	(* eos  *)
 	END ReadComponents;
 
 	(** compute bounding box and maximal border width of component list **)
-	PROCEDURE GetComponentsBox* (bottom: Shape; VAR llx, lly, urx, ury, bw: REAL);
+	PROCEDURE GetComponentsBox* (bottom: Shape; VAR llx, lly, urx, ury, bw: FLOAT32);
 	BEGIN
-		llx := MAX(REAL); lly := MAX(REAL); urx := MIN(REAL); ury := MIN(REAL); bw := 0;
+		llx := MAX(FLOAT32); lly := MAX(FLOAT32); urx := MIN(FLOAT32); ury := MIN(FLOAT32); bw := 0;
 		WHILE bottom # NIL DO
 			IF bottom.llx < llx THEN llx := bottom.llx END;
 			IF bottom.lly < lly THEN lly := bottom.lly END;

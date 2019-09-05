@@ -1942,7 +1942,7 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 		PROCEDURE GetVisualObjectHeader(): BOOLEAN;
 		VAR
 				temp, i, k: SIGNED32;
-				tempReal: REAL;
+				tempReal: FLOAT32;
 		BEGIN
 
 			IF AVI.ShowBits(27, buffer.data^, buffer.index ) = DT.VideoObjectStartCode THEN
@@ -2166,7 +2166,7 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 		PROCEDURE GetVideoObjectPlaneHeader(): BOOLEAN;
 		VAR
 			temp: SIGNED32;
-			tempReal: REAL;
+			tempReal: FLOAT32;
 		BEGIN
 
 			IF AVI.GetBits(32, buffer.data^, buffer.index) # DT.VideoObjectPlaneStartCode THEN
