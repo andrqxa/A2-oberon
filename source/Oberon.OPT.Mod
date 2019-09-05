@@ -1478,9 +1478,9 @@ BEGIN
 	syslink := topScope.right;  universe := topScope;  topScope.right := NIL;
 
 	EnterTyp( "CHAR", Char, OPM.CharSize, chartyp, SFtypChar );  EnterTyp( "SET", Set, OPM.SetSize, settyp, SFtypSet );
-	EnterTyp( "FLOAT32", Real, OPM.RealSize, realtyp, SFtypReal );  EnterTyp( "SIGNED16", Int, OPM.IntSize, inttyp, SFtypInt );
-	EnterTyp( "SIGNED32", LInt, OPM.LIntSize, linttyp, SFtypLInt );  EnterTyp( "SIGNED64", HInt, OPM.HIntSize, hinttyp, SFtypHInt );
-	EnterTyp( "FLOAT64", LReal, OPM.LRealSize, lrltyp, SFtypLReal );  EnterTyp( "SIGNED8", SInt, OPM.SIntSize, sinttyp, SFtypSInt );
+	EnterTyp( "REAL", Real, OPM.RealSize, realtyp, SFtypReal );  EnterTyp( "INTEGER", Int, OPM.IntSize, inttyp, SFtypInt );
+	EnterTyp( "LONGINT", LInt, OPM.LIntSize, linttyp, SFtypLInt );  EnterTyp( "HUGEINT", HInt, OPM.HIntSize, hinttyp, SFtypHInt );
+	EnterTyp( "LONGREAL", LReal, OPM.LRealSize, lrltyp, SFtypLReal );  EnterTyp( "SHORTINT", SInt, OPM.SIntSize, sinttyp, SFtypSInt );
 	EnterTyp( "BOOLEAN", Bool, OPM.BoolSize, booltyp, SFtypBool );
 	(*
 	EnterTyp("CHAR16", Char16, OPM.IntSize, char16typ, SFtypChar16);

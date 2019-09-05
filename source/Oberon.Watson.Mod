@@ -565,9 +565,9 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 			END
 		ELSE
 			(* check if ident is a keyword, if so write it and return *)
-			IF (name = "CHAR") OR (name = "BOOLEAN") OR (name = "SIGNED16") THEN Str(name); RETURN
-			ELSIF (name = "SIGNED32") OR (name = "SIGNED8") OR (name = "SET")THEN Str(name); RETURN
-			ELSIF (name = "FLOAT32") OR (name = "FLOAT64") THEN Str(name); RETURN
+			IF (name = "CHAR") OR (name = "BOOLEAN") OR (name = "INTEGER") THEN Str(name); RETURN
+			ELSIF (name = "LONGINT") OR (name = "SHORTINT") OR (name = "SET")THEN Str(name); RETURN
+			ELSIF (name = "REAL") OR (name = "LONGREAL") THEN Str(name); RETURN
 			ELSIF (name = "TRUE") OR (name = "FALSE") THEN Str(name); RETURN
 			ELSIF (name = "MOD") OR (name = "DIV") THEN Str(name); RETURN
 			ELSIF (name = "MAX") OR (name = "MIN") OR (name = "ABS") THEN Str(name); RETURN
@@ -577,7 +577,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 			ELSIF (name = "LONG") OR (name = "SHORT") OR (name = "ENTIER") THEN Str(name); RETURN
 			ELSIF (name = "c") OR (name = "winapi") OR (name = "notag") OR (name = "untraced") THEN Str(name); RETURN
 			ELSIF (name = "PTR") THEN Str(name); RETURN
-			ELSIF (name = "SIGNED64") THEN Str(name); RETURN
+			ELSIF (name = "HUGEINT") THEN Str(name); RETURN
 			ELSE obj:= FindIdent(name);
 				(* check whether object is exported or not *)
 				IF (obj = NIL) THEN (* exported => write control *) SetColor(LinkCol); Str(name); Control("", GotoCmd, name)

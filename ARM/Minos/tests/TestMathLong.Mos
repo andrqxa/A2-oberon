@@ -346,7 +346,7 @@ BEGIN
 	InitCmd("MUL", "rr", "r", CalcMUL, CompareRelative1eps, ShowRRR);
 	InitCmd("DIV", "rr", "r", CalcDIV, CompareRelative1eps, ShowRRR);
 	InitCmd("ENTIER", "r", "i", CalcENTIER, CompareI, NIL);
-	InitCmd("FLOAT32", "i", "r", CalcREAL, CompareRelative1eps, ShowIR);
+	InitCmd("REAL", "i", "r", CalcREAL, CompareRelative1eps, ShowIR);
 	InitCmd("GREATER", "rr", "b", CalcGREATER, CompareB, NIL);
 	InitCmd("LOWER", "rr", "b", CalcLOWER, CompareB, NIL);
 	InitCmd("SIN", "r", "r", CalcSIN, CompareAbsolute4eps, ShowRR);

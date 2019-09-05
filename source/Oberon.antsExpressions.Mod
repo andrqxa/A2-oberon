@@ -1925,17 +1925,17 @@ END EvalProcObj;
 		IF obj # NIL THEN
 			IF obj IS vyLongrealVec.tLONGREAL THEN
 				WITH obj: vyLongrealVec.tLONGREAL DO
-					Str( "FLOAT64" );  val.class := LReal;  COPY( name, val.name );  val.y := obj.x;  val.ptr := ADDRESSOF( obj.x );
+					Str( "LONGREAL" );  val.class := LReal;  COPY( name, val.name );  val.y := obj.x;  val.ptr := ADDRESSOF( obj.x );
 					val.p := SYSTEM.VAL( ANY, val.ptr );  val.adr := SYSTEM.GET32( ADDRESSOF( obj ) );  RETURN TRUE
 				END;
 			ELSIF obj IS vyRealVec.tREAL THEN
 				WITH obj: vyRealVec.tREAL DO
-					Str( "FLOAT32" );  val.class := Real;  COPY( name, val.name );  val.x := obj.x;  val.ptr := ADDRESSOF( obj.x );
+					Str( "REAL" );  val.class := Real;  COPY( name, val.name );  val.x := obj.x;  val.ptr := ADDRESSOF( obj.x );
 					val.p := SYSTEM.VAL( ANY, val.ptr );  val.adr := SYSTEM.GET32( ADDRESSOF( obj ) );  RETURN TRUE
 				END;
 			ELSIF obj IS vyLongintVec.tLONGINT THEN
 				WITH obj: vyLongintVec.tLONGINT DO
-					Str( "SIGNED32" );  val.class := LInt;  COPY( name, val.name );  val.i := obj.i;  val.ptr := ADDRESSOF( obj.i );
+					Str( "LONGINT" );  val.class := LInt;  COPY( name, val.name );  val.i := obj.i;  val.ptr := ADDRESSOF( obj.i );
 					val.p := SYSTEM.VAL( ANY, val.ptr );  val.adr := SYSTEM.GET32( ADDRESSOF( obj ) );  RETURN TRUE;
 				END;
 			ELSIF obj IS vyIntVec.tINTEGER THEN

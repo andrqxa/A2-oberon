@@ -1294,14 +1294,14 @@ BEGIN
 	AddBasicType(Universe, "BOOLEAN", TS.BasicBoolean);
 	AddBasicType(Universe, "ANY", TS.BasicInt32);
 	AddBasicType(Universe, "PTR", TS.BasicInt32);
-	AddBasicType(Universe, "SIGNED8", TS.BasicInt8);
-	AddBasicType(Universe, "SIGNED16", TS.BasicInt16);
-	AddBasicType(Universe, "SIGNED32", TS.BasicInt32);
+	AddBasicType(Universe, "SHORTINT", TS.BasicInt8);
+	AddBasicType(Universe, "INTEGER", TS.BasicInt16);
+	AddBasicType(Universe, "LONGINT", TS.BasicInt32);
 	AddBasicType(Universe, "SET", TS.BasicInt32);
-	AddBasicType(Universe, "SIGNED64", TS.BasicInt64);
+	AddBasicType(Universe, "HUGEINT", TS.BasicInt64);
 	AddBasicType(Universe, "CHAR", TS.BasicChar8);
-	AddBasicType(Universe, "FLOAT32", TS.BasicReal32);
-	AddBasicType(Universe, "FLOAT64", TS.BasicReal64);
+	AddBasicType(Universe, "REAL", TS.BasicReal32);
+	AddBasicType(Universe, "LONGREAL", TS.BasicReal64);
 	AddBasicType(Universe, "STRING", TS.BasicString);
 END TFAOParser.
 
