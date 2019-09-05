@@ -433,7 +433,7 @@ CONST
 			SYSTEM.GET(adr, s64); Unsigned(s64, SIZEOF(UNSIGNED64));
 			w.String(")");
 		| sfTypeCOMPLEX:
-			size := SIZEOF(COMPLEX);
+			size := SIZEOF(COMPLEX32);
 			cplx := adr; w.Float(cplx.re,12); w.String("+ i*"); w.Float(cplx.im,12);
 		| sfTypeLONGCOMPLEX:
 			size := SIZEOF(LONGCOMPLEX);
@@ -1118,7 +1118,7 @@ TYPE
 		| sfTypeUNSIGNED64: w.String("UNSIGNED64");
 		| sfTypeREAL: w.String("FLOAT32");
 		| sfTypeLONGREAL: w.String("FLOAT64");
-		| sfTypeCOMPLEX: w.String("COMPLEX");
+		| sfTypeCOMPLEX: w.String("COMPLEX32");
 		| sfTypeLONGCOMPLEX: w.String("LONGCOMPLEX");
 		| sfTypeSET: w.String("SET");
 		| sfTypeANY: w.String("ANY");

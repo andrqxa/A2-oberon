@@ -14,7 +14,7 @@ TYPE
 	GenericUnaryAALoopH = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED64): SIGNED64 );
 	GenericUnaryAALoopR = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: FLOAT32): FLOAT32 );
 	GenericUnaryAALoopX = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: FLOAT64): FLOAT64 );
-	GenericUnaryAALoopZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX): COMPLEX );
+	GenericUnaryAALoopZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX32): COMPLEX32 );
 	GenericUnaryAALoopLZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: LONGCOMPLEX): LONGCOMPLEX );
 	UnaryAALoop = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
 	UnaryASLoop = PROCEDURE ( ladr, dadr: ADDRESS; linc, len: SIZE );
@@ -829,8 +829,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ApplyGenericUnaryAAOpX;
 	
-	(** apply unary operator to array:  array COMPLEX -> array COMPLEX *)
-	PROCEDURE ApplyGenericUnaryAAOpZ( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopZ; op: PROCEDURE(x: COMPLEX): COMPLEX );
+	(** apply unary operator to array:  array COMPLEX32 -> array COMPLEX32 *)
+	PROCEDURE ApplyGenericUnaryAAOpZ( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopZ; op: PROCEDURE(x: COMPLEX32): COMPLEX32 );
 	VAR loopd, looplen, loopli, loopdi: SIZE;  p: ANY;  glen: SIZE;
 		origdest: SIZE;  modes: SET;
 			dest, left: ADDRESS;  dim: SIZE;
@@ -2154,9 +2154,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END GenericLoopX;
 	
-(** COMPLEX *)
-	PROCEDURE GenericLoopZ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX): COMPLEX );
-	VAR lval,dval: POINTER{UNSAFE,UNTRACED} TO RECORD val: COMPLEX END;	
+(** COMPLEX32 *)
+	PROCEDURE GenericLoopZ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX32): COMPLEX32 );
+	VAR lval,dval: POINTER{UNSAFE,UNTRACED} TO RECORD val: COMPLEX32 END;	
 	BEGIN
 		WHILE (len > 0) DO
 			lval := ladr;
@@ -2351,9 +2351,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "+";
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE AddAZAZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: COMPLEX;
+	VAR lval, rval: COMPLEX32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval + rval );
@@ -2361,10 +2361,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddAZAZLoop;
 
-	OPERATOR "+"*(CONST left,right: ARRAY [?] OF COMPLEX): ARRAY [?] OF COMPLEX;
+	OPERATOR "+"*(CONST left,right: ARRAY [?] OF COMPLEX32): ARRAY [?] OF COMPLEX32;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( COMPLEX ), loopAddAZAZ );
+										  SIZEOF( COMPLEX32 ), loopAddAZAZ );
 		RETURN RESULT
 	END "+";
 
@@ -2517,9 +2517,9 @@ Sufficient (but not necessary) conditions:
 	END "+";
 
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE AddAZSZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: COMPLEX;
+	VAR lval, rval: COMPLEX32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2528,16 +2528,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddAZSZLoop;
 
-	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF COMPLEX; right: COMPLEX ): ARRAY [ ? ] OF COMPLEX;
+	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF COMPLEX32; right: COMPLEX32 ): ARRAY [ ? ] OF COMPLEX32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( COMPLEX ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( COMPLEX32 ),
 										  AddAZSZLoop );
 		RETURN RESULT
 	END "+";
 
-	OPERATOR "+"*(left: COMPLEX; CONST right: ARRAY [ ? ] OF COMPLEX): ARRAY [ ? ] OF COMPLEX;
+	OPERATOR "+"*(left: COMPLEX32; CONST right: ARRAY [ ? ] OF COMPLEX32): ARRAY [ ? ] OF COMPLEX32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( COMPLEX ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( COMPLEX32 ),
 										  AddAZSZLoop );
 		RETURN RESULT
 	END "+";
@@ -2656,9 +2656,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE SubAZAZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: COMPLEX;
+	VAR lval, rval: COMPLEX32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval - rval );
@@ -2666,10 +2666,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubAZAZLoop;
 
-	OPERATOR "-"*(CONST left,right: ARRAY [?] OF COMPLEX): ARRAY [?] OF COMPLEX;
+	OPERATOR "-"*(CONST left,right: ARRAY [?] OF COMPLEX32): ARRAY [?] OF COMPLEX32;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( COMPLEX ), SubAZAZLoop );
+										  SIZEOF( COMPLEX32 ), SubAZAZLoop );
 		RETURN RESULT
 	END "-";
 
@@ -2730,8 +2730,8 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** COMPLEX *)
-	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF COMPLEX; right: COMPLEX ): ARRAY [ ? ] OF COMPLEX;
+(** COMPLEX32 *)
+	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF COMPLEX32; right: COMPLEX32 ): ARRAY [ ? ] OF COMPLEX32;
 	BEGIN
 		RESULT := left + (-right);
 		RETURN RESULT
@@ -2837,9 +2837,9 @@ Sufficient (but not necessary) conditions:
 	END "-";
 
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE SubSZAZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval, dval: COMPLEX;
+	VAR lval, rval, dval: COMPLEX32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2848,10 +2848,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubSZAZLoop;
 
-	OPERATOR "-"*(left: COMPLEX; CONST right: ARRAY [ ? ] OF COMPLEX): ARRAY [ ? ] OF COMPLEX;
+	OPERATOR "-"*(left: COMPLEX32; CONST right: ARRAY [ ? ] OF COMPLEX32): ARRAY [ ? ] OF COMPLEX32;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( COMPLEX ), SubSZAZLoop );
+										  SIZEOF( COMPLEX32 ), SubSZAZLoop );
 		RETURN RESULT
 	END "-";
 
@@ -2964,9 +2964,9 @@ Sufficient (but not necessary) conditions:
 	END ".*";
 
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE EMulAZAZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: COMPLEX;
+	VAR lval, rval: COMPLEX32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval * rval );
@@ -2974,10 +2974,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulAZAZLoop;
 
-	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF COMPLEX): ARRAY [?] OF COMPLEX;
+	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF COMPLEX32): ARRAY [?] OF COMPLEX32;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( COMPLEX ), EMulAZAZLoop );
+										  SIZEOF( COMPLEX32 ), EMulAZAZLoop );
 		RETURN RESULT
 	END ".*";
 
@@ -3217,9 +3217,9 @@ Sufficient (but not necessary) conditions:
 	END "*";
 
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE MulAZSZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: COMPLEX;
+	VAR lval, rval: COMPLEX32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3228,16 +3228,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MulAZSZLoop;
 
-	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF COMPLEX; right: COMPLEX ): ARRAY [ ? ] OF COMPLEX;
+	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF COMPLEX32; right: COMPLEX32 ): ARRAY [ ? ] OF COMPLEX32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( COMPLEX ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( COMPLEX32 ),
 										  loopMulAZSZ );
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(left: COMPLEX; CONST right: ARRAY [ ? ] OF COMPLEX): ARRAY [ ? ] OF COMPLEX;
+	OPERATOR "*"*(left: COMPLEX32; CONST right: ARRAY [ ? ] OF COMPLEX32): ARRAY [ ? ] OF COMPLEX32;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( COMPLEX ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( COMPLEX32 ),
 										  loopMulAZSZ );
 		RETURN RESULT
 	END "*";
@@ -3587,9 +3587,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "./";
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE EDivideAZAZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: COMPLEX;  dval: COMPLEX;
+	VAR lval, rval: COMPLEX32;  dval: COMPLEX32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval / rval;
@@ -3598,10 +3598,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivideAZAZLoop;
 
-	OPERATOR "./"*(CONST left,right: ARRAY [?] OF COMPLEX): ARRAY [?] OF COMPLEX;
+	OPERATOR "./"*(CONST left,right: ARRAY [?] OF COMPLEX32): ARRAY [?] OF COMPLEX32;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( COMPLEX ), EDivideAZAZLoop );
+										  SIZEOF( COMPLEX32 ), EDivideAZAZLoop );
 		RETURN RESULT
 	END "./";
 
@@ -3813,9 +3813,9 @@ Sufficient (but not necessary) conditions:
 	END "/";
 
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE DivideAZSZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: COMPLEX;  dval: COMPLEX;
+	VAR lval, rval: COMPLEX32;  dval: COMPLEX32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3824,15 +3824,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideAZSZLoop;
 
-	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF COMPLEX; right: COMPLEX ): ARRAY [ ? ] OF COMPLEX;
+	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF COMPLEX32; right: COMPLEX32 ): ARRAY [ ? ] OF COMPLEX32;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( COMPLEX ), DivideAZSZLoop );
+										  SIZEOF( COMPLEX32 ), DivideAZSZLoop );
 		RETURN RESULT
 	END "/";
 
 	PROCEDURE DivideSZAZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: COMPLEX;  dval: COMPLEX;
+	VAR lval, rval: COMPLEX32;  dval: COMPLEX32;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3841,10 +3841,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideSZAZLoop;
 
-	OPERATOR "/"*(left: COMPLEX; CONST right: ARRAY [ ? ] OF COMPLEX): ARRAY [ ? ] OF COMPLEX;
+	OPERATOR "/"*(left: COMPLEX32; CONST right: ARRAY [ ? ] OF COMPLEX32): ARRAY [ ? ] OF COMPLEX32;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( COMPLEX ), DivideSZAZLoop );
+										  SIZEOF( COMPLEX32 ), DivideSZAZLoop );
 		RETURN RESULT
 	END "/";
 
@@ -4340,9 +4340,9 @@ Sufficient (but not necessary) conditions:
 		RETURN dest;
 	END "+*";
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE SPAZAZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval: COMPLEX;  dval: COMPLEX;
+	VAR lval, rval: COMPLEX32;  dval: COMPLEX32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -4354,15 +4354,15 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END SPAZAZLoop;
 
-	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF COMPLEX ): COMPLEX;
-	VAR dest: COMPLEX;
+	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF COMPLEX32 ): COMPLEX32;
+	VAR dest: COMPLEX32;
 	BEGIN
 		dest := 0;
 		ApplyBinaryAASOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), loopSPAZAZ );
 		RETURN dest;
 	END "+*";
 
-	(** COMPLEX *)
+	(** COMPLEX32 *)
 	PROCEDURE SPALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;  dvalRe, dvalIm: FLOAT64;
 	BEGIN
@@ -6315,9 +6315,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlAXAXLoop, FALSE );
 	END "#";
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE EqlAZAZLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: COMPLEX;
+	VAR lval, rval: COMPLEX32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6327,12 +6327,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlAZAZLoop;
 
-	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF COMPLEX ): BOOLEAN;
+	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF COMPLEX32 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlAZAZLoop, FALSE );
 	END "=";
 
-	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF COMPLEX ): BOOLEAN;
+	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF COMPLEX32 ): BOOLEAN;
 	BEGIN
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlAZAZLoop, FALSE );
 	END "#";
@@ -7778,9 +7778,9 @@ TYPE
 	END "SUM";
 
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE SumAZLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: COMPLEX;
+	VAR lval, dval: COMPLEX32;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7789,8 +7789,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END SumAZLoop;
 
-	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF COMPLEX ): COMPLEX;
-	TYPE Type = COMPLEX;
+	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF COMPLEX32 ): COMPLEX32;
+	TYPE Type = COMPLEX32;
 	VAR val: Type;
 	BEGIN
 		val := 0;  ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), SumAZLoop );
@@ -7900,9 +7900,9 @@ TYPE
 		RETURN RESULT
 	END "ABS";
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE AbsLoopZ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: COMPLEX;
+	VAR lval: COMPLEX32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, ABS(lval) );  INC( ladr, linc );
@@ -7910,7 +7910,7 @@ TYPE
 		END;
 	END AbsLoopZ;
 
-	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF COMPLEX): ARRAY [ ? ] OF FLOAT32;
+	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF COMPLEX32): ARRAY [ ? ] OF FLOAT32;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), AbsLoopZ );
 		RETURN RESULT
@@ -8017,15 +8017,15 @@ TYPE
 		ApplyUnarySAOp( ADDRESSOF( dest ), ADDRESSOF( right ), AssignSXAXLoop );
 	END ":=";
 
-(** COMPLEX *)
+(** COMPLEX32 *)
 	PROCEDURE AssignSZAZLoop( ladr, dadr: ADDRESS; dinc, len: SIZE );
-	VAR lval: COMPLEX;
+	VAR lval: COMPLEX32;
 	BEGIN
 		SYSTEM.GET( ladr, lval );
 		WHILE (len > 0) DO SYSTEM.PUT( dadr, lval );  INC( dadr, dinc );  DEC( len );  END;
 	END AssignSZAZLoop;
 
-	OPERATOR ":="*(VAR dest: ARRAY [?] OF COMPLEX; right: COMPLEX);
+	OPERATOR ":="*(VAR dest: ARRAY [?] OF COMPLEX32; right: COMPLEX32);
 	BEGIN
 		ApplyUnarySAOp( ADDRESSOF( dest ), ADDRESSOF( right ), AssignSZAZLoop );
 	END ":=";
@@ -10041,9 +10041,9 @@ TYPE
 		RETURN RESULT
 	END "**";
 
-	OPERATOR "**"*(CONST left,right: ARRAY [?] OF COMPLEX): ARRAY [?] OF COMPLEX;
+	OPERATOR "**"*(CONST left,right: ARRAY [?] OF COMPLEX32): ARRAY [?] OF COMPLEX32;
 	BEGIN
-		ApplyTensorAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( COMPLEX ),
+		ApplyTensorAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( COMPLEX32 ),
 										  loopMulAZSZ );
 		RETURN RESULT
 	END "**";
@@ -10237,9 +10237,9 @@ TYPE
 		RETURN RESULT;
 	END "ALL";
 	
-	OPERATOR "ALL"*(CONST x: ARRAY [?] OF COMPLEX; op: PROCEDURE(x: COMPLEX): COMPLEX): ARRAY[?] OF COMPLEX; (*should also accept operator ?*)
+	OPERATOR "ALL"*(CONST x: ARRAY [?] OF COMPLEX32; op: PROCEDURE(x: COMPLEX32): COMPLEX32): ARRAY[?] OF COMPLEX32; (*should also accept operator ?*)
 	BEGIN
-		ApplyGenericUnaryAAOpZ(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(COMPLEX),GenericLoopZ,op);
+		ApplyGenericUnaryAAOpZ(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(COMPLEX32),GenericLoopZ,op);
 		RETURN RESULT;
 	END "ALL";
 

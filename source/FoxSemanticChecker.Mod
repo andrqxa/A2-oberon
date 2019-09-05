@@ -2083,7 +2083,7 @@ TYPE
 				ELSIF
 					(leftType IS SyntaxTree.ComplexType) & (rightType IS SyntaxTree.FloatType) OR
 					(leftType IS SyntaxTree.FloatType) & (rightType IS SyntaxTree.ComplexType) THEN
-					(* must be the case FLOAT64 / COMPLEX ) *)
+					(* must be the case FLOAT64 / COMPLEX32 ) *)
 					left := NewConversion(left.position, left, Global.Complex64, NIL);
 					right := NewConversion(right.position, right, Global.Complex64, NIL);
 				ELSE

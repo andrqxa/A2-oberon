@@ -12667,7 +12667,7 @@ TYPE
 							END;
 						| SyntaxTree.ComplexType DO
 							IF (type = module.system.complexType) OR (type.sizeInBits = 64) THEN
-								IF RefInfo THEN Info(section,"COMPLEX") END;
+								IF RefInfo THEN Info(section,"COMPLEX32") END;
 								Char(section, sfTypeCOMPLEX);
 							ELSIF (type = module.system.longcomplexType) OR (type.sizeInBits = 12) THEN
 								IF RefInfo THEN Info(section,"LONGCOMPLEX") END;
