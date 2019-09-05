@@ -11,8 +11,8 @@ platforms := Bios32 Bios64 Zynq Win32 Win64 Linux32 Linux64 Darwin32 Darwin64 So
 
 target := Linux64
 pltfrm := Unix64
-object := .GofUu
-symbol := .SymUu
+object := .Gof
+symbol := .Sym
 
 # module dependencies
 
