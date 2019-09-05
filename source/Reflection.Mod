@@ -436,7 +436,7 @@ CONST
 			size := SIZEOF(COMPLEX32);
 			cplx := adr; w.Float(cplx.re,12); w.String("+ i*"); w.Float(cplx.im,12);
 		| sfTypeLONGCOMPLEX:
-			size := SIZEOF(LONGCOMPLEX);
+			size := SIZEOF(COMPLEX64);
 			lcplx := adr;
 			w.Float(lcplx.re,13); w.String("+ i*"); w.Float(lcplx.im,13);
 		| sfTypeSET:
@@ -1119,7 +1119,7 @@ TYPE
 		| sfTypeREAL: w.String("FLOAT32");
 		| sfTypeLONGREAL: w.String("FLOAT64");
 		| sfTypeCOMPLEX: w.String("COMPLEX32");
-		| sfTypeLONGCOMPLEX: w.String("LONGCOMPLEX");
+		| sfTypeLONGCOMPLEX: w.String("COMPLEX64");
 		| sfTypeSET: w.String("SET");
 		| sfTypeANY: w.String("ANY");
 		| sfTypeOBJECT: w.String("OBJECT");

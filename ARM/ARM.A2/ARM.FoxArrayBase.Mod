@@ -15,7 +15,7 @@ TYPE
 	GenericUnaryAALoopR = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: FLOAT32): FLOAT32 );
 	GenericUnaryAALoopX = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: FLOAT64): FLOAT64 );
 	GenericUnaryAALoopZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX32): COMPLEX32 );
-	GenericUnaryAALoopLZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: LONGCOMPLEX): LONGCOMPLEX );
+	GenericUnaryAALoopLZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX64): COMPLEX64 );
 	UnaryAALoop = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
 	UnaryASLoop = PROCEDURE ( ladr, dadr: ADDRESS; linc, len: SIZE );
 	UnarySALoop = PROCEDURE ( ladr, dadr: ADDRESS; dinc, len: SIZE );
@@ -883,8 +883,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ApplyGenericUnaryAAOpZ;
 	
-	(** apply unary operator to array:  array LONGCOMPLEX -> array LONGCOMPLEX *)
-	PROCEDURE ApplyGenericUnaryAAOpLZ( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopLZ; op: PROCEDURE(x: LONGCOMPLEX): LONGCOMPLEX );
+	(** apply unary operator to array:  array COMPLEX64 -> array COMPLEX64 *)
+	PROCEDURE ApplyGenericUnaryAAOpLZ( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopLZ; op: PROCEDURE(x: COMPLEX64): COMPLEX64 );
 	VAR loopd, looplen, loopli, loopdi: SIZE;  p: ANY;  glen: SIZE;
 		origdest: SIZE;  modes: SET;
 			dest, left: ADDRESS;  dim: SIZE;
@@ -2167,9 +2167,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END GenericLoopZ;
 
-(** LONGCOMPLEX *)
-	PROCEDURE GenericLoopLZ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: LONGCOMPLEX): LONGCOMPLEX );
-	VAR lval,dval: POINTER{UNSAFE,UNTRACED} TO RECORD val: LONGCOMPLEX END;	
+(** COMPLEX64 *)
+	PROCEDURE GenericLoopLZ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX64): COMPLEX64 );
+	VAR lval,dval: POINTER{UNSAFE,UNTRACED} TO RECORD val: COMPLEX64 END;	
 	BEGIN
 		WHILE (len > 0) DO
 			lval := ladr;
@@ -2369,7 +2369,7 @@ Sufficient (but not necessary) conditions:
 	END "+";
 
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE AddALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
@@ -2382,10 +2382,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddALZALZLoop;
 
-	OPERATOR "+"*(CONST left,right: ARRAY [?] OF LONGCOMPLEX): ARRAY [?] OF LONGCOMPLEX;
+	OPERATOR "+"*(CONST left,right: ARRAY [?] OF COMPLEX64): ARRAY [?] OF COMPLEX64;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGCOMPLEX ), loopAddALZALZ );
+										  SIZEOF( COMPLEX64 ), loopAddALZALZ );
 		RETURN RESULT
 	END "+";
 
@@ -2542,7 +2542,7 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "+";
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE AddALZSLZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
@@ -2555,16 +2555,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddALZSLZLoop;
 
-	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF LONGCOMPLEX; right: LONGCOMPLEX ): ARRAY [ ? ] OF LONGCOMPLEX;
+	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF COMPLEX64; right: COMPLEX64 ): ARRAY [ ? ] OF COMPLEX64;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( LONGCOMPLEX ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( COMPLEX64 ),
 										  AddALZSLZLoop );
 		RETURN RESULT
 	END "+";
 
-	OPERATOR "+"*(left: LONGCOMPLEX; CONST right: ARRAY [ ? ] OF LONGCOMPLEX): ARRAY [ ? ] OF LONGCOMPLEX;
+	OPERATOR "+"*(left: COMPLEX64; CONST right: ARRAY [ ? ] OF COMPLEX64): ARRAY [ ? ] OF COMPLEX64;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( LONGCOMPLEX ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( COMPLEX64 ),
 										  AddALZSLZLoop );
 		RETURN RESULT
 	END "+";
@@ -2673,7 +2673,7 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE SubALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
@@ -2686,10 +2686,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubALZALZLoop;
 
-	OPERATOR "-"*(CONST left,right: ARRAY [?] OF LONGCOMPLEX): ARRAY [?] OF LONGCOMPLEX;
+	OPERATOR "-"*(CONST left,right: ARRAY [?] OF COMPLEX64): ARRAY [?] OF COMPLEX64;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGCOMPLEX ), SubALZALZLoop );
+										  SIZEOF( COMPLEX64 ), SubALZALZLoop );
 		RETURN RESULT
 	END "-";
 
@@ -2737,8 +2737,8 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** LONGCOMPLEX *)
-	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF LONGCOMPLEX; right: LONGCOMPLEX ): ARRAY [ ? ] OF LONGCOMPLEX;
+(** COMPLEX64 *)
+	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF COMPLEX64; right: COMPLEX64 ): ARRAY [ ? ] OF COMPLEX64;
 	BEGIN
 		RESULT := left + (-right);
 		RETURN RESULT
@@ -2855,7 +2855,7 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE SubSLZALZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
@@ -2868,10 +2868,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubSLZALZLoop;
 
-	OPERATOR "-"*(left: LONGCOMPLEX; CONST right: ARRAY [ ? ] OF LONGCOMPLEX): ARRAY [ ? ] OF LONGCOMPLEX;
+	OPERATOR "-"*(left: COMPLEX64; CONST right: ARRAY [ ? ] OF COMPLEX64): ARRAY [ ? ] OF COMPLEX64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( LONGCOMPLEX ), SubSLZALZLoop );
+										  SIZEOF( COMPLEX64 ), SubSLZALZLoop );
 		RETURN RESULT
 	END "-";
 
@@ -2981,7 +2981,7 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".*";
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE EMulALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
@@ -2994,10 +2994,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulALZALZLoop;
 
-	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF LONGCOMPLEX): ARRAY [?] OF LONGCOMPLEX;
+	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF COMPLEX64): ARRAY [?] OF COMPLEX64;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGCOMPLEX ), EMulALZALZLoop );
+										  SIZEOF( COMPLEX64 ), EMulALZALZLoop );
 		RETURN RESULT
 	END ".*";
 
@@ -3242,7 +3242,7 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "*";
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE MulALZSLZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
@@ -3255,16 +3255,16 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MulALZSLZLoop;
 
-	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF LONGCOMPLEX; right: LONGCOMPLEX ): ARRAY [ ? ] OF LONGCOMPLEX;
+	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF COMPLEX64; right: COMPLEX64 ): ARRAY [ ? ] OF COMPLEX64;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( LONGCOMPLEX ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( COMPLEX64 ),
 										  loopMulALZSLZ );
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(left: LONGCOMPLEX; CONST right: ARRAY [ ? ] OF LONGCOMPLEX): ARRAY [ ? ] OF LONGCOMPLEX;
+	OPERATOR "*"*(left: COMPLEX64; CONST right: ARRAY [ ? ] OF COMPLEX64): ARRAY [ ? ] OF COMPLEX64;
 	BEGIN
-		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( LONGCOMPLEX ),
+		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ), SIZEOF( COMPLEX64 ),
 										  loopMulALZSLZ );
 		RETURN RESULT
 	END "*";
@@ -3606,7 +3606,7 @@ Sufficient (but not necessary) conditions:
 	END "./";
 
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE EDivideALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;  dvalRe, dvalIm: FLOAT64; v: FLOAT64;
 	BEGIN
@@ -3627,10 +3627,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivideALZALZLoop;
 
-	OPERATOR "./"*(CONST left,right: ARRAY [?] OF LONGCOMPLEX): ARRAY [?] OF LONGCOMPLEX;
+	OPERATOR "./"*(CONST left,right: ARRAY [?] OF COMPLEX64): ARRAY [?] OF COMPLEX64;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGCOMPLEX ), EDivideALZALZLoop );
+										  SIZEOF( COMPLEX64 ), EDivideALZALZLoop );
 		RETURN RESULT
 	END "./";
 
@@ -3849,7 +3849,7 @@ Sufficient (but not necessary) conditions:
 	END "/";
 
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE DivideALZSLZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;  dvalRe, dvalIm: FLOAT64; v: FLOAT64;
 	BEGIN
@@ -3876,10 +3876,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideALZSLZLoop;
 
-	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF LONGCOMPLEX; right: LONGCOMPLEX ): ARRAY [ ? ] OF LONGCOMPLEX;
+	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF COMPLEX64; right: COMPLEX64 ): ARRAY [ ? ] OF COMPLEX64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGCOMPLEX ), DivideALZSLZLoop );
+										  SIZEOF( COMPLEX64 ), DivideALZSLZLoop );
 		RETURN RESULT
 	END "/";
 
@@ -3898,10 +3898,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideSLZALZLoop;
 
-	OPERATOR "/"*(left: LONGCOMPLEX; CONST right: ARRAY [ ? ] OF LONGCOMPLEX): ARRAY [ ? ] OF LONGCOMPLEX;
+	OPERATOR "/"*(left: COMPLEX64; CONST right: ARRAY [ ? ] OF COMPLEX64): ARRAY [ ? ] OF COMPLEX64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( LONGCOMPLEX ), DivideSLZALZLoop );
+										  SIZEOF( COMPLEX64 ), DivideSLZALZLoop );
 		RETURN RESULT
 	END "/";
 
@@ -4377,8 +4377,8 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), dvalIm );
 	END SPALZALZLoop;
 
-	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF LONGCOMPLEX ): LONGCOMPLEX;
-	VAR dest: LONGCOMPLEX;
+	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF COMPLEX64 ): COMPLEX64;
+	VAR dest: COMPLEX64;
 	BEGIN
 		dest := 0;
 		ApplyBinaryAASOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), loopSPALZALZ );
@@ -6337,7 +6337,7 @@ Sufficient (but not necessary) conditions:
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlAZAZLoop, FALSE );
 	END "#";
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE EqlALZALZLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
 	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
@@ -6350,12 +6350,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlALZALZLoop;
 
-	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF LONGCOMPLEX ): BOOLEAN;
+	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF COMPLEX64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlALZALZLoop, FALSE );
 	END "=";
 
-	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF LONGCOMPLEX ): BOOLEAN;
+	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF COMPLEX64 ): BOOLEAN;
 	BEGIN
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlALZALZLoop, FALSE );
 	END "#";
@@ -7797,7 +7797,7 @@ TYPE
 		RETURN val;
 	END "SUM";
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE SumALZLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
 	VAR lvalRe, lvalIm, dvalRe, dvalIm: FLOAT64;
 	BEGIN
@@ -7810,8 +7810,8 @@ TYPE
 		SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), dvalIm );
 	END SumALZLoop;
 
-	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF LONGCOMPLEX ): LONGCOMPLEX;
-	TYPE Type = LONGCOMPLEX;
+	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF COMPLEX64 ): COMPLEX64;
+	TYPE Type = COMPLEX64;
 	VAR val: Type;
 	BEGIN
 		val := 0;  ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), SumALZLoop );
@@ -7916,7 +7916,7 @@ TYPE
 		RETURN RESULT
 	END "ABS";
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE AbsLoopLZ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
 	VAR lvalRe, lvalIm: FLOAT64;
 	BEGIN
@@ -7928,7 +7928,7 @@ TYPE
 		END;
 	END AbsLoopLZ;
 
-	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF LONGCOMPLEX): ARRAY [ ? ] OF FLOAT64;
+	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF COMPLEX64): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT64 ), AbsLoopLZ );
 		RETURN RESULT
@@ -8030,7 +8030,7 @@ TYPE
 		ApplyUnarySAOp( ADDRESSOF( dest ), ADDRESSOF( right ), AssignSZAZLoop );
 	END ":=";
 
-(** LONGCOMPLEX *)
+(** COMPLEX64 *)
 	PROCEDURE AssignSLZALZLoop( ladr, dadr: ADDRESS; dinc, len: SIZE );
 	VAR lvalRe, lvalIm: FLOAT64;
 	BEGIN
@@ -8038,7 +8038,7 @@ TYPE
 		WHILE (len > 0) DO SYSTEM.PUT( dadr, lvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), lvalIm ); INC( dadr, dinc );  DEC( len );  END;
 	END AssignSLZALZLoop;
 
-	OPERATOR ":="*(VAR dest: ARRAY [?] OF LONGCOMPLEX; right: LONGCOMPLEX);
+	OPERATOR ":="*(VAR dest: ARRAY [?] OF COMPLEX64; right: COMPLEX64);
 	BEGIN
 		ApplyUnarySAOp( ADDRESSOF( dest ), ADDRESSOF( right ), AssignSLZALZLoop );
 	END ":=";
@@ -10048,9 +10048,9 @@ TYPE
 		RETURN RESULT
 	END "**";
 
-	OPERATOR "**"*(CONST left,right: ARRAY [?] OF LONGCOMPLEX): ARRAY [?] OF LONGCOMPLEX;
+	OPERATOR "**"*(CONST left,right: ARRAY [?] OF COMPLEX64): ARRAY [?] OF COMPLEX64;
 	BEGIN
-		ApplyTensorAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( LONGCOMPLEX ),
+		ApplyTensorAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( COMPLEX64 ),
 										  loopMulALZSLZ );
 		RETURN RESULT
 	END "**";
@@ -10243,9 +10243,9 @@ TYPE
 		RETURN RESULT;
 	END "ALL";
 
-	OPERATOR "ALL"*(CONST x: ARRAY [?] OF LONGCOMPLEX; op: PROCEDURE(x: LONGCOMPLEX): LONGCOMPLEX): ARRAY[?] OF LONGCOMPLEX; (*should also accept operator ?*)
+	OPERATOR "ALL"*(CONST x: ARRAY [?] OF COMPLEX64; op: PROCEDURE(x: COMPLEX64): COMPLEX64): ARRAY[?] OF COMPLEX64; (*should also accept operator ?*)
 	BEGIN
-		ApplyGenericUnaryAAOpLZ(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(LONGCOMPLEX),GenericLoopLZ,op);
+		ApplyGenericUnaryAAOpLZ(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(COMPLEX64),GenericLoopLZ,op);
 		RETURN RESULT;
 	END "ALL";
 

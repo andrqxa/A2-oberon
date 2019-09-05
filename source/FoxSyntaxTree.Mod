@@ -949,8 +949,8 @@ TYPE
 
 	END FloatType;
 
-	(** <<COMPLEX32,LONGCOMPLEX>>
-		complex types: COMPLEX32, LONGCOMPLEX
+	(** <<COMPLEX32,COMPLEX64>>
+		complex types: COMPLEX32, COMPLEX64
 	**)
 	ComplexType*= OBJECT (NumberType)
 		VAR componentType-: Type; (* FLOAT32 or FLOAT64*)

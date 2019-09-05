@@ -224,7 +224,7 @@ negative: incompatible actual parameter type for static formal type
 
 
 
-positive: use of COMPLEX32 and LONGCOMPLEX
+positive: use of COMPLEX32 and COMPLEX64
 
 MODULE Test;
 
@@ -235,8 +235,8 @@ MODULE Test;
         RETURN exp
     END Exp;
 
-PROCEDURE Exp*( z: LONGCOMPLEX): LONGCOMPLEX;
-    VAR coef, re, reaL, im, imaG: FLOAT64;  exp: LONGCOMPLEX; real: FLOAT32;
+PROCEDURE Exp*( z: COMPLEX64): COMPLEX64;
+    VAR coef, re, reaL, im, imaG: FLOAT64;  exp: COMPLEX64; real: FLOAT32;
     BEGIN
          exp :=  reaL + reaL * IMAG;   
         RETURN exp
@@ -249,8 +249,8 @@ MODULE Test;
 
 TYPE
 	Object = OBJECT
-	VAR yn1, ct: LONGCOMPLEX;
-	VAR i: SIGNED32; xn: ARRAY [*] OF LONGCOMPLEX;
+	VAR yn1, ct: COMPLEX64;
+	VAR i: SIGNED32; xn: ARRAY [*] OF COMPLEX64;
 	BEGIN
 		yn1 := yn1
 	END Object;
@@ -260,7 +260,7 @@ END Test.
 positive: complex conjugate operator
 
 MODULE Test;
-VAR c: COMPLEX32; lc: LONGCOMPLEX;
+VAR c: COMPLEX32; lc: COMPLEX64;
 BEGIN
 	c := ~c;
 	lc := ~lc;

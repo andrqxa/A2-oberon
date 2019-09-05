@@ -12670,7 +12670,7 @@ TYPE
 								IF RefInfo THEN Info(section,"COMPLEX32") END;
 								Char(section, sfTypeCOMPLEX);
 							ELSIF (type = module.system.longcomplexType) OR (type.sizeInBits = 12) THEN
-								IF RefInfo THEN Info(section,"LONGCOMPLEX") END;
+								IF RefInfo THEN Info(section,"COMPLEX64") END;
 								Char(section, sfTypeLONGCOMPLEX);
 							ELSE
 								HALT(100);
