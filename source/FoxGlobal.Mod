@@ -793,6 +793,8 @@ TYPE
 	PROCEDURE SetDefaultDeclarations*(system: System; minBits: SIZE);
 	VAR now: Dates.DateTime; date, time: ARRAY 20 OF CHAR;
 	BEGIN
+		ASSERT (minBits = 8);
+
 		(* types *)
 		system.longintType := SyntaxTree.NewIntegerType(32, TRUE);
 		system.hugeintType := SyntaxTree.NewIntegerType(64, TRUE);
@@ -808,21 +810,11 @@ TYPE
 		system.longrealType := Float64;
 		*)
 
-		IF minBits = 8 THEN
-			system.shortintType := SyntaxTree.NewIntegerType(8, TRUE);
-			system.integerType := SyntaxTree.NewIntegerType(16, TRUE);
-			system.booleanType := SyntaxTree.NewBooleanType(8);
-			system.byteType := SyntaxTree.NewByteType(8);
-			system.characterType := SyntaxTree.NewCharacterType(8);
-		ELSIF minBits = 32 THEN
-			system.shortintType := SyntaxTree.NewIntegerType(32, TRUE);
-			system.integerType := SyntaxTree.NewIntegerType(32, TRUE);
-			system.booleanType := SyntaxTree.NewBooleanType(32);
-			system.byteType := SyntaxTree.NewByteType(32);
-			system.characterType := SyntaxTree.NewCharacterType(32);
-		ELSE
-			HALT (3214); (* nothing else is currently implemented *)
-		END;
+		system.shortintType := SyntaxTree.NewIntegerType(8, TRUE);
+		system.integerType := SyntaxTree.NewIntegerType(16, TRUE);
+		system.booleanType := SyntaxTree.NewBooleanType(8);
+		system.byteType := SyntaxTree.NewByteType(8);
+		system.characterType := SyntaxTree.NewCharacterType(8);
 
 		system.anyType := SyntaxTree.NewAnyType(system.addressSize);
 		system.objectType := SyntaxTree.NewObjectType(system.addressSize);
