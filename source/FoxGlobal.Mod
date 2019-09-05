@@ -902,6 +902,9 @@ TYPE
 		DeclareType(Unsigned32, "UNSIGNED32", system.globalScope);
 		DeclareType(Unsigned64, "UNSIGNED64", system.globalScope);
 
+		DeclareType(Float32, "FLOAT32", system.globalScope);
+		DeclareType(Float64, "FLOAT64", system.globalScope);
+
 		DeclareType(system.realType,"REAL",system.globalScope);
 		DeclareType(system.longrealType,"LONGREAL",system.globalScope);
 		DeclareType(system.complexType,"COMPLEX",system.globalScope);

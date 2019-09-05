@@ -11,8 +11,8 @@ CONST
 TYPE
 	ULONGINT = SIGNED32; (* alias to make distinction between signed and unsigned more clear *)
 	UHUGEINT = SIGNED64;
-	FLOAT32 = SIGNED32; (* alias to make clear that the integer actually contains a IEEE 32 bit float *)
-	FLOAT64= SIGNED64;
+	Single = SIGNED32; (* alias to make clear that the integer actually contains a IEEE single float *)
+	Double = SIGNED64; (* alias to make clear that the integer actually contains a IEEE double float *)
 	DoubleWord = RECORD
 		low*: UNSIGNED32; high*: SIGNED32;
 	END;
@@ -263,21 +263,21 @@ TYPE
 	END DivModU64;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE NegF32*(float: FLOAT32): FLOAT32;
+	PROCEDURE NegF32*(float: Single): Single;
 	CODE
 		LDR R0, [FP, #+float] ; R0 := float
 		EOR R0, R0, #S ; invert only the sign bit
 	END NegF32;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE AbsF32*(float: FLOAT32): FLOAT32;
+	PROCEDURE AbsF32*(float: Single): Single;
 	CODE
 		LDR R0, [FP, #+float] ; R0 := float
 		BIC R0, R0, #S ; clear the sign bit
 	END AbsF32;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE AddF32*(x, y: FLOAT32): FLOAT32;
+	PROCEDURE AddF32*(x, y: Single): Single;
 	VAR xe, ye, s: SIGNED32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF SYSTEM.NULL(x) = TRUE THEN x := y
@@ -311,50 +311,50 @@ TYPE
 	END AddF32;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE AddF64*(x,y: FLOAT64): FLOAT64;
-	VAR z: FLOAT64;
+	PROCEDURE AddF64*(x,y: Double): Double;
+	VAR z: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Add(SYSTEM.VAL(FPE64.Float64,x),SYSTEM.VAL(FPE64.Float64,y),SYSTEM.VAL(FPE64.Float64,z)); RETURN z
 	END AddF64;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE MulF64*(x,y: FLOAT64): FLOAT64;
-	VAR z: FLOAT64;
+	PROCEDURE MulF64*(x,y: Double): Double;
+	VAR z: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Mul(SYSTEM.VAL(FPE64.Float64,x),SYSTEM.VAL(FPE64.Float64,y),SYSTEM.VAL(FPE64.Float64,z)); RETURN z
 	END MulF64;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE DivF64*(x,y: FLOAT64): FLOAT64;
-	VAR z: FLOAT64;
+	PROCEDURE DivF64*(x,y: Double): Double;
+	VAR z: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Div(SYSTEM.VAL(FPE64.Float64,x),SYSTEM.VAL(FPE64.Float64,y),SYSTEM.VAL(FPE64.Float64,z)); RETURN z
 	END DivF64;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE SubF64*(x,y: FLOAT64): FLOAT64;
-	VAR z: FLOAT64;
+	PROCEDURE SubF64*(x,y: Double): Double;
+	VAR z: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Sub(SYSTEM.VAL(FPE64.Float64,x),SYSTEM.VAL(FPE64.Float64,y),SYSTEM.VAL(FPE64.Float64,z)); RETURN z
 	END SubF64;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE AbsF64*(x: FLOAT64): FLOAT64;
-	VAR z: FLOAT64;
+	PROCEDURE AbsF64*(x: Double): Double;
+	VAR z: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Abs(SYSTEM.VAL(FPE64.Float64,x),SYSTEM.VAL(FPE64.Float64,z)); RETURN z
 	END AbsF64;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE NegF64*(x: FLOAT64): FLOAT64;
-	VAR z: FLOAT64;
+	PROCEDURE NegF64*(x: Double): Double;
+	VAR z: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Neg(SYSTEM.VAL(FPE64.Float64,x),SYSTEM.VAL(FPE64.Float64,z)); RETURN z
 	END NegF64;
 
-	PROCEDURE ConvS32F64*(x: FLOAT64): SIGNED32;
+	PROCEDURE ConvS32F64*(x: Double): SIGNED32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN FPE64.Fix(SYSTEM.VAL(FPE64.Float64,x))
 	END ConvS32F64;
 
-	PROCEDURE ConvS64F64*(x: FLOAT64): SIGNED64;
+	PROCEDURE ConvS64F64*(x: Double): SIGNED64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN FPE64.FixInt64(SYSTEM.VAL(FPE64.Float64,x))
 	END ConvS64F64;
 
-	PROCEDURE ConvS64F32*(x: FLOAT32): SIGNED64;
+	PROCEDURE ConvS64F32*(x: Single): SIGNED64;
 	VAR d: FPE64.Float64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		FPE64.Double(x, d);
@@ -362,33 +362,33 @@ TYPE
 	END ConvS64F32;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE ConvF32F64*(x: FLOAT64): FLOAT32;
+	PROCEDURE ConvF32F64*(x: Double): Single;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN FPE64.Single(SYSTEM.VAL(FPE64.Float64,x))
 	END ConvF32F64;
 
 	(* if an FPU32 is available, the result must be made available via FPU register *)
-	PROCEDURE ConvF32F64F*(x: FLOAT64): REAL;
-	VAR r: FLOAT32;
+	PROCEDURE ConvF32F64F*(x: Double): REAL;
+	VAR r: Single;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		r := FPE64.Single(SYSTEM.VAL(FPE64.Float64,x));
 		RETURN SYSTEM.VAL(REAL, r);
 	END ConvF32F64F;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE ConvF64F32*(x: FLOAT32): FLOAT64;
-	VAR z: FLOAT64;
+	PROCEDURE ConvF64F32*(x: Single): Double;
+	VAR z: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Double(x,SYSTEM.VAL(FPE64.Float64,z)); RETURN z
 	END ConvF64F32;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE ConvF64S64*(x: SIGNED64): FLOAT64;
-	VAR flt: FLOAT64;
+	PROCEDURE ConvF64S64*(x: SIGNED64): Double;
+	VAR flt: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		FPE64.FloatInt64(x, SYSTEM.VAL(FPE64.Float64, flt)); RETURN flt
 	END ConvF64S64;
 
 	(* stub in order to make the runtime itself compile, cf next procedure. This module needs to be compiled with FPU support on *)
-	PROCEDURE ConvF64U32*(x: UNSIGNED32): FLOAT64;
+	PROCEDURE ConvF64U32*(x: UNSIGNED32): Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		HALT(100);
 	END ConvF64U32;
@@ -403,42 +403,42 @@ TYPE
 	END ConvF64S64F;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE ConvF64S32*(x: SIGNED32): FLOAT64;
-	VAR flt: FLOAT64;
+	PROCEDURE ConvF64S32*(x: SIGNED32): Double;
+	VAR flt: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Float(x, SYSTEM.VAL(FPE64.Float64,flt)); RETURN flt
 	END ConvF64S32;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE ConvF64S16*(x: SIGNED16): FLOAT64;
-	VAR flt: FLOAT64;
+	PROCEDURE ConvF64S16*(x: SIGNED16): Double;
+	VAR flt: Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} FPE64.Float(x, SYSTEM.VAL(FPE64.Float64,flt)); RETURN flt
 	END ConvF64S16;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE ConvF32S16*(x: SIGNED16): FLOAT32;
+	PROCEDURE ConvF32S16*(x: SIGNED16): Single;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		RETURN ConvF32S32(SIGNED32(x))
 	END ConvF32S16;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE ConvF32S8*(x: SIGNED8): FLOAT32;
+	PROCEDURE ConvF32S8*(x: SIGNED8): Single;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		RETURN ConvF32S16(SIGNED16(x))
 	END ConvF32S8;
 
 	(* only called when no FPU64 is available *)
-	PROCEDURE ConvF64S8*(x: SIGNED8): FLOAT64;
+	PROCEDURE ConvF64S8*(x: SIGNED8): Double;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		RETURN ConvF64S16(SIGNED16(x))
 	END ConvF64S8;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE SubF32*(left, right: FLOAT32): FLOAT32;
+	PROCEDURE SubF32*(left, right: Single): Single;
 	BEGIN {UNCOOPERATIVE, UNCHECKED} RETURN AddF32(left, NegF32(right))
 	END SubF32;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE MulF32*(x, y: FLOAT32): FLOAT32;
+	PROCEDURE MulF32*(x, y: Single): Single;
 	VAR xe, zh, ye, s: SIGNED32;  (*zh, ye in this order; ye used as zh in MULD*)
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF SYSTEM.NULL(y) = TRUE THEN x := 0
@@ -470,7 +470,7 @@ TYPE
 	END MulF32;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE DivF32*(x, y: FLOAT32): FLOAT32;
+	PROCEDURE DivF32*(x, y: Single): Single;
 	VAR xe, ye, q, s: SIGNED32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		s := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, SYSTEM.XOR(x, y))*{31});
@@ -508,7 +508,7 @@ TYPE
 
 	(** converts a float into an integer, ignores the fractional part
 	- corresponds to ENTIER(x) **)
-	PROCEDURE ConvS32F32*(x: FLOAT32): SIGNED32;
+	PROCEDURE ConvS32F32*(x: Single): SIGNED32;
 	VAR xe, s: SIGNED32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF SYSTEM.NULL(x) = TRUE THEN
@@ -530,7 +530,7 @@ TYPE
 	- note that no rounding occurs
 	only called when no FPU32 is available
 	**)
-	PROCEDURE ConvF32S32*(x: SIGNED32): FLOAT32;
+	PROCEDURE ConvF32S32*(x: SIGNED32): Single;
 	VAR xe, s: SIGNED32;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF x = SIGNED32(80000000H) THEN (* ABS cannot handle the most negative SIGNED32 number! *)
@@ -551,13 +551,13 @@ TYPE
 	END ConvF32S32;
 
 	(* only called when no FPU32 is available *)
-	PROCEDURE ConvF32S64*(x: SIGNED64): FLOAT32;
+	PROCEDURE ConvF32S64*(x: SIGNED64): Single;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		RETURN ConvF32F64(ConvF64S64(x))
 	END ConvF32S64;
 
 	(* stub in order to make the runtime itself compile, cf next procedure. This module needs to be compiled with FPU support on *)
-	PROCEDURE ConvF32U32*(x: UNSIGNED32): FLOAT32;
+	PROCEDURE ConvF32U32*(x: UNSIGNED32): Single;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		HALT(100);
 	END ConvF32U32;
