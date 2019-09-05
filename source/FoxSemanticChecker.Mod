@@ -2084,8 +2084,8 @@ TYPE
 					(leftType IS SyntaxTree.ComplexType) & (rightType IS SyntaxTree.FloatType) OR
 					(leftType IS SyntaxTree.FloatType) & (rightType IS SyntaxTree.ComplexType) THEN
 					(* must be the case FLOAT64 / COMPLEX ) *)
-					left := NewConversion(left.position, left, Global.Complex128, NIL);
-					right := NewConversion(right.position, right, Global.Complex128, NIL);
+					left := NewConversion(left.position, left, Global.Complex64, NIL);
+					right := NewConversion(right.position, right, Global.Complex64, NIL);
 				ELSE
 					Error(left.position,"incompatible operands");
 				END;
@@ -5114,7 +5114,7 @@ TYPE
 					ELSIF type IS SyntaxTree.ComplexType THEN
 						IF (type.sizeInBits = 64) OR (type = system.complexType) THEN Error(parameter0.position,"short not applicable")
 						ELSIF (type = system.longcomplexType) THEN type := system.complexType
-						ELSIF type.sizeInBits = 128 THEN type := Global.Complex64
+						ELSIF type.sizeInBits = 128 THEN type := Global.Complex32
 						END;
 					ELSE
 						Error(parameter0.position,"short not applicable")
@@ -5157,7 +5157,7 @@ TYPE
 					ELSIF type IS SyntaxTree.ComplexType THEN
 						IF (type.sizeInBits = 128) OR (type = system.longcomplexType) THEN Error(parameter0.position,"long not applicable")
 						ELSIF type = system.complexType THEN type := system.longcomplexType
-						ELSIF type.sizeInBits = 64 THEN type := Global.Complex128
+						ELSIF type.sizeInBits = 64 THEN type := Global.Complex64
 						END;
 					ELSE
 						Error(parameter0.position,"long not applicable")

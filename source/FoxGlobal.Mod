@@ -203,7 +203,7 @@ VAR
 	Unsigned8-, Unsigned16-, Unsigned32-, Unsigned64-: SyntaxTree.IntegerType;
 	Set8-, Set16-, Set32-, Set64-: SyntaxTree.SetType;
 	Float32-, Float64-: SyntaxTree.FloatType;
-	Complex64-, Complex128-: SyntaxTree.ComplexType;
+	Complex32-, Complex64-: SyntaxTree.ComplexType;
 
 TYPE
 	Position = SyntaxTree.Position;
@@ -832,8 +832,8 @@ TYPE
 
 		system.rangeType := SyntaxTree.NewRangeType(3 * system.SizeOf(system.sizeType));
 
-		system.complexType := Complex64;
-		system.longcomplexType := Complex128;
+		system.complexType := Complex32;
+		system.longcomplexType := Complex64;
 		system.setType := SyntaxTree.NewSetType(system.addressSize);
 
 		system.maxSize := MaxInteger(system, system.sizeType(SyntaxTree.BasicType), TRUE);
@@ -1858,8 +1858,8 @@ TYPE
 		Unsigned64 := SyntaxTree.NewIntegerType(64, FALSE);
 		Float32 := SyntaxTree.NewFloatType(32);
 		Float64 := SyntaxTree.NewFloatType(64);
-		Complex64 := SyntaxTree.NewComplexType(Float32);
-		Complex128 := SyntaxTree.NewComplexType(Float64);
+		Complex32 := SyntaxTree.NewComplexType(Float32);
+		Complex64 := SyntaxTree.NewComplexType(Float64);
 		Set8 := SyntaxTree.NewSetType(8);
 		Set16 := SyntaxTree.NewSetType(16);
 		Set32 := SyntaxTree.NewSetType(32);
