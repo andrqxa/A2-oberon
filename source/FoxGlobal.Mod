@@ -1503,14 +1503,14 @@ TYPE
 	END MinInteger;
 
 	(*! make architecture  independent ! *)
-	PROCEDURE MaxFloat*(system: System; type: SyntaxTree.FloatType): LONGREAL;
+	PROCEDURE MaxFloat*(system: System; type: SyntaxTree.FloatType): FLOAT64;
 	BEGIN
-		IF system.SizeOf(type) = 32 THEN RETURN MAX(FLOAT32) ELSE RETURN MAX(LONGREAL) END;
+		IF system.SizeOf(type) = 32 THEN RETURN MAX(FLOAT32) ELSE RETURN MAX(FLOAT64) END;
 	END MaxFloat;
 
-	PROCEDURE MinFloat*(system: System; type: SyntaxTree.FloatType): LONGREAL;
+	PROCEDURE MinFloat*(system: System; type: SyntaxTree.FloatType): FLOAT64;
 	BEGIN
-		IF system.SizeOf(type) = 32 THEN RETURN MIN(FLOAT32) ELSE RETURN MIN(LONGREAL) END;
+		IF system.SizeOf(type) = 32 THEN RETURN MIN(FLOAT32) ELSE RETURN MIN(FLOAT64) END;
 	END MinFloat;
 
 	PROCEDURE ConvertSet*(this: Basic.Set; bits: SIZE): Basic.Set;

@@ -82,7 +82,7 @@ BEGIN
 	RETURN E.v[v1, v2, v3, v4]
 END M;
 
-PROCEDURE F* (E: EmpiricalDistribution;   x, v1, v2, v3, v4: Index): LONGREAL;
+PROCEDURE F* (E: EmpiricalDistribution;   x, v1, v2, v3, v4: Index): FLOAT64;
 	VAR nv: SIGNED32;
 BEGIN
 	nv := M(E, v1, v2, v3, v4);

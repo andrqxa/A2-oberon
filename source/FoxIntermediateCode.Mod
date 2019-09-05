@@ -89,7 +89,7 @@ TYPE
 		registerClass-: RegisterClass; (* normal register vs. special registers such as parameter registers *)
 		offset-: SIZE; (* offset on register or immediate symbol, in units *)
 		intValue-: SIGNED64; (* integer value, if mode = ModeImmediate and type.form IN Integer or ModeNumber *)
-		floatValue-: LONGREAL; (* real value, if mode = ModeImmediate and type.form = Float *)
+		floatValue-: FLOAT64; (* real value, if mode = ModeImmediate and type.form = Float *)
 
 		symbol-: ObjectFile.Identifier; (* referenced symbol, only valid for mode = ModeImmediate or mode = ModeMemory *)
 		symbolOffset-: SIZE; (* offset in IntermediateCode section, the difference to offset is that symbolOffset needs a resolving to real address offset *)
@@ -1007,13 +1007,13 @@ TYPE
 	BEGIN InitImmediate(op,type,value); RETURN op
 	END Immediate;
 
-	PROCEDURE InitFloatImmediate*(VAR op: Operand; type: Type; value: LONGREAL);
+	PROCEDURE InitFloatImmediate*(VAR op: Operand; type: Type; value: FLOAT64);
 	BEGIN
 		Assert(type.form = Float,"operand type does not match value type");
 		InitOperand(op); op.mode := ModeImmediate; op.type := type; op.floatValue := value;
 	END InitFloatImmediate;
 
-	PROCEDURE FloatImmediate*(type: Type; value: LONGREAL): Operand;
+	PROCEDURE FloatImmediate*(type: Type; value: FLOAT64): Operand;
 	VAR op: Operand;
 	BEGIN InitFloatImmediate(op,type,value); RETURN op
 	END FloatImmediate;

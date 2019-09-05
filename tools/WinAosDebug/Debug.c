@@ -518,7 +518,7 @@ void Variables(HWND hWnd, LPVOID mod, LPVOID refs, SIGNED32 reflen, SIGNED32 i, 
 							ReadProcessMemory(proc.hProcess, (LPVOID)adr, &x, 4, &read);
 							sprintf(msg, "%E", x);
 							break;
-						case 8: // LONGREAL
+						case 8: // FLOAT64
 							ReadProcessMemory(proc.hProcess, (LPVOID)adr, &y, 8, &read);
 							sprintf(msg, "%E", y);
 							break;

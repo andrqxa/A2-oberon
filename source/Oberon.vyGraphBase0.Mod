@@ -372,7 +372,7 @@ PROCEDURE StretchedImageC (VAR sP: Images.Image;  X, Y, W, H, DX, DY, DW, DH: SI
 	VAR y, x0, x1: SIGNED16;  oldpix, pix: Images.Pixel;
 	xe, ye: SIGNED16;
 	nx, ny, nw, nh, ndx, ndy, ndw, ndh: SIGNED16;  thisx, nextx, thisy, nexty: SIGNED16;
-	scalex, scaley: LONGREAL;  r, g, b, a: SIGNED16;
+	scalex, scaley: FLOAT64;  r, g, b, a: SIGNED16;
 	scalexl, scaleyl: SIGNED16;
 BEGIN
 	IF (W = DW) & (H = DH) THEN ImageC(sP, X, Y, W, H, DX, DY) END;
@@ -1070,7 +1070,7 @@ PROCEDURE StretchedPicti (sP: Pictures.Picture;  X, Y, W, H, DX, DY, DW, DH: SIG
 	VAR pixs: ARRAY 256 OF Images.Pixel;  idx, max: SIGNED16;  pr, pg, pb: SIGNED16;  y, x0, x1: SIGNED16;  oldpix: Images.Pixel;
 	xe, ye: SIGNED16;
 	nx, ny, nw, nh, ndx, ndy, ndw, ndh: SIGNED16;  thisx, nextx, thisy, nexty: SIGNED16;
-	scalex, scaley: LONGREAL;
+	scalex, scaley: FLOAT64;
 	scalexl, scaleyl: SIGNED16;
 BEGIN
 	IF (W = DW) & (H = DH) THEN Picti(sP, X, Y, W, H, DX, DY) END;
@@ -1208,7 +1208,7 @@ PROCEDURE StretchedImagei (VAR sP: Images.Image;  X, Y, W, H, DX, DY, DW, DH: SI
 	VAR y, x0, x1: SIGNED16;  oldpix, pix: Images.Pixel;
 	xe, ye: SIGNED16;
 	nx, ny, nw, nh, ndx, ndy, ndw, ndh: SIGNED16;  thisx, nextx, thisy, nexty: SIGNED16;
-	scalex, scaley: LONGREAL;  r, g, b, a: SIGNED16;
+	scalex, scaley: FLOAT64;  r, g, b, a: SIGNED16;
 	scalexl, scaleyl: SIGNED16;
 BEGIN
 	IF (W = DW) & (H = DH) THEN Imagei(sP, X, Y, W, H, DX, DY) END;

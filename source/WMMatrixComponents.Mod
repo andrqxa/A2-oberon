@@ -192,7 +192,7 @@ TYPE
 		(*matrix: Matrix;*)
 		curves* : Curve;
 		X0, Y0, W, H : SIGNED32;
-		minx, miny, maxx, maxy, scalex, scaley : LONGREAL;
+		minx, miny, maxx, maxy, scalex, scaley : FLOAT64;
 	END Graph;
 
 TYPE

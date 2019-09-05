@@ -708,7 +708,7 @@ TYPE
 		BEGIN  w.RawReal(x)
 		END RawReal;
 
-		PROCEDURE RawLReal*( x: LONGREAL );
+		PROCEDURE RawLReal*( x: FLOAT64 );
 		BEGIN  w.RawLReal(x)
 		END RawLReal;
 
@@ -752,11 +752,11 @@ TYPE
 		BEGIN Indent; w.Date822(t,d,tz)
 		END Date822;
 
-		PROCEDURE Float*( x: LONGREAL;  n: SIGNED32 );
+		PROCEDURE Float*( x: FLOAT64;  n: SIGNED32 );
 		BEGIN Indent; w.Float(x,n)
 		END Float;
 
-		PROCEDURE FloatFix*( x: LONGREAL;  n, f, D: SIGNED32 );
+		PROCEDURE FloatFix*( x: FLOAT64;  n, f, D: SIGNED32 );
 		BEGIN Indent; w.FloatFix(x,n,f,D)
 		END FloatFix;
 

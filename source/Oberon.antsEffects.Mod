@@ -66,7 +66,7 @@ BEGIN
 END OpenBuffer;
 
 PROCEDURE Ants* (x, y, w, h: SIGNED16;  num: SIGNED16;  dur: SIGNED32);
-	VAR xp, yp: POINTER TO ARRAY OF SIGNED16;  timee, time, i: SIGNED32;  r : LONGREAL;
+	VAR xp, yp: POINTER TO ARRAY OF SIGNED16;  timee, time, i: SIGNED32;  r : FLOAT64;
 	dir: POINTER TO ARRAY  OF SIGNED16;
 BEGIN
 	vyGraphBase.SetDisplayMode(vyGraphBase.invert);

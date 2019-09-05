@@ -44,8 +44,8 @@ VAR
 
 	(** Analytical solution for homography for the case of 4 points mapping to the unit rectangle.
 		According to "ProjectiveMappings for Image Warping" by Paul Heckbert, 	15-869, Image-Based Modeling and Rendering *)
-	PROCEDURE CalculateUnitSquareHomography(CONST p : ARRAY OF Point; VAR H, inverse : ARRAY  OF LONGREAL);
-	VAR sx, sy, dx1, dy1, dx2, dy2, a, b, c, d, e, f, g, h, z : LONGREAL;
+	PROCEDURE CalculateUnitSquareHomography(CONST p : ARRAY OF Point; VAR H, inverse : ARRAY  OF FLOAT64);
+	VAR sx, sy, dx1, dy1, dx2, dy2, a, b, c, d, e, f, g, h, z : FLOAT64;
 	BEGIN
 		sx := (p[0].x - p[1].x) + (p[2].x - p[3].x);
 		sy := (p[0].y - p[1].y) + (p[2].y - p[3].y);
@@ -74,14 +74,14 @@ VAR
 		inverse[6] := d * h - e * g; inverse[7] := b * g - a * h; inverse[8] := a * e - b * d
 	END CalculateUnitSquareHomography;
 
-	PROCEDURE MapProjective(CONST H : ARRAY OF LONGREAL; u, v : LONGREAL; VAR x, y : LONGREAL);
+	PROCEDURE MapProjective(CONST H : ARRAY OF FLOAT64; u, v : FLOAT64; VAR x, y : FLOAT64);
 	BEGIN
 		x := (H[0] * u + H[1] * v + H[2]) / (H[6] * u + H[7] * v + 1);
 		y := (H[3] * u + H[4] * v + H[5]) / (H[6] * u + H[7] * v + 1)
 	END MapProjective;
 
-	PROCEDURE MapInverseProjective(CONST H : ARRAY OF LONGREAL; u, v : LONGREAL; VAR x, y : LONGREAL);
-	VAR z : LONGREAL;
+	PROCEDURE MapInverseProjective(CONST H : ARRAY OF FLOAT64; u, v : FLOAT64; VAR x, y : FLOAT64);
+	VAR z : FLOAT64;
 	BEGIN
 		x := (H[0] * u + H[1] * v + H[2]) / (H[6] *u + H[7] * v + 1);
 		y := (H[3] * u + H[4] * v + H[5]) / (H[6] *u + H[7] * v + 1);
@@ -91,9 +91,9 @@ VAR
 	END MapInverseProjective;
 
 PROCEDURE Transform(src, dst : Raster.Image; CONST points : ARRAY OF Point);
-VAR h, hinv : ARRAY 9 OF LONGREAL;
+VAR h, hinv : ARRAY 9 OF FLOAT64;
 	x,  y, six, siy : SIZE;
-	u, v, sx, sy : LONGREAL;
+	u, v, sx, sy : FLOAT64;
 	mode : Raster.Mode;
 	pix : Raster.Pixel;
 BEGIN
@@ -582,9 +582,9 @@ VAR nof, length, i, j : SIGNED32; w, h: SIZE; res: WORD;
 	poly : ARRAY 40 OF Point;
 	nofPoints : SIGNED32;
 	t0, t1, labeltime,  tracetime, linetime : SIGNED64;
-	f  : LONGREAL;
+	f  : FLOAT64;
 	gp : ARRAY 50 OF WMGraphics.Point2d;
-	PROCEDURE Sqr(x: LONGREAL):LONGREAL;
+	PROCEDURE Sqr(x: FLOAT64):FLOAT64;
 	BEGIN
 		RETURN x * x
 	END Sqr;

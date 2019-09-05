@@ -32,8 +32,8 @@ TYPE
 	tModel* = POINTER TO tModelDesc;
 	tModelDesc* = RECORD (antsModels.tModelDesc);
 	(* a0  a[0] ,a1 a[1] ,a2 a[2] ,a3 a[3] ,a4 a[4] ,a5 a[5] ,b2 a[6] ,b4 a[7] ,b5 a[8] ,g0 a[9] ,g1 a[10] ,g2 a[11] ,d a[12] ,
-		e  a[13] ,pen a[14] : LONGREAL; *)
-		a: ARRAY 15 OF LONGREAL;
+		e  a[13] ,pen a[14] : FLOAT64; *)
+		a: ARRAY 15 OF FLOAT64;
 
 		(* Parameters:
 		a[0] : Edge when no vertice
@@ -73,7 +73,7 @@ VAR
 		IF e1 = e2 THEN RETURN 1 ELSE RETURN -1 END;
 	END dist2;
 
-	PROCEDURE f1( e, v1, v2: SIGNED16 ): LONGREAL;
+	PROCEDURE f1( e, v1, v2: SIGNED16 ): FLOAT64;
 	(*		+v1
 	| e
 	+v2
@@ -96,7 +96,7 @@ VAR
 		END
 	END f1;
 
-	PROCEDURE f2( v, e1, e2, e3, e4: SIGNED16 ): LONGREAL;
+	PROCEDURE f2( v, e1, e2, e3, e4: SIGNED16 ): FLOAT64;
 	(*
 	| e1
 	-e2 +v -e3
@@ -124,45 +124,45 @@ VAR
 		END
 	END f2;
 
-	PROCEDURE f3( e, p1, p2: SIGNED16 ): LONGREAL;
+	PROCEDURE f3( e, p1, p2: SIGNED16 ): FLOAT64;
 	(* p1 * |e * p2 *)
 	BEGIN
 		IF e = 1 THEN RETURN dist2( p1, p2 ) * GM.a[9] ELSE RETURN dist2( p1, p2 ) * GM.a[10] END
 	END f3;
 
-	PROCEDURE f4( p: SIGNED16 ): LONGREAL;
+	PROCEDURE f4( p: SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN GM.a[11] * p
 	END f4;
 
-	PROCEDURE f5( e: SIGNED16 ): LONGREAL;
+	PROCEDURE f5( e: SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN GM.a[12] * e
 	END f5;
 
-	PROCEDURE f6( v: SIGNED16 ): LONGREAL;
+	PROCEDURE f6( v: SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN GM.a[13] * v
 	END f6;
 
-	PROCEDURE f7( p1, p2: SIGNED16 ): LONGREAL;
+	PROCEDURE f7( p1, p2: SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN GM.a[14] * dist( p1, p2 )
 	END f7;
 
-	PROCEDURE UP( VAR a: ARRAY OF SIGNED16 ): LONGREAL;
+	PROCEDURE UP( VAR a: ARRAY OF SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN f3( a[5], a[0], a[1] ) + f3( a[6], a[0], a[2] ) + f3( a[7], a[0], a[3] ) + f3( a[8], a[0], a[4] ) + f4( a[0] ) +
 				    f7( a[0], a[9] )
 	END UP;
 
-	PROCEDURE EP( VAR a: ARRAY OF SIGNED16 ): LONGREAL;
+	PROCEDURE EP( VAR a: ARRAY OF SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN Math.exp( UP( a ) )
 	END EP;
 
 	PROCEDURE DistriFromLocalChar( F: antsPEV.tField;  y, x: SIGNED32 );
-	VAR po, p, p1, p2, p3, p4, e1, e2, e3, e4: SIGNED16;  nges, prob, rand: LONGREAL;
+	VAR po, p, p1, p2, p3, p4, e1, e2, e3, e4: SIGNED16;  nges, prob, rand: FLOAT64;
 	BEGIN
 		(* insert penalization to AOrig here *)
 		po := F.Aorig.A[y, x];  antsPEV.EGetPNeighbours( F, y, x, p, p1, p2, p3, p4, e1, e2, e3, e4 );  nges := 0;
@@ -181,7 +181,7 @@ VAR
 	PROCEDURE FastestC( F: antsPEV.tField );
 	VAR y, x, w, h, offset: SIGNED32;  p: SIGNED16;
 		a: ARRAY 11 OF SIGNED16;
-		rand: LONGREAL;  c: antsCaches.FullCache;  A, H, V, O: antsArrayObjects.tINTEGERArray;
+		rand: FLOAT64;  c: antsCaches.FullCache;  A, H, V, O: antsArrayObjects.tINTEGERArray;
 	BEGIN
 		c := GM.cp;  A := F.A.A;  V := F.Ev.A;  H := F.Eh.A;  O := F.Aorig.A;  w := F.w;  h := F.h;
 		FOR y := 0 TO h - 1 DO
@@ -196,18 +196,18 @@ VAR
 		END
 	END FastestC;
 
-	PROCEDURE UE( VAR a: ARRAY OF SIGNED16 ): LONGREAL;
+	PROCEDURE UE( VAR a: ARRAY OF SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN f1( a[0], a[1], a[2] ) + f3( a[0], a[3], a[4] ) + f5( a[0] )
 	END UE;
 
-	PROCEDURE EE( VAR a: ARRAY OF SIGNED16 ): LONGREAL;
+	PROCEDURE EE( VAR a: ARRAY OF SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN Math.exp( UE( a ) )
 	END EE;
 
 	PROCEDURE DistriFromLocalCharE( F: antsPEV.tField;  y, x: SIGNED32 );
-	VAR e, p1, p2, v1, v2: SIGNED16;  nges, ges, prob: LONGREAL;
+	VAR e, p1, p2, v1, v2: SIGNED16;  nges, ges, prob: FLOAT64;
 	BEGIN
 		antsPEV.EVGetENeighboursH( F, y, x, e, p1, p2, v1, v2 );  e := 0;  nges := f1( e, v1, v2 ) + f3( e, p1, p2 ) + f5( e );  e := 1;
 		ges := f1( e, v1, v2 ) + f3( e, p1, p2 ) + f5( e );  prob := Math.exp( ges );  prob := prob / (prob + Math.exp( nges ));
@@ -238,18 +238,18 @@ VAR
 
 (****)
 
-	PROCEDURE UV( VAR a: ARRAY OF SIGNED16 ): LONGREAL;
+	PROCEDURE UV( VAR a: ARRAY OF SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN f2( a[0], a[1], a[2], a[3], a[4] ) + f6( a[0] )
 	END UV;
 
-	PROCEDURE EV( VAR a: ARRAY OF SIGNED16 ): LONGREAL;
+	PROCEDURE EV( VAR a: ARRAY OF SIGNED16 ): FLOAT64;
 	BEGIN
 		RETURN Math.exp( UV( a ) )
 	END EV;
 
 	PROCEDURE DistriFromLocalCharV( F: antsPEV.tField;  y, x: SIGNED32 );
-	VAR e1, e2, e3, e4, v: SIGNED16;  nges, ges, prob: LONGREAL;
+	VAR e1, e2, e3, e4, v: SIGNED16;  nges, ges, prob: FLOAT64;
 	BEGIN
 		antsPEV.EVGetVNeighbours( F, y, x, v, e1, e2, e3, e4 );  v := 0;  nges := f2( v, e1, e2, e3, e4 ) + f6( v );  v := 1;
 		ges := f2( v, e1, e2, e3, e4 ) + f6( v );  prob := Math.exp( ges );  prob := prob / (prob + Math.exp( nges ));
@@ -273,7 +273,7 @@ VAR
 
 	PROCEDURE CreateCaches( m: tModel;  d: SIGNED16 );
 	VAR A: ARRAY 11 OF SIGNED16;
-		i: SIGNED16;  offset: SIGNED32;  c: antsCaches.FullCache;  s: LONGREAL;
+		i: SIGNED16;  offset: SIGNED32;  c: antsCaches.FullCache;  s: FLOAT64;
 	BEGIN
 		FOR i := 0 TO 4 DO A[i] := d END;
 		FOR i := 5 TO 8 DO A[i] := 2 END;
@@ -350,14 +350,14 @@ VAR
 		antsPEV.DoUniform( s.A( antsPEV.tField ) )
 	END Uniform;
 
-	PROCEDURE WriteArray( VAR R: Files.Rider;  VAR A: ARRAY OF LONGREAL );
+	PROCEDURE WriteArray( VAR R: Files.Rider;  VAR A: ARRAY OF FLOAT64 );
 	VAR i: SIGNED32;
 	BEGIN
 		Files.WriteLInt( R, LEN( A ) );  aM.launch;
 		FOR i := 0 TO LEN( A ) - 1 DO Files.WriteLReal( R, A[i] ) END
 	END WriteArray;
 
-	PROCEDURE ReadArray( VAR R: Files.Rider;  VAR A: ARRAY OF LONGREAL );
+	PROCEDURE ReadArray( VAR R: Files.Rider;  VAR A: ARRAY OF FLOAT64 );
 	VAR i, len: SIGNED32;
 	BEGIN
 		Files.ReadLInt( R, len );
@@ -375,7 +375,7 @@ VAR
 		Files.ReadInt( R, version );  ReadArray( R, s.a )
 	END LoadM;
 
-	PROCEDURE ArrayHandleAttribute( VAR M: Objects.AttrMsg;  prefix: ARRAY OF CHAR;  VAR array: ARRAY OF LONGREAL ): BOOLEAN;
+	PROCEDURE ArrayHandleAttribute( VAR M: Objects.AttrMsg;  prefix: ARRAY OF CHAR;  VAR array: ARRAY OF FLOAT64 ): BOOLEAN;
 	VAR cur: ARRAY 64 OF CHAR;
 		i: SIGNED32;  len: SIGNED32;
 	BEGIN
@@ -454,7 +454,7 @@ VAR
 
 	PROCEDURE NewModel*;
 	VAR l: antsCommands.tScanList;  name: vyCG.tNameArray;  M: tModel;
-		a: ARRAY 15 OF LONGREAL;
+		a: ARRAY 15 OF FLOAT64;
 		i: SIGNED32;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name= NAME a0=FLOAT32 a1=FLOAT32 a2=FLOAT32 a3=FLOAT32 a4=FLOAT32 a5=FLOAT32 a6=FLOAT32 a7=FLOAT32 a8=FLOAT32 a9=FLOAT32 a10=FLOAT32 a11=FLOAT32 a12=FLOAT32 a13=FLOAT32 a14=FLOAT32" );

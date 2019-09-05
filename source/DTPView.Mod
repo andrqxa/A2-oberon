@@ -2234,7 +2234,7 @@ TYPE
 
 		PROCEDURE SetValueHandler(sender, data: ANY);
 		VAR
-			plreal, plreal2, plreal3, plreal4 : LONGREAL;
+			plreal, plreal2, plreal3, plreal4 : FLOAT64;
 			pstring, pstring2, pstring3, pstring4 : ARRAY 128 OF CHAR;
 			pbool : BOOLEAN;
 			content : DTPData.ContentObject;
@@ -2335,7 +2335,7 @@ TYPE
 
 		PROCEDURE Show*(VAR w, h: FLOAT32): BOOLEAN;
 		VAR resultString: ARRAY 8 OF CHAR;
-			resW, resH: LONGREAL;
+			resW, resH: FLOAT64;
 		BEGIN
 				result := -1;
 				WMWindowManager.ExtAddWindow(SELF, 200, 100, {WMWindowManager.FlagFrame, WMWindowManager.FlagStayOnTop});

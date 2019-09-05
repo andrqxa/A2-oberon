@@ -113,7 +113,7 @@ TYPE
 		END
 	END GetV;
 
-	PROCEDURE GetUniform( r: vyRanBase.tRandom ): LONGREAL;
+	PROCEDURE GetUniform( r: vyRanBase.tRandom ): FLOAT64;
 	CONST posScalefact = 0.5 / MAX( SIGNED32 );  negScalefact = 0.5 / MIN( SIGNED32 );
 	VAR seed: vyRanBase.tSeed;  n: SIGNED32;
 		dummy: ARRAY 1 OF Bits;

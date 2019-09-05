@@ -168,7 +168,7 @@ VAR
 	PROCEDURE Handler*( obj: Objects.Object;  VAR msg: Objects.ObjMsg );
 	(*vs 0.0a1	md  20.07.94 *)
 
-	VAR copy: tLayer;  minX, minY, maxY, maxX: LONGREAL;  nansY: SIGNED32;
+	VAR copy: tLayer;  minX, minY, maxY, maxX: FLOAT64;  nansY: SIGNED32;
 
 	BEGIN
 		WITH obj: tLayer DO

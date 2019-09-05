@@ -133,7 +133,7 @@ TYPE
 	(* hitable object in the starfield space *)
 	Mass = POINTER TO MassDesc;
 	MassDesc = RECORD(SpaceObjDesc)
-		mass: LONGREAL;
+		mass: FLOAT64;
 		rot,xvel,yvel,rotvel: FLOAT32;
 		shape: Shape;
 		n0,u,v,w,h: SIGNED16;

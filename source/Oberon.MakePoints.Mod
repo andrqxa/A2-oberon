@@ -55,7 +55,7 @@ VAR
 	w: Texts.Writer;
 
 (* several output routines *)
-PROCEDURE Rea(x: LONGREAL; n: SIGNED16);
+PROCEDURE Rea(x: FLOAT64; n: SIGNED16);
 BEGIN Texts.WriteLongRealFix(w, x, 0, n, 0); Texts.Append(Oberon.Log, w.buf)
 END Rea;
 

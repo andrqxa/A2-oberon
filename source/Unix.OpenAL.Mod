@@ -16,7 +16,7 @@ TYPE
   ALint     * =  SIGNED32;  (* 4-byte signed *)
 
   ALfloat   * =  FLOAT32;
-  ALdouble  * =  LONGREAL;
+  ALdouble  * =  FLOAT64;
   ALboolean * =  BOOLEAN;
 
   ALubyte   * =  CHAR;     (* 1-byte unsigned *)
@@ -269,7 +269,7 @@ TYPE
   ALCint     * =  SIGNED32;  (* 4-byte signed *)
 
   ALCfloat   * =  FLOAT32;
-  ALCdouble  * =  LONGREAL;
+  ALCdouble  * =  FLOAT64;
   ALCboolean * =  BOOLEAN;
 
   ALCubyte   * =  CHAR;     (* 1-byte unsigned *)

@@ -66,7 +66,7 @@ VAR
 	END UniformO;
 
 	PROCEDURE ExampleO*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy: LONGREAL;
+	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy: FLOAT64;
 	BEGIN
 		gen := vyRanBase.RandomGenerator;
 		IF o # NIL THEN
@@ -85,7 +85,7 @@ VAR
 	END ExampleO;
 
 	PROCEDURE ExampleOBall*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: LONGREAL;  oms: LONGREAL;
+	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
 	CONST size = 1 / 3;
 	BEGIN
 		oms := 1 - size;  gen := vyRanBase.RandomGenerator;
@@ -111,7 +111,7 @@ VAR
 	END ExampleOBall;
 
 	PROCEDURE ExampleOBall2*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: LONGREAL;  oms: LONGREAL;
+	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
 	CONST size = 1 / 3;
 	BEGIN
 		oms := 1 - size;  gen := vyRanBase.RandomGenerator;
@@ -139,7 +139,7 @@ VAR
 	END ExampleOBall2;
 
 	PROCEDURE ExampleOBall3*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: LONGREAL;  oms: LONGREAL;
+	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
 	CONST size = 1 / 3;
 	BEGIN
 		oms := 1 - size;  gen := vyRanBase.RandomGenerator;
@@ -167,7 +167,7 @@ VAR
 	END ExampleOBall3;
 
 	PROCEDURE ExampleOColumn*( o: tObject );
-	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: LONGREAL;  oms: LONGREAL;
+	VAR l, j, i, k: SIGNED32;  gen: vyRanBase.tRandom;  rx, ry, rz, rt, rxx, ryy, rzz: FLOAT64;  oms: FLOAT64;
 	CONST size = 1 / 5;
 	BEGIN
 		oms := 1 - size;  gen := vyRanBase.RandomGenerator;
@@ -525,8 +525,8 @@ VAR
 	END Uniform;
 
 	PROCEDURE Channel*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: LONGREAL;  y, x, ll, k: SIGNED32;
-		ra: POINTER TO ARRAY OF LONGREAL;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  y, x, ll, k: SIGNED32;
+		ra: POINTER TO ARRAY OF FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ p=FLOAT32 # noise <name> with channel noise, prob = <p>" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "p", p ) THEN

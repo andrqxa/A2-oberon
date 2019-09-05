@@ -396,7 +396,7 @@ BEGIN
 	RETURN F
 END MakeInt;
 
-PROCEDURE MakeReal(val: LONGREAL): Display.Frame;
+PROCEDURE MakeReal(val: FLOAT64): Display.Frame;
 	VAR F: TextFields.TextField;
 BEGIN
 	TextFields.NewTextField; F:= Objects.NewObj(TextFields.TextField);

@@ -69,7 +69,7 @@ VAR
 	END UniformO;
 
 	PROCEDURE ExampleO*( o: tObject );
-	VAR l, j, i: SIGNED32;  rx, ry, rz, rxx, ryy: LONGREAL;
+	VAR l, j, i: SIGNED32;  rx, ry, rz, rxx, ryy: FLOAT64;
 	BEGIN
 		IF o # NIL THEN
 			FOR l := 0 TO o.d - 1 DO
@@ -85,7 +85,7 @@ VAR
 	END ExampleO;
 
 	PROCEDURE ExampleOBlock*( o: tObject );
-	VAR l, j, i: SIGNED32;  rx, ry, rz: LONGREAL;
+	VAR l, j, i: SIGNED32;  rx, ry, rz: FLOAT64;
 	BEGIN
 		IF o # NIL THEN
 			FOR l := 0 TO o.d - 1 DO
@@ -100,7 +100,7 @@ VAR
 	END ExampleOBlock;
 
 	PROCEDURE ExampleOColumn*( o: tObject );
-	VAR l, j, i: SIGNED32;  rx, ry, rz: LONGREAL;
+	VAR l, j, i: SIGNED32;  rx, ry, rz: FLOAT64;
 	BEGIN
 		IF o # NIL THEN
 			FOR l := 0 TO o.d - 1 DO
@@ -115,7 +115,7 @@ VAR
 	END ExampleOColumn;
 
 	PROCEDURE ExampleOBall*( o: tObject );
-	VAR l, j, i: SIGNED32;  rx, ry, rz: LONGREAL;
+	VAR l, j, i: SIGNED32;  rx, ry, rz: FLOAT64;
 	BEGIN
 		IF o # NIL THEN
 			FOR l := 0 TO o.d - 1 DO
@@ -440,8 +440,8 @@ VAR
 	END Uniform;
 
 	PROCEDURE Channel*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: LONGREAL;  y, x, ll: SIGNED32;
-		ra: POINTER TO ARRAY OF LONGREAL;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  y, x, ll: SIGNED32;
+		ra: POINTER TO ARRAY OF FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ p=FLOAT32 # noise <name> with channel nois, prob = <p>" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "p", p ) THEN

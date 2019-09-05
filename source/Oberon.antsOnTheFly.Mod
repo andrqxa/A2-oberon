@@ -31,8 +31,8 @@ Objects, (* OPS,*)  aM := antsMessages,Builder,Display, antsTexts,PC,AosModules 
 	VAR debug*: BOOLEAN;
 
 TYPE
-	Function1d* = PROCEDURE{DELEGATE} (x: LONGREAL): LONGREAL;
-	FunctionXd* = PROCEDURE{DELEGATE} (x: ARRAY OF LONGREAL): LONGREAL;
+	Function1d* = PROCEDURE{DELEGATE} (x: FLOAT64): FLOAT64;
+	FunctionXd* = PROCEDURE{DELEGATE} (x: ARRAY OF FLOAT64): FLOAT64;
 
 CONST
 	standardModule = "antsOnTheFlyMod.Text";
@@ -308,7 +308,7 @@ END Test1d;
 
 PROCEDURE TestXd*;
 	VAR r: Texts.Reader;   ch: CHAR;    Function: ARRAY 1024 OF CHAR;    i: SIGNED32;
-	X: ARRAY 2 OF LONGREAL;
+	X: ARRAY 2 OF FLOAT64;
 BEGIN
 	Texts.OpenReader(r, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Read(r, ch);    i := 0;

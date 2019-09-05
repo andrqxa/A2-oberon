@@ -99,7 +99,7 @@ representation.
 contain
 a decimal scale factor. The letter E (or D) is pronounced as  "times ten to
 the power of". A real number is of type FLOAT32, unless it has a scale factor
-containing the letter D; in this case it is of type LONGREAL.
+containing the letter D; in this case it is of type FLOAT64.
 <PRE><STRONG>
 $  number  =  integer | real.
 $  integer  =  digit {digit} | digit {hexDigit} "H" .
@@ -217,7 +217,7 @@ the indicated sections:
   ABS       (10.2)   LEN       (10.2)
   ASH       (10.2)   LONG      (10.2)
   BOOLEAN   (6.1)    SIGNED32   (6.1)
-  CAP       (10.2)   LONGREAL  (10.2)
+  CAP       (10.2)   FLOAT64  (10.2)
   CHAR      (6.1)    MAX       (10.2)
   CHR       (10.2)   MIN       (10.2)
   COPY      (10.2)   NEW       (6.4)
@@ -295,14 +295,14 @@ The values of a given basic type are the following:
 <LI>SIGNED16 the integers between MIN(SIGNED16) and MAX(SIGNED16).
 <LI>SIGNED32 the integers between MIN(SIGNED32) and MAX(SIGNED32).
 <LI>FLOAT32 real numbers between MIN(FLOAT32) and MAX(FLOAT32).
-<LI>LONGREAL real numbers between MIN(LONGREAL) and MAX(LONGREAL).
+<LI>FLOAT64 real numbers between MIN(FLOAT64) and MAX(FLOAT64).
 <LI>SET the sets of integers between 0 and MAX(SET).
 </OL>
 Types 3 to 5 are <EM>integer</EM> types, 6 and 7 are <EM>real</EM> types,
 and together they are called <EM>numeric</EM> types. They form a hierarchy;
 the larger type <EM>includes</EM> (the values of) the smaller type:
 <P>
-&nbsp; &nbsp; LONGREAL  &gt;=  FLOAT32  &gt;=  SIGNED32  &gt;=  SIGNED16  &gt;=  SIGNED8
+&nbsp; &nbsp; FLOAT64  &gt;=  FLOAT32  &gt;=  SIGNED32  &gt;=  SIGNED16  &gt;=  SIGNED8
 <P>Note: &gt;= stands here for "is superset of or equal to".
 
 <H3>6.2. Array types</H3>
@@ -1032,11 +1032,11 @@ x</TD></TR>
 <TR><TD>CHR(x)</TD><TD>integer type</TD><TD>CHAR</TD><TD>character with
 ordinal
 number x</TD></TR>
-<TR><TD>SHORT(x)</TD><TD>SIGNED32<BR>SIGNED16<BR>LONGREAL</TD>
+<TR><TD>SHORT(x)</TD><TD>SIGNED32<BR>SIGNED16<BR>FLOAT64</TD>
 <TD>SIGNED16<BR>SIGNED8<BR>FLOAT32</TD><TD>identity (truncation
 possible)</TD></TR>
 <TR><TD>LONG(x)</TD><TD>SIGNED8<BR>SIGNED16<BR>FLOAT32</TD>
-<TD>SIGNED16<BR>SIGNED32<BR>LONGREAL</TD><TD>identity</TD></TR>
+<TD>SIGNED16<BR>SIGNED32<BR>FLOAT64</TD><TD>identity</TD></TR>
 <TR><TD>ENTIER(x)</TD><TD>real type</TD><TD>SIGNED32</TD><TD>largest integer
 not greater than x.<BR>Note that  ENTIER(i/j)  =  i DIV j</TD></TR></TABLE>
 

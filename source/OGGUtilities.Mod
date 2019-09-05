@@ -758,7 +758,7 @@ TYPE
 	END ScaleUpHuge;
 
 	(** scales a float up for fix-point representation with fraction Ny *)
-	PROCEDURE ScaleUp*(r: LONGREAL): SIGNED32;
+	PROCEDURE ScaleUp*(r: FLOAT64): SIGNED32;
 	VAR tmp: SIGNED32;
 	BEGIN
 		tmp := ENTIER(0.5 + r * ScaleFactor);
@@ -766,7 +766,7 @@ TYPE
 	END ScaleUp;
 
 	(** scales a float up for fix-point representation with fraction Ny *)
-	PROCEDURE ScaleUpRealToHuge*(r: LONGREAL): SIGNED64;
+	PROCEDURE ScaleUpRealToHuge*(r: FLOAT64): SIGNED64;
 	VAR tmp: SIGNED64;
 	BEGIN
 		tmp := ENTIERH(0.5 + r * ScaleFactor);
@@ -967,7 +967,7 @@ TYPE
 	END PrintHex;
 
 	(** print a varname with its value, type must be a FLOAT32 *)
-	PROCEDURE VarReal*(name: ARRAY OF CHAR; value: LONGREAL);
+	PROCEDURE VarReal*(name: ARRAY OF CHAR; value: FLOAT64);
 	VAR tmpStr: ARRAY 32 OF CHAR;
 	BEGIN
 		Strings.FloatToStr(value, 5, 4, 0, tmpStr);

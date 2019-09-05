@@ -46,7 +46,7 @@ IMPORT antsToolbox, antsArrayObjects, Strings := vyHostStrings, antsCommands, vy
 
 VAR
 	globalStat: antsBellman.Statistic;
-	globalGamma: LONGREAL;
+	globalGamma: FLOAT64;
 	globaly1, globaly2: SIGNED32;
 	globalRstern: antsArrays.I1d;      globalBellman: antsArrays.X1d;
 	globalMinWeite, globalMaxWeite: SIGNED32;
@@ -54,7 +54,7 @@ VAR
 
 	(* Interaktive Routine zum Anwenden des Minimierers auf Array oder Teil davon per Mausklick *)
 PROCEDURE ApplyInteractively*;
-VAR   		A: antsArrayObjects.tObject;            		r: antsRegions.tRegion;            		gamma: LONGREAL;
+VAR   		A: antsArrayObjects.tObject;            		r: antsRegions.tRegion;            		gamma: FLOAT64;
 	w, h, minweit, maxweit, 			this, last: SIGNED32;
 	Aorig, Aorigtr, APott1, Apotttr, APott2: antsArrayObjects.tLONGREALArray;
 	lengths: BOOLEAN;
@@ -153,7 +153,7 @@ END ApplyInteractively;
 	(* Routine um Minimierer auf ganze Verzeichnisse anzuwenden *)
 PROCEDURE PottsFile (in, out: ARRAY OF CHAR;               		minWeite, maxWeite: SIGNED32);
 VAR A: antsArrayObjects.tLONGREALArray;                o: antsArrayObjects.tINTEGERObject;                AL: antsArrayObjects.tLONGINTArray;                 w, h: SIGNED32;
-	Aorigtr, APott1, Apotttr, APott2: antsArrayObjects.tLONGREALArray;                       gamma: LONGREAL;
+	Aorigtr, APott1, Apotttr, APott2: antsArrayObjects.tLONGREALArray;                       gamma: FLOAT64;
 BEGIN
 	antsArrayObjects.ReadPGM(o, in);
 	IF o = NIL THEN HALT(100) END;
@@ -224,18 +224,18 @@ BEGIN
 END OnDirectory;
 
 	(* gamma + ssq (aus statistic)*)
-PROCEDURE Function1d (from, to: SIGNED32): LONGREAL;
+PROCEDURE Function1d (from, to: SIGNED32): FLOAT64;
 BEGIN
 	RETURN globalStat.s[from, to] + globalGamma
 END Function1d;
 
 	(* gamma + ssq (aus Matrix der kumulativen Summen)*)
-PROCEDURE CumFunction (from, to: SIGNED32): LONGREAL;
+PROCEDURE CumFunction (from, to: SIGNED32): FLOAT64;
 BEGIN
 	RETURN globalGamma + antsBellman.GetSsq2d(globalStat, from, globaly1, to, globaly2)
 END CumFunction;
 
-PROCEDURE MatrixFunction (from, to: SIGNED32): LONGREAL;
+PROCEDURE MatrixFunction (from, to: SIGNED32): FLOAT64;
 BEGIN
 	globaly1 := from;            		globaly2 := to;
 	antsSecurity.SetProgress(SHORT(ENTIER(to / globalStat.N * 100)));
@@ -244,12 +244,12 @@ BEGIN
 	RETURN globalBellman[LEN(globalStat.m[0]) - 1] (* fof 020709, -1 -> -2 *)
 END MatrixFunction;
 
-PROCEDURE CumFunction2 (from, to: SIGNED32): LONGREAL;
+PROCEDURE CumFunction2 (from, to: SIGNED32): FLOAT64;
 BEGIN
 	RETURN globalGamma * (globaly2 - globaly1 + 1) + antsBellman.GetSsq2d(globalStat, from, globaly1, to, globaly2)
 END CumFunction2;
 
-PROCEDURE MatrixFunction2 (from, to: SIGNED32): LONGREAL;
+PROCEDURE MatrixFunction2 (from, to: SIGNED32): FLOAT64;
 BEGIN
 	globaly1 := from;            		globaly2 := to;
 	antsSecurity.SetProgress(SHORT(ENTIER(to / LEN(globalStat.m) * 100)));
@@ -258,12 +258,12 @@ BEGIN
 	RETURN globalBellman[LEN(globalStat.m[0]) - 1] + globalGamma * LEN(globalStat.m[0])
 END MatrixFunction2;
 
-PROCEDURE statMean (k1, k2: SIGNED32): LONGREAL;
+PROCEDURE statMean (k1, k2: SIGNED32): FLOAT64;
 BEGIN RETURN globalStat.m[k1, k2]
 END statMean;
 
 	(* Berechnen der besten Partition fuer Matrix mit Mittelwert aus den kumulativen Summen*)
-PROCEDURE CumWritePartition* (s: antsBellman.Statistic;         VAR   Parti: ARRAY OF ARRAY OF LONGREAL;                   		rstern: antsArrays.I1d;                   		y1, y2: SIGNED32);                      VAR k, next, y: SIGNED32;                   		mean: LONGREAL;
+PROCEDURE CumWritePartition* (s: antsBellman.Statistic;         VAR   Parti: ARRAY OF ARRAY OF FLOAT64;                   		rstern: antsArrays.I1d;                   		y1, y2: SIGNED32);                      VAR k, next, y: SIGNED32;                   		mean: FLOAT64;
 BEGIN
 	k := LEN(s.m[0]) - 1;          (* fof 020709 *)
 	WHILE(k > 0) DO
@@ -276,7 +276,7 @@ BEGIN
 	END
 END CumWritePartition;
 
-PROCEDURE MatrixWritePartition* (s: antsBellman.Statistic;         VAR Parti: ARRAY OF ARRAY OF LONGREAL;            		rstern: antsArrays.I1d);
+PROCEDURE MatrixWritePartition* (s: antsBellman.Statistic;         VAR Parti: ARRAY OF ARRAY OF FLOAT64;            		rstern: antsArrays.I1d);
 VAR k, next: SIGNED32;                   		bellmanneu: antsArrays.X1d;                   		rsternneu : antsArrays.I1d;
 BEGIN
 	k := LEN(s.m) - 1;
@@ -293,23 +293,23 @@ END MatrixWritePartition;
 
 
 	(* Skalieren von gamma  mit Min und Max von einem Vektor orig*)
-PROCEDURE Scale* (VAR orig: ARRAY OF LONGREAL;                  		VAR gamma: LONGREAL);
-VAR max, min: LONGREAL;                  		na, minpos, maxpos: SIGNED32;
+PROCEDURE Scale* (VAR orig: ARRAY OF FLOAT64;                  		VAR gamma: FLOAT64);
+VAR max, min: FLOAT64;                  		na, minpos, maxpos: SIGNED32;
 BEGIN
 	vyLongreal.MinMax(LEN(orig), orig, 0, min, minpos, max, maxpos, na);
 	gamma := gamma * (max - min) * (max - min)
 END Scale;
 
 	(* Skalieren von gamma mit Median von Matrix S*)
-PROCEDURE ScaleMatrix* (VAR S: ARRAY OF ARRAY OF LONGREAL;                       VAR gamma: LONGREAL);
-VAR   median: LONGREAL;
+PROCEDURE ScaleMatrix* (VAR S: ARRAY OF ARRAY OF FLOAT64;                       VAR gamma: FLOAT64);
+VAR   median: FLOAT64;
 BEGIN
 	median := antsArrays.Median2dX(S);                       	(* Median von S*)
 	gamma := gamma * median * median
 END ScaleMatrix;
 
 	(* Potts auf Matrix Orig mit statistic (ssq, median)*)
-PROCEDURE PottsStatLongreal* (VAR Orig, Pott: ARRAY OF ARRAY OF LONGREAL);
+PROCEDURE PottsStatLongreal* (VAR Orig, Pott: ARRAY OF ARRAY OF FLOAT64);
 VAR i, h, w: SIGNED32;           parti: antsArrays.X1d;       		this, last: SIGNED32;
 BEGIN
 	h := LEN(Orig);            		w := LEN(Orig[0]);
@@ -338,7 +338,7 @@ BEGIN
 END PottsStatLongreal;
 
 	(* Potts2 auf Matrix Orig mit ssq und median aus Matrix mit kumulativen Summen*)
-PROCEDURE MatrixPottsLongreal* (VAR Orig, Pott: ARRAY OF ARRAY OF LONGREAL;    minweit, maxweit: SIGNED32;    lengths: BOOLEAN);
+PROCEDURE MatrixPottsLongreal* (VAR Orig, Pott: ARRAY OF ARRAY OF FLOAT64;    minweit, maxweit: SIGNED32;    lengths: BOOLEAN);
 VAR i, h, w: SIGNED32;                   	  	(* 	Akum, AkumSq: antsArrayObjects.tLONGREALArray;     *)		this, last: SIGNED32;
 	Rstern: antsArrays.I1d;                Bellman: antsArrays.X1d;          s: antsBellman.Statistic;
 BEGIN
@@ -379,7 +379,7 @@ END MatrixPottsLongreal;
 
 PROCEDURE PottsToVec*;
 VAR          		obj1, obj2, obj3: vyBase.Object;                  		vec1, vec2, vec3: vyLongrealVec.tVector;
-	i, N, this, last: SIGNED32;                  		rstern: antsArrays.I1d;                  		bellman, maxima, maxima2, data: antsArrays.X1d;                  		gamma: LONGREAL;
+	i, N, this, last: SIGNED32;                  		rstern: antsArrays.I1d;                  		bellman, maxima, maxima2, data: antsArrays.X1d;                  		gamma: FLOAT64;
 BEGIN
 	antsCommands.InitScan("data=OBJ rek=OBJ gamma=FLOAT32");
 	IF antsCommands.ExpectObject( "data",  obj1) &
@@ -434,7 +434,7 @@ END antsHierarchicPotts2d.
 (* Test fuer Potts auf vektoren*)
 PROCEDURE PottsToVec*;
 VAR          		obj1, obj2, obj3: vyBase.Object;                		vec1, vec2, vec3: vyLongrealVec.tVector;
-i, N, this, last: SIGNED32;                		rstern: antsArrays.I1d;                		bellman, maxima, maxima2, data: antsArrays.X1d;                		gamma: LONGREAL;
+i, N, this, last: SIGNED32;                		rstern: antsArrays.I1d;                		bellman, maxima, maxima2, data: antsArrays.X1d;                		gamma: FLOAT64;
 BEGIN
 antsCommands.InitScan();
 IF antsCommands.ExpectObject( "meinVektor",  obj1) &
@@ -505,7 +505,7 @@ END  PottsToVec;
 (*Test fuer die kumulativen Summen*)
 PROCEDURE Test2*;
 VAR sc: antsCommands.tScanList;
-VAR i, j: SIGNED32;		pos, rows, cols: SIGNED32;		VAR A: antsArrayObjects.tLONGREALArray;		B, C: POINTER TO ARRAY OF ARRAY OF LONGREAL;
+VAR i, j: SIGNED32;		pos, rows, cols: SIGNED32;		VAR A: antsArrayObjects.tLONGREALArray;		B, C: POINTER TO ARRAY OF ARRAY OF FLOAT64;
 BEGIN
 sc := antsCommands.ScanFromPar();
 IF antsCommands.ExpectNumberFromKeyword(sc, "rows", 1, rows) &

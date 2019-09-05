@@ -28,7 +28,7 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT  antsArrayObjects, antsCommands, vyBase, aM := antsMessages;
 
 PROCEDURE MakeEdges*;
-	VAR l: antsCommands.tScanList;   beta: LONGREAL;    obj, objh, objv: vyBase.Object;
+	VAR l: antsCommands.tScanList;   beta: FLOAT64;    obj, objh, objv: vyBase.Object;
 	A, hor, ver: antsArrayObjects.tINTEGERObject;  x, y: SIGNED32;
 	pyx, pyxm, pymx : SIGNED16;
 BEGIN

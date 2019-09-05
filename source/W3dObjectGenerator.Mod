@@ -83,7 +83,7 @@ BEGIN
 	END
 END ConnectVLists;
 
-PROCEDURE Arrow*(mat : Matrix.Matrix4x4; l0, l1, r0, r1 : LONGREAL; segments : SIGNED32; obj : AbstractWorld.Object; color : SIGNED32);
+PROCEDURE Arrow*(mat : Matrix.Matrix4x4; l0, l1, r0, r1 : FLOAT64; segments : SIGNED32; obj : AbstractWorld.Object; color : SIGNED32);
 VAR p : Path;
 BEGIN
 	NEW(p);
@@ -94,7 +94,7 @@ BEGIN
 	RotationObject(mat, p, Vectors.Vector3d(1, 0, 0), segments, obj, color);
 END Arrow;
 
-PROCEDURE Sphere*(mat : Matrix.Matrix4x4; radius : LONGREAL; segments : SIGNED32; obj : AbstractWorld.Object; color : SIGNED32);
+PROCEDURE Sphere*(mat : Matrix.Matrix4x4; radius : FLOAT64; segments : SIGNED32; obj : AbstractWorld.Object; color : SIGNED32);
 VAR p : Path;
 	i : SIGNED32;
 BEGIN
@@ -105,7 +105,7 @@ BEGIN
   RotationObject(mat, p, Vectors.Vector3d(0, 1, 0), segments, obj, color)
 END Sphere;
 
-PROCEDURE Box*(mat : Matrix.Matrix4x4; x, y, z: LONGREAL; obj : AbstractWorld.Object; color : SIGNED32);
+PROCEDURE Box*(mat : Matrix.Matrix4x4; x, y, z: FLOAT64; obj : AbstractWorld.Object; color : SIGNED32);
 VAR vert : ARRAY 8 OF AbstractWorld.Vertex;
 BEGIN
 	x := x/2; y := y/2; z := z/2;
@@ -135,7 +135,7 @@ BEGIN
 	obj.AddTriangle(vert[1], vert[5], vert[0], color, NIL, FALSE, TRUE); obj.AddTriangle(vert[0], vert[5], vert[4], color, NIL, FALSE, TRUE)
 END Box;
 
-PROCEDURE TexBox*(mat : Matrix.Matrix4x4; x, y, z: LONGREAL; obj : AbstractWorld.Object; color : SIGNED32; tex: AbstractWorld.Texture);
+PROCEDURE TexBox*(mat : Matrix.Matrix4x4; x, y, z: FLOAT64; obj : AbstractWorld.Object; color : SIGNED32; tex: AbstractWorld.Texture);
 VAR vert : ARRAY 8 OF Vectors.TVector3d;
 		va, vb, vc, vd: AbstractWorld.Vertex;
 BEGIN

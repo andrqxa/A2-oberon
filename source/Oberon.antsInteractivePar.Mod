@@ -41,19 +41,19 @@ TYPE
 		isotropic: BOOLEAN;
 		commands: vyCommandMenus.List;
 		viewnum: BOOLEAN;
-		max: LONGREAL
+		max: FLOAT64
 	END;
 VAR
 	tempLayer: tLayer;
 
 	PROCEDURE Recall( layer: tLayer );
-	VAR cells: SIGNED32;  cellsize: LONGREAL;  i, j: SIGNED32;
+	VAR cells: SIGNED32;  cellsize: FLOAT64;  i, j: SIGNED32;
 		str: ARRAY 20 OF CHAR;
 
-		PROCEDURE PaintCell( x, y: SIGNED32;  val: LONGREAL );
+		PROCEDURE PaintCell( x, y: SIGNED32;  val: FLOAT64 );
 		BEGIN
 			vyHostStrings.RealToFixStr( val, str, 1, 2, 0 );
-			IF val = MIN( LONGREAL ) THEN val := layer.max;  str := "";  vyGraphBase.SetForeColor( layer.style.bcol )
+			IF val = MIN( FLOAT64 ) THEN val := layer.max;  str := "";  vyGraphBase.SetForeColor( layer.style.bcol )
 			ELSIF val < 0 THEN val := -val;  vyGraphBase.SetForeColor( layer.style.selectcol )
 			ELSE vyGraphBase.SetForeColor( layer.style.fcol )
 			END;
@@ -107,7 +107,7 @@ VAR
 	END Prompt;
 
 	PROCEDURE OnLayer( layer: tLayer;  VAR event: vyEvents.EventMsg ): BOOLEAN;
-	VAR i, j: SIGNED16;  cells: SIGNED32;  cellsize: LONGREAL;
+	VAR i, j: SIGNED16;  cells: SIGNED32;  cellsize: FLOAT64;
 
 		PROCEDURE InCell( x, y: SIGNED32;  cx, cy: SIGNED16 ): BOOLEAN;
 		VAR rx, ry, rw, rh: SIGNED16;
@@ -129,7 +129,7 @@ VAR
 	END OnLayer;
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR cells: SIGNED32;  cellsize: LONGREAL;  i, j: SIGNED32;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;
+	VAR cells: SIGNED32;  cellsize: FLOAT64;  i, j: SIGNED32;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;
 
 		PROCEDURE InCell( x, y: SIGNED32;  cx, cy: SIGNED16 ): BOOLEAN;
 		VAR rx, ry, rw, rh: SIGNED16;
@@ -142,7 +142,7 @@ VAR
 		IF layer.maxx > layer.maxy THEN cells := layer.maxx ELSE cells := layer.maxy END;
 		cellsize := 1 / (cells + 1);  oldx := MAX( SIGNED16 );
 		FOR i := 0 TO layer.n.dim - 1 DO
-			IF layer.n.par[i] # MIN( LONGREAL ) THEN
+			IF layer.n.par[i] # MIN( FLOAT64 ) THEN
 				FOR j := 0 TO layer.n.count[i] - 1 DO
 					IF InCell( layer.n.x[i, j], layer.n.y[i, j], event.x, event.y ) THEN
 						origx := event.x;  origy := event.y;  gesture := event.gesture;
@@ -171,7 +171,7 @@ VAR
 	END Select;
 
 	PROCEDURE Wheel( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR cells: SIGNED32;  cellsize: LONGREAL;  i, j: SIGNED32;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;  add, val: LONGREAL;
+	VAR cells: SIGNED32;  cellsize: FLOAT64;  i, j: SIGNED32;  origx, origy: SIGNED16;  gesture: SIGNED16;  oldx: SIGNED16;  add, val: FLOAT64;
 
 		PROCEDURE InCell( x, y: SIGNED32;  cx, cy: SIGNED16 ): BOOLEAN;
 		VAR rx, ry, rw, rh: SIGNED16;
@@ -184,7 +184,7 @@ VAR
 		IF layer.maxx > layer.maxy THEN cells := layer.maxx ELSE cells := layer.maxy END;
 		cellsize := 1 / (cells + 1);  oldx := MAX( SIGNED16 );
 		FOR i := 0 TO layer.n.dim - 1 DO
-			IF layer.n.par[i] # MIN( LONGREAL ) THEN
+			IF layer.n.par[i] # MIN( FLOAT64 ) THEN
 				FOR j := 0 TO layer.n.count[i] - 1 DO
 					IF InCell( layer.n.x[i, j], layer.n.y[i, j], event.x, event.y ) THEN
 						add := layer.max / 20;
@@ -415,7 +415,7 @@ VAR
 		IF (l # NIL ) & (l IS tLayer) THEN
 			layer := l( tLayer );  antsCommands.InitScan( "num=INT" );
 			IF antsCommands.ExpectNumber( "num", num ) THEN
-				IF layer.n.par[num] # MIN( LONGREAL ) THEN layer.n.par[num] := MIN( LONGREAL ) ELSE layer.n.par[num] := 0 END
+				IF layer.n.par[num] # MIN( FLOAT64 ) THEN layer.n.par[num] := MIN( FLOAT64 ) ELSE layer.n.par[num] := 0 END
 			END
 		END
 	END ToggleDisable;

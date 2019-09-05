@@ -429,7 +429,7 @@ VAR
 	VAR
 		r: Reader;
 		i: SIGNED32;
-		speed: LONGREAL;
+		speed: FLOAT64;
 	BEGIN
 		WHILE (i < readers.Length()) & (readers.Get(i)(Reader).id # id) DO INC(i); END;
 		IF i < readers.Length() THEN

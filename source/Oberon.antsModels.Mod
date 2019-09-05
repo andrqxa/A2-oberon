@@ -32,9 +32,9 @@ TYPE
 
 
 	tModel* = POINTER TO tModelDesc;   (*= input parameters for the gibbs sampler, may be extended in your module *)
-	PotentialFunction* = PROCEDURE ( M: tModel;  A: vyBase.Object ): LONGREAL;
+	PotentialFunction* = PROCEDURE ( M: tModel;  A: vyBase.Object ): FLOAT64;
 	tModelDesc* = RECORD (vyBase.ObjDesc)
-		coolingTemp-: LONGREAL;
+		coolingTemp-: FLOAT64;
 		synced*: BOOLEAN;
 		MCache*: antsCaches.FullCache;
 		maxCacheSize-: SIGNED32;
@@ -181,7 +181,7 @@ TYPE
 		par.coolingTemp := 1;  par.synced := FALSE;  par.maxCacheSize := 10000000
 	END Open;
 
-	PROCEDURE SetTemperature*( par: tModel;  temp: LONGREAL );
+	PROCEDURE SetTemperature*( par: tModel;  temp: FLOAT64 );
 	BEGIN
 		IF par.coolingTemp = temp THEN RETURN END;
 		par.coolingTemp := temp;  par.synced := FALSE

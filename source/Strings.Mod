@@ -117,7 +117,7 @@ TYPE
 		RETURN str
 	END "+";
 
-	OPERATOR "+"*( a: String; b: LONGREAL ): String;
+	OPERATOR "+"*( a: String; b: FLOAT64 ): String;
 	VAR
 		digits: ARRAY 32 OF CHAR;
 		str: String;
@@ -782,7 +782,7 @@ BEGIN
 END HexStrToSize;
 
 (** converts a real value to a string *)
-PROCEDURE FloatToStr*(x: LONGREAL; n, f, D: SIGNED32; VAR str: ARRAY OF CHAR);
+PROCEDURE FloatToStr*(x: FLOAT64; n, f, D: SIGNED32; VAR str: ARRAY OF CHAR);
 BEGIN
 	RC.RealToStringFix( x, n, f, D, str )
 END FloatToStr;
@@ -793,7 +793,7 @@ BEGIN
 END AddressToStr;
 
 (** converts a string to a real value *)
-PROCEDURE StrToFloat*(CONST s: ARRAY OF CHAR; VAR r: LONGREAL);
+PROCEDURE StrToFloat*(CONST s: ARRAY OF CHAR; VAR r: FLOAT64);
 BEGIN
 	RC.StringToReal(s,r);
 END StrToFloat;

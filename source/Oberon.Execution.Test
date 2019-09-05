@@ -176,7 +176,7 @@ positive: Longreal stored in PAF
 	MODULE Test;
 
 	PROCEDURE Longreal;
-	VAR a,b: LONGREAL;
+	VAR a,b: FLOAT64;
 	BEGIN
 		a := 888;
 		b := a;
@@ -803,7 +803,7 @@ positive: relational operations on reals
 positive: relational operations on long reals
 
 	MODULE Test;
-	VAR value: LONGREAL;
+	VAR value: FLOAT64;
 	BEGIN
 		value := 5;
 		ASSERT (value = 5); ASSERT (~(value = 6)); ASSERT (value = value);
@@ -884,7 +884,7 @@ positive: negation on reals
 positive: negation on long reals
 
 	MODULE Test;
-	VAR value: LONGREAL;
+	VAR value: FLOAT64;
 	BEGIN value := 5; ASSERT (-value = -5); ASSERT (-(-value) = 5); ASSERT (-(-value) = value)
 	END Test.
 
@@ -946,7 +946,7 @@ positive: absolute value of real
 positive: absolute value of long real
 
 	MODULE Test;
-	VAR value: LONGREAL;
+	VAR value: FLOAT64;
 	BEGIN
 		value := 5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = value); ASSERT (ABS (-value) = value);
 		value := -5; ASSERT (ABS (value) = 5); ASSERT (ABS (-value) = 5); ASSERT (ABS (value) = -value); ASSERT (ABS (-value) = -value);
@@ -1552,7 +1552,7 @@ positive: entier on reals
 positive: entier on long reals
 
 	MODULE Test;
-	VAR value: LONGREAL;
+	VAR value: FLOAT64;
 	BEGIN
 		value := 0; ASSERT (ENTIER (value) = 0);
 		value := 1; ASSERT (ENTIER (value) = 1);
@@ -1626,7 +1626,7 @@ positive: addition on reals
 positive: addition on long reals
 
 	MODULE Test;
-	VAR a, b: LONGREAL;
+	VAR a, b: FLOAT64;
 	BEGIN
 		a := 3; b := 2; ASSERT (a + b = +5); ASSERT (a + b = 3 + 2);
 		a := -3; b := 2; ASSERT (a + b = -1); ASSERT (a + b = (-3) + 2);
@@ -1697,7 +1697,7 @@ positive: subtraction on reals
 positive: subtraction on long reals
 
 	MODULE Test;
-	VAR a, b: LONGREAL;
+	VAR a, b: FLOAT64;
 	BEGIN
 		a := 3.5; b := 2.5; ASSERT (a - b = +1); ASSERT (a - b = 3.5 - 2.5);
 		a := -3.5; b := 2.5; ASSERT (a - b = -6); ASSERT (a - b = (-3.5) - 2.5);
@@ -1768,7 +1768,7 @@ positive: multiplication on reals
 positive: multiplication on long reals
 
 	MODULE Test;
-	VAR a, b: LONGREAL;
+	VAR a, b: FLOAT64;
 	BEGIN
 		a := 3.5; b := 2.5; ASSERT (a * b = +8.75); ASSERT (a * b = 3.5 * 2.5);
 		a := -3.5; b := 2.5; ASSERT (a * b = -8.75); ASSERT (a * b = (-3.5) * 2.5);
@@ -1923,7 +1923,7 @@ positive: real division on reals
 positive: real division on long reals
 
 	MODULE Test;
-	VAR a, b: LONGREAL;
+	VAR a, b: FLOAT64;
 	BEGIN a := 3; b := 2; ASSERT (a / b = 1.5); ASSERT (a / b = 3 / 2);
 	END Test.
 
@@ -7322,10 +7322,10 @@ positive: return of real number (was: problem in AMD float stack)
 
 	MODULE Test; (** AUTHOR ""; PURPOSE ""; *)
 
-	VAR r: LONGREAL;
+	VAR r: FLOAT64;
 
-	PROCEDURE P(): LONGREAL;
-	VAR x,y : LONGREAL;
+	PROCEDURE P(): FLOAT64;
+	VAR x,y : FLOAT64;
 	BEGIN
 		x := 10;
 		y := 20;
@@ -7360,7 +7360,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 
 	IMPORT SYSTEM;
 
-	VAR r: FLOAT32; x: LONGREAL;  l: SIGNED32; h: SIGNED64;
+	VAR r: FLOAT32; x: FLOAT64;  l: SIGNED32; h: SIGNED64;
 
 	PROCEDURE Real(): SIGNED32;
 	VAR r: FLOAT32; l: SIGNED32;
@@ -7372,7 +7372,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 	END Real;
 
 	PROCEDURE Longreal(): SIGNED64;
-	VAR r: LONGREAL; l: SIGNED64;
+	VAR r: FLOAT64; l: SIGNED64;
 	BEGIN
 		r := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
@@ -7389,12 +7389,12 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 		RETURN r;
 	END Longint;
 
-	PROCEDURE Hugeint(): LONGREAL;
-	VAR r: LONGREAL; l: SIGNED64;
+	PROCEDURE Hugeint(): FLOAT64;
+	VAR r: FLOAT64; l: SIGNED64;
 	BEGIN
 		l := 10;
 		(* trick to store real value in original format in longint variable wihout using SYSTEM.VAL, for testing SYSTEM.VAL ! *)
-		SYSTEM.MOVE(SYSTEM.ADR(l),SYSTEM.ADR(r),SIZEOF(LONGREAL));
+		SYSTEM.MOVE(SYSTEM.ADR(l),SYSTEM.ADR(r),SIZEOF(FLOAT64));
 		RETURN r;
 	END Hugeint;
 
@@ -7402,7 +7402,7 @@ positive: test for correct use of SYSTEM.VAL (without conversion)
 	BEGIN
 		r := SYSTEM.VAL(FLOAT32,Real());
 		ASSERT(r = 10);
-		x := SYSTEM.VAL(LONGREAL,Longreal());
+		x := SYSTEM.VAL(FLOAT64,Longreal());
 		ASSERT(x = 10);
 		l := SYSTEM.VAL(SIGNED32, Longint());
 		ASSERT(l=10);

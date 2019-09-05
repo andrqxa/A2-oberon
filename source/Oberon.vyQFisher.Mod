@@ -28,8 +28,8 @@ IMPORT MathL IN A2, Texts, In, vyBase, vyHostTexts;
 TYPE
 	Stattyp* = RECORD
 		Count*: SIGNED16;
-		Mean*: LONGREAL;
-		Ssq*: LONGREAL
+		Mean*: FLOAT64;
+		Ssq*: FLOAT64
 	END;
 
 	VAR w: vyBase.TextsWriter;
@@ -51,7 +51,7 @@ TYPE
 	**********************************************************)
 
 	PROCEDURE Qfisher* (N, M: SIGNED16;
-Percentage: LONGREAL; VAR ErrCode: SIGNED16): LONGREAL;
+Percentage: FLOAT64; VAR ErrCode: SIGNED16): FLOAT64;
 CONST
 	Accuracy = 1.0E-6;
 	K1 = 2.30753;
@@ -62,10 +62,10 @@ CONST
 	cBadprob = 1;
 
 VAR
-	A, B, C, Psq, V, T: LONGREAL;
-	E, Up, Help: LONGREAL;
+	A, B, C, Psq, V, T: FLOAT64;
+	E, Up, Help: FLOAT64;
 
-PROCEDURE Sqr (x: LONGREAL): LONGREAL;
+PROCEDURE Sqr (x: FLOAT64): FLOAT64;
 BEGIN
 	RETURN x * x
 END Sqr;
@@ -87,11 +87,11 @@ Accuracy=1.0E-6.
 ********************************************************************)
 
 PROCEDURE Pffisher (N, M: SIGNED16;
-X: LONGREAL; VAR Err: SIGNED16): LONGREAL;
+X: FLOAT64; VAR Err: SIGNED16): FLOAT64;
 
 VAR
 	A, B, I, J: SIGNED16;
-	W, Y, Z, D, P: LONGREAL;
+	W, Y, Z, D, P: FLOAT64;
 
 BEGIN (*PFFISHER*)
 	Err := cNoErr;
@@ -169,7 +169,7 @@ BEGIN (*Function QFISHER*)
 		Percentage = 0 THEN
 		RETURN 0
 	ELSIF Percentage = 1 THEN
-		RETURN MAX(LONGREAL)
+		RETURN MAX(FLOAT64)
 
 	ELSE
 		(*real approximation*)
@@ -230,7 +230,7 @@ BEGIN (*Function QFISHER*)
 
 END Qfisher;  (*Function Qfisher*)
 
-PROCEDURE QF*;  VAR N, M: SIGNED16; RP: FLOAT32; X, P: LONGREAL; Err: SIGNED16;
+PROCEDURE QF*;  VAR N, M: SIGNED16; RP: FLOAT32; X, P: FLOAT64; Err: SIGNED16;
 BEGIN
 	In.Open; In.Int(N); In.Int(M); In.Real(RP); P := RP;
 	X := Qfisher(N, M, P, Err);
@@ -248,9 +248,9 @@ BEGIN
 	s.Count := 0; s.Mean := 0; s.Ssq := 0
 END initstat;
 
-PROCEDURE Addbistat* (X, Y: LONGREAL;
+PROCEDURE Addbistat* (X, Y: FLOAT64;
 VAR Xstat, Ystat: Stattyp;
-VAR Xyssq: LONGREAL);
+VAR Xyssq: FLOAT64);
 	(*Fuction: accumulate (x,y) into the statistics*)
 	(*Input: (x,y): new data*)
 	(*          xstat,ystat,xyssq: current statistics*)
@@ -263,7 +263,7 @@ VAR Xyssq: LONGREAL);
 	(*you can save updating one 'count' if you want to*)
 
 VAR
-	Xdiff, Ydiff: LONGREAL;
+	Xdiff, Ydiff: FLOAT64;
 
 BEGIN
 	(*update statistics for x*)

@@ -25,7 +25,7 @@ CONST
 	GRAD = 2;	(* trigonometric in grad *)
 TYPE
 	Operand = RECORD	(* a value *)
-		value: LONGREAL;
+		value: FLOAT64;
 		factor,base,angle: SIGNED16;
 	END;
 
@@ -39,14 +39,14 @@ TYPE
 		expr*: Calculator.Expression;
 		state: SIGNED16;
 		op: ARRAY CalcUndoOp OF Operand;
-		mem: ARRAY CalcMem OF LONGREAL;
-		undo: ARRAY CalcUndoKey OF LONGREAL;
+		mem: ARRAY CalcMem OF FLOAT64;
+		undo: ARRAY CalcUndoKey OF FLOAT64;
 		tag: ARRAY 32 OF CHAR;
 	END;
 
 (* ** Add-On Operators **************************************** *)
 
-PROCEDURE and(x,y: LONGREAL): LONGREAL;
+PROCEDURE and(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
@@ -54,7 +54,7 @@ BEGIN
 	RETURN(SYSTEM.VAL(SIGNED32,setx * sety));
 END and;
 
-PROCEDURE or(x,y: LONGREAL): LONGREAL;
+PROCEDURE or(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
@@ -62,7 +62,7 @@ BEGIN
 	RETURN(SYSTEM.VAL(SIGNED32,setx + sety));
 END or;
 
-PROCEDURE nor(x,y: LONGREAL): LONGREAL;
+PROCEDURE nor(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
@@ -70,7 +70,7 @@ BEGIN
 	RETURN(SYSTEM.VAL(SIGNED32,(setx / {MIN(SET)..MAX(SET)}) + sety));
 END nor;
 
-PROCEDURE xor(x,y: LONGREAL): LONGREAL;
+PROCEDURE xor(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
@@ -78,7 +78,7 @@ BEGIN
 	RETURN(SYSTEM.VAL(SIGNED32,setx / sety));
 END xor;
 
-PROCEDURE xnor(x,y: LONGREAL): LONGREAL;
+PROCEDURE xnor(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
@@ -88,7 +88,7 @@ END xnor;
 
 (* ** Built-In Functions **************************************** *)
 
-PROCEDURE not(x: LONGREAL): LONGREAL;
+PROCEDURE not(x: FLOAT64): FLOAT64;
 VAR
 	setx: SET;
 BEGIN
@@ -96,7 +96,7 @@ BEGIN
 	RETURN(SYSTEM.VAL(SIGNED32,setx / {MIN(SET)..MAX(SET)}));
 END not;
 
-PROCEDURE Rad(value: LONGREAL; angle: SIGNED16): LONGREAL;
+PROCEDURE Rad(value: FLOAT64; angle: SIGNED16): FLOAT64;
 BEGIN
 	CASE angle OF
 	|	DEG:
@@ -108,7 +108,7 @@ BEGIN
 	END;
 END Rad;
 
-PROCEDURE Deg(value: LONGREAL; angle: SIGNED16): LONGREAL;
+PROCEDURE Deg(value: FLOAT64; angle: SIGNED16): FLOAT64;
 BEGIN
 	CASE angle OF
 	|	DEG:
@@ -120,7 +120,7 @@ BEGIN
 	END;
 END Deg;
 
-PROCEDURE RadOp(op: Operand): LONGREAL;
+PROCEDURE RadOp(op: Operand): FLOAT64;
 BEGIN
 	RETURN(Rad(op.value,op.angle));
 END RadOp;
@@ -182,10 +182,10 @@ PROCEDURE AddDigit(E: Engine; c: CHAR): BOOLEAN;
 	(* Add a digit to the current Operand depending on it's base *)
 VAR
 	ok: BOOLEAN;
-	val,inp: LONGREAL;
+	val,inp: FLOAT64;
 	i: SIGNED16;
 BEGIN
-	ok:= TRUE; val:= E.op[0].value; inp:= MAX(LONGREAL);
+	ok:= TRUE; val:= E.op[0].value; inp:= MAX(FLOAT64);
 	IF Strings.IsDigit(c) THEN
 		inp:= ORD(c) - ORD("0");
 	ELSIF Strings.IsHexDigit(c) THEN

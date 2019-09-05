@@ -323,8 +323,8 @@ OSCBundle b:
 		(* 64 double IEE754: OSC Type Tag 'd' *)
 		OSCParamFloat64* = OBJECT(OSCParamObject)
 			VAR
-				float: LONGREAL;
-			PROCEDURE &InitFloat64*(f: LONGREAL);
+				float: FLOAT64;
+			PROCEDURE &InitFloat64*(f: FLOAT64);
 			BEGIN
 				float := f;
 				tag := 'd';
@@ -1112,7 +1112,7 @@ OSCBundle b:
 	VAR
 		p: OSCParamFloat64;
 		h,l: SIGNED32;
-		f: LONGREAL;
+		f: FLOAT64;
 	BEGIN
 		IF Trace THEN KernelLog.String('parseOSCParamFloat64: '); KernelLog.Int(ofs, 4); KernelLog.Int(endofs, 4); KernelLog.Ln; END;
 		IF (ofs+8) > endofs THEN RETURN NIL END;

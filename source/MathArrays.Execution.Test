@@ -364,7 +364,7 @@ positive: test driver
 		 	INC(i,STEP(r1)) END;
 		END TestL3;
 
-		PROCEDURE FillX0(VAR a: ARRAY [?] OF LONGREAL; base: SIGNED32);
+		PROCEDURE FillX0(VAR a: ARRAY [?] OF FLOAT64; base: SIGNED32);
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
@@ -374,11 +374,11 @@ positive: test driver
 			END;
 		END FillX0;
 
-		PROCEDURE FillX*(VAR a: ARRAY [?] OF LONGREAL);
+		PROCEDURE FillX*(VAR a: ARRAY [?] OF FLOAT64);
 		BEGIN FillX0(a,0);
 		END FillX;
 
-		PROCEDURE TestFillX0*(CONST a: ARRAY [?] OF LONGREAL; base: SIGNED32);
+		PROCEDURE TestFillX0*(CONST a: ARRAY [?] OF FLOAT64; base: SIGNED32);
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
@@ -388,12 +388,12 @@ positive: test driver
 			END;
 		END TestFillX0;
 
-		PROCEDURE TestFillX*(CONST a: ARRAY [?] OF LONGREAL);
+		PROCEDURE TestFillX*(CONST a: ARRAY [?] OF FLOAT64);
 		BEGIN
 			TestFillX0(a,0);
 		END TestFillX;
 
-		PROCEDURE RandomX*(VAR a: ARRAY [?] OF LONGREAL);
+		PROCEDURE RandomX*(VAR a: ARRAY [?] OF FLOAT64);
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
@@ -403,7 +403,7 @@ positive: test driver
 			END;
 		END RandomX;
 
-		PROCEDURE PrintX*(CONST a: ARRAY [?] OF LONGREAL);
+		PROCEDURE PrintX*(CONST a: ARRAY [?] OF FLOAT64);
 		VAR i: SIGNED32;
 		BEGIN
 			IF DIM(a) = 1 THEN
@@ -413,32 +413,32 @@ positive: test driver
 			END;
 		END PrintX;
 
-		PROCEDURE TestX1*(CONST a: ARRAY [*] OF LONGREAL; r: RANGE);
+		PROCEDURE TestX1*(CONST a: ARRAY [*] OF FLOAT64; r: RANGE);
 		VAR i: SIGNED32;
 		BEGIN
 		 	i := FIRST(r); WHILE i <= LAST(r) DO
-		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=LONGREAL(i));
+		 		ASSERT(a[(i-FIRST(r)) DIV STEP(r)]=FLOAT64(i));
 		 		INC(i,STEP(r));
 		 	END;
 		END TestX1;
 
-		PROCEDURE TestX2*(CONST a: ARRAY [*,*] OF LONGREAL; r1, r2: RANGE);
+		PROCEDURE TestX2*(CONST a: ARRAY [*,*] OF FLOAT64; r1, r2: RANGE);
 		VAR i,j: SIGNED32;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
-		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2)]=LONGREAL(10*i+j));
+		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2)]=FLOAT64(10*i+j));
 		 	INC(j,STEP(r2)) END;
 		 	INC(i,STEP(r1)) END;
 		END TestX2;
 
-		PROCEDURE TestX3*(CONST a: ARRAY [*,*,*] OF LONGREAL; r1, r2, r3: RANGE);
+		PROCEDURE TestX3*(CONST a: ARRAY [*,*,*] OF FLOAT64; r1, r2, r3: RANGE);
 		VAR i,j,k: SIGNED32;
 		BEGIN
 		 	i := FIRST(r1); WHILE i <= LAST(r1) DO
 		 	j := FIRST(r2); WHILE j <= LAST(r2) DO
 		 	k := FIRST(r3); WHILE k <= LAST(r3) DO
-		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2),(k-FIRST(r3)) DIV STEP(r3)]=LONGREAL(100*i+10*j+k));
+		 		ASSERT(a[(i-FIRST(r1)) DIV STEP(r1),(j-FIRST(r2)) DIV STEP(r2),(k-FIRST(r3)) DIV STEP(r3)]=FLOAT64(100*i+10*j+k));
 		 	INC(k,STEP(r3)) END;
 		 	INC(j,STEP(r2)) END;
 		 	INC(i,STEP(r1)) END;
@@ -469,7 +469,7 @@ positive: test driver
 			END;
 		END TestFillR0;
 
-		PROCEDURE TestFillR*(CONST a: ARRAY [?] OF LONGREAL);
+		PROCEDURE TestFillR*(CONST a: ARRAY [?] OF FLOAT64);
 		BEGIN
 			TestFillX0(a,0);
 		END TestFillR;
@@ -569,7 +569,7 @@ positive: driver tests (fill and compare arrays)
 		END TestR;
 
 		PROCEDURE TestX;
-		VAR a: ARRAY [*,*] OF LONGREAL; b: ARRAY [?] OF LONGREAL; c: ARRAY [2,3] OF LONGREAL;
+		VAR a: ARRAY [*,*] OF FLOAT64; b: ARRAY [?] OF FLOAT64; c: ARRAY [2,3] OF FLOAT64;
 		BEGIN
 			NEW(a,2,3); NEW(b,2,3);
 			Driver.FillX(a); Driver.FillX(b); Driver.FillX(c);
@@ -669,7 +669,7 @@ positive: simple tests for ranges
 	END TestR;
 
 	PROCEDURE TestX;
-	VAR s1: ARRAY [*] OF LONGREAL; s2: ARRAY [*,*] OF LONGREAL; s3: ARRAY [*,*,*] OF LONGREAL;
+	VAR s1: ARRAY [*] OF FLOAT64; s2: ARRAY [*,*] OF FLOAT64; s3: ARRAY [*,*,*] OF FLOAT64;
 	BEGIN
 		NEW(s1,3); NEW(s2,3,4); NEW(s3,3,4,5);
 		Driver.FillX(s1); Driver.FillX(s2); Driver.FillX(s3);
@@ -687,7 +687,7 @@ positive: conversion tests
 
 	MODULE Test;
 	IMPORT Driver;
-	VAR s: ARRAY [?] OF SIGNED8; i: ARRAY [?] OF SIGNED16; l: ARRAY [?] OF SIGNED32; r: ARRAY [?] OF FLOAT32; x: ARRAY [?] OF LONGREAL;
+	VAR s: ARRAY [?] OF SIGNED8; i: ARRAY [?] OF SIGNED16; l: ARRAY [?] OF SIGNED32; r: ARRAY [?] OF FLOAT32; x: ARRAY [?] OF FLOAT64;
 	BEGIN
 		NEW(s,2,3,5);
 		Driver.FillS(s); Driver.TestFillS(s);

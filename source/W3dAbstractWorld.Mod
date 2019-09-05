@@ -10,7 +10,7 @@ TYPE
 		END SetPos;
 
 		(** SetUV - set the relative texture position of this vertex (texture is defined in the triangle) *)
-		PROCEDURE SetUV*(u, v : LONGREAL);
+		PROCEDURE SetUV*(u, v : FLOAT64);
 		END SetUV;
 	END Vertex;
 

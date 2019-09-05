@@ -263,7 +263,7 @@ TYPE
 				| 5H : w.String("SIGNED16")
 				| 6H : w.String("SIGNED32")
 				| 7H : w.String("FLOAT32")
-				| 8H : w.String("LONGREAL")
+				| 8H : w.String("FLOAT64")
 				| 9H : w.String("SET")
 				| 0AH : w.String("?")
 				| 0BH : w.String("?")

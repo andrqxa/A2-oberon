@@ -86,7 +86,7 @@ CONST
 TYPE
 	(*** Numeric Types *)
 	Index* = SIGNED32;      	(*= default type for counts, indices of arrays, and related purposes *)
-	Real* = LONGREAL;      	(*= default type for numerics and 2d/3d graphics *)
+	Real* = FLOAT64;      	(*= default type for numerics and 2d/3d graphics *)
 
 	(*** Access Types *)
 	(*= -- must match declaration in vyHost.
@@ -2118,9 +2118,9 @@ BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)
 END COPYR;
 
-PROCEDURE COPYX* (VAR src: ARRAY OF LONGREAL;      srcoffs, len: SIGNED32;
-VAR dest: ARRAY OF LONGREAL;     destoffs: SIGNED32);
-CONST sz = SIZEOF(LONGREAL);
+PROCEDURE COPYX* (VAR src: ARRAY OF FLOAT64;      srcoffs, len: SIGNED32;
+VAR dest: ARRAY OF FLOAT64;     destoffs: SIGNED32);
+CONST sz = SIZEOF(FLOAT64);
 BEGIN	ASSERT(LEN(src) >= len, 100);     	ASSERT(LEN(dest) >= len, 101);
 	ASSERT((len >= 0) & (len < (MAX(SIGNED32) DIV sz)), 102);
 	SYSTEM.MOVE(ADDRESSOF(src[srcoffs]), ADDRESSOF(dest[destoffs]), len * sz)

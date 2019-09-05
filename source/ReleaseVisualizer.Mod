@@ -395,8 +395,8 @@ TYPE
 	KillerMsg = OBJECT
 	END KillerMsg;
 
-	RealRect* = RECORD l*, t*, r*, b* : LONGREAL; END;
-	Point = RECORD x, y : LONGREAL END;
+	RealRect* = RECORD l*, t*, r*, b* : FLOAT64; END;
+	Point = RECORD x, y : FLOAT64 END;
 	PointArray = POINTER TO ARRAY OF Point;
 
 	Object = OBJECT
@@ -404,7 +404,7 @@ TYPE
 		aabb: RealRect;
 		parent : Object;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : LONGREAL);
+		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		BEGIN
 		END Draw;
 
@@ -435,7 +435,7 @@ TYPE
 			INC(nofObj)
 		END Add;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : LONGREAL);
+		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		VAR i : SIZE;
 		BEGIN
 			FOR i := 0 TO nofObj - 1 DO
@@ -447,7 +447,7 @@ TYPE
 
 	Rectangle = OBJECT(Object)
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : LONGREAL);
+		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		BEGIN
 			WMGraphicUtilities.DrawRect(canvas,
 				WMRectangles.MakeRect(ENTIER(dx + fx * aabb.l), ENTIER(dy + fy * aabb.t),
@@ -459,7 +459,7 @@ TYPE
 
 	Line = OBJECT(Object)
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : LONGREAL);
+		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		BEGIN
 			canvas.Line(ENTIER(dx + fx * aabb.l), ENTIER(dy + fy * aabb.t), ENTIER(dx + fx * aabb.r), ENTIER(dy + fy * aabb.b),
 				0FFH, WMGraphics.ModeCopy);
@@ -470,7 +470,7 @@ TYPE
 	Title  = OBJECT(Object)
 	VAR title : ARRAY 100 OF CHAR;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : LONGREAL);
+		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		BEGIN
 			canvas.SetFont(WMGraphics.GetFont("Vera", ENTIER(75 * fy + 0.5),  {}));
 			IF canvas IS PDF.PDFCanvas THEN canvas(PDF.PDFCanvas).PDFSetFont("Courier", ENTIER(75 * SHORT(fy)), {}) END;
@@ -500,7 +500,7 @@ TYPE
 			CalcPath
 		END SetFromTo;
 
-		PROCEDURE CalcDirs(p, d : Point; VAR alternate : SIGNED32; VAR d0, d1 : LONGREAL) : SIGNED32;
+		PROCEDURE CalcDirs(p, d : Point; VAR alternate : SIGNED32; VAR d0, d1 : FLOAT64) : SIGNED32;
 		VAR l, t : BOOLEAN; dir : SIGNED32;
 		BEGIN
 			l := p.x > d.x; t := p.y > d.y;
@@ -519,10 +519,10 @@ TYPE
 			RETURN dir
 		END CalcDirs;
 
-		PROCEDURE HasIntersection(p : Point; d : SIGNED32; VAR mdist : LONGREAL; VAR colBox : RealRect) : BOOLEAN;
+		PROCEDURE HasIntersection(p : Point; d : SIGNED32; VAR mdist : FLOAT64; VAR colBox : RealRect) : BOOLEAN;
 		VAR g : Graphic;
 			o : Object;
-			dist : LONGREAL;
+			dist : FLOAT64;
 			inter, first : BOOLEAN;
 			i : SIZE;
 		BEGIN
@@ -554,7 +554,7 @@ TYPE
 			RETURN ~first
 		END HasIntersection;
 
-		PROCEDURE Go(VAR p : Point; d : SIGNED32; dist : LONGREAL);
+		PROCEDURE Go(VAR p : Point; d : SIGNED32; dist : FLOAT64);
 		BEGIN
 			IF TraceSC THEN KernelLog.String("Going "); END;
 			CASE d OF
@@ -569,10 +569,10 @@ TYPE
 		PROCEDURE CalcPath;
 		VAR  p : Point;
 			d, altd, lc, lastDir : SIGNED32;
-			d0, d1, dist : LONGREAL;
+			d0, d1, dist : FLOAT64;
 			colBox : RealRect;
 			ta, tb : Point;
-			rla, rlb : LONGREAL;
+			rla, rlb : FLOAT64;
 		BEGIN
 			a.x := (from.aabb.l + from.aabb.r) / 2; a.y := (from.aabb.t + from.aabb.b) / 2;
 			b.x := (to.aabb.l + to.aabb.r) / 2; b.y := (to.aabb.t + to.aabb.b) / 2;
@@ -624,7 +624,7 @@ TYPE
 			way[nofPoints] := b; INC(nofPoints);
 		END CalcPath;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : LONGREAL);
+		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		VAR i : SIGNED32;
 		BEGIN
 			FOR i := 1 TO nofPoints - 1 DO
@@ -639,12 +639,12 @@ TYPE
 		name, info : ARRAY 64 OF CHAR;
 		color : SIGNED32;
 		m : ModuleInfo;
-		rellayerpos : LONGREAL;
+		rellayerpos : FLOAT64;
 
-		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : LONGREAL);
+		PROCEDURE Draw(canvas : WMGraphics.Canvas; dx, dy, fx, fy : FLOAT64);
 		VAR
 			r, rect : WMRectangles.Rectangle;
-			ty : LONGREAL;
+			ty : FLOAT64;
 			sec : ARRAY 30 OF CHAR;
 			i, l : SIGNED32;
 		BEGIN
@@ -689,7 +689,7 @@ TYPE
 	DrawSpace = OBJECT(WMComponents.VisualComponent)
 	VAR
 		g : Graphic;
-		dx, dy : LONGREAL;
+		dx, dy : FLOAT64;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -697,7 +697,7 @@ TYPE
 			NEW(g);
 		END Init;
 
-		PROCEDURE XSetPos(dx, dy : LONGREAL);
+		PROCEDURE XSetPos(dx, dy : FLOAT64);
 		BEGIN
 			SELF.dx := dx; SELF.dy := dy;
 			Invalidate;

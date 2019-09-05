@@ -31,7 +31,7 @@ TYPE
 
 	tModel* = POINTER TO tModelDesc;
 	tModelDesc* = RECORD (antsModels.tModelDesc);
-		horprob: LONGREAL
+		horprob: FLOAT64
 	END;
 
 	PROCEDURE StoreM( VAR R: Files.Rider;  s: tModel );

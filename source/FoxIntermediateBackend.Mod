@@ -12660,7 +12660,7 @@ TYPE
 								IF RefInfo THEN Info(section,"FLOAT32") END;
 								Char(section, sfTypeREAL);
 							ELSIF (type = module.system.longrealType) OR (type.sizeInBits = 64) THEN
-								IF RefInfo THEN Info(section,"LONGREAL") END;
+								IF RefInfo THEN Info(section,"FLOAT64") END;
 								Char(section, sfTypeLONGREAL);
 							ELSE
 								HALT(100);

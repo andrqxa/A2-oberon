@@ -646,9 +646,9 @@ TYPE
 				result := result OR IntermediateCode.IsConstantInteger(irInstruction.op3,value) & IntermediateBackend.PowerOf2(value,exp)
 
 			| IntermediateCode.conv:
-				IF IsInteger64(irInstruction.op1) & IsFloat(irInstruction.op2) THEN  (* ENTIERH: FLOAT32/LONGREAL --> SIGNED64*)
+				IF IsInteger64(irInstruction.op1) & IsFloat(irInstruction.op2) THEN  (* ENTIERH: FLOAT32/FLOAT64 --> SIGNED64*)
 					result := FALSE
-				ELSIF IsInteger64(irInstruction.op2) & IsFloat(irInstruction.op1) THEN (* SIGNED64 --> FLOAT32 / SIGNED64 --> LONGREAL *)
+				ELSIF IsInteger64(irInstruction.op2) & IsFloat(irInstruction.op1) THEN (* SIGNED64 --> FLOAT32 / SIGNED64 --> FLOAT64 *)
 					result := FALSE;
 				ELSE
 					result := ~IsFloat(irInstruction.op1) & ~IsFloat(irInstruction.op2)
@@ -1651,7 +1651,7 @@ TYPE
 		END SinglePrecisionFloatRegisterFromValue;
 
 		(** get a single precision VFP register that holds a certain floating point value **)
-		PROCEDURE DoublePrecisionFloatRegisterFromValue(value: LONGREAL; registerHint: Operand): Operand;
+		PROCEDURE DoublePrecisionFloatRegisterFromValue(value: FLOAT64; registerHint: Operand): Operand;
 		VAR
 			intValue: SIGNED64; dummy: SIGNED32;
 			result, temp: Operand;
@@ -3173,7 +3173,7 @@ TYPE
 						ResetRounding(fpstatus);
 						Emit2(opFMRS, destination[Low], temp)
 					ELSIF IsDoublePrecisionFloat(irSource) THEN
-						(* LONGREAL --> SIGNED16 *)
+						(* FLOAT64 --> SIGNED16 *)
 						ASSERT(backend.useFPU64);
 						(* single precision float to non-complex integer: *)
 						temp := GetFreeRegister(IntermediateCode.FloatType(32));
@@ -3210,7 +3210,7 @@ TYPE
 					(* single precision float to single precision float: *)
 					MovIfDifferent(destination[Low], source[Low])
 				ELSIF IsDoublePrecisionFloat(irSource) THEN
-					(* LONGREAL --> FLOAT32 *)
+					(* FLOAT64 --> FLOAT32 *)
 					Emit2(opFCVTSD, destination[Low], source[Low])
 				ELSE
 					(* anything else to single precision float: *)
@@ -3231,7 +3231,7 @@ TYPE
 						Emit2(opFSITOD, destination[Low], temp)
 					END
 				ELSIF IsSinglePrecisionFloat(irSource) THEN
-					(* FLOAT32 --> LONGREAL *)
+					(* FLOAT32 --> FLOAT64 *)
 					Emit2(opFCVTDS, destination[Low], source[Low])
 				ELSIF IsDoublePrecisionFloat(irSource) THEN
 					(* single precision float to single precision float: *)

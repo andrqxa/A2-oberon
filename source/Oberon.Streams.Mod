@@ -60,7 +60,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		S.ReadBytes(S, x, 4)
 	END ReadLInt;
 
-	PROCEDURE ReadLReal*(S: Stream; VAR x: LONGREAL);
+	PROCEDURE ReadLReal*(S: Stream; VAR x: FLOAT64);
 	BEGIN
 		S.ReadBytes(S, x, 8)
 	END ReadLReal;
@@ -114,7 +114,7 @@ MODULE Streams IN Oberon;	(** portable *)
 		S.WriteBytes(S, x, 4)
 	END WriteLInt;
 
-	PROCEDURE WriteLReal*(S: Stream; x: LONGREAL);
+	PROCEDURE WriteLReal*(S: Stream; x: FLOAT64);
 	BEGIN
 		S.WriteBytes(S, x, 8)
 	END WriteLReal;

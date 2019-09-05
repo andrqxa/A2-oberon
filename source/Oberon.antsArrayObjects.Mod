@@ -55,7 +55,7 @@ TYPE
 	tLONGREALObject* = POINTER TO tLONGREALObjectDesc;
 	tLONGREALObjectDesc* = RECORD (tObjectDesc)
 		A*, Cache*: tLONGREALArray;
-		depth*: LONGREAL
+		depth*: FLOAT64
 	END;
 
 CONST
@@ -64,14 +64,14 @@ VAR
 	globalLA: tLONGINTArray;  newobject-: tObject;  globalD: SIGNED32;  globalobj: tObject;  loadedobj*: tObject;
 	(* RandomR-: tLONGREALArray; RandomL-:tLONGINTArray; 	*)
 
-	ra*: POINTER TO ARRAY OF LONGREAL;
+	ra*: POINTER TO ARRAY OF FLOAT64;
 	la*: POINTER TO ARRAY OF SIGNED32;
 	ia*: POINTER TO ARRAY OF SIGNED16;
 
 
 	(** top is EXCLUSIVE ! i.e. top = 2 => max = 1 *)
 	(*
-	PROCEDURE Uniform1dR* (VAR a: ARRAY OF LONGREAL; x,w: SIGNED32; top: LONGREAL);
+	PROCEDURE Uniform1dR* (VAR a: ARRAY OF FLOAT64; x,w: SIGNED32; top: FLOAT64);
 	VAR  xx: SIGNED32;
 	BEGIN
 	vyRanBase.RandomUVX(w,a,x);
@@ -116,7 +116,7 @@ VAR
 	END;
 	END UniformLONGINTArray;
 
-	PROCEDURE UniformLONGREALArray* (A: tLONGREALArray; top: LONGREAL; x,y,w,h: SIGNED32);
+	PROCEDURE UniformLONGREALArray* (A: tLONGREALArray; top: FLOAT64; x,y,w,h: SIGNED32);
 	VAR  y0: SIGNED32 ;
 	BEGIN
 	FOR y0 := y TO y+h-1 DO
@@ -274,7 +274,7 @@ VAR
 		FOR curline := y TO y + h - 1 DO vyLongint.Fill( w, A[curline], x, val ) END
 	END FillLongintArray;
 
-	PROCEDURE FillLongrealArray*( val: LONGREAL;  A: tLONGREALArray;  x, y, w, h: SIGNED32 );
+	PROCEDURE FillLongrealArray*( val: FLOAT64;  A: tLONGREALArray;  x, y, w, h: SIGNED32 );
 	VAR curline: SIGNED32;
 	BEGIN
 		FOR curline := y TO y + h - 1 DO vyLongreal.Fill( w, A[curline], x, val ) END
@@ -316,7 +316,7 @@ VAR
 		RETURN res;
 	END "/";
 
-	OPERATOR "+"*( a: tLONGREALArray;  b: LONGREAL ): tLONGREALArray;
+	OPERATOR "+"*( a: tLONGREALArray;  b: FLOAT64 ): tLONGREALArray;
 	VAR y, x: SIGNED32;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN NIL END;
@@ -325,7 +325,7 @@ VAR
 		RETURN res;
 	END "+";
 
-	OPERATOR "-"*( a: tLONGREALArray;  b: LONGREAL ): tLONGREALArray;
+	OPERATOR "-"*( a: tLONGREALArray;  b: FLOAT64 ): tLONGREALArray;
 	VAR y, x: SIGNED32;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN NIL END;
@@ -334,7 +334,7 @@ VAR
 		RETURN res;
 	END "-";
 
-	OPERATOR "*"*( a: tLONGREALArray;  b: LONGREAL ): tLONGREALArray;
+	OPERATOR "*"*( a: tLONGREALArray;  b: FLOAT64 ): tLONGREALArray;
 	VAR y, x: SIGNED32;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN NIL END;
@@ -343,7 +343,7 @@ VAR
 		RETURN res;
 	END "*";
 
-	OPERATOR "/"*( a: tLONGREALArray;  b: LONGREAL ): tLONGREALArray;
+	OPERATOR "/"*( a: tLONGREALArray;  b: FLOAT64 ): tLONGREALArray;
 	VAR y, x: SIGNED32;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN NIL END;
@@ -353,30 +353,30 @@ VAR
 	END "/";
 
 	OPERATOR "/"*( a: tLONGREALArray;  b: SIGNED16 ): tLONGREALArray;
-	VAR bb: LONGREAL;
+	VAR bb: FLOAT64;
 	BEGIN
 		bb := b;  RETURN a / bb;
 	END "/";
 
 	OPERATOR "*"*( a: tLONGREALArray;  b: SIGNED16 ): tLONGREALArray;
-	VAR bb: LONGREAL;
+	VAR bb: FLOAT64;
 	BEGIN
 		bb := b;  RETURN a * bb;
 	END "*";
 
 	OPERATOR "+"*( a: tLONGREALArray;  b: SIGNED16 ): tLONGREALArray;
-	VAR bb: LONGREAL;
+	VAR bb: FLOAT64;
 	BEGIN
 		bb := b;  RETURN a + bb;
 	END "+";
 
 	OPERATOR "-"*( a: tLONGREALArray;  b: SIGNED16 ): tLONGREALArray;
-	VAR bb: LONGREAL;
+	VAR bb: FLOAT64;
 	BEGIN
 		bb := b;  RETURN a - bb;
 	END "-";
 
-	OPERATOR ":="*( VAR a: tLONGREALArray;  b: LONGREAL );
+	OPERATOR ":="*( VAR a: tLONGREALArray;  b: FLOAT64 );
 	VAR y, x: SIGNED32;  res: tLONGREALArray;
 	BEGIN
 		IF (a = NIL ) THEN RETURN END;
@@ -412,7 +412,7 @@ VAR
 		END;
 	END ":=";
 
-	OPERATOR ":="*( VAR o: tObject;  val: LONGREAL );
+	OPERATOR ":="*( VAR o: tObject;  val: FLOAT64 );
 	BEGIN
 		WITH o: tLONGREALObject DO FillLongrealArray( val, o.A, 0, 0, o.w, o.h )
 		END;
@@ -617,7 +617,7 @@ VAR
 		EmbedLONGINTArray( a, A );  RETURN A
 	END NewLONGINTObject;
 
-	PROCEDURE NewLONGREALObject*( w, h: SIGNED32;  d: LONGREAL ): tLONGREALObject;
+	PROCEDURE NewLONGREALObject*( w, h: SIGNED32;  d: FLOAT64 ): tLONGREALObject;
 	(*= create a new instance of an array within an array object *)
 	VAR a: tLONGREALArray;  A: tLONGREALObject;
 	BEGIN
@@ -750,7 +750,7 @@ VAR
 	END FrameLinks;
 
 	PROCEDURE HandleFileMsg( obj: tObject;  VAR msg: Objects.FileMsg );
-	VAR w, h, depth: SIGNED32;  version: SIGNED16;  rdepth: LONGREAL;
+	VAR w, h, depth: SIGNED32;  version: SIGNED16;  rdepth: FLOAT64;
 		(*! store Picts as GIF for color preserving or store colors *)
 	BEGIN
 		IF msg.id = Objects.load THEN
@@ -999,7 +999,7 @@ VAR
 	END Uniform;
 
 	PROCEDURE Channel*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: LONGREAL;  y, x: SIGNED32;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  p: FLOAT64;  y, x: SIGNED32;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ p=FLOAT32" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "p", p ) THEN

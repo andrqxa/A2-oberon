@@ -255,10 +255,10 @@ TYPE
 			p.r := r;
 		END PushR;
 
-		PROCEDURE PushX(x: LONGREAL);
-		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD x: LONGREAL END;
+		PROCEDURE PushX(x: FLOAT64);
+		VAR p: POINTER {UNSAFE,UNTRACED} TO RECORD x: FLOAT64 END;
 		BEGIN
-			p := Next(SIZEOF(LONGREAL));
+			p := Next(SIZEOF(FLOAT64));
 			p.x := x;
 		END PushX;
 
@@ -329,11 +329,11 @@ TYPE
 			RETURN res;
 		END CallR;
 
-		PROCEDURE CallX(adr: ADDRESS): LONGREAL;
+		PROCEDURE CallX(adr: ADDRESS): FLOAT64;
 		TYPE
-			P = PROCEDURE(): LONGREAL;
+			P = PROCEDURE(): FLOAT64;
 		VAR
-			res: LONGREAL; esp: ADDRESS;
+			res: FLOAT64; esp: ADDRESS;
 			p: P;
 		BEGIN
 			p := SYSTEM.VAL(P, adr);
@@ -420,7 +420,7 @@ TYPE
 		PROCEDURE PushTyped*(o: Result; mode: CHAR; refs: Modules.Bytes; VAR offset: SIZE): BOOLEAN;
 		VAR ofs: SIZE;
 			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
-			r: FLOAT32; x: LONGREAL;
+			r: FLOAT32; x: FLOAT64;
 			b: BOOLEAN;
 			set: SET;
 			v:Value;
@@ -520,7 +520,7 @@ TYPE
 		PROCEDURE Push*(o: Result): BOOLEAN;
 		VAR
 			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
-			r: FLOAT32; x: LONGREAL;
+			r: FLOAT32; x: FLOAT64;
 			b: BOOLEAN;
 			set: SET;
 			v:Value;
@@ -648,7 +648,7 @@ TYPE
 		PROCEDURE SetV*(v: Value): BOOLEAN;
 		VAR
 			s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
-			r: FLOAT32; x: LONGREAL;
+			r: FLOAT32; x: FLOAT64;
 			b: BOOLEAN;
 			set: SET;
 			type: Meta;
@@ -820,7 +820,7 @@ TYPE
 			RETURN FALSE;
 		END GetAddress;
 
-		PROCEDURE GetReal*(VAR x: LONGREAL): BOOLEAN;
+		PROCEDURE GetReal*(VAR x: FLOAT64): BOOLEAN;
 		BEGIN
 			RETURN FALSE;
 		END GetReal;
@@ -989,7 +989,7 @@ TYPE
 			v := value; RETURN TRUE;
 		END GetInt;
 
-		PROCEDURE GetReal*(VAR x: LONGREAL): BOOLEAN;
+		PROCEDURE GetReal*(VAR x: FLOAT64): BOOLEAN;
 		BEGIN
 			x := value; RETURN TRUE;
 		END GetReal;
@@ -1006,9 +1006,9 @@ TYPE
 	END IntegerValue;
 
 	RealValue*=OBJECT(Value)
-	VAR value*: LONGREAL;
+	VAR value*: FLOAT64;
 
-		PROCEDURE & InitReal*(value: LONGREAL);
+		PROCEDURE & InitReal*(value: FLOAT64);
 		BEGIN InitValue; SELF.value := value; type := "RealValue";
 		END InitReal;
 
@@ -1030,7 +1030,7 @@ TYPE
 			END;
 		END Get;
 
-		PROCEDURE GetReal*(VAR x: LONGREAL): BOOLEAN;
+		PROCEDURE GetReal*(VAR x: FLOAT64): BOOLEAN;
 		BEGIN
 			x := value; RETURN TRUE;
 		END GetReal;
@@ -1525,7 +1525,7 @@ TYPE
 		NEW(obj, value); RETURN obj
 	END NewIntegerValue;
 
-	PROCEDURE NewFloatValue(value: LONGREAL): RealValue;
+	PROCEDURE NewFloatValue(value: FLOAT64): RealValue;
 	VAR obj: RealValue;
 	BEGIN
 		NEW(obj, value); RETURN obj

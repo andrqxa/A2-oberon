@@ -49,7 +49,7 @@ S SIGNED8
 I SIGNED16
 L SIGNED32
 R FLOAT32
-X LONGREAL
+X FLOAT64
 *)
 (*! move merge routines to type specific bases *)
 IMPORT Texts, vyHostTexts, vyHost, vyBase, vyLongintVec, vyBooleanVec, vyIntVec, vyRealVec, vyLongrealVec;
@@ -377,7 +377,7 @@ END GrowIntegerVector;
 	(** array allocation *)
 
 (** Additional vector routines *)
-	PROCEDURE SSQ*( x, y: vyBase.tVector ): LONGREAL;   (*vs 0.1d0 gs *)
+	PROCEDURE SSQ*( x, y: vyBase.tVector ): FLOAT64;   (*vs 0.1d0 gs *)
 	(*! add error handling *)
 	BEGIN
 		vyBase.GC( 0, x, 0 );  vyBase.GC( 0, y, 0 );
@@ -408,10 +408,10 @@ END GetIndex;
 *)
 (** Minimum and maximum *)
 
-	PROCEDURE VGetMinMax*( v: vyBase.tVector;  VAR min, max: LONGREAL;  VAR nrNaNs: SIGNED32 );
+	PROCEDURE VGetMinMax*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIGNED32 );
 	VAR imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
 	BEGIN
-		IF v = NIL THEN min := MIN( LONGREAL );  max := MAX( LONGREAL );  nrNaNs := 0;  RETURN END;
+		IF v = NIL THEN min := MIN( FLOAT64 );  max := MAX( FLOAT64 );  nrNaNs := 0;  RETURN END;
 		(*! check and propagate to other types *)
 		IF v IS vyLongrealVec.tVector THEN
 			WITH v: vyLongrealVec.tVector DO vyLongrealVec.GetMinMax( v, min, max, nrNaNs );
@@ -430,9 +430,9 @@ END GetIndex;
 
 	PROCEDURE VGetMinMaxR*( v: vyBase.tVector;  VAR rmin, rmax: FLOAT32;  VAR nrNaNs: SIGNED32 );
 	(*! check. if ok: move this model to other variants *)
-	VAR xmin, xmax: LONGREAL;  imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
+	VAR xmin, xmax: FLOAT64;  imin, imax: SIGNED16;  lmin, lmax: SIGNED32;
 	BEGIN
-		xmin := MAX( LONGREAL );  xmax := MIN( LONGREAL );  nrNaNs := 0;
+		xmin := MAX( FLOAT64 );  xmax := MIN( FLOAT64 );  nrNaNs := 0;
 		ASSERT ( v # NIL , 100 );
 		IF v IS vyLongrealVec.tVector THEN
 			WITH v: vyLongrealVec.tVector DO vyLongrealVec.GetMinMax( v, xmin, xmax, nrNaNs );
@@ -451,10 +451,10 @@ END GetIndex;
 		rmin := SHORT( xmin );  rmax := SHORT( xmax )
 	END VGetMinMaxR;
 
-	PROCEDURE VGetMinMaxX*( v: vyBase.tVector;  VAR min, max: LONGREAL;  VAR nrNaNs: SIGNED32 );
-	VAR imin, imax: SIGNED16;  lmin, lmax: SIGNED32;  rmin, rmax: LONGREAL;
+	PROCEDURE VGetMinMaxX*( v: vyBase.tVector;  VAR min, max: FLOAT64;  VAR nrNaNs: SIGNED32 );
+	VAR imin, imax: SIGNED16;  lmin, lmax: SIGNED32;  rmin, rmax: FLOAT64;
 	BEGIN
-		min := MAX( LONGREAL );  max := MIN( LONGREAL );  nrNaNs := 0;
+		min := MAX( FLOAT64 );  max := MIN( FLOAT64 );  nrNaNs := 0;
 		IF v IS vyLongrealVec.tVector THEN
 			WITH v: vyLongrealVec.tVector DO vyLongrealVec.GetMinMax( v, min, max, nrNaNs );
 			END;
@@ -611,7 +611,7 @@ END VectorType;
 	END Compatible;
 
 	PROCEDURE Summary*( VAR w: vyBase.TextsWriter;  v: vyBase.tData );
-	VAR i: SIGNED32;  min, max: LONGREAL;  nrNaNs: SIGNED32;
+	VAR i: SIGNED32;  min, max: FLOAT64;  nrNaNs: SIGNED32;
 	BEGIN
 		IF v IS vyBase.tVector THEN
 			IF v IS vyBase.tVector THEN
@@ -707,7 +707,7 @@ END VectorType;
 		END
 	END Short;
 
-	PROCEDURE Entier*( from: vyBase.tData;  offs, factor: LONGREAL ): vyBase.tData;
+	PROCEDURE Entier*( from: vyBase.tData;  offs, factor: FLOAT64 ): vyBase.tData;
 	(*= offs and factor are included to allow some scaling *)
 	(*! speedup: use chunk structure *)
 	VAR fromv, v: vyBase.tVector;  i: SIGNED32;  len: SIGNED32;

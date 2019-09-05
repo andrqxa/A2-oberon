@@ -580,7 +580,7 @@ TYPE
 	Const* = POINTER TO RECORD
 		type-: Struct;
 		int-: SIGNED32;
-		real-: LONGREAL;
+		real-: FLOAT64;
 		long-: SIGNED64;
 		set-: SET;
 		bool-: BOOLEAN;
@@ -1738,7 +1738,7 @@ VAR
 	BEGIN  NEW(c);  c.set := s; c.type := Set;  RETURN c
 	END NewSetConst;
 
-	PROCEDURE NewFloatConst*(r: LONGREAL; type: Struct): Const;
+	PROCEDURE NewFloatConst*(r: FLOAT64; type: Struct): Const;
 	VAR c: Const;
 	BEGIN
 		ASSERT((type = Float32) OR (type = Float64));
@@ -2509,7 +2509,7 @@ VAR
 		NumericType[2] := NewBasic(Universe, "SIGNED32"); Int32 := NumericType[2];
 		NumericType[3] := NewBasic(Universe, "SIGNED64"); Int64 := NumericType[3];
 		NumericType[4] := NewBasic(Universe, "FLOAT32"); Float32 := NumericType[4];
-		NumericType[5]:= NewBasic(Universe, "LONGREAL"); Float64 := NumericType[5];
+		NumericType[5]:= NewBasic(Universe, "FLOAT64"); Float64 := NumericType[5];
 		Set := NewBasic(Universe, "SET");
 		Ptr := NewBasic(Universe, "ANY");
 		NEW(String);

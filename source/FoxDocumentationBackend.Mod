@@ -618,7 +618,7 @@ TYPE
 			VisitMathArrayExpression(x.array);
 		END VisitMathArrayValue;
 
-		PROCEDURE FormatedFloat(value: LONGREAL; subtype: SIGNED32);
+		PROCEDURE FormatedFloat(value: FLOAT64; subtype: SIGNED32);
 		VAR string: ARRAY 128 OF CHAR; i: SIGNED32;
 		BEGIN
 			IF subtype = Scanner.Real THEN

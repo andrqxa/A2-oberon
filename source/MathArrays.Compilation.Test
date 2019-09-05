@@ -45,14 +45,14 @@ positive: math array types of basic types
 		TAROS= ARRAY [*,*,2,3] OF FLOAT32;
 		TART= ARRAY [?] OF FLOAT32;
 
-		TAXS1= ARRAY [2] OF LONGREAL;
-		TAXO1= ARRAY [*] OF LONGREAL;
-		TAXS2= ARRAY [2,3] OF LONGREAL;
-		TAXO2= ARRAY [*,*] OF LONGREAL;
-		TAXS3= ARRAY [2,3,4] OF LONGREAL;
-		TAXO3= ARRAY [*,*,*] OF LONGREAL;
-		TAXOS= ARRAY [*,*,2,3] OF LONGREAL;
-		TAXT= ARRAY [?] OF LONGREAL;
+		TAXS1= ARRAY [2] OF FLOAT64;
+		TAXO1= ARRAY [*] OF FLOAT64;
+		TAXS2= ARRAY [2,3] OF FLOAT64;
+		TAXO2= ARRAY [*,*] OF FLOAT64;
+		TAXS3= ARRAY [2,3,4] OF FLOAT64;
+		TAXO3= ARRAY [*,*,*] OF FLOAT64;
+		TAXOS= ARRAY [*,*,2,3] OF FLOAT64;
+		TAXT= ARRAY [?] OF FLOAT64;
 
 		TASetS1= ARRAY [2] OF SET;
 		TASetO1= ARRAY [*] OF SET;
@@ -236,7 +236,7 @@ MODULE Test;
     END Exp;
 
 PROCEDURE Exp*( z: LONGCOMPLEX): LONGCOMPLEX;
-    VAR coef, re, reaL, im, imaG: LONGREAL;  exp: LONGCOMPLEX; real: FLOAT32;
+    VAR coef, re, reaL, im, imaG: FLOAT64;  exp: LONGCOMPLEX; real: FLOAT32;
     BEGIN
          exp :=  reaL + reaL * IMAG;   
         RETURN exp

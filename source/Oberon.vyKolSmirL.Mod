@@ -23,10 +23,10 @@ Report any problems as soon as possible to voyager@statlab.uni-heidelberg.de
 *)
 
 
-(* LONGREAL version, jb 26.10.00 *)
+(* FLOAT64 version, jb 26.10.00 *)
 IMPORT MathL IN A2; (* := Math , jb 26.10.00 *)
 TYPE
-	real = LONGREAL;  (* jb, 26.10.00 *)
+	real = FLOAT64;  (* jb, 26.10.00 *)
 
 	Function* = PROCEDURE (x: real): real;
 

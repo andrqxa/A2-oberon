@@ -46,7 +46,7 @@ Institut für Computersysteme, ETH Zürich,
 	0DH 	SIGNED8	13
 	12.3	FLOAT32	12.3
 	4.567E8 	FLOAT32	456700000
-	0.57712566D-6 	LONGREAL		0.00000057712566
+	0.57712566D-6 	FLOAT64		0.00000057712566
     3)字符常量用带有“X”的十六进制序数字符表示。
 字符 ： 数字{十六进制数}“X”
     4）字符串是一列用单引号（‘）或双引号（“）括起来的字符。开放的引用必须与封闭的引用一样，并且不能出现在字符串里。字符的多少称为字符串的长度。长度是1的字符串可以用在任何允许使用字符常量的地方。
@@ -84,7 +84,7 @@ Institut für Computersysteme, ETH Zürich,
     ABS	(10.3)			LEN(10.3)
     ASH	(10.3)			LONG (10.3)
     BOOLEAN (6.1)		SIGNED32 (6.1)
-    CAP	(10.3)			LONGREAL(6.1)
+    CAP	(10.3)			FLOAT64(6.1)
     CHAR (6.1)			MAX (10.3)
     CHR	(10.3)			MIN (10.3)
     COPY (10.3)			 NEW(10.3)
@@ -134,11 +134,11 @@ Institut für Computersysteme, ETH Zürich,
 4. 整型（SIGNED16）：在最小整型数和最大整型数之间的整数
 5. 长整型（SIGNED32）：在最小长整型数和最大长整型数之间的整数
 6. 实型（FLOAT32）：在最小实型数和最大实型数之间的实数
-7. 长实型（LONGREAL）：在最小长实型数和最大长实型数之间的实数
+7. 长实型（FLOAT64）：在最小长实型数和最大长实型数之间的实数
 8. 集合型（SET）：在0和最大集合型数之间的整数集合
 9. PTR型（PTR）：任意结构指针类型的基础类型
     类型3到5都是整数型，类型6和7都是实型，他们合起来称为数字型。他们构成了一个层次关系；大类型（值）的范围包含小类型（值）的范围：
-	LONGREAL  >=  FLOAT32  >=  SIGNED32  >=  SIGNED16  >=  SIGNED8
+	FLOAT64  >=  FLOAT32  >=  SIGNED32  >=  SIGNED16  >=  SIGNED8
     6.2 数组类型
     数组是一列类型（称为元素类型）相同的元素构成的结构。元素的个数称为数组的长度。数组元素由下标指定，下标从0到长度－1。
     数组类型：数组[长度｛“，”长度｝]OF 类型。
@@ -565,7 +565,7 @@ END Trees.
     
     附录 A：术语解说
     整数型   SIGNED8, SIGNED16, SIGNED32
-    实型   FLOAT32, LONGREAL
+    实型   FLOAT32, FLOAT64
     数字型   整数型，实型
 相同类型
     两个Ta和Tb型的变量a和b类型相同如果
@@ -579,7 +579,7 @@ END Trees.
  3) Ta和Tb是形参列表一致的过程类型。
     类型包含
     数字型的层次如下：
-    LONGREAL >= FLOAT32 >= SIGNED32 >= SIGNED16 >= SIGNED8
+    FLOAT64 >= FLOAT32 >= SIGNED32 >= SIGNED16 >= SIGNED8
 类型扩展
     若类型声明Tb＝RECORD（Ta）...END，Tb是Ta的直接扩展，Ta是Tb的直接基础类型。类型Tb是Ta的扩展（Ta是Tb的基础类型）如果
 1) Ta与Tb是相同的类型，或

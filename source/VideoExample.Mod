@@ -197,7 +197,7 @@ PROCEDURE {WINAPI} FrameReceived (hWnd : VfW.HWND; VAR lpVHdr : VfW.VHdr) : User
 VAR y : SIZE;
 	i : ADDRESS;
 	t0, t1 : SIGNED64;
-	t, f : LONGREAL;
+	t, f : FLOAT64;
 	trap : BOOLEAN;
 	bytesperpixel:SIGNED32;
 BEGIN

@@ -30,7 +30,7 @@ TYPE
 	RealDesc* = RECORD (DataDesc) x*: FLOAT32 END;
 
 	LReal* = POINTER TO LRealDesc;
-	LRealDesc* = RECORD (DataDesc) x*: LONGREAL END;
+	LRealDesc* = RECORD (DataDesc) x*: FLOAT64 END;
 
 
 	Method* = POINTER TO MethodDesc;

@@ -70,7 +70,7 @@ BEGIN	Next(r);    RETURN r.seed(vyRanBase.tLongintSeed).val
 	(* better shift adjust: give preference to higher order bits *)
 END Get;
 
-PROCEDURE GetUniform (r: vyRanBase.tRandom): LONGREAL;
+PROCEDURE GetUniform (r: vyRanBase.tRandom): FLOAT64;
 CONST (*a = 16807;*)	m = 2147483647;      	(*q = m DIV a;	r = m MOD a; *)scalefact = 1.0D0 / m;
 BEGIN	 Next(r);   	RETURN r.seed(vyRanBase.tLongintSeed).val * scalefact
 END GetUniform;
@@ -95,12 +95,12 @@ BEGIN
 	r.seed (vyRanBase.tLongintSeed).val := v
 END Reset;
 
-PROCEDURE SumPSqr* (gen: vyRanBase.tRandom;   top: SIGNED32): LONGREAL;
+PROCEDURE SumPSqr* (gen: vyRanBase.tRandom;   top: SIGNED32): FLOAT64;
 CONST
 	m = 2147483647;    (*= = 2^31 -1 *)
 	N = m - 1;
 VAR
-	k, t: LONGREAL;
+	k, t: FLOAT64;
 BEGIN
 	IF (top <= 0) OR (top >= m - 1) THEN RETURN 1 / top END;
 

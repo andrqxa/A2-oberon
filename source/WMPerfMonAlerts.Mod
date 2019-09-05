@@ -82,12 +82,12 @@ TYPE
 
 		(* alert trigger *)
 		trigger- : SIGNED32;
-		value1-, value2- : LONGREAL;
-		violation- :LONGREAL; (* value that triggered trigger *)
+		value1-, value2- : FLOAT64;
+		violation- :FLOAT64; (* value that triggered trigger *)
 		nbrOfViolations- : SIGNED32;
 
 		lastValueIsValid : BOOLEAN;
-		lastValue : LONGREAL;
+		lastValue : FLOAT64;
 
 		(* command activated when trigger is triggered *)
 		onAlertCommand- : XML.String;
@@ -128,7 +128,7 @@ TYPE
 			onLeaveCalled := FALSE;
 		END ResetState;
 
-		PROCEDURE Alert(value : LONGREAL);
+		PROCEDURE Alert(value : FLOAT64);
 		BEGIN
 			info.state := Triggered;
 			info.violation := value;
@@ -136,7 +136,7 @@ TYPE
 		END Alert;
 
 		PROCEDURE AlarmTriggered() : BOOLEAN;
-		VAR value : LONGREAL; triggered : BOOLEAN;
+		VAR value : FLOAT64; triggered : BOOLEAN;
 		BEGIN
 			IF info.state = Off THEN RETURN FALSE; END;
 			lastState := info.state;
@@ -312,7 +312,7 @@ VAR
 	(* XML scanner/parser *)
 	xmlHasErrors : BOOLEAN;
 
-PROCEDURE Add*(CONST fullname : ARRAY OF CHAR; type, trigger : SIGNED32; value1, value2 : LONGREAL; onAlert, onLeave : XML.String; VAR msg : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE Add*(CONST fullname : ARRAY OF CHAR; type, trigger : SIGNED32; value1, value2 : FLOAT64; onAlert, onLeave : XML.String; VAR msg : ARRAY OF CHAR; VAR res : WORD);
 VAR a, alert : AlertObject; plugin : WMPerfMonPlugins.Plugin; index : SIGNED32;
 BEGIN {EXCLUSIVE}
 	plugin := WMPerfMonPlugins.updater.GetByFullname(fullname, index, msg);
@@ -497,8 +497,8 @@ BEGIN
 	RETURN string;
 END GetAttributeValue;
 
-PROCEDURE GetLongreal(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR res : WORD) : LONGREAL;
-VAR string : XML.String; nbr : LONGREAL;
+PROCEDURE GetLongreal(elem : XML.Element; CONST name : ARRAY OF CHAR; VAR res : WORD) : FLOAT64;
+VAR string : XML.String; nbr : FLOAT64;
 BEGIN
 	res := Error;
 	string := GetAttributeValue(elem, name);
@@ -509,7 +509,7 @@ BEGIN
 	RETURN nbr;
 END GetLongreal;
 
-PROCEDURE GetLongrealString(value : LONGREAL; VAR string : ARRAY OF CHAR);
+PROCEDURE GetLongrealString(value : FLOAT64; VAR string : ARRAY OF CHAR);
 BEGIN
 	Strings.FloatToStr(value, 10, 10, 3, string);
 END GetLongrealString;
@@ -723,7 +723,7 @@ END ParseAlert;
 PROCEDURE ParseXmlAlert(elem : XML.Element; VAR msg : ARRAY OF CHAR) : AlertObject;
 VAR
 	alert : AlertObject; string : XML.String;
-	fullname : ARRAY 256 OF CHAR; type, trigger : SIGNED32;  value1, value2 : LONGREAL;
+	fullname : ARRAY 256 OF CHAR; type, trigger : SIGNED32;  value1, value2 : FLOAT64;
 	plugin : WMPerfMonPlugins.Plugin;
 	index : SIGNED32; res: WORD;
 BEGIN

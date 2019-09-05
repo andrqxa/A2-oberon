@@ -413,7 +413,7 @@ BEGIN
 END MakeStackItem;
 
 PROCEDURE MakeConst*(VAR x: Item;  o: PCT.Const;  type: PCT.Struct);
-VAR	t: PCT.Struct;  adr: PCBT.GlobalVariable; r: FLOAT32;  lr: LONGREAL; h: SIGNED64;
+VAR	t: PCT.Struct;  adr: PCBT.GlobalVariable; r: FLOAT32;  lr: FLOAT64; h: SIGNED64;
 BEGIN
 	x.mode := Const; t := o.type;
 	IF (t = PCT.Int8) OR (t = PCT.Int16) OR (t = PCT.Int32)  THEN
@@ -2005,7 +2005,7 @@ END MOp;
 		ELSIF fcc = PCS.gtr THEN fc := PCLIR.jgt
 		ELSE HALT( 100 );
 		END;
-		(* this ugly and complicated thing is needed for compatibility with types such as LONGREAL *)
+		(* this ugly and complicated thing is needed for compatibility with types such as FLOAT64 *)
 		(* if done more directly the comparison changes the value of a.adr or does not work at all - has to do with stack-machine nature of the FPU *)
 		Load( code, a );  Load( code, b );
 		PCLIR.Emit01(code, PCLIR.push, a.adr);

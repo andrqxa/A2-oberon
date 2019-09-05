@@ -18,7 +18,7 @@ BEGIN
 	RETURN GetArg().GetInteger(i, hex);
 END Int;
 
-PROCEDURE Real*(VAR f: LONGREAL): BOOLEAN;
+PROCEDURE Real*(VAR f: FLOAT64): BOOLEAN;
 BEGIN
 	RETURN GetArg().GetReal(f);
 END Real;

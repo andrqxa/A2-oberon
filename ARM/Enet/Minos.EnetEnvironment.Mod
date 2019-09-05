@@ -72,7 +72,7 @@ VAR
 	(** Convert time counts to microseconds *)
 	PROCEDURE ToMicro*(time: Time): Time;
 	BEGIN
-		RETURN ENTIERH((0.5D0 + time) / (LONGREAL(Board.CpuClockHz)) * 2.0D6)
+		RETURN ENTIERH((0.5D0 + time) / (FLOAT64(Board.CpuClockHz)) * 2.0D6)
 	END ToMicro;
 
 	(** Convert milliseconds to time counts *)
@@ -84,7 +84,7 @@ VAR
 	(** Convert time counts to milliseconds *)
 	PROCEDURE ToMilli*(time: Time): Time;
 	BEGIN
-		RETURN ENTIERH((0.5D0 + time) / (LONGREAL(Board.CpuClockHz)) * 2.0D3)
+		RETURN ENTIERH((0.5D0 + time) / (FLOAT64(Board.CpuClockHz)) * 2.0D3)
 	END ToMilli;
 
 	(** Delegating interrupt handler *)

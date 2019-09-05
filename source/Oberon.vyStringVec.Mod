@@ -38,7 +38,7 @@ TYPE
 	index* = SIGNED32;
 
 	(* FLOAT32 *)  (* preferred chunk sizes: 128, 1024, 8192 *)
-	nameptr* = vyName.tName;   (* technical convenience, to avoid duplicate code for FLOAT32 and LONGREAL *)
+	nameptr* = vyName.tName;   (* technical convenience, to avoid duplicate code for FLOAT32 and FLOAT64 *)
 
 	tVector* = POINTER TO tVectorDesc;
 	tVectorDesc* = RECORD (vyBase.tVectorDesc) END;
@@ -60,7 +60,7 @@ TYPE
 	tChunkedMatrixDesc* = RECORD (vyBase.ObjDesc)
 		buf*: tMatrixChunk
 	END;
-	(*VAR globallongnameptr: LONGREAL;   (* sneak globel. handle with care! *)*)
+	(*VAR globallongnameptr: FLOAT64;   (* sneak globel. handle with care! *)*)
 
 	(** Defs from vyTypes2 *)
 	(*= vyTypes is defunct. Migrate to OPT type system *)
@@ -389,10 +389,10 @@ END SetNrData; *)
 	END NewFilledNamed;
 
 	(*
-PROCEDURE SSQ* (x, y: vyBase.tVector): LONGREAL;
+PROCEDURE SSQ* (x, y: vyBase.tVector): FLOAT64;
 (*= Return centered sum of squares *)
 (*! add error handling *)
-VAR xcr, ycr: tBuf;         s, mx, my : LONGREAL;
+VAR xcr, ycr: tBuf;         s, mx, my : FLOAT64;
 i, cur: index;
 BEGIN s := 0;     i := 0;     cur := 0;     mx := 0;     my := 0;     vyBase.GC(0, x, 0);     vyBase.GC(0, y, 0);
 WITH

@@ -927,8 +927,8 @@ TYPE
 
 	END IntegerType;
 
-	(** <<FLOAT32,LONGREAL>>
-		real types: FLOAT32, LONGREAL
+	(** <<FLOAT32,FLOAT64>>
+		real types: FLOAT32, FLOAT64
 	**)
 	FloatType*= OBJECT (NumberType)
 
@@ -953,7 +953,7 @@ TYPE
 		complex types: COMPLEX, LONGCOMPLEX
 	**)
 	ComplexType*= OBJECT (NumberType)
-		VAR componentType-: Type; (* FLOAT32 or LONGREAL*)
+		VAR componentType-: Type; (* FLOAT32 or FLOAT64*)
 
 		PROCEDURE & InitComplexType(componentType: Type);
 		BEGIN
@@ -2546,15 +2546,15 @@ TYPE
 	(** <<value = 1.2345E01>> **)
 	RealValue* = OBJECT (Value)
 		VAR
-			value-: LONGREAL;
-			subtype-: SubType; (* accuracy information: FLOAT32 vs. LONGREAL *)
+			value-: FLOAT64;
+			subtype-: SubType; (* accuracy information: FLOAT32 vs. FLOAT64 *)
 
-		PROCEDURE & InitRealValue(position: Position; value: LONGREAL; subType: SubType);
+		PROCEDURE & InitRealValue(position: Position; value: FLOAT64; subType: SubType);
 		BEGIN
 			InitValue(position);  SELF.value := value; SELF.subtype := subType;
 		END InitRealValue;
 
-		PROCEDURE SetValue*(value: LONGREAL);
+		PROCEDURE SetValue*(value: FLOAT64);
 		BEGIN	SELF.value := value
 		END SetValue;
 
@@ -2569,15 +2569,15 @@ TYPE
 
 	ComplexValue* = OBJECT (Value)
 		VAR
-			realValue-, imagValue-: LONGREAL;
-			subtype-: SubType; (* accuracy information of components: FLOAT32 vs. LONGREAL *)
+			realValue-, imagValue-: FLOAT64;
+			subtype-: SubType; (* accuracy information of components: FLOAT32 vs. FLOAT64 *)
 
-		PROCEDURE & InitComplexValue(position: Position; realValue, imagValue: LONGREAL; subType: SubType);
+		PROCEDURE & InitComplexValue(position: Position; realValue, imagValue: FLOAT64; subType: SubType);
 		BEGIN
 			InitValue(position); SELF.realValue := realValue; SELF.imagValue := imagValue; SELF.subtype := subType;
 		END InitComplexValue;
 
-		PROCEDURE SetValue*(realValue, imagValue: LONGREAL);
+		PROCEDURE SetValue*(realValue, imagValue: FLOAT64);
 		BEGIN	SELF.realValue := realValue; SELF.imagValue := imagValue;
 		END SetValue;
 
@@ -5649,13 +5649,13 @@ VAR
 	BEGIN NEW( mathArrayValue, position,arr );  RETURN mathArrayValue
 	END NewMathArrayValue;
 
-	PROCEDURE NewRealValue*( position: Position;  value: LONGREAL; subType: SubType): RealValue;
+	PROCEDURE NewRealValue*( position: Position;  value: FLOAT64; subType: SubType): RealValue;
 	VAR realValue: RealValue;
 	BEGIN
 		NEW( realValue, position, value, subType);  RETURN realValue
 	END NewRealValue;
 
-	PROCEDURE NewComplexValue*( position: Position;  realValue, imagValue: LONGREAL; subType: SubType): ComplexValue;
+	PROCEDURE NewComplexValue*( position: Position;  realValue, imagValue: FLOAT64; subType: SubType): ComplexValue;
 	VAR complexValue: ComplexValue;
 	BEGIN
 		NEW( complexValue, position, realValue, imagValue, subType);  RETURN complexValue

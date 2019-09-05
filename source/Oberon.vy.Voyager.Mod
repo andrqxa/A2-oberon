@@ -75,7 +75,7 @@ CONST
 	idversion* = 'Voyager v0.1a3';  cDefaultPlotName = 'vyScatter';
 
 TYPE
-	tGeneratorProc = PROCEDURE ( ): LONGREAL;
+	tGeneratorProc = PROCEDURE ( ): FLOAT64;
 
 VAR
 	gnrObjects: SIGNED16;  gplotname: vyName.tNameArray;  gobjects: Objects.Object;  gGenerator: tGeneratorProc;
@@ -431,12 +431,12 @@ END Show;
 		(*	vyHostTexts.MsgStS("End of",name);*)
 	END Sort;
 
-	PROCEDURE StdGauss( ): LONGREAL;
+	PROCEDURE StdGauss( ): FLOAT64;
 	BEGIN
 		RETURN vyRandom.Gauss( 0, 1 )
 	END StdGauss;
 
-	PROCEDURE TrappedMouse( ): LONGREAL;
+	PROCEDURE TrappedMouse( ): FLOAT64;
 	BEGIN
 		RETURN vyMouseData.Random()
 	END TrappedMouse;

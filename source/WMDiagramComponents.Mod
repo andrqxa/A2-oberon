@@ -733,16 +733,16 @@ TYPE
 
 	(* coordinate system as preparation for more flexible handling of plots *)
 	CoordinateSystem= RECORD
-		l,t,r,b: LONGREAL;
+		l,t,r,b: FLOAT64;
 	END;
 
 	BarChart* = OBJECT(WMComponents.VisualComponent)
 	VAR
 		barColor-,lineColor- ,textColor-,backgroundColor-: WMProperties.ColorProperty;
 
-		width-,offset-: LONGREAL; (* width and offset of histogram, initialized to width=1, offset = -0.5  *)
+		width-,offset-: FLOAT64; (* width and offset of histogram, initialized to width=1, offset = -0.5  *)
 		numberData-: SIGNED32; (* number of box plot data *)
-		heights-: POINTER TO ARRAY OF LONGREAL; (* bin height *)
+		heights-: POINTER TO ARRAY OF FLOAT64; (* bin height *)
 		labels-: POINTER TO ARRAY OF Strings.String; (* bin label (if any) *)
 		colors- : POINTER TO ARRAY OF WMGraphics.Color;
 		c: CoordinateSystem;
@@ -779,7 +779,7 @@ TYPE
 			END;
 		END UpdateCoordinateSystem;
 
-		PROCEDURE SetData*(CONST heights: ARRAY OF LONGREAL; numberData: SIGNED32);
+		PROCEDURE SetData*(CONST heights: ARRAY OF FLOAT64; numberData: SIGNED32);
 		VAR i: SIGNED32;
 		BEGIN
 			IF LEN(heights) < numberData THEN RETURN END;
@@ -821,7 +821,7 @@ TYPE
 			Invalidate;
 		END SetColors;
 
-		PROCEDURE SetWidthOffset*(width,offset: LONGREAL);
+		PROCEDURE SetWidthOffset*(width,offset: FLOAT64);
 		BEGIN
 			Acquire();
 			SELF.width := width;
@@ -849,13 +849,13 @@ TYPE
 		PROCEDURE DrawBackground*(canvas : WMGraphics.Canvas);
 		VAR boundary,rect: WMRectangles.Rectangle; i: SIGNED32;
 
-			PROCEDURE Point2dToPoint(xr,yr: LONGREAL; VAR x,y: SIZE);
+			PROCEDURE Point2dToPoint(xr,yr: FLOAT64; VAR x,y: SIZE);
 			BEGIN
 				x := ENTIER(boundary.l + (xr-c.l)/(c.r-c.l) * (boundary.r-boundary.l) +0.5);
 				y := ENTIER(boundary.b + (yr-c.b)/(c.t-c.b) * (boundary.t-boundary.b) +0.5);
 			END Point2dToPoint;
 
-			PROCEDURE Rect2dToRect(xr,yr,wr,hr: LONGREAL; VAR rect: WMRectangles.Rectangle);
+			PROCEDURE Rect2dToRect(xr,yr,wr,hr: FLOAT64; VAR rect: WMRectangles.Rectangle);
 			BEGIN
 				Point2dToPoint(xr,yr,rect.l,rect.b);
 				Point2dToPoint(xr+wr,yr+hr,rect.r,rect.t);

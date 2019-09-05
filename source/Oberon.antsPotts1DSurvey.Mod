@@ -73,14 +73,14 @@ TYPE
 		jumps*: antsArrays.I1d;
 		InterLength*: antsArrays.I2d;
 		aiciOpt*, aicEstOpt*, aiccOpt*, schwarzOpt*, schwarzEstOpt*, schwarzCorOpt*, scanningOpt*, scanningLogOpt*, scanningVarOpt*, VarDiffOpt*, KneeCheckOpt*, MultiResOpt*, LongestRunOpt*: SIGNED32;
-		mad*: LONGREAL;
+		mad*: FLOAT64;
 		reko*: antsArrays.X1d;   (*for fixed gamma*)
 	END;
 
-	ArrayFunction = PROCEDURE ( VAR f: ARRAY OF LONGREAL;  i: SIGNED32 ): LONGREAL;
+	ArrayFunction = PROCEDURE ( VAR f: ARRAY OF FLOAT64;  i: SIGNED32 ): FLOAT64;
 
 VAR
-	globalS: antsBellman.Statistic;  globalG: LONGREAL;
+	globalS: antsBellman.Statistic;  globalG: FLOAT64;
 
 	(* *****************************************************************************)
 
@@ -108,12 +108,12 @@ VAR
 
 (* *****************************************************************************)
 
-	PROCEDURE SsqFct( k, n: SIGNED32 ): LONGREAL;
+	PROCEDURE SsqFct( k, n: SIGNED32 ): FLOAT64;
 	BEGIN
 		RETURN globalS.s[k, n]
 	END SsqFct;
 
-	PROCEDURE SsqFctGamma( k, n: SIGNED32 ): LONGREAL;
+	PROCEDURE SsqFctGamma( k, n: SIGNED32 ): FLOAT64;
 	BEGIN
 		RETURN globalS.s[k, n] + globalG;
 	END SsqFctGamma;
@@ -123,7 +123,7 @@ VAR
 		globalS := s;  antsBellman.BellmanMatrix( rstern, Bellman, s.N, SsqFct )
 	END BellmanFunction;
 
-	PROCEDURE getMean( k, n: SIGNED32 ): LONGREAL;
+	PROCEDURE getMean( k, n: SIGNED32 ): FLOAT64;
 	BEGIN
 		RETURN globalS.m[k, n]
 	END getMean;
@@ -134,8 +134,8 @@ VAR
 	END Parti;
 
 (*Procedure finding the minimium and minimum position of a vector*)
-	PROCEDURE Minimize( VAR this: ARRAY OF LONGREAL;  VAR kmin: SIGNED32 );
-	VAR min: LONGREAL;
+	PROCEDURE Minimize( VAR this: ARRAY OF FLOAT64;  VAR kmin: SIGNED32 );
+	VAR min: FLOAT64;
 	BEGIN
 		min := vyLongreal.Min( LEN( this ), this, 0, kmin );
 		IF kmin < 0 THEN kmin := 0;  aM.eS( "Warning: Minimize with no valid return value, temporarily fixed." );  END;
@@ -156,7 +156,7 @@ AIC(k) = - loglikelihood function(k) + k
 *)
  (*The produre called Akaike does NOT realize Akaike's Information Criterion, the penalty for the number of jumps is arbitrary*)
 
-	PROCEDURE Akaike( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  sigmaqu: LONGREAL );
+	PROCEDURE Akaike( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  sigmaqu: FLOAT64 );
 	VAR k, N: SIGNED32;
 	BEGIN
 		N := LEN( Bellman^ );
@@ -168,7 +168,7 @@ AIC(k) = - loglikelihood function(k) + k
 This is indeed a realization of Akaike's Information Criterion (AIC) if the variance sigmaqu is known, it reduces to
 AIC(k) = 1/(2 sigmaqu) * Bellman^[k - 1][N - 1] + k
 *)
-	PROCEDURE AkaikeIndependent( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  sigmaqu: LONGREAL );
+	PROCEDURE AkaikeIndependent( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  sigmaqu: FLOAT64 );
 	VAR k, N: SIGNED32;
 	BEGIN
 		N := LEN( Bellman^ );
@@ -188,7 +188,7 @@ AIC(k) = N/2 * ln(Bellman[k-1][N-1]) + k
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
 		FOR k := 1 TO N DO
 			Vals^[k - 1] := 0.5 * N * Math.ln( Bellman^[k - 1][N - 1] ) + k;
-			IF Bellman^[k - 1][N - 1] = 0 THEN Vals^[k - 1] := MAX( LONGREAL ) END  (* undefined *)
+			IF Bellman^[k - 1][N - 1] = 0 THEN Vals^[k - 1] := MAX( FLOAT64 ) END  (* undefined *)
 		END
 	END AkaikeIndependentEst;
 
@@ -216,7 +216,7 @@ under the assumption that data are independent and normal distributed in each of
 If the variance is assumed to be known we get
 SIC(k) = 1/(2 sigmaqu) * Bellman^[k - 1][N - 1] + k/2 ln(N)
 *)
-	PROCEDURE SchwarzIndependent( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  sigmaqu: LONGREAL );
+	PROCEDURE SchwarzIndependent( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  sigmaqu: FLOAT64 );
 	VAR k, N: SIGNED32;
 	BEGIN
 		N := LEN( Bellman^ );
@@ -235,7 +235,7 @@ SIC(k) = N/2 ln(Bellman[k-1][N-1]) + k/2 ln(N)
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;
 		FOR k := 1 TO N DO
 			Vals^[k - 1] := 0.5 * N * Math.ln( Bellman^[k - 1][N - 1] ) + k / 2 * Math.ln( N );
-			IF Bellman^[k - 1][N - 1] = 0 THEN Vals^[k - 1] := MAX( LONGREAL ) END  (* undefined *)
+			IF Bellman^[k - 1][N - 1] = 0 THEN Vals^[k - 1] := MAX( FLOAT64 ) END  (* undefined *)
 		END
 	END SchwarzIndependentEst;
 
@@ -259,7 +259,7 @@ SICC(k) = (N-k-2)/2 ln(2 pi sigmaqu) - 1/2 sum_(l=1)^k ln(|I_l|)
 		FOR k := 1 TO N DO Vals^[k - 1] := (N - k - 2) * Math.ln( 2 * 3.14 * 1 / N * Bellman^[k - 1][N - 1] ) + lnsum^[k - 1] END
 	END SchwarzCor;
 
-	PROCEDURE MaxPosArrayFunction( VAR f: ARRAY OF LONGREAL;  VAR values: antsArrays.X1d;  p: ArrayFunction;  value: LONGREAL ): SIGNED32;
+	PROCEDURE MaxPosArrayFunction( VAR f: ARRAY OF FLOAT64;  VAR values: antsArrays.X1d;  p: ArrayFunction;  value: FLOAT64 ): SIGNED32;
 	VAR i, maxpos: SIGNED32;
 	BEGIN
 		NEW( values, LEN( f ) - 1 );
@@ -269,30 +269,30 @@ SICC(k) = (N-k-2)/2 ln(2 pi sigmaqu) - 1/2 sum_(l=1)^k ln(|I_l|)
 		value := vyLongreal.Max( LEN( f ) - 1, values^, 0, maxpos );  RETURN maxpos + 1
 	END MaxPosArrayFunction;
 
-	PROCEDURE ARatio( VAR f: ARRAY OF LONGREAL;  i: SIGNED32 ): LONGREAL;
+	PROCEDURE ARatio( VAR f: ARRAY OF FLOAT64;  i: SIGNED32 ): FLOAT64;
 	BEGIN
-		IF i = LEN( f ) - 1 THEN RETURN MIN( LONGREAL ) ELSE RETURN f[i] / f[i + 1] END
+		IF i = LEN( f ) - 1 THEN RETURN MIN( FLOAT64 ) ELSE RETURN f[i] / f[i + 1] END
 	END ARatio;
 
 	(* Achtung, zu Testzwecken!!!!!!!!!!!!!!!!!!!!!!!!!!*********************************)
 (*
 (*mit anderer Funktion als der Identität oder dem Logarithmus*)
-PROCEDURE ALen(VAR f: ARRAY OF LONGREAL; i: SIGNED32): LONGREAL;
+PROCEDURE ALen(VAR f: ARRAY OF FLOAT64; i: SIGNED32): FLOAT64;
 BEGIN
-	IF i = LEN(f) - 1 THEN RETURN MIN(LONGREAL)
+	IF i = LEN(f) - 1 THEN RETURN MIN(FLOAT64)
 	ELSE
 		RETURN ABS(Math.sqrt(f[i]) - Math.sqrt(f[i + 1]))/Math.sqrt(f[i]*f[i+1])
 	END
 END ALen;
 *)
 
-	PROCEDURE ALen( VAR f: ARRAY OF LONGREAL;  i: SIGNED32 ): LONGREAL;
+	PROCEDURE ALen( VAR f: ARRAY OF FLOAT64;  i: SIGNED32 ): FLOAT64;
 	BEGIN
-		IF i = LEN( f ) - 1 THEN RETURN MIN( LONGREAL ) ELSE RETURN ABS( f[i] - f[i + 1] ) END
+		IF i = LEN( f ) - 1 THEN RETURN MIN( FLOAT64 ) ELSE RETURN ABS( f[i] - f[i + 1] ) END
 	END ALen;
 
-	PROCEDURE MaxLenPos( VAR f: ARRAY OF LONGREAL;  p: ArrayFunction ): SIGNED32;
-	VAR values: antsArrays.X1d;  value: LONGREAL;
+	PROCEDURE MaxLenPos( VAR f: ARRAY OF FLOAT64;  p: ArrayFunction ): SIGNED32;
+	VAR values: antsArrays.X1d;  value: FLOAT64;
 	BEGIN
 		RETURN MaxPosArrayFunction( f, values, p, value )
 	END MaxLenPos;
@@ -303,7 +303,7 @@ in the gamma-scanning
 (depending on type maximum likelihood estimator or the common unbiased variance estimator 1/(N-1) \sum_{i=1}^N (y_i - \bar{y} )^2 is taken)
 *)
 	PROCEDURE VarianceGain( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  VAR kstern: SIGNED32 );
-	VAR k, N: SIGNED32;  jumpN: SIGNED32;  Vals: antsArrays.X1d;  diff: LONGREAL;  b: LONGREAL;
+	VAR k, N: SIGNED32;  jumpN: SIGNED32;  Vals: antsArrays.X1d;  diff: FLOAT64;  b: FLOAT64;
 	BEGIN
 		jumpN := LEN( jumps^ );  NEW( Vals, jumpN );  b := EstimatedVariance( Xstern^[jumps^[0]], data^, type );
 		diff := b - EstimatedVariance( Xstern^[jumps^[1]], data^, type );  Vals^[0] := diff;  kstern := jumps^[1];  k := 1;
@@ -318,7 +318,7 @@ in the gamma-scanning
 (*
 estimator for the variance (depending on type maximum likelihood estimator or an unbiased estimator) of y if x is assumed to be the real signal
 *)
-	PROCEDURE EstimatedVariance*( VAR x, y: ARRAY OF LONGREAL;  type: SIGNED16 ): LONGREAL;
+	PROCEDURE EstimatedVariance*( VAR x, y: ARRAY OF FLOAT64;  type: SIGNED16 ): FLOAT64;
 	BEGIN
 		IF type = cGaussML THEN RETURN vyLongreal.Dist2Sq( LEN( x ), x, 0, y, 0 ) / LEN( x )
 		ELSIF type = cLaplaceML THEN
@@ -343,7 +343,7 @@ for the reconstructions in the gamma-scanning
 Depending on type the unbiased estimator 1/(N-1) sum_{i=1}^N (y_i - bar{y} )^2 or the maximum likelihood estimator for the variance is taken
 for every number of intervals and check for which number of intervals this estimator is closest to the given variance
 *)
-	PROCEDURE VarianceTest( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  variance: LONGREAL );
+	PROCEDURE VarianceTest( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  VAR Vals: antsArrays.X1d;  variance: FLOAT64 );
 	VAR k, N: SIGNED32;
 	BEGIN
 		N := LEN( data^ );
@@ -357,7 +357,7 @@ only for number of intervals appearing in the scanning
 and check for which number of intervals this estimator is closest to the given variance
 *)
 	PROCEDURE VarianceTestScanning( type: SIGNED16;  data: antsArrays.X1d;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;
-															 VAR Vals: antsArrays.X1d;  variance: LONGREAL );
+															 VAR Vals: antsArrays.X1d;  variance: FLOAT64 );
 	VAR k, jumpN: SIGNED32;
 	BEGIN
 		jumpN := LEN( jumps^ );
@@ -379,7 +379,7 @@ We compute the second differences for the variance estimator N*Bellman[k-1][N-1]
 (*
 Compute multiresolution coefficients
 *)
-	PROCEDURE MultiCoefficients( y: ARRAY OF LONGREAL;  Xstern: ARRAY OF LONGREAL;  VAR Coeff: antsArrays.X2d );
+	PROCEDURE MultiCoefficients( y: ARRAY OF FLOAT64;  Xstern: ARRAY OF FLOAT64;  VAR Coeff: antsArrays.X2d );
 	VAR cumsum: antsArrays.X1d;  i, j, N: SIGNED32;
 	BEGIN
 		N := LEN( y );
@@ -403,8 +403,8 @@ Compute multiresolution coefficients
 The median absolute deviation is defined as
 MAD(z) = median(z_i - median(z))
 *)
-	PROCEDURE MAD*( y: vyLongrealVec.tVector ): LONGREAL;
-	VAR N, i: SIGNED32;  val: LONGREAL;  z: vyLongrealVec.tVector;  mad: LONGREAL;  len: SIGNED32;  median: LONGREAL;
+	PROCEDURE MAD*( y: vyLongrealVec.tVector ): FLOAT64;
+	VAR N, i: SIGNED32;  val: FLOAT64;  z: vyLongrealVec.tVector;  mad: FLOAT64;  len: SIGNED32;  median: FLOAT64;
 	BEGIN
 		N := vyLongrealVec.Len( y( vyLongrealVec.tVector ) );  len := N - 1;  z := vyLongrealVec.New( len );
 
@@ -424,9 +424,9 @@ MAD(z) = median(z_i - median(z))
 (*
 Using MAD estimator for the variance and the Davies/Kovac criterion for the wavelet coefficients
 *)
-	PROCEDURE MultiResCheck( data: ARRAY OF LONGREAL;  mad: LONGREAL;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  factor: LONGREAL;
+	PROCEDURE MultiResCheck( data: ARRAY OF FLOAT64;  mad: FLOAT64;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  factor: FLOAT64;
 												 VAR ksterndl: SIGNED32 );
-	VAR const: LONGREAL;  N: SIGNED32;  xsterndl: antsArrays.X1d;  i, j, k: SIGNED32;  toobig: BOOLEAN;  kstern: SIGNED16;  Coeff: antsArrays.X2d;  estimatedsigma: LONGREAL;
+	VAR const: FLOAT64;  N: SIGNED32;  xsterndl: antsArrays.X1d;  i, j, k: SIGNED32;  toobig: BOOLEAN;  kstern: SIGNED16;  Coeff: antsArrays.X2d;  estimatedsigma: FLOAT64;
 
 	BEGIN
 		N := LEN( Xstern );
@@ -476,7 +476,7 @@ Using MAD estimator for the variance and the Davies/Kovac criterion for the wave
 
 	END MultiResCheck;
 
-	PROCEDURE LongestRunCheck( data: ARRAY OF LONGREAL;  mad: LONGREAL;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  VAR kstern: SIGNED32 );
+	PROCEDURE LongestRunCheck( data: ARRAY OF FLOAT64;  mad: FLOAT64;  Xstern: antsArrays.X2d;  jumps: antsArrays.I1d;  VAR kstern: SIGNED32 );
 	VAR const: SIGNED32;  N: SIGNED32;  residuals: antsArrays.X1d;
 		(* j, k: SIGNED32; *)
 		maxrun: SIGNED32;  toobig: BOOLEAN;  i, j, k: SIGNED32;
@@ -520,7 +520,7 @@ Using MAD estimator for the variance and the Davies/Kovac criterion for the wave
 (*
 Procedure to compare MAD of data and height of jump in reconstruction
 *)
-	PROCEDURE LargestJump( reconstruction: vyBase.Object;  VAR maxjump: LONGREAL );
+	PROCEDURE LargestJump( reconstruction: vyBase.Object;  VAR maxjump: FLOAT64 );
 	VAR N: SIGNED32;  rec: antsArrays.X1d;  maxpos: SIGNED32;
 	BEGIN
 		N := vyLongrealVec.Len( reconstruction( vyLongrealVec.tVector ) );
@@ -529,7 +529,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		maxjump := rec[maxpos]
 	END LargestJump;
 
-	PROCEDURE LargestJumpPos*( reconstruction: vyBase.Object;  VAR maxjump: LONGREAL;  VAR maxpos: SIGNED32 );
+	PROCEDURE LargestJumpPos*( reconstruction: vyBase.Object;  VAR maxjump: FLOAT64;  VAR maxpos: SIGNED32 );
 	VAR N: SIGNED32;  rec: antsArrays.X1d;
 	BEGIN
 		N := vyLongrealVec.Len( reconstruction( vyLongrealVec.tVector ) );
@@ -569,7 +569,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		END
 	END CreateStatistics;
 
-	PROCEDURE CreateScaledStatisticsGamma*( VAR s: StatisticObj;  degraded: vyBase.Object;  gamma: LONGREAL );
+	PROCEDURE CreateScaledStatisticsGamma*( VAR s: StatisticObj;  degraded: vyBase.Object;  gamma: FLOAT64 );
 	VAR N, j, k: SIGNED32;  rstern: antsArrays.I1d;  bellman, reko: antsArrays.X1d;
 	BEGIN
 		ASSERT ( (degraded # NIL ) & (degraded IS vyLongrealVec.tVector), 109 );
@@ -594,26 +594,26 @@ Procedure to compare MAD of data and height of jump in reconstruction
 
 	END CreateScaledStatisticsGamma;
 
-	PROCEDURE LineToVec*( VAR line: ARRAY OF LONGREAL;  vec: vyBase.Object );
+	PROCEDURE LineToVec*( VAR line: ARRAY OF FLOAT64;  vec: vyBase.Object );
 	VAR msg: vyPort.AdjustCoordMsg;
 	BEGIN
 		vyLongrealVec.CopyToVec( line, vec( vyLongrealVec.tVector ), LEN( line ), 0, 0 );  vyBase.Update( vec );
 		vyBase.ForUsersHandle( vec, msg )
 	END LineToVec;
 
-	PROCEDURE GetColumn*( VAR A: ARRAY OF ARRAY OF LONGREAL;  column: SIGNED32;  VAR col: ARRAY OF LONGREAL );
+	PROCEDURE GetColumn*( VAR A: ARRAY OF ARRAY OF FLOAT64;  column: SIGNED32;  VAR col: ARRAY OF FLOAT64 );
 	VAR i: SIGNED32;
 	BEGIN
 		FOR i := 1 TO LEN( A ) DO col[i - 1] := A[i - 1][column] END
 	END GetColumn;
 
-	PROCEDURE GetColumnVec*( VAR A: ARRAY OF ARRAY OF LONGREAL;  column: SIGNED32;  VAR vec: vyBase.Object );
+	PROCEDURE GetColumnVec*( VAR A: ARRAY OF ARRAY OF FLOAT64;  column: SIGNED32;  VAR vec: vyBase.Object );
 	VAR col: antsArrays.X1d;
 	BEGIN
 		GetColumn( A, column, col^ );  LineToVec( col^, vec )
 	END GetColumnVec;
 
-	PROCEDURE AppendValue*( value: LONGREAL;  vec: vyBase.Object );
+	PROCEDURE AppendValue*( value: FLOAT64;  vec: vyBase.Object );
 	BEGIN
 		IF vec # NIL THEN
 			IF vec IS vyLongrealVec.tVector THEN
@@ -630,7 +630,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		link := NIL;  vyLinks.InsertObj( link, vec );  vyBase.Show( link, 1, as )
 	END ViewVector;
 
-	PROCEDURE ViewArray*( VAR a: ARRAY OF LONGREAL;  as, name: ARRAY OF CHAR );
+	PROCEDURE ViewArray*( VAR a: ARRAY OF FLOAT64;  as, name: ARRAY OF CHAR );
 	VAR vec: vyLongrealVec.tVector;  link: vyLinks.Link;
 	BEGIN
 		vec := vyLongrealVec.New( LEN( a ) );  vyLongrealVec.CopyToVec( a, vec, LEN( a ), 0, 0 );  link := NIL;
@@ -638,7 +638,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END ViewArray;
 
 	PROCEDURE DoViewScannings( degraded: vyBase.Object;  statistic: StatisticObj );
-	VAR N, i, jumpN: SIGNED32;  intervals: antsArrays.X1d;  index: antsArrays.L1d;  maxquot: LONGREAL;  maxquotpos: SIGNED32;
+	VAR N, i, jumpN: SIGNED32;  intervals: antsArrays.X1d;  index: antsArrays.L1d;  maxquot: FLOAT64;  maxquotpos: SIGNED32;
 		name: ARRAY 64 OF CHAR;
 		type: SIGNED16;
 	BEGIN
@@ -757,14 +757,14 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		END
 	END MLOrNot;
 
-	PROCEDURE DoAIC*( statistic: StatisticObj;  VAR vec: vyBase.Object;  variance: LONGREAL );
+	PROCEDURE DoAIC*( statistic: StatisticObj;  VAR vec: vyBase.Object;  variance: FLOAT64 );
 	BEGIN
 		AkaikeIndependent( statistic.Bellman, statistic.XAIC, variance );  Minimize( statistic.XAIC^, statistic.aiciOpt );
 		LineToVec( statistic.Xstern[statistic.aiciOpt], vec )
 	END DoAIC;
 
 	PROCEDURE MakeAIC*;
-	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  variance: LONGREAL;
+	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  variance: FLOAT64;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 		(*additional parameters ***)
@@ -801,14 +801,14 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		bool := antsCommands.GetObject( "statvec", statvec );  DoAICC( statistic, vec );  AppendValue( statistic.aiccOpt, statvec )
 	END MakeAICC;
 
-	PROCEDURE DoSIC*( statistic: StatisticObj;  vec: vyBase.Object;  variance: LONGREAL );
+	PROCEDURE DoSIC*( statistic: StatisticObj;  vec: vyBase.Object;  variance: FLOAT64 );
 	BEGIN
 		SchwarzIndependent( statistic.Bellman, statistic.XSchwarz, variance );
 		Minimize( statistic.XSchwarz^, statistic.schwarzOpt );  LineToVec( statistic.Xstern[statistic.schwarzOpt], vec )
 	END DoSIC;
 
 	PROCEDURE MakeSIC*;
-	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  variance: LONGREAL;
+	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  variance: FLOAT64;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 
@@ -856,7 +856,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END DoMaxInterval;
 
 	PROCEDURE MakeMaxInterval*;
-	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  MaxJump: LONGREAL;  outputMaxJump: Objects.Object;
+	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  MaxJump: FLOAT64;  outputMaxJump: Objects.Object;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 
@@ -916,14 +916,14 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		AppendValue( statistic.scanningVarOpt, statvec )
 	END MakeVarianceGain;
 
-	PROCEDURE DoVarianceTest*( statistic: StatisticObj;  vec: vyBase.Object;  variance: LONGREAL;  type: SIGNED16 );
+	PROCEDURE DoVarianceTest*( statistic: StatisticObj;  vec: vyBase.Object;  variance: FLOAT64;  type: SIGNED16 );
 	BEGIN
 		VarianceTest( type, statistic.data, statistic.Xstern, statistic.XVarDiff, variance );
 		Minimize( statistic.XVarDiff^, statistic.VarDiffOpt );  LineToVec( statistic.Xstern[statistic.VarDiffOpt], vec )
 	END DoVarianceTest;
 
 	PROCEDURE MakeVarianceTest*;
-	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  variance: LONGREAL;  type: SIGNED16;
+	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  variance: FLOAT64;  type: SIGNED16;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 
@@ -937,14 +937,14 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		AppendValue( statistic.VarDiffOpt, statvec )
 	END MakeVarianceTest;
 
-	PROCEDURE DoVarianceTestScanning*( statistic: StatisticObj;  vec: vyBase.Object;  variance: LONGREAL;  type: SIGNED16 );
+	PROCEDURE DoVarianceTestScanning*( statistic: StatisticObj;  vec: vyBase.Object;  variance: FLOAT64;  type: SIGNED16 );
 	BEGIN
 		VarianceTestScanning( type, statistic.data, statistic.Xstern, statistic.jumps, statistic.XVarDiff, variance );
 		Minimize( statistic.XVarDiff^, statistic.VarDiffOpt );  LineToVec( statistic.Xstern[statistic.VarDiffOpt], vec )
 	END DoVarianceTestScanning;
 
 	PROCEDURE MakeVarianceTestScanning*;
-	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  variance: LONGREAL;  type: SIGNED16;
+	VAR statistic: StatisticObj;  vec, statvec, obj: vyBase.Object;  bool: BOOLEAN;  variance: FLOAT64;  type: SIGNED16;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 
@@ -973,7 +973,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		AppendValue( statistic.KneeCheckOpt, statvec )
 	END MakeKneeCheck;
 
-	PROCEDURE DoMultiCoeff*( statistic: StatisticObj;  vec: vyBase.Object;  factor: LONGREAL );
+	PROCEDURE DoMultiCoeff*( statistic: StatisticObj;  vec: vyBase.Object;  factor: FLOAT64 );
 	VAR ksterndl: SIGNED32;
 	BEGIN
 		antsBellman.gammaScanning( statistic.Bellman, statistic.jumps, statistic.gamma );
@@ -982,7 +982,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	END DoMultiCoeff;
 
 	PROCEDURE MakeMultiCoeff*;
-	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  factor: LONGREAL;  ksterndl: SIGNED32;
+	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;  factor: FLOAT64;  ksterndl: SIGNED32;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
 
@@ -1003,7 +1003,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 
 	PROCEDURE MakeLongestRun*;
 	VAR statistic: StatisticObj;  vec, statvec: vyBase.Object;  bool: BOOLEAN;
-		(* factor: LONGREAL; *)
+		(* factor: FLOAT64; *)
 		kstern: SIGNED32;
 	BEGIN
 		IF ~Header( statistic, vec ) THEN RETURN END;
@@ -1012,13 +1012,13 @@ Procedure to compare MAD of data and height of jump in reconstruction
 		AppendValue( statistic.aicEstOpt, statvec )
 	END MakeLongestRun;
 
-	PROCEDURE DoIterativePotts*( input: vyBase.Object;  vec, res: vyLongrealVec.tVector;  type: SIGNED16;  factor: LONGREAL );
+	PROCEDURE DoIterativePotts*( input: vyBase.Object;  vec, res: vyLongrealVec.tVector;  type: SIGNED16;  factor: FLOAT64 );
 	VAR i, N, j, k: SIGNED32;  alarm: SIGNED32;
 		(* ch: CHAR; *)
 		msg: vyPort.AdjustCoordMsg;
 		(* NumOfJumps: SIGNED32;
-	lastval: LONGREAL; *)
-		statistic: StatisticObj;  toobig: BOOLEAN;  estimatedsigma, const: LONGREAL;  mad: LONGREAL;  vecArray, inputArray: antsArrays.X1d;
+	lastval: FLOAT64; *)
+		statistic: StatisticObj;  toobig: BOOLEAN;  estimatedsigma, const: FLOAT64;  mad: FLOAT64;  vecArray, inputArray: antsArrays.X1d;
 		Coeff: antsArrays.X2d;  degraded: vyBase.Object;
 	BEGIN
 		alarm := 0;
@@ -1097,7 +1097,7 @@ Procedure to compare MAD of data and height of jump in reconstruction
 	PROCEDURE MakeIterativePotts*;
 	VAR degraded: vyBase.Object;  vec, res: vyBase.Object;
 		vecname, resname: ARRAY 64 OF CHAR;
-		type: SIGNED16;  factor: LONGREAL;
+		type: SIGNED16;  factor: FLOAT64;
 	BEGIN
 		antsCommands.InitScan( "data=OBJ (vec=OBJ | (vec=NAME res=NAME |create))" );
 		IF antsCommands.ExpectObject( "data", degraded ) & antsCommands.GetObject( "vec", vec ) & antsCommands.GetObject( "res", res ) THEN
@@ -1238,7 +1238,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END DoModiMatrix;
 
 	PROCEDURE DoRecursiveScanning( degraded: vyBase.Object;  vec, res: vyLongrealVec.tVector;  type: SIGNED16 );
-	VAR i, N: SIGNED32;  alarm: SIGNED32;  ch: CHAR;  msg: vyPort.AdjustCoordMsg;  NumOfJumps: SIGNED32;  lastval: LONGREAL;  statistic: StatisticObj;
+	VAR i, N: SIGNED32;  alarm: SIGNED32;  ch: CHAR;  msg: vyPort.AdjustCoordMsg;  NumOfJumps: SIGNED32;  lastval: FLOAT64;  statistic: StatisticObj;
 	BEGIN
 		alarm := 0;  Input.Read( ch );
 
@@ -1272,7 +1272,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		END
 	END DoRecursiveScanning;
 
-	PROCEDURE sgn*( x: LONGREAL ): SIGNED16;
+	PROCEDURE sgn*( x: FLOAT64 ): SIGNED16;
 	VAR number: SIGNED16;
 	BEGIN
 		IF x > 0 THEN number := 1
@@ -1282,7 +1282,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		RETURN number;
 	END sgn;
 
-	PROCEDURE MaxRun( x: ARRAY OF LONGREAL ): SIGNED32;
+	PROCEDURE MaxRun( x: ARRAY OF FLOAT64 ): SIGNED32;
 	VAR i, N: SIGNED32;  runlength: SIGNED32;  last, this: SIGNED16;  startpoint: SIGNED32;  len: SIGNED32;
 	CONST invalid = -1;
 	BEGIN
@@ -1333,7 +1333,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END RecursiveScanning;
 
 	PROCEDURE EmpiricalVariance*;
-	VAR obj1: vyBase.Object;  variance: LONGREAL;
+	VAR obj1: vyBase.Object;  variance: FLOAT64;
 		(*N, *) n: SIGNED32;  vv2, vv: vyLongrealVec.tVector;
 		varname, gammaname: ARRAY 64 OF CHAR;
 		type, type2: SIGNED16;
@@ -1363,7 +1363,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		DoEmpiricalVariance( obj1, variance, n, type, type2, vv2, vv )
 	END EmpiricalVariance;
 
-	PROCEDURE DoEmpiricalVariance( obj1: vyBase.Object;  variance: LONGREAL;  n: SIGNED32;  type, type2: SIGNED16;  vv2, vv: vyLongrealVec.tVector );
+	PROCEDURE DoEmpiricalVariance( obj1: vyBase.Object;  variance: FLOAT64;  n: SIGNED32;  type, type2: SIGNED16;  vv2, vv: vyLongrealVec.tVector );
 	VAR i, m, N: SIGNED32;  statistic: StatisticObj;  gammalen: SIGNED32;  obj2: vyBase.Object;
 	BEGIN
 		N := vyLongrealVec.Len( obj1( vyLongrealVec.tVector ) );  obj2 := vyLongrealVec.New( N );
@@ -1400,10 +1400,10 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 		aM.S( "okay" )
 	END DoEmpiricalVariance;
 (****)
-	PROCEDURE DoConsistencySimulation( obj1: vyBase.Object;  variance: LONGREAL;  n: SIGNED32;  gamma: LONGREAL;
+	PROCEDURE DoConsistencySimulation( obj1: vyBase.Object;  variance: FLOAT64;  n: SIGNED32;  gamma: FLOAT64;
 																  heightvec, posvec: vyLongrealVec.tVector );
 	VAR i, j, k, N: SIGNED32;  statistic: StatisticObj;  obj2: vyBase.Object;  rstern: antsArrays.I1d;  rek: antsArrays.X1d;
-		bellman: antsArrays.X1d;  maxjump: LONGREAL;  maxpos: SIGNED32;  vec2: vyBase.Object;
+		bellman: antsArrays.X1d;  maxjump: FLOAT64;  maxpos: SIGNED32;  vec2: vyBase.Object;
 		(*stat: antsBellman.Statistic;*)
 	BEGIN
 		(*vyHostTexts.DoOpenLog("ViewReko"); vyHostTexts.SetCaret;*)
@@ -1458,9 +1458,9 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END DoConsistencySimulation;
 (* *******************Simulation für fixiertes Gamma**********************************************************)
 	PROCEDURE ConsistencySimulation*;
-	VAR obj1: vyBase.Object;  variance: LONGREAL;  n: SIGNED32;  heightvec, posvec: vyLongrealVec.tVector;
+	VAR obj1: vyBase.Object;  variance: FLOAT64;  n: SIGNED32;  heightvec, posvec: vyLongrealVec.tVector;
 		heightname, positionname: ARRAY 64 OF CHAR;
-		gamma: LONGREAL;
+		gamma: FLOAT64;
 	BEGIN
 		antsCommands.InitScan( "data=OBJ var=FLOAT32 gamma=FLOAT32 samples=INT heightvec=NAME positionvec=NAME" );
 		IF antsCommands.ExpectObject( "data", obj1 ) & antsCommands.ExpectReal( "var", variance ) &
@@ -1475,7 +1475,7 @@ To plot the estimated variances only for reconstruction which appear in the gamm
 	END ConsistencySimulation;
 
 	PROCEDURE EmpiricalGamma*;
-	VAR obj1, obj2: vyBase.Object;  variance: LONGREAL;  N, n: SIGNED32;  vv1, vv2, vv3: vyLongrealVec.tVector;  type, type2: SIGNED16;
+	VAR obj1, obj2: vyBase.Object;  variance: FLOAT64;  N, n: SIGNED32;  vv1, vv2, vv3: vyLongrealVec.tVector;  type, type2: SIGNED16;
 		gammavecname, numbervecname, partivecname: ARRAY 64 OF CHAR;
 		this, old: Texts.Text;
 	BEGIN
@@ -1522,12 +1522,12 @@ Then it computes the statistic and and does the gamma-scanning. From the gamma-v
 and write this into lens. From this vector the mean and the sum of squares are computed. The largest gamma is written into gamma0vector.
 This whole procedure is repeated with the signal n times. The gamma_vector could then plotted as histogram to get an idea of the distribution of gamma0.
 *)
-	PROCEDURE DoEmpiricalGamma( obj1, obj2: vyBase.Object;  variance: LONGREAL;  n: SIGNED32;  type, type2: SIGNED16;  vv2: vyLongrealVec.tVector;
+	PROCEDURE DoEmpiricalGamma( obj1, obj2: vyBase.Object;  variance: FLOAT64;  n: SIGNED32;  type, type2: SIGNED16;  vv2: vyLongrealVec.tVector;
 													    vecname: ARRAY OF CHAR;  intervalnumbervec: vyLongrealVec.tVector;
 													    numbervecname: ARRAY OF CHAR;  partivec: vyLongrealVec.tVector;  partivecname: ARRAY OF CHAR );
-	VAR i, j: SIGNED32;  statistic: StatisticObj;  mean, ssq, median: LONGREAL;  maxjump: LONGREAL;  lens: antsArrays.X1d;  nrNaNs: SIGNED32;  maxjumpPos: SIGNED32;
+	VAR i, j: SIGNED32;  statistic: StatisticObj;  mean, ssq, median: FLOAT64;  maxjump: FLOAT64;  lens: antsArrays.X1d;  nrNaNs: SIGNED32;  maxjumpPos: SIGNED32;
 		gammalen: SIGNED32;  gammaneu: antsArrays.X1d;  vv2array, partiarray, numberarray: antsArrays.X1d;
-		R: antsReadWrite.Rider;  min, max: LONGREAL;  N: SIGNED32;
+		R: antsReadWrite.Rider;  min, max: FLOAT64;  N: SIGNED32;
 	BEGIN
 		N := vyLongrealVec.Len( obj1( vyBase.tVector ) );
 		FOR i := 1 TO n DO  (* Out.Int( i, 5 ); Out.Ln(); *)
@@ -1620,8 +1620,8 @@ This whole procedure is repeated with the signal n times. The gamma_vector could
 
 	END DoEmpiricalGamma;
 
-	PROCEDURE UpdateMSSQ( val: LONGREAL;  at: SIGNED32;  VAR mean, var: LONGREAL );
-	VAR diff: LONGREAL;
+	PROCEDURE UpdateMSSQ( val: FLOAT64;  at: SIGNED32;  VAR mean, var: FLOAT64 );
+	VAR diff: FLOAT64;
 	BEGIN
 		diff := val - mean;  mean := mean + diff / at;  var := var + diff * (val - mean)
 	END UpdateMSSQ;
@@ -1629,10 +1629,10 @@ This whole procedure is repeated with the signal n times. The gamma_vector could
 (*
 Survey of different properties of the gamma values in the scanning
 *)
-	PROCEDURE DoGammaStatistics( from, to, step, n, jumps1: SIGNED32;  variance: LONGREAL;  type: SIGNED16 );
-	VAR minmean, maxmean, meanmean, minvar, maxvar, meanvar, MeanLenMean, MeanLenVar, max2mean, max2var: LONGREAL;
-		i, j, k: SIGNED32;  statistic: StatisticObj;  lengamma: SIGNED32;  truejumpInter: SIGNED32;  IntervalLen, TrueIntervalLen: LONGREAL;
-		min, max, max2, mean, Ratio, MeanLen: LONGREAL;  MaxInt, Max2Int: LONGREAL;
+	PROCEDURE DoGammaStatistics( from, to, step, n, jumps1: SIGNED32;  variance: FLOAT64;  type: SIGNED16 );
+	VAR minmean, maxmean, meanmean, minvar, maxvar, meanvar, MeanLenMean, MeanLenVar, max2mean, max2var: FLOAT64;
+		i, j, k: SIGNED32;  statistic: StatisticObj;  lengamma: SIGNED32;  truejumpInter: SIGNED32;  IntervalLen, TrueIntervalLen: FLOAT64;
+		min, max, max2, mean, Ratio, MeanLen: FLOAT64;  MaxInt, Max2Int: FLOAT64;
 		minmeanvec, maxmeanvec, meanmeanvec, minvarvec, maxvarvec, meanvarvec, MeanLenMeanvec, MeanLenVarvec, max2meanvec, max2varvec: vyLongrealVec.tVector;
 		len: SIGNED32;  obj: vyBase.Object;  datavec: vyLongrealVec.tVector;
 	BEGIN
@@ -1711,8 +1711,8 @@ Survey of different properties of the gamma values in the scanning
 				IF truejumpInter = -1 THEN aM.vS( "true number of jumps not in scanning" )
 				ELSE
 					(*length of the gamma-interval with the true number of jumps*)
-					TrueIntervalLen := statistic.gamma[truejumpInter - 1] - statistic.gamma[truejumpInter];  min := MAX( LONGREAL );
-					max := MIN( LONGREAL );  mean := 0;  MaxInt := MIN( LONGREAL );  Max2Int := MIN( LONGREAL );
+					TrueIntervalLen := statistic.gamma[truejumpInter - 1] - statistic.gamma[truejumpInter];  min := MAX( FLOAT64 );
+					max := MIN( FLOAT64 );  mean := 0;  MaxInt := MIN( FLOAT64 );  Max2Int := MIN( FLOAT64 );
 					FOR k := 0 TO lengamma - 1 DO
 						IntervalLen := statistic.gamma[k] - statistic.gamma[k + 1];
 						IF IntervalLen > MaxInt THEN
@@ -1746,7 +1746,7 @@ Survey of different properties of the gamma values in the scanning
 	END DoGammaStatistics;
 
 	PROCEDURE GammaStatistics*;
-	VAR n: SIGNED32;  variance: LONGREAL;  jumps1: SIGNED32;  from, to, step: SIGNED32;  type: SIGNED16;
+	VAR n: SIGNED32;  variance: FLOAT64;  jumps1: SIGNED32;  from, to, step: SIGNED32;  type: SIGNED16;
 	BEGIN
 		antsCommands.InitScan( "samples=INT var=FLOAT32 jumps=INT (>median|>mean) [from=INT to=INT step=INT]" );
 		IF antsCommands.ExpectNumber( "samples", n ) & antsCommands.ExpectReal( "var", variance ) &
@@ -1772,15 +1772,15 @@ Survey of different properties of the gamma values in the scanning
 (*
 Survey of the reconstruction for fixed gamma for increasing length of the signal
 *)
-PROCEDURE DoFixedGammaStatistics (from, to, step, n, jumps1: SIGNED32 ; variance: LONGREAL; type: SIGNED16 );
-VAR (*minmean, maxmean, meanmean, minvar, maxvar, meanvar, MeanLenMean, MeanLenVar, max2mean, max2var: LONGREAL; *)
+PROCEDURE DoFixedGammaStatistics (from, to, step, n, jumps1: SIGNED32 ; variance: FLOAT64; type: SIGNED16 );
+VAR (*minmean, maxmean, meanmean, minvar, maxvar, meanvar, MeanLenMean, MeanLenVar, max2mean, max2var: FLOAT64; *)
 i, j, k: SIGNED32;
 statistic: StatisticObj;
 (*lengamma: SIGNED32;
 truejumpInter: SIGNED32;
-IntervalLen, TrueIntervalLen: LONGREAL;
-min, max, max2, mean, Ratio, MeanLen: LONGREAL;
-MaxInt, Max2Int: LONGREAL;
+IntervalLen, TrueIntervalLen: FLOAT64;
+min, max, max2, mean, Ratio, MeanLen: FLOAT64;
+MaxInt, Max2Int: FLOAT64;
 minmeanvec, maxmeanvec, meanmeanvec, minvarvec, maxvarvec, meanvarvec, MeanLenMeanvec, MeanLenVarvec,
 max2meanvec, max2varvec: vyLongrealVec.tVector; *)
 len: SIGNED32;
@@ -1851,8 +1851,8 @@ END DoFixedGammaStatistics;
 *)
 
 
-	PROCEDURE Regression( y: vyLongrealVec.tVector;  start, end: SIGNED32;  VAR a, b, residuum: LONGREAL );
-	VAR number, i: SIGNED32;  sumsimple, sumwith, sumsquare: LONGREAL;
+	PROCEDURE Regression( y: vyLongrealVec.tVector;  start, end: SIGNED32;  VAR a, b, residuum: FLOAT64 );
+	VAR number, i: SIGNED32;  sumsimple, sumwith, sumsquare: FLOAT64;
 	BEGIN
 		number := end - start + 1;
 
@@ -1876,8 +1876,8 @@ END DoFixedGammaStatistics;
 (*
 procedure to compute the sum of squares for the regression with two linear regression curves
 *)
-	PROCEDURE SumofResiduals( y: vyLongrealVec.tVector;  knee: SIGNED32;  VAR totalresi: LONGREAL );
-	VAR N: SIGNED32;  start, end: SIGNED32;  a1, b1, a2, b2, resi1, resi2: LONGREAL;
+	PROCEDURE SumofResiduals( y: vyLongrealVec.tVector;  knee: SIGNED32;  VAR totalresi: FLOAT64 );
+	VAR N: SIGNED32;  start, end: SIGNED32;  a1, b1, a2, b2, resi1, resi2: FLOAT64;
 
 	BEGIN
 		N := vyLongrealVec.Len( y( vyLongrealVec.tVector ) );
@@ -1898,7 +1898,7 @@ procedure to compute the sum of squares for the regression with two linear regre
 This procedure stores the residuals for an approximation to the time series by two linear fits with break point at k
 *)
 	PROCEDURE KneeCheck( Bellman: antsArrays.X2d;  VAR Vals: antsArrays.X1d );
-	VAR k, N: SIGNED32;  totalresi, a1, a2, b1, b2, resi1, resi2: LONGREAL;  BellmanVec: vyBase.Object;  Column: antsArrays.X1d;
+	VAR k, N: SIGNED32;  totalresi, a1, a2, b1, b2, resi1, resi2: FLOAT64;  BellmanVec: vyBase.Object;  Column: antsArrays.X1d;
 	BEGIN
 		N := LEN( Bellman^ );
 		IF (Vals = NIL ) OR (LEN( Vals ) # N) THEN NEW( Vals, N ) END;

@@ -44,7 +44,7 @@ BEGIN
 	Commands.GetContext().out.Address(a);
 END Address;
 
-PROCEDURE Float*(x: LONGREAL; n = 4, f= 3, d=0: WORD);
+PROCEDURE Float*(x: FLOAT64; n = 4, f= 3, d=0: WORD);
 BEGIN
 	Commands.GetContext().out.FloatFix(x,n,f,d);
 END Float;

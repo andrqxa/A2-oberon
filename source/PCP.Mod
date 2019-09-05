@@ -1181,7 +1181,7 @@ TYPE
 			END Convert;
 
 			PROCEDURE FillConst( a: PCB.ArrayQ );
-			VAR s: SIGNED8;  i: SIGNED16;  l: SIGNED32;  r: FLOAT32;  x: LONGREAL;  con: PCT.Const;
+			VAR s: SIGNED8;  i: SIGNED16;  l: SIGNED32;  r: FLOAT32;  x: FLOAT64;  con: PCT.Const;
 			BEGIN
 				WHILE (a # NIL ) DO
 					IF a.e IS PCB.ArrayExpression  THEN FillConst( a.e(PCB.ArrayExpression).array )

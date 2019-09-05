@@ -443,8 +443,8 @@ MODULE Strings IN Oberon;	(** portable *) (* ejz,  *)
 	END IntToStr;
 
 (** Converts a real to a string. *)
-PROCEDURE RealToStr*(x: LONGREAL; VAR s: ARRAY OF CHAR);
-VAR i, j, pos, len: SIZE; e, h, l, n: SIGNED32; z: LONGREAL; d: ARRAY 16 OF CHAR;
+PROCEDURE RealToStr*(x: FLOAT64; VAR s: ARRAY OF CHAR);
+VAR i, j, pos, len: SIZE; e, h, l, n: SIGNED32; z: FLOAT64; d: ARRAY 16 OF CHAR;
 
 	PROCEDURE Wr(ch: CHAR);
 	BEGIN
@@ -498,8 +498,8 @@ BEGIN
 	s[pos] := 0X
 END RealToStr;
 
-PROCEDURE RealToFixStr*(x: LONGREAL; VAR str: ARRAY OF CHAR; n, f, D: SIGNED32);
-	VAR pos, len: SIZE; e, i, h, l: SIGNED32; r, z: LONGREAL; d: ARRAY 16 OF CHAR; s: CHAR;
+PROCEDURE RealToFixStr*(x: FLOAT64; VAR str: ARRAY OF CHAR; n, f, D: SIGNED32);
+	VAR pos, len: SIZE; e, i, h, l: SIGNED32; r, z: FLOAT64; d: ARRAY 16 OF CHAR; s: CHAR;
 	PROCEDURE Wr(ch: CHAR);
 	BEGIN
 		IF ch = 0X THEN HALT(42) END;
@@ -566,8 +566,8 @@ BEGIN
 END RealToFixStr;
 
 (** Convert a string into a real. Precondition: s has a well defined real syntax. Scientific notation with D and E to indicate exponents is allowed. *)
-PROCEDURE StrToReal*(CONST s: ARRAY OF CHAR; VAR r: LONGREAL);
-VAR p: SIZE; e: SIGNED16; y, g: LONGREAL; neg, negE: BOOLEAN;
+PROCEDURE StrToReal*(CONST s: ARRAY OF CHAR; VAR r: FLOAT64);
+VAR p: SIZE; e: SIGNED16; y, g: FLOAT64; neg, negE: BOOLEAN;
 BEGIN
 	p := 0;
 	WHILE (s[p] = " ") OR (s[p] = "0") DO INC(p) END;

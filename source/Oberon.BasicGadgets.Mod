@@ -40,7 +40,7 @@ CONST
 	outofboundsmodify = 4;
 
 	MaxLen = 256;
-	CONST	DontCare = MAX(SIGNED32); DontCareR = MAX(LONGREAL);
+	CONST	DontCare = MAX(SIGNED32); DontCareR = MAX(FLOAT64);
 
 
 TYPE
@@ -63,7 +63,7 @@ TYPE
 
 	Real* = POINTER TO RealDesc;
 	RealDesc* = RECORD (Gadgets.ObjDesc)
-		val*: LONGREAL;
+		val*: FLOAT64;
 	END;
 
 	(* --- Gadgets --- *)
@@ -681,10 +681,10 @@ BEGIN
 	to.downC:=from.downC; to.upC:=from.upC; to.bottomC:=from.bottomC; to.topC:=from.topC;
 END CopyButton;
 
-PROCEDURE ParseConstraints(CONST s: ARRAY OF CHAR; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:LONGREAL);
+PROCEDURE ParseConstraints(CONST s: ARRAY OF CHAR; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:FLOAT64);
 VAR p: ARRAY 64 OF CHAR; i, j: SIGNED16;
 
-	PROCEDURE ReadNum(VAR x:SIGNED32; VAR y:LONGREAL);
+	PROCEDURE ReadNum(VAR x:SIGNED32; VAR y:FLOAT64);
 	VAR isReal:BOOLEAN;
 	BEGIN
 		isReal:=FALSE;
@@ -705,7 +705,7 @@ BEGIN
 	ReadNum(l,lrel); ReadNum(t,trel); ReadNum(r,rrel); ReadNum(b,brel);
 END ParseConstraints;
 
-PROCEDURE Constraints(f: Display.Frame; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:LONGREAL): BOOLEAN;
+PROCEDURE Constraints(f: Display.Frame; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:FLOAT64): BOOLEAN;
 VAR A: Objects.AttrMsg;
 BEGIN
 	A.id := Objects.get; A.name := "Constraints"; A.res := -1; Gadgets.framehandle(f, A);
@@ -717,7 +717,7 @@ BEGIN
 END Constraints;
 
 PROCEDURE Constrain(F:Button):BOOLEAN;
-VAR l,r,t,b:SIGNED32; lrel,rrel,trel,brel:LONGREAL;
+VAR l,r,t,b:SIGNED32; lrel,rrel,trel,brel:FLOAT64;
 BEGIN
 	IF (F.look#NIL) &Constraints(F.look(Display.Frame),l,t,r,b,lrel,trel,rrel,brel) THEN (*constraints must be positive*)
 		IF (l#DontCare) & (r#DontCare) THEN

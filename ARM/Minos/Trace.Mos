@@ -50,11 +50,11 @@ BEGIN
 	END;
 END StringA;
 
-PROCEDURE Real*(x: LONGREAL; dec, len: SIGNED32);
+PROCEDURE Real*(x: FLOAT64; dec, len: SIGNED32);
 VAR 
 	res, i, n, x0: SIGNED32; 
 	a: ARRAY MAXBUFLEN OF CHAR; 
-	z: LONGREAL;
+	z: FLOAT64;
 BEGIN
 	n := 0;
 	z := 1.0;

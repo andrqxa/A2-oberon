@@ -836,7 +836,7 @@ TYPE
 			content : DTPData.ContentObject;
 			page : DTPData.PageObject; mpage: DTPData.MasterPageObject;
 			frame : DTPData.FrameObject;
-			tempReal: LONGREAL; tempInt: SIGNED32; res: WORD; tempBool: BOOLEAN;
+			tempReal: FLOAT64; tempInt: SIGNED32; res: WORD; tempBool: BOOLEAN;
 			mt, mb, ml, mr: FLOAT32;
 		BEGIN
 			NEW(built, 0, 0, 0, 0, 0, 0, FALSE);
@@ -1278,7 +1278,7 @@ TYPE
 			oldZoomFactor: FLOAT32;
 			oldZoomMode: SIGNED32;
 			tempString: ARRAY 256 OF CHAR;
-			tempReal: LONGREAL;
+			tempReal: FLOAT64;
 			wait: PleaseWaitWindow;
 		BEGIN
 			popup.Close;
@@ -1882,7 +1882,7 @@ TYPE
 		result : SIGNED32;
 		dhe, dwe, dmte, dmbe, dmle, dmre, dfpe : WMEditors.Editor;
 		dhs, dws, dmts, dmbs, dmls, dmrs, dfps : ARRAY 256 OF CHAR;
-		dhr, dwr, dmtr, dmbr, dmlr, dmrr, dfpr : LONGREAL;
+		dhr, dwr, dmtr, dmbr, dmlr, dmrr, dfpr : FLOAT64;
 		fpCheck: DTPUtilities.Checkbox;
 		facep : BOOLEAN;
 		theCaller : Window;
@@ -2427,7 +2427,7 @@ PROCEDURE OpenEmpty*(context : Commands.Context);
 VAR instance : Window;
 	w, h, mt, mb, ml, mr : FLOAT32; f : SIGNED32; fp : BOOLEAN;
 	dstring : ARRAY 16 OF CHAR;
-	lreal : LONGREAL;
+	lreal : FLOAT64;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.Token(dstring);
 	Strings.StrToFloat(dstring, lreal); w := SHORT(lreal);

@@ -91,7 +91,7 @@ VAR
 		END
 	END Handler;
 
-	PROCEDURE Random*( ): LONGREAL;
+	PROCEDURE Random*( ): FLOAT64;
 	(*vs 0.0a1 *)  (* md  14.02.95 *)
 	VAR x, y, x1, x2, y1, y2, dx, dindx, offset: FLOAT32;  i: SIGNED16;  ok: BOOLEAN;
 	BEGIN

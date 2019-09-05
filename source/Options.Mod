@@ -71,7 +71,7 @@ TYPE
 		name : Name; (* multi character name *)
 		type : SIGNED32; (* Flag, String or Integer *)
 		value : SIGNED32; (* Integer value if type = Integer *)
-		rvalue: LONGREAL; (*real value if type = real*)
+		rvalue: FLOAT64; (*real value if type = real*)
 		string : Parameter; (* String value if type = String *)
 	END;
 
@@ -206,7 +206,7 @@ TYPE
 
 
 
-		PROCEDURE GetReal*(CONST name : Name; VAR real: LONGREAL) : BOOLEAN;
+		PROCEDURE GetReal*(CONST name : Name; VAR real: FLOAT64) : BOOLEAN;
 		VAR index: SIGNED32;
 		BEGIN{EXCLUSIVE}
 			index:=FindOption(name);

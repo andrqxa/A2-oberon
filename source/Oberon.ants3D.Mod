@@ -99,7 +99,7 @@ BEGIN
 END MatrixFromArray;
 
 PROCEDURE ScaleMatrix*;
-	VAR  obj: vyBase.Object;  par: LONGREAL;  y, x: SIGNED32;
+	VAR  obj: vyBase.Object;  par: FLOAT64;  y, x: SIGNED32;
 BEGIN
 	antsCommands.InitScan("name=NAME scale=FLOAT32");
 	IF antsCommands.ExpectObject("name", obj) &
@@ -202,7 +202,7 @@ END NewFromRegion;
 
 (*PROCEDURE MakeMatrixFromLayer*;
 VAR l: antsCommands.tScanList; p: antsCommands.tParameter; name: vyCG.tNameArray;
-real: LONGREAL; obj: vyBase.Object; A: antsArrayObjects.tINTEGERObject; obj2: vyLinks.Link; 			surface: vyPicture.tLayer;
+real: FLOAT64; obj: vyBase.Object; A: antsArrayObjects.tINTEGERObject; obj2: vyLinks.Link; 			surface: vyPicture.tLayer;
 c3: vyLayers3d.tCoordinate3d;
 pict : vyPicture.Picture; x,y,w,h: SIGNED32; l1: vyPort.tLayer; l2 : antsViews.tLayer;
 

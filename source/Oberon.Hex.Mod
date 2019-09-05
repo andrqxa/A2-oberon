@@ -1106,7 +1106,7 @@ BEGIN
 			IF j > 1 THEN Texts.WriteString(W, " Bytes)") ELSE Texts.WriteString(W, " Byte)") END
 		ELSIF S.s = "FLOAT32" THEN
 			Texts.WriteReal(W, Reals.Real(ReadLInt()), 16)
-		ELSIF S.s = "LONGREAL" THEN
+		ELSIF S.s = "FLOAT64" THEN
 			i := ReadLInt();
 			Texts.WriteLongReal(W, Reals.RealL(ReadLInt(), i), 20)
 		ELSIF S.s = "SET" THEN
@@ -1247,7 +1247,7 @@ BEGIN
 			AddItem(M.R, "SIGNED8");
 			AddItem(M.R, "NUM");
 			AddItem(M.R, "FLOAT32");
-			AddItem(M.R, "LONGREAL");
+			AddItem(M.R, "FLOAT64");
 			AddItem(M.R, "SET");
 			AddItem(M.R, "-------------");
 			AddItem(M.R, "ADDR (LSB rel.)");

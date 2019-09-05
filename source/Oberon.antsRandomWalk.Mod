@@ -30,8 +30,8 @@ TYPE
 	(*Pars*)
 		v2: vyBase.Object;
 		v1: vyBase.Object;
-		ph: LONGREAL;
-		pv: LONGREAL;
+		ph: FLOAT64;
+		pv: FLOAT64;
 	END;
 
 CONST
@@ -59,7 +59,7 @@ VAR
 	END LoadM;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR o: tModel;  O: vyBase.Object;  u1, u2, val1, val2, min, max: LONGREAL;  v1, v2: vyLongrealVec.tVector;
+	VAR o: tModel;  O: vyBase.Object;  u1, u2, val1, val2, min, max: FLOAT64;  v1, v2: vyLongrealVec.tVector;
 		(*
 	AO: antsArrayObjects.tObject;
 	A: antsArrayObjects.tArray
@@ -223,7 +223,7 @@ VAR
 	END NewModel;
 
 	PROCEDURE Many1d*;
-	VAR linePlot: vyLinePlot.tLayer;  pict: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  nans: SIGNED32;  r, ran: LONGREAL;
+	VAR linePlot: vyLinePlot.tLayer;  pict: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  nans: SIGNED32;  r, ran: FLOAT64;
 		v: vyLongrealVec.tVector;  i: SIGNED32;  j: SIGNED32;  hist0, hist1, hist2: vyLongrealVec.tVector;  link: vyLinks.Link;  obj: vyBase.Object;
 		vname: ARRAY 256 OF CHAR;
 		append: BOOLEAN;  len: SIGNED32;

@@ -135,7 +135,7 @@ VAR
 	END Set;
 
 
-	PROCEDURE Float*( r: LONGREAL; len: WORD );
+	PROCEDURE Float*( r: FLOAT64; len: WORD );
 	BEGIN
 		Log.Float( r, len );
 	END Float;

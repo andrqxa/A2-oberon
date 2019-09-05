@@ -32,7 +32,7 @@ IMPORT Objects, antsPortability,aM := antsMessages,vyHostStrings;
 
 TYPE
 
-	Parameters* = POINTER TO ARRAY OF LONGREAL;
+	Parameters* = POINTER TO ARRAY OF FLOAT64;
 	ParameterNames* = POINTER TO ARRAY OF ARRAY 64 OF CHAR;
 
 

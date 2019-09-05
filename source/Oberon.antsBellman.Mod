@@ -30,7 +30,7 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT antsArrays, vyLongreal, aM := antsMessages;
 
 TYPE
-	Function* = PROCEDURE (k, n: SIGNED32): LONGREAL;
+	Function* = PROCEDURE (k, n: SIGNED32): FLOAT64;
 
 	Statistic* = POINTER TO StatisticDesc;
 	StatisticDesc* = RECORD
@@ -64,10 +64,10 @@ IF i < j THEN RETURN i ELSE RETURN j END
 END Min;
 
 	(*! für Katrin Modul: Indexverschiebung in der Statistik! *)
-PROCEDURE Step (VAR argmin: ARRAY OF SIGNED16;     VAR min: ARRAY OF LONGREAL;      n, minw, maxw : SIGNED32;     p: Function);
-VAR i, minpos: SIGNED32;     minv, current: LONGREAL;         from, to: SIGNED32;
+PROCEDURE Step (VAR argmin: ARRAY OF SIGNED16;     VAR min: ARRAY OF FLOAT64;      n, minw, maxw : SIGNED32;     p: Function);
+VAR i, minpos: SIGNED32;     minv, current: FLOAT64;         from, to: SIGNED32;
 BEGIN
-	minv := MAX(LONGREAL);     from := Max(0, n - maxw);     to := Min(n - 1, n - minw);
+	minv := MAX(FLOAT64);     from := Max(0, n - maxw);     to := Min(n - 1, n - minw);
 	FOR i := from TO to DO  (*Bestimmen des Min fuer die jeweilige Partiton*)
 		current :=  min[i] + p(i, n - 1);
 		IF current < minv THEN  minv := current;     minpos := i  END
@@ -76,7 +76,7 @@ BEGIN
 	argmin[n] := SHORT(minpos)
 END Step;
 
-PROCEDURE Bellman* (VAR argmin: antsArrays.I1d;      VAR min: antsArrays.X1d;     N, minw, maxw: SIGNED32;     p: Function;     initvalue: LONGREAL);
+PROCEDURE Bellman* (VAR argmin: antsArrays.I1d;      VAR min: antsArrays.X1d;     N, minw, maxw: SIGNED32;     p: Function;     initvalue: FLOAT64);
 VAR i: SIGNED32;
 	(* Bellman calculates the min and the argmin of a function
 	h:  R^n -> R,
@@ -101,7 +101,7 @@ BEGIN
 END Bellman;
 
 PROCEDURE BellmanMatrix* ( VAR argmin: antsArrays.I2d;    VAR min:  antsArrays.X2d;     N: SIGNED32;    p: Function );
-VAR n, k, r : SIGNED32;             mini, H, ssq: LONGREAL;             rsterndl: SIGNED16;
+VAR n, k, r : SIGNED32;             mini, H, ssq: FLOAT64;             rsterndl: SIGNED16;
 BEGIN
 	IF (min = NIL ) OR (LEN( min ) # N) THEN NEW( min, N, N ) END;
 	(* min[k,l] = Fehler bei k+1 Intervallen und l+1 Punkten,
@@ -122,7 +122,7 @@ BEGIN
 			(*ssq := s.Ssq[n - 1, n - 1];          mini := min^[k - 2][n - 2] + ssq;
 			rsterndl := SHORT( n - 1 );
 			*)
-			(* mini := MAX(LONGREAL); *)
+			(* mini := MAX(FLOAT64); *)
 			ssq := p(n-1, n - 1);  (* ist das nicht = 0 ?  in Spezialfällen mit Sicherheit aber nicht in voller Allgemeinheit.*)
 			mini := min^[k - 2][n-2] +ssq;
 			rsterndl := SHORT( n - 1 );
@@ -137,7 +137,7 @@ BEGIN
 END BellmanMatrix;
 
 PROCEDURE PartitionMatrix* (argmin: antsArrays.I2d;   VAR result: antsArrays.X2d;   p: Function);
-VAR k, l, N: SIGNED32;            start, stop: SIGNED16;            mean: LONGREAL;
+VAR k, l, N: SIGNED32;            start, stop: SIGNED16;            mean: FLOAT64;
 BEGIN
 	N := LEN(argmin);
 	IF (result = NIL) OR (LEN(result) # N) THEN NEW(result, N, N) END;
@@ -264,8 +264,8 @@ BEGIN
 	statistic.type := cInval
 END InitStatistic2d;
 
-PROCEDURE ComputeMeanStat1d* (VAR A: ARRAY OF LONGREAL;   VAR s: Statistic);
-VAR i, j, n, nm1, len, N: SIGNED32;            factor, provmean, provssq, diff, x: LONGREAL;            ssq, mean: antsArrays.X2d;
+PROCEDURE ComputeMeanStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
+VAR i, j, n, nm1, len, N: SIGNED32;            factor, provmean, provssq, diff, x: FLOAT64;            ssq, mean: antsArrays.X2d;
 BEGIN
 	IF s = NIL THEN InitStatistic1d( s, LEN( A ) ) END;
 	IF s.type = cInval THEN s.type := cMean1d END;
@@ -285,16 +285,16 @@ BEGIN
 	END
 END ComputeMeanStat1d;
 
-PROCEDURE median ( y: ARRAY OF LONGREAL;            start, ende: SIGNED32 ): LONGREAL;
+PROCEDURE median ( y: ARRAY OF FLOAT64;            start, ende: SIGNED32 ): FLOAT64;
 VAR len: SIGNED32;
-	yneu: POINTER TO ARRAY OF LONGREAL;
+	yneu: POINTER TO ARRAY OF FLOAT64;
 BEGIN
 	len := ende - start + 1;            NEW( yneu, len );            vyLongreal.Copy( len, y, start, yneu^, 0 );
 	RETURN antsArrays.Median1dX(yneu^, len)
 END median;
 
-PROCEDURE ComputeMedianStat1d* (VAR A: ARRAY OF LONGREAL;   VAR s: Statistic);
-VAR i, j, n, nm1, t: SIGNED32;            factor, sum, m: LONGREAL;            sabs, med: antsArrays.X2d;
+PROCEDURE ComputeMedianStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
+VAR i, j, n, nm1, t: SIGNED32;            factor, sum, m: FLOAT64;            sabs, med: antsArrays.X2d;
 BEGIN
 	InitStatistic1d( s, LEN( A ) );
 	IF s.type = cInval THEN s.type := cMedian END;
@@ -314,10 +314,10 @@ BEGIN
 	END
 END ComputeMedianStat1d;
 
-PROCEDURE ComputeHampelStat1d* (VAR A: ARRAY OF LONGREAL;   VAR s: Statistic);
+PROCEDURE ComputeHampelStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
 
 VAR i, j, d, m, f, n, N, len1, len2: SIGNED32;
-	x, y, t1, t2, fail1, fail2, tmin, failmin, prtrmean1,prtrmean2, prtrssq1, prtrssq2, diff1, diff2: LONGREAL;
+	x, y, t1, t2, fail1, fail2, tmin, failmin, prtrmean1,prtrmean2, prtrssq1, prtrssq2, diff1, diff2: FLOAT64;
 	trssq, trmean: antsArrays.X2d;
 	sortedArray: antsArrays.X1d;
 	I: antsArrays.L1d;
@@ -439,10 +439,10 @@ BEGIN
 
 END ComputeHampelStat1d;
 
-PROCEDURE ComputeSaegezahnStat1d* (VAR A: ARRAY OF LONGREAL;   VAR s: Statistic);
+PROCEDURE ComputeSaegezahnStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
 
 VAR i, j, d, m, f, k, n, N: SIGNED32;
-	t1, t2, fail, tmin, failmin: LONGREAL;
+	t1, t2, fail, tmin, failmin: FLOAT64;
 	trsum, trmed: antsArrays.X2d;
 	sortedArray: antsArrays.X1d;
 	I: antsArrays.L1d;
@@ -569,10 +569,10 @@ BEGIN
 
 END ComputeSaegezahnStat1d;
 
-PROCEDURE ComputeHuberStat1d* (VAR A: ARRAY OF LONGREAL;   VAR s: Statistic);
+PROCEDURE ComputeHuberStat1d* (VAR A: ARRAY OF FLOAT64;   VAR s: Statistic);
 
 VAR i, j, d, m, f, h, k, n, N, len1, len2: SIGNED32;
-	x, y, t1, t2, fail, tmin, failmin, prtrmeanmed1, prtrmeanmed2, prtrssqsum1, prtrssqsum2: LONGREAL;
+	x, y, t1, t2, fail, tmin, failmin, prtrmeanmed1, prtrmeanmed2, prtrssqsum1, prtrssqsum2: FLOAT64;
 	trssqsum, trmeanmed: antsArrays.X2d;
 	sortedArray: antsArrays.X1d;
 	I: antsArrays.L1d;
@@ -719,10 +719,10 @@ BEGIN
 END ComputeHuberStat1d;
 
 (*
-PROCEDURE ComputeHampelStat1d* (VAR A: ARRAY OF LONGREAL;  VAR s: Statistic);
+PROCEDURE ComputeHampelStat1d* (VAR A: ARRAY OF FLOAT64;  VAR s: Statistic);
 
 	VAR i, j, d, m, f, n, N, ok, len, first: SIGNED32;
-			x, t, fail, tmin, failmin, prtrmean, prtrssq, diff: LONGREAL;
+			x, t, fail, tmin, failmin, prtrmean, prtrssq, diff: FLOAT64;
 			trssq, trmean: antsArrays.X2d;
 			sortedArray: antsArrays.X1d;
 			I: antsArrays.L1d;
@@ -799,10 +799,10 @@ BEGIN
 
 END ComputeHampelStat1d;
 
-PROCEDURE ComputeSaegezahnStat1d* (VAR A: ARRAY OF LONGREAL;  VAR s: Statistic);
+PROCEDURE ComputeSaegezahnStat1d* (VAR A: ARRAY OF FLOAT64;  VAR s: Statistic);
 
 	VAR i, j, d, m, f, k, n, N, ok, first: SIGNED32;
-			t, fail, tmin, failmin: LONGREAL;
+			t, fail, tmin, failmin: FLOAT64;
 			trsum, trmed: antsArrays.X2d;
 			sortedArray: antsArrays.X1d;
 			I: antsArrays.L1d;
@@ -881,10 +881,10 @@ BEGIN
 
 END ComputeSaegezahnStat1d;
 
-PROCEDURE ComputeHuberStat1d* (VAR A: ARRAY OF LONGREAL;  VAR s: Statistic);
+PROCEDURE ComputeHuberStat1d* (VAR A: ARRAY OF FLOAT64;  VAR s: Statistic);
 
 	VAR i, j, d, m, f, h, k, n, N, ok, len, first: SIGNED32;
-			x, t, fail, tmin, failmin, prtrmeanmed, prtrssqsum, diff: LONGREAL;
+			x, t, fail, tmin, failmin, prtrmeanmed, prtrssqsum, diff: FLOAT64;
 			trssqsum, trmeanmed: antsArrays.X2d;
 			sortedArray: antsArrays.X1d;
 			I: antsArrays.L1d;
@@ -974,7 +974,7 @@ BEGIN
 END ComputeHuberStat1d;
 *)
 
-PROCEDURE CreateSortedArray(y: ARRAY OF LONGREAL;  start, ende: SIGNED32): antsArrays.X1d;
+PROCEDURE CreateSortedArray(y: ARRAY OF FLOAT64;  start, ende: SIGNED32): antsArrays.X1d;
 VAR len: SIGNED32;  yneu: antsArrays.X1d;
 
 BEGIN
@@ -988,7 +988,7 @@ BEGIN
 
 END CreateSortedArray;
 
-PROCEDURE ComputeMeanStat2d* (VAR A: ARRAY OF ARRAY OF LONGREAL;   VAR s: Statistic);
+PROCEDURE ComputeMeanStat2d* (VAR A: ARRAY OF ARRAY OF FLOAT64;   VAR s: Statistic);
 VAR i, j, h, w: SIGNED32;
 BEGIN
 	h := LEN(A);   w := LEN(A[0]);
@@ -1018,32 +1018,32 @@ BEGIN
 	END
 END ComputeMeanStat2d;
 
-PROCEDURE GetMean1d* (s: Statistic;   from, to: SIGNED32): LONGREAL;
+PROCEDURE GetMean1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMean1d);
 	RETURN s.m[from, to]
 END GetMean1d;
 
-PROCEDURE GetMedian1d* (s: Statistic;   from, to: SIGNED32): LONGREAL;
+PROCEDURE GetMedian1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMedian);
 	RETURN s.m[from, to]
 END GetMedian1d;
 
-PROCEDURE GetSsq1d* (s: Statistic;   from, to: SIGNED32): LONGREAL;
+PROCEDURE GetSsq1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMean1d);
 	RETURN s.s[from, to]
 END GetSsq1d;
 
-PROCEDURE GetSAbs1d* (s: Statistic;   from, to: SIGNED32): LONGREAL;
+PROCEDURE GetSAbs1d* (s: Statistic;   from, to: SIGNED32): FLOAT64;
 BEGIN
 	ASSERT(s.type = cMedian);
 	RETURN s.s[from, to]
 END GetSAbs1d;
 
-PROCEDURE GetMean2d* (s: Statistic;   	fromx, fromy, tox, toy: SIGNED32): LONGREAL;
-VAR factor, mean: LONGREAL;    Akum: antsArrays.X2d;
+PROCEDURE GetMean2d* (s: Statistic;   	fromx, fromy, tox, toy: SIGNED32): FLOAT64;
+VAR factor, mean: FLOAT64;    Akum: antsArrays.X2d;
 BEGIN
 	Akum := s.m;
 	ASSERT(s.type = cMean2d);
@@ -1053,8 +1053,8 @@ BEGIN
 	RETURN mean
 END GetMean2d;
 
-PROCEDURE GetSsq2d* (s: Statistic;   	fromx, fromy, tox, toy: SIGNED32): LONGREAL;
-VAR Sum, SumSq, L, factor: LONGREAL;    Akum, AkumSq: antsArrays.X2d;
+PROCEDURE GetSsq2d* (s: Statistic;   	fromx, fromy, tox, toy: SIGNED32): FLOAT64;
+VAR Sum, SumSq, L, factor: FLOAT64;    Akum, AkumSq: antsArrays.X2d;
 BEGIN
 	Akum := s.m;   AkumSq := s.s;
 	INC(tox);      		INC(toy);      		factor := ( tox - fromx) * (toy - fromy);
@@ -1066,7 +1066,7 @@ END GetSsq2d;
 
 
 PROCEDURE gammaScanning* ( min: antsArrays.X2d;             VAR jumps: antsArrays.I1d;             VAR gamma: antsArrays.X1d );
-VAR N: SIGNED32;             n, nn, m: SIGNED32;             h, s: LONGREAL;
+VAR N: SIGNED32;             n, nn, m: SIGNED32;             h, s: FLOAT64;
 BEGIN
 	N := LEN( min );
 	IF (jumps = NIL ) OR (LEN( jumps ) # N) THEN NEW( jumps, N ) END;

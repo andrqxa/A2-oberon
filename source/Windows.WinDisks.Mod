@@ -204,7 +204,7 @@ VAR
 	END Cleanup;
 
 	PROCEDURE ReportDiskGeometry( VAR pdg: DISK_GEOMETRY; out : Streams.Writer );
-	VAR size: LONGREAL;
+	VAR size: FLOAT64;
 	BEGIN
 		out.String( "Disk type: " );
 		CASE pdg.MediaType OF
@@ -283,7 +283,7 @@ VAR
 		RETURN handle # Kernel32.InvalidHandleValue;
 	END OpenVolume;
 
-	PROCEDURE OutSize( f: LONGREAL; out : Streams.Writer );
+	PROCEDURE OutSize( f: FLOAT64; out : Streams.Writer );
 	BEGIN
 		IF f > 1.E9 THEN out.FloatFix( f / 1024 / 1024 / 1024, 4, 3, 0 );  out.String( " GiB" );
 		ELSIF f > 1.E6 THEN out.FloatFix( f / 1024 / 1024, 4, 3, 0 );  out.String( " MiB" );
@@ -293,7 +293,7 @@ VAR
 	END OutSize;
 
 	PROCEDURE GetPhysicalDrive( VAR handle: Kernel32.HANDLE; flags: SET;  VAR name: ARRAY OF CHAR; context : Commands.Context );
-	VAR done, returned: SIGNED32;  extents: VOLUME_DISK_EXTENTS;  drive: SIGNED32;  first, last: LONGREAL;  bps: LONGREAL;  pdg: DISK_GEOMETRY;   (* number of first and last block used *)
+	VAR done, returned: SIGNED32;  extents: VOLUME_DISK_EXTENTS;  drive: SIGNED32;  first, last: FLOAT64;  bps: FLOAT64;  pdg: DISK_GEOMETRY;   (* number of first and last block used *)
 	BEGIN
 		done := DeviceIoControl( handle, VOLUME_GET_VOLUME_DISK_EXTENTS, NIL , 0, extents, SIZEOF( VOLUME_DISK_EXTENTS ), returned, NIL );
 		IF done > 0 THEN

@@ -44,7 +44,7 @@ IMPORT Objects, Display, Effects, Gadgets, Panels, Oberon, Strings (*, Messages*
 CONST
 	outofboundsmodify = 3;
 	DontCare = MAX(SIGNED32);
-	DontCareR = MAX(LONGREAL);
+	DontCareR = MAX(FLOAT64);
 
 VAR
 	methods: Panels.Methods;
@@ -68,10 +68,10 @@ BEGIN
 	l := ReadNum(); t := ReadNum(); r := ReadNum(); b := ReadNum()
 END Parse;
 
-PROCEDURE ParseGeneral(s: ARRAY OF CHAR; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:LONGREAL);
+PROCEDURE ParseGeneral(s: ARRAY OF CHAR; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:FLOAT64);
 VAR p: ARRAY 64 OF CHAR; i, j: SIGNED16;
 
-	PROCEDURE ReadNum(VAR x:SIGNED32; VAR y:LONGREAL);
+	PROCEDURE ReadNum(VAR x:SIGNED32; VAR y:FLOAT64);
 	VAR isReal:BOOLEAN;
 	BEGIN
 		isReal:=FALSE;
@@ -101,7 +101,7 @@ BEGIN
 	END
 END HasConstraints;
 
-PROCEDURE HasGeneralConstraints*(f: Display.Frame; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:LONGREAL): BOOLEAN;
+PROCEDURE HasGeneralConstraints*(f: Display.Frame; VAR l, t, r, b: SIGNED32; VAR lrel,trel,rrel,brel:FLOAT64): BOOLEAN;
 VAR A: Objects.AttrMsg;
 BEGIN
 	A.id := Objects.get; A.name := "Constraints"; A.res := -1; f.handle(f, A);
@@ -131,7 +131,7 @@ BEGIN
 	END
 END SolveGadget;
 
-PROCEDURE SolveGadgetGeneral*(PW, PH: SIGNED16; f: Display.Frame; l, t, r, b: SIGNED32; lrel,trel,rrel,brel:LONGREAL; VAR X, Y, W, H: SIGNED16);
+PROCEDURE SolveGadgetGeneral*(PW, PH: SIGNED16; f: Display.Frame; l, t, r, b: SIGNED32; lrel,trel,rrel,brel:FLOAT64; VAR X, Y, W, H: SIGNED16);
 VAR ll, tt, rr, bb: SIGNED32;
 BEGIN
 	IF lrel#DontCareR THEN l := ENTIER(PW*lrel) END;
@@ -158,7 +158,7 @@ BEGIN
 END SolveGadgetGeneral;
 
 PROCEDURE Solve*(F: Panels.Panel; dX, dY, W, H: SIGNED16; mode: SIGNED16);
-VAR f: Display.Frame; l, t, r, b: SIGNED32; lrel, trel, rrel, brel:LONGREAL; M: Display.ModifyMsg;
+VAR f: Display.Frame; l, t, r, b: SIGNED32; lrel, trel, rrel, brel:FLOAT64; M: Display.ModifyMsg;
 BEGIN
 	f := F.dsc;
 	WHILE f # NIL DO
@@ -176,7 +176,7 @@ BEGIN
 END Solve;
 
 PROCEDURE Handler*(F: Objects.Object; VAR M: Objects.ObjMsg);
-VAR l, t, r, b: SIGNED32; lrel, trel, rrel, brel:LONGREAL; oX, oY, oW, oH, mode: SIGNED16; f: Objects.Object; A: Display.ModifyMsg;
+VAR l, t, r, b: SIGNED32; lrel, trel, rrel, brel:FLOAT64; oX, oY, oW, oH, mode: SIGNED16; f: Objects.Object; A: Display.ModifyMsg;
 BEGIN
 	WITH F: Panels.Panel DO
 		IF M IS Display.ModifyMsg THEN
@@ -243,7 +243,7 @@ BEGIN
 END RestoreBackGround;*)
 
 PROCEDURE InsertChild(F: Panels.Panel; f: Display.Frame; u, v: SIGNED16);
-VAR l, t, r, b: SIGNED32; lrel, trel, rrel, brel:LONGREAL; x, y, w, h: SIGNED16;
+VAR l, t, r, b: SIGNED32; lrel, trel, rrel, brel:FLOAT64; x, y, w, h: SIGNED16;
 BEGIN
 	IF HasGeneralConstraints(f, l, t, r, b, lrel, trel, rrel, brel) THEN
 		SolveGadgetGeneral(F.W, F.H, f, l, t, r, b, lrel, trel, rrel, brel, x, y, w, h);
@@ -255,7 +255,7 @@ BEGIN
 END InsertChild;
 
 PROCEDURE TrackMouse(F: Panels.Panel; VAR M: Oberon.InputMsg);
-VAR T: Display.Frame; x, y, t, u, v: SIGNED16; d: SIGNED32; r:LONGREAL; Fdlink, Mdlink: Objects.Object; flags: SET;
+VAR T: Display.Frame; x, y, t, u, v: SIGNED16; d: SIGNED32; r:FLOAT64; Fdlink, Mdlink: Objects.Object; flags: SET;
 BEGIN
 	x := M.x + F.X; y := M.y + F.Y; t := y + F.H - 1;
 	T := Panels.ThisChild(F, x, y, M.X, M.Y);

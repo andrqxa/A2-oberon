@@ -2521,7 +2521,7 @@ negative: redefining longint
 negative: redefining longreal
 
 	MODULE Test;
-	CONST LONGREAL = 0;
+	CONST FLOAT64 = 0;
 	END Test.
 
 negative: redefining loop
@@ -4802,13 +4802,13 @@ negative: capital letter of constant real
 positive: minimal value of real
 
 	MODULE Test;
-	CONST A = MIN (FLOAT32); B = MIN (LONGREAL)
+	CONST A = MIN (FLOAT32); B = MIN (FLOAT64)
 	END Test.
 
 positive: maximal value of real
 
 	MODULE Test;
-	CONST A = MAX (FLOAT32); B = MAX (LONGREAL)
+	CONST A = MAX (FLOAT32); B = MAX (FLOAT64)
 	END Test.
 
 negative: arithmetic shift of constant reals
@@ -6905,7 +6905,7 @@ positive: predefined basic real type
 positive: predefined basic long real type
 
 	MODULE Test;
-	TYPE BasicType = LONGREAL;
+	TYPE BasicType = FLOAT64;
 	END Test.
 
 positive: predefined basic set type
@@ -7067,7 +7067,7 @@ positive: array of basic real type
 positive: array of basic long real type
 
 	MODULE Test;
-	TYPE Array = ARRAY 10 OF LONGREAL;
+	TYPE Array = ARRAY 10 OF FLOAT64;
 	END Test.
 
 positive: array of basic set type
@@ -7635,7 +7635,7 @@ negative: pointer to basic real type
 negative: pointer to basic long real type
 
 	MODULE Test;
-	TYPE Pointer = POINTER TO LONGREAL;
+	TYPE Pointer = POINTER TO FLOAT64;
 	END Test.
 
 negative: pointer to basic set type
@@ -7799,7 +7799,7 @@ positive: procedure type returning basic real type
 positive: procedure type returning basic long real type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (): LONGREAL;
+	TYPE Procedure = PROCEDURE (): FLOAT64;
 	END Test.
 
 positive: procedure type returning basic set type
@@ -8255,43 +8255,43 @@ positive: procedure type with intermixed parameters of real type
 positive: procedure type with a parameter of basic long real type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (parameter: LONGREAL);
+	TYPE Procedure = PROCEDURE (parameter: FLOAT64);
 	END Test.
 
 positive: procedure type with parameters of basic long real type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (a, b, c: LONGREAL);
+	TYPE Procedure = PROCEDURE (a, b, c: FLOAT64);
 	END Test.
 
 positive: procedure type with a parameter of variable long real type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (VAR parameter: LONGREAL);
+	TYPE Procedure = PROCEDURE (VAR parameter: FLOAT64);
 	END Test.
 
 positive: procedure type with parameters of variable long real type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (VAR a, b, c: LONGREAL);
+	TYPE Procedure = PROCEDURE (VAR a, b, c: FLOAT64);
 	END Test.
 
 positive: procedure type with a parameter of constant long real type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (CONST parameter: LONGREAL);
+	TYPE Procedure = PROCEDURE (CONST parameter: FLOAT64);
 	END Test.
 
 positive: procedure type with parameters of constant long real type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (CONST a, b, c: LONGREAL);
+	TYPE Procedure = PROCEDURE (CONST a, b, c: FLOAT64);
 	END Test.
 
 positive: procedure type with intermixed parameters of long real type
 
 	MODULE Test;
-	TYPE Procedure = PROCEDURE (a: LONGREAL; VAR b: LONGREAL; CONST c: LONGREAL);
+	TYPE Procedure = PROCEDURE (a: FLOAT64; VAR b: FLOAT64; CONST c: FLOAT64);
 	END Test.
 
 positive: procedure type with a parameter of basic set type
@@ -9588,7 +9588,7 @@ positive: variable of basic real type
 positive: variable of basic long real type
 
 	MODULE Test;
-	VAR variable: LONGREAL;
+	VAR variable: FLOAT64;
 	END Test.
 
 positive: variable of basic set type
@@ -10710,7 +10710,7 @@ positive: procedure returning basic real type
 positive: procedure returning basic long real type
 
 	MODULE Test;
-	PROCEDURE Procedure (): LONGREAL;
+	PROCEDURE Procedure (): FLOAT64;
 	END Procedure;
 	END Test.
 
@@ -11260,49 +11260,49 @@ positive: procedure with intermixed parameters of real type
 positive: procedure with a parameter of basic long real type
 
 	MODULE Test;
-	PROCEDURE Procedure (parameter: LONGREAL);
+	PROCEDURE Procedure (parameter: FLOAT64);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of basic long real type
 
 	MODULE Test;
-	PROCEDURE Procedure (a, b, c: LONGREAL);
+	PROCEDURE Procedure (a, b, c: FLOAT64);
 	END Procedure;
 	END Test.
 
 positive: procedure with a parameter of variable long real type
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR parameter: LONGREAL);
+	PROCEDURE Procedure (VAR parameter: FLOAT64);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of variable long real type
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR a, b, c: LONGREAL);
+	PROCEDURE Procedure (VAR a, b, c: FLOAT64);
 	END Procedure;
 	END Test.
 
 positive: procedure with a parameter of constant long real type
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST parameter: LONGREAL);
+	PROCEDURE Procedure (CONST parameter: FLOAT64);
 	END Procedure;
 	END Test.
 
 positive: procedure with parameters of constant long real type
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST a, b, c: LONGREAL);
+	PROCEDURE Procedure (CONST a, b, c: FLOAT64);
 	END Procedure;
 	END Test.
 
 positive: procedure with intermixed parameters of long real type
 
 	MODULE Test;
-	PROCEDURE Procedure (a: LONGREAL; VAR b: LONGREAL; CONST c: LONGREAL);
+	PROCEDURE Procedure (a: FLOAT64; VAR b: FLOAT64; CONST c: FLOAT64);
 	END Procedure;
 	END Test.
 
@@ -12101,7 +12101,7 @@ positive: real parameter assignment
 positive: long real parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGREAL); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); BEGIN value := value; END Procedure;
 	END Test.
 
 positive: set parameter assignment
@@ -12251,7 +12251,7 @@ positive: variable real parameter assignment
 positive: variable long real parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR value: LONGREAL); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); BEGIN value := value; END Procedure;
 	END Test.
 
 positive: variable set parameter assignment
@@ -12401,7 +12401,7 @@ negative: constant real parameter assignment
 negative: constant long real parameter assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (CONST value: LONGREAL); BEGIN value := value; END Procedure;
+	PROCEDURE Procedure (CONST value: FLOAT64); BEGIN value := value; END Procedure;
 	END Test.
 
 negative: constant set parameter assignment
@@ -12565,7 +12565,7 @@ negative: calling procedure with boolean parameter with real argument
 negative: calling procedure with boolean parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: BOOLEAN); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12693,7 +12693,7 @@ negative: calling procedure with character parameter with real argument
 negative: calling procedure with character parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12821,7 +12821,7 @@ negative: calling procedure with short integer parameter with real argument
 negative: calling procedure with short integer parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -12949,7 +12949,7 @@ negative: calling procedure with integer parameter with real argument
 negative: calling procedure with integer parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13077,7 +13077,7 @@ negative: calling procedure with long integer parameter with real argument
 negative: calling procedure with long integer parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13205,7 +13205,7 @@ negative: calling procedure with huge integer parameter with real argument
 negative: calling procedure with huge integer parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: SIGNED64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13333,7 +13333,7 @@ positive: calling procedure with real parameter with real argument
 negative: calling procedure with real parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: FLOAT32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13406,7 +13406,7 @@ negative: calling procedure with long real parameter with boolean argument
 
 	MODULE Test;
 	VAR argument: BOOLEAN;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13414,7 +13414,7 @@ negative: calling procedure with long real parameter with character argument
 
 	MODULE Test;
 	VAR argument: CHAR;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13422,7 +13422,7 @@ positive: calling procedure with long real parameter with short integer argument
 
 	MODULE Test;
 	VAR argument: SIGNED8;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13430,7 +13430,7 @@ positive: calling procedure with long real parameter with integer argument
 
 	MODULE Test;
 	VAR argument: SIGNED16;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13438,7 +13438,7 @@ positive: calling procedure with long real parameter with long integer argument
 
 	MODULE Test;
 	VAR argument: SIGNED32;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13446,7 +13446,7 @@ positive: calling procedure with long real parameter with huge integer argument
 
 	MODULE Test;
 	VAR argument: SIGNED64;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13454,15 +13454,15 @@ positive: calling procedure with long real parameter with real argument
 
 	MODULE Test;
 	VAR argument: FLOAT32;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
 positive: calling procedure with long real parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	VAR argument: FLOAT64;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13470,7 +13470,7 @@ negative: calling procedure with long real parameter with set argument
 
 	MODULE Test;
 	VAR argument: SET;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13478,7 +13478,7 @@ negative: calling procedure with long real parameter with array argument
 
 	MODULE Test;
 	VAR argument: ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13486,7 +13486,7 @@ negative: calling procedure with long real parameter with record argument
 
 	MODULE Test;
 	VAR argument: RECORD END;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13494,7 +13494,7 @@ negative: calling procedure with long real parameter with object argument
 
 	MODULE Test;
 	VAR argument: OBJECT END;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13502,7 +13502,7 @@ negative: calling procedure with long real parameter with base object argument
 
 	MODULE Test;
 	VAR argument: OBJECT;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13510,7 +13510,7 @@ negative: calling procedure with long real parameter with pointer to array argum
 
 	MODULE Test;
 	VAR argument: POINTER TO ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13518,7 +13518,7 @@ negative: calling procedure with long real parameter with pointer to record argu
 
 	MODULE Test;
 	VAR argument: POINTER TO RECORD END;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13526,7 +13526,7 @@ negative: calling procedure with long real parameter with procedure argument
 
 	MODULE Test;
 	VAR argument: PROCEDURE;
-	PROCEDURE Procedure (value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -13589,7 +13589,7 @@ negative: calling procedure with set parameter with real argument
 negative: calling procedure with set parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: SET); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13717,7 +13717,7 @@ negative: calling procedure with array parameter with real argument
 negative: calling procedure with array parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -13868,7 +13868,7 @@ negative: calling procedure with open array parameter with real argument
 negative: calling procedure with open array parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: ARRAY OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14003,7 +14003,7 @@ negative: calling procedure with record parameter with real argument
 negative: calling procedure with record parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14150,7 +14150,7 @@ negative: calling procedure with object parameter with real argument
 negative: calling procedure with object parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: OBJECT END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14297,7 +14297,7 @@ negative: calling procedure with base object parameter with real argument
 negative: calling procedure with base object parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: OBJECT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14425,7 +14425,7 @@ negative: calling procedure with pointer to array parameter with real argument
 negative: calling procedure with pointer to array parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14553,7 +14553,7 @@ negative: calling procedure with pointer to record parameter with real argument
 negative: calling procedure with pointer to record parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: POINTER TO RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14700,7 +14700,7 @@ negative: calling procedure with procedure parameter with real argument
 negative: calling procedure with procedure parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (value: PROCEDURE); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14828,7 +14828,7 @@ negative: calling procedure with boolean variable parameter with real argument
 negative: calling procedure with boolean variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: BOOLEAN); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -14956,7 +14956,7 @@ negative: calling procedure with character variable parameter with real argument
 negative: calling procedure with character variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15084,7 +15084,7 @@ negative: calling procedure with short integer variable parameter with real argu
 negative: calling procedure with short integer variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: SIGNED8); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15212,7 +15212,7 @@ negative: calling procedure with integer variable parameter with real argument
 negative: calling procedure with integer variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: SIGNED16); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15340,7 +15340,7 @@ negative: calling procedure with long integer variable parameter with real argum
 negative: calling procedure with long integer variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: SIGNED32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15468,7 +15468,7 @@ negative: calling procedure with huge integer variable parameter with real argum
 negative: calling procedure with huge integer variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: SIGNED64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15596,7 +15596,7 @@ positive: calling procedure with real variable parameter with real argument
 negative: calling procedure with real variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: FLOAT32); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15669,7 +15669,7 @@ negative: calling procedure with long real variable parameter with boolean argum
 
 	MODULE Test;
 	VAR argument: BOOLEAN;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15677,7 +15677,7 @@ negative: calling procedure with long real variable parameter with character arg
 
 	MODULE Test;
 	VAR argument: CHAR;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15685,7 +15685,7 @@ negative: calling procedure with long real variable parameter with short integer
 
 	MODULE Test;
 	VAR argument: SIGNED8;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15693,7 +15693,7 @@ negative: calling procedure with long real variable parameter with integer argum
 
 	MODULE Test;
 	VAR argument: SIGNED16;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15701,7 +15701,7 @@ negative: calling procedure with long real variable parameter with long integer 
 
 	MODULE Test;
 	VAR argument: SIGNED32;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15709,7 +15709,7 @@ negative: calling procedure with long real variable parameter with huge integer 
 
 	MODULE Test;
 	VAR argument: SIGNED64;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15717,15 +15717,15 @@ negative: calling procedure with long real variable parameter with real argument
 
 	MODULE Test;
 	VAR argument: FLOAT32;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
 positive: calling procedure with long real variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	VAR argument: FLOAT64;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15733,7 +15733,7 @@ negative: calling procedure with long real variable parameter with set argument
 
 	MODULE Test;
 	VAR argument: SET;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15741,7 +15741,7 @@ negative: calling procedure with long real variable parameter with array argumen
 
 	MODULE Test;
 	VAR argument: ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15749,7 +15749,7 @@ negative: calling procedure with long real variable parameter with record argume
 
 	MODULE Test;
 	VAR argument: RECORD END;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15757,7 +15757,7 @@ negative: calling procedure with long real variable parameter with object argume
 
 	MODULE Test;
 	VAR argument: OBJECT END;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15765,7 +15765,7 @@ negative: calling procedure with long real variable parameter with base object a
 
 	MODULE Test;
 	VAR argument: OBJECT;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15773,7 +15773,7 @@ negative: calling procedure with long real variable parameter with pointer to ar
 
 	MODULE Test;
 	VAR argument: POINTER TO ARRAY 10 OF CHAR;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15781,7 +15781,7 @@ negative: calling procedure with long real variable parameter with pointer to re
 
 	MODULE Test;
 	VAR argument: POINTER TO RECORD END;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15789,7 +15789,7 @@ negative: calling procedure with long real variable parameter with procedure arg
 
 	MODULE Test;
 	VAR argument: PROCEDURE;
-	PROCEDURE Procedure (VAR value: LONGREAL); END Procedure;
+	PROCEDURE Procedure (VAR value: FLOAT64); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
 
@@ -15852,7 +15852,7 @@ negative: calling procedure with set variable parameter with real argument
 negative: calling procedure with set variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: SET); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -15980,7 +15980,7 @@ negative: calling procedure with array variable parameter with real argument
 negative: calling procedure with array variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16116,7 +16116,7 @@ negative: calling procedure with open array variable parameter with real argumen
 negative: calling procedure with open array variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: ARRAY OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16244,7 +16244,7 @@ negative: calling procedure with record variable parameter with real argument
 negative: calling procedure with record variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16391,7 +16391,7 @@ negative: calling procedure with object variable parameter with real argument
 negative: calling procedure with object variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: OBJECT END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16538,7 +16538,7 @@ negative: calling procedure with base object variable parameter with real argume
 negative: calling procedure with base object variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: OBJECT); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16666,7 +16666,7 @@ negative: calling procedure with pointer to array variable parameter with real a
 negative: calling procedure with pointer to array variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: POINTER TO ARRAY 10 OF CHAR); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16794,7 +16794,7 @@ negative: calling procedure with pointer to record variable parameter with real 
 negative: calling procedure with pointer to record variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: POINTER TO RECORD END); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -16941,7 +16941,7 @@ negative: calling procedure with procedure variable parameter with real argument
 negative: calling procedure with procedure variable parameter with long real argument
 
 	MODULE Test;
-	VAR argument: LONGREAL;
+	VAR argument: FLOAT64;
 	PROCEDURE Procedure (VAR value: PROCEDURE); END Procedure;
 	BEGIN Procedure (argument);
 	END Test.
@@ -17793,7 +17793,7 @@ negative: while statement with condition of type real
 negative: while statement with condition of type long real
 
 	MODULE Test;
-	VAR condition: LONGREAL;
+	VAR condition: FLOAT64;
 	BEGIN WHILE condition DO END;
 	END Test.
 
@@ -17956,7 +17956,7 @@ negative: repeat statement with condition of type real
 negative: repeat statement with condition of type long real
 
 	MODULE Test;
-	VAR condition: LONGREAL;
+	VAR condition: FLOAT64;
 	BEGIN REPEAT UNTIL condition;
 	END Test.
 
@@ -18154,7 +18154,7 @@ negative: await statement with condition of type real
 negative: await statement with condition of type long real
 
 	MODULE Test;
-	VAR condition: LONGREAL;
+	VAR condition: FLOAT64;
 	BEGIN {EXCLUSIVE} AWAIT (condition);
 	END Test.
 
@@ -18934,126 +18934,126 @@ negative: procedure to variable real assignment
 negative: constant boolean to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := TRUE;
 	END Test.
 
 negative: constant character to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := 'f';
 	END Test.
 
 positive: constant short integer to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := 10H;
 	END Test.
 
 negative: constant short integer to temporary long real assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGREAL;
+	VAR result: PROCEDURE (): FLOAT64;
 	BEGIN result () := 10H;
 	END Test.
 
 positive: constant integer to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := 1000H;
 	END Test.
 
 negative: constant integer to temporary long real assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGREAL;
+	VAR result: PROCEDURE (): FLOAT64;
 	BEGIN result () := 1000H;
 	END Test.
 
 positive: constant long integer to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := 100000H;
 	END Test.
 
 negative: constant long integer to temporary long real assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGREAL;
+	VAR result: PROCEDURE (): FLOAT64;
 	BEGIN result () := 100000H;
 	END Test.
 
 positive: constant huge integer to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := 10000000000H;
 	END Test.
 
 negative: constant huge integer to temporary long real assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGREAL;
+	VAR result: PROCEDURE (): FLOAT64;
 	BEGIN result () := 10000000000H;
 	END Test.
 
 positive: constant real to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := 5.4;
 	END Test.
 
 negative: constant real to temporary long real assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGREAL;
+	VAR result: PROCEDURE (): FLOAT64;
 	BEGIN result () := 5.4;
 	END Test.
 
 positive: constant long real to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := 5.4D100;
 	END Test.
 
 negative: constant long real to temporary long real assignment
 
 	MODULE Test;
-	VAR result: PROCEDURE (): LONGREAL;
+	VAR result: PROCEDURE (): FLOAT64;
 	BEGIN result () := 5.4D100;
 	END Test.
 
 negative: constant set to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := {5};
 	END Test.
 
 negative: string to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := "string";
 	END Test.
 
 negative: nil pointer to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	BEGIN result := NIL;
 	END Test.
 
 negative: procedure to variable long real assignment
 
 	MODULE Test;
-	VAR result: LONGREAL;
+	VAR result: FLOAT64;
 	PROCEDURE Procedure; END Procedure;
 	BEGIN result := Procedure;
 	END Test.
@@ -19294,7 +19294,7 @@ negative: string to variable array of real assignment
 negative: string to variable array of long real assignment
 
 	MODULE Test;
-	VAR result: ARRAY 10 OF LONGREAL;
+	VAR result: ARRAY 10 OF FLOAT64;
 	BEGIN result := "string";
 	END Test.
 
@@ -19992,7 +19992,7 @@ negative: variable real to variable boolean assignment
 negative: variable long real to variable boolean assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: BOOLEAN;
+	VAR variable: FLOAT64; result: BOOLEAN;
 	BEGIN result := variable;
 	END Test.
 
@@ -20111,7 +20111,7 @@ negative: variable real to variable character assignment
 negative: variable long real to variable character assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: CHAR;
+	VAR variable: FLOAT64; result: CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -20230,7 +20230,7 @@ negative: variable real to variable short integer assignment
 negative: variable long real to variable short integer assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: SIGNED8;
+	VAR variable: FLOAT64; result: SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
@@ -20356,7 +20356,7 @@ negative: variable real to variable integer assignment
 negative: variable long real to variable integer assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: SIGNED16;
+	VAR variable: FLOAT64; result: SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
@@ -20489,7 +20489,7 @@ negative: variable real to variable long integer assignment
 negative: variable long real to variable long integer assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: SIGNED32;
+	VAR variable: FLOAT64; result: SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
@@ -20629,7 +20629,7 @@ negative: variable real to variable huge integer assignment
 negative: variable long real to variable huge integer assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: SIGNED64;
+	VAR variable: FLOAT64; result: SIGNED64;
 	BEGIN result := variable;
 	END Test.
 
@@ -20776,7 +20776,7 @@ negative: variable real to temporary real assignment
 negative: variable long real to variable real assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: FLOAT32;
+	VAR variable: FLOAT64; result: FLOAT32;
 	BEGIN result := variable;
 	END Test.
 
@@ -20839,154 +20839,154 @@ negative: type to variable real assignment
 negative: variable boolean to variable long real assignment
 
 	MODULE Test;
-	VAR variable: BOOLEAN; result: LONGREAL;
+	VAR variable: BOOLEAN; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable character to variable long real assignment
 
 	MODULE Test;
-	VAR variable: CHAR; result: LONGREAL;
+	VAR variable: CHAR; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 positive: variable short integer to variable long real assignment
 
 	MODULE Test;
-	VAR variable: SIGNED8; result: LONGREAL;
+	VAR variable: SIGNED8; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable short integer to temporary long real assignment
 
 	MODULE Test;
-	VAR variable: SIGNED8; result: PROCEDURE (): LONGREAL;
+	VAR variable: SIGNED8; result: PROCEDURE (): FLOAT64;
 	BEGIN result () := variable;
 	END Test.
 
 positive: variable integer to variable long real assignment
 
 	MODULE Test;
-	VAR variable: SIGNED16; result: LONGREAL;
+	VAR variable: SIGNED16; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable integer to temporary long real assignment
 
 	MODULE Test;
-	VAR variable: SIGNED16; result: PROCEDURE (): LONGREAL;
+	VAR variable: SIGNED16; result: PROCEDURE (): FLOAT64;
 	BEGIN result () := variable;
 	END Test.
 
 positive: variable long integer to variable long real assignment
 
 	MODULE Test;
-	VAR variable: SIGNED32; result: LONGREAL;
+	VAR variable: SIGNED32; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long integer to temporary long real assignment
 
 	MODULE Test;
-	VAR variable: SIGNED32; result: PROCEDURE (): LONGREAL;
+	VAR variable: SIGNED32; result: PROCEDURE (): FLOAT64;
 	BEGIN result () := variable;
 	END Test.
 
 positive: variable huge integer to variable long real assignment
 
 	MODULE Test;
-	VAR variable: SIGNED64; result: LONGREAL;
+	VAR variable: SIGNED64; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable huge integer to temporary long real assignment
 
 	MODULE Test;
-	VAR variable: SIGNED64; result: PROCEDURE (): LONGREAL;
+	VAR variable: SIGNED64; result: PROCEDURE (): FLOAT64;
 	BEGIN result () := variable;
 	END Test.
 
 positive: variable real to variable long real assignment
 
 	MODULE Test;
-	VAR variable: FLOAT32; result: LONGREAL;
+	VAR variable: FLOAT32; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable real to temporary long real assignment
 
 	MODULE Test;
-	VAR variable: FLOAT32; result: PROCEDURE (): LONGREAL;
+	VAR variable: FLOAT32; result: PROCEDURE (): FLOAT64;
 	BEGIN result () := variable;
 	END Test.
 
 positive: variable long real to variable long real assignment
 
 	MODULE Test;
-	VAR variable, result: LONGREAL;
+	VAR variable, result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable long real to temporary long real assignment
 
 	MODULE Test;
-	VAR variable: FLOAT32; result: PROCEDURE (): LONGREAL;
+	VAR variable: FLOAT32; result: PROCEDURE (): FLOAT64;
 	BEGIN result () := variable;
 	END Test.
 
 negative: variable set to variable long real assignment
 
 	MODULE Test;
-	VAR variable: SET; result: LONGREAL;
+	VAR variable: SET; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array to variable long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF CHAR; result: LONGREAL;
+	VAR variable: ARRAY 10 OF CHAR; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: record to variable long real assignment
 
 	MODULE Test;
-	VAR variable: RECORD END; result: LONGREAL;
+	VAR variable: RECORD END; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: object to variable long real assignment
 
 	MODULE Test;
-	VAR variable: OBJECT; result: LONGREAL;
+	VAR variable: OBJECT; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: pointer to variable long real assignment
 
 	MODULE Test;
-	VAR variable: POINTER TO RECORD END; result: LONGREAL;
+	VAR variable: POINTER TO RECORD END; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable procedure to variable long real assignment
 
 	MODULE Test;
-	VAR variable: PROCEDURE; result: LONGREAL;
+	VAR variable: PROCEDURE; result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: import to variable long real assignment
 
 	MODULE Test;
-	IMPORT variable := Dummy; VAR result: LONGREAL;
+	IMPORT variable := Dummy; VAR result: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: type to variable long real assignment
 
 	MODULE Test;
-	TYPE Type = LONGREAL; VAR result: Type;
+	TYPE Type = FLOAT64; VAR result: Type;
 	BEGIN result := Type;
 	END Test.
 
@@ -21042,7 +21042,7 @@ negative: variable real to variable set assignment
 negative: variable long real to variable set assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: SET;
+	VAR variable: FLOAT64; result: SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -21161,7 +21161,7 @@ negative: variable real to array assignment
 negative: variable long real to array assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: ARRAY 10 OF CHAR;
+	VAR variable: FLOAT64; result: ARRAY 10 OF CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -21270,7 +21270,7 @@ negative: array of real to array of boolean assignment
 negative: array of long real to array of boolean assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF BOOLEAN;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF BOOLEAN;
 	BEGIN result := variable;
 	END Test.
 
@@ -21429,7 +21429,7 @@ negative: array of real to array of character assignment
 negative: array of long real to array of character assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF CHAR;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF CHAR;
 	BEGIN result := variable;
 	END Test.
 
@@ -21573,7 +21573,7 @@ negative: array of real to array of short integer assignment
 negative: array of long real to array of short integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF SIGNED8;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF SIGNED8;
 	BEGIN result := variable;
 	END Test.
 
@@ -21717,7 +21717,7 @@ negative: array of real to array of integer assignment
 negative: array of long real to array of integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF SIGNED16;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF SIGNED16;
 	BEGIN result := variable;
 	END Test.
 
@@ -21861,7 +21861,7 @@ negative: array of real to array of long integer assignment
 negative: array of long real to array of long integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF SIGNED32;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF SIGNED32;
 	BEGIN result := variable;
 	END Test.
 
@@ -22005,7 +22005,7 @@ negative: array of real to array of huge integer assignment
 negative: array of long real to array of huge integer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF SIGNED64;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF SIGNED64;
 	BEGIN result := variable;
 	END Test.
 
@@ -22149,7 +22149,7 @@ negative: array of real to dereferenced open array of real assignment
 negative: array of long real to array of real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF FLOAT32;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF FLOAT32;
 	BEGIN result := variable;
 	END Test.
 
@@ -22198,85 +22198,85 @@ negative: array of procedure to array of real assignment
 negative: array of boolean to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF BOOLEAN; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF BOOLEAN; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of character to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF CHAR; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF CHAR; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of short integer to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF SIGNED8; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of integer to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF SIGNED16; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long integer to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF SIGNED32; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of huge integer to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SIGNED64; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF SIGNED64; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of real to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF FLOAT32; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF FLOAT32; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 positive: array of long real to array of long real assignment
 
 	MODULE Test;
-	VAR variable, result: ARRAY 10 OF LONGREAL;
+	VAR variable, result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long real to temporary array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: PROCEDURE (): ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF FLOAT64; result: PROCEDURE (): ARRAY 10 OF FLOAT64;
 	BEGIN result () := variable;
 	END Test.
 
 negative: array of long real to longer array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 20 OF LONGREAL;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 20 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long real to shorter array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 5 OF LONGREAL;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 5 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of long real to open array of long real assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR result: ARRAY OF LONGREAL);
-	VAR variable: ARRAY 10 OF LONGREAL;
+	PROCEDURE Procedure (VAR result: ARRAY OF FLOAT64);
+	VAR variable: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Procedure;
 	END Test.
@@ -22284,8 +22284,8 @@ negative: array of long real to open array of long real assignment
 negative: open array of long real to array of long real assignment
 
 	MODULE Test;
-	PROCEDURE Procedure (VAR variable: ARRAY OF LONGREAL);
-	VAR result: ARRAY 10 OF LONGREAL;
+	PROCEDURE Procedure (VAR variable: ARRAY OF FLOAT64);
+	VAR result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Procedure;
 	END Test.
@@ -22293,49 +22293,49 @@ negative: open array of long real to array of long real assignment
 negative: array of long real to dereferenced open array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: POINTER TO ARRAY OF LONGREAL;
+	VAR variable: ARRAY 10 OF FLOAT64; result: POINTER TO ARRAY OF FLOAT64;
 	BEGIN result^ := variable;
 	END Test.
 
 negative: array of set to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF SET; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF SET; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of array to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF ARRAY 10 OF SET; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF ARRAY 10 OF SET; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of record to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF RECORD END; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF RECORD END; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of object to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF OBJECT; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF OBJECT; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of pointer to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF POINTER TO RECORD END; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF POINTER TO RECORD END; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
 negative: array of procedure to array of long real assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF PROCEDURE; result: ARRAY 10 OF LONGREAL;
+	VAR variable: ARRAY 10 OF PROCEDURE; result: ARRAY 10 OF FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
@@ -22391,7 +22391,7 @@ negative: array of real to array of set assignment
 negative: array of long real to array of set assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF SET;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -22528,7 +22528,7 @@ negative: array of real to array of array assignment
 negative: array of long real to array of array assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF ARRAY 10 OF SET;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF ARRAY 10 OF SET;
 	BEGIN result := variable;
 	END Test.
 
@@ -22672,7 +22672,7 @@ negative: array of real to array of record assignment
 negative: array of long real to array of record assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF RECORD END;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -22822,7 +22822,7 @@ negative: array of real to array of object assignment
 negative: array of long real to array of object assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF OBJECT END;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF OBJECT END;
 	BEGIN result := variable;
 	END Test.
 
@@ -22972,7 +22972,7 @@ negative: array of real to array of pointer assignment
 negative: array of long real to array of pointer assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF POINTER TO RECORD END;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF POINTER TO RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23122,7 +23122,7 @@ negative: array of real to array of procedure assignment
 negative: array of long real to array of procedure assignment
 
 	MODULE Test;
-	VAR variable: ARRAY 10 OF LONGREAL; result: ARRAY 10 OF PROCEDURE;
+	VAR variable: ARRAY 10 OF FLOAT64; result: ARRAY 10 OF PROCEDURE;
 	BEGIN result := variable;
 	END Test.
 
@@ -23308,14 +23308,14 @@ negative: variable real to record assignment
 negative: variable long real to record assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: RECORD END;
+	VAR variable: FLOAT64; result: RECORD END;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable set to record assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: RECORD END;
+	VAR variable: FLOAT64; result: RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23486,14 +23486,14 @@ negative: variable real to object assignment
 negative: variable long real to object assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: OBJECT END;
+	VAR variable: FLOAT64; result: OBJECT END;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable set to object assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: OBJECT END;
+	VAR variable: FLOAT64; result: OBJECT END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23636,14 +23636,14 @@ negative: variable real to pointer assignment
 negative: variable long real to pointer assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: POINTER TO RECORD END;
+	VAR variable: FLOAT64; result: POINTER TO RECORD END;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable set to pointer assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: POINTER TO RECORD END;
+	VAR variable: FLOAT64; result: POINTER TO RECORD END;
 	BEGIN result := variable;
 	END Test.
 
@@ -23861,14 +23861,14 @@ negative: variable real to procedure assignment
 negative: variable long real to procedure assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: PROCEDURE;
+	VAR variable: FLOAT64; result: PROCEDURE;
 	BEGIN result := variable;
 	END Test.
 
 negative: variable set to procedure assignment
 
 	MODULE Test;
-	VAR variable: LONGREAL; result: PROCEDURE;
+	VAR variable: FLOAT64; result: PROCEDURE;
 	BEGIN result := variable;
 	END Test.
 
@@ -24248,7 +24248,7 @@ negative: variable long real to import assignment
 
 	MODULE Test;
 	IMPORT result := Dummy;
-	VAR variable: LONGREAL;
+	VAR variable: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
@@ -24256,7 +24256,7 @@ negative: variable set to import assignment
 
 	MODULE Test;
 	IMPORT result := Dummy;
-	VAR variable: LONGREAL;
+	VAR variable: FLOAT64;
 	BEGIN result := variable;
 	END Test.
 
@@ -24366,7 +24366,7 @@ negative: variable real to type assignment
 negative: variable long real to type assignment
 
 	MODULE Test;
-	TYPE result = LONGREAL; VAR variable: result;
+	TYPE result = FLOAT64; VAR variable: result;
 	BEGIN result := variable;
 	END Test.
 
@@ -25557,7 +25557,7 @@ negative: short on variable real
 positive: short on variable long real
 
 	MODULE Test;
-	VAR longreal, result: LONGREAL;
+	VAR longreal, result: FLOAT64;
 	BEGIN result := SHORT (longreal)
 	END Test.
 
@@ -25571,7 +25571,7 @@ positive: long on variable real
 negative: long on variable long real
 
 	MODULE Test;
-	VAR longreal, result: LONGREAL;
+	VAR longreal, result: FLOAT64;
 	BEGIN result := SHORT (LONG (longreal))
 	END Test.
 
@@ -25585,7 +25585,7 @@ positive: entier on variable real
 positive: entier on variable long real
 
 	MODULE Test;
-	VAR longreal, result: LONGREAL;
+	VAR longreal, result: FLOAT64;
 	BEGIN result := ENTIER (longreal)
 	END Test.
 
@@ -29831,14 +29831,14 @@ positive: implicit variable integer to real conversion
 positive: implicit variable integer to long real conversion
 
 	MODULE Test;
-	VAR integer: SIGNED16; longreal, result: LONGREAL;
+	VAR integer: SIGNED16; longreal, result: FLOAT64;
 	BEGIN result := integer / longreal
 	END Test.
 
 positive: implicit variable real to long real conversion
 
 	MODULE Test;
-	VAR real: FLOAT32; longreal, result: LONGREAL;
+	VAR real: FLOAT32; longreal, result: FLOAT64;
 	BEGIN result := longreal * real
 	END Test.
 
@@ -30086,28 +30086,28 @@ positive: explicit variable real to huge integer conversion
 negative: explicit variable long real to short integer conversion
 
 	MODULE Test;
-	VAR longreal: LONGREAL; shortint: SIGNED8;
+	VAR longreal: FLOAT64; shortint: SIGNED8;
 	BEGIN shortint := ENTIER (longreal);
 	END Test.
 
 negative: explicit variable long real to integer conversion
 
 	MODULE Test;
-	VAR longreal: LONGREAL; integer: SIGNED16;
+	VAR longreal: FLOAT64; integer: SIGNED16;
 	BEGIN integer := ENTIER (longreal);
 	END Test.
 
 positive: explicit variable long real to long integer conversion
 
 	MODULE Test;
-	VAR longreal: LONGREAL; longint: SIGNED32;
+	VAR longreal: FLOAT64; longint: SIGNED32;
 	BEGIN longint := ENTIER (longreal);
 	END Test.
 
 positive: explicit variable long real to huge integer conversion
 
 	MODULE Test;
-	VAR longreal: LONGREAL; hugeint: SIGNED64;
+	VAR longreal: FLOAT64; hugeint: SIGNED64;
 	BEGIN hugeint := ENTIER (longreal);
 	END Test.
 
@@ -31265,7 +31265,7 @@ positive: procedure with real as return type returning real
 negative: procedure with real as return type returning long real
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGREAL): FLOAT32; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: FLOAT64): FLOAT32; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with real as return type returning set
@@ -31319,97 +31319,97 @@ negative: procedure with real as return type returning procedure
 negative: procedure with long real as return type returning boolean
 
 	MODULE Test;
-	PROCEDURE Procedure (value: BOOLEAN): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: BOOLEAN): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long real as return type returning character
 
 	MODULE Test;
-	PROCEDURE Procedure (value: CHAR): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: CHAR): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long real as return type returning short integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SIGNED8): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED8): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long real as return type returning integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SIGNED16): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED16): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long real as return type returning long integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SIGNED32): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED32): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long real as return type returning huge integer
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SIGNED64): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SIGNED64): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long real as return type returning real
 
 	MODULE Test;
-	PROCEDURE Procedure (value: FLOAT32): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: FLOAT32): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 positive: procedure with long real as return type returning long real
 
 	MODULE Test;
-	PROCEDURE Procedure (value: LONGREAL): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: FLOAT64): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long real as return type returning set
 
 	MODULE Test;
-	PROCEDURE Procedure (value: SET): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: SET): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long real as return type returning array
 
 	MODULE Test;
-	PROCEDURE Procedure (value: ARRAY 10 OF CHAR): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: ARRAY 10 OF CHAR): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long real as return type returning record
 
 	MODULE Test;
-	PROCEDURE Procedure (value: RECORD END): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: RECORD END): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long real as return type returning object
 
 	MODULE Test;
-	PROCEDURE Procedure (value: OBJECT END): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: OBJECT END): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long real as return type returning base object
 
 	MODULE Test;
-	PROCEDURE Procedure (value: OBJECT): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: OBJECT): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long real as return type returning pointer to array
 
 	MODULE Test;
-	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: POINTER TO ARRAY 10 OF CHAR): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long real as return type returning pointer to record
 
 	MODULE Test;
-	PROCEDURE Procedure (value: POINTER TO RECORD END): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: POINTER TO RECORD END): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with long real as return type returning procedure
 
 	MODULE Test;
-	PROCEDURE Procedure (value: PROCEDURE): LONGREAL; BEGIN RETURN value END Procedure;
+	PROCEDURE Procedure (value: PROCEDURE): FLOAT64; BEGIN RETURN value END Procedure;
 	END Test.
 
 negative: procedure with set as return type returning boolean
@@ -32266,7 +32266,7 @@ negative: assert statement with condition of type real
 negative: assert statement with condition of type long real
 
 	MODULE Test;
-	VAR condition: LONGREAL;
+	VAR condition: FLOAT64;
 	BEGIN ASSERT (condition);
 	END Test.
 
@@ -32414,7 +32414,7 @@ negative: assert statement with number of type real
 negative: assert statement with number of type long real
 
 	MODULE Test;
-	VAR number: LONGREAL;
+	VAR number: FLOAT64;
 	BEGIN ASSERT (TRUE, number);
 	END Test.
 
@@ -32577,7 +32577,7 @@ negative: if statement with condition of type real
 negative: if statement with condition of type long real
 
 	MODULE Test;
-	VAR condition: LONGREAL;
+	VAR condition: FLOAT64;
 	BEGIN IF condition THEN END;
 	END Test.
 
@@ -32737,7 +32737,7 @@ negative: else if statement with condition of type real
 negative: else if statement with condition of type long real
 
 	MODULE Test;
-	VAR condition: LONGREAL;
+	VAR condition: FLOAT64;
 	BEGIN IF TRUE THEN ELSIF condition THEN END;
 	END Test.
 
@@ -32888,7 +32888,7 @@ negative: halt statement with number of type real
 negative: halt statement with number of type long real
 
 	MODULE Test;
-	VAR number: LONGREAL;
+	VAR number: FLOAT64;
 	BEGIN HALT (number);
 	END Test.
 
@@ -33302,7 +33302,7 @@ negative: character case statement with variable real case
 negative: character case statement with variable long real case
 
 	MODULE Test;
-	VAR value: CHAR; case: LONGREAL;
+	VAR value: CHAR; case: FLOAT64;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33507,7 +33507,7 @@ negative: short integer case statement with variable real case
 negative: short integer case statement with variable long real case
 
 	MODULE Test;
-	VAR value: SIGNED8; case: LONGREAL;
+	VAR value: SIGNED8; case: FLOAT64;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33710,7 +33710,7 @@ negative: integer case statement with variable real case
 negative: integer case statement with variable long real case
 
 	MODULE Test;
-	VAR value: SIGNED16; case: LONGREAL;
+	VAR value: SIGNED16; case: FLOAT64;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -33913,7 +33913,7 @@ negative: long integer case statement with variable real case
 negative: long integer case statement with variable long real case
 
 	MODULE Test;
-	VAR value: SIGNED32; case: LONGREAL;
+	VAR value: SIGNED32; case: FLOAT64;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -34116,7 +34116,7 @@ negative: huge integer case statement with variable real case
 negative: huge integer case statement with variable long real case
 
 	MODULE Test;
-	VAR value: SIGNED64; case: LONGREAL;
+	VAR value: SIGNED64; case: FLOAT64;
 	BEGIN CASE value OF case: END
 	END Test.
 
@@ -34659,14 +34659,14 @@ negative: with statement with variable real value type
 negative: with statement with variable long real value
 
 	MODULE Test;
-	VAR value: LONGREAL;
-	BEGIN WITH value : LONGREAL DO END;
+	VAR value: FLOAT64;
+	BEGIN WITH value : FLOAT64 DO END;
 	END Test.
 
 negative: with statement with variable long real value type
 
 	MODULE Test;
-	TYPE Type = LONGREAL;
+	TYPE Type = FLOAT64;
 	VAR value: Type;
 	BEGIN WITH value : Type DO END;
 	END Test.
@@ -38000,7 +38000,7 @@ positive: realtime object containing basic type fields
 	IMPORT SYSTEM;
 	TYPE A = OBJECT {REALTIME}
 		VAR a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: SIGNED32; a4: SIGNED64; a5: FLOAT32;
-			a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
+			a6: FLOAT64; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END A;
 	END Test.
 
@@ -38010,7 +38010,7 @@ positive: realtime pointer to record that contains basic type fields
 	IMPORT SYSTEM;
 	TYPE A = POINTER {REALTIME} TO RECORD
 		a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: SIGNED32; a4: SIGNED64; a5: FLOAT32;
-		a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
+		a6: FLOAT64; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END;
 	END Test.
 
@@ -38020,7 +38020,7 @@ positive: realtime pointer to array where the elements contain basic type fields
 	IMPORT SYSTEM;
 	TYPE A0 = POINTER {REALTIME} TO ARRAY OF RECORD
 		a0: CHAR; a1: SIGNED8; a2: SIGNED16; a3: SIGNED32; a4: SIGNED64; a5: FLOAT32;
-		a6: LONGREAL; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
+		a6: FLOAT64; a7: BOOLEAN; a8: SET; a9: ADDRESS; a10:SIZE; a11: SYSTEM.BYTE;
 	END;
 	END Test.
 
@@ -39245,7 +39245,7 @@ positive: use of SYSTEM.NEW
 positive: expression involving a reordering of floating point stack
 
 	MODULE Test;
-	VAR x,y: LONGREAL;
+	VAR x,y: FLOAT64;
 
 	PROCEDURE Sqrt(x: FLOAT32): FLOAT32;
 	BEGIN END Sqrt;

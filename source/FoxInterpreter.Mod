@@ -184,7 +184,7 @@ TYPE
 			NEW(v, i); item.object := v; value := TRUE
 		END NewInt;
 
-		PROCEDURE NewReal(i: LONGREAL);
+		PROCEDURE NewReal(i: FLOAT64);
 		VAR v: Real;
 		BEGIN
 			NEW(v, i); item.object := v; value := TRUE
@@ -221,7 +221,7 @@ TYPE
 		END NewChar;
 
 		PROCEDURE VisitUnaryExpression*(x: SyntaxTree.UnaryExpression);
-		VAR value: Value; i: SIGNED64; r: LONGREAL; b: BOOLEAN; operator: SIGNED32;
+		VAR value: Value; i: SIGNED64; r: FLOAT64; b: BOOLEAN; operator: SIGNED32;
 		BEGIN
 			operator := x.operator;
 			IF ~GetValue(x.left, value) THEN
@@ -259,7 +259,7 @@ TYPE
 		END VisitUnaryExpression;
 
 		PROCEDURE VisitBinaryExpression*(x: SyntaxTree.BinaryExpression);
-		VAR left, right: Value; operator: SIGNED32; li, ri: SIGNED64; lr, rr: LONGREAL; lb, rb:  BOOLEAN; sl, sr: SET;
+		VAR left, right: Value; operator: SIGNED32; li, ri: SIGNED64; lr, rr: FLOAT64; lb, rb:  BOOLEAN; sl, sr: SET;
 		BEGIN
 			operator := x.operator;
 			IF ~GetValue(x.left, left) OR ~GetValue(x.right, right) THEN RETURN END;

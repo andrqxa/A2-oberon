@@ -1190,7 +1190,7 @@ TYPE
 			NEW(unitModel, PrototypeUnit, NIL, NIL); properties.Add(unitModel)
 		END Init;
 
-		PROCEDURE GetUnit(VAR u: LONGREAL): BOOLEAN;
+		PROCEDURE GetUnit(VAR u: FLOAT64): BOOLEAN;
 		VAR res: WORD; real: Types.Longreal; m: Models.Model;
 		BEGIN
 			IF WMProperties.GetModel(unitModel, m) THEN
@@ -1210,7 +1210,7 @@ TYPE
 		END RecacheProperties;
 
 		PROCEDURE LinkChanged*(sender, data : ANY);
-		VAR string : Types.String256; res : WORD; real: Types.Longreal; unit: LONGREAL; m: Models.Model;
+		VAR string : Types.String256; res : WORD; real: Types.Longreal; unit: FLOAT64; m: Models.Model;
 		BEGIN
 			IF (sender = model) OR (sender = unitModel) THEN
 				res := -1;
@@ -1235,7 +1235,7 @@ TYPE
 		END LinkChanged;
 
 		PROCEDURE UpdateModel;
-		VAR string : Types.String256; res : WORD; str: Strings.String; real: Types.Longreal; u: LONGREAL; m: Models.Model;
+		VAR string : Types.String256; res : WORD; str: Strings.String; real: Types.Longreal; u: FLOAT64; m: Models.Model;
 		BEGIN
 			GetAsString(string.value);
 			IF WMProperties.GetModel(model, m) & ~(m IS Models.String) THEN
@@ -1399,7 +1399,7 @@ TYPE
 		END PropertyChanged;
 
 		PROCEDURE LinkChanged*(sender, data : ANY);
-		VAR string : Types.String256; res : WORD; real: Types.Longreal; unit: LONGREAL; m: Models.Model;
+		VAR string : Types.String256; res : WORD; real: Types.Longreal; unit: FLOAT64; m: Models.Model;
 		BEGIN
 			LinkChanged^(sender, data);
 		END LinkChanged;

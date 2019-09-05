@@ -72,9 +72,9 @@ BEGIN {EXCLUSIVE}
 	context.out.String("done."); context.out.Ln;
 END Bench;
 
-PROCEDURE CyclesToMs(cycles : SIGNED64; mhz : SIGNED32) : LONGREAL;
+PROCEDURE CyclesToMs(cycles : SIGNED64; mhz : SIGNED32) : FLOAT64;
 BEGIN
-	RETURN LONGREAL(cycles) / (1000*mhz);
+	RETURN FLOAT64(cycles) / (1000*mhz);
 END CyclesToMs;
 
 PROCEDURE ShowMs(cycles : SIGNED64; out : Streams.Writer);
@@ -88,7 +88,7 @@ END ShowMs;
 PROCEDURE Show*(context : Commands.Context); (** mhz ~ *)
 VAR
 	nofSamples, min, avg, max : SIGNED32; i : SIZE; sum : SIGNED64;
-	diff, diffSum, standardDeviation : LONGREAL;
+	diff, diffSum, standardDeviation : FLOAT64;
 BEGIN {EXCLUSIVE}
 	context.arg.SkipWhitespace; context.arg.Int(mhz, FALSE);
 	IF (data # NIL) THEN

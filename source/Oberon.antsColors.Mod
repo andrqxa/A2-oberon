@@ -73,7 +73,7 @@ VAR
 	END Recall;
 
 	PROCEDURE LGetCol*( l: tLayer;  x, y: SIGNED16;  VAR index: SIGNED16 ): BOOLEAN;
-	VAR x2d, y2d: LONGREAL;
+	VAR x2d, y2d: FLOAT64;
 	BEGIN
 		vyGraphBase.PointToPoint2d( x, y, x2d, y2d );
 		IF (x2d < 0) OR (y2d < 0) OR (x2d > 16) OR (y2d > 16) THEN RETURN FALSE END;
@@ -328,7 +328,7 @@ VAR
 	END LPath;
 
 	PROCEDURE Path*;
-	VAR l: antsCommands.tScanList;  r1, g1, b1, r2, g2, b2: LONGREAL;  keys: SET;  x, y, dx, dy: SIGNED16;  msg: vyColorPalettes.GetColMsg;
+	VAR l: antsCommands.tScanList;  r1, g1, b1, r2, g2, b2: FLOAT64;  keys: SET;  x, y, dx, dy: SIGNED16;  msg: vyColorPalettes.GetColMsg;
 	BEGIN
 		l := antsCommands.ScanFromPar( "r1=INT g1=INT b1=INT r2=INT g2=INT b2=INT" );
 		IF antsCommands.ExpectRealFromKeyword( l, "r1", r1 ) & antsCommands.ExpectRealFromKeyword( l, "g1", g1 ) &

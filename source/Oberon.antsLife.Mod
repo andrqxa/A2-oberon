@@ -145,7 +145,7 @@ TYPE
 		END  (* tVector*)
 	END Handler;
 
-	PROCEDURE OpenModel*( M: tModel;  name: vyName.tNameArray;  beta, h: LONGREAL );
+	PROCEDURE OpenModel*( M: tModel;  name: vyName.tNameArray;  beta, h: FLOAT64 );
 	BEGIN
 		IF M.handle # NIL THEN M.handle := Handler END;
 		vyName.RegisterNamed( M, name )
@@ -158,7 +158,7 @@ TYPE
 	END Gen;
 
 	PROCEDURE NewModel*;
-	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  beta, h: LONGREAL;
+	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  beta, h: FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) THEN

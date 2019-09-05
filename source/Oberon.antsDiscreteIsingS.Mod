@@ -29,25 +29,25 @@ IMPORT antsObjects, Files, vyBase, Math := MathL IN A2, antsKernel, antsArrays, 
 	vyName, Objects, aM := antsMessages;
 
 TYPE
-	nb = POINTER TO ARRAY OF ARRAY OF ARRAY OF ARRAY OF LONGREAL;
-	pb = POINTER TO ARRAY OF ARRAY OF ARRAY OF ARRAY OF ARRAY OF LONGREAL;
+	nb = POINTER TO ARRAY OF ARRAY OF ARRAY OF ARRAY OF FLOAT64;
+	pb = POINTER TO ARRAY OF ARRAY OF ARRAY OF ARRAY OF ARRAY OF FLOAT64;
 
 
 	(* unused, old idea, realized in antsCaches in more generality
-	tCachedU = POINTER TO ARRAY OF LONGREAL;
+	tCachedU = POINTER TO ARRAY OF FLOAT64;
 	tConstNeighbourCache* = POINTER TO RECORD
-	Z: LONGREAL;
+	Z: FLOAT64;
 	U: tCachedU;
-	E: LONGREAL
+	E: FLOAT64
 	END;
 	*)
 
-	RandomArray = POINTER TO ARRAY OF LONGREAL;
+	RandomArray = POINTER TO ARRAY OF FLOAT64;
 
 	tModel* = POINTER TO tModelDesc;
 	tModelDesc* = RECORD (antsModels.tModelDesc)
-		h-, beta-: LONGREAL;
-		ch, cbeta: LONGREAL;
+		h-, beta-: FLOAT64;
+		ch, cbeta: FLOAT64;
 		Z: nb;
 		U, P, Cdf: pb;
 		card: SIGNED32;
@@ -58,7 +58,7 @@ TYPE
 VAR  (* localCache: tConstNeighbourCache;  *)
 	localModel: tModel;
 
-	PROCEDURE U( m: tModel;  x, v1, v2, v3, v4: SIGNED32 ): LONGREAL;
+	PROCEDURE U( m: tModel;  x, v1, v2, v3, v4: SIGNED32 ): FLOAT64;
 	VAR a: SIGNED32;
 	BEGIN
 		IF m.dist = "L1" THEN a := ABS( x - v1 ) + ABS( x - v2 ) + ABS( x - v3 ) + ABS( x - v4 )
@@ -73,8 +73,8 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 		RETURN Math.exp( m.coolingTemp * (m.ch * x - m.cbeta * a) )
 	END U;
 
-	PROCEDURE Z( m: tModel;  v1, v2, v3, v4: SIGNED32 ): LONGREAL;
-	VAR x: SIGNED32;  z: LONGREAL;
+	PROCEDURE Z( m: tModel;  v1, v2, v3, v4: SIGNED32 ): FLOAT64;
+	VAR x: SIGNED32;  z: FLOAT64;
 	BEGIN
 		z := 0;
 		FOR x := 0 TO m.card - 1 DO z := z + U( m, x, v1, v2, v3, v4 ) END;
@@ -82,8 +82,8 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	END Z;
 
 (*
-PROCEDURE FillCache* (VAR c: tConstNeighbourCache;   beta, h: LONGREAL;   d: SIGNED32;   v1, v2, v3, v4: SIGNED32);
-VAR x: SIGNED32;   r: LONGREAL;
+PROCEDURE FillCache* (VAR c: tConstNeighbourCache;   beta, h: FLOAT64;   d: SIGNED32;   v1, v2, v3, v4: SIGNED32);
+VAR x: SIGNED32;   r: FLOAT64;
 BEGIN
 localModel.beta := beta;   localModel.h := h;   localModel.card := d;
 IF c = NIL THEN NEW(c) END;
@@ -100,22 +100,22 @@ END;
 c.E := c.E / c.Z
 END FillCache;
 
-PROCEDURE CachedU* (c: tConstNeighbourCache;   x: SIGNED32): LONGREAL;
+PROCEDURE CachedU* (c: tConstNeighbourCache;   x: SIGNED32): FLOAT64;
 BEGIN	RETURN c.U[x] END CachedU;
 
-PROCEDURE CachedZ* (c: tConstNeighbourCache): LONGREAL;
+PROCEDURE CachedZ* (c: tConstNeighbourCache): FLOAT64;
 BEGIN	RETURN c.Z END CachedZ;
 
-PROCEDURE CachedP* (c: tConstNeighbourCache;   x: SIGNED32): LONGREAL;
+PROCEDURE CachedP* (c: tConstNeighbourCache;   x: SIGNED32): FLOAT64;
 BEGIN	RETURN c.U[x] / c.Z END CachedP;
 
-PROCEDURE CachedE* (c: tConstNeighbourCache): LONGREAL;
+PROCEDURE CachedE* (c: tConstNeighbourCache): FLOAT64;
 BEGIN	RETURN c.E
 END CachedE;
 *)
 
 	PROCEDURE CalcP( M: tModel );
-	VAR x, v1, v2, v3, v4: SIGNED32;  card: SIGNED32;  p: LONGREAL;  t1, t2: LONGREAL;
+	VAR x, v1, v2, v3, v4: SIGNED32;  card: SIGNED32;  p: FLOAT64;  t1, t2: FLOAT64;
 	BEGIN
 		card := M.card;  DEC( card );
 		FOR v1 := 0 TO card DO
@@ -146,7 +146,7 @@ END CachedE;
 		END
 	END NewDepth;
 
-	PROCEDURE Open*( M: tModel;  beta, h: LONGREAL );
+	PROCEDURE Open*( M: tModel;  beta, h: FLOAT64 );
 	BEGIN
 		M.h := h;  M.beta := beta;  M.card := 0
 	END Open;
@@ -172,8 +172,8 @@ END CachedE;
 	END CheckDepth;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR x, y, w, h: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  p: RandomArray;  xv: SIGNED16;  v1, v2, v3, v4: SIGNED32;  cdf: LONGREAL;
-		AO: antsArrayObjects.tINTEGERObject;  t1, t2, t3, t4: SIGNED32;  ran: LONGREAL;  d: SIGNED16;
+	VAR x, y, w, h: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  p: RandomArray;  xv: SIGNED16;  v1, v2, v3, v4: SIGNED32;  cdf: FLOAT64;
+		AO: antsArrayObjects.tINTEGERObject;  t1, t2, t3, t4: SIGNED32;  ran: FLOAT64;  d: SIGNED16;
 
 		PROCEDURE DistriFromLocalChar( VAR x, y: SIGNED32 );
 		BEGIN
@@ -273,7 +273,7 @@ END CachedE;
 		END  (* tVector*)
 	END Handler;
 
-	PROCEDURE OpenModel*( M: tModel;  name: vyName.tNameArray;  beta, h: LONGREAL );
+	PROCEDURE OpenModel*( M: tModel;  name: vyName.tNameArray;  beta, h: FLOAT64 );
 	BEGIN
 		Open( M, beta, h );  vyName.RegisterNamed( M, name )
 	END OpenModel;
@@ -285,7 +285,7 @@ END CachedE;
 	END Gen;
 
 	PROCEDURE NewModel*;
-	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  beta, h: LONGREAL;
+	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  beta, h: FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME beta=FLOAT32 h=FLOAT32" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectRealFromKeyword( l, "beta", beta ) &

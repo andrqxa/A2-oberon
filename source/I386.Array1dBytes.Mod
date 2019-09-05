@@ -434,7 +434,7 @@ Array1dBytes.Test ~
 		adr := ADDRESSOF( a );
 	END Test1;
 
-	PROCEDURE Test2( a: LONGREAL );
+	PROCEDURE Test2( a: FLOAT64 );
 	VAR adr: SIGNED32;
 	BEGIN
 		adr := ADDRESSOF( a );
@@ -490,7 +490,7 @@ TYPE
 	END Test4;
 
 	PROCEDURE CallTest*;
-	VAR a: QWord;  b: LONGREAL;  c: QRec;  time, i: SIGNED32;
+	VAR a: QWord;  b: FLOAT64;  c: QRec;  time, i: SIGNED32;
 	BEGIN
 		time := Oberon.Time();
 		FOR i := 0 TO 10000000 DO Test1( a );  END;
@@ -519,8 +519,8 @@ TYPE
 	END CallFIllQ;
 
 	PROCEDURE Test*;
-	VAR a, b, c: Bytes;  len, i, time, low, high, overlap: SIGNED32;  word: Word;  longreal: LONGREAL;
-		longreals: POINTER TO ARRAY OF LONGREAL;
+	VAR a, b, c: Bytes;  len, i, time, low, high, overlap: SIGNED32;  word: Word;  longreal: FLOAT64;
+		longreals: POINTER TO ARRAY OF FLOAT64;
 
 		PROCEDURE TMove;
 		CONST maxlen = 1000000;  maxtries = 100000;  minlen = 100;
@@ -556,7 +556,7 @@ TYPE
 			END;
 		END TMove;
 
-		PROCEDURE FillArray( VAR a: ARRAY OF LONGREAL;  val: LONGREAL;  len: SIGNED32 );
+		PROCEDURE FillArray( VAR a: ARRAY OF FLOAT64;  val: FLOAT64;  len: SIGNED32 );
 		BEGIN
 			WHILE (len > 0) DO DEC( len );  a[len] := val;  END;
 		END FillArray;
@@ -564,9 +564,9 @@ TYPE
 		PROCEDURE TFill;
 		CONST maxtries = 1000;  maxlen = 100000;
 		VAR ints: POINTER TO ARRAY OF SIGNED16;
-			longreals: POINTER TO ARRAY OF LONGREAL;
+			longreals: POINTER TO ARRAY OF FLOAT64;
 			chars: POINTER TO ARRAY OF CHAR;
-			int: SIGNED16;  r: LONGREAL;
+			int: SIGNED16;  r: FLOAT64;
 		BEGIN
 			(*
 			NEW( longreals, 256 );  longreal := 1.23456789E-20;

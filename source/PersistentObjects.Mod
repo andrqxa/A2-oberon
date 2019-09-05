@@ -73,7 +73,7 @@ TYPE
 		object*: Object;
 		char*: CHAR;
 		integer*: SIGNED64;
-		float*: LONGREAL;
+		float*: FLOAT64;
 		boolean*: BOOLEAN;
 		translation*: Translation;
 		range*: RANGE;
@@ -137,7 +137,7 @@ TYPE
 		END SetAsString;
 
 		PROCEDURE Equals*(CONST s: ARRAY OF CHAR): BOOLEAN;
-		VAR int: SIGNED32; flt: LONGREAL; st: SET; split: Strings.StringArray; first, last, step: SIGNED32;
+		VAR int: SIGNED32; flt: FLOAT64; st: SET; split: Strings.StringArray; first, last, step: SIGNED32;
 		BEGIN
 			CASE class OF
 				Class.String: RETURN (string # NIL) & (string^ = s)
@@ -218,12 +218,12 @@ TYPE
 			SELF.class := Class.Range; SELF.range := range; success := TRUE; persistent := TRUE;
 		END SetRange;
 
-		PROCEDURE GetFloat*(VAR float: LONGREAL);
+		PROCEDURE GetFloat*(VAR float: FLOAT64);
 		BEGIN
 			IF SELF.class = Class.Float THEN float := SELF.float; success := TRUE ELSE HALT(200) END;
 		END GetFloat;
 
-		PROCEDURE SetFloat*(float: LONGREAL);
+		PROCEDURE SetFloat*(float: FLOAT64);
 		BEGIN
 			SELF.class := Class.Float; SELF.float := float;success := TRUE; persistent := TRUE;
 		END SetFloat;
@@ -624,7 +624,7 @@ TYPE
 			IF NameAttribute(name, s) THEN Strings.StrToInt(s, v); value := v; RETURN TRUE ELSE RETURN FALSE END;
 		END IntegerAttribute;
 
-		PROCEDURE FloatAttribute*(CONST name: ARRAY OF CHAR; VAR value: LONGREAL): BOOLEAN;
+		PROCEDURE FloatAttribute*(CONST name: ARRAY OF CHAR; VAR value: FLOAT64): BOOLEAN;
 		VAR str: ARRAY 64 OF CHAR;
 		BEGIN
 			IF NameAttribute(name, str) THEN
@@ -712,7 +712,7 @@ TYPE
 			NameAttribute(name, str);
 		END IntegerAttribute;
 
-		PROCEDURE FloatAttribute*(CONST name: ARRAY OF CHAR; value: LONGREAL);
+		PROCEDURE FloatAttribute*(CONST name: ARRAY OF CHAR; value: FLOAT64);
 		VAR str: ARRAY 64 OF CHAR; sw: Streams.StringWriter;
 		BEGIN
 			NEW(sw, 32); sw.Float(value, 31); sw.Update;

@@ -14,7 +14,7 @@ MODULE Simulator IN Oberon; (*JG 10.10.93*)
   END Random;
 
   PROCEDURE Start*;
-    VAR a, b, r, x: LONGREAL; t, T: SIGNED32; limited: BOOLEAN;
+    VAR a, b, r, x: FLOAT64; t, T: SIGNED32; limited: BOOLEAN;
       N: Diagrams.UpdateMsg;
   BEGIN
     Attributes.GetBool(Gadgets.FindObj(Gadgets.context, "Loss"), "Value", limited);

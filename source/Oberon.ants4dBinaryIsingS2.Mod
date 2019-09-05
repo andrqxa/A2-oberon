@@ -29,12 +29,12 @@ IMPORT antsObjects, Objects, Files, ants4dArrayObjects, Math := MathL IN A2, ant
 	Gadgets, antsCaches, Links, antsArrays, aM := antsMessages;
 
 TYPE
-	RandomArray = POINTER TO ARRAY OF LONGREAL;
+	RandomArray = POINTER TO ARRAY OF FLOAT64;
 
 	tModel* = POINTER TO tModelDesc;
 	tModelDesc* = RECORD (antsModels.tModelDesc);
-	(* h-, beta-,penalty-: LONGREAL; *)
-		ccool: LONGREAL;
+	(* h-, beta-,penalty-: FLOAT64; *)
+		ccool: FLOAT64;
 		ran: RandomArray
 	END;
 
@@ -59,8 +59,8 @@ TYPE
 		Open( s )
 	END LoadM;
 
-	PROCEDURE U( m: tModel;  a: ARRAY OF SIGNED16 ): LONGREAL;
-	VAR theta: LONGREAL;  sum: LONGREAL;
+	PROCEDURE U( m: tModel;  a: ARRAY OF SIGNED16 ): FLOAT64;
+	VAR theta: FLOAT64;  sum: FLOAT64;
 	BEGIN
 		theta := 0;
 		IF m.par[2] > 0 THEN
@@ -76,7 +76,7 @@ TYPE
 
 	PROCEDURE Cache( m: tModel );
 	VAR cv: ARRAY 10 OF SIGNED16;
-		c: antsCaches.FullCache;  offset: SIGNED32;  s: LONGREAL;  i: SIGNED16;
+		c: antsCaches.FullCache;  offset: SIGNED32;  s: FLOAT64;  i: SIGNED16;
 	BEGIN
 		m.MCache := antsCaches.Cube( 10, 2, m.maxCacheSize );  m.ccool := m.coolingTemp;  c := m.MCache;  offset := -1;
 		WHILE (c.NextPoint( offset, cv, 1 )) DO
@@ -93,7 +93,7 @@ TYPE
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
 	VAR x, y, w, h, maxx, maxy: SIGNED32;  A, AOrig: ants4dArrayObjects.tArray;  model: tModel;  AO: ants4dArrayObjects.tObject;
-		Random: RandomArray;  ran: LONGREAL;  cpos: SIGNED32;  u: LONGREAL;  l, maxl, ll, k, maxt, tt: SIGNED32;  orig: Objects.Object;
+		Random: RandomArray;  ran: FLOAT64;  cpos: SIGNED32;  u: FLOAT64;  l, maxl, ll, k, maxt, tt: SIGNED32;  orig: Objects.Object;
 		a: ARRAY 10 OF SIGNED16;
 
 	BEGIN
@@ -180,7 +180,7 @@ TYPE
 		END;   (* tVector*)
 	END Handler;
 
-	PROCEDURE OpenModel*( M: tModel;  name: vyName.tNameArray;  beta, h, penalty: LONGREAL );
+	PROCEDURE OpenModel*( M: tModel;  name: vyName.tNameArray;  beta, h, penalty: FLOAT64 );
 	BEGIN
 		M.par[0] := h;  M.par[1] := beta;  M.par[2] := penalty;  Open( M );
 		IF M.handle # NIL THEN M.handle := Handler END;
@@ -196,7 +196,7 @@ TYPE
 	END Gen;
 
 	PROCEDURE NewModel*;
-	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  beta, h, pen: LONGREAL;
+	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;  beta, h, pen: FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME beta=FLOAT32 h=FLOAT32 penalty=FLOAT32" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectRealFromKeyword( l, "beta", beta ) &

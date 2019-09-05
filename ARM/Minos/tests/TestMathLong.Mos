@@ -32,7 +32,7 @@ MODULE TestMathLong;
 			single: FLOAT32;
 			boolean: BOOLEAN;
 			int: SIGNED32;
-			double: LONGREAL;
+			double: FLOAT64;
 		END;
 	
 	VAR
@@ -41,7 +41,7 @@ MODULE TestMathLong;
 		cmds: Command;
 		singlepar: ARRAY 2 OF FLOAT32;
 		intpar: SIGNED32;
-		doublepar: ARRAY 2 OF LONGREAL;
+		doublepar: ARRAY 2 OF FLOAT64;
 		trueres: ResultDesc;
 		calcres: ResultDesc;
 
@@ -116,7 +116,7 @@ MODULE TestMathLong;
 	END CompareRelative31eps;
 	
 	PROCEDURE CompareRelative1epsLR(): BOOLEAN;
-		VAR x0, y0: LONGREAL;
+		VAR x0, y0: FLOAT64;
 	BEGIN
 		x0 := calcres.double;
 		y0 := trueres.double;
@@ -147,7 +147,7 @@ MODULE TestMathLong;
 		Log.S(" ("); Log.R(trueres.single); Log.SL(")");
 	END ShowIR;
 	
-	PROCEDURE ShowLR(a: LONGREAL);
+	PROCEDURE ShowLR(a: FLOAT64);
 		VAR x: FPE64.Float64;
 	BEGIN
 		x := SYSTEM.VAL(FPE64.Float64, a);

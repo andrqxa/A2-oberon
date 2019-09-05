@@ -102,7 +102,7 @@ TYPE
 		CONST pi=3.1516; headscale= 0.25;
 		VAR  alpha: FLOAT32;
 			dx,dy: SIZE;
-			size:SIGNED32; head: LONGREAL;
+			size:SIGNED32; head: FLOAT64;
 		BEGIN
 			DrawBackground^(canvas);
 			IF (colorI # 0) THEN

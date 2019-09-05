@@ -2622,7 +2622,7 @@ END SSE2Q0BGRA8888BGR565;
 
 PROCEDURE Scale*(src : Image; sr : Rectangle; dst : Image; dr : Rectangle; clip : Rectangle; copyMode, scaleMode : SIGNED32);
 VAR dw, dh, sw, sh : SIZE;
-	fw, fh : LONGREAL; sx, sy : SIZE;
+	fw, fh : FLOAT64; sx, sy : SIZE;
 	scaler : ScalerProc; xscaler : XScalerProc;
 	mode : Raster.Mode;
 	SSE2enabled : BOOLEAN;

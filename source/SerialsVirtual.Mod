@@ -276,7 +276,7 @@ TYPE
 
 VAR
 	active : ARRAY Serials.MaxPorts+1 OF BOOLEAN;
-	errorRate: LONGREAL;
+	errorRate: FLOAT64;
 	random: Random.Generator;
 
 PROCEDURE ShowModule;

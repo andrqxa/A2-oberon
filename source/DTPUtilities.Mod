@@ -828,7 +828,7 @@ TYPE
 
 		PROCEDURE UpdateValueHandler(sender, data: ANY);
 		VAR tempString : ARRAY 64 OF CHAR;
-			tempLReal : LONGREAL;
+			tempLReal : FLOAT64;
 			tempInt : SIGNED32; res: WORD;
 			tempCharStyle: DTPData.CharacterStyleObject;
 			tempFont: WMGraphics.Font;
@@ -1069,7 +1069,7 @@ TYPE
 
 		PROCEDURE ImportParagraphStyles(filename: ARRAY OF CHAR);
 		VAR tempString : ARRAY 256 OF CHAR;
-			tempReal : LONGREAL;
+			tempReal : FLOAT64;
 			reader : Files.Reader;
 			parser : XMLParser.Parser;
 			scanner : XMLScanner.Scanner;
@@ -1127,7 +1127,7 @@ TYPE
 
 		PROCEDURE ApplyPHandler(sender, data: ANY);
 		VAR tempString : ARRAY 256 OF CHAR;
-			tempLReal: LONGREAL;
+			tempLReal: FLOAT64;
 			tempCharStyle : DTPData.CharacterStyleObject;
 		BEGIN
 			(* retrieve tempvalues first.. *)
@@ -1270,7 +1270,7 @@ TYPE
 
 		PROCEDURE ImportCharacterStyles(filename: ARRAY OF CHAR);
 		VAR tempString : ARRAY 256 OF CHAR;
-			tempReal: LONGREAL;
+			tempReal: FLOAT64;
 			tempInt: SIGNED32; res: WORD;
 			reader : Files.Reader;
 			parser : XMLParser.Parser;
@@ -1337,7 +1337,7 @@ TYPE
 
 		PROCEDURE ApplyCHandler(sender, data: ANY);
 		VAR tempString : ARRAY 256 OF CHAR;
-			tempLReal: LONGREAL;
+			tempLReal: FLOAT64;
 			tempInt: SIGNED32; res: WORD;
 			tempFont : WMGraphics.Font;
 		BEGIN

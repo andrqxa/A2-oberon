@@ -389,7 +389,7 @@ BEGIN
 END WritePart;
 
 PROCEDURE WriteTable(VAR w: Texts.Writer; d: Disks.Device; table: Disks.PartitionTable; verbose: BOOLEAN; VAR dosnum: SIGNED32);
-VAR j: SIGNED32; r: LONGREAL;
+VAR j: SIGNED32; r: FLOAT64;
 BEGIN
 	FOR j := 0 TO LEN(table)(SIGNED32)-1 DO
 		r := (table[j].size * 1.0D0 * d.blockSize) / (1024*1024);	(* M *)

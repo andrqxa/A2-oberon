@@ -70,7 +70,7 @@ VAR
 		RETURN v
 	END RanV;
 
-	PROCEDURE Ran*( ): LONGREAL;
+	PROCEDURE Ran*( ): FLOAT64;
 	BEGIN
 		RETURN vyRandom.Uniform()
 	END Ran;

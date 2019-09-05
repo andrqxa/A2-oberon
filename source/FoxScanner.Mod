@@ -184,7 +184,7 @@ TYPE
 		numberType*: SubType;  (* Integer, HugeInteger, Real or Longreal *)
 		integer*: SIGNED64;
 		character*: CHAR;
-		real*: LONGREAL;
+		real*: FLOAT64;
 	END;
 
 	StringMaker* = OBJECT (* taken from TF's scanner *)
@@ -596,14 +596,14 @@ TYPE
 		PROCEDURE GetNumber(VAR token: Token): Symbol;
 		VAR i, m, n, d, e, si: SIGNED32;
 			dig: ARRAY 24 OF CHAR;
-			f: LONGREAL;  expCh: CHAR;  neg, long: BOOLEAN;
+			f: FLOAT64;  expCh: CHAR;  neg, long: BOOLEAN;
 			result: Symbol;
 			hugeint, tenh, number, nextInt: SIGNED64;
 			digits: SIGNED32;
 
 			(** 10^e **)
-			PROCEDURE Ten( e: SIGNED32 ): LONGREAL;
-			VAR x, p: LONGREAL;
+			PROCEDURE Ten( e: SIGNED32 ): FLOAT64;
+			VAR x, p: FLOAT64;
 			BEGIN
 				x := 1;  p := 10;
 				WHILE e > 0 DO

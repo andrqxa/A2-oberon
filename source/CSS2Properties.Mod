@@ -142,7 +142,7 @@ VAR
 	nResizeCursor*, seResizeCursor*, swResizeCursor*, sResizeCursor*, wResizeCursor*, textCursor*, waitCursor*,
 	helpCursor* : WMWindowManager.PointerInfo;
 	defaultFont*, captionFont*, iconFont*, menuFont*, messageBoxFont*, smallCaptionFont*, statusBarFont*: GfxFonts.Font;
-	thinBorder*, mediumBorder*, thickBorder*: LONGREAL;
+	thinBorder*, mediumBorder*, thickBorder*: FLOAT64;
 
 TYPE
 	String = CSS2.String;
@@ -157,7 +157,7 @@ TYPE
 	TRBLIdent* = RECORD
 		top*, right*, bottom*, left*: Ident
 	END;
-	Dim* = RECORD (Value) computed*: LONGREAL END;
+	Dim* = RECORD (Value) computed*: FLOAT64 END;
 	OrientDim* = RECORD
 		horizontal*, vertical*: Dim
 	END;
@@ -269,9 +269,9 @@ TYPE
 		VAR
 			dimensionChanged-: BOOLEAN;
 			containingBlock: RECORD
-				width, height: LONGREAL
+				width, height: FLOAT64
 			END;
-			ppi*: LONGREAL;
+			ppi*: FLOAT64;
 			backgroundAttachment*: Bool;	(* Scroll = TRUE, Fixed = FALSE *)
 			backgroundColor*: Color;
 			backgroundImage*: Img;
@@ -316,7 +316,7 @@ TYPE
 			textShadow*: RECORD (Value) END;
 			textTransform*: Ident;
 			unicodeBidi*: Ident;
-			verticalAlign*: RECORD (Value) computedLength*: LONGREAL; computed*: SIGNED8 END;
+			verticalAlign*: RECORD (Value) computedLength*: FLOAT64; computed*: SIGNED8 END;
 			visibility*: Ident;
 			whiteSpace*: Ident;
 			zIndex*: RECORD (Value) computed*: SIGNED32 END;	(* Auto = -1 *)
@@ -1646,7 +1646,7 @@ TYPE
 				ComputeDim(width, parent.width, ppi, containingBlock.width, font.computed);
 				ComputeWidthsAndMargins();
 				IF (maxWidth.specified = NIL) OR maxWidth.specified.IsIdent(None) THEN
-					maxWidth.computed := MAX(LONGREAL)
+					maxWidth.computed := MAX(FLOAT64)
 				ELSE
 					ComputeDim(maxWidth, parent.maxWidth, ppi, containingBlock.width, font.computed)
 				END;
@@ -1692,7 +1692,7 @@ TYPE
 
 		PROCEDURE ComputeWidthsAndMargins;	(* 10.3 *)
 		VAR floating: BOOLEAN (* floating = TRUE, normal flow = FALSE *);
-			remainingWidth: LONGREAL;
+			remainingWidth: FLOAT64;
 		BEGIN
 			IF borderStyle.left.computed = None THEN borderWidth.left.computed := 0.0 END;
 			IF borderStyle.right.computed = None THEN borderWidth.right.computed := 0.0 END;
@@ -1778,7 +1778,7 @@ TYPE
 		END ComputeWidthsAndMargins;
 
 		PROCEDURE ComputeHeightsAndMargins;	(* 10.6 *)
-		VAR remainingHeight: LONGREAL;
+		VAR remainingHeight: FLOAT64;
 		BEGIN
 				IF borderStyle.top.computed = None THEN borderWidth.top.computed := 0.0 END;
 				IF borderStyle.bottom.computed = None THEN borderWidth.bottom.computed := 0.0 END;
@@ -2002,8 +2002,8 @@ VAR m : WMWindowManager.WindowManager;
 	END SetIdentOrInheritCollection;
 
 	(* ppi: pixel per inch *)
-	PROCEDURE GetPixels(term: CSS2.Term; ppi: LONGREAL; font: GfxFonts.Font): LONGREAL;
-	VAR fact, pixels: LONGREAL; x, y, dx, dy: FLOAT32; map: Raster.Image;
+	PROCEDURE GetPixels(term: CSS2.Term; ppi: FLOAT64; font: GfxFonts.Font): FLOAT64;
+	VAR fact, pixels: FLOAT64; x, y, dx, dy: FLOAT32; map: Raster.Image;
 	BEGIN
 		IF (term # NIL) & term.IsLength() THEN
 			CASE term.GetUnit() OF
@@ -2028,7 +2028,7 @@ VAR m : WMWindowManager.WindowManager;
 		RETURN pixels
 	END GetPixels;
 
-	PROCEDURE ChangeToPixel(pixelVal: LONGREAL): CSS2.Term;
+	PROCEDURE ChangeToPixel(pixelVal: FLOAT64): CSS2.Term;
 	VAR term: CSS2.Term;
 	BEGIN
 		NEW(term); term.SetType(CSS2.RealDimension); term.SetRealVal(pixelVal); term.SetUnit(CSS2.px); RETURN term
@@ -2266,7 +2266,7 @@ VAR m : WMWindowManager.WindowManager;
 		END
 	END ComputeImg;
 
-	PROCEDURE ComputeDim(VAR property: Dim; parentProperty: Dim; ppi, referenceDim: LONGREAL; font: GfxFonts.Font);
+	PROCEDURE ComputeDim(VAR property: Dim; parentProperty: Dim; ppi, referenceDim: FLOAT64; font: GfxFonts.Font);
 	BEGIN
 		IF (property.specified # NIL) THEN
 			IF property.specified.IsIdent(Inherit) THEN

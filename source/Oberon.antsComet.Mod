@@ -29,7 +29,7 @@ IMPORT antsObjects, Files, antsKernel, antsArrayObjects, antsModels, antsCommand
 	vyRandom, vyBase, vyLongrealVec, Gadgets, aM := antsMessages;
 
 TYPE
-	LRA = POINTER TO ARRAY OF LONGREAL;
+	LRA = POINTER TO ARRAY OF FLOAT64;
 
 	tModel* = POINTER TO tModelDesc;
 	tModelDesc* = RECORD (antsModels.tModelDesc)
@@ -69,10 +69,10 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	END Range;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR w, h: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  i: SIGNED32;  x, y: LONGREAL;
-		xi, yi: SIGNED16;  xa, ya, mass: LRA;  dr: LONGREAL;  K1, K: LONGREAL;  nuM, variance: LONGREAL;  vv: SIGNED16;
+	VAR w, h: SIGNED32;  A: antsArrayObjects.tINTEGERArray;  model: tModel;  AO: antsArrayObjects.tINTEGERObject;  i: SIGNED32;  x, y: FLOAT64;
+		xi, yi: SIGNED16;  xa, ya, mass: LRA;  dr: FLOAT64;  K1, K: FLOAT64;  nuM, variance: FLOAT64;  vv: SIGNED16;
 
-		PROCEDURE drift( mass: LONGREAL ): LONGREAL;
+		PROCEDURE drift( mass: FLOAT64 ): FLOAT64;
 		BEGIN
 
 			RETURN 1 / (K1 + mass * nuM / K)
@@ -101,10 +101,10 @@ VAR  (* localCache: tConstNeighbourCache;  *)
 	END OneSweep;
 
 	PROCEDURE Uniform( s: antsKernel.Kernel );
-	VAR i: SIGNED32;  model: tModel;  A: antsArrayObjects.tINTEGERObject;  gen: vyRanBase.tRandom;  xi, yi: SIGNED16;  x, y: LONGREAL;
-		minmass, maxmass, meanmass: LONGREAL;  vv: SIGNED16;
+	VAR i: SIGNED32;  model: tModel;  A: antsArrayObjects.tINTEGERObject;  gen: vyRanBase.tRandom;  xi, yi: SIGNED16;  x, y: FLOAT64;
+		minmass, maxmass, meanmass: FLOAT64;  vv: SIGNED16;
 	BEGIN
-				minmass := MAX( LONGREAL );  maxmass := MIN( LONGREAL );  meanmass := 0;  gen := vyRanBase.RandomGenerator;  model := s.par( tModel );
+				minmass := MAX( FLOAT64 );  maxmass := MIN( FLOAT64 );  meanmass := 0;  gen := vyRanBase.RandomGenerator;  model := s.par( tModel );
 		A := s.A( antsArrayObjects.tINTEGERObject );  antsArrayObjects.FillIntArray( 0, A.A, 0, 0, A.w, A.h );
 		IF model.vertmassv.nrData # A.w THEN vyLongrealVec.SetLen( model.vertmassv, A.w ) END;
 		vyLongrealVec.Fill( model.vertmassv, 0, 0, A.w );

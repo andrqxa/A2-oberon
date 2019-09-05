@@ -36,7 +36,7 @@ TYPE
 		error*: BOOLEAN;
 		errormsg*: ARRAY 256 OF CHAR;
 		pos*: SIGNED32;
-		temp*: LONGREAL
+		temp*: FLOAT64
 	END;
 
 	InitMsg* = RECORD (Msg) END;

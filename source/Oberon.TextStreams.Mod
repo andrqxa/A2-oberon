@@ -141,11 +141,11 @@ MODULE TextStreams IN Oberon;	(** portable *)
 		END
 	END WriteLn;
 
-	PROCEDURE WriteLongReal*(S: Streams.Stream; x: LONGREAL; n: SIGNED32);
+	PROCEDURE WriteLongReal*(S: Streams.Stream; x: FLOAT64; n: SIGNED32);
 	(* BM 1993.4.22. Do not simplify rounding! *)
 		VAR
 			e, h, l, i: SIGNED32;
-			z: LONGREAL;
+			z: FLOAT64;
 			d: ARRAY 16 OF CHAR;
 	BEGIN
 		e := Reals.ExpoL(x);
@@ -182,11 +182,11 @@ MODULE TextStreams IN Oberon;	(** portable *)
 		END
 	END WriteLongReal;
 
-	PROCEDURE WriteLongRealFix*(S: Streams.Stream; x: LONGREAL; n, f, D: SIGNED32);
+	PROCEDURE WriteLongRealFix*(S: Streams.Stream; x: FLOAT64; n, f, D: SIGNED32);
 	(* BM 1993.4.22. Do not simplify rounding! / JG formatting adjusted *)
 		VAR
 			e, h, l, i: SIGNED32;
-			r, z: LONGREAL;
+			r, z: FLOAT64;
 			d: ARRAY 16 OF CHAR;
 			s: CHAR;
 	BEGIN
@@ -244,7 +244,7 @@ MODULE TextStreams IN Oberon;	(** portable *)
 		END
 	END WriteLongRealFix;
 
-	PROCEDURE WriteLongRealHex*(S: Streams.Stream; x: LONGREAL);
+	PROCEDURE WriteLongRealHex*(S: Streams.Stream; x: FLOAT64);
 		VAR h, l: SIGNED32; (* BM 1991.12.25 *)
 	BEGIN
 		Reals.IntL(x, h, l); WriteHex(S, h); WriteHex(S, l)
@@ -254,7 +254,7 @@ MODULE TextStreams IN Oberon;	(** portable *)
 	(* BM 1993.4.22. Do not simplify rounding! *)
 		VAR
 			e, h, i: SIGNED32;
-			y: LONGREAL;
+			y: FLOAT64;
 			z: FLOAT32;
 			d: ARRAY 8 OF CHAR;
 	BEGIN
@@ -297,7 +297,7 @@ MODULE TextStreams IN Oberon;	(** portable *)
 
 	PROCEDURE WriteRealFix*(S: Streams.Stream; x: FLOAT32; n, f, E: SIGNED32);
 	(* BM 1993.4.22. Do not simplify rounding ! / JG formatting adjusted *)
-		VAR e, h, i: SIGNED32; r, y: LONGREAL; z: FLOAT32; s: CHAR; d: ARRAY 8 OF CHAR;
+		VAR e, h, i: SIGNED32; r, y: FLOAT64; z: FLOAT32; s: CHAR; d: ARRAY 8 OF CHAR;
 	BEGIN
 		e := Reals.Expo(x);
 		IF (e = 255) OR (ABS(E) > 38) THEN

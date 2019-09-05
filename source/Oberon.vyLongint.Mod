@@ -32,12 +32,12 @@ CONST idversion* = ' v0r0a2';
 	(* strategies: pre-check array bounds *)
 	(*? limit counts at 0 or 1 ? 0 may need exception anyhow, so 1 is ok *)
 	(* Assertion models: single array
-	(len:SIGNED32; VAR x: ARRAY OF LONGREAL; start: SIGNED32; .....)
+	(len:SIGNED32; VAR x: ARRAY OF FLOAT64; start: SIGNED32; .....)
 	ASSERT(start>=0,100);ASSERT(len>=0,101);
 	ASSERT(start<=LEN(x)-len,102);
 
 	single array with step size
-	(len:SIGNED32; VAR x: ARRAY OF LONGREAL; start, step: SIGNED32; .....)
+	(len:SIGNED32; VAR x: ARRAY OF FLOAT64; start, step: SIGNED32; .....)
 	ASSERT(start>=0,100);ASSERT(len>=0,101);
 	ASSERT(start+len<=LEN(x),102);	ASSERT(step>0,103);
 
@@ -425,10 +425,10 @@ BEGIN
 END Order;
 
 PROCEDURE Summary* (len: SIGNED32;  VAR x: ARRAY OF SIGNED32;
-start: SIGNED32;  VAR min, max: SIGNED32;  VAR mean, ssq: LONGREAL);  (** vs 0.1d0 gs *)
+start: SIGNED32;  VAR min, max: SIGNED32;  VAR mean, ssq: FLOAT64);  (** vs 0.1d0 gs *)
 	(* One pass summary *)
 	(*= The array x isn't changed *)
-	VAR i, top: SIGNED32;  Xdiff: LONGREAL;  xx: SIGNED32;
+	VAR i, top: SIGNED32;  Xdiff: FLOAT64;  xx: SIGNED32;
 BEGIN
 	min := MAX(SIGNED32);  max := MIN(SIGNED32);  mean := 0;  ssq := 0;
 	i := start;  top := start + len;
@@ -441,8 +441,8 @@ BEGIN
 	INC(i) END
 END Summary;
 
-PROCEDURE MeanSSq* (len: SIGNED32;  VAR x: ARRAY OF int;  start: SIGNED32;  VAR mean, ssq: LONGREAL; VAR nans: SIGNED32);
-	VAR i, top: SIGNED32;  Xdiff: LONGREAL;  xx: int;
+PROCEDURE MeanSSq* (len: SIGNED32;  VAR x: ARRAY OF int;  start: SIGNED32;  VAR mean, ssq: FLOAT64; VAR nans: SIGNED32);
+	VAR i, top: SIGNED32;  Xdiff: FLOAT64;  xx: int;
 BEGIN
 	nans := 0;  (*! not yet supported *)
 	mean := 0;  ssq := 0;
@@ -598,10 +598,10 @@ BEGIN
 END Div;
 
 PROCEDURE SSQxy* (VAR x, y: ARRAY OF SIGNED32;
-mx, my: LONGREAL;
-len: SIGNED32): LONGREAL;  (** vs 0.1d0 gs *)
+mx, my: FLOAT64;
+len: SIGNED32): FLOAT64;  (** vs 0.1d0 gs *)
 	(*= The arrays x and y aren't changed *)
-	VAR i: SIGNED32;  s: LONGREAL;
+	VAR i: SIGNED32;  s: FLOAT64;
 BEGIN
 	s := 0;  i := 0;  WHILE i < len DO s := s + (x[i] - mx) * (y[i] - my);  INC(i)  END;
 	RETURN s

@@ -352,7 +352,7 @@ TYPE
 			jpegColorSpace: SIGNED16;		 	 (* Farbformat des JPEG Bildes *)
 			outColorSpace: SIGNED16;		   	(* gewuenschtes Farbformat des Output *)
 			scaleNum, scaleDenom: SIGNED16;   (* im Moment nicht implementiert *)
-			outputGamma: LONGREAL;	   	(* im Moment nicht implementiert *)
+			outputGamma: FLOAT64;	   	(* im Moment nicht implementiert *)
 			rawDataOut: BOOLEAN;				(* rawDataOut=TRUE -> nicht sinnvoll *)
 			doFancyUpsampling :BOOLEAN; 	(* TRUE -> Fancy Upsampling anwenden *)
 			sawJFIFMarker: BOOLEAN;			(* Kontoll-Flag *)

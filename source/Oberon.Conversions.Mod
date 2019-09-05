@@ -67,7 +67,7 @@ END IntToStr;
 
 
 (** RealToStr -- convert a longreal to a representation in a given base (2..16) *)
-PROCEDURE RealToStr*(x: LONGREAL; VAR s: ARRAY OF CHAR; base: SIGNED32);
+PROCEDURE RealToStr*(x: FLOAT64; VAR s: ARRAY OF CHAR; base: SIGNED32);
 VAR h, l: SIGNED32; d: ARRAY 16 OF CHAR;
 
 BEGIN

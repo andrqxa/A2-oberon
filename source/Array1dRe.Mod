@@ -6,7 +6,7 @@ MODULE Array1dRe;   (** AUTHOR "adf, fof"; PURPOSE "Basic operations on type ARR
 IMPORT SYSTEM, Array1dBytes, NbrRe, DataErrors, Array1dInt, Array1dRat, NbrInt, NbrRat;
 
 TYPE
-	Value* = NbrRe.Real;  LongerValue* = LONGREAL;  RealValue* = NbrRe.Real;
+	Value* = NbrRe.Real;  LongerValue* = FLOAT64;  RealValue* = NbrRe.Real;
 
 	Array* = POINTER TO ARRAY OF Value;
 	Index* = SIGNED32;
@@ -1187,7 +1187,7 @@ TYPE
 		IF (l # NIL ) & (r # NIL ) THEN
 			IF LEN( l ) = LEN( r ) THEN
 				len := LEN( l );  sum := 0;
-				(* Sum in LONGREAL to minimize roundoff error. *)
+				(* Sum in FLOAT64 to minimize roundoff error. *)
 				FOR i := 0 TO len - 1 DO sum := sum + (l[i] * r[i]) END;
 				dot := (sum)
 			ELSE DataErrors.Error( "The lengths of the two supplied mixed-type vectors were not equal." )
@@ -1204,7 +1204,7 @@ TYPE
 		IF (l # NIL ) & (r # NIL ) THEN
 			IF LEN( l ) = LEN( r ) THEN
 				len := LEN( l );  sum := 0;
-				(* Sum in LONGREAL to minimize roundoff error. *)
+				(* Sum in FLOAT64 to minimize roundoff error. *)
 				FOR i := 0 TO len - 1 DO sum := sum + (l[i] * r[i]) END;
 				dot := (sum)
 			ELSE DataErrors.Error( "The lengths of the two supplied mixed-type vectors were not equal." )
@@ -1221,7 +1221,7 @@ TYPE
 		IF (l # NIL ) & (r # NIL ) THEN
 			IF LEN( l ) = LEN( r ) THEN
 				len := LEN( l );  sum := 0;
-				(* Sum in LONGREAL to minimize roundoff error. *)
+				(* Sum in FLOAT64 to minimize roundoff error. *)
 				FOR i := 0 TO len - 1 DO sum := sum + (l[i]) * r[i] END;
 				dot := (sum)
 			ELSE DataErrors.Error( "The lengths of the two supplied mixed-type vectors were not equal." )
@@ -1238,7 +1238,7 @@ TYPE
 		IF (l # NIL ) & (r # NIL ) THEN
 			IF LEN( l ) = LEN( r ) THEN
 				len := LEN( l );  sum := 0;
-				(* Sum in LONGREAL to minimize roundoff error. *)
+				(* Sum in FLOAT64 to minimize roundoff error. *)
 				FOR i := 0 TO len - 1 DO sum := sum + l[i] * (r[i]) END;
 				dot := (sum)
 			ELSE DataErrors.Error( "The lengths of the two supplied mixed-type vectors were not equal." )

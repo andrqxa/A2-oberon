@@ -46,13 +46,13 @@ BEGIN
 END RealFix;
 
 (** Write the longreal x in n field positions. *)
-PROCEDURE LongReal*(x: LONGREAL; n: SIGNED16);
+PROCEDURE LongReal*(x: FLOAT64; n: SIGNED16);
 BEGIN
 	Texts.WriteLongReal(W, x, n); Texts.Append(T, W.buf)
 END LongReal;
 
 (** Write the longreal x in n field positions in fixed point notation with f fraction digits. *)
-PROCEDURE LongRealFix*(x: LONGREAL; n, f: SIGNED16);
+PROCEDURE LongRealFix*(x: FLOAT64; n, f: SIGNED16);
 BEGIN
 	Texts.WriteLongRealFix(W, x, n, f, 0); Texts.Append(T, W.buf)
 END LongRealFix;

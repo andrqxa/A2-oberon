@@ -52,7 +52,7 @@ TYPE
 			sym-: SIGNED32;
 			numberType-: SIGNED8;
 			intVal-: SIGNED32;
-			realVal-: LONGREAL;
+			realVal-: FLOAT64;
 			line-, row-, pos: SIGNED32;
 			reportError*: PROCEDURE (pos, line, row: SIGNED32; msg: ARRAY OF CHAR);
 			nextCh: CHAR;

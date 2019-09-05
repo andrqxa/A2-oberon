@@ -117,17 +117,17 @@ BEGIN
 	Texts.WriteRealHex(w, x)
 END RealHex;
 
-PROCEDURE LongReal*(x: LONGREAL;  n: SIGNED32);
+PROCEDURE LongReal*(x: FLOAT64;  n: SIGNED32);
 BEGIN
 	Texts.WriteLongReal(w, x, n)
 END LongReal;
 
-PROCEDURE LongRealFix*(x: LONGREAL;  n, f, E: SIGNED32);
+PROCEDURE LongRealFix*(x: FLOAT64;  n, f, E: SIGNED32);
 BEGIN
 	Texts.WriteLongRealFix(w, x, n, f, E)
 END LongRealFix;
 
-PROCEDURE LongRealHex*(x: LONGREAL);
+PROCEDURE LongRealHex*(x: FLOAT64);
 BEGIN
 	Texts.WriteLongRealHex(w, x)
 END LongRealHex;

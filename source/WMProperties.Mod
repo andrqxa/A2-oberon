@@ -1131,13 +1131,13 @@ TYPE
 	(** Accessor property to an real value. The range of possible values can be restricted. *)
 	RealProperty* = OBJECT(Property)
 	VAR
-		value : LONGREAL;
-		min, max : LONGREAL;
+		value : FLOAT64;
+		min, max : FLOAT64;
 		bounded : BOOLEAN;
 
 		(** Confines the possible input values between min and max. Implicitly activates the bounds check. If the current value
 			lies outside the bounds, it is truncated to the nearest and a change notification is sent after the end of the transaction. *)
-		PROCEDURE SetBounds*(min, max : LONGREAL);
+		PROCEDURE SetBounds*(min, max : FLOAT64);
 		BEGIN
 			AcquireWrite;
 			SELF.min := min; SELF.max := max; bounded := TRUE;
@@ -1146,7 +1146,7 @@ TYPE
 			ReleaseWrite
 		END SetBounds;
 
-		PROCEDURE GetBounds*(VAR min, max : LONGREAL);
+		PROCEDURE GetBounds*(VAR min, max : FLOAT64);
 		BEGIN
 			AcquireRead;
 			min := SELF.min; max := SELF.max;
@@ -1173,8 +1173,8 @@ TYPE
 			ReleaseRead;
 		END GetIsBounded;
 
-		PROCEDURE Validate(v : LONGREAL) : LONGREAL;
-		VAR result : LONGREAL;
+		PROCEDURE Validate(v : FLOAT64) : FLOAT64;
+		VAR result : FLOAT64;
 		BEGIN
 			result := v;
 			IF bounded THEN
@@ -1184,7 +1184,7 @@ TYPE
 		END Validate;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR temp : ARRAY 64 OF CHAR; value : LONGREAL;
+		VAR temp : ARRAY 64 OF CHAR; value : FLOAT64;
 		BEGIN
 			r.String(temp);
 			value := 0.0;
@@ -1218,8 +1218,8 @@ TYPE
 			END;
 		END UpdateModel;
 
-		PROCEDURE Get*() : LONGREAL;
-		VAR r : LONGREAL;
+		PROCEDURE Get*() : FLOAT64;
+		VAR r : FLOAT64;
 		BEGIN
 			AcquireRead;
 			IF nonDefault OR (prototype = NIL) THEN r := value;
@@ -1229,8 +1229,8 @@ TYPE
 			RETURN r
 		END Get;
 
-		PROCEDURE Set*(value : LONGREAL);
-		VAR v: LONGREAL;
+		PROCEDURE Set*(value : FLOAT64);
+		VAR v: FLOAT64;
 		BEGIN
 			v := Validate(value);
 			AcquireWrite;
@@ -1245,8 +1245,8 @@ TYPE
 			ReleaseWrite
 		END Set;
 
-		PROCEDURE SetPassive*(value: LONGREAL);
-		VAR v: LONGREAL;
+		PROCEDURE SetPassive*(value: FLOAT64);
+		VAR v: FLOAT64;
 		BEGIN
 			v := Validate(value);
 			AcquireWrite;
@@ -1266,8 +1266,8 @@ TYPE
 			AcquireWrite; NotDefault;
 			mins := xml.GetAttributeValue("min");
 			maxs := xml.GetAttributeValue("max");
-			IF mins # NIL THEN Strings.StrToFloat(mins^, min) ELSE min := MIN(LONGREAL) END;
-			IF maxs # NIL THEN Strings.StrToFloat(maxs^, max) ELSE max := MAX(LONGREAL) END;
+			IF mins # NIL THEN Strings.StrToFloat(mins^, min) ELSE min := MIN(FLOAT64) END;
+			IF maxs # NIL THEN Strings.StrToFloat(maxs^, max) ELSE max := MAX(FLOAT64) END;
 			bounded := (mins # NIL) OR (maxs # NIL);
 			en := xml.GetContents();
 			IF en.HasMoreElements() THEN

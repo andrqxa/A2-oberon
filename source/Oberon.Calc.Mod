@@ -15,7 +15,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		SymbolDesc = RECORD
 			name: ARRAY 32 OF CHAR;
 			funct: BOOLEAN;
-			val: LONGREAL;
+			val: FLOAT64;
 			next: Symbol
 		END;
 
@@ -43,60 +43,60 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	END err;
 
 
-	PROCEDURE sign (n: LONGREAL): LONGREAL;
+	PROCEDURE sign (n: FLOAT64): FLOAT64;
 	BEGIN
 		IF n < 0 THEN RETURN -1
 		ELSIF n = 0 THEN RETURN 0
 		ELSE RETURN 1 END
 	END sign;
 
-	PROCEDURE short (n: LONGREAL): FLOAT32;
+	PROCEDURE short (n: FLOAT64): FLOAT32;
 	BEGIN RETURN SHORT(n + Eps0)
 	END short;
 
-	PROCEDURE entier (n: LONGREAL): SIGNED32;
+	PROCEDURE entier (n: FLOAT64): SIGNED32;
 	BEGIN RETURN ENTIER(n + Eps0)
 	END entier;
 
 
-	PROCEDURE sin (n: LONGREAL): LONGREAL;
+	PROCEDURE sin (n: FLOAT64): FLOAT64;
 	BEGIN RETURN MathL.sin(n)
 	END sin;
 
-	PROCEDURE cos (n: LONGREAL): LONGREAL;
+	PROCEDURE cos (n: FLOAT64): FLOAT64;
 	BEGIN RETURN MathL.cos(n)
 	END cos;
 
-	PROCEDURE tan (n: LONGREAL): LONGREAL;
-		VAR x: LONGREAL;
+	PROCEDURE tan (n: FLOAT64): FLOAT64;
+		VAR x: FLOAT64;
 	BEGIN x := MathL.cos(n);
 		IF x # 0 THEN RETURN MathL.sin(n) / x ELSE err; RETURN 1 END
 	END tan;
 
-	PROCEDURE arcsin (n: LONGREAL): LONGREAL;
-		VAR x: LONGREAL;
+	PROCEDURE arcsin (n: FLOAT64): FLOAT64;
+		VAR x: FLOAT64;
 	BEGIN x := MathL.sqrt(1 - n * n);
 		IF x # 0 THEN RETURN MathL.arctan(n / x) ELSE err; RETURN 1 END
 	END arcsin;
 
-	PROCEDURE arccos (n: LONGREAL): LONGREAL;
+	PROCEDURE arccos (n: FLOAT64): FLOAT64;
 	BEGIN RETURN MathL.pi / 2 - arcsin(n)
 	END arccos;
 
-	PROCEDURE arctan (n: LONGREAL): LONGREAL;
+	PROCEDURE arctan (n: FLOAT64): FLOAT64;
 	BEGIN RETURN MathL.arctan(n)
 	END arctan;
 
-	PROCEDURE exp (n: LONGREAL): LONGREAL;
+	PROCEDURE exp (n: FLOAT64): FLOAT64;
 	BEGIN RETURN MathL.exp(n)
 	END exp;
 
-	PROCEDURE ln (n: LONGREAL): LONGREAL;
+	PROCEDURE ln (n: FLOAT64): FLOAT64;
 	BEGIN
 		IF n > 0 THEN RETURN MathL.ln(n) ELSE err; RETURN 1 END
 	END ln;
 
-	PROCEDURE sqrt (n: LONGREAL): LONGREAL;
+	PROCEDURE sqrt (n: FLOAT64): FLOAT64;
 	BEGIN
 		IF n >= 0 THEN RETURN MathL.sqrt(n) ELSE err; RETURN 1 END
 	END sqrt;
@@ -110,7 +110,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	BEGIN Texts.WriteString(W, s);
 	END Str;
 
-	PROCEDURE WrHex (n: LONGREAL);
+	PROCEDURE WrHex (n: FLOAT64);
 		VAR x, y: SIGNED32; i: SIGNED16;
 			a: ARRAY 10 OF CHAR;
 	BEGIN x := entier(n);
@@ -125,11 +125,11 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		Texts.Write(W, "H")
 	END WrHex;
 
-	PROCEDURE WrInt (n: LONGREAL);
+	PROCEDURE WrInt (n: FLOAT64);
 	BEGIN Texts.Write(W, " "); Texts.WriteInt(W, entier(n), 0)
 	END WrInt;
 
-	PROCEDURE WrChar (n: LONGREAL);
+	PROCEDURE WrChar (n: FLOAT64);
 		VAR ch: CHAR;
 	BEGIN ch := CHR(entier(n));
 		IF (" " <= ch) & (ch < 7FX) OR (80X <= ch) & (ch < 0A0X) THEN Ch(" "); Ch(22X); Ch(ch); Ch(22X)
@@ -137,8 +137,8 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		END
 	END WrChar;
 
-	PROCEDURE WrReal (n: LONGREAL);
-		VAR x: LONGREAL;
+	PROCEDURE WrReal (n: FLOAT64);
+		VAR x: FLOAT64;
 	BEGIN
 		IF (MIN(SIGNED32) <= n) & (n <= MAX(SIGNED32)) THEN x := ABS(n - ENTIER(SHORT(n)));
 			IF x < Eps THEN WrInt(n); RETURN END
@@ -154,8 +154,8 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		Texts.WriteLongReal(W, n, 23)
 	END WrReal;
 
-	PROCEDURE WrValue (n: LONGREAL);
-		VAR x: LONGREAL;
+	PROCEDURE WrValue (n: FLOAT64);
+		VAR x: FLOAT64;
 	BEGIN
 		Str(" ="); WrReal(n);
 		IF (MIN(SIGNED32) <= n) & (n <= MAX(SIGNED32)) THEN x := ABS(n - ENTIER(SHORT(n)));
@@ -206,7 +206,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	END OpenScanner;
 
 
-	PROCEDURE FindIdent (CONST name: ARRAY OF CHAR; insert: BOOLEAN; VAR val: LONGREAL);
+	PROCEDURE FindIdent (CONST name: ARRAY OF CHAR; insert: BOOLEAN; VAR val: FLOAT64);
 		VAR s: Symbol;
 	BEGIN s := syms;
 		WHILE (s # NIL) & ((s.name # name) OR s.funct) DO s := s.next END;
@@ -231,7 +231,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	END FindFunct;
 
 	PROCEDURE InitSyms;
-		VAR s: Symbol; n: LONGREAL; name: ARRAY 2 OF CHAR;
+		VAR s: Symbol; n: FLOAT64; name: ARRAY 2 OF CHAR;
 	BEGIN name[1] := 0X;
 		name[0] := "e"; n := MathL.e; FindIdent(name, TRUE, n);
 		n := MathL.pi; FindIdent("pi", TRUE, n);
@@ -251,7 +251,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	END InitSyms;
 
 
-	PROCEDURE Functor (sym: Symbol; VAR n: LONGREAL);
+	PROCEDURE Functor (sym: Symbol; VAR n: FLOAT64);
 	BEGIN
 		IF sym.name = "arcsin" THEN n := arcsin(n)
 		ELSIF sym.name = "arccos" THEN n := arccos(n)
@@ -268,7 +268,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		END
 	END Functor;
 
-	PROCEDURE Atom (VAR n: LONGREAL);
+	PROCEDURE Atom (VAR n: FLOAT64);
 		VAR sym: Symbol;
 	BEGIN
 		IF S.class = Texts.Int THEN n := S.i; Scan(S)
@@ -290,8 +290,8 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		END
 	END Atom;
 
-	PROCEDURE Factor (VAR n: LONGREAL);
-		VAR x: LONGREAL;
+	PROCEDURE Factor (VAR n: FLOAT64);
+		VAR x: FLOAT64;
 	BEGIN Atom(n);
 		WHILE (S.class = Texts.Char) & (S.c = "^") DO
 			Scan(S); Factor(x);
@@ -299,8 +299,8 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		END
 	END Factor;
 
-	PROCEDURE Term (VAR n: LONGREAL);
-		VAR x: LONGREAL; op: CHAR;
+	PROCEDURE Term (VAR n: FLOAT64);
+		VAR x: FLOAT64; op: CHAR;
 	BEGIN Factor(n);
 		WHILE (S.class = Texts.Char)
 		& ((S.c = "*") OR (S.c = "/") OR (S.c = "%") OR (S.c = ">") OR (S.c = "<")) DO
@@ -315,8 +315,8 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 		END
 	END Term;
 
-	PROCEDURE Expr (VAR n: LONGREAL);
-		VAR x: LONGREAL; op: CHAR;
+	PROCEDURE Expr (VAR n: FLOAT64);
+		VAR x: FLOAT64; op: CHAR;
 	BEGIN Term(n);
 		WHILE (S.class = Texts.Char) & ((S.c = "+") OR (S.c = "-")) OR (S.class = Texts.Int) DO
 			IF S.class = Texts.Char THEN op := S.c; Scan(S) ELSE op := "+" END;
@@ -330,28 +330,28 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 
 
 	PROCEDURE Hex*;	(** expr **)
-		VAR n: LONGREAL;
+		VAR n: FLOAT64;
 	BEGIN Str("Calc.Hex"); OpenScanner(S); Expr(n);
 		IF S.class # Texts.Inval THEN WrHex(n) ELSE Str(" failed: bad argument") END;
 		Ln
 	END Hex;
 
 	PROCEDURE Dec*;	(** expr **)
-		VAR n: LONGREAL;
+		VAR n: FLOAT64;
 	BEGIN Str("Calc.Dec"); OpenScanner(S); Expr(n);
 		IF S.class # Texts.Inval THEN WrInt(n) ELSE Str(" failed: bad argument") END;
 		Ln
 	END Dec;
 
 	PROCEDURE Real*;	(** expr **)
-		VAR n: LONGREAL;
+		VAR n: FLOAT64;
 	BEGIN Str("Calc.Real"); OpenScanner(S); Expr(n);
 		IF S.class # Texts.Inval THEN WrReal(n) ELSE Str(" failed: bad argument") END;
 		Ln
 	END Real;
 
 	PROCEDURE Char*;	(** expr **)
-		VAR n: LONGREAL;
+		VAR n: FLOAT64;
 	BEGIN Str("Calc.Char"); OpenScanner(S); Expr(n);
 		IF S.class # Texts.Inval THEN
 			IF (0 <= n) & (n < 256) THEN WrChar(n)
@@ -363,7 +363,7 @@ MODULE Calc IN Oberon;	(** portable *)	(* CAS 28.9.93 / tk adapted for System 3 
 	END Char;
 
 	PROCEDURE Set*;	(** {name ":=" expr} "~" **)
-		VAR n: LONGREAL; name: ARRAY 32 OF CHAR;
+		VAR n: FLOAT64; name: ARRAY 32 OF CHAR;
 	BEGIN Str("Calc.Set"); Ln; OpenScanner(S);
 		WHILE S.class = Texts.Name DO COPY(S.s, name); Scan(S);
 			IF (S.class = Texts.Char) & (S.c = ":") THEN

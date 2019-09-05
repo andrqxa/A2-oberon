@@ -5,7 +5,7 @@ MODULE Reals;	(** portable, except where noted *)
 (** AUTHOR "bmoesli"; PURPOSE "Real number manipulation"; *)
 
 (** Implementation of the non-portable components of IEEE FLOAT32 and
-LONGREAL manipulation. The routines here are required to do conversion
+FLOAT64 manipulation. The routines here are required to do conversion
 of reals to strings and back.
 Implemented by Bernd Moesli, Seminar for Applied Mathematics,
 Swiss Federal Institute of Technology Zürich.
@@ -40,8 +40,8 @@ IMPORT SYSTEM, Machine;
 
 VAR
 	DefaultFCR*: SET;
-	tene: ARRAY 23 OF LONGREAL; (* e = 0..22: exact values of 10^e *)
-	ten: ARRAY 27 OF LONGREAL;
+	tene: ARRAY 23 OF FLOAT64; (* e = 0..22: exact values of 10^e *)
+	ten: ARRAY 27 OF FLOAT64;
 	eq, gr: ARRAY 20 OF SET;
 	H, L: SIGNED16;
 
@@ -52,7 +52,7 @@ BEGIN
 END Expo;
 
 (** Returns the shifted binary exponent (0 <= e < 2048). *)
-PROCEDURE ExpoL* (x: LONGREAL): SIGNED32;
+PROCEDURE ExpoL* (x: FLOAT64): SIGNED32;
 	VAR i: SIGNED32;
 BEGIN
 	SYSTEM.GET(ADDRESSOF(x) + H, i); RETURN ASH(i, -20) MOD 2048
@@ -74,7 +74,7 @@ BEGIN
 END SetExpo;
 
 (** Sets the shifted binary exponent. *)
-PROCEDURE SetExpoL* (e: SIGNED32; VAR x: LONGREAL);
+PROCEDURE SetExpoL* (e: SIGNED32; VAR x: FLOAT64);
 	VAR i: SIGNED32;
 BEGIN
 	SYSTEM.GET(ADDRESSOF(x) + H, i);
@@ -88,9 +88,9 @@ PROCEDURE Real* (h: SIGNED32): FLOAT32;
 BEGIN SYSTEM.PUT(ADDRESSOF(x), h); RETURN x
 END Real;
 
-(** Convert hexadecimal to LONGREAL. h and l are the high and low parts.*)
-PROCEDURE RealL* (h, l: SIGNED32): LONGREAL;
-	VAR x: LONGREAL;
+(** Convert hexadecimal to FLOAT64. h and l are the high and low parts.*)
+PROCEDURE RealL* (h, l: SIGNED32): FLOAT64;
+	VAR x: FLOAT64;
 BEGIN SYSTEM.PUT(ADDRESSOF(x) + H, h); SYSTEM.PUT(ADDRESSOF(x) + L, l); RETURN x
 END RealL;
 
@@ -100,14 +100,14 @@ PROCEDURE Int* (x: FLOAT32): SIGNED32;
 BEGIN SYSTEM.PUT(ADDRESSOF(i), x); RETURN i
 END Int;
 
-(** Convert LONGREAL to hexadecimal. h and l are the high and low parts. *)
-PROCEDURE IntL* (x: LONGREAL; VAR h, l: SIGNED32);
+(** Convert FLOAT64 to hexadecimal. h and l are the high and low parts. *)
+PROCEDURE IntL* (x: FLOAT64; VAR h, l: SIGNED32);
 BEGIN SYSTEM.GET(ADDRESSOF(x) + H, h); SYSTEM.GET(ADDRESSOF(x) + L, l)
 END IntL;
 
 (** Returns 10^e (e <= 308, 308 < e delivers IEEE-code +INF). *)
-PROCEDURE Ten* (e: SIGNED32): LONGREAL;
-	VAR E: SIGNED32; r: LONGREAL;
+PROCEDURE Ten* (e: SIGNED32): FLOAT64;
+	VAR E: SIGNED32; r: FLOAT64;
 BEGIN
 	IF e < -307 THEN RETURN 0 ELSIF 308 < e THEN RETURN RealL(2146435072, 0) END;
 	INC(e, 307); r:= ten[e DIV 23] * tene[e MOD 23];
@@ -130,7 +130,7 @@ BEGIN
 END NaNCode;
 
 (** Returns the NaN code (0 <= h < 1048576, MIN(SIGNED32) <= l <= MAX(SIGNED32)) or (-1,-1) if not NaN/Infinite. *)
-PROCEDURE NaNCodeL* (x: LONGREAL;  VAR h, l: SIGNED32);
+PROCEDURE NaNCodeL* (x: FLOAT64;  VAR h, l: SIGNED32);
 BEGIN
 	SYSTEM.GET(ADDRESSOF(x) + H, h); SYSTEM.GET(ADDRESSOF(x) + L, l);
 	IF ASH(h, -20) MOD 2048 = 2047 THEN	(* Infinite or NaN *)
@@ -147,7 +147,7 @@ BEGIN
 END IsNaN;
 
 (** Returns TRUE iff x is NaN/Infinite. *)
-PROCEDURE IsNaNL* (x: LONGREAL): BOOLEAN;
+PROCEDURE IsNaNL* (x: FLOAT64): BOOLEAN;
 VAR h: SIGNED32;
 BEGIN
 	SYSTEM.GET(ADDRESSOF(x) + H, h);
@@ -163,8 +163,8 @@ BEGIN
 END NaN;
 
 (** Returns NaN with specified code (0 <= h < 1048576, MIN(SIGNED32) <= l <= MAX(SIGNED32)). *)
-PROCEDURE NaNL* (h, l: SIGNED32): LONGREAL;
-VAR x: LONGREAL;
+PROCEDURE NaNL* (h, l: SIGNED32): FLOAT64;
+VAR x: FLOAT64;
 BEGIN
 	h := (h MOD 100000H) + 7FF00000H;
 	SYSTEM.PUT(ADDRESSOF(x) + H, h);
@@ -198,7 +198,7 @@ END Round;
 
 (** Round x to an integer using the current rounding mode. *)
 
-PROCEDURE RoundL*(x: LONGREAL): SIGNED32;	(** non-portable *)
+PROCEDURE RoundL*(x: FLOAT64): SIGNED32;	(** non-portable *)
 END RoundL;
 
 PROCEDURE RealX (hh, hl: SIGNED64; adr: ADDRESS);

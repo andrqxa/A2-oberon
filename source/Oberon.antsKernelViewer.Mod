@@ -35,7 +35,7 @@ TYPE
 		kernel: antsKernel.Kernel
 	END;
 
-	Real = LONGREAL;
+	Real = FLOAT64;
 
 	PROCEDURE Copy( source, dest: tLayer );
 	BEGIN

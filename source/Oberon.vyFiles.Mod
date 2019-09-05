@@ -62,7 +62,7 @@ PROCEDURE ReadReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF FLOAT32;  start
 BEGIN	FOR i := start TO count DO Files.ReadReal(R, x[i]) END
 END ReadReal;
 
-PROCEDURE ReadLReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF LONGREAL;  start, count: SIGNED32);
+PROCEDURE ReadLReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF FLOAT64;  start, count: SIGNED32);
 	VAR i: SIGNED32;
 BEGIN	FOR i := start TO count DO Files.ReadLReal(R, x[i]) END
 END ReadLReal;
@@ -113,7 +113,7 @@ PROCEDURE WriteReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF FLOAT32;  star
 BEGIN	FOR i := start TO count DO Files.WriteReal(R, x[i]) END
 END WriteReal;
 
-PROCEDURE WriteLReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF LONGREAL;  start, count: SIGNED32);
+PROCEDURE WriteLReal* (VAR R: Files.Rider;  VAR (*OUT*)x: ARRAY OF FLOAT64;  start, count: SIGNED32);
 	VAR i: SIGNED32;
 BEGIN	FOR i := start TO count DO Files.WriteLReal(R, x[i]) END
 END WriteLReal;

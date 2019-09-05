@@ -44,7 +44,7 @@ TYPE
 
 	GetCoordMsg* = RECORD (Objects.ObjMsg)
 		x*, y*: SIGNED16;
-		xr*, yr*: LONGREAL;
+		xr*, yr*: FLOAT64;
 		w*, h*: SIGNED32;
 		layer*: vyPort.tLayer;
 		update*: BOOLEAN;
@@ -499,7 +499,7 @@ END LoadPictureDialoged;
 	END SetSize;
 
 	PROCEDURE CopyCoordinates*;
-	VAR frame1, frame2: Display.Frame;  obj1, obj2: Objects.Object;  x, y, w, h: LONGREAL;  keys: SET;  X, Y: SIGNED16;  type: Types.Type;
+	VAR frame1, frame2: Display.Frame;  obj1, obj2: Objects.Object;  x, y, w, h: FLOAT64;  keys: SET;  X, Y: SIGNED16;  type: Types.Type;
 	BEGIN
 		antsCommands.InitScan( "[>X] [>Y]" );  aM.S( "Select source" );  frame1 := SelectFrame();  obj1 := dlink;
 		REPEAT Input.Mouse( keys, X, Y );  UNTIL keys = {};
@@ -741,7 +741,7 @@ END LoadPictureDialoged;
 		END;
 	END FrameToGIF2;
 
-	PROCEDURE InteractiveGetCoordinates*( VAR xr, yr: LONGREAL;  VAR wr, hr: LONGREAL );
+	PROCEDURE InteractiveGetCoordinates*( VAR xr, yr: FLOAT64;  VAR wr, hr: FLOAT64 );
 	VAR keys: SET;  x, y, dx, dy: SIGNED16;  msg: GetCoordMsg;
 	BEGIN
 		Input.Mouse( keys, x, y );
@@ -765,7 +765,7 @@ END LoadPictureDialoged;
 	END InteractiveMsg;
 
 	PROCEDURE Test*;
-	VAR xr, yr, wr, hr: LONGREAL;
+	VAR xr, yr, wr, hr: FLOAT64;
 	BEGIN
 		InteractiveGetCoordinates( xr, yr, wr, hr );  aM.SRSR( "Returned: ", xr, " ", yr );  aM.SI( "Position is : ", ENTIER( ENTIER( yr ) * hr + ENTIER( xr ) ) )
 	END Test;
@@ -909,7 +909,7 @@ END LoadPictureDialoged;
 	END Test2;
 
 	PROCEDURE SetCoords*;
-	VAR x, y, w, h: LONGREAL;  frame: Display.Frame;  context: Objects.Object;  o: Objects.Object;
+	VAR x, y, w, h: FLOAT64;  frame: Display.Frame;  context: Objects.Object;  o: Objects.Object;
 	BEGIN
 		context := Gadgets.executorObj;  Links.GetLink( context, "x", o );  Attributes.GetLongReal( o, "Value", (x) );
 		Links.GetLink( context, "y", o );  Attributes.GetLongReal( o, "Value", (y) );  Links.GetLink( context, "w", o );
@@ -926,7 +926,7 @@ END LoadPictureDialoged;
 	END SetCoords;
 
 	PROCEDURE GetCoords*;
-	VAR x, y, w, h: LONGREAL;  frame: Display.Frame;
+	VAR x, y, w, h: FLOAT64;  frame: Display.Frame;
 	VAR o: Objects.Object;  context: Objects.Object;
 	BEGIN
 		aM.vS( "antsToolbox.GetCoords" );  context := Gadgets.executorObj;  frame := SelectFrame();

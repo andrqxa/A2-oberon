@@ -176,7 +176,7 @@ VAR
 
 (*
 PROCEDURE keepsel;
-VAR c: tCoordinate; x2,y2: LONGREAL;
+VAR c: tCoordinate; x2,y2: FLOAT64;
 BEGIN
 
 c := command.c;
@@ -208,7 +208,7 @@ END keepsel;
 	END usecurrentsel;
 
 	PROCEDURE MakeSel*( cc: tCoordinate;  sel: Selection;  xx, yy, ww, hh: SIGNED16 );
-	VAR x2, y2: LONGREAL;
+	VAR x2, y2: FLOAT64;
 	CONST eps = 0.001;
 	BEGIN
 		vyDisplay2d.MakeSel( cc, sel, xx, yy, ww, hh );  x2 := sel.x + sel.w;  y2 := sel.y + sel.h;  sel.x := ENTIER( sel.x + eps );
@@ -287,7 +287,7 @@ END keepsel;
 	END AdjustRect;
 
 	PROCEDURE GetXY*( c: tCoordinate;  fromx, fromy: SIGNED16;  VAR x, y: SIGNED16 );
-	VAR xr, yr: LONGREAL;
+	VAR xr, yr: FLOAT64;
 	BEGIN
 		IF ~c.fixed THEN x := (fromx - (c.X + c.x)) DIV c.dx;  y := (fromy - (c.Y + c.y)) DIV c.dy
 		ELSE vyGraphBase.PointToPoint2d( fromx, fromy, xr, yr );  x := SHORT( ENTIER( xr + 0.5 ) );  y := SHORT( ENTIER( yr + 0.5 ) )
@@ -295,8 +295,8 @@ END keepsel;
 	END GetXY;
 
 	PROCEDURE ZoomIn( c: tCoordinate;  x, y, w, h: SIGNED16 );
-	VAR lastzoom: tZoom;  newx, newy, newdx, newdy: LONGREAL;  a, b: SIGNED16;  time: SIGNED32;
-	VAR fact: LONGREAL;
+	VAR lastzoom: tZoom;  newx, newy, newdx, newdy: FLOAT64;  a, b: SIGNED16;  time: SIGNED32;
+	VAR fact: FLOAT64;
 	BEGIN
 		lastzoom := c.zoom;
 		NEW( c.zoom );  c.zoom.next := lastzoom;   (* create new entry in zoom list *)
@@ -370,7 +370,7 @@ END keepsel;
 		IF c.sel # NIL  THEN
 		Files.WriteLReal(R,c.sel.x); Files.WriteLReal(R,c.sel.y); Files.WriteLReal(R,c.sel.w); Files.WriteLReal(R,c.sel.h)
 		ELSE
-		Files.WriteLReal(R,MIN(LONGREAL)); Files.WriteLReal(R,MIN(LONGREAL)); Files.WriteLReal(R,MIN(LONGREAL)); Files.WriteLReal(R,MIN(LONGREAL))
+		Files.WriteLReal(R,MIN(FLOAT64)); Files.WriteLReal(R,MIN(FLOAT64)); Files.WriteLReal(R,MIN(FLOAT64)); Files.WriteLReal(R,MIN(FLOAT64))
 		END;
 		*)
 		END
@@ -393,7 +393,7 @@ END keepsel;
 				(*
 			IF c.sel # NIL THEN NEW(c.sel) END;
 			Files.ReadLReal(R,c.sel.x); Files.ReadLReal(R,c.sel.y); Files.ReadLReal(R,c.sel.w); Files.ReadLReal(R,c.sel.h);
-			IF c.sel.x = MIN(LONGREAL) THEN c.sel := NIL END;
+			IF c.sel.x = MIN(FLOAT64) THEN c.sel := NIL END;
 			*)
 			END;
 			IF flag > 89 THEN Files.ReadBool( R, c.free ) END;

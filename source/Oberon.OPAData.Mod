@@ -2104,7 +2104,7 @@ BEGIN
 END FindSize;
 
 PROCEDURE FillTable*;		(** InstrTableSize OpTableSize *)
-VAR k, j: SIGNED32; S: Texts.Scanner; lr: LONGREAL;
+VAR k, j: SIGNED32; S: Texts.Scanner; lr: FLOAT64;
 BEGIN
 	Texts.OpenScanner(S, Oberon.Par.text, Oberon.Par.pos);
 	Texts.Scan(S); k := SHORT(S.i);

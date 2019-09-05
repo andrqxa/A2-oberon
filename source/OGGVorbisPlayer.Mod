@@ -1932,7 +1932,7 @@ TYPE
 
 		PROCEDURE &Init*(n: SIGNED32);
 		VAR ae, ao, be, bo, ce, co, i, j, acc, mask, msb, notAcc: SIGNED32;
-			float: LONGREAL;
+			float: FLOAT64;
 		BEGIN
 			NEW(x);
 			NEW(w);

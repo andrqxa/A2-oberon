@@ -66,9 +66,9 @@ VAR
 	END Grid;
 
 	PROCEDURE Recall( editor: tLayer );
-	VAR x, y, w, h: Coordinate;  X, Y, W, H: Real;  xr, dx: LONGREAL;  i, count, accuracy: SIGNED32;
+	VAR x, y, w, h: Coordinate;  X, Y, W, H: Real;  xr, dx: FLOAT64;  i, count, accuracy: SIGNED32;
 
-		PROCEDURE Min( r1, r2: LONGREAL ): LONGREAL;
+		PROCEDURE Min( r1, r2: FLOAT64 ): FLOAT64;
 		BEGIN
 			IF r1 < r2 THEN RETURN r1 ELSE RETURN r2 END
 		END Min;
@@ -143,7 +143,7 @@ VAR
 		END Discretize;
 
 		PROCEDURE Linear( a: antsFunctions.Array;  from, to: SIGNED32 );
-		VAR t, i: SIGNED32;  a1, a2: LONGREAL;
+		VAR t, i: SIGNED32;  a1, a2: FLOAT64;
 		BEGIN
 			IF from > to THEN t := to;  to := from;  from := t END;
 			a1 := a[from];  a2 := a[to];
@@ -183,7 +183,7 @@ VAR
 	VAR priority: SIGNED16;
 
 		PROCEDURE Check( x, y: Coordinate ): BOOLEAN;
-		VAR X, Y: LONGREAL;
+		VAR X, Y: FLOAT64;
 		BEGIN
 			vyGraphBase.PointToPoint2d( x, y, X, Y );
 			IF (X >= editor.xr) & (Y >= editor.yr) & (X <= editor.xr + editor.wr) & (Y <= editor.yr + editor.hr) THEN RETURN TRUE
@@ -465,7 +465,7 @@ VAR
 	END ShowP;
 
 	PROCEDURE Show*;
-	VAR l: antsCommands.tScanList;  from, to, by: LONGREAL;  f: antsFunctions.Function;  obj: vyBase.Object;
+	VAR l: antsCommands.tScanList;  from, to, by: FLOAT64;  f: antsFunctions.Function;  obj: vyBase.Object;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ from=FLOAT32 to=FLOAT32 by=FLOAT32" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectRealFromKeyword( l, "from", from ) &

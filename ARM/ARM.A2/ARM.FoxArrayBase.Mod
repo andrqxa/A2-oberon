@@ -13,7 +13,7 @@ TYPE
 	GenericUnaryAALoopL = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED32): SIGNED32 );
 	GenericUnaryAALoopH = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: SIGNED64): SIGNED64 );
 	GenericUnaryAALoopR = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: FLOAT32): FLOAT32 );
-	GenericUnaryAALoopX = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: LONGREAL): LONGREAL );
+	GenericUnaryAALoopX = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: FLOAT64): FLOAT64 );
 	GenericUnaryAALoopZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: COMPLEX): COMPLEX );
 	GenericUnaryAALoopLZ = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: LONGCOMPLEX): LONGCOMPLEX );
 	UnaryAALoop = PROCEDURE ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
@@ -775,8 +775,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ApplyGenericUnaryAAOpR;
 	
-	(** apply unary operator to array:  array LONGREAL -> array LONGREAL *)
-	PROCEDURE ApplyGenericUnaryAAOpX( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopX; op: PROCEDURE(x: LONGREAL): LONGREAL );
+	(** apply unary operator to array:  array FLOAT64 -> array FLOAT64 *)
+	PROCEDURE ApplyGenericUnaryAAOpX( d, l: ADDRESS;  elementSize: SIZE; Loop: GenericUnaryAALoopX; op: PROCEDURE(x: FLOAT64): FLOAT64 );
 	VAR loopd, looplen, loopli, loopdi: SIZE;  p: ANY;  glen: SIZE;
 		origdest: SIZE;  modes: SET;
 			dest, left: ADDRESS;  dim: SIZE;
@@ -1840,9 +1840,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "@Convert";
 
-(** SIGNED8 -> LONGREAL *)
+(** SIGNED8 -> FLOAT64 *)
 	PROCEDURE ConvertLoopSX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SIGNED8;  dval: LONGREAL;
+	VAR lval: SIGNED8;  dval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1850,9 +1850,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopSX;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED8 ):  ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED8 ):  ARRAY [ ? ] OF FLOAT64;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ), ConvertLoopSX );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT64 ), ConvertLoopSX );
 		RETURN RESULT
 	END "@Convert";
 
@@ -1916,9 +1916,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "@Convert";
 
-(** SIGNED16 -> LONGREAL *)
+(** SIGNED16 -> FLOAT64 *)
 	PROCEDURE ConvertLoopIX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SIGNED16;  dval: LONGREAL;
+	VAR lval: SIGNED16;  dval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1926,9 +1926,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopIX;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED16 ):  ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED16 ):  ARRAY [ ? ] OF FLOAT64;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ), ConvertLoopIX );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT64 ), ConvertLoopIX );
 		RETURN RESULT
 	END "@Convert";
 
@@ -1970,9 +1970,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "@Convert";
 
-(** SIGNED32 -> LONGREAL *)
+(** SIGNED32 -> FLOAT64 *)
 	PROCEDURE ConvertLoopLX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: SIGNED32;  dval: LONGREAL;
+	VAR lval: SIGNED32;  dval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -1980,9 +1980,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopLX;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED32 ): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF SIGNED32 ): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ), ConvertLoopLX );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT64 ), ConvertLoopLX );
 		RETURN RESULT
 	END "@Convert";
 
@@ -2008,9 +2008,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "ENTIER";
 
-(** FLOAT32 -> LONGREAL *)
+(** FLOAT32 -> FLOAT64 *)
 	PROCEDURE ConvertLoopRX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: FLOAT32;  dval: LONGREAL;
+	VAR lval: FLOAT32;  dval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := lval;  SYSTEM.PUT( dadr, dval );  INC( ladr, linc );
@@ -2018,21 +2018,21 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopRX;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF FLOAT32 ):  ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF FLOAT32 ):  ARRAY [ ? ] OF FLOAT64;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ), ConvertLoopRX );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT64 ), ConvertLoopRX );
 		RETURN RESULT
 	END "@Convert";
 
-	OPERATOR "LONG"*(CONST src: ARRAY [ ? ] OF FLOAT32 ):  ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "LONG"*(CONST src: ARRAY [ ? ] OF FLOAT32 ):  ARRAY [ ? ] OF FLOAT64;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ), ConvertLoopRX );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT64 ), ConvertLoopRX );
 		RETURN RESULT
 	END "LONG";
 
-(** LONGREAL -> FLOAT32 (SHORT) *)
+(** FLOAT64 -> FLOAT32 (SHORT) *)
 	PROCEDURE ConvertLoopXR( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: LONGREAL;  dval: FLOAT32;
+	VAR lval: FLOAT64;  dval: FLOAT32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := SHORT( lval );  SYSTEM.PUT( dadr, dval );
@@ -2040,21 +2040,21 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopXR;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF LONGREAL ):  ARRAY [ ? ] OF FLOAT32;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF FLOAT64 ):  ARRAY [ ? ] OF FLOAT32;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), ConvertLoopXR );
 		RETURN RESULT
 	END "@Convert";
 
-	OPERATOR "SHORT"*(CONST src: ARRAY [ ? ] OF LONGREAL ):  ARRAY [ ? ] OF FLOAT32;
+	OPERATOR "SHORT"*(CONST src: ARRAY [ ? ] OF FLOAT64 ):  ARRAY [ ? ] OF FLOAT32;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT32 ), ConvertLoopXR );
 		RETURN RESULT
 	END "SHORT";
 
-(** LONGREAL -> SIGNED32 (ENTIER) *)
+(** FLOAT64 -> SIGNED32 (ENTIER) *)
 	PROCEDURE ConvertLoopXL( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: LONGREAL;  dval: SIGNED32;
+	VAR lval: FLOAT64;  dval: SIGNED32;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  dval := ENTIER( lval );  SYSTEM.PUT( dadr, dval );
@@ -2062,13 +2062,13 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ConvertLoopXL;
 
-	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF LONGREAL ):  ARRAY [ ? ] OF SIGNED32;
+	OPERATOR "@Convert"*(CONST src: ARRAY [ ? ] OF FLOAT64 ):  ARRAY [ ? ] OF SIGNED32;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( SIGNED32 ),ConvertLoopXL );
 		RETURN RESULT
 	END "@Convert";
 
-	OPERATOR "ENTIER"*(CONST src: ARRAY [ ? ] OF LONGREAL ):  ARRAY [ ? ] OF SIGNED32;
+	OPERATOR "ENTIER"*(CONST src: ARRAY [ ? ] OF FLOAT64 ):  ARRAY [ ? ] OF SIGNED32;
 	BEGIN
 		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( SIGNED32 ),ConvertLoopXL );
 		RETURN RESULT
@@ -2144,9 +2144,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END GenericLoopR;
 
-(** LONGREAL *)
-	PROCEDURE GenericLoopX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: LONGREAL): LONGREAL );
-	VAR lval: LONGREAL;
+(** FLOAT64 *)
+	PROCEDURE GenericLoopX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE; op: PROCEDURE(x: FLOAT64): FLOAT64 );
+	VAR lval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, op(lval) );  INC( ladr, linc );  INC( dadr, dinc );
@@ -2247,9 +2247,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE MinusLoopX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: LONGREAL;
+	VAR lval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, -lval );  INC( ladr, linc );  INC( dadr, dinc );
@@ -2257,9 +2257,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MinusLoopX;
 
-	OPERATOR "-"*(CONST src: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "-"*(CONST src: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ),
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT64 ),
 									   MinusLoopX );
 		RETURN RESULT
 	END "-";
@@ -2334,9 +2334,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "+";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE AddAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval + rval );
@@ -2344,10 +2344,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddAXAXLoop;
 
-	OPERATOR "+"*(CONST left,right: ARRAY [?] OF LONGREAL): ARRAY [?] OF LONGREAL;
+	OPERATOR "+"*(CONST left,right: ARRAY [?] OF FLOAT64): ARRAY [?] OF FLOAT64;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), loopAddAXAX );
+										  SIZEOF( FLOAT64 ), loopAddAXAX );
 		RETURN RESULT
 	END "+";
 
@@ -2371,12 +2371,12 @@ Sufficient (but not necessary) conditions:
 
 (** LONGCOMPLEX *)
 	PROCEDURE AddALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
-			SYSTEM.PUT( dadr, lvalRe+rvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), lvalIm+rvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
+			SYSTEM.PUT( dadr, lvalRe+rvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), lvalIm+rvalIm );
 			INC( ladr, linc );  INC( radr, rinc );  INC( dadr, dinc );
 			DEC( len );
 		END;
@@ -2491,9 +2491,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "+";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE AddAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2502,17 +2502,17 @@ Sufficient (but not necessary) conditions:
 		END;
 	END AddAXSXLoop;
 
-	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "+"*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), AddAXSXLoop );
+										  SIZEOF( FLOAT64 ), AddAXSXLoop );
 		RETURN RESULT
 	END "+";
 
-	OPERATOR "+"*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "+"*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( LONGREAL ), AddAXSXLoop );
+										  SIZEOF( FLOAT64 ), AddAXSXLoop );
 		RETURN RESULT
 	END "+";
 
@@ -2544,12 +2544,12 @@ Sufficient (but not necessary) conditions:
 
 (** LONGCOMPLEX *)
 	PROCEDURE AddALZSLZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
-		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
+		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-			SYSTEM.PUT( dadr, lvalRe + rvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), lvalIm + rvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+			SYSTEM.PUT( dadr, lvalRe + rvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), lvalIm + rvalIm );
 			INC( ladr, linc );
 			INC( dadr, dinc );  DEC( len );
 		END;
@@ -2639,9 +2639,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE SubAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval - rval );
@@ -2649,10 +2649,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubAXAXLoop;
 
-	OPERATOR "-"*(CONST left,right: ARRAY [?] OF LONGREAL): ARRAY [?] OF LONGREAL;
+	OPERATOR "-"*(CONST left,right: ARRAY [?] OF FLOAT64): ARRAY [?] OF FLOAT64;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), SubAXAXLoop );
+										  SIZEOF( FLOAT64 ), SubAXAXLoop );
 		RETURN RESULT
 	END "-";
 
@@ -2675,12 +2675,12 @@ Sufficient (but not necessary) conditions:
 
 (** LONGCOMPLEX *)
 	PROCEDURE SubALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
-			SYSTEM.PUT( dadr, lvalRe-rvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), lvalIm-rvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
+			SYSTEM.PUT( dadr, lvalRe-rvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), lvalIm-rvalIm );
 			INC( ladr, linc );  INC( radr, rinc );  INC( dadr, dinc );
 			DEC( len );
 		END;
@@ -2723,8 +2723,8 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** LONGREAL *)
-	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF LONGREAL;
+(** FLOAT64 *)
+	OPERATOR "-"*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		RESULT := left + (-right);
 		RETURN RESULT
@@ -2818,9 +2818,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "-";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE SubSXAXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval, dval: LONGREAL;
+	VAR lval, rval, dval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -2829,10 +2829,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END SubSXAXLoop;
 
-	OPERATOR "-"*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "-"*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( LONGREAL ), SubSXAXLoop );
+										  SIZEOF( FLOAT64 ), SubSXAXLoop );
 		RETURN RESULT
 	END "-";
 
@@ -2857,12 +2857,12 @@ Sufficient (but not necessary) conditions:
 
 (** LONGCOMPLEX *)
 	PROCEDURE SubSLZALZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
-		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
+		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-			SYSTEM.PUT( dadr, rvalRe-lvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), rvalIm-lvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+			SYSTEM.PUT( dadr, rvalRe-lvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), rvalIm-lvalIm );
 			INC( ladr, linc );
 			INC( dadr, dinc );  DEC( len );
 		END;
@@ -2946,9 +2946,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".*";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EMulAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval * rval );
@@ -2956,10 +2956,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulAXAXLoop;
 
-	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF LONGREAL): ARRAY [?] OF LONGREAL;
+	OPERATOR ".*"*(CONST left,right: ARRAY [?] OF FLOAT64): ARRAY [?] OF FLOAT64;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), EMulAXAXLoop );
+										  SIZEOF( FLOAT64 ), EMulAXAXLoop );
 		RETURN RESULT
 	END ".*";
 
@@ -2983,12 +2983,12 @@ Sufficient (but not necessary) conditions:
 
 (** LONGCOMPLEX *)
 	PROCEDURE EMulALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
-			SYSTEM.PUT( dadr, lvalRe*rvalRe - lvalIm*rvalIm ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), lvalRe*rvalIm + lvalIm*rvalRe );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
+			SYSTEM.PUT( dadr, lvalRe*rvalRe - lvalIm*rvalIm ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), lvalRe*rvalIm + lvalIm*rvalRe );
 			INC( ladr, linc );  INC( radr, rinc );  INC( dadr, dinc );
 			DEC( len );
 		END;
@@ -3068,9 +3068,9 @@ Sufficient (but not necessary) conditions:
 										  EMulIncARARLoop );
 	END  ".*+";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EMulIncAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval,dval: LONGREAL;
+	VAR lval, rval,dval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval ); SYSTEM.GET(dadr,dval);  SYSTEM.PUT( dadr,dval+ lval * rval );
@@ -3078,10 +3078,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EMulIncAXAXLoop;
 
-	OPERATOR ".*+"*(CONST left,right: ARRAY [?] OF LONGREAL): ARRAY [?] OF LONGREAL;
+	OPERATOR ".*+"*(CONST left,right: ARRAY [?] OF FLOAT64): ARRAY [?] OF FLOAT64;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), EMulIncAXAXLoop );
+										  SIZEOF( FLOAT64 ), EMulIncAXAXLoop );
 	END  ".*+";
 	(*** multiply array x scalar -> array and scalar + array -> array ********************************************************************)
 
@@ -3185,9 +3185,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "*";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE MulAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		IF debug THEN
 			KernelLog.String( "MulAXSXLoop, ladr,radr,dadr,linc,dinc,len= " );  KernelLog.Int( ladr, 10 );  KernelLog.Int( radr, 10 );
@@ -3202,17 +3202,17 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MulAXSXLoop;
 
-	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "*"*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), loopMulAXSX );
+										  SIZEOF( FLOAT64 ), loopMulAXSX );
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "*"*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( LONGREAL ), loopMulAXSX );
+										  SIZEOF( FLOAT64 ), loopMulAXSX );
 		RETURN RESULT
 	END "*";
 
@@ -3244,12 +3244,12 @@ Sufficient (but not necessary) conditions:
 
 (** LONGCOMPLEX *)
 	PROCEDURE MulALZSLZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
-		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
+		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-			SYSTEM.PUT( dadr, lvalRe * rvalRe - lvalIm*rvalIm ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), lvalRe * rvalIm + lvalIm*rvalRe );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+			SYSTEM.PUT( dadr, lvalRe * rvalRe - lvalIm*rvalIm ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), lvalRe * rvalIm + lvalIm*rvalRe );
 			INC( ladr, linc );
 			INC( dadr, dinc );  DEC( len );
 		END;
@@ -3446,9 +3446,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "DECMUL";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE IncMulAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval, dval: LONGREAL;
+	VAR lval, rval, dval: FLOAT64;
 	BEGIN
 		IF debug THEN
 			KernelLog.String( "IncMulAXSXLoop, ladr,radr,dadr,linc,dinc,len= " );  KernelLog.Int( ladr, 10 );  KernelLog.Int( radr, 10 );
@@ -3463,34 +3463,34 @@ Sufficient (but not necessary) conditions:
 		END;
 	END IncMulAXSXLoop;
 
-	OPERATOR "INCMUL"*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "INCMUL"*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), loopIncMulAXSX );
+										  SIZEOF( FLOAT64 ), loopIncMulAXSX );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "INCMUL"*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "INCMUL"*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( LONGREAL ), loopIncMulAXSX );
+										  SIZEOF( FLOAT64 ), loopIncMulAXSX );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "DECMUL"*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "DECMUL"*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), loopIncMulAXSX );
+										  SIZEOF( FLOAT64 ), loopIncMulAXSX );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
 
-	OPERATOR "DECMUL"*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "DECMUL"*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( LONGREAL ), loopIncMulAXSX );
+										  SIZEOF( FLOAT64 ), loopIncMulAXSX );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
@@ -3569,9 +3569,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "./";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EDivideAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;  dval: LONGREAL;
+	VAR lval, rval: FLOAT64;  dval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  dval := lval / rval;
@@ -3580,10 +3580,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EDivideAXAXLoop;
 
-	OPERATOR "./"*(CONST left,right: ARRAY [?] OF LONGREAL): ARRAY [?] OF LONGREAL;
+	OPERATOR "./"*(CONST left,right: ARRAY [?] OF FLOAT64): ARRAY [?] OF FLOAT64;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), EDivideAXAXLoop );
+										  SIZEOF( FLOAT64 ), EDivideAXAXLoop );
 		RETURN RESULT
 	END "./";
 
@@ -3608,11 +3608,11 @@ Sufficient (but not necessary) conditions:
 
 (** LONGCOMPLEX *)
 	PROCEDURE EDivideALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;  dvalRe, dvalIm: LONGREAL; v: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;  dvalRe, dvalIm: FLOAT64; v: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
 			IF rvalIm # 0.0D0 THEN
 				v := 1.0D0/(rvalRe*rvalRe + rvalIm*rvalIm);
 				dvalRe := v*(lvalRe*rvalRe+lvalIm*rvalIm);
@@ -3621,7 +3621,7 @@ Sufficient (but not necessary) conditions:
 				dvalRe := lvalRe/rvalRe;
 				dvalIm := lvalIm/rvalRe;
 			END;
-			SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), dvalIm );
+			SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), dvalIm );
 			INC( ladr, linc );  INC( radr, rinc );  INC( dadr, dinc );
 			DEC( len );
 		END;
@@ -3777,9 +3777,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END "/";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE DivideAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;  dval: LONGREAL;
+	VAR lval, rval: FLOAT64;  dval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3788,15 +3788,15 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideAXSXLoop;
 
-	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "/"*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), DivideAXSXLoop );
+										  SIZEOF( FLOAT64 ), DivideAXSXLoop );
 		RETURN RESULT
 	END "/";
 
 	PROCEDURE DivideSXAXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;  dval: LONGREAL;
+	VAR lval, rval: FLOAT64;  dval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -3805,10 +3805,10 @@ Sufficient (but not necessary) conditions:
 		END;
 	END DivideSXAXLoop;
 
-	OPERATOR "/"*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "/"*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
-										  SIZEOF( LONGREAL ), DivideSXAXLoop );
+										  SIZEOF( FLOAT64 ), DivideSXAXLoop );
 		RETURN RESULT
 	END "/";
 
@@ -3851,25 +3851,25 @@ Sufficient (but not necessary) conditions:
 
 (** LONGCOMPLEX *)
 	PROCEDURE DivideALZSLZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;  dvalRe, dvalIm: LONGREAL; v: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;  dvalRe, dvalIm: FLOAT64; v: FLOAT64;
 	BEGIN
-		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
+		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
 
 		IF rvalIm # 0.0D0 THEN
 			v := 1.0D0/(rvalRe*rvalRe + rvalIm*rvalIm);
 			WHILE (len > 0) DO
-				SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
+				SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
 				dvalRe := v*(lvalRe*rvalRe+lvalIm*rvalIm);
 				dvalIm := v*(lvalIm*rvalRe-lvalRe*rvalIm);
-				SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), dvalIm );
+				SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), dvalIm );
 				INC( ladr, linc );
 				INC( dadr, dinc );  DEC( len );
 			END;
 		ELSE
 			WHILE (len > 0) DO
-				SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
+				SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
 				dvalRe := lvalRe / rvalRe; dvalIm := lvalIm / rvalRe;
-				SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), dvalIm );
+				SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), dvalIm );
 				INC( ladr, linc );
 				INC( dadr, dinc );  DEC( len );
 			END;
@@ -3884,15 +3884,15 @@ Sufficient (but not necessary) conditions:
 	END "/";
 
 	PROCEDURE DivideSLZALZLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;  dvalRe, dvalIm: LONGREAL; v: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;  dvalRe, dvalIm: FLOAT64; v: FLOAT64;
 	BEGIN
-		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
+		SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
 			v := 1.0D0/(lvalRe*lvalRe + lvalIm*lvalIm);
 			dvalRe := v*(rvalRe*lvalRe+rvalIm*lvalIm);
 			dvalIm := v*(rvalIm*lvalRe-rvalRe*lvalIm);
-			SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), dvalIm );
+			SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), dvalIm );
 			INC( ladr, linc );
 			INC( dadr, dinc );  DEC( len );
 		END;
@@ -4316,7 +4316,7 @@ Sufficient (but not necessary) conditions:
 	END "+*";
 
 	PROCEDURE SPAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval, dval: LONGREAL;
+	VAR lval, rval, dval: FLOAT64;
 	BEGIN
 		IF debug THEN
 			KernelLog.String( "SPAXAX, ladr,radr,dadr,linc,rinc,len= " );  KernelLog.Int( ladr, 10 );  KernelLog.Int( radr, 10 );
@@ -4332,8 +4332,8 @@ Sufficient (but not necessary) conditions:
 		SYSTEM.PUT( dadr, dval );
 	END SPAXAXLoop;
 
-	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF LONGREAL ): LONGREAL;
-	VAR dest: LONGREAL;
+	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF FLOAT64 ): FLOAT64;
+	VAR dest: FLOAT64;
 	BEGIN
 		dest := 0;
 		ApplyBinaryAASOp( ADDRESSOF( dest ), ADDRESSOF( left ), ADDRESSOF( right ), loopSPAXAX );
@@ -4364,17 +4364,17 @@ Sufficient (but not necessary) conditions:
 
 	(** COMPLEX *)
 	PROCEDURE SPALZALZLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;  dvalRe, dvalIm: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;  dvalRe, dvalIm: FLOAT64;
 	BEGIN
-		SYSTEM.GET( dadr, dvalRe ); SYSTEM.GET( dadr+SIZEOF(LONGREAL), dvalIm );
+		SYSTEM.GET( dadr, dvalRe ); SYSTEM.GET( dadr+SIZEOF(FLOAT64), dvalIm );
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
 			dvalRe := dvalRe + lvalRe * rvalRe + lvalIm * rvalIm;
 			dvalIm := dvalIm - lvalRe * rvalIm + lvalIm * rvalRe;
 			INC( ladr, linc );  INC( radr, rinc );  DEC( len );
 		END;
-		SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), dvalIm );
+		SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), dvalIm );
 	END SPALZALZLoop;
 
 	OPERATOR "+*"*( CONST left, right: ARRAY [ ? ] OF LONGCOMPLEX ): LONGCOMPLEX;
@@ -4476,9 +4476,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".=";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EEqlAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval = rval );
@@ -4486,7 +4486,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EEqlAXAXLoop;
 
-	OPERATOR ".="*(CONST left, right: ARRAY [ ? ] OF LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".="*(CONST left, right: ARRAY [ ? ] OF FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EEqlAXAXLoop );
@@ -4620,9 +4620,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".=";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EEqlAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4631,14 +4631,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EEqlAXSXLoop;
 
-	OPERATOR ".="*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".="*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EEqlAXSXLoop );
 		RETURN RESULT
 	END ".=";
 
-	OPERATOR ".="*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".="*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), EEqlAXSXLoop );
@@ -4732,9 +4732,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".#";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE ENeqAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval # rval );
@@ -4742,7 +4742,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ENeqAXAXLoop;
 
-	OPERATOR ".#"*(CONST left, right: ARRAY [ ? ] OF LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".#"*(CONST left, right: ARRAY [ ? ] OF FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ENeqAXAXLoop );
@@ -4876,9 +4876,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".#";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE ENeqAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -4887,14 +4887,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ENeqAXSXLoop;
 
-	OPERATOR ".#"*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".#"*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ENeqAXSXLoop );
 		RETURN RESULT
 	END ".#";
 
-	OPERATOR ".#"*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".#"*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), ENeqAXSXLoop );
@@ -4972,9 +4972,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".>";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EGtrAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval > rval );
@@ -4982,7 +4982,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGtrAXAXLoop;
 
-	OPERATOR ".>"*(CONST left, right: ARRAY [ ? ] OF LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>"*(CONST left, right: ARRAY [ ? ] OF FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EGtrAXAXLoop );
@@ -5091,9 +5091,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".<";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EGtrAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5102,14 +5102,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGtrAXSXLoop;
 
-	OPERATOR ".>"*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>"*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EGtrAXSXLoop );
 		RETURN RESULT
 	END ".>";
 
-	OPERATOR ".<"*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<"*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), EGtrAXSXLoop );
@@ -5187,9 +5187,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".>=";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EGeqAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval >= rval );
@@ -5197,7 +5197,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGeqAXAXLoop;
 
-	OPERATOR ".>="*(CONST left, right: ARRAY [ ? ] OF LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>="*(CONST left, right: ARRAY [ ? ] OF FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EGeqAXAXLoop );
@@ -5306,9 +5306,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".<=";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EGeqAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5317,14 +5317,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END EGeqAXSXLoop;
 
-	OPERATOR ".>="*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>="*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), EGeqAXSXLoop );
 		RETURN RESULT
 	END ".>=";
 
-	OPERATOR ".<="*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<="*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), EGeqAXSXLoop );
@@ -5401,9 +5401,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".<";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE ELssAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval < rval );
@@ -5411,7 +5411,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELssAXAXLoop;
 
-	OPERATOR ".<"*(CONST left, right: ARRAY [ ? ] OF LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<"*(CONST left, right: ARRAY [ ? ] OF FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ELssAXAXLoop );
@@ -5520,9 +5520,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".>";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE ELssAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5531,14 +5531,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELssAXSXLoop;
 
-	OPERATOR ".<"*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<"*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ELssAXSXLoop );
 		RETURN RESULT
 	END ".<";
 
-	OPERATOR ".>"*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>"*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), ELssAXSXLoop );
@@ -5616,9 +5616,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".<=";
 
-(** LONGREAL*)
+(** FLOAT64*)
 	PROCEDURE ELeqAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );  SYSTEM.PUT( dadr, lval <= rval );
@@ -5626,7 +5626,7 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELeqAXAXLoop;
 
-	OPERATOR ".<="*(CONST left, right: ARRAY [ ? ] OF LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<="*(CONST left, right: ARRAY [ ? ] OF FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ELeqAXAXLoop );
@@ -5735,9 +5735,9 @@ Sufficient (but not necessary) conditions:
 		RETURN RESULT
 	END ".>=";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE ELeqAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -5746,14 +5746,14 @@ Sufficient (but not necessary) conditions:
 		END;
 	END ELeqAXSXLoop;
 
-	OPERATOR ".<="*(CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".<="*(CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
 										  SIZEOF( BOOLEAN ), ELeqAXSXLoop );
 		RETURN RESULT
 	END ".<=";
 
-	OPERATOR ".>="*(left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF BOOLEAN;
+	OPERATOR ".>="*(left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF BOOLEAN;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( right ), ADDRESSOF( left ),
 										  SIZEOF( BOOLEAN ), ELeqAXSXLoop );
@@ -5980,9 +5980,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GeqARARLoop , FALSE);
 	END ">=";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE LssAXAXLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -5992,13 +5992,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LssAXAXLoop;
 
-	OPERATOR "<"*( CONST left, right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR "<"*( CONST left, right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LssAXAXLoop , FALSE);
 	END "<";
 
 	PROCEDURE GeqAXAXLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6008,7 +6008,7 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GeqAXAXLoop;
 
-	OPERATOR ">="*( CONST left, right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR ">="*( CONST left, right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GeqAXAXLoop , FALSE);
 	END ">=";
@@ -6147,9 +6147,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LeqARARLoop , FALSE);
 	END "<=";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE GtrAXAXLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6159,13 +6159,13 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GtrAXAXLoop;
 
-	OPERATOR ">"*( CONST left, right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR ">"*( CONST left, right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrAXAXLoop , FALSE);
 	END ">";
 
 	PROCEDURE LeqAXAXLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6175,7 +6175,7 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LeqAXAXLoop;
 
-	OPERATOR "<="*( CONST left, right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR "<="*( CONST left, right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), LeqAXAXLoop , FALSE);
 	END "<=";
@@ -6293,9 +6293,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlARARLoop, FALSE );
 	END "#";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EqlAXAXLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.GET( radr, rval );
@@ -6305,12 +6305,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlAXAXLoop;
 
-	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR "="*( CONST left, right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlAXAXLoop, FALSE );
 	END "=";
 
-	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR "#"*( CONST left, right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ~ApplyBinaryAABOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlAXAXLoop, FALSE );
 	END "#";
@@ -6339,11 +6339,11 @@ Sufficient (but not necessary) conditions:
 
 (** LONGCOMPLEX *)
 	PROCEDURE EqlALZALZLoop( ladr, radr: ADDRESS; linc, rinc, len: SIZE ): BOOLEAN;
-	VAR lvalRe, lvalIm, rvalRe, rvalIm: LONGREAL;
+	VAR lvalRe, lvalIm, rvalRe, rvalIm: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(LONGREAL), rvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+			SYSTEM.GET( radr, rvalRe ); SYSTEM.GET( radr+SIZEOF(FLOAT64), rvalIm );
 			IF (rvalRe # lvalRe) OR (rvalIm # lvalIm) THEN RETURN FALSE END;
 			INC( ladr, linc );  INC( radr, rinc );  DEC( len );
 		END;
@@ -6539,9 +6539,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ~( left = right );
 	END "#";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE EqlAXSXLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6552,25 +6552,25 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END EqlAXSXLoop;
 
-	OPERATOR "="*( CONST left: ARRAY [ ? ] OF LONGREAL;
-										    right: LONGREAL ): BOOLEAN;
+	OPERATOR "="*( CONST left: ARRAY [ ? ] OF FLOAT64;
+										    right: FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), EqlAXSXLoop );
 	END "=";
 
-	OPERATOR "="*( left: LONGREAL;
-										    CONST right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR "="*( left: FLOAT64;
+										    CONST right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), EqlAXSXLoop );
 	END "=";
 
-	OPERATOR "#"*( CONST left: ARRAY [ ? ] OF LONGREAL;
-											 right: LONGREAL ): BOOLEAN;
+	OPERATOR "#"*( CONST left: ARRAY [ ? ] OF FLOAT64;
+											 right: FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ~( left = right );
 	END "#";
 
-	OPERATOR "#"*( left: LONGREAL;CONST right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR "#"*( left: FLOAT64;CONST right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ~( left= right );
 	END "#";
@@ -6673,9 +6673,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GtrARSRLoop );
 	END "<";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE GtrAXSXLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6686,14 +6686,14 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GtrAXSXLoop;
 
-	OPERATOR ">"*( CONST left: ARRAY [ ? ] OF LONGREAL;
-										   right: LONGREAL ): BOOLEAN;
+	OPERATOR ">"*( CONST left: ARRAY [ ? ] OF FLOAT64;
+										   right: FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), GtrAXSXLoop );
 	END ">";
 
-	OPERATOR "<"*( left: LONGREAL;
-										    CONST right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR "<"*( left: FLOAT64;
+										    CONST right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GtrAXSXLoop );
 	END "<";
@@ -6799,9 +6799,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GeqARSRLoop );
 	END "<=";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE GeqAXSXLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6812,12 +6812,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END GeqAXSXLoop;
 
-	OPERATOR ">="*( CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): BOOLEAN;
+	OPERATOR ">="*( CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), GeqAXSXLoop );
 	END ">=";
 
-	OPERATOR "<="*( left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR "<="*( left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), GeqAXSXLoop );
 	END "<=";
@@ -6917,9 +6917,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LeqARSRLoop );
 	END ">=";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE LeqAXSXLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -6930,12 +6930,12 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LeqAXSXLoop;
 
-	OPERATOR "<="*( CONST left: ARRAY [ ? ] OF LONGREAL; right: LONGREAL ): BOOLEAN;
+	OPERATOR "<="*( CONST left: ARRAY [ ? ] OF FLOAT64; right: FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), LeqAXSXLoop );
 	END "<=";
 
-	OPERATOR ">="*( left: LONGREAL; CONST right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR ">="*( left: FLOAT64; CONST right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LeqAXSXLoop );
 	END ">=";
@@ -7039,9 +7039,9 @@ Sufficient (but not necessary) conditions:
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LssARSRLoop );
 	END ">";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE LssAXSXLoop( ladr, radr: ADDRESS; linc, len: SIZE ): BOOLEAN;
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, rval );
 		WHILE (len > 0) DO
@@ -7052,14 +7052,14 @@ Sufficient (but not necessary) conditions:
 		RETURN TRUE;
 	END LssAXSXLoop;
 
-	OPERATOR "<"*( CONST left: ARRAY [ ? ] OF LONGREAL;
-										    right: LONGREAL ): BOOLEAN;
+	OPERATOR "<"*( CONST left: ARRAY [ ? ] OF FLOAT64;
+										    right: FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( left ), ADDRESSOF( right ), LssAXSXLoop );
 	END "<";
 
-	OPERATOR ">"*( left: LONGREAL;
-										   CONST right: ARRAY [ ? ] OF LONGREAL ): BOOLEAN;
+	OPERATOR ">"*( left: FLOAT64;
+										   CONST right: ARRAY [ ? ] OF FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ApplyBinaryASBOp( ADDRESSOF( right ), ADDRESSOF( left ), LssAXSXLoop );
 	END ">";
@@ -7067,7 +7067,7 @@ Sufficient (but not necessary) conditions:
 	(**** binary max/min operators array x scalar-> array ********************************************************************)
 	
 	PROCEDURE MaxAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE ); 
-	VAR lval, val: LONGREAL;
+	VAR lval, val: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, val );
 		WHILE (len > 0) DO
@@ -7078,8 +7078,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MaxAXSXLoop;
 	
-	OPERATOR "MAX"*(CONST left: ARRAY [?] OF LONGREAL; right: LONGREAL): ARRAY [?] OF LONGREAL;
-	TYPE Type = LONGREAL;
+	OPERATOR "MAX"*(CONST left: ARRAY [?] OF FLOAT64; right: FLOAT64): ARRAY [?] OF FLOAT64;
+	TYPE Type = FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( Type ), MaxAXSXLoop );
 		RETURN RESULT
@@ -7165,7 +7165,7 @@ Sufficient (but not necessary) conditions:
 	
 
 	PROCEDURE MinAXSXLoop( ladr, radr, dadr: ADDRESS; linc, dinc, len: SIZE ); 
-	VAR lval, val: LONGREAL;
+	VAR lval, val: FLOAT64;
 	BEGIN
 		SYSTEM.GET( radr, val );
 		WHILE (len > 0) DO
@@ -7176,8 +7176,8 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MinAXSXLoop;
 	
-	OPERATOR "MIN"*(CONST left: ARRAY [?] OF LONGREAL; right: LONGREAL): ARRAY [?] OF LONGREAL;
-	TYPE Type = LONGREAL;
+	OPERATOR "MIN"*(CONST left: ARRAY [?] OF FLOAT64; right: FLOAT64): ARRAY [?] OF FLOAT64;
+	TYPE Type = FLOAT64;
 	BEGIN
 		ApplyBinaryASAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( Type ), MinAXSXLoop );
 		RETURN RESULT
@@ -7263,7 +7263,7 @@ Sufficient (but not necessary) conditions:
 	(**** binary max/min operators array x array -> array ********************************************************************)
 
 	PROCEDURE MaxAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE ); 
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval ); SYSTEM.GET( radr, rval ); 
@@ -7273,9 +7273,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MaxAXAXLoop;
 
-	OPERATOR "MAX"*(CONST left, right: ARRAY [?] OF LONGREAL): ARRAY [?] OF LONGREAL;
+	OPERATOR "MAX"*(CONST left, right: ARRAY [?] OF FLOAT64): ARRAY [?] OF FLOAT64;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( LONGREAL ), MaxAXAXLoop );
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT64 ), MaxAXAXLoop );
 		RETURN RESULT
 	END "MAX";
 	
@@ -7349,7 +7349,7 @@ Sufficient (but not necessary) conditions:
 	END "MAX";
 
 	PROCEDURE MinAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, dinc, len: SIZE ); 
-	VAR lval, rval: LONGREAL;
+	VAR lval, rval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval ); SYSTEM.GET( radr, rval );
@@ -7359,9 +7359,9 @@ Sufficient (but not necessary) conditions:
 		END;
 	END MinAXAXLoop;
 	
-	OPERATOR "MIN"*(CONST left, right: ARRAY [?] OF LONGREAL): ARRAY [?] OF LONGREAL;
+	OPERATOR "MIN"*(CONST left, right: ARRAY [?] OF FLOAT64): ARRAY [?] OF FLOAT64;
 	BEGIN
-		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( LONGREAL ), MinAXAXLoop );
+		ApplyBinaryAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT64 ), MinAXAXLoop );
 		RETURN RESULT
 	END "MIN";
 		
@@ -7539,9 +7539,9 @@ TYPE
 		ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), MinARLoop );  RETURN val;
 	END "MIN";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE MinAXLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: LONGREAL;
+	VAR lval, dval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7552,8 +7552,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MinAXLoop;
 
-	OPERATOR "MIN"*( CONST left: ARRAY [ ? ] OF LONGREAL ): LONGREAL;
-	TYPE Type = LONGREAL;
+	OPERATOR "MIN"*( CONST left: ARRAY [ ? ] OF FLOAT64 ): FLOAT64;
+	TYPE Type = FLOAT64;
 	VAR val: Type;
 	BEGIN
 		val := MAX( Type );
@@ -7646,9 +7646,9 @@ TYPE
 		ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), MaxARLoop );  RETURN val;
 	END "MAX";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE MaxAXLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: LONGREAL;
+	VAR lval, dval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7659,8 +7659,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MaxAXLoop;
 
-	OPERATOR "MAX"*( CONST left: ARRAY [ ? ] OF LONGREAL ): LONGREAL;
-	TYPE Type = LONGREAL;
+	OPERATOR "MAX"*( CONST left: ARRAY [ ? ] OF FLOAT64 ): FLOAT64;
+	TYPE Type = FLOAT64;
 	VAR val: Type;
 	BEGIN
 		val := MIN( Type );
@@ -7758,9 +7758,9 @@ TYPE
 		RETURN val;
 	END "SUM";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE SumAXLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lval, dval: LONGREAL;
+	VAR lval, dval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -7769,8 +7769,8 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END SumAXLoop;
 
-	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF LONGREAL ): LONGREAL;
-	TYPE Type = LONGREAL;
+	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF FLOAT64 ): FLOAT64;
+	TYPE Type = FLOAT64;
 	VAR val: Type;
 	BEGIN
 		val := 0;  ApplyUnaryASOp( ADDRESSOF( val ), ADDRESSOF( left ), SumAXLoop );
@@ -7799,15 +7799,15 @@ TYPE
 
 (** LONGCOMPLEX *)
 	PROCEDURE SumALZLoop( ladr, dadr: ADDRESS; linc, len: SIZE );
-	VAR lvalRe, lvalIm, dvalRe, dvalIm: LONGREAL;
+	VAR lvalRe, lvalIm, dvalRe, dvalIm: FLOAT64;
 	BEGIN
-		SYSTEM.GET( dadr, dvalRe ); SYSTEM.GET( dadr+SIZEOF(LONGREAL), dvalIm );
+		SYSTEM.GET( dadr, dvalRe ); SYSTEM.GET( dadr+SIZEOF(FLOAT64), dvalIm );
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
 			dvalRe := dvalRe + lvalRe; dvalIm := dvalIm + lvalIm;
 			INC( ladr, linc );  DEC( len );
 		END;
-		SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), dvalIm );
+		SYSTEM.PUT( dadr, dvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), dvalIm );
 	END SumALZLoop;
 
 	OPERATOR "SUM"*( CONST left: ARRAY [ ? ] OF LONGCOMPLEX ): LONGCOMPLEX;
@@ -7884,9 +7884,9 @@ TYPE
 		RETURN RESULT
 	END "ABS";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE AbsLoopX( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lval: LONGREAL;
+	VAR lval: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
 			SYSTEM.GET( ladr, lval );  SYSTEM.PUT( dadr, ABS( lval ) );  INC( ladr, linc );
@@ -7894,9 +7894,9 @@ TYPE
 		END;
 	END AbsLoopX;
 
-	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF LONGREAL): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF FLOAT64): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ), AbsLoopX );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT64 ), AbsLoopX );
 		RETURN RESULT
 	END "ABS";
 
@@ -7918,19 +7918,19 @@ TYPE
 
 (** LONGCOMPLEX *)
 	PROCEDURE AbsLoopLZ( ladr, dadr: ADDRESS; linc, dinc, len: SIZE );
-	VAR lvalRe, lvalIm: LONGREAL;
+	VAR lvalRe, lvalIm: FLOAT64;
 	BEGIN
 		WHILE (len > 0) DO
-			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
+			SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
 			SYSTEM.PUT( dadr, MathL.sqrt(lvalRe*lvalRe + lvalIm*lvalIm) );
 			INC( ladr, linc );
 			INC( dadr, dinc );  DEC( len );
 		END;
 	END AbsLoopLZ;
 
-	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF LONGCOMPLEX): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "ABS"*(CONST src: ARRAY [ ? ] OF LONGCOMPLEX): ARRAY [ ? ] OF FLOAT64;
 	BEGIN
-		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( LONGREAL ), AbsLoopLZ );
+		ApplyUnaryAAOp( ADDRESSOF( RESULT ), ADDRESSOF( src ), SIZEOF( FLOAT64 ), AbsLoopLZ );
 		RETURN RESULT
 	END "ABS";
 
@@ -8004,15 +8004,15 @@ TYPE
 	END ":=";
 
 
-(** LONGREAL *)
+(** FLOAT64 *)
 	PROCEDURE AssignSXAXLoop( ladr, dadr: ADDRESS; dinc, len: SIZE );
-	VAR lval: LONGREAL;
+	VAR lval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( ladr, lval );
 		WHILE (len > 0) DO SYSTEM.PUT( dadr, lval );  INC( dadr, dinc );  DEC( len );  END;
 	END AssignSXAXLoop;
 
-	OPERATOR ":="*(VAR dest: ARRAY [?] OF LONGREAL; right: LONGREAL);
+	OPERATOR ":="*(VAR dest: ARRAY [?] OF FLOAT64; right: FLOAT64);
 	BEGIN
 		ApplyUnarySAOp( ADDRESSOF( dest ), ADDRESSOF( right ), AssignSXAXLoop );
 	END ":=";
@@ -8032,10 +8032,10 @@ TYPE
 
 (** LONGCOMPLEX *)
 	PROCEDURE AssignSLZALZLoop( ladr, dadr: ADDRESS; dinc, len: SIZE );
-	VAR lvalRe, lvalIm: LONGREAL;
+	VAR lvalRe, lvalIm: FLOAT64;
 	BEGIN
-		SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(LONGREAL), lvalIm );
-		WHILE (len > 0) DO SYSTEM.PUT( dadr, lvalRe ); SYSTEM.PUT( dadr+SIZEOF(LONGREAL), lvalIm ); INC( dadr, dinc );  DEC( len );  END;
+		SYSTEM.GET( ladr, lvalRe ); SYSTEM.GET( ladr+SIZEOF(FLOAT64), lvalIm );
+		WHILE (len > 0) DO SYSTEM.PUT( dadr, lvalRe ); SYSTEM.PUT( dadr+SIZEOF(FLOAT64), lvalIm ); INC( dadr, dinc );  DEC( len );  END;
 	END AssignSLZALZLoop;
 
 	OPERATOR ":="*(VAR dest: ARRAY [?] OF LONGCOMPLEX; right: LONGCOMPLEX);
@@ -8580,10 +8580,10 @@ TYPE
 		RETURN RESULT
 	END "*";
 
-(** LONGREAL *)
+(** FLOAT64 *)
 
 	PROCEDURE MatMulAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval, dval: LONGREAL;
+	VAR lval, rval, dval: FLOAT64;
 	BEGIN
 		dval := 0;
 		WHILE (len > 0) DO
@@ -8598,7 +8598,7 @@ TYPE
 
 		use of CONST for left, right makes execution slower, it seems that a new descriptor is created in this case
 	*)
-	OPERATOR "*"*( CONST left, right: ARRAY [ * , * ] OF LONGREAL): ARRAY [ * , * ] OF LONGREAL;
+	OPERATOR "*"*( CONST left, right: ARRAY [ * , * ] OF FLOAT64): ARRAY [ * , * ] OF FLOAT64;
 	VAR
 		flags: SET; dadr, ladr, radr: ADDRESS;
 	BEGIN
@@ -8681,11 +8681,11 @@ TYPE
 						RESULT[3,3] := left[3,0]*right[0,3] + left[3,1]*right[1,3] + left[3,2]*right[2,3] + left[3,3]*right[3,3];
 					END;
 			ELSE
-				ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( LONGREAL ),
+				ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT64 ),
 									    loopMatMulAXAX, matMulX );
 			END;
 		ELSE
-			ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( LONGREAL ),
+			ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ), SIZEOF( FLOAT64 ),
 									    loopMatMulAXAX, matMulX );
 		END;
 		RETURN RESULT
@@ -8696,11 +8696,11 @@ TYPE
 
 		use of CONST for left, right makes execution slower, it seems that a new descriptor is created in this case
 	*)
-	OPERATOR "*"*(CONST left: ARRAY [ * , * ] OF LONGREAL;
-												CONST right: ARRAY [ * ] OF LONGREAL  ): ARRAY [ * ] OF LONGREAL;
+	OPERATOR "*"*(CONST left: ARRAY [ * , * ] OF FLOAT64;
+												CONST right: ARRAY [ * ] OF FLOAT64  ): ARRAY [ * ] OF FLOAT64;
 	VAR
 		flags: SET; dadr, ladr, radr: ADDRESS;
-		v0, v1, v2: LONGREAL;
+		v0, v1, v2: FLOAT64;
 	BEGIN
 
 		dadr := GetAdr(ADDRESSOF(RESULT));
@@ -8762,16 +8762,16 @@ TYPE
 
 		ELSE
 			ApplyMatVecMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( LONGREAL ), loopMatMulAXAX, matMulX );
+											 SIZEOF( FLOAT64 ), loopMatMulAXAX, matMulX );
 		END;
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*( CONST left: ARRAY [ * ] OF LONGREAL;
-														 CONST right: ARRAY [ * , * ] OF LONGREAL  ): ARRAY [ * ] OF LONGREAL;
+	OPERATOR "*"*( CONST left: ARRAY [ * ] OF FLOAT64;
+														 CONST right: ARRAY [ * , * ] OF FLOAT64  ): ARRAY [ * ] OF FLOAT64;
 	BEGIN
 		ApplyVecMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( LONGREAL ), loopMatMulAXAX, matMulX );
+											 SIZEOF( FLOAT64 ), loopMatMulAXAX, matMulX );
 		RETURN RESULT
 	END "*";
 
@@ -9020,10 +9020,10 @@ TYPE
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
-(** LONGREAL *)
+(** FLOAT64 *)
 
 	PROCEDURE MatMulIncAXAXLoop( ladr, radr, dadr: ADDRESS; linc, rinc, len: SIZE );
-	VAR lval, rval, dval: LONGREAL;
+	VAR lval, rval, dval: FLOAT64;
 	BEGIN
 		SYSTEM.GET( dadr, dval );
 		WHILE (len > 0) DO
@@ -9033,51 +9033,51 @@ TYPE
 		SYSTEM.PUT( dadr, dval );
 	END MatMulIncAXAXLoop;
 
-	OPERATOR "INCMUL"*(CONST left, right: ARRAY [ * , * ] OF LONGREAL  ): ARRAY [ * , * ] OF LONGREAL;
+	OPERATOR "INCMUL"*(CONST left, right: ARRAY [ * , * ] OF FLOAT64  ): ARRAY [ * , * ] OF FLOAT64;
 	BEGIN
 		ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-									    SIZEOF( LONGREAL ), loopMatMulIncAXAX, matMulIncX );
+									    SIZEOF( FLOAT64 ), loopMatMulIncAXAX, matMulIncX );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "INCMUL"*(CONST left: ARRAY [ * , * ] OF LONGREAL; CONST right: ARRAY [ * ] OF LONGREAL  ): ARRAY [ * ] OF LONGREAL;
+	OPERATOR "INCMUL"*(CONST left: ARRAY [ * , * ] OF FLOAT64; CONST right: ARRAY [ * ] OF FLOAT64  ): ARRAY [ * ] OF FLOAT64;
 	BEGIN
 		ApplyMatVecMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( LONGREAL ), loopMatMulIncAXAX, matMulIncX );
+											 SIZEOF( FLOAT64 ), loopMatMulIncAXAX, matMulIncX );
 		RETURN RESULT
 	END "INCMUL";
 
-	OPERATOR "INCMUL"*( CONST left: ARRAY [ * ] OF LONGREAL; CONST right: ARRAY [ * , * ] OF LONGREAL ): ARRAY [ * ] OF LONGREAL;
+	OPERATOR "INCMUL"*( CONST left: ARRAY [ * ] OF FLOAT64; CONST right: ARRAY [ * , * ] OF FLOAT64 ): ARRAY [ * ] OF FLOAT64;
 		BEGIN
 		ApplyVecMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( LONGREAL ), loopMatMulIncAXAX, matMulIncX );
+											 SIZEOF( FLOAT64 ), loopMatMulIncAXAX, matMulIncX );
 		RETURN RESULT
 	END "INCMUL";
 
 
-	OPERATOR "DECMUL"*(CONST left, right: ARRAY [ * , * ] OF LONGREAL ): ARRAY [ * , * ] OF LONGREAL;
+	OPERATOR "DECMUL"*(CONST left, right: ARRAY [ * , * ] OF FLOAT64 ): ARRAY [ * , * ] OF FLOAT64;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-									    SIZEOF( LONGREAL ), loopMatMulIncAXAX, matMulIncX );
+									    SIZEOF( FLOAT64 ), loopMatMulIncAXAX, matMulIncX );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
 
-	OPERATOR "DECMUL"*( CONST left: ARRAY [ * , * ] OF LONGREAL; CONST right: ARRAY [ * ] OF LONGREAL ): ARRAY [ * ] OF LONGREAL;
+	OPERATOR "DECMUL"*( CONST left: ARRAY [ * , * ] OF FLOAT64; CONST right: ARRAY [ * ] OF FLOAT64 ): ARRAY [ * ] OF FLOAT64;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyMatVecMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( LONGREAL ), loopMatMulIncAXAX, matMulIncX );
+											 SIZEOF( FLOAT64 ), loopMatMulIncAXAX, matMulIncX );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
 
-	OPERATOR "DECMUL"*( CONST left: ARRAY [ * ] OF LONGREAL; CONST right: ARRAY [ * , * ] OF LONGREAL ): ARRAY [ * ] OF LONGREAL;
+	OPERATOR "DECMUL"*( CONST left: ARRAY [ * ] OF FLOAT64; CONST right: ARRAY [ * , * ] OF FLOAT64 ): ARRAY [ * ] OF FLOAT64;
 	BEGIN
 		RESULT := -RESULT;
 		ApplyVecMatMulLoop( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-											 SIZEOF( LONGREAL ), loopMatMulIncAXAX, matMulIncX );
+											 SIZEOF( FLOAT64 ), loopMatMulIncAXAX, matMulIncX );
 		RESULT := -RESULT;
 		RETURN RESULT
 	END "DECMUL";
@@ -9136,8 +9136,8 @@ TYPE
 		RETURN RESULT
 	END "*";
 
-	OPERATOR "*"*(CONST left, right: ARRAY [ * ] OF LONGREAL ): ARRAY [ * ] OF LONGREAL;
-	VAR vl1, vl2, vl3, vr1, vr2, vr3: LONGREAL;
+	OPERATOR "*"*(CONST left, right: ARRAY [ * ] OF FLOAT64 ): ARRAY [ * ] OF FLOAT64;
+	VAR vl1, vl2, vl3, vr1, vr2, vr3: FLOAT64;
 	BEGIN
 		IF (LEN( left,0 ) # 3) OR (LEN( right,0 ) # 3) THEN
 			Halt( GeometryMismatch, ADDRESSOF( left ), ADDRESSOF( right ),  0 )
@@ -9150,7 +9150,7 @@ TYPE
 	END "*";
 	
 
-	OPERATOR "*"*(CONST left, right: ARRAY [ ? ] OF LONGREAL ): ARRAY [ ? ] OF LONGREAL;
+	OPERATOR "*"*(CONST left, right: ARRAY [ ? ] OF FLOAT64 ): ARRAY [ ? ] OF FLOAT64;
 	VAR tensor: Tensor;
 	BEGIN
 		IF (DIM(left) = 2) & (DIM(right)=2) THEN
@@ -9159,7 +9159,7 @@ TYPE
 			EnsureArrayDesc(1, SYSTEM.VAL(Tensor, RESULT));
 		ELSE HALT(200);
 		END;
-		ApplyMatMulLoop(SYSTEM.VAL(Tensor, RESULT), SYSTEM.VAL(Tensor, left), SYSTEM.VAL(Tensor, right), SIZEOF( LONGREAL ),
+		ApplyMatMulLoop(SYSTEM.VAL(Tensor, RESULT), SYSTEM.VAL(Tensor, left), SYSTEM.VAL(Tensor, right), SIZEOF( FLOAT64 ),
 									    loopMatMulAXAX, matMulX );
 		RETURN RESULT
 	END "*";
@@ -9400,9 +9400,9 @@ TYPE
 		RETURN RESULT
 	END "`";
 
-	OPERATOR "`"*( CONST left: ARRAY [ * , * ] OF LONGREAL ): ARRAY [ * , * ] OF LONGREAL;
+	OPERATOR "`"*( CONST left: ARRAY [ * , * ] OF FLOAT64 ): ARRAY [ * , * ] OF FLOAT64;
 	BEGIN
-		Transpose( ADDRESSOF( RESULT ), ADDRESSOF( left ), SIZEOF( LONGREAL ) );
+		Transpose( ADDRESSOF( RESULT ), ADDRESSOF( left ), SIZEOF( FLOAT64 ) );
 		RETURN RESULT
 	END "`";
 
@@ -10034,10 +10034,10 @@ TYPE
 		RETURN RESULT
 	END "**";
 
-	OPERATOR "**"*(CONST left,right: ARRAY [?] OF LONGREAL): ARRAY [?] OF LONGREAL;
+	OPERATOR "**"*(CONST left,right: ARRAY [?] OF FLOAT64): ARRAY [?] OF FLOAT64;
 	BEGIN
 		ApplyTensorAAAOp( ADDRESSOF( RESULT ), ADDRESSOF( left ), ADDRESSOF( right ),
-										  SIZEOF( LONGREAL ), loopMulAXSX );
+										  SIZEOF( FLOAT64 ), loopMulAXSX );
 		RETURN RESULT
 	END "**";
 
@@ -10231,9 +10231,9 @@ TYPE
 		RETURN RESULT;
 	END "ALL";
 
-	OPERATOR "ALL"*(CONST x: ARRAY [?] OF LONGREAL; op: PROCEDURE(x: LONGREAL): LONGREAL): ARRAY[?] OF LONGREAL; (*should also accept operator ?*)
+	OPERATOR "ALL"*(CONST x: ARRAY [?] OF FLOAT64; op: PROCEDURE(x: FLOAT64): FLOAT64): ARRAY[?] OF FLOAT64; (*should also accept operator ?*)
 	BEGIN
-		ApplyGenericUnaryAAOpX(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(LONGREAL),GenericLoopX,op);
+		ApplyGenericUnaryAAOpX(ADDRESSOF(RESULT),ADDRESSOF(x),SIZEOF(FLOAT64),GenericLoopX,op);
 		RETURN RESULT;
 	END "ALL";
 	

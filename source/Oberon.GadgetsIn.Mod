@@ -150,7 +150,7 @@ END Real;
 
 (** LongReal - Input a long real number. *)
 
-PROCEDURE LongReal*(VAR x: LONGREAL);
+PROCEDURE LongReal*(VAR x: FLOAT64);
 BEGIN
 	IF done THEN
 		Texts.Scan(s);

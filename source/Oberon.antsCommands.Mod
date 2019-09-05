@@ -60,7 +60,7 @@ TYPE
 
 	tReal* = POINTER TO tRealDesc;   (* caution: a real number MAY be an integer number, check the type *)
 	tRealDesc* = RECORD (tParameterDesc)
-		real-: LONGREAL
+		real-: FLOAT64
 	END;
 
 	tNumber* = POINTER TO tNumberDesc;   (* be aware of the fact that a number IS a real number*)
@@ -103,7 +103,7 @@ VAR
 	usage  keywords
 
 	OBJ = vyBase.Object
-	FLOAT32 = LONGREAL
+	FLOAT32 = FLOAT64
 	INT = SIGNED32
 	STR = ARRAY OF CHAR
 	NAME = Voyager.Name (ARRAY OF CHAR with restrictions)
@@ -367,7 +367,7 @@ VAR
 		RETURN pars
 	END GetFromPosition;
 
-	PROCEDURE GetRealFromKeyword*( list: tScanList;  key: ARRAY OF CHAR;  VAR r: LONGREAL ): BOOLEAN;
+	PROCEDURE GetRealFromKeyword*( list: tScanList;  key: ARRAY OF CHAR;  VAR r: FLOAT64 ): BOOLEAN;
 	VAR p: tParameter;
 	BEGIN
 		p := ParsFromKeyword( list, key );
@@ -393,7 +393,7 @@ VAR
 		RETURN FALSE
 	END GetRealFromKeyword;
 
-	PROCEDURE GetReal*( key: ARRAY OF CHAR;  VAR r: LONGREAL ): BOOLEAN;
+	PROCEDURE GetReal*( key: ARRAY OF CHAR;  VAR r: FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN GetRealFromKeyword( lastScanned, key, r )
 	END GetReal;
@@ -509,7 +509,7 @@ VAR
 		RETURN GetObjectFromKeyword( lastScanned, key, obj )
 	END GetObject;
 
-	PROCEDURE ExpectRealFromKeyword*( list: tScanList;  key: ARRAY OF CHAR;  VAR r: LONGREAL ): BOOLEAN;
+	PROCEDURE ExpectRealFromKeyword*( list: tScanList;  key: ARRAY OF CHAR;  VAR r: FLOAT64 ): BOOLEAN;
 	BEGIN
 		IF ~GetRealFromKeyword( list, key, r ) THEN
 			aM.eSS( "antsCommands: Real expected, key:", key );  aM.eSI( "or expected at Position", list.spos );  aM.usage( callerS, usageS );
@@ -519,7 +519,7 @@ VAR
 		END
 	END ExpectRealFromKeyword;
 
-	PROCEDURE ExpectReal*( key: ARRAY OF CHAR;  VAR r: LONGREAL ): BOOLEAN;
+	PROCEDURE ExpectReal*( key: ARRAY OF CHAR;  VAR r: FLOAT64 ): BOOLEAN;
 	BEGIN
 		RETURN ExpectRealFromKeyword( lastScanned, key, r )
 	END ExpectReal;
@@ -692,7 +692,7 @@ VAR
 	END Expect;
 
 	PROCEDURE Test*;
-	VAR sc: vyScanners.Scanner;  m: tScanList;  p: tParameter;  name: vyName.tNameArray;  real: LONGREAL;  number: SIGNED32;
+	VAR sc: vyScanners.Scanner;  m: tScanList;  p: tParameter;  name: vyName.tNameArray;  real: FLOAT64;  number: SIGNED32;
 	BEGIN
 		vyScanners.NewSScanner( sc );  vyScanners.OpenParScanner( sc );  m := Scan( sc );  DumpScanList( m );  aM.S( "------------------" );
 		aM.SS( "Looking for Keyword:", "ww" );

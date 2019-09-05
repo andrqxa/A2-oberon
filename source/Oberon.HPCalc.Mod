@@ -70,7 +70,7 @@ MODULE HPCalc IN Oberon;	(** portable *)	(** prk  **)
 		o A Swap operation which swaps the TOS and TOS-1 (proposed by pjm)
 		o When clicking on Integer it displays "switch to base mode".  This should be "switched to integer mode". (found by PM)
 		o Execute Reset and then any operation which takes a parameter.  Garbage is displayed at the top of the stack. (found by PM)
-		o use LONGREAL instead of FLOAT32, everywhere. (PM proposal)
+		o use FLOAT64 instead of FLOAT32, everywhere. (PM proposal)
 		o small improvement in the OutS/OutR/OutI procedures
 		o improved parsing: in hex view mode, the input is interpreted as hex input.
 		o copy of partial results now supported
@@ -177,13 +177,13 @@ PROCEDURE PopI(m: CalcModel; VAR i: SIGNED32);	(* pop Longint from the stack *)
 BEGIN	Pop (m, dummy); Pop (m, i)
 END PopI;
 
-PROCEDURE PushR(m: CalcModel; r: LONGREAL);	(* push Longreal on the stack *)
+PROCEDURE PushR(m: CalcModel; r: FLOAT64);	(* push Longreal on the stack *)
 	VAR h, l: SIGNED32;
 BEGIN
 	Reals.IntL (r, h, l); Push (m, h); Push (m, l)
 END PushR;
 
-PROCEDURE PopR(m: CalcModel; VAR r: LONGREAL);	(* pop Longreal from the stack *)
+PROCEDURE PopR(m: CalcModel; VAR r: FLOAT64);	(* pop Longreal from the stack *)
 	VAR h, l: SIGNED32;
 BEGIN
 	Pop (m, l); Pop (m, h); r := Reals.RealL (h, l)
@@ -225,7 +225,7 @@ PROCEDURE ChangeMode (m: CalcModel; from, to: SIGNED8);
 	VAR i: SIGNED32;
 
 	PROCEDURE Convert (VAR h, l: SIGNED32);
-		VAR r: LONGREAL;
+		VAR r: FLOAT64;
 	BEGIN
 		IF (from = Real) & (to = Integer) THEN
 			r := Reals.RealL (h, l); h := ENTIER(r); l := 0
@@ -244,7 +244,7 @@ BEGIN
 END ChangeMode;
 
 PROCEDURE GetModelValue (F: CalcModel; pos: SIGNED16; VAR s: ARRAY OF CHAR): SIGNED16;	(* get textual value from stack *)
-	VAR	lr: LONGREAL; l, h: SIGNED32;
+	VAR	lr: FLOAT64; l, h: SIGNED32;
 BEGIN
 	(* Check Range *)
 	IF (F.TOS <= pos*2) THEN
@@ -335,7 +335,7 @@ END GetModel;
 (*	The basic functions of the calculator *)
 
 PROCEDURE DoRealFunction (m: CalcModel; VAR FN: ARRAY OF CHAR);
-	VAR	a, b, r: LONGREAL;
+	VAR	a, b, r: FLOAT64;
 BEGIN
 	IF FN = "ABS" THEN
 		PopR (m, b); r := ABS (b)
@@ -441,7 +441,7 @@ BEGIN
 END DoIntegerFunction;
 
 PROCEDURE Calc;
-	VAR r, r1: LONGREAL; tmp: ARRAY 64 OF CHAR; j, l: SIGNED32; hex, number: BOOLEAN; ch: CHAR; R: Texts.Reader;
+	VAR r, r1: FLOAT64; tmp: ARRAY 64 OF CHAR; j, l: SIGNED32; hex, number: BOOLEAN; ch: CHAR; R: Texts.Reader;
 		m: CalcModel; o, dlink: Objects.Object;
 
 	PROCEDURE Read;

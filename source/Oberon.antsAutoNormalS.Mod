@@ -33,7 +33,7 @@ TYPE
 	tModel* = POINTER TO tModelDesc;
 	tModelDesc* = RECORD (antsModels.tModelDesc);
 		dim-: SIGNED32;
-		mu, sigmasq: LONGREAL;
+		mu, sigmasq: FLOAT64;
 		n*: antsNeighbourhoods.Neighbours;
 		current: intArray (* to cache neighbours, temp! *)
 	END;
@@ -70,8 +70,8 @@ VAR
 
 	PROCEDURE OneSweep*( s: antsKernel.Kernel;  visit: antsKernel.visitingScheme );
 	VAR A, Orig: antsArrayObjects.tINTEGERObject;  AA: antsArrayObjects.tINTEGERArray;  model: tModel;  dim, x, y, w, h: SIGNED32;
-		x0, y0, w0, h0: SIGNED32;  orig: Objects.Object;  count: SIGNED16;  nb: intArray;  cooling: LONGREAL;  max: SIGNED16;  nclen: SIGNED32;
-		cx, cy: antsNeighbourhoods.Index;  i: SIGNED32;  pars: antsNeighbourhoods.pars;  theta: LONGREAL;  position, posi: SIGNED32;  mu, sigmasq: LONGREAL;
+		x0, y0, w0, h0: SIGNED32;  orig: Objects.Object;  count: SIGNED16;  nb: intArray;  cooling: FLOAT64;  max: SIGNED16;  nclen: SIGNED32;
+		cx, cy: antsNeighbourhoods.Index;  i: SIGNED32;  pars: antsNeighbourhoods.pars;  theta: FLOAT64;  position, posi: SIGNED32;  mu, sigmasq: FLOAT64;
 	BEGIN
 		A := s.A( antsArrayObjects.tINTEGERObject );  AA := A.A;  w := A.w;  h := A.h;  model := s.par( tModel );
 		antsRegions.Get( model.region, A, x0, y0, w0, h0 );   (* DEC(w0);    DEC(h0);   w0 := w0+x0; h0 := h0+y0;  *)
@@ -243,7 +243,7 @@ fofAutomatic.Do > interactive > secure
 antsMC.Forward chain  1 1 ~
 ~
 Optimizing history: (8sec) = > (6sec)
-(* PROCEDURE U (y, x, val: SIGNED32): LONGREAL;
+(* PROCEDURE U (y, x, val: SIGNED32): FLOAT64;
 BEGIN
 theta := 0;
 FOR i := 0 TO M.dim DO
@@ -262,9 +262,9 @@ END U;
 *)
 (*PROCEDURE Local (o: antsArrayObjects.tObject;   dim: SIGNED32;   par: array;    x, y: SIGNED32;   M: tModel;
 s: antsKernel.Kernel);
-VAR theta: LONGREAL;   k: SIGNED32;   f: antsFunctions.Function;   ran, u, z: LONGREAL;   count: SIGNED16;
+VAR theta: FLOAT64;   k: SIGNED32;   f: antsFunctions.Function;   ran, u, z: FLOAT64;   count: SIGNED16;
 
-PROCEDURE U (y, x, val: SIGNED32): LONGREAL;
+PROCEDURE U (y, x, val: SIGNED32): FLOAT64;
 VAR i: SIGNED32;
 BEGIN
 theta := 0;
@@ -275,7 +275,7 @@ END;
 RETURN theta
 END U;
 
-PROCEDURE Penalize (y, x, val: SIGNED32): LONGREAL;
+PROCEDURE Penalize (y, x, val: SIGNED32): FLOAT64;
 BEGIN
 IF s.Aorig # NIL THEN
 RETURN - par[0] * o.depth * (val - s.Aorig(antsArrayObjects.tObject).A[y, x]) * (val - s.Aorig(antsArrayObjects.tObject).A[y, x])

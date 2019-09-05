@@ -73,7 +73,7 @@ BEGIN
 	RETURN E.v[v + 4];
 END M;
 
-PROCEDURE F* (E: EmpiricalDistribution;    x, v: Index): LONGREAL;
+PROCEDURE F* (E: EmpiricalDistribution;    x, v: Index): FLOAT64;
 	VAR nv: States;
 BEGIN
 	nv := M(E, v);

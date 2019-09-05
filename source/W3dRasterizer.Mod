@@ -9,7 +9,7 @@ TYPE
 	Vertex* = OBJECT(AbstractWorld.Vertex)
 	VAR
 		p*, pt*, n*, nt* : Vectors.TVector3d;
-		u*, v*, x*, y* : LONGREAL;
+		u*, v*, x*, y* : FLOAT64;
 		color* : SIGNED32;
 		behind* : BOOLEAN;
 
@@ -18,7 +18,7 @@ TYPE
 			SELF.p := p
 		END SetPos;
 
-		PROCEDURE SetUV*(u, v : LONGREAL);
+		PROCEDURE SetUV*(u, v : FLOAT64);
 		BEGIN
 			SELF.u := u; SELF.v := v
 		END SetUV;
@@ -769,9 +769,9 @@ TYPE
 		END SubDivTriangle;
 
 		PROCEDURE SubDivLine*(a, b: Vertex);
-		VAR tdx, tdy : LONGREAL;
+		VAR tdx, tdy : FLOAT64;
 			tv : Vertex;
-			xr, yr, dxinv, dyinv, invdz, invaz, invbz, invz, z, dz, dx, dy : LONGREAL;
+			xr, yr, dxinv, dyinv, invdz, invaz, invbz, invz, z, dz, dx, dy : FLOAT64;
 			iy, ix, i : SIZE;
 		CONST SubDiv = 8;
 			SubDivInv = 1 / SubDiv;

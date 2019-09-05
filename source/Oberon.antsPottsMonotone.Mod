@@ -36,7 +36,7 @@ CONST
 	cMedian* = 0;  cMean* = 1;  cAbs* = 0;  cLog* = 1;  cIncr* = 0;  cDecr* = 1;
 TYPE
 
-	ArrayFunction = PROCEDURE ( VAR f: ARRAY OF LONGREAL;  i: SIGNED32 ): LONGREAL;
+	ArrayFunction = PROCEDURE ( VAR f: ARRAY OF FLOAT64;  i: SIGNED32 ): FLOAT64;
 
 	PROCEDURE MakeMonotoneRec*;
 	VAR name: ARRAY 64 OF CHAR;
@@ -59,7 +59,7 @@ TYPE
 	END MakeMonotoneRec;
 
 	PROCEDURE DoMonotone( degraded: vyBase.Object;  type: SIGNED16;  VAR vec: vyLongrealVec.tVector );
-	VAR N, i, j: SIGNED32;  data: antsArrays.X1d;  pos: SIGNED32;  multi: antsArrays.L1d;  start, end: SIGNED32;  mean, ssq: LONGREAL;  nrNaNs: SIGNED32;
+	VAR N, i, j: SIGNED32;  data: antsArrays.X1d;  pos: SIGNED32;  multi: antsArrays.L1d;  start, end: SIGNED32;  mean, ssq: FLOAT64;  nrNaNs: SIGNED32;
 		len: SIGNED32;  interval: vyLongrealVec.tVector;
 	BEGIN
 		ASSERT ( (degraded # NIL ) & (degraded IS vyLongrealVec.tVector), 109 );
@@ -137,7 +137,7 @@ this generates a new vector where the value at position is dropped out
 		END
 	END DropL1d;
 
-	PROCEDURE TestMonotone( VAR vector: ARRAY OF LONGREAL;  montype: SIGNED16 ): BOOLEAN;
+	PROCEDURE TestMonotone( VAR vector: ARRAY OF FLOAT64;  montype: SIGNED16 ): BOOLEAN;
 	VAR i, N: SIGNED32;  flag: BOOLEAN;
 	BEGIN
 		N := LEN( vector );  i := 0;  flag := TRUE;

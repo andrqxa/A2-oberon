@@ -206,8 +206,8 @@ TYPE
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4 )
 		END RawReal;
 
-	(** Write a LONGREAL. *)
-		PROCEDURE RawLReal*( x: LONGREAL );
+	(** Write a FLOAT64. *)
+		PROCEDURE RawLReal*( x: FLOAT64 );
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes8, x ), 0, 8 )
 		END RawLReal;
@@ -375,8 +375,8 @@ TYPE
 		END Date822;
 
 
-	(** Write LONGREAL x  using n character positions. *)
-		PROCEDURE Float*( x: LONGREAL;  n: WORD );
+	(** Write FLOAT64 x  using n character positions. *)
+		PROCEDURE Float*( x: FLOAT64;  n: WORD );
 		VAR
 			buf: ARRAY 32 OF CHAR;
 		BEGIN
@@ -384,8 +384,8 @@ TYPE
 			String( buf )
 		END Float;
 
-	(** Write LONGREAL x in a fixed point notation. n is the overall minimal length for the output field, f the number of fraction digits following the decimal point, D the fixed exponent (printed only when D # 0). *)
-		PROCEDURE FloatFix*( x: LONGREAL;  n, f, D: WORD );
+	(** Write FLOAT64 x in a fixed point notation. n is the overall minimal length for the output field, f the number of fraction digits following the decimal point, D the fixed exponent (printed only when D # 0). *)
+		PROCEDURE FloatFix*( x: FLOAT64;  n, f, D: WORD );
 		VAR
 			buf: ARRAY 512 OF CHAR;
 		BEGIN
@@ -648,8 +648,8 @@ TYPE
 			Bytes( SYSTEM.VAL( Bytes4, x ), 0, 4, ignore )
 		END RawReal;
 
-	(** Read a LONGREAL. *)
-		PROCEDURE RawLReal*( VAR x: LONGREAL );
+	(** Read a FLOAT64. *)
+		PROCEDURE RawLReal*( VAR x: FLOAT64 );
 		VAR ignore: SIZE;
 		BEGIN
 			Bytes( SYSTEM.VAL( Bytes8, x ), 0, 8, ignore )
@@ -902,7 +902,7 @@ TYPE
 		END GetSize;
 
 		(** First skip whitespace, then read a real *)
-		PROCEDURE GetReal*(VAR real: LONGREAL): BOOLEAN;
+		PROCEDURE GetReal*(VAR real: FLOAT64): BOOLEAN;
 		BEGIN
 			SkipWhitespace;
 			real := RC.ScanReal(Get);

@@ -29,7 +29,7 @@ IMPORT Display, vyBase, vyName, vyGraphBase, vyDisplay2d, vyPort, vyEvents, vyLi
 	vyTracking, Files, vyHighlight, Gadgets, vyGraph := antsGraph, Objects, antsCommands, vyCommandMenus;
 
 TYPE
-	Real = LONGREAL;
+	Real = FLOAT64;
 
 	tNode = POINTER TO tNodeDesc;
 	tNodeDesc = RECORD (vyGraph.tNodeDesc)
@@ -52,7 +52,7 @@ VAR
 	minlevel, maxlevel: SIGNED16;
 	currange: POINTER TO ARRAY OF SIGNED16;
 	graph: vyGraph.tGraph;   (* temp *)
-	min, max: SIGNED16;  rangex: LONGREAL;  tempLayer: tLayer;  vvv: tNode;
+	min, max: SIGNED16;  rangex: FLOAT64;  tempLayer: tLayer;  vvv: tNode;
 
 	PROCEDURE StoreNode( VAR R: Files.Rider;  n: tNode );
 	BEGIN
@@ -282,7 +282,7 @@ VAR
 	END rangepos;
 
 	PROCEDURE posit( n: vyGraph.tNode );
-	VAR x, y: LONGREAL;
+	VAR x, y: FLOAT64;
 	BEGIN
 		y := -n( tNode ).level;  x := ((n( tNode ).levelpos) + 1) / (currange[n( tNode ).level - minlevel] + 1);
 		vyGraph.PlaceNode( graph, n, x, y )
@@ -387,7 +387,7 @@ END RefineGraph;
 	END RefineGraph;
 
 	PROCEDURE checkSelection( n: vyGraph.tNode );
-	VAR nx, ny: LONGREAL;  sel: vyDisplay2d.Selection;
+	VAR nx, ny: FLOAT64;  sel: vyDisplay2d.Selection;
 	BEGIN
 
 		vyGraph.GetNodePlace( graph, n, nx, ny );  sel := vyDisplay2d.currentsel;
@@ -444,7 +444,7 @@ END RefineGraph;
 	END LoadL;
 
 	PROCEDURE updwonsel( n: vyGraph.tNode );
-	VAR x, y: LONGREAL;
+	VAR x, y: FLOAT64;
 	BEGIN
 		IF vyGraph.Selected( n ) THEN
 			vyGraph.GetNodePlace( graph, n, x, y );

@@ -161,7 +161,7 @@ VAR
 		accesses: SIGNED32;
 		byteRead, byteWritten, read, write: SIGNED64;
 		tread, twrite: SIGNED64;
-		speedR, speedW: LONGREAL;
+		speedR, speedW: FLOAT64;
 	BEGIN
 		byteRead := Sd.NbyteRead;
 		byteWritten := Sd.NbyteWritten;
@@ -171,27 +171,27 @@ VAR
 		twrite := SdEnvironment.ToMicro(Sd.Twrite);
 
 		IF read > 0 THEN
-			speedR := LONGREAL(byteRead) / LONGREAL(tread);
+			speedR := FLOAT64(byteRead) / FLOAT64(tread);
 			c.out.String("SD Statistics:"); c.out.Ln;
 			c.out.String("  Bytes read: "); c.out.Int(byteRead, 0); c.out.Ln;
 			c.out.String("  Number of reads: "); c.out.Int(read, 0); c.out.Ln;
 			c.out.String("  Read time: "); c.out.Int(tread, 0); c.out.String(" us"); c.out.Ln;
 			c.out.String("  Average read size: "); c.out.Int(byteRead DIV read, 0); c.out.String(" bytes"); c.out.Ln;
 			c.out.String("  Read speed: "); c.out.FloatFix(speedR, 0, 3, 0); c.out.String(" Mb/s"); c.out.Ln;
-			c.out.String("  Average read time: "); c.out.FloatFix(LONGREAL(tread) / LONGREAL(read), 0, 3, 0); c.out.String(" us"); c.out.Ln;
+			c.out.String("  Average read time: "); c.out.FloatFix(FLOAT64(tread) / FLOAT64(read), 0, 3, 0); c.out.String(" us"); c.out.Ln;
 		ELSE
 			c.out.String("No read statistics");
 			c.out.Ln
 		END;
 
 		IF write > 0 THEN
-			speedW := LONGREAL(byteWritten) / LONGREAL(twrite);
+			speedW := FLOAT64(byteWritten) / FLOAT64(twrite);
 			c.out.String("  Bytes written: "); c.out.Int(byteWritten, 0); c.out.Ln;
 			c.out.String("  Number of writes: "); c.out.Int(write, 0); c.out.Ln;
 			c.out.String("  Write time: "); c.out.Int(twrite, 0); c.out.String(" us"); c.out.Ln;
 			c.out.String("  Average write size: "); c.out.Int(byteWritten DIV write, 0); c.out.String(" bytes"); c.out.Ln;
 			c.out.String("  Write speed: "); c.out.FloatFix(speedW, 0, 3, 0); c.out.String(" Mb/s"); c.out.Ln;
-			c.out.String("  Average write time: "); c.out.FloatFix(LONGREAL(twrite) / LONGREAL(write), 0, 3, 0); c.out.String(" us"); c.out.Ln;
+			c.out.String("  Average write time: "); c.out.FloatFix(FLOAT64(twrite) / FLOAT64(write), 0, 3, 0); c.out.String(" us"); c.out.Ln;
 		ELSE
 			c.out.String("No write statistics");
 			c.out.Ln

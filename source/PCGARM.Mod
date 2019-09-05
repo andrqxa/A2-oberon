@@ -3007,7 +3007,7 @@ BEGIN
 	PCLIR.CG.SysCallMap[FGe] := CHR(214);
 	PCLIR.CG.SysCallMap[FGt] := CHR(215);
 
-	(* LONGREAL syscalls *)
+	(* FLOAT64 syscalls *)
 	PCLIR.CG.SysCallMap[FAdd+FLongOffset] := CHR(220);
 	PCLIR.CG.SysCallMap[FSub+FLongOffset] := CHR(221);
 	PCLIR.CG.SysCallMap[FMul+FLongOffset] := CHR(222);

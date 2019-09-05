@@ -70,23 +70,23 @@ VAR
 		END;
 	END tabelize;
 
-	PROCEDURE Calc( pos: SIGNED32;  dim: SIGNED32;  par: ARRAY OF LONGREAL ): LONGREAL;
-	VAR theta: LONGREAL;  k: SIGNED32;
+	PROCEDURE Calc( pos: SIGNED32;  dim: SIGNED32;  par: ARRAY OF FLOAT64 ): FLOAT64;
+	VAR theta: FLOAT64;  k: SIGNED32;
 	BEGIN
 		theta := 0;
 		FOR k := 1 TO dim DO theta := theta + par[k] * temptable[pos, k];  END;
 		theta := theta + par[0];  RETURN -(theta * temptable[pos, 0]) + MathL.ln( MathL.exp( theta ) + MathL.exp( -theta ) );
 	END Calc;
 
-	PROCEDURE IsingPMLE( o: antsArrayObjects.tObject;  dim: SIGNED32;  par: ARRAY OF LONGREAL ): LONGREAL;
-	VAR pos: SIGNED32;  ret: LONGREAL;
+	PROCEDURE IsingPMLE( o: antsArrayObjects.tObject;  dim: SIGNED32;  par: ARRAY OF FLOAT64 ): FLOAT64;
+	VAR pos: SIGNED32;  ret: FLOAT64;
 	BEGIN
 		ret := 0;
 		FOR pos := 0 TO (tw * th) - 1 DO ret := ret + Calc( pos, dim, par );  END;
 		RETURN ret;
 	END IsingPMLE;
 
-	PROCEDURE func( VAR Par: ARRAY OF LONGREAL ): LONGREAL;
+	PROCEDURE func( VAR Par: ARRAY OF FLOAT64 ): FLOAT64;
 	BEGIN
 		IF antsSecurity.CheckDisplay( TRUE ) THEN END;
 		RETURN IsingPMLE( tempO, tempDim, Par ) / (tempO.w * tempO.h);
@@ -224,7 +224,7 @@ VAR
 
 	PROCEDURE Estimate*;
 	VAR l: antsCommands.tScanList;  obj, obj1: vyBase.Object;  ni, nn, lastni, lastnn: antsNeighbourhoods.Neighbours;  j: SIGNED32;
-		listi, listn: vyLinks.Link;  e: Estimator;  dim: SIGNED32;  init: BOOLEAN;  fret, fret2: LONGREAL;  miniso, minniso: LONGREAL;
+		listi, listn: vyLinks.Link;  e: Estimator;  dim: SIGNED32;  init: BOOLEAN;  fret, fret2: FLOAT64;  miniso, minniso: FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME from=OBJ [>init] " );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) & antsCommands.ExpectObjectFromKeyword( l, "from", obj1 ) THEN
@@ -233,7 +233,7 @@ VAR
 			dim := e.lowdim;  listi := e.Isotropic;  listn := e.NonIsotropic;  tx := 0;  ty := 0;  tw := tempO.w;  th := tempO.h;
 
 			n := antsNeighbourhoods.NewL2( e.highdim, TRUE );  tabelize( tempO, e.highdim - 1 );  dim := e.lowdim;
-			miniso := MAX( LONGREAL );
+			miniso := MAX( FLOAT64 );
 			WHILE (listi # NIL ) DO
 				e.current := SHORT( dim );  aM.vSI( "dim", dim );  ni := listi.obj( antsNeighbourhoods.Neighbours );
 				(****)
@@ -246,7 +246,7 @@ VAR
 			END;
 
 			n := antsNeighbourhoods.NewL2( e.highdim, FALSE );  tabelize( tempO, e.highdim - 1 );  dim := e.lowdim;
-			minniso := MAX( LONGREAL );
+			minniso := MAX( FLOAT64 );
 			WHILE (listn # NIL ) DO
 				e.current := SHORT( dim );  aM.vSI( "dim", dim );  nn := listn.obj( antsNeighbourhoods.Neighbours );
 				(****)
@@ -266,7 +266,7 @@ VAR
 
 	PROCEDURE DoShow( e: Estimator );
 	VAR ni, nn: antsNeighbourhoods.Neighbours;  listi, listn: vyLinks.Link;  dim: SIGNED32;  mindim, maxdim: SIGNED32;
-		port1, port2: vyPort.Frame;  picture: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  w, h: SIGNED16;  fact: LONGREAL;  width: SIGNED16;
+		port1, port2: vyPort.Frame;  picture: vyPort.Picture;  c: vyDisplay2d.tCoordinate2d;  w, h: SIGNED16;  fact: FLOAT64;  width: SIGNED16;
 	BEGIN
 		w := SHORT( e.highdim - e.lowdim + 1 );  h := 1;  width := vyHostTexts.GetCurWidth();
 		IF width = 0 THEN width := 200 END;

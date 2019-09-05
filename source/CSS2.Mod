@@ -480,7 +480,7 @@ TYPE
 			operator, unaryOperator: SIGNED8;
 			type: SIGNED8;
 			intVal: SIGNED32;
-			realVal: LONGREAL;
+			realVal: FLOAT64;
 			stringVal: String;
 			unit: SIGNED8;
 			expr: Objects.Collection;	(* if term is a function *)
@@ -568,12 +568,12 @@ TYPE
 			SELF.intVal := intVal
 		END SetIntVal;
 
-		PROCEDURE GetRealVal*(): LONGREAL;
+		PROCEDURE GetRealVal*(): FLOAT64;
 		BEGIN
 			RETURN realVal
 		END GetRealVal;
 
-		PROCEDURE SetRealVal*(realVal: LONGREAL);
+		PROCEDURE SetRealVal*(realVal: FLOAT64);
 		BEGIN
 			SELF.realVal := realVal
 		END SetRealVal;

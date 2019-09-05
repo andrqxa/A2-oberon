@@ -63,9 +63,9 @@ TYPE
 (*! implement cache, general: speed up *)
 
 	PROCEDURE Local( o, c: antsArrayObjects.tINTEGERObject;  dim: SIGNED32;  par: array;  x, y: SIGNED32;  M: tModel;  s: antsKernel.Kernel );
-	VAR theta: LONGREAL;  f: antsMatrixPar.Matrix;  ran, u, z: LONGREAL;  count: SIGNED16;
+	VAR theta: FLOAT64;  f: antsMatrixPar.Matrix;  ran, u, z: FLOAT64;  count: SIGNED16;
 
-		PROCEDURE U( y, x, val: SIGNED32 ): LONGREAL;
+		PROCEDURE U( y, x, val: SIGNED32 ): FLOAT64;
 		VAR i: SIGNED32;
 		BEGIN
 			theta := 0;
@@ -76,7 +76,7 @@ TYPE
 		END U;
 
 	(*
-PROCEDURE Penalize (y, x, val: SIGNED32): LONGREAL;
+PROCEDURE Penalize (y, x, val: SIGNED32): FLOAT64;
 BEGIN
 IF s.Aorig # NIL THEN
 RETURN - par[0] * o.depth * (val - s.Aorig(antsArrayObjects.tObject).A[y, x]) * (val - s.Aorig(antsArrayObjects.tObject).A[y, x])

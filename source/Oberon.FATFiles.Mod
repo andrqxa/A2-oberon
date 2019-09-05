@@ -1470,7 +1470,7 @@ Portable routines to read the standard Oberon types.
 	BEGIN ReadBytes(R, x, 4, res)
 	END ReadReal;
 
-	PROCEDURE ReadLReal*(VAR R: Rider; VAR x: LONGREAL; VAR res: WORD);
+	PROCEDURE ReadLReal*(VAR R: Rider; VAR x: FLOAT64; VAR res: WORD);
 	BEGIN ReadBytes(R, x, 8, res)
 	END ReadLReal;
 
@@ -1603,7 +1603,7 @@ Portable routines to write the standard Oberon types.
 	BEGIN WriteBytes(R, x, 4, res)
 	END WriteReal;
 
-	PROCEDURE WriteLReal*(VAR R: Rider; x: LONGREAL; VAR res: WORD);
+	PROCEDURE WriteLReal*(VAR R: Rider; x: FLOAT64; VAR res: WORD);
 	BEGIN WriteBytes(R, x, 8, res)
 	END WriteLReal;
 

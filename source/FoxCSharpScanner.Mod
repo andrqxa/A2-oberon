@@ -169,7 +169,7 @@ TYPE
         numberType*: FoxScanner.SubType;
         integer*: SIGNED64;
         character*: CHAR;
-        real*: LONGREAL;
+        real*: FLOAT64;
     END;
 
     StringMaker* = FoxScanner.StringMaker;
@@ -462,7 +462,7 @@ TYPE
         PROCEDURE GetNumber(VAR token: Token; frac: BOOLEAN): Symbol;
             VAR i, m, n, d, e, si: SIGNED32;
                 dig: ARRAY 24 OF CHAR;
-                f: LONGREAL;
+                f: FLOAT64;
                 hex, neg, long: BOOLEAN;
                 hugeint, tenh, nextInt: SIGNED64;
                 result: Symbol;
@@ -494,8 +494,8 @@ TYPE
                 RETURN 0
             END HexDigit;
 
-            PROCEDURE Ten(e: SIGNED32): LONGREAL;
-                VAR x, p: LONGREAL;
+            PROCEDURE Ten(e: SIGNED32): FLOAT64;
+                VAR x, p: FLOAT64;
             BEGIN
                 x := 1;
                 p := 10;

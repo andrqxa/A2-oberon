@@ -19,7 +19,7 @@ TYPE
 	Int4 = SIGNED32;
 	Int8 = SIGNED64;
 	Float4 = FLOAT32;
-	Float8 = LONGREAL;
+	Float8 = FLOAT64;
 
 	Value = RECORD
 		int1: Int1;
@@ -449,7 +449,7 @@ TYPE
 	END SetFloat;
 
 	PROCEDURE Convert (VAR value: Value; CONST from, to: Intermediate.Type);
-	VAR val: LONGREAL;
+	VAR val: FLOAT64;
 	BEGIN
 		IF from.form = Intermediate.Float THEN
 			IF from.sizeInBits= 8 THEN val := value.float8; ELSE val := value.float4; END;

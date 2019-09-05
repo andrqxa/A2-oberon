@@ -73,8 +73,8 @@ MODULE SchemeOps IN Oberon; (** portable *)	(* eos  *)
 		END
 	END NumArg;
 
-	PROCEDURE NumVal* (ctxt: Scheme.Context; VAR args: Object): LONGREAL;
-		VAR r: LONGREAL;
+	PROCEDURE NumVal* (ctxt: Scheme.Context; VAR args: Object): FLOAT64;
+		VAR r: FLOAT64;
 	BEGIN
 		Scheme.GetReal(NumArg(ctxt, args), r); RETURN r
 	END NumVal;

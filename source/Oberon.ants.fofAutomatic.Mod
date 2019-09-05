@@ -419,7 +419,7 @@ END Do;
 	END Schedule;
 
 	PROCEDURE Pause*;
-	VAR l: antsCommands.tScanList;  time, etime, num: LONGREAL;  keys: SET;  x, y: SIGNED16;
+	VAR l: antsCommands.tScanList;  time, etime, num: FLOAT64;  keys: SET;  x, y: SIGNED16;
 	BEGIN
 		l := antsCommands.ScanFromPar( "[time=INT]" );
 		IF antsCommands.GetRealFromKeyword( l, "time", num ) THEN

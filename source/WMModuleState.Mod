@@ -277,7 +277,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 		tmp: Bytes;
 		set: SET;
 		rval: FLOAT32;
-		lrval: LONGREAL;
+		lrval: FLOAT64;
 	BEGIN
 		m := LEN(refs^);  mode := refs[i];  INC(i);
 		WHILE (i < m) & (mode >= 1X) & (mode <= 3X) DO	(* var *)
@@ -350,7 +350,7 @@ TYPE StateWindow= OBJECT(WMComponents.FormWindow)
 								SYSTEM.GET(adr, lval);  w.Int( lval, 1)
 							|7:	(* FLOAT32 *)
 								SYSTEM.GET(adr, rval);  w.RawReal(rval)
-							|8:	(* LONGREAL *)
+							|8:	(* FLOAT64 *)
 								SYSTEM.GET(adr, lrval);  w.RawLReal(lrval)
 							|9:	(* SET *)
 								SYSTEM.GET(adr, set);  w.Set(set)

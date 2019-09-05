@@ -177,8 +177,8 @@ VAR
 		RawLInt(wr, SYSTEM.VAL( SIGNED32, x ) )
 	END RawReal;
 
-	(** Write a LONGREAL. *)
-	PROCEDURE RawLReal*(VAR wr: Writer; x: LONGREAL );
+	(** Write a FLOAT64. *)
+	PROCEDURE RawLReal*(VAR wr: Writer; x: FLOAT64 );
 	BEGIN
 		RawHInt(wr,SYSTEM.VAL(SIGNED64,x));
 	END RawLReal;

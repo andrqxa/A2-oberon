@@ -29,7 +29,7 @@ IMPORT antsObjects, Files, vyBase, Objects, vyName, antsCommands, aM := antsMess
 
 TYPE
 
-	MatrixArray* = POINTER TO ARRAY OF ARRAY OF LONGREAL;
+	MatrixArray* = POINTER TO ARRAY OF ARRAY OF FLOAT64;
 
 	Matrix* = POINTER TO MatrixDesc;
 	MatrixDesc* = RECORD (vyBase.ObjDesc)
@@ -114,7 +114,7 @@ TYPE
 		END
 	END CopyMatrixArray;
 
-	PROCEDURE Fill( a: MatrixArray;  with: LONGREAL );
+	PROCEDURE Fill( a: MatrixArray;  with: FLOAT64 );
 	VAR y, x: SIGNED32;
 	BEGIN
 		FOR y := 0 TO LEN( a ) - 1 DO
@@ -140,10 +140,10 @@ TYPE
 		END
 	END Symmetry;
 
-	PROCEDURE MinMax*( n: Matrix;  VAR min, max: LONGREAL );
+	PROCEDURE MinMax*( n: Matrix;  VAR min, max: FLOAT64 );
 	VAR y, x: SIGNED32;
 	BEGIN
-		min := MAX( LONGREAL );  max := MIN( LONGREAL );
+		min := MAX( FLOAT64 );  max := MIN( FLOAT64 );
 		FOR y := 0 TO n.dimy - 1 DO
 			FOR x := 0 TO n.dimx - 1 DO
 				IF n.par[y, x] > max THEN max := n.par[y, x] END;
@@ -153,7 +153,7 @@ TYPE
 	END MinMax;
 
 	PROCEDURE Standardize*( n: Matrix );
-	VAR y, x: SIGNED32;  min, max: LONGREAL;
+	VAR y, x: SIGNED32;  min, max: FLOAT64;
 	BEGIN
 		MinMax( n, min, max );
 		IF min = max THEN Fill( n.par, 0 ) ELSE

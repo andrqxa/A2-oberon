@@ -2,7 +2,7 @@
 Refer to the "General ETH Oberon System Source License" contract available at: http://www.oberon.ethz.ch/ *)
 
 MODULE MathL;	(** portable *)
-(** AUTHOR "?"; PURPOSE "Math utility module (LONGREAL)"; *)
+(** AUTHOR "?"; PURPOSE "Math utility module (FLOAT64)"; *)
 
 (* Aos version - requires floating-point instruction support. *)
 
@@ -15,7 +15,7 @@ CONST
 	eps = 2.2D-16;
 
 TYPE
-	Value = LONGREAL;
+	Value = FLOAT64;
 
 PROCEDURE Expo (x: Value): UNSIGNED32;
 BEGIN

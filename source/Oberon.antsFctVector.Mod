@@ -28,7 +28,7 @@ TYPE
 	Object* = POINTER TO ObjectDesc;
 	ObjectDesc* = RECORD (vyBase.ObjDesc)
 		x-: vyBase.tVector;
-		from-, to-: LONGREAL;
+		from-, to-: FLOAT64;
 		f-: antsFunctions.Function
 	END;
 
@@ -72,7 +72,7 @@ TYPE
 	END HandleFileMsg;
 
 	PROCEDURE Sync*( obj: Object );
-	VAR i: SIGNED32;  get, at: LONGREAL;
+	VAR i: SIGNED32;  get, at: FLOAT64;
 	BEGIN
 		IF obj.f # NIL THEN
 			FOR i := 0 TO obj.x.nrData - 1 DO
@@ -116,7 +116,7 @@ TYPE
 
 (*
 PROCEDURE New*;
-VAR l: antsCommands.tScanList;    name: vyName.tNameArray;    fct, vect:  vyBase.Object;   obj: Object; 	from, to: LONGREAL;
+VAR l: antsCommands.tScanList;    name: vyName.tNameArray;    fct, vect:  vyBase.Object;   obj: Object; 	from, to: FLOAT64;
 BEGIN
 l := antsCommands.ScanFromPar("name = NAME fct = OBJ  vect= OBJ [from=FLOAT32 to=FLOAT32]");
 IF antsCommands.ExpectNameFromKeyword(l, "name",  name) &
@@ -144,7 +144,7 @@ END New;
 
 PROCEDURE NewVec*;
 VAR l: antsCommands.tScanList;   vec: vyLongrealVec.tVector;   len: SIGNED32;   name: vyName.tNameArray ;   from: vyBase.Object;
-val: LONGREAL;    i: SIGNED32;
+val: FLOAT64;    i: SIGNED32;
 BEGIN
 l := antsCommands.ScanFromPar("name=NAME ( len=INT| from=OBJ )");
 IF antsCommands.ExpectNameFromKeyword(l, "name",  name) THEN
@@ -174,7 +174,7 @@ END
 END NewVec;
 *)
 	PROCEDURE New*;
-	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  fct, vect: vyBase.Object;  obj: Object;  from, to: LONGREAL;
+	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  fct, vect: vyBase.Object;  obj: Object;  from, to: FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name = NAME fct = OBJ  vect= OBJ[from=FLOAT32 to=FLOAT32]" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectObjectFromKeyword( l, "fct", fct ) &
@@ -195,7 +195,7 @@ PROCEDURE New*;
 VAR l: antsCommands.tScanList;
 	name: vyName.tNameArray;
 	fct, vect:  vyBase.Object;
-	from, to: LONGREAL;
+	from, to: FLOAT64;
 BEGIN
 	l := antsCommands.ScanFromPar("name = NAME fct = OBJ  vect= OBJ [from=FLOAT32 to=FLOAT32]");
 	IF antsCommands.ExpectNameFromKeyword(l, "name",  name) &
@@ -212,7 +212,7 @@ BEGIN
 END New;
 *)
 
-	PROCEDURE DoNew*( name: vyName.tNameArray;  fct: antsFunctions.Function;  vect: vyLongrealVec.tVector;  from, to: LONGREAL );
+	PROCEDURE DoNew*( name: vyName.tNameArray;  fct: antsFunctions.Function;  vect: vyLongrealVec.tVector;  from, to: FLOAT64 );
 	VAR obj: Object;
 	BEGIN
 		Gen;  obj := Objects.NewObj( Object );  vyName.RegisterNamed( obj, name );  antsObjects.Register( obj );
@@ -223,7 +223,7 @@ END New;
 		vyBase.Subscribe( obj.f, obj );  vyBase.Subscribe( obj, obj.x );  Sync( obj )
 	END DoNew;
 
-	PROCEDURE DoSetObject*( VAR obj: Object;  fct: antsFunctions.Function;  vect: vyLongrealVec.tVector;  from, to: LONGREAL );
+	PROCEDURE DoSetObject*( VAR obj: Object;  fct: antsFunctions.Function;  vect: vyLongrealVec.tVector;  from, to: FLOAT64 );
 	BEGIN
 		obj.x := vect;  obj.f := fct;  obj.from := 0;  obj.to := 1;
 
@@ -255,7 +255,7 @@ END New;
 	END DoNewVec1;
 
 	PROCEDURE DoNewVec2*( from: vyBase.Object;  VAR vec: vyLongrealVec.tVector );
-	VAR i: SIGNED32;  val: LONGREAL;
+	VAR i: SIGNED32;  val: FLOAT64;
 	BEGIN
 		IF from IS vyLongrealVec.tVector THEN
 			WITH from: vyLongrealVec.tVector DO

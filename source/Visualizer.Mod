@@ -1364,7 +1364,7 @@ PROCEDURE IsBasicType(CONST string : ARRAY OF CHAR) : BOOLEAN;
 BEGIN
 	RETURN (string = "CHAR") OR (string = "ANY") OR (string = "BOOLEAN") OR (string = "SET")
 		OR (string = "SIGNED8") OR (string = "SIGNED16") OR (string = "SIGNED32") OR (string = "SIGNED64")
-		OR (string = "FLOAT32") OR (string = "LONGREAL")
+		OR (string = "FLOAT32") OR (string = "FLOAT64")
 		OR (string = "ADDRESS") OR (string = "SIZE") OR (string = "SYSTEM.BYTE");
 END IsBasicType;
 

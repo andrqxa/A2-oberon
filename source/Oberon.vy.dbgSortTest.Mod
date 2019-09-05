@@ -198,7 +198,7 @@ END TestRealWId;
 
 PROCEDURE TestLongRealWId*;
 	VAR size, i, j, count: SIGNED32;   sc: vyParser.Scanner;   X, Xcopy: vyBase.tVector;   temp, tempcopy: vyBase.tVector;
-	XA: POINTER TO ARRAY OF LONGREAL;   tempA: POINTER TO ARRAY OF SIGNED32;   failed: BOOLEAN;
+	XA: POINTER TO ARRAY OF FLOAT64;   tempA: POINTER TO ARRAY OF SIGNED32;   failed: BOOLEAN;
 BEGIN
 	failed := FALSE;
 	NEW(sc);   vyParser.OpenParScanner(sc);

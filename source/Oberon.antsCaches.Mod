@@ -28,13 +28,13 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT Out,aM := antsMessages;
 CONST debug = FALSE;
 TYPE
-	Function* = PROCEDURE (VAR A: ARRAY OF SIGNED16): LONGREAL;
+	Function* = PROCEDURE (VAR A: ARRAY OF SIGNED16): FLOAT64;
 
 	FullCache* = OBJECT (* POINTER TO FullCacheDesc;
 	FullCacheDesc* = RECORD
 	*)
 	VAR
-		values*: POINTER TO ARRAY OF LONGREAL;
+		values*: POINTER TO ARRAY OF FLOAT64;
 		offset: POINTER TO ARRAY  OF SIGNED32;
 		len-: POINTER TO ARRAY OF SIGNED32;
 		d-, size-: SIGNED32;
@@ -65,12 +65,12 @@ BEGIN
 	END;
 	RETURN TRUE
 END NextPoint;
-PROCEDURE (*c: FullCache*) SetVal* (offset: SIGNED32;  val: LONGREAL);
+PROCEDURE (*c: FullCache*) SetVal* (offset: SIGNED32;  val: FLOAT64);
 BEGIN
 	SELF.values[offset] := val
 END SetVal;
 
-PROCEDURE (*c: FullCache*) GetVal* (offset: SIGNED32): LONGREAL;
+PROCEDURE (*c: FullCache*) GetVal* (offset: SIGNED32): FLOAT64;
 BEGIN
 	RETURN SELF.values[offset]
 END GetVal;
@@ -79,9 +79,9 @@ END GetVal;
 
 	(* FullCache: Caches matrices of dimensions >>2,
 
-	1.) setvalue at pos vector (a0,a1,..,a(dim-1)) = LONGREAL
-	2.) getvalue at pos vector (a0,a1,...a(dim-1)) = LONGREAL
-	3.) getvalvec at pos vector (a0,a1,...,a(dim-2)) = ARRAY OF LONGREAL;
+	1.) setvalue at pos vector (a0,a1,..,a(dim-1)) = FLOAT64
+	2.) getvalue at pos vector (a0,a1,...a(dim-1)) = FLOAT64
+	3.) getvalvec at pos vector (a0,a1,...,a(dim-2)) = ARRAY OF FLOAT64;
 
 	=> d-dimensional box with lengths len.
 
@@ -253,13 +253,13 @@ PROCEDURE CreateFullCache* (dimensions, size: SIGNED32; maxsize: SIGNED32): Full
 	VAR c: FullCache; l: SIGNED32; i: SIGNED32;
 BEGIN
 	l := len(size, dimensions);
-	IF size * SIZEOF(LONGREAL) > maxsize THEN
-		vyHostTexts.NoteSI(vyHostTexts.cNotify, "Building no cache, size would be", size * l * SIZEOF(LONGREAL));
+	IF size * SIZEOF(FLOAT64) > maxsize THEN
+		vyHostTexts.NoteSI(vyHostTexts.cNotify, "Building no cache, size would be", size * l * SIZEOF(FLOAT64));
 		RETURN NIL
 	ELSE
 		NEW(c);
 		NEW(c.vals, l);
-		FOR i := 0 TO l - 1 DO  c.vals[i] := MAX(LONGREAL) END;
+		FOR i := 0 TO l - 1 DO  c.vals[i] := MAX(FLOAT64) END;
 		c.size := size;
 		c.dimensions := dimensions;
 		makeoffsets(c);
@@ -276,7 +276,7 @@ BEGIN
 	RETURN offset
 END cachedArrayAddr;
 
-PROCEDURE (c: FullCache)  cacheArray* ( VAR v: ARRAY OF SIGNED16; VAR A: ARRAY OF LONGREAL);
+PROCEDURE (c: FullCache)  cacheArray* ( VAR v: ARRAY OF SIGNED16; VAR A: ARRAY OF FLOAT64);
 	VAR i: SIGNED32; pos, mv: SIGNED32;
 BEGIN
 	pos := pos0(c, v); mv := c.size - 1;

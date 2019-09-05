@@ -1,7 +1,7 @@
 (* ETH Oberon, Copyright 2000 ETH Zuerich Institut fuer Computersysteme, ETH Zentrum, CH-8092 Zuerich.
 Refer to the "General ETH Oberon System Source License" contract available at: http://www.oberon.ethz.ch/ *)
 
-(* fof: modification of Scrollbars to handle FLOAT32 and LONGREAL numbers, needed by ants *)
+(* fof: modification of Scrollbars to handle FLOAT32 and FLOAT64 numbers, needed by ants *)
 (* this file is part of the ants distribution by Felix Friedrich, (c) 2002, above Copyright of the ETH applies. *)
 
 
@@ -24,7 +24,7 @@ Refer to the "General ETH Oberon System Source License" contract available at: h
 		FrameDesc* = RECORD (Gadgets.FrameDesc)
 			state0*: SET;
 			backC*, knoblen: SIGNED16;
-			min*, max*, step*, val*,size*: LONGREAL;
+			min*, max*, step*, val*,size*: FLOAT64;
 			stepO*, minO*, maxO*: Objects.Object;
 			vertical*: BOOLEAN
 		END;
@@ -40,11 +40,11 @@ Refer to the "General ETH Oberon System Source License" contract available at: h
 	END TimeOk;
 
 	(* Given a position, calculate the relative slider position. *)
-PROCEDURE Value (F: Frame; x, y, w, h, X, Y: SIGNED16; min, max: LONGREAL): LONGREAL;
-	VAR res: LONGREAL;
+PROCEDURE Value (F: Frame; x, y, w, h, X, Y: SIGNED16; min, max: FLOAT64): FLOAT64;
+	VAR res: FLOAT64;
 
-PROCEDURE CalcVal (x, w, bx, bw: SIGNED16; min, max: LONGREAL): LONGREAL;
-	VAR r, d: LONGREAL;
+PROCEDURE CalcVal (x, w, bx, bw: SIGNED16; min, max: FLOAT64): FLOAT64;
+	VAR r, d: FLOAT64;
 BEGIN
 	d := max - min;
 	IF d = 0 THEN r := 0
@@ -65,11 +65,11 @@ BEGIN
 END Value;
 
 (* Given the min, max and val, calculate the absolute bar position *)
-PROCEDURE Pos (F: Frame; x, y, w, h, bw: SIGNED16; min, max, val: LONGREAL): SIGNED16;
+PROCEDURE Pos (F: Frame; x, y, w, h, bw: SIGNED16; min, max, val: FLOAT64): SIGNED16;
 	VAR res: SIGNED16;
 
-PROCEDURE CalcPos (x, w, bw: SIGNED16; min, max, val: LONGREAL): SIGNED16;
-	VAR d: LONGREAL;
+PROCEDURE CalcPos (x, w, bw: SIGNED16; min, max, val: FLOAT64): SIGNED16;
+	VAR d: FLOAT64;
 BEGIN
 	d := ABS(max - min);
 	IF d = 0 THEN RETURN x
@@ -108,7 +108,7 @@ BEGIN
 	F.handle(F, D)
 END SendUpdate;
 
-PROCEDURE SetValue (F: Frame; val: LONGREAL);
+PROCEDURE SetValue (F: Frame; val: FLOAT64);
 	VAR name: ARRAY 64 OF CHAR;
 BEGIN
 	F.val := val;
@@ -118,8 +118,8 @@ BEGIN
 	END
 END SetValue;
 
-PROCEDURE SetValueAndUpdate (F: Frame; val: LONGREAL; px, py: SIGNED16; dlink: Objects.Object);
-	VAR name: ARRAY 64 OF CHAR; stepsize: LONGREAL;
+PROCEDURE SetValueAndUpdate (F: Frame; val: FLOAT64; px, py: SIGNED16; dlink: Objects.Object);
+	VAR name: ARRAY 64 OF CHAR; stepsize: FLOAT64;
 BEGIN
 	F.val := val;
 	IF F.obj # NIL THEN
@@ -147,7 +147,7 @@ BEGIN
 END GetValue;
 
 PROCEDURE AdjustKnoblen (F: Frame);
-	VAR W: SIGNED16; kl: LONGREAL;
+	VAR W: SIGNED16; kl: FLOAT64;
 BEGIN
 	IF F.minO # NIL THEN Attributes.GetLongReal(F.minO, "Value", F.min) END;
 	IF F.maxO # NIL THEN Attributes.GetLongReal(F.maxO, "Value", F.max) END;
@@ -304,10 +304,10 @@ BEGIN
 END PrintFrame;
 
 PROCEDURE TrackFrame (F: Frame; x, y, w, h: SIGNED16; VAR M: Oberon.InputMsg);
-	VAR Q: Display3.Mask; keysum: SET; n: SIGNED16; pos, npos, dpos, oldpos: LONGREAL;
+	VAR Q: Display3.Mask; keysum: SET; n: SIGNED16; pos, npos, dpos, oldpos: FLOAT64;
 
-PROCEDURE Pushed (x, y, w, h: SIGNED16; step: LONGREAL);
-	VAR pos: LONGREAL; on, newstate: BOOLEAN;
+PROCEDURE Pushed (x, y, w, h: SIGNED16; step: FLOAT64);
+	VAR pos: FLOAT64; on, newstate: BOOLEAN;
 
 PROCEDURE On (): BOOLEAN;
 BEGIN RETURN Effects.Inside(M.X, M.Y, x, y, w, h)

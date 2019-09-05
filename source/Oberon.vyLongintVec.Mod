@@ -46,7 +46,7 @@ TYPE
 	END;
 	tMeanCache = POINTER TO tMeanCacheDesc;
 	tMeanCacheDesc = RECORD (vyBase.tCacheDesc)
-		mean, ssq: LONGREAL;     	(* Valid if nans>=0 & ssq>=0 *)
+		mean, ssq: FLOAT64;     	(* Valid if nans>=0 & ssq>=0 *)
 		nans: SIGNED32
 	END;
 
@@ -486,13 +486,13 @@ BEGIN min := MAX(integer);     max := MIN(integer);       buf := v.buf;     nrNa
 
 END GetMinMax;
 
-PROCEDURE GetMeanSsq* (v: vyBase.tVector;  VAR Mean, Ssq: LONGREAL;  VAR nrNaNs: SIGNED32);
+PROCEDURE GetMeanSsq* (v: vyBase.tVector;  VAR Mean, Ssq: FLOAT64;  VAR nrNaNs: SIGNED32);
 	(*! check handling of 0 len vectors! *)
 
 VAR
 	buf: vyBase.tBuf;
 	mmCache: tMeanCache;
-	MeanAdd, SsqAdd, Sum, SumAdd, temp, temp1: LONGREAL;
+	MeanAdd, SsqAdd, Sum, SumAdd, temp, temp1: FLOAT64;
 	Count, CountAdd: SIGNED32;
 
 BEGIN
@@ -1138,9 +1138,9 @@ BEGIN
 END SortWId;
 
 (*
-PROCEDURE SSQ* (x, y: vyBase.tVector): LONGREAL;  (*vs 0.1d0 gs *)
+PROCEDURE SSQ* (x, y: vyBase.tVector): FLOAT64;  (*vs 0.1d0 gs *)
 (*! add error handling *)
-VAR       xcl, ycl:  tBuf;   s, mx, my : LONGREAL;
+VAR       xcl, ycl:  tBuf;   s, mx, my : FLOAT64;
 i, cur: SIGNED32;
 BEGIN s := 0;   i := 0;   cur := 0;   mx := 0;   my := 0;   vyBase.GC(0, x, 0);   vyBase.GC(0, y, 0);
 WITH
@@ -1165,10 +1165,10 @@ END;
 RETURN s;
 END SSQ;
 *)
-PROCEDURE SSQ* (x, y: vyBase.tVector): LONGREAL;
+PROCEDURE SSQ* (x, y: vyBase.tVector): FLOAT64;
 	(*= Return centered sum of squares *)
 	(*! add error handling *)
-	VAR   xcx, ycx: tBuf;            s, mx, my : LONGREAL;
+	VAR   xcx, ycx: tBuf;            s, mx, my : FLOAT64;
 	i, cur: index;  xcxmean, ycxmean: tMeanCache;
 BEGIN s := 0;      i := 0;      cur := 0;      mx := 0;      my := 0;      vyBase.GC(0, x, 0);      vyBase.GC(0, y, 0);
 	WITH

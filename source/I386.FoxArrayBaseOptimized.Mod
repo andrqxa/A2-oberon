@@ -12,13 +12,13 @@ CONST
 	L0BlockKR = 4;   (* L0 block size -> nr of elements that can be processed at once for type FLOAT32 *)
 	L1MaxBlockKR = 336;   (* L1CacheSize/SIZEOF(FLOAT32)/2/6*)
 	L2BlockSize = 81920;
-	L0BlockKX = 2;   (* L0 block size -> nr of elements that can be processed at once for type LONGREAL *)
-	L1MaxBlockKX = 256;   (* > L1CacheSize/SIZEOF(LONGREAL)/2/6*)
+	L0BlockKX = 2;   (* L0 block size -> nr of elements that can be processed at once for type FLOAT64 *)
+	L1MaxBlockKX = 256;   (* > L1CacheSize/SIZEOF(FLOAT64)/2/6*)
 
 	(*
 	DefaultL2CacheSize = 81920;
 	L2SizeR = L2CacheSize DIV 8;  MaxBlockKR = 336; (* ca L1CacheSize/SIZEOF(FLOAT32)/2/6*)   (* nr of elements that can be processed using L2 cache *)
-	L2SizeX = L2CacheSize DIV 8;  MaxBlockKX = 256;  (* bit more than L1CacheSize/SIZEL(LONGREAL)/2/6*) (* nr of elements that can be processed using L2 cache *)
+	L2SizeX = L2CacheSize DIV 8;  MaxBlockKX = 256;  (* bit more than L1CacheSize/SIZEL(FLOAT64)/2/6*) (* nr of elements that can be processed using L2 cache *)
 *)
 
 	debug = FALSE;  parallel = TRUE;  SSE = TRUE;
@@ -4462,12 +4462,12 @@ VAR
 		L2BlockK := L2BlockK + (-L2BlockK) MOD 16;
 
 		L2BlockN :=
-			L2BlockSize DIV SIZEOF( LONGREAL ) DIV
+			L2BlockSize DIV SIZEOF( FLOAT64 ) DIV
 			(L2BlockK * (L2BARatio + 1));
 		IF L2BlockN > N THEN L2BlockN := N END;
 
 		L2BlockM :=
-			(L2BlockSize DIV SIZEOF( LONGREAL ) - L2BlockN * L2BlockK) DIV
+			(L2BlockSize DIV SIZEOF( FLOAT64 ) - L2BlockN * L2BlockK) DIV
 						L2BlockK;
 		(* Round up to next multiple of 5 *)
 		IF L2BlockM > M THEN L2BlockM := M
@@ -4480,7 +4480,7 @@ VAR
 (*
 
 	PROCEDURE L1Block1X( adrA, adrB, adrC, K: SIGNED32 );   (* condition: K MOD 4 = 0 *)
-	VAR reg: ARRAY 8 OF ARRAY 2 OF LONGREAL;
+	VAR reg: ARRAY 8 OF ARRAY 2 OF FLOAT64;
 
 		PROCEDURE null( i: SIGNED32 );
 		BEGIN
@@ -4535,7 +4535,7 @@ VAR
 	END L1Block1X;
 
 	PROCEDURE L1Block5X( adrA, adrB, adrC, IncC, K: SIGNED32 );   (* condition: K MOD 4 = 0 *)
-	VAR reg: ARRAY 8 OF ARRAY 2 OF LONGREAL;
+	VAR reg: ARRAY 8 OF ARRAY 2 OF FLOAT64;
 
 		PROCEDURE null( i: SIGNED32 );
 		BEGIN
@@ -4736,7 +4736,7 @@ VAR
 
 	PROCEDURE DispCX( adrM: ADDRESS;
 									inc, stride, M, N: SIZE );
-	VAR i, j: SIZE; adr: ADDRESS;  val: LONGREAL;
+	VAR i, j: SIZE; adr: ADDRESS;  val: FLOAT64;
 	BEGIN
 		FOR i := 0 TO M - 1 DO
 			adr := adrM + i * stride;
@@ -4761,7 +4761,7 @@ VAR
 	*)
 	VAR m, n, k, a1, b1: SIZE; adrA, adrB, adrC: ADDRESS;
 		KAligned: SIZE;
-	CONST Size = SIZEOF( LONGREAL );
+	CONST Size = SIZEOF( FLOAT64 );
 
 		PROCEDURE L2Block( matrixA, matrixB, matrixC: ADDRESS; M, N, K: SIZE );
 		(* M,N and K arbitrary ! *)
@@ -5335,7 +5335,7 @@ VAR
 		END;
 	END DispMR;
 
-	PROCEDURE FillMX( VAR A: ARRAY [ .. , .. ] OF LONGREAL );
+	PROCEDURE FillMX( VAR A: ARRAY [ .. , .. ] OF FLOAT64 );
 	VAR i, j: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN( A, 0 ) - 1 DO
@@ -5346,7 +5346,7 @@ VAR
 		END;
 	END FillMX;
 
-	PROCEDURE DispMX( VAR A: ARRAY [ .. , .. ] OF LONGREAL );
+	PROCEDURE DispMX( VAR A: ARRAY [ .. , .. ] OF FLOAT64 );
 	VAR i, j: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN( A, 0 ) - 1 DO
@@ -5371,7 +5371,7 @@ VAR
 										IncA, StrideA, IncB, StrideB, IncC, StrideC: SIZE;
 										add: BOOLEAN );
 	VAR lenA, lenB: SIZE; adrA, adrB, adrC: ADDRESS;  m: SIZE;
-		M1, M2, i: SIZE;  val: LONGREAL;  t: SIGNED64;
+		M1, M2, i: SIZE;  val: FLOAT64;  t: SIGNED64;
 		inc: SIZE;
 		obj: POINTER TO ARRAY OF MultiplyObjectX;
 		cache: Cache;
@@ -5486,11 +5486,11 @@ VAR
 
 	PROCEDURE DoTestX( M, N, K, L2BlockM, L2BlockN, L2BlockK: SIGNED32;  check: BOOLEAN;  iter: SIGNED32 );
 	VAR  (* A, B, C, D: ARRAY [ .. , .. ] OF FLOAT32;  *)
-		A, B, C, D: ARRAY [ .. , .. ] OF LONGREAL;
+		A, B, C, D: ARRAY [ .. , .. ] OF FLOAT64;
 		p, q: ANY;  l1, l2: SIGNED32;  adrA, adrB, len, lenA, lenB: SIGNED32;
-		matrixA, matrixB, matrixC: SIGNED32;  i: SIGNED32;  val: LONGREAL;  atime, time: SIGNED32;
+		matrixA, matrixB, matrixC: SIGNED32;  i: SIGNED32;  val: FLOAT64;  atime, time: SIGNED32;
 	BEGIN
-		KernelLog.String( "LONGREAL" );  KernelLog.Ln;  KernelLog.String( "M=" );  KernelLog.Int( M, 0 );  KernelLog.Ln;
+		KernelLog.String( "FLOAT64" );  KernelLog.Ln;  KernelLog.String( "M=" );  KernelLog.Int( M, 0 );  KernelLog.Ln;
 		KernelLog.String( "N=" );  KernelLog.Int( N, 0 );  KernelLog.Ln;  KernelLog.String( "K=" );  KernelLog.Int( K, 0 );
 		KernelLog.Ln;  KernelLog.String( "L2BlockM=" );  KernelLog.Int( L2BlockM, 0 );  KernelLog.Ln;  KernelLog.String( "L2BlockN=" );
 		KernelLog.Int( L2BlockN, 0 );  KernelLog.Ln;  KernelLog.String( "L2BlockK=" );  KernelLog.Int( L2BlockK, 0 );
@@ -5922,22 +5922,22 @@ VAR
 		NEW(proc,nrProcesses);
 		ASSERT( ColsA = RowsB );
 
-		stride := Align( ColsA * SIZEOF( LONGREAL ), 16 );
+		stride := Align( ColsA * SIZEOF( FLOAT64 ), 16 );
 
-		IF (IncA # SIZEOF( LONGREAL )) OR (StrideA # stride) OR
+		IF (IncA # SIZEOF( FLOAT64 )) OR (StrideA # stride) OR
 			(matrixA MOD 16 # 0) THEN
 			cacheA := cachePool.Acquire( stride * RowsA );
 			CopyDataX( matrixA, cacheA.adr, IncA, StrideA,
-							SIZEOF( LONGREAL ), stride, RowsA, ColsA );   (* copy to array *)
+							SIZEOF( FLOAT64 ), stride, RowsA, ColsA );   (* copy to array *)
 			matrixA := cacheA.adr;
 		ELSE cacheA := NIL;
 		END;
 
-		IF (StrideB # SIZEOF( LONGREAL )) OR (IncB # stride) OR
+		IF (StrideB # SIZEOF( FLOAT64 )) OR (IncB # stride) OR
 			(matrixB MOD 16 # 0) THEN
 			cacheB := cachePool.Acquire( stride * ColsB );
 			CopyDataX( matrixB, cacheB.adr, StrideB, IncB,
-							SIZEOF( LONGREAL ), stride, ColsB, RowsB );   (* copy to transposed array *)
+							SIZEOF( FLOAT64 ), stride, ColsB, RowsB );   (* copy to transposed array *)
 			matrixB := cacheB.adr;
 		ELSE cacheB := NIL;
 		END;
@@ -6066,40 +6066,40 @@ VAR
 	PROCEDURE MatMulAXAXSSEStride( matrixA, matrixB, matrixC: ADDRESS;
 		IncA, StrideA, IncB, StrideB, IncC, StrideC, RowsA, ColsA, RowsB, ColsB: SIZE;
 															add: BOOLEAN ): BOOLEAN;
-	VAR sum: LONGREAL;  CbFrom, i, j, k: SIZE;
-		valA, valB: LONGREAL;  adrA, adrB, adrC: ADDRESS;
+	VAR sum: FLOAT64;  CbFrom, i, j, k: SIZE;
+		valA, valB: FLOAT64;  adrA, adrB, adrC: ADDRESS;
 		cacheA, cacheB, cacheC: Cache;
 		matrixCO, StrideCO, IncCO:SIZE;  t: SIGNED64;
 	BEGIN
-		IF (IncA # SIZEOF( LONGREAL )) THEN
+		IF (IncA # SIZEOF( FLOAT64 )) THEN
 			cacheA :=
-				cachePool.Acquire( RowsA * ColsA * SIZEOF( LONGREAL ) );
+				cachePool.Acquire( RowsA * ColsA * SIZEOF( FLOAT64 ) );
 			CopyDataX( matrixA, cacheA.adr, IncA, StrideA,
-							SIZEOF( LONGREAL ),
-							SIZEOF( LONGREAL ) * ColsA, RowsA, ColsA );
+							SIZEOF( FLOAT64 ),
+							SIZEOF( FLOAT64 ) * ColsA, RowsA, ColsA );
 			matrixA := cacheA.adr;
-			StrideA := SIZEOF( LONGREAL ) * ColsA;
-			IncA := SIZEOF( LONGREAL );
+			StrideA := SIZEOF( FLOAT64 ) * ColsA;
+			IncA := SIZEOF( FLOAT64 );
 		END;
-		IF (IncB # SIZEOF( LONGREAL )) THEN
+		IF (IncB # SIZEOF( FLOAT64 )) THEN
 			cacheB :=
-				cachePool.Acquire( RowsB * ColsB * SIZEOF( LONGREAL ) );
+				cachePool.Acquire( RowsB * ColsB * SIZEOF( FLOAT64 ) );
 			CopyDataX( matrixB, cacheB.adr, IncB, StrideB,
-							SIZEOF( LONGREAL ),
-							SIZEOF( LONGREAL ) * ColsB, RowsB, ColsB );
+							SIZEOF( FLOAT64 ),
+							SIZEOF( FLOAT64 ) * ColsB, RowsB, ColsB );
 			matrixB := cacheB.adr;
-			StrideB := SIZEOF( LONGREAL ) * ColsB;
-			IncB := SIZEOF( LONGREAL );
+			StrideB := SIZEOF( FLOAT64 ) * ColsB;
+			IncB := SIZEOF( FLOAT64 );
 		END;
-		IF (IncC # SIZEOF( LONGREAL )) THEN
+		IF (IncC # SIZEOF( FLOAT64 )) THEN
 			cacheC :=
-				cachePool.Acquire( RowsA * ColsB * SIZEOF( LONGREAL ) );
+				cachePool.Acquire( RowsA * ColsB * SIZEOF( FLOAT64 ) );
 			CopyDataX( matrixC, cacheC.adr, IncC, StrideC,
-							SIZEOF( LONGREAL ),
-							SIZEOF( LONGREAL ) * ColsB, RowsA, ColsB );
+							SIZEOF( FLOAT64 ),
+							SIZEOF( FLOAT64 ) * ColsB, RowsA, ColsB );
 			matrixCO := matrixC;  StrideCO := StrideC;
-			IncCO := IncC;  StrideC := SIZEOF( LONGREAL ) * ColsB;
-			IncC := SIZEOF( LONGREAL );  matrixC := cacheC.adr;
+			IncCO := IncC;  StrideC := SIZEOF( FLOAT64 ) * ColsB;
+			IncC := SIZEOF( FLOAT64 );  matrixC := cacheC.adr;
 		END;
 
 		Tic( t );
@@ -6205,7 +6205,7 @@ VAR
 		C is M x N matrix; M=rows(C); N=cols(C);
 	*)
 	VAR adrA, adrB, innerB, adrC:  ADDRESS; i, j, k: SIZE;
-		val1, val2, sum: LONGREAL;  t: SIGNED64;
+		val1, val2, sum: FLOAT64;  t: SIGNED64;
 	BEGIN
 		Tic( t );
 		FOR i := 1 TO M DO

@@ -781,7 +781,7 @@ TYPE
 *)
 
 (** Traverse memory elementwise with a function proc, proc must be the adress of a  PROCEDURE (VAR l: (elementtype) );
-		example with basic type LONGREAL:  TraverseMemory(ADDRESSOF(p),mem); with p := PROCEDURE (VAR l: LONGREAL); *)
+		example with basic type FLOAT64:  TraverseMemory(ADDRESSOF(p),mem); with p := PROCEDURE (VAR l: FLOAT64); *)
 	PROCEDURE TraverseMemory*( proc: Address;  mem: ArrayMemoryStructure );
 	VAR enum: Enumerator;  len, diminclen, adr: SIGNED32;
 
@@ -801,7 +801,7 @@ TYPE
 	END TraverseMemory;
 
 (** Traverse memory elementwise with a function proc, proc must be the adress of a  PROCEDURE (VAR l,r: (elementtype) );
-	example with basic type LONGREAL;  TraverseMemory(ADDRESSOF(p),left,right); with p := PROCEDURE (VAR l,r: LONGREAL); *)
+	example with basic type FLOAT64;  TraverseMemory(ADDRESSOF(p),left,right); with p := PROCEDURE (VAR l,r: FLOAT64); *)
 	PROCEDURE TraverseMemory2*( proc: Address;  srcmem, destmem: ArrayMemoryStructure );
 	VAR src, dest: Enumerator;
 
@@ -820,7 +820,7 @@ TYPE
 	END TraverseMemory2;
 
 (** Traverse memory elementwise with a function proc, proc must be the adress of a  PROCEDURE (VAR l,r: (elementtype) );
-	example with basic type LONGREAL;  TraverseMemory(ADDRESSOF(p),left,right,dest); with p := PROCEDURE (VAR l,r,d: LONGREAL); *)
+	example with basic type FLOAT64;  TraverseMemory(ADDRESSOF(p),left,right,dest); with p := PROCEDURE (VAR l,r,d: FLOAT64); *)
 	PROCEDURE TraverseMemory3*( proc: Address;  leftmem, rightmem, destmem: ArrayMemoryStructure );
 	VAR left, right, dest: Enumerator;
 

@@ -246,7 +246,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 		x^.conval^.intval := intval; SetIntType(x); RETURN x
 	END NewIntConst;
 
-	PROCEDURE NewRealConst*(realval: LONGREAL; typ: OPT.Struct): OPT.Node;
+	PROCEDURE NewRealConst*(realval: FLOAT64; typ: OPT.Struct): OPT.Node;
 		VAR x: OPT.Node;
 	BEGIN
 		x := OPT.NewNode(Nconst); x^.conval := OPT.NewConst();
@@ -394,7 +394,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END log;
 
 	PROCEDURE CheckRealType(f, nr: SIGNED16; x: OPT.Const);
-		VAR min, max, r: LONGREAL;
+		VAR min, max, r: FLOAT64;
 	BEGIN
 		IF f = Real THEN min := OPM.MinReal; max := OPM.MaxReal
 		ELSE min := OPM.MinLReal; max := OPM.MaxLReal
@@ -691,7 +691,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 					END
 				ELSIF f IN realSet THEN
 					temp := ABS(yval^.realval) <= 1.0;
-					IF temp OR (ABS(xval^.realval) <= MAX(LONGREAL) / ABS(yval^.realval)) THEN
+					IF temp OR (ABS(xval^.realval) <= MAX(FLOAT64) / ABS(yval^.realval)) THEN
 						xval^.realval := xval^.realval * yval^.realval; CheckRealType(f, 204, xval)
 					ELSE err(204)
 					END
@@ -708,7 +708,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 					x^.typ := OPT.realtyp
 				ELSIF f IN realSet THEN
 					temp := ABS(yval^.realval) >= 1.0;
-					IF temp OR (ABS(xval^.realval) <= MAX(LONGREAL) * ABS(yval^.realval)) THEN
+					IF temp OR (ABS(xval^.realval) <= MAX(FLOAT64) * ABS(yval^.realval)) THEN
 						xval^.realval := xval^.realval / yval^.realval; CheckRealType(f, 205, xval)
 					ELSE err(205)
 					END
@@ -745,8 +745,8 @@ MODULE OPB IN Oberon;	(** non-portable *)
 					ELSE err(206)
 					END
 				ELSIF f IN realSet THEN
-					temp := (yval^.realval >= 0.0) & (xval^.realval <= MAX(LONGREAL) - yval^.realval);
-					IF temp OR (yval^.realval < 0.0) & (xval^.realval >= -MAX(LONGREAL) - yval^.realval) THEN
+					temp := (yval^.realval >= 0.0) & (xval^.realval <= MAX(FLOAT64) - yval^.realval);
+					IF temp OR (yval^.realval < 0.0) & (xval^.realval >= -MAX(FLOAT64) - yval^.realval) THEN
 							xval^.realval := xval^.realval + yval^.realval; CheckRealType(f, 206, xval)
 					ELSE err(206)
 					END
@@ -762,8 +762,8 @@ MODULE OPB IN Oberon;	(** non-portable *)
 					ELSE err(207)
 					END
 				ELSIF f IN realSet THEN
-					temp := (yval^.realval >= 0.0) & (xval^.realval >= -MAX(LONGREAL) + yval^.realval);
-					IF temp OR (yval^.realval < 0.0) & (xval^.realval <= MAX(LONGREAL) + yval^.realval) THEN
+					temp := (yval^.realval >= 0.0) & (xval^.realval >= -MAX(FLOAT64) + yval^.realval);
+					IF temp OR (yval^.realval < 0.0) & (xval^.realval <= MAX(FLOAT64) + yval^.realval) THEN
 							xval^.realval := xval^.realval - yval^.realval; CheckRealType(f, 207, xval)
 					ELSE err(207)
 					END
@@ -800,7 +800,7 @@ MODULE OPB IN Oberon;	(** non-portable *)
 	END ConstOp;
 
 	PROCEDURE Convert(VAR x: OPT.Node; typ: OPT.Struct);
-		VAR node: OPT.Node; f, g: SIGNED16; k: SIGNED32; r: LONGREAL;
+		VAR node: OPT.Node; f, g: SIGNED16; k: SIGNED32; r: FLOAT64;
 	BEGIN f := x^.typ^.form; g := typ^.form;
 		IF x^.class = Nconst THEN
 			IF f IN intSet THEN

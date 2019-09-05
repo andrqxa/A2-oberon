@@ -152,9 +152,9 @@ TYPE
 
 	LongRealConstant* = OBJECT(ConstantContent)
 		VAR
-			v-: LONGREAL;
+			v-: FLOAT64;
 
-		PROCEDURE &Init*(value: LONGREAL);
+		PROCEDURE &Init*(value: FLOAT64);
 		BEGIN v := value
 		END Init;
 
@@ -475,7 +475,7 @@ VAR c: RealConstant;
 BEGIN NEW(c, v); RETURN c
 END NewRealConst;
 
-PROCEDURE NewLongRealConst*(v: LONGREAL): LongRealConstant;
+PROCEDURE NewLongRealConst*(v: FLOAT64): LongRealConstant;
 VAR c: LongRealConstant;
 BEGIN NEW(c, v); RETURN c
 END NewLongRealConst;

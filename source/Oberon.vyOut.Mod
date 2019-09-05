@@ -41,13 +41,13 @@ BEGIN Texts.WriteInt(w, i, n);   vyHostTexts.InsertLog(w.buf) END Int;
 PROCEDURE Real* (x: FLOAT32;   n: SIGNED16);
 BEGIN Texts.WriteReal(w, x, n);   vyHostTexts.InsertLog(w.buf) END Real;
 
-PROCEDURE LongReal* (x: LONGREAL;   n: SIGNED16);
+PROCEDURE LongReal* (x: FLOAT64;   n: SIGNED16);
 BEGIN Texts.WriteLongReal(w, x, n);   vyHostTexts.InsertLog(w.buf) END LongReal;
 
 PROCEDURE Ln*;
 BEGIN Texts.WriteLn(w);   vyHostTexts.InsertLog(w.buf) END Ln;
 
-PROCEDURE Mean* (x: LONGREAL);
+PROCEDURE Mean* (x: FLOAT64);
 BEGIN Texts.WriteString(w, 'Mean=');  tab;  Texts.WriteReal(w, SHORT(x), 0);  Flush  END Mean;
 
 PROCEDURE Open*;

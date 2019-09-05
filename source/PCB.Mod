@@ -1082,7 +1082,7 @@ g) Static array as return type of a function
 								first :=
 									NewConversion( stat.pos, stat,
 															PCT.NumericType[i + 1] );
-							ELSIF i = LEN( PCT.NumericType ) - 1 THEN  (*skip: LONG(LONGREAL) = LONGREAL*)
+							ELSIF i = LEN( PCT.NumericType ) - 1 THEN  (*skip: LONG(FLOAT64) = FLOAT64*)
 							ELSE PCM.Error( 115, stat.pos, "" )
 							END
 						ELSE
@@ -1102,7 +1102,7 @@ g) Static array as return type of a function
 						ELSE
 							i:=0;  WHILE (i<LEN(PCT.NumericType))&(stat.type#PCT.NumericType[i]) DO  INC(i)  END;
 							IF i<LEN(PCT.NumericType)-1 THEN first:=NewConversion(stat.pos, stat, PCT.NumericType[i+1])
-							ELSIF i = LEN(PCT.NumericType)-1 THEN	(*skip: LONG(LONGREAL) = LONGREAL*)
+							ELSIF i = LEN(PCT.NumericType)-1 THEN	(*skip: LONG(FLOAT64) = FLOAT64*)
 							ELSIF stat.type = PCT.Char8 THEN  first := NewConversion(stat.pos, stat, PCT.Int32)
 							ELSE  PCM.Error(115, stat.pos, "")  END
 						END
@@ -3059,7 +3059,7 @@ END RealtimeCompatible;
 		 NEW(con, pos, PCT.NewInt64Const(i));  RETURN con
 	END NewLongIntValue;
 
-	PROCEDURE NewFloatValue*(pos: SIGNED32; r: LONGREAL; type: PCT.Struct): Const;
+	PROCEDURE NewFloatValue*(pos: SIGNED32; r: FLOAT64; type: PCT.Struct): Const;
 		VAR con: Const;
 	BEGIN  NEW(con, pos, PCT.NewFloatConst(r, type));  RETURN con
 	END NewFloatValue;
@@ -3097,7 +3097,7 @@ END RealtimeCompatible;
 
 
 	PROCEDURE NewConversion*(pos: SIGNED32; exp: Expression; type: PCT.Struct): Expression;	(*not exported, parser should not check types*)
-		VAR  conv: Conversion;  str: PCS.String;  con: PCT.Const; l: SIGNED32; ch: CHAR; r: FLOAT32;  lr: LONGREAL;
+		VAR  conv: Conversion;  str: PCS.String;  con: PCT.Const; l: SIGNED32; ch: CHAR; r: FLOAT32;  lr: FLOAT64;
 	BEGIN
 		IF IsInvalid(exp) THEN  exp := InvalidExpr
 		ELSIF type IS PCT.Delegate THEN
@@ -3194,7 +3194,7 @@ END RealtimeCompatible;
 			ELSIF type = PCT.Int64  THEN	exp := NewIntValue(pos, buf, type)
 			ELSIF type = PCT.Char8  THEN	exp := NewIntValue(pos, SYSTEM.VAL(SIGNED8, buf), PCT.Char8)
 			ELSIF type = PCT.Float32  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(FLOAT32, buf), PCT.Float32)
-			ELSIF type = PCT.Float64  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(LONGREAL, buf), PCT.Float64)
+			ELSIF type = PCT.Float64  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(FLOAT64, buf), PCT.Float64)
 			ELSIF type = PCT.Set  THEN	exp := NewSetValue(pos, SYSTEM.VAL(SET, buf))
 			ELSIF ptr THEN  exp := NewIntValue(pos, buf, type)
 			ELSE   PCM.Error(1503, pos, "");  exp := InvalidExpr
@@ -3243,7 +3243,7 @@ END RealtimeCompatible;
 						ELSIF type=PCT.Int64 THEN RETURN NewLongIntValue(pos, 7FFFFFFFFFFFFFFFH)
 (* < bootstrap 1 *)
 						ELSIF type=PCT.Float32 THEN RETURN NewFloatValue(pos, MAX(FLOAT32), PCT.Float32)
-						ELSIF type=PCT.Float64 THEN RETURN NewFloatValue(pos, MAX(LONGREAL), PCT.Float64)
+						ELSIF type=PCT.Float64 THEN RETURN NewFloatValue(pos, MAX(FLOAT64), PCT.Float64)
 						ELSIF type=PCT.Set THEN RETURN NewIntValue(pos, PCT.SetSize * 8 - 1, PCT.Int8)
 						ELSIF type IS PCT.EnhArray THEN RETURN NewArrayOperator( pos, fnr, NIL ,  params.first, NIL ,  FALSE ) (* fof *)
 						ELSE  PCM.Error(64, first.pos, "");  RETURN InvalidExpr  END
@@ -3264,7 +3264,7 @@ END RealtimeCompatible;
 						ELSIF type=PCT.Int64 THEN RETURN NewLongIntValue(pos, 8000000000000000H)
 (* < bootstrap 1 *)
 						ELSIF type=PCT.Float32 THEN RETURN NewFloatValue(pos, MIN(FLOAT32), PCT.Float32)
-						ELSIF type=PCT.Float64 THEN RETURN NewFloatValue(pos, MIN(LONGREAL), PCT.Float64)
+						ELSIF type=PCT.Float64 THEN RETURN NewFloatValue(pos, MIN(FLOAT64), PCT.Float64)
 						ELSIF type=PCT.Set THEN RETURN NewIntValue(pos, 0, PCT.Int8)
 						ELSIF type IS PCT.EnhArray THEN RETURN NewArrayOperator( pos, fnr, NIL , params.first, NIL , FALSE ) (* fof *)
 						ELSE  PCM.Error(64, first.pos, "");  RETURN InvalidExpr  END
@@ -3355,7 +3355,7 @@ END RealtimeCompatible;
 
 	PROCEDURE NewMOp*(pos: SIGNED32; scope: PCT.Scope; op: Operator; opd: Expression): Expression;
 		VAR mop: MOp;
-			i: SIGNED32; lr: LONGREAL; restyp: PCT.Struct; const: BOOLEAN;  type: PCT.Struct; c: PCT.Const;
+			i: SIGNED32; lr: FLOAT64; restyp: PCT.Struct; const: BOOLEAN;  type: PCT.Struct; c: PCT.Const;
 	BEGIN
 		IF IsInvalid(opd) THEN  RETURN InvalidExpr  END;
 		type := opd.type;
@@ -3564,7 +3564,7 @@ END RealtimeCompatible;
 	PROCEDURE NewDOp*(pos: SIGNED32;  op: Operator; lopd, ropd: Expression): Expression;
 		VAR	dop: DOp;  const: BOOLEAN;  typ, restyp: PCT.Struct;
 			lc, rc: PCT.Const;
-			i1, i2: SIGNED32; l1, l2: LONGREAL; b1, b2: BOOLEAN; s1, s2: SET;
+			i1, i2: SIGNED32; l1, l2: FLOAT64; b1, b2: BOOLEAN; s1, s2: SET;
 			str: PCS.String; res: Expression;
 	BEGIN
 		IF IsInvalid(lopd) OR IsInvalid(ropd) THEN  RETURN InvalidExpr  END;
@@ -5726,10 +5726,10 @@ END PCB.
 
 	Impossible errors:
 
-	1500	Conversion: const LONGREAL to other than FLOAT32
-	1501	Conversion of const which is not Cardinal, CHAR, FLOAT32, LONGREAL
+	1500	Conversion: const FLOAT64 to other than FLOAT32
+	1501	Conversion of const which is not Cardinal, CHAR, FLOAT32, FLOAT64
 	1502	Projection of const which is not Cardinal, CHAR, FLOAT32, SET, NIL
-	1503	Projection to const which is not Cardinal, CHAR, FLOAT32, LONGREAL, SET
+	1503	Projection to const which is not Cardinal, CHAR, FLOAT32, FLOAT64, SET
 	1504	MakeNode: field/method cannot be referenced through SELF (SELF not found)
 
 *)

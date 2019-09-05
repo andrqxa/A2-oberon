@@ -25,14 +25,14 @@ TYPE
       no: SIGNED32;
       checksum*: SIGNED32; (** font's tfm-checksum **)
       s,d,a,l: SIGNED32; (* cf. DVIViewers *)
-      width*: ARRAY 256 OF LONGREAL; (** widths in dvi-units **)
+      width*: ARRAY 256 OF FLOAT64; (** widths in dvi-units **)
    END;
 
    File* = POINTER TO FileDesc;
    FileDesc* = RECORD(Gadgets.ObjDesc)
       fileName: ARRAY 128 OF CHAR;
       file: Files.File;
-      num*,den*,mag*: LONGREAL;
+      num*,den*,mag*: FLOAT64;
       pageNr*: SIGNED32; (* number of pages in the dvi-file *)
       page: POINTER TO ARRAY OF PageDesc;
       fonts: FontInfo;
@@ -124,7 +124,7 @@ TYPE
 
    (** Read four bytes from rider r and interpret them as
        fixed-point number. **)
-   PROCEDURE ReadFixedWord*(VAR r: Files.Rider): LONGREAL;
+   PROCEDURE ReadFixedWord*(VAR r: Files.Rider): FLOAT64;
    CONST Multiplier = 9.5367431640625D-7;
    BEGIN
       RETURN ReadSignedQuad(r) * Multiplier
@@ -149,7 +149,7 @@ TYPE
    VAR
       tfmFile: Files.File; tfm: Files.Rider;
       checksum: SIGNED32; (* tfm-checksum of the font *)
-      w: POINTER TO ARRAY OF LONGREAL;
+      w: POINTER TO ARRAY OF FLOAT64;
       wIndex: ARRAY 256 OF SIGNED16;
       headerLength,begin,end,widthNr,i: SIGNED32;
 

@@ -211,7 +211,7 @@ VAR
 		ASSERT ( p.gcontext # NIL , 100 )
 	END SetNewC2d;
 
-	PROCEDURE SetC2d*( p: Picture;  x, y, w, h: LONGREAL );
+	PROCEDURE SetC2d*( p: Picture;  x, y, w, h: FLOAT64 );
 	BEGIN
 		Attributes.SetLongReal( p, "x2d", x );  Attributes.SetLongReal( p, "y2d", y );  Attributes.SetLongReal( p, "w2d", w );
 		Attributes.SetLongReal( p, "h2d", h )

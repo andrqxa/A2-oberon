@@ -311,7 +311,7 @@ BEGIN
 	ReadBytes(r, SYSTEM.VAL(Bytes4, x), 4)
 END ReadReal;
 
-PROCEDURE ReadLReal*(VAR r: Rider; VAR x: LONGREAL);
+PROCEDURE ReadLReal*(VAR r: Rider; VAR x: FLOAT64);
 BEGIN
 	ReadBytes(r, SYSTEM.VAL(Bytes8, x), 8)
 END ReadLReal;
@@ -440,7 +440,7 @@ BEGIN
 	WriteBytes(r, SYSTEM.VAL(Bytes4, x), 4)
 END WriteReal;
 
-PROCEDURE WriteLReal*(VAR r: Rider; x: LONGREAL);
+PROCEDURE WriteLReal*(VAR r: Rider; x: FLOAT64);
 BEGIN
 	WriteBytes(r, SYSTEM.VAL(Bytes8, x), 8)
 END WriteLReal;

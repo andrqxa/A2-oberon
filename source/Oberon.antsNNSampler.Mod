@@ -33,7 +33,7 @@ TYPE
 	tModelDesc* = RECORD (antsModels.tModelDesc)
 	(*Pars*)
 		datafct: antsFunctions.Function;
-		ud, u: POINTER TO ARRAY OF ARRAY OF LONGREAL;
+		ud, u: POINTER TO ARRAY OF ARRAY OF FLOAT64;
 		fct: antsFunctions.Function
 	END;
 
@@ -66,7 +66,7 @@ VAR
 	A: antsArrayObjects.tArray
 	*)
 		A: antsArrayObjects.tINTEGERObject;  Ao: antsArrayObjects.tINTEGERObject;
-		AA, AAo: antsArrayObjects.tINTEGERArray;  y, W, H: SIGNED32;  ran: LONGREAL;  depth: SIGNED32;  n1, n2, n3, n4, nd, nh: SIGNED16;  h, h1, h2, cooling: LONGREAL;
+		AA, AAo: antsArrayObjects.tINTEGERArray;  y, W, H: SIGNED32;  ran: FLOAT64;  depth: SIGNED32;  n1, n2, n3, n4, nd, nh: SIGNED16;  h, h1, h2, cooling: FLOAT64;
 		gen: vyRanBase.tRandom;  zvax, zvay, zva: SIGNED32;  orig: Objects.Object;
 
 	BEGIN
@@ -101,7 +101,7 @@ VAR
 	A: antsArrayObjects.tArray
 	*)
 		A: antsArrayObjects.tINTEGERObject;  Ao: antsArrayObjects.tINTEGERObject;
-		AA, AAo: antsArrayObjects.tINTEGERArray;  y, x, W, H: SIGNED32;  ran, this, z: LONGREAL;  depth, i: SIGNED32;  n1, n2, n3, n4, nd: SIGNED16;
+		AA, AAo: antsArrayObjects.tINTEGERArray;  y, x, W, H: SIGNED32;  ran, this, z: FLOAT64;  depth, i: SIGNED32;  n1, n2, n3, n4, nd: SIGNED16;
 		orig: Objects.Object;
 	BEGIN
 		o := s.par( tModel );  A := s.A( antsArrayObjects.tINTEGERObject );  Links.GetLink( A, "orig", orig );

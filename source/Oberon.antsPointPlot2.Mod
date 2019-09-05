@@ -41,7 +41,7 @@ TYPE
 	END;
 
 VAR
-	tempLayer: tLayer;  tempNum: SIGNED32;  tempX, tempY: LONGREAL;
+	tempLayer: tLayer;  tempNum: SIGNED32;  tempX, tempY: FLOAT64;
 
 	dlink-: Objects.Object;  newlayer-: tLayer;
 
@@ -161,7 +161,7 @@ VAR
 	END InPoint;
 
 	PROCEDURE Loc( scatter: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR num: SIGNED32;  vx, vy: vyBase.tVector;  xr, yr: LONGREAL;  oldx, oldy: SIGNED16;  x, y, w, h: SIGNED16;  c: vyGraphBase.tCoordinate2d;  gesture: SIGNED16;
+	VAR num: SIGNED32;  vx, vy: vyBase.tVector;  xr, yr: FLOAT64;  oldx, oldy: SIGNED16;  x, y, w, h: SIGNED16;  c: vyGraphBase.tCoordinate2d;  gesture: SIGNED16;
 
 	BEGIN
 		c := vyGraphBase.GetCoordinate();  vyGraphBase.GetScreenRgn( x, y, w, h );

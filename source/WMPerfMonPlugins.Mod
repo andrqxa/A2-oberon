@@ -678,7 +678,7 @@ TYPE
 			IF lastTimestamp # 0 THEN
 				Objects.GetCpuCycles(me, cpuCycles, TRUE);
 				FOR i := 0 TO LEN(cpuCycles)-1 DO INC (cycles , cpuCycles[i]); END;
-				value := SHORT(100.0 * LONGREAL(cycles - lastCycles) / LONGREAL(timestamp - lastTimestamp));
+				value := SHORT(100.0 * FLOAT64(cycles - lastCycles) / FLOAT64(timestamp - lastTimestamp));
 				sampleBuffer[sample MOD sampleBufferSize] := value; INC(sample);
 				lastCycles := cycles;
 				FOR i := 0 TO sampleBufferSize-1 DO sum := sum + sampleBuffer[i]; END;

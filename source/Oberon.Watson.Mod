@@ -567,7 +567,7 @@ MODULE Watson IN Oberon;	(** portable *)	(** PS/tk  *)
 			(* check if ident is a keyword, if so write it and return *)
 			IF (name = "CHAR") OR (name = "BOOLEAN") OR (name = "SIGNED16") THEN Str(name); RETURN
 			ELSIF (name = "SIGNED32") OR (name = "SIGNED8") OR (name = "SET")THEN Str(name); RETURN
-			ELSIF (name = "FLOAT32") OR (name = "LONGREAL") THEN Str(name); RETURN
+			ELSIF (name = "FLOAT32") OR (name = "FLOAT64") THEN Str(name); RETURN
 			ELSIF (name = "TRUE") OR (name = "FALSE") THEN Str(name); RETURN
 			ELSIF (name = "MOD") OR (name = "DIV") THEN Str(name); RETURN
 			ELSIF (name = "MAX") OR (name = "MIN") OR (name = "ABS") THEN Str(name); RETURN

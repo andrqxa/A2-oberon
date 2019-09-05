@@ -12,16 +12,16 @@ CONST
 
 TYPE
 	GTFConstants = RECORD
-		margin: LONGREAL;	(* Margin size as percentage of display *)
-		cellGran: LONGREAL;	(* Character cell granularity *)
-		minPorch: LONGREAL;	(* Minimum front porch in lines/chars *)
-		vSyncRqd: LONGREAL;	(* Width of V sync in lines *)
-		hSync: LONGREAL;	(* Width of H sync as percent of total *)
-		minVSyncBP: LONGREAL;	(* Minimum vertical sync + back porch (us) *)
-		m: LONGREAL;	(* Blanking formula gradient *)
-		c: LONGREAL;	(* Blanking formula offset *)
-		k: LONGREAL;	(* Blanking formula scaling factor *)
-		j: LONGREAL	(* Blanking formula scaling factor weight *)
+		margin: FLOAT64;	(* Margin size as percentage of display *)
+		cellGran: FLOAT64;	(* Character cell granularity *)
+		minPorch: FLOAT64;	(* Minimum front porch in lines/chars *)
+		vSyncRqd: FLOAT64;	(* Width of V sync in lines *)
+		hSync: FLOAT64;	(* Width of H sync as percent of total *)
+		minVSyncBP: FLOAT64;	(* Minimum vertical sync + back porch (us) *)
+		m: FLOAT64;	(* Blanking formula gradient *)
+		c: FLOAT64;	(* Blanking formula offset *)
+		k: FLOAT64;	(* Blanking formula scaling factor *)
+		j: FLOAT64	(* Blanking formula scaling factor weight *)
 	END;
 
 	GTFHCRTC = RECORD
@@ -44,22 +44,22 @@ TYPE
 		hSyncPol: CHAR;	(* Horizontal sync polarity *)
 		vSyncPol: CHAR;	(* Vertical sync polarity *)
 		interlace: CHAR;	(* 'I' for Interlace, 'N' for Non *)
-		vFreq: LONGREAL;	(* Vertical frequency (Hz) *)
-		hFreq: LONGREAL;	(* Horizontal frequency (KHz) *)
+		vFreq: FLOAT64;	(* Vertical frequency (Hz) *)
+		hFreq: FLOAT64;	(* Horizontal frequency (KHz) *)
 	END;
 VAR
 	conf*: ARRAY 512 OF CHAR;
 	hex: ARRAY 17 OF CHAR;
 
-PROCEDURE pow(x: LONGREAL; n: SIGNED32): LONGREAL;
-VAR s: LONGREAL;
+PROCEDURE pow(x: FLOAT64; n: SIGNED32): FLOAT64;
+VAR s: FLOAT64;
 BEGIN
 	s := 1;
 	WHILE n > 0 DO s := s * x; DEC(n) END;
 	RETURN s
 END pow;
 
-PROCEDURE Round(v: LONGREAL): LONGREAL;
+PROCEDURE Round(v: FLOAT64): FLOAT64;
 BEGIN
 	RETURN ENTIER(v + 0.5)
 END Round;
@@ -94,17 +94,17 @@ wantInterlace - TRUE if interlaced timings to be generated
 t - Place to store the resulting timings
 *)
 
-PROCEDURE GTFCalcTimings(hPixels, vLines, freq: LONGREAL; type: SIGNED32; wantMargins, wantInterlace: BOOLEAN; VAR t: GTFTimings);
+PROCEDURE GTFCalcTimings(hPixels, vLines, freq: FLOAT64; type: SIGNED32; wantMargins, wantInterlace: BOOLEAN; VAR t: GTFTimings);
 VAR
-	interlace,vFieldRate,hPeriod: LONGREAL;
-	topMarginLines,botMarginLines: LONGREAL;
-	leftMarginPixels,rightMarginPixels: LONGREAL;
-	hPeriodEst,vSyncBP,vBackPorch: LONGREAL;
-	vTotalLines,vFieldRateEst: LONGREAL;
-	hTotalPixels,hTotalActivePixels,hBlankPixels: LONGREAL;
-	idealDutyCycle,hSyncWidth,hSyncBP,hBackPorch: LONGREAL;
-	idealHPeriod: LONGREAL;
-	vFreq,hFreq,dotClock: LONGREAL;
+	interlace,vFieldRate,hPeriod: FLOAT64;
+	topMarginLines,botMarginLines: FLOAT64;
+	leftMarginPixels,rightMarginPixels: FLOAT64;
+	hPeriodEst,vSyncBP,vBackPorch: FLOAT64;
+	vTotalLines,vFieldRateEst: FLOAT64;
+	hTotalPixels,hTotalActivePixels,hBlankPixels: FLOAT64;
+	idealDutyCycle,hSyncWidth,hSyncBP,hBackPorch: FLOAT64;
+	idealHPeriod: FLOAT64;
+	vFreq,hFreq,dotClock: FLOAT64;
 	c: GTFConstants;
 BEGIN
 	GetInternalConstants(c);

@@ -72,7 +72,7 @@ BEGIN
 END Real;
 
 (** Scan a long real number. *)
-PROCEDURE LongReal* (VAR y: LONGREAL);
+PROCEDURE LongReal* (VAR y: FLOAT64);
 BEGIN
 	IF Done THEN
 		Texts.Scan(S);

@@ -121,7 +121,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END ScanCh;
 
 	PROCEDURE Scan (VAR s: Scanner);
-		VAR i: SIGNED32; str: ARRAY 100 OF CHAR; r, f: LONGREAL; term: CHAR;
+		VAR i: SIGNED32; str: ARRAY 100 OF CHAR; r, f: FLOAT64; term: CHAR;
 	BEGIN
 		LOOP
 			IF Scheme.Eof(s.ctxt.in) THEN s.token := eof; s.pos := Scheme.Pos(s.ctxt.in); RETURN
@@ -883,7 +883,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END GetColorVal;
 
 	PROCEDURE GetPatternVal* (ctxt: Scheme.Context; VAR args: Object; VAR img: Images.Image; VAR px, py: FLOAT32);
-		VAR val, vec: Object; ref: Objects.Object; x, y: LONGREAL;
+		VAR val, vec: Object; ref: Objects.Object; x, y: FLOAT64;
 	BEGIN
 		img := NIL; val := Ops.Arg(ctxt, args);
 		IF Scheme.IsPair(val) & (Scheme.Car(val) = pattern) THEN
@@ -897,7 +897,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END GetPatternVal;
 
 	PROCEDURE GetDashVal* (ctxt: Scheme.Context; VAR args: Object; VAR on, off: ARRAY OF FLOAT32; VAR n: SIGNED32);
-		VAR val, obj: Object; i, size: SIGNED32; r: LONGREAL;
+		VAR val, obj: Object; i, size: SIGNED32; r: FLOAT64;
 	BEGIN
 		val := Ops.VectorArg(ctxt, args);
 		i := 0; size := Scheme.VectorLen(val);
@@ -945,7 +945,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END JoinVal;
 
 	PROCEDURE GetMatrixVal* (ctxt: Scheme.Context; VAR args: Object; VAR m: GfxMatrix.Matrix);
-		VAR obj, elem: Object; i: SIGNED32; x: LONGREAL;
+		VAR obj, elem: Object; i: SIGNED32; x: FLOAT64;
 	BEGIN
 		obj := Ops.Arg(ctxt, args);
 		IF Scheme.IsVector(obj) & (Scheme.VectorLen(obj) = 6) THEN
@@ -1476,7 +1476,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE EvalColorsRGB (c: Scheme.Context; args: Object; VAR res: Object);
 		CONST max = 255.999;
-		VAR r, g, b: LONGREAL;
+		VAR r, g, b: FLOAT64;
 	BEGIN
 		r := NumVal(c, args); g := NumVal(c, args); b := NumVal(c, args); Ops.CheckNull(c, args);
 		res := MakeColor(ENTIER(max * r), ENTIER(max * g), ENTIER(max * b))
@@ -1537,7 +1537,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalMatrixInvert;
 
 	PROCEDURE EvalMatrixTranslate (c: Scheme.Context; args: Object; VAR res: Object);
-		VAR m: GfxMatrix.Matrix; dx, dy: LONGREAL;
+		VAR m: GfxMatrix.Matrix; dx, dy: FLOAT64;
 	BEGIN
 		GetMatrixVal(c, args, m); dx := NumVal(c, args); dy := NumVal(c, args); Ops.CheckNull(c, args);
 		GfxMatrix.Translate(m, SHORT(dx), SHORT(dy), m);
@@ -1545,7 +1545,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalMatrixTranslate;
 
 	PROCEDURE EvalMatrixScale (c: Scheme.Context; args: Object; VAR res: Object);
-		VAR m: GfxMatrix.Matrix; sx, sy: LONGREAL;
+		VAR m: GfxMatrix.Matrix; sx, sy: FLOAT64;
 	BEGIN
 		GetMatrixVal(c, args, m); sx := NumVal(c, args);
 		IF Scheme.IsPair(args) THEN sy := NumVal(c, args)
@@ -1557,7 +1557,7 @@ MODULE Vinci IN Oberon; (** portable *)	(* eos  *)
 	END EvalMatrixScale;
 
 	PROCEDURE EvalMatrixRotate (c: Scheme.Context; args: Object; VAR res: Object);
-		VAR m: GfxMatrix.Matrix; phi: LONGREAL;
+		VAR m: GfxMatrix.Matrix; phi: FLOAT64;
 	BEGIN
 		GetMatrixVal(c, args, m); phi := NumVal(c, args); Ops.CheckNull(c, args);
 		GfxMatrix.Rotate(m, SHORT(MathL.sin(phi)), SHORT(MathL.cos(phi)), m);

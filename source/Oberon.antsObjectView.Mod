@@ -59,7 +59,7 @@ TYPE
 		entriescount: SIGNED32;
 		repetition: BOOLEAN;
 		X, Y, W, H: SIGNED16;
-		x, y: LONGREAL;
+		x, y: FLOAT64;
 		selected: BOOLEAN;
 		visible: BOOLEAN
 	END;
@@ -294,7 +294,7 @@ VAR
 		INC( layer.forbiddencount );  layer.forbidden[layer.forbiddencount] := "Gen";  INC( layer.forbiddencount )
 	END ListFromDummy;
 
-	PROCEDURE BoxedText( a1, a2: ARRAY OF CHAR;  x, y: LONGREAL;  VAR X, Y, W, H: SIGNED16;  n: tNode;  selected: BOOLEAN );
+	PROCEDURE BoxedText( a1, a2: ARRAY OF CHAR;  x, y: FLOAT64;  VAR X, Y, W, H: SIGNED16;  n: tNode;  selected: BOOLEAN );
 	VAR dsr: SIGNED16;
 	BEGIN
 		vyHostStrings.Append( a1, ": " );  vyHostStrings.Append( a1, a2 );
@@ -311,8 +311,8 @@ VAR
 		END
 	END BoxedText;
 
-	PROCEDURE RecallNode( n: tNode;  VAR x, y: LONGREAL;  oldx, oldy: LONGREAL;  drx, dry: LONGREAL;  SY1, SY2: SIGNED16 );
-	VAR e: tEntry;  X, Y, W, H: SIGNED16;  w, h: LONGREAL;  firstline: BOOLEAN;
+	PROCEDURE RecallNode( n: tNode;  VAR x, y: FLOAT64;  oldx, oldy: FLOAT64;  drx, dry: FLOAT64;  SY1, SY2: SIGNED16 );
+	VAR e: tEntry;  X, Y, W, H: SIGNED16;  w, h: FLOAT64;  firstline: BOOLEAN;
 	BEGIN
 		IF ~n.visible THEN RETURN END;
 		vyGraphBase.Line2d( oldx, y, x, y );  BoxedText( n.name, n.val, x, y, X, Y, W, H, n, n.selected );  n.X := X;  n.Y := Y;
@@ -617,7 +617,7 @@ VAR
 	END UpdateSpecial;
 
 	PROCEDURE Recall( layer: tLayer;  msg: Display.DisplayMsg );
-	VAR x, y, w, h: SIGNED16;  hp: vyPort.Picture;  drx, dry, xr, yr: LONGREAL;
+	VAR x, y, w, h: SIGNED16;  hp: vyPort.Picture;  drx, dry, xr, yr: FLOAT64;
 	BEGIN
 		IF (layer.lifeUpdate) & ((Oberon.Time() - layer.lastLink) > TICKS) THEN
 			LinksUpdate( layer );  layer.lastLink := Oberon.Time()

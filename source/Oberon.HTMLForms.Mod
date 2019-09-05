@@ -89,8 +89,8 @@ MODULE HTMLForms IN Oberon; (** portable *)	(* ejz  *)
 			obj, obj2: Objects.Object;
 			curForm: HTMLDocs.Form;
 			val: SIGNED32;
-			rval, min, max: LONGREAL;
-			y: LONGREAL;
+			rval, min, max: FLOAT64;
+			y: FLOAT64;
 	BEGIN
 		IF on THEN
 			P := S.page; Links.GetLink(S.page, "CurForm", obj);

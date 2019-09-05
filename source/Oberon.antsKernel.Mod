@@ -48,8 +48,8 @@ TYPE
 	metropolis*=RECORD(samplingMsg)  END;
 
 
-	annealing*= RECORD(gibbs); (* temp*: LONGREAL *) END;
-	metropolisanneal*= RECORD(metropolis); (*  temp*: LONGREAL *) END;
+	annealing*= RECORD(gibbs); (* temp*: FLOAT64 *) END;
+	metropolisanneal*= RECORD(metropolis); (*  temp*: FLOAT64 *) END;
 	*)
 
 
@@ -69,7 +69,7 @@ TYPE
 		ModelClassCount*: SIGNED16;
 		makeTemperature*: temperatureScheme;
 		cacheSize*: SIGNED32;
-		temperature*: LONGREAL;
+		temperature*: FLOAT64;
 		samplerType*: vyName.tNameArray
 	END;
 
@@ -206,7 +206,7 @@ END ExpMetrAnneal;
 PROCEDURE Metropolis (s: Kernel; VAR omsg:antsMC.Msg);
 VAR msg: metropolis;
 BEGIN
-Prepare(s,omsg,msg); msg.cacheSize := staticCacheSize; msg.temp := MIN(LONGREAL);
+Prepare(s,omsg,msg); msg.cacheSize := staticCacheSize; msg.temp := MIN(FLOAT64);
 s.par.handle(s.par,msg);
 END Metropolis;
 *)

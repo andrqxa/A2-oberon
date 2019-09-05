@@ -25,7 +25,7 @@ TYPE
 			nofVertices : SIGNED32;
 			aabb : AABB;
 			bsCenter : Vectors.TVector3d;
-			bsRadius : LONGREAL;
+			bsRadius : FLOAT64;
 			bsValid : BOOLEAN;
 			isAnimated : BOOLEAN;
 			index : SIGNED32;
@@ -113,7 +113,7 @@ TYPE
 		objects, animated : Classes.List;
 		p, d, u : Vectors.TVector3d;
 		trans : Matrix.Matrix4x4;
-		distpp : LONGREAL;
+		distpp : FLOAT64;
 		rasterizer : Rasterizer.Rasterizer;
 		width, height : SIZE;
 		quality* 	: SIGNED32;
@@ -171,8 +171,8 @@ TYPE
 			worldValid := FALSE
 		END SetCamera;
 
-		PROCEDURE ScreenPos(p : Vectors.TVector3d; VAR x, y: LONGREAL);
-		VAR inv : LONGREAL;
+		PROCEDURE ScreenPos(p : Vectors.TVector3d; VAR x, y: FLOAT64);
+		VAR inv : FLOAT64;
 		BEGIN
 			inv := distpp / p.z;
 			x := p.x * inv + (rasterizer.width DIV 2);
@@ -204,7 +204,7 @@ TYPE
 		END RasterTriangle;
 
 		PROCEDURE ClipDrawTriangle(VAR tri : Triangle);
-		VAR c : SIGNED32; v0, v1, v2 : Vertex; d, m: LONGREAL;
+		VAR c : SIGNED32; v0, v1, v2 : Vertex; d, m: FLOAT64;
 		BEGIN
 			IF ~(tri.vert[0].behind OR tri.vert[1].behind OR tri.vert[2].behind) THEN
 				RasterTriangle(tri)

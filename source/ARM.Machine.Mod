@@ -2258,7 +2258,7 @@ VAR
 		(* time slot in private timer counts; take into account that private timer clock frequency is equal to half of the CPU clock frequency *)
 		delay: SIGNED32;
 	BEGIN
-		delay := ENTIER( ( LONGREAL(TimerPeriod) * 0.5D0 * LONGREAL(BootConfig.GetIntValue("CpuClockHz")) ) / 1.0D6 + 0.5D0 );
+		delay := ENTIER( ( FLOAT64(TimerPeriod) * 0.5D0 * FLOAT64(BootConfig.GetIntValue("CpuClockHz")) ) / 1.0D6 + 0.5D0 );
 		(* disable first *)
 		SYSTEM.PUT32(Platform.PrivateTimerControlRegister, {});
 

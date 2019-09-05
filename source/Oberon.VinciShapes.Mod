@@ -102,7 +102,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END IsMatrix;
 
 	PROCEDURE GetMatrix (s: Shape; VAR m: GfxMatrix.Matrix);
-		VAR val, res: Scheme.Object; ctxt: Vinci.Context; i: SIGNED32; x: LONGREAL;
+		VAR val, res: Scheme.Object; ctxt: Vinci.Context; i: SIGNED32; x: FLOAT64;
 	BEGIN
 		m := GfxMatrix.Identity;
 		IF Scheme.LookupVariable(matrix, s.env, val) THEN
@@ -121,7 +121,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 
 	PROCEDURE GetBox (s: Shape; VAR m: GfxMatrix.Matrix; VAR llx, lly, urx, ury, bw: FLOAT32);
 		VAR
-			val, res, obj: Scheme.Object; ctxt: Vinci.Context; len, i: SIGNED32; x: LONGREAL; b: ARRAY 5 OF FLOAT32;
+			val, res, obj: Scheme.Object; ctxt: Vinci.Context; len, i: SIGNED32; x: FLOAT64; b: ARRAY 5 OF FLOAT32;
 			x0, y0, x1, y1: FLOAT32;
 	BEGIN
 		Leonardo.GetComponentsBox(s.bottom, llx, lly, urx, ury, bw);
@@ -475,7 +475,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END BindParams;
 
 	PROCEDURE WriteParams (s: Shape; VAR r: Files.Rider);
-		VAR par: Parameter; res: BOOLEAN; val: Scheme.Object; l: SIGNED32; x: LONGREAL; str: ARRAY 64 OF CHAR;
+		VAR par: Parameter; res: BOOLEAN; val: Scheme.Object; l: SIGNED32; x: FLOAT64; str: ARRAY 64 OF CHAR;
 	BEGIN
 		par := s.par;
 		WHILE par # NIL DO
@@ -984,7 +984,7 @@ MODULE VinciShapes IN Oberon; (** portable *)	(* eos  *)
 	END EvalRectInit;
 
 	PROCEDURE GetRectArg (ctxt: Scheme.Context; VAR args: Scheme.Object; VAR llx, lly, urx, ury: FLOAT32);
-		VAR obj, elem: Scheme.Object; x: LONGREAL;
+		VAR obj, elem: Scheme.Object; x: FLOAT64;
 	BEGIN
 		obj := Ops.Arg(ctxt, args);
 		IF Scheme.IsVector(obj) & (Scheme.VectorLen(obj) = 4) THEN

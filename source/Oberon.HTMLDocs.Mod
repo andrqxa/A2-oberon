@@ -795,7 +795,7 @@ to.elems := from.elems
 			END;
 			Texts.Write(Wr, "&")
 		END StrAttr;
-		PROCEDURE RealAttr(y: LONGREAL; l: SIGNED16);
+		PROCEDURE RealAttr(y: FLOAT64; l: SIGNED16);
 		BEGIN
 			Texts.WriteString(Wr, name);
 			Texts.Write(Wr, "=");

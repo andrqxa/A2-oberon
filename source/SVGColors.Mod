@@ -154,12 +154,12 @@ CONST
 
 TYPE
 	Color*=SIGNED32;
-	ColorSum*=ARRAY 4 OF LONGREAL;
+	ColorSum*=ARRAY 4 OF FLOAT64;
 
 (* Parse a color specified by name or value *)
 PROCEDURE Parse*(value: Strings.String; VAR color: Color):BOOLEAN;
 VAR res: WORD; i: SIZE; r, g, b: SIGNED32;
-	f: LONGREAL;
+	f: FLOAT64;
 BEGIN
 	IF value[0]='#' THEN
 		value := Strings.Substring2(1,value^);
@@ -373,9 +373,9 @@ BEGIN
 END Unsplit;
 
 (* Blend two pixels and premultiply their alpha values *)
-PROCEDURE BlendAndPremultiply*(VAR a,b: Raster.Pixel; t: LONGREAL): Raster.Pixel;
+PROCEDURE BlendAndPremultiply*(VAR a,b: Raster.Pixel; t: FLOAT64): Raster.Pixel;
 VAR p: Raster.Pixel;
-	fa: LONGREAL;
+	fa: FLOAT64;
 BEGIN
 	fa := (ORD(a[3])+(ORD(b[3])-ORD(a[3]))*t) / 255.0;
 	p[0] := CHR(ENTIER( fa*(ORD(a[0])+(ORD(b[0])-ORD(a[0]))*t) ));
@@ -398,7 +398,7 @@ BEGIN
 END ColorToPixel;
 
 (* Add the r, g, b and a values of a pixel to a running sum *)
-PROCEDURE WeightedAdd*(VAR sum: ColorSum;  w: LONGREAL; pix: Raster.Pixel);
+PROCEDURE WeightedAdd*(VAR sum: ColorSum;  w: FLOAT64; pix: Raster.Pixel);
 BEGIN
 	sum[0] := sum[0] + w*ORD(pix[0]);
 	sum[1] := sum[1] + w*ORD(pix[1]);

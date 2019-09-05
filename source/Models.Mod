@@ -490,7 +490,7 @@ TYPE
 
 	Longreal* = OBJECT(Model)
 	VAR
-		value : LONGREAL;
+		value : FLOAT64;
 
 		PROCEDURE &Init*;
 		BEGIN
@@ -500,7 +500,7 @@ TYPE
 			SetGenerator("Models.GenLongreal");
 		END Init;
 
-		PROCEDURE Set*(value : LONGREAL);
+		PROCEDURE Set*(value : FLOAT64);
 		BEGIN
 			AcquireWrite;
 			IF (SELF.value # value) THEN
@@ -510,8 +510,8 @@ TYPE
 			ReleaseWrite;
 		END Set;
 
-		PROCEDURE Get*() : LONGREAL;
-		VAR value : LONGREAL;
+		PROCEDURE Get*() : FLOAT64;
+		VAR value : FLOAT64;
 		BEGIN
 			AcquireRead;
 			value := SELF.value;
@@ -520,14 +520,14 @@ TYPE
 		END Get;
 
 		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
-		VAR newValue : LONGREAL;
+		VAR newValue : FLOAT64;
 		BEGIN
 			Types.GetLongreal(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
 		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
-		VAR currentValue : LONGREAL;
+		VAR currentValue : FLOAT64;
 		BEGIN
 			currentValue := Get();
 			Types.SetLongreal(value, currentValue, res);
@@ -983,7 +983,7 @@ END IsPrintableCharacter;
 
 
 
-PROCEDURE GetReal*(m: Model; VAR r: LONGREAL): BOOLEAN;
+PROCEDURE GetReal*(m: Model; VAR r: FLOAT64): BOOLEAN;
 VAR real: Types.Longreal; res: WORD;
 BEGIN
 	IF m = NIL THEN RETURN FALSE END;
@@ -1005,7 +1005,7 @@ BEGIN
 	END;
 END GetInteger;
 
-PROCEDURE SetReal*(m: Model; r: LONGREAL);
+PROCEDURE SetReal*(m: Model; r: FLOAT64);
 VAR real: Types.Longreal; res: WORD;
 BEGIN
 	IF m = NIL THEN RETURN END;

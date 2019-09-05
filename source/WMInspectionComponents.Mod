@@ -606,7 +606,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Apply(force : BOOLEAN);
-		VAR real : WMProperties.RealProperty; string : ARRAY 256 OF CHAR; value : LONGREAL;
+		VAR real : WMProperties.RealProperty; string : ARRAY 256 OF CHAR; value : FLOAT64;
 		BEGIN
 			real := SELF.real;
 			IF (real # NIL) THEN
@@ -621,7 +621,7 @@ TYPE
 		END Apply;
 
 		PROCEDURE Synchronize(force : BOOLEAN);
-		VAR real : WMProperties.RealProperty; value : LONGREAL; string : ARRAY 256 OF CHAR; sw: Streams.StringWriter;
+		VAR real : WMProperties.RealProperty; value : FLOAT64; string : ARRAY 256 OF CHAR; sw: Streams.StringWriter;
 		BEGIN
 			Synchronize^(force);
 			real := SELF.real;

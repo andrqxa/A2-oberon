@@ -394,8 +394,8 @@ TYPE
 	END ConvF64U32;
 
 	(* if an FPU64 is available, the result must be made available via FPU register *)
-	PROCEDURE ConvF64S64F*(x: DoubleWord): LONGREAL;
-	VAR l,h:LONGREAL;
+	PROCEDURE ConvF64S64F*(x: DoubleWord): FLOAT64;
+	VAR l,h:FLOAT64;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		l := x.low;
 		h := x.high;

@@ -105,7 +105,7 @@ TYPE
 			cont: XMLObjects.Enumerator;
 			ptr: ANY;
 			tempInt : SIGNED32; res: WORD;
-			tempReal : LONGREAL;
+			tempReal : FLOAT64;
 		BEGIN
 			cont := elem.GetContents(); cont.Reset();
 			WHILE cont.HasMoreElements() DO
@@ -433,7 +433,7 @@ TYPE
 		VAR
 			colorString, origString : ARRAY 128 OF CHAR;
 			color : SIGNED32; res: WORD;
-			width: LONGREAL;
+			width: FLOAT64;
 			bool: BOOLEAN;
 
 		BEGIN

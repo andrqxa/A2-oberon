@@ -27,7 +27,7 @@ TYPE
 		lastCycles : ARRAY Machine.MaxCPU OF SIGNED64;
 
 		PROCEDURE Update;
-		VAR cpuNbr : SIGNED32; dCycles, total : LONGREAL;
+		VAR cpuNbr : SIGNED32; dCycles, total : FLOAT64;
 		BEGIN
 			timestamp := Machine.GetTimer();
 

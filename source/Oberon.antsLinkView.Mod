@@ -29,7 +29,7 @@ IMPORT Display, vyBase, vyName, vyGraphBase, vyDisplay2d, vyPort, vyEvents, vyLi
 	vyTracking, Files, vyHighlight, Gadgets, vyGraph := antsGraph, Objects, antsCommands, Strings, vyCommandMenus, aM := antsMessages;
 
 TYPE
-	Real = LONGREAL;
+	Real = FLOAT64;
 
 	tNode = POINTER TO tNodeDesc;
 	tNodeDesc = RECORD (vyGraph.tNodeDesc)
@@ -327,7 +327,7 @@ END NodeUsers;
 	END rangepos;
 
 	PROCEDURE posit( n: vyGraph.tNode );
-	VAR x, y: LONGREAL;
+	VAR x, y: FLOAT64;
 	BEGIN
 		y := -n( tNode ).level;
 		x := (maxlevel - minlevel) / 2 - currange[n( tNode ).level - minlevel] / 2 + n( tNode ).levelpos;
@@ -385,7 +385,7 @@ END NodeUsers;
 	END Respond;
 
 	PROCEDURE DoubleClick( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	VAR v: vyGraph.tNode;  x2d, y2d: Real;  n: tNode;  xr, yr, wr, hr: LONGREAL;
+	VAR v: vyGraph.tNode;  x2d, y2d: Real;  n: tNode;  xr, yr, wr, hr: FLOAT64;
 	BEGIN
 		vyGraphBase.PointToPoint2d( event.x, event.y, x2d, y2d );  v := vyGraph.ThisNode( layer.graph, x2d, y2d );
 		IF (v # NIL ) & (v IS tNode) THEN
@@ -437,7 +437,7 @@ END NodeUsers;
 	END viewNode;
 
 	PROCEDURE Handler*( o: Objects.Object;  VAR msg: Objects.ObjMsg );
-	VAR layer, copy: tLayer;  done: BOOLEAN;  x2d, y2d: LONGREAL;  v: vyGraph.tNode;
+	VAR layer, copy: tLayer;  done: BOOLEAN;  x2d, y2d: FLOAT64;  v: vyGraph.tNode;
 	BEGIN
 		layer := o( tLayer );  done := FALSE;
 		IF msg IS Display.DisplayMsg THEN

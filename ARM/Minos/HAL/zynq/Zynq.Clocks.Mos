@@ -229,7 +229,7 @@ CONST
 	OFFS = 12;
 VAR
 	reg : SIGNED32;
-	f : LONGREAL;
+	f : FLOAT64;
 BEGIN
 	reg := Platform.slcr.ARM_PLL_CTRL;
 	(*SYSTEM.GET( Platform.SLCRARMPLL, reg );*)

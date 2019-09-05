@@ -77,14 +77,14 @@ TYPE
 		PROCEDURE UpdateDataset*;
 		VAR
 			i : SIZE; timer : SIGNED64;
-			pAll, timeDiff, cyclesDiff : LONGREAL;
+			pAll, timeDiff, cyclesDiff : FLOAT64;
 		BEGIN
 			Objects.GetCpuCycles(process, currentCycles, TRUE);
 			timer := Machine.GetTimer();
 			timeDiff := timer - lastTimer;
 			IF lastSamplesValid THEN
 				IF (LEN(dataset) = 1) THEN
-					dataset[0]  := SHORT(100.00 * LONGREAL(currentCycles[0] - lastCycles[0]) / timeDiff);
+					dataset[0]  := SHORT(100.00 * FLOAT64(currentCycles[0] - lastCycles[0]) / timeDiff);
 				ELSE
 					pAll := 0.0;
 					FOR i := 1 TO LEN(dataset)-1 DO

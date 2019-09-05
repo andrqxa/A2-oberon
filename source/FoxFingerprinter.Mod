@@ -1323,7 +1323,7 @@ TYPE
 	END FPSet;
 
 	(* fp = fp <*> real *)
-	PROCEDURE FPReal*(VAR fp: Basic.Fingerprint; real: LONGREAL);
+	PROCEDURE FPReal*(VAR fp: Basic.Fingerprint; real: FLOAT64);
 	BEGIN FPNumber(fp, SYSTEM.VAL(SIGNED64, real))
 	END FPReal;
 

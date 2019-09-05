@@ -371,7 +371,7 @@ TYPE
 			PutDWord(ConvertReal(f))
 		END PutReal;
 
-		PROCEDURE PutLongreal*(f: LONGREAL);
+		PROCEDURE PutLongreal*(f: FLOAT64);
 		BEGIN
 			PutQWord(ConvertLongreal(f))
 		END PutLongreal;
@@ -476,7 +476,7 @@ TYPE
 			RETURN ConvertToReal(GetDWord(pc))
 		END GetReal;
 
-		PROCEDURE GetLongreal*(pc: Unit): LONGREAL;
+		PROCEDURE GetLongreal*(pc: Unit): FLOAT64;
 		BEGIN
 			RETURN ConvertToLongreal(GetDWord(pc))
 		END GetLongreal;
@@ -637,7 +637,7 @@ TYPE
 		RETURN result;
 	END ConvertReal;
 
-	PROCEDURE ConvertLongreal*(value: LONGREAL): SIGNED64;
+	PROCEDURE ConvertLongreal*(value: FLOAT64): SIGNED64;
 	CONST Exponent = 11; Significant = 52;
 	VAR result: SIGNED64; VAR exponent, i: WORD;
 	BEGIN
@@ -683,8 +683,8 @@ TYPE
 		RETURN result
 	END ConvertToReal;
 
-	PROCEDURE ConvertToLongreal*(x: SIGNED64): LONGREAL;
-	VAR result: LONGREAL; e,i: SIGNED32;
+	PROCEDURE ConvertToLongreal*(x: SIGNED64): FLOAT64;
+	VAR result: FLOAT64; e,i: SIGNED32;
 
 		PROCEDURE Bit(bit: SIGNED32): BOOLEAN;
 		BEGIN

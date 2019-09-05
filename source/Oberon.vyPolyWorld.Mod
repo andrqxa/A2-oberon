@@ -118,7 +118,7 @@ VAR
 	PHIGS3DError: SIGNED16;
 	lightDirX, lightDirY, lightDirZ: Real;      	(* light direction: this vector have to be normed to 1 *)
 	maxFaces: SIGNED32;
-	faceDepths: POINTER TO ARRAY OF LONGREAL;
+	faceDepths: POINTER TO ARRAY OF FLOAT64;
 	faceIndex: POINTER TO ARRAY OF SIGNED32;  (* POINTER ! *)
 	triangulate: BOOLEAN;
 	lines: BOOLEAN;
@@ -594,7 +594,7 @@ BEGIN
 	faces := 0;
 	Out.Ln;     Out.String("before SORT");
 	(* Out.Ln;    Out.LongReal(GetFaceDepth (m.firstFace),20);  *)
-	faceDepth := MIN(LONGREAL);
+	faceDepth := MIN(FLOAT64);
 	WHILE (face # NIL)  DO
 	INC(faces);
 
@@ -634,7 +634,7 @@ BEGIN
 	(*
 	faces := 0;
 	face := m.firstFace.next;
-	faceDepth := MIN(LONGREAL);
+	faceDepth := MIN(FLOAT64);
 	WHILE (face # NIL)  DO
 	INC(faces);
 	lastfaceD := faceDepth;
@@ -929,7 +929,7 @@ BEGIN n := Norm (x, y, z);
 END SetLightDirection;
 
 PROCEDURE SetFaceColor (nx, ny, nz: Real);
-	VAR a: Real;     col: SIGNED32;     vx, vy, vz: LONGREAL;
+	VAR a: Real;     col: SIGNED32;     vx, vy, vz: FLOAT64;
 BEGIN
 	vx :=  lightDirX;     vy := lightDirY;     vz := lightDirZ;
 	a := (nx * lightDirX + ny * lightDirY + nz * lightDirZ) / (Norm (nx, ny, nz)) + 1;

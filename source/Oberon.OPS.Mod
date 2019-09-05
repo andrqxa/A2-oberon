@@ -20,7 +20,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		Token = POINTER TO RECORD	pos: SIGNED32; sym: SIGNED8; next: Token	END;
 		IntToken = POINTER TO RECORD (Token)	intval: SIGNED32; typ: SIGNED16	END;
 		RealToken = POINTER TO RECORD (Token)	realval: FLOAT32	END;
-		LRealToken = POINTER TO RECORD (Token)	lrlval: LONGREAL	END;
+		LRealToken = POINTER TO RECORD (Token)	lrlval: FLOAT64	END;
 		StrToken = POINTER TO RECORD (Token)	str: String; len: SIGNED32	END;
 		NameToken = POINTER TO RECORD (Token)	name: Name	END;
 
@@ -34,7 +34,7 @@ MODULE OPS IN Oberon;	(** non-portable *)
 		numtyp*: SIGNED16; (* 1 = char, 2 = integer, 3 = real, 4 = longreal *)
 		intval*: SIGNED32;	(* integer value or string length *)
 		realval*: FLOAT32;
-		lrlval*: LONGREAL;
+		lrlval*: FLOAT64;
 		Get*: GetProc;
 		ch*: CHAR;     (*current character*)
 		stream, last: TokenStream;
@@ -182,10 +182,10 @@ MODULE OPS IN Oberon;	(** non-portable *)
 	END CheckOperator;
 
 		PROCEDURE Number*;
-		VAR i, m, n, d, e: SIGNED16; dig: ARRAY 24 OF CHAR; f: LONGREAL; expCh: CHAR; neg: BOOLEAN;
+		VAR i, m, n, d, e: SIGNED16; dig: ARRAY 24 OF CHAR; f: FLOAT64; expCh: CHAR; neg: BOOLEAN;
 
-		PROCEDURE Ten(e: SIGNED16): LONGREAL;
-			VAR x, p: LONGREAL;
+		PROCEDURE Ten(e: SIGNED16): FLOAT64;
+			VAR x, p: FLOAT64;
 		BEGIN x := 1; p := 10;
 			WHILE e > 0 DO
 				IF ODD(e) THEN x := x*p END;

@@ -128,13 +128,13 @@ TYPE
 
 			(* Navigation *)
 			lookat: Vectors.TVector3d;
-			radius, angle, height : LONGREAL;
+			radius, angle, height : FLOAT64;
 			mouseKeys : SET;
 			oldX, oldY : SIZE;
 
 			(* 3d World *)
 			world : World.World;
-			mx, my, mz : LONGREAL;
+			mx, my, mz : FLOAT64;
 
 			infoList : Classes.List;
 			index : SIGNED32;

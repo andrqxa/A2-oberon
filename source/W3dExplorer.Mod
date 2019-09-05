@@ -9,7 +9,7 @@ TYPE
 	Explorer = OBJECT (WM.BufferWindow)
 	VAR
 		lookat: Vectors.TVector3d;
-		radius, angle, height : LONGREAL;
+		radius, angle, height : FLOAT64;
 		quality : SIGNED32;
 
 		mouseKeys : SET;

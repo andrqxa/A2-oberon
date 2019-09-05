@@ -45,7 +45,7 @@ TYPE
 VAR
 
 	PROCEDURE Recall( layer: tLayer );
-	VAR cells: SIGNED32;  cellsize: LONGREAL;  i, j: SIGNED32;  A: antsArrayObjects.tINTEGERObject;  x, y: SIGNED32;  ry, rx: SIGNED32;  vx, vn: SIGNED32;  rx1, ry1, rx2, ry2: SIGNED32;
+	VAR cells: SIGNED32;  cellsize: FLOAT64;  i, j: SIGNED32;  A: antsArrayObjects.tINTEGERObject;  x, y: SIGNED32;  ry, rx: SIGNED32;  vx, vn: SIGNED32;  rx1, ry1, rx2, ry2: SIGNED32;
 
 		PROCEDURE PaintCell( x, y: SIGNED32 );
 		VAR
@@ -57,7 +57,7 @@ VAR
 		END PaintCell;
 
 		PROCEDURE PaintCell2( x, y: SIGNED32;  C: antsArrayObjects.tLONGINTArray );
-		VAR yi, xi: SIGNED32;  y0r, x0r, yr, xr, wr, hr: LONGREAL;  maxr: LONGREAL;  col: SIGNED32;  index: SIGNED32;
+		VAR yi, xi: SIGNED32;  y0r, x0r, yr, xr, wr, hr: FLOAT64;  maxr: FLOAT64;  col: SIGNED32;  index: SIGNED32;
 		BEGIN
 			maxr := 0;
 			FOR yi := 0 TO A.depth - 1 DO
@@ -154,7 +154,7 @@ VAR
 	END Copy;
 
 	PROCEDURE Select( layer: tLayer;  VAR event: vyEvents.EventMsg );
-	(*	VAR         cells: SIGNED32;   cellsize : LONGREAL;   i, j: SIGNED32;
+	(*	VAR         cells: SIGNED32;   cellsize : FLOAT64;   i, j: SIGNED32;
 	origx, origy: SIGNED16;
 
 	PROCEDURE InCell (x, y: SIGNED32;   cx, cy: SIGNED16 ): BOOLEAN;

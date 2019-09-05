@@ -976,7 +976,7 @@ TYPE
 			recordBase: SyntaxTree.RecordType;
 			numberMethods: SIZE;
 			int: Basic.Integer;
-			real: LONGREAL;
+			real: FLOAT64;
 			bool: BOOLEAN;
 			set: Basic.Set;
 			v: SyntaxTree.Expression;
@@ -1595,7 +1595,7 @@ TYPE
 		PROCEDURE ResolveUnaryExpression(unaryExpression: SyntaxTree.UnaryExpression): SyntaxTree.Expression;
 		VAR
 			left: SyntaxTree.Expression;
-			int: Basic.Integer; real, imaginary: LONGREAL; set: Basic.Set; operator: SIGNED32;
+			int: Basic.Integer; real, imaginary: FLOAT64; set: Basic.Set; operator: SIGNED32;
 			bool: BOOLEAN;
 			result: SyntaxTree.Expression; type: SyntaxTree.Type; operatorCall: SyntaxTree.Expression;
 			value: SyntaxTree.Value;
@@ -1809,7 +1809,7 @@ TYPE
 		END MathArrayConversion;
 
 		PROCEDURE ConvertValue(position: Position; expression: SyntaxTree.Value; type: SyntaxTree.Type): SyntaxTree.Expression;
-		VAR result: SyntaxTree.Expression; int: Basic.Integer; real, imaginary: LONGREAL; set: Basic.Set; char: CHAR; string: Scanner.StringType;
+		VAR result: SyntaxTree.Expression; int: Basic.Integer; real, imaginary: FLOAT64; set: Basic.Set; char: CHAR; string: Scanner.StringType;
 		BEGIN
 			result := expression; type := type.resolved;
 			IF (type IS SyntaxTree.ArrayType) & (type(SyntaxTree.ArrayType).arrayBase.resolved IS SyntaxTree.ByteType) THEN
@@ -2083,7 +2083,7 @@ TYPE
 				ELSIF
 					(leftType IS SyntaxTree.ComplexType) & (rightType IS SyntaxTree.FloatType) OR
 					(leftType IS SyntaxTree.FloatType) & (rightType IS SyntaxTree.ComplexType) THEN
-					(* must be the case LONGREAL / COMPLEX ) *)
+					(* must be the case FLOAT64 / COMPLEX ) *)
 					left := NewConversion(left.position, left, Global.Complex128, NIL);
 					right := NewConversion(right.position, right, Global.Complex128, NIL);
 				ELSE
@@ -2248,7 +2248,7 @@ TYPE
 		PROCEDURE ResolveBinaryExpression(binaryExpression: SyntaxTree.BinaryExpression): SyntaxTree.Expression;
 		VAR left,right,result: SyntaxTree.Expression;
 			leftType, rightType: SyntaxTree.Type;
-			il,ir: Basic.Integer; rl,rr,a,b,c,d,divisor: LONGREAL; hl,hr: Basic.Integer;bl,br: BOOLEAN; sl,sr: Basic.Set;  strl,strr: Scanner.StringType;
+			il,ir: Basic.Integer; rl,rr,a,b,c,d,divisor: FLOAT64; hl,hr: Basic.Integer;bl,br: BOOLEAN; sl,sr: Basic.Set;  strl,strr: Scanner.StringType;
 			cl,cr: CHAR;
 			operator: SIGNED32; operatorCall: SyntaxTree.Expression;
 			type: SyntaxTree.Type;
@@ -2285,7 +2285,7 @@ TYPE
 				type := value.type;
 			END NewInteger;
 
-			PROCEDURE NewReal(v: LONGREAL; t: SyntaxTree.Type);
+			PROCEDURE NewReal(v: FLOAT64; t: SyntaxTree.Type);
 			BEGIN
 				value := SyntaxTree.NewRealValue(binaryExpression.position,v, Scanner.None);
 				value.SetType(t);
@@ -2293,7 +2293,7 @@ TYPE
 				type := t;
 			END NewReal;
 
-			PROCEDURE NewComplex(realValue, imagValue: LONGREAL; t: SyntaxTree.Type);
+			PROCEDURE NewComplex(realValue, imagValue: FLOAT64; t: SyntaxTree.Type);
 			BEGIN
 				value := SyntaxTree.NewComplexValue(binaryExpression.position, realValue, imagValue, Scanner.None);
 				value.SetType(t);
@@ -4433,7 +4433,7 @@ TYPE
 			type,base,parameterType: SyntaxTree.Type;
 			arrayType: SyntaxTree.ArrayType;
 			i: SIZE; i0, i1, value: Basic.Integer;
-			r,r0,r1,im: LONGREAL;
+			r,r0,r1,im: FLOAT64;
 			c: CHAR;
 			id: SIGNED32;
 			b: BOOLEAN;
@@ -8960,7 +8960,7 @@ TYPE
 		RETURN result
 	END IsEnumerationValue;
 
-	PROCEDURE IsRealValue(x: SyntaxTree.Expression; VAR value: LONGREAL): BOOLEAN;
+	PROCEDURE IsRealValue(x: SyntaxTree.Expression; VAR value: FLOAT64): BOOLEAN;
 	VAR result: BOOLEAN;
 	BEGIN
 		IF  (x.resolved # NIL) & (x.resolved IS SyntaxTree.RealValue) THEN
@@ -8972,7 +8972,7 @@ TYPE
 		RETURN result
 	END IsRealValue;
 
-	PROCEDURE IsComplexValue(x: SyntaxTree.Expression; VAR realValue, imagValue: LONGREAL): BOOLEAN;
+	PROCEDURE IsComplexValue(x: SyntaxTree.Expression; VAR realValue, imagValue: FLOAT64): BOOLEAN;
 	VAR result: BOOLEAN;
 	BEGIN
 		IF  (x.resolved # NIL) & (x.resolved IS SyntaxTree.ComplexValue) THEN

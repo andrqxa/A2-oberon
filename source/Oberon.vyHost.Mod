@@ -115,7 +115,7 @@ TYPE
 	Index* = SIGNED32;  	(*= index type for open arrays *)
 	(*	Coordinate*=SIGNED16; 	(*= type used for output coordinates *)
 	Color*= SIGNED16;
-	RealNumber*=LONGREAL;  (*= base type for numerics and 2d coordinates*)
+	RealNumber*=FLOAT64;  (*= base type for numerics and 2d coordinates*)
 
 	FilesReader*=Files.Rider;
 	FilesWriter*=Files.Rider;
@@ -485,26 +485,26 @@ Contents	Tools and hacks for Oberon
 (*
 (*! defunct. Use NaN support of module Reals.
 Remove calls to these functions *)
-PROCEDURE IsNaN* (x: LONGREAL): BOOLEAN;
+PROCEDURE IsNaN* (x: FLOAT64): BOOLEAN;
 BEGIN
 RETURN (Reals.IsNaNL(x))
 END IsNaN;
 
-PROCEDURE NaNCode* (x: LONGREAL): SIGNED16;
+PROCEDURE NaNCode* (x: FLOAT64): SIGNED16;
 VAR h, l: SIGNED32;
 BEGIN
 Reals.NaNCodeL(x, h, l);
 RETURN  SHORT(l)	(*! code high part not yet supported *)
 END NaNCode;
 
-PROCEDURE NaN* (code: SIGNED16): LONGREAL;
-VAR x: LONGREAL;
+PROCEDURE NaN* (code: SIGNED16): FLOAT64;
+VAR x: FLOAT64;
 BEGIN
 RETURN Reals.NaN(code) (*! hack: Reals.NaNL not yet supported in MacOberon 2.3 *)
 END NaN;
 *)
-(*PROCEDURE NoNumberNaN* ():LONGREAL;
-VAR x:LONGREAL;
+(*PROCEDURE NoNumberNaN* ():FLOAT64;
+VAR x:FLOAT64;
 BEGIN
 RETURN Reals.NaN(cnonumber);(*! hack: Reals.NaNL not yet supported in MacOberon 2.3 *)
 END NoNumberNaN;
@@ -523,8 +523,8 @@ BEGIN IF i < 0 THEN  x := 1 / x;  i := - i END;
 	RETURN z
 END XpwrI;
 
-PROCEDURE XLpwrIL* (x: LONGREAL;   i: SIGNED32): LONGREAL;
-	VAR z: LONGREAL;
+PROCEDURE XLpwrIL* (x: FLOAT64;   i: SIGNED32): FLOAT64;
+	VAR z: FLOAT64;
 BEGIN IF i < 0 THEN  x := 1 / x;  i := - i END;
 	z := 1;
 	WHILE i > 0 DO
@@ -549,9 +549,9 @@ BEGIN
 
 END Ten;
 
-PROCEDURE TenL* (i: SIGNED32): LONGREAL;
+PROCEDURE TenL* (i: SIGNED32): FLOAT64;
 	(* special case of XpwrI(10.0,i) -- optimize ! Use Reals.Ten*)
-	VAR x, z: LONGREAL;
+	VAR x, z: FLOAT64;
 BEGIN IF i < 0 THEN x := 0.1  ELSE x := 10.0  END;
 	z := 1;
 	WHILE i > 0 DO (* z*u**e=x**i, e>0 *)
@@ -615,7 +615,7 @@ BEGIN res := GetLInt(text, pos, len, xl);
 END GetSInt;
 
 PROCEDURE GetLReal* (VAR text: Texts.Text;  pos: SIGNED32;   len: SIGNED16;
-VAR x: LONGREAL): BOOLEAN;
+VAR x: FLOAT64): BOOLEAN;
 	VAR i: SIGNED16;   r: Texts.Reader;   more, res, negex: BOOLEAN;  c: CHAR;  pre, post, exp, pow: SIGNED32;
 	(*xx:ARRAY 2 OF CHAR; *)neg: BOOLEAN;
 BEGIN IF (text = NIL) OR ((pos < 0) OR (len <= 0)) THEN x := 0;   RETURN FALSE END;
@@ -673,7 +673,7 @@ BEGIN IF (text = NIL) OR ((pos < 0) OR (len <= 0)) THEN x := 0;   RETURN FALSE E
 
 	PROCEDURE GetReal* (VAR text: Texts.Text;  pos: SIGNED32;   len: SIGNED16;
 VAR x: FLOAT32): BOOLEAN;
-	VAR xl: LONGREAL;   res: BOOLEAN;
+	VAR xl: FLOAT64;   res: BOOLEAN;
 BEGIN res := GetLReal(text, pos, len, xl);
 	IF res THEN	(*! Add range check *)
 		x := SHORT(xl);   RETURN TRUE

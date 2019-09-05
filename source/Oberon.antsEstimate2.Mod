@@ -101,7 +101,7 @@ VAR
 		END
 	END New;
 
-	PROCEDURE func( VAR Par: ARRAY OF LONGREAL ): LONGREAL;
+	PROCEDURE func( VAR Par: ARRAY OF FLOAT64 ): FLOAT64;
 	VAR i, time: SIGNED32;
 	BEGIN
 		FOR i := 0 TO LEN( Par ) - 1 DO gM.n.par[i] := Par[i] END;
@@ -113,8 +113,8 @@ VAR
 (*
 PROCEDURE EstimateOld*;
 VAR A: antsArrayObjects.tINTEGERObject; m: antsMDimDiscreteS.tModel; link: vyLinks.Link;  c: tClass; region: antsRegions.tRegion;
-l: antsCommands.tScanList;   obj1,obj2: vyBase.Object; i: SIGNED32;  len: SIGNED32; fret: LONGREAL;
-a: POINTER TO ARRAY OF LONGREAL;
+l: antsCommands.tScanList;   obj1,obj2: vyBase.Object; i: SIGNED32;  len: SIGNED32; fret: FLOAT64;
+a: POINTER TO ARRAY OF FLOAT64;
 BEGIN
 l := antsCommands.ScanFromPar();
 IF
@@ -144,8 +144,8 @@ END EstimateOld;
 
 	PROCEDURE Estimate*;
 	VAR A: antsArrayObjects.tINTEGERObject;  m: antsMDimDiscreteS.tModel;  c: tClass;  region: antsRegions.tRegion;
-		l: antsCommands.tScanList;  obj1: vyBase.Object;  fret: LONGREAL;
-		a: POINTER TO ARRAY OF LONGREAL;
+		l: antsCommands.tScanList;  obj1: vyBase.Object;  fret: FLOAT64;
+		a: POINTER TO ARRAY OF FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj1 ) THEN

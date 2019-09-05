@@ -52,13 +52,13 @@ TYPE
 		END
 	END Get;
 
-	PROCEDURE GetUniform( r: vyRanBase.tRandom ): LONGREAL;
+	PROCEDURE GetUniform( r: vyRanBase.tRandom ): FLOAT64;
 	BEGIN
 		WITH r: tRandom DO RETURN r.constval / r.max
 		END
 	END GetUniform;
 
-	PROCEDURE RandomUVX( r: vyRanBase.tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF LONGREAL;  start: SIGNED32 );
+	PROCEDURE RandomUVX( r: vyRanBase.tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF FLOAT64;  start: SIGNED32 );
 	VAR i: SIGNED32;
 	BEGIN
 		WITH r: tRandom DO

@@ -107,7 +107,7 @@ TYPE
 			IF SELF.type = antsFiles.bin THEN SELF.WriteLInt( 0 );  SELF.WriteLInt( 0 );  ELSE SELF.WriteEmptyLine() END;
 		END WriteNilMatrix;
 
-		PROCEDURE  (*VAR R: Rider*) WriteMatrixX*( VAR A: ARRAY OF ARRAY OF LONGREAL );
+		PROCEDURE  (*VAR R: Rider*) WriteMatrixX*( VAR A: ARRAY OF ARRAY OF FLOAT64 );
 		VAR i: SIGNED32;
 		BEGIN
 			IF SELF.type = antsFiles.bin THEN
@@ -120,7 +120,7 @@ TYPE
 			END
 		END WriteMatrixX;
 
-		PROCEDURE  (*VAR R: Rider*) ReadMatrixX*( VAR A: ARRAY OF ARRAY OF LONGREAL );
+		PROCEDURE  (*VAR R: Rider*) ReadMatrixX*( VAR A: ARRAY OF ARRAY OF FLOAT64 );
 		VAR rows, cols, i: SIGNED32;  v: vyLongrealVec.tVector;
 		BEGIN
 			IF SELF.type = antsFiles.bin THEN
@@ -188,7 +188,7 @@ TYPE
 			IF SELF.type = antsFiles.bin THEN
 				SELF.ReadLInt( rows );  SELF.ReadLInt( cols );
 				IF row >= rows THEN v := NIL;  RETURN END;
-				SELF.SetPos( SELF.Pos() + row * cols * SIZEOF( LONGREAL ) );  NEW( A, cols );  SELF.ReadLRealsFix( A^, cols );
+				SELF.SetPos( SELF.Pos() + row * cols * SIZEOF( FLOAT64 ) );  NEW( A, cols );  SELF.ReadLRealsFix( A^, cols );
 				IF v = NIL THEN v := vyLongrealVec.New( cols ) ELSE vyLongrealVec.SetLen( v, cols ) END;
 				vyLongrealVec.CopyToVec( A^, v, cols, 0, 0 )
 			ELSE
@@ -240,17 +240,17 @@ TYPE
 		END ReadRowI;
 
 		PROCEDURE  (*VAR R: Rider*) ReadColX*( VAR v: vyLongrealVec.tVector;  col: SIGNED32 );
-		VAR r, rows, cols: SIGNED32;  v2: vyLongrealVec.tVector;  x: LONGREAL;
+		VAR r, rows, cols: SIGNED32;  v2: vyLongrealVec.tVector;  x: FLOAT64;
 		BEGIN
 			IF v = NIL THEN v := vyLongrealVec.New( 0 ) ELSE vyLongrealVec.SetLen( v, 0 ) END;
 			IF SELF.type = antsFiles.bin THEN
 				SELF.ReadLInt( rows );  SELF.ReadLInt( cols );
 				IF col >= cols THEN v := NIL;  RETURN END;
-				SELF.SetPos( SELF.Pos() + col * SIZEOF( LONGREAL ) );
+				SELF.SetPos( SELF.Pos() + col * SIZEOF( FLOAT64 ) );
 				FOR r := 0 TO rows - 1 DO
-					SELF.ReadLReal( x );  vyLongrealVec.Append( x, v );  SELF.SetPos( SELF.Pos() + (cols - 1) * SIZEOF( LONGREAL ) )
+					SELF.ReadLReal( x );  vyLongrealVec.Append( x, v );  SELF.SetPos( SELF.Pos() + (cols - 1) * SIZEOF( FLOAT64 ) )
 				END;
-				SELF.SetPos( SELF.Pos() + (cols - 1 - col) * SIZEOF( LONGREAL ) )
+				SELF.SetPos( SELF.Pos() + (cols - 1 - col) * SIZEOF( FLOAT64 ) )
 			ELSE
 				r := 0;
 				LOOP
@@ -593,7 +593,7 @@ Scan
 (******************************* old stuff
 PROCEDURE Scan (T: Texts.Text;    VAR r,c: SIGNED32;    v: vyLongrealVec.tVector;    VAR len: SIGNED32;    analyze: BOOLEAN);
 VAR   sc: Texts.Scanner;  row,col,thisline: SIGNED32;
-pos: SIGNED32;  num: LONGREAL; columns,rows: SIGNED32; 	type: SIGNED16;
+pos: SIGNED32;  num: FLOAT64; columns,rows: SIGNED32; 	type: SIGNED16;
 CONST cnumber=0;    cname =1;    cunknown =2;
 BEGIN
 columns := MAX(SIGNED32);
@@ -643,7 +643,7 @@ r := rows; c := columns;
 END Scan;
 
 
-PROCEDURE DoWriteBinaryMatrix* (VAR R: Files.Rider; VAR A: ARRAY OF ARRAY OF LONGREAL);
+PROCEDURE DoWriteBinaryMatrix* (VAR R: Files.Rider; VAR A: ARRAY OF ARRAY OF FLOAT64);
 VAR i,j: SIGNED32;
 BEGIN
 Files.WriteLInt(R,LEN(A)); Files.WriteLInt(R,LEN(A[0]));
@@ -654,7 +654,7 @@ END;
 END;
 END DoWriteBinaryMatrix;
 
-PROCEDURE DoReadBinaryMatrix* (VAR R: Files.Rider; VAR A: ARRAY OF ARRAY OF LONGREAL; VAR h,w: SIGNED32): BOOLEAN;
+PROCEDURE DoReadBinaryMatrix* (VAR R: Files.Rider; VAR A: ARRAY OF ARRAY OF FLOAT64; VAR h,w: SIGNED32): BOOLEAN;
 VAR i,j: SIGNED32;
 BEGIN
 Files.ReadLInt(R,h); Files.ReadLInt(R,w);
@@ -668,7 +668,7 @@ RETURN TRUE;
 END DoReadBinaryMatrix;
 
 PROCEDURE DoReadBinaryRow* (VAR R: Files.Rider; v: vyLongrealVec.tVector; y: SIGNED32; VAR w: SIGNED32);
-VAR i,j,h: SIGNED32;dummy: LONGREAL;
+VAR i,j,h: SIGNED32;dummy: FLOAT64;
 BEGIN
 Files.ReadLInt(R,h); Files.ReadLInt(R,w);
 FOR i := 0 TO y-1 DO
@@ -682,9 +682,9 @@ vyLongrealVec.Set(dummy,v,j);
 END;
 END DoReadBinaryRow;
 
-PROCEDURE DoReadMatrix (T: Texts.Text;    fr,tr,fc,tc: SIGNED32;   VAR A: ARRAY OF ARRAY OF LONGREAL);
+PROCEDURE DoReadMatrix (T: Texts.Text;    fr,tr,fc,tc: SIGNED32;   VAR A: ARRAY OF ARRAY OF FLOAT64);
 VAR   sc: Texts.Scanner;  row,col,thisline: SIGNED32;
-pos: SIGNED32;  num: LONGREAL; columns: SIGNED32; 	type: SIGNED16;
+pos: SIGNED32;  num: FLOAT64; columns: SIGNED32; 	type: SIGNED16;
 CONST cnumber=0;    cname =1;    cunknown =2;
 BEGIN
 columns := MAX(SIGNED32);
@@ -716,7 +716,7 @@ END;
 END;
 END DoReadMatrix;
 
-PROCEDURE ReadMatrix* (f: ARRAY OF CHAR; fromrow,torow,fromcol,tocol: SIGNED32; VAR A: ARRAY OF ARRAY OF LONGREAL): BOOLEAN;
+PROCEDURE ReadMatrix* (f: ARRAY OF CHAR; fromrow,torow,fromcol,tocol: SIGNED32; VAR A: ARRAY OF ARRAY OF FLOAT64): BOOLEAN;
 VAR r,c: SIGNED32;    T: Texts.Text;     F: Files.File; len: SIGNED32;
 BEGIN
 F := Files.Old(f);
@@ -786,7 +786,7 @@ Scan(T,r,c,NIL,len,TRUE);
 END DoAnalyze;
 
 PROCEDURE AppendRow* (f: ARRAY OF CHAR;    v: vyLongrealVec.tVector;    VAR len: SIGNED32;    id: BOOLEAN);
-VAR w: Texts.Writer;   i: SIGNED32;    T: Texts.Text;    x: LONGREAL;    name: ARRAY 64 OF CHAR;
+VAR w: Texts.Writer;   i: SIGNED32;    T: Texts.Text;    x: FLOAT64;    name: ARRAY 64 OF CHAR;
 BEGIN
 T := TextFrames.Text(f);    Texts.OpenWriter(w);
 vyName.GetObjId(v,name);
@@ -803,8 +803,8 @@ WriteAscii(T,f);
 len := vyLongrealVec.Len(v)-1;
 END AppendRow;
 
-PROCEDURE AppendRowA* (f: ARRAY OF CHAR;    VAR A: ARRAY OF LONGREAL;    len: SIGNED32);
-VAR w: Texts.Writer;   i: SIGNED32;    T: Texts.Text;    x: LONGREAL;
+PROCEDURE AppendRowA* (f: ARRAY OF CHAR;    VAR A: ARRAY OF FLOAT64;    len: SIGNED32);
+VAR w: Texts.Writer;   i: SIGNED32;    T: Texts.Text;    x: FLOAT64;
 BEGIN
 T := TextFrames.Text(f);    Texts.OpenWriter(w);
 FOR i := 0 TO len-1 DO
@@ -816,8 +816,8 @@ Texts.Append(T,w.buf);
 WriteAscii(T,f);
 END AppendRowA;
 
-PROCEDURE AppendRowAT (VAR w: Texts.Writer;  VAR A: ARRAY OF LONGREAL;    len: SIGNED32);
-VAR   i: SIGNED32;       x: LONGREAL;
+PROCEDURE AppendRowAT (VAR w: Texts.Writer;  VAR A: ARRAY OF FLOAT64;    len: SIGNED32);
+VAR   i: SIGNED32;       x: FLOAT64;
 BEGIN
 FOR i := 0 TO len-1 DO
 x := A[i];
@@ -836,7 +836,7 @@ END;
 Texts.WriteLn(w);   Texts.Write(w,0AX);
 END AppendRowATI;
 
-PROCEDURE WriteMatrix* (f: ARRAY OF CHAR;    VAR A: ARRAY OF ARRAY OF LONGREAL): BOOLEAN;
+PROCEDURE WriteMatrix* (f: ARRAY OF CHAR;    VAR A: ARRAY OF ARRAY OF FLOAT64): BOOLEAN;
 VAR w: Texts.Writer;   i: SIGNED32;    T: Texts.Text;
 BEGIN
 NEW(T); Texts.Open(T,"");
@@ -862,9 +862,9 @@ WriteAscii(T,f);
 RETURN TRUE;
 END WriteMatrixI;
 
-PROCEDURE WriteMatrixTransposed* (f: ARRAY OF CHAR;    VAR A: ARRAY OF ARRAY OF LONGREAL): BOOLEAN;
+PROCEDURE WriteMatrixTransposed* (f: ARRAY OF CHAR;    VAR A: ARRAY OF ARRAY OF FLOAT64): BOOLEAN;
 VAR w: Texts.Writer;   i,y: SIGNED32;    T: Texts.Text;
-X: POINTER TO ARRAY OF LONGREAL;
+X: POINTER TO ARRAY OF FLOAT64;
 BEGIN
 NEW(T); Texts.Open(T,"");
 Texts.OpenWriter(w );
@@ -881,7 +881,7 @@ RETURN TRUE;
 END WriteMatrixTransposed;
 
 PROCEDURE WriteVec* (f: ARRAY OF CHAR;    v: vyLongrealVec.tVector;    VAR len: SIGNED32);
-VAR w: Texts.Writer;   i: SIGNED32;    T: Texts.Text;    x: LONGREAL;
+VAR w: Texts.Writer;   i: SIGNED32;    T: Texts.Text;    x: FLOAT64;
 BEGIN
 NEW(T); Texts.Open(T,"test");
 Texts.OpenWriter(w);
@@ -907,7 +907,7 @@ END;
 END Analyze;
 
 PROCEDURE TransposeFile*;
-VAR l: antsCommands.tScanList;    str,str2: ARRAY 64 OF CHAR;    rows,columns: SIGNED32;    A: POINTER TO ARRAY OF ARRAY OF LONGREAL;
+VAR l: antsCommands.tScanList;    str,str2: ARRAY 64 OF CHAR;    rows,columns: SIGNED32;    A: POINTER TO ARRAY OF ARRAY OF FLOAT64;
 BEGIN
 l:= antsCommands.ScanFromPar();
 IF antsCommands.ExpectStringFromKeyword(l,"from",str) &
@@ -923,7 +923,7 @@ END TransposeFile;
 
 PROCEDURE FileToBinary*;
 VAR l: antsCommands.tScanList;    str,str2: ARRAY 64 OF CHAR;    rows,columns: SIGNED32;
-A: POINTER TO ARRAY OF ARRAY OF LONGREAL; F: Files.File; R: Files.Rider;
+A: POINTER TO ARRAY OF ARRAY OF FLOAT64; F: Files.File; R: Files.Rider;
 BEGIN
 l:= antsCommands.ScanFromPar();
 IF antsCommands.ExpectStringFromKeyword(l,"from",str) &

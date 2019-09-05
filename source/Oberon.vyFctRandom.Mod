@@ -85,7 +85,7 @@ VAR
 	PROCEDURE Random*( factor: FLOAT32 ): FLOAT32;
 	(*! ????  careful check needed. What does it do ? *)
 	(*vs 0.0d0  md  14.02.95 10:36:18 *)
-	VAR x, y, y1, y2, dx, dindx, offset: LONGREAL;  i: SIGNED16;
+	VAR x, y, y1, y2, dx, dindx, offset: FLOAT64;  i: SIGNED16;
 	BEGIN
 		IF (RandomData.x.nrData >= cNNNN) THEN CleanUp;  vyBase.Update( gMouseDense ) END;
 		x := vyRandom.Uniform();

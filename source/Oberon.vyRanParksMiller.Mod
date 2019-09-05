@@ -97,7 +97,7 @@ BEGIN
 	(* better shift adjust: give preference to higher order bits *)
 END GetV;
 
-PROCEDURE GetUniform (gen: tRandom): LONGREAL;
+PROCEDURE GetUniform (gen: tRandom): FLOAT64;
 CONST
 	scalefact = 1.0D0 / m;
 VAR
@@ -112,7 +112,7 @@ BEGIN
 	RETURN s * scalefact
 END GetUniform;
 
-PROCEDURE RandomUVX (gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF LONGREAL;  start: SIGNED32);
+PROCEDURE RandomUVX (gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF FLOAT64;  start: SIGNED32);
 CONST
 	scalefact = 1.0D0 / m;
 VAR
@@ -183,11 +183,11 @@ BEGIN
 	r.seed (vyRanBase.tLongintSeed).val := v
 END Reset;
 
-PROCEDURE SumPSqr* (gen: tRandom;  top: SIGNED32): LONGREAL;
+PROCEDURE SumPSqr* (gen: tRandom;  top: SIGNED32): FLOAT64;
 CONST
 	N = m - 1;
 VAR
-	k, t: LONGREAL;
+	k, t: FLOAT64;
 BEGIN
 	IF (top <= 0) OR (top >= m - 1) THEN RETURN 1 / top END;
 

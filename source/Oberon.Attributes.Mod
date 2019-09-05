@@ -66,7 +66,7 @@ TYPE
 		class*: SIGNED16;		(** Scanner classes. Scanned tokens are returned in the record fields below. *)
 		i*: SIGNED32;
 		x*: FLOAT32;
-		y*: LONGREAL;
+		y*: FLOAT64;
 		c*: CHAR;
 		len*: SIGNED8;
 		s*: ARRAY MaxLen OF CHAR;
@@ -90,7 +90,7 @@ TYPE
 	IntDesc* = RECORD (AttrDesc) i*: SIGNED32 END;
 
 	RealAttr* = POINTER TO RealDesc;
-	RealDesc* = RECORD (AttrDesc) r*: LONGREAL END;
+	RealDesc* = RECORD (AttrDesc) r*: FLOAT64 END;
 
 	StringAttr* = POINTER TO StringDesc;
 	StringDesc* = RECORD (AttrDesc) s*: ARRAY 256 OF CHAR; END;
@@ -219,7 +219,7 @@ END OpenScanner;
       neg, negE, hex, old: BOOLEAN;
       i, j, h: SIGNED8;
       e: SIGNED16; k: SIGNED32;
-      y: LONGREAL;
+      y: FLOAT64;
       d: ARRAY maxD OF CHAR;
 	  k1, k2, k3: SIGNED32;
 
@@ -310,12 +310,12 @@ END OpenScanner;
           y := k3*Reals.Ten(-32) + k2*Reals.Ten(-24); y := y + k1*Reals.Ten(-16);
           IF ABS(e+h) < 308 THEN y := (y + k*Reals.Ten(-8)) / Reals.Ten(-e-h)
           ELSE y := (y + k*Reals.Ten(-8)) * Reals.Ten(h);
-            IF (e <= 308-32) OR (e <= 308) & (y < MAX(LONGREAL) / Reals.Ten(e)) THEN y := y * Reals.Ten(e)
-              ELSE y := MAX(LONGREAL)
+            IF (e <= 308-32) OR (e <= 308) & (y < MAX(FLOAT64) / Reals.Ten(e)) THEN y := y * Reals.Ten(e)
+              ELSE y := MAX(FLOAT64)
             END
           END;
           IF E = "D" THEN S.class:= LongReal;
-            IF y = MAX(LONGREAL) THEN S.y := Reals.RealL(-1, -1)
+            IF y = MAX(FLOAT64) THEN S.y := Reals.RealL(-1, -1)
               ELSIF neg THEN S.y := - y
               ELSE S.y := y
             END;
@@ -516,7 +516,7 @@ END WriteAttr;
 	Bool	BOOLEAN	Bool, String, Char
 	Int	SIGNED32	Int, String, Real, LongReal
 	Real	FLOAT32	Real, String, LongReal, Int
-	LongReal	LONGREAL	LongReal, String, Real, Int
+	LongReal	FLOAT64	LongReal, String, Real, Int
 	String	ARRAY OF CHAR	String, Int, Bool, Real, LongReal, Bool
 *)
 
@@ -579,7 +579,7 @@ END WriteAttr;
 		END
 	END GetReal;
 
-	PROCEDURE GetLongReal*(obj: Objects.Object; name: ARRAY OF CHAR; VAR y: LONGREAL);
+	PROCEDURE GetLongReal*(obj: Objects.Object; name: ARRAY OF CHAR; VAR y: FLOAT64);
 		VAR A: Objects.AttrMsg;
 	BEGIN
 		y := 0.0;
@@ -629,7 +629,7 @@ END WriteAttr;
 	Bool	BOOLEAN	Bool, String, Char
 	Int	SIGNED32	Int, String, Real, LongReal
 	Real	FLOAT32	Real, String, LongReal, Int
-	LongReal	LONGREAL	LongReal, String, Real, Int
+	LongReal	FLOAT64	LongReal, String, Real, Int
 	String	ARRAY OF CHAR	String, Int, Bool, Real, LongReal, Bool
 *)
 
@@ -695,7 +695,7 @@ END WriteAttr;
 		END
 	END SetReal;
 
-	PROCEDURE SetLongReal*(obj: Objects.Object; name: ARRAY OF CHAR; y: LONGREAL);
+	PROCEDURE SetLongReal*(obj: Objects.Object; name: ARRAY OF CHAR; y: FLOAT64);
 		VAR A: Objects.AttrMsg;
 	BEGIN
 		IF obj # NIL THEN

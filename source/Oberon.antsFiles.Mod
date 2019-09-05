@@ -57,7 +57,7 @@ TYPE
 		class: SIGNED16;   (** Scan result: Int, Real, String etc. *)
 		i: SIGNED32;
 		x: FLOAT32;
-		y: LONGREAL;
+		y: FLOAT64;
 		c: CHAR;
 		len: SIGNED8;   (** Length of name or string scanned. *)
 		s: ARRAY 64 OF CHAR;
@@ -170,7 +170,7 @@ TYPE
 			WHILE (~StopReading( SELF, num )) DO SELF.ReadReal( val );  vyRealVec.Append( val, x ) END
 		END ReadRealsLine;
 
-		PROCEDURE  (* VAR R: Rider*) ReadLReal*( VAR x: LONGREAL );
+		PROCEDURE  (* VAR R: Rider*) ReadLReal*( VAR x: FLOAT64 );
 		BEGIN
 			CASE SELF.type OF
 			bin:  BinReadLReal( SELF, x )
@@ -179,7 +179,7 @@ TYPE
 			END
 		END ReadLReal;
 
-		PROCEDURE  (* VAR R: Rider*) ReadLRealsFix*( VAR x: ARRAY OF LONGREAL;  num: SIGNED32 );
+		PROCEDURE  (* VAR R: Rider*) ReadLRealsFix*( VAR x: ARRAY OF FLOAT64;  num: SIGNED32 );
 		VAR i: SIGNED32;
 		BEGIN
 			i := 0;
@@ -187,7 +187,7 @@ TYPE
 		END ReadLRealsFix;
 
 		PROCEDURE  (* VAR R: Rider*) ReadLRealsLine*( VAR x: vyLongrealVec.tVector );
-		VAR num: SIGNED32;  val: LONGREAL;
+		VAR num: SIGNED32;  val: FLOAT64;
 		BEGIN
 			IF x = NIL THEN x := vyLongrealVec.New( 0 ) ELSE vyLongrealVec.SetLen( x, 0 ) END;
 			StartReading( SELF );  num := 0;
@@ -338,7 +338,7 @@ END ReadLn;
 			StopWriting( SELF )
 		END WriteRealsLine;
 
-		PROCEDURE  (* VAR R: Rider*) WriteLReal*( x: LONGREAL );
+		PROCEDURE  (* VAR R: Rider*) WriteLReal*( x: FLOAT64 );
 		BEGIN
 			CASE SELF.type OF
 			bin:  BinWriteLongReal( SELF, x )
@@ -347,7 +347,7 @@ END ReadLn;
 			END
 		END WriteLReal;
 
-		PROCEDURE  (* VAR R: Rider*) WriteLRealsFix*( VAR x: ARRAY OF LONGREAL;  num: SIGNED32 );
+		PROCEDURE  (* VAR R: Rider*) WriteLRealsFix*( VAR x: ARRAY OF FLOAT64;  num: SIGNED32 );
 		VAR i: SIGNED32;
 		BEGIN
 			i := 0;
@@ -535,7 +535,7 @@ VAR
 (** Write real x to W's buffer using n character positions. *)
 	PROCEDURE WriteReal( W: Rider;  x: FLOAT32;  n: SIGNED32 );
 	(* BM 1993.4.22. Do not simplify rounding! *)
-	VAR e, h, i: SIGNED32;  y: LONGREAL;  z: FLOAT32;
+	VAR e, h, i: SIGNED32;  y: FLOAT64;  z: FLOAT32;
 		d: ARRAY 8 OF CHAR;
 	BEGIN
 		e := Reals.Expo( x );
@@ -577,7 +577,7 @@ VAR
 (** Write real x in a fixed point notation. n is the overall minimal length for the output field, f the number of fraction digits following the decimal point, E the fixed exponent (printed only when E # 0). *)
 	PROCEDURE WriteRealFix( W: Rider;  x: FLOAT32;  n, f, E: SIGNED32 );
 	(* BM 1993.4.22. Do not simplify rounding ! / JG formatting adjusted *)
-	VAR e, h, i: SIGNED32;  r, y: LONGREAL;  z: FLOAT32;  s: CHAR;
+	VAR e, h, i: SIGNED32;  r, y: FLOAT64;  z: FLOAT32;  s: CHAR;
 		d: ARRAY 8 OF CHAR;
 	BEGIN
 		e := Reals.Expo( x );
@@ -644,10 +644,10 @@ VAR
 		IF W.noExponent THEN WriteRealFix( W, x, 0, 15, 0 );  W.Write( TAB ) ELSE WriteReal( W, x, 20 );  W.Write( TAB ) END;
 	END AsciiWriteReal;
 
-(** Write LONGREAL x to W's buffer using n character positions. *)
-	PROCEDURE WriteLongReal(W: Rider;  x: LONGREAL;  n: SIGNED32 );
+(** Write FLOAT64 x to W's buffer using n character positions. *)
+	PROCEDURE WriteLongReal(W: Rider;  x: FLOAT64;  n: SIGNED32 );
 	(* BM 1993.4.22. Do not simplify rounding! *)
-	VAR e, h, l, i: SIGNED32;  z: LONGREAL;
+	VAR e, h, l, i: SIGNED32;  z: FLOAT64;
 		d: ARRAY 16 OF CHAR;
 	BEGIN
 		e := Reals.ExpoL( x );
@@ -684,11 +684,11 @@ VAR
 			W.Write( CHR( e DIV 100 + ORD( "0" ) ) );  e := e MOD 100;  W.Write( CHR( e DIV 10 + ORD( "0" ) ) );  W.Write( CHR( e MOD 10 + ORD( "0" ) ) )
 		END
 	END WriteLongReal;
-(** Write LONGREAL x in a fixed point notation. n is the overall minimal length for the output field, f the number of fraction digits following the decimal point,
+(** Write FLOAT64 x in a fixed point notation. n is the overall minimal length for the output field, f the number of fraction digits following the decimal point,
 D the fixed exponent (printed only when D # 0). *)
-	PROCEDURE WriteLongRealFix( W: Rider;  x: LONGREAL;  n, f, D: SIGNED32 );
+	PROCEDURE WriteLongRealFix( W: Rider;  x: FLOAT64;  n, f, D: SIGNED32 );
 	(* BM 1993.4.22. Do not simplify rounding! / JG formatting adjusted *)
-	VAR e, h, l, i: SIGNED32;  r, z: LONGREAL;
+	VAR e, h, l, i: SIGNED32;  r, z: FLOAT64;
 		d: ARRAY 16 OF CHAR;
 		s: CHAR;
 	BEGIN
@@ -751,7 +751,7 @@ D the fixed exponent (printed only when D # 0). *)
 		END
 	END WriteLongRealFix;
 
-	PROCEDURE AsciiWriteLongReal( W: Rider;  x: LONGREAL );
+	PROCEDURE AsciiWriteLongReal( W: Rider;  x: FLOAT64 );
 	BEGIN
 		IF W.noExponent THEN WriteLongRealFix( W, x, 0, 15, 0 );  W.Write( TAB )
 		ELSE WriteLongReal( W, x, 20 );  W.Write( TAB )
@@ -778,7 +778,7 @@ D the fixed exponent (printed only when D # 0). *)
 (** Read the next symbol. Whitespace is ignored. CR increments the line counter. *)
 	PROCEDURE Scan( VAR S: Rider );
 	CONST maxD = 32;   (* fixed size: maxD <= LEN(S.s)! *)
-	VAR ch, E: CHAR;  neg, negE, hex, sign: BOOLEAN;  i, j, h, e, k, k1, k2, k3: SIGNED32;  y: LONGREAL;
+	VAR ch, E: CHAR;  neg, negE, hex, sign: BOOLEAN;  i, j, h, e, k, k1, k2, k3: SIGNED32;  y: FLOAT64;
 		d: ARRAY maxD OF CHAR;
 
 		PROCEDURE Read( VAR S: Rider;  VAR ch: CHAR );
@@ -864,11 +864,11 @@ D the fixed exponent (printed only when D # 0). *)
 					IF ABS( e + h ) < 308 THEN y := (y + k * Reals.Ten( -8 )) / Reals.Ten( -e - h )
 					ELSE
 						y := (y + k * Reals.Ten( -8 )) * Reals.Ten( h );
-						IF (e <= 308 - 32) OR (e <= 308) & (y < MAX( LONGREAL ) / Reals.Ten( e )) THEN y := y * Reals.Ten( e ) ELSE y := MAX( LONGREAL ) END
+						IF (e <= 308 - 32) OR (e <= 308) & (y < MAX( FLOAT64 ) / Reals.Ten( e )) THEN y := y * Reals.Ten( e ) ELSE y := MAX( FLOAT64 ) END
 					END;
 
 					IF E = "D" THEN
-						IF y = MAX( LONGREAL ) THEN
+						IF y = MAX( FLOAT64 ) THEN
 							S.class := Texts.Inval (* NaN *)
 						ELSE
 							S.class := Texts.LongReal;
@@ -979,7 +979,7 @@ D the fixed exponent (printed only when D # 0). *)
 		R.ReadBytes( x, 4 )
 	END BinReadReal;
 
-	PROCEDURE AsciiReadLReal( R: Rider;  VAR x: LONGREAL );   (* Read Integer Value ignoring Names *)
+	PROCEDURE AsciiReadLReal( R: Rider;  VAR x: FLOAT64 );   (* Read Integer Value ignoring Names *)
 	VAR pos: SIGNED32;
 	BEGIN
 		pos := R.Pos();  Scan( R );
@@ -991,7 +991,7 @@ D the fixed exponent (printed only when D # 0). *)
 		END
 	END AsciiReadLReal;
 
-	PROCEDURE BinReadLReal( R: Rider;  VAR x: LONGREAL );
+	PROCEDURE BinReadLReal( R: Rider;  VAR x: FLOAT64 );
 	BEGIN
 		R.ReadBytes( x, 8 )
 	END BinReadLReal;
@@ -1044,7 +1044,7 @@ D the fixed exponent (printed only when D # 0). *)
 		R.WriteBytes( x, 4 )
 	END BinWriteReal;
 
-	PROCEDURE BinWriteLongReal( R: Rider;  x: LONGREAL );
+	PROCEDURE BinWriteLongReal( R: Rider;  x: FLOAT64 );
 	BEGIN
 		R.WriteBytes( x, 8 )
 	END BinWriteLongReal;

@@ -584,7 +584,7 @@ VAR
 	PROCEDURE Number;
 	VAR i, m, n, d, e: SIGNED16;
 		dig: ARRAY 24 OF CHAR;
-		f: LONGREAL;  expCh: CHAR;  neg: BOOLEAN;  intval: SIGNED32;
+		f: FLOAT64;  expCh: CHAR;  neg: BOOLEAN;  intval: SIGNED32;
 
 		PROCEDURE Ord( ch: CHAR;  hex: BOOLEAN ): SIGNED16;
 		BEGIN

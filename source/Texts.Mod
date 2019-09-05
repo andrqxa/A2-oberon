@@ -1400,7 +1400,7 @@ VAR
 	str: Strings.String;
 	cStyle : CharacterStyle;
 	pStyle : ParagraphStyle;
-	tempReal: LONGREAL; tempInt: SIGNED32; tempRes : WORD;
+	tempReal: FLOAT64; tempInt: SIGNED32; tempRes : WORD;
 BEGIN
 	NEW(scanner, r);
 	NEW(parser, scanner);

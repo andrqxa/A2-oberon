@@ -42,8 +42,8 @@ TYPE
 	END;
 
 	Mapper* = PROCEDURE ( VAR A: ARRAY OF SIGNED32 );
-	Matrix* = POINTER TO ARRAY OF ARRAY OF LONGREAL;
-	Vector* = POINTER TO ARRAY OF LONGREAL;
+	Matrix* = POINTER TO ARRAY OF ARRAY OF FLOAT64;
+	Vector* = POINTER TO ARRAY OF FLOAT64;
 
 	Chain = POINTER TO ChainDesc;
 	ChainDesc = RECORD (vyBase.ObjDesc)
@@ -205,7 +205,7 @@ VAR
 	END LoadChain;
 
 	PROCEDURE DefaultMapper( VAR m: ARRAY OF SIGNED32 );
-	VAR c: Chain;  ran: LONGREAL;  A, cA: Matrix;  i, j: SIGNED32;  dim: SIGNED32;
+	VAR c: Chain;  ran: FLOAT64;  A, cA: Matrix;  i, j: SIGNED32;  dim: SIGNED32;
 	BEGIN
 		c := cur( Chain );  A := c.A;  cA := c.cA;  dim := c.dim;
 
@@ -218,7 +218,7 @@ VAR
 	END DefaultMapper;
 
 	PROCEDURE OneRMapper( VAR m: ARRAY OF SIGNED32 );
-	VAR c: Chain;  ran: LONGREAL;  A, cA: Matrix;  i, j: SIGNED32;  dim: SIGNED32;
+	VAR c: Chain;  ran: FLOAT64;  A, cA: Matrix;  i, j: SIGNED32;  dim: SIGNED32;
 	BEGIN
 		c := cur( Chain );  A := c.A;  cA := c.cA;  dim := c.dim;  ran := vyRandom.Uniform();
 		FOR i := 0 TO dim - 1 DO
@@ -259,7 +259,7 @@ VAR
 	END ItApply;
 
 	PROCEDURE MapperIt( VAR m: ARRAY OF SIGNED32 );
-	VAR c: Chain;  ran: LONGREAL;  A, cA: Matrix;  i, j: SIGNED32;  dim: SIGNED32;
+	VAR c: Chain;  ran: FLOAT64;  A, cA: Matrix;  i, j: SIGNED32;  dim: SIGNED32;
 		n: POINTER TO ARRAY OF SIGNED32;
 	BEGIN
 		c := cur( Chain );  A := c.A;  cA := c.cA;  dim := c.dim;
@@ -542,7 +542,7 @@ VAR
 	END NewQueue;
 
 	PROCEDURE Init*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  dim: SIGNED32;  A, cA: Matrix;  c: Chain;  i, j: SIGNED32;  sum: LONGREAL;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  dim: SIGNED32;  A, cA: Matrix;  c: Chain;  i, j: SIGNED32;  sum: FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ [dim=INT]" );
 		IF ~antsCommands.ExpectObjectFromKeyword( l, "name", obj ) THEN RETURN END;
@@ -665,15 +665,15 @@ VAR
 		END
 	END ApplyMapperForw;
 
-	PROCEDURE TimeSlice( time: LONGREAL );
-	VAR etime: LONGREAL;
+	PROCEDURE TimeSlice( time: FLOAT64 );
+	VAR etime: FLOAT64;
 	BEGIN
 		etime := time;  time := Oberon.Time();  etime := time + etime * Input.TimeUnit;
 		WHILE (time < etime) DO time := Oberon.Time() END
 	END TimeSlice;
 
 	PROCEDURE ApplyMapperR*;
-	VAR l: antsCommands.tScanList;  c: Chain;  obj: vyBase.Object;  time: LONGREAL;
+	VAR l: antsCommands.tScanList;  c: Chain;  obj: vyBase.Object;  time: FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=OBJ [>update|update=INT]" );
 		IF antsCommands.ExpectObjectFromKeyword( l, "name", obj ) THEN

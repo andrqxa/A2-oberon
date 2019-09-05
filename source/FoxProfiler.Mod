@@ -100,7 +100,7 @@ VAR
 	(* logging *)
 	log: Streams.Writer;
 	(* timing *)
-	frequency: LONGREAL;
+	frequency: FLOAT64;
 
 	PROCEDURE Put*(key, value: SIZE);
 	VAR hash: SIZE;
@@ -254,7 +254,7 @@ VAR
 			(*log.Update;*)
 		END String;
 
-		PROCEDURE Percent(x: LONGREAL);
+		PROCEDURE Percent(x: FLOAT64);
 		BEGIN
 			log.String("["); log.Int(ENTIER(x*100),2); log.String("."); log.Int(ENTIER(x*1000 +0.5) MOD 10, 1); log.String("]");
 		END Percent;

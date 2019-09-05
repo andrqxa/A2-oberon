@@ -94,7 +94,7 @@ TYPE
 		intval*: SIGNED32;   (* constant value or adr, proc par size, text position or least case label *)
 		intval2*: SIGNED32;   (* string length, proc var size or larger case label *)
 		setval*: SET;   (* constant value, procedure body present or "ELSE" present in case *)
-		realval*: LONGREAL (* real or longreal constant value *)
+		realval*: FLOAT64 (* real or longreal constant value *)
 	END;
 
 	ObjDesc* = RECORD
@@ -1480,7 +1480,7 @@ BEGIN
 	EnterTyp( "CHAR", Char, OPM.CharSize, chartyp, SFtypChar );  EnterTyp( "SET", Set, OPM.SetSize, settyp, SFtypSet );
 	EnterTyp( "FLOAT32", Real, OPM.RealSize, realtyp, SFtypReal );  EnterTyp( "SIGNED16", Int, OPM.IntSize, inttyp, SFtypInt );
 	EnterTyp( "SIGNED32", LInt, OPM.LIntSize, linttyp, SFtypLInt );  EnterTyp( "SIGNED64", HInt, OPM.HIntSize, hinttyp, SFtypHInt );
-	EnterTyp( "LONGREAL", LReal, OPM.LRealSize, lrltyp, SFtypLReal );  EnterTyp( "SIGNED8", SInt, OPM.SIntSize, sinttyp, SFtypSInt );
+	EnterTyp( "FLOAT64", LReal, OPM.LRealSize, lrltyp, SFtypLReal );  EnterTyp( "SIGNED8", SInt, OPM.SIntSize, sinttyp, SFtypSInt );
 	EnterTyp( "BOOLEAN", Bool, OPM.BoolSize, booltyp, SFtypBool );
 	(*
 	EnterTyp("CHAR16", Char16, OPM.IntSize, char16typ, SFtypChar16);

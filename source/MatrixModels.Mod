@@ -128,7 +128,7 @@ VAR length, nofColumns, nofRows, column, row,  i : SIGNED32; error : BOOLEAN;
 		RETURN result;
 	END Append;
 
-	PROCEDURE AppendFloat(VAR string : ARRAY OF CHAR; VAR index : SIGNED32; float : LONGREAL) : BOOLEAN;
+	PROCEDURE AppendFloat(VAR string : ARRAY OF CHAR; VAR index : SIGNED32; float : FLOAT64) : BOOLEAN;
 	VAR floatStr : ARRAY 128 OF CHAR;
 	BEGIN
 		Strings.FloatToStr(float, 0, 10, 4, floatStr);
@@ -270,8 +270,8 @@ VAR
 		END;
 	END GetDimensions;
 
-	PROCEDURE ReadFloat(CONST string : ARRAY OF CHAR; VAR index : SIGNED32) : LONGREAL;
-	VAR floatStr : ARRAY 128 OF CHAR; float : LONGREAL; i : SIGNED32;
+	PROCEDURE ReadFloat(CONST string : ARRAY OF CHAR; VAR index : SIGNED32) : FLOAT64;
+	VAR floatStr : ARRAY 128 OF CHAR; float : FLOAT64; i : SIGNED32;
 	BEGIN
 		i := 0;
 		WHILE (string[index] # ",") & (string[index] # "]") DO

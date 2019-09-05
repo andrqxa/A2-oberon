@@ -24,8 +24,8 @@ CONST
 	OPERAND = 4;
 TYPE
 	(** Implementation of unary resp. binary operators *)
-	UnaryFunc* = PROCEDURE(x: LONGREAL): LONGREAL;
-	BinaryFunc* = PROCEDURE(x: LONGREAL; y: LONGREAL): LONGREAL;
+	UnaryFunc* = PROCEDURE(x: FLOAT64): FLOAT64;
+	BinaryFunc* = PROCEDURE(x: FLOAT64; y: FLOAT64): FLOAT64;
 
 	Reference = POINTER TO ReferenceDesc;	(* Element of the list of known operators *)
 	ReferenceDesc = RECORD
@@ -60,7 +60,7 @@ TYPE
 
 	Value = POINTER TO ValueDesc;
 	ValueDesc = RECORD(NodeDesc)
-		value: LONGREAL;
+		value: FLOAT64;
 	END;
 
 	Expression* = POINTER TO ExpressionDesc;	(** the expression tree *)
@@ -75,30 +75,30 @@ VAR
 
 (* ** Built-In Operators **************************************** *)
 
-PROCEDURE Add(to,this: LONGREAL): LONGREAL;
+PROCEDURE Add(to,this: FLOAT64): FLOAT64;
 BEGIN
 	RETURN(to+this);
 END Add;
 
-PROCEDURE Subtract(this,from: LONGREAL): LONGREAL;
+PROCEDURE Subtract(this,from: FLOAT64): FLOAT64;
 BEGIN
 	RETURN(from-this);
 END Subtract;
 
-PROCEDURE Multiply(by,this: LONGREAL): LONGREAL;
+PROCEDURE Multiply(by,this: FLOAT64): FLOAT64;
 BEGIN
 	RETURN(this*by);
 END Multiply;
 
-PROCEDURE Divide(by,this: LONGREAL): LONGREAL;
+PROCEDURE Divide(by,this: FLOAT64): FLOAT64;
 BEGIN
 	RETURN(this/by);
 END Divide;
 
 (** raise base by exponent using e ^ (exponent * ln(base)). This is exportet for Calculator Gadgets *)
-PROCEDURE Power*(base,exponent: LONGREAL): LONGREAL;
+PROCEDURE Power*(base,exponent: FLOAT64): FLOAT64;
 VAR
-	res: LONGREAL;
+	res: FLOAT64;
 BEGIN
 	IF (base <= 0.0) THEN
 		res:= 0.0;
@@ -109,9 +109,9 @@ BEGIN
 END Power;
 
 (** calculate factorial of this using Stirling's approximation. This is exportet for Calculator Gadgets *)
-PROCEDURE Fac*(this: LONGREAL): LONGREAL;
+PROCEDURE Fac*(this: FLOAT64): FLOAT64;
 VAR
-	cf: LONGREAL;
+	cf: FLOAT64;
 BEGIN
 	IF (this > 0.0) THEN
 		cf:= 1.0+1.0/(12.0*this)+1.0/(288.0*this*this)-139.0/(51840.0*this*this*this)-571.0/(2488320.0*this*this*this*this);
@@ -123,10 +123,10 @@ END Fac;
 
 (* ********************************************************** *)
 
-PROCEDURE Calc(node: Node; VAR res: SIGNED16): LONGREAL;
+PROCEDURE Calc(node: Node; VAR res: SIGNED16): FLOAT64;
 	(* rekursive calculation of node results *)
 VAR
-	val,val0: LONGREAL;
+	val,val0: FLOAT64;
 	ref: Reference;
 BEGIN
 	IF (res # Done) THEN
@@ -287,7 +287,7 @@ BEGIN
 END AppendOperator;
 
 (** Add a new operand to the expression tree. This is exported for CalculatorGadgets. *)
-PROCEDURE AppendOperand*(VAR exp: Expression; op: LONGREAL);
+PROCEDURE AppendOperand*(VAR exp: Expression; op: FLOAT64);
 VAR
 	val: Value;
 BEGIN
@@ -345,9 +345,9 @@ BEGIN
 END Scan;
 
 (** traverse the expression tree starting from the current node of exp and return the result. *)
-PROCEDURE EvaluateCurrent*(exp: Expression): LONGREAL;
+PROCEDURE EvaluateCurrent*(exp: Expression): FLOAT64;
 VAR
-	res: LONGREAL;
+	res: FLOAT64;
 	node: Node;
 BEGIN
 	node:= exp.curr; exp.res:= Done;
@@ -357,9 +357,9 @@ BEGIN
 END EvaluateCurrent;
 
 (** traverse the expression tree starting from the topmost node of exp and return the result *)
-PROCEDURE EvaluateRoot*(exp: Expression): LONGREAL;
+PROCEDURE EvaluateRoot*(exp: Expression): FLOAT64;
 VAR
-	res: LONGREAL;
+	res: FLOAT64;
 BEGIN
 	IF (exp.res = Done) THEN
 		IF (exp.nest # 0) THEN
@@ -397,7 +397,7 @@ VAR
 	S: Texts.Scanner;
 	W: Texts.Writer;
 	exp: Expression;
-	val: LONGREAL;
+	val: FLOAT64;
 BEGIN
 	Texts.OpenWriter(W); NEW(exp); test:= exp;
 	Texts.OpenScanner(S,Oberon.Par.text,Oberon.Par.pos); Scan(exp,S);
@@ -426,9 +426,9 @@ BEGIN
 END Calculate;
 
 (** Add a new unary prefix operator. It must be followed by a value and is calculated first on Evaluation.
-f must be PROCEDURE(x: LONGREAL) returning LONGREAL. For example to define the unary operator log
+f must be PROCEDURE(x: FLOAT64) returning FLOAT64. For example to define the unary operator log
 
-		PROCEDURE log(x: LONGREAL): LONGREAL;
+		PROCEDURE log(x: FLOAT64): FLOAT64;
 		BEGIN
 			RETURN(MathL.ln(x) / MathL.ln(10));
 		END log;
@@ -451,10 +451,10 @@ BEGIN
 END AddPrefixOperator;
 
 (** Add a new binary infix operator. It must be between two expressions and is calculated depending on w.
-f must be PROCEDURE(x: LONGREAL; y: LONGREAL) returning LONGREAL. For example to define the binary
+f must be PROCEDURE(x: FLOAT64; y: FLOAT64) returning FLOAT64. For example to define the binary
 operator modulo
 
-		PROCEDURE modulo(x,y: LONGREAL): LONGREAL;
+		PROCEDURE modulo(x,y: FLOAT64): FLOAT64;
 		BEGIN
 			RETURN(ENTIER(x) MOD ENTIER(y));
 		END modulo;
@@ -483,12 +483,12 @@ BEGIN
 END AddInfixOperator;
 
 (** Add a new unary postfix operator. It must be preceeded by a value and is calculated last on evaluation.
-f must be PROCEDURE(x: LONGREAL) returning LONGREAL. For example to define a simple unary operator fac
+f must be PROCEDURE(x: FLOAT64) returning FLOAT64. For example to define a simple unary operator fac
 
-		PROCEDURE fac(x: LONGREAL): LONGREAL;
+		PROCEDURE fac(x: FLOAT64): FLOAT64;
 		VAR
 			i: SIGNED32;
-			y: LONGREAL;
+			y: FLOAT64;
 		BEGIN
 			i:= 0; y:= 1.0;
 			WHILE (i < ENTIER(x)) DO y:= y * i; INC(i); END;

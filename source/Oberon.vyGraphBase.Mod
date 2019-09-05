@@ -547,9 +547,9 @@ END Pict2d;
 
 PROCEDURE StretchedPict2d* (picture: Pictures.Picture;     x, y, w, h: SIGNED16;  dx, dy, dw, dh: Real);
 	VAR dxi, dyi, dwi, dhi: Coordinate;
-	factx,facty,factw,facth: LONGREAL;
+	factx,facty,factw,facth: FLOAT64;
 	nx,ny,nw,nh: SIGNED16;
-	ndx,ndy,ndw,ndh: LONGREAL;
+	ndx,ndy,ndw,ndh: FLOAT64;
 BEGIN
 	factx := (theCoordinate.x2d-dx) / dw;
 	facty := (theCoordinate.y2d-dy) / dh;

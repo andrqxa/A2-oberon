@@ -134,12 +134,12 @@ VAR
 	newF-: TextGadgets.Frame;
 	(*** Procedures *)
 
-PROCEDURE InRealRange (x: LONGREAL): BOOLEAN;
+PROCEDURE InRealRange (x: FLOAT64): BOOLEAN;
 BEGIN
 	RETURN (x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32))
 END InRealRange;
 
-PROCEDURE WReal* (VAR w: Texts.Writer;   x: LONGREAL;   prec: SIGNED16);
+PROCEDURE WReal* (VAR w: Texts.Writer;   x: FLOAT64;   prec: SIGNED16);
 BEGIN
 	IF (x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)) THEN	Texts.WriteReal(w, SHORT(x), prec) ELSE Texts.WriteLongReal(w, x, prec) END
 END WReal;
@@ -150,7 +150,7 @@ BEGIN Texts.WriteString(w, idversion);   Texts.WriteString(w, ' DebugNote:');   
 END DebugNote;
 
 (** Interface to unify System3/4/F *)
-PROCEDURE WriteRealFix* (VAR W: Texts.Writer;   x: LONGREAL;   n, f, E: SIGNED32);
+PROCEDURE WriteRealFix* (VAR W: Texts.Writer;   x: FLOAT64;   n, f, E: SIGNED32);
 BEGIN
 	(*(* V4 *)
 	Texts.WriteRealFix(W,x, n, f);
@@ -424,7 +424,7 @@ BEGIN
 	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteInt(W, x[start], n);   INC(start) END
 END WriteIntTab;
 
-PROCEDURE WriteLongRealTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF LONGREAL;   start: SIGNED32;   n: SIGNED32);
+PROCEDURE WriteLongRealTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF FLOAT64;   start: SIGNED32;   n: SIGNED32);
 BEGIN
 	IF len <= 0 THEN RETURN END;
 	Texts.WriteLongReal(W, x[start], n);
@@ -432,7 +432,7 @@ BEGIN
 	WHILE start < len DO Texts.Write(W, cTab);   Texts.WriteLongReal(W, x[start], n);   INC(start) END
 END WriteLongRealTab;
 
-PROCEDURE WriteLongRealFixTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF LONGREAL;   start: SIGNED32;   n, f, E: SIGNED32);
+PROCEDURE WriteLongRealFixTab* (VAR W: Texts.Writer;   len: SIGNED32;   x: ARRAY OF FLOAT64;   start: SIGNED32;   n, f, E: SIGNED32);
 BEGIN
 	IF len <= 0 THEN RETURN END;
 	Texts.WriteLongRealFix(W, x[start], n, f, E);
@@ -457,7 +457,7 @@ BEGIN
 END WriteRealFixTab;
 (* IO *)
 
-PROCEDURE WriteReal* (VAR W: Texts.Writer;   x: LONGREAL);
+PROCEDURE WriteReal* (VAR W: Texts.Writer;   x: FLOAT64);
 	(*! replace by smatrt choice *)
 BEGIN
 	IF (x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)) THEN
@@ -732,20 +732,20 @@ BEGIN Texts.WriteString(w, s1);   Texts.Write(w, msgsep);
 	Texts.WriteInt(w, i, 0);   Texts.Write(w, msgsep);
 MsgSI(s2, j) END MsgSISI;
 
-PROCEDURE MsgSR* ( s1: ARRAY OF CHAR;   x: LONGREAL);   	(*vs 0.1d1 gs *)
+PROCEDURE MsgSR* ( s1: ARRAY OF CHAR;   x: FLOAT64);   	(*vs 0.1d1 gs *)
 	(*! find proper default format for this and other real output*)
 BEGIN Texts.WriteString(w, s1);   Texts.Write(w, msgsep);
 	WReal(w, x, 10);   Texts.WriteLn(w);   InsertLog(w.buf)
 END MsgSR;
 
-PROCEDURE MsgSRR* ( s1: ARRAY OF CHAR;   x, y: LONGREAL);   	(*vs 0.1d0 gs *)
+PROCEDURE MsgSRR* ( s1: ARRAY OF CHAR;   x, y: FLOAT64);   	(*vs 0.1d0 gs *)
 BEGIN Texts.WriteString(w, s1);   Texts.Write(w, msgsep);
 	WReal(w, x, 10);   Texts.Write(w, msgsep);
 	WReal(w, y, 10);   Texts.Write(w, msgsep);
 	Texts.WriteLn(w);   InsertLog(w.buf)
 END MsgSRR;
 
-PROCEDURE MsgSRSR* ( s1: ARRAY OF CHAR;   x: LONGREAL;   s2: ARRAY OF CHAR;   y: LONGREAL);   	(*vs 0.1d0 gs *)
+PROCEDURE MsgSRSR* ( s1: ARRAY OF CHAR;   x: FLOAT64;   s2: ARRAY OF CHAR;   y: FLOAT64);   	(*vs 0.1d0 gs *)
 BEGIN Texts.WriteString(w, s1);   Texts.Write(w, msgsep);
 	WReal(w, x, 10);   Texts.Write(w, msgsep);
 	Texts.WriteString(w, s2);   Texts.Write(w, msgsep);
@@ -787,7 +787,7 @@ BEGIN   WriteTableStyle(w);
 	Texts.WriteLn(w); WritePrevStyle(w)
 END DumpReal;
 
-PROCEDURE DumpLongreal* (VAR w: Texts.Writer;     VAR a: ARRAY OF LONGREAL;   prec: SIGNED16);
+PROCEDURE DumpLongreal* (VAR w: Texts.Writer;     VAR a: ARRAY OF FLOAT64;   prec: SIGNED16);
 	VAR i, count: SIZE;
 BEGIN   WriteTableStyle(w);
 	count := LEN(a); i := 0;
@@ -840,7 +840,7 @@ BEGIN Texts.WriteString(w, "Summary for real array ");
 	Texts.WriteLn(w)
 END SummaryReal;
 
-PROCEDURE SummaryLongreal* (VAR w: Texts.Writer;   count: SIGNED32;   VAR a: ARRAY OF LONGREAL;   prec: SIGNED16);
+PROCEDURE SummaryLongreal* (VAR w: Texts.Writer;   count: SIGNED32;   VAR a: ARRAY OF FLOAT64;   prec: SIGNED16);
 	VAR i: SIGNED32;
 BEGIN Texts.WriteString(w, "Summary for longreal array ");
 	Texts.WriteString(w, " count=");   Texts.WriteInt(w, count, 0);

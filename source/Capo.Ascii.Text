@@ -46,7 +46,7 @@ This module exports a low-level integer type with 64-bit length, i.e., a SIGNED6
 This module exports a low-level real type with 32-bit length, i.e., a FLOAT32. 
 
 1.6 NbrRe64.Mod
-This module exports a low-level real type with 64-bit length, i.e., a LONGREAL.  Notice the similarity in its structure to that of NbrRe32. 
+This module exports a low-level real type with 64-bit length, i.e., a FLOAT64.  Notice the similarity in its structure to that of NbrRe32. 
 
 	This concludes the low-level modules that establish the core numeric types of the system. What follows are higher-level modules that define the base types used by CAPO to do numeric computations; these include: NbrInt, NbrRat, NbrRe, NbrCplx, and NbrStrings.
 

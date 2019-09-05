@@ -111,7 +111,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 		END;
 
 		Flonum = POINTER TO RECORD (ObjDesc)
-			real: LONGREAL;
+			real: FLOAT64;
 		END;
 
 		Rational = POINTER TO RECORD (ObjDesc)
@@ -200,7 +200,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 			bool: BOOLEAN;
 			char: CHAR;
 			num, denom: SIGNED32;
-			real: LONGREAL;
+			real: FLOAT64;
 			s: ARRAY 100H OF CHAR;
 		END;
 
@@ -421,7 +421,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 		END
 	END NewRational;
 
-	PROCEDURE NewReal* (val: LONGREAL): Object;
+	PROCEDURE NewReal* (val: FLOAT64): Object;
 		VAR flo: Flonum;
 	BEGIN
 		NEW(flo); flo.type := number; flo.sub := flonum; flo.real := val; RETURN flo
@@ -429,7 +429,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 
 
 	PROCEDURE ToExact* (obj: Object): Object;
-		VAR r: LONGREAL; h, l, exp: SIGNED32;
+		VAR r: FLOAT64; h, l, exp: SIGNED32;
 	BEGIN
 		IF obj.sub IN {fixnum, rational} THEN RETURN obj
 		ELSE r := obj(Flonum).real
@@ -468,7 +468,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 
 
 	PROCEDURE GetInteger* (obj: Object; VAR val: SIGNED32; VAR exact: BOOLEAN);
-		VAR rat: Rational; r: LONGREAL;
+		VAR rat: Rational; r: FLOAT64;
 	BEGIN
 		IF obj.sub = fixnum THEN
 			val := obj(Fixnum).int; exact := TRUE
@@ -500,7 +500,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 		END
 	END GetRational;
 
-	PROCEDURE GetReal* (obj: Object; VAR val: LONGREAL);
+	PROCEDURE GetReal* (obj: Object; VAR val: FLOAT64);
 		VAR rat: Rational;
 	BEGIN
 		IF obj.sub = fixnum THEN val := obj(Fixnum).int
@@ -547,7 +547,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 
 
 	PROCEDURE Compare* (obj1, obj2: Object): SIGNED32;
-		VAR n1, d1, n2, d2, t1, t2: SIGNED32; r: Rational; p1, p2: LONGREAL;
+		VAR n1, d1, n2, d2, t1, t2: SIGNED32; r: Rational; p1, p2: FLOAT64;
 	BEGIN
 		IF obj1 = obj2 THEN RETURN 0
 		ELSIF IsInexact(obj1) OR IsInexact(obj2) THEN
@@ -581,7 +581,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Compare;
 
 	PROCEDURE Add* (obj1, obj2: Object): Object;
-		VAR n1, n2, d1, d2, gcd: SIGNED32; r: Rational; x1, x2: LONGREAL;
+		VAR n1, n2, d1, d2, gcd: SIGNED32; r: Rational; x1, x2: FLOAT64;
 	BEGIN
 		IF obj1 = zero THEN RETURN obj2
 		ELSIF obj2 = zero THEN RETURN obj1
@@ -631,7 +631,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Neg;
 
 	PROCEDURE Sub* (obj1, obj2: Object): Object;
-		VAR n1, n2, d1, d2, gcd: SIGNED32; r: Rational; x1, x2: LONGREAL;
+		VAR n1, n2, d1, d2, gcd: SIGNED32; r: Rational; x1, x2: FLOAT64;
 	BEGIN
 		IF obj1 = zero THEN RETURN Neg(obj2)
 		ELSIF obj2 = zero THEN RETURN obj1
@@ -671,7 +671,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Sub;
 
 	PROCEDURE Mul * (obj1, obj2: Object): Object;
-		VAR n1, n2, d1, d2, gcd: SIGNED32; r: Rational; x1, x2: LONGREAL;
+		VAR n1, n2, d1, d2, gcd: SIGNED32; r: Rational; x1, x2: FLOAT64;
 	BEGIN
 		IF (obj1 = zero) OR (obj2 = zero) THEN RETURN zero
 		ELSIF obj1 = one THEN RETURN obj2
@@ -726,7 +726,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Inv;
 
 	PROCEDURE Div * (obj1, obj2: Object): Object;
-		VAR n1, n2, d1, d2, gcd: SIGNED32; r: Rational; x1, x2: LONGREAL;
+		VAR n1, n2, d1, d2, gcd: SIGNED32; r: Rational; x1, x2: FLOAT64;
 	BEGIN
 		IF obj1 = one THEN RETURN Inv(obj2)
 		ELSIF obj2 = one THEN RETURN obj1
@@ -776,7 +776,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Quotient;
 
 	PROCEDURE Sqrt* (obj: Object): Object;
-		VAR x: LONGREAL; res, exres: Object;
+		VAR x: FLOAT64; res, exres: Object;
 	BEGIN
 		GetReal(obj, x);
 		IF x < 0.0D0 THEN RETURN nan END;
@@ -791,7 +791,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Sqrt;
 
 	PROCEDURE Exp* (obj: Object): Object;
-		VAR x: LONGREAL;
+		VAR x: FLOAT64;
 	BEGIN
 		GetReal(obj, x);
 		IF (x = 0.0D0) & (obj.sub = fixnum) THEN RETURN one
@@ -800,7 +800,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Exp;
 
 	PROCEDURE Ln* (obj: Object): Object;
-		VAR x: LONGREAL;
+		VAR x: FLOAT64;
 	BEGIN
 		GetReal(obj, x);
 		IF x < 0.0D0 THEN RETURN nan
@@ -810,7 +810,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Ln;
 
 	PROCEDURE Expt* (base, power: Object): Object;
-		VAR x, y, res: LONGREAL;
+		VAR x, y, res: FLOAT64;
 	BEGIN
 		GetReal(base, x);
 		IF x < 0.0D0 THEN RETURN nan
@@ -826,13 +826,13 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Expt;
 
 	PROCEDURE Sin* (obj: Object): Object;
-		VAR x: LONGREAL;
+		VAR x: FLOAT64;
 	BEGIN
 		GetReal(obj, x); RETURN NewReal(MathL.sin(x))
 	END Sin;
 
 	PROCEDURE ASin* (obj: Object): Object;
-		VAR x: LONGREAL;
+		VAR x: FLOAT64;
 	BEGIN
 		GetReal(obj, x);
 		IF ABS(x) > 1.0D0 THEN RETURN nan
@@ -844,13 +844,13 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END ASin;
 
 	PROCEDURE Cos* (obj: Object): Object;
-		VAR x: LONGREAL;
+		VAR x: FLOAT64;
 	BEGIN
 		GetReal(obj, x); RETURN NewReal(MathL.cos(x))
 	END Cos;
 
 	PROCEDURE ACos* (obj: Object): Object;
-		VAR x: LONGREAL;
+		VAR x: FLOAT64;
 	BEGIN
 		GetReal(obj, x);
 		IF ABS(x) > 1.0D0 THEN RETURN nan
@@ -862,7 +862,7 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END ACos;
 
 	PROCEDURE Tan* (obj: Object): Object;
-		VAR x, y: LONGREAL;
+		VAR x, y: FLOAT64;
 	BEGIN
 		GetReal(obj, x);
 		y := MathL.cos(x);
@@ -876,16 +876,16 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END Tan;
 
 	PROCEDURE ATan* (obj: Object): Object;
-		VAR x: LONGREAL;
+		VAR x: FLOAT64;
 	BEGIN
 		GetReal(obj, x); RETURN NewReal(MathL.arctan(x))
 	END ATan;
 
 	PROCEDURE ATan2* (obj1, obj2: Object): Object;
-		VAR x, y, phi: LONGREAL;
+		VAR x, y, phi: FLOAT64;
 	BEGIN
 		GetReal(obj1, x); GetReal(obj2, y);
-		IF (ABS(x) < 1.0D0) & (ABS(y) >= ABS(x * MAX(LONGREAL))) THEN	(* y/x would overflow *)
+		IF (ABS(x) < 1.0D0) & (ABS(y) >= ABS(x * MAX(FLOAT64))) THEN	(* y/x would overflow *)
 			IF y >= 0.0D0 THEN phi := MathL.pi/2.0D0
 			ELSE phi := -MathL.pi/2.0D0
 			END
@@ -2158,9 +2158,9 @@ MODULE Scheme IN Oberon; (** portable *)	(* eos  *)
 	END ScanCh;
 
 	PROCEDURE ScanNumber (in: Object; VAR ch: CHAR; radix: SIGNED32; VAR t: Token);
-		VAR part, state, sign, i, d: SIGNED32; polar, exact: BOOLEAN; r, f, imag: LONGREAL;
+		VAR part, state, sign, i, d: SIGNED32; polar, exact: BOOLEAN; r, f, imag: FLOAT64;
 
-		PROCEDURE derationalize (n, d: SIGNED32): LONGREAL;
+		PROCEDURE derationalize (n, d: SIGNED32): FLOAT64;
 		BEGIN
 			IF d = 0 THEN t.kind := invalid; RETURN 0
 			ELSE RETURN n/d

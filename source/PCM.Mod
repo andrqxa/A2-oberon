@@ -205,7 +205,7 @@ IMPORT
 	PROCEDURE SymWReal*(VAR R: Rider; r: FLOAT32);
 	BEGIN  R.sym.RawReal(r)  END SymWReal;
 
-	PROCEDURE SymWLReal*(VAR R: Rider; r: LONGREAL);
+	PROCEDURE SymWLReal*(VAR R: Rider; r: FLOAT64);
 	BEGIN  R.sym.RawLReal(r)  END SymWLReal;
 
 

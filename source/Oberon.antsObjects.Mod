@@ -249,7 +249,7 @@ VAR
 	PROCEDURE SetAttribute*;
 	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  obj1: Objects.Object;
 		attribute, name, class: ARRAY 32 OF CHAR;
-		model: Objects.Object;  num: SIGNED32;  real: LONGREAL;
+		model: Objects.Object;  num: SIGNED32;  real: FLOAT64;
 		string: ARRAY 256 OF CHAR;
 	BEGIN
 		l := antsCommands.ScanFromPar( "[obj=OBJ | obj=NAME] attr=NAME val=(INT|FLOAT32|STR) ~#use obj=LAYER or obj=PICTURE for last opened graphics" );

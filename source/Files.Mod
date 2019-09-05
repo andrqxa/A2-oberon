@@ -1249,7 +1249,7 @@ BEGIN
 	r.file.ReadBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
 END ReadReal;
 
-PROCEDURE ReadLReal*(VAR r: Rider; VAR x: LONGREAL);
+PROCEDURE ReadLReal*(VAR r: Rider; VAR x: FLOAT64);
 BEGIN
 	r.file.ReadBytes(r, SYSTEM.VAL(Bytes8, x), 0, 8)
 END ReadLReal;
@@ -1334,7 +1334,7 @@ BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
 END WriteReal;
 
-PROCEDURE WriteLReal*(VAR r: Rider; x: LONGREAL);
+PROCEDURE WriteLReal*(VAR r: Rider; x: FLOAT64);
 BEGIN
 	r.file.WriteBytes(r, SYSTEM.VAL(Bytes8, x), 0, 8)
 END WriteLReal;

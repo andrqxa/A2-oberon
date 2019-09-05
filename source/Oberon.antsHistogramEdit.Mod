@@ -35,7 +35,7 @@ TYPE
 	tObject* = POINTER TO tObjectDesc;
 	tObjectDesc* = RECORD (vyBase.ObjDesc)
 		x, y: vyBase.tVector;
-		x0, y0, w, h: LONGREAL;
+		x0, y0, w, h: FLOAT64;
 	END;
 
 	tView* = POINTER TO tViewDesc;
@@ -49,7 +49,7 @@ TYPE
 VAR
 	tempLayer: tView;
 
-	PROCEDURE GetPosition*( o: tObject;  x, y, epsx, epsy: LONGREAL ): SIGNED32;
+	PROCEDURE GetPosition*( o: tObject;  x, y, epsx, epsy: FLOAT64 ): SIGNED32;
 	VAR i, len: SIGNED32;
 	BEGIN
 		len := vyLongrealVec.Len( o.x );
@@ -59,8 +59,8 @@ VAR
 		RETURN -1
 	END GetPosition;
 
-	PROCEDURE SetXY*( o: tObject;  x, y: LONGREAL;  pos: SIGNED32 ): BOOLEAN;
-	VAR lx, rx, ly, ry, tx, ty: LONGREAL;
+	PROCEDURE SetXY*( o: tObject;  x, y: FLOAT64;  pos: SIGNED32 ): BOOLEAN;
+	VAR lx, rx, ly, ry, tx, ty: FLOAT64;
 	BEGIN
 		IF pos = 0 THEN RETURN FALSE END;
 		IF pos = vyLongrealVec.Len( o.x ) - 1 THEN RETURN FALSE END;
@@ -78,8 +78,8 @@ VAR
 
 	END SetXY;
 
-	PROCEDURE GetValue*( o: tObject;  x: LONGREAL ): LONGREAL;
-	VAR cur: LONGREAL;  last: LONGREAL;  pos: SIGNED32;  y, yl: LONGREAL;
+	PROCEDURE GetValue*( o: tObject;  x: FLOAT64 ): FLOAT64;
+	VAR cur: FLOAT64;  last: FLOAT64;  pos: SIGNED32;  y, yl: FLOAT64;
 	BEGIN
 		IF x <= o.x0 THEN RETURN o.y0
 		ELSIF x >= o.x0 + o.w THEN RETURN o.y0 + o.h
@@ -89,8 +89,8 @@ VAR
 		y := vyLongrealVec.Get( o.y, pos );  yl := vyLongrealVec.Get( o.y, pos - 1 );  RETURN yl + (x - last) / (cur - last) * (y - yl)
 	END GetValue;
 
-	PROCEDURE AddPoint*( o: tObject;  x: LONGREAL ): BOOLEAN;
-	VAR x0, cval: LONGREAL;  pos, len, cur: SIGNED32;  y: LONGREAL;
+	PROCEDURE AddPoint*( o: tObject;  x: FLOAT64 ): BOOLEAN;
+	VAR x0, cval: FLOAT64;  pos, len, cur: SIGNED32;  y: FLOAT64;
 	BEGIN
 		IF (x < o.x0) OR (x >= o.x0 + o.w) THEN RETURN FALSE END;
 		len := vyLongrealVec.Len( o.x );
@@ -124,9 +124,9 @@ VAR
 	END AddPoint;
 
 	PROCEDURE AddGenericPoint*( o: tObject );
-	VAR max, mean: LONGREAL;  len, i: SIGNED32;
+	VAR max, mean: FLOAT64;  len, i: SIGNED32;
 	BEGIN
-		max := MIN( LONGREAL );  len := vyLongrealVec.Len( o.x );
+		max := MIN( FLOAT64 );  len := vyLongrealVec.Len( o.x );
 		FOR i := 0 TO len - 2 DO
 			IF (vyLongrealVec.Get( o.x, i + 1 ) - vyLongrealVec.Get( o.x, i )) > max THEN
 				max := (vyLongrealVec.Get( o.x, i + 1 ) - vyLongrealVec.Get( o.x, i ));
@@ -136,7 +136,7 @@ VAR
 		IF ~AddPoint( o, mean ) THEN HALT( 100 ) END
 	END AddGenericPoint;
 
-	PROCEDURE InitObject*( o: tObject;  x, y, w, h: LONGREAL );
+	PROCEDURE InitObject*( o: tObject;  x, y, w, h: FLOAT64 );
 	BEGIN
 		o.handle := ObjectHandler;  o.x0 := x;  o.y0 := y;  o.w := w;  o.h := h;  o.x := vyLongrealVec.New( 2 );
 		o.y := vyLongrealVec.New( 2 );  vyLongrealVec.Set( x, o.x, 0 );  vyLongrealVec.Set( y, o.y, 0 );
@@ -175,7 +175,7 @@ VAR
 	(*vs 0.0a1   md  14.02.95 *)
 	VAR
 
-		xr, yr, epsx, epsy: LONGREAL;  pos: SIGNED32;  gesture: SIGNED16;
+		xr, yr, epsx, epsy: FLOAT64;  pos: SIGNED32;  gesture: SIGNED16;
 	BEGIN
 		(*
 	Out.Ln; Out.String("edit");
@@ -201,7 +201,7 @@ VAR
 	END Edit;
 
 	PROCEDURE Responsible( editor: tView;  VAR event: vyEvents.EventMsg );
-	VAR priority: SIGNED16;  xr, yr, epsx, epsy: LONGREAL;
+	VAR priority: SIGNED16;  xr, yr, epsx, epsy: FLOAT64;
 
 	BEGIN
 		IF event.gesture = vyEvents.EvtIdent THEN priority := vyEvents.PrioHigh
@@ -280,13 +280,13 @@ VAR
 		IF objsub # NIL THEN obj.o := objsub( tObject ) END
 	END LoadV0;
 
-	PROCEDURE Min( a, b: LONGREAL ): LONGREAL;
+	PROCEDURE Min( a, b: FLOAT64 ): FLOAT64;
 	BEGIN
 		IF a < b THEN RETURN a ELSE RETURN b END;
 	END Min;
 
 	PROCEDURE ViewHandler*( obj: Objects.Object;  VAR msg: Objects.ObjMsg );
-	VAR copy: tView;  x, y: LONGREAL;
+	VAR copy: tView;  x, y: FLOAT64;
 	BEGIN
 		WITH obj: tView DO
 			IF msg IS Display.DisplayMsg THEN
@@ -441,7 +441,7 @@ VAR
 
 	END ObjectHandler;
 
-	PROCEDURE DoShow*( o: tObject;  x, y, w, h: LONGREAL );
+	PROCEDURE DoShow*( o: tObject;  x, y, w, h: FLOAT64 );
 	VAR pict: vyPort.Picture;  obj: tView;
 	BEGIN
 		NEW( obj );  vyPort.OpenLayer( obj, "antsHisto" );  InitView( obj, o );  pict := vyPort.NewP( vyDisplay2d.NewC2d( x, y, w, h ) );

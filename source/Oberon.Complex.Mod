@@ -49,7 +49,7 @@ BEGIN
 END Copy;
 
 PROCEDURE Handler*(obj: Objects.Object; VAR M: Objects.ObjMsg);
-VAR obj0: Complex; x: LONGREAL;
+VAR obj0: Complex; x: FLOAT64;
 BEGIN
 	WITH obj: Complex DO
 		IF M IS Objects.AttrMsg THEN

@@ -291,7 +291,7 @@ MODULE BIT;	(** portable *)	(* tk 12.2.96 *)
 
 	PROCEDURE LDIV*(x, y: LONGCARD): LONGCARD;
 		CONST m = 4.294967296D9;
-		VAR x0, y0: LONGREAL;
+		VAR x0, y0: FLOAT64;
 	BEGIN IF x < 0 THEN x0 := m - x ELSE x0 := x END;
 		IF y < 0 THEN y0 := m - y ELSE y0 := y END;
 		RETURN ENTIER(x0 / y0)

@@ -28,7 +28,7 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT vyBase, antsObjects, Objects, antsCommands, vyName, antsArrayObjects, Files, aM := antsMessages;
 
 TYPE
-	tMeanArray = POINTER TO ARRAY OF ARRAY OF LONGREAL;
+	tMeanArray = POINTER TO ARRAY OF ARRAY OF FLOAT64;
 	tArray* = antsArrayObjects.tINTEGERArray;
 
 	tMean* = POINTER TO tMeanDesc;

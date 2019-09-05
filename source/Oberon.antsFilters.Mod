@@ -142,12 +142,12 @@ CONST
 		END
 	END New;
 
-	PROCEDURE ksmallest( VAR a: ARRAY OF LONGREAL;  n, k: SIGNED32 ): LONGREAL;
+	PROCEDURE ksmallest( VAR a: ARRAY OF FLOAT64;  n, k: SIGNED32 ): FLOAT64;
 	(* algorithm of Nikolaus Wirth *)
-	VAR i, j, l, m: SIGNED32;  x: LONGREAL;
+	VAR i, j, l, m: SIGNED32;  x: FLOAT64;
 
-		PROCEDURE swap( VAR x, y: LONGREAL );
-		VAR z: LONGREAL;
+		PROCEDURE swap( VAR x, y: FLOAT64 );
+		VAR z: FLOAT64;
 		BEGIN
 			z := x;  x := y;  y := z
 		END swap;
@@ -167,7 +167,7 @@ CONST
 		RETURN a[k]
 	END ksmallest;
 
-	PROCEDURE Median( VAR a: ARRAY OF LONGREAL;  n: SIGNED32 ): LONGREAL;
+	PROCEDURE Median( VAR a: ARRAY OF FLOAT64;  n: SIGNED32 ): FLOAT64;
 	BEGIN
 		RETURN ksmallest( a, n, n DIV 2 )
 	END Median;
@@ -182,8 +182,8 @@ CONST
 	END WeightsToMedian;
 
 	PROCEDURE ApplyFilter( A: antsArrayObjects.tINTEGERArray;  VAR res: antsArrayObjects.tINTEGERArray;  filter: tFilter );
-	VAR W, H: SIGNED32;  weight, weights, value: LONGREAL;  wx, wy, y, x, count, len: SIGNED32;
-		a: POINTER TO ARRAY OF LONGREAL;
+	VAR W, H: SIGNED32;  weight, weights, value: FLOAT64;  wx, wy, y, x, count, len: SIGNED32;
+		a: POINTER TO ARRAY OF FLOAT64;
 	BEGIN
 		W := LEN( A[0] );  H := LEN( A );  NEW( res, H, W );
 		IF filter.type = mean THEN
@@ -361,7 +361,7 @@ CONST
 
 (*
 PROCEDURE TestMedian*;
-	VAR i: SIGNED32;   a: POINTER TO ARRAY OF LONGREAL;
+	VAR i: SIGNED32;   a: POINTER TO ARRAY OF FLOAT64;
 BEGIN
 	NEW(a, 1001);
 	FOR i := 0 TO 1000 DO

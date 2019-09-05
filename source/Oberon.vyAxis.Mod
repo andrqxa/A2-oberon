@@ -239,9 +239,9 @@ BEGIN
 	END
 END LoadAxe;
 
-PROCEDURE DecExpR (m: SIGNED16): LONGREAL;
+PROCEDURE DecExpR (m: SIGNED16): FLOAT64;
 	(*! ???? TenL aus vyBase benutzen. gs *)
-	VAR z : LONGREAL;
+	VAR z : FLOAT64;
 BEGIN
 	z := 1;
 	WHILE m > 0 DO DEC(m);  z := z * 10 END;
@@ -261,7 +261,7 @@ END InRect;
 PROCEDURE equals (r1, r2: Real): BOOLEAN;
 BEGIN IF ABS(r1 - r2) < EPS THEN RETURN TRUE ELSE RETURN FALSE END END equals;
 
-PROCEDURE SetExponent (VAR r: LONGREAL;  VAR Expo: SIGNED16);  	(** vs 1.0d FOF	 27.06.94 15:30:37*)
+PROCEDURE SetExponent (VAR r: FLOAT64;  VAR Expo: SIGNED16);  	(** vs 1.0d FOF	 27.06.94 15:30:37*)
 	(*! ???? Intervallschachtelung benutzten ! gs *)
 	VAR m : SIGNED16;
 BEGIN
@@ -277,12 +277,12 @@ BEGIN
 END SetExponent;
 
 
-PROCEDURE AppendRealToString (l: LONGREAL;  VAR s: ARRAY OF CHAR;  E: BOOLEAN;  m: SIGNED16);
+PROCEDURE AppendRealToString (l: FLOAT64;  VAR s: ARRAY OF CHAR;  E: BOOLEAN;  m: SIGNED16);
 VAR
 	e, i: SIGNED16;
-PROCEDURE RTS (r: LONGREAL;  m1: SIGNED16;  VAR string: ARRAY OF CHAR);
+PROCEDURE RTS (r: FLOAT64;  m1: SIGNED16;  VAR string: ARRAY OF CHAR);
 VAR
-	r1: LONGREAL;  L, L1, L2: SIGNED32;  h, a: SIGNED16;  neg: BOOLEAN;
+	r1: FLOAT64;  L, L1, L2: SIGNED32;  h, a: SIGNED16;  neg: BOOLEAN;
 BEGIN
 	IF r < 0 THEN neg := TRUE;  r := - r ELSE neg := FALSE END;
 	r1 := vyHost.TenL(m1) * r;
@@ -582,7 +582,7 @@ END CalcTheTicks;
 
 
 PROCEDURE AutomaticMinorTicks (maxnumoflabels: Coordinate;  axe: tAxe);
-	VAR dr: LONGREAL;  e2: SIGNED16;
+	VAR dr: FLOAT64;  e2: SIGNED16;
 BEGIN
 	dr := axe.dr;   SetExponent(dr, e2);
 	IF equals(SHORT(dr), 1) THEN axe.MinorTicks := 9
@@ -597,7 +597,7 @@ BEGIN
 END AutomaticMinorTicks;
 
 PROCEDURE Automaticdr (maxnumoflabels: Coordinate;  axe: tAxe);
-	VAR z: LONGREAL;  e2: SIGNED16;
+	VAR z: FLOAT64;  e2: SIGNED16;
 BEGIN
 	z := axe.r2 - axe.r1;   SetExponent(z, e2);
 	z := axe.r2 - axe.r1;  axe.dr := SHORT( vyHost.TenL(e2));

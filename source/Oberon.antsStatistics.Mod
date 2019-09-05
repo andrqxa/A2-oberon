@@ -28,8 +28,8 @@ Report any problems as soon as possible to ants@AntsInFields.de
 IMPORT antsMessages, antsArrayObjects, antsCommands, vyBase, vyLongrealVec := vyRealVec, Math := MathL IN A2, antsDirSet, aM := antsMessages;
 
 VAR
-	v1, v2: vyBase.tVector;  t1d, t2d, ph1, ph2: LONGREAL;  wd, hd: SIGNED32;
-	t1, t2: POINTER TO ARRAY OF LONGREAL;
+	v1, v2: vyBase.tVector;  t1d, t2d, ph1, ph2: FLOAT64;  wd, hd: SIGNED32;
+	t1, t2: POINTER TO ARRAY OF FLOAT64;
 
 	PROCEDURE bin( x: SIGNED16 ): SIGNED16;
 	BEGIN
@@ -37,7 +37,7 @@ VAR
 	END bin;
 
 	PROCEDURE t1t2*;
-	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  x, y: SIGNED32;  t1, t2: LONGREAL;  b: BOOLEAN;
+	VAR l: antsCommands.tScanList;  obj: vyBase.Object;  x, y: SIGNED32;  t1, t2: FLOAT64;  b: BOOLEAN;
 	BEGIN
 		l := antsCommands.ScanFromPar( "from=OBJ" );  b := antsCommands.ExpectObjectFromKeyword( l, "from", obj );
 		WITH obj: antsArrayObjects.tINTEGERObject DO
@@ -55,13 +55,13 @@ VAR
 		END
 	END t1t2;
 
-	PROCEDURE Max( x1, x2: LONGREAL ): LONGREAL;
+	PROCEDURE Max( x1, x2: FLOAT64 ): FLOAT64;
 	BEGIN
 		IF x1 > x2 THEN RETURN x1 ELSE RETURN x2 END
 	END Max;
 
-	PROCEDURE est( VAR A: ARRAY OF LONGREAL ): LONGREAL;
-	VAR i: SIGNED32;  dd: LONGREAL;  a1, a2: LONGREAL;  max, exp, val: LONGREAL;  len: SIGNED32;
+	PROCEDURE est( VAR A: ARRAY OF FLOAT64 ): FLOAT64;
+	VAR i: SIGNED32;  dd: FLOAT64;  a1, a2: FLOAT64;  max, exp, val: FLOAT64;  len: SIGNED32;
 	BEGIN
 		a1 := A[0];  a2 := A[1];  len := vyLongrealVec.Len( v1 );
 		ASSERT ( len > 0 );
@@ -92,8 +92,8 @@ VAR
 	END DefineValues;
 
 	PROCEDURE Estimate*;
-	VAR A: POINTER TO ARRAY OF LONGREAL;
-		ret: LONGREAL;
+	VAR A: POINTER TO ARRAY OF FLOAT64;
+		ret: FLOAT64;
 	BEGIN
 		NEW( A, 2 );
 

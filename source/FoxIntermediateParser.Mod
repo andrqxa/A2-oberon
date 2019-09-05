@@ -160,7 +160,7 @@ TYPE
 			positionOfOperand, pos: Position; registerNumber, symbolOffset, integer: SIGNED32;
 			someHugeint: SIGNED64;
 			hasTypeDescriptor, isMemoryOperand, lastWasIdentifier, isNegated: BOOLEAN;
-			someLongreal: LONGREAL;
+			someLongreal: FLOAT64;
 			identifier: SyntaxTree.IdentifierString;
 			type: IntermediateCode.Type;
 			sectionOfSymbol: Sections.Section;

@@ -29,7 +29,7 @@ TYPE
 	Index = SIGNED32;
 
 	NINNED* = ARRAY 2 OF ARRAY 16 OF SIGNED32;   (*= non isotropic nearest neighbour empirical distribution *)
-	NINSSProb* = ARRAY 16 OF LONGREAL;  (*= probability vector for non isotropic nearest neighbour structures *)
+	NINSSProb* = ARRAY 16 OF FLOAT64;  (*= probability vector for non isotropic nearest neighbour structures *)
 
 	EmpiricalDistribution* = POINTER TO EDDesc;   (* empirical Distribution of a binary state space model *)
 	EDDesc = RECORD (antsEmpiricD.EDDesc)
@@ -46,9 +46,9 @@ TYPE
 		gen: PROCEDURE (g: tEDGenerator);
 	END;
 
-	VAR   lastprob*: NINSSProb;  black*: LONGREAL;
+	VAR   lastprob*: NINSSProb;  black*: FLOAT64;
 
-PROCEDURE Prob* (E: EmpiricalDistribution;  conf: SIGNED32): LONGREAL;
+PROCEDURE Prob* (E: EmpiricalDistribution;  conf: SIGNED32): FLOAT64;
 	VAR s: SIGNED32;
 BEGIN
 	s := E.val[0, conf] + E.val[1, conf];

@@ -63,7 +63,7 @@ CONST
 	maxreallen = 20;  (* maximal string lenght for real *)
 	ExpChar = "E";  (* instead of "D" as used in Strings *)
 
-	VAR TenM1, Ten7, Ten8: LONGREAL;
+	VAR TenM1, Ten7, Ten8: FLOAT64;
 	HexDig: ARRAY 17 OF CHAR;
 	(*
 	PROCEDURE Expo (x: FLOAT32): SIGNED16;
@@ -263,16 +263,16 @@ j := Length(str);  WHILE (j < text.len) DO Texts.Read(R, str[j]);  INC(j) END
 END AppendBuffer;
 *)
 
-PROCEDURE RealToHexStr* (x: LONGREAL;  VAR s: ARRAY OF CHAR);
+PROCEDURE RealToHexStr* (x: FLOAT64;  VAR s: ARRAY OF CHAR);
 	(* adapted from Texts.WriteLongRealHex *)
 	VAR h, l: SIGNED32;
 BEGIN Reals.IntL(x, h, l); IntToHexStr(h, s);  AppendHex(l, s)
 END RealToHexStr;
 
-PROCEDURE RealToStr* (x: LONGREAL;  n: SIGNED32;  VAR s: ARRAY OF CHAR);
+PROCEDURE RealToStr* (x: FLOAT64;  n: SIGNED32;  VAR s: ARRAY OF CHAR);
 	(*= Right adjusted in n pos. n >=9 preferred *)
 	(* from Texts.WriteLongReal *)
-	VAR e, h, l, i, len, pos: SIGNED32;  z: LONGREAL;  d: ARRAY 16 OF CHAR;
+	VAR e, h, l, i, len, pos: SIGNED32;  z: FLOAT64;  d: ARRAY 16 OF CHAR;
 
 PROCEDURE Wr (ch: CHAR);
 BEGIN
@@ -313,10 +313,10 @@ BEGIN
 		END
 	END RealToStr;
 
-	PROCEDURE RealToStrOld* (x: LONGREAL;  VAR s: ARRAY OF CHAR);
+	PROCEDURE RealToStrOld* (x: FLOAT64;  VAR s: ARRAY OF CHAR);
 		(*= Deprecated. Use new  RealToStr instead. Left adjusted. Length is determined by length of s. *)
 		(* from Strings. Modified to use E notation, using precalculated powers of ten  *)
-		VAR e, h, l, n, len: SIGNED32;  i, j, pos: SIGNED32;  z: LONGREAL;  d: ARRAY 16 OF CHAR;
+		VAR e, h, l, n, len: SIGNED32;  i, j, pos: SIGNED32;  z: FLOAT64;  d: ARRAY 16 OF CHAR;
 	PROCEDURE Wr (ch: CHAR);
 	BEGIN
 		IF ch = 0X THEN HALT(42) END;  (*! remove when possible *)
@@ -377,9 +377,9 @@ BEGIN
 END RealToStrOld;
 
 
-PROCEDURE RealToFixStr* (x: LONGREAL;   VAR str: ARRAY OF CHAR;   n, f, D: SIGNED32);
+PROCEDURE RealToFixStr* (x: FLOAT64;   VAR str: ARRAY OF CHAR;   n, f, D: SIGNED32);
 	(* from Strings. Modified to use E notation, using precalculated powers of ten *)
-	VAR pos, len, e, i, h, l: SIGNED32;   r, z: LONGREAL;   d: ARRAY 16 OF CHAR;   s: CHAR;
+	VAR pos, len, e, i, h, l: SIGNED32;   r, z: FLOAT64;   d: ARRAY 16 OF CHAR;   s: CHAR;
 
 PROCEDURE Wr (ch: CHAR);
 BEGIN
@@ -452,7 +452,7 @@ BEGIN
 END RealToFixStr;
 
 
-PROCEDURE AppendRealFix* ( x: LONGREAL;   n, k, D: SIGNED32;   VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendRealFix* ( x: FLOAT64;   n, k, D: SIGNED32;   VAR dest: ARRAY OF CHAR);
 	VAR s: ARRAY 64 OF CHAR;
 BEGIN 	(*ASSERT((x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)), 100);
 	Texts.OpenWriter(W);
@@ -463,7 +463,7 @@ BEGIN 	(*ASSERT((x >= MIN(FLOAT32)) & (x <= MAX(FLOAT32)), 100);
 
 END AppendRealFix;
 
-PROCEDURE AppendLongReal* (x: LONGREAL;   n: SIGNED32;   VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendLongReal* (x: FLOAT64;   n: SIGNED32;   VAR dest: ARRAY OF CHAR);
 	VAR s: ARRAY maxreallen OF CHAR;
 BEGIN
 	RealToStr(x, n, s);  Append(dest, s)
@@ -474,13 +474,13 @@ PROCEDURE AppendReal* (x: FLOAT32;   n: SIGNED32;   VAR  dest: ARRAY OF CHAR);
 BEGIN 	 RealToStr(x, n, s);  Append(dest, s)
 END AppendReal;
 
-PROCEDURE AppendLongRealHex* ( x: LONGREAL;   VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendLongRealHex* ( x: FLOAT64;   VAR dest: ARRAY OF CHAR);
 	VAR s: ARRAY maxreallen OF CHAR;
 BEGIN
 	RealToHexStr(x, s);  Append(dest, s)
 END AppendLongRealHex;
 
-PROCEDURE AppendRealHex* ( x: LONGREAL;   VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendRealHex* ( x: FLOAT64;   VAR dest: ARRAY OF CHAR);
 	VAR s: ARRAY maxreallen OF CHAR;
 BEGIN
 	RealToHexStr(x, s);  Append(dest, s)
@@ -576,9 +576,9 @@ REPEAT dest[pos]:= d[i]; INC(pos); INC(i) UNTIL i = 8;
 dest[pos]:=0X
 END AppendRealHex;
 
-PROCEDURE AppendLongReal* (x: LONGREAL; n: SIGNED32;VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendLongReal* (x: FLOAT64; n: SIGNED32;VAR dest: ARRAY OF CHAR);
 CONST maxD = 16;
-VAR e: SIGNED32; x0: LONGREAL;
+VAR e: SIGNED32; x0: FLOAT64;
 d: ARRAY maxD OF CHAR;pos:SIGNED32;
 BEGIN pos:=Length(dest);
 e := Reals.ExpoL(x);
@@ -610,7 +610,7 @@ END;
 dest[pos]:=0X;
 END AppendLongReal;
 
-PROCEDURE AppendLongRealHex* ( x: LONGREAL;VAR dest: ARRAY OF CHAR);
+PROCEDURE AppendLongRealHex* ( x: FLOAT64;VAR dest: ARRAY OF CHAR);
 VAR pos,i: SIGNED32;
 d: ARRAY 16 OF CHAR;
 BEGIN pos:=Length(dest);

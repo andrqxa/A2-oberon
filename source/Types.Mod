@@ -47,7 +47,7 @@ TYPE
 	END;
 
 	Longreal* = RECORD(Any)
-		value* : LONGREAL;
+		value* : FLOAT64;
 	END;
 
 	Char* = RECORD(Any)
@@ -422,7 +422,7 @@ BEGIN
 END SetSize;
 
 PROCEDURE GetReal*(CONST source : Any; VAR value : FLOAT32; VAR res : WORD);
-VAR longreal : LONGREAL; real : Real;
+VAR longreal : FLOAT64; real : Real;
 BEGIN
 	res := Ok;
 	IF (source IS Real) THEN
@@ -509,7 +509,7 @@ BEGIN
 	END;
 END SetReal;
 
-PROCEDURE GetLongreal*(CONST source : Any; VAR value : LONGREAL; VAR res : WORD);
+PROCEDURE GetLongreal*(CONST source : Any; VAR value : FLOAT64; VAR res : WORD);
 VAR longreal : Longreal;
 BEGIN
 	res := Ok;
@@ -549,7 +549,7 @@ BEGIN
 	END;
 END GetLongreal;
 
-PROCEDURE SetLongreal*(VAR target : Any; value : LONGREAL; VAR res : WORD);
+PROCEDURE SetLongreal*(VAR target : Any; value : FLOAT64; VAR res : WORD);
 VAR longreal : Longreal; w:Streams.StringWriter;
 BEGIN
 	res := Ok;
@@ -725,7 +725,7 @@ END EnsureStringLength;
 
 
 PROCEDURE SetAOC*(VAR target : Any; CONST value : ARRAY OF CHAR; VAR res : WORD);
-VAR temp : LONGREAL; string : String;
+VAR temp : FLOAT64; string : String;
 BEGIN
 	res := Ok;
 	IF (target IS String) THEN
@@ -977,7 +977,7 @@ BEGIN
 END GetText;
 
 PROCEDURE SetText*(VAR target : Any; CONST value : Texts.Text; VAR res : WORD);
-VAR text : Text; temp : ARRAY 64 OF CHAR; lr : LONGREAL;
+VAR text : Text; temp : ARRAY 64 OF CHAR; lr : FLOAT64;
 BEGIN
 	res := Ok;
 	IF (target IS Text) THEN
@@ -1245,7 +1245,7 @@ BEGIN
 	s[i] := 0X;
 END CleanString;
 
-PROCEDURE FloatToString*(r: LONGREAL; fractionalDigits: SIGNED32; VAR s: ARRAY OF CHAR);
+PROCEDURE FloatToString*(r: FLOAT64; fractionalDigits: SIGNED32; VAR s: ARRAY OF CHAR);
 BEGIN
 	Strings.FloatToStr(r, 0, fractionalDigits, 0, s);
 	CleanString(s);

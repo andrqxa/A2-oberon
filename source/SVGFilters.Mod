@@ -175,7 +175,7 @@ TYPE
 	END feOffset;
 
 	ColorMatrix*=RECORD
-		a: ARRAY 5,4 OF LONGREAL;
+		a: ARRAY 5,4 OF FLOAT64;
 	END;
 
 	feColorMatrix*=OBJECT(FilterElement)
@@ -209,9 +209,9 @@ TYPE
 			source: Buffer;
 			pix: Raster.Pixel;
 			temp: Buffer;
-			kernel: POINTER TO ARRAY OF LONGREAL;
+			kernel: POINTER TO ARRAY OF FLOAT64;
 			kernelSizeX, kernelSizeY, kernelHalfX, kernelHalfY: SIZE;
-			norm, sSquared2: LONGREAL;
+			norm, sSquared2: FLOAT64;
 			sum: SVGColors.ColorSum;
 		BEGIN
 		(* Gaussian Kernel is seperable into a vertical part and a horizontal part. *)
@@ -515,7 +515,7 @@ END ParseColorMatrixType;
 (* Parse some values attribute of some feColorMatrix element *)
 PROCEDURE ParseColorMatrixValues*(values: XML.String; type: SIGNED8; VAR matrix: ColorMatrix):BOOLEAN;
 VAR pos: SIZE; i,j: SIZE;
-	angle, s,c: LONGREAL;
+	angle, s,c: FLOAT64;
 BEGIN
 	(* Init to the zero matrix *)
 	FOR i := 0 TO 4 DO
@@ -569,7 +569,7 @@ END ParseColorMatrixValues;
 
 (* Transform a pixel by a matrix *)
 PROCEDURE TransformByColorMatrix(VAR pix: Raster.Pixel; VAR matrix: ColorMatrix);
-VAR p, result: ARRAY 4 OF LONGREAL;
+VAR p, result: ARRAY 4 OF FLOAT64;
 BEGIN
 	p[0] := ORD(pix[0])/255.0;
 	p[1] := ORD(pix[1])/255.0;

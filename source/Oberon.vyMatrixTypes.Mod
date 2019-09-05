@@ -37,7 +37,7 @@ TYPE
 	labels = POINTER TO ARRAY OF label;   (*! replace labels by vyTypesVector type *)
 
 	par = RECORD
-		min, max, mean: LONGREAL
+		min, max, mean: FLOAT64
 	END;
 	pars = POINTER TO ARRAY OF par;
 
@@ -80,7 +80,7 @@ TYPE
 		Set: tRealSetProc
 	END;
 
-	VDist* = PROCEDURE ( v1, v2: vyBase.tVector ): LONGREAL;
+	VDist* = PROCEDURE ( v1, v2: vyBase.tVector ): FLOAT64;
 
 	(*! substituting COPY for copyLabel yields a compiler crash in MacOberon S3R2.1 OPL *)
 	PROCEDURE copyLabel( VAR l1, l2: label );
@@ -303,7 +303,7 @@ TYPE
 	END AppendC;
 
 	PROCEDURE rParsCache( M: tMatrix );
-	VAR r, min, max, mean: LONGREAL;  row, i, l: SIGNED32;
+	VAR r, min, max, mean: FLOAT64;  row, i, l: SIGNED32;
 	BEGIN
 		NEW( M.rParsCache, M.rows );
 		FOR row := 0 TO M.rows - 1 DO
@@ -322,14 +322,14 @@ TYPE
 		END
 	END rParsCache;
 
-	PROCEDURE GetRPars*( M: tMatrix;  row: SIGNED32;  VAR min, max, mean: LONGREAL );
+	PROCEDURE GetRPars*( M: tMatrix;  row: SIGNED32;  VAR min, max, mean: FLOAT64 );
 	BEGIN
 		IF M.rParsCache = NIL THEN rParsCache( M ) END;
 		min := M.rParsCache[row].min;  max := M.rParsCache[row].max;  mean := M.rParsCache[row].mean
 	END GetRPars;
 
 	PROCEDURE cParsCache( M: tMatrix );
-	VAR r, min, max, mean: LONGREAL;  col, i, l: SIGNED32;
+	VAR r, min, max, mean: FLOAT64;  col, i, l: SIGNED32;
 	BEGIN
 		NEW( M.cParsCache, M.columns );
 		FOR col := 0 TO M.columns - 1 DO
@@ -347,14 +347,14 @@ TYPE
 		END
 	END cParsCache;
 
-	PROCEDURE GetCPars*( M: tMatrix;  col: SIGNED32;  VAR min, max, mean: LONGREAL );
+	PROCEDURE GetCPars*( M: tMatrix;  col: SIGNED32;  VAR min, max, mean: FLOAT64 );
 	BEGIN
 		IF M.cParsCache = NIL THEN cParsCache( M ) END;
 		min := M.cParsCache[col].min;  max := M.cParsCache[col].max;  mean := M.cParsCache[col].mean
 	END GetCPars;
 
-	PROCEDURE GetPars*( M: tMatrix;  VAR min, max, mean: LONGREAL );
-	VAR i, j: SIGNED32;  r: LONGREAL;  l: SIGNED32;
+	PROCEDURE GetPars*( M: tMatrix;  VAR min, max, mean: FLOAT64 );
+	VAR i, j: SIGNED32;  r: FLOAT64;  l: SIGNED32;
 	BEGIN
 		min := MAX( FLOAT32 );  max := MIN( FLOAT32 );  mean := 0;  l := M.rows;
 		FOR j := 0 TO M.columns - 1 DO
@@ -467,8 +467,8 @@ TYPE
 	(*! add correlation *)
 (*! support NaNs *)
 
-	PROCEDURE L1Dist*( v1, v2: vyBase.tVector ): LONGREAL;
-	VAR temp: LONGREAL;  k: SIGNED32;
+	PROCEDURE L1Dist*( v1, v2: vyBase.tVector ): FLOAT64;
+	VAR temp: FLOAT64;  k: SIGNED32;
 	BEGIN
 		ASSERT ( v1.nrData = v2.nrData, 101 );
 		temp := 0;
@@ -484,8 +484,8 @@ TYPE
 		RETURN temp
 	END L1Dist;
 
-	PROCEDURE L2Dist*( v1, v2: vyBase.tVector ): LONGREAL;
-	VAR temp: LONGREAL;  k: SIGNED32;
+	PROCEDURE L2Dist*( v1, v2: vyBase.tVector ): FLOAT64;
+	VAR temp: FLOAT64;  k: SIGNED32;
 	BEGIN
 		ASSERT ( v1.nrData = v2.nrData, 101 );
 		temp := 0;
@@ -507,8 +507,8 @@ TYPE
 		RETURN temp
 	END L2Dist;
 
-	PROCEDURE CorrDist*( v1, v2: vyBase.tVector ): LONGREAL;
-	VAR temp: LONGREAL;  xstat, ystat: vyQFisher.Stattyp;  xyssq: LONGREAL;  k: SIGNED32;
+	PROCEDURE CorrDist*( v1, v2: vyBase.tVector ): FLOAT64;
+	VAR temp: FLOAT64;  xstat, ystat: vyQFisher.Stattyp;  xyssq: FLOAT64;  k: SIGNED32;
 	BEGIN
 		ASSERT ( v1.nrData = v2.nrData, 101 );
 		temp := 0;  vyQFisher.initstat( xstat );  vyQFisher.initstat( ystat );  xyssq := 0;
@@ -530,7 +530,7 @@ TYPE
 	END CorrDist;
 
 	PROCEDURE NewRowDistMatrix*( data: tMatrix;  distf: VDist ): tMatrix;
-	VAR M: tRealMatrix;  i, j: SIGNED32;  vi, vj: vyBase.tVector;  temp: LONGREAL;
+	VAR M: tRealMatrix;  i, j: SIGNED32;  vi, vj: vyBase.tVector;  temp: FLOAT64;
 	BEGIN
 		NEW( M );  Init( M, data.rows, data.rows );  AdjustAccess( M );
 		FOR i := 0 TO data.rows - 1 DO
@@ -543,7 +543,7 @@ TYPE
 	END NewRowDistMatrix;
 
 	PROCEDURE NewColDistMatrix*( data: tMatrix;  distf: VDist ): tMatrix;
-	VAR M: tRealMatrix;  i, j: SIGNED32;  vi, vj: vyBase.tVector;  temp: LONGREAL;
+	VAR M: tRealMatrix;  i, j: SIGNED32;  vi, vj: vyBase.tVector;  temp: FLOAT64;
 	BEGIN
 		NEW( M );  Init( M, data.columns, data.columns );  AdjustAccess( M );
 		FOR i := 0 TO data.columns - 1 DO

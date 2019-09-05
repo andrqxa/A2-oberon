@@ -225,14 +225,14 @@ VAR notyetimplemented: BOOLEAN;
 BEGIN notyetimplemented := TRUE; HALT(100);
 END EnumerateFiles;
 
-	PROCEDURE HIToLR*( h: SIGNED64 ): LONGREAL;
+	PROCEDURE HIToLR*( h: SIGNED64 ): FLOAT64;
 	BEGIN
 		RETURN h;
 		(*
 		RETURN 1.0D0 * h.low + 1.0D0 * h.hi * MAX( SIGNED32 );
 		*)
 	END HIToLR;
-	PROCEDURE LRToHI*( l: LONGREAL ): SIGNED64;
+	PROCEDURE LRToHI*( l: FLOAT64 ): SIGNED64;
 	VAR h: SIGNED64;
 	BEGIN
 		RETURN ENTIER(l);
@@ -250,7 +250,7 @@ END EnumerateFiles;
 	END LIToHI;
 
 PROCEDURE Modulus*(x,y: SIGNED64): SIGNED64;
-VAR xr,yr,mod: LONGREAL;
+VAR xr,yr,mod: FLOAT64;
 BEGIN
 	xr := HIToLR(x);
 	yr := HIToLR(y);
@@ -280,7 +280,7 @@ END Add;
 
 (*
 PROCEDURE Test*;
-VAR l: LONGREAL; h: SIGNED64;
+VAR l: FLOAT64; h: SIGNED64;
 BEGIN
 	l := 1.2345D13;
 	aM.SR("l = ",l);

@@ -47,9 +47,9 @@ CONST
 	SqlDecimalType* = 3;	(** signed exact numeric value with a precision p and scale s (1<=p<=15, 0<=s<=p) **)
 	SqlLongIntType* = 4;	(** SIGNED32 **)
 	SqlIntType* = 5;	(** SIGNED16 **)
-	SqlFloatType* = 6;	(** LONGREAL **)
+	SqlFloatType* = 6;	(** FLOAT64 **)
 	SqlRealType* = 7;	(** FLOAT32 **)
-	SqlLongRealType* = 8;	(** LONGREAL **)
+	SqlLongRealType* = 8;	(** FLOAT64 **)
 	SqlDateType* = 9;	(** date data (yyyy-mm-dd) **)
 	SqlTimeType* = 10;	(** time data (hh:mm:ss) **)
 	SqlTimeStampType* = 11;	(** date/time data (yyyy-mm-dd hh:mm:ss[f..]) **)
@@ -177,7 +177,7 @@ TYPE
 	(** field extension to hold floating point data (SQLFloatType, SQLRealType and SQLLongRealType) **)
 	RealField* = POINTER TO RealFieldDesc;
 	RealFieldDesc* = RECORD(FieldDesc)
-			r*: LONGREAL
+			r*: FLOAT64
 		END;
 
 	(** field extension to hold date (SQLDateType) **)

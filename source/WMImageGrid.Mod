@@ -128,7 +128,7 @@ TYPE GridWindow* = OBJECT(WMWindowManager.Window)
 		END Draw;
 
 		PROCEDURE Invalidate*(rect : Rectangle);
-		VAR w, h : SIZE; fx, fy : LONGREAL;
+		VAR w, h : SIZE; fx, fy : FLOAT64;
 		BEGIN
 			w := GetWidth(); h := GetHeight();
 			IF (w > 0) & (h > 0) & ((w # totalW) OR (h # totalH))  THEN

@@ -60,25 +60,25 @@ VAR
 	(** Convert microseconds to time counts *)
 	PROCEDURE FromMicro*(us: Time): Time;
 	BEGIN
-		RETURN us * ENTIERH(0.5D0+LONGREAL(cpuClockHz)/2.0D6);
+		RETURN us * ENTIERH(0.5D0+FLOAT64(cpuClockHz)/2.0D6);
 	END FromMicro;
 
 	(** Convert time counts to microseconds *)
 	PROCEDURE ToMicro*(time: Time): Time;
 	BEGIN
-		RETURN ENTIERH((0.5D0 + time) / (LONGREAL(cpuClockHz)) * 2.0D6)
+		RETURN ENTIERH((0.5D0 + time) / (FLOAT64(cpuClockHz)) * 2.0D6)
 	END ToMicro;
 
 	(** Convert milliseconds to time counts *)
 	PROCEDURE FromMilli*(ms: Time): Time;
 	BEGIN
-		RETURN ms * ENTIERH(0.5D0 + LONGREAL(cpuClockHz)/2.0D3);
+		RETURN ms * ENTIERH(0.5D0 + FLOAT64(cpuClockHz)/2.0D3);
 	END FromMilli;
 
 	(** Convert time counts to milliseconds *)
 	PROCEDURE ToMilli*(time: Time): Time;
 	BEGIN
-		RETURN ENTIERH((0.5D0 + time) / (LONGREAL(cpuClockHz)) * 2.0D3)
+		RETURN ENTIERH((0.5D0 + time) / (FLOAT64(cpuClockHz)) * 2.0D3)
 	END ToMilli;
 
 	PROCEDURE WaitMilli*(ms: Time);

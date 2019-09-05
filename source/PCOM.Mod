@@ -224,7 +224,7 @@ PROCEDURE FPrintReal(VAR fp: SIGNED32; real: FLOAT32);
 BEGIN FPrint(fp, SYSTEM.VAL(SIGNED32, real))
 END FPrintReal;
 
-PROCEDURE FPrintLReal(VAR fp: SIGNED32; lr: LONGREAL);
+PROCEDURE FPrintLReal(VAR fp: SIGNED32; lr: FLOAT64);
 	VAR l, h: SIGNED32;
 BEGIN
 	SYSTEM.GET(ADDRESSOF(lr)+4, l); SYSTEM.GET(ADDRESSOF(lr), h);
@@ -572,7 +572,7 @@ BEGIN
 		IF  con.type=PCT.Bool  THEN
 			IF con.bool  THEN  FPrint(fp, FPtrue)  ELSE  FPrint(fp, FPfalse)  END
 		ELSIF  con.type=PCT.Char8  THEN FPrint(fp, con.int)
-		ELSIF  con.type=PCT.Int64  THEN FPrintLReal(fp, SYSTEM.VAL(LONGREAL, con.long))
+		ELSIF  con.type=PCT.Int64  THEN FPrintLReal(fp, SYSTEM.VAL(FLOAT64, con.long))
 		ELSIF  PCT.IsCardinalType(con.type)  THEN FPrint(fp, con.int)
 		ELSIF  con.type=PCT.Set  THEN FPrintSet(fp, con.set)
 		ELSIF  con.type=PCT.Float32  THEN FPrintReal(fp, SHORT(con.real))
@@ -692,7 +692,7 @@ PROCEDURE Export*(VAR r: PCM.Rider; M: PCT.Module; new, extend, skipImport: BOOL
 	BEGIN
 		type := c.type;
 		IF type = PCT.Char8 THEN  PCM.SymWNum(r, c.int)
-		ELSIF type = PCT.Int64 THEN PCM.SymWLReal(r, SYSTEM.VAL(LONGREAL, c.long))
+		ELSIF type = PCT.Int64 THEN PCM.SymWLReal(r, SYSTEM.VAL(FLOAT64, c.long))
 		ELSIF PCT.IsCardinalType(type) THEN  PCM.SymWNum(r, c.int)
 		ELSIF type = PCT.Float32 THEN  PCM.SymWReal(r, SHORT(c.real))
 		ELSIF type = PCT.Float64 THEN  PCM.SymWLReal(r, c.real)
@@ -1303,7 +1303,7 @@ PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index
 		END GetImports;
 
 		PROCEDURE InConst(): PCT.Const;
-			VAR i: SIGNED32;  r: FLOAT32;  lr: LONGREAL;  str: PCS.String;  set: SET;  c: PCT.Const;
+			VAR i: SIGNED32;  r: FLOAT32;  lr: FLOAT64;  str: PCS.String;  set: SET;  c: PCT.Const;
 		BEGIN
 			CASE	tag	OF
 			| SFtypBool:	R.RawNum(i);

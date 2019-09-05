@@ -10,7 +10,7 @@ CONST 	OnOmittedParseDefault=0;
 TYPE
 	SVGLoader=OBJECT
 		VAR
-			ppi: LONGREAL;	(* pixels per inch of the documents *)
+			ppi: FLOAT64;	(* pixels per inch of the documents *)
 			state: SVG.State; (* the current state *)
 			mainDocument: SVG.Document; (* the main target *)
 

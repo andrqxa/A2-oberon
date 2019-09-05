@@ -13,8 +13,8 @@ IMPORT
 		closed: BOOLEAN;
 		curve: BSplineCurves.Curve;
 		i, N: SIGNED32;
-		d, t: LONGREAL;
-		kx, ky, x, y: ARRAY [*] OF LONGREAL;
+		d, t: FLOAT64;
+		kx, ky, x, y: ARRAY [*] OF FLOAT64;
 		t1, t2, t3: SIGNED32;
 		timer: Kernel.MilliTimer;
 	BEGIN

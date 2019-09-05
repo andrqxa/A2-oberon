@@ -67,7 +67,7 @@ TYPE
 	Real = vyBase.Real;  Coordinate = vyGraphBase.Coordinate;
 	Selection* = POINTER TO SelDesc;
 	SelDesc* = RECORD (Objects.ObjDesc)
-		x*, y*, w*, h*: LONGREAL
+		x*, y*, w*, h*: FLOAT64
 	END;
 
 	tCoordinate2d* = POINTER TO tCoordinate2dDesc;
@@ -188,7 +188,7 @@ VAR
 		vyGraphBase.SetCoordinate( command.c.c2d );  vyGraphBase.ZoomOut();  vyBase.Update( command.c )
 	END zoomout;
 
-	PROCEDURE AdjustRectR( VAR x, y, w, h: LONGREAL );
+	PROCEDURE AdjustRectR( VAR x, y, w, h: FLOAT64 );
 	BEGIN
 		IF w < 0 THEN x := x + w;  w := -w END;
 		IF h < 0 THEN y := y + h;  h := -h END

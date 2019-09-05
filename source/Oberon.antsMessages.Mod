@@ -112,7 +112,7 @@ BEGIN
 	Texts.WriteString(w,s1); Texts.WriteString(w,sep); Texts.WriteInt(w,i,0);  Texts.WriteLn(w); write(w.buf);
 END wSI;
 
-PROCEDURE wSR*(mode: SIGNED16; s: ARRAY OF CHAR; r: LONGREAL);
+PROCEDURE wSR*(mode: SIGNED16; s: ARRAY OF CHAR; r: FLOAT64);
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w,s); Texts.WriteString(w,sep); Texts.WriteReal(w, SHORT(r), 20); Texts.WriteLn(w); write(w.buf);
@@ -126,7 +126,7 @@ BEGIN
 	Texts.WriteLn(w); write(w.buf);
 END wSISI;
 
-PROCEDURE wSRSR* (mode: SIGNED16; s1: ARRAY OF CHAR;    r1: LONGREAL;   s2: ARRAY OF CHAR;    r2: LONGREAL);
+PROCEDURE wSRSR* (mode: SIGNED16; s1: ARRAY OF CHAR;    r1: FLOAT64;   s2: ARRAY OF CHAR;    r2: FLOAT64);
 BEGIN
 	IF ~Init(mode) THEN RETURN END;
 	Texts.WriteString(w, s1);
@@ -161,13 +161,13 @@ BEGIN	wSSSS(normalMode,s1,s2,s3,s4); END SSSS;
 PROCEDURE SI* (s1: ARRAY OF CHAR;    i: SIGNED32);
 BEGIN	wSI(normalMode,s1,i); END SI;
 
-PROCEDURE SR* (s1: ARRAY OF CHAR;    R: LONGREAL);
+PROCEDURE SR* (s1: ARRAY OF CHAR;    R: FLOAT64);
 BEGIN	wSR(normalMode,s1,R); END SR;
 
 PROCEDURE SISI* (s1: ARRAY OF CHAR;    i1: SIGNED32;    s2: ARRAY OF CHAR;    i2: SIGNED32 );
 BEGIN	wSISI(normalMode,s1,i1,s2,i2); END SISI;
 
-PROCEDURE SRSR* (s1: ARRAY OF CHAR;    r1: LONGREAL;   s2: ARRAY OF CHAR;    r2: LONGREAL);
+PROCEDURE SRSR* (s1: ARRAY OF CHAR;    r1: FLOAT64;   s2: ARRAY OF CHAR;    r2: FLOAT64);
 BEGIN	wSRSR(normalMode,s1,r1,s2,r2); END SRSR;
 
 PROCEDURE eSc* (write: BOOLEAN; s: ARRAY OF CHAR);
@@ -191,13 +191,13 @@ BEGIN	wSSSS(errorMode,s1,s2,s3,s4); END eSSSS;
 PROCEDURE eSI* (s1: ARRAY OF CHAR;    i: SIGNED32);
 BEGIN	wSI(errorMode,s1,i); END eSI;
 
-PROCEDURE eSR* (s1: ARRAY OF CHAR;    R: LONGREAL);
+PROCEDURE eSR* (s1: ARRAY OF CHAR;    R: FLOAT64);
 BEGIN	wSR(errorMode,s1,R); END eSR;
 
 PROCEDURE eSISI* (s1: ARRAY OF CHAR;    i1: SIGNED32;    s2: ARRAY OF CHAR;    i2: SIGNED32 );
 BEGIN	wSISI(errorMode,s1,i1,s2,i2); END eSISI;
 
-PROCEDURE eSRSR* (s1: ARRAY OF CHAR;    r1: LONGREAL;   s2: ARRAY OF CHAR;    r2: LONGREAL);
+PROCEDURE eSRSR* (s1: ARRAY OF CHAR;    r1: FLOAT64;   s2: ARRAY OF CHAR;    r2: FLOAT64);
 BEGIN	wSRSR(errorMode,s1,r1,s2,r2); END eSRSR;
 
 PROCEDURE vS* (s: ARRAY OF CHAR);
@@ -221,13 +221,13 @@ BEGIN	wSSSS(verboseMode,s1,s2,s3,s4); END vSSSS;
 PROCEDURE vSI* (s1: ARRAY OF CHAR;    i: SIGNED32);
 BEGIN	wSI(verboseMode,s1,i); END vSI;
 
-PROCEDURE vSR* (s1: ARRAY OF CHAR;    R: LONGREAL);
+PROCEDURE vSR* (s1: ARRAY OF CHAR;    R: FLOAT64);
 BEGIN	wSR(verboseMode,s1,R); END vSR;
 
 PROCEDURE vSISI* (s1: ARRAY OF CHAR;    i1: SIGNED32;    s2: ARRAY OF CHAR;    i2: SIGNED32 );
 BEGIN	wSISI(verboseMode,s1,i1,s2,i2); END vSISI;
 
-PROCEDURE vSRSR* (s1: ARRAY OF CHAR;    r1: LONGREAL;   s2: ARRAY OF CHAR;    r2: LONGREAL);
+PROCEDURE vSRSR* (s1: ARRAY OF CHAR;    r1: FLOAT64;   s2: ARRAY OF CHAR;    r2: FLOAT64);
 BEGIN	wSRSR(verboseMode,s1,r1,s2,r2); END vSRSR;
 
 PROCEDURE dSc* (write: BOOLEAN; s: ARRAY OF CHAR);
@@ -251,13 +251,13 @@ BEGIN	wSSSS(debugMode,s1,s2,s3,s4); END dSSSS;
 PROCEDURE dSI* (s1: ARRAY OF CHAR;    i: SIGNED32);
 BEGIN	wSI(debugMode,s1,i); END dSI;
 
-PROCEDURE dSR* (s1: ARRAY OF CHAR;    R: LONGREAL);
+PROCEDURE dSR* (s1: ARRAY OF CHAR;    R: FLOAT64);
 BEGIN	wSR(debugMode,s1,R); END dSR;
 
 PROCEDURE dSISI* (s1: ARRAY OF CHAR;    i1: SIGNED32;    s2: ARRAY OF CHAR;    i2: SIGNED32 );
 BEGIN	wSISI(debugMode,s1,i1,s2,i2); END dSISI;
 
-PROCEDURE dSRSR* (s1: ARRAY OF CHAR;    r1: LONGREAL;   s2: ARRAY OF CHAR;    r2: LONGREAL);
+PROCEDURE dSRSR* (s1: ARRAY OF CHAR;    r1: FLOAT64;   s2: ARRAY OF CHAR;    r2: FLOAT64);
 BEGIN	wSRSR(debugMode,s1,r1,s2,r2); END dSRSR;
 
 PROCEDURE usage*(cmd,s: ARRAY OF CHAR);

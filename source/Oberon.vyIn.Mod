@@ -58,7 +58,7 @@ PROCEDURE Real* (VAR x: FLOAT32);
 BEGIN	IF Done THEN Done := vyParser.Real(S, x) END
 END Real;
 
-PROCEDURE LongReal* (VAR y: LONGREAL);
+PROCEDURE LongReal* (VAR y: FLOAT64);
 	(*! add proper LongReal support *)
 	VAR x: FLOAT32;
 BEGIN	IF Done THEN Real(x);  y := x END

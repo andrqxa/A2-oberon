@@ -87,7 +87,7 @@ BEGIN
 	(*	RETURN E.v[v+4];  *)
 END M;
 
-PROCEDURE F* (E: EmpiricalDistribution;   x, v: Index): LONGREAL;
+PROCEDURE F* (E: EmpiricalDistribution;   x, v: Index): FLOAT64;
 BEGIN
 	IF E.Mn[v] = 0 THEN RETURN 0 ELSE RETURN E.Rn[x, v] / E.Mn[v] END
 	(* 	nv := M(E,v);

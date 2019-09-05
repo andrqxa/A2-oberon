@@ -16,7 +16,7 @@ TYPE
 		END Init;
 
 
-		PROCEDURE Drand48*(): LONGREAL;		(* [0.0 .. 1.0] *)
+		PROCEDURE Drand48*(): FLOAT64;		(* [0.0 .. 1.0] *)
 		CONST twom = 1.0D0 / m;
 		BEGIN
 			x := (x*a + c) MOD m;
@@ -91,7 +91,7 @@ TYPE
 		END Init;
 
 
-		PROCEDURE Drand48*(): LONGREAL;
+		PROCEDURE Drand48*(): FLOAT64;
 		CONST two16m = 1.0D0 / B;
 		BEGIN
 			Next;  RETURN two16m*(two16m*(two16m*x[0] + x[1]) + x[2])

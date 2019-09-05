@@ -25,7 +25,7 @@ MODULE DBF IN Oberon; (* ejz  *)
 			character*: ARRAY 256 OF CHAR;
 			date*: SIGNED32;
 			logical*: BOOLEAN;
-			numeric*: LONGREAL
+			numeric*: FLOAT64
 		END;
 
 		Reader* = RECORD

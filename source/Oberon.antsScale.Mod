@@ -53,7 +53,7 @@ VAR
 	END Max;
 
 	PROCEDURE Recall( scale: tLayer;  VAR msg: Display.DisplayMsg );
-	VAR x, y, w, h: Coordinate;  x2d1, x2d2, y2d1, y2d2: LONGREAL;
+	VAR x, y, w, h: Coordinate;  x2d1, x2d2, y2d1, y2d2: FLOAT64;
 	BEGIN
 		vyAxis.SetColors( scale.style.fcol, scale.style.fcol, scale.style.fcol );  vyAxis.PlotLabels( TRUE );
 		vyAxis.SetLabelFont( scale.style.fnt );  vyAxis.AutomaticTicks( TRUE );

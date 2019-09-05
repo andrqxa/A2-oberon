@@ -237,7 +237,7 @@ TYPE
 			END;
 
 			IF PCM.bigEndian THEN
-				IF len = 8 THEN (* const is 64 bits (e.g. SIGNED64, LONGREAL)-> swap low and high 4-byte words separately *)
+				IF len = 8 THEN (* const is 64 bits (e.g. SIGNED64, FLOAT64)-> swap low and high 4-byte words separately *)
 					PCM.SwapBytes(a, 0, 4); PCM.SwapBytes(a, 4, 4);
 				ELSE
 					PCM.SwapBytes(a, 0, len);

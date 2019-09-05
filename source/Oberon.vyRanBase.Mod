@@ -104,7 +104,7 @@ TYPE
 	(*** The general type for random number generators ***)
 	(*= a new random number generator should shield its internal structure,
 	but allow as efficient access as possible. The minimum is to supply a SIGNED32 variant
-	Random with values in 0..MAX, and a LONGREAL variant normed to [0,1] *)
+	Random with values in 0..MAX, and a FLOAT64 variant normed to [0,1] *)
 
 	tRandom* = POINTER TO tRandomNumberDesc;
 	(*	tRandomFct*=PROCEDURE (gen:tRandom):;*)
@@ -123,7 +123,7 @@ TYPE
 
 		(*= Read out functions. Supply best attempts for each generator *)
 		GetRandom*: PROCEDURE ( gen: tRandom ): Bits;   (*= A bit pattern within [0, unsigned (MAX)] *)
-		GetRandomU*: PROCEDURE ( gen: tRandom ): LONGREAL;   (*= U[0,1] *)
+		GetRandomU*: PROCEDURE ( gen: tRandom ): FLOAT64;   (*= U[0,1] *)
 		NextRandom*: PROCEDURE ( gen: tRandom );   (*= advance random number generator. Status is kept in seed *)
 		Max*: PROCEDURE ( gen: tRandom ): Bits;   (*= maximum value returned by GetRandom *)
 
@@ -133,7 +133,7 @@ TYPE
 		GetRandomV*: PROCEDURE (gen: tRandom; count: SIGNED32; VAR nrs: ARRAY OF SIGNED32; start: SIGNED32);	(*= A bit pattern, stored as SIGNED32 *)
 		*)
 		GetRandomUV*: PROCEDURE ( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF FLOAT32;  start: SIGNED32 );   (*= U[0,1] *)
-		GetRandomUVX*: PROCEDURE ( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF LONGREAL;  start: SIGNED32 );   (*= U[0,1] *)
+		GetRandomUVX*: PROCEDURE ( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF FLOAT64;  start: SIGNED32 );   (*= U[0,1] *)
 
 		(* the following procedures generate a random SIGNED32 within [0; top) *)
 		(* if top <= 0 or top > min ( MAX (SIGNED32), unsigned (MAX ()) ), a non-negative random SIGNED32
@@ -144,7 +144,7 @@ TYPE
 		theoretical value of chi square test statistic is then given by unsigned (MAX ()) * (SumPSqr () * top - 1),
 		unsigned (MAX ()) - 1 degrees of freedom *)
 		(* jb 6.3.01 *)
-		SumPSqr*: PROCEDURE ( gen: tRandom;  top: SIGNED32 ): LONGREAL;
+		SumPSqr*: PROCEDURE ( gen: tRandom;  top: SIGNED32 ): FLOAT64;
 		GetRandomL*: PROCEDURE ( gen: tRandom;  top: SIGNED32 ): SIGNED32;
 		GetRandomLV*: PROCEDURE ( gen: tRandom;  top: SIGNED32;  count: SIGNED32;  VAR nrs: ARRAY OF SIGNED32;  start: SIGNED32 );
 
@@ -248,7 +248,7 @@ PROCEDURE Random* (): SIGNED32;
 BEGIN RETURN RandomGenerator.GetRandomL(RandomGenerator, MAX(SIGNED32)) END Random;
 *)
 
-	PROCEDURE RandomU*( ): LONGREAL;
+	PROCEDURE RandomU*( ): FLOAT64;
 	(*= return a random number from RandomGenerator, transformed to U[0,1] *)
 	BEGIN
 		RETURN RandomGenerator.GetRandomU( RandomGenerator )
@@ -295,7 +295,7 @@ END RandomV;
 		RandomGenerator.GetRandomUV( RandomGenerator, count, nrs, start )
 	END RandomUV;
 
-	PROCEDURE RandomUVX*( count: SIGNED32;  VAR nrs: ARRAY OF LONGREAL;  start: SIGNED32 );
+	PROCEDURE RandomUVX*( count: SIGNED32;  VAR nrs: ARRAY OF FLOAT64;  start: SIGNED32 );
 	(* VAR i: SIGNED32; *)
 	BEGIN
 		(* jb 12.3.00
@@ -385,7 +385,7 @@ END DefaultRandomV;
 		FOR i := start TO start + count - 1 DO nrs[i] := SHORT( gen.GetRandomU( gen ) ) END
 	END DefaultRandomUV;
 
-	PROCEDURE DefaultRandomUVX*( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF LONGREAL;  start: SIGNED32 );
+	PROCEDURE DefaultRandomUVX*( gen: tRandom;  count: SIGNED32;  VAR nrs: ARRAY OF FLOAT64;  start: SIGNED32 );
 	VAR i: SIGNED32;
 	BEGIN
 		FOR i := start TO start + count - 1 DO nrs[i] := gen.GetRandomU( gen ) END
@@ -572,10 +572,10 @@ END Store;
 		END
 	END DefaultLongintReset;
 
-	PROCEDURE DefaultSumPSqr*( gen: tRandom;  top: SIGNED32 ): LONGREAL;
+	PROCEDURE DefaultSumPSqr*( gen: tRandom;  top: SIGNED32 ): FLOAT64;
 	(* default procedure if MAX () = sysMaxUnsigned *)
 	CONST N = MAX( SIGNED32 );
-	VAR k, t: LONGREAL;
+	VAR k, t: FLOAT64;
 	BEGIN
 		IF top <= 0 THEN RETURN 1 / top END;
 

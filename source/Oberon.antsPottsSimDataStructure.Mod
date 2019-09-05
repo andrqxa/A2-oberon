@@ -70,7 +70,7 @@ TYPE
 	DegradedDesc* = RECORD (vyBase.ObjDesc)
 		name: POINTER TO ARRAY OF CHAR;
 		degraded: antsArrays.X1d;
-		variance: LONGREAL;
+		variance: FLOAT64;
 		rekoChain: POINTER TO ARRAY OF Reko;
 	END;
 
@@ -802,7 +802,7 @@ TYPE
 		END;
 	END GetResults;
 
-	PROCEDURE GetDiff*( set: SetChain;  dataChainname, dataname, mon: ARRAY OF CHAR ): LONGREAL;
+	PROCEDURE GetDiff*( set: SetChain;  dataChainname, dataname, mon: ARRAY OF CHAR ): FLOAT64;
 	(* Gibt die Differenz zwischen dem grössten und kleinsten Element in Monotone zurück. *)
 
 	VAR i, j: SIGNED32;
@@ -844,7 +844,7 @@ TYPE
 		END;
 	END GetAllDiff;
 
-	PROCEDURE GetEN*( set: SetChain;  dataChainname, dataname, mon: ARRAY OF CHAR ): LONGREAL;
+	PROCEDURE GetEN*( set: SetChain;  dataChainname, dataname, mon: ARRAY OF CHAR ): FLOAT64;
 	(* Gibt die Estimated Noises zurück. *)
 
 	VAR i, j: SIGNED32;
@@ -970,7 +970,7 @@ TYPE
 		END;
 	END GetNoiseNumber;
 
-	PROCEDURE GetNoiseVariance*( set: SetChain;  dataChainname, dataname, monotonename, degradedname: ARRAY OF CHAR ): LONGREAL;
+	PROCEDURE GetNoiseVariance*( set: SetChain;  dataChainname, dataname, monotonename, degradedname: ARRAY OF CHAR ): FLOAT64;
 	(* Gibt die Varianz einer Verrauschung zurück. *)
 
 	VAR i, j, k, l: SIGNED32;
@@ -1147,7 +1147,7 @@ TYPE
 	END NewMonotone;
 
 	PROCEDURE NewDegraded*( VAR set: SetChain;  dataChainname, dataname, monotonename, name: ARRAY OF CHAR;
-												  degraded: antsArrays.X1d;  parameter: LONGREAL );
+												  degraded: antsArrays.X1d;  parameter: FLOAT64 );
 
 	VAR dummy: POINTER TO ARRAY OF Degraded;
 		newdegraded: Degraded;  len, i, j, k, l: SIGNED32;

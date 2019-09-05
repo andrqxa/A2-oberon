@@ -136,21 +136,21 @@ VAR
 		i := 0;  l := ReadNum();  t := ReadNum();  r := ReadNum();  b := ReadNum()
 	END Parse;
 
-	PROCEDURE Round( x: LONGREAL ): SIGNED32;
+	PROCEDURE Round( x: FLOAT64 ): SIGNED32;
 	BEGIN
 		RETURN ENTIER( x + 0.5 )
 	END Round;
 
 	PROCEDURE fParse( pw, ph: SIGNED16;  w, h: SIGNED16;  s: ARRAY OF CHAR;  VAR l, t, r, b: SIGNED32 );
 	VAR p: ARRAY 64 OF CHAR;
-		i, j: SIGNED16;  xr, yr, x2r, y2r: LONGREAL;
+		i, j: SIGNED16;  xr, yr, x2r, y2r: FLOAT64;
 
-		PROCEDURE ReadNum( ): LONGREAL;
-		VAR x: LONGREAL;
+		PROCEDURE ReadNum( ): FLOAT64;
+		VAR x: FLOAT64;
 		BEGIN
 			WHILE (s[i] # 0X) & (s[i] <= " ") DO INC( i ) END;
 			IF s[i] = 0X THEN RETURN 0
-			ELSIF ((s[i] < "0") OR (s[i] > "9")) & (s[i] # "-") & (s[i] # ".") THEN INC( i );  RETURN MAX( LONGREAL )
+			ELSIF ((s[i] < "0") OR (s[i] > "9")) & (s[i] # "-") & (s[i] # ".") THEN INC( i );  RETURN MAX( FLOAT64 )
 			END;
 			j := 0;
 			WHILE (s[i] # 0X) & (s[i] > " ") DO p[j] := s[i];  INC( i );  INC( j ) END;
@@ -159,14 +159,14 @@ VAR
 
 	BEGIN
 		i := 0;  xr := ReadNum();  yr := ReadNum();  x2r := ReadNum();  y2r := ReadNum();
-		IF (xr = MAX( LONGREAL )) THEN l := DontCare ELSE l := Round( pw * xr );  END;
-		IF (yr = MAX( LONGREAL )) THEN t := DontCare;  ELSE t := Round( ph * yr );  END;
-		IF (x2r = MAX( LONGREAL )) THEN r := DontCare;  ELSE r := pw - Round( pw * x2r ) END;
-		IF (y2r = MAX( LONGREAL )) THEN b := DontCare;  ELSE b := ph - Round( ph * y2r );  END;
-		IF (xr = x2r) & (xr # MAX( LONGREAL )) THEN  (* center hor *)
+		IF (xr = MAX( FLOAT64 )) THEN l := DontCare ELSE l := Round( pw * xr );  END;
+		IF (yr = MAX( FLOAT64 )) THEN t := DontCare;  ELSE t := Round( ph * yr );  END;
+		IF (x2r = MAX( FLOAT64 )) THEN r := DontCare;  ELSE r := pw - Round( pw * x2r ) END;
+		IF (y2r = MAX( FLOAT64 )) THEN b := DontCare;  ELSE b := ph - Round( ph * y2r );  END;
+		IF (xr = x2r) & (xr # MAX( FLOAT64 )) THEN  (* center hor *)
 			l := Round( pw * xr ) - w DIV 2;  r := pw - Round( pw * x2r ) - w DIV 2;
 		END;
-		IF (yr = y2r) & (yr # MAX( LONGREAL )) THEN  (* center ver *)
+		IF (yr = y2r) & (yr # MAX( FLOAT64 )) THEN  (* center ver *)
 			t := Round( ph * yr ) - h DIV 2;  b := ph - Round( ph * y2r ) - h DIV 2;
 		END;
 		IF t < 0 THEN t := 0 END;
@@ -531,7 +531,7 @@ END RestoreBackGround;*)
 		IF (fnt = Fonts.Default) & (fnt.name # name) THEN RETURN NIL ELSE RETURN fnt END
 	END ThisFont;
 
-	PROCEDURE MakeFontSize*( F: Objects.Object;  ratio: LONGREAL;  offset: SIGNED16 );
+	PROCEDURE MakeFontSize*( F: Objects.Object;  ratio: FLOAT64;  offset: SIGNED16 );
 	VAR Font, this: Objects.Name;  i, j, size, i1, j1, size1, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;
 		updmsg: Display.DisplayMsg;  diff: SIGNED32;
 	BEGIN
@@ -583,7 +583,7 @@ END RestoreBackGround;*)
 
 	PROCEDURE MakeFontSizes*( F: Objects.Object );
 	VAR Font: ARRAY 256 OF CHAR;
-		w, h: SIGNED32;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: SIGNED32;  ratio: LONGREAL;
+		w, h: SIGNED32;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: SIGNED32;  ratio: FLOAT64;
 		list: contentList;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN
@@ -610,7 +610,7 @@ END RestoreBackGround;*)
 
 	PROCEDURE ResetFontSizes*( F: Objects.Object );
 	VAR Font: ARRAY 256 OF CHAR;
-		w, h: SIGNED32;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: SIGNED32;  ratio: LONGREAL;
+		w, h: SIGNED32;  i, j, size, newsize: SIGNED16;  fnt: Fonts.Font;  fn: Objects.Name;  updmsg: Display.DisplayMsg;  diff: SIGNED32;  ratio: FLOAT64;
 		list: contentList;
 	BEGIN
 		IF (F # NIL ) & (F IS Panels.Panel) THEN

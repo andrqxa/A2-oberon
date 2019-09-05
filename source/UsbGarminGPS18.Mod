@@ -193,7 +193,7 @@ TYPE
 TYPE
 
 	RadianType* = RECORD
-		lat-, long- : LONGREAL;
+		lat-, long- : FLOAT64;
 	END;
 
 	D800PVT* = RECORD;
@@ -201,7 +201,7 @@ TYPE
 		epe- : FLOAT32; 				(* estimated position error, 2 sigma (meters) *)
 		eph-, epv- : FLOAT32; 		(* epe, but horizontal rsp. vertical only (meters) *)
 		fix- : SIGNED16; 			(* type of position fix: 0 = no fix; 1 = no fix; 2 = 2D; 3 = 3D; 4 = 2D differential, 5 = 3D differential *)
-		tow- : LONGREAL; 		(* time of week (seconds) *)
+		tow- : FLOAT64; 		(* time of week (seconds) *)
 		posn- : RadianType;  		(* latitude and longitude (radians) *)
 		east-, north-, up- : FLOAT32; 	(* velocity east, north & up (meters per second) *)
 		mslHeight- : FLOAT32; 		(* height of WGS 84 ellipsoid above MSL (meters) *)
@@ -616,7 +616,7 @@ TYPE
 
 	END GarminGPS18;
 
-PROCEDURE RadianToDegree(radian : LONGREAL) : LONGREAL;
+PROCEDURE RadianToDegree(radian : FLOAT64) : FLOAT64;
 BEGIN
 	RETURN radian * (180 / pi);
 END RadianToDegree;

@@ -31,7 +31,7 @@ TYPE
 
 	tModel* = POINTER TO tModelDesc;
 	tModelDesc* = RECORD (antsModels.tModelDesc)
-		a: ARRAY 6 OF LONGREAL
+		a: ARRAY 6 OF FLOAT64
 	END;
 	(*
 	a[0]: Fact1
@@ -43,7 +43,7 @@ TYPE
 	*)
 
 
-	PROCEDURE Open*( M: tModel;  a: ARRAY OF LONGREAL );
+	PROCEDURE Open*( M: tModel;  a: ARRAY OF FLOAT64 );
 	VAR i: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 5 DO M.a[i] := a[i] END
@@ -64,7 +64,7 @@ TYPE
 	END LoadM;
 
 	PROCEDURE OneSweep( s: antsKernel.Kernel );
-	VAR model: tModel;  ran: LONGREAL;  v1, v2: vyBase.tVector;  x, y: LONGREAL;
+	VAR model: tModel;  ran: FLOAT64;  v1, v2: vyBase.tVector;  x, y: FLOAT64;
 
 	BEGIN
 		model := s.par( tModel );  v1 := antsVectors.GetVector( s.A( antsVectors.Container ), 0 );
@@ -81,7 +81,7 @@ TYPE
 	END OneSweep;
 
 	PROCEDURE Uniform( s: antsKernel.Kernel );
-	VAR v1, v2: vyBase.tVector;  ran: LONGREAL;
+	VAR v1, v2: vyBase.tVector;  ran: FLOAT64;
 	BEGIN
 		v1 := antsVectors.GetVector( s.A( antsVectors.Container ), 0 );
 		v2 := antsVectors.GetVector( s.A( antsVectors.Container ), 1 );  vyLongrealVec.SetLen( v1( vyLongrealVec.tVector ), 0 );
@@ -92,7 +92,7 @@ TYPE
 		vyLongrealVec.Append( ran, v2( vyLongrealVec.tVector ) )
 	END Uniform;
 
-	PROCEDURE ArrayHandleAttribute( VAR M: Objects.AttrMsg;  prefix: ARRAY OF CHAR;  VAR array: ARRAY OF LONGREAL ): BOOLEAN;
+	PROCEDURE ArrayHandleAttribute( VAR M: Objects.AttrMsg;  prefix: ARRAY OF CHAR;  VAR array: ARRAY OF FLOAT64 ): BOOLEAN;
 	VAR cur: ARRAY 64 OF CHAR;
 		i: SIGNED32;  len: SIGNED32;
 	BEGIN
@@ -171,7 +171,7 @@ TYPE
 
 	PROCEDURE NewModel*;
 	VAR l: antsCommands.tScanList;  name: vyName.tNameArray;  M: tModel;
-		a: ARRAY 6 OF LONGREAL;
+		a: ARRAY 6 OF FLOAT64;
 	BEGIN
 		l := antsCommands.ScanFromPar( "name=NAME f1=FLOAT32 f2=FLOAT32 v1=FLOAT32 v2=FLOAT32 add1=FLOAT32 add2=FLOAT32" );
 		IF antsCommands.ExpectNameFromKeyword( l, "name", name ) & antsCommands.ExpectRealFromKeyword( l, "f1", a[0] ) &

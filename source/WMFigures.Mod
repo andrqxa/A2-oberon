@@ -382,7 +382,7 @@ TYPE
 		PROCEDURE DrawArrow*(canvas : WMGraphics.Canvas; p0,p1: Point);
 		CONST pi=3.1516;
 		VAR  alpha: FLOAT32;
-			 head: LONGREAL;
+			 head: FLOAT64;
 			col: WMGraphics.Color;
 		BEGIN
 				alpha:=arctan2(p1.x-p0.x, p1.y-p0.y);

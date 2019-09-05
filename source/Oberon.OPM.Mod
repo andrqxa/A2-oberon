@@ -22,7 +22,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 		LIntSize* = 4;	(* SIGNED32 *)
 		HIntSize* = 8;	(* SIGNED64 *)
 		RealSize* = 4;	(* FLOAT32 *)
-		LRealSize* = 8;	(* LONGREAL *)
+		LRealSize* = 8;	(* FLOAT64 *)
 		ProcSize* = 4;	(* PROCEDURE type *)
 		PointerSize* = 4;	(* POINTER type *)
 
@@ -60,7 +60,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 
 		(* inclusive range of register number of procedures SYSTEM.GETREG and SYSTEM.PUTREG: *)
 		MinRegNr* = 0;	(* interpretation is left to the back-end, e.g. for i386: *)
-		MaxRegNr* = 31;	(* F0-F7 if second parameter is FLOAT32 or LONGREAL, R0-R7 else *)
+		MaxRegNr* = 31;	(* F0-F7 if second parameter is FLOAT32 or FLOAT64, R0-R7 else *)
 
 		(* maximal value of flag used to mark interface structures: *)
 		MaxSysFlag* = 0;	(* i386: only 0 is valid, not used *)
@@ -132,7 +132,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 
 	VAR
 		MinReal*, MaxReal*: FLOAT32;
-		MinLReal*, MaxLReal*: LONGREAL;
+		MinLReal*, MaxLReal*: FLOAT64;
 		noerr*: BOOLEAN;	(* no error found until now *)
 		curpos*, errpos*: SIGNED32;	(* character and error position in source file *)
 		breakpos*: SIGNED32;	(* set by Mark *)
@@ -212,7 +212,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	BEGIN FPrint(fp, SYSTEM.VAL(SIGNED32, real))
 	END FPrintReal;
 
-	PROCEDURE FPrintLReal*(VAR fp: SIGNED32; lr: LONGREAL);
+	PROCEDURE FPrintLReal*(VAR fp: SIGNED32; lr: FLOAT64);
 		VAR l, h: SIGNED32;
 	BEGIN
 		SYSTEM.GET(ADDRESSOF(lr)+4, l); SYSTEM.GET(ADDRESSOF(lr), h);
@@ -352,7 +352,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	BEGIN Files.WriteReal(newSymF, r)
 	END SymWReal;
 
-	PROCEDURE SymWLReal*(lr: LONGREAL);
+	PROCEDURE SymWLReal*(lr: FLOAT64);
 	BEGIN Files.WriteLReal(newSymF, lr)
 	END SymWLReal;
 

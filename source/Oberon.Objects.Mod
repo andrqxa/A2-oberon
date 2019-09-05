@@ -52,7 +52,7 @@ Most entities in Oberon are derived from this base type.
 		class*: SIGNED16;	(** Attribute class (Inval, String, Int, Real, LongReal, Char or Bool). *)
 		i*: SIGNED32;
         x*: FLOAT32;
-        y*: LONGREAL;
+        y*: FLOAT64;
 		c*: CHAR;
 		b*: BOOLEAN;
 		s*: ARRAY 256 OF CHAR

@@ -122,7 +122,7 @@ TYPE
 			intval-: SIGNED32;	(* integer value or string length *)
 			longintval-: SIGNED64;
 			realval-: FLOAT32;
-			lrlval-: LONGREAL;
+			lrlval-: FLOAT64;
 			numStartPos, numEndPos: SIGNED32;
 			curpos-, errpos-: SIGNED32;	(*pos in text*)
 			isNummer: BOOLEAN;
@@ -187,10 +187,10 @@ TYPE
 		END Identifier;
 
 		PROCEDURE Number;
-		VAR i, m, n, d, e: SIGNED16; dig: ARRAY 24 OF CHAR; f: LONGREAL; expCh: CHAR; neg: BOOLEAN; longintval: SIGNED64;
+		VAR i, m, n, d, e: SIGNED16; dig: ARRAY 24 OF CHAR; f: FLOAT64; expCh: CHAR; neg: BOOLEAN; longintval: SIGNED64;
 
-			PROCEDURE Ten(e: SIGNED16): LONGREAL;
-				VAR x, p: LONGREAL;
+			PROCEDURE Ten(e: SIGNED16): FLOAT64;
+				VAR x, p: FLOAT64;
 			BEGIN x := 1; p := 10;
 				WHILE e > 0 DO
 					IF ODD(e) THEN x := x*p END;

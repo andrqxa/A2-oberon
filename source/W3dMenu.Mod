@@ -106,13 +106,13 @@ TYPE
 	VAR
 		(* Navigation *)
 		lookat: Vectors.TVector3d;
-		radius, angle, height : LONGREAL;
+		radius, angle, height : FLOAT64;
 		mouseKeys, keyflags : SET;
 		oldX, oldY : SIZE;
 
 		(* 3d World *)
 		world : World.World;
-		mx, my, mz : LONGREAL;
+		mx, my, mz : FLOAT64;
 
 		infoList : Classes.List;
 		index : SIGNED32;
@@ -122,7 +122,7 @@ TYPE
 		blurp : Blurp;
 		selectedSymbol : Symbol;
 
-		PROCEDURE SetSelection(pos : Vectors.TVector3d; l : LONGREAL; visible : BOOLEAN);
+		PROCEDURE SetSelection(pos : Vectors.TVector3d; l : FLOAT64; visible : BOOLEAN);
 		VAR temp : AbstractWorld.Object;
 		BEGIN
 			aniObj2.Clear;

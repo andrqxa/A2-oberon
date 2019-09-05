@@ -232,7 +232,7 @@ HALT(100);
 END TestTrap;
 
 PROCEDURE Time*;
-VAR time: SIGNED32; i: LONGREAL;
+VAR time: SIGNED32; i: FLOAT64;
 BEGIN
 time := Oberon.Time()+Input.TimeUnit;
 WHILE Oberon.Time() < time DO
@@ -257,13 +257,13 @@ BEGIN
 IF executor = NIL THEN RETURN END;
 END Test3;
 
-PROCEDURE TestBM (A: ARRAY OF LONGREAL);
+PROCEDURE TestBM (A: ARRAY OF FLOAT64);
 BEGIN
 A[0] := 0;
 END TestBM;
 
 PROCEDURE TestBigMatrix*;
-VAR A: POINTER TO ARRAY OF LONGREAL;
+VAR A: POINTER TO ARRAY OF FLOAT64;
 BEGIN
 Out.Ln; Out.String("Calling testbigmatrix..");
 NEW(A,100000);

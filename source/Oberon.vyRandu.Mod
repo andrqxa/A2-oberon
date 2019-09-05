@@ -118,7 +118,7 @@ BEGIN	seed := r.seed(vyRanBase.tLongintSeed).val;    Randu(seed);    r.seed(vyRa
 	(* better shift adjust: give preference to higher order bits *)
 END Get ;
 
-PROCEDURE GetUniform (r: tRandom): LONGREAL;
+PROCEDURE GetUniform (r: tRandom): FLOAT64;
 CONST (*a = 16807;*)	m = 2147483647;    	(*q = m DIV a;	r = m MOD a; *)scalefact = 1.0D0 / m;
 	VAR seed: SIGNED32;
 BEGIN	 seed := r.seed(vyRanBase.tLongintSeed).val;    	Randu(seed);    r.seed(vyRanBase.tLongintSeed).val := seed;

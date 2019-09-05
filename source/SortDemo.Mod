@@ -29,7 +29,7 @@ TYPE
 		ha, hb: Index;  (* highlighted elements *)
 		concurrent: BOOLEAN;  concSorters: SIGNED32;
 		nofcomps, nofswaps, nofmoves: SIGNED32;
-		compareWeight, swapWeight: LONGREAL; (* in relation to element move *)
+		compareWeight, swapWeight: FLOAT64; (* in relation to element move *)
 		timer: Kernel.Timer;
 
 		data, backup: SortValues;

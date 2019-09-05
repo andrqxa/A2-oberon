@@ -45,7 +45,7 @@ CONST
 	maxHistogramLen* = 1000;
 
 	PROCEDURE SetHisto( obj: tObject );
-	VAR y, x: SIGNED32;  val, pos: SIGNED32;  len: SIGNED32;  nrNaNs: SIGNED32;  min, max: LONGREAL;
+	VAR y, x: SIGNED32;  val, pos: SIGNED32;  len: SIGNED32;  nrNaNs: SIGNED32;  min, max: FLOAT64;
 	BEGIN
 		IF obj.A.depth > maxHistogramLen THEN len := maxHistogramLen ELSE len := obj.A.depth END;
 		(* len := maxHistogramLen;  *)
@@ -152,7 +152,7 @@ CONST
 	END Handler;
 
 	PROCEDURE A2P*( o: Objects.Object );
-	VAR x, y: SIGNED32;  obj: tObject;   (* pix: Images.Pixel; *) val: SIGNED32;  valr: LONGREAL;  len: SIGNED32;  r: SIGNED16;
+	VAR x, y: SIGNED32;  obj: tObject;   (* pix: Images.Pixel; *) val: SIGNED32;  valr: FLOAT64;  len: SIGNED32;  r: SIGNED16;
 	BEGIN
 
 		obj := o( tObject );
@@ -207,7 +207,7 @@ CONST
 	END Min;
 
 	PROCEDURE AdjustCurve( obj: tObject );
-	VAR sum, up: LONGREAL;  i: SIGNED32;  len: SIGNED32;
+	VAR sum, up: FLOAT64;  i: SIGNED32;  len: SIGNED32;
 	BEGIN
 		IF obj.A.depth > maxHistogramLen THEN len := maxHistogramLen ELSE len := obj.A.depth END;
 

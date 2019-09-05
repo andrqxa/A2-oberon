@@ -51,7 +51,7 @@ TYPE
 	(*	tHistogram*= POINTER TO tHistogramDesc;
 	tHistogramDesc*= RECORD
 	(* histogram definition *)
-	offs,width,top: LONGREAL; (* offs<=x<top *)
+	offs,width,top: FLOAT64; (* offs<=x<top *)
 	bincount: ARRAY maxBins OF SIGNED32; (* top:= offs+bincount*width *) (* bin:= ENTIER (x-offs/width) *)
 	toosmall,toolarge,nans:SIGNED32 (* special counters *)
 
@@ -460,7 +460,7 @@ VAR
 	END Load0;
 
 	PROCEDURE Handler*( obj: Objects.Object;  VAR msg: Objects.ObjMsg );   (*vs 0.0a1	md  20.07.94 *)
-	VAR minX, maxX: LONGREAL;  pict: vyPort.Picture;  nans: SIGNED32;
+	VAR minX, maxX: FLOAT64;  pict: vyPort.Picture;  nans: SIGNED32;
 	BEGIN
 		WITH obj: tLayer DO
 			IF msg IS Display.DisplayMsg THEN

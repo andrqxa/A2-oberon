@@ -582,7 +582,7 @@ TYPE
 		spacings : WMGrids.Spacings;
 		nofRows : SIGNED32;
 
-		PROCEDURE NbrToStr(nbr :LONGREAL; VAR string : ARRAY OF CHAR);
+		PROCEDURE NbrToStr(nbr :FLOAT64; VAR string : ARRAY OF CHAR);
 		BEGIN
 			IF nbr < MAX(SIGNED32) THEN
 				Strings.IntToStr(ENTIER(nbr), string);
@@ -725,7 +725,7 @@ TYPE
 	VAR
 		barChart : WMDiagramComponents.BarChart;
 		ds : Plugins.DatasetDescriptor;
-		heights : POINTER TO ARRAY OF LONGREAL;
+		heights : POINTER TO ARRAY OF FLOAT64;
 
 		PROCEDURE InitView*;
 		VAR

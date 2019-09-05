@@ -64,7 +64,7 @@ IMPORT Math, MathL;
 	END "/";
 
 	OPERATOR "/"*(CONST left, right: LONGCOMPLEX): LONGCOMPLEX;
-	VAR result: LONGCOMPLEX; iDivisor: LONGREAL;
+	VAR result: LONGCOMPLEX; iDivisor: FLOAT64;
 	BEGIN
 		iDivisor := 1.0D0 / (RE(right) * RE(right) + IM(right) * IM(right));
 		RE(result) := (RE(left) * RE(right) + IM(left) * IM(right)) * iDivisor;
@@ -76,7 +76,7 @@ IMPORT Math, MathL;
 	BEGIN RETURN Math.sqrt(RE(arg) * RE(arg) + IM(arg) * IM(arg))
 	END "ABS";
 
-	OPERATOR "ABS"*(CONST arg: LONGCOMPLEX): LONGREAL;
+	OPERATOR "ABS"*(CONST arg: LONGCOMPLEX): FLOAT64;
 	BEGIN RETURN MathL.sqrt(RE(arg) * RE(arg) + IM(arg) * IM(arg))
 	END "ABS";
 
