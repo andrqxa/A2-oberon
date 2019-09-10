@@ -240,8 +240,8 @@ TYPE
 		addressSize-: SIGNED32;
 
 		(* system type mapping *)
-		addressType-, sizeType-, wordType-, longWordType-, wordSetType-, characterType-, setType-, booleanType-, anyType-, byteType-,
-		objectType-, nilType-, rangeType-: SyntaxTree.Type;
+		addressType-, sizeType-, integerType-, longIntegerType-, integerSetType-, wordType-, longWordType-, wordSetType-, characterType-, setType-, booleanType-, anyType-, byteType-,
+		realType-, objectType-, nilType-, rangeType-: SyntaxTree.Type;
 
 		CanPassInRegister-: PassInRegisterProc;
 		cellsAreObjects-: BOOLEAN;
@@ -794,6 +794,11 @@ TYPE
 		ASSERT (minBits = 8);
 
 		(* types *)
+		system.integerType := SyntaxTree.NewIntegerType(MIN(system.addressSize,32),TRUE);
+		system.longIntegerType := SyntaxTree.NewIntegerType(system.addressSize,TRUE);
+		system.integerSetType := SyntaxTree.NewSetType(system.integerType.sizeInBits);
+		system.realType := SyntaxTree.NewFloatType(64);
+
 		system.wordType := SyntaxTree.NewIntegerType(MIN(system.addressSize,32),TRUE);
 		system.longWordType := SyntaxTree.NewIntegerType(system.addressSize,TRUE);
 		system.wordSetType := SyntaxTree.NewSetType(system.wordType.sizeInBits);
@@ -860,6 +865,9 @@ TYPE
 		(* Set up system types *)
 		DeclareType(system.characterType,"CHAR",system.globalScope);
 		DeclareType(system.rangeType,"RANGE",system.globalScope);
+		DeclareType(system.integerType,"INTEGER",system.globalScope);
+		DeclareType(system.longIntegerType,"LONGINTEGER",system.globalScope);
+		DeclareType(system.integerSetType,"INTEGERSET",system.globalScope);
 		DeclareType(system.wordType,"WORD",system.globalScope);
 		DeclareType(system.longWordType,"LONGWORD",system.globalScope);
 		DeclareType(system.wordSetType,"WORDSET",system.globalScope);
@@ -880,6 +888,7 @@ TYPE
 		DeclareType(Complex32, "COMPLEX32", system.globalScope);
 		DeclareType(Complex64, "COMPLEX64", system.globalScope);
 
+		DeclareType(system.realType,"REAL",system.globalScope);
 		DeclareType(system.booleanType,"BOOLEAN",system.globalScope);
 		DeclareType(system.setType,"SET",system.globalScope);
 		DeclareType(system.anyType,"ANY",system.globalScope);
