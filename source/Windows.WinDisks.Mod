@@ -262,7 +262,7 @@ VAR
 	END AppendInt;
 
 	PROCEDURE OpenVolume( VAR handle: Kernel32.HANDLE;  flags: SET; CONST name: ARRAY OF CHAR; context : Commands.Context ): BOOLEAN;
-	VAR devname: ARRAY 256 OF CHAR;  tflags: WORDSET; errorcode : SIGNED32;
+	VAR devname: ARRAY 256 OF CHAR;  tflags: INTEGERSET; errorcode : SIGNED32;
 	BEGIN
 		Strings.Concat( "\\.\", name, devname );
 		IF Disks.ReadOnly IN flags THEN tflags := {Kernel32.GenericRead} ELSE tflags := {(*2 (* Kernel32.GenericDelete *), *)Kernel32.GenericWrite,Kernel32.GenericRead} END;

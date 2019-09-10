@@ -374,7 +374,7 @@ TYPE
 	(** GetMC - Return the state of the specified modem control lines.  s contains
 			the current state of DSR, CTS, RI, DCD & Break Interrupt. *)
 		PROCEDURE GetMC*( VAR s: SET );
-		VAR state: WORDSET;  res: INTEGER;
+		VAR state: INTEGERSET;  res: INTEGER;
 		BEGIN {EXCLUSIVE}
 			s := {};
 			IF handle # Kernel32.InvalidHandleValue THEN

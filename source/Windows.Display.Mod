@@ -137,7 +137,7 @@ TYPE
 		win: Window;
 		finished: BOOLEAN;
 		className: ARRAY 32 OF CHAR;
-		style: WORDSET;
+		style: INTEGERSET;
 		x, y, w, h: SIGNED32;
 		hMenu: User32.HMenu
 	END;

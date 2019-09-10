@@ -201,19 +201,19 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		ntohs-: PROCEDURE {WINAPI} (x: SIGNED16): SIGNED16;
 
 		(** The Windows Sockets recv function receives data from a connected socket. *)
-		recv-: PROCEDURE {WINAPI} (s: Socket; VAR buf: ARRAY   OF SYSTEM.BYTE; len: INTEGER; flags: WORDSET): INTEGER;
+		recv-: PROCEDURE {WINAPI} (s: Socket; VAR buf: ARRAY   OF SYSTEM.BYTE; len: INTEGER; flags: INTEGERSET): INTEGER;
 
 		(** The Windows Sockets recvfrom function receives a datagram and stores the source address. *)
-		recvfrom-: PROCEDURE {WINAPI} (s: Socket; VAR buf: ARRAY   OF SYSTEM.BYTE; len: INTEGER; flags: WORDSET; VAR from: sockaddrIn (*VAR from: ARRAY   OF SYSTEM.BYTE*); VAR fromlen: INTEGER): INTEGER;
+		recvfrom-: PROCEDURE {WINAPI} (s: Socket; VAR buf: ARRAY   OF SYSTEM.BYTE; len: INTEGER; flags: INTEGERSET; VAR from: sockaddrIn (*VAR from: ARRAY   OF SYSTEM.BYTE*); VAR fromlen: INTEGER): INTEGER;
 
 		(**  The select function determines the status of one or more sockets, waiting if necessary, to perform synchronous I/O *)
 		select-: PROCEDURE {WINAPI} (nfds: INTEGER; VAR readfds,writefds,exceptfds: FDSet; timeout: TimeVal): INTEGER;
 
 		(** The Windows Sockets send function sends data on a connected socket. *)
-		send-: PROCEDURE {WINAPI} (s: Socket; CONST buf: ARRAY   OF SYSTEM.BYTE; len: INTEGER; flags: WORDSET): INTEGER;
+		send-: PROCEDURE {WINAPI} (s: Socket; CONST buf: ARRAY   OF SYSTEM.BYTE; len: INTEGER; flags: INTEGERSET): INTEGER;
 
 		(** The Windows Sockets sendto function sends data to a specific destination. *)
-		sendto-: PROCEDURE {WINAPI} (s: Socket; CONST buf: ARRAY   OF SYSTEM.BYTE; len: INTEGER; flags: WORDSET; VAR to: ARRAY   OF SYSTEM.BYTE; tolen: INTEGER): INTEGER;
+		sendto-: PROCEDURE {WINAPI} (s: Socket; CONST buf: ARRAY   OF SYSTEM.BYTE; len: INTEGER; flags: INTEGERSET; VAR to: ARRAY   OF SYSTEM.BYTE; tolen: INTEGER): INTEGER;
 
 		(** The Windows Sockets setsockopt function sets a socket option. *)
 		setsockopt-: PROCEDURE {WINAPI} (s: Socket; level, optname: INTEGER; VAR optval: ARRAY   OF SYSTEM.BYTE; optlen: INTEGER): INTEGER;

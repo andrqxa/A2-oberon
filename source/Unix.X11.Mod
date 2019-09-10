@@ -161,7 +161,7 @@ TYPE
 				window*, root*, subwindow*: Window;
 				time*: Time;
 				x*, y*, xRoot*, yRoot*: INTEGER;
-				state*: WORDSET;
+				state*: INTEGERSET;
 				keycode*: INTEGER;
 				sameScreen: Bool
 			END;
@@ -861,7 +861,7 @@ VAR
 	LookupString-:			PROCEDURE {C} ( VAR event: KeyEvent;  VAR buf: ARRAY OF CHAR;  bufsize: INTEGER;
 													VAR keysym: KeySym;  VAR cstat: ComposeStatus ): INTEGER;
 	QueryPointer-:			PROCEDURE {C} ( d: DisplayPtr;  w: Window;  VAR rw, cw: Window;
-													VAR xr, yr, xw, yw: INTEGER; VAR keysButtons: WORDSET );
+													VAR xr, yr, xw, yw: INTEGER; VAR keysButtons: INTEGERSET );
 	RefreshKeyboardMapping-:
 								PROCEDURE {C} ( event: ADDRESS );
 	Bell-:						PROCEDURE {C} ( d: DisplayPtr;  percent: INTEGER );
