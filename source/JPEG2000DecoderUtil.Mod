@@ -9,11 +9,11 @@ MODULE JPEG2000DecoderUtil;
 	CONST
 
 		(* Number of bits used to represent a SIGNED32 *)
-		LONGINT_BITS* = SYSTEM.VAL(SIGNED32, SIZEOF(SIGNED32) * 8);
+		LONGINT_BITS* = SIGNED32(SIZEOF(SIGNED32) * 8);
 		(* Mask to set / test for the sign bit of a SIGNED32, i.e. the MSB of a SIGNED32 register *)
 		LONGINT_SIGN_BIT* = {LONGINT_BITS - 1};
 
-		SWAP_MASK* = SYSTEM.VAL(SIGNED32, -1);
+		SWAP_MASK* = SIGNED32(-1);
 
 		(* --- Subband types --- *)
 		SUB_LL*	= 0;
@@ -140,7 +140,7 @@ MODULE JPEG2000DecoderUtil;
 				BEGIN
 					IF curBytePos =  0 THEN
 						(* Do bit unstuffing? *)
-						IF SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, curByte) * {0..7}) = 0FFH THEN
+						IF SIGNED32(SET(curByte) * {0..7}) = 0FFH THEN
 							curBytePos := 7;
 						ELSE
 							curBytePos := 8;
@@ -150,8 +150,7 @@ MODULE JPEG2000DecoderUtil;
 
 					DEC(curBytePos);
 
-					RETURN SYSTEM.VAL(SIGNED32,
-											SYSTEM.VAL(SET, LSH(curByte, -curBytePos))
+					RETURN SIGNED32(SET(LSH(curByte, -curBytePos))
 											* {0}
 										);
 			END NextBit;
@@ -187,7 +186,7 @@ MODULE JPEG2000DecoderUtil;
 						alternating sequence of 0's and 1's, starting with a 0
 					*)
 					IF curBytePos > 0 THEN
-						seq := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, curByte) * SYSTEM.VAL(SET, LSH(1, curBytePos) - 1));
+						seq := SIGNED32(SET(curByte) * SET(LSH(1, curBytePos) - 1));
 
 						IF seq # LSH(55H, curBytePos - 8) THEN
 							RETURN FALSE;
@@ -345,8 +344,8 @@ MODULE JPEG2000DecoderUtil;
 							nodes[i][j].valid := FALSE;
 						END;
 
-						x := LSH(x, -1) + SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, x) * {0});
-						y := LSH(y, -1) + SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, y) * {0});
+						x := LSH(x, -1) + SIGNED32(SET(x) * {0});
+						y := LSH(y, -1) + SIGNED32(SET(y) * {0});
 					END;
 
 					SELF.src := src;

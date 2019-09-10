@@ -194,7 +194,7 @@ IMPORT
 	BEGIN  R.sym.RawNum(i)  END SymWNum;
 
 	PROCEDURE SymWSet*(VAR R: Rider; s: SET);
-	BEGIN  R.sym.RawNum(SYSTEM.VAL(SIGNED32, s))  END SymWSet;
+	BEGIN  R.sym.RawNum(SIGNED32( s))  END SymWSet;
 
 	PROCEDURE SymWString*(VAR R: Rider; CONST str: ARRAY OF CHAR);
 	BEGIN  WriteString(R.sym, str)  END SymWString;

@@ -947,7 +947,7 @@ TYPE
 		END EmitCall;
 
 		PROCEDURE GetImmediate32(val: SIGNED32; CONST reg: InstructionSet.Operand; emit: BOOLEAN): SIGNED32;
-		VAR ops: SIGNED32; set: SET;
+		VAR ops: SIGNED32; set: SET32;
 
 			PROCEDURE Add(val,pos: SIGNED32; VAR first: BOOLEAN): SIGNED32;
 			VAR imm: InstructionSet.Operand; ops: SIGNED32; op: InstructionSet.Operand;
@@ -997,7 +997,7 @@ TYPE
 			END Compute;
 
 		BEGIN
-			set := SYSTEM.VAL(SET,val);
+			set := SYSTEM.VAL(SET32,val);
 			ops := Compute(set);
 			RETURN ops
 		END GetImmediate32;

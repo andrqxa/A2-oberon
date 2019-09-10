@@ -1696,7 +1696,7 @@ TYPE
 						(* negative difference: invert all bits and make number negative *)
 						tmp := stream.GetBits(size);
 						IF tmp < 0 THEN hasMoreFrames := FALSE; RETURN FALSE END;
-						dcDiff := -(SYSTEM.VAL(SIGNED16, ((-SYSTEM.VAL(SET, tmp)) * {0..(size-1)})));
+						dcDiff := -(SIGNED16 ((-SET(tmp) * {0..(size-1)})));
 					ELSE
 						(* positive difference *)
 						dcDiff := stream.GetBits(size);
@@ -1817,7 +1817,7 @@ TYPE
 						(* negative difference: invert all bits and make number negative *)
 						bits := stream.GetBits(size);
 						IF bits < 0 THEN hasMoreFrames := FALSE; RETURN FALSE END;
-						dcDiff := -(SYSTEM.VAL(SIGNED16, ((-SYSTEM.VAL(SET, bits)) * {0..(size-1)})));
+						dcDiff := -(SIGNED16((-SET(bits)) * {0..(size-1)}));
 					ELSE
 						(* positive difference *)
 						dcDiff := stream.GetBits(size);

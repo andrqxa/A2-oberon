@@ -2517,11 +2517,11 @@ TYPE
 	END Matches;
 
 	PROCEDURE ValueInByteRange (value: SIGNED64): BOOLEAN;
-	BEGIN RETURN SYSTEM.VAL (SIGNED8, value) = value
+	BEGIN RETURN SIGNED8(value) = value
 	END ValueInByteRange;
 
 	PROCEDURE ValueInWordRange (value: SIGNED64): BOOLEAN;
-	BEGIN RETURN SYSTEM.VAL (SIGNED16, value) = value
+	BEGIN RETURN SIGNED16(value) = value
 	END ValueInWordRange;
 
 	PROCEDURE InitOperand*(VAR operand: Operand);

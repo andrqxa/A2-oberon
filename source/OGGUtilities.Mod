@@ -369,7 +369,7 @@ TYPE
 			i := 0; split := 16; (* every 'split' elements make a line break *)
 			cur := SELF.start;
 			String("-> List <-");
-			Var("list-length", SYSTEM.VAL(SIGNED32,length));
+			Var("list-length", SIGNED32(length));
 			WHILE (cur # NIL) DO
 				IF (~(i = 0) & (i MOD split = 0)) THEN w.Ln END;
 				cur.Print;

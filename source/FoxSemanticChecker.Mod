@@ -1833,7 +1833,7 @@ TYPE
 					result := SyntaxTree.NewSetValue(expression.position,SYSTEM.VAL(Basic.Set,int));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.CharacterType) OR (type IS SyntaxTree.ByteType) THEN
-					result := SyntaxTree.NewCharacterValue(expression.position,SYSTEM.VAL(CHAR,int));
+					result := SyntaxTree.NewCharacterValue(expression.position,CHR(int));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.EnumerationType) THEN
 					result := SyntaxTree.NewEnumerationValue(expression.position,int);
@@ -1881,11 +1881,11 @@ TYPE
 					result := SyntaxTree.invalidExpression;
 				END
 			ELSIF IsSetValue(expression,set) THEN
-				IF (type IS SyntaxTree.IntegerType) THEN
+				IF IsIntegerType(type) THEN
 					result := SyntaxTree.NewIntegerValue(expression.position,SYSTEM.VAL(Basic.Integer,set));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.CharacterType) OR (type IS SyntaxTree.ByteType) THEN (* for example: possible via ch = CHR(SYSTEM.VAL(Basic.Integer,set)) *)
-					result := SyntaxTree.NewCharacterValue(expression.position,SYSTEM.VAL(CHAR,set));
+					result := SyntaxTree.NewCharacterValue(expression.position,SYSTEM.VAL(CHAR,SET8(set)));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.PortType) THEN
 					result := ConvertValue(position, expression, Global.Signed16);
@@ -1917,7 +1917,7 @@ TYPE
 					result := SyntaxTree.NewCharacterValue(expression.position,char);
 					result.SetType(type)
 				ELSIF (type IS SyntaxTree.IntegerType) THEN
-					result := SyntaxTree.NewIntegerValue(expression.position,SYSTEM.VAL(Basic.Integer,char));
+					result := SyntaxTree.NewIntegerValue(expression.position,ORD(char));
 					result.SetType(type);
 				ELSIF (type IS SyntaxTree.SetType) THEN
 					result := SyntaxTree.NewSetValue(expression.position,SYSTEM.VAL(Basic.Set,Basic.Integer(ORD(char))));
@@ -4804,36 +4804,6 @@ TYPE
 					ELSE
 						type := SyntaxTree.invalidType;
 					END;
-				(* ---- ASH, ASR ----- *)
-				ELSIF ((id = Global.Ash) OR (id= Global.Asr)) & CheckArity(2,2) THEN
-					type := type0;
-					IF CheckIntegerType(parameter0) & CheckIntegerType(parameter1) THEN
-						(*
-						ConvertOperands(parameter0,parameter1); (* same type *)
-						*)
-
-						type := parameter0.type;
-						IF IsIntegerValue(parameter0,i0) THEN
-							IF IsIntegerValue(parameter1,i1) THEN
-								IF id = Global.Ash THEN i0 := ASH(i0,i1) ELSE i0 := ASR(i0,i1) END;
-								result.SetResolved(SyntaxTree.NewIntegerValue(position,i0));
-								result := ResolveExpression(result);
-								type := Global.GetIntegerType(system,i0);
-							END;
-						END;
-
-						IF type.resolved.sizeInBits < 32 THEN
-							type := Global.Signed32;
-						END;
-
-						(*!compatibility with release, remove when resolved
-							critical in release : SHORT(ASH(..))), ASH(ORD(..))
-						*)
-						parameter1 := NewConversion(parameter1.position,parameter1,Global.Signed32,NIL);
-						parameter0 := NewConversion(parameter0.position,parameter0,type,NIL);
-						actualParameters.SetExpression(0,parameter0);
-						actualParameters.SetExpression(1,parameter1);
-					END;
 				(* ---- CAP ----- *)
 				ELSIF (id = Global.Cap) & CheckArity(1,1) THEN
 					type := system.characterType;
@@ -5270,21 +5240,53 @@ TYPE
 						parameter0 := NewConversion(Basic.invalidPosition,parameter0,system.addressType,NIL);
 						actualParameters.SetExpression(0,parameter0);
 					END;
-				(* ---- LSH, LSL, ROT, ROR ----- *)
-				ELSIF ((id = Global.Lsh) OR (id = Global.Rot) OR (id= Global.Ror)) & CheckArity(2,2) THEN
+				(* ---- LSH, ROT, ASH ----- *)
+				ELSIF ((id = Global.Lsh) OR (id = Global.Rot) OR (id = Global.Ash)
+					OR (id = Global.Shl) OR (id = Global.Shr) OR (id = Global.Ror) OR (id = Global.Rol)
+				) & CheckArity(2,2) THEN
 					type := type0;
 
-					parameter1 := NewConversion(parameter1.position,parameter1,Global.Signed32,NIL);
-					actualParameters.SetExpression(1, parameter1);
+					IF (id # Global.Ash) OR CheckIntegerType(parameter0) & CheckIntegerType(parameter1) THEN 
+						parameter1 := NewConversion(parameter1.position,parameter1,Global.Signed32,NIL);
+						actualParameters.SetExpression(1, parameter1);
 
-					IF IsIntegerValue(parameter0,i0) & IsIntegerValue(parameter1,i1) THEN
-						IF id = Global.Lsh THEN
-							result.SetResolved(SyntaxTree.NewIntegerValue(position,LSH(i0,i1)));
-						ELSIF id = Global.Rot THEN
-							result.SetResolved(SyntaxTree.NewIntegerValue(position,ROT(i0,i1)));
-						ELSIF id = Global.Ror THEN
-							result.SetResolved(SyntaxTree.NewIntegerValue(position,ROR(i0,i1)));
+						IF IsIntegerValue(parameter1,i1) & (i1 < 0) THEN
+							IF (id = Global.Shl) OR (id = Global.Shr) OR (id = Global.Rol) OR (id = Global.Ror) THEN
+								Error(parameter1.position,"must not be negative");
+							END; 
+						END; 
+
+						IF IsIntegerValue(parameter0,i0) & IsIntegerValue(parameter1,i1) THEN
+							IF id = Global.Lsh THEN
+								result.SetResolved(SyntaxTree.NewIntegerValue(position,LSH(i0,i1)));
+							ELSIF id = Global.Rot THEN
+								result.SetResolved(SyntaxTree.NewIntegerValue(position,ROT(i0,i1)));
+							ELSIF id = Global.Ash THEN
+								result.SetResolved(SyntaxTree.NewIntegerValue(position,ASH(i0,i1)));
+								result := ResolveExpression(result);
+								type := Global.GetIntegerType(system,i0);
+							ELSIF id = Global.Shl THEN
+								result.SetResolved(SyntaxTree.NewIntegerValue(position,SHL(i0,i1)));
+							ELSIF id = Global.Shr THEN
+								result.SetResolved(SyntaxTree.NewIntegerValue(position,SHR(i0,i1)));					
+							ELSIF id = Global.Rol THEN
+								result.SetResolved(SyntaxTree.NewIntegerValue(position,ROL(i0,i1)));
+							ELSIF id = Global.Ror THEN
+								result.SetResolved(SyntaxTree.NewIntegerValue(position,ROR(i0,i1)));					
+							END;
 						END;
+						IF id = Global.Ash THEN
+							IF type.resolved.sizeInBits < 32 THEN
+								type := Global.Signed32;
+							END;
+							(*!compatibility with release, remove when resolved
+								critical in release : SHORT(ASH(..))), ASH(ORD(..))
+							*)
+							parameter1 := NewConversion(parameter1.position,parameter1,Global.Signed32,NIL);
+							parameter0 := NewConversion(parameter0.position,parameter0,type,NIL);
+							actualParameters.SetExpression(0,parameter0);
+							actualParameters.SetExpression(1,parameter1);
+						END; 
 					END;
 				(* ---- SYSTEM.VAL ----- *)
 				ELSIF (id = Global.systemVal) & CheckArity(2,2) THEN
@@ -5294,6 +5296,9 @@ TYPE
 							result := SyntaxTree.invalidExpression;
 							Error(parameter0.position,"is no basic type");
 						ELSE
+							IF (system.SizeOf(parameter1.type) # system.SizeOf(type)) & (IsBasicType(parameter1.type) OR IsBasicType(type)) THEN
+								Warning(parameter0.position,"types do not have the same size");
+							END;
 							IF (parameter1.resolved # NIL) THEN
 								parameter0 := ConvertValue(parameter1.position,parameter1.resolved,type);
 								IF parameter0 IS SyntaxTree.Value THEN
@@ -5496,9 +5501,9 @@ TYPE
 								REPEAT value := 2 * value; DEC(i1) UNTIL value >= 800000H;
 							END;
 							value := (i1 + 127)*800000H - 800000H + value;
-							IF i0 < 0 THEN value := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, value) + {31}); END;
+							IF i0 < 0 THEN value := SYSTEM.VAL(Basic.Integer, SYSTEM.VAL(Basic.Set, value) + {31}); END;
 						END;
-						result.SetResolved(SyntaxTree.NewRealValue(position, SYSTEM.VAL(FLOAT32, value), Scanner.None));
+						result.SetResolved(SyntaxTree.NewRealValue(position, SYSTEM.VAL(Basic.Real, value), Scanner.None));
 					END;
 				(* ------- CONNECT -------*)
 				ELSIF (id = Global.Connect) & (CheckArity(2,3)) THEN
@@ -5689,10 +5694,20 @@ TYPE
 						expression := parameters.GetExpression(0);
 						type := typeDeclaration.declaredType.resolved;
 						expressionType := BaseType(expression.type); (* type or base type of math array, if applicable *)
-						IF ((type IS SyntaxTree.NumberType) OR (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.SizeType)) &
-							((expressionType IS SyntaxTree.NumberType) OR (expressionType IS SyntaxTree.AddressType) OR (expressionType IS SyntaxTree.SizeType)
-							OR (expressionType IS SyntaxTree.EnumerationType)
-							) OR ((type IS SyntaxTree.SetType) & (expressionType IS SyntaxTree.SetType)) THEN
+						IF (IsNumberType(type)) &
+							(
+								(expressionType IS SyntaxTree.NumberType) OR (expressionType IS SyntaxTree.AddressType) OR (expressionType IS SyntaxTree.SizeType) 
+								OR (expressionType IS SyntaxTree.EnumerationType) OR (expressionType IS SyntaxTree.SetType)
+							) 
+								OR 
+							(
+								(type IS SyntaxTree.SetType) & 
+								((expressionType IS SyntaxTree.SetType) OR IsIntegerType(expressionType))
+							)
+								OR
+							(type IS SyntaxTree.AddressType) & 
+							((expressionType IS SyntaxTree.ProcedureType) OR IsPointerType(expressionType))
+						THEN
 							IF ((type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.IntegerType) & (~type(SyntaxTree.IntegerType).signed)) & (expressionType IS SyntaxTree.FloatType) THEN
 								Error(left.position,"invalid unsigned type in explicit conversion");
 							ELSE
@@ -6689,6 +6704,53 @@ TYPE
 			IF error THEN error := FALSE; RETURN FALSE ELSE RETURN TRUE END;
 		END AddImport;
 
+		PROCEDURE GetImportModuleName(x: SyntaxTree.Import): SyntaxTree.Identifier;
+		VAR i: SIZE;
+			printer: Printout.Printer;
+			stringWriter: Streams.StringWriter;
+			name: Basic.SectionName;
+			expression: SyntaxTree.Expression;
+			symbol: SyntaxTree.Symbol;
+			typeDeclaration: SyntaxTree.TypeDeclaration;
+		BEGIN
+		    IF x.module # NIL THEN
+		        RETURN x.module.name;           
+		    ELSE
+					NEW(stringWriter, LEN(name)); 
+					NEW(printer, stringWriter, Printout.SymbolFile, FALSE);
+		       	
+		       	Basic.GetString(x.moduleName, name);
+					stringWriter.String(name); 
+					stringWriter.String("(");
+		        FOR i := 0 TO x.parameters.Length()-1 DO
+		            IF i > 0 THEN stringWriter.String(",") END;
+		            expression := x.parameters.GetExpression(i);
+		            WITH expression: SyntaxTree.SymbolDesignator DO
+		                symbol := expression.symbol;
+		                WITH symbol: SyntaxTree.TypeDeclaration DO
+		                    typeDeclaration := symbol.declaredType.resolved.typeDeclaration;
+		                    IF typeDeclaration = NIL THEN
+		                        printer.Type(symbol.declaredType.resolved);
+		                    ELSE
+		                        Global.GetSymbolName(typeDeclaration, name);
+		                        ReplaceCharacter(name,".","_");
+		                        stringWriter.String(name);
+		                    END
+		                | SyntaxTree.Constant DO Error(expression.position,"not yet implemented");
+		                | SyntaxTree.Procedure DO
+		                    Global.GetSymbolName(symbol, name);
+		                    stringWriter.String(name);
+		                END;
+		            ELSE
+		            END;
+		        END;
+		        stringWriter.String(")");
+		        stringWriter.Get(name);
+		        ReplaceCharacter(name,".","_");
+		    END;
+		    RETURN SyntaxTree.NewIdentifier(name);
+		END GetImportModuleName;
+  
 		PROCEDURE ResolveTemplateImport(x: SyntaxTree.Import);
 		VAR
 			checker: Checker;
@@ -6700,13 +6762,22 @@ TYPE
 			filename: FileName;
 			module: SyntaxTree.Module;
 			parameter: SyntaxTree.TemplateParameter;
-			name: Basic.SectionName;
 			import: SyntaxTree.Import;
-			stringWriter: Streams.StringWriter;
-			printer: Printout.Printer;
+			identifier: SyntaxTree.Identifier;
 		BEGIN
 			IF ExpressionList(x.parameters) THEN (* resolve all symbols *) END;
 
+			IF x.module # NIL THEN
+				RETURN
+			END;
+			identifier := GetImportModuleName(x);
+			IF importCache # NIL THEN
+				import := importCache.ImportByModuleName(identifier,x.context);
+				IF import # NIL THEN 
+					x.SetModule(import.module);
+					RETURN;
+				END 
+			END;
 			Global.ModuleFileName(x.moduleName,x.context,filename);
 
 			IF symbolFileFormat # NIL THEN
@@ -6717,12 +6788,6 @@ TYPE
 				import.SetModule(SELF.module);
 				module.moduleScope.AddImport(import);
 				import.SetState(SyntaxTree.Resolved);
-				module.GetName(name);
-
-				NEW(stringWriter, LEN(name));
-				NEW(printer, stringWriter, Printout.SymbolFile, FALSE);
-				stringWriter.String(name);
-				stringWriter.String("(");
 
 				IF module = NIL THEN
 					Error(x.position, "module could not be imported: parser errors");
@@ -6732,27 +6797,17 @@ TYPE
 					Error(x.position,"numbers of template parameters do not match");
 				ELSE
 					FOR i := 0 TO module.parameters.Length()-1 DO
-						IF i > 0 THEN stringWriter.String(",") END;
 						parameter := module.parameters.Get(i);
 						expression := x.parameters.GetExpression(i);
 						WITH expression: SyntaxTree.SymbolDesignator DO
 							symbol := expression.symbol;
 							WITH symbol: SyntaxTree.TypeDeclaration DO
-								TRACE(symbol.declaredType,symbol.declaredType.typeDeclaration);
 								typeDeclaration := SyntaxTree.NewTypeDeclaration(expression.position,parameter.identifier);
 								typeDeclaration.SetDeclaredType(symbol.declaredType);
 								module.moduleScope.AddTypeDeclaration(typeDeclaration);
 								IF parameter.type # SyntaxTree.TemplateType.Type THEN
 									Error(expression.position,"passed type where no type is expected");
 								END;
-								typeDeclaration := symbol.declaredType.resolved.typeDeclaration;
-								IF typeDeclaration = NIL THEN
-									printer.Type(symbol.declaredType.resolved);
-								ELSE
-									Global.GetSymbolName(typeDeclaration, name);
-									ReplaceCharacter(name,".","_");
-									stringWriter.String(name);
-								END
 							| SyntaxTree.Constant DO Error(expression.position,"not yet implemented");
 							| SyntaxTree.Procedure DO
 								constDeclaration := SyntaxTree.NewConstant(expression.position, parameter.identifier);
@@ -6761,9 +6816,6 @@ TYPE
 								IF parameter.type # SyntaxTree.TemplateType.Const THEN
 									Error(expression.position,"passed procedure where no constant is expected");
 								END;
-								Global.GetSymbolName(symbol, name);
-								ReplaceCharacter(name,".","_");
-								stringWriter.String(name);
 							ELSE
 								Printout.Info("expression", expression);
 							END;
@@ -6774,11 +6826,15 @@ TYPE
 					END;
 					checker := NewChecker(diagnostics,VerboseErrorMessage,cooperative,system,symbolFileFormat,importCache,"");
 					ASSERT(SELF.module.moduleScope # NIL);
-					stringWriter.String(")");
-					stringWriter.Get(name);
-					module.SetName(SyntaxTree.NewIdentifier(name));
+					module.SetName(identifier); 
 					module.SetScope(SELF.module.moduleScope);
 					checker.Module(module);
+					IF importCache # NIL THEN
+						import := SyntaxTree.NewImport(Basic.invalidPosition,module.name,module.name,FALSE);
+						import.SetContext(x.context);
+						import.SetModule(module);
+						importCache.AddImport(import);
+					END;
 					IF checker.error THEN
 						Error(x.position,"semantic errors when importing module");
 					ELSE
@@ -7318,8 +7374,9 @@ TYPE
 				type := expression.type;
 			ELSIF IsCharacterType(type) THEN
 			ELSIF IsEnumerationType(type) THEN
+			ELSIF IsSetType(type) THEN
 			ELSE
-				Error(caseStatement.variable.position,"variable must be integer or character type");
+				Error(caseStatement.variable.position,"variable must be integer, enum, set or character type");
 				expression := SyntaxTree.invalidExpression;
 			END;
 			caseStatement.SetVariable(expression);
@@ -8910,29 +8967,45 @@ TYPE
 
 	PROCEDURE IsIntegerType*(type: SyntaxTree.Type): BOOLEAN;
 	BEGIN
-		RETURN (type # NIL) & ((type IS SyntaxTree.IntegerType) OR (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.SizeType))
+		IF type = NIL THEN RETURN FALSE END; 
+		type := type.resolved; 
+		RETURN (type IS SyntaxTree.IntegerType) OR (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.SizeType);
 	END IsIntegerType;
+	
+	PROCEDURE IsNumberType*(type: SyntaxTree.Type): BOOLEAN;
+	BEGIN
+		IF type = NIL THEN RETURN FALSE END; 
+		type := type.resolved; 
+		RETURN (type IS SyntaxTree.NumberType) OR (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.SizeType);
+	END IsNumberType;
 
 	PROCEDURE IsAddressType*(type: SyntaxTree.Type; addressWidth: SIGNED32): BOOLEAN;
 	BEGIN
-		RETURN (type # NIL) & ((type IS SyntaxTree.IntegerType) & (type(SyntaxTree.IntegerType).sizeInBits <= addressWidth)
+		IF type = NIL THEN RETURN FALSE END; 
+		type := type.resolved; 
+		RETURN (type IS SyntaxTree.IntegerType) & (type(SyntaxTree.IntegerType).sizeInBits <= addressWidth)
 					OR (type IS SyntaxTree.AddressType) OR (type IS SyntaxTree.SizeType)
-					OR IsPointerType(type)
-					)
+					OR IsPointerType(type);
 	END IsAddressType;
 
 	PROCEDURE IsSizeType(type: SyntaxTree.Type; addressWidth: SIGNED32): BOOLEAN;
 	BEGIN
-		RETURN (type # NIL) & ((type.resolved IS SyntaxTree.IntegerType) & (type.resolved(SyntaxTree.IntegerType).sizeInBits <= addressWidth) OR (type.resolved IS SyntaxTree.SizeType))
+		IF type = NIL THEN RETURN FALSE END; 
+		type := type.resolved; 
+		RETURN (type # NIL) & ((type IS SyntaxTree.IntegerType) & (type.resolved(SyntaxTree.IntegerType).sizeInBits <= addressWidth) OR (type.resolved IS SyntaxTree.SizeType))
 	END IsSizeType;
 
 	PROCEDURE IsSignedIntegerType*(type: SyntaxTree.Type): BOOLEAN;
 	BEGIN
+		IF type = NIL THEN RETURN FALSE END; 
+		type := type.resolved; 
 		RETURN (type # NIL) & (type IS SyntaxTree.IntegerType) & type(SyntaxTree.IntegerType).signed
 	END IsSignedIntegerType;
 
 	PROCEDURE IsUnsignedIntegerType*(type: SyntaxTree.Type): BOOLEAN;
 	BEGIN
+		IF type = NIL THEN RETURN FALSE END; 
+		type := type.resolved; 
 		RETURN (type # NIL) & (type IS SyntaxTree.IntegerType) & ~type(SyntaxTree.IntegerType).signed
 	END IsUnsignedIntegerType;
 
@@ -9214,6 +9287,12 @@ TYPE
 		type := type.resolved;
 		RETURN (type IS SyntaxTree.CharacterType) OR (type IS SyntaxTree.ByteType) OR (type IS SyntaxTree.StringType) & (type(SyntaxTree.StringType).length = 2)
 	END IsCharacterType;
+	
+	PROCEDURE IsSetType*(type: SyntaxTree.Type):BOOLEAN;
+	BEGIN
+		IF type = NIL THEN RETURN FALSE END;
+		RETURN type.resolved IS SyntaxTree.SetType; 
+	END IsSetType;
 
 	PROCEDURE IsEnumerationType*(type: SyntaxTree.Type):BOOLEAN;
 	BEGIN

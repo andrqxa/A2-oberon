@@ -898,7 +898,7 @@ Statements
 					Byte..LInt, NilTyp, Pointer:
 						z.mode := Con; z.adr := con.intval
 				  | Set:
-						z.mode := Con; z.adr := SYSTEM.VAL (SIGNED32, con.setval)
+						z.mode := Con; z.adr := SIGNED32(con.setval)
 				  | String:
 						AllocConst (con.ext^, con.intval2, 4);
 						z.mode := Abs; z.adr := con.intval; z.offs := con.intval2 (* length *); z.inx := OPL.none

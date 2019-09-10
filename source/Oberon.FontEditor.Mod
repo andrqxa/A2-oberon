@@ -86,7 +86,7 @@ PROCEDURE Get(F: Font; beg, w, x, y: SIGNED32): BOOLEAN;
 VAR ch: SIGNED16; s: SET;
 BEGIN
 	ch := ORD(F.raster[beg + w * y + x DIV 8]);
-	s := SYSTEM.VAL(SET, ch);
+	s := SET(ch);
 	RETURN x MOD 8 IN s
 END Get;
 
@@ -95,11 +95,11 @@ PROCEDURE Put(F: Font; beg, w, x, y: SIGNED32; b: BOOLEAN);
 VAR ch: SIGNED16; s: SET;
 BEGIN
 	ch := ORD(F.raster[beg+w * y + x DIV 8]);
-	s := SYSTEM.VAL(SET, ch);
+	s := SET(ch);
 	IF b THEN s := s + {x MOD 8}
 	ELSE s := s - {x MOD 8}
 	END;
-	F.raster[beg+w * y + x DIV 8] := SYSTEM.VAL(CHAR, s);
+	F.raster[beg+w * y + x DIV 8] := CHR(SIGNED32(s));
 END Put;
 
 PROCEDURE CharOrg(F: Font; VAR x0, y0: SIGNED16);

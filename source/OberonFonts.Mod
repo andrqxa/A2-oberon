@@ -35,7 +35,7 @@ TYPE
 			WHILE n > 0 DO
 				ASSERT( (data.adr <= a) & (a < data.adr + data.len), 110 );
 				S.GET( a, byte );
-				S.PUT( a, CHR( S.VAL(SIGNED32, S.VAL(SET, LONG(ORD( byte ))) + mask)) );
+				S.PUT( a, CHR( SIGNED32(SET(ORD( byte )) + mask)) );
 				DEC( n ); INC( a, data.bpr )
 			END;
 			IF x0 < x1 THEN
@@ -55,7 +55,7 @@ TYPE
 					WHILE n > 0 DO
 						ASSERT( (data.adr <= a) & (a < data.adr + data.len), 112 );
 						S.GET( a, byte );
-						S.PUT( a, CHR( S.VAL(SIGNED32, S.VAL(SET, LONG(ORD( byte ))) + mask)));
+						S.PUT( a, CHR( SIGNED32(SET(ORD( byte )) + mask)));
 						DEC( n ); INC( a, data.bpr )
 					END
 				END

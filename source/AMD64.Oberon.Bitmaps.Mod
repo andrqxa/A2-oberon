@@ -52,7 +52,7 @@ VAR adr: ADDRESS; size: SIGNED32;
 BEGIN
 	size := B.size;  adr := B.address;
 	WHILE size >= 4 DO
-		SYSTEM.PUT(adr, SYSTEM.VAL(SIGNED32, 0));
+		SYSTEM.PUT(adr, SIGNED32(0));
 		INC(adr, 4);  DEC(size, 4)
 	END;
 	WHILE size > 0 DO SYSTEM.PUT(adr, 0X);  INC(adr);  DEC(size) END
@@ -65,8 +65,8 @@ BEGIN
 	INC(adr, B.address);
 	IF mode = Display.invert THEN
 		SYSTEM.GET(adr, ch);
-		SYSTEM.PUT(adr, CHR(SYSTEM.VAL(SIGNED32,
-				SYSTEM.VAL(SET, LONG(ORD(ch))) / SYSTEM.VAL(SET, LONG(col)))))
+		SYSTEM.PUT(adr, CHR(SIGNED32(
+				SET(ORD(ch)) / SET(col))))
 	ELSE
 		SYSTEM.PUT(adr, CHR(col))
 	END
@@ -122,7 +122,7 @@ BEGIN	(* only the destination block is clipped *)
 END CopyBlock;
 
 PROCEDURE CopyPattern0(ofs: SIGNED32; src, dst: ADDRESS; w, col, mode: SIGNED32);
-VAR ch: CHAR;  m, i: SIGNED32;  s: SET;
+VAR ch: CHAR;  m, i: SIGNED32;  s: SET; 
 BEGIN
 	IF mode = Display.invert THEN
 		REPEAT	(* loop over w pixels *)
@@ -132,8 +132,9 @@ BEGIN
 			IF m > ofs+w THEN m := ofs+w END;
 			REPEAT	(* loop over bits *)
 				IF ODD(ASH(ORD(ch), -i)) THEN	(* pixel on *)
-					SYSTEM.GET(dst, SYSTEM.VAL(CHAR, s));
-					SYSTEM.PUT(dst, CHR(SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, col) / s)))
+					SYSTEM.GET(dst, ch);
+					s := SET(ORD(ch));
+					SYSTEM.PUT(dst, CHR(SIGNED32(SET(col) / s)))
 				END;
 				INC(dst);  INC(i)
 			UNTIL i = m;
@@ -208,15 +209,16 @@ BEGIN
 END CopyPattern;
 
 PROCEDURE ReplConst*(B: Bitmap; col, X, Y, W, H, mode: SIGNED16);
-VAR addr, addr0: ADDRESS; pat, w: SIGNED32; s: SET;
+VAR addr, addr0: ADDRESS; pat, w: SIGNED32; s: SET; c: CHAR;
 BEGIN
 	addr := B.address + B.wth*Y + X;
 	pat := col + ASH(col, 8) + ASH(col, 16) + ASH(col, 24);
 	IF mode = Display.invert THEN
 		WHILE H > 0 DO w := W; addr0 := addr;
 			WHILE w # 0 DO
-				SYSTEM.GET(addr0, SYSTEM.VAL(CHAR,s));
-				SYSTEM.PUT(addr0, CHR(SYSTEM.VAL(SIGNED32, s/SYSTEM.VAL(SET, col))));
+				SYSTEM.GET(addr0, c);
+				s := SET(ORD(c));
+				SYSTEM.PUT(addr0, CHR(SIGNED32(s/SET(col))));
 				DEC(w); INC(addr0)
 			END;
 			INC(addr, B.wth); DEC(H)
@@ -230,7 +232,7 @@ BEGIN
 END ReplConst;
 
 PROCEDURE FillPattern0(ofs: SIGNED32; src, dst: ADDRESS; w, pw, col, mode: SIGNED32);
-VAR ch: CHAR;  m, i: SIGNED32; src0: ADDRESS; left: SIGNED32;  s: SET;
+VAR ch: CHAR;  m, i: SIGNED32; src0: ADDRESS; left: SIGNED32;  s: SET; c: CHAR;
 BEGIN
 	left := pw-ofs;	(* pixels left to do in pattern *)
 	src0 := src;  INC(src, ofs DIV 8);  ofs := ofs MOD 8;	(* start position *)
@@ -243,8 +245,9 @@ BEGIN
 			IF m > ofs+w THEN m := ofs+w END;	(* max w times *)
 			REPEAT	(* loop over bits *)
 				IF ODD(ASH(ORD(ch), -i)) THEN	(* pixel on *)
-					SYSTEM.GET(dst, SYSTEM.VAL(CHAR, s));
-					SYSTEM.PUT(dst, CHR(SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, col) / s)))
+					SYSTEM.GET(dst, c);
+					s := SET(ORD(c));
+					SYSTEM.PUT(dst, CHR(SIGNED32(SET(col) / s)))
 				END;
 				INC(dst);  INC(i)
 			UNTIL i = m;

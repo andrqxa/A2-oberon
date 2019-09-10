@@ -1077,7 +1077,7 @@ Intel i386 :
 			GenFlags (bt, y, x);
 			SetCC (z, CS)
 		ELSE
-			x.adr := LSH(SYSTEM.VAL(SIGNED32, 1), x.adr);  x.typ := OPT.linttyp;
+			x.adr := LSH(SIGNED32(1), x.adr);  x.typ := OPT.linttyp;
 			GenFlags (test, y, x);
 			SetCC (z, NE)	(*jump on ZF flag*)
 		END
@@ -1505,9 +1505,9 @@ Intel i386 :
 						MakeCon (z, x.typ, 0);
 						CASE x.typ.form OF
 							Byte, Char, SInt:
-								z.adr := ROT (SYSTEM.VAL (SIGNED8, x.adr), SHORT (y.adr))
+								z.adr := ROT (SIGNED8(x.adr), SHORT (y.adr))
 						  | Int:
-								z.adr := ROT (SYSTEM.VAL (SIGNED16, x.adr), SHORT (y.adr))
+								z.adr := ROT (SIGNED16(x.adr), SHORT (y.adr))
 						  | LInt:
 								z.adr := ROT ( x.adr, SHORT (y.adr))
 						END

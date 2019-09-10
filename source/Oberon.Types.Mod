@@ -23,9 +23,9 @@ END This;
 (** Return the type extension level level of type t. *)
 PROCEDURE BaseOf* (t: Type; level: SIGNED16): Type;
 BEGIN
-	S.GET(S.VAL(SIGNED32,t.tag) - 8 - 4*level, t);
+	S.GET(ADDRESS(t.tag) - 8 - 4*level, t);
 	IF t # NIL THEN
-		S.GET(S.VAL(SIGNED32, t) - 4, t)
+		S.GET(ADDRESS(t) - 4, t)
 	END;
 	RETURN t
 END BaseOf;
@@ -33,7 +33,7 @@ END BaseOf;
 (** What is the extension level of t? *)
 PROCEDURE LevelOf* (t: Type): SIGNED16;
 BEGIN
-	RETURN S.VAL(SIGNED16,t.flags-{Modules.ProtTypeBit})
+	RETURN SIGNED16(t.flags-{Modules.ProtTypeBit})
 END LevelOf;
 
 (*
@@ -47,8 +47,8 @@ END IsProtected;
 PROCEDURE TypeOf* (o: ANY): Type;
 	VAR type: Type;
 BEGIN
-	S.GET(S.VAL(SIGNED32, o)-4, type);
-	S.GET(S.VAL(SIGNED32, type)-4, type);
+	S.GET(S.VAL(ADDRESS, o)-4, type);
+	S.GET(S.VAL(ADDRESS, type)-4, type);
 	RETURN type
 END TypeOf;
 
@@ -56,9 +56,9 @@ END TypeOf;
 PROCEDURE NewObj* (VAR o: ANY; t: Type);
 	VAR otype: Type;
 BEGIN
-	S.GET(S.VAL(SIGNED32, o) - 4, otype);	(* uses compiler hack in OPC.Parameter *)
+	S.GET(S.VAL(ADDRESS,o) - 4, otype);	(* uses compiler hack in OPC.Parameter *)
 	IF BaseOf(t, LevelOf(otype)) # otype THEN o := NIL; RETURN END ;
-	Heaps.NewRec(o,S.VAL(SIGNED32,t.tag),FALSE); (* ug: only allow copying of non-realtime objects *)
+	Heaps.NewRec(o,ADDRESS(t.tag),FALSE); (* ug: only allow copying of non-realtime objects *)
 	(*
 	newRec(S.VAL(SIGNED32, o), S.VAL(SIGNED32,t.tag))
 	*)

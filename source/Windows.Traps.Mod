@@ -36,7 +36,7 @@ VAR
 					w.Char( ch )
 				END
 			END;
-			w.String( " iopl" );  w.Int( ASH( SYSTEM.VAL( SIGNED32, s * {12, 13} ), -12 ), 1 )
+			w.String( " iopl" );  w.Int( ASH( SIGNED32(s * {12, 13} ), -12 ), 1 )
 		END Flags;
 
 		PROCEDURE Val( CONST s: ARRAY OF CHAR;  val:ADDRESS );
@@ -152,14 +152,14 @@ VAR
 				Val( "EBP", int.BP );  Val( "FS", int.FS );  Val( "GS", int.GS );
 				Val( "TMR", Kernel.GetTicks());
 				#IF I386 THEN
-					IF SYSTEM.VAL( CHAR, int.DR7 ) # 0X THEN  (* some breakpoints enabled *)
+					IF UNSIGNED8(int.DR7 ) # 0 THEN  (* some breakpoints enabled *)
 						Val( "DR0", int.DR0 );  Val( "DR1", int.DR1 );  Val( "DR2", int.DR2 );  Val( "DR3", int.DR3 );  Val( "DR6", int.DR6 );
 						Val( "DR7", int.DR7 );  w.Ln
 					END;
 				#END
-				w.Ln; w.String( " FLAGS: " );  Flags( w, SYSTEM.VAL( SET, int.FLAGS ) );
+				w.Ln; w.String( " FLAGS: " );  Flags( w, SET(int.FLAGS ) );
 				w.Char( 0FX );   (* "proportional font" *)
-				w.Char( " " );  w.Set( SYSTEM.VAL( SET, int.FLAGS ) );  w.Ln;
+				w.Char( " " );  w.Set( SET(int.FLAGS ) );  w.Ln;
 				w.String(" Features="); w.Set(Machine.features); w.Set(Machine.features2); w.Ln;
 			ELSE w.Ln
 			END;

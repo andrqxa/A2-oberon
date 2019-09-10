@@ -3182,20 +3182,20 @@ END RealtimeCompatible;
 			IF PCT.IsCardinalType(exp.type) THEN  buf := con.int
 			ELSIF exp.type = PCT.Char8  THEN  buf := con.int
 			ELSIF exp.type = PCT.Float32  THEN  buf := SYSTEM.VAL(SIGNED32, SHORT(con.real))
-			ELSIF exp.type = PCT.Set  THEN  buf := SYSTEM.VAL(SIGNED32, con.set)
+			ELSIF exp.type = PCT.Set  THEN  buf := SIGNED32(con.set)
 			ELSIF exp.type = PCT.NilType  THEN  buf := PCM.nilval
 			ELSE   PCM.Error(1502, pos, "");  exp := InvalidExpr
 			END;
 
 			(* create *)
-			IF type = PCT.Int8 THEN	exp := NewIntValue(pos, SYSTEM.VAL(SIGNED8, buf), type)
-			ELSIF type = PCT.Int16  THEN	 exp := NewIntValue(pos, SYSTEM.VAL(SIGNED16, buf), type)
+			IF type = PCT.Int8 THEN	exp := NewIntValue(pos, SIGNED8(buf), type)
+			ELSIF type = PCT.Int16  THEN	 exp := NewIntValue(pos, SIGNED16( buf), type)
 			ELSIF type = PCT.Int32  THEN	exp := NewIntValue(pos, buf, type)
 			ELSIF type = PCT.Int64  THEN	exp := NewIntValue(pos, buf, type)
-			ELSIF type = PCT.Char8  THEN	exp := NewIntValue(pos, SYSTEM.VAL(SIGNED8, buf), PCT.Char8)
-			ELSIF type = PCT.Float32  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(FLOAT32, buf), PCT.Float32)
-			ELSIF type = PCT.Float64  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(FLOAT64, buf), PCT.Float64)
-			ELSIF type = PCT.Set  THEN	exp := NewSetValue(pos, SYSTEM.VAL(SET, buf))
+			ELSIF type = PCT.Char8  THEN	exp := NewIntValue(pos, SIGNED8(buf), PCT.Char8)
+			ELSIF type = PCT.Float32  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(FLOAT32, SIGNED32(buf)), PCT.Float32)
+			ELSIF type = PCT.Float64  THEN	exp := NewFloatValue(pos, SYSTEM.VAL(FLOAT64, SIGNED64(buf)), PCT.Float64)
+			ELSIF type = PCT.Set  THEN	exp := NewSetValue(pos, SET(buf))
 			ELSIF ptr THEN  exp := NewIntValue(pos, buf, type)
 			ELSE   PCM.Error(1503, pos, "");  exp := InvalidExpr
 			END

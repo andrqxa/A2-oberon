@@ -648,11 +648,11 @@ VAR i, k, crc: SIGNED32;
 BEGIN
 	crc := 0; i := 0;
 	WHILE i < len DO
-		crc := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, crc) / SYSTEM.VAL(SET, LONG(ORD(buf[i]))*LONG(100H)));
+		crc := SIGNED32(SET(crc) / SET(ORD(buf[i])*LONG(100H)));
 		k := 0;
 		WHILE k < 8 DO
-			IF (15 IN SYSTEM.VAL(SET, crc)) THEN
-				crc := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, crc*2) / SYSTEM.VAL(SET, 1021H))
+			IF 15 IN SET(crc) THEN
+				crc := SIGNED32(SET(crc*2) / SET(1021H))
 			ELSE
 				crc := crc*2
 			END;

@@ -1398,7 +1398,7 @@ ASSERT(code.data[offset-1] # 0E8X);
 							BeginBlock(W, x, blockva, blocksize, blockfix)
 						END;
 						bak := x; DEC(x, blockva);
-						W.RawInt(SHORT(x + LSH(SYSTEM.VAL(SIGNED32, ImageRelBasedHighLow), 12)));
+						W.RawInt(SHORT(x + LSH(SIGNED32(ImageRelBasedHighLow), 12)));
 						INC(blocksize, 2);
 						r := r.next
 					END;
@@ -1500,7 +1500,7 @@ KernelLog.String("PCOFPE "); KernelLog.String(file);
 				ELSE
 					HALT(99)
 				END;
-				SELF.fileHdr.Characteristics := SYSTEM.VAL(SIGNED16, s);
+				SELF.fileHdr.Characteristics := SIGNED16(s);
 				SELF.optHdr.Magic := ImageOptionalMagic;
 				SELF.optHdr.MajorLinkerVersion := MajorLinkerVersion;
 				SELF.optHdr.MinorLinkerVersion := MinorLinkerVersion;

@@ -407,7 +407,7 @@ VAR
 	END GetXDisplay;
 
 BEGIN
-	ASSERT( S.VAL( SIGNED32, {0} ) = 1 );
+	ASSERT( SIGNED32({0} ) = 1 );
 	GetXDisplay;
 END KbdMouse.
 

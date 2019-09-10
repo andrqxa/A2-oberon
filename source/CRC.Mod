@@ -25,14 +25,14 @@ TYPE
 		END InitStream;
 
 		PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
-			VAR fcs, idx: SET; i: SIZE;
+			VAR fcs, idx: SET32; i: SIZE;
 		BEGIN
-			fcs := SYSTEM.VAL( SET, crc ) * SYSTEM.VAL( SET, 0FFFFH );
+			fcs := SET32( crc ) * SET32( 0FFFFH );
 			FOR i := ofs TO ofs + len - 1 DO
-				idx := SYSTEM.VAL( SET, SYSTEM.VAL( SIGNED32, fcs ) DIV 256 ) / SYSTEM.VAL( SET, LONG( ORD( buf[i] ) ) );
-				fcs := CRC16Table[SYSTEM.VAL( SIGNED32, idx) MOD 256] / SYSTEM.VAL( SET, SYSTEM.VAL( SIGNED32, fcs ) * 256 )
+				idx := SET32( SIGNED32(fcs ) DIV 256 ) / SET32( LONG( ORD( buf[i] ) ) );
+				fcs := CRC16Table[SIGNED32(idx) MOD 256] / SET32( SIGNED32(fcs ) * 256 )
 			END;
-			crc := SHORT( SYSTEM.VAL( SIGNED32, fcs * SYSTEM.VAL( SET, 0FFFFH ) ) );
+			crc := SHORT( SIGNED32(fcs * SET32( 0FFFFH ) ) );
 			res := Streams.Ok
 		END Send;
 
@@ -70,8 +70,8 @@ TYPE
 		VAR idx: SIGNED32;
 		BEGIN
 			WHILE len > 0 DO
-				idx := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, crc) / SYSTEM.VAL(SET, LONG(ORD(buf[ofs])))) MOD 100H;
-				crc := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, CRC32Table[idx])/SYSTEM.VAL(SET, LSH(crc, -8)));
+				idx := SIGNED32( SET32( crc) / SET32( LONG(ORD(buf[ofs])))) MOD 100H;
+				crc := SIGNED32( SET32( CRC32Table[idx])/SET32( LSH(crc, -8)));
 				DEC(len); INC(ofs)
 			END;
 			res := Streams.Ok
@@ -86,7 +86,7 @@ TYPE
 		PROCEDURE GetCRC*():SIGNED32;
 		BEGIN
 			Update();
-			RETURN SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, crc)/{0..31})
+			RETURN SIGNED32( SET32( crc)/{0..31})
 		END GetCRC;
 
 		PROCEDURE GetUninvertedCRC*():SIGNED32;
@@ -109,46 +109,46 @@ TYPE CRC32*= OBJECT
 		PROCEDURE Char*(c: CHAR);
 		VAR idx: SIGNED32;
 		BEGIN
-			idx := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, crc) / SYSTEM.VAL(SET, LONG(ORD(c)))) MOD 100H;
-			crc := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, CRC32Table[idx])/SYSTEM.VAL(SET, LSH(crc, -8)));
+			idx := SIGNED32( SET32( crc) / SET32( LONG(ORD(c)))) MOD 100H;
+			crc := SIGNED32( SET32( CRC32Table[idx])/SET32( LSH(crc, -8)));
 		END Char;
 
 		(* nonstandard use - add a SIGNED32; LSB *)
 		PROCEDURE Add*(i: SIGNED32);
 		VAR idx: SIGNED32;
 		BEGIN
-			i:= SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, crc) / SYSTEM.VAL(SET, i));
+			i:= SIGNED32( SET32( crc) / SET32( i));
 			idx := i MOD 100H;
-			crc := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, CRC32Table[idx])/SYSTEM.VAL(SET, LSH(crc, -8)));
+			crc := SIGNED32( SET32( CRC32Table[idx])/SET32( LSH(crc, -8)));
 			idx := i DIV 100H MOD 100H;
-			crc := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, CRC32Table[idx])/SYSTEM.VAL(SET, LSH(crc, -8)));
+			crc := SIGNED32( SET32( CRC32Table[idx])/SET32( LSH(crc, -8)));
 			idx := i DIV 10000H MOD 100H;
-			crc := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, CRC32Table[idx])/SYSTEM.VAL(SET, LSH(crc, -8)));
+			crc := SIGNED32( SET32( CRC32Table[idx])/SET32( LSH(crc, -8)));
 			idx := i DIV 1000000H MOD 100H;
-			crc := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, CRC32Table[idx])/SYSTEM.VAL(SET, LSH(crc, -8)));
+			crc := SIGNED32( SET32( CRC32Table[idx])/SET32( LSH(crc, -8)));
 		END Add;
 
 		PROCEDURE Get*():SIGNED32;
 		BEGIN
-			RETURN SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, crc)/{0..31})
+			RETURN SIGNED32( SET32( crc)/{0..31})
 		END Get;
 
 	END CRC32;
 
 VAR
-	CRC16Table, CRC32Table: ARRAY 256 OF SET;
+	CRC16Table, CRC32Table: ARRAY 256 OF SET32;
 
 	PROCEDURE InitTable16;
-	VAR fcs, t: SET;  d, i, k: SIGNED32;
+	VAR fcs, t: SET32;  d, i, k: SIGNED32;
 	BEGIN
 		FOR i := 0 TO 255 DO
 			fcs := { };  d := i*256;
 			FOR k := 0 TO 7 DO
-				t := fcs;  fcs := SYSTEM.VAL( SET, SYSTEM.VAL( SIGNED32, fcs ) * 2 );
-				IF (t / SYSTEM.VAL( SET, d )) * SYSTEM.VAL( SET, 8000H ) # {} THEN  fcs := fcs / SYSTEM.VAL( SET, 1021H ) END;
+				t := fcs;  fcs := SET32( SIGNED32(fcs ) * 2 );
+				IF (t / SET32( d )) * SET32( 8000H ) # {} THEN  fcs := fcs / SET32( 1021H ) END;
 				d := d * 2
 			END;
-			CRC16Table[i] := fcs * SYSTEM.VAL( SET, 0FFFFH )
+			CRC16Table[i] := fcs * SET32( 0FFFFH )
 		END
 	END InitTable16;
 
@@ -159,11 +159,11 @@ VAR
 		FOR n := 0 TO 255 DO
 			c := n;
 			FOR k := 0 TO 7 DO
-				IF ODD(c) THEN c := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, poly) / SYSTEM.VAL(SET, LSH(c, -1)))
+				IF ODD(c) THEN c := SIGNED32( SET32( poly) / SET32( LSH(c, -1)))
 				ELSE c := LSH(c, -1)
 				END
 			END;
-			CRC32Table[n] := SYSTEM.VAL(SET, c)
+			CRC32Table[n] := SET32( c)
 		END
 	END InitTable32;
 

@@ -3219,7 +3219,7 @@ PROCEDURE PrintImm (n: SIGNED64; w : Streams.Writer);
 VAR high, low: SIGNED32;
 BEGIN
 	IF (n >= -80H) & (n < 100H) THEN
-		w.Int (SYSTEM.VAL (SIGNED8, n), 0);
+		w.Int (SIGNED8(n), 0);
 	ELSE
 		SYSTEM.GET (ADDRESSOF (n), low);
 		SYSTEM.GET (ADDRESSOF (n) + 4, high);

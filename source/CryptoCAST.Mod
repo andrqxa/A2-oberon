@@ -532,6 +532,6 @@ TYPE
 
 
 BEGIN
-	ASSERT( S.VAL( SIGNED32, {0} ) = 1 );  Init
+	ASSERT( SIGNED32({0} ) = 1 );  Init
 END CryptoCAST.
 

@@ -469,7 +469,7 @@ TYPE
 				INC (pcOffset, current.len);
 				current := current.next;
 			END;
-			current.code[pc - pcOffset] := SYSTEM.VAL (CHAR, b);
+			current.code[pc - pcOffset] := CHR(b);
 			IF (current.len = pc - pcOffset) THEN INC (current.len) END;
 			INC (pc);
 		END PutByte;
@@ -2017,11 +2017,11 @@ BEGIN
 END HexOrd;
 
 PROCEDURE ValueInByteRange (value: SIGNED64): BOOLEAN;
-BEGIN RETURN SYSTEM.VAL (SIGNED8, value) = value
+BEGIN RETURN SIGNED8(value) = value
 END ValueInByteRange;
 
 PROCEDURE ValueInWordRange (value: SIGNED64): BOOLEAN;
-BEGIN RETURN SYSTEM.VAL (SIGNED16, value) = value
+BEGIN RETURN SIGNED16(value) = value
 END ValueInWordRange;
 
 PROCEDURE NewReg (type, index: SIGNED32): Reg;

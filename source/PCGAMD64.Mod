@@ -1759,7 +1759,7 @@ BEGIN
 	| PCLIR.loadc:
 		(* workaround for paco generating code that assigns too large values to bytes *)
 		IF instr.dstSize = PCLIR.Int8 THEN
-			instr.val := SYSTEM.VAL (SIGNED8, instr.val);
+			instr.val := SIGNED8(instr.val);
 		END;
 	| PCLIR.ret:
 		IF src1 >= 0 THEN

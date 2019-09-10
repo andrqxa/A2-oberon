@@ -50,40 +50,40 @@ PROCEDURE and(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
-	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(SIGNED32,setx * sety));
+	setx:= SET(ENTIER(x)); sety:= SET(ENTIER(y));
+	RETURN(SIGNED32(setx * sety));
 END and;
 
 PROCEDURE or(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
-	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(SIGNED32,setx + sety));
+	setx:= SET(ENTIER(x)); sety:= SET(ENTIER(y));
+	RETURN(SIGNED32(setx + sety));
 END or;
 
 PROCEDURE nor(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
-	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(SIGNED32,(setx / {MIN(SET)..MAX(SET)}) + sety));
+	setx:= SET(ENTIER(x)); sety:= SET(ENTIER(y));
+	RETURN(SIGNED32((setx / {MIN(SET)..MAX(SET)}) + sety));
 END nor;
 
 PROCEDURE xor(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
-	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(SIGNED32,setx / sety));
+	setx:= SET(ENTIER(x)); sety:= SET(ENTIER(y));
+	RETURN(SIGNED32(setx / sety));
 END xor;
 
 PROCEDURE xnor(x,y: FLOAT64): FLOAT64;
 VAR
 	setx,sety: SET;
 BEGIN
-	setx:= SYSTEM.VAL(SET,ENTIER(x)); sety:= SYSTEM.VAL(SET,ENTIER(y));
-	RETURN(SYSTEM.VAL(SIGNED32,(setx / {MIN(SET)..MAX(SET)}) / sety));
+	setx:= SET(ENTIER(x)); sety:= SET(ENTIER(y));
+	RETURN(SIGNED32((setx / {MIN(SET)..MAX(SET)}) / sety));
 END xnor;
 
 (* ** Built-In Functions **************************************** *)
@@ -92,8 +92,8 @@ PROCEDURE not(x: FLOAT64): FLOAT64;
 VAR
 	setx: SET;
 BEGIN
-	setx:= SYSTEM.VAL(SET,ENTIER(x));
-	RETURN(SYSTEM.VAL(SIGNED32,setx / {MIN(SET)..MAX(SET)}));
+	setx:= SET(ENTIER(x));
+	RETURN(SIGNED32(setx / {MIN(SET)..MAX(SET)}));
 END not;
 
 PROCEDURE Rad(value: FLOAT64; angle: SIGNED16): FLOAT64;

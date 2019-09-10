@@ -559,14 +559,14 @@ TYPE
 		VAR shifted: SIGNED32;
 		BEGIN
 			(*left shift then convert to set*)
-			shifted:=LSL(num,( instructionW-opcodeW ) );
+			shifted:=LSH(num,( instructionW-opcodeW ) );
 			RETURN NumberToSet(shifted);
 		END makeOpcode;
 
 		PROCEDURE makeCondition(num:SIGNED32):SET;
 		VAR shifted: SIGNED32;
 		BEGIN
-			shifted:=LSL(num,( instructionW-opcodeW-conditionW) );
+			shifted:=LSH(num,( instructionW-opcodeW-conditionW) );
 			RETURN NumberToSet(shifted);
 		END makeCondition;
 

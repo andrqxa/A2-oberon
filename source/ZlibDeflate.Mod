@@ -836,7 +836,7 @@ END ClearHash;
 	from the previous key instead of complete recalculation each time *)
 PROCEDURE UpdateHash(VAR h: SIGNED32; ch: CHAR);
 BEGIN
-	h := SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, ASH(h, HashShift)) / SYSTEM.VAL(SET, LONG(ORD(ch)))) MOD HashSize
+	h := SIGNED32(SET32(ASH(h, HashShift)) /SET32(LONG(ORD(ch)))) MOD HashSize
 END UpdateHash;
 
 (* Insert string starting at position pos in the dictionary and set head to the previous head of the hash chain

@@ -1774,7 +1774,7 @@ TYPE
 				END;
 			|SyntaxTree.CharacterValue DO
 				InitOperand(result,ModeValue);
-				IntermediateCode.InitImmediate(result.op,IntermediateCode.GetType(system,x.type),SYSTEM.VAL(Basic.Integer,x.value));
+				IntermediateCode.InitImmediate(result.op,IntermediateCode.GetType(system,x.type),ORD(x.value));
 			|SyntaxTree.RealValue DO
 				InitOperand(result,ModeValue);
 				IntermediateCode.InitFloatImmediate(result.op,IntermediateCode.GetType(system,x.type),x.value);
@@ -4342,7 +4342,7 @@ TYPE
 					PutMathArrayField(result.tag, IntermediateCode.Immediate(addressType, targetArrayDimensionality),MathDimOffset);
 				END;
 
-				PutMathArrayField(result.tag, IntermediateCode.Immediate(addressType,SYSTEM.VAL(SIGNED32,{RangeFlag})),MathFlagsOffset);
+				PutMathArrayField(result.tag, IntermediateCode.Immediate(addressType,ASH(1,RangeFlag)),MathFlagsOffset);
 
 			END;
 
@@ -4876,7 +4876,7 @@ TYPE
 						PutMathArrayField(arrayDestinationTag,dimOp,MathDimOffset);
 						PutMathArrayField(arrayDestinationTag,operand.op,MathAdrOffset);
 						PutMathArrayField(arrayDestinationTag,nil,MathPtrOffset);
-						PutMathArrayField(arrayDestinationTag,IntermediateCode.Immediate(addressType,SYSTEM.VAL(SIGNED32,arrayFlags)),MathFlagsOffset);
+						PutMathArrayField(arrayDestinationTag,IntermediateCode.Immediate(addressType,SYSTEM.VAL(Basic.Integer,Basic.Set(arrayFlags))),MathFlagsOffset);
 						baseType := SemanticChecker.ArrayBase(type,dim);
 						tmp := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(baseType)));
 						PutMathArrayField(arrayDestinationTag,tmp,MathElementSizeOffset);
@@ -4936,7 +4936,7 @@ TYPE
 							PutMathArrayField(arrayDestinationTag,dimOp,MathDimOffset);
 							PutMathArrayField(arrayDestinationTag,operand.op,MathAdrOffset);
 							PutMathArrayField(arrayDestinationTag,nil,MathPtrOffset);
-							PutMathArrayField(arrayDestinationTag, IntermediateCode.Immediate(addressType,SYSTEM.VAL(SIGNED32,{StaticFlag})),MathFlagsOffset);
+							PutMathArrayField(arrayDestinationTag, IntermediateCode.Immediate(addressType,ASH(1, StaticFlag)),MathFlagsOffset);
 							baseType := SemanticChecker.ArrayBase(type,dim);
 							tmp := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(baseType)));
 							PutMathArrayField(arrayDestinationTag,tmp,MathElementSizeOffset);
@@ -5001,7 +5001,7 @@ TYPE
 						PutMathArrayField(arrayDestinationTag,dimOp,MathDimOffset);
 						PutMathArrayField(arrayDestinationTag,operand.op,MathAdrOffset);
 						PutMathArrayField(arrayDestinationTag,nil,MathPtrOffset);
-						PutMathArrayField(arrayDestinationTag,IntermediateCode.Immediate(addressType,SYSTEM.VAL(SIGNED32,arrayFlags)),MathFlagsOffset);
+						PutMathArrayField(arrayDestinationTag,IntermediateCode.Immediate(addressType,SYSTEM.VAL(Basic.Integer,Basic.Set(arrayFlags))),MathFlagsOffset);
 						baseType := SemanticChecker.ArrayBase(type,dim);
 						tmp := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(baseType)));
 						PutMathArrayField(arrayDestinationTag,tmp,MathElementSizeOffset);
@@ -5114,7 +5114,7 @@ TYPE
 						PutMathArrayField(arrayDestinationTag,dimOp,MathDimOffset);
 						PutMathArrayField(arrayDestinationTag,operand.op,MathAdrOffset);
 						PutMathArrayField(arrayDestinationTag,nil,MathPtrOffset);
-						PutMathArrayField(arrayDestinationTag,IntermediateCode.Immediate(addressType,SYSTEM.VAL(SIGNED32,{StaticFlag})),MathFlagsOffset);
+						PutMathArrayField(arrayDestinationTag,IntermediateCode.Immediate(addressType,ASH(1,StaticFlag)),MathFlagsOffset);
 						baseType := SemanticChecker.ArrayBase(type,dim);
 						tmp := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(baseType)));
 						PutMathArrayField(arrayDestinationTag,tmp,MathElementSizeOffset);
@@ -5226,7 +5226,7 @@ TYPE
 						PutMathArrayField(arrayDestinationTag,dimOp,MathDimOffset);
 						PutMathArrayField(arrayDestinationTag,operand.op,MathAdrOffset);
 						PutMathArrayField(arrayDestinationTag,nil,MathPtrOffset);
-						PutMathArrayField(arrayDestinationTag,IntermediateCode.Immediate(addressType,SYSTEM.VAL(SIGNED32,{StaticFlag})),MathFlagsOffset);
+						PutMathArrayField(arrayDestinationTag,IntermediateCode.Immediate(addressType,ASH(1,StaticFlag)),MathFlagsOffset);
 						baseType := SemanticChecker.ArrayBase(type,dim);
 						tmp := IntermediateCode.Immediate(addressType,ToMemoryUnits(system,system.AlignedSizeOf(baseType)));
 						PutMathArrayField(arrayDestinationTag,tmp,MathElementSizeOffset);
@@ -6303,7 +6303,7 @@ TYPE
 
 					(* push kind *)
 					(* IF dump # NIL THEN dump.String("push kind"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
-					operatorInitializationCodeSection.Emit(Push(position,IntermediateCode.Immediate(setType, SYSTEM.VAL(SIGNED32, kind))));
+					operatorInitializationCodeSection.Emit(Push(position,IntermediateCode.Immediate(setType, SYSTEM.VAL(Basic.Integer,Basic.Set(kind)))));
 
 					(* push type infos *)
 					PushTypeInfo(leftType);
@@ -6660,7 +6660,7 @@ TYPE
 						Symbol(variable,operand);
 						InitFields(type, operand.tag,0);
 						IF temporary THEN
-							PutMathArrayField(operand.tag, IntermediateCode.Immediate(addressType,SYSTEM.VAL(SIGNED32,{StackFlag})),MathFlagsOffset);
+							PutMathArrayField(operand.tag, IntermediateCode.Immediate(addressType,ASH(1,StackFlag)),MathFlagsOffset);
 						END;
 					ELSIF type.form = SyntaxTree.Tensor THEN
 						Symbol(variable, operand);
@@ -8460,8 +8460,25 @@ TYPE
 				Emit(Push(position,s2.op));
 				ReleaseOperand(s0); ReleaseOperand(s1); ReleaseOperand(s2);
 				CallThis(position,"Modules","GetProcedure", 7);
+			|Global.Shr, Global.Shl, Global.Ror, Global.Rol:
+				Evaluate(p0,s0);
+				Evaluate(p1,s1);
+				ReuseCopy(reg,s0.op);
+				IF IsIntegerConstant(p1,hint) THEN
+					IntermediateCode.InitImmediate(s1.op,s1.op.type,hint);
+				END; 
+				ReuseCopy(tmp,s1.op);
+				Convert(tmp,s1.op.type);
+				IF x.id = Global.Shl THEN Emit(Shl(position,reg,reg,tmp))
+				ELSIF x.id = Global.Shr THEN Emit(Shr(position,reg,reg,tmp))
+				ELSIF x.id = Global.Rol THEN Emit(Rol(position,reg,reg,tmp))
+				ELSIF x.id = Global.Ror THEN Emit(Ror(position,reg,reg,tmp))
+				END;
+				ReleaseOperand(s0); ReleaseOperand(s1);ReleaseIntermediateOperand(tmp);
+				InitOperand(result,ModeValue);
+				result.op := reg;
 			(* ---- ASH, LSH, ROT ----- *)
-			|Global.Ash, Global.Asr, Global.Lsh, Global.Rot, Global.Ror:
+			|Global.Ash, Global.Lsh, Global.Rot:
 				Evaluate(p0,s0);
 				IF (x.id = Global.Lsh) OR (x.id = Global.Rot) OR (x.id = Global.Ror)THEN
 					(* make unsigned arguments in order to produced a logical shift *)
@@ -8482,16 +8499,12 @@ TYPE
 						IF x.id = Global.Ash THEN Emit(Shl(position,reg,s0.op,s1.op))
 						ELSIF x.id = Global.Lsh THEN Emit(Shl(position,reg,s0.op,s1.op))
 						ELSIF x.id = Global.Rot THEN Emit(Rol(position,reg,s0.op,s1.op))
-						ELSIF x.id = Global.Ror THEN Emit(Ror(position,reg,s0.op,s1.op))
-						ELSIF x.id = Global.Asr THEN Emit(Shr(position,reg,s0.op,s1.op))
 						END;
 					ELSIF hint < 0 THEN
 						IntermediateCode.InitImmediate(s1.op,s1.op.type,-hint);
 						IF x.id = Global.Ash THEN Emit(Shr(position,reg,s0.op,s1.op));
 						ELSIF x.id = Global.Lsh THEN Emit(Shr(position,reg,s0.op,s1.op));
 						ELSIF x.id = Global.Rot THEN Emit(Ror(position,reg,s0.op,s1.op));
-						ELSIF x.id = Global.Ror THEN Emit(Rol(position,reg,s0.op,s1.op))
-						ELSIF x.id = Global.Asr THEN Emit(Shl(position,reg,s0.op,s1.op))
 						END;
 					END;
 					ReleaseOperand(s0); ReleaseOperand(s1);
@@ -8506,8 +8519,6 @@ TYPE
 					IF x.id = Global.Ash THEN Emit(Shr(position,reg,reg,tmp))
 					ELSIF x.id = Global.Lsh THEN Emit(Shr(position,reg,reg,tmp))
 					ELSIF x.id = Global.Rot THEN Emit(Ror(position,reg,reg,tmp))
-					ELSIF x.id = Global.Ror THEN Emit(Rol(position,reg,reg,tmp))
-					ELSIF x.id = Global.Asr THEN Emit(Shl(position,reg,reg,tmp))
 					END;
 					ReleaseIntermediateOperand(tmp);
 					BrL(end);
@@ -8517,8 +8528,6 @@ TYPE
 					IF x.id = Global.Ash THEN Emit(Shl(position,reg,reg,tmp))
 					ELSIF x.id = Global.Lsh THEN Emit(Shl(position,reg,reg,tmp))
 					ELSIF x.id = Global.Rot THEN Emit(Rol(position,reg,reg,tmp))
-					ELSIF x.id = Global.Ror THEN Emit(Ror(position,reg,reg,tmp))
-					ELSIF x.id = Global.Asr THEN Emit(Shr(position,reg,reg,tmp))
 					END;
 					ReleaseIntermediateOperand(tmp);
 					SetLabel(end);
@@ -9078,9 +9087,24 @@ TYPE
 			IF len > 2 THEN p2 := x.parameters.GetExpression(2); t2 := p2.type.resolved END;
 
 			CASE x.id OF
+			|Global.Shr, Global.Shl, Global.Ror, Global.Rol:
+				Evaluate(p0,s0);
+				Evaluate(p1,s1);
+				ReuseCopy(reg,s0.op);
+				IF IsIntegerConstant(p1,hint) THEN
+					IntermediateCode.InitImmediate(s1.op,s1.op.type,hint);
+				END; 
+				IF x.id = Global.Shl THEN Emit(Shl(position,reg,reg,s1.op))
+				ELSIF x.id = Global.Shr THEN Emit(Shr(position,reg,reg,s1.op))
+				ELSIF x.id = Global.Rol THEN Emit(Rol(position,reg,reg,s1.op))
+				ELSIF x.id = Global.Ror THEN Emit(Ror(position,reg,reg,s1.op))
+				END;
+				ReleaseOperand(s0); ReleaseOperand(s1);
+				InitOperand(result,ModeValue);
+				result.op := reg;
 			(* ---- ASH, LSH, ROT ----- *)
-			|Global.Ash, Global.Asr, Global.Lsh, Global.Rot, Global.Ror:
-				Evaluate(p0, s0);
+			|Global.Ash, Global.Lsh, Global.Rot:
+				Evaluate(p0,s0);
 				IF (x.id = Global.Lsh) OR (x.id = Global.Rot) OR (x.id = Global.Ror)THEN
 					(* make unsigned arguments in order to produced a logical shift *)
 					IF s0.op.type.form = IntermediateCode.SignedInteger THEN
@@ -9100,16 +9124,12 @@ TYPE
 						IF x.id = Global.Ash THEN Emit(Shl(position,reg,s0.op,s1.op))
 						ELSIF x.id = Global.Lsh THEN Emit(Shl(position,reg,s0.op,s1.op))
 						ELSIF x.id = Global.Rot THEN Emit(Rol(position,reg,s0.op,s1.op))
-						ELSIF x.id = Global.Ror THEN Emit(Ror(position,reg,s0.op,s1.op))
-						ELSIF x.id = Global.Asr THEN Emit(Shr(position,reg,s0.op,s1.op))
 						END;
 					ELSIF hint < 0 THEN
 						IntermediateCode.InitImmediate(s1.op,s1.op.type,-hint);
 						IF x.id = Global.Ash THEN Emit(Shr(position,reg,s0.op,s1.op));
 						ELSIF x.id = Global.Lsh THEN Emit(Shr(position,reg,s0.op,s1.op));
 						ELSIF x.id = Global.Rot THEN Emit(Ror(position,reg,s0.op,s1.op));
-						ELSIF x.id = Global.Ror THEN Emit(Rol(position,reg,s0.op,s1.op))
-						ELSIF x.id = Global.Asr THEN Emit(Shl(position,reg,s0.op,s1.op))
 						END;
 					END;
 					ReleaseOperand(s0); ReleaseOperand(s1);
@@ -9124,8 +9144,6 @@ TYPE
 					IF x.id = Global.Ash THEN Emit(Shr(position,reg,reg,tmp))
 					ELSIF x.id = Global.Lsh THEN Emit(Shr(position,reg,reg,tmp))
 					ELSIF x.id = Global.Rot THEN Emit(Ror(position,reg,reg,tmp))
-					ELSIF x.id = Global.Ror THEN Emit(Rol(position,reg,reg,tmp))
-					ELSIF x.id = Global.Asr THEN Emit(Shl(position,reg,reg,tmp))
 					END;
 					ReleaseIntermediateOperand(tmp);
 					BrL(end);
@@ -9135,8 +9153,6 @@ TYPE
 					IF x.id = Global.Ash THEN Emit(Shl(position,reg,reg,tmp))
 					ELSIF x.id = Global.Lsh THEN Emit(Shl(position,reg,reg,tmp))
 					ELSIF x.id = Global.Rot THEN Emit(Rol(position,reg,reg,tmp))
-					ELSIF x.id = Global.Ror THEN Emit(Ror(position,reg,reg,tmp))
-					ELSIF x.id = Global.Asr THEN Emit(Shr(position,reg,reg,tmp))
 					END;
 					ReleaseIntermediateOperand(tmp);
 					SetLabel(end);
@@ -13915,21 +13931,20 @@ TYPE
 					NEW(module,import.module,system); (* backend structures *)
 
 					Global.GetModuleName(import.module, name);
-					exports.AddName(name);
-					(*
-					module.SetModuleName(name);
-					*)
-					NEW(implementationEmitter,system,checker,supportedInstruction, supportedImmediate, Compiler.FindPC IN flags, builtinsModuleName, SELF);
-					NEW(declarationEmitter,system,implementationEmitter,SELF,Compiler.ForceModuleBodies IN flags,trace & (Compiler.Info IN flags));
-					NEW(meta, implementationEmitter, declarationEmitter,simpleMetaData);
-					declarationEmitter.Module(import.module,module);
+					IF ~exports.ContainsName(name) THEN
+						exports.AddName(name); 
+						NEW(implementationEmitter,system,checker,supportedInstruction, supportedImmediate, Compiler.FindPC IN flags, builtinsModuleName, SELF);
+						NEW(declarationEmitter,system,implementationEmitter,SELF,Compiler.ForceModuleBodies IN flags,trace & (Compiler.Info IN flags));
+						NEW(meta, implementationEmitter, declarationEmitter,simpleMetaData);
+						declarationEmitter.Module(import.module,module);
 
-					IF ~meta.simple THEN
-						meta.Module(implementationEmitter.moduleBodySection);
-					END;
-
-					FOR i := 0 TO module.allSections.Length()-1 DO
-						sections.AddSection(module.allSections.GetSection(i));
+						IF ~meta.simple THEN
+							meta.Module(implementationEmitter.moduleBodySection);
+						END;
+						
+						FOR i := 0 TO module.allSections.Length()-1 DO 
+							sections.AddSection(module.allSections.GetSection(i));
+						END;
 					END;
 				END;
 				import := import.nextImport

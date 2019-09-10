@@ -867,7 +867,7 @@ VAR
 
 	PROCEDURE Imp( VAR impName, modName: OPS.Name;  VAR M: Module );
 	VAR R: Files.Rider;  i: SIGNED16;  tag: SIGNED32;  done: BOOLEAN;  mode: SIGNED8;  obj, last: Object;  tdum: Struct;  new, operator, zeroCompress: BOOLEAN;
-		readString: ReadStringProc;   flag: SET; (* fof *)
+		readString: ReadStringProc;   flag: SET; (* fof *) int: SIGNED32;
 
 		PROCEDURE GetImports;
 		VAR name: OPS.Name;  TM: Module;
@@ -926,7 +926,9 @@ VAR
 		VAR scope, last, fld: Object;  btyp: Struct;  n: SIGNED32;  flags: SET;  conval: Const;
 		BEGIN
 			NEW( scope );  scope.mode := Head;  scope.mnolev := -typ.mno;  last := NIL;  btyp := typ.BaseTyp;  conval := NewConst();
-			typ.strobj.conval := conval;  Files.ReadNum( R, SYSTEM.VAL( SIGNED32, flags ) );
+			typ.strobj.conval := conval;  
+			Files.ReadNum( R, n );
+			flags := SET(n); 
 			IF 0 IN flags THEN INCL( conval.setval, protectedObj ) END;
 			IF 1 IN flags THEN INCL( conval.setval, activeObj ) END;
 			IF 2 IN flags THEN INCL( conval.setval, safe ) END;
@@ -1055,14 +1057,15 @@ VAR
 		END InCProc;
 
 		PROCEDURE InConst;
-		VAR conval: Const;  s: SIGNED16;  r: FLOAT32;
+		VAR conval: Const;  s: SIGNED16;  r: FLOAT32; int: SIGNED32;
 		BEGIN
 			NEW( conval );  obj.conval := conval;
 			CASE tag OF
 			| SFtypBool, SFtypChar, SFtypSInt..SFtypLInt:
 					Files.ReadNum( R, conval.intval )
 			| SFtypSet:
-					Files.ReadNum( R, SYSTEM.VAL( SIGNED32, conval.setval ) )
+					Files.ReadNum( R, int); 
+					conval.setval := SET(int); 
 			| SFtypReal:
 					Files.ReadReal( R, r );  conval.realval := r;  conval.intval := OPM.ConstNotAlloc
 			| SFtypLReal:
@@ -1098,7 +1101,7 @@ VAR
 
 					(** fof >> *)
 					flag := {};
-					IF tag = SFsysflag THEN Files.ReadNum( R, SYSTEM.VAL( SIGNED32, flag ) );  Files.ReadNum( R, tag );  END;
+					IF tag = SFsysflag THEN Files.ReadNum( R, int); flag := SET(int);  Files.ReadNum( R, tag );  END;
 					(** << fof  *)
 
 					IF tag = SFconst THEN

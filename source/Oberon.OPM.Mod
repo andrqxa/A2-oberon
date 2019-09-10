@@ -201,11 +201,11 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	(* ----- Fingerprint calculation ----- *)
 
 	PROCEDURE FPrint*(VAR fp: SIGNED32; val: SIGNED32);
-	BEGIN fp:=SYSTEM.VAL(SIGNED32, SYSTEM.VAL(SET, ROT(fp, 7)) / SYSTEM.VAL(SET, val))
+	BEGIN fp:=SIGNED32(SET(ROT(fp, 7)) /SET(val))
 	END FPrint;
 
 	PROCEDURE FPrintSet*(VAR fp: SIGNED32; set: SET);
-	BEGIN FPrint(fp, SYSTEM.VAL(SIGNED32, set))
+	BEGIN FPrint(fp, SIGNED32(set))
 	END FPrintSet;
 
 	PROCEDURE FPrintReal*(VAR fp: SIGNED32; real: FLOAT32);
@@ -345,7 +345,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 	END SymWMod;
 
 	PROCEDURE SymWSet*(s: SET);
-	BEGIN	Files.WriteNum(newSymF, SYSTEM.VAL(SIGNED32, s))
+	BEGIN	Files.WriteNum(newSymF, SIGNED32(s))
 	END SymWSet;
 
 	PROCEDURE SymWReal*(r: FLOAT32);
@@ -397,7 +397,7 @@ MODULE OPM IN Oberon;	(** non-portable *)
 
 	PROCEDURE ObjAllocInt*(): SIGNED32;
 		VAR pos: SIGNED32;
-	BEGIN	pos:=Files.Pos(ObjF); Files.WriteInt(ObjF, SYSTEM.VAL(SIGNED16, 0));
+	BEGIN	pos:=Files.Pos(ObjF); Files.WriteInt(ObjF, SIGNED16(0));
 		RETURN pos;
 	END ObjAllocInt;
 
