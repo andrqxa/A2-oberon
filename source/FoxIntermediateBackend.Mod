@@ -1252,7 +1252,7 @@ TYPE
 
 		(* useful operands and types *)
 		nil,one,fp,sp,ap,lr,true,false: IntermediateCode.Operand;
-		booleanType,addressType,setType, sizeType, byteType, characterType, longintType, hugeintType: IntermediateCode.Type;
+		booleanType,addressType,setType, sizeType, byteType, characterType, signed32, signed64: IntermediateCode.Type;
 
 		commentPrintout: Printout.Printer;
 		dump: Streams.Writer;
@@ -1316,8 +1316,8 @@ TYPE
 			sizeType := IntermediateCode.GetType(system, system.sizeType);
 			byteType := IntermediateCode.GetType(system, system.byteType);
 			characterType := IntermediateCode.GetType(system, system.characterType);
-			longintType := IntermediateCode.GetType(system, Global.Signed32);
-			hugeintType := IntermediateCode.GetType(system, Global.Signed64);
+			signed32 := IntermediateCode.GetType(system, Global.Signed32);
+			signed64 := IntermediateCode.GetType(system, Global.Signed64);
 
 			fp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.FP);
 			sp := IntermediateCode.Register(addressType,IntermediateCode.GeneralPurposeRegister,IntermediateCode.SP);
@@ -5863,7 +5863,7 @@ TYPE
 				(* IF dump # NIL THEN dump.String("push ID"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
 				ASSERT(x.left IS SyntaxTree.SymbolDesignator);
 				identifierNumber := Global.GetSymbol(module.module.case, x.left(SyntaxTree.SymbolDesignator).symbol.name);
-				Emit(Push(position,IntermediateCode.Immediate(longintType, identifierNumber)));
+				Emit(Push(position,IntermediateCode.Immediate(signed32, identifierNumber)));
 
 				formalParameter := procedureType.firstParameter;
 				FOR i := 0 TO parameters.Length() - 1 DO
@@ -5890,12 +5890,12 @@ TYPE
 						ELSE
 							(* push 'NonPointer' *)
 							(* IF dump # NIL THEN dump.String("push 'NonPointer'"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
-							Emit(Push(position,IntermediateCode.Immediate(longintType, NonPointer)));
+							Emit(Push(position,IntermediateCode.Immediate(signed32, NonPointer)));
 
 							(* push fingerprint *)
 							(* IF dump # NIL THEN dump.String("push fingerprint"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
 							fingerprint := fingerprinter.TypeFP(formalParameter.type.resolved);
-							Emit(Push(position,IntermediateCode.Immediate(hugeintType, fingerprint.public))) (* TODO: push the type's fingerprint *)
+							Emit(Push(position,IntermediateCode.Immediate(signed64, fingerprint.public))) (* TODO: push the type's fingerprint *)
 						END
 					END;
 					formalParameter := formalParameter.nextParameter
@@ -5905,11 +5905,11 @@ TYPE
 				IF procedureType.numberParameters < 2 THEN
 					(* push 'NonPointer' *)
 					(* IF dump # NIL THEN dump.String("push 'NonPointer'"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
-					Emit(Push(position,IntermediateCode.Immediate(longintType, NonPointer)));
+					Emit(Push(position,IntermediateCode.Immediate(signed32, NonPointer)));
 
 					(* push 'NoType' *)
 					(* IF dump # NIL THEN dump.String("push 'NoType'"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
-					Emit(Push(position,IntermediateCode.Immediate(longintType, NoType)));
+					Emit(Push(position,IntermediateCode.Immediate(signed32, NoType)));
 				END;
 
 				(* call operator selection procedure *)
@@ -6168,9 +6168,9 @@ TYPE
 			OR ~enter & GetRuntimeProcedure("FoxProfiler","ExitProcedure",procedure,TRUE)
 			THEN
 				IntermediateCode.InitAddress(reg, addressType, profileId.name , GetFingerprint(profileId.symbol), 0);
-				IntermediateCode.MakeMemory(reg, longintType);
+				IntermediateCode.MakeMemory(reg, signed32);
 				Emit(Push(position,reg));
-				IntermediateCode.InitImmediate(reg, longintType, procedureNumber);
+				IntermediateCode.InitImmediate(reg, signed32, procedureNumber);
 				Emit(Push(position,reg));
 				StaticCallOperand(procedure,result);
 				Emit(Call(position,result.op,ProcParametersSize(procedure)));
@@ -6183,9 +6183,9 @@ TYPE
 		BEGIN
 			IF GetRuntimeProcedure("FoxProfiler","AddProcedure",procedure,TRUE) THEN
 				IntermediateCode.InitAddress(reg, addressType, profileId.name , GetFingerprint(profileId.symbol), 0);
-				IntermediateCode.MakeMemory(reg, longintType);
+				IntermediateCode.MakeMemory(reg, signed32);
 				profileInit.Emit(Push(position,reg));
-				IntermediateCode.InitImmediate(reg, longintType, procedureNumber);
+				IntermediateCode.InitImmediate(reg, signed32, procedureNumber);
 				profileInit.Emit(Push(position,reg));
 				NEW(string, LEN(name)); COPY(name, string^);
 				sv := SyntaxTree.NewStringValue(Basic.invalidPosition,string);
@@ -6224,7 +6224,7 @@ TYPE
 		PROCEDURE ProfilerPatchInit;
 		VAR reg: IntermediateCode.Operand;
 		BEGIN
-			IntermediateCode.InitImmediate(reg, longintType, numberProcedures);
+			IntermediateCode.InitImmediate(reg, signed32, numberProcedures);
 			profileInit.EmitAt(profileInitPatchPosition,Push(position,reg));
 			EmitLeave(profileInit,position,NIL,0);
 			profileInit.Emit(Exit(position,0,0,0));
@@ -6249,7 +6249,7 @@ TYPE
 				IF type = NIL THEN
 					(* no type: push 'NoType' *)
 					(* IF dump # NIL THEN dump.String("push 'NoType'"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
-					arg := IntermediateCode.Immediate(longintType, NoType)
+					arg := IntermediateCode.Immediate(signed32, NoType)
 				ELSIF IsStrictlyPointerToRecord(type) THEN
 					(* pointer to record type: push typetag *)
 					(* IF dump # NIL THEN dump.String("push typetag"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
@@ -6259,7 +6259,7 @@ TYPE
 					(* non-pointer to record type: push fingerprint *)
 					(* IF dump # NIL THEN dump.String("push fingerprint"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
 					fingerprint := fingerprinter.TypeFP(type.resolved);
-					arg := IntermediateCode.Immediate(hugeintType, fingerprint.public)
+					arg := IntermediateCode.Immediate(signed64, fingerprint.public)
 				END;
 				operatorInitializationCodeSection.Emit(Push(position,arg))
 			END PushTypeInfo;
@@ -6299,7 +6299,7 @@ TYPE
 					(* push ID *)
 					(* IF dump # NIL THEN dump.String("push ID"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
 					id := Global.GetSymbol(module.module.case, operator.name);
-					operatorInitializationCodeSection.Emit(Push(position,IntermediateCode.Immediate(longintType, id)));
+					operatorInitializationCodeSection.Emit(Push(position,IntermediateCode.Immediate(signed32, id)));
 
 					(* push kind *)
 					(* IF dump # NIL THEN dump.String("push kind"); dump.Ln; dump.Update END; *) (* TENTATIVE *)
