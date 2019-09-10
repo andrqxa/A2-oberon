@@ -240,7 +240,7 @@ TYPE
 		addressSize-: SIGNED32;
 
 		(* system type mapping *)
-		addressType-, sizeType-, integerType-, longIntegerType-, integerSetType-, wordType-, longWordType-, wordSetType-, characterType-, setType-, booleanType-, anyType-, byteType-,
+		addressType-, sizeType-, integerType-, longIntegerType-, integerSetType-, characterType-, setType-, booleanType-, anyType-, byteType-,
 		realType-, objectType-, nilType-, rangeType-: SyntaxTree.Type;
 
 		CanPassInRegister-: PassInRegisterProc;
@@ -799,10 +799,6 @@ TYPE
 		system.integerSetType := SyntaxTree.NewSetType(system.integerType.sizeInBits);
 		system.realType := SyntaxTree.NewFloatType(64);
 
-		system.wordType := SyntaxTree.NewIntegerType(MIN(system.addressSize,32),TRUE);
-		system.longWordType := SyntaxTree.NewIntegerType(system.addressSize,TRUE);
-		system.wordSetType := SyntaxTree.NewSetType(system.wordType.sizeInBits);
-
 		system.booleanType := SyntaxTree.NewBooleanType(8);
 		system.byteType := SyntaxTree.NewByteType(8);
 		system.characterType := SyntaxTree.NewCharacterType(8);
@@ -868,9 +864,6 @@ TYPE
 		DeclareType(system.integerType,"INTEGER",system.globalScope);
 		DeclareType(system.longIntegerType,"LONGINTEGER",system.globalScope);
 		DeclareType(system.integerSetType,"INTEGERSET",system.globalScope);
-		DeclareType(system.wordType,"WORD",system.globalScope);
-		DeclareType(system.longWordType,"LONGWORD",system.globalScope);
-		DeclareType(system.wordSetType,"WORDSET",system.globalScope);
 
 		DeclareType(Signed8, "SIGNED8", system.globalScope);
 		DeclareType(Signed16, "SIGNED16", system.globalScope);
