@@ -11759,9 +11759,9 @@ TYPE
 			INC(dataAdrOffset,14); (*! change this when changing data structure below *)
 			HeapBlock(moduleName,typeName,section,dataAdrOffset);
 			Info(section,"count*: SIGNED32");
-			Longint(section,0);
+			Signed32(section,0);
 			Info(section,"locked*: BOOLEAN");
-			Longint(section,0);
+			Signed32(section,0);
 			Info(section,"awaitingLock*: ProcessQueue");
 			Address(section,0);
 			Address(section,0);
@@ -11771,9 +11771,9 @@ TYPE
 			Info(section,"lockedBy*: ANY");
 			Address(section,0);
 			Info(section,"waitingPriorities*: ARRAY NumPriorities OF SIGNED32");
-			Longint(section,1);
+			Signed32(section,1);
 			FOR i := 2 TO 6 DO
-			Longint(section,0);
+			Signed32(section,0);
 			END;
 			Info(section,"lock*: ANY");
 			Address(section,0);
@@ -11805,19 +11805,19 @@ TYPE
 			section.Emit(Data(Basic.invalidPosition,op));
 		END Set;
 
-		PROCEDURE Longint(section: IntermediateCode.Section; value: SIGNED32);
+		PROCEDURE Signed32(section: IntermediateCode.Section; value: SIGNED32);
 		VAR op: IntermediateCode.Operand;
 		BEGIN
 			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, Global.Signed32),value);
 			section.Emit(Data(Basic.invalidPosition,op));
-		END Longint;
+		END Signed32;
 
-		PROCEDURE Hugeint(section: IntermediateCode.Section; value: SIGNED64);
+		PROCEDURE Signed64(section: IntermediateCode.Section; value: SIGNED64);
 		VAR op: IntermediateCode.Operand;
 		BEGIN
 			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, Global.Signed64),value);
 			section.Emit(Data(Basic.invalidPosition,op));
-		END Hugeint;
+		END Signed64;
 
 		PROCEDURE PatchSize(section: IntermediateCode.Section; pc: SIZE; value: SIZE);
 		VAR op,noOperand: IntermediateCode.Operand;
@@ -11827,13 +11827,13 @@ TYPE
 			section.PatchOperands(pc,op,noOperand,noOperand);
 		END PatchSize;
 
-		PROCEDURE PatchLongint(section: IntermediateCode.Section; pc: SIZE; value: SIGNED32);
+		PROCEDURE PatchSigned32(section: IntermediateCode.Section; pc: SIZE; value: SIGNED32);
 		VAR op,noOperand: IntermediateCode.Operand;
 		BEGIN
 			IntermediateCode.InitOperand(noOperand);
 			IntermediateCode.InitImmediate(op,IntermediateCode.GetType(module.system, Global.Signed32),value);
 			section.PatchOperands(pc,op,noOperand,noOperand);
-		END PatchLongint;
+		END PatchSigned32;
 
 		PROCEDURE PatchSymbol(section: IntermediateCode.Section; pc: SIZE; name: Basic.SegmentedName; symbol: SyntaxTree.Symbol; virtualOffset: SIZE; realOffset: SIGNED32);
 		VAR op, noOperand: IntermediateCode.Operand;
@@ -12203,9 +12203,9 @@ TYPE
 					IF (symbol = NIL) OR (symbol # NIL) & (symbol.type # Sections.InlineCodeSection) THEN
 						IF (symbol # NIL) & (symbol.symbol # NIL) THEN
 							fingerprint := fingerprinter.SymbolFP(symbol.symbol);
-							Hugeint(source,fingerprint.public);
+							Signed64(source,fingerprint.public);
 						ELSE
-							Hugeint(source, 0);
+							Signed64(source, 0);
 						END;
 						Symbol(source, namePool, DynamicName(namePool, name, poolMap), 0); (* reference to dynamic name *)
 						Symbol(source, symbol,0,0);
@@ -13424,7 +13424,7 @@ TYPE
 			Set( moduleSection, flags);
 			Info(moduleSection, "crc*: SIGNED32");
 			patchCRC:= moduleSection.pc;
-			Longint(moduleSection, 0); (*!  must be implemented *)
+			Signed32(moduleSection, 0); (*!  must be implemented *)
 			Info(moduleSection, "init, published: BOOLEAN");
 			Boolean(moduleSection,FALSE);
 			Boolean(moduleSection,FALSE);
@@ -13447,7 +13447,7 @@ TYPE
 		PROCEDURE PatchCRC(crc: SIGNED32);
 		BEGIN
 			IF ~simple THEN
-				PatchLongint(ModuleSection(), patchCRC, crc);
+				PatchSigned32(ModuleSection(), patchCRC, crc);
 			END;
 		END PatchCRC;
 
