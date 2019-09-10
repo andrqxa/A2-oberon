@@ -93,7 +93,7 @@ BEGIN
 END Close;
 
 (** uncompress deflated data from scr and write them to dst **)
-PROCEDURE Uncompress*(VAR src, dst: Files.Rider; VAR crc32: SIGNED32; VAR res: WORD);
+PROCEDURE Uncompress*(VAR src, dst: Files.Rider; VAR crc32: SIGNED32; VAR res: INTEGER);
 VAR
 	r: Reader; buf: ARRAY BufSize OF CHAR; read: SIGNED32;
 BEGIN

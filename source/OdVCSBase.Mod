@@ -128,7 +128,7 @@ TYPE
 VAR
 	errMsg*: ARRAY 256 OF CHAR;
 	formatStr: ARRAY FormatLen+1 OF CHAR;
-	res: WORD;
+	res: INTEGER;
 
 (* Split a filename in it's directory part and member name.
 	filename = [ filesystem ":" ] ["/"] [ dir "/" ] base. *)
@@ -160,10 +160,10 @@ BEGIN
 END splitDirBase;
 
 (** Create directory for a filename if it doesn't exist. *)
-PROCEDURE makeDirs(name: ARRAY OF CHAR): WORD;
+PROCEDURE makeDirs(name: ARRAY OF CHAR): INTEGER;
 VAR
 	dir, base: ARRAY 128 OF CHAR;
-	res: WORD;
+	res: INTEGER;
 	dirFile: Files.File;
 BEGIN
 	Files.SplitPath(name, dir, base);
@@ -797,9 +797,9 @@ END newVersion;
 (** Get a version from <name>.VCS and save it as <newFileName>.
 DeltaV.Select: can be used because the complete paths are already given for source and sink.
 *)
-PROCEDURE View*(name: TFileName; n: SIGNED32; newFileName: TFileName): WORD;
+PROCEDURE View*(name: TFileName; n: SIGNED32; newFileName: TFileName): INTEGER;
 VAR
-	version: SIGNED32; res: WORD;
+	version: SIGNED32; res: INTEGER;
 	ok: BOOLEAN;
 	dFileName: TFileName;
 	old, new: TData;

@@ -149,7 +149,7 @@ TYPE
 			avgDuration : FLOAT32;
 			milliTimer : Kernel.MilliTimer;
 			time : SIGNED32;
-			i : SIGNED32; res : WORD;
+			i : SIGNED32; res : INTEGER;
 			temp : ARRAY 256 OF CHAR;
 		BEGIN
 			ASSERT((mode = Disks.Read) OR (mode = Disks.Write));
@@ -198,7 +198,7 @@ TYPE
 			nbrOfBytes : SIGNED64;
 			milliTimer : Kernel.MilliTimer;
 			time : SIGNED32;
-			i : SIGNED32; res : WORD;
+			i : SIGNED32; res : INTEGER;
 			temp : ARRAY 256 OF CHAR;
 		BEGIN
 			ASSERT((mode = Disks.Read) OR (mode = Disks.Write));

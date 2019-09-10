@@ -22,7 +22,7 @@ TYPE
 
 		(* Initialize Recorder with the given File *)
 		PROCEDURE &Init*(out : Streams.Writer);
-		VAR i: SIGNED32; res: WORD;
+		VAR i: SIGNED32; res: INTEGER;
 		BEGIN
 			ready := FALSE; recording := FALSE; paused := FALSE; finished := FALSE;
 			SELF.out := out; recLength := 0;
@@ -63,7 +63,7 @@ TYPE
 		END Init;
 
 		PROCEDURE WriteBuffer(buf : SoundDevices.Buffer);
-		VAR res : WORD;
+		VAR res : INTEGER;
 		BEGIN
 			encoder.Write(buf, res);
 			INC(recLength, buf.len);
@@ -129,7 +129,7 @@ TYPE
 
 		(* Initialize Recorder with the given File *)
 		PROCEDURE &Init*;
-		VAR i, res : WORD;
+		VAR i, res : INTEGER;
 		BEGIN
 			ready := FALSE; recording := FALSE; paused := FALSE; finished := FALSE;
 

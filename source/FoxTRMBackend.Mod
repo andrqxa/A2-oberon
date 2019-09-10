@@ -2231,7 +2231,7 @@ TYPE
 		END SetInstructionWidth;
 
 		PROCEDURE GetSystem*(): Global.System;
-		VAR system: System; variableOffset: WORD;
+		VAR system: System; variableOffset: INTEGER;
 		BEGIN
 			IF preciseGC THEN variableOffset := -32 ELSE variableOffset := 0 END;
 			NEW(system, 18, 32, 32, 32, 32, 32, 32, 64(* parameter offset 0: handled locally *), variableOffset,  cooperative);

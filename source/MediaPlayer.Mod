@@ -589,7 +589,7 @@ TYPE
 		(** -- Player Controls ----------------------------------------------- *)
 
 		(* Open the given uri *)
-		PROCEDURE Open*(CONST uri : ARRAY OF CHAR; VAR msg : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE Open*(CONST uri : ARRAY OF CHAR; VAR msg : ARRAY OF CHAR; VAR res : INTEGER);
 		VAR  context : Context;
 		BEGIN
 			context := GetContext(uri, msg, res);
@@ -611,7 +611,7 @@ TYPE
 		END Play;
 
 		(* pos & duration set in number of video frames *)
-		PROCEDURE DoTransition*(CONST uri: ARRAY OF CHAR; pos, duration : SIGNED32; VAR msg : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE DoTransition*(CONST uri: ARRAY OF CHAR; pos, duration : SIGNED32; VAR msg : ARRAY OF CHAR; VAR res : INTEGER);
 		VAR context : Context; audioPos : SIGNED32;
 		BEGIN
 			IF Trace * TraceTransitions # {} THEN
@@ -682,7 +682,7 @@ TYPE
 
 		(* Get in  1/10 sec. Returns -1 if information is not available. *)
 		PROCEDURE GetPos*(): SIGNED32;
-		VAR context : Context; res : WORD;
+		VAR context : Context; res : INTEGER;
 		BEGIN {EXCLUSIVE}
 			res := -1;
 			context := current;
@@ -839,7 +839,7 @@ TYPE
 		END InitTime;
 
 		(* Allocate ressources required for playing the audio/video stream *)
-		PROCEDURE GetContext(CONST uri : ARRAY OF CHAR; VAR msg : ARRAY OF CHAR; VAR res : WORD) : Context;
+		PROCEDURE GetContext(CONST uri : ARRAY OF CHAR; VAR msg : ARRAY OF CHAR; VAR res : INTEGER) : Context;
 		VAR
 			in, audioStream, videoStream : Streams.Reader;
 			demux : Codecs.AVDemultiplexer;
@@ -1169,7 +1169,7 @@ TYPE
 		END Close;
 
 		PROCEDURE StopIntern;
-		VAR img : WMGraphics.Image; res : WORD;
+		VAR img : WMGraphics.Image; res : INTEGER;
 		BEGIN
 			FreeContext(next); next := NIL;
 			IF current # NIL THEN
@@ -1183,7 +1183,7 @@ TYPE
 		END StopIntern;
 
 		PROCEDURE StartPlayIntern;
-		VAR res : WORD;
+		VAR res : INTEGER;
 		BEGIN
 			IF current # NIL THEN
 				IF state = Finished THEN
@@ -1237,7 +1237,7 @@ TYPE
 		END ResumeIntern;
 
 		PROCEDURE OpenIntern(nextContext : Context);
-		VAR img : WMGraphics.Image; data : Setup; res : WORD;
+		VAR img : WMGraphics.Image; data : Setup; res : INTEGER;
 		BEGIN
 			FreeContext(next); next := NIL;
 			FreeContext(current); current := nextContext;
@@ -1416,7 +1416,7 @@ VAR mplayer : Player;
 
 (** Play the specified video/audio file *)
 PROCEDURE Open*(context : Commands.Context); (** <filename> ~ *)
-VAR filename, msg : ARRAY 256 OF CHAR; res : WORD;
+VAR filename, msg : ARRAY 256 OF CHAR; res : INTEGER;
 BEGIN {EXCLUSIVE}
 	context.arg.String(filename);
 	IF mplayer = NIL THEN NEW(mplayer); END;
@@ -1432,7 +1432,7 @@ END Open;
 
 (** Do a transition to the specified video/audio file (of the specified duration) *)
 PROCEDURE TransitionTo*(context : Commands.Context); (** <filename> [transitionDuration] ~ *)
-VAR filename, msg : ARRAY 256 OF CHAR; duration : SIGNED32; res : WORD;
+VAR filename, msg : ARRAY 256 OF CHAR; duration : SIGNED32; res : INTEGER;
 BEGIN {EXCLUSIVE}
 	context.arg.SkipWhitespace; context.arg.String(filename);
 	context.arg.SkipWhitespace; context.arg.Int(duration, FALSE);

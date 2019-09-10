@@ -97,7 +97,7 @@ VAR
 	flags : SET;
 	options : Options.Options;
 	newContext : Commands.Context;
-	res : WORD;
+	res : INTEGER;
 	fontName: ARRAY 128 OF CHAR;
 BEGIN
 	NEW(options);

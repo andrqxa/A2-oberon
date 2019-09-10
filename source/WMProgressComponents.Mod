@@ -95,7 +95,7 @@ TYPE
 		END RecacheProperties;
 
 		PROCEDURE UpdateModel(value : SIGNED64);
-		VAR integer : Types.Hugeint; res : WORD; model : Models.Model;
+		VAR integer : Types.Hugeint; res : INTEGER; model : Models.Model;
 		BEGIN
 			model := modelI;
 			IF (model # NIL) THEN
@@ -105,7 +105,7 @@ TYPE
 		END UpdateModel;
 
 		PROCEDURE ModelChanged(sender, data : ANY);
-		VAR integer : Types.Hugeint; res : WORD;
+		VAR integer : Types.Hugeint; res : INTEGER;
 		BEGIN
 			Acquire;
 			modelI.GetGeneric(integer, res);
@@ -135,7 +135,7 @@ TYPE
 			rect: WMRectangles.Rectangle;
 			width: SIGNED32;
 			string : ARRAY 32 OF CHAR;
-			min, max, cur: SIGNED64; percent : WORD; color: WMGraphics.Color;
+			min, max, cur: SIGNED64; percent : INTEGER; color: WMGraphics.Color;
 			isVertical : BOOLEAN;
 		BEGIN
 			min := SELF.min.Get();

@@ -78,7 +78,7 @@ TYPE
 
 	Reader* = POINTER TO ReaderDesc;
 	ReaderDesc* = RECORD	(** structure for reading from a zip-file into a buffer **)
-		res-: WORD;	(** result of last operation **)
+		res-: INTEGER;	(** result of last operation **)
 		open: BOOLEAN;
 		ent: Entry
 	END;
@@ -94,7 +94,7 @@ TYPE
 		zr: ZlibReaders.Reader
 	END;
 
-PROCEDURE ShowError*(errorCode : WORD; out : Streams.Writer);
+PROCEDURE ShowError*(errorCode : INTEGER; out : Streams.Writer);
 BEGIN
 	ASSERT(out # NIL);
 	CASE errorCode OF
@@ -334,7 +334,7 @@ END WriteCentralDirectory;
 	- Ok: operation was successful
 	- FileError: file with specified name does not exist
 	- NotZipArchiveError: file is not a correct zipfile **)
-PROCEDURE OpenArchive*(CONST name: ARRAY OF CHAR; VAR res: WORD): Archive;
+PROCEDURE OpenArchive*(CONST name: ARRAY OF CHAR; VAR res: INTEGER): Archive;
 VAR
 	arc: Archive;
 	ent: Entry;
@@ -399,7 +399,7 @@ END OpenArchive;
 (** Returns an Archive that corresponds to a file with specified name;
 	if there is already a zip-file with the same name, this already existing archive is returned;
 	possible results: cf. OpenArchive **)
-PROCEDURE CreateArchive*(CONST name: ARRAY OF CHAR; VAR res: WORD): Archive;
+PROCEDURE CreateArchive*(CONST name: ARRAY OF CHAR; VAR res: INTEGER): Archive;
 VAR
 	f: Files.File;
 	r: Files.Rider;
@@ -443,7 +443,7 @@ END NextEntry;
 	- Ok: Operation was successful
 	- NotZipArchiveError: arc is not a valid Archive
 	- EntryNotFound: no Entry corresponding to name was found **)
-PROCEDURE GetEntry*(arc: Archive; CONST name: ARRAY OF CHAR; VAR res: WORD): Entry;
+PROCEDURE GetEntry*(arc: Archive; CONST name: ARRAY OF CHAR; VAR res: INTEGER): Entry;
 VAR
 	ent: Entry;
 BEGIN
@@ -471,7 +471,7 @@ END GetEntry;
 	- NotSupportedError: data of ent are encrypted or compression method is not supported
 	- DataError: zipfile is corrupted
 	- BadName: entry has a bad file name **)
-PROCEDURE ExtractEntry*(arc: Archive; ent: Entry; VAR dst: Files.Rider; VAR res: WORD);
+PROCEDURE ExtractEntry*(arc: Archive; ent: Entry; VAR dst: Files.Rider; VAR res: INTEGER);
 VAR
 	src: Files.Rider; crc32: SIGNED32;
 BEGIN
@@ -516,7 +516,7 @@ END ExtractEntry;
 	- EntryAlreadyExists: there is already an Entry in arc with the same name
 	- DataError: error during compression
 	- BadName: src is not based on a valid file **)
-PROCEDURE AddEntry*(arc: Archive; CONST name: ARRAY OF CHAR; VAR src: Files.Rider; len: SIGNED32; level, strategy: SIGNED8; VAR res: WORD);
+PROCEDURE AddEntry*(arc: Archive; CONST name: ARRAY OF CHAR; VAR src: Files.Rider; len: SIGNED32; level, strategy: SIGNED8; VAR res: INTEGER);
 VAR
 	dst: Files.Rider; ent: Entry; start: SIGNED32;
 BEGIN
@@ -591,7 +591,7 @@ END AddEntry;
 	- Ok: ent was deleted, ent is set to NIL
 	- NotZipArchiveError: arc is not a valid zip-archive
 	- EntryNotFound: ent is not an Entry of Archive arc **)
-PROCEDURE DeleteEntry*(arc: Archive; VAR ent: Entry; VAR res: WORD);
+PROCEDURE DeleteEntry*(arc: Archive; VAR ent: Entry; VAR res: INTEGER);
 VAR
 	f: Files.File; r1, r2: Files.Rider;
 	ent2: Entry;

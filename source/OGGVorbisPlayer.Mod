@@ -2193,7 +2193,7 @@ TYPE
 		END CloseSoundChannel;
 
 		PROCEDURE InitSoundChannel*(nrOfChannels, samplingRate, samplingResolution: SIGNED32);
-		VAR i: SIGNED32; res: WORD;
+		VAR i: SIGNED32; res: INTEGER;
 			buffer: SoundDevices.Buffer;
 		BEGIN
 		 	IF (Trace IN Debug) THEN
@@ -2705,7 +2705,7 @@ TYPE
 			RETURN Ok
 		END DecodeSetupHeader;
 
-		PROCEDURE DecodeDataPacket(res: WORD);
+		PROCEDURE DecodeDataPacket(res: INTEGER);
 		BEGIN
 			IF (Trace IN Debug) THEN OGGUtilities.String("@DecodeDataPacket()") END;
 			INC(frameCnt);
@@ -2952,7 +2952,7 @@ TYPE
 		END FloorCurveDecode;
 
 		(* calculate determining points of the window and return the amount of data to be returned *)
-		PROCEDURE WindowDecode(VAR res: WORD): SIGNED32;
+		PROCEDURE WindowDecode(VAR res: INTEGER): SIGNED32;
 		VAR modeNr, previousWindowFlag, nextWindowFlag, previousSize, currentSize: SIGNED32;
 		BEGIN
 			IF (Trace IN Debug) THEN
@@ -3414,7 +3414,7 @@ InverseDBLookupReal[255] := 1;
 		output: SoundOutput;
 		rh : WebHTTP.RequestHeader;
 		h : WebHTTP.ResponseHeader;
-		res: WORD; volume, nrOfBuffers: SIGNED32;
+		res: INTEGER; volume, nrOfBuffers: SIGNED32;
 		con : TCP.Connection;
 		outputFilename: ARRAY 64 OF CHAR;
 		timer: Kernel.Timer;
@@ -3537,7 +3537,7 @@ InverseDBLookupReal[255] := 1;
 	END IsM3UPlaylist;
 
 	PROCEDURE GetURLFromM3U(VAR url: Strings.String);
-	VAR res: WORD;
+	VAR res: INTEGER;
 		rh : WebHTTP.RequestHeader;
 		h : WebHTTP.ResponseHeader;
 		con : TCP.Connection;

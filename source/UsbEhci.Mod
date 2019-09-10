@@ -1119,7 +1119,7 @@ TYPE
 			END;
 		END Schedule;
 
-		PROCEDURE CreateTDList(pipe : UsbHcdi.Pipe; direction: WORD; len, ofs : SIZE; VAR buffer : Usbdi.Buffer; firstTD : SIGNED32; VAR lastTD : Machine.Address32; tdToggle : BOOLEAN) : BOOLEAN;
+		PROCEDURE CreateTDList(pipe : UsbHcdi.Pipe; direction: INTEGER; len, ofs : SIZE; VAR buffer : Usbdi.Buffer; firstTD : SIGNED32; VAR lastTD : Machine.Address32; tdToggle : BOOLEAN) : BOOLEAN;
 		VAR
 			restlen, curlen, temp : SIGNED32;
 			j, qtd, nextTd : SIGNED32;

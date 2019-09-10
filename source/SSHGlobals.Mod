@@ -172,7 +172,7 @@ VAR
 	PROCEDURE GetConfigBuffer(): Buffer;
 	VAR
 		text: Texts.Text; r: Texts.TextReader;
-		ch, format: WORD; len, i, j, bytesPerChar: SIZE; res: WORD;
+		ch, format: INTEGER; len, i, j, bytesPerChar: SIZE; res: INTEGER;
 		buffer: Buffer;
 	BEGIN
 		NEW( text );

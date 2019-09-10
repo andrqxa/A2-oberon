@@ -604,7 +604,7 @@ TYPE
 
 		PROCEDURE ReplaceNonDChars(VAR str: ARRAY OF CHAR);
 		VAR
-			i: SIZE; num: WORD;
+			i: SIZE; num: INTEGER;
 		BEGIN
 			WHILE str[i] # 0X DO
 				num := ORD(str[i]);
@@ -833,7 +833,7 @@ TYPE
 		PROCEDURE Read*(startsec: SIGNED32): SIGNED32;
 		VAR
 			voldescr: PSVolumeDescriptor;
-			res: WORD; treeType: SIGNED32;
+			res: INTEGER; treeType: SIGNED32;
 			rootRec: DirectoryRecord;
 			root: Directory;
 			tmp, name: ARRAY MaxLen OF CHAR;
@@ -856,9 +856,9 @@ TYPE
 			RETURN ResOk;
 		END Read;
 
-		PROCEDURE ReadDir(parent: Directory): WORD;
+		PROCEDURE ReadDir(parent: Directory): INTEGER;
 		VAR
-			index, size, lba, len: SIGNED32; res: WORD;
+			index, size, lba, len: SIGNED32; res: INTEGER;
 			name : ARRAY MaxLen OF CHAR;
 			dirRec: DirectoryRecord;
 			file: File;
@@ -1222,9 +1222,9 @@ TYPE
 				END;
 			END GetSysType;
 
-			PROCEDURE WriteImages(w: Streams.Writer): WORD;
+			PROCEDURE WriteImages(w: Streams.Writer): INTEGER;
 			VAR
-				res : WORD;
+				res : INTEGER;
 				cur: BCEntry;
 			BEGIN
 				cur := root;
@@ -1351,12 +1351,12 @@ BEGIN
 	END;
 END Pad;
 
-PROCEDURE WriteFiles(w: Streams.Writer; dir: Directory): WORD;
+PROCEDURE WriteFiles(w: Streams.Writer; dir: Directory): INTEGER;
 VAR
 	node: Node;
 	cur: Directory;
 	pathname: ARRAY MaxLen OF CHAR;
-	res: WORD;
+	res: INTEGER;
 BEGIN
 	node := dir.content;
 	WHILE node # NIL DO
@@ -1390,7 +1390,7 @@ VAR
 	file: Files.File;
 	r: Files.Reader;
 	buf: ARRAY 1024 OF CHAR;
-	bytesRead: SIZE; res: WORD;
+	bytesRead: SIZE; res: INTEGER;
 BEGIN
 	res := ErrFileNotFound;
 	status.fileName := Strings.NewString(pathname);
@@ -1590,7 +1590,7 @@ BEGIN
 	Strings.TrimRight(str, ' ');
 END ConvertIdentToUTF8;
 
-PROCEDURE MakeImageFromDir*(rootDir, isoDest: String; settings: IsoSettings; writeStatusChanged: Utils.StatusProc): WORD;
+PROCEDURE MakeImageFromDir*(rootDir, isoDest: String; settings: IsoSettings; writeStatusChanged: Utils.StatusProc): INTEGER;
 VAR
 	root: Directory;
 	isotree: DirectoryTree;
@@ -1605,7 +1605,7 @@ BEGIN
 	RETURN MakeImage(isotree, isoDest, settings);
 END MakeImageFromDir;
 
-PROCEDURE MakeImageFromTree*(root: Directory; isoDest: String; settings: IsoSettings; writeStatusChanged: Utils.StatusProc): WORD;
+PROCEDURE MakeImageFromTree*(root: Directory; isoDest: String; settings: IsoSettings; writeStatusChanged: Utils.StatusProc): INTEGER;
 VAR
 	isotree: DirectoryTree;
 BEGIN
@@ -1615,13 +1615,13 @@ BEGIN
 	RETURN MakeImage(isotree, isoDest, settings);
 END MakeImageFromTree;
 
-PROCEDURE MakeImage*(isotree: DirectoryTree; isoDest: String; settings: IsoSettings): WORD;
+PROCEDURE MakeImage*(isotree: DirectoryTree; isoDest: String; settings: IsoSettings): INTEGER;
 VAR
 	fOut: Files.File;
 	out: Files.Writer;
 	jtree : DirectoryTree;
 	isotable, jtable: PathTable;
-	lba, freeSpace, padding: SIGNED32; res: WORD;
+	lba, freeSpace, padding: SIGNED32; res: INTEGER;
 	pdescr, sdescr: PSVolumeDescriptor;
 	bdescr: BootRecord;
 	tdescr: SetTerminator;
@@ -1748,9 +1748,9 @@ BEGIN
 END DirExists;
 
 (* SaveImage is used to copy data cds *)
-PROCEDURE SaveImage*(dev: ATADisks.DeviceATAPI; startsec: SIGNED32; CONST dest: ARRAY OF CHAR; onWriteStatusChanged: Utils.StatusProc): WORD;
+PROCEDURE SaveImage*(dev: ATADisks.DeviceATAPI; startsec: SIGNED32; CONST dest: ARRAY OF CHAR; onWriteStatusChanged: Utils.StatusProc): INTEGER;
 VAR
-	sec, size: SIGNED32; res: WORD;
+	sec, size: SIGNED32; res: INTEGER;
 	buf: ARRAY TransferSize*SectorSize OF CHAR;
 	pvd: PSVolumeDescriptor;
 	f: Files.File;
@@ -1795,10 +1795,10 @@ BEGIN
 	RETURN ResOk;
 END SaveImage;
 
-PROCEDURE GetVolumeDescriptor*(dev: ATADisks.DeviceATAPI; startsec: SIGNED32; VAR descr: PSVolumeDescriptor; descrType: SIGNED32): WORD;
+PROCEDURE GetVolumeDescriptor*(dev: ATADisks.DeviceATAPI; startsec: SIGNED32; VAR descr: PSVolumeDescriptor; descrType: SIGNED32): INTEGER;
 VAR
 	type: CHAR;
-	sec: SIGNED32; res: WORD;
+	sec: SIGNED32; res: INTEGER;
 	tmp: ARRAY MaxLen OF CHAR;
 	buf: ARRAY SectorSize OF CHAR;
 BEGIN
@@ -1827,7 +1827,7 @@ END GetVolumeDescriptor;
 PROCEDURE Make*(context : Commands.Context);
 VAR
 	rootDir, isoDest: String;
-	res : WORD;
+	res : INTEGER;
 	settings: IsoSettings;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(isoDest^);

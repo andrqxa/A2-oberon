@@ -521,9 +521,9 @@ TYPE
 		maxMnemonicNameLength: SIGNED32;
 		maxOpcodeLength: SIGNED32;
 
-		PROCEDURE Priority(i: Instruction): WORD;
+		PROCEDURE Priority(i: Instruction): INTEGER;
 
-			PROCEDURE OP(CONST o: ARRAY OF CHAR): WORD;
+			PROCEDURE OP(CONST o: ARRAY OF CHAR): INTEGER;
 			BEGIN
 				IF o = "" THEN
 					RETURN 10

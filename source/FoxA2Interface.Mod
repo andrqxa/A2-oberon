@@ -101,7 +101,7 @@ TYPE
 
 	END StreamDiagnostics;
 
-	PROCEDURE Print (w: Streams.Writer; CONST source : ARRAY OF CHAR; position: Streams.Position; type: WORD; CONST message: ARRAY OF CHAR);
+	PROCEDURE Print (w: Streams.Writer; CONST source : ARRAY OF CHAR; position: Streams.Position; type: INTEGER; CONST message: ARRAY OF CHAR);
 	VAR attributes: Texts.Attributes;
 	BEGIN
 		IF w IS TextUtilities.TextWriter THEN

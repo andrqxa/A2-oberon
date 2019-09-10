@@ -170,7 +170,7 @@ TYPE
 			started: BOOLEAN;
 			next*: Disk;
 
-		PROCEDURE Transfer*(op, start, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE Transfer*(op, start, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		VAR  requ: Command;  str: ARRAY 32 OF CHAR;
 		BEGIN
 			IF (op = Disks.Read) OR (op = Disks.Write) THEN
@@ -194,7 +194,7 @@ TYPE
 			END
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: WORD);
+		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		VAR  blkSize: SIGNED32;
 		BEGIN
 			DoReadCapacity(bus, target, 0, size, blkSize, res);
@@ -204,7 +204,7 @@ TYPE
 			END;
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: WORD);
+		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
 		BEGIN
 			IF msg IS Disks.EjectMsg THEN
 				res := Disks.Unsupported
@@ -331,7 +331,7 @@ BEGIN
 	c.target := t;  c.lun := l;  c.chan := 0;
 END NewCmd;
 
-PROCEDURE DoSense*(b: Bus;  target,  lun: SIGNED8;  VAR key, code: SIGNED32; VAR res: WORD);
+PROCEDURE DoSense*(b: Bus;  target,  lun: SIGNED8;  VAR key, code: SIGNED32; VAR res: INTEGER);
 VAR requ: Command; data: ARRAY 36 OF CHAR;
 BEGIN
 	MakeCmd6(requ.cmd, RequestSense, lun, 0, 36, 0);
@@ -346,7 +346,7 @@ BEGIN
 	res := requ.status
 END DoSense;
 
-PROCEDURE SubmitAndSense*(d: Bus;  VAR requ: Command;  maxtry: SIGNED32;  msg: ARRAY OF CHAR;  VAR res: WORD);
+PROCEDURE SubmitAndSense*(d: Bus;  VAR requ: Command;  maxtry: SIGNED32;  msg: ARRAY OF CHAR;  VAR res: INTEGER);
 VAR key, code, kind: SIGNED32; first: BOOLEAN;
 BEGIN
 	first := TRUE;
@@ -385,7 +385,7 @@ BEGIN
 	res := requ.status
 END SubmitAndSense;
 
-PROCEDURE DoTestUnitReady*(b: Bus;  target, lun: SIGNED8;  VAR res: WORD);
+PROCEDURE DoTestUnitReady*(b: Bus;  target, lun: SIGNED8;  VAR res: INTEGER);
 VAR requ: Command;
 BEGIN
 	MakeCmd6(requ.cmd, TestUnitReady, lun, 0, 0, 0);
@@ -394,7 +394,7 @@ BEGIN
 	res := requ.status
 END DoTestUnitReady;
 
-PROCEDURE DoInquiry*(b: Bus;  target, lun: SIGNED8; VAR inq: InquiryData; VAR res: WORD);
+PROCEDURE DoInquiry*(b: Bus;  target, lun: SIGNED8; VAR inq: InquiryData; VAR res: INTEGER);
 VAR requ: Command; data: ARRAY 36 OF CHAR; i: SIGNED32;
 BEGIN
 	MakeCmd6(requ.cmd, Inquiry, lun, 0, 36, 0);
@@ -427,7 +427,7 @@ BEGIN
 	END
 END DoInquiry;
 
-PROCEDURE DoStartStopUnit*(b: Bus;  target, lun: SIGNED8; start: BOOLEAN;  VAR res: WORD);
+PROCEDURE DoStartStopUnit*(b: Bus;  target, lun: SIGNED8; start: BOOLEAN;  VAR res: INTEGER);
 VAR	requ: Command;
 BEGIN
 	MakeCmd6(requ.cmd, StartStop, 0, 0, 0, 0);
@@ -437,7 +437,7 @@ BEGIN
 	res := requ.status
 END DoStartStopUnit;
 
-PROCEDURE PreventAllowRemoval(d: Disk;  prevent: BOOLEAN;  VAR res: WORD);
+PROCEDURE PreventAllowRemoval(d: Disk;  prevent: BOOLEAN;  VAR res: INTEGER);
 VAR	requ: Command;
 BEGIN
 	IF Disks.Removable IN d.flags THEN
@@ -450,7 +450,7 @@ BEGIN
 	END
 END PreventAllowRemoval;
 
-PROCEDURE DoReadCapacity*(b: Bus;  target, lun: SIGNED8;  VAR capacity, blockSize: SIGNED32;  VAR res: WORD);
+PROCEDURE DoReadCapacity*(b: Bus;  target, lun: SIGNED8;  VAR capacity, blockSize: SIGNED32;  VAR res: INTEGER);
 VAR  requ: Command;  data: ARRAY 128 OF CHAR;  i: SIGNED32;
 BEGIN
 	capacity := 0;  blockSize := 0;
@@ -468,7 +468,7 @@ BEGIN
 END DoReadCapacity;
 
 PROCEDURE InitDisk(d: Disk);
-VAR  requ: Command;  data: ARRAY 128 OF CHAR; res: WORD;
+VAR  requ: Command;  data: ARRAY 128 OF CHAR; res: INTEGER;
 BEGIN
 	MakeCmd6(requ.cmd, ModeSense, 0, 0, 128, 0);
 	NewCmd(requ, d.target, 0, 6, ADDRESSOF(data), 128);
@@ -489,7 +489,7 @@ BEGIN
 END InitDisk;
 
 PROCEDURE TerminateDisk(d: Disk);
-VAR  res: WORD;
+VAR  res: INTEGER;
 BEGIN
 	IF d.started THEN
 		DoStartStopUnit(d.bus, d.target, 0, FALSE, res);
@@ -512,7 +512,7 @@ END NumToChar;
 (** SCSI Bus Handling *)
 
 PROCEDURE InitBus(bus: Bus);
-VAR  i: SIGNED8;  d: Disk; data: InquiryData;  max, j, k: SIGNED32; res: WORD; name: Plugins.Name;
+VAR  i: SIGNED8;  d: Disk; data: InquiryData;  max, j, k: SIGNED32; res: INTEGER; name: Plugins.Name;
 BEGIN
 	i := 0;
 	IF bus.wide THEN  max := 16  ELSE  max := 8  END;

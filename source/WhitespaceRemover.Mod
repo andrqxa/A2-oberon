@@ -70,8 +70,8 @@ BEGIN
 END CheckWhitespace;
 
 (** Removed all end-of-line whitespace from file named 'filename' *)
-PROCEDURE RemoveFromFile*(VAR filename : Files.FileName; VAR nofRemoved: SIZE; VAR res : WORD);
-VAR file : Files.File; text : Texts.Text; format : WORD;
+PROCEDURE RemoveFromFile*(VAR filename : Files.FileName; VAR nofRemoved: SIZE; VAR res : INTEGER);
+VAR file : Files.File; text : Texts.Text; format : INTEGER;
 BEGIN
 	file := Files.Old(filename);
 	IF (file # NIL) THEN
@@ -103,7 +103,7 @@ VAR
 	fileflags : SET;
 	time, date : SIGNED32;
 	size : Files.Size;
-	nofRemovedTotal: SIZE; res : WORD;
+	nofRemovedTotal: SIZE; res : INTEGER;
 	nofFiles, nofErrors : SIZE;
 
 	PROCEDURE RemoveFromThisFile(VAR filename : Files.FileName);

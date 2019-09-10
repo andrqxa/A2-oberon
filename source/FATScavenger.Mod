@@ -735,7 +735,7 @@ TYPE
 			collision : BOOLEAN;
 			vdf, clnShutdown, ioError : SET; (* Volume dirty flags (FAT16/32) *)
 			bpb : Block;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			IF Trace THEN KernelLog.String("FATScavenger started on "); END;
 			SetStatus(state.status, "Scavenger starting...", 0, 0, 0, FALSE);
@@ -918,7 +918,7 @@ TYPE
 		PROCEDURE GetFSInfo(VAR freeCount, nextFree : SIGNED32) : BOOLEAN;
 		VAR
 			bootsector : ARRAY FATVolumes.BS OF CHAR;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			(* load the boot sector to get address of FSinfo block *)
 			dev.Transfer(Disks.Read, vol.start, 1, bootsector, 0, res);
@@ -958,7 +958,7 @@ TYPE
 		END GetFSInfo;
 
 		PROCEDURE SetFSInfo(freeCount, nextFree : SIGNED32);
-		VAR res : WORD;
+		VAR res : INTEGER;
 		BEGIN
 			IF fsInfoLoaded THEN
 				FATVolumes.PutLongint(fsinfo, 488, freeCount); (* - deleted + created *)
@@ -980,7 +980,7 @@ TYPE
 			buffer : POINTER TO ARRAY OF CHAR;
 			buffersize, reads : SIGNED32;
 			operation : String;
-			i, j, k : SIGNED32; res : WORD;
+			i, j, k : SIGNED32; res : INTEGER;
 		BEGIN
 			IF Trace THEN KernelLog.String("Comparing FATs... "); END;
 			INC(curOp); operation := GetString(curOp, maxOp, "", "Comparing FAT structures");
@@ -1123,7 +1123,7 @@ TYPE
 			newBadClusters, cluster, link : SIGNED32;
 			operation, string, temp : String;
 			address : Files.Address;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			NEW(data,vol.clusterSize);
 			IF Trace THEN KernelLog.String("Surface scan started..."); END;
@@ -1174,7 +1174,7 @@ TYPE
 		VAR
 			temp, temp2 : LostCluster;
 			string, error : String;
-			counter : SIGNED32; res : WORD;
+			counter : SIGNED32; res : INTEGER;
 		BEGIN
 			IF Trace THEN KernelLog.String("Deleting lost clusters... "); END;
 			ASSERT((lostErrorList#NIL) & (fileList#NIL));
@@ -1469,7 +1469,7 @@ TYPE
 			entry : Entry; shortEntry : ShortEntry;
 			dirFragments, dirClusters : SIGNED32;
 			collision : BOOLEAN;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			IF Trace THEN KernelLog.String("Scanning FAT directory structure... "); END;
 			INC(curOp); operation := GetString(curOp, maxOp, "", "Scanning FAT directory: ");
@@ -1600,7 +1600,7 @@ TYPE
 			temp2 : Entry;
 			test : BOOLEAN;
 			address : Files.Address;
-			offset : SIGNED32; res : WORD;
+			offset : SIGNED32; res : INTEGER;
 		BEGIN
 			ASSERT((entry # NIL) & (vol # NIL) & (dev # NIL));
 			test:=TRUE;
@@ -1650,7 +1650,7 @@ TYPE
 			RETURN string;
 		END GetString;
 
-		PROCEDURE ReportTransferError(name : ARRAY OF CHAR; op, adr: SIGNED32; res: WORD);
+		PROCEDURE ReportTransferError(name : ARRAY OF CHAR; op, adr: SIGNED32; res: INTEGER);
 		VAR temp: ARRAY 256 OF CHAR;
 		BEGIN
 			Strings.Append(name, " (");
@@ -1731,7 +1731,7 @@ TYPE
 			rootDirSectors, firstDataSector : SIGNED32;
 			freeCount, firstFree, media: SIGNED32;
 			spc, type : SIGNED32; (* sectors per cluster *)
-			i : SIZE; res : WORD;
+			i : SIZE; res : INTEGER;
 			temp: ARRAY 256 OF CHAR;
 		BEGIN
 			type := disk.table[partition].type;
@@ -1854,7 +1854,7 @@ TYPE
 		VAR
 			buf : POINTER TO ARRAY OF CHAR;
 			ofs, num : SIGNED32;
-			res : WORD;
+			res : INTEGER;
 			temp: ARRAY 256 OF CHAR;
 		BEGIN
 			ASSERT(from < to);

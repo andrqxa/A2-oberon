@@ -88,7 +88,7 @@ TYPE
 		method: ARRAY 16 OF CHAR;
 		uri: ARRAY 1024 OF CHAR;
 		status: SIGNED32;
-		result: WORD;
+		result: INTEGER;
 		pending: BOOLEAN;
 	END;
 
@@ -197,7 +197,7 @@ TYPE
 
 		PROCEDURE Directory(name: ARRAY OF CHAR; full: BOOLEAN);
 		VAR data: TCP.Connection; w: Streams.Writer; e: Files.Enumerator; t: Kernel.MilliTimer;
-			prefix: Files.Prefix; str: ARRAY 20 OF CHAR; date, time: SIGNED32; size: Files.Size; res: WORD; flags: SET; c: CHAR;
+			prefix: Files.Prefix; str: ARRAY 20 OF CHAR; date, time: SIGNED32; size: Files.Size; res: INTEGER; flags: SET; c: CHAR;
 			split: BOOLEAN;
 		BEGIN
 			SendMessage(150, "Opening ASCII mode data connection for file list.");
@@ -277,7 +277,7 @@ TYPE
 
 		PROCEDURE Retrieve(name: ARRAY OF CHAR; marker: SIGNED32);
 		VAR data: TCP.Connection; w: Streams.Writer; f: Files.File; r: Files.Reader;
-			filename, msg: ARRAY dirLen OF CHAR; res: WORD;
+			filename, msg: ARRAY dirLen OF CHAR; res: INTEGER;
 		BEGIN
 			IF (type = ASCII) THEN COPY("ASCII", msg) ELSE COPY("Binary", msg) END;
 			Strings.Append(msg, " data connection for "); Strings.Append(msg, name);
@@ -326,7 +326,7 @@ TYPE
 
 		PROCEDURE Store(name: ARRAY OF CHAR; marker: Files.Position);
 		VAR data: TCP.Connection; r: Streams.Reader; f: Files.File; w: Files.Writer;
-			filename, msg: ARRAY dirLen OF CHAR; res: WORD;
+			filename, msg: ARRAY dirLen OF CHAR; res: INTEGER;
 		BEGIN
 			IF (type = ASCII) THEN COPY("ASCII", msg) ELSE COPY("Binary", msg) END;
 			Strings.Append(msg, " data connection for "); Strings.Append(msg, name);
@@ -383,7 +383,7 @@ TYPE
 		PROCEDURE Execute(VAR cmd, param: ARRAY OF CHAR);
 		VAR
 			tmp, filename, str: ARRAY dirLen OF CHAR;
-			i, code, lastState: SIGNED32; res: WORD;
+			i, code, lastState: SIGNED32; res: INTEGER;
 
 		BEGIN
 			lastState := state; state := Ok;
@@ -894,7 +894,7 @@ BEGIN
 END NewFTPAgent;
 
 PROCEDURE Start*(context : Commands.Context); (** ["\l:" log file] *)
-VAR c, opt: CHAR; str, log: ARRAY 1024 OF CHAR;	res : WORD;
+VAR c, opt: CHAR; str, log: ARRAY 1024 OF CHAR;	res : INTEGER;
 BEGIN
 	IF ftp = NIL THEN
 		COPY(LogFile, log);

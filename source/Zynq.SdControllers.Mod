@@ -25,7 +25,7 @@ TYPE
 
 		PROCEDURE & Init (base: ADDRESS; int: SIGNED32; clock: SIGNED64);
 		VAR
-			result: WORD;
+			result: INTEGER;
 		BEGIN
 			NEW(hc);
 			Sd.InitHostController(hc, base);

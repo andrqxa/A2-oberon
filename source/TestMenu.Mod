@@ -187,7 +187,7 @@ TYPE
 		END Init;
 
 		PROCEDURE Execute;
-		VAR ignoreRes : WORD; ignoreMsg : ARRAY 1 OF CHAR;
+		VAR ignoreRes : INTEGER; ignoreMsg : ARRAY 1 OF CHAR;
 		BEGIN
 			Commands.Call(commandString, {}, ignoreRes, ignoreMsg);
 		END Execute;

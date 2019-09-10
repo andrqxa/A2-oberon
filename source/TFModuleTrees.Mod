@@ -460,7 +460,7 @@ TYPE
 
 			done : BOOLEAN;
 			cr : Reference; count, i : SIGNED32; refs : RefArray;
-			t0, t1: SIGNED32; res: WORD;
+			t0, t1: SIGNED32; res: INTEGER;
 			child: WMTrees.TreeNode;
 
 			PROCEDURE QuickSort(references: RefArray; lo, hi: SIGNED32);

@@ -99,7 +99,7 @@ BEGIN
 END ReadQuotesX;
 
 PROCEDURE StartService(context : Commands.Context);
-VAR res : WORD;
+VAR res : INTEGER;
 BEGIN
 	IF (NnofQuotes > 0) THEN
 		NEW(quoteService, QuotePort, NewQuoteAgent, res);

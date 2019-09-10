@@ -37,7 +37,7 @@ VAR
 	NDNSReceived-, NDNSSent-, NDNSMismatchID-, NDNSError-: SIGNED32;
 
 	(** Find the host responsible for mail exchange of the specified domain. *)
-	PROCEDURE MailHostByDomain*( CONST domain: ARRAY OF CHAR;  VAR hostname: ARRAY OF CHAR;  VAR res: WORD );
+	PROCEDURE MailHostByDomain*( CONST domain: ARRAY OF CHAR;  VAR hostname: ARRAY OF CHAR;  VAR res: INTEGER );
 	BEGIN
 		HALT( 99 );	(* not implemented yet. needed ?? *)
 		hostname[0] := 0X
@@ -45,7 +45,7 @@ VAR
 
 	(** Find the IP address of the specified host. *)
 
-	PROCEDURE HostByName*( CONST hostname: ARRAY OF CHAR;  VAR addr: IP.Adr;  VAR res: WORD );
+	PROCEDURE HostByName*( CONST hostname: ARRAY OF CHAR;  VAR addr: IP.Adr;  VAR res: INTEGER );
 	VAR
 		hostent: Hostent;
 		firstaddrPtr: ADDRESS;
@@ -68,7 +68,7 @@ VAR
 
 	(** Find the host name of the specified IP address. *)
 
-	PROCEDURE HostByNumber*( addr: IP.Adr;  VAR hostname: ARRAY OF CHAR;  VAR res: WORD );
+	PROCEDURE HostByNumber*( addr: IP.Adr;  VAR hostname: ARRAY OF CHAR;  VAR res: INTEGER );
 	VAR
 		hostent: Hostent;
 	BEGIN {EXCLUSIVE}
@@ -89,7 +89,7 @@ VAR
 	END HostByNumber;
 
 	(* none portable, Unix ports only! *)
-	PROCEDURE GetHostName*( VAR name: ARRAY OF CHAR;  VAR res: WORD );
+	PROCEDURE GetHostName*( VAR name: ARRAY OF CHAR;  VAR res: INTEGER );
 	VAR x: SIGNED32;
 	BEGIN
 		x := gethostname( ADDRESSOF( name ), LEN( name ) );

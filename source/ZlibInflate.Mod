@@ -59,7 +59,7 @@ MODULE ZlibInflate;	(** eos  **)
 
 		(** result codes **)
 		Result* = RECORD
-			code-: WORD;	(** result code including special conditions and errors **)
+			code-: INTEGER;	(** result code including special conditions and errors **)
 			msg-: POINTER TO ARRAY OF CHAR;	(** detailed error description if available **)
 		END;
 
@@ -238,7 +238,7 @@ MODULE ZlibInflate;	(** eos  **)
 	END MakeFixedDistCode;
 
 	(* build huffman tree for given code *)
-	PROCEDURE BuildTree (VAR clen: Lengths; VAR code: Code; VAR tn: TreeNodes; VAR tree: Tree; VAR res: WORD);
+	PROCEDURE BuildTree (VAR clen: Lengths; VAR code: Code; VAR tn: TreeNodes; VAR tree: Tree; VAR res: INTEGER);
 		CONST
 			maxLen = 15;	(* maximum bit length of any code *)
 		VAR
@@ -746,7 +746,7 @@ MODULE ZlibInflate;	(** eos  **)
 
 	PROCEDURE InflateBlocks (VAR s: Stream);
 		VAR
-			wavail, t: SIZE; cnt, len: SIGNED32; tn: TreeNodes; clen: ARRAY MaxLitLenCodes OF SIGNED8; code: Code; res: WORD;
+			wavail, t: SIZE; cnt, len: SIGNED32; tn: TreeNodes; clen: ARRAY MaxLitLenCodes OF SIGNED8; code: Code; res: INTEGER;
 			node: Node; lltree, dtree: Tree;
 	BEGIN
 		IF s.write < s.read THEN wavail := s.read - s.write - 1
@@ -1032,7 +1032,7 @@ MODULE ZlibInflate;	(** eos  **)
 
 	(** inflate until either input or output buffer runs out; if op is 'Finish', Inflate returns with either 'StreamEnd' or an error **)
 	PROCEDURE Inflate* (VAR stream: Stream; flush: SIGNED8);
-		VAR res: WORD; byte: CHAR; (* inxt, onxt: SIGNED32; *)
+		VAR res: INTEGER; byte: CHAR; (* inxt, onxt: SIGNED32; *)
 	BEGIN
 		IF ~stream.open THEN
 			stream.res.code := StreamError

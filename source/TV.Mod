@@ -223,7 +223,7 @@ TYPE
 			dragging := FALSE
 		END PointerUp;
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : WORD);
+		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			Draw^(canvas, w, h, 0)
 		END Draw;
@@ -443,7 +443,7 @@ CONST
 VAR
 	ch, max, found: SIGNED32;
 	i, length: SIZE;
-	res: WORD;
+	res: INTEGER;
 	tvWnd : TvWindow;
 	tvCh : TVChannels.TVChannel;
 	channels : TVChannels.ChannelList;

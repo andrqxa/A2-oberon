@@ -454,7 +454,7 @@ TYPE
 *)
 
 		PROCEDURE VisitIdentifierDesignator*(x: SyntaxTree.IdentifierDesignator);
-		VAR moduleName: Modules.Name; msg: ARRAY 128 OF CHAR; res: WORD;
+		VAR moduleName: Modules.Name; msg: ARRAY 128 OF CHAR; res: INTEGER;
 			builtin : Builtin; anyValue: Any;
 		BEGIN
 			ASSERT(x.left = NIL);
@@ -877,7 +877,7 @@ TYPE
 		END TranslateString;
 
 		PROCEDURE VisitCommandStatement(x: CommandStatement);
-		VAR t: Strings.String; res: WORD; msg: ARRAY 128 OF CHAR; i: SIZE; array: Strings.StringArray; pos: SIGNED32;
+		VAR t: Strings.String; res: INTEGER; msg: ARRAY 128 OF CHAR; i: SIZE; array: Strings.StringArray; pos: SIGNED32;
 			command: ARRAY 256 OF CHAR; context: Commands.Context;
 
 			PROCEDURE CreateContext(paramString : Strings.String; pos: SIGNED32) : Commands.Context;

@@ -265,7 +265,7 @@ CONST HLOver* = 0; HLUnder* = 1; HLWave* = 2;
 TYPE
 	Highlight* = OBJECT
 	VAR
-		kind : WORD;
+		kind : INTEGER;
 		from*, to* : Texts.TextPosition;
 		a*, b* : SIZE; (* only valid after sort, while holding the lock *)
 		active* : BOOLEAN; (* only valid after sort, while holding the lock *)
@@ -280,7 +280,7 @@ TYPE
 			oldColor := color;
 		END New;
 
-		PROCEDURE SetKind*(kind : WORD);
+		PROCEDURE SetKind*(kind : INTEGER);
 		BEGIN
 			IF SELF.kind # kind THEN
 				SELF.kind := kind;
@@ -593,7 +593,7 @@ TYPE
 			SELF.text := text; SELF.pos := pos
 		END New;
 
-		PROCEDURE GetInterface*(type : WORD) : WMDropTarget.DropInterface;
+		PROCEDURE GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
 		VAR di : WMDropTarget.DropText;
 		BEGIN
 			IF type = WMDropTarget.TypeText THEN
@@ -3129,7 +3129,7 @@ TYPE
 			itf : WMDropTarget.DropInterface;
 			targetText, temp : Texts.Text;
 			string : Strings.String;
-			pos, a, b: SIZE; res: WORD;
+			pos, a, b: SIZE; res: INTEGER;
 		BEGIN
 			IF (dragSelA = NIL) OR (dragSelB = NIL)  THEN RETURN END;
 
@@ -3757,7 +3757,7 @@ TYPE
 			s : Strings.String;
 			msg : ARRAY 128 OF CHAR;
 			ignore : Modules.Name;
-			paramSize, i, j, nofLastSelections, a, b: SIZE; res: WORD;
+			paramSize, i, j, nofLastSelections, a, b: SIZE; res: INTEGER;
 			selectionText : Texts.Text;
 			selectionOk : BOOLEAN;
 			from, to: Texts.TextPosition;
@@ -3873,7 +3873,7 @@ TYPE
 		END StartCommand;
 
 		PROCEDURE Start(sender, data: ANY);
-		VAR msg: ARRAY 512 OF CHAR; res: WORD;
+		VAR msg: ARRAY 512 OF CHAR; res: INTEGER;
 		BEGIN
 			IF (data # NIL) & (data IS ClickInfo) THEN
 				IF data(ClickInfo).cmdPar # NIL THEN

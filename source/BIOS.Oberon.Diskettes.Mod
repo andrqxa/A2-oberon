@@ -27,17 +27,17 @@ TYPE
 			size, sectors, heads, tracks: SIGNED32;
 			gap, rate, spec1, spec2, fgap: CHAR;
 
-		PROCEDURE Transfer*(op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD);
+		PROCEDURE Transfer*(op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: INTEGER);
 		BEGIN
 			Transfer1(SELF, op, start, num, buf, ofs, res)
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: WORD);
+		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			GetSize1(SELF, size, res)
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message;  VAR res: WORD);
+		PROCEDURE Handle*(VAR msg: Disks.Message;  VAR res: INTEGER);
 		BEGIN
 			Handle1(SELF, msg, res)
 		END Handle;
@@ -373,7 +373,7 @@ BEGIN
 	IF dev.media = media THEN RETURN Ok ELSE RETURN Disks.MediaChanged END
 END Do;
 
-PROCEDURE Transfer0(d: Disks.Device;  op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD);
+PROCEDURE Transfer0(d: Disks.Device;  op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: INTEGER);
 VAR dev: Device; sector, head, track, s, n, max, start0, num0: SIGNED32; ofs0: SIZE;
 BEGIN
 	dev := d(Device);
@@ -406,12 +406,12 @@ BEGIN
 	END
 END Transfer0;
 
-PROCEDURE Transfer1(d: Disks.Device;  op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD);
+PROCEDURE Transfer1(d: Disks.Device;  op, start, num: SIGNED32;  VAR buf: ARRAY OF CHAR;  ofs: SIZE;  VAR res: INTEGER);
 BEGIN {EXCLUSIVE}
 	Transfer0(d, op, start, num, buf, ofs, res)
 END Transfer1;
 
-PROCEDURE GetSize1(d: Disks.Device;  VAR size: SIGNED32; VAR res: WORD);
+PROCEDURE GetSize1(d: Disks.Device;  VAR size: SIGNED32; VAR res: INTEGER);
 VAR dev: Device;  buf: ARRAY BS OF CHAR;
 BEGIN {EXCLUSIVE}
 	dev := d(Device);
@@ -419,7 +419,7 @@ BEGIN {EXCLUSIVE}
 	IF res = Disks.Ok THEN size := dev.size ELSE size := 0 END
 END GetSize1;
 
-PROCEDURE Handle1(d: Disks.Device;  VAR msg: Disks.Message;  VAR res: WORD);
+PROCEDURE Handle1(d: Disks.Device;  VAR msg: Disks.Message;  VAR res: INTEGER);
 VAR dev: Device;  buf: ARRAY BS OF CHAR;
 BEGIN {EXCLUSIVE}
 	dev := d(Device);
@@ -553,7 +553,7 @@ BEGIN
 END Init;
 
 PROCEDURE Register;
-VAR i: SIGNED32; res: WORD; dev: Device; name: Plugins.Name;
+VAR i: SIGNED32; res: INTEGER; dev: Device; name: Plugins.Name;
 BEGIN
 	FOR i := 0 TO MaxDevices-1 DO
 		dev := device[i];

@@ -687,7 +687,7 @@ BEGIN
 END QInSet;
 
 PROCEDURE QInit(d: Bus);
-VAR paddr: ADDRESS; i: WORD;
+VAR paddr: ADDRESS; i: INTEGER;
 BEGIN
 	IF traceCalls IN trace THEN  BusNameMsg(d, "QInit"); KernelLog.Ln  END;
 (*
@@ -765,7 +765,7 @@ BEGIN
 END HSFreeScb;
 
 PROCEDURE HSInit(d: Bus);
-VAR  paddr: ADDRESS; i: WORD;  quit: BOOLEAN;
+VAR  paddr: ADDRESS; i: INTEGER;  quit: BOOLEAN;
 BEGIN
 	IF traceCalls IN trace THEN  BusNameMsg(d, "HSInit"); KernelLog.Ln  END;
 	(*allocate hw-scb buffer*)
@@ -867,7 +867,7 @@ END SeqLoad;
 
 PROCEDURE PCIClearInt(d: Bus);
 CONST	DPR = 0;  RMA = 5;  RTA = 4;
-VAR	res: WORD; dw: SIGNED32;  bus, dev, slot: SIGNED32;
+VAR	res: INTEGER; dw: SIGNED32;  bus, dev, slot: SIGNED32;
 BEGIN
 	bus := d.busNo;  dev := d.devNo;  slot := d.slotNo;
 	res := PCI.ReadConfigByte(bus, dev, slot, 7H, dw);
@@ -878,7 +878,7 @@ BEGIN
 END PCIClearInt;
 
 PROCEDURE PCIInit(d: Bus;  bus, dev, slot: SIGNED32);
-VAR  res: WORD; dw: SIGNED32;
+VAR  res: INTEGER; dw: SIGNED32;
 BEGIN
 	IF traceCalls IN trace THEN  BusNameMsg(d, "PCIInit"); KernelLog.Ln  END;
 	res:=PCI.ReadConfigByte(bus, dev, slot, PCI.IntlReg, dw);	(*irq*)
@@ -1598,7 +1598,7 @@ END BusInit;
 (* Bus detection *)
 
 PROCEDURE Detect;
-VAR  dummy, idx, bus, dev, slot, signature, i: SIGNED32; res: WORD; host: Bus;
+VAR  dummy, idx, bus, dev, slot, signature, i: SIGNED32; res: INTEGER; host: Bus;
 BEGIN
 	IF traceCalls IN trace THEN KernelLog.String("Ada7: Detect"); KernelLog.Ln  END;
 	IF PCI.Done = PCI.PCIPresent(dummy, dummy, dummy) THEN
@@ -1820,7 +1820,7 @@ BEGIN	WriteScsiState(firstBus)
 END ScsiState;
 
 PROCEDURE Test*;
-VAR  d: Bus;  res: WORD;
+VAR  d: Bus;  res: INTEGER;
 BEGIN
 	d := firstBus;
 	KernelLog.String("Adaptec7.Test"); KernelLog.Int(aCount, 0); KernelLog.Ln;
@@ -1830,7 +1830,7 @@ BEGIN
 END Test;
 
 PROCEDURE Scan*;
-VAR  d: Bus;  res: WORD;  i: SIGNED8;  inq: SCSI.InquiryData;
+VAR  d: Bus;  res: INTEGER;  i: SIGNED8;  inq: SCSI.InquiryData;
 BEGIN
 	d := firstBus;
 	KernelLog.String("Adaptec7.Scan"); KernelLog.Int(aCount, 0); KernelLog.Ln;

@@ -234,7 +234,7 @@ TYPE
 		PROCEDURE AddInt* (n, len: SIZE);
 		VAR
 			i: SIZE;
-			b: SIZE; res: WORD;
+			b: SIZE; res: INTEGER;
 			s: ARRAY 4 OF CHAR;
 		BEGIN
 			ASSERT (len <= 4);

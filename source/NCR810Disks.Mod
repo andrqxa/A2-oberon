@@ -20,20 +20,20 @@ IMPORT SYSTEM, Machine, KernelLog, ASPI := SymbiosASPI, Disks, Plugins;
 	Device = OBJECT (Disks.Device)
 	VAR drive: SIGNED32;
 
-		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		BEGIN
 			IF op = Disks.Read THEN res := ReadBlocks(drive, block, num, ADDRESSOF(data[ofs]), 0)
 			ELSIF op = Disks.Write THEN res := WriteBlocks(drive, block, num, ADDRESSOF(data[ofs]), 0)
 			END
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: WORD);
+		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			size := devs[drive].capacity;
 			res := Disks.Ok
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message;  VAR res: WORD);
+		PROCEDURE Handle*(VAR msg: Disks.Message;  VAR res: INTEGER);
 		BEGIN
 			IF msg IS Disks.GetGeometryMsg THEN
 				WITH msg: Disks.GetGeometryMsg DO
@@ -132,7 +132,7 @@ IMPORT SYSTEM, Machine, KernelLog, ASPI := SymbiosASPI, Disks, Plugins;
 
 (* ---- Calculate disk geometry ---- *)
 
-	PROCEDURE Partsize(drive: SIGNED32; VAR res: WORD);
+	PROCEDURE Partsize(drive: SIGNED32; VAR res: INTEGER);
 	VAR
 		p, cyl, lcyl, cyl2, sector2, head2, extpend, extcyl, lend, pend, i: SIGNED32;
 		pp, lpp: Part;
@@ -203,7 +203,7 @@ IMPORT SYSTEM, Machine, KernelLog, ASPI := SymbiosASPI, Disks, Plugins;
 		END
 	END Partsize;
 
-	PROCEDURE Setsize(drive: SIGNED32; VAR res: WORD);
+	PROCEDURE Setsize(drive: SIGNED32; VAR res: INTEGER);
 	VAR cylinders, temp, heads, sectors, capacity: SIGNED32;
 	BEGIN
 		cylinders := 1024; sectors := 62;
@@ -234,7 +234,7 @@ IMPORT SYSTEM, Machine, KernelLog, ASPI := SymbiosASPI, Disks, Plugins;
 	END Setsize;
 
 	PROCEDURE GetGeo(drive: SIGNED32);
-	VAR res: WORD;
+	VAR res: INTEGER;
 	BEGIN
 		devs[drive].heads := 0; devs[drive].heads0 := 0;
 		devs[drive].cylinders := 0; devs[drive].cylinders0 := 0;
@@ -315,7 +315,7 @@ IMPORT SYSTEM, Machine, KernelLog, ASPI := SymbiosASPI, Disks, Plugins;
 	END Init;
 
 	PROCEDURE Register;
-	VAR i: SIGNED32; res: WORD; dev: Device; name : ARRAY 12 OF CHAR;
+	VAR i: SIGNED32; res: INTEGER; dev: Device; name : ARRAY 12 OF CHAR;
 	BEGIN
 		FOR i := 0 TO numdevs-1 DO
 			NEW(dev); devs[i].dev := dev;

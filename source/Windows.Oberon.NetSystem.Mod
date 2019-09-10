@@ -83,7 +83,7 @@ END ToNum;
 (** GetIP delivers the ip-number of a named host. If a symbolic name is given, it will be resolved by use of domain name servers. *)
 
 PROCEDURE GetIP*(name: ARRAY OF CHAR; VAR adr: IPAdr);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	adr := IP.StrToAdr(name);
 	IF IP.IsNilAdr(adr) THEN
@@ -97,7 +97,7 @@ END GetIP;
 (** GetName is the reverse of GetIP. Given an ip-number, it delivers the name of a host. *)
 
 PROCEDURE GetName* (IP: IPAdr; VAR name: ARRAY OF CHAR);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	IF started THEN
 		DNS.HostByNumber(IP, name, res)
@@ -227,7 +227,7 @@ END Available;
 (** Blocking read a single byte. *)
 
 PROCEDURE Read* (C: Connection; VAR ch: CHAR);
-VAR len: SIZE; res: WORD; buf: ARRAY 1 OF CHAR;
+VAR len: SIZE; res: INTEGER; buf: ARRAY 1 OF CHAR;
 BEGIN
 	C.pcb.Receive(buf, 0, 1, 1, len, res);
 	IF (res = 0) & (len = 1) THEN ch := buf[0] ELSE C.res := error; ch := 0X END
@@ -236,7 +236,7 @@ END Read;
 (** Blocking read len bytes of data (beginning at pos in buf) to buf. *)
 
 PROCEDURE ReadBytes* (C: Connection; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
-VAR read: SIZE; res: WORD;
+VAR read: SIZE; res: INTEGER;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));	(* index check *)
 	C.pcb.Receive(SYSTEM.VAL(Bytes, buf), pos, len, len, read, res);
@@ -246,7 +246,7 @@ END ReadBytes;
 (** Blocking read two bytes in network byte ordering. *)
 
 PROCEDURE ReadInt* (C: Connection; VAR x: SIGNED16);
-VAR buf: ARRAY 2 OF CHAR; res: WORD; len: SIZE;
+VAR buf: ARRAY 2 OF CHAR; res: INTEGER; len: SIZE;
 BEGIN
 	C.pcb.Receive(buf, 0, 2, 2, len, res);
 	IF (res = 0) & (len = 2) THEN
@@ -259,7 +259,7 @@ END ReadInt;
 (** Blocking read four bytes in network byte ordering. *)
 
 PROCEDURE ReadLInt* (C: Connection; VAR x: SIGNED32);
-VAR buf: ARRAY 4 OF CHAR; res: WORD; len: SIZE;
+VAR buf: ARRAY 4 OF CHAR; res: INTEGER; len: SIZE;
 BEGIN
 	C.pcb.Receive(buf, 0, 4, 4, len, res);
 	IF (res = 0) & (len = 4) THEN
@@ -286,7 +286,7 @@ END ReadString;
 (** Blocking write a single byte to C. *)
 
 PROCEDURE Write* (C: Connection; ch: CHAR);
-VAR res: WORD; buf: ARRAY 1 OF CHAR;
+VAR res: INTEGER; buf: ARRAY 1 OF CHAR;
 BEGIN
 	buf[0] := ch;
 	C.pcb.Send(buf, 0, 1, FALSE, res);
@@ -296,7 +296,7 @@ END Write;
 (** Blocking write len bytes of data (beginning at pos in buf) to C. *)
 
 PROCEDURE WriteBytes* (C: Connection; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));
 	C.pcb.Send(SYSTEM.VAL(Bytes, buf), pos, len, FALSE, res);
@@ -306,7 +306,7 @@ END WriteBytes;
 (** Blocking write two bytes in network byte ordering to C. *)
 
 PROCEDURE WriteInt* (C: Connection; x: SIGNED16);
-VAR res: WORD; buf: ARRAY 2 OF CHAR;
+VAR res: INTEGER; buf: ARRAY 2 OF CHAR;
 BEGIN
 	buf[0] := CHR(x DIV 100H MOD 100H); buf[1] := CHR(x MOD 100H);
 	C.pcb.Send(buf, 0, 2, FALSE, res);
@@ -316,7 +316,7 @@ END WriteInt;
 (** Blocking write four bytes in network byte ordering to C. *)
 
 PROCEDURE WriteLInt* (C: Connection; x: SIGNED32);
-VAR res: WORD; buf: ARRAY 4 OF CHAR;
+VAR res: INTEGER; buf: ARRAY 4 OF CHAR;
 BEGIN
 	buf[0] := CHR(x DIV 1000000H MOD 100H); buf[1] := CHR(x DIV 10000H MOD 100H);
 	buf[2] := CHR(x DIV 100H MOD 100H); buf[3] := CHR(x MOD 100H);
@@ -375,7 +375,7 @@ END CloseSocket;
 (** Sends len bytes of data (beginning at pos in buf) to the host specified by remIP and remPort. *)
 
 PROCEDURE SendDG* (S: Socket; remIP: IPAdr; remPort: SIGNED16; pos, len: SIGNED32; VAR buf: ARRAY OF SYSTEM.BYTE);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	ASSERT(pos+len <= LEN(buf));	(* index check *)
 	S.pcb.Send(remIP, LONG(remPort) MOD 10000H, SYSTEM.VAL(Bytes, buf), pos, len, res);

@@ -17,7 +17,7 @@ TYPE
 TYPE
 	Sender = OBJECT
 		VAR
-			res: WORD;
+			res: INTEGER;
 			c: TCP.Connection; num, num0: SIZE; buf: Bytes; done: BOOLEAN;
 
 		PROCEDURE &Init*(c: TCP.Connection; buf: Bytes; num: SIZE);
@@ -27,7 +27,7 @@ TYPE
 			done := FALSE
 		END Init;
 
-		PROCEDURE Join(): WORD;
+		PROCEDURE Join(): INTEGER;
 		BEGIN {EXCLUSIVE}
 			AWAIT(done);
 			RETURN res
@@ -47,7 +47,7 @@ TYPE
 TYPE
 	Tester = OBJECT
 		VAR
-			res: WORD;
+			res: INTEGER;
 			c: TCP.Connection; num, num0: SIZE; port: SIGNED32; fip: IP.Adr;
 			timer: Kernel.MilliTimer; sender: Sender; server: ARRAY 64 OF CHAR;
 			total, len: SIZE; time: SIGNED64;
@@ -103,7 +103,7 @@ VAR
 	buf: Bytes;
 
 
-PROCEDURE Message(CONST msg1, msg2: ARRAY OF CHAR; res: WORD);
+PROCEDURE Message(CONST msg1, msg2: ARRAY OF CHAR; res: INTEGER);
 BEGIN
 	KernelLog.String(Header); KernelLog.String(msg1); KernelLog.String(msg2);
 	IF res # 0 THEN

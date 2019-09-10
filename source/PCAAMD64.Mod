@@ -1917,7 +1917,7 @@ END AssembleText;
 
 PROCEDURE AssembleFile* (CONST fileName: ARRAY OF CHAR; diagnostics: Diagnostics.Diagnostics; labels, listing: Streams.Writer);
 VAR
-	format: SIGNED32; res: WORD;
+	format: SIGNED32; res: INTEGER;
 	text: Texts.Text;
 	assembly: Assembly;
 	destFile: ARRAY Files.NameLength OF CHAR;

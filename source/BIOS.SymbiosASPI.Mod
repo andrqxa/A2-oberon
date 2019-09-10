@@ -281,8 +281,8 @@ MODULE SymbiosASPI;	(** non-portable *)
 		IDs[4] := C825DevId; IDs[5] := C860DevId; IDs[6] := C875DevId; IDs[7] := C896DevId
 	END InitIDs;
 
-	PROCEDURE PCIFindSYMDevice(Dev: DevicePtr): WORD;
-	VAR res, res1: WORD; regVal: SIGNED32;
+	PROCEDURE PCIFindSYMDevice(Dev: DevicePtr): INTEGER;
+	VAR res, res1: INTEGER; regVal: SIGNED32;
 	BEGIN
 		res := PCI.FindPCIDevice(Dev.devId, NCRVendorId, Dev.devIdx, Dev.busNr, Dev.devNr, Dev.fktNr);
 (*
@@ -931,7 +931,7 @@ MODULE SymbiosASPI;	(** non-portable *)
 	END InitTargets;
 
 	PROCEDURE InitASPI;
-	VAR res: CHAR; res1: WORD; version, lastPCIbus, hwMech, dev: SIGNED32;
+	VAR res: CHAR; res1: INTEGER; version, lastPCIbus, hwMech, dev: SIGNED32;
 	BEGIN
 		res := SSFailedInit; DevNum := 0;
 		res1 := PCI.PCIPresent(version, lastPCIbus, hwMech);

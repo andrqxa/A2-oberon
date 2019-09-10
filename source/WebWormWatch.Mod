@@ -105,7 +105,7 @@ END Cached;
 PROCEDURE MyHandle(vn, fn: ARRAY OF CHAR; VAR in: Streams.Reader; VAR out: Streams.Writer;
 	VAR header : WebHTTP.RequestHeader; VAR reply: WebHTTP.ResponseHeader);
 VAR
-	f: Files.File; w : Files.Writer; res: WORD; i, time, date: SIGNED32;
+	f: Files.File; w : Files.Writer; res: INTEGER; i, time, date: SIGNED32;
 	ch :CHAR;
 	md : ARRAY 32 OF CHAR;
 	origin : ARRAY 64 OF CHAR;

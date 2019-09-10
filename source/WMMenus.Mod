@@ -593,7 +593,7 @@ TYPE
 		END MyStartDrag;
 
 		PROCEDURE DragWasAccepted(sender, data : ANY);
-		VAR di : WMWindowManager.DragInfo; itf : WMDropTarget.DropInterface; ignoreRes : WORD;
+		VAR di : WMWindowManager.DragInfo; itf : WMDropTarget.DropInterface; ignoreRes : INTEGER;
 		BEGIN
 			IF (data # NIL) & (data IS WMWindowManager.DragInfo) THEN
 				di := data(WMWindowManager.DragInfo);

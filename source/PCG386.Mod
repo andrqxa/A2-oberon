@@ -2967,7 +2967,7 @@ END Init;
 
 (* Done - Code generator results - Installed in PCBT.CG *)
 
-PROCEDURE Done(VAR result: WORD);
+PROCEDURE Done(VAR result: INTEGER);
 BEGIN
 	IF PCO.CodeErr THEN result := -1
 	ELSE result := 0

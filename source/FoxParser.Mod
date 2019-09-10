@@ -187,8 +187,8 @@ TYPE
 		(* conditional compilation *)
 		CONST Processing = 0; ProcessingElse = 1; Skipping = 2; Ignoring = 3; IgnoringElse = 4;
 
-		VAR conditional: WORD;
-		VAR conditionals: ARRAY 10 OF WORD;
+		VAR conditional: INTEGER;
+		VAR conditionals: ARRAY 10 OF INTEGER;
 		VAR definitions: ARRAY 10 OF Scanner.IdentifierType;
 		VAR conditionalCount, definitionCount: SIZE;
 

@@ -93,7 +93,7 @@ TYPE
 	VAR
 		r: Streams.Reader;  w: Streams.Writer;
 		msg: ARRAY 512 OF CHAR;
-		res: WORD;
+		res: INTEGER;
 		knownKey: DSA.Key;
 	BEGIN
 		r := GetKeyStart( "ssh-dss", host );
@@ -125,7 +125,7 @@ TYPE
 	VAR
 		r: Streams.Reader;  w: Streams.Writer;
 		msg: ARRAY 512 OF CHAR;
-		res: WORD;
+		res: INTEGER;
 		knownKey: RSA.Key;
 	BEGIN
 		r := GetKeyStart( "ssh-rsa", host );

@@ -116,13 +116,13 @@ VAR
 		Log.Address(i);
 	END Address;
 
-	PROCEDURE Int*( i: SIGNED64; j: WORD );
+	PROCEDURE Int*( i: SIGNED64; j: INTEGER );
 	BEGIN
 		Log.Int( i, j );
 	END Int;
 
 	PROCEDURE Set*(set: SET);
-	VAR i: WORD; first: BOOLEAN;
+	VAR i: INTEGER; first: BOOLEAN;
 	BEGIN
 		Log.String("{"); first := TRUE;
 		FOR i := MIN(SET) TO MAX(SET) DO
@@ -135,12 +135,12 @@ VAR
 	END Set;
 
 
-	PROCEDURE Float*( r: FLOAT64; len: WORD );
+	PROCEDURE Float*( r: FLOAT64; len: INTEGER );
 	BEGIN
 		Log.Float( r, len );
 	END Float;
 
-	PROCEDURE Hex*( i: SIGNED64; j: WORD );
+	PROCEDURE Hex*( i: SIGNED64; j: INTEGER );
 	BEGIN
 		Log.Hex( i, j );
 	END Hex;

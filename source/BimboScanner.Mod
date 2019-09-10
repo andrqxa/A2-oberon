@@ -46,7 +46,7 @@ TYPE
 			NEW(data, initialSize); length := 0;
 		END Init;
 
-		PROCEDURE Add*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Add*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR i : SIZE; n : Strings.String;
 		BEGIN
 			IF length + len + 1 >= LEN(data) THEN
@@ -457,7 +457,7 @@ TYPE
 	END Scanner;
 
 PROCEDURE InitWithText*(t: Texts.Text; pos: SIGNED32): Scanner;
-	VAR buffer: Strings.String; len, i, j: SIZE; ch: WORD; r: Texts.TextReader;
+	VAR buffer: Strings.String; len, i, j: SIZE; ch: INTEGER; r: Texts.TextReader;
 	bytesPerChar: SIGNED32;
 	s : Scanner;
 BEGIN

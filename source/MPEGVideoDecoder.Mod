@@ -82,7 +82,7 @@ TYPE
 		END InitNew;
 
 		(* Overwrite draw procedure because we do not want any interpolation *)
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : WORD);
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			Draw^(canvas, w, h, 0)
 		END Draw;
@@ -181,7 +181,7 @@ TYPE
 		END Init;
 
 		(* Open a video stream by reading the sequence header *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			marker: CHAR;
 
@@ -467,7 +467,7 @@ TYPE
 			RETURN time;
 		END GetCurrentTime;
 
-		PROCEDURE SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		VAR
 			i: SIGNED32;
 			code: CHAR;
@@ -539,7 +539,7 @@ TYPE
 			res := Codec.ResOk;
 		END SeekFrame;
 
-		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeyFrame : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		VAR
 			newframe: SIGNED32;
 
@@ -1933,7 +1933,7 @@ TYPE
 		END Init;
 
 		(** open the demultiplexer on an input stream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			oldPos: Streams.Position;
 			i: SIGNED32;
@@ -2153,7 +2153,7 @@ TYPE
 		END GetStreamInfo;
 
 		(* read data from streamNr, store it into buffer buf starting at offset ofs, store size bytes if possible, block if not read min bytes at least. Return number of read bytes in len and return code res *)
-		PROCEDURE GetData*(streamNr : SIGNED32; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE GetData*(streamNr : SIGNED32; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			cur: POINTER TO StreamType;
 			length: SIZE;
@@ -2221,7 +2221,7 @@ TYPE
 			END;
 		END GetData;
 
-		PROCEDURE SkipData(streamNr : SIGNED32; size: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE SkipData(streamNr : SIGNED32; size: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			cur: POINTER TO StreamType;
 
@@ -2356,7 +2356,7 @@ TYPE
 
 
 		(* seek the streamNr to position pos with seekType. itemSize contains the size of the element seeked to, if known and applicable; res = 0 if Ok, otherwise an error number *)
-		PROCEDURE SetStreamPos*(streamNr :  SIGNED32; seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32;  VAR res : WORD);
+		PROCEDURE SetStreamPos*(streamNr :  SIGNED32; seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32;  VAR res : INTEGER);
 		VAR
 			cur: POINTER TO StreamType;
 			len: SIZE;
@@ -2457,7 +2457,7 @@ TYPE
 		file: Files.File;
 		fileinputstream: Codec.FileInputStream;
 		vstream: Codec.DemuxStream;
-		result: WORD;
+		result: INTEGER;
 		i: SIGNED32;
 
 		w, h, ms: SIGNED32;

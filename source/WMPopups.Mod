@@ -47,7 +47,7 @@ TYPE
 
 		PROCEDURE Translate(value: Strings.String): Strings.String;
 		VAR
-			res : WORD;
+			res : INTEGER;
 			temp, word : Strings.String;
 			dictionary : Repositories.Dictionary;
 		BEGIN
@@ -260,7 +260,7 @@ TYPE
 		END Init;
 
 		PROCEDURE PointerDown*(x, y : SIZE; keys : SET);
-		VAR r, g, b, a: WORD; i, j: SIZE; cColor: WMGraphics.Color;
+		VAR r, g, b, a: INTEGER; i, j: SIZE; cColor: WMGraphics.Color;
 		BEGIN
 			i := y DIV 10; j := x DIV 10;
 			IF (i>= 0) & (i<=2) THEN
@@ -282,7 +282,7 @@ TYPE
 		END PointerDown;
 
 		PROCEDURE DrawBackground*(canvas: WMGraphics.Canvas);
-		VAR r, g, b, a: WORD; i, j: SIZE; color: WMGraphics.Color;
+		VAR r, g, b, a: INTEGER; i, j: SIZE; color: WMGraphics.Color;
 		BEGIN
 			DrawBackground^(canvas);
 

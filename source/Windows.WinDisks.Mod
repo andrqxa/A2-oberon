@@ -52,12 +52,12 @@ TYPE
 		next: VirtualDisk;
 		drive: SIGNED32;
 
-		PROCEDURE Finish( VAR res: WORD );
+		PROCEDURE Finish( VAR res: INTEGER );
 		BEGIN
 			IGNORE Kernel32.CloseHandle( handle );  KernelLog.String("Disk closed"); KernelLog.Ln;
 		END Finish;
 
-		PROCEDURE Transfer*( op, block, num: SIGNED32;  VAR data: ARRAY OF CHAR;  ofs: SIZE;  VAR res: WORD );
+		PROCEDURE Transfer*( op, block, num: SIGNED32;  VAR data: ARRAY OF CHAR;  ofs: SIZE;  VAR res: INTEGER );
 		VAR bool, n,err: SIGNED32;  pos: SIGNED64;  poslow, poshigh: SIGNED32;  large: Kernel32.LargeInteger;
 		BEGIN {EXCLUSIVE}
 			IF (block < 0) OR (num < 1) OR (block + num > size) THEN res := BlockNumberInvalid;  RETURN;  END;
@@ -116,12 +116,12 @@ TYPE
 			END;
 		END Transfer;
 
-		PROCEDURE GetSize*( VAR size: SIGNED32; VAR res: WORD );
+		PROCEDURE GetSize*( VAR size: SIGNED32; VAR res: INTEGER );
 		BEGIN
 			size := SELF.size;  res := Disks.Ok;
 		END GetSize;
 
-		PROCEDURE Handle*( VAR msg: Disks.Message;  VAR res: WORD );
+		PROCEDURE Handle*( VAR msg: Disks.Message;  VAR res: INTEGER );
 		BEGIN
 			res := Disks.Unsupported;
 		END Handle;
@@ -198,7 +198,7 @@ VAR
 	END Uninstall;
 
 	PROCEDURE Cleanup;
-	VAR res: WORD;
+	VAR res: INTEGER;
 	BEGIN {EXCLUSIVE}
 		WHILE (disks # NIL ) DO disks.Finish( res );  Disks.registry.Remove( disks );  disks := disks.next;  END;
 	END Cleanup;
@@ -325,7 +325,7 @@ VAR
 	PROCEDURE Install*(context : Commands.Context);   (** diskname filename [blocksize]  ~ *)
 	VAR
 		diskname, flagss: ARRAY 256 OF CHAR;  flags: SET;
-		res: WORD; handle: Kernel32.HANDLE;  pdg: DISK_GEOMETRY;  size: SIGNED32;  vd: VirtualDisk;  drive: SIGNED32;
+		res: INTEGER; handle: Kernel32.HANDLE;  pdg: DISK_GEOMETRY;  size: SIGNED32;  vd: VirtualDisk;  drive: SIGNED32;
 		i: SIGNED32;
 	BEGIN
 		context.arg.SkipWhitespace;
@@ -374,7 +374,7 @@ VAR
 	END Install;
 
 	PROCEDURE Notification(type: SIGNED32; drives: SET);
-	VAR v: VirtualDisk; res: WORD;
+	VAR v: VirtualDisk; res: INTEGER;
 	BEGIN
 		IF type = WinFS.deviceArrival THEN
 		ELSIF type = WinFS.deviceRemove THEN

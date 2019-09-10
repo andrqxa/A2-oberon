@@ -1797,7 +1797,7 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 
 
 		(* Sets the the stream on which to read *)
-		PROCEDURE Open*(in: Streams.Reader; VAR res: WORD );
+		PROCEDURE Open*(in: Streams.Reader; VAR res: INTEGER );
 		BEGIN
 			SELF.s := in;
 			NEW( mp4State);
@@ -1838,10 +1838,10 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 			RETURN frameCounter;
 		END GetCurrentFrame;
 
-		PROCEDURE SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		VAR
 			seekType: SIGNED32;
-			dummy: WORD;
+			dummy: INTEGER;
 		BEGIN
 			IF goKeyFrame THEN
 				seekType := Codecs.SeekKeyFrame;
@@ -1856,10 +1856,10 @@ TYPE DivXDecoder* = OBJECT(Codecs.VideoDecoder)
 		END SeekFrame;
 
 		(* Seeks a position based on timevalue. If gokeyframe is set, the next following keyframe is searched *)
-		PROCEDURE SeekMillisecond*(millisecond: SIGNED32; goKeyFrame : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekMillisecond*(millisecond: SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		VAR
 			frame: SIGNED32;
-			dummy: WORD;
+			dummy: INTEGER;
 			seekType: SIGNED32;
 		BEGIN
 			(* Now, this is wrong: we cannot assume, that microsecsperframe is always 40000 *)

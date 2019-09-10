@@ -762,7 +762,7 @@ TYPE
 			contextFound, validContext, charFound : BOOLEAN;
 			charString : XML.String;
 			charCode : Texts.Char32;
-			res : WORD;
+			res : INTEGER;
 			base16, neg : BOOLEAN;
 			genericRangeSize, offset : SIGNED32;
 
@@ -999,7 +999,7 @@ TYPE
 		(* Parses a range string and puts the ranges into a range array *)
 		PROCEDURE ParseRangeString(rangeString : XML.String; base16, neg : BOOLEAN; VAR ranges : Ranges);
 		VAR
-			numberOfRanges, i, j, k: SIZE; res : WORD;
+			numberOfRanges, i, j, k: SIZE; res : INTEGER;
 			tempString : XML.String;
 			range : Range;
 			theseRanges, oldRanges : RangeArray;
@@ -1285,7 +1285,7 @@ VAR
 	tagName, languageAttribute, baseAttribute : XML.String;
 	base16, propertyFound : BOOLEAN;
 
-	rangeLow, rangeHigh: SIGNED32; res: WORD;
+	rangeLow, rangeHigh: SIGNED32; res: INTEGER;
 	mode, tempRangeLow, tempRangeHigh : Strings.String;
 BEGIN
 	propertyFound := FALSE;

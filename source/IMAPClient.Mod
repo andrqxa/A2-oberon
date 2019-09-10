@@ -598,7 +598,7 @@ TYPE
 		PROCEDURE Synchronize(): SIGNED32;
 		VAR
 			path, items: String;
-			r: WORD;
+			r: INTEGER;
 			i, count, step, start, stop, single, fetchStart, fetchStop: SIZE;
 			oldMessages, newMessages: Classes.List;
 			p, pOld: ANY;

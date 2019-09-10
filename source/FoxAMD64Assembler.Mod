@@ -1444,7 +1444,7 @@ TYPE
 			END Factor;
 
 			PROCEDURE Term (VAR x: SIGNED64; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
-			VAR y: SIGNED64; op : WORD;
+			VAR y: SIGNED64; op : INTEGER;
 			BEGIN
 				IF Factor (x, critical,type) THEN
 					WHILE (symbol = symTimes) OR (symbol = symDiv) OR (symbol = symMod) DO
@@ -1465,7 +1465,7 @@ TYPE
 			END Term;
 
 			PROCEDURE Expression (VAR x: SIGNED64; critical: BOOLEAN; VAR type: OperandType): BOOLEAN;
-			VAR y: SIGNED64; op : WORD;
+			VAR y: SIGNED64; op : INTEGER;
 			BEGIN
 				IF symbol = symMinus THEN
 					op := symbol; NextSymbol;

@@ -2677,7 +2677,7 @@ VAR
 	file : Files.File;
 	decoder : Codecs.TextDecoder;
 	in : Streams.Reader;
-	decoderRes : WORD;
+	decoderRes : INTEGER;
 	text : Texts.Text;
 	error : BOOLEAN;
 	bidiFormatter : BidiFormatter;

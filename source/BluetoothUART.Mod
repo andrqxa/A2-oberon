@@ -289,7 +289,7 @@ TYPE
 			RETURN res
 		END GetPacketType;
 
-		PROCEDURE Send*(type: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: WORD);
+		PROCEDURE Send*(type: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR  pt: CHAR; i: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF ~GetPacketType(type, pt) THEN
@@ -312,7 +312,7 @@ TYPE
 			res := out.res
 		END Send;
 
-		PROCEDURE Send1H*(type: SIGNED32; VAR hdr: ARRAY OF CHAR; hdrlen: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: WORD);
+		PROCEDURE Send1H*(type: SIGNED32; VAR hdr: ARRAY OF CHAR; hdrlen: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR pt: CHAR; i: SIGNED32;
 		BEGIN
 			IF ~GetPacketType(type, pt) THEN
@@ -339,7 +339,7 @@ TYPE
 
 		PROCEDURE Send2H*(type: SIGNED32; VAR hdr1: ARRAY OF CHAR; hdr1len: SIGNED32;
 								VAR hdr2: ARRAY OF CHAR; hdr2len: SIGNED32;
-								VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: WORD);
+								VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR pt: CHAR; i: SIGNED32;
 		BEGIN
 			IF ~GetPacketType(type, pt) THEN

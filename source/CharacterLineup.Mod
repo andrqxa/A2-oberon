@@ -246,7 +246,7 @@ TYPE
 		END NewCharacter;
 
 		PROCEDURE NewCode(sender, data :ANY);
-		VAR code: SIGNED32; res : WORD;
+		VAR code: SIGNED32; res : INTEGER;
 			codeStr: ARRAY 9 OF CHAR;
 		BEGIN
 			codeEdit.GetAsString(codeStr);

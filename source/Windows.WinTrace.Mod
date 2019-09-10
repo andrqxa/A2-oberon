@@ -11,7 +11,7 @@ VAR
 	traceChar0: PROCEDURE(ch: CHAR);
 
 (* Sender to be used with Stream.Writer *)
-PROCEDURE Send* (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+PROCEDURE Send* (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 VAR b: Kernel32.BOOL; written: Kernel32.DWORD;
 BEGIN
 	IF mode # none THEN
@@ -21,7 +21,7 @@ BEGIN
 END Send;
 
 (* Sender to be used with Stream.Writer *)
-PROCEDURE SendError* (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+PROCEDURE SendError* (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 VAR b: Kernel32.BOOL; written: Kernel32.DWORD;
 BEGIN
 	IF mode # none THEN
@@ -32,7 +32,7 @@ END SendError;
 
 
 (* Receiver to be used with Stream.Reader *)
-PROCEDURE Receive* (VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+PROCEDURE Receive* (VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 VAR b: Kernel32.BOOL; tlen: SIGNED32;
 BEGIN
 	tlen := 0;
@@ -69,7 +69,7 @@ BEGIN
 END Close;
 
 PROCEDURE OpenConsole*;
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	IF mode = console THEN RETURN
 	ELSIF mode = file THEN Close

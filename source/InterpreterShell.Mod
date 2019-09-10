@@ -177,7 +177,7 @@ TYPE
 		echo, dead, close: BOOLEAN;
 		context: Commands.Context;
 		command: ARRAY MaxLen OF CHAR;
-		res: WORD;
+		res: INTEGER;
 		nestingLevel : SIGNED32; (* how many shells run in this shell? *)
 		aliases: Alias;
 		prompt: ARRAY 32 OF CHAR;
@@ -667,7 +667,7 @@ TYPE
 		PROCEDURE Execute(cmd: Command; wait: BOOLEAN; VAR exit: BOOLEAN);
 		VAR
 			c: Command; flags: SET;
-			res : WORD; msg: ARRAY MaxLen OF CHAR; oldContext: Commands.Context;
+			res : INTEGER; msg: ARRAY MaxLen OF CHAR; oldContext: Commands.Context;
 			moduleName, commandName : Modules.Name; errormsg : ARRAY 128 OF CHAR;
 		BEGIN
 			IF (cmd.command = "alias") THEN
@@ -739,7 +739,7 @@ TYPE
 			InitReader( Receive, initialSize )
 		END Init;
 
-		PROCEDURE Add*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Add*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR i,pos : SIZE; n: StringType;
 		BEGIN{EXCLUSIVE}
 			IF length + len + 1 >= LEN(data) THEN
@@ -754,7 +754,7 @@ TYPE
 			END;
 		END Add;
 
-		PROCEDURE Receive( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+		PROCEDURE Receive( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 		VAR o,pos: SIZE;
 		BEGIN{EXCLUSIVE}
 			AWAIT(length >= min);

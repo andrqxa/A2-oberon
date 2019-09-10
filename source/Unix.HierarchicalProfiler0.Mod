@@ -23,7 +23,7 @@ TYPE
 		nofProcesses, oldNofProcesses : SIZE;
 		times, oldTimes : ProcessTimeArray;
 		me : Objects.Process;
-		state : WORD;
+		state : INTEGER;
 		timer: Kernel.Timer;
 		NormalGC: PROCEDURE; (*gc that is currently used*)
 
@@ -105,7 +105,7 @@ TYPE
 VAR
 	poller : Poller;
 	callback : Callback;
-	state : WORD;
+	state : INTEGER;
 
 PROCEDURE Nothing; (*no-op garbage collector*)
 BEGIN

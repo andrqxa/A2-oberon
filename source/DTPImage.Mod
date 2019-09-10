@@ -32,7 +32,7 @@ TYPE
 		END New;
 
 		PROCEDURE Draw*(canvas : WMGraphics.Canvas; x, y, w, h : SIZE; zoomFactor: FLOAT32; quality, preview: BOOLEAN);
-		VAR mode: WORD;
+		VAR mode: INTEGER;
 		BEGIN
 			IF ~quality THEN
 				mode := WMRasterScale.ScaleBox;

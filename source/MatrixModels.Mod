@@ -41,7 +41,7 @@ TYPE
 		END Get;
 
 		(** Generically set data of model. Implicit type conversion if necessary and possible *)
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD); (** abstract *)
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER); (** abstract *)
 		VAR matrix : Matrix;
 		BEGIN
 			GetMatrix(value, matrix, res);
@@ -49,7 +49,7 @@ TYPE
 		END SetGeneric;
 
 		(** Generically get data of model. Implicit type conversion if necessary and possible *)
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD); (** abstract *)
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER); (** abstract *)
 		BEGIN
 			AcquireRead;
 			SetMatrix(value, matrix, res);
@@ -108,7 +108,7 @@ BEGIN
 	RETURN length;
 END GetStringLength;
 
-PROCEDURE MatrixToString(CONST matrix : Matrix; VAR string : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE MatrixToString(CONST matrix : Matrix; VAR string : ARRAY OF CHAR; VAR res : INTEGER);
 VAR length, nofColumns, nofRows, column, row,  i : SIGNED32; error : BOOLEAN;
 
 	PROCEDURE Append(VAR string : ARRAY OF CHAR; VAR index : SIGNED32; CONST suffix : ARRAY OF CHAR) : BOOLEAN;
@@ -168,7 +168,7 @@ BEGIN
 	END;
 END MatrixToString;
 
-PROCEDURE StringToMatrix(CONST string : ARRAY OF CHAR; VAR matrix : Matrix; VAR res : WORD);
+PROCEDURE StringToMatrix(CONST string : ARRAY OF CHAR; VAR matrix : Matrix; VAR res : INTEGER);
 VAR
 	nofColumns, nofRows, column, row, length, index : SIGNED32;
 
@@ -205,7 +205,7 @@ VAR
 		RETURN result;
 	END Consume;
 
-	PROCEDURE GetDimensions(CONST string : ARRAY OF CHAR; length : SIGNED32; VAR nofColumns, nofRows : SIGNED32; VAR res : WORD);
+	PROCEDURE GetDimensions(CONST string : ARRAY OF CHAR; length : SIGNED32; VAR nofColumns, nofRows : SIGNED32; VAR res : INTEGER);
 	CONST Start = 0; ExpectRow = 1; ReadingRow = 2; Error = 9; Done = 10;
 	VAR oldIndex, index : SIGNED32; state, nofFloats : SIGNED32;
 	BEGIN
@@ -329,7 +329,7 @@ BEGIN
 	END;
 END StringToMatrix;
 
-PROCEDURE GetMatrix(CONST source : Types.Any; VAR value : Matrix; VAR res : WORD);
+PROCEDURE GetMatrix(CONST source : Types.Any; VAR value : Matrix; VAR res : INTEGER);
 VAR matrixValue : MatrixValue;
 BEGIN
 	res := Types.Ok;
@@ -359,7 +359,7 @@ BEGIN
 	END;
 END GetMatrix;
 
-PROCEDURE SetMatrix(VAR target : Types.Any; CONST value : Matrix; VAR res : WORD);
+PROCEDURE SetMatrix(VAR target : Types.Any; CONST value : Matrix; VAR res : INTEGER);
 VAR matrixValue : MatrixValue;
 BEGIN
 	res := Types.Ok;
@@ -390,13 +390,13 @@ BEGIN
 	END;
 END SetMatrix;
 
-PROCEDURE MatrixValueGetter(CONST self : Types.Generic; VAR target : Types.Any; VAR res : WORD);
+PROCEDURE MatrixValueGetter(CONST self : Types.Generic; VAR target : Types.Any; VAR res : INTEGER);
 BEGIN
 	ASSERT(self IS MatrixValue);
 	SetMatrix(target, self(MatrixValue).value, res);
 END MatrixValueGetter;
 
-PROCEDURE MatrixValueSetter(CONST self : Types.Generic; CONST source : Types.Any; VAR res : WORD);
+PROCEDURE MatrixValueSetter(CONST self : Types.Generic; CONST source : Types.Any; VAR res : INTEGER);
 BEGIN
 	ASSERT(self IS MatrixValue);
 	GetMatrix(source, self(MatrixValue).value, res);

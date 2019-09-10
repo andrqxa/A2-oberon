@@ -42,11 +42,11 @@ TYPE
 	(** Generic access to data of the model using type conversion *)
 
 		(** Generically set data of model. Implicit type conversion if necessary and possible *)
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD); (** abstract *)
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER); (** abstract *)
 		END SetGeneric;
 
 		(** Generically get data of model. Implicit type conversion if necessary and possible *)
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD); (** abstract *)
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER); (** abstract *)
 		END GetGeneric;
 
 	(** Locking (Recursive reader/writer lock) *)
@@ -129,7 +129,7 @@ TYPE
 	(** Internalization and externalization *)
 
 		PROCEDURE AddContent*(content : XML.Content); (** overwrite, protected *)
-		VAR string : Types.String; res : WORD;
+		VAR string : Types.String; res : INTEGER;
 		BEGIN
 			IF (content # NIL) & (content IS XML.Element) & (content(XML.Element).GetName()^="VALUE") THEN
 				content := content(XML.Element).GetFirst();
@@ -218,14 +218,14 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : BOOLEAN;
 		BEGIN
 			Types.GetBoolean(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : BOOLEAN;
 		BEGIN
 			currentValue := Get();
@@ -283,14 +283,14 @@ TYPE
 			END;
 		END Add;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : SIGNED32;
 		BEGIN
 			Types.GetInteger(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : SIGNED32;
 		BEGIN
 			currentValue := Get();
@@ -346,14 +346,14 @@ TYPE
 			END;
 		END Add;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : SIGNED64;
 		BEGIN
 			Types.GetHugeint(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : SIGNED64;
 		BEGIN
 			currentValue := Get();
@@ -409,14 +409,14 @@ TYPE
 			END;
 		END Add;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : SIZE;
 		BEGIN
 			Types.GetSize(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : SIZE;
 		BEGIN
 			currentValue := Get();
@@ -464,14 +464,14 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : FLOAT32;
 		BEGIN
 			Types.GetReal(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : FLOAT32;
 		BEGIN
 			currentValue := Get();
@@ -519,14 +519,14 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : FLOAT64;
 		BEGIN
 			Types.GetLongreal(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : FLOAT64;
 		BEGIN
 			currentValue := Get();
@@ -574,14 +574,14 @@ TYPE
 			RETURN value;
 		END Get;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : CHAR;
 		BEGIN
 			Types.GetChar(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : CHAR;
 		BEGIN
 			currentValue := Get();
@@ -660,14 +660,14 @@ TYPE
 			ReleaseRead;
 		END GetAOC;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : Strings.String;
 		BEGIN
 			Types.GetString(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : Strings.String;
 		BEGIN
 			currentValue := Get();
@@ -675,7 +675,7 @@ TYPE
 		END GetGeneric;
 
 		PROCEDURE WriteValue*(w : Streams.Writer; level : SIGNED32); (** protected *)
-		VAR res : WORD;
+		VAR res : INTEGER;
 		BEGIN
 			WriteValue^(w, level);
 			XML.UTF8ToStream(value^, w, res); (* ignore res *)
@@ -745,14 +745,14 @@ TYPE
 			RETURN result;
 		END Contains;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : SET;
 		BEGIN
 			Types.GetSet(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : SET;
 		BEGIN
 			currentValue := Get();
@@ -864,14 +864,14 @@ TYPE
 			ReleaseRead;
 		END GetAsString;
 
-		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetGeneric*(CONST value : Types.Any; VAR res : INTEGER);
 		VAR newValue : Texts.Text;
 		BEGIN
 			Types.GetText(value, newValue, res);
 			IF (res = Types.Ok) THEN Set(newValue); END;
 		END SetGeneric;
 
-		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetGeneric*(VAR value : Types.Any; VAR res : INTEGER);
 		VAR currentValue : Texts.Text;
 		BEGIN
 			currentValue := Get();
@@ -938,7 +938,7 @@ TYPE
 			RETURN curModel;
 		END FindModelByName;
 
-		PROCEDURE SetField*(CONST name : ARRAY OF CHAR; CONST value : Types.Any; VAR res : WORD);
+		PROCEDURE SetField*(CONST name : ARRAY OF CHAR; CONST value : Types.Any; VAR res : INTEGER);
 		VAR model : Model;
 		BEGIN
 			model := FindModelByName(name);
@@ -949,7 +949,7 @@ TYPE
 			END;
 		END SetField;
 
-		PROCEDURE GetField*(CONST name : ARRAY OF CHAR; VAR value : Types.Any; VAR res : WORD);
+		PROCEDURE GetField*(CONST name : ARRAY OF CHAR; VAR value : Types.Any; VAR res : INTEGER);
 		VAR model : Model;
 		BEGIN
 			model := FindModelByName(name);
@@ -984,7 +984,7 @@ END IsPrintableCharacter;
 
 
 PROCEDURE GetReal*(m: Model; VAR r: FLOAT64): BOOLEAN;
-VAR real: Types.Longreal; res: WORD;
+VAR real: Types.Longreal; res: INTEGER;
 BEGIN
 	IF m = NIL THEN RETURN FALSE END;
 	m.GetGeneric(real, res);
@@ -995,7 +995,7 @@ BEGIN
 END GetReal;
 
 PROCEDURE GetInteger*(m: Model; VAR i: SIGNED32): BOOLEAN;
-VAR int: Types.Integer; res: WORD;
+VAR int: Types.Integer; res: INTEGER;
 BEGIN
 	IF m = NIL THEN RETURN FALSE END;
 	m.GetGeneric(int, res);
@@ -1006,7 +1006,7 @@ BEGIN
 END GetInteger;
 
 PROCEDURE SetReal*(m: Model; r: FLOAT64);
-VAR real: Types.Longreal; res: WORD;
+VAR real: Types.Longreal; res: INTEGER;
 BEGIN
 	IF m = NIL THEN RETURN END;
 	real.value := r;

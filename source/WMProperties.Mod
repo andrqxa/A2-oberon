@@ -54,7 +54,7 @@ TYPE
 
 		PROCEDURE SetLinkAsString*(CONST string : ARRAY OF CHAR);
 		VAR repositoryName : ARRAY 256 OF CHAR; componentName : ARRAY 128 OF CHAR; componentID : SIZE;
-		context : Repositories.Context; res : WORD; object: Repositories.Component;
+		context : Repositories.Context; res : INTEGER; object: Repositories.Component;
 		BEGIN
 			IF Repositories.IsCommandString(string) THEN
 				AcquireWrite;
@@ -131,7 +131,7 @@ TYPE
 		END IsLink;
 
 		PROCEDURE WriteLink*(w : Streams.Writer; context: ANY;  indent : SIGNED32): BOOLEAN;
-		VAR name : String; id: SIZE; res: WORD; repository: Repositories.Repository; objectName: String;
+		VAR name : String; id: SIZE; res: INTEGER; repository: Repositories.Repository; objectName: String;
 		BEGIN
 			IF object # NIL THEN
 				Indent(w, indent);
@@ -171,7 +171,7 @@ TYPE
 		END SetLink;
 
 		PROCEDURE GetLink*() : Repositories.Component;
-		VAR object : Repositories.Component; context : Repositories.Context; res : WORD;
+		VAR object : Repositories.Component; context : Repositories.Context; res : INTEGER;
 		BEGIN
 			AcquireRead;
 			object := SELF.object;
@@ -330,7 +330,7 @@ TYPE
 		END ToStream;
 
 		PROCEDURE UpdateProperty;
-		VAR boolean: Types.Boolean; model: Models.Model; res: WORD;
+		VAR boolean: Types.Boolean; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
 				 model.GetGeneric(boolean, res);
@@ -339,7 +339,7 @@ TYPE
 		END UpdateProperty;
 
 		PROCEDURE UpdateModel;
-		VAR type: Types.Boolean; model: Models.Model; res: WORD;
+		VAR type: Types.Boolean; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
 			IF GetModel(object, model) THEN
@@ -456,7 +456,7 @@ TYPE
 		END SetToInt;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR token : ARRAY 10 OF CHAR; v : SET; i:SIGNED32; res: WORD;
+		VAR token : ARRAY 10 OF CHAR; v : SET; i:SIGNED32; res: INTEGER;
 		BEGIN
 			AcquireWrite;
 			NotDefault;
@@ -481,7 +481,7 @@ TYPE
 		END ToStream;
 
 		PROCEDURE UpdateProperty;
-		VAR boolean: Types.Set; model: Models.Model; res: WORD;
+		VAR boolean: Types.Set; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
 				 model.GetGeneric(boolean, res);
@@ -490,7 +490,7 @@ TYPE
 		END UpdateProperty;
 
 		PROCEDURE UpdateModel;
-		VAR type: Types.Set; model: Models.Model; res: WORD;
+		VAR type: Types.Set; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
 			IF GetModel(object, model) THEN
@@ -593,7 +593,7 @@ TYPE
 		bounded : BOOLEAN;
 
 		PROCEDURE UpdateProperty;
-		VAR integer: Types.Integer; model: Models.Model; res: WORD;
+		VAR integer: Types.Integer; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
 				 model.GetGeneric(integer, res);
@@ -602,7 +602,7 @@ TYPE
 		END UpdateProperty;
 
 		PROCEDURE UpdateModel;
-		VAR type: Types.Integer; model: Models.Model; res: WORD;
+		VAR type: Types.Integer; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
 			IF GetModel(object, model) THEN
@@ -774,7 +774,7 @@ TYPE
 		bounded : BOOLEAN;
 
 		PROCEDURE UpdateProperty;
-		VAR integer: Types.Hugeint; model: Models.Model; res: WORD;
+		VAR integer: Types.Hugeint; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
 				 model.GetGeneric(integer, res);
@@ -783,7 +783,7 @@ TYPE
 		END UpdateProperty;
 
 		PROCEDURE UpdateModel;
-		VAR type: Types.Hugeint; model: Models.Model; res: WORD;
+		VAR type: Types.Hugeint; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
 			IF GetModel(object, model) THEN
@@ -954,7 +954,7 @@ TYPE
 		bounded : BOOLEAN;
 
 		PROCEDURE UpdateProperty;
-		VAR integer: Types.Size; model: Models.Model; res: WORD;
+		VAR integer: Types.Size; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
 				 model.GetGeneric(integer, res);
@@ -963,7 +963,7 @@ TYPE
 		END UpdateProperty;
 
 		PROCEDURE UpdateModel;
-		VAR type: Types.Size; model: Models.Model; res: WORD;
+		VAR type: Types.Size; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
 			IF GetModel(object, model) THEN
@@ -1200,7 +1200,7 @@ TYPE
 		END ToStream;
 
 		PROCEDURE UpdateProperty;
-		VAR longreal: Types.Longreal; model: Models.Model; res: WORD; silent: BOOLEAN;
+		VAR longreal: Types.Longreal; model: Models.Model; res: INTEGER; silent: BOOLEAN;
 		BEGIN
 			IF GetModel(object, model) THEN
 				 model.GetGeneric(longreal, res);
@@ -1209,7 +1209,7 @@ TYPE
 		END UpdateProperty;
 
 		PROCEDURE UpdateModel;
-		VAR type: Types.Longreal; model: Models.Model; res: WORD;
+		VAR type: Types.Longreal; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
 			IF GetModel(object, model) THEN
@@ -1346,7 +1346,7 @@ TYPE
 		END SetTranslate;
 
 		PROCEDURE Translate;
-		VAR res : WORD; temp : Strings.String;
+		VAR res : INTEGER; temp : Strings.String;
 		BEGIN (* caller holds lock *)
 			IF translate & (SELF.value # NIL) THEN
 				Repositories.GetTranslationInfo(SELF.value^, dictionary, word, res);
@@ -1372,7 +1372,7 @@ TYPE
 		END SetLanguage;
 
 		PROCEDURE FromStream*(r : Streams.Reader);
-		VAR buffer : ARRAY 1024 OF CHAR; res : WORD;
+		VAR buffer : ARRAY 1024 OF CHAR; res : INTEGER;
 		BEGIN
 			AcquireWrite;
 			XML.UTF8FromStream(buffer, r, res);
@@ -1403,7 +1403,7 @@ TYPE
 		END Get;
 
 		PROCEDURE UpdateModel;
-		VAR type: Types.String; model: Models.Model; res: WORD;
+		VAR type: Types.String; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
 			IF GetModel(object, model) THEN
@@ -1439,7 +1439,7 @@ TYPE
 		END SetPassive;
 
 		PROCEDURE UpdateProperty;
-		VAR type: Types.String; model: Models.Model; res: WORD;
+		VAR type: Types.String; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
 				type.value := value; (* pass pointer to string *)
@@ -1482,7 +1482,7 @@ TYPE
 		END FromXML;
 
 		PROCEDURE ToXML*(VAR element: XML.Element);
-		VAR chars: XML.ArrayChars;s: String; w: Streams.StringWriter; res: WORD; len: SIZE;
+		VAR chars: XML.ArrayChars;s: String; w: Streams.StringWriter; res: INTEGER; len: SIZE;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
 				ToXML^(element);
@@ -1509,7 +1509,7 @@ TYPE
 		END ToXML;
 
 		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY; indent : SIGNED32);
-		VAR name : String; res : WORD;
+		VAR name : String; res : INTEGER;
 		BEGIN
 			name := GetName();
 			IF name = NIL THEN KernelLog.String("WMProperties: Nameless string property encountered. Ignored "); KernelLog.Ln; RETURN END;
@@ -1563,7 +1563,7 @@ TYPE
 		END ToStream;
 
 		PROCEDURE UpdateProperty;
-		VAR boolean: Types.Integer; model: Models.Model; res: WORD;
+		VAR boolean: Types.Integer; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF GetModel(object, model) THEN
 				 model.GetGeneric(boolean, res);
@@ -1572,7 +1572,7 @@ TYPE
 		END UpdateProperty;
 
 		PROCEDURE UpdateModel;
-		VAR type: Types.Integer; model: Models.Model; res: WORD;
+		VAR type: Types.Integer; model: Models.Model; res: INTEGER;
 		BEGIN
 			IF inLinkUpdate THEN RETURN END;
 			IF GetModel(object, model) THEN
@@ -1619,7 +1619,7 @@ TYPE
 		VAR
 			en : XMLObjects.Enumerator;
 			p : ANY;
-			s : String; res : WORD;
+			s : String; res : INTEGER;
 		BEGIN
 			AcquireWrite;
 			en := xml.GetContents();
@@ -1636,7 +1636,7 @@ TYPE
 		END FromXML;
 
 		PROCEDURE ToXML*(VAR element: XML.Element);
-		VAR chars: XML.ArrayChars;s: String; w: Streams.StringWriter; res: WORD;
+		VAR chars: XML.ArrayChars;s: String; w: Streams.StringWriter; res: INTEGER;
 		BEGIN
 			IF (GetName # NIL) & nonDefault THEN
 				ToXML^(element);
@@ -2336,7 +2336,7 @@ TYPE
 		END ToStream;
 
 		PROCEDURE Get*() : Repositories.Component;
-		VAR object : Repositories.Component; context : Repositories.Context; res : WORD;
+		VAR object : Repositories.Component; context : Repositories.Context; res : INTEGER;
 		BEGIN
 			AcquireRead;
 			object := SELF.object;
@@ -2439,7 +2439,7 @@ TYPE
 		END ToXML;
 
 		PROCEDURE WriteXML*(w : Streams.Writer; context: ANY;  indent : SIGNED32);
-		VAR name : String; id: SIZE; res: WORD; repository: Repositories.Repository; objectName: String;
+		VAR name : String; id: SIZE; res: INTEGER; repository: Repositories.Repository; objectName: String;
 		BEGIN
 			name := GetName();
 			IF name = NIL THEN KernelLog.String("Nameless boolean property encountered. Ignored"); KernelLog.Ln; RETURN END;
@@ -2674,7 +2674,7 @@ TYPE
 			en : XMLObjects.Enumerator;
 			p : ANY; s, n : String; i : SIGNED32;
 			moduleName, procedureName: Modules.Name;
-			res: WORD; msg: ARRAY 32 OF CHAR;
+			res: INTEGER; msg: ARRAY 32 OF CHAR;
 			found: BOOLEAN;
 		BEGIN
 			IF xml # NIL THEN

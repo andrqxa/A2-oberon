@@ -549,7 +549,7 @@ END Store;
 	END Combo;
 
 	PROCEDURE SetInitSeeds;
-	VAR res: WORD;  i: SIGNED16;
+	VAR res: INTEGER;  i: SIGNED16;
 	BEGIN
 		initSeed1 := Oberon.Time();  Oberon.GetClock( initSeed2, initSeed3 );
 		FOR i := 1 TO 10 DO res := Combo( initSeed1, initSeed2, initSeed3 ) END

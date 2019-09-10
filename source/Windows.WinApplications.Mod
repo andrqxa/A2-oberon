@@ -29,7 +29,7 @@ IMPORT Kernel32, KernelLog, Commands, Strings, SYSTEM, Options;
 	END Call;
 
 	PROCEDURE Run*(context : Commands.Context);
-	VAR options: Options.Options; visible: BOOLEAN; cmdpar: ARRAY 256 OF CHAR;  res: WORD;
+	VAR options: Options.Options; visible: BOOLEAN; cmdpar: ARRAY 256 OF CHAR;  res: INTEGER;
 	BEGIN
 		NEW (options);
 		options.Add("h", "hide", Options.Flag);

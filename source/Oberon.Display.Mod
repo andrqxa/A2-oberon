@@ -556,7 +556,7 @@ END TransferBlock;
 (** Change screen mode. *)
 PROCEDURE SetMode*(x: SIGNED32; s: SET);
 VAR p: Plugins.Plugin; t : Kernel.Timer;
-	res : WORD; msg : ARRAY 64 OF CHAR;
+	res : INTEGER; msg : ARRAY 64 OF CHAR;
 	name : ARRAY 64 OF CHAR; context: Commands.Context;
 BEGIN
 	context := Commands.GetContext ();

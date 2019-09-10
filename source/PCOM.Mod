@@ -1191,7 +1191,7 @@ END ImportComplete;
 
 PROCEDURE Import*(self: PCT.Module; VAR M: PCT.Module; modname: StringPool.Index);
 	VAR
-			res: WORD; tag, i: SIGNED32;  name: PCS.Name;  str: PCT.Struct;  vis: SET32; R: PCM.SymReader;
+			res: INTEGER; tag, i: SIGNED32;  name: PCS.Name;  str: PCT.Struct;  vis: SET32; R: PCM.SymReader;
 			proc: PCT.Proc;
 			scope: PCT.ModScope;
 			pscope: PCT.ProcScope;

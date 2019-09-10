@@ -100,7 +100,7 @@ VAR
 
 (* Compare the specified XML attritbute value to the specified integer value *)
 PROCEDURE Matches(driver : XML.Element; CONST attribute : ARRAY OF CHAR; value : SIGNED32) : BOOLEAN;
-VAR string : XML.String; number : SIGNED32; res : WORD;
+VAR string : XML.String; number : SIGNED32; res : INTEGER;
 BEGIN
 	ASSERT(driver # NIL);
 	string := driver.GetAttributeValue(attribute);
@@ -225,7 +225,7 @@ END HasBeenExecuted;
 PROCEDURE LoadDriver(driver : Driver) : BOOLEAN;
 VAR
 	commands : Strings.StringArray;
-	flags : SET; msg : ARRAY 256 OF CHAR; res : WORD;
+	flags : SET; msg : ARRAY 256 OF CHAR; res : INTEGER;
 	i : SIGNED32;
 BEGIN {EXCLUSIVE}
 	res := -1;

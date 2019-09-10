@@ -575,7 +575,7 @@ TYPE
 		END Init;
 
 		PROCEDURE New0*(CONST name: ARRAY OF CHAR): Files.File;
-		VAR i: SIGNED32; res: WORD; f: File; buf: Buffer; head {UNTRACED}: POINTER {UNSAFE} TO FileHeader; namebuf: FileName;
+		VAR i: SIGNED32; res: INTEGER; f: File; buf: Buffer; head {UNTRACED}: POINTER {UNSAFE} TO FileHeader; namebuf: FileName;
 		BEGIN {EXCLUSIVE}
 			f := NIL; Check(name, namebuf, res);
 			IF res <= 0 THEN
@@ -599,7 +599,7 @@ TYPE
 
 		PROCEDURE Old0*(CONST name: ARRAY OF CHAR): Files.File;
 		VAR
-			i, k: SIGNED32; res: WORD; f: File; header: DiskAdr; buf: Buffer; head {UNTRACED}: POINTER {UNSAFE} TO FileHeader;
+			i, k: SIGNED32; res: INTEGER; f: File; header: DiskAdr; buf: Buffer; head {UNTRACED}: POINTER {UNSAFE} TO FileHeader;
 			namebuf: FileName; super: SuperIndex; sub: SubIndex; sec: IndexSector;
 		BEGIN {EXCLUSIVE}
 			f := NIL; Check(name, namebuf, res);
@@ -637,7 +637,7 @@ TYPE
 			RETURN f
 		END Old0;
 
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: WORD);
+		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
 		VAR adr: DiskAdr; namebuf: FileName; head: FileHeader;
 		BEGIN {EXCLUSIVE}
 			Check(name, namebuf, res);
@@ -660,7 +660,7 @@ TYPE
 			END
 		END Delete0;
 
-		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: WORD);
+		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
 		VAR adr, newAdr: DiskAdr; oldbuf, newbuf: FileName;  head: FileHeader;
 		BEGIN {EXCLUSIVE}
 			Check(old, oldbuf, res);
@@ -694,7 +694,7 @@ TYPE
 		END Enumerate0;
 
 		PROCEDURE FileKey*(CONST name: ARRAY OF CHAR): SIGNED32;
-			VAR res: WORD; namebuf: FileName; header: DiskAdr;
+			VAR res: INTEGER; namebuf: FileName; header: DiskAdr;
 		BEGIN {EXCLUSIVE}
 			header := 0;
 			Check(name, namebuf, res);
@@ -1153,7 +1153,7 @@ TYPE
 			Files.JoinName(fs.prefix, SELF.name, name)
 		END GetName;
 
-		PROCEDURE Register0*(VAR res: WORD);
+		PROCEDURE Register0*(VAR res: INTEGER);
 		VAR oldAdr: DiskAdr; fs0: FileSystem;
 		BEGIN {EXCLUSIVE}
 			Unbuffer(SELF);
@@ -1295,7 +1295,7 @@ END enumerate;
 
 (* Check a file name. *)
 
-PROCEDURE Check(CONST s: ARRAY OF CHAR; VAR name: FileName; VAR res: WORD);
+PROCEDURE Check(CONST s: ARRAY OF CHAR; VAR name: FileName; VAR res: INTEGER);
 VAR i, k: SIGNED32; ch: CHAR;
 BEGIN
 	ch := s[0]; i := 0; k := 0;

@@ -11,7 +11,7 @@ MODULE ZipFS; (** AUTHOR "ejz"; PURPOSE "mount a zipped file as a file-system"; 
 			END Init;
 
 			PROCEDURE Old0*(CONST name: ARRAY OF CHAR): Files.File;
-				VAR E: Unzip.Entry; key: SIGNED32; res: WORD; F: File; F0: Files.File; W: Files.Writer;
+				VAR E: Unzip.Entry; key: SIGNED32; res: INTEGER; F: File; F0: Files.File; W: Files.Writer;
 			BEGIN {EXCLUSIVE}
 				key := 0;
 				E := zip.GetFirst();
@@ -162,7 +162,7 @@ MODULE ZipFS; (** AUTHOR "ejz"; PURPOSE "mount a zipped file as a file-system"; 
 	PROCEDURE NewFS*(context : Files.Parameters);
 	VAR
 		name: Files.FileName;
-		F: Files.File; zip: Unzip.ZipFile; fs: FileSystem; res: WORD;
+		F: Files.File; zip: Unzip.ZipFile; fs: FileSystem; res: INTEGER;
 	BEGIN
 		IF (Files.This(context.prefix) = NIL) THEN
 			context.arg.SkipWhitespace; context.arg.String(name);

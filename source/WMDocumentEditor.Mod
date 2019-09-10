@@ -76,7 +76,7 @@ TYPE
 		PROCEDURE Load*(CONST filename,  format : ARRAY OF CHAR);
 		VAR
 			text : Texts.Text;
-			msg : ARRAY 512 OF CHAR; res : WORD;
+			msg : ARRAY 512 OF CHAR; res : INTEGER;
 			fullname : Files.FileName;
 			decoder : Codecs.TextDecoder;
 			in : Streams.Reader;
@@ -162,7 +162,7 @@ TYPE
 		VAR
 			text : Texts.Text;
 			fullname : Files.FileName;
-			msg : ARRAY 512 OF CHAR; res : WORD;
+			msg : ARRAY 512 OF CHAR; res : INTEGER;
 			backName : ARRAY 128 OF CHAR;
 			encoder : Codecs.TextEncoder;
 			w : Files.Writer;

@@ -32,7 +32,7 @@ VAR
 	tabi04adr, tabi17adr, tabi26adr, tabi35adr, onecorradr, roundinvrowadr, roundinvcoladr, roundinvcorradr, tg116adr, tg216adr, tg316adr, cos416adr: ADDRESS;
 	Transform*: PROCEDURE (src, dst: ADDRESS);
 	intTab: POINTER TO ARRAY OF SIGNED16;
-	status*: WORD;
+	status*: INTEGER;
 
 
 PROCEDURE -MOVDQA1;

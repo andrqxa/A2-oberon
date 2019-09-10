@@ -207,7 +207,7 @@ END DisplayMTTR;
 
 (*
 PROCEDURE IntSetCache(VAR state: Machine.State);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	Machine.SetLocalCacheProperties(0FA800000H, 800000H, Machine.WC, res);
 	KernelLog.Enter; KernelLog.String("SetCache "); KernelLog.Int(res, 1); KernelLog.Exit

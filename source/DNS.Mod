@@ -287,7 +287,7 @@ BEGIN
 	name[j] := 0X
 END Domain;
 
-PROCEDURE RetrieveInfo(qtype: SIGNED32; VAR adr: IP.Adr; VAR buf, hname: ARRAY OF CHAR; VAR len: SIZE; VAR timeout: SIGNED32; VAR res: WORD);
+PROCEDURE RetrieveInfo(qtype: SIGNED32; VAR adr: IP.Adr; VAR buf, hname: ARRAY OF CHAR; VAR len: SIZE; VAR timeout: SIGNED32; VAR res: INTEGER);
 VAR
 	name0: Name;
 	adr0: IP.Adr;
@@ -372,7 +372,7 @@ BEGIN
 	END
 END RetrieveInfo;
 
-PROCEDURE SendQuery(pcb: UDP.Socket; server: IP.Adr; name: ARRAY OF CHAR; type: SIGNED32; VAR buf: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE SendQuery(pcb: UDP.Socket; server: IP.Adr; name: ARRAY OF CHAR; type: SIGNED32; VAR buf: ARRAY OF CHAR; VAR res: INTEGER);
 VAR len: SIGNED32;
 BEGIN
 	len := 0; res := 0;
@@ -382,7 +382,7 @@ BEGIN
 	INC(NDNSSent);
 END SendQuery;
 
-PROCEDURE ReceiveReply(pcb: UDP.Socket; VAR buf: ARRAY OF CHAR; VAR len: SIZE; VAR res: WORD);
+PROCEDURE ReceiveReply(pcb: UDP.Socket; VAR buf: ARRAY OF CHAR; VAR len: SIZE; VAR res: INTEGER);
 VAR radr: IP.Adr; rport: SIGNED32;
 BEGIN
 	REPEAT
@@ -391,7 +391,7 @@ BEGIN
 	IF res = Ok THEN INC(NDNSReceived) ELSE len := 0 END
 END ReceiveReply;
 
-PROCEDURE QueryDNS(type: SIGNED32; VAR buf, qname, hname: ARRAY OF CHAR; VAR adr: IP.Adr; VAR timeout: SIGNED32; VAR res: WORD);
+PROCEDURE QueryDNS(type: SIGNED32; VAR buf, qname, hname: ARRAY OF CHAR; VAR adr: IP.Adr; VAR timeout: SIGNED32; VAR res: INTEGER);
 VAR
 	j, k, serverCount: SIGNED32;
 	len: SIZE;
@@ -436,7 +436,7 @@ END QueryDNS;
 
 (** Find the host responsible for mail exchange of the specified domain. *)
 
-PROCEDURE MailHostByDomain*(domain: ARRAY OF CHAR; VAR hostname: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE MailHostByDomain*(domain: ARRAY OF CHAR; VAR hostname: ARRAY OF CHAR; VAR res: INTEGER);
 VAR
 	buf: ARRAY 512 OF CHAR;
 	timeout: SIGNED32;
@@ -459,7 +459,7 @@ END MailHostByDomain;
 
 (** Find the IP address of the specified host. *)
 
-PROCEDURE HostByName*(hostname: ARRAY OF CHAR; VAR adr: IP.Adr; VAR res: WORD);
+PROCEDURE HostByName*(hostname: ARRAY OF CHAR; VAR adr: IP.Adr; VAR res: INTEGER);
 VAR
 	buf: ARRAY 512 OF CHAR;
 	name: Name;
@@ -506,7 +506,7 @@ END HostByName;
 
 (** Find the host name of the specified IP address. *)
 
-PROCEDURE HostByNumber*(adr: IP.Adr; VAR hostname: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE HostByNumber*(adr: IP.Adr; VAR hostname: ARRAY OF CHAR; VAR res: INTEGER);
 VAR
 	buf: ARRAY 512 OF CHAR;
 	name: Name;

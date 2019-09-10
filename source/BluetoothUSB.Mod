@@ -191,7 +191,7 @@ TYPE
 			END;
 		END ReadACL;
 
-		PROCEDURE Send*(type: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: WORD);
+		PROCEDURE Send*(type: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR  i: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF TraceSend THEN
@@ -212,7 +212,7 @@ TYPE
 			END;
 		END Send;
 
-		PROCEDURE Send1H*(type: SIGNED32; VAR hdr: ARRAY OF CHAR; hdrlen: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: WORD);
+		PROCEDURE Send1H*(type: SIGNED32; VAR hdr: ARRAY OF CHAR; hdrlen: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR  i: SIGNED32; buffer : POINTER TO ARRAY OF CHAR; bufferLen : SIGNED32;
 		BEGIN
 			IF TraceSend THEN
@@ -242,7 +242,7 @@ TYPE
 		END Send1H;
 
 		PROCEDURE Send2H*(type: SIGNED32; VAR hdr1: ARRAY OF CHAR; hdr1len: SIGNED32;
-				VAR hdr2: ARRAY OF CHAR; hdr2len: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: WORD);
+				VAR hdr2: ARRAY OF CHAR; hdr2len: SIGNED32; VAR data: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR
 			i: SIGNED32;
 			buffer : POINTER TO ARRAY OF CHAR;
@@ -318,7 +318,7 @@ BEGIN
 	END;
 END ShowEvent;
 
-PROCEDURE ShowErrorCode(errorcode : WORD);
+PROCEDURE ShowErrorCode(errorcode : INTEGER);
 BEGIN
 	CASE errorcode OF
 		00H: KernelLog.String("OK");

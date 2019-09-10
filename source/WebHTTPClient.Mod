@@ -19,7 +19,7 @@ TYPE
 		PROCEDURE & InitContentReader * (in: Streams.Reader; CONST h: WebHTTP.ResponseHeader);
 		VAR
 			token: ARRAY 64 OF CHAR;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			InitReader(Receive, 1024);
 			SELF.in := in;
@@ -31,10 +31,10 @@ TYPE
 			END;
 		END InitContentReader;
 
-		PROCEDURE Receive * (VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive * (VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			token: ARRAY 16 OF CHAR;
-			i, total: SIGNED32; r: WORD;
+			i, total: SIGNED32; r: INTEGER;
 			ch: CHAR;
 		BEGIN
 			IF (encoding # "") & Strings.Match("chunked", encoding) THEN
@@ -66,7 +66,7 @@ TYPE
 		END Receive;
 	END ContentReader;
 
-PROCEDURE Head*(CONST url : ARRAY OF CHAR; VAR con : TCP.Connection; VAR header: WebHTTP.ResponseHeader; VAR res : WORD);
+PROCEDURE Head*(CONST url : ARRAY OF CHAR; VAR con : TCP.Connection; VAR header: WebHTTP.ResponseHeader; VAR res : INTEGER);
 VAR
 	host : ARRAY 128 OF CHAR;
 	path : ARRAY 256 OF CHAR;
@@ -98,7 +98,7 @@ END Head;
 
 (** The HTTP versions is ignored and set to 1.0; uri and host are ignored and taken from the url parameter *)
 PROCEDURE Get*(CONST url : ARRAY OF CHAR; VAR rHeader : WebHTTP.RequestHeader;
-								VAR con : TCP.Connection; VAR header: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+								VAR con : TCP.Connection; VAR header: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 VAR
 	host : ARRAY 128 OF CHAR;
 	path : ARRAY 256 OF CHAR;

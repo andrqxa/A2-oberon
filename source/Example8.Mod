@@ -6,7 +6,7 @@ MODULE Example8;	(* pjm *)
 
 TYPE
 	Semaphore* = OBJECT
-		VAR s: WORD;
+		VAR s: INTEGER;
 
 		PROCEDURE V*;
 		BEGIN {EXCLUSIVE} s := s+1 END V;

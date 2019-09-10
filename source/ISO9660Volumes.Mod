@@ -22,7 +22,7 @@ MODULE ISO9660Volumes;	(* AUTHOR "?/be"; PURPOSE "ISO 9660 volume (ported from N
 			spc: SIGNED32;	(* sectors per cluster *)
 
 			PROCEDURE Finalize*;
-			VAR res: WORD;
+			VAR res: INTEGER;
 			BEGIN {EXCLUSIVE}
 				IF debug THEN KernelLog.String("Entering OFSISO9660Volumes.Finalize"); KernelLog.Ln END;
 				EXCL(dev.flags, Disks.Mounted);
@@ -35,7 +35,7 @@ MODULE ISO9660Volumes;	(* AUTHOR "?/be"; PURPOSE "ISO 9660 volume (ported from N
 			END Available;
 
 			PROCEDURE GetBlock*(adr: SIGNED32; VAR blk: ARRAY OF CHAR);
-			VAR res: WORD; i: SIGNED32;
+			VAR res: INTEGER; i: SIGNED32;
 			BEGIN {EXCLUSIVE}
 				ASSERT(dev # NIL, 101);
 				i := 0;
@@ -83,7 +83,7 @@ END GetISO9660Volume;
 (** Generate a new ISO9660 volume object. Files.Par: device [# part (ignored)] *)
 PROCEDURE New*(context : Files.Parameters);
 VAR
-	name: Plugins.Name;  i, ignore: SIGNED32; res: WORD;
+	name: Plugins.Name;  i, ignore: SIGNED32; res: INTEGER;
 	table: Plugins.Table; dev: Disks.Device;
 BEGIN
 	context.vol := NIL;

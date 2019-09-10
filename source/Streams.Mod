@@ -25,17 +25,17 @@ TYPE
 	Position* = SIGNED64; (* position in the stream *)
 
 	(** Any stream output procedure or method. *)
-	Sender* = PROCEDURE {DELEGATE} ( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
+	Sender* = PROCEDURE {DELEGATE} ( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
 
 	(** Any stream input procedure or method. *)
-	Receiver* = PROCEDURE {DELEGATE} ( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+	Receiver* = PROCEDURE {DELEGATE} ( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 
 	Connection* = OBJECT
 
-		PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
+		PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
 		END Send;
 
-		PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+		PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 		END Receive;
 
 		PROCEDURE Close*;
@@ -49,7 +49,7 @@ TYPE
 	VAR
 		tail: SIZE;
 		buf: POINTER TO ARRAY OF CHAR;
-		res*: WORD; (** result of last output operation. *)
+		res*: INTEGER; (** result of last output operation. *)
 		send: Sender;
 		sent*: Position;  (** count of sent bytes *)
 		(* buf[0..tail-1] contains data to write. *)
@@ -267,9 +267,9 @@ TYPE
 
 	(** Write a SET in Oberon notation. *)
 		PROCEDURE Set*( s: SET );   (* from P. Saladin *)
-		VAR i, last: WORD;  dots: BOOLEAN;
+		VAR i, last: INTEGER;  dots: BOOLEAN;
 		BEGIN
-			Char( "{" );  last := MAX( WORD );  dots := FALSE;
+			Char( "{" );  last := MAX( INTEGER );  dots := FALSE;
 			FOR i := MAX( SET ) TO 0 BY -1 DO
 				IF i IN s THEN
 					IF last = (i + 1) THEN
@@ -376,7 +376,7 @@ TYPE
 
 
 	(** Write FLOAT64 x  using n character positions. *)
-		PROCEDURE Float*( x: FLOAT64;  n: WORD );
+		PROCEDURE Float*( x: FLOAT64;  n: INTEGER );
 		VAR
 			buf: ARRAY 32 OF CHAR;
 		BEGIN
@@ -385,7 +385,7 @@ TYPE
 		END Float;
 
 	(** Write FLOAT64 x in a fixed point notation. n is the overall minimal length for the output field, f the number of fraction digits following the decimal point, D the fixed exponent (printed only when D # 0). *)
-		PROCEDURE FloatFix*( x: FLOAT64;  n, f, D: WORD );
+		PROCEDURE FloatFix*( x: FLOAT64;  n, f, D: INTEGER );
 		VAR
 			buf: ARRAY 512 OF CHAR;
 		BEGIN
@@ -402,7 +402,7 @@ TYPE
 			InitWriter( Send, size )
 		END InitStringWriter;
 
-		PROCEDURE Send( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
+		PROCEDURE Send( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
 		BEGIN
 			res := StringFull
 		END Send;
@@ -449,7 +449,7 @@ TYPE
 	VAR
 		head, tail: SIZE;
 		buf: POINTER TO ARRAY OF CHAR;
-		res*: WORD;   (** result of last input operation. *)
+		res*: INTEGER;   (** result of last input operation. *)
 		receive: Receiver;
 		received*: Position;   (** count of received bytes *)
 		(* buf[buf.head..buf.tail-1] contains data to read. *)
@@ -700,7 +700,7 @@ TYPE
 	 (** Read an integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
 
 		PROCEDURE Int*( VAR x: SIGNED32;  hex: BOOLEAN );
-		VAR vd, vh: SIGNED32; sgn, d: WORD;  ch: CHAR;  ok: BOOLEAN;
+		VAR vd, vh: SIGNED32; sgn, d: INTEGER;  ch: CHAR;  ok: BOOLEAN;
 		BEGIN
 			vd := 0;  vh := 0;  sgn := 1;  ok := FALSE;
 			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
@@ -724,7 +724,7 @@ TYPE
 	 (** Read a huge integer value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
 
 		PROCEDURE HInt*( VAR x: SIGNED64;  hex: BOOLEAN );
-		VAR vd, vh: SIGNED64; sgn, d: WORD;  ch: CHAR;  ok: BOOLEAN;
+		VAR vd, vh: SIGNED64; sgn, d: INTEGER;  ch: CHAR;  ok: BOOLEAN;
 		BEGIN
 			vd := 0;  vh := 0;  sgn := 1;  ok := FALSE;
 			IF Peek() = "-" THEN sgn := -1;  ch := Get() END;
@@ -748,7 +748,7 @@ TYPE
 	 (** Read a size value in decimal or hexadecimal.  If hex = TRUE, recognize the "H" postfix for hexadecimal numbers. *)
 
 		PROCEDURE Size*( VAR x: SIZE;  hex: BOOLEAN );
-		VAR vd, vh: SIZE; d: WORD;  ch: CHAR;  ok: BOOLEAN;
+		VAR vd, vh: SIZE; d: INTEGER;  ch: CHAR;  ok: BOOLEAN;
 		BEGIN
 			vd := 0;  vh := 0; ok := FALSE;
 			LOOP
@@ -940,7 +940,7 @@ TYPE
 			tail := LEN( buf );  received := LEN( buf );  res := Ok;
 		END SetPos;
 
-		PROCEDURE Receive( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+		PROCEDURE Receive( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 		BEGIN
 			IF min = 0 THEN res := Ok ELSE res := EOF END;
 			len := 0;

@@ -40,7 +40,7 @@ VAR
 	index : SIGNED32;
 	lastModuleName : Modules.Name;
 
-PROCEDURE GetErrorString(errorCode : WORD) : Strings.String;
+PROCEDURE GetErrorString(errorCode : INTEGER) : Strings.String;
 VAR message : ARRAY 128 OF CHAR; nbr : ARRAY 16 OF CHAR;
 BEGIN
 	message := "Unknown error, res: ";
@@ -49,8 +49,8 @@ BEGIN
 END GetErrorString;
 
 (** Get error message for the specified error number. If no message can be found, a generic error message is generated *)
-PROCEDURE GetErrorMessage*(errorCode : WORD) : ErrorMessage;
-VAR errorMessage : ErrorMessage; res : WORD;
+PROCEDURE GetErrorMessage*(errorCode : INTEGER) : ErrorMessage;
+VAR errorMessage : ErrorMessage; res : INTEGER;
 BEGIN {EXCLUSIVE}
 	res := -1;
 	Get(errorCode, errorMessage, res);
@@ -62,7 +62,7 @@ BEGIN {EXCLUSIVE}
 	RETURN errorMessage;
 END GetErrorMessage;
 
-PROCEDURE ToStream*(errorCode : WORD; out : Streams.Writer);
+PROCEDURE ToStream*(errorCode : INTEGER; out : Streams.Writer);
 VAR errorMessage : ErrorMessage;
 BEGIN
 	ASSERT(out # NIL);
@@ -93,7 +93,7 @@ BEGIN
 	INC(index);
 END Add;
 
-PROCEDURE Get(number : WORD; VAR errorMessage : ErrorMessage; VAR res : WORD);
+PROCEDURE Get(number : INTEGER; VAR errorMessage : ErrorMessage; VAR res : INTEGER);
 VAR i : SIGNED32;
 BEGIN
 	IF (cache # NIL) THEN
@@ -108,7 +108,7 @@ BEGIN
 	END;
 END Get;
 
-PROCEDURE ParseLine(reader : Streams.Reader; VAR errorMessage : ErrorMessage; VAR res : WORD);
+PROCEDURE ParseLine(reader : Streams.Reader; VAR errorMessage : ErrorMessage; VAR res : INTEGER);
 VAR line : ARRAY MaxLineLength OF CHAR;
 BEGIN
 	IF reader.GetInteger(errorMessage.code, FALSE) THEN
@@ -121,7 +121,7 @@ BEGIN
 	res := reader.res;
 END ParseLine;
 
-PROCEDURE ParseFile(CONST filename : Files.FileName; VAR res : WORD);
+PROCEDURE ParseFile(CONST filename : Files.FileName; VAR res : INTEGER);
 VAR file : Files.File; reader : Files.Reader; errorMessage : ErrorMessage; ch : CHAR;
 BEGIN
 	file := Files.Old(filename);
@@ -152,7 +152,7 @@ END ParseFile;
 
 (**	Load and parse a error message file. *)
 PROCEDURE Open*(context : Commands.Context); (** [filename] ~ *)
-VAR filename : Files.FileName; res : WORD;
+VAR filename : Files.FileName; res : INTEGER;
 BEGIN {EXCLUSIVE}
 	index := 0; cache := NIL;
 	context.arg.SkipWhitespace; context.arg.String(filename);

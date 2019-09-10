@@ -55,7 +55,7 @@ TYPE
 			dead := TRUE;
 		END Close;
 
-		PROCEDURE Get(VAR ch : CHAR; VAR result : WORD);
+		PROCEDURE Get(VAR ch : CHAR; VAR result : INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF TraceBuffer THEN
 				KernelLog.String(ModuleName);
@@ -444,7 +444,7 @@ TYPE
 
 		(* --------------------------------------------- *)
 
-		PROCEDURE Sender(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Sender(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 
 		VAR
 			info : ARRAY 127 OF CHAR;
@@ -480,7 +480,7 @@ TYPE
 
 		(* --------------------------------------------- *)
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 
 		BEGIN
 
@@ -547,7 +547,7 @@ TYPE
 
 		PROCEDURE &Init*(l2capLayer : BluetoothL2CAP.L2CAP);
 		VAR
-			result : WORD;
+			result : INTEGER;
 			controlChannel : ControlChannel;
 			i : SIGNED32;
 		BEGIN
@@ -571,7 +571,7 @@ TYPE
 			RETURN l2capLayer;
 		END GetL2CAPLayer;
 
-		PROCEDURE Start*(bdAddr: Bluetooth.BDAddr; VAR result : WORD);
+		PROCEDURE Start*(bdAddr: Bluetooth.BDAddr; VAR result : INTEGER);
 		VAR
 			status : SIGNED32;
 			inMTU, outFlushTO : SIGNED32;
@@ -695,14 +695,14 @@ TYPE
 
 		PROCEDURE SendInformation*(serverChannel : SIGNED32; info : ARRAY OF CHAR; infoLength : SIZE);
 		VAR
-			result : WORD;
+			result : INTEGER;
 		BEGIN
 			channelList[serverChannel * 2].Sender(info,0,infoLength,TRUE,result);
 		END SendInformation;
 
 		PROCEDURE ReceiveInformation*(serverChannel : SIGNED32; VAR info : ARRAY OF CHAR; VAR infoLength : SIZE);
 		VAR
-			result : WORD;
+			result : INTEGER;
 		BEGIN
 			channelList[serverChannel * 2].Receiver(info,0,LEN(info),1,infoLength,result);
 		END ReceiveInformation;
@@ -771,7 +771,7 @@ TYPE
 
 		PROCEDURE L2CAPConfigIndication(inParam : BluetoothL2CAP.Indication);
 		VAR
-			result : WORD;
+			result : INTEGER;
 		BEGIN
 			WITH inParam : BluetoothL2CAP.ConfigInd DO
 				IF TraceRFCOMM THEN
@@ -792,7 +792,7 @@ TYPE
 		PROCEDURE SendFrame(frame : ARRAY OF CHAR;length : SIGNED32);
 		VAR
 			size : SIGNED32;
-			result : WORD;
+			result : INTEGER;
 			i : SIGNED32;
 		BEGIN
 			IF TraceRFCOMM THEN

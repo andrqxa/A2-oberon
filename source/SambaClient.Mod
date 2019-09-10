@@ -80,7 +80,7 @@ TYPE
 
 		(** Delete a file. res = 0 indicates success.  End users use Files.Delete instead. *)
 
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: WORD);
+		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
 		VAR
 			check : BOOLEAN;
 			closekey : SIGNED32;
@@ -123,7 +123,7 @@ TYPE
 
 		(** Rename a file. res = 0 indicates success.  End users use Files.Rename instead. *)
 
-		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: WORD);
+		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
 		VAR
 			check : BOOLEAN;
 			closekey : SIGNED32;
@@ -330,7 +330,7 @@ TYPE
 		(** Create a new directory structure. May not be supported by the actual implementation.
 			End users use Files.CreateDirectory instead.*)
 
-		PROCEDURE CreateDirectory0*(CONST name: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE CreateDirectory0*(CONST name: ARRAY OF CHAR; VAR res: INTEGER);
 		VAR check: BOOLEAN;
 		BEGIN
 			IF Trace THEN
@@ -362,7 +362,7 @@ TYPE
 		(** Remove a directory. If force=TRUE, any subdirectories and files should be automatically deleted.
 			End users use Files.RemoveDirectory instead. *)
 
-		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: WORD);
+		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: INTEGER);
 		VAR check: BOOLEAN;
 		BEGIN
 			IF Trace THEN
@@ -688,7 +688,7 @@ TYPE
 
 		(** Register a file created with New in the directory, replacing the previous file in the directory with the same name. The file is automatically updated.  End users use Files.Register instead. *)
 
-		PROCEDURE Register0*(VAR res: WORD);
+		PROCEDURE Register0*(VAR res: INTEGER);
 		BEGIN END Register0;
 
 		(** Flush the changes made to a file from its buffers. Register0 will automatically update a file. *)
@@ -707,7 +707,7 @@ TYPE
 		PROCEDURE Connect(CONST host: ARRAY OF CHAR; port: SIGNED32; VAR c: Connection);
 		VAR
 			fadr: IP.Adr;
-			res: WORD;
+			res: INTEGER;
 		BEGIN {EXCLUSIVE}
 			res := 0;
 			DNS.HostByName(host, fadr, res);

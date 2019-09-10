@@ -291,7 +291,7 @@ TYPE
 
 		(* Load settings from system configuration database *)
 		PROCEDURE Load;
-		VAR string : String; temp: SIGNED32; res: WORD;
+		VAR string : String; temp: SIGNED32; res: INTEGER;
 		BEGIN
 			(* General *)
 			Configuration.Get("Applications.PET.General.BackupOnStore", string, res);
@@ -471,7 +471,7 @@ TYPE
 			SELF.win := win;
 		END New;
 
-		PROCEDURE URL*(CONST url : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE URL*(CONST url : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			win.Load(url, "AUTO");
 			res := 0
@@ -921,7 +921,7 @@ TYPE
 
 			PROCEDURE HandleDiff;
 			VAR
-				filename, string : Filename; context : Commands.Context; res : WORD;
+				filename, string : Filename; context : Commands.Context; res : INTEGER;
 				arg : Streams.StringReader;
 			BEGIN
 				IF (settings.diffCommand = "") THEN
@@ -1313,7 +1313,7 @@ TYPE
 		END CreateForm;
 
 		PROCEDURE ButtonHandler(sender, data : ANY);
-		VAR options : CompilerOptions; searchString : SearchString; res : WORD;
+		VAR options : CompilerOptions; searchString : SearchString; res : INTEGER;
 		BEGIN
 			IF sender = undoBtn THEN
 				currentPage.editor.Undo;
@@ -1710,7 +1710,7 @@ TYPE
 			SetInfo(windowInfo);
 		END UpdateInfo;
 
-		PROCEDURE HandleDocumentInfo(CONST info : WMWindowManager.DocumentInfo; new : BOOLEAN; VAR res : WORD);
+		PROCEDURE HandleDocumentInfo(CONST info : WMWindowManager.DocumentInfo; new : BOOLEAN; VAR res : INTEGER);
 		BEGIN
 			IF (pages[info.id] # NIL) THEN SelectTab(info.id); END;
 		END HandleDocumentInfo;
@@ -1876,7 +1876,7 @@ TYPE
 		END FilenameEditEscapeHandler;
 
 		PROCEDURE LoadHandler(sender, data : ANY);
-		VAR filename : Filename; command : ARRAY 1024 OF CHAR; msg : ARRAY 64 OF CHAR; ignoreRes : WORD;
+		VAR filename : Filename; command : ARRAY 1024 OF CHAR; msg : ARRAY 64 OF CHAR; ignoreRes : INTEGER;
 		BEGIN
 			filenameEdit.GetAsString(filename);
 			Strings.TrimWS(filename);
@@ -1900,7 +1900,7 @@ TYPE
 
 		PROCEDURE Load(CONST filename,  format : ARRAY OF CHAR);
 		VAR
-			text : Texts.Text; res : WORD;
+			text : Texts.Text; res : INTEGER;
 			decoder : Codecs.TextDecoder;
 			msg : ARRAY 512 OF CHAR;
 			readonly : BOOLEAN;
@@ -2045,7 +2045,7 @@ TYPE
 
 		PROCEDURE Store(CONST filename, format  : ARRAY OF CHAR);
 		VAR
-			res : WORD;
+			res : INTEGER;
 			msg : ARRAY 512 OF CHAR;
 			name, backName, fullname, archiveName, entryName, path: Filename;
 			syntaxHighlighterName : ARRAY 32 OF CHAR;
@@ -2337,7 +2337,7 @@ TYPE
 		VAR
 			path, filename : Files.FileName;
 			name, extension, msg : ARRAY 128 OF CHAR;
-			tw : TextUtilities.TextWriter; res : WORD;
+			tw : TextUtilities.TextWriter; res : INTEGER;
 		BEGIN
 			ASSERT(currentPage # NIL);
 			Files.SplitPath(currentPage.filename, path, filename);
@@ -2815,7 +2815,7 @@ BEGIN
 END Uncomment;
 
 PROCEDURE GetSyntaxHighlighterName*(fullname : ARRAY OF CHAR; VAR name : ARRAY OF CHAR);
-VAR filename, extension, config : Files.FileName; res : WORD; tries: SIGNED32;
+VAR filename, extension, config : Files.FileName; res : INTEGER; tries: SIGNED32;
 BEGIN
 	name := "";
 	tries := 0;
@@ -2870,7 +2870,7 @@ BEGIN (* caller holds module lock *)
 END LoadScratchText;
 
 PROCEDURE StoreText(CONST filename : ARRAY OF CHAR; text : Texts.Text);
-VAR res : WORD;
+VAR res : INTEGER;
 BEGIN
 	text.AcquireRead;
 	TextUtilities.StoreOberonText(text, filename, res);
@@ -2878,7 +2878,7 @@ BEGIN
 END StoreText;
 
 PROCEDURE LoadText(CONST filename : ARRAY OF CHAR) : Texts.Text;
-VAR text : Texts.Text; res : WORD;
+VAR text : Texts.Text; res : INTEGER;
 BEGIN
 	NEW(text);
 	text.AcquireWrite;
@@ -2939,7 +2939,7 @@ BEGIN {EXCLUSIVE}
 END Cleanup;
 
 PROCEDURE LoadModule(CONST moduleName : ARRAY OF CHAR);
-VAR module : Modules.Module; msg : ARRAY 128 OF CHAR; res : WORD;
+VAR module : Modules.Module; msg : ARRAY 128 OF CHAR; res : INTEGER;
 BEGIN
 	module := Modules.ThisModule(moduleName, res, msg);
 END LoadModule;

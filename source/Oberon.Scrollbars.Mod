@@ -35,7 +35,7 @@ MODULE Scrollbars IN Oberon;	(** portable *)		(** ps (based on sources of rv and
 
 	(* Given a position, calculate the relative slider position. *)
 	PROCEDURE Value (F: Frame; x, y, w, h, X, Y: SIGNED16; min, max: SIGNED32): SIGNED32;
-	VAR res: WORD;
+	VAR res: INTEGER;
 
 		PROCEDURE CalcVal (x, w, bx, bw: SIGNED16; min, max: SIGNED32): SIGNED32;
 		VAR r, d: SIGNED32;

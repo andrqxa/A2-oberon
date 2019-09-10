@@ -94,15 +94,15 @@ TYPE
 	END;
 
 	(** Get own value and store it into target *)
-	Getter* = PROCEDURE {DELEGATE} (CONST self : Generic; VAR target : Any; VAR res : WORD);
+	Getter* = PROCEDURE {DELEGATE} (CONST self : Generic; VAR target : Any; VAR res : INTEGER);
 
 	(** Set own value from source *)
-	Setter* = PROCEDURE {DELEGATE} (CONST self : Generic; CONST source : Any; VAR res : WORD);
+	Setter* = PROCEDURE {DELEGATE} (CONST self : Generic; CONST source : Any; VAR res : INTEGER);
 
 VAR
 	StrEmptyString : Strings.String;
 
-PROCEDURE GetBoolean*(CONST source : Any; VAR value : BOOLEAN; VAR res : WORD);
+PROCEDURE GetBoolean*(CONST source : Any; VAR value : BOOLEAN; VAR res : INTEGER);
 VAR temp : ARRAY 2 OF CHAR; boolean : Boolean;
 BEGIN
 	res := Ok;
@@ -138,7 +138,7 @@ BEGIN
 	END;
 END GetBoolean;
 
-PROCEDURE SetBoolean*(VAR target : Any; value : BOOLEAN; VAR res : WORD);
+PROCEDURE SetBoolean*(VAR target : Any; value : BOOLEAN; VAR res : INTEGER);
 VAR temp : ARRAY 2 OF CHAR; boolean : Boolean;
 BEGIN
 	res := Ok;
@@ -172,7 +172,7 @@ BEGIN
 	END;
 END SetBoolean;
 
-PROCEDURE GetInteger*(CONST source : Any; VAR value : SIGNED32; VAR res : WORD);
+PROCEDURE GetInteger*(CONST source : Any; VAR value : SIGNED32; VAR res : INTEGER);
 VAR integer : Integer;
 BEGIN
 	res := Ok;
@@ -212,7 +212,7 @@ BEGIN
 	END;
 END GetInteger;
 
-PROCEDURE SetInteger*(VAR target : Any; value : SIGNED32;  VAR res : WORD);
+PROCEDURE SetInteger*(VAR target : Any; value : SIGNED32;  VAR res : INTEGER);
 VAR integer : Integer;
 BEGIN
 	res := Ok;
@@ -255,7 +255,7 @@ BEGIN
 	END;
 END SetInteger;
 
-PROCEDURE GetHugeint*(CONST source : Any; VAR value : SIGNED64; VAR res : WORD);
+PROCEDURE GetHugeint*(CONST source : Any; VAR value : SIGNED64; VAR res : INTEGER);
 VAR hugeint : Hugeint;
 BEGIN
 	res := Ok;
@@ -295,7 +295,7 @@ BEGIN
 	END;
 END GetHugeint;
 
-PROCEDURE SetHugeint*(VAR target : Any; value : SIGNED64;  VAR res : WORD);
+PROCEDURE SetHugeint*(VAR target : Any; value : SIGNED64;  VAR res : INTEGER);
 VAR hugeint : Hugeint;
 BEGIN
 	res := Ok;
@@ -338,7 +338,7 @@ BEGIN
 	END;
 END SetHugeint;
 
-PROCEDURE GetSize*(CONST source : Any; VAR value : SIZE; VAR res : WORD);
+PROCEDURE GetSize*(CONST source : Any; VAR value : SIZE; VAR res : INTEGER);
 VAR size : Size;
 BEGIN
 	res := Ok;
@@ -378,7 +378,7 @@ BEGIN
 	END;
 END GetSize;
 
-PROCEDURE SetSize*(VAR target : Any; value : SIZE;  VAR res : WORD);
+PROCEDURE SetSize*(VAR target : Any; value : SIZE;  VAR res : INTEGER);
 VAR size : Size;
 BEGIN
 	res := Ok;
@@ -421,7 +421,7 @@ BEGIN
 	END;
 END SetSize;
 
-PROCEDURE GetReal*(CONST source : Any; VAR value : FLOAT32; VAR res : WORD);
+PROCEDURE GetReal*(CONST source : Any; VAR value : FLOAT32; VAR res : INTEGER);
 VAR longreal : FLOAT64; real : Real;
 BEGIN
 	res := Ok;
@@ -465,7 +465,7 @@ BEGIN
 	END;
 END GetReal;
 
-PROCEDURE SetReal*(VAR target : Any; value : FLOAT32; VAR res : WORD);
+PROCEDURE SetReal*(VAR target : Any; value : FLOAT32; VAR res : INTEGER);
 VAR real : Real; w:Streams.StringWriter;
 BEGIN
 	res := Ok;
@@ -509,7 +509,7 @@ BEGIN
 	END;
 END SetReal;
 
-PROCEDURE GetLongreal*(CONST source : Any; VAR value : FLOAT64; VAR res : WORD);
+PROCEDURE GetLongreal*(CONST source : Any; VAR value : FLOAT64; VAR res : INTEGER);
 VAR longreal : Longreal;
 BEGIN
 	res := Ok;
@@ -549,7 +549,7 @@ BEGIN
 	END;
 END GetLongreal;
 
-PROCEDURE SetLongreal*(VAR target : Any; value : FLOAT64; VAR res : WORD);
+PROCEDURE SetLongreal*(VAR target : Any; value : FLOAT64; VAR res : INTEGER);
 VAR longreal : Longreal; w:Streams.StringWriter;
 BEGIN
 	res := Ok;
@@ -592,7 +592,7 @@ BEGIN
 	END;
 END SetLongreal;
 
-PROCEDURE GetChar*(CONST source : Any; VAR value : CHAR; VAR res : WORD);
+PROCEDURE GetChar*(CONST source : Any; VAR value : CHAR; VAR res : INTEGER);
 VAR string : ARRAY 8 OF CHAR; char : Char;
 BEGIN
 	res := Ok;
@@ -627,7 +627,7 @@ BEGIN
 	END;
 END GetChar;
 
-PROCEDURE SetChar*(VAR target : Any; value : CHAR; VAR res : WORD);
+PROCEDURE SetChar*(VAR target : Any; value : CHAR; VAR res : INTEGER);
 VAR temp : ARRAY 2 OF CHAR; char : Char;
 BEGIN
 	res := Ok;
@@ -666,7 +666,7 @@ BEGIN
 	END;
 END SetChar;
 
-PROCEDURE GetAOC*(CONST source : Any; VAR value : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE GetAOC*(CONST source : Any; VAR value : ARRAY OF CHAR; VAR res : INTEGER);
 BEGIN
 	res := Ok;
 	IF (source IS String) THEN
@@ -724,7 +724,7 @@ BEGIN
 END EnsureStringLength;
 
 
-PROCEDURE SetAOC*(VAR target : Any; CONST value : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE SetAOC*(VAR target : Any; CONST value : ARRAY OF CHAR; VAR res : INTEGER);
 VAR temp : FLOAT64; string : String;
 BEGIN
 	res := Ok;
@@ -775,7 +775,7 @@ BEGIN
 	END;
 END SetAOC;
 
-PROCEDURE GetString*(CONST source : Any; VAR string : Strings.String; VAR res : WORD);
+PROCEDURE GetString*(CONST source : Any; VAR string : Strings.String; VAR res : INTEGER);
 VAR
 	value : ARRAY 64 OF CHAR; (*? !!! *)
 BEGIN
@@ -824,7 +824,7 @@ BEGIN
 	END;
 END GetString;
 
-PROCEDURE SetString*(VAR target : Any; value : Strings.String; VAR res : WORD);
+PROCEDURE SetString*(VAR target : Any; value : Strings.String; VAR res : INTEGER);
 BEGIN
 	IF (value # NIL) THEN
 		SetAOC(target, value^, res);
@@ -836,7 +836,7 @@ BEGIN
 	END;
 END SetString;
 
-PROCEDURE GetSet*(CONST source : Any; VAR value : SET; VAR res : WORD);
+PROCEDURE GetSet*(CONST source : Any; VAR value : SET; VAR res : INTEGER);
 VAR set : Set;
 BEGIN
 	res := Ok;
@@ -868,7 +868,7 @@ BEGIN
 	END;
 END GetSet;
 
-PROCEDURE SetSet*(VAR target : Any; value : SET; VAR res : WORD);
+PROCEDURE SetSet*(VAR target : Any; value : SET; VAR res : INTEGER);
 VAR set : Set;
 BEGIN
 	res := Ok;
@@ -899,7 +899,7 @@ BEGIN
 	END;
 END SetSet;
 
-PROCEDURE GetText*(CONST source : Any; VAR value : Texts.Text; VAR res : WORD);
+PROCEDURE GetText*(CONST source : Any; VAR value : Texts.Text; VAR res : INTEGER);
 VAR
 	temp : ARRAY 64 OF CHAR;
 	text : Text;
@@ -976,7 +976,7 @@ BEGIN
 	END;
 END GetText;
 
-PROCEDURE SetText*(VAR target : Any; CONST value : Texts.Text; VAR res : WORD);
+PROCEDURE SetText*(VAR target : Any; CONST value : Texts.Text; VAR res : INTEGER);
 VAR text : Text; temp : ARRAY 64 OF CHAR; lr : FLOAT64;
 BEGIN
 	res := Ok;
@@ -1029,7 +1029,7 @@ BEGIN
 	END;
 END SetText;
 
-PROCEDURE GetObject*(CONST source : Any; VAR value : Repositories.Component; VAR res : WORD);
+PROCEDURE GetObject*(CONST source : Any; VAR value : Repositories.Component; VAR res : INTEGER);
 VAR object : Object;
 BEGIN
 	res := Ok;
@@ -1061,7 +1061,7 @@ BEGIN
 	END;
 END GetObject;
 
-PROCEDURE SetObject*(VAR target : Any; CONST value : Repositories.Component; VAR res : WORD);
+PROCEDURE SetObject*(VAR target : Any; CONST value : Repositories.Component; VAR res : INTEGER);
 VAR object : Object;
 BEGIN
 	res := Ok;
@@ -1088,7 +1088,7 @@ BEGIN
 	END;
 END SetObject;
 
-PROCEDURE Assign*(VAR to : Any; CONST from : Any; VAR res : WORD);
+PROCEDURE Assign*(VAR to : Any; CONST from : Any; VAR res : INTEGER);
 VAR string : String;
 BEGIN
 	IF (from IS Boolean) THEN
@@ -1136,7 +1136,7 @@ END Assign;
 
 
 
-PROCEDURE StringToComponent(CONST string : ARRAY OF CHAR; VAR component : Repositories.Component; VAR res : WORD);
+PROCEDURE StringToComponent(CONST string : ARRAY OF CHAR; VAR component : Repositories.Component; VAR res : INTEGER);
 VAR repositoryName, componentName : ARRAY 64 OF CHAR; componentID : SIZE;
 BEGIN
 	component := NIL;
@@ -1147,7 +1147,7 @@ BEGIN
 	END;
 END StringToComponent;
 
-PROCEDURE ComponentToString(CONST component : Repositories.Component; VAR string : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE ComponentToString(CONST component : Repositories.Component; VAR string : ARRAY OF CHAR; VAR res : INTEGER);
 VAR repository : Repositories.Repository; componentName : Repositories.Name; nbr : ARRAY 16 OF CHAR; componentID : SIZE;
 BEGIN
 	string := "";

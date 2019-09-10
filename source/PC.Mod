@@ -191,7 +191,7 @@ PROCEDURE Module*(scanner: PCS.Scanner; CONST source, options: ARRAY OF CHAR; br
 VAR
 	scope: PCT.ModScope; dest, objF: ARRAY 16 OF CHAR;
 	size: SIGNED32; R: PCM.Rider; new, extend, nofile, skip: BOOLEAN;
-	version: CHAR; res: WORD;
+	version: CHAR; res: INTEGER;
 	str: StringBuf;
 	msg: ARRAY 32 OF CHAR;
 	finished: BOOLEAN; copyscanner: PCS.Scanner; sym: SIGNED8;
@@ -313,7 +313,7 @@ END CompileInterface;
 PROCEDURE CompileFile*(CONST name, opt: ARRAY OF CHAR; pc: SIGNED32; log: Streams.Writer;
 	diagnostics : Diagnostics.Diagnostics; VAR error: BOOLEAN);
 VAR
-	atu: Texts.Text; format: SIGNED32; res: WORD;
+	atu: Texts.Text; format: SIGNED32; res: INTEGER;
 BEGIN
 	NEW(atu);
 	TextUtilities.LoadAuto(atu, name, format, res);
@@ -392,7 +392,7 @@ VAR
 	code: SIGNED32; i: SIZE; str: XML.String;
 	dynStr: DynamicStrings.DynamicString;
 	r : Files.Reader;
-	res : WORD;
+	res : INTEGER;
 BEGIN
 	Configuration.Get("Paco.ErrorMessages", ErrorFile, res);
 	IF (res # Configuration.Ok) THEN ErrorFile := DefaultErrorFile END;

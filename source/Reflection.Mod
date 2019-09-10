@@ -127,7 +127,7 @@ CONST
 	END CheckHeapAddress;
 
 	PROCEDURE Wait(w: Streams.Writer);
-	VAR i: WORD;
+	VAR i: INTEGER;
 	BEGIN
 		IF LineDelay > 0 THEN
 			FOR i := 0 TO LineDelay DO END;
@@ -348,7 +348,7 @@ CONST
 		c: CHAR;
 		s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
 		sz: SIZE; a, pc: ADDRESS;
-		word: WORD; lword: LONGWORD;
+		word: INTEGER; lword: LONGWORD;
 		s8: SIGNED8; s16: SIGNED16; s32: SIGNED32; s64: SIGNED64;
 		u8: UNSIGNED8; u16: UNSIGNED16; u32: UNSIGNED32;
 		r: FLOAT32; x: FLOAT64;
@@ -391,7 +391,7 @@ CONST
 			size := SIZEOF(SIGNED64);
 			SYSTEM.GET(adr, h); Signed(h);
 		| sfTypeWORD:
-			size := SIZEOF(WORD);
+			size := SIZEOF(INTEGER);
 			SYSTEM.GET(adr, word); Signed(word);
 		| sfTypeLONGWORD:
 			size := SIZEOF(LONGWORD);
@@ -977,7 +977,7 @@ CONST
 
 	(** Write a process's state in one line. *)
 	PROCEDURE WriteProcess*(w: Streams.Writer; p: Objects.Process);
-	VAR adr: ADDRESS; mode: WORD; m: Modules.Module;
+	VAR adr: ADDRESS; mode: INTEGER; m: Modules.Module;
 	BEGIN
 		IF p # NIL THEN
 			w.Int(p.id, 5);
@@ -1106,7 +1106,7 @@ TYPE
 		| sfTypeINTEGER: w.String("SIGNED16");
 		| sfTypeLONGINT: w.String("SIGNED32");
 		| sfTypeHUGEINT: w.String("SIGNED64");
-		| sfTypeWORD: w.String("WORD");
+		| sfTypeWORD: w.String("INTEGER");
 		| sfTypeLONGWORD: w.String("LONGWORD");
 		| sfTypeSIGNED8: w.String("SIGNED8");
 		| sfTypeSIGNED16: w.String("SIGNED16");
@@ -1347,7 +1347,7 @@ VAR trace: Streams.Writer;
 	END TraceProcesses;
 
 	PROCEDURE Test*;
-	VAR res: WORD; mod: Modules.Module; msg: ARRAY 32 OF CHAR; pos: SIZE;
+	VAR res: INTEGER; mod: Modules.Module; msg: ARRAY 32 OF CHAR; pos: SIZE;
 	BEGIN
 		mod := Modules.ThisModule("Reflection",res,msg);
 		ReportModule(trace, mod.refs, pos);

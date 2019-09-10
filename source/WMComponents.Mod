@@ -109,7 +109,7 @@ TYPE
 	Recursion*= ENUM None*, FromComponent*, FromBottom* END;
 
 TYPE
-	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; x,y : SIZE; VAR res : WORD);
+	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; x,y : SIZE; VAR res : INTEGER);
 
 	DropTarget = OBJECT(WMDropTarget.DropTarget)
 	VAR
@@ -126,7 +126,7 @@ TYPE
 			SELF.y := y;
 		END Init;
 
-		PROCEDURE GetInterface*(type : WORD) : WMDropTarget.DropInterface;
+		PROCEDURE GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
 		VAR sdi : DropString;
 		BEGIN
 			IF (type = WMDropTarget.TypeString) THEN
@@ -152,7 +152,7 @@ TYPE
 			SELF.x := x; SELF.y := y;
 		END Init;
 
-		PROCEDURE Set*(CONST string : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE Set*(CONST string : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			setString(string, x,y, res);
 		END Set;
@@ -1212,7 +1212,7 @@ TYPE
 			END;
 		END EditDragDropped;
 
-		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; x,y : SIZE; VAR res : WORD);
+		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; x,y : SIZE; VAR res : INTEGER);
 		VAR gen: XML.GeneratorProcedure; moduleName, procedureName ,msg: Modules.Name; element: XML.Element;
 			context: Repositories.Context; repositoryName, componentName: ARRAY 265 OF CHAR; componentID: SIZE; object: Repositories.Component;
 		BEGIN
@@ -1434,7 +1434,7 @@ TYPE
 			Release
 		END SetFont;
 
-		PROCEDURE ScaleFont*(height: SIZE; percent: WORD);
+		PROCEDURE ScaleFont*(height: SIZE; percent: INTEGER);
 		VAR fh,newSize: SIZE; f: WMGraphics.Font;
 		BEGIN
 			IF height < 4 THEN height := 4 END;
@@ -1831,7 +1831,7 @@ TYPE
 			IF (command # NIL) THEN HandleEvent(event, SELF, command); END;
 		END CheckPointerUpEvent;
 
-		PROCEDURE InEditBounds(x,y: SIZE): WORD;
+		PROCEDURE InEditBounds(x,y: SIZE): INTEGER;
 		CONST Border = 8;
 		VAR left, right, top, bottom: SIZE;
 		BEGIN
@@ -3096,7 +3096,7 @@ BEGIN (* caller must hold module lock! *)
 	RETURN handler;
 END FindMacroHandler;
 
-PROCEDURE AddMacroHandler*(CONST namespace : Namespace; handler : MacroHandlerProcedure; VAR res : WORD);
+PROCEDURE AddMacroHandler*(CONST namespace : Namespace; handler : MacroHandlerProcedure; VAR res : INTEGER);
 VAR new, node : MacroHandler; h : MacroHandlerProcedure;
 BEGIN {EXCLUSIVE}
 	ASSERT((namespace # NoNamespace) & (handler # NIL));
@@ -3168,7 +3168,7 @@ END SetAttribute;
 	support some component-related macro substitution or be replaced by Commands.Call
 *)
 
-PROCEDURE Call*(cmds : ARRAY OF CHAR; caller : Component; flags : SET; VAR res : WORD; VAR msg : ARRAY OF CHAR);
+PROCEDURE Call*(cmds : ARRAY OF CHAR; caller : Component; flags : SET; VAR res : INTEGER; VAR msg : ARRAY OF CHAR);
 VAR
 	context : Commands.Context; arg : Streams.StringReader;
 	buffer : Strings.Buffer; w : Streams.Writer; par : Strings.String;
@@ -3275,7 +3275,7 @@ BEGIN
 END Call;
 
 PROCEDURE GetComponent*(CONST name : ARRAY OF CHAR) : Component;
-VAR component : Component; c : Repositories.Component; res : WORD;
+VAR component : Component; c : Repositories.Component; res : INTEGER;
 BEGIN
 	component := NIL;
 	Repositories.GetComponentByString(name, c, res);
@@ -3294,7 +3294,7 @@ BEGIN
 END GetComponent;
 
 PROCEDURE GetVisualComponent*(CONST name : ARRAY OF CHAR) : VisualComponent;
-VAR component : VisualComponent; c : Repositories.Component; res : WORD;
+VAR component : VisualComponent; c : Repositories.Component; res : INTEGER;
 BEGIN
 	component := NIL;
 	Repositories.GetComponentByString(name, c, res);
@@ -3396,7 +3396,7 @@ VAR winx: XML.Element; formx: XML.Content; window: FormWindow; name, string:Stri
 	canvasGenerator: WMGraphics.CanvasGenerator;
 	moduleName, procedureName : Modules.Name;
 	msg : ARRAY 128 OF CHAR;
-	res: WORD;
+	res: INTEGER;
 	l,t,r,b: SIGNED32;
 BEGIN
 	IF xml IS XML.Element THEN
@@ -3440,7 +3440,7 @@ formx, c:Component;
 	name, string, load:Strings.String;
 	moduleName, procedureName : Modules.Name;
 	msg : ARRAY 128 OF CHAR;
-	res: WORD;
+	res: INTEGER;
 	gen:WindowGenerator;
 	bounds:Rectangles.Rectangle;
 BEGIN
@@ -3722,7 +3722,7 @@ VAR generator: PROCEDURE(): XML.Element;
 VAR
 	l,name: Strings.String;
 	moduleName, procedureName: Modules.Name;
-	res: WORD; msg: ARRAY 32 OF CHAR;
+	res: INTEGER; msg: ARRAY 32 OF CHAR;
 	component: Component;
 	element: XML.Element;
 BEGIN

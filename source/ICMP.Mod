@@ -82,7 +82,7 @@ VAR
 	NICMPRcvTotal-, NICMPTooSmall-, NICMPBadChecksum-, NICMPNoReceiver-, NICMPDelivered-,
 	NICMPEchoRequest-, NICMPSend-: SIGNED32;
 
-	res: WORD;
+	res: INTEGER;
 
 (* Receive an ICMP (v4 and v6) packet *)
 PROCEDURE Input(int: IP.Interface; type: SIGNED32; fip, lip: IP.Adr; buffer: Network.Buffer);
@@ -246,7 +246,7 @@ END SendDirectly;
 
 
 (** Install a receiver for this type *)
-PROCEDURE InstallReceiver*(type: SIGNED32; r: Receiver; VAR res: WORD);
+PROCEDURE InstallReceiver*(type: SIGNED32; r: Receiver; VAR res: INTEGER);
 BEGIN {EXCLUSIVE}
 	ASSERT(r # NIL);
 	ASSERT((type >=0) & (type <= 255));
@@ -260,7 +260,7 @@ END InstallReceiver;
 
 
 (** Remove the currently installed receiver for this type *)
-PROCEDURE RemoveReceiver*(type: SIGNED32; VAR res: WORD);
+PROCEDURE RemoveReceiver*(type: SIGNED32; VAR res: INTEGER);
 BEGIN {EXCLUSIVE}
 	ASSERT((type >=0) & (type <= 255));
 	IF receivers[type] = NIL THEN
@@ -814,7 +814,7 @@ END RouteInfoOption;
 
 PROCEDURE Cleanup;
 VAR
-	res: WORD;
+	res: INTEGER;
 
 BEGIN
 	IPv6.sendNeighborSolicitation := NIL;

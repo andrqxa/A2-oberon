@@ -60,7 +60,7 @@ TYPE
 
 				PROCEDURE & Open*( CONST hostname: ARRAY OF CHAR );
 				VAR
-					res: WORD;  adr: IP.Adr;  p: SIZE;
+					res: INTEGER;  adr: IP.Adr;  p: SIZE;
 				BEGIN
 					state := Closed;
 					Out.String( "connecting to " );  Out.String( hostname );  Out.String( " ... " );
@@ -120,7 +120,7 @@ TYPE
 
 				PROCEDURE SendClientVersion;
 				VAR
-					len: SIGNED32; pos: SIZE; res: WORD;
+					len: SIGNED32; pos: SIZE; res: INTEGER;
 					nl: ARRAY 4 OF CHAR;
 				BEGIN
 					pos := 0;
@@ -133,7 +133,7 @@ TYPE
 				(** Send packet p *)
 				PROCEDURE SendPacket*( p: Packet );
 				VAR
-					i, trlen, payload, pad, cbs: SIZE; res: WORD;
+					i, trlen, payload, pad, cbs: SIZE; res: INTEGER;
 					seqno: ARRAY 4 OF CHAR;
 					trbuf: ARRAY 8196 OF CHAR;
 					packType: SIGNED32;
@@ -170,7 +170,7 @@ TYPE
 
 				(** Receive SSH Packet into buf,  return packet type *)
 				PROCEDURE ReceivePacket*( VAR buf: ARRAY OF CHAR;  VAR size: SIZE ): CHAR;
-				VAR i, l: SIZE; pos: SIZE; l2, pad, trlen, cbs: SIGNED32; res: WORD;
+				VAR i, l: SIZE; pos: SIZE; l2, pad, trlen, cbs: SIGNED32; res: INTEGER;
 					seqno: ARRAY 4 OF CHAR; rmac, cmac: ARRAY 20 OF CHAR;
 					trbuf: ARRAY 8196 OF CHAR;
 					packType: SIGNED32;
@@ -665,7 +665,7 @@ VAR hexd: ARRAY 17 OF CHAR;
 	END Head;
 
 	PROCEDURE ReceiveLine( tcp: TCP.Connection;  VAR buf: ARRAY OF CHAR ): SIZE;
-	VAR i, l: SIZE; res: WORD;
+	VAR i, l: SIZE; res: INTEGER;
 	BEGIN
 		i := 0;
 		REPEAT tcp.Receive( buf, i, 1, 1, l, res );  INC( i );

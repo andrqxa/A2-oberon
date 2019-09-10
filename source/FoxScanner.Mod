@@ -197,7 +197,7 @@ TYPE
 			NEW(data, initialSize); length := 0;
 		END Init;
 
-		PROCEDURE Add*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Add*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR i : SIZE; n: StringType;
 		BEGIN
 			IF length + len + 1 >= LEN(data) THEN
@@ -1230,7 +1230,7 @@ TYPE
 	END InitReservedCharacters;
 
 	(* get keyword by symbol *)
-	PROCEDURE GetKeyword*(case:WORD; symbol: Symbol; VAR identifier: IdentifierType);
+	PROCEDURE GetKeyword*(case:INTEGER; symbol: Symbol; VAR identifier: IdentifierType);
 	BEGIN
 		IF case = Uppercase THEN
 			keywordsUpper.IdentifierBySymbol(symbol,identifier);

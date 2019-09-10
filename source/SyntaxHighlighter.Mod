@@ -199,7 +199,7 @@ TYPE
 		END ResetMatchers;
 
 		PROCEDURE GetStyle(position : SIZE; VAR start, end : SIZE) : Style;
-		VAR style : Style; entry : DataEntry; location : WORD;
+		VAR style : Style; entry : DataEntry; location : INTEGER;
 		BEGIN
 			style := NIL;
 			IF Find(position, entry) THEN
@@ -763,7 +763,7 @@ TYPE
 				res : BOOLEAN;
 				start, end, oldStart, oldEnd : SIZE;
 				ignore, match : BOOLEAN;
-				location : WORD;
+				location : INTEGER;
 			BEGIN
 				IF Statistics THEN INC(NnofPatchInsert); END;
 				fullLayout := FALSE;
@@ -833,7 +833,7 @@ TYPE
 				left, middle, right : DataEntry;
 				start, end, oldStart, oldEnd : SIZE;
 				match, ignore, res : BOOLEAN;
-				location : WORD;
+				location : INTEGER;
 			BEGIN
 				fullLayout := FALSE;
 				state.FindTriple(position, hasLeft, hasMiddle, hasRight, left, middle, right);
@@ -1061,7 +1061,7 @@ TYPE
 			RETURN style;
 		END GetStyle;
 
-		PROCEDURE AddToken(CONST tokenname : ARRAY OF CHAR; style : Style; VAR res : WORD);
+		PROCEDURE AddToken(CONST tokenname : ARRAY OF CHAR; style : Style; VAR res : INTEGER);
 		VAR token, t : Word; length, index1, index2 : SIZE;
 		BEGIN
 			ASSERT((Strings.Length(tokenname) > 0) & (style # NIL) & (style.name # ""));
@@ -1088,7 +1088,7 @@ TYPE
 			END;
 		END AddToken;
 
-		PROCEDURE AddWord(CONST keyword : ARRAY OF CHAR; style : Style; VAR res : WORD);
+		PROCEDURE AddWord(CONST keyword : ARRAY OF CHAR; style : Style; VAR res : INTEGER);
 		VAR word, w : Word; nofWildcards, index1, index2, length : SIZE;
 		BEGIN
 			ASSERT((Strings.Length(keyword) > 0) & (style # NIL) & (style.name # ""));
@@ -1147,7 +1147,7 @@ TYPE
 			END;
 		END AddRegion;
 
-		PROCEDURE DebugInterface*(code : WORD; state : State);
+		PROCEDURE DebugInterface*(code : INTEGER; state : State);
 		VAR out : Streams.Writer;
 		BEGIN
 			ASSERT(state # NIL);
@@ -1386,8 +1386,8 @@ END Indent;
 	Content: 		[4, 7]
 	CloseString:		[8, 10]
 *)
-PROCEDURE GetLocation(position : SIZE; CONST entry : DataEntry) : WORD;
-VAR location: WORD; closeLength : SIZE;
+PROCEDURE GetLocation(position : SIZE; CONST entry : DataEntry) : INTEGER;
+VAR location: INTEGER; closeLength : SIZE;
 BEGIN
 	IF entry.eol THEN closeLength := 0; ELSE closeLength := entry.region.closeLength; END;
 	IF (position >= entry.open) THEN
@@ -1416,7 +1416,7 @@ VAR
 	fontsize, color, bgcolor, voff : SIGNED32;
 	fontstyle : SET;
 	defined : SET;
-	res : WORD;
+	res : INTEGER;
 BEGIN
 	ASSERT((element # NIL) & (styles # NIL) & (diagnostics # NIL));
 	string := element.GetName();
@@ -1544,7 +1544,7 @@ VAR
 	string : Strings.String; ptr : ANY;
 	reader : Streams.StringReader;
 	token : ARRAY 128 OF CHAR;
-	style : Style; res : WORD;
+	style : Style; res : INTEGER;
 BEGIN
 	ASSERT((element # NIL) & (highlighter # NIL) & (styles # NIL) & (diagnostics # NIL));
 	ASSERT((type = TypeWords) OR (type = TypeTokens));
@@ -1991,7 +1991,7 @@ PROCEDURE Highlight*(context : Commands.Context); (** filename highlighterName ~
 VAR
 	file : Files.File; filename : Files.FileName; highlighterName : Identifier;
 	highlighter : Highlighter;
-	text : Texts.Text; format: SIGNED32; res: WORD;
+	text : Texts.Text; format: SIGNED32; res: INTEGER;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(filename);
 	context.arg.SkipWhitespace; context.arg.String(highlighterName);

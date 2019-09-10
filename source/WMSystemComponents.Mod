@@ -38,7 +38,7 @@ TYPE
 			overwriteAll := FALSE; overwriteNever := FALSE; abort := FALSE;
 		END New;
 
-		PROCEDURE OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : WORD);
+		PROCEDURE OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : INTEGER);
 		VAR oldFile : Files.File; name : ARRAY 1024 OF CHAR;
 		BEGIN
 			res := -1;
@@ -80,7 +80,7 @@ TYPE
 			IF TraceCopy IN Trace THEN KernelLog.Ln; END;
 		END OpenPut;
 
-		PROCEDURE ClosePut*(VAR res : WORD);
+		PROCEDURE ClosePut*(VAR res : INTEGER);
 		BEGIN
 			IF (f # NIL) & (w # NIL)  THEN
 				w.Update;
@@ -444,7 +444,7 @@ TYPE
 			w : SelectionWrapper;
 			filename : Files.FileName;
 			command : ARRAY 1024 OF CHAR;
-			position: SIZE; res: WORD;
+			position: SIZE; res: INTEGER;
 			msg : ARRAY 256 OF CHAR;
 		BEGIN
 			IF (data # NIL) & (data IS SelectionWrapper) THEN
@@ -550,7 +550,7 @@ TYPE
 
 		PROCEDURE Rename(sender, data : ANY);
 		VAR  d : DirEntry; rename : WMDialogs.MiniStringInput;
-			wmx, wmy: SIZE; res: WORD;
+			wmx, wmy: SIZE; res: INTEGER;
 			name, op, np : ARRAY FileNameLength OF CHAR;
 		BEGIN
 			IF popup # NIL THEN popup.Close; popup := NIL END;
@@ -581,7 +581,7 @@ TYPE
 
 		PROCEDURE Delete(sender, data : ANY);
 		VAR  d : DirEntry; i: SIZE;
-			dr  : SIGNED32; res: WORD;
+			dr  : SIGNED32; res: INTEGER;
 			dp : Files.FileName;
 			delete, always, never : BOOLEAN;
 		BEGIN
@@ -618,7 +618,7 @@ TYPE
 		PROCEDURE Duplicate(sender, data : ANY);
 		VAR  d : DirEntry;
 			name : ARRAY FileNameLength (* was 128*) OF CHAR;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			IF popup # NIL THEN popup.Close; popup := NIL END;
 			IF (data # NIL) & (data IS SelectionWrapper) THEN
@@ -793,7 +793,7 @@ END Open;
 			END;
 		END MyStartDrag;
 
-		PROCEDURE CopyFile(target : WMDropTarget.DropFiles; CONST local, remote : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE CopyFile(target : WMDropTarget.DropFiles; CONST local, remote : ARRAY OF CHAR; VAR res : INTEGER);
 		VAR w : Streams.Writer;
 			f : Files.File;
 			r : Files.Reader;
@@ -844,7 +844,7 @@ END Open;
 		VAR di : WM.DragInfo;
 			dt : WMDropTarget.DropTarget;
 			itf : WMDropTarget.DropInterface;
-			i : SIZE; res: WORD;
+			i : SIZE; res: INTEGER;
 			sel : DirEntries;
 			url : ARRAY 1024 OF CHAR;
 			text : Texts.Text;

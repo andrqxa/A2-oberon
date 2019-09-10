@@ -1847,7 +1847,7 @@ BEGIN
 END Init;
 
 (* Done - Code generator results - Installed in PCBT.CG *)
-PROCEDURE Done (VAR result: WORD);
+PROCEDURE Done (VAR result: INTEGER);
 BEGIN result := 0;
 END Done;
 

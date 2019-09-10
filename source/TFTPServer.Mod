@@ -32,25 +32,25 @@ TYPE
 		VAR socket: UDP.Socket;
 			fip: IP.Adr;
 			lport, fport: SIGNED32;
-			res: WORD;
+			res: INTEGER;
 			dead: BOOLEAN;
 			buf: ARRAY BlockSize + 4 OF CHAR;
 			timer: Kernel.Timer;
 
 		(* Log functions *)
-		PROCEDURE LogEnter(level: WORD);
+		PROCEDURE LogEnter(level: INTEGER);
 		BEGIN IF (TraceLevel >= level) THEN KernelLog.Enter END
 		END LogEnter;
 
-		PROCEDURE LogExit(level: WORD);
+		PROCEDURE LogExit(level: INTEGER);
 		BEGIN IF (TraceLevel >= level) THEN KernelLog.Exit END
 		END LogExit;
 
-		PROCEDURE Log(level: WORD; CONST s: ARRAY OF CHAR);
+		PROCEDURE Log(level: INTEGER; CONST s: ARRAY OF CHAR);
 		BEGIN IF (TraceLevel >= level) THEN KernelLog.String(s) END
 		END Log;
 
-		PROCEDURE LogInt(level: WORD; i: SIZE);
+		PROCEDURE LogInt(level: INTEGER; i: SIZE);
 		BEGIN IF (TraceLevel >= level) THEN KernelLog.Int(i, 0) END
 		END LogInt;
 
@@ -81,7 +81,7 @@ TYPE
 		END ExtractString;
 
 		(* SendAck - sends an ack packet *)
-		PROCEDURE SendAck(blockNr: SIGNED32; VAR res: WORD);
+		PROCEDURE SendAck(blockNr: SIGNED32; VAR res: INTEGER);
 		VAR ackHdr: ARRAY 4 OF CHAR; retries: SIGNED32;
 		BEGIN
 			Put2(ackHdr, 0, ACK); Put2(ackHdr, 2, blockNr);
@@ -92,7 +92,7 @@ TYPE
 		END SendAck;
 
 		(* SendError - sends an error packet *)
-		PROCEDURE SendError(errNo: SIGNED16; s: ErrorMsg; VAR res: WORD);
+		PROCEDURE SendError(errNo: SIGNED16; s: ErrorMsg; VAR res: INTEGER);
 		VAR errHdr: ARRAY BlockSize+4 OF CHAR; p, retries: SIGNED32;
 		BEGIN
 			Put2(errHdr, 0, ERROR); Put2(errHdr, 2, errNo);
@@ -127,7 +127,7 @@ TYPE
 			r: Files.Rider;
 
 		(* Init - constructor *)
-		PROCEDURE &Init*(fip: IP.Adr; fport: SIGNED32; CONST filename: Files.FileName; VAR res: WORD);
+		PROCEDURE &Init*(fip: IP.Adr; fport: SIGNED32; CONST filename: Files.FileName; VAR res: INTEGER);
 		VAR retries: SIGNED32;
 		BEGIN SELF.fip := fip; SELF.fport := fport;
 			file := Files.Old(filename);
@@ -201,7 +201,7 @@ TYPE
 			r: Files.Rider;
 
 		(* Init - constructor *)
-		PROCEDURE &Init*(fip: IP.Adr; fport: SIGNED32; CONST filename: Files.FileName; VAR res: WORD);
+		PROCEDURE &Init*(fip: IP.Adr; fport: SIGNED32; CONST filename: Files.FileName; VAR res: INTEGER);
 		VAR retries: SIGNED32;
 		BEGIN
 			SELF.fip := fip; SELF.fport := fport; res := 0;
@@ -300,7 +300,7 @@ TYPE
 			tftprrq: TFTPRRQ;
 			tftpwrq: TFTPWRQ;
 
-		PROCEDURE &Init*(port: SIGNED32; VAR res: WORD);
+		PROCEDURE &Init*(port: SIGNED32; VAR res: INTEGER);
 		BEGIN NEW(socket, port, res); lport := port
 		END Init;
 
@@ -375,12 +375,12 @@ TYPE
 
 VAR
 	tftpserver: TFTPServer;
-	TraceLevel: WORD;
+	TraceLevel: INTEGER;
 	errorMsg: ARRAY 8 OF ErrorMsg;
 	generator: Random.Generator;
 
 PROCEDURE Start*;
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	IF (tftpserver = NIL) THEN
 		KernelLog.Enter; KernelLog.String("Starting TFTP Server..."); KernelLog.Exit;

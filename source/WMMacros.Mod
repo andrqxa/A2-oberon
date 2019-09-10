@@ -239,7 +239,7 @@ END Handle;
 PROCEDURE GetMacroKeySym() : SIGNED32;
 VAR
 	enum : XMLObjects.Enumerator; elem : XML.Element; s : XML.String; p : ANY;
-	keysym : SIGNED32; res: WORD;
+	keysym : SIGNED32; res: INTEGER;
 BEGIN
 	IF macros # NIL THEN
 		enum := macros.GetContents();

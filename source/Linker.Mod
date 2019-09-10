@@ -294,7 +294,7 @@ END WriteUnixBinaryFile;
 PROCEDURE WriteTRMFile (arrangement: Arrangement; writer: Files.Writer; bitsPerLine, lines: SIZE);
 VAR i, j, size, end, nonZeroInLeadingNibble: SIZE;
 
-	PROCEDURE GetBits(pos: SIZE): WORD;
+	PROCEDURE GetBits(pos: SIZE): INTEGER;
 	BEGIN
 		IF pos >= size THEN RETURN 0
 		ELSIF pos+4 > size THEN RETURN arrangement.bits.GetBits(pos,size-pos)
@@ -302,7 +302,7 @@ VAR i, j, size, end, nonZeroInLeadingNibble: SIZE;
 		END;
 	END GetBits;
 
-	PROCEDURE GetFirstNibble(pos: SIZE): WORD;
+	PROCEDURE GetFirstNibble(pos: SIZE): INTEGER;
 	BEGIN
 		RETURN arrangement.bits.GetBits(pos,nonZeroInLeadingNibble);
 	END GetFirstNibble;

@@ -80,10 +80,10 @@ TYPE
 		PROCEDURE SendFrame*(dst: Network.LinkAdr; type: SIGNED32; CONST l3hdr, l4hdr, data: ARRAY OF CHAR;  h3len, h4len, dofs, dlen: SIGNED32); (* abstract *)
 		BEGIN {EXCLUSIVE} HALT(301); END SendFrame;
 
-		PROCEDURE GetLinkAddress*(VAR linkAddress : Network.LinkAdr; VAR res : WORD); (* abstract *)
+		PROCEDURE GetLinkAddress*(VAR linkAddress : Network.LinkAdr; VAR res : INTEGER); (* abstract *)
 		BEGIN HALT(301); END GetLinkAddress;
 
-		PROCEDURE SetLinkAddress*(linkAddress : Network.LinkAdr; VAR res : WORD); (* abstract *)
+		PROCEDURE SetLinkAddress*(linkAddress : Network.LinkAdr; VAR res : INTEGER); (* abstract *)
 		BEGIN HALT(301); END SetLinkAddress;
 
 		PROCEDURE HandleInterrupt*(status : Usbdi.Status; actLen : SIZE); (* abstract *)
@@ -105,7 +105,7 @@ TYPE
 		END Diag;
 
 		PROCEDURE InitLinkDevice() : BOOLEAN;
-		VAR name : Plugins.Name; nofDevices, i : SIGNED32; res : WORD;
+		VAR name : Plugins.Name; nofDevices, i : SIGNED32; res : INTEGER;
 		BEGIN
 			NEW(linkDevice, Network.TypeEthernet, 1000, AddressSize);
 

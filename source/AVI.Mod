@@ -221,7 +221,7 @@ IMPORT
 
 		PROCEDURE Bytes*(VAR x: ARRAY OF CHAR; ofs, size: SIZE; VAR len: SIZE);
 		VAR
-			min: SIGNED32; res: WORD;
+			min: SIGNED32; res: INTEGER;
 		BEGIN
 			IF Debug THEN KernelLog.String("Bytes"); KernelLog.Ln; END;
 			demultiplexer.GetData(streamNr, x, ofs, size, min, len, res);
@@ -229,7 +229,7 @@ IMPORT
 
 		(* Set Byte Position *)
 		PROCEDURE SetPos*(pos : Streams.Position);
-		VAR seekType, itemSize: SIGNED32; res : WORD;
+		VAR seekType, itemSize: SIGNED32; res : INTEGER;
 		BEGIN
 			IF Debug THEN KernelLog.String("DemuxStream.SetPos"); KernelLog.Ln; END;
 			seekType := Codecs.SeekByte;
@@ -268,7 +268,7 @@ IMPORT
 		videoFramePos: SIGNED32;
 		audioFramePos: SIGNED32;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		BEGIN
 			r := in;
 			res := Codecs.ResFailed;
@@ -1076,7 +1076,7 @@ IMPORT
 
 		END GetInfo;
 
-		PROCEDURE GetData*(streamNr: SIGNED32;  VAR buf:  ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE GetData*(streamNr: SIGNED32;  VAR buf:  ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			rres: BOOLEAN;
 		BEGIN
@@ -1133,8 +1133,8 @@ IMPORT
 			END;
 		END GetData;
 
-		PROCEDURE SetStreamPos*(streamNr: SIGNED32; seekType: SIGNED32; pos: SIGNED32; VAR itemSize: SIGNED32; VAR res: WORD);
-		(* PROCEDURE SetStreamPos*(streamNr, pos : SIGNED32; VAR res: WORD); *)
+		PROCEDURE SetStreamPos*(streamNr: SIGNED32; seekType: SIGNED32; pos: SIGNED32; VAR itemSize: SIGNED32; VAR res: INTEGER);
+		(* PROCEDURE SetStreamPos*(streamNr, pos : SIGNED32; VAR res: INTEGER); *)
 		VAR
 			n0, n1, n, spos: SIGNED32;
 			(* seekType, itemSize : SIGNED32; *)

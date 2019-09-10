@@ -192,7 +192,7 @@ TYPE
 
 	HighlightStyle* = OBJECT
 	VAR
-		kind*: WORD;
+		kind*: INTEGER;
 
 		PROCEDURE IsEqual*(hstyle: HighlightStyle) : BOOLEAN;
 		BEGIN
@@ -236,7 +236,7 @@ TYPE
 
 	UnicodePiece* = OBJECT(Piece)
 		(** index in text position; index and (index + length) must be in the piece *)
-		PROCEDURE GetUCS32Buf*(index : SIZE; length : SIZE; VAR ucs : UCS32String; VAR res : WORD);
+		PROCEDURE GetUCS32Buf*(index : SIZE; length : SIZE; VAR ucs : UCS32String; VAR res : INTEGER);
 		END GetUCS32Buf;
 
 		(** index in text position; index and (index + length) must be in the piece *)
@@ -281,7 +281,7 @@ TYPE
 		END Clone;
 
 		(** index in text position; index and (index + length) must be in the piece *)
-		PROCEDURE GetUCS32Buf*(index : SIZE; length : SIZE; VAR ucs : UCS32String; VAR res : WORD);
+		PROCEDURE GetUCS32Buf*(index : SIZE; length : SIZE; VAR ucs : UCS32String; VAR res : INTEGER);
 		VAR i, j : SIZE;
 		BEGIN
 			i := index - startpos; IF (i < 0) OR (i >= len) THEN ucs[0] := 0; res := -1; RETURN END;
@@ -444,7 +444,7 @@ TYPE
 		END New;
 
 		(** Listens for text changes *)
-		PROCEDURE Changed*(op: WORD; pos, len : SIZE);
+		PROCEDURE Changed*(op: INTEGER; pos, len : SIZE);
 		BEGIN
 			IF TraceHard THEN
 				KernelLog.String("TextPosition : ChangeRequest"); KernelLog.Int(op, 5); KernelLog.Int(pos, 5); KernelLog.Int(len, 5);KernelLog.Ln;
@@ -527,13 +527,13 @@ TYPE
 		END CloneProperties;
 
 		(** Listens for text changes *)
-		PROCEDURE Changed*(op : WORD; pos, len : SIZE);
+		PROCEDURE Changed*(op : INTEGER; pos, len : SIZE);
 		BEGIN
 			Changed^(op, pos, len); piece := NIL
 		END Changed;
 
 		PROCEDURE ReadCh*(VAR ucs32 : SIGNED32);
-		VAR res : WORD; tfont: FontInfo;
+		VAR res : INTEGER; tfont: FontInfo;
 			tempObj : ObjectPiece;
 		BEGIN
 			eot := (backwards) & (position = 0) OR (~backwards) & (position = text.GetLength());
@@ -592,7 +592,7 @@ TYPE
 
 		(** Direction the text is read. dir >= 0 --> forward; dir < 0 --> backwards
 		      Backwards can be very slow depending on the text *)
-		PROCEDURE SetDirection*(dir : WORD);
+		PROCEDURE SetDirection*(dir : INTEGER);
 		BEGIN
 			backwards := dir < 0;
 			eot := (backwards & (position = 0)) OR (~backwards & (position = text.GetLength()));
@@ -603,7 +603,7 @@ TYPE
 	TextChangeInfo* = OBJECT
 	VAR
 		timestamp* : SIGNED32;
-		op* : WORD;
+		op* : INTEGER;
 		pos*, len* : SIZE;
 	END TextChangeInfo;
 
@@ -618,10 +618,10 @@ TYPE
 		PROCEDURE BeginObjectChange*(pos: SIZE);
 		END BeginObjectChange;
 
-		PROCEDURE ObjectChanged*(pos, len: SIZE; type: WORD; obj: ANY);
+		PROCEDURE ObjectChanged*(pos, len: SIZE; type: INTEGER; obj: ANY);
 		END ObjectChanged;
 
-		PROCEDURE EndObjectChange*(len: SIZE; type: WORD; to: ANY);
+		PROCEDURE EndObjectChange*(len: SIZE; type: INTEGER; to: ANY);
 		END EndObjectChange;
 
 		PROCEDURE SetText*(text: Text);
@@ -649,9 +649,9 @@ TYPE
 		nofPieces : SIZE;
 
 		posObjects : Kernel.FinalizedCollection;
-		pop: WORD; ppos, plen : SIZE;
+		pop: INTEGER; ppos, plen : SIZE;
 		timestamp : SIGNED32;
-		upOp: WORD; upPos, upLen : SIZE;
+		upOp: INTEGER; upPos, upLen : SIZE;
 		onTextChanged* : WMEvents.EventSource;
 		lock : Locks.RWLock;
 		pieceTableOk : BOOLEAN;
@@ -701,7 +701,7 @@ TYPE
 		(** release the write lock on the object *)
 		PROCEDURE ReleaseWrite*;
 		VAR removeLock : BOOLEAN;
-			op : WORD; pos, len : SIZE; localtimestamp : SIGNED32;
+			op : INTEGER; pos, len : SIZE; localtimestamp : SIGNED32;
 		BEGIN
 			removeLock := lock.GetWLockLevel() = 1;
 			IF removeLock THEN op := upOp; pos := upPos; len := upLen; localtimestamp := GetTimestamp(); upOp := -1 END;
@@ -733,7 +733,7 @@ TYPE
 			RETURN lock.HasReadLock();
 		END HasReadLock;
 
-		PROCEDURE InformListeners(timestamp : SIGNED32; op : WORD; pos, len : SIZE);
+		PROCEDURE InformListeners(timestamp : SIGNED32; op : INTEGER; pos, len : SIZE);
 		VAR updateInfo : TextChangeInfo; um : UndoManager;
 		BEGIN
 			NEW(updateInfo);
@@ -796,13 +796,13 @@ TYPE
 			END
 		END SendPositionUpdate;
 
-		PROCEDURE UpdatePositionObjects(op : WORD; pos, len : SIZE);
+		PROCEDURE UpdatePositionObjects(op : INTEGER; pos, len : SIZE);
 		BEGIN
 			SELF.pop := op; SELF.ppos := pos; SELF.plen := len;
 			posObjects.Enumerate(SendPositionUpdate)
 		END UpdatePositionObjects;
 
-		PROCEDURE AccumulateChanges(op : WORD; pos, len : SIZE);
+		PROCEDURE AccumulateChanges(op : INTEGER; pos, len : SIZE);
 		BEGIN
 			IF upOp >= 0 THEN
 				IF (upOp = OpInsert) & (op = OpAttributes) & (pos = upPos) & (len = upLen) THEN (* ignore *)
@@ -1400,7 +1400,7 @@ VAR
 	str: Strings.String;
 	cStyle : CharacterStyle;
 	pStyle : ParagraphStyle;
-	tempReal: FLOAT64; tempInt: SIGNED32; tempRes : WORD;
+	tempReal: FLOAT64; tempInt: SIGNED32; tempRes : INTEGER;
 BEGIN
 	NEW(scanner, r);
 	NEW(parser, scanner);
@@ -1497,7 +1497,7 @@ CONST
 	(** FontStyles from WMGraphics *)
 	FontBold = 0; FontItalic = 1;
 VAR
-	res : WORD;
+	res : INTEGER;
 	textColor := 0xFF, textBackColor := 0x00: SIGNED32;
 	defaultFontSize : SIGNED32;
 	defaultFontStyle := {} : SET;

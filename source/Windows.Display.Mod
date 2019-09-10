@@ -1083,7 +1083,7 @@ VAR
 
 	PROCEDURE DoInstall( w, h, left, top: SIGNED32 );
 	VAR ts: ARRAY 16 OF CHAR;
-		res: WORD;  create: CreateStruct;  win: Window;  hMenu: User32.HMenu;  x, y: SIGNED32;
+		res: INTEGER;  create: CreateStruct;  win: Window;  hMenu: User32.HMenu;  x, y: SIGNED32;
 	VAR border: SIGNED32;  rect: User32.Rect;   (*ALEX 2005.11.30*)
 
 		hDC: User32.HDC;

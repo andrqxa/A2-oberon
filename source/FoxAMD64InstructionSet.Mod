@@ -1368,7 +1368,7 @@ CONST
 
 TYPE
 	Name = ARRAY 20 OF CHAR;
-	OperandType* = WORD;
+	OperandType* = INTEGER;
 	CPUOptions*= SET;
 	Code*=CHAR; (* should be unsigned -- for emitter *)
 
@@ -1624,7 +1624,7 @@ VAR
 			INC(numberMnemonics);
 		END AddMnemonic;
 
-		PROCEDURE HexOrd (ch: CHAR): WORD;
+		PROCEDURE HexOrd (ch: CHAR): INTEGER;
 		BEGIN
 			IF ("0" <= ch) & (ch <= "9") THEN RETURN ORD (ch) - ORD ("0")
 			ELSIF ("A" <= ch) & (ch <= "F") THEN RETURN ORD (CAP (ch)) - ORD ("A") + 10

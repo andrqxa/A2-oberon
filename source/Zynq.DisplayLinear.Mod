@@ -61,7 +61,7 @@ TYPE
 		Format = 4;
 
 		(** Transfer a block of pixels in "raw" display format to (op = set) or from (op = get) the display.  Pixels in the rectangular area are transferred from left to right and top to bottom.  The pixels are transferred to or from "buf", starting at "ofs".  The line byte increment is "stride", which may be positive, negative or zero. *)
-		PROCEDURE Transfer*(VAR buf: ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op: WORD);
+		PROCEDURE Transfer*(VAR buf: ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op: INTEGER);
 		VAR bufadr, buflow, bufhigh, dispadr,w0,b,d: ADDRESS;
 		BEGIN
 
@@ -200,7 +200,7 @@ VAR
 
 	PROCEDURE Init;
 	VAR
-		res: WORD;
+		res: INTEGER;
 		d: SIGNED32;
 	BEGIN
 		SetupClocks;

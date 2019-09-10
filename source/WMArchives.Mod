@@ -33,7 +33,7 @@ TYPE
 			at := t; parent := n
 		END New;
 
-		PROCEDURE OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : WORD);
+		PROCEDURE OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			caption := Strings.NewString(remoteName);
@@ -50,7 +50,7 @@ TYPE
 			outw := out;
 		END OpenPut;
 
-		PROCEDURE ClosePut*(VAR res : WORD);
+		PROCEDURE ClosePut*(VAR res : INTEGER);
 		VAR ei : EntryInfo;
 		BEGIN
 			IF out # NIL THEN out.Update END;
@@ -70,7 +70,7 @@ TYPE
 			tree := t; node := n
 		END New;
 
-		PROCEDURE GetInterface*(type : WORD) : WMDropTarget.DropInterface;
+		PROCEDURE GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
 		VAR di : ArchiveDropInterface;
 		BEGIN
 			IF type = WMDropTarget.TypeFiles THEN
@@ -190,7 +190,7 @@ TYPE
 		VAR di : WM.DragInfo;
 			dt : WMDropTarget.DropTarget;
 			itf : WMDropTarget.DropInterface;
-			res : WORD;
+			res : INTEGER;
 			text : Texts.Text;
 			textPos : Texts.TextPosition;
 			caption, entryName : Strings.String;
@@ -869,7 +869,7 @@ TYPE
 		PROCEDURE DeleteEntries(sender, data : ANY);
 		VAR parent : WMTrees.TreeNode;
 			entry : NodeEntry; entryInfo : ANY; s : Strings.String;
-			dr : WORD; i : SIZE; name : ARRAY 128 OF CHAR;
+			dr : INTEGER; i : SIZE; name : ARRAY 128 OF CHAR;
 			delete, always, never : BOOLEAN;
 		BEGIN
 			IF (data # NIL) & (data IS SelectionWrapper) THEN
@@ -985,7 +985,7 @@ TYPE
 		VAR di : WM.DragInfo;
 			dt : WMDropTarget.DropTarget;
 			itf : WMDropTarget.DropInterface;
-			i : SIZE; res : WORD;
+			i : SIZE; res : INTEGER;
 			sel : NodeList;
 			url, caption : ARRAY 1024 OF CHAR;
 			text : Texts.Text;
@@ -1110,7 +1110,7 @@ BEGIN
 END RemovePartitionLabel;
 
 (* transfer data from rec to target *)
-PROCEDURE CopyFile(rec : Streams.Receiver; target : WMDropTarget.DropFiles; CONST remote : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE CopyFile(rec : Streams.Receiver; target : WMDropTarget.DropFiles; CONST remote : ARRAY OF CHAR; VAR res : INTEGER);
 VAR w : Streams.Writer; r : Streams.Reader; buf: ARRAY BufSize OF CHAR; len: SIZE;
 BEGIN
 	res := -1;

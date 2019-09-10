@@ -75,7 +75,7 @@ TYPE
 			processes : ARRAY ProcessInfo.MaxNofProcesses OF Objects.Process;
 			nofProcesses : SIZE;
 			scol, srow, ecol, erow, i : SIZE;
-			id: WORD;
+			id: INTEGER;
 			selection : Selection;
 			str : Strings.String;
 		BEGIN
@@ -140,7 +140,7 @@ TYPE
 		VAR
 			grid : WMStringGrids.StringGrid;
 			str : ARRAY 256 OF CHAR;
-			i : WORD; dx, dy, minWidth : SIZE;
+			i : INTEGER; dx, dy, minWidth : SIZE;
 			f : WMGraphics.Font;
 		BEGIN
 			NEW(grid); grid.alignment.Set(WMComponents.AlignClient);
@@ -548,7 +548,7 @@ VAR
 	StrProcessSelector, StrProcessManager : Strings.String;
 	PrototypeSort : WMProperties.Int32Property;
 
-PROCEDURE GetTitleStr(col : WORD; VAR x : ARRAY OF CHAR);
+PROCEDURE GetTitleStr(col : INTEGER; VAR x : ARRAY OF CHAR);
 BEGIN
 	CASE col OF
 		| 0 : COPY("PID", x)
@@ -587,7 +587,7 @@ BEGIN
 END CheckBP;
 
 PROCEDURE OpenCpuLoadWindow(pid : SIGNED32);
-VAR commandString, msg : ARRAY 128 OF CHAR; nbr : ARRAY 16 OF CHAR; res : WORD;
+VAR commandString, msg : ARRAY 128 OF CHAR; nbr : ARRAY 16 OF CHAR; res : INTEGER;
 BEGIN
 	commandString := "WMPerfMonPluginProcesses.Install ";
 	Strings.IntToStr(pid, nbr);

@@ -195,7 +195,7 @@ TYPE
 			END
 		END Update;
 
-		PROCEDURE Transfer*(VAR buf : ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op : WORD);
+		PROCEDURE Transfer*(VAR buf : ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op : INTEGER);
 		BEGIN
 			Raster.InitMode(mode, Raster.srcCopy);
 			IF Flip THEN
@@ -316,7 +316,7 @@ TYPE
 		END Copy;
 
 		PROCEDURE &Init*(name : ARRAY OF CHAR; w, h, x, y : SIGNED32);
-		VAR res : WORD; ptr : WM.PointerInfo; pixel : Raster.Pixel; mode : Raster.Mode;
+		VAR res : INTEGER; ptr : WM.PointerInfo; pixel : Raster.Pixel; mode : Raster.Mode;
 			s : ARRAY 16 OF CHAR;
 		BEGIN
 			ml := MAX(SIGNED32); mt := MAX(SIGNED32); mr := MIN(SIGNED32); mb := MIN(SIGNED32);

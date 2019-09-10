@@ -588,7 +588,7 @@ BEGIN
 END SetTraceFile;
 
 PROCEDURE SetTraceConsole*;
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	Trace.String("trace -> console"); Trace.Ln;
 	res := Kernel32.AllocConsole ();
@@ -648,7 +648,7 @@ BEGIN
 END SetupTraceName;
 
 PROCEDURE RemoveTraceFile;
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	IF (traceName # "") & (traceName # "Console") THEN
 		Trace.String("removing "); Trace.String(traceName); Trace.Ln;
@@ -762,7 +762,7 @@ END Init;
 
 (** Acquire a spin-lock. *)
 	PROCEDURE Acquire*( level: SIGNED32 );   (* non reentrant lock  (non reentrance "ensured" by ASSERT statement ), CriticalSections are reentrant *)
-	VAR i: WORD;
+	VAR i: INTEGER;
 	BEGIN
 		Kernel32.EnterCriticalSection( cs[level] );
 		taken[level] := Kernel32.GetCurrentThreadId();

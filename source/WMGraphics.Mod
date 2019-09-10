@@ -266,14 +266,14 @@ TYPE
 
 		(** draw a line within the current clipping rectangle *)
 		(** Override for improved speed *)
-		PROCEDURE Line*(x0, y0, x1, y1 : SIZE; color : Color; mode : WORD);
+		PROCEDURE Line*(x0, y0, x1, y1 : SIZE; color : Color; mode : INTEGER);
 		VAR t, xi, mi, xf, mf, dt2, ds2 : SIZE; r: Rectangles.Rectangle;
 
 
 		(* clipped bresenham algorithm according to
 			Bresenham's Line Generation Algorithm with Built-in Clipping, Yevgeny P. Kuzmin, 1995
 		*)
-		PROCEDURE ClippedLine(x0,y0,x1,y1: SIZE; r: Rectangle; color : Color; mode : WORD);
+		PROCEDURE ClippedLine(x0,y0,x1,y1: SIZE; r: Rectangle; color : Color; mode : INTEGER);
 		VAR
 			dsx,dsy,stx,sty,xd,yd,dx2,dy2,rem,term,e: SIZE;
 			tmp: SIGNED64;
@@ -429,7 +429,7 @@ TYPE
 			END
 		END Line;
 
-		PROCEDURE LineReal*(x0, y0, x1, y1 : Real; color : Color; mode : WORD);
+		PROCEDURE LineReal*(x0, y0, x1, y1 : Real; color : Color; mode : INTEGER);
 		BEGIN
 			IF ~( Reals.IsNaNL(x0) OR Reals.IsNaNL(y0) OR Reals.IsNaNL(x1) OR Reals.IsNaNL(y1)) THEN
 				Line(ENTIER(x0),ENTIER(y0),ENTIER(x1),ENTIER(y1),color,mode);
@@ -437,23 +437,23 @@ TYPE
 		END LineReal;
 
 		(** set a pixel within the current clipping rectangle *)
-		PROCEDURE SetPixel*(x, y : SIZE; color : Color; mode : WORD);
+		PROCEDURE SetPixel*(x, y : SIZE; color : Color; mode : INTEGER);
 		BEGIN
 			Fill(Rectangles.MakeRect(x, y, x + 1, y + 1), color, mode)
 		END SetPixel;
 
 		(** fill a rectangle within the current clipping rectangle *)
-		PROCEDURE Fill*(rect : Rectangle; color : Color; mode : WORD);
+		PROCEDURE Fill*(rect : Rectangle; color : Color; mode : INTEGER);
 		END Fill;
 
 		(** fill a polygon given by points *)
-		PROCEDURE FillPolygonFlat*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; color : Color; mode : WORD);
+		PROCEDURE FillPolygonFlat*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; color : Color; mode : INTEGER);
 		END FillPolygonFlat;
 
 		PROCEDURE FillPolygonCB*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; callBack : FillLineCallBack);
 		END FillPolygonCB;
 
-		PROCEDURE PolyLine*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; closed : BOOLEAN;	color : Color; mode : WORD);
+		PROCEDURE PolyLine*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; closed : BOOLEAN;	color : Color; mode : INTEGER);
 		VAR i : SIZE;
 		BEGIN
 			FOR i := 1 TO nofPoints - 1 DO
@@ -465,10 +465,10 @@ TYPE
 		END PolyLine;
 
 		(** draw an image within the current clipping rectangle *)
-		PROCEDURE DrawImage*(x, y: SIZE; image: Raster.Image; mode : WORD);
+		PROCEDURE DrawImage*(x, y: SIZE; image: Raster.Image; mode : INTEGER);
 		END DrawImage;
 
-		PROCEDURE ScaleImage*(src : Raster.Image; sr, dr : Rectangle; copyMode, scaleMode : WORD);
+		PROCEDURE ScaleImage*(src : Raster.Image; sr, dr : Rectangle; copyMode, scaleMode : INTEGER);
 		END ScaleImage;
 
 		(** Set coordinate shift *)
@@ -532,11 +532,11 @@ TYPE
 			Rectangles.ClipRect(r, bounds); SetLimits^(r)
 		END SetLimits;
 
-	(*	PROCEDURE Line*(x0, y0, x1, y1 : SIZE; color : Color; mode : WORD);
+	(*	PROCEDURE Line*(x0, y0, x1, y1 : SIZE; color : Color; mode : INTEGER);
 		BEGIN
 		END Line; *)
 
-		PROCEDURE Fill*(rect : Rectangle; color : Color; mode : WORD);
+		PROCEDURE Fill*(rect : Rectangle; color : Color; mode : INTEGER);
 		VAR rm : Raster.Mode; pix : Raster.Pixel;
 		BEGIN
 			(* convert to super coordinates *)
@@ -555,7 +555,7 @@ TYPE
 
 		(* Polygon filling *)
 		(** fill a polygon given by points *)
-		PROCEDURE FillPolygonFlat*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; color : Color; mode : WORD);
+		PROCEDURE FillPolygonFlat*(CONST points : ARRAY OF Point2d; nofPoints : SIZE; color : Color; mode : INTEGER);
 		VAR i : SIZE;
 		BEGIN
 			IF nofPoints < 3 THEN RETURN END;
@@ -634,7 +634,7 @@ TYPE
 			END
 		END AddLine;
 
-		PROCEDURE FillFlat(color : Color; mode : WORD);
+		PROCEDURE FillFlat(color : Color; mode : INTEGER);
 		VAR i, sp, cur : SIZE;
 		in : BOOLEAN;
 		BEGIN
@@ -668,7 +668,7 @@ TYPE
 			END
 		END FillCB;
 
-		PROCEDURE DrawImage*(x, y: SIZE; img: Raster.Image; mode : WORD);
+		PROCEDURE DrawImage*(x, y: SIZE; img: Raster.Image; mode : INTEGER);
 		VAR imgBounds : Rectangle;
 			rm : Raster.Mode;
 			dx, dy: SIZE;
@@ -705,7 +705,7 @@ TYPE
 			END;
 		END DrawImage;
 
-		PROCEDURE ScaleImage*(src : Raster.Image; sr , dr : Rectangle; copyMode, scaleMode : WORD);
+		PROCEDURE ScaleImage*(src : Raster.Image; sr , dr : Rectangle; copyMode, scaleMode : INTEGER);
 		BEGIN
 			Rectangles.MoveRel(dr, dx, dy);
 			RasterScale.Scale(src, sr, img, dr, clipRect, copyMode, scaleMode);
@@ -806,7 +806,7 @@ END GetExtension;
 *)
 PROCEDURE LoadImage*(CONST name : ARRAY OF CHAR; shared : BOOLEAN): Image;
 VAR img : Image;
-	res: WORD; w, h : SIZE; x : SIGNED32;
+	res: INTEGER; w, h : SIZE; x : SIGNED32;
 	decoder : Codecs.ImageDecoder;
 	in : Streams.Reader;
 	ext : ARRAY 16 OF CHAR;
@@ -844,7 +844,7 @@ BEGIN
 	RETURN img
 END LoadImage;
 
-PROCEDURE StoreImage*(img : Raster.Image; CONST name : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE StoreImage*(img : Raster.Image; CONST name : ARRAY OF CHAR; VAR res : INTEGER);
 VAR encoder : Codecs.ImageEncoder;
 	f : Files.File;
 	w : Files.Writer;
@@ -874,7 +874,7 @@ END StoreImage;
 
 
 (** Draw an UTF8 String in a rectangle *)
-PROCEDURE DrawStringInRect*(canvas : Canvas; rect : Rectangle; wrap : BOOLEAN; hAlign, vAlign : WORD;
+PROCEDURE DrawStringInRect*(canvas : Canvas; rect : Rectangle; wrap : BOOLEAN; hAlign, vAlign : INTEGER;
 								CONST text : ARRAY OF CHAR);
 VAR tw, th, xPos, yPos : SIZE;
 	font : Font;

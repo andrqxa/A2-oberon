@@ -18,7 +18,7 @@ VAR
 
 
 	(* Find the IP address of the specified host. *)
-	PROCEDURE HostByName*( hostname: ARRAY OF CHAR;  VAR adr: IP.Adr;  VAR res: WORD );
+	PROCEDURE HostByName*( hostname: ARRAY OF CHAR;  VAR adr: IP.Adr;  VAR res: INTEGER );
 	VAR hostent: WSock32.PHostent; str: ARRAY 64 OF CHAR; addr: ADDRESS;
 	BEGIN
 		hostent := WSock32.gethostbyname(hostname);
@@ -47,13 +47,13 @@ VAR
 	END HostByName;
 
 (* Find the host name of the specified IP address. *)
-	PROCEDURE HostByNumber*( adr: IP.Adr;  VAR hostname: ARRAY OF CHAR;  VAR res: WORD );
-	VAR len: WORD;
+	PROCEDURE HostByNumber*( adr: IP.Adr;  VAR hostname: ARRAY OF CHAR;  VAR res: INTEGER );
+	VAR len: INTEGER;
 	BEGIN
 		COPY( "", hostname );
 		IF (adr.usedProtocol = IP.IPv4) THEN
 			adr.ipv4Adr := WSock32.htonl(adr.ipv4Adr);   (*  host byte order to TCP/IP network order*)
-			len := LEN(hostname)(WORD);
+			len := LEN(hostname)(INTEGER);
 			len := WSock32.getpeername(adr.ipv4Adr, hostname,len);(* Dan 10.11.05 *)
 		END;
 		IF hostname # "" THEN res := Ok ELSE res := NotFound END;

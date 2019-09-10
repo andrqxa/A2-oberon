@@ -16,7 +16,7 @@ CONST
 TYPE
 	SetCacheMessage = POINTER TO RECORD (Machine.Message)
 		physAdr: ADDRESS; size, type: SIGNED32;
-		res: ARRAY Machine.MaxCPU OF WORD
+		res: ARRAY Machine.MaxCPU OF INTEGER
 	END;
 
 (* Return the value of the MTTRcap register. *)
@@ -141,7 +141,7 @@ END SetMTTRphysMask;
 
 (** Set the cache properties of the specified physical memory area on the current processor. {physAdr, size MOD PS = 0}  Must be called from supervisor mode. *)
 
-PROCEDURE LocalSetCacheProperties*(physAdr: ADDRESS; size, type: SIGNED32; VAR res: WORD);
+PROCEDURE LocalSetCacheProperties*(physAdr: ADDRESS; size, type: SIGNED32; VAR res: INTEGER);
 VAR i, n, f: SIGNED32; mask, base: SET; j, k: ADDRESS;
 BEGIN
 	ASSERT((physAdr MOD PS = 0) & (size MOD PS = 0) & (size # 0));
@@ -206,7 +206,7 @@ END HandleSetCacheProperties;
 
 (** Broadcast a LocalSetCacheProperties operation to all processors. *)
 
-PROCEDURE GlobalSetCacheProperties*(physAdr: ADDRESS; size, type: SIGNED32; VAR res: WORD);
+PROCEDURE GlobalSetCacheProperties*(physAdr: ADDRESS; size, type: SIGNED32; VAR res: INTEGER);
 VAR i: SIGNED32; msg: SetCacheMessage;
 BEGIN
 	NEW(msg); msg.physAdr := physAdr; msg.size := size; msg.type := type;

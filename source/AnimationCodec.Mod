@@ -70,12 +70,12 @@ TYPE
 		END ReportError;
 
 		(* open the decoder on an InputStream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			scanner : XMLScanner.Scanner; parser : XMLParser.Parser; document : XML.Document;
 			content : XML.Content;
 
-			PROCEDURE CheckHeader(header : XML.Element; VAR res : WORD);
+			PROCEDURE CheckHeader(header : XML.Element; VAR res : INTEGER);
 			VAR name, version : Strings.String; ignore : BOOLEAN;
 			BEGIN
 				ASSERT(header # NIL);
@@ -129,7 +129,7 @@ TYPE
 			END;
 		END Open;
 
-		PROCEDURE ProcessFrame(frame : XML.Element; VAR desc : Codecs.ImageDescriptor; VAR res : WORD);
+		PROCEDURE ProcessFrame(frame : XML.Element; VAR desc : Codecs.ImageDescriptor; VAR res : INTEGER);
 		VAR string, imageName : Strings.String; left, top, from, to, current : SIGNED32; minDigits : SIZE; filename : Files.FileName; last, d : Codecs.ImageDescriptor;
 		BEGIN
 			NEW(desc);
@@ -185,7 +185,7 @@ TYPE
 			END;
 		END ProcessFrame;
 
-		PROCEDURE ProcessFrames(frames : XML.Element; VAR sequence : Codecs.ImageSequence; VAR res : WORD);
+		PROCEDURE ProcessFrames(frames : XML.Element; VAR sequence : Codecs.ImageSequence; VAR res : INTEGER);
 		VAR frame : XML.Content; name : Strings.String; desc, last : Codecs.ImageDescriptor; value : SIGNED32;
 		BEGIN
 			ASSERT(frames # NIL);
@@ -221,7 +221,7 @@ TYPE
 			END;
 		END ProcessFrames;
 
-		PROCEDURE GetImageSequence*(VAR sequence : Codecs.ImageSequence; VAR res : WORD);
+		PROCEDURE GetImageSequence*(VAR sequence : Codecs.ImageSequence; VAR res : INTEGER);
 		VAR content : XML.Content; frames : XML.Element; string : Strings.String;
 		BEGIN
 			IF (animation = NIL) THEN res := Codecs.ResFailed; RETURN; END;

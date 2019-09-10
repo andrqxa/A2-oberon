@@ -875,7 +875,7 @@ TYPE
 		(* 	- 	Returns TRUE and as a side effect copies the client buffer into the scatter/gather buffer for OUT transfers if the specified buffer	*)
 		(*		cannot directly be used by the host controller																					*)
 		(*	-	Returns FALSE when the client buffer meets the requirement of the host controller hardware									*)
-		PROCEDURE NeedSWScatterGather(direction: WORD; bufferLen, offset : SIZE; VAR buffer : Usbdi.Buffer; VAR doCopy : BOOLEAN) : BOOLEAN;
+		PROCEDURE NeedSWScatterGather(direction: INTEGER; bufferLen, offset : SIZE; VAR buffer : Usbdi.Buffer; VAR doCopy : BOOLEAN) : BOOLEAN;
 		VAR adr : ADDRESS;
 		BEGIN
 			doCopy := FALSE;
@@ -1258,7 +1258,7 @@ VAR
 
 (** Assign a name to the host controller and add it to the controllers registry *)
 PROCEDURE RegisterHostController*(hcd : Hcd; CONST description : Plugins.Description);
-VAR name : Plugins.Name; res : WORD;
+VAR name : Plugins.Name; res : INTEGER;
 BEGIN {EXCLUSIVE}
 	name := "USBHC"; name[5] := CHR(controllerCount + 48); name[6] := 0X;
 	hcd.SetName(name); hcd.desc := description;

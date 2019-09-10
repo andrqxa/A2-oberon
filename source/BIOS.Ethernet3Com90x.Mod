@@ -234,7 +234,7 @@ TYPE
 		(* Initialize the controller. *)
 
 		PROCEDURE &Init*(dev: LinkDevice; base, irq, model: SIGNED32; flags, media: SET);
-		VAR res: WORD; i: SIGNED32;
+		VAR res: INTEGER; i: SIGNED32;
 		BEGIN
 			SELF.interrupted := FALSE;
 			SELF.base := base; SELF.irq := irq;  SELF.dev := dev; SELF.model := model; SELF.media := media;
@@ -672,7 +672,7 @@ END InitRegisters;
 (* Scan the PCI bus for the specified card. *)
 
 PROCEDURE ScanPCI(vendor, device, model: SIGNED32; flags, media: SET);
-VAR index, bus, dev, fct, base, irq, i: SIGNED32; res: WORD; d: LinkDevice; c: Controller; name: Plugins.Name;
+VAR index, bus, dev, fct, base, irq, i: SIGNED32; res: INTEGER; d: LinkDevice; c: Controller; name: Plugins.Name;
 BEGIN
 	index := 0;
 	WHILE (PCI.FindPCIDevice(device, vendor, index, bus, dev, fct) = PCI.Done) & (installed < 10) DO
@@ -776,7 +776,7 @@ VAR i: SIZE; base, win: SIGNED32; int: SIGNED16; table: Plugins.Table;
 	END DWord;
 
 	PROCEDURE PCIWord(reg: ARRAY OF CHAR; ofs: SIGNED32);
-	VAR x: SIGNED32; res: WORD; ctrl: Controller;
+	VAR x: SIGNED32; res: INTEGER; ctrl: Controller;
 	BEGIN
 		ctrl := table[i](LinkDevice).ctrl;
 		KernelLog.String(reg); KernelLog.Char("=");

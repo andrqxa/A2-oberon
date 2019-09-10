@@ -26,7 +26,7 @@ TYPE
 		next: Card;
 
 		PROCEDURE Read( R: Reader );
-		VAR res: WORD;
+		VAR res: INTEGER;
 			msg: ARRAY 64 OF CHAR;
 			string: NbrStrings.String;  module: Modules.Module;  moduleName, typeName: Modules.Name;
 		BEGIN

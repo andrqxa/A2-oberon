@@ -170,7 +170,7 @@ TYPE
 		mode-: SIGNED32;   (* process state *)  (* only changed inside Objects lock ??? *)
 		procID-: SIGNED32;   (* processor ID where running,  exported for compatibilty , useless in WinAos *)
 		waitingOn-: ProtectedObject;   (* obj this process is waiting on (for lock or condition) *)
-		id-: WORD;   (* unique process ID for tracing *)
+		id-: INTEGER;   (* unique process ID for tracing *)
 		flags*: SET;   (* process flags *)
 		priority-: SIGNED32;   (* process priority *)
 
@@ -495,7 +495,7 @@ BEGIN
 END ActiveObject;
 
 (** Return the ID of the active currently executing process. *)
-PROCEDURE GetProcessID* (): WORD;
+PROCEDURE GetProcessID* (): INTEGER;
 VAR r: Process;
 BEGIN
 	r := SYSTEM.VAL (Process, Kernel32.TlsGetValue( tlsIndex ));
@@ -885,7 +885,7 @@ END CreateProcess;
 (* The procedure Lock, Unlock and Await do not use header locks since it turned out that the header locks sometimes were finalized
      too early. *)
 PROCEDURE Lock*(obj: ProtectedObject; exclusive: BOOLEAN );
-VAR hdr {UNTRACED}: Heaps.ProtRecBlock; r: Process; res: WORD;
+VAR hdr {UNTRACED}: Heaps.ProtRecBlock; r: Process; res: INTEGER;
 BEGIN  (* {called from user level} *)
 	SYSTEM.GET(SYSTEM.VAL(ADDRESS, obj) + Heaps.HeapBlockOffset, hdr);
 	IF StrongChecks THEN
@@ -944,7 +944,7 @@ END FindCondition;
 (* The procedure Lock, Unlock and Await do not use header locks since it turned out that the header locks sometimes were finalized
      too early. *)
 PROCEDURE Unlock*( obj: ProtectedObject;  dummy: BOOLEAN );
-VAR hdr {UNTRACED}: Heaps.ProtRecBlock; t, c: Process; res: WORD;
+VAR hdr {UNTRACED}: Heaps.ProtRecBlock; t, c: Process; res: INTEGER;
 BEGIN
 	SYSTEM.GET(SYSTEM.VAL(ADDRESS, obj) + Heaps.HeapBlockOffset, hdr);
 	IF StrongChecks THEN
@@ -992,7 +992,7 @@ VAR globalRunning: Process;
 (* The procedure Lock, Unlock and Await do not use header locks since it turned out that the header locks sometimes were finalized
      too early. *)
 PROCEDURE Await*( cond: Condition;  slink: SIGNED32;  obj: ProtectedObject;  flags: SET );
-VAR hdr {UNTRACED}: Heaps.ProtRecBlock; r, c, t: Process;  res: WORD;
+VAR hdr {UNTRACED}: Heaps.ProtRecBlock; r, c, t: Process;  res: INTEGER;
 BEGIN
 	IF 1 IN flags THEN  (* compiler did not generate IF *)
 		IF cond(slink) THEN
@@ -1299,7 +1299,7 @@ END GetCpuCycles;
 
 (* suspend and store state *)
 PROCEDURE Suspend(p: Process);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN{UNTRACKED}
 	res := Kernel32.SuspendThread(p.handle);
 	ASSERT(res >= 0);
@@ -1308,7 +1308,7 @@ BEGIN{UNTRACKED}
 END Suspend;
 
 PROCEDURE Resume(p: Process);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	res := Kernel32.ResumeThread(p.handle);
 	ASSERT(res >= 0);
@@ -1347,7 +1347,7 @@ END ResumeActivities;
 
 
 PROCEDURE CurrentProcessTime*(): SIGNED64;
-VAR res: WORD; result: SIGNED64;
+VAR res: INTEGER; result: SIGNED64;
 BEGIN
 	IF (Kernel32.QueryThreadCycleTime # NIL) THEN
 		res := Kernel32.QueryThreadCycleTime(CurrentProcess().handle, result);

@@ -1524,7 +1524,7 @@ VAR
 	iobaseVirt: ADDRESS;
 	pciCmdReg : SIGNED32;
 	index : SIGNED32;
-	res: WORD;
+	res: INTEGER;
 BEGIN
 	index := 0;
 	IF Debug.Trace & Debug.traceInit THEN KernelLog.String("UsbOhci: Looking for PCI Open Host Controllers..."); KernelLog.Ln; END;

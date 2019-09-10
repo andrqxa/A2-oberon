@@ -16,7 +16,7 @@ CONST
 TYPE
 	(** structure for reading from a file with deflated data **)
 	Reader* = RECORD
-		res-: WORD;	(** current stream state **)
+		res-: INTEGER;	(** current stream state **)
 		crc32-: SIGNED32;	(* crc32 of uncompressed data *)
 		wrapper-: BOOLEAN;	(** if set, a zlib header and a checksum are present **)
 		eof: BOOLEAN;	(* set if at end of input file and input buffer empty *)
@@ -93,7 +93,7 @@ BEGIN
 END Close;
 
 (** uncompress deflated data from scr and write them to dst **)
-PROCEDURE Uncompress*(VAR src, dst: Files.Rider; VAR crc32: SIGNED32; VAR res: WORD);
+PROCEDURE Uncompress*(VAR src, dst: Files.Rider; VAR crc32: SIGNED32; VAR res: INTEGER);
 VAR
 	r: Reader; buf: ARRAY BufSize OF CHAR; read: SIZE;
 BEGIN

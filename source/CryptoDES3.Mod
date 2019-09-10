@@ -47,7 +47,7 @@ TYPE
 				END SetIV;
 
 				PROCEDURE Encrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
-				VAR i: SIZE;  r: WORD;  X, Y: SET32;
+				VAR i: SIZE;  r: INTEGER;  X, Y: SET32;
 				BEGIN
 					ASSERT( isKeyInitialized & (mode IN {Ciphers.ECB, Ciphers.CBC}) );
 					ASSERT( len MOD blockSize = 0 );   (* padding must have been added *)
@@ -76,7 +76,7 @@ TYPE
 				END Encrypt;
 
 				PROCEDURE Decrypt*( VAR buf: ARRAY OF CHAR;  ofs, len: SIZE );
-				VAR i: SIZE;  r: WORD;  X, Y, X0, Y0: SET32;
+				VAR i: SIZE;  r: INTEGER;  X, Y, X0, Y0: SET32;
 				BEGIN
 					ASSERT( isKeyInitialized );
 					ASSERT( len MOD blockSize = 0 );   (* padding must have been added *)

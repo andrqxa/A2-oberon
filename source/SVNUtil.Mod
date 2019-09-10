@@ -180,7 +180,7 @@ END UrlEncode;
 
 PROCEDURE UrlDecode* (CONST input : ARRAY OF CHAR; VAR output : ARRAY OF CHAR );
 VAR
-	i, j, value: SIGNED32; res: WORD;
+	i, j, value: SIGNED32; res: INTEGER;
 	tmp : ARRAY 3 OF CHAR;
 BEGIN
 	i := 0; j := 0;

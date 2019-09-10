@@ -1045,7 +1045,7 @@ VAR
 	bus, device, function : SIGNED32;
 	iobase, irqline : SIGNED32;
 	index : SIGNED32;
-	res : WORD;
+	res : INTEGER;
 BEGIN
 	index := 0;
 	WHILE PCI.FindPCIClassCode(UhciClassCode, index, bus, device, function) = PCI.Done DO

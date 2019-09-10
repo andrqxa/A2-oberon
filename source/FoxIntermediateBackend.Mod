@@ -122,7 +122,7 @@ TYPE
 		tag: IntermediateCode.Operand;
 		extra: IntermediateCode.Operand; (* stores the step size of an array range *)
 		dimOffset: SIZE;
-		availability: WORD; (* index *)
+		availability: INTEGER; (* index *)
 	END;
 
 	Fixup= POINTER TO RECORD
@@ -516,7 +516,7 @@ TYPE
 			null,size,src,dest,fp,res: IntermediateCode.Operand;
 			callingConvention: SIGNED32;
 			cellType: SyntaxTree.CellType;
-			register: WORD;
+			register: INTEGER;
 			registerClass: IntermediateCode.RegisterClass;
 			type: IntermediateCode.Type;
 			formalParameter: SyntaxTree.Parameter;
@@ -525,7 +525,7 @@ TYPE
 			parametersSize: SIGNED32;
 			position: Streams.Position;
 			variable: SyntaxTree.Variable;
-			nonParameterRegisters: WORD;
+			nonParameterRegisters: INTEGER;
 
 			PROCEDURE Signature;
 			VAR parameter: SyntaxTree.Parameter; procedureType: SyntaxTree.ProcedureType; returnType : SyntaxTree.Type;
@@ -4654,7 +4654,7 @@ TYPE
 
 		END PrepareTensorDescriptor;
 
-		PROCEDURE PushParameter(expression: SyntaxTree.Expression; parameter: SyntaxTree.Parameter; callingConvention: SIGNED32; needsParameterBackup: BOOLEAN; VAR parameterBackup: IntermediateCode.Operand; register: WORD);
+		PROCEDURE PushParameter(expression: SyntaxTree.Expression; parameter: SyntaxTree.Parameter; callingConvention: SIGNED32; needsParameterBackup: BOOLEAN; VAR parameterBackup: IntermediateCode.Operand; register: INTEGER);
 		VAR
 			type, descriptorType, baseType, componentType: SyntaxTree.Type;
 			operand, tmpOperand, variableOp, variable2Op: Operand;
@@ -5568,7 +5568,7 @@ TYPE
 			identifierNumber: SIGNED32;
 
 			parameterRegisters: SIZE;
-			registers: ARRAY 64 OF WORD;
+			registers: ARRAY 64 OF INTEGER;
 			callingConvention: SyntaxTree.CallingConvention;
 			type: IntermediateCode.Type;
 
@@ -9843,8 +9843,8 @@ TYPE
 		END GetBaseRegister;
 
 		(* EXPERIMENTAL *)
-		PROCEDURE GetAvailability(x: SyntaxTree.Variable): WORD;
-		VAR i: WORD;
+		PROCEDURE GetAvailability(x: SyntaxTree.Variable): INTEGER;
+		VAR i: INTEGER;
 		BEGIN
 			IF ~backend.experiment THEN RETURN -1 END;
 			i := 0;
@@ -12634,7 +12634,7 @@ TYPE
 									IF RefInfo THEN Info(section,"SIGNED64") END;
 									Char(section, sfTypeHUGEINT)
 								ELSIF (type = module.system.wordType) THEN
-									IF RefInfo THEN Info(section,"WORD") END;
+									IF RefInfo THEN Info(section,"INTEGER") END;
 									Char(section, sfTypeWORD)
 								ELSIF (type = module.system.longWordType) THEN
 									IF RefInfo THEN Info(section,"LONGWORD") END;
@@ -13896,7 +13896,7 @@ TYPE
 		END InitIntermediateBackend;
 
 		(* must be overwritten by actual backend, if parameter registers should be used *)
-		PROCEDURE GetParameterRegister*(callingConvention: SyntaxTree.CallingConvention; type: IntermediateCode.Type; VAR register: WORD): BOOLEAN;
+		PROCEDURE GetParameterRegister*(callingConvention: SyntaxTree.CallingConvention; type: IntermediateCode.Type; VAR register: INTEGER): BOOLEAN;
 		BEGIN
 			register := -1;
 			RETURN FALSE;

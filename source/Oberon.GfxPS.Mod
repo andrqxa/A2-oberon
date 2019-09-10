@@ -1929,7 +1929,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	(*--- Exported Interface ---*)
 
 	(** initialize context **)
-	PROCEDURE Init* (psc: Context; level2, landscape: BOOLEAN; width, height, left, right, bot, top: FLOAT32; res: WORD);
+	PROCEDURE Init* (psc: Context; level2, landscape: BOOLEAN; width, height, left, right, bot, top: FLOAT32; res: INTEGER);
 	BEGIN
 		psc.do := Methods;
 		psc.eps := FALSE;
@@ -1940,7 +1940,7 @@ MODULE GfxPS IN Oberon; (** portable *)	(* eos  *)
 	END Init;
 
 	(** initialize context that generates EPS output **)
-	PROCEDURE InitEPS* (psc: Context; level2: BOOLEAN; res: WORD);
+	PROCEDURE InitEPS* (psc: Context; level2: BOOLEAN; res: INTEGER);
 	BEGIN
 		psc.do := Methods;
 		psc.eps := TRUE;

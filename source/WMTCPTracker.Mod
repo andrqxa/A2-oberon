@@ -88,7 +88,7 @@ TYPE
 
 		PROCEDURE &New*(delay : SIGNED32;  c : WMRestorable.Context);
 		VAR str : ARRAY 256 OF CHAR;
-			i : WORD; dx, dy, minWidth : SIZE;
+			i : INTEGER; dx, dy, minWidth : SIZE;
 			 vc : WMComponents.VisualComponent;
 			f  : WMGraphics.Font;
 		BEGIN

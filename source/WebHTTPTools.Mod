@@ -43,7 +43,7 @@ PROCEDURE Get*(context : Commands.Context);
 VAR h : WebHTTP.ResponseHeader;
 		rh : WebHTTP.RequestHeader;
 		in : Streams.Reader;
-		res: WORD; i: SIZE; cs : SIGNED32;
+		res: INTEGER; i: SIZE; cs : SIGNED32;
 		ch : CHAR; token : ARRAY 16 OF CHAR;
 		name : ARRAY 32 OF CHAR;
 		url : ARRAY 256 OF CHAR;
@@ -92,7 +92,7 @@ END Get;
 PROCEDURE Head*(context : Commands.Context);
 VAR
 	h : WebHTTP.ResponseHeader;
-	res : WORD;
+	res : INTEGER;
 	url : ARRAY 256 OF CHAR;
 	con : TCP.Connection;
 BEGIN
@@ -113,7 +113,7 @@ VAR
 	h: WebHTTP.ResponseHeader;
 	con: TCP.Connection;
 	in: Streams.Reader;
-	res: WORD; i: SIZE; cs: SIGNED32;
+	res: INTEGER; i: SIZE; cs: SIGNED32;
 	ch : CHAR;
 BEGIN
 	IF ~context.arg.GetString(baseUrl) THEN
@@ -188,7 +188,7 @@ VAR
 	h: WebHTTP.ResponseHeader;
 	in: Streams.Reader;
 	con: TCP.Connection;
-	res: WORD;
+	res: INTEGER;
 BEGIN
 	IF ~context.arg.GetString(url) THEN RETURN END;
 

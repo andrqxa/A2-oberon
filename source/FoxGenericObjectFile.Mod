@@ -441,7 +441,7 @@ TYPE
 	END Get;
 
 	PROCEDURE ReadHeader(reader: Streams.Reader; VAR binary: BOOLEAN; VAR poolMap: ObjectFile.PoolMap; VAR offers, requires: ObjectFile.NameList);
-	VAR ch: CHAR; version: WORD; string: ARRAY 32 OF CHAR;
+	VAR ch: CHAR; version: INTEGER; string: ARRAY 32 OF CHAR;
 	BEGIN
 		reader.String(string);
 		binary := string="FoxOFB";

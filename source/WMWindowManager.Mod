@@ -165,7 +165,7 @@ TYPE
 	(** A window may provide information about currently opened documents. Additionally, it can provide a visual component that controls it. *)
 	WindowInfo* = RECORD
 		openDocuments* : ARRAY 16 OF DocumentInfo;
-		handleDocumentInfo* : PROCEDURE {DELEGATE} (CONST info : DocumentInfo; new : BOOLEAN; VAR res : WORD);
+		handleDocumentInfo* : PROCEDURE {DELEGATE} (CONST info : DocumentInfo; new : BOOLEAN; VAR res : INTEGER);
 		vc* : VisualComponentInfo;
 	END;
 
@@ -477,7 +477,7 @@ TYPE
 		(** Draw request form the window manager. The canvas becomes invalid when the method ends. The
 		draw method may not modify window or WindowManager properties.
 		w, h is the area in view coordinates, q is the Quality 0 lowest 1 mid 2 high. A window may ignore q  *)
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : WORD);
+		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
 		END Draw;
 
 		(** Is called by the windowmanager with reduce set, if the window is resized or moved on slow machines *)
@@ -529,7 +529,7 @@ TYPE
 			END
 		END IsHit;
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : WORD);
+		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
 		VAR img: Graphics.Image;
 		BEGIN
 			img := SELF.img;
@@ -613,7 +613,7 @@ TYPE
 			IF manager # NIL THEN manager.AddVisibleDirty(SELF, bounds) END
 		END SetCanvasGenerator;
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : WORD);
+		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			BEGIN{EXCLUSIVE}
 				AWAIT(~swapping); drawing := TRUE;

@@ -1602,7 +1602,7 @@ TYPE
 	END Phy;
 
 PROCEDURE Install* (context: Commands.Context);
-VAR ld: LinkDevice; res: WORD;
+VAR ld: LinkDevice; res: INTEGER;
 BEGIN {EXCLUSIVE}
 	NEW(ld, Network.TypeEthernet, 1500, 6); (*! What is the correct MTU? *)
 	ld.SetName("XEmac");

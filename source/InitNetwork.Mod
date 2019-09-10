@@ -47,7 +47,7 @@ TYPE
 	RunnerDHCP = OBJECT
 		VAR
 			int: IP.Interface;
-			res: WORD;
+			res: INTEGER;
 
 		PROCEDURE &Constr*(int: IP.Interface);
 		BEGIN
@@ -67,7 +67,7 @@ VAR
 	hasXMLErrors: BOOLEAN;
 
 	(* temporary variables used in module body *)
-	res: WORD;
+	res: INTEGER;
 
 
 (* Error output for XML parser *)
@@ -80,7 +80,7 @@ END Error;
 
 
 (**Get interface configurations from NetInit.XML for the specified device. *)
-PROCEDURE GetConfig(CONST devName: ARRAY OF CHAR; VAR res:WORD): Config;
+PROCEDURE GetConfig(CONST devName: ARRAY OF CHAR; VAR res:INTEGER): Config;
 VAR
 	netConfigElem: XML.Element;
 	elem: XML.Element;
@@ -856,7 +856,7 @@ VAR
 	intv6: IPv6.Interface;
 	intName: IP.Name; (* if autoconf = true; there are two ip interfaces (v4 & v6) *)
 	i: SIGNED32;
-	res: WORD;
+	res: INTEGER;
 	linkLocalAdr: IP.Adr;
 	linkLocalPrefix: IP.Adr;
 	routerConfigItem: IPv6.RouterConfig;
@@ -1007,7 +1007,7 @@ END Removed;
 
 
 (* Handle events of installed/removed devices *)
-PROCEDURE EventHandler(event: WORD; plugin: Plugins.Plugin);
+PROCEDURE EventHandler(event: INTEGER; plugin: Plugins.Plugin);
 BEGIN
 	IF event = Plugins.EventAdd THEN
 		Added(plugin(Network.LinkDevice));

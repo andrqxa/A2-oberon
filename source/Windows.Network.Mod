@@ -98,7 +98,7 @@ TYPE
 			of the overriding constructor!
 		*)
 		PROCEDURE &Constr*(type, mtu, adrSize: SIGNED32);
-		VAR res: WORD;
+		VAR res: INTEGER;
 		BEGIN
 			ASSERT((mtu >= 0) & (mtu <= MaxPacketSize));
 			ASSERT((adrSize >= 0) & (adrSize <= MaxLinkAdrSize));
@@ -482,7 +482,7 @@ END Equal;
 
 (** Put a 32-bit host value into buf[ofs..ofs+3] *)
 
-PROCEDURE Put4*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: WORD);
+PROCEDURE Put4*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: INTEGER);
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP+val]
@@ -501,7 +501,7 @@ END Put4;
 
 (** Put a 16-bit host value into buf[ofs..ofs+1] *)
 
-PROCEDURE Put2*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: WORD);
+PROCEDURE Put2*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: INTEGER);
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP+val]
@@ -520,7 +520,7 @@ END Put2;
 
 (** Get a 32-bit host value from buf[ofs..ofs+3] *)
 
-PROCEDURE Get4*(CONST buf: ARRAY OF CHAR; ofs: SIZE): WORD;
+PROCEDURE Get4*(CONST buf: ARRAY OF CHAR; ofs: SIZE): INTEGER;
 CODE
 #IF I386 THEN
 	MOV EBX, [EBP+ofs]
@@ -537,7 +537,7 @@ END Get4;
 
 (** Get a 16-bit host value from buf[ofs..ofs+1] *)
 
-PROCEDURE Get2*(CONST buf: ARRAY OF CHAR; ofs: SIZE): WORD;
+PROCEDURE Get2*(CONST buf: ARRAY OF CHAR; ofs: SIZE): INTEGER;
 CODE
 #IF I386 THEN
 	MOV EBX, [EBP+ofs]
@@ -556,7 +556,7 @@ END Get2;
 
 (** Put a 32-bit host value into buf[ofs..ofs+3] in network byte order *)
 
-PROCEDURE PutNet4*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: WORD);
+PROCEDURE PutNet4*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: INTEGER);
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP+val]
@@ -581,7 +581,7 @@ END PutNet4;
 
 (** Put a 16-bit host value into buf[ofs..ofs+1] in network byte order *)
 
-PROCEDURE PutNet2*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: WORD);
+PROCEDURE PutNet2*(VAR buf: ARRAY OF CHAR; ofs: SIZE; val: INTEGER);
 CODE
 #IF I386 THEN
 	MOV EAX, [EBP+val]
@@ -602,7 +602,7 @@ END PutNet2;
 
 (** Get a 32-bit network value from buf[ofs..ofs+3] in host byte order *)
 
-PROCEDURE GetNet4*(CONST buf: ARRAY OF CHAR; ofs: SIZE): WORD;
+PROCEDURE GetNet4*(CONST buf: ARRAY OF CHAR; ofs: SIZE): INTEGER;
 CODE
 #IF I386 THEN
 	MOV EBX, [EBP+ofs]
@@ -625,7 +625,7 @@ END GetNet4;
 
 (** Get a 16-bit network value from buf[ofs..ofs+1] in host byte order *)
 
-PROCEDURE GetNet2*(CONST buf: ARRAY OF CHAR; ofs: SIZE): WORD;
+PROCEDURE GetNet2*(CONST buf: ARRAY OF CHAR; ofs: SIZE): INTEGER;
 CODE
 #IF I386 THEN
 	MOV EBX, [EBP+ofs]

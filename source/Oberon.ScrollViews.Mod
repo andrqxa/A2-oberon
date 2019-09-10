@@ -62,7 +62,7 @@ BEGIN RETURN SHORT(X * Display.Unit DIV Printer.Unit)
 END P;
 
 PROCEDURE Value (VAR bar: Bar; x, y, w, h, X, Y: SIGNED16; min, max: SIGNED32): SIGNED32;
-VAR res: WORD;
+VAR res: INTEGER;
 
 	PROCEDURE CalcVal (x, w, bx, bw: SIGNED16; min, max: SIGNED32): SIGNED32;
 	VAR r, d: SIGNED32;

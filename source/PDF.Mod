@@ -94,7 +94,7 @@ TYPE
 			SELF.context := context; NEW(data, 4 *  4096); length := 0;
 		END Init;
 
-		PROCEDURE Add (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Add (CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR i : SIZE; n : Strings.String;
 		BEGIN
 			IF length + len >= LEN(data) THEN
@@ -955,7 +955,7 @@ TYPE
 			w.String(str); w.String(" j");
 		END PDFSetLineJoin;
 
-		PROCEDURE PolyLine*(CONST points : ARRAY OF WMGraphics.Point2d; nofPoints : SIZE; closed : BOOLEAN;  color : WMGraphics.Color; mode : WORD);
+		PROCEDURE PolyLine*(CONST points : ARRAY OF WMGraphics.Point2d; nofPoints : SIZE; closed : BOOLEAN;  color : WMGraphics.Color; mode : INTEGER);
 		VAR i : SIZE;
 		BEGIN
 			IF nofPoints < 2 THEN RETURN END;

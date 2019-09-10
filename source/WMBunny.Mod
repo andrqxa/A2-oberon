@@ -64,7 +64,7 @@ TYPE
 			END
 		END PointerUp;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : WORD);
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			IF movie # NIL THEN
 				IF (w = GetWidth()) & (h = GetHeight()) THEN

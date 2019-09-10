@@ -426,28 +426,28 @@ BEGIN
 END WriteCmdSts;
 
 PROCEDURE ReadConfigByte(bus, devfn, ofs: SIGNED32;  VAR val: SIGNED32);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	res := PCI.ReadConfigByte(bus, ASH(devfn, -3) MOD 20H, devfn MOD 8, ofs, val);
 	ASSERT(res = PCI.Done)
 END ReadConfigByte;
 
 PROCEDURE ReadConfigWord(bus, devfn, ofs: SIGNED32;  VAR val: SIGNED32);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	res := PCI.ReadConfigWord(bus, ASH(devfn, -3) MOD 20H, devfn MOD 8, ofs, val);
 	ASSERT(res = PCI.Done)
 END ReadConfigWord;
 
 PROCEDURE ReadConfigDword(bus, devfn, ofs: SIGNED32;  VAR val: SIGNED32);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	res := PCI.ReadConfigDword(bus, ASH(devfn, -3) MOD 20H, devfn MOD 8, ofs, val);
 	ASSERT(res = PCI.Done)
 END ReadConfigDword;
 
 PROCEDURE WriteConfigDword(bus, devfn, ofs, val: SIGNED32);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	res := PCI.WriteConfigDword(bus, ASH(devfn, -3) MOD 20H, devfn MOD 8, ofs, val);
 	ASSERT(res = PCI.Done)

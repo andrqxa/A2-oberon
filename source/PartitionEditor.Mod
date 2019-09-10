@@ -41,7 +41,7 @@ TYPE
 		PROCEDURE HandleButtons(sender, data : ANY);
 		VAR
 			deviceName : ARRAY 32 OF CHAR;
-			pt : PartitionTable.PartitionTable; blockNumber : SIGNED32; res : WORD;
+			pt : PartitionTable.PartitionTable; blockNumber : SIGNED32; res : INTEGER;
 			message: ARRAY 256 OF CHAR;
 		BEGIN
 			IF (sender = storeBtn) THEN
@@ -162,7 +162,7 @@ TYPE
 		END New;
 
 		PROCEDURE Load(deviceName : ARRAY OF CHAR; block : SIGNED32);
-		VAR pt : PartitionTable.PartitionTable; blockStr : ARRAY 16 OF CHAR; message: ARRAY 256 OF CHAR; res : WORD;
+		VAR pt : PartitionTable.PartitionTable; blockStr : ARRAY 16 OF CHAR; message: ARRAY 256 OF CHAR; res : INTEGER;
 		BEGIN
 			Strings.TrimWS(deviceName);
 			deviceNameEditor.SetAsString(deviceName);
@@ -198,7 +198,7 @@ TYPE
 		END Resizing;
 
 		PROCEDURE HandleChange(changeType : SIGNED32; VAR partition : PartitionTable.Partition);
-		VAR deviceName : ARRAY 32 OF CHAR; res : WORD;
+		VAR deviceName : ARRAY 32 OF CHAR; res : INTEGER;
 		BEGIN
 			deviceNameEditor.GetAsString(deviceName);
 			PartitionTable.Changed(changeType, partition, deviceName, res);
@@ -224,7 +224,7 @@ TYPE
 VAR
 	nofWindows : SIGNED32;
 
-PROCEDURE GetErrorMessage(CONST string1, devicename : ARRAY OF CHAR; res : WORD; VAR message: ARRAY OF CHAR);
+PROCEDURE GetErrorMessage(CONST string1, devicename : ARRAY OF CHAR; res : INTEGER; VAR message: ARRAY OF CHAR);
 VAR nbr : ARRAY 8 OF CHAR;
 BEGIN
 	COPY(string1, message);

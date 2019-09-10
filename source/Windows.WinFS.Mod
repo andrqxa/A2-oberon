@@ -151,13 +151,13 @@ TYPE
 			Prefix( name, fname );  f :=  fs.Old0( fname ); IF f # NIL THEN  f.fs := SELF; END; RETURN f;
 		END Old0;
 
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR;  VAR key: SIGNED32; VAR res: WORD);
+		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR;  VAR key: SIGNED32; VAR res: INTEGER);
 		VAR fname: FileName;
 		BEGIN
 			Prefix( name, fname );  fs.Delete0( fname, key, res );
 		END Delete0;
 
-		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR;  fold: Files.File;  VAR res: WORD );
+		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR;  fold: Files.File;  VAR res: INTEGER );
 		VAR old0, new0: FileName;
 		BEGIN
 			Prefix( old, old0 );  Prefix( new, new0 );  fs.Rename0( old0, new0, fold, res );
@@ -175,13 +175,13 @@ TYPE
 			Prefix( name, fname );  RETURN fs.FileKey( fname );
 		END FileKey;
 
-		PROCEDURE CreateDirectory0*(CONST name: ARRAY OF CHAR;  VAR res: WORD );
+		PROCEDURE CreateDirectory0*(CONST name: ARRAY OF CHAR;  VAR res: INTEGER );
 		VAR fname: FileName;
 		BEGIN
 			Prefix( name, fname );  fs.CreateDirectory0( fname, res );
 		END CreateDirectory0;
 
-		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR;  force: BOOLEAN;  VAR key: SIGNED32; VAR res: WORD );
+		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR;  force: BOOLEAN;  VAR key: SIGNED32; VAR res: INTEGER );
 		VAR fname: FileName;
 		BEGIN
 			Prefix( name, fname );  fs.RemoveDirectory0( fname, force, key, res );
@@ -233,7 +233,7 @@ TYPE
 			RETURN NIL
 		END Old0;
 
-		PROCEDURE Delete0( name: ARRAY OF CHAR;  VAR key: SIGNED32; VAR res: WORD );
+		PROCEDURE Delete0( name: ARRAY OF CHAR;  VAR key: SIGNED32; VAR res: INTEGER );
 		VAR fname: FileName;  F: File;  ret: Kernel32.BOOL;
 		BEGIN {EXCLUSIVE}
 			ConvertChar( name, Files.PathDelimiter, PathDelimiter );  key := 0;  res := 1;
@@ -249,7 +249,7 @@ TYPE
 			END
 		END Delete0;
 
-		PROCEDURE Rename0( old, new: ARRAY OF CHAR;  fold: Files.File;  VAR res: WORD );
+		PROCEDURE Rename0( old, new: ARRAY OF CHAR;  fold: Files.File;  VAR res: INTEGER );
 		VAR fnold, fnnew: FileName;  Fo, Fn: File;  ret: Kernel32.BOOL;
 		BEGIN {EXCLUSIVE}
 			IF TraceFileSystem IN Trace THEN KernelLog.String( "Rename " );  KernelLog.String( old );  KernelLog.String( " -> " );  KernelLog.String( new );  KernelLog.Ln;  END;
@@ -376,7 +376,7 @@ TYPE
 
 		END FileKey;
 
-		PROCEDURE CreateDirectory0( name: ARRAY OF CHAR;  VAR res: WORD );
+		PROCEDURE CreateDirectory0( name: ARRAY OF CHAR;  VAR res: INTEGER );
 		VAR ret: Kernel32.BOOL;
 		BEGIN {EXCLUSIVE}
 			ConvertChar( name, Files.PathDelimiter, PathDelimiter );  ret := Kernel32.CreateDirectory( name, NIL );
@@ -386,7 +386,7 @@ TYPE
 			ELSE res := 1 END
 		END CreateDirectory0;
 
-		PROCEDURE RemoveDirectory0( name: ARRAY OF CHAR;  force: BOOLEAN;  VAR key: SIGNED32; VAR res: WORD );
+		PROCEDURE RemoveDirectory0( name: ARRAY OF CHAR;  force: BOOLEAN;  VAR key: SIGNED32; VAR res: INTEGER );
 		VAR ret: Kernel32.BOOL;
 		BEGIN {EXCLUSIVE}
 			ConvertChar( name, Files.PathDelimiter, PathDelimiter );  key := 0;  res := 1;
@@ -645,7 +645,7 @@ TYPE
 			ASSERT( hfile # Kernel32.InvalidHandleValue );  fsize := Kernel32.GetFileSize( hfile, NIL );  ASSERT( fsize >= 0 );  SELF.tfname := tfname;  COPY( tfname^, fname );  RETURN TRUE;
 		END ToTemp;
 
-		PROCEDURE Register0*( VAR res: WORD );
+		PROCEDURE Register0*( VAR res: INTEGER );
 		VAR F: File;  ret: Kernel32.BOOL;
 			from, to: ARRAY 256 OF CHAR;
 		BEGIN {EXCLUSIVE}
@@ -840,7 +840,7 @@ VAR
 	PROCEDURE MountDrive(CONST drive: ARRAY OF CHAR; context : Commands.Context);
 	VAR
 		p: Files.Parameters; namebuf1, namebuf2: FileName;  size, snum, mlen, sysfl: SIGNED32;
-		res: WORD; prefix: ARRAY 256 OF CHAR;
+		res: INTEGER; prefix: ARRAY 256 OF CHAR;
 	BEGIN
 		COPY(drive,prefix);
 		size := LEN( namebuf1 );  res := Kernel32.GetVolumeInformation( prefix, namebuf1, size, snum, mlen, sysfl, namebuf2, size );

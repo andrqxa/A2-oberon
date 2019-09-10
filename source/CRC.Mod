@@ -24,7 +24,7 @@ TYPE
 			InitWriter(Send, 256)
 		END InitStream;
 
-		PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 			VAR fcs, idx: SET32; i: SIZE;
 		BEGIN
 			fcs := SET32( crc ) * SET32( 0FFFFH );
@@ -66,7 +66,7 @@ TYPE
 			crc := Init32
 		END Reset;
 
-		PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR idx: SIGNED32;
 		BEGIN
 			WHILE len > 0 DO

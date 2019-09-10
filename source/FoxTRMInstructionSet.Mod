@@ -1050,7 +1050,7 @@ TYPE
 		Disasm = OBJECT (Disassembler.Disassembler)
 
 			PROCEDURE DisassembleInstruction(bitSet: BitSets.BitSet; VAR adr: Disassembler.Unit; maxInstructionSize: Disassembler.Unit; w:Streams.Writer);
-			VAR instruction: Instruction; value: WORD; mnemonic: WORD;
+			VAR instruction: Instruction; value: INTEGER; mnemonic: INTEGER;
 			BEGIN
 				(* maxInstructionSize can be ignored here *)
 				value := bitSet.GetBits(adr*36,decodeInstance.instructionW);    (*bitset treated as series of 36 bit slots, individual words left aligned.*)
@@ -1072,8 +1072,8 @@ TYPE
 		END Disasm;
 
 	VAR disassembler: Disasm; codeFileName, dataFileName, logFileName: Files.FileName; codeFile, dataFile, logFile: Files.File;code, data: BitSets.BitSet; options: Options.Options;
-		address: WORD;
-		instructionWidth: WORD;
+		address: INTEGER;
+		instructionWidth: INTEGER;
 	BEGIN
 		IF context.arg.GetString(codeFileName) THEN
 			codeFile := Files.Old(codeFileName);

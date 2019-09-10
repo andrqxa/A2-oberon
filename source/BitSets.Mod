@@ -85,8 +85,8 @@ TYPE BitSet* = OBJECT
 		SYSTEM.MOVE(ADDRESS OF values[0], adr, bytes);
 	END SetBytes;
 
-	PROCEDURE GetBits* (startPos, bits: Bits): WORD;
-	VAR value: WORD; adr: ADDRESS;
+	PROCEDURE GetBits* (startPos, bits: Bits): INTEGER;
+	VAR value: INTEGER; adr: ADDRESS;
 	BEGIN
 		ASSERT (startPos >= 0); ASSERT (startPos+bits <= size);
 		IF (bits = 8) & (startPos MOD 8 =0) THEN

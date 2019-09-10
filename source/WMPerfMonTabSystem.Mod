@@ -150,7 +150,7 @@ TYPE
 		END HandleTimerButton;
 
 		PROCEDURE HandleUnloadButton(sender, data : ANY);
-		VAR msg : ARRAY 128 OF CHAR; res : WORD;
+		VAR msg : ARRAY 128 OF CHAR; res : INTEGER;
 		BEGIN
 			Commands.Call("System.FreeDownTo WMPerfMonPlugins", {}, res, msg);
 		END HandleUnloadButton;

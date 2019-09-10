@@ -370,7 +370,7 @@ TYPE
 		(** Open a TCP connection (only use once per Connection instance).
 			Use TCP.NilPort for lport to automatically assign an unused local port.
 		*)
-		PROCEDURE Open*(lport: SIGNED32; fip: IP.Adr; fport: SIGNED32; VAR res: WORD);
+		PROCEDURE Open*(lport: SIGNED32; fip: IP.Adr; fport: SIGNED32; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			ASSERT((state = Unused) & (lport >= 0) & (lport < 10000H) & (fport >= 0) & (fport < 10000H));
 			IF timeSource # NIL THEN
@@ -413,7 +413,7 @@ TYPE
 
 
 		(** Send data on a TCP connection. *)
-		PROCEDURE Send*(CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send*(CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR buf: SendBuffer; len0: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF StrongChecks THEN Invariant(SELF) END;
@@ -460,7 +460,7 @@ TYPE
 
 
 		(** Receive data on a TCP connection. The data parameter specifies the buffer. The ofs parameters specify the position in the buffer where data should be received (usually 0), and the size parameters specifies how many bytes of data can be received in the buffer. The min parameter specifies the minimum number of bytes to receive before Receive returns and must by <= size. The len parameter returns the number of bytes received, and the res parameter returns 0 if ok, or a non-zero error code otherwise (e.g. if the connection is closed by the communication partner, or by a call of the Close method). *)
-		PROCEDURE Receive*(VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive*(VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			buf: Network.Buffer;
 			rlen: SIGNED32;
@@ -625,7 +625,7 @@ TYPE
 
 
 		(** Wait until the connection state is either in the good or bad set, up to "ms" milliseconds. *)
-		PROCEDURE AwaitState*(good, bad: SET; ms: SIGNED32; VAR res: WORD);
+		PROCEDURE AwaitState*(good, bad: SET; ms: SIGNED32; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF ~(state IN (good+bad)) THEN
 				IF ms # -1 THEN
@@ -682,7 +682,7 @@ TYPE
 
 
 		(** Accept a client waiting on a listening connection. Blocks until a client is available or the connection is closed. *)
-		PROCEDURE Accept*(VAR client: Connection; VAR res: WORD);
+		PROCEDURE Accept*(VAR client: Connection; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			AWAIT((state # Listen) OR (acceptNext # NIL));
 			IF acceptNext # NIL THEN
@@ -923,7 +923,7 @@ TYPE
 			ELSE an active open is assumed.
 			IF (lport = NilPort), an ephemeral port is assigned.
 		*)
-		PROCEDURE Add(p: Connection; lport, fport: SIGNED32; VAR res: WORD);
+		PROCEDURE Add(p: Connection; lport, fport: SIGNED32; VAR res: INTEGER);
 		VAR i, sport: SIGNED32;
 		BEGIN {EXCLUSIVE}
 			IF ((fport # NilPort) & (IP.IsNilAdr(p.fip))) OR (* workaround for XOR *)
@@ -1167,7 +1167,7 @@ END WriteTime;
 
 (* TCP error function. *)
 
-PROCEDURE Error(err: WORD; n: SIGNED32; p: Connection);
+PROCEDURE Error(err: INTEGER; n: SIGNED32; p: Connection);
 BEGIN
 	IF trace THEN
 		KernelLog.Enter; KernelLog.String("TCP: "); WriteTime(Kernel.GetTicks());
@@ -1801,7 +1801,7 @@ VAR
 
 	PROCEDURE ProcessListen(): BOOLEAN;	(* fig. 28.15-17 *)
 	VAR
-		res: WORD;
+		res: INTEGER;
 		q: Connection;
 	BEGIN
 		IF Rst IN pf THEN GotoDrop; RETURN FALSE END;

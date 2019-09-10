@@ -313,7 +313,7 @@ TYPE
 		VAR
 			changeInfo : ChangeInfo;
 			string: ARRAY 32 OF CHAR;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			NEW(changeInfo);
 			IF (famCheck.state.Get() = 1) THEN
@@ -418,7 +418,7 @@ TYPE
 		END BGColorPopupHandler;
 
 		PROCEDURE UpdateColors(sender, data : ANY);
-		VAR colorString : ARRAY 16 OF CHAR; caption : ARRAY 2 OF CHAR;  color: SIGNED32; res: WORD;
+		VAR colorString : ARRAY 16 OF CHAR; caption : ARRAY 2 OF CHAR;  color: SIGNED32; res: INTEGER;
 		BEGIN
 			colorEdit.GetAsString(colorString);
 			Strings.HexStrToInt(colorString, color, res);

@@ -10,7 +10,7 @@ CONST
 	ShowErrorCode = TRUE;
 	MaxErrorTextLength = 512;
 
-PROCEDURE Show*(errorCode : WORD);
+PROCEDURE Show*(errorCode : INTEGER);
 VAR
 	errorMessage : Errors.ErrorMessage;
 	text : ARRAY MaxErrorTextLength OF CHAR;

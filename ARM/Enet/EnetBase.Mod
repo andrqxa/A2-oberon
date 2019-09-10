@@ -15,7 +15,7 @@ TYPE
 	Int* = SIZE; (** system signed integer type *)
 	UInt* = ADDRESS; (** system unsigned integer type *)
 	
-	ResultCode* = WORD;
+	ResultCode* = INTEGER;
 
 	UnalignedInt32 = EnetUtils.UnalignedInt32;
 

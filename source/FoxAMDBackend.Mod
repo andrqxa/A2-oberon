@@ -3243,8 +3243,8 @@ TYPE
 		forceFPU: BOOLEAN;
 		winAPIRegisters: ARRAY 4 OF SIGNED32;
 		cRegisters: ARRAY 6 OF SIGNED32;
-		intParameterIndex: WORD;
-		floatParameterIndex: WORD;
+		intParameterIndex: INTEGER;
+		floatParameterIndex: INTEGER;
 
 		PROCEDURE &InitBackendAMD64;
 		BEGIN
@@ -3273,7 +3273,7 @@ TYPE
 		END Initialize;
 
 		PROCEDURE GetSystem*(): Global.System;
-		VAR system: Global.System; variableOffset: WORD;
+		VAR system: Global.System; variableOffset: INTEGER;
 
 			PROCEDURE AddRegister(CONST name: Scanner.IdentifierString; val: SIGNED32);
 			BEGIN
@@ -3374,8 +3374,8 @@ TYPE
 			floatParameterIndex := 0;
 		END ResetParameterRegisters;
 
-		PROCEDURE GetParameterRegister*(callingConvention: SyntaxTree.CallingConvention;  type: IntermediateCode.Type; VAR register: WORD): BOOLEAN;
-		VAR index: WORD;
+		PROCEDURE GetParameterRegister*(callingConvention: SyntaxTree.CallingConvention;  type: IntermediateCode.Type; VAR register: INTEGER): BOOLEAN;
+		VAR index: INTEGER;
 		BEGIN
 			IF bits = 32 THEN register := -1; RETURN FALSE END;
 

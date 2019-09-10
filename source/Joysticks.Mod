@@ -226,7 +226,7 @@ TYPE
 		END Poll;
 
 		(** Set the deadzone for all axis *)
-		PROCEDURE SetGlobalDeadzone*(deadzone : FLOAT32; VAR errorMessage : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE SetGlobalDeadzone*(deadzone : FLOAT32; VAR errorMessage : ARRAY OF CHAR; VAR res : INTEGER);
 		VAR i : SIGNED32;
 		BEGIN
 			FOR i := 0 TO MaxNbrOfAxis - 1 DO
@@ -238,7 +238,7 @@ TYPE
 		END SetGlobalDeadzone;
 
 		(** Set the deadzone for the specified axis *)
-		PROCEDURE SetDeadzone*(axisNbr : SIGNED32; deadzone : FLOAT32; VAR errorMessage : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE SetDeadzone*(axisNbr : SIGNED32; deadzone : FLOAT32; VAR errorMessage : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			IF (axisNbr < 0) OR (axisNbr >= MaxNbrOfAxis) OR (~(axisNbr IN implementedAxis)) THEN
 				errorMessage := ErrorAxisNotImplemented;
@@ -266,7 +266,7 @@ TYPE
 		END StartCalibration;
 
 		(* At the time this procedure is called, the axes should be in center position *)
-		PROCEDURE StopCalibration*(VAR errorMsg : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE StopCalibration*(VAR errorMsg : ARRAY OF CHAR; VAR res : INTEGER);
 		VAR i : SIGNED32;
 		BEGIN
 			FOR i := 0 TO MaxNbrOfAxis - 1 DO
@@ -458,7 +458,7 @@ VAR
 	registry- : Plugins.Registry;
 	nextId : SIGNED32;
 
-PROCEDURE EventHandler(event : WORD; plugin : Plugins.Plugin);
+PROCEDURE EventHandler(event : INTEGER; plugin : Plugins.Plugin);
 VAR
 	joystick : Joystick;
 	connectedMsg : JoystickConnectedMessage; disconnectedMsg : JoystickDisconnectedMessage;
@@ -525,7 +525,7 @@ BEGIN
 END Show;
 
 PROCEDURE Init;
-VAR res : WORD;
+VAR res : INTEGER;
 BEGIN
 	registry.AddEventHandler(EventHandler, res);
 	IF res # Plugins.Ok THEN

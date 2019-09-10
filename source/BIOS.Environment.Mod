@@ -21,7 +21,7 @@ VAR memory: SIZE;
 VAR traceMode: SET;
 VAR bootFlag: ADDRESS;
 VAR clock: SIGNED32;
-VAR status-: WORD;
+VAR status-: INTEGER;
 VAR memTop: ADDRESS;
 VAR traceBase: ADDRESS;
 VAR heap: HeapManager.Heap;
@@ -48,7 +48,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (CAS (status, ShuttingDown, Rebooting) = ShuttingDown);
 END Reboot;
 
-PROCEDURE {NORETURN} Exit- (status: WORD);
+PROCEDURE {NORETURN} Exit- (status: INTEGER);
 VAR index: SIZE;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Trace.String ("system: ");

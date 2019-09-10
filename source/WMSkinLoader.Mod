@@ -67,7 +67,7 @@ TYPE
 		PROCEDURE LoadSkin(sender, data : ANY);
 		VAR look : Looks.Look;
 			cmd, msg : ARRAY 128 OF CHAR;
-			index: SIGNED32; res: WORD;
+			index: SIGNED32; res: INTEGER;
 		BEGIN
 			IF sender IS WMStandardComponents.Button THEN
 				FindSender(sender(WMStandardComponents.Button), index);

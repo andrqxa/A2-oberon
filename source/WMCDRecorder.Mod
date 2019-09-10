@@ -234,9 +234,9 @@ TYPE
 			sizeLabel.caption.SetAOC(text);
 		END UpdateSize;
 
-		PROCEDURE IdentifyRecorders(): WORD;
+		PROCEDURE IdentifyRecorders(): INTEGER;
 		VAR
-			res: WORD;
+			res: INTEGER;
 			dlg: WaitDialog;
 			ticks : SIGNED32;
 		BEGIN
@@ -307,7 +307,7 @@ TYPE
 			recorder: CDRecord.CDRecorder;
 			disc: CDRecord.Disc;
 			compilation: CDRecord.Compilation;
-			res, tmp: WORD; startsec, size, freeSpace: SIGNED32;
+			res, tmp: INTEGER; startsec, size, freeSpace: SIGNED32;
 			toc: Lib.TocDescriptor;
 			dest: String;
 			pvd: MakeIsoImages.PSVolumeDescriptor;
@@ -411,7 +411,7 @@ TYPE
 			typeDlg: BlankTypeDialog;
 			disc: CDRecord.Disc;
 			recorder: CDRecord.CDRecorder;
-			res: WORD;
+			res: INTEGER;
 			waitDlg: WaitDialog;
 		BEGIN
 			IF IdentifyRecorders() # ResOk THEN RETURN END;
@@ -454,7 +454,7 @@ TYPE
 			info: MakeIsoImages.ISOInfo;
 			compilation: CDRecord.Compilation;
 			image: String;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			IF IdentifyRecorders() = ResErr THEN RETURN END;
 			NEW(imageDlg, Strings.NewString("Burn"), bounds, 300, 400);
@@ -497,7 +497,7 @@ TYPE
 			dataPanel: DataPanel;
 			sessDlg: SessionDialog;
 			bootDlg: BootDialog;
-			res: WORD;
+			res: INTEGER;
 			audioProject: AudioProject;
 			dataProject: DataProject;
 		BEGIN
@@ -590,7 +590,7 @@ TYPE
 
 		PROCEDURE WaitOnDisc(recorder: CDRecord.CDRecorder): SIGNED32;
 		VAR
-			res: WORD;
+			res: INTEGER;
 			waitDlg: WaitDialog;
 		BEGIN
 			NEW(waitDlg, Strings.NewString("Waiting"), bounds, 200, 100, TRUE);
@@ -645,7 +645,7 @@ TYPE
 		VAR
 			audioDlg: AudioDialog;
 			waitDlg: WaitDialog;
-			tmp, res: WORD; freeSpace, wavSpace: SIGNED32;
+			tmp, res: INTEGER; freeSpace, wavSpace: SIGNED32;
 			dest:String;
 			cur: Node;
 			project: AudioProject;
@@ -731,7 +731,7 @@ TYPE
 
 		PROCEDURE Convert(project: AudioProject; dest: String): SIGNED32;
 		VAR
-			no: SIGNED32; res: WORD;
+			no: SIGNED32; res: INTEGER;
 			cur: Node;
 			filename, path, tmp: ARRAY MaxLen OF CHAR;
 		BEGIN
@@ -841,7 +841,7 @@ TYPE
 		PROCEDURE BurnDataHandler(sender, data: ANY);
 		VAR
 			dataDlg: DataDialog;
-			res, tmp: WORD;
+			res, tmp: INTEGER;
 			root: ANY;
 			dest: String;
 			compilation: CDRecord.Compilation;
@@ -932,9 +932,9 @@ TYPE
 			END;
 		END BurnDataHandler;
 
-		PROCEDURE Record(compilation: CDRecord.Compilation; recorder: CDRecord.CDRecorder; settings: CDRecord.BurnSettings): WORD;
+		PROCEDURE Record(compilation: CDRecord.Compilation; recorder: CDRecord.CDRecorder; settings: CDRecord.BurnSettings): INTEGER;
 		VAR
-			res, tmp : WORD;
+			res, tmp : INTEGER;
 			msg, str : ARRAY MaxLen OF CHAR;
 			waitDlg: WaitDialog;
 			timer: Timer;
@@ -2131,7 +2131,7 @@ TYPE
 			SELF.node := node;
 		END New;
 
-		PROCEDURE URL*(CONST url: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE URL*(CONST url: ARRAY OF CHAR; VAR res: INTEGER);
 		BEGIN
 			IF panel.enabled.Get() THEN
 				panel.AddFile(url, node);

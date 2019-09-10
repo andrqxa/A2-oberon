@@ -328,9 +328,9 @@ TYPE
 			RETURN size;
 		END GetSize;
 
-		PROCEDURE AddTrack*(filename: Strings.String; trackType : SIGNED32; permitCopy: BOOLEAN) : WORD;
+		PROCEDURE AddTrack*(filename: Strings.String; trackType : SIGNED32; permitCopy: BOOLEAN) : INTEGER;
 		VAR
-			res: WORD;
+			res: INTEGER;
 			track: InformationTrack;
 			file: Files.File;
 		BEGIN
@@ -382,15 +382,15 @@ TYPE
 
 		PROCEDURE UpdateCapacity*;
 		VAR
-			size: SIGNED32; res: WORD;
+			size: SIGNED32; res: INTEGER;
 		BEGIN
 			dev.GetSize(size, res);
 		END UpdateCapacity;
 
-		PROCEDURE GetBufferCapacity(VAR totalCapacity, unusedCapacity: SIGNED32): WORD;
+		PROCEDURE GetBufferCapacity(VAR totalCapacity, unusedCapacity: SIGNED32): INTEGER;
 		VAR
 			capacity: Lib.BufferCapacity;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			res := Lib.ReadBufferCapacity(dev, FALSE, ADDRESSOF(capacity), SIZEOF(Lib.BufferCapacity));
 			IF res = ResOk THEN
@@ -400,10 +400,10 @@ TYPE
 			RETURN res;
 		END GetBufferCapacity;
 
-		PROCEDURE Record*(VAR compilation: Compilation; settings: BurnSettings; onRecordStatusChanged: Utils.StatusProc): WORD;
+		PROCEDURE Record*(VAR compilation: Compilation; settings: BurnSettings; onRecordStatusChanged: Utils.StatusProc): INTEGER;
 		VAR
 			disc: Disc;
-			res: WORD; i, op, nwa, secs: SIGNED32;
+			res: INTEGER; i, op, nwa, secs: SIGNED32;
 			nibble: SET; (* the control nibble of the q channel *)
 			params: WriteParams;
 			cuesheet: CueSheet;
@@ -551,7 +551,7 @@ TYPE
 		END InitWriteParams;
 
 		(* only data tracks are verified. reading DA is not accurate enough since there is no sync pattern. *)
-		PROCEDURE VerifyCompilation(compilation: Compilation): WORD;
+		PROCEDURE VerifyCompilation(compilation: Compilation): INTEGER;
 		VAR
 			i: SIGNED32;
 			track: InformationTrack;
@@ -575,7 +575,7 @@ TYPE
 			RETURN ResOk;
 		END VerifyCompilation;
 
-		PROCEDURE VerifyTrack(track: InformationTrack): WORD;
+		PROCEDURE VerifyTrack(track: InformationTrack): INTEGER;
 		VAR
 			lba, secs, nofBlocks, timestamp, ofs: SIGNED32;
 			discBuf: POINTER TO ARRAY OF SIGNED32;
@@ -634,7 +634,7 @@ TYPE
 
 		PROCEDURE Abort;
 		VAR
-			size: SIGNED32; res: WORD;
+			size: SIGNED32; res: INTEGER;
 		BEGIN
 			Unlock();
 			(* restore previous blockSize *)
@@ -646,9 +646,9 @@ TYPE
 			reader := NIL;
 		END Abort;
 
-		PROCEDURE Write(op, startSec, nofBlocks: SIGNED32; adr: ADDRESS): WORD;
+		PROCEDURE Write(op, startSec, nofBlocks: SIGNED32; adr: ADDRESS): INTEGER;
 		VAR
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			LOOP
 				res := dev.TransferEx(op, startSec, nofBlocks, adr, dma & UseDma);
@@ -661,9 +661,9 @@ TYPE
 			RETURN res;
 		END Write;
 
-		PROCEDURE PadTrack(op: SIGNED32; track: InformationTrack) : WORD;
+		PROCEDURE PadTrack(op: SIGNED32; track: InformationTrack) : INTEGER;
 		VAR
-			res: WORD;
+			res: INTEGER;
 			startSec, secsToPad, nofBlocks: SIGNED32;
 			buf: POINTER TO ARRAY OF CHAR;
 		BEGIN
@@ -694,9 +694,9 @@ TYPE
 			RETURN res;
 		END PadTrack;
 
-		PROCEDURE WriteTrack(op: SIGNED32; VAR track: InformationTrack) : WORD;
+		PROCEDURE WriteTrack(op: SIGNED32; VAR track: InformationTrack) : INTEGER;
 		VAR
-			res: WORD; startSec, bytesRead, count, nofBlocks: SIGNED32;
+			res: INTEGER; startSec, bytesRead, count, nofBlocks: SIGNED32;
 			timestamp, lastSecs: SIGNED32;
 			buf: Buffer;
 		BEGIN
@@ -731,7 +731,7 @@ TYPE
 			RETURN ResOk;
 		END WriteTrack;
 
-		PROCEDURE SetWriteSpeed(speed: SIGNED32): WORD;
+		PROCEDURE SetWriteSpeed(speed: SIGNED32): INTEGER;
 		BEGIN
 			RETURN Lib.SetCDSpeed(dev, BestSpeed, speed*SingleSpeed, 0H);
 		END SetWriteSpeed;
@@ -744,7 +744,7 @@ TYPE
 		PROCEDURE GetDiscInfo*(disc: Disc): SIGNED32;
 		VAR
 			info: Lib.DiscInfo;
-			res: WORD; secsize,secs, nwa: SIGNED32;
+			res: INTEGER; secsize,secs, nwa: SIGNED32;
 		BEGIN
 			IF dev.TestUnitReady() # ResOk THEN
 				res := dev.RequestSense();
@@ -780,7 +780,7 @@ TYPE
 			RETURN ResOk;
 		END GetDiscInfo;
 
-		PROCEDURE GetDiscInfoEx*(disc: DiscEx): WORD;
+		PROCEDURE GetDiscInfoEx*(disc: DiscEx): INTEGER;
 		VAR
 			adr: ADDRESS;
 			res, clvLow, clvHigh: SIGNED32;
@@ -822,9 +822,9 @@ TYPE
 			RETURN ResOk;
 		END GetDiscInfoEx;
 
-		PROCEDURE GetWriteParams(VAR  params: WriteParams): WORD;
+		PROCEDURE GetWriteParams(VAR  params: WriteParams): INTEGER;
 		VAR
-			res: WORD;
+			res: INTEGER;
 			page: Lib.WriteParameterPage;
 		BEGIN
 			res := Lib.ModeSense(dev, Lib.MPCurrent, Lib.MPWriteParameters, ADDRESSOF(page), SIZEOF(Lib.WriteParameterPage));
@@ -839,10 +839,10 @@ TYPE
 			RETURN res;
 		END GetWriteParams;
 
-		PROCEDURE SetWriteParams(VAR params: WriteParams; save: BOOLEAN): WORD;
+		PROCEDURE SetWriteParams(VAR params: WriteParams; save: BOOLEAN): INTEGER;
 		VAR
 			page: Lib.WriteParameterPage;
-			tmp: WORD;
+			tmp: INTEGER;
 
 		BEGIN
 			IF Lib.ModeSense(dev, Lib.MPCurrent, Lib.MPWriteParameters, ADDRESSOF(page), SIZEOF(Lib.WriteParameterPage)) # ResOk THEN
@@ -875,10 +875,10 @@ TYPE
 			RETURN ResOk;
 		END SetWriteParams;
 
-		PROCEDURE PrintWriteParams(): WORD;
+		PROCEDURE PrintWriteParams(): INTEGER;
 		VAR
 			page: Lib.WriteParameterPage;
-			tmp: WORD;
+			tmp: INTEGER;
 		BEGIN
 			IF Lib.ModeSense(dev, Lib.MPCurrent, Lib.MPWriteParameters, ADDRESSOF(page), SIZEOF(Lib.WriteParameterPage)) # ResOk THEN
 				tmp := dev.RequestSense(); RETURN ResErr;
@@ -920,7 +920,7 @@ TYPE
 		PROCEDURE CheckIncompatibleMedium(): BOOLEAN;
 		VAR
 			msg: ATADisks.GetSenseMsg;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			dev.Handle(msg, res);
 			RETURN (msg.sense = 5) & (msg.asc = 30);
@@ -930,7 +930,7 @@ TYPE
 		PROCEDURE WaitUntilFinished*;
 		VAR
 			msg: ATADisks.GetSenseMsg;
-			res, tmp: WORD;
+			res, tmp: INTEGER;
 			timer: Kernel.Timer;
 		BEGIN
 			NEW(timer);
@@ -946,7 +946,7 @@ TYPE
 		PROCEDURE CheckNoMediumPresent*(): BOOLEAN;
 		VAR
 			msg: ATADisks.GetSenseMsg;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			dev.Handle(msg, res);
 			RETURN (msg.sense = 2) & (msg.asc = 3AH) & ((msg.ascq = 0) OR (msg.ascq = 1) OR (msg.ascq = 2));
@@ -956,7 +956,7 @@ TYPE
 		PROCEDURE IsInProgress*(): BOOLEAN;
 		VAR
 			msg: ATADisks.GetSenseMsg;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			dev.Handle(msg, res);
 			RETURN (msg.sense = 2) & (msg.asc = 4) & ((msg.ascq = 4) OR (msg.ascq = 7) OR (msg.ascq = 8));
@@ -1166,13 +1166,13 @@ TYPE
 	END BufferedReader;
 
 
-PROCEDURE IdentifyRecorders*(VAR recorders: ARRAY OF CDRecorder): WORD;
+PROCEDURE IdentifyRecorders*(VAR recorders: ARRAY OF CDRecorder): INTEGER;
 VAR
 	devTable: Plugins.Table;
 	device : ATADisks.DeviceATAPI;
 	i, cur: SIZE;
 	cap: Capabilities;
-	res : WORD;
+	res : INTEGER;
 BEGIN
 	res := ResErr;
 	FOR i := 0 TO MaxRecorders-1 DO
@@ -1196,7 +1196,7 @@ BEGIN
 	RETURN ResOk;
 END IdentifyRecorders;
 
-PROCEDURE GetCapabilities(VAR dev: ATADisks.DeviceATAPI; VAR cap: Capabilities) : WORD;
+PROCEDURE GetCapabilities(VAR dev: ATADisks.DeviceATAPI; VAR cap: Capabilities) : INTEGER;
 VAR
 	buf : POINTER TO ARRAY OF CHAR;
 	ofs, size, numSpeeds, i, curSpeed, maxSpeed, speed, tmp: SIGNED32;
@@ -1317,7 +1317,7 @@ END InsertionSort;
 PROCEDURE GetSense*(dev: ATADisks.DeviceATAPI);
 VAR
 	msg: ATADisks.GetSenseMsg;
-	res: WORD;
+	res: INTEGER;
 BEGIN
 	res := dev.RequestSense();
 	dev.Handle(msg, res);
@@ -1372,7 +1372,7 @@ END MsfToSector;
 
 PROCEDURE Test*;
 VAR
-	res: WORD;
+	res: INTEGER;
 	settings: BurnSettings;
 	compilation: Compilation;
 	recorders: ARRAY MaxRecorders OF CDRecorder;

@@ -9,7 +9,7 @@ CONST IsNative* = FALSE;
 
 CONST Running* = 0; ShuttingDown* = 1; Rebooting* = 2;
 
-VAR status* := 0: WORD;
+VAR status* := 0: INTEGER;
 VAR clock: Timer.Counter;
 VAR milliseconds: Timer.Counter;
 VAR sleepingQueue: Queues.Queue;
@@ -34,7 +34,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (CAS (status, ShuttingDown, Rebooting) = ShuttingDown);
 END Reboot;
 
-PROCEDURE {NORETURN} Exit- (status: WORD);
+PROCEDURE {NORETURN} Exit- (status: INTEGER);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Trace.String ("system: exiting to Unix"); Trace.Ln;
 	Unix.exit (status);

@@ -25,7 +25,7 @@ TYPE
 			SELF.ftp := ftp
 		END New;
 
-		PROCEDURE OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : WORD);
+		PROCEDURE OpenPut*(CONST remoteName : ARRAY OF CHAR; VAR outw : Streams.Writer; VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			IF ftp = NIL THEN RETURN END;
@@ -35,7 +35,7 @@ TYPE
 			ELSE w := outw END
 		END OpenPut;
 
-		PROCEDURE ClosePut*(VAR res : WORD);
+		PROCEDURE ClosePut*(VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			KernelLog.String("ClosePut called"); KernelLog.Ln;
@@ -199,7 +199,7 @@ TYPE
 
 		PROCEDURE Connect;
 		VAR user, pass, host, temp : ARRAY 64 OF CHAR;
-			port: SIGNED32; res: WORD;
+			port: SIGNED32; res: INTEGER;
 		BEGIN
 			IF ftp # NIL THEN
 				KernelLog.String("Already open"); KernelLog.Ln; RETURN
@@ -228,7 +228,7 @@ TYPE
 		END Connect;
 
 		PROCEDURE Disconnect;
-		VAR res : WORD;
+		VAR res : INTEGER;
 		BEGIN
 			IF ftp = NIL THEN
 				KernelLog.String("not connected"); KernelLog.Ln;
@@ -249,7 +249,7 @@ TYPE
 		END Close;
 
 		PROCEDURE CommandHandler(sender, data : ANY);
-		VAR res : WORD; command : ARRAY 256 OF CHAR;
+		VAR res : INTEGER; command : ARRAY 256 OF CHAR;
 		BEGIN
 			IF ftp = NIL THEN
 				KernelLog.String("not connected"); KernelLog.Ln;
@@ -280,7 +280,7 @@ TYPE
 		END ListHandler;
 
 		PROCEDURE ChangeDir(path :Strings.String);
-		VAR res : WORD; dir : ARRAY 256 OF CHAR;
+		VAR res : INTEGER; dir : ARRAY 256 OF CHAR;
 		BEGIN
 			IF ftp = NIL THEN
 				KernelLog.String("not connected"); KernelLog.Ln;
@@ -448,7 +448,7 @@ TYPE
 
 		PROCEDURE DeleteEntries(sender, data : ANY);
 		VAR  d : FTPClient.FTPEntry;
-			dr : SIGNED32; i : SIZE; res : WORD;
+			dr : SIGNED32; i : SIZE; res : INTEGER;
 			dp : ARRAY 128 OF CHAR;
 			delete, always, never : BOOLEAN;
 		BEGIN
@@ -490,7 +490,7 @@ TYPE
 
 		PROCEDURE RenameEntry(sender, data : ANY);
 		VAR  d : FTPClient.FTPEntry; rename : WMDialogs.MiniStringInput;
-			res : WORD;
+			res : INTEGER;
 			name, op : ARRAY 128 OF CHAR;
 		BEGIN
 			IF popup # NIL THEN popup.Close; popup := NIL END;
@@ -519,7 +519,7 @@ TYPE
 		END RenameEntry;
 
 		PROCEDURE CreateDir(sender, data : ANY);
-		VAR res : WORD;
+		VAR res : INTEGER;
 			name : ARRAY 128 OF CHAR;
 		BEGIN
 			COPY("NewFolder", name);
@@ -661,7 +661,7 @@ TYPE
 		VAR di : WMWindowManager.DragInfo;
 			dt : WMDropTarget.DropTarget;
 			itf : WMDropTarget.DropInterface;
-			i : SIZE; res : WORD;
+			i : SIZE; res : INTEGER;
 			sel : FTPClient.FTPListing;
 			url : ARRAY 1024 OF CHAR;
 			text : Texts.Text;
@@ -735,7 +735,7 @@ TYPE
 			RETURN selection
 		END GetSelection;
 
-		PROCEDURE CopyFile(target : WMDropTarget.DropFiles; CONST local, remote : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE CopyFile(target : WMDropTarget.DropFiles; CONST local, remote : ARRAY OF CHAR; VAR res : INTEGER);
 		VAR w : Streams.Writer;
 			r : Streams.Reader;
 			buf: ARRAY BufSize OF CHAR; len : SIZE;

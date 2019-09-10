@@ -364,7 +364,7 @@ END GetWriter;
 
 (* UNSAFE *)
 (** Send the specified characters to the trace output (cf. Streams.Sender). *)
-PROCEDURE Send*(CONST buf : ARRAY OF CHAR; ofs, len : SIZE; propagate : BOOLEAN; VAR res : WORD);
+PROCEDURE Send*(CONST buf : ARRAY OF CHAR; ofs, len : SIZE; propagate : BOOLEAN; VAR res : INTEGER);
 VAR i : SIZE; str : POINTER TO ARRAY OF CHAR;
 BEGIN
 	NEW(str, len + 1);

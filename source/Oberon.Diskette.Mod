@@ -95,7 +95,7 @@ BEGIN
 END OpenDiskette;
 
 PROCEDURE CloseDiskette;
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	ASSERT(open);
 	EXCL(device.table[0].flags, Disks.Mounted);

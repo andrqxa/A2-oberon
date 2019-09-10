@@ -40,7 +40,7 @@ TYPE
 			remain := firstChunk;
 		END Init;
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR i: SIZE; crc, tag: SIGNED32; ch: CHAR;
 		BEGIN
 			IF ~eof THEN
@@ -493,7 +493,7 @@ TYPE
 			RETURN result
 		END GetLongint;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR ch : ChunkHeader;
 			i : SIGNED32;
 			isPNG : BOOLEAN;

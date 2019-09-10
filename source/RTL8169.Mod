@@ -114,7 +114,7 @@ TYPE
 
 		PROCEDURE &Init*(dev: LinkDevice; base: ADDRESS; irq: SIGNED32);
 		VAR
-			res: WORD; i: SIGNED32;
+			res: INTEGER; i: SIGNED32;
 			s: SET;
 		BEGIN
 			(* update list of installed controllers, insert at head *)
@@ -398,7 +398,7 @@ TYPE
 		PROCEDURE ReadMACAddress;
 		VAR
 			i: SIGNED16;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			(* MAC address is in registers 00H - 05H *)
 			IF DebugMAC IN Debug THEN
@@ -934,7 +934,7 @@ TYPE
 		PROCEDURE DebugConfig;
 		VAR
 			s: SET;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			KernelLog.String("*** BEGIN OF NIC CONFIGURATION ***"); KernelLog.Ln;
 
@@ -1064,7 +1064,7 @@ TYPE
 
 (* Scan the PCI bus for the specified card. *)
 PROCEDURE ScanPCI(vendor, device: SIGNED32);
-VAR index, bus, dev, fct, irq, i: SIGNED32; res: WORD; base: ADDRESS; d: LinkDevice; c: Controller; name: Plugins.Name;
+VAR index, bus, dev, fct, irq, i: SIGNED32; res: INTEGER; base: ADDRESS; d: LinkDevice; c: Controller; name: Plugins.Name;
 BEGIN
 	index := 0;
 	WHILE (PCI.FindPCIDevice(device, vendor, index, bus, dev, fct) = PCI.Done) & (installed < 16) DO

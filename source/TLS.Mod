@@ -650,7 +650,7 @@ TYPE
 
 		(** open a TLS connection (only use once per Connection instance). Use IP.NilPort for lport to automatically assign
 		an unused local port. Use IP.NilAdr for fip to open a passive connection. *)
-		PROCEDURE Open*(  lport: SIGNED32; fip: IP.Adr; fport: SIGNED32; VAR res: WORD );
+		PROCEDURE Open*(  lport: SIGNED32; fip: IP.Adr; fport: SIGNED32; VAR res: INTEGER );
 		BEGIN
 			(*ASSERT( IP.IsNilAdr(fip) );	(* only server-side is implemented *)*)
 			(*ASSERT( context # NIL );*)	(* context must be set before calling Open *)
@@ -692,7 +692,7 @@ TYPE
 		END SetConnection;
 
 		(** Call this method only on a passive (listenig server-side) TLS.Connection. Non blocking *)
-		PROCEDURE Accept*( VAR client: TCP.Connection; VAR res: WORD );
+		PROCEDURE Accept*( VAR client: TCP.Connection; VAR res: INTEGER );
 			VAR
 				newTLSConn: Connection;
 				newTCPConn: TCP.Connection;
@@ -732,7 +732,7 @@ TYPE
 		END Close;
 
 		(** Send secured data *)
-		PROCEDURE Send*( CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD );
+		PROCEDURE Send*( CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER );
 			VAR i, size: SIZE;
 		BEGIN {EXCLUSIVE}
 			AWAIT((state = TCP.Established) OR (state = TCP.Closed));
@@ -754,7 +754,7 @@ TYPE
 		END Send;
 
 		(** Receive secured data *)
-		PROCEDURE Receive*( VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive*( VAR data: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		BEGIN
 			applicationDataPipe.Receive(data, ofs, size, min, len ,res);
 		END Receive;
@@ -851,7 +851,7 @@ TYPE
 			END
 		END InitializeConnectionState;
 
-		PROCEDURE PrepareConnectionState( state: ConnectionState; cipherSuite: SIGNED32 ; VAR res : WORD);
+		PROCEDURE PrepareConnectionState( state: ConnectionState; cipherSuite: SIGNED32 ; VAR res : INTEGER);
 		BEGIN
 			ASSERT( cipherSuite # 0 );
 			res := Ok;
@@ -885,7 +885,7 @@ TYPE
 			END;
 		END PrepareConnectionState;
 
-		PROCEDURE PrepareSecurityParameters( sp: SecurityParameters; cipherSuite: SIGNED32 ; VAR res : WORD);
+		PROCEDURE PrepareSecurityParameters( sp: SecurityParameters; cipherSuite: SIGNED32 ; VAR res : INTEGER);
 		BEGIN
 			ASSERT( cipherSuite # 0 );
 			res := Ok;
@@ -1197,7 +1197,7 @@ TYPE
 
 		PROCEDURE ReceiveClientHello( VAR data: ARRAY OF CHAR; ofs, len: SIZE ): SIGNED32;
 			VAR
-				nofSuites, i, idLen, cipherSuite, major, minor: SIGNED32; idPos, pos: SIZE; res: WORD;
+				nofSuites, i, idLen, cipherSuite, major, minor: SIGNED32; idPos, pos: SIZE; res: INTEGER;
 		BEGIN
 			IF Trace THEN PrintDirection(FALSE); KernelLog.String("ClientHello");KernelLog.Ln END;
 			pos := ofs;
@@ -1326,7 +1326,7 @@ TYPE
 		END SendClientHello;
 
 		PROCEDURE ReceiveV2ClientHello( VAR data: ARRAY OF CHAR; ofs, len: SIZE ): SIGNED32;
-			VAR nofSuites, idLen, challengeLen, i, cipherSuite: SIGNED32; res: WORD;
+			VAR nofSuites, idLen, challengeLen, i, cipherSuite: SIGNED32; res: INTEGER;
 		BEGIN
 			IF Trace THEN PrintDirection(FALSE); KernelLog.String("SSLv2.0 ClientHello");KernelLog.Ln END;
 			nofSuites := ( 256 * ORD(data[ofs+3]) + ORD(data[ofs+4]) ) DIV 3;
@@ -1382,7 +1382,7 @@ TYPE
 
 		PROCEDURE ReceiveServerHello(VAR data: ARRAY OF CHAR; ofs, len: SIZE): SIGNED32;
 		VAR
-			major, minor, i, idLen, cipherSuite: SIGNED32; idPos, pos: SIZE; res: WORD;
+			major, minor, i, idLen, cipherSuite: SIGNED32; idPos, pos: SIZE; res: INTEGER;
 		BEGIN
 			IF Trace THEN PrintDirection(FALSE); KernelLog.String("ServerHello");KernelLog.Ln END;
 			pos := ofs;
@@ -1708,7 +1708,7 @@ TYPE
 
 		PROCEDURE Transition( VAR data: ARRAY OF CHAR; action, subAction: SIGNED32; ofs, len: SIZE );
 			VAR dummy: ARRAY 1 OF CHAR;
-				res : WORD;
+				res : INTEGER;
 		BEGIN
 			IF action = ChangeCipherSpec THEN
 				CASE handshakeState OF

@@ -16,7 +16,7 @@ TYPE
 	VAR
 		caption : String;
 		color, textColor : WMGraphics.Color;
-		align: WORD;
+		align: INTEGER;
 		img : WMGraphics.Image;
 		data : ANY;
 		flags : SET;
@@ -271,7 +271,7 @@ TYPE
 			END
 		END GetCellImage;
 
-		PROCEDURE SetTextAlign*(col, row : SIZE; align : WORD);
+		PROCEDURE SetTextAlign*(col, row : SIZE; align : INTEGER);
 		BEGIN
 			ASSERT(Objects.ActiveObject() = lockedBy, 3000);
 			IF (col >= 0) & (row >= 0) & (col < nofCols) & (row < nofRows) THEN
@@ -283,7 +283,7 @@ TYPE
 			END
 		END SetTextAlign;
 
-		PROCEDURE GetTextAlign*(col, row : SIZE) : WORD;
+		PROCEDURE GetTextAlign*(col, row : SIZE) : INTEGER;
 		BEGIN
 			ASSERT(Objects.ActiveObject() = lockedBy, 3000);
 			IF (col >= 0) & (row >= 0) & (col < nofCols) & (row < nofRows) THEN

@@ -83,7 +83,7 @@ TYPE
 			KernelLog.String("USB Blueetooth dongle "); KernelLog.String(name); KernelLog.String(" disconnected."); KernelLog.Ln;
 		END Disconnect;
 
-		PROCEDURE SendACL*(VAR buf: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res : WORD);
+		PROCEDURE SendACL*(VAR buf: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res : INTEGER);
 		VAR
 			buffer : Usbdi.BufferPtr;
 			status : Usbdi.Status;
@@ -103,7 +103,7 @@ TYPE
 			END;
 		END ReadACL;
 
-		PROCEDURE SendCommand*(buf: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: WORD);
+		PROCEDURE SendCommand*(buf: ARRAY OF CHAR; ofs, len: SIGNED32; VAR res: INTEGER);
 		VAR
 			buffer : Usbdi.BufferPtr;
 			status : Usbdi.Status;

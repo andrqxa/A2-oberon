@@ -25,8 +25,8 @@ CONST
 	StailaStyle = 1;
 
 TYPE
-	TYPE Style = WORD;
-	TYPE Indent = WORD;
+	TYPE Style = INTEGER;
+	TYPE Indent = INTEGER;
 	Identifier = ARRAY Scanner.MaxIdentifierLength OF CHAR;
 
 	TYPE Transpiler* = OBJECT (SyntaxTree.Visitor)

@@ -175,7 +175,7 @@ TYPE
 			editEndPosition := cursorPosition;
 		END SetEditStart;
 
-		PROCEDURE Send( CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send( CONST data: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR i : SIZE;
 		BEGIN
 			lock.Acquire;
@@ -536,7 +536,7 @@ TYPE
 			commandLine : Strings.String;
 			nbr : ARRAY 8 OF CHAR;
 			msg, command : ARRAY 128 OF CHAR;
-			i, length : SIZE; res : WORD;
+			i, length : SIZE; res : INTEGER;
 		BEGIN
 			commandLine := textBuffer.GetCurrentLine();
 			Strings.TrimWS(commandLine^);

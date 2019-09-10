@@ -121,7 +121,7 @@ MODULE ZipDocs IN Oberon; (** portable *)	(* ejz  *)
 		name: ARRAY 256 OF CHAR;
 		arc: Zip.Archive;
 		ent: Zip.Entry;
-		res: WORD;
+		res: INTEGER;
 		n, m: SIGNED32;	(* number of extracted files *)
 	BEGIN
 		GetArcName(name);
@@ -321,7 +321,7 @@ MODULE ZipDocs IN Oberon; (** portable *)	(* ejz  *)
 	END DocHandler;
 
 	PROCEDURE LoadDoc(D: Documents.Document);
-		VAR res: WORD;
+		VAR res: INTEGER;
 	BEGIN
 		ZipTool.WriteDirectory(W, D.name, TRUE, TRUE, res);
 		Texts.Append(D.dsc(TextGadgets.Frame).text, W.buf)

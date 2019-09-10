@@ -270,7 +270,7 @@ TYPE
 
 		(* sets the loaded skin as default skin in Configuration *)
 		PROCEDURE SetHandler(sender, data : ANY);
-		VAR val : ARRAY 128 OF CHAR; res : WORD;
+		VAR val : ARRAY 128 OF CHAR; res : INTEGER;
 		BEGIN
 			IF SkinEngine.current # NIL THEN
 				IF SkinEngine.current.xml # NIL THEN
@@ -299,7 +299,7 @@ TYPE
 
 		(* open an editor-window with showing a document *)
 		PROCEDURE ShowDocument(CONST docname : ARRAY OF CHAR);
-		VAR res : WORD;
+		VAR res : INTEGER;
 			msg : ARRAY 32 OF CHAR;
 			cmd : ARRAY 128 OF CHAR;
 		BEGIN
@@ -356,7 +356,7 @@ TYPE
 
 		PROCEDURE Load(filename : ARRAY OF CHAR);
 		VAR text : Texts.Text;
-			res : WORD;
+			res : INTEGER;
 			decoder : Codecs.TextDecoder;
 			in : Streams.Reader;
 			hi  : HistoryItem;
@@ -421,7 +421,7 @@ TYPE
 		END StoreHandler;
 
 		PROCEDURE Store(CONST filename : ARRAY OF CHAR);
-		VAR text : Texts.Text; res : WORD;
+		VAR text : Texts.Text; res : INTEGER;
 			w : Streams.Writer;
 			encoder : Codecs.TextEncoder;
 			newSkinFile : Archives.Archive;

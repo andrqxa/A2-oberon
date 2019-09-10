@@ -221,7 +221,7 @@ TYPE
 	VAR
 		shell : ShellComponent;
 
-		PROCEDURE HandleUpcall(command : WORD);
+		PROCEDURE HandleUpcall(command : INTEGER);
 		BEGIN
 			IF command = Shell.Clear THEN
 				shell.Clear;

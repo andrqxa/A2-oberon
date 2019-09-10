@@ -32,7 +32,7 @@ TYPE
 		out: Streams.Writer;
 		h: WaveHeader;
 
-		PROCEDURE Open*(out: Streams.Writer; sRate, sRes, nofCh: SIGNED32; VAR res : WORD);
+		PROCEDURE Open*(out: Streams.Writer; sRate, sRes, nofCh: SIGNED32; VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			IF out = NIL THEN
@@ -84,7 +84,7 @@ TYPE
 			res := 0
 		END Open;
 
-		PROCEDURE Write*(buffer : SoundDevices.Buffer; VAR res : WORD);
+		PROCEDURE Write*(buffer : SoundDevices.Buffer; VAR res : INTEGER);
 		BEGIN
 			out.Bytes(buffer.data^, 0, buffer.len);
 			out.Update
@@ -98,7 +98,7 @@ TYPE
 		h: WaveHeader;
 		hasMoreBytes : BOOLEAN;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR len: SIGNED32; inLen: SIZE; c: CHAR;
 		BEGIN
 			res := -1; inLen := 0;
@@ -226,7 +226,7 @@ TYPE
 			h.dataSize := length-SIZEOF(WaveHeader);
 		END SetStreamLength;
 
-		PROCEDURE SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		VAR seekType: SIGNED32;
 		BEGIN
 			seekType := Codecs.SeekByte;
@@ -234,7 +234,7 @@ TYPE
 			in.SetPos(h.fileSize - h.dataSize + ENTIER(sample / h.sRate * h.bRate))
 		END SeekSample;
 
-		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		BEGIN
 			SeekSample(ENTIER(millisecond / 1000 * h.sRate), goKeySample, res)
 		END SeekMillisecond;
@@ -260,7 +260,7 @@ TYPE
 		h : WaveHeader;
 		hasMoreBytes : BOOLEAN;
 
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		BEGIN
 			res := -1;
 			IF in = NIL THEN
@@ -326,7 +326,7 @@ TYPE
 			h.dataSize := length
 		END SetStreamLength;
 
-		PROCEDURE SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		VAR seekType: SIGNED32;
 		BEGIN
 			KernelLog.String("pu= "); KernelLog.Int(sample, 0);
@@ -336,7 +336,7 @@ TYPE
 			in.SetPos(ENTIER(sample * h.bitsPerSample / 8 * h.nofCh))
 		END SeekSample;
 
-		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		BEGIN
 			SeekSample(ENTIER(millisecond / 1000 * h.sRate), goKeySample, res)
 		END SeekMillisecond;

@@ -83,7 +83,7 @@ TYPE
 
 		(* ReceiveAck - receives a server answer *)
 		PROCEDURE ReceiveAck(socket: UDP.Socket; VAR fip: IP.Adr; VAR fport: SIGNED32; blockNr: SIGNED32; VAR ack: ARRAY OF CHAR): BOOLEAN;
-		VAR ip: IP.Adr; port, ofs, wait: SIGNED32; len: SIZE; res: WORD; acked: BOOLEAN; msg: ARRAY 256 OF CHAR;
+		VAR ip: IP.Adr; port, ofs, wait: SIGNED32; len: SIZE; res: INTEGER; acked: BOOLEAN; msg: ARRAY 256 OF CHAR;
 		BEGIN
 			wait := 0;
 			REPEAT
@@ -115,7 +115,7 @@ TYPE
 		END ReceiveAck;
 
 		(* SendAck - sends an ack packet *)
-		PROCEDURE SendAck(socket: UDP.Socket; fip: IP.Adr; fport: SIGNED32; blockNr: SIGNED32; VAR res: WORD);
+		PROCEDURE SendAck(socket: UDP.Socket; fip: IP.Adr; fport: SIGNED32; blockNr: SIGNED32; VAR res: INTEGER);
 		VAR ackHdr: ARRAY 4 OF CHAR; retries: SIGNED32;
 		BEGIN
 			Put2(ackHdr, 0, ACK); Put2(ackHdr, 2, blockNr);
@@ -126,7 +126,7 @@ TYPE
 		END SendAck;
 
 		(* SendError - sends an error packet *)
-		PROCEDURE SendError(socket: UDP.Socket; fip: IP.Adr; fport: SIGNED32; errNo: SIGNED16; s: ErrorMsg; VAR res: WORD);
+		PROCEDURE SendError(socket: UDP.Socket; fip: IP.Adr; fport: SIGNED32; errNo: SIGNED16; s: ErrorMsg; VAR res: INTEGER);
 		VAR errHdr: ARRAY BlockSize+4 OF CHAR; p, retries: SIGNED32;
 		BEGIN
 			Put2(errHdr, 0, ERROR); Put2(errHdr, 2, errNo);
@@ -141,7 +141,7 @@ TYPE
 
 		(* GetSocket - finds & initializes a free UDP socket *)
 		PROCEDURE GetSocket*(VAR socket: UDP.Socket): BOOLEAN;
-		VAR retries, lport: SIGNED32; res: WORD;
+		VAR retries, lport: SIGNED32; res: INTEGER;
 		BEGIN
 			REPEAT
 				INC(retries); lport := 1024 + generator.Integer() MOD 64512;
@@ -154,7 +154,7 @@ TYPE
 		(* Send - send a file to TFTP server at fip:fport *)
 		PROCEDURE Send*(localFN, remoteFN: ARRAY OF CHAR; fip: IP.Adr; fport: SIGNED32): BOOLEAN;
 		VAR buf, ack: ARRAY 4+BlockSize OF CHAR; socket: UDP.Socket; msg: ARRAY 256 OF CHAR;
-			file: Files.File; r: Files.Rider; ofs, retries, blockNr, errNo: SIGNED32; res: WORD; acked: BOOLEAN;
+			file: Files.File; r: Files.Rider; ofs, retries, blockNr, errNo: SIGNED32; res: INTEGER; acked: BOOLEAN;
 		BEGIN
 			acked := FALSE;
 			file := Files.Old(localFN);
@@ -232,7 +232,7 @@ TYPE
 
 		(* Receive - receive a file from TFTP server at source:port *)
 		PROCEDURE Receive*(remoteFN, localFN: ARRAY OF CHAR; fip: IP.Adr; fport: SIGNED32): BOOLEAN;
-		VAR socket: UDP.Socket; ofs, blockNr, port, retries, waitPacket: SIGNED32; len: SIZE; res: WORD; ok, Abort: BOOLEAN; ip: IP.Adr;
+		VAR socket: UDP.Socket; ofs, blockNr, port, retries, waitPacket: SIGNED32; len: SIZE; res: INTEGER; ok, Abort: BOOLEAN; ip: IP.Adr;
 			buf: ARRAY 4+BlockSize OF CHAR; file: Files.File; r: Files.Rider;
 		BEGIN
 			ok := FALSE;

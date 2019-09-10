@@ -62,7 +62,7 @@ END MergeWithTemplate;
 PROCEDURE Replace*(context : Commands.Context);
 VAR srcdir, dstdir, src, dst, name, template, tdate : ARRAY 128 OF CHAR;
 	templateT, srcT, dstT, dateT : Text;
-	res : WORD;
+	res : INTEGER;
 BEGIN
 	context.arg.Token(template); context.arg.SkipWhitespace; context.arg.Token(srcdir); context.arg.SkipWhitespace;
 	context.arg.Token(dstdir); context.arg.SkipWhitespace;

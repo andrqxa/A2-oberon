@@ -53,7 +53,7 @@ TYPE
 		reader*: Streams.Reader;
 	END;
 
-	ErrorCode* = WORD;
+	ErrorCode* = INTEGER;
 
 	Fingerprint* = ObjectFile.Fingerprint;
 

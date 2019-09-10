@@ -904,7 +904,7 @@ MODULE WMVT100; (* ejz,  ph *)
 	PROCEDURE Open*(CONST name: ARRAY OF CHAR; port:SIGNED32; type:SIGNED32; error:Streams.Writer):Window;
 	VAR
 		inst: Window;
-		title: Strings.String; adr: IP.Adr; res: WORD;
+		title: Strings.String; adr: IP.Adr; res: INTEGER;
 		C: TCP.Connection; TC: Connection;
 	BEGIN
 		IF port = 0 THEN port := 23 END;

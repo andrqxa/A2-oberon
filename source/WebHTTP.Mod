@@ -143,7 +143,7 @@ TYPE
 			END
 		END Init;
 
-		PROCEDURE Sender(CONST inBuf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Sender(CONST inBuf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR i: SIZE;
 		BEGIN
 			ASSERT(chunked);
@@ -201,7 +201,7 @@ TYPE
 			eof := FALSE; first := TRUE;
 		END Init;
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR i: SIZE; token: ARRAY 16 OF CHAR; ch: CHAR;
 		BEGIN
 			IF ~eof THEN
@@ -248,7 +248,7 @@ TYPE
 			Streams.OpenWriter(inW, Sender);
 		END Init;
 
-		PROCEDURE Sender(CONST outBuf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Sender(CONST outBuf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR i: SIZE;
 		BEGIN
 			i := ofs;
@@ -297,7 +297,7 @@ TYPE
 			Streams.OpenReader(outR, Receiver);
 		END Init;
 
-		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receiver(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR l: SIZE;
 		BEGIN
 			IF remain > 0 THEN
@@ -499,7 +499,7 @@ BEGIN
 	END;
 END GetMethodName;
 
-PROCEDURE ParseRequest*(VAR in: Streams.Reader; VAR header: RequestHeader; VAR res: WORD; log : TFLog.Log);
+PROCEDURE ParseRequest*(VAR in: Streams.Reader; VAR header: RequestHeader; VAR res: INTEGER; log : TFLog.Log);
 VAR s: ARRAY 32 OF CHAR; af: AdditionalField; ch :CHAR; wellformed: BOOLEAN;
 BEGIN
 	header.host[0] := 0X;
@@ -526,7 +526,7 @@ BEGIN
 	END
 END ParseRequest;
 
-PROCEDURE ParseRequestHeaderFields*(VAR in: Streams.Reader; VAR header: RequestHeader; VAR res: WORD);
+PROCEDURE ParseRequestHeaderFields*(VAR in: Streams.Reader; VAR header: RequestHeader; VAR res: INTEGER);
 VAR s: ARRAY 32 OF CHAR; af: AdditionalField; ch :CHAR; i:SIGNED32;
 BEGIN
 	i:=0;
@@ -549,7 +549,7 @@ BEGIN
 	res := OK
 END ParseRequestHeaderFields;
 
-PROCEDURE ParseReply*(VAR in: Streams.Reader; VAR header: ResponseHeader; VAR res: WORD; log : TFLog.Log);
+PROCEDURE ParseReply*(VAR in: Streams.Reader; VAR header: ResponseHeader; VAR res: INTEGER; log : TFLog.Log);
 VAR s, sLow: ARRAY 32 OF CHAR; af: AdditionalField;
 	i :SIGNED32; ch :CHAR; wellformed: BOOLEAN;
 BEGIN
@@ -588,7 +588,7 @@ BEGIN
 	END;
 END ParseReply;
 
-PROCEDURE ModifyReply*(VAR in: Streams.Reader; VAR header: ResponseHeader; VAR res: WORD; log : TFLog.Log);
+PROCEDURE ModifyReply*(VAR in: Streams.Reader; VAR header: ResponseHeader; VAR res: INTEGER; log : TFLog.Log);
 VAR s, sLow: ARRAY 32 OF CHAR; af: AdditionalField;
 	i :SIGNED32; ch :CHAR;
 BEGIN

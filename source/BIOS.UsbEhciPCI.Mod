@@ -19,7 +19,7 @@ TYPE
 	EnhancedHostController = OBJECT (UsbEhci.EnhancedHostController)
 		(* Release the HC ownership semaphore; eecp is the EHCI Extended Capability Pointer *)
 		PROCEDURE ReleaseHcOwnerShip(bus, device, function, eecp : SIGNED32);
-		VAR register : SIGNED32; res : WORD; usblegsup : SET;
+		VAR register : SIGNED32; res : INTEGER; usblegsup : SET;
 		BEGIN
 			(* 00H: No capability list; > 40H to maintain consistency with PCI header *)
 			IF (eecp > 40H) THEN
@@ -60,7 +60,7 @@ TYPE
 	VAR
 		timer : Kernel.Timer;
 		usblegsup : SET;
-		eecp, reg, waits : SIGNED32; res: WORD;
+		eecp, reg, waits : SIGNED32; res: INTEGER;
 		hcOwnedByOS : BOOLEAN;
 	BEGIN
 		(* Get the HC Capabilities Parameters register *)
@@ -139,7 +139,7 @@ TYPE
 		iobaseVirt: ADDRESS;
 		pciCmdStsReg, sbrn  : SIGNED32;
 		index : SIGNED32;
-		res: WORD;
+		res: INTEGER;
 	BEGIN
 		IF Debug.Trace & Debug.traceInit THEN KernelLog.String("UsbEhci: Looking for PCI Enhanced USB Host Controllers..."); KernelLog.Ln; END;
 		(* Traverse all USB EHCI Host Controllers of all PCI busses in the system *)

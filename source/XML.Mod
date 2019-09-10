@@ -1728,7 +1728,7 @@ VAR
 
 (**	Write an 0X-terminated UTF8 string to a stream (excl. 0X). XML special characters are escaped.
 	Also works for ASCII strings. *)
-PROCEDURE UTF8ToStream*(CONST string : ARRAY OF CHAR; w : Streams.Writer; VAR res : WORD);
+PROCEDURE UTF8ToStream*(CONST string : ARRAY OF CHAR; w : Streams.Writer; VAR res : INTEGER);
 VAR codeLength, stringLength, i : SIZE; ch : CHAR;
 BEGIN
 	ASSERT(w # NIL);
@@ -1763,7 +1763,7 @@ END UTF8ToStream;
 (**	Read an UTF8 string from a stream and undo escaping of XML special characters. If the string array is to small, the string
 	will be truncated and an error will be reported. <string> is always a valid 0X-terminated string.
 	Also works for ASCII strings. *)
-PROCEDURE UTF8FromStream*(VAR string : ARRAY OF CHAR; r : Streams.Reader; VAR res : WORD);
+PROCEDURE UTF8FromStream*(VAR string : ARRAY OF CHAR; r : Streams.Reader; VAR res : INTEGER);
 VAR ch : CHAR;  escapeBuffer : ARRAY 8 OF CHAR; escaping : BOOLEAN; escapeIdx, codeLength, stringLength, i, len, actLen : SIZE;
 
 	PROCEDURE FlushEscapeBuffer;

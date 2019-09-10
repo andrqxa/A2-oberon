@@ -206,7 +206,7 @@ TYPE
 		firstComment-,lastComment-: Comment; comments-: SIGNED32;
 		getPC: GetPCProcedure;
 
-		PROCEDURE AppendToLine*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN;  VAR res: WORD );
+		PROCEDURE AppendToLine*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN;  VAR res: INTEGER );
 		VAR pos: SIZE;
 		BEGIN
 			IF len = 0 THEN RETURN END;

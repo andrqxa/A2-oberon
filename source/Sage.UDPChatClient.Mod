@@ -45,7 +45,7 @@ TYPE
 		password, passwordConfirm: ARRAY 33 OF CHAR;
 		shortName, fullName, eMail: ARRAY 65 OF CHAR;
 
-		uin: SIGNED32; res: WORD;
+		uin: SIGNED32; res: INTEGER;
 		dt: Dates.DateTime;
 
 		keepAliveTimer: Kernel.MilliTimer;
@@ -98,7 +98,7 @@ TYPE
 	PROCEDURE Client_ACK (seqNum: SIGNED16; uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
-		res: WORD;
+		res: INTEGER;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.ACK, seqNum, uin, sendBuf);
@@ -110,7 +110,7 @@ TYPE
 		VAR seqNum: SIGNED16; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
-		len: SIZE; res: WORD;
+		len: SIZE; res: INTEGER;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.NEW_USER_REG, seqNum, 0, sendBuf);
@@ -145,7 +145,7 @@ TYPE
 		VAR seqNum: SIGNED16; uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
-		len: SIZE; res: WORD;
+		len: SIZE; res: INTEGER;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.LOGIN, seqNum, uin, sendBuf);
@@ -168,7 +168,7 @@ TYPE
 		uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
-		res: WORD;
+		res: INTEGER;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.INFO_REQ, seqNum, uin, sendBuf);
@@ -191,7 +191,7 @@ TYPE
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		string: String;
-		len: SIZE; res: WORD;
+		len: SIZE; res: INTEGER;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.SEND_MESSAGE, seqNum, uin, sendBuf);
 
@@ -222,7 +222,7 @@ TYPE
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
 		string: String;
-		len: SIZE; res: WORD;
+		len: SIZE; res: INTEGER;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.SEND_TEXT_CODE, seqNum, uin, sendBuf);
 
@@ -243,7 +243,7 @@ TYPE
 	PROCEDURE Client_KeepAlive (VAR seqNum: SIGNED16; uin: SIGNED32; sendBuf: Base.Buffer;
 		s: UDP.Socket; ip: IP.Adr);
 	VAR
-		res: WORD;
+		res: INTEGER;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ClientPacketInit (Base.KEEP_ALIVE, seqNum, uin, sendBuf);

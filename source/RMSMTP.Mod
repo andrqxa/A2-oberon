@@ -42,7 +42,7 @@ PROCEDURE SendMessage*(message: IMAPClient.Message; CONST server, thisHost: ARRA
 VAR
 	smtp: SMTPClient.SMTPSession;
 	i: SIGNED32;
-	res: WORD;
+	res: INTEGER;
 	returnValue: SIGNED32;
 	w: Streams.Writer;
 	p: ANY;

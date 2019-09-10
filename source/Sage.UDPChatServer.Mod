@@ -31,7 +31,7 @@ TYPE
 		ip: IP.Adr;
 		branch, command, seqNum, messageType: SIGNED16;
 		uin, receiverUin, port, receiveBufOffset: SIGNED32;
-		len: SIZE; res: WORD;
+		len: SIZE; res: INTEGER;
 		user: Base.User;
 		users: Base.Users;
 		clients: Base.List;
@@ -111,7 +111,7 @@ TYPE
 	PROCEDURE Server_NewUserReply (ip: IP.Adr; port: SIGNED32; uin: SIGNED32;
 		seqNum: SIGNED16; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
-		res: WORD;
+		res: INTEGER;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ServerPacketInit (Base.NEW_USER_REPLY, seqNum, sendBuf);
@@ -125,7 +125,7 @@ TYPE
 	PROCEDURE Server_LoginReply (client: Base.Client;
 		sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
-		res: WORD;
+		res: INTEGER;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ServerPacketInit (Base.LOGIN_REPLY, client.inSeqNum, sendBuf);
@@ -140,7 +140,7 @@ TYPE
 		user: Base.User; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		string: String;
-		res: WORD; len: SIGNED32;
+		res: INTEGER; len: SIGNED32;
 	BEGIN {EXCLUSIVE}
 		Base.ServerPacketInit (Base.INFO_REPLY, client.inSeqNum, sendBuf);
 
@@ -157,7 +157,7 @@ TYPE
 	PROCEDURE Server_ACK (client: Base.Client;
 		sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
-		res: WORD;
+		res: INTEGER;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ServerPacketInit (Base.ACK, client.inSeqNum, sendBuf);
@@ -169,7 +169,7 @@ TYPE
 	PROCEDURE Server_UserStatus (client, receiver: Base.Client;
 		status: SIGNED16; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
-		res: WORD;
+		res: INTEGER;
 		string: String;
 	BEGIN {EXCLUSIVE}
 		Base.ServerPacketInit (status, receiver.outSeqNum, sendBuf);
@@ -190,7 +190,7 @@ TYPE
 		messageType: SIGNED16; message: String; sendBuf: Base.Buffer; s: UDP.Socket);
 	VAR
 		string: String;
-		res: WORD; len: SIZE;
+		res: INTEGER; len: SIZE;
 	BEGIN {EXCLUSIVE}
 		Base.ServerPacketInit (Base.RECEIVE_MESSAGE, receiver.outSeqNum, sendBuf);
 
@@ -525,7 +525,7 @@ END Log;
 PROCEDURE Start* ;
 VAR
 	s: UDP.Socket;
-	res: WORD;
+	res: INTEGER;
 	str: ARRAY 256 OF CHAR;
 BEGIN
 	IF instance = NIL THEN

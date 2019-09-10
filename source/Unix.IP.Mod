@@ -136,7 +136,7 @@ VAR
 		hexToChar: ARRAY 3 OF CHAR;
 		leftParts: SIGNED32;   (* number of bytes before :: *)
 		rightParts: SIGNED32;   (* number of bytes after :: *)
-		val: SIGNED32; res: WORD;
+		val: SIGNED32; res: INTEGER;
 		state: SIGNED32;   (* state of the FSM look at the eof for more info *)
 		dPointOcc: BOOLEAN;   (* double point occured *)
 		prefixVal: SIGNED32;

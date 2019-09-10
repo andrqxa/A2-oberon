@@ -117,7 +117,7 @@ TYPE
 			SELF.input := input; SELF.max := size; SELF.archive := archive
 		END Init;
 
-		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		BEGIN
 			IF max = 0 THEN
 				res := -1;
@@ -136,7 +136,7 @@ TYPE
 	(* for internal use only. abstract buffer class *)
 	Buffer = OBJECT
 
-		PROCEDURE Send(CONST data : ARRAY OF CHAR; ofs, len : SIZE; propagate : BOOLEAN; VAR res : WORD);
+		PROCEDURE Send(CONST data : ARRAY OF CHAR; ofs, len : SIZE; propagate : BOOLEAN; VAR res : INTEGER);
 		BEGIN HALT(301)
 		END Send;
 
@@ -170,7 +170,7 @@ TYPE
 		END Init;
 
 		(* buffer any data until propagate is TRUE *)
-		PROCEDURE Send(CONST data : ARRAY OF CHAR; ofs, len : SIZE; propagate : BOOLEAN; VAR res : WORD);
+		PROCEDURE Send(CONST data : ARRAY OF CHAR; ofs, len : SIZE; propagate : BOOLEAN; VAR res : INTEGER);
 		VAR i : SIZE;
 		BEGIN
 			IF closed THEN res := StreamClosed; RETURN END;
@@ -573,7 +573,7 @@ TYPE
 	END CopyArchiveName;
 
 	PROCEDURE Backup(f: Files.File);
-	VAR old, new: Files.FileName; res: WORD;
+	VAR old, new: Files.FileName; res: INTEGER;
 	BEGIN
 		f.GetName(old); COPY(old, new);
 		Strings.Append(new, ".Bak");

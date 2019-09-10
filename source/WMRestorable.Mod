@@ -126,7 +126,7 @@ VAR
 	proc : RestoreContextProc;
 	moduleName, procedureName : Modules.Name;
 	msg : ARRAY 128 OF CHAR;
-	res : WORD;
+	res : INTEGER;
 	loader : Loader;
 	context : Context;
 	c : XML.Content;

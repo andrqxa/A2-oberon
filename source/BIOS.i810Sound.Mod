@@ -261,7 +261,7 @@ TYPE
 
 			PROCEDURE &Constr*(nambar, nabmbar, irq : SIGNED32);
 			VAR
-				res : WORD;
+				res : INTEGER;
 				DMAInPhysAdr, DMAOutPhysAdr: SIGNED32;
 				i : SIGNED32;
 			BEGIN
@@ -642,7 +642,7 @@ TYPE
 			END NofWaveFormats;
 
 			PROCEDURE OpenPlayChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution,
-				nofSubChannels, format : SIGNED32; VAR res : WORD);
+				nofSubChannels, format : SIGNED32; VAR res : INTEGER);
 			VAR
 				playChannel : PlayChannel;
 				sResolution : SIGNED32;
@@ -724,7 +724,7 @@ TYPE
 			END AddPlayChannel;
 
 			PROCEDURE OpenRecordChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution,
-				nofSubChannels, format : SIGNED32; VAR res : WORD);
+				nofSubChannels, format : SIGNED32; VAR res : INTEGER);
 			VAR
 				recChannel : RecChannel;
 				item : RecChannelList;
@@ -1464,7 +1464,7 @@ TYPE
 	(* Scan after PCI card and install it if found *)
 	PROCEDURE ScanPCI(vendid, devid : SIGNED32);
 	VAR
-		index, i : SIGNED32; res: WORD;
+		index, i : SIGNED32; res: INTEGER;
 		CmdReg : SIGNED32;
 		bus, dev, fkt : SIGNED32;
 		nambar, nabmbar, irq : SIGNED32;

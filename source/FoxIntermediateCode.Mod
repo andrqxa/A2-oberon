@@ -1201,7 +1201,7 @@ TYPE
 	END DenotesType;
 
 	PROCEDURE GetType*(system: Global.System; type: SyntaxTree.Type): Type;
-	VAR t: Type; length: WORD;
+	VAR t: Type; length: INTEGER;
 	BEGIN
 		type := type.resolved;
 		IF type IS SyntaxTree.CharacterType THEN

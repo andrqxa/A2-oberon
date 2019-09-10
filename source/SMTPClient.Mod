@@ -31,7 +31,7 @@ TYPE
 		BEGIN RETURN sendReady
 		END GetSendReady;
 
-		PROCEDURE GetReplyCode*(VAR code: SIGNED32; VAR res: WORD);
+		PROCEDURE GetReplyCode*(VAR code: SIGNED32; VAR res: INTEGER);
 		VAR msg : ARRAY 256 OF CHAR;
 		BEGIN
 			r.Ln(msg);
@@ -44,7 +44,7 @@ TYPE
 			IF r.res = Streams.Ok THEN res := Ok ELSE res := r.res END
 		END GetReplyCode;
 
-		PROCEDURE SendCommand*(CONST cmd, arg : ARRAY OF CHAR; VAR res:WORD);
+		PROCEDURE SendCommand*(CONST cmd, arg : ARRAY OF CHAR; VAR res:INTEGER);
 		BEGIN
 			IF Trace THEN
 				KernelLog.Enter; KernelLog.String("CMD:"); KernelLog.String(cmd); KernelLog.String(" "); KernelLog.String(arg); KernelLog.Exit;
@@ -53,9 +53,9 @@ TYPE
 			IF w.res = Streams.Ok THEN res := Ok ELSE res := w.res END
 		END SendCommand;
 
-		PROCEDURE Open*(CONST server, thisHost : ARRAY OF CHAR; port: SIGNED32; VAR result : WORD);
+		PROCEDURE Open*(CONST server, thisHost : ARRAY OF CHAR; port: SIGNED32; VAR result : INTEGER);
 		VAR fip : IP.Adr;
-				res: WORD; reply : SIGNED32;
+				res: INTEGER; reply : SIGNED32;
 		BEGIN
 			result := NotConnected;
 			DNS.HostByName(server, fip, res);
@@ -84,7 +84,7 @@ TYPE
 		END Open;
 
 		PROCEDURE Close*;
-		VAR res : WORD;
+		VAR res : INTEGER;
 		BEGIN
 			IF open THEN
 				sendReady := FALSE; open := FALSE;
@@ -94,7 +94,7 @@ TYPE
 		END Close;
 
 		PROCEDURE StartMailFrom*(CONST fromAddr : ARRAY OF CHAR) : BOOLEAN;
-		VAR reply: SIGNED32; res: WORD;
+		VAR reply: SIGNED32; res: INTEGER;
 		BEGIN
 			w.String("MAIL FROM:<");  w.String(fromAddr); w.String(">"); w.Ln; w.Update;
 			IF w.res = Streams.Ok THEN
@@ -105,7 +105,7 @@ TYPE
 		END StartMailFrom;
 
 		PROCEDURE SendTo*(CONST toAddr : ARRAY OF CHAR) :BOOLEAN;
-		VAR reply: SIGNED32; res: WORD;
+		VAR reply: SIGNED32; res: INTEGER;
 		BEGIN
 			w.String("RCPT TO:<");  w.String(toAddr); w.String(">"); w.Ln; w.Update;
 			IF w.res = Streams.Ok THEN
@@ -116,7 +116,7 @@ TYPE
 		END SendTo;
 
 		PROCEDURE StartData*() : BOOLEAN;
-		VAR reply: SIGNED32; res: WORD;
+		VAR reply: SIGNED32; res: INTEGER;
 		BEGIN
 			SendCommand("DATA", "", res);
 			IF res = Ok THEN
@@ -156,7 +156,7 @@ TYPE
 		END SendRawLine;
 
 		PROCEDURE FinishSendRaw*() : BOOLEAN;
-		VAR reply: SIGNED32; res: WORD;
+		VAR reply: SIGNED32; res: INTEGER;
 		BEGIN
 			w.Update;
 			GetReplyCode(reply, res);

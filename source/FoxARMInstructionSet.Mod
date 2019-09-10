@@ -2859,7 +2859,7 @@ CONST
 		Disasm = OBJECT (Disassembler.Disassembler)
 
 			PROCEDURE DisassembleInstruction(bitSet: BitSets.BitSet; VAR adr: Disassembler.Unit; maxInstructionSize: Disassembler.Unit; w:Streams.Writer);
-			VAR instruction: Instruction; value: WORD; mnemonic: WORD;
+			VAR instruction: Instruction; value: INTEGER; mnemonic: INTEGER;
 			BEGIN
 				(* maxInstructionSize can be ignored here *)
 				value := bitSet.GetBits(adr*8,32);
@@ -2874,9 +2874,9 @@ CONST
 						ASSERT(instruction.operands[1].mode = modeMemory);
 						IF (instruction.operands[1].register = PC) & (instruction.operands[1].offsetRegister = None) THEN
 							IF Decrement IN instruction.operands[1].indexing THEN
-								value := -instruction.operands[1].offsetImmediate + adr(WORD) + 8;
+								value := -instruction.operands[1].offsetImmediate + adr(INTEGER) + 8;
 							ELSE
-								value := instruction.operands[1].offsetImmediate + adr(WORD) + 8;
+								value := instruction.operands[1].offsetImmediate + adr(INTEGER) + 8;
 							END;
 							WriteReference(value, TRUE, w);
 							IF (value>=0) & (value * 8 + 32 < bitSet.GetSize()) THEN
@@ -2893,7 +2893,7 @@ CONST
 		END Disasm;
 
 	VAR disassembler: Disasm; codeFileName, dataFileName, logFileName: Files.FileName; codeFile, logFile: Files.File;code: BitSets.BitSet; options: Options.Options;
-		address, offset: WORD;
+		address, offset: INTEGER;
 	BEGIN
 		IF context.arg.GetString(codeFileName) THEN
 			codeFile := Files.Old(codeFileName);

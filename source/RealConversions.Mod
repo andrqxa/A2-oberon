@@ -91,7 +91,7 @@ VAR
 	END StringToReal;
 
 	(**	Convert FLOAT64 x  to string using n character positions. *)
-	PROCEDURE RealToString*( x: FLOAT64;  n: WORD;  VAR buf: ARRAY OF CHAR );
+	PROCEDURE RealToString*( x: FLOAT64;  n: INTEGER;  VAR buf: ARRAY OF CHAR );
 	(* BM 1993.4.22. Do not simplify rounding! *)
 	VAR
 		e, h, l, i, pos: SIGNED32;  z: FLOAT64;  d: ARRAY 16 OF CHAR;
@@ -151,7 +151,7 @@ VAR
 	(**	Convert FLOAT64 x to string in a fixed point notation.
 		n is the overall minimal length for the output field, f the number of fraction digits following the decimal point,
 		D the fixed exponent (printed only when D # 0). *)
-	PROCEDURE RealToStringFix*( x: FLOAT64;  n, f, D: WORD; VAR buf: ARRAY OF CHAR );
+	PROCEDURE RealToStringFix*( x: FLOAT64;  n, f, D: INTEGER; VAR buf: ARRAY OF CHAR );
 	(* BM 1993.4.22. Do not simplify rounding! / JG formatting adjusted *)
 	VAR
 		e, h, l, i, pos: SIGNED32;  r, z: FLOAT64;

@@ -941,7 +941,7 @@ TYPE
 			NEW(sendBuffer, 128); NEW(data1,1);
 		END InitPort;
 
-		PROCEDURE Open(bps, data, parity, stop : SIGNED32; VAR res: WORD);
+		PROCEDURE Open(bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF open THEN
 				IF Verbose THEN ShowModule(name); KernelLog.String(" already open"); KernelLog.Ln; END;
@@ -957,7 +957,7 @@ TYPE
 		END Open;
 
 		(** Send len characters from buf to output, starting at ofs. res is non-zero on error. *)
-		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR status : Usbdi.Status;
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN res := Serials.Closed; RETURN; END;
@@ -975,7 +975,7 @@ TYPE
 		END Send;
 
 		(** Send a single character to the UART. *)
-		PROCEDURE SendChar(ch: CHAR; VAR res : WORD);
+		PROCEDURE SendChar(ch: CHAR; VAR res : INTEGER);
 		VAR status : Usbdi.Status;
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN res := Serials.Closed; RETURN; END;
@@ -992,7 +992,7 @@ TYPE
 		END SendChar;
 
 		(** Wait for the next character is received in the input buffer. The buffer is fed by HandleData *)
-		PROCEDURE ReceiveChar(VAR ch: CHAR; VAR res: WORD);
+		PROCEDURE ReceiveChar(VAR ch: CHAR; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF ~open THEN res := Serials.Closed; RETURN; END;
 			AWAIT(tail # head);
@@ -1007,7 +1007,7 @@ TYPE
 
 		(** Receive size characters into buf, starting at ofs and return the effective number of bytes read in len.
 			Wait until at least min bytes (possibly zero) are available. res is non-zero on error. *)
-		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR ch: CHAR;
 		BEGIN
 			len := 0;
@@ -1071,7 +1071,7 @@ TYPE
 			RETURN (tail - head) MOD BufSize
 		END Available;
 
-		PROCEDURE SetPortState(bps, data, parity, stop : SIGNED32; VAR res: WORD);
+		PROCEDURE SetPortState(bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
 		VAR s : SET;
 		BEGIN
 			IF (bps > 0) & (921600 MOD bps = 0) THEN

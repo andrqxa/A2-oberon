@@ -56,7 +56,7 @@ VAR
 
 
 	PROCEDURE PrintHex*( CONST buf: ARRAY OF CHAR;  p, n: SIZE );
-	VAR ch: WORD; i: SIZE;
+	VAR ch: INTEGER; i: SIZE;
 	BEGIN
 		FOR i := 0 TO n - 1 DO
 			IF i MOD 4 = 0 THEN
@@ -198,7 +198,7 @@ VAR
 							VAR bin: ARRAY OF CHAR;  bp: SIZE;
 							len: SIZE );
 	VAR
-		i: SIZE; h, b: WORD; c: CHAR;
+		i: SIZE; h, b: INTEGER; c: CHAR;
 	BEGIN
 		i := 0;
 		WHILE i < 2*len DO 		(* parse one nibble at a time *)
@@ -225,7 +225,7 @@ VAR
 	PROCEDURE Bin2Hex*(	CONST bin: ARRAY OF CHAR;  bp: SIZE;
 							VAR hex: ARRAY OF CHAR;  hp: SIZE;
 							len: SIZE );
-	VAR i: SIZE; c: WORD;
+	VAR i: SIZE; c: INTEGER;
 	BEGIN
 		FOR i := 0 TO len - 1 DO
 			c := ORD( bin[ bp + i] );

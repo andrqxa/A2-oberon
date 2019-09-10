@@ -26,7 +26,7 @@ TYPE
 
 	Element = RECORD
 		val: SIZE;
-		dir: WORD;
+		dir: INTEGER;
 	END;
 
 	Handler* = PROCEDURE {DELEGATE} (pos, line: SIZE; string: Strings.String; out : Streams.Writer);
@@ -96,7 +96,7 @@ TYPE
 	VAR
 		leftText, rightText: Texts.Text;
 		leftReader, rightReader: Texts.TextReader;
-		format, res: WORD;
+		format, res: INTEGER;
 		leftBuffer, rightBuffer, left, right: LineBuffer;
 		width, height : SIZE;
 		table: POINTER TO ARRAY OF ARRAY OF Element;

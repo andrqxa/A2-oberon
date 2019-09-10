@@ -168,7 +168,7 @@ END CreateDHCPRequestMsg;
 (* Initiate the boot protocol. When successful, return res = 0 and set the parameters. *)
 
 PROCEDURE InitDHCP(int: IP.Interface; VAR localAdr, maskAdr, gatewayAdr: IP.Adr;
-		VAR dns: ARRAY OF IP.Adr; VAR domain: ARRAY OF CHAR; VAR res: WORD);
+		VAR dns: ARRAY OF IP.Adr; VAR domain: ARRAY OF CHAR; VAR res: INTEGER);
 VAR
 	p: UDP.Socket;
 	fport, time, start, offerDelay, requestDelay: SIGNED32;
@@ -311,7 +311,7 @@ END InitDHCP;
 
 (** Run DHCP on specified interface and try to configure it directly. *)
 
-PROCEDURE RunDHCP*(int: IP.Interface; VAR res: WORD);
+PROCEDURE RunDHCP*(int: IP.Interface; VAR res: INTEGER);
 VAR
 	localAdr, maskAdr, gatewayAdr: IP.Adr;
 	dns: ARRAY IP.MaxNofDNS OF IP.Adr;

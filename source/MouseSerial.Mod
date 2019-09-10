@@ -76,7 +76,7 @@ TYPE
 		mask0, val0, mask1, val1, lastkeys: SET; (* protocol parameters *)
 
 		errors : SIGNED32;
-		res : WORD;
+		res : INTEGER;
 
 		port : Serials.Port;
 		m : Inputs.MouseMsg; keys: SET;
@@ -84,8 +84,8 @@ TYPE
 		dead : BOOLEAN;
 
 		(* Read a mouse event *)
-		PROCEDURE GetMouseEvent(VAR keys: SET;  VAR dx, dy: SIGNED32): WORD;
-		VAR ch : CHAR; b : SET; res : WORD;
+		PROCEDURE GetMouseEvent(VAR keys: SET;  VAR dx, dy: SIGNED32): INTEGER;
+		VAR ch : CHAR; b : SET; res : INTEGER;
 		BEGIN
 			b := {};
 
@@ -157,7 +157,7 @@ TYPE
 			"bps" - V24.BPS*
 			"rate" - sample rate (not all mice support this) *)
 		PROCEDURE &Init*(port : Serials.Port; type : SIGNED32);
-		VAR c: CHAR; res: WORD; n: SIGNED32;
+		VAR c: CHAR; res: INTEGER; n: SIGNED32;
 		BEGIN
 			(* ASSERT: Port is already open *)
 			ASSERT(port # NIL);
@@ -248,7 +248,7 @@ VAR
 
 (* Set mouse speed *)
 PROCEDURE SetSpeed(port : Serials.Port; mouseType, oldBPS, newBPS: SIGNED32);
-VAR word, stop, par : SIGNED16; c : CHAR;  res : WORD;
+VAR word, stop, par : SIGNED16; c : CHAR;  res : INTEGER;
 BEGIN
 	ASSERT(port # NIL);
 	port.Close();
@@ -322,7 +322,7 @@ BEGIN
 END GetMouseType;
 
 PROCEDURE Detect(port : Serials.Port; VAR mouseType : SIGNED32): BOOLEAN;
-VAR ch: CHAR; i : SIGNED32; res : WORD; mouseIdent : ARRAY DetectMaxIdent OF CHAR;
+VAR ch: CHAR; i : SIGNED32; res : INTEGER; mouseIdent : ARRAY DetectMaxIdent OF CHAR;
 BEGIN
 	ASSERT(port # NIL);
 	port.Open(BPS, 7,  Serials.ParNo, Serials.Stop1, res);
@@ -413,7 +413,7 @@ BEGIN {EXCLUSIVE}
 END Wait;
 
 PROCEDURE LoadSerialPortDriver;
-VAR msg : ARRAY 64 OF CHAR; res : WORD;
+VAR msg : ARRAY 64 OF CHAR; res : INTEGER;
 BEGIN
 	KernelLog.String("MouseSerial: Loading serial port driver..."); KernelLog.Ln;
 	Commands.Call("V24.Install", {Commands.Wait}, res, msg);

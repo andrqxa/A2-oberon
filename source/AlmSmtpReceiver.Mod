@@ -142,7 +142,7 @@ TYPE
 	SmtpAgent* = OBJECT (TCPServices.Agent)
 	VAR
 			ch: CHAR;				(*current input character*)
-			res: WORD;
+			res: INTEGER;
 			out: Streams.Writer; in: Streams.Reader;
 			log : Files.Writer;
 			env : Envelope;
@@ -382,7 +382,7 @@ TYPE
 
 	(* Begin Parser Productions *)
 	PROCEDURE HELO*;
-		VAR res : WORD;
+		VAR res : INTEGER;
 	BEGIN
 		Confirm(SyHelo);
 		sym := SyCopy; ToMemory (env.mta);
@@ -437,7 +437,7 @@ TYPE
 		receiveTime, remoteIP : String;
 
 		PROCEDURE WriteIPNr( ip : IP.Adr );
-			VAR result : WORD; str : ARRAY 128 OF CHAR;
+			VAR result : INTEGER; str : ARRAY 128 OF CHAR;
 		BEGIN
 					IP.AdrToStr(ip, remoteIP);
 					msgWr.String (" (");
@@ -1027,7 +1027,7 @@ BEGIN
 END Announce;
 
 PROCEDURE Open*;
-VAR res : WORD;
+VAR res : INTEGER;
 BEGIN
 	IF smtp = NIL THEN
 		NEW(smtp, AlmSmtpReceiverPort, NewSmtpAgent, res);

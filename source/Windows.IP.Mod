@@ -407,7 +407,7 @@ BEGIN
 END InterfaceByDstIP;
 
 		(* Find MULTIPLE IP address of the specified host. *)
-PROCEDURE InitInterfaces( hostname: ARRAY OF CHAR; VAR res: WORD );
+PROCEDURE InitInterfaces( hostname: ARRAY OF CHAR; VAR res: INTEGER );
 	VAR hostent: WSock32.PHostent; str: ARRAY 64 OF CHAR;
 		adr, adr2: Adr;
 		int0, int:Interface; i:SIGNED32;
@@ -440,7 +440,7 @@ PROCEDURE InitInterfaces( hostname: ARRAY OF CHAR; VAR res: WORD );
 END InitInterfaces;
 
 PROCEDURE Init;
-	VAR name: ARRAY 256 OF CHAR; res: WORD;
+	VAR name: ARRAY 256 OF CHAR; res: INTEGER;
 BEGIN
 	KernelLog.String("IP.Init: Hostname ");
 	res := WSock32.gethostname(name, 256);

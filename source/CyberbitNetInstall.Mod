@@ -17,7 +17,7 @@ TYPE
 	Downloader = OBJECT
 
 		PROCEDURE &New*;
-		VAR res : WORD; temp : ARRAY 16 OF CHAR;
+		VAR res : INTEGER; temp : ARRAY 16 OF CHAR;
 			r : Streams.Reader; w : Files.Writer;
 			buf: ARRAY BufSize OF CHAR; size : SIGNED32;
 			msg, s : ARRAY 256 OF CHAR; len, i, j : SIZE;

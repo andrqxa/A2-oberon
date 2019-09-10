@@ -33,7 +33,7 @@ TYPE
 		(* virtual disk geometry CHS *)
 		cyls, hds, spt : SIGNED32;
 
-		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF (block < 0) OR (num < 1) OR (block + num > size) THEN res := BlockNumberInvalid; RETURN; END;
 			ASSERT((ofs >= 0) & (ofs + num * blockSize <= LEN(data)));
@@ -58,17 +58,17 @@ TYPE
 			END;
 		END Transfer;
 
-		PROCEDURE TransferOperation(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE TransferOperation(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		BEGIN
 			HALT(301); (* abstract *)
 		END TransferOperation;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: WORD);
+		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			size := SELF.size;	res := Disks.Ok;
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg : Disks.Message; VAR res : WORD);
+		PROCEDURE Handle*(VAR msg : Disks.Message; VAR res : INTEGER);
 		BEGIN
 			IF (msg IS Disks.GetGeometryMsg) & (cyls > 0) THEN
 				WITH msg: Disks.GetGeometryMsg DO
@@ -96,7 +96,7 @@ TYPE
 		file : Files.File;
 		rider : Files.Rider;
 
-		PROCEDURE TransferOperation(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE TransferOperation(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		BEGIN
 			file.Set(rider, SYSTEM.VAL (SIGNED32, block * blockSize));
 			IF rider.res # Files.Ok THEN res := BlockNumberInvalid; RETURN; END;
@@ -133,7 +133,7 @@ TYPE
 	VAR
 		memory : MemoryBlock;
 
-		PROCEDURE TransferOperation(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE TransferOperation(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		BEGIN
 			IF op = Disks.Read THEN
 				ASSERT((block  + num) * blockSize <= LEN(memory));
@@ -234,7 +234,7 @@ END GetOptions;
 PROCEDURE Install*(context : Commands.Context); (** [Options] diskname filename ~ *)
 VAR
 	diskname, filename : ARRAY 256 OF CHAR;
-	blocksize, c, h, s: SIGNED32; res: WORD;
+	blocksize, c, h, s: SIGNED32; res: INTEGER;
 	file : Files.File;
 	disk : FileDisk;
 
@@ -284,7 +284,7 @@ END Install;
 PROCEDURE InstallRamdisk*(context : Commands.Context); (** [Options] diskname size  ~ *)
 VAR
 	diskname  : ARRAY 256 OF CHAR;
-	size, blocksize, c, h, s: SIGNED32; res: WORD;
+	size, blocksize, c, h, s: SIGNED32; res: INTEGER;
 	memory : MemoryBlock;
 	disk : RamDisk;
 

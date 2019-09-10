@@ -1388,7 +1388,7 @@ TYPE
 	VAR
 		tableElem : XML.Element;
 		parentWidth : SIZE;
-		align- : WORD;
+		align- : INTEGER;
 		textColor, linkColor, vlinkColor, alinkColor : SIGNED32;
 		url : String;
 		loadLink : WMEvents.EventListener;
@@ -2727,7 +2727,7 @@ END Gb23122Utf8;
 PROCEDURE GetColor(s : String) : SIGNED32;
 VAR
 	aoc : ARRAY 17 OF CHAR;
-	i : SIGNED32; res: WORD;
+	i : SIGNED32; res: INTEGER;
 BEGIN
 	IF s#NIL THEN
 		IF (s^[0]='#') THEN
@@ -3148,7 +3148,7 @@ PROCEDURE GetCharEnt(VAR ent : ARRAY OF CHAR) : String;
 VAR
 	temp : String;
 	aoc : ARRAY 5 OF CHAR;
-	len : SIZE; res, suc: WORD;
+	len : SIZE; res, suc: INTEGER;
 BEGIN
 	res := 0;
 	IF ent[0] = '#' THEN

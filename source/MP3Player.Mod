@@ -25,7 +25,7 @@ TYPE
 
 		(* Initialize Player with the given File *)
 		PROCEDURE &Init*(in : Streams.Reader; length: SIGNED32);
-		VAR i: SIGNED32; res: WORD;
+		VAR i: SIGNED32; res: INTEGER;
 		BEGIN
 			ready := FALSE; finished := FALSE; paused := FALSE; oldPos := 0;
 			SELF.in := in;
@@ -70,7 +70,7 @@ TYPE
 		END Play;
 
 		PROCEDURE Stop*;
-		VAR res : WORD;
+		VAR res : INTEGER;
 		BEGIN {EXCLUSIVE}
 			(* playChannel.Stop *)
 			playChannel.Pause;
@@ -87,7 +87,7 @@ TYPE
 
 		(* set in 1/10 sec *)
 		PROCEDURE SetPos*(pos: SIGNED32);
-		VAR res : WORD;
+		VAR res : INTEGER;
 		BEGIN {EXCLUSIVE}
 			pos := ENTIER(pos / 10 * rate);
 			decoder.SeekSample(pos, FALSE, res);

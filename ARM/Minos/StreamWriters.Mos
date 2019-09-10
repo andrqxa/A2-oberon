@@ -27,12 +27,12 @@ TYPE
 	Position* = SIGNED32; (* position in the stream *)
 
 	(** Any stream output procedure *)
-	Sender* = PROCEDURE(VAR writer: Writer; CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD);
+	Sender* = PROCEDURE(VAR writer: Writer; CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER);
 
 	Writer* = RECORD
 		tail: SIZE;
 		buf: POINTER TO ARRAY OF CHAR;
-		res*: WORD; (** result of last output operation. *)
+		res*: INTEGER; (** result of last output operation. *)
 		send: Sender;
 		sent-: Position;  (** count of sent bytes *)
 		(* buf[0..tail-1] contains data to write. *)
@@ -400,7 +400,7 @@ VAR
 	END Float;
 
 	(** Write a floating point number x in a fixed point notation. n is the overall minimal length for the output field, f the number of fraction digits following the decimal point, D the fixed exponent (printed only when D # 0). *)
-	PROCEDURE FloatFix*(VAR writer: Writer; x: FLOAT32; n, f, D: WORD);
+	PROCEDURE FloatFix*(VAR writer: Writer; x: FLOAT32; n, f, D: INTEGER);
 	VAR
 		d: SIGNED32;
 	BEGIN
@@ -421,7 +421,7 @@ VAR
 		END;
 	END FloatFix;
 
-	PROCEDURE NullSender*(VAR writer: Writer; CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD);
+	PROCEDURE NullSender*(VAR writer: Writer; CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER);
 	BEGIN
 		res := Ok
 	END NullSender;

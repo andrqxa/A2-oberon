@@ -12,8 +12,8 @@ CONST Running* = 0; ShuttingDown* = 1; Rebooting* = 2;
 CONST DefaultConfigFile = "aos.ini";
 CONST UserConfigFile = "myaos.ini";
 
-VAR activity: WORD;
-VAR status* := 0: WORD;
+VAR activity: INTEGER;
+VAR status* := 0: INTEGER;
 VAR heap: Kernel32.HANDLE;
 VAR sleepingQueue: Queues.Queue;
 VAR stdin, stdout: Kernel32.HANDLE;
@@ -42,7 +42,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (CAS (status, ShuttingDown, Rebooting) = ShuttingDown);
 END Reboot;
 
-PROCEDURE {NORETURN} Exit- (status: WORD);
+PROCEDURE {NORETURN} Exit- (status: INTEGER);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Trace.String ("system: exiting to windows");
 	RemoveTraceFile;
@@ -179,7 +179,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 END SetupTraceName;
 
 PROCEDURE RemoveTraceFile;
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	IF traceName[0] # 0X THEN
 		Trace.String("removing "); Trace.String(traceName); Trace.Ln;

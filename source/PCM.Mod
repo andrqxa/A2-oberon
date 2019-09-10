@@ -322,7 +322,7 @@ IMPORT
 
 (** ---------- text output functions --------------------- *)
 
-	PROCEDURE GetMessage (err: WORD; CONST msg: ARRAY OF CHAR; VAR res: ARRAY OF CHAR);
+	PROCEDURE GetMessage (err: INTEGER; CONST msg: ARRAY OF CHAR; VAR res: ARRAY OF CHAR);
 	VAR str: ARRAY 128 OF CHAR;
 	BEGIN
 		COPY (msg, res);
@@ -347,7 +347,7 @@ IMPORT
 		TraceBackThis( Machine.CurrentPC(), SYSTEM.GetFramePointer() );
 	END TraceBack;
 
-	PROCEDURE Error* (err: WORD; pos: SIGNED32;  CONST msg: ARRAY OF CHAR);
+	PROCEDURE Error* (err: INTEGER; pos: SIGNED32;  CONST msg: ARRAY OF CHAR);
 		VAR str: ARRAY 128 OF CHAR;
 	BEGIN {EXCLUSIVE}
 		(** fof >> *)
@@ -373,7 +373,7 @@ IMPORT
 		END;
 	END Error;
 
-	PROCEDURE ErrorN* (err: WORD; pos: SIGNED32; msg: StringPool.Index);
+	PROCEDURE ErrorN* (err: INTEGER; pos: SIGNED32; msg: StringPool.Index);
 		VAR str: ARRAY 256 OF CHAR;
 	BEGIN
 		StringPool.GetString(msg, str);

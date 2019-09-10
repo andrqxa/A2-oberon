@@ -14,7 +14,7 @@ TYPE GridWindow* = OBJECT(WMWindowManager.Window)
 		canvas* : Graphics.BufferCanvas;
 		canvasGen-: Graphics.CanvasGenerator;
 		pointerThreshold*,
-		maxInterpolation* : WORD; (* allows limiting the interpolation degree on Draw *)
+		maxInterpolation* : INTEGER; (* allows limiting the interpolation degree on Draw *)
 		hs,ws: POINTER TO ARRAY OF SIZE;
 		totalW, totalH: SIZE;
 		gap: SIZE;
@@ -79,14 +79,14 @@ TYPE GridWindow* = OBJECT(WMWindowManager.Window)
 			END
 		END IsHit;
 
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : WORD);
+		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
 		VAR
-			mode: WORD;
+			mode: INTEGER;
 			isScaled: BOOLEAN;
 			i,j: SIZE;
 			x,y: SIZE;
 
-			PROCEDURE DrawSingle(CONST  img: Graphics.Image; offX,offY: SIZE; isScaled: BOOLEAN; mode: WORD);
+			PROCEDURE DrawSingle(CONST  img: Graphics.Image; offX,offY: SIZE; isScaled: BOOLEAN; mode: INTEGER);
 			VAR
 				wscaled,hscaled: SIZE;
 			BEGIN

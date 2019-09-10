@@ -28,7 +28,7 @@ TYPE
 	VAR
 		lineColor, rectColor, rectColor2: WMGraphics.Color;
 		lineWidth : FLOAT32;
-		fillMode : WORD;
+		fillMode : INTEGER;
 		gradientHorizontal: BOOLEAN;
 		properties : RectPropWindow;
 
@@ -104,7 +104,7 @@ TYPE
 		VAR name : Strings.String;
 			cont: XMLObjects.Enumerator;
 			ptr: ANY;
-			tempInt : SIGNED32; res: WORD;
+			tempInt : SIGNED32; res: INTEGER;
 			tempReal : FLOAT64;
 		BEGIN
 			cont := elem.GetContents(); cont.Reset();
@@ -432,7 +432,7 @@ TYPE
 		PROCEDURE SetValueHandler(sender, data: ANY);
 		VAR
 			colorString, origString : ARRAY 128 OF CHAR;
-			color : SIGNED32; res: WORD;
+			color : SIGNED32; res: INTEGER;
 			width: FLOAT64;
 			bool: BOOLEAN;
 

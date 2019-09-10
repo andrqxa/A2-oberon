@@ -93,8 +93,8 @@ END Args;
 
 #END
 
-PROCEDURE ReceiveStdin( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
-VAR ures: SIZE;  err: WORD;
+PROCEDURE ReceiveStdin( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
+VAR ures: SIZE;  err: INTEGER;
 BEGIN
 	len := 0;
 	REPEAT
@@ -107,14 +107,14 @@ BEGIN
 	IF len >= min THEN  res := Streams.Ok  ELSE  res := Streams.EOF  END;
 END ReceiveStdin;
 
-PROCEDURE SendStdout( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  prop: BOOLEAN;  VAR res: WORD );
+PROCEDURE SendStdout( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  prop: BOOLEAN;  VAR res: INTEGER );
 VAR ignore: SIZE;
 BEGIN
 	ignore := Unix.write( 1, ADDRESSOF( data[ofs] ), len );  res := Streams.Ok
 END SendStdout;
 
 
-PROCEDURE SendErrout( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  prop: BOOLEAN;  VAR res: WORD );
+PROCEDURE SendErrout( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  prop: BOOLEAN;  VAR res: INTEGER );
 VAR ignore: SIZE;
 BEGIN
 	ignore := Unix.write( 2, ADDRESSOF( data[ofs] ), len );  res := Streams.Ok

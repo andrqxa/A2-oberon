@@ -45,7 +45,7 @@ TYPE
 		END Init;
 
 		(* adapted from LNO.V24.Mod *)
-		PROCEDURE Open*( bps, data, parity, stop: SIGNED32;  VAR res: WORD );
+		PROCEDURE Open*( bps, data, parity, stop: SIGNED32;  VAR res: INTEGER );
 		VAR
 			err, speed: SIGNED32;
 			tio: Unix.Termios;
@@ -126,13 +126,13 @@ TYPE
 
 		PROCEDURE Available*(): SIZE;
 		VAR
-			num, err: WORD;
+			num, err: INTEGER;
 		BEGIN
 		 	err := Unix.ioctl( fd, Unix.FIONREAD, ADDRESSOF(num) );
 			RETURN num;
 		END Available;
 
-		PROCEDURE ReceiveChar*( VAR ch: CHAR;  VAR res: WORD );
+		PROCEDURE ReceiveChar*( VAR ch: CHAR;  VAR res: INTEGER );
 		VAR r: SIZE;
 		BEGIN
 			r := Unix.read( fd, ADDRESSOF(ch), 1);  res := SIGNED32(r);
@@ -145,7 +145,7 @@ TYPE
 		END ReceiveChar;
 
 		(** Send - Send a byte to the specified port.  Waits until buffer space is available.  res = 0 iff ok. *)
-		PROCEDURE SendChar*( ch: CHAR;  VAR res: WORD );
+		PROCEDURE SendChar*( ch: CHAR;  VAR res: INTEGER );
 		VAR r: SIZE;
 		BEGIN
 			r := Unix.write( fd, ADDRESSOF(ch), 1);  res := SIGNED32(r);
@@ -157,7 +157,7 @@ TYPE
 			END;
 		END SendChar;
 
-		PROCEDURE Send*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD );
+		PROCEDURE Send*( CONST buf: ARRAY OF CHAR;  ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER );
 		VAR r: SIZE;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + len );   (* array bound check not implemented in Kernel32.WriteFile *)
@@ -170,7 +170,7 @@ TYPE
 			END;
 		END Send;
 
-		PROCEDURE Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+		PROCEDURE Receive*( VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 		VAR i, l: SIZE;  read: SIZE;
 		BEGIN
 			ASSERT ( LEN( buf ) >= ofs + size );

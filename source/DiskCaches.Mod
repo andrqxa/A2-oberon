@@ -1,7 +1,7 @@
 MODULE DiskCaches; (* Simple (disk) cache, fof 2018 *)
 IMPORT SYSTEM, Disks;
 
-	TYPE TransferProcedure = PROCEDURE {DELEGATE} (op,block,num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+	TYPE TransferProcedure = PROCEDURE {DELEGATE} (op,block,num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 
 	CONST BlockSize = 512;
 	CONST NumberCacheLines = 128;
@@ -37,7 +37,7 @@ IMPORT SYSTEM, Disks;
 		END Init;
 
 		(* LONGINTs for compatibility -- should be largely replaced by SIZEs ! *)
-		PROCEDURE Transfer* (op: SIGNED32; block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE Transfer* (op: SIGNED32; block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		VAR globalIndex, lineIndex, lineOfs, lineFirstBlock, lineBlocks: SIGNED32;
 		BEGIN
 			WHILE num > 0 DO
@@ -79,12 +79,12 @@ END DiskCaches.
 		...
 		cache: DiskCaches.Cache;
 
-		PROCEDURE TransferX*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: WORD);
+		PROCEDURE TransferX*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			.... OLD TRANSFER CODE
 		END TransferX;
 
-		PROCEDURE Transfer(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: WORD);
+		PROCEDURE Transfer(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: INTEGER);
 		BEGIN{EXCLUSIVE}
 			cache.Transfer(op,block,num,data,ofs,res)
 		END Transfer;

@@ -752,9 +752,9 @@ BEGIN
 	dst[0] := CHR(x DIV 1000000H MOD 100H);
 END SetBE32;
 
-PROCEDURE Mp3ToWave*(srcFileName, destFileName : Strings.String; onConvertStatusChanged: StatusProc) : WORD;
+PROCEDURE Mp3ToWave*(srcFileName, destFileName : Strings.String; onConvertStatusChanged: StatusProc) : INTEGER;
 VAR
-	res: WORD;
+	res: INTEGER;
 	srcFile, destFile : Files.File;
 	decoder: Codecs.AudioDecoder;
 	encoder: Codecs.AudioEncoder;
@@ -810,11 +810,11 @@ BEGIN
 
 END Mp3ToWave;
 
-PROCEDURE GetFreeSpace*(CONST destination: ARRAY OF CHAR; VAR freeSpace: SIGNED32): WORD;
+PROCEDURE GetFreeSpace*(CONST destination: ARRAY OF CHAR; VAR freeSpace: SIGNED32): INTEGER;
 VAR
 	fs: Files.FileSystem;
 	prefix, name: ARRAY MaxLen OF CHAR;
-	res: WORD;
+	res: INTEGER;
 BEGIN
 	res := ResErr;
 	Files.SplitName(destination, prefix, name);
@@ -826,11 +826,11 @@ BEGIN
 	RETURN res;
 END GetFreeSpace;
 
-PROCEDURE IsReadOnly*(CONST destination: ARRAY OF CHAR; VAR readOnly: BOOLEAN): WORD;
+PROCEDURE IsReadOnly*(CONST destination: ARRAY OF CHAR; VAR readOnly: BOOLEAN): INTEGER;
 VAR
 	fs: Files.FileSystem;
 	prefix, name: ARRAY MaxLen OF CHAR;
-	res: WORD;
+	res: INTEGER;
 BEGIN
 	res := ResErr;
 	Files.SplitName(destination, prefix, name);
@@ -842,10 +842,10 @@ BEGIN
 	RETURN res;
 END IsReadOnly;
 
-PROCEDURE GetDevice*(file: Files.File; VAR device: Disks.Device): WORD;
+PROCEDURE GetDevice*(file: Files.File; VAR device: Disks.Device): INTEGER;
 VAR
 	fs: Files.FileSystem;
-	res: WORD;
+	res: INTEGER;
 BEGIN
 	res := ResErr;
 	fs := file.fs;

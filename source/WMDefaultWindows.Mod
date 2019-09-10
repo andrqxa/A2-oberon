@@ -668,7 +668,7 @@ TYPE
 
 (** GRAPHIC TOOLS *)
 (** Fill a rectangle vertically with images, repeating the middle if needed *)
-PROCEDURE RepeatMiddleVertical*(canvas : Graphics.Canvas; csw, csh, w, h : SIZE; q : WORD; top, middle, bottom : Graphics.Image);
+PROCEDURE RepeatMiddleVertical*(canvas : Graphics.Canvas; csw, csh, w, h : SIZE; q : INTEGER; top, middle, bottom : Graphics.Image);
 VAR fh : FLOAT32; y, t : SIZE;
 BEGIN
 	IF (csw = 0) OR (csh = 0) OR (w = 0) OR (h = 0) THEN RETURN END;
@@ -700,7 +700,7 @@ BEGIN
 END RepeatMiddleVertical;
 
 (** Fill a rectangle vertically with images, repeating the middle if needed *)
-PROCEDURE RepeatMiddleHorizontal*(canvas : Graphics.Canvas; csw, csh, w, h : SIZE; q : WORD; left, middle, right : Graphics.Image);
+PROCEDURE RepeatMiddleHorizontal*(canvas : Graphics.Canvas; csw, csh, w, h : SIZE; q : INTEGER; left, middle, right : Graphics.Image);
 VAR fw : FLOAT32; x, t : SIZE;
 BEGIN
 	IF (csw = 0) OR (csh = 0) OR (w = 0) OR (h = 0) THEN RETURN END;

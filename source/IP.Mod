@@ -89,7 +89,7 @@ TYPE
 			subnet as the "localAdr".
 			"domain" can be an empty string. It is normally used by a DNS implementation. It is not used in IP directly.
 			In IPv6 maskAdr is the prefix of the currently IP address *)
-		PROCEDURE SetAdrs*(localAdr, maskOrPrefixAdr, gatewayAdr: Adr; VAR res: WORD);
+		PROCEDURE SetAdrs*(localAdr, maskOrPrefixAdr, gatewayAdr: Adr; VAR res: INTEGER);
 		BEGIN
 			(* Extensions have to override this method.*)
 			HALT(99);
@@ -375,7 +375,7 @@ VAR
 	leftParts: SIGNED32;					(* number of bytes before :: *)
 	rightParts: SIGNED32;				(* number of bytes after :: *)
 	val: SIGNED32;
-	res: WORD;
+	res: INTEGER;
 	state: SIGNED32;						(* state of the FSM look at the eof for more info *)
 	dPointOcc: BOOLEAN;				(* double point occured *)
 	prefixVal: SIGNED32;
@@ -1620,7 +1620,7 @@ END SetIPv6AdrNil;
 
 
 (* Add the interface to the IP configuration. *)
-PROCEDURE AddInterface*(int: Interface; VAR res: WORD);
+PROCEDURE AddInterface*(int: Interface; VAR res: INTEGER);
 VAR
 	item: Interface;
 BEGIN {EXCLUSIVE}

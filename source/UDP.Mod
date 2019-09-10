@@ -70,7 +70,7 @@ TYPE
 
 
 		(** Constructor *)
-		PROCEDURE &Open*(lport: SIGNED32; VAR res: WORD);
+		PROCEDURE &Open*(lport: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			open := TRUE;
 			ASSERT((lport >= 0) & (lport < 10000H));
@@ -91,7 +91,7 @@ TYPE
 
 		(** Send a UDP datagram to the foreign address specified by "fip" and "fport".
 			The data is in "data[ofs..ofs+len-1]".  In case of concurrent sends the datagrams are serialized. *)
-		PROCEDURE Send*(fip: IP.Adr; fport: SIGNED32; CONST data: ARRAY OF CHAR; ofs, len: SIZE; VAR res: WORD);
+		PROCEDURE Send*(fip: IP.Adr; fport: SIGNED32; CONST data: ARRAY OF CHAR; ofs, len: SIZE; VAR res: INTEGER);
 		VAR
 			int: IP.Interface;
 
@@ -127,7 +127,7 @@ TYPE
 		"len" returns the actual datagram size and "data[ofs..ofs+len-1]" returns the data.
 		"res" returns "Timeout" in case of a timeout and "BufferOverflow" if the received datagram was too big.
 		*)
-		PROCEDURE Receive*(VAR data: ARRAY OF CHAR; ofs, size: SIZE; ms: SIGNED32; VAR fip: IP.Adr; VAR fport: SIGNED32; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive*(VAR data: ARRAY OF CHAR; ofs, size: SIZE; ms: SIGNED32; VAR fip: IP.Adr; VAR fport: SIGNED32; VAR len: SIZE; VAR res: INTEGER);
 		VAR
 			buffer: Network.Buffer;
 			fragmentBuffer: Network.Buffer;

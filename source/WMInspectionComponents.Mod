@@ -48,7 +48,7 @@ CONST
 	ModelWindowWidth = 320; ModelWindowHeight = 80;
 
 TYPE
-	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : WORD);
+	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : INTEGER);
 
 	DropTarget = OBJECT(WMDropTarget.DropTarget)
 	VAR
@@ -90,7 +90,7 @@ TYPE
 			SELF.position := position;
 		END Init;
 
-		PROCEDURE Set*(CONST string : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE Set*(CONST string : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			setString(string, position, res);
 		END Set;
@@ -150,7 +150,7 @@ TYPE
 		END Init;
 
 		PROCEDURE UpdateAdrLabel(object : XML.Element);
-		VAR string : Types.String32; res : WORD; nbrStr : ARRAY 17 OF CHAR; t: Modules.TypeDesc;
+		VAR string : Types.String32; res : INTEGER; nbrStr : ARRAY 17 OF CHAR; t: Modules.TypeDesc;
 		BEGIN
 			IF (object # NIL) THEN
 				t := Modules.TypeOf(object);
@@ -230,7 +230,7 @@ TYPE
 			END;
 		END MyDragDropped;
 
-		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : WORD);
+		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : INTEGER);
 		VAR object: ANY; gen: XML.GeneratorProcedure; moduleName, procedureName ,msg: Modules.Name; element: XML.Element;
 
 		BEGIN
@@ -1127,7 +1127,7 @@ TYPE
 		color : WMProperties.ColorProperty;
 		editor : WMEditors.TextField;
 		colorPot : WMColorComponents.ColorPot;
-		res : WORD;
+		res : INTEGER;
 		outOfDate : BOOLEAN;
 
 		PROCEDURE &Init*;
@@ -1468,7 +1468,7 @@ TYPE
 		END HandleButton;
 
 		PROCEDURE Apply(force : BOOLEAN);
-		VAR reference : WMProperties.ReferenceProperty; string, oldString : ARRAY 256 OF CHAR; stringType: Types.String256; res: WORD;
+		VAR reference : WMProperties.ReferenceProperty; string, oldString : ARRAY 256 OF CHAR; stringType: Types.String256; res: INTEGER;
 		BEGIN
 			reference := SELF.reference;
 			IF (reference # NIL) THEN
@@ -1494,7 +1494,7 @@ TYPE
 		END Apply;
 
 		PROCEDURE Synchronize(force : BOOLEAN);
-		VAR reference : WMProperties.ReferenceProperty;string : ARRAY 256 OF CHAR; stringType: Types.String256; res: WORD;
+		VAR reference : WMProperties.ReferenceProperty;string : ARRAY 256 OF CHAR; stringType: Types.String256; res: INTEGER;
 		BEGIN
 			reference := SELF.reference;
 			IF (reference # NIL) & (force OR (lastTimestamp # reference.GetTimestamp())) THEN
@@ -1528,7 +1528,7 @@ TYPE
 		END Disable;
 
 		PROCEDURE UpdateButton(object : XML.Element);
-		VAR string : Types.String32; res : WORD; nbrStr : ARRAY 17 OF CHAR; t: Modules.TypeDesc;
+		VAR string : Types.String32; res : INTEGER; nbrStr : ARRAY 17 OF CHAR; t: Modules.TypeDesc;
 		BEGIN
 			IF (object # NIL) THEN
 				button.fillColor.Set(WMGraphics.Green);
@@ -1602,7 +1602,7 @@ TYPE
 		alignment_chooser : WMDropDownLists.DropDownList;
 
 		PROCEDURE &Init*;
-		VAR res : WORD;
+		VAR res : INTEGER;
 		BEGIN
 			Init^;
 			SetNameAsString(StrAlignmentPropertyView);
@@ -1834,7 +1834,7 @@ TYPE
 			enabledView.SetProperty(NIL);
 		END ResetProperties;
 
-		PROCEDURE SetProperty(property : WMProperties.Property; VAR res : WORD);
+		PROCEDURE SetProperty(property : WMProperties.Property; VAR res : INTEGER);
 		VAR name : Strings.String;
 		BEGIN
 			res := Ok;
@@ -1962,7 +1962,7 @@ TYPE
 			boundsView.SetEnabled(s);
 		END SetAlignment;
 
-		PROCEDURE SetProperty(property : WMProperties.Property; VAR res : WORD);
+		PROCEDURE SetProperty(property : WMProperties.Property; VAR res : INTEGER);
 		VAR name : Strings.String;
 		BEGIN
 			res := Ok;
@@ -2137,7 +2137,7 @@ TYPE
 		END CountNofElements;
 
 		PROCEDURE SetProperties(component : WMComponents.Component);
-		VAR propertyArray : WMProperties.PropertyArray; res: WORD; i : SIZE;
+		VAR propertyArray : WMProperties.PropertyArray; res: INTEGER; i : SIZE;
 			init:WMProperties.BooleanProperty;
 		BEGIN
 			ASSERT(component # NIL);
@@ -3404,7 +3404,7 @@ TYPE
 		PROCEDURE HandleStoreButton(sender, data : ANY);
 		VAR
 			component : Repositories.Component; repository : Repositories.Repository;
-			name, repositoryName, componentName : ARRAY 256 OF CHAR; id: SIZE; res: WORD;
+			name, repositoryName, componentName : ARRAY 256 OF CHAR; id: SIZE; res: INTEGER;
 			filename : Files.FileName;
 		BEGIN
 			component := SELF.component;
@@ -3441,7 +3441,7 @@ TYPE
 
 		PROCEDURE HandleRemoveButton(sender, data : ANY);
 		VAR component : Repositories.Component; ignore : Repositories.Name; repository : Repositories.Repository; refNum: SIZE;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			component := SELF.component;
 			IF (component # NIL) THEN
@@ -3459,7 +3459,7 @@ TYPE
 
 		PROCEDURE HandleUpdateButton(sender, data : ANY);
 		VAR component : Repositories.Component; ignore : Repositories.Name;  repository : Repositories.Repository; refNum: SIZE;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			component := SELF.component;
 			IF (component # NIL) THEN
@@ -3650,7 +3650,7 @@ TYPE
 		END EditorKeyEvent;
 
 		PROCEDURE HandleShiftReturn;
-		VAR model : Models.Model; string : Types.DynamicString; length : SIZE; res: WORD;
+		VAR model : Models.Model; string : Types.DynamicString; length : SIZE; res: INTEGER;
 		BEGIN
 			model := SELF.model;
 			IF (model # NIL) THEN
@@ -3667,7 +3667,7 @@ TYPE
 		END HandleShiftReturn;
 
 		PROCEDURE SetModel*(model : Models.Model);
-		VAR string : Types.DynamicString; res : WORD;
+		VAR string : Types.DynamicString; res : INTEGER;
 		BEGIN
 			Acquire;
 			IF (SELF.model # NIL) THEN SELF.model.onChanged.Remove(ModelChanged); END;
@@ -3696,7 +3696,7 @@ TYPE
 		END SetModel;
 
 		PROCEDURE ModelChanged(sender, data : ANY);
-		VAR model : Models.Model; string : Types.String256; res : WORD;
+		VAR model : Models.Model; string : Types.String256; res : INTEGER;
 		BEGIN
 			IF autoRefresh THEN
 				model := SELF.model;

@@ -410,7 +410,7 @@ TYPE
 		VAR name, msg: ARRAY 32 OF CHAR;
 			string: Strings.String;
 			i : SIGNED32;
-			(* res : WORD;	*)
+			(* res : INTEGER;	*)
 		BEGIN
 			drawPanel.selectionON := FALSE;
 			msg := "";
@@ -836,7 +836,7 @@ TYPE
 			content : DTPData.ContentObject;
 			page : DTPData.PageObject; mpage: DTPData.MasterPageObject;
 			frame : DTPData.FrameObject;
-			tempReal: FLOAT64; tempInt: SIGNED32; res: WORD; tempBool: BOOLEAN;
+			tempReal: FLOAT64; tempInt: SIGNED32; res: INTEGER; tempBool: BOOLEAN;
 			mt, mb, ml, mr: FLOAT32;
 		BEGIN
 			NEW(built, 0, 0, 0, 0, 0, 0, FALSE);
@@ -1273,7 +1273,7 @@ TYPE
 			pixelPerMM : FLOAT32;
 			renderCanvas: WMGraphics.BufferCanvas;
 			renderImg: Raster.Image;
-			res: WORD;
+			res: INTEGER;
 			oldDocOriginX, oldDocOriginY : SIGNED32;
 			oldZoomFactor: FLOAT32;
 			oldZoomMode: SIGNED32;
@@ -2337,7 +2337,7 @@ TYPE
 		PROCEDURE InstantiatePlugin*(CONST name: ARRAY OF CHAR): DTPData.ContentObject;
 		VAR
 			contentObject : DTPData.ContentObject; gen: DTPData.ContentFactory;
-			moduleName, procedureName : Modules.Name; msg : ARRAY 16 OF CHAR; res : WORD;
+			moduleName, procedureName : Modules.Name; msg : ARRAY 16 OF CHAR; res : INTEGER;
 			pp : ANY;
 		BEGIN
 			contentObject := NIL;

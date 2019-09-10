@@ -369,7 +369,7 @@ BEGIN
 	RETURN TRUE
 END Init;
 
-PROCEDURE Done(VAR res: WORD);
+PROCEDURE Done(VAR res: INTEGER);
 BEGIN
 	PCO.Close;
 	res := 0

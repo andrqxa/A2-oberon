@@ -47,7 +47,7 @@ BEGIN
 END Append;
 
 PROCEDURE OpenArchive(CONST archiveName : ARRAY OF CHAR; errorLog : Streams.Writer) : Zip.Archive;
-VAR archive : Zip.Archive; res : WORD;
+VAR archive : Zip.Archive; res : INTEGER;
 BEGIN
 	archive := Zip.OpenArchive(archiveName, res);
 	IF (res # Zip.Ok) THEN
@@ -60,7 +60,7 @@ END OpenArchive;
 
 
 (** Writes the directory of an archive. **)
-PROCEDURE WriteDirectory*(out, error : Streams.Writer; CONST archiveName: ARRAY OF CHAR; details: BOOLEAN; VAR res: WORD);
+PROCEDURE WriteDirectory*(out, error : Streams.Writer; CONST archiveName: ARRAY OF CHAR; details: BOOLEAN; VAR res: INTEGER);
 VAR
 	archive: Zip.Archive;
 	entry: Zip.Entry;
@@ -105,7 +105,7 @@ PROCEDURE Directory*(context : Commands.Context);
 VAR
 	archiveName : Files.FileName;
 	options : Options.Options;
-	res: WORD;
+	res: INTEGER;
 BEGIN
 	NEW(options);
 	options.Add("d", "details", Options.Flag);
@@ -121,10 +121,10 @@ END Directory;
 PROCEDURE DoExtract(
 	action: SIGNED32;
 	archive: Zip.Archive; entry: Zip.Entry; name: ARRAY OF CHAR; VAR tempfile: Files.File;
-	path, overwrite, show: BOOLEAN; out, error : Streams.Writer; VAR res: WORD);
+	path, overwrite, show: BOOLEAN; out, error : Streams.Writer; VAR res: INTEGER);
 VAR
 	f, of: Files.File; r: Files.Rider;
-	bakname, temp: ARRAY 256 OF CHAR; res2: WORD;
+	bakname, temp: ARRAY 256 OF CHAR; res2: INTEGER;
 	suf: ARRAY 32 OF CHAR;
 BEGIN
 	IF action = EXTRACT THEN
@@ -193,7 +193,7 @@ END DoExtract;
 	If path is set, the file is stored in the directory according to the relative path in name.
 	If overwrite is set, files with the same name are overwritten, otherwise they are renamed to name.Bak.
 	Possible results: cf. Zip.ExtractEntry **)
-PROCEDURE ExtractFile*(arc: Zip.Archive; ent: Zip.Entry; CONST name: ARRAY OF CHAR; path, overwrite: BOOLEAN; log, error : Streams.Writer; VAR res: WORD);
+PROCEDURE ExtractFile*(arc: Zip.Archive; ent: Zip.Entry; CONST name: ARRAY OF CHAR; path, overwrite: BOOLEAN; log, error : Streams.Writer; VAR res: INTEGER);
 VAR temp: Files.File;
 BEGIN
 	DoExtract(EXTRACT, arc, ent, name, temp, path, overwrite, FALSE, log, error, res);
@@ -205,7 +205,7 @@ END ExtractFile;
 	Possible results: cf. Zip.ExtractEntry **)
 PROCEDURE OpenFile*(
 	arc: Zip.Archive; ent: Zip.Entry; CONST name: ARRAY OF CHAR; VAR tempfile: Files.File;
-	path, overwrite, show: BOOLEAN; log, error : Streams.Writer; VAR res: WORD);
+	path, overwrite, show: BOOLEAN; log, error : Streams.Writer; VAR res: INTEGER);
 BEGIN
 	DoExtract(OPEN, arc, ent, name, tempfile, path, overwrite, show, log, error, res);
 END OpenFile;
@@ -225,7 +225,7 @@ VAR
 	options : Options.Options;
 	archive: Zip.Archive; entry: Zip.Entry;
 	path, overwrite, stopOnError: BOOLEAN;
-	nofExtracted, nofErrors: SIGNED32; res: WORD;
+	nofExtracted, nofErrors: SIGNED32; res: INTEGER;
 BEGIN
 	NEW(options);
 	options.Add("d", "directory", Options.Flag);
@@ -296,7 +296,7 @@ VAR
 	path, overwrite, stopOnError, silent: BOOLEAN;
 	archive: Zip.Archive;
 	entry: Zip.Entry;
-	nofExtracted, nofErrors: SIGNED32; res: WORD;
+	nofExtracted, nofErrors: SIGNED32; res: INTEGER;
 BEGIN
 	NEW(options);
 	options.Add("d", "directory", Options.Flag);
@@ -366,7 +366,7 @@ END ExtractAll;
 	level: specifies the compression level (0: no compression, 9: best compression)
 	strategy: specifies the compression strategy (from 0 - 2)
 	res = Zip.Ok, Zip.BadName, Zip.EntryAlreadyExists, Zip.DataError **)
-PROCEDURE AddFile*(arc: Zip.Archive; CONST srcname : ARRAY OF CHAR; CONST dstname: ARRAY OF CHAR; level, strategy: SIGNED32; VAR res: WORD);
+PROCEDURE AddFile*(arc: Zip.Archive; CONST srcname : ARRAY OF CHAR; CONST dstname: ARRAY OF CHAR; level, strategy: SIGNED32; VAR res: INTEGER);
 VAR f: Files.File; r: Files.Rider;
 BEGIN
 	f := Files.Old(srcname);
@@ -409,7 +409,7 @@ VAR
 	archive: Zip.Archive;
 	strategy, level: SIGNED32; stopOnError : BOOLEAN;
 	oldname, newname: ARRAY 256 OF CHAR;
-	nofAdded, nofErrors: SIGNED32; res: WORD;
+	nofAdded, nofErrors: SIGNED32; res: INTEGER;
 
 	PROCEDURE ShowFile(CONST oldname, newname : ARRAY OF CHAR; out : Streams.Writer);
 	BEGIN
@@ -496,7 +496,7 @@ VAR
 	archive: Zip.Archive;
 	entry: Zip.Entry;
 	stopOnError : BOOLEAN;
-	nofDeleted, nofErrors: SIGNED32; res: WORD;
+	nofDeleted, nofErrors: SIGNED32; res: INTEGER;
 BEGIN
 	NEW(options);
 	options.Add("i", "ignore", Options.Flag);

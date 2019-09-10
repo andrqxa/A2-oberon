@@ -3583,7 +3583,7 @@ TYPE
 		END EnterCustomBuiltins;
 
 		PROCEDURE GetSystem*(): Global.System;
-		VAR variableOffset: WORD;
+		VAR variableOffset: INTEGER;
 		BEGIN
 			(* create system object if not yet existing *)
 			IF system = NIL THEN

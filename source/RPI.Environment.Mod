@@ -11,7 +11,7 @@ VAR memory: SIZE;
 VAR heap: HeapManager.Heap;
 VAR clock := 0: SIGNED32;
 VAR frequency: Timer.Counter;
-VAR status* := Running: WORD;
+VAR status* := Running: INTEGER;
 VAR uartInterruptInstalled := 0: SIZE;
 VAR timerInterruptInstalled := 0: SIZE;
 VAR uartInterrupt: Interrupts.Interrupt;
@@ -125,7 +125,7 @@ BEGIN {UNCOOPERATIVE, UNCHECKED}
 	ASSERT (CAS (status, ShuttingDown, Rebooting) = ShuttingDown);
 END Reboot;
 
-PROCEDURE {NORETURN} Exit- (status: WORD);
+PROCEDURE {NORETURN} Exit- (status: INTEGER);
 BEGIN {UNCOOPERATIVE, UNCHECKED}
 	Trace.String ("system: ");
 	IF status = Rebooting THEN Trace.StringLn ("rebooting..."); CPU.Reset END;

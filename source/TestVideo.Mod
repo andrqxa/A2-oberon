@@ -276,7 +276,7 @@ END CheckFields;
 	*)
 PROCEDURE BinaryLabler*(buffer : Raster.Image; VAR labelBuffer, equivalence : ARRAY OF SIGNED16; colorThreshold, pixelThreshold, maxLabels : SIGNED32;
 	VAR labelInfo : ARRAY OF LabelInfo;
-	unifyLabels : BOOLEAN; VAR nofFLabels : SIGNED32; VAR res : WORD);
+	unifyLabels : BOOLEAN; VAR nofFLabels : SIGNED32; VAR res : INTEGER);
 VAR i, x, y, w, h: SIZE; color: SIGNED32;
 	tr, tg, tb, ta  : SIGNED32;
 	mode : Raster.Mode;
@@ -422,7 +422,7 @@ END BinaryLabler;
 (* trace a region in the label buffer. The image buffer is used for the width and height and debug output.*)
 PROCEDURE Trace(buffer : Raster.Image; CONST labelBuffer : ARRAY OF SIGNED16; VAR labelInfo :  LabelInfo;
 			VAR length : SIGNED32; VAR path : ARRAY OF Point;
-			VAR res : WORD);
+			VAR res : INTEGER);
 VAR x, y, tx, ty : SIZE;
 	w, h, i, j: SIZE;
 	dir, p, p2 : SIZE;
@@ -577,7 +577,7 @@ BEGIN
 END GetFreq;
 
 PROCEDURE Label2(buffer : Raster.Image);
-VAR nof, length, i, j : SIGNED32; w, h: SIZE; res: WORD;
+VAR nof, length, i, j : SIGNED32; w, h: SIZE; res: INTEGER;
 	path : ARRAY 1024*4 OF Point;
 	poly : ARRAY 40 OF Point;
 	nofPoints : SIGNED32;

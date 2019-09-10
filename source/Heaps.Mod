@@ -220,7 +220,7 @@ VAR
 
 	gcStatus*: GCStatus;
 
-	GCType*: WORD;
+	GCType*: INTEGER;
 	trace-: BOOLEAN;
 
 	allocationLogger-: PROCEDURE(p: ANY);
@@ -840,7 +840,7 @@ VAR throughput* := 0 : SIZE;
 
 (* NewBlock - Allocate a heap block. {(size MOD BlockSize = 0)}. Caller must hold Heap lock. *)
 PROCEDURE NewBlock(size: SIZE): ADDRESS;
-VAR try: WORD; p: FreeBlock; freeBlock : FreeBlockU; memBlock {UNTRACED}: Machine.MemoryBlock;
+VAR try: INTEGER; p: FreeBlock; freeBlock : FreeBlockU; memBlock {UNTRACED}: Machine.MemoryBlock;
 	beginHeapBlockAdr, endHeapBlockAdr: ADDRESS;
 BEGIN
 	try := 1;

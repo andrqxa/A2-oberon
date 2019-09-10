@@ -797,7 +797,7 @@ TYPE
 			temp : RegisteredDriver;
 			drv : Usbdi.Driver;
 			interface : InterfaceDescriptor;
-			i : SIGNED32; res : WORD;
+			i : SIGNED32; res : INTEGER;
 			name : Usbdi.Name;
 			suffix : SIGNED32; (* 0-99; suffix is used to generate unique names for AosPlugin.Name *)
 		BEGIN
@@ -1663,7 +1663,7 @@ BEGIN {EXCLUSIVE}
 	END;
 END GetRootHubs;
 
-PROCEDURE RootHubEvent(event : WORD; plugin : Plugins.Plugin);
+PROCEDURE RootHubEvent(event : INTEGER; plugin : Plugins.Plugin);
 VAR hcd : UsbHcdi.Hcd;
 BEGIN
 	hcd := plugin(UsbHcdi.Hcd);
@@ -1723,7 +1723,7 @@ BEGIN {EXCLUSIVE}
 END RemoveRootHub;
 
 PROCEDURE InstallRootHubs;
-VAR table : Plugins.Table; i : SIZE; res: WORD;
+VAR table : Plugins.Table; i : SIZE; res: INTEGER;
 BEGIN
 	UsbHcdi.controllers.AddEventHandler(RootHubEvent, res); (* ignore res *)
 	UsbHcdi.controllers.GetAll(table);

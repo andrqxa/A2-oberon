@@ -98,7 +98,7 @@ TYPE
 	FilePurger = OBJECT
 		VAR count: SIGNED32;
 		PROCEDURE EnumFile(f: ANY; VAR cont: BOOLEAN);
-		VAR res: WORD;
+		VAR res: INTEGER;
 		BEGIN ASSERT(~f(File).registered);
 			KernelLog.Enter;
 			KernelLog.String(moduleName); KernelLog.String("purging anonymous file '"); KernelLog.String(f(File).long); KernelLog.String("'...");
@@ -262,11 +262,11 @@ TYPE
 		END OldX;
 
 		(** Delete a file. res = 0 indicates success.  End users use Files.Delete instead. *)
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: WORD);
+		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE} Delete0X(name, key, res)
 		END Delete0;
 
-		PROCEDURE Delete0X(name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: WORD);
+		PROCEDURE Delete0X(name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
 		VAR path, filename: Filename; dir: Directory; f: File; s: SearchByName; dcc: BOOLEAN;
 		BEGIN
 			res := ErrInvalidFilename; key := 0;
@@ -310,7 +310,7 @@ TYPE
 		END Delete0X;
 
 		(* Rename a file. res = 0 indicates success.  End users use Files.Rename instead. *)
-		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: WORD);
+		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: Files.File; VAR res: INTEGER);
 		VAR oldpath, oldname, newpath, newname: Filename; r: File; dir: Directory; s: SearchByName;
 		BEGIN {EXCLUSIVE}
 			res := ErrInvalidFilename;
@@ -412,7 +412,7 @@ TYPE
 			RETURN key
 		END FileKey;
 
-		PROCEDURE CreateDirectory0*(CONST path: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE CreateDirectory0*(CONST path: ARRAY OF CHAR; VAR res: INTEGER);
 		VAR f: File; d: Directory; i,j: SIGNED32; name: Filename; lookup: BOOLEAN; s: SearchByName;
 		BEGIN {EXCLUSIVE}
 			IF (Files.ReadOnly IN vol.flags) THEN res := ErrReadOnly; RETURN END;
@@ -461,7 +461,7 @@ TYPE
 		BEGIN INC(par(CountFiles).count); RETURN TRUE
 		END RmDirCallback;
 
-		PROCEDURE RemoveDirectory0*(CONST path: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: WORD);
+		PROCEDURE RemoveDirectory0*(CONST path: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: INTEGER);
 		VAR f: File; par: CountFiles; s: SearchByName; parent: Directory;
 		BEGIN {EXCLUSIVE}
 			IF (Files.ReadOnly IN vol.flags) THEN res := ErrReadOnly; RETURN END;
@@ -497,7 +497,7 @@ TYPE
 			END
 		END RemoveDirectory0;
 
-		PROCEDURE QuickFormat*(volLabel: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE QuickFormat*(volLabel: ARRAY OF CHAR; VAR res: INTEGER);
 		VAR f: File; label: ARRAY 11 OF CHAR; i: SIGNED32;
 			clean: FileEnumerator; c: CHAR; dummy: BOOLEAN;
 		BEGIN {EXCLUSIVE}
@@ -671,7 +671,7 @@ TYPE
 		PROCEDURE ReadBuffer(buffer: Buffer; pos: SIGNED32);
 		VAR
 			last: Address;
-			i: SIGNED32; res: WORD;
+			i: SIGNED32; res: INTEGER;
 			bp, bc, ctrlflow, stopc: SIGNED32;
 		BEGIN
 			ASSERT(buffer.pos # pos);
@@ -739,7 +739,7 @@ TYPE
 
 		(* Write logical cluster. Depending on buf.cluster, a new physical cluster may be allocated. cf. ReadBuffer *)
 		PROCEDURE WriteBuffer(buffer: Buffer);
-		VAR link: Address; res: WORD;
+		VAR link: Address; res: INTEGER;
 		BEGIN
 			IF (buffer.cluster < 2) THEN	(* allocate new cluster *)
 				IF (buffer.cluster = -EOC) THEN link := FATVolumes.FREE
@@ -913,7 +913,7 @@ TYPE
 
 		(* Register a file created with New in the directory, replacing the previous file in the directory with the same name.
 			The file is automatically updated.  End users use Files.Register instead. *)
-		PROCEDURE Register0*(VAR res: WORD);
+		PROCEDURE Register0*(VAR res: INTEGER);
 		VAR dir: Directory; old: File; s: SearchByName;
 		BEGIN {EXCLUSIVE}
 			IF ~registered THEN
@@ -963,7 +963,7 @@ TYPE
 			END
 		END UpdateX;
 
-		PROCEDURE DeleteClusterChain(VAR res: WORD);
+		PROCEDURE DeleteClusterChain(VAR res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			UpdateX;
 			fs.vol(FATVolumes.Volume).FreeClusterChain(cluster, res);
@@ -1028,7 +1028,7 @@ TYPE
 	END;
 
 	ResultParam = POINTER TO RECORD(Parameter)
-		res: WORD
+		res: INTEGER
 	END;
 
 	TailGenParam = POINTER TO RECORD(Parameter)
@@ -1516,7 +1516,7 @@ TYPE
 			IF ro THEN INCL(attr, faReadOnly) END
 		END WriteFileHeaderX;
 
-		PROCEDURE NewSubdirectory(name: ARRAY OF CHAR; VAR res: WORD): Directory;
+		PROCEDURE NewSubdirectory(name: ARRAY OF CHAR; VAR res: INTEGER): Directory;
 		VAR upName: Filename; dir: Directory; f: File; i, t, d, p: SIGNED32; r: Files.Rider; entry: ARRAY 32 OF CHAR;
 		BEGIN {EXCLUSIVE}
 			IF UTF8Strings.Valid(name) & ValidateName(name) THEN
@@ -1552,7 +1552,7 @@ TYPE
 						FOR i := 2 TO (dir.clusterSize DIV 32)-1 DO dir.WriteBytes(r, entry, 0, 32) END;
 
 						dir.Update;
-						res := r.res(WORD);
+						res := r.res(INTEGER);
 					ELSE dir := NIL	(* res is already set *)
 					END
 				ELSE
@@ -1579,7 +1579,7 @@ TYPE
 			END
 		END DeleteCallback;
 
-		PROCEDURE DeleteContents(VAR res: WORD);
+		PROCEDURE DeleteContents(VAR res: INTEGER);
 		VAR par: ResultParam; enum: FileEnumerator;
 		BEGIN {EXCLUSIVE}
 			NEW(enum, cluster);
@@ -1673,7 +1673,7 @@ TYPE
 		END InitSize;
 
 		PROCEDURE ReadBuffer(buffer: Buffer; pos: SIGNED32);
-		VAR vol: FATVolumes.FAT1216Volume; res: WORD;
+		VAR vol: FATVolumes.FAT1216Volume; res: INTEGER;
 		BEGIN
 			vol := fs.vol(FATVolumes.FAT1216Volume);
 			IF (pos < 0) OR (pos >= vol.numRootSectors) THEN HALT(ErrInvalidParams) END;
@@ -1683,7 +1683,7 @@ TYPE
 		END ReadBuffer;
 
 		PROCEDURE WriteBuffer(buffer: Buffer);
-		VAR vol: FATVolumes.FAT1216Volume; res: WORD;
+		VAR vol: FATVolumes.FAT1216Volume; res: INTEGER;
 		BEGIN
 			vol := fs.vol(FATVolumes.FAT1216Volume);
 			IF (buffer.cluster < 0) OR (buffer.cluster >= vol.numRootSectors) THEN HALT(ErrInvalidParams) END;
@@ -1723,7 +1723,7 @@ BEGIN
 END NewFS;
 
 PROCEDURE PurgeFile(f: ANY);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	WITH f: File DO
 		IF ~f.registered & (f.cluster # NotAssigned) THEN
@@ -1782,7 +1782,7 @@ BEGIN
 END IsShortName;
 
 PROCEDURE CheckSum*(short: Shortname): CHAR;
-VAR chksum: WORD; i: SIZE;
+VAR chksum: INTEGER; i: SIZE;
 BEGIN
 	chksum := 0;
 	FOR i := 0 TO 10 DO

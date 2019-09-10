@@ -18,7 +18,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 		SizeReader = OBJECT
 			VAR input: Streams.Reader; max: SIZE;
 
-			PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+			PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 			BEGIN
 				IF min > max THEN min := max END;
 				input.Bytes(buf, ofs, min, len);
@@ -65,7 +65,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 				RETURN entries
 			END NoOfEntries;
 
-			PROCEDURE OpenReceiver*(VAR R: Streams.Receiver; entry: Entry; VAR res: WORD);
+			PROCEDURE OpenReceiver*(VAR R: Streams.Receiver; entry: Entry; VAR res: INTEGER);
 				VAR fR: Files.Reader; sig: SIGNED32; e: Entry; I: Inflate.Reader; S: SizeReader;
 			BEGIN
 				R := NIL; res := Streams.FormatError;
@@ -81,7 +81,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 				END
 			END OpenReceiver;
 
-			PROCEDURE Extract*(entry: Entry; dest: Streams.Writer; VAR res: WORD);
+			PROCEDURE Extract*(entry: Entry; dest: Streams.Writer; VAR res: INTEGER);
 				VAR receiver : Streams.Receiver; R: Streams.Reader; buf: ARRAY 1024 OF CHAR; l: SIZE; crc: CRC.CRC32Stream;
 			BEGIN
 				OpenReceiver(receiver, entry, res);
@@ -103,7 +103,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 				END
 			END Extract;
 
-			PROCEDURE &New*(F: Files.File; VAR res: WORD);
+			PROCEDURE &New*(F: Files.File; VAR res: INTEGER);
 				VAR R: Files.Reader; r, e: Entry; pos: Files.Position; sig, l, j: SIGNED32; i: SIGNED16;
 			BEGIN
 				res := Streams.Ok; SELF.F := NIL; root := NIL; entries := 0;
@@ -215,7 +215,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 	END StripPrefix;
 
 	PROCEDURE ExtractEntry(w: Streams.Writer; zip: ZipFile; entry: Entry; name: ARRAY OF CHAR; backup, path: BOOLEAN);
-		VAR F: Files.File; W: Files.Writer; res: WORD; bak: Files.FileName;
+		VAR F: Files.File; W: Files.Writer; res: INTEGER; bak: Files.FileName;
 	BEGIN
 		IF ~path THEN StripPrefix(name, name) END;
 		w.String(name);
@@ -242,7 +242,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 	(* Extract [ \o ] [ \d ] [ \p prefix ] zip { entry } ~ *)
 	PROCEDURE Extract*(context : Commands.Context);
 	VAR
-		F: Files.File; zip: ZipFile; name, fs: Files.FileName; res: WORD;
+		F: Files.File; zip: ZipFile; name, fs: Files.FileName; res: INTEGER;
 		e: Entry; opt: ARRAY 32 OF CHAR; ch: CHAR; backup, path, prefix: BOOLEAN;
 	BEGIN
 		context.arg.SkipWhitespace();
@@ -289,7 +289,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 	(* ExtractAll [ \o ] [ \d ] [ \p prefix ] zip ~ *)
 	PROCEDURE ExtractAll*(context : Commands.Context);
 	VAR
-		F: Files.File; zip: ZipFile; name, fs: Files.FileName; res: WORD;
+		F: Files.File; zip: ZipFile; name, fs: Files.FileName; res: INTEGER;
 		e: Entry; opt: ARRAY 32 OF CHAR; ch: CHAR; backup, path, prefix: BOOLEAN;
 	BEGIN
 		context.arg.SkipWhitespace();
@@ -338,7 +338,7 @@ MODULE Unzip; (** AUTHOR "ejz"; PURPOSE "Aos unzip program"; *)
 	(* Directory [ \d ] zip ~ *)
 	PROCEDURE Directory*(context : Commands.Context);
 	VAR
-		F: Files.File; zip: ZipFile; name: Files.FileName; res: WORD; i: SIGNED32;
+		F: Files.File; zip: ZipFile; name: Files.FileName; res: INTEGER; i: SIGNED32;
 		e: Entry; opt: ARRAY 32 OF CHAR; ch: CHAR; detail: BOOLEAN;
 	BEGIN
 		context.arg.SkipWhitespace();

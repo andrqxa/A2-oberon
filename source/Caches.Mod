@@ -93,7 +93,7 @@ TYPE
 		(** Synchronize all momentarily dirty buffers that are not locked. *)
 
 		PROCEDURE Synchronize*;
-		VAR list, buf: Buffer; res: WORD; num, count: SIGNED32;
+		VAR list, buf: Buffer; res: INTEGER; num, count: SIGNED32;
 		BEGIN
 			AcquireDirty(list); count := 0;
 			WHILE list # NIL DO
@@ -210,7 +210,7 @@ TYPE
 
 (* Report an error during asynchronous disk access. *)
 
-PROCEDURE ReportError(dev: Disks.Device; block, num: SIGNED32; res: WORD);
+PROCEDURE ReportError(dev: Disks.Device; block, num: SIGNED32; res: INTEGER);
 BEGIN
 	KernelLog.Enter; KernelLog.String("Caches: Error "); KernelLog.Int(res, 1);
 	KernelLog.String(" on disk "); KernelLog.String(dev.name); KernelLog.Int(num, 1);

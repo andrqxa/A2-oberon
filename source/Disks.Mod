@@ -60,25 +60,25 @@ TYPE
 			NnofReads*, NnofWrites*, NnofOthers*, (** operation count *)
 			NnofErrors* : SIGNED64; (** read/write errors *)
 
-		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		BEGIN
 			res := Unsupported
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: WORD);
+		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			res := Unsupported
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Message;  VAR res: WORD);
+		PROCEDURE Handle*(VAR msg: Message;  VAR res: INTEGER);
 		BEGIN
 			res := Unsupported
 		END Handle;
 
 		(** Open the device and increment its open count if successful. If the device is opened for the first time, lock it and update its partition table. *)
 
-		PROCEDURE Open*(VAR res: WORD);
-		VAR lockMsg: LockMsg; unlockMsg: UnlockMsg; ignore: WORD;
+		PROCEDURE Open*(VAR res: INTEGER);
+		VAR lockMsg: LockMsg; unlockMsg: UnlockMsg; ignore: INTEGER;
 		BEGIN
 			res := Ok;
 			IF openCount = 0 THEN
@@ -96,7 +96,7 @@ TYPE
 
 		(** Close the device and decrement its open count. Unlock it if the open count has reached 0. *)
 
-		PROCEDURE Close*(VAR res: WORD);
+		PROCEDURE Close*(VAR res: INTEGER);
 		VAR unlockMsg: UnlockMsg;
 		BEGIN
 			res := Ok; ASSERT(openCount > 0);
@@ -182,7 +182,7 @@ END ValidFlag;
 
 (* Read primary partition table entries into p *)
 
-PROCEDURE ReadPrimary(VAR b: DiskBlock; dev: Device;  VAR p: PartitionTable;  VAR n: SIGNED32; VAR res: WORD; VAR valid: BOOLEAN);
+PROCEDURE ReadPrimary(VAR b: DiskBlock; dev: Device;  VAR p: PartitionTable;  VAR n: SIGNED32; VAR res: INTEGER; VAR valid: BOOLEAN);
 VAR e, size, i: SIGNED32;
 BEGIN
 	n := 0;
@@ -212,7 +212,7 @@ END ReadPrimary;
 
 (* Read "logical drive" partitions into p *)
 
-PROCEDURE ReadLogical(VAR b: DiskBlock; dev: Device;  first: SIGNED32;  VAR p: PartitionTable;  VAR n: SIGNED32; VAR res: WORD);
+PROCEDURE ReadLogical(VAR b: DiskBlock; dev: Device;  first: SIGNED32;  VAR p: PartitionTable;  VAR n: SIGNED32; VAR res: INTEGER);
 VAR e, sec, size, i: SIGNED32; found: BOOLEAN;
 BEGIN
 	sec := first;
@@ -254,7 +254,7 @@ END ReadLogical;
 partition spanning the entire device, with type = 256. If the device has been opened before, do nothing and
 return DeviceInUse, otherwise return Ok. On any other error dev.table is set NIL. *)
 
-PROCEDURE UpdatePartitionTable*(dev: Device; VAR res: WORD);
+PROCEDURE UpdatePartitionTable*(dev: Device; VAR res: INTEGER);
 VAR p, t: PartitionTable; i, pn, tn, size: SIGNED32; buf: DiskBlock; valid: BOOLEAN;
 BEGIN
 	IF dev.openCount = 0 THEN
@@ -291,7 +291,7 @@ END UpdatePartitionTable;
 
 (* Clean up the installed devices. *)
 PROCEDURE Cleanup;
-VAR dev: Plugins.Table; i: SIZE; res: WORD; msg: ShutdownMsg;
+VAR dev: Plugins.Table; i: SIZE; res: INTEGER; msg: ShutdownMsg;
 BEGIN
 	registry.GetAll(dev);
 	IF dev # NIL THEN

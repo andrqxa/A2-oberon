@@ -28,7 +28,7 @@ TYPE
 			NEW(data, initialSize); length := 0;
 		END Init;
 
-		PROCEDURE Add*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Add*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR newSize, i : SIZE; n : String;
 		BEGIN
 			IF length + len + 1 >= LEN(data) THEN
@@ -713,7 +713,7 @@ BEGIN
 END StrToSizePos;
 
 (** converts an integer value to a hex string *)
-PROCEDURE IntToHexStr*(h : SIGNED64; width: WORD; VAR s: ARRAY OF CHAR);
+PROCEDURE IntToHexStr*(h : SIGNED64; width: INTEGER; VAR s: ARRAY OF CHAR);
 VAR c: CHAR;
 BEGIN
 	IF (width <= 0) THEN width := 8 END;
@@ -728,7 +728,7 @@ BEGIN
 END IntToHexStr;
 
 (** converts a hex string to an integer. Leading whitespace is ignored. res=Ok indicates success, val=0 on failure. *)
-PROCEDURE HexStrToInt*(CONST string: ARRAY OF CHAR; VAR val: SIGNED32; VAR res: WORD);
+PROCEDURE HexStrToInt*(CONST string: ARRAY OF CHAR; VAR val: SIGNED32; VAR res: INTEGER);
 VAR length, i : SIZE; ch: CHAR; negative : BOOLEAN;
 BEGIN
 	length := LEN(string); val := 0; res := -1;
@@ -758,7 +758,7 @@ BEGIN
 END HexStrToInt;
 
 (** converts a hex string to a size. Leading whitespace is ignored. res=Ok indicates success, val=0 on failure. *)
-PROCEDURE HexStrToSize*(CONST string: ARRAY OF CHAR; VAR val: SIZE; VAR res: WORD);
+PROCEDURE HexStrToSize*(CONST string: ARRAY OF CHAR; VAR val: SIZE; VAR res: INTEGER);
 VAR length, i : SIZE; ch: CHAR;
 BEGIN
 	length := LEN(string); val := 0; res := -1;

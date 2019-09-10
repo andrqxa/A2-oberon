@@ -577,7 +577,7 @@ BEGIN
 END IsDAVError;
 
 (* don't write anything. Just for counting what's written to a writer. *)
-PROCEDURE Dev0(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+PROCEDURE Dev0(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 BEGIN END Dev0;
 
 (* Find size of an XML object which must be written. *)

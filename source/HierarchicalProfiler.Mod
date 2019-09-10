@@ -517,7 +517,7 @@ BEGIN
 END GetBufferSize;
 
 (**	Generate hierarchical profile of the last profiler run's data. Returns NIL if no data available *)
-PROCEDURE GetProfile*(type, info : SIGNED32; VAR profile : Profile; VAR res : WORD);
+PROCEDURE GetProfile*(type, info : SIGNED32; VAR profile : Profile; VAR res : INTEGER);
 BEGIN {EXCLUSIVE}
 	profile := NIL;
 	IF (state # Running) THEN
@@ -534,7 +534,7 @@ END GetProfile;
 
 (** Start profiling. If the profiler is already running, it is stopped and the sample data is discarded before re-starting it *)
 PROCEDURE Start*(context : Commands.Context); (** [options] ~ *)
-VAR options : Options.Options; unit : ARRAY 4 OF CHAR; maxTime: SIGNED32; bufferSize: SIZE; res: WORD;
+VAR options : Options.Options; unit : ARRAY 4 OF CHAR; maxTime: SIGNED32; bufferSize: SIZE; res: INTEGER;
 BEGIN
 	NEW(options);
 	options.Add("t", "time", Options.Integer); (* in seconds *)
@@ -563,7 +563,7 @@ BEGIN
 END Start;
 
 (** Start profiling. If the profiler is already running, it is stopped and the sample data is discarded before re-starting it *)
-PROCEDURE StartProfiling*(maxTime : SIGNED32; VAR res : WORD);
+PROCEDURE StartProfiling*(maxTime : SIGNED32; VAR res : INTEGER);
 BEGIN {EXCLUSIVE}
 	ASSERT(maxTime > 0);
 	IF (state # Running) THEN
@@ -586,7 +586,7 @@ END StartProfiling;
 
 (** Stop profiling. The profile data is not discarded. It can be retrieved using the procedure 'GetProfile' *)
 PROCEDURE Stop*(context : Commands.Context);
-VAR res : WORD;
+VAR res : INTEGER;
 BEGIN
 	StopProfiling(res);
 	IF (res = Ok) THEN
@@ -599,7 +599,7 @@ BEGIN
 END Stop;
 
 (** Stop profiling. The profile data is not discarded. It can be retrieved using the procedure 'GetProfile' *)
-PROCEDURE StopProfiling*(VAR res : WORD);
+PROCEDURE StopProfiling*(VAR res : INTEGER);
 BEGIN {EXCLUSIVE}
 	IF (state = Running) THEN
 		HierarchicalProfiler0.Disable;
@@ -611,7 +611,7 @@ BEGIN {EXCLUSIVE}
 END StopProfiling;
 
 PROCEDURE Continue*(context : Commands.Context); (** ~ *)
-VAR res : WORD;
+VAR res : INTEGER;
 BEGIN
 	ContinueProfiling(res);
 	IF (res = Ok) THEN
@@ -622,7 +622,7 @@ BEGIN
 	context.out.Ln;
 END Continue;
 
-PROCEDURE ContinueProfiling*(VAR res : WORD);
+PROCEDURE ContinueProfiling*(VAR res : INTEGER);
 BEGIN {EXCLUSIVE}
 	IF (state # Running) THEN
 		IF (samples # NIL) THEN
@@ -639,7 +639,7 @@ BEGIN {EXCLUSIVE}
 END ContinueProfiling;
 
 (** Returns TRUE if the profiler is currently running, FALSE otherwise *)
-PROCEDURE GetState*(VAR currentSamples, maxSamples : SIZE) : WORD;
+PROCEDURE GetState*(VAR currentSamples, maxSamples : SIZE) : INTEGER;
 BEGIN {EXCLUSIVE}
 	IF (state = Running) THEN
 		currentSamples := currentIndex;
@@ -677,7 +677,7 @@ BEGIN {EXCLUSIVE}
 END Show;
 
 PROCEDURE Cleanup;
-VAR ignore : WORD;
+VAR ignore : INTEGER;
 BEGIN
 	StopProfiling(ignore);
 END Cleanup;

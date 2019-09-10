@@ -1596,7 +1596,7 @@ MODULE OpenType;	(** AUTHOR "eos, PL"; PURPOSE "Bluebottle port of OpenType"; *)
 
 PROCEDURE GetSharpenContours;
 VAR
-	res: WORD;
+	res: INTEGER;
 BEGIN
 	Configuration.GetBoolean("WindowManager.FontManager.SharpenContours", SharpenContours, res);
 	IF res # Configuration.Ok THEN

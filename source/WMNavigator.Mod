@@ -75,7 +75,7 @@ TYPE
 			SetZoomLevel(currentZoomLevel + dz, xg, yg);
 		END ChangeZoom;
 
-		PROCEDURE ReInit(width, height : SIZE; format : WORD; onDrawn : OnDrawnProc);
+		PROCEDURE ReInit(width, height : SIZE; format : INTEGER; onDrawn : OnDrawnProc);
 		VAR tf : FLOAT32;
 		BEGIN
 			SELF.onDrawn := onDrawn;

@@ -27,7 +27,7 @@ TYPE
 				f: Forwarder; (* this client belogs to *)
 				p: T.Packet;
 				buf: ARRAY 64 OF CHAR;
-				len: SIZE; res: WORD;
+				len: SIZE; res: INTEGER;
 
 
 
@@ -73,7 +73,7 @@ TYPE
 				buf: ARRAY 4096 OF CHAR;
 				type: CHAR;
 				len: SIZE;
-				res: WORD;
+				res: INTEGER;
 
 				clientHandlerRunning: BOOLEAN;
 				clientHandler: ClientHandler;
@@ -209,7 +209,7 @@ TYPE
 				rbstart, rbend: SIGNED32;
 				interactive: BOOLEAN;
 
-				PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
+				PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
 				VAR p: T.Packet; l: SIZE; t: CHAR;
 					buf: ARRAY 512 OF CHAR;
 				BEGIN
@@ -227,7 +227,7 @@ TYPE
 					conn.SendPacket( p );  DEC( wsize, len );  res := Streams.Ok
 				END Send;
 
-				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 				VAR
 					plen: SIZE; dlen: SIGNED32; pType, ch: CHAR;
 				BEGIN
@@ -786,7 +786,7 @@ TYPE
 		locPort, destPort: SIGNED32;
 		arg: Streams.Reader;
 		strings: Strings.StringArray;
-		res: WORD;
+		res: INTEGER;
 	BEGIN
 		arg := context.arg;
 		arg.SkipWhitespace; arg.String( token );

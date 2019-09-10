@@ -156,7 +156,7 @@ TYPE
 
 		PROCEDURE &Init*(dev: LinkDevice; base, irq: SIGNED32);
 		VAR
-			res: WORD;
+			res: INTEGER;
 			s: SET;
 			i,x: SIGNED16;
 
@@ -517,7 +517,7 @@ TYPE
 (* Scan the PCI bus for the specified card. *)
 PROCEDURE ScanPCI(vendor, device: SIGNED32);
 VAR
-	index, bus, dev, fct, base, irq, i: SIGNED32; res: WORD;
+	index, bus, dev, fct, base, irq, i: SIGNED32; res: INTEGER;
 	d: LinkDevice;
 	c: Controller;
 	name: Plugins.Name;

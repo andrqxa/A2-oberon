@@ -251,7 +251,7 @@ TYPE
 		END SetNodeState;
 
 		(** Incl node state *)
-		PROCEDURE InclNodeState*(node : TreeNode; state : WORD);
+		PROCEDURE InclNodeState*(node : TreeNode; state : INTEGER);
 		BEGIN
 			ASSERT(Objects.ActiveObject() = lockedBy, 3000);
 			IF node = NIL THEN RETURN END;
@@ -265,7 +265,7 @@ TYPE
 		END InclNodeState;
 
 		(**Excl node state *)
-		PROCEDURE ExclNodeState*(node : TreeNode; state : WORD);
+		PROCEDURE ExclNodeState*(node : TreeNode; state : INTEGER);
 		BEGIN
 			ASSERT(Objects.ActiveObject() = lockedBy, 3000);
 			IF node = NIL THEN RETURN END;

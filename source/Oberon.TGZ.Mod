@@ -49,7 +49,7 @@ BEGIN
 	RETURN x
 END GetNum;
 
-PROCEDURE UnpackTGZ(tgzname, prefix: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE UnpackTGZ(tgzname, prefix: ARRAY OF CHAR; VAR res: INTEGER);
 CONST
 	RS = 512;
 VAR
@@ -101,7 +101,7 @@ BEGIN
 END UnpackTGZ;
 
 PROCEDURE Extract*;	(** file.tgz dstprefix *)
-VAR res: WORD; name, prefix: FileName;
+VAR res: INTEGER; name, prefix: FileName;
 BEGIN
 	In.Open; In.String(name); In.String(prefix);
 	IF In.Done THEN

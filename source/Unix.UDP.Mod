@@ -26,7 +26,7 @@ TYPE
 
 
 				(** Constructor *)
-				PROCEDURE & Open*( lport: SIGNED32;  VAR res: WORD );
+				PROCEDURE & Open*( lport: SIGNED32;  VAR res: INTEGER );
 				VAR laddr: Sockets.SocketAdr;
 				BEGIN
 					ASSERT( (lport >= 0) & (lport < 10000H) );
@@ -55,7 +55,7 @@ TYPE
 				PROCEDURE Send*( fip: IP.Adr;
 								   fport: SIGNED32;
 								   CONST data: ARRAY OF CHAR;  ofs, len: SIZE;
-								   VAR res: WORD );
+								   VAR res: INTEGER );
 				VAR addr: Sockets.SocketAdr;
 				BEGIN {EXCLUSIVE}
 					ASSERT( (fport >= 0) & (fport < 10000H) );
@@ -85,7 +85,7 @@ TYPE
 					too big.
 				*)
 				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size: SIZE; ms: SIGNED32;
-									 VAR fip: IP.Adr;  VAR fport: SIGNED32; VAR len: SIZE; VAR res: WORD );
+									 VAR fip: IP.Adr;  VAR fport: SIGNED32; VAR len: SIZE; VAR res: INTEGER );
 				VAR
 					addr: Sockets.SocketAdr; i: SIZE;
 				BEGIN {EXCLUSIVE}

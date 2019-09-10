@@ -852,7 +852,7 @@ TYPE
 
 		PROCEDURE OpenPlayChannel*(VAR channel : SoundDevices.Channel;
 		samplingRate, samplingResolution, nofSubChannels, format : SIGNED32;
-		VAR res : WORD);
+		VAR res : INTEGER);
 		VAR i, count : SIGNED32;
 		BEGIN {EXCLUSIVE}
 			channel := NIL;
@@ -887,7 +887,7 @@ TYPE
 
 		PROCEDURE OpenRecordChannel*(VAR channel : SoundDevices.Channel;
 		samplingRate, samplingResolution, nofSubChannels, format : SIGNED32;
-		VAR res: WORD);
+		VAR res: INTEGER);
 		VAR i : SIGNED32;
 		BEGIN
 			channel := NIL;
@@ -1416,7 +1416,7 @@ BEGIN
 END Cleanup;
 
 PROCEDURE ScanPCI(vendor, device: SIGNED32; name: Plugins.Name);
-VAR index, bus, dev, fct, base, irq, i : SIGNED32; res: WORD;
+VAR index, bus, dev, fct, base, irq, i : SIGNED32; res: INTEGER;
 	driver : Driver;
 	drivername : Plugins.Name;
 BEGIN

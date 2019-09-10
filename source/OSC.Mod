@@ -569,7 +569,7 @@ OSCBundle b:
 				RETURN returner # NIL;
 			END IsReturnable;
 
-			PROCEDURE Return*(p: OSCPacket): WORD; (* returns the packet p to the sender of the current packet *)
+			PROCEDURE Return*(p: OSCPacket): INTEGER; (* returns the packet p to the sender of the current packet *)
 			BEGIN
 				IF returner # NIL THEN
 					RETURN returner(p, returnerdata);
@@ -606,7 +606,7 @@ OSCBundle b:
 		OSCPacketArray* = POINTER TO ARRAY OF OSCPacket;
 
 		(* signature of return procedures *)
-		OSCReturnProc* = PROCEDURE {DELEGATE} (p: OSCPacket; data: OBJECT): WORD;
+		OSCReturnProc* = PROCEDURE {DELEGATE} (p: OSCPacket; data: OBJECT): INTEGER;
 
 
 		(* OSCMessage stores a single OSCMessage *)

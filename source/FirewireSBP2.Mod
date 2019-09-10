@@ -193,7 +193,7 @@ TYPE
 		t: Kernel.Timer;
 
 		PROCEDURE Config;
-		VAR size ,payloadNotCoded: SIGNED32; diskres: WORD;
+		VAR size ,payloadNotCoded: SIGNED32; diskres: INTEGER;
 		BEGIN
 			payloadNotCoded:= SYSTEM.VAL(SIGNED32,LSH({0},maxPayload+1));
 			NEW(dataBufferFIFO,10,payloadNotCoded);
@@ -297,7 +297,7 @@ BEGIN
 	END
 END CreateCommandOrb;
 
-PROCEDURE LinkCommandOrb(commandOrb: Sbp2CommandOrb;VAR diskres: WORD);
+PROCEDURE LinkCommandOrb(commandOrb: Sbp2CommandOrb;VAR diskres: INTEGER);
 VAR buffer: ARRAY 2 OF SET; quadlet: SET;
 BEGIN
 	diskres:= 0;
@@ -378,7 +378,7 @@ BEGIN
 	SYSTEM.PUT32(statusBufAddr,{});
 END HandleStatus;
 
-PROCEDURE SendCommand(VAR command: Command;VAR diskres: WORD): BOOLEAN;
+PROCEDURE SendCommand(VAR command: Command;VAR diskres: INTEGER): BOOLEAN;
 VAR
 	commandOrb: Sbp2CommandOrb;i,addr,retBufferAddr : SIGNED32; (* t: Kernel.Timer; *)
 	statusHi,statusLow: SET;
@@ -432,7 +432,7 @@ BEGIN
 	RETURN TRUE;
 END SendCommand;
 
-PROCEDURE Handle *(VAR msg: Disks.Message; VAR diskres: WORD);
+PROCEDURE Handle *(VAR msg: Disks.Message; VAR diskres: INTEGER);
 (* VAR command: Command; cylinders,heads,sectors,i: SIGNED32; *)
 BEGIN
 	KernelLog.String("HANDLE"); KernelLog.Ln;
@@ -466,7 +466,7 @@ BEGIN
 	(* KernelLog.Int(SELF.blockSize,2); *)
 END Handle;
 
-PROCEDURE Transfer*(op,block,num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR diskres: WORD);
+PROCEDURE Transfer*(op,block,num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR diskres: INTEGER);
 VAR i, payloadNotCoded: SIGNED32; command: Command; numOfBlocks,tries: SIGNED32;
 BEGIN
 
@@ -513,7 +513,7 @@ BEGIN
 	END;
 END Transfer;
 
-PROCEDURE GetSize*(VAR size: SIGNED32;VAR diskres: WORD);
+PROCEDURE GetSize*(VAR size: SIGNED32;VAR diskres: INTEGER);
 VAR command: Command; i: SIGNED32; (* dev: Sbp2Dev; *)
 BEGIN
 
@@ -1081,7 +1081,7 @@ BEGIN
 END ScanUD;
 
 PROCEDURE AddStorageDevices(VAR dev: Sbp2Dev);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	(* now add to disk system *)
 	Disks.registry.Add(dev,res);
@@ -1183,7 +1183,7 @@ END Print;
 
 (** Test procedure *)
 PROCEDURE TestTransfer*;
-VAR diskres: WORD; ofs,i: SIGNED32; data: ARRAY 1024 OF CHAR; dev: Sbp2Dev;grp: SbpDevGrp;
+VAR diskres: INTEGER; ofs,i: SIGNED32; data: ARRAY 1024 OF CHAR; dev: Sbp2Dev;grp: SbpDevGrp;
 	tempSet: SET;
 BEGIN
 	ofs:= 0;

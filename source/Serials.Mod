@@ -64,17 +64,17 @@ TYPE
 		(** Characters sent/read since port has been opened. Consider these fields read-only! *)
 		charactersSent*, charactersReceived* : Streams.Position;
 
-		PROCEDURE Open* (bps, data, parity, stop : SIGNED32; VAR res: WORD);
+		PROCEDURE Open* (bps, data, parity, stop : SIGNED32; VAR res: INTEGER);
 		END Open;
 
 		PROCEDURE Close* ;
 		END Close;
 
-		PROCEDURE SendChar* (ch: CHAR; VAR res : WORD);
+		PROCEDURE SendChar* (ch: CHAR; VAR res : INTEGER);
 		END SendChar;
 
 		(** Send len characters from buf to output, starting at ofs. res is non-zero on error. *)
-		PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send*(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		VAR i : SIZE;
 		BEGIN
 			i := 0;
@@ -85,12 +85,12 @@ TYPE
 			END
 		END Send;
 
-		PROCEDURE ReceiveChar* (VAR ch: CHAR; VAR res: WORD);
+		PROCEDURE ReceiveChar* (VAR ch: CHAR; VAR res: INTEGER);
 		END ReceiveChar;
 
 		(** Receive size characters into buf, starting at ofs and return the effective number of bytes read in len.
 			Wait until at least min bytes (possibly zero) are available. res is non-zero on error. *)
-		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive*(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		VAR ch: CHAR;
 		BEGIN
 			len := 0;
@@ -211,7 +211,7 @@ BEGIN {EXCLUSIVE}
 END GetPort;
 
 PROCEDURE TraceChar(ch: CHAR);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	IF tracePort # NIL THEN
 		tracePort.SendChar(ch, res);
@@ -224,11 +224,11 @@ END TraceChar;
 	portNumber: serial port number, or 0 to disable trace output, or a negative value for rolling back to the initial trace output configuration
 	bps, data, parity, stop: serial port settings
 *)
-PROCEDURE SetTracePort*(portNumber: SIGNED32; bps, data, parity, stop: SIGNED32; VAR res: WORD);
+PROCEDURE SetTracePort*(portNumber: SIGNED32; bps, data, parity, stop: SIGNED32; VAR res: INTEGER);
 VAR
 	isOpen0: BOOLEAN;
 	bps0, data0, parity0, stop0 : SIGNED32;
-	res1: WORD;
+	res1: INTEGER;
 	port: Port;
 BEGIN{EXCLUSIVE}
 	res := 0;
@@ -293,7 +293,7 @@ END IsTracePort;
 	params: set of parameters specified by the user (0-bps, 1-data, 2-parity, 3-stop)
 	res: error code, 0 in case of success
 *)
-PROCEDURE GetPortParameters*(r: Streams.Reader; VAR portNumber, bps, data, parity, stop: SIGNED32; VAR params: SET; VAR res: WORD);
+PROCEDURE GetPortParameters*(r: Streams.Reader; VAR portNumber, bps, data, parity, stop: SIGNED32; VAR params: SET; VAR res: INTEGER);
 VAR
 	str : ARRAY 32 OF CHAR;
 	d: SIGNED32;
@@ -362,7 +362,7 @@ END GetPortParameters;
 *)
 PROCEDURE SetTrace*(context: Commands.Context);
 VAR
-	portNumber, bps, data, parity, stop: SIGNED32; res: WORD; params: SET;
+	portNumber, bps, data, parity, stop: SIGNED32; res: INTEGER; params: SET;
 BEGIN
 	GetPortParameters(context.arg, portNumber, bps, data, parity, stop, params, res);
 	IF (portNumber > 0) & (res # 0) THEN
@@ -397,7 +397,7 @@ END Show;
 (** Test serial ports COM1 and if present COM2 with the generic driver *)
 PROCEDURE Test*(context : Commands.Context);
 VAR
-	result : WORD;
+	result : INTEGER;
 	portgotten : Port;
 BEGIN
 	context.out.String ("Testing availability of COM1 and COM2."); context.out.Ln;

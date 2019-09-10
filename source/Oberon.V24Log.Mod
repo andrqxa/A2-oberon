@@ -12,7 +12,7 @@ MODULE V24Log IN Oberon;	(** portable *) (* ejz,  *)
 	VAR
 		W: Texts.Writer;
 		T: Oberon.Task;
-		res: WORD;
+		res: INTEGER;
 		last: CHAR;
 		Port: SIGNED32;
 

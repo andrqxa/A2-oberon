@@ -39,7 +39,7 @@ TYPE
 		next: Connection;	(* link in connection pool *)
 		pcb: TCP.Connection;
 		w: Window;
-		res: WORD;
+		res: INTEGER;
 		id: SIGNED32;
 		receiver: Receiver;
 		sender: Sender;
@@ -171,7 +171,7 @@ TYPE
 		VAR
 			c: Connection;
 			head, middle, tail, lx, ly: SIZE;
-			res: WORD;
+			res: INTEGER;
 			lkeys : SET;
 			buf: ARRAY OutBufSize OF CHAR;
 			done, poll: BOOLEAN;
@@ -834,7 +834,7 @@ END OpenVNC;
 (* Close a VNC connection. *)
 
 PROCEDURE CloseVNC*(VAR c: Connection);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN
 	pool.Remove(c);
 	c.pcb.Close();
@@ -846,7 +846,7 @@ BEGIN
 END CloseVNC;
 
 PROCEDURE PrintConnection(c: Connection; out : Streams.Writer);
-VAR res: WORD; name: ARRAY 128 OF CHAR;
+VAR res: INTEGER; name: ARRAY 128 OF CHAR;
 BEGIN
 	out.Int(c.id, 1);
 	CASE c.fmt.code OF
@@ -883,7 +883,7 @@ END ReadString;
 
 PROCEDURE Open*(context : Commands.Context); (** server[pwd|?] port *)
 VAR
-	server: IP.Adr; res: WORD; port: SIGNED32;
+	server: IP.Adr; res: INTEGER; port: SIGNED32;
 	c: Connection; pwd: ARRAY 32 OF CHAR; svr, title: ARRAY 128 OF CHAR;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(svr); context.arg.SkipWhitespace;

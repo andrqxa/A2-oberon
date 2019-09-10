@@ -191,7 +191,7 @@ TYPE
 		END LoadRepository;
 
 		PROCEDURE HandleButtons(sender, data : ANY);
-		VAR filename : ARRAY 256 OF CHAR; res : WORD;
+		VAR filename : ARRAY 256 OF CHAR; res : INTEGER;
 		BEGIN
 			IF (sender = loadBtn) THEN
 				filenameEditor.GetAsString(filename);
@@ -257,7 +257,7 @@ TYPE
 		END OnComponentClicked;
 
 		PROCEDURE OnClickedSelected(sender, data : ANY);
-		VAR command, msg : ARRAY 384 OF CHAR; res : WORD; string : Strings.String;
+		VAR command, msg : ARRAY 384 OF CHAR; res : INTEGER; string : Strings.String;
 		BEGIN
 			IF (data # NIL) & (data IS WMRepositories.EntryWrapper) THEN
 				IF (data(WMRepositories.EntryWrapper).repository # NIL) & (data(WMRepositories.EntryWrapper).element # NIL) THEN
@@ -789,8 +789,8 @@ TYPE
 			);
 		END FixBounds;
 
-		PROCEDURE IsInActiveFrameHandle(x, y : SIZE) : WORD;
-		VAR res : WORD;
+		PROCEDURE IsInActiveFrameHandle(x, y : SIZE) : INTEGER;
+		VAR res : INTEGER;
 		BEGIN
 			res := IsInFrameHandle(x, y);
 			IF (res # No) & ~(res IN activeHandles) THEN
@@ -799,8 +799,8 @@ TYPE
 			RETURN res;
 		END IsInActiveFrameHandle;
 
-		PROCEDURE IsInFrameHandle(x, y : SIZE): WORD;
-		VAR xs, ys, xe, ye: SIZE; res : WORD;
+		PROCEDURE IsInFrameHandle(x, y : SIZE): INTEGER;
+		VAR xs, ys, xe, ye: SIZE; res : INTEGER;
 		BEGIN
 			IF IsValid() THEN
 				xs := bounds.l; ys := bounds.t; xe := bounds.r; ye := bounds.b;
@@ -993,7 +993,7 @@ TYPE
 			END;
 		END SetExtents;
 
-		PROCEDURE SetLimit(rect : WMRectangles.Rectangle; mode : WORD);
+		PROCEDURE SetLimit(rect : WMRectangles.Rectangle; mode : INTEGER);
 		VAR bounds : WMRectangles.Rectangle; dx, dy, i : SIZE;
 		BEGIN
 			FOR i := 0 TO nofComponents - 1 DO
@@ -1312,7 +1312,7 @@ TYPE
 		insertObjAt : WMComponents.VisualComponent;
 
 		downX, downY, lastX, lastY, dragX, dragY : SIZE;
-		oldPointerInfo: WORD;
+		oldPointerInfo: INTEGER;
 		selectInsertObjAt : BOOLEAN;
 
 		showSnapGrid : WMProperties.BooleanProperty;
@@ -1588,7 +1588,7 @@ TYPE
 			END;
 		END InvalidateFrame;
 
-		PROCEDURE GetLimitMode(x, y : SIZE; VAR bounds : WMRectangles.Rectangle) : WORD;
+		PROCEDURE GetLimitMode(x, y : SIZE; VAR bounds : WMRectangles.Rectangle) : INTEGER;
 		VAR
 			vc : WMComponents.VisualComponent; mode : SIGNED32;
 			ci : ComponentInfo;
@@ -1685,7 +1685,7 @@ TYPE
 
 		PROCEDURE CheckCursor(x, y : SIZE; keys, modifierFlags : SET);
 		CONST ShiftValue = 256;
-		VAR ignore : WMRectangles.Rectangle; res : WORD;
+		VAR ignore : WMRectangles.Rectangle; res : INTEGER;
 		BEGIN
 			IF paint THEN
 				IF (oldPointerInfo # Paint) THEN
@@ -2094,7 +2094,7 @@ TYPE
 			END;
 		END DragOver;
 
-		PROCEDURE DragAddComponent(component : Repositories.Component; VAR res : WORD); (* ! needs work work hierarchical buildup *)
+		PROCEDURE DragAddComponent(component : Repositories.Component; VAR res : INTEGER); (* ! needs work work hierarchical buildup *)
 		VAR x, y : SIZE; c: WMComponents.VisualComponent;
 			rect:WMRectangles.Rectangle; id:ARRAY 64 OF CHAR; b:BOOLEAN;
 		BEGIN
@@ -2743,7 +2743,7 @@ TYPE
 			SetInfo(windowInfo);
 		END UpdateInfo;
 
-		PROCEDURE HandleDocumentInfo(CONST info : WMWindowManager.DocumentInfo; new : BOOLEAN; VAR res : WORD);
+		PROCEDURE HandleDocumentInfo(CONST info : WMWindowManager.DocumentInfo; new : BOOLEAN; VAR res : INTEGER);
 		VAR w : EditWindow;
 		BEGIN
 			w := windowList.Get(info.id);
@@ -2820,7 +2820,7 @@ TYPE
 		END ButtonHandler;
 
 		PROCEDURE HandleOpenBtn(sender, data : ANY);
-		VAR filename : Files.FileName; res: SIGNED32; ignoreRes: WORD;
+		VAR filename : Files.FileName; res: SIGNED32; ignoreRes: INTEGER;
 		BEGIN
 			res := WMDialogs.QueryString("Open...", filename);
 			IF (res = WMDialogs.ResOk) THEN
@@ -2829,7 +2829,7 @@ TYPE
 		END HandleOpenBtn;
 
 		PROCEDURE HandleSaveBtn(sender, data : ANY);
-		VAR w : EditWindow; filename : Files.FileName; res : WORD;
+		VAR w : EditWindow; filename : Files.FileName; res : INTEGER;
 		BEGIN
 			w := windowList.GetActive();
 			IF (w # NIL) THEN
@@ -2940,7 +2940,7 @@ TYPE
 			repositoryName, componentName : ARRAY 64 OF CHAR; refNum : SIZE;
 			name, filename : Files.FileName;
 			repository : Repositories.Repository;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			w := windowList.GetActive();
 			IF (w = NIL) THEN RETURN; END;
@@ -3072,7 +3072,7 @@ TYPE
 			END;
 		END UpdateFramePosition;
 
-		PROCEDURE Load(CONST filename : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE Load(CONST filename : ARRAY OF CHAR; VAR res : INTEGER);
 		VAR window : EditWindow; content : XML.Content; panel : WMStandardComponents.Panel; width, height : SIZE;
 		BEGIN
 			content := WMComponents.Load(filename);
@@ -3103,7 +3103,7 @@ TYPE
 			END;
 		END Load;
 
-		PROCEDURE Store(CONST filename : ARRAY OF CHAR; window : EditWindow; VAR res : WORD);
+		PROCEDURE Store(CONST filename : ARRAY OF CHAR; window : EditWindow; VAR res : INTEGER);
 		VAR file : Files.File; writer : Files.Writer;
 		BEGIN
 			ASSERT(window # NIL);
@@ -3123,7 +3123,7 @@ TYPE
 		END Store;
 
 		PROCEDURE LoadWindows(data : XML.Element);
-		VAR c : XML.Content; e : XML.Element; s : Strings.String; bounds : WMRectangles.Rectangle; filename : Files.FileName; res : WORD;
+		VAR c : XML.Content; e : XML.Element; s : Strings.String; bounds : WMRectangles.Rectangle; filename : Files.FileName; res : INTEGER;
 		BEGIN
 			ASSERT(data # NIL);
 			c := data.GetFirst();
@@ -3367,7 +3367,7 @@ BEGIN
 END LabelComponent;
 
 PROCEDURE Open*(context : Commands.Context); (** {filename} ~ *)
-VAR window : MainWindow; filename : Files.FileName; count: SIGNED32;  ignoreRes : WORD;
+VAR window : MainWindow; filename : Files.FileName; count: SIGNED32;  ignoreRes : INTEGER;
 BEGIN
 	NEW(window, NIL);
 	count := 0;

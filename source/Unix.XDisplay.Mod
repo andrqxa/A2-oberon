@@ -157,7 +157,7 @@ TYPE
 					are transferred to or from "buf", starting at "ofs".  The line byte increment is "stride", which may
 					be positive, negative or zero. *)
 
-				PROCEDURE Transfer*( VAR buf: ARRAY OF CHAR;  ofs, stride, left, top, width, height : SIZE; op: WORD );
+				PROCEDURE Transfer*( VAR buf: ARRAY OF CHAR;  ofs, stride, left, top, width, height : SIZE; op: INTEGER );
 				CONST  Get = 0;  Set = 1;
 				VAR image: X11.Image;
 					imp: X11.ImagePtr;
@@ -311,7 +311,7 @@ TYPE
 				END IndexToColor;
 
 				PROCEDURE SetColor*( col, red, green, blue: SIGNED16 );   (* 0 <= col, red, green, blue < 256 *)
-				VAR xcol: X11.Color;  res: WORD;
+				VAR xcol: X11.Color;  res: INTEGER;
 				BEGIN
 					IF (col < 0) OR (col > 255) THEN  RETURN   END;
 					rgb[col].r := red;  rgb[col].g := green;  rgb[col].b := blue;
@@ -842,7 +842,7 @@ VAR
 	END GetDisplaySize;
 
 	PROCEDURE Install*;
-	VAR disp: Display; res: WORD; s, w, h: SIGNED32; xdisp: X11.DisplayPtr;
+	VAR disp: Display; res: INTEGER; s, w, h: SIGNED32; xdisp: X11.DisplayPtr;
 	BEGIN
 		InitNames; xdisp := OpenX11Display( );
 		s := GetDisplaySize( w, h );

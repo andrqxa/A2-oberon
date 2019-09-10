@@ -74,7 +74,7 @@ VAR
 
 	ticks-: SIGNED32;	(** timer ticks. Use Kernel.GetTicks() to read, don't write *)
 
-	prioLow-, prioHigh-: WORD;	(* permitted thread priorities *)
+	prioLow-, prioHigh-: INTEGER;	(* permitted thread priorities *)
 
 	fcr-: SET;	(** default floating-point control register value (default rounding mode is towards -infinity, for ENTIER) *)
 	mhz-: SIGNED64;	(** clock rate of GetTimer in MHz, or 0 if not known *)
@@ -85,7 +85,7 @@ VAR
 	config: ARRAY 2048 OF CHAR;	(* config strings *)
 
 	logname: ARRAY 32 OF CHAR;
-	logfile: WORD;
+	logfile: INTEGER;
 	traceHeap: BOOLEAN;
 
 	timer0	: SIGNED64;
@@ -760,7 +760,7 @@ END GetTimer;
 
 	(** Acquire a spin-lock. *)
 	PROCEDURE  Acquire*( level: SIGNED32 );   (* non reentrant lock *)
-	VAR i: WORD;
+	VAR i: INTEGER;
 	BEGIN
 		Unix.MtxLock( mtx[level] );
 		IF StrongChecks THEN
@@ -774,7 +774,7 @@ END GetTimer;
 
 	(** Release a spin-lock. *)
 	PROCEDURE  Release*( level: SIGNED32 );
-	VAR i: WORD;
+	VAR i: INTEGER;
 	BEGIN
 		IF StrongChecks THEN
 			ASSERT(taken[level] = Unix.ThrThis( ));

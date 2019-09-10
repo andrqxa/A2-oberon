@@ -42,7 +42,7 @@ TYPE
 		f* : Files.File;
 		streamInfo*: AVStreamInfo;
 
-		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		BEGIN
 			f.ReadBytes(r, buf, ofs, size);
 			len := size - r.res;
@@ -73,7 +73,7 @@ TYPE
 	AVDemultiplexer* = OBJECT
 
 		(** open the demultiplexer on an input stream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		END Open;
 
 		PROCEDURE GetNumberOfStreams*() : SIGNED32;
@@ -95,12 +95,12 @@ TYPE
 
 		(* read data from streamNr, store it into buffer buf starting at offset ofs, store size bytes if possible, block if not read min bytes at least. Return number of read bytes in len and return code res *)
 		(* this procedure should not be directly called - it is called by the DemuxStream object! *)
-		PROCEDURE GetData*(streamNr : SIGNED32; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE GetData*(streamNr : SIGNED32; VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		END GetData;
 
 		(* seek the streamNr to position pos (defined bz seekType), res = 0 if Ok, otherwise an error number *)
 		(* this procedure should not be directly called - it is called by the DemuxStream object! *)
-		PROCEDURE SetStreamPos*(streamNr : SIGNED32; seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32; VAR res : WORD);
+		PROCEDURE SetStreamPos*(streamNr : SIGNED32; seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32; VAR res : INTEGER);
 		END SetStreamPos;
 
 	END AVDemultiplexer;
@@ -118,13 +118,13 @@ TYPE
 			InitReader(Receive, 4096)
 		END Open;
 
-		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		BEGIN
 			demultiplexer.GetData(streamNr, buf, ofs, size, min, len, res)
 		END Receive;
 
 		PROCEDURE SetPos*(pos : Streams.Position);
-		VAR  seekType, itemSize: SIGNED32; res: WORD;
+		VAR  seekType, itemSize: SIGNED32; res: INTEGER;
 		BEGIN
 			seekType := SeekByte;
 			demultiplexer.SetStreamPos(streamNr, seekType, pos(SIGNED32), itemSize, res);
@@ -132,7 +132,7 @@ TYPE
 		END SetPos;
 
 		(* seek the streamNr to position pos with seekType. itemSize contains the size of the element seeked to, if known and applicable; res = 0 if Ok, otherwise an error number *)
-		PROCEDURE SetPosX*(seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32; VAR res : WORD);
+		PROCEDURE SetPosX*(seekType : SIGNED32; pos : SIGNED32; VAR itemSize : SIGNED32; VAR res : INTEGER);
 		BEGIN
 			demultiplexer.SetStreamPos(streamNr, seekType, pos, itemSize, res);
 			Reset
@@ -141,7 +141,7 @@ TYPE
 
 	AudioDecoder* = OBJECT
 		(* open the decoder on a file *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		END Open;
 
 		PROCEDURE HasMoreData*():BOOLEAN;
@@ -172,10 +172,10 @@ TYPE
 		PROCEDURE SetStreamLength*(length : SIGNED32);
 		END SetStreamLength;
 
-		PROCEDURE SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekSample*(sample: SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		END SeekSample;
 
-		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeySample : BOOLEAN; VAR res : INTEGER);
 		END SeekMillisecond;
 
 		(** Prepare the next audio bytes not yet filled into a buffer *)
@@ -189,20 +189,20 @@ TYPE
 
 	AudioEncoder* = OBJECT
 		(* open the encoder *)
-		PROCEDURE Open*(out : Streams.Writer; sRate, sRes, nofCh: SIGNED32; VAR res : WORD);
+		PROCEDURE Open*(out : Streams.Writer; sRate, sRes, nofCh: SIGNED32; VAR res : INTEGER);
 		END Open;
 
-		PROCEDURE Write*(buffer : SoundDevices.Buffer; VAR res : WORD);
+		PROCEDURE Write*(buffer : SoundDevices.Buffer; VAR res : INTEGER);
 		END Write;
 
-		PROCEDURE Close*(VAR res : WORD);
+		PROCEDURE Close*(VAR res : INTEGER);
 		END Close;
 
 	END  AudioEncoder;
 
 	VideoDecoder* = OBJECT
 		(* open the decoder on a file *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		END Open;
 
 		PROCEDURE HasMoreData*():BOOLEAN;
@@ -221,10 +221,10 @@ TYPE
 		PROCEDURE GetCurrentTime*() : SIGNED32;
 		END GetCurrentTime;
 
-		PROCEDURE SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekFrame*(frame : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		END SeekFrame;
 
-		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeyFrame : BOOLEAN; VAR res : WORD);
+		PROCEDURE SeekMillisecond*(millisecond : SIGNED32; goKeyFrame : BOOLEAN; VAR res : INTEGER);
 		END SeekMillisecond;
 
 		(** Prepare the next frame *)
@@ -238,20 +238,20 @@ TYPE
 
 	VideoEncoder* = OBJECT
 		(* open the encoder *)
-		PROCEDURE Open*(out : Streams.Writer; VAR res : WORD);
+		PROCEDURE Open*(out : Streams.Writer; VAR res : INTEGER);
 		END Open;
 
 		PROCEDURE Write*(img : Raster.Image);
 		END Write;
 
-		PROCEDURE Close*(VAR res : WORD);
+		PROCEDURE Close*(VAR res : INTEGER);
 		END Close;
 
 	END  VideoEncoder;
 
 	ImageDecoder* = OBJECT
 		(* open the decoder on an InputStream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		END Open;
 
 		PROCEDURE GetImageInfo*(VAR width, height : SIZE; VAR format, maxProgressionLevel : SIGNED32);
@@ -285,7 +285,7 @@ TYPE
 		PROCEDURE SetQuality*(quality : SIGNED32);
 		END SetQuality;
 
-		PROCEDURE WriteImage*(img : Raster.Image; VAR res : WORD);
+		PROCEDURE WriteImage*(img : Raster.Image; VAR res : INTEGER);
 		END WriteImage;
 
 	END ImageEncoder;
@@ -293,7 +293,7 @@ TYPE
 
 	TextDecoder* = OBJECT
 		(* open the decoder on an InputStream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		END Open;
 
 		PROCEDURE GetText*() : Texts.Text;
@@ -307,12 +307,12 @@ TYPE
 		PROCEDURE Open*(out : Streams.Writer);
 		END Open;
 
-		PROCEDURE WriteText*(text : Texts.Text; VAR res : WORD);
+		PROCEDURE WriteText*(text : Texts.Text; VAR res : INTEGER);
 		END WriteText;
 	END TextEncoder;
 
 	CryptoDecoder* = OBJECT
-		PROCEDURE Open*(in: Streams.Reader; VAR res: WORD);
+		PROCEDURE Open*(in: Streams.Reader; VAR res: INTEGER);
 		END Open;
 
 		PROCEDURE GetReader*(): Streams.Reader;
@@ -370,10 +370,10 @@ TYPE
 	AnimationDecoder* = OBJECT
 
 		(* open the decoder on an InputStream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		END Open;
 
-		PROCEDURE GetImageSequence*(VAR sequence : ImageSequence; VAR res : WORD);
+		PROCEDURE GetImageSequence*(VAR sequence : ImageSequence; VAR res : INTEGER);
 		END GetImageSequence;
 
 	END AnimationDecoder;
@@ -400,7 +400,7 @@ TYPE
 	AnimationDecoderFactory = PROCEDURE () : AnimationDecoder;
 
 
-PROCEDURE GetDemuxFactoryName(CONST name : ARRAY OF CHAR; VAR module , procedure : Modules.Name; VAR res : WORD);
+PROCEDURE GetDemuxFactoryName(CONST name : ARRAY OF CHAR; VAR module , procedure : Modules.Name; VAR res : INTEGER);
 VAR config, factoryName, msg : ARRAY 128 OF CHAR;
 BEGIN
 	res := ResFailed;
@@ -411,7 +411,7 @@ BEGIN
 	END
 END GetDemuxFactoryName;
 
-PROCEDURE GetDecoderFactoryName(CONST type, name : ARRAY OF CHAR; VAR module, procedure : Modules.Name; VAR res : WORD);
+PROCEDURE GetDecoderFactoryName(CONST type, name : ARRAY OF CHAR; VAR module, procedure : Modules.Name; VAR res : INTEGER);
 VAR config, factoryName, msg : ARRAY 128 OF CHAR;
 BEGIN
 	res := ResFailed;
@@ -423,7 +423,7 @@ BEGIN
 	END
 END GetDecoderFactoryName;
 
-PROCEDURE GetEncoderFactoryName(CONST type, name : ARRAY OF CHAR; VAR module, procedure : Modules.Name; VAR res : WORD);
+PROCEDURE GetEncoderFactoryName(CONST type, name : ARRAY OF CHAR; VAR module, procedure : Modules.Name; VAR res : INTEGER);
 VAR config, factoryName, msg : ARRAY 128 OF CHAR;
 BEGIN
 	res := ResFailed;
@@ -439,7 +439,7 @@ END GetEncoderFactoryName;
 PROCEDURE GetDemultiplexer*(CONST name : ARRAY OF CHAR) : AVDemultiplexer;
 VAR
 	demux : AVDemultiplexer; factory : DemuxFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	demux := NIL;
 	GetDemuxFactoryName(name, moduleName, procedureName, res);
@@ -456,7 +456,7 @@ END GetDemultiplexer;
 PROCEDURE GetImageDecoder*(CONST name : ARRAY OF CHAR) : ImageDecoder;
 VAR
 	decoder : ImageDecoder; factory : ImageDecoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	decoder := NIL;
 	GetDecoderFactoryName("Image", name, moduleName, procedureName, res);
@@ -473,7 +473,7 @@ END GetImageDecoder;
 PROCEDURE GetImageEncoder*(CONST name : ARRAY OF CHAR) : ImageEncoder;
 VAR
 	encoder : ImageEncoder; factory : ImageEncoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	encoder := NIL;
 	GetEncoderFactoryName("Image", name, moduleName, procedureName, res);
@@ -490,7 +490,7 @@ END GetImageEncoder;
 PROCEDURE GetVideoDecoder*(CONST name : ARRAY OF CHAR) : VideoDecoder;
 VAR
 	decoder : VideoDecoder; factory : VideoDecoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	decoder := NIL;
 	GetDecoderFactoryName("Video", name, moduleName, procedureName, res);
@@ -507,7 +507,7 @@ END GetVideoDecoder;
 PROCEDURE GetVideoEncoder*(CONST name : ARRAY OF CHAR) : VideoEncoder;
 VAR
 	encoder : VideoEncoder; factory : VideoEncoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	encoder := NIL;
 	GetEncoderFactoryName("Video", name, moduleName, procedureName, res);
@@ -524,7 +524,7 @@ END GetVideoEncoder;
 PROCEDURE GetAudioDecoder*(CONST name : ARRAY OF CHAR) : AudioDecoder;
 VAR
 	decoder : AudioDecoder; factory : AudioDecoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	decoder := NIL;
 	GetDecoderFactoryName("Audio", name, moduleName, procedureName, res);
@@ -541,7 +541,7 @@ END GetAudioDecoder;
 PROCEDURE GetAudioEncoder*(CONST name : ARRAY OF CHAR) : AudioEncoder;
 VAR
 	encoder : AudioEncoder; factory : AudioEncoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	encoder := NIL;
 	GetEncoderFactoryName("Audio", name, moduleName, procedureName, res);
@@ -558,7 +558,7 @@ END GetAudioEncoder;
 PROCEDURE GetTextDecoder*(CONST name : ARRAY OF CHAR) : TextDecoder;
 VAR
 	decoder : TextDecoder; factory : TextDecoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	decoder := NIL;
 	GetDecoderFactoryName("Text", name, moduleName, procedureName, res);
@@ -575,7 +575,7 @@ END GetTextDecoder;
 PROCEDURE GetTextEncoder*(CONST name : ARRAY OF CHAR) : TextEncoder;
 VAR
 	encoder : TextEncoder; factory : TextEncoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	encoder := NIL;
 	GetEncoderFactoryName("Text", name, moduleName, procedureName, res);
@@ -592,7 +592,7 @@ END GetTextEncoder;
 PROCEDURE GetCryptoDecoder*(CONST name : ARRAY OF CHAR) : CryptoDecoder;
 VAR
 	decoder : CryptoDecoder; factory : CryptoDecoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	decoder := NIL;
 	GetDecoderFactoryName("Crypto", name, moduleName, procedureName, res);
@@ -609,7 +609,7 @@ END GetCryptoDecoder;
 PROCEDURE GetCryptoEncoder*(CONST name : ARRAY OF CHAR) : CryptoEncoder;
 VAR
 	encoder : CryptoEncoder; factory : CryptoEncoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	encoder := NIL;
 	GetEncoderFactoryName("Crypto", name, moduleName, procedureName, res);
@@ -626,7 +626,7 @@ END GetCryptoEncoder;
 PROCEDURE GetAnimationDecoder*(CONST name : ARRAY OF CHAR) : AnimationDecoder;
 VAR
 	decoder : AnimationDecoder; factory : AnimationDecoderFactory;
-	moduleName, procedureName : Modules.Name; res : WORD;
+	moduleName, procedureName : Modules.Name; res : INTEGER;
 BEGIN
 	decoder := NIL;
 	GetDecoderFactoryName("Animation", name, moduleName, procedureName, res);
@@ -672,7 +672,7 @@ VAR f : Files.File;
 	zf : Unzip.ZipFile;
 	entry : Unzip.Entry;
 	archive : Archives.Archive;
-	res : WORD;
+	res : INTEGER;
 BEGIN
 	SplitName(name, protocol, filename);
 	COPY(protocol, tp); Strings.LowerCase(tp);

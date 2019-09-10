@@ -96,7 +96,7 @@ TYPE
 		label : WMStandardComponents.Label;
 		panel : WMStandardComponents.Panel;
 		button : WMStandardComponents.Button;
-		result: WORD; chosenColor* : WMGraphics.Color;
+		result: INTEGER; chosenColor* : WMGraphics.Color;
 		shown : BOOLEAN;
 
 		PROCEDURE CreateForm() : WMComponents.VisualComponent;
@@ -160,7 +160,7 @@ TYPE
 			Hide;
 		END OKHandler;
 
-		PROCEDURE SetResult(res: WORD);
+		PROCEDURE SetResult(res: INTEGER);
 		BEGIN {EXCLUSIVE}
 			result := res;
 		END SetResult;
@@ -829,7 +829,7 @@ TYPE
 		PROCEDURE UpdateValueHandler(sender, data: ANY);
 		VAR tempString : ARRAY 64 OF CHAR;
 			tempLReal : FLOAT64;
-			tempInt : SIGNED32; res: WORD;
+			tempInt : SIGNED32; res: INTEGER;
 			tempCharStyle: DTPData.CharacterStyleObject;
 			tempFont: WMGraphics.Font;
 		BEGIN
@@ -1271,7 +1271,7 @@ TYPE
 		PROCEDURE ImportCharacterStyles(filename: ARRAY OF CHAR);
 		VAR tempString : ARRAY 256 OF CHAR;
 			tempReal: FLOAT64;
-			tempInt: SIGNED32; res: WORD;
+			tempInt: SIGNED32; res: INTEGER;
 			reader : Files.Reader;
 			parser : XMLParser.Parser;
 			scanner : XMLScanner.Scanner;
@@ -1338,7 +1338,7 @@ TYPE
 		PROCEDURE ApplyCHandler(sender, data: ANY);
 		VAR tempString : ARRAY 256 OF CHAR;
 			tempLReal: FLOAT64;
-			tempInt: SIGNED32; res: WORD;
+			tempInt: SIGNED32; res: INTEGER;
 			tempFont : WMGraphics.Font;
 		BEGIN
 			(* retrieve tempvalues first for those who didn't press enter after changing a value... *)

@@ -300,7 +300,7 @@ TYPE
 
 	HTTPAgent = OBJECT (TCPServices.Agent)
 	VAR
-		res: WORD;
+		res: INTEGER;
 		len : SIZE;
 		body, closeRequested: BOOLEAN;
 		out: Streams.Writer; in, inR: Streams.Reader;
@@ -533,7 +533,7 @@ BEGIN {EXCLUSIVE}
 END FindHosts;
 
 (** remove the virtual host given by name *)
-PROCEDURE RemoveHost*(CONST host : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE RemoveHost*(CONST host : ARRAY OF CHAR; VAR res : INTEGER);
 VAR i : SIZE; o, h : ANY;
 BEGIN {EXCLUSIVE}
 	hosts.Lock;
@@ -549,7 +549,7 @@ BEGIN {EXCLUSIVE}
 END RemoveHost;
 
 (** Start the basic Server functionality. *)
-PROCEDURE StartHTTP*(root : ARRAY OF CHAR; CONST logFile: ARRAY OF CHAR; VAR msg : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE StartHTTP*(root : ARRAY OF CHAR; CONST logFile: ARRAY OF CHAR; VAR msg : ARRAY OF CHAR; VAR res : INTEGER);
 BEGIN {EXCLUSIVE}
 	IF (http = NIL) THEN
 		Strings.Trim(root, " "); defaultHost.SetPrefix(root);
@@ -568,7 +568,7 @@ BEGIN {EXCLUSIVE}
 END StartHTTP;
 
 (** Start the basic Server functionality. *)
-PROCEDURE StartHTTPS*(root : ARRAY OF CHAR; CONST  logFile: ARRAY OF CHAR; VAR msg : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE StartHTTPS*(root : ARRAY OF CHAR; CONST  logFile: ARRAY OF CHAR; VAR msg : ARRAY OF CHAR; VAR res : INTEGER);
 BEGIN {EXCLUSIVE}
 	IF (https = NIL) THEN
 		Strings.Trim(root, " "); defaultHost.SetPrefix(root);
@@ -587,7 +587,7 @@ BEGIN {EXCLUSIVE}
 END StartHTTPS;
 
 (** Stop the server *)
-PROCEDURE StopHTTP*(VAR msg : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE StopHTTP*(VAR msg : ARRAY OF CHAR; VAR res : INTEGER);
 BEGIN {EXCLUSIVE}
 	IF (http # NIL) THEN
 		res := Ok; COPY("", msg);
@@ -600,7 +600,7 @@ BEGIN {EXCLUSIVE}
 END StopHTTP;
 
 (** Stop the server *)
-PROCEDURE StopHTTPS*(VAR msg : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE StopHTTPS*(VAR msg : ARRAY OF CHAR; VAR res : INTEGER);
 BEGIN {EXCLUSIVE}
 	IF (https # NIL) THEN
 		res := Ok; COPY("", msg);
@@ -646,7 +646,7 @@ BEGIN {EXCLUSIVE}
 END ShowHosts;
 
 PROCEDURE Cleanup;
-VAR t: Kernel.Timer; msg : ARRAY 32 OF CHAR; ignore : WORD;
+VAR t: Kernel.Timer; msg : ARRAY 32 OF CHAR; ignore : INTEGER;
 BEGIN
 	hitStat.Kill;
 	StopHTTP(msg, ignore);

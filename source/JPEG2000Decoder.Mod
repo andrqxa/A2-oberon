@@ -5791,7 +5791,7 @@ MODULE JPEG2000Decoder;
 			(* --- Codecs.ImageDecoder methods --- *)
 
 			(* open the decoder on a file *)
-			PROCEDURE Open*(s : Streams.Reader; VAR res : WORD);
+			PROCEDURE Open*(s : Streams.Reader; VAR res : INTEGER);
 				VAR
 					imgInfo : J2KCS.ImageInfo;
 					buffCr : J2KCS.BufferedCodestreamReader;
@@ -6929,7 +6929,7 @@ MODULE JPEG2000Decoder;
 			bmpTransPar : Raster.PictureTransferParameters;
 			bmpStoreRet : ANY;
 			opt : ARRAY 255 OF CHAR;
-			res : WORD;
+			res : INTEGER;
 			(* --- END Variables used in option parsing --- *)
 		BEGIN
 			noFile := TRUE;

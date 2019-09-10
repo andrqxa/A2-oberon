@@ -27,7 +27,7 @@ CONST
 
 TYPE
 
-	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : WORD);
+	SetStringProcedure = PROCEDURE {DELEGATE} (CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : INTEGER);
 
 	DropTarget = OBJECT(WMDropTarget.DropTarget)
 	VAR
@@ -69,7 +69,7 @@ TYPE
 			SELF.position := position;
 		END Init;
 
-		PROCEDURE Set*(CONST string : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE Set*(CONST string : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			setString(string, position, res);
 		END Set;
@@ -303,7 +303,7 @@ TYPE
 		END SetAsString;
 
 		PROCEDURE LinkChanged*(sender, object : ANY);
-		VAR string : Types.String256; res : WORD; real: Types.Longreal; m: Models.Model;
+		VAR string : Types.String256; res : INTEGER; real: Types.Longreal; m: Models.Model;
 		BEGIN
 			IF (sender = model) & WMProperties.GetModel(model,m) THEN
 				m.GetGeneric(string, res);
@@ -315,7 +315,7 @@ TYPE
 		END LinkChanged;
 
 		PROCEDURE UpdateModel;
-		VAR string : Types.String256; res : WORD; str: Strings.String; m: Models.Model;
+		VAR string : Types.String256; res : INTEGER; str: Strings.String; m: Models.Model;
 		BEGIN
 			GetAsString(string.value);
 			IF WMProperties.GetModel(model,m) THEN
@@ -554,7 +554,7 @@ TYPE
 		END InsertChar;
 
 		(** Notes: Does not call DeleteSelection, x should already be checked for validity *)
-		PROCEDURE InsertStringAt(CONST x : ARRAY OF CHAR; position : SIZE; VAR res : WORD);
+		PROCEDURE InsertStringAt(CONST x : ARRAY OF CHAR; position : SIZE; VAR res : INTEGER);
 		VAR length, i, j, idx : SIZE; changed, valid : BOOLEAN;
 		BEGIN
 			ASSERT(UTF8Strings.Valid(x));
@@ -832,7 +832,7 @@ TYPE
 		END SelectAll;
 
 		PROCEDURE Paste;
-		VAR text : ARRAY MaxStringSize OF CHAR; valid : BOOLEAN; ignore : WORD;
+		VAR text : ARRAY MaxStringSize OF CHAR; valid : BOOLEAN; ignore : INTEGER;
 		BEGIN
 			Texts.clipboard.AcquireRead;
 			IF (0 < Texts.clipboard.GetLength()) & (Texts.clipboard.GetLength() < MaxStringSize) THEN
@@ -1030,7 +1030,7 @@ TYPE
 			ds : DropString;
 			itf : WMDropTarget.DropInterface;
 			targetText, temp : Texts.Text;
-			pos: SIZE; value : SIGNED32; res : WORD;
+			pos: SIZE; value : SIGNED32; res : INTEGER;
 		BEGIN
 			IF (dragString = NIL) THEN RETURN; END;
 
@@ -1113,7 +1113,7 @@ TYPE
 			END;
 		END DragDropped;
 
-		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : WORD);
+		PROCEDURE SetDroppedString( CONST string : ARRAY OF CHAR; position : SIGNED32; VAR res : INTEGER);
 		BEGIN
 			Acquire;
 			ResetSelection;
@@ -1191,7 +1191,7 @@ TYPE
 		END Init;
 
 		PROCEDURE GetUnit(VAR u: FLOAT64): BOOLEAN;
-		VAR res: WORD; real: Types.Longreal; m: Models.Model;
+		VAR res: INTEGER; real: Types.Longreal; m: Models.Model;
 		BEGIN
 			IF WMProperties.GetModel(unitModel, m) THEN
 				m.GetGeneric(real, res);
@@ -1210,7 +1210,7 @@ TYPE
 		END RecacheProperties;
 
 		PROCEDURE LinkChanged*(sender, data : ANY);
-		VAR string : Types.String256; res : WORD; real: Types.Longreal; unit: FLOAT64; m: Models.Model;
+		VAR string : Types.String256; res : INTEGER; real: Types.Longreal; unit: FLOAT64; m: Models.Model;
 		BEGIN
 			IF (sender = model) OR (sender = unitModel) THEN
 				res := -1;
@@ -1235,7 +1235,7 @@ TYPE
 		END LinkChanged;
 
 		PROCEDURE UpdateModel;
-		VAR string : Types.String256; res : WORD; str: Strings.String; real: Types.Longreal; u: FLOAT64; m: Models.Model;
+		VAR string : Types.String256; res : INTEGER; str: Strings.String; real: Types.Longreal; u: FLOAT64; m: Models.Model;
 		BEGIN
 			GetAsString(string.value);
 			IF WMProperties.GetModel(model, m) & ~(m IS Models.String) THEN
@@ -1399,7 +1399,7 @@ TYPE
 		END PropertyChanged;
 
 		PROCEDURE LinkChanged*(sender, data : ANY);
-		VAR string : Types.String256; res : WORD; real: Types.Longreal; unit: FLOAT64; m: Models.Model;
+		VAR string : Types.String256; res : INTEGER; real: Types.Longreal; unit: FLOAT64; m: Models.Model;
 		BEGIN
 			LinkChanged^(sender, data);
 		END LinkChanged;
@@ -1518,7 +1518,7 @@ TYPE
 		END DeleteSelection;
 
 		PROCEDURE PasteToHostClipboard*;
-		VAR clipboard: Texts.UnicodeText; res : WORD;
+		VAR clipboard: Texts.UnicodeText; res : INTEGER;
 		BEGIN
 			text.AcquireWrite;
 			NEW(clipboard);

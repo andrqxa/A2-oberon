@@ -953,7 +953,7 @@ TYPE
 		fileName[i] := 0X;
 	END SectionNameToFileName;
 
-	PROCEDURE GetPriority*(block: Sections.Section): WORD;
+	PROCEDURE GetPriority*(block: Sections.Section): INTEGER;
 	CONST Fixed=0; EntryCode=1;InitCode=2; ExitCode=3; BodyCode=4;Code=5; Data=6; Const=7; Empty =8;
 	BEGIN
 		IF block.fixed THEN RETURN Fixed END;

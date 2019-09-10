@@ -44,7 +44,7 @@ VAR
 
 	PROCEDURE TerminateA2;
 	VAR
-		res: WORD;
+		res: INTEGER;
 		s: ARRAY 256 OF CHAR;
 	BEGIN
 		Commands.Call( "WMTerminator.Shutdown", {}, res, s );

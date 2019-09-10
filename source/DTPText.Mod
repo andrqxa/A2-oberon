@@ -233,7 +233,7 @@ TYPE
 
 	Highlight* = OBJECT
 	VAR
-		kind : WORD;
+		kind : INTEGER;
 		from*, to* : Texts.TextPosition;
 		a*, b* : SIZE; (* only valid after sort, while holding the lock *)
 		active* : BOOLEAN; (* only valid after sort, while holding the lock *)
@@ -255,7 +255,7 @@ TYPE
 			onChanged := owner.HighlightChanged;
 		END SetOwner;
 
-		PROCEDURE SetKind*(kind : WORD);
+		PROCEDURE SetKind*(kind : INTEGER);
 		BEGIN
 			IF SELF.kind # kind THEN
 				SELF.kind := kind;
@@ -436,7 +436,7 @@ TYPE TextDropTarget* = OBJECT(WMDropTarget.DropTarget);
 			SELF.text := text; SELF.pos := pos
 		END New;
 
-(*		PROCEDURE GetInterface*(type : WORD) : WMDropTarget.DropInterface;
+(*		PROCEDURE GetInterface*(type : INTEGER) : WMDropTarget.DropInterface;
 		VAR di : WMDropTarget.DropText;
 		BEGIN
 			IF type = WMDropTarget.TypeText THEN
@@ -1697,7 +1697,7 @@ TYPE
 		VAR g: WMGraphics.GlyphSpacings; img: WMGraphics.Image;
 			glyphCanvas: WMGraphics.BufferCanvas;
 			glyphImg: WMGraphics.Image;
-			mode : WORD;
+			mode : INTEGER;
 
 			curve : BOOLEAN;
 		BEGIN
@@ -1953,7 +1953,7 @@ TYPE
 		VAR di : WMWindowManager.DragInfo;
 			dt : WMDropTarget.DropTarget;
 		(*	itf : WMDropTarget.DropInterface;
-			res : WORD;
+			res : INTEGER;
 			targetText, temp : Texts.Text;
 			pos, a, b : SIZE; *)
 		BEGIN

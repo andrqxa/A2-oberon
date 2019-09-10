@@ -215,7 +215,7 @@ TYPE
 		buffer: POINTER TO ARRAY OF CHAR;
 		bufferAdr: ADDRESS;
 
-		PROCEDURE ExecuteCommand*(command: Command; ms: SIGNED32; VAR status: SET): WORD;
+		PROCEDURE ExecuteCommand*(command: Command; ms: SIGNED32; VAR status: SET): INTEGER;
 		CONST
 			PIO = SYSTEM.VAL(SIGNED32, Protocol_PIO);
 			DMA = SYSTEM.VAL(SIGNED32, Protocol_DMA);
@@ -224,7 +224,7 @@ TYPE
 			DeviceReset = SYSTEM.VAL(SIGNED32, Protocol_DeviceReset);
 			NonData = SYSTEM.VAL(SIGNED32, Protocol_NonData);
 		VAR
-			res: WORD;
+			res: INTEGER;
 			ch: CHAR;
 			dma: BOOLEAN;
 		BEGIN {EXCLUSIVE}
@@ -320,7 +320,7 @@ TYPE
 			RETURN res;
 		END ExecuteCommand;
 
-		PROCEDURE Reset(): WORD;
+		PROCEDURE Reset(): INTEGER;
 		BEGIN {EXCLUSIVE}
 			RETURN ProtSwReset(ResetTimeout);
 		END Reset;
@@ -386,11 +386,11 @@ TYPE
 			RETURN Res_OK;
 		END SetupPRD;
 
-		PROCEDURE SetupDMA(command: Command): WORD;
+		PROCEDURE SetupDMA(command: Command): INTEGER;
 		VAR
 			ch: CHAR;
 			s: SET;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			(* Clear Interrupt & Errror *)
 			Machine.Portin8(bmbase + Ofs_BMStatus, ch); s := SYSTEM.VAL(SET, ORD(ch));
@@ -456,11 +456,11 @@ TYPE
 
 		(*	Software reset protocol
 			States: HSR0(ISet_SRST), HSR1 (Clear_wait), HSR2 (Check_Status) *)
-		PROCEDURE ProtSwReset(ms: SIGNED32): WORD;
+		PROCEDURE ProtSwReset(ms: SIGNED32): INTEGER;
 		VAR
 			t: Kernel.MilliTimer;
 			status: SET;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			IF state = 1 THEN RETURN Res_Err; END;
 			(* HSR0 *)
@@ -477,7 +477,7 @@ TYPE
 
 		(*	Bus idle protocol
 			States: HI0(Host_Idle), HI1 (Check_Status), HI2 (Device_Select), HI3 (Write_parameters), HI4(Write_command) *)
-		PROCEDURE ProtIssueCommand(cmd: Command; ms: SIGNED32): WORD;
+		PROCEDURE ProtIssueCommand(cmd: Command; ms: SIGNED32): INTEGER;
 		VAR
 			cmdCHS: CommandCHS;
 			cmdLBA: CommandLBA;
@@ -485,7 +485,7 @@ TYPE
 			cmdPacket: CommandPacket;
 			ch: CHAR;
 			status, devReg: SET;
-			res: WORD;
+			res: INTEGER;
 		BEGIN
 			(* HI1 *)
 			res := WaitStatus({Status_BSY, Status_DRQ}, {}, {}, ms, status);
@@ -747,9 +747,9 @@ TYPE
 
 		(*	Packet DMA Protocol
 			States: HPD0(Check_Status_A), HPD1 (Send_Packet), HPD2 (Check_Status_B), HPD3 (INTRQ_wait), HPD4 (Transfer_Data) *)
-		PROCEDURE ProtPacketDMA(command: CommandPacket; ms: SIGNED32; VAR status: SET): WORD;
+		PROCEDURE ProtPacketDMA(command: CommandPacket; ms: SIGNED32; VAR status: SET): INTEGER;
 		VAR
-			res: WORD;
+			res: INTEGER;
 			ch: CHAR;
 			s: SET;
 			t: Kernel.MilliTimer;
@@ -799,9 +799,9 @@ TYPE
 			Machine.Portout8(cnlbase+Ofs_Control, CHR(i));
 		END SetInterrupt;
 
-		PROCEDURE CreateDevice(devNum: SIGNED32): WORD;
+		PROCEDURE CreateDevice(devNum: SIGNED32): INTEGER;
 		VAR status: SET;
-			res: WORD; dev, devATA: Device; devATAPI: DeviceATAPI; ch: CHAR;
+			res: INTEGER; dev, devATA: Device; devATAPI: DeviceATAPI; ch: CHAR;
 			buf: ARRAY BS DIV 2 OF SIGNED16;
 			command: Command;
 			devReg: SET;
@@ -870,7 +870,7 @@ TYPE
 		END CreateDevice;
 
 		PROCEDURE InitController;
-		VAR p: SIGNED32; res: WORD; status: SET;
+		VAR p: SIGNED32; res: INTEGER; status: SET;
 		BEGIN
 			res := ProtSwReset(IdentifyTimeout);
 			(*IF res # Res_OK THEN
@@ -967,9 +967,9 @@ TYPE
 		cmdLBA: CommandLBA;
 		cmdLBA48: CommandLBA48;
 
-		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: WORD);
+		PROCEDURE Transfer*(op, block, num: SIGNED32; VAR data: ARRAY OF CHAR; ofs: SIZE; VAR res: INTEGER);
 		VAR
-			num1, try: SIGNED32; ignore: WORD; bufAdr: ADDRESS;
+			num1, try: SIGNED32; ignore: INTEGER; bufAdr: ADDRESS;
 			dma: BOOLEAN;
 		BEGIN
 			bufAdr := ADDRESSOF(data[ofs]);
@@ -1021,13 +1021,13 @@ TYPE
 			END;
 		END Transfer;
 
-		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: WORD);
+		PROCEDURE GetSize*(VAR size: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			size := SELF.size;
 			res := Disks.Ok;
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: WORD);
+		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
 		BEGIN
 			res := Disks.Unsupported;
 			IF msg IS Disks.GetGeometryMsg THEN
@@ -1070,7 +1070,7 @@ TYPE
 			RETURN controller.ExecuteCommand(cmd, IOTimeout, status) = Res_OK;
 		END SetWriteCache;
 
-		PROCEDURE TransferEx(op: SIGNED32; lba: SIGNED64; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): WORD;
+		PROCEDURE TransferEx(op: SIGNED32; lba: SIGNED64; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): INTEGER;
 		VAR command: Command; status: SET;
 		BEGIN {EXCLUSIVE}
 			IF (op # Disks.Read) & (op # Disks.Write) THEN RETURN Disks.Unsupported; END;
@@ -1079,8 +1079,8 @@ TYPE
 			RETURN controller.ExecuteCommand(command, IOTimeout, status);
 		END TransferEx;
 
-		PROCEDURE Reset(): WORD;
-		VAR res: WORD;
+		PROCEDURE Reset(): INTEGER;
+		VAR res: INTEGER;
 		BEGIN
 			IF TraceVerbose & (trace * TraceCommands # {})  THEN Show(name); KernelLog.String(" reset controller"); KernelLog.Ln; END;
 			res := controller.Reset();
@@ -1093,7 +1093,7 @@ TYPE
 		END Reset;
 
 		(* Only for ATA 4 or older *)
-		PROCEDURE InitDevice(): WORD;
+		PROCEDURE InitDevice(): INTEGER;
 		VAR command: CommandCHS; status: SET;
 		BEGIN
 			command := cmdCHS;
@@ -1103,8 +1103,8 @@ TYPE
 			RETURN controller.ExecuteCommand(command, IOTimeout, status);
 		END InitDevice;
 
-		PROCEDURE Flush(): WORD;
-		VAR res: WORD;
+		PROCEDURE Flush(): INTEGER;
+		VAR res: INTEGER;
 		BEGIN
 			res := Disks.Unsupported;
 			IF FlushBit IN id.type THEN
@@ -1113,16 +1113,16 @@ TYPE
 			RETURN res;
 		END Flush;
 
-		PROCEDURE MediaEject(immediate, load: BOOLEAN): WORD;
+		PROCEDURE MediaEject(immediate, load: BOOLEAN): INTEGER;
 		BEGIN {EXCLUSIVE}
 			IF ~(RemovableBit IN id.type) THEN RETURN Disks.Unsupported; END;
 			RETURN SendATACommand(0EDH, IOTimeout); (* media eject *)
 		END MediaEject;
 
-		PROCEDURE MediaLock(lock: BOOLEAN): WORD;
+		PROCEDURE MediaLock(lock: BOOLEAN): INTEGER;
 		VAR
 			command: CommandLBA;
-			res: WORD;
+			res: INTEGER;
 			status: SET;
 		BEGIN {EXCLUSIVE}
 			IF RMSNBit IN id.type THEN
@@ -1143,12 +1143,12 @@ TYPE
 			RETURN res;
 		END MediaLock;
 
-		PROCEDURE Powersave(): WORD;
+		PROCEDURE Powersave(): INTEGER;
 		BEGIN
 			RETURN SendATACommand(0E0H, IOTimeout); (* standby immediate *)
 		END Powersave;
 
-		PROCEDURE SendATACommand(cmd, ms: SIGNED32): WORD;
+		PROCEDURE SendATACommand(cmd, ms: SIGNED32): INTEGER;
 		VAR command: Command; status: SET;
 		BEGIN {EXCLUSIVE}
 			command := NewCommand(cmd, Protocol_NonData);
@@ -1240,7 +1240,7 @@ TYPE
 		END NewCommandLBA48;
 
 		(* Identify an ATA device. *)
-		PROCEDURE IdentifyDevice(buf: ARRAY OF SIGNED16): WORD;
+		PROCEDURE IdentifyDevice(buf: ARRAY OF SIGNED16): INTEGER;
 		VAR res, size1, hsize: SIGNED32;
 		BEGIN
 			(* ATA 4 or older *)
@@ -1354,7 +1354,7 @@ TYPE
 		VAR
 			name: Plugins.Name;
 			str: ARRAY 32 OF CHAR;
-			i: SIGNED32; res: WORD;
+			i: SIGNED32; res: INTEGER;
 		BEGIN
 			name := Name;
 			i := 0; WHILE name[i] # 0X DO INC(i) END;
@@ -1392,7 +1392,7 @@ TYPE
 		END Create;
 
 		PROCEDURE Finalize;
-		VAR res: WORD;
+		VAR res: INTEGER;
 		BEGIN
 			(* unregister device *)
 			Disks.registry.Remove(SELF);
@@ -1422,7 +1422,7 @@ TYPE
 			size := cap;
 		END SetCapacity;
 
-		PROCEDURE GetSize*(VAR asize: SIGNED32; VAR res: WORD);
+		PROCEDURE GetSize*(VAR asize: SIGNED32; VAR res: INTEGER);
 		BEGIN
 			res := Res_OK;
 			IF RemovableBit IN id.type THEN
@@ -1439,7 +1439,7 @@ TYPE
 			END;
 		END GetSize;
 
-		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: WORD);
+		PROCEDURE Handle*(VAR msg: Disks.Message; VAR res: INTEGER);
 		BEGIN
 			res := Disks.Unsupported;
 			IF msg IS Disks.GetGeometryMsg THEN
@@ -1458,10 +1458,10 @@ TYPE
 			END
 		END Handle;
 
-		PROCEDURE ExecuteCommand*(read: BOOLEAN; VAR packet, data: ARRAY OF CHAR; ofs, size: SIGNED32; dma: BOOLEAN): WORD;
+		PROCEDURE ExecuteCommand*(read: BOOLEAN; VAR packet, data: ARRAY OF CHAR; ofs, size: SIGNED32; dma: BOOLEAN): INTEGER;
 		VAR
 			command: CommandPacket;
-			i: SIZE; res: WORD;
+			i: SIZE; res: INTEGER;
 			status: SET;
 		BEGIN {EXCLUSIVE}
 			ASSERT(LEN(packet) <= LEN(command.packet));
@@ -1488,7 +1488,7 @@ TYPE
 			RETURN res;
 		END ExecuteCommand;
 
-		PROCEDURE ProcessSense(VAR res: WORD);
+		PROCEDURE ProcessSense(VAR res: INTEGER);
 		BEGIN
 			IF res = Res_OK THEN
 				sense := 0; asc := 0; ascq := 0;
@@ -1506,10 +1506,10 @@ TYPE
 			END;
 		END ProcessSense;
 
-		PROCEDURE TransferEx*(op: SIGNED32; lba: SIGNED64; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): WORD;
+		PROCEDURE TransferEx*(op: SIGNED32; lba: SIGNED64; num: SIGNED32; bufAdr: ADDRESS; dma: BOOLEAN): INTEGER;
 		VAR
 			command: Command;
-			res: WORD; timeout: SIGNED32;
+			res: INTEGER; timeout: SIGNED32;
 			status: SET;
 		BEGIN {EXCLUSIVE}
 			IF (op # Disks.Read) & (op # Disks.Write) & (op # WriteAndVerify) THEN RETURN Disks.Unsupported; END;
@@ -1528,8 +1528,8 @@ TYPE
 			RETURN res;
 		END TransferEx;
 
-		PROCEDURE WaitUntilReady(): WORD;
-		VAR res: WORD; retry: BOOLEAN;
+		PROCEDURE WaitUntilReady(): INTEGER;
+		VAR res: INTEGER; retry: BOOLEAN;
 		BEGIN
 			REPEAT
 				retry := FALSE;
@@ -1548,9 +1548,9 @@ TYPE
 
 	(* ATAPI funtions *)
 
-		PROCEDURE Reset(): WORD;
+		PROCEDURE Reset(): INTEGER;
 		VAR
-			i: SIGNED32; res: WORD;
+			i: SIGNED32; res: INTEGER;
 			status: SET;
 			command: Command;
 		BEGIN
@@ -1577,11 +1577,11 @@ TYPE
 			RETURN Res_OK;
 		END Reset;
 
-		PROCEDURE RequestSense*(): WORD;
+		PROCEDURE RequestSense*(): INTEGER;
 		VAR
 			command: CommandPacket;
 			buf: ARRAY 18 OF CHAR;
-			res: WORD;
+			res: INTEGER;
 			status: SET;
 		BEGIN
 			IF TraceVerbose & (trace * (TraceCommands + TraceAtapi) # {}) THEN
@@ -1614,10 +1614,10 @@ TYPE
 			RETURN Res_OK;
 		END RequestSense;
 
-		PROCEDURE TestUnitReady*(): WORD;
+		PROCEDURE TestUnitReady*(): INTEGER;
 		VAR
 			command: CommandPacket;
-			res: WORD;
+			res: INTEGER;
 			status: SET;
 		BEGIN
 			IF TraceVerbose & (trace * (TraceCommands + TraceAtapi) # {}) THEN
@@ -1634,15 +1634,15 @@ TYPE
 			RETURN res;
 		END TestUnitReady;
 
-		PROCEDURE Flush(): WORD;
+		PROCEDURE Flush(): INTEGER;
 		BEGIN
 			RETURN Flush^();
 		END Flush;
 
-		PROCEDURE MediaEject*(immediate, load: BOOLEAN): WORD;
+		PROCEDURE MediaEject*(immediate, load: BOOLEAN): INTEGER;
 		VAR
 			command: CommandPacket;
-			res: WORD; timeout: SIGNED32;
+			res: INTEGER; timeout: SIGNED32;
 			status: SET;
 		BEGIN {EXCLUSIVE}
 			command := NewCommandPacket(1BH); (* start/stop unit *)
@@ -1667,10 +1667,10 @@ TYPE
 			RETURN res;
 		END MediaEject;
 
-		PROCEDURE MediaLock*(lock: BOOLEAN): WORD;
+		PROCEDURE MediaLock*(lock: BOOLEAN): INTEGER;
 		VAR
 			command: CommandPacket;
-			res: WORD;
+			res: INTEGER;
 			status: SET;
 		BEGIN {EXCLUSIVE}
 			command := NewCommandPacket(1EH); (* prevent/allow medium removal *)
@@ -1684,10 +1684,10 @@ TYPE
 			RETURN res;
 		END MediaLock;
 
-		PROCEDURE Powersave(): WORD;
+		PROCEDURE Powersave(): INTEGER;
 		VAR
 			command: CommandPacket;
-			res: WORD;
+			res: INTEGER;
 			status: SET;
 		BEGIN {EXCLUSIVE}
 			command := NewCommandPacket(1BH); (* start/stop unit *)
@@ -1700,9 +1700,9 @@ TYPE
 			RETURN res;
 		END Powersave;
 
-		PROCEDURE ReadCapacity*(VAR blkSize, size: SIGNED32): WORD;
+		PROCEDURE ReadCapacity*(VAR blkSize, size: SIGNED32): INTEGER;
 		VAR
-			buf: ARRAY 2 OF SIGNED32;  res: WORD; sense: SIGNED32;
+			buf: ARRAY 2 OF SIGNED32;  res: INTEGER; sense: SIGNED32;
 			command: CommandPacket; status: SET;
 		BEGIN
 			IF TraceVerbose & (trace * (TraceCommands + TraceAtapi + TraceInit) # {}) THEN
@@ -1798,8 +1798,8 @@ TYPE
 			RETURN command;
 		END NewCommandPacket;
 
-		PROCEDURE IdentifyDevice(buf: ARRAY OF SIGNED16): WORD;
-		VAR res : WORD;
+		PROCEDURE IdentifyDevice(buf: ARRAY OF SIGNED16): INTEGER;
+		VAR res : INTEGER;
 		BEGIN
 			maxTransfer := 65535;
 
@@ -1878,7 +1878,7 @@ TYPE
 		END ShowDevice;
 
 		PROCEDURE &Create*(acontroller: Controller; adev: SIGNED32; identifyDevice: ARRAY OF SIGNED16);
-		VAR res: WORD;
+		VAR res: INTEGER;
 		BEGIN
 			INCL(id.type, AtapiBit);
 			NEW(cmdPacket);
@@ -2191,7 +2191,7 @@ BEGIN {EXCLUSIVE}
 END AddController;
 
 PROCEDURE IdentifyController*(bus, dev, fkt: SIGNED32);
-VAR res: WORD; pcmd_ba, pcnl_ba, scmd_ba, scnl_ba, bm_ba, irq: SIGNED32; s: SET;
+VAR res: INTEGER; pcmd_ba, pcnl_ba, scmd_ba, scnl_ba, bm_ba, irq: SIGNED32; s: SET;
 	c: Controller;
 BEGIN
 	res := PCI.ReadConfigDword(bus, dev, fkt,  PCI.Adr0Reg, pcmd_ba);
@@ -2272,7 +2272,7 @@ BEGIN
 END ScanPCIClass;
 
 PROCEDURE ScanIterate;
-VAR pci: PCI.Pci; res: WORD; r0,r8,class: SIGNED32;
+VAR pci: PCI.Pci; res: INTEGER; r0,r8,class: SIGNED32;
 BEGIN
 	PCI.StartIterate(pci);
 	WHILE PCI.Iterate(pci) DO

@@ -57,8 +57,8 @@ BEGIN
 END GetDevice;
 
 (* Get the disk geometry of a named device *)
-PROCEDURE GetDiskGeometry(CONST devicename : ARRAY OF CHAR; VAR diskGeometry : DiskGeometry; VAR res : WORD);
-VAR device : Disks.Device; geometry : Disks.GetGeometryMsg; ignore : WORD;
+PROCEDURE GetDiskGeometry(CONST devicename : ARRAY OF CHAR; VAR diskGeometry : DiskGeometry; VAR res : INTEGER);
+VAR device : Disks.Device; geometry : Disks.GetGeometryMsg; ignore : INTEGER;
 BEGIN
 	device := GetDevice(devicename);
 	IF (device # NIL) THEN
@@ -78,8 +78,8 @@ BEGIN
 END GetDiskGeometry;
 
 (* read a block from device with name devicename. Returns with res = Disks.Ok, if successful *)
-PROCEDURE ReadBlock*(CONST devicename : ARRAY OF CHAR;  block : SIGNED32; VAR buffer: Buffer; VAR res: WORD);
-VAR device : Disks.Device; ignore : WORD;
+PROCEDURE ReadBlock*(CONST devicename : ARRAY OF CHAR;  block : SIGNED32; VAR buffer: Buffer; VAR res: INTEGER);
+VAR device : Disks.Device; ignore : INTEGER;
 BEGIN
 	device := GetDevice(devicename);
 	IF (device # NIL) THEN
@@ -98,8 +98,8 @@ BEGIN
 END ReadBlock;
 
 (* write a block to device with name devicename. Returns with res = Disks.Ok, if successful*)
-PROCEDURE WriteBlock*(CONST devicename : ARRAY OF CHAR; block : SIGNED32; VAR buffer: Buffer; VAR res: WORD);
-VAR device : Disks.Device; ignore : WORD;
+PROCEDURE WriteBlock*(CONST devicename : ARRAY OF CHAR; block : SIGNED32; VAR buffer: Buffer; VAR res: INTEGER);
+VAR device : Disks.Device; ignore : INTEGER;
 BEGIN
 	device := GetDevice(devicename);
 	IF (device # NIL) THEN
@@ -144,7 +144,7 @@ END Put4;
 
 (**	This procedure is called by the Partition Editor when you press the Load button. It should load the block number <block> on the
 	device <devicename> and extract the partition table inside if any *)
-PROCEDURE LoadPartitionTable*(CONST devicename : ARRAY OF CHAR;  block : SIGNED32; VAR res : WORD) : PartitionTable;
+PROCEDURE LoadPartitionTable*(CONST devicename : ARRAY OF CHAR;  block : SIGNED32; VAR res : INTEGER) : PartitionTable;
 VAR pt : PartitionTable; buffer: Buffer;
 BEGIN
 	Clear(pt);
@@ -155,7 +155,7 @@ BEGIN
 	RETURN pt;
 END LoadPartitionTable;
 
-PROCEDURE ParseBuffer*(CONST buffer : Buffer; VAR res : WORD) : PartitionTable;
+PROCEDURE ParseBuffer*(CONST buffer : Buffer; VAR res : INTEGER) : PartitionTable;
 VAR pt : PartitionTable; entry, offset : SIGNED32;
 
 	PROCEDURE ParseCHS(CONST buffer : Buffer; offset : SIGNED32; VAR cylinder, head, sector : SIGNED32);
@@ -192,7 +192,7 @@ END ParseBuffer;
 
 (** 	This procedure is called by the Partition Editor when you press the Store button. It shall encode the given partition table <pt>  into a
 	512 bytes block and store this block on the named device at block number <block> *)
-PROCEDURE StorePartitionTable*(CONST devicename : ARRAY OF CHAR; block : SIGNED32; CONST pt : PartitionTable; VAR res : WORD);
+PROCEDURE StorePartitionTable*(CONST devicename : ARRAY OF CHAR; block : SIGNED32; CONST pt : PartitionTable; VAR res : INTEGER);
 VAR buffer : Buffer;
 BEGIN
 	ReadBlock(devicename,block,buffer,res);
@@ -243,7 +243,7 @@ END Chs2Lba;
 	Dependent of the changeType, we should now fixup all other entries of the provide partition table entry, e.g.
 	if the start LBA changed, we should adjust the start CHS and the partition size.
 	The Partition Editor will visualize changes we do to the Partition record *)
-PROCEDURE Changed*(changeType : SIGNED32; VAR partition : Partition; CONST devicename : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE Changed*(changeType : SIGNED32; VAR partition : Partition; CONST devicename : ARRAY OF CHAR; VAR res : INTEGER);
 VAR diskGeometry : DiskGeometry; geometry : BOOLEAN;
 BEGIN
 	GetDiskGeometry(devicename, diskGeometry, res);

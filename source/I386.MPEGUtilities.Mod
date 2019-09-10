@@ -512,7 +512,7 @@ TYPE
 
 		PROCEDURE Reset*;
 		VAR
-			dummy: SIGNED32; result: WORD;
+			dummy: SIGNED32; result: INTEGER;
 
 		BEGIN
 			input.SetPosX(Codecs.SeekByte, 0, dummy, result);
@@ -641,7 +641,7 @@ TYPE
 
 		PROCEDURE SetPos*(pos: Streams.Position);
 		VAR
-			dummy: SIGNED32; result: WORD;
+			dummy: SIGNED32; result: INTEGER;
 
 		BEGIN
 			input.SetPosX(Codecs.SeekByte, pos(SIGNED32), dummy, result);

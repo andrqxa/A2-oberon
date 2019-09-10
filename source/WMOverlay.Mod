@@ -39,14 +39,14 @@ TYPE
 	Window = OBJECT (WMWindowManager.BufferWindow);
 	VAR
 		lx, ly, stringX, stringY, stringX0, stringY0 : SIZE;
-		mode : WORD;
+		mode : INTEGER;
 
 		currentString : ARRAY 1024 OF CHAR;
 		currentIdx : SIZE;
 
 		mrEnabled : BOOLEAN;
 		mouseOver : SIZE; (* index of mouse over icon, -1 of no mouse over *)
-		currentPointer : WORD;
+		currentPointer : INTEGER;
 		currentIndex : SIZE;
 		color, bgColor : SIGNED32;
 
@@ -131,7 +131,7 @@ TYPE
 			RETURN (mode = Mode_Drawing) OR (GetItemIndex(x, y) >= 0);
 		END IsHit;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; width, height : SIZE; quality : WORD);
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; width, height : SIZE; quality : INTEGER);
 		CONST IconBorder = 8;
 		VAR image : WMGraphics.Image; nbr : ARRAY 8 OF CHAR; color, i : SIGNED32;
 		BEGIN
@@ -297,7 +297,7 @@ TYPE
 
 		PROCEDURE KeyEvent*(ucs : SIZE; flags : SET; keySym : SIZE);
 		VAR
-			filename : Files.FileName; newImg : WMGraphics.Image; oldMode: SIGNED32; res: WORD;
+			filename : Files.FileName; newImg : WMGraphics.Image; oldMode: SIGNED32; res: INTEGER;
 			string : ARRAY 2 OF CHAR; dx, dy : SIZE;
 			font : WMGraphics.Font;
 		BEGIN

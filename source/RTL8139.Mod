@@ -216,7 +216,7 @@ TYPE
 	END Reset;
 
 		PROCEDURE &Init*(dev: LinkDevice; base: ADDRESS; irq, model: SIGNED32);
-		VAR res: WORD; dp, ver, i, dummy: SIGNED32; val, nval: SET;
+		VAR res: INTEGER; dp, ver, i, dummy: SIGNED32; val, nval: SET;
 		BEGIN
 			SELF.next:=installedControllers; installedControllers:=SELF;
 			NEW(timer);
@@ -519,7 +519,7 @@ TYPE
 (* Scan the PCI bus for the specified card. *)
 
 PROCEDURE ScanPCI(vendor, device, model: SIGNED32);
-VAR index, bus, dev, fct, irq, i: SIGNED32; res: WORD; base: ADDRESS; d: LinkDevice; c: Controller; name: Plugins.Name;
+VAR index, bus, dev, fct, irq, i: SIGNED32; res: INTEGER; base: ADDRESS; d: LinkDevice; c: Controller; name: Plugins.Name;
 BEGIN
 	index := 0;
 	WHILE (PCI.FindPCIDevice(device, vendor, index, bus, dev, fct) = PCI.Done) & (installed < 10) DO

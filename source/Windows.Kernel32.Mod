@@ -162,7 +162,7 @@ CONST
 TYPE
 	(* OutputStringProc* = PROCEDURE (VAR str: ARRAY OF CHAR); *)
 
-	BOOL* = WORD;
+	BOOL* = INTEGER;
 
 	HANDLE* = ADDRESS;  HMODULE* = ADDRESS;
 	HINSTANCE* = ADDRESS;  ATOM* = SIGNED16;  HGLOBAL* = HANDLE;
@@ -1113,7 +1113,7 @@ VAR hout: HANDLE;
 
 
 	PROCEDURE SetTraceConsole;
-	VAR res: WORD;
+	VAR res: INTEGER;
 	BEGIN
 		hout := GetStdHandle (STDOutput);
 		Trace.Char := TraceChar;

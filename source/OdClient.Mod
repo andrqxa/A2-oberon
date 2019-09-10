@@ -81,7 +81,7 @@ TYPE
 		(* Get filelist of server discriminated by version state *)
 		PROCEDURE VersionMembers(CONST remote: ARRAY OF CHAR; VAR all, unversioned, checkedin, checkedout: OdUtil.Lines);
 		VAR
-			res: WORD;
+			res: INTEGER;
 			resHeader: WebHTTP.ResponseHeader; out : Streams.Reader;
 			doc: XML.Document; root, response, href, prop: XML.Element;
 			responses: XMLObjects.Enumerator; p: ANY;
@@ -225,7 +225,7 @@ TYPE
 			reqHeader: WebHTTP.RequestHeader; resHeader: WebHTTP.ResponseHeader;
 			doc: XML.Document; lenStr: ARRAY 16 OF CHAR;
 			root: XML.Element; s: XML.String;
-			url, info: ARRAY 128 OF CHAR; rc: WORD;
+			url, info: ARRAY 128 OF CHAR; rc: INTEGER;
 			all, unversioned, checkedin, checkedout: OdUtil.Lines;
 		BEGIN
 			toPut := ClientRes(local);
@@ -294,14 +294,14 @@ TYPE
 			toDelete := all.notIn(ClientMembers(local));
 			WHILE toDelete # NIL DO
 				(* Delete(url: ARRAY OF CHAR; VAR con : TCP.Connection;
-					VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+					VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 				*)
 				toDelete := toDelete.next;
 			END;
 			(* GET local members. *)
 			WHILE all # NIL DO
 				(* Get*(url : ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader; VAR con : TCP.Connection;
-					VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; in : Streams.Reader; VAR res : WORD);
+					VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; in : Streams.Reader; VAR res : INTEGER);
 				*)
 				all := all.next;
 			END;
@@ -314,7 +314,7 @@ TYPE
 		VAR
 			all, unversioned, checkedin, checkedout: OdUtil.Lines;
 			reqHeader : WebHTTP.RequestHeader; resHeader: WebHTTP.ResponseHeader;
-			out : Streams.Reader; rc: WORD;
+			out : Streams.Reader; rc: INTEGER;
 			doc: XML.Document; root: XML.Element; info, rootStr: ARRAY 128 OF CHAR; s: XML.String;
 			props: WebHTTP.AdditionalField;
 		BEGIN
@@ -432,7 +432,7 @@ TYPE
 		PROCEDURE checkout * (CONST remote: ARRAY OF CHAR);
 		VAR
 			resHeader: WebHTTP.ResponseHeader;
-			out : Streams.Reader; rc: WORD;
+			out : Streams.Reader; rc: INTEGER;
 			doc: XML.Document; root: XML.Element; info, rootStr: ARRAY 128 OF CHAR; elName: OdUtil.Line;
 			all, unversioned, checkedin, checkedout: OdUtil.Lines;
 		BEGIN
@@ -467,7 +467,7 @@ TYPE
 		PROCEDURE uncheckout * (CONST remote: ARRAY OF CHAR);
 		VAR
 			reqHeader: WebHTTP.RequestHeader; resHeader: WebHTTP.ResponseHeader;
-			out : Streams.Reader; rc: WORD;
+			out : Streams.Reader; rc: INTEGER;
 			doc: XML.Document; root: XML.Element; info, rootStr: ARRAY 128 OF CHAR; elName: OdUtil.Line;
 			all, unversioned, checkedin, checkedout: OdUtil.Lines;
 		BEGIN
@@ -635,7 +635,7 @@ TYPE
 
 
 
-		PROCEDURE XmlResult * (VAR resHeader: WebHTTP.ResponseHeader; res: WORD;
+		PROCEDURE XmlResult * (VAR resHeader: WebHTTP.ResponseHeader; res: INTEGER;
 			out : Streams.Reader): XML.Document;
 		CONST
 			BufSize = 512; XmlInName = "XmlIn0.Log";
@@ -784,7 +784,7 @@ TYPE
 		END SetRepos;
 
 
-		PROCEDURE OpenConnection ( CONST url : ARRAY OF CHAR; VAR host, path : ARRAY OF CHAR; VAR port : SIGNED32; VAR res : WORD ) : BOOLEAN;
+		PROCEDURE OpenConnection ( CONST url : ARRAY OF CHAR; VAR host, path : ARRAY OF CHAR; VAR port : SIGNED32; VAR res : INTEGER ) : BOOLEAN;
 		VAR
 			fadr : IP.Adr;
 		BEGIN
@@ -825,7 +825,7 @@ TYPE
 
 		(** Generic routine to connect to a server and wait for reply. *)
 		PROCEDURE Net(CONST url : ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			VAR resHeader: WebHTTP.ResponseHeader; xmlReq: XML.Document; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; xmlReq: XML.Document; VAR out : Streams.Reader; VAR res : INTEGER);
 		CONST
 			StringWriterSize = 10000;
 		VAR
@@ -894,7 +894,7 @@ TYPE
 		END Net;
 
 
-		PROCEDURE ParseReply ( out : Streams.Reader; VAR resHeader: WebHTTP.ResponseHeader; VAR res : WORD );
+		PROCEDURE ParseReply ( out : Streams.Reader; VAR resHeader: WebHTTP.ResponseHeader; VAR res : INTEGER );
 		VAR
 			state : ARRAY 50 OF CHAR;
 		BEGIN
@@ -913,14 +913,14 @@ TYPE
 		END ParseReply;
 
 		PROCEDURE BaselineControlFreeze * (CONST url: ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		BEGIN (* localServer.freezeInitialConfiguration(conf, log, flags); *)
 			reqHeader.method := WebHTTP.BaselineControlM;
 			Net(url, reqHeader, resHeader, NIL, out, res);
 		END BaselineControlFreeze;
 
 		PROCEDURE BaselineControlSelect * (CONST url, baseline: ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			 VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			 VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqBody: OdXml.BaselineControlReq;
 			host : ARRAY 128 OF CHAR; path : ARRAY 256 OF CHAR; port : SIGNED32;
@@ -934,7 +934,7 @@ TYPE
 		END BaselineControlSelect;
 
 
-		PROCEDURE Head*(CONST url : ARRAY OF CHAR; VAR resHeader: WebHTTP.ResponseHeader; VAR res : WORD);
+		PROCEDURE Head*(CONST url : ARRAY OF CHAR; VAR resHeader: WebHTTP.ResponseHeader; VAR res : INTEGER);
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
@@ -968,7 +968,7 @@ TYPE
 		?>HTTP/1.1 200 OK
 		*)
 		PROCEDURE Get*(CONST url : ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
@@ -1002,7 +1002,7 @@ TYPE
 
 		(** The HTTP versions is ignored and set to 1.1; uri and host are ignored and taken from the url parameter *)
 		PROCEDURE Put*(CONST url : ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; in : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
@@ -1044,14 +1044,14 @@ TYPE
 		>HTTP/1.1 200 OK
 		*)
 		PROCEDURE VersionControlFreeze*(CONST url: ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		BEGIN
 			reqHeader.method := WebHTTP.VersionControlM;
 			Net(url, reqHeader, resHeader, NIL, out, res);
 		END VersionControlFreeze;
 
 		PROCEDURE VersionControlSelect*(CONST url, ver: ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		CONST PLog = FALSE;
 		VAR
 			host : ARRAY 128 OF CHAR;
@@ -1113,7 +1113,7 @@ TYPE
 		>HTTP/1.1 200 OK
 		*)
 		PROCEDURE Checkout*(CONST url: ARRAY OF CHAR;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader;
 			coReq: OdXml.CheckoutReq;
@@ -1150,7 +1150,7 @@ TYPE
 		>HTTP/1.1 200 OK
 		*)
 		PROCEDURE Merge*(CONST url, source: ARRAY OF CHAR;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader;
 			mergeReq: OdXml.MergeSvnReq;
@@ -1174,7 +1174,7 @@ TYPE
 		>HTTP/1.1 200 OK
 		*)
 		PROCEDURE Uncheckout*(CONST url : ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
@@ -1199,7 +1199,7 @@ TYPE
 		END Uncheckout;
 
 		PROCEDURE Report1*(CONST type: ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			host : ARRAY 128 OF CHAR;
 			path : ARRAY 256 OF CHAR;
@@ -1243,7 +1243,7 @@ TYPE
 
 		(* Already get the request XML doc as a parameter. *)
 		PROCEDURE Report*(CONST url, depth: ARRAY OF CHAR; reqBody: XML.Document;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader;
 		BEGIN
@@ -1255,7 +1255,7 @@ TYPE
 		END Report;
 
 		PROCEDURE Propfind*(CONST url, depth: ARRAY OF CHAR; props: WebHTTP.AdditionalField;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader; xmlDoc: XML.Document;
 		BEGIN
@@ -1274,7 +1274,7 @@ TYPE
 
 		(* Properties are gives as a list of lines: 1{ name 1{value} } . mode = "set" | "add" *)
 		PROCEDURE Proppatch*(CONST url, mode : ARRAY OF CHAR; props: WebHTTP.AdditionalField;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader; xmlDoc: XML.Document;
 		BEGIN
@@ -1284,7 +1284,7 @@ TYPE
 		END Proppatch;
 
 		PROCEDURE Checkin*(CONST url: ARRAY OF CHAR;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader;
 		BEGIN
@@ -1302,7 +1302,7 @@ TYPE
 		Location: http://webdav.ethz.ch//test/new
 		*)
 		PROCEDURE Move*(CONST url, destUrl: ARRAY OF CHAR; overwrite: BOOLEAN;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader; xmlDoc: XML.Document;
 		BEGIN
@@ -1316,7 +1316,7 @@ TYPE
 		END Move;
 
 		PROCEDURE Copy*(CONST url, destUrl : ARRAY OF CHAR; overwrite: BOOLEAN;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader; xmlDoc: XML.Document;
 		BEGIN
@@ -1330,7 +1330,7 @@ TYPE
 		END Copy;
 
 		PROCEDURE Delete*(CONST url: ARRAY OF CHAR;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader;
 		BEGIN
@@ -1344,7 +1344,7 @@ TYPE
 		< Content-Length: 0
 		?>HTTP/1.1 200 OK *)
 		PROCEDURE Mkcol*(CONST url: ARRAY OF CHAR;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader;
 		BEGIN
@@ -1359,7 +1359,7 @@ TYPE
 		< Content-Length: 0
 		?>HTTP/1.1 200 OK *)
 		PROCEDURE Mkactivity*(CONST url: ARRAY OF CHAR;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader;
 		BEGIN
@@ -1370,7 +1370,7 @@ TYPE
 
 		(** Options request to learn about a new server. Example cadaver:   *)
 		PROCEDURE Options*(CONST url: ARRAY OF CHAR;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		VAR
 			reqHeader : WebHTTP.RequestHeader;
 		BEGIN
@@ -1381,7 +1381,7 @@ TYPE
 		(* Version can be a number. Then it's just a version number of VCSBase and is sent as <host>/version.<version>.
 			Or it's a version url string. For VCSBase it must have the form /hist/<version history>.<version number> *)
 		PROCEDURE Update*(CONST url, version: ARRAY OF CHAR; VAR reqHeader : WebHTTP.RequestHeader;
-			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : WORD);
+			VAR resHeader: WebHTTP.ResponseHeader; VAR out : Streams.Reader; VAR res : INTEGER);
 		CONST PLog = FALSE;
 		VAR
 			host : ARRAY 128 OF CHAR;
@@ -1506,7 +1506,7 @@ BEGIN
 	END;
 END ShowStatus;
 
-PROCEDURE StoreResult2File * (VAR resHeader: WebHTTP.ResponseHeader; res: WORD;
+PROCEDURE StoreResult2File * (VAR resHeader: WebHTTP.ResponseHeader; res: INTEGER;
 	out : Streams.Reader; CONST target: ARRAY OF CHAR; VAR f: Files.File);
 CONST
 	BufSize = 512;

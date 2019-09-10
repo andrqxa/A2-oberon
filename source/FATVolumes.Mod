@@ -125,7 +125,7 @@ TYPE
 		END InitLowLevel;
 
 		PROCEDURE Finalize*;
-		VAR i, j: SIGNED32; res: WORD; ptable: Disks.PartitionTable;
+		VAR i, j: SIGNED32; res: INTEGER; ptable: Disks.PartitionTable;
 		BEGIN (* must be exclusive in overridden methods *)
 			quit := TRUE;
 			timer.Wakeup;
@@ -191,7 +191,7 @@ TYPE
 		END InitCache;
 
 		PROCEDURE FlushCache(cache: Cache);
-		VAR i, firstDirty, lastDirty, adr, num, ofs: SIGNED32; res: WORD; start: SIGNED32;
+		VAR i, firstDirty, lastDirty, adr, num, ofs: SIGNED32; res: INTEGER; start: SIGNED32;
 		BEGIN
 			IF (cache # NIL) & cache.dirty THEN
 				cache.dirty := FALSE;
@@ -218,11 +218,11 @@ TYPE
 		END FlushCache;
 
 		(** ReadSector: reads a sector from the FAT area. Use ReadCluster to read a data cluster *)
-		PROCEDURE ReadSector*(adr: Address; VAR data: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE ReadSector*(adr: Address; VAR data: ARRAY OF CHAR; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE} ReadSectorX(adr, data, 0, res)
 		END ReadSector;
 
-		PROCEDURE ReadSectorX(adr: Address; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: WORD);
+		PROCEDURE ReadSectorX(adr: Address; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: INTEGER);
 		VAR block, idx: SIGNED32;
 		BEGIN
 			INC(NreadSector);
@@ -245,11 +245,11 @@ TYPE
 		END ReadSectorX;
 
 		(** WriteSector: writes a sector to the FAT area. Use WriteCluster to write a data cluster *)
-		PROCEDURE WriteSector*(adr: Address; VAR data: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE WriteSector*(adr: Address; VAR data: ARRAY OF CHAR; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE} WriteSectorX(adr, data, 0, res)
 		END WriteSector;
 
-		PROCEDURE WriteSectorX(adr: Address; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: WORD);
+		PROCEDURE WriteSectorX(adr: Address; VAR data: ARRAY OF CHAR; ofs: SIGNED32; VAR res: INTEGER);
 		VAR block, idx: SIGNED32;
 		BEGIN
 			INC(NwriteSector);
@@ -280,20 +280,20 @@ TYPE
 		BEGIN HALT(301) (* abstract *)
 		END ReadFATEntryX;
 
-		PROCEDURE WriteFATEntry*(adr, link: Address; VAR res: WORD);
+		PROCEDURE WriteFATEntry*(adr, link: Address; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE} WriteFATEntryX(adr, link, res)
 		END WriteFATEntry;
 
-		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: WORD);
+		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
 		BEGIN HALT(301) (* abstract *)
 		END WriteFATEntryX;
 
 		(** ReadCluster: reads a cluster from the data area. Use ReadSector to read a sector from the FAT area *)
-		PROCEDURE ReadCluster*(adr: Address; VAR data: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE ReadCluster*(adr: Address; VAR data: ARRAY OF CHAR; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE} ReadClusterX(adr, data, res)
 		END ReadCluster;
 
-		PROCEDURE ReadClusterX(adr: Address; VAR data: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE ReadClusterX(adr: Address; VAR data: ARRAY OF CHAR; VAR res: INTEGER);
 		VAR block, idx: SIGNED32;
 		BEGIN
 			INC(NreadCluster);
@@ -316,11 +316,11 @@ TYPE
 		END ReadClusterX;
 
 		(** WriteCluster: writes a cluster to the data area. Use WriteSector to write a sector to the FAT area *)
-		PROCEDURE WriteCluster*(adr: Address; VAR data: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE WriteCluster*(adr: Address; VAR data: ARRAY OF CHAR; VAR res: INTEGER);
 		BEGIN {EXCLUSIVE} WriteClusterX(adr, data, res)
 		END WriteCluster;
 
-		PROCEDURE WriteClusterX(adr: Address; VAR data: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE WriteClusterX(adr: Address; VAR data: ARRAY OF CHAR; VAR res: INTEGER);
 		VAR block, idx: SIGNED32;
 		BEGIN
 			INC(NwriteCluster);
@@ -343,7 +343,7 @@ TYPE
 			ioError := ioError OR (res # Ok)
 		END WriteClusterX;
 
-		PROCEDURE AllocCluster*(link: Address; VAR res: WORD): Address;
+		PROCEDURE AllocCluster*(link: Address; VAR res: INTEGER): Address;
 		VAR c, cnt, entry: Address;
 		BEGIN {EXCLUSIVE}
 			INC(NallocCluster);
@@ -374,7 +374,7 @@ TYPE
 			RETURN BAD
 		END AllocCluster;
 
-		PROCEDURE FreeClusterChain*(cluster: Address; VAR res: WORD);
+		PROCEDURE FreeClusterChain*(cluster: Address; VAR res: INTEGER);
 		VAR c, new: Address;
 		BEGIN {EXCLUSIVE}
 			c := cluster; res := Ok;
@@ -387,7 +387,7 @@ TYPE
 		END FreeClusterChain;
 
 		PROCEDURE QuickFormat*;
-		VAR sec: ARRAY BS OF CHAR; i: SIGNED32; res: WORD; entries: ARRAY 2 OF SIGNED32;
+		VAR sec: ARRAY BS OF CHAR; i: SIGNED32; res: INTEGER; entries: ARRAY 2 OF SIGNED32;
 		BEGIN {EXCLUSIVE}
 			unsafe := TRUE; entries[0] := ReadFATEntryX(0);
 			unsafe := TRUE; entries[1] := ReadFATEntryX(1);
@@ -450,7 +450,7 @@ TYPE
 		END Initialize;
 
 		PROCEDURE InitRoot;
-		VAR sec: ARRAY BS OF CHAR; i: SIGNED32; res: WORD;
+		VAR sec: ARRAY BS OF CHAR; i: SIGNED32; res: INTEGER;
 		BEGIN
 			FOR i := 0 TO numRootSectors-1 DO
 				WriteSectorX(firstRootSector + i, sec, 0, res) (* ignore res *)
@@ -476,7 +476,7 @@ TYPE
 		END Finalize;
 
 		PROCEDURE ReadFATEntryX(adr: Address): Address;
-		VAR offset: SIGNED32; res: WORD;
+		VAR offset: SIGNED32; res: INTEGER;
 			entry: Address;
 			data: ARRAY 2*BS OF CHAR;
 		BEGIN
@@ -508,7 +508,7 @@ TYPE
 			RETURN entry
 		END ReadFATEntryX;
 
-		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: WORD);
+		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
 		VAR offset, entry: Address; i: SIGNED32;
 			data: ARRAY 2*BS OF CHAR;
 		BEGIN
@@ -564,7 +564,7 @@ CONST
 TYPE
 	FAT16Volume* = OBJECT(FAT1216Volume)
 		PROCEDURE Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
-		VAR vcf: SET32; res: WORD;
+		VAR vcf: SET32; res: INTEGER;
 		BEGIN {EXCLUSIVE}
 			IF Initialize^(bpb, MaxClusters) THEN	(* see note in Volumes.Initialize *)
 				unsafe := TRUE; vcf := SET32(ReadFATEntryX(1));
@@ -587,7 +587,7 @@ TYPE
 		END Initialize;
 
 		PROCEDURE Finalize*;
-		VAR vcf: SET32; res: WORD;
+		VAR vcf: SET32; res: INTEGER;
 		BEGIN {EXCLUSIVE}
 			IF ~(Files.ReadOnly IN flags) THEN
 				unsafe := TRUE; vcf := SET32(ReadFATEntryX(1));
@@ -600,7 +600,7 @@ TYPE
 
 		PROCEDURE ReadFATEntryX(adr: Address): Address;
 		VAR offset, entry: Address;
-			res: WORD;
+			res: INTEGER;
 			data: ARRAY BS OF CHAR;
 		BEGIN
 			INC(NreadFAT);
@@ -623,7 +623,7 @@ TYPE
 			RETURN entry
 		END ReadFATEntryX;
 
-		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: WORD);
+		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
 		VAR offset: Address; i: SIGNED32;
 			data: ARRAY BS OF CHAR;
 		BEGIN
@@ -672,7 +672,7 @@ TYPE
 			fsInfo-: Address; 	(* sector number of FSInfo sector (relative to 'start') *)
 
 		PROCEDURE Initialize(VAR bpb: BPB; MaxClusters: SIGNED32): BOOLEAN;
-		VAR i: SIGNED32; res: WORD; result: BOOLEAN; info: ARRAY BS OF CHAR; vcf: SET32;
+		VAR i: SIGNED32; res: INTEGER; result: BOOLEAN; info: ARRAY BS OF CHAR; vcf: SET32;
 		BEGIN {EXCLUSIVE}
 			result := FALSE;
 			IF Initialize^(bpb, MaxClusters) THEN	(* see note in Volumes.Initialize *)
@@ -731,7 +731,7 @@ TYPE
 		END Initialize;
 
 		PROCEDURE Finalize*;
-		VAR vcf: SET32; res: WORD; info: ARRAY BS OF CHAR;
+		VAR vcf: SET32; res: INTEGER; info: ARRAY BS OF CHAR;
 		BEGIN {EXCLUSIVE}
 			IF ~(Files.ReadOnly IN flags) THEN
 				dev.Transfer(Disks.Read, start + fsInfo, 1, info, 0, res);
@@ -754,7 +754,7 @@ TYPE
 		END Finalize;
 
 		PROCEDURE InitRoot;
-		VAR cluster: POINTER TO ARRAY OF CHAR; res: WORD;
+		VAR cluster: POINTER TO ARRAY OF CHAR; res: INTEGER;
 		BEGIN
 			NEW(cluster,clusterSize);
 			WriteFATEntryX(rootCluster, EOC, res); (* ignore res *)
@@ -762,7 +762,7 @@ TYPE
 		END InitRoot;
 
 		PROCEDURE ReadFATEntryX(adr: Address): Address;
-		VAR offset, entry: Address; res: WORD; data: ARRAY BS OF CHAR;
+		VAR offset, entry: Address; res: INTEGER; data: ARRAY BS OF CHAR;
 		BEGIN
 			INC(NreadFAT);
 			IF ~unsafe & ((adr < 2) OR (adr > maxClusters+1)) THEN HALT(ErrInvalidParams) END;
@@ -784,7 +784,7 @@ TYPE
 			RETURN entry
 		END ReadFATEntryX;
 
-		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: WORD);
+		PROCEDURE WriteFATEntryX(adr, link: Address; VAR res: INTEGER);
 		VAR offset: Address; i: SIGNED32; data: ARRAY BS OF CHAR;
 		BEGIN
 			INC(NwriteFAT);
@@ -819,7 +819,7 @@ TYPE
 
 PROCEDURE New*(context : Files.Parameters);
 VAR
-	part, type, cacheSize: SIGNED32; res: WORD; flags: SET; stop: BOOLEAN;
+	part, type, cacheSize: SIGNED32; res: INTEGER; flags: SET; stop: BOOLEAN;
 	name: Plugins.Name; plugin: Plugins.Plugin; dev: Disks.Device;
 	ptable: Disks.PartitionTable; ch : CHAR;
 BEGIN {EXCLUSIVE}
@@ -896,7 +896,7 @@ END WritePartitionType;
 PROCEDURE InitVol(dev: Disks.Device; partIdx, type: SIGNED32; VAR vol: Files.Volume; flags: SET; cacheSize: SIGNED32);
 VAR
 	bpb: BPB; vol12: FAT12Volume; vol16: FAT16Volume; vol32: FAT32Volume; fatString : ARRAY 12 OF CHAR;
-	fatSize, numSectors, numClusters, reserved, numFATs, rootEntryCount, sectPC, fat : SIGNED32; res: WORD;
+	fatSize, numSectors, numClusters, reserved, numFATs, rootEntryCount, sectPC, fat : SIGNED32; res: INTEGER;
 BEGIN
 	dev.Transfer(Disks.Read, dev.table[partIdx].start, 1, bpb, 0, res);
 	IF (res = Ok) THEN

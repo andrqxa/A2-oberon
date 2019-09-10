@@ -101,7 +101,7 @@ TYPE
 
 	END EventContainer;
 
-PROCEDURE LoadFromFile*(CONST filename : ARRAY OF CHAR; VAR events : EventContainer; VAR msg : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE LoadFromFile*(CONST filename : ARRAY OF CHAR; VAR events : EventContainer; VAR msg : ARRAY OF CHAR; VAR res : INTEGER);
 VAR file : Files.File; r : Files.Reader; event : Events.Event; nofEvents : SIZE;
 BEGIN
 	file := Files.Old(filename);
@@ -131,7 +131,7 @@ BEGIN
 	END;
 END LoadFromFile;
 
-PROCEDURE StoreToFile*(CONST filename : ARRAY OF CHAR; events : EventContainer; VAR msg : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE StoreToFile*(CONST filename : ARRAY OF CHAR; events : EventContainer; VAR msg : ARRAY OF CHAR; VAR res : INTEGER);
 VAR
 	file : Files.File; w : Files.Writer; wrapper : EventWrapper;
 	nofEvents, lastCleared, i, idx : SIZE; full : BOOLEAN;
@@ -172,7 +172,7 @@ BEGIN
 	w.Update;
 END ToStream;
 
-PROCEDURE FromStream*(r : Streams.Reader; VAR event : Events.Event; VAR msg : ARRAY OF CHAR; VAR res : WORD);
+PROCEDURE FromStream*(r : Streams.Reader; VAR event : Events.Event; VAR msg : ARRAY OF CHAR; VAR res : INTEGER);
 VAR dt : Dates.DateTime; str : Events.Message; ch : CHAR; class, subclass, code : SIGNED32;
 
 	PROCEDURE IsValid(value : SIGNED32) : BOOLEAN;

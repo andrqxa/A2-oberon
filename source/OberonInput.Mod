@@ -129,7 +129,7 @@ VAR
 	default: DefaultInput;
 
 PROCEDURE Install*;
-VAR res: WORD; p: Plugins.Plugin; d: Displays.Display;
+VAR res: INTEGER; p: Plugins.Plugin; d: Displays.Display;
 BEGIN
 	IF default = NIL THEN
 		p := Displays.registry.Get("");	(* get first display *)

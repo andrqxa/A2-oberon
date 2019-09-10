@@ -22,7 +22,7 @@ VAR
 	i: SIGNED32;
 	hostname: DNS.Name;
 	fip: IP.Adr;
-	res1, res2: WORD;
+	res1, res2: INTEGER;
 	data: ARRAY PingHdrSize+MaxPingSize OF CHAR;
 
 BEGIN {EXCLUSIVE}
@@ -77,7 +77,7 @@ BEGIN {EXCLUSIVE}
 END Ping;
 
 PROCEDURE TimeoutHandler;
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN {EXCLUSIVE}
 	IF running THEN
 		KernelLog.String("Ping: Timeout! No reply received within "); KernelLog.Int(timeout, 0);
@@ -91,7 +91,7 @@ BEGIN {EXCLUSIVE}
 END TimeoutHandler;
 
 PROCEDURE GetReply(int: IP.Interface; type, code: SIGNED32; fip, lip: IP.Adr; buffer: Network.Buffer);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN {EXCLUSIVE}
 	IF running THEN
 		KernelLog.String("Ping: Successful! Reply received within "); KernelLog.Int(Kernel.Elapsed(ms), 0);
@@ -107,7 +107,7 @@ BEGIN {EXCLUSIVE}
 END GetReply;
 
 PROCEDURE Cleanup;
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN {EXCLUSIVE}
 	IF running THEN
 		running := FALSE;

@@ -24,7 +24,7 @@ CONST
 	TraceBoot = FALSE;
 
 PROCEDURE BootCommand(CONST config: ARRAY OF CHAR; flags: SET);
-VAR i, j: SIGNED32; res: WORD; par: ARRAY 32 OF CHAR; s: ARRAY 256 OF CHAR;
+VAR i, j: SIGNED32; res: INTEGER; par: ARRAY 32 OF CHAR; s: ARRAY 256 OF CHAR;
 BEGIN
 	COPY(config, par);
 	i := 0; j := 0; WHILE par[j] # 0X DO INC(j) END;
@@ -67,7 +67,7 @@ END Error;
 
 PROCEDURE Generate(CONST name: ARRAY OF CHAR; par: Files.Parameters): BOOLEAN;
 VAR
-	factory : Files.FileSystemFactory; res: WORD; msg: ARRAY 256 OF CHAR;
+	factory : Files.FileSystemFactory; res: INTEGER; msg: ARRAY 256 OF CHAR;
 	moduleName, procedureName : Modules.Name;
 BEGIN
 	Commands.Split(name, moduleName, procedureName, res, msg);

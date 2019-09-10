@@ -11,7 +11,7 @@ TYPE
 	Entry = OBJECT
 		VAR
 			next: Entry;
-			priority: WORD;
+			priority: INTEGER;
 			turn: BOOLEAN;
 	END Entry;
 

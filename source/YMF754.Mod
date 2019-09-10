@@ -1068,7 +1068,7 @@ TYPE
 		(* Constructor *)
 		PROCEDURE &Constr*(name: ARRAY OF CHAR; physbase, irq: SIGNED32; CntrlInst1E: BOOLEAN);
 		VAR
-			i: SIGNED32; res: WORD;
+			i: SIGNED32; res: INTEGER;
 			PCDbase: SIGNED32; (* physical base address of PCI Audio play control data table *)
 		BEGIN
 			SELF.irq := irq;
@@ -1304,7 +1304,7 @@ TYPE
 			nofSubChannes = 1 for Mono, 2 for Stereo
 			format is the wave format
 		*)
-		PROCEDURE OpenPlayChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution, nofSubChannels, format : SIGNED32; VAR res : WORD);
+		PROCEDURE OpenPlayChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution, nofSubChannels, format : SIGNED32; VAR res : INTEGER);
 		VAR
 			playSlotPair: SIGNED32;
 			playChannel: PlayerChannel;
@@ -1355,7 +1355,7 @@ TYPE
 			nofSubChannes = 1 for Mono, 2 for Stereo
 			format is the wave format
 		*)
-		PROCEDURE OpenRecordChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution, nofSubChannels, format : SIGNED32; VAR res : WORD);
+		PROCEDURE OpenRecordChannel*(VAR channel : SoundDevices.Channel; samplingRate, samplingResolution, nofSubChannels, format : SIGNED32; VAR res : INTEGER);
 		BEGIN {EXCLUSIVE}
 			IF Logging THEN
 				KernelLog.String("YMF754 - Opening RecordChannel");
@@ -1396,7 +1396,7 @@ TYPE
 		END StartPCIAudio;
 
 		(* Check channel parameters and convert the values for internal use *)
-		PROCEDURE CheckChannelParam(onlyNativeFreq: BOOLEAN; VAR sRate, sResolution, nofSubCh, format: SIGNED32; VAR res: WORD);
+		PROCEDURE CheckChannelParam(onlyNativeFreq: BOOLEAN; VAR sRate, sResolution, nofSubCh, format: SIGNED32; VAR res: INTEGER);
 		VAR i: SIGNED32;
 		BEGIN
 			res := SoundDevices.ResOK;
@@ -1616,7 +1616,7 @@ END GetPhysicalAdr;
 (* Scan the PCI bus for the specified card *)
 PROCEDURE ScanPCI(vendor, device: SIGNED32; name: Plugins.Name; CntrlInst1E: BOOLEAN);
 VAR
-	reg, index: SIGNED32; res: WORD;
+	reg, index: SIGNED32; res: INTEGER;
 	bus, dev, fct: SIGNED32;
 	base, irq: SIGNED32;
 	len: SIZE;

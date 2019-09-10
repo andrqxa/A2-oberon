@@ -696,9 +696,9 @@ TYPE
 			info2 : WMWindowManager.WindowInfo;
 			gx, gy: SIZE;
 			menu : MenuWindow;
-			type : WORD; index2 : SIZE;
+			type : INTEGER; index2 : SIZE;
 			infoKeys : SET;
-			res : WORD;
+			res : INTEGER;
 			rect : WMRectangles.Rectangle;
 			closeWindow : DoCloseWindow;
 			same: BOOLEAN;
@@ -945,7 +945,7 @@ TYPE
 		menuLocation : SIGNED32;
 		showThumbnails : BOOLEAN;
 
-		type : WORD;
+		type : INTEGER;
 		index : SIZE;
 		keys : SET;
 
@@ -1239,7 +1239,7 @@ TYPE
 
 		close : BOOLEAN;
 
-		PROCEDURE GetSelection(VAR type : WORD; VAR index : SIZE; VAR keys : SET);
+		PROCEDURE GetSelection(VAR type : INTEGER; VAR index : SIZE; VAR keys : SET);
 		BEGIN {EXCLUSIVE}
 			AWAIT(close);
 			type := infoView.type;
@@ -1248,7 +1248,7 @@ TYPE
 		END GetSelection;
 
 		PROCEDURE&New(
-			x, y, width : SIZE; menuLocation : WORD;
+			x, y, width : SIZE; menuLocation : INTEGER;
 			showThumbnails : BOOLEAN;
 			window : WMWindowManager.Window; CONST info : WMWindowManager.WindowInfo
 		);
@@ -1286,7 +1286,7 @@ TYPE
 			manager.SetFocus(SELF);
 		END New;
 
-		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : WORD); (** override *)
+		PROCEDURE Draw*(canvas : WMGraphics.Canvas; w, h : SIZE; q : INTEGER); (** override *)
 		BEGIN
 			Draw^(canvas, w, h, q);
 			canvas.Fill(shadowRectB, 04FH, WMGraphics.ModeSrcOverDst);
@@ -1426,7 +1426,7 @@ BEGIN
 END GenerateName;
 
 PROCEDURE WindowShot(window: WMWindowManager.Window; scale:FLOAT32);
-VAR str,fn: Files.FileName;  w,h: SIGNED32; res: WORD; startTime: Dates.DateTime;
+VAR str,fn: Files.FileName;  w,h: SIGNED32; res: INTEGER; startTime: Dates.DateTime;
 	img:WMGraphics.Image;
 BEGIN
 	GenerateName(window.GetTitle(),fn);

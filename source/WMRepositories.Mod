@@ -17,7 +17,7 @@ TYPE
 
 	(* Drag'n'Drop for components *)
 
-	AddComponentProcedure* = PROCEDURE {DELEGATE} (component : Repositories.Component; VAR res : WORD);
+	AddComponentProcedure* = PROCEDURE {DELEGATE} (component : Repositories.Component; VAR res : INTEGER);
 
 	DropTarget* = OBJECT(WMDropTarget.DropTarget)
 	VAR
@@ -55,7 +55,7 @@ TYPE
 			SELF.addComponent := addComponent;
 		END Init;
 
-		PROCEDURE Set(component : Repositories.Component; VAR res : WORD);
+		PROCEDURE Set(component : Repositories.Component; VAR res : INTEGER);
 		BEGIN
 			addComponent(component, res);
 		END Set;
@@ -335,7 +335,7 @@ TYPE
 			itf : WMDropTarget.DropInterface;
 			dropText : WMDropTarget.DropText;
 			op : Texts.ObjectPiece;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			IF (draggedComponent = NIL) THEN RETURN END;
 
@@ -649,7 +649,7 @@ TYPE
 		END LoadRepository;
 
 		PROCEDURE HandleButtons(sender, data : ANY);
-		VAR filename : ARRAY 256 OF CHAR; res : WORD;
+		VAR filename : ARRAY 256 OF CHAR; res : INTEGER;
 		BEGIN
 			IF (sender = loadBtn) THEN
 			filenameEditor.GetAsString(filename);
@@ -684,7 +684,7 @@ TYPE
 		END OnRepositoriesClicked;
 
 		PROCEDURE OnComponentClicked(sender, data : ANY);
-		VAR command, msg : ARRAY 384 OF CHAR; res : WORD; string : Strings.String;
+		VAR command, msg : ARRAY 384 OF CHAR; res : INTEGER; string : Strings.String;
 		BEGIN
 			IF (data # NIL) & (data IS EntryWrapper) THEN
 				IF (data(EntryWrapper).repository # NIL) & (data(EntryWrapper).element # NIL) THEN

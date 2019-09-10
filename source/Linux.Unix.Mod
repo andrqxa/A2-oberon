@@ -156,13 +156,13 @@ TYPE
 	Mutex_t* = ADDRESS;
 	Condition_t* = ADDRESS;
 
-	MutexType = ARRAY 10 OF WORD;
-	MutexAttributeType = ARRAY 1 OF WORD;
-	ConditionType = ARRAY 12 OF WORD;
+	MutexType = ARRAY 10 OF INTEGER;
+	MutexAttributeType = ARRAY 1 OF INTEGER;
+	ConditionType = ARRAY 12 OF INTEGER;
 
 	Key_t* = ADDRESS;
 
-	Sigset_t= ARRAY 32 OF WORD;
+	Sigset_t= ARRAY 32 OF INTEGER;
 	SignalTrap = PROCEDURE ( sig: SIGNED32; mc: Mcontext );
 
 	path_t*	= ARRAY OF CHAR;
@@ -170,7 +170,7 @@ TYPE
 	argv_t*	= ARRAY OF arg_t;
 
 	Sem* = RECORD reserved1-: ARRAY 4 OF ADDRESS END;
-	Barrier* = RECORD reserved1-: ARRAY 3 OF ADDRESS; reserved2-: ARRAY 2 OF WORD END;
+	Barrier* = RECORD reserved1-: ARRAY 3 OF ADDRESS; reserved2-: ARRAY 2 OF INTEGER END;
 
 	CPUSet* = ARRAY CPUSetSize DIV (MAX (SET) - MIN (SET) + 1) OF SET;
 
@@ -278,7 +278,7 @@ TYPE
 	dev_t*		= SIGNED64;
 	ino_t*		= LONGWORD;
 	nlink_t*	= LONGWORD;
-	mode_t*	= WORD;
+	mode_t*	= INTEGER;
 	off_t*		= LONGWORD;
 	blksize_t*= LONGWORD;
 	blkcnt_t*	= LONGWORD;
@@ -289,14 +289,14 @@ TYPE
 	Status* = RECORD
 			#IF I386 THEN
 				dev-		: dev_t;
-				pad1		: WORD;
+				pad1		: INTEGER;
 				ino-		: ino_t;
 				mode-	: mode_t;
 				nlink-		: nlink_t;
 				uid-		: SIGNED32;
 				gid-		: SIGNED32;
 				rdev-		: dev_t;
-				pad2		: WORD;
+				pad2		: INTEGER;
 				size-		: SIZE;
 				blksize-	: blksize_t;
 				blocks-	: blkcnt_t;
@@ -308,9 +308,9 @@ TYPE
 				ino-		: ino_t;
 				nlink-		: nlink_t;
 				mode-	: mode_t;
-				uid-		: WORD;
-				gid-		: WORD;
-				pad1		: WORD;
+				uid-		: INTEGER;
+				gid-		: INTEGER;
+				pad1		: INTEGER;
 				rdev-		: dev_t;
 				size-		: SIZE;
 				blksize-	: blksize_t;
@@ -438,7 +438,7 @@ TYPE
 
 	PThreadAttr = RECORD
 		reserved1-: ARRAY 5 OF ADDRESS;
-		reserved2-: ARRAY 4 OF WORD;
+		reserved2-: ARRAY 4 OF INTEGER;
 	END;
 
 
@@ -470,47 +470,47 @@ VAR
 		sysname-, nodename-, release-, version-, machine-: ARRAY 65 OF CHAR;
 	END;
 
-	sysconf: PROCEDURE {C} (name: WORD):LONGWORD;
+	sysconf: PROCEDURE {C} (name: INTEGER):LONGWORD;
 
-	pthread_mutex_init: PROCEDURE {C} (mutex: ADDRESS; mutexattr: ADDRESS): WORD;
-	pthread_mutex_destroy: PROCEDURE {C} (mutex: ADDRESS): WORD;
-	pthread_mutex_lock: PROCEDURE {C} (mutex: ADDRESS): WORD;
-	pthread_mutex_unlock: PROCEDURE {C} (mutex: ADDRESS): WORD;
+	pthread_mutex_init: PROCEDURE {C} (mutex: ADDRESS; mutexattr: ADDRESS): INTEGER;
+	pthread_mutex_destroy: PROCEDURE {C} (mutex: ADDRESS): INTEGER;
+	pthread_mutex_lock: PROCEDURE {C} (mutex: ADDRESS): INTEGER;
+	pthread_mutex_unlock: PROCEDURE {C} (mutex: ADDRESS): INTEGER;
 
-	pthread_mutexattr_init: PROCEDURE {C} (mutexattr: ADDRESS): WORD;
-	pthread_mutexattr_settype: PROCEDURE {C} (mutexattr: ADDRESS; type: WORD): WORD;
+	pthread_mutexattr_init: PROCEDURE {C} (mutexattr: ADDRESS): INTEGER;
+	pthread_mutexattr_settype: PROCEDURE {C} (mutexattr: ADDRESS; type: INTEGER): INTEGER;
 
-	pthread_cond_init: PROCEDURE {C} (cond: ADDRESS; condAttr: ADDRESS): WORD;
-	pthread_cond_destroy: PROCEDURE {C} (cond: ADDRESS): WORD;
-	pthread_cond_wait: PROCEDURE {C} (cond: ADDRESS; mutex: ADDRESS): WORD;
-	pthread_cond_signal: PROCEDURE {C} (cond: ADDRESS): WORD;
+	pthread_cond_init: PROCEDURE {C} (cond: ADDRESS; condAttr: ADDRESS): INTEGER;
+	pthread_cond_destroy: PROCEDURE {C} (cond: ADDRESS): INTEGER;
+	pthread_cond_wait: PROCEDURE {C} (cond: ADDRESS; mutex: ADDRESS): INTEGER;
+	pthread_cond_signal: PROCEDURE {C} (cond: ADDRESS): INTEGER;
 
-	pthread_create-: PROCEDURE {C} (newthread: ADDRESS; attr: ADDRESS; start_routine: ADDRESS; arg: PROCEDURE): WORD;
+	pthread_create-: PROCEDURE {C} (newthread: ADDRESS; attr: ADDRESS; start_routine: ADDRESS; arg: PROCEDURE): INTEGER;
 	pthread_detach: PROCEDURE {C} (thr: ADDRESS);
-	pthread_kill: PROCEDURE {C} (thr: ADDRESS; sigid: WORD): WORD;
+	pthread_kill: PROCEDURE {C} (thr: ADDRESS; sigid: INTEGER): INTEGER;
 	pthread_cancel: PROCEDURE {C} (thr: ADDRESS);
-	pthread_join-: PROCEDURE {C} (thread: Thread_t; return: ADDRESS): WORD;
+	pthread_join-: PROCEDURE {C} (thread: Thread_t; return: ADDRESS): INTEGER;
 
-	pthread_key_create	: PROCEDURE {C} ( key: ADDRESS; destructor: PROCEDURE {C} ( param: ADDRESS ) ): WORD;
-	pthread_setspecific	: PROCEDURE {C} ( key: Key_t; value: ADDRESS ): WORD;
+	pthread_key_create	: PROCEDURE {C} ( key: ADDRESS; destructor: PROCEDURE {C} ( param: ADDRESS ) ): INTEGER;
+	pthread_setspecific	: PROCEDURE {C} ( key: Key_t; value: ADDRESS ): INTEGER;
 	pthread_getspecific	: PROCEDURE {C} ( key: Key_t ): ADDRESS;
 
 	pthread_attr_init: PROCEDURE {C} (attr: ADDRESS);
 	pthread_attr_destroy: PROCEDURE {C} (attr: ADDRESS);
-	pthread_attr_setscope: PROCEDURE {C}(attr: ADDRESS; set: WORD);
-	pthread_attr_setdetachstate: PROCEDURE {C}(attr: ADDRESS; set: WORD);
+	pthread_attr_setscope: PROCEDURE {C}(attr: ADDRESS; set: INTEGER);
+	pthread_attr_setdetachstate: PROCEDURE {C}(attr: ADDRESS; set: INTEGER);
 	pthread_attr_setstacksize: PROCEDURE {C}(attr: ADDRESS; stackSize: SIZE);
 	pthread_attr_getstacksize: PROCEDURE {C}(attr: ADDRESS; stackSize: ADDRESS);
 	pthread_getattr_np: PROCEDURE {C} (thr: ADDRESS; attr: ADDRESS);
 	pthread_self-: PROCEDURE {C} (): Thread_t;
 
-	sched_get_priority_max: PROCEDURE {C} (policy: WORD): WORD;
-	sched_get_priority_min: PROCEDURE {C} (policy: WORD): WORD;
-	pthread_setschedparam: PROCEDURE {C} (thread: Thread_t; policy: WORD; param: ADDRESS): WORD;
-	pthread_getschedparam: PROCEDURE {C} (thread: Thread_t; policy: ADDRESS; param: ADDRESS): WORD;
-	pthread_setcancelstate: PROCEDURE {C} (state: WORD; oldstate: ADDRESS): WORD;
-	pthread_setcanceltype: PROCEDURE {C} (type: WORD; oldtype: ADDRESS): WORD;
-	sigaction: PROCEDURE {C} (signum: WORD; CONST act, oldact: ADDRESS): WORD;
+	sched_get_priority_max: PROCEDURE {C} (policy: INTEGER): INTEGER;
+	sched_get_priority_min: PROCEDURE {C} (policy: INTEGER): INTEGER;
+	pthread_setschedparam: PROCEDURE {C} (thread: Thread_t; policy: INTEGER; param: ADDRESS): INTEGER;
+	pthread_getschedparam: PROCEDURE {C} (thread: Thread_t; policy: ADDRESS; param: ADDRESS): INTEGER;
+	pthread_setcancelstate: PROCEDURE {C} (state: INTEGER; oldstate: ADDRESS): INTEGER;
+	pthread_setcanceltype: PROCEDURE {C} (type: INTEGER; oldtype: ADDRESS): INTEGER;
+	sigaction: PROCEDURE {C} (signum: INTEGER; CONST act, oldact: ADDRESS): INTEGER;
 	sigemptyset: PROCEDURE {C} (set: ADDRESS);
 	sigfillset: PROCEDURE {C} (set: ADDRESS): SIGNED32;
 	sigsuspend: PROCEDURE {C} (set: ADDRESS): SIGNED32;
@@ -520,17 +520,17 @@ VAR
 	sigaltstack: PROCEDURE {C} (ss, oss: ADDRESS): SIGNED32;
 	pthread_sigmask: PROCEDURE {C}(how: SIGNED32; set: ADDRESS; oldset: ADDRESS): SIGNED32;
 
-	sem_init-: PROCEDURE {C} (sem: ADDRESS; pshared: WORD; value: WORD): WORD;
-	sem_wait-: PROCEDURE {C} (sem: ADDRESS): WORD;
-	sem_post-: PROCEDURE {C} (sem: ADDRESS): WORD;
-	sem_destroy-: PROCEDURE {C} (sem: ADDRESS): WORD;
+	sem_init-: PROCEDURE {C} (sem: ADDRESS; pshared: INTEGER; value: INTEGER): INTEGER;
+	sem_wait-: PROCEDURE {C} (sem: ADDRESS): INTEGER;
+	sem_post-: PROCEDURE {C} (sem: ADDRESS): INTEGER;
+	sem_destroy-: PROCEDURE {C} (sem: ADDRESS): INTEGER;
 
-	pthread_barrier_init-: PROCEDURE {C} (barrier: ADDRESS; attr: ADDRESS; count: WORD): WORD;
-	pthread_barrier_wait-: PROCEDURE {C} (barrier: ADDRESS): WORD;
-	pthread_barrier_destroy-: PROCEDURE {C} (barrier: ADDRESS): WORD;
+	pthread_barrier_init-: PROCEDURE {C} (barrier: ADDRESS; attr: ADDRESS; count: INTEGER): INTEGER;
+	pthread_barrier_wait-: PROCEDURE {C} (barrier: ADDRESS): INTEGER;
+	pthread_barrier_destroy-: PROCEDURE {C} (barrier: ADDRESS): INTEGER;
 
-	pthread_getaffinity_np-: PROCEDURE {C} (thread: Thread_t; cpusetsize: SIZE; cpuset: ADDRESS): WORD;
-	pthread_setaffinity_np-: PROCEDURE {C} (thread: Thread_t; cpusetsize: SIZE; cpuset: ADDRESS): WORD;
+	pthread_getaffinity_np-: PROCEDURE {C} (thread: Thread_t; cpusetsize: SIZE; cpuset: ADDRESS): INTEGER;
+	pthread_setaffinity_np-: PROCEDURE {C} (thread: Thread_t; cpusetsize: SIZE; cpuset: ADDRESS): INTEGER;
 
 	(*pid: return param for process id. Only set if initialized non-null. path: pointer to string denoting the executable. file_actions: modify which files are open for the new process, if NIL it inherits open files from parent process. attrp: sets process groups, scheduler, signals etc, leave NIL. argv, evp: char** to the arguments and env. variables*)
 	posix_spawnp- 	: PROCEDURE {C} (pid: ADDRESS; path: ADDRESS; file_actions: ADDRESS; attrp: ADDRESS; argv: ADDRESS ; envp: ADDRESS): SIGNED32;
@@ -576,8 +576,8 @@ VAR
 	alarm-		: PROCEDURE {C} ( ms: SIGNED32 ): SIGNED32;
 	setitimer-		: PROCEDURE {C} ( which: SIGNED32;  VAR value, ovalue: Itimerval ): SIGNED32;
 	getitimer-		: PROCEDURE {C} ( which: SIGNED32;  VAR value: Itimerval ): SIGNED32;
-	clock_gettime-	: PROCEDURE {C} (clk_id: WORD; tp: ADDRESS): WORD;
-	clock_getres-	: PROCEDURE {C} (clk_id: WORD; res: ADDRESS): WORD;
+	clock_gettime-	: PROCEDURE {C} (clk_id: INTEGER; tp: ADDRESS): INTEGER;
+	clock_getres-	: PROCEDURE {C} (clk_id: INTEGER; res: ADDRESS): INTEGER;
 
 	gettimeofday-	: PROCEDURE {C} ( VAR tv: Timeval;  VAR tz: Timezone ): SIGNED32;
 	mktime-			: PROCEDURE {C} ( VAR tm: Tm ): SIGNED32;
@@ -603,8 +603,8 @@ VAR
 	perror-		: PROCEDURE {C} ( msg: ADDRESS );
 	errno_location: PROCEDURE {C} ( ): ADDRESS;
 
-	xSetErrorHandler: PROCEDURE {C} (h: ADDRESS): WORD;
-	xSetIOErrorHandler: PROCEDURE {C} (h: ADDRESS): WORD;
+	xSetErrorHandler: PROCEDURE {C} (h: ADDRESS): INTEGER;
+	xSetIOErrorHandler: PROCEDURE {C} (h: ADDRESS): INTEGER;
 
 	libc-: ADDRESS;
 	libp-: ADDRESS;
@@ -653,7 +653,7 @@ VAR
 	VAR
 		mtx: Mutex_t;
 		attr: MutexAttributeType;
-		res: WORD;
+		res: INTEGER;
 	CONST
 		Recursive = 1;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
@@ -748,7 +748,7 @@ VAR
 		me: Thread_t;
 		old, new: Sigset_t;
 		param: Sched_param;
-		res: WORD;
+		res: INTEGER;
 		attr: PThreadAttr;
 		stack: Stack;
 		size: SIZE;
@@ -794,7 +794,7 @@ VAR
 	VAR
 		attr: PThreadAttr;
 		id: Thread_t;
-		res: WORD;
+		res: INTEGER;
 	CONST
 		PTHREAD_SCOPE_SYSTEM = 0;
 		PTHREAD_CREATE_DETACHED = 1;
@@ -855,7 +855,7 @@ VAR
 	END resume_handler;
 
 	PROCEDURE ThrResume*( thr: Thread_t );
-	VAR  res: WORD;
+	VAR  res: INTEGER;
 	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		res := pthread_mutex_lock(ADDRESS OF suspend_mutex );
 		resume_done := 0;
@@ -869,7 +869,7 @@ VAR
 	VAR suspendHandler*: PROCEDURE(c: Ucontext);
 
 	PROCEDURE {C} suspend_handler(sig: SIGNED32; scp: ADDRESS; ucp: ADDRESS);
-	VAR block: Sigset_t; res: WORD;
+	VAR block: Sigset_t; res: INTEGER;
 	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		IF suspendHandler # NIL THEN suspendHandler( S.VAL( Ucontext, ucp) ) END;
 		res := sigfillset( ADDRESS OF block );
@@ -880,7 +880,7 @@ VAR
 	END suspend_handler;
 
 	PROCEDURE ThrSuspend*(thr: Thread_t; saveContext: BOOLEAN);
-	VAR res: WORD;
+	VAR res: INTEGER;
 	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		res := pthread_mutex_lock(ADDRESS OF suspend_mutex );
 		suspend_done := 0;
@@ -896,7 +896,7 @@ VAR
 
 	PROCEDURE ThrInitialize*( VAR low, high: SIGNED32 ): BOOLEAN;
 	VAR
-		param: Sched_param; res: WORD;
+		param: Sched_param; res: INTEGER;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		ASSERT(pthread_mutex_init( ADDRESS OF suspend_mutex, NIL ) = 0);
 		mainthread := pthread_self();
@@ -1006,7 +1006,7 @@ VAR
 
 
 	PROCEDURE getSysinfo;
-	VAR res: WORD;  p: SIGNED16;
+	VAR res: INTEGER;  p: SIGNED16;
 		buf: ARRAY 4096 OF CHAR;
 
 		PROCEDURE copy( VAR p: SIGNED16;  VAR dest: ARRAY OF CHAR );
@@ -1098,8 +1098,8 @@ VAR
 	VAR oberonXIOErrorHandler: OberonXIOErrorHandler;
 
 
-	PROCEDURE {C} X11ErrorHandler(d: ADDRESS; err: ADDRESS): WORD;
-	VAR res: WORD;
+	PROCEDURE {C} X11ErrorHandler(d: ADDRESS; err: ADDRESS): INTEGER;
+	VAR res: INTEGER;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF oberonXErrorHandler # NIL THEN
 			res := oberonXErrorHandler(d, err);
@@ -1107,8 +1107,8 @@ VAR
 		RETURN 0;
 	END X11ErrorHandler;
 
-	PROCEDURE {C} X11IOErrorHandler(d: ADDRESS): WORD;
-	VAR res: WORD;
+	PROCEDURE {C} X11IOErrorHandler(d: ADDRESS): INTEGER;
+	VAR res: INTEGER;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		IF oberonXIOErrorHandler # NIL THEN
 			res := oberonXIOErrorHandler(d);
@@ -1117,7 +1117,7 @@ VAR
 	END X11IOErrorHandler;
 
 	PROCEDURE InitXErrorHandlers*(xErrorHandler: OberonXErrorHandler; xIOErrorHandler: OberonXIOErrorHandler);
-	VAR res: WORD;
+	VAR res: INTEGER;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		oberonXErrorHandler := xErrorHandler;
 		oberonXIOErrorHandler := xIOErrorHandler;

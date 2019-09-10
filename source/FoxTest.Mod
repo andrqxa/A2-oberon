@@ -28,8 +28,8 @@ TYPE
 			IF log = NIL THEN INCL(commandFlags, Commands.Silent) END;
 		END InitTester;
 
-		PROCEDURE Handle* (r: Streams.Reader; position: Streams.Position; CONST name: ARRAY OF CHAR; type: TestSuite.TestType): WORD;
-		VAR result: SIGNED16; msg: ARRAY 128 OF CHAR; res: WORD; f: Files.File; w: Files.Writer; ch: CHAR;
+		PROCEDURE Handle* (r: Streams.Reader; position: Streams.Position; CONST name: ARRAY OF CHAR; type: TestSuite.TestType): INTEGER;
+		VAR result: SIGNED16; msg: ARRAY 128 OF CHAR; res: INTEGER; f: Files.File; w: Files.Writer; ch: CHAR;
 		BEGIN
 			result := TestSuite.Failure;
 			IF log # NIL THEN log.String ("testing: "); log.String (name); log.String("@"); log.Int(position,0); log.Ln; log.Update; END;

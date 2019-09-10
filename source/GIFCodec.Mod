@@ -39,7 +39,7 @@ TYPE
 		PROCEDURE SetQuality*(quality : SIGNED32);
 		END SetQuality;
 
-		PROCEDURE WriteImage*(img : Raster.Image; VAR res : WORD);
+		PROCEDURE WriteImage*(img : Raster.Image; VAR res : INTEGER);
 		VAR pal : Raster.Palette;
 		BEGIN
 			NEW(pal); Raster.ComputePalette(img, pal, 0,256, 8);
@@ -217,7 +217,7 @@ TYPE
 		END Error;
 
 		(* open the decoder on an InputStream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			header : Header;
 			ch : CHAR;
@@ -371,7 +371,7 @@ TYPE
 		END Error;
 
 		(* open the decoder on an InputStream *)
-		PROCEDURE Open*(in : Streams.Reader; VAR res : WORD);
+		PROCEDURE Open*(in : Streams.Reader; VAR res : INTEGER);
 		VAR
 			header : Header;
 			ch : CHAR;
@@ -420,7 +420,7 @@ TYPE
 			res := 0;
 		END Open;
 
-		PROCEDURE GetImageSequence*(VAR sequence : Codecs.ImageSequence; VAR res : WORD);
+		PROCEDURE GetImageSequence*(VAR sequence : Codecs.ImageSequence; VAR res : INTEGER);
 		VAR
 			first, last, current : Codecs.ImageDescriptor;
 			label, ch, transPix, idFlags : CHAR;

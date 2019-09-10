@@ -101,7 +101,7 @@ TYPE Canvas*= OBJECT(WMGraphics.BufferCanvas)
 			Gfx.DrawStringAt(gfxContext, x, y, text);
 		END DrawString;
 
-		PROCEDURE Line*(x0, y0, x1, y1 : SIZE; lineColor : WMGraphics.Color; mode : WORD); (*this is a heavy duty procedure that can be called millions of times in time-varying or scrolled graphs - optimize*)
+		PROCEDURE Line*(x0, y0, x1, y1 : SIZE; lineColor : WMGraphics.Color; mode : INTEGER); (*this is a heavy duty procedure that can be called millions of times in time-varying or scrolled graphs - optimize*)
 		BEGIN
 			IF lineColor # color THEN
 				SetColor(lineColor);

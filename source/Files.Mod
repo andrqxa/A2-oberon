@@ -86,7 +86,7 @@ TYPE
 		file : File;
 		r: Rider;
 
-		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: WORD);
+		PROCEDURE Receive(VAR buf: ARRAY OF CHAR; ofs, size, min: SIZE; VAR len: SIZE; VAR res: INTEGER);
 		BEGIN
 			file.ReadBytes(r, buf, ofs, size);
 			len := size - r.res;
@@ -124,7 +124,7 @@ TYPE
 		file : File;
 		r: Rider;
 
-		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: WORD);
+		PROCEDURE Send(CONST buf: ARRAY OF CHAR; ofs, len: SIZE; propagate: BOOLEAN; VAR res: INTEGER);
 		BEGIN
 			r.file.WriteBytes(r, buf, ofs, len);
 			IF propagate THEN r.file.Update END;
@@ -316,12 +316,12 @@ TYPE
 
 		(** Delete a file. res = 0 indicates success.  End users use Files.Delete instead. *)
 
-		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: WORD);
+		PROCEDURE Delete0*(CONST name: ARRAY OF CHAR; VAR key: SIGNED32; VAR res: INTEGER);
 		BEGIN HALT(301) END Delete0;	(* abstract *)
 
 		(** Rename a file. res = 0 indicates success.  End users use Files.Rename instead. *)
 
-		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: File; VAR res: WORD);
+		PROCEDURE Rename0*(CONST old, new: ARRAY OF CHAR; f: File; VAR res: INTEGER);
 		BEGIN HALT(301) END Rename0;	(* abstract *)
 
 		(** Enumerate canonical file names. mask may contain * wildcards.  For internal use only.  End users use Enumerator instead. *)
@@ -337,14 +337,14 @@ TYPE
 		(** Create a new directory structure. May not be supported by the actual implementation.
 			End users use Files.CreateDirectory instead.*)
 
-		PROCEDURE CreateDirectory0*(CONST name: ARRAY OF CHAR; VAR res: WORD);
+		PROCEDURE CreateDirectory0*(CONST name: ARRAY OF CHAR; VAR res: INTEGER);
 		BEGIN res := -1	(* not supported *)
 		END CreateDirectory0;
 
 		(** Remove a directory. If force=TRUE, any subdirectories and files should be automatically deleted.
 			End users use Files.RemoveDirectory instead. *)
 
-		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: WORD);
+		PROCEDURE RemoveDirectory0*(CONST name: ARRAY OF CHAR; force: BOOLEAN; VAR key: SIGNED32; VAR res: INTEGER);
 		BEGIN res := -1	(* not supported *)
 		END RemoveDirectory0;
 
@@ -443,7 +443,7 @@ TYPE
 		BEGIN HALT(301) END GetName;	(* abstract *)
 
 		(** Register a file created with New in the directory, replacing the previous file in the directory with the same name. The file is automatically updated.  End users use Files.Register instead. *)
-		PROCEDURE Register0*(VAR res: WORD);
+		PROCEDURE Register0*(VAR res: INTEGER);
 		BEGIN HALT(301) END Register0;	(* abstract *)
 
 		(** Flush the changes made to a file from its buffers. Register0 will automatically update a file. *)
@@ -917,7 +917,7 @@ END New;
 
 (** Delete a file. res = 0 indicates success. *)
 
-PROCEDURE Delete*(CONST name: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE Delete*(CONST name: ARRAY OF CHAR; VAR res: INTEGER);
 VAR fs: FileSystem; f: File; key: SIGNED32; prefix: Prefix; fname: FileName;
 BEGIN {EXCLUSIVE}
 	SplitName(name, prefix, fname);
@@ -942,7 +942,7 @@ BEGIN {EXCLUSIVE}
 END Delete;
 
 (* copies the file with the given name to the fileClipboard *)
-PROCEDURE Copy*(CONST name: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE Copy*(CONST name: ARRAY OF CHAR; VAR res: INTEGER);
 VAR file: File;
 BEGIN
 	res := -1;
@@ -953,7 +953,7 @@ BEGIN
 END Copy;
 
 (* pastes the fileClipboard into the file with the given name if it doesn't exist already *)
-PROCEDURE Paste*(CONST name: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE Paste*(CONST name: ARRAY OF CHAR; VAR res: INTEGER);
 VAR writer : Writer;
 	reader : Reader;
 	file : File;
@@ -984,7 +984,7 @@ END Paste;
  * @param overwrite: @in: Overwrite existing files? @out: Has an existing file been overwritten?
  * @param res: @out: Result code
  *)
-PROCEDURE CopyFile*(CONST source, destination : ARRAY OF CHAR; VAR overwrite : BOOLEAN; VAR res : WORD);
+PROCEDURE CopyFile*(CONST source, destination : ARRAY OF CHAR; VAR overwrite : BOOLEAN; VAR res : INTEGER);
 VAR
 	sprefix, dprefix : Prefix;
 	sname, dname, dpath, dfilename: FileName;
@@ -1048,7 +1048,7 @@ END CopyFile;
 
 (** Rename a file. res = 0 indicates success. *)
 
-PROCEDURE Rename*(CONST old, new: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE Rename*(CONST old, new: ARRAY OF CHAR; VAR res: INTEGER);
 VAR
 	key: SIGNED32; ofs, nfs: FileSystem; f: File; pold, pnew: Prefix;
 	fold, fnew: FileName;
@@ -1073,7 +1073,7 @@ END Rename;
 (** Register a file created with New in the directory, replacing the previous file in the directory with the same name. The file is automatically closed. *)
 
 PROCEDURE Register*(f: File);
-VAR res: WORD;
+VAR res: INTEGER;
 BEGIN {EXCLUSIVE}
 	IF f # NIL THEN
 		f.Register0(res);
@@ -1086,7 +1086,7 @@ END Register;
 
 (** Create a directory structure. Directories are automatically registered. res=0 indicates success.
 	Use Files.RemoveDirectory to delete a directory *)
-PROCEDURE CreateDirectory*(CONST path: ARRAY OF CHAR; VAR res: WORD);
+PROCEDURE CreateDirectory*(CONST path: ARRAY OF CHAR; VAR res: INTEGER);
 VAR prefix: Prefix; fs: FileSystem; fpath: FileName;
 BEGIN {EXCLUSIVE}
 	SplitName(path, prefix, fpath);
@@ -1099,7 +1099,7 @@ BEGIN {EXCLUSIVE}
 END CreateDirectory;
 
 (** Remove a directory. res=0 indicates success. If force=TRUE, any files and subdirectories are automatically deleted. *)
-PROCEDURE RemoveDirectory*(CONST path: ARRAY OF CHAR; force: BOOLEAN; VAR res: WORD);
+PROCEDURE RemoveDirectory*(CONST path: ARRAY OF CHAR; force: BOOLEAN; VAR res: INTEGER);
 VAR prefix: Prefix; fs: FileSystem; f: File; key: SIGNED32; fpath: FileName;
 BEGIN {EXCLUSIVE}
 	SplitName(path, prefix, fpath);
@@ -1170,7 +1170,7 @@ END Exists;
 
 (* add a search path to the system *)
 PROCEDURE AddSearchPath*(context: Commands.Context);
-VAR cmd: ARRAY 32 OF CHAR; msg: ARRAY 256 OF CHAR;  res: WORD;
+VAR cmd: ARRAY 32 OF CHAR; msg: ARRAY 256 OF CHAR;  res: INTEGER;
 BEGIN
 	(* preliminary implementation until we know how to solve this generically *)
 	IF Modules.ModuleByName("WinFS") # NIL THEN
@@ -1186,7 +1186,7 @@ END AddSearchPath;
 
 (* add a search path to the system *)
 PROCEDURE SetWorkPath*(context: Commands.Context);
-VAR cmd: ARRAY 32 OF CHAR; msg: ARRAY 256 OF CHAR;  res: WORD;
+VAR cmd: ARRAY 32 OF CHAR; msg: ARRAY 256 OF CHAR;  res: INTEGER;
 BEGIN
 	(* preliminary implementation until we know how to solve this generically *)
 	IF Modules.ModuleByName("WinFS") # NIL THEN

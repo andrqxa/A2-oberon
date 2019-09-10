@@ -91,7 +91,7 @@ TYPE
 
 				(** Open a TCP connection (only use once per Connection instance).
 					Use TCP.NilPort for lport to automatically assign an unused local port.*)
-				PROCEDURE Open*( lport: SIGNED32;  fip: IP.Adr;  fport: SIGNED32;  VAR res: WORD );
+				PROCEDURE Open*( lport: SIGNED32;  fip: IP.Adr;  fport: SIGNED32;  VAR res: INTEGER );
 				VAR
 					localAdr, foreignAdr: Sockets.SocketAdr;
 				BEGIN {EXCLUSIVE}
@@ -153,7 +153,7 @@ TYPE
 
 
 				(** Send data on a TCP connection. *)
-				PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD );
+				PROCEDURE Send*( CONST data: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER );
 				BEGIN
 					IF trace THEN  Out.String( "Send: socket=" );  Out.Int( socket, 0 )  END;
 					IF state = Established THEN
@@ -176,7 +176,7 @@ TYPE
 					res parameter returns 0 if ok, or a non-zero error code otherwise (e.g. if the connection is closed
 					by the communication partner, or by a call of the Close method). *)
 
-				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD );
+				PROCEDURE Receive*( VAR data: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER );
 				VAR p, x: SIZE;
 				BEGIN {EXCLUSIVE}
 					ASSERT( (ofs >= 0) & (ofs + size <= LEN( data )) & (min <= size) );   (* parameter consistency check *)
@@ -257,7 +257,7 @@ TYPE
 				END State;
 
 				(** Wait until the connection state is either in the good or bad set, up to "ms" milliseconds. *)
-				PROCEDURE AwaitState*( good, bad: SET;  ms: SIGNED32;  VAR res: WORD );
+				PROCEDURE AwaitState*( good, bad: SET;  ms: SIGNED32;  VAR res: INTEGER );
 				BEGIN
 					WHILE (ms > 0) & ~(state IN (good+bad)) DO  Objects.Sleep( 10 );  DEC( ms, 10 )  END;
 					IF state IN good THEN
@@ -283,7 +283,7 @@ TYPE
 
 				(** Accept a client waiting on a listening connection. Blocks until a client is available or the
 					  connection is closed. *)
-				PROCEDURE Accept*( VAR client: Connection;  VAR res: WORD );
+				PROCEDURE Accept*( VAR client: Connection;  VAR res: INTEGER );
 				VAR newsocket: SIGNED32;  peerAdr: Sockets.SocketAdr;
 				BEGIN {EXCLUSIVE}
 					IF trace THEN

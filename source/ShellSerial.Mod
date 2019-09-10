@@ -45,7 +45,7 @@ PROCEDURE ModemReceive(context : Commands.Context; modemMode: SIGNED32); (** [[f
 VAR
 	fileName : Files.FileName;
 	length: SIGNED32;
-	port : Serials.Port; portNbr, bps, data, parity, stop: SIGNED32; res : WORD;
+	port : Serials.Port; portNbr, bps, data, parity, stop: SIGNED32; res : INTEGER;
 	isOpen0 : BOOLEAN;
 	bps0, data0, parity0, stop0 : SIGNED32;
 	w : Streams.Writer; r : Streams.Reader;
@@ -185,7 +185,7 @@ END Wait;
 (** Open a shell listening on the specified <portNbr> *)
 PROCEDURE Open*(context : Commands.Context); (** [portNbr BitsPerSecond DataBits Parity StopBits Prompt] ~ *)
 VAR
-	port : Serials.Port; portNbr, bps, data, parity, stop: SIGNED32; res : WORD;
+	port : Serials.Port; portNbr, bps, data, parity, stop: SIGNED32; res : INTEGER;
 	prompt: ARRAY 32 OF CHAR;
 	w : Streams.Writer; r : Streams.Reader;
 	params: SET;
@@ -226,7 +226,7 @@ END Open;
 PROCEDURE Cleanup;
 VAR
 	port : Serials.Port;
-	i: SIGNED32; res : WORD;
+	i: SIGNED32; res : INTEGER;
 	isOpen0, isTracePort : BOOLEAN;
 	bps0, data0, parity0, stop0 : SIGNED32;
 BEGIN

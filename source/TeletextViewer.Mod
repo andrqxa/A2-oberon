@@ -649,7 +649,7 @@ TYPE
 
 		(** Overwrite standard 'Draw' routine: Move the channel selector window
 			   together with the viewer window. *)
-		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : WORD);
+		PROCEDURE Draw*(canvas : Graphics.Canvas; w, h : SIZE; q : INTEGER);
 		BEGIN
 			Draw^(canvas, w, h, q);
 			IF (channelSwitcher # NIL) & ((bounds.l # l) OR (bounds.t # t)) THEN

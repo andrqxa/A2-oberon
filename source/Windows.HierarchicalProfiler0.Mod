@@ -23,7 +23,7 @@ TYPE
 		nofProcesses, oldNofProcesses : SIZE;
 		times, oldTimes : ProcessTimeArray;
 		me : Objects.Process;
-		state : WORD;
+		state : INTEGER;
 
 		PROCEDURE &Init;
 		BEGIN
@@ -98,7 +98,7 @@ TYPE
 VAR
 	poller : Poller;
 	callback : Callback;
-	state : WORD;
+	state : INTEGER;
 
 PROCEDURE HandleProcess(process : Objects.Process);
 VAR context : Kernel32.Context; handle : Kernel32.HANDLE; res : Kernel32.BOOL; stackBottom, sp, bp: ADDRESS;

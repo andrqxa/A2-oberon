@@ -33,7 +33,7 @@ BEGIN
 END TestIntegerConversion;
 
 PROCEDURE TestHexConversion*(context : Commands.Context);
-VAR i, val : SIGNED32; res: WORD; string : ARRAY 16 OF CHAR;
+VAR i, val : SIGNED32; res: INTEGER; string : ARRAY 16 OF CHAR;
 BEGIN
 	context.out.String("Test hex <-> string conversion... "); context.out.Update;
 	i := MIN(SIGNED32);
@@ -64,7 +64,7 @@ PROCEDURE TestNegativeHexConversion*(context : Commands.Context);
 VAR i : SIGNED32;
 
 	PROCEDURE Test(number : SIGNED64);
-	VAR string, signedString : ARRAY 16 OF CHAR; val, idx: SIGNED32; res: WORD;
+	VAR string, signedString : ARRAY 16 OF CHAR; val, idx: SIGNED32; res: INTEGER;
 	BEGIN
 		Strings.IntToHexStr(number, 8, string);
 		signedString[0] := "-";
@@ -78,7 +78,7 @@ VAR i : SIGNED32;
 	END Test;
 
 	PROCEDURE TestMaxLongintPlus1;
-	VAR string : ARRAY 16 OF CHAR; val : SIGNED32; res: WORD;
+	VAR string : ARRAY 16 OF CHAR; val : SIGNED32; res: INTEGER;
 	BEGIN
 		string := "-80000000";
 		Strings.HexStrToInt(string, val, res);

@@ -395,7 +395,7 @@ END CanReplace;
 
 (** Compare str1 and str2 lexically, and return CmpLess if str1 is less than str2, CmpEqual if str1 and str2 are equal, or CmpGreater if str1 is greater than str2. *)
 
-PROCEDURE Compare*(CONST str1, str2: ARRAY OF CHAR): WORD;
+PROCEDURE Compare*(CONST str1, str2: ARRAY OF CHAR): INTEGER;
 VAR i: SIZE; ch: CHAR;
 BEGIN
 	i := 0;
@@ -408,8 +408,8 @@ BEGIN
 	IF ch < str2[i] THEN RETURN CmpLess ELSE RETURN CmpGreater END
 END Compare;
 
-PROCEDURE CompareToUnicode*(CONST utf8 : ARRAY OF CHAR; CONST unicode : ARRAY OF SIGNED32) : WORD;
-VAR len, i, j: SIZE; char, ucs: SIGNED32; result: WORD; valid, abort : BOOLEAN;
+PROCEDURE CompareToUnicode*(CONST utf8 : ARRAY OF CHAR; CONST unicode : ARRAY OF SIGNED32) : INTEGER;
+VAR len, i, j: SIZE; char, ucs: SIGNED32; result: INTEGER; valid, abort : BOOLEAN;
 BEGIN
 	len := LEN(unicode);
 	i := 0; j := 0; valid := TRUE; abort := FALSE;

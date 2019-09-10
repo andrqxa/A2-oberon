@@ -34,7 +34,7 @@ CONST
 TYPE
 
 	Entry* = RECORD
-		type- : WORD;
+		type- : INTEGER;
 		source- : Files.FileName;
 		position-: Streams.Position;
 		message- : ARRAY 256 OF CHAR;
@@ -160,7 +160,7 @@ TYPE
 			Add(TypeInformation, source, position, message, nofInformations);
 		END Information;
 
-		PROCEDURE Exists(type: WORD; position : Streams.Position; CONST message: ARRAY OF CHAR) : BOOLEAN;
+		PROCEDURE Exists(type: INTEGER; position : Streams.Position; CONST message: ARRAY OF CHAR) : BOOLEAN;
 		VAR i : SIZE;
 		BEGIN
 			i := 0;
@@ -170,7 +170,7 @@ TYPE
 			RETURN (nofEntries > 0) & (i < nofEntries);
 		END Exists;
 
-		PROCEDURE Add(type: WORD; CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR; VAR counter: SIZE);
+		PROCEDURE Add(type: INTEGER; CONST source : ARRAY OF CHAR; position : Streams.Position; CONST message : ARRAY OF CHAR; VAR counter: SIZE);
 		BEGIN
 			AcquireWrite;
 			IF ~Exists(type, position, message) THEN
@@ -215,7 +215,7 @@ TYPE
 		PROCEDURE Synchronize(VAR entries : ViewEntryArray; VAR nofEntries : SIGNED32);
 		VAR dest : SIZE;
 
-			PROCEDURE Insert(type: WORD);
+			PROCEDURE Insert(type: INTEGER);
 			VAR i: SIZE;
 			BEGIN
 				FOR i := 0 TO nofEntries - 1 DO
@@ -247,7 +247,7 @@ TYPE
 
 TYPE
 
-	CompareProcedure = PROCEDURE(CONST entry1, entry2 : Entry) : WORD;
+	CompareProcedure = PROCEDURE(CONST entry1, entry2 : Entry) : INTEGER;
 
 
 	ViewEntry* = RECORD (Entry)
@@ -328,7 +328,7 @@ TYPE
 
 		PROCEDURE OnClickHandler(sender, data : ANY);
 		CONST Position = 0;
-		VAR column, row : SIZE; newMode: WORD;
+		VAR column, row : SIZE; newMode: INTEGER;
 		BEGIN
 			IF ~IsCallFromSequencer() THEN sequencer.ScheduleEvent(SELF.OnClickHandler, sender, data)
 			ELSE
@@ -382,7 +382,7 @@ TYPE
 			Release;
 		END ShowMarkers;
 
-		PROCEDURE SortBy(mode : WORD);
+		PROCEDURE SortBy(mode : INTEGER);
 		BEGIN
 			ASSERT(
 				(mode = SortByTypeAscending) OR (mode = SortByTypeDescending) OR
@@ -634,8 +634,8 @@ VAR
 	PrototypeShowMarkers : WMProperties.BooleanProperty;
 	PrototypeSortBy : WMProperties.Int32Property;
 
-PROCEDURE CompareByPosition(CONST e1, e2 : Entry) : WORD;
-VAR result : WORD;
+PROCEDURE CompareByPosition(CONST e1, e2 : Entry) : INTEGER;
+VAR result : INTEGER;
 BEGIN
 	IF (e1.position < e2.position) THEN result := Less;
 	ELSIF (e1.position > e2.position) THEN result := Greater;
@@ -645,8 +645,8 @@ BEGIN
 	RETURN result;
 END CompareByPosition;
 
-PROCEDURE CompareByType(CONST e1, e2 : Entry) : WORD;
-VAR result : WORD;
+PROCEDURE CompareByType(CONST e1, e2 : Entry) : INTEGER;
+VAR result : INTEGER;
 BEGIN
 	IF (e1.type < e2.type) THEN result := Less;
 	ELSIF (e1.type > e2.type) THEN result := Greater;

@@ -81,7 +81,7 @@ VAR
 	unsafeMode : BOOLEAN;
 
 PROCEDURE ExpandAlias(CONST alias : ARRAY OF CHAR; VAR genvol, genfs: ARRAY OF CHAR);
-VAR t: ARRAY 64 OF CHAR; i, j: SIGNED32; res: WORD;
+VAR t: ARRAY 64 OF CHAR; i, j: SIGNED32; res: INTEGER;
 BEGIN
 	genvol[0] := 0X; genfs[0] := 0X;
 	t := "Files.Alias.";
@@ -105,7 +105,7 @@ END ExpandAlias;
 PROCEDURE GetFileSystemFactory(CONST name : ARRAY OF CHAR; error : Streams.Writer) : Files.FileSystemFactory;
 VAR
 	factory : Files.FileSystemFactory;
-	moduleName, procedureName : Modules.Name; msg : ARRAY 128 OF CHAR; res : WORD;
+	moduleName, procedureName : Modules.Name; msg : ARRAY 128 OF CHAR; res : INTEGER;
 BEGIN
 	factory := NIL;
 	Commands.Split(name, moduleName, procedureName, res, msg);
@@ -408,7 +408,7 @@ VAR
 	enum : Files.Enumerator;
 	enumContext : Commands.Context;
 	arg : Streams.StringReader;
-	res : WORD;
+	res : INTEGER;
 	ignore: SIZE;
 BEGIN
 	NEW(options);
@@ -501,7 +501,7 @@ BEGIN
 END CreateFile;
 
 PROCEDURE CopyTo*(context : Commands.Context); (** targetpath sourcepath {filename} ~ *)
-VAR targetPath, sourcePath, targetFullname, sourceFullname,  filename : Files.FileName; overwrite : BOOLEAN; nofFilesCopied, nofErrors: SIGNED32; res : WORD;
+VAR targetPath, sourcePath, targetFullname, sourceFullname,  filename : Files.FileName; overwrite : BOOLEAN; nofFilesCopied, nofErrors: SIGNED32; res : INTEGER;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(targetPath);
 	context.arg.SkipWhitespace; context.arg.String(sourcePath);
@@ -536,7 +536,7 @@ PROCEDURE CopyFiles*(context : Commands.Context); (** [Options] {source  => dest
 VAR
 	source, destination : FileList;
 	overwritten, error, ignoreErrors, quiet : BOOLEAN;
-	nofFiles, n : SIGNED32; res: WORD;
+	nofFiles, n : SIGNED32; res: INTEGER;
 	options: Options.Options;
 BEGIN
 	NEW(options);
@@ -607,7 +607,7 @@ BEGIN
 END GenerateName;
 
 PROCEDURE Backup*(context: Commands.Context);
-VAR index: SIGNED32; fileList: FileList; nofFiles, n: SIGNED32; res: WORD; str: Files.FileName; overwritten: BOOLEAN;
+VAR index: SIGNED32; fileList: FileList; nofFiles, n: SIGNED32; res: INTEGER; str: Files.FileName; overwritten: BOOLEAN;
 BEGIN
 	overwritten := FALSE;
 	nofFiles := GetFileList(context, fileList);
@@ -630,7 +630,7 @@ PROCEDURE DeleteFiles*(context : Commands.Context); (** [Options] {file} ~ *)
 VAR
 	filelist : FileList;
 	error, ignoreErrors, silent : BOOLEAN;
-	nofFiles, n, ndone : SIGNED32; res: WORD;
+	nofFiles, n, ndone : SIGNED32; res: INTEGER;
 	options : Options.Options;
 BEGIN
 	NEW(options);
@@ -676,7 +676,7 @@ PROCEDURE RenameFiles*(context : Commands.Context); (** [Options] {source => des
 VAR
 	source, target : FileList;
 	error, ignoreErrors : BOOLEAN;
-	nofFiles, n : SIGNED32; res: WORD;
+	nofFiles, n : SIGNED32; res: INTEGER;
 	options : Options.Options;
 BEGIN
 	NEW(options);
@@ -716,7 +716,7 @@ BEGIN
 END RenameFiles;
 
 PROCEDURE CreateDirectory*(context : Commands.Context); (* path ~ *)
-VAR path : Files.FileName; res : WORD;
+VAR path : Files.FileName; res : INTEGER;
 BEGIN
 	IF context.arg.GetString(path) THEN
 		Files.CreateDirectory(path, res);
@@ -732,7 +732,7 @@ BEGIN
 END CreateDirectory;
 
 PROCEDURE DeleteDirectory*(context : Commands.Context); (* path ~ *)
-VAR path : Files.FileName; res : WORD;
+VAR path : Files.FileName; res : INTEGER;
 BEGIN
 	IF context.arg.GetString(path) THEN
 		Files.RemoveDirectory(path, FALSE, res);
@@ -1117,7 +1117,7 @@ BEGIN
 	out.String("FSTools: Pattern matching is disabled in SAFE mode. Press FSTools.Unsafe ~ to enable pattern matching."); out.Ln;
 END ShowUnsafeMessage;
 
-PROCEDURE ShowRes(out : Streams.Writer; res : WORD);
+PROCEDURE ShowRes(out : Streams.Writer; res : INTEGER);
 BEGIN
 	out.String("(");
 	CASE res OF

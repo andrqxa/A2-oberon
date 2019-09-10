@@ -110,7 +110,7 @@ TYPE
 		PROCEDURE Load;
 		VAR
 			value, temp : ARRAY 256 OF CHAR;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			Configuration.Get("Applications.WMV24Component.PortSettings", value, res);
 			IF (res = Configuration.Ok) THEN COPY(value, portSettings); END;
@@ -925,7 +925,7 @@ TYPE
 			progressInfo : ProgressInfo;
 			xysender : XYModem.Sender;
 			msg : ARRAY 32 OF CHAR;
-			x, y : SIZE; res: WORD;
+			x, y : SIZE; res: INTEGER;
 		BEGIN
 			f := Files.Old(filename);
 			IF f # NIL THEN
@@ -972,7 +972,7 @@ TYPE
 			caption : ARRAY 128 OF CHAR;
 			xyreceiver : XYModem.Receiver;
 			msg : ARRAY 32 OF CHAR;
-			x, y : SIZE; res: WORD;
+			x, y : SIZE; res: INTEGER;
 			awaitF : BOOLEAN;
 		BEGIN
 			IF filename # "" THEN
@@ -1050,7 +1050,7 @@ TYPE
 		PROCEDURE ToggleOpen(sender, data : ANY);
 		VAR msg, s, t : ARRAY 64 OF CHAR; parityChar : CHAR;
 			r : Streams.StringReader;
-			res : WORD;
+			res : INTEGER;
 		BEGIN
 			ResetStatus;
 			IF open THEN
@@ -1112,7 +1112,7 @@ TYPE
 			text.ReleaseWrite;
 		END DeleteNCharacters;
 
-		PROCEDURE ReportError(CONST title : ARRAY OF CHAR; res : WORD);
+		PROCEDURE ReportError(CONST title : ARRAY OF CHAR; res : INTEGER);
 		VAR msg : ARRAY 128 OF CHAR;
 		BEGIN
 		CASE res OF
@@ -1131,7 +1131,7 @@ TYPE
 		WMDialogs.Error(title, msg)
 		END ReportError;
 
-		PROCEDURE EvaluateError(res : WORD);
+		PROCEDURE EvaluateError(res : INTEGER);
 		BEGIN
 			CASE res OF
 				|Serials.OverrunError: INC(overrunErrors);
@@ -1145,7 +1145,7 @@ TYPE
 		END EvaluateError;
 
 		PROCEDURE ReceiveCharacters;
-		VAR ch : CHAR; buffer : ARRAY ReceiveBufferSize OF CHAR; backspaces, i, len : SIZE; res: WORD;
+		VAR ch : CHAR; buffer : ARRAY ReceiveBufferSize OF CHAR; backspaces, i, len : SIZE; res: INTEGER;
 		BEGIN
 			len := 0;
 			res := Streams.Ok;
@@ -1306,7 +1306,7 @@ TYPE
 		terminal : TerminalComponent;
 
 		PROCEDURE GetStartupSize(VAR width, height : SIGNED32);
-		VAR strings : Strings.StringArray; value : ARRAY 64 OF CHAR; res : WORD;
+		VAR strings : Strings.StringArray; value : ARRAY 64 OF CHAR; res : INTEGER;
 		BEGIN
 			width := DefaultWidth; height := DefaultHeight;
 			Configuration.Get("Applications.WMV24Component.WindowStartupSize", value, res);
@@ -1509,7 +1509,7 @@ BEGIN {EXCLUSIVE}
 END Cleanup;
 
 PROCEDURE InitV24;
-VAR res: WORD; msg: ARRAY 32 OF CHAR;
+VAR res: INTEGER; msg: ARRAY 32 OF CHAR;
 BEGIN
 	Commands.Call("V24.Install",{},res,msg); (* auto-initialize V24 in Windows *)
 END InitV24;

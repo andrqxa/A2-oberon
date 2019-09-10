@@ -1570,7 +1570,7 @@ TYPE
 		platform: PlatformDesc;
 		fileName: Files.FileName;
 		mod: Modules.Module;
-		res: WORD;
+		res: INTEGER;
 		msg: ARRAY 8 OF CHAR;
 	BEGIN
 

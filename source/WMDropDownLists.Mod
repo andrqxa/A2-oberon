@@ -255,7 +255,7 @@ TYPE
 			RETURN nofEntries;
 		END GetNofEntries;
 
-		PROCEDURE Add*(key : SIGNED32; CONST name : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE Add*(key : SIGNED32; CONST name : ARRAY OF CHAR; VAR res : INTEGER);
 		BEGIN
 			Acquire;
 			IF (FindDuplicate(key, name) = NIL) THEN
@@ -272,7 +272,7 @@ TYPE
 			Release;
 		END Add;
 
-		PROCEDURE Remove*(CONST name : ARRAY OF CHAR; VAR res : WORD);
+		PROCEDURE Remove*(CONST name : ARRAY OF CHAR; VAR res : INTEGER);
 		VAR i : SIGNED32;
 		BEGIN
 			Acquire;

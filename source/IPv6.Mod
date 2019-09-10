@@ -1184,7 +1184,7 @@ TYPE
 		intName: IP.Name;
 		intv6: Interface;
 		int: IP.Interface;
-		res: WORD;
+		res: INTEGER;
 		fragmentList: FragmentList;
 
 		(* router *)
@@ -1197,7 +1197,7 @@ TYPE
 			"name" must be a unique name for this interface (tested in "AddInterface").
 			"dev" must be a Network.LinkDevice that can be used in other interfaces => multiple IP addresses on the
 			same interface. *)
-		PROCEDURE &Constr*(name: IP.Name; dev: Network.LinkDevice; VAR res: WORD);
+		PROCEDURE &Constr*(name: IP.Name; dev: Network.LinkDevice; VAR res: INTEGER);
 		VAR
 			devListItem: DeviceList;
 
@@ -1295,7 +1295,7 @@ TYPE
 
 		(** Set addresses. Is normally called just after instanciation, but can also be called later, e.g. by DHCP.
 			If "gatewayAdr" is not "NilAdr", it will be added to the default router list. *)
-		PROCEDURE SetAdrs*(localAdr, prefixAdr, defaultRouterAdr: IP.Adr; VAR res: WORD);
+		PROCEDURE SetAdrs*(localAdr, prefixAdr, defaultRouterAdr: IP.Adr; VAR res: INTEGER);
 		VAR
 			devListItem: DeviceList;
 
@@ -2194,7 +2194,7 @@ TYPE
 			prefixItem: PrefixesEntry;
 			nbrOfPrefixOpt: SIGNED32;
 			i: SIGNED32;
-			res: WORD;
+			res: INTEGER;
 			tmpStr: ARRAY 8 OF CHAR;
 
 
@@ -2469,7 +2469,7 @@ TYPE
 			count: SIGNED32;
 			tmpStr: ARRAY 8 OF CHAR;
 			newLocalAdr: IP.Adr;
-			res: WORD;
+			res: INTEGER;
 			i: SIGNED32;
 
 		BEGIN

@@ -32,7 +32,7 @@ TYPE
 		END ListHCIConnections;
 
 		PROCEDURE InitL2CAP;
-		VAR res: WORD;
+		VAR res: INTEGER;
 		BEGIN
 			IF (l2cap # NIL) THEN CloseL2CAP END;
 			(* NEW(l2cap, hci, res); *)
@@ -56,7 +56,7 @@ TYPE
 		END CloseL2CAP;
 
 		PROCEDURE ConnectIndication(indication: L2CAP.Indication);
-		VAR res: WORD;
+		VAR res: INTEGER;
 		BEGIN
 			KernelLog.String(ident); KernelLog.String(": connect indication!!!"); KernelLog.Ln;
 			WITH indication: L2CAP.ConnectInd DO
@@ -66,7 +66,7 @@ TYPE
 		END ConnectIndication;
 
 		PROCEDURE ConfigIndication(indication: L2CAP.Indication);
-		VAR res: WORD;
+		VAR res: INTEGER;
 		BEGIN
 			WITH indication: L2CAP.ConfigInd DO
 				KernelLog.String(ident); KernelLog.String(": configuration indication:"); KernelLog.Ln;
@@ -90,7 +90,7 @@ TYPE
 		END QoSViolationIndication;
 
 		PROCEDURE SendString(cid: SIGNED32; VAR str: ARRAY OF CHAR);
-		VAR buf: POINTER TO ARRAY OF CHAR; i, len: SIGNED32; res: WORD;
+		VAR buf: POINTER TO ARRAY OF CHAR; i, len: SIGNED32; res: INTEGER;
 		BEGIN
 			NEW(buf,LEN(str)+2);
 			WHILE (str[i] # 0X) DO buf[i] := str[i]; INC(i) END;
@@ -263,7 +263,7 @@ END TraceMode;
 PROCEDURE ReadLocalName*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	event: Bluetooth.EventPacket; pending: BOOLEAN; res: WORD; i: SIGNED32;
+	event: Bluetooth.EventPacket; pending: BOOLEAN; res: INTEGER; i: SIGNED32;
 BEGIN
 	IF context.arg.GetString(ident) THEN
 		d := Find(ident);
@@ -291,7 +291,7 @@ END ReadLocalName;
 PROCEDURE ChangeLocalName*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	name: ARRAY 248 OF CHAR; event: Bluetooth.EventPacket; pending: BOOLEAN; res : WORD;
+	name: ARRAY 248 OF CHAR; event: Bluetooth.EventPacket; pending: BOOLEAN; res : INTEGER;
 BEGIN
 	IF context.arg.GetString(ident) & context.arg.GetString(name) THEN
 		d := Find(ident);
@@ -314,7 +314,7 @@ END ChangeLocalName;
 PROCEDURE ReadClassOfDevice*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	event: Bluetooth.EventPacket; pending: BOOLEAN; res: WORD; i: SIGNED32;
+	event: Bluetooth.EventPacket; pending: BOOLEAN; res: INTEGER; i: SIGNED32;
 BEGIN
 	IF context.arg.GetString(ident) THEN
 		d := Find(ident);
@@ -338,7 +338,7 @@ END ReadClassOfDevice;
 PROCEDURE WriteClassOfDevice*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	event: Bluetooth.EventPacket; pending: BOOLEAN; res: WORD;  i: SIGNED32; cod: Bluetooth.DeviceClass;
+	event: Bluetooth.EventPacket; pending: BOOLEAN; res: INTEGER;  i: SIGNED32; cod: Bluetooth.DeviceClass;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(ident); context.arg.SkipWhitespace;
 	FOR i := 0 TO LEN(cod)-1 DO cod[i] := HexToChar(context.arg.Get(), context.arg.Get()) END;
@@ -358,7 +358,7 @@ BEGIN
 END WriteClassOfDevice;
 
 PROCEDURE Reset*(context : Commands.Context);
-VAR ident: Ident; d: Device; res: WORD;
+VAR ident: Ident; d: Device; res: INTEGER;
 BEGIN
 	IF context.arg.GetString(ident) THEN
 		d := Find(ident);
@@ -376,7 +376,7 @@ END Reset;
 PROCEDURE ReadScanEnable*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	res: WORD; event: Bluetooth.EventPacket; pending: BOOLEAN;
+	res: INTEGER; event: Bluetooth.EventPacket; pending: BOOLEAN;
 BEGIN
 	IF context.arg.GetString(ident) THEN
 		d := Find(ident);
@@ -404,7 +404,7 @@ END ReadScanEnable;
 PROCEDURE WriteScanEnable*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	res: WORD;  scanMode: SIGNED32; param: ARRAY 1 OF CHAR; event: Bluetooth.EventPacket; pending: BOOLEAN;
+	res: INTEGER;  scanMode: SIGNED32; param: ARRAY 1 OF CHAR; event: Bluetooth.EventPacket; pending: BOOLEAN;
 BEGIN
 	IF context.arg.GetString(ident) & context.arg.GetInteger(scanMode, TRUE) THEN
 		IF (0 <= scanMode) & (scanMode <= 3) THEN
@@ -426,7 +426,7 @@ END WriteScanEnable;
 PROCEDURE SetFilter*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	cond: ARRAY 1 OF CHAR; res: WORD;
+	cond: ARRAY 1 OF CHAR; res: INTEGER;
 BEGIN
 	IF context.arg.GetString(ident) THEN
 		d := Find(ident);
@@ -445,7 +445,7 @@ END SetFilter;
 PROCEDURE ReadPageScanActivity*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	interval, window: SIGNED32; res: WORD; pending: BOOLEAN; event: Bluetooth.EventPacket; intStr, winStr: ARRAY 16 OF CHAR;
+	interval, window: SIGNED32; res: INTEGER; pending: BOOLEAN; event: Bluetooth.EventPacket; intStr, winStr: ARRAY 16 OF CHAR;
 BEGIN
 	IF context.arg.GetString(ident) THEN
 		d := Find(ident);
@@ -473,7 +473,7 @@ END ReadPageScanActivity;
 PROCEDURE WritePageScanActivity*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	interval, window: SIGNED32; res: WORD; pending: BOOLEAN; event: Bluetooth.EventPacket; param: ARRAY 4 OF CHAR;
+	interval, window: SIGNED32; res: INTEGER; pending: BOOLEAN; event: Bluetooth.EventPacket; param: ARRAY 4 OF CHAR;
 BEGIN
 	IF context.arg.GetString(ident) & context.arg.GetInteger(interval, TRUE) & context.arg.GetInteger(window, TRUE) THEN
 		d := Find(ident);
@@ -501,7 +501,7 @@ END WritePageScanActivity;
 PROCEDURE ReadInquiryScanActivity*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	interval, window: SIGNED32; res: WORD; pending: BOOLEAN; event: Bluetooth.EventPacket; intStr, winStr: ARRAY 16 OF CHAR;
+	interval, window: SIGNED32; res: INTEGER; pending: BOOLEAN; event: Bluetooth.EventPacket; intStr, winStr: ARRAY 16 OF CHAR;
 BEGIN
 	IF context.arg.GetString(ident) THEN
 		d := Find(ident);
@@ -529,7 +529,7 @@ END ReadInquiryScanActivity;
 PROCEDURE WriteInquiryScanActivity*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	interval, window: SIGNED32; res: WORD; pending: BOOLEAN; event: Bluetooth.EventPacket; param: ARRAY 4 OF CHAR;
+	interval, window: SIGNED32; res: INTEGER; pending: BOOLEAN; event: Bluetooth.EventPacket; param: ARRAY 4 OF CHAR;
 BEGIN
 	IF context.arg.GetString(ident) & context.arg.GetInteger(interval, TRUE) & context.arg.GetInteger(window, TRUE) THEN
 		d := Find(ident);
@@ -558,7 +558,7 @@ PROCEDURE Inquiry*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device; lap: ARRAY 3 OF CHAR;
 	params: ARRAY 5 OF CHAR; event: Bluetooth.EventPacket; pending: BOOLEAN;
-	length, numResponses, i: SIGNED32; res: WORD;
+	length, numResponses, i: SIGNED32; res: INTEGER;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(ident); context.arg.SkipWhitespace;
 	FOR i := 0 TO LEN(lap)-1 DO lap[i] := HexToChar(context.arg.Get(), context.arg.Get()) END;
@@ -624,7 +624,7 @@ END HexToChar;
 PROCEDURE ConnectTo*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	remote: Bluetooth.BDAddr; i , offset: SIGNED32; res: WORD;
+	remote: Bluetooth.BDAddr; i , offset: SIGNED32; res: INTEGER;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(ident); context.arg.SkipWhitespace;
 	FOR i := 0 TO LEN(remote)-1 DO remote[i] := HexToChar(context.arg.Get(), context.arg.Get()) END;
@@ -654,7 +654,7 @@ END Supported;
 PROCEDURE ReadLocalSupportedFeatures*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	res: WORD; event: Bluetooth.EventPacket; pending: BOOLEAN;
+	res: INTEGER; event: Bluetooth.EventPacket; pending: BOOLEAN;
 	s: SET;
 BEGIN
 	IF context.arg.GetString(ident) THEN
@@ -720,7 +720,7 @@ END ListHCIConnections;
 PROCEDURE ReadClockOffset*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	handle: SIGNED32; res: WORD; event: Bluetooth.EventPacket; pending: BOOLEAN; param: ARRAY 2 OF CHAR;
+	handle: SIGNED32; res: INTEGER; event: Bluetooth.EventPacket; pending: BOOLEAN; param: ARRAY 2 OF CHAR;
 BEGIN
 	IF context.arg.GetString(ident) & context.arg.GetInteger(handle, TRUE) THEN
 		d := Find(ident);
@@ -756,7 +756,7 @@ END ReadClockOffset;
 PROCEDURE SendACL*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	data: ARRAY 256 OF CHAR; i, handle, cid: SIGNED32; res: WORD; c1, c2: CHAR;
+	data: ARRAY 256 OF CHAR; i, handle, cid: SIGNED32; res: INTEGER; c1, c2: CHAR;
 	l: HCI.Link;
 BEGIN
 	IF context.arg.GetString(ident) & context.arg.GetInteger(handle, FALSE) & context.arg.GetInteger(cid, FALSE) THEN
@@ -819,7 +819,7 @@ END TestStringToParam;
 PROCEDURE ReadBDAddr*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	res: WORD; i: SIGNED32; bdAddr: Bluetooth.BDAddr;
+	res: INTEGER; i: SIGNED32; bdAddr: Bluetooth.BDAddr;
 BEGIN
 	IF context.arg.GetString(ident) THEN
 		d := Find(ident);
@@ -875,7 +875,7 @@ END L2CAPClose;
 PROCEDURE L2CAPConnect*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	remote: Bluetooth.BDAddr; i, lcid, status: SIGNED32; res: WORD;
+	remote: Bluetooth.BDAddr; i, lcid, status: SIGNED32; res: INTEGER;
 BEGIN
 	context.arg.SkipWhitespace; context.arg.String(ident); context.arg.SkipWhitespace;
 	FOR i := 0 TO LEN(remote)-1 DO remote[i] := HexToChar(context.arg.Get(), context.arg.Get()) END;
@@ -903,7 +903,7 @@ END L2CAPConnect;
 PROCEDURE L2CAPConfigure*(context : Commands.Context);
 VAR
 	ident: Ident; d: Device;
-	cid, mtu, flushTO, flow, linkTO: SIGNED32; res: WORD;
+	cid, mtu, flushTO, flow, linkTO: SIGNED32; res: INTEGER;
 BEGIN
 	IF context.arg.GetString(ident) & context.arg.GetInteger(cid, TRUE) & context.arg.GetInteger(mtu, TRUE) &
 		context.arg.GetInteger(flushTO, TRUE) & context.arg.GetInteger(linkTO, TRUE) THEN

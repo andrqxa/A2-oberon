@@ -795,7 +795,7 @@ TYPE
 	END ReadRegisteredModules;
 
 	PROCEDURE RegisterModuleByName(moduleName: Strings.String);
-	VAR module: Modules.Module; factory : DynamicWebpage.ActiveElementDescSetFactory; i: SIZE; res: WORD;
+	VAR module: Modules.Module; factory : DynamicWebpage.ActiveElementDescSetFactory; i: SIZE; res: INTEGER;
 		msg: ARRAY 1024 OF CHAR; desc: DynamicWebpage.ActiveElementDescriptor;
 		descList: DynamicWebpage.ActiveElementDescSet;
 	BEGIN

@@ -271,49 +271,49 @@ TYPE
 TYPE
 	dev_t*		= LONGWORD;
 	ino_t*		= LONGWORD;
-	nlink_t*	= WORD;
-	mode_t*	= WORD;
+	nlink_t*	= INTEGER;
+	mode_t*	= INTEGER;
 	off_t*		= LONGWORD;
-	blksize_t*= WORD;
+	blksize_t*= INTEGER;
 	blkcnt_t*	= LONGWORD;
-	uid_t*		= WORD;
-	gid_t*		= WORD;
-	pid_t*		= WORD;
+	uid_t*		= INTEGER;
+	gid_t*		= INTEGER;
+	pid_t*		= INTEGER;
 
 	Status* = RECORD
 		#IF I386 THEN
 				dev-		: dev_t;
-				pad1		: ARRAY 3 OF WORD;
+				pad1		: ARRAY 3 OF INTEGER;
 				ino-		: ino_t;
-				mode-	: WORD;
-				nlink-		: WORD;
-				uid-		: WORD;
-				gid-		: WORD;
+				mode-	: INTEGER;
+				nlink-		: INTEGER;
+				uid-		: INTEGER;
+				gid-		: INTEGER;
 				rdev-		: dev_t;
-				pad2		: ARRAY 2 OF WORD;
-				size-		: WORD;
-				pad3		: WORD;
+				pad2		: ARRAY 2 OF INTEGER;
+				size-		: INTEGER;
+				pad3		: INTEGER;
 				atime-	: Timeval;
 				mtime-	: Timeval;
 				ctime-	: Timeval;
-				blksize-	: WORD;
-				blocks-	: WORD;
+				blksize-	: INTEGER;
+				blocks-	: INTEGER;
 				fstype-	: ARRAY 16 OF CHAR;
-				pad4		: ARRAY 8 OF WORD
+				pad4		: ARRAY 8 OF INTEGER
 		#ELSIF AMD64 THEN
 				dev-		: dev_t;
 				ino-		: ino_t;
-				mode-	: WORD;
-				nlink-		: WORD;
-				uid-		: WORD;
-				gid-		: WORD;
+				mode-	: INTEGER;
+				nlink-		: INTEGER;
+				uid-		: INTEGER;
+				gid-		: INTEGER;
 				rdev-		: dev_t;
 				size-		: LONGWORD;
 				atime-	: Timeval;
 				mtime-	: Timeval;
 				ctime-	: Timeval;
-				blksize-	: WORD;
-				pad0		: WORD;
+				blksize-	: INTEGER;
+				pad0		: INTEGER;
 				blocks-	: LONGWORD;
 				fstype-	: ARRAY 16 OF CHAR
 		#ELSE
@@ -364,7 +364,7 @@ TYPE
 	Stack* = RECORD
 				sp-	: ADDRESS;
 				size-	: SIZE;
-				flags-	: WORD;
+				flags-	: INTEGER;
 			END;
 
 	Ucontext* = POINTER TO UcontextDesc;
@@ -438,10 +438,10 @@ TYPE
 
 
 	Sigaction = RECORD
-				sa_flags: WORD;
+				sa_flags: INTEGER;
 				sa_handler: ADDRESS;
 				sa_mask: Sigset;
-				pad1, pad2: WORD
+				pad1, pad2: INTEGER
 			END;
 
 	Sched_param = RECORD
@@ -472,20 +472,20 @@ VAR
 
 	sigstack-: ARRAY 32*4096 OF CHAR;
 
-	sysconf	: PROCEDURE {C} ( name: SIGNED32 ): WORD;
+	sysconf	: PROCEDURE {C} ( name: SIGNED32 ): INTEGER;
 
-	pthread_mutex_init		: PROCEDURE {C} ( mutex: ADDRESS; mutexattr: ADDRESS ): WORD;
-	pthread_mutex_destroy	: PROCEDURE {C} ( mutex: ADDRESS ): WORD;
-	pthread_mutex_lock		: PROCEDURE {C} ( mutex: ADDRESS ): WORD;
-	pthread_mutex_unlock	: PROCEDURE {C} ( mutex: ADDRESS ): WORD;
+	pthread_mutex_init		: PROCEDURE {C} ( mutex: ADDRESS; mutexattr: ADDRESS ): INTEGER;
+	pthread_mutex_destroy	: PROCEDURE {C} ( mutex: ADDRESS ): INTEGER;
+	pthread_mutex_lock		: PROCEDURE {C} ( mutex: ADDRESS ): INTEGER;
+	pthread_mutex_unlock	: PROCEDURE {C} ( mutex: ADDRESS ): INTEGER;
 
-	pthread_mutexattr_init		: PROCEDURE {C} ( mutexattr: ADDRESS ): WORD;
-	pthread_mutexattr_settype	: PROCEDURE {C} ( mutexattr: ADDRESS; type: WORD ): WORD;
+	pthread_mutexattr_init		: PROCEDURE {C} ( mutexattr: ADDRESS ): INTEGER;
+	pthread_mutexattr_settype	: PROCEDURE {C} ( mutexattr: ADDRESS; type: INTEGER ): INTEGER;
 
-	pthread_cond_init		: PROCEDURE {C} ( cond: ADDRESS; condAttr: ADDRESS ): WORD;
-	pthread_cond_destroy	: PROCEDURE {C} ( cond: ADDRESS ): WORD;
-	pthread_cond_wait		: PROCEDURE {C} ( cond: ADDRESS; mutex: ADDRESS ): WORD;
-	pthread_cond_signal		: PROCEDURE {C} ( cond: ADDRESS ): WORD;
+	pthread_cond_init		: PROCEDURE {C} ( cond: ADDRESS; condAttr: ADDRESS ): INTEGER;
+	pthread_cond_destroy	: PROCEDURE {C} ( cond: ADDRESS ): INTEGER;
+	pthread_cond_wait		: PROCEDURE {C} ( cond: ADDRESS; mutex: ADDRESS ): INTEGER;
+	pthread_cond_signal		: PROCEDURE {C} ( cond: ADDRESS ): INTEGER;
 
 	pthread_create	: PROCEDURE {C} ( newthread: ADDRESS; attr: ADDRESS; start_routine: PROCEDURE {C} (arg: PROCEDURE):ADDRESS; arg:PROCEDURE): Thread_t;
 	pthread_exit		: PROCEDURE {C} ( thr: ADDRESS );
@@ -494,19 +494,19 @@ VAR
 	pthread_cancel	: PROCEDURE {C} ( thr: Thread_t );
 	pthread_self		: PROCEDURE {C} ( ): Thread_t;
 
-	pthread_key_create:		PROCEDURE {C} ( key: ADDRESS; destructor: PROCEDURE {C} ( param: ADDRESS ) ): WORD;
-	pthread_setspecific:		PROCEDURE {C} ( key: Key_t; value: ADDRESS ): WORD;
+	pthread_key_create:		PROCEDURE {C} ( key: ADDRESS; destructor: PROCEDURE {C} ( param: ADDRESS ) ): INTEGER;
+	pthread_setspecific:		PROCEDURE {C} ( key: Key_t; value: ADDRESS ): INTEGER;
 	pthread_getspecific:		PROCEDURE {C} ( key: Key_t ): ADDRESS;
 
 	pthread_attr_init					: PROCEDURE {C} ( attr: ADDRESS );
-	pthread_attr_setscope			: PROCEDURE {C} ( attr: ADDRESS; set: WORD );
-	pthread_attr_setdetachstate	: PROCEDURE {C} ( attr: ADDRESS; set: WORD );
+	pthread_attr_setscope			: PROCEDURE {C} ( attr: ADDRESS; set: INTEGER );
+	pthread_attr_setdetachstate	: PROCEDURE {C} ( attr: ADDRESS; set: INTEGER );
 	pthread_attr_setstacksize		: PROCEDURE {C} ( attr: ADDRESS; stackSize: SIZE );
 
 	sched_get_priority_max		: PROCEDURE {C} ( policy: SIGNED32 ): SIGNED32;
 	sched_get_priority_min		: PROCEDURE {C} ( policy: SIGNED32 ): SIGNED32;
-	pthread_setschedparam		: PROCEDURE {C} ( thread: Thread_t; policy: SIGNED32; param: ADDRESS ): WORD;
-	pthread_getschedparam		: PROCEDURE {C} ( thread: Thread_t; policy: ADDRESS; param: ADDRESS ): WORD;
+	pthread_setschedparam		: PROCEDURE {C} ( thread: Thread_t; policy: SIGNED32; param: ADDRESS ): INTEGER;
+	pthread_getschedparam		: PROCEDURE {C} ( thread: Thread_t; policy: ADDRESS; param: ADDRESS ): INTEGER;
 	pthread_setcancelstate		: PROCEDURE {C} ( state: SIGNED32; oldstate: ADDRESS ): SIGNED32;
 	pthread_setcanceltype		: PROCEDURE {C} ( type: SIGNED32; oldtype: ADDRESS ): SIGNED32;
 
@@ -536,7 +536,7 @@ VAR
 	write-			: PROCEDURE {C} ( fd: SIGNED32; buf: ADDRESS; n: SIZE ): SIZE;
 	open-			: PROCEDURE {C} ( name: ADDRESS;  flags: SET32;  mode: mode_t ): SIGNED32;
 	close-		: PROCEDURE {C} ( fd: SIGNED32 ): SIGNED32;
-	lseek-		: PROCEDURE {C} ( fd: SIGNED32; offset: off_t; origin: WORD ): off_t;
+	lseek-		: PROCEDURE {C} ( fd: SIGNED32; offset: off_t; origin: INTEGER ): off_t;
 	fsync-		: PROCEDURE {C} ( fd: SIGNED32 ): SIGNED32;
 	ioctl-			: PROCEDURE {C} ( fd: SIGNED32; request: SIGNED32; arg: ADDRESS ): SIGNED32;
 	unlink-		: PROCEDURE {C} ( name: ADDRESS ): SIGNED32;
@@ -593,8 +593,8 @@ VAR
 
 	errno_location	: PROCEDURE {C} ( ): ADDRESS;
 
-	xSetErrorHandler		: PROCEDURE {C} ( h: ADDRESS ): WORD;
-	xSetIOErrorHandler	: PROCEDURE {C} ( h: ADDRESS ): WORD;
+	xSetErrorHandler		: PROCEDURE {C} ( h: ADDRESS ): INTEGER;
+	xSetIOErrorHandler	: PROCEDURE {C} ( h: ADDRESS ): INTEGER;
 
 	libc-: ADDRESS;
 	libp-: ADDRESS;
@@ -787,7 +787,7 @@ VAR
 	VAR
 		attr: PthreadAttributeDesc;
 		id: Thread_t;
-		res: WORD;
+		res: INTEGER;
 	BEGIN
 		pthread_attr_init( ADDRESSOF( attr ) );
 		pthread_attr_setscope( ADDRESSOF( attr ), PTHREAD_SCOPE_SYSTEM);
@@ -949,8 +949,8 @@ VAR
 	(*-------------------------------------------------------------------------------------------------------------*)
 
 
-	PROCEDURE {C} X11ErrorHandler( d: ADDRESS; err: ADDRESS ): WORD;
-	VAR res: WORD;
+	PROCEDURE {C} X11ErrorHandler( d: ADDRESS; err: ADDRESS ): INTEGER;
+	VAR res: INTEGER;
 	BEGIN
 		IF oberonXErrorHandler # NIL THEN
 			res := oberonXErrorHandler( d, err );
@@ -958,8 +958,8 @@ VAR
 		RETURN 0;
 	END X11ErrorHandler;
 
-	PROCEDURE {C} X11IOErrorHandler( d: ADDRESS ): WORD;
-	VAR res: WORD;
+	PROCEDURE {C} X11IOErrorHandler( d: ADDRESS ): INTEGER;
+	VAR res: INTEGER;
 	BEGIN
 		IF oberonXIOErrorHandler # NIL THEN
 			res := oberonXIOErrorHandler( d );
@@ -968,7 +968,7 @@ VAR
 	END X11IOErrorHandler;
 
 	PROCEDURE InitXErrorHandlers*( xErrorHandler: OberonXErrorHandler; xIOErrorHandler: OberonXIOErrorHandler );
-	VAR res: WORD;
+	VAR res: INTEGER;
 	BEGIN
 		oberonXErrorHandler := xErrorHandler;
 		oberonXIOErrorHandler := xIOErrorHandler;
@@ -1042,7 +1042,7 @@ VAR
 	END GetArgval;
 
 	PROCEDURE getSysinfo;
-	VAR res: WORD;  p: SIGNED16;
+	VAR res: INTEGER;  p: SIGNED16;
 		buf: ARRAY 4096 OF CHAR;
 
 		PROCEDURE copy( VAR p: SIGNED16;  VAR dest: ARRAY OF CHAR );

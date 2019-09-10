@@ -92,7 +92,7 @@ TYPE
 
 		PROCEDURE UpdateStatusBar(forceUpdate : BOOLEAN);
 		VAR
-			state: WORD; currentNofSamples, maxNofSamples : SIZE;
+			state: INTEGER; currentNofSamples, maxNofSamples : SIZE;
 			caption : ARRAY 256 OF CHAR; number : ARRAY 16 OF CHAR;
 		BEGIN
 			state := HierarchicalProfiler.GetState(currentNofSamples, maxNofSamples);
@@ -184,7 +184,7 @@ TYPE
 			tempProfile : HierarchicalProfiler.Profile;
 			mask : ARRAY 128 OF CHAR; timeStr : ARRAY 16 OF CHAR;
 			minPercent : SIGNED32;
-			time, type, info: SIGNED32; res: WORD;
+			time, type, info: SIGNED32; res: INTEGER;
 			root : WMTrees.TreeNode;
 		BEGIN
 			IF (sender = startBtn) THEN

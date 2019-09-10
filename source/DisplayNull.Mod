@@ -16,7 +16,7 @@ TYPE
 			format := Displays.color565; unit := 10000
 		END Init;
 
-		PROCEDURE Transfer*(VAR buf: ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op: WORD);
+		PROCEDURE Transfer*(VAR buf: ARRAY OF CHAR; ofs, stride, x, y, w, h: SIZE; op: INTEGER);
 		END Transfer;
 
 		PROCEDURE Fill*(col, x, y, w, h: SIGNED32);
@@ -34,7 +34,7 @@ TYPE
 	END Display;
 
 PROCEDURE Install*;
-VAR d: Display; res: WORD;
+VAR d: Display; res: INTEGER;
 BEGIN
 	NEW(d); d.desc := "Null display driver";
 	Displays.registry.Add(d, res);

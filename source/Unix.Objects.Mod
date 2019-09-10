@@ -59,7 +59,7 @@ VAR
 	processPointer	: Unix.Key_t;
 
 	newProcess: Process;
-	nextPID: WORD;
+	nextPID: INTEGER;
 
 	finalizerCaller	: FinalizerCaller;
 	mainthread: Unix.Thread_t;
@@ -205,11 +205,11 @@ TYPE
 		threadId-			: Unix.Thread_t;
 		nextProcess-	: Process;	(* next in list of all processes *)
 		stackBottom	-	: ADDRESS;
-		id-				: WORD;
+		id-				: INTEGER;
 		body			: Body;
-		mode-		: WORD;
+		mode-		: INTEGER;
 		flags-			: SET;
-		priority-		: WORD;	(* only effective if Aos is running SUID root *)
+		priority-		: INTEGER;	(* only effective if Aos is running SUID root *)
 		succ			: Process;   		  	(* in ProcessQueue *)
 		obj-			: ProtectedObject;	(* associated active object *)
 		condition-	: Condition;   			(* awaited process' condition *)
@@ -223,7 +223,7 @@ TYPE
 		lastThreadTimes: SIGNED64;
 		gcContext: GCContext;
 
-		PROCEDURE SetMode (mode: WORD);
+		PROCEDURE SetMode (mode: INTEGER);
 		BEGIN
 				Machine.Acquire(Machine.Heaps);(* process does not silently stop or run when GC is active *)
 				SELF.mode := mode;
@@ -325,13 +325,13 @@ TYPE
 			END
 		END Cancel;
 
-		PROCEDURE GetPriority( ): WORD;
+		PROCEDURE GetPriority( ): INTEGER;
 		BEGIN
 			RETURN Unix.ThrGetPriority( threadId )
 		END GetPriority;
 
-		PROCEDURE SetPriority( prio: WORD );
-		VAR pr: WORD;
+		PROCEDURE SetPriority( prio: INTEGER );
+		VAR pr: INTEGER;
 		BEGIN
 		(*
 			Linux/Solaris11: works only with SUID root and FIFO threads
@@ -344,7 +344,7 @@ TYPE
 		END SetPriority;
 
 
-		PROCEDURE & Initialize( obj: ProtectedObject;  bodyProc: Body;  prio: WORD; fl: SET; stacksize: SIZE);
+		PROCEDURE & Initialize( obj: ProtectedObject;  bodyProc: Body;  prio: INTEGER; fl: SET; stacksize: SIZE);
 		BEGIN
 			SELF.obj := obj;  condition := NIL;  continue := Unix.NewCond( );
 			flags := fl;
@@ -403,7 +403,7 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 
 
 	PROCEDURE BodyStarter;
-	VAR p: Process;  res: WORD; sp: ADDRESS;
+	VAR p: Process;  res: INTEGER; sp: ADDRESS;
 	BEGIN
 		(* make sure the process cannot be GCed in an intermediate unsafe state *)
 		Machine.Acquire(Machine.Heaps);
@@ -454,7 +454,7 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 	END InitProtHeader;
 
 
-	PROCEDURE CreateProcess*( body: Body;  priority: WORD;  flags: SET;  obj: ProtectedObject );
+	PROCEDURE CreateProcess*( body: Body;  priority: INTEGER;  flags: SET;  obj: ProtectedObject );
 	VAR p: Process;  hdr{UNTRACED}: ObjectHeader;
 	BEGIN
 		Unix.MtxLock( createProcess );
@@ -564,7 +564,7 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 		p.Cancel
 	END TerminateThis;
 
-	PROCEDURE SetPriority*( pri: WORD );		(* Set the current process' priority. *)
+	PROCEDURE SetPriority*( pri: INTEGER );		(* Set the current process' priority. *)
 	VAR me: Process;
 	BEGIN
 		me := CurrentProcess();
@@ -649,7 +649,7 @@ TYPE	GCStatusExt = OBJECT (Heaps.GCStatus)
 		RETURN bp  # NIL;
 	END NextValidStackSegment;
 
-	PROCEDURE GetProcessID*( ): WORD;
+	PROCEDURE GetProcessID*( ): INTEGER;
 	VAR p: Process;
 	BEGIN
 		p := CurrentProcess();

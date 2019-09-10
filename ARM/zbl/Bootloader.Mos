@@ -856,13 +856,13 @@ VAR
 	END StartNetwork;
 
 	(** UART receiver *)
-	PROCEDURE Receive ( VAR reader: StreamReaders.Reader; VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: WORD);
+	PROCEDURE Receive ( VAR reader: StreamReaders.Reader; VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER);
 	BEGIN
 		Uart.Receive(uart, buf, ofs, size, min, len, NIL, res)
 	END Receive;
 
 	(** UART sender *)
-	PROCEDURE Send (VAR writer: StreamWriters.Writer; CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: WORD);
+	PROCEDURE Send (VAR writer: StreamWriters.Writer; CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER);
 	BEGIN
 		Uart.Send(uart, buf, ofs, len, propagate, NIL, res)
 	END Send;

@@ -209,7 +209,7 @@ TYPE
 			rcvAdr, rcvSize: SIGNED32;
 
 		PROCEDURE &Init*(dev: LinkDevice; base: ADDRESS; irq: SIGNED32);
-		VAR res: WORD; i: SIGNED32;
+		VAR res: INTEGER; i: SIGNED32;
 			configCmd, iASetupCmd: DataBlock;
 		BEGIN
 			SELF.next := installedControllers; installedControllers := SELF;
@@ -816,7 +816,7 @@ END Remove;
 
 PROCEDURE ScanPCI(vendor, device: SIGNED32);
 VAR
-	index, bus, dev, fct, irq, i: SIGNED32; res: WORD;
+	index, bus, dev, fct, irq, i: SIGNED32; res: INTEGER;
 	base: ADDRESS;
 	d: LinkDevice;
 	c: Controller;

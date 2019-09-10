@@ -80,7 +80,7 @@ TYPE
 		END CreateFile;
 
 		PROCEDURE DeleteFile(CONST filename : ARRAY OF CHAR; VAR error : BOOLEAN);
-		VAR fullname : Files.FileName; res : WORD;
+		VAR fullname : Files.FileName; res : INTEGER;
 		BEGIN
 			COPY(path, fullname); Strings.Append(fullname, filename);
 			log.String("DELETE '"); log.String(fullname); log.String("' ... "); log.Update;
@@ -513,7 +513,7 @@ TYPE
 			arg : Streams.StringReader;
 			commandStr : ARRAY 128 OF CHAR; parameterStr : Strings.String;
 			msg : ARRAY 128 OF CHAR;
-			pos : SIZE; res : WORD;
+			pos : SIZE; res : INTEGER;
 		BEGIN
 			NEW(parameterStr, 4096); Strings.Truncate(parameterStr^, 0);
 			r.SkipWhitespace; r.String(commandStr);
@@ -598,7 +598,7 @@ TYPE
 			IF ~parseError & (string[0] # "#") THEN log.Ln; log.Update; END;
 		END ProcessCommand;
 
-		PROCEDURE Handle*(r: Streams.Reader; pos : Streams.Position; CONST name: ARRAY OF CHAR; testType: TestSuite.TestType): WORD;
+		PROCEDURE Handle*(r: Streams.Reader; pos : Streams.Position; CONST name: ARRAY OF CHAR; testType: TestSuite.TestType): INTEGER;
 		VAR result: SIGNED16; error, parseError, finished, trapped: BOOLEAN;
 		BEGIN
 			trapped := TRUE;
