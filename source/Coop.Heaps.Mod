@@ -175,7 +175,7 @@ BEGIN
 END CallFinalizers;
 
 (* Check reachability of finalized objects. *)
-PROCEDURE CheckFinalizedObjects (cycle: LONGWORD);
+PROCEDURE CheckFinalizedObjects (cycle: LONGINTEGER);
 VAR n, p, t: FinalizerNode; pointer {UNTRACED}: BaseTypes.Pointer;
 
 	PROCEDURE MarkDelegate(p: Finalizer);

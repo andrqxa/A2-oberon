@@ -111,7 +111,7 @@ TYPE
 				cmap				: X11.Colormap;
 				planesMask			: SIGNED32;
 				foreground,
-				background			: LONGWORD;
+				background			: LONGINTEGER;
 				rgb, defPal			: ARRAY 256 OF RGB;	(* 8-bit pseudo color *)
 				pixel				: ARRAY 256 OF SIGNED32;   (* pixel values for Oberon colors *)
 

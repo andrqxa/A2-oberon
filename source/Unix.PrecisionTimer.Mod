@@ -27,7 +27,7 @@ CONST
 
 TYPE
 	Timespec = RECORD
-		sec: LONGWORD;
+		sec: LONGINTEGER;
 		nsec: SIGNED32;
 	END;
 

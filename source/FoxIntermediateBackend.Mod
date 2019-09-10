@@ -12637,7 +12637,7 @@ TYPE
 									IF RefInfo THEN Info(section,"INTEGER") END;
 									Char(section, sfTypeWORD)
 								ELSIF (type = module.system.longWordType) THEN
-									IF RefInfo THEN Info(section,"LONGWORD") END;
+									IF RefInfo THEN Info(section,"LONGINTEGER") END;
 									Char(section, sfTypeLONGWORD);
 								ELSIF (type = Global.Signed8) OR (type.sizeInBits = 8 ) THEN
 									IF RefInfo THEN Info(section,"SIGNED8") END;

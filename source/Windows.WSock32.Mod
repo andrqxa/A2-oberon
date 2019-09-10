@@ -187,7 +187,7 @@ MODULE WSock32; (* AUTHOR "ejz, additions Alex Popescu"; PURPOSE " Win32 WSock32
 		htons-: PROCEDURE {WINAPI} (x: SIGNED16): SIGNED16;
 
 		(** The Windows Sockets ioctlsocket function controls the I/O mode of a socket. *)
-		ioctlsocket-: PROCEDURE {WINAPI} (s: Socket; cmd: LONGWORD; VAR argp: SIGNED32): INTEGER;
+		ioctlsocket-: PROCEDURE {WINAPI} (s: Socket; cmd: LONGINTEGER; VAR argp: SIGNED32): INTEGER;
 
 		(** The Windows Sockets listen function places a socket a state where it is listening for an incoming connection. *)
 		listen-: PROCEDURE {WINAPI} (s: Socket; backlog: INTEGER): INTEGER;

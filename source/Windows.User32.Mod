@@ -7,7 +7,7 @@ MODULE User32; (** non-portable / source: Windows.User32.Mod *)	(* ejz  *)
 
 	TYPE
 		DWORD = Kernel32.DWORD;
-		Long = LONGWORD;
+		Long = LONGINTEGER;
 	CONST
 		(** window messages *)
 		WMCreate* = 01H; WMDestroy* = 02H; WMMove* = 03H; WMSize* = 05H; WMActivate* = 06H; WMSetFocus* = 07H;

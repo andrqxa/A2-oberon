@@ -111,7 +111,7 @@ BEGIN
 END SendSelection;
 
 PROCEDURE ReceiveSelection(VAR event: X11.SelectionEvent);
-	VAR type: X11.Atom; format: INTEGER; len, after: LONGWORD;  prop, adr: ADDRESS; ch: CHAR; f: Files.File; r: Files.Rider; i: SIGNED32;
+	VAR type: X11.Atom; format: INTEGER; len, after: LONGINTEGER;  prop, adr: ADDRESS; ch: CHAR; f: Files.File; r: Files.Rider; i: SIGNED32;
 BEGIN
 	IF (event.property = X11.None) & (retries = 0) THEN
 		retries := 1; RequestSelection; RETURN

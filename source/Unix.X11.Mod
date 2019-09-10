@@ -63,7 +63,7 @@ TYPE
 				extData*: ADDRESS;
 				visualid*: VisualID;
 				class*: INTEGER;
-				redMask*, greenMask*, blueMask*: LONGWORD;
+				redMask*, greenMask*, blueMask*: LONGINTEGER;
 				bitsPerRgb*, mapEntries*: INTEGER
 			END;
 	VisualPtr* = POINTER {UNSAFE,UNTRACED} TO Visual;
@@ -71,11 +71,11 @@ TYPE
 				visual*{UNTRACED}:  VisualPtr;
 				visualID*: VisualID;
 				screen*, depth*, class*: INTEGER;
-				redmask*, greenmask*, bluemask*: LONGWORD;
+				redmask*, greenmask*, bluemask*: LONGINTEGER;
 				colomapsize*, bitsperrgb*: INTEGER
 			END;
 	Color* = RECORD
-				pixel*: LONGWORD;
+				pixel*: LONGINTEGER;
 				red*, green*, blue*: SIGNED16;
 				flags*, pad*: CHAR
 			END;
@@ -88,7 +88,7 @@ TYPE
 	Cursor* = ADDRESS;  KeySym* = ADDRESS;  KeyCode* = CHAR;
 	AnyEvent* = RECORD
 				typ*: INTEGER;
-				serial*: LONGWORD;
+				serial*: LONGINTEGER;
 				sendEvent*: Bool;
 				display*: DisplayPtr;
 				window*: Window;
@@ -98,7 +98,7 @@ TYPE
 			END;
 	SelectionEvent* = RECORD
 				typ*: INTEGER;
-				serial*: LONGWORD;
+				serial*: LONGINTEGER;
 				sendEvent*: Bool;
 				display*: DisplayPtr;
 				requestor*: Window;
@@ -107,7 +107,7 @@ TYPE
 			END;
 	SelectionRequestEvent* = RECORD
 				typ*: INTEGER;
-				serial*: LONGWORD;
+				serial*: LONGINTEGER;
 				sendEvent*: Bool;
 				display*: DisplayPtr;
 				owner*, requestor*: Window;
@@ -116,7 +116,7 @@ TYPE
 			END;
 	ExposeEvent* = RECORD
 				typ*: INTEGER;
-				serial*: LONGWORD;
+				serial*: LONGINTEGER;
 				sendEvent*: Bool;
 				display*: DisplayPtr;
 				window*: Window;
@@ -124,7 +124,7 @@ TYPE
 			END;
 	GraphicsExposeEvent* = RECORD
 				typ*: INTEGER;
-				serial*: LONGWORD;
+				serial*: LONGINTEGER;
 				sendEvent*: Bool;
 				display*: DisplayPtr;
 				drawable*: Drawable;
@@ -132,7 +132,7 @@ TYPE
 			END;
 	ButtonEvent* = RECORD
 				typ*: INTEGER;
-				serial*: LONGWORD;
+				serial*: LONGINTEGER;
 				sendEvent*: Bool;
 				display*: DisplayPtr;
 				window*, root*, subwindow*: Window;
@@ -143,7 +143,7 @@ TYPE
 
 	MotionEvent * = RECORD
 				typ*: INTEGER;
-				serial*: LONGWORD;
+				serial*: LONGINTEGER;
 				sendEvent*: Bool;
 				display*: DisplayPtr;
 				window*, root*, subwindow*: Window;
@@ -155,7 +155,7 @@ TYPE
 
 	KeyEvent* = RECORD
 				typ*: INTEGER;
-				serial*: LONGWORD;
+				serial*: LONGINTEGER;
 				sendEvent*: Bool;
 				display*: DisplayPtr;
 				window*, root*, subwindow*: Window;
@@ -173,25 +173,25 @@ TYPE
 				xoffset*, format*: INTEGER; data*: ADDRESS;
 				byteOrder*, bitmapUnit*, bitmapBitOrder*: INTEGER;
 				bitmapPad*, depth*, bytesPerLine*, bitsPerPixel*: INTEGER;
-				redmask*, greenmask*, bluemask*: LONGWORD;
+				redmask*, greenmask*, bluemask*: LONGINTEGER;
 				obdata*, createImage*, destroyImage*, getPixel*, putPixel*, subImage*, addPixel*: ADDRESS
 			END;
 	ErrorEvent* = RECORD
 				typ*: INTEGER;
 				display*: DisplayPtr;
 				resourceid*: ADDRESS;
-				serial*: LONGWORD;
+				serial*: LONGINTEGER;
 				errorCode*, requestCode*, minorCode*: CHAR
 	END;
 
-	Data40 * = ARRAY 5 OF LONGWORD; (* max of these is 40 bytes*)
+	Data40 * = ARRAY 5 OF LONGINTEGER; (* max of these is 40 bytes*)
 	Data40b* = ARRAY 20 OF CHAR; (* 20x 8 bits *)
 	Data40s* = ARRAY 10 OF SIGNED16; (* 10x 16 bits *)
 	Data40l* = ARRAY 5 OF SIGNED32; (* 5x 32 bits *)
 
 	ClientMessageEvent * = RECORD
 		typ* : INTEGER;
-		serial* : LONGWORD(*unsigned*);	(* # of last request processed by server *)
+		serial* : LONGINTEGER(*unsigned*);	(* # of last request processed by server *)
 		sendEvent* : BOOLEAN;	(* true if this came from a SendEvent request *)
 		display* : DisplayPtr;	(* Display the event was read from *)
 		window* : Window;
@@ -207,7 +207,7 @@ TYPE
 
 	ConfigureEvent * = RECORD
 		typ* : INTEGER;
-		serial* : LONGWORD(*unsigned*);	(* # of last request processed by server *)
+		serial* : LONGINTEGER(*unsigned*);	(* # of last request processed by server *)
 		sendEvent* : BOOLEAN;	(* true if this came from a SendEvent request *)
 		display* : DisplayPtr;	(* Display the event was read from *)
 		event* : Window;
@@ -230,17 +230,17 @@ TYPE
 TYPE
 	XSetWindowAttributes* = RECORD
 		backgroundPixmap*: Pixmap; (* background, None, or ParentRelative *)
-		backgroundPixel*: LONGWORD;(* background pixel *)
+		backgroundPixel*: LONGINTEGER;(* background pixel *)
 		borderPixmap*: Pixmap;    (* border of the window or CopyFromParent *)
-		borderPixel*: LONGWORD;(* border pixel value *)
+		borderPixel*: LONGINTEGER;(* border pixel value *)
 		bitGravity*: INTEGER;         (* one of bit gravity values *)
 		winGravity*: INTEGER;         (* one of the window gravity values *)
 		backingStore*: INTEGER;       (* NotUseful, WhenMapped, Always *)
-		backingPlanes*: LONGWORD;(* planes to be preserved if possible *)
-		backingPixel*: LONGWORD;(* value to use in restoring planes *)
+		backingPlanes*: LONGINTEGER;(* planes to be preserved if possible *)
+		backingPixel*: LONGINTEGER;(* value to use in restoring planes *)
 		saveUnder*: BOOLEAN;         (* should bits under be saved? (popups) *)
-		eventMask*:  LONGWORD;         (* set of events that should be saved *)
-		doNotPropagateMask*: LONGWORD;(* set of events that should not propagate *)
+		eventMask*:  LONGINTEGER;         (* set of events that should be saved *)
+		doNotPropagateMask*: LONGINTEGER;(* set of events that should not propagate *)
 		overrideRedirect*: BOOLEAN;  (* boolean value for override_redirect *)
 		colormap*: Colormap;       (* color map to be associated with window *)
 		cursor*: Cursor ;           (* cursor to be displayed (or None) *)
@@ -257,15 +257,15 @@ TYPE
 		bitGravity*: INTEGER;			(* one of the bit gravity values *)
 		winGravity*: INTEGER;			(* one of the window gravity values *)
 		backingStore*: INTEGER;		(* NotUseful, WhenMapped, Always *)
-		backingPlanes*: LONGWORD;		(* planes to be preserved if possible *)
-		backingPixel*: LONGWORD;		(* value to be used when restoring planes *)
+		backingPlanes*: LONGINTEGER;		(* planes to be preserved if possible *)
+		backingPixel*: LONGINTEGER;		(* value to be used when restoring planes *)
 		saveUnder*: BOOLEAN;			(* boolean, should bits under be saved? *)
 		colormap*: Colormap;			(* color map to be associated with window *)
 		mapInstalled*: BOOLEAN;		(* boolean, is color map currently installed*)
 		mapState*: INTEGER;		(* IsUnmapped, IsUnviewable, IsViewable *)
-		allEventMasks*: LONGWORD;		(* set of events all people have interest in*)
-		yourEventMask*: LONGWORD;		(* my event mask *)
-		doNotPropagateMask*: LONGWORD;	(* set of events that should not propagate *)
+		allEventMasks*: LONGINTEGER;		(* set of events all people have interest in*)
+		yourEventMask*: LONGINTEGER;		(* my event mask *)
+		doNotPropagateMask*: LONGINTEGER;	(* set of events that should not propagate *)
 		overrideRedirect*: BOOLEAN;		(* boolean value for override-redirect *)
 		screen*: ADDRESS; (*X11.Screen;*)			(* back pointer to correct screen *)
 	END;
@@ -305,7 +305,7 @@ TYPE
 		END;
 
 	TYPE XSizeHints* = RECORD
-			flags*: LONGWORD;	(* marks which fields in this structure are defined *) (* SIGNED64 ?*)
+			flags*: LONGINTEGER;	(* marks which fields in this structure are defined *) (* SIGNED64 ?*)
 			x*, y*: INTEGER;		(* obsolete for new window mgrs, but clients *)
 			width*, height*: INTEGER;	(* should set so old wm's don't mess up *)
 			minWidth*, minHeight*: INTEGER;
@@ -368,7 +368,7 @@ TYPE
 	(* To allow arbitrary information with fonts, there are additional properties returned. *)
 	FontProp* = RECORD
 		name*: Atom;
-		card32*: LONGWORD;
+		card32*: LONGINTEGER;
 	END;
 
 	FontStruct* = POINTER  {UNTRACED, UNSAFE} TO FontStructDesc;
@@ -398,7 +398,7 @@ TYPE
 		value*: ADDRESS;		(* same as Property routines *)
 		encoding*: Atom;		(* prop type *)
 		format*: INTEGER;	(* prop data format: 8, 16, or 32 *)
-		nitems*: LONGWORD;	(* number of data items in value *)
+		nitems*: LONGINTEGER;	(* number of data items in value *)
 	END;
 
 (*! ------------------- ends  Xutil.h ----------- *)
@@ -792,13 +792,13 @@ VAR
 	DefaultDepth-:			PROCEDURE {C} ( d: DisplayPtr;  screen: INTEGER ): INTEGER;
 	DisplayCells-:			PROCEDURE {C} ( d: DisplayPtr;  screen: INTEGER ): INTEGER;
 	DisplayPlanes-:			PROCEDURE {C} ( d: DisplayPtr;  screen: INTEGER ): INTEGER;
-	BlackPixel-:			PROCEDURE {C} ( d: DisplayPtr;  screen: INTEGER ): LONGWORD;
-	WhitePixel-:			PROCEDURE {C} ( d: DisplayPtr;  screen: INTEGER ): LONGWORD;
+	BlackPixel-:			PROCEDURE {C} ( d: DisplayPtr;  screen: INTEGER ): LONGINTEGER;
+	WhitePixel-:			PROCEDURE {C} ( d: DisplayPtr;  screen: INTEGER ): LONGINTEGER;
 	DefaultVisual-:			PROCEDURE {C} ( d: DisplayPtr;  screen: INTEGER ): ADDRESS;
 	DefaultColormap-:		PROCEDURE {C} ( d: DisplayPtr;  screen: INTEGER ): Colormap;
 	DefaultRootWindow-:	PROCEDURE {C} ( d: DisplayPtr ): Window;
 	CreateSimpleWindow-:	PROCEDURE {C} ( d: DisplayPtr;  parent: Window;
-													x, y, width, height, borderWidth: INTEGER; border, background: LONGWORD ): Window;
+													x, y, width, height, borderWidth: INTEGER; border, background: LONGINTEGER ): Window;
 	TranslateCoordinates-:	PROCEDURE {C} ( d: DisplayPtr;  sw, dw: Window;  srcx, srcy: INTEGER;
 													VAR dstx, dsty: INTEGER;  VAR child: Window );
 	MoveResizeWindow-:	PROCEDURE {C} ( d: DisplayPtr;  w: Window;  x, y, width, height: INTEGER );
@@ -817,26 +817,26 @@ VAR
 	CopyArea-:				PROCEDURE {C} ( d: DisplayPtr;  src, dest: Drawable;  gc: GC;
 													srcX, srcY, width, height, destX, destY: INTEGER );
 	CopyPlane-:				PROCEDURE {C} ( d: DisplayPtr;  src, dest: Drawable;  gc: GC;
-													srcX, srcY, width, height, destX, destY: INTEGER; plane: LONGWORD );
+													srcX, srcY, width, height, destX, destY: INTEGER; plane: LONGINTEGER );
 	SetStipple-:				PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  stipple: Pixmap );
 	SetTSOrigin-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  tsxorigin, tsyorigin: INTEGER );
 	DrawPoint-:				PROCEDURE {C} ( d: DisplayPtr;  w: Drawable;  gc: GC;  x, y: INTEGER );
 	FillRectangle-:			PROCEDURE {C} ( d: DisplayPtr;  w: Drawable;  gc: GC;  x, y, width, height: INTEGER );
 	DrawString-:				PROCEDURE {C} ( d: DisplayPtr;  w: Drawable;  gc: GC;  x, y: INTEGER; string: ADDRESS; length: INTEGER );
-	CreateGC-:				PROCEDURE {C} ( d: DisplayPtr;  drawable: Drawable;  valueMask: LONGWORD; values: ADDRESS ): GC;
-	SetForeground-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  foreground: LONGWORD );
-	SetBackground-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  background: LONGWORD );
+	CreateGC-:				PROCEDURE {C} ( d: DisplayPtr;  drawable: Drawable;  valueMask: LONGINTEGER; values: ADDRESS ): GC;
+	SetForeground-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  foreground: LONGINTEGER );
+	SetBackground-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  background: LONGINTEGER );
 	SetFunction-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  function: INTEGER );
 	SetFont-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  font: ADDRESS );
 	SetFillStyle-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  fill_style: INTEGER );
-	SetPlaneMask-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  mask: LONGWORD );
+	SetPlaneMask-:			PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  mask: LONGINTEGER );
 	SetGraphicsExposures-:
 								PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  graphicsExposures: Bool );
 	SetLineAttributes-:		PROCEDURE {C} ( d: DisplayPtr;  gc: GC;  lineWidth, lineStyle, capStyle, joinStyle: INTEGER );
-	AllocColorCells-:		PROCEDURE {C} ( d: DisplayPtr;  cmap: Colormap;  contig: Bool;  VAR planeMasks: LONGWORD;
-													nplanes: INTEGER;  VAR pixels: LONGWORD;  ncolors: INTEGER ): INTEGER;
+	AllocColorCells-:		PROCEDURE {C} ( d: DisplayPtr;  cmap: Colormap;  contig: Bool;  VAR planeMasks: LONGINTEGER;
+													nplanes: INTEGER;  VAR pixels: LONGINTEGER;  ncolors: INTEGER ): INTEGER;
 	SetWindowBackground-:
-								PROCEDURE {C} ( d: DisplayPtr;  w: Window;  pixel: LONGWORD );
+								PROCEDURE {C} ( d: DisplayPtr;  w: Window;  pixel: LONGINTEGER );
 	CreateFontCursor-:		PROCEDURE {C} ( d: DisplayPtr;  shape: INTEGER ): Cursor;
 	CreatePixmapCursor-:	PROCEDURE {C} ( d: DisplayPtr;  csource, cmask: Pixmap;
 													VAR cfore, cback: Color;  xhot, yhot: INTEGER ): Cursor;
@@ -854,7 +854,7 @@ VAR
 	ListFonts-:				PROCEDURE {C} ( d: DisplayPtr;  pattern: ADDRESS; maxnames: INTEGER; VAR count: INTEGER ): ADDRESS;
 	FreeFontNames-:		PROCEDURE {C} ( list: ADDRESS );
 	LoadFont-:				PROCEDURE {C} ( d: DisplayPtr;  name: ADDRESS ): INTEGER;
-	SelectInput-:				PROCEDURE {C} ( d: DisplayPtr;  w: Window;  eventMask: LONGWORD );
+	SelectInput-:				PROCEDURE {C} ( d: DisplayPtr;  w: Window;  eventMask: LONGINTEGER );
 	NextEvent-:				PROCEDURE {C} ( d: DisplayPtr;  VAR event: Event );
 	EventsQueued-:			PROCEDURE {C} ( d: DisplayPtr;  mode: INTEGER ): INTEGER;
 	SetInputFocus-:			PROCEDURE {C} ( d: DisplayPtr;  focus: Window;  revertTo: INTEGER;  time: Time );
@@ -884,15 +884,15 @@ VAR
 	DestroyImage-:			PROCEDURE {C} ( image: Image );
 	SubImage-:				PROCEDURE {C} ( image: Image;  x, y, width, height: INTEGER ): Image;
 	GetImage-:				PROCEDURE {C} ( d: DisplayPtr;  drawable: Drawable;
-													x, y, width, height: INTEGER; planeMask: LONGWORD; format: INTEGER ): Image;
+													x, y, width, height: INTEGER; planeMask: LONGINTEGER; format: INTEGER ): Image;
 	GetSubImage-:			PROCEDURE {C} ( d: DisplayPtr;  drawable: Drawable;
-													x, y, width, height: INTEGER; planeMask: LONGWORD; format: INTEGER;  dstImage: Image;
+													x, y, width, height: INTEGER; planeMask: LONGINTEGER; format: INTEGER;  dstImage: Image;
 													dstX, dstY: INTEGER ): Image;
 	PutImage-:				PROCEDURE {C} ( d: DisplayPtr;  drawable: Drawable;  gc: GC;  image: Image;
 													srcX, srcY, dstX, dstY, width, height: INTEGER );
-	PutPixel-:				PROCEDURE {C} ( image: Image;  x, y: INTEGER; pixel: LONGWORD ): INTEGER;
-	GetPixel-:				PROCEDURE {C} ( image: Image;  x, y: INTEGER ): LONGWORD;
-	AddPixel-:				PROCEDURE {C} ( image: Image;  value: LONGWORD );
+	PutPixel-:				PROCEDURE {C} ( image: Image;  x, y: INTEGER; pixel: LONGINTEGER ): INTEGER;
+	GetPixel-:				PROCEDURE {C} ( image: Image;  x, y: INTEGER ): LONGINTEGER;
+	AddPixel-:				PROCEDURE {C} ( image: Image;  value: LONGINTEGER );
 	Free-:						PROCEDURE {C} ( data: ADDRESS );
 (*	SetErrorHandler-:		PROCEDURE {C} ( handler: ErrorHandler );	*)
 	GetErrorText-:			PROCEDURE {C} ( d: DisplayPtr;  errcode: INTEGER; VAR buf: ARRAY OF CHAR; length: INTEGER );
@@ -901,15 +901,15 @@ VAR
 	SetSelectionOwner-:	PROCEDURE {C} ( d: DisplayPtr;  selection: Atom;  owner: Window;  time: Time );
 	GetSelectionOwner-:	PROCEDURE {C} ( d: DisplayPtr;  selection: Atom ): Window;
 	InternAtom-:				PROCEDURE {C} ( d: DisplayPtr;  CONST name: ARRAY OF CHAR;  onlyifexists: Bool ): Atom;
-	SendEvent-:				PROCEDURE {C} ( d: DisplayPtr;  w: Window;  propagate: Bool;  eventmask: LONGWORD;  event: ADDRESS );
+	SendEvent-:				PROCEDURE {C} ( d: DisplayPtr;  w: Window;  propagate: Bool;  eventmask: LONGINTEGER;  event: ADDRESS );
 	ConvertSelection-:		PROCEDURE {C} ( d: DisplayPtr;  selection, target, property: Atom;
 													requestor: Window;  timestamp: Time );
 	ChangeProperty-:		PROCEDURE {C} ( d: DisplayPtr;  w: Window;  property, typ: Atom;
 													format, mode: INTEGER; data: ADDRESS; nelements: INTEGER );
 	GetWindowProperty-:
 								PROCEDURE {C} ( d: DisplayPtr;  w: Window;  property: Atom;
-													offset, length: LONGWORD;  delete: Bool;  reqtype: Atom;  VAR typ: Atom;
-													VAR format: INTEGER; VAR nitems, bytesafter: LONGWORD;  VAR prop: ADDRESS );
+													offset, length: LONGINTEGER;  delete: Bool;  reqtype: Atom;  VAR typ: Atom;
+													VAR format: INTEGER; VAR nitems, bytesafter: LONGINTEGER;  VAR prop: ADDRESS );
 	DeleteProperty-:			PROCEDURE {C} ( d: DisplayPtr;  w: Window;  property: Atom );
 	WarpPointer-:			PROCEDURE {C} ( d: DisplayPtr;  srcwin, dstwin: Window;  srcx, srcy, srcw, srch, dstx, dsty: INTEGER );
 	InstallColormap-:		PROCEDURE {C} ( d: DisplayPtr;  cmap: Colormap );
@@ -921,7 +921,7 @@ VAR
 	InitXErrorHandlers-:		PROCEDURE {C} ( eh: ErrorHandler; ioeh: IOErrorHandler );
 
 	CloseDisplay- : PROCEDURE {C} (display:DisplayPtr): INTEGER;
-	CreateWindow- : PROCEDURE {C} (display: DisplayPtr; parent: Window; x, y: INTEGER; width, height, borderWidth, depth, class: INTEGER; visual: VisualPtr; valuemask: LONGWORD;  VAR attributes: XSetWindowAttributes ): Window;
+	CreateWindow- : PROCEDURE {C} (display: DisplayPtr; parent: Window; x, y: INTEGER; width, height, borderWidth, depth, class: INTEGER; visual: VisualPtr; valuemask: LONGINTEGER;  VAR attributes: XSetWindowAttributes ): Window;
 	DestroyWindow-: PROCEDURE {C}(display:DisplayPtr; win: Window): INTEGER;
 	DisplayWidthMM-: PROCEDURE {C} (d: DisplayPtr; screen: INTEGER ): INTEGER;
 	FreeColormap- : PROCEDURE {C} (display: DisplayPtr; colormap: Colormap);
@@ -953,10 +953,10 @@ VAR
 	ClearSelection*: PROCEDURE {DELEGATE} ;
 
 	CheckTypedEvent-: PROCEDURE {C} (display: DisplayPtr; eventType: INTEGER; VAR event: Event): Bool;
-	CheckMaskEvent-: PROCEDURE {C} (display: DisplayPtr; eventMask: LONGWORD; VAR event: Event): Bool;
+	CheckMaskEvent-: PROCEDURE {C} (display: DisplayPtr; eventMask: LONGINTEGER; VAR event: Event): Bool;
 
 	CheckTypedWindowEvent-: PROCEDURE {C} (display: DisplayPtr; window: Window; eventType: INTEGER; VAR event: Event): Bool;
-	CheckWindowEvent-: PROCEDURE {C} (display: DisplayPtr; window: Window; eventMask: LONGWORD; VAR event: Event): Bool;
+	CheckWindowEvent-: PROCEDURE {C} (display: DisplayPtr; window: Window; eventMask: LONGINTEGER; VAR event: Event): Bool;
 
 	(* Font *)
 	LoadQueryFont-: PROCEDURE {C} (display: DisplayPtr; name: ADDRESS): FontStruct;

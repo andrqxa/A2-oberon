@@ -269,13 +269,13 @@ TYPE
 	(*------------------------------------------------------------------*)
 
 TYPE
-	dev_t*		= LONGWORD;
-	ino_t*		= LONGWORD;
+	dev_t*		= LONGINTEGER;
+	ino_t*		= LONGINTEGER;
 	nlink_t*	= INTEGER;
 	mode_t*	= INTEGER;
-	off_t*		= LONGWORD;
+	off_t*		= LONGINTEGER;
 	blksize_t*= INTEGER;
-	blkcnt_t*	= LONGWORD;
+	blkcnt_t*	= LONGINTEGER;
 	uid_t*		= INTEGER;
 	gid_t*		= INTEGER;
 	pid_t*		= INTEGER;
@@ -308,13 +308,13 @@ TYPE
 				uid-		: INTEGER;
 				gid-		: INTEGER;
 				rdev-		: dev_t;
-				size-		: LONGWORD;
+				size-		: LONGINTEGER;
 				atime-	: Timeval;
 				mtime-	: Timeval;
 				ctime-	: Timeval;
 				blksize-	: INTEGER;
 				pad0		: INTEGER;
-				blocks-	: LONGWORD;
+				blocks-	: LONGINTEGER;
 				fstype-	: ARRAY 16 OF CHAR
 		#ELSE
 			unimplemented
@@ -323,8 +323,8 @@ TYPE
 
 
 	Timeval* = RECORD
-				sec*	: LONGWORD;
-				usec*	: LONGWORD
+				sec*	: LONGINTEGER;
+				usec*	: LONGINTEGER
 			END;
 
 	TmPtr* = POINTER TO Tm;
@@ -369,12 +369,12 @@ TYPE
 
 	Ucontext* = POINTER TO UcontextDesc;
 	UcontextDesc* = RECORD
-				flags-		: LONGWORD;
+				flags-		: LONGINTEGER;
 				link-		: ADDRESS;
 				sigmask-	: Sigset;
 				stack-	: Stack;
 			#IF AMD64 THEN
-				pad: LONGWORD;		(* force proper alignment of 'mc' *)
+				pad: LONGINTEGER;		(* force proper alignment of 'mc' *)
 			#END
 				mc-		: McontextDesc;
 			END;
@@ -800,8 +800,8 @@ VAR
 	PROCEDURE ThrSleep*( ms: SIGNED32 );
 	VAR
 		sltime, rem: RECORD
-			tv_sec: LONGWORD;        (* seconds *)
-         		tv_nsec: LONGWORD;       (* nanoseconds *)
+			tv_sec: LONGINTEGER;        (* seconds *)
+         		tv_nsec: LONGINTEGER;       (* nanoseconds *)
      	END;
 	BEGIN
 		sltime.tv_sec := ms DIV 1000;
@@ -813,11 +813,11 @@ VAR
 	END ThrSleep;
 
 
-	PROCEDURE NanoSleep*( ns: LONGWORD );
+	PROCEDURE NanoSleep*( ns: LONGINTEGER );
 	VAR
 		sltime, rem: RECORD
-			tv_sec: LONGWORD;        (* seconds *)
-			tv_nsec: LONGWORD;       (* nanoseconds *)
+			tv_sec: LONGINTEGER;        (* seconds *)
+			tv_nsec: LONGINTEGER;       (* nanoseconds *)
      	END;
 	BEGIN {UNTRACKED}
 		sltime.tv_sec := ns DIV 1000000000;

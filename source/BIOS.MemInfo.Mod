@@ -102,7 +102,7 @@ BEGIN
 	KernelLog.String(s); KernelLog.Char("="); KernelLog.Bits(x, ofs, n)
 END Bits;
 
-PROCEDURE -RealReadMSR(msr: LONGWORD; VAR low, high: SET);
+PROCEDURE -RealReadMSR(msr: LONGINTEGER; VAR low, high: SET);
 CODE
 #IF I386 THEN
 	POP EDI

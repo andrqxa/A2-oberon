@@ -348,7 +348,7 @@ CONST
 		c: CHAR;
 		s: SIGNED8; i: SIGNED16; l: SIGNED32; h: SIGNED64;
 		sz: SIZE; a, pc: ADDRESS;
-		word: INTEGER; lword: LONGWORD;
+		word: INTEGER; lword: LONGINTEGER;
 		s8: SIGNED8; s16: SIGNED16; s32: SIGNED32; s64: SIGNED64;
 		u8: UNSIGNED8; u16: UNSIGNED16; u32: UNSIGNED32;
 		r: FLOAT32; x: FLOAT64;
@@ -394,7 +394,7 @@ CONST
 			size := SIZEOF(INTEGER);
 			SYSTEM.GET(adr, word); Signed(word);
 		| sfTypeLONGWORD:
-			size := SIZEOF(LONGWORD);
+			size := SIZEOF(LONGINTEGER);
 			SYSTEM.GET(adr, lword); Signed(lword);
 		| sfTypeSIGNED8:
 			size := SIZEOF(SIGNED8);
@@ -1107,7 +1107,7 @@ TYPE
 		| sfTypeLONGINT: w.String("SIGNED32");
 		| sfTypeHUGEINT: w.String("SIGNED64");
 		| sfTypeWORD: w.String("INTEGER");
-		| sfTypeLONGWORD: w.String("LONGWORD");
+		| sfTypeLONGWORD: w.String("LONGINTEGER");
 		| sfTypeSIGNED8: w.String("SIGNED8");
 		| sfTypeSIGNED16: w.String("SIGNED16");
 		| sfTypeSIGNED32: w.String("SIGNED32");

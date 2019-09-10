@@ -276,12 +276,12 @@ TYPE
 
 TYPE
 	dev_t*		= SIGNED64;
-	ino_t*		= LONGWORD;
-	nlink_t*	= LONGWORD;
+	ino_t*		= LONGINTEGER;
+	nlink_t*	= LONGINTEGER;
 	mode_t*	= INTEGER;
-	off_t*		= LONGWORD;
-	blksize_t*= LONGWORD;
-	blkcnt_t*	= LONGWORD;
+	off_t*		= LONGINTEGER;
+	blksize_t*= LONGINTEGER;
+	blkcnt_t*	= LONGINTEGER;
 	uid_t*		= SIGNED32;
 	gid_t*		= SIGNED32;
 	pid_t*		= SIGNED32;
@@ -321,12 +321,12 @@ TYPE
 			#ELSE
 				unimplemented
 			#END
-				reserved	: ARRAY 3 OF LONGWORD;
+				reserved	: ARRAY 3 OF LONGINTEGER;
 		END;
 	tvPtr* = POINTER {UNSAFE, UNTRACED} TO Timeval;
 	Timeval* = RECORD
-				sec*	: LONGWORD;
-				usec*	: LONGWORD;
+				sec*	: LONGINTEGER;
+				usec*	: LONGINTEGER;
 			END;
 
 	TmPtr* = POINTER {UNSAFE, UNTRACED} TO Tm;
@@ -348,8 +348,8 @@ TYPE
 			END;
 
 	Timespec* = RECORD
-		tv_sec*: LONGWORD;
-		tv_nsec*: LONGWORD;
+		tv_sec*: LONGINTEGER;
+		tv_nsec*: LONGINTEGER;
 	END;
 
 CONST
@@ -470,7 +470,7 @@ VAR
 		sysname-, nodename-, release-, version-, machine-: ARRAY 65 OF CHAR;
 	END;
 
-	sysconf: PROCEDURE {C} (name: INTEGER):LONGWORD;
+	sysconf: PROCEDURE {C} (name: INTEGER):LONGINTEGER;
 
 	pthread_mutex_init: PROCEDURE {C} (mutex: ADDRESS; mutexattr: ADDRESS): INTEGER;
 	pthread_mutex_destroy: PROCEDURE {C} (mutex: ADDRESS): INTEGER;
@@ -615,7 +615,7 @@ VAR
 
 
 
-	PROCEDURE getnprocs* (): LONGWORD;
+	PROCEDURE getnprocs* (): LONGINTEGER;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		RETURN sysconf( 0x54 ); (*0x53 for number of processors configured, 0x54 for number of processors online *)
 	END getnprocs;
@@ -811,8 +811,8 @@ VAR
 	PROCEDURE ThrSleep*(ms: SIGNED32);
 	VAR
 		sltime,rem: RECORD
-			tv_sec: LONGWORD;        (* seconds *)
-			tv_nsec: LONGWORD;       (* nanoseconds *)
+			tv_sec: LONGINTEGER;        (* seconds *)
+			tv_nsec: LONGINTEGER;       (* nanoseconds *)
      	END;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
 		sltime.tv_sec := ms DIV 1000;
@@ -823,11 +823,11 @@ VAR
 		END;
 	END ThrSleep;
 
-	PROCEDURE NanoSleep*(ns: LONGWORD);
+	PROCEDURE NanoSleep*(ns: LONGINTEGER);
 	VAR
 		sltime,rem: RECORD
-			tv_sec: LONGWORD;        (* seconds *)
-			tv_nsec: LONGWORD;       (* nanoseconds *)
+			tv_sec: LONGINTEGER;        (* seconds *)
+			tv_nsec: LONGINTEGER;       (* nanoseconds *)
      	END;
 	BEGIN {UNCOOPERATIVE, UNCHECKED, UNTRACKED}
 		sltime.tv_sec := ns DIV 1000000000;

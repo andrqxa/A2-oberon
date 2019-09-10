@@ -275,7 +275,7 @@ TYPE
 
 TYPE
 	dev_t*		= INTEGER;
-	ino_t*		= LONGWORD;
+	ino_t*		= LONGINTEGER;
 	nlink_t*	= SIGNED16;
 	mode_t*	= SIGNED16;
 	off_t*		= SIGNED64;
@@ -331,8 +331,8 @@ TYPE
 
 	tvPtr* = POINTER TO Timeval;
 	Timeval* = RECORD
-				sec*		: LONGWORD;
-				usec*		: LONGWORD
+				sec*		: LONGINTEGER;
+				usec*		: LONGINTEGER
 			END;
 
 
@@ -800,8 +800,8 @@ VAR
 	PROCEDURE ThrSleep*(ms: SIGNED32);
 	VAR
 		sltime,rem: RECORD
-			tv_sec: LONGWORD;        (* seconds *)
-			tv_nsec: LONGWORD;       (* nanoseconds *)
+			tv_sec: LONGINTEGER;        (* seconds *)
+			tv_nsec: LONGINTEGER;       (* nanoseconds *)
      	END;
 	BEGIN
 		sltime.tv_sec := ms DIV 1000;
@@ -812,11 +812,11 @@ VAR
 		END;
 	END ThrSleep;
 
-	PROCEDURE NanoSleep*( ns: LONGWORD );
+	PROCEDURE NanoSleep*( ns: LONGINTEGER );
 	VAR
 		sltime, rem: RECORD
-			tv_sec: LONGWORD;        (* seconds *)
-			tv_nsec: LONGWORD;       (* nanoseconds *)
+			tv_sec: LONGINTEGER;        (* seconds *)
+			tv_nsec: LONGINTEGER;       (* nanoseconds *)
      	END;
 	BEGIN {UNTRACKED}
 		sltime.tv_sec := ns DIV 1000000000;
