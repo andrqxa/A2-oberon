@@ -1,0 +1,55 @@
+
+stages:
+  - build
+  - test
+
+default:
+  image: debian:latest
+  before_script:
+    - echo "before script"
+    - apt-get update
+    - apt-get install zip -y
+buildLinuxARM:
+  stage: build
+  script:
+    - unzip Linux64.zip
+    - cd build
+    - ./build.sh LinuxARM
+  cache:
+    paths:
+  artifacts:
+    paths:
+      - LinuxARM.zip
+
+buildLinuxAMD:
+  stage: build
+  script:
+    - unzip Linux64.zip
+    - cd build
+    - ./build.sh Linux32
+    - ./build.sh Linux64
+  cache:
+    paths:
+  artifacts:
+    paths:
+      - Linux32.zip
+      - Linux64.zip
+
+buildWinAMD:
+  stage: build
+  script:
+    - unzip Linux64.zip
+    - cd build
+    - ./build.sh Win32
+    - ./build.sh Win64
+  cache:
+    paths:
+  artifacts:
+    paths:
+      - Win32.zip
+      - Win64.zip
+
+test:
+  stage: test
+  script:
+      - ls -la LinuxARM.zip
