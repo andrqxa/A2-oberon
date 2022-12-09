@@ -52,4 +52,5 @@ buildWinAMD:
 test:
   stage: test
   script:
-      - ls -la LinuxARM.zip
+      - echo "Artifacts generated:"
+      - ls -la *.zip
