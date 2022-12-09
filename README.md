@@ -11,7 +11,7 @@ Note that in order to keep size of the repository reasonable, we do not commmit 
 
 If you cannot or do not want to install LFS for git, you need to download the corresponding zip file from this gitlab website because then git is downloading only a stub of the files. You can identify this with file sizes: if the zip files in the root directory of this project are a few bytes small, then you do not have lfs installed.
 
-Please inform me, if you need developer-access to the repository.
+Please inform me, if you need developer-access to the repository, if you observe missing files, or if you, in general, want to help setting this up.
 
 ## Active Object System (AOS aka A2) SVN repository (before 9.12.2022)
 
@@ -24,4 +24,4 @@ svn checkout --username infsvn.anonymous --password anonymous https://svn-dept.i
 
 ## Build Server
 
-The previously existing build-server is being replaced by the CI/CD pipeline in this gitlab. Currently, the pipeline builds the binaries for each commit in a zip file. The zip-files comprise the most-recent binaries and can be downloaded from the pipeline artifacts. More will follow. 
+The previously existing build-server is being replaced by the CI/CD pipeline in this gitlab. Currently, the pipeline builds the binaries for each commit in a zip file. The zip-files comprise the most-recent binaries and can be downloaded from the pipeline artifacts. More tests will follow. 
