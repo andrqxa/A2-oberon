@@ -1,0 +1,17 @@
+BASS A2 OS (WinA2, LinuxA2, DarwinA2) Wrapper
+
+Installation in Darwin:
+
+1. Copy BASS folder, for example, to desktop
+2. Start shell, get admin rights
+	sudo -s
+3. Copy libbass.dylib into /usr/lib
+	cp Desktop/BASS/libbass.dylib /usr/lib/libbass.dylib
+4. Check rights
+	cd /usr/lib
+	ls -l libbass.dylib
+change if needed
+	chmod 777 libbass.dylib
+4. Go to working directory and run Aos
+	cd /Users/User/Desktop/BASS
+	aos

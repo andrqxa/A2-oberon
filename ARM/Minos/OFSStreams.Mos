@@ -1,0 +1,73 @@
+MODULE OFSStreams;
+(**
+	AUTHOR Timothée Martiel, 01/2016
+	PURPOSE Streams for OFS files.
+*)
+
+IMPORT
+	Trace,
+	StreamReaders, StreamWriters, OFS;
+
+TYPE
+	Reader * = RECORD (StreamReaders.Reader)
+		rider *: OFS.Rider;
+	END;
+
+	Writer * = RECORD (StreamWriters.Writer)
+		rider *: OFS.Rider;
+	END;
+
+	PROCEDURE OpenReader * (VAR reader: Reader; size: SIZE; file: OFS.File);
+	BEGIN
+		StreamReaders.Init(reader, Receive, size);
+		OFS.Set(reader.rider, file, 0)
+	END OpenReader;
+
+	PROCEDURE OpenWriter * (VAR writer: Writer; size: SIZE; file: OFS.File);
+	BEGIN
+		StreamWriters.Init(writer, Send, size);
+		OFS.Set(writer.rider, file, 0)
+	END OpenWriter;
+
+	PROCEDURE SetReaderPos * (VAR reader: Reader; pos: StreamReaders.Position);
+	BEGIN
+		OFS.Set(reader.rider, reader.rider.file, pos)
+	END SetReaderPos;
+
+	PROCEDURE SetWriterPos * (VAR writer: Writer; pos: StreamWriters.Position);
+	BEGIN
+		OFS.Set(writer.rider, writer.rider.file, pos)
+	END SetWriterPos;
+
+	PROCEDURE ReaderPos * (VAR reader: Reader): StreamReaders.Position;
+	BEGIN
+		RETURN OFS.Pos(reader.rider)
+	END ReaderPos;
+
+	PROCEDURE WriterPos * (VAR writer: Writer): StreamWriters.Position;
+	BEGIN
+		RETURN OFS.Pos(writer.rider)
+	END WriterPos;
+
+	PROCEDURE Send (VAR writer: StreamWriters.Writer; CONST buf: ARRAY OF CHAR;  ofs, len: SIZE;  propagate: BOOLEAN;  VAR res: INTEGER);
+	BEGIN
+		WHILE len > 0 DO
+			OFS.Write(writer(Writer).rider, buf[ofs]);
+			INC(ofs);
+			DEC(len)
+		END
+	END Send;
+
+	PROCEDURE Receive (VAR reader: StreamReaders.Reader; VAR buf: ARRAY OF CHAR;  ofs, size, min: SIZE;  VAR len: SIZE; VAR res: INTEGER);
+	BEGIN
+		len := 0;
+		WHILE ((min > 0) OR ~reader(Reader).rider.eof) & (size > 0) DO
+			OFS.Read(reader(Reader).rider, buf[ofs]);
+			INC(ofs);
+			INC(len);
+			DEC(min);
+			DEC(size)
+		END
+	END Receive;
+	
+END OFSStreams.

@@ -1,0 +1,1 @@
+MODULE Startup;(*@	001 2009-12-26 jc: Initial version for Minos*)	IMPORT Minos, UartLoader, ProcessMonitor, Trace;VAR		BEGIN	(* start the process monitor, that will take care of starting up the rest of the system *)	Trace.StringLn("ProcessMonitor.Start()");	ProcessMonitor.Start();		Trace.StringLn("Minos.FinishStartup()");	Minos.FinishStartUp();	END Startup.

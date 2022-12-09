@@ -1,0 +1,1 @@
+MODULE UartConstants;	CONST 			SETBAUDRATE* 	= 4;		SETPARITY* 		= 5;		SETDATABITS* 	= 6;		SETINVERTED*	= 7;		SETSTOPBITS*		= 3;				PNONE* 			= 0;  		PODD* 			= 8;  		PEVEN* 			= 24;  		PFORCE1* 			= 40;  		PFORCE0* 			= 56;  		BEGIN END UartConstants.
