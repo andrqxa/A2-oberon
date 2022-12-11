@@ -54,3 +54,10 @@ test:
   script:
       - echo "Artifacts generated:"
       - ls -la *.zip
+      - rm -r Linux64
+      - unzip -q Linux64.zip
+      - cd Linux64
+      - ./oberon do "
+      System.DoFile oberon.ini ~ 
+      FoxTest.Compile -l=Test.Log  Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~
+      "
