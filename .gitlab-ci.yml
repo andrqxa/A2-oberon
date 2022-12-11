@@ -58,6 +58,6 @@ test:
       - unzip -q Linux64.zip
       - cd Linux64
       - ./oberon do "
-      System.DoFile oberon.ini ~ 
-      FoxTest.Compile -l=Test.Log  Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~
-      "
+        System.DoFile oberon.ini ~ 
+        FoxTest.Compile -l=Test.Log  Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~
+        "
