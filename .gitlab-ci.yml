@@ -54,7 +54,6 @@ test:
   script:
       - echo "Artifacts generated:"
       - ls -la *.zip
-      - rm -r Linux64
       - unzip -q Linux64.zip
       - cd Linux64
       - ./oberon do "
