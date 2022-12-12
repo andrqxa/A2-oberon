@@ -59,4 +59,5 @@ test:
       - ./oberon do "
         System.DoFile oberon.ini ~ 
         FoxTest.Compile -l=Test.Log  Oberon.Compilation.Test Oberon.Compilation.AMD64TestDiff ~
+        FoxTest.Compile	-l=Test.Log Oberon.Execution.Test Oberon.Execution.AMD64TestDiff ~
         "
