@@ -279,8 +279,7 @@ BEGIN
 	valueStr := element.GetAttributeValue(attributeName);
 	IF (valueStr # NIL) THEN
 		Strings.TrimWS(valueStr^);
-		Strings.StrToInt(valueStr^, value);
-		RETURN TRUE;
+		RETURN Strings.TryParseInt32(valueStr^, value);
 	ELSE
 		RETURN FALSE;
 	END;

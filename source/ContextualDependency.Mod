@@ -1,7 +1,7 @@
 MODULE ContextualDependency; (** AUTHOR "gubsermi"; PURPOSE "Resolve context dependency rules"; *)
 
 IMPORT
-	Files, KernelLog, Configuration, Texts, Strings,
+	Files, KernelLog, Configuration, Texts, Strings, UTF8Strings,
 	XML, XMLObjects, XMLParser, XMLScanner, Streams;
 
 CONST
@@ -797,9 +797,9 @@ TYPE
 								(* get the target character *)
 								charString := charElement.GetAttributeValue(CodeAttribute);
 								IF base16 THEN
-									Strings.HexStrToInt(charString^,charCode(SIGNED32),res);
+									UTF8Strings.HexStrToChar32(charString^,charCode,res);
 								ELSE
-									Strings.StrToInt(charString^,charCode(SIGNED32));
+									UTF8Strings.StrToChar32(charString^,charCode);
 								END;
 
 								(* load only the context rules for the currently considered character (lazy loading) *)
@@ -952,9 +952,9 @@ TYPE
 														ELSIF tagName^ = ResultTag THEN
 															resultAttribute := rangeElement.GetAttributeValue(CodeAttribute);
 															IF base16 THEN
-																Strings.HexStrToInt(resultAttribute^,newContext.resultingChar(SIGNED32),res);
+																UTF8Strings.HexStrToChar32(resultAttribute^,newContext.resultingChar,res);
 															ELSE
-																Strings.StrToInt(resultAttribute^,newContext.resultingChar(SIGNED32));
+																UTF8Strings.StrToChar32(resultAttribute^,newContext.resultingChar);
 															END;
 
 															(* a Zero defines the Zero-Width Space, which is used to simulate

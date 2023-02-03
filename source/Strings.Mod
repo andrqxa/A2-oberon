@@ -4,6 +4,12 @@ IMPORT RC := RealConversions;
 
 CONST
 	Ok* = 0;
+	SyntaxError* = 1;
+	BaseError* = 2;
+	RangeError* = 3;
+
+	radix10 = 10;
+	radix16 = 16;
 
 TYPE
 	String* = POINTER TO ARRAY OF CHAR;
@@ -517,6 +523,350 @@ BEGIN
 	s[j] := 0X;
 END IntToStr;
 
+PROCEDURE TryScanUInt32At*(VAR pos: SIZE; CONST number: ARRAY OF CHAR; base: UNSIGNED32; VAR value: UNSIGNED32; VAR res: INTEGER): BOOLEAN;
+VAR len := LEN(number): SIZE; answer := 0: UNSIGNED32;
+	d := 0: SIGNED32; c: CHAR; hasPrefix := FALSE: BOOLEAN;
+BEGIN
+	IF (pos >= len) OR (number[pos] = 0X) THEN
+		res := SyntaxError;
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	IF base = 0 THEN
+		base := 10;
+		IF (number[pos] = '0') & (pos + 2 <= len) THEN
+			c := number[pos+1];
+			IF c = 'b' THEN
+				INC(pos, 2); base := 2; hasPrefix := TRUE;
+			ELSIF c = 'o' THEN
+				INC(pos, 2); base := 8; hasPrefix := TRUE;
+			ELSIF c = 'x' THEN
+				INC(pos, 2); base := 16; hasPrefix := TRUE;
+			END;
+			IF (number[pos] = "'") & (pos + 1 < len) & IsDigit(number[pos+1], base, d) THEN INC(pos); END;
+		END;
+	ELSIF (base < 2) OR (base > 16) THEN
+		res := BaseError;
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	IF (pos >= len) OR ~IsDigit(number[pos], base, d) THEN
+		res := SyntaxError;
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	answer := d; INC(pos);
+	LOOP
+		c := number[pos];
+		IF IsDigit(c, base, d) THEN
+			IF answer > MAX(UNSIGNED32) DIV UNSIGNED32(base) THEN
+				res := RangeError;
+				value := MAX(UNSIGNED32);
+				RETURN FALSE;
+			END;
+
+			answer := answer * base;
+			VAR try := answer + UNSIGNED32(d);
+			IF (try < answer) THEN
+				res := RangeError;
+				value := MAX(UNSIGNED32);
+				RETURN FALSE;
+			END;
+			answer := try;
+		ELSIF (c = "'") THEN
+			IF ((pos + 1 >= len) OR ~IsDigit(number[pos+1], base, d)) THEN
+				res := SyntaxError;
+				value := 0;
+				RETURN FALSE;
+			END;
+		ELSE
+			EXIT;
+		END;
+		INC(pos);
+	END;
+	IF (base = 16) & ~hasPrefix & (number[pos] = "H") THEN INC(pos); END;
+
+	value := answer;
+	res := Ok;
+	RETURN TRUE;
+END TryScanUInt32At;
+
+PROCEDURE TryScanInt32At*(VAR pos: SIZE; CONST number: ARRAY OF CHAR; base: UNSIGNED32; VAR value: SIGNED32; VAR res: INTEGER): BOOLEAN;
+VAR answer: UNSIGNED32; isNegative := number[pos] = '-': BOOLEAN;
+BEGIN
+	IF isNegative OR (number[pos] = "+") THEN INC(pos); END;
+	value := 0;
+
+	IF TryScanUInt32At(pos, number, base, answer, res) THEN
+		IF isNegative & (answer > UNSIGNED32(MIN(SIGNED32))) THEN
+			res := RangeError;
+			value := MIN(SIGNED32);
+		ELSIF ~isNegative & (answer >= UNSIGNED32(MIN(SIGNED32))) THEN
+			res := RangeError;
+			value := MAX(SIGNED32);
+		ELSIF ~isNegative THEN
+			value := SIGNED32(answer);
+		ELSE
+			value := -SIGNED32(answer);
+		END;
+	END;
+	RETURN res = Ok;
+END TryScanInt32At;
+
+PROCEDURE TryScanUInt64At*(VAR pos: SIZE; CONST number: ARRAY OF CHAR; base: UNSIGNED32; VAR value: UNSIGNED64; VAR res: INTEGER): BOOLEAN;
+VAR len := LEN(number): SIZE; answer := 0: UNSIGNED64;
+	d := 0: SIGNED32; c: CHAR; hasPrefix := FALSE: BOOLEAN;
+BEGIN
+	IF base = 0 THEN
+		base := 10;
+		IF (number[pos] = '0') & (pos + 2 <= len) THEN
+			c := number[pos+1];
+			IF c = 'b' THEN
+				INC(pos, 2); base := 2; hasPrefix := TRUE;
+			ELSIF c = 'o' THEN
+				INC(pos, 2); base := 8; hasPrefix := TRUE;
+			ELSIF c = 'x' THEN
+				INC(pos, 2); base := 16; hasPrefix := TRUE;
+			END;
+			IF (number[pos] = "'") & (pos + 1 < len) & IsDigit(number[pos+1], base, d) THEN INC(pos); END;
+		END;
+	ELSIF (base < 2) OR (base > 16) THEN
+		res := BaseError;
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	IF (pos >= len) OR ~IsDigit(number[pos], base, d) THEN (* ""|"0b/0o/0x"|"0b'/0o'/0x'" ...*)
+		res := SyntaxError;
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	answer := d; INC(pos);
+	LOOP
+		c := number[pos];
+		IF IsDigit(c, base, d) THEN
+			IF answer > MAX(UNSIGNED64) DIV base THEN
+				res := RangeError;
+				value := MAX(UNSIGNED64);
+				RETURN FALSE;
+			END;
+
+			answer := answer * base;
+			VAR try := answer + UNSIGNED32(d);
+			IF (try < answer) THEN
+				res := RangeError;
+				value := MAX(UNSIGNED64);
+				RETURN FALSE;
+			END;
+			answer := try;
+		ELSIF (c = "'") THEN
+			IF ((pos + 1 >= len) OR ~IsDigit(number[pos+1], base, d)) THEN
+				res := SyntaxError;
+				value := 0;
+				RETURN FALSE;
+			END;
+		ELSE
+			EXIT;
+		END;
+		INC(pos);
+	END;
+	IF (base = 16) & ~hasPrefix & (number[pos] = "H") THEN INC(pos); END;
+
+	res := Ok;
+	value := answer;
+	RETURN TRUE;
+END TryScanUInt64At;
+
+PROCEDURE TryScanInt64At*(VAR pos: SIZE; CONST number: ARRAY OF CHAR; base: UNSIGNED32; VAR value: SIGNED64; VAR res: INTEGER): BOOLEAN;
+CONST maxValue = UNSIGNED64(MIN(SIGNED64));
+VAR answer: UNSIGNED64; isNegative := number[pos] = '-': BOOLEAN;
+BEGIN
+	IF isNegative OR (number[pos] = "+") THEN INC(pos); END;
+	value := 0;
+
+	IF TryScanUInt64At(pos, number, base, answer, res) THEN
+		IF isNegative & (answer > maxValue) THEN
+			res := RangeError;
+			value := -SIGNED64(maxValue);
+		ELSIF ~isNegative & (answer >= maxValue) THEN
+			res := RangeError;
+			value := SIGNED64(maxValue - 1);
+		ELSIF ~isNegative THEN
+			value := SIGNED64(answer);
+		ELSE
+			value := -SIGNED64(answer);
+		END;
+	END;
+	RETURN res = Ok;
+END TryScanInt64At;
+
+PROCEDURE TryParseInt32*(CONST number: ARRAY OF CHAR; VAR value: SIGNED32; i := 0: SIZE): BOOLEAN;
+VAR n := 0: SIGNED32; d := 0: SIGNED32; isNegative := number[i] = "-": BOOLEAN;
+BEGIN
+	IF isNegative OR (number[i] = "+") THEN INC(i); END;
+	IF ~IsDecimal(number[i], d) THEN
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	REPEAT
+		IF UNSIGNED32(n) > MAX(SIGNED32) DIV radix10 THEN
+			value := MAX(SIGNED32);
+			RETURN FALSE;
+		END;
+		n := n * 10 + d;
+		INC(i);
+	UNTIL ~IsDecimal(number[i], d);
+
+	IF isNegative THEN
+		n := -n;
+		IF n > 0 THEN
+			value := MIN(SIGNED32);
+			RETURN FALSE;
+		END;
+	ELSE
+		IF n < 0 THEN
+			value := MAX(SIGNED32);
+			RETURN FALSE;
+		END;
+	END;
+
+	value := n;
+	RETURN TRUE;
+END TryParseInt32;
+
+PROCEDURE TryParseInt64*(CONST number: ARRAY OF CHAR; VAR value: SIGNED64; i := 0: SIZE): BOOLEAN;
+VAR n := 0: SIGNED64; d := 0: SIGNED32; isNegative := number[i] = "-": BOOLEAN;
+BEGIN
+	IF isNegative OR (number[i] = "+") THEN INC(i); END;
+	IF ~IsDecimal(number[i], d) THEN (*! syntax error *)
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	REPEAT
+		IF UNSIGNED64(n) > MAX(SIGNED64) DIV radix10 THEN
+			value := MAX(SIGNED64);
+			RETURN FALSE;
+		END;
+		n := n * 10 + d;
+		INC(i);
+	UNTIL ~IsDecimal(number[i], d);
+
+	IF isNegative THEN
+		n := -n;
+		IF n > 0 THEN
+			value := MIN(SIGNED64);
+			RETURN FALSE;
+		END;
+	ELSE
+		IF n < 0 THEN
+			value := MAX(SIGNED64);
+			RETURN FALSE;
+		END;
+	END;
+
+	value := n;
+	RETURN TRUE;
+END TryParseInt64;
+
+PROCEDURE TryParseSize*(CONST number: ARRAY OF CHAR; VAR value: SIZE; i := 0: SIZE): BOOLEAN;
+VAR n := 0: SIZE; d := 0: SIGNED32; isNegative := number[i] = "-": BOOLEAN;
+BEGIN
+	IF isNegative OR (number[i] = "+") THEN INC(i); END;
+	IF ~IsDecimal(number[i], d) THEN (*! syntax error *)
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	REPEAT
+		IF ADDRESS(n) > MAX(SIZE) DIV radix10 THEN
+			value := MAX(SIZE);
+			RETURN FALSE;
+		END;
+		n := n * 10 + d;
+		INC(i);
+	UNTIL ~IsDecimal(number[i], d);
+
+	IF isNegative THEN
+		n := -n;
+		IF n > 0 THEN
+			value := MIN(SIZE);
+			RETURN FALSE;
+		END;
+	ELSE
+		IF n < 0 THEN
+			value := MAX(SIZE);
+			RETURN FALSE;
+		END;
+	END;
+
+	value := n;
+	RETURN TRUE;
+END TryParseSize;
+
+PROCEDURE TryParseUInt32*(CONST number: ARRAY OF CHAR; VAR value: UNSIGNED32; i := 0: SIZE): BOOLEAN;
+VAR n := 0: UNSIGNED32; d := 0: SIGNED32;
+BEGIN
+	IF ~IsDecimal(number[i], d) THEN
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	REPEAT
+		IF n > MAX(UNSIGNED32) DIV radix10 THEN
+			value := MAX(UNSIGNED32);
+			RETURN FALSE;
+		END;
+		n := n * radix10;
+
+		VAR nn := n + UNSIGNED32(d);
+		IF nn < n THEN
+			value := MAX(UNSIGNED32);
+			RETURN FALSE;
+		END;
+		n := nn;
+
+		INC(i);
+	UNTIL ~IsDecimal(number[i], d);
+
+	value := n;
+	RETURN TRUE;
+END TryParseUInt32;
+
+PROCEDURE TryParseUInt64*(CONST number: ARRAY OF CHAR; VAR value: UNSIGNED64; i := 0: SIZE): BOOLEAN;
+VAR n := 0: UNSIGNED64; d := 0: SIGNED32;
+BEGIN
+	IF ~IsDecimal(number[i], d) THEN
+		value := 0;
+		RETURN FALSE;
+	END;
+
+	REPEAT
+		IF n > MAX(UNSIGNED64) DIV radix10 THEN
+			value := MAX(UNSIGNED64);
+			RETURN FALSE;
+		END;
+		n := n * radix10;
+
+		VAR nn := n + UNSIGNED64(d);
+		IF nn < n THEN
+			value := MAX(UNSIGNED64);
+			RETURN FALSE;
+		END;
+		n := nn;
+
+		INC(i);
+	UNTIL ~IsDecimal(number[i], d);
+
+	value := n;
+	RETURN TRUE;
+END TryParseUInt64;
+
 (** converts a string to an integer. Leading whitespace is ignored *)
 PROCEDURE StrToInt*(CONST str: ARRAY OF CHAR; VAR val: SIGNED32);
 VAR i: SIZE; d: SIGNED32; neg: BOOLEAN;
@@ -536,11 +886,32 @@ BEGIN
 			val := MIN(SIGNED32); neg := FALSE
 		ELSE
 			HALT(99)
-		END;
+	END;
 		INC(i)
 	END;
 	IF neg THEN val := -val END
 END StrToInt;
+
+PROCEDURE StrToInt32*(CONST str: ARRAY OF CHAR; VAR val: SIGNED32);
+VAR i := 0: SIZE;
+BEGIN
+	val := 0;
+	WHILE (i < LEN(str)) & (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
+	IF (i < LEN(str)) & (str[i] # 0X) THEN
+	  ASSERT(TryParseInt32(str, val, i));
+	END;
+END StrToInt32;
+
+(** converts a string to an unsigned32. Leading whitespace is ignored *)
+PROCEDURE StrToUInt32*(CONST str: ARRAY OF CHAR; VAR val: UNSIGNED32);
+VAR i := 0: SIZE;
+BEGIN
+	val := 0;
+	WHILE (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
+	IF (i < LEN(str)) & (str[i] # 0X) THEN
+		ASSERT(TryParseUInt32(str, val, i));
+	END;
+END StrToUInt32;
 
 (** converts a string to a huge integer. Leading whitespace is ignored *)
 PROCEDURE StrToHInt*(CONST str: ARRAY OF CHAR; VAR val: SIGNED64);
@@ -567,6 +938,27 @@ BEGIN
 	IF neg THEN val := -val END
 END StrToHInt;
 
+PROCEDURE StrToInt64*(CONST str: ARRAY OF CHAR; VAR val: SIGNED64);
+VAR i := 0: SIZE;
+BEGIN
+	val := 0;
+	WHILE (i < LEN(str)) & (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
+	IF (i < LEN(str)) & (str[i] # 0X) THEN
+		ASSERT(TryParseInt64(str, val, i));
+	END;
+END StrToInt64;
+
+(** converts a string to an unsigned64. Leading whitespace is ignored *)
+PROCEDURE StrToUInt64*(CONST str: ARRAY OF CHAR; VAR val: UNSIGNED64);
+VAR i := 0: SIZE;
+BEGIN
+	val := 0;
+	WHILE (i < LEN(str)) & (str[i] # 0X) & (str[i] <= " ") DO INC(i) END;
+	IF (i < LEN(str)) & (str[i] # 0X) THEN
+		ASSERT(TryParseUInt64(str, val, i));
+	END;
+END StrToUInt64;
+
 (** converts a string to a size. Leading whitespace is ignored *)
 PROCEDURE StrToSize*(CONST str: ARRAY OF CHAR; VAR val: SIZE);
 VAR i: SIZE; d: SIZE; neg: BOOLEAN;
@@ -586,7 +978,7 @@ BEGIN
 			val := MIN(SIZE); neg := FALSE
 		ELSE
 			HALT(99)
-		END;
+	END;
 		INC(i)
 	END;
 	IF neg THEN val := -val END
@@ -655,6 +1047,21 @@ BEGIN
 	END
 END IntToHexStr;
 
+(** converts an unsigned integer value to a hex string *)
+PROCEDURE UIntToHexStr*(h : UNSIGNED64; width: INTEGER; VAR s: ARRAY OF CHAR);
+CONST hexDigits = "0123456789ABCDEF";
+BEGIN
+	IF (width <= 0) THEN width := 8 END; (*! legacy?*)
+
+	s[width] := 0X;
+	DEC(width);
+	WHILE (width >= 0) DO
+		s[width] := hexDigits[h MOD 16];
+		h := LSH(h, -4);
+		DEC(width);
+	END
+END UIntToHexStr;
+
 (** converts a hex string to an integer. Leading whitespace is ignored. res=Ok indicates success, val=0 on failure. *)
 PROCEDURE HexStrToInt*(CONST string: ARRAY OF CHAR; VAR val: SIGNED32; VAR res: INTEGER);
 VAR length, i : SIZE; ch: CHAR; negative : BOOLEAN;
@@ -684,6 +1091,31 @@ BEGIN
 		END;
 	END;
 END HexStrToInt;
+CONST HexStrToInt32* = HexStrToInt;
+
+(** converts a hex string to an unsigned integer. Leading whitespace is ignored. res=Ok indicates success, val=0 on failure. *)
+PROCEDURE HexStrToUInt32*(CONST string: ARRAY OF CHAR; VAR val: UNSIGNED32; VAR res: INTEGER);
+VAR length, i : SIZE; ch: CHAR;
+BEGIN
+	length := LEN(string); val := 0; res := -1;
+	(* skip whitespace *)
+	i := 0; WHILE (i < length) & (string[i] # 0X) & (string[i] <= " ") DO INC(i); END;
+	IF (i < length) THEN
+		LOOP
+			IF (i >= length) OR (string[i] = 0X) THEN EXIT; END;
+			ch := string[i];
+			IF (ch >= "0") & (ch <= "9") THEN val := 16 * val + ORD(ch) - ORD("0");
+			ELSIF (CAP(ch) >= "A") & (CAP(ch) <= "F") THEN val := 16 * val + ORD(CAP(ch)) - ORD("A") + 10;
+			ELSE EXIT;
+			END;
+			INC(i);
+		END;
+		IF (i < length) & (string[i] = "H") THEN INC(i); END; (* skip optional "H" *)
+		IF (i < length) & (string[i] = 0X) THEN
+			res := Ok;
+		END;
+	END;
+END HexStrToUInt32;
 
 (** converts a hex string to a size. Leading whitespace is ignored. res=Ok indicates success, val=0 on failure. *)
 PROCEDURE HexStrToSize*(CONST string: ARRAY OF CHAR; VAR val: SIZE; VAR res: INTEGER);
@@ -969,6 +1401,45 @@ BEGIN
 	UpperCase(n^);
 	RETURN n;
 END UpperCaseInNew;
+
+PROCEDURE - IsDigit(c: CHAR; radix: UNSIGNED32; VAR d: SIGNED32): BOOLEAN;
+VAR t: UNSIGNED32;
+BEGIN
+	t := ORD32(c) - ORD32('0');
+	IF t > radix10 THEN
+		t := ORD32(CAP(c)) - ORD32('A') + 10;
+		IF t >= radix THEN
+			RETURN FALSE;
+		END;
+	END;
+	d := SIGNED32(t);
+	RETURN t < radix;
+END IsDigit;
+
+PROCEDURE - IsDecimal(c: CHAR; VAR d: SIGNED32): BOOLEAN;
+VAR t: SIGNED32;
+BEGIN
+  t := ORD(c) - ORD('0');
+  IF UNSIGNED32(t) < radix10 THEN
+    d := t;
+    RETURN TRUE
+  END;
+  RETURN FALSE
+END IsDecimal;
+
+PROCEDURE - IsHexadecimal*(c: CHAR; VAR d: SIGNED32): BOOLEAN;
+VAR t: SIGNED32;
+BEGIN
+	t := ORD(c) - ORD('0');
+	IF UNSIGNED32(t) >= radix10 THEN
+		t := ORD(CAP(c)) - ORD('A') + 10;
+		IF t >= radix16 THEN
+			RETURN FALSE;
+		END;
+	END;
+	d := t;
+	RETURN TRUE;
+END IsHexadecimal;
 
 END Strings.
 

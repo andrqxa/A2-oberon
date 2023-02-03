@@ -375,7 +375,7 @@ TYPE
 				ASSERT(g.nofSubComponents <= 255);
 				w.Char(CHR(g.nofSubComponents));
 				FOR i := 0 TO g.nofSubComponents - 1 DO
-					w.Net32(SIGNED32(g.subComponents[i].refucs));
+					w.UNet32(g.subComponents[i].refucs);
 					w.Char(CHR(g.subComponents[i].refvariant));
 					w.Char(CHR(g.subComponents[i].x));
 					w.Char(CHR(g.subComponents[i].y));

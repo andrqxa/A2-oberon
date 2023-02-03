@@ -1230,6 +1230,16 @@ BEGIN
 	r.file.Read(r, x)
 END Read;
 
+PROCEDURE ReadChar16*(VAR r: Rider; VAR x: Streams.Char16);
+BEGIN
+	r.file.ReadBytes(r, SYSTEM.VAL(Bytes2, x), 0, 2)
+END ReadChar16;
+
+PROCEDURE ReadChar32*(VAR r: Rider; VAR x: Streams.Char32);
+BEGIN
+	r.file.ReadBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
+END ReadChar32;
+
 PROCEDURE ReadBytes*(VAR r: Rider; VAR x: ARRAY OF CHAR; ofs, len: SIZE);
 BEGIN
 	r.file.ReadBytes(r, x, ofs, len);
@@ -1325,6 +1335,16 @@ PROCEDURE Write*(VAR r: Rider; x: CHAR);
 BEGIN
 	r.file.Write(r, x)
 END Write;
+
+PROCEDURE WriteChar16*(VAR r: Rider; x: Streams.Char16);
+BEGIN
+	r.file.WriteBytes(r, SYSTEM.VAL(Bytes2, x), 0, 2)
+END WriteChar16;
+
+PROCEDURE WriteChar32*(VAR r: Rider; x: Streams.Char32);
+BEGIN
+	r.file.WriteBytes(r, SYSTEM.VAL(Bytes4, x), 0, 4)
+END WriteChar32;
 
 PROCEDURE WriteBytes*(VAR r: Rider; CONST x: ARRAY OF CHAR; ofs, len: SIZE);
 BEGIN
