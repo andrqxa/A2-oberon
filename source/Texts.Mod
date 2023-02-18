@@ -1440,7 +1440,7 @@ BEGIN
 			ELSIF (str # NIL) & (str^ = "paragraph-style") THEN				(* paragraph styles *)
 				NEW(pStyle);
 				str := ptr(XML.Element).GetAttributeValue("name"); IF str # NIL THEN COPY(str^, pStyle.name) END;
-				str := ptr(XML.Element).GetAttributeValue("alignment"); IF str # NIL THEN Strings.StrToInt(str^, pStyle.alignment) END;
+				str := ptr(XML.Element).GetAttributeValue("alignment"); IF str # NIL THEN Strings.StrToInt32(str^, pStyle.alignment) END;
 				str := ptr(XML.Element).GetAttributeValue("first-indent"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); pStyle.firstIndent := FP1616.FloatToFixp(SHORT(tempReal)); END;
 				str := ptr(XML.Element).GetAttributeValue("left-indent"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); pStyle.leftIndent := FP1616.FloatToFixp(SHORT(tempReal)); END;
 				str := ptr(XML.Element).GetAttributeValue("right-indent"); IF str # NIL THEN Strings.StrToFloat(str^, tempReal); pStyle.rightIndent :=  FP1616.FloatToFixp(SHORT(tempReal)); END;

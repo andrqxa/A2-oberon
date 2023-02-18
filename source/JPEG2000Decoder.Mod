@@ -6961,7 +6961,7 @@ MODULE JPEG2000Decoder;
 					ELSE
 						context.arg.String(decResStr);
 						decRes := -1;
-						Strings.StrToInt(decResStr, decRes);
+						Strings.StrToInt32(decResStr, decRes);
 
 						IF (decRes < 0) OR (decRes > 32) THEN
 							context.error.String("Invalid resolution decrease value");
@@ -6981,7 +6981,7 @@ MODULE JPEG2000Decoder;
 					ELSE
 						context.arg.String(decLayStr);
 						decLay := -1;
-						Strings.StrToInt(decLayStr, decLay);
+						Strings.StrToInt32(decLayStr, decLay);
 
 						IF (decLay < 0) OR (decLay > 65535) THEN
 							context.error.String("Invalid layer decrease value");
@@ -7002,7 +7002,7 @@ MODULE JPEG2000Decoder;
 
 					context.arg.String(bmpFormatStr);
 					bmpFormat := -1;
-					Strings.StrToInt(bmpFormatStr, bmpFormat);
+					Strings.StrToInt32(bmpFormatStr, bmpFormat);
 
 					IF bmpFormat = 16 THEN
 						bmpRasterFormat := Raster.BGR565;

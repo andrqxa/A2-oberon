@@ -339,7 +339,7 @@ TYPE
 				changeInfo.fields := changeInfo.fields + ChangeFont;
 			END;
 			IF (sizeCheck.state.Get() = 1) THEN
-				sizeEdit.GetAsString(string); Strings.StrToInt(string, changeInfo.deltaSize);  changeInfo.deltaSizeMode := Absolute;
+				sizeEdit.GetAsString(string); Strings.StrToInt32(string, changeInfo.deltaSize);  changeInfo.deltaSizeMode := Absolute;
 				changeInfo.fields := changeInfo.fields + ChangeSize;
 			END;
 			IF (styleCheck.state.Get() = 1) THEN

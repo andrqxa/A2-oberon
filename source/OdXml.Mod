@@ -728,7 +728,7 @@ BEGIN
 	NEW(v); v.SetName("D:version"); vc.AddContent(v);
 	NEW(h); h.SetName("D:href"); v.AddContent(h);
 	name := "http://"; Strings.Append(name, host);
-	Strings.StrToInt(ver, versionNumber);
+	Strings.StrToInt32(ver, versionNumber);
 	IF versionNumber > 0 THEN
 		(* A version number is given. *)
 		Strings.Append(name, UpdateVersionTag);

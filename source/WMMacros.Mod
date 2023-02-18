@@ -139,7 +139,7 @@ VAR
 		BEGIN
 			s := xml.GetAttributeValue("nr");
 			IF s # NIL THEN
-				Strings.StrToInt(s^, nr);
+				Strings.StrToInt32(s^, nr);
 				IF nr < LEN(parameters^) THEN InsertParameter(text, parameters[nr], cursor.GetPosition()) END
 			END
 		END HandleArg;

@@ -1046,7 +1046,7 @@ TYPE
 			IF (typeI = Decimal) OR (typeI = Hex) THEN
 				itf := dt.GetInterface(WMDropTarget.TypeInt32);
 				IF (itf # NIL) THEN
-					Strings.StrToInt(dragString^, value);
+					Strings.StrToInt32(dragString^, value);
 					itf(WMDropTarget.DropInt32).Set(value);
 					dragString := NIL;
 					RETURN;

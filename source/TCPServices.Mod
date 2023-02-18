@@ -87,9 +87,9 @@ TYPE
 			Configuration.Get("TLS.pHex", pHex, res);
 			Configuration.Get("TLS.qHex", qHex, res);
 			Configuration.Get("TLS.eHex", eHex, res);
-			Configuration.Get("TLS.pLen", intstring, res); Strings.StrToInt(intstring, pLen);
-			Configuration.Get("TLS.qLen", intstring, res); Strings.StrToInt(intstring, qLen);
-			Configuration.Get("TLS.eLen", intstring, res); Strings.StrToInt(intstring, eLen);
+			Configuration.Get("TLS.pLen", intstring, res); Strings.StrToInt32(intstring, pLen);
+			Configuration.Get("TLS.qLen", intstring, res); Strings.StrToInt32(intstring, qLen);
+			Configuration.Get("TLS.eLen", intstring, res); Strings.StrToInt32(intstring, eLen);
 
 			(* get a connection with default TLS policy *)
 			service := TLS.GetServerConnection(certificate, pHex, qHex, eHex, pLen, qLen, eLen);

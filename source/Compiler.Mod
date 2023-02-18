@@ -202,7 +202,7 @@ TYPE
 					IF options.findPC # "" THEN
 						split := Strings.Split(options.findPC,":");
 						IF LEN(split)>1 THEN
-							Strings.StrToInt(split[1]^,sectionOffset);
+							Strings.StrToInt32(split[1]^,sectionOffset);
 							options.backend.FindPC(module, split[0]^,sectionOffset);
 							IF options.backend.error THEN
 								FinalMessage(TRUE," could not be compiled (backend errors).");
@@ -232,7 +232,7 @@ TYPE
 					options.objectFile.SetPath(options.destPath);
 
 					IF options.findPC # "" THEN
-						Strings.StrToInt(options.findPC, sectionOffset);
+						Strings.StrToInt32(options.findPC, sectionOffset);
 						generatedModule.SetFindPC(sectionOffset);
 					END;
 

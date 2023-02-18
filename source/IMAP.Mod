@@ -525,7 +525,7 @@ TYPE
 					END;
 					(* got number in buffer ?*)
 					IF (buffer[0] >="0") & (buffer[0] <= "9") THEN
-						Strings.StrToInt(buffer^,i);
+						Strings.StrToInt32(buffer^,i);
 						IF ~ ReadUToken(buffer) THEN (* get command *)
 							IF DEBUG THEN KernelLog.String("IMAP: ReadResponse: Read failed at ReadUtoken2") END;
 							RETURN FALSE;
@@ -757,15 +757,15 @@ TYPE
 
 				ELSIF command^ = "UIDVALIDITY" THEN
 					IF ~ReadPToken(argument) THEN RETURN FALSE END;
-					Strings.StrToInt(argument^,argi);
+					Strings.StrToInt32(argument^,argi);
 
 				ELSIF command^ = "UIDNEXT" THEN
 					IF ~ReadPToken(argument) THEN RETURN FALSE END;
-					Strings.StrToInt(argument^,argi);
+					Strings.StrToInt32(argument^,argi);
 
 				ELSIF command^ = "UNSEEN" THEN
 					IF ~ReadPToken(argument) THEN RETURN FALSE END;
-					Strings.StrToInt(argument^,argi);
+					Strings.StrToInt32(argument^,argi);
 
 				ELSIF command^ = "CAPABILITY" THEN
 					NEW(ret);
@@ -911,7 +911,7 @@ TYPE
 				INC(i);
 			END;
 			IF (in.Peek() # "}") THEN RETURN FALSE END;
-			Strings.StrToInt(data,size);
+			Strings.StrToInt32(data,size);
 			in.SkipLn();
 			IF ~(in.res=Streams.Ok) THEN RETURN FALSE END;
 			NEW(buffer,size+1);

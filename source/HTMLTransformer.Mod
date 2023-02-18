@@ -282,13 +282,13 @@ TYPE
 				IF s2 = NIL THEN s2 := Strings.NewString("") END;
 				s3 := GetElemAttributeValue(elem, "size", FALSE);
 				IF s3 # NIL THEN
-					Strings.StrToInt(s3^, i);
+					Strings.StrToInt32(s3^, i);
 				ELSE
 					i := 20
 				END;
 				s3 := GetElemAttributeValue(elem, "maxlength", FALSE);
 				IF s3 # NIL THEN
-					Strings.StrToInt(s3^, j);
+					Strings.StrToInt32(s3^, j);
 				ELSE
 					j := 0
 				END;
@@ -495,7 +495,7 @@ TYPE
 					IF s#NIL THEN
 						Strings.Copy(s^, 0, LEN(s^)-1, aoc);
 						Strings.TrimLeft(aoc, ' ');
-						Strings.StrToInt(aoc, res);
+						Strings.StrToInt32(aoc, res);
 						IF (aoc[0]='+') OR (aoc[0]='-') THEN
 							style.size := style.size + res;
 						ELSE
@@ -681,12 +681,12 @@ TYPE
 					s := GetElemAttributeValue(elem, "width", FALSE);
 					IF s#NIL THEN
 						Strings.Copy(s^, 0, LEN(s^)-1, aoc);
-						Strings.StrToInt(aoc, i);
+						Strings.StrToInt32(aoc, i);
 					END;
 					s := GetElemAttributeValue(elem, "height", FALSE);
 					IF s#NIL THEN
 						Strings.Copy(s^, 0, LEN(s^)-1, aoc);
-						Strings.StrToInt(aoc, j);
+						Strings.StrToInt32(aoc, j);
 					END;
 					s := GetElemAttributeValue(elem, "src", FALSE);
 					IF s#NIL THEN
@@ -803,7 +803,7 @@ TYPE
 					IF olulStackTop#NIL THEN
 						s := GetElemAttributeValue(elem, "value", FALSE);
 						IF s#NIL THEN
-							Strings.StrToInt(s^, olulStackTop.value);
+							Strings.StrToInt32(s^, olulStackTop.value);
 						END;
 					END;
 					i := style.enumtype;
@@ -929,7 +929,7 @@ TYPE
 					olulStackTop := olulStackItem;
 					s := GetElemAttributeValue(elem, "start", FALSE);
 					IF s#NIL THEN
-						Strings.StrToInt(s^, olulStackItem.value);
+						Strings.StrToInt32(s^, olulStackItem.value);
 					ELSE
 						olulStackItem.value := 1;
 					END;
@@ -1468,7 +1468,7 @@ TYPE
 					relativeWidth := TRUE;
 					s := Strings.Substring(0, Strings.Length(s^)-1, s^);
 				END;
-				Strings.StrToInt(s^, width);
+				Strings.StrToInt32(s^, width);
 			ELSE
 				width := 0;
 			END;
@@ -1477,7 +1477,7 @@ TYPE
 			s := GetElemAttributeValue(tableElem, "border", FALSE);
 			IF s # NIL THEN
 				Strings.TrimWS(s^);
-				Strings.StrToInt(s^, border);
+				Strings.StrToInt32(s^, border);
 			ELSE
 				border := 0;
 			END;
@@ -1499,7 +1499,7 @@ TYPE
 					relativeCellspacing := TRUE;
 					s := Strings.Substring(0, Strings.Length(s^)-1, s^);
 				END;
-				Strings.StrToInt(s^, cellspacing);
+				Strings.StrToInt32(s^, cellspacing);
 			ELSE
 				cellspacing := 0;
 			END;
@@ -1512,7 +1512,7 @@ TYPE
 					relativeCellpadding := TRUE;
 					s := Strings.Substring(0, Strings.Length(s^)-1, s^);
 				END;
-				Strings.StrToInt(s^, cellpadding);
+				Strings.StrToInt32(s^, cellpadding);
 			ELSE
 				cellpadding := 0;
 			END;
@@ -1995,7 +1995,7 @@ TYPE
 			s := GetElemAttributeValue(elem, "colspan", FALSE);
 			IF s # NIL THEN
 				Strings.TrimWS(s^);
-				Strings.StrToInt(s^, colspan);
+				Strings.StrToInt32(s^, colspan);
 				IF colspan < 1 THEN colspan := 1 END;
 			ELSE
 				colspan := 1;
@@ -2005,7 +2005,7 @@ TYPE
 			s := GetElemAttributeValue(elem, "rowspan", FALSE);
 			IF s # NIL THEN
 				Strings.TrimWS(s^);
-				Strings.StrToInt(s^, rowspan);
+				Strings.StrToInt32(s^, rowspan);
 				IF rowspan < 1 THEN rowspan := 1 END;
 			ELSE
 				rowspan := 1;
@@ -2015,7 +2015,7 @@ TYPE
 			s := GetElemAttributeValue(elem, "width", FALSE);
 			IF s # NIL THEN
 				Strings.TrimWS(s^);
-				Strings.StrToInt(s^, width);
+				Strings.StrToInt32(s^, width);
 			END;
 			INC(width, 2 * colspan * parentTable.cellpadding + (colspan - 1) * parentTable.cellspacing);
 
@@ -2023,7 +2023,7 @@ TYPE
 			s := GetElemAttributeValue(elem, "height", FALSE);
 			IF s # NIL THEN
 				Strings.TrimWS(s^);
-				Strings.StrToInt(s^, height);
+				Strings.StrToInt32(s^, height);
 			END;
 			INC(height, 2 * rowspan * parentTable.cellpadding + (rowspan - 1) * parentTable.cellspacing);
 
@@ -3158,7 +3158,7 @@ BEGIN
 				Strings.HexStrToInt(temp^, res, suc);
 				IF suc # 0 THEN res := 160 END;
 			ELSE
-				Strings.StrToInt(temp^, res);
+				Strings.StrToInt32(temp^, res);
 			END;
 		ELSE
 			res := 160;

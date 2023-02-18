@@ -238,7 +238,7 @@ TYPE
 						INC(i); INC(j); IF (i >= LEN(devpart)) OR (j >= LEN(partStr)) OR (devpart[i]=0X) THEN EXIT END;
 					END;
 					IF (i < LEN(devpart)) THEN
-						Strings.StrToInt(partStr, selection.partition);
+						Strings.StrToInt32(partStr, selection.partition);
 						Acquire; (* lock disks[] *)
 						i := 0;
 						LOOP (* get disk record *)

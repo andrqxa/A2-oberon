@@ -853,7 +853,7 @@ TYPE
 						ds2.Append(s^);
 						IF ds1.Get(start + 1) = '#' THEN	(* character reference *)
 							s := ds1.Extract(start + 2, end - start - 1);
-							val := StrToInt(s^);
+							val := StrToInt32(s^);
 							msg[0] := ExpandCharacterRef(val);
 							msg[1] := 0X;
 							ds2.Append(msg);
@@ -914,7 +914,7 @@ TYPE
 						ds2.Append(s^);
 						IF (ds1.Get(start) = '&') & (ds1.Get(start + 1) = '#') THEN	(* character reference *)
 							s := ds1.Extract(start + 2, end - start - 1);
-							val := StrToInt(s^);
+							val := StrToInt32(s^);
 							msg[0] := ExpandCharacterRef(val);
 							msg[1] := 0X;
 							ds2.Append(msg);
@@ -966,7 +966,7 @@ TYPE
 				Strings.Delete(s^, 0, 1);
 				Strings.HexStrToInt(s^, code, res);
 			ELSE	(* decimal *)
-				Strings.StrToInt(s^, code);
+				Strings.StrToInt32(s^, code);
 			END;
 			NEW(cRef); cRef.SetPos(scanner.GetPos());
 			cRef.SetCode(code);
@@ -1013,15 +1013,17 @@ BEGIN
 	RETURN i = len
 END IsPubidLiteral;
 
-PROCEDURE StrToInt(VAR str: ARRAY OF CHAR): SIGNED32;
+PROCEDURE StrToInt32(VAR str: ARRAY OF CHAR): SIGNED32;
+VAR answer: SIGNED32; res: INTEGER
 BEGIN
 	IF str[0] = 'x' THEN	(* str in hexadecimal form *)
 		str[0] := ' ';
-		RETURN DynamicStrings.HexStrToInt(str)
+		Strings.HexStrToInt32(str, answer, res);
 	ELSE
-		RETURN DynamicStrings.StrToInt(str)
-	END
-END StrToInt;
+		Strings.StrToInt32(str, answer);
+	END;
+	RETURN answer;
+END StrToInt32;
 
 PROCEDURE DefaultReportError(pos, line, col: Streams.Position; CONST msg: ARRAY OF CHAR);
 BEGIN

@@ -301,7 +301,7 @@ BEGIN
 		s := xml.GetAttributeValue("device");
 		IF s # NIL THEN
 			(* Read device number *)
-			Strings.StrToInt(s^, devNr);
+			Strings.StrToInt32(s^, devNr);
 			IF devNr = -1 THEN
 				vcd := TVDriver.GetDefaultDevice()
 			ELSE

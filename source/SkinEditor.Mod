@@ -251,8 +251,8 @@ TYPE
 				WMRestorable.AddByContext(SELF, c);
 				IF c.appData # NIL THEN
 					xml := c.appData(XML.Element);
-					s := xml.GetAttributeValue("firstLine");IF s # NIL THEN Strings.StrToInt(s^, fl) END;
-					s := xml.GetAttributeValue("cursorPos");IF s # NIL THEN Strings.StrToInt(s^, cp) END;
+					s := xml.GetAttributeValue("firstLine");IF s # NIL THEN Strings.StrToInt32(s^, fl) END;
+					s := xml.GetAttributeValue("cursorPos");IF s # NIL THEN Strings.StrToInt32(s^, cp) END;
 
 					s := xml.GetAttributeValue("file");
 					IF s # NIL THEN Load(s^) END;

@@ -824,14 +824,14 @@ TYPE
 				sr.SkipWhitespace; sr.Token(token);												(* AdHoc *)
 				sr.SkipWhitespace; sr.Token(token); COPY(token, attr.fontInfo.name); 				(* family *)
 				sr.SkipWhitespace; sr.Token(token); Strings.StrToSize(token, attr.fontInfo.size);		(* size *)
-				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, tempInt); 					(* style *)
+				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt32(token, tempInt); 					(* style *)
 				IF (tempInt = 0) THEN attr.fontInfo.style := {};
 				ELSIF (tempInt = 1) THEN attr.fontInfo.style := {0};
 				ELSIF (tempInt = 2) THEN attr.fontInfo.style := {1};
 				ELSIF (tempInt = 3) THEN attr.fontInfo.style := {0,1};
 				ELSE attr.fontInfo.style := {};
 				END;
-				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, attr.voff);				(* voff *)
+				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt32(token, attr.voff);				(* voff *)
 				sr.SkipWhitespace; sr.Token(token); Strings.HexStrToInt(token, attr.color, res);		(* color *)
 				sr.SkipWhitespace; sr.Token(token); Strings.HexStrToInt(token, attr.bgcolor, res);	(* bgcolor *)
 
@@ -862,12 +862,12 @@ TYPE
 				NEW(pStyle);
 				NEW(sr, LEN(pstylename)); sr.Set(pstylename);
 				sr.SkipWhitespace; sr.Token(token); COPY(pstylename, pStyle.name);														(* AdHoc *)
-				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, tempInt); pStyle.alignment := tempInt;							(* alignment *)
-				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, tempInt); pStyle.firstIndent := FP1616.FloatToFixp(tempInt);		(* first Indent *)
-				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, tempInt); pStyle.leftIndent := FP1616.FloatToFixp(tempInt);		(* left Indent *)
-				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, tempInt); pStyle.rightIndent := FP1616.FloatToFixp(tempInt);	(* right Indent *)
-				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, tempInt); pStyle.spaceBefore := FP1616.FloatToFixp(tempInt);	(* space above *)
-				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt(token, tempInt); pStyle.spaceAfter := FP1616.FloatToFixp(tempInt);		(* space below *)
+				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt32(token, tempInt); pStyle.alignment := tempInt;							(* alignment *)
+				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt32(token, tempInt); pStyle.firstIndent := FP1616.FloatToFixp(tempInt);		(* first Indent *)
+				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt32(token, tempInt); pStyle.leftIndent := FP1616.FloatToFixp(tempInt);		(* left Indent *)
+				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt32(token, tempInt); pStyle.rightIndent := FP1616.FloatToFixp(tempInt);	(* right Indent *)
+				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt32(token, tempInt); pStyle.spaceBefore := FP1616.FloatToFixp(tempInt);	(* space above *)
+				sr.SkipWhitespace; sr.Token(token); Strings.StrToInt32(token, tempInt); pStyle.spaceAfter := FP1616.FloatToFixp(tempInt);		(* space below *)
 				sr.SkipWhitespace; char := sr.Peek(); IF (char = "t") THEN sr.SkipBytes(1); sr.RawString(token); COPY(token, pStyle.tabStops); END; (* tabstops *)
 				Texts.AddParagraphStyle(pStyle);
 			END;

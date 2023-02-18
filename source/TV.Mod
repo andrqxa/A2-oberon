@@ -658,7 +658,7 @@ BEGIN
 			(* Read the device number *)
 			s := xml.GetAttributeValue("device");
 			IF s # NIL THEN
-				Strings.StrToInt(s^, i);
+				Strings.StrToInt32(s^, i);
 				IF i = -1 THEN
 					vcd := TVDriver.GetDefaultDevice()
 				ELSE
@@ -674,7 +674,7 @@ BEGIN
 			s := xml.GetAttributeValue("freq");
 			IF (s # NIL) & (vcd # NIL) THEN
 				tuner := vcd.GetTuner();
-				Strings.StrToInt(s^, i);
+				Strings.StrToInt32(s^, i);
 				tuner.SetTVFrequency(i)
 			END;
 			(* Read the autoswitch setting *)

@@ -215,7 +215,7 @@ TYPE
 				sbitmap := x.GetAttributeValue("bitmap");
 				Raster.InitMode(mode, Raster.srcCopy);
 				IF (scode # NIL) & (sbitmap # NIL) THEN
-					Strings.StrToInt(scode^, code);
+					Strings.StrToInt32(scode^, code);
 					pos := 0;
 					w := ReadByte(sbitmap^, pos); INC(pos, 2);
 					h := ReadByte(sbitmap^, pos); INC(pos, 2);

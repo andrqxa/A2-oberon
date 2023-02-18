@@ -478,7 +478,7 @@ TYPE
 					FOR j := 0 TO LEN(stringArray[i])-1 DO
 						IF (stringArray[i][j] < "0") & ("9" < stringArray[i][j]) THEN error := TRUE; END;
 					END;
-					IF ~error THEN Strings.StrToInt(stringArray[i]^, nbrArray[i]); END;
+					IF ~error THEN Strings.StrToInt32(stringArray[i]^, nbrArray[i]); END;
 				END;
 				RETURN error;
 			END GetNumbers;

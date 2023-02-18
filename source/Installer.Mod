@@ -1225,7 +1225,7 @@ BEGIN
 	number := -1;
 	string := p.GetAttributeValue(attributeName);
 	IF (string # NIL) THEN
-		Strings.StrToInt(string^, number);
+		Strings.StrToInt32(string^, number);
 	END;
 	RETURN number;
 END GetXmlNumber;

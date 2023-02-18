@@ -88,7 +88,7 @@ TYPE
 				NEW(selection, erow - srow + 1);
 				FOR i := srow TO erow DO
 					str := grid.model.GetCellText(0, i); (* Get the Process ID *)
-					Strings.StrToInt(str^, id);
+					Strings.StrToInt32(str^, id);
 					IF id > 0 THEN
 						selection[i - srow] := ProcessInfo.Find(processes, id); (* may be NIL *)
 					ELSE

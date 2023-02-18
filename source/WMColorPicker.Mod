@@ -838,9 +838,9 @@ TYPE
 			END;
 			colorInd.updateEditors:=FALSE;
 			j:=n DIV 3;
-				editorial[j*3].GetAsString(string); Strings.StrToInt(string, a1);
-				editorial[j*3+1].GetAsString(string); Strings.StrToInt(string, a2);
-				editorial[j*3+2].GetAsString(string); Strings.StrToInt(string, a3);
+				editorial[j*3].GetAsString(string); Strings.StrToInt32(string, a1);
+				editorial[j*3+1].GetAsString(string); Strings.StrToInt32(string, a2);
+				editorial[j*3+2].GetAsString(string); Strings.StrToInt32(string, a3);
 			CASE j OF
 			 |0:colorInd.fillColor.Set(RGBToColor(a1,a2,a3));
 			 |1:colorInd.fillColor.Set(HSLToColor(a1,a2,a3));

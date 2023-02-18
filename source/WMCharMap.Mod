@@ -155,7 +155,7 @@ TYPE
 					SelectChar(SELF, NIL)
 				ELSIF sender(WMEditors.Editor) = decEd THEN
 					decEd.GetAsString(tempString);
-					Strings.StrToInt(tempString, pos);
+					Strings.StrToInt32(tempString, pos);
 					curChar := pos; characters.SetSelection(pos MOD NofCols, pos DIV NofCols, pos MOD NofCols, pos DIV NofCols);
 					characters.SetTopPosition(0, pos DIV NofCols, TRUE);
 					SelectChar(SELF, NIL)

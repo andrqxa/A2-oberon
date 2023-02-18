@@ -816,12 +816,12 @@ BEGIN
 	s := HTMLTransformer.GetElemAttributeValue(frameset, "frameborder", FALSE);
 	IF s # NIL THEN
 		Strings.TrimWS(s^);
-		Strings.StrToInt(s^, frameborderSize);
+		Strings.StrToInt32(s^, frameborderSize);
 	ELSE
 		s := HTMLTransformer.GetElemAttributeValue(frameset, "border", FALSE);
 		IF s # NIL THEN
 			Strings.TrimWS(s^);
-			Strings.StrToInt(s^, frameborderSize);
+			Strings.StrToInt32(s^, frameborderSize);
 		END;
 	END;
 
@@ -860,7 +860,7 @@ BEGIN
 		Strings.TrimWS(s^);
 		IF Strings.EndsWith("%", s^) THEN
 			sizeStr := Strings.Substring(0, Strings.Length(s^)-1, s^);
-			Strings.StrToInt(sizeStr^, size);
+			Strings.StrToInt32(sizeStr^, size);
 			type := typePercent;
 		ELSIF Strings.EndsWith("*", s^) THEN
 			IF Strings.Length(s^) = 1 THEN
@@ -868,11 +868,11 @@ BEGIN
 			ELSE
 				sizeStr := Strings.Substring(0, Strings.Length(s^)-1, s^);
 				Strings.TrimWS(sizeStr^);
-				Strings.StrToInt(sizeStr^, size);
+				Strings.StrToInt32(sizeStr^, size);
 			END;
 			type := typeParts;
 		ELSE
-			Strings.StrToInt(s^, size);
+			Strings.StrToInt32(s^, size);
 			type := typeFix;
 		END;
 		IF size > 0 THEN

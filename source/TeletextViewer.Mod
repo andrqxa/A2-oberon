@@ -556,7 +556,7 @@ TYPE
 		BEGIN
 			ResetTimer();
 			nrEditor.GetAsString(nr);
-			Strings.StrToInt(nr, pageNo);
+			Strings.StrToInt32(nr, pageNo);
 			ClearNumberField;
 			ShowPage(browser.GetPage(pageNo))
 		END OnLoad;
@@ -711,7 +711,7 @@ BEGIN
 		(* Read the TV frequency to restore the channel *)
 		s := xml.GetAttributeValue("tvFreq");
 		IF s # NIL THEN
-			Strings.StrToInt(s^, freq);
+			Strings.StrToInt32(s^, freq);
 			suite := TeletextDecoder.SelectTeletextSuite(freq);
 			IF suite # NIL THEN
 				w.browser.SetSuite(suite)
@@ -720,7 +720,7 @@ BEGIN
 		(* Read the page number *)
 		s := xml.GetAttributeValue("page");
 		IF s # NIL THEN
-			Strings.StrToInt(s^, page);
+			Strings.StrToInt32(s^, page);
 			w.ShowPage(w.browser.GetPage(page+100));
 		END;
 		(* Check if the channel selector window was open *)

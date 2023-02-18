@@ -188,16 +188,16 @@ BEGIN
 		value := ENTIER(source(Longreal).value);
 	ELSIF (source IS String) THEN
 		IF (source(String).value # NIL) THEN
-			Strings.StrToInt(source(String).value^, value);
+			Strings.StrToInt32(source(String).value^, value);
 		ELSE
 			res := ConversionError;
 		END;
 	ELSIF (source IS DynamicString) THEN
-		Strings.StrToInt(source(DynamicString).value^, value);
+		Strings.StrToInt32(source(DynamicString).value^, value);
 	ELSIF (source IS String32) THEN
-		Strings.StrToInt(source(String32).value, value);
+		Strings.StrToInt32(source(String32).value, value);
 	ELSIF (source IS String256) THEN
-		Strings.StrToInt(source(String256).value, value);
+		Strings.StrToInt32(source(String256).value, value);
 	ELSIF (source IS Generic) THEN
 		IF (source(Generic).Get # NIL) THEN
 			source(Generic).Get(source(Generic), integer, res);
@@ -271,16 +271,16 @@ BEGIN
 		value := ENTIER(source(Longreal).value);
 	ELSIF (source IS String) THEN
 		IF (source(String).value # NIL) THEN
-			Strings.StrToHInt(source(String).value^, value);
+			Strings.StrToInt64(source(String).value^, value);
 		ELSE
 			res := ConversionError;
 		END;
 	ELSIF (source IS DynamicString) THEN
-		Strings.StrToHInt(source(DynamicString).value^, value);
+		Strings.StrToInt64(source(DynamicString).value^, value);
 	ELSIF (source IS String32) THEN
-		Strings.StrToHInt(source(String32).value, value);
+		Strings.StrToInt64(source(String32).value, value);
 	ELSIF (source IS String256) THEN
-		Strings.StrToHInt(source(String256).value, value);
+		Strings.StrToInt64(source(String256).value, value);
 	ELSIF (source IS Generic) THEN
 		IF (source(Generic).Get # NIL) THEN
 			source(Generic).Get(source(Generic), hugeint, res);
@@ -751,9 +751,9 @@ BEGIN
 	ELSIF (target IS Boolean) THEN
 		Strings.StrToBool(value, target(Boolean).value);
 	ELSIF (target IS Integer) THEN
-		Strings.StrToInt(value, target(Integer).value);
+		Strings.StrToInt32(value, target(Integer).value);
 	ELSIF (target IS Hugeint) THEN
-		Strings.StrToHInt(value, target(Hugeint).value);
+		Strings.StrToInt64(value, target(Hugeint).value);
 	ELSIF (target IS Size) THEN
 		Strings.StrToSize(value, target(Size).value);
 	ELSIF (target IS Real) THEN
@@ -997,10 +997,10 @@ BEGIN
 		TextUtilities.TextToStr(value, target(String256).value); (*? no valid result code, e.g. truncation *)
 	ELSIF (target IS Integer) THEN
 		TextUtilities.TextToStr(value, temp);
-		Strings.StrToInt(temp, target(Integer).value);
+		Strings.StrToInt32(temp, target(Integer).value);
 	ELSIF (target IS Hugeint) THEN
 		TextUtilities.TextToStr(value, temp);
-		Strings.StrToHInt(temp, target(Hugeint).value);
+		Strings.StrToInt64(temp, target(Hugeint).value);
 	ELSIF (target IS Size) THEN
 		TextUtilities.TextToStr(value, temp);
 		Strings.StrToSize(temp, target(Size).value);

@@ -174,7 +174,7 @@ BEGIN
 						(* read TV frequency *)
 						s := e.GetAttributeValue ("freq");
 						IF s # NIL THEN
-							Strings.StrToInt (s^, ch.freq)
+							Strings.StrToInt32 (s^, ch.freq)
 						END;
 						(* read optional teletext attribute *)
 						s := e.GetAttributeValue ("teletext");

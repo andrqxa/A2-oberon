@@ -126,7 +126,7 @@ TYPE
 						IF (name # NIL) THEN Strings.HexStrToInt(name^, tempInt, res); rectColor2 := tempInt; END;
 					ELSIF (name # NIL) & (name^ = "fill-mode") THEN
 						name := ptr(XML.Element).GetAttributeValue("value");
-						IF (name # NIL) THEN Strings.StrToInt(name^, tempInt); fillMode := tempInt; END;
+						IF (name # NIL) THEN Strings.StrToInt32(name^, tempInt); fillMode := tempInt; END;
 					ELSIF (name # NIL) & (name^ = "gradient-horizontal") THEN
 						name := ptr(XML.Element).GetAttributeValue("value");
 						IF (name # NIL) THEN
@@ -470,7 +470,7 @@ TYPE
 				fillModeEdit.GetAsString(colorString);
 				Strings.IntToStr(theCaller.fillMode, origString);
 				IF origString # colorString THEN									(* Set new FillMode *)
-					Strings.StrToInt(colorString, color);
+					Strings.StrToInt32(colorString, color);
 					theCaller.fillMode := color;
 				END;
 			ELSIF (sender = gradHorizEdit) THEN

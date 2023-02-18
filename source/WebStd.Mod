@@ -288,7 +288,7 @@ TYPE
 	 	BEGIN
 	 		posStr := params.GetParameterValueByName("pos");
 	 		IF (posStr # NIL) THEN
-		 		Strings.StrToInt(posStr^, stateCounter)
+		 		Strings.StrToInt32(posStr^, stateCounter)
 		 	ELSE
 		 		KernelLog.String("WebStd:Sequence - event handler 'SetState' has parameter 'pos'.");
 		 		KernelLog.Ln
@@ -1136,7 +1136,7 @@ TYPE
 			ELSIF (elemLabel^ = "elem") THEN
 				refStr := elem.GetAttributeValue("ref");
 				IF (refStr # NIL) THEN
-					Strings.StrToInt(refStr^, ref);
+					Strings.StrToInt32(refStr^, ref);
 					IF (registeredAt # NIL) THEN
 						persObj := registeredAt.GetPersistentObject(ref);
 						(* this is possible because of the recovery algorithm of the prevalence system *)
@@ -1545,7 +1545,7 @@ TYPE
 			IF (paging # NIL) THEN
 				pagingSizeStr := paging.GetAttributeValue("size");
 				IF (pagingSizeStr # NIL) THEN
-					Strings.StrToInt(pagingSizeStr^, pagingSize)
+					Strings.StrToInt32(pagingSizeStr^, pagingSize)
 				ELSE
 					pagingSize := MAX(SIGNED32)
 				END
@@ -1669,7 +1669,7 @@ TYPE
 		BEGIN
 			posString := params.GetParameterValueByName("pos");
 			IF (posString # NIL) THEN
-				Strings.StrToInt(posString^, pos)
+				Strings.StrToInt32(posString^, pos)
 			ELSE
 				KernelLog.String("WebStd:Datagrid - event handler 'SetPos' has parameter 'pos'.");
 				KernelLog.Ln
@@ -2236,7 +2236,7 @@ TYPE
 		IF (elem # NIL) THEN
 			intStr := GetXMLCharContent(elem);
 			IF (intStr # NIL) THEN
-				Strings.StrToInt(intStr^, number)
+				Strings.StrToInt32(intStr^, number)
 			END
 		END;
 		RETURN number

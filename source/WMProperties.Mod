@@ -546,7 +546,7 @@ TYPE
 				s := p(XML.Chars).GetStr();
 				IF s # NIL THEN
 					Strings.Trim(s^, " ");
-					Strings.StrToInt(s^,i);
+					Strings.StrToInt32(s^,i);
 					Set(IntToSet(i))
 				END
 			END
@@ -722,8 +722,8 @@ TYPE
 			AcquireWrite; NotDefault;
 			mins := xml.GetAttributeValue("min");
 			maxs := xml.GetAttributeValue("max");
-			IF mins # NIL THEN Strings.StrToInt(mins^, min) ELSE min := MIN(SIGNED32) END;
-			IF maxs # NIL THEN Strings.StrToInt(maxs^, max) ELSE max := MAX(SIGNED32) END;
+			IF mins # NIL THEN Strings.StrToInt32(mins^, min) ELSE min := MIN(SIGNED32) END;
+			IF maxs # NIL THEN Strings.StrToInt32(maxs^, max) ELSE max := MAX(SIGNED32) END;
 			bounded := (mins # NIL) OR (maxs # NIL);
 			en := xml.GetContents();
 			IF en.HasMoreElements() THEN
@@ -731,7 +731,7 @@ TYPE
 				IF IsLink(p) THEN
 				ELSIF p IS XML.Chars THEN
 					s := p(XML.Chars).GetStr();
-					IF s # NIL THEN Strings.StrToInt(s^, value); Set(value) END
+					IF s # NIL THEN Strings.StrToInt32(s^, value); Set(value) END
 				END
 			END;
 			Stamp;
@@ -903,8 +903,8 @@ TYPE
 			AcquireWrite; NotDefault;
 			mins := xml.GetAttributeValue("min");
 			maxs := xml.GetAttributeValue("max");
-			IF mins # NIL THEN Strings.StrToHInt(mins^, min) ELSE min := MIN(SIGNED64) END;
-			IF maxs # NIL THEN Strings.StrToHInt(maxs^, max) ELSE max := MAX(SIGNED64) END;
+			IF mins # NIL THEN Strings.StrToInt64(mins^, min) ELSE min := MIN(SIGNED64) END;
+			IF maxs # NIL THEN Strings.StrToInt64(maxs^, max) ELSE max := MAX(SIGNED64) END;
 			bounded := (mins # NIL) OR (maxs # NIL);
 			en := xml.GetContents();
 			IF en.HasMoreElements() THEN
@@ -912,7 +912,7 @@ TYPE
 				IF IsLink(p) THEN
 				ELSIF p IS XML.Chars THEN
 					s := p(XML.Chars).GetStr();
-					IF s # NIL THEN Strings.StrToHInt(s^, value); Set(value) END
+					IF s # NIL THEN Strings.StrToInt64(s^, value); Set(value) END
 				END
 			END;
 			Stamp;
@@ -1841,7 +1841,7 @@ TYPE
 			s := xml.GetAttributeValue("name");
 			IF (s # NIL) THEN COPY(s^, name); ELSE name := ""; END;
 			s := xml.GetAttributeValue("size");
-			IF (s  # NIL) THEN Strings.StrToInt(s^, size); ELSE size := 0; END;
+			IF (s  # NIL) THEN Strings.StrToInt32(s^, size); ELSE size := 0; END;
 			s := xml.GetAttributeValue("style");
 			IF (s # NIL) THEN Strings.StrToSet(s^, style); ELSE style := {}; END;
 			SetFont(name, size, style);
@@ -2804,7 +2804,7 @@ BEGIN
 		p := en.GetNext();
 		IF p IS XML.Chars THEN
 			s := p(XML.Chars).GetStr();
-			IF s # NIL THEN Strings.StrToInt(s^, value) END
+			IF s # NIL THEN Strings.StrToInt32(s^, value) END
 		END;
 	END;
 	RETURN value

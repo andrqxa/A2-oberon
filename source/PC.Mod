@@ -303,7 +303,7 @@ PROCEDURE CompileInterface(t: Texts.Text; CONST source: ARRAY OF CHAR; pos: SIGN
 diagnostics : Diagnostics.Diagnostics; VAR error: BOOLEAN);
 VAR pcNum: SIGNED32;
 BEGIN
-	Strings.StrToInt(pc, pcNum);
+	Strings.StrToInt32(pc, pcNum);
 	CompileText(t,source,pos,pcNum, opt,log, diagnostics, error);
 END CompileInterface;
 
@@ -417,7 +417,7 @@ BEGIN
 			IF str^ = ErrorTag THEN
 					(* extract error code *)
 				str := e.GetAttributeValue(ErrCodeAttr);
-				Strings.StrToInt(str^, code);
+				Strings.StrToInt32(str^, code);
 					(* extract error message *)
 				msgEnum := e.GetContents();
 				NEW(dynStr);

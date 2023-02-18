@@ -693,7 +693,7 @@ TYPE
 			IF (elem # NIL) THEN
 				oidStr := WebStd.GetXMLCharContent(elem);
 				IF (oidStr # NIL) THEN
-					Strings.StrToInt(oidStr^, oidNr);
+					Strings.StrToInt32(oidStr^, oidNr);
 					persObj := prevSys.GetPersistentObject(oidNr);
 					IF ((persObj # NIL) & (persObj IS WebStd.PersistentDataContainer)) THEN
 						members := persObj(WebStd.PersistentDataContainer)
@@ -1622,7 +1622,7 @@ TYPE
 			IF (prevSys # NIL) THEN
 				accountOidStr := params.GetParameterValueByName("accountoid");
 				IF (accountOidStr # NIL) THEN
-					Strings.StrToInt(accountOidStr^, accountOid);
+					Strings.StrToInt32(accountOidStr^, accountOid);
 					persObj := prevSys.GetPersistentObject(accountOid);
 					IF ((persObj # NIL) & (persObj IS WebAccount)) THEN
 						obj := persObj(WebAccount);

@@ -1473,7 +1473,7 @@ BEGIN
 			Strings.TrimWS(string^);
 			IF (string^ # XmlDontCare) THEN
 				INCL(defined, FontSize);
-				Strings.StrToInt(string^, fontsize);
+				Strings.StrToInt32(string^, fontsize);
 			END;
 		ELSE
 			diagnostics.Warning(source, element.GetPos(), "Style attribute font size missing");
@@ -1526,7 +1526,7 @@ BEGIN
 			Strings.TrimWS(string^);
 			IF (string^ # XmlDontCare) THEN
 				INCL(defined, Voff);
-				Strings.StrToInt(string^, voff);
+				Strings.StrToInt32(string^, voff);
 			END;
 		ELSE
 			INCL(defined, Voff);

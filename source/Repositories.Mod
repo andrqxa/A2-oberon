@@ -1394,7 +1394,7 @@ BEGIN
 		(* no, this is ambiguous, rather use ":ComponenName:Number" for such cases
 		IF ~succeeded & IsValidName(repositoryName) & IsNumber(componentName) THEN
 			succeeded := TRUE;
-			Strings.StrToInt(componentName, id);
+			Strings.StrToInt32(componentName, id);
 			D.String("split name with index"); D.String(repositoryName); D.String(" : "); D.Int(id,1); D.Ln;
 			COPY(repositoryName, componentName);
 			repositoryName := "";

@@ -1733,7 +1733,7 @@ TYPE
 						sr.Reset; tabCounter := 0;
 						WHILE (sr.res = Streams.Ok) DO
 							sr.SkipWhitespace; sr.String(token);
-							Strings.StrToInt(token, tabPos);
+							Strings.StrToInt32(token, tabPos);
 							tp[tabCounter] := tabPos;
 							INC(tabCounter);
 						END;
@@ -2181,7 +2181,7 @@ TYPE
 						sr.Reset; tabCounter := 0;
 						WHILE (sr.res = Streams.Ok) DO
 							sr.SkipWhitespace; sr.String(token);
-							Strings.StrToInt(token, tabPos);
+							Strings.StrToInt32(token, tabPos);
 							tp[tabCounter] := tabPos;
 							INC(tabCounter);
 						END;

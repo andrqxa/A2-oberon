@@ -1819,7 +1819,7 @@ TYPE
 		BEGIN
 			IF (currentPage # NIL) THEN
 				positionEdit.GetAsString(tempString);
-				Strings.StrToInt(tempString, tempInt);
+				Strings.StrToInt32(tempString, tempInt);
 				currentPage.editor.tv.cursor.SetPosition(tempInt);
 				currentPage.editor.tv.cursor.SetVisible(TRUE);
 				currentPage.editor.SetFocus;

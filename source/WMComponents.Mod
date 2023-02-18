@@ -3407,10 +3407,10 @@ BEGIN
 		winx:=xml(XML.Element);
 		string:=winx.GetName();
 		IF string^="FormWindow" THEN
-			string:=winx.GetAttributeValue("l"); Strings.StrToInt(string^,l);
-			string:=winx.GetAttributeValue("t"); Strings.StrToInt(string^,t);
-			string:=winx.GetAttributeValue("r"); Strings.StrToInt(string^,r);
-			string:=winx.GetAttributeValue("b"); Strings.StrToInt(string^,b);
+			string:=winx.GetAttributeValue("l"); Strings.StrToInt32(string^,l);
+			string:=winx.GetAttributeValue("t"); Strings.StrToInt32(string^,t);
+			string:=winx.GetAttributeValue("r"); Strings.StrToInt32(string^,r);
+			string:=winx.GetAttributeValue("b"); Strings.StrToInt32(string^,b);
 			NEW(window, r-l, b-t, TRUE);
 			name:=winx.GetAttributeValue("name"); window.SetTitle(name);
 			window.bounds.r:=r; window.bounds.l:=l; window.bounds.t:=t; window.bounds.b:=b;

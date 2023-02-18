@@ -371,7 +371,7 @@ TYPE
 
 							IF res = WMDialogs.ResOk THEN
 
-								Strings.StrToInt (login, uin);
+								Strings.StrToInt32 (login, uin);
 
 								IF uin # 0 THEN
 
@@ -626,7 +626,7 @@ TYPE
 
 							res := WMDialogs.QueryLogin ("Login", login, password);
 							IF res = WMDialogs.ResOk THEN
-								Strings.StrToInt (login, uin);
+								Strings.StrToInt32 (login, uin);
 
 								IF uin # 0 THEN
 

@@ -506,7 +506,7 @@ TYPE
 						Files.SplitPath(bc, pathName, name); (* "remove" trailing '/' of baseline collection. *)
 						Files.SplitPath(pathName, path, name); (* HEAD revision is last segment. *)
 						(*log.Enter; log.String("Head="); log.String(name); log.Exit;*)
-						U.StrToInt(name, start);
+						U.StrToInt32(name, start);
 					END;
 				END;
 				LogReport(url, bc, start, end);
@@ -1452,7 +1452,7 @@ TYPE
 			(* add a new directory *)
 			data.Revision := globalVersion;
 			COPY ( props.date, data.LastChangedDate );
-			U.StrToInt ( props.revision, data.LastChangedRevision );
+			U.StrToInt32 ( props.revision, data.LastChangedRevision );
 			COPY ( props.author, data.LastChangedAuthor );
 			COPY ( props.uuid, data.RepositoryUUID );
 
@@ -1549,7 +1549,7 @@ TYPE
 						COPY ( props.date, data.LastChangedDate );
 						COPY ( props.author, data.LastChangedAuthor );
 						data.NodeKind := "file";
-						U.StrToInt ( props.revision, data.LastChangedRevision );
+						U.StrToInt32 ( props.revision, data.LastChangedRevision );
 
 						SVNAdmin.Write ( w, data );
 

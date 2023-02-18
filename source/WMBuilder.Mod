@@ -231,7 +231,7 @@ TYPE
 			component := NIL;
 			IF (selection # NIL) & (selection.repository # NIL) & (selection.element # NIL) THEN
 				string := selection.element.GetAttributeValue("id");
-				IF (string # NIL) THEN Strings.StrToInt(string^, id); ELSE id := 0; END;
+				IF (string # NIL) THEN Strings.StrToInt32(string^, id); ELSE id := 0; END;
 				string := selection.element.GetAttributeValue("name");
 				IF (string # NIL) THEN
 					component := selection.repository.GetComponent(string^, id);

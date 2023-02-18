@@ -253,7 +253,7 @@ VAR string : String;
 BEGIN
 	string := elem.GetAttributeValue(name);
 	IF string # NIL THEN
-		Strings.StrToInt(string^, value);
+		Strings.StrToInt32(string^, value);
 	ELSE
 		ShowLoadError("LoadLongint", elem, name);
 	END;

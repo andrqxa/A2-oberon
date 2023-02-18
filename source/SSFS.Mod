@@ -893,7 +893,7 @@ VAR
 		stringArray := Strings.Split(devPart, "#");
 		IF (LEN(stringArray) = 2) THEN
 			COPY(stringArray[0]^, devicename);
-			Strings.StrToInt(stringArray[1]^, partition);
+			Strings.StrToInt32(stringArray[1]^, partition);
 			RETURN TRUE;
 		ELSE
 			RETURN FALSE;

@@ -522,7 +522,7 @@ BEGIN
 	ASSERT(element # NIL);
 	string := element.GetAttributeValue(attributeName);
 	IF (string # NIL) THEN
-		Strings.StrToInt(string^, value);
+		Strings.StrToInt32(string^, value);
 	END;
 	RETURN (string # NIL);
 END GetInteger;

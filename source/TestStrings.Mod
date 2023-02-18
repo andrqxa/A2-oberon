@@ -14,7 +14,7 @@ BEGIN
 	i := MIN(SIGNED32);
 	WHILE (i < MAX(SIGNED32)) DO
 		Strings.IntToStr(i, string);
-		Strings.StrToInt(string, temp);
+		Strings.StrToInt32(string, temp);
 		ASSERT(i = temp);
 		INC(i);
 		IF (i MOD Step = 0) THEN
@@ -27,7 +27,7 @@ BEGIN
 		END;
 	END;
 	Strings.IntToStr(MAX(SIGNED32), string);
-	Strings.StrToInt(string, temp);
+	Strings.StrToInt32(string, temp);
 	ASSERT(temp = MAX(SIGNED32));
 	context.out.String("100% done."); context.out.Ln;
 END TestIntegerConversion;

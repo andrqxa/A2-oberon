@@ -32,7 +32,7 @@ BEGIN
 		stopWatchIntToStr.Stop( );
 
 		VAR stopWatchStrToHInt := stopWatch.StartNew( );
-			Strings.StrToHInt( buffer, i64 );
+			Strings.StrToInt64( buffer, i64 );
 		stopWatchStrToHInt.Stop( );
 
 		VAR stopWatchStartNew := stopWatch.StartNew( );
@@ -56,7 +56,7 @@ BEGIN
 	context.out.Ln;
 
 	Stopwatch.ToString( stopWatchStrToHInt.Elapsed( ), buffer );
-	context.out.String("StrToHInt elapsed: " );
+	context.out.String("StrToInt64 elapsed: " );
 	context.out.String( buffer );
 	context.out.Ln;
 

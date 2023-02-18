@@ -154,7 +154,7 @@ TYPE
 						subElem := p(XML.Element);
 						str := WebStd.GetXMLCharContent(subElem);
 						IF (str # NIL) THEN
-							Strings.StrToInt(str^, number);
+							Strings.StrToInt32(str^, number);
 							grades.Add(number)
 						END
 					END
@@ -616,7 +616,7 @@ TYPE
 			IF (elem # NIL) THEN
 				oidStr := WebStd.GetXMLCharContent(elem);
 				IF (oidStr # NIL) THEN
-					Strings.StrToInt(oidStr^, oidNr);
+					Strings.StrToInt32(oidStr^, oidNr);
 					persObj := PrevalenceSystem.GetPersistentObject(oidNr);
 					IF ((persObj # NIL) & (persObj IS WebStd.PersistentDataContainer)) THEN
 						members := persObj(WebStd.PersistentDataContainer)
@@ -1274,7 +1274,7 @@ TYPE
 			END;
 
 			IF ((groupOidStr # NIL) & (prevSys # NIL)) THEN
-				Strings.StrToInt(groupOidStr^, groupOid);
+				Strings.StrToInt32(groupOidStr^, groupOid);
 				persObj := prevSys.GetPersistentObject(groupOid);
 				IF ((persObj # NIL) & (persObj IS Group)) THEN
 					group := persObj(Group);
@@ -1530,8 +1530,8 @@ TYPE
 							 IF ((sepIdx > 0) & (sepIdx < length-1)) THEN
 							 	NEW(personOidStr, sepIdx+1); Strings.Copy(tempStr^, 0, sepIdx, personOidStr^);
 							 	NEW(exerciseNoStr, length-sepIdx); Strings.Copy(tempStr^, sepIdx+1, length-sepIdx-1, exerciseNoStr^);
-							 	Strings.StrToInt(personOidStr^, personOid); Strings.StrToInt(exerciseNoStr^, exerciseNo);
-							 	Strings.StrToInt(par.value^, newGrade);
+							 	Strings.StrToInt32(personOidStr^, personOid); Strings.StrToInt32(exerciseNoStr^, exerciseNo);
+							 	Strings.StrToInt32(par.value^, newGrade);
 							 	group.UpdateGrade(personOid, exerciseNo, newGrade)
 							 END
 						END
@@ -1553,7 +1553,7 @@ TYPE
 		BEGIN
 			exerciseNoStr := params.GetParameterValueByName("exerciseno");
 			IF (exerciseNoStr # NIL) THEN
-				Strings.StrToInt(exerciseNoStr^, exerciseNo);
+				Strings.StrToInt32(exerciseNoStr^, exerciseNo);
 				IF (group # NIL) THEN
 					group.DeleteExercise(exerciseNo)
 				END
