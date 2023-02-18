@@ -165,35 +165,38 @@ TYPE
 		END GetBoolean;
 
 		PROCEDURE GetColor*(CONST key : ARRAY OF CHAR; VAR value : SIGNED32; VAR res : INTEGER);
-		VAR string : ARRAY 16 OF CHAR; tempres : INTEGER;
+		VAR string : ARRAY 16 OF CHAR; pos := 0: SIZE; answer: UNSIGNED32;
 		BEGIN
 			Get(key, string, res);
 			IF (res = Ok) THEN
 				Strings.TrimWS(string);
-				Strings.HexStrToInt(string, value, tempres);
-				IF tempres # Strings.Ok THEN res := Error; END;
+				IF Strings.TryScanUInt32At(pos, string, 16, answer, res) THEN
+					value := SIGNED32(answer);
+				ELSE
+					res := Error;
+				END;
 			END;
 		END GetColor;
 
 		PROCEDURE GetInteger*(CONST key : ARRAY OF CHAR; VAR value : SIGNED32; VAR res : INTEGER);
-		VAR string : ARRAY 16 OF CHAR;
+		VAR string : ARRAY 16 OF CHAR; pos := 0: SIZE;
 		BEGIN
 			Get(key, string, res);
 			IF (res = Ok) THEN
 				Strings.TrimWS(string);
-				IF ~Strings.TryParseInt32(string, value) THEN
+				IF ~Strings.TryScanInt32At(pos, string, 0, value, res) THEN
 					res := Error;
 				END;
 			END;
 		END GetInteger;
 
 		PROCEDURE GetInteger64*(CONST key : ARRAY OF CHAR; VAR value : SIGNED64; VAR res : INTEGER);
-		VAR string : ARRAY 21 OF CHAR;
+		VAR string : ARRAY 21 OF CHAR; pos := 0: SIZE;
 		BEGIN
 			Get(key, string, res);
 			IF (res = Ok) THEN
 				Strings.TrimWS(string);
-				IF ~Strings.TryParseInt64(string, value) THEN
+				IF ~Strings.TryScanInt64At(pos, string, 0, value, res) THEN
 					res := Error;
 				END;
 			END;
