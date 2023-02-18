@@ -44,8 +44,7 @@ TYPE
 			Init(panel.bounds.GetWidth(), panel.bounds.GetHeight(), FALSE);
 			SetContent(panel);
 			manager := WM.GetDefaultManager();
-			SetTitle(WMComponents.NewString(title));
-
+			SetTitle(Strings.NewString(title));
 
 			WM.DefaultAddWindow(SELF);
 			NEW(tw, out.text);

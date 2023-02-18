@@ -17,7 +17,7 @@ MODULE JPEG2000Decoder;
 		- Optimization: Inline procedures Renormd, LpsExchange and MpsExchange of MQDecoder.
 	*)
 
-	IMPORT SYSTEM, KernelLog, Streams, J2KCS := JPEG2000DecoderCS, J2KU := JPEG2000DecoderUtil,
+	IMPORT SYSTEM, KernelLog, Strings, Streams, J2KCS := JPEG2000DecoderCS, J2KU := JPEG2000DecoderUtil,
 			Codecs, Raster, Machine;
 
 	CONST
@@ -7109,7 +7109,7 @@ MODULE JPEG2000Decoder;
 			(* Display the image if the "view" option has been set, or the "output-to-file" option is not set *)
 			IF view OR ~bmpOut THEN
 				NEW(window, imgWidth, imgHeight, FALSE);
-				window.SetTitle(WM.NewString(fileName));
+				window.SetTitle(Strings.NewString(fileName));
 				WM.DefaultAddWindow(window);
 				NEW(rasterImgAdapt, window.img);
 				imgConsumerArr[nconsumer] := rasterImgAdapt;

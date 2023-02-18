@@ -1,7 +1,7 @@
 MODULE MultiLogger; (** AUTHOR "TF"; PURPOSE "Log window with a rich-text enabled TextWriter."; *)
 
 IMPORT
-	Streams, TextUtilities,
+	Streams, TextUtilities, Strings,
 	WMComponents, WMEditors, WMGraphics, WMStandardComponents,
 	WM := WMWindowManager;
 
@@ -24,7 +24,7 @@ TYPE
 			Init(panel.bounds.GetWidth(), panel.bounds.GetHeight(), FALSE);
 			SetContent(panel);
 			manager := WM.GetDefaultManager();
-			SetTitle(WMComponents.NewString(title));
+			SetTitle(Strings.NewString(title));
 			WM.DefaultAddWindow(SELF);
 			NEW(tw, out.text);
 			stream := tw;

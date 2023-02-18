@@ -862,7 +862,7 @@ TYPE
 
 		PROCEDURE SetCaption*(CONST x : ARRAY OF CHAR);
 		BEGIN
-			caption.Set(WMComponents.NewString(x))
+			caption.Set(Strings.NewString(x))
 		END SetCaption;
 
 		PROCEDURE IsHit*(x, y: SIZE) : BOOLEAN;
@@ -2025,7 +2025,7 @@ TYPE
 		BEGIN
 			Init^;
 			SetGenerator("WMStandardComponents.GenSlider");
-			SetNameAsString(NewString("Slider"));
+			SetNameAsString(Strings.NewString("Slider"));
 			NEW(min, PrototypeSmin, NIL, NIL); properties.Add(min);
 			NEW(max, PrototypeSmax,  NIL, NIL); properties.Add(max);
 			NEW(pos, PrototypeSpos, NIL, NIL); properties.Add(pos);
@@ -3098,34 +3098,34 @@ VAR
 
 PROCEDURE InitStrings;
 BEGIN
-	GSonTimer := NewString("onTimer"); GSonTimerInfo := NewString("generates an event if the timer runs out");
-	GSStart := NewString("Start"); GSStartTimerInfo := NewString("start the timer");
-	GSStop := NewString("Stop"); GSStopTimerInfo := NewString("stop the timer");
-	GSRun := NewString("Run");
+	GSonTimer := Strings.NewString("onTimer"); GSonTimerInfo := Strings.NewString("generates an event if the timer runs out");
+	GSStart := Strings.NewString("Start"); GSStartTimerInfo := Strings.NewString("start the timer");
+	GSStop := Strings.NewString("Stop"); GSStopTimerInfo := Strings.NewString("stop the timer");
+	GSRun := Strings.NewString("Run");
 
-	GSRunSystemCommandInfo := NewString("run the system command specified in commandString");
-	GSCallEventInfo := NewString("call the event listener specified in commandString");
+	GSRunSystemCommandInfo := Strings.NewString("run the system command specified in commandString");
+	GSCallEventInfo := Strings.NewString("call the event listener specified in commandString");
 
-	GSonClick := NewString("onClick"); GSonClickButtonInfo := NewString("generates an event if the button is clicked");
-	GSonClickCheckboxInfo := NewString("generates an event if the checkbox is clicked");
-	GSonPositionChanged := NewString("onPositionChanged");
-	GSonPositionChangedInfo := NewString("generates an event if the position is changed");
+	GSonClick := Strings.NewString("onClick"); GSonClickButtonInfo := Strings.NewString("generates an event if the button is clicked");
+	GSonClickCheckboxInfo := Strings.NewString("generates an event if the checkbox is clicked");
+	GSonPositionChanged := Strings.NewString("onPositionChanged");
+	GSonPositionChangedInfo := Strings.NewString("generates an event if the position is changed");
 
-	StrTimer := NewString("Timer");
-	StrSystemCommand := NewString("SystemCommand");
-	StrEvent := NewString("Event");
-	StrPanel := NewString("Panel");
-	StrDecoratorPanel := NewString("DecoratorPanel");
-	StrLabel := NewString("Label");
-	StrButton := NewString("Button");
-	StrScrollbar := NewString("Scrollbar");
-	StrResizer := NewString("Resizer");
-	StrCheckbox := NewString("Checkbox");
-	StrGroupPanel := NewString("GroupPanel");
-	StrImage := NewString("Image");
-	StrImagePanel := NewString("ImagePanel");
-	StrModel := NewString("Model");
-	StrModelInfo := NewString("Model used by component");
+	StrTimer := Strings.NewString("Timer");
+	StrSystemCommand := Strings.NewString("SystemCommand");
+	StrEvent := Strings.NewString("Event");
+	StrPanel := Strings.NewString("Panel");
+	StrDecoratorPanel := Strings.NewString("DecoratorPanel");
+	StrLabel := Strings.NewString("Label");
+	StrButton := Strings.NewString("Button");
+	StrScrollbar := Strings.NewString("Scrollbar");
+	StrResizer := Strings.NewString("Resizer");
+	StrCheckbox := Strings.NewString("Checkbox");
+	StrGroupPanel := Strings.NewString("GroupPanel");
+	StrImage := Strings.NewString("Image");
+	StrImagePanel := Strings.NewString("ImagePanel");
+	StrModel := Strings.NewString("Model");
+	StrModelInfo := Strings.NewString("Model used by component");
 END InitStrings;
 
 PROCEDURE InitPrototypes;
@@ -3134,374 +3134,374 @@ VAR
 BEGIN
 	(* Timer properties *)
 	NEW(plTimer);
-	NEW(PrototypeInterval, NIL, NewString("Interval"),  NewString("time between two timer ticks in ms"));
+	NEW(PrototypeInterval, NIL, Strings.NewString("Interval"),  Strings.NewString("time between two timer ticks in ms"));
 	PrototypeInterval.Set(100);
 	plTimer.Add(PrototypeInterval);
-	NEW(PrototypeDelay, NIL, NewString("Delay"),  NewString("delay before timer ticks run"));
+	NEW(PrototypeDelay, NIL, Strings.NewString("Delay"),  Strings.NewString("delay before timer ticks run"));
 	PrototypeDelay.Set(1000);
 	plTimer.Add(PrototypeDelay);
 	WMComponents.propertyListList.Add("Timer", plTimer);
 
 	(* SystemCommand properties *)
-	NEW(PrototypeCommandString, NIL, NewString("CommandString"), NewString("command to be executed uppon call to Run"));
+	NEW(PrototypeCommandString, NIL, Strings.NewString("CommandString"), Strings.NewString("command to be executed uppon call to Run"));
 
 	(* Label properties *)
 	NEW(plLabel); WMComponents.propertyListList.Add("Label", plLabel);
-	NEW(PrototypeCaption, NIL, NewString("Caption"), NewString("caption text"));
-	NEW(PrototypeFont, NIL, NewString("Font"), NewString("Font"));
+	NEW(PrototypeCaption, NIL, Strings.NewString("Caption"), Strings.NewString("caption text"));
+	NEW(PrototypeFont, NIL, Strings.NewString("Font"), Strings.NewString("Font"));
 	PrototypeFont.Set(WMGraphics.GetDefaultFont());
-	NEW(PrototypeTextColor, NIL, NewString("TextColor"), NewString("text color")); plLabel.Add(PrototypeTextColor);
+	NEW(PrototypeTextColor, NIL, Strings.NewString("TextColor"), Strings.NewString("text color")); plLabel.Add(PrototypeTextColor);
 	PrototypeTextColor.Set(0FFH);
-	NEW(PrototypeAlignH, NIL, NewString("AlignH"), NewString("horizontal alignment")); plLabel.Add(PrototypeAlignH);
+	NEW(PrototypeAlignH, NIL, Strings.NewString("AlignH"), Strings.NewString("horizontal alignment")); plLabel.Add(PrototypeAlignH);
 	PrototypeAlignH.Set(WMGraphics.AlignLeft);
-	NEW(PrototypeAlignV, NIL, NewString("AlignV"), NewString("vertical alignment")); plLabel.Add(PrototypeAlignV);
+	NEW(PrototypeAlignV, NIL, Strings.NewString("AlignV"), Strings.NewString("vertical alignment")); plLabel.Add(PrototypeAlignV);
 	PrototypeAlignV.Set(WMGraphics.AlignCenter);
 
 	(*
 	NEW(plDecorator); WMComponents.propertyListList.Add("Decorator", plDecorator);
-	NEW(PrototypeTopLeftName, NIL, NewString("TopLeft"), NewString("Default Top Left Decorator Bitmap")); PrototypeTopLeftName.Set(NewString("")); plDecorator.Add(PrototypeTopLeftName);
-	NEW(PrototypeTopName, NIL, NewString("Top"), NewString("Default Top Decorator Bitmap")); PrototypeLeftName.Set(NewString("")); plDecorator.Add(PrototypeTopName);
-	NEW(PrototypeTopRightName, NIL, NewString("TopRight"), NewString("Default Top Right Decorator Bitmap")); PrototypeRightName.Set(NewString("")); plDecorator.Add(PrototypeTopRightName);
-	NEW(PrototypeBottomLeftName, NIL, NewString("BottomLeft"), NewString("Default Bottom Left Decorator Bitmap")); PrototypeBottomLeftName.Set(NewString("")); plDecorator.Add(PrototypeBottomLeftName);
-	NEW(PrototypeBottomName, NIL, NewString("Bottom"), NewString("Default Bottom Decorator Bitmap")); PrototypeBottomName.Set(NewString("")); plDecorator.Add(PrototypeBottomName);
-	NEW(PrototypeBottomRightName, NIL, NewString("BottomRight"), NewString("Default Bottom Right Decorator Bitmap")); PrototypeBottomRightName.Set(NewString("")); plDecorator.Add(PrototypeBottomRightName);
-	NEW(PrototypeLeftName, NIL, NewString("Left"), NewString("Default Left Decorator Bitmap")); PrototypeLeftName.Set(NewString("")); plDecorator.Add(PrototypeLeftName);
-	NEW(PrototypeRightName, NIL, NewString("Right"), NewString("Default Right Decorator Bitmap")); PrototypeRightName.Set(NewString("")); plDecorator.Add(PrototypeRightName);
+	NEW(PrototypeTopLeftName, NIL, Strings.NewString("TopLeft"), Strings.NewString("Default Top Left Decorator Bitmap")); PrototypeTopLeftName.Set(Strings.NewString("")); plDecorator.Add(PrototypeTopLeftName);
+	NEW(PrototypeTopName, NIL, Strings.NewString("Top"), Strings.NewString("Default Top Decorator Bitmap")); PrototypeLeftName.Set(Strings.NewString("")); plDecorator.Add(PrototypeTopName);
+	NEW(PrototypeTopRightName, NIL, Strings.NewString("TopRight"), Strings.NewString("Default Top Right Decorator Bitmap")); PrototypeRightName.Set(Strings.NewString("")); plDecorator.Add(PrototypeTopRightName);
+	NEW(PrototypeBottomLeftName, NIL, Strings.NewString("BottomLeft"), Strings.NewString("Default Bottom Left Decorator Bitmap")); PrototypeBottomLeftName.Set(Strings.NewString("")); plDecorator.Add(PrototypeBottomLeftName);
+	NEW(PrototypeBottomName, NIL, Strings.NewString("Bottom"), Strings.NewString("Default Bottom Decorator Bitmap")); PrototypeBottomName.Set(Strings.NewString("")); plDecorator.Add(PrototypeBottomName);
+	NEW(PrototypeBottomRightName, NIL, Strings.NewString("BottomRight"), Strings.NewString("Default Bottom Right Decorator Bitmap")); PrototypeBottomRightName.Set(Strings.NewString("")); plDecorator.Add(PrototypeBottomRightName);
+	NEW(PrototypeLeftName, NIL, Strings.NewString("Left"), Strings.NewString("Default Left Decorator Bitmap")); PrototypeLeftName.Set(Strings.NewString("")); plDecorator.Add(PrototypeLeftName);
+	NEW(PrototypeRightName, NIL, Strings.NewString("Right"), Strings.NewString("Default Right Decorator Bitmap")); PrototypeRightName.Set(Strings.NewString("")); plDecorator.Add(PrototypeRightName);
 	*)
 
 	(* Button properties *)
 	NEW(plButton);	WMComponents.propertyListList.Add("Button", plButton);
 		(* caption *)
-	NEW(PrototypeBcaption, NIL, NewString("Caption"), NewString("defines the button text"));
+	NEW(PrototypeBcaption, NIL, Strings.NewString("Caption"), Strings.NewString("defines the button text"));
 		(* font size *)
-	NEW(Int32Prototype, NIL, NewString("FontHeight"), NewString("height of the button text")); Int32Prototype.Set(12);
-	NEW(PrototypeBisRepeating, NIL, NewString("IsRepeating"), NewString("defines if the button repeats sending click events while being pressed down"));
-	NEW(PrototypeBisToggle, NIL, NewString("IsToggle"), NewString("defines if the button is a toggle button"));
-	NEW(PrototypeBisInverse, NIL, NewString("IsInverse"), NewString("defines if the button is the inverse of the model"));
-	NEW(PrototypeBindicateToggle, NIL, NewString("IndicateToggle"), NewString("Display small LED in toggle buttons"));
+	NEW(Int32Prototype, NIL, Strings.NewString("FontHeight"), Strings.NewString("height of the button text")); Int32Prototype.Set(12);
+	NEW(PrototypeBisRepeating, NIL, Strings.NewString("IsRepeating"), Strings.NewString("defines if the button repeats sending click events while being pressed down"));
+	NEW(PrototypeBisToggle, NIL, Strings.NewString("IsToggle"), Strings.NewString("defines if the button is a toggle button"));
+	NEW(PrototypeBisInverse, NIL, Strings.NewString("IsInverse"), Strings.NewString("defines if the button is the inverse of the model"));
+	NEW(PrototypeBindicateToggle, NIL, Strings.NewString("IndicateToggle"), Strings.NewString("Display small LED in toggle buttons"));
 	PrototypeBindicateToggle.Set(TRUE);
 		(* behaviour *)
-	NEW(PrototypeBonClickHandler, NIL, NewString("OnClickHandler"), NewString("handler"));
+	NEW(PrototypeBonClickHandler, NIL, Strings.NewString("OnClickHandler"), Strings.NewString("handler"));
 		(* single images *)
-	NEW(StringPrototype, NIL, NewString("BgDefault"), NewString("Default background bitmap")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgDefault"), Strings.NewString("Default background bitmap")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeBimgDefaultName, StringPrototype, NIL, NIL); plButton.Add(PrototypeBimgDefaultName);
-	NEW(StringPrototype, NIL, NewString("BgInactive"), NewString("Default disabled background bitmap")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgInactive"), Strings.NewString("Default disabled background bitmap")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeBimgInactiveName, StringPrototype, NIL, NIL); plButton.Add(PrototypeBimgInactiveName);
-	NEW(StringPrototype, NIL, NewString("BgHover"), NewString("Mouseover background bitmap")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgHover"), Strings.NewString("Mouseover background bitmap")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeBimgHoverName, StringPrototype, NIL, NIL); plButton.Add(PrototypeBimgHoverName);
-	NEW(StringPrototype, NIL, NewString("BgPressed"), NewString("Pressed background bitmap")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgPressed"), Strings.NewString("Pressed background bitmap")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeBimgPressedName, StringPrototype, NIL, NIL); plButton.Add(PrototypeBimgPressedName);
-	NEW(StringPrototype, NIL, NewString("BgImage"), NewString("background bitmap")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgImage"), Strings.NewString("background bitmap")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeBimageName, StringPrototype, NIL, NIL); plButton.Add(PrototypeBimageName);
 		(* presentation *)
-	NEW(BooleanPrototype, NIL, NewString("UseBgBitmaps"), NewString("Is the button decorated by bitmaps or simple colors?")); BooleanPrototype.Set(FALSE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("UseBgBitmaps"), Strings.NewString("Is the button decorated by bitmaps or simple colors?")); BooleanPrototype.Set(FALSE);
 	NEW(PrototypeBUseBgImages, BooleanPrototype, NIL, NIL); plButton.Add(PrototypeBUseBgImages);
-	NEW(PrototypeBIsHorizontal, NIL, NewString("IsHorizontal"), NewString("Specifies if the button is horizontal or vertical")); PrototypeBIsHorizontal.Set(TRUE);
-	NEW(BooleanPrototype, NIL, NewString("RepeatMiddleImage"), NewString("If TRUE, the middle image of the button representation will be repeated, scaled if FALSE"));
+	NEW(PrototypeBIsHorizontal, NIL, Strings.NewString("IsHorizontal"), Strings.NewString("Specifies if the button is horizontal or vertical")); PrototypeBIsHorizontal.Set(TRUE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("RepeatMiddleImage"), Strings.NewString("If TRUE, the middle image of the button representation will be repeated, scaled if FALSE"));
 	BooleanPrototype.Set(FALSE);
 	NEW(PrototypeBRepeatMiddleImg, BooleanPrototype, NIL, NIL); plButton.Add(PrototypeBRepeatMiddleImg);
 		(* button size *)
-	NEW(RectanglePrototype, WMComponents.PrototypeBounds, NewString("Bounds"), NIL); RectanglePrototype.Set(WMRectangles.MakeRect(0, 0, 50, 20));
-	NEW(PrototypeBBounds, RectanglePrototype, NewString("Bounds"), NIL); plButton.Add(PrototypeBBounds);
+	NEW(RectanglePrototype, WMComponents.PrototypeBounds, Strings.NewString("Bounds"), NIL); RectanglePrototype.Set(WMRectangles.MakeRect(0, 0, 50, 20));
+	NEW(PrototypeBBounds, RectanglePrototype, Strings.NewString("Bounds"), NIL); plButton.Add(PrototypeBBounds);
 		(* background color *)
-	NEW(ColorPrototype, NIL, NewString("ClDefault"), NewString("Default background color")); ColorPrototype.Set(1010C080H);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClDefault"), Strings.NewString("Default background color")); ColorPrototype.Set(1010C080H);
 	NEW(PrototypeBclDefault, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclDefault);
-	NEW(ColorPrototype, NIL, NewString("ClHover"), NewString("Mouseover background color")); ColorPrototype.Set(SIGNED32(0EEEE00FFH));
+	NEW(ColorPrototype, NIL, Strings.NewString("ClHover"), Strings.NewString("Mouseover background color")); ColorPrototype.Set(SIGNED32(0EEEE00FFH));
 	NEW(PrototypeBclHover, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclHover);
-	NEW(ColorPrototype, NIL, NewString("ClPressed"), NewString("Pressed background color")); ColorPrototype.Set(SIGNED32(0EEEE00FFH));
+	NEW(ColorPrototype, NIL, Strings.NewString("ClPressed"), Strings.NewString("Pressed background color")); ColorPrototype.Set(SIGNED32(0EEEE00FFH));
 	NEW(PrototypeBclPressed, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclPressed);
-	NEW(ColorPrototype, NIL, NewString("ClInactive"), NewString("Inactive background color")); ColorPrototype.Set(SIGNED32(80808080H));
+	NEW(ColorPrototype, NIL, Strings.NewString("ClInactive"), Strings.NewString("Inactive background color")); ColorPrototype.Set(SIGNED32(80808080H));
 	NEW(PrototypeBclInactive, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclInactive);
 		(* font color *)
-	NEW(ColorPrototype, NIL, NewString("ClTextDefault"), NewString("Default text color")); ColorPrototype.Set(SIGNED32(0FFFF00FFH));
+	NEW(ColorPrototype, NIL, Strings.NewString("ClTextDefault"), Strings.NewString("Default text color")); ColorPrototype.Set(SIGNED32(0FFFF00FFH));
 	NEW(PrototypeBclTextDefault, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclTextDefault);
-	NEW(ColorPrototype, NIL, NewString("ClTextHover"), NewString("Mouseover text color")); ColorPrototype.Set(00000FFFFH);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClTextHover"), Strings.NewString("Mouseover text color")); ColorPrototype.Set(00000FFFFH);
 	NEW(PrototypeBclTextHover, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclTextHover);
-	NEW(ColorPrototype, NIL, NewString("ClTextPressed"), NewString("Pressed text color")); ColorPrototype.Set(00000FFFFH);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClTextPressed"), Strings.NewString("Pressed text color")); ColorPrototype.Set(00000FFFFH);
 	NEW(PrototypeBclTextPressed, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclTextPressed);
-	NEW(ColorPrototype, NIL, NewString("ClTextInactive"), NewString("Inactive text color")); ColorPrototype.Set(0FFFFFF80H);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClTextInactive"), Strings.NewString("Inactive text color")); ColorPrototype.Set(0FFFFFF80H);
 	NEW(PrototypeBclTextInactive, ColorPrototype, NIL, NIL); plButton.Add(PrototypeBclTextInactive);
 
 		(* effect3D *)
-	NEW(Int32Prototype, NIL, NewString("Effect3D"), NewString("Degree of 3d-effect. Zero for flat presentation")); Int32Prototype.Set(2);
+	NEW(Int32Prototype, NIL, Strings.NewString("Effect3D"), Strings.NewString("Degree of 3d-effect. Zero for flat presentation")); Int32Prototype.Set(2);
 	NEW(PrototypeBEffect3D, Int32Prototype, NIL, NIL); plButton.Add(PrototypeBEffect3D);
 	(* 3 x 5 background images *)
-	NEW(StringPrototype, NIL, NewString("BgLeftDefault"), NewString("Default background bitmap left")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgLeftDefault"), Strings.NewString("Default background bitmap left")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgDefaultNameLeft, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgDefaultNameLeft);
-	NEW(StringPrototype, NIL, NewString("BgRightDefault"), NewString("Default background bitmap right")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgRightDefault"), Strings.NewString("Default background bitmap right")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgDefaultNameRight, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgDefaultNameRight);
-	NEW(StringPrototype, NIL, NewString("BgMiddleDefault"), NewString("Default background bitmap middle")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgMiddleDefault"), Strings.NewString("Default background bitmap middle")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgDefaultNameMiddle, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgDefaultNameMiddle);
-	NEW(StringPrototype, NIL, NewString("BgTopDefault"), NewString("Default background bitmap top")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgTopDefault"), Strings.NewString("Default background bitmap top")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgDefaultNameTop, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgDefaultNameTop);
-	NEW(StringPrototype, NIL, NewString("BgBottomDefault"), NewString("Default background bitmap bottom")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgBottomDefault"), Strings.NewString("Default background bitmap bottom")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgDefaultNameBottom, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgDefaultNameBottom);
 
-	NEW(BooleanPrototype, NIL, NewString("UseDeco"), NewString("Is the button decorated by decoration?")); BooleanPrototype.Set(FALSE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("UseDeco"), Strings.NewString("Is the button decorated by decoration?")); BooleanPrototype.Set(FALSE);
 	NEW(PrototypeUseDeco, BooleanPrototype, NIL, NIL); plButton.Add(PrototypeUseDeco);
-	NEW(StringPrototype, NIL, NewString("DecoDefault"), NewString("Default background decoration name")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("DecoDefault"), Strings.NewString("Default background decoration name")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeDecoDefaultName, StringPrototype, NIL, NIL); plButton.Add(PrototypeDecoDefaultName);
-	NEW(StringPrototype, NIL, NewString("DecoHover"), NewString("Hover background decoration name")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("DecoHover"), Strings.NewString("Hover background decoration name")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeDecoHoverName, StringPrototype, NIL, NIL); plButton.Add(PrototypeDecoHoverName);
-	NEW(StringPrototype, NIL, NewString("DecoPressed"), NewString("Pressed background decoration name")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("DecoPressed"), Strings.NewString("Pressed background decoration name")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeDecoPressedName, StringPrototype, NIL, NIL); plButton.Add(PrototypeDecoPressedName);
 
 
-	NEW(StringPrototype, NIL, NewString("BgLeftHover"), NewString("Mouseover background bitmap left")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgLeftHover"), Strings.NewString("Mouseover background bitmap left")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgHoverNameLeft, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgHoverNameLeft);
-	NEW(StringPrototype, NIL, NewString("BgRightHover"), NewString("Mouseover background bitmap right")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgRightHover"), Strings.NewString("Mouseover background bitmap right")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgHoverNameRight, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgHoverNameRight);
-	NEW(StringPrototype, NIL, NewString("BgMiddleHover"), NewString("Mouseover background bitmap middle")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgMiddleHover"), Strings.NewString("Mouseover background bitmap middle")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgHoverNameMiddle, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgHoverNameMiddle);
-	NEW(StringPrototype, NIL, NewString("BgTopHover"), NewString("Mouseover background bitmap top")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgTopHover"), Strings.NewString("Mouseover background bitmap top")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgHoverNameTop, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgHoverNameTop);
-	NEW(StringPrototype, NIL, NewString("BgBottomHover"), NewString("Mouseover background bitmap bottom")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgBottomHover"), Strings.NewString("Mouseover background bitmap bottom")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgHoverNameBottom, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgHoverNameBottom);
 
-	NEW(StringPrototype, NIL, NewString("BgLeftPressed"), NewString("Pressed background bitmap left")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgLeftPressed"), Strings.NewString("Pressed background bitmap left")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgPressedNameLeft, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgPressedNameLeft);
-	NEW(StringPrototype, NIL, NewString("BgRightPressed"), NewString("Pressed background bitmap right")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgRightPressed"), Strings.NewString("Pressed background bitmap right")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgPressedNameRight, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgPressedNameRight);
-	NEW(StringPrototype, NIL, NewString("BgMiddlePressed"), NewString("Pressed background bitmap middle")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgMiddlePressed"), Strings.NewString("Pressed background bitmap middle")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgPressedNameMiddle, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgPressedNameMiddle);
-	NEW(StringPrototype, NIL, NewString("BgTopPressed"), NewString("Pressed background bitmap top")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgTopPressed"), Strings.NewString("Pressed background bitmap top")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgPressedNameTop, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgPressedNameTop);
-	NEW(StringPrototype, NIL, NewString("BgBottomPressed"), NewString("Pressed background bitmap bottom")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("BgBottomPressed"), Strings.NewString("Pressed background bitmap bottom")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeImgPressedNameBottom, StringPrototype, NIL, NIL); plButton.Add(PrototypeImgPressedNameBottom);
-	NEW(PrototypeButtonAlignH, NIL, NewString("TextAlignH"), NewString("horizontal text alignment")); plButton.Add(PrototypeAlignH);
+	NEW(PrototypeButtonAlignH, NIL, Strings.NewString("TextAlignH"), Strings.NewString("horizontal text alignment")); plButton.Add(PrototypeAlignH);
 	PrototypeButtonAlignH.Set(WMGraphics.AlignCenter);
-	NEW(PrototypeButtonAlignV, NIL, NewString("TextAlignV"), NewString("vertical text alignment")); plButton.Add(PrototypeAlignV);
+	NEW(PrototypeButtonAlignV, NIL, Strings.NewString("TextAlignV"), Strings.NewString("vertical text alignment")); plButton.Add(PrototypeAlignV);
 	PrototypeButtonAlignV.Set(WMGraphics.AlignCenter);
 
 	(* Scrollbar prototypes *)
 	NEW(plScrollbar); WMComponents.propertyListList.Add("Scrollbar", plScrollbar);
-	NEW(PrototypeSmin, NIL,  NewString("Min"), NewString("defines the scrollbar min position"));
-	NEW(PrototypeSmax, NIL, NewString("Max"), NewString("defines the scrollbar max position"));
+	NEW(PrototypeSmin, NIL,  Strings.NewString("Min"), Strings.NewString("defines the scrollbar min position"));
+	NEW(PrototypeSmax, NIL, Strings.NewString("Max"), Strings.NewString("defines the scrollbar max position"));
 	PrototypeSmax.Set(100);
-	NEW(PrototypeSpos, NIL, NewString("Pos"), NewString("defines the scrollbar position"));
-	NEW(PrototypeSpageSize, NIL, NewString("PageSize"), NewString("defines the scrollbar page size"));
+	NEW(PrototypeSpos, NIL, Strings.NewString("Pos"), Strings.NewString("defines the scrollbar position"));
+	NEW(PrototypeSpageSize, NIL, Strings.NewString("PageSize"), Strings.NewString("defines the scrollbar page size"));
 	PrototypeSpageSize.Set(20);
-	NEW(PrototypeTrackerSize, NIL, NewString("TrackerSize"), NewString("defines the tracker size"));
+	NEW(PrototypeTrackerSize, NIL, Strings.NewString("TrackerSize"), Strings.NewString("defines the tracker size"));
 	PrototypeTrackerSize.Set(20);
 		(* scrollbar width *)
-	NEW(SizePrototype, NIL, NewString("Width"), NewString("defines the scrollbar width")); SizePrototype.Set(14);
+	NEW(SizePrototype, NIL, Strings.NewString("Width"), Strings.NewString("defines the scrollbar width")); SizePrototype.Set(14);
 	NEW(PrototypeSWidth, SizePrototype, NIL, NIL); plScrollbar.Add(PrototypeSWidth);
 
-	NEW(PrototypeSvertical, NIL, NewString("Vertical"),	NewString("defines if the scrollbar is vertical"));
+	NEW(PrototypeSvertical, NIL, Strings.NewString("Vertical"),	Strings.NewString("defines if the scrollbar is vertical"));
 	PrototypeSvertical.Set(TRUE);
-	NEW(SizePrototype, NIL, NewString("MinTrackerSize"), NewString("")); SizePrototype.Set(5);
+	NEW(SizePrototype, NIL, Strings.NewString("MinTrackerSize"), Strings.NewString("")); SizePrototype.Set(5);
 	NEW(PrototypeSMinTrackerSize, SizePrototype, NIL, NIL); plScrollbar.Add(PrototypeSMinTrackerSize);
 			(* color *)
-	NEW(ColorPrototype, NIL, NewString("ClDefault"), NewString("Default background color")); ColorPrototype.Set(000000077H);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClDefault"), Strings.NewString("Default background color")); ColorPrototype.Set(000000077H);
 	NEW(PrototypeSClDefault, ColorPrototype, NIL, NIL); plScrollbar.Add(PrototypeSClDefault);
-	NEW(ColorPrototype, NIL, NewString("ClHover"), NewString("Mouseover background color")); ColorPrototype.Set(WMGraphics.Yellow);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClHover"), Strings.NewString("Mouseover background color")); ColorPrototype.Set(WMGraphics.Yellow);
 	NEW(PrototypeSClHover, ColorPrototype, NIL, NIL); plScrollbar.Add(PrototypeSClHover);
-	NEW(ColorPrototype, NIL, NewString("ClPressed"), NewString("Pressed background color")); ColorPrototype.Set(WMGraphics.Yellow);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClPressed"), Strings.NewString("Pressed background color")); ColorPrototype.Set(WMGraphics.Yellow);
 	NEW(PrototypeSClPressed, ColorPrototype, NIL, NIL); plScrollbar.Add(PrototypeSClPressed);
-	NEW(ColorPrototype, NIL, NewString("ClBtnDefault"), NewString("Default background color")); ColorPrototype.Set(1010C080H);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClBtnDefault"), Strings.NewString("Default background color")); ColorPrototype.Set(1010C080H);
 	NEW(PrototypeSClBtnDefault, ColorPrototype, NIL, NIL); plScrollbar.Add(PrototypeSClBtnDefault);
-	NEW(ColorPrototype, NIL, NewString("ClBtnHover"), NewString("Mouseover background color")); ColorPrototype.Set(SIGNED32(0EEEE00FFH));
+	NEW(ColorPrototype, NIL, Strings.NewString("ClBtnHover"), Strings.NewString("Mouseover background color")); ColorPrototype.Set(SIGNED32(0EEEE00FFH));
 	NEW(PrototypeSClBtnHover, ColorPrototype, NIL, NIL); plScrollbar.Add(PrototypeSClBtnHover);
-	NEW(ColorPrototype, NIL, NewString("ClBtnPressed"), NewString("Pressed background color")); ColorPrototype.Set(SIGNED32(0EEEE00FFH));
+	NEW(ColorPrototype, NIL, Strings.NewString("ClBtnPressed"), Strings.NewString("Pressed background color")); ColorPrototype.Set(SIGNED32(0EEEE00FFH));
 	NEW(PrototypeSClBtnPressed, ColorPrototype, NIL, NIL); plScrollbar.Add(PrototypeSClBtnPressed);
-	NEW(PrototypeSEffect3D, NIL, NewString("Effect3D"), NewString("Degree of 3d-effect. Zero for flat presentation")); PrototypeSEffect3D.Set(2);
+	NEW(PrototypeSEffect3D, NIL, Strings.NewString("Effect3D"), Strings.NewString("Degree of 3d-effect. Zero for flat presentation")); PrototypeSEffect3D.Set(2);
 		(* background *)
-	NEW(BooleanPrototype, NIL, NewString("UseBackgroundBitmaps"), NewString("Should background be decorated by bitmaps or simple color?")); BooleanPrototype.Set(FALSE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("UseBackgroundBitmaps"), Strings.NewString("Should background be decorated by bitmaps or simple color?")); BooleanPrototype.Set(FALSE);
 	NEW(PrototypeSUseBgBitmaps, BooleanPrototype, NIL, NIL);  plScrollbar.Add(PrototypeSUseBgBitmaps);
-	NEW(BooleanPrototype, NIL, NewString("RepeatBgBitmaps"), NewString("Should background bitmap be repeated or streched?")); BooleanPrototype.Set(TRUE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("RepeatBgBitmaps"), Strings.NewString("Should background bitmap be repeated or streched?")); BooleanPrototype.Set(TRUE);
 	NEW(PrototypeSRepeateBgBitmap, BooleanPrototype, NIL, NIL);  plScrollbar.Add(PrototypeSRepeateBgBitmap);
 			(* bitmaps *)
-	NEW(StringPrototype, NIL, NewString("HorizontalBgDefault"), NewString("Default background bitmap for the horizontal scrollbar")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalBgDefault"), Strings.NewString("Default background bitmap for the horizontal scrollbar")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShBgDefault, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShBgDefault);
-	NEW(StringPrototype, NIL, NewString("HorizontalBgHover"), NewString("Hover background bitmap for the horizontal scrollbar")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalBgHover"), Strings.NewString("Hover background bitmap for the horizontal scrollbar")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShBgHover, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShBgHover);
-	NEW(StringPrototype, NIL, NewString("HorizontalBgPressed"), NewString("Pressed background bitmap for the horizontal scrollbar")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalBgPressed"), Strings.NewString("Pressed background bitmap for the horizontal scrollbar")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShBgPressed, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShBgPressed);
-	NEW(StringPrototype, NIL, NewString("VerticalBgDefault"), NewString("Default background bitmap for the vertical scrollbar")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalBgDefault"), Strings.NewString("Default background bitmap for the vertical scrollbar")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvBgDefault, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvBgDefault);
-	NEW(StringPrototype, NIL, NewString("VerticalBgHover"), NewString("Hover background bitmap for the vertical scrollbar")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalBgHover"), Strings.NewString("Hover background bitmap for the vertical scrollbar")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvBgHover, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvBgHover);
-	NEW(StringPrototype, NIL, NewString("VerticalBgPressed"), NewString("Pressed background bitmap for the vertical scrollbar")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalBgPressed"), Strings.NewString("Pressed background bitmap for the vertical scrollbar")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvBgPressed, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvBgPressed);
 		(* trackers *)
-	NEW(BooleanPrototype, NIL, NewString("UseTrackerBitmaps"), NewString("Should thumbs be decorated by bitmaps or simple color?")); BooleanPrototype.Set(FALSE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("UseTrackerBitmaps"), Strings.NewString("Should thumbs be decorated by bitmaps or simple color?")); BooleanPrototype.Set(FALSE);
 	NEW(PrototypeSUseTrackerImages, BooleanPrototype, NIL, NIL);  plScrollbar.Add(PrototypeSUseTrackerImages);
-	NEW(BooleanPrototype, NIL, NewString("RepeatMiddleBitmaps"), NewString("Has the middle thumb bitmap to be repeated or streched?")); BooleanPrototype.Set(TRUE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("RepeatMiddleBitmaps"), Strings.NewString("Has the middle thumb bitmap to be repeated or streched?")); BooleanPrototype.Set(TRUE);
 	NEW(PrototypeSRepeatMiddleBitmap, BooleanPrototype, NIL, NIL);  plScrollbar.Add(PrototypeSRepeatMiddleBitmap);
 			(* horizontal*)
-	NEW(StringPrototype, NIL, NewString("HorizontalTrackerDefaultLeft"), NewString("Default background bitmap left of the horizontal thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalTrackerDefaultLeft"), Strings.NewString("Default background bitmap left of the horizontal thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShTrackerDefaultLeft, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShTrackerDefaultLeft);
-	NEW(StringPrototype, NIL, NewString("HorizontalTrackerHoverLeft"), NewString("Mouseover background bitmap left of the horizontal thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalTrackerHoverLeft"), Strings.NewString("Mouseover background bitmap left of the horizontal thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShTrackerHoverLeft, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShTrackerHoverLeft);
-	NEW(StringPrototype, NIL, NewString("HorizontalTrackerPressedLeft"), NewString("Pressed background bitmap left of the horizontal thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalTrackerPressedLeft"), Strings.NewString("Pressed background bitmap left of the horizontal thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShTrackerPressedLeft, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShTrackerPressedLeft);
-	NEW(StringPrototype, NIL, NewString("HorizontalTrackerDefaultMiddle"), NewString("Default background bitmap middle of the horizontal thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalTrackerDefaultMiddle"), Strings.NewString("Default background bitmap middle of the horizontal thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShTrackerDefaultMiddle, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShTrackerDefaultMiddle);
-	NEW(StringPrototype, NIL, NewString("HorizontalTrackerHoverMiddle"), NewString("Mouseover background bitmap middle of the horizontal thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalTrackerHoverMiddle"), Strings.NewString("Mouseover background bitmap middle of the horizontal thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShTrackerHoverMiddle, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShTrackerHoverMiddle);
-	NEW(StringPrototype, NIL, NewString("HorizontalTrackerPressedMiddle"), NewString("Pressed background bitmap middle of the horizontal thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalTrackerPressedMiddle"), Strings.NewString("Pressed background bitmap middle of the horizontal thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShTrackerPressedMiddle, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShTrackerPressedMiddle);
-	NEW(StringPrototype, NIL, NewString("HorizontalTrackerDefaultRight"), NewString("Default background bitmap right of the horizontal thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalTrackerDefaultRight"), Strings.NewString("Default background bitmap right of the horizontal thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShTrackerDefaultRight, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShTrackerDefaultRight);
-	NEW(StringPrototype, NIL, NewString("HorizontalTrackerHoverRight"), NewString("Mouseover background bitmap right of the horizontal thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalTrackerHoverRight"), Strings.NewString("Mouseover background bitmap right of the horizontal thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShTrackerHoverRight, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShTrackerHoverRight);
-	NEW(StringPrototype, NIL, NewString("HorizontalTrackerPressedRight"), NewString("Pressed background bitmap right of the horizontal thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("HorizontalTrackerPressedRight"), Strings.NewString("Pressed background bitmap right of the horizontal thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeShTrackerPressedRight, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeShTrackerPressedRight);
 			(* vertical *)
-	NEW(StringPrototype, NIL, NewString("VerticalTrackerDefaultTop"), NewString("Default background bitmap top of the vertical thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalTrackerDefaultTop"), Strings.NewString("Default background bitmap top of the vertical thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvTrackerDefaultTop, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvTrackerDefaultTop);
-	NEW(StringPrototype, NIL, NewString("VerticalTrackerHoverTop"), NewString("Mouseover background bitmap top of the vertical thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalTrackerHoverTop"), Strings.NewString("Mouseover background bitmap top of the vertical thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvTrackerHoverTop, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvTrackerHoverTop);
-	NEW(StringPrototype, NIL, NewString("VerticalTrackerPressedTop"), NewString("Pressed background bitmap top of the vertical thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalTrackerPressedTop"), Strings.NewString("Pressed background bitmap top of the vertical thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvTrackerPressedTop, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvTrackerPressedTop);
-	NEW(StringPrototype, NIL, NewString("VerticalTrackerDefaultMiddle"), NewString("Default background bitmap middle of the vertical thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalTrackerDefaultMiddle"), Strings.NewString("Default background bitmap middle of the vertical thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvTrackerDefaultMiddle, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvTrackerDefaultMiddle);
-	NEW(StringPrototype, NIL, NewString("VerticalTrackerHoverMiddle"), NewString("Mouseover background bitmap middle of the vertical thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalTrackerHoverMiddle"), Strings.NewString("Mouseover background bitmap middle of the vertical thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvTrackerHoverMiddle, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvTrackerHoverMiddle);
-	NEW(StringPrototype, NIL, NewString("VerticalTrackerPressedMiddle"), NewString("Pressed background bitmap middle of the vertical thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalTrackerPressedMiddle"), Strings.NewString("Pressed background bitmap middle of the vertical thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvTrackerPressedMiddle, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvTrackerPressedMiddle);
-	NEW(StringPrototype, NIL, NewString("VerticalTrackerDefaultBottom"), NewString("Default background bitmap bottom of the vertical thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalTrackerDefaultBottom"), Strings.NewString("Default background bitmap bottom of the vertical thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvTrackerDefaultBottom, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvTrackerDefaultBottom);
-	NEW(StringPrototype, NIL, NewString("VerticalTrackerHoverBottom"), NewString("Mouseover background bitmap bottom of the vertical thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalTrackerHoverBottom"), Strings.NewString("Mouseover background bitmap bottom of the vertical thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvTrackerHoverBottom, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvTrackerHoverBottom);
-	NEW(StringPrototype, NIL, NewString("VerticalTrackerPressedBottom"), NewString("Pressed background bitmap bottom of the vertical thumb")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("VerticalTrackerPressedBottom"), Strings.NewString("Pressed background bitmap bottom of the vertical thumb")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSvTrackerPressedBottom, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSvTrackerPressedBottom);
 		(* arrows *)
-	NEW(BooleanPrototype, NIL, NewString("UseArrowBitmaps"), NewString("Have the arrow-buttons to be decorated by bitmaps or simple colors")); BooleanPrototype.Set(FALSE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("UseArrowBitmaps"), Strings.NewString("Have the arrow-buttons to be decorated by bitmaps or simple colors")); BooleanPrototype.Set(FALSE);
 	NEW(PrototypeSUseArrowImages, BooleanPrototype, NIL, NIL);  plScrollbar.Add(PrototypeSUseArrowImages);
 			(* left *)
-	NEW(StringPrototype, NIL, NewString("ArrowLeftDefault"), NewString("Default bitmap for the left-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowLeftDefault"), Strings.NewString("Default bitmap for the left-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowLeftDefault, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowLeftDefault);
-	NEW(StringPrototype, NIL, NewString("ArrowLeftHover"), NewString("Mouseover bitmap for the left-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowLeftHover"), Strings.NewString("Mouseover bitmap for the left-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowLeftHover, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowLeftHover);
-	NEW(StringPrototype, NIL, NewString("ArrowLeftPressed"), NewString("Pressed bitmap for the left-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowLeftPressed"), Strings.NewString("Pressed bitmap for the left-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowLeftPressed, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowLeftPressed);
 			(* right *)
-	NEW(StringPrototype, NIL, NewString("ArrowRightDefault"), NewString("Default bitmap for the right-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowRightDefault"), Strings.NewString("Default bitmap for the right-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowRightDefault, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowRightDefault);
-	NEW(StringPrototype, NIL, NewString("ArrowRightHover"), NewString("Mouseover bitmap for the right-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowRightHover"), Strings.NewString("Mouseover bitmap for the right-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowRightHover, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowRightHover);
-	NEW(StringPrototype, NIL, NewString("ArrowRightPressed"), NewString("Pressed bitmap for the right-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowRightPressed"), Strings.NewString("Pressed bitmap for the right-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowRightPressed, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowRightPressed);
 			(* up *)
-	NEW(StringPrototype, NIL, NewString("ArrowUpDefault"), NewString("Default bitmap for the up-arrow"));StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowUpDefault"), Strings.NewString("Default bitmap for the up-arrow"));StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowUpDefault, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowUpDefault);
-	NEW(StringPrototype, NIL, NewString("ArrowUpHover"), NewString("Mouseover bitmap for the up-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowUpHover"), Strings.NewString("Mouseover bitmap for the up-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowUpHover, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowUpHover);
-	NEW(StringPrototype, NIL, NewString("ArrowUpPressed"), NewString("Pressed bitmap for the up-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowUpPressed"), Strings.NewString("Pressed bitmap for the up-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowUpPressed, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowUpPressed);
 			(* down *)
-	NEW(StringPrototype, NIL, NewString("ArrowDownDefault"), NewString("Default bitmap for the down-arrow"));StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowDownDefault"), Strings.NewString("Default bitmap for the down-arrow"));StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowDownDefault, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowDownDefault);
-	NEW(StringPrototype, NIL, NewString("ArrowDownHover"), NewString("Mouseover bitmap for the down-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowDownHover"), Strings.NewString("Mouseover bitmap for the down-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowDownHover, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowDownHover);
-	NEW(StringPrototype, NIL, NewString("ArrowDownPressed"), NewString("Pressed bitmap for the down-arrow")); StringPrototype.Set(NewString(""));
+	NEW(StringPrototype, NIL, Strings.NewString("ArrowDownPressed"), Strings.NewString("Pressed bitmap for the down-arrow")); StringPrototype.Set(Strings.NewString(""));
 	NEW(PrototypeSArrowDownPressed, StringPrototype, NIL, NIL); plScrollbar.Add(PrototypeSArrowDownPressed);
 
 	 (* Slider prototypes *)
 	NEW(plSlider); WMComponents.propertyListList.Add("Slider", plSlider);
-	NEW(PrototypeSlhTrackerDefault, NIL, NewString("HTrackerDefaultName"), NewString("Default tracker image for the horizontal slider"));
-	NEW(PrototypeSlhTrackerHover, NIL, NewString("HTrackerHoverName"), NewString("Hover tracker image for the horizontal slider"));
-	NEW(PrototypeSlhTrackerPressed, NIL, NewString("HTrackerPressedName"), NewString("Pressed tracker image for the horizontal slider"));
-	NEW(PrototypeSlvTrackerDefault, NIL, NewString("VTrackerDefaultName"), NewString("Default tracker image for the vertical slider"));
-	NEW(PrototypeSlvTrackerHover, NIL, NewString("VTrackerHoverName"), NewString("Hover tracker image for the vertical slider"));
-	NEW(PrototypeSlvTrackerPressed, NIL, NewString("VTrackerPressedName"), NewString("Pressed tracker image for the vertical slider"));
+	NEW(PrototypeSlhTrackerDefault, NIL, Strings.NewString("HTrackerDefaultName"), Strings.NewString("Default tracker image for the horizontal slider"));
+	NEW(PrototypeSlhTrackerHover, NIL, Strings.NewString("HTrackerHoverName"), Strings.NewString("Hover tracker image for the horizontal slider"));
+	NEW(PrototypeSlhTrackerPressed, NIL, Strings.NewString("HTrackerPressedName"), Strings.NewString("Pressed tracker image for the horizontal slider"));
+	NEW(PrototypeSlvTrackerDefault, NIL, Strings.NewString("VTrackerDefaultName"), Strings.NewString("Default tracker image for the vertical slider"));
+	NEW(PrototypeSlvTrackerHover, NIL, Strings.NewString("VTrackerHoverName"), Strings.NewString("Hover tracker image for the vertical slider"));
+	NEW(PrototypeSlvTrackerPressed, NIL, Strings.NewString("VTrackerPressedName"), Strings.NewString("Pressed tracker image for the vertical slider"));
 
-	NEW(PrototypeSlhBgDefault, NIL, NewString("HBgDefaultName"), NewString("Default background image for the horizontal slider"));
-	NEW(PrototypelShBgHover, NIL, NewString("HBgHoverName"), NewString("Hover background image for the horizontal slider"));
-	NEW(PrototypeSlhBgPressed, NIL, NewString("HBgPressedName"), NewString("Pressed background image for the horizontal slider"));
-	NEW(PrototypeSlvBgDefault, NIL, NewString("VBgDefaultName"), NewString("Default background image for the vertical slider"));
-	NEW(PrototypeSlvBgHover, NIL, NewString("VBgHoverName"), NewString("Hover background image for the vertical slider"));
-	NEW(PrototypeSlvBgPressed, NIL, NewString("VBgPressedName"), NewString("Pressed background image for the vertical slider"));
+	NEW(PrototypeSlhBgDefault, NIL, Strings.NewString("HBgDefaultName"), Strings.NewString("Default background image for the horizontal slider"));
+	NEW(PrototypelShBgHover, NIL, Strings.NewString("HBgHoverName"), Strings.NewString("Hover background image for the horizontal slider"));
+	NEW(PrototypeSlhBgPressed, NIL, Strings.NewString("HBgPressedName"), Strings.NewString("Pressed background image for the horizontal slider"));
+	NEW(PrototypeSlvBgDefault, NIL, Strings.NewString("VBgDefaultName"), Strings.NewString("Default background image for the vertical slider"));
+	NEW(PrototypeSlvBgHover, NIL, Strings.NewString("VBgHoverName"), Strings.NewString("Hover background image for the vertical slider"));
+	NEW(PrototypeSlvBgPressed, NIL, Strings.NewString("VBgPressedName"), Strings.NewString("Pressed background image for the vertical slider"));
 
-	NEW(PrototypeSlUseTrackerImages, NIL, NewString("UseTrackerImages"), NewString("Use images for the tracker of the slider?"));
-	NEW(PrototypeSlUseBgBitmaps, NIL, NewString("UseBgBitmaps"), NewString("Use backgroun images for slider?"));
-	NEW(PrototypeSlRepeatBgBitmap, NIL, NewString("RepeatBgBitamp"), NewString("Repeat middle bitmap of background image?"));
+	NEW(PrototypeSlUseTrackerImages, NIL, Strings.NewString("UseTrackerImages"), Strings.NewString("Use images for the tracker of the slider?"));
+	NEW(PrototypeSlUseBgBitmaps, NIL, Strings.NewString("UseBgBitmaps"), Strings.NewString("Use backgroun images for slider?"));
+	NEW(PrototypeSlRepeatBgBitmap, NIL, Strings.NewString("RepeatBgBitamp"), Strings.NewString("Repeat middle bitmap of background image?"));
 
-	NEW(PrototypeSlClDefault, NIL, NewString("ClDefault"), NewString("Default color of slider"));
+	NEW(PrototypeSlClDefault, NIL, Strings.NewString("ClDefault"), Strings.NewString("Default color of slider"));
 	PrototypeSlClDefault.Set(0);
-	NEW(PrototypeSlClHover, NIL, NewString("ClHover"), NewString("Hover color of slider"));
+	NEW(PrototypeSlClHover, NIL, Strings.NewString("ClHover"), Strings.NewString("Hover color of slider"));
 	PrototypeSlClHover.Set(0);
-	NEW(PrototypeSlClPressed, NIL, NewString("ClPressed"), NewString("Pressed color of slider"));
+	NEW(PrototypeSlClPressed, NIL, Strings.NewString("ClPressed"), Strings.NewString("Pressed color of slider"));
 	PrototypeSlClPressed.Set(0);
-	NEW(PrototypeSlClBar, NIL, NewString("ClBar"), NewString("Color of slider bar"));
+	NEW(PrototypeSlClBar, NIL, Strings.NewString("ClBar"), Strings.NewString("Color of slider bar"));
 	PrototypeSlClBar.Set(SIGNED32(0CCCCCCCCH));
 
-	NEW(PrototypeSlvertical, NIL, NewString("Vertical"),NewString("defines if the slider is vertical"));
+	NEW(PrototypeSlvertical, NIL, Strings.NewString("Vertical"),Strings.NewString("defines if the slider is vertical"));
 	PrototypeSlvertical.Set(TRUE);
-	NEW(PrototypeSlmin, NIL, NewString("Min"), NewString("defines the slider min position"));
+	NEW(PrototypeSlmin, NIL, Strings.NewString("Min"), Strings.NewString("defines the slider min position"));
 	PrototypeSlmin.Set(0);
-	NEW(PrototypeSlmax, NIL, NewString("Max"), NewString("defines the slider max position"));
+	NEW(PrototypeSlmax, NIL, Strings.NewString("Max"), Strings.NewString("defines the slider max position"));
 	PrototypeSlmax.Set(100);
-	NEW(PrototypeSlpos, NIL, NewString("Pos"), NewString("defines the slider position"));
-	NEW(PrototypeSlpageSize, NIL, NewString("PageSize"),NewString("defines the slider page size"));
+	NEW(PrototypeSlpos, NIL, Strings.NewString("Pos"), Strings.NewString("defines the slider position"));
+	NEW(PrototypeSlpageSize, NIL, Strings.NewString("PageSize"),Strings.NewString("defines the slider page size"));
 	PrototypeSlpageSize.Set(20);
 
 	(* Resizer *)
 	NEW(plResizer);	WMComponents.propertyListList.Add("Resizer", plResizer);
-	NEW(ColorPrototype, NIL, NewString("ClDefault"), NewString("Default Color")); ColorPrototype.Set(WMGraphics.White);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClDefault"), Strings.NewString("Default Color")); ColorPrototype.Set(WMGraphics.White);
 	NEW(PrototypeRclDefault, ColorPrototype, NIL, NIL); plResizer.Add(PrototypeRclDefault);
-	NEW(BooleanPrototype, NIL, NewString("IsFlat"), NewString("Is the resizer flat or 3d?")); BooleanPrototype.Set(FALSE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("IsFlat"), Strings.NewString("Is the resizer flat or 3d?")); BooleanPrototype.Set(FALSE);
 	NEW(PrototypeRisFlat, BooleanPrototype, NIL, NIL); plResizer.Add(PrototypeRisFlat);
-	NEW(RectanglePrototype, NIL, NewString("Bounds"), NewString("Default width and height")); RectanglePrototype.SetWidth(5); RectanglePrototype.SetHeight(5);
+	NEW(RectanglePrototype, NIL, Strings.NewString("Bounds"), Strings.NewString("Default width and height")); RectanglePrototype.SetWidth(5); RectanglePrototype.SetHeight(5);
 	NEW(PrototypeRBounds, RectanglePrototype, NIL, NIL); plResizer.Add(PrototypeRBounds);
 	(* Checkbox *)
 	NEW(plCheckbox); WMComponents.propertyListList.Add("Checkbox", plCheckbox);
 
-	NEW(ProtCBCaption, NIL, NewString("Caption"), NewString("caption text")); plCheckbox.Add(ProtCBCaption);
+	NEW(ProtCBCaption, NIL, Strings.NewString("Caption"), Strings.NewString("caption text")); plCheckbox.Add(ProtCBCaption);
 	ProtCBCaption.SetAOC("");
-	NEW(ProtCBCaptionPos, NIL, NewString("CaptionPos"), NewString("caption position"));  plCheckbox.Add(ProtCBCaptionPos);
+	NEW(ProtCBCaptionPos, NIL, Strings.NewString("CaptionPos"), Strings.NewString("caption position"));  plCheckbox.Add(ProtCBCaptionPos);
 	ProtCBCaptionPos.Set(Right);
 		(* Checkbox size *)
-	NEW(RectanglePrototype, WMComponents.PrototypeBounds, NewString("Bounds"), NIL); RectanglePrototype.Set(WMRectangles.MakeRect(0, 0, 100, 20));
-	NEW(ProtCBBounds, RectanglePrototype, NewString("Bounds"), NIL); plCheckbox.Add(ProtCBBounds);
+	NEW(RectanglePrototype, WMComponents.PrototypeBounds, Strings.NewString("Bounds"), NIL); RectanglePrototype.Set(WMRectangles.MakeRect(0, 0, 100, 20));
+	NEW(ProtCBBounds, RectanglePrototype, Strings.NewString("Bounds"), NIL); plCheckbox.Add(ProtCBBounds);
 		(* Checkbox state *)
-	NEW(ProtCBHasThreeStates, NIL, NewString("HasThreeStates"), NewString("enables three state checkbox")); plCheckbox.Add(ProtCBHasThreeStates);
+	NEW(ProtCBHasThreeStates, NIL, Strings.NewString("HasThreeStates"), Strings.NewString("enables three state checkbox")); plCheckbox.Add(ProtCBHasThreeStates);
 	ProtCBHasThreeStates.Set(FALSE);
-	NEW(ProtCBState, NIL, NewString("State"), NewString("current state")); plCheckbox.Add(ProtCBState);
+	NEW(ProtCBState, NIL, Strings.NewString("State"), Strings.NewString("current state")); plCheckbox.Add(ProtCBState);
 	ProtCBState.Set(Unchecked);
-	NEW(PrototypeCBonClickHandler, NIL, NewString("onClickHandler"), NewString("onClickHandler")); plCheckbox.Add(PrototypeCBonClickHandler);
+	NEW(PrototypeCBonClickHandler, NIL, Strings.NewString("onClickHandler"), Strings.NewString("onClickHandler")); plCheckbox.Add(PrototypeCBonClickHandler);
 
 			(* background color *)
-	NEW(ColorPrototype, NIL, NewString("ClBack"), NewString("Checkbox Background Color")); ColorPrototype.Set(SIGNED32(0FFFFFF80H));
+	NEW(ColorPrototype, NIL, Strings.NewString("ClBack"), Strings.NewString("Checkbox Background Color")); ColorPrototype.Set(SIGNED32(0FFFFFF80H));
 	NEW(ProtCBclBack, ColorPrototype, NIL, NIL); plCheckbox.Add(ProtCBclBack);
-	NEW(ColorPrototype, NIL, NewString("ClCheck"), NewString("Checkbox Check Color")); ColorPrototype.Set(0000000FFH);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClCheck"), Strings.NewString("Checkbox Check Color")); ColorPrototype.Set(0000000FFH);
 	NEW(ProtCBclCheck, ColorPrototype, NIL, NIL); plCheckbox.Add(ProtCBclCheck);
-	NEW(ColorPrototype, NIL, NewString("ClDefault"), NewString("Checkbox 3rd state Check Color")); ColorPrototype.Set(0555555FFH);
+	NEW(ColorPrototype, NIL, Strings.NewString("ClDefault"), Strings.NewString("Checkbox 3rd state Check Color")); ColorPrototype.Set(0555555FFH);
 	NEW(ProtCBclDefault, ColorPrototype, NIL, NIL); plCheckbox.Add(ProtCBclDefault);
-	NEW(ColorPrototype, NIL, NewString("ClInactive"), NewString("Checkbox Inactive Color")); ColorPrototype.Set(SIGNED32(088888880H));
+	NEW(ColorPrototype, NIL, Strings.NewString("ClInactive"), Strings.NewString("Checkbox Inactive Color")); ColorPrototype.Set(SIGNED32(088888880H));
 	NEW(ProtCBclInactive, ColorPrototype, NIL, NIL); plCheckbox.Add(ProtCBclInactive);
 		(* presentation *)
-	NEW(BooleanPrototype, NIL, NewString("UseBitmaps"), NewString("Have the Checkbox decorated by Images")); BooleanPrototype.Set(FALSE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("UseBitmaps"), Strings.NewString("Have the Checkbox decorated by Images")); BooleanPrototype.Set(FALSE);
 	NEW(ProtCBUseImages, BooleanPrototype, NIL, NIL); plCheckbox.Add(ProtCBUseImages);
-	NEW(BooleanPrototype, NIL, NewString("ScaleBitmaps"), NewString("Have the Images scaled with the component siye")); BooleanPrototype.Set(FALSE);
+	NEW(BooleanPrototype, NIL, Strings.NewString("ScaleBitmaps"), Strings.NewString("Have the Images scaled with the component siye")); BooleanPrototype.Set(FALSE);
 	NEW(ProtCBScaleImages, BooleanPrototype, NIL, NIL); plCheckbox.Add(ProtCBScaleImages);
 		(* Checkbox images *)
-	NEW(StringPrototype, NIL, NewString("ImgUnchecked"), NewString("Unchecked Image")); StringPrototype.SetAOC("");
+	NEW(StringPrototype, NIL, Strings.NewString("ImgUnchecked"), Strings.NewString("Unchecked Image")); StringPrototype.SetAOC("");
 	NEW(ProtCBImgUncheckedN, StringPrototype, NIL, NIL); plCheckbox.Add(ProtCBImgUncheckedN);
-	NEW(StringPrototype, NIL, NewString("ImgChecked"), NewString("Checked Image")); StringPrototype.SetAOC("");
+	NEW(StringPrototype, NIL, Strings.NewString("ImgChecked"), Strings.NewString("Checked Image")); StringPrototype.SetAOC("");
 	NEW(ProtCBImgCheckedN, StringPrototype, NIL, NIL); plCheckbox.Add(ProtCBImgCheckedN);
-	NEW(StringPrototype, NIL, NewString("ImgDefault"), NewString("3rd state Image")); StringPrototype.SetAOC("");
+	NEW(StringPrototype, NIL, Strings.NewString("ImgDefault"), Strings.NewString("3rd state Image")); StringPrototype.SetAOC("");
 	NEW(ProtCBImgDefaultN, StringPrototype, NIL, NIL); plCheckbox.Add(ProtCBImgDefaultN);
-	NEW(StringPrototype, NIL, NewString("ImgUncheckedInactive"), NewString("Unchecked Inactive Image")); StringPrototype.SetAOC("");
+	NEW(StringPrototype, NIL, Strings.NewString("ImgUncheckedInactive"), Strings.NewString("Unchecked Inactive Image")); StringPrototype.SetAOC("");
 	NEW(ProtCBImgUncheckedInactiveN, StringPrototype, NIL, NIL); plCheckbox.Add(ProtCBImgUncheckedInactiveN);
-	NEW(StringPrototype, NIL, NewString("ImgCheckedInactive"), NewString("Checked Inactive Image")); StringPrototype.SetAOC("");
+	NEW(StringPrototype, NIL, Strings.NewString("ImgCheckedInactive"), Strings.NewString("Checked Inactive Image")); StringPrototype.SetAOC("");
 	NEW(ProtCBImgCheckedInactiveN, StringPrototype, NIL, NIL); plCheckbox.Add(ProtCBImgCheckedInactiveN);
-	NEW(StringPrototype, NIL, NewString("ImgDefaultInactive"), NewString("3rd state Inactive Image")); StringPrototype.SetAOC("");
+	NEW(StringPrototype, NIL, Strings.NewString("ImgDefaultInactive"), Strings.NewString("3rd state Inactive Image")); StringPrototype.SetAOC("");
 	NEW(ProtCBImgDefaultInactiveN, StringPrototype, NIL, NIL); plCheckbox.Add(ProtCBImgDefaultInactiveN);
 	(* Group Panel *)
 	NEW(plGroupPanel); WMComponents.propertyListList.Add("GroupPanel", plGroupPanel);
-	NEW(ProtGPCaption, NIL, NewString("Caption"), NewString("caption text")); plGroupPanel.Add(ProtGPCaption);
-	NEW(ProtGPTextColor, NIL, NewString("TextColor"), NewString("Text color of group panel caption")); plGroupPanel.Add(ProtGPTextColor);
+	NEW(ProtGPCaption, NIL, Strings.NewString("Caption"), Strings.NewString("caption text")); plGroupPanel.Add(ProtGPCaption);
+	NEW(ProtGPTextColor, NIL, Strings.NewString("TextColor"), Strings.NewString("Text color of group panel caption")); plGroupPanel.Add(ProtGPTextColor);
 	(* Image *)
-	NEW(PrototypeImageName, NIL, NewString("ImageName"), NewString("Name of image to be displayed"));
+	NEW(PrototypeImageName, NIL, Strings.NewString("ImageName"), Strings.NewString("Name of image to be displayed"));
 	PrototypeImageName.Set(NIL);
-	NEW(PrototypeScaleImage, NIL, NewString("ScaleImage"), NewString("Scale image to fit size of component?"));
+	NEW(PrototypeScaleImage, NIL, Strings.NewString("ScaleImage"), Strings.NewString("Scale image to fit size of component?"));
 	PrototypeScaleImage.Set(TRUE);
 	(* Image Panel *)
 	NEW(plImagePanel); WMComponents.propertyListList.Add("ImagePanel", plImagePanel);
-	NEW(ProtoIpImgName, NIL, NewString("Image"), NewString("Name of image to be displayed")); plImagePanel.Add(ProtoIpImgName);
-	NEW(PrototypeBlinking, NIL, NewString("Blinking"), NewString("Toggle Display of Component")); PrototypeBlinking.Set(FALSE);
+	NEW(ProtoIpImgName, NIL, Strings.NewString("Image"), Strings.NewString("Name of image to be displayed")); plImagePanel.Add(ProtoIpImgName);
+	NEW(PrototypeBlinking, NIL, Strings.NewString("Blinking"), Strings.NewString("Toggle Display of Component")); PrototypeBlinking.Set(FALSE);
 	NEW(PrototypeHorizontalFit, NIL, Strings.NewString("HorFit"), Strings.NewString("horiztonal fit")); PrototypeHorizontalFit.Set(TRUE);
 	NEW(PrototypeTextBorder, NIL, Strings.NewString("TextBorder"), Strings.NewString("inner text border")); PrototypeTextBorder.Set(1);
 	WMComponents.propertyListList.UpdateStyle
@@ -3619,12 +3619,6 @@ BEGIN
 		RETURN NIL;
 	END;
 END FindCheckbox;
-
-PROCEDURE NewString*(CONST x : ARRAY OF CHAR) : String;
-VAR t : String;
-BEGIN
-	NEW(t, LEN(x)); COPY(x, t^); RETURN t
-END NewString;
 
 PROCEDURE Cleanup;
 BEGIN

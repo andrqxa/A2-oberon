@@ -352,17 +352,17 @@ BEGIN
 	NEW(cmSetImageName, CmSetImageName);
 	NEW(cmSetCaption, CmSetCaption);
 	Modules.InstallTermHandler(Cleanup);
-	NEW(prototypeColor, NIL, WMStandardComponents.NewString("color"),
-		WMStandardComponents.NewString("toggle icon border color"));
+	NEW(prototypeColor, NIL, Strings.NewString("color"),
+		Strings.NewString("toggle icon border color"));
 	prototypeColor.Set(WMGraphics.White);
-	NEW(prototypeCommandString, NIL, WMStandardComponents.NewString("commandString"),
-		WMStandardComponents.NewString("command to be executed when double-clicking the icon"));
-	NEW(prototypeImageName, NIL, WMStandardComponents.NewString("imageName"),
-		WMStandardComponents.NewString("name of icon image"));
-	NEW(prototypeCaption, NIL, WMStandardComponents.NewString("caption"),
-		WMStandardComponents.NewString("caption of the icon"));
-	NEW(prototypeBorder, NIL, WMStandardComponents.NewString("border"),
-		WMStandardComponents.NewString("border"));
+	NEW(prototypeCommandString, NIL, Strings.NewString("commandString"),
+		Strings.NewString("command to be executed when double-clicking the icon"));
+	NEW(prototypeImageName, NIL, Strings.NewString("imageName"),
+		Strings.NewString("name of icon image"));
+	NEW(prototypeCaption, NIL, Strings.NewString("caption"),
+		Strings.NewString("caption of the icon"));
+	NEW(prototypeBorder, NIL, Strings.NewString("border"),
+		Strings.NewString("border"));
 	prototypeBorder.Set(5);
 END WMDesktopIcons.
 

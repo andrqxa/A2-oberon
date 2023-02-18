@@ -207,7 +207,7 @@ TYPE
 
 			(* open the window *)
 			manager := WM.GetDefaultManager();
-			SetTitle(WM.NewString("Teletext Channel Selector"));
+			SetTitle(Strings.NewString("Teletext Channel Selector"));
 			left := viewer.bounds.l + viewer.GetWidth() + 30;
 			top := viewer.bounds.t;
 			manager.Add(left, top, SELF, {WM.FlagFrame});
@@ -381,7 +381,7 @@ TYPE
 
 			(* open the window *)
 			manager := WM.GetDefaultManager();
-			SetTitle(WM.NewString("Teletext - No data available"));
+			SetTitle(Strings.NewString("Teletext - No data available"));
 
 			l := 100; t := 100;
 			manager.Add(l, t, SELF, {WM.FlagFrame});
@@ -609,10 +609,10 @@ TYPE
 			IF text # NIL THEN
 				Strings.IntToStr (browser.page+100, pnum);
 				Strings.Append (title, pnum);
-				SetTitle(WM.NewString(title))
+				SetTitle(Strings.NewString(title))
 			ELSE
 				Strings.Append (title, "<Page does not exist>");
-				SetTitle(WM.NewString(title));
+				SetTitle(Strings.NewString(title));
 				NEW(text)
 			END;
 			teleText.Acquire;

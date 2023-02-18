@@ -147,7 +147,7 @@ TYPE
 			tree.Acquire;
 			NEW(tr);
 			tree.SetRoot(tr);
-			tree.SetNodeCaption(tr, WMComponents.NewString("FileSystems"));
+			tree.SetNodeCaption(tr, Strings.NewString("FileSystems"));
 			tree.InclNodeState(tr, WMTrees.NodeAlwaysExpanded);
 			FillMountedFS(tree, tr);
 			tree.Release;
@@ -267,7 +267,7 @@ TYPE
 						IF Files.Directory IN flags THEN
 							has := TRUE;
 							Files.SplitPath(name, path, filename);
-							NEW(td); td.path := WMComponents.NewString(name); td.name := WMComponents.NewString(filename);
+							NEW(td); td.path := Strings.NewString(name); td.name := Strings.NewString(filename);
 							dirArray[i] := td; INC(i)
 						END
 					END
@@ -300,9 +300,9 @@ TYPE
 			WHILE tree.GetChildren(node) # NIL DO tree.RemoveNode(tree.GetChildren(node)) END;
 			FOR i := 0 TO LEN(list) - 1 DO
 				NEW(prefixNode);
-				tree.SetNodeCaption(prefixNode, WMComponents.NewString(list[i].prefix));
+				tree.SetNodeCaption(prefixNode, Strings.NewString(list[i].prefix));
 				COPY(list[i].prefix, prefix); Strings.Append(prefix, ":");
-				NEW(td); td.path := WMComponents.NewString(prefix);
+				NEW(td); td.path := Strings.NewString(prefix);
 				tree.SetNodeData(prefixNode, td);
 				tree.SetNodeState(prefixNode, {WMTrees.NodeSubnodesUnknown});
 				tree.AddChildNode(node, prefixNode);

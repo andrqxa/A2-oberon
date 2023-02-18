@@ -124,7 +124,7 @@ TYPE
 
 			(* open the window *)
 			manager := WM.GetDefaultManager();
-			SetTitle(WM.NewString("TV Remote Control"));
+			SetTitle(Strings.NewString("TV Remote Control"));
 			manager.Add(770, 100, SELF, {WM.FlagFrame});
 			next := window;
 			window := SELF;

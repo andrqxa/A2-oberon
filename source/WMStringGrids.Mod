@@ -53,7 +53,7 @@ TYPE
 
 		PROCEDURE &Init*;
 		BEGIN
-			NEW(onChanged, SELF, WMComponents.NewString("StringGridModelChanged"), NIL, NIL);
+			NEW(onChanged, SELF, Strings.NewString("StringGridModelChanged"), NIL, NIL);
 			NEW(rows, 4);
 			lockLevel :=0;
 		END Init;
