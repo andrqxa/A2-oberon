@@ -10,6 +10,8 @@ TYPE
 	(*SplineCurve* = ARRAY [ 2 , * ] OF Datatype;  ;*)
 	Cube* = ARRAY [ * , * , * ] OF Datatype;
 	Signal* = ARRAY [ * ] OF Datatype;
+	
+VAR dummyRect:Rect;
 
 CONST
 	finite* = Filters.finite;  periodic* = Filters.cyclicH;  mirrorH* = Filters.mirrorH;  mirrorW* = Filters.mirrorW;  antimirrorH* = Filters.antimirrorH;
@@ -98,13 +100,13 @@ CONST
 	END clamp;
 
 (** Resampling of input data, starting from x0,y0, in increments of dx,dy; if upscaling (dx,dy>1), then )
-	Input: data: spline coefficients of "splinedegree"; allocated 'resdata' of desired size; boundary: see Filters.Mod for boundary types
+	Input: data: spline coefficients of "splinedegree"; allocated 'resdata' of desired size; boundary: see LinearFilters.Mod for boundary types
 	Output: resampled data in 'resdata' *)
-	PROCEDURE Resample*( CONST data: Rect;  VAR resdata: Rect;  x0, y0, dx, dy: Datatype;  splinedegree, boundary: SIGNED32 );
+	PROCEDURE Resample*( CONST data: Rect;  VAR resdata: Rect;  x0, y0, dx, dy: Datatype;  splinedegree, boundary: SIGNED32);
 	VAR w: Rect;  indices: ARRAY [ * ] OF SIGNED32;
 		temp: Rect;  x, y, x1, x2, y1, y2: SIZE;  v: Signal;  Dx,Dy:SIGNED32; ddx,ddy:Datatype;
 	BEGIN
-		NEW( temp, LEN( data, 0 ), LEN( resdata, 1 ) );
+		(*NEW( temp, LEN( data, 0 ), LEN( resdata, 1 ) );*)
 		NEW( v, LEN( resdata, 1 ) );
 		CASE splinedegree OF
 		0: (* nearest neighbour *)
@@ -126,6 +128,7 @@ CONST
 				END;
 			END;
 		|3: (*cubic spline interpolation; precondition: data is in spline domain of 3rd order *)
+			NEW( temp, LEN( data, 0 ), LEN( resdata, 1 ) );(*to do: avoid reallocation when not needed*)
 			w := MatrixBSplineInterpolation.LineInterpolationWeights( LEN( data, 1 ), LEN( resdata, 1 ), 3, 0, (LEN( data, 1 ) - 1) / (LEN( resdata, 1 ) - 1), indices );
 			FOR y := 0 TO LEN( data, 0 ) - 1 DO v := MatrixBSplineInterpolation.InterpolateLine( data[y], w, indices );  temp[y] := v;  END;
 			NEW( indices, 0 );  NEW( w, 0, 0 );  NEW( v, LEN( resdata, 0 ) );

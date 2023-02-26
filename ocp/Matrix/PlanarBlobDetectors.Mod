@@ -13,9 +13,14 @@ TYPE
 (* Laplacian of Gaussian: 
 Support of Window Defines the Responsivity of the operator. Use sampling modes from PlanarNabla.Mod *)
 (*! not yet finished: support width. Best used in a scale-space setup, i.e. multiresolution or multiple Gauss Support *)
-PROCEDURE LaplacianOfGaussian*(CONST p:ScalarField; sampling:SIGNED32):ScalarField;
+PROCEDURE LaplacianOfGaussian*(CONST p:ScalarField; sampling:SIGNED32; smoothings:=1:SIGNED32):ScalarField;
+VAR i:SIZE;
 BEGIN
-	RETURN PlanarNabla.Laplacian(Smooth(p), sampling); (*smoothing approximates gaussian filtering*)
+	RESULT:=p;
+	FOR i:=0 TO smoothings-1 DO
+		RESULT:=Smooth(RESULT);
+	END;
+	RETURN PlanarNabla.Laplacian(RESULT(*Smooth(p)*), sampling); (*smoothing approximates gaussian filtering*)
 END LaplacianOfGaussian;
 
 (*to do: PROCEDURE DeterminantOfHessian() *)
