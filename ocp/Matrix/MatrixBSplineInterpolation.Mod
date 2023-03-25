@@ -1,5 +1,5 @@
 MODULE MatrixBSplineInterpolation;	(**  AUTHOR "ph"; PURPOSE "";  **)
-IMPORT  MatrixBase, MatrixFilters:=LinearFilters;
+IMPORT  MatrixBase, MatrixFilters:=LinearFilters, MatrixUtilities;
 
 TYPE Datatype=MatrixBase.Datatype;
 		Vector=MatrixBase.Vector;
@@ -138,24 +138,24 @@ application: do an inner product of strides of 4 coefficients of the signal coef
 CAVE: boundary not handled here; i.e., indices array will contain indices <0 and/or > LEN(C) *)
 PROCEDURE LineInterpolationWeights*(datasize,resultsize, splinedegree: SIZE; x,dx:Datatype; VAR indices: ARRAY [*] OF SIGNED32): Matrix;
 CONST div6=1/6;
-VAR w:Matrix;
+VAR (*w:Matrix;*)
 		t,tt,ttt: Datatype;
 		i:SIZE; index:SIGNED32;
 BEGIN
-	NEW(w,resultsize,4);
-	NEW(indices,resultsize);
+	IF (LEN(RESULT,0)# resultsize) OR (LEN(RESULT,1)#4) THEN NEW(RESULT,resultsize,4) END;
+	IF LEN(indices,0) # resultsize THEN NEW(indices,resultsize) END;
 	(*dx:= (datasize-1) / (resultsize-1);*)
 	FOR i:=0 TO resultsize-1 DO
 		index:=ENTIER(x);
 		indices[i]:=index-1; (*first coefficient relevant for interplation at x*)
 		t:=x-index; tt:=t*t; ttt:=t*tt;
-		w[i,0]:= (1-ttt+3*tt-3*t)/6;
-		w[i,1]:= (4+3*ttt-6*tt)/6;
-		w[i,2]:= (1-3*ttt+3*(t+tt))/6;
-		w[i,3]:= ttt/6;
+		RESULT[i,0]:= (1-ttt+3*tt-3*t)/6;
+		RESULT[i,1]:= (4+3*ttt-6*tt)/6;
+		RESULT[i,2]:= (1-3*ttt+3*(t+tt))/6;
+		RESULT[i,3]:= ttt/6;
 		x:=x+dx;
 	END;
-	RETURN w
+	RETURN RESULT
 END LineInterpolationWeights;
 
 PROCEDURE InterpolateLine*(CONST coefficients: Vector; CONST weights:Matrix; CONST indices:ARRAY [*] OF SIGNED32):Vector;
@@ -168,6 +168,33 @@ BEGIN
 	END;
 	RETURN v
 END InterpolateLine;
+
+PROCEDURE InterpolateLineUnbounded*(CONST coefficients: Vector; CONST weights:Matrix; CONST indices:ARRAY [*] OF SIGNED32):Vector;
+VAR v:Vector; i, size, len0,lenC:SIZE;
+
+	PROCEDURE bracket(j:SIZE):SIZE;
+	BEGIN
+		RETURN MAX(MIN(j,lenC-1),0);
+	END bracket;
+	
+BEGIN
+	len0:=LEN(indices,0);
+	lenC:=LEN(coefficients,0);
+	IF LEN(RESULT,0)#len0 THEN NEW(RESULT,len0) END;
+	size:=LEN(weights,1);
+	ASSERT(size=4,200); (*implementation limitation to cubic splines*)
+	FOR i:=0 TO len0-1 DO (*for coefficients for cubic splines*)
+		RESULT[i]:=
+				weights[i,0]*coefficients[bracket(indices[i])] +
+				weights[i,1]*coefficients[bracket(indices[i]+1)] +
+				weights[i,2]*coefficients[bracket(indices[i]+2)] +
+				weights[i,3]*coefficients[bracket(indices[i]+3)];
+	END;
+	(*FOR i:=size DIV 2 +1 TO LEN(v,0)-2 - size DIV 2 DO
+		v[i]:=weights[i] +* coefficients[indices[i]..indices[i]+size-1]
+	END;*)
+	RETURN RESULT
+END InterpolateLineUnbounded;
 (*
 PROCEDURE Do*;
 VAR P: ARRAY [*] OF Datatype; t,s: Datatype; f:MatrixFilters.FIRFilter;
@@ -182,20 +209,34 @@ BEGIN
 	Out.LongRealFix(f.coeff[2],3,6); Out.Ln;
 	Out.LongRealFix(f.coeff[3],3,6); Out.Ln;
 END Do;
+*)
+
+PROCEDURE Do1*;
+VAR c,s:Vector; w:Matrix; indices:ARRAY [*] OF SIGNED32;
+BEGIN
+	c:=[0,0,1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,0,0,0];
+	NEW(s,15);
+	w:=LineInterpolationWeights(LEN(c,0), LEN(s,0), 3, 5, (LEN(c,0)-1)/(LEN(s,0)-1+10), indices);
+	s:=InterpolateLine(c, w, indices);
+	MatrixUtilities.Out(c);
+	MatrixUtilities.OutMatrix(w); 
+	MatrixUtilities.OutVector(indices); 
+	MatrixUtilities.OutVector(s); 
+END Do1;
 
 PROCEDURE Do2*;
 VAR c,s:Vector; w:Matrix; indices:ARRAY [*] OF SIGNED32;
 BEGIN
 	c:=[0,0,1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,0,0,0];
 	NEW(s,15);
-	w:=LineInterpolationWeights(LEN(c), LEN(s), 3, 5, (LEN(c)-1)/(LEN(s)-1+10), indices);
-	s:=InterpolateLine(c, w, indices);
-	MatrixUtilities.OutVector(c);
-	MatrixUtilities.OutMatrix(w); Out.Ln;
-	MatrixUtilities.OutVector(indices); Out.Ln;
-	MatrixUtilities.OutVector(s); Out.Ln;
+	w:=LineInterpolationWeights(LEN(c,0), LEN(s,0), 3, 5, (LEN(c,0)-1)/(LEN(s,0)-1+10), indices);
+	s:=InterpolateLineUnbounded(c, w, indices);
+	MatrixUtilities.Out(c);
+	MatrixUtilities.OutMatrix(w); 
+	MatrixUtilities.OutVector(indices); 
+	MatrixUtilities.OutVector(s); 
 END Do2;
-*)
+
 
 END MatrixBSplineInterpolation.
 
@@ -203,7 +244,7 @@ MatrixBSplineInterpolation.Do
 
 System.Free
 MatrixFilters
-MatrixBSplineInterpolation.Do 1
+MatrixBSplineInterpolation.Do1
 MatrixBSplineInterpolation.Do2
 fofPC.Compile \f *
 

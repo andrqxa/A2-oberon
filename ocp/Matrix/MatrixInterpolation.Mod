@@ -127,7 +127,7 @@ TYPE
 		interpolated := w;  RETURN (interpolated);
 	END InterpolateSpline;
 
-(** to do InterpolateSplineN for two dimensional regular displacement by [dx,dy]*)
+(** to do: InterpolateSplineN for two dimensional regular displacement by [dx,dy]*)
 
 PROCEDURE InterpolateSplineN*	( CONST Bcoeff: Vector (*	float*   *) ;   (* input B-spline array of coefficients *)
 																VAR res: Vector;(*	result is in the signal domain, not a spline   *)
