@@ -297,7 +297,7 @@ CONST
 	BipolarMode* = 1;
 
 VAR
-	devCfg: Platform.DevCfgRegisters;
+	devCfg: POINTER{UNSAFE,UNTRACED} TO Platform.DevCfgRegisters;
 	initialized := FALSE : BOOLEAN;
 
 	PROCEDURE Initialize*();
