@@ -7,7 +7,7 @@ IMPORT SYSTEM, Displays, Plugins, Machine, Kernel, Commands, Options,
 
 IMPORT Unix, Modules;
 
-CONST FrameBufDevName* = "/dev/vidout_buf"; (** video frame buffer device name *)
+CONST FrameBufDevName* = "/dev/disp_dma_buf"; (** display DMA buffer device name *)
 
 #END
 
