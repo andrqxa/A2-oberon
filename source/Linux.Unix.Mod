@@ -6,7 +6,7 @@ MODULE Unix;   (* Josef Templ, 5.3.90	SVR4 system calls *)  (** Linux x86 versio
 (*	2002.06.27	g.f.	TmDesc fixed,  new: Utime, Mktime *)
 (*	2006.07.31	g.f.	shared memory support added *)
 (*	2007.04.13	g.f.	Thread priorities added *)
-(*  	2020.04.06  P	DR     corrected AFINET6* = 10 not 26*) 
+(*  	2020.04.06  P	DR     corrected AFINET6* = 10 not 26*)
 
 IMPORT S := SYSTEM, Glue, Trace;
 
@@ -75,8 +75,59 @@ CONST
 	EDEADLK* = 35;   (* Deadlock condition. *)
 	ENOLCK* = 37;   (* No record locks available. *)
 
+	(** open flag values *)
+	O_ACCMODE* = 0x00000003;
+	O_RDONLY* = 0x00000000;
+	O_WRONLY* = 0x00000001;
+	O_RDWR* = 0x00000002;
+	O_CREAT* = 0x00000040;
+	O_EXCL* = 0x00000080;
+	O_NOCTTY* = 0x00000100;
+	O_TRUNC* = 0x00000200;
+	O_APPEND* = 0x00000400;
+	O_NONBLOCK* = 0x00000800;
+	O_DSYNC* = 0x00001000;
+	O_DIRECT* = 0x00004000;
+	O_LARGEFILE* = 0x00000000;
+	O_DIRECTORY* = 0x00010000;
+	O_NOFOLLOW* = 0x00020000;
+	O_NOATIME* = 0x00040000;
+	O_CLOEXEC* = 0x00080000;
+	O_SYNC* = 0x00101000;
+	O_PATH* = 0x00200000;
+	O_TMPFILE* = 0x00410000;
+	O_NDELAY* = 0x00000800;
+
+	(** memory protection flag values *)
+	PROT_READ* = 0x1; (* page can be read *)
+	PROT_WRITE* = 0x2; (* page can be written *)
+	PROT_EXEC* = 0x4; (* page can be executed *)
+	PROT_SEM* = 0x8; (* page may be used for atomic ops *)
+	PROT_NONE* = 0x0; (* page can not be accessed *)
+	PROT_GROWSDOWN* = 0x01000000; (* mprotect flag: extend change to start of growsdown vma *)
+	PROT_GROWSUP* = 0x02000000; (* mprotect flag: extend change to end of growsup vma *)
+
+	(** mmap flag values *)
+	MAP_SHARED* = 0x01; (* Share changes *)
+	MAP_PRIVATE* = 0x02; (* Changes are private *)
+	MAP_TYPE* = 0x0f; (* Mask for type of mapping *)
+	MAP_FIXED* = 0x10; (* Interpret addr exactly *)
+	MAP_ANONYMOUS* = 0x20; (* don't use a file *)
+	MAP_GROWSDOWN* = 0x0100; (* stack-like segment *)
+	MAP_DENYWRITE* = 0x0800; (* ETXTBSY *)
+	MAP_EXECUTABLE* = 0x1000; (* mark it as an executable *)
+	MAP_LOCKED* = 0x2000; (* pages are locked *)
+	MAP_NORESERVE* = 0x4000; (* don't check for reservations *)
+	MAP_POPULATE* = 0x008000; (* populate (prefault) pagetables *)
+	MAP_NONBLOCK* = 0x010000; (* do not block on IO *)
+	MAP_STACK* = 0x020000; (* give out an address that is best suited for process/thread stacks *)
+	MAP_HUGETLB* = 0x040000; (* create a huge page mapping *)
+	MAP_SYNC* = 0x080000; (* perform synchronous page faults for the mapping *)
+	MAP_FIXED_NOREPLACE* = 0x100000; (* MAP_FIXED which doesn't unmap underlying mapping *)
+	MAP_UNINITIALIZED* = 0x4000000; (* For anonymous mmap, memory could be uninitialized *)
+
 	(* open flags *)
-	rdonly* = SET32({});  rdwr* = SET32({1});  creat* = SET32({6});  trunc* = SET32({9});
+	rdonly* = SET32(O_RDONLY);  rdwr* = SET32(O_RDWR);  creat* = SET32(O_CREAT);  trunc* = SET32(O_TRUNC);
 
 	(* access modes *)
 	rwrwr* = 1B4H;  rwxrwxrwx* = 1FFH;
@@ -551,6 +602,8 @@ VAR
 
 	read-			: PROCEDURE {C} ( fd: SIGNED32; buf: ADDRESS; n: SIZE ): SIZE;
 	write-			: PROCEDURE {C} ( fd: SIGNED32; buf: ADDRESS; n: SIZE ): SIZE;
+	pread-			: PROCEDURE{C}( fd: INTEGER; buf: ADDRESS; count: SIZE; offset: off_t): SIZE;
+	pwrite-			: PROCEDURE{C}( fd: INTEGER; buf: ADDRESS; count: SIZE; offset: off_t): SIZE;
 	open-			: PROCEDURE {C} ( name: ADDRESS;  flags: SET32; mode: mode_t ): SIGNED32;
 	close-		: PROCEDURE {C} ( fd: SIGNED32 ): SIGNED32;
 	lseek-		: PROCEDURE {C} ( fd: SIGNED32; offset: off_t; origin: SIGNED32 ): off_t;
@@ -580,6 +633,8 @@ VAR
 	malloc-		: PROCEDURE {C} ( size: SIZE ): ADDRESS;
 	free-			: PROCEDURE {C} ( p: ADDRESS );
 	mprotect-	: PROCEDURE {C} ( p: ADDRESS; len: SIZE; prot: SIGNED32 ): SIGNED32;
+	mmap-		: PROCEDURE {C}( addr: ADDRESS; length: SIZE; prot: INTEGER; flags: INTEGER; fd: INTEGER; offset: off_t ): ADDRESS;
+	munmap-		: PROCEDURE {C}( addr: ADDRESS; length: SIZE ): INTEGER;
 
 	alarm-		: PROCEDURE {C} ( ms: SIGNED32 ): SIGNED32;
 	setitimer-		: PROCEDURE {C} ( which: SIGNED32;  VAR value, ovalue: Itimerval ): SIGNED32;
@@ -763,7 +818,7 @@ VAR
 		size: SIZE;
 		state: ARRAY 2048 OF CHAR;
 	BEGIN {UNCOOPERATIVE, UNCHECKED}
-		me := pthread_self();		
+		me := pthread_self();
 
 		pthread_getattr_np(me, ADDRESS OF attr);
 		pthread_attr_getstacksize (ADDRESS OF attr, ADDRESS OF size);
@@ -1245,6 +1300,8 @@ VAR
 
 		Dlsym( libc, "read",		ADDRESSOF( read ) );
 		Dlsym( libc, "write",	ADDRESSOF( write ) );
+		Dlsym( libc, "pread",		ADDRESSOF( pread ) );
+		Dlsym( libc, "pwrite",	ADDRESSOF( pwrite ) );
 		Dlsym( libc, "open",		ADDRESSOF( open ) );
 		Dlsym( libc, "close",	ADDRESSOF( close ) );
 		Dlsym( libc, "lseek",	ADDRESSOF( lseek ) );
@@ -1299,6 +1356,8 @@ VAR
 		Dlsym( libc, "posix_memalign",	ADDRESSOF( posix_memalign ) );
 		Dlsym( libc, "free",			ADDRESSOF( free ) );
 		Dlsym( libc, "mprotect",	ADDRESSOF( mprotect ) );
+		Dlsym( libc, "mmap",	ADDRESSOF( mmap ) );
+		Dlsym( libc, "munmap",	ADDRESSOF( munmap ) );
 
 		Dlsym( libc, "system",	ADDRESSOF( system ) );
 		Dlsym( libc, "uname",	ADDRESSOF( uname ) );
