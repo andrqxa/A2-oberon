@@ -1275,12 +1275,12 @@ VAR
 
 	PROCEDURE LoadDialoged*;
 	BEGIN
-		antsCommands.InitScan( "name=NAME [>replace] [>show] # Load an Array dialoged from file" );  antsToolbox.FileOpen( finishload, "PGM Images", "*.PGM" )
+		antsCommands.InitScan( "name=NAME [>replace] [>show] # Load an Array dialoged from file" );  antsToolbox.FileOpen( finishload, "PGM Images", "*.PGM;*.pgm" )
 	END LoadDialoged;
 
 	PROCEDURE LoadDialogedP2*;
 	BEGIN
-		antsCommands.InitScan( "name=NAME [>replace] [>show] # Load an Array dialoged from file" );  antsToolbox.FileOpen( finishloadP2, "PGM Images", "*.PGM" )
+		antsCommands.InitScan( "name=NAME [>replace] [>show] # Load an Array dialoged from file" );  antsToolbox.FileOpen( finishloadP2, "PGM Images", "*.PGM;*.pgm" )
 	END LoadDialogedP2;
 
 	PROCEDURE LoadP2*;

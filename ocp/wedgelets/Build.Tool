@@ -1,0 +1,22 @@
+Compiler.Compile 
+	wedge/wedgeLinearEq.Mod
+	wedge/wedgeQuadraticEq.Mod
+	wedge/wedgeGenericEq.Mod
+	wedge/wedgeArrays.Mod
+	wedge/wedgeTrees.Mod
+	wedge/wedgeConstantModels.Mod
+	wedge/wedgeLinearModels.Mod
+	wedge/wedgeQuadraticModels.Mod
+	wedge/wedgeHierarchicModel.Mod
+	wedge/wedgeFunctions2d.Mod
+	wedge/wedgeGenericModels.Mod
+	wedge/wedgeTreePlot.Mod
+	wedge/wedgeCommands.Mod
+	wedge/antsGammaShooting.Mod
+	wedge/wedgeLog.Mod
+	wedge/wedgeNumOps.Mod
+	wedge/Miniscript.Mod
+	wedge/CumulativeMatrices.Mod
+	wedge/Wedgelets.Mod
+	wedge/Arclets.Mod
+~
