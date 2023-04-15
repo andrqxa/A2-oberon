@@ -3,6 +3,10 @@ MODULE Platform;
 	Author: Timothee Martiel
 *)
 
+#IF UNIX THEN
+	IMPORT Unix, Modules;
+#END
+
 CONST
 	(* ===== Units ===== *)
 	k *		= 1024;
@@ -89,9 +93,15 @@ CONST
 	DevCfgMctrlPsVersion30 * = 2;
 	DevCfgMctrlPsVersion31 * = 3;
 
-	(* ===== AXI interfaces ===== *)
+	(* ===== Master AXI interfaces ===== *)
 	MasterAxiGp0Base* = 07F000000H; (** base address for Master AXI General Purpose interface 0 *)
 	MasterAxiGp1Base* = 0BF000000H; (** base address for Master AXI General Purpose interface 1 *)
+	
+	(* ===== AXI HP interfaces ===== *)
+	AxiHp0Base * = 0xF8008000; (** base address for AXI High Performance interface 0 register set *)
+	AxiHp1Base * = 0xF8009000; (** base address for AXI High Performance interface 1 register set *)
+	AxiHp2Base * = 0xF800A000; (** base address for AXI High Performance interface 2 register set *)
+	AxiHp3Base * = 0xF800B000; (** base address for AXI High Performance interface 3 register set *)
 
 	(* ===== GPIO Registers ===== *)
 	GpioBase * = ADDRESS(0E000A000H); (** Base address of GPIO registers *)
@@ -111,7 +121,7 @@ CONST
 	(* ===== SD ===== *)
 	SdBase * = [ADDRESS(0E0100000H), ADDRESS(0E0101000H)];
 	SdIrq * = [56, 79];
-	
+
 	(* ===== QSPI ===== *)
 	QspiBase* = [ADDRESS(0xE000D000)];
 
@@ -127,7 +137,7 @@ CONST
 TYPE
 
 	(** System Level Control (SLCR) registers definition *)
-	SlcrRegisters* = POINTER{UNSAFE,UNTRACED} TO RECORD
+	SlcrRegisters* = RECORD
 		SCL*: SIGNED32; (** 0x00000000 32 rw 0x00000000 Secure Configuration Lock *)
 		SLCR_LOCK*: SIGNED32; (** 0x00000004 32 wo 0x00000000 SLCR Write Protection Lock *)
 		SLCR_UNLOCK*: SIGNED32; (** 0x00000008 32 wo 0x00000000 SLCR Write Protection Unlock *)
@@ -316,7 +326,7 @@ TYPE
 	END;
 
 	(** Device Configuration (Devcfg) register definitions *)
-	DevCfgRegisters * = POINTER {UNSAFE,UNTRACED} TO RECORD
+	DevCfgRegisters * = RECORD
 		CTRL *,								(** 000H 32 mixed 0C006000H Control Register *)
 		LOCK *,								(** 004H 32 mixed 00000000H Lock Register *)
 		CFG *,									(** 008H 32 rw 00000508H Configuration Register *)
@@ -343,7 +353,7 @@ TYPE
 		XADCIF_MCTL *: SIGNED32;			(** 118H 32 rw 00000010H XADC Interface Miscellanous Control Register *)
 	END;
 
-	MpcoreRegisters * = POINTER {UNSAFE, UNTRACED} TO RECORD
+	MpcoreRegisters * = RECORD
 		SCU_CONTROL_REGISTER * {ALIGNED(1)}: SIGNED32; (* 0x00000000 32 rw 0x00000002 SCU Control Register *)
 		SCU_CONFIGURATION_REGISTER * {ALIGNED(1)}: SIGNED32; (* 0x00000004 32 ro 0x00000501 SCU Configuration Register *)
 		SCU_CPU_Power_Status_Register * {ALIGNED(1)}: SIGNED32; (* 0x00000008 32 rw 0x00000000 SCU CPU Power Status Register *)
@@ -490,22 +500,91 @@ TYPE
 		ICCIDR3 * {ALIGNED(1)}: SIGNED32; (* 0x00001FFC 32 rw 0x000000B1 Component ID3 *)
 	END;
 
-	SWDTRegisters * = POINTER {UNSAFE, UNTRACED} TO RECORD
+	SWDTRegisters * = RECORD
 		XWDTPS_ZMR_OFFSET * {ALIGNED(1)}: SIGNED32; (* 0x00000000 24 mixed 0x000001C0 WD zero mode register *)
 		XWDTPS_CCR_OFFSET * {ALIGNED(1)}: SIGNED32; (* 0x00000004 26 mixed 0x00003FFC Counter Control Register *)
 		XWDTPS_RESTART_OFFSET * {ALIGNED(1)}: SIGNED32; (* 0x00000008 16 wo 0x00000000 Restart key register - this not a real register as no data is stored *)
 		XWDTPS_SR_OFFSET * {ALIGNED(1)}: SIGNED32; (* 0x0000000C 1 ro 0x00000000 Status Register *)
 	END;
+	
+	AxiHpRegisters* = RECORD
+		AFI_RDCHAN_CTRL*: SIGNED32; (* 0x00000000 32 mixed 0x00000000 Read Channel Control Register *)
+		AFI_RDCHAN_ISSUINGCAP*: SIGNED32; (* 0x00000004 32 mixed 0x00000007 Read Issuing Capability Register *)
+		AFI_RDQOS*: SIGNED32; (* 0x00000008 32 mixed 0x00000000 QOS Read Channel Register *)
+		AFI_RDDATAFIFO_LEVEL*: SIGNED32; (* 0x0000000C 32 mixed 0x00000000 Read Data FIFO Level Register *)
+		AFI_RDDEBUG*: SIGNED32; (* 0x00000010 32 mixed 0x00000000 Read Channel Debug Register *)
+		AFI_WRCHAN_CTRL*: SIGNED32; (* 0x00000014 32 mixed 0x00000F00 Write Channel Control Register *)
+		AFI_WRCHAN_ISSUINGCAP*: SIGNED32; (* 0x00000018 32 mixed 0x00000007 Write Issuing Capability Register *)
+		AFI_WRQOS*: SIGNED32; (* 0x0000001C 32 mixed 0x00000000 QOS Write Channel Register *)
+		AFI_WRDATAFIFO_LEVEL*: SIGNED32; (* 0x00000020 32 mixed 0x00000000 Write Data FIFO Level Register *)
+		AFI_WRDEBUG*: SIGNED32; (* 0x00000024 32 mixed 0x00000000 Write Channel Debug Register *)
+	END;
 
 VAR
-	slcr*: SlcrRegisters; (** System Level Control (SLCR) registers set *)
-	devcfg*: DevCfgRegisters; (** Device Configuration (Devcfg) register set *)
-	mpcore*: MpcoreRegisters; (** Cortex-A9 multiprocessor extensions (MPCore) register set *)
-	swdt*: SWDTRegisters; (** System watchdog (SWDT) register set *)
+	slcr-: POINTER{UNSAFE,UNTRACED} TO SlcrRegisters; (** System Level Control (SLCR) registers set *)
+	devcfg-: POINTER{UNSAFE,UNTRACED} TO DevCfgRegisters; (** Device Configuration (Devcfg) register set *)
+	mpcore-: POINTER{UNSAFE,UNTRACED} TO MpcoreRegisters; (** Cortex-A9 multiprocessor extensions (MPCore) register set *)
+	swdt-: POINTER{UNSAFE,UNTRACED} TO SWDTRegisters; (** System watchdog (SWDT) register set *)
+	axihp-: ARRAY 4 OF POINTER{UNSAFE,UNTRACED} TO AxiHpRegisters;
+
+#IF UNIX THEN
+
+	PROCEDURE InitMod;
+	BEGIN
+		VAR memDev := Unix.open(ADDRESSOF("/dev/mem"), INTEGERSET(Unix.O_RDWR+Unix.O_SYNC), 0);
+		ASSERT(memDev >= 0);
+
+		slcr := Unix.mmap(NIL, SIZEOF(SlcrRegisters), Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(SlcrBase));
+		ASSERT(slcr # NIL);
+		devcfg := Unix.mmap(NIL, SIZEOF(DevCfgRegisters), Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(DevCfgBase));
+		ASSERT(devcfg # NIL);
+		mpcore := Unix.mmap(NIL, SIZEOF(MpcoreRegisters), Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(MpcoreBase));
+		ASSERT(mpcore # NIL);
+		swdt := Unix.mmap(NIL, SIZEOF(SWDTRegisters), Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(SWDTBase));
+		ASSERT(swdt # NIL);
+		
+		axihp[0] := Unix.mmap(NIL, SIZEOF(AxiHpRegisters), Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(AxiHp0Base));
+		ASSERT(axihp[0] # NIL);
+		axihp[1] := Unix.mmap(NIL, SIZEOF(AxiHpRegisters), Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(AxiHp1Base));
+		ASSERT(axihp[1] # NIL);
+		axihp[2] := Unix.mmap(NIL, SIZEOF(AxiHpRegisters), Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(AxiHp2Base));
+		ASSERT(axihp[2] # NIL);
+		axihp[3] := Unix.mmap(NIL, SIZEOF(AxiHpRegisters), Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(AxiHp3Base));
+		ASSERT(axihp[3] # NIL);
+
+		IGNORE Unix.close(memDev);
+		Modules.InstallTermHandler(TerminateMod);
+		RETURN;
+	FINALLY
+		IF memDev >= 0 THEN
+			IGNORE Unix.close(memDev);
+			TerminateMod;
+		END;
+	END InitMod;
+
+	PROCEDURE TerminateMod;
+	BEGIN
+		IF slcr # NIL THEN IGNORE Unix.munmap(slcr, SIZEOF(SlcrRegisters)); END;
+		IF devcfg # NIL THEN IGNORE Unix.munmap(devcfg, SIZEOF(DevCfgRegisters)); END;
+		IF mpcore # NIL THEN IGNORE Unix.munmap(mpcore, SIZEOF(MpcoreRegisters)); END;
+		IF swdt # NIL THEN IGNORE Unix.munmap(swdt, SIZEOF(SWDTRegisters)); END;
+	END TerminateMod;
+
+#END
 
 BEGIN
+
+#IF ~UNIX THEN
 	slcr := SlcrBase;
 	devcfg := DevCfgBase;
 	mpcore := MpcoreBase;
 	swdt := SWDTBase;
+	axihp[0] := AxiHp0Base;
+	axihp[1] := AxiHp1Base;
+	axihp[2] := AxiHp2Base;
+	axihp[3] := AxiHp3Base;
+#ELSE
+	InitMod;
+#END
+
 END Platform.
