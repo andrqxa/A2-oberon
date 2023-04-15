@@ -5,7 +5,13 @@
 MODULE PsConfig;
 
 IMPORT
-	SYSTEM, Platform, BootConfig, Trace;
+	SYSTEM, Platform;
+	
+#IF ~UNIX THEN
+	IMPORT BootConfig;
+#ELSE
+	IMPORT Configuration;
+#END
 
 CONST
 	(** error codes *)
@@ -34,6 +40,8 @@ CONST
 	IoCan* = 7;
 	IoGpio* = 8;
 	IoI2c* = 9;
+
+	PsRefClockHz* = 33333333;
 
 VAR
 	psRefClockHz: SIGNED64;
@@ -372,5 +380,13 @@ VAR
 	END StopIoClock;
 
 BEGIN
+
+#IF ~UNIX THEN
 	psRefClockHz := BootConfig.GetIntValue("PsRefClockHz");
+#ELSE
+	VAR res: INTEGER;
+	Configuration.GetInteger64("PsRefClockHz", psRefClockHz, res);
+	IF res # 0 THEN psRefClockHz := PsRefClockHz; END;
+#END
+
 END PsConfig.
