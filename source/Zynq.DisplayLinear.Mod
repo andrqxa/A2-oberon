@@ -1,15 +1,17 @@
 MODULE DisplayLinear;
 
 IMPORT SYSTEM, Displays, Plugins, Machine, Kernel, Commands, Options,
-	PsConfig, Channels, Video := AcStreamVideoOut, AcAxiDma, Trace;
+	Platform, PsConfig, Channels, Video := AcStreamVideoOut, AcAxiDma, Trace;
+
+#IF UNIX THEN
+
+IMPORT Unix, Modules;
+
+CONST FrameBufDevName* = "/dev/vidout_buf"; (** video frame buffer device name *)
+
+#END
 
 CONST
-	MaxWidth = 1920;
-	MaxHeight = 1080;
-
-	CacheLineSize = 32; (* cache line size in bytes *)
-	DmaBurstLen = 16;
-
 	(*
 		Video settings for 1024 x 768 @ 62 Hz
 	*)
@@ -54,6 +56,8 @@ CONST
 
 	DefaultColor* = SIGNED32(0FFFFFFFFH); (** the color of the booting screen  *)
 
+	FrameBufSize = Height * Width * 4; (* frame buffer size in bytes *)
+
 TYPE
 
 	Display = OBJECT(Displays.Display)
@@ -92,7 +96,10 @@ TYPE
 						ELSE
 							w0 := w DIV Format;
 							WHILE h > 0 DO
-								Copy32(bufadr,dispadr,w0); (*SYSTEM.MOVE(bufadr, dispadr, w);*) Machine.FlushDCacheRange(dispadr,w);
+								Copy32(bufadr,dispadr,w0); (*SYSTEM.MOVE(bufadr, dispadr, w);*)
+							#IF ~UNIX THEN
+								Machine.FlushDCacheRange(dispadr, w);
+							#END;
 								INC(bufadr, stride); INC(dispadr, fbstride);
 								DEC(h)
 							END
@@ -134,8 +141,12 @@ VAR
 
 	pixelClock: FLOAT32; (* pixel clock in Hz *)
 
-	buf: POINTER TO ARRAY OF CHAR;
-	bufAddr: ADDRESS;
+#IF UNIX THEN
+	frameBufFid: INTEGER;
+	frameBufMap: ADDRESS;
+#ELSE
+	frameBuf: POINTER TO ARRAY OF CHAR;
+#END
 
 	rCfgCmd, rCfgData: PORT OUT;
 	rStatus: PORT IN;
@@ -198,10 +209,61 @@ VAR
 		END;
 	END SetupClocks;
 
+#IF UNIX THEN
+
+CONST
+	IOCTL_GET_PHYS_ADDR = SIGNED32(0x80085000);
+
+	PROCEDURE AllocateFrameBuffer(VAR frameBufAddr, frameBufPhysAddr: ADDRESS);
+	BEGIN
+		frameBufFid := Unix.open(ADDRESSOF(FrameBufDevName[0]), INTEGERSET(Unix.O_RDWR+Unix.O_SYNC), 0);
+		ASSERT(frameBufFid >= 0);
+		frameBufMap := Unix.mmap(NIL, FrameBufSize, Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, frameBufFid, 0);
+		ASSERT(frameBufMap > 0);
+		VAR res := Unix.ioctl(frameBufFid, IOCTL_GET_PHYS_ADDR, ADDRESSOF(frameBufPhysAddr));
+		ASSERT(res = 0);
+		ASSERT(frameBufPhysAddr > 0);
+
+		frameBufAddr := frameBufMap;
+
+		Modules.InstallTermHandler(Cleanup);
+
+		RETURN;
+	FINALLY
+		Cleanup;
+	END AllocateFrameBuffer;
+
+	PROCEDURE Cleanup;
+	BEGIN
+		IF frameBufMap > 0 THEN
+			IGNORE Unix.munmap(frameBufMap, FrameBufSize);
+		END;
+		IF frameBufFid >= 0 THEN
+			IGNORE Unix.close(frameBufFid);
+		END;
+	END Cleanup;
+
+#ELSE
+
+	PROCEDURE AllocateFrameBuffer(VAR frameBufAddr, frameBufPhysAddr: ADDRESS);
+	CONST
+		CacheLineSize = 32; (* cache line size in bytes *)
+	BEGIN
+		NEW(frameBuf,CacheLineSize*((Height*Width*4+CacheLineSize-1) DIV CacheLineSize)+CacheLineSize);
+		frameBufAddr := ADDRESSOF(frameBuf[0]);
+		frameBufAddr := frameBufAddr + (CacheLineSize - frameBufAddr MOD CacheLineSize); (* align to cache line size boundary *)
+		ASSERT(frameBufAddr MOD CacheLineSize = 0);
+		ASSERT(ADDRESSOF(frameBuf[LEN(frameBuf)-1]) >= frameBufAddr+Height*Width*4-1);
+		frameBufPhysAddr := frameBufAddr;
+	END AllocateFrameBuffer;
+
+#END
+
 	PROCEDURE Init;
+	CONST
+		DmaBurstLen = 16; (* AXI DMA burst length in transfers *)
 	VAR
 		res: INTEGER;
-		d: SIGNED32;
 	BEGIN
 		SetupClocks;
 
@@ -221,13 +283,14 @@ VAR
 		(*
 			Allocate frame buffer
 		*)
-		NEW(buf,CacheLineSize*((MaxHeight*MaxWidth*4+CacheLineSize-1) DIV CacheLineSize)+CacheLineSize);
-		bufAddr := ADDRESSOF(buf[0]);
-		bufAddr := bufAddr + (CacheLineSize - bufAddr MOD CacheLineSize); (* align to cache line size boundary *)
-		Trace.String("DisplayLinear: bufAddr0="); Trace.Hex(ADDRESSOF(buf[0]),-8); Trace.Ln;
-		Trace.String("DisplayLinear: bufAddr="); Trace.Hex(bufAddr,-8); Trace.Ln;
-		ASSERT(bufAddr MOD CacheLineSize = 0);
-		ASSERT(ADDRESSOF(buf[LEN(buf)-1]) >= bufAddr+MaxHeight*MaxWidth*4-1);
+		VAR frameBufAddr, frameBufPhysAddr: ADDRESS;
+		AllocateFrameBuffer(frameBufAddr, frameBufPhysAddr);
+
+		Machine.Fill32(frameBufAddr, FrameBufSize, DefaultColor); (* fill the framebuffer with the default color *)
+
+#IF ~UNIX THEN
+		Machine.FlushDCacheRange(frameBufAddr, FrameBufSize);
+#END
 
 		(*
 			Setup video streaming
@@ -249,18 +312,15 @@ VAR
 		(*
 			Setup AXI DMA for transfering data from the frame buffer to the video output
 		*)
-
 		(* configure read channel of S_AXI_HP0 as a 32-bit interface *)
-		d := SYSTEM.GET32(0xF8008000); SYSTEM.PUT32(0xF8008000,SYSTEM.MSK(d,0xFFFFFFFE)+1);
-
-		Machine.Fill32(bufAddr,Width*Height*4,DefaultColor); (* fill the framebuffer with the default color *)
-		Machine.FlushDCacheRange(bufAddr,Width*Height*4);
+		(*VAR d := SYSTEM.GET32(0xF8008000); SYSTEM.PUT32(0xF8008000,SYSTEM.MSK(d,0xFFFFFFFE)+1);*)
+		Platform.axihp[0].AFI_RDCHAN_CTRL := SYSTEM.MSK(Platform.axihp[0].AFI_RDCHAN_CTRL,SIGNED32(0xFFFFFFFE))+1;
 
 		NEW(rdma,rCfgCmd,rCfgData,rStatus,4,16);
 		rdma.SetBurstLen(DmaBurstLen);
 
 		(* configure read DMA transfer *)
-		rdma.SetAddr(bufAddr);
+		rdma.SetAddr(SIZE(frameBufPhysAddr));
 		rdma.SetCount(Width*Height);
 		rdma.SetWrap(TRUE); (* recurring transfer *)
 
@@ -279,7 +339,7 @@ VAR
 		display.offscreen := 0;
 		display.format := 4;
 		display.unit := 10000;
-		display.InitFrameBuffer(bufAddr,Width*Height*4,Width*4);
+		display.InitFrameBuffer(frameBufAddr,FrameBufSize,Width*4);
 		display.desc := "Linear framebuffer driver for Zynq";
 		display.Update;
 		Displays.registry.Add(display,res);
@@ -323,16 +383,3 @@ BEGIN
 	Init;
 END DisplayLinear.
 
-System.DoCommands
-
-WinDisks.Install I: RW ~
-FSTools.Mount AOS AosFS PhysicalDrive4#3 ~
-
-System.DoCommands
-
-FSTools.CopyFiles -o WORK:/build/DisplayLinear.Gof => AOS:/DisplayLinear.Gof ~
-FSTools.CopyFiles -o WORK:/build/DisplayLinear.Sym => AOS:/DisplayLinear.Sym ~
-
-FSTools.Unmount AOS ~
-WinDisks.Uninstall PhysicalDrive4 ~
-~
