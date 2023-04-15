@@ -2,8 +2,23 @@ MODULE antsHybridObjects IN Oberon;   (**  AUTHOR "fof"; PURPOSE "";  **)
 
 IMPORT vyBase, Objects, Files, aM := antsMessages, Modules IN A2, Types, Strings, Gadgets, antsObjects, vyName;
 
+PROCEDURE StripContext(CONST moduleName: ARRAY OF CHAR; VAR name: ARRAY OF CHAR);
+VAR i: SIZE;
+CONST prefix = "Oberon-"; len = 7;
+BEGIN
+	FOR i := 0 TO len-1 DO
+		ASSERT(moduleName[i] = prefix[i]);
+	END;
+	i := 0;
+	WHILE (moduleName[i+len] # 0X) DO 
+		name[i] := moduleName[i+len];
+		INC(i);
+	END;
+	name[i] := 0X;
+END StripContext;
+
 TYPE
-	(* do bind with enumeration, do links with enumeration, do attributes with enumeration *)
+	(* do bind with enumeration, do links with enumeration, do attributes with enumeration *)	
 
 	Object* = OBJECT (vyBase.Object)
 
@@ -13,7 +28,8 @@ TYPE
 			(*trying to guess a name for the generator, standardname: <Modulename>.Gen<TypeName>*)
 			type := Types.TypeOf( SELF );  commandname := "Gen";  Strings.Append( commandname, type.name );
 
-			COPY( type.mod.name, name );  Strings.Append( name, "." );  Strings.Append( name, commandname );
+			StripContext(type.mod.name, name);
+			Strings.Append( name, "." );  Strings.Append( name, commandname );
 			GETPROCEDURE ( type.mod.name, commandname, command);
 			IF command = NIL THEN
 				aM.eSS( "antsHybridObjects: Failed to find standard generator procedure ", name );  COPY( type.mod.name, name );  Strings.Append( name, "." );  Strings.Append( name, type.name );
