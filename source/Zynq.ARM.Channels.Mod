@@ -7,11 +7,17 @@ MODULE Channels;
 IMPORT
 	SYSTEM;
 
+#IF UNIX THEN
+	IMPORT Unix, Modules;
+#END
+
 CONST
 	MasterAxiGp0Base = 07F000000H; (* base address for Master AXI General Purpose interface 0 *)
 	MasterAxiGp1Base = 0BF000000H; (* base address for Master AXI General Purpose interface 1 *)
 
-	ChanOffset  = 256*4; (* ActiveCells AXI4 Stream channel offset in bytes *)
+	MaxNumChannels = 1024;
+
+	ChanAddrRange  = 256*4; (* ActiveCells AXI4 Stream channel address range in bytes *)
 (*
 	OutDataOffset = 0;
 	OutReadyOffset = SIZEOF(SIGNED32);
@@ -23,38 +29,39 @@ CONST
 TYPE
 	(* AXI4 Stream logical port descriptor *)
 	PortDesc = RECORD
-		lockAddr: ADDRESS; (** address of the associated spin lock *)
-		portAddr: ADDRESS; (** address of the logical channel port;  *)
+		lockAddr: ADDRESS; (* address of the associated spin lock *)
+		portAddr: ADDRESS; (* address of the logical channel port *)
 	END;
+	PortDescPtr = POINTER TO PortDesc;
 
 	Output* = PORT OUT; (** AXI4 Stream output port *)
 	Input* = PORT IN; (** AXI4 Stream input port *)
 
 VAR
-	inputs: ARRAY 2 OF ARRAY 256 OF PortDesc;
-	outputs: ARRAY 2 OF ARRAY 256 OF PortDesc;
+	inputs: ARRAY 2 OF ARRAY MaxNumChannels OF PortDescPtr;
+	outputs: ARRAY 2 OF ARRAY MaxNumChannels OF PortDescPtr;
 
 	locks: ARRAY 2 OF SIGNED32; (* locks for each physical channel *)
 
-(**
-	Writing to and reading from a port can be described by the following high-level code:
+(*
+	Writing/reading to/from a port can be described by the following high-level code:
 
 	PROCEDURE WriteToPort(out: Output; data: SIGNED32);
 	VAR
-		portDesc: POINTER {UNSAFE} TO PortDesc;
+		portDesc: PortDescPtr;
 		outDesc: OutputDesc;
 	BEGIN
-		portDesc := SYSTEM.VAL(ADDRESS,out);
+		portDesc := SYSTEM.VAL(PortDescPtr,out);
 		outDesc := portDesc.portAddr;
 		outDesc.data := data;
 	END WriteToPort;
 
 	PROCEDURE ReadFromPort(inp: Input; VAR data: SIGNED32);
 	VAR
-		portDesc: POINTER {UNSAFE} TO PortDesc;
+		portDesc: PortDescPtr;
 		inpDesc: InputDesc;
 	BEGIN
-		portDesc := SYSTEM.VAL(ADDRESS,inp);
+		portDesc := SYSTEM.VAL(PortDescPtr,inp);
 		inpDesc := portDesc.portAddr;
 		data := inpDesc.data;
 	END ReadFromPort;
@@ -64,13 +71,13 @@ VAR
 	(** AXI4 Stream output port descriptor *)
 	OutputDesc* = POINTER{UNSAFE,UNTRACED} TO RECORD
 		data: SIGNED32; (** output data, write only *)
-		ready: BOOLEAN; (** TRUE when output is available for sending data *)
+		ready: UNSIGNED8; (** non-zero when output is available for sending data *)
 		padding: ARRAY 3 OF CHAR;
 	END;
 
 	(** AXI4 Stream input port descriptor *)
 	InputDesc* = POINTER{UNSAFE,UNTRACED} TO RECORD
-		available: BOOLEAN; (** TRUE when input data is available *)
+		available: UNSIGNED8; (** non-zero when input data is available *)
 		padding: ARRAY 7 OF CHAR;
 		data: SIGNED32; (** input data, read only *)
 	END;
@@ -84,17 +91,20 @@ VAR
 	*)
 	PROCEDURE GetInput*(physicalPortNum, logicalPortNum: SIGNED32; VAR port: Input): BOOLEAN;
 	VAR
-		portDesc: POINTER {UNSAFE} TO PortDesc;
 		portAddr: ADDRESS;
 	BEGIN
+		ASSERT(logicalPortNum < MaxNumChannels);
 		CASE physicalPortNum OF
-			|0: portAddr := MasterAxiGp0Base + logicalPortNum*ChanOffset;
-			|1: portAddr := MasterAxiGp1Base + logicalPortNum*ChanOffset;
+			|0: portAddr := masterAxiGp0Base + logicalPortNum*ChanAddrRange;
+			|1: portAddr := masterAxiGp1Base + logicalPortNum*ChanAddrRange;
 		ELSE
 			RETURN FALSE;
 		END;
 
-		portDesc := ADDRESSOF(inputs[physicalPortNum,logicalPortNum]);
+		VAR portDesc := inputs[physicalPortNum,logicalPortNum];
+		IF portDesc = NIL THEN
+			NEW(portDesc); inputs[physicalPortNum,logicalPortNum] := portDesc;
+		END;
 		portDesc.portAddr := portAddr;
 		portDesc.lockAddr := ADDRESSOF(locks[physicalPortNum]);
 		port := SYSTEM.VAL(Input,portDesc);
@@ -110,17 +120,20 @@ VAR
 	*)
 	PROCEDURE GetOutput*(physicalPortNum, logicalPortNum: SIGNED32; VAR port: Output): BOOLEAN;
 	VAR
-		portDesc: POINTER {UNSAFE} TO PortDesc;
 		portAddr: ADDRESS;
 	BEGIN
+		ASSERT(logicalPortNum < MaxNumChannels);
 		CASE physicalPortNum OF
-			|0: portAddr := MasterAxiGp0Base + logicalPortNum*ChanOffset;
-			|1: portAddr := MasterAxiGp1Base + logicalPortNum*ChanOffset;
+			|0: portAddr := masterAxiGp0Base + logicalPortNum*ChanAddrRange;
+			|1: portAddr := masterAxiGp1Base + logicalPortNum*ChanAddrRange;
 		ELSE
 			RETURN FALSE;
 		END;
 
-		portDesc := ADDRESSOF(outputs[physicalPortNum,logicalPortNum]);
+		VAR portDesc := outputs[physicalPortNum,logicalPortNum];
+		IF portDesc = NIL THEN
+			NEW(portDesc); outputs[physicalPortNum,logicalPortNum] := portDesc;
+		END;
 		portDesc.portAddr := portAddr;
 		portDesc.lockAddr := ADDRESSOF(locks[physicalPortNum]);
 		port := SYSTEM.VAL(Output,portDesc);
@@ -129,19 +142,13 @@ VAR
 	END GetOutput;
 
 	PROCEDURE GetOutputDataAddr*(out: Output): ADDRESS;
-	VAR portDesc: POINTER {UNSAFE} TO PortDesc;
 	BEGIN
-		portDesc := SYSTEM.VAL(ADDRESS,out);
-		ASSERT(portDesc # NIL);
-		RETURN portDesc.portAddr;
+		RETURN SYSTEM.VAL(PortDesc,out).portAddr;
 	END GetOutputDataAddr;
 
 	PROCEDURE GetInputDataAddr*(inp: Input): ADDRESS;
-	VAR portDesc: POINTER {UNSAFE} TO PortDesc;
 	BEGIN
-		portDesc := SYSTEM.VAL(ADDRESS,inp);
-		ASSERT(portDesc # NIL);
-		RETURN portDesc.portAddr+8;
+		RETURN SYSTEM.VAL(PortDesc,inp).portAddr+8;
 	END GetInputDataAddr;
 
 	(*
@@ -189,7 +196,8 @@ VAR
 		SEV
 	END ReleaseResource;
 
-	(*PROCEDURE AcquireObject(lockAddr: ADDRESS);
+	(*
+	PROCEDURE AcquireObject(lockAddr: ADDRESS);
 	BEGIN
 		CODE
 			LDR R1, [FP, #lockAddr] ; R1 := address of lock
@@ -203,14 +211,14 @@ VAR
 			LDR R1, [FP, #lockAddr] ; R1 := address of lock
 		END;
 		ReleaseResource
-	END ReleaseObject;*)
+	END ReleaseObject;
+	*)
 
 	(**
 		Returns TRUE if the given output port is ready to accept new data
 	*)
 	PROCEDURE Ready*(out: Output): BOOLEAN;
 	VAR b: BOOLEAN;
-	(*VAR p: POINTER {UNSAFE} TO PortDesc;*)
 	BEGIN
 		CODE
 			LDR R3, [FP, #out] ; R3 := address of PortDesc.lockAddr
@@ -223,19 +231,19 @@ VAR
 			STRB R4, [FP, #b] ; b := R4
 		END;
 		ReleaseResource;
-
-		(*p := SYSTEM.VAL(ADDRESS,out);
+		(*
+		VAR p := SYSTEM.VAL(PortDescPtr,out);
+		TRACE(p.portAddr, p.lockAddr);
 		AcquireObject(p.lockAddr);
-		b := SYSTEM.VAL(BOOLEAN,SYSTEM.GET32(p.portAddr+OutReadyOffset));
-		ReleaseObject(p.lockAddr);*)
-
+		b := SYSTEM.GET32(p.portAddr+OutReadyOffset) # 0;
+		ReleaseObject(p.lockAddr);
+		*)
 		RETURN b;
 	END Ready;
 
 	(** Returns number of data elements available to read from an input port *)
 	PROCEDURE Available*(inp: Input): SIGNED32;
 	VAR available: SIGNED32;
-	(*VAR p: POINTER {UNSAFE} TO PortDesc;*)
 	BEGIN
 		CODE
 			LDR R3, [FP, #inp] ; R3 := address of PortDesc.lockAddr
@@ -248,18 +256,17 @@ VAR
 			STR R4, [FP, #available] ; available := R4
 		END;
 		ReleaseResource;
-
-		(*p := SYSTEM.VAL(ADDRESS,inp);
+		(*
+		VAR p := SYSTEM.VAL(PortDescPtr,inp);
 		AcquireObject(p.lockAddr);
 		available := SYSTEM.GET32(p.portAddr+InpAvailableOffset);
-		ReleaseObject(p.lockAddr);*)
-
+		ReleaseObject(p.lockAddr);
+		*)
 		RETURN available;
 	END Available;
 
 	(** Send data to an output port (blocking version) *)
 	PROCEDURE Send*(out: Output; x: SIGNED32);
-	(*VAR p: POINTER {UNSAFE} TO PortDesc;*)
 	BEGIN
 		CODE
 			LDR R3, [FP, #out] ; R3 := address of PortDesc.lockAddr
@@ -272,17 +279,17 @@ VAR
 			STR R2, [R3, #0] ; out.Data := R2
 		END;
 		ReleaseResource;
-
-		(*p := SYSTEM.VAL(ADDRESS,out);
+		(*
+		VAR p := SYSTEM.VAL(PortDescPtr,out);
 		AcquireObject(p.lockAddr);
 		SYSTEM.PUT32(p.portAddr+OutDataOffset,x);
-		ReleaseObject(p.lockAddr);*)
+		ReleaseObject(p.lockAddr);
+		*)
 	END Send;
 
 	(** Send data to an output port (non-blocking version) *)
 	PROCEDURE SendNonBlocking*(out: Output; x: SIGNED32): BOOLEAN;
 	VAR b: BOOLEAN;
-	(*VAR p: POINTER {UNSAFE} TO PortDesc;*)
 	BEGIN
 		CODE
 			LDR R3, [FP, #out] ; R3 := address of PortDesc.lockAddr
@@ -302,13 +309,13 @@ VAR
 		Exit:
 		END;
 		ReleaseResource;
-
-		(*p := SYSTEM.VAL(ADDRESS,out);
+		(*
+		VAR p := SYSTEM.VAL(PortDescPtr,out);
 		AcquireObject(p.lockAddr);
-		b := SYSTEM.VAL(BOOLEAN,SYSTEM.GET32(p.portAddr+OutReadyOffset));
+		b := SYSTEM.GET32(p.portAddr+OutReadyOffset) # 0;
 		IF b THEN SYSTEM.PUT32(p.portAddr+OutDataOffset,x); END;
-		ReleaseObject(p.lockAddr);*)
-
+		ReleaseObject(p.lockAddr);
+		*)
 		RETURN b;
 	END SendNonBlocking;
 
@@ -334,7 +341,6 @@ VAR
 
 	(** Receive data from an input port (blocking version) *)
 	PROCEDURE Receive*(inp: Input; VAR x: SIGNED32);
-	(*VAR p: POINTER {UNSAFE} TO PortDesc;*)
 	BEGIN
 		CODE
 			LDR R3, [FP, #inp] ; R3 := address of PortDesc.lockAddr
@@ -348,17 +354,17 @@ VAR
 			STR R4, [R2, #0] ; x := R4
 		END;
 		ReleaseResource;
-
-		(*p := SYSTEM.VAL(ADDRESS,inp);
+		(*
+		VAR p := SYSTEM.VAL(PortDescPtr,inp);
 		AcquireObject(p.lockAddr);
 		x := SYSTEM.GET32(p.portAddr+InpDataOffset);
-		ReleaseObject(p.lockAddr);*)
+		ReleaseObject(p.lockAddr);
+		*)
 	END Receive;
 
 	(** Receive data from an input port (non-blocking version) *)
 	PROCEDURE ReceiveNonBlocking*(inp: Input; VAR x: SIGNED32): BOOLEAN;
 	VAR b: BOOLEAN;
-	(*VAR p: POINTER {UNSAFE} TO PortDesc;*)
 	BEGIN
 		CODE
 			LDR R3, [FP, #inp] ; R3 := address of PortDesc.lockAddr
@@ -379,13 +385,13 @@ VAR
 		Exit:
 		END;
 		ReleaseResource;
-
-		(*p := SYSTEM.VAL(ADDRESS,inp);
+		(*
+		VAR p := SYSTEM.VAL(PortDescPtr,inp);
 		AcquireObject(p.lockAddr);
-		b := SYSTEM.VAL(BOOLEAN,SYSTEM.GET32(p.portAddr+InpAvailableOffset));
+		b := SYSTEM.GET32(p.portAddr+InpAvailableOffset) # 0;
 		IF b THEN x := SYSTEM.GET32(p.portAddr+InpDataOffset); END;
-		ReleaseObject(p.lockAddr);*)
-
+		ReleaseObject(p.lockAddr);
+		*)
 		RETURN b;
 	END ReceiveNonBlocking;
 
@@ -409,6 +415,7 @@ VAR
 		RETURN ReceiveNonBlocking(inp,x);
 	END "<<?";
 
+	(*
 	PROCEDURE SendMultiple(portAddr, dataAddr: ADDRESS; numElements: SIGNED32);
 	CODE
 		LDR R0, [FP,#portAddr]
@@ -543,6 +550,7 @@ VAR
 	Exit:
 
 	END ReceiveMultiple;
+	*)
 
 	OPERATOR "<<"*(port: Output; x: SET32); BEGIN Send(port,SYSTEM.VAL(SIGNED32,x)); END "<<";
 	OPERATOR ">>"*(x: SET32; port: Output); BEGIN Send(port,SYSTEM.VAL(SIGNED32,x)); END ">>";
@@ -561,6 +569,53 @@ VAR
 	OPERATOR "<<"*(VAR x: FLOAT32; port: Input); BEGIN Receive(port,SYSTEM.VAL(SIGNED32,x)); END "<<";
 	OPERATOR ">>?"*(port: Input; VAR x: FLOAT32): BOOLEAN; BEGIN RETURN ReceiveNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END ">>?";
 	OPERATOR "<<?"*(VAR x: FLOAT32; port: Input): BOOLEAN; BEGIN RETURN ReceiveNonBlocking(port,SYSTEM.VAL(SIGNED32,x)); END "<<?";
+
+
+VAR
+	masterAxiGp0Base: ADDRESS;
+	masterAxiGp1Base: ADDRESS;
+
+#IF UNIX THEN
+
+CONST
+	ChannelsAddrSpace = MaxNumChannels * ChanAddrRange;
+
+	PROCEDURE InitMod;
+	BEGIN
+		VAR memDev := Unix.open(ADDRESSOF("/dev/mem"), INTEGERSET(Unix.O_RDWR+Unix.O_SYNC), 0);
+		ASSERT(memDev >= 0);
+
+		masterAxiGp0Base := Unix.mmap(NIL, ChannelsAddrSpace, Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(MasterAxiGp0Base));
+		ASSERT(masterAxiGp0Base # NIL);
+		masterAxiGp1Base := Unix.mmap(NIL, ChannelsAddrSpace, Unix.PROT_READ+Unix.PROT_WRITE, Unix.MAP_SHARED, memDev, Unix.off_t(MasterAxiGp1Base));
+		ASSERT(masterAxiGp1Base # NIL);
+
+		IGNORE Unix.close(memDev);
+		Modules.InstallTermHandler(TerminateMod);
+		RETURN;
+	FINALLY
+		IF memDev >= 0 THEN
+			IGNORE Unix.close(memDev);
+			TerminateMod;
+		END;
+	END InitMod;
+
+	PROCEDURE TerminateMod;
+	BEGIN
+		IF masterAxiGp0Base # NIL THEN IGNORE Unix.munmap(masterAxiGp0Base, ChannelsAddrSpace); END;
+		IF masterAxiGp1Base # NIL THEN IGNORE Unix.munmap(masterAxiGp1Base, ChannelsAddrSpace); END;
+	END TerminateMod;
+
+#END
+
+BEGIN
+
+#IF ~UNIX THEN
+	masterAxiGp0Base := MasterAxiGp0Base;
+	masterAxiGp1Base := MasterAxiGp1Base;
+#ELSE
+	InitMod;
+#END
 
 END Channels.
 
