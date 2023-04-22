@@ -129,27 +129,31 @@ VAR manager : WM.WindowManager;
 	viewport : WM.ViewPort;
 	sv : View;
 	p : Plugins.Plugin;
-	w, h: SIGNED32; res: INTEGER;
+	w, h, rl, rt, rw, rh: SIGNED32; res: INTEGER;
 BEGIN
-	context.arg.SkipWhitespace; context.arg.String(fn);
-	IF ~((context.arg.Peek() >= '0') & (context.arg.Peek() <= '9')) THEN
-		context.arg.String(viewportName);
+	context.arg.SkipWhitespace; context.arg.String(fn); context.arg.SkipWhitespace; 
+	IF ~((context.arg.Peek() >= '0') & (context.arg.Peek() <= '9')) THEN 
+		IGNORE context.arg.GetString(viewportName);
 	END;
-
+	
 	manager := WM.GetDefaultManager();
 	p := manager.viewRegistry.Get(viewportName);
 	IF p # NIL THEN viewport := p(WM.ViewPort) ELSE viewport := WM.GetDefaultView() END;
-
 	w := MAX(ENTIER(viewport.range.r - viewport.range.l), 1);
 	h := MAX(ENTIER(viewport.range.b - viewport.range.t), 1);
+	rl:=SIGNED32(viewport.range.l); 
+	rt:=SIGNED32(viewport.range.t); 
+	rw:=w; 
+	rh:=h;
+	
 	context.arg.SkipWhitespace;
 	IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') THEN context.arg.Int(w, FALSE) END;
 	context.arg.SkipWhitespace;
 	IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') THEN context.arg.Int(h, FALSE) END;
-
-	context.out.String("Screenshot : ");
+	
+	context.out.String("ScreenShot View : ");
 	NEW(sv, manager, w, h);
-	sv.SetRange(viewport.range.l, viewport.range.t, viewport.range.r, viewport.range.b, FALSE);
+	sv.SetRange(rl, rt, rw, rh, FALSE);
 
 	WMGraphics.StoreImage(sv.backbuffer, fn, res);
 	IF res = 0 THEN
@@ -161,38 +165,51 @@ BEGIN
 	sv.Close;
 END SnapShotView;
 
-(** Parameters : filename width height [(left top)|(left top width height)]*)
-PROCEDURE SnapShotRange*(context : Commands.Context);
+(** Parameters : filename [width height [(left top)|(left top width height)]]
+	if no size arguments are given, a screen shot of the entire populated view area is made.
+*)
+PROCEDURE SnapShotRange*(context : Commands.Context);(*! to be done: avoid having the thumbnail bar and the menu bar floating somewhere in the stored image *)
 VAR manager : WM.WindowManager;
 	fn : ARRAY 100 OF CHAR;
 	sv : View;
 	w, h, rl, rt, rw, rh: SIGNED32; res: INTEGER;
+	r:	WMRectangles.Rectangle;
 BEGIN
-	context.arg.SkipWhitespace; context.arg.String(fn);
-	context.arg.SkipWhitespace; context.arg.Int(w, FALSE);
-	IF w <1 THEN w := 1 END; IF w > 10000 THEN w := 10000 END;
-
-	context.arg.SkipWhitespace; context.arg.Int(h, FALSE);
-	IF h <1 THEN h := 1 END; IF h > 10000 THEN h := 10000 END;
-
-	context.arg.SkipWhitespace;
-	IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-')THEN
-		context.arg.SkipWhitespace; context.arg.Int(rl, FALSE);
-		context.arg.SkipWhitespace; context.arg.Int(rt, FALSE);
-	 END;
-
-	rw := w; rh := h;
-	context.arg.SkipWhitespace;
-	IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') THEN
-		context.arg.SkipWhitespace; context.arg.Int(rw, FALSE);
-		context.arg.SkipWhitespace; context.arg.Int(rh, FALSE);
-	 END;
-
-	 IF rw <= 0 THEN rw := 1 END;
-	 IF rh <= 0 THEN rh := 1 END;
-
-	context.out.String("Screenshot : ");
 	manager := WM.GetDefaultManager();
+
+	context.arg.SkipWhitespace; context.arg.String(fn);
+	context.arg.SkipWhitespace; 
+	IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-')THEN (*caller defines range*)
+		context.arg.Int(w, FALSE);
+		IF w <1 THEN w := 1 END; IF w > 10000 THEN w := 10000 END;
+
+		context.arg.SkipWhitespace; context.arg.Int(h, FALSE);
+		IF h <1 THEN h := 1 END; IF h > 10000 THEN h := 10000 END;
+
+		context.arg.SkipWhitespace;
+		IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') OR (context.arg.Peek() = '-')THEN
+			context.arg.SkipWhitespace; context.arg.Int(rl, FALSE);
+			context.arg.SkipWhitespace; context.arg.Int(rt, FALSE);
+		 END;
+
+		rw := w; rh := h;
+		context.arg.SkipWhitespace;
+		IF (context.arg.Peek() >= '0') & (context.arg.Peek() <= '9') THEN
+			context.arg.SkipWhitespace; context.arg.Int(rw, FALSE);
+			context.arg.SkipWhitespace; context.arg.Int(rh, FALSE);
+		 END;
+
+		 IF rw <= 0 THEN rw := 1 END;
+		 IF rh <= 0 THEN rh := 1 END;
+
+	ELSE (*snapshot of entire populated area*)
+		manager.GetPopulatedArea(r);
+		w:=SIGNED32(r.r-r.l); h:=SIGNED32(r.b-r.t);
+		rl:=SIGNED32(r.l); rt:=SIGNED32(r.t); 
+		rw:=w; rh:=h;
+	END;
+
+	context.out.String("ScreenShot Range : ");
 	NEW(sv, manager, w, h);
 	context.out.Int(rl, 0); context.out.String(",  "); context.out.Int(rt, 0);  context.out.String(", ");
 	context.out.Int(rl + rw, 0); context.out.String(", "); context.out.Int(rt + rh, 0);
@@ -224,7 +241,13 @@ WMScreenShot.SnapShotView test.bmp View#0 ~
 Take a snap shot of the View#0 store it in test.bmp scaled to 200 by 200 pixels
 WMScreenShot.SnapShotView test.bmp View#0 200 200 ~
 
+To an image of same size, store a snapshot of the populated area of the display space
+WMScreenShot.SnapShotRange test.bmp ~ 
+
 To a image of 300 by 300 pixels store a snapshot of range -100 -100 to 200 200 in the display space
 WMScreenShot.SnapShotRange test.bmp 300 300 -100 -100 300 300 ~
+
+Store a snapshot of range -300 -300 with size 1600 1200 in the display space
+WMScreenShot.SnapShotRange test.bmp 1600 1200 -300 -300 1600 1200 ~
 
 WMPicView.Open test.bmp ~
