@@ -144,7 +144,11 @@ VAR
 							xbuttons := newxbuttons;  i := 0;
 							WHILE i < keycount DO
 								km.ch := buffer[i];
-								km.keysym := MapKeysym( ORD( km.ch ) );
+								IF X11.ControlMask IN kp.state THEN
+									km.keysym := ORD( km.ch )
+								ELSE
+									km.keysym := MapKeysym( ORD( km.ch ) )
+								END;
 								km.flags := KeyState( );
 								SendKeyboardMsg( km );
 								INC( i )
