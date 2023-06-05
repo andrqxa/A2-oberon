@@ -1257,30 +1257,35 @@ TYPE
 					Keyword("CONST ");
 				END;
 
-				first := TRUE;
-				IF type.stackAlignment > 1 THEN Value(Global.NameStackAligned,type.stackAlignment,first) END;
-				IF (type.isRealtime) THEN Flag(Global.NameRealtime,first) END;
-				IF (type.noReturn) THEN Flag(Global.NameNoReturn,first) END;
-				IF (x.isAbstract) THEN Flag(Global.NameAbstract,first) END;
-				IF (x.isFinal) THEN Flag(Global.NameFinal,first) END;
-				IF (x.isTest) THEN Flag(Global.NameTest,first) END;
-				IF (x.fixed) & (x.extern = NIL) THEN Value(Global.NameOffset, x.alignment,first)
-				ELSIF (x.alignment >1) THEN Value(Global.NameAligned, x.alignment, first)
-				END;
-				IF type.callingConvention = SyntaxTree.WinAPICallingConvention THEN
-					Flag(Global.NameWinAPI,first)
-				ELSIF type.callingConvention = SyntaxTree.CCallingConvention THEN
-					Flag(Global.NameC,first)
-				ELSIF type.callingConvention = SyntaxTree.PlatformCallingConvention THEN
-					Flag(Global.NamePlatformCC,first)
-				END;
+				IF (currentScope.ownerModule.parameters # NIL) & (type.modifiers # NIL) THEN
+					Modifiers(type.modifiers);
+				ELSE
+					first := TRUE;
+					IF type.stackAlignment > 1 THEN Value(Global.NameStackAligned,type.stackAlignment,first) END;
+					IF (type.isRealtime) THEN Flag(Global.NameRealtime,first) END;
+					IF (type.noReturn) THEN Flag(Global.NameNoReturn,first) END;
+					IF (x.isAbstract) THEN Flag(Global.NameAbstract,first) END;
+					IF (x.isFinal) THEN Flag(Global.NameFinal,first) END;
+					IF (x.isOverride) THEN Flag(Global.NameOverride,first) END;
+					IF (x.isTest) THEN Flag(Global.NameTest,first) END;
+					IF (x.fixed) & (x.extern = NIL) THEN Value(Global.NameOffset, x.alignment,first)
+					ELSIF (x.alignment >1) THEN Value(Global.NameAligned, x.alignment, first)
+					END;
+					IF type.callingConvention = SyntaxTree.WinAPICallingConvention THEN
+						Flag(Global.NameWinAPI,first)
+					ELSIF type.callingConvention = SyntaxTree.CCallingConvention THEN
+						Flag(Global.NameC,first)
+					ELSIF type.callingConvention = SyntaxTree.PlatformCallingConvention THEN
+						Flag(Global.NamePlatformCC,first)
+					END;
 
-				IF x.isInline & (mode = SymbolFile) THEN
-					IF fingerprinter = NIL THEN NEW(fingerprinter) END;
-					fp := fingerprinter.SymbolFP(x);
-					Value(Global.NameFingerprint, fp.public, first)
+					IF x.isInline & (mode = SymbolFile) THEN
+						IF fingerprinter = NIL THEN NEW(fingerprinter) END;
+						fp := fingerprinter.SymbolFP(x);
+						Value(Global.NameFingerprint, fp.public, first)
+					END;
+					FlagEnd(first);
 				END;
-				FlagEnd(first);
 
 				IF x.isInline OR x.isOberonInline THEN w.String(" - ") END;
 				IF x.isConstructor THEN w.String(" & ") END;
@@ -1352,15 +1357,20 @@ TYPE
 					Keyword("CONST ");
 				END;
 
-				first := TRUE;
+				IF (currentScope.ownerModule.parameters # NIL) & (type.modifiers # NIL) THEN
+					Modifiers(type.modifiers);
+				ELSE
+					first := TRUE;
+					IF ~x.isInline & ~x.isOberonInline THEN
+						IF x.isDynamic THEN Flag(Global.NameDynamic, first) END;
+					END;
+					IF (x.isOverride) THEN Flag(Global.NameOverride,first) END;
+					FlagEnd(first);
+				END;
 				IF x.isInline  OR x.isOberonInline THEN
 					ASSERT(~x.isDynamic);
 					w.String("-");
-				ELSE
-					IF x.isDynamic THEN Flag(Global.NameDynamic, first) END;
-					IF ~first THEN w.String("}") END;
 				END;
-
 				IF (type.selfParameter # NIL) & ~(type.selfParameter.name = "@Self") THEN
 					ParameterList(type.selfParameter);
 				END;
